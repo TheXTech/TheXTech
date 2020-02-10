@@ -5,7 +5,11 @@ CONFIG -= qt
 
 LIBS += -lSDL2_mixer_ext -lSDL2
 
+INCLUDEPATH += lib/
+INCLUDEPATH += /usr/include/SDL2
+
 SOURCES += \
+    lib/AppPath/app_path.cpp \
     src/blocks.cpp \
     src/change_res.cpp \
     src/collision.cpp \
@@ -26,6 +30,7 @@ SOURCES += \
     src/sound.cpp
 
 HEADERS += \
+    lib/AppPath/app_path.h \
     src/blocks.h \
     src/change_res.h \
     src/collision.h \
@@ -44,3 +49,32 @@ HEADERS += \
     src/player.h \
     src/sorting.h \
     src/sound.h
+
+macx: HEADERS += lib/AppPath/app_path_macosx.h
+macx: SOURCES += lib/AppPath/app_path_macosx.m
+
+# PGE File Library
+SOURCES += $$files($$PWD/lib/PGE_File_Formats/*.cpp)
+SOURCES += $$files($$PWD/lib/PGE_File_Formats/*.c)
+HEADERS += $$files($$PWD/lib/PGE_File_Formats/*.h)
+
+# DirManager
+SOURCES += $$files($$PWD/lib/DirManager/*.cpp)
+HEADERS += $$files($$PWD/lib/DirManager/*.h)
+
+# fmt
+SOURCES += $$files($$PWD/lib/fmt/*.cpp)
+HEADERS += $$files($$PWD/lib/fmt/*.h)
+HEADERS += $$files($$PWD/lib/fmt_*.h)
+
+# IniProcessor
+SOURCES += $$files($$PWD/lib/IniProcessor/*.cpp)
+HEADERS += $$files($$PWD/lib/IniProcessor/*.h)
+
+# Utils
+SOURCES += $$files($$PWD/lib/Utils/*.cpp)
+HEADERS += $$files($$PWD/lib/Utils/*.h)
+
+# Logger
+SOURCES += $$files($$PWD/lib/Logger/*.cpp)
+HEADERS += $$files($$PWD/lib/Logger/*.h)
