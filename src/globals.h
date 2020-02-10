@@ -47,7 +47,9 @@ public:
 // DUMMY
 struct StdPicture
 {
-    int dummy;
+    int w;
+    int h;
+    SDL_Texture *texture;
 };
 
 //Option Explicit
@@ -1484,7 +1486,7 @@ extern RangeArr<double, 0, maxPlayers> qScreenX;
 //Public qScreenY(1 To maxPlayers) As Double 'vScreen offset adjust
 extern RangeArr<double, 0, maxPlayers> qScreenY;
 //Public qScreen As Boolean 'Weather or not the screen needs adjusting
-extern RangeArr<bool, 0, maxPlayers> qScreen;
+extern bool qScreen;
 
 //Public BlockWidth(0 To maxBlockType) As Integer 'Block type width
 extern RangeArr<int, 0, maxBlockType> BlockWidth;
@@ -1603,6 +1605,7 @@ extern bool ExitMenu;
 //Public LevelSelect As Boolean 'true if game should load the world map
 extern bool LevelSelect;
 //Public WorldPlayer(1) As WorldPlayer
+extern RangeArr<WorldPlayer, 0, 1> worldPlayer;
 //Public LevelBeatCode As Integer ' code for the way the plauer beat the level
 extern int LevelBeatCode;
 //Public curWorldLevel As Integer

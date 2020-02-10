@@ -1,6 +1,8 @@
 #include "globals.h"
 #include "sound.h"
 
+#include <SDL2/SDL_mixer_ext.h>
+
 void InitMixerX()
 {
 
