@@ -8,6 +8,7 @@
 #include <SDL2/SDL.h>
 
 #include "frm_main.h"
+#include "std_picture.h"
 #include "gfx.h"
 
 #include "location.h"
@@ -44,13 +45,7 @@ public:
     }
 };
 
-// DUMMY
-struct StdPicture
-{
-    int w;
-    int h;
-    SDL_Texture *texture;
-};
+#define For(A, From, To) for(int A = From; A <= To; ++A)
 
 //Option Explicit
 //Public Declare Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As Long)
@@ -78,10 +73,13 @@ extern FrmMain frmMain;
 extern GFX gfx;
 
 extern bool GameIsActive;
+extern std::string AppPath;
 
 extern void DoEvents();
 
 extern int ShowCursor(int show);
+
+extern Uint8 getKeyState(SDL_Scancode key);
 
 //'Saved Events
 //Public Const MaxSavedEvents As Integer = 200
@@ -121,7 +119,7 @@ extern int AllCharBlock;
 //Public Const KEY_TOGGLED As Integer = &H1   'For control information
 const int KEY_TOGGLED = 0x01;
 //Public Const KEY_PRESSED As Integer = &H1000    'For control information
-const int KEY_PRESSED = 0x1000;
+const int KEY_PRESSED = 1;
 //Public LocalNick As String  'Online Nickname
 //Public LocalCursor As Integer  'Online Cursor color
 //Public ClientPassword As String  'Password client is connecting with
@@ -144,25 +142,25 @@ extern std::string EoT;
 struct Controls
 {
 //    Up As Boolean
-    bool Up;
+    bool Up = false;
 //    Down As Boolean
-    bool Down;
+    bool Down = false;
 //    Left As Boolean
-    bool Left;
+    bool Left = false;
 //    Right As Boolean
-    bool Right;
+    bool Right = false;
 //    Jump As Boolean
-    bool Jump;
+    bool Jump = false;
 //    AltJump As Boolean
-    bool AltJump;
+    bool AltJump = false;
 //    Run As Boolean
-    bool Run;
+    bool Run = false;
 //    AltRun As Boolean
-    bool AltRun;
+    bool AltRun = false;
 //    Drop As Boolean
-    bool Drop;
+    bool Drop = false;
 //    Start As Boolean
-    bool Start;
+    bool Start = false;
 //End Type
 };
 
@@ -215,15 +213,15 @@ struct Controls
 struct EditorControls
 {
 //    Up As Boolean
-    bool Up;
+    bool Up = false;
 //    Down As Boolean
-    bool Down;
+    bool Down = false;
 //    Left As Boolean
-    bool Left;
+    bool Left = false;
 //    Right As Boolean
-    bool Right;
+    bool Right = false;
 //    Mouse1 As Boolean
-    bool Mouse1;
+    bool Mouse1 = false;
 //End Type
 };
 
@@ -232,25 +230,25 @@ struct EditorControls
 struct ConKeyboard
 {
 //    Up As Integer
-    int Up;
+    int Up = 0;
 //    Down As Integer
-    int Down;
+    int Down = 0;
 //    Left As Integer
-    int Left;
+    int Left = 0;
 //    Right As Integer
-    int Right;
+    int Right = 0;
 //    Jump As Integer
-    int Jump;
+    int Jump = 0;
 //    AltJump As Integer
-    int AltJump;
+    int AltJump = 0;
 //    Run As Integer
-    int Run;
+    int Run = 0;
 //    AltRun As Integer
-    int AltRun;
+    int AltRun = 0;
 //    Drop As Integer
-    int Drop;
+    int Drop = 0;
 //    Start As Integer
-    int Start;
+    int Start = 0;
 //End Type
 };
 
@@ -258,17 +256,17 @@ struct ConKeyboard
 struct ConJoystick
 {
 //    Jump As Integer
-    int Jump;
+    int Jump = 0;
 //    Run As Integer
-    int Run;
+    int Run = 0;
 //    Drop As Integer
-    int Drop;
+    int Drop = 0;
 //    Start As Integer
-    int Start;
+    int Start = 0;
 //    AltJump As Integer
-    int AltJump;
+    int AltJump = 0;
 //    AltRun As Integer
-    int AltRun;
+    int AltRun = 0;
 //End Type
 };
 
@@ -287,39 +285,39 @@ struct NPC
 //    AttLayer As String
     std::string AttLayer;
 //    Quicksand As Integer
-    int Quicksand;
+    int Quicksand = 0;
 //    RespawnDelay As Integeri
-    int RespawnDelay;
+    int RespawnDelay = 0;
 //    Bouce As Boolean
-    bool Bouce;
+    bool Bouce = false;
 //    Pinched1 As Integer  'getting smashed by a block
-    int Pinched1;
+    int Pinched1 = 0;
 //    Pinched2 As Integer
-    int Pinched2;
+    int Pinched2 = 0;
 //    Pinched3 As Integer
-    int Pinched3;
+    int Pinched3 = 0;
 //    Pinched4 As Integer
-    int Pinched4;
+    int Pinched4 = 0;
 //    MovingPinched As Integer 'required to be smashed
-    int MovingPinched;
+    int MovingPinched = 0;
 //    NetTimeout As Integer 'for online
-    int NetTimeout;
+    int NetTimeout = 0;
 //    RealSpeedX As Single 'the real speed of the NPC
-    float RealSpeedX;
+    float RealSpeedX = 0.0f;
 //    Wet As Integer ' greater then 0 of the NPC is in water
-    int Wet;
+    int Wet = 0;
 //    Settings As Integer
-    int Settings;
+    int Settings = 0;
 //    NoLavaSplash As Boolean 'true for no lava splash
-    bool NoLavaSplash;
+    bool NoLavaSplash = false;
 //    Slope As Integer 'the block that the NPC is on a slope with
-    int Slope;
+    int Slope = 0;
 //    Multiplier As Integer 'for upping the points the player recieves
-    int Multiplier;
+    int Multiplier = 0;
 //    TailCD As Integer 'if greater then 0 the player can't hit with it's tail
-    int TailCD;
+    int TailCD = 0;
 //    Shadow As Boolean 'if true turn the NPC black and allow it to pass through walls.  only used for a cheat code
-    bool Shadow;
+    bool Shadow = false;
 //    TriggerActivate As String 'for events - triggers when NPC gets activated
     std::string TriggerActivate;
 //    TriggerDeath As String 'triggers when NPC dies
@@ -331,125 +329,125 @@ struct NPC
 //    Layer As String 'the layer name that the NPC is in
     std::string Layer;
 //    Hidden As Boolean 'if the layer is hidden or not
-    bool Hidden;
+    bool Hidden = false;
 //    Legacy As Boolean 'Legacy Boss
-    bool Legacy;
+    bool Legacy = false;
 //    Chat As Boolean 'for talking to the NPC
-    bool Chat;
+    bool Chat = false;
 //    Inert As Boolean 'the friendly toggle. makes the NPC not do anything
-    bool Inert;
+    bool Inert = false;
 //    Stuck As Boolean 'the 'don't move' toggle. forces the NPC not to move
-    bool Stuck;
+    bool Stuck = false;
 //    DefaultStuck As Boolean
-    bool DefaultStuck;
+    bool DefaultStuck = false;
 //    Text As String 'the text that is displayed when you talk to the NPC
     std::string Text;
 //    oldAddBelt As Single
-    float oldAddBelt;
+    float oldAddBelt = 0.0f;
 //    PinchCount As Integer 'obsolete
-    int PinchCount;
+    int PinchCount = 0;
 //    Pinched As Boolean 'obsolete
-    bool Pinched;
+    bool Pinched = false;
 //    PinchedDirection As Integer 'obsolete
-    int PinchedDirection;
+    int PinchedDirection = 0;
 //    BeltSpeed As Single 'The speed of the object this NPC is standing on
-    float BeltSpeed;
+    float BeltSpeed = 0.0f;
 //    standingOnPlayer As Integer 'If this NPC is standing on a player in the clown car
-    int standingOnPlayer;
+    int standingOnPlayer = 0;
 //    standingOnPlayerY As Integer
-    int standingOnPlayerY;
+    int standingOnPlayerY = 0;
 //    Generator As Boolean 'for spawning new NPCs
-    bool Generator;
+    bool Generator = false;
 //    GeneratorTimeMax As Single
-    float GeneratorTimeMax;
+    float GeneratorTimeMax = 0.0f;
 //    GeneratorTime As Single
-    float GeneratorTime;
+    float GeneratorTime = 0.0f;
 //    GeneratorDirection As Integer
-    int GeneratorDirection;
+    int GeneratorDirection = 0;
 //    GeneratorEffect As Integer
-    int GeneratorEffect;
+    int GeneratorEffect = 0;
 //    GeneratorActive As Boolean
-    bool GeneratorActive;
+    bool GeneratorActive = false;
 //    playerTemp As Boolean
-    bool playerTemp;
+    bool playerTemp = false;
 //    Location As Location 'collsion detection information
     Location location;
 //'the default values are used when De-Activating an NPC when it goes on screen
 //    DefaultLocation As Location
     Location DefaultLocation;
 //    DefaultDirection As Single
-    float DefaultDirection;
+    float DefaultDirection = 0.0f;
 //    DefaultType As Integer
-    int DefaultType;
+    int DefaultType = 0;
 //    DefaultSpecial As Integer
-    int DefaultSpecial;
+    int DefaultSpecial = 0;
 //    DefaultSpecial2 As Integer
-    int DefaultSpecial2;
+    int DefaultSpecial2 = 0;
 //    Type As Integer 'Defines what NPC this is.  1 for goomba, 2 for red goomba, etc.
-    int Type;
+    int Type = 0;
 //    Frame As Integer 'The graphic to be shown
-    int Frame;
+    int Frame = 0;
 //    FrameCount As Single 'The counter for incrementing the frames
-    float FrameCount;
+    float FrameCount = 0.0f;
 //    Direction As Single 'The direction the NPC is walking
-    float Direction;
+    float Direction = 0.0f;
 //'Secial - misc variables used for NPC AI
 //    Special As Double
-    double Special;
+    double Special = 0.0;
 //    Special2 As Double
-    double Special2;
+    double Special2 = 0.0;
 //    Special3 As Double
-    double Special3;
+    double Special3 = 0.0;
 //    Special4 As Double
-    double Special4;
+    double Special4 = 0.0;
 //    Special5 As Double
-    double Special5;
+    double Special5 = 0.0;
 //    Special6 As Double
-    double Special6;
+    double Special6 = 0.0;
 //    TurnAround As Boolean 'if the NPC needs to turn around
-    bool TurnAround;
+    bool TurnAround = false;
 //    Killed As Integer 'Flags the NPC to die a specific way.
-    int Killed;
+    int Killed = 0;
 //    Active As Boolean 'If on screen
-    bool Active;
+    bool Active = false;
 //    Reset(1 To 2) As Boolean 'If it can display the NPC
     RangeArr<bool, 1, 2> Reset;
 //    TimeLeft As Integer 'Time left before reset when not on screen
-    int TimeLeft;
+    int TimeLeft = 0;
 //    HoldingPlayer As Integer 'Who is holding it
-    int HoldingPlayer;
+    int HoldingPlayer = 0;
 //    CantHurt As Integer 'Won't hurt the player
-    int CantHurt;
+    int CantHurt = 0;
 //    CantHurtPlayer As Integer
-    int CantHurtPlayer;
+    int CantHurtPlayer = 0;
 //    BattleOwner As Integer 'Owner of the projectile
-    int BattleOwner;
+    int BattleOwner = 0;
 //    WallDeath As Integer
-    int WallDeath;
+    int WallDeath = 0;
 //    Projectile As Boolean 'If the NPC is a projectile
-    int Projectile;
+    int Projectile = 0;
 //    Effect As Integer 'For starting / stopping effects
-    int Effect;
+    int Effect = 0;
 //    Effect2 As Double
-    int Effect2;
+    int Effect2 = 0;
 //    Effect3 As Integer
-    int Effect3;
+    int Effect3 = 0;
 //    Section As Integer 'what section of the level the NPC is in
-    int Section;
+    int Section = 0;
 //    Damage As Single
-    float Damage;
+    float Damage = 0.0f;
 //    JustActivated As Integer 'The player that activated the NPC
-    int JustActivated;
+    int JustActivated = 0;
 //    Block As Integer 'Used when a P-Switch turns a block into a coint
-    int Block;
+    int Block = 0;
 //    tempBlock As Integer
-    int tempBlock;
+    int tempBlock = 0;
 //    onWall As Boolean
-    bool onWall;
+    bool onWall = false;
 //    TurnBackWipe As Boolean
-    bool TurnBackWipe;
+    bool TurnBackWipe = false;
 //    Immune As Integer 'time that the NPC is immune
-    int Immune;
+    int Immune = 0;
 //End Type
 };
 
@@ -457,248 +455,248 @@ struct NPC
 struct Player
 {
 //    DoubleJump As Boolean
-    bool DoubleJump;
+    bool DoubleJump = false;
 //    FlySparks As Boolean
-    bool FlySparks;
+    bool FlySparks = false;
 //    Driving As Boolean
-    bool Driving;
+    bool Driving = false;
 //    Quicksand As Integer
-    int Quicksand;
+    int Quicksand = 0;
 //    Bombs As Integer
-    int Bombs;
+    int Bombs = 0;
 //    Slippy As Boolean
-    bool Slippy;
+    bool Slippy = false;
 //    Fairy As Boolean
-    bool Fairy;
+    bool Fairy = false;
 //    FairyCD As Integer
-    int FairyCD;
+    int FairyCD = 0;
 //    FairyTime As Integer
-    int FairyTime;
+    int FairyTime = 0;
 //    HasKey As Boolean
-    bool HasKey;
+    bool HasKey = false;
 //    SwordPoke As Integer
-    int SwordPoke;
+    int SwordPoke = 0;
 //    Hearts As Integer
-    int Hearts;
+    int Hearts = 0;
 //    CanFloat As Boolean
-    bool CanFloat;
+    bool CanFloat = false;
 //    FloatRelease As Boolean
-    bool FloatRelease;
+    bool FloatRelease = false;
 //    FloatTime As Integer
-    int FloatTime;
+    int FloatTime = 0;
 //    FloatSpeed As Single
-    float FloatSpeed;
+    float FloatSpeed = 0.0f;
 //    FloatDir As Integer
-    int FloatDir;
+    int FloatDir = 0;
 //    GrabTime As Integer 'how long the player has been trying to grab an npc from above
-    int GrabTime;
+    int GrabTime = 0;
 //    GrabSpeed As Single
-    float GrabSpeed;
+    float GrabSpeed = 0.0f;
 //    VineNPC As Double 'the NPC that the player is climbing
-    double VineNPC;
+    double VineNPC = 0.0;
 //    Wet As Integer 'weather or not the player is under water
-    int Wet;
+    int Wet = 0;
 //    WetFrame As Boolean 'true if the play should be swimming
-    bool WetFrame;
+    bool WetFrame = false;
 //    SwimCount As Integer 'cool down between swim strokes
-    int SwimCount;
+    int SwimCount = 0;
 //    NoGravity As Integer
-    int NoGravity;
+    int NoGravity = 0;
 //    Slide As Boolean 'true if the player is sliding
-    bool Slide;
+    bool Slide = false;
 //    SlideKill As Boolean 'true if the player is sliding fast enough to kill an NPC
-    bool SlideKill;
+    bool SlideKill = false;
 //    Vine As Integer 'greater then 0 if the player is climbing
-    int Vine;
+    int Vine = 0;
 //    NoShellKick As Integer 'dont kick a shell
-    int NoShellKick;
+    int NoShellKick = 0;
 //    ShellSurf As Boolean 'true if surfing a shell
-    bool ShellSurf;
+    bool ShellSurf = false;
 //    StateNPC As Integer
-    int StateNPC;
+    int StateNPC = 0;
 //    Slope As Integer 'the block that the player is standing on when on a slope
-    int Slope;
+    int Slope = 0;
 //    Stoned As Boolean 'true of a statue form (tanooki suit)
-    bool Stoned;
+    bool Stoned = false;
 //    StonedCD As Integer 'delay before going back in to stone form
-    int StonedCD;
+    int StonedCD = 0;
 //    StonedTime As Integer 'how long the player can remain as a statue
-    int StonedTime;
+    int StonedTime = 0;
 //    SpinJump As Boolean 'true if spin jumping
-    bool SpinJump;
+    bool SpinJump = false;
 //    SpinFrame As Integer 'frame for spinning
-    int SpinFrame;
+    int SpinFrame = 0;
 //    SpinFireDir As Integer 'for shooting fireballs while spin jumping
-    int SpinFireDir;
+    int SpinFireDir = 0;
 //    Multiplier As Integer 'for score increase for multiple hops
-    int Multiplier;
+    int Multiplier = 0;
 //    SlideCounter As Integer 'for creating the dust effect when sliding
-    int SlideCounter;
+    int SlideCounter = 0;
 //    ShowWarp As Integer
-    int ShowWarp;
+    int ShowWarp = 0;
 //    GroundPound As Boolean 'for purple yoshi pound
-    bool GroundPound;
+    bool GroundPound = false;
 //    GroundPound2 As Boolean 'for purple yoshi pound
-    bool GroundPound2;
+    bool GroundPound2 = false;
 //    CanPound As Boolean 'for purple yoshi pound
-    bool CanPound;
+    bool CanPound = false;
 //    ForceHold As Integer  'force the player to hold an item for a specific amount of time
-    int ForceHold;
+    int ForceHold = 0;
 //'yoshi powers
 //    YoshiYellow As Boolean
-    bool YoshiYellow;
+    bool YoshiYellow = false;
 //    YoshiBlue As Boolean
-    bool YoshiBlue;
+    bool YoshiBlue = false;
 //    YoshiRed As Boolean
-    bool YoshiRed;
+    bool YoshiRed = false;
 //    YoshiWingsFrame As Integer
-    int YoshiWingsFrame;
+    int YoshiWingsFrame = 0;
 //    YoshiWingsFrameCount As Integer
-    int YoshiWingsFrameCount;
+    int YoshiWingsFrameCount = 0;
 //'yoshi graphic display
 //    YoshiTX As Integer
-    int YoshiTX;
+    int YoshiTX = 0;
 //    YoshiTY As Integer
-    int YoshiTY;
+    int YoshiTY = 0;
 //    YoshiTFrame As Integer
-    int YoshiTFrame;
+    int YoshiTFrame = 0;
 //    YoshiTFrameCount As Integer
-    int YoshiTFrameCount;
+    int YoshiTFrameCount = 0;
 //    YoshiBX As Integer
-    int YoshiBX;
+    int YoshiBX = 0;
 //    YoshiBY As Integer
-    int YoshiBY;
+    int YoshiBY = 0;
 //    YoshiBFrame As Integer
-    int YoshiBFrame;
+    int YoshiBFrame = 0;
 //    YoshiBFrameCount As Integer
-    int YoshiBFrameCount;
+    int YoshiBFrameCount = 0;
 //    YoshiTongue As Location
     Location YoshiTongue;
 //    YoshiTongueX As Single
-    float YoshiTongueX;
+    float YoshiTongueX = 0.0f;
 //    YoshiTongueLength As Integer 'length of yoshi's tongue
-    int YoshiTongueLength;
+    int YoshiTongueLength = 0;
 //    YoshiTonugeBool As Boolean
-    bool YoshiTonugeBool;
+    bool YoshiTonugeBool = false;
 //    YoshiNPC As Integer 'the NPC that is in yoshi's mouth
-    int YoshiNPC;
+    int YoshiNPC = 0;
 //    YoshiPlayer As Integer 'the player that is in yoshi's mouth
-    int YoshiPlayer;
+    int YoshiPlayer = 0;
 //    Dismount As Integer 'delay before you can remount
-    int Dismount;
+    int Dismount = 0;
 //    NoPlayerCol As Integer
-    int NoPlayerCol;
+    int NoPlayerCol = 0;
 //    Location As Location 'collision detection info
     Location location;
 //    Character As Integer 'luigi or mario
-    int Character;
+    int Character = 0;
 //    Controls As Controls 'players controls
     Controls controls;
 //    Direction As Integer 'the way the player is facing
-    int Direction;
+    int Direction = 0;
 //    Mount As Integer '1 for boot, 2 for clown car, 3 for yoshi
-    int Mount;
+    int Mount = 0;
 //    MountType As Integer 'for different types of mounts. blue yoshi, red yoshi, etc
-    int MountType;
+    int MountType = 0;
 //    MountSpecial As Integer
-    int MountSpecial;
+    int MountSpecial = 0;
 //    MountOffsetY As Integer
-    int MountOffsetY;
+    int MountOffsetY = 0;
 //    MountFrame As Integer 'GFX frame for the player's mount
-    int MountFrame;
+    int MountFrame = 0;
 //    State As Integer '1 for small mario, 2 for super, 3 for fire, 4 for racoon, 5 for tanooki, 6 for hammer
-    int State;
+    int State = 0;
 //    Frame As Integer
-    int Frame;
+    int Frame = 0;
 //    FrameCount As Single
-    float FrameCount;
+    float FrameCount = 0.0f;
 //    Jump As Integer 'how long the player can jump for
-    int Jump;
+    int Jump = 0;
 //    CanJump As Boolean 'true if the player can jump
-    bool CanJump;
+    bool CanJump = false;
 //    CanAltJump As Boolean 'true if the player can alt jump
-    bool CanAltJump;
+    bool CanAltJump = false;
 //    Effect As Integer 'for various effects like shrinking/growing/warping
-    int Effect;
+    int Effect = 0;
 //    Effect2 As Double 'counter for the effects
-    double Effect2;
+    double Effect2 = 0.0;
 //    DuckRelease As Boolean
-    bool DuckRelease;
+    bool DuckRelease = false;
 //    Duck As Boolean 'true if ducking
-    bool Duck;
+    bool Duck = false;
 //    DropRelease As Boolean
-    bool DropRelease;
+    bool DropRelease = false;
 //    StandUp As Boolean 'aid with collision detection after ducking
-    bool StandUp;
+    bool StandUp = false;
 //    StandUp2 As Boolean
-    bool StandUp2;
+    bool StandUp2 = false;
 //    Bumped As Boolean 'true if hit by another player
-    bool Bumped;
+    bool Bumped = false;
 //    Bumped2 As Single
-    float Bumped2;
+    float Bumped2 = 0.0f;
 //    Dead As Boolean 'true if dead
-    bool Dead;
+    bool Dead = false;
 //    TimeToLive As Integer 'for returning to the other play after dying
-    int TimeToLive;
+    int TimeToLive = 0;
 //    Immune As Integer 'greater then 0 if immune, this is a counter
-    int Immune;
+    int Immune = 0;
 //    Immune2 As Boolean 'makes the player blink
-    bool Immune2;
+    bool Immune2 = false;
 //    ForceHitSpot3 As Boolean 'force hitspot 3 for collision detection
-    bool ForceHitSpot3;
+    bool ForceHitSpot3 = false;
 //'for getting smashed by a block
 //    Pinched1 As Integer
-    int Pinched1;
+    int Pinched1 = 0;
 //    Pinched2 As Integer
-    int Pinched2;
+    int Pinched2 = 0;
 //    Pinched3 As Integer
-    int Pinched3;
+    int Pinched3 = 0;
 //    Pinched4 As Integer
-    int Pinched4;
+    int Pinched4 = 0;
 //    NPCPinched As Integer 'must be > 0 for the player to get crushed
-    int NPCPinched;
+    int NPCPinched = 0;
 //    m2Speed As Single
-    float m2Speed;
+    float m2Speed = 0.0f;
 //    HoldingNPC As Integer 'What NPC is being held
-    int HoldingNPC;
+    int HoldingNPC = 0;
 //    CanGrabNPCs As Boolean 'If the player can grab NPCs
-    bool CanGrabNPCs;
+    bool CanGrabNPCs = false;
 //    HeldBonus As Integer 'the NPC that is in the player's container
-    int HeldBonus;
+    int HeldBonus = 0;
 //    Section As Integer 'What section of the level the player is in
-    int Section;
+    int Section = 0;
 //    WarpCD As Integer 'delay before allowing the player to warp again
-    int WarpCD;
+    int WarpCD = 0;
 //    Warp As Integer 'the warp the player is using
-    int Warp;
+    int Warp = 0;
 //    FireBallCD As Integer 'How long the player has to wait before he can shoot again
-    int FireBallCD;
+    int FireBallCD = 0;
 //    FireBallCD2 As Integer 'How long the player has to wait before he can shoot again
-    int FireBallCD2;
+    int FireBallCD2 = 0;
 //    TailCount As Integer 'Used for the tail swipe
-    int TailCount;
+    int TailCount = 0;
 //    RunCount As Single 'To find how long the player has ran for
-    float RunCount;
+    float RunCount = 0.0f;
 //    CanFly As Boolean 'If the player can fly
-    bool CanFly;
+    bool CanFly = false;
 //    CanFly2 As Boolean
-    bool CanFly2;
+    bool CanFly2 = false;
 //    FlyCount As Integer 'length of time the player can fly
-    int FlyCount;
+    int FlyCount = 0;
 //    RunRelease As Boolean 'The player let go of run and pressed again
-    bool RunRelease;
+    bool RunRelease = false;
 //    JumpRelease As Boolean 'The player let go of run and pressed again
-    bool JumpRelease;
+    bool JumpRelease = false;
 //    StandingOnNPC As Integer 'The NPC the player is standing on
-    int StandingOnNPC;
+    int StandingOnNPC = 0;
 //    StandingOnTempNPC As Integer 'The NPC the player is standing on
-    int StandingOnTempNPC;
+    int StandingOnTempNPC = 0;
 //    UnStart As Boolean 'Player let go of the start button
-    bool UnStart;
+    bool UnStart = false;
 //    mountBump As Single 'Player hit something while in a mount
-    float mountBump;
+    float mountBump = 0.0f;
 //    SpeedFixY As Single
-    float SpeedFixY;
+    float SpeedFixY = 0.0f;
 //End Type
 };
 
@@ -708,9 +706,9 @@ struct Background
 //    Layer As String
     std::string Layer;
 //    Hidden As Boolean
-    bool Hidden;
+    bool Hidden = false;
 //    Type As Integer
-    int Type;
+    int Type = 0;
 //    Location As Location
     Location location;
 //End Type
@@ -722,11 +720,11 @@ struct Water
 //    Layer As String
     std::string Layer;
 //    Hidden As Boolean
-    bool Hidden;
+    bool Hidden = false;
 //    Buoy As Single 'not used
-    float Buoy;
+    float Buoy = 0.0f;
 //    Quicksand As Boolean
-    bool Quicksand;
+    bool Quicksand = false;
 //    Location As Location
     Location location;
 //End Type
@@ -736,15 +734,15 @@ struct Water
 struct Block
 {
 //    Slippy As Boolean
-    bool Slippy;
+    bool Slippy = false;
 //    RespawnDelay As Integer
-    int RespawnDelay;
+    int RespawnDelay = 0;
 //    RapidHit As Integer
-    int RapidHit;
+    int RapidHit = 0;
 //    DefaultType As Integer
-    int DefaultType;
+    int DefaultType = 0;
 //    DefaultSpecial As Integer
-    int DefaultSpecial;
+    int DefaultSpecial = 0;
 //'for event triggers
 //    TriggerHit As String
     std::string TriggerHit;
@@ -755,36 +753,36 @@ struct Block
 //    Layer As String
     std::string Layer;
 //    Hidden As Boolean
-    bool Hidden;
+    bool Hidden = false;
 //    Type As Integer 'the block's type
-    int Type;
+    int Type = 0;
 //    Location As Location
     Location location;
 //    Special As Integer 'what is in the block?
-    int Special;
+    int Special = 0;
 //'for the shake effect after hitting ablock
 //    ShakeY As Integer
-    int ShakeY;
+    int ShakeY = 0;
 //    ShakeY2 As Integer
-    int ShakeY2;
+    int ShakeY2 = 0;
 //    ShakeY3 As Integer
-    int ShakeY3;
+    int ShakeY3 = 0;
 //    Kill As Boolean 'if true the game will destroy the block
-    bool Kill;
+    bool Kill = false;
 //    Invis As Boolean 'for invisible blocks
-    bool Invis;
+    bool Invis = false;
 //    NPC As Integer 'when a coin is turned into a block after the p switch is hit
-    int NPC;
+    int NPC = 0;
 //    IsPlayer As Integer 'for the clown car
-    int IsPlayer;
+    int IsPlayer = 0;
 //    IsNPC As Integer 'the type of NPC the block is
-    int IsNPC;
+    int IsNPC = 0;
 //    standingOnPlayerY As Integer 'when standing on a player in the clown car
-    int standingOnPlayerY;
+    int standingOnPlayerY = 0;
 //    noProjClipping As Boolean
-    bool noProjClipping;
+    bool noProjClipping = false;
 //    IsReally As Integer 'the NPC that is this block
-    int IsReally;
+    int IsReally = 0;
 //End Type
 };
 
@@ -792,19 +790,19 @@ struct Block
 struct Effect
 {
 //    Type As Integer
-    int Type;
+    int Type = 0;
 //    Location As Location
     Location location;
 //    Frame As Integer
-    int Frame;
+    int Frame = 0;
 //    FrameCount As Single
-    float FrameCount;
+    float FrameCount = 0.0f;
 //    Life As Integer 'timer before the effect disappears
-    int Life;
+    int Life = 0;
 //    NewNpc As Integer 'when an effect should create and NPC, such as Yoshi
-    int NewNpc;
+    int NewNpc = 0;
 //    Shadow As Boolean 'for a black effect set to true
-    bool Shadow;
+    bool Shadow = false;
 //End Type
 };
 
@@ -812,21 +810,21 @@ struct Effect
 struct vScreen
 {
 //    Left As Double
-    double Left;
+    double Left = 0.0;
 //    Top As Double
-    double Top;
+    double Top = 0.0;
 //    Width As Double
-    double Width;
+    double Width = 0.0;
 //    Height As Double
-    double Height;
+    double Height = 0.0;
 //    Visible As Boolean
-    bool Visible;
+    bool Visible = false;
 //    tempX As Double
-    double tempX;
+    double tempX = 0.0;
 //    TempY As Double
-    double TempY;
+    double TempY = 0.0;
 //    TempDelay As Integer
-    int TempDelay;
+    int TempDelay = 0;
 //End Type
 };
 
@@ -836,29 +834,29 @@ struct WorldLevel
 //    Location As Location
     Location location;
 //    Type As Integer
-    int Type;
+    int Type = 0;
 //    FileName As String 'level's file
     std::string FileName;
 //    LevelExit(1 To 4) As Integer ' For the direction each type of exit opens the path
     RangeArr<int, 1, 4> LevelExit;
 //    Active As Boolean
-    bool Active;
+    bool Active = false;
 //    LevelName As String 'The name of the level
     std::string LevelName;
 //    StartWarp As Integer 'If the level should start with a player exiting a warp
-    int StartWarp;
+    int StartWarp = 0;
 //    WarpX As Double 'for warping to another location on the world map
-    double WarpX;
+    double WarpX = 0.0;
 //    WarpY As Double
-    double WarpY;
+    double WarpY = 0.0;
 //    Path As Boolean 'for drawing a small path background
-    bool Path;
+    bool Path = false;
 //    Path2 As Boolean 'big path background
-    bool Path2;
+    bool Path2 = false;
 //    Start As Boolean 'true if the game starts here
-    bool Start;
+    bool Start = false;
 //    Visible As Boolean 'true if it should be shown on the map
-    bool Visible;
+    bool Visible = false;
 //End Type
 };
 
@@ -866,46 +864,46 @@ struct WorldLevel
 struct Warp
 {
 //    Locked As Boolean 'requires a key NPC
-    bool Locked;
+    bool Locked = false;
 //    WarpNPC As Boolean 'allows NPC through the warp
-    bool WarpNPC;
+    bool WarpNPC = false;
 //    NoYoshi As Boolean 'don't allow yoshi
-    bool NoYoshi;
+    bool NoYoshi = false;
 //    Layer As String 'the name of the layer
 //    Hidden As Boolean 'if the layer is hidden
-    bool Hidden;
+    bool Hidden = false;
 //    PlacedEnt As Boolean 'for the editor, flags the entranced as placed
-    bool PlacedEnt;
+    bool PlacedEnt = false;
 //    PlacedExit As Boolean
-    bool PlacedExit;
+    bool PlacedExit = false;
 //    Stars As Integer 'number of stars required to enter
-    int Stars;
+    int Stars = 0;
 //    Entrance As Location 'location of warp entrance
     Location Entrance;
 //    Exit As Location 'location of warp exit
     Location Exit;
 //    Effect As Integer 'style of warp. door/
-    int Effect;
+    int Effect = 0;
 //    level As String 'filename of the level it should warp to
     std::string level;
 //    LevelWarp As Integer
-    int LevelWarp;
+    int LevelWarp = 0;
 //    LevelEnt As Boolean 'this warp can't be used if set to true (this is for level entrances)
-    bool LevelEnt;
+    bool LevelEnt = false;
 //    Direction As Integer 'direction of the entrance for pipe style warps
-    int Direction;
+    int Direction = 0;
 //    Direction2 As Integer 'direction of the exit
-    int Direction2;
+    int Direction2 = 0;
 //    MapWarp As Boolean
-    bool MapWarp;
+    bool MapWarp = false;
 //    MapX As Integer
-    int MapX;
+    int MapX = 0;
 //    MapY As Integer
-    int MapY;
+    int MapY = 0;
 //    curStars As Integer
-    int curStars;
+    int curStars = 0;
 //    maxStars As Integer
-    int maxStars;
+    int maxStars = 0;
 //End Type
 };
 
@@ -915,7 +913,7 @@ struct Tile
 //    Location As Location
     Location location;
 //    Type As Integer
-    int Type;
+    int Type = 0;
 //End Type
 };
 
@@ -925,9 +923,9 @@ struct Scene
 //    Location As Location
     Location location;
 //    Type As Integer
-    int Type;
+    int Type = 0;
 //    Active As Boolean 'if false this won't be shown. used for paths that become available on a scene
-    bool Active;
+    bool Active = false;
 //End Type
 };
 
@@ -937,9 +935,9 @@ struct WorldPath
 //    Location As Location
     Location location;
 //    Active As Boolean
-    bool Active;
+    bool Active = false;
 //    Type As Integer
-    int Type;
+    int Type = 0;
 //End Type
 };
 
@@ -949,7 +947,7 @@ struct WorldMusic
 //    Location As Location
     Location location;
 //    Type As Integer
-    int Type;
+    int Type = 0;
 //End Type
 };
 
@@ -957,19 +955,19 @@ struct WorldMusic
 struct EditorCursor
 {
 //    X As Single
-    float X;
+    float X = 0.0f;
 //    Y As Single
-    float Y;
+    float Y = 0.0f;
 //    SelectedMode As Integer 'cursor mode. eraser/npc/block/background
-    int SelectedMode;
+    int SelectedMode = 0;
 //    Selected As Integer
-    int Selected;
+    int Selected = 0;
 //    Location As Location
     Location location;
 //    Layer As String 'current layer
     std::string Layer;
 //    Mode As Integer
-    int Mode;
+    int Mode = 0;
 //    Block As Block
     Block block;
 //    Water As Water
@@ -999,17 +997,17 @@ struct WorldPlayer
 //    Location As Location
     Location location;
 //    Type As Integer
-    int Type;
+    int Type = 0;
 //    Frame As Integer
-    int Frame;
+    int Frame = 0;
 //    Frame2 As Integer
-    int Frame2;
+    int Frame2 = 0;
 //    Move As Integer
-    int Move;
+    int Move = 0;
 //    Move2 As Integer
-    int Move2;
+    int Move2 = 0;
 //    Move3 As Boolean
-    int Move3;
+    int Move3 = 0;
 //    LevelName As String
     std::string LevelName;
 //End Type
@@ -1019,15 +1017,15 @@ struct WorldPlayer
 struct Layer
 {
 //    EffectStop As Boolean
-    bool EffectStop;
+    bool EffectStop = false;
 //    Name As String
-    bool Name;
+    bool Name = false;
 //    Hidden As Boolean
-    bool Hidden;
+    bool Hidden = false;
 //    SpeedX As Single
-    float SpeedX;
+    float SpeedX = 0.0f;
 //    SpeedY As Single
-    float SpeedY;
+    float SpeedY = 0.0f;
 //End Type
 };
 
@@ -1178,7 +1176,7 @@ struct Star
 //    level As String
     std::string level;
 //    Section As Integer
-    int Section;
+    int Section = 0;
 //End Type
 };
 
@@ -1669,25 +1667,25 @@ extern int maxShow;
 struct Physics
 {
 //    PlayerJumpHeight As Integer
-    int PlayerJumpHeight;
+    int PlayerJumpHeight = 0;
 //    PlayerBlockJumpHeight As Integer
-    int PlayerBlockJumpHeight;
+    int PlayerBlockJumpHeight = 0;
 //    PlayerHeadJumpHeight As Integer
-    int PlayerHeadJumpHeight;
+    int PlayerHeadJumpHeight = 0;
 //    PlayerNPCJumpHeight As Integer
-    int PlayerNPCJumpHeight;
+    int PlayerNPCJumpHeight = 0;
 //    PlayerSpringJumpHeight As Integer
-    int PlayerSpringJumpHeight;
+    int PlayerSpringJumpHeight = 0;
 //    PlayerJumpVelocity As Single
-    float PlayerJumpVelocity;
+    float PlayerJumpVelocity = 0.0f;
 //    PlayerRunSpeed As Single
-    float PlayerRunSpeed;
+    float PlayerRunSpeed = 0.0f;
 //    PlayerWalkSpeed As Single
-    float PlayerWalkSpeed;
+    float PlayerWalkSpeed = 0.0f;
 //    PlayerTerminalVelocity As Integer
-    int PlayerTerminalVelocity;
+    int PlayerTerminalVelocity = 0;
 //    PlayerGravity As Single
-    float PlayerGravity;
+    float PlayerGravity = 0.0f;
 //    PlayerHeight(1 To numCharacters, 1 To numStates) As Integer
     RangeArr<RangeArr<int, 1, numStates>, 1, numCharacters> PlayerHeight;
 //    PlayerDuckHeight(1 To numCharacters, 1 To numStates) As Integer
@@ -1699,25 +1697,25 @@ struct Physics
 //    PlayerGrabSpotY(1 To numCharacters, 1 To numStates) As Integer
     RangeArr<RangeArr<int, 1, numStates>, 1, numCharacters> PlayerGrabSpotY;
 //    NPCTimeOffScreen As Integer
-    int NPCTimeOffScreen;
+    int NPCTimeOffScreen = 0;
 //    NPCCanHurtWait As Integer
-    int NPCCanHurtWait;
+    int NPCCanHurtWait = 0;
 //    NPCShellSpeed As Single
-    float NPCShellSpeed;
+    float NPCShellSpeed = 0.0f;
 //    NPCShellSpeedY As Single
-    float NPCShellSpeedY;
+    float NPCShellSpeedY = 0.0f;
 //    NPCWalkingSpeed As Single
-    float NPCWalkingSpeed;
+    float NPCWalkingSpeed = 0.0f;
 //    NPCWalkingOnSpeed As Single
-    float NPCWalkingOnSpeed;
+    float NPCWalkingOnSpeed = 0.0f;
 //    NPCMushroomSpeed As Single
-    float NPCMushroomSpeed;
+    float NPCMushroomSpeed = 0.0f;
 //    NPCGravity As Single
-    float NPCGravity;
+    float NPCGravity = 0.0f;
 //    NPCGravityReal As Single
-    float NPCGravityReal;
+    float NPCGravityReal = 0.0f;
 //    NPCPSwitch As Integer
-    int NPCPSwitch;
+    int NPCPSwitch = 0;
 //End Type
 };
 
@@ -1729,9 +1727,9 @@ struct Events
 //    RemoveSavedEvent As String
     std::string RemoveSavedEvent;
 //    LayerSmoke As Boolean
-    bool LayerSmoke;
+    bool LayerSmoke = false;
 //    Sound As Integer
-    int Sound;
+    int Sound = 0;
 //    Name As String
     std::string Name;
 //    Text As String
@@ -1749,27 +1747,27 @@ struct Events
 //    level(0 To maxSections) As Location
     RangeArr<Location, 0, maxSections> level;
 //    EndGame As Integer
-    int EndGame;
+    int EndGame = 0;
 //    TriggerEvent As String
     std::string TriggerEvent;
 //    TriggerDelay As Double
-    double TriggerDelay;
+    double TriggerDelay = 0.0;
 //    Controls As Controls
     Controls controls;
 //    MoveLayer As String
     std::string MoveLayer;
 //    SpeedX As Single
-    float SpeedX;
+    float SpeedX = 0.0f;
 //    SpeedY As Single
-    float SpeedY;
+    float SpeedY = 0.0f;
 //    AutoX As Single
-    float AutoX;
+    float AutoX = 0.0f;
 //    AutoY As Single
-    float AutoY;
+    float AutoY = 0.0f;
 //    AutoSection As Integer
-    int AutoSection;
+    int AutoSection = 0;
 //    AutoStart As Boolean
-    bool AutoStart;
+    bool AutoStart = false;
 //End Type
 };
 

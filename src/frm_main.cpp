@@ -3,6 +3,9 @@
 #include "graphics.h"
 #include <SDL2/SDL_mixer_ext.h>
 #include <Logger/logger.h>
+#include <Utils/files.h>
+#include <Graphics/graphics_funcs.h>
+#include <FreeImageLite.h>
 
 #include "frm_main.h"
 
@@ -16,6 +19,13 @@ FrmMain::FrmMain()
 {
     ScaleWidth = ScreenW;
     ScaleHeight = ScreenH;
+}
+
+Uint8 FrmMain::getKeyState(SDL_Scancode key)
+{
+    if(m_keyboardState)
+        return m_keyboardState[key];
+    return 0;
 }
 
 bool FrmMain::initSDL()
@@ -82,6 +92,13 @@ bool FrmMain::initSDL()
         return false;
     }
 
+    if(isSdlError())
+    {
+        pLogCritical("Unable to create window!");
+        SDL_ClearError();
+        return false;
+    }
+
 #ifdef __EMSCRIPTEN__ //Set canvas be 1/2 size for a faster rendering
     SDL_SetWindowMinimumSize(window, ScaleWidth / 2, ScaleHeight / 2);
 #else
@@ -89,6 +106,52 @@ bool FrmMain::initSDL()
 #endif //__EMSCRIPTEN__
 
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
+
+
+#ifdef _WIN32
+    FIBITMAP *img[2];
+    img[0] = GraphicsHelps::loadImage(AppPath + "/graphics/common/icon/cat_16.png");
+    img[1] = GraphicsHelps::loadImage(AppPath + "/graphics/common/icon/cat_32.png");
+
+    if(!GraphicsHelps::setWindowIcon(window, img[0], 16))
+    {
+        pLogWarning("Unable to setup window icon!");
+        SDL_ClearError();
+    }
+
+    if(!GraphicsHelps::setWindowIcon(window, img[1], 32))
+    {
+        pLogWarning("Unable to setup window icon!");
+        SDL_ClearError();
+    }
+
+    GraphicsHelps::closeImage(img[0]);
+    GraphicsHelps::closeImage(img[1]);
+#else//IF _WIN32
+
+    FIBITMAP *img;
+#   ifdef __APPLE__
+    img = GraphicsHelps::loadImage(AppPath + "/graphics/common/icon/cat_256.png");
+#   else
+    img = GraphicsHelps::loadImage(AppPath + "/graphics/common/icon/cat_32.png");
+#   endif //__APPLE__
+
+    if(img)
+    {
+        SDL_Surface *sIcon = GraphicsHelps::fi2sdl(img);
+        SDL_SetWindowIcon(window, sIcon);
+        GraphicsHelps::closeImage(img);
+        SDL_FreeSurface(sIcon);
+
+        if(isSdlError())
+        {
+            pLogWarning("Unable to setup window icon!");
+            SDL_ClearError();
+        }
+    }
+#endif//IF _WIN32 #else
+
+    pLogDebug("Init renderer settings...");
 
     m_gRenderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     if(!m_gRenderer)
@@ -99,6 +162,8 @@ bool FrmMain::initSDL()
     }
 
     SDL_SetRenderDrawBlendMode(m_gRenderer, SDL_BLENDMODE_BLEND);
+
+    m_keyboardState = SDL_GetKeyboardState(nullptr);
 
     return res;
 }
@@ -296,4 +361,208 @@ int FrmMain::setFullScreen(bool fs)
     }
 
     return 0;
+}
+
+bool FrmMain::isSdlError()
+{
+    const char *error = SDL_GetError();
+    return (*error != '\0');
+}
+
+StdPicture FrmMain::LoadPicture(std::string path, std::string maskPath, std::string maskFallbackPath)
+{
+    StdPicture target;
+
+    //SDL_Surface * sourceImage;
+    FIBITMAP *sourceImage;
+
+    if(path.empty())
+        return target;
+
+    // Load the OpenGL texture
+    //sourceImage = GraphicsHelps::loadQImage(path); // Gives us the information to make the texture
+    sourceImage = GraphicsHelps::loadImage(path);
+
+    //Don't load mask if PNG image is used
+    if(Files::hasSuffix(path, ".png"))
+    {
+        maskPath.clear();
+        maskFallbackPath.clear();
+    }
+
+    if(!sourceImage)
+    {
+        pLogWarning("Error loading of image file:\n"
+                    "%s\n"
+                    "Reason: %s.",
+                    path.c_str(),
+                    (Files::fileExists(path) ? "wrong image format" : "file not exist"));
+        // target = g_renderer->getDummyTexture();
+        return target;
+    }
+
+#ifdef DEBUG_BUILD
+    ElapsedTimer totalTime;
+    ElapsedTimer maskMergingTime;
+    ElapsedTimer bindingTime;
+    ElapsedTimer unloadTime;
+    totalTime.start();
+    int64_t maskElapsed = 0;
+    int64_t bindElapsed = 0;
+    int64_t unloadElapsed = 0;
+#endif
+
+    //Apply Alpha mask
+    if(!maskPath.empty() && Files::fileExists(maskPath))
+    {
+        #ifdef DEBUG_BUILD
+        maskMergingTime.start();
+        #endif
+        GraphicsHelps::mergeWithMask(sourceImage, maskPath);
+        #ifdef DEBUG_BUILD
+        maskElapsed = maskMergingTime.nanoelapsed();
+        #endif
+    }
+    else if(!maskFallbackPath.empty())
+    {
+        #ifdef DEBUG_BUILD
+        maskMergingTime.start();
+        #endif
+        GraphicsHelps::mergeWithMask(sourceImage, "", maskFallbackPath);
+        #ifdef DEBUG_BUILD
+        maskElapsed = maskMergingTime.nanoelapsed();
+        #endif
+    }
+
+    uint32_t w = static_cast<uint32_t>(FreeImage_GetWidth(sourceImage));
+    uint32_t h = static_cast<uint32_t>(FreeImage_GetHeight(sourceImage));
+
+    if((w == 0) || (h == 0))
+    {
+        FreeImage_Unload(sourceImage);
+        pLogWarning("Error loading of image file:\n"
+                    "%s\n"
+                    "Reason: %s.",
+                    path.c_str(),
+                    "Zero image size!");
+        //target = g_renderer->getDummyTexture();
+        return target;
+    }
+
+#ifdef DEBUG_BUILD
+    bindingTime.start();
+#endif
+    RGBQUAD upperColor;
+    FreeImage_GetPixelColor(sourceImage, 0, 0, &upperColor);
+    target.ColorUpper.r = float(upperColor.rgbRed) / 255.0f;
+    target.ColorUpper.b = float(upperColor.rgbBlue) / 255.0f;
+    target.ColorUpper.g = float(upperColor.rgbGreen) / 255.0f;
+    RGBQUAD lowerColor;
+    FreeImage_GetPixelColor(sourceImage, 0, static_cast<unsigned int>(h - 1), &lowerColor);
+    target.ColorLower.r = float(lowerColor.rgbRed) / 255.0f;
+    target.ColorLower.b = float(lowerColor.rgbBlue) / 255.0f;
+    target.ColorLower.g = float(lowerColor.rgbGreen) / 255.0f;
+    FreeImage_FlipVertical(sourceImage);
+    target.nOfColors = GL_RGBA;
+    target.format = GL_BGRA;
+    target.w = static_cast<int>(w);
+    target.h = static_cast<int>(h);
+    target.frame_w = static_cast<int>(w);
+    target.frame_h = static_cast<int>(h);
+    GLubyte *textura = reinterpret_cast<GLubyte *>(FreeImage_GetBits(sourceImage));
+    loadTexture(target, w, h, textura);
+#ifdef DEBUG_BUILD
+    bindElapsed = bindingTime.nanoelapsed();
+    unloadTime.start();
+#endif
+    //SDL_FreeSurface(sourceImage);
+    GraphicsHelps::closeImage(sourceImage);
+#ifdef DEBUG_BUILD
+    unloadElapsed = unloadTime.nanoelapsed();
+#endif
+#ifdef DEBUG_BUILD
+    pLogDebug("Mask merging of %s passed in %d nanoseconds", path.c_str(), static_cast<int>(maskElapsed));
+    pLogDebug("Binding time of %s passed in %d nanoseconds", path.c_str(), static_cast<int>(bindElapsed));
+    pLogDebug("Unload time of %s passed in %d nanoseconds", path.c_str(), static_cast<int>(unloadElapsed));
+    pLogDebug("Total Loading of texture %s passed in %d nanoseconds (%dx%d)",
+              path.c_str(),
+              static_cast<int>(totalTime.nanoelapsed()),
+              static_cast<int>(w),
+              static_cast<int>(h));
+#endif
+
+    return target;
+}
+
+void FrmMain::loadTexture(StdPicture &target, uint32_t width, uint32_t height, uint8_t *RGBApixels)
+{
+    SDL_Surface *surface;
+    SDL_Texture *texture;
+    surface = SDL_CreateRGBSurfaceFrom(RGBApixels,
+                                       static_cast<int>(width),
+                                       static_cast<int>(height),
+                                       32,
+                                       static_cast<int>(width * 4),
+                                       FI_RGBA_RED_MASK,
+                                       FI_RGBA_GREEN_MASK,
+                                       FI_RGBA_BLUE_MASK,
+                                       FI_RGBA_ALPHA_MASK);
+    texture = SDL_CreateTextureFromSurface(m_gRenderer, surface);
+    SDL_FreeSurface(surface);
+    if(!texture)
+    {
+        pLogWarning("Render SW-SDL: Failed to load texture!");
+        return;
+    }
+
+    target.texture = texture;
+    m_textureBank.insert(texture);
+
+    target.inited = true;
+}
+
+void FrmMain::deleteTexture(StdPicture &tx)
+{
+    if(!tx.inited || !tx.texture)
+    {
+        tx.inited = false;
+        return;
+    }
+
+    if(!tx.texture)
+    {
+        tx.inited = false;
+        return;
+    }
+
+    auto corpseIt = m_textureBank.find(tx.texture);
+    if(corpseIt == m_textureBank.end())
+    {
+        if(tx.texture)
+            SDL_DestroyTexture(tx.texture);
+        tx.texture = nullptr;
+        tx.inited = false;
+        return;
+    }
+
+    SDL_Texture *corpse = *corpseIt;
+    if(corpse)
+        SDL_DestroyTexture(corpse);
+    m_textureBank.erase(corpse);
+
+    tx.texture = nullptr;
+    tx.inited = false;
+
+    tx.w = 0;
+    tx.h = 0;
+    tx.frame_w = 0;
+    tx.frame_h = 0;
+    tx.format = 0;
+    tx.nOfColors = 0;
+    tx.ColorUpper.r = 0;
+    tx.ColorUpper.g = 0;
+    tx.ColorUpper.b = 0;
+    tx.ColorLower.r = 0;
+    tx.ColorLower.g = 0;
+    tx.ColorLower.b = 0;
 }

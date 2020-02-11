@@ -5,17 +5,17 @@
 struct Location
 {
 //    X As Double
-    double X;
+    double X = 0.0;
 //    Y As Double
-    double Y;
+    double Y = 0.0;
 //    Height As Double
-    double Height;
+    double Height = 0.0;
 //    Width As Double
-    double Width;
+    double Width = 0.0;
 //    SpeedX As Double
-    double SpeedX;
+    double SpeedX = 0.0;
 //    SpeedY As Double
-    double SpeedY;
+    double SpeedY = 0.0;
 //End Type
 };
 

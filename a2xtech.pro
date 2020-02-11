@@ -3,7 +3,7 @@ CONFIG += console c++11
 CONFIG -= app_bundle
 CONFIG -= qt
 
-LIBS += -lSDL2_mixer_ext -lSDL2
+LIBS += -lSDL2_mixer_ext -lSDL2 -lFreeImageLite
 
 INCLUDEPATH += lib/
 INCLUDEPATH += /usr/include/SDL2
@@ -17,6 +17,10 @@ SOURCES += \
     src/effect.cpp \
     src/frm_main.cpp \
     src/game_main.cpp \
+    src/main/game_loop.cpp \
+    src/main/menu_loop.cpp \
+    src/main/setup_physics.cpp \
+    src/main/setup_vars.cpp \
     src/gfx.cpp \
     src/globals.cpp \
     src/graphics.cpp \
@@ -48,7 +52,8 @@ HEADERS += \
     src/npc.h \
     src/player.h \
     src/sorting.h \
-    src/sound.h
+    src/sound.h \
+    src/std_picture.h
 
 macx: HEADERS += lib/AppPath/app_path_macosx.h
 macx: SOURCES += lib/AppPath/app_path_macosx.m
@@ -66,6 +71,14 @@ HEADERS += $$files($$PWD/lib/DirManager/*.h)
 SOURCES += $$files($$PWD/lib/fmt/*.cpp)
 HEADERS += $$files($$PWD/lib/fmt/*.h)
 HEADERS += $$files($$PWD/lib/fmt_*.h)
+
+# Graphics
+SOURCES += $$files($$PWD/lib/Graphics/*.cpp)
+HEADERS += $$files($$PWD/lib/Graphics/*.h)
+
+# Graphics
+SOURCES += $$files($$PWD/lib/FileMapper/*.cpp)
+HEADERS += $$files($$PWD/lib/FileMapper/*.h)
 
 # IniProcessor
 SOURCES += $$files($$PWD/lib/IniProcessor/*.cpp)
