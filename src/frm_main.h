@@ -47,6 +47,7 @@ public:
     bool isSdlError();
 
     void repaint();
+    void updateViewport();
 
     StdPicture LoadPicture(std::string path, std::string maskPath, std::string maskFallbackPath);
     void deleteTexture(StdPicture &tx);
@@ -57,6 +58,12 @@ public:
 private:
     void loadTexture(StdPicture &target, uint32_t width, uint32_t height, uint8_t *RGBApixels);
 
+    //Scale of virtual and window resolutuins
+    float scale_x = 1.f;
+    float scale_y = 1.f;
+    //Side offsets to keep ratio
+    float offset_x = 0.f;
+    float offset_y = 0.f;
     //Need to calculate relative viewport position when screen was scaled
     float viewport_scale_x = 1.0f;
     float viewport_scale_y = 1.0f;

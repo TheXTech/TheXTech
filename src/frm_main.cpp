@@ -165,6 +165,8 @@ bool FrmMain::initSDL()
 
     m_keyboardState = SDL_GetKeyboardState(nullptr);
 
+    updateViewport();
+
     frmMain.renderRect(0, 0, frmMain.ScaleWidth, frmMain.ScaleHeight, 0.f, 0.f, 0.f, 0.f, true);
     repaint();
     doEvents();
@@ -324,6 +326,7 @@ void FrmMain::eventMouseUp(SDL_MouseButtonEvent &)
 
 void FrmMain::eventResize()
 {
+    updateViewport();
     SetupScreens();
 }
 
@@ -377,6 +380,42 @@ bool FrmMain::isSdlError()
 void FrmMain::repaint()
 {
     SDL_RenderPresent(m_gRenderer);
+}
+
+void FrmMain::updateViewport()
+{
+    float w, w1, h, h1;
+    int   wi, hi;
+    SDL_GetWindowSize(window, &wi, &hi);
+    w = wi;
+    h = hi;
+    w1 = w;
+    h1 = h;
+    scale_x = w / ScaleWidth;
+    scale_y = h / ScaleHeight;
+    viewport_scale_x = scale_x;
+    viewport_scale_y = scale_y;
+
+    if(scale_x > scale_y)
+    {
+        w1 = scale_y * ScaleWidth;
+        viewport_scale_x = w1 / ScaleWidth;
+    }
+    else if(scale_x < scale_y)
+    {
+        h1 = scale_x * ScaleHeight;
+        viewport_scale_y = h1 / ScaleHeight;
+    }
+
+    offset_x = (w - w1) / 2;
+    offset_y = (h - h1) / 2;
+
+    SDL_Rect topLeftViewport;
+    topLeftViewport.x = static_cast<int>(offset_x);
+    topLeftViewport.y = static_cast<int>(offset_y);
+    topLeftViewport.w = static_cast<int>(w1);
+    topLeftViewport.h = static_cast<int>(h1);
+    SDL_RenderSetViewport(m_gRenderer, &topLeftViewport);
 }
 
 StdPicture FrmMain::LoadPicture(std::string path, std::string maskPath, std::string maskFallbackPath)
