@@ -165,11 +165,16 @@ bool FrmMain::initSDL()
 
     m_keyboardState = SDL_GetKeyboardState(nullptr);
 
+    frmMain.renderRect(0, 0, frmMain.ScaleWidth, frmMain.ScaleHeight, 0.f, 0.f, 0.f, 0.f, true);
+    repaint();
+    doEvents();
+
     return res;
 }
 
 void FrmMain::freeSDL()
 {
+    clearAllTextures();
     if(m_gRenderer)
         SDL_DestroyRenderer(m_gRenderer);
     if(window)
@@ -369,6 +374,11 @@ bool FrmMain::isSdlError()
     return (*error != '\0');
 }
 
+void FrmMain::repaint()
+{
+    SDL_RenderPresent(m_gRenderer);
+}
+
 StdPicture FrmMain::LoadPicture(std::string path, std::string maskPath, std::string maskFallbackPath)
 {
     StdPicture target;
@@ -521,6 +531,39 @@ void FrmMain::loadTexture(StdPicture &target, uint32_t width, uint32_t height, u
     target.inited = true;
 }
 
+SDL_Rect FrmMain::scaledRectIS(float x, float y, int w, int h)
+{
+    return
+    {
+        static_cast<int>(std::ceil(x * viewport_scale_x)),
+        static_cast<int>(std::ceil(y * viewport_scale_y)),
+        static_cast<int>(std::ceil(static_cast<float>(w) * viewport_scale_x)),
+        static_cast<int>(std::ceil(static_cast<float>(h) * viewport_scale_y))
+    };
+}
+
+SDL_Rect FrmMain::scaledRect(float x, float y, float w, float h)
+{
+    return
+    {
+        static_cast<int>(std::ceil(x * viewport_scale_x)),
+        static_cast<int>(std::ceil(y * viewport_scale_y)),
+        static_cast<int>(std::ceil(w * viewport_scale_x)),
+        static_cast<int>(std::ceil(h * viewport_scale_y))
+    };
+}
+
+SDL_Rect FrmMain::scaledRectS(float left, float top, float right, float bottom)
+{
+    return
+    {
+        static_cast<int>(std::ceil(left * viewport_scale_x)),
+        static_cast<int>(std::ceil(top * viewport_scale_y)),
+        static_cast<int>(std::ceil((right - left)*viewport_scale_x)),
+        static_cast<int>(std::ceil((bottom - top)*viewport_scale_y))
+    };
+}
+
 void FrmMain::deleteTexture(StdPicture &tx)
 {
     if(!tx.inited || !tx.texture)
@@ -565,4 +608,39 @@ void FrmMain::deleteTexture(StdPicture &tx)
     tx.ColorLower.r = 0;
     tx.ColorLower.g = 0;
     tx.ColorLower.b = 0;
+}
+
+void FrmMain::clearAllTextures()
+{
+    for(SDL_Texture *tx : m_textureBank)
+        SDL_DestroyTexture(tx);
+    m_textureBank.clear();
+}
+
+void FrmMain::renderRect(int x, int y, int w, int h, float red, float green, float blue, float alpha, bool filled)
+{
+    SDL_Rect aRect = scaledRect(x, y, w, h);
+    SDL_SetRenderDrawColor(m_gRenderer,
+                           static_cast<unsigned char>(255.f * red),
+                           static_cast<unsigned char>(255.f * green),
+                           static_cast<unsigned char>(255.f * blue),
+                           static_cast<unsigned char>(255.f * alpha)
+                          );
+
+    if(filled)
+        SDL_RenderFillRect(m_gRenderer, &aRect);
+    else
+        SDL_RenderDrawRect(m_gRenderer, &aRect);
+}
+
+void FrmMain::renderRectBR(int _left, int _top, int _right, int _bottom, float red, float green, float blue, float alpha)
+{
+    SDL_Rect aRect = scaledRectS(_left, _top, _right, _bottom);
+    SDL_SetRenderDrawColor(m_gRenderer,
+                           static_cast<unsigned char>(255.f * red),
+                           static_cast<unsigned char>(255.f * green),
+                           static_cast<unsigned char>(255.f * blue),
+                           static_cast<unsigned char>(255.f * alpha)
+                          );
+    SDL_RenderFillRect(m_gRenderer, &aRect);
 }

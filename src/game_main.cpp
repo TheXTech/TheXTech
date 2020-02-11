@@ -292,6 +292,7 @@ int GameMain(int argc, char**argv)
 //                    overTime = (overTime - (tempTime - gameTime))
                     overTime = (overTime - (tempTime - gameTime));
 //                    DoEvents
+                    frmMain.repaint();
                     DoEvents();
 //                    If GetTickCount > fpsTime Then
                     if(SDL_GetTicks() > fpsTime)
@@ -539,6 +540,7 @@ int GameMain(int argc, char**argv)
 //                    overTime = (overTime - (tempTime - gameTime))
                     overTime = (overTime - (tempTime - gameTime));
 //                    DoEvents
+                    frmMain.repaint();
                     DoEvents();
 //                    If GetTickCount > fpsTime Then
                     if(SDL_GetTicks() > fpsTime)
@@ -712,6 +714,7 @@ int GameMain(int argc, char**argv)
 //                        WorldLoop
                         WorldLoop();
 //                        DoEvents
+                        frmMain.repaint();
                         DoEvents();
 //                        If GetTickCount > fpsTime Then
                         if(SDL_GetTicks() > fpsTime)
@@ -947,6 +950,7 @@ int GameMain(int argc, char**argv)
 //                    GameLoop    'Run the game loop
                     GameLoop();
 //                    DoEvents
+                    frmMain.repaint();
                     DoEvents();
 //                    If GetTickCount > fpsTime Then
                     if(SDL_GetTicks() > fpsTime)

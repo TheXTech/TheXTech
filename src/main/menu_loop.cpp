@@ -234,6 +234,7 @@ void MenuLoop()
 //                    PlaySound 29
 //                    BitBlt myBackBuffer, 0, 0, ScreenW, ScreenH, 0, 0, 0, vbWhiteness
 //                    BitBlt frmMain.hdc, 0, 0, frmMain.ScaleWidth, frmMain.ScaleHeight, 0, 0, 0, vbWhiteness
+                frmMain.renderRect(0, 0, frmMain.ScaleWidth, frmMain.ScaleHeight, 1.f, 1.f, 1.f, 1.f, true);
 //                    StopMusic
 //                    DoEvents
 //                    Sleep 500
