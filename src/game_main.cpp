@@ -326,6 +326,8 @@ int GameMain(int argc, char**argv)
                     }
 //                End If
                 }
+
+                if(!GameIsActive) break;// Break on quit
 //            Loop While GameOutro = True
             } while(GameOutro);
         }
@@ -574,6 +576,8 @@ int GameMain(int argc, char**argv)
                     }
 //                End If
                 }
+
+                if(!GameIsActive) break;// Break on quit
 //            Loop While GameMenu = True
             } while(GameMenu);
         }
@@ -748,6 +752,8 @@ int GameMain(int argc, char**argv)
                         }
 //                    End If
                     }
+
+                    if(!GameIsActive) break;// Break on quit
 //                Loop While LevelSelect = True
                 } while(LevelSelect);
 //            End If
@@ -991,6 +997,8 @@ int GameMain(int argc, char**argv)
                     }
 //                End If
                 }
+
+                if(!GameIsActive) break;// Break on quit
 //            Loop While LevelSelect = False And GameMenu = False
             } while(!LevelSelect || !GameMenu);
 //            If TestLevel = True Then
