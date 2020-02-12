@@ -81,6 +81,8 @@ private:
     SDL_Rect   scaledRectIS(float x, float y, int w, int h);
     SDL_Rect   scaledRect(float x, float y, float w, float h);
     SDL_Rect   scaledRectS(float left, float top, float right, float bottom);
+
+    SDL_Point MapToScr(int x, int y);
 };
 
 #endif // FRMMAIN_H

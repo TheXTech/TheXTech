@@ -95,7 +95,7 @@ int GameMain(int argc, char**argv)
 //    SetupGraphics 'setup graphics
     SetupGraphics(); // setup graphics
 //    Load GFX 'load the graphics form
-    gfx.load(); // load the graphics form
+    GFX.load(); // load the graphics form
 //    SizableBlocks
     SizableBlocks();
 //    LoadGFX 'load the graphics from file

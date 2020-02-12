@@ -99,9 +99,9 @@ void UpdateLoad()
             LoadCoins = 0;
     }
 
-    frmMain.renderTexture(0, 0, gfx.MenuGFX[4]);
-    frmMain.renderTexture(632, 576, gfx.Loader);
-    frmMain.renderTexture(760, 560, gfx.LoadCoin.w, gfx.LoadCoin.h / 4, gfx.LoadCoin, 0, 32 * LoadCoins);
+    frmMain.renderTexture(0, 0, GFX.MenuGFX[4]);
+    frmMain.renderTexture(632, 576, GFX.Loader);
+    frmMain.renderTexture(760, 560, GFX.LoadCoin.w, GFX.LoadCoin.h / 4, GFX.LoadCoin, 0, 32 * LoadCoins);
 
     frmMain.repaint();
     DoEvents();

@@ -1,7 +1,7 @@
 #include "globals.h"
 
 FrmMain frmMain;
-GFX gfx;
+GFX_t GFX;
 
 bool GameIsActive = false;
 std::string AppPath;
@@ -98,7 +98,7 @@ int numWorldMusic = 0;
 RangeArr<WorldLevel_t, 1, maxWorldLevels> WorldLevel;
 RangeArr<Background_t, 1, maxBackgrounds> Background;
 RangeArr<Effect_t, 1, maxEffects> Effect;
-RangeArr<NPC_t, 1, maxNPCs> NPC;
+RangeArr<NPC_t, -128, maxNPCs> NPC;
 RangeArr<Block_t, 0, maxBlocks> Block;
 RangeArr<Player_t, 0, maxPlayers> Player;
 RangeArr<int, 0, maxPlayerFrames> MarioFrameX;
@@ -450,4 +450,10 @@ int ShowCursor(int show)
 Uint8 getKeyState(SDL_Scancode key)
 {
     return frmMain.getKeyState(key);
+}
+
+const char *getKeyName(int key)
+{
+    SDL_Scancode k = static_cast<SDL_Scancode>(key);
+    return SDL_GetScancodeName(k);
 }

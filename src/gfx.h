@@ -6,12 +6,12 @@
 #include <vector>
 #include <string>
 
-class GFX
+class GFX_t
 {
     std::vector<StdPicture*> m_loadedImages;
     void loadImage(StdPicture &img, std::string path);
 public:
-    GFX();
+    GFX_t();
     void load();
     void unLoad();
 

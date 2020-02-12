@@ -176,7 +176,7 @@ bool FrmMain::initSDL()
 
 void FrmMain::freeSDL()
 {
-    gfx.unLoad();
+    GFX.unLoad();
     clearAllTextures();
     if(m_gRenderer)
         SDL_DestroyRenderer(m_gRenderer);
@@ -314,8 +314,9 @@ void FrmMain::eventMouseDown(SDL_MouseButtonEvent &event)
 
 void FrmMain::eventMouseMove(SDL_MouseMotionEvent &event)
 {
-    MenuMouseX = int(event.x * ScreenW / ScaleWidth);
-    MenuMouseY = int(event.y * ScreenH / ScaleHeight);
+    SDL_Point p = MapToScr(event.x, event.y);
+    MenuMouseX = p.x;// int(event.x * ScreenW / ScaleWidth);
+    MenuMouseY = p.y;//int(event.y * ScreenH / ScaleHeight);
     MenuMouseMove = true;
 }
 
@@ -601,6 +602,14 @@ SDL_Rect FrmMain::scaledRectS(float left, float top, float right, float bottom)
         static_cast<int>(std::ceil(top * viewport_scale_y)),
         static_cast<int>(std::ceil((right - left)*viewport_scale_x)),
         static_cast<int>(std::ceil((bottom - top)*viewport_scale_y))
+    };
+}
+
+SDL_Point FrmMain::MapToScr(int x, int y)
+{
+    return {
+        static_cast<int>((static_cast<float>(x) - offset_x) / viewport_scale_x),
+                static_cast<int>((static_cast<float>(y) - offset_y) / viewport_scale_y)
     };
 }
 

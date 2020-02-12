@@ -32,9 +32,8 @@
 //Public Declare Function GetTickCount& Lib "kernel32" ()
 //Public OnlineDisc As Boolean
 
-
 extern FrmMain frmMain;
-extern GFX gfx;
+extern GFX_t GFX;
 
 extern bool GameIsActive;
 extern std::string AppPath;
@@ -44,6 +43,8 @@ extern void DoEvents();
 extern int ShowCursor(int show);
 
 extern Uint8 getKeyState(SDL_Scancode key);
+
+const char *getKeyName(int key);
 
 //'Saved Events
 //Public Const MaxSavedEvents As Integer = 200
@@ -1241,7 +1242,7 @@ extern RangeArr<Background_t, 1, maxBackgrounds> Background;
 //Public Effect(1 To maxEffects) As Effect
 extern RangeArr<Effect_t, 1, maxEffects> Effect;
 //Public NPC(-128 To maxNPCs) As NPC
-extern RangeArr<NPC_t, 1, maxNPCs> NPC;
+extern RangeArr<NPC_t, -128, maxNPCs> NPC;
 //Public Block(0 To maxBlocks) As Block
 extern RangeArr<Block_t, 0, maxBlocks> Block;
 //Public Player(0 To maxPlayers) As Player

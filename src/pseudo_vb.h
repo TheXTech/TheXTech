@@ -9,11 +9,11 @@
 #define Then ) {
 #define End }
 #define And &&
-#define Not !
 #define Or ||
 #define Len(x) std::strlen(x)
 
-const int vbKeyEscape = SDL_SCANCODE_ESCAPE;
-const int vbKeySpace = SDL_SCANCODE_SPACE;
+const SDL_Scancode vbKeyEscape = SDL_SCANCODE_ESCAPE;
+const SDL_Scancode vbKeySpace = SDL_SCANCODE_SPACE;
+const SDL_Scancode vbKeyReturn = SDL_SCANCODE_RETURN;
 
 #endif // PSEUDO_VB_H

@@ -102,12 +102,13 @@ void GetCurrentRes()
 
 void SetOrigRes()
 {
-
+    frmMain.setFullScreen(false);
+    resChanged = false;
 }
 
-void ChangeRes(int ScreenX, int ScreenY, int ScreenColor, int ScreenFreq)
+void ChangeRes(int, int, int, int)
 {
-
+    frmMain.setFullScreen(true);
 }
 
 void SaveIt(int ScX, int ScY, int ScC, int ScF, std::string ScreenChanged)

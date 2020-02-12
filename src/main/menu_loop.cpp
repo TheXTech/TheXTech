@@ -954,64 +954,137 @@ void MenuLoop()
         else if(MenuMode == 3)
         {
 //            If MenuMouseMove = True Then
+            if(MenuMouseMove == True)
+            {
 //                For A = 0 To 3
+                For(A, 0, 3)
+                {
 //                    If MenuMouseY >= 350 + A * 30 And MenuMouseY <= 366 + A * 30 Then
+                    if(MenuMouseY >= 350 + A * 30 And MenuMouseY <= 366 + A * 30)
+                    {
 //                        If A = 0 Then
+                        if(A == 0)
 //                            menuLen = 18 * Len("player 1 controls") - 4
+                            menuLen = 18 * Len("player 1 controls") - 4;
 //                        ElseIf A = 1 Then
+                        else if(A == 1)
 //                            menuLen = 18 * Len("player 2 controls") - 4
+                            menuLen = 18 * Len("player 2 controls") - 4;
 //                        ElseIf A = 2 Then
+                        else if(A == 2)
+                        {
 //                            If resChanged = True Then
+                            if(resChanged == True)
 //                                menuLen = 18 * Len("windowed mode")
+                                menuLen = 18 * Len("windowed mode");
 //                            Else
+                            else
 //                                menuLen = 18 * Len("fullscreen mode")
+                                menuLen = 18 * Len("fullscreen mode");
 //                            End If
 //                        Else
+                        } else {
 //                            menuLen = 18 * Len("view credits") - 2
+                            menuLen = 18 * Len("view credits") - 2;
 //                        End If
+                        }
+
 //                        If MenuMouseX >= 300 And MenuMouseX <= 300 + menuLen Then
+                        if(MenuMouseX >= 300 And MenuMouseX <= 300 + menuLen) {
 //                            If MenuMouseRelease = True And MenuMouseDown = True Then MenuMouseClick = True
+                            if(MenuMouseRelease And MenuMouseDown)
+                                MenuMouseClick = True;
 //                            If MenuCursor <> A Then
+                            if(MenuCursor != A) {
 //                                PlaySound 26
+                                PlaySound(26);
 //                                MenuCursor = A
+                                MenuCursor = A;
 //                            End If
+                            }
 //                        End If
+                        }
 //                    End If
+                    }
 //                Next A
+                }
 //            End If
+            }
+
 //            If MenuCursorCanMove = True Or MenuMouseClick = True Or MenuMouseBack = True Then
+            if(MenuCursorCanMove Or MenuMouseClick Or MenuMouseBack) {
 //                If .Run = True Or (GetKeyState(vbKeyEscape) And KEY_PRESSED) Or MenuMouseBack = True Then
+                if(c.Run Or getKeyState(vbKeyEscape) == KEY_PRESSED Or MenuMouseBack)
+                {
 //                    MenuMode = 0
+                    MenuMode = 0;
 //                    MenuCursor = 3
+                    MenuCursor = 3;
 //                    MenuCursorCanMove = False
+                    MenuCursorCanMove = False;
 //                    PlaySound 26
+                    PlaySound(26);
 //                ElseIf .Jump = True Or .Start = True Or (GetKeyState(vbKeySpace) And KEY_PRESSED) Or (GetKeyState(vbKeyReturn) And KEY_PRESSED) Or MenuMouseClick = True Then
+                }
+                else if(c.Jump Or c.Start Or
+                        (getKeyState(vbKeySpace) == KEY_PRESSED) Or
+                        (getKeyState(vbKeyReturn) == KEY_PRESSED) Or
+                        MenuMouseClick)
+                {
 //                    MenuCursorCanMove = False
+                    MenuCursorCanMove = False;
 //                    If MenuCursor = 0 Then
+                    if(MenuCursor == 0) {
 //                        MenuCursor = 0
+                        MenuCursor = 0;
 //                        MenuMode = 31
+                        MenuMode = 31;
 //                        PlaySound 26
+                        PlaySound(26);
 //                    ElseIf MenuCursor = 1 Then
+                    } else if(MenuCursor == 1) {
 //                        MenuCursor = 0
+                        MenuCursor = 0;
 //                        MenuMode = 32
+                        MenuMode = 32;
 //                        PlaySound 26
+                        PlaySound(26);
 //                    ElseIf MenuCursor = 2 Then
+                    } else if(MenuCursor == 2) {
 //                        PlaySound 29
+                        PlaySound(29);
 //                        ChangeScreen
+                        ChangeScreen();
 //                    ElseIf MenuCursor = 3 Then
+                    } else if(MenuCursor == 3) {
 //                        PlaySound 29
+                        PlaySound(29);
 //                        GameMenu = False
+                        GameMenu = False;
 //                        GameOutro = True
+                        GameOutro = True;
 //                        CreditChop = 300
+                        CreditChop = 300;
 //                        EndCredits = 0
+                        EndCredits = 0;
 //                        SetupCredits
+                        SetupCredits();
 //                    End If
+                    }
 //                End If
+                }
 //            End If
+            }
 //            If MenuMode = 3 Then
+            if(MenuMode == 3) {
 //                If MenuCursor > 3 Then MenuCursor = 0
+                if(MenuCursor > 3)
+                    MenuCursor = 0;
 //                If MenuCursor < 0 Then MenuCursor = 3
+                if(MenuCursor < 0)
+                    MenuCursor = 3;
 //            End If
+            }
 
 //        ElseIf MenuMode = 31 Or MenuMode = 32 Then 'Input Settings
         }
@@ -1020,80 +1093,209 @@ void MenuLoop()
         else if(MenuMode == 31 || MenuMode == 32)
         {
 //            If MenuMouseMove = True And getNewJoystick = False And getNewKeyboard = False Then
+            if(MenuMouseMove And !getNewJoystick And !getNewKeyboard)
+            {
 //                If useJoystick(MenuMode - 30) = 0 Then
+                if(useJoystick[MenuMode - 30] == 0)
+                {
 //                    For A = 0 To 10
+                    For(A, 0, 10)
+                    {
 //                        If MenuMouseY >= 260 - 44 + A * 30 And MenuMouseY <= 276 - 44 + A * 30 Then
+                        if(MenuMouseY >= 260 - 44 + A * 30 And MenuMouseY <= 276 - 44 + A * 30)
+                        {
+                            switch(A)
+                            {
 //                            If A = 0 Then
 //                                menuLen = 18 * Len("INPUT......KEYBOARD")
+                            default:
+                            case 0:
+                                menuLen = 18 * Len("INPUT......KEYBOARD");
+                                break;
 //                            ElseIf A = 1 Then
 //                                menuLen = 18 * Len("UP........." & CheckKey(Chr(conKeyboard(MenuMode - 30).Up)))
+                            case 1:
+                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
+                                                        getKeyName(conKeyboard[MenuMode - 30].Up)).size());
+                                break;
 //                            ElseIf A = 2 Then
 //                                menuLen = 18 * Len("UP........." & CheckKey(Chr(conKeyboard(MenuMode - 30).Down)))
+                            case 2:
+                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
+                                                        getKeyName(conKeyboard[MenuMode - 30].Down)).size());
+                                break;
 //                            ElseIf A = 3 Then
 //                                menuLen = 18 * Len("UP........." & CheckKey(Chr(conKeyboard(MenuMode - 30).Left)))
+                            case 3:
+                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
+                                                        getKeyName(conKeyboard[MenuMode - 30].Left)).size());
+                                break;
 //                            ElseIf A = 4 Then
 //                                menuLen = 18 * Len("UP........." & CheckKey(Chr(conKeyboard(MenuMode - 30).Right)))
+                            case 4:
+                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
+                                                        getKeyName(conKeyboard[MenuMode - 30].Right)).size());
+                                break;
 //                            ElseIf A = 5 Then
 //                                menuLen = 18 * Len("UP........." & CheckKey(Chr(conKeyboard(MenuMode - 30).Run)))
+                            case 5:
+                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
+                                                        getKeyName(conKeyboard[MenuMode - 30].Run)).size());
+                                break;
 //                            ElseIf A = 6 Then
 //                                menuLen = 18 * Len("UP........." & CheckKey(Chr(conKeyboard(MenuMode - 30).AltRun)))
+                            case 6:
+                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
+                                                        getKeyName(conKeyboard[MenuMode - 30].AltRun)).size());
+                                break;
 //                            ElseIf A = 7 Then
 //                                menuLen = 18 * Len("UP........." & CheckKey(Chr(conKeyboard(MenuMode - 30).Jump)))
+                            case 7:
+                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
+                                                        getKeyName(conKeyboard[MenuMode - 30].Jump)).size());
+                                break;
 //                            ElseIf A = 8 Then
 //                                menuLen = 18 * Len("UP........." & CheckKey(Chr(conKeyboard(MenuMode - 30).AltJump)))
+                            case 8:
+                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
+                                                        getKeyName(conKeyboard[MenuMode - 30].AltJump)).size());
+                                break;
 //                            ElseIf A = 9 Then
 //                                menuLen = 18 * Len("UP........." & CheckKey(Chr(conKeyboard(MenuMode - 30).Drop)))
+                            case 9:
+                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
+                                                        getKeyName(conKeyboard[MenuMode - 30].Drop)).size());
+                                break;
 //                            ElseIf A = 10 Then
+                            case 10:
+                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
+                                                        getKeyName(conKeyboard[MenuMode - 30].Start)).size());
+                                break;
 //                                menuLen = 18 * Len("UP........." & CheckKey(Chr(conKeyboard(MenuMode - 30).Start)))
 //                            End If
+                            }
 //                            If MenuMouseX >= 300 And MenuMouseX <= 300 + menuLen Then
+                            if(MenuMouseX >= 300 And MenuMouseX <= 300 + menuLen)
+                            {
 //                                If MenuMouseRelease = True And MenuMouseDown = True Then MenuMouseClick = True
+                                if(MenuMouseRelease And MenuMouseDown)
+                                    MenuMouseClick = True;
 //                                If MenuCursor <> A Then
+                                if(MenuCursor != A)
+                                {
 //                                    PlaySound 26
+                                    PlaySound(26);
 //                                    MenuCursor = A
+                                    MenuCursor = A;
 //                                End If
+                                }
 //                            End If
+                            }
 //                        End If
+                        }
 //                    Next A
+                    }
 //                Else
+                } else {
 //                    For A = 0 To 6
+                    For(A, 0, 6)
+                    {
 //                        If MenuMouseY >= 260 - 44 + A * 30 And MenuMouseY <= 276 + A * 30 - 44 Then
+                        if(MenuMouseY >= 260 - 44 + A * 30 And MenuMouseY <= 276 + A * 30 - 44)
+                        {
 //                            If A = 0 Then
+                            if(A == 0) {
 //                                menuLen = 18 * Len("INPUT......JOYSTICK 1") - 2
+                                menuLen = 18 * Len("INPUT......JOYSTICK 1") - 2;
 //                            Else
+                            } else {
 //                                menuLen = 18 * Len("RUN........_")
+                                menuLen = 18 * Len("RUN........_");
 //                            End If
+                            }
 //                            If MenuMouseX >= 300 And MenuMouseX <= 300 + menuLen Then
+                            if(MenuMouseX >= 300 And MenuMouseX <= 300 + menuLen)
+                            {
 //                                If MenuMouseRelease = True And MenuMouseDown = True Then MenuMouseClick = True
+                                if(MenuMouseRelease And MenuMouseDown)
+                                    MenuMouseClick = True;
 //                                If MenuCursor <> A Then
+                                if(MenuCursor != A)
+                                {
 //                                    PlaySound 26
+                                    PlaySound(26);
 //                                    MenuCursor = A
+                                    MenuCursor = A;
 //                                End If
+                                }
 //                            End If
+                            }
 //                        End If
+                        }
 //                    Next A
+                    }
 //                End If
+                }
 //            End If
+            }
+
 //            If MenuCursorCanMove = True Or ((getNewKeyboard = False And getNewJoystick = False) And (MenuMouseClick = True Or MenuMouseBack = True)) Then
+            if(MenuCursorCanMove Or
+                ((!getNewKeyboard And !getNewJoystick) And
+                 (MenuMouseClick Or MenuMouseBack))
+            )
+            {
 //                If getNewKeyboard = True Then
+                if(getNewKeyboard)
+                {
 //                    If inputKey <> 0 Then
+                    if(inputKey != 0)
+                    {
 //                        getNewKeyboard = False
+                        getNewKeyboard = False;
 //                        MenuCursorCanMove = False
+                        MenuCursorCanMove = False;
 //                        PlaySound 29
+                        PlaySound(29);
 //                        If MenuCursor = 1 Then
+                        if(MenuCursor == 1) {
 //                            conKeyboard(MenuMode - 30).Up = inputKey
+                            conKeyboard[MenuMode - 30].Up = inputKey;
 //                        ElseIf MenuCursor = 2 Then conKeyboard(MenuMode - 30).Down = inputKey
+                        } else if(MenuCursor == 2) {
+                            conKeyboard[MenuMode - 30].Down = inputKey;
 //                        ElseIf MenuCursor = 3 Then conKeyboard(MenuMode - 30).Left = inputKey
+                        } else if(MenuCursor == 3) {
+                            conKeyboard[MenuMode - 30].Left = inputKey;
 //                        ElseIf MenuCursor = 4 Then conKeyboard(MenuMode - 30).Right = inputKey
+                        } else if(MenuCursor == 4) {
+                            conKeyboard[MenuMode - 30].Right = inputKey;
 //                        ElseIf MenuCursor = 5 Then conKeyboard(MenuMode - 30).Run = inputKey
+                        } else if(MenuCursor == 5) {
+                            conKeyboard[MenuMode - 30].Run = inputKey;
 //                        ElseIf MenuCursor = 6 Then conKeyboard(MenuMode - 30).AltRun = inputKey
+                        } else if(MenuCursor == 6) {
+                            conKeyboard[MenuMode - 30].AltRun = inputKey;
 //                        ElseIf MenuCursor = 7 Then conKeyboard(MenuMode - 30).Jump = inputKey
+                        } else if(MenuCursor == 7) {
+                            conKeyboard[MenuMode - 30].Jump = inputKey;
 //                        ElseIf MenuCursor = 8 Then conKeyboard(MenuMode - 30).AltJump = inputKey
+                        } else if(MenuCursor == 8) {
+                            conKeyboard[MenuMode - 30].AltJump = inputKey;
 //                        ElseIf MenuCursor = 9 Then conKeyboard(MenuMode - 30).Drop = inputKey
+                        } else if(MenuCursor == 9) {
+                            conKeyboard[MenuMode - 30].Drop = inputKey;
 //                        ElseIf MenuCursor = 10 Then conKeyboard(MenuMode - 30).Start = inputKey
+                        } else if(MenuCursor == 10) {
+                            conKeyboard[MenuMode - 30].Start = inputKey;
 //                        End If
+                        }
 //                    End If
+                    }
 //                ElseIf getNewJoystick = True Then
+                }
+                else if(getNewJoystick)
+                {
 //                    JoyNum = useJoystick(MenuMode - 30) - 1
 //                    PollJoystick
 //                    If JoyButtons(oldJumpJoy) = True Then
@@ -1128,6 +1330,9 @@ void MenuLoop()
 //                        Next A
 //                    End If
 //                Else
+                }
+                else
+                {
 //                    If .Run = True Or (GetKeyState(vbKeyEscape) And KEY_PRESSED) Or MenuMouseBack = True Then
 //                        SaveConfig
 //                        MenuCursor = MenuMode - 31
@@ -1184,7 +1389,10 @@ void MenuLoop()
 //                        MenuCursorCanMove = False
 //                    End If
 //                End If
+                }
 //            End If
+            }
+
 //            If MenuMode <> 3 Then
 //                If useJoystick(MenuMode - 30) = 0 Then
 //                    If MenuCursor > 10 Then MenuCursor = 0
@@ -1758,9 +1966,16 @@ void MenuLoop()
 //            End If
         }
 //            If .WetFrame = True Then
+        if(p.WetFrame)
+        {
 //                If .Location.SpeedY = 0 Or .Slope > 0 Then .CanJump = True
+            if(p.Location.SpeedY == 0.0 Or p.Slope > 0)
+                p.CanJump = True;
 //                If Rnd * 100 > 98 Or .Location.SpeedY = 0 Or .Slope > 0 Then .Controls.Jump = True
+            if(std::rand() % 100 > 98 Or p.Location.SpeedY == 0.0 Or p.Slope > 0)
+                p.Controls.Jump = True;
 //            End If
+        }
 //            If Rnd * 100 > 95 And .HoldingNPC = 0 And .Slide = False And .CanAltJump = True And .Mount = 0 Then .Controls.AltJump = True
 //            If Rnd * 1000 >= 999 And .CanFly2 = False Then .Controls.Run = False
 //            If .Mount = 3 And Rnd * 100 >= 98 And .RunRelease = False Then .Controls.Run = False

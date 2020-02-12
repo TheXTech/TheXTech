@@ -5,7 +5,7 @@
 #include <fmt_format_ne.h>
 #include <Logger/logger.h>
 
-void GFX::loadImage(StdPicture &img, std::string path)
+void GFX_t::loadImage(StdPicture &img, std::string path)
 {
     pLogDebug("Loading texture %s...", path.c_str());
     img = frmMain.LoadPicture(path);
@@ -14,10 +14,10 @@ void GFX::loadImage(StdPicture &img, std::string path)
     m_loadedImages.push_back(&img);
 }
 
-GFX::GFX()
+GFX_t::GFX_t()
 {}
 
-void GFX::load()
+void GFX_t::load()
 {
     std::string uiPath = AppPath + "graphics/ui/";
 
@@ -75,7 +75,7 @@ void GFX::load()
     loadImage(YoshiWings, uiPath + "YoshiWings.png");
 }
 
-void GFX::unLoad()
+void GFX_t::unLoad()
 {
     for(StdPicture *p : m_loadedImages)
         frmMain.deleteTexture(*p);
