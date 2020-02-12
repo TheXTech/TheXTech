@@ -201,49 +201,103 @@ void MenuLoop()
             if(getKeyState(SDL_SCANCODE_ESCAPE) == KEY_PRESSED && MenuCursorCanMove)
             {
 //                If MenuCursor <> 4 Then
+                if(MenuCursor != 4)
+                {
 //                    MenuCursor = 4
+                    MenuCursor = 4;
 //                    PlaySound 26
+                    PlaySound(26);
 //                End If
-//            ElseIf ((.Jump = True Or .Start = True Or (GetKeyState(vbKeySpace) And KEY_PRESSED) Or (GetKeyState(vbKeyReturn) And KEY_PRESSED)) And MenuCursorCanMove = True) Or MenuMouseClick = True Then
+                }
+//            ElseIf ((.Jump = True Or _
+//                     .Start = True Or _
+//                      (GetKeyState(vbKeySpace) And KEY_PRESSED) Or _
+//                      (GetKeyState(vbKeyReturn) And KEY_PRESSED)) And _
+//                       MenuCursorCanMove = True) Or MenuMouseClick = True Then
             }
-            else if(1)
+            else if(
+                ((c.Jump || c.Start ||
+                  getKeyState(SDL_SCANCODE_SPACE) == KEY_PRESSED ||
+                  getKeyState(SDL_SCANCODE_RETURN) == KEY_PRESSED) &&
+                  MenuCursorCanMove) || MenuMouseClick
+            )
             {
 //                MenuCursorCanMove = False
+                MenuCursorCanMove = false;
 //                PlayerCharacter = 0
+                PlayerCharacter = 0;
 //                PlayerCharacter2 = 0
+                PlayerCharacter2 = 0;
 //                If MenuCursor = 0 Then
+                if(MenuCursor == 0)
+                {
 //                    PlaySound 29
+                    PlaySound(29);
 //                    MenuMode = 1
+                    MenuMode = 1;
 //                    FindWorlds
+                    FindWorlds();
 //                    MenuCursor = 0
+                    MenuCursor = 0;
 //                ElseIf MenuCursor = 1 Then
+                }
+                else if(MenuCursor == 1)
+                {
 //                    PlaySound 29
+                    PlaySound(29);
 //                    MenuMode = 2
+                    MenuMode = 2;
 //                    FindWorlds
+                    FindWorlds();
 //                    MenuCursor = 0
+                    MenuCursor = 0;
 //                ElseIf MenuCursor = 2 Then
+                }
+                else if(MenuCursor == 2)
+                {
 //                    PlaySound 29
+                    PlaySound(29);
 //                    MenuMode = 4
+                    MenuMode = 4;
 //                    FindLevels
+                    FindLevels();
 //                    MenuCursor = 0
+                    MenuCursor = 0;
 //                ElseIf MenuCursor = 3 Then
+                }
+                else if(MenuCursor == 3)
+                {
 //                    PlaySound 29
+                    PlaySound(29);
 //                    MenuMode = 3
+                    MenuMode = 3;
 //                    MenuCursor = 0
+                    MenuCursor = 0;
 //                ElseIf MenuCursor = 4 Then
+                }
+                else if(MenuCursor == 4)
+                {
 //                    PlaySound 29
+                    PlaySound(29);
 //                    BitBlt myBackBuffer, 0, 0, ScreenW, ScreenH, 0, 0, 0, vbWhiteness
 //                    BitBlt frmMain.hdc, 0, 0, frmMain.ScaleWidth, frmMain.ScaleHeight, 0, 0, 0, vbWhiteness
-                frmMain.renderRect(0, 0, frmMain.ScaleWidth, frmMain.ScaleHeight, 1.f, 1.f, 1.f, 1.f, true);
+                    frmMain.renderRect(0, 0, frmMain.ScaleWidth, frmMain.ScaleHeight, 0.f, 0.f, 0.f, 1.f, true);
 //                    StopMusic
+                    StopMusic();
 //                    DoEvents
+                    DoEvents();
 //                    Sleep 500
+                    SDL_Delay(500);
 //                    KillIt
+                    KillIt();
 //                End If
+                }
 //            End If
             }
 //            If MenuCursor > 4 Then MenuCursor = 0
+            if(MenuCursor > 4) MenuCursor = 0;
 //            If MenuCursor < 0 Then MenuCursor = 4
+            if(MenuCursor < 0) MenuCursor = 4;
 //        ElseIf MenuMode = 100 Or MenuMode = 200 Or MenuMode = 300 Or MenuMode = 400 Or MenuMode = 500 Then  'Character Select
         }
 
@@ -833,10 +887,17 @@ void MenuLoop()
 //        ShowLayer "Destroyed Blocks"
         ShowLayer("Destroyed Blocks");
 //        For A = 1 To numNPCs
+        For(A, 1, numNPCs)
+        {
 //            If NPC(A).DefaultType = 0 Then
+            if(npc[A].DefaultType == 0)
+            {
 //                If NPC(A).TimeLeft > 10 Then NPC(A).TimeLeft = 10
+                if(npc[A].TimeLeft > 10) npc[A].TimeLeft = 10;
 //            End If
+            }
 //        Next A
+        }
 //    End If
     }
 //    For A = 1 To numPlayers
@@ -1151,11 +1212,22 @@ void MenuLoop()
 //    End If
 
 //    MenuMouseMove = False
+    MenuMouseMove = false;
 //    MenuMouseClick = False
+    MenuMouseClick = false;
 //    If MenuMouseDown = True Then
+    if(MenuMouseDown)
+    {
 //        MenuMouseRelease = False
+        MenuMouseRelease = false;
 //    Else
+    }
+    else
+    {
 //        MenuMouseRelease = True
+        MenuMouseRelease = true;
 //    End If
+    }
 //    MenuMouseBack = False
+    MenuMouseBack = false;
 }

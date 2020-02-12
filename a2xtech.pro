@@ -51,6 +51,7 @@ HEADERS += \
     src/location.h \
     src/npc.h \
     src/player.h \
+    src/range_arr.hpp \
     src/sorting.h \
     src/sound.h \
     src/std_picture.h

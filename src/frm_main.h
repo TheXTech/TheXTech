@@ -49,12 +49,22 @@ public:
     void repaint();
     void updateViewport();
 
-    StdPicture LoadPicture(std::string path, std::string maskPath, std::string maskFallbackPath);
+    StdPicture LoadPicture(std::string path, std::string maskPath = std::string(), std::string maskFallbackPath = std::string());
     void deleteTexture(StdPicture &tx);
     void clearAllTextures();
 
     void renderRect(int x, int y, int w, int h, float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f, bool filled = true);
     void renderRectBR(int _left, int _top, int _right, int _bottom, float red, float green, float blue, float alpha);
+
+    // Similar to BitBlt, but without masks, just draw a texture or it's fragment!
+    void renderTexture(int xDst, int yDst, int wDst, int hDst,
+                       const StdPicture &tx,
+                       int xSrc, int ySrc,
+                       float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f);
+
+    void renderTexture(int xDst, int yDst, const StdPicture &tx,
+                       float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f);
+
 private:
     void loadTexture(StdPicture &target, uint32_t width, uint32_t height, uint8_t *RGBApixels);
 

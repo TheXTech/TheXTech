@@ -1,6 +1,8 @@
 #include "globals.h"
 #include "load_gfx.h"
 
+#include <ctime>
+
 // Private Sub cBlockGFX(A As Integer)
 void cBlockGFX(int A);
 // Private Sub cNPCGFX(A As Integer)
@@ -89,5 +91,18 @@ void cPathGFX(int A)
 
 void UpdateLoad()
 {
+    if(LoadCoinsT <= SDL_GetTicks())
+    {
+        LoadCoinsT = SDL_GetTicks() + 100;
+        LoadCoins += 1;
+        if(LoadCoins > 3)
+            LoadCoins = 0;
+    }
 
+    frmMain.renderTexture(0, 0, gfx.MenuGFX[4]);
+    frmMain.renderTexture(632, 576, gfx.Loader);
+    frmMain.renderTexture(760, 560, gfx.LoadCoin.w, gfx.LoadCoin.h / 4, gfx.LoadCoin, 0, 32 * LoadCoins);
+
+    frmMain.repaint();
+    DoEvents();
 }

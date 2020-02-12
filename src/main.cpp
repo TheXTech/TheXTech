@@ -12,6 +12,7 @@ int main(int argc, char**argv)
         frmMain.freeSDL();
         return 1;
     }
+
     int ret = GameMain(argc, argv);
     frmMain.freeSDL();
     return ret;

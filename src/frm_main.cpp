@@ -167,7 +167,7 @@ bool FrmMain::initSDL()
 
     updateViewport();
 
-    frmMain.renderRect(0, 0, frmMain.ScaleWidth, frmMain.ScaleHeight, 0.f, 0.f, 0.f, 0.f, true);
+    renderRect(0, 0, frmMain.ScaleWidth, frmMain.ScaleHeight, 0.f, 0.f, 0.f, 1.f, true);
     repaint();
     doEvents();
 
@@ -176,6 +176,7 @@ bool FrmMain::initSDL()
 
 void FrmMain::freeSDL()
 {
+    gfx.unLoad();
     clearAllTextures();
     if(m_gRenderer)
         SDL_DestroyRenderer(m_gRenderer);
@@ -682,4 +683,43 @@ void FrmMain::renderRectBR(int _left, int _top, int _right, int _bottom, float r
                            static_cast<unsigned char>(255.f * alpha)
                           );
     SDL_RenderFillRect(m_gRenderer, &aRect);
+}
+
+void FrmMain::renderTexture(int xDst, int yDst, int wDst, int hDst,
+                            const StdPicture &tx,
+                            int xSrc, int ySrc,
+                            float red, float green, float blue, float alpha)
+{
+    const unsigned int flip = SDL_FLIP_NONE;
+    SDL_Rect destRect = scaledRect(xDst, yDst, wDst, hDst);
+    SDL_Rect sourceRect =
+    {
+        xSrc,
+        ySrc,
+        wDst,
+        hDst
+    };
+
+    SDL_SetTextureColorMod(tx.texture,
+                           static_cast<unsigned char>(255.f * red),
+                           static_cast<unsigned char>(255.f * green),
+                           static_cast<unsigned char>(255.f * blue));
+    SDL_SetTextureAlphaMod(tx.texture, static_cast<unsigned char>(255.f * alpha));
+    SDL_RenderCopyEx(m_gRenderer, tx.texture, &sourceRect, &destRect,
+                     0.0, nullptr, static_cast<SDL_RendererFlip>(flip));
+}
+
+void FrmMain::renderTexture(int xDst, int yDst, const StdPicture &tx, float red, float green, float blue, float alpha)
+{
+    const unsigned int flip = SDL_FLIP_NONE;
+    SDL_Rect destRect = scaledRect(xDst, yDst, tx.w, tx.h);
+    SDL_Rect sourceRect = {0, 0, tx.w, tx.h};
+
+    SDL_SetTextureColorMod(tx.texture,
+                           static_cast<unsigned char>(255.f * red),
+                           static_cast<unsigned char>(255.f * green),
+                           static_cast<unsigned char>(255.f * blue));
+    SDL_SetTextureAlphaMod(tx.texture, static_cast<unsigned char>(255.f * alpha));
+    SDL_RenderCopyEx(m_gRenderer, tx.texture, &sourceRect, &destRect,
+                     0.0, nullptr, static_cast<SDL_RendererFlip>(flip));
 }
