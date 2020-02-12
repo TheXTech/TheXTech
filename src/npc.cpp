@@ -36,7 +36,7 @@ void Deactivate(int A)
 
 }
 
-void Bomb(Location location, int Game, int ImmunePlayer)
+void Bomb(Location_t location, int Game, int ImmunePlayer)
 {
 
 }

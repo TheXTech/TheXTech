@@ -42,9 +42,9 @@ std::string CheckKey(std::string newStrizzle);
 // draws the background to the screen
 void DrawBackground(int S, int Z);
 // Public Sub PlayerWarpGFX(A As Integer, tempLocation As Location, X2 As Single, Y2 As Single)
-void PlayerWarpGFX(int A, Location tempLocation, float X2, float Y2);
+void PlayerWarpGFX(int A, Location_t tempLocation, float X2, float Y2);
 // Public Sub NPCWarpGFX(A As Integer, tempLocation As Location, X2 As Single, Y2 As Single)
-void NPCWarpGFX(int A, Location tempLocation, float X2, float Y2);
+void NPCWarpGFX(int A, Location_t tempLocation, float X2, float Y2);
 // Public Sub ChangeScreen() 'change from fullscreen to windowed mode
 // change from fullscreen to windowed mode
 void ChangeScreen();

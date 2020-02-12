@@ -6,7 +6,7 @@ void UpdateEffects()
 
 }
 
-void NewEffect(int A, Location Location, float Direction, int NewNpc, bool Shadow)
+void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Shadow)
 {
 
 }

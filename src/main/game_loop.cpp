@@ -113,13 +113,13 @@ void GameLoop()
 //        If MagicHand = True Then UpdateEditor
 
 //        If Player(1).Controls.Start = True Or (GetKeyState(vbKeyEscape) And KEY_PRESSED) Then
-        if(player[1].controls.Start || (getKeyState(SDL_SCANCODE_ESCAPE) == KEY_PRESSED))
+        if(Player[1].Controls.Start || (getKeyState(SDL_SCANCODE_ESCAPE) == KEY_PRESSED))
         {
 //            If LevelMacro = 0 And CheckLiving > 0 Then
             if(LevelMacro == 0 && CheckLiving() > 0)
             {
 //                If Player(1).UnStart = True Then
-                if(player[1].UnStart)
+                if(Player[1].UnStart)
                 {
 //                    If (CaptainN = True Or FreezeNPCs = True) And PSwitchStop = 0 Then
                     if((CaptainN || FreezeNPCs) && PSwitchStop == 0)
@@ -136,7 +136,7 @@ void GameLoop()
                         else
                         {
 //                            Player(1).UnStart = False
-                            player[1].UnStart = false;
+                            Player[1].UnStart = false;
 //                            If FreezeNPCs = True Then
                             if(FreezeNPCs)
                             {
@@ -186,19 +186,19 @@ void GameLoop()
             }
 //        ElseIf numPlayers = 2 And Player(2).Controls.Start = True Then
         }
-        else if(numPlayers == 2 && player[2].controls.Start)
+        else if(numPlayers == 2 && Player[2].Controls.Start)
         {
 //            If LevelMacro = 0 And CheckLiving > 0 Then
             if(LevelMacro == 0 && CheckLiving() > 0)
             {
 //                If Player(2).UnStart = True Then
-                if(player[2].UnStart)
+                if(Player[2].UnStart)
                 {
 //                    If CaptainN = True Or FreezeNPCs = True Then
                     if(CaptainN || FreezeNPCs)
                     {
 //                        Player(2).UnStart = False
-                        player[2].UnStart = false;
+                        Player[2].UnStart = false;
 //                        If FreezeNPCs = True Then
                         if(FreezeNPCs)
                         {

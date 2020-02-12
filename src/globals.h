@@ -103,7 +103,7 @@ extern std::string LB;
 extern std::string EoT;
 
 //Public Type Controls 'Controls for the player
-struct Controls
+struct Controls_t
 {
 //    Up As Boolean
     bool Up = false;
@@ -174,7 +174,7 @@ struct Controls
 //End Type
 
 //Public Type EditorControls      'Controls for the editor
-struct EditorControls
+struct EditorControls_t
 {
 //    Up As Boolean
     bool Up = false;
@@ -191,7 +191,7 @@ struct EditorControls
 
 
 //Public Type conKeyboard  'Input settings for the keyboard
-struct ConKeyboard
+struct ConKeyboard_t
 {
 //    Up As Integer
     int Up = 0;
@@ -217,7 +217,7 @@ struct ConKeyboard
 };
 
 //Public Type conJoystick   'Input settings for the joystick
-struct ConJoystick
+struct ConJoystick_t
 {
 //    Jump As Integer
     int Jump = 0;
@@ -235,16 +235,16 @@ struct ConJoystick
 };
 
 //Public conKeyboard(1 To 2) As conKeyboard  'player 1 and 2's controls
-extern RangeArr<ConKeyboard, 1, 2> conKeyboard;
+extern RangeArr<ConKeyboard_t, 1, 2> conKeyboard;
 
 //Public conJoystick(1 To 2) As conJoystick
-extern RangeArr<ConJoystick, 1, 2> conJoystick;
+extern RangeArr<ConJoystick_t, 1, 2> conJoystick;
 
 //Public useJoystick(1 To 2) As Integer
 extern RangeArr<int, 1, 2> useJoystick;
 
 //Public Type NPC 'The NPC Type
-struct NPC
+struct NPC_t
 {
 //    AttLayer As String
     std::string AttLayer;
@@ -335,10 +335,10 @@ struct NPC
 //    playerTemp As Boolean
     bool playerTemp = false;
 //    Location As Location 'collsion detection information
-    Location location;
+    Location_t Location;
 //'the default values are used when De-Activating an NPC when it goes on screen
 //    DefaultLocation As Location
-    Location DefaultLocation;
+    Location_t DefaultLocation;
 //    DefaultDirection As Single
     float DefaultDirection = 0.0f;
 //    DefaultType As Integer
@@ -416,7 +416,7 @@ struct NPC
 };
 
 //Public Type Player              'The player data type.
-struct Player
+struct Player_t
 {
 //    DoubleJump As Boolean
     bool DoubleJump = false;
@@ -535,7 +535,7 @@ struct Player
 //    YoshiBFrameCount As Integer
     int YoshiBFrameCount = 0;
 //    YoshiTongue As Location
-    Location YoshiTongue;
+    Location_t YoshiTongue;
 //    YoshiTongueX As Single
     float YoshiTongueX = 0.0f;
 //    YoshiTongueLength As Integer 'length of yoshi's tongue
@@ -551,11 +551,11 @@ struct Player
 //    NoPlayerCol As Integer
     int NoPlayerCol = 0;
 //    Location As Location 'collision detection info
-    Location location;
+    Location_t Location;
 //    Character As Integer 'luigi or mario
     int Character = 0;
 //    Controls As Controls 'players controls
-    Controls controls;
+    Controls_t Controls;
 //    Direction As Integer 'the way the player is facing
     int Direction = 0;
 //    Mount As Integer '1 for boot, 2 for clown car, 3 for yoshi
@@ -665,7 +665,7 @@ struct Player
 };
 
 //Public Type Background  'Background objects
-struct Background
+struct Background_t
 {
 //    Layer As String
     std::string Layer;
@@ -674,12 +674,12 @@ struct Background
 //    Type As Integer
     int Type = 0;
 //    Location As Location
-    Location location;
+    Location_t Location;
 //End Type
 };
 
 //Public Type Water
-struct Water
+struct Water_t
 {
 //    Layer As String
     std::string Layer;
@@ -690,12 +690,12 @@ struct Water
 //    Quicksand As Boolean
     bool Quicksand = false;
 //    Location As Location
-    Location location;
+    Location_t Location;
 //End Type
 };
 
 //Public Type Block   'Blocks
-struct Block
+struct Block_t
 {
 //    Slippy As Boolean
     bool Slippy = false;
@@ -721,7 +721,7 @@ struct Block
 //    Type As Integer 'the block's type
     int Type = 0;
 //    Location As Location
-    Location location;
+    Location_t Location;
 //    Special As Integer 'what is in the block?
     int Special = 0;
 //'for the shake effect after hitting ablock
@@ -751,12 +751,12 @@ struct Block
 };
 
 //Public Type Effect  'Special effects
-struct Effect
+struct Effect_t
 {
 //    Type As Integer
     int Type = 0;
 //    Location As Location
-    Location location;
+    Location_t Location;
 //    Frame As Integer
     int Frame = 0;
 //    FrameCount As Single
@@ -771,7 +771,7 @@ struct Effect
 };
 
 //Public Type vScreen 'Screen controls
-struct vScreen
+struct vScreen_t
 {
 //    Left As Double
     double Left = 0.0;
@@ -793,10 +793,10 @@ struct vScreen
 };
 
 //Public Type WorldLevel 'the type for levels on the world map
-struct WorldLevel
+struct WorldLevel_t
 {
 //    Location As Location
-    Location location;
+    Location_t Location;
 //    Type As Integer
     int Type = 0;
 //    FileName As String 'level's file
@@ -825,7 +825,7 @@ struct WorldLevel
 };
 
 //Public Type Warp 'warps such as pipes and doors
-struct Warp
+struct Warp_t
 {
 //    Locked As Boolean 'requires a key NPC
     bool Locked = false;
@@ -843,9 +843,9 @@ struct Warp
 //    Stars As Integer 'number of stars required to enter
     int Stars = 0;
 //    Entrance As Location 'location of warp entrance
-    Location Entrance;
+    Location_t Entrance;
 //    Exit As Location 'location of warp exit
-    Location Exit;
+    Location_t Exit;
 //    Effect As Integer 'style of warp. door/
     int Effect = 0;
 //    level As String 'filename of the level it should warp to
@@ -872,20 +872,20 @@ struct Warp
 };
 
 //Public Type Tile 'Tiles for the World
-struct Tile
+struct Tile_t
 {
 //    Location As Location
-    Location location;
+    Location_t Location;
 //    Type As Integer
     int Type = 0;
 //End Type
 };
 
 //Public Type Scene 'World Scenery
-struct Scene
+struct Scene_t
 {
 //    Location As Location
-    Location location;
+    Location_t Location;
 //    Type As Integer
     int Type = 0;
 //    Active As Boolean 'if false this won't be shown. used for paths that become available on a scene
@@ -894,10 +894,10 @@ struct Scene
 };
 
 //Public Type WorldPath 'World Paths
-struct WorldPath
+struct WorldPath_t
 {
 //    Location As Location
-    Location location;
+    Location_t Location;
 //    Active As Boolean
     bool Active = false;
 //    Type As Integer
@@ -906,10 +906,10 @@ struct WorldPath
 };
 
 //Public Type WorldMusic 'World Music
-struct WorldMusic
+struct WorldMusic_t
 {
 //    Location As Location
-    Location location;
+    Location_t Location;
 //    Type As Integer
     int Type = 0;
 //End Type
@@ -927,31 +927,31 @@ struct EditorCursor
 //    Selected As Integer
     int Selected = 0;
 //    Location As Location
-    Location location;
+    Location_t Location;
 //    Layer As String 'current layer
     std::string Layer;
 //    Mode As Integer
     int Mode = 0;
 //    Block As Block
-    Block block;
+    Block_t block;
 //    Water As Water
-    Water water;
+    Water_t water;
 //    Background As Background
-    Background background;
+    Background_t background;
 //    NPC As NPC
-    NPC npc;
+    NPC_t npc;
 //    Warp As Warp
-    Warp warp;
+    Warp_t warp;
 //    Tile As Tile
-    Tile tile;
+    Tile_t tile;
 //    Scene As Scene
-    Scene scene;
+    Scene_t scene;
 //    WorldLevel As WorldLevel
-    WorldLevel worldLevel;
+    WorldLevel_t worldLevel;
 //    WorldPath As WorldPath
-    WorldPath worldPath;
+    WorldPath_t WorldPath;
 //    WorldMusic As WorldMusic
-    WorldMusic worldMusic;
+    WorldMusic_t WorldMusic;
 //End Type
 };
 
@@ -959,7 +959,7 @@ struct EditorCursor
 struct WorldPlayer
 {
 //    Location As Location
-    Location location;
+    Location_t Location;
 //    Type As Integer
     int Type = 0;
 //    Frame As Integer
@@ -994,10 +994,10 @@ struct Layer
 };
 
 //Public Type CreditLine
-struct CreditLine
+struct CreditLine_t
 {
 //    Location As Location
-    Location location;
+    Location_t Location;
 //    Text As String
     std::string Text;
 //End Type
@@ -1010,7 +1010,7 @@ extern std::string Checkpoint;
 //Public MagicHand As Boolean 'true if playing a level in the editor while not in fullscreen mode
 extern bool MagicHand;
 //Public testPlayer(1 To 2) As Player 'test level player settings
-extern RangeArr<Player, 1, 2> testPlayer;
+extern RangeArr<Player_t, 1, 2> testPlayer;
 //Public ClearBuffer As Boolean 'true to black the backbuffer
 extern bool ClearBuffer;
 //Public numLocked As Integer
@@ -1032,14 +1032,14 @@ extern bool MessageText;
 //Public NumSelectWorld As Integer
 extern int NumSelectWorld;
 //Public SelectWorld(1 To 100) As SelectWorld
-struct SelectWorld;
-extern RangeArr<SelectWorld, 1, 100> selectWorld;
+struct SelectWorld_t;
+extern RangeArr<SelectWorld_t, 1, 100> SelectWorld;
 //Public ShowFPS As Boolean
 extern bool ShowFPS;
 //Public PrintFPS As Double
 extern double PrintFPS;
 //Public vScreen(0 To 2) As vScreen 'Sets up the players screens
-extern RangeArr<vScreen, 0, 2> vscreen;
+extern RangeArr<vScreen_t, 0, 2> vScreen;
 //Public ScreenType As Integer 'The screen/view type
 extern int ScreenType;
 //Public DScreenType As Integer 'The dynamic screen setup
@@ -1049,7 +1049,7 @@ extern bool LevelEditor;
 //Public WorldEditor As Boolean
 extern bool WorldEditor;
 //Public PlayerStart(1 To 2) As Location
-extern RangeArr<Location, 1, 2> PlayerStart;
+extern RangeArr<Location_t, 1, 2> PlayerStart;
 //Public Const vScreenYOffset As Integer = 0     'Players Y on the screen
 const int vScreenYOffset = 0;
 //Public Const maxBlocks As Integer = 20000  'Max # of blocks
@@ -1110,7 +1110,7 @@ const int frameRate = 15;
 extern RangeArr<bool, 0, 20> blockCharacter;
 
 //Public Type SelectWorld
-struct SelectWorld
+struct SelectWorld_t
 {
 //    WorldName As String
     std::string WorldName;
@@ -1135,7 +1135,7 @@ extern RangeArr<float, 0, maxSections> AutoY;
 extern int numStars;
 
 //Public Type Star 'keeps track of where there player got the stars from
-struct Star
+struct Star_t
 {
 //    level As String
     std::string level;
@@ -1146,11 +1146,11 @@ struct Star
 
 //Public nPlay As nPlay ' for online stuff
 //Public Water(0 To maxWater) As Water
-extern RangeArr<Water, 0, maxWater> water;
+extern RangeArr<Water_t, 0, maxWater> Water;
 //Public numWater As Integer 'number of water
 extern int numWater;
 //Public Star(1 To 1000) As Star
-extern RangeArr<Star, 1, 1000> star;
+extern RangeArr<Star_t, 1, 1000> Star;
 //Public GoToLevel As String
 extern std::string GoToLevel;
 //Public StartLevel As String 'start level for an episode
@@ -1183,7 +1183,7 @@ extern int numScenes;
 //Public CustomMusic(0 To maxSections) As String 'section's custom music
 extern RangeArr<std::string, 0, maxSections> CustomMusic;
 //Public level(0 To maxSections) As Location 'sections
-extern RangeArr<Location, 0, maxSections> level;
+extern RangeArr<Location_t, 0, maxSections> level;
 //Public LevelWrap(0 To maxSections) As Boolean 'Wrap around the level
 extern RangeArr<bool, 0, maxSections> LevelWrap;
 //Public OffScreenExit(0 To maxSections) As Boolean 'walk offscreen to end the level
@@ -1195,7 +1195,7 @@ extern RangeArr<int, 0, maxSections> bgMusicREAL;
 //Public Background2REAL(0 To maxSections) As Integer 'background
 extern RangeArr<int, 0, maxSections> Background2REAL;
 //Public LevelREAL(0 To maxSections) As Location 'default background
-extern RangeArr<Location, 0, maxSections> LevelREAL;
+extern RangeArr<Location_t, 0, maxSections> LevelREAL;
 //Public curMusic As Integer 'current music playing
 extern int curMusic;
 //Public bgColor(0 To maxSections) As Long 'obsolete
@@ -1203,19 +1203,19 @@ extern RangeArr<long, 0, maxSections> bgColor;
 //Public Background2(0 To maxSections) As Integer 'level background
 extern RangeArr<int, 0, maxSections> Background2;
 //Public WorldPath(1 To maxWorldPaths) As WorldPath
-extern RangeArr<WorldPath, 1, maxWorldPaths> worldPath;
+extern RangeArr<WorldPath_t, 1, maxWorldPaths> WorldPath;
 //Public numWorldPaths As Integer
 extern int numWorldPaths;
 //Public numWarps As Integer 'number of warps in a level
 extern int numWarps;
 //Public Warp(1 To maxWarps) As Warp 'define the warps
-extern RangeArr<Warp, 1, maxWarps> warp;
+extern RangeArr<Warp_t, 1, maxWarps> Warp;
 //Public Tile(1 To maxTiles) As Tile
-extern RangeArr<Tile, 1, maxTiles> tile;
+extern RangeArr<Tile_t, 1, maxTiles> Tile;
 //Public Scene(1 To maxScenes) As Scene
-extern RangeArr<Scene, 1, maxScenes> scene;
+extern RangeArr<Scene_t, 1, maxScenes> Scene;
 //Public Credit(1 To 200) As CreditLine 'for end game credits
-extern RangeArr<CreditLine, 1, 200> credit;
+extern RangeArr<CreditLine_t, 1, 200> Credit;
 //Public numCredits As Integer 'number of credits
 extern int numCredits;
 //Public numBlock As Integer 'number of blocks
@@ -1231,21 +1231,21 @@ extern int numPlayers;
 //Public numWorldLevels As Integer
 extern int numWorldLevels;
 //Public WorldMusic(1 To maxWorldMusic) As WorldMusic
-extern RangeArr<WorldMusic, 1, maxWorldMusic> worldMusic;
+extern RangeArr<WorldMusic_t, 1, maxWorldMusic> WorldMusic;
 //Public numWorldMusic As Integer
 extern int numWorldMusic;
 //Public WorldLevel(1 To maxWorldLevels) As WorldLevel
-extern RangeArr<WorldLevel, 1, maxWorldLevels> worldLevel;
+extern RangeArr<WorldLevel_t, 1, maxWorldLevels> WorldLevel;
 //Public Background(1 To maxBackgrounds) As Background
-extern RangeArr<Background, 1, maxBackgrounds> background;
+extern RangeArr<Background_t, 1, maxBackgrounds> Background;
 //Public Effect(1 To maxEffects) As Effect
-extern RangeArr<Effect, 1, maxEffects> effect;
+extern RangeArr<Effect_t, 1, maxEffects> Effect;
 //Public NPC(-128 To maxNPCs) As NPC
-extern RangeArr<NPC, 1, maxNPCs> npc;
+extern RangeArr<NPC_t, 1, maxNPCs> NPC;
 //Public Block(0 To maxBlocks) As Block
-extern RangeArr<Block, 0, maxBlocks> block;
+extern RangeArr<Block_t, 0, maxBlocks> Block;
 //Public Player(0 To maxPlayers) As Player
-extern RangeArr<Player, 0, maxPlayers> player;
+extern RangeArr<Player_t, 0, maxPlayers> Player;
 //Public MarioFrameX(0 To maxPlayerFrames) As Integer 'Player frame offset X
 extern RangeArr<int, 0, maxPlayerFrames> MarioFrameX;
 //Public MarioFrameY(0 To maxPlayerFrames) As Integer 'Player frame offset Y
@@ -1540,7 +1540,7 @@ extern RangeArr<int, 1, 10> CoinFrame2;
 //Public EditorCursor As EditorCursor
 extern EditorCursor editorCursor;
 //Public EditorControls As EditorControls
-extern EditorControls editorControls;
+extern EditorControls_t editorControls;
 
 //Public Sound(1 To numSounds) As Integer
 extern RangeArr<int, 1, numSounds> Sound;
@@ -1628,7 +1628,7 @@ extern int minShow;
 extern int maxShow;
 
 //Public Type Physics
-struct Physics
+struct Physics_t
 {
 //    PlayerJumpHeight As Integer
     int PlayerJumpHeight = 0;
@@ -1709,7 +1709,7 @@ struct Events
 //    Background(0 To maxSections) As Integer
     RangeArr<int, 0, maxSections> Background;
 //    level(0 To maxSections) As Location
-    RangeArr<Location, 0, maxSections> level;
+    RangeArr<Location_t, 0, maxSections> level;
 //    EndGame As Integer
     int EndGame = 0;
 //    TriggerEvent As String
@@ -1717,7 +1717,7 @@ struct Events
 //    TriggerDelay As Double
     double TriggerDelay = 0.0;
 //    Controls As Controls
-    Controls controls;
+    Controls_t Controls;
 //    MoveLayer As String
     std::string MoveLayer;
 //    SpeedX As Single
@@ -1744,7 +1744,7 @@ extern int ReturnWarp;
 //Public StartWarp As Integer
 extern int StartWarp;
 //Public Physics As Physics
-extern Physics physics;
+extern Physics_t Physics;
 //Public MenuCursor As Integer
 extern int MenuCursor;
 //Public MenuMode As Integer
@@ -1824,7 +1824,7 @@ extern int MaxWorldStars;
 //Public Debugger As Boolean 'if the debugger window is open
 extern bool Debugger;
 //Public SavedChar(0 To 10) As Player 'Saves the Player's Status
-extern RangeArr<Player, 0, 10> SavedChar;
+extern RangeArr<Player_t, 0, 10> SavedChar;
 
 //Public LoadCoins As Integer
 extern int LoadCoins;
@@ -2086,7 +2086,7 @@ extern int newEventNum;
 //Public ForcedControls As Boolean
 extern bool ForcedControls;
 //Public ForcedControl As Controls
-extern Controls ForcedControl;
+extern Controls_t ForcedControl;
 //Public SyncCount As Integer
 extern int SyncCount;
 //Public noUpdate As Boolean

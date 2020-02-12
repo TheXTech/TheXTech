@@ -19,9 +19,6 @@
 #include "sorting.h"
 #include "sound.h"
 
-//Dim ScrollDelay As Integer
-static int ScrollDelay = 0;
-
 void CheckActive();
 // set up sizable blocks
 void SizableBlocks();
@@ -41,7 +38,7 @@ bool FileExists(const std::string &fileName)
 
 int GameMain(int argc, char**argv)
 {
-    Player blankPlayer;
+    Player_t blankPlayer;
     int A = 0;
     int B = 0;
     int C = 0;
@@ -58,7 +55,7 @@ int GameMain(int argc, char**argv)
     FrameSkip = false;
     noSound = false;
 
-    SDL_memset(&blankPlayer, 0, sizeof(Player));
+    SDL_memset(&blankPlayer, 0, sizeof(Player_t));
 
 //    Unload frmLoader
 
@@ -153,7 +150,7 @@ int GameMain(int argc, char**argv)
             for(int A = 1; A <= maxPlayers; A++)
             {
 //                Player(A) = blankPlayer
-                player[A] = blankPlayer;
+                Player[A] = blankPlayer;
 //            Next A
             }
 //            numPlayers = 5
@@ -174,7 +171,7 @@ int GameMain(int argc, char**argv)
             for(int A = 1; A <= numPlayers; ++A)
             {
 //                With Player(A)
-                Player &p = player[A];
+                Player_t &p = Player[A];
 //                    If A = 1 Then
                 if(A == 1)
 //                        .State = 4
@@ -222,9 +219,9 @@ int GameMain(int argc, char**argv)
 //                    .Section = 0
                 p.Section = 0;
 //                    .Location.Height = Physics.PlayerHeight(.Character, .State)
-                p.location.Height = physics.PlayerHeight[p.Character][p.State];
+                p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
 //                    .Location.Width = Physics.PlayerWidth(.Character, .State)
-                p.location.Width = physics.PlayerWidth[p.Character][p.State];
+                p.Location.Width = Physics.PlayerWidth[p.Character][p.State];
 //                End With
 //            Next A
             }
@@ -419,7 +416,7 @@ int GameMain(int argc, char**argv)
             for(int A = 1; A <= maxPlayers; ++A)
             {
 //                Player(A) = blankPlayer
-                player[A] = blankPlayer;
+                Player[A] = blankPlayer;
 //            Next A
             }
 //            numPlayers = 6
@@ -436,7 +433,7 @@ int GameMain(int argc, char**argv)
             For(A, 1, numPlayers)
             {
 //                With Player(A)
-                Player &p = player[A];
+                Player_t &p = Player[A];
 //                    .State = Int(Rnd * 6) + 2
                 p.State = int(std::rand() % 6) + 2;
 //                    .Character = Int(Rnd * 5) + 1
@@ -449,13 +446,13 @@ int GameMain(int argc, char**argv)
 //                    .Section = 0
                 p.Section = 0;
 //                    .Location.Height = Physics.PlayerHeight(.Character, .State)
-                p.location.Height = physics.PlayerHeight[p.Character][p.State];
+                p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
 //                    .Location.Width = Physics.PlayerWidth(.Character, .State)
-                p.location.Width = physics.PlayerWidth[p.Character][p.State];
+                p.Location.Width = Physics.PlayerWidth[p.Character][p.State];
 //                    .Location.X = level(.Section).X + ((128 + Rnd * 64) * A)
-                p.location.X = level[p.Section].X + ((128 + std::rand() % 64) * A);
+                p.Location.X = level[p.Section].X + ((128 + std::rand() % 64) * A);
 //                    .Location.Y = level(.Section).Height - .Location.Height - 65
-                p.location.Y = level[p.Section].Height - p.location.Height - 65;
+                p.Location.Y = level[p.Section].Height - p.Location.Height - 65;
 //                    Do
                 do
                 {
@@ -465,10 +462,10 @@ int GameMain(int argc, char**argv)
                     for(int B = 1; B <= numBlock; ++B)
                     {
 //                            If CheckCollision(.Location, Block(B).Location) = True Then
-                        if(CheckCollision(p.location, block[B].location))
+                        if(CheckCollision(p.Location, Block[B].Location))
                         {
 //                                .Location.Y = Block(B).Location.Y - .Location.Height - 0.1
-                            p.location.Y = block[B].location.Y - p.location.Height - 0.1;
+                            p.Location.Y = Block[B].Location.Y - p.Location.Height - 0.1;
 //                                tempBool = False
                             tempBool = false;
 //                            End If
@@ -592,21 +589,21 @@ int GameMain(int argc, char**argv)
             For(A, 1, numPlayers)
             {
 //                If Player(A).Mount = 0 Or Player(A).Mount = 2 Then
-                if(player[A].Mount == 0 || player[A].Mount == 2)
+                if(Player[A].Mount == 0 || Player[A].Mount == 2)
                 {
 //                    If OwedMount(A) > 0 Then
                     if(OwedMount[A] > 0)
                     {
 //                        Player(A).Mount = OwedMount(A)
-                        player[A].Mount = OwedMount[A];
+                        Player[A].Mount = OwedMount[A];
 //                        If OwedMountType(A) > 0 Then
                         if(OwedMountType[A] > 0)
 //                            Player(A).MountType = OwedMountType(A)
-                            player[A].MountType = OwedMountType[A];
+                            Player[A].MountType = OwedMountType[A];
 //                        Else
                         else
 //                            Player(A).MountType = 1
-                            player[A].MountType = 1;
+                            Player[A].MountType = 1;
 //                        End If
 //                    End If
                     }
@@ -628,9 +625,9 @@ int GameMain(int argc, char**argv)
 //                If NoMap = True Then SaveGame
                 if(NoMap) SaveGame();
 //                Player(1).Vine = 0
-                player[1].Vine = 0;
+                Player[1].Vine = 0;
 //                Player(2).Vine = 0
-                player[2].Vine = 0;
+                Player[2].Vine = 0;
 //                PlaySound 28
                 PlaySound(28);
 //                SoundPause(26) = 200
@@ -648,12 +645,12 @@ int GameMain(int argc, char**argv)
 //                If GoToLevel = "" Then
                 if(GoToLevel == "")
 //                    OpenLevel SelectWorld(selWorld).WorldPath & StartLevel
-                    OpenLevel(selectWorld[selWorld].WorldPath + StartLevel);
+                    OpenLevel(SelectWorld[selWorld].WorldPath + StartLevel);
 //                Else
                 else
                 {
 //                    OpenLevel SelectWorld(selWorld).WorldPath & GoToLevel
-                    OpenLevel(selectWorld[selWorld].WorldPath + GoToLevel);
+                    OpenLevel(SelectWorld[selWorld].WorldPath + GoToLevel);
 //                    GoToLevel = ""
                     GoToLevel = "";
 //                End If
@@ -794,8 +791,8 @@ int GameMain(int argc, char**argv)
             for(int A = 1; A <= numPlayers; ++A)
             {
 //                If Player(A).Mount = 2 Then Player(A).Mount = 0 'take players off the clown car
-                if(player[A].Mount == 2)
-                    player[A].Mount = 0; // take players off the clown car
+                if(Player[A].Mount == 2)
+                    Player[A].Mount = 0; // take players off the clown car
 //            Next A
             }
 //            SetupPlayers 'Setup Players for the level
@@ -810,7 +807,7 @@ int GameMain(int argc, char**argv)
                 for(int A = 1; A <= numPlayers; ++A)
                 {
 //                    With Player(A)
-                    Player &p = player[A];
+                    Player_t &p = Player[A];
 //                        If StartWarp > 0 Then
                     if(StartWarp > 0)
 //                            .Warp = StartWarp
@@ -821,43 +818,43 @@ int GameMain(int argc, char**argv)
                         p.Warp = ReturnWarp;
 //                        End If
 //                        If Warp(.Warp).Effect = 1 Then
-                    if(warp[p.Warp].Effect == 1)
+                    if(Warp[p.Warp].Effect == 1)
                     {
 //                            If Warp(.Warp).Direction2 = 1 Then
-                        if(warp[p.Warp].Direction2 == 1)
+                        if(Warp[p.Warp].Direction2 == 1)
                         {
 //                                .Location.X = Warp(.Warp).Exit.X + Warp(.Warp).Exit.Width / 2 - .Location.Width / 2
-                            p.location.X = warp[p.Warp].Exit.X + warp[p.Warp].Exit.Width / 2 - p.location.Width / 2;
+                            p.Location.X = Warp[p.Warp].Exit.X + Warp[p.Warp].Exit.Width / 2 - p.Location.Width / 2;
 //                                .Location.Y = Warp(.Warp).Exit.Y - .Location.Height - 8
-                            p.location.Y = warp[p.Warp].Exit.Y + warp[p.Warp].Exit.Height - 8;
+                            p.Location.Y = Warp[p.Warp].Exit.Y + Warp[p.Warp].Exit.Height - 8;
                         }
 //                            ElseIf Warp(.Warp).Direction2 = 3 Then
-                        if(warp[p.Warp].Direction2 == 3)
+                        if(Warp[p.Warp].Direction2 == 3)
                         {
 //                                .Location.X = Warp(.Warp).Exit.X + Warp(.Warp).Exit.Width / 2 - .Location.Width / 2
-                            p.location.X = warp[p.Warp].Exit.X + warp[p.Warp].Exit.Width / 2 - p.location.Width / 2;
+                            p.Location.X = Warp[p.Warp].Exit.X + Warp[p.Warp].Exit.Width / 2 - p.Location.Width / 2;
 //                                .Location.Y = Warp(.Warp).Exit.Y + Warp(.Warp).Exit.Height + 8
-                            p.location.Y = warp[p.Warp].Exit.Y + warp[p.Warp].Exit.Height + 8;
+                            p.Location.Y = Warp[p.Warp].Exit.Y + Warp[p.Warp].Exit.Height + 8;
                         }
 //                            ElseIf Warp(.Warp).Direction2 = 2 Then
-                        if(warp[p.Warp].Direction2 == 2)
+                        if(Warp[p.Warp].Direction2 == 2)
                         {
 //                                If .Mount = 3 Then .Duck = True
                             if(p.Mount == 3) p.Duck = true;
 //                                .Location.X = Warp(.Warp).Exit.X - .Location.Width - 8
-                            p.location.X = warp[p.Warp].Exit.X + warp[p.Warp].Exit.Width - 8;
+                            p.Location.X = Warp[p.Warp].Exit.X + Warp[p.Warp].Exit.Width - 8;
 //                                .Location.Y = Warp(.Warp).Exit.Y + Warp(.Warp).Exit.Height - .Location.Height - 2
-                            p.location.Y = warp[p.Warp].Exit.Y + warp[p.Warp].Exit.Height / 2 - p.location.Height / 2;
+                            p.Location.Y = Warp[p.Warp].Exit.Y + Warp[p.Warp].Exit.Height / 2 - p.Location.Height / 2;
                         }
 //                            ElseIf Warp(.Warp).Direction2 = 4 Then
-                        if(warp[p.Warp].Direction2 == 4)
+                        if(Warp[p.Warp].Direction2 == 4)
                         {
 //                                If .Mount = 3 Then .Duck = True
                             if(p.Mount == 3) p.Duck = true;
 //                                .Location.X = Warp(.Warp).Exit.X + Warp(.Warp).Exit.Width + 8
-                            p.location.X = warp[p.Warp].Exit.X + warp[p.Warp].Exit.Width + 8;
+                            p.Location.X = Warp[p.Warp].Exit.X + Warp[p.Warp].Exit.Width + 8;
 //                                .Location.Y = Warp(.Warp).Exit.Y + Warp(.Warp).Exit.Height - .Location.Height - 2
-                            p.location.Y = warp[p.Warp].Exit.Y + warp[p.Warp].Exit.Height / 2 - p.location.Height / 2;
+                            p.Location.Y = Warp[p.Warp].Exit.Y + Warp[p.Warp].Exit.Height / 2 - p.Location.Height / 2;
 //                            End If
                         }
 //                            PlayerFrame A
@@ -872,12 +869,12 @@ int GameMain(int argc, char**argv)
                         p.Effect2 = 950;
                     }
 //                        ElseIf Warp(.Warp).Effect = 2 Then
-                    else if(warp[p.Warp].Effect == 2)
+                    else if(Warp[p.Warp].Effect == 2)
                     {
 //                            .Location.X = Warp(.Warp).Exit.X + Warp(.Warp).Exit.Width / 2 - .Location.Width / 2
-                        p.location.X = warp[p.Warp].Exit.X + warp[p.Warp].Exit.Width / 2 - p.location.Width / 2;
+                        p.Location.X = Warp[p.Warp].Exit.X + Warp[p.Warp].Exit.Width / 2 - p.Location.Width / 2;
 //                            .Location.Y = Warp(.Warp).Exit.Y + Warp(.Warp).Exit.Height - .Location.Height
-                        p.location.Y = warp[p.Warp].Exit.Y + warp[p.Warp].Exit.Height / 2 - p.location.Height / 2;
+                        p.Location.Y = Warp[p.Warp].Exit.Y + Warp[p.Warp].Exit.Height / 2 - p.Location.Height / 2;
 //                            CheckSection A
                         CheckSection(A);
 //                            .Effect = 8
@@ -1189,10 +1186,21 @@ void FindStars()
 
 void AddCredit(std::string newCredit)
 {
-
+    numCredits += 1;
+    Credit[numCredits].Text = newCredit;
 }
 
-void MoreScore(int addScore, Location Loc, int Multiplier)
+Location_t newLoc(double X, double Y, double Width, double Height)
+{
+    Location_t ret;
+    ret.X = X;
+    ret.Y = Y;
+    ret.Width = Width;
+    ret.Height = Height;
+    return ret;
+}
+
+void MoreScore(int addScore, Location_t Loc, int Multiplier)
 {
 
 }

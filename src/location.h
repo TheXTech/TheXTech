@@ -2,7 +2,7 @@
 #define LOCATION_H
 
 //Public Type Location    'Holds location information for objects
-struct Location
+struct Location_t
 {
 //    X As Double
     double X = 0.0;

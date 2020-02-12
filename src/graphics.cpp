@@ -74,12 +74,12 @@ void DrawBackground(int S, int Z)
 
 }
 
-void PlayerWarpGFX(int A, Location tempLocation, float X2, float Y2)
+void PlayerWarpGFX(int A, Location_t tempLocation, float X2, float Y2)
 {
 
 }
 
-void NPCWarpGFX(int A, Location tempLocation, float X2, float Y2)
+void NPCWarpGFX(int A, Location_t tempLocation, float X2, float Y2)
 {
 
 }
