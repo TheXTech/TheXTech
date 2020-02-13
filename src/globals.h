@@ -1968,26 +1968,27 @@ extern RangeArr<int, 1, 10> GFXLinkHeight;
 //Public GFXLinkWidth(1 To 10) As Integer
 extern RangeArr<int, 1, 10> GFXLinkWidth;
 
+const int maxYoshiGfx = 10;
 //Public GFXYoshiBCustom(1 To 10) As Boolean
-extern RangeArr<bool, 1, 10> GFXYoshiBCustom;
+extern RangeArr<bool, 1, maxYoshiGfx> GFXYoshiBCustom;
 //Public GFXYoshiB(1 To 10) As Long
-extern RangeArr<long, 1, 10> GFXYoshiB;
+extern RangeArr<long, 1, maxYoshiGfx> GFXYoshiB;
 //Public GFXYoshiBMask(1 To 10) As Long
-extern RangeArr<long, 1, 10> GFXYoshiBMask;
+extern RangeArr<long, 1, maxYoshiGfx> GFXYoshiBMask;
 //Public GFXYoshiBBMP(1 To 10) As StdPicture
-extern RangeArr<StdPicture, 1, 10> GFXYoshiBBMP;
+extern RangeArr<StdPicture, 1, maxYoshiGfx> GFXYoshiBBMP;
 //Public GFXYoshiBMaskBMP(1 To 10) As StdPicture
-extern RangeArr<StdPicture, 1, 10> GFXYoshiBMaskBMP;
+extern RangeArr<StdPicture, 1, maxYoshiGfx> GFXYoshiBMaskBMP;
 //Public GFXYoshiTCustom(1 To 10) As Boolean
-extern RangeArr<bool, 1, 10> GFXYoshiTCustom;
+extern RangeArr<bool, 1, maxYoshiGfx> GFXYoshiTCustom;
 //Public GFXYoshiT(1 To 10) As Long
-extern RangeArr<long, 1, 10> GFXYoshiT;
+extern RangeArr<long, 1, maxYoshiGfx> GFXYoshiT;
 //Public GFXYoshiTMask(1 To 10) As Long
-extern RangeArr<long, 1, 10> GFXYoshiTMask;
+extern RangeArr<long, 1, maxYoshiGfx> GFXYoshiTMask;
 //Public GFXYoshiTBMP(1 To 10) As StdPicture
-extern RangeArr<StdPicture, 1, 10> GFXYoshiTBMP;
+extern RangeArr<StdPicture, 1, maxYoshiGfx> GFXYoshiTBMP;
 //Public GFXYoshiTMaskBMP(1 To 10) As StdPicture
-extern RangeArr<StdPicture, 1, 10> GFXYoshiTMaskBMP;
+extern RangeArr<StdPicture, 1, maxYoshiGfx> GFXYoshiTMaskBMP;
 //'World Map Graphics
 //Public GFXTileCustom(1 To maxTileType) As Long
 extern RangeArr<long, 1, maxTileType> GFXTileCustom;

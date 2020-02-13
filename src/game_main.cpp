@@ -1060,9 +1060,6 @@ void KillIt()
     if(resChanged)
         SetOrigRes();
     QuitMixerX();
-//    DeleteDC myBackBuffer
-//    DeleteObject myBufferBMP
-//    UnloadGFX
     UnloadGFX();
     ShowCursor(1);
 }
