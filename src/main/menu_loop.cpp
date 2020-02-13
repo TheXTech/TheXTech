@@ -68,7 +68,7 @@ void MenuLoop()
             else
             {
 //            MenuCursorCanMove = True
-            MenuCursorCanMove = true;
+                MenuCursorCanMove = true;
 //        End If
             }
 //    End If
@@ -111,7 +111,9 @@ void MenuLoop()
 //                MenuCursorCanMove = False
                 MenuCursorCanMove = false;
 //            ElseIf .Down = True Or (GetKeyState(vbKeyDown) And KEY_PRESSED) Then
-            } else {
+            }
+            else if(c.Down Or getKeyState(vbKeyDown) == KEY_PRESSED)
+            {
 //                If MenuCursorCanMove = True Then
                 if(MenuCursorCanMove)
                 {
