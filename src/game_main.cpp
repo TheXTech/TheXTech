@@ -61,6 +61,7 @@ int GameMain(int argc, char**argv)
 
 //    Unload frmLoader
 
+    GFX.load(); // load the graphics form
 
 //    If LevelEditor = False Then
 //        frmMain.Show
@@ -97,7 +98,7 @@ int GameMain(int argc, char**argv)
 //    SetupGraphics 'setup graphics
     SetupGraphics(); // setup graphics
 //    Load GFX 'load the graphics form
-    GFX.load(); // load the graphics form
+//    GFX.load(); // load the graphics form // Moved to before sound load
 //    SizableBlocks
     SizableBlocks();
 //    LoadGFX 'load the graphics from file
@@ -1143,31 +1144,19 @@ void PauseGame(int plr)
 
 void InitControls()
 {
-    // Dim A As Integer
     int A = 0;
-    // Dim B As Integer
     int B = 0;
-    // Dim newJoystick As Boolean
     bool newJoystick = false;
 
-//    Do
     while(true)
     {
-//        newJoystick = StartJoystick(A)
         newJoystick = StartJoystick(A);
-//        If newJoystick = True Then
         if(newJoystick) {
-//            A = A + 1
             A += 1;
-//        Else
         } else {
-//            Exit Do
             break;
-//        End If
         }
-//    Loop
     }
-//    numJoysticks = A
     numJoysticks = A;
 
     /* // Crazy Redigit's solution, useless
@@ -1194,35 +1183,23 @@ void InitControls()
     */
 
 //    '
-//    useJoystick(1) = 0
     useJoystick[1] = 0;
-//    useJoystick(2) = 0
     useJoystick[2] = 0;
 //    '
 
-//    For A = 1 To 2
     For(A, 1, 2)
     {
-//        With conJoystick(A)
         {
             auto &j = conJoystick[A];
-//            .Run = 2
             j.Run = 2;
-//            .AltRun = 3
             j.AltRun = 3;
-//            .Jump = 0
             j.Jump = 0;
-//            .AltJump = 1
             j.AltJump = 1;
-//            .Drop = 6
             j.Drop = 6;
-//            .Start = 7
             j.Start = 7;
-//        End With
         }
-//    Next A
     }
-//    With conKeyboard[1]
+
     conKeyboard[1].Down = vbKeyDown;
     conKeyboard[1].Left = vbKeyLeft;
     conKeyboard[1].Up = vbKeyUp;
@@ -1233,9 +1210,7 @@ void InitControls()
     conKeyboard[1].Start = vbKeyEscape;
     conKeyboard[1].AltJump = vbKeyA;
     conKeyboard[1].AltRun = vbKeyS;
-//    End With
 
-//    With conKeyboard(2)
     conKeyboard[2].Down = vbKeyDown;
     conKeyboard[2].Left = vbKeyLeft;
     conKeyboard[2].Up = vbKeyUp;
@@ -1246,13 +1221,11 @@ void InitControls()
     conKeyboard[2].Start = vbKeyEscape;
     conKeyboard[2].AltJump = vbKeyA;
     conKeyboard[2].AltRun = vbKeyS;
-//    End With
-//    OpenConfig
+
     OpenConfig();
-//    If useJoystick(1) > numJoysticks Then useJoystick(1) = 0
+
     if(useJoystick[1] > numJoysticks)
         useJoystick[1] = 0;
-//    If useJoystick(2) > numJoysticks Then useJoystick(2) = 0
     if(useJoystick[2] > numJoysticks)
         useJoystick[2] = 0;
 }
@@ -1329,6 +1302,6 @@ void StartBattleMode()
 
 std::string FixComma(std::string newStr)
 {
-
+    return newStr; // TODO IT
 }
 

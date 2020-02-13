@@ -291,10 +291,11 @@ void MenuLoop()
                     PlaySound(29);
 //                    BitBlt myBackBuffer, 0, 0, ScreenW, ScreenH, 0, 0, 0, vbWhiteness
 //                    BitBlt frmMain.hdc, 0, 0, frmMain.ScaleWidth, frmMain.ScaleHeight, 0, 0, 0, vbWhiteness
-                    frmMain.renderRect(0, 0, frmMain.ScaleWidth, frmMain.ScaleHeight, 0.f, 0.f, 0.f, 1.f, true);
+                    frmMain.renderRect(0, 0, frmMain.ScaleWidth, frmMain.ScaleHeight, 0.f, 0.f, 0.f, 1.f);
 //                    StopMusic
                     StopMusic();
 //                    DoEvents
+                    frmMain.repaint();
                     DoEvents();
 //                    Sleep 500
                     SDL_Delay(500);
@@ -628,7 +629,8 @@ void MenuLoop()
 //                    MenuCursor = MenuMode - 1
                     MenuCursor = MenuMode - 1;
 //                    If MenuMode = 4 Then MenuCursor = 2
-                    if(MenuMode == 4) MenuCursor = 2;
+                    if(MenuMode == 4)
+                        MenuCursor = 2;
 //                    MenuMode = 0
                     MenuMode = 0;
 //'world select back

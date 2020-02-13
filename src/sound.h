@@ -3,14 +3,17 @@
 
 #include <string>
 
+// Public musicPlaying As Boolean
+extern bool musicPlaying;
+// Public musicLoop As Integer
+extern int musicLoop;
+// Public musicName As String
+extern std::string musicName;
+
 // Public Sub InitMixerX()
 void InitMixerX();
 // Public Sub QuitMixerX()
 void QuitMixerX();
-// Public Sub AddMusic(Alias As String, Path As String, FallBack As String)
-void AddMusic(std::string Alias, std::string Path, std::string FallBack);
-// Public Sub AddSfx(Alias As String, Path As String, FallBack As String)
-void AddSfx(std::string Alias, std::string Path, std::string FallBack);
 // Public Sub SetMusicVolume(Alias As String, Volume As Long)
 void SetMusicVolume(std::string Alias, long Volume);
 // Public Sub SoundPauseAll()
