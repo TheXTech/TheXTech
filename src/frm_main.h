@@ -10,7 +10,7 @@
 class FrmMain
 {
     SDL_Event event;
-    std::string WindowTitle = "A2XT v1.3";
+    std::string WindowTitle = "A2xTech v1.3";
     SDL_Window *window = nullptr;
     SDL_Renderer *m_gRenderer = nullptr;
     std::set<SDL_Texture *> m_textureBank;
