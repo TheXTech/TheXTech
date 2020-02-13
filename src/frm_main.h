@@ -42,7 +42,6 @@ public:
     void eventMouseMove(SDL_MouseMotionEvent &event);
     void eventMouseUp(SDL_MouseButtonEvent &event);
     void eventResize();
-    void toggleFullScreen();
     int setFullScreen(bool fs);
     bool isSdlError();
 
@@ -53,6 +52,7 @@ public:
     void deleteTexture(StdPicture &tx);
     void clearAllTextures();
 
+    void clearBuffer();
     void renderRect(int x, int y, int w, int h, float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f, bool filled = true);
     void renderRectBR(int _left, int _top, int _right, int _bottom, float red, float green, float blue, float alpha);
 
@@ -65,8 +65,28 @@ public:
     void renderTexture(int xDst, int yDst, const StdPicture &tx,
                        float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f);
 
+    void getScreenPixels(int x, int y, int w, int h, unsigned char *pixels);
+    void getScreenPixelsRGBA(int x, int y, int w, int h, unsigned char *pixels);
+    int  getPixelDataSize(const StdPicture &tx);
+    void getPixelData(const StdPicture &tx, unsigned char *pixelData);
+
+    void makeShot();
+
 private:
     void loadTexture(StdPicture &target, uint32_t width, uint32_t height, uint8_t *RGBApixels);
+
+    struct PGE_GL_shoot
+    {
+        FrmMain *me = nullptr;
+        uint8_t *pixels = nullptr;
+        int w = 0, h = 0;
+    };
+
+    std::string g_ScreenshotPath;
+
+    static int makeShot_action(void *_pixels);
+
+    SDL_Thread *m_screenshot_thread = nullptr;
 
     //Scale of virtual and window resolutuins
     float scale_x = 1.f;

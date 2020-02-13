@@ -291,7 +291,7 @@ void MenuLoop()
                     PlaySound(29);
 //                    BitBlt myBackBuffer, 0, 0, ScreenW, ScreenH, 0, 0, 0, vbWhiteness
 //                    BitBlt frmMain.hdc, 0, 0, frmMain.ScaleWidth, frmMain.ScaleHeight, 0, 0, 0, vbWhiteness
-                    frmMain.renderRect(0, 0, frmMain.ScaleWidth, frmMain.ScaleHeight, 0.f, 0.f, 0.f, 1.f);
+                    frmMain.clearBuffer();
 //                    StopMusic
                     StopMusic();
 //                    DoEvents
@@ -852,7 +852,7 @@ void MenuLoop()
                     GameMenu = False;
 //                    BitBlt myBackBuffer, 0, 0, ScreenW, ScreenH, 0, 0, 0, vbWhiteness
 //                    BitBlt frmMain.hdc, 0, 0, frmMain.ScaleWidth, frmMain.ScaleHeight, 0, 0, 0, vbWhiteness
-                    frmMain.renderRect(0, 0, ScreenW, ScreenH, 0.f, 0.f, 0.f, 1.f);
+                    frmMain.clearBuffer();
 //                    StopMusic
                     StopMusic();
 //                    DoEvents
@@ -1398,14 +1398,28 @@ void MenuLoop()
             }
 
 //            If MenuMode <> 3 Then
+            if(MenuMode != 3)
+            {
 //                If useJoystick(MenuMode - 30) = 0 Then
+                if(useJoystick[MenuMode - 30] == 0) {
 //                    If MenuCursor > 10 Then MenuCursor = 0
+                    if(MenuCursor > 10)
+                        MenuCursor = 0;
 //                    If MenuCursor < 0 Then MenuCursor = 10
+                    if(MenuCursor < 0)
+                        MenuCursor = 10;
 //                Else
+                } else {
 //                    If MenuCursor > 6 Then MenuCursor = 0
+                    if(MenuCursor > 6)
+                        MenuCursor = 0;
 //                    If MenuCursor < 0 Then MenuCursor = 6
+                    if(MenuCursor < 0)
+                        MenuCursor = 6;
 //                End If
+                }
 //            End If
+            }
 //        End If
         }
 //    End With ' Player.Controls
@@ -2157,4 +2171,19 @@ void MenuLoop()
     }
 //    MenuMouseBack = False
     MenuMouseBack = false;
+}
+
+void FindWorlds()
+{
+
+}
+
+void FindLevels()
+{
+
+}
+
+void FindSaves()
+{
+
 }

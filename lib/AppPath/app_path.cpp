@@ -220,7 +220,7 @@ std::string AppPathManager::screenshotsDir()
         path = base_path;
         SDL_free(base_path);
     }
-    return path + "/Moondust Game Screenshots";
+    return path + "/A2xTech Game Screenshots";
 #endif
 }
 

@@ -61,7 +61,7 @@ int GameMain(int argc, char**argv)
 
 //    Unload frmLoader
 
-    GFX.load(); // load the graphics form
+    GFX.load(); // Load UI graphics
 
 //    If LevelEditor = False Then
 //        frmMain.Show
@@ -72,24 +72,17 @@ int GameMain(int argc, char**argv)
 //        frmSplash.Show
 //        BlocksSorted = True
 //    End If
-//    InitControls 'init player's controls
+
     InitControls(); // init player's controls
-//    DoEvents
     DoEvents();
-//    If noSound = False Then
+
     if(!noSound)
     {
-//        InitMixerX
         InitMixerX();
-//        ' mciSendString "open " & Chr(34) & App.path & "\sound\do.mp3" & Chr(34) & " alias sound29", 0, 0, 0 'play the nintendo sound
-//        ' mciSendString "play sound29 from 10", 0, 0, 0
-//        PlayInitSound
         PlayInitSound();
-//    End If
     }
-//    InitSound 'Setup sound effects
-    InitSound();
-//    LevelSelect = True 'world map is to be shown
+
+    InitSound(); // Setup sound effects
     LevelSelect = true; // world map is to be shown
 //    DoEvents
     DoEvents();
@@ -1105,21 +1098,6 @@ void PathWait()
 }
 
 void ClearWorld()
-{
-
-}
-
-void FindWorlds()
-{
-
-}
-
-void FindLevels()
-{
-
-}
-
-void FindSaves()
 {
 
 }

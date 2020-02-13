@@ -1,11 +1,17 @@
 #include "globals.h"
 #include "game_main.h"
 #include "graphics.h"
-#include <SDL2/SDL_mixer_ext.h>
+#include <AppPath/app_path.h>
 #include <Logger/logger.h>
 #include <Utils/files.h>
+#include <DirManager/dirman.h>
 #include <Graphics/graphics_funcs.h>
 #include <FreeImageLite.h>
+#include <chrono>
+#include <fmt_time_ne.h>
+#include <fmt_format_ne.h>
+
+#include <SDL2/SDL_thread.h>
 
 #include "frm_main.h"
 
@@ -36,8 +42,9 @@ bool FrmMain::initSDL()
     //Write into log the application start event
     pLogDebug("<Application started>");
 
+    g_ScreenshotPath = AppPath + "screenshots/";
+
     Uint32 sdlInitFlags = 0;
-    int sdlMixerInitFlags = 0;
     // Prepare flags for SDL initialization
     sdlInitFlags |= SDL_INIT_TIMER;
     sdlInitFlags |= SDL_INIT_AUDIO;
@@ -47,12 +54,6 @@ bool FrmMain::initSDL()
     //(Cool thing, but is not needed yet)
     //sdlInitFlags |= SDL_INIT_HAPTIC;
     sdlInitFlags |= SDL_INIT_GAMECONTROLLER;
-
-    sdlMixerInitFlags |= MIX_INIT_FLAC;
-    sdlMixerInitFlags |= MIX_INIT_MOD;
-    sdlMixerInitFlags |= MIX_INIT_MP3;
-    sdlMixerInitFlags |= MIX_INIT_OGG;
-    sdlMixerInitFlags |= MIX_INIT_MID;
 
     // Initialize SDL
     res = (SDL_Init(sdlInitFlags) < 0);
@@ -64,11 +65,6 @@ bool FrmMain::initSDL()
     const char *error = SDL_GetError();
     if(*error != '\0')
         pLogWarning("Error while SDL Initialization: %s", error);
-    SDL_ClearError();
-
-    // Initialize SDL Mixer
-    res = (Mix_Init(sdlMixerInitFlags) < 0);
-
     SDL_ClearError();
 
     SDL_GL_ResetAttributes();
@@ -167,7 +163,6 @@ bool FrmMain::initSDL()
 
     updateViewport();
 
-    renderRect(0, 0, frmMain.ScaleWidth, frmMain.ScaleHeight, 0.f, 0.f, 0.f, 1.f, true);
     repaint();
     doEvents();
 
@@ -332,11 +327,6 @@ void FrmMain::eventResize()
     SetupScreens();
 }
 
-void FrmMain::toggleFullScreen()
-{
-
-}
-
 int FrmMain::setFullScreen(bool fs)
 {
     if(window == nullptr)
@@ -412,29 +402,29 @@ void FrmMain::updateViewport()
     offset_x = (w - w1) / 2;
     offset_y = (h - h1) / 2;
 
-    SDL_Rect topLeftViewport;
+    SDL_Rect topLeftViewport = {0, 0, wi, hi};
+    SDL_RenderSetViewport(m_gRenderer, &topLeftViewport);
+    clearBuffer();
+
     topLeftViewport.x = static_cast<int>(offset_x);
     topLeftViewport.y = static_cast<int>(offset_y);
     topLeftViewport.w = static_cast<int>(w1);
     topLeftViewport.h = static_cast<int>(h1);
+    clearBuffer();
     SDL_RenderSetViewport(m_gRenderer, &topLeftViewport);
 }
 
 StdPicture FrmMain::LoadPicture(std::string path, std::string maskPath, std::string maskFallbackPath)
 {
     StdPicture target;
-
-    //SDL_Surface * sourceImage;
     FIBITMAP *sourceImage;
 
     if(path.empty())
         return target;
 
-    // Load the OpenGL texture
-    //sourceImage = GraphicsHelps::loadQImage(path); // Gives us the information to make the texture
     sourceImage = GraphicsHelps::loadImage(path);
 
-    //Don't load mask if PNG image is used
+    // Don't load mask if PNG image is used
     if(Files::hasSuffix(path, ".png"))
     {
         maskPath.clear();
@@ -466,23 +456,23 @@ StdPicture FrmMain::LoadPicture(std::string path, std::string maskPath, std::str
     //Apply Alpha mask
     if(!maskPath.empty() && Files::fileExists(maskPath))
     {
-        #ifdef DEBUG_BUILD
+#ifdef DEBUG_BUILD
         maskMergingTime.start();
-        #endif
+#endif
         GraphicsHelps::mergeWithMask(sourceImage, maskPath);
-        #ifdef DEBUG_BUILD
+#ifdef DEBUG_BUILD
         maskElapsed = maskMergingTime.nanoelapsed();
-        #endif
+#endif
     }
     else if(!maskFallbackPath.empty())
     {
-        #ifdef DEBUG_BUILD
+#ifdef DEBUG_BUILD
         maskMergingTime.start();
-        #endif
+#endif
         GraphicsHelps::mergeWithMask(sourceImage, "", maskFallbackPath);
-        #ifdef DEBUG_BUILD
+#ifdef DEBUG_BUILD
         maskElapsed = maskMergingTime.nanoelapsed();
-        #endif
+#endif
     }
 
     uint32_t w = static_cast<uint32_t>(FreeImage_GetWidth(sourceImage));
@@ -570,6 +560,146 @@ void FrmMain::loadTexture(StdPicture &target, uint32_t width, uint32_t height, u
     m_textureBank.insert(texture);
 
     target.inited = true;
+}
+
+
+void FrmMain::makeShot()
+{
+    if(!m_gRenderer)
+        return;
+
+    // Make the BYTE array, factor of 3 because it's RBG.
+    int w, h;
+    float wF, hF;
+    SDL_GetWindowSize(window, &w, &h);
+
+    if((w == 0) || (h == 0))
+    {
+        pLogWarning("Can't make screenshot: invalid width(%d) or height(%d).", w, h);
+        return;
+    }
+
+    wF = static_cast<float>(w);
+    hF = static_cast<float>(h);
+    wF = wF - offset_x * 2.0f;
+    hF = hF - offset_y * 2.0f;
+    w = static_cast<int>(wF);
+    h = static_cast<int>(hF);
+    uint8_t *pixels = new uint8_t[size_t(4 * w * h)];
+    getScreenPixels(static_cast<int>(offset_x), static_cast<int>(offset_y), w, h, pixels);
+    PGE_GL_shoot *shoot = new PGE_GL_shoot();
+    shoot->pixels = pixels;
+    shoot->w = w;
+    shoot->h = h;
+    shoot->me = this;
+#ifndef PGE_NO_THREADING
+    m_screenshot_thread = SDL_CreateThread(makeShot_action, "scrn_maker", reinterpret_cast<void *>(shoot));
+#else
+    makeShot_action(reinterpret_cast<void *>(shoot));
+#endif
+}
+
+static std::string shoot_getTimedString(std::string path, const char *ext = "png")
+{
+    auto now = std::chrono::system_clock::now();
+    std::time_t in_time_t = std::chrono::system_clock::to_time_t(now);
+    std::tm t = fmt::localtime_ne(in_time_t);
+    static int prevSec = 0;
+    static int prevSecCounter = 0;
+    if(prevSec != t.tm_sec)
+    {
+        prevSec = t.tm_sec;
+        prevSecCounter = 0;
+    }
+    else
+        prevSecCounter++;
+
+    if(!prevSecCounter)
+    {
+        return fmt::sprintf_ne("%sScr_%04d-%02d-%02d_%02d-%02d-%02d.%s",
+                               path,
+                               (1900 + t.tm_year), (1 + t.tm_mon), t.tm_mday,
+                               t.tm_hour, t.tm_min, t.tm_sec,
+                               ext);
+    }
+    else
+    {
+        return fmt::sprintf_ne("%sScr_%04d-%02d-%02d_%02d-%02d-%02d_(%d).%s",
+                               path,
+                               (1900 + t.tm_year), (1 + t.tm_mon), t.tm_mday,
+                               t.tm_hour, t.tm_min, t.tm_sec,
+                               prevSecCounter,
+                               ext);
+    }
+}
+
+int FrmMain::makeShot_action(void *_pixels)
+{
+    PGE_GL_shoot *shoot = reinterpret_cast<PGE_GL_shoot *>(_pixels);
+    FrmMain *me = shoot->me;
+    FIBITMAP *shotImg = FreeImage_ConvertFromRawBits(reinterpret_cast<BYTE *>(shoot->pixels), shoot->w, shoot->h,
+                        3 * shoot->w + shoot->w % 4, 24, 0xFF0000, 0x00FF00, 0x0000FF, true);
+
+    if(!shotImg)
+    {
+        delete []shoot->pixels;
+        shoot->pixels = nullptr;
+        delete []shoot;
+        me->m_screenshot_thread = nullptr;
+        return 0;
+    }
+
+    FIBITMAP *temp;
+    temp = FreeImage_ConvertTo32Bits(shotImg);
+
+    if(!temp)
+    {
+        FreeImage_Unload(shotImg);
+        delete []shoot->pixels;
+        shoot->pixels = nullptr;
+        delete []shoot;
+        me->m_screenshot_thread = nullptr;
+        return 0;
+    }
+
+    FreeImage_Unload(shotImg);
+    shotImg = temp;
+
+    if((shoot->w != ScreenW) || (shoot->h != ScreenH))
+    {
+        FIBITMAP *temp = FreeImage_Rescale(shotImg, ScreenW, ScreenH, FILTER_BOX);
+        if(!temp)
+        {
+            FreeImage_Unload(shotImg);
+            delete []shoot->pixels;
+            shoot->pixels = nullptr;
+            delete []shoot;
+            me->m_screenshot_thread = nullptr;
+            return 0;
+        }
+
+        FreeImage_Unload(shotImg);
+        shotImg = temp;
+    }
+
+    if(!DirMan::exists(me->g_ScreenshotPath))
+        DirMan::mkAbsDir(me->g_ScreenshotPath);
+
+    std::string saveTo = shoot_getTimedString(me->g_ScreenshotPath, "png");
+    pLogDebug("%s %d %d", saveTo.c_str(), shoot->w, shoot->h);
+
+    if(FreeImage_HasPixels(shotImg) == FALSE)
+        pLogWarning("Can't save screenshot: no pixel data!");
+    else
+        FreeImage_Save(FIF_PNG, shotImg, saveTo.data(), PNG_Z_BEST_COMPRESSION);
+
+    FreeImage_Unload(shotImg);
+    delete []shoot->pixels;
+    shoot->pixels = nullptr;
+    delete []shoot;
+
+    me->m_screenshot_thread = nullptr;
+    return 0;
 }
 
 SDL_Rect FrmMain::scaledRectIS(float x, float y, int w, int h)
@@ -666,6 +796,12 @@ void FrmMain::clearAllTextures()
     m_textureBank.clear();
 }
 
+void FrmMain::clearBuffer()
+{
+    SDL_SetRenderDrawColor(m_gRenderer, 0, 0, 0, 255);
+    SDL_RenderClear(m_gRenderer);
+}
+
 void FrmMain::renderRect(int x, int y, int w, int h, float red, float green, float blue, float alpha, bool filled)
 {
     SDL_Rect aRect = scaledRect(x, y, w, h);
@@ -731,4 +867,52 @@ void FrmMain::renderTexture(int xDst, int yDst, const StdPicture &tx, float red,
     SDL_SetTextureAlphaMod(tx.texture, static_cast<unsigned char>(255.f * alpha));
     SDL_RenderCopyEx(m_gRenderer, tx.texture, &sourceRect, &destRect,
                      0.0, nullptr, static_cast<SDL_RendererFlip>(flip));
+}
+
+void FrmMain::getScreenPixels(int x, int y, int w, int h, unsigned char *pixels)
+{
+    SDL_Rect rect;
+    rect.x = x;
+    rect.y = y;
+    rect.w = w;
+    rect.h = h;
+    SDL_RenderReadPixels(m_gRenderer,
+                         &rect,
+                         SDL_PIXELFORMAT_BGR24,
+                         pixels,
+                         w * 3 + (w % 4));
+}
+
+void FrmMain::getScreenPixelsRGBA(int x, int y, int w, int h, unsigned char *pixels)
+{
+    SDL_Rect rect;
+    rect.x = x;
+    rect.y = y;
+    rect.w = w;
+    rect.h = h;
+    SDL_RenderReadPixels(m_gRenderer,
+                         &rect,
+                         SDL_PIXELFORMAT_ABGR8888,
+                         pixels,
+                         w * 4);
+}
+
+int FrmMain::getPixelDataSize(const StdPicture &tx)
+{
+    if(!tx.texture)
+        return 0;
+    return (tx.w * tx.h * 4);
+}
+
+void FrmMain::getPixelData(const StdPicture &tx, unsigned char *pixelData)
+{
+    if(tx.texture)
+        return;
+    int pitch, w, h, a;
+    void *pixels;
+    SDL_SetTextureBlendMode(tx.texture, SDL_BLENDMODE_BLEND);
+    SDL_QueryTexture(tx.texture, nullptr, &a, &w, &h);
+    SDL_LockTexture(tx.texture, nullptr, &pixels, &pitch);
+    std::memcpy(pixelData, pixels, static_cast<size_t>(pitch * h));
+    SDL_UnlockTexture(tx.texture);
 }

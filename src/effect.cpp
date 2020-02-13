@@ -13,9 +13,16 @@ void UpdateEffects()
 //    Dim tempBool As Boolean
 //    Dim CoinCount As Integer
 //    If FreezeNPCs = True Then Exit Sub
+    if(FreezeNPCs)
+        return;
 //    For A = 1 To numEffects
+    For(A, 1, numEffects)
+    {
 //        With Effect(A)
+        {
+            auto &e = Effect[A];
 //            .Life = .Life - 1
+            e.Life -= 1;
 //            If .Life = 0 Then
 //                If .Type = 14 Then
 //                    If .NewNpc > 0 Then
@@ -345,13 +352,22 @@ void UpdateEffects()
 //                    End If
 //                End If
 //            ElseIf .Type = 80 Then 'Twinkle
+            if(e.Type == 80) {
 //                .FrameCount = .FrameCount + 1
+                e.FrameCount += 1;
 //                If .FrameCount >= 8 Then
+                if(e.FrameCount >= 8) {
 //                    .FrameCount = 0
+                    e.FrameCount = 0;
 //                    .Frame = .Frame + 1
+                    e.Frame += 1;
 //                    If .Frame = 3 Then .Life = 0
+                    if(e.Frame == 3)
+                        e.Life = 0;
 //                End If
+                }
 //            ElseIf .Type = 77 Or .Type = 139 Then ' Small Fireball Tail
+            }
 //                .Location.X = .Location.X + Rnd * 2 - 1
 //                .Location.Y = .Location.Y + Rnd * 2 - 1
 //                .FrameCount = .FrameCount + 1
@@ -561,10 +577,17 @@ void UpdateEffects()
 //                .Location.SpeedY = .Location.SpeedY * 0.97
 //            End If
 //        End With
+        }
 //    Next A
+    }
 //    For A = numEffects To 1 Step -1
+    for(int A = numEffects; A >= 1; --A)
+    {
 //        If Effect(A).Life <= 0 Then KillEffect A
+        if(Effect[A].Life <= 0)
+            KillEffect(A);
 //    Next A
+    }
 }
 
 void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Shadow)
@@ -1243,20 +1266,27 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
 //            .Type = A
 //        End With
 //    ElseIf A = 80 Then ' Twinkle
+    if(A == 80) // Twinkle
+    {
 //        numEffects = numEffects + 1
+        numEffects += 1;
 //        With Effect(numEffects)
-//            .Shadow = Shadow
-//            .Location.Width = 16
-//            .Location.Height = 16
-//            .Location.X = Location.X + Location.Width / 2 - 4 + Rnd * 4 - 2
-//            .Location.Y = Location.Y + Location.Height / 2 - 4 + Rnd * 4 - 2
-//            .Location.SpeedY = 0
-//            .Location.SpeedX = 0
-//            .Frame = 0
-//            .Life = 60
-//            .Type = A
+        {
+            auto &e = Effect[numEffects];
+            e.Shadow = Shadow;
+            e.Location.Width = 16;
+            e.Location.Height = 16;
+            e.Location.X = Location.X + Location.Width / 2 - 4 + std::rand() % 4 - 2;
+            e.Location.Y = Location.Y + Location.Height / 2 - 4 + std::rand() % 4 - 2;
+            e.Location.SpeedY = 0;
+            e.Location.SpeedX = 0;
+            e.Frame = 0;
+            e.Life = 60;
+            e.Type = A;
 //        End With
+        }
 //    ElseIf A = 13 Then ' Lava Splash
+    }
 //        numEffects = numEffects + 1
 //        With Effect(numEffects)
 //            .Shadow = Shadow

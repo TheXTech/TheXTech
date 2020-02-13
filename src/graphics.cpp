@@ -3,6 +3,7 @@
 #include "collision.h"
 #include "game_main.h"
 #include "gfx.h"
+#include "sound.h"
 #include "change_res.h"
 #include <fmt_format_ne.h>
 
@@ -478,6 +479,8 @@ void UpdateGraphics2()
 //        StretchBlt frmMain.hdc, 0, 0, frmMain.ScaleWidth, frmMain.ScaleHeight, myBackBuffer, 0, 0, 800, 600, vbSrcCopy
 //    End If
 //    If TakeScreen = True Then ScreenShot
+    if(TakeScreen)
+        ScreenShot();
 }
 
 // This draws the graphic to the screen when in a level/game menu/outro/level editor
@@ -790,7 +793,7 @@ void UpdateGraphics()
         ClearBuffer = False;
 //        BitBlt myBackBuffer, 0, 0, ScreenW, ScreenH, 0, 0, 0, vbWhiteness
 //        BitBlt frmMain.hdc, 0, 0, frmMain.ScaleWidth, frmMain.ScaleHeight, 0, 0, 0, vbWhiteness
-        frmMain.renderRect(0, 0, ScreenW, ScreenH, 0.f, 0.f, 0.f, 1.f);
+        frmMain.clearBuffer();
 //    End If
     }
 
@@ -838,7 +841,7 @@ void UpdateGraphics()
 //            End If
 //            If Background2(S) = 0 Then BitBlt myBackBuffer, 0, 0, ScreenW, ScreenH, 0, 0, 0, vbWhiteness
             if(Background2[S] == 0)
-                frmMain.renderRect(0, 0, ScreenW, ScreenH, 0.f, 0.f, 0.f, 1.f);
+                frmMain.clearBuffer();
         }
 //        Else
 //            If Background2(S) = 0 Then BitBlt myBackBuffer, 0, 0, ScreenW, ScreenH, 0, 0, 0, vbWhiteness
@@ -912,13 +915,10 @@ void UpdateGraphics()
 //        If GameMenu = True Then
         if(GameMenu)
         {
-//            'BitBlt myBackBuffer, 0, 0, GFX.MenuGFX(1).ScaleWidth, GFX.MenuGFX(1).ScaleWidth, GFX.MenuGFXMask(1).hdc, 0, 0, vbSrcAnd
-//            'BitBlt myBackBuffer, 0, 0, GFX.MenuGFX(1).ScaleWidth, GFX.MenuGFX(1).ScaleWidth, GFX.MenuGFX(1).hdc, 0, 0, vbSrcPaint
-            frmMain.renderTexture(0, 0, GFX.MenuGFX[1].w, GFX.MenuGFX[1].h, GFX.MenuGFX[1], 0, 0);
-//            'BitBlt myBackBuffer, ScreenW / 2 - GFX.MenuGFX(2).ScaleWidth / 2, 70, GFX.MenuGFX(2).ScaleWidth, GFX.MenuGFX(2).ScaleWidth, GFX.MenuGFXMask(2).hdc, 0, 0, vbSrcAnd
-//            'BitBlt myBackBuffer, ScreenW / 2 - GFX.MenuGFX(2).ScaleWidth / 2, 70, GFX.MenuGFX(2).ScaleWidth, GFX.MenuGFX(2).ScaleWidth, GFX.MenuGFX(2).hdc, 0, 0, vbSrcPaint
-            frmMain.renderTexture(ScreenW / 2 - GFX.MenuGFX[2].w / 2, 70,
-                    GFX.MenuGFX[2].w, GFX.MenuGFX[2].h, GFX.MenuGFX[2], 0, 0);
+            // Curtain
+            frmMain.renderTexture(0, 0, GFX.MenuGFX[1]);
+            // Game logo
+            frmMain.renderTexture(ScreenW / 2 - GFX.MenuGFX[2].w / 2, 70, GFX.MenuGFX[2]);
 //        ElseIf LevelEditor = False Then
         } else { // it's NO editor, obviously
 //            If numPlayers > 2 And nPlay.Online = False Then
@@ -1909,15 +1909,31 @@ void UpdateGraphics()
 
 //'effects on top
 //        For A = 1 To numEffects
+        For(A, 1, numEffects)
+        {
 //            With Effect(A)
+            auto &e = Effect[A];
 //                If .Type <> 112 And .Type <> 54 And .Type <> 55 And .Type <> 59 And .Type <> 77 And .Type <> 81 And .Type <> 82 And .Type <> 103 And .Type <> 104 And .Type <> 114 And .Type <> 123 And .Type <> 124 Then
+            if(e.Type != 112 And e.Type != 54 And e.Type != 55 And e.Type != 59 And
+               e.Type != 77 And e.Type != 81 And e.Type != 82 And e.Type != 103 And
+               e.Type != 104 And e.Type != 114 And e.Type != 123 And e.Type != 124)
+            {
 //                    If vScreenCollision(Z, .Location) Then
+                if(vScreenCollision(Z, e.Location))
+                {
 //                        BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, .Location.Width, .Location.Height, GFXEffectMask(.Type), 0, .Frame * EffectHeight(.Type), vbSrcAnd
 //                        If .Shadow = False Then BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, .Location.Width, .Location.Height, GFXEffect(.Type), 0, .Frame * EffectHeight(.Type), vbSrcPaint
+                    float c = e.Shadow ? 0.f : 1.f;
+                    frmMain.renderTexture(int(vScreenX[Z] + e.Location.X), int(vScreenY[Z] + e.Location.Y),
+                                          int(e.Location.Width), int(e.Location.Height),
+                                          GFXEffectBMP[e.Type], 0, e.Frame * EffectHeight[e.Type], c, c, c);
 //                    End If
+                }
 //                End If
+            }
 //            End With
 //        Next A
+        }
 
 //        'water
 //        If LevelEditor = True Then
@@ -2760,6 +2776,8 @@ void UpdateGraphics()
     }
 
 //    If TakeScreen = True Then ScreenShot
+    if(TakeScreen)
+        ScreenShot();
 
 //    'Update Coin Frames
 //    CoinFrame2(1) = CoinFrame2(1) + 1
@@ -4129,26 +4147,9 @@ void DrawPlayer(int A, int Z)
 
 void ScreenShot()
 {
-//    Dim ScreenFile As String
-//    Dim A As Integer
-//    Do
-//        A = A + 1
-//    Loop Until Dir(App.Path & "\screenshots\" & "screen" & A & ".bmp") = ""
-//    ScreenFile = App.Path & "\screenshots\" & "screen" & A & ".bmp"
-//    If LevelEditor = True Or MagicHand = True Then
-//        SavePicture frmLevelWindow.vScreen(1).Image, ScreenFile
-//        frmLevelWindow.vScreen(1).AutoRedraw = False
-//    Else
-//        frmMain.ScaleMode = 1
-//        GFX.ScreenShooter.Width = frmMain.ScaleWidth
-//        GFX.ScreenShooter.Height = frmMain.ScaleHeight
-//        GFX.ScreenShooter.Picture = frmMain.Image
-//        SavePicture GFX.ScreenShooter.Image, ScreenFile
-//        frmMain.AutoRedraw = False
-//        frmMain.ScaleMode = 3
-//    End If
-//    PlaySound 12
-//    TakeScreen = False
+    frmMain.makeShot();
+    PlaySound(12);
+    TakeScreen = false;
 }
 
 void DrawFrozenNPC(int Z, int A)
