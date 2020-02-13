@@ -19,6 +19,8 @@
 #include "sorting.h"
 #include "sound.h"
 
+#include "pseudo_vb.h"
+
 void CheckActive();
 // set up sizable blocks
 void SizableBlocks();
@@ -1141,18 +1143,123 @@ void PauseGame(int plr)
 
 void InitControls()
 {
+    // Dim A As Integer
+    int A = 0;
+    // Dim B As Integer
+    int B = 0;
+    // Dim newJoystick As Boolean
+    bool newJoystick = false;
 
+//    Do
+    while(true)
+    {
+//        newJoystick = StartJoystick(A)
+        newJoystick = StartJoystick(A);
+//        If newJoystick = True Then
+        if(newJoystick) {
+//            A = A + 1
+            A += 1;
+//        Else
+        } else {
+//            Exit Do
+            break;
+//        End If
+        }
+//    Loop
+    }
+//    numJoysticks = A
+    numJoysticks = A;
+
+    /* // Crazy Redigit's solution, useless
+//    If numJoysticks = 0 Then
+    if(numJoysticks == 0) {
+//        useJoystick(1) = 0
+        useJoystick[1] = 0;
+//        useJoystick(2) = 0
+        useJoystick[2] = 0;
+//    ElseIf numJoysticks = 1 Then
+    } else if(numJoysticks == 1) {
+//        useJoystick(1) = 1
+        useJoystick[1] = 1;
+//        useJoystick(2) = 0
+        useJoystick[2] = 0;
+//    Else
+    } else {
+//        useJoystick(1) = 1
+        useJoystick[1] = 1;
+//        useJoystick(2) = 2
+        useJoystick[2] = 2;
+//    End If
+    }
+    */
+
+//    '
+//    useJoystick(1) = 0
+    useJoystick[1] = 0;
+//    useJoystick(2) = 0
+    useJoystick[2] = 0;
+//    '
+
+//    For A = 1 To 2
+    For(A, 1, 2)
+    {
+//        With conJoystick(A)
+        {
+            auto &j = conJoystick[A];
+//            .Run = 2
+            j.Run = 2;
+//            .AltRun = 3
+            j.AltRun = 3;
+//            .Jump = 0
+            j.Jump = 0;
+//            .AltJump = 1
+            j.AltJump = 1;
+//            .Drop = 6
+            j.Drop = 6;
+//            .Start = 7
+            j.Start = 7;
+//        End With
+        }
+//    Next A
+    }
+//    With conKeyboard[1]
+    conKeyboard[1].Down = vbKeyDown;
+    conKeyboard[1].Left = vbKeyLeft;
+    conKeyboard[1].Up = vbKeyUp;
+    conKeyboard[1].Right = vbKeyRight;
+    conKeyboard[1].Jump = vbKeyZ;
+    conKeyboard[1].Run = vbKeyX;
+    conKeyboard[1].Drop = vbKeyShift;
+    conKeyboard[1].Start = vbKeyEscape;
+    conKeyboard[1].AltJump = vbKeyA;
+    conKeyboard[1].AltRun = vbKeyS;
+//    End With
+
+//    With conKeyboard(2)
+    conKeyboard[2].Down = vbKeyDown;
+    conKeyboard[2].Left = vbKeyLeft;
+    conKeyboard[2].Up = vbKeyUp;
+    conKeyboard[2].Right = vbKeyRight;
+    conKeyboard[2].Jump = vbKeyZ;
+    conKeyboard[2].Run = vbKeyX;
+    conKeyboard[2].Drop = vbKeyShift;
+    conKeyboard[2].Start = vbKeyEscape;
+    conKeyboard[2].AltJump = vbKeyA;
+    conKeyboard[2].AltRun = vbKeyS;
+//    End With
+//    OpenConfig
+    OpenConfig();
+//    If useJoystick(1) > numJoysticks Then useJoystick(1) = 0
+    if(useJoystick[1] > numJoysticks)
+        useJoystick[1] = 0;
+//    If useJoystick(2) > numJoysticks Then useJoystick(2) = 0
+    if(useJoystick[2] > numJoysticks)
+        useJoystick[2] = 0;
 }
 
-void OpenConfig()
-{
 
-}
+// main_config.cpp
 
-void SaveConfig()
-{
-
-}
 
 void NPCyFix()
 {

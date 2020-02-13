@@ -18,6 +18,7 @@ SOURCES += \
     src/frm_main.cpp \
     src/game_main.cpp \
     src/main/game_loop.cpp \
+    src/main/main_config.cpp \
     src/main/menu_loop.cpp \
     src/main/setup_physics.cpp \
     src/main/setup_vars.cpp \
