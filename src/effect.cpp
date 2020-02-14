@@ -23,6 +23,7 @@ void UpdateEffects()
             auto &e = Effect[A];
 //            .Life = .Life - 1
             e.Life -= 1;
+
 //            If .Life = 0 Then
 //                If .Type = 14 Then
 //                    If .NewNpc > 0 Then
@@ -43,8 +44,12 @@ void UpdateEffects()
 //                    End If
 //                End If
 //            End If
+
 //            .Location.X = .Location.X + .Location.SpeedX
 //            .Location.Y = .Location.Y + .Location.SpeedY
+            e.Location.X += e.Location.SpeedX;
+            e.Location.Y += e.Location.SpeedY;
+
 //            If .Type = 2 Or .Type = 126 Or .Type = 6 Or .Type = 23 Or .Type = 35 Or .Type = 37 Or .Type = 39 Or .Type = 41 Or .Type = 43 Or .Type = 45 Or .Type = 52 Or .Type = 62 Then     'Stomped Goombas
 //                .Location.SpeedY = 0
 //                .Location.SpeedX = 0
