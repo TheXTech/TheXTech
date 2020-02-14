@@ -10,6 +10,10 @@
 #include "../player.h"
 #include "../collision.h"
 
+#include <DirManager/dirman.h>
+#include <Utils/files.h>
+#include <PGE_File_Formats/file_formats.h>
+
 #include "../pseudo_vb.h"
 
 #include <fmt_format_ne.h>
@@ -394,7 +398,7 @@ void MenuLoop()
             if(MenuCursorCanMove || MenuMouseClick || MenuMouseBack)
             {
 //                If .Run = True Or (GetKeyState(vbKeyEscape) And KEY_PRESSED) Or MenuMouseBack = True Then
-                if(c.Run || getKeyState(SDL_SCANCODE_RETURN) == KEY_PRESSED || MenuMouseBack)
+                if(c.Run || getKeyState(SDL_SCANCODE_ESCAPE) == KEY_PRESSED || MenuMouseBack)
                 {
 //                    If MenuMode = 300 Then
                     if(MenuMode == 300)
@@ -1300,99 +1304,144 @@ void MenuLoop()
                 }
                 else if(getNewJoystick)
                 {
-//                    JoyNum = useJoystick(MenuMode - 30) - 1
-//                    PollJoystick
-//                    If JoyButtons(oldJumpJoy) = True Then
-//                    Else
-//                        oldJumpJoy = -1
-//                        For A = 0 To 15
-//                            If JoyButtons(A) = True Then
-//                                PlaySound 29
-//                                If MenuCursor = 1 Then
-//                                    conJoystick(MenuMode - 30).Run = A
-//                                ElseIf MenuCursor = 2 Then conJoystick(MenuMode - 30).AltRun = A
-//                                ElseIf MenuCursor = 3 Then conJoystick(MenuMode - 30).Jump = A
-//                                ElseIf MenuCursor = 4 Then conJoystick(MenuMode - 30).AltJump = A
-//                                ElseIf MenuCursor = 5 Then conJoystick(MenuMode - 30).Drop = A
-//                                ElseIf MenuCursor = 6 Then conJoystick(MenuMode - 30).Start = A
-//                                End If
-//                                getNewJoystick = False
-//                                MenuCursorCanMove = False
-//                                Exit For
-//                            ElseIf (GetKeyState(vbKeyEscape) And KEY_PRESSED) Then
-//                                If MenuCursor = 1 Then
-//                                    conJoystick(MenuMode - 30).Run = lastJoyButton
-//                                ElseIf MenuCursor = 2 Then conJoystick(MenuMode - 30).AltRun = lastJoyButton
-//                                ElseIf MenuCursor = 3 Then conJoystick(MenuMode - 30).AltJump = lastJoyButton
-//                                ElseIf MenuCursor = 4 Then conJoystick(MenuMode - 30).Jump = lastJoyButton
-//                                ElseIf MenuCursor = 5 Then conJoystick(MenuMode - 30).Drop = lastJoyButton
-//                                ElseIf MenuCursor = 6 Then conJoystick(MenuMode - 30).Start = lastJoyButton
-//                                End If
-//                                getNewJoystick = False
-//                                MenuCursorCanMove = False
-//                            End If
-//                        Next A
-//                    End If
-//                Else
+                    JoyNum = useJoystick[MenuMode - 30] - 1;
+                    PollJoystick();
+                    if(JoyButtons[oldJumpJoy] == true)
+                    {
+                    }
+                    else
+                    {
+                        oldJumpJoy = -1;
+                        for(auto A = 0; A <= 15; A++)
+                        {
+                            if(JoyButtons[A] == true)
+                            {
+                                PlaySound(29);
+                                if(MenuCursor == 1)
+                                    conJoystick[MenuMode - 30].Run = A;
+                                else if(MenuCursor == 2)
+                                    conJoystick[MenuMode - 30].AltRun = A;
+                                else if(MenuCursor == 3)
+                                    conJoystick[MenuMode - 30].Jump = A;
+                                else if(MenuCursor == 4)
+                                    conJoystick[MenuMode - 30].AltJump = A;
+                                else if(MenuCursor == 5)
+                                    conJoystick[MenuMode - 30].Drop = A;
+                                else if(MenuCursor == 6)
+                                    conJoystick[MenuMode - 30].Start = A;
+                                getNewJoystick = false;
+                                MenuCursorCanMove = false;
+                                break;
+                            }
+                            else if(getKeyState(vbKeyEscape) == KEY_PRESSED)
+                            {
+                                if(MenuCursor == 1)
+                                    conJoystick[MenuMode - 30].Run = lastJoyButton;
+                                else if(MenuCursor == 2)
+                                    conJoystick[MenuMode - 30].AltRun = lastJoyButton;
+                                else if(MenuCursor == 3)
+                                    conJoystick[MenuMode - 30].AltJump = lastJoyButton;
+                                else if(MenuCursor == 4)
+                                    conJoystick[MenuMode - 30].Jump = lastJoyButton;
+                                else if(MenuCursor == 5)
+                                    conJoystick[MenuMode - 30].Drop = lastJoyButton;
+                                else if(MenuCursor == 6)
+                                    conJoystick[MenuMode - 30].Start = lastJoyButton;
+                                getNewJoystick = false;
+                                MenuCursorCanMove = false;
+                            }
+                        }
+                    }
+
                 }
                 else
                 {
-//                    If .Run = True Or (GetKeyState(vbKeyEscape) And KEY_PRESSED) Or MenuMouseBack = True Then
-//                        SaveConfig
-//                        MenuCursor = MenuMode - 31
-//                        MenuMode = 3
-//                        MenuCursorCanMove = False
-//                        PlaySound 26
-//                    ElseIf .Jump = True Or .Start = True Or (GetKeyState(vbKeySpace) And KEY_PRESSED) Or (GetKeyState(vbKeyReturn) And KEY_PRESSED) Or MenuMouseClick = True Then
-//                        If MenuCursor = 0 Then
-//                            PlaySound 29
-//                            useJoystick(MenuMode - 30) = useJoystick(MenuMode - 30) + 1
-//                            If useJoystick(MenuMode - 30) > numJoysticks Then useJoystick(MenuMode - 30) = 0
-//                        Else
-//                            If useJoystick(MenuMode - 30) = 0 Then
-//                                getNewKeyboard = True
-//                                inputKey = Asc("_")
-//                                If MenuCursor = 1 Then
-//                                    conKeyboard(MenuMode - 30).Up = inputKey
-//                                ElseIf MenuCursor = 2 Then conKeyboard(MenuMode - 30).Down = inputKey
-//                                ElseIf MenuCursor = 3 Then conKeyboard(MenuMode - 30).Left = inputKey
-//                                ElseIf MenuCursor = 4 Then conKeyboard(MenuMode - 30).Right = inputKey
-//                                ElseIf MenuCursor = 5 Then conKeyboard(MenuMode - 30).Run = inputKey
-//                                ElseIf MenuCursor = 6 Then conKeyboard(MenuMode - 30).AltRun = inputKey
-//                                ElseIf MenuCursor = 7 Then conKeyboard(MenuMode - 30).Jump = inputKey
-//                                ElseIf MenuCursor = 8 Then conKeyboard(MenuMode - 30).AltJump = inputKey
-//                                ElseIf MenuCursor = 9 Then conKeyboard(MenuMode - 30).Drop = inputKey
-//                                ElseIf MenuCursor = 10 Then conKeyboard(MenuMode - 30).Start = inputKey
-//                                End If
-//                                inputKey = 0
-//                            Else
-//                                If MenuCursor = 1 Then
-//                                    lastJoyButton = conJoystick(MenuMode - 30).Run
-//                                    conJoystick(MenuMode - 30).Run = -1
-//                                ElseIf MenuCursor = 2 Then
-//                                    lastJoyButton = conJoystick(MenuMode - 30).AltRun
-//                                    conJoystick(MenuMode - 30).AltRun = -1
-//                                ElseIf MenuCursor = 3 Then
-//                                    lastJoyButton = conJoystick(MenuMode - 30).Jump
-//                                    oldJumpJoy = conJoystick(MenuMode - 30).Jump
-//                                    conJoystick(MenuMode - 30).Jump = -1
-//                                ElseIf MenuCursor = 4 Then
-//                                    lastJoyButton = conJoystick(MenuMode - 30).AltJump
-//                                    conJoystick(MenuMode - 30).AltJump = -1
-//                                ElseIf MenuCursor = 5 Then
-//                                    lastJoyButton = conJoystick(MenuMode - 30).Drop
-//                                    conJoystick(MenuMode - 30).Drop = -1
-//                                ElseIf MenuCursor = 6 Then
-//                                    lastJoyButton = conJoystick(MenuMode - 30).Start
-//                                    conJoystick(MenuMode - 30).Start = -1
-//                                End If
-//                                getNewJoystick = True
-//                                MenuCursorCanMove = False
-//                            End If
-//                        End If
-//                        MenuCursorCanMove = False
-//                    End If
-//                End If
+                    if(Player[1].Controls.Run == true || getKeyState(vbKeyEscape) == KEY_PRESSED || MenuMouseBack == true)
+                    {
+                        SaveConfig();
+                        MenuCursor = MenuMode - 31;
+                        MenuMode = 3;
+                        MenuCursorCanMove = false;
+                        PlaySound(26);
+                    }
+                    else if(Player[1].Controls.Jump == true || Player[1].Controls.Start == true ||
+                            (getKeyState(vbKeySpace) == KEY_PRESSED) ||
+                            (getKeyState(vbKeyReturn) & KEY_PRESSED) || MenuMouseClick == true)
+                    {
+                        if(MenuCursor == 0)
+                        {
+                            PlaySound(29);
+                            useJoystick[MenuMode - 30] = useJoystick[MenuMode - 30] + 1;
+                            if(useJoystick[MenuMode - 30] > numJoysticks)
+                                useJoystick[MenuMode - 30] = 0;
+                        }
+                        else
+                        {
+                            if(useJoystick[MenuMode - 30] == 0)
+                            {
+                                getNewKeyboard = true;
+                                inputKey = '_';
+                                if(MenuCursor == 1)
+                                    conKeyboard[MenuMode - 30].Up = inputKey;
+                                else if(MenuCursor == 2)
+                                    conKeyboard[MenuMode - 30].Down = inputKey;
+                                else if(MenuCursor == 3)
+                                    conKeyboard[MenuMode - 30].Left = inputKey;
+                                else if(MenuCursor == 4)
+                                    conKeyboard[MenuMode - 30].Right = inputKey;
+                                else if(MenuCursor == 5)
+                                    conKeyboard[MenuMode - 30].Run = inputKey;
+                                else if(MenuCursor == 6)
+                                    conKeyboard[MenuMode - 30].AltRun = inputKey;
+                                else if(MenuCursor == 7)
+                                    conKeyboard[MenuMode - 30].Jump = inputKey;
+                                else if(MenuCursor == 8)
+                                    conKeyboard[MenuMode - 30].AltJump = inputKey;
+                                else if(MenuCursor == 9)
+                                    conKeyboard[MenuMode - 30].Drop = inputKey;
+                                else if(MenuCursor == 10)
+                                    conKeyboard[MenuMode - 30].Start = inputKey;
+                                inputKey = 0;
+                            }
+                            else
+                            {
+                                if(MenuCursor == 1)
+                                {
+                                    lastJoyButton = conJoystick[MenuMode - 30].Run;
+                                    conJoystick[MenuMode - 30].Run = -1;
+                                }
+                                else if(MenuCursor == 2)
+                                {
+                                    lastJoyButton = conJoystick[MenuMode - 30].AltRun;
+                                    conJoystick[MenuMode - 30].AltRun = -1;
+                                }
+                                else if(MenuCursor == 3)
+                                {
+                                    lastJoyButton = conJoystick[MenuMode - 30].Jump;
+                                    oldJumpJoy = conJoystick[MenuMode - 30].Jump;
+                                    conJoystick[MenuMode - 30].Jump = -1;
+                                }
+                                else if(MenuCursor == 4)
+                                {
+                                    lastJoyButton = conJoystick[MenuMode - 30].AltJump;
+                                    conJoystick[MenuMode - 30].AltJump = -1;
+                                }
+                                else if(MenuCursor == 5)
+                                {
+                                    lastJoyButton = conJoystick[MenuMode - 30].Drop;
+                                    conJoystick[MenuMode - 30].Drop = -1;
+                                }
+                                else if(MenuCursor == 6)
+                                {
+                                    lastJoyButton = conJoystick[MenuMode - 30].Start;
+                                    conJoystick[MenuMode - 30].Start = -1;
+                                }
+                                getNewJoystick = true;
+                                MenuCursorCanMove = false;
+                            }
+                        }
+                        MenuCursorCanMove = false;
+                    }
                 }
 //            End If
             }
@@ -1994,72 +2043,88 @@ void MenuLoop()
                 p.Controls.Jump = True;
 //            End If
         }
-//            If Rnd * 100 > 95 And .HoldingNPC = 0 And .Slide = False And .CanAltJump = True And .Mount = 0 Then .Controls.AltJump = True
-//            If Rnd * 1000 >= 999 And .CanFly2 = False Then .Controls.Run = False
-//            If .Mount = 3 And Rnd * 100 >= 98 And .RunRelease = False Then .Controls.Run = False
-//            If NPC(.HoldingNPC).Type = 22 Or NPC(.HoldingNPC).Type = 49 Then .Controls.Run = True
-//            If .Slide = True And .CanJump = True Then
-//                If .Location.SpeedX > -2 And .Location.SpeedX < 2 Then .Controls.Jump = True
-//            End If
-//            If .CanFly = False And .CanFly2 = False And (.State = 4 Or .State = 5) And .Slide = False Then
-//                .Controls.Jump = True
-//            End If
-//            If .Quicksand > 0 Then
-//                .CanJump = True
-//                .Controls.Jump = True
-//            End If
-//            If .FloatTime > 0 Or (.CanFloat = True And .FloatRelease = True And .Jump = 0 And .Location.SpeedY > 0 And Rnd * 100 > 95) Then
-//                .Controls.Jump = True
-//            End If
-//            If NPC(.HoldingNPC).Type = 13 And Rnd * 100 > 95 Then
-//                .Controls.Run = False
-//                If Rnd * 2 > 1 Then .Controls.Up = True
-//                If Rnd * 2 > 1 Then .Controls.Right = False
-//            End If
 
-//            If .Slide = False And (.Slope > 0 Or .StandingOnNPC > 0 Or .Location.SpeedY = 0) Then
-//                tempLocation = .Location
-//                tempLocation.Width = 95
-//                tempLocation.Height = tempLocation.Height - 1
-//                For B = 1 To numBlock
-//                    If BlockSlope(Block(B).Type) = 0 And BlockIsSizable(Block(B).Type) = False And BlockOnlyHitspot1(Block(B).Type) = False And Block(B).Hidden = False Then
-//                        If CheckCollision(Block(B).Location, tempLocation) = True Then
-//                            .CanJump = True
-//                            .SpinJump = False
-//                            .Controls.Jump = True
-//                            Exit For
-//                        End If
-//                    End If
-//                Next B
-//            End If
-//            If .Slope = 0 And .Slide = False And .StandingOnNPC = 0 And (.Slope > 0 Or .Location.SpeedY = 0) Then
-//                tempBool = False
-//                tempLocation = .Location
-//                tempLocation.Width = 16
-//                tempLocation.Height = 16
-//                tempLocation.X = .Location.X + .Location.Width
-//                tempLocation.Y = .Location.Y + .Location.Height
-//                For B = 1 To numBlock
-//                    If (BlockIsSizable(Block(B).Type) = False Or Block(B).Location.Y > .Location.Y + .Location.Height - 1) And BlockOnlyHitspot1(Block(B).Type) = False And Block(B).Hidden = False Then
-//                        If CheckCollision(Block(B).Location, tempLocation) = True Then
-//                            tempBool = True
-//                            Exit For
-//                        End If
-//                    End If
-//                Next B
-//                If tempBool = False Then
-//                    .CanJump = True
-//                    .SpinJump = False
-//                    .Controls.Jump = True
-//                End If
-//            End If
-//            If .Character = 5 And .Controls.Jump = True Then
-//                .Controls.AltJump = True
-//                '.Controls.Jump = False
-//            End If
+        if(std::rand() % 100 > 95 && Player[A].HoldingNPC == 0 && Player[A].Slide == false && Player[A].CanAltJump == true && Player[A].Mount == 0)
+            Player[A].Controls.AltJump = true;
+        if(std::rand() % 1000 >= 999 && Player[A].CanFly2 == false)
+            Player[A].Controls.Run = false;
+        if(Player[A].Mount == 3 && std::rand() % 100 >= 98 && Player[A].RunRelease == false)
+            Player[A].Controls.Run = false;
+        if(NPC[Player[A].HoldingNPC].Type == 22 || NPC[Player[A].HoldingNPC].Type == 49)
+            Player[A].Controls.Run = true;
+        if(Player[A].Slide == true && Player[A].CanJump == true)
+        {
+            if(Player[A].Location.SpeedX > -2 && Player[A].Location.SpeedX < 2)
+                Player[A].Controls.Jump = true;
+        }
+        if(Player[A].CanFly == false && Player[A].CanFly2 == false && (Player[A].State == 4 || Player[A].State == 5) && Player[A].Slide == false)
+            Player[A].Controls.Jump = true;
+        if(Player[A].Quicksand > 0)
+        {
+            Player[A].CanJump = true;
+            Player[A].Controls.Jump = true;
+        }
+        if(Player[A].FloatTime > 0 || (Player[A].CanFloat == true && Player[A].FloatRelease == true && Player[A].Jump == 0 && Player[A].Location.SpeedY > 0 && std::rand() % 100 > 95))
+            Player[A].Controls.Jump = true;
+        if(NPC[Player[A].HoldingNPC].Type == 13 && std::rand() % 100 > 95)
+        {
+            Player[A].Controls.Run = false;
+            if(std::rand() % 2 > 1)
+                Player[A].Controls.Up = true;
+            if(std::rand() % 2 > 1)
+                Player[A].Controls.Right = false;
+        }
 
-//        End With ' Player
-//    Next A
+        if(Player[A].Slide == false && (Player[A].Slope > 0 || Player[A].StandingOnNPC > 0 || Player[A].Location.SpeedY == 0.0))
+        {
+            tempLocation = Player[A].Location;
+            tempLocation.Width = 95;
+            tempLocation.Height = tempLocation.Height - 1;
+            for(auto B = 1; B <= numBlock; B++)
+            {
+                if(BlockSlope[Block[B].Type] == 0 && BlockIsSizable[Block[B].Type] == false && BlockOnlyHitspot1[Block[B].Type] == false && Block[B].Hidden == false)
+                {
+                    if(CheckCollision(Block[B].Location, tempLocation) == true)
+                    {
+                        Player[A].CanJump = true;
+                        Player[A].SpinJump = false;
+                        Player[A].Controls.Jump = true;
+                        break;
+                    }
+                }
+            }
+        }
+        if(Player[A].Slope == 0 && Player[A].Slide == false && Player[A].StandingOnNPC == 0 && (Player[A].Slope > 0 || Player[A].Location.SpeedY == 0.0))
+        {
+            tempBool = false;
+            tempLocation = Player[A].Location;
+            tempLocation.Width = 16;
+            tempLocation.Height = 16;
+            tempLocation.X = Player[A].Location.X + Player[A].Location.Width;
+            tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height;
+            for(auto B = 1; B <= numBlock; B++)
+            {
+                if((BlockIsSizable[Block[B].Type] == false || Block[B].Location.Y > Player[A].Location.Y + Player[A].Location.Height - 1) && BlockOnlyHitspot1[Block[B].Type] == false && Block[B].Hidden == false)
+                {
+                    if(CheckCollision(Block[B].Location, tempLocation) == true)
+                    {
+                        tempBool = true;
+                        break;
+                    }
+                }
+            }
+            if(tempBool == false)
+            {
+                Player[A].CanJump = true;
+                Player[A].SpinJump = false;
+                Player[A].Controls.Jump = true;
+            }
+        }
+        if(Player[A].Character == 5 && Player[A].Controls.Jump == true)
+        {
+            Player[A].Controls.AltJump = true;
+            // .Controls.Jump = False
+        }
     }
 
 //    If LevelMacro > 0 Then UpdateMacro
@@ -2175,7 +2240,47 @@ void MenuLoop()
 
 void FindWorlds()
 {
+    NumSelectWorld = 0;
+    std::string worldsRoot = AppPath + "worlds/";
 
+    DirMan episodes(worldsRoot);
+
+    std::vector<std::string> dirs;
+    std::vector<std::string> files;
+    episodes.getListOfFolders(dirs);
+    WorldData head;
+
+    for(auto &dir : dirs)
+    {
+        std::string epDir = worldsRoot + dir + "/";
+        DirMan episode(epDir);
+        episode.getListOfFiles(files, {".wld", ".wldx"});
+
+        for(std::string &fName : files)
+        {
+            std::string wPath = epDir + fName;
+            if(FileFormats::OpenWorldFileHeader(wPath, head))
+            {
+                NumSelectWorld += 1;
+                auto &w = SelectWorld[NumSelectWorld];
+                w.WorldName = head.EpisodeTitle;
+                head.charactersToS64();
+                w.WorldPath = epDir;
+                w.WorldFile = fName;
+                w.blockChar[1] = head.nocharacter1;
+                w.blockChar[2] = head.nocharacter2;
+                w.blockChar[3] = head.nocharacter3;
+                w.blockChar[4] = head.nocharacter4;
+                w.blockChar[5] = head.nocharacter5;
+
+                if(NumSelectWorld >= maxSelectWorlds)
+                    break;
+            }
+        }
+
+        if(NumSelectWorld >= maxSelectWorlds)
+            break;
+    }
 }
 
 void FindLevels()
@@ -2185,5 +2290,114 @@ void FindLevels()
 
 void FindSaves()
 {
+    int curActive = 0;
+    int maxActive = 0;
+    std::string newInput = "";
+
+    std::string episode = SelectWorld[selWorld].WorldPath;
+    GamesaveData f;
+    for(auto A = 1; A <= maxSaveSlots; A++)
+    {
+        SaveSlot[A] = -1;
+        SaveStars[A] = 0;
+        std::string saveFile = episode + fmt::format_ne("save{0}.savx", A);
+        std::string saveFileOld = episode + fmt::format_ne("save{0}.sav", A);
+        if((Files::fileExists(saveFile) && FileFormats::ReadExtendedSaveFileF(saveFile, f)) ||
+           (Files::fileExists(saveFileOld) && FileFormats::ReadSMBX64SavFileF(saveFileOld, f)))
+        {
+            for(auto &p : f.visiblePaths)
+            {
+                maxActive++;
+                if(p.second)
+                    curActive++;
+            }
+
+            for(auto &p : f.visibleLevels)
+            {
+                maxActive++;
+                if(p.second)
+                    curActive++;
+            }
+
+            SaveStars[A] = int(f.gottenStars.size());
+
+            maxActive = maxActive + (int(f.totalStars) * 4);
+            curActive = curActive + (SaveStars[A] * 4);
+
+            if(maxActive > 0)
+                SaveSlot[A] = int((float(curActive) / float(maxActive)) * 100);
+            else
+                SaveSlot[A] = 100;
+        }
+    }
+
+//    For A = 1 To 3
+//        curActive = 0
+//        maxActive = 0
+//        If Dir(SelectWorld(selWorld).WorldPath & "save" & A & ".sav") <> "" Then
+//            Open SelectWorld(selWorld).WorldPath & "save" & A & ".sav" For Input As #1
+//                Input #1, FileRelease
+//                If FileRelease >= 56 Then 'Version 1.2.2 and newer
+//                    For B = 1 To 4 'Misc Skipping
+//                        Input #1, newInput
+//                    Next B
+//                    For B = 1 To 5 'Character Info Skipping
+//                        Input #1, newInput
+//                        Input #1, newInput
+//                        Input #1, newInput
+//                        Input #1, newInput
+//                        Input #1, newInput
+//                    Next B
+//                    Input #1, newInput 'World music skipping
+//                Else 'Version 1.2.1 and older
+//                    For B = 1 To 13
+//                        Input #1, newInput
+//                    Next B
+//                End If
+//                Do Until EOF(1)
+//                    Input #1, newInput
+//                    If newInput = "next" Then Exit Do
+//                    maxActive = maxActive + 1
+//                    If newInput = "#TRUE#" Then
+//                        curActive = curActive + 1
+//                    End If
+//                Loop
+//                Do Until EOF(1)
+//                    Input #1, newInput
+//                    If newInput = "next" Then Exit Do
+//                    maxActive = maxActive + 1
+//                    If newInput = "#TRUE#" Then
+//                        curActive = curActive + 1
+//                    End If
+//                Loop
+//                Do Until EOF(1)
+//                    Input #1, newInput
+//                    If newInput = "next" Then Exit Do
+//                Loop
+//                If FileRelease >= 7 Then
+//                    SaveStars(A) = 0
+//                    Do Until EOF(1)
+//                        Input #1, newInput
+//                        If newInput = "next" Then Exit Do
+//                        If FileRelease >= 16 Then Input #1, newInput
+//                        If newInput = "next" Then Exit Do
+//                        SaveStars(A) = SaveStars(A) + 1
+//                    Loop
+//                End If
+//                If FileRelease >= 20 Then
+//                    Input #1, newInput
+//                    maxActive = maxActive + (newInput * 4)
+//                    curActive = curActive + (SaveStars(A) * 4)
+//                End If
+//            Close #1
+//            If maxActive > 0 Then
+//                SaveSlot(A) = Int((curActive / maxActive) * 100)
+//            Else
+//                SaveSlot(A) = 100
+//            End If
+//        Else
+//            SaveSlot(A) = -1
+//        End If
+//    Next A
 
 }

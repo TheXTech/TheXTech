@@ -481,7 +481,7 @@ int GameMain(int argc, char**argv)
             For(A, 2, 100)
             {
 //                If Events(A).AutoStart = True Then ProcEvent Events(A).Name, True
-                if(events[A].AutoStart) ProcEvent(events[A].Name, true);
+                if(Events[A].AutoStart) ProcEvent(Events[A].Name, true);
 //            Next A
             }
 //            overTime = 0
@@ -900,8 +900,8 @@ int GameMain(int argc, char**argv)
             for(int A = 2; A <= 100; ++A)
             {
 //                If Events(A).AutoStart = True Then ProcEvent Events(A).Name, True
-                if(events[A].AutoStart)
-                    ProcEvent(events[A].Name, true);
+                if(Events[A].AutoStart)
+                    ProcEvent(Events[A].Name, true);
 //            Next A
             }
 //            overTime = 0

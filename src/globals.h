@@ -918,7 +918,7 @@ struct WorldMusic_t
 };
 
 //Public Type EditorCursor 'The editor's cursor
-struct EditorCursor
+struct EditorCursor_t
 {
 //    X As Single
     float X = 0.0f;
@@ -958,7 +958,7 @@ struct EditorCursor
 };
 
 //Public Type WorldPlayer 'the players variables on the world map
-struct WorldPlayer
+struct WorldPlayer_t
 {
 //    Location As Location
     Location_t Location;
@@ -980,12 +980,12 @@ struct WorldPlayer
 };
 
 //Public Type Layer
-struct Layer
+struct Layer_t
 {
 //    EffectStop As Boolean
     bool EffectStop = false;
 //    Name As String
-    bool Name = false;
+    std::string Name;
 //    Hidden As Boolean
     bool Hidden = false;
 //    SpeedX As Single
@@ -1035,7 +1035,8 @@ extern bool MessageText;
 extern int NumSelectWorld;
 //Public SelectWorld(1 To 100) As SelectWorld
 struct SelectWorld_t;
-extern RangeArr<SelectWorld_t, 1, 100> SelectWorld;
+const int maxSelectWorlds = 100;
+extern RangeArr<SelectWorld_t, 1, maxSelectWorlds> SelectWorld;
 //Public ShowFPS As Boolean
 extern bool ShowFPS;
 //Public PrintFPS As Double
@@ -1540,9 +1541,9 @@ extern RangeArr<int, 1, 10> CoinFrame;
 //Public CoinFrame2(1 To 10) As Integer 'Counter to update the coin frames
 extern RangeArr<int, 1, 10> CoinFrame2;
 //Public EditorCursor As EditorCursor
-extern EditorCursor editorCursor;
+extern EditorCursor_t EditorCursor;
 //Public EditorControls As EditorControls
-extern EditorControls_t editorControls;
+extern EditorControls_t EditorControls;
 
 //Public Sound(1 To numSounds) As Integer
 extern RangeArr<int, 1, numSounds> Sound;
@@ -1569,7 +1570,7 @@ extern bool ExitMenu;
 //Public LevelSelect As Boolean 'true if game should load the world map
 extern bool LevelSelect;
 //Public WorldPlayer(1) As WorldPlayer
-extern RangeArr<WorldPlayer, 0, 1> worldPlayer;
+extern RangeArr<WorldPlayer_t, 0, 1> worldPlayer;
 //Public LevelBeatCode As Integer ' code for the way the plauer beat the level
 extern int LevelBeatCode;
 //Public curWorldLevel As Integer
@@ -1600,10 +1601,11 @@ extern int PSwitchTime;
 extern int PSwitchStop;
 //Public PSwitchPlayer As Integer
 extern int PSwitchPlayer;
+const int maxSaveSlots = 3;
 //Public SaveSlot(1 To 3) As Integer
-extern RangeArr<int, 1, 3> SaveSlot;
+extern RangeArr<int, 1, maxSaveSlots> SaveSlot;
 //Public SaveStars(1 To 3) As Integer
-extern RangeArr<int, 1, 3> SaveStars;
+extern RangeArr<int, 1, maxSaveSlots> SaveStars;
 //Public BeltDirection As Integer 'direction of the converyer belt blocks
 extern int BeltDirection;
 //Public BeatTheGame As Boolean 'true if the game has been beaten
@@ -1686,7 +1688,7 @@ struct Physics_t
 };
 
 //Public Type Events
-struct Events
+struct Events_t
 {
 //    addSavedEvent As String
     std::string addSavedEvent;
@@ -1738,9 +1740,9 @@ struct Events
 };
 
 //Public Layer(0 To 100) As Layer
-extern RangeArr<Layer, 0, 100> layer;
+extern RangeArr<Layer_t, 0, 100> Layer;
 //Public Events(0 To 100) As Events
-extern RangeArr<Events, 0, 100> events;
+extern RangeArr<Events_t, 0, 100> Events;
 //Public ReturnWarp As Integer 'for when the player returns from a warp
 extern int ReturnWarp;
 //Public StartWarp As Integer

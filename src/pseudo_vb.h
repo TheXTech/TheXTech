@@ -11,6 +11,10 @@
 #define And &&
 #define Or ||
 #define Len(x) std::strlen(x)
+#define CDbl(x) static_cast<double>(x)
+#define CSng(x) static_cast<float>(x)
+#define CBool(x) static_cast<bool>(x)
+#define CInt(x) static_cast<int>(x)
 
 const SDL_Scancode vbKeyEscape = SDL_SCANCODE_ESCAPE;
 const SDL_Scancode vbKeySpace = SDL_SCANCODE_SPACE;

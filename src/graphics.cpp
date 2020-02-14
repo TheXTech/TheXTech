@@ -6,6 +6,7 @@
 #include "sound.h"
 #include "change_res.h"
 #include <fmt_format_ne.h>
+#include <algorithm>
 
 #include "pseudo_vb.h"
 
@@ -2031,7 +2032,7 @@ void UpdateGraphics()
             DrawInterface(Z, numScreens);
 
 //                For A = 1 To numNPCs 'Display NPCs that got dropped from the container
-            For(A,1, numNPCs)
+            For(A, 1, numNPCs)
             {
 //                    With NPC(A)
 //                        If .Effect = 2 Then
@@ -2129,14 +2130,15 @@ void UpdateGraphics()
 //                End If
             }
 //            ElseIf GameOutro = False Then
-        } else if(!GameOutro) {
-
+        }
+        else if(!GameOutro)
+        {
 //                If MenuMode <> 1 And MenuMode <> 2 And MenuMode <> 4 Then worldCurs = 0
             if(MenuMode != 1 && MenuMode != 2 && MenuMode != 4)
                 worldCurs = 0;
 //Dim menuFix As Integer ' for Input Settings
 //menuFix = -44
-            int menuFix = 44;
+            int menuFix = 44; // for Input Settings
 
 
 //            BitBlt myBackBuffer, 0, 0, GFX.MenuGFX(1).ScaleWidth, GFX.MenuGFX(1).ScaleWidth, GFX.MenuGFXMask(1).hdc, 0, 0, vbSrcAnd
@@ -2154,6 +2156,7 @@ void UpdateGraphics()
                     GFX.MenuGFX[3].w, GFX.MenuGFX[3].h, GFX.MenuGFX[3], 0, 0);
 
 //                If MenuMode = 0 Then 'Main Menu
+            // Main Menu
             if(MenuMode == 0)
             {
 //                    SuperPrint "1 PLAYER GAME", 3, 300, 350
@@ -2169,131 +2172,195 @@ void UpdateGraphics()
 //                    BitBlt myBackBuffer, 300 - 20, 350 + (MenuCursor * 30), 16, 16, GFX.MCursorMask(0).hdc, 0, 0, vbSrcAnd
 //                    BitBlt myBackBuffer, 300 - 20, 350 + (MenuCursor * 30), 16, 16, GFX.MCursor(0).hdc, 0, 0, vbSrcPaint
                 frmMain.renderTexture(300 - 20, 350 + (MenuCursor * 30), 16, 16, GFX.MCursor[0], 0, 0);
-            }
 //                ElseIf MenuMode = 100 Or MenuMode = 200 Or MenuMode = 300 Or MenuMode = 400 Or MenuMode = 500 Then   'Character select
+            }
+            // Character select
+            else if(MenuMode == 100 Or MenuMode == 200 Or MenuMode == 300 Or MenuMode == 400 Or MenuMode == 500)
+            {
+                A = 0;
+                B = 0;
+                C = 0;
+                if(blockCharacter[1] == false)
+                    SuperPrint("MARIO GAME", 3, 300, 350);
+                else
+                {
+                    A = A - 30;
+                    if(MenuCursor + 1 >= 1)
+                        B = B - 30;
+                    if(PlayerCharacter >= 1)
+                        C = C - 30;
+                }
+                if(blockCharacter[2] == false)
+                    SuperPrint("LUIGI GAME", 3, 300, 380 + A);
+                else
+                {
+                    A = A - 30;
+                    if(MenuCursor + 1 >= 2)
+                        B = B - 30;
+                    if(PlayerCharacter >= 2)
+                        C = C - 30;
+                }
+                if(blockCharacter[3] == false)
+                    SuperPrint("PEACH GAME", 3, 300, 410 + A);
+                else
+                {
+                    A = A - 30;
+                    if(MenuCursor + 1 >= 3)
+                        B = B - 30;
+                    if(PlayerCharacter >= 3)
+                        C = C - 30;
+                }
+                if(blockCharacter[4] == false)
+                    SuperPrint("TOAD GAME", 3, 300, 440 + A);
+                else
+                {
+                    A = A - 30;
+                    if(MenuCursor + 1 >= 4)
+                        B = B - 30;
+                    if(PlayerCharacter >= 4)
+                        C = C - 30;
+                }
+                if(blockCharacter[5] == false)
+                    SuperPrint("LINK GAME", 3, 300, 470 + A);
+                else
+                {
+                    A = A - 30;
+                    if(MenuCursor + 1 >= 5)
+                        B = B - 30;
+                    if(PlayerCharacter >= 5)
+                        C = C - 30;
+                }
+                if(MenuMode == 300 || MenuMode == 500)
+                {
+//                    BitBlt myBackBuffer, 300 - 20, B + 350 + (MenuCursor * 30), 16, 16, GFX::MCursorMask(0).hdc, 0, 0, vbSrcAnd;
+//                    BitBlt myBackBuffer, 300 - 20, B + 350 + (MenuCursor * 30), 16, 16, GFX::MCursor(3).hdc, 0, 0, vbSrcPaint;
+                    frmMain.renderTexture(300 - 20, B + 350 + (MenuCursor * 30), GFX.MCursor[3]);
+//                    BitBlt myBackBuffer, 300 - 20, C + 350 + ((PlayerCharacter - 1) * 30), 16, 16, GFX::MCursorMask(0).hdc, 0, 0, vbSrcAnd;
+//                    BitBlt myBackBuffer, 300 - 20, C + 350 + ((PlayerCharacter - 1) * 30), 16, 16, GFX::MCursor(0).hdc, 0, 0, vbSrcPaint;
+                    frmMain.renderTexture(300 - 20, B + 350 + ((PlayerCharacter - 1) * 30), GFX.MCursor[0]);
+                }
+                else
+                {
+//                    BitBlt myBackBuffer, 300 - 20, B + 350 + (MenuCursor * 30), 16, 16, GFX::MCursorMask(0).hdc, 0, 0, vbSrcAnd;
+//                    BitBlt myBackBuffer, 300 - 20, B + 350 + (MenuCursor * 30), 16, 16, GFX::MCursor(0).hdc, 0, 0, vbSrcPaint;
+                    frmMain.renderTexture(300 - 20, B + 350 + (MenuCursor * 30), GFX.MCursor[0]);
+                }
 
-//                    A = 0
-//                    B = 0
-//                    C = 0
-//                    If blockCharacter(1) = False Then
-//                        SuperPrint "MARIO GAME", 3, 300, 350
-//                    Else
-//                        A = A - 30
-//                        If MenuCursor + 1 >= 1 Then B = B - 30
-//                        If PlayerCharacter >= 1 Then C = C - 30
-//                    End If
-//                    If blockCharacter(2) = False Then
-//                        SuperPrint "LUIGI GAME", 3, 300, 380 + A
-//                    Else
-//                        A = A - 30
-//                        If MenuCursor + 1 >= 2 Then B = B - 30
-//                        If PlayerCharacter >= 2 Then C = C - 30
-//                    End If
-//                    If blockCharacter(3) = False Then
-//                        SuperPrint "PEACH GAME", 3, 300, 410 + A
-//                    Else
-//                        A = A - 30
-//                        If MenuCursor + 1 >= 3 Then B = B - 30
-//                        If PlayerCharacter >= 3 Then C = C - 30
-//                    End If
-//                    If blockCharacter(4) = False Then
-//                        SuperPrint "TOAD GAME", 3, 300, 440 + A
-//                    Else
-//                        A = A - 30
-//                        If MenuCursor + 1 >= 4 Then B = B - 30
-//                        If PlayerCharacter >= 4 Then C = C - 30
-//                    End If
-//                    If blockCharacter(5) = False Then
-//                        SuperPrint "LINK GAME", 3, 300, 470 + A
-//                    Else
-//                        A = A - 30
-//                        If MenuCursor + 1 >= 5 Then B = B - 30
-//                        If PlayerCharacter >= 5 Then C = C - 30
-//                    End If
-//                    If MenuMode = 300 Or MenuMode = 500 Then
-//                        BitBlt myBackBuffer, 300 - 20, B + 350 + (MenuCursor * 30), 16, 16, GFX.MCursorMask(0).hdc, 0, 0, vbSrcAnd
-//                        BitBlt myBackBuffer, 300 - 20, B + 350 + (MenuCursor * 30), 16, 16, GFX.MCursor(3).hdc, 0, 0, vbSrcPaint
-//                        BitBlt myBackBuffer, 300 - 20, C + 350 + ((PlayerCharacter - 1) * 30), 16, 16, GFX.MCursorMask(0).hdc, 0, 0, vbSrcAnd
-//                        BitBlt myBackBuffer, 300 - 20, C + 350 + ((PlayerCharacter - 1) * 30), 16, 16, GFX.MCursor(0).hdc, 0, 0, vbSrcPaint
-//                    Else
-//                        BitBlt myBackBuffer, 300 - 20, B + 350 + (MenuCursor * 30), 16, 16, GFX.MCursorMask(0).hdc, 0, 0, vbSrcAnd
-//                        BitBlt myBackBuffer, 300 - 20, B + 350 + (MenuCursor * 30), 16, 16, GFX.MCursor(0).hdc, 0, 0, vbSrcPaint
-//                    End If
 //                ElseIf MenuMode = 1 Or MenuMode = 2 Or MenuMode = 4 Then 'World Select
-//                    Dim tempStr As String
-//                    minShow = 1
-//                    maxShow = NumSelectWorld
-//                    If NumSelectWorld > 5 Then
-//                        minShow = worldCurs
-//                        maxShow = minShow + 4
+            } else if(MenuMode == 1 Or MenuMode == 2 Or MenuMode == 4) {
+                std::string tempStr = "";
+                minShow = 1;
+                maxShow = NumSelectWorld;
+                if(NumSelectWorld > 5)
+                {
+                    minShow = worldCurs;
+                    maxShow = minShow + 4;
 
-//                        If MenuCursor <= minShow - 1 Then worldCurs = worldCurs - 1
-//                        If MenuCursor >= maxShow - 1 Then worldCurs = worldCurs + 1
+                    if(MenuCursor <= minShow - 1)
+                        worldCurs = worldCurs - 1;
+                    if(MenuCursor >= maxShow - 1)
+                        worldCurs = worldCurs + 1;
 
-//                        If worldCurs < 1 Then worldCurs = 1
-//                        If worldCurs > NumSelectWorld - 4 Then worldCurs = NumSelectWorld - 4
+                    if(worldCurs < 1)
+                        worldCurs = 1;
+                    if(worldCurs > NumSelectWorld - 4)
+                        worldCurs = NumSelectWorld - 4;
 
-//                        If maxShow >= NumSelectWorld Then
-//                            maxShow = NumSelectWorld
-//                            minShow = NumSelectWorld - 4
-//                        End If
+                    if(maxShow >= NumSelectWorld)
+                    {
+                        maxShow = NumSelectWorld;
+                        minShow = NumSelectWorld - 4;
+                    }
 
-//                        minShow = worldCurs
-//                        maxShow = minShow + 4
+                    minShow = worldCurs;
+                    maxShow = minShow + 4;
+                }
 
-//                    End If
+                for(auto A = minShow; A <= maxShow; A++)
+                {
+                    B = A - minShow + 1;
+                    tempStr = SelectWorld[A].WorldName;
+                    SuperPrint(tempStr, 3, 300, 320 + (B * 30));
+                }
 
-
-//                    For A = minShow To maxShow
-//                        B = A - minShow + 1
-//                        tempStr = UCase(SelectWorld(A).WorldName)
-//                        SuperPrint tempStr, 3, 300, 320 + (B * 30)
-//                    Next A
-
-//                        If minShow > 1 Then
-//                            BitBlt myBackBuffer, 400 - 8, 350 - 20, 16, 16, GFX.MCursorMask(1).hdc, 0, 0, vbSrcAnd
-//                            BitBlt myBackBuffer, 400 - 8, 350 - 20, 16, 16, GFX.MCursor(1).hdc, 0, 0, vbSrcPaint
-//                        End If
-//                        If maxShow < NumSelectWorld Then
-//                            BitBlt myBackBuffer, 400 - 8, 490, 16, 16, GFX.MCursorMask(2).hdc, 0, 0, vbSrcAnd
-//                            BitBlt myBackBuffer, 400 - 8, 490, 16, 16, GFX.MCursor(2).hdc, 0, 0, vbSrcPaint
-//                        End If
-
+                if(minShow > 1)
+                {
+//                    BitBlt myBackBuffer, 400 - 8, 350 - 20, 16, 16, GFX::MCursorMask(1).hdc, 0, 0, vbSrcAnd;
+//                    BitBlt myBackBuffer, 400 - 8, 350 - 20, 16, 16, GFX::MCursor(1).hdc, 0, 0, vbSrcPaint;
+                    frmMain.renderTexture(400 - 8, 350 - 20, GFX.MCursor[1]);
+                }
+                if(maxShow < NumSelectWorld)
+                {
+//                    BitBlt myBackBuffer, 400 - 8, 490, 16, 16, GFX::MCursorMask(2).hdc, 0, 0, vbSrcAnd;
+//                    BitBlt myBackBuffer, 400 - 8, 490, 16, 16, GFX::MCursor(2).hdc, 0, 0, vbSrcPaint;
+                    frmMain.renderTexture(400 - 8, 490, GFX.MCursor[2]);
+                }
 
 //                    B = MenuCursor - minShow + 1
+                B = MenuCursor - minShow + 1;
 //                    If B >= 0 And B < 5 Then
+                if(B >= 0 And B < 5)
+                {
 //                    BitBlt myBackBuffer, 300 - 20, 350 + (B * 30), 16, 16, GFX.MCursorMask(0).hdc, 0, 0, vbSrcAnd
 //                    BitBlt myBackBuffer, 300 - 20, 350 + (B * 30), 16, 16, GFX.MCursor(0).hdc, 0, 0, vbSrcPaint
+                    frmMain.renderTexture(300 - 20, 350 + (B * 30),
+                                          GFX.MCursor[0].w, GFX.MCursor[0].h, GFX.MCursor[0], 0, 0);
 //                    End If
+                }
 //                ElseIf MenuMode = 10 Or MenuMode = 20 Then 'Save Select
-//                    For A = 1 To 3
-//                        If SaveSlot(A) >= 0 Then
-//                            SuperPrint "SLOT" & Str(A) & " ... " & SaveSlot(A), 3, 300, 320 + (A * 30)
-//                            If SaveStars(A) > 0 Then
-//                                BitBlt myBackBuffer, 560, 320 + (A * 30) + 1, GFX.Interface(5).ScaleWidth, GFX.Interface(5).ScaleHeight, GFX.InterfaceMask(5).hdc, 0, 0, vbSrcAnd
-//                                BitBlt myBackBuffer, 560, 320 + (A * 30) + 1, GFX.Interface(5).ScaleWidth, GFX.Interface(5).ScaleHeight, GFX.Interface(5).hdc, 0, 0, vbSrcPaint
-//                                BitBlt myBackBuffer, 560 + 24, 320 + (A * 30) + 2, GFX.Interface(1).ScaleWidth, GFX.Interface(1).ScaleHeight, GFX.InterfaceMask(1).hdc, 0, 0, vbSrcAnd
-//                                BitBlt myBackBuffer, 560 + 24, 320 + (A * 30) + 2, GFX.Interface(1).ScaleWidth, GFX.Interface(1).ScaleHeight, GFX.Interface(1).hdc, 0, 0, vbSrcPaint
-//                                SuperPrint Str(SaveStars(A)), 3, 588, 320 + (A * 30)
-//                            End If
-//                        Else
-//                            SuperPrint "SLOT" & Str(A) & " ... EMPTY", 3, 300, 320 + (A * 30)
-//                        End If
-//                    Next A
-//                    BitBlt myBackBuffer, 300 - 20, 350 + (MenuCursor * 30), 16, 16, GFX.MCursorMask(0).hdc, 0, 0, vbSrcAnd
-//                    BitBlt myBackBuffer, 300 - 20, 350 + (MenuCursor * 30), 16, 16, GFX.MCursor(0).hdc, 0, 0, vbSrcPaint
-//                ElseIf MenuMode = 3 Then 'Options Menu
+            }
+            else if(MenuMode == 10 Or MenuMode == 20) // Save Select
+            {
+                for(auto A = 1; A <= maxSaveSlots; A++)
+                {
+                    if(SaveSlot[A] >= 0)
+                    {
+                        SuperPrint(fmt::format_ne("SLOT {0} ... {1}", A, SaveSlot[A]), 3, 300, 320 + (A * 30));
+                        if(SaveStars[A] > 0)
+                        {
+//                            BitBlt myBackBuffer, 560, 320 + (A * 30) + 1, GFX::Interface(5).ScaleWidth, GFX::Interface(5).ScaleHeight, GFX::InterfaceMask(5).hdc, 0, 0, vbSrcAnd;
+//                            BitBlt myBackBuffer, 560, 320 + (A * 30) + 1, GFX::Interface(5).ScaleWidth, GFX::Interface(5).ScaleHeight, GFX::Interface(5).hdc, 0, 0, vbSrcPaint;
+                            frmMain.renderTexture(560, 320 + (A * 30) + 1, GFX.Interface[5]);
+//                            BitBlt myBackBuffer, 560 + 24, 320 + (A * 30) + 2, GFX::Interface(1).ScaleWidth, GFX::Interface(1).ScaleHeight, GFX::InterfaceMask(1).hdc, 0, 0, vbSrcAnd;
+//                            BitBlt myBackBuffer, 560 + 24, 320 + (A * 30) + 2, GFX::Interface(1).ScaleWidth, GFX::Interface(1).ScaleHeight, GFX::Interface(1).hdc, 0, 0, vbSrcPaint;
+                            frmMain.renderTexture(560 + 24, 320 + (A * 30) + 2, GFX.Interface[1]);
+                            SuperPrint(fmt::format_ne("{0}", SaveStars[A]), 3, 588, 320 + (A * 30));
+                        }
+                    }
+                    else
+                    {
+                        SuperPrint(fmt::format_ne("SLOT {0} ... EMPTY", A), 3, 300, 320 + (A * 30));
+                    }
+                }
+//                BitBlt myBackBuffer, 300 - 20, 350 + (MenuCursor * 30), 16, 16, GFX::MCursorMask(0).hdc, 0, 0, vbSrcAnd;
+//                BitBlt myBackBuffer, 300 - 20, 350 + (MenuCursor * 30), 16, 16, GFX::MCursor(0).hdc, 0, 0, vbSrcPaint;
+                frmMain.renderTexture(300 - 20, 350 + (MenuCursor * 30), GFX.MCursor[0]);
+            }
+
+            // Options Menu
+            else if(MenuMode == 3)
+            {
 //                    SuperPrint "PLAYER 1 CONTROLS", 3, 300, 350
+                SuperPrint("PLAYER 1 CONTROLS", 3, 300, 350);
 //                    SuperPrint "PLAYER 2 CONTROLS", 3, 300, 380
+                SuperPrint("PLAYER 2 CONTROLS", 3, 300, 380);
 //                    If resChanged = True Then
+                if(resChanged)
 //                        SuperPrint "WINDOWED MODE", 3, 300, 410
+                    SuperPrint("WINDOWED MODE", 3, 300, 410);
 //                    Else
+                else
 //                        SuperPrint "FULLSCREEN MODE", 3, 300, 410
+                    SuperPrint("FULLSCREEN MODE", 3, 300, 410);
 //                    End If
 //                    SuperPrint "VIEW CREDITS", 3, 300, 440
+                SuperPrint("VIEW CREDITS", 3, 300, 440);
 //                    BitBlt myBackBuffer, 300 - 20, 350 + (MenuCursor * 30), 16, 16, GFX.MCursorMask(0).hdc, 0, 0, vbSrcAnd
 //                    BitBlt myBackBuffer, 300 - 20, 350 + (MenuCursor * 30), 16, 16, GFX.MCursor(0).hdc, 0, 0, vbSrcPaint
+                frmMain.renderTexture(300 - 20, 350 + (MenuCursor * 30),
+                                      GFX.MCursor[0].w, GFX.MCursor[0].h, GFX.MCursor[0], 0, 0);
 //                ElseIf MenuMode = 31 Or MenuMode = 32 Then
+            } else if(MenuMode == 31 Or MenuMode == 32) {
 //                    If useJoystick(MenuMode - 30) = 0 Then
 //                        SuperPrint "INPUT......KEYBOARD", 3, 300, 260 + menuFix
 //                        SuperPrint "UP........." & CheckKey(Chr(conKeyboard(MenuMode - 30).Up)), 3, 300, 290 + menuFix
@@ -2339,10 +2406,13 @@ void UpdateGraphics()
 //                            SuperPrint "PAUSE......_", 3, 300, 440 + menuFix
 //                        End If
 //                    End If
+
 //                    BitBlt myBackBuffer, 300 - 20, 260 + (MenuCursor * 30) + menuFix, 16, 16, GFX.MCursorMask(0).hdc, 0, 0, vbSrcAnd
 //                    BitBlt myBackBuffer, 300 - 20, 260 + (MenuCursor * 30) + menuFix, 16, 16, GFX.MCursor(0).hdc, 0, 0, vbSrcPaint
+                frmMain.renderTexture(300 - 20, 260 + (MenuCursor * 30) + menuFix,
+                                      GFX.MCursor[0].w, GFX.MCursor[0].h, GFX.MCursor[0], 0, 0);
 //                End If
-
+            }
 
 //                BitBlt myBackBuffer, MenuMouseX, MenuMouseY, GFX.ECursor(2).ScaleWidth, GFX.ECursor(2).ScaleHeight, GFX.ECursorMask(2).hdc, 0, 0, vbSrcAnd
 //                BitBlt myBackBuffer, MenuMouseX, MenuMouseY, GFX.ECursor(2).ScaleWidth, GFX.ECursor(2).ScaleHeight, GFX.ECursor(2).hdc, 0, 0, vbSrcPaint
@@ -3299,8 +3369,10 @@ void SuperPrint(std::string SuperWords, int Font, float X, float Y)
         }
 //    ElseIf Font = 3 Then
     } else if (Font == 3) {
+        std::string Words = SuperWords;
+        std::transform(Words.begin(), Words.end(), Words.begin(), [](unsigned char c){ return std::toupper(c); });
 //        Do While Len(Words) > 0
-        for(auto c : SuperWords)
+        for(auto c : Words)
         {
 //            If Asc(Left(Words, 1)) >= 33 And Asc(Left(Words, 1)) <= 126 Then
             if(c >= 33 && c <= 126)
@@ -4155,21 +4227,51 @@ void ScreenShot()
 void DrawFrozenNPC(int Z, int A)
 {
 //    With NPC(A)
+    auto &n = NPC[A];
 //        If (vScreenCollision(Z, .Location) Or vScreenCollision(Z, newLoc(.Location.X - (NPCWidthGFX(.Type) - .Location.Width) / 2, .Location.Y, CDbl(NPCWidthGFX(.Type)), CDbl(NPCHeight(.Type))))) And .Hidden = False Then
+    if((vScreenCollision(Z, n.Location) Or
+        vScreenCollision(Z, newLoc(n.Location.X - (NPCWidthGFX[n.Type] - n.Location.Width) / 2,
+                            n.Location.Y, CDbl(NPCWidthGFX[n.Type]), CDbl(NPCHeight[n.Type])))) And !n.Hidden)
+    {
 //        'draw npc
 
 //            BitBlt myBackBuffer, vScreenX(Z) + .Location.X + 2, vScreenY(Z) + .Location.Y + 2, .Location.Width - 4, .Location.Height - 4, GFXNPCMask(.Special), 2, 2 + .Special2 * NPCHeight(.Special), vbSrcAnd
 //            If .Shadow = False Then BitBlt myBackBuffer, vScreenX(Z) + .Location.X + 2, vScreenY(Z) + .Location.Y + 2, .Location.Width - 4, .Location.Height - 4, GFXNPC(.Special), 2, 2 + .Special2 * NPCHeight(.Special), vbSrcPaint
+        float c = n.Shadow ? 0.f : 1.f;
+
+        frmMain.renderTexture(int(vScreenX[Z] + n.Location.X + 2),
+                              int(vScreenY[Z] + n.Location.Y + 2),
+                              int(n.Location.Width - 4),
+                              int(n.Location.Height - 4),
+                              GFXNPCBMP[int(n.Special)],
+                              2, 2 + int(n.Special2) * NPCHeight[int(n.Special)], c, c, c);
 
 //        'draw ice
 //            BitBlt myBackBuffer, vScreenX(Z) + .Location.X + NPCFrameOffsetX(.Type), vScreenY(Z) + .Location.Y + NPCFrameOffsetY(.Type), .Location.Width - 6, .Location.Height - 6, GFXNPCMask(.Type), 0, 0, vbSrcAnd
 //            If .Shadow = False Then BitBlt myBackBuffer, vScreenX(Z) + .Location.X + NPCFrameOffsetX(.Type), vScreenY(Z) + .Location.Y + NPCFrameOffsetY(.Type), .Location.Width - 6, .Location.Height - 6, GFXNPC(.Type), 0, 0, vbSrcPaint
-//            BitBlt myBackBuffer, vScreenX(Z) + .Location.X + NPCFrameOffsetX(.Type) + .Location.Width - 6, vScreenY(Z) + .Location.Y + NPCFrameOffsetY(.Type), 6, .Location.Height - 6, GFXNPCMask(.Type), 128 - 6, 0, vbSrcAnd
-//            If .Shadow = False Then BitBlt myBackBuffer, vScreenX(Z) + .Location.X + NPCFrameOffsetX(.Type) + .Location.Width - 6, vScreenY(Z) + .Location.Y + NPCFrameOffsetY(.Type), 6, .Location.Height - 6, GFXNPC(.Type), 128 - 6, 0, vbSrcPaint
-//            BitBlt myBackBuffer, vScreenX(Z) + .Location.X + NPCFrameOffsetX(.Type), vScreenY(Z) + .Location.Y + NPCFrameOffsetY(.Type) + .Location.Height - 6, .Location.Width - 6, 6, GFXNPCMask(.Type), 0, 128 - 6, vbSrcAnd
-//            If .Shadow = False Then BitBlt myBackBuffer, vScreenX(Z) + .Location.X + NPCFrameOffsetX(.Type), vScreenY(Z) + .Location.Y + NPCFrameOffsetY(.Type) + .Location.Height - 6, .Location.Width - 6, 6, GFXNPC(.Type), 0, 128 - 6, vbSrcPaint
-//            BitBlt myBackBuffer, vScreenX(Z) + .Location.X + NPCFrameOffsetX(.Type) + .Location.Width - 6, vScreenY(Z) + .Location.Y + NPCFrameOffsetY(.Type) + .Location.Height - 6, 6, 6, GFXNPCMask(.Type), 128 - 6, 128 - 6, vbSrcAnd
-//            If .Shadow = False Then BitBlt myBackBuffer, vScreenX(Z) + .Location.X + NPCFrameOffsetX(.Type) + .Location.Width - 6, vScreenY(Z) + .Location.Y + NPCFrameOffsetY(.Type) + .Location.Height - 6, 6, 6, GFXNPC(.Type), 128 - 6, 128 - 6, vbSrcPaint
+        frmMain.renderTexture(int(vScreenX[Z] + n.Location.X + NPCFrameOffsetX[n.Type]),
+                              int(vScreenY[Z] + n.Location.Y + NPCFrameOffsetY[n.Type]),
+                              int(n.Location.Width - 6), int(n.Location.Height - 6),
+                              GFXNPCBMP[n.Type], 0, 0, c, c, c);
+//            BitBlt myBackBuffer, vScreenX[Z] + n.Location.X + NPCFrameOffsetX[n.Type] + n.Location.Width - 6, vScreenY[Z] + n.Location.Y + NPCFrameOffsetY[n.Type], 6, n.Location.Height - 6, GFXNPCMask[n.Type], 128 - 6, 0, vbSrcAnd
+//            If .Shadow = False Then BitBlt myBackBuffer, vScreenX[Z] + n.Location.X + NPCFrameOffsetX[n.Type] + n.Location.Width - 6, vScreenY[Z] + n.Location.Y + NPCFrameOffsetY[n.Type], 6, n.Location.Height - 6, GFXNPC[n.Type], 128 - 6, 0, vbSrcPaint
+        frmMain.renderTexture(int(vScreenX[Z] + n.Location.X + NPCFrameOffsetX[n.Type] + n.Location.Width - 6),
+                              int(vScreenY[Z] + n.Location.Y + NPCFrameOffsetY[n.Type]),
+                              6, int(n.Location.Height - 6),
+                              GFXNPCBMP[n.Type], 128 - 6, 0, c, c, c);
+//            BitBlt myBackBuffer, vScreenX[Z] + n.Location.X + NPCFrameOffsetX[n.Type], vScreenY[Z] + n.Location.Y + NPCFrameOffsetY[n.Type] + n.Location.Height - 6, n.Location.Width - 6, 6, GFXNPCMask[n.Type], 0, 128 - 6, vbSrcAnd
+//            If .Shadow = False Then BitBlt myBackBuffer, vScreenX[Z] + n.Location.X + NPCFrameOffsetX[n.Type], vScreenY[Z] + n.Location.Y + NPCFrameOffsetY[n.Type] + n.Location.Height - 6, n.Location.Width - 6, 6, GFXNPC[n.Type], 0, 128 - 6, vbSrcPaint
+        frmMain.renderTexture(int(vScreenX[Z] + n.Location.X + NPCFrameOffsetX[n.Type]),
+                              int(vScreenY[Z] + n.Location.Y + NPCFrameOffsetY[n.Type] + n.Location.Height - 6),
+                              int(n.Location.Width - 6), 6,
+                              GFXNPCBMP[n.Type], 0, 128 - 6, c, c, c);
+//            BitBlt myBackBuffer, vScreenX[Z] + n.Location.X + NPCFrameOffsetX[n.Type] + n.Location.Width - 6, vScreenY[Z] + n.Location.Y + NPCFrameOffsetY[n.Type] + n.Location.Height - 6, 6, 6, GFXNPCMask[n.Type], 128 - 6, 128 - 6, vbSrcAnd
+//            If .Shadow = False Then BitBlt myBackBuffer, vScreenX[Z] + n.Location.X + NPCFrameOffsetX[n.Type] + n.Location.Width - 6, vScreenY[Z] + n.Location.Y + NPCFrameOffsetY[n.Type] + n.Location.Height - 6, 6, 6, GFXNPC[n.Type], 128 - 6, 128 - 6, vbSrcPaint
+        frmMain.renderTexture(int(vScreenX[Z] + n.Location.X + NPCFrameOffsetX[n.Type] + n.Location.Width - 6),
+                              int(vScreenY[Z] + n.Location.Y + NPCFrameOffsetY[n.Type] + n.Location.Height - 6),
+                              6, 6, GFXNPCBMP[n.Type],
+                              128 - 6, 128 - 6);
 //        End If
+    }
 //    End With
 }
