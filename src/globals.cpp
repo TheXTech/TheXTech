@@ -454,11 +454,15 @@ Uint8 getKeyState(SDL_Scancode key)
 
 Uint8 getKeyStateI(int key)
 {
+    if(key < 0)
+        return 0;
     return frmMain.getKeyState(static_cast<SDL_Scancode>(key));
 }
 
 const char *getKeyName(int key)
 {
+    if(key < 0)
+        return " ... ";
     SDL_Scancode k = static_cast<SDL_Scancode>(key);
     return SDL_GetScancodeName(k);
 }

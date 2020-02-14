@@ -2138,7 +2138,7 @@ void UpdateGraphics()
                 worldCurs = 0;
 //Dim menuFix As Integer ' for Input Settings
 //menuFix = -44
-            int menuFix = 44; // for Input Settings
+            int menuFix = -44; // for Input Settings
 
 
 //            BitBlt myBackBuffer, 0, 0, GFX.MenuGFX(1).ScaleWidth, GFX.MenuGFX(1).ScaleWidth, GFX.MenuGFXMask(1).hdc, 0, 0, vbSrcAnd
@@ -2362,18 +2362,22 @@ void UpdateGraphics()
 //                ElseIf MenuMode = 31 Or MenuMode = 32 Then
             } else if(MenuMode == 31 Or MenuMode == 32) {
 //                    If useJoystick(MenuMode - 30) = 0 Then
+                if(useJoystick[MenuMode - 30] == 0)
+                {
 //                        SuperPrint "INPUT......KEYBOARD", 3, 300, 260 + menuFix
-//                        SuperPrint "UP........." & CheckKey(Chr(conKeyboard(MenuMode - 30).Up)), 3, 300, 290 + menuFix
-//                        SuperPrint "DOWN......." & CheckKey(Chr(conKeyboard(MenuMode - 30).Down)), 3, 300, 320 + menuFix
-//                        SuperPrint "LEFT......." & CheckKey(Chr(conKeyboard(MenuMode - 30).Left)), 3, 300, 350 + menuFix
-//                        SuperPrint "RIGHT......" & CheckKey(Chr(conKeyboard(MenuMode - 30).Right)), 3, 300, 380 + menuFix
-//                        SuperPrint "RUN........" & CheckKey(Chr(conKeyboard(MenuMode - 30).Run)), 3, 300, 410 + menuFix
-//                        SuperPrint "ALT RUN...." & CheckKey(Chr(conKeyboard(MenuMode - 30).AltRun)), 3, 300, 440 + menuFix
-//                        SuperPrint "JUMP......." & CheckKey(Chr(conKeyboard(MenuMode - 30).Jump)), 3, 300, 470 + menuFix
-//                        SuperPrint "ALT JUMP..." & CheckKey(Chr(conKeyboard(MenuMode - 30).AltJump)), 3, 300, 500 + menuFix
-//                        SuperPrint "DROP ITEM.." & CheckKey(Chr(conKeyboard(MenuMode - 30).Drop)), 3, 300, 530 + menuFix
-//                        SuperPrint "PAUSE......" & CheckKey(Chr(conKeyboard(MenuMode - 30).Start)), 3, 300, 560 + menuFix
+                    SuperPrint("INPUT......KEYBOARD", 3, 300, 260 + menuFix);
+                    SuperPrint(fmt::format_ne("UP.........{0}", getKeyName(conKeyboard[MenuMode - 30].Up)), 3, 300, 290 + menuFix);
+                    SuperPrint(fmt::format_ne("DOWN.......{0}", getKeyName(conKeyboard[MenuMode - 30].Down)), 3, 300, 320 + menuFix);
+                    SuperPrint(fmt::format_ne("LEFT.......{0}", getKeyName(conKeyboard[MenuMode - 30].Left)), 3, 300, 350 + menuFix);
+                    SuperPrint(fmt::format_ne("RIGHT......{0}", getKeyName(conKeyboard[MenuMode - 30].Right)), 3, 300, 380 + menuFix);
+                    SuperPrint(fmt::format_ne("RUN........{0}", getKeyName(conKeyboard[MenuMode - 30].Run)), 3, 300, 410 + menuFix);
+                    SuperPrint(fmt::format_ne("ALT RUN....{0}", getKeyName(conKeyboard[MenuMode - 30].AltRun)), 3, 300, 440 + menuFix);
+                    SuperPrint(fmt::format_ne("JUMP.......{0}", getKeyName(conKeyboard[MenuMode - 30].Jump)), 3, 300, 470 + menuFix);
+                    SuperPrint(fmt::format_ne("ALT JUMP...{0}", getKeyName(conKeyboard[MenuMode - 30].AltJump)), 3, 300, 500 + menuFix);
+                    SuperPrint(fmt::format_ne("DROP ITEM..{0}", getKeyName(conKeyboard[MenuMode - 30].Drop)), 3, 300, 530 + menuFix);
+                    SuperPrint(fmt::format_ne("PAUSE......{0}", getKeyName(conKeyboard[MenuMode - 30].Start)), 3, 300, 560 + menuFix);
 //                    Else
+                }
 //                        SuperPrint "INPUT......JOYSTICK " & useJoystick(MenuMode - 30), 3, 300, 260 + menuFix
 //                        If conJoystick(MenuMode - 30).Run >= 0 Then
 //                            SuperPrint "RUN........" & conJoystick(MenuMode - 30).Run, 3, 300, 290 + menuFix

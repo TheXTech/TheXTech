@@ -1247,11 +1247,10 @@ void MenuLoop()
 //            End If
             }
 
-//            If MenuCursorCanMove = True Or ((getNewKeyboard = False And getNewJoystick = False) And (MenuMouseClick = True Or MenuMouseBack = True)) Then
-            if(MenuCursorCanMove Or
-                ((!getNewKeyboard And !getNewJoystick) And
-                 (MenuMouseClick Or MenuMouseBack))
-            )
+//            If MenuCursorCanMove = True Or _
+//              ((getNewKeyboard = False And getNewJoystick = False) And _
+//              (MenuMouseClick = True Or MenuMouseBack = True)) Then
+            if(MenuCursorCanMove || ((!getNewKeyboard && !getNewJoystick) && (MenuMouseClick || MenuMouseBack)))
             {
 //                If getNewKeyboard = True Then
                 if(getNewKeyboard)
@@ -1356,7 +1355,9 @@ void MenuLoop()
                 }
                 else
                 {
-                    if(Player[1].Controls.Run == true || getKeyState(vbKeyEscape) == KEY_PRESSED || MenuMouseBack == true)
+                    if(c.Run == true ||
+                       getKeyState(vbKeyEscape) == KEY_PRESSED ||
+                       MenuMouseBack == true)
                     {
                         SaveConfig();
                         MenuCursor = MenuMode - 31;
@@ -1364,9 +1365,10 @@ void MenuLoop()
                         MenuCursorCanMove = false;
                         PlaySound(26);
                     }
-                    else if(Player[1].Controls.Jump == true || Player[1].Controls.Start == true ||
+                    else if(c.Jump == true || c.Start == true ||
                             (getKeyState(vbKeySpace) == KEY_PRESSED) ||
-                            (getKeyState(vbKeyReturn) & KEY_PRESSED) || MenuMouseClick == true)
+                            (getKeyState(vbKeyReturn) == KEY_PRESSED) ||
+                            MenuMouseClick == true)
                     {
                         if(MenuCursor == 0)
                         {
@@ -1380,27 +1382,41 @@ void MenuLoop()
                             if(useJoystick[MenuMode - 30] == 0)
                             {
                                 getNewKeyboard = true;
-                                inputKey = '_';
-                                if(MenuCursor == 1)
-                                    conKeyboard[MenuMode - 30].Up = inputKey;
-                                else if(MenuCursor == 2)
-                                    conKeyboard[MenuMode - 30].Down = inputKey;
-                                else if(MenuCursor == 3)
-                                    conKeyboard[MenuMode - 30].Left = inputKey;
-                                else if(MenuCursor == 4)
-                                    conKeyboard[MenuMode - 30].Right = inputKey;
-                                else if(MenuCursor == 5)
-                                    conKeyboard[MenuMode - 30].Run = inputKey;
-                                else if(MenuCursor == 6)
-                                    conKeyboard[MenuMode - 30].AltRun = inputKey;
-                                else if(MenuCursor == 7)
-                                    conKeyboard[MenuMode - 30].Jump = inputKey;
-                                else if(MenuCursor == 8)
-                                    conKeyboard[MenuMode - 30].AltJump = inputKey;
-                                else if(MenuCursor == 9)
-                                    conKeyboard[MenuMode - 30].Drop = inputKey;
-                                else if(MenuCursor == 10)
-                                    conKeyboard[MenuMode - 30].Start = inputKey;
+                                switch(MenuCursor)
+                                {
+                                case 1:
+                                    conKeyboard[MenuMode - 30].Up = -1;
+                                    break;
+                                case 2:
+                                    conKeyboard[MenuMode - 30].Down = -1;
+                                    break;
+                                case 3:
+                                    conKeyboard[MenuMode - 30].Left = -1;
+                                    break;
+                                case 4:
+                                    conKeyboard[MenuMode - 30].Right = -1;
+                                    break;
+                                case 5:
+                                    conKeyboard[MenuMode - 30].Run = -1;
+                                    break;
+                                case 6:
+                                    conKeyboard[MenuMode - 30].AltRun = -1;
+                                    break;
+                                case 7:
+                                    conKeyboard[MenuMode - 30].Jump = -1;
+                                    break;
+                                case 8:
+                                    conKeyboard[MenuMode - 30].AltJump = -1;
+                                    break;
+                                case 9:
+                                    conKeyboard[MenuMode - 30].Drop = -1;
+                                    break;
+                                case 10:
+                                    conKeyboard[MenuMode - 30].Start = -1;
+                                    break;
+                                default:
+                                    break;
+                                }
                                 inputKey = 0;
                             }
                             else
@@ -2285,7 +2301,25 @@ void FindWorlds()
 
 void FindLevels()
 {
+    std::string FileName = "";
+    std::string worldsRoot = AppPath + "battle/";
+    NumSelectWorld = 1;
+    SelectWorld[1].WorldName = "Random Level";
+    std::vector<std::string> files;
+    DirMan battleLvls(worldsRoot);
+    LevelData head;
 
+    battleLvls.getListOfFiles(files, {".lvl", ".lvlx"});
+    for(std::string &fName : files)
+    {
+        std::string wPath = worldsRoot + fName;
+        if(FileFormats::OpenLevelFileHeader(wPath, head))
+        {
+            NumSelectWorld++;
+            SelectWorld[NumSelectWorld].WorldFile = fName;
+            SelectWorld[NumSelectWorld].WorldName = head.LevelName;
+        }
+    }
 }
 
 void FindSaves()
@@ -2330,74 +2364,4 @@ void FindSaves()
                 SaveSlot[A] = 100;
         }
     }
-
-//    For A = 1 To 3
-//        curActive = 0
-//        maxActive = 0
-//        If Dir(SelectWorld(selWorld).WorldPath & "save" & A & ".sav") <> "" Then
-//            Open SelectWorld(selWorld).WorldPath & "save" & A & ".sav" For Input As #1
-//                Input #1, FileRelease
-//                If FileRelease >= 56 Then 'Version 1.2.2 and newer
-//                    For B = 1 To 4 'Misc Skipping
-//                        Input #1, newInput
-//                    Next B
-//                    For B = 1 To 5 'Character Info Skipping
-//                        Input #1, newInput
-//                        Input #1, newInput
-//                        Input #1, newInput
-//                        Input #1, newInput
-//                        Input #1, newInput
-//                    Next B
-//                    Input #1, newInput 'World music skipping
-//                Else 'Version 1.2.1 and older
-//                    For B = 1 To 13
-//                        Input #1, newInput
-//                    Next B
-//                End If
-//                Do Until EOF(1)
-//                    Input #1, newInput
-//                    If newInput = "next" Then Exit Do
-//                    maxActive = maxActive + 1
-//                    If newInput = "#TRUE#" Then
-//                        curActive = curActive + 1
-//                    End If
-//                Loop
-//                Do Until EOF(1)
-//                    Input #1, newInput
-//                    If newInput = "next" Then Exit Do
-//                    maxActive = maxActive + 1
-//                    If newInput = "#TRUE#" Then
-//                        curActive = curActive + 1
-//                    End If
-//                Loop
-//                Do Until EOF(1)
-//                    Input #1, newInput
-//                    If newInput = "next" Then Exit Do
-//                Loop
-//                If FileRelease >= 7 Then
-//                    SaveStars(A) = 0
-//                    Do Until EOF(1)
-//                        Input #1, newInput
-//                        If newInput = "next" Then Exit Do
-//                        If FileRelease >= 16 Then Input #1, newInput
-//                        If newInput = "next" Then Exit Do
-//                        SaveStars(A) = SaveStars(A) + 1
-//                    Loop
-//                End If
-//                If FileRelease >= 20 Then
-//                    Input #1, newInput
-//                    maxActive = maxActive + (newInput * 4)
-//                    curActive = curActive + (SaveStars(A) * 4)
-//                End If
-//            Close #1
-//            If maxActive > 0 Then
-//                SaveSlot(A) = Int((curActive / maxActive) * 100)
-//            Else
-//                SaveSlot(A) = 100
-//            End If
-//        Else
-//            SaveSlot(A) = -1
-//        End If
-//    Next A
-
 }
