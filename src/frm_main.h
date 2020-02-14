@@ -33,6 +33,9 @@ public:
     void show();
     void hide();
     void doEvents();
+    void waitEvents();
+
+    bool isWindowActive();
 
     void eventDoubleClick();
     void eventKeyDown(SDL_KeyboardEvent &evt);
@@ -73,6 +76,7 @@ public:
     void makeShot();
 
 private:
+    void processEvent();
     void loadTexture(StdPicture &target, uint32_t width, uint32_t height, uint8_t *RGBApixels);
 
     struct PGE_GL_shoot

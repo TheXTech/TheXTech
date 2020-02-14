@@ -9,219 +9,449 @@
 #include "../layers.h"
 #include "../player.h"
 
+#include "../pseudo_vb.h"
+
+void CheckActive();//in game_main.cpp
+
 void GameLoop()
 {
-//    Dim A As Integer
-    //int A;
-//    Dim tempLocation As Location
-    //Location tempLocation;
-//    UpdateControls
+
     UpdateControls();
-//    If LevelMacro > 0 Then UpdateMacro
     if(LevelMacro > 0)
         UpdateMacro();
-//    If BattleMode = True Then
     if(BattleMode)
     {
-//        If BattleOutro > 0 Then
         if(BattleOutro > 0)
         {
-//            BattleOutro = BattleOutro + 1
-            BattleOutro += 1;
-//            If BattleOutro = 260 Then EndLevel = True
+            BattleOutro++;
             if(BattleOutro == 260)
                 EndLevel = true;
-//        End If
         }
-//    End If
     }
 
 
-//    If EndLevel = True Then
     if(EndLevel)
     {
-//        If LevelBeatCode > 0 Then
         if(LevelBeatCode > 0)
         {
-//            If Checkpoint = FullFileName Then
             if(Checkpoint == FullFileName)
             {
-//                Checkpoint = ""
                 Checkpoint = "";
-//            End If
             }
-//        End If
         }
-//        NextLevel
         NextLevel();
-//        UpdateControls
         UpdateControls();
     }
-//    ElseIf qScreen = True Then
     else if(qScreen)
     {
-//        UpdateEffects
         UpdateEffects();
-//        UpdateGraphics
         UpdateGraphics();
     }
-//    ElseIf BattleIntro > 0 Then
     else if(BattleIntro > 0)
     {
-//        UpdateGraphics
         UpdateGraphics();
-//        BlockFrames
         BlockFrames();
-//        UpdateSound
         UpdateSound();
-//        For A = 1 To numNPCs
         For(A, 1, numNPCs)
         {
-//            NPCFrames A
-                NPCFrames(A);
-//        Next A
+            NPCFrames(A);
         }
-//        BattleIntro = BattleIntro - 1
-        BattleIntro -= 1;
-//        If BattleIntro = 1 Then PlaySound 58
+        BattleIntro--;
         if(BattleIntro == 1)
             PlaySound(58);
     }
-//    Else
     else
     {
-//        UpdateLayers 'layers before/after npcs
         UpdateLayers(); // layers before/after npcs
-//        UpdateNPCs
         UpdateNPCs();
-//        If LevelMacro = 3 Then Exit Sub 'stop on key exit
+
         if(LevelMacro == 3)
             return; // stop on key exit
-//        UpdateBlocks
+
         UpdateBlocks();
-//        UpdateEffects
         UpdateEffects();
-//        UpdatePlayer
         UpdatePlayer();
-//        If LivingPlayers = True Or BattleMode = True Then UpdateGraphics
         if(LivingPlayers() || BattleMode)
             UpdateGraphics();
-//        UpdateSound
         UpdateSound();
-//        UpdateEvents
         UpdateEvents();
 //        If MagicHand = True Then UpdateEditor
 
-//        If Player(1).Controls.Start = True Or (GetKeyState(vbKeyEscape) And KEY_PRESSED) Then
         if(Player[1].Controls.Start || (getKeyState(SDL_SCANCODE_ESCAPE) == KEY_PRESSED))
         {
-//            If LevelMacro = 0 And CheckLiving > 0 Then
             if(LevelMacro == 0 && CheckLiving() > 0)
             {
-//                If Player(1).UnStart = True Then
                 if(Player[1].UnStart)
                 {
-//                    If (CaptainN = True Or FreezeNPCs = True) And PSwitchStop = 0 Then
                     if((CaptainN || FreezeNPCs) && PSwitchStop == 0)
                     {
-//                        If (GetKeyState(vbKeyEscape) And KEY_PRESSED) Then
                         if(getKeyState(SDL_SCANCODE_ESCAPE) == KEY_PRESSED)
                         {
-//                            FreezeNPCs = False
                             FreezeNPCs = false;
-//                            PauseGame 1
                             PauseGame(1);
-//                        Else
                         }
                         else
                         {
-//                            Player(1).UnStart = False
                             Player[1].UnStart = false;
-//                            If FreezeNPCs = True Then
                             if(FreezeNPCs)
                             {
-//                                FreezeNPCs = False
                                 FreezeNPCs = false;
-//                                If PSwitchTime > 0 Then
                                 if(PSwitchTime > 0)
                                 {
-//                                    ' If noSound = False Then mciSendString "resume smusic", 0, 0, 0
-//                                    If noSound = False Then SoundResumeAll
                                     if(!noSound)
                                         SoundResumeAll();
-//                                End If
                                 }
-//                            Else
                             }
                             else
                             {
-//                                FreezeNPCs = True
                                 FreezeNPCs = true;
-//                                If PSwitchTime > 0 Then
                                 if(PSwitchTime > 0)
                                 {
-//                                    ' If noSound = False Then mciSendString "pause smusic", 0, 0, 0
-//                                    If noSound = False Then SoundPauseAll
                                     if(!noSound)
                                         SoundPauseAll();
-//                                End If
                                 }
-//                            End If
                             }
-//                            PlaySound 30
                             PlaySound(30);
-//                        End If
                         }
-//                    Else
                     }
                     else
                     {
-//                        PauseGame 1
                         PauseGame(1);
-//                    End If
                     }
-//                End If
                 }
-//            End If
             }
-//        ElseIf numPlayers = 2 And Player(2).Controls.Start = True Then
         }
         else if(numPlayers == 2 && Player[2].Controls.Start)
         {
-//            If LevelMacro = 0 And CheckLiving > 0 Then
             if(LevelMacro == 0 && CheckLiving() > 0)
             {
-//                If Player(2).UnStart = True Then
                 if(Player[2].UnStart)
                 {
-//                    If CaptainN = True Or FreezeNPCs = True Then
                     if(CaptainN || FreezeNPCs)
                     {
-//                        Player(2).UnStart = False
                         Player[2].UnStart = false;
-//                        If FreezeNPCs = True Then
                         if(FreezeNPCs)
                         {
-//                            FreezeNPCs = False
                             FreezeNPCs = false;
-//                        Else
                         }
                         else
                         {
-//                            FreezeNPCs = True
                             FreezeNPCs = true;
-//                        End If
                         }
-//                        PlaySound 30
                         PlaySound(30);
-//                    End If
                     }
-//                End If
                 }
-//            End If
             }
-//        End If
         }
-//    End If
     }
 }
+
+void PauseGame(int plr)
+{
+    bool stopPause = false;
+    int A = 0;
+    int B = 0;
+    bool noButtons = false;
+    double fpsTime = 0;
+    int fpsCount = 0;
+
+    for(A = numPlayers; A >= 1; A--)
+        SavedChar[Player[A].Character] = Player[A];
+
+    if(TestLevel == true && MessageText.empty())
+        return;
+    if(MessageText.empty())
+        PlaySound(30);
+    else
+    {
+        SoundPause[47] = 0;
+        PlaySound(47);
+    }
+
+    GamePaused = true;
+    MenuCursor = 0;
+    MenuCursorCanMove = false;
+
+    if(PSwitchTime > 0)
+    {
+        // If noSound = False Then mciSendString "pause smusic", 0, 0, 0
+        if(noSound == false)
+            SoundPauseAll();
+    }
+
+    overTime = 0;
+    GoalTime = SDL_GetTicks() + 1000;
+    fpsCount = 0;
+    fpsTime = 0;
+    cycleCount = 0;
+    gameTime = 0;
+
+    do
+    {
+        tempTime = SDL_GetTicks();
+        if(tempTime >= gameTime + frameRate || tempTime < gameTime || MaxFPS == true)
+        {
+            if(fpsCount >= 32000) // Fixes Overflow bug
+                fpsCount = 0;
+            if(cycleCount >= 32000) // Fixes Overflow bug
+                cycleCount = 0;
+            overTime = overTime + (tempTime - (gameTime + frameRate));
+            if(gameTime == 0.0)
+                overTime = 0;
+            if(overTime <= 1)
+                overTime = 0;
+            else if(overTime > 1000)
+                overTime = 1000;
+            gameTime = tempTime - overTime;
+            overTime = (overTime - (tempTime - gameTime));
+            if(SDL_GetTicks() > fpsTime)
+            {
+                if(cycleCount >= 65)
+                {
+                    overTime = 0;
+                    gameTime = tempTime;
+                }
+                cycleCount = 0;
+                fpsTime = SDL_GetTicks() + 1000;
+                GoalTime = fpsTime;
+//                if(Debugger == true)
+//                    frmLevelDebugger.lblFPS = fpsCount;
+                if(ShowFPS == true)
+                    PrintFPS = fpsCount;
+                fpsCount = 0;
+            }
+
+
+            DoEvents();
+            CheckActive();
+
+            if(LevelSelect == true)
+                UpdateGraphics2();
+            else
+                UpdateGraphics();
+            UpdateControls();
+            UpdateSound();
+            BlockFrames();
+            UpdateEffects();
+
+            if(SingleCoop > 0 || numPlayers > 2)
+            {
+                for(A = 1; A <= numPlayers; A++)
+                    Player[A].Controls = Player[1].Controls;
+            }
+
+            if(MessageText.empty())
+            {
+                if(noButtons == false)
+                {
+                    if(!Player[plr].Controls.Down && !Player[plr].Controls.Up &&
+                       !Player[plr].Controls.Run && !Player[plr].Controls.Jump &&
+                       !Player[plr].Controls.Start)
+                    {
+                        if(!getKeyState(vbKeyEscape) && !getKeyState(vbKeySpace) &&
+                           !getKeyState(vbKeyReturn) && !getKeyState(vbKeyDown) &&
+                           !getKeyState(vbKeyUp))
+                        {
+                            noButtons = true;
+                        }
+                    }
+                }
+                else
+                {
+                    if(getKeyState(vbKeyEscape) == KEY_PRESSED)
+                    {
+                        if(LevelSelect && !Cheater)
+                        {
+                            if(MenuCursor != 2)
+                                PlaySound(26);
+                            MenuCursor = 2;
+                        }
+                        else
+                        {
+                            if(MenuCursor != 1)
+                                PlaySound(26);
+                            MenuCursor = 1;
+                        }
+                        noButtons = false;
+                    }
+                    else if(Player[plr].Controls.Start == true)
+                        stopPause = true;
+
+                    if(Player[plr].Controls.Up == true || getKeyState(vbKeyUp) == KEY_PRESSED)
+                    {
+                        PlaySound(26);
+                        MenuCursor = MenuCursor - 1;
+                        noButtons = false;
+                    }
+                    else if(Player[plr].Controls.Down == true || getKeyState(vbKeyDown) == KEY_PRESSED)
+                    {
+                        PlaySound(26);
+                        MenuCursor = MenuCursor + 1;
+                        noButtons = false;
+                    }
+
+                    if(LevelSelect)
+                    {
+                        if(Player[A].Character == 1 || Player[A].Character == 2)
+                            Player[A].Hearts = 0;
+                        for(A = 1; A <= numPlayers; A++)
+                        {
+                            if(!Player[A].RunRelease)
+                            {
+                                if(!Player[A].Controls.Left && !Player[A].Controls.Right)
+                                    Player[A].RunRelease = true;
+                            }
+                            else if(Player[A].Controls.Left || Player[A].Controls.Right)
+                            {
+                                AllCharBlock = 0;
+                                for(B = 1; B <= numCharacters; B++)
+                                {
+                                    if(blockCharacter[B] == false)
+                                    {
+                                        if(AllCharBlock == 0)
+                                            AllCharBlock = B;
+                                        else
+                                        {
+                                            AllCharBlock = 0;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if(AllCharBlock == 0)
+                                {
+                                    PlaySound(26);
+                                    Player[A].RunRelease = false;
+                                    if(A == 1)
+                                        B = 2;
+                                    else
+                                        B = 1;
+                                    if(numPlayers == 1)
+                                        B = 0;
+                                    Player[0].Character = 0;
+                                    if(Player[A].Controls.Left == true)
+                                    {
+                                        do
+                                        {
+                                            Player[A].Character = Player[A].Character - 1;
+                                            if(Player[A].Character <= 0)
+                                                Player[A].Character = 5;
+                                        } while(Player[A].Character == Player[B].Character || blockCharacter[Player[A].Character]);
+                                    }
+                                    else
+                                    {
+                                        do
+                                        {
+                                            Player[A].Character = Player[A].Character + 1;
+                                            if(Player[A].Character >= 6)
+                                                Player[A].Character = 1;
+                                        } while(Player[A].Character == Player[B].Character || blockCharacter[Player[A].Character]);
+                                    }
+                                    Player[A] = SavedChar[Player[A].Character];
+                                    SetupPlayers();
+                                }
+                            }
+                        }
+                    }
+
+                    if(Player[plr].Controls.Jump || getKeyState(vbKeySpace) || getKeyState(vbKeyReturn))
+                    {
+                        if(MenuCursor == 0)
+                            stopPause = true;
+                        else if(MenuCursor == 1 && (LevelSelect == true ||
+                                (StartLevel == FileName && NoMap == true)) && !Cheater)
+                        {
+                            SaveGame();
+                            stopPause = true;
+                        }
+                        else
+                        {
+                            if(!Cheater && (LevelSelect ||
+                              (StartLevel == FileName && NoMap)))
+                            {
+                                SaveGame();
+                            }
+                            stopPause = true;
+                            GameMenu = true;
+                            MenuMode = 0;
+                            MenuCursor = 0;
+                            if(LevelSelect == false)
+                            {
+                                LevelSelect = true;
+                                EndLevel = true;
+                            }
+                            else
+                                LevelSelect = false;
+                            frmMain.clearBuffer();
+                            StopMusic();
+                            DoEvents();
+                            SDL_Delay(500);
+                        }
+                    }
+                    if(Cheater || !(LevelSelect || (StartLevel == FileName && NoMap)))
+                    {
+                        if(MenuCursor > 1)
+                            MenuCursor = 0;
+                        if(MenuCursor < 0)
+                            MenuCursor = 1;
+                    }
+                    else
+                    {
+                        if(MenuCursor > 2)
+                            MenuCursor = 0;
+                        if(MenuCursor < 0)
+                            MenuCursor = 2;
+                    }
+                }
+            }
+            else
+            {
+                if(noButtons == false)
+                {
+                    if(!Player[plr].Controls.Down && !Player[plr].Controls.Up &&
+                       !Player[plr].Controls.Run && !Player[plr].Controls.Jump &&
+                       !Player[plr].Controls.Start)
+                    {
+                        if(!getKeyState(vbKeyEscape) && !getKeyState(vbKeySpace) &&
+                           !getKeyState(vbKeyReturn) && !getKeyState(vbKeyDown) &&
+                            !getKeyState(vbKeyUp))
+                        {
+                            noButtons = true;
+                        }
+                    }
+                }
+                else
+                {
+                    if(getKeyState(vbKeyEscape) || Player[plr].Controls.Jump ||
+                       Player[plr].Controls.Run == true || Player[plr].Controls.Start == true ||
+                       getKeyState(vbKeySpace) || getKeyState(vbKeyReturn))
+                    {
+                        stopPause = true;
+                    }
+                }
+            }
+        }
+        if(qScreen == true)
+            stopPause = false;
+        SDL_Delay(1);
+    } while(!(stopPause == true));
+    GamePaused = false;
+    Player[plr].UnStart = false;
+    Player[plr].CanJump = false;
+    if(MessageText.empty())
+        PlaySound(30);
+    if(PSwitchTime > 0)
+    {
+        // If noSound = False Then mciSendString "resume smusic", 0, 0, 0
+        if(noSound == false)
+            SoundResumeAll();
+    }
+    MessageText.clear();
+
+    overTime = 0;
+    GoalTime = SDL_GetTicks() + 1000;
+    fpsCount = 0;
+    cycleCount = 0;
+    gameTime = 0;
+    fpsTime = 0;
+}
+

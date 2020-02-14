@@ -17,9 +17,14 @@ SOURCES += \
     src/effect.cpp \
     src/frm_main.cpp \
     src/game_main.cpp \
+    src/main/cheat_code.cpp \
     src/main/game_loop.cpp \
+    src/main/game_save.cpp \
+    src/main/level_file.cpp \
     src/main/main_config.cpp \
     src/main/menu_loop.cpp \
+    src/main/outro_loop.cpp \
+    src/main/player_frames.cpp \
     src/main/setup_physics.cpp \
     src/main/setup_vars.cpp \
     src/gfx.cpp \
@@ -29,6 +34,8 @@ SOURCES += \
     src/layers.cpp \
     src/load_gfx.cpp \
     src/main.cpp \
+    src/main/world_file.cpp \
+    src/main/world_loop.cpp \
     src/npc.cpp \
     src/player.cpp \
     src/sorting.cpp \

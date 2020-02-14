@@ -3,6 +3,8 @@
 #include "collision.h"
 #include "game_main.h"
 #include "gfx.h"
+#include "player.h"
+#include "npc.h"
 #include "sound.h"
 #include "change_res.h"
 #include <fmt_format_ne.h>
@@ -15,115 +17,142 @@ void SpecialFrames();
 // draws GFX to screen when on the world map/world map editor
 void UpdateGraphics2()
 {
-//    cycleCount = cycleCount + 1
-//    If FrameSkip = True Then
-//        If GetTickCount + Int(1000 * (1 - (cycleCount / 63))) > GoalTime Then
-//            Exit Sub
-//        End If
-//    End If
-//    fpsCount = fpsCount + 1
-//    Dim A As Integer
-//    Dim B As Integer
-//    Dim Z As Integer
-//    Dim WPHeight As Integer
-//    Dim tempLocation As Location
-//    Z = 1
-//    vScreen(Z).Left = 0
-//    vScreen(Z).Top = 0
-//    vScreen(Z).Width = ScreenW
-//    vScreen(Z).Height = ScreenH
-//    SpecialFrames
-//    SceneFrame2(1) = SceneFrame2(1) + 1
-//    If SceneFrame2(1) >= 12 Then
-//        SceneFrame2(1) = 0
-//        SceneFrame(1) = SceneFrame(1) + 1
-//        If SceneFrame(1) >= 4 Then SceneFrame(1) = 0
-//        SceneFrame(4) = SceneFrame(1)
-//        SceneFrame(5) = SceneFrame(1)
-//        SceneFrame(6) = SceneFrame(1)
-//        SceneFrame(9) = SceneFrame(1)
-//        SceneFrame(10) = SceneFrame(1)
-//        SceneFrame(12) = SceneFrame(1)
-//        SceneFrame(51) = SceneFrame(1)
-//        SceneFrame(52) = SceneFrame(1)
-//        SceneFrame(53) = SceneFrame(1)
-//        SceneFrame(54) = SceneFrame(1)
-//        SceneFrame(55) = SceneFrame(1)
-//    End If
-//    SceneFrame2(27) = SceneFrame2(27) + 1
-//    If SceneFrame2(27) >= 8 Then
-//        SceneFrame2(27) = 0
-//        SceneFrame(27) = SceneFrame(27) + 1
-//        If SceneFrame(27) >= 12 Then SceneFrame(27) = 0
-//        SceneFrame(28) = SceneFrame(27)
-//        SceneFrame(29) = SceneFrame(27)
-//        SceneFrame(30) = SceneFrame(27)
-//    End If
-//    SceneFrame2(33) = SceneFrame2(33) + 1
-//    If SceneFrame2(33) >= 4 Then
-//        SceneFrame2(33) = 0
-//        SceneFrame(33) = SceneFrame(27) + 1
-//        If SceneFrame(33) >= 14 Then SceneFrame(33) = 0
-//        SceneFrame(34) = SceneFrame(33)
-//    End If
-//    SceneFrame2(62) = SceneFrame2(62) + 1
-//    If SceneFrame2(62) >= 8 Then
-//        SceneFrame2(62) = 0
-//        SceneFrame(62) = SceneFrame(62) + 1
-//        If SceneFrame(62) >= 8 Then SceneFrame(62) = 0
-//        SceneFrame(63) = SceneFrame(62)
-//    End If
-//    LevelFrame2(2) = LevelFrame2(2) + 1
-//    If LevelFrame2(2) >= 6 Then
-//        LevelFrame2(2) = 0
-//        LevelFrame(2) = LevelFrame(2) + 1
-//        If LevelFrame(2) >= 6 Then LevelFrame(2) = 0
-//        LevelFrame(9) = LevelFrame(2)
-//        LevelFrame(13) = LevelFrame(2)
-//        LevelFrame(14) = LevelFrame(2)
-//        LevelFrame(15) = LevelFrame(2)
-//        LevelFrame(31) = LevelFrame(2)
-//        LevelFrame(32) = LevelFrame(2)
-//    End If
-//    LevelFrame2(8) = LevelFrame2(8) + 1
-//    If LevelFrame2(8) >= 12 Then
-//        LevelFrame2(8) = 0
-//        LevelFrame(8) = LevelFrame(8) + 1
-//        If LevelFrame(8) >= 4 Then LevelFrame(8) = 0
-//    End If
-//    LevelFrame2(12) = LevelFrame2(12) + 1
-//    If LevelFrame2(12) >= 8 Then
-//        LevelFrame2(12) = 0
-//        LevelFrame(12) = LevelFrame(12) + 1
-//        If LevelFrame(12) >= 2 Then LevelFrame(12) = 0
-//    End If
-//    LevelFrame2(25) = LevelFrame2(25) + 1
-//    If LevelFrame2(25) >= 8 Then
-//        LevelFrame2(25) = 0
-//        LevelFrame(25) = LevelFrame(25) + 1
-//        If LevelFrame(25) >= 4 Then LevelFrame(25) = 0
-//        LevelFrame(26) = LevelFrame(25)
-//    End If
-//    TileFrame2(14) = TileFrame2(14) + 1
-//    If TileFrame2(14) >= 14 Then
-//        TileFrame2(14) = 0
-//        TileFrame(14) = TileFrame(14) + 1
-//        If TileFrame(14) >= 4 Then TileFrame(14) = 0
-//        TileFrame(27) = TileFrame(14)
-//        TileFrame(241) = TileFrame(14)
-//    End If
-//    If WorldEditor = True Then
-//        BitBlt myBackBuffer, 0, 0, ScreenW, ScreenH, 0, 0, 0, vbWhiteness
-//    Else
-//        BitBlt myBackBuffer, 0, 0, ScreenW, ScreenH, 0, 0, 0, vbWhiteness
-//    End If
-//    If TakeScreen = True Then
-//        If LevelEditor = True Or MagicHand = True Then
-//            frmLevelWindow.vScreen(1).AutoRedraw = True
-//        Else
-//            frmMain.AutoRedraw = True
-//        End If
-//    End If
+    float c = ShadowMode ? 0.f : 1.f;
+    cycleCount = cycleCount + 1;
+    if(FrameSkip == true)
+    {
+        if(SDL_GetTicks() + floor(1000 * (1 - (cycleCount / 63.0))) > GoalTime)
+            return;
+    }
+    fpsCount = fpsCount + 1;
+    int A = 0;
+    int B = 0;
+    int Z = 0;
+    int WPHeight = 0;
+    Location_t tempLocation;
+    Z = 1;
+
+    vScreen[Z].Left = 0;
+    vScreen[Z].Top = 0;
+    vScreen[Z].Width = ScreenW;
+    vScreen[Z].Height = ScreenH;
+    SpecialFrames();
+    SceneFrame2[1] = SceneFrame2[1] + 1;
+    if(SceneFrame2[1] >= 12)
+    {
+        SceneFrame2[1] = 0;
+        SceneFrame[1] = SceneFrame[1] + 1;
+        if(SceneFrame[1] >= 4)
+            SceneFrame[1] = 0;
+        SceneFrame[4] = SceneFrame[1];
+        SceneFrame[5] = SceneFrame[1];
+        SceneFrame[6] = SceneFrame[1];
+        SceneFrame[9] = SceneFrame[1];
+        SceneFrame[10] = SceneFrame[1];
+        SceneFrame[12] = SceneFrame[1];
+        SceneFrame[51] = SceneFrame[1];
+        SceneFrame[52] = SceneFrame[1];
+        SceneFrame[53] = SceneFrame[1];
+        SceneFrame[54] = SceneFrame[1];
+        SceneFrame[55] = SceneFrame[1];
+    }
+    SceneFrame2[27] = SceneFrame2[27] + 1;
+    if(SceneFrame2[27] >= 8)
+    {
+        SceneFrame2[27] = 0;
+        SceneFrame[27] = SceneFrame[27] + 1;
+        if(SceneFrame[27] >= 12)
+            SceneFrame[27] = 0;
+        SceneFrame[28] = SceneFrame[27];
+        SceneFrame[29] = SceneFrame[27];
+        SceneFrame[30] = SceneFrame[27];
+    }
+    SceneFrame2[33] = SceneFrame2[33] + 1;
+    if(SceneFrame2[33] >= 4)
+    {
+        SceneFrame2[33] = 0;
+        SceneFrame[33] = SceneFrame[27] + 1;
+        if(SceneFrame[33] >= 14)
+            SceneFrame[33] = 0;
+        SceneFrame[34] = SceneFrame[33];
+    }
+    SceneFrame2[62] = SceneFrame2[62] + 1;
+    if(SceneFrame2[62] >= 8)
+    {
+        SceneFrame2[62] = 0;
+        SceneFrame[62] = SceneFrame[62] + 1;
+        if(SceneFrame[62] >= 8)
+            SceneFrame[62] = 0;
+        SceneFrame[63] = SceneFrame[62];
+    }
+    LevelFrame2[2] = LevelFrame2[2] + 1;
+    if(LevelFrame2[2] >= 6)
+    {
+        LevelFrame2[2] = 0;
+        LevelFrame[2] = LevelFrame[2] + 1;
+        if(LevelFrame[2] >= 6)
+            LevelFrame[2] = 0;
+        LevelFrame[9] = LevelFrame[2];
+        LevelFrame[13] = LevelFrame[2];
+        LevelFrame[14] = LevelFrame[2];
+        LevelFrame[15] = LevelFrame[2];
+        LevelFrame[31] = LevelFrame[2];
+        LevelFrame[32] = LevelFrame[2];
+    }
+    LevelFrame2[8] = LevelFrame2[8] + 1;
+    if(LevelFrame2[8] >= 12)
+    {
+        LevelFrame2[8] = 0;
+        LevelFrame[8] = LevelFrame[8] + 1;
+        if(LevelFrame[8] >= 4)
+            LevelFrame[8] = 0;
+    }
+    LevelFrame2[12] = LevelFrame2[12] + 1;
+    if(LevelFrame2[12] >= 8)
+    {
+        LevelFrame2[12] = 0;
+        LevelFrame[12] = LevelFrame[12] + 1;
+        if(LevelFrame[12] >= 2)
+            LevelFrame[12] = 0;
+    }
+    LevelFrame2[25] = LevelFrame2[25] + 1;
+    if(LevelFrame2[25] >= 8)
+    {
+        LevelFrame2[25] = 0;
+        LevelFrame[25] = LevelFrame[25] + 1;
+        if(LevelFrame[25] >= 4)
+            LevelFrame[25] = 0;
+        LevelFrame[26] = LevelFrame[25];
+    }
+    TileFrame2[14] = TileFrame2[14] + 1;
+    if(TileFrame2[14] >= 14)
+    {
+        TileFrame2[14] = 0;
+        TileFrame[14] = TileFrame[14] + 1;
+        if(TileFrame[14] >= 4)
+            TileFrame[14] = 0;
+        TileFrame[27] = TileFrame[14];
+        TileFrame[241] = TileFrame[14];
+    }
+
+//    if(WorldEditor == true)
+//    {
+//        BitBlt myBackBuffer, 0, 0, ScreenW, ScreenH, 0, 0, 0, vbWhiteness;
+//    }
+//    else
+//    {
+//        BitBlt myBackBuffer, 0, 0, ScreenW, ScreenH, 0, 0, 0, vbWhiteness;
+//    }
+    frmMain.clearBuffer();
+
+//    if(TakeScreen == true)
+//    {
+//        if(LevelEditor == true || MagicHand == true)
+//            frmLevelWindow::vScreen[1].AutoRedraw = true;
+//        else
+//            frmMain.AutoRedraw = true;
+//    }
+
 //    If LevelEditor = True Then
 //        For A = 1 To numTiles
 //            With Tile(A)
@@ -170,51 +199,88 @@ void UpdateGraphics2()
 //            End With
 //        Next A
 //    Else
-//        For A = 1 To numTiles
-//            With Tile(A)
-//                If vScreenCollision2(1, .Location) = True Then
-//                    BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, .Location.Width, .Location.Height, GFXTile(.Type), 0, TileHeight(.Type) * TileFrame(.Type), vbSrcCopy
-//                End If
-//            End With
-//        Next A
-//        For A = 1 To numScenes
-//            With Scene(A)
-//                If vScreenCollision2(1, .Location) = True And .Active = True Then
-//                    BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, .Location.Width, .Location.Height, GFXSceneMask(.Type), 0, SceneHeight(.Type) * SceneFrame(.Type), vbSrcAnd
-//                    BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, .Location.Width, .Location.Height, GFXScene(.Type), 0, SceneHeight(.Type) * SceneFrame(.Type), vbSrcPaint
-//                End If
-//            End With
-//        Next A
-//        For A = 1 To numWorldPaths
-//            With WorldPath(A)
-//                If vScreenCollision2(1, .Location) = True And .Active = True Then
-//                    BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, .Location.Width, .Location.Height, GFXPathMask(.Type), 0, 0, vbSrcAnd
-//                    BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, .Location.Width, .Location.Height, GFXPath(.Type), 0, 0, vbSrcPaint
-//                End If
-//            End With
-//        Next A
-//        For A = 1 To numWorldLevels
-//            With WorldLevel(A)
-//                If vScreenCollision2(1, .Location) = True And .Active = True Then
-//                    If .Path = True Then
-//                        BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, .Location.Width, .Location.Height, GFXLevelMask(0), 0, 0, vbSrcAnd
-//                        BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, .Location.Width, .Location.Height, GFXLevel(0), 0, 0, vbSrcPaint
-//                    End If
-//                    If .Path2 = True Then
-//                        BitBlt myBackBuffer, vScreenX(Z) + .Location.X - 16, vScreenY(Z) + 8 + .Location.Y, 64, 32, GFXLevelMask(29), 0, 0, vbSrcAnd
-//                        BitBlt myBackBuffer, vScreenX(Z) + .Location.X - 16, vScreenY(Z) + 8 + .Location.Y, 64, 32, GFXLevel(29), 0, 0, vbSrcPaint
-//                    End If
-//                    If GFXLevelBig(.Type) = True Then
-//                        BitBlt myBackBuffer, vScreenX(Z) + .Location.X - (GFXLevelWidth(.Type) - 32) / 2, vScreenY(Z) + .Location.Y - GFXLevelHeight(.Type) + 32, GFXLevelWidth(.Type), GFXLevelHeight(.Type), GFXLevelMask(.Type), 0, 32 * LevelFrame(.Type), vbSrcAnd
-//                        BitBlt myBackBuffer, vScreenX(Z) + .Location.X - (GFXLevelWidth(.Type) - 32) / 2, vScreenY(Z) + .Location.Y - GFXLevelHeight(.Type) + 32, GFXLevelWidth(.Type), GFXLevelHeight(.Type), GFXLevel(.Type), 0, 32 * LevelFrame(.Type), vbSrcPaint
-//                    Else
-//                        BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, .Location.Width, .Location.Height, GFXLevelMask(.Type), 0, 32 * LevelFrame(.Type), vbSrcAnd
-//                        BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, .Location.Width, .Location.Height, GFXLevel(.Type), 0, 32 * LevelFrame(.Type), vbSrcPaint
-//                    End If
-//                End If
-//            End With
-//        Next A
-//    End If
+    {
+        for(A = 1; A <= numTiles; A++)
+        {
+            if(vScreenCollision2(1, Tile[A].Location) == true)
+            {
+//                BitBlt myBackBuffer, vScreenX[Z] + Tile[A].Location.X, vScreenY[Z] + Tile[A].Location.Y, Tile[A].Location.Width, Tile[A].Location.Height, GFXTile[Tile[A].Type], 0, TileHeight[Tile[A].Type] * TileFrame[Tile[A].Type], vbSrcCopy;
+                frmMain.renderTexture(vScreenX[Z] + Tile[A].Location.X,
+                                      vScreenY[Z] + Tile[A].Location.Y,
+                                      Tile[A].Location.Width,
+                                      Tile[A].Location.Height,
+                                      GFXTileBMP[Tile[A].Type], 0, TileHeight[Tile[A].Type] * TileFrame[Tile[A].Type]);
+            }
+        }
+        for(A = 1; A <= numScenes; A++)
+        {
+            if(vScreenCollision2(1, Scene[A].Location) == true && Scene[A].Active == true)
+            {
+//                BitBlt myBackBuffer, vScreenX[Z] + Scene[A].Location.X, vScreenY[Z] + Scene[A].Location.Y, Scene[A].Location.Width, Scene[A].Location.Height, GFXSceneMask[Scene[A].Type], 0, SceneHeight[Scene[A].Type] * SceneFrame[Scene[A].Type], vbSrcAnd;
+//                BitBlt myBackBuffer, vScreenX[Z] + Scene[A].Location.X, vScreenY[Z] + Scene[A].Location.Y, Scene[A].Location.Width, Scene[A].Location.Height, GFXScene[Scene[A].Type], 0, SceneHeight[Scene[A].Type] * SceneFrame[Scene[A].Type], vbSrcPaint;
+                frmMain.renderTexture(vScreenX[Z] + Scene[A].Location.X,
+                                      vScreenY[Z] + Scene[A].Location.Y,
+                                      Scene[A].Location.Width, Scene[A].Location.Height,
+                                      GFXSceneBMP[Scene[A].Type], 0, SceneHeight[Scene[A].Type] * SceneFrame[Scene[A].Type]);
+            }
+        }
+        for(A = 1; A <= numWorldPaths; A++)
+        {
+            if(vScreenCollision2(1, WorldPath[A].Location) == true && WorldPath[A].Active == true)
+            {
+//                BitBlt myBackBuffer, vScreenX[Z] + WorldPath[A].Location.X, vScreenY[Z] + WorldPath[A].Location.Y, WorldPath[A].Location.Width, WorldPath[A].Location.Height, GFXPathMask[WorldPath[A].Type], 0, 0, vbSrcAnd;
+//                BitBlt myBackBuffer, vScreenX[Z] + WorldPath[A].Location.X, vScreenY[Z] + WorldPath[A].Location.Y, WorldPath[A].Location.Width, WorldPath[A].Location.Height, GFXPath[WorldPath[A].Type], 0, 0, vbSrcPaint;
+                frmMain.renderTexture(vScreenX[Z] + WorldPath[A].Location.X,
+                                      vScreenY[Z] + WorldPath[A].Location.Y,
+                                      WorldPath[A].Location.Width, WorldPath[A].Location.Height,
+                                      GFXPathBMP[WorldPath[A].Type], 0, 0);
+            }
+        }
+        for(A = 1; A <= numWorldLevels; A++)
+        {
+            if(vScreenCollision2(1, WorldLevel[A].Location) == true && WorldLevel[A].Active == true)
+            {
+                if(WorldLevel[A].Path == true)
+                {
+//                    BitBlt myBackBuffer, vScreenX[Z] + WorldLevel[A].Location.X, vScreenY[Z] + WorldLevel[A].Location.Y, WorldLevel[A].Location.Width, WorldLevel[A].Location.Height, GFXLevelMask[0], 0, 0, vbSrcAnd;
+//                    BitBlt myBackBuffer, vScreenX[Z] + WorldLevel[A].Location.X, vScreenY[Z] + WorldLevel[A].Location.Y, WorldLevel[A].Location.Width, WorldLevel[A].Location.Height, GFXLevel[0], 0, 0, vbSrcPaint;
+                    frmMain.renderTexture(vScreenX[Z] + WorldLevel[A].Location.X,
+                                          vScreenY[Z] + WorldLevel[A].Location.Y,
+                                          WorldLevel[A].Location.Width,
+                                          WorldLevel[A].Location.Height,
+                                          GFXLevelBMP[0], 0, 0);
+                }
+                if(WorldLevel[A].Path2 == true)
+                {
+//                    BitBlt myBackBuffer, vScreenX[Z] + WorldLevel[A].Location.X - 16, vScreenY[Z] + 8 + WorldLevel[A].Location.Y, 64, 32, GFXLevelMask[29], 0, 0, vbSrcAnd;
+//                    BitBlt myBackBuffer, vScreenX[Z] + WorldLevel[A].Location.X - 16, vScreenY[Z] + 8 + WorldLevel[A].Location.Y, 64, 32, GFXLevel[29], 0, 0, vbSrcPaint;
+                    frmMain.renderTexture(vScreenX[Z] + WorldLevel[A].Location.X - 16,
+                                          vScreenY[Z] + 8 + WorldLevel[A].Location.Y,
+                                          64, 32,
+                                          GFXLevelBMP[29], 0, 0);
+                }
+                if(GFXLevelBig[WorldLevel[A].Type] == true)
+                {
+//                    BitBlt myBackBuffer, vScreenX[Z] + WorldLevel[A].Location.X - (GFXLevelWidth[WorldLevel[A].Type] - 32) / 2.0, vScreenY[Z] + WorldLevel[A].Location.Y - GFXLevelHeight[WorldLevel[A].Type] + 32, GFXLevelWidth[WorldLevel[A].Type], GFXLevelHeight[WorldLevel[A].Type], GFXLevelMask[WorldLevel[A].Type], 0, 32 * LevelFrame[WorldLevel[A].Type], vbSrcAnd;
+//                    BitBlt myBackBuffer, vScreenX[Z] + WorldLevel[A].Location.X - (GFXLevelWidth[WorldLevel[A].Type] - 32) / 2.0, vScreenY[Z] + WorldLevel[A].Location.Y - GFXLevelHeight[WorldLevel[A].Type] + 32, GFXLevelWidth[WorldLevel[A].Type], GFXLevelHeight[WorldLevel[A].Type], GFXLevel[WorldLevel[A].Type], 0, 32 * LevelFrame[WorldLevel[A].Type], vbSrcPaint;
+                    frmMain.renderTexture(vScreenX[Z] + WorldLevel[A].Location.X - (GFXLevelWidth[WorldLevel[A].Type] - 32) / 2.0,
+                                          vScreenY[Z] + WorldLevel[A].Location.Y - GFXLevelHeight[WorldLevel[A].Type] + 32,
+                                          GFXLevelWidth[WorldLevel[A].Type], GFXLevelHeight[WorldLevel[A].Type],
+                                          GFXLevelBMP[WorldLevel[A].Type], 0, 32 * LevelFrame[WorldLevel[A].Type]);
+                }
+                else
+                {
+//                    BitBlt myBackBuffer, vScreenX[Z] + WorldLevel[A].Location.X, vScreenY[Z] + WorldLevel[A].Location.Y, WorldLevel[A].Location.Width, WorldLevel[A].Location.Height, GFXLevelMask[WorldLevel[A].Type], 0, 32 * LevelFrame[WorldLevel[A].Type], vbSrcAnd;
+//                    BitBlt myBackBuffer, vScreenX[Z] + WorldLevel[A].Location.X, vScreenY[Z] + WorldLevel[A].Location.Y, WorldLevel[A].Location.Width, WorldLevel[A].Location.Height, GFXLevel[WorldLevel[A].Type], 0, 32 * LevelFrame[WorldLevel[A].Type], vbSrcPaint;
+                    frmMain.renderTexture(vScreenX[Z] + WorldLevel[A].Location.X,
+                                          vScreenY[Z] + WorldLevel[A].Location.Y,
+                                          WorldLevel[A].Location.Width, WorldLevel[A].Location.Height,
+                                          GFXLevelBMP[WorldLevel[A].Type], 0, 32 * LevelFrame[WorldLevel[A].Type]);
+                }
+            }
+        }
+    }
+
 //    If WorldEditor = True Then
 //        For A = 1 To numEffects
 //            With Effect(A)
@@ -290,196 +356,255 @@ void UpdateGraphics2()
 //        'BitBlt frmLevelWindow.vScreen(Z).hdc, 0, 0, frmLevelWindow.vScreen(Z).ScaleWidth, frmLevelWindow.vScreen(Z).ScaleHeight, myBackBuffer, 0, 0, vbSrcCopy
 //        StretchBlt frmLevelWindow.vScreen(Z).hdc, 0, 0, frmLevelWindow.vScreen(Z).ScaleWidth, frmLevelWindow.vScreen(Z).ScaleHeight, myBackBuffer, 0, 0, 800, 600, vbSrcCopy
 //    Else
-//        With WorldPlayer(1)
-//            If .Type = 0 Then .Type = 1
-//            If Player(1).Character = 1 Then .Type = 1
-//            If Player(1).Character = 2 Then .Type = 2
-//            If Player(1).Character = 3 Then .Type = 3
-//            If Player(1).Character = 4 Then .Type = 4
-//            If Player(1).Character = 5 Then .Type = 5
-//            If .Type = 3 Then
-//                WPHeight = 44
-//            ElseIf .Type = 4 Then
-//                WPHeight = 40
-//            Else
-//                WPHeight = 32
-//            End If
-//            BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y - 10 + .Location.Height - WPHeight, .Location.Width, WPHeight, GFXPlayerMask(.Type), 0, WPHeight * .Frame, vbSrcAnd
-//            BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y - 10 + .Location.Height - WPHeight, .Location.Width, WPHeight, GFXPlayer(.Type), 0, WPHeight * .Frame, vbSrcPaint
-//        End With
-//        BitBlt myBackBuffer, 0, 0, 800, 130, GFX.Interface(4).hdc, 0, 0, vbSrcCopy
-//        BitBlt myBackBuffer, 0, 534, 800, 66, GFX.Interface(4).hdc, 0, 534, vbSrcCopy
-//        BitBlt myBackBuffer, 0, 130, 66, 404, GFX.Interface(4).hdc, 0, 130, vbSrcCopy
-//        BitBlt myBackBuffer, 734, 130, 66, 404, GFX.Interface(4).hdc, 734, 130, vbSrcCopy
-//        For A = 1 To numPlayers
-//            With Player(A)
-//                .Direction = -1
-//                .Location.SpeedY = 0
-//                .Location.SpeedX = -1
-//                .Controls.Left = False
-//                .Controls.Right = False
-//                If .Duck = True Then UnDuck A
-//                PlayerFrame A
-//                If .Mount = 3 Then
-//                    If .MountType = 0 Then .MountType = 1
-//                    B = .MountType
-//                    'Yoshi's Body
-//                    BitBlt myBackBuffer, 32 + (48 * A) + .YoshiBX, 124 - .Location.Height + .YoshiBY, 32, 32, GFXYoshiBMask(B), 0, 32 * .YoshiBFrame, vbSrcAnd
-//                    If ShadowMode = False Then BitBlt myBackBuffer, 32 + (48 * A) + .YoshiBX, 124 - .Location.Height + .YoshiBY, 32, 32, GFXYoshiB(B), 0, 32 * .YoshiBFrame, vbSrcPaint
-//                    'Yoshi's Head
-//                    BitBlt myBackBuffer, 32 + (48 * A) + .YoshiTX, 124 - .Location.Height + .YoshiTY, 32, 32, GFXYoshiTMask(B), 0, 32 * .YoshiTFrame, vbSrcAnd
-//                    If ShadowMode = False Then BitBlt myBackBuffer, 32 + (48 * A) + .YoshiTX, 124 - .Location.Height + .YoshiTY, 32, 32, GFXYoshiT(B), 0, 32 * .YoshiTFrame, vbSrcPaint
-//                End If
-//                If .Character = 1 Then
-//                    If .Mount = 0 Or .Mount = 3 Then
-//                        BitBlt myBackBuffer, 32 + (48 * A) + MarioFrameX((.State * 100) + (.Frame * .Direction)), 124 - .Location.Height + MarioFrameY((.State * 100) + (.Frame * .Direction)) + .MountOffsetY, 99, 99, GFXMarioMask(.State), pfrX(100 + .Frame * .Direction), pfrY(100 + .Frame * .Direction), vbSrcAnd
-//                        If ShadowMode = False Then BitBlt myBackBuffer, 32 + (48 * A) + MarioFrameX((.State * 100) + (.Frame * .Direction)), 124 - .Location.Height + MarioFrameY((.State * 100) + (.Frame * .Direction)) + .MountOffsetY, 99, 99, GFXMario(.State), pfrX(100 + .Frame * .Direction), pfrY(100 + .Frame * .Direction), vbSrcPaint
-//                    ElseIf .Mount = 1 Then
-//                        BitBlt myBackBuffer, 32 + (48 * A) + MarioFrameX((.State * 100) + (.Frame * .Direction)), 124 - .Location.Height + MarioFrameY((.State * 100) + (.Frame * .Direction)), 99, .Location.Height - 26, GFXMarioMask(.State), pfrX(100 + .Frame * .Direction), pfrY(100 + .Frame * .Direction), vbSrcAnd
-//                        If ShadowMode = False Then BitBlt myBackBuffer, 32 + (48 * A) + MarioFrameX((.State * 100) + (.Frame * .Direction)), 124 - .Location.Height + MarioFrameY((.State * 100) + (.Frame * .Direction)), 99, .Location.Height - 26, GFXMario(.State), pfrX(100 + .Frame * .Direction), pfrY(100 + .Frame * .Direction), vbSrcPaint
-//                        BitBlt myBackBuffer, 32 + (48 * A) + .Location.Width / 2 - 16, 124 - 30, 32, 32, GFX.BootMask(.MountType).hdc, 0, 32 * .MountFrame, vbSrcAnd
-//                        If ShadowMode = False Then BitBlt myBackBuffer, 32 + (48 * A) + .Location.Width / 2 - 16, 124 - 30, 32, 32, GFX.Boot(.MountType).hdc, 0, 32 * .MountFrame, vbSrcPaint
-//                        If .MountType = 3 Then
-//                            .YoshiWingsFrameCount = .YoshiWingsFrameCount + 1
-//                            .YoshiWingsFrame = 0
-//                            If .YoshiWingsFrameCount <= 12 Then
-//                                .YoshiWingsFrame = 1
-//                            ElseIf .YoshiWingsFrameCount >= 24 Then
-//                                .YoshiWingsFrameCount = 0
-//                            End If
-//                            BitBlt myBackBuffer, 32 + (48 * A) + .Location.Width / 2 - 16 + 20, 124 - 30 - 10, 32, 32, GFX.YoshiWingsMask.hdc, 0, 0 + 32 * .YoshiWingsFrame, vbSrcAnd
-//                            If ShadowMode = False Then BitBlt myBackBuffer, 32 + (48 * A) + .Location.Width / 2 - 16 + 20, 124 - 30 - 10, 32, 32, GFX.YoshiWings.hdc, 0, 0 + 32 * .YoshiWingsFrame, vbSrcPaint
-//                        End If
-//                    End If
-//                ElseIf .Character = 2 Then
-//                    If .Mount = 0 Or .Mount = 3 Then
-//                        BitBlt myBackBuffer, 32 + (48 * A) + LuigiFrameX((.State * 100) + (.Frame * .Direction)), 124 - .Location.Height + LuigiFrameY((.State * 100) + (.Frame * .Direction)) + .MountOffsetY, 99, 99, GFXLuigiMask(.State), pfrX(100 + .Frame * .Direction), pfrY(100 + .Frame * .Direction), vbSrcAnd
-//                        If ShadowMode = False Then BitBlt myBackBuffer, 32 + (48 * A) + LuigiFrameX((.State * 100) + (.Frame * .Direction)), 124 - .Location.Height + LuigiFrameY((.State * 100) + (.Frame * .Direction)) + .MountOffsetY, 99, 99, GFXLuigi(.State), pfrX(100 + .Frame * .Direction), pfrY(100 + .Frame * .Direction), vbSrcPaint
-//                    ElseIf .Mount = 1 Then
-//                        BitBlt myBackBuffer, 32 + (48 * A) + LuigiFrameX((.State * 100) + (.Frame * .Direction)), 124 - .Location.Height + LuigiFrameY((.State * 100) + (.Frame * .Direction)), 99, .Location.Height - 24, GFXLuigiMask(.State), pfrX(100 + .Frame * .Direction), pfrY(100 + .Frame * .Direction), vbSrcAnd
-//                        If ShadowMode = False Then BitBlt myBackBuffer, 32 + (48 * A) + LuigiFrameX((.State * 100) + (.Frame * .Direction)), 124 - .Location.Height + LuigiFrameY((.State * 100) + (.Frame * .Direction)), 99, .Location.Height - 24, GFXLuigi(.State), pfrX(100 + .Frame * .Direction), pfrY(100 + .Frame * .Direction), vbSrcPaint
-//                        BitBlt myBackBuffer, 32 + (48 * A) + .Location.Width / 2 - 16, 124 - 30, 32, 32, GFX.BootMask(.MountType).hdc, 0, 32 * .MountFrame, vbSrcAnd
-//                        If ShadowMode = False Then BitBlt myBackBuffer, 32 + (48 * A) + .Location.Width / 2 - 16, 124 - 30, 32, 32, GFX.Boot(.MountType).hdc, 0, 32 * .MountFrame, vbSrcPaint
-//                        If .MountType = 3 Then
-//                            .YoshiWingsFrameCount = .YoshiWingsFrameCount + 1
-//                            .YoshiWingsFrame = 0
-//                            If .YoshiWingsFrameCount <= 12 Then
-//                                .YoshiWingsFrame = 1
-//                            ElseIf .YoshiWingsFrameCount >= 24 Then
-//                                .YoshiWingsFrameCount = 0
-//                            End If
-//                            BitBlt myBackBuffer, 32 + (48 * A) + .Location.Width / 2 - 16 + 20, 124 - 30 - 10, 32, 32, GFX.YoshiWingsMask.hdc, 0, 0 + 32 * .YoshiWingsFrame, vbSrcAnd
-//                            If ShadowMode = False Then BitBlt myBackBuffer, 32 + (48 * A) + .Location.Width / 2 - 16 + 20, 124 - 30 - 10, 32, 32, GFX.YoshiWings.hdc, 0, 0 + 32 * .YoshiWingsFrame, vbSrcPaint
-//                        End If
-//                    End If
-//                ElseIf .Character = 3 Then
-//                    If .Mount = 0 Or .Mount = 3 Then
-//                        BitBlt myBackBuffer, 32 + (48 * A) + PeachFrameX((.State * 100) + (.Frame * .Direction)), 124 - .Location.Height + PeachFrameY((.State * 100) + (.Frame * .Direction)) + .MountOffsetY, 99, 99, GFXPeachMask(.State), pfrX(100 + .Frame * .Direction), pfrY(100 + .Frame * .Direction), vbSrcAnd
-//                        If ShadowMode = False Then BitBlt myBackBuffer, 32 + (48 * A) + PeachFrameX((.State * 100) + (.Frame * .Direction)), 124 - .Location.Height + PeachFrameY((.State * 100) + (.Frame * .Direction)) + .MountOffsetY, 99, 99, GFXPeach(.State), pfrX(100 + .Frame * .Direction), pfrY(100 + .Frame * .Direction), vbSrcPaint
-//                    ElseIf .Mount = 1 Then
+    { // NOT AN EDITOR!!!
+        if(WorldPlayer[1].Type == 0)
+            WorldPlayer[1].Type = 1;
+        if(Player[1].Character == 1)
+            WorldPlayer[1].Type = 1;
+        if(Player[1].Character == 2)
+            WorldPlayer[1].Type = 2;
+        if(Player[1].Character == 3)
+            WorldPlayer[1].Type = 3;
+        if(Player[1].Character == 4)
+            WorldPlayer[1].Type = 4;
+        if(Player[1].Character == 5)
+            WorldPlayer[1].Type = 5;
+        if(WorldPlayer[1].Type == 3)
+            WPHeight = 44;
+        else if(WorldPlayer[1].Type == 4)
+            WPHeight = 40;
+        else
+            WPHeight = 32;
+//        BitBlt myBackBuffer, vScreenX[Z] + WorldPlayer[1].Location.X, vScreenY[Z] + WorldPlayer[1].Location.Y - 10 + WorldPlayer[1].Location.Height - WPHeight, WorldPlayer[1].Location.Width, WPHeight, GFXPlayerMask[WorldPlayer[1].Type], 0, WPHeight * WorldPlayer[1].Frame, vbSrcAnd;
+//        BitBlt myBackBuffer, vScreenX[Z] + WorldPlayer[1].Location.X, vScreenY[Z] + WorldPlayer[1].Location.Y - 10 + WorldPlayer[1].Location.Height - WPHeight, WorldPlayer[1].Location.Width, WPHeight, GFXPlayer[WorldPlayer[1].Type], 0, WPHeight * WorldPlayer[1].Frame, vbSrcPaint;
+        frmMain.renderTexture(vScreenX[Z] + WorldPlayer[1].Location.X,
+                              vScreenY[Z] + WorldPlayer[1].Location.Y - 10 + WorldPlayer[1].Location.Height - WPHeight,
+                              WorldPlayer[1].Location.Width, WPHeight,
+                              GFXPlayerBMP[WorldPlayer[1].Type], 0, WPHeight * WorldPlayer[1].Frame);
 
-//                        BitBlt myBackBuffer, 32 + (48 * A) + PeachFrameX((.State * 100) + (.Frame * .Direction)), 124 - .Location.Height + PeachFrameY((.State * 100) + (.Frame * .Direction)), 99, .Location.Height - 24, GFXPeachMask(.State), pfrX(100 + .Frame * .Direction), pfrY(100 + .Frame * .Direction), vbSrcAnd
-//                        If ShadowMode = False Then BitBlt myBackBuffer, 32 + (48 * A) + PeachFrameX((.State * 100) + (.Frame * .Direction)), 124 - .Location.Height + PeachFrameY((.State * 100) + (.Frame * .Direction)), 99, .Location.Height - 24, GFXPeach(.State), pfrX(100 + .Frame * .Direction), pfrY(100 + .Frame * .Direction), vbSrcPaint
+//        BitBlt myBackBuffer, 0, 0, 800, 130, GFX::Interface(4).hdc, 0, 0, vbSrcCopy;
+        frmMain.renderTexture(0, 0, 800, 130, GFX.Interface[4], 0, 0);
+        frmMain.renderTexture(0, 534, 800, 66, GFX.Interface[4], 0, 534);
+        frmMain.renderTexture(0, 130, 66, 404, GFX.Interface[4], 0, 130);
+        frmMain.renderTexture(734, 130, 66, 404, GFX.Interface[4], 734, 130);
+        for(A = 1; A <= numPlayers; A++)
+        {
+            Player[A].Direction = -1;
+            Player[A].Location.SpeedY = 0;
+            Player[A].Location.SpeedX = -1;
+            Player[A].Controls.Left = false;
+            Player[A].Controls.Right = false;
+            if(Player[A].Duck == true)
+            {
+                UnDuck(A);
+            }
+            PlayerFrame(A);
+            if(Player[A].Mount == 3)
+            {
+                if(Player[A].MountType == 0)
+                    Player[A].MountType = 1;
+                B = Player[A].MountType;
+                // Yoshi's Body
+                frmMain.renderTexture(32 + (48 * A) + Player[A].YoshiBX, 124 - Player[A].Location.Height + Player[A].YoshiBY,
+                                      32, 32, GFXYoshiBBMP[B], 0, 32 * Player[A].YoshiBFrame, c, c, c);
 
-//                        BitBlt myBackBuffer, 32 + (48 * A) + .Location.Width / 2 - 16, 124 - 30, 32, 32, GFX.BootMask(.MountType).hdc, 0, 32 * .MountFrame, vbSrcAnd
-//                        If ShadowMode = False Then BitBlt myBackBuffer, 32 + (48 * A) + .Location.Width / 2 - 16, 124 - 30, 32, 32, GFX.Boot(.MountType).hdc, 0, 32 * .MountFrame, vbSrcPaint
-//                        If .MountType = 3 Then
-//                            .YoshiWingsFrameCount = .YoshiWingsFrameCount + 1
-//                            .YoshiWingsFrame = 0
-//                            If .YoshiWingsFrameCount <= 12 Then
-//                                .YoshiWingsFrame = 1
-//                            ElseIf .YoshiWingsFrameCount >= 24 Then
-//                                .YoshiWingsFrameCount = 0
-//                            End If
-//                            BitBlt myBackBuffer, 32 + (48 * A) + .Location.Width / 2 - 16 + 20, 124 - 30 - 10, 32, 32, GFX.YoshiWingsMask.hdc, 0, 0 + 32 * .YoshiWingsFrame, vbSrcAnd
-//                            If ShadowMode = False Then BitBlt myBackBuffer, 32 + (48 * A) + .Location.Width / 2 - 16 + 20, 124 - 30 - 10, 32, 32, GFX.YoshiWings.hdc, 0, 0 + 32 * .YoshiWingsFrame, vbSrcPaint
-//                        End If
-//                    End If
-//                ElseIf .Character = 4 Then
-//                    If .Mount = 0 Or .Mount = 3 Then
-//                        BitBlt myBackBuffer, 32 + (48 * A) + ToadFrameX((.State * 100) + (.Frame * .Direction)), 124 - .Location.Height + ToadFrameY((.State * 100) + (.Frame * .Direction)) + .MountOffsetY, 99, 99, GFXToadMask(.State), pfrX(100 + .Frame * .Direction), pfrY(100 + .Frame * .Direction), vbSrcAnd
-//                        If ShadowMode = False Then BitBlt myBackBuffer, 32 + (48 * A) + ToadFrameX((.State * 100) + (.Frame * .Direction)), 124 - .Location.Height + ToadFrameY((.State * 100) + (.Frame * .Direction)) + .MountOffsetY, 99, 99, GFXToad(.State), pfrX(100 + .Frame * .Direction), pfrY(100 + .Frame * .Direction), vbSrcPaint
-//                    ElseIf .Mount = 1 Then
-//                        If .State = 1 Then
-//                            BitBlt myBackBuffer, 32 + (48 * A) + ToadFrameX((.State * 100) + (.Frame * .Direction)), 6 + 124 - .Location.Height + ToadFrameY((.State * 100) + (.Frame * .Direction)), 99, .Location.Height - 24, GFXToadMask(.State), pfrX(100 + .Frame * .Direction), pfrY(100 + .Frame * .Direction), vbSrcAnd
-//                            If ShadowMode = False Then BitBlt myBackBuffer, 32 + (48 * A) + ToadFrameX((.State * 100) + (.Frame * .Direction)), 6 + 124 - .Location.Height + ToadFrameY((.State * 100) + (.Frame * .Direction)), 99, .Location.Height - 24, GFXToad(.State), pfrX(100 + .Frame * .Direction), pfrY(100 + .Frame * .Direction), vbSrcPaint
-//                        Else
-//                            BitBlt myBackBuffer, 32 + (48 * A) + ToadFrameX((.State * 100) + (.Frame * .Direction)), 124 - .Location.Height + ToadFrameY((.State * 100) + (.Frame * .Direction)), 99, .Location.Height - 24, GFXToadMask(.State), pfrX(100 + .Frame * .Direction), pfrY(100 + .Frame * .Direction), vbSrcAnd
-//                            If ShadowMode = False Then BitBlt myBackBuffer, 32 + (48 * A) + ToadFrameX((.State * 100) + (.Frame * .Direction)), 124 - .Location.Height + ToadFrameY((.State * 100) + (.Frame * .Direction)), 99, .Location.Height - 24, GFXToad(.State), pfrX(100 + .Frame * .Direction), pfrY(100 + .Frame * .Direction), vbSrcPaint
-//                        End If
-//                        BitBlt myBackBuffer, 32 + (48 * A) + .Location.Width / 2 - 16, 124 - 30, 32, 32, GFX.BootMask(.MountType).hdc, 0, 32 * .MountFrame, vbSrcAnd
-//                        If ShadowMode = False Then BitBlt myBackBuffer, 32 + (48 * A) + .Location.Width / 2 - 16, 124 - 30, 32, 32, GFX.Boot(.MountType).hdc, 0, 32 * .MountFrame, vbSrcPaint
+                // Yoshi's Head
+                frmMain.renderTexture(32 + (48 * A) + Player[A].YoshiTX,
+                                      124 - Player[A].Location.Height + Player[A].YoshiTY,
+                                      32, 32, GFXYoshiTBMP[B], 0, 32 * Player[A].YoshiTFrame, c, c, c);
+            }
+            if(Player[A].Character == 1)
+            {
+                if(Player[A].Mount == 0 || Player[A].Mount == 3)
+                {
+                    frmMain.renderTexture(32 + (48 * A) + MarioFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
+                                          124 - Player[A].Location.Height + MarioFrameY[(Player[A].State * 100) +
+                                            (Player[A].Frame * Player[A].Direction)] + Player[A].MountOffsetY,
+                                          99, 99, GFXMarioBMP[Player[A].State], pfrX(100 + Player[A].Frame * Player[A].Direction),
+                                          pfrY(100 + Player[A].Frame * Player[A].Direction), c, c, c);
+                }
+                else if(Player[A].Mount == 1)
+                {
+                    frmMain.renderTexture(32 + (48 * A) + MarioFrameX[(Player[A].State * 100) +
+                                            (Player[A].Frame * Player[A].Direction)],
+                                          124 - Player[A].Location.Height + MarioFrameY[(Player[A].State * 100) +
+                                            (Player[A].Frame * Player[A].Direction)],
+                                          99, Player[A].Location.Height - 26,
+                                          GFXMarioBMP[Player[A].State], pfrX(100 + Player[A].Frame * Player[A].Direction),
+                                          pfrY(100 + Player[A].Frame * Player[A].Direction), c, c, c);
 
-//                        If .MountType = 3 Then
-//                            .YoshiWingsFrameCount = .YoshiWingsFrameCount + 1
-//                            .YoshiWingsFrame = 0
-//                            If .YoshiWingsFrameCount <= 12 Then
-//                                .YoshiWingsFrame = 1
-//                            ElseIf .YoshiWingsFrameCount >= 24 Then
-//                                .YoshiWingsFrameCount = 0
-//                            End If
-//                            BitBlt myBackBuffer, 32 + (48 * A) + .Location.Width / 2 - 16 + 20, 124 - 30 - 10, 32, 32, GFX.YoshiWingsMask.hdc, 0, 0 + 32 * .YoshiWingsFrame, vbSrcAnd
-//                            If ShadowMode = False Then BitBlt myBackBuffer, 32 + (48 * A) + .Location.Width / 2 - 16 + 20, 124 - 30 - 10, 32, 32, GFX.YoshiWings.hdc, 0, 0 + 32 * .YoshiWingsFrame, vbSrcPaint
-//                        End If
-//                    End If
-//                ElseIf .Character = 5 Then
-//                    BitBlt myBackBuffer, 32 + (48 * A) + LinkFrameX((.State * 100) + (.Frame * .Direction)), 124 - .Location.Height + LinkFrameY((.State * 100) + (.Frame * .Direction)), 99, 99, GFXLinkMask(.State), pfrX(100 + .Frame * .Direction), pfrY(100 + .Frame * .Direction), vbSrcAnd
-//                    If ShadowMode = False Then BitBlt myBackBuffer, 32 + (48 * A) + LinkFrameX((.State * 100) + (.Frame * .Direction)), 124 - .Location.Height + LinkFrameY((.State * 100) + (.Frame * .Direction)), 99, 99, GFXLink(.State), pfrX(100 + .Frame * .Direction), pfrY(100 + .Frame * .Direction), vbSrcPaint
-//                End If
-//            End With
-//        Next A
-//        A = numPlayers + 1
-//        'Print lives on the screen
-//        BitBlt myBackBuffer, 32 + (48 * A), 126 - GFX.Interface(3).ScaleHeight, GFX.Interface(3).ScaleWidth, GFX.Interface(3).ScaleHeight, GFX.InterfaceMask(3).hdc, 0, 0, vbSrcAnd
-//        BitBlt myBackBuffer, 32 + (48 * A), 126 - GFX.Interface(3).ScaleHeight, GFX.Interface(3).ScaleWidth, GFX.Interface(3).ScaleHeight, GFX.Interface(3).hdc, 0, 0, vbSrcPaint
-//        BitBlt myBackBuffer, 32 + (48 * A) + 40, 128 - GFX.Interface(3).ScaleHeight, GFX.Interface(1).ScaleWidth, GFX.Interface(1).ScaleHeight, GFX.InterfaceMask(1).hdc, 0, 0, vbSrcAnd
-//        BitBlt myBackBuffer, 32 + (48 * A) + 40, 128 - GFX.Interface(3).ScaleHeight, GFX.Interface(1).ScaleWidth, GFX.Interface(1).ScaleHeight, GFX.Interface(1).hdc, 0, 0, vbSrcPaint
-//        SuperPrint Str(Lives), 1, 32 + (48 * A) + 62, 112
-//        'Print coins on the screen
-//        If Player(1).Character = 5 Then
-//            BitBlt myBackBuffer, 32 + (48 * A) + 16, 88, GFX.Interface(2).ScaleWidth, GFX.Interface(2).ScaleHeight, GFX.InterfaceMask(6).hdc, 0, 0, vbSrcAnd
-//            BitBlt myBackBuffer, 32 + (48 * A) + 16, 88, GFX.Interface(2).ScaleWidth, GFX.Interface(2).ScaleHeight, GFX.Interface(6).hdc, 0, 0, vbSrcPaint
-//        Else
-//            BitBlt myBackBuffer, 32 + (48 * A) + 16, 88, GFX.Interface(2).ScaleWidth, GFX.Interface(2).ScaleHeight, GFX.InterfaceMask(2).hdc, 0, 0, vbSrcAnd
-//            BitBlt myBackBuffer, 32 + (48 * A) + 16, 88, GFX.Interface(2).ScaleWidth, GFX.Interface(2).ScaleHeight, GFX.Interface(2).hdc, 0, 0, vbSrcPaint
-//        End If
-//        BitBlt myBackBuffer, 32 + (48 * A) + 40, 90, GFX.Interface(1).ScaleWidth, GFX.Interface(1).ScaleHeight, GFX.InterfaceMask(1).hdc, 0, 0, vbSrcAnd
-//        BitBlt myBackBuffer, 32 + (48 * A) + 40, 90, GFX.Interface(1).ScaleWidth, GFX.Interface(1).ScaleHeight, GFX.Interface(1).hdc, 0, 0, vbSrcPaint
-//        SuperPrint Str(Coins), 1, 32 + (48 * A) + 62, 90
-//        'Print stars on the screen
-//        If numStars > 0 Then
-//            BitBlt myBackBuffer, 32 + (48 * A) + 16, 66, GFX.Interface(5).ScaleWidth, GFX.Interface(5).ScaleHeight, GFX.InterfaceMask(5).hdc, 0, 0, vbSrcAnd
-//            BitBlt myBackBuffer, 32 + (48 * A) + 16, 66, GFX.Interface(5).ScaleWidth, GFX.Interface(5).ScaleHeight, GFX.Interface(5).hdc, 0, 0, vbSrcPaint
-//            BitBlt myBackBuffer, 32 + (48 * A) + 40, 68, GFX.Interface(1).ScaleWidth, GFX.Interface(1).ScaleHeight, GFX.InterfaceMask(1).hdc, 0, 0, vbSrcAnd
-//            BitBlt myBackBuffer, 32 + (48 * A) + 40, 68, GFX.Interface(1).ScaleWidth, GFX.Interface(1).ScaleHeight, GFX.Interface(1).hdc, 0, 0, vbSrcPaint
-//            SuperPrint Str(numStars), 1, 32 + (48 * A) + 62, 68
-//        End If
-//        'Print the level's name
-//        If WorldPlayer(1).LevelName <> "" Then
-//            SuperPrint WorldPlayer(1).LevelName, 2, 32 + (48 * A) + 116, 109
-//        End If
-//        If GamePaused = True Then
-//            BitBlt myBackBuffer, 210, 200, 380, 200, 0, 0, 0, vbWhiteness
-//            If Cheater = False Then
-//                SuperPrint "CONTINUE", 3, 272, 257
-//                SuperPrint "SAVE & CONTINUE", 3, 272, 292
-//                SuperPrint "SAVE & QUIT", 3, 272, 327
-//                BitBlt myBackBuffer, 252, 257 + (MenuCursor * 35), 16, 16, GFX.MCursorMask(0).hdc, 0, 0, vbSrcAnd
-//                BitBlt myBackBuffer, 252, 257 + (MenuCursor * 35), 16, 16, GFX.MCursor(0).hdc, 0, 0, vbSrcPaint
-//            Else
-//                SuperPrint "CONTINUE", 3, 272 + 56, 275
-//                SuperPrint "QUIT", 3, 272 + 56, 310
-//                BitBlt myBackBuffer, 252 + 56, 275 + (MenuCursor * 35), 16, 16, GFX.MCursorMask(0).hdc, 0, 0, vbSrcAnd
-//                BitBlt myBackBuffer, 252 + 56, 275 + (MenuCursor * 35), 16, 16, GFX.MCursor(0).hdc, 0, 0, vbSrcPaint
-//            End If
-//        End If
-//        If PrintFPS > 0 Then
-//            SuperPrint Str(PrintFPS), 1, 8, 8
-//        End If
-//        'BitBlt frmMain.hdc, 0, 0, ScreenW, ScreenH, myBackBuffer, 0, 0, vbSrcCopy
-//        StretchBlt frmMain.hdc, 0, 0, frmMain.ScaleWidth, frmMain.ScaleHeight, myBackBuffer, 0, 0, 800, 600, vbSrcCopy
-//    End If
-//    If TakeScreen = True Then ScreenShot
+                    frmMain.renderTexture(32 + (48 * A) + Player[A].Location.Width / 2.0 - 16, 124 - 30, 32, 32,
+                                          GFX.Boot[Player[A].MountType], 0, 32 * Player[A].MountFrame, c, c, c);
+
+                    if(Player[A].MountType == 3)
+                    {
+                        Player[A].YoshiWingsFrameCount = Player[A].YoshiWingsFrameCount + 1;
+                        Player[A].YoshiWingsFrame = 0;
+                        if(Player[A].YoshiWingsFrameCount <= 12)
+                            Player[A].YoshiWingsFrame = 1;
+                        else if(Player[A].YoshiWingsFrameCount >= 24)
+                            Player[A].YoshiWingsFrameCount = 0;
+
+                        frmMain.renderTexture(32 + (48 * A) + Player[A].Location.Width / 2.0 - 16 + 20, 124 - 30 - 10, 32, 32,
+                                              GFX.YoshiWings, 0, 0 + 32 * Player[A].YoshiWingsFrame);
+                    }
+                }
+            }
+            else if(Player[A].Character == 2)
+            {
+                if(Player[A].Mount == 0 || Player[A].Mount == 3)
+                {
+                    frmMain.renderTexture(32 + (48 * A) + LuigiFrameX[(Player[A].State * 100) +
+                                            (Player[A].Frame * Player[A].Direction)],
+                                          124 - Player[A].Location.Height + LuigiFrameY[(Player[A].State * 100) +
+                                            (Player[A].Frame * Player[A].Direction)] + Player[A].MountOffsetY, 99, 99,
+                                          GFXLuigiBMP[Player[A].State], pfrX(100 + Player[A].Frame * Player[A].Direction),
+                                          pfrY(100 + Player[A].Frame * Player[A].Direction), c, c, c);
+                }
+                else if(Player[A].Mount == 1)
+                {
+                    frmMain.renderTexture(32 + (48 * A) + LuigiFrameX[(Player[A].State * 100) +
+                                            (Player[A].Frame * Player[A].Direction)],
+                                          124 - Player[A].Location.Height +
+                                            LuigiFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
+                                          99, Player[A].Location.Height - 24,
+                                          GFXLuigiBMP[Player[A].State],
+                                          pfrX(100 + Player[A].Frame * Player[A].Direction),
+                                          pfrY(100 + Player[A].Frame * Player[A].Direction), c, c, c);
+
+                    frmMain.renderTexture(32 + (48 * A) + Player[A].Location.Width / 2.0 - 16, 124 - 30, 32, 32, GFX.Boot[Player[A].MountType], 0, 32 * Player[A].MountFrame, c, c, c);
+
+                    if(Player[A].MountType == 3)
+                    {
+                        Player[A].YoshiWingsFrameCount = Player[A].YoshiWingsFrameCount + 1;
+                        Player[A].YoshiWingsFrame = 0;
+                        if(Player[A].YoshiWingsFrameCount <= 12)
+                            Player[A].YoshiWingsFrame = 1;
+                        else if(Player[A].YoshiWingsFrameCount >= 24)
+                            Player[A].YoshiWingsFrameCount = 0;
+
+                        frmMain.renderTexture(32 + (48 * A) + Player[A].Location.Width / 2.0 - 16 + 20, 124 - 30 - 10, 32, 32, GFX.YoshiWings, 0, 0 + 32 * Player[A].YoshiWingsFrame, c, c, c);
+                    }
+                }
+            }
+            else if(Player[A].Character == 3)
+            {
+                if(Player[A].Mount == 0 || Player[A].Mount == 3)
+                {
+                    frmMain.renderTexture(32 + (48 * A) + PeachFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], 124 - Player[A].Location.Height + PeachFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] + Player[A].MountOffsetY, 99, 99, GFXPeachBMP[Player[A].State], pfrX(100 + Player[A].Frame * Player[A].Direction), pfrY(100 + Player[A].Frame * Player[A].Direction), c, c, c);
+                }
+                else if(Player[A].Mount == 1)
+                {
+                    frmMain.renderTexture(32 + (48 * A) + PeachFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], 124 - Player[A].Location.Height + PeachFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], 99, Player[A].Location.Height - 24, GFXPeachBMP[Player[A].State], pfrX(100 + Player[A].Frame * Player[A].Direction), pfrY(100 + Player[A].Frame * Player[A].Direction), c, c, c);
+
+                    frmMain.renderTexture(32 + (48 * A) + Player[A].Location.Width / 2.0 - 16, 124 - 30, 32, 32, GFX.Boot[Player[A].MountType], 0, 32 * Player[A].MountFrame, c, c, c);
+
+                    if(Player[A].MountType == 3)
+                    {
+                        Player[A].YoshiWingsFrameCount = Player[A].YoshiWingsFrameCount + 1;
+                        Player[A].YoshiWingsFrame = 0;
+                        if(Player[A].YoshiWingsFrameCount <= 12)
+                            Player[A].YoshiWingsFrame = 1;
+                        else if(Player[A].YoshiWingsFrameCount >= 24)
+                            Player[A].YoshiWingsFrameCount = 0;
+
+                        frmMain.renderTexture(32 + (48 * A) + Player[A].Location.Width / 2.0 - 16 + 20, 124 - 30 - 10, 32, 32, GFX.YoshiWings, 0, 0 + 32 * Player[A].YoshiWingsFrame, c, c, c);
+                    }
+                }
+            }
+            else if(Player[A].Character == 4)
+            {
+                if(Player[A].Mount == 0 || Player[A].Mount == 3)
+                {
+                    frmMain.renderTexture(32 + (48 * A) + ToadFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], 124 - Player[A].Location.Height + ToadFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] + Player[A].MountOffsetY, 99, 99, GFXToadBMP[Player[A].State], pfrX(100 + Player[A].Frame * Player[A].Direction), pfrY(100 + Player[A].Frame * Player[A].Direction), c, c, c);
+                }
+                else if(Player[A].Mount == 1)
+                {
+                    if(Player[A].State == 1)
+                    {
+                        frmMain.renderTexture(32 + (48 * A) + ToadFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], 6 + 124 - Player[A].Location.Height + ToadFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], 99, Player[A].Location.Height - 24, GFXToadBMP[Player[A].State], pfrX(100 + Player[A].Frame * Player[A].Direction), pfrY(100 + Player[A].Frame * Player[A].Direction), c, c, c);
+                    }
+                    else
+                    {
+                        frmMain.renderTexture(32 + (48 * A) + ToadFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], 124 - Player[A].Location.Height + ToadFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], 99, Player[A].Location.Height - 24, GFXToadBMP[Player[A].State], pfrX(100 + Player[A].Frame * Player[A].Direction), pfrY(100 + Player[A].Frame * Player[A].Direction), c, c, c);
+                    }
+                    frmMain.renderTexture(32 + (48 * A) + Player[A].Location.Width / 2.0 - 16, 124 - 30, 32, 32, GFX.Boot[Player[A].MountType], 0, 32 * Player[A].MountFrame, c, c, c);
+
+                    if(Player[A].MountType == 3)
+                    {
+                        Player[A].YoshiWingsFrameCount = Player[A].YoshiWingsFrameCount + 1;
+                        Player[A].YoshiWingsFrame = 0;
+                        if(Player[A].YoshiWingsFrameCount <= 12)
+                            Player[A].YoshiWingsFrame = 1;
+                        else if(Player[A].YoshiWingsFrameCount >= 24)
+                            Player[A].YoshiWingsFrameCount = 0;
+                        frmMain.renderTexture(32 + (48 * A) + Player[A].Location.Width / 2.0 - 16 + 20, 124 - 30 - 10, 32, 32, GFX.YoshiWings, 0, 0 + 32 * Player[A].YoshiWingsFrame, c, c, c);
+                    }
+                }
+            }
+            else if(Player[A].Character == 5)
+            {
+                frmMain.renderTexture(32 + (48 * A) + LinkFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], 124 - Player[A].Location.Height + LinkFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], 99, 99, GFXLinkBMP[Player[A].State], pfrX(100 + Player[A].Frame * Player[A].Direction), pfrY(100 + Player[A].Frame * Player[A].Direction), c, c, c);
+            }
+        }
+        A = numPlayers + 1;
+        // Print lives on the screen
+        frmMain.renderTexture(32 + (48 * A), 126 - GFX.Interface[3].h, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0);
+        frmMain.renderTexture(32 + (48 * A) + 40, 128 - GFX.Interface[3].h, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+
+        SuperPrint(std::to_string(Lives), 1, 32 + (48 * A) + 62, 112);
+        // Print coins on the screen
+        if(Player[1].Character == 5)
+        {
+            frmMain.renderTexture(32 + (48 * A) + 16, 88, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[6], 0, 0);
+        }
+        else
+        {
+            frmMain.renderTexture(32 + (48 * A) + 16, 88, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[2], 0, 0);
+        }
+        frmMain.renderTexture(32 + (48 * A) + 40, 90, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+
+        SuperPrint(std::to_string(Coins), 1, 32 + (48 * A) + 62, 90);
+        // Print stars on the screen
+        if(numStars > 0)
+        {
+            frmMain.renderTexture(32 + (48 * A) + 16, 66, GFX.Interface[5].w, GFX.Interface[5].h, GFX.Interface[5], 0, 0);
+            frmMain.renderTexture(32 + (48 * A) + 40, 68, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+            SuperPrint(std::to_string(numStars), 1, 32 + (48 * A) + 62, 68);
+        }
+        // Print the level's name
+        if(WorldPlayer[1].LevelName != "")
+        {
+            SuperPrint(WorldPlayer[1].LevelName, 2, 32 + (48 * A) + 116, 109);
+        }
+        if(GamePaused == true)
+        {
+            frmMain.renderRect(210, 200, 380, 200, 0.f, 0.f, 0.f);
+            if(Cheater == false)
+            {
+                SuperPrint("CONTINUE", 3, 272, 257);
+                SuperPrint("SAVE & CONTINUE", 3, 272, 292);
+                SuperPrint("SAVE & QUIT", 3, 272, 327);
+                frmMain.renderTexture(252, 257 + (MenuCursor * 35), 16, 16, GFX.MCursor[0], 0, 0);
+            }
+            else
+            {
+                SuperPrint("CONTINUE", 3, 272 + 56, 275);
+                SuperPrint("QUIT", 3, 272 + 56, 310);
+                frmMain.renderTexture(252 + 56, 275 + (MenuCursor * 35), 16, 16, GFX.MCursor[0], 0, 0);
+            }
+        }
+        if(PrintFPS > 0)
+        {
+            SuperPrint(std::to_string(PrintFPS), 1, 8, 8);
+        }
+//        BitBlt frmMain.hdc, 0, 0, ScreenW, ScreenH, myBackBuffer, 0, 0, vbSrcCopy
+//        StretchBlt frmMain::hdc, 0, 0, frmMain::ScaleWidth, frmMain::ScaleHeight, myBackBuffer, 0, 0, 800, 600, vbSrcCopy;
+    }
+
+    if(TakeScreen == true)
+        ScreenShot();
+
     if(TakeScreen)
         ScreenShot();
 }

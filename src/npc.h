@@ -25,7 +25,7 @@ void CheckSectionNPC(int A);
 void Deactivate(int A);
 // Public Sub Bomb(Location As Location, Game As Integer, Optional ImmunePlayer As Integer = 0) 'for bomb explosions
 // for bomb explosions
-void Bomb(Location_t location, int Game, int ImmunePlayer);
+void Bomb(Location_t location, int Game, int ImmunePlayer = 0);
 // Public Sub DropNPC(A As Integer, NPCType As Integer)  'Drops an NPC from the screen
 // Drops an NPC from the screen
 void DropNPC(int A, int NPCType);

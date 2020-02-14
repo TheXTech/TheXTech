@@ -196,34 +196,54 @@ void FrmMain::doEvents()
 {
     while(SDL_PollEvent(&event))
     {
-        switch(event.type)
-        {
-        case SDL_QUIT:
-            ShowCursor(1);
-            KillIt();
-            break;
-        case SDL_WINDOWEVENT:
-            if((event.window.event == SDL_WINDOWEVENT_RESIZED) || (event.window.event == SDL_WINDOWEVENT_MOVED))
-                eventResize();
-            break;
-        case SDL_KEYDOWN:
-            eventKeyDown(event.key);
-            eventKeyPress(event.key.keysym.sym);
-            break;
-        case SDL_KEYUP:
-            eventKeyUp(event.key);
-            break;
-        case SDL_MOUSEBUTTONDOWN:
-            eventMouseDown(event.button);
-            break;
-        case SDL_MOUSEBUTTONUP:
-            eventMouseUp(event.button);
-            break;
-        case SDL_MOUSEMOTION:
-            eventMouseMove(event.motion);
-            break;
-        }
+        processEvent();
     }
+}
+
+void FrmMain::processEvent()
+{
+    switch(event.type)
+    {
+    case SDL_QUIT:
+        ShowCursor(1);
+        KillIt();
+        break;
+    case SDL_WINDOWEVENT:
+        if((event.window.event == SDL_WINDOWEVENT_RESIZED) || (event.window.event == SDL_WINDOWEVENT_MOVED))
+            eventResize();
+        break;
+    case SDL_KEYDOWN:
+        eventKeyDown(event.key);
+        eventKeyPress(event.key.keysym.sym);
+        break;
+    case SDL_KEYUP:
+        eventKeyUp(event.key);
+        break;
+    case SDL_MOUSEBUTTONDOWN:
+        eventMouseDown(event.button);
+        break;
+    case SDL_MOUSEBUTTONUP:
+        eventMouseUp(event.button);
+        break;
+    case SDL_MOUSEMOTION:
+        eventMouseMove(event.motion);
+        break;
+    }
+}
+
+void FrmMain::waitEvents()
+{
+    if(SDL_WaitEventTimeout(&event, 1000))
+        processEvent();
+    doEvents();
+}
+
+bool FrmMain::isWindowActive()
+{
+    if(!window)
+        return false;
+    Uint32 flags = SDL_GetWindowFlags(window);
+    return (flags & SDL_WINDOW_INPUT_FOCUS) != 0;
 }
 
 void FrmMain::eventDoubleClick()
@@ -255,33 +275,33 @@ void FrmMain::eventKeyPress(SDL_Keycode KeyASCII)
 {
     switch(KeyASCII)
     {
-    case SDLK_a: CheatCode("a"); break;
-    case SDLK_b: CheatCode("b"); break;
-    case SDLK_c: CheatCode("c"); break;
-    case SDLK_d: CheatCode("d"); break;
-    case SDLK_e: CheatCode("e"); break;
-    case SDLK_f: CheatCode("f"); break;
-    case SDLK_g: CheatCode("g"); break;
-    case SDLK_h: CheatCode("h"); break;
-    case SDLK_i: CheatCode("i"); break;
-    case SDLK_j: CheatCode("j"); break;
-    case SDLK_k: CheatCode("k"); break;
-    case SDLK_l: CheatCode("l"); break;
-    case SDLK_m: CheatCode("m"); break;
-    case SDLK_n: CheatCode("n"); break;
-    case SDLK_o: CheatCode("o"); break;
-    case SDLK_p: CheatCode("p"); break;
-    case SDLK_q: CheatCode("q"); break;
-    case SDLK_r: CheatCode("r"); break;
-    case SDLK_s: CheatCode("s"); break;
-    case SDLK_t: CheatCode("t"); break;
-    case SDLK_u: CheatCode("u"); break;
-    case SDLK_v: CheatCode("v"); break;
-    case SDLK_w: CheatCode("w"); break;
-    case SDLK_x: CheatCode("x"); break;
-    case SDLK_y: CheatCode("y"); break;
-    case SDLK_z: CheatCode("z"); break;
-    default: CheatCode(" "); break;
+    case SDLK_a: CheatCode('a'); break;
+    case SDLK_b: CheatCode('b'); break;
+    case SDLK_c: CheatCode('c'); break;
+    case SDLK_d: CheatCode('d'); break;
+    case SDLK_e: CheatCode('e'); break;
+    case SDLK_f: CheatCode('f'); break;
+    case SDLK_g: CheatCode('g'); break;
+    case SDLK_h: CheatCode('h'); break;
+    case SDLK_i: CheatCode('i'); break;
+    case SDLK_j: CheatCode('j'); break;
+    case SDLK_k: CheatCode('k'); break;
+    case SDLK_l: CheatCode('l'); break;
+    case SDLK_m: CheatCode('m'); break;
+    case SDLK_n: CheatCode('n'); break;
+    case SDLK_o: CheatCode('o'); break;
+    case SDLK_p: CheatCode('p'); break;
+    case SDLK_q: CheatCode('q'); break;
+    case SDLK_r: CheatCode('r'); break;
+    case SDLK_s: CheatCode('s'); break;
+    case SDLK_t: CheatCode('t'); break;
+    case SDLK_u: CheatCode('u'); break;
+    case SDLK_v: CheatCode('v'); break;
+    case SDLK_w: CheatCode('w'); break;
+    case SDLK_x: CheatCode('x'); break;
+    case SDLK_y: CheatCode('y'); break;
+    case SDLK_z: CheatCode('z'); break;
+    default: CheatCode(' '); break;
     }
 }
 

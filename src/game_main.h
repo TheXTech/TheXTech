@@ -59,7 +59,7 @@ void SaveConfig();
 
 void NPCyFix();
 
-void CheatCode(std::string NewKey);
+void CheatCode(char NewKey);
 //! credit loop
 void OutroLoop();
 

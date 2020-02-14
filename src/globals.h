@@ -1030,7 +1030,7 @@ extern int lastJoyButton;
 //Public GamePaused As Boolean 'true if the game is paused
 extern bool GamePaused;
 //Public MessageText As String 'when talking to an npc
-extern bool MessageText;
+extern std::string MessageText;
 //Public NumSelectWorld As Integer
 extern int NumSelectWorld;
 //Public SelectWorld(1 To 100) As SelectWorld
@@ -1570,7 +1570,7 @@ extern bool ExitMenu;
 //Public LevelSelect As Boolean 'true if game should load the world map
 extern bool LevelSelect;
 //Public WorldPlayer(1) As WorldPlayer
-extern RangeArr<WorldPlayer_t, 0, 1> worldPlayer;
+extern RangeArr<WorldPlayer_t, 0, 1> WorldPlayer;
 //Public LevelBeatCode As Integer ' code for the way the plauer beat the level
 extern int LevelBeatCode;
 //Public curWorldLevel As Integer

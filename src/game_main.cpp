@@ -1,6 +1,7 @@
 #include <ctime>
 
 #include <AppPath/app_path.h>
+#include <Logger/logger.h>
 
 #include "globals.h"
 #include "game_main.h"
@@ -367,7 +368,7 @@ int GameMain(int argc, char**argv)
 //            Checkpoint = ""
             Checkpoint = "";
 //            WorldPlayer(1).Frame = 0
-            worldPlayer[1].Frame = 0;
+            WorldPlayer[1].Frame = 0;
 //            CheatString = ""
             CheatString = "";
 //            LevelBeatCode = 0
@@ -572,7 +573,7 @@ int GameMain(int argc, char**argv)
                 }
 
                 SDL_Delay(1);
-                if(!GameIsActive) break;// Break on quit
+                if(!GameIsActive) return 0;// Break on quit
 //            Loop While GameMenu = True
             } while(GameMenu);
         }
@@ -749,7 +750,7 @@ int GameMain(int argc, char**argv)
                     }
 
                     SDL_Delay(1);
-                    if(!GameIsActive) break;// Break on quit
+                    if(!GameIsActive) return 0;// Break on quit
 //                Loop While LevelSelect = True
                 } while(LevelSelect);
 //            End If
@@ -995,7 +996,7 @@ int GameMain(int argc, char**argv)
                 }
 
                 SDL_Delay(1);
-                if(!GameIsActive) break;// Break on quit
+                if(!GameIsActive) return 0;// Break on quit
 //            Loop While LevelSelect = False And GameMenu = False
             } while(!LevelSelect || !GameMenu);
 //            If TestLevel = True Then
@@ -1057,64 +1058,273 @@ void KillIt()
     ShowCursor(1);
 }
 
-void OpenLevel(std::string FilePath)
-{
-    // USE PGE-FL here
-}
-
-void ClearLevel()
-{
-
-}
 
 void NextLevel()
 {
-
+    int A = 0;
+    for(A = 1; A <= numPlayers; A++)
+        Player[A].HoldingNPC = 0;
+    LevelMacro = 0;
+    LevelMacroCounter = 0;
+    StopMusic();
+    ClearLevel();
+    frmMain.clearBuffer();
+    DoEvents();
+    if(!TestLevel && GoToLevel == "" && !NoMap)
+        SDL_Delay(500);
+    if(BattleMode && !LevelEditor)
+    {
+        EndLevel = false;
+        GameMenu = true;
+        MenuMode = 4;
+        MenuCursor = selWorld - 1;
+        PlayerCharacter = Player[1].Character;
+        PlayerCharacter2 = Player[2].Character;
+    }
+    else
+    {
+        LevelSelect = true;
+        EndLevel = false;
+    }
 }
 
+// macros mainly used for end of level stuffs. takes over the players controls
 void UpdateMacro()
 {
+    int A = 0;
+    bool OnScreen = false;
+    if(LevelMacro == 1) // SMB3 Exit
+    {
+        for(A = 1; A <= numPlayers; A++)
+        {
+            if(Player[A].Location.X < level[Player[A].Section].Width && Player[A].Dead == false)
+            {
+                OnScreen = true;
+                Player[A].Controls.Down = false;
+                Player[A].Controls.Drop = false;
+                Player[A].Controls.Jump = false;
+                Player[A].Controls.Left = false;
+                Player[A].Controls.Right = true;
+                Player[A].Controls.Run = false;
+                Player[A].Controls.Up = false;
+                Player[A].Controls.Start = false;
+                Player[A].Controls.AltJump = false;
+                Player[A].Controls.AltRun = false;
+                if(Player[A].Wet > 0 && Player[A].CanJump == true)
+                {
+                    if(Player[A].Location.SpeedY > 1)
+                        Player[A].Controls.Jump = true;
+                }
+            }
+            else
+            {
+                Player[A].Location.SpeedY = -Physics.PlayerGravity;
+                Player[A].Controls.Down = false;
+                Player[A].Controls.Drop = false;
+                Player[A].Controls.Jump = false;
+                Player[A].Controls.Left = false;
+                Player[A].Controls.Right = true;
+                Player[A].Controls.Run = false;
+                Player[A].Controls.Up = false;
+                Player[A].Controls.Start = false;
+                Player[A].Controls.AltJump = false;
+                Player[A].Controls.AltRun = false;
+            }
+        }
+        if(OnScreen == false)
+        {
+            LevelMacroCounter = LevelMacroCounter + 1;
+            if(LevelMacroCounter >= 100)
+            {
+                LevelBeatCode = 1;
+                LevelMacro = 0;
+                LevelMacroCounter = 0;
+                EndLevel = true;
+            }
+        }
+    }
+    else if(LevelMacro == 2)
+    {
+        for(A = 1; A <= numPlayers; A++)
+        {
+            Player[A].Controls.Down = false;
+            Player[A].Controls.Drop = false;
+            Player[A].Controls.Jump = false;
+            Player[A].Controls.Left = false;
+            Player[A].Controls.Right = false;
+            Player[A].Controls.Run = false;
+            Player[A].Controls.Up = false;
+            Player[A].Controls.Start = false;
+            Player[A].Controls.AltJump = false;
+            Player[A].Controls.AltRun = false;
+        }
+        LevelMacroCounter = LevelMacroCounter + 1;
+        if(LevelMacroCounter >= 460)
+        {
+            LevelBeatCode = 2;
+            EndLevel = true;
+            LevelMacro = 0;
+            LevelMacroCounter = 0;
+            frmMain.clearBuffer();
+        }
+    }
+    else if(LevelMacro == 3)
+    {
+        float tempTime = 0;
+        float gameTime = 0;
 
-}
+        do
+        {
+            // tempTime = Timer - Int(Timer)
+            tempTime = std::floor(float(SDL_GetTicks()) / 1000.0f);
+            if(tempTime > (float)(gameTime + 0.01) || tempTime < gameTime)
+            {
+                gameTime = tempTime;
+                DoEvents();
+                UpdateGraphics();
+                UpdateSound();
+                BlockFrames();
+                LevelMacroCounter = LevelMacroCounter + 1;
+                if(LevelMacroCounter >= 300)
+                    break;
+            }
 
-void OpenWorld(std::string FilePath)
-{
-    // USE PGE-FL here
-}
+            if(!GameIsActive)
+                return;
 
-void WorldLoop()
-{
+        } while(true);
 
-}
-
-void LevelPath(int Lvl, int Direction, bool Skp)
-{
-
-}
-
-void PathWait()
-{
-
-}
-
-void ClearWorld()
-{
-
-}
-
-void SaveGame()
-{
-
-}
-
-void LoadGame()
-{
-
-}
-
-void PauseGame(int plr)
-{
-
+        LevelBeatCode = 4;
+        EndLevel = true;
+        LevelMacro = 0;
+        LevelMacroCounter = 0;
+        frmMain.clearBuffer();
+    }
+    else if(LevelMacro == 4)
+    {
+        for(A = 1; A <= numPlayers; A++)
+        {
+            Player[A].Controls.Down = false;
+            Player[A].Controls.Drop = false;
+            Player[A].Controls.Jump = false;
+            Player[A].Controls.Left = false;
+            Player[A].Controls.Right = false;
+            Player[A].Controls.Run = false;
+            Player[A].Controls.Up = false;
+            Player[A].Controls.Start = false;
+            Player[A].Controls.AltJump = false;
+            Player[A].Controls.AltRun = false;
+        }
+        LevelMacroCounter = LevelMacroCounter + 1;
+        if(LevelMacroCounter >= 300)
+        {
+            LevelBeatCode = 5;
+            EndLevel = true;
+            LevelMacro = 0;
+            LevelMacroCounter = 0;
+            frmMain.clearBuffer();
+        }
+    }
+    else if(LevelMacro == 5)
+    {
+        // numNPCs = 0
+        for(A = 1; A <= numPlayers; A++)
+        {
+            Player[A].Controls.Down = false;
+            Player[A].Controls.Drop = false;
+            Player[A].Controls.Jump = false;
+            Player[A].Controls.Left = false;
+            Player[A].Controls.Right = false;
+            Player[A].Controls.Run = false;
+            Player[A].Controls.Up = false;
+            Player[A].Controls.Start = false;
+            Player[A].Controls.AltJump = false;
+            Player[A].Controls.AltRun = false;
+        }
+        LevelMacroCounter = LevelMacroCounter + 1;
+        if(LevelMacroCounter == 250)
+            PlaySound(45);
+        if(LevelMacroCounter >= 800)
+        {
+            EndLevel = true;
+            LevelMacro = 0;
+            LevelMacroCounter = 0;
+            if(TestLevel == false)
+            {
+                GameOutro = true;
+                BeatTheGame = true;
+                SaveGame();
+                MenuMode = 0;
+                MenuCursor = 0;
+            }
+            frmMain.clearBuffer();
+        }
+    }
+    else if(LevelMacro == 6) // Star Exit
+    {
+        for(A = 1; A <= numPlayers; A++)
+        {
+            Player[A].Controls.Down = false;
+            Player[A].Controls.Drop = false;
+            Player[A].Controls.Jump = false;
+            Player[A].Controls.Left = false;
+            Player[A].Controls.Right = false;
+            Player[A].Controls.Run = false;
+            Player[A].Controls.Up = false;
+            Player[A].Controls.Start = false;
+            Player[A].Controls.AltJump = false;
+            Player[A].Controls.AltRun = false;
+        }
+        LevelMacroCounter = LevelMacroCounter + 1;
+        if(LevelMacroCounter >= 300)
+        {
+            LevelBeatCode = 7;
+            LevelMacro = 0;
+            LevelMacroCounter = 0;
+            EndLevel = true;
+        }
+    }
+    else if(LevelMacro == 7) // SMW Exit
+    {
+        for(A = 1; A <= numPlayers; A++)
+        {
+            if(Player[A].Location.X < level[Player[A].Section].Width && Player[A].Dead == false)
+            {
+                Player[A].Controls.Down = false;
+                Player[A].Controls.Drop = false;
+                Player[A].Controls.Jump = false;
+                Player[A].Controls.Left = false;
+                Player[A].Controls.Right = true;
+                Player[A].Controls.Run = false;
+                Player[A].Controls.Up = false;
+                Player[A].Controls.Start = false;
+                Player[A].Controls.AltJump = false;
+                Player[A].Controls.AltRun = false;
+            }
+            else
+            {
+                Player[A].Location.SpeedY = -Physics.PlayerGravity;
+                Player[A].Controls.Down = false;
+                Player[A].Controls.Drop = false;
+                Player[A].Controls.Jump = false;
+                Player[A].Controls.Left = false;
+                Player[A].Controls.Right = true;
+                Player[A].Controls.Run = false;
+                Player[A].Controls.Up = false;
+                Player[A].Controls.Start = false;
+                Player[A].Controls.AltJump = false;
+                Player[A].Controls.AltRun = false;
+            }
+        }
+        LevelMacroCounter = LevelMacroCounter + 1;
+        if(LevelMacroCounter >= 630)
+        {
+            LevelBeatCode = 8;
+            LevelMacro = 0;
+            LevelMacroCounter = 0;
+            EndLevel = true;
+        }
+    }
 }
 
 void InitControls()
@@ -1211,33 +1421,97 @@ void InitControls()
 
 void NPCyFix()
 {
-
+    int A = 0;
+    float XnH = 0;
+    float XnHfix = 0;
+    for(A = 1; A <= numNPCs; A++)
+    {
+        XnH = NPC[A].Location.Y + NPC[A].Location.Height;
+        if((int(XnH * 100) % 800) / 100 != 0)
+        {
+            if((int(XnH + std::abs((int(XnH * 100) % 800) / 100)) * 100) % 800 == 0)
+                XnHfix = std::abs((int(XnH * 100) % 800) / 100);
+            else
+                XnHfix = std::abs(8 - ((int(XnH * 100) % 800) / 100));
+            NPC[A].Location.Y = NPC[A].Location.Y + XnHfix;
+        }
+    }
 }
 
 void CheckActive()
 {
+    bool MusicPaused = false;
+//    If nPlay.Online = True Then Exit Sub
+    // If LevelEditor = False And TestLevel = False Then Exit Sub
+    // If LevelEditor = False Then Exit Sub
+    while(!frmMain.isWindowActive())
+    {
+        frmMain.waitEvents();
+//        If LevelEditor = True Or MagicHand = True Then frmLevelWindow.vScreen(1).MousePointer = 0
+        overTime = 0;
+        GoalTime = SDL_GetTicks() + 1000;
+        fpsCount = 0;
+        fpsTime = 0;
+        cycleCount = 0;
+        gameTime = 0;
+        tempTime = 0;
+        keyDownEnter = false;
+        keyDownAlt = false;
+        if(musicPlaying == true && !MusicPaused)
+        {
+            pLogDebug("Window Focus lost");
+            MusicPaused = true;
+            // If noSound = False Then mciSendString "pause all", 0, 0, 0
+            if(noSound == false)
+                SoundPauseAll();
+        }
 
+        if(!GameIsActive)
+            break;
+    }
+
+    if(MusicPaused)
+        pLogDebug("Window Focus got back");
+
+    if(noSound == false)
+    {
+        if(MusicPaused == true)
+        {
+            if(GameOutro == true)
+            {
+                // mciSendString "resume tmusic", 0, 0, 0
+                SoundResumeAll();
+            }
+            else if(LevelSelect == true && GameMenu == false && LevelEditor == false)
+            {
+                // mciSendString "resume wmusic" & curWorldMusic, 0, 0, 0
+                SoundResumeAll();
+            }
+            else if(curMusic > 0)
+            {
+                // mciSendString "resume music" & curMusic, 0, 0, 0
+                SoundResumeAll();
+            }
+            else if(curMusic < 0)
+            {
+                if(PSwitchStop > 0)
+                {
+                    // mciSendString "resume stmusic", 0, 0, 0
+                    SoundResumeAll();
+                }
+                else
+                {
+                    // mciSendString "resume smusic", 0, 0, 0
+                    SoundResumeAll();
+                }
+            }
+        }
+    }
+//    If LevelEditor = True Or MagicHand = True Then frmLevelWindow.vScreen(1).MousePointer = 99
 }
 
-void CheatCode(std::string NewKey)
-{
 
-}
 
-void OutroLoop()
-{
-
-}
-
-void SetupCredits()
-{
-
-}
-
-void FindStars()
-{
-
-}
 
 void AddCredit(std::string newCredit)
 {
@@ -1257,22 +1531,126 @@ Location_t newLoc(double X, double Y, double Width, double Height)
 
 void MoreScore(int addScore, Location_t Loc, int Multiplier)
 {
-
-}
-
-void SetupPlayerFrames()
-{
-
+    //int oldM = 0;
+    int A = 0;
+    if(GameMenu || GameOutro || BattleMode)
+        return;
+    A = addScore + Multiplier;
+    if(A == 0)
+        return;
+    Multiplier++;
+    if(A > 13)
+        A = 13;
+    if(A < addScore)
+        A = addScore;
+    if(Multiplier > 9)
+        Multiplier = 8;
+    if(A > 13)
+        A = 13;
+    if(Points[A] <= 5)
+    {
+        Lives = Lives + Points[A];
+        PlaySound(15);
+    }
+    else
+        Score = Score + Points[A];
+    NewEffect(79, Loc);
+    Effect[numEffects].Frame = A - 1;
 }
 
 void SizableBlocks()
 {
-
+    BlockIsSizable[568] = true;
+    BlockIsSizable[579] = true;
+    BlockIsSizable[575] = true;
+    BlockIsSizable[25] = true;
+    BlockIsSizable[26] = true;
+    BlockIsSizable[27] = true;
+    BlockIsSizable[28] = true;
+    BlockIsSizable[38] = true;
+    BlockIsSizable[79] = true;
+    BlockIsSizable[108] = true;
+    BlockIsSizable[130] = true;
+    BlockIsSizable[161] = true;
+    BlockIsSizable[240] = true;
+    BlockIsSizable[241] = true;
+    BlockIsSizable[242] = true;
+    BlockIsSizable[243] = true;
+    BlockIsSizable[244] = true;
+    BlockIsSizable[245] = true;
+    BlockIsSizable[259] = true;
+    BlockIsSizable[260] = true;
+    BlockIsSizable[261] = true;
+    BlockIsSizable[287] = true;
+    BlockIsSizable[288] = true;
+    BlockIsSizable[437] = true;
+    BlockIsSizable[441] = true;
+    BlockIsSizable[442] = true;
+    BlockIsSizable[443] = true;
+    BlockIsSizable[444] = true;
+    BlockIsSizable[438] = true;
+    BlockIsSizable[439] = true;
+    BlockIsSizable[440] = true;
+    BlockIsSizable[445] = true;
 }
 
 void StartBattleMode()
 {
+    int A = 0;
+    Player_t blankPlayer;
+    numPlayers = 2;
+    for(A = 1; A <= numCharacters; A++)
+    {
+        SavedChar[A] = blankPlayer;
+        SavedChar[A].Character = A;
+        SavedChar[A].State = 1;
+    }
+    Player[1].State = 2;
+    Player[1].Mount = 0;
+    Player[1].Character = 1;
+    Player[1].HeldBonus = 0;
+    Player[1].CanFly = false;
+    Player[1].CanFly2 = false;
+    Player[1].TailCount = 0;
+    Player[1].YoshiBlue = false;
+    Player[1].YoshiRed = false;
+    Player[1].YoshiYellow = false;
+    Player[1].Hearts = 2;
+    Player[2].State = 2;
+    Player[2].Mount = 0;
+    Player[2].Character = 2;
+    Player[2].HeldBonus = 0;
+    Player[2].CanFly = false;
+    Player[2].CanFly2 = false;
+    Player[2].TailCount = 0;
+    Player[2].YoshiBlue = false;
+    Player[2].YoshiRed = false;
+    Player[2].YoshiYellow = false;
+    Player[2].Hearts = 2;
+    Player[1].Character = PlayerCharacter;
+    Player[2].Character = PlayerCharacter2;
+    numStars = 0;
+    Coins = 0;
+    Score = 0;
+    Lives = 99;
+    BattleLives[1] = 3;
+    BattleLives[2] = 3;
+    LevelSelect = false;
+    GameMenu = false;
+    BattleMode = true;
+    frmMain.clearBuffer();
+    StopMusic();
+    DoEvents();
+    SDL_Delay(500);
+    ClearLevel();
+    if(selWorld == 1)
+        selWorld = (std::rand() % (NumSelectWorld - 1)) + 2;
 
+    OpenLevel(SelectWorld[selWorld].WorldFile);
+    SetupPlayers();
+    BattleIntro = 150;
+    BattleWinner = 0;
+    BattleOutro = 0;
 }
 
 std::string FixComma(std::string newStr)
