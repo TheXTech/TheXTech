@@ -48,7 +48,7 @@ void YoshiEat(int A);
 // Public Sub YoshiSpit(A As Integer)
 void YoshiSpit(int A);
 // Public Sub YoshiPound(A As Integer, C As Integer, Optional BreakBlocks As Boolean = False)
-void YoshiPound(int A, int C, bool BreakBlocks);
+void YoshiPound(int A, int C, bool BreakBlocks = false);
 // Public Sub SwapCoop()
 void SwapCoop();
 // Public Sub PlayerPush(A As Integer, HitSpot As Integer)

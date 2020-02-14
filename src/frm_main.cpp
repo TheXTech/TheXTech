@@ -408,6 +408,9 @@ void FrmMain::updateViewport()
     viewport_scale_x = scale_x;
     viewport_scale_y = scale_y;
 
+    viewport_offset_x = 0;
+    viewport_offset_y = 0;
+
     if(scale_x > scale_y)
     {
         w1 = scale_y * ScaleWidth;
@@ -422,16 +425,27 @@ void FrmMain::updateViewport()
     offset_x = (w - w1) / 2;
     offset_y = (h - h1) / 2;
 
+    viewport_w = static_cast<int>(w1);
+    viewport_h = static_cast<int>(h1);
+
     SDL_Rect topLeftViewport = {0, 0, wi, hi};
     SDL_RenderSetViewport(m_gRenderer, &topLeftViewport);
     clearBuffer();
 
     topLeftViewport.x = static_cast<int>(offset_x);
     topLeftViewport.y = static_cast<int>(offset_y);
-    topLeftViewport.w = static_cast<int>(w1);
-    topLeftViewport.h = static_cast<int>(h1);
-    clearBuffer();
+    topLeftViewport.w = viewport_w;
+    topLeftViewport.h = viewport_h;
     SDL_RenderSetViewport(m_gRenderer, &topLeftViewport);
+}
+
+void FrmMain::offsetViewport(int x, int y)
+{
+    if(viewport_offset_x != x || viewport_offset_y != y)
+    {
+        viewport_offset_x = x;
+        viewport_offset_y = y;
+    }
 }
 
 StdPicture FrmMain::LoadPicture(std::string path, std::string maskPath, std::string maskFallbackPath)
@@ -724,6 +738,8 @@ int FrmMain::makeShot_action(void *_pixels)
 
 SDL_Rect FrmMain::scaledRectIS(float x, float y, int w, int h)
 {
+    x += viewport_offset_x;
+    y += viewport_offset_y;
     return
     {
         static_cast<int>(std::ceil(x * viewport_scale_x)),
@@ -735,6 +751,8 @@ SDL_Rect FrmMain::scaledRectIS(float x, float y, int w, int h)
 
 SDL_Rect FrmMain::scaledRect(float x, float y, float w, float h)
 {
+    x += viewport_offset_x;
+    y += viewport_offset_y;
     return
     {
         static_cast<int>(std::ceil(x * viewport_scale_x)),
@@ -746,6 +764,10 @@ SDL_Rect FrmMain::scaledRect(float x, float y, float w, float h)
 
 SDL_Rect FrmMain::scaledRectS(float left, float top, float right, float bottom)
 {
+    left += viewport_offset_x;
+    top += viewport_offset_y;
+    right += viewport_offset_x;
+    bottom += viewport_offset_y;
     return
     {
         static_cast<int>(std::ceil(left * viewport_scale_x)),

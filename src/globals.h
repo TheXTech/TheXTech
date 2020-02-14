@@ -356,7 +356,7 @@ struct NPC_t
 //    FrameCount As Single 'The counter for incrementing the frames
     float FrameCount = 0.0f;
 //    Direction As Single 'The direction the NPC is walking
-    float Direction = 0.0f;
+    int Direction = 0;/*!!!!!!WAS FLOAT!!!!!!!*/
 //'Secial - misc variables used for NPC AI
 //    Special As Double
     double Special = 0.0;
@@ -575,7 +575,7 @@ struct Player_t
 //    Frame As Integer
     int Frame = 0;
 //    FrameCount As Single
-    float FrameCount = 0.0f;
+    int FrameCount = 0;
 //    Jump As Integer 'how long the player can jump for
     int Jump = 0;
 //    CanJump As Boolean 'true if the player can jump
@@ -1507,7 +1507,9 @@ extern RangeArr<int, 1, maxSceneType> SceneFrame;
 //Public SceneFrame2(1 To maxSceneType) As Integer 'Counter to update the scene frames
 extern RangeArr<int, 1, maxSceneType> SceneFrame2;
 //Public SpecialFrame(100) As Integer 'misc frames for things like coins and the kurbi shoe
+extern RangeArr<int, 0, 100> SpecialFrame;
 //Public SpecialFrameCount(100) As Single
+extern RangeArr<float, 0, 100> SpecialFrameCount;
 //Public TileWidth(1 To maxTileType) As Integer
 extern RangeArr<int, 1, maxTileType> TileWidth;
 //Public TileHeight(1 To maxTileType) As Integer
@@ -1839,7 +1841,8 @@ extern float LoadCoinsT;
 //Public GFXBlockCustom(1 To maxBlockType) As Boolean
 extern RangeArr<bool, 1, maxBlockType> GFXBlockCustom;
 //Public GFXBlock(1 To maxBlockType) As Long
-extern RangeArr<long, 1, maxBlockType> GFXBlock;
+//extern RangeArr<long, 1, maxBlockType> GFXBlock;
+#define GFXBlock GFXBlockBMP
 //Public GFXBlockMask(1 To maxBlockType) As Long
 extern RangeArr<long, 1, maxBlockType> GFXBlockMask;
 //Public GFXBlockBMP(1 To maxBlockType) As StdPicture
@@ -1849,7 +1852,8 @@ extern RangeArr<StdPicture, 1, maxBlockType> GFXBlockMaskBMP;
 //Public GFXBackground2Custom(1 To numBackground2) As Boolean
 extern RangeArr<bool, 1, numBackground2> GFXBackground2Custom;
 //Public GFXBackground2(1 To numBackground2) As Long
-extern RangeArr<long, 1, numBackground2> GFXBackground2;
+//extern RangeArr<long, 1, numBackground2> GFXBackground2;
+#define GFXBackground2 GFXBackground2BMP
 //Public GFXBackground2BMP(1 To numBackground2) As StdPicture
 extern RangeArr<StdPicture, 1, numBackground2> GFXBackground2BMP;
 //Public GFXBackground2Height(1 To numBackground2) As Integer
@@ -1859,7 +1863,8 @@ extern RangeArr<int, 1, numBackground2> GFXBackground2Width;
 //Public GFXNPCCustom(1 To maxNPCType) As Boolean
 extern RangeArr<bool, 1, maxNPCType> GFXNPCCustom;
 //Public GFXNPC(1 To maxNPCType) As Long
-extern RangeArr<long, 1, maxNPCType> GFXNPC;
+//extern RangeArr<long, 1, maxNPCType> GFXNPC;
+#define GFXNPC GFXNPCBMP
 //Public GFXNPCMask(1 To maxNPCType) As Long
 extern RangeArr<long, 1, maxNPCType> GFXNPCMask;
 //Public GFXNPCBMP(1 To maxNPCType) As StdPicture
@@ -1873,7 +1878,8 @@ extern RangeArr<int, 1, maxNPCType> GFXNPCWidth;
 //Public GFXEffectCustom(1 To maxEffectType) As Boolean
 extern RangeArr<bool, 1, maxEffectType> GFXEffectCustom;
 //Public GFXEffect(1 To maxEffectType) As Long
-extern RangeArr<long, 1, maxEffectType> GFXEffect;
+//extern RangeArr<long, 1, maxEffectType> GFXEffect;
+#define GFXEffect GFXEffectBMP
 //Public GFXEffectMask(1 To maxEffectType) As Long
 extern RangeArr<long, 1, maxEffectType> GFXEffectMask;
 //Public GFXEffectBMP(1 To maxEffectType) As StdPicture
@@ -1887,7 +1893,8 @@ extern RangeArr<int, 1, maxEffectType> GFXEffectWidth;
 //Public GFXBackgroundCustom(1 To maxBackgroundType) As Boolean
 extern RangeArr<bool, 1, maxBackgroundType> GFXBackgroundCustom;
 //Public GFXBackground(1 To maxBackgroundType) As Long
-extern RangeArr<long, 1, maxBackgroundType> GFXBackground;
+//extern RangeArr<long, 1, maxBackgroundType> GFXBackground;
+#define GFXBackground GFXBackgroundBMP
 //Public GFXBackgroundMask(1 To maxBackgroundType) As Long
 extern RangeArr<long, 1, maxBackgroundType> GFXBackgroundMask;
 //Public GFXBackgroundBMP(1 To maxBackgroundType) As StdPicture
@@ -1901,7 +1908,8 @@ extern RangeArr<int, 1, maxBackgroundType> GFXBackgroundWidth;
 //Public GFXMarioCustom(1 To 10) As Boolean
 extern RangeArr<bool, 1, 10> GFXMarioCustom;
 //Public GFXMario(1 To 10) As Long
-extern RangeArr<long, 1, 10> GFXMario;
+//extern RangeArr<long, 1, 10> GFXMario;
+#define GFXMario GFXMarioBMP
 //Public GFXMarioMask(1 To 10) As Long
 extern RangeArr<long, 1, 10> GFXMarioMask;
 //Public GFXMarioBMP(1 To 10) As StdPicture
@@ -1915,7 +1923,8 @@ extern RangeArr<int, 1, 10> GFXMarioWidth;
 //Public GFXLuigiCustom(1 To 10) As Boolean
 extern RangeArr<bool, 1, 10> GFXLuigiCustom;
 //Public GFXLuigi(1 To 10) As Long
-extern RangeArr<long, 1, 10> GFXLuigi;
+//extern RangeArr<long, 1, 10> GFXLuigi;
+#define GFXLuigi GFXLuigiBMP
 //Public GFXLuigiMask(1 To 10) As Long
 extern RangeArr<long, 1, 10> GFXLuigiMask;
 //Public GFXLuigiBMP(1 To 10) As StdPicture
@@ -1929,7 +1938,8 @@ extern RangeArr<int, 1, 10> GFXLuigiWidth;
 //Public GFXPeachCustom(1 To 10) As Boolean
 extern RangeArr<bool, 1, 10> GFXPeachCustom;
 //Public GFXPeach(1 To 10) As Long
-extern RangeArr<long, 1, 10> GFXPeach;
+//extern RangeArr<long, 1, 10> GFXPeach;
+#define GFXPeach GFXPeachBMP
 //Public GFXPeachMask(1 To 10) As Long
 extern RangeArr<long, 1, 10> GFXPeachMask;
 //Public GFXPeachBMP(1 To 10) As StdPicture
@@ -1943,7 +1953,8 @@ extern RangeArr<int, 1, 10> GFXPeachWidth;
 //Public GFXToadCustom(1 To 10) As Boolean
 extern RangeArr<bool, 1, 10> GFXToadCustom;
 //Public GFXToad(1 To 10) As Long
-extern RangeArr<long, 1, 10> GFXToad;
+//extern RangeArr<long, 1, 10> GFXToad;
+#define GFXToad GFXToadBMP
 //Public GFXToadMask(1 To 10) As Long
 extern RangeArr<long, 1, 10> GFXToadMask;
 //Public GFXToadBMP(1 To 10) As StdPicture
@@ -1958,7 +1969,8 @@ extern RangeArr<int, 1, 10> GFXToadWidth;
 //Public GFXLinkCustom(1 To 10) As Boolean
 extern RangeArr<bool, 1, 10> GFXLinkCustom;
 //Public GFXLink(1 To 10) As Long
-extern RangeArr<long, 1, 10> GFXLink;
+//extern RangeArr<long, 1, 10> GFXLink;
+#define GFXLink GFXLinkBMP
 //Public GFXLinkMask(1 To 10) As Long
 extern RangeArr<long, 1, 10> GFXLinkMask;
 //Public GFXLinkBMP(1 To 10) As StdPicture
@@ -1974,7 +1986,8 @@ const int maxYoshiGfx = 10;
 //Public GFXYoshiBCustom(1 To 10) As Boolean
 extern RangeArr<bool, 1, maxYoshiGfx> GFXYoshiBCustom;
 //Public GFXYoshiB(1 To 10) As Long
-extern RangeArr<long, 1, maxYoshiGfx> GFXYoshiB;
+//extern RangeArr<long, 1, maxYoshiGfx> GFXYoshiB;
+#define GFXYoshiB GFXYoshiBBMP
 //Public GFXYoshiBMask(1 To 10) As Long
 extern RangeArr<long, 1, maxYoshiGfx> GFXYoshiBMask;
 //Public GFXYoshiBBMP(1 To 10) As StdPicture
@@ -1984,7 +1997,8 @@ extern RangeArr<StdPicture, 1, maxYoshiGfx> GFXYoshiBMaskBMP;
 //Public GFXYoshiTCustom(1 To 10) As Boolean
 extern RangeArr<bool, 1, maxYoshiGfx> GFXYoshiTCustom;
 //Public GFXYoshiT(1 To 10) As Long
-extern RangeArr<long, 1, maxYoshiGfx> GFXYoshiT;
+//extern RangeArr<long, 1, maxYoshiGfx> GFXYoshiT;
+#define GFXYoshiT GFXYoshiTBMP
 //Public GFXYoshiTMask(1 To 10) As Long
 extern RangeArr<long, 1, maxYoshiGfx> GFXYoshiTMask;
 //Public GFXYoshiTBMP(1 To 10) As StdPicture
@@ -1995,7 +2009,8 @@ extern RangeArr<StdPicture, 1, maxYoshiGfx> GFXYoshiTMaskBMP;
 //Public GFXTileCustom(1 To maxTileType) As Long
 extern RangeArr<long, 1, maxTileType> GFXTileCustom;
 //Public GFXTile(1 To maxTileType) As Long
-extern RangeArr<long, 1, maxTileType> GFXTile;
+//extern RangeArr<long, 1, maxTileType> GFXTile;
+#define GFXTile GFXTileBMP
 //Public GFXTileBMP(1 To maxTileType) As StdPicture
 extern RangeArr<StdPicture, 1, maxTileType> GFXTileBMP;
 //Public GFXTileHeight(1 To maxTileType) As Integer
@@ -2005,7 +2020,8 @@ extern RangeArr<int, 1, maxTileType> GFXTileWidth;
 //Public GFXLevelCustom(0 To maxLevelType) As Long
 extern RangeArr<long, 0, maxLevelType> GFXLevelCustom;
 //Public GFXLevel(0 To maxLevelType) As Long
-extern RangeArr<long, 0, maxLevelType> GFXLevel;
+//extern RangeArr<long, 0, maxLevelType> GFXLevel;
+#define GFXLevel GFXLevelBMP
 //Public GFXLevelMask(0 To maxLevelType) As Long
 extern RangeArr<long, 0, maxLevelType> GFXLevelMask;
 //Public GFXLevelBMP(0 To maxLevelType) As StdPicture
@@ -2021,7 +2037,8 @@ extern RangeArr<bool, 0, maxLevelType> GFXLevelBig;
 //Public GFXSceneCustom(1 To maxSceneType) As Long
 extern RangeArr<long, 1, maxSceneType> GFXSceneCustom;
 //Public GFXScene(1 To maxSceneType) As Long
-extern RangeArr<long, 1, maxSceneType> GFXScene;
+//extern RangeArr<long, 1, maxSceneType> GFXScene;
+#define GFXScene GFXSceneBMP
 //Public GFXSceneMask(1 To maxSceneType) As Long
 extern RangeArr<long, 1, maxSceneType> GFXSceneMask;
 //Public GFXSceneBMP(1 To maxSceneType) As StdPicture
@@ -2035,7 +2052,8 @@ extern RangeArr<int, 1, maxSceneType> GFXSceneWidth;
 //Public GFXPathCustom(1 To maxPathType) As Long
 extern RangeArr<long, 1, maxPathType> GFXPathCustom;
 //Public GFXPath(1 To maxPathType) As Long
-extern RangeArr<long, 1, maxPathType> GFXPath;
+//extern RangeArr<long, 1, maxPathType> GFXPath;
+#define GFXPath GFXPathBMP
 //Public GFXPathMask(1 To maxPathType) As Long
 extern RangeArr<long, 1, maxPathType> GFXPathMask;
 //Public GFXPathBMP(1 To maxPathType) As StdPicture
@@ -2050,7 +2068,8 @@ extern RangeArr<int, 1, maxPathType> GFXPathWidth;
 //Public GFXPlayerCustom(1 To numCharacters) As Long
 extern RangeArr<long, 1, numCharacters> GFXPlayerCustom;
 //Public GFXPlayer(1 To numCharacters) As Long
-extern RangeArr<long, 1, numCharacters> GFXPlayer;
+//extern RangeArr<long, 1, numCharacters> GFXPlayer;
+#define GFXPlayer GFXPlayerBMP
 //Public GFXPlayerMask(1 To numCharacters) As Long
 extern RangeArr<long, 1, numCharacters> GFXPlayerMask;
 //Public GFXPlayerBMP(1 To numCharacters) As StdPicture

@@ -14,6 +14,7 @@ SOURCES += \
     src/change_res.cpp \
     src/collision.cpp \
     src/custom.cpp \
+    src/editor.cpp \
     src/effect.cpp \
     src/frm_main.cpp \
     src/game_main.cpp \
@@ -47,6 +48,7 @@ HEADERS += \
     src/change_res.h \
     src/collision.h \
     src/custom.h \
+    src/editor.h \
     src/effect.h \
     src/frm_main.h \
     src/game_main.h \
