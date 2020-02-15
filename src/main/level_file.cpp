@@ -16,13 +16,13 @@
 void OpenLevel(std::string FilePath)
 {
     std::string newInput = "";
-    int FileRelease = 0;
+//    int FileRelease = 0;
     int A = 0;
     int B = 0;
-    int C = 0;
-    bool tempBool = false;
+//    int C = 0;
+//    bool tempBool = false;
     int mSections = 0;
-    Location_t tempLocation;
+//    Location_t tempLocation;
 
     qScreen = false;
     ClearLevel();
@@ -55,13 +55,13 @@ void OpenLevel(std::string FilePath)
     numWarps = 0;
 
 // Load Custom Stuff
-    if(DirMan::exists(FileNamePath + FileName))
-        FindCustomNPCs(FileNamePath + FileName);
-    else
-        FindCustomNPCs();
+//    if(DirMan::exists(FileNamePath + FileName))
+//        FindCustomNPCs(FileNamePath + FileName);
+//    else
+    FindCustomNPCs();
     LoadCustomGFX();
-    if(DirMan::exists(FileNamePath + FileName))
-        LoadCustomGFX2(FileNamePath + FileName);
+//    if(DirMan::exists(FileNamePath + FileName)) // Useless now
+//        LoadCustomGFX2(FileNamePath + FileName);
 // Blah
 
     if(FilePath == ".lvl" || FilePath == ".lvlx")
@@ -129,7 +129,7 @@ void OpenLevel(std::string FilePath)
         Block[numBlock].Location.Width = b.w;
         Block[numBlock].Type = int(b.id);
         Block[numBlock].DefaultType = Block[numBlock].Type;
-        Block[numBlock].Special = int(b.npc_id);
+        Block[numBlock].Special = int(b.npc_id > 0 ? b.npc_id + 1000 : -1 * b.npc_id);
         if(Block[numBlock].Special == 100)
             Block[numBlock].Special = 1009;
         if(Block[numBlock].Special == 102)
@@ -179,9 +179,10 @@ void OpenLevel(std::string FilePath)
             NPC[numNPCs].Location.Y = NPC[numNPCs].Location.Y - 0.01;
         NPC[numNPCs].Direction = n.direct;
         NPC[numNPCs].Type = int(n.id);
+
         if(NPC[numNPCs].Type == 91 || NPC[numNPCs].Type == 96 || NPC[numNPCs].Type == 283 || NPC[numNPCs].Type == 284)
         {
-            NPC[numNPCs].Special = n.special_data;
+            NPC[numNPCs].Special = n.contents;
             NPC[numNPCs].DefaultSpecial = NPC[numNPCs].Special;
         }
         if(NPC[numNPCs].Type == 288 || NPC[numNPCs].Type == 289 || (NPC[numNPCs].Type == 91 && int(NPC[numNPCs].Special) == 288))
@@ -190,24 +191,24 @@ void OpenLevel(std::string FilePath)
             NPC[numNPCs].DefaultSpecial2 = NPC[numNPCs].Special2;
         }
 
-        if(FileRelease >= 15)
+        if(NPCIsAParaTroopa[NPC[numNPCs].Type] == true)
         {
-            if(NPCIsAParaTroopa[NPC[numNPCs].Type] == true)
-            {
-                NPC[numNPCs].Special = n.special_data;
-                NPC[numNPCs].DefaultSpecial = NPC[numNPCs].Special;
-            }
+            NPC[numNPCs].Special = n.special_data;
+            NPC[numNPCs].DefaultSpecial = NPC[numNPCs].Special;
         }
+
         if(NPCIsCheep[NPC[numNPCs].Type] == true)
         {
             NPC[numNPCs].Special = n.special_data;
             NPC[numNPCs].DefaultSpecial = NPC[numNPCs].Special;
         }
+
         if(NPC[numNPCs].Type == 260)
         {
             NPC[numNPCs].Special = n.special_data;
             NPC[numNPCs].DefaultSpecial = NPC[numNPCs].Special;
         }
+
         NPC[numNPCs].Generator = n.generator;
         if(NPC[numNPCs].Generator == true)
         {
@@ -246,14 +247,14 @@ void OpenLevel(std::string FilePath)
 
         if(NPC[numNPCs].Type == 97 || NPC[numNPCs].Type == 196)
         {
-            tempBool = false;
+            bool tempBool = false;
             for(B = 1; B <= numStars; B++)
             {
                 if(Star[B].level == FileName && (Star[B].Section == NPC[numNPCs].Section || Star[B].Section == -1))
                     tempBool = true;
             }
 
-            if(tempBool == true)
+            if(tempBool)
             {
                 NPC[numNPCs].Special = 1;
                 NPC[numNPCs].DefaultSpecial = 1;
@@ -578,16 +579,19 @@ void ClearLevel()
     BlocksSorted = true;
     qScreen = false;
     UnloadCustomGFX();
+
     for(A = 1; A <= newEventNum; A++)
     {
         NewEvent[A] = "";
         newEventDelay[A] = 0;
     }
+
     for(A = 0; A <= maxSections; A++)
     {
         AutoX[A] = 0;
         AutoY[A] = 0;
     }
+
     newEventNum = 0;
     for(A = 0; A <= 100; A++)
     {
@@ -599,8 +603,10 @@ void ClearLevel()
             Events[A].level[B].X = -1;
         }
     }
+
     for(A = 0; A <= maxWater; A++)
         Water[A] = blankwater;
+
     numWater = 0;
     Events[0].Name = "Level - Start";
     Events[1].Name = "P Switch - Start";
@@ -618,6 +624,7 @@ void ClearLevel()
     Layer[1].Hidden = true;
     Layer[2].Name = "Spawned NPCs";
     Layer[2].Hidden = false;
+
     for(A = 0; A <= maxLayers; A++)
     {
         if(A > 2)
@@ -650,12 +657,15 @@ void ClearLevel()
 
     for(A = -128; A <= maxNPCs; A++)
         NPC[A] = blankNPC;
+
     numNPCs = 0;
     for(A = 1; A <= maxBlocks; A++)
         Block[A] = blankBlock;
+
     numBlock = 0;
     for(A = 1; A <= maxBackgrounds; A++)
         Background[A] = BlankBackground;
+
     for(A = 0; A <= maxSections; A++)
     {
         Background2[A] = 0;
@@ -669,8 +679,10 @@ void ClearLevel()
         OffScreenExit[A] = false;
         CustomMusic[A] = "";
     }
+
     for(A = 1; A <= numWarps; A++)
         Warp[A] = blankWarp;
+
     numEffects = 0;
     numBackground = 0;
     PlayerStart[1] = BlankLocation;

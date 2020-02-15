@@ -4,14 +4,15 @@
 #include <string>
 
 // Public Sub SaveNPCDefaults()
-
 void SaveNPCDefaults();
+
 // Public Sub LoadNPCDefaults()
-
 void LoadNPCDefaults();
-// Public Sub FindCustomNPCs(Optional cFilePath As String = "")
 
-void FindCustomNPCs(std::string cFilePath = "");
+// Public Sub FindCustomNPCs(Optional cFilePath As String = "")
+//void FindCustomNPCs(std::string cFilePath = "");
+void FindCustomNPCs();
+
 // Private Sub LoadCustomNPC(A As Integer, cFileName As String)
 
 

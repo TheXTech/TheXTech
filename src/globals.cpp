@@ -154,7 +154,7 @@ RangeArr<int, 0, maxNPCType> NPCFrame;
 RangeArr<int, 0, maxNPCType> NPCFrameSpeed;
 RangeArr<int, 0, maxNPCType> NPCFrameStyle;
 
-NPCDefaults npcDefaults;
+NPCDefaults_t NPCDefaults;
 
 RangeArr<bool, 0, maxBlockType> BlockIsSizable;
 RangeArr<int, 0, maxBlockType> BlockSlope;

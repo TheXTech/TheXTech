@@ -1355,7 +1355,7 @@ extern RangeArr<int, 0, maxNPCType> NPCFrameSpeed;
 extern RangeArr<int, 0, maxNPCType> NPCFrameStyle;
 
 //Public Type NPCDefaults 'Default NPC Settings
-struct NPCDefaults
+struct NPCDefaults_t
 {
 //    NPCFrameOffsetX(0 To maxNPCType) As Integer
     RangeArr<int, 0, maxNPCType> NPCFrameOffsetX;
@@ -1434,7 +1434,7 @@ struct NPCDefaults
 //End Type
 };
 //Public NPCDefaults As NPCDefaults
-extern NPCDefaults npcDefaults;
+extern NPCDefaults_t NPCDefaults;
 
 //Public BlockIsSizable(0 To maxBlockType) As Boolean 'Flags block if it is sizable
 extern RangeArr<bool, 0, maxBlockType> BlockIsSizable;

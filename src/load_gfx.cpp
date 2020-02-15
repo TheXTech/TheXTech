@@ -436,7 +436,7 @@ void UnloadGFX()
     frmMain.clearAllTextures();
 }
 
-static void getExistingFiles(std::set<std::string> &existingFiles)
+static SDL_INLINE void getExistingFiles(std::set<std::string> &existingFiles)
 {
     DirMan searchDir(FileNamePath);
     std::vector<std::string> files;
@@ -561,10 +561,7 @@ void UnloadCustomGFX()
     restoreLevelBackupTextures();
 }
 
-void LoadCustomGFX2(std::string /*GFXFilePath*/)
-{
-    // Useless now
-}
+
 
 void LoadWorldCustomGFX()
 {

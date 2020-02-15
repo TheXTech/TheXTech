@@ -143,7 +143,7 @@ void LoadGame()
         A++;
     }
 
-    numStars = int(sav.totalStars);
+    numStars = int(sav.gottenStars.size());
 
     for(A = 1; A <= numPlayers; A++)
         Player[A] = SavedChar[Player[A].Character];

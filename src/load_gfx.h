@@ -12,7 +12,7 @@ void LoadCustomGFX();
 // Public Sub UnloadCustomGFX()
 void UnloadCustomGFX();
 // Public Sub LoadCustomGFX2(GFXFilePath As String)
-void LoadCustomGFX2(std::string GFXFilePath);
+//void LoadCustomGFX2(std::string GFXFilePath);
 // Public Sub LoadWorldCustomGFX()
 void LoadWorldCustomGFX();
 // Public Sub UnloadWorldCustomGFX()
