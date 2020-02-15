@@ -31,21 +31,21 @@ void SaveGame()
 
 //    Open SelectWorld[selWorld].WorldPath + "save" + selSave + ".sav" For Output As #1;
     sav.lives = Lives;
-    sav.coins = Coins;
+    sav.coins = uint32_t(Coins);
     sav.worldPosX = WorldPlayer[1].Location.X;
     sav.worldPosY = WorldPlayer[1].Location.Y;
 
     for(A = 1; A <= 5; A++)
     {
         saveCharState c;
-        c.state = SavedChar[A].State;
-        c.itemID = SavedChar[A].HeldBonus;
-        c.mountID = SavedChar[A].Mount;
-        c.mountType = SavedChar[A].MountType;
-        c.health = SavedChar[A].Hearts;
+        c.state = uint32_t(SavedChar[A].State);
+        c.itemID = uint32_t(SavedChar[A].HeldBonus);
+        c.mountID = uint32_t(SavedChar[A].Mount);
+        c.mountType = uint32_t(SavedChar[A].MountType);
+        c.health = uint32_t(SavedChar[A].Hearts);
         sav.characterStates.push_back(c);
     }
-    sav.musicID = curWorldMusic;
+    sav.musicID = uint32_t(curWorldMusic);
 
     // ABOVE GETS SKIPPED BY FINDSAVES
     sav.gameCompleted = BeatTheGame; // Can only get 99% until you finish the game;
@@ -62,7 +62,7 @@ void SaveGame()
     for(A = 1; A <= numStars; A++)
         sav.gottenStars.push_back({Star[A].level, Star[A].Section});
 
-    sav.totalStars = MaxWorldStars;
+    sav.totalStars = uint32_t(MaxWorldStars);
 
     FileFormats::WriteExtendedSaveFileF(savePath, sav);
 }
@@ -94,20 +94,22 @@ void LoadGame()
     }
 
     Lives = sav.lives;
-    Coins = sav.coins;
+    Coins = int(sav.coins);
     WorldPlayer[1].Location.X = sav.worldPosX;
     WorldPlayer[1].Location.Y = sav.worldPosY;
+
+    curWorldMusic = int(sav.musicID);
 
     for(A = 1, i = 0; A <= 5; A++, i++)
     {
         if(i < sav.characterStates.size())
         {
             auto &s = sav.characterStates[i];
-            SavedChar[A].State = s.state;
-            SavedChar[A].HeldBonus = s.itemID;
-            SavedChar[A].Mount = s.mountID;
-            SavedChar[A].MountType = s.mountType;
-            SavedChar[A].Hearts = s.health;
+            SavedChar[A].State = int(s.state);
+            SavedChar[A].HeldBonus = int(s.itemID);
+            SavedChar[A].Mount = int(s.mountID);
+            SavedChar[A].MountType = int(s.mountType);
+            SavedChar[A].Hearts = int(s.health);
             SavedChar[A].Character = A;
         }
     }
@@ -141,7 +143,7 @@ void LoadGame()
         A++;
     }
 
-    numStars = sav.totalStars;
+    numStars = int(sav.totalStars);
 
     for(A = 1; A <= numPlayers; A++)
         Player[A] = SavedChar[Player[A].Character];
