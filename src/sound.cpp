@@ -233,8 +233,8 @@ void StartMusic(int A)
     {
         StopMusic();
         curMusic = bgMusic[A];
-        std::string mus = fmt::format_ne("music{0}", A);
-        if(bgMusic[A] == g_customLvlMusicId)
+        std::string mus = fmt::format_ne("music{0}", curMusic);
+        if(curMusic == g_customLvlMusicId)
         {
             pLogDebug("Starting custom music [%s]", CustomMusic[A].c_str());
             if(g_curMusic)

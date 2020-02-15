@@ -145,7 +145,7 @@ static void restoreLevelBackupTextures()
 
 static void restoreWorldBackupTextures()
 {
-    for(auto &t : g_defaultLevelGfxBackup)
+    for(auto &t : g_defaultWorldGfxBackup)
     {
         if(t.remote_width)
             *t.remote_width = t.width;
@@ -157,7 +157,7 @@ static void restoreWorldBackupTextures()
         frmMain.deleteTexture(*t.remote_texture);
         *t.remote_texture = t.texture;
     }
-    g_defaultLevelGfxBackup.clear();
+    g_defaultWorldGfxBackup.clear();
 }
 
 
