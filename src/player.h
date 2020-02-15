@@ -68,7 +68,7 @@ void ClownCar();
 // Private Sub PlayerCollide(A As Integer)
 
 // Public Sub PlayerGrabCode(A As Integer, Optional DontResetGrabTime As Boolean = False)
-void PlayerGrabCode(int A, bool DontResetGrabTime);
+void PlayerGrabCode(int A, bool DontResetGrabTime = false);
 // Public Sub LinkFrame(A As Integer)
 void LinkFrame(int A);
 // Private Sub PlayerEffects(A As Integer)

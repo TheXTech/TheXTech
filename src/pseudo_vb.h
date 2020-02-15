@@ -15,6 +15,7 @@
 #define CSng(x) static_cast<float>(x)
 #define CBool(x) static_cast<bool>(x)
 #define CInt(x) static_cast<int>(x)
+#define Abs(x) std::abs(x)
 
 const SDL_Scancode vbKeyEscape = SDL_SCANCODE_ESCAPE;
 const SDL_Scancode vbKeySpace = SDL_SCANCODE_SPACE;

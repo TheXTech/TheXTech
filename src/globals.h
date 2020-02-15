@@ -762,7 +762,7 @@ struct Effect_t
 //    Frame As Integer
     int Frame = 0;
 //    FrameCount As Single
-    float FrameCount = 0.0f;
+    int FrameCount = 0;
 //    Life As Integer 'timer before the effect disappears
     int Life = 0;
 //    NewNpc As Integer 'when an effect should create and NPC, such as Yoshi
@@ -836,6 +836,7 @@ struct Warp_t
 //    NoYoshi As Boolean 'don't allow yoshi
     bool NoYoshi = false;
 //    Layer As String 'the name of the layer
+    std::string Layer;
 //    Hidden As Boolean 'if the layer is hidden
     bool Hidden = false;
 //    PlacedEnt As Boolean 'for the editor, flags the entranced as placed
@@ -1818,7 +1819,8 @@ extern bool GrabAll;
 extern bool Cheater;
 //'--------------------------------
 //Public WorldCredits(1 To 5) As String
-extern RangeArr<std::string, 1, 5> WorldCredits;
+const int maxWorldCredits = 100;
+extern RangeArr<std::string, 1, maxWorldCredits> WorldCredits;
 //Public Score As Long 'player's score
 extern int Score;
 //Public Points(1 To 13) As Integer

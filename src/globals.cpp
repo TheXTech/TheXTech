@@ -287,7 +287,7 @@ bool MaxFPS = false;
 bool GodMode = false;
 bool GrabAll = false;
 bool Cheater = false;
-RangeArr<std::string, 1, 5> WorldCredits;
+RangeArr<std::string, 1, maxWorldCredits> WorldCredits;
 int Score = 0;
 RangeArr<int, 1, 13> Points;
 int oldJumpJoy = 0;
@@ -467,4 +467,41 @@ const char *getKeyName(int key)
         return " ... ";
     SDL_Scancode k = static_cast<SDL_Scancode>(key);
     return SDL_GetScancodeName(k);
+}
+
+
+void initAll()
+{
+    SavedEvents.fill(std::string());
+    BlockSwitch.fill(false);
+    PowerUpUnlock.fill(false);
+    conKeyboard.fill(ConKeyboard_t());
+    conJoystick.fill(ConJoystick_t());
+    useJoystick.fill(0);
+    testPlayer.fill(Player_t());
+    SelectWorld.fill(SelectWorld_t());
+    vScreen.fill(vScreen_t());
+    PlayerStart.fill(Location_t());
+    blockCharacter.fill(false);
+    OwedMount.fill(0);
+    OwedMountType.fill(0);
+    AutoX.fill(0.f);
+    AutoY.fill(0.f);
+    Water.fill(Water_t());
+    Star.fill(Star_t());
+    FirstBlock.fill(0);
+    LastBlock.fill(0);
+    iBlock.fill(0);
+    CustomMusic.fill(std::string());
+    level.fill(Location_t());
+    LevelWrap.fill(false);
+    OffScreenExit.fill(false);
+    bgMusic.fill(0);
+    bgMusicREAL.fill(0);
+    Background2REAL.fill(0);
+    Background2.fill(0);
+
+    Block.fill(Block_t());
+    Background.fill(Background_t());
+    NPC.fill(NPC_t());
 }

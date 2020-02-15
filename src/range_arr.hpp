@@ -20,13 +20,21 @@ public:
 
     RangeArr(const RangeArr &o)
     {
-        std::memcpy(array, o.array, o.size);
+        for(size_t i = 0; i < size; i++)
+            array[i] = o.array[i];
     }
 
     RangeArr& operator=(const RangeArr &o)
     {
-        std::memcpy(array, o.array, o.size);
+        for(size_t i = 0; i < size; i++)
+            array[i] = o.array[i];
         return *this;
+    }
+
+    void fill(const T &o)
+    {
+        for(size_t i = 0; i < size; i++)
+            array[i] = o;
     }
 
     T& operator[](long index)

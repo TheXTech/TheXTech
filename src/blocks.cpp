@@ -1340,6 +1340,7 @@ void BlockFrames()
     int A = 0;
 
     RangeArr<bool, 0, 5> pChar;
+    pChar.fill(false);
 
     bool tempBool = false;
     if(FreezeNPCs == true)

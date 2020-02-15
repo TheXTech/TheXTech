@@ -1,12 +1,209 @@
 #include "../globals.h"
 #include "../game_main.h"
+#include "../joystick.h"
+#include "../npc.h"
+#include "../blocks.h"
+#include "../effect.h"
+#include "../player.h"
+#include "../graphics.h"
+#include "../sound.h"
 
 void OutroLoop()
 {
+    Controls_t blankControls;
+    int A = 0;
+    int B = 0;
+    Location_t tempLocation;
+    bool jumpBool = false;
+    long long fBlock = 0;
+    long long lBlock = 0;
+    UpdateControls();
+
+    for(A = 1; A <= numPlayers; A++)
+    {
+        Player[A].Controls = blankControls;
+        Player[A].Controls.Left = true;
+        jumpBool = true;
+        tempLocation = Player[A].Location;
+        tempLocation = Player[A].Location;
+        tempLocation.SpeedX = 0;
+        tempLocation.SpeedY = 0;
+        tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height - 8;
+        tempLocation.Height = 16;
+        tempLocation.Width = 16;
+        if(Player[A].Location.SpeedX > 0)
+            tempLocation.X = Player[A].Location.X + Player[A].Location.Width + 20;
+        else
+            tempLocation.X = Player[A].Location.X - tempLocation.Width - 20;
+        fBlock = FirstBlock[(tempLocation.X / 32) - 1];
+        lBlock = LastBlock[((tempLocation.X + tempLocation.Width) / 32.0) + 1];
+        for(B = (int)fBlock; B <= lBlock; B++)
+        {
+            if(tempLocation.X + tempLocation.Width >= Block[B].Location.X)
+            {
+                if(tempLocation.X <= Block[B].Location.X + Block[B].Location.Width)
+                {
+                    if(tempLocation.Y + tempLocation.Height >= Block[B].Location.Y)
+                    {
+                        if(tempLocation.Y <= Block[B].Location.Y + Block[B].Location.Height)
+                        {
+                            if(BlockNoClipping[Block[B].Type] == false && Block[B].Invis == false && Block[B].Hidden == false && !(BlockIsSizable[Block[B].Type] && Block[B].Location.Y < Player[A].Location.Y + Player[A].Location.Height - 3))
+                                jumpBool = false;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if(BlocksSorted == true)
+                    break;
+            }
+        }
+        if(jumpBool == true || Player[A].Jump > 0)
+            Player[A].Controls.Jump = true;
+    }
+    UpdateNPCs();
+    UpdateBlocks();
+    UpdateEffects();
+    UpdatePlayer();
+    UpdateGraphics();
+    UpdateSound();
 
 }
 
 void SetupCredits()
 {
+    int A = 0;
+    numCredits = 0;
 
+    AddCredit("A2xTech");
+    AddCredit("");
+    AddCredit("");
+    AddCredit("");
+    AddCredit("");
+    AddCredit("");
+    AddCredit("VB6 SMBX By:");
+    AddCredit("");
+    AddCredit("Andrew Spinks");
+    AddCredit("'Redigit'");
+    AddCredit("");
+    AddCredit("");
+    AddCredit("C++ A2xTech port By:");
+    AddCredit("");
+    AddCredit("Vitaly Novichkov");
+    AddCredit("'Wohlstand'");
+    AddCredit("");
+    AddCredit("");
+
+    if(!WorldCredits[1].empty())
+    {
+        AddCredit("Level Design:");
+        AddCredit("");
+        for(A = 1; A <= maxWorldCredits; A++)
+        {
+            if(WorldCredits[A].empty())
+                break;
+            AddCredit(WorldCredits[A]);
+        }
+        AddCredit("");
+        AddCredit("");
+        AddCredit("");
+    }
+
+    AddCredit("");
+    AddCredit("");
+    AddCredit("");
+    AddCredit("Custom Sprites:");
+    AddCredit("");
+    AddCredit("Blue");
+    AddCredit("Iceman404");
+    AddCredit("LuigiFan");
+    AddCredit("NameUser");
+    AddCredit("Redigit");
+    AddCredit("Valtteri");
+    AddCredit("");
+    AddCredit("");
+    AddCredit("");
+    AddCredit("Special Thanks:");
+    AddCredit("");
+    AddCredit("Kevsoft");
+    AddCredit("Rednaxela");
+    AddCredit("Aero");
+    AddCredit("Kley");
+    AddCredit("ShadowYoshi (Joey)");
+    AddCredit("");
+    AddCredit("4matsy");
+    AddCredit("AndyDark");
+    AddCredit("Bikcmp");
+    AddCredit("Blue");
+    AddCredit("Captain Obvious");
+    AddCredit("CaptainTrek");
+    AddCredit("Chase");
+    AddCredit("Coldwin");
+    AddCredit("CrystalMike");
+    AddCredit("DarkMatt");
+    AddCredit("FallingSnow");
+    AddCredit("Garro");
+    AddCredit("Knuckles96");
+    AddCredit("Kuribo");
+    AddCredit("Kyasarin");
+    AddCredit("Luminous");
+    AddCredit("m4sterbr0s");
+    AddCredit("NameUser");
+    AddCredit("Namyrr");
+    AddCredit("Qig");
+    AddCredit("Quill");
+    AddCredit("Red_Yoshi");
+    AddCredit("Spitfire");
+    AddCredit("Valtteri");
+    AddCredit("Vandarx");
+    AddCredit("Zephyr");
+    AddCredit("");
+    AddCredit("");
+    AddCredit("");
+    AddCredit("");
+    AddCredit("");
+    AddCredit("");
+    AddCredit("");
+    AddCredit("");
+    AddCredit("");
+    AddCredit("");
+    AddCredit("");
+    AddCredit("");
+    AddCredit("");
+    AddCredit("");
+    AddCredit("");
+    AddCredit("");
+    AddCredit("'He has delivered us from the power");
+    AddCredit("of darkness and conveyed us into");
+    AddCredit("the kingdom of the Son of His love.'");
+    AddCredit("");
+    AddCredit("Colossians 1:13");
+    AddCredit("");
+    AddCredit("");
+    AddCredit("");
+    AddCredit("");
+    AddCredit("");
+    AddCredit("");
+    AddCredit("");
+    AddCredit("");
+    AddCredit("");
+    AddCredit("");
+    AddCredit("");
+    AddCredit("");
+    AddCredit("");
+    AddCredit("");
+    AddCredit("");
+    AddCredit("");
+    AddCredit("");
+    AddCredit("");
+    AddCredit("wohlsoft.ru");
+
+    for(A = 1; A <= numCredits; A++)
+    {
+        Credit[A].Location.Width = Credit[A].Text.size() * 18;
+        Credit[A].Location.Height = 16;
+        Credit[A].Location.X = 400 - Credit[A].Location.Width / 2.0;
+        Credit[A].Location.Y = 640 + 32 * A;
+    }
 }

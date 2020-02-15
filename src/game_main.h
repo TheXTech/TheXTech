@@ -7,6 +7,8 @@ bool FileExists(const std::string &fileName);
 
 void SetupPhysics();
 
+void initAll();
+
 int GameMain(int argc, char**argv);
 //! Set up object sizes and frame offsets for blocks/npcs/effects
 void SetupVars();

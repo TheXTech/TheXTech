@@ -31,15 +31,15 @@ static std::string SfxRoot;
 struct Music_t
 {
     std::string path;
-    int volume = 0;
+    int volume = 52;
 };
 
 struct SFX_t
 {
     std::string path;
     Mix_Chunk *chunk = nullptr;
-    int volume = 0;
-    int channel = 0;
+    int volume = 128;
+    int channel = -1;
 };
 
 static std::unordered_map<std::string, Music_t> music;
@@ -116,6 +116,7 @@ static void AddSfx(IniProcessing &ini, std::string alias, std::string group)
         m.volume = 128;
         pLogDebug("Adding SFX [%s] '%s'", alias.c_str(), m.path.c_str());
         m.chunk = Mix_LoadWAV(m.path.c_str());
+        m.channel = -1;
         if(m.chunk)
         {
             bool isSingleChannel = false;

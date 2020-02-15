@@ -138,11 +138,11 @@ void UpdateGraphics2()
 
 //    if(WorldEditor == true)
 //    {
-//        BitBlt myBackBuffer, 0, 0, ScreenW, ScreenH, 0, 0, 0, vbWhiteness;
+//        frmMain.renderTexture(0, 0, ScreenW, ScreenH, 0, 0, 0);
 //    }
 //    else
 //    {
-//        BitBlt myBackBuffer, 0, 0, ScreenW, ScreenH, 0, 0, 0, vbWhiteness;
+//        frmMain.renderTexture(0, 0, ScreenW, ScreenH, 0, 0, 0);
 //    }
     frmMain.clearBuffer();
 
@@ -205,7 +205,7 @@ void UpdateGraphics2()
         {
             if(vScreenCollision2(1, Tile[A].Location) == true)
             {
-//                BitBlt myBackBuffer, vScreenX[Z] + Tile[A].Location.X, vScreenY[Z] + Tile[A].Location.Y, Tile[A].Location.Width, Tile[A].Location.Height, GFXTile[Tile[A].Type], 0, TileHeight[Tile[A].Type] * TileFrame[Tile[A].Type], vbSrcCopy;
+//                frmMain.renderTexture(vScreenX[Z] + Tile[A].Location.X, vScreenY[Z] + Tile[A].Location.Y, Tile[A].Location.Width, Tile[A].Location.Height, GFXTile[Tile[A].Type], 0, TileHeight[Tile[A].Type] * TileFrame[Tile[A].Type]);
                 frmMain.renderTexture(vScreenX[Z] + Tile[A].Location.X,
                                       vScreenY[Z] + Tile[A].Location.Y,
                                       Tile[A].Location.Width,
@@ -217,8 +217,8 @@ void UpdateGraphics2()
         {
             if(vScreenCollision2(1, Scene[A].Location) == true && Scene[A].Active == true)
             {
-//                BitBlt myBackBuffer, vScreenX[Z] + Scene[A].Location.X, vScreenY[Z] + Scene[A].Location.Y, Scene[A].Location.Width, Scene[A].Location.Height, GFXSceneMask[Scene[A].Type], 0, SceneHeight[Scene[A].Type] * SceneFrame[Scene[A].Type], vbSrcAnd;
-//                BitBlt myBackBuffer, vScreenX[Z] + Scene[A].Location.X, vScreenY[Z] + Scene[A].Location.Y, Scene[A].Location.Width, Scene[A].Location.Height, GFXScene[Scene[A].Type], 0, SceneHeight[Scene[A].Type] * SceneFrame[Scene[A].Type], vbSrcPaint;
+//                frmMain.renderTexture(vScreenX[Z] + Scene[A].Location.X, vScreenY[Z] + Scene[A].Location.Y, Scene[A].Location.Width, Scene[A].Location.Height, GFXSceneMask[Scene[A].Type], 0, SceneHeight[Scene[A].Type] * SceneFrame[Scene[A].Type]);
+//                frmMain.renderTexture(vScreenX[Z] + Scene[A].Location.X, vScreenY[Z] + Scene[A].Location.Y, Scene[A].Location.Width, Scene[A].Location.Height, GFXScene[Scene[A].Type], 0, SceneHeight[Scene[A].Type] * SceneFrame[Scene[A].Type]);
                 frmMain.renderTexture(vScreenX[Z] + Scene[A].Location.X,
                                       vScreenY[Z] + Scene[A].Location.Y,
                                       Scene[A].Location.Width, Scene[A].Location.Height,
@@ -229,8 +229,8 @@ void UpdateGraphics2()
         {
             if(vScreenCollision2(1, WorldPath[A].Location) == true && WorldPath[A].Active == true)
             {
-//                BitBlt myBackBuffer, vScreenX[Z] + WorldPath[A].Location.X, vScreenY[Z] + WorldPath[A].Location.Y, WorldPath[A].Location.Width, WorldPath[A].Location.Height, GFXPathMask[WorldPath[A].Type], 0, 0, vbSrcAnd;
-//                BitBlt myBackBuffer, vScreenX[Z] + WorldPath[A].Location.X, vScreenY[Z] + WorldPath[A].Location.Y, WorldPath[A].Location.Width, WorldPath[A].Location.Height, GFXPath[WorldPath[A].Type], 0, 0, vbSrcPaint;
+//                frmMain.renderTexture(vScreenX[Z] + WorldPath[A].Location.X, vScreenY[Z] + WorldPath[A].Location.Y, WorldPath[A].Location.Width, WorldPath[A].Location.Height, GFXPathMask[WorldPath[A].Type], 0, 0);
+//                frmMain.renderTexture(vScreenX[Z] + WorldPath[A].Location.X, vScreenY[Z] + WorldPath[A].Location.Y, WorldPath[A].Location.Width, WorldPath[A].Location.Height, GFXPath[WorldPath[A].Type], 0, 0);
                 frmMain.renderTexture(vScreenX[Z] + WorldPath[A].Location.X,
                                       vScreenY[Z] + WorldPath[A].Location.Y,
                                       WorldPath[A].Location.Width, WorldPath[A].Location.Height,
@@ -243,8 +243,6 @@ void UpdateGraphics2()
             {
                 if(WorldLevel[A].Path == true)
                 {
-//                    BitBlt myBackBuffer, vScreenX[Z] + WorldLevel[A].Location.X, vScreenY[Z] + WorldLevel[A].Location.Y, WorldLevel[A].Location.Width, WorldLevel[A].Location.Height, GFXLevelMask[0], 0, 0, vbSrcAnd;
-//                    BitBlt myBackBuffer, vScreenX[Z] + WorldLevel[A].Location.X, vScreenY[Z] + WorldLevel[A].Location.Y, WorldLevel[A].Location.Width, WorldLevel[A].Location.Height, GFXLevel[0], 0, 0, vbSrcPaint;
                     frmMain.renderTexture(vScreenX[Z] + WorldLevel[A].Location.X,
                                           vScreenY[Z] + WorldLevel[A].Location.Y,
                                           WorldLevel[A].Location.Width,
@@ -253,8 +251,6 @@ void UpdateGraphics2()
                 }
                 if(WorldLevel[A].Path2 == true)
                 {
-//                    BitBlt myBackBuffer, vScreenX[Z] + WorldLevel[A].Location.X - 16, vScreenY[Z] + 8 + WorldLevel[A].Location.Y, 64, 32, GFXLevelMask[29], 0, 0, vbSrcAnd;
-//                    BitBlt myBackBuffer, vScreenX[Z] + WorldLevel[A].Location.X - 16, vScreenY[Z] + 8 + WorldLevel[A].Location.Y, 64, 32, GFXLevel[29], 0, 0, vbSrcPaint;
                     frmMain.renderTexture(vScreenX[Z] + WorldLevel[A].Location.X - 16,
                                           vScreenY[Z] + 8 + WorldLevel[A].Location.Y,
                                           64, 32,
@@ -262,8 +258,6 @@ void UpdateGraphics2()
                 }
                 if(GFXLevelBig[WorldLevel[A].Type] == true)
                 {
-//                    BitBlt myBackBuffer, vScreenX[Z] + WorldLevel[A].Location.X - (GFXLevelWidth[WorldLevel[A].Type] - 32) / 2.0, vScreenY[Z] + WorldLevel[A].Location.Y - GFXLevelHeight[WorldLevel[A].Type] + 32, GFXLevelWidth[WorldLevel[A].Type], GFXLevelHeight[WorldLevel[A].Type], GFXLevelMask[WorldLevel[A].Type], 0, 32 * LevelFrame[WorldLevel[A].Type], vbSrcAnd;
-//                    BitBlt myBackBuffer, vScreenX[Z] + WorldLevel[A].Location.X - (GFXLevelWidth[WorldLevel[A].Type] - 32) / 2.0, vScreenY[Z] + WorldLevel[A].Location.Y - GFXLevelHeight[WorldLevel[A].Type] + 32, GFXLevelWidth[WorldLevel[A].Type], GFXLevelHeight[WorldLevel[A].Type], GFXLevel[WorldLevel[A].Type], 0, 32 * LevelFrame[WorldLevel[A].Type], vbSrcPaint;
                     frmMain.renderTexture(vScreenX[Z] + WorldLevel[A].Location.X - (GFXLevelWidth[WorldLevel[A].Type] - 32) / 2.0,
                                           vScreenY[Z] + WorldLevel[A].Location.Y - GFXLevelHeight[WorldLevel[A].Type] + 32,
                                           GFXLevelWidth[WorldLevel[A].Type], GFXLevelHeight[WorldLevel[A].Type],
@@ -271,8 +265,6 @@ void UpdateGraphics2()
                 }
                 else
                 {
-//                    BitBlt myBackBuffer, vScreenX[Z] + WorldLevel[A].Location.X, vScreenY[Z] + WorldLevel[A].Location.Y, WorldLevel[A].Location.Width, WorldLevel[A].Location.Height, GFXLevelMask[WorldLevel[A].Type], 0, 32 * LevelFrame[WorldLevel[A].Type], vbSrcAnd;
-//                    BitBlt myBackBuffer, vScreenX[Z] + WorldLevel[A].Location.X, vScreenY[Z] + WorldLevel[A].Location.Y, WorldLevel[A].Location.Width, WorldLevel[A].Location.Height, GFXLevel[WorldLevel[A].Type], 0, 32 * LevelFrame[WorldLevel[A].Type], vbSrcPaint;
                     frmMain.renderTexture(vScreenX[Z] + WorldLevel[A].Location.X,
                                           vScreenY[Z] + WorldLevel[A].Location.Y,
                                           WorldLevel[A].Location.Width, WorldLevel[A].Location.Height,
@@ -376,14 +368,14 @@ void UpdateGraphics2()
             WPHeight = 40;
         else
             WPHeight = 32;
-//        BitBlt myBackBuffer, vScreenX[Z] + WorldPlayer[1].Location.X, vScreenY[Z] + WorldPlayer[1].Location.Y - 10 + WorldPlayer[1].Location.Height - WPHeight, WorldPlayer[1].Location.Width, WPHeight, GFXPlayerMask[WorldPlayer[1].Type], 0, WPHeight * WorldPlayer[1].Frame, vbSrcAnd;
-//        BitBlt myBackBuffer, vScreenX[Z] + WorldPlayer[1].Location.X, vScreenY[Z] + WorldPlayer[1].Location.Y - 10 + WorldPlayer[1].Location.Height - WPHeight, WorldPlayer[1].Location.Width, WPHeight, GFXPlayer[WorldPlayer[1].Type], 0, WPHeight * WorldPlayer[1].Frame, vbSrcPaint;
+//        frmMain.renderTexture(vScreenX[Z] + WorldPlayer[1].Location.X, vScreenY[Z] + WorldPlayer[1].Location.Y - 10 + WorldPlayer[1].Location.Height - WPHeight, WorldPlayer[1].Location.Width, WPHeight, GFXPlayerMask[WorldPlayer[1].Type], 0, WPHeight * WorldPlayer[1].Frame);
+//        frmMain.renderTexture(vScreenX[Z] + WorldPlayer[1].Location.X, vScreenY[Z] + WorldPlayer[1].Location.Y - 10 + WorldPlayer[1].Location.Height - WPHeight, WorldPlayer[1].Location.Width, WPHeight, GFXPlayer[WorldPlayer[1].Type], 0, WPHeight * WorldPlayer[1].Frame);
         frmMain.renderTexture(vScreenX[Z] + WorldPlayer[1].Location.X,
                               vScreenY[Z] + WorldPlayer[1].Location.Y - 10 + WorldPlayer[1].Location.Height - WPHeight,
                               WorldPlayer[1].Location.Width, WPHeight,
                               GFXPlayerBMP[WorldPlayer[1].Type], 0, WPHeight * WorldPlayer[1].Frame);
 
-//        BitBlt myBackBuffer, 0, 0, 800, 130, GFX::Interface(4).hdc, 0, 0, vbSrcCopy;
+//        frmMain.renderTexture(0, 0, 800, 130, GFX.Interface[4], 0, 0);
         frmMain.renderTexture(0, 0, 800, 130, GFX.Interface[4], 0, 0);
         frmMain.renderTexture(0, 534, 800, 66, GFX.Interface[4], 0, 534);
         frmMain.renderTexture(0, 130, 66, 404, GFX.Interface[4], 0, 130);
@@ -553,7 +545,7 @@ void UpdateGraphics2()
         frmMain.renderTexture(32 + (48 * A), 126 - GFX.Interface[3].h, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0);
         frmMain.renderTexture(32 + (48 * A) + 40, 128 - GFX.Interface[3].h, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
 
-        SuperPrint(std::to_string(Lives), 1, 32 + (48 * A) + 62, 112);
+        SuperPrint(std::to_string(int(Lives)), 1, 32 + (48 * A) + 62, 112);
         // Print coins on the screen
         if(Player[1].Character == 5)
         {
@@ -599,8 +591,8 @@ void UpdateGraphics2()
         {
             SuperPrint(std::to_string(PrintFPS), 1, 8, 8);
         }
-//        BitBlt frmMain.hdc, 0, 0, ScreenW, ScreenH, myBackBuffer, 0, 0, vbSrcCopy
-//        StretchBlt frmMain::hdc, 0, 0, frmMain::ScaleWidth, frmMain::ScaleHeight, myBackBuffer, 0, 0, 800, 600, vbSrcCopy;
+
+        frmMain.repaint();
     }
 
     if(TakeScreen)
@@ -2266,7 +2258,7 @@ void UpdateGraphics()
     //                If GamePaused = True Then
                 if(GamePaused)
                 {
-                    if(MessageText == "")
+                    if(MessageText.empty())
                     {
                         X = 0;
                         Y = 0;
@@ -2300,7 +2292,9 @@ void UpdateGraphics()
 
                         SuperText = MessageText;
                         BoxY = 150;
-                        frmMain.renderTexture(400 - GFX.TextBox.w / 2 + X, BoxY + Y + Y, GFX.TextBox.h, 20, GFX.TextBox, 0, 0);
+                        frmMain.renderTexture(400 - GFX.TextBox.w / 2 + X,
+                                              BoxY + Y + Y,
+                                              GFX.TextBox.w, 20, GFX.TextBox, 0, 0);
                         BoxY = BoxY + 10;
                         tempBool = false;
                         do
@@ -2984,17 +2978,16 @@ void UpdateGraphics()
 //            StretchBlt frmLevelWindow.vScreen(Z).hdc, 0, 0, frmLevelWindow.vScreen(Z).ScaleWidth, frmLevelWindow.vScreen(Z).ScaleHeight, myBackBuffer, 0, 0, 800, 600, vbSrcCopy
 //        Else
         { // NOT AN EDITOR!!!
+            if(ScreenShake > 0)
             {
-                if(ScreenShake > 0)
-                {
-                    ScreenShake--;
-                    A = (std::rand() % ScreenShake * 4) - ScreenShake * 2;
-                    B = (std::rand() % ScreenShake * 4) - ScreenShake * 2;
-                    frmMain.offsetViewport(A, B);
-                    if(ScreenShake == 0)
-                        frmMain.offsetViewport(0, 0);
-                }
+                ScreenShake--;
+                A = (std::rand() % ScreenShake * 4) - ScreenShake * 2;
+                B = (std::rand() % ScreenShake * 4) - ScreenShake * 2;
+                frmMain.offsetViewport(A, B);
+                if(ScreenShake == 0)
+                    frmMain.offsetViewport(0, 0);
             }
+            frmMain.repaint();
         }
 //    Next Z
     }
@@ -3041,142 +3034,179 @@ void UpdateGraphics()
 //  Get the screen position
 void GetvScreen(int A)
 {
-//    If ScreenType = 8 Then
-//        If Player(nPlay.MySlot + 1).Mount = 2 Then Player(nPlay.MySlot + 1).Location.Height = 0
-//        vScreenX(1) = -Player(nPlay.MySlot + 1).Location.X + (vScreen(1).Width * 0.5) - Player(nPlay.MySlot + 1).Location.Width / 2
-//        vScreenY(1) = -Player(nPlay.MySlot + 1).Location.Y + (vScreen(1).Height * 0.5) - vScreenYOffset - Player(nPlay.MySlot + 1).Location.Height
-//        vScreenX(1) = vScreenX(1) - vScreen(1).tempX
-//        vScreenY(1) = vScreenY(1) - vScreen(1).TempY
-//        If -vScreenX(1) < level(Player(nPlay.MySlot + 1).Section).X Then vScreenX(1) = -level(Player(nPlay.MySlot + 1).Section).X
-//        If -vScreenX(1) + vScreen(1).Width > level(Player(nPlay.MySlot + 1).Section).Width Then vScreenX(1) = -(level(Player(nPlay.MySlot + 1).Section).Width - vScreen(1).Width)
-//        If -vScreenY(1) < level(Player(nPlay.MySlot + 1).Section).Y Then vScreenY(1) = -level(Player(nPlay.MySlot + 1).Section).Y
-//        If -vScreenY(1) + vScreen(1).Height > level(Player(nPlay.MySlot + 1).Section).Height Then vScreenY(1) = -(level(Player(nPlay.MySlot + 1).Section).Height - vScreen(1).Height)
-//        If vScreen(1).TempDelay > 0 Then
-//            vScreen(1).TempDelay = vScreen(1).TempDelay - 1
-//        Else
-//            If vScreen(1).tempX > 0 Then vScreen(1).tempX = vScreen(1).tempX - 1
-//            If vScreen(1).tempX < 0 Then vScreen(1).tempX = vScreen(1).tempX + 1
-//            If vScreen(1).TempY > 0 Then vScreen(1).TempY = vScreen(1).TempY - 1
-//            If vScreen(1).TempY < 0 Then vScreen(1).TempY = vScreen(1).TempY + 1
-//        End If
-//        If Player(nPlay.MySlot + 1).Mount = 2 Then Player(nPlay.MySlot + 1).Location.Height = 128
-//    Else
-//        If Player(A).Mount = 2 Then Player(A).Location.Height = 0
-//        vScreenX(A) = -Player(A).Location.X + (vScreen(A).Width * 0.5) - Player(A).Location.Width / 2
-//        vScreenY(A) = -Player(A).Location.Y + (vScreen(A).Height * 0.5) - vScreenYOffset - Player(A).Location.Height
-//        vScreenX(A) = vScreenX(A) - vScreen(A).tempX
-//        vScreenY(A) = vScreenY(A) - vScreen(A).TempY
-//        If -vScreenX(A) < level(Player(A).Section).X Then vScreenX(A) = -level(Player(A).Section).X
-//        If -vScreenX(A) + vScreen(A).Width > level(Player(A).Section).Width Then vScreenX(A) = -(level(Player(A).Section).Width - vScreen(A).Width)
-//        If -vScreenY(A) < level(Player(A).Section).Y Then vScreenY(A) = -level(Player(A).Section).Y
-//        If -vScreenY(A) + vScreen(A).Height > level(Player(A).Section).Height Then vScreenY(A) = -(level(Player(A).Section).Height - vScreen(A).Height)
-//        If vScreen(A).TempDelay > 0 Then
-//            vScreen(A).TempDelay = vScreen(A).TempDelay - 1
-//        Else
-//            If vScreen(A).tempX > 0 Then vScreen(A).tempX = vScreen(A).tempX - 1
-//            If vScreen(A).tempX < 0 Then vScreen(A).tempX = vScreen(A).tempX + 1
-//            If vScreen(A).TempY > 0 Then vScreen(A).TempY = vScreen(A).TempY - 1
-//            If vScreen(A).TempY < 0 Then vScreen(A).TempY = vScreen(A).TempY + 1
-//        End If
-//        If Player(A).Mount = 2 Then Player(A).Location.Height = 128
-//    End If
+    // Netplay code, disabled
+//    if(ScreenType == 8)
+//    {
+//        if(Player[nPlay.MySlot + 1].Mount == 2)
+//            Player[nPlay.MySlot + 1].Location.Height = 0;
+//        vScreenX[1] = -Player[nPlay.MySlot + 1].Location.X + (vScreen[1].Width * 0.5) - Player[nPlay.MySlot + 1].Location.Width / 2.0;
+//        vScreenY[1] = -Player[nPlay.MySlot + 1].Location.Y + (vScreen[1].Height * 0.5) - vScreenYOffset - Player[nPlay.MySlot + 1].Location.Height;
+//        vScreenX[1] = vScreenX[1] - vScreen[1].tempX;
+//        vScreenY[1] = vScreenY[1] - vScreen[1].TempY;
+//        if(-vScreenX[1] < level[Player[nPlay.MySlot + 1].Section].X)
+//            vScreenX[1] = -level[Player[nPlay.MySlot + 1].Section].X;
+//        if(-vScreenX[1] + vScreen[1].Width > level[Player[nPlay.MySlot + 1].Section].Width)
+//            vScreenX[1] = -(level[Player[nPlay.MySlot + 1].Section].Width - vScreen[1].Width);
+//        if(-vScreenY[1] < level[Player[nPlay.MySlot + 1].Section].Y)
+//            vScreenY[1] = -level[Player[nPlay.MySlot + 1].Section].Y;
+//        if(-vScreenY[1] + vScreen[1].Height > level[Player[nPlay.MySlot + 1].Section].Height)
+//            vScreenY[1] = -(level[Player[nPlay.MySlot + 1].Section].Height - vScreen[1].Height);
+//        if(vScreen[1].TempDelay > 0)
+//            vScreen[1].TempDelay = vScreen[1].TempDelay - 1;
+//        else
+//        {
+//            if(vScreen[1].tempX > 0)
+//                vScreen[1].tempX = vScreen[1].tempX - 1;
+//            if(vScreen[1].tempX < 0)
+//                vScreen[1].tempX = vScreen[1].tempX + 1;
+//            if(vScreen[1].TempY > 0)
+//                vScreen[1].TempY = vScreen[1].TempY - 1;
+//            if(vScreen[1].TempY < 0)
+//                vScreen[1].TempY = vScreen[1].TempY + 1;
+//        }
+//        if(Player[nPlay.MySlot + 1].Mount == 2)
+//            Player[nPlay.MySlot + 1].Location.Height = 128;
+//    }
+//    else
+    {
+        if(Player[A].Mount == 2)
+            Player[A].Location.Height = 0;
+        vScreenX[A] = -Player[A].Location.X + (vScreen[A].Width * 0.5) - Player[A].Location.Width / 2.0;
+        vScreenY[A] = -Player[A].Location.Y + (vScreen[A].Height * 0.5) - vScreenYOffset - Player[A].Location.Height;
+        vScreenX[A] = vScreenX[A] - vScreen[A].tempX;
+        vScreenY[A] = vScreenY[A] - vScreen[A].TempY;
+        if(-vScreenX[A] < level[Player[A].Section].X)
+            vScreenX[A] = -level[Player[A].Section].X;
+        if(-vScreenX[A] + vScreen[A].Width > level[Player[A].Section].Width)
+            vScreenX[A] = -(level[Player[A].Section].Width - vScreen[A].Width);
+        if(-vScreenY[A] < level[Player[A].Section].Y)
+            vScreenY[A] = -level[Player[A].Section].Y;
+        if(-vScreenY[A] + vScreen[A].Height > level[Player[A].Section].Height)
+            vScreenY[A] = -(level[Player[A].Section].Height - vScreen[A].Height);
+        if(vScreen[A].TempDelay > 0)
+            vScreen[A].TempDelay = vScreen[A].TempDelay - 1;
+        else
+        {
+            if(vScreen[A].tempX > 0)
+                vScreen[A].tempX = vScreen[A].tempX - 1;
+            if(vScreen[A].tempX < 0)
+                vScreen[A].tempX = vScreen[A].tempX + 1;
+            if(vScreen[A].TempY > 0)
+                vScreen[A].TempY = vScreen[A].TempY - 1;
+            if(vScreen[A].TempY < 0)
+                vScreen[A].TempY = vScreen[A].TempY + 1;
+        }
+        if(Player[A].Mount == 2)
+            Player[A].Location.Height = 128;
+    }
 }
 
 // Get the average screen position for all players
 void GetvScreenAverage()
 {
-//    Dim A As Integer
-//    Dim B As Integer
-//    Dim OldX As Double
-//    Dim OldY As Double
-//    OldX = vScreenX(1)
-//    OldY = vScreenY(1)
-//    vScreenX(1) = 0
-//    vScreenY(1) = 0
-//    For A = 1 To numPlayers
-//        If Player(A).Dead = False And Player(A).Effect <> 6 Then
-//            vScreenX(1) = vScreenX(1) - Player(A).Location.X - Player(A).Location.Width / 2
-//            If Player(A).Mount = 2 Then
-//                vScreenY(1) = vScreenY(1) - Player(A).Location.Y
-//            Else
-//                vScreenY(1) = vScreenY(1) - Player(A).Location.Y - Player(A).Location.Height
-//            End If
-//            B = B + 1
-//        End If
-//    Next A
-//    A = 1
-//    If B = 0 Then
-//        If GameMenu = True Then
-//            vScreenX(1) = -level(0).X
-//            B = 1
-//        Else
-//            Exit Sub
-//        End If
-//    End If
-//    vScreenX(1) = (vScreenX(1) / B) + (ScreenW * 0.5)
-//    vScreenY(1) = (vScreenY(1) / B) + (ScreenH * 0.5) - vScreenYOffset
-//    If -vScreenX(A) < level(Player(1).Section).X Then vScreenX(A) = -level(Player(1).Section).X
-//    If -vScreenX(A) + ScreenW > level(Player(1).Section).Width Then vScreenX(A) = -(level(Player(1).Section).Width - ScreenW)
-//    If -vScreenY(A) < level(Player(1).Section).Y Then vScreenY(A) = -level(Player(1).Section).Y
-//    If -vScreenY(A) + ScreenH > level(Player(1).Section).Height Then vScreenY(A) = -(level(Player(1).Section).Height - ScreenH)
-//    If GameMenu = True Then
-//        If vScreenX(1) > OldX Then
-//            If vScreenX(1) = -level(0).X Then
-//                vScreenX(1) = OldX + 20
-//            Else
-//                vScreenX(1) = OldX
-//            End If
-//        ElseIf vScreenX(1) < OldX - 10 Then
-//            vScreenX(1) = OldX - 10
-//        End If
-//    End If
+    int A = 0;
+    int B = 0;
+    double OldX = 0;
+    double OldY = 0;
+    OldX = vScreenX[1];
+    OldY = vScreenY[1];
+    vScreenX[1] = 0;
+    vScreenY[1] = 0;
+    for(A = 1; A <= numPlayers; A++)
+    {
+        if(Player[A].Dead == false && Player[A].Effect != 6)
+        {
+            vScreenX[1] = vScreenX[1] - Player[A].Location.X - Player[A].Location.Width / 2.0;
+            if(Player[A].Mount == 2)
+                vScreenY[1] = vScreenY[1] - Player[A].Location.Y;
+            else
+                vScreenY[1] = vScreenY[1] - Player[A].Location.Y - Player[A].Location.Height;
+            B = B + 1;
+        }
+    }
+    A = 1;
+    if(B == 0)
+    {
+        if(GameMenu == true)
+        {
+            vScreenX[1] = -level[0].X;
+            B = 1;
+        }
+        else
+            return;
+    }
+    vScreenX[1] = (vScreenX[1] / B) + (ScreenW * 0.5);
+    vScreenY[1] = (vScreenY[1] / B) + (ScreenH * 0.5) - vScreenYOffset;
+    if(-vScreenX[A] < level[Player[1].Section].X)
+        vScreenX[A] = -level[Player[1].Section].X;
+    if(-vScreenX[A] + ScreenW > level[Player[1].Section].Width)
+        vScreenX[A] = -(level[Player[1].Section].Width - ScreenW);
+    if(-vScreenY[A] < level[Player[1].Section].Y)
+        vScreenY[A] = -level[Player[1].Section].Y;
+    if(-vScreenY[A] + ScreenH > level[Player[1].Section].Height)
+        vScreenY[A] = -(level[Player[1].Section].Height - ScreenH);
+    if(GameMenu == true)
+    {
+        if(vScreenX[1] > OldX)
+        {
+            if(vScreenX[1] == -level[0].X)
+                vScreenX[1] = OldX + 20;
+            else
+                vScreenX[1] = OldX;
+        }
+        else if(vScreenX[1] < OldX - 10)
+            vScreenX[1] = OldX - 10;
+    }
 }
 
 // Get the average screen position for all players with no level edge detection
 void GetvScreenAverage2()
 {
-//    Dim A As Integer
-//    Dim B As Integer
-//    vScreenX(1) = 0
-//    vScreenY(1) = 0
-//    For A = 1 To numPlayers
-//        If Player(A).Dead = False Then
-//            vScreenX(1) = vScreenX(1) - Player(A).Location.X - Player(A).Location.Width / 2
-//            If Player(A).Mount = 2 Then
-//                vScreenY(1) = vScreenY(1) - Player(A).Location.Y
-//            Else
-//                vScreenY(1) = vScreenY(1) - Player(A).Location.Y - Player(A).Location.Height
-//            End If
-//            B = B + 1
-//        End If
-//    Next A
-//    A = 1
-//    If B = 0 Then Exit Sub
-//    vScreenX(1) = (vScreenX(1) / B) + (ScreenW * 0.5)
-//    vScreenY(1) = (vScreenY(1) / B) + (ScreenH * 0.5) - vScreenYOffset
+    int A = 0;
+    int B = 0;
+    vScreenX[1] = 0;
+    vScreenY[1] = 0;
+    for(A = 1; A <= numPlayers; A++)
+    {
+        if(Player[A].Dead == false)
+        {
+            vScreenX[1] = vScreenX[1] - Player[A].Location.X - Player[A].Location.Width / 2.0;
+            if(Player[A].Mount == 2)
+                vScreenY[1] = vScreenY[1] - Player[A].Location.Y;
+            else
+                vScreenY[1] = vScreenY[1] - Player[A].Location.Y - Player[A].Location.Height;
+            B = B + 1;
+        }
+    }
+    A = 1;
+    if(B == 0)
+        return;
+    vScreenX[1] = (vScreenX[1] / B) + (ScreenW * 0.5);
+    vScreenY[1] = (vScreenY[1] / B) + (ScreenH * 0.5) - vScreenYOffset;
 }
 
 void SetupGraphics()
 {
     //DUMMY AND USELESS
 
-//    'Creates the back buffer for the main game
-//    'myBackBuffer = CreateCompatibleDC(GetDC(0))
-//    'myBufferBMP = CreateCompatibleBitmap(GetDC(0), screenw, screenh)
-
-//    myBackBuffer = CreateCompatibleDC(frmMain.hdc)
-//    myBufferBMP = CreateCompatibleBitmap(frmMain.hdc, ScreenW, ScreenH)
-//    SelectObject myBackBuffer, myBufferBMP
-//    GFX.Split(2).Width = ScreenW
-//    GFX.Split(2).Height = ScreenH
-//    'GFX.BackgroundColor(1).Width = Screen.Width
-//    'GFX.BackgroundColor(1).Height = Screen.Height
-//    'GFX.BackgroundColor(2).Width = Screen.Width
-//    'GFX.BackgroundColor(2).Height = Screen.Height
+    // Creates the back buffer for the main game
+    // myBackBuffer = CreateCompatibleDC(GetDC(0))
+    // myBufferBMP = CreateCompatibleBitmap(GetDC(0), screenw, screenh)
+//    myBackBuffer = CreateCompatibleDC(frmMain::hdc);
+//    myBufferBMP = CreateCompatibleBitmap(frmMain::hdc, ScreenW, ScreenH);
+//    SelectObject myBackBuffer, myBufferBMP;
+//    GFX.Split(2).Width = ScreenW;
+//    GFX.Split(2).Height = ScreenH;
+    // GFX.BackgroundColor(1).Width = Screen.Width
+    // GFX.BackgroundColor(1).Height = Screen.Height
+    // GFX.BackgroundColor(2).Width = Screen.Width
+    // GFX.BackgroundColor(2).Height = Screen.Height
 }
 
 void SetupEditorGraphics()
 {
+    //DUMMY AND USELESS
+
 //    GFX.Split(1).Width = frmLevelWindow.vScreen(1).Width
 //    GFX.Split(1).Height = frmLevelWindow.vScreen(1).Height
 //    GFX.Split(2).Width = frmLevelWindow.vScreen(1).Width
@@ -3201,16 +3231,14 @@ void SetupScreens()
 {
     switch(ScreenType)
     {
-//    If ScreenType = 0 Then 'Follows Player 1
-    case 0:
+    case 0: // Follows Player 1
         vScreen[1].Height = ScreenH;
         vScreen[1].Width = ScreenW;
         vScreen[1].Left = 0;
         vScreen[1].Top = 0;
         vScreen[2].Visible = False;
         break;
-//    ElseIf ScreenType = 1 Then 'Split Screen vertical
-    case 1:
+    case 1: // Split Screen vertical
         vScreen[1].Height = ScreenH / 2;
         vScreen[1].Width = ScreenW;
         vScreen[1].Left = 0;
@@ -3220,24 +3248,21 @@ void SetupScreens()
         vScreen[2].Left = 0;
         vScreen[2].Top = ScreenH / 2;
         break;
-//    ElseIf ScreenType = 2 Then 'Follows all players
-    case 2:
+    case 2: // Follows all players
         vScreen[1].Height = ScreenH;
         vScreen[1].Width = ScreenW;
         vScreen[1].Left = 0;
         vScreen[1].Top = 0;
         vScreen[2].Visible = False;
         break;
-//    ElseIf ScreenType = 3 Then 'Follows all players. Noone leaves the screen
-    case 3:
+    case 3: // Follows all players. Noone leaves the screen
         vScreen[1].Height = ScreenH;
         vScreen[1].Width = ScreenW;
         vScreen[1].Left = 0;
         vScreen[1].Top = 0;
         vScreen[2].Visible = False;
         break;
-//    ElseIf ScreenType = 4 Then 'Split Screen horizontal
-    case 4:
+    case 4: // Split Screen horizontal
         vScreen[1].Height = ScreenH;
         vScreen[1].Width = ScreenW / 2;
         vScreen[1].Left = 0;
@@ -3247,16 +3272,14 @@ void SetupScreens()
         vScreen[2].Left = ScreenW / 2;
         vScreen[2].Top = 0;
         break;
-//    ElseIf ScreenType = 5 Then 'Dynamic screen detection
-    case 5:
+    case 5: // Dynamic screen detection
         vScreen[1].Height = ScreenH;
         vScreen[1].Width = ScreenW;
         vScreen[1].Left = 0;
         vScreen[1].Top = 0;
         vScreen[2].Visible = False;
         break;
-//    ElseIf ScreenType = 6 Then 'VScreen Coop
-    case 6:
+    case 6: // VScreen Coop
         vScreen[1].Height = ScreenH;
         vScreen[1].Width = ScreenW;
         vScreen[1].Left = 0;
@@ -3266,7 +3289,6 @@ void SetupScreens()
         vScreen[2].Left = 0;
         vScreen[2].Top = 0;
         break;
-//    ElseIf ScreenType = 7 Then
     case 7:
         vScreen[1].Left = 0;
         vScreen[1].Width = 800;
@@ -3274,8 +3296,7 @@ void SetupScreens()
         vScreen[1].Height = 600;
         vScreen[2].Visible = False;
         break;
-//    ElseIf ScreenType = 8 Then 'netplay
-    case 8:
+    case 8: // netplay
         vScreen[1].Left = 0;
         vScreen[1].Width = 800;
         vScreen[1].Top = 0;
@@ -3288,248 +3309,243 @@ void SetupScreens()
 
 void DynamicScreen()
 {
-//    Dim A As Integer
-//    GetvScreenAverage
-//    For A = 1 To numPlayers
-//        If Player(A).Effect = 6 Then Exit Sub
-//    Next A
-//    For A = 1 To numPlayers
-//        If Player(A).Mount = 2 Then Player(A).Location.Height = 0
-//    Next A
-//    If CheckDead = 0 Then
-//        If Player(1).Section = Player(2).Section Then
-//            If level(Player(1).Section).Width - level(Player(1).Section).X > ScreenW And (((vScreen(2).Visible = False And Player(2).Location.X + vScreenX(1) >= ScreenW * 0.75 - Player(2).Location.Width / 2) Or (vScreen(2).Visible = True And Player(2).Location.X + vScreenX(1) >= ScreenW * 0.75 - Player(2).Location.Width / 2)) And (Player(1).Location.X < level(Player(1).Section).Width - ScreenW * 0.75 - Player(1).Location.Width / 2)) Then
-//                vScreen(2).Height = ScreenH
-//                vScreen(2).Width = ScreenW / 2
-//                vScreen(2).Left = ScreenW / 2
-//                vScreen(2).Top = 0
-//                vScreen(1).Height = ScreenH
-//                vScreen(1).Width = ScreenW / 2
-//                vScreen(1).Left = 0
-//                vScreen(1).Top = 0
-//                GetvScreenAverage2
-//                If DScreenType <> 1 Then PlaySound 13
-//                For A = 1 To 2
-//                    vScreen(A).TempDelay = 200
-//                    vScreen(A).tempX = 0
-//                    vScreen(A).TempY = -vScreenY(1) + ScreenH * 0.5 - Player(A).Location.Y - vScreenYOffset - Player(A).Location.Height
-//                Next A
-//                vScreen(2).Visible = True
-//                DScreenType = 1
-//            ElseIf level(Player(1).Section).Width - level(Player(1).Section).X > ScreenW And (((vScreen(2).Visible = False And Player(1).Location.X + vScreenX(1) >= ScreenW * 0.75 - Player(1).Location.Width / 2) Or (vScreen(2).Visible = True And Player(1).Location.X + vScreenX(2) >= ScreenW * 0.75 - Player(1).Location.Width / 2)) And (Player(2).Location.X < level(Player(1).Section).Width - ScreenW * 0.75 - Player(2).Location.Width / 2)) Then
-//                vScreen(1).Height = ScreenH
-//                vScreen(1).Width = ScreenW / 2
-//                vScreen(1).Left = ScreenW / 2
-//                vScreen(1).Top = 0
-//                vScreen(2).Height = ScreenH
-//                vScreen(2).Width = ScreenW / 2
-//                vScreen(2).Left = 0
-//                vScreen(2).Top = 0
-//                GetvScreenAverage2
-//                If DScreenType <> 2 Then PlaySound 13
-//                For A = 1 To 2
-//                    vScreen(A).TempDelay = 200
-//                    vScreen(A).tempX = 0
-//                    vScreen(A).TempY = -vScreenY(1) + ScreenH * 0.5 - Player(A).Location.Y - vScreenYOffset - Player(A).Location.Height
-//                Next A
-//                DScreenType = 2
-//                vScreen(2).Visible = True
-//            ElseIf (level(Player(1).Section).Height - level(Player(1).Section).Y > ScreenH And ((vScreen(2).Visible = False And Player(1).Location.Y + vScreenY(1) >= ScreenH * 0.75 - vScreenYOffset - Player(1).Location.Height) Or (vScreen(2).Visible = True And Player(1).Location.Y + vScreenY(2) >= ScreenH * 0.75 - vScreenYOffset - Player(1).Location.Height)) And (Player(2).Location.Y < level(Player(1).Section).Height - ScreenH * 0.75 - vScreenYOffset - Player(2).Location.Height)) Then
-//                vScreen(1).Height = ScreenH / 2
-//                vScreen(1).Width = ScreenW
-//                vScreen(1).Left = 0
-//                vScreen(1).Top = ScreenH / 2
-//                vScreen(2).Height = ScreenH / 2
-//                vScreen(2).Width = ScreenW
-//                vScreen(2).Left = 0
-//                vScreen(2).Top = 0
-//                GetvScreenAverage2
-//                If DScreenType <> 3 Then PlaySound 13
-//                For A = 1 To 2
-//                    vScreen(A).TempDelay = 200
-//                    vScreen(A).TempY = 0
-//                    vScreen(A).tempX = -vScreenX(1) + ScreenW * 0.5 - Player(A).Location.X - Player(A).Location.Width * 0.5
-//                Next A
-//                vScreen(2).Visible = True
-//                DScreenType = 3
-//            ElseIf (level(Player(1).Section).Height - level(Player(1).Section).Y > ScreenH And ((vScreen(2).Visible = False And Player(2).Location.Y + vScreenY(1) >= ScreenH * 0.75 - vScreenYOffset - Player(2).Location.Height) Or (vScreen(2).Visible = True And Player(2).Location.Y + vScreenY(1) >= ScreenH * 0.75 - vScreenYOffset - Player(2).Location.Height)) And (Player(1).Location.Y < level(Player(1).Section).Height - ScreenH * 0.75 - vScreenYOffset - Player(1).Location.Height)) Then
-//                vScreen(1).Height = ScreenH / 2
-//                vScreen(1).Width = ScreenW
-//                vScreen(1).Left = 0
-//                vScreen(1).Top = 0
-//                vScreen(2).Height = ScreenH / 2
-//                vScreen(2).Width = ScreenW
-//                vScreen(2).Left = 0
-//                vScreen(2).Top = ScreenH / 2
-//                GetvScreenAverage2
-//                If DScreenType <> 4 Then PlaySound 13
-//                For A = 1 To 2
-//                    vScreen(A).TempDelay = 200
-//                    vScreen(A).TempY = 0
-//                    vScreen(A).tempX = -vScreenX(1) + ScreenW * 0.5 - Player(A).Location.X - Player(A).Location.Width * 0.5
-//                Next A
-//                vScreen(2).Visible = True
-//                DScreenType = 4
-//            Else
-//                If vScreen(2).Visible = True Then
-//                    If DScreenType <> 5 Then PlaySound 13
-//                    vScreen(2).Visible = False
-//                    vScreen(1).Height = ScreenH
-//                    vScreen(1).Width = ScreenW
-//                    vScreen(1).Left = 0
-//                    vScreen(1).Top = 0
-//                    vScreen(1).tempX = 0
-//                    vScreen(1).TempY = 0
-//                    vScreen(2).tempX = 0
-//                    vScreen(2).TempY = 0
-//                End If
-//                DScreenType = 5
-//            End If
-//            For A = 1 To 2
-//                If vScreen(A).TempY > (vScreen(A).Height * 0.25) Then vScreen(A).TempY = (vScreen(A).Height * 0.25)
-//                If vScreen(A).TempY < -(vScreen(A).Height * 0.25) Then vScreen(A).TempY = -(vScreen(A).Height * 0.25)
-//                If vScreen(A).tempX > (vScreen(A).Width * 0.25) Then vScreen(A).tempX = (vScreen(A).Width * 0.25)
-//                If vScreen(A).tempX < -(vScreen(A).Width * 0.25) Then vScreen(A).tempX = -(vScreen(A).Width * 0.25)
-//            Next A
-//        Else
-//            vScreen(1).Height = ScreenH / 2
-//            vScreen(1).Width = ScreenW
-//            vScreen(1).Left = 0
-//            vScreen(1).Top = 0
-//            vScreen(2).Height = ScreenH / 2
-//            vScreen(2).Width = ScreenW
-//            vScreen(2).Left = 0
-//            vScreen(2).Top = ScreenH / 2
-//            vScreen(1).tempX = 0
-//            vScreen(1).TempY = 0
-//            vScreen(2).tempX = 0
-//            vScreen(2).TempY = 0
-//            GetvScreenAverage2
-//            If DScreenType <> 6 Then PlaySound 13
-//            DScreenType = 6
-//            vScreen(2).Visible = True
-//        End If
-//    Else
-//        If vScreen(2).Visible = True Then
-//            vScreen(2).Visible = False
-//            vScreen(1).Visible = False
-//            vScreen(1).Height = ScreenH
-//            vScreen(1).Width = ScreenW
-//            vScreen(1).Left = 0
-//            vScreen(1).Top = 0
-//            vScreen(1).Visible = True
-//            vScreen(1).tempX = 0
-//            vScreen(1).TempY = 0
-//            vScreen(2).tempX = 0
-//            vScreen(2).TempY = 0
-//        End If
-//    End If
-//    For A = 1 To numPlayers
-//        If Player(A).Mount = 2 Then Player(A).Location.Height = 128
-//    Next A
+    int A = 0;
+    GetvScreenAverage();
+
+    for(A = 1; A <= numPlayers; A++)
+    {
+        if(Player[A].Effect == 6)
+            return;
+    }
+
+    for(A = 1; A <= numPlayers; A++)
+    {
+        if(Player[A].Mount == 2)
+            Player[A].Location.Height = 0;
+    }
+
+    if(CheckDead() == 0)
+    {
+        if(Player[1].Section == Player[2].Section)
+        {
+            if(level[Player[1].Section].Width - level[Player[1].Section].X > ScreenW && (((vScreen[2].Visible == false && Player[2].Location.X + vScreenX[1] >= ScreenW * 0.75 - Player[2].Location.Width / 2.0) || (vScreen[2].Visible == true && Player[2].Location.X + vScreenX[1] >= ScreenW * 0.75 - Player[2].Location.Width / 2.0)) && (Player[1].Location.X < level[Player[1].Section].Width - ScreenW * 0.75 - Player[1].Location.Width / 2.0)))
+            {
+                vScreen[2].Height = ScreenH;
+                vScreen[2].Width = ScreenW / 2;
+                vScreen[2].Left = ScreenW / 2.0;
+                vScreen[2].Top = 0;
+                vScreen[1].Height = ScreenH;
+                vScreen[1].Width = ScreenW / 2;
+                vScreen[1].Left = 0;
+                vScreen[1].Top = 0;
+                GetvScreenAverage2();
+                if(DScreenType != 1)
+                    PlaySound(13);
+                for(A = 1; A <= 2; A++)
+                {
+                    vScreen[A].TempDelay = 200;
+                    vScreen[A].tempX = 0;
+                    vScreen[A].TempY = -vScreenY[1] + ScreenH * 0.5 - Player[A].Location.Y - vScreenYOffset - Player[A].Location.Height;
+                }
+                vScreen[2].Visible = true;
+                DScreenType = 1;
+            }
+            else if(level[Player[1].Section].Width - level[Player[1].Section].X > ScreenW && (((vScreen[2].Visible == false && Player[1].Location.X + vScreenX[1] >= ScreenW * 0.75 - Player[1].Location.Width / 2.0) || (vScreen[2].Visible == true && Player[1].Location.X + vScreenX[2] >= ScreenW * 0.75 - Player[1].Location.Width / 2.0)) && (Player[2].Location.X < level[Player[1].Section].Width - ScreenW * 0.75 - Player[2].Location.Width / 2.0)))
+            {
+                vScreen[1].Height = ScreenH;
+                vScreen[1].Width = ScreenW / 2;
+                vScreen[1].Left = ScreenW / 2.0;
+                vScreen[1].Top = 0;
+                vScreen[2].Height = ScreenH;
+                vScreen[2].Width = ScreenW / 2;
+                vScreen[2].Left = 0;
+                vScreen[2].Top = 0;
+                GetvScreenAverage2();
+                if(DScreenType != 2)
+                    PlaySound(13);
+                for(A = 1; A <= 2; A++)
+                {
+                    vScreen[A].TempDelay = 200;
+                    vScreen[A].tempX = 0;
+                    vScreen[A].TempY = -vScreenY[1] + ScreenH * 0.5 - Player[A].Location.Y - vScreenYOffset - Player[A].Location.Height;
+                }
+                DScreenType = 2;
+                vScreen[2].Visible = true;
+            }
+            else if(level[Player[1].Section].Height - level[Player[1].Section].Y > ScreenH && ((vScreen[2].Visible == false && Player[1].Location.Y + vScreenY[1] >= ScreenH * 0.75 - vScreenYOffset - Player[1].Location.Height) || (vScreen[2].Visible == true && Player[1].Location.Y + vScreenY[2] >= ScreenH * 0.75 - vScreenYOffset - Player[1].Location.Height)) && (Player[2].Location.Y < level[Player[1].Section].Height - ScreenH * 0.75 - vScreenYOffset - Player[2].Location.Height))
+            {
+                vScreen[1].Height = ScreenH / 2;
+                vScreen[1].Width = ScreenW;
+                vScreen[1].Left = 0;
+                vScreen[1].Top = ScreenH / 2.0;
+                vScreen[2].Height = ScreenH / 2;
+                vScreen[2].Width = ScreenW;
+                vScreen[2].Left = 0;
+                vScreen[2].Top = 0;
+                GetvScreenAverage2();
+                if(DScreenType != 3)
+                    PlaySound(13);
+                for(A = 1; A <= 2; A++)
+                {
+                    vScreen[A].TempDelay = 200;
+                    vScreen[A].TempY = 0;
+                    vScreen[A].tempX = -vScreenX[1] + ScreenW * 0.5 - Player[A].Location.X - Player[A].Location.Width * 0.5;
+                }
+                vScreen[2].Visible = true;
+                DScreenType = 3;
+            }
+            else if(level[Player[1].Section].Height - level[Player[1].Section].Y > ScreenH && ((vScreen[2].Visible == false && Player[2].Location.Y + vScreenY[1] >= ScreenH * 0.75 - vScreenYOffset - Player[2].Location.Height) || (vScreen[2].Visible == true && Player[2].Location.Y + vScreenY[1] >= ScreenH * 0.75 - vScreenYOffset - Player[2].Location.Height)) && (Player[1].Location.Y < level[Player[1].Section].Height - ScreenH * 0.75 - vScreenYOffset - Player[1].Location.Height))
+            {
+                vScreen[1].Height = ScreenH / 2;
+                vScreen[1].Width = ScreenW;
+                vScreen[1].Left = 0;
+                vScreen[1].Top = 0;
+                vScreen[2].Height = ScreenH / 2;
+                vScreen[2].Width = ScreenW;
+                vScreen[2].Left = 0;
+                vScreen[2].Top = ScreenH / 2.0;
+                GetvScreenAverage2();
+                if(DScreenType != 4)
+                    PlaySound(13);
+                for(A = 1; A <= 2; A++)
+                {
+                    vScreen[A].TempDelay = 200;
+                    vScreen[A].TempY = 0;
+                    vScreen[A].tempX = -vScreenX[1] + ScreenW * 0.5 - Player[A].Location.X - Player[A].Location.Width * 0.5;
+                }
+                vScreen[2].Visible = true;
+                DScreenType = 4;
+            }
+            else
+            {
+                if(vScreen[2].Visible == true)
+                {
+                    if(DScreenType != 5)
+                        PlaySound(13);
+                    vScreen[2].Visible = false;
+                    vScreen[1].Height = ScreenH;
+                    vScreen[1].Width = ScreenW;
+                    vScreen[1].Left = 0;
+                    vScreen[1].Top = 0;
+                    vScreen[1].tempX = 0;
+                    vScreen[1].TempY = 0;
+                    vScreen[2].tempX = 0;
+                    vScreen[2].TempY = 0;
+                }
+                DScreenType = 5;
+            }
+            for(A = 1; A <= 2; A++)
+            {
+                if(vScreen[A].TempY > (vScreen[A].Height * 0.25))
+                    vScreen[A].TempY = (vScreen[A].Height * 0.25);
+                if(vScreen[A].TempY < -(vScreen[A].Height * 0.25))
+                    vScreen[A].TempY = -(vScreen[A].Height * 0.25);
+                if(vScreen[A].tempX > (vScreen[A].Width * 0.25))
+                    vScreen[A].tempX = (vScreen[A].Width * 0.25);
+                if(vScreen[A].tempX < -(vScreen[A].Width * 0.25))
+                    vScreen[A].tempX = -(vScreen[A].Width * 0.25);
+            }
+        }
+        else
+        {
+            vScreen[1].Height = ScreenH / 2;
+            vScreen[1].Width = ScreenW;
+            vScreen[1].Left = 0;
+            vScreen[1].Top = 0;
+            vScreen[2].Height = ScreenH / 2;
+            vScreen[2].Width = ScreenW;
+            vScreen[2].Left = 0;
+            vScreen[2].Top = ScreenH / 2.0;
+            vScreen[1].tempX = 0;
+            vScreen[1].TempY = 0;
+            vScreen[2].tempX = 0;
+            vScreen[2].TempY = 0;
+            GetvScreenAverage2();
+            if(DScreenType != 6)
+                PlaySound(13);
+            DScreenType = 6;
+            vScreen[2].Visible = true;
+        }
+    }
+    else
+    {
+        if(vScreen[2].Visible == true)
+        {
+            vScreen[2].Visible = false;
+            vScreen[1].Visible = false;
+            vScreen[1].Height = ScreenH;
+            vScreen[1].Width = ScreenW;
+            vScreen[1].Left = 0;
+            vScreen[1].Top = 0;
+            vScreen[1].Visible = true;
+            vScreen[1].tempX = 0;
+            vScreen[1].TempY = 0;
+            vScreen[2].tempX = 0;
+            vScreen[2].TempY = 0;
+        }
+    }
+    for(A = 1; A <= numPlayers; A++)
+    {
+        if(Player[A].Mount == 2)
+            Player[A].Location.Height = 128;
+    }
 }
 
 void SuperPrint(std::string SuperWords, int Font, float X, float Y)
 {
-//    On Error Resume Next
-//    Dim A As Integer
-    int A = 0;
-//    Dim B As Integer
+//    int A = 0;
     int B = 0;
-//    Dim C As Integer
     int C = 0;
-//    Dim Words As String
-//    Words = SuperWords
-//    If Font = 1 Then
-    if(Font == 1) {
-//        Do While Len(Words) > 0
+
+    if(Font == 1)
+    {
         for(auto c : SuperWords)
         {
-//            If Left(Words, 1) <> " " Then
-            if(c != ' ' && c >= 0 && c <= 9)
-            {
-//                BitBlt myBackBuffer, X + B, Y, 16, 14, GFX.Font1M(Left(Words, 1)).hdc, 0, 0, vbSrcAnd
-//                BitBlt myBackBuffer, X + B, Y, 16, 14, GFX.Font1(Left(Words, 1)).hdc, 0, 0, vbSrcPaint
-                frmMain.renderTexture(int(X + B), int(Y), 16, 14, GFX.Font1[c], 0, 0);
-//                B = B + 18
-                B += 18;
-//            End If
-            }
-//            Words = Right(Words, Len(Words) - 1)
-//        Loop
+            if(c >= '0' && c <= '9')
+                frmMain.renderTexture(int(X + B), int(Y), 16, 14, GFX.Font1[c - '0'], 0, 0);
+            B += 18;
         }
-//    ElseIf Font = 2 Then
-    } else if(Font == 2) {
-//        Do While Len(Words) > 0
+    }
+    else if(Font == 2)
+    {
         for(auto c : SuperWords)
         {
-//            If Asc(Left(Words, 1)) >= 48 And Asc(Left(Words, 1)) <= 57 Then
             if(c >= 48 && c <= 57) {
-//                C = (Asc(Left(Words, 1)) - 48) * 16
                 C = (c - 48) * 16;
-//                BitBlt myBackBuffer, X + B, Y, 15, 17, GFX.Font2(1).hdc, C, 0, vbSrcAnd
                 frmMain.renderTexture(int(X + B), int(Y), 15, 17, GFX.Font2[1], C, 0);
-//                B = B + 16
                 B += 16;
-//            ElseIf Asc(Left(Words, 1)) >= 65 And Asc(Left(Words, 1)) <= 90 Then
             } else if(c >= 65 && c <= 90) {
-//                C = (Asc(Left(Words, 1)) - 55) * 16
                 C = (c - 55) * 16;
-//                BitBlt myBackBuffer, X + B, Y, 15, 17, GFX.Font2(1).hdc, C, 0, vbSrcAnd
                 frmMain.renderTexture(int(X + B), int(Y), 15, 17, GFX.Font2[1], C, 0);
-//                B = B + 16
                 B += 16;
-//            ElseIf Asc(Left(Words, 1)) >= 97 And Asc(Left(Words, 1)) <= 122 Then
             } else if(c >= 97 && c <= 122) {
-//                C = (Asc(Left(Words, 1)) - 61) * 16
                 C = (c - 61) * 16;
-//                BitBlt myBackBuffer, X + B, Y, 15, 17, GFX.Font2(1).hdc, C, 0, vbSrcAnd
                 frmMain.renderTexture(int(X + B), int(Y), 15, 17, GFX.Font2[1], C, 0);
-//                B = B + 16
                 B += 16;
-//            ElseIf Asc(Left(Words, 1)) >= 33 And Asc(Left(Words, 1)) <= 47 Then
             } else if(c >= 33 && c <= 47) {
-//                C = (Asc(Left(Words, 1)) - 33) * 16
                 C = (c - 33) * 16;
-//                BitBlt myBackBuffer, X + B, Y, 15, 17, GFX.Font2S(1).hdc, C, 0, vbSrcAnd
                 frmMain.renderTexture(int(X + B), int(Y), 15, 17, GFX.Font2S, C, 0);
-//                B = B + 16
                 B += 16;
-//            ElseIf Asc(Left(Words, 1)) >= 58 And Asc(Left(Words, 1)) <= 64 Then
             } else if(c >= 58 && c <= 64) {
-//                C = (Asc(Left(Words, 1)) - 58 + 15) * 16
                 C = (c - 58 + 15) * 16;
-//                BitBlt myBackBuffer, X + B, Y, 15, 17, GFX.Font2S(1).hdc, C, 0, vbSrcAnd
                 frmMain.renderTexture(int(X + B), int(Y), 15, 17, GFX.Font2S, C, 0);
-//                B = B + 16
                 B += 16;
-//            ElseIf Asc(Left(Words, 1)) >= 91 And Asc(Left(Words, 1)) <= 96 Then
             } else if(c >= 91 && c <= 96) {
-//                C = (Asc(Left(Words, 1)) - 91 + 22) * 16
                 C = (c - 91 + 22) * 16;
-//                BitBlt myBackBuffer, X + B, Y, 15, 17, GFX.Font2S(1).hdc, C, 0, vbSrcAnd
                 frmMain.renderTexture(int(X + B), int(Y), 15, 17, GFX.Font2S, C, 0);
-//                B = B + 16
                 B += 16;
-//            ElseIf Asc(Left(Words, 1)) >= 123 And Asc(Left(Words, 1)) <= 125 Then
             } else if(c >= 123 && c <= 125) {
-//                C = (Asc(Left(Words, 1)) - 123 + 28) * 16
                 C = (c - 123 + 28) * 16;
-//                BitBlt myBackBuffer, X + B, Y, 15, 17, GFX.Font2S(1).hdc, C, 0, vbSrcAnd
                 frmMain.renderTexture(int(X + B), int(Y), 15, 17, GFX.Font2S, C, 0);
-//                B = B + 16
                 B += 16;
-//            Else
             } else {
-//                B = B + 16
                 B += 16;
-//            End If
             }
-//            Words = Right(Words, Len(Words) - 1)
-//        Loop
         }
-//    ElseIf Font = 3 Then
-    } else if (Font == 3) {
+
+    }
+    else if (Font == 3)
+    {
         std::string Words = SuperWords;
         std::transform(Words.begin(), Words.end(), Words.begin(), [](unsigned char c){ return std::toupper(c); });
 //        Do While Len(Words) > 0
@@ -3558,7 +3574,9 @@ void SuperPrint(std::string SuperWords, int Font, float X, float Y)
 //        Loop
         }
 //    ElseIf Font = 4 Then
-    } else if(Font == 4) {
+    }
+    else if(Font == 4)
+    {
 //        Do While Len(Words) > 0
         for(auto c : SuperWords)
         {
@@ -3586,15 +3604,9 @@ void SuperPrint(std::string SuperWords, int Font, float X, float Y)
 
 void SetRes()
 {
-//    GetCurrentRes
     GetCurrentRes();
-//    resChanged = True
     resChanged = true;
-//    ChangeRes 800, 600, 16, 60     '800x600 pixels, 16 bit Color, 60Hz
-    ChangeRes(800, 600, 16, 60);
-//    'SetWindowPos frmMain.hWnd, HWND_TOPMOST, 0, 0, 0, 0, FLAGS
-//    Do
-//    Loop Until ShowCursor(0) < 0
+    ChangeRes(800, 600, 16, 60); // 800x600 pixels, 16 bit Color, 60Hz
     ShowCursor(0);
 }
 
@@ -3637,22 +3649,1989 @@ std::string CheckKey(std::string newStrizzle)
 /*Private*/
 void SpecialFrames()
 {
+    SpecialFrameCount[1] = SpecialFrameCount[1] + 1;
+    if(SpecialFrameCount[1] >= 6)
+    {
+        SpecialFrame[1] = SpecialFrame[1] + 1;
+        if(SpecialFrame[1] >= 2)
+            SpecialFrame[1] = 0;
+        SpecialFrameCount[1] = 0;
+    }
+    SpecialFrameCount[2] = SpecialFrameCount[2] + 1;
+    if(SpecialFrameCount[2] >= 3)
+    {
+        SpecialFrame[2] = SpecialFrame[2] + 1;
+        if(SpecialFrame[2] >= 4)
+            SpecialFrame[2] = 0;
+        SpecialFrameCount[2] = 0;
+    }
+    SpecialFrameCount[3] = SpecialFrameCount[3] + 1;
+    if(SpecialFrameCount[3] >= 8)
+    {
+        SpecialFrame[3] = SpecialFrame[3] + 1;
+        if(SpecialFrame[3] >= 4)
+            SpecialFrame[3] = 0;
+        SpecialFrameCount[3] = 0;
+    }
+    SpecialFrameCount[4] = SpecialFrameCount[4] + 1;
+    if(SpecialFrameCount[4] >= 2.475F)
+    {
+        SpecialFrame[4] = SpecialFrame[4] + 1;
+        if(SpecialFrame[4] >= 4)
+            SpecialFrame[4] = 0;
+        SpecialFrameCount[4] = (float)(SpecialFrameCount[4] - 2.475);
+    }
+    SpecialFrameCount[5] = SpecialFrameCount[5] + 1;
+    if(SpecialFrameCount[5] < 20)
+        SpecialFrame[5] = 1;
+    else if(SpecialFrameCount[5] < 25)
+        SpecialFrame[5] = 2;
+    else if(SpecialFrameCount[5] < 30)
+        SpecialFrame[5] = 3;
+    else if(SpecialFrameCount[5] < 35)
+        SpecialFrame[5] = 4;
+    else if(SpecialFrameCount[5] < 40)
+        SpecialFrame[5] = 5;
+    else if(SpecialFrameCount[5] < 45)
+        SpecialFrame[5] = 1;
+    else if(SpecialFrameCount[5] < 50)
+        SpecialFrame[5] = 0;
+    else
+        SpecialFrameCount[5] = 0;
+    SpecialFrameCount[6] = SpecialFrameCount[6] + 1;
+    if(SpecialFrameCount[6] >= 12)
+    {
+        SpecialFrame[6] = SpecialFrame[6] + 1;
+        if(SpecialFrame[6] >= 4)
+            SpecialFrame[6] = 0;
+        SpecialFrameCount[6] = 0;
+    }
+    SpecialFrameCount[7] = SpecialFrameCount[7] + 1;
+    if(SpecialFrameCount[7] < 8)
+        SpecialFrame[7] = 0;
+    else if(SpecialFrameCount[7] < 16)
+        SpecialFrame[7] = 1;
+    else if(SpecialFrameCount[7] < 24)
+        SpecialFrame[7] = 2;
+    else if(SpecialFrameCount[7] < 32)
+        SpecialFrame[7] = 3;
+    else if(SpecialFrameCount[7] < 40)
+        SpecialFrame[7] = 2;
+    else if(SpecialFrameCount[7] < 48)
+        SpecialFrame[7] = 1;
+    else
+        SpecialFrameCount[7] = 0;
+    SpecialFrameCount[8] = SpecialFrameCount[8] + 1;
+    if(SpecialFrameCount[8] >= 8)
+    {
+        SpecialFrame[8] = SpecialFrame[8] + 1;
+        if(SpecialFrame[8] >= 3)
+            SpecialFrame[8] = 0;
+        SpecialFrameCount[8] = 0;
+    }
 
+    SpecialFrameCount[9] = SpecialFrameCount[9] + 1; // Fairy frame
+    if(SpecialFrameCount[9] >= 8)
+    {
+        SpecialFrame[9] = SpecialFrame[9] + 1;
+        if(SpecialFrame[9] >= 2)
+            SpecialFrame[9] = 0;
+        SpecialFrameCount[9] = 0;
+    }
 }
 
 void DrawBackground(int S, int Z)
 {
+    int A = 0;
+    int B = 0;
+    Location_t tempLocation;
+    Location_t tempLevel;
+    tempLevel = level[S];
+    if(LevelEditor == true)
+        LevelREAL[S] = level[S];
+    level[S] = LevelREAL[S];
+    A = 1; // Blocks
+    if(Background2[S] == 1)
+    {
+        int tempVar = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
+        for(B = 0; B <= tempVar; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+            tempLocation.Height = GFXBackground2Height[A];
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            }
+        }
+    }
+    A = 2; // Clouds
+    if(Background2[S] == 1 || Background2[S] == 2 || Background2[S] == 22)
+    {
+        int tempVar2 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.75))) + 1;
+        for(B = 0; B <= tempVar2; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.75);
+            tempLocation.Y = level[S].Height - GFXBackground2Height[A] - ScreenH + 100;
+            tempLocation.Height = GFXBackground2Height[A];
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            }
+        }
+    }
+    if(Background2[S] == 13)
+    {
+
+        int tempVar3 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.75))) + 1;
+        for(B = 0; B <= tempVar3; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.75);
+            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
+            {
+                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
+                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
+                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
+            }
+            else
+                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+            tempLocation.Height = GFXBackground2Height[A];
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            }
+        }
+    }
+    A = 3; // Hills
+    if(Background2[S] == 2)
+    {
+
+        int tempVar4 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
+        for(B = 0; B <= tempVar4; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+            tempLocation.Height = GFXBackground2Height[A];
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            }
+        }
+    }
+    A = 4; // Castle
+    if(Background2[S] == 3)
+    {
+
+        int tempVar5 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 2;
+        for(B = 0; B <= tempVar5; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
+            {
+                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
+                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
+                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
+            }
+            else
+                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+            tempLocation.Height = GFXBackground2Height[A];
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            }
+        }
+    }
+    A = 5; // Pipes
+    if(Background2[S] == 4)
+    {
+
+        int tempVar6 = static_cast<int>(floor(static_cast<double>((level[S].Height - level[S].Y) / GFXBackground2Height[A] * 0.5))) + 1;
+        for(B = 0; B <= tempVar6; B++)
+        {
+            tempLocation.Y = level[S].Y + ((B * GFXBackground2Height[A] - B) - (vScreenY[Z] + vScreen[Z].Top + level[S].Y) * 0.5) - 32;
+            if(level[S].Width - level[S].X > GFXBackground2Width[A])
+            {
+                tempLocation.X = (-vScreenX[Z] - level[S].X) / (level[S].Width - level[S].X - (800 - vScreen[Z].Left)) * (GFXBackground2Width[A] - (800 - vScreen[Z].Left));
+                tempLocation.X = -vScreenX[Z] - tempLocation.X;
+            }
+            else
+                tempLocation.X = level[S].Width - GFXBackground2Width[A];
+            tempLocation.Height = GFXBackground2Height[A];
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            }
+        }
+    }
+    A = 6; // Trees
+    if(Background2[S] == 5)
+    {
+
+        int tempVar7 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
+        for(B = 0; B <= tempVar7; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
+            {
+                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
+                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
+                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
+            }
+            else
+                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+            tempLocation.Height = GFXBackground2Height[A];
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            }
+        }
+    }
+    A = 7; // Bonus
+    if(Background2[S] == 6)
+    {
+
+        int tempVar8 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
+        for(B = 0; B <= tempVar8; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
+            {
+                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
+                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
+                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
+            }
+            else
+                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+            tempLocation.Height = GFXBackground2Height[A];
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            }
+        }
+    }
+    A = 8; // SMB Underground
+    if(Background2[S] == 7)
+    {
+
+        int tempVar9 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
+        for(B = 0; B <= tempVar9; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            tempLocation.Y = level[S].Y - 32;
+            tempLocation.Height = GFXBackground2Height[A];
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            }
+        }
+    }
+    A = 9; // Night
+    if(Background2[S] == 8 || Background2[S] == 9)
+    {
+
+        int tempVar10 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.75))) + 1;
+        for(B = 0; B <= tempVar10; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.75);
+            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
+            {
+                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
+                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
+                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
+            }
+            else
+                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+            tempLocation.Height = GFXBackground2Height[A];
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            }
+        }
+    }
+    A = 10; // Night 2
+    if(Background2[S] == 9)
+    {
+
+        int tempVar11 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
+        for(B = 0; B <= tempVar11; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+            tempLocation.Height = GFXBackground2Height[A];
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            }
+        }
+    }
+    A = 11; // Overworld
+    if(Background2[S] == 10)
+    {
+
+        int tempVar12 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
+        for(B = 0; B <= tempVar12; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
+            {
+                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
+                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
+                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
+            }
+            else
+                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+            tempLocation.Height = GFXBackground2Height[A];
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            }
+        }
+    }
+    A = 12; // SMW Hills
+    if(Background2[S] == 11)
+    {
+
+        int tempVar13 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
+        for(B = 0; B <= tempVar13; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
+            {
+                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
+                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
+                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
+            }
+            else
+                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+            tempLocation.Height = GFXBackground2Height[A];
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            }
+        }
+    }
+    A = 13; // SMW Trees
+    if(Background2[S] == 12)
+    {
+
+        int tempVar14 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
+        for(B = 0; B <= tempVar14; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
+            {
+                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
+                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
+                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
+            }
+            else
+                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+            tempLocation.Height = GFXBackground2Height[A];
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            }
+        }
+    }
+    A = 14; // SMB3 Desert
+    if(Background2[S] == 14)
+    {
+
+        int tempVar15 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
+        for(B = 0; B <= tempVar15; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
+            {
+                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
+                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
+                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
+            }
+            else
+                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+            tempLocation.Height = GFXBackground2Height[A];
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            }
+        }
+    }
+    A = 15; // SMB3 Dungeon
+    if(Background2[S] == 15)
+    {
+
+        int tempVar16 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
+        for(B = 0; B <= tempVar16; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
+            {
+                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
+                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
+                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
+            }
+            else
+                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+            tempLocation.Height = GFXBackground2Height[A];
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            }
+        }
+    }
+    A = 16; // Crateria
+    if(Background2[S] == 16)
+    {
+
+        int tempVar17 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
+        for(B = 0; B <= tempVar17; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
+            {
+                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
+                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
+                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
+            }
+            else
+                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+            tempLocation.Height = GFXBackground2Height[A];
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            }
+        }
+    }
+    A = 17; // smb3 ship
+    if(Background2[S] == 17)
+    {
+
+        int tempVar18 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
+        for(B = 0; B <= tempVar18; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            tempLocation.Y = level[S].Y - 32;
+            tempLocation.Height = GFXBackground2Height[A];
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            }
+        }
+    }
+    A = 18; // SMW ghost house
+    if(Background2[S] == 18)
+    {
+
+        int tempVar19 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
+        for(B = 0; B <= tempVar19; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            if(level[S].Height - level[S].Y > GFXBackground2Height[A] / 4.0)
+            {
+                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - (600 - vScreen(Z).Top)) * (GFXBackground2Height(A) / 4 - (600 - vScreen(Z).Top))
+                // .Y = -vScreenY(Z) - .Y
+                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] / 4.0 - ScreenH) + vScreen[Z].Top;
+                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
+            }
+            else
+                tempLocation.Y = level[S].Height - GFXBackground2Height[A] / 4.0;
+            tempLocation.Height = GFXBackground2Height[A] / 4;
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A] / 4.0, GFXBackground2[A], 0, (GFXBackground2Height[A] / 4.0) * SpecialFrame[3]);
+            }
+        }
+    }
+    A = 19; // smw forest
+    if(Background2[S] == 19)
+    {
+
+        int tempVar20 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
+        for(B = 0; B <= tempVar20; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
+            {
+                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
+                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
+                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
+            }
+            else
+                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+            tempLocation.Height = GFXBackground2Height[A];
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            }
+        }
+    }
+    A = 20; // smb3 forest
+    if(Background2[S] == 20)
+    {
+
+        int tempVar21 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
+        for(B = 0; B <= tempVar21; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
+            {
+                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
+                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
+                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
+            }
+            else
+                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+            tempLocation.Height = GFXBackground2Height[A];
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            }
+        }
+    }
+    A = 21; // smb3 battle game
+    if(Background2[S] == 21)
+    {
+
+        int tempVar22 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
+        for(B = 0; B <= tempVar22; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
+            {
+                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
+                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
+                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
+            }
+            else
+                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+            tempLocation.Height = GFXBackground2Height[A];
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            }
+        }
+    }
+    A = 22; // SMB3 Waterfall
+    if(Background2[S] == 22)
+    {
+
+        int tempVar23 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
+        for(B = 0; B <= tempVar23; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            tempLocation.Y = level[S].Height - GFXBackground2Height[A] / 4.0;
+            tempLocation.Height = GFXBackground2Height[A] / 4;
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A] / 4.0, GFXBackground2[A], 0, (GFXBackground2Height[A] / 4.0) * SpecialFrame[3]);
+            }
+        }
+    }
+    A = 23; // SMB3 Tank
+    if(Background2[S] == 23)
+    {
+
+        int tempVar24 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
+        for(B = 0; B <= tempVar24; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
+            {
+                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
+                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
+                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
+            }
+            else
+                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+            tempLocation.Height = GFXBackground2Height[A];
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            }
+        }
+    }
+    A = 24; // smb3 bowsers castle
+    if(Background2[S] == 24)
+    {
+
+        int tempVar25 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
+        for(B = 0; B <= tempVar25; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            tempLocation.Y = level[S].Y - 32; // Height - GFXBackground2height(a)
+            tempLocation.Height = GFXBackground2Height[A];
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            }
+        }
+    }
+    A = 25; // SMB2 Underground
+    if(Background2[S] == 25)
+    {
+
+        int tempVar26 = static_cast<int>(floor(static_cast<double>((level[S].Height - level[S].Y) / GFXBackground2Height[A] * 0.5))) + 1;
+        for(B = 0; B <= tempVar26; B++)
+        {
+            tempLocation.Y = level[S].Y + ((B * GFXBackground2Height[A] - B) - (vScreenY[Z] + vScreen[Z].Top + level[S].Y) * 0.5) - 32;
+            // .X = Level(S).X
+            if(level[S].Width - level[S].X > GFXBackground2Width[A])
+            {
+                // .X = (-vScreenX(Z) - level(S).X) / (level(S).Width - level(S).X - 800) * (GFXBackground2Width(A) - 800)
+                tempLocation.X = (-vScreenX[Z] - level[S].X) / (level[S].Width - level[S].X - (800 - vScreen[Z].Left)) * (GFXBackground2Width[A] - (800 - vScreen[Z].Left));
+                tempLocation.X = -vScreenX[Z] - tempLocation.X;
+            }
+            else
+                tempLocation.X = level[S].Width - GFXBackground2Width[A];
+            tempLocation.Height = GFXBackground2Height[A];
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            }
+        }
+    }
+    A = 26; // Toad's House
+    if(Background2[S] == 26)
+    {
+
+        int tempVar27 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
+        for(B = 0; B <= tempVar27; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            tempLocation.Y = level[S].Y - 32; // Height - GFXBackground2height(a)
+            tempLocation.Height = GFXBackground2Height[A];
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            }
+        }
+    }
+    A = 27; // SMB3 Castle
+    if(Background2[S] == 27)
+    {
+
+        int tempVar28 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
+        for(B = 0; B <= tempVar28; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
+            {
+                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
+                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
+                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
+            }
+            else
+                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+            tempLocation.Height = GFXBackground2Height[A];
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            }
+        }
+    }
+    A = 28; // SMW Bonus
+    if(Background2[S] == 28)
+    {
+
+        int tempVar29 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 3;
+        for(B = 0; B <= tempVar29; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
+            {
+                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
+                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
+                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
+            }
+            else
+                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+            tempLocation.Height = GFXBackground2Height[A];
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            }
+        }
+    }
+    A = 29; // SMW Night
+    if(Background2[S] == 29)
+    {
+
+        int tempVar30 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
+        for(B = 0; B <= tempVar30; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            if(level[S].Height - level[S].Y > GFXBackground2Height[A] / 4.0)
+            {
+                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - (600 - vScreen(Z).Top)) * (GFXBackground2Height(A) / 4 - (600 - vScreen(Z).Top))
+                // .Y = -vScreenY(Z) - .Y
+                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] / 4.0 - ScreenH) + vScreen[Z].Top;
+                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
+            }
+            else
+                tempLocation.Y = level[S].Height - GFXBackground2Height[A] / 4.0;
+            tempLocation.Height = GFXBackground2Height[A] / 4;
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A] / 4.0, GFXBackground2[A], 0, (GFXBackground2Height[A] / 4.0) * SpecialFrame[6]);
+            }
+        }
+    }
+    A = 30; // SMW Cave
+    if(Background2[S] == 30)
+    {
+
+        int tempVar31 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
+        for(B = 0; B <= tempVar31; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            if(level[S].Height - level[S].Y > GFXBackground2Height[A] / 4.0)
+            {
+                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - (600 - vScreen(Z).Top)) * (GFXBackground2Height(A) / 4 - (600 - vScreen(Z).Top))
+                // .Y = -vScreenY(Z) - .Y
+                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] / 4.0 - ScreenH) + vScreen[Z].Top;
+                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
+            }
+            else
+                tempLocation.Y = level[S].Height - GFXBackground2Height[A] / 4.0;
+            tempLocation.Height = GFXBackground2Height[A] / 4;
+            tempLocation.Width = GFXBackground2Width[A];
+
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A] / 4.0, GFXBackground2[A], 0, (GFXBackground2Height[A] / 4.0) * SpecialFrame[3]);
+            }
+
+
+        }
+    }
+    A = 31; // SMW Hills 2
+    if(Background2[S] == 31)
+    {
+
+        int tempVar32 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
+        for(B = 0; B <= tempVar32; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
+            {
+                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
+                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
+                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
+            }
+            else
+                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+            tempLocation.Height = GFXBackground2Height[A];
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            }
+        }
+    }
+    A = 32; // SMW Clouds
+    if(Background2[S] == 32)
+    {
+
+        int tempVar33 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
+        for(B = 0; B <= tempVar33; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
+            {
+                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
+                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
+                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
+            }
+            else
+                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+            tempLocation.Height = GFXBackground2Height[A];
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            }
+        }
+    }
+    A = 33; // SMW Snow
+    if(Background2[S] == 33)
+    {
+
+        int tempVar34 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
+        for(B = 0; B <= tempVar34; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
+            {
+                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
+                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
+                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
+            }
+            else
+                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+            tempLocation.Height = GFXBackground2Height[A];
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            }
+        }
+    }
+    A = 34; // SMW Hills 3
+    if(Background2[S] == 34)
+    {
+
+        int tempVar35 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
+        for(B = 0; B <= tempVar35; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
+            {
+                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
+                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
+                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
+            }
+            else
+                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+            tempLocation.Height = GFXBackground2Height[A];
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            }
+        }
+    }
+    A = 35; // SMB 3 Snow Trees
+    if(Background2[S] == 35)
+    {
+
+        int tempVar36 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
+        for(B = 0; B <= tempVar36; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+            tempLocation.Height = GFXBackground2Height[A];
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            }
+        }
+    }
+    A = 36; // Snow Clouds
+    if(Background2[S] == 35 || Background2[S] == 37)
+    {
+
+        int tempVar37 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.75))) + 1;
+        for(B = 0; B <= tempVar37; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.75);
+            tempLocation.Y = level[S].Height - GFXBackground2Height[A] - ScreenH + 100;
+            tempLocation.Height = GFXBackground2Height[A];
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            }
+        }
+    }
+    if(Background2[S] == 36)
+    {
+
+        int tempVar38 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.75))) + 1;
+        for(B = 0; B <= tempVar38; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.75);
+            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
+            {
+                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
+                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
+                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
+            }
+            else
+                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+            tempLocation.Height = GFXBackground2Height[A];
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            }
+        }
+    }
+    A = 37; // SMB 3 Snow Hills
+    if(Background2[S] == 37)
+    {
+
+        int tempVar39 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
+        for(B = 0; B <= tempVar39; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+            tempLocation.Height = GFXBackground2Height[A];
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            }
+        }
+    }
+    A = 38; // SMB3 Cave with Sky
+    if(Background2[S] == 38)
+    {
+
+        int tempVar40 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
+        for(B = 0; B <= tempVar40; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            tempLocation.Y = level[S].Y - 20; // Height - GFXBackground2height(a)
+            tempLocation.Height = GFXBackground2Height[A];
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            }
+        }
+    }
+    A = 39; // SMB3 Cave no Sky
+    if(Background2[S] == 39)
+    {
+
+        int tempVar41 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
+        for(B = 0; B <= tempVar41; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
+            {
+                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
+                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
+                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
+            }
+            else
+                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+            tempLocation.Height = GFXBackground2Height[A];
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            }
+        }
+    }
+    A = 40; // Mystic Cave Zone
+    if(Background2[S] == 40)
+    {
+        if(level[S].Height - level[S].Y > GFXBackground2Height[A])
+        {
+
+
+
+            // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - (ScreenH - vScreen(Z).Top)) * (GFXBackground2Height(A) - (ScreenH - vScreen(Z).Top))
+            // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
+
+
+
+            tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
+            tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
+        }
+        else
+            tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+        tempLocation.Height = GFXBackground2Height[A];
+        tempLocation.Width = GFXBackground2Width[A];
+
+        int tempVar42 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
+        for(B = 0; B <= tempVar42; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y + 953, GFXBackground2Width[A], 47, GFXBackground2[A], 0, 953);
+            }
+        }
+
+        int tempVar43 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.6))) + 1;
+        for(B = 0; B <= tempVar43; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.6);
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y + 916, GFXBackground2Width[A], 37, GFXBackground2[A], 0, 916);
+            }
+        }
+
+        int tempVar44 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.7))) + 1;
+        for(B = 0; B <= tempVar44; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.7);
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y + 849, GFXBackground2Width[A], 67, GFXBackground2[A], 0, 849);
+            }
+        }
+
+        int tempVar45 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.8))) + 1;
+        for(B = 0; B <= tempVar45; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.8);
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y + 815, GFXBackground2Width[A], 34, GFXBackground2[A], 0, 815);
+            }
+        }
+
+        int tempVar46 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.9))) + 1;
+        for(B = 0; B <= tempVar46; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.9);
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y + 709, GFXBackground2Width[A], 106, GFXBackground2[A], 0, 709);
+            }
+        }
+
+        int tempVar47 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.85))) + 1;
+        for(B = 0; B <= tempVar47; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.85);
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y + 664, GFXBackground2Width[A], 45, GFXBackground2[A], 0, 664);
+            }
+        }
+
+        int tempVar48 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.8))) + 1;
+        for(B = 0; B <= tempVar48; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.8);
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y + 614, GFXBackground2Width[A], 50, GFXBackground2[A], 0, 614);
+            }
+        }
+
+        int tempVar49 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.75))) + 1;
+        for(B = 0; B <= tempVar49; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.75);
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y + 540, GFXBackground2Width[A], 74, GFXBackground2[A], 0, 540);
+            }
+        }
+
+        int tempVar50 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.7))) + 1;
+        for(B = 0; B <= tempVar50; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.7);
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y + 408, GFXBackground2Width[A], 132, GFXBackground2[A], 0, 408);
+            }
+        }
+
+        int tempVar51 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.75))) + 1;
+        for(B = 0; B <= tempVar51; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.75);
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y + 333, GFXBackground2Width[A], 75, GFXBackground2[A], 0, 333);
+            }
+        }
+
+        int tempVar52 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.8))) + 1;
+        for(B = 0; B <= tempVar52; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.8);
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y + 278, GFXBackground2Width[A], 55, GFXBackground2[A], 0, 278);
+            }
+        }
+
+        int tempVar53 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.85))) + 1;
+        for(B = 0; B <= tempVar53; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.85);
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y + 235, GFXBackground2Width[A], 43, GFXBackground2[A], 0, 235);
+            }
+        }
+
+        int tempVar54 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.9))) + 1;
+        for(B = 0; B <= tempVar54; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.9);
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y + 123, GFXBackground2Width[A], 112, GFXBackground2[A], 0, 123);
+            }
+        }
+
+        int tempVar55 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.8))) + 1;
+        for(B = 0; B <= tempVar55; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.8);
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y + 85, GFXBackground2Width[A], 38, GFXBackground2[A], 0, 85);
+            }
+        }
+
+        int tempVar56 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.7))) + 1;
+        for(B = 0; B <= tempVar56; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.7);
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y + 48, GFXBackground2Width[A], 37, GFXBackground2[A], 0, 48);
+            }
+        }
+
+        int tempVar57 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.6))) + 1;
+        for(B = 0; B <= tempVar57; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.6);
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], 48, GFXBackground2[A], 0, 0);
+            }
+        }
+    }
+    A = 41; // SMB 1 Castle
+    if(Background2[S] == 41)
+    {
+
+        int tempVar58 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 2;
+        for(B = 0; B <= tempVar58; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
+            {
+                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
+                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
+                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
+            }
+            else
+                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+            tempLocation.Height = GFXBackground2Height[A];
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            }
+        }
+    }
+    A = 42; // SMW Castle
+    if(Background2[S] == 42)
+    {
+
+        int tempVar59 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
+        for(B = 0; B <= tempVar59; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            if(level[S].Height - level[S].Y > GFXBackground2Height[A] / 4.0)
+            {
+
+                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - (600 - vScreen(Z).Top)) * (GFXBackground2Height(A) / 4 - (600 - vScreen(Z).Top))
+                // .Y = -vScreenY(Z) - .Y
+
+                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] / 4.0 - ScreenH) + vScreen[Z].Top;
+                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
+            }
+            else
+                tempLocation.Y = level[S].Height - GFXBackground2Height[A] / 4.0;
+            tempLocation.Height = GFXBackground2Height[A] / 4;
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A] / 4.0, GFXBackground2[A], 0, (GFXBackground2Height[A] / 4.0) * SpecialFrame[3]);
+            }
+        }
+    }
+    A = 43; // SMW Castle 2
+    if(Background2[S] == 43)
+    {
+
+        int tempVar60 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
+        for(B = 0; B <= tempVar60; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
+            {
+                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
+                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
+                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
+            }
+            else
+                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+            tempLocation.Height = GFXBackground2Height[A];
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            }
+        }
+    }
+    A = 44; // SMB2 Castle
+    if(Background2[S] == 44)
+    {
+
+        int tempVar61 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
+        for(B = 0; B <= tempVar61; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
+            {
+                tempLocation.Y = (-vScreenY[Z] - level[S].Y) / (level[S].Height - level[S].Y - 600) * (GFXBackground2Height[A] - 600);
+                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
+            }
+            else
+                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+            tempLocation.Height = GFXBackground2Height[A];
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            }
+        }
+    }
+    A = 45; // Brinstar
+    if(Background2[S] == 45)
+    {
+
+        int tempVar62 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 2;
+        for(B = 0; B <= tempVar62; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
+            {
+                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
+                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
+                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
+            }
+            else
+                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+            tempLocation.Height = GFXBackground2Height[A];
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            }
+        }
+    }
+    A = 46; // Transport
+    if(Background2[S] == 46)
+    {
+
+        int tempVar63 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 2;
+        for(B = 0; B <= tempVar63; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
+            {
+                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
+                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
+                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
+            }
+            else
+                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+            tempLocation.Height = GFXBackground2Height[A];
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            }
+        }
+    }
+    A = 47; // Transport
+    if(Background2[S] == 47)
+    {
+
+        int tempVar64 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 2;
+        for(B = 0; B <= tempVar64; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
+            {
+                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
+                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
+                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
+            }
+            else
+                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+            tempLocation.Height = GFXBackground2Height[A];
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            }
+        }
+    }
+    A = 48; // SMB2 Blouds
+    if(Background2[S] == 48)
+    {
+
+        int tempVar65 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 2;
+        for(B = 0; B <= tempVar65; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
+            {
+                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
+                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
+                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
+            }
+            else
+                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+            tempLocation.Height = GFXBackground2Height[A];
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            }
+        }
+    }
+    A = 49; // Desert Night
+    if(Background2[S] == 49)
+    {
+        if(level[S].Height - level[S].Y > GFXBackground2Height[A])
+        {
+            // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
+            tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
+            tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
+        }
+        else
+            tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+        tempLocation.Height = GFXBackground2Height[A];
+        tempLocation.Width = GFXBackground2Width[A];
+
+        int tempVar66 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
+        for(B = 0; B <= tempVar66; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y + 280, GFXBackground2Width[A], 450, GFXBackground2[A], 0, 280);
+            }
+        }
+
+        int tempVar67 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.9))) + 1;
+        for(B = 0; B <= tempVar67; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.9);
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y + 268, GFXBackground2Width[A], 12, GFXBackground2[A], 0, 268);
+            }
+        }
+
+        int tempVar68 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.89))) + 1;
+        for(B = 0; B <= tempVar68; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.89);
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y + 244, GFXBackground2Width[A], 24, GFXBackground2[A], 0, 244);
+            }
+        }
+
+        int tempVar69 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.88))) + 1;
+        for(B = 0; B <= tempVar69; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.88);
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y + 228, GFXBackground2Width[A], 16, GFXBackground2[A], 0, 228);
+            }
+        }
+
+        int tempVar70 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.87))) + 1;
+        for(B = 0; B <= tempVar70; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.87);
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y + 196, GFXBackground2Width[A], 32, GFXBackground2[A], 0, 196);
+            }
+        }
+
+        int tempVar71 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.86))) + 1;
+        for(B = 0; B <= tempVar71; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.86);
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y + 164, GFXBackground2Width[A], 32, GFXBackground2[A], 0, 164);
+            }
+        }
+
+        int tempVar72 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.85))) + 1;
+        for(B = 0; B <= tempVar72; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.85);
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y + 116, GFXBackground2Width[A], 48, GFXBackground2[A], 0, 116);
+            }
+        }
+
+        int tempVar73 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.84))) + 1;
+        for(B = 0; B <= tempVar73; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.84);
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y + 58, GFXBackground2Width[A], 58, GFXBackground2[A], 0, 58);
+            }
+        }
+
+        int tempVar74 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.83))) + 1;
+        for(B = 0; B <= tempVar74; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.83);
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], 58, GFXBackground2[A], 0, 0);
+            }
+        }
+    }
+    A = 50; // Shrooms
+    if(Background2[S] == 50)
+    {
+        if(level[S].Height - level[S].Y > GFXBackground2Height[A])
+        {
+            // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
+            tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
+            tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
+        }
+        else
+            tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+        tempLocation.Height = GFXBackground2Height[A];
+        tempLocation.Width = GFXBackground2Width[A];
+
+        int tempVar75 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
+        for(B = 0; B <= tempVar75; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y + 378, GFXBackground2Width[A], 378, GFXBackground2[A], 0, 378);
+            }
+        }
+
+        int tempVar76 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.65))) + 1;
+        for(B = 0; B <= tempVar76; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.65);
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], 220, GFXBackground2[A], 0, 0);
+            }
+        }
+
+        int tempVar77 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.6))) + 1;
+        for(B = 0; B <= tempVar77; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.6);
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y + 220, GFXBackground2Width[A], 159, GFXBackground2[A], 0, 220);
+            }
+        }
+    }
+
+    A = 51; // SMB1 Desert
+    if(Background2[S] == 51)
+    {
+        if(level[S].Height - level[S].Y > GFXBackground2Height[A])
+        {
+            // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
+            tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
+            tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
+        }
+        else
+            tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+        tempLocation.Height = GFXBackground2Height[A];
+        tempLocation.Width = GFXBackground2Width[A];
+
+        int tempVar78 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.75))) + 1;
+        for(B = 0; B <= tempVar78; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.75);
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], 350, GFXBackground2[A], 0, 0);
+            }
+        }
+
+        int tempVar79 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
+        for(B = 0; B <= tempVar79; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y + 350, GFXBackground2Width[A], GFXBackground2Height[A] - 350, GFXBackground2[A], 0, 350);
+            }
+        }
+    }
+    A = 52; // SMB2 Desert Night
+    if(Background2[S] == 52)
+    {
+        if(level[S].Height - level[S].Y > GFXBackground2Height[A])
+        {
+            // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
+            tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
+            tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
+        }
+        else
+            tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+        tempLocation.Height = GFXBackground2Height[A];
+        tempLocation.Width = GFXBackground2Width[A];
+
+        int tempVar80 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
+        for(B = 0; B <= tempVar80; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y + 280, GFXBackground2Width[A], GFXBackground2Height[A] - 280, GFXBackground2[A], 0, 280);
+            }
+        }
+
+        int tempVar81 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.9))) + 1;
+        for(B = 0; B <= tempVar81; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.9);
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y + 268, GFXBackground2Width[A], 12, GFXBackground2[A], 0, 268);
+            }
+        }
+
+        int tempVar82 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.89))) + 1;
+        for(B = 0; B <= tempVar82; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.89);
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y + 244, GFXBackground2Width[A], 24, GFXBackground2[A], 0, 244);
+            }
+        }
+
+        int tempVar83 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.88))) + 1;
+        for(B = 0; B <= tempVar83; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.88);
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y + 228, GFXBackground2Width[A], 16, GFXBackground2[A], 0, 228);
+            }
+        }
+
+        int tempVar84 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.87))) + 1;
+        for(B = 0; B <= tempVar84; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.87);
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y + 196, GFXBackground2Width[A], 32, GFXBackground2[A], 0, 196);
+            }
+        }
+
+        int tempVar85 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.86))) + 1;
+        for(B = 0; B <= tempVar85; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.86);
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y + 164, GFXBackground2Width[A], 32, GFXBackground2[A], 0, 164);
+            }
+        }
+
+        int tempVar86 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.85))) + 1;
+        for(B = 0; B <= tempVar86; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.85);
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y + 116, GFXBackground2Width[A], 48, GFXBackground2[A], 0, 116);
+            }
+        }
+
+        int tempVar87 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.84))) + 1;
+        for(B = 0; B <= tempVar87; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.84);
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y + 58, GFXBackground2Width[A], 58, GFXBackground2[A], 0, 58);
+            }
+        }
+
+        int tempVar88 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.83))) + 1;
+        for(B = 0; B <= tempVar88; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.83);
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], 58, GFXBackground2[A], 0, 0);
+            }
+        }
+    }
+    A = 53; // Cliffs
+    if(Background2[S] == 53)
+    {
+
+        int tempVar89 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 2;
+        for(B = 0; B <= tempVar89; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
+            {
+                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
+                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
+                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
+            }
+            else
+                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+            tempLocation.Height = GFXBackground2Height[A];
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            }
+        }
+    }
+    A = 54; // Warehouse
+    if(Background2[S] == 54)
+    {
+
+        int tempVar90 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 2;
+        for(B = 0; B <= tempVar90; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
+            {
+                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
+                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
+                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
+            }
+            else
+                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+            tempLocation.Height = GFXBackground2Height[A];
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            }
+        }
+    }
+    A = 55; // SMW Water
+    if(Background2[S] == 55)
+    {
+
+        int tempVar91 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
+        for(B = 0; B <= tempVar91; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            if(level[S].Height - level[S].Y > GFXBackground2Height[A] / 4.0)
+            {
+                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) / 4 - 600)
+                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] / 4.0 - ScreenH) + vScreen[Z].Top;
+                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
+            }
+            else
+                tempLocation.Y = level[S].Height - GFXBackground2Height[A] / 4.0;
+            tempLocation.Height = GFXBackground2Height[A] / 4;
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A] / 4.0, GFXBackground2[A], 0, (GFXBackground2Height[A] / 4.0) * SpecialFrame[3]);
+            }
+        }
+    }
+    A = 56; // SMB3 Water
+    if(Background2[S] == 56)
+    {
+        if(level[S].Height - level[S].Y > GFXBackground2Height[A])
+        {
+            // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
+            tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
+            tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
+        }
+        else
+            tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+        tempLocation.Height = GFXBackground2Height[A];
+        tempLocation.Width = GFXBackground2Width[A];
+
+
+
+        int tempVar92 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.65))) + 1;
+        for(B = 0; B <= tempVar92; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.65);
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], 100, GFXBackground2[A], 0, 0);
+            }
+        }
+
+
+        int tempVar93 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.6))) + 1;
+        for(B = 0; B <= tempVar93; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.6);
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y + 100, GFXBackground2Width[A], 245, GFXBackground2[A], 0, 100);
+            }
+        }
+
+
+        int tempVar94 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.55))) + 1;
+        for(B = 0; B <= tempVar94; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.55);
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y + 345, GFXBackground2Width[A], 110, GFXBackground2[A], 0, 345);
+            }
+        }
+
+
+        int tempVar95 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
+        for(B = 0; B <= tempVar95; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y + 455, GFXBackground2Width[A], GFXBackground2Height[A] - 455, GFXBackground2[A], 0, 455);
+            }
+        }
+    }
+    A = 57; // Warehouse
+    if(Background2[S] == 57)
+    {
+
+        int tempVar96 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 2;
+        for(B = 0; B <= tempVar96; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
+            {
+                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
+                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
+                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
+            }
+            else
+                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+            tempLocation.Height = GFXBackground2Height[A];
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            }
+        }
+    }
+    A = 58; // SMW Night
+    if(Background2[S] == 58)
+    {
+
+        int tempVar97 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
+        for(B = 0; B <= tempVar97; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            if(level[S].Height - level[S].Y > GFXBackground2Height[A] / 4.0)
+            {
+                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - (600 - vScreen(Z).Top)) * (GFXBackground2Height(A) / 4 - (600 - vScreen(Z).Top))
+                // .Y = -vScreenY(Z) - .Y
+                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] / 4.0 - ScreenH) + vScreen[Z].Top;
+                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
+            }
+            else
+                tempLocation.Y = level[S].Height - GFXBackground2Height[A] / 4.0;
+            tempLocation.Height = GFXBackground2Height[A] / 4;
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A] / 4.0, GFXBackground2[A], 0, (GFXBackground2Height[A] / 4.0) * SpecialFrame[6]);
+            }
+        }
+    }
+    level[S] = tempLevel;
 
 }
 
 void PlayerWarpGFX(int A, Location_t tempLocation, float X2, float Y2)
 {
-
+    // .Effect = 3      -- Warp Pipe
+    // .Effect2 = 0     -- Entering
+    // .Effect2 = 1     -- Move to next spot
+    // .Effect2 => 100  -- Delay at next spot
+    // .Effect2 = 2     -- Exiting
+    // .Effect2 = 3     -- Done
+    if(Player[A].Effect2 == 0)
+    {
+        if(Warp[Player[A].Warp].Direction == 3) // Moving down
+        {
+            if(tempLocation.Height > (Warp[Player[A].Warp].Entrance.Y + Warp[Player[A].Warp].Entrance.Height) - (tempLocation.Y))
+                tempLocation.Height = (Warp[Player[A].Warp].Entrance.Y + Warp[Player[A].Warp].Entrance.Height) - (tempLocation.Y);
+        }
+        else if(Warp[Player[A].Warp].Direction == 1) // Moving up
+        {
+            if(Warp[Player[A].Warp].Entrance.Y > tempLocation.Y)
+            {
+                Y2 = (Warp[Player[A].Warp].Entrance.Y - tempLocation.Y);
+                tempLocation.Y = Warp[Player[A].Warp].Entrance.Y;
+                tempLocation.Height = tempLocation.Height - Y2;
+            }
+        }
+        else if(Warp[Player[A].Warp].Direction == 4) // Moving right
+            tempLocation.Width = (Warp[Player[A].Warp].Entrance.X + Warp[Player[A].Warp].Entrance.Width) - (tempLocation.X);
+        else if(Warp[Player[A].Warp].Direction == 2) // Moving left
+        {
+            X2 = (Warp[Player[A].Warp].Entrance.X - tempLocation.X);
+            if(X2 < 0)
+                X2 = 0;
+            else
+                tempLocation.X = Warp[Player[A].Warp].Entrance.X;
+        }
+    }
+    else if(Player[A].Effect2 == 2)
+    {
+        if(Warp[Player[A].Warp].Direction2 == 3) // Moving up
+        {
+            if(tempLocation.Height > (Warp[Player[A].Warp].Exit.Y + Warp[Player[A].Warp].Exit.Height) - (tempLocation.Y))
+                tempLocation.Height = (Warp[Player[A].Warp].Exit.Y + Warp[Player[A].Warp].Exit.Height) - (tempLocation.Y);
+        }
+        else if(Warp[Player[A].Warp].Direction2 == 1) // Moving down
+        {
+            if(Warp[Player[A].Warp].Exit.Y > tempLocation.Y)
+            {
+                Y2 = (Warp[Player[A].Warp].Exit.Y - tempLocation.Y);
+                tempLocation.Y = Warp[Player[A].Warp].Exit.Y;
+                tempLocation.Height = tempLocation.Height - Y2;
+            }
+        }
+        else if(Warp[Player[A].Warp].Direction2 == 4) // Moving left
+            tempLocation.Width = (Warp[Player[A].Warp].Exit.X + Warp[Player[A].Warp].Exit.Width) - (tempLocation.X);
+        else if(Warp[Player[A].Warp].Direction2 == 2) // Moving right
+        {
+            X2 = (Warp[Player[A].Warp].Exit.X - tempLocation.X);
+            if(X2 < 0)
+                X2 = 0;
+            else
+                tempLocation.X = Warp[Player[A].Warp].Exit.X;
+        }
+    }
+    if(Player[A].Effect2 == 1 || Player[A].Effect2 >= 100)
+        tempLocation.Height = 0;
+    if(tempLocation.Height < 0)
+    {
+        tempLocation.Height = 0;
+        tempLocation.Width = 0;
+    }
+    tempLocation.Width = tempLocation.Width - X2;
 }
 
 void NPCWarpGFX(int A, Location_t tempLocation, float X2, float Y2)
 {
-
+    // player(a).effect = 3      -- Warp Pipe
+    // player(a).effect2 = 0     -- Entering
+    // player(a).effect2 = 1     -- Move to next spot
+    // player(a).effect2 => 100  -- Delay at next spot
+    // player(a).effect2 = 2     -- Exiting
+    // player(a).effect2 = 3     -- Done
+    if(Player[A].Effect2 == 0)
+    {
+        if(Warp[Player[A].Warp].Direction == 3) // Moving down
+        {
+            if(tempLocation.Height > (Warp[Player[A].Warp].Entrance.Y + Warp[Player[A].Warp].Entrance.Height) - (tempLocation.Y))
+                tempLocation.Height = (Warp[Player[A].Warp].Entrance.Y + Warp[Player[A].Warp].Entrance.Height) - (tempLocation.Y);
+        }
+        else if(Warp[Player[A].Warp].Direction == 1) // Moving up
+        {
+            if(Warp[Player[A].Warp].Entrance.Y > tempLocation.Y)
+            {
+                Y2 = (Warp[Player[A].Warp].Entrance.Y - tempLocation.Y);
+                tempLocation.Y = Warp[Player[A].Warp].Entrance.Y;
+                tempLocation.Height = tempLocation.Height - Y2;
+            }
+        }
+        else if(Warp[Player[A].Warp].Direction == 4) // Moving right
+            tempLocation.Width = (Warp[Player[A].Warp].Entrance.X + Warp[Player[A].Warp].Entrance.Width) - (tempLocation.X);
+        else if(Warp[Player[A].Warp].Direction == 2) // Moving left
+        {
+            X2 = (Warp[Player[A].Warp].Entrance.X - tempLocation.X);
+            if(X2 < 0)
+                X2 = 0;
+            else
+                tempLocation.X = Warp[Player[A].Warp].Entrance.X;
+        }
+    }
+    else if(Player[A].Effect2 == 2)
+    {
+        if(Warp[Player[A].Warp].Direction2 == 3) // Moving up
+        {
+            if(tempLocation.Height > (Warp[Player[A].Warp].Exit.Y + Warp[Player[A].Warp].Exit.Height) - (tempLocation.Y))
+                tempLocation.Height = (Warp[Player[A].Warp].Exit.Y + Warp[Player[A].Warp].Exit.Height) - (tempLocation.Y);
+        }
+        else if(Warp[Player[A].Warp].Direction2 == 1) // Moving down
+        {
+            if(Warp[Player[A].Warp].Exit.Y > tempLocation.Y)
+            {
+                Y2 = (Warp[Player[A].Warp].Exit.Y - tempLocation.Y);
+                tempLocation.Y = Warp[Player[A].Warp].Exit.Y;
+                tempLocation.Height = tempLocation.Height - Y2;
+            }
+        }
+        else if(Warp[Player[A].Warp].Direction2 == 4) // Moving left
+            tempLocation.Width = (Warp[Player[A].Warp].Exit.X + Warp[Player[A].Warp].Exit.Width) - (tempLocation.X);
+        else if(Warp[Player[A].Warp].Direction2 == 2) // Moving right
+        {
+            X2 = (Warp[Player[A].Warp].Exit.X - tempLocation.X);
+            if(X2 < 0)
+                X2 = 0;
+            else
+                tempLocation.X = Warp[Player[A].Warp].Exit.X;
+        }
+    }
+    if(Player[A].Effect2 == 1 || Player[A].Effect2 >= 100)
+        tempLocation.Height = 0;
+    if(tempLocation.Height < 0)
+    {
+        tempLocation.Height = 0;
+        tempLocation.Width = 0;
+    }
 }
 
 // change from fullscreen to windowed mode
@@ -3718,664 +5697,743 @@ void ChangeScreen()
 
 void GetvScreenCredits()
 {
-//    Dim A As Integer
-//    Dim B As Integer
-//    vScreenX(1) = 0
-//    vScreenY(1) = 0
-//    For A = 1 To numPlayers
-//        If Player(A).Dead = False And Player(A).Effect <> 6 Then
-//            vScreenX(1) = vScreenX(1) - Player(A).Location.X - Player(A).Location.Width / 2
-//            If Player(A).Mount = 2 Then
-//                vScreenY(1) = vScreenY(1) - Player(A).Location.Y
-//            Else
-//                vScreenY(1) = vScreenY(1) - Player(A).Location.Y - Player(A).Location.Height
-//            End If
-//            B = B + 1
-//        End If
-//    Next A
-//    A = 1
-//    If B = 0 Then Exit Sub
-//    vScreenX(1) = (vScreenX(1) / B) + (ScreenW * 0.5)
-//    vScreenY(1) = (vScreenY(1) / B) + (ScreenH * 0.5) - vScreenYOffset
-//    If -vScreenX(A) < level(Player(1).Section).X Then vScreenX(A) = -level(Player(1).Section).X
-//    If -vScreenX(A) + ScreenW > level(Player(1).Section).Width Then vScreenX(A) = -(level(Player(1).Section).Width - ScreenW)
-//    If -vScreenY(A) < level(Player(1).Section).Y + 100 Then vScreenY(A) = -level(Player(1).Section).Y + 100
-//    If -vScreenY(A) + ScreenH > level(Player(1).Section).Height - 100 Then vScreenY(A) = -(level(Player(1).Section).Height - ScreenH) - 100
+    int A = 0;
+    int B = 0;
+    vScreenX[1] = 0;
+    vScreenY[1] = 0;
+    for(A = 1; A <= numPlayers; A++)
+    {
+        if(Player[A].Dead == false && Player[A].Effect != 6)
+        {
+            vScreenX[1] = vScreenX[1] - Player[A].Location.X - Player[A].Location.Width / 2.0;
+            if(Player[A].Mount == 2)
+                vScreenY[1] = vScreenY[1] - Player[A].Location.Y;
+            else
+                vScreenY[1] = vScreenY[1] - Player[A].Location.Y - Player[A].Location.Height;
+            B = B + 1;
+        }
+    }
+    A = 1;
+    if(B == 0)
+        return;
+    vScreenX[1] = (vScreenX[1] / B) + (ScreenW * 0.5);
+    vScreenY[1] = (vScreenY[1] / B) + (ScreenH * 0.5) - vScreenYOffset;
+    if(-vScreenX[A] < level[Player[1].Section].X)
+        vScreenX[A] = -level[Player[1].Section].X;
+    if(-vScreenX[A] + ScreenW > level[Player[1].Section].Width)
+        vScreenX[A] = -(level[Player[1].Section].Width - ScreenW);
+    if(-vScreenY[A] < level[Player[1].Section].Y + 100)
+        vScreenY[A] = -level[Player[1].Section].Y + 100;
+    if(-vScreenY[A] + ScreenH > level[Player[1].Section].Height - 100)
+        vScreenY[A] = -(level[Player[1].Section].Height - ScreenH) - 100;
 }
 
 void DoCredits()
 {
-//    Dim A As Integer
-//    If GameMenu = True Then Exit Sub
-//    For A = 1 To numCredits
-//        With Credit(A)
-//            .Location.Y = .Location.Y - 0.8
-//            If .Location.Y <= 600 And .Location.Y + .Location.Height >= 0 Then
-//                SuperPrint .Text, 4, CSng(.Location.X), CSng(.Location.Y)
-//            ElseIf A = numCredits And .Location.Y + .Location.Height < -100 Then
-//                CreditChop = CreditChop + 0.4
-//                If CreditChop >= 300 Then
-//                    CreditChop = 300
-//                    EndCredits = EndCredits + 1
-//                    If EndCredits = 300 Then
-//                        SetupCredits
-//                        GameOutro = False
-//                        GameMenu = True
-//                    End If
-//                Else
-//                    EndCredits = 0
-//                End If
-//            ElseIf CreditChop > 100 And Credit(numCredits).Location.Y + Credit(numCredits).Location.Height > 0 Then
-//                CreditChop = CreditChop - 0.02
-//                If CreditChop < 100 Then CreditChop = 100
-//            ElseIf musicPlaying = False Then
-//                musicName = "tmusic"
-//                ' mciSendString "play tmusic from 10", 0, 0, 0
-//                PlayMusic "tmusic"
-//                musicPlaying = True
-//            End If
-//        End With
-//    Next A
-//    If CreditChop <= 100 Or EndCredits > 0 Then
-//        For A = 1 To 2
-//            With Player(A).Controls
-//                If (GetKeyState(vbKeyEscape) And KEY_PRESSED) Or (GetKeyState(vbKeySpace) And KEY_PRESSED) Or (GetKeyState(vbKeyReturn) And KEY_PRESSED) Then
-//                    CreditChop = 300
-//                    EndCredits = 0
-//                    SetupCredits
-//                    GameMenu = True
-//                    GameOutro = False
-//                End If
-//            End With
-//        Next A
-//    End If
+    int A = 0;
+    if(GameMenu == true)
+        return;
+
+    for(A = 1; A <= numCredits; A++)
+    {
+        Credit[A].Location.Y = Credit[A].Location.Y - 0.8;
+
+        if(Credit[A].Location.Y <= 600 && Credit[A].Location.Y + Credit[A].Location.Height >= 0)
+        {
+            SuperPrint(Credit[A].Text, 4, static_cast<float>(Credit[A].Location.X), static_cast<float>(Credit[A].Location.Y));
+        }
+
+        else if(A == numCredits && Credit[A].Location.Y + Credit[A].Location.Height < -100)
+        {
+            CreditChop = (float)(CreditChop + 0.4f);
+            if(CreditChop >= 300)
+            {
+                CreditChop = 300;
+                EndCredits = EndCredits + 1;
+                if(EndCredits == 300)
+                {
+                    SetupCredits();
+                    GameOutro = false;
+                    GameMenu = true;
+                }
+            }
+            else
+                EndCredits = 0;
+        }
+        else if(CreditChop > 100 && Credit[numCredits].Location.Y + Credit[numCredits].Location.Height > 0)
+        {
+            CreditChop = (float)(CreditChop - 0.02f);
+            if(CreditChop < 100)
+                CreditChop = 100;
+        }
+        else if(musicPlaying == false)
+        {
+            musicName = "tmusic";
+            // mciSendString "play tmusic from 10", 0, 0, 0
+            PlayMusic("tmusic");
+            musicPlaying = true;
+        }
+    }
+    if(CreditChop <= 100 || EndCredits > 0)
+    {
+        for(A = 1; A <= 2; A++)
+        {
+            if(((getKeyState(vbKeyEscape) == KEY_PRESSED) | (getKeyState(vbKeySpace) == KEY_PRESSED) | (getKeyState(vbKeyReturn) == KEY_PRESSED)) != 0)
+            {
+                CreditChop = 300;
+                EndCredits = 0;
+                SetupCredits();
+                GameMenu = true;
+                GameOutro = false;
+            }
+        }
+    }
 }
 
 void DrawInterface(int Z, int numScreens)
 {
-//    Dim B As Integer
-//    Dim C As Integer
-//    Dim D As Integer
-//    If ScreenType = 5 Or ScreenType = 6 Then   ' 2 Players
-//        If numScreens = 1 And ScreenType <> 6 Then  'Only 1 screen
-//            For B = 1 To numPlayers
-//                If B = 1 Then
-//                    C = -40
-//                Else
-//                    C = 40
-//                End If
-//                With Player(B)
-//                    If .Character = 3 Or .Character = 4 Or .Character = 5 Then
-//                        If B = 1 Then
-//                            D = -1
-//                        Else
-//                            D = 1
-//                        End If
-//                        BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Heart(1).ScaleWidth / 2 + C - 32 + 17 * D, 16, GFX.Heart(1).ScaleWidth, GFX.Heart(1).ScaleHeight, GFX.HeartMask(1).hdc, 0, 0, vbSrcAnd
-//                        BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Heart(1).ScaleWidth / 2 + C + 17 * D, 16, GFX.Heart(1).ScaleWidth, GFX.Heart(1).ScaleHeight, GFX.HeartMask(1).hdc, 0, 0, vbSrcAnd
-//                        BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Heart(1).ScaleWidth / 2 + C + 32 + 17 * D, 16, GFX.Heart(1).ScaleWidth, GFX.Heart(1).ScaleHeight, GFX.HeartMask(1).hdc, 0, 0, vbSrcAnd
-//                        If .Hearts > 0 Then
-//                            BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Heart(1).ScaleWidth / 2 + C - 32 + 17 * D, 16, GFX.Heart(1).ScaleWidth, GFX.Heart(1).ScaleHeight, GFX.Heart(1).hdc, 0, 0, vbSrcPaint
-//                        Else
-//                            BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Heart(1).ScaleWidth / 2 + C - 32 + 17 * D, 16, GFX.Heart(1).ScaleWidth, GFX.Heart(1).ScaleHeight, GFX.Heart(2).hdc, 0, 0, vbSrcPaint
-//                        End If
-//                        If .Hearts > 1 Then
-//                            BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Heart(1).ScaleWidth / 2 + C + 17 * D, 16, GFX.Heart(1).ScaleWidth, GFX.Heart(1).ScaleHeight, GFX.Heart(1).hdc, 0, 0, vbSrcPaint
-//                        Else
-//                            BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Heart(1).ScaleWidth / 2 + C + 17 * D, 16, GFX.Heart(1).ScaleWidth, GFX.Heart(1).ScaleHeight, GFX.Heart(2).hdc, 0, 0, vbSrcPaint
-//                        End If
-//                        If .Hearts > 2 Then
-//                            BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Heart(1).ScaleWidth / 2 + C + 32 + 17 * D, 16, GFX.Heart(1).ScaleWidth, GFX.Heart(1).ScaleHeight, GFX.Heart(1).hdc, 0, 0, vbSrcPaint
-//                        Else
-//                            BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Heart(1).ScaleWidth / 2 + C + 32 + 17 * D, 16, GFX.Heart(1).ScaleWidth, GFX.Heart(1).ScaleHeight, GFX.Heart(2).hdc, 0, 0, vbSrcPaint
-//                        End If
-//                    Else
-//    '2 players 1 screen heldbonus
-//                        BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + C, 16, GFX.Container(1).ScaleWidth, GFX.Container(1).ScaleHeight, GFX.ContainerMask(Player(B).Character).hdc, 0, 0, vbSrcAnd
-//                        BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + C, 16, GFX.Container(1).ScaleWidth, GFX.Container(1).ScaleHeight, GFX.Container(Player(B).Character).hdc, 0, 0, vbSrcPaint
-//                        If .HeldBonus > 0 Then
-//                            BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + C + 12, 16 + 12, NPCWidth(.HeldBonus), NPCHeight(.HeldBonus), GFXNPCMask(.HeldBonus), 0, 0, vbSrcAnd
-//                            BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + C + 12, 16 + 12, NPCWidth(.HeldBonus), NPCHeight(.HeldBonus), GFXNPC(.HeldBonus), 0, 0, vbSrcPaint
-//                        End If
-//                    End If
-//                End With
-//            Next B
+    int B = 0;
+    int C = 0;
+    int D = 0;
+    if(ScreenType == 5 || ScreenType == 6) // 2 Players
+    {
+        if(static_cast<int>(numScreens) == 1 && ScreenType != 6) // Only 1 screen
+        {
+            for(B = 1; B <= numPlayers; B++)
+            {
+                if(B == 1)
+                    C = -40;
+                else
+                    C = 40;
+                if(Player[B].Character == 3 || Player[B].Character == 4 || Player[B].Character == 5)
+                {
+                    if(B == 1)
+                        D = -1;
+                    else
+                        D = 1;
 
-//            For B = 1 To 2
-//                If B = 1 Then
-//                    C = -58
-//                Else
-//                    C = 56
-//                End If
+                    if(Player[B].Hearts > 0)
+                    {
+                        frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C - 32 + 17 * D, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[1], 0, 0);
+                    }
+                    else
+                    {
+                        frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C - 32 + 17 * D, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[2], 0, 0);
+                    }
+                    if(Player[B].Hearts > 1)
+                    {
+                        frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C + 17 * D, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[1], 0, 0);
+                    }
+                    else
+                    {
+                        frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C + 17 * D, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[2], 0, 0);
+                    }
+                    if(Player[B].Hearts > 2)
+                    {
+                        frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C + 32 + 17 * D, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[1], 0, 0);
+                    }
+                    else
+                    {
+                        frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C + 32 + 17 * D, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[2], 0, 0);
+                    }
+                }
+                else
+                {
+// 2 players 1 screen heldbonus
+                    frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C, 16, GFX.Container[1].w, GFX.Container[1].h, GFX.Container[Player[B].Character], 0, 0);
+                    if(Player[B].HeldBonus > 0)
+                    {
+                        frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C + 12, 16 + 12, NPCWidth[Player[B].HeldBonus], NPCHeight[Player[B].HeldBonus], GFXNPC[Player[B].HeldBonus], 0, 0);
+                    }
+                }
+            }
 
-//                If Player(B).Character = 5 And Player(B).Bombs > 0 Then
-//                    BitBlt myBackBuffer, 20 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 - 34 + C, 52, GFX.Interface(2).ScaleWidth, GFX.Interface(2).ScaleHeight, GFX.InterfaceMask(8).hdc, 0, 0, vbSrcAnd
-//                    BitBlt myBackBuffer, 20 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 - 34 + C, 52, GFX.Interface(2).ScaleWidth, GFX.Interface(2).ScaleHeight, GFX.Interface(8).hdc, 0, 0, vbSrcPaint
-//                    BitBlt myBackBuffer, 20 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 - 10 + C, 53, GFX.Interface(1).ScaleWidth, GFX.Interface(1).ScaleHeight, GFX.InterfaceMask(1).hdc, 0, 0, vbSrcAnd
-//                    BitBlt myBackBuffer, 20 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 - 10 + C, 53, GFX.Interface(1).ScaleWidth, GFX.Interface(1).ScaleHeight, GFX.Interface(1).hdc, 0, 0, vbSrcPaint
-//                    SuperPrint Str(Player(B).Bombs), 1, 20 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + 12 + C, 53
-//                End If
-//            Next B
-//            C = 40
+            for(B = 1; B <= 2; B++)
+            {
+                if(B == 1)
+                    C = -58;
+                else
+                    C = 56;
 
-//            If BattleMode = False Then
-//                'Print coins on the screen
-//                If Player(1).HasKey Or Player(2).HasKey Then
-//                    BitBlt myBackBuffer, -24 + 40 + 20 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + 96, 16 + 10, GFX.Interface(2).ScaleWidth, GFX.Interface(2).ScaleHeight, GFX.InterfaceMask(0).hdc, 0, 0, vbSrcAnd
-//                    BitBlt myBackBuffer, -24 + 40 + 20 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + 96, 16 + 10, GFX.Interface(2).ScaleWidth, GFX.Interface(2).ScaleHeight, GFX.Interface(0).hdc, 0, 0, vbSrcPaint
-//                End If
-//                If Player(1).Character = 5 Then
-//                    BitBlt myBackBuffer, 40 + 20 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + 96, 16 + 10, GFX.Interface(2).ScaleWidth, GFX.Interface(2).ScaleHeight, GFX.InterfaceMask(6).hdc, 0, 0, vbSrcAnd
-//                    BitBlt myBackBuffer, 40 + 20 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + 96, 16 + 10, GFX.Interface(2).ScaleWidth, GFX.Interface(2).ScaleHeight, GFX.Interface(6).hdc, 0, 0, vbSrcPaint
-//                Else
-//                    BitBlt myBackBuffer, 40 + 20 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + 96, 16 + 10, GFX.Interface(2).ScaleWidth, GFX.Interface(2).ScaleHeight, GFX.InterfaceMask(2).hdc, 0, 0, vbSrcAnd
-//                    BitBlt myBackBuffer, 40 + 20 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + 96, 16 + 10, GFX.Interface(2).ScaleWidth, GFX.Interface(2).ScaleHeight, GFX.Interface(2).hdc, 0, 0, vbSrcPaint
-//                End If
-//                BitBlt myBackBuffer, 40 + 20 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + 96 + 8 + GFX.Interface(2).ScaleWidth, 16 + 11, GFX.Interface(1).ScaleWidth, GFX.Interface(1).ScaleHeight, GFX.InterfaceMask(1).hdc, 0, 0, vbSrcAnd
-//                BitBlt myBackBuffer, 40 + 20 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + 96 + 8 + GFX.Interface(2).ScaleWidth, 16 + 11, GFX.Interface(1).ScaleWidth, GFX.Interface(1).ScaleHeight, GFX.Interface(1).hdc, 0, 0, vbSrcPaint
-//                SuperPrint Str(Coins), 1, 40 + 20 - (Len(Str(Coins)) - 1) * 18 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + 80 + 4 + 12 + 18 + 32 + GFX.Interface(3).ScaleWidth, 16 + 11
-//                'Print Score
-//                SuperPrint Str(Score), 1, 40 + 20 - (Len(Str(Score)) - 1) * 18 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + 80 + 12 + 4 + 18 + 32 + GFX.Interface(3).ScaleWidth, 16 + 31
-//                'Print lives on the screen
-//                BitBlt myBackBuffer, -80 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + C - 122 - 16, 16 + 10, GFX.Interface(3).ScaleWidth, GFX.Interface(3).ScaleHeight, GFX.InterfaceMask(3).hdc, 0, 0, vbSrcAnd
-//                BitBlt myBackBuffer, -80 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + C - 122 - 16, 16 + 10, GFX.Interface(3).ScaleWidth, GFX.Interface(3).ScaleHeight, GFX.Interface(3).hdc, 0, 0, vbSrcPaint
-//                BitBlt myBackBuffer, -80 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + C - 122 + 10 + GFX.Interface(1).ScaleWidth, 16 + 11, GFX.Interface(1).ScaleWidth, GFX.Interface(1).ScaleHeight, GFX.InterfaceMask(1).hdc, 0, 0, vbSrcAnd
-//                BitBlt myBackBuffer, -80 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + C - 122 + 10 + GFX.Interface(1).ScaleWidth, 16 + 11, GFX.Interface(1).ScaleWidth, GFX.Interface(1).ScaleHeight, GFX.Interface(1).hdc, 0, 0, vbSrcPaint
-//                SuperPrint Str(Lives), 1, -80 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + C - 122 + 12 + 18 + GFX.Interface(5).ScaleWidth, 16 + 11
-//                'Print stars on the screen
-//                If numStars > 0 Then
-//                    BitBlt myBackBuffer, -80 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + C - 122, 16 + 30, GFX.Interface(5).ScaleWidth, GFX.Interface(5).ScaleHeight, GFX.InterfaceMask(5).hdc, 0, 0, vbSrcAnd
-//                    BitBlt myBackBuffer, -80 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + C - 122, 16 + 30, GFX.Interface(5).ScaleWidth, GFX.Interface(5).ScaleHeight, GFX.Interface(5).hdc, 0, 0, vbSrcPaint
-//                    BitBlt myBackBuffer, -80 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + C - 122 + 10 + GFX.Interface(1).ScaleWidth, 16 + 31, GFX.Interface(1).ScaleWidth, GFX.Interface(1).ScaleHeight, GFX.InterfaceMask(1).hdc, 0, 0, vbSrcAnd
-//                    BitBlt myBackBuffer, -80 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + C - 122 + 10 + GFX.Interface(1).ScaleWidth, 16 + 31, GFX.Interface(1).ScaleWidth, GFX.Interface(1).ScaleHeight, GFX.Interface(1).hdc, 0, 0, vbSrcPaint
-//                    SuperPrint Str(numStars), 1, -80 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + C - 122 + 12 + 18 + GFX.Interface(5).ScaleWidth, 16 + 31
-//                End If
-//            Else
-//            'plr 1 score
-//                    BitBlt myBackBuffer, -80 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + C - 122 - 16, 16 + 10, GFX.Interface(3).ScaleWidth, GFX.Interface(3).ScaleHeight, GFX.InterfaceMask(3).hdc, 0, 0, vbSrcAnd
-//                    BitBlt myBackBuffer, -80 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + C - 122 - 16, 16 + 10, GFX.Interface(3).ScaleWidth, GFX.Interface(3).ScaleHeight, GFX.Interface(3).hdc, 0, 0, vbSrcPaint
-//                    BitBlt myBackBuffer, -80 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + C - 122 + 10 + GFX.Interface(1).ScaleWidth, 16 + 11, GFX.Interface(1).ScaleWidth, GFX.Interface(1).ScaleHeight, GFX.InterfaceMask(1).hdc, 0, 0, vbSrcAnd
-//                    BitBlt myBackBuffer, -80 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + C - 122 + 10 + GFX.Interface(1).ScaleWidth, 16 + 11, GFX.Interface(1).ScaleWidth, GFX.Interface(1).ScaleHeight, GFX.Interface(1).hdc, 0, 0, vbSrcPaint
-//                    SuperPrint Str(BattleLives(1)), 1, -80 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + C - 122 + 12 + 18 + GFX.Interface(5).ScaleWidth, 16 + 11
-//            'plr 2 score
-//                    BitBlt myBackBuffer, 40 + 20 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + 96 - 16, 16 + 10, GFX.Interface(3).ScaleWidth, GFX.Interface(3).ScaleHeight, GFX.InterfaceMask(7).hdc, 0, 0, vbSrcAnd
-//                    BitBlt myBackBuffer, 40 + 20 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + 96 - 16, 16 + 10, GFX.Interface(3).ScaleWidth, GFX.Interface(3).ScaleHeight, GFX.Interface(7).hdc, 0, 0, vbSrcPaint
-//                    BitBlt myBackBuffer, 40 + 20 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + 96 + 8 + GFX.Interface(2).ScaleWidth, 16 + 11, GFX.Interface(1).ScaleWidth, GFX.Interface(1).ScaleHeight, GFX.InterfaceMask(1).hdc, 0, 0, vbSrcAnd
-//                    BitBlt myBackBuffer, 40 + 20 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + 96 + 8 + GFX.Interface(2).ScaleWidth, 16 + 11, GFX.Interface(1).ScaleWidth, GFX.Interface(1).ScaleHeight, GFX.Interface(1).hdc, 0, 0, vbSrcPaint
-//                    SuperPrint Str(BattleLives(2)), 1, 24 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + 80 + 4 + 12 + 18 + 32 + GFX.Interface(3).ScaleWidth, 16 + 11
-//            End If
-//        Else 'Split screen
+                if(Player[B].Character == 5 && Player[B].Bombs > 0)
+                {
+                    frmMain.renderTexture(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 - 34 + C, 52, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[8], 0, 0);
+                    frmMain.renderTexture(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 - 10 + C, 53, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+                    SuperPrint(std::to_string(Player[B].Bombs), 1, 20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 12 + C, 53);
+                }
+            }
+            C = 40;
 
+            if(BattleMode == false)
+            {
+                // Print coins on the screen
+                if((Player[1].HasKey | Player[2].HasKey) != 0)
+                {
+                    frmMain.renderTexture(-24 + 40 + 20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96, 16 + 10, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[0], 0, 0);
+                }
+                if(Player[1].Character == 5)
+                {
+                    frmMain.renderTexture(40 + 20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96, 16 + 10, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[6], 0, 0);
+                }
+                else
+                {
+                    frmMain.renderTexture(40 + 20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96, 16 + 10, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[2], 0, 0);
+                }
 
-//'2 players 2 screen heldbonus
+                frmMain.renderTexture(40 + 20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96 + 8 + GFX.Interface[2].w, 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
 
-//            With Player(Z)
-//                If .Character = 3 Or .Character = 4 Or .Character = 5 Then
-//                    BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Heart(1).ScaleWidth / 2 + C - 32, 16, GFX.Heart(1).ScaleWidth, GFX.Heart(1).ScaleHeight, GFX.HeartMask(1).hdc, 0, 0, vbSrcAnd
-//                    BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Heart(1).ScaleWidth / 2 + C, 16, GFX.Heart(1).ScaleWidth, GFX.Heart(1).ScaleHeight, GFX.HeartMask(1).hdc, 0, 0, vbSrcAnd
-//                    BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Heart(1).ScaleWidth / 2 + C + 32, 16, GFX.Heart(1).ScaleWidth, GFX.Heart(1).ScaleHeight, GFX.HeartMask(1).hdc, 0, 0, vbSrcAnd
-//                    If .Hearts > 0 Then
-//                        BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Heart(1).ScaleWidth / 2 + C - 32, 16, GFX.Heart(1).ScaleWidth, GFX.Heart(1).ScaleHeight, GFX.Heart(1).hdc, 0, 0, vbSrcPaint
-//                    Else
-//                        BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Heart(1).ScaleWidth / 2 + C - 32, 16, GFX.Heart(1).ScaleWidth, GFX.Heart(1).ScaleHeight, GFX.Heart(2).hdc, 0, 0, vbSrcPaint
-//                    End If
-//                    If .Hearts > 1 Then
-//                        BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Heart(1).ScaleWidth / 2 + C, 16, GFX.Heart(1).ScaleWidth, GFX.Heart(1).ScaleHeight, GFX.Heart(1).hdc, 0, 0, vbSrcPaint
-//                    Else
-//                        BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Heart(1).ScaleWidth / 2 + C, 16, GFX.Heart(1).ScaleWidth, GFX.Heart(1).ScaleHeight, GFX.Heart(2).hdc, 0, 0, vbSrcPaint
-//                    End If
-//                    If .Hearts > 2 Then
-//                        BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Heart(1).ScaleWidth / 2 + C + 32, 16, GFX.Heart(1).ScaleWidth, GFX.Heart(1).ScaleHeight, GFX.Heart(1).hdc, 0, 0, vbSrcPaint
-//                    Else
-//                        BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Heart(1).ScaleWidth / 2 + C + 32, 16, GFX.Heart(1).ScaleWidth, GFX.Heart(1).ScaleHeight, GFX.Heart(2).hdc, 0, 0, vbSrcPaint
-//                    End If
-//                Else
-//                    BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2, 16, GFX.Container(1).ScaleWidth + B, GFX.Container(1).ScaleHeight, GFX.ContainerMask(Player(Z).Character).hdc, 0, 0, vbSrcAnd
-//                    BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2, 16, GFX.Container(1).ScaleWidth + B, GFX.Container(1).ScaleHeight, GFX.Container(Player(Z).Character).hdc, 0, 0, vbSrcPaint
-//                    If .HeldBonus > 0 Then
-//                        BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + 12, 16 + 12, NPCWidth(.HeldBonus), NPCHeight(.HeldBonus), GFXNPCMask(.HeldBonus), 0, 0, vbSrcAnd
-//                        BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + 12, 16 + 12, NPCWidth(.HeldBonus), NPCHeight(.HeldBonus), GFXNPC(.HeldBonus), 0, 0, vbSrcPaint
-//                    End If
-//                End If
-//            End With
-//            If Player(Z).Character = 5 And Player(Z).Bombs > 0 Then
-//                BitBlt myBackBuffer, 20 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 - 34, 52, GFX.Interface(2).ScaleWidth, GFX.Interface(2).ScaleHeight, GFX.InterfaceMask(8).hdc, 0, 0, vbSrcAnd
-//                BitBlt myBackBuffer, 20 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 - 34, 52, GFX.Interface(2).ScaleWidth, GFX.Interface(2).ScaleHeight, GFX.Interface(8).hdc, 0, 0, vbSrcPaint
-//                BitBlt myBackBuffer, 20 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 - 10, 53, GFX.Interface(1).ScaleWidth, GFX.Interface(1).ScaleHeight, GFX.InterfaceMask(1).hdc, 0, 0, vbSrcAnd
-//                BitBlt myBackBuffer, 20 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 - 10, 53, GFX.Interface(1).ScaleWidth, GFX.Interface(1).ScaleHeight, GFX.Interface(1).hdc, 0, 0, vbSrcPaint
-//                SuperPrint Str(Player(Z).Bombs), 1, 20 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + 12, 53
-//            End If
-//            If BattleMode = False Then
-//                'Print coins on the screen
-//                If Player(Z).HasKey = True Then
-//                    BitBlt myBackBuffer, -24 + 20 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + 96, 16 + 10, GFX.Interface(2).ScaleWidth, GFX.Interface(2).ScaleHeight, GFX.InterfaceMask(0).hdc, 0, 0, vbSrcAnd
-//                    BitBlt myBackBuffer, -24 + 20 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + 96, 16 + 10, GFX.Interface(2).ScaleWidth, GFX.Interface(2).ScaleHeight, GFX.Interface(0).hdc, 0, 0, vbSrcPaint
-//                End If
-//                If Player(Z).Character = 5 Then
-//                    BitBlt myBackBuffer, 20 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + 96, 16 + 10, GFX.Interface(2).ScaleWidth, GFX.Interface(2).ScaleHeight, GFX.InterfaceMask(6).hdc, 0, 0, vbSrcAnd
-//                    BitBlt myBackBuffer, 20 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + 96, 16 + 10, GFX.Interface(2).ScaleWidth, GFX.Interface(2).ScaleHeight, GFX.Interface(6).hdc, 0, 0, vbSrcPaint
-//                Else
-//                    BitBlt myBackBuffer, 20 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + 96, 16 + 10, GFX.Interface(2).ScaleWidth, GFX.Interface(2).ScaleHeight, GFX.InterfaceMask(2).hdc, 0, 0, vbSrcAnd
-//                    BitBlt myBackBuffer, 20 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + 96, 16 + 10, GFX.Interface(2).ScaleWidth, GFX.Interface(2).ScaleHeight, GFX.Interface(2).hdc, 0, 0, vbSrcPaint
-//                End If
+                SuperPrint(std::to_string(Coins), 1, 40 + 20 - (std::to_string(Coins).size() - 1) * 18 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 80 + 4 + 12 + 18 + 32 + GFX.Interface[3].w, 16 + 11);
+                // Print Score
+                SuperPrint(std::to_string(Score), 1, 40 + 20 - (std::to_string(Score).size() - 1) * 18 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 80 + 12 + 4 + 18 + 32 + GFX.Interface[3].w, 16 + 31);
+                // Print lives on the screen
+                frmMain.renderTexture(-80 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 - 16, 16 + 10, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0);
+                frmMain.renderTexture(-80 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 10 + GFX.Interface[1].w, 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+                SuperPrint(std::to_string(int(Lives)), 1, -80 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 12 + 18 + GFX.Interface[5].w, 16 + 11);
+                // Print stars on the screen
+                if(numStars > 0)
+                {
 
-//                BitBlt myBackBuffer, 20 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + 96 + 8 + GFX.Interface(2).ScaleWidth, 16 + 11, GFX.Interface(1).ScaleWidth, GFX.Interface(1).ScaleHeight, GFX.InterfaceMask(1).hdc, 0, 0, vbSrcAnd
-//                BitBlt myBackBuffer, 20 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + 96 + 8 + GFX.Interface(2).ScaleWidth, 16 + 11, GFX.Interface(1).ScaleWidth, GFX.Interface(1).ScaleHeight, GFX.Interface(1).hdc, 0, 0, vbSrcPaint
-//                SuperPrint Str(Coins), 1, 20 - (Len(Str(Coins)) - 1) * 18 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + 80 + 4 + 12 + 18 + 32 + GFX.Interface(3).ScaleWidth, 16 + 11
-//                'Print Score
-//                SuperPrint Str(Score), 1, 20 - (Len(Str(Score)) - 1) * 18 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + 80 + 12 + 4 + 18 + 32 + GFX.Interface(3).ScaleWidth, 16 + 31
-//                'Print lives on the screen
-//                BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + C - 122 - 16, 16 + 10, GFX.Interface(3).ScaleWidth, GFX.Interface(3).ScaleHeight, GFX.InterfaceMask(3).hdc, 0, 0, vbSrcAnd
-//                BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + C - 122 - 16, 16 + 10, GFX.Interface(3).ScaleWidth, GFX.Interface(3).ScaleHeight, GFX.Interface(3).hdc, 0, 0, vbSrcPaint
-//                BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + C - 122 + 10 + GFX.Interface(1).ScaleWidth, 16 + 11, GFX.Interface(1).ScaleWidth, GFX.Interface(1).ScaleHeight, GFX.InterfaceMask(1).hdc, 0, 0, vbSrcAnd
-//                BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + C - 122 + 10 + GFX.Interface(1).ScaleWidth, 16 + 11, GFX.Interface(1).ScaleWidth, GFX.Interface(1).ScaleHeight, GFX.Interface(1).hdc, 0, 0, vbSrcPaint
-//                SuperPrint Str(Lives), 1, vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + C - 122 + 12 + 18 + GFX.Interface(5).ScaleWidth, 16 + 11
-//                'Print stars on the screen
-//                If numStars > 0 Then
-//                    BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + C - 122, 16 + 30, GFX.Interface(5).ScaleWidth, GFX.Interface(5).ScaleHeight, GFX.InterfaceMask(5).hdc, 0, 0, vbSrcAnd
-//                    BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + C - 122, 16 + 30, GFX.Interface(5).ScaleWidth, GFX.Interface(5).ScaleHeight, GFX.Interface(5).hdc, 0, 0, vbSrcPaint
-//                    BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + C - 122 + 10 + GFX.Interface(1).ScaleWidth, 16 + 31, GFX.Interface(1).ScaleWidth, GFX.Interface(1).ScaleHeight, GFX.InterfaceMask(1).hdc, 0, 0, vbSrcAnd
-//                    BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + C - 122 + 10 + GFX.Interface(1).ScaleWidth, 16 + 31, GFX.Interface(1).ScaleWidth, GFX.Interface(1).ScaleHeight, GFX.Interface(1).hdc, 0, 0, vbSrcPaint
-//                    SuperPrint Str(numStars), 1, vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + C - 122 + 12 + 18 + GFX.Interface(5).ScaleWidth, 16 + 31
-//                End If
-//            Else
-//                If Z = 1 Then
-//                    BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + C - 122, 16 + 10, GFX.Interface(3).ScaleWidth, GFX.Interface(3).ScaleHeight, GFX.InterfaceMask(3).hdc, 0, 0, vbSrcAnd
-//                    BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + C - 122, 16 + 10, GFX.Interface(3).ScaleWidth, GFX.Interface(3).ScaleHeight, GFX.Interface(3).hdc, 0, 0, vbSrcPaint
-//                Else
-//                    BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + C - 122, 16 + 10, GFX.Interface(3).ScaleWidth, GFX.Interface(3).ScaleHeight, GFX.InterfaceMask(7).hdc, 0, 0, vbSrcAnd
-//                    BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + C - 122, 16 + 10, GFX.Interface(3).ScaleWidth, GFX.Interface(3).ScaleHeight, GFX.Interface(7).hdc, 0, 0, vbSrcPaint
-//                End If
-//                BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + C - 122 + 10 + GFX.Interface(1).ScaleWidth + 16, 16 + 11, GFX.Interface(1).ScaleWidth, GFX.Interface(1).ScaleHeight, GFX.InterfaceMask(1).hdc, 0, 0, vbSrcAnd
-//                BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + C - 122 + 10 + GFX.Interface(1).ScaleWidth + 16, 16 + 11, GFX.Interface(1).ScaleWidth, GFX.Interface(1).ScaleHeight, GFX.Interface(1).hdc, 0, 0, vbSrcPaint
-//                SuperPrint Str(BattleLives(Z)), 1, vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + C - 122 + 12 + 18 + GFX.Interface(5).ScaleWidth + 16, 16 + 11
-//            End If
-//        End If
-//    Else '1 Player or Multi Mario
+                    frmMain.renderTexture(-80 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122, 16 + 30, GFX.Interface[5].w, GFX.Interface[5].h, GFX.Interface[5], 0, 0);
+                    frmMain.renderTexture(-80 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 10 + GFX.Interface[1].w, 16 + 31, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+                    SuperPrint(std::to_string(numStars), 1, -80 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 12 + 18 + GFX.Interface[5].w, 16 + 31);
+                }
+            }
+            else
+            {
+            // plr 1 score
+
+                    frmMain.renderTexture(-80 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 - 16, 16 + 10, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0);
+                    frmMain.renderTexture(-80 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 10 + GFX.Interface[1].w, 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+                    SuperPrint(std::to_string(BattleLives[1]), 1, -80 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 12 + 18 + GFX.Interface[5].w, 16 + 11);
+            // plr 2 score
+                    frmMain.renderTexture(40 + 20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96 - 16, 16 + 10, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[7], 0, 0);
+                    frmMain.renderTexture(40 + 20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96 + 8 + GFX.Interface[2].w, 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+                    SuperPrint(std::to_string(BattleLives[2]), 1, 24 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 80 + 4 + 12 + 18 + 32 + GFX.Interface[3].w, 16 + 11);
+            }
+        }
+        else // Split screen
+        {
 
 
-//        If nPlay.Online = False Then
-//            With Player(1)
-//                If .Character = 3 Or .Character = 4 Or .Character = 5 Then
-//                    BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Heart(1).ScaleWidth / 2 + C - 32, 16, GFX.Heart(1).ScaleWidth, GFX.Heart(1).ScaleHeight, GFX.HeartMask(1).hdc, 0, 0, vbSrcAnd
-//                    BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Heart(1).ScaleWidth / 2 + C, 16, GFX.Heart(1).ScaleWidth, GFX.Heart(1).ScaleHeight, GFX.HeartMask(1).hdc, 0, 0, vbSrcAnd
-//                    BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Heart(1).ScaleWidth / 2 + C + 32, 16, GFX.Heart(1).ScaleWidth, GFX.Heart(1).ScaleHeight, GFX.HeartMask(1).hdc, 0, 0, vbSrcAnd
-//                    If .Hearts > 0 Then
-//                        BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Heart(1).ScaleWidth / 2 + C - 32, 16, GFX.Heart(1).ScaleWidth, GFX.Heart(1).ScaleHeight, GFX.Heart(1).hdc, 0, 0, vbSrcPaint
-//                    Else
-//                        BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Heart(1).ScaleWidth / 2 + C - 32, 16, GFX.Heart(1).ScaleWidth, GFX.Heart(1).ScaleHeight, GFX.Heart(2).hdc, 0, 0, vbSrcPaint
-//                    End If
-//                    If .Hearts > 1 Then
-//                        BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Heart(1).ScaleWidth / 2 + C, 16, GFX.Heart(1).ScaleWidth, GFX.Heart(1).ScaleHeight, GFX.Heart(1).hdc, 0, 0, vbSrcPaint
-//                    Else
-//                        BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Heart(1).ScaleWidth / 2 + C, 16, GFX.Heart(1).ScaleWidth, GFX.Heart(1).ScaleHeight, GFX.Heart(2).hdc, 0, 0, vbSrcPaint
-//                    End If
-//                    If .Hearts > 2 Then
-//                        BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Heart(1).ScaleWidth / 2 + C + 32, 16, GFX.Heart(1).ScaleWidth, GFX.Heart(1).ScaleHeight, GFX.Heart(1).hdc, 0, 0, vbSrcPaint
-//                    Else
-//                        BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Heart(1).ScaleWidth / 2 + C + 32, 16, GFX.Heart(1).ScaleWidth, GFX.Heart(1).ScaleHeight, GFX.Heart(2).hdc, 0, 0, vbSrcPaint
-//                    End If
-//                Else
-//                    BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2, 16, GFX.Container(1).ScaleWidth + B, GFX.Container(1).ScaleHeight, GFX.ContainerMask(0).hdc, 0, 0, vbSrcAnd
-//                    BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2, 16, GFX.Container(1).ScaleWidth + B, GFX.Container(1).ScaleHeight, GFX.Container(0).hdc, 0, 0, vbSrcPaint
-//                    If .HeldBonus > 0 Then
-//                        BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + 12, 16 + 12, NPCWidth(.HeldBonus), NPCHeight(.HeldBonus), GFXNPCMask(.HeldBonus), 0, 0, vbSrcAnd
-//                        BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + 12, 16 + 12, NPCWidth(.HeldBonus), NPCHeight(.HeldBonus), GFXNPC(.HeldBonus), 0, 0, vbSrcPaint
-//                    End If
-//                End If
-//            End With
-//        Else
-//            With Player(nPlay.MySlot + 1)
-//                If .Character = 3 Or .Character = 4 Then
-//                    BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Heart(1).ScaleWidth / 2 + C - 32, 16, GFX.Heart(1).ScaleWidth, GFX.Heart(1).ScaleHeight, GFX.HeartMask(1).hdc, 0, 0, vbSrcAnd
-//                    BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Heart(1).ScaleWidth / 2 + C, 16, GFX.Heart(1).ScaleWidth, GFX.Heart(1).ScaleHeight, GFX.HeartMask(1).hdc, 0, 0, vbSrcAnd
-//                    BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Heart(1).ScaleWidth / 2 + C + 32, 16, GFX.Heart(1).ScaleWidth, GFX.Heart(1).ScaleHeight, GFX.HeartMask(1).hdc, 0, 0, vbSrcAnd
-//                    If .Hearts > 0 Then
-//                        BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Heart(1).ScaleWidth / 2 + C - 32, 16, GFX.Heart(1).ScaleWidth, GFX.Heart(1).ScaleHeight, GFX.Heart(1).hdc, 0, 0, vbSrcPaint
-//                    Else
-//                        BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Heart(1).ScaleWidth / 2 + C - 32, 16, GFX.Heart(1).ScaleWidth, GFX.Heart(1).ScaleHeight, GFX.Heart(2).hdc, 0, 0, vbSrcPaint
-//                    End If
-//                    If .Hearts > 1 Then
-//                        BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Heart(1).ScaleWidth / 2 + C, 16, GFX.Heart(1).ScaleWidth, GFX.Heart(1).ScaleHeight, GFX.Heart(1).hdc, 0, 0, vbSrcPaint
-//                    Else
-//                        BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Heart(1).ScaleWidth / 2 + C, 16, GFX.Heart(1).ScaleWidth, GFX.Heart(1).ScaleHeight, GFX.Heart(2).hdc, 0, 0, vbSrcPaint
-//                    End If
-//                    If .Hearts > 2 Then
-//                        BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Heart(1).ScaleWidth / 2 + C + 32, 16, GFX.Heart(1).ScaleWidth, GFX.Heart(1).ScaleHeight, GFX.Heart(1).hdc, 0, 0, vbSrcPaint
-//                    Else
-//                        BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Heart(1).ScaleWidth / 2 + C + 32, 16, GFX.Heart(1).ScaleWidth, GFX.Heart(1).ScaleHeight, GFX.Heart(2).hdc, 0, 0, vbSrcPaint
-//                    End If
-//                Else
-//                    BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2, 16, GFX.Container(1).ScaleWidth + B, GFX.Container(1).ScaleHeight, GFX.ContainerMask(0).hdc, 0, 0, vbSrcAnd
-//                    BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2, 16, GFX.Container(1).ScaleWidth + B, GFX.Container(1).ScaleHeight, GFX.Container(0).hdc, 0, 0, vbSrcPaint
-//                    If .HeldBonus > 0 Then
-//                        BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + 12, 16 + 12, NPCWidth(.HeldBonus), NPCHeight(.HeldBonus), GFXNPCMask(.HeldBonus), 0, 0, vbSrcAnd
-//                        BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + 12, 16 + 12, NPCWidth(.HeldBonus), NPCHeight(.HeldBonus), GFXNPC(.HeldBonus), 0, 0, vbSrcPaint
-//                    End If
-//                End If
-//            End With
-//        End If
-//        If Player(1).Character = 5 And Player(1).Bombs > 0 Then
-//            BitBlt myBackBuffer, 20 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 - 34 + C, 52, GFX.Interface(2).ScaleWidth, GFX.Interface(2).ScaleHeight, GFX.InterfaceMask(8).hdc, 0, 0, vbSrcAnd
-//            BitBlt myBackBuffer, 20 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 - 34 + C, 52, GFX.Interface(2).ScaleWidth, GFX.Interface(2).ScaleHeight, GFX.Interface(8).hdc, 0, 0, vbSrcPaint
-//            BitBlt myBackBuffer, 20 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 - 10 + C, 53, GFX.Interface(1).ScaleWidth, GFX.Interface(1).ScaleHeight, GFX.InterfaceMask(1).hdc, 0, 0, vbSrcAnd
-//            BitBlt myBackBuffer, 20 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 - 10 + C, 53, GFX.Interface(1).ScaleWidth, GFX.Interface(1).ScaleHeight, GFX.Interface(1).hdc, 0, 0, vbSrcPaint
-//            SuperPrint Str(Player(1).Bombs), 1, 20 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + 12 + C, 53
-//        End If
-//        'Print coins on the screen
-//        If Player(1).HasKey = True Then
-//            BitBlt myBackBuffer, -24 + 20 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + 96, 16 + 10, GFX.Interface(2).ScaleWidth, GFX.Interface(2).ScaleHeight, GFX.InterfaceMask(0).hdc, 0, 0, vbSrcAnd
-//            BitBlt myBackBuffer, -24 + 20 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + 96, 16 + 10, GFX.Interface(2).ScaleWidth, GFX.Interface(2).ScaleHeight, GFX.Interface(0).hdc, 0, 0, vbSrcPaint
-//        End If
-//        If Player(1).Character = 5 Then
-//            BitBlt myBackBuffer, 20 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + 96, 16 + 10, GFX.Interface(2).ScaleWidth, GFX.Interface(2).ScaleHeight, GFX.InterfaceMask(6).hdc, 0, 0, vbSrcAnd
-//            BitBlt myBackBuffer, 20 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + 96, 16 + 10, GFX.Interface(2).ScaleWidth, GFX.Interface(2).ScaleHeight, GFX.Interface(6).hdc, 0, 0, vbSrcPaint
-//        Else
-//            BitBlt myBackBuffer, 20 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + 96, 16 + 10, GFX.Interface(2).ScaleWidth, GFX.Interface(2).ScaleHeight, GFX.InterfaceMask(2).hdc, 0, 0, vbSrcAnd
-//            BitBlt myBackBuffer, 20 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + 96, 16 + 10, GFX.Interface(2).ScaleWidth, GFX.Interface(2).ScaleHeight, GFX.Interface(2).hdc, 0, 0, vbSrcPaint
-//        End If
-//        BitBlt myBackBuffer, 20 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + 96 + 8 + GFX.Interface(2).ScaleWidth, 16 + 11, GFX.Interface(1).ScaleWidth, GFX.Interface(1).ScaleHeight, GFX.InterfaceMask(1).hdc, 0, 0, vbSrcAnd
-//        BitBlt myBackBuffer, 20 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + 96 + 8 + GFX.Interface(2).ScaleWidth, 16 + 11, GFX.Interface(1).ScaleWidth, GFX.Interface(1).ScaleHeight, GFX.Interface(1).hdc, 0, 0, vbSrcPaint
-//        SuperPrint Str(Coins), 1, 20 - (Len(Str(Coins)) - 1) * 18 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + 80 + 4 + 12 + 18 + 32 + GFX.Interface(3).ScaleWidth, 16 + 11
-//        'Print Score
-//        SuperPrint Str(Score), 1, 20 - (Len(Str(Score)) - 1) * 18 + vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + 80 + 12 + 4 + 18 + 32 + GFX.Interface(3).ScaleWidth, 16 + 31
-//        'Print lives on the screen
-//        BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + C - 122 - 16, 16 + 10, GFX.Interface(3).ScaleWidth, GFX.Interface(3).ScaleHeight, GFX.InterfaceMask(3).hdc, 0, 0, vbSrcAnd
-//        BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + C - 122 - 16, 16 + 10, GFX.Interface(3).ScaleWidth, GFX.Interface(3).ScaleHeight, GFX.Interface(3).hdc, 0, 0, vbSrcPaint
-//        BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + C - 122 + 10 + GFX.Interface(1).ScaleWidth, 16 + 11, GFX.Interface(1).ScaleWidth, GFX.Interface(1).ScaleHeight, GFX.InterfaceMask(1).hdc, 0, 0, vbSrcAnd
-//        BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + C - 122 + 10 + GFX.Interface(1).ScaleWidth, 16 + 11, GFX.Interface(1).ScaleWidth, GFX.Interface(1).ScaleHeight, GFX.Interface(1).hdc, 0, 0, vbSrcPaint
-//        SuperPrint Str(Lives), 1, vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + C - 122 + 12 + 18 + GFX.Interface(5).ScaleWidth, 16 + 11
-//        'Print stars on the screen
-//        If numStars > 0 Then
-//            BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + C - 122, 16 + 30, GFX.Interface(5).ScaleWidth, GFX.Interface(5).ScaleHeight, GFX.InterfaceMask(5).hdc, 0, 0, vbSrcAnd
-//            BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + C - 122, 16 + 30, GFX.Interface(5).ScaleWidth, GFX.Interface(5).ScaleHeight, GFX.Interface(5).hdc, 0, 0, vbSrcPaint
-//            BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + C - 122 + 10 + GFX.Interface(1).ScaleWidth, 16 + 31, GFX.Interface(1).ScaleWidth, GFX.Interface(1).ScaleHeight, GFX.InterfaceMask(1).hdc, 0, 0, vbSrcAnd
-//            BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + C - 122 + 10 + GFX.Interface(1).ScaleWidth, 16 + 31, GFX.Interface(1).ScaleWidth, GFX.Interface(1).ScaleHeight, GFX.Interface(1).hdc, 0, 0, vbSrcPaint
-//            SuperPrint Str(numStars), 1, vScreen(Z).Width / 2 - GFX.Container(1).ScaleWidth / 2 + C - 122 + 12 + 18 + GFX.Interface(5).ScaleWidth, 16 + 31
-//        End If
-//    End If
-//    If BattleIntro > 0 Then
-//        If BattleIntro > 45 Or BattleIntro Mod 2 = 1 Then
-//            BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.BMVs.ScaleWidth / 2, -96 + vScreen(Z).Height / 2 - GFX.BMVs.ScaleHeight / 2, GFX.BMVs.ScaleWidth, GFX.BMVs.ScaleHeight, GFX.BMVsMask.hdc, 0, 0, vbSrcAnd
-//            BitBlt myBackBuffer, vScreen(Z).Width / 2 - GFX.BMVs.ScaleWidth / 2, -96 + vScreen(Z).Height / 2 - GFX.BMVs.ScaleHeight / 2, GFX.BMVs.ScaleWidth, GFX.BMVs.ScaleHeight, GFX.BMVs.hdc, 0, 0, vbSrcPaint
-//            BitBlt myBackBuffer, -50 + vScreen(Z).Width / 2 - GFX.CharacterName(Player(1).Character).ScaleWidth, -96 + vScreen(Z).Height / 2 - GFX.CharacterName(Player(1).Character).ScaleHeight / 2, GFX.CharacterName(Player(1).Character).ScaleWidth, GFX.CharacterName(Player(1).Character).ScaleHeight, GFX.CharacterNameMask(Player(1).Character).hdc, 0, 0, vbSrcAnd
-//            BitBlt myBackBuffer, -50 + vScreen(Z).Width / 2 - GFX.CharacterName(Player(1).Character).ScaleWidth, -96 + vScreen(Z).Height / 2 - GFX.CharacterName(Player(1).Character).ScaleHeight / 2, GFX.CharacterName(Player(1).Character).ScaleWidth, GFX.CharacterName(Player(1).Character).ScaleHeight, GFX.CharacterName(Player(1).Character).hdc, 0, 0, vbSrcPaint
-//            BitBlt myBackBuffer, 50 + vScreen(Z).Width / 2, -96 + vScreen(Z).Height / 2 - GFX.CharacterName(Player(2).Character).ScaleHeight / 2, GFX.CharacterName(Player(2).Character).ScaleWidth, GFX.CharacterName(Player(2).Character).ScaleHeight, GFX.CharacterNameMask(Player(2).Character).hdc, 0, 0, vbSrcAnd
-//            BitBlt myBackBuffer, 50 + vScreen(Z).Width / 2, -96 + vScreen(Z).Height / 2 - GFX.CharacterName(Player(2).Character).ScaleHeight / 2, GFX.CharacterName(Player(2).Character).ScaleWidth, GFX.CharacterName(Player(2).Character).ScaleHeight, GFX.CharacterName(Player(2).Character).hdc, 0, 0, vbSrcPaint
-//        End If
-//    End If
-//    If BattleOutro > 0 Then
-//        BitBlt myBackBuffer, 10 + vScreen(Z).Width / 2, -96 + vScreen(Z).Height / 2 - GFX.BMWin.ScaleHeight / 2, GFX.BMWin.ScaleWidth, GFX.BMWin.ScaleHeight, GFX.BMWinMask.hdc, 0, 0, vbSrcAnd
-//        BitBlt myBackBuffer, 10 + vScreen(Z).Width / 2, -96 + vScreen(Z).Height / 2 - GFX.BMWin.ScaleHeight / 2, GFX.BMWin.ScaleWidth, GFX.BMWin.ScaleHeight, GFX.BMWin.hdc, 0, 0, vbSrcPaint
-//        BitBlt myBackBuffer, -10 + vScreen(Z).Width / 2 - GFX.CharacterName(Player(BattleWinner).Character).ScaleWidth, -96 + vScreen(Z).Height / 2 - GFX.CharacterName(Player(BattleWinner).Character).ScaleHeight / 2, GFX.CharacterName(Player(BattleWinner).Character).ScaleWidth, GFX.CharacterName(Player(BattleWinner).Character).ScaleHeight, GFX.CharacterNameMask(Player(BattleWinner).Character).hdc, 0, 0, vbSrcAnd
-//        BitBlt myBackBuffer, -10 + vScreen(Z).Width / 2 - GFX.CharacterName(Player(BattleWinner).Character).ScaleWidth, -96 + vScreen(Z).Height / 2 - GFX.CharacterName(Player(BattleWinner).Character).ScaleHeight / 2, GFX.CharacterName(Player(BattleWinner).Character).ScaleWidth, GFX.CharacterName(Player(BattleWinner).Character).ScaleHeight, GFX.CharacterName(Player(BattleWinner).Character).hdc, 0, 0, vbSrcPaint
-//    End If
+// 2 players 2 screen heldbonus
+
+            if(Player[Z].Character == 3 || Player[Z].Character == 4 || Player[Z].Character == 5)
+            {
+                if(Player[Z].Hearts > 0)
+                {
+                    frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C - 32, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[1], 0, 0);
+                }
+                else
+                {
+                    frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C - 32, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[2], 0, 0);
+                }
+                if(Player[Z].Hearts > 1)
+                {
+                    frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[1], 0, 0);
+                }
+                else
+                {
+                    frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[2], 0, 0);
+                }
+                if(Player[Z].Hearts > 2)
+                {
+                    frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C + 32, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[1], 0, 0);
+                }
+                else
+                {
+                    frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C + 32, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[2], 0, 0);
+                }
+            }
+            else
+            {
+
+                frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2, 16, GFX.Container[1].w + B, GFX.Container[1].h, GFX.Container[Player[Z].Character], 0, 0);
+                if(Player[Z].HeldBonus > 0)
+                {
+                    frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 12, 16 + 12, NPCWidth[Player[Z].HeldBonus], NPCHeight[Player[Z].HeldBonus], GFXNPC[Player[Z].HeldBonus], 0, 0);
+                }
+            }
+            if(Player[Z].Character == 5 && Player[Z].Bombs > 0)
+            {
+
+                frmMain.renderTexture(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 - 34, 52, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[8], 0, 0);
+                frmMain.renderTexture(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 - 10, 53, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+                SuperPrint(std::to_string(Player[Z].Bombs), 1, 20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 12, 53);
+            }
+            if(BattleMode == false)
+            {
+                // Print coins on the screen
+                if(Player[Z].HasKey == true)
+                {
+                    frmMain.renderTexture(-24 + 20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96, 16 + 10, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[0], 0, 0);
+                }
+                if(Player[Z].Character == 5)
+                {
+                    frmMain.renderTexture(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96, 16 + 10, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[6], 0, 0);
+                }
+                else
+                {
+                    frmMain.renderTexture(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96, 16 + 10, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[2], 0, 0);
+                }
+
+
+                frmMain.renderTexture(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96 + 8 + GFX.Interface[2].w, 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+                SuperPrint(std::to_string(Coins), 1, 20 - (std::to_string(Coins).size() - 1) * 18 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 80 + 4 + 12 + 18 + 32 + GFX.Interface[3].w, 16 + 11);
+                // Print Score
+                SuperPrint(std::to_string(Score), 1, 20 - (std::to_string(Score).size() - 1) * 18 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 80 + 12 + 4 + 18 + 32 + GFX.Interface[3].w, 16 + 31);
+                // Print lives on the screen
+
+                frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 - 16, 16 + 10, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0);
+                frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 10 + GFX.Interface[1].w, 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+                SuperPrint(std::to_string(int(Lives)), 1, vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 12 + 18 + GFX.Interface[5].w, 16 + 11);
+                // Print stars on the screen
+                if(numStars > 0)
+                {
+
+                    frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122, 16 + 30, GFX.Interface[5].w, GFX.Interface[5].h, GFX.Interface[5], 0, 0);
+
+                    frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 10 + GFX.Interface[1].w, 16 + 31, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+                    SuperPrint(std::to_string(numStars), 1, vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 12 + 18 + GFX.Interface[5].w, 16 + 31);
+                }
+            }
+            else
+            {
+                if(Z == 1)
+                {
+
+                    frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122, 16 + 10, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0);
+                }
+                else
+                {
+
+                    frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122, 16 + 10, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[7], 0, 0);
+                }
+
+                frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 10 + GFX.Interface[1].w + 16, 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+                SuperPrint(std::to_string(BattleLives[Z]), 1, vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 12 + 18 + GFX.Interface[5].w + 16, 16 + 11);
+            }
+        }
+    }
+    else // 1 Player or Multi Mario
+    {
+
+
+//        if(nPlay.Online == false)
+        {
+            if(Player[1].Character == 3 || Player[1].Character == 4 || Player[1].Character == 5)
+            {
+//                BitBlt myBackBuffer, vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C - 32, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX::HeartMask(1).hdc, 0, 0, vbSrcAnd;
+//                BitBlt myBackBuffer, vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX::HeartMask(1).hdc, 0, 0, vbSrcAnd;
+//                BitBlt myBackBuffer, vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C + 32, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX::HeartMask(1).hdc, 0, 0, vbSrcAnd;
+                if(Player[1].Hearts > 0)
+                {
+                    frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C - 32, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[1], 0, 0);
+                }
+                else
+                {
+                    frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C - 32, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[2], 0, 0);
+                }
+                if(Player[1].Hearts > 1)
+                {
+                    frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[1], 0, 0);
+                }
+                else
+                {
+                    frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[2], 0, 0);
+                }
+                if(Player[1].Hearts > 2)
+                {
+                    frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C + 32, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[1], 0, 0);
+                }
+                else
+                {
+                    frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C + 32, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[2], 0, 0);
+                }
+            }
+            else
+            {
+                frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2, 16, GFX.Container[1].w + B, GFX.Container[1].h, GFX.Container[0], 0, 0);
+                if(Player[1].HeldBonus > 0)
+                {
+                    frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 12, 16 + 12, NPCWidth[Player[1].HeldBonus], NPCHeight[Player[1].HeldBonus], GFXNPC[Player[1].HeldBonus], 0, 0);
+                }
+            }
+        }
+//        else
+//        {
+//            if(Player[nPlay.MySlot + 1].Character == 3 || Player[nPlay.MySlot + 1].Character == 4)
+//            {
+////                BitBlt myBackBuffer, vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C - 32, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX::HeartMask(1).hdc, 0, 0, vbSrcAnd;
+////                BitBlt myBackBuffer, vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX::HeartMask(1).hdc, 0, 0, vbSrcAnd;
+////                BitBlt myBackBuffer, vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C + 32, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX::HeartMask(1).hdc, 0, 0, vbSrcAnd;
+//                if(Player[nPlay.MySlot + 1].Hearts > 0)
+//                {
+//                    frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C - 32, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[1], 0, 0);
+//                }
+//                else
+//                {
+//                    frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C - 32, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[2], 0, 0);
+//                }
+//                if(Player[nPlay.MySlot + 1].Hearts > 1)
+//                {
+//                    frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[1], 0, 0);
+//                }
+//                else
+//                {
+//                    frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[2], 0, 0);
+//                }
+//                if(Player[nPlay.MySlot + 1].Hearts > 2)
+//                {
+//                    frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C + 32, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[1], 0, 0);
+//                }
+//                else
+//                {
+//                    frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C + 32, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[2], 0, 0);
+//                }
+//            }
+//            else
+//            {
+//                BitBlt myBackBuffer, vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2, 16, GFX.Container[1].w + B, GFX.Container[1].h, GFX::ContainerMask(0).hdc, 0, 0, vbSrcAnd;
+//                BitBlt myBackBuffer, vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2, 16, GFX.Container[1].w + B, GFX.Container[1].h, GFX::Container(0).hdc, 0, 0, vbSrcPaint;
+//                if(Player[nPlay.MySlot + 1].HeldBonus > 0)
+//                {
+//                    frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 12, 16 + 12, NPCWidth[Player[nPlay.MySlot + 1].HeldBonus], NPCHeight[Player[nPlay.MySlot + 1].HeldBonus], GFXNPCMask[Player[nPlay.MySlot + 1].HeldBonus], 0, 0);
+//                    frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 12, 16 + 12, NPCWidth[Player[nPlay.MySlot + 1].HeldBonus], NPCHeight[Player[nPlay.MySlot + 1].HeldBonus], GFXNPC[Player[nPlay.MySlot + 1].HeldBonus], 0, 0);
+//                }
+//            }
+//        }
+
+        if(Player[1].Character == 5 && Player[1].Bombs > 0)
+        {
+
+            frmMain.renderTexture(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 - 34 + C, 52, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[8], 0, 0);
+            frmMain.renderTexture(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 - 10 + C, 53, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+            SuperPrint(std::to_string(Player[1].Bombs), 1, 20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 12 + C, 53);
+        }
+
+        // Print coins on the screen
+        if(Player[1].HasKey == true)
+        {
+            frmMain.renderTexture(-24 + 20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96, 16 + 10, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[0], 0, 0);
+        }
+        if(Player[1].Character == 5)
+        {
+            frmMain.renderTexture(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96, 16 + 10, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[6], 0, 0);
+        }
+        else
+        {
+            frmMain.renderTexture(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96, 16 + 10, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[2], 0, 0);
+        }
+        frmMain.renderTexture(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96 + 8 + GFX.Interface[2].w, 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+        SuperPrint(std::to_string(Coins), 1, 20 - (std::to_string(Coins).size() - 1) * 18 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 80 + 4 + 12 + 18 + 32 + GFX.Interface[3].w, 16 + 11);
+        // Print Score
+        SuperPrint(std::to_string(Score), 1, 20 - (std::to_string(Score).size() - 1) * 18 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 80 + 12 + 4 + 18 + 32 + GFX.Interface[3].w, 16 + 31);
+        // Print lives on the screen
+        frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 - 16, 16 + 10, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0);
+        frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 10 + GFX.Interface[1].w, 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+        SuperPrint(std::to_string(int(Lives)), 1, vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 12 + 18 + GFX.Interface[5].w, 16 + 11);
+        // Print stars on the screen
+        if(numStars > 0)
+        {
+            frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122, 16 + 30, GFX.Interface[5].w, GFX.Interface[5].h, GFX.Interface[5], 0, 0);
+            frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 10 + GFX.Interface[1].w, 16 + 31, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+            SuperPrint(std::to_string(numStars), 1, vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 12 + 18 + GFX.Interface[5].w, 16 + 31);
+        }
+    }
+    if(BattleIntro > 0)
+    {
+        if(BattleIntro > 45 || BattleIntro % 2 == 1)
+        {
+            frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.BMVs.w / 2, -96 + vScreen[Z].Height / 2.0 - GFX.BMVs.h / 2, GFX.BMVs.w, GFX.BMVs.h, GFX.BMVs, 0, 0);
+            frmMain.renderTexture(-50 + vScreen[Z].Width / 2.0 - GFX.CharacterName[Player[1].Character].w, -96 + vScreen[Z].Height / 2.0 - GFX.CharacterName[Player[1].Character].h / 2, GFX.CharacterName[Player[1].Character].w, GFX.CharacterName[Player[1].Character].h, GFX.CharacterName[Player[1].Character], 0, 0);
+            frmMain.renderTexture(50 + vScreen[Z].Width / 2.0, -96 + vScreen[Z].Height / 2.0 - GFX.CharacterName[Player[2].Character].h / 2, GFX.CharacterName[Player[2].Character].w, GFX.CharacterName[Player[2].Character].h, GFX.CharacterName[Player[2].Character], 0, 0);
+        }
+    }
+    if(BattleOutro > 0)
+    {
+        frmMain.renderTexture(10 + vScreen[Z].Width / 2.0, -96 + vScreen[Z].Height / 2.0 - GFX.BMWin.h / 2, GFX.BMWin.w, GFX.BMWin.h, GFX.BMWin, 0, 0);
+        frmMain.renderTexture(-10 + vScreen[Z].Width / 2.0 - GFX.CharacterName[Player[BattleWinner].Character].w, -96 + vScreen[Z].Height / 2.0 - GFX.CharacterName[Player[BattleWinner].Character].h / 2, GFX.CharacterName[Player[BattleWinner].Character].w, GFX.CharacterName[Player[BattleWinner].Character].h, GFX.CharacterName[Player[BattleWinner].Character], 0, 0);
+    }
 }
 
 int pfrX(int plrFrame)
 {
-//    Dim A As Integer
-//        A = plrFrame
-//        A = A - 50
-//        Do While A > 100
-//            A = A - 100
-//        Loop
-//        If A > 90 Then
-//            A = 9
-//        ElseIf A > 90 Then
-//            A = 9
-//        ElseIf A > 80 Then
-//            A = 8
-//        ElseIf A > 70 Then
-//            A = 7
-//        ElseIf A > 60 Then
-//            A = 6
-//        ElseIf A > 50 Then
-//            A = 5
-//        ElseIf A > 40 Then
-//            A = 4
-//        ElseIf A > 30 Then
-//            A = 3
-//        ElseIf A > 20 Then
-//            A = 2
-//        ElseIf A > 10 Then
-//            A = 1
-//        Else
-//            A = 0
-//        End If
-//        pfrX = A * 100
+    int A;
+    A = plrFrame;
+    A = A - 50;
+    while(A > 100)
+        A = A - 100;
+    if(A > 90)
+        A = 9;
+    else if(A > 90)
+        A = 9;
+    else if(A > 80)
+        A = 8;
+    else if(A > 70)
+        A = 7;
+    else if(A > 60)
+        A = 6;
+    else if(A > 50)
+        A = 5;
+    else if(A > 40)
+        A = 4;
+    else if(A > 30)
+        A = 3;
+    else if(A > 20)
+        A = 2;
+    else if(A > 10)
+        A = 1;
+    else
+        A = 0;
+    return A * 100;
 }
 
 int pfrY(int plrFrame)
 {
-//    Dim A As Integer
-//    A = plrFrame
-//    A = A - 50
-//    Do While A > 100
-//        A = A - 100
-//    Loop
-//    A = A - 1
-//    Do While A > 9
-//        A = A - 10
-//    Loop
-//    pfrY = A * 100
+    int A;
+    A = plrFrame;
+    A = A - 50;
+    while(A > 100)
+        A = A - 100;
+    A = A - 1;
+    while(A > 9)
+        A = A - 10;
+    return A * 100;
 }
 
 void GameThing()
 {
-//    Dim A As Integer
-//    Dim B As Integer
-//    Dim tempPlayer(1 To 2) As Player
-//    tempPlayer(1) = Player(1)
-//    tempPlayer(2) = Player(2)
+    int A = 0;
+//    int B = 0;
+    RangeArr<Player_t, 1, 2> tempPlayer;
+    tempPlayer[1] = Player[1];
+    tempPlayer[2] = Player[2];
 
-//    SetupPlayers
-//    Player(1).Location.SpeedY = 0
-//    Player(2).Location.SpeedY = 0
+    SetupPlayers();
+    Player[1].Location.SpeedY = 0;
+    Player[2].Location.SpeedY = 0;
 
-//    If numPlayers = 1 Then
-//        Player(1).Location.X = ScreenW / 2 - Player(1).Location.Width / 2
-//        Player(1).Location.Y = ScreenH / 2 - Player(1).Location.Height + 24
-//        Player(1).Direction = 1
-//    Else
-//        Player(1).Location.X = ScreenW / 2 - Player(1).Location.Width / 2 - 30
-//        Player(1).Location.Y = ScreenH / 2 - Player(1).Location.Height + 24
-//        Player(1).Direction = -1
-//        Player(2).Location.X = ScreenW / 2 - Player(2).Location.Width / 2 + 32
-//        Player(2).Location.Y = ScreenH / 2 - Player(2).Location.Height + 24
-//        Player(2).Direction = 1
-//    End If
+    if(numPlayers == 1)
+    {
+        Player[1].Location.X = ScreenW / 2.0 - Player[1].Location.Width / 2.0;
+        Player[1].Location.Y = ScreenH / 2.0 - Player[1].Location.Height + 24;
+        Player[1].Direction = 1;
+    }
+    else
+    {
+        Player[1].Location.X = ScreenW / 2.0 - Player[1].Location.Width / 2.0 - 30;
+        Player[1].Location.Y = ScreenH / 2.0 - Player[1].Location.Height + 24;
+        Player[1].Direction = -1;
+        Player[2].Location.X = ScreenW / 2.0 - Player[2].Location.Width / 2.0 + 32;
+        Player[2].Location.Y = ScreenH / 2.0 - Player[2].Location.Height + 24;
+        Player[2].Direction = 1;
+    }
 
-//    PlayerFrame 1
-//    PlayerFrame 2
+    PlayerFrame(1);
+    PlayerFrame(2);
 
-//    BitBlt myBackBuffer, 0, 0, ScreenW, ScreenH, 0, 0, 0, vbWhiteness
+    frmMain.clearBuffer();
 
-//    For A = 1 To numPlayers
-//        DrawPlayer A, 0
-//    Next A
+    for(A = 1; A <= numPlayers; A++)
+    {
+        DrawPlayer(A, 0);
+    }
 
-//    BitBlt myBackBuffer, ScreenW / 2 - 46, ScreenH / 2 + 31, GFX.Interface(3).ScaleWidth, GFX.Interface(3).ScaleHeight, GFX.InterfaceMask(3).hdc, 0, 0, vbSrcAnd
-//    BitBlt myBackBuffer, ScreenW / 2 - 46, ScreenH / 2 + 31, GFX.Interface(3).ScaleWidth, GFX.Interface(3).ScaleHeight, GFX.Interface(3).hdc, 0, 0, vbSrcPaint
-//    BitBlt myBackBuffer, ScreenW / 2 - GFX.Interface(1).ScaleWidth / 2, ScreenH / 2 + 32, GFX.Interface(1).ScaleWidth, GFX.Interface(1).ScaleHeight, GFX.InterfaceMask(1).hdc, 0, 0, vbSrcAnd
-//    BitBlt myBackBuffer, ScreenW / 2 - GFX.Interface(1).ScaleWidth / 2, ScreenH / 2 + 32, GFX.Interface(1).ScaleWidth, GFX.Interface(1).ScaleHeight, GFX.Interface(1).hdc, 0, 0, vbSrcPaint
-//    SuperPrint Str(Lives), 1, ScreenW / 2 + 12, ScreenH / 2 + 32
+    frmMain.renderTexture(ScreenW / 2.0 - 46, ScreenH / 2.0 + 31, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0);
+    frmMain.renderTexture(ScreenW / 2.0 - GFX.Interface[1].w / 2, ScreenH / 2.0 + 32, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+    SuperPrint(std::to_string(int(Lives)), 1, ScreenW / 2.0 + 12, ScreenH / 2.0 + 32);
 
-//    StretchBlt frmMain.hdc, 0, 0, frmMain.ScaleWidth, frmMain.ScaleHeight, myBackBuffer, 0, 0, 800, 600, vbSrcCopy
+    frmMain.repaint();
 
-//    Player(1) = tempPlayer(1)
-//    Player(2) = tempPlayer(2)
-//    DoEvents
+    Player[1] = tempPlayer[1];
+    Player[2] = tempPlayer[2];
+    DoEvents();
 }
 
 void DrawPlayer(int A, int Z)
 {
-//    On Error Resume Next
-//    Dim B As Integer
-//    Dim C As Double
-//    With Player(A)
-//        If .Dead = False And .Immune2 = False And .TimeToLive = 0 And Not (.Effect = 3 Or .Effect = 5 Or .Effect = 8 Or .Effect = 10) Then
-//            If vScreenCollision(Z, .Location) Then
-//                If .Mount = 3 And .Fairy = False Then
-//                    B = .MountType
-//                    'Yoshi's Tongue
-//                    If .MountSpecial > 0 Then
+    int B = 0;
+    double C = 0;
+    float s = ShadowMode ? 0.f : 1.f;
+    if(Player[A].Dead == false && Player[A].Immune2 == false && Player[A].TimeToLive == 0 && !(Player[A].Effect == 3 || Player[A].Effect == 5 || Player[A].Effect == 8 || Player[A].Effect == 10))
+    {
+        if(vScreenCollision(Z, Player[A].Location))
+        {
+            if(Player[A].Mount == 3 && Player[A].Fairy == false)
+            {
+                B = Player[A].MountType;
+                // Yoshi's Tongue
+                if(Player[A].MountSpecial > 0)
+                {
 
-//                        C = 0
-//                        If .Direction = -1 Then C = .YoshiTongueLength
+                    C = 0;
+                    if(Player[A].Direction == -1)
+                        C = Player[A].YoshiTongueLength;
 
-//                        BitBlt myBackBuffer, vScreenX(Z) + .YoshiTongueX - C - 1, vScreenY(Z) + .YoshiTongue.Y, .YoshiTongueLength + 2, 16, GFX.TongueMask(2).hdc, 0, 0, vbSrcAnd
-//                        If ShadowMode = False Then BitBlt myBackBuffer, vScreenX(Z) + .YoshiTongueX - C - 1, vScreenY(Z) + .YoshiTongue.Y, .YoshiTongueLength + 2, 16, GFX.Tongue(2).hdc, 0, 0, vbSrcPaint
+                    frmMain.renderTexture(vScreenX[Z] + Player[A].YoshiTongueX - C - 1, vScreenY[Z] + Player[A].YoshiTongue.Y, Player[A].YoshiTongueLength + 2, 16, GFX.Tongue[2], 0, 0, s, s, s);
 
-//                        C = 1
-//                        If .Direction = 1 Then C = 0
+                    C = 1;
+                    if(Player[A].Direction == 1)
+                        C = 0;
 
-//                        BitBlt myBackBuffer, vScreenX(Z) + Int(.YoshiTongue.X), vScreenY(Z) + .YoshiTongue.Y, 16, 16, GFX.TongueMask(1).hdc, 0, 16 * C, vbSrcAnd
-//                        If ShadowMode = False Then BitBlt myBackBuffer, vScreenX(Z) + Int(.YoshiTongue.X), vScreenY(Z) + .YoshiTongue.Y, 16, 16, GFX.Tongue(1).hdc, 0, 16 * C, vbSrcPaint
+                    frmMain.renderTexture(vScreenX[Z] + static_cast<int>(floor(static_cast<double>(Player[A].YoshiTongue.X))), vScreenY[Z] + Player[A].YoshiTongue.Y, 16, 16, GFX.Tongue[1], 0, 16 * C, s, s, s);
 
-//                    End If
-//                    'Yoshi's Body
-//                    BitBlt myBackBuffer, vScreenX(Z) + Int(.Location.X) + .YoshiBX, vScreenY(Z) + .Location.Y + .YoshiBY, 32, 32, GFXYoshiBMask(B), 0, 32 * .YoshiBFrame, vbSrcAnd
-//                    If ShadowMode = False Then BitBlt myBackBuffer, vScreenX(Z) + Int(.Location.X) + .YoshiBX, vScreenY(Z) + .Location.Y + .YoshiBY, 32, 32, GFXYoshiB(B), 0, 32 * .YoshiBFrame, vbSrcPaint
-//                    'Yoshi's Head
-//                    BitBlt myBackBuffer, vScreenX(Z) + Int(.Location.X) + .YoshiTX, vScreenY(Z) + .Location.Y + .YoshiTY, 32, 32, GFXYoshiTMask(B), 0, 32 * .YoshiTFrame, vbSrcAnd
-//                    If ShadowMode = False Then BitBlt myBackBuffer, vScreenX(Z) + Int(.Location.X) + .YoshiTX, vScreenY(Z) + .Location.Y + .YoshiTY, 32, 32, GFXYoshiT(B), 0, 32 * .YoshiTFrame, vbSrcPaint
-//                End If
-//                If .Fairy = True Then 'draw a fairy
-//                    .Frame = 1
-//                    If .Immune2 = False Then
-//                    If .Direction = 1 Then
-//                        BitBlt myBackBuffer, vScreenX(Z) + .Location.X - 5, vScreenY(Z) + .Location.Y - 2, 32, 32, GFXNPCMask(254), 0, (SpecialFrame(9) + 1) * 32, vbSrcAnd
-//                        If ShadowMode = False Then BitBlt myBackBuffer, vScreenX(Z) + .Location.X - 5, vScreenY(Z) + .Location.Y - 2, 32, 32, GFXNPC(254), 0, (SpecialFrame(9) + 1) * 32, vbSrcPaint
-//                    Else
-//                        BitBlt myBackBuffer, vScreenX(Z) + .Location.X - 5, vScreenY(Z) + .Location.Y - 2, 32, 32, GFXNPCMask(254), 0, (SpecialFrame(9) + 3) * 32, vbSrcAnd
-//                        If ShadowMode = False Then BitBlt myBackBuffer, vScreenX(Z) + .Location.X - 5, vScreenY(Z) + .Location.Y - 2, 32, 32, GFXNPC(254), 0, (SpecialFrame(9) + 3) * 32, vbSrcPaint
-//                    End If
-//                    End If
-//                ElseIf .Character = 1 Then 'draw mario
-//                    If .Mount = 0 Then
-//                        BitBlt myBackBuffer, _
-//                            vScreenX(Z) + Int(.Location.X) + MarioFrameX((.State * 100) + (.Frame * .Direction)), _
-//                            vScreenY(Z) + .Location.Y + MarioFrameY((.State * 100) + (.Frame * .Direction)), _
-//                            99, 99, _
-//                            GFXMarioMask(.State), _
-//                            pfrX(100 + .Frame * .Direction), _
-//                            pfrY(100 + .Frame * .Direction), _
-//                            vbSrcAnd
+                }
+                // Yoshi's Body
+                frmMain.renderTexture(vScreenX[Z] + static_cast<int>(floor(static_cast<double>(Player[A].Location.X))) + Player[A].YoshiBX, vScreenY[Z] + Player[A].Location.Y + Player[A].YoshiBY, 32, 32, GFXYoshiB[B], 0, 32 * Player[A].YoshiBFrame, s, s, s);
 
-//                        If ShadowMode = False Then _
-//                            BitBlt myBackBuffer, _
-//                                vScreenX(Z) + Int(.Location.X) + MarioFrameX((.State * 100) + (.Frame * .Direction)), _
-//                                vScreenY(Z) + .Location.Y + MarioFrameY((.State * 100) + (.Frame * .Direction)), _
-//                                99, 99, _
-//                                GFXMario(.State), _
-//                                pfrX(100 + .Frame * .Direction), _
-//                                pfrY(100 + .Frame * .Direction), _
-//                                vbSrcPaint
-//                    ElseIf .Mount = 1 Then
-//                        If .Duck = False Then
-//                            BitBlt myBackBuffer, vScreenX(Z) + Int(.Location.X) + MarioFrameX((.State * 100) + (.Frame * .Direction)), vScreenY(Z) + .Location.Y + MarioFrameY((.State * 100) + (.Frame * .Direction)), 99, .Location.Height - 26 - .MountOffsetY - MarioFrameY((.State * 100) + (.Frame * .Direction)), GFXMarioMask(.State), pfrX(100 + .Frame * .Direction), pfrY(100 + .Frame * .Direction), vbSrcAnd
-//                            If ShadowMode = False Then BitBlt myBackBuffer, vScreenX(Z) + Int(.Location.X) + MarioFrameX((.State * 100) + (.Frame * .Direction)), vScreenY(Z) + .Location.Y + MarioFrameY((.State * 100) + (.Frame * .Direction)), 99, .Location.Height - 26 - .MountOffsetY - MarioFrameY((.State * 100) + (.Frame * .Direction)), GFXMario(.State), pfrX(100 + .Frame * .Direction), pfrY(100 + .Frame * .Direction), vbSrcPaint
-//                        End If
-//                        BitBlt myBackBuffer, vScreenX(Z) + Int(.Location.X) + .Location.Width / 2 - 16, vScreenY(Z) + .Location.Y + .Location.Height - 30, 32, 32, GFX.BootMask(.MountType).hdc, 0, 32 * .MountFrame, vbSrcAnd
-//                        If ShadowMode = False Then BitBlt myBackBuffer, vScreenX(Z) + Int(.Location.X) + .Location.Width / 2 - 16, vScreenY(Z) + .Location.Y + .Location.Height - 30, 32, 32, GFX.Boot(.MountType).hdc, 0, 32 * .MountFrame, vbSrcPaint
-//                    ElseIf .Mount = 3 Then
-//                        BitBlt myBackBuffer, vScreenX(Z) + Int(.Location.X) + MarioFrameX((.State * 100) + (.Frame * .Direction)), vScreenY(Z) + .Location.Y + MarioFrameY((.State * 100) + (.Frame * .Direction)) + .MountOffsetY, 99, 99, GFXMarioMask(.State), pfrX(100 + .Frame * .Direction), pfrY(100 + .Frame * .Direction), vbSrcAnd
-//                        If ShadowMode = False Then BitBlt myBackBuffer, vScreenX(Z) + Int(.Location.X) + MarioFrameX((.State * 100) + (.Frame * .Direction)), vScreenY(Z) + .Location.Y + MarioFrameY((.State * 100) + (.Frame * .Direction)) + .MountOffsetY, 99, 99, GFXMario(.State), pfrX(100 + .Frame * .Direction), pfrY(100 + .Frame * .Direction), vbSrcPaint
-//                    End If
-//                ElseIf .Character = 2 Then 'draw luigi
-//                    If .Mount = 0 Then
-//                        BitBlt myBackBuffer, vScreenX(Z) + Int(.Location.X) + LuigiFrameX((.State * 100) + (.Frame * .Direction)), vScreenY(Z) + .Location.Y + LuigiFrameY((.State * 100) + (.Frame * .Direction)), 99, 99, GFXLuigiMask(.State), pfrX(100 + .Frame * .Direction), pfrY(100 + .Frame * .Direction), vbSrcAnd
-//                        If ShadowMode = False Then BitBlt myBackBuffer, vScreenX(Z) + Int(.Location.X) + LuigiFrameX((.State * 100) + (.Frame * .Direction)), vScreenY(Z) + .Location.Y + LuigiFrameY((.State * 100) + (.Frame * .Direction)), 99, 99, GFXLuigi(.State), pfrX(100 + .Frame * .Direction), pfrY(100 + .Frame * .Direction), vbSrcPaint
-//                    ElseIf .Mount = 1 Then
-//                        If .Duck = False Then
-//                            BitBlt myBackBuffer, vScreenX(Z) + Int(.Location.X) + LuigiFrameX((.State * 100) + (.Frame * .Direction)), vScreenY(Z) + .Location.Y + LuigiFrameY((.State * 100) + (.Frame * .Direction)), 99, .Location.Height - 26 - .MountOffsetY - LuigiFrameY((.State * 100) + (.Frame * .Direction)), GFXLuigiMask(.State), pfrX(100 + .Frame * .Direction), pfrY(100 + .Frame * .Direction), vbSrcAnd
-//                            If ShadowMode = False Then BitBlt myBackBuffer, vScreenX(Z) + Int(.Location.X) + LuigiFrameX((.State * 100) + (.Frame * .Direction)), vScreenY(Z) + .Location.Y + LuigiFrameY((.State * 100) + (.Frame * .Direction)), 99, .Location.Height - 26 - .MountOffsetY - LuigiFrameY((.State * 100) + (.Frame * .Direction)), GFXLuigi(.State), pfrX(100 + .Frame * .Direction), pfrY(100 + .Frame * .Direction), vbSrcPaint
-//                        End If
-//                        BitBlt myBackBuffer, vScreenX(Z) + Int(.Location.X) + .Location.Width / 2 - 16, vScreenY(Z) + .Location.Y + .Location.Height - 30, 32, 32, GFX.BootMask(.MountType).hdc, 0, 32 * .MountFrame, vbSrcAnd
-//                        If ShadowMode = False Then BitBlt myBackBuffer, vScreenX(Z) + Int(.Location.X) + .Location.Width / 2 - 16, vScreenY(Z) + .Location.Y + .Location.Height - 30, 32, 32, GFX.Boot(.MountType).hdc, 0, 32 * .MountFrame, vbSrcPaint
-//                    ElseIf .Mount = 3 Then
-//                        BitBlt myBackBuffer, vScreenX(Z) + Int(.Location.X) + LuigiFrameX((.State * 100) + (.Frame * .Direction)), vScreenY(Z) + .Location.Y + LuigiFrameY((.State * 100) + (.Frame * .Direction)) + .MountOffsetY, 99, 99, GFXLuigiMask(.State), pfrX(100 + .Frame * .Direction), pfrY(100 + .Frame * .Direction), vbSrcAnd
-//                        If ShadowMode = False Then BitBlt myBackBuffer, vScreenX(Z) + Int(.Location.X) + LuigiFrameX((.State * 100) + (.Frame * .Direction)), vScreenY(Z) + .Location.Y + LuigiFrameY((.State * 100) + (.Frame * .Direction)) + .MountOffsetY, 99, 99, GFXLuigi(.State), pfrX(100 + .Frame * .Direction), pfrY(100 + .Frame * .Direction), vbSrcPaint
-//                    End If
-//                ElseIf .Character = 3 Then 'draw peach
-//                    If .Mount = 0 Then
-//                        BitBlt myBackBuffer, vScreenX(Z) + .Location.X + PeachFrameX((.State * 100) + (.Frame * .Direction)), vScreenY(Z) + .Location.Y + PeachFrameY((.State * 100) + (.Frame * .Direction)), 99, 99, GFXPeachMask(.State), pfrX(100 + .Frame * .Direction), pfrY(100 + .Frame * .Direction), vbSrcAnd
-//                        If ShadowMode = False Then BitBlt myBackBuffer, vScreenX(Z) + .Location.X + PeachFrameX((.State * 100) + (.Frame * .Direction)), vScreenY(Z) + .Location.Y + PeachFrameY((.State * 100) + (.Frame * .Direction)), 99, 99, GFXPeach(.State), pfrX(100 + .Frame * .Direction), pfrY(100 + .Frame * .Direction), vbSrcPaint
-//                    ElseIf .Mount = 1 Then
-//                        If .Duck = False Then
-//                            BitBlt myBackBuffer, vScreenX(Z) + Int(.Location.X) + PeachFrameX((.State * 100) + (.Frame * .Direction)), vScreenY(Z) + .Location.Y + PeachFrameY((.State * 100) + (.Frame * .Direction)), 99, .Location.Height - 26 - PeachFrameY((.State * 100) + (.Frame * .Direction)) - 2, GFXPeachMask(.State), pfrX(100 + .Frame * .Direction), pfrY(100 + .Frame * .Direction), vbSrcAnd
-//                            If ShadowMode = False Then BitBlt myBackBuffer, vScreenX(Z) + Int(.Location.X) + PeachFrameX((.State * 100) + (.Frame * .Direction)), vScreenY(Z) + .Location.Y + PeachFrameY((.State * 100) + (.Frame * .Direction)), 99, .Location.Height - 26 - PeachFrameY((.State * 100) + (.Frame * .Direction)) - 2, GFXPeach(.State), pfrX(100 + .Frame * .Direction), pfrY(100 + .Frame * .Direction), vbSrcPaint
-//                        End If
-//                        BitBlt myBackBuffer, vScreenX(Z) + Int(.Location.X) + .Location.Width / 2 - 16, vScreenY(Z) + .Location.Y + .Location.Height - 30, 32, 32, GFX.BootMask(.MountType).hdc, 0, 32 * .MountFrame, vbSrcAnd
-//                        If ShadowMode = False Then BitBlt myBackBuffer, vScreenX(Z) + Int(.Location.X) + .Location.Width / 2 - 16, vScreenY(Z) + .Location.Y + .Location.Height - 30, 32, 32, GFX.Boot(.MountType).hdc, 0, 32 * .MountFrame, vbSrcPaint
-//                    End If
-//                ElseIf .Character = 4 Then 'draw Toad
-//                    If .Mount = 0 Then
-//                        BitBlt myBackBuffer, vScreenX(Z) + .Location.X + ToadFrameX((.State * 100) + (.Frame * .Direction)), vScreenY(Z) + .Location.Y + ToadFrameY((.State * 100) + (.Frame * .Direction)), 99, 99, GFXToadMask(.State), pfrX(100 + .Frame * .Direction), pfrY(100 + .Frame * .Direction), vbSrcAnd
-//                        If ShadowMode = False Then BitBlt myBackBuffer, vScreenX(Z) + .Location.X + ToadFrameX((.State * 100) + (.Frame * .Direction)), vScreenY(Z) + .Location.Y + ToadFrameY((.State * 100) + (.Frame * .Direction)), 99, 99, GFXToad(.State), pfrX(100 + .Frame * .Direction), pfrY(100 + .Frame * .Direction), vbSrcPaint
-//                    ElseIf .Mount = 1 Then
-//                        If .Duck = False Then
-//                            If .State = 1 Then
-//                                BitBlt myBackBuffer, vScreenX(Z) + Int(.Location.X) + ToadFrameX((.State * 100) + (.Frame * .Direction)), 6 + vScreenY(Z) + .Location.Y + ToadFrameY((.State * 100) + (.Frame * .Direction)), 99, .Location.Height - 26 - .MountOffsetY - ToadFrameY((.State * 100) + (.Frame * .Direction)), GFXToadMask(.State), pfrX(100 + .Frame * .Direction), pfrY(100 + .Frame * .Direction), vbSrcAnd
-//                                If ShadowMode = False Then BitBlt myBackBuffer, vScreenX(Z) + Int(.Location.X) + ToadFrameX((.State * 100) + (.Frame * .Direction)), 6 + vScreenY(Z) + .Location.Y + ToadFrameY((.State * 100) + (.Frame * .Direction)), 99, .Location.Height - 26 - .MountOffsetY - ToadFrameY((.State * 100) + (.Frame * .Direction)), GFXToad(.State), pfrX(100 + .Frame * .Direction), pfrY(100 + .Frame * .Direction), vbSrcPaint
-//                            Else
-//                                BitBlt myBackBuffer, vScreenX(Z) + Int(.Location.X) + ToadFrameX((.State * 100) + (.Frame * .Direction)), vScreenY(Z) + .Location.Y + ToadFrameY((.State * 100) + (.Frame * .Direction)), 99, .Location.Height - 26 - .MountOffsetY - ToadFrameY((.State * 100) + (.Frame * .Direction)), GFXToadMask(.State), pfrX(100 + .Frame * .Direction), pfrY(100 + .Frame * .Direction), vbSrcAnd
-//                                If ShadowMode = False Then BitBlt myBackBuffer, vScreenX(Z) + Int(.Location.X) + ToadFrameX((.State * 100) + (.Frame * .Direction)), vScreenY(Z) + .Location.Y + ToadFrameY((.State * 100) + (.Frame * .Direction)), 99, .Location.Height - 26 - .MountOffsetY - ToadFrameY((.State * 100) + (.Frame * .Direction)), GFXToad(.State), pfrX(100 + .Frame * .Direction), pfrY(100 + .Frame * .Direction), vbSrcPaint
-//                            End If
-//                        End If
-//                        BitBlt myBackBuffer, vScreenX(Z) + Int(.Location.X) + .Location.Width / 2 - 16, vScreenY(Z) + .Location.Y + .Location.Height - 30, 32, 32, GFX.BootMask(.MountType).hdc, 0, 32 * .MountFrame, vbSrcAnd
-//                        If ShadowMode = False Then BitBlt myBackBuffer, vScreenX(Z) + Int(.Location.X) + .Location.Width / 2 - 16, vScreenY(Z) + .Location.Y + .Location.Height - 30, 32, 32, GFX.Boot(.MountType).hdc, 0, 32 * .MountFrame, vbSrcPaint
-//                    End If
-//                ElseIf .Character = 5 Then 'draw link
-//                    If .Mount = 0 Then
-//                        BitBlt myBackBuffer, vScreenX(Z) + .Location.X + LinkFrameX((.State * 100) + (.Frame * .Direction)), vScreenY(Z) + .Location.Y + LinkFrameY((.State * 100) + (.Frame * .Direction)), 99, 99, GFXLinkMask(.State), pfrX(100 + .Frame * .Direction), pfrY(100 + .Frame * .Direction), vbSrcAnd
-//                        If ShadowMode = False Then BitBlt myBackBuffer, vScreenX(Z) + .Location.X + LinkFrameX((.State * 100) + (.Frame * .Direction)), vScreenY(Z) + .Location.Y + LinkFrameY((.State * 100) + (.Frame * .Direction)), 99, 99, GFXLink(.State), pfrX(100 + .Frame * .Direction), pfrY(100 + .Frame * .Direction), vbSrcPaint
-//                    End If
-//                End If
-//            'peach/toad held npcs
-//                If (.Character = 3 Or .Character = 4) And .HoldingNPC > 0 And .Effect <> 7 Then
-//                    With NPC(.HoldingNPC)
-//                        If .Type <> 263 Then
-//                            If (((.HoldingPlayer > 0 And Player(.HoldingPlayer).Effect <> 3) Or (.Type = 50 And .standingOnPlayer = 0) Or .Type = 17 And .CantHurt > 0) Or .Effect = 5) And Not .Type = 91 And Player(.HoldingPlayer).Dead = False Then
-//                                If NPCIsYoshi(.Type) = False And .Type > 0 Then
-//                                    If NPCWidthGFX(.Type) = 0 Then
-//                                        BitBlt myBackBuffer, vScreenX(Z) + .Location.X + NPCFrameOffsetX(.Type), vScreenY(Z) + .Location.Y + NPCFrameOffsetY(.Type), .Location.Width, .Location.Height, GFXNPCMask(.Type), 0, .Frame * .Location.Height, vbSrcAnd
-//                                        If .Shadow = False Then BitBlt myBackBuffer, vScreenX(Z) + .Location.X + NPCFrameOffsetX(.Type), vScreenY(Z) + .Location.Y + NPCFrameOffsetY(.Type), .Location.Width, .Location.Height, GFXNPC(.Type), 0, .Frame * .Location.Height, vbSrcPaint
-//                                    Else
-//                                        BitBlt myBackBuffer, vScreenX(Z) + .Location.X + (NPCFrameOffsetX(.Type) * -.Direction) - NPCWidthGFX(.Type) / 2 + .Location.Width / 2, vScreenY(Z) + .Location.Y + NPCFrameOffsetY(.Type) - NPCHeightGFX(.Type) + .Location.Height, NPCWidthGFX(.Type), NPCHeightGFX(.Type), GFXNPCMask(.Type), 0, .Frame * NPCHeightGFX(.Type), vbSrcAnd
-//                                        If .Shadow = False Then BitBlt myBackBuffer, vScreenX(Z) + .Location.X + (NPCFrameOffsetX(.Type) * -.Direction) - NPCWidthGFX(.Type) / 2 + .Location.Width / 2, vScreenY(Z) + .Location.Y + NPCFrameOffsetY(.Type) - NPCHeightGFX(.Type) + .Location.Height, NPCWidthGFX(.Type), NPCHeightGFX(.Type), GFXNPC(.Type), 0, .Frame * NPCHeightGFX(.Type), vbSrcPaint
-//                                    End If
-//                                End If
-//                            End If
-//                        Else
-//                            DrawFrozenNPC Z, Player(A).HoldingNPC
-//                        End If
-//                    End With
-//                End If
-//                If .Fairy = False Then
-//                    If .Mount = 3 And .YoshiBlue = True Then
-//                        If .Direction = 1 Then
-//                            BitBlt myBackBuffer, vScreenX(Z) + Int(.Location.X) + .YoshiBX - 12, vScreenY(Z) + .Location.Y + .YoshiBY - 16, 32, 32, GFX.YoshiWingsMask.hdc, 0, 0 + 32 * .YoshiWingsFrame, vbSrcAnd
-//                            If ShadowMode = False Then BitBlt myBackBuffer, vScreenX(Z) + Int(.Location.X) + .YoshiBX - 12, vScreenY(Z) + .Location.Y + .YoshiBY - 16, 32, 32, GFX.YoshiWings.hdc, 0, 0 + 32 * .YoshiWingsFrame, vbSrcPaint
-//                        Else
-//                            BitBlt myBackBuffer, vScreenX(Z) + Int(.Location.X) + .YoshiBX + 12, vScreenY(Z) + .Location.Y + .YoshiBY - 16, 32, 32, GFX.YoshiWingsMask.hdc, 0, 0 + 32 * .YoshiWingsFrame, vbSrcAnd
-//                            If ShadowMode = False Then BitBlt myBackBuffer, vScreenX(Z) + Int(.Location.X) + .YoshiBX + 12, vScreenY(Z) + .Location.Y + .YoshiBY - 16, 32, 32, GFX.YoshiWings.hdc, 0, 0 + 32 * .YoshiWingsFrame, vbSrcPaint
-//                        End If
-//                    End If
-//                    If .Mount = 1 And .MountType = 3 Then
-//                        If .Direction = 1 Then
-//                            BitBlt myBackBuffer, vScreenX(Z) + Int(.Location.X) - 24, vScreenY(Z) + .Location.Y + .Location.Height - 40, 32, 32, GFX.YoshiWingsMask.hdc, 0, 0 + 32 * .YoshiWingsFrame, vbSrcAnd
-//                            If ShadowMode = False Then BitBlt myBackBuffer, vScreenX(Z) + Int(.Location.X) - 24, vScreenY(Z) + .Location.Y + .Location.Height - 40, 32, 32, GFX.YoshiWings.hdc, 0, 0 + 32 * .YoshiWingsFrame, vbSrcPaint
-//                        Else
-//                            BitBlt myBackBuffer, vScreenX(Z) + Int(.Location.X) + 16, vScreenY(Z) + .Location.Y + .Location.Height - 40, 32, 32, GFX.YoshiWingsMask.hdc, 0, 0 + 32 * .YoshiWingsFrame, vbSrcAnd
-//                            If ShadowMode = False Then BitBlt myBackBuffer, vScreenX(Z) + Int(.Location.X) + 16, vScreenY(Z) + .Location.Y + .Location.Height - 40, 32, 32, GFX.YoshiWings.hdc, 0, 0 + 32 * .YoshiWingsFrame, vbSrcPaint
-//                        End If
-//                    End If
-//                End If
-//            End If
-//        End If
-//    End With
+                // Yoshi's Head
+                frmMain.renderTexture(vScreenX[Z] + static_cast<int>(floor(static_cast<double>(Player[A].Location.X))) + Player[A].YoshiTX, vScreenY[Z] + Player[A].Location.Y + Player[A].YoshiTY, 32, 32, GFXYoshiT[B], 0, 32 * Player[A].YoshiTFrame, s, s, s);
+            }
+            if(Player[A].Fairy == true) // draw a fairy
+            {
+                Player[A].Frame = 1;
+                if(Player[A].Immune2 == false)
+                {
+                    if(Player[A].Direction == 1)
+                    {
+                        frmMain.renderTexture(vScreenX[Z] + Player[A].Location.X - 5, vScreenY[Z] + Player[A].Location.Y - 2, 32, 32, GFXNPC[254], 0, (SpecialFrame[9] + 1) * 32, s, s, s);
+                    }
+                    else
+                    {
+                        frmMain.renderTexture(vScreenX[Z] + Player[A].Location.X - 5, vScreenY[Z] + Player[A].Location.Y - 2, 32, 32, GFXNPC[254], 0, (SpecialFrame[9] + 3) * 32, s, s, s);
+                    }
+                }
+            }
+            else if(Player[A].Character == 1) // draw mario
+            {
+                if(Player[A].Mount == 0)
+                {
+                    frmMain.renderTexture(vScreenX[Z] + static_cast<int>(floor(static_cast<double>(Player[A].Location.X))) + MarioFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], vScreenY[Z] + Player[A].Location.Y + MarioFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], 99, 99, GFXMario[Player[A].State], pfrX(100 + Player[A].Frame * Player[A].Direction), pfrY(100 + Player[A].Frame * Player[A].Direction), s, s, s);
+                }
+                else if(Player[A].Mount == 1)
+                {
+                    if(Player[A].Duck == false)
+                    {
+                        frmMain.renderTexture(vScreenX[Z] + static_cast<int>(floor(static_cast<double>(Player[A].Location.X))) + MarioFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], vScreenY[Z] + Player[A].Location.Y + MarioFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], 99, Player[A].Location.Height - 26 - Player[A].MountOffsetY - MarioFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], GFXMario[Player[A].State], pfrX(100 + Player[A].Frame * Player[A].Direction), pfrY(100 + Player[A].Frame * Player[A].Direction), s, s, s);
+                    }
+                    frmMain.renderTexture(vScreenX[Z] + static_cast<int>(floor(static_cast<double>(Player[A].Location.X))) + Player[A].Location.Width / 2.0 - 16, vScreenY[Z] + Player[A].Location.Y + Player[A].Location.Height - 30, 32, 32, GFX.Boot[Player[A].MountType], 0, 32 * Player[A].MountFrame, s, s, s);
+                }
+                else if(Player[A].Mount == 3)
+                {
+                    frmMain.renderTexture(vScreenX[Z] + static_cast<int>(floor(static_cast<double>(Player[A].Location.X))) + MarioFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], vScreenY[Z] + Player[A].Location.Y + MarioFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] + Player[A].MountOffsetY, 99, 99, GFXMario[Player[A].State], pfrX(100 + Player[A].Frame * Player[A].Direction), pfrY(100 + Player[A].Frame * Player[A].Direction), s, s, s);
+                }
+            }
+            else if(Player[A].Character == 2) // draw luigi
+            {
+                if(Player[A].Mount == 0)
+                {
+                    frmMain.renderTexture(vScreenX[Z] + static_cast<int>(floor(static_cast<double>(Player[A].Location.X))) + LuigiFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], vScreenY[Z] + Player[A].Location.Y + LuigiFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], 99, 99, GFXLuigi[Player[A].State], pfrX(100 + Player[A].Frame * Player[A].Direction), pfrY(100 + Player[A].Frame * Player[A].Direction), s, s, s);
+                }
+                else if(Player[A].Mount == 1)
+                {
+                    if(Player[A].Duck == false)
+                    {
+                        frmMain.renderTexture(vScreenX[Z] + static_cast<int>(floor(static_cast<double>(Player[A].Location.X))) + LuigiFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], vScreenY[Z] + Player[A].Location.Y + LuigiFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], 99, Player[A].Location.Height - 26 - Player[A].MountOffsetY - LuigiFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], GFXLuigi[Player[A].State], pfrX(100 + Player[A].Frame * Player[A].Direction), pfrY(100 + Player[A].Frame * Player[A].Direction), s, s, s);
+                    }
+                    frmMain.renderTexture(vScreenX[Z] + static_cast<int>(floor(static_cast<double>(Player[A].Location.X))) + Player[A].Location.Width / 2.0 - 16, vScreenY[Z] + Player[A].Location.Y + Player[A].Location.Height - 30, 32, 32, GFX.Boot[Player[A].MountType], 0, 32 * Player[A].MountFrame);
+                }
+                else if(Player[A].Mount == 3)
+                {
+                    frmMain.renderTexture(vScreenX[Z] + static_cast<int>(floor(static_cast<double>(Player[A].Location.X))) + LuigiFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], vScreenY[Z] + Player[A].Location.Y + LuigiFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] + Player[A].MountOffsetY, 99, 99, GFXLuigi[Player[A].State], pfrX(100 + Player[A].Frame * Player[A].Direction), pfrY(100 + Player[A].Frame * Player[A].Direction), s, s, s);
+                }
+            }
+            else if(Player[A].Character == 3) // draw peach
+            {
+                if(Player[A].Mount == 0)
+                {
+                    frmMain.renderTexture(vScreenX[Z] + Player[A].Location.X + PeachFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], vScreenY[Z] + Player[A].Location.Y + PeachFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], 99, 99, GFXPeach[Player[A].State], pfrX(100 + Player[A].Frame * Player[A].Direction), pfrY(100 + Player[A].Frame * Player[A].Direction), s, s, s);
+                }
+                else if(Player[A].Mount == 1)
+                {
+                    if(Player[A].Duck == false)
+                    {
+                        frmMain.renderTexture(vScreenX[Z] + static_cast<int>(floor(static_cast<double>(Player[A].Location.X))) + PeachFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], vScreenY[Z] + Player[A].Location.Y + PeachFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], 99, Player[A].Location.Height - 26 - PeachFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] - 2, GFXPeach[Player[A].State], pfrX(100 + Player[A].Frame * Player[A].Direction), pfrY(100 + Player[A].Frame * Player[A].Direction), s, s, s);
+                    }
+                    frmMain.renderTexture(vScreenX[Z] + static_cast<int>(floor(static_cast<double>(Player[A].Location.X))) + Player[A].Location.Width / 2.0 - 16, vScreenY[Z] + Player[A].Location.Y + Player[A].Location.Height - 30, 32, 32, GFX.Boot[Player[A].MountType], 0, 32 * Player[A].MountFrame, s, s, s);
+                }
+            }
+            else if(Player[A].Character == 4) // draw Toad
+            {
+                if(Player[A].Mount == 0)
+                {
+                    frmMain.renderTexture(vScreenX[Z] + Player[A].Location.X + ToadFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], vScreenY[Z] + Player[A].Location.Y + ToadFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], 99, 99, GFXToad[Player[A].State], pfrX(100 + Player[A].Frame * Player[A].Direction), pfrY(100 + Player[A].Frame * Player[A].Direction), s, s, s);
+                }
+                else if(Player[A].Mount == 1)
+                {
+                    if(Player[A].Duck == false)
+                    {
+                        if(Player[A].State == 1)
+                        {
+                            frmMain.renderTexture(vScreenX[Z] + static_cast<int>(floor(static_cast<double>(Player[A].Location.X))) + ToadFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], 6 + vScreenY[Z] + Player[A].Location.Y + ToadFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], 99, Player[A].Location.Height - 26 - Player[A].MountOffsetY - ToadFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], GFXToad[Player[A].State], pfrX(100 + Player[A].Frame * Player[A].Direction), pfrY(100 + Player[A].Frame * Player[A].Direction), s, s, s);
+                        }
+                        else
+                        {
+                            frmMain.renderTexture(vScreenX[Z] + static_cast<int>(floor(static_cast<double>(Player[A].Location.X))) + ToadFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], vScreenY[Z] + Player[A].Location.Y + ToadFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], 99, Player[A].Location.Height - 26 - Player[A].MountOffsetY - ToadFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], GFXToad[Player[A].State], pfrX(100 + Player[A].Frame * Player[A].Direction), pfrY(100 + Player[A].Frame * Player[A].Direction), s, s, s);
+                        }
+                    }
+                    frmMain.renderTexture(vScreenX[Z] + static_cast<int>(floor(static_cast<double>(Player[A].Location.X))) + Player[A].Location.Width / 2.0 - 16, vScreenY[Z] + Player[A].Location.Y + Player[A].Location.Height - 30, 32, 32, GFX.Boot[Player[A].MountType], 0, 32 * Player[A].MountFrame, s, s, s);
+                }
+            }
+            else if(Player[A].Character == 5) // draw link
+            {
+                if(Player[A].Mount == 0)
+                {
+                    frmMain.renderTexture(vScreenX[Z] + Player[A].Location.X + LinkFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], vScreenY[Z] + Player[A].Location.Y + LinkFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], 99, 99, GFXLink[Player[A].State], pfrX(100 + Player[A].Frame * Player[A].Direction), pfrY(100 + Player[A].Frame * Player[A].Direction), s, s, s);
+                }
+            }
+        // peach/toad held npcs
+            if((Player[A].Character == 3 || Player[A].Character == 4) && Player[A].HoldingNPC > 0 && Player[A].Effect != 7)
+            {
+                if(NPC[Player[A].HoldingNPC].Type != 263)
+                {
+                    if((((NPC[Player[A].HoldingNPC].HoldingPlayer > 0 && Player[NPC[Player[A].HoldingNPC].HoldingPlayer].Effect != 3) || (NPC[Player[A].HoldingNPC].Type == 50 && NPC[Player[A].HoldingNPC].standingOnPlayer == 0) || NPC[Player[A].HoldingNPC].Type == 17 && NPC[Player[A].HoldingNPC].CantHurt > 0) || NPC[Player[A].HoldingNPC].Effect == 5) && !(NPC[Player[A].HoldingNPC].Type == 91) && Player[NPC[Player[A].HoldingNPC].HoldingPlayer].Dead == false)
+                    {
+                        if(NPCIsYoshi[NPC[Player[A].HoldingNPC].Type] == false && NPC[Player[A].HoldingNPC].Type > 0)
+                        {
+                            if(NPCWidthGFX[NPC[Player[A].HoldingNPC].Type] == 0)
+                            {
+                                frmMain.renderTexture(vScreenX[Z] + NPC[Player[A].HoldingNPC].Location.X + NPCFrameOffsetX[NPC[Player[A].HoldingNPC].Type], vScreenY[Z] + NPC[Player[A].HoldingNPC].Location.Y + NPCFrameOffsetY[NPC[Player[A].HoldingNPC].Type], NPC[Player[A].HoldingNPC].Location.Width, NPC[Player[A].HoldingNPC].Location.Height, GFXNPC[NPC[Player[A].HoldingNPC].Type], 0, NPC[Player[A].HoldingNPC].Frame * NPC[Player[A].HoldingNPC].Location.Height);
+                            }
+                            else
+                            {
+                                frmMain.renderTexture(vScreenX[Z] + NPC[Player[A].HoldingNPC].Location.X + (NPCFrameOffsetX[NPC[Player[A].HoldingNPC].Type] * -NPC[Player[A].HoldingNPC].Direction) - NPCWidthGFX[NPC[Player[A].HoldingNPC].Type] / 2.0 + NPC[Player[A].HoldingNPC].Location.Width / 2.0, vScreenY[Z] + NPC[Player[A].HoldingNPC].Location.Y + NPCFrameOffsetY[NPC[Player[A].HoldingNPC].Type] - NPCHeightGFX[NPC[Player[A].HoldingNPC].Type] + NPC[Player[A].HoldingNPC].Location.Height, NPCWidthGFX[NPC[Player[A].HoldingNPC].Type], NPCHeightGFX[NPC[Player[A].HoldingNPC].Type], GFXNPC[NPC[Player[A].HoldingNPC].Type], 0, NPC[Player[A].HoldingNPC].Frame * NPCHeightGFX[NPC[Player[A].HoldingNPC].Type]);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    DrawFrozenNPC( Z, Player[A].HoldingNPC);
+                }
+            }
+            if(Player[A].Fairy == false)
+            {
+                if(Player[A].Mount == 3 && Player[A].YoshiBlue == true)
+                {
+                    if(Player[A].Direction == 1)
+                    {
+                        frmMain.renderTexture(vScreenX[Z] + static_cast<int>(floor(static_cast<double>(Player[A].Location.X))) + Player[A].YoshiBX - 12, vScreenY[Z] + Player[A].Location.Y + Player[A].YoshiBY - 16, 32, 32, GFX.YoshiWings, 0, 0 + 32 * Player[A].YoshiWingsFrame, s, s, s);
+                    }
+                    else
+                    {
+                        frmMain.renderTexture(vScreenX[Z] + static_cast<int>(floor(static_cast<double>(Player[A].Location.X))) + Player[A].YoshiBX + 12, vScreenY[Z] + Player[A].Location.Y + Player[A].YoshiBY - 16, 32, 32, GFX.YoshiWings, 0, 0 + 32 * Player[A].YoshiWingsFrame, s, s, s);
+                    }
+                }
+                if(Player[A].Mount == 1 && Player[A].MountType == 3)
+                {
+                    if(Player[A].Direction == 1)
+                    {
+                        frmMain.renderTexture(vScreenX[Z] + static_cast<int>(floor(static_cast<double>(Player[A].Location.X))) - 24, vScreenY[Z] + Player[A].Location.Y + Player[A].Location.Height - 40, 32, 32, GFX.YoshiWings, 0, 0 + 32 * Player[A].YoshiWingsFrame, s, s, s);
+                    }
+                    else
+                    {
+                        frmMain.renderTexture(vScreenX[Z] + static_cast<int>(floor(static_cast<double>(Player[A].Location.X))) + 16, vScreenY[Z] + Player[A].Location.Y + Player[A].Location.Height - 40, 32, 32, GFX.YoshiWings, 0, 0 + 32 * Player[A].YoshiWingsFrame, s, s, s);
+                    }
+                }
+            }
+        }
+    }
 }
 
 void ScreenShot()
@@ -4387,17 +6445,12 @@ void ScreenShot()
 
 void DrawFrozenNPC(int Z, int A)
 {
-//    With NPC(A)
     auto &n = NPC[A];
-//        If (vScreenCollision(Z, .Location) Or vScreenCollision(Z, newLoc(.Location.X - (NPCWidthGFX(.Type) - .Location.Width) / 2, .Location.Y, CDbl(NPCWidthGFX(.Type)), CDbl(NPCHeight(.Type))))) And .Hidden = False Then
     if((vScreenCollision(Z, n.Location) Or
         vScreenCollision(Z, newLoc(n.Location.X - (NPCWidthGFX[n.Type] - n.Location.Width) / 2,
                             n.Location.Y, CDbl(NPCWidthGFX[n.Type]), CDbl(NPCHeight[n.Type])))) And !n.Hidden)
     {
-//        'draw npc
-
-//            BitBlt myBackBuffer, vScreenX(Z) + .Location.X + 2, vScreenY(Z) + .Location.Y + 2, .Location.Width - 4, .Location.Height - 4, GFXNPCMask(.Special), 2, 2 + .Special2 * NPCHeight(.Special), vbSrcAnd
-//            If .Shadow = False Then BitBlt myBackBuffer, vScreenX(Z) + .Location.X + 2, vScreenY(Z) + .Location.Y + 2, .Location.Width - 4, .Location.Height - 4, GFXNPC(.Special), 2, 2 + .Special2 * NPCHeight(.Special), vbSrcPaint
+// draw npc
         float c = n.Shadow ? 0.f : 1.f;
 
         frmMain.renderTexture(int(vScreenX[Z] + n.Location.X + 2),
@@ -4407,32 +6460,22 @@ void DrawFrozenNPC(int Z, int A)
                               GFXNPCBMP[int(n.Special)],
                               2, 2 + int(n.Special2) * NPCHeight[int(n.Special)], c, c, c);
 
-//        'draw ice
-//            BitBlt myBackBuffer, vScreenX(Z) + .Location.X + NPCFrameOffsetX(.Type), vScreenY(Z) + .Location.Y + NPCFrameOffsetY(.Type), .Location.Width - 6, .Location.Height - 6, GFXNPCMask(.Type), 0, 0, vbSrcAnd
-//            If .Shadow = False Then BitBlt myBackBuffer, vScreenX(Z) + .Location.X + NPCFrameOffsetX(.Type), vScreenY(Z) + .Location.Y + NPCFrameOffsetY(.Type), .Location.Width - 6, .Location.Height - 6, GFXNPC(.Type), 0, 0, vbSrcPaint
+        // draw ice
         frmMain.renderTexture(int(vScreenX[Z] + n.Location.X + NPCFrameOffsetX[n.Type]),
                               int(vScreenY[Z] + n.Location.Y + NPCFrameOffsetY[n.Type]),
                               int(n.Location.Width - 6), int(n.Location.Height - 6),
                               GFXNPCBMP[n.Type], 0, 0, c, c, c);
-//            BitBlt myBackBuffer, vScreenX[Z] + n.Location.X + NPCFrameOffsetX[n.Type] + n.Location.Width - 6, vScreenY[Z] + n.Location.Y + NPCFrameOffsetY[n.Type], 6, n.Location.Height - 6, GFXNPCMask[n.Type], 128 - 6, 0, vbSrcAnd
-//            If .Shadow = False Then BitBlt myBackBuffer, vScreenX[Z] + n.Location.X + NPCFrameOffsetX[n.Type] + n.Location.Width - 6, vScreenY[Z] + n.Location.Y + NPCFrameOffsetY[n.Type], 6, n.Location.Height - 6, GFXNPC[n.Type], 128 - 6, 0, vbSrcPaint
         frmMain.renderTexture(int(vScreenX[Z] + n.Location.X + NPCFrameOffsetX[n.Type] + n.Location.Width - 6),
                               int(vScreenY[Z] + n.Location.Y + NPCFrameOffsetY[n.Type]),
                               6, int(n.Location.Height - 6),
                               GFXNPCBMP[n.Type], 128 - 6, 0, c, c, c);
-//            BitBlt myBackBuffer, vScreenX[Z] + n.Location.X + NPCFrameOffsetX[n.Type], vScreenY[Z] + n.Location.Y + NPCFrameOffsetY[n.Type] + n.Location.Height - 6, n.Location.Width - 6, 6, GFXNPCMask[n.Type], 0, 128 - 6, vbSrcAnd
-//            If .Shadow = False Then BitBlt myBackBuffer, vScreenX[Z] + n.Location.X + NPCFrameOffsetX[n.Type], vScreenY[Z] + n.Location.Y + NPCFrameOffsetY[n.Type] + n.Location.Height - 6, n.Location.Width - 6, 6, GFXNPC[n.Type], 0, 128 - 6, vbSrcPaint
         frmMain.renderTexture(int(vScreenX[Z] + n.Location.X + NPCFrameOffsetX[n.Type]),
                               int(vScreenY[Z] + n.Location.Y + NPCFrameOffsetY[n.Type] + n.Location.Height - 6),
                               int(n.Location.Width - 6), 6,
                               GFXNPCBMP[n.Type], 0, 128 - 6, c, c, c);
-//            BitBlt myBackBuffer, vScreenX[Z] + n.Location.X + NPCFrameOffsetX[n.Type] + n.Location.Width - 6, vScreenY[Z] + n.Location.Y + NPCFrameOffsetY[n.Type] + n.Location.Height - 6, 6, 6, GFXNPCMask[n.Type], 128 - 6, 128 - 6, vbSrcAnd
-//            If .Shadow = False Then BitBlt myBackBuffer, vScreenX[Z] + n.Location.X + NPCFrameOffsetX[n.Type] + n.Location.Width - 6, vScreenY[Z] + n.Location.Y + NPCFrameOffsetY[n.Type] + n.Location.Height - 6, 6, 6, GFXNPC[n.Type], 128 - 6, 128 - 6, vbSrcPaint
         frmMain.renderTexture(int(vScreenX[Z] + n.Location.X + NPCFrameOffsetX[n.Type] + n.Location.Width - 6),
                               int(vScreenY[Z] + n.Location.Y + NPCFrameOffsetY[n.Type] + n.Location.Height - 6),
                               6, 6, GFXNPCBMP[n.Type],
-                              128 - 6, 128 - 6);
-//        End If
+                              128 - 6, 128 - 6, c, c, c);
     }
-//    End With
 }

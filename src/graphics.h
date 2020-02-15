@@ -20,8 +20,10 @@ void GetvScreenAverage();
 //  Get the average screen position for all players with no level edge detection
 void GetvScreenAverage2();
 // Public Sub SetupGraphics()
+//! DUMMY AND USELESS
 void SetupGraphics();
 // Public Sub SetupEditorGraphics()
+//! DUMMY AND USELESS
 void SetupEditorGraphics();
 // Public Sub SetupScreens()
 void SetupScreens();
