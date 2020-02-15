@@ -8,6 +8,8 @@ LIBS += -lSDL2_mixer_ext -lSDL2 -lFreeImageLite
 INCLUDEPATH += lib/
 INCLUDEPATH += /usr/include/SDL2
 
+QMAKE_CXXFLAGS += -Wno-unused-but-set-variable -Wno-unused-variable
+
 debug: DEFINES += DEBUG_BUILD
 
 SOURCES += \
@@ -40,6 +42,10 @@ SOURCES += \
     src/main/world_file.cpp \
     src/main/world_loop.cpp \
     src/npc.cpp \
+    src/npc/npc_frames.cpp \
+    src/npc/npc_hit.cpp \
+    src/npc/npc_kill.cpp \
+    src/npc/npc_update.cpp \
     src/player.cpp \
     src/sorting.cpp \
     src/sound.cpp

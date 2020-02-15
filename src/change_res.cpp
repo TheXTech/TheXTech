@@ -89,7 +89,7 @@
 ////End Type
 //};
 
-void SaveIt(int ScX, int ScY, int ScC, int ScF, std::string ScreenChanged);
+//void SaveIt(int ScX, int ScY, int ScC, int ScF, std::string ScreenChanged);
 
 //DEVMODE DevM;
 //int OldX, OldY, OldColor, OldFreq;
@@ -111,7 +111,7 @@ void ChangeRes(int, int, int, int)
     frmMain.setFullScreen(true);
 }
 
-void SaveIt(int ScX, int ScY, int ScC, int ScF, std::string ScreenChanged)
-{
+//void SaveIt(int ScX, int ScY, int ScC, int ScF, std::string ScreenChanged)
+//{
 
-}
+//}

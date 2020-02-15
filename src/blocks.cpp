@@ -16,7 +16,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
     bool makeShroom = false; // if true make amushroom
     int newBlock = 0; // what the block should turn into if anything
     int C = 0;
-    int B = 0;
+//    int B = 0;
     Block_t blankBlock;
     bool tempBool = false;
     int oldSpecial = 0; // previous .Special
@@ -526,7 +526,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
         if(tempPlayer == 0) // Spawn the npc
         {
-            numNPCs = numNPCs + 1; // create a new NPC
+            numNPCs++; // create a new NPC
             NPC[numNPCs].Active = true;
             NPC[numNPCs].TimeLeft = 1000;
             if(NPCIsYoshi[C])
@@ -596,25 +596,29 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             {
                 NPC[numNPCs].Type = C;
             }
+
             if(makeShroom == true && whatPlayer > 0 &&
                (Player[whatPlayer].State > 1 || Player[whatPlayer].Character == 5)) // set the NPC type if the conditions are met
             {
                 NPC[numNPCs].Type = C;
             }
+
             if(makeShroom == true && BattleMode == true) // always spawn the item in battlemode
             {
                 NPC[numNPCs].Type = C;
             }
+
             if(NPC[numNPCs].Type == 287)
             {
                 NPC[numNPCs].Type = RandomBonus();
             }
+
             CharStuff(numNPCs);
             NPC[numNPCs].Location.Width = NPCWidth[C];
-            if(int(b.Location.Width) == 32)
+            if(int(b.Location.Width * 1000.0) == 32000) // Make block a bit smaller to allow player take a bonus easier (Redigit's idea)
             {
-                b.Location.Width = b.Location.Width - 0.1;
-                b.Location.X = b.Location.X + 0.05;
+                b.Location.Width = b.Location.Width - 0.01;
+                b.Location.X = b.Location.X + 0.005;
             }
             NPC[numNPCs].Location.Height = 0;
             NPC[numNPCs].Location.X = (b.Location.X + b.Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0);
@@ -648,6 +652,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                     NPC[numNPCs].Frame = 6;
                 }
             }
+
             if(HitDown == false)
             {
                 NPC[numNPCs].Location.Y = b.Location.Y; // - 0.1
@@ -679,9 +684,18 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                 NPC[numNPCs].Effect = 3;
                 PlaySound(70);
             }
+
             NPC[numNPCs].Effect2 = 0;
             CheckSectionNPC(numNPCs);
-            if(NPCIsYoshi[NPC[numNPCs].Type] || NPCIsBoot[NPC[numNPCs].Type] || NPC[numNPCs].Type == 9 || NPC[numNPCs].Type == 14 || NPC[numNPCs].Type == 22 || NPC[numNPCs].Type == 90 || NPC[numNPCs].Type == 153 || NPC[numNPCs].Type == 169 || NPC[numNPCs].Type == 170 || NPC[numNPCs].Type == 182 || NPC[numNPCs].Type == 183 || NPC[numNPCs].Type == 184 || NPC[numNPCs].Type == 185 || NPC[numNPCs].Type == 186 || NPC[numNPCs].Type == 187 || NPC[numNPCs].Type == 188 || NPC[numNPCs].Type == 195)
+            if(NPCIsYoshi[NPC[numNPCs].Type] ||
+               NPCIsBoot[NPC[numNPCs].Type] || NPC[numNPCs].Type == 9 ||
+               NPC[numNPCs].Type == 14 || NPC[numNPCs].Type == 22 ||
+               NPC[numNPCs].Type == 90 || NPC[numNPCs].Type == 153 ||
+               NPC[numNPCs].Type == 169 || NPC[numNPCs].Type == 170 ||
+               NPC[numNPCs].Type == 182 || NPC[numNPCs].Type == 183 ||
+               NPC[numNPCs].Type == 184 || NPC[numNPCs].Type == 185 ||
+               NPC[numNPCs].Type == 186 || NPC[numNPCs].Type == 187 ||
+               NPC[numNPCs].Type == 188 || NPC[numNPCs].Type == 195)
             {
                 NPC[numNPCs].TimeLeft = Physics.NPCTimeOffScreen * 20;
             }
@@ -1302,7 +1316,7 @@ void KillBlock(int A, bool Splode)
     }
     else
     {
-        Score = Score + 50;
+        Score += 50;
         if(Block[A].TriggerDeath != "")
         {
             ProcEvent(Block[A].TriggerDeath);

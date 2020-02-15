@@ -1215,14 +1215,14 @@ void UpdateGraphics()
         For(A, 1, numNPCs) // Display NPCs that should be behind blocks
         {
             float cn = NPC[A].Shadow ? 0.f : 1.f;
-            if((NPC[A].Effect == 208 || NPCIsAVine[NPC[A].Type] == true ||
-                NPC[A].Type == 209 || NPC[A].Type == 159 || NPC[A].Type == 245 ||
-                NPC[A].Type == 8 || NPC[A].Type == 93 || NPC[A].Type == 74 ||
-                NPC[A].Type == 256 || NPC[A].Type == 257 || NPC[A].Type == 51 ||
-                NPC[A].Type == 52 || NPC[A].Effect == 1 || NPC[A].Effect == 3 ||
-                NPC[A].Effect == 4 || (NPC[A].Type == 45 && NPC[A].Special == 0.0)) &&
-                    NPC[A].standingOnPlayer == 0 && (NPC[A].Generator == false || LevelEditor == true) ||
-                    NPC[A].Type == 179 || NPC[A].Type == 270)
+            if(((NPC[A].Effect == 208 || NPCIsAVine[NPC[A].Type] == true ||
+                 NPC[A].Type == 209 || NPC[A].Type == 159 || NPC[A].Type == 245 ||
+                 NPC[A].Type == 8 || NPC[A].Type == 93 || NPC[A].Type == 74 ||
+                 NPC[A].Type == 256 || NPC[A].Type == 257 || NPC[A].Type == 51 ||
+                 NPC[A].Type == 52 || NPC[A].Effect == 1 || NPC[A].Effect == 3 ||
+                 NPC[A].Effect == 4 || (NPC[A].Type == 45 && NPC[A].Special == 0.0)) &&
+                 (NPC[A].standingOnPlayer == 0 && (!NPC[A].Generator || LevelEditor == true))) ||
+                 NPC[A].Type == 179 || NPC[A].Type == 270)
             {
                 if(!(NPC[A].Effect == 2) && (NPC[A].Generator == false || LevelEditor == true))
                 {
@@ -1970,10 +1970,15 @@ void UpdateGraphics()
         for(A = 1; A <= numNPCs; A++) // Put held NPCs on top
         {
             float cn = NPC[A].Shadow ? 0.f : 1.f;
-            if((((NPC[A].HoldingPlayer > 0 && Player[NPC[A].HoldingPlayer].Effect != 3) ||
-               (NPC[A].Type == 50 && NPC[A].standingOnPlayer == 0) ||
-                NPC[A].Type == 17 && NPC[A].CantHurt > 0) ||
-                NPC[A].Effect == 5) && !(NPC[A].Type == 91) && Player[NPC[A].HoldingPlayer].Dead == false)
+            if(
+                (
+                  (
+                    (NPC[A].HoldingPlayer > 0 && Player[NPC[A].HoldingPlayer].Effect != 3) ||
+                    (NPC[A].Type == 50 && NPC[A].standingOnPlayer == 0) ||
+                    (NPC[A].Type == 17 && NPC[A].CantHurt > 0)
+                  ) || NPC[A].Effect == 5
+                ) && !(NPC[A].Type == 91) && !Player[NPC[A].HoldingPlayer].Dead
+            )
             {
                 if(NPC[A].Type == 263)
                 {
@@ -2303,7 +2308,7 @@ void UpdateGraphics()
                             int tempVar6 = int(SuperText.size());
                             for(A = 1; A <= tempVar6; A++)
                             {
-                                if(SuperText[A - 1] == ' ' || A == SuperText.size())
+                                if(SuperText[size_t(A) - 1] == ' ' || A == int(SuperText.size()))
                                 {
                                     if(A < 28)
                                         B = A;
@@ -5885,7 +5890,7 @@ void DrawInterface(int Z, int numScreens)
 
                 SuperPrint(std::to_string(Coins), 1, 40 + 20 - (std::to_string(Coins).size() - 1) * 18 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 80 + 4 + 12 + 18 + 32 + GFX.Interface[3].w, 16 + 11);
                 // Print Score
-                SuperPrint(std::to_string(Score), 1, 40 + 20 - (std::to_string(Score).size() - 1) * 18 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 80 + 12 + 4 + 18 + 32 + GFX.Interface[3].w, 16 + 31);
+                SuperPrint(std::to_string(int(Score)), 1, 40 + 20 - (std::to_string(int(Score)).size() - 1) * 18 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 80 + 12 + 4 + 18 + 32 + GFX.Interface[3].w, 16 + 31);
                 // Print lives on the screen
                 frmMain.renderTexture(-80 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 - 16, 16 + 10, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0);
                 frmMain.renderTexture(-80 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 10 + GFX.Interface[1].w, 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
@@ -5981,7 +5986,7 @@ void DrawInterface(int Z, int numScreens)
                 frmMain.renderTexture(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96 + 8 + GFX.Interface[2].w, 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
                 SuperPrint(std::to_string(Coins), 1, 20 - (std::to_string(Coins).size() - 1) * 18 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 80 + 4 + 12 + 18 + 32 + GFX.Interface[3].w, 16 + 11);
                 // Print Score
-                SuperPrint(std::to_string(Score), 1, 20 - (std::to_string(Score).size() - 1) * 18 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 80 + 12 + 4 + 18 + 32 + GFX.Interface[3].w, 16 + 31);
+                SuperPrint(std::to_string(int(Score)), 1, 20 - (std::to_string((Score)).size() - 1) * 18 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 80 + 12 + 4 + 18 + 32 + GFX.Interface[3].w, 16 + 31);
                 // Print lives on the screen
 
                 frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 - 16, 16 + 10, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0);
@@ -6128,7 +6133,7 @@ void DrawInterface(int Z, int numScreens)
         frmMain.renderTexture(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96 + 8 + GFX.Interface[2].w, 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
         SuperPrint(std::to_string(Coins), 1, 20 - (std::to_string(Coins).size() - 1) * 18 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 80 + 4 + 12 + 18 + 32 + GFX.Interface[3].w, 16 + 11);
         // Print Score
-        SuperPrint(std::to_string(Score), 1, 20 - (std::to_string(Score).size() - 1) * 18 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 80 + 12 + 4 + 18 + 32 + GFX.Interface[3].w, 16 + 31);
+        SuperPrint(std::to_string(int(Score)), 1, 20 - (std::to_string(int(Score)).size() - 1) * 18 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 80 + 12 + 4 + 18 + 32 + GFX.Interface[3].w, 16 + 31);
         // Print lives on the screen
         frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 - 16, 16 + 10, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0);
         frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 10 + GFX.Interface[1].w, 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
@@ -6388,7 +6393,21 @@ void DrawPlayer(int A, int Z)
             {
                 if(NPC[Player[A].HoldingNPC].Type != 263)
                 {
-                    if((((NPC[Player[A].HoldingNPC].HoldingPlayer > 0 && Player[NPC[Player[A].HoldingNPC].HoldingPlayer].Effect != 3) || (NPC[Player[A].HoldingNPC].Type == 50 && NPC[Player[A].HoldingNPC].standingOnPlayer == 0) || NPC[Player[A].HoldingNPC].Type == 17 && NPC[Player[A].HoldingNPC].CantHurt > 0) || NPC[Player[A].HoldingNPC].Effect == 5) && !(NPC[Player[A].HoldingNPC].Type == 91) && Player[NPC[Player[A].HoldingNPC].HoldingPlayer].Dead == false)
+                    if(
+                        (
+                            (
+                                 (
+                                        NPC[Player[A].HoldingNPC].HoldingPlayer > 0 &&
+                                        Player[NPC[Player[A].HoldingNPC].HoldingPlayer].Effect != 3
+                                  ) ||
+                                 (NPC[Player[A].HoldingNPC].Type == 50 && NPC[Player[A].HoldingNPC].standingOnPlayer == 0) ||
+                                 (NPC[Player[A].HoldingNPC].Type == 17 && NPC[Player[A].HoldingNPC].CantHurt > 0)
+                             ) ||
+                          NPC[Player[A].HoldingNPC].Effect == 5
+                        ) &&
+                     !(NPC[Player[A].HoldingNPC].Type == 91) &&
+                     !Player[NPC[Player[A].HoldingNPC].HoldingPlayer].Dead
+                    )
                     {
                         if(NPCIsYoshi[NPC[Player[A].HoldingNPC].Type] == false && NPC[Player[A].HoldingNPC].Type > 0)
                         {

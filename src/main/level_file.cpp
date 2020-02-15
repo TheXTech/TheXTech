@@ -21,7 +21,7 @@ void OpenLevel(std::string FilePath)
     int B = 0;
 //    int C = 0;
 //    bool tempBool = false;
-    int mSections = 0;
+//    int mSections = 0;
 //    Location_t tempLocation;
 
     qScreen = false;
@@ -46,8 +46,8 @@ void OpenLevel(std::string FilePath)
 
     FileName = lvl.meta.filename;
     FileNamePath = lvl.meta.path + "/";
-    if(FileNamePath.substr(FileNamePath.length() - 2) == "\\\\")
-        FileNamePath = FileNamePath.substr(0, FileNamePath.length() - 1);
+//    if(FileNamePath.substr(FileNamePath.length() - 2) == "/")
+//        FileNamePath = FileNamePath.substr(0, FileNamePath.length() - 1);
     FullFileName = FilePath;
     numBlock = 0;
     numBackground = 0;
@@ -69,7 +69,6 @@ void OpenLevel(std::string FilePath)
 
     maxStars = lvl.stars;
     LevelName = lvl.LevelName;
-    mSections = maxSections;
 
     B = 0;
     for(auto & s : lvl.sections)

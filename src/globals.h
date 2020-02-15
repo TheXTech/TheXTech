@@ -47,6 +47,16 @@ extern Uint8 getKeyStateI(int key);
 
 const char *getKeyName(int key);
 
+static SDL_INLINE float fRand()
+{
+    return static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX);
+}
+
+static SDL_INLINE double dRand()
+{
+    return static_cast <double>(std::rand()) / static_cast<double>(RAND_MAX);
+}
+
 //'Saved Events
 //Public Const MaxSavedEvents As Integer = 200
 const int MaxSavedEvents = 200;

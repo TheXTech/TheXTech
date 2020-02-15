@@ -25,7 +25,7 @@ void MenuLoop()
 {
 //    On Error Resume Next
 //    Dim A As Integer
-    int A;
+//    int A;
 //    Dim B As Integer
     int B;
 //    Dim tempLocation As Location
@@ -2303,20 +2303,21 @@ void FindWorlds()
 void FindLevels()
 {
     std::string FileName = "";
-    std::string worldsRoot = AppPath + "battle/";
+    std::string battleRoot = AppPath + "battle/";
     NumSelectWorld = 1;
     SelectWorld[1].WorldName = "Random Level";
     std::vector<std::string> files;
-    DirMan battleLvls(worldsRoot);
+    DirMan battleLvls(battleRoot);
     LevelData head;
 
     battleLvls.getListOfFiles(files, {".lvl", ".lvlx"});
     for(std::string &fName : files)
     {
-        std::string wPath = worldsRoot + fName;
+        std::string wPath = battleRoot + fName;
         if(FileFormats::OpenLevelFileHeader(wPath, head))
         {
             NumSelectWorld++;
+            SelectWorld[NumSelectWorld].WorldPath = battleRoot;
             SelectWorld[NumSelectWorld].WorldFile = fName;
             SelectWorld[NumSelectWorld].WorldName = head.LevelName;
         }

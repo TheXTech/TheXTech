@@ -42,9 +42,9 @@ bool FileExists(const std::string &fileName)
 int GameMain(int argc, char**argv)
 {
     Player_t blankPlayer;
-    int A = 0;
-    int B = 0;
-    int C = 0;
+//    int A = 0;
+//    int B = 0;
+//    int C = 0;
     bool tempBool = false;
     LB = "\n";
     EoT = "";
@@ -1644,7 +1644,7 @@ void StartBattleMode()
     if(selWorld == 1)
         selWorld = (std::rand() % (NumSelectWorld - 1)) + 2;
 
-    OpenLevel(SelectWorld[selWorld].WorldFile);
+    OpenLevel(SelectWorld[selWorld].WorldPath + SelectWorld[selWorld].WorldFile);
     SetupPlayers();
     BattleIntro = 150;
     BattleWinner = 0;
