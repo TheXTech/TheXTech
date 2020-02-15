@@ -857,6 +857,7 @@ void MenuLoop()
 //                    BitBlt myBackBuffer, 0, 0, ScreenW, ScreenH, 0, 0, 0, vbWhiteness
 //                    BitBlt frmMain.hdc, 0, 0, frmMain.ScaleWidth, frmMain.ScaleHeight, 0, 0, 0, vbWhiteness
                     frmMain.clearBuffer();
+                    frmMain.repaint();
 //                    StopMusic
                     StopMusic();
 //                    DoEvents

@@ -1743,9 +1743,13 @@ struct Events_t
 };
 
 //Public Layer(0 To 100) As Layer
-extern RangeArr<Layer_t, 0, 100> Layer;
+const int maxLayers = 100;
+extern RangeArr<Layer_t, 0, maxLayers> Layer;
+
 //Public Events(0 To 100) As Events
-extern RangeArr<Events_t, 0, 100> Events;
+const int maxEvents = 100;
+extern RangeArr<Events_t, 0, maxEvents> Events;
+
 //Public ReturnWarp As Integer 'for when the player returns from a warp
 extern int ReturnWarp;
 //Public StartWarp As Integer
@@ -2009,7 +2013,7 @@ extern RangeArr<StdPicture, 1, maxYoshiGfx> GFXYoshiTBMP;
 extern RangeArr<StdPicture, 1, maxYoshiGfx> GFXYoshiTMaskBMP;
 //'World Map Graphics
 //Public GFXTileCustom(1 To maxTileType) As Long
-extern RangeArr<long, 1, maxTileType> GFXTileCustom;
+extern RangeArr<bool, 1, maxTileType> GFXTileCustom;
 //Public GFXTile(1 To maxTileType) As Long
 //extern RangeArr<long, 1, maxTileType> GFXTile;
 #define GFXTile GFXTileBMP
@@ -2020,7 +2024,7 @@ extern RangeArr<int, 1, maxTileType> GFXTileHeight;
 //Public GFXTileWidth(1 To maxTileType) As Integer
 extern RangeArr<int, 1, maxTileType> GFXTileWidth;
 //Public GFXLevelCustom(0 To maxLevelType) As Long
-extern RangeArr<long, 0, maxLevelType> GFXLevelCustom;
+extern RangeArr<bool, 0, maxLevelType> GFXLevelCustom;
 //Public GFXLevel(0 To maxLevelType) As Long
 //extern RangeArr<long, 0, maxLevelType> GFXLevel;
 #define GFXLevel GFXLevelBMP
@@ -2037,7 +2041,7 @@ extern RangeArr<int, 0, maxLevelType> GFXLevelWidth;
 //Public GFXLevelBig(0 To maxLevelType) As Boolean
 extern RangeArr<bool, 0, maxLevelType> GFXLevelBig;
 //Public GFXSceneCustom(1 To maxSceneType) As Long
-extern RangeArr<long, 1, maxSceneType> GFXSceneCustom;
+extern RangeArr<bool, 1, maxSceneType> GFXSceneCustom;
 //Public GFXScene(1 To maxSceneType) As Long
 //extern RangeArr<long, 1, maxSceneType> GFXScene;
 #define GFXScene GFXSceneBMP
@@ -2052,7 +2056,7 @@ extern RangeArr<int, 1, maxSceneType> GFXSceneHeight;
 //Public GFXSceneWidth(1 To maxSceneType) As Integer
 extern RangeArr<int, 1, maxSceneType> GFXSceneWidth;
 //Public GFXPathCustom(1 To maxPathType) As Long
-extern RangeArr<long, 1, maxPathType> GFXPathCustom;
+extern RangeArr<bool, 1, maxPathType> GFXPathCustom;
 //Public GFXPath(1 To maxPathType) As Long
 //extern RangeArr<long, 1, maxPathType> GFXPath;
 #define GFXPath GFXPathBMP
@@ -2068,7 +2072,7 @@ extern RangeArr<int, 1, maxPathType> GFXPathHeight;
 extern RangeArr<int, 1, maxPathType> GFXPathWidth;
 
 //Public GFXPlayerCustom(1 To numCharacters) As Long
-extern RangeArr<long, 1, numCharacters> GFXPlayerCustom;
+extern RangeArr<bool, 1, numCharacters> GFXPlayerCustom;
 //Public GFXPlayer(1 To numCharacters) As Long
 //extern RangeArr<long, 1, numCharacters> GFXPlayer;
 #define GFXPlayer GFXPlayerBMP

@@ -4,6 +4,7 @@
 #include <AppPath/app_path.h>
 #include <Logger/logger.h>
 #include <Utils/files.h>
+#include <Utils/elapsed_timer.h>
 #include <DirManager/dirman.h>
 #include <Graphics/graphics_funcs.h>
 #include <FreeImageLite.h>

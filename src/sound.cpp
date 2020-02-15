@@ -209,6 +209,7 @@ void StartMusic(int A)
     {
         StopMusic();
         std::string mus = fmt::format_ne("wmusic{0}", A);
+        pLogDebug("Starting world music [%s]", mus.c_str());
         PlayMusic(mus);
         musicName = mus;
         curWorldMusic = A;
@@ -218,9 +219,11 @@ void StartMusic(int A)
     {
         StopMusic();
         if(FreezeNPCs) {
+            pLogDebug("Starting special music [stmusic]");
             PlayMusic("stmusic");
             musicName = "stmusic";
         } else {
+            pLogDebug("Starting special music [smusic]");
             PlayMusic("smusic");
             musicName = "smusic";
         }
@@ -233,6 +236,7 @@ void StartMusic(int A)
         std::string mus = fmt::format_ne("music{0}", A);
         if(bgMusic[A] == g_customLvlMusicId)
         {
+            pLogDebug("Starting custom music [%s]", CustomMusic[A].c_str());
             if(g_curMusic)
                 Mix_FreeMusic(g_curMusic);
             g_curMusic = Mix_LoadMUS((FileNamePath + "/" + CustomMusic[A]).c_str());
@@ -241,6 +245,7 @@ void StartMusic(int A)
         }
         else
         {
+            pLogDebug("Starting level music [%s]", mus.c_str());
             PlayMusic(mus);
         }
         musicName = mus;
@@ -324,9 +329,9 @@ void InitSound()
     for(unsigned int i = 1; i <= totalSpecial; ++i)
     {
         std::string alias = fmt::format_ne("smusic{0}", i);
-        if(i == 0)
+        if(i == 1)
             alias = "smusic";
-        else if(i == 1)
+        else if(i == 2)
             alias = "stmusic";
         else if(i == 3)
             alias = "tmusic";

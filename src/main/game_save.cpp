@@ -80,7 +80,7 @@ void LoadGame()
     if(!Files::fileExists(savePath) && Files::fileExists(savePathOld))
         FileFormats::ReadSMBX64SavFileF(savePathOld, sav);
     else if(Files::fileExists(savePath))
-        FileFormats::ReadSMBX64SavFileF(savePath, sav);
+        FileFormats::ReadExtendedSaveFileF(savePath, sav);
     else
     {
         pLogDebug("Game save file not found: %s", savePath.c_str());

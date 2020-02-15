@@ -37,8 +37,8 @@ void CheatCode(char NewKey)
     }
     oldString = CheatString;
 
-    std::printf("Cheat string: [%s]\n", CheatString.c_str());
-    std::fflush(stdout);
+//    std::printf("Cheat string: [%s]\n", CheatString.c_str());
+//    std::fflush(stdout);
 
     if(SDL_strstr(CheatString.c_str(), "redigitiscool"))
     {
@@ -1591,7 +1591,7 @@ void CheatCode(char NewKey)
         }
         else if(SDL_strstr(CheatString.c_str(), "framerate"))
         {
-            if(ShowFPS == true)
+            if(ShowFPS)
             {
 //                if(TestLevel == true)
 //                    frmTestSettings::chkShowFPS.Value = 0;
@@ -1628,8 +1628,6 @@ void CheatCode(char NewKey)
             CheatString.clear();
             cheated = true;
         }
-
-
     }
 
     if(cheated)

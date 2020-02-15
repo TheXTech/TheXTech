@@ -216,7 +216,7 @@ void PauseGame(int plr)
                 GoalTime = fpsTime;
 //                if(Debugger == true)
 //                    frmLevelDebugger.lblFPS = fpsCount;
-                if(ShowFPS == true)
+                if(ShowFPS)
                     PrintFPS = fpsCount;
                 fpsCount = 0;
             }
@@ -382,6 +382,7 @@ void PauseGame(int plr)
                             else
                                 LevelSelect = false;
                             frmMain.clearBuffer();
+                            frmMain.repaint();
                             StopMusic();
                             DoEvents();
                             SDL_Delay(500);

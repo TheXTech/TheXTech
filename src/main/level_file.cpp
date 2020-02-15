@@ -7,6 +7,7 @@
 #include "../blocks.h"
 #include "../graphics.h"
 #include "../sorting.h"
+#include "../layers.h"
 
 #include <DirManager/dirman.h>
 #include <Utils/files.h>
@@ -22,6 +23,7 @@ void OpenLevel(std::string FilePath)
     bool tempBool = false;
     int mSections = 0;
     Location_t tempLocation;
+
     qScreen = false;
     ClearLevel();
     BlockSound();
@@ -42,16 +44,8 @@ void OpenLevel(std::string FilePath)
     FileFormats::smbx64LevelSortBlocks(lvl);
     FileFormats::smbx64LevelSortBGOs(lvl);
 
-//    if(StringHelper::toLower(FilePath.substr(FilePath.length() - 4)) != ".lvl" && StringHelper::toLower(FilePath.substr(FilePath.length() - 4)) != ".dat")
-//        FilePath = FilePath + ".lvl";
-//    for(A = FilePath.length(); A >= 1; A--)
-//    {
-//        if(FilePath.substr(A - 1, 1) == "/" || FilePath.substr(A - 1, 1) == "\\")
-//            break;
-//    }
-
-    FileName = lvl.meta.filename;//FilePath.substr(FilePath.length() - (FilePath.length() - A));
-    FileNamePath = lvl.meta.path + "/";//FilePath.substr(0, (A));
+    FileName = lvl.meta.filename;
+    FileNamePath = lvl.meta.path + "/";
     if(FileNamePath.substr(FileNamePath.length() - 2) == "\\\\")
         FileNamePath = FileNamePath.substr(0, FileNamePath.length() - 1);
     FullFileName = FilePath;
@@ -73,24 +67,8 @@ void OpenLevel(std::string FilePath)
     if(FilePath == ".lvl" || FilePath == ".lvlx")
         return;
 
-//// VB TO C++ CONVERTER WARNING: VB to C++ Converter converts from VB(.NET), not VB6:
-//        Open FilePath For Input As #1;
-//        Input #1, FileRelease;
-//        if(FileRelease > curRelease)
-//        {
-//            MsgBox "You are using an old version of SMBX that is incompatible with this file. Please visit www.SuperMarioBrothers.org to get the latest updates.", Microsoft::VisualBasic::Constants::vbCritical, "Please click OK so the game can crash.";
-//            KillIt();
-//        }
-//        if(FileRelease >= 17)
-//            Input #1, maxStars;
     maxStars = lvl.stars;
-//        if(FileRelease >= 60)
-//            Input #1, LevelName;
     LevelName = lvl.LevelName;
-//        if(FileRelease <= 7)
-//            mSections = 5;
-//        else
-//            mSections = maxSections;
     mSections = maxSections;
 
     B = 0;
@@ -115,6 +93,13 @@ void OpenLevel(std::string FilePath)
             break;
     }
 
+    for(A = 1; A <= 2; A++) // Fill with zeroes
+    {
+        PlayerStart[A].X = 0;
+        PlayerStart[A].Y = 0;
+        PlayerStart[A].Width = 0;
+        PlayerStart[A].Height = 0;
+    }
 
     A = 1;
     for(auto &p : lvl.players)
@@ -199,7 +184,7 @@ void OpenLevel(std::string FilePath)
             NPC[numNPCs].Special = n.special_data;
             NPC[numNPCs].DefaultSpecial = NPC[numNPCs].Special;
         }
-        if(NPC[numNPCs].Type == 288 || NPC[numNPCs].Type == 289 || (NPC[numNPCs].Type == 91 && NPC[numNPCs].Special == 288))
+        if(NPC[numNPCs].Type == 288 || NPC[numNPCs].Type == 289 || (NPC[numNPCs].Type == 91 && int(NPC[numNPCs].Special) == 288))
         {
             NPC[numNPCs].Special2 = n.special_data2;
             NPC[numNPCs].DefaultSpecial2 = NPC[numNPCs].Special2;
@@ -278,172 +263,190 @@ void OpenLevel(std::string FilePath)
         }
     }
 
+    std::vector<int> twoWayWarps;
+    for(auto &w : lvl.doors)
+    {
+        numWarps++;
+        if(numWarps > maxWarps)
+        {
+            numWarps = maxWarps;
+            break;
+        }
 
-//        while(!Microsoft::VisualBasic::FileSystem::EOF(1))
+        Warp[numWarps].PlacedEnt = true;
+        Warp[numWarps].PlacedExit = true;
+        Warp[numWarps].Entrance.X = w.ix;
+        Warp[numWarps].Entrance.Y = w.iy;
+        Warp[numWarps].Exit.X = w.ox;
+        Warp[numWarps].Exit.Y = w.oy;
+        Warp[numWarps].Direction = w.idirect;
+        Warp[numWarps].Direction2 = w.odirect;
+        Warp[numWarps].Effect = w.type;
+        Warp[numWarps].level = w.lname;
+        Warp[numWarps].LevelWarp = int(w.warpto);
+        Warp[numWarps].LevelEnt = w.lvl_i;
+
+        Warp[numWarps].MapWarp = w.lvl_o;
+        Warp[numWarps].MapX = int(w.world_x);
+        Warp[numWarps].MapY = int(w.world_y);
+
+        Warp[numWarps].Stars = w.stars;
+        Warp[numWarps].Layer = w.layer;
+        Warp[numWarps].Hidden = w.unknown;
+
+        Warp[numWarps].NoYoshi = w.novehicles;
+        Warp[numWarps].WarpNPC = w.allownpc;
+        Warp[numWarps].Locked = w.locked;
+
+        Warp[numWarps].Entrance.Height = 32;
+        Warp[numWarps].Entrance.Width = 32;
+        Warp[numWarps].Exit.Height = 32;
+        Warp[numWarps].Exit.Width = 32;
+        if(w.two_way)
+            twoWayWarps.push_back(numWarps);
+    }
+
+    if(!twoWayWarps.empty())
+    {
+        for(auto &tww : twoWayWarps)
+        {
+            numWarps++;
+            if(numWarps > maxWarps)
+            {
+                numWarps = maxWarps;
+                break;
+            }
+            Warp[numWarps] = Warp[tww];
+            Warp[numWarps].Exit = Warp[tww].Entrance;
+            Warp[numWarps].Entrance = Warp[tww].Exit;
+            Warp[numWarps].Direction2 = Warp[tww].Direction;
+            Warp[numWarps].Direction = Warp[tww].Direction2;
+        }
+    }
+
+    for(auto &w : lvl.physez)
+    {
+        numWater++;
+        if(numWater > maxWater)
+        {
+            numWater = maxWater;
+            break;
+        }
+
+        Water[numWater].Location.X = w.x;
+        Water[numWater].Location.Y = w.y;
+        Water[numWater].Location.Width = w.w;
+        Water[numWater].Location.Height = w.h;
+        Water[numWater].Buoy = w.buoy;
+        Water[numWater].Quicksand = w.env_type;
+        Water[numWater].Layer = w.layer;
+    }
+
+    A = 0;
+    for(auto &l : lvl.layers)
+    {
+        Layer[A].Name = l.name;
+        Layer[A].Hidden = l.hidden;
+        if(Layer[A].Hidden == true)
+        {
+            HideLayer(Layer[A].Name, true);
+        }
+//        if(LevelEditor == true || MagicHand == true)
 //        {
-//            Input #1, newInput;
-//            if(newInput == "next")
-//                break;
-//            numWarps = numWarps + 1;
-//            Warp[numWarps].PlacedEnt = true;
-//            Warp[numWarps].PlacedExit = true;
-//            Warp[numWarps].Entrance.X = newInput;
-//            Input #1, Warp[numWarps].Entrance.Y;
-//            Input #1, Warp[numWarps].Exit.X;
-//            Input #1, Warp[numWarps].Exit.Y;
-//            Input #1, Warp[numWarps].Direction;
-//            Input #1, Warp[numWarps].Direction2;
-//            Input #1, Warp[numWarps].Effect;
-//            if(FileRelease >= 3)
-//            {
-//                Input #1, Warp[numWarps].level;
-//                Input #1, Warp[numWarps].LevelWarp;
-//                Input #1, Warp[numWarps].LevelEnt;
-//            }
-//            if(FileRelease >= 4)
-//            {
-//                Input #1, Warp[numWarps].MapWarp;
-//                Input #1, Warp[numWarps].MapX;
-//                Input #1, Warp[numWarps].MapY;
-//            }
-//            if(FileRelease >= 7)
-//                Input #1, Warp[numWarps].Stars;
-//            if(FileRelease >= 12)
-//            {
-//                Input #1, Warp[numWarps].Layer;
-//                Input #1, Warp[numWarps].Hidden;
-//            }
-//            if(FileRelease >= 23)
-//                Input #1, Warp[numWarps].NoYoshi;
-//            if(FileRelease >= 25)
-//                Input #1, Warp[numWarps].WarpNPC;
-//            if(FileRelease >= 26)
-//                Input #1, Warp[numWarps].Locked;
-//            Warp[numWarps].Entrance.Height = 32;
-//            Warp[numWarps].Entrance.Width = 32;
-//            Warp[numWarps].Exit.Height = 32;
-//            Warp[numWarps].Exit.Width = 32;
+//            // Add into listbox
 //        }
+        A++;
+        if(A > maxLayers)
+            break;
+    }
 
+    A = 0;
+    for(auto &e : lvl.events)
+    {
+        Events[A].Name = e.name;
+        Events[A].Text = e.msg;
+        Events[A].Sound = int(e.sound_id);
+        Events[A].EndGame = int(e.end_game);
 
-//        if(FileRelease >= 29)
-//        {
-//            A = 0;
-//            while(!Microsoft::VisualBasic::FileSystem::EOF(1))
-//            {
-//                Input #1, newInput;
-//                if(newInput == "next")
-//                    break;
-//                numWater = numWater + 1;
-//                Water[numWater].Location.X = newInput;
-//                Input #1, Water[numWater].Location.Y;
-//                Input #1, Water[numWater].Location.Width;
-//                Input #1, Water[numWater].Location.Height;
-//                Input #1, Water[numWater].Buoy;
-//                if(FileRelease >= 62)
-//                    Input #1, Water[numWater].Quicksand;
-//                Input #1, Water[numWater].Layer;
-//            }
-//        }
+        int hideLayersNum = int(e.layers_hide.size());
+        int showLayersNum = int(e.layers_show.size());
+        int toggleLayersNum = int(e.layers_toggle.size());
 
+        for(B = 0; B <= maxSections; B++)
+        {
+            Events[A].HideLayer[B].clear();
+            Events[A].ShowLayer[B].clear();
+            Events[A].ToggleLayer[B].clear();
+        }
 
-//        A = 0;
-//        while(!Microsoft::VisualBasic::FileSystem::EOF(1))
-//        {
-//            Input #1, newInput;
-//            if(newInput == "next")
-//                break;
-//            Layer[A].Name = newInput;
-//            Input #1, Layer[A].Hidden;
-//            if(Layer[A].Hidden == true)
-//            {
-//                HideLayer Layer[A].Name, true;
-//            }
-//            if(LevelEditor == true || MagicHand == true)
-//            {
-//                if(Layer[A].Name.ToLower() != "default" && Layer[A].Name.ToLower() != "destroyed blocks" && Layer[A].Name.ToLower() != "spawned npcs" && Layer[A].Name != "")
-//                {
-//                    frmLayers::lstLayer::AddItem Layer[A].Name;
-//                    if(Layer[A].Hidden == false)
-//                        frmLayers::lstLayer::Selected(frmLayers::lstLayer::ListCount - 1) = true;
-//                }
-//            }
-//            A = A + 1;
-//        }
-//        A = 0;
-//        while(!Microsoft::VisualBasic::FileSystem::EOF(1))
-//        {
-//            Input #1, newInput;
-//            if(newInput == "next")
-//                break;
-//            Events[A].Name = newInput;
-//            if(FileRelease >= 11)
-//                Input #1, Events[A].Text;
-//            if(FileRelease >= 14)
-//                Input #1, Events[A].Sound;
-//            if(FileRelease >= 18)
-//                Input #1, Events[A].EndGame;
-//            for(B = 0; B <= 20; B++)
-//            {
-//                Input #1, Events[A].HideLayer(B);
-//                Input #1, Events[A].ShowLayer(B);
-//                if(FileRelease >= 14)
-//                    Input #1, Events[A].ToggleLayer(B);
-//            }
-//            if(FileRelease >= 13)
-//            {
-//                for(B = 0; B <= maxSections; B++)
-//                {
-//                    Input #1, Events[A].Music(B);
-//                    Input #1, Events[A].Background[B];
-//                    Input #1, Events[A].level[B].X;
-//                    Input #1, Events[A].level[B].Y;
-//                    Input #1, Events[A].level[B].Height;
-//                    Input #1, Events[A].level[B].Width;
-//                }
-//            }
-//            if(FileRelease >= 26)
-//            {
-//                Input #1, Events[A].TriggerEvent;
-//                Input #1, Events[A].TriggerDelay;
-//            }
-//            if(FileRelease >= 27)
-//                Input #1, Events[A].LayerSmoke;
-//            if(FileRelease >= 28)
-//            {
-//                Input #1, Events[A].Controls.AltJump;
-//                Input #1, Events[A].Controls.AltRun;
-//                Input #1, Events[A].Controls.Down;
-//                Input #1, Events[A].Controls.Drop;
-//                Input #1, Events[A].Controls.Jump;
-//                Input #1, Events[A].Controls.Left;
-//                Input #1, Events[A].Controls.Right;
-//                Input #1, Events[A].Controls.Run;
-//                Input #1, Events[A].Controls.Start;
-//                Input #1, Events[A].Controls.Up;
-//            }
-//            if(FileRelease >= 32)
-//            {
-//                Input #1, Events[A].AutoStart;
-//                Input #1, Events[A].MoveLayer;
-//                Input #1, Events[A].SpeedX;
-//                Input #1, Events[A].SpeedY;
-//            }
-//            if(FileRelease >= 33)
-//            {
-//                Input #1, Events[A].AutoX;
-//                Input #1, Events[A].AutoY;
-//                Input #1, Events[A].AutoSection;
-//            }
-//            A = A + 1;
-//        }
-//    Close #1;
+        for(B = 0; B <= maxSections; B++)
+        {
+            if(B < hideLayersNum)
+                Events[A].HideLayer[B] = e.layers_hide[size_t(B)];
+            if(B < showLayersNum)
+                Events[A].ShowLayer[B] = e.layers_show[size_t(B)];
+            if(B < toggleLayersNum)
+                Events[A].ToggleLayer[B] = e.layers_toggle[size_t(B)];
+        }
 
+        int maxSets = int(e.sets.size());
+        if(maxSets > maxSections)
+            maxSets = maxSections;
+
+        for(B = 0; B <= maxSections; B++)
+        {
+            Events[A].Music[B] = LevelEvent_Sets::LESet_Nothing;
+            Events[A].Background[B] = LevelEvent_Sets::LESet_Nothing;
+            Events[A].level[B].X = LevelEvent_Sets::LESet_Nothing;
+            Events[A].level[B].Y = 0;
+            Events[A].level[B].Height = 0;
+            Events[A].level[B].Width = 0;
+        }
+
+        for(B = 0; B <= maxSets; B++)
+        {
+            auto &s = e.sets[size_t(B)];
+            Events[A].Music[B] = int(s.music_id);
+            Events[A].Background[B] = int(s.background_id);
+            Events[A].level[B].X = s.position_left;
+            Events[A].level[B].Y = s.position_top;
+            Events[A].level[B].Height = s.position_bottom;
+            Events[A].level[B].Width = s.position_right;
+        }
+
+        Events[A].TriggerEvent = e.trigger;
+        Events[A].TriggerDelay = e.trigger_timer;
+
+        Events[A].LayerSmoke = e.nosmoke;
+
+        Events[A].Controls.AltJump = e.ctrl_altjump;
+        Events[A].Controls.AltRun = e.ctrl_altrun;
+        Events[A].Controls.Down = e.ctrl_down;
+        Events[A].Controls.Drop = e.ctrl_drop;
+        Events[A].Controls.Jump = e.ctrl_jump;
+        Events[A].Controls.Left = e.ctrl_left;
+        Events[A].Controls.Right = e.ctrl_right;
+        Events[A].Controls.Run = e.ctrl_run;
+        Events[A].Controls.Start = e.ctrl_start;
+        Events[A].Controls.Up = e.ctrl_up;
+
+        Events[A].AutoStart = e.autostart;
+        Events[A].MoveLayer = e.movelayer;
+        Events[A].SpeedX = float(e.layer_speed_x);
+        Events[A].SpeedY = float(e.layer_speed_y);
+
+        Events[A].AutoX = float(e.move_camera_x);
+        Events[A].AutoY = float(e.move_camera_y);
+        Events[A].AutoSection = int(e.scroll_section);
+
+        A++;
+        if(A > maxEvents)
+            break;
+    }
 
     FindBlocks();
     UpdateBackgrounds();
     FindSBlocks();
-
 
 
 //    if(LevelEditor == true || MagicHand == true)
@@ -511,10 +514,13 @@ void OpenLevel(std::string FilePath)
     {
         FindStars();
         LevelMacro = 0;
-        for(A = 0; A <= maxSections; A++)
+        for(A = 0; A <= maxSections; A++) // Automatically correct 608 section height to 600
         {
-            if(int(level[A].Height - level[A].Y) == 608)
-                level[A].Y = level[A].Y + 8;
+//            if(int(level[A].Height - level[A].Y) == 608)
+//                level[A].Y = level[A].Y + 8;
+            int height = int(level[A].Height - level[A].Y);
+            if(height > 600 && height < 610)
+                level[A].Y = level[A].Height - 600; // Better and cleaner logic
         }
 
         B = numBackground;
@@ -612,7 +618,7 @@ void ClearLevel()
     Layer[1].Hidden = true;
     Layer[2].Name = "Spawned NPCs";
     Layer[2].Hidden = false;
-    for(A = 0; A <= 100; A++)
+    for(A = 0; A <= maxLayers; A++)
     {
         if(A > 2)
         {

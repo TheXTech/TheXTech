@@ -2402,6 +2402,7 @@ void UpdatePlayer()
                         LevelMacro = 0;
                         LevelMacroCounter = 0;
                         frmMain.clearBuffer();
+                        frmMain.repaint();
                     }
                     else if(Player[A].Location.X > level[Player[A].Section].Width)
                     {
@@ -2410,6 +2411,7 @@ void UpdatePlayer()
                         LevelMacro = 0;
                         LevelMacroCounter = 0;
                         frmMain.clearBuffer();
+                        frmMain.repaint();
                     }
                 }
                 else if(LevelMacro != 1 && LevelMacro != 7 && GameMenu == false)
@@ -5148,6 +5150,7 @@ void EveryonesDead()
     FreezeNPCs = false;
     StopMusic();
     frmMain.clearBuffer();
+    frmMain.repaint();
 //    if(MagicHand == true)
 //        BitBlt frmLevelWindow::vScreen[1].hdc, 0, 0, frmLevelWindow::vScreen[1].ScaleWidth, frmLevelWindow::vScreen[1].ScaleHeight, 0, 0, 0, vbWhiteness;
 

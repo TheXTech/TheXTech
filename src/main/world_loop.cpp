@@ -335,6 +335,7 @@ void WorldLoop()
                         StopMusic();
                         PlaySound(28);
                         frmMain.clearBuffer();
+                        frmMain.repaint();
                         DoEvents();
                         SDL_Delay(1000);
 
@@ -642,7 +643,7 @@ void PathWait()
                 GoalTime = fpsTime;
 //                if(Debugger == true)
 //                    frmLevelDebugger.lblFPS = fpsCount;
-                if(ShowFPS == true)
+                if(ShowFPS)
                     PrintFPS = fpsCount;
                 fpsCount = 0;
             }

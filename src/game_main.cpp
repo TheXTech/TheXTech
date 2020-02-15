@@ -1065,6 +1065,7 @@ void NextLevel()
     StopMusic();
     ClearLevel();
     frmMain.clearBuffer();
+    frmMain.repaint();
     DoEvents();
     if(!TestLevel && GoToLevel == "" && !NoMap)
         SDL_Delay(500);
@@ -1635,6 +1636,7 @@ void StartBattleMode()
     GameMenu = false;
     BattleMode = true;
     frmMain.clearBuffer();
+    frmMain.repaint();
     StopMusic();
     DoEvents();
     SDL_Delay(500);

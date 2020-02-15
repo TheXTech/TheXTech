@@ -8,6 +8,8 @@ LIBS += -lSDL2_mixer_ext -lSDL2 -lFreeImageLite
 INCLUDEPATH += lib/
 INCLUDEPATH += /usr/include/SDL2
 
+debug: DEFINES += DEBUG_BUILD
+
 SOURCES += \
     lib/AppPath/app_path.cpp \
     src/blocks.cpp \
