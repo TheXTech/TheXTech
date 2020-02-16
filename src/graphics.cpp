@@ -1096,20 +1096,32 @@ void UpdateGraphics()
 //            For A = 1 To MidBackground - 1 'First backgrounds
             For(A, 1, MidBackground - 1)  // First backgrounds
             {
-                if(BackgroundHasNoMask[Background[A].Type] == false)
+//                if(BackgroundHasNoMask[Background[A].Type] == false) // Useless code
+//                {
+//                    if(vScreenCollision(Z, Background[A].Location) && !Background[A].Hidden)
+//                    {
+//                        frmMain.renderTexture(vScreenX[Z] + Background[A].Location.X,
+//                                              vScreenY[Z] + Background[A].Location.Y,
+//                                              BackgroundWidth[Background[A].Type],
+//                                              BackgroundHeight[Background[A].Type],
+//                                              GFXBackgroundBMP[Background[A].Type], 0,
+//                                              BackgroundHeight[Background[A].Type] *
+//                                              BackgroundFrame[Background[A].Type]);
+//                    }
+//                }
+//                else
+//                {
+                if(vScreenCollision(Z, Background[A].Location) && !Background[A].Hidden)
                 {
-                    if(vScreenCollision(Z, Background[A].Location) && Background[A].Hidden == false)
-                    {
-                        frmMain.renderTexture(vScreenX[Z] + Background[A].Location.X, vScreenY[Z] + Background[A].Location.Y, BackgroundWidth[Background[A].Type], BackgroundHeight[Background[A].Type], GFXBackgroundBMP[Background[A].Type], 0, BackgroundHeight[Background[A].Type] * BackgroundFrame[Background[A].Type]);
-                    }
+                    frmMain.renderTexture(vScreenX[Z] + Background[A].Location.X,
+                                          vScreenY[Z] + Background[A].Location.Y,
+                                          GFXBackgroundWidth[Background[A].Type],
+                                          BackgroundHeight[Background[A].Type],
+                                          GFXBackgroundBMP[Background[A].Type], 0,
+                                          BackgroundHeight[Background[A].Type] *
+                                          BackgroundFrame[Background[A].Type]);
                 }
-                else
-                {
-                    if(vScreenCollision(Z, Background[A].Location) && Background[A].Hidden == false)
-                    {
-                        frmMain.renderTexture(vScreenX[Z] + Background[A].Location.X, vScreenY[Z] + Background[A].Location.Y, GFXBackgroundWidth[Background[A].Type], BackgroundHeight[Background[A].Type], GFXBackgroundBMP[Background[A].Type], 0, BackgroundHeight[Background[A].Type] * BackgroundFrame[Background[A].Type]);
-                    }
-                }
+//                }
             }
 //        End If
         }
