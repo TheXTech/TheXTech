@@ -146,7 +146,7 @@ void SoundPauseAll()
 {
     pLogDebug("Pause all sound");
     Mix_Pause(-1);
-//    Mix_PauseMusic();
+    Mix_PauseMusic();
 }
 
 void SoundResumeAll()
