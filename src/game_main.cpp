@@ -1174,8 +1174,8 @@ void UpdateMacro()
         do
         {
             // tempTime = Timer - Int(Timer)
-            tempTime = std::floor(float(SDL_GetTicks()) / 1000.0f);
-            if(tempTime > (float)(gameTime + 0.01) || tempTime < gameTime)
+            tempTime = (float(SDL_GetTicks()) / 1000.0f) - std::floor(float(SDL_GetTicks()) / 1000.0f);
+            if(tempTime > (float)(gameTime + 0.01f) || tempTime < gameTime)
             {
                 gameTime = tempTime;
                 DoEvents();
