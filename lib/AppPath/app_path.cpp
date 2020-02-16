@@ -159,7 +159,7 @@ void AppPathManager::initAppPath()
         }
 #endif
         m_userPath = appDir.absolutePath();
-        m_userPath.push_back('/');
+        m_userPath.append("/a2xtech/");
         initSettingsPath();
     }
     else

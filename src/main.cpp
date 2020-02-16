@@ -6,7 +6,7 @@ extern "C"
 int main(int argc, char**argv)
 {
     AppPathManager::initAppPath();
-    AppPath = AppPathManager::userAppDirSTD() + "a2xtech/";
+    AppPath = AppPathManager::userAppDirSTD();
     if(frmMain.initSDL())
     {
         frmMain.freeSDL();
