@@ -9,6 +9,7 @@ INCLUDEPATH += lib/
 INCLUDEPATH += /usr/include/SDL2
 
 QMAKE_CXXFLAGS += -Wno-unused-but-set-variable -Wno-unused-variable
+QMAKE_LFLAGS += -no-pie
 
 debug: DEFINES += DEBUG_BUILD
 
