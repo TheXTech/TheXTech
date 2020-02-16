@@ -639,6 +639,7 @@ void UpdateGraphics()
                 if(ScreenType == 8)
                     numScreens = 1;
             }
+
             for(Z = 1; Z <= numScreens; Z++)
             {
                 if(LevelEditor == false)
@@ -979,6 +980,10 @@ void UpdateGraphics()
                 }
             }
         }
+
+        if(numScreens > 1) // To separate drawing of screens
+            frmMain.setViewport(vScreen[Z].Left, vScreen[Z].Top, vScreen[Z].Width, vScreen[Z].Height);
+
         DrawBackground(S, Z);
 
 
@@ -2971,6 +2976,9 @@ void UpdateGraphics()
 //            End With
 //        End If
 
+
+        if(numScreens > 1) // for multiple screens
+            frmMain.resetViewport();
 
         if(GameOutro)
         {

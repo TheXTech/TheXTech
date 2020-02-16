@@ -6,6 +6,7 @@
 #include <Utils/files.h>
 #include <Utils/elapsed_timer.h>
 #include <DirManager/dirman.h>
+#include <Utils/maths.h>
 #include <Graphics/graphics_funcs.h>
 #include <FreeImageLite.h>
 #include <chrono>
@@ -426,6 +427,8 @@ void FrmMain::updateViewport()
     offset_x = (w - w1) / 2;
     offset_y = (h - h1) / 2;
 
+    viewport_x = 0;
+    viewport_y = 0;
     viewport_w = static_cast<int>(w1);
     viewport_h = static_cast<int>(h1);
 
@@ -438,6 +441,68 @@ void FrmMain::updateViewport()
     topLeftViewport.w = viewport_w;
     topLeftViewport.h = viewport_h;
     SDL_RenderSetViewport(m_gRenderer, &topLeftViewport);
+}
+
+void FrmMain::resetViewport()
+{
+    float w, w1, h, h1;
+    int   wi, hi;
+    SDL_GetWindowSize(window, &wi, &hi);
+    w = wi;
+    h = hi;
+    w1 = w;
+    h1 = h;
+    scale_x = w / ScaleWidth;
+    scale_y = h / ScaleHeight;
+    viewport_scale_x = scale_x;
+    viewport_scale_y = scale_y;
+
+    viewport_offset_x = 0;
+    viewport_offset_y = 0;
+
+    if(scale_x > scale_y)
+    {
+        w1 = scale_y * ScaleWidth;
+        viewport_scale_x = w1 / ScaleWidth;
+    }
+    else if(scale_x < scale_y)
+    {
+        h1 = scale_x * ScaleHeight;
+        viewport_scale_y = h1 / ScaleHeight;
+    }
+
+    offset_x = (w - w1) / 2;
+    offset_y = (h - h1) / 2;
+
+    viewport_x = 0;
+    viewport_y = 0;
+    viewport_w = static_cast<int>(w1);
+    viewport_h = static_cast<int>(h1);
+
+    SDL_Rect topLeftViewport = {0, 0, wi, hi};
+    topLeftViewport.x = static_cast<int>(offset_x);
+    topLeftViewport.y = static_cast<int>(offset_y);
+    topLeftViewport.w = viewport_w;
+    topLeftViewport.h = viewport_h;
+    SDL_RenderSetViewport(m_gRenderer, &topLeftViewport);
+}
+
+void FrmMain::setViewport(int x, int y, int w, int h)
+{
+    auto xF = static_cast<float>(x);
+    auto yF = static_cast<float>(y);
+    auto wF = static_cast<float>(w);
+    auto hF = static_cast<float>(h);
+    SDL_Rect topLeftViewport;
+    topLeftViewport.x = Maths::iRound(offset_x + std::ceil(xF * viewport_scale_x));
+    topLeftViewport.y = Maths::iRound(offset_y + std::ceil(yF * viewport_scale_y));
+    topLeftViewport.w = Maths::iRound(wF * viewport_scale_x);
+    topLeftViewport.h = Maths::iRound(hF * viewport_scale_y);
+    SDL_RenderSetViewport(m_gRenderer, &topLeftViewport);
+    viewport_x = xF;
+    viewport_y = yF;
+    viewport_w = wF;
+    viewport_h = hF;
 }
 
 void FrmMain::offsetViewport(int x, int y)

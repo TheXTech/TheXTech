@@ -50,6 +50,8 @@ public:
 
     void repaint();
     void updateViewport();
+    void resetViewport();
+    void setViewport(int x, int y, int w, int h);
     void offsetViewport(int x, int y); // for screen-shaking
 
     StdPicture LoadPicture(std::string path, std::string maskPath = std::string(), std::string maskFallbackPath = std::string());
@@ -105,6 +107,9 @@ private:
     //Need to calculate relative viewport position when screen was scaled
     float viewport_scale_x = 1.0f;
     float viewport_scale_y = 1.0f;
+
+    int viewport_x = 0;
+    int viewport_y = 0;
     int viewport_w = 0;
     int viewport_h = 0;
 
