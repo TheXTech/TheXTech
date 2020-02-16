@@ -38,6 +38,7 @@ void SaveGame()
     for(A = 1; A <= 5; A++)
     {
         saveCharState c;
+        c.id = static_cast<unsigned long>(A);
         c.state = uint32_t(SavedChar[A].State);
         c.itemID = uint32_t(SavedChar[A].HeldBonus);
         c.mountID = uint32_t(SavedChar[A].Mount);
@@ -102,17 +103,57 @@ void LoadGame()
 
     for(A = 1, i = 0; A <= 5; A++, i++)
     {
-        if(i < sav.characterStates.size())
-        {
-            auto &s = sav.characterStates[i];
-            SavedChar[A].State = int(s.state);
-            SavedChar[A].HeldBonus = int(s.itemID);
-            SavedChar[A].Mount = int(s.mountID);
-            SavedChar[A].MountType = int(s.mountType);
-            SavedChar[A].Hearts = int(s.health);
-            SavedChar[A].Character = A;
-        }
+        SavedChar[A].State = 1;
+        SavedChar[A].HeldBonus = 0;
+        SavedChar[A].Mount = 0;
+        SavedChar[A].MountType = 0;
+        SavedChar[A].Hearts = 1;
+        SavedChar[A].Character = A;
     }
+
+    for(auto &s : sav.characterStates)
+    {
+        if(s.id < 1 || s.id > 5)
+            continue;
+        A = int(s.id);
+
+        if(s.state < 1 || s.state > 10)
+            SavedChar[A].State = 1;
+        else
+            SavedChar[A].State = int(s.state);
+
+        SavedChar[A].HeldBonus = int(s.itemID);
+
+        switch(s.mountID)
+        {
+        default:
+        case 0:
+            SavedChar[A].Mount = 0;
+            SavedChar[A].MountType = 0;
+            break;
+        case 1: case 2: case 3:
+            SavedChar[A].Mount = int(s.mountID);
+        }
+
+        SavedChar[A].MountType = int(s.mountType);
+        switch(s.mountID)
+        {
+        case 1:
+            if(s.mountType < 1 || s.mountType > 3)
+                SavedChar[A].MountType = 1;
+            break;
+        default:
+            break;
+        case 3:
+            if(s.mountType < 1 || s.mountType > 8)
+                SavedChar[A].MountType = 1;
+            break;
+        }
+
+        SavedChar[A].Hearts = int(s.health);
+        SavedChar[A].Character = A;
+    }
+
 
     for(auto &p : sav.visiblePaths)
     {
