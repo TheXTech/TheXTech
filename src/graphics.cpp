@@ -30,7 +30,7 @@ void UpdateGraphics2()
     int B = 0;
     int Z = 0;
     int WPHeight = 0;
-    Location_t tempLocation;
+//    Location_t tempLocation;
     Z = 1;
 
     vScreen[Z].Left = 0;
@@ -2509,9 +2509,13 @@ void UpdateGraphics()
                             SuperPrint(fmt::format_ne("SLOT {0} ... {1}", A, SaveSlot[A]), 3, 300, 320 + (A * 30));
                             if(SaveStars[A] > 0)
                             {
-                                frmMain.renderTexture(560, 320 + (A * 30) + 1, GFX.Interface[5].w, GFX.Interface[5].h, GFX.Interface[5], 0, 0);
-                                frmMain.renderTexture(560 + 24, 320 + (A * 30) + 2, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
-                                SuperPrint(fmt::format_ne("{0}", SaveStars[A]), 3, 588, 320 + (A * 30));
+                                frmMain.renderTexture(560, 320 + (A * 30) + 1,
+                                                      GFX.Interface[5].w, GFX.Interface[5].h,
+                                                      GFX.Interface[5], 0, 0);
+                                frmMain.renderTexture(560 + 24, 320 + (A * 30) + 2,
+                                                      GFX.Interface[1].w, GFX.Interface[1].h,
+                                                      GFX.Interface[1], 0, 0);
+                                SuperPrint(fmt::format_ne(" {0}", SaveStars[A]), 3, 588, 320 + (A * 30));
                             }
                         }
                         else
@@ -3587,7 +3591,7 @@ void SuperPrint(std::string SuperWords, int Font, float X, float Y,
 //                BitBlt myBackBuffer, X + B, Y, 18, 16, GFX.Font2(2).hdc, 2, C, vbSrcPaint
                 frmMain.renderTexture(int(X + B), int(Y), 18, 16, GFX.Font2[2], 2, C, r, g, b, a);
 //                B = B + 18
-                B += 16;
+                B += 18;
 //                If Left(Words, 1) = "M" Then B = B + 2
                 if(c == 'M')
                     B += 2;
@@ -5526,7 +5530,7 @@ void PlayerWarpGFX(int A, Location_t tempLocation, float X2, float Y2)
     // .Effect2 => 100  -- Delay at next spot
     // .Effect2 = 2     -- Exiting
     // .Effect2 = 3     -- Done
-    if(Player[A].Effect2 == 0)
+    if(Player[A].Effect2 == 0.0)
     {
         if(Warp[Player[A].Warp].Direction == 3) // Moving down
         {
@@ -5919,12 +5923,12 @@ void DrawInterface(int Z, int numScreens)
                 frmMain.renderTexture(40 + 20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96 + 8 + GFX.Interface[2].w, 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
 
                 SuperPrint(coinsStr, 1,
-                           40 + 20 - ((int(coinsStr.size()) - 1) * 18) +
+                           40 + 20 - (int(coinsStr.size()) * 18) +
                            (float(vScreen[Z].Width) / 2.0f) - (GFX.Container[1].w / 2) + 80 + 4 + 12 + 18 + 32 + GFX.Interface[3].w,
                            16 + 11);
                 // Print Score
                 SuperPrint(scoreStr, 1,
-                           40 + 20 - (((int(scoreStr.size()) - 1)) * 18) +
+                           40 + 20 - (int(scoreStr.size()) * 18) +
                            (float(vScreen[Z].Width) / 2.0f) - (GFX.Container[1].w / 2) + 80 + 12 + 4 + 18 + 32 + GFX.Interface[3].w,
                            16 + 31);
                 // Print lives on the screen
@@ -6027,12 +6031,12 @@ void DrawInterface(int Z, int numScreens)
 
                 frmMain.renderTexture(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96 + 8 + GFX.Interface[2].w, 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
                 SuperPrint(coinsStr, 1,
-                           float(20 - (coinsStr.size() - 1) * 18 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 80 + 4 + 12 + 18 + 32 + GFX.Interface[3].w),
+                           float(20 - int(coinsStr.size()) * 18 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 80 + 4 + 12 + 18 + 32 + GFX.Interface[3].w),
                            16 + 11);
                 // Print Score
                 SuperPrint(scoreStr,
                            1,
-                           float(20 - (int(scoreStr.size()) - 1) * 18 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 80 + 12 + 4 + 18 + 32 + GFX.Interface[3].w),
+                           float(20 - int(scoreStr.size()) * 18 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 80 + 12 + 4 + 18 + 32 + GFX.Interface[3].w),
                            16 + 31);
                 // Print lives on the screen
 
@@ -6055,17 +6059,27 @@ void DrawInterface(int Z, int numScreens)
             {
                 if(Z == 1)
                 {
-
-                    frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122, 16 + 10, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0);
+                    frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122,
+                                          16 + 10,
+                                          GFX.Interface[3].w,
+                                          GFX.Interface[3].h,
+                                          GFX.Interface[3],
+                                          0, 0);
                 }
                 else
                 {
-
-                    frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122, 16 + 10, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[7], 0, 0);
+                    frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122,
+                                          16 + 10,
+                                          GFX.Interface[3].w,
+                                          GFX.Interface[3].h,
+                                          GFX.Interface[7],
+                                          0, 0);
                 }
 
                 frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 10 + GFX.Interface[1].w + 16, 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
-                SuperPrint(std::to_string(BattleLives[Z]), 1, vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 12 + 18 + GFX.Interface[5].w + 16, 16 + 11);
+                SuperPrint(std::to_string(BattleLives[Z]), 1,
+                           float(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 12 + 18 + GFX.Interface[5].w + 16),
+                           16 + 11);
             }
         }
     }
@@ -6163,7 +6177,8 @@ void DrawInterface(int Z, int numScreens)
 
             frmMain.renderTexture(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 - 34 + C, 52, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[8], 0, 0);
             frmMain.renderTexture(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 - 10 + C, 53, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
-            SuperPrint(std::to_string(Player[1].Bombs), 1, 20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 12 + C, 53);
+            SuperPrint(std::to_string(Player[1].Bombs), 1,
+                       float(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 12 + C), 53);
         }
 
         // Print coins on the screen
@@ -6181,18 +6196,18 @@ void DrawInterface(int Z, int numScreens)
         }
         frmMain.renderTexture(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96 + 8 + GFX.Interface[2].w, 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
         SuperPrint(coinsStr, 1,
-                   20 - (int(coinsStr.size()) - 1) * 18 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 80 + 4 + 12 + 18 + 32 + GFX.Interface[3].w,
+                   float(20 - int(coinsStr.size()) * 18 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 80 + 4 + 12 + 18 + 32 + GFX.Interface[3].w),
                    16 + 11);
         // Print Score
         SuperPrint(scoreStr, 1,
-                   20 - (int(scoreStr.size()) - 1) * 18 +
+                   20 - int(scoreStr.size()) * 18 +
                    float(vScreen[Z].Width) / 2.0f - GFX.Container[1].w / 2 + 80 + 12 + 4 + 18 + 32 + GFX.Interface[3].w,
                    16 + 31);
         // Print lives on the screen
         frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 - 16, 16 + 10, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0);
         frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 10 + GFX.Interface[1].w, 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
         SuperPrint(livesStr, 1,
-                   vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 12 + 18 + GFX.Interface[5].w,
+                   float(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 12 + 18 + GFX.Interface[5].w),
                    16 + 11);
         // Print stars on the screen
         if(numStars > 0)
@@ -6200,7 +6215,7 @@ void DrawInterface(int Z, int numScreens)
             frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122, 16 + 30, GFX.Interface[5].w, GFX.Interface[5].h, GFX.Interface[5], 0, 0);
             frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 10 + GFX.Interface[1].w, 16 + 31, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
             SuperPrint(numStarsStr, 1,
-                       vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 12 + 18 + GFX.Interface[5].w,
+                       float(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 12 + 18 + GFX.Interface[5].w),
                        16 + 31);
         }
     }
@@ -6334,7 +6349,7 @@ void DrawPlayer(int A, int Z)
                     if(Player[A].Direction == -1)
                         C = Player[A].YoshiTongueLength;
 
-                    frmMain.renderTexture(vScreenX[Z] + Player[A].YoshiTongueX - C - 1, vScreenY[Z] + Player[A].YoshiTongue.Y, Player[A].YoshiTongueLength + 2, 16, GFX.Tongue[2], 0, 0, s, s, s);
+                    frmMain.renderTexture(vScreenX[Z] + double(Player[A].YoshiTongueX) - C - 1, vScreenY[Z] + Player[A].YoshiTongue.Y, Player[A].YoshiTongueLength + 2, 16, GFX.Tongue[2], 0, 0, s, s, s);
 
                     C = 1;
                     if(Player[A].Direction == 1)
