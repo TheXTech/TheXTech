@@ -617,7 +617,7 @@ void UpdateGraphics()
 //    cycleCount = cycleCount + 1
     cycleCount += 1;
 //    If FrameSkip = True And TakeScreen = False Then
-    if(FrameSkip And !TakeScreen)
+    if(FrameSkip && !TakeScreen)
     {
         if(SDL_GetTicks() + floor(1000 * (1 - (cycleCount / 63.0))) > GoalTime) // Don't draw this frame
         {
@@ -884,7 +884,7 @@ void UpdateGraphics()
 
     if(ClearBuffer)
     {
-        ClearBuffer = False;
+        ClearBuffer = false;
         frmMain.clearBuffer();
     }
 
@@ -914,11 +914,11 @@ void UpdateGraphics()
 //        If LevelEditor = False Then
         {
 //            If ScreenType = 2 Or ScreenType = 3 Then
-            if(ScreenType == 2 Or ScreenType == 3)
+            if(ScreenType == 2 || ScreenType == 3)
 //                GetvScreenAverage
                 GetvScreenAverage();
 //            ElseIf ScreenType = 5 And vScreen(2).Visible = False Then
-            else if(ScreenType == 5 And !vScreen[2].Visible)
+            else if(ScreenType == 5 && !vScreen[2].Visible)
 //                GetvScreenAverage
                 GetvScreenAverage();
 //            ElseIf ScreenType = 7 Then
@@ -1030,10 +1030,10 @@ void UpdateGraphics()
 //                    With Player(A)
                     Player_t &p = Player[A];
 //                        If vScreenCollision(Z, .Location) = False And LevelMacro = 0 And .Location.Y < level(.Section).Height And .Location.Y + .Location.Height > level(.Section).Y And .TimeToLive = 0 And .Dead = False Then
-                    if(!vScreenCollision(Z, p.Location) And LevelMacro == 0 And
-                        p.Location.Y < level[p.Section].Height And
-                        p.Location.Y + p.Location.Height > level[p.Section].Y And
-                        p.TimeToLive == 0 And !p.Dead)
+                    if(!vScreenCollision(Z, p.Location) && LevelMacro == 0 &&
+                        p.Location.Y < level[p.Section].Height &&
+                        p.Location.Y + p.Location.Height > level[p.Section].Y &&
+                        p.TimeToLive == 0 && !p.Dead)
                     {
                         for(B = 1; B <= numPlayers; B++)
                         {
@@ -2133,9 +2133,9 @@ void UpdateGraphics()
 //            With Effect(A)
             auto &e = Effect[A];
 //                If .Type <> 112 And .Type <> 54 And .Type <> 55 And .Type <> 59 And .Type <> 77 And .Type <> 81 And .Type <> 82 And .Type <> 103 And .Type <> 104 And .Type <> 114 And .Type <> 123 And .Type <> 124 Then
-            if(e.Type != 112 And e.Type != 54 And e.Type != 55 And e.Type != 59 And
-               e.Type != 77 And e.Type != 81 And e.Type != 82 And e.Type != 103 And
-               e.Type != 104 And e.Type != 114 And e.Type != 123 And e.Type != 124)
+            if(e.Type != 112 && e.Type != 54 && e.Type != 55 && e.Type != 59 &&
+               e.Type != 77 && e.Type != 81 && e.Type != 82 && e.Type != 103 &&
+               e.Type != 104 && e.Type != 114 && e.Type != 123 && e.Type != 124)
             {
 //                    If vScreenCollision(Z, .Location) Then
                 if(vScreenCollision(Z, e.Location))
@@ -2383,7 +2383,7 @@ void UpdateGraphics()
                     frmMain.renderTexture(300 - 20, 350 + (MenuCursor * 30), 16, 16, GFX.MCursor[0], 0, 0);
                 }
                 // Character select
-                else if(MenuMode == 100 Or MenuMode == 200 Or MenuMode == 300 Or MenuMode == 400 Or MenuMode == 500)
+                else if(MenuMode == 100 || MenuMode == 200 || MenuMode == 300 || MenuMode == 400 || MenuMode == 500)
                 {
                     A = 0;
                     B = 0;
@@ -2448,7 +2448,7 @@ void UpdateGraphics()
                         frmMain.renderTexture(300 - 20, B + 350 + (MenuCursor * 30), GFX.MCursor[0]);
                     }
 
-                } else if(MenuMode == 1 Or MenuMode == 2 Or MenuMode == 4) {
+                } else if(MenuMode == 1 || MenuMode == 2 || MenuMode == 4) {
                     std::string tempStr = "";
                     minShow = 1;
                     maxShow = NumSelectWorld;
@@ -2494,13 +2494,13 @@ void UpdateGraphics()
                     }
 
                     B = MenuCursor - minShow + 1;
-                    if(B >= 0 And B < 5)
+                    if(B >= 0 && B < 5)
                     {
                         frmMain.renderTexture(300 - 20, 350 + (B * 30), GFX.MCursor[0].w, GFX.MCursor[0].h, GFX.MCursor[0], 0, 0);
                     }
                 }
 
-                else if(MenuMode == 10 Or MenuMode == 20) // Save Select
+                else if(MenuMode == 10 || MenuMode == 20) // Save Select
                 {
                     for(auto A = 1; A <= maxSaveSlots; A++)
                     {
@@ -2549,7 +2549,7 @@ void UpdateGraphics()
                     frmMain.renderTexture(300 - 20, 350 + (MenuCursor * 30),
                                           GFX.MCursor[0].w, GFX.MCursor[0].h, GFX.MCursor[0], 0, 0);
     //                ElseIf MenuMode = 31 Or MenuMode = 32 Then
-                } else if(MenuMode == 31 Or MenuMode == 32) {
+                } else if(MenuMode == 31 || MenuMode == 32) {
     //                    If useJoystick(MenuMode - 30) = 0 Then
                     if(useJoystick[MenuMode - 30] == 0)
                     {
@@ -3266,7 +3266,7 @@ void SetupScreens()
         vScreen[1].Width = ScreenW;
         vScreen[1].Left = 0;
         vScreen[1].Top = 0;
-        vScreen[2].Visible = False;
+        vScreen[2].Visible = false;
         break;
     case 1: // Split Screen vertical
         vScreen[1].Height = ScreenH / 2;
@@ -3283,14 +3283,14 @@ void SetupScreens()
         vScreen[1].Width = ScreenW;
         vScreen[1].Left = 0;
         vScreen[1].Top = 0;
-        vScreen[2].Visible = False;
+        vScreen[2].Visible = false;
         break;
     case 3: // Follows all players. Noone leaves the screen
         vScreen[1].Height = ScreenH;
         vScreen[1].Width = ScreenW;
         vScreen[1].Left = 0;
         vScreen[1].Top = 0;
-        vScreen[2].Visible = False;
+        vScreen[2].Visible = false;
         break;
     case 4: // Split Screen horizontal
         vScreen[1].Height = ScreenH;
@@ -3307,7 +3307,7 @@ void SetupScreens()
         vScreen[1].Width = ScreenW;
         vScreen[1].Left = 0;
         vScreen[1].Top = 0;
-        vScreen[2].Visible = False;
+        vScreen[2].Visible = false;
         break;
     case 6: // VScreen Coop
         vScreen[1].Height = ScreenH;
@@ -3324,14 +3324,14 @@ void SetupScreens()
         vScreen[1].Width = 800;
         vScreen[1].Top = 0;
         vScreen[1].Height = 600;
-        vScreen[2].Visible = False;
+        vScreen[2].Visible = false;
         break;
     case 8: // netplay
         vScreen[1].Left = 0;
         vScreen[1].Width = 800;
         vScreen[1].Top = 0;
         vScreen[1].Height = 600;
-        vScreen[2].Visible = False;
+        vScreen[2].Visible = false;
         break;
 //    End If
     }
@@ -6539,9 +6539,9 @@ void ScreenShot()
 void DrawFrozenNPC(int Z, int A)
 {
     auto &n = NPC[A];
-    if((vScreenCollision(Z, n.Location) Or
+    if((vScreenCollision(Z, n.Location) ||
         vScreenCollision(Z, newLoc(n.Location.X - (NPCWidthGFX[n.Type] - n.Location.Width) / 2,
-                            n.Location.Y, CDbl(NPCWidthGFX[n.Type]), CDbl(NPCHeight[n.Type])))) And !n.Hidden)
+                            n.Location.Y, CDbl(NPCWidthGFX[n.Type]), CDbl(NPCHeight[n.Type])))) && !n.Hidden)
     {
 // draw npc
         float c = n.Shadow ? 0.f : 1.f;

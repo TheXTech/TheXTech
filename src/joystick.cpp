@@ -44,7 +44,7 @@ void UpdateControls()
         if(getKeyState(vbKeyEscape) == KEY_PRESSED)
         {
 //            EndLevel = True
-            EndLevel = True;
+            EndLevel = true;
 //        End If
         }
 //    End If
@@ -55,7 +55,7 @@ void UpdateControls()
     For(B, 1, numPlayers)
     {
 //        If B = 2 And numPlayers = 2 Then
-        if(B == 2 And numPlayers == 2) {
+        if(B == 2 && numPlayers == 2) {
 //            A = 2
             A = 2;
 //        Else
@@ -67,16 +67,16 @@ void UpdateControls()
 //        With Player(A).Controls
         {
             Controls_t &c = Player[A].Controls;
-            c.Down = False;
-            c.Drop = False;
-            c.Jump = False;
-            c.Left = False;
-            c.Right = False;
-            c.Run = False;
-            c.Start = False;
-            c.Up = False;
-            c.AltJump = False;
-            c.AltRun = False;
+            c.Down = false;
+            c.Drop = false;
+            c.Jump = false;
+            c.Left = false;
+            c.Right = false;
+            c.Run = false;
+            c.Start = false;
+            c.Up = false;
+            c.AltJump = false;
+            c.AltRun = false;
 //            If useJoystick(A) > 0 Then 'There is a joystick
             if(useJoystick[A] > 0)
             {
@@ -85,64 +85,64 @@ void UpdateControls()
 //                PollJoystick
                 PollJoystick();
 //                If CurrentJoyX < CenterX(JoyNum) - CenterX(JoyNum) * 0.3 Or (CurrentJoyPOV >= 22500 And CurrentJoyPOV <= 31500) Then
-                if(CurrentJoyX < CenterX[JoyNum] - CenterX[JoyNum] * 0.3 Or
-                   (CurrentJoyPOV >= 22500 And CurrentJoyPOV <= 31500)) {
+                if(CurrentJoyX < CenterX[JoyNum] - CenterX[JoyNum] * 0.3 ||
+                   (CurrentJoyPOV >= 22500 && CurrentJoyPOV <= 31500)) {
 //                    .Left = True
-                    c.Left = True;
+                    c.Left = true;
 //                ElseIf CurrentJoyX > CenterX(JoyNum) + CenterX(JoyNum) * 0.3 Or (CurrentJoyPOV >= 4500 And CurrentJoyPOV <= 13500) Then
-                } else if(CurrentJoyX > CenterX[JoyNum] + CenterX[JoyNum] * 0.3 Or
-                         (CurrentJoyPOV >= 4500 And CurrentJoyPOV <= 13500)) {
+                } else if(CurrentJoyX > CenterX[JoyNum] + CenterX[JoyNum] * 0.3 ||
+                         (CurrentJoyPOV >= 4500 && CurrentJoyPOV <= 13500)) {
 //                    .Right = True
-                    c.Right = True;
+                    c.Right = true;
 //                End If
                 }
 //                If CurrentJoyY < CenterY(JoyNum) - CenterY(JoyNum) * 0.3 Or (CurrentJoyPOV >= 0 And CurrentJoyPOV <= 4500) Or CurrentJoyPOV = 31500 Then
-                if(CurrentJoyY < CenterY[JoyNum] - CenterY[JoyNum] * 0.3 Or
-                         (CurrentJoyPOV >= 0 And CurrentJoyPOV <= 4500) Or CurrentJoyPOV == 31500) {
+                if(CurrentJoyY < CenterY[JoyNum] - CenterY[JoyNum] * 0.3 ||
+                         (CurrentJoyPOV >= 0 && CurrentJoyPOV <= 4500) || CurrentJoyPOV == 31500) {
 //                    .Up = True
-                    c.Up = True;
+                    c.Up = true;
 //                ElseIf CurrentJoyY > CenterY(JoyNum) + CenterY(JoyNum) * 0.3 Or (CurrentJoyPOV >= 13500 And CurrentJoyPOV <= 22500) Then
-                } else if(CurrentJoyY > CenterY[JoyNum] + CenterY[JoyNum] * 0.3 Or
-                          (CurrentJoyPOV >= 13500 And CurrentJoyPOV <= 22500)) {
+                } else if(CurrentJoyY > CenterY[JoyNum] + CenterY[JoyNum] * 0.3 ||
+                          (CurrentJoyPOV >= 13500 && CurrentJoyPOV <= 22500)) {
 //                    .Down = True
-                    c.Down = True;
+                    c.Down = true;
 //                End If
                 }
 
 //                If JoyButtons(conJoystick(A).Jump) = True Then
                 if(JoyButtons[conJoystick[A].Jump]) {
 //                    .Jump = True
-                    c.Jump = True;
+                    c.Jump = true;
 //                End If
                 }
 //                If JoyButtons(conJoystick(A).Run) = True Then
                 if(JoyButtons[conJoystick[A].Run]) {
 //                    .Run = True
-                    c.Run = True;
+                    c.Run = true;
 //                End If
                 }
 //                If JoyButtons(conJoystick(A).Drop) = True Then
                 if(JoyButtons[conJoystick[A].Drop]) {
 //                    .Drop = True
-                    c.Drop = True;
+                    c.Drop = true;
 //                End If
                 }
 //                If JoyButtons(conJoystick(A).Start) = True Then
                 if(JoyButtons[conJoystick[A].Start]) {
 //                    .Start = True
-                    c.Start = True;
+                    c.Start = true;
 //                End If
                 }
 //                If JoyButtons(conJoystick(A).AltRun) = True Then
                 if(JoyButtons[conJoystick[A].AltRun]) {
 //                    .AltRun = True
-                    c.AltRun = True;
+                    c.AltRun = true;
 //                End If
                 }
 //                If JoyButtons(conJoystick(A).AltJump) = True Then
                 if(JoyButtons[conJoystick[A].AltJump]) {
 //                    .AltJump = True
-                    c.AltJump = True;
+                    c.AltJump = true;
 //                End If
                 }
 //            End If
@@ -153,61 +153,61 @@ void UpdateControls()
 //                If GetKeyState(conKeyboard(A).Up) And KEY_PRESSED Then
                 if(getKeyStateI(conKeyboard[A].Up)) {
 //                    .Up = True
-                    c.Up = True;
+                    c.Up = true;
 //                End If
                 }
 //                If GetKeyState(conKeyboard(A).Down) And KEY_PRESSED Then
                 if(getKeyStateI(conKeyboard[A].Down)) {
 //                    .Down = True
-                    c.Down = True;
+                    c.Down = true;
 //                End If
                 }
 //                If GetKeyState(conKeyboard(A).Left) And KEY_PRESSED Then
                 if(getKeyStateI(conKeyboard[A].Left)) {
 //                    .Left = True
-                    c.Left = True;
+                    c.Left = true;
 //                End If
                 }
 //                If GetKeyState(conKeyboard(A).Right) And KEY_PRESSED Then
                 if(getKeyStateI(conKeyboard[A].Right)) {
 //                    .Right = True
-                    c.Right = True;
+                    c.Right = true;
 //                End If
                 }
 //                If GetKeyState(conKeyboard(A).Jump) And KEY_PRESSED Then
                 if(getKeyStateI(conKeyboard[A].Jump)) {
 //                    .Jump = True
-                    c.Jump = True;
+                    c.Jump = true;
 //                End If
                 }
 //                If GetKeyState(conKeyboard(A).Run) And KEY_PRESSED Then
                 if(getKeyStateI(conKeyboard[A].Run)) {
 //                    .Run = True
-                    c.Run = True;
+                    c.Run = true;
 //                End If
                 }
 //                If GetKeyState(conKeyboard(A).Drop) And KEY_PRESSED Then
                 if(getKeyStateI(conKeyboard[A].Drop)) {
 //                    .Drop = True
-                    c.Drop = True;
+                    c.Drop = true;
 //                End If
                 }
 //                If GetKeyState(conKeyboard(A).Start) And KEY_PRESSED Then
                 if(getKeyStateI(conKeyboard[A].Start)) {
 //                    .Start = True
-                    c.Start = True;
+                    c.Start = true;
 //                End If
                 }
 //                If GetKeyState(conKeyboard(A).AltJump) And KEY_PRESSED Then
                 if(getKeyStateI(conKeyboard[A].AltJump)) {
 //                    .AltJump = True
-                    c.AltJump = True;
+                    c.AltJump = true;
 //                End If
                 }
 //                If GetKeyState(conKeyboard(A).AltRun) And KEY_PRESSED Then
                 if(getKeyStateI(conKeyboard[A].AltRun)) {
 //                    .AltRun = True
-                    c.AltRun = True;
+                    c.AltRun = true;
 //                End If
                 }
 //            End If
@@ -224,34 +224,34 @@ void UpdateControls()
             }*/
 
 //            If Player(A).Controls.Start = False And Player(A).Controls.Jump = False Then
-            if(!Player[A].Controls.Start And !Player[A].Controls.Jump) {
+            if(!Player[A].Controls.Start && !Player[A].Controls.Jump) {
 //                Player(A).UnStart = True
-                Player[A].UnStart = True;
+                Player[A].UnStart = true;
 //            End If
             }
 //            If .Up = True And .Down = True Then
-            if(c.Up And c.Down) {
+            if(c.Up && c.Down) {
 //                .Up = False
-                c.Up = False;
+                c.Up = false;
 //                .Down = False
-                c.Down = False;
+                c.Down = false;
 //            End If
             }
 
 //            If .Left = True And .Right = True Then
-            if(c.Left And c.Right) {
+            if(c.Left && c.Right) {
 //                .Left = False
-                c.Left = False;
+                c.Left = false;
 //                .Right = False
-                c.Right = False;
+                c.Right = false;
 //            End If
             }
 
 //            If Not (Player(A).State = 5 And Player(A).Mount = 0) And .AltRun = True Then .Run = True
-            if(!(Player[A].State == 5 And Player[A].Mount == 0) And c.AltRun)
-                c.Run = True;
+            if(!(Player[A].State == 5 && Player[A].Mount == 0) && c.AltRun)
+                c.Run = true;
 //            If ForcedControls = True And GamePaused = False Then
-            if(ForcedControls And !GamePaused ) {
+            if(ForcedControls && !GamePaused ) {
 //                Player(A).Controls = ForcedControl
                 Player[A].Controls = ForcedControl;
 //            End If
@@ -265,7 +265,7 @@ void UpdateControls()
     if(SingleCoop > 0)
     {
 //        If numPlayers = 1 Or numPlayers > 2 Then SingleCoop = 0
-        if(numPlayers == 1 Or numPlayers > 2)
+        if(numPlayers == 1 || numPlayers > 2)
             SingleCoop = 0;
 //        Dim tempControls As Controls
         Controls_t tempControls;
@@ -312,7 +312,7 @@ void UpdateControls()
             if(p.SpinJump)
             {
 //                If .SpinFrame < 4 Or .SpinFrame > 9 Then
-                if(p.SpinFrame < 4 Or p.SpinFrame > 9) {
+                if(p.SpinFrame < 4 || p.SpinFrame > 9) {
 //                    .Direction = -1
                     p.Direction = -1;
 //                Else

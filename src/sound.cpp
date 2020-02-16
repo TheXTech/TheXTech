@@ -144,12 +144,14 @@ void SetMusicVolume(std::string Alias, long Volume)
 
 void SoundPauseAll()
 {
+    pLogDebug("Pause all sound");
     Mix_Pause(-1);
-    Mix_PauseMusic();
+//    Mix_PauseMusic();
 }
 
 void SoundResumeAll()
 {
+    pLogDebug("Resume all sound");
     Mix_Resume(-1);
     Mix_ResumeMusic();
 }
@@ -205,7 +207,7 @@ void StartMusic(int A)
     if(noSound)
         return;
 
-    if(LevelSelect And !GameMenu) // music on the world map
+    if(LevelSelect && !GameMenu) // music on the world map
     {
         StopMusic();
         std::string mus = fmt::format_ne("wmusic{0}", A);
@@ -213,7 +215,6 @@ void StartMusic(int A)
         PlayMusic(mus);
         musicName = mus;
         curWorldMusic = A;
-
     }
     else if(A == -1) // P switch music
     {
@@ -258,8 +259,9 @@ void StopMusic()
 {
     if(!musicPlaying || noSound)
         return;
-//    If musicPlaying = False Then Exit Sub
-//    If noSound = True Then Exit Sub
+
+    pLogDebug("Stopping music");
+
     Mix_HaltMusic();
     if(g_curMusic)
         Mix_FreeMusic(g_curMusic);

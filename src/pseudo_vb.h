@@ -8,9 +8,7 @@
 #define If if(
 #define Then ) {
 #define End }
-#define And &&
-#define Or ||
-#define Len(x) std::strlen(x)
+
 #define CDbl(x) static_cast<double>(x)
 #define CSng(x) static_cast<float>(x)
 #define CBool(x) static_cast<bool>(x)

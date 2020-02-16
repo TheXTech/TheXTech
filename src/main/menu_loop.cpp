@@ -116,7 +116,7 @@ void MenuLoop()
                 MenuCursorCanMove = false;
 //            ElseIf .Down = True Or (GetKeyState(vbKeyDown) And KEY_PRESSED) Then
             }
-            else if(c.Down Or getKeyState(vbKeyDown) == KEY_PRESSED)
+            else if(c.Down || getKeyState(vbKeyDown) == KEY_PRESSED)
             {
 //                If MenuCursorCanMove = True Then
                 if(MenuCursorCanMove)
@@ -709,13 +709,13 @@ void MenuLoop()
                 For(A, 0, 2)
                 {
 //                    If MenuMouseY >= 350 + A * 30 And MenuMouseY <= 366 + A * 30 Then
-                    if(MenuMouseY >= 350 + A * 30 And MenuMouseY <= 366 + A * 30)
+                    if(MenuMouseY >= 350 + A * 30 && MenuMouseY <= 366 + A * 30)
                     {
 //                        menuLen = 18 * Len("slot 1 empty") - 2
-                        menuLen = 18 * Len("slot 1 empty") - 2;
+                        menuLen = 18 * std::strlen("slot 1 empty") - 2;
 //                        If SaveSlot(A + 1) >= 0 Then menuLen = 18 * Len("slot ... 100") - 2
                         if(SaveSlot[A + 1] >= 0)
-                            menuLen = 18 * Len("slot ... 100") - 2;
+                            menuLen = 18 * std::strlen("slot ... 100") - 2;
 //                        If SaveStars(A + 1) > 0 Then menuLen = 288 + Len(SaveStars(A + 1)) * 18
                         if(SaveStars[A + 1] > 0)
                             menuLen = 288 + 2/*sizeof(short) == 2 in VB6*/ * 18;
@@ -724,7 +724,7 @@ void MenuLoop()
                         {
 //                            If MenuMouseRelease = True And MenuMouseDown = True Then MenuMouseClick = True
                             if(MenuMouseRelease && MenuMouseDown)
-                                MenuMouseClick = True;
+                                MenuMouseClick = true;
 //                            If MenuCursor <> A Then
                             if(MenuCursor != A)
                             {
@@ -774,7 +774,7 @@ void MenuLoop()
 //                    End If
                     }
 //                    MenuCursorCanMove = False
-                    MenuCursorCanMove = False;
+                    MenuCursorCanMove = false;
 //                    PlaySound 29
                     PlaySound(29);
 //                ElseIf .Jump = True Or .Start = True Or _
@@ -805,26 +805,26 @@ void MenuLoop()
                     Player[1].Mount = 0;
                     Player[1].Character = 1;
                     Player[1].HeldBonus = 0;
-                    Player[1].CanFly = False;
-                    Player[1].CanFly2 = False;
+                    Player[1].CanFly = false;
+                    Player[1].CanFly2 = false;
                     Player[1].TailCount = 0;
-                    Player[1].YoshiBlue = False;
-                    Player[1].YoshiRed = False;
-                    Player[1].YoshiYellow = False;
+                    Player[1].YoshiBlue = false;
+                    Player[1].YoshiRed = false;
+                    Player[1].YoshiYellow = false;
                     Player[1].Hearts = 0;
                     Player[2].State = 1;
                     Player[2].Mount = 0;
                     Player[2].Character = 2;
                     Player[2].HeldBonus = 0;
-                    Player[2].CanFly = False;
-                    Player[2].CanFly2 = False;
+                    Player[2].CanFly = false;
+                    Player[2].CanFly2 = false;
                     Player[2].TailCount = 0;
-                    Player[2].YoshiBlue = False;
-                    Player[2].YoshiRed = False;
-                    Player[2].YoshiYellow = False;
+                    Player[2].YoshiBlue = false;
+                    Player[2].YoshiRed = false;
+                    Player[2].YoshiYellow = false;
                     Player[2].Hearts = 0;
 //                    If numPlayers <= 2 And PlayerCharacter > 0 Then
-                    if(numPlayers <= 2 And PlayerCharacter > 0) {
+                    if(numPlayers <= 2 && PlayerCharacter > 0) {
 //                        Player(1).Character = PlayerCharacter
                         Player[1].Character = PlayerCharacter;
 //                        PlayerCharacter = 0
@@ -832,7 +832,7 @@ void MenuLoop()
 //                    End If
                     }
 //                    If numPlayers = 2 And PlayerCharacter2 > 0 Then
-                    if(numPlayers == 2 And PlayerCharacter2 > 0)
+                    if(numPlayers == 2 && PlayerCharacter2 > 0)
                     {
 //                        Player(2).Character = PlayerCharacter2
                         Player[2].Character = PlayerCharacter2;
@@ -851,9 +851,9 @@ void MenuLoop()
 //                    Lives = 3
                     Lives = 3;
 //                    LevelSelect = True
-                    LevelSelect = True;
+                    LevelSelect = true;
 //                    GameMenu = False
-                    GameMenu = False;
+                    GameMenu = false;
 //                    BitBlt myBackBuffer, 0, 0, ScreenW, ScreenH, 0, 0, 0, vbWhiteness
 //                    BitBlt frmMain.hdc, 0, 0, frmMain.ScaleWidth, frmMain.ScaleHeight, 0, 0, 0, vbWhiteness
                     frmMain.clearBuffer();
@@ -898,13 +898,13 @@ void MenuLoop()
 //                        End With
                             }
 //                            WorldPath(A).Active = True
-                            WorldPath[A].Active = True;
+                            WorldPath[A].Active = true;
 //                            For B = 1 To numScenes
                             For(B, 1, numScenes)
                             {
 //                                If CheckCollision(tempLocation, Scene(B).Location) Then Scene(B).Active = False
                                 if(CheckCollision(tempLocation, Scene[B].Location))
-                                    Scene[B].Active = False;
+                                    Scene[B].Active = false;
 //                            Next B
                             }
 //                        Next A
@@ -913,7 +913,7 @@ void MenuLoop()
                         For(A, 1, numWorldLevels)
                         {
 //                            WorldLevel(A).Active = True
-                            WorldLevel[A].Active = True;
+                            WorldLevel[A].Active = true;
 //                        Next A
                         }
 //                    End If
@@ -928,7 +928,7 @@ void MenuLoop()
 //                        SoundPause(26) = 200
                         SoundPause[26] = 200;
 //                        LevelSelect = False
-                        LevelSelect = False;
+                        LevelSelect = false;
 
 //                        GameThing
                         GameThing();
@@ -963,46 +963,46 @@ void MenuLoop()
         else if(MenuMode == 3)
         {
 //            If MenuMouseMove = True Then
-            if(MenuMouseMove == True)
+            if(MenuMouseMove == true)
             {
 //                For A = 0 To 3
                 For(A, 0, 3)
                 {
 //                    If MenuMouseY >= 350 + A * 30 And MenuMouseY <= 366 + A * 30 Then
-                    if(MenuMouseY >= 350 + A * 30 And MenuMouseY <= 366 + A * 30)
+                    if(MenuMouseY >= 350 + A * 30 && MenuMouseY <= 366 + A * 30)
                     {
 //                        If A = 0 Then
                         if(A == 0)
 //                            menuLen = 18 * Len("player 1 controls") - 4
-                            menuLen = 18 * Len("player 1 controls") - 4;
+                            menuLen = 18 * std::strlen("player 1 controls") - 4;
 //                        ElseIf A = 1 Then
                         else if(A == 1)
 //                            menuLen = 18 * Len("player 2 controls") - 4
-                            menuLen = 18 * Len("player 2 controls") - 4;
+                            menuLen = 18 * std::strlen("player 2 controls") - 4;
 //                        ElseIf A = 2 Then
                         else if(A == 2)
                         {
 //                            If resChanged = True Then
-                            if(resChanged == True)
+                            if(resChanged == true)
 //                                menuLen = 18 * Len("windowed mode")
-                                menuLen = 18 * Len("windowed mode");
+                                menuLen = 18 * std::strlen("windowed mode");
 //                            Else
                             else
 //                                menuLen = 18 * Len("fullscreen mode")
-                                menuLen = 18 * Len("fullscreen mode");
+                                menuLen = 18 * std::strlen("fullscreen mode");
 //                            End If
 //                        Else
                         } else {
 //                            menuLen = 18 * Len("view credits") - 2
-                            menuLen = 18 * Len("view credits") - 2;
+                            menuLen = 18 * std::strlen("view credits") - 2;
 //                        End If
                         }
 
 //                        If MenuMouseX >= 300 And MenuMouseX <= 300 + menuLen Then
-                        if(MenuMouseX >= 300 And MenuMouseX <= 300 + menuLen) {
+                        if(MenuMouseX >= 300 && MenuMouseX <= 300 + menuLen) {
 //                            If MenuMouseRelease = True And MenuMouseDown = True Then MenuMouseClick = True
-                            if(MenuMouseRelease And MenuMouseDown)
-                                MenuMouseClick = True;
+                            if(MenuMouseRelease && MenuMouseDown)
+                                MenuMouseClick = true;
 //                            If MenuCursor <> A Then
                             if(MenuCursor != A) {
 //                                PlaySound 26
@@ -1021,27 +1021,27 @@ void MenuLoop()
             }
 
 //            If MenuCursorCanMove = True Or MenuMouseClick = True Or MenuMouseBack = True Then
-            if(MenuCursorCanMove Or MenuMouseClick Or MenuMouseBack) {
+            if(MenuCursorCanMove || MenuMouseClick || MenuMouseBack) {
 //                If .Run = True Or (GetKeyState(vbKeyEscape) And KEY_PRESSED) Or MenuMouseBack = True Then
-                if(c.Run Or getKeyState(vbKeyEscape) == KEY_PRESSED Or MenuMouseBack)
+                if(c.Run || getKeyState(vbKeyEscape) == KEY_PRESSED || MenuMouseBack)
                 {
 //                    MenuMode = 0
                     MenuMode = 0;
 //                    MenuCursor = 3
                     MenuCursor = 3;
 //                    MenuCursorCanMove = False
-                    MenuCursorCanMove = False;
+                    MenuCursorCanMove = false;
 //                    PlaySound 26
                     PlaySound(26);
 //                ElseIf .Jump = True Or .Start = True Or (GetKeyState(vbKeySpace) And KEY_PRESSED) Or (GetKeyState(vbKeyReturn) And KEY_PRESSED) Or MenuMouseClick = True Then
                 }
-                else if(c.Jump Or c.Start Or
-                        (getKeyState(vbKeySpace) == KEY_PRESSED) Or
-                        (getKeyState(vbKeyReturn) == KEY_PRESSED) Or
+                else if(c.Jump || c.Start ||
+                        (getKeyState(vbKeySpace) == KEY_PRESSED) ||
+                        (getKeyState(vbKeyReturn) == KEY_PRESSED) ||
                         MenuMouseClick)
                 {
 //                    MenuCursorCanMove = False
-                    MenuCursorCanMove = False;
+                    MenuCursorCanMove = false;
 //                    If MenuCursor = 0 Then
                     if(MenuCursor == 0) {
 //                        MenuCursor = 0
@@ -1069,9 +1069,9 @@ void MenuLoop()
 //                        PlaySound 29
                         PlaySound(29);
 //                        GameMenu = False
-                        GameMenu = False;
+                        GameMenu = false;
 //                        GameOutro = True
-                        GameOutro = True;
+                        GameOutro = true;
 //                        CreditChop = 300
                         CreditChop = 300;
 //                        EndCredits = 0
@@ -1102,7 +1102,7 @@ void MenuLoop()
         else if(MenuMode == 31 || MenuMode == 32)
         {
 //            If MenuMouseMove = True And getNewJoystick = False And getNewKeyboard = False Then
-            if(MenuMouseMove And !getNewJoystick And !getNewKeyboard)
+            if(MenuMouseMove && !getNewJoystick && !getNewKeyboard)
             {
 //                If useJoystick(MenuMode - 30) = 0 Then
                 if(useJoystick[MenuMode - 30] == 0)
@@ -1111,7 +1111,7 @@ void MenuLoop()
                     For(A, 0, 10)
                     {
 //                        If MenuMouseY >= 260 - 44 + A * 30 And MenuMouseY <= 276 - 44 + A * 30 Then
-                        if(MenuMouseY >= 260 - 44 + A * 30 And MenuMouseY <= 276 - 44 + A * 30)
+                        if(MenuMouseY >= 260 - 44 + A * 30 && MenuMouseY <= 276 - 44 + A * 30)
                         {
                             switch(A)
                             {
@@ -1119,7 +1119,7 @@ void MenuLoop()
 //                                menuLen = 18 * Len("INPUT......KEYBOARD")
                             default:
                             case 0:
-                                menuLen = 18 * Len("INPUT......KEYBOARD");
+                                menuLen = 18 * std::strlen("INPUT......KEYBOARD");
                                 break;
 //                            ElseIf A = 1 Then
 //                                menuLen = 18 * Len("UP........." & CheckKey(Chr(conKeyboard(MenuMode - 30).Up)))
@@ -1184,11 +1184,11 @@ void MenuLoop()
 //                            End If
                             }
 //                            If MenuMouseX >= 300 And MenuMouseX <= 300 + menuLen Then
-                            if(MenuMouseX >= 300 And MenuMouseX <= 300 + menuLen)
+                            if(MenuMouseX >= 300 && MenuMouseX <= 300 + menuLen)
                             {
 //                                If MenuMouseRelease = True And MenuMouseDown = True Then MenuMouseClick = True
-                                if(MenuMouseRelease And MenuMouseDown)
-                                    MenuMouseClick = True;
+                                if(MenuMouseRelease && MenuMouseDown)
+                                    MenuMouseClick = true;
 //                                If MenuCursor <> A Then
                                 if(MenuCursor != A)
                                 {
@@ -1210,24 +1210,24 @@ void MenuLoop()
                     For(A, 0, 6)
                     {
 //                        If MenuMouseY >= 260 - 44 + A * 30 And MenuMouseY <= 276 + A * 30 - 44 Then
-                        if(MenuMouseY >= 260 - 44 + A * 30 And MenuMouseY <= 276 + A * 30 - 44)
+                        if(MenuMouseY >= 260 - 44 + A * 30 && MenuMouseY <= 276 + A * 30 - 44)
                         {
 //                            If A = 0 Then
                             if(A == 0) {
 //                                menuLen = 18 * Len("INPUT......JOYSTICK 1") - 2
-                                menuLen = 18 * Len("INPUT......JOYSTICK 1") - 2;
+                                menuLen = 18 * std::strlen("INPUT......JOYSTICK 1") - 2;
 //                            Else
                             } else {
 //                                menuLen = 18 * Len("RUN........_")
-                                menuLen = 18 * Len("RUN........_");
+                                menuLen = 18 * std::strlen("RUN........_");
 //                            End If
                             }
 //                            If MenuMouseX >= 300 And MenuMouseX <= 300 + menuLen Then
-                            if(MenuMouseX >= 300 And MenuMouseX <= 300 + menuLen)
+                            if(MenuMouseX >= 300 && MenuMouseX <= 300 + menuLen)
                             {
 //                                If MenuMouseRelease = True And MenuMouseDown = True Then MenuMouseClick = True
-                                if(MenuMouseRelease And MenuMouseDown)
-                                    MenuMouseClick = True;
+                                if(MenuMouseRelease && MenuMouseDown)
+                                    MenuMouseClick = true;
 //                                If MenuCursor <> A Then
                                 if(MenuCursor != A)
                                 {
@@ -1260,9 +1260,9 @@ void MenuLoop()
                     if(inputKey != 0)
                     {
 //                        getNewKeyboard = False
-                        getNewKeyboard = False;
+                        getNewKeyboard = false;
 //                        MenuCursorCanMove = False
-                        MenuCursorCanMove = False;
+                        MenuCursorCanMove = false;
 //                        PlaySound 29
                         PlaySound(29);
 //                        If MenuCursor = 1 Then
@@ -1702,17 +1702,17 @@ void MenuLoop()
                 For(B, 1, numNPCs)
                 {
 //                        If NPC(B).Active = True And Not NPCIsABonus(NPC(B).Type) And Not NPCWontHurt(NPC(B).Type) And NPC(B).HoldingPlayer = 0 Then
-                    if(NPC[B].Active And !NPCIsABonus[NPC[B].Type] And
-                      !NPCWontHurt[NPC[B].Type] And NPC[B].HoldingPlayer == 0)
+                    if(NPC[B].Active && !NPCIsABonus[NPC[B].Type] &&
+                      !NPCWontHurt[NPC[B].Type] && NPC[B].HoldingPlayer == 0)
                     {
 //                            If CheckCollision(tempLocation, NPC(B).Location) Then
                         if(CheckCollision(tempLocation, NPC[B].Location))
                         {
 //                                .RunRelease = True
-                            p.RunRelease = True;
+                            p.RunRelease = true;
 //                                If NPC(B).Location.Y > .Location.Y + .Location.Height / 2 Then .Controls.Down = True
                             if(NPC[B].Location.Y > p.Location.Y + p.Location.Height / 2)
-                                p.Controls.Down = True;
+                                p.Controls.Down = true;
 //                                Exit For
                             break;
 //                            End If
@@ -1725,7 +1725,7 @@ void MenuLoop()
             }
 
 //                If .Slope = 0 And .StandingOnNPC = 0 Then
-            if(p.Slope == 0 And p.StandingOnNPC == 0)
+            if(p.Slope == 0 && p.StandingOnNPC == 0)
             {
 //                    If .Location.SpeedY < 0 Then
                 if(p.Location.SpeedY < 0)
@@ -1742,14 +1742,14 @@ void MenuLoop()
                     For(B, 1, numNPCs)
                     {
 //                            If NPC(B).Active = True And Not NPCIsABonus(NPC(B).Type) And Not NPCWontHurt(NPC(B).Type) And NPC(B).HoldingPlayer = 0 Then
-                        if(NPC[B].Active And !NPCIsABonus[NPC[B].Type] And
-                           !NPCWontHurt[NPC[B].Type] And NPC[B].HoldingPlayer == 0)
+                        if(NPC[B].Active && !NPCIsABonus[NPC[B].Type] &&
+                           !NPCWontHurt[NPC[B].Type] && NPC[B].HoldingPlayer == 0)
                         {
 //                                If CheckCollision(tempLocation, NPC(B).Location) Then
                             if(CheckCollision(tempLocation, NPC[B].Location))
                             {
 //                                    .Controls.Up = True
-                                p.Controls.Up = True;
+                                p.Controls.Up = true;
 //                                    Exit For
                                 break;
 //                                End If
@@ -1772,14 +1772,14 @@ void MenuLoop()
                     For(B, 1, numNPCs)
                     {
 //                            If NPC(B).Active = True And Not NPCIsABonus(NPC(B).Type) And Not NPCWontHurt(NPC(B).Type) And NPC(B).HoldingPlayer = 0 Then
-                        if(NPC[B].Active And !NPCIsABonus[NPC[B].Type] And
-                           !NPCWontHurt[NPC[B].Type] And NPC[B].HoldingPlayer == 0)
+                        if(NPC[B].Active && !NPCIsABonus[NPC[B].Type] &&
+                           !NPCWontHurt[NPC[B].Type] && NPC[B].HoldingPlayer == 0)
                         {
 //                                If CheckCollision(tempLocation, NPC(B).Location) Then
                             if(CheckCollision(tempLocation, NPC[B].Location))
                             {
 //                                    .Controls.Down = True
-                                p.Controls.Down = True;
+                                p.Controls.Down = true;
 //                                    Exit For
                                 break;
 //                                End If
@@ -1797,35 +1797,35 @@ void MenuLoop()
 
 
 //            If .Location.X < -vScreenX(1) - .Location.Width And Not -vScreenX(1) <= level(0).X Then .Dead = True
-        if(p.Location.X < -vScreenX[1] - p.Location.Width And !(-vScreenX[1] <= level[0].X))
-            p.Dead = True;
+        if(p.Location.X < -vScreenX[1] - p.Location.Width && !(-vScreenX[1] <= level[0].X))
+            p.Dead = true;
 //            If .Location.X > -vScreenX(1) + 1000 Then .Dead = True
         if(p.Location.X > -vScreenX[1] + 1000)
-            p.Dead = True;
+            p.Dead = true;
 //            If .Location.X > -vScreenX(1) + 600 And -vScreenX(1) + 850 < level(0).Width Then .Controls.Run = False
-        if(p.Location.X > -vScreenX[1] + 600 And -vScreenX[1] + 850 < level[0].Width)
-            p.Controls.Run = False;
+        if(p.Location.X > -vScreenX[1] + 600 && -vScreenX[1] + 850 < level[0].Width)
+            p.Controls.Run = false;
 //            If -vScreenX(1) <= level(0).X And (.Dead = True Or .TimeToLive > 0) Then
-        if(-vScreenX[1] <= level[0].X And (p.Dead Or p.TimeToLive > 0))
+        if(-vScreenX[1] <= level[0].X && (p.Dead || p.TimeToLive > 0))
         {
 //                .ForceHold = 65
             p.ForceHold = 65;
 //                .State = Int(Rnd * 6) + 2
             p.State = (std::rand() % 6) + 2;
 //                .CanFly = False
-            p.CanFly = False;
+            p.CanFly = false;
 //                .CanFly2 = False
-            p.CanFly2 = False;
+            p.CanFly2 = false;
 //                .TailCount = 0
             p.TailCount = 0;
 //                .Dead = False
-            p.Dead = False;
+            p.Dead = false;
 //                .TimeToLive = 0
             p.TimeToLive = 0;
 //                .Character = Int(Rnd * 5) + 1
             p.Character = (std::rand() % 5) + 1;
 //                If A >= 1 And A <= 5 Then .Character = A
-            if(A >= 1 And A <= 5) p.Character = A;
+            if(A >= 1 && A <= 5) p.Character = A;
 //                .HeldBonus = 0
             p.HeldBonus = 0;
 //                .Section = 0
@@ -1835,21 +1835,21 @@ void MenuLoop()
 //                .MountType = 0
             p.MountType = 0;
 //                .YoshiBlue = False
-            p.YoshiBlue = False;
+            p.YoshiBlue = false;
 //                .YoshiRed = False
-            p.YoshiRed = False;
+            p.YoshiRed = false;
 //                .YoshiYellow = False
-            p.YoshiYellow = False;
+            p.YoshiYellow = false;
 //                .YoshiNPC = 0
             p.YoshiNPC = 0;
 //                .Wet = 0
             p.Wet = 0;
 //                .WetFrame = False
-            p.WetFrame = False;
+            p.WetFrame = false;
 //                .YoshiPlayer = 0
             p.YoshiPlayer = 0;
 //                .Bumped = False
-            p.Bumped = False;
+            p.Bumped = false;
 //                .Bumped2 = 0
             p.Bumped2 = 0;
 //                .Direction = 1
@@ -1869,7 +1869,7 @@ void MenuLoop()
 //                .WarpCD = 0
             p.WarpCD = 0;
 //                .GroundPound = False
-            p.GroundPound = False;
+            p.GroundPound = false;
 //                .Immune = 0
             p.Immune = 0;
 //                .Frame = 0
@@ -1877,17 +1877,17 @@ void MenuLoop()
 //                .Slope = 0
             p.Slope = 0;
 //                .Slide = False
-            p.Slide = False;
+            p.Slide = false;
 //                .SpinJump = False
-            p.SpinJump = False;
+            p.SpinJump = false;
 //                .FrameCount = 0
             p.FrameCount = 0;
 //                .TailCount = 0
             p.TailCount = 0;
 //                .Duck = False
-            p.Duck = False;
+            p.Duck = false;
 //                .GroundPound = False
-            p.GroundPound = False;
+            p.GroundPound = false;
 //                .Hearts = 3
             p.Hearts = 3;
 //                PlayerFrame A
@@ -1907,7 +1907,7 @@ void MenuLoop()
             do
             {
 //                    tempBool = True
-                tempBool = True;
+                tempBool = true;
 //                    For B = 1 To numBlock
                 For(B, 1, numBlock)
                 {
@@ -1917,7 +1917,7 @@ void MenuLoop()
 //                            .Location.Y = Block(B).Location.Y - .Location.Height - 0.1
                         p.Location.Y = Block[B].Location.Y - p.Location.Height - 0.1;
 //                            tempBool = False
-                        tempBool = False;
+                        tempBool = false;
 //                        End If
                     }
 //                    Next B
@@ -1950,7 +1950,7 @@ void MenuLoop()
             }
 
 //                If .Mount = 0 And .Character <= 2 Then
-            if(p.Mount == 0 And p.Character <= 2)
+            if(p.Mount == 0 && p.Character <= 2)
             {
 //                    If Int(Rnd * 15) + 1 = 15 Then
                 if((std::rand() % 15) + 1 == 15)
@@ -1971,13 +1971,13 @@ void MenuLoop()
             }
 
 //                .CanFly = False
-            p.CanFly = False;
+            p.CanFly = false;
 //                .CanFly2 = False
-            p.CanFly2 = False;
+            p.CanFly2 = false;
 //                .RunCount = 0
             p.RunCount = 0;
 //                If .Mount = 0 And .Character <> 5 Then
-            if(p.Mount == 0 And p.Character != 5)
+            if(p.Mount == 0 && p.Character != 5)
             {
 //                    numNPCs = numNPCs + 1
                 numNPCs += 1;
@@ -1997,34 +1997,34 @@ void MenuLoop()
 //                                .Type = Int(Rnd * 286) + 1
                             n.Type = (std::rand() % 286) + 1;
 //                            Loop While .Type = 11 Or .Type = 16 Or .Type = 18 Or .Type = 15 Or .Type = 21 Or .Type = 12 Or .Type = 13 Or .Type = 30 Or .Type = 17 Or .Type = 31 Or .Type = 32 Or (.Type >= 37 And .Type <= 44) Or .Type = 46 Or .Type = 47 Or .Type = 50 Or (.Type >= 56 And .Type <= 70) Or .Type = 8 Or .Type = 74 Or .Type = 51 Or .Type = 52 Or .Type = 75 Or .Type = 34 Or NPCIsToad(.Type) Or NPCIsAnExit(.Type) Or NPCIsYoshi(.Type) Or (.Type >= 78 And .Type <= 87) Or .Type = 91 Or .Type = 93 Or (.Type >= 104 And .Type <= 108) Or .Type = 125 Or .Type = 133 Or (.Type >= 148 And .Type <= 151) Or .Type = 159 Or .Type = 160 Or .Type = 164 Or .Type = 168 Or (.Type >= 154 And .Type <= 157) Or .Type = 159 Or .Type = 160 Or .Type = 164 Or .Type = 165 Or .Type = 171 Or .Type = 178 Or .Type = 197 Or .Type = 180 Or .Type = 181 Or .Type = 190 Or .Type = 192 Or .Type = 196 Or .Type = 197 Or (UnderWater(0) = True And NPCIsBoot(.Type) = True) Or (.Type >= 198 And .Type <= 228) Or .Type = 234
-                        } while(n.Type == 11 Or n.Type == 16 Or n.Type == 18 Or n.Type == 15 Or
-                                n.Type == 21 Or n.Type == 12 Or n.Type == 13 Or n.Type == 30 Or
-                                n.Type == 17 Or n.Type == 31 Or n.Type == 32 Or
-                                (n.Type >= 37 And n.Type <= 44) Or n.Type == 46 Or n.Type == 47 Or
-                                n.Type == 50 Or (n.Type >= 56 And n.Type <= 70) Or n.Type == 8 Or
-                                n.Type == 74 Or n.Type == 51 Or n.Type == 52 Or n.Type == 75 Or
-                                n.Type == 34 Or NPCIsToad[n.Type] Or NPCIsAnExit[n.Type] Or
-                                NPCIsYoshi[n.Type] Or (n.Type >= 78 And n.Type <= 87) Or
-                                n.Type == 91 Or n.Type == 93 Or (n.Type >= 104 And n.Type <= 108) Or
-                                n.Type == 125 Or n.Type == 133 Or (n.Type >= 148 And n.Type <= 151) Or
-                                n.Type == 159 Or n.Type == 160 Or n.Type == 164 Or n.Type == 168 Or
-                                (n.Type >= 154 And n.Type <= 157) Or n.Type == 159 Or n.Type == 160 Or
-                                n.Type == 164 Or n.Type == 165 Or n.Type == 171 Or n.Type == 178 Or
-                                n.Type == 197 Or n.Type == 180 Or n.Type == 181 Or n.Type == 190 Or
-                                n.Type == 192 Or n.Type == 196 Or n.Type == 197 Or
-                                (UnderWater[0] == True And NPCIsBoot[n.Type] == True) Or
-                                (n.Type >= 198 And n.Type <= 228) Or n.Type == 234);
+                        } while(n.Type == 11 || n.Type == 16 || n.Type == 18 || n.Type == 15 ||
+                                n.Type == 21 || n.Type == 12 || n.Type == 13 || n.Type == 30 ||
+                                n.Type == 17 || n.Type == 31 || n.Type == 32 ||
+                                (n.Type >= 37 && n.Type <= 44) || n.Type == 46 || n.Type == 47 ||
+                                n.Type == 50 || (n.Type >= 56 && n.Type <= 70) || n.Type == 8 ||
+                                n.Type == 74 || n.Type == 51 || n.Type == 52 || n.Type == 75 ||
+                                n.Type == 34 || NPCIsToad[n.Type] || NPCIsAnExit[n.Type] ||
+                                NPCIsYoshi[n.Type] || (n.Type >= 78 && n.Type <= 87) ||
+                                n.Type == 91 || n.Type == 93 || (n.Type >= 104 && n.Type <= 108) ||
+                                n.Type == 125 || n.Type == 133 || (n.Type >= 148 && n.Type <= 151) ||
+                                n.Type == 159 || n.Type == 160 || n.Type == 164 || n.Type == 168 ||
+                                (n.Type >= 154 && n.Type <= 157) || n.Type == 159 || n.Type == 160 ||
+                                n.Type == 164 || n.Type == 165 || n.Type == 171 || n.Type == 178 ||
+                                n.Type == 197 || n.Type == 180 || n.Type == 181 || n.Type == 190 ||
+                                n.Type == 192 || n.Type == 196 || n.Type == 197 ||
+                                (UnderWater[0] == true && NPCIsBoot[n.Type] == true) ||
+                                (n.Type >= 198 && n.Type <= 228) || n.Type == 234);
 //                        Loop While .Type = 235 Or .Type = 231 Or .Type = 179 Or .Type = 49 Or .Type = 237 Or .Type = 238 Or .Type = 239 Or .Type = 240 Or .Type = 245 Or .Type = 246 Or .Type = 248 Or .Type = 254 Or .Type = 255 Or .Type = 256 Or .Type = 257 Or .Type = 259 Or .Type = 260 Or .Type = 262 Or .Type = 263 Or .Type = 265 Or .Type = 266 Or (.Type >= 267 And .Type <= 272) Or .Type = 275 Or .Type = 276 Or (.Type >= 280 And .Type <= 284) Or .Type = 241
-                    } while(n.Type == 235 Or n.Type == 231 Or n.Type == 179 Or n.Type == 49 Or
-                            n.Type == 237 Or n.Type == 238 Or n.Type == 239 Or n.Type == 240 Or
-                            n.Type == 245 Or n.Type == 246 Or n.Type == 248 Or n.Type == 254 Or
-                            n.Type == 255 Or n.Type == 256 Or n.Type == 257 Or n.Type == 259 Or
-                            n.Type == 260 Or n.Type == 262 Or n.Type == 263 Or n.Type == 265 Or
-                            n.Type == 266 Or (n.Type >= 267 And n.Type <= 272) Or
-                            n.Type == 275 Or n.Type == 276 Or
-                            (n.Type >= 280 And n.Type <= 284) Or n.Type == 241);
+                    } while(n.Type == 235 || n.Type == 231 || n.Type == 179 || n.Type == 49 ||
+                            n.Type == 237 || n.Type == 238 || n.Type == 239 || n.Type == 240 ||
+                            n.Type == 245 || n.Type == 246 || n.Type == 248 || n.Type == 254 ||
+                            n.Type == 255 || n.Type == 256 || n.Type == 257 || n.Type == 259 ||
+                            n.Type == 260 || n.Type == 262 || n.Type == 263 || n.Type == 265 ||
+                            n.Type == 266 || (n.Type >= 267 && n.Type <= 272) ||
+                            n.Type == 275 || n.Type == 276 ||
+                            (n.Type >= 280 && n.Type <= 284) || n.Type == 241);
 //                        .Active = True
-                    n.Active = True;
+                    n.Active = true;
 //                        .HoldingPlayer = A
                     n.HoldingPlayer = A;
 //                        .Location.Height = NPCHeight(.Type)
@@ -2046,18 +2046,18 @@ void MenuLoop()
 //            ElseIf .Location.X > level(.Section).Width + 64 Then
         } else if(p.Location.X > level[p.Section].Width + 64) {
 //                .Dead = True
-            p.Dead = True;
+            p.Dead = true;
 //            End If
         }
 //            If .WetFrame = True Then
         if(p.WetFrame)
         {
 //                If .Location.SpeedY = 0 Or .Slope > 0 Then .CanJump = True
-            if(p.Location.SpeedY == 0.0 Or p.Slope > 0)
-                p.CanJump = True;
+            if(p.Location.SpeedY == 0.0 || p.Slope > 0)
+                p.CanJump = true;
 //                If Rnd * 100 > 98 Or .Location.SpeedY = 0 Or .Slope > 0 Then .Controls.Jump = True
-            if(std::rand() % 100 > 98 Or p.Location.SpeedY == 0.0 Or p.Slope > 0)
-                p.Controls.Jump = True;
+            if(std::rand() % 100 > 98 || p.Location.SpeedY == 0.0 || p.Slope > 0)
+                p.Controls.Jump = true;
 //            End If
         }
 
