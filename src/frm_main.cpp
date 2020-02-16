@@ -944,6 +944,21 @@ void FrmMain::renderTexture(int xDst, int yDst, int wDst, int hDst,
                             float red, float green, float blue, float alpha)
 {
     const unsigned int flip = SDL_FLIP_NONE;
+
+    // Don't go more than size of texture
+    if(xSrc + wDst > tx.w)
+    {
+        wDst = tx.w - xSrc;
+        if(wDst < 0)
+            wDst = 0;
+    }
+    if(ySrc + hDst > tx.h)
+    {
+        hDst = tx.h - ySrc;
+        if(hDst < 0)
+            hDst = 0;
+    }
+
     SDL_Rect destRect = scaledRect(xDst, yDst, wDst, hDst);
     SDL_Rect sourceRect =
     {
