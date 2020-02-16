@@ -60,7 +60,7 @@ void GFX_t::load()
     For(i, 1, 4)
         loadImage(MenuGFX[i], uiPath + fmt::format_ne("MenuGFX{0}.png", i));
 
-    loadImage(Mount[1], uiPath + "Mount.png");
+    loadImage(Mount[2], uiPath + "Mount.png");
 
     For(i, 0, 7)
         loadImage(nCursor[i], uiPath + fmt::format_ne("nCursor{0}.png", i));

@@ -1924,7 +1924,8 @@ void UpdateGraphics()
 
         For(A, 1, numPlayers) // The clown car
         {
-            if(Player[A].Dead == false && Player[A].Immune2 == false && Player[A].TimeToLive == 0 && !(Player[A].Effect == 3 || Player[A].Effect == 5) && Player[A].Mount == 2)
+            if(!Player[A].Dead && !Player[A].Immune2 && Player[A].TimeToLive == 0 &&
+               !(Player[A].Effect == 3 || Player[A].Effect == 5) && Player[A].Mount == 2)
             {
                  if(Player[A].Character == 1)
                  {

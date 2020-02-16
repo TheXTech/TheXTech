@@ -31,7 +31,7 @@ public:
     StdPicture Loader;
     RangeArr<StdPicture, 0, 3> MCursor;
     RangeArr<StdPicture, 1, 4> MenuGFX;
-    RangeArr<StdPicture, 1, 1> Mount;
+    RangeArr<StdPicture, 2, 2> Mount;
     RangeArr<StdPicture, 0, 7> nCursor;
     StdPicture TextBox;
     RangeArr<StdPicture, 1, 2> Tongue;
