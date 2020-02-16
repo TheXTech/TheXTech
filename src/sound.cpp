@@ -354,6 +354,7 @@ void InitSound()
         AddSfx(sounds, alias, group);
     }
     UpdateLoad();
+    Mix_ReserveChannels(g_reservedChannels);
 }
 
 void PlaySound(int A)
