@@ -758,7 +758,7 @@ int GameMain(int argc, char**argv)
         {
 
 //            CheatString = "" 'clear the cheat codes
-            CheatString = "";
+            CheatString.clear();
 //            EndLevel = False
             EndLevel = false;
 //            If numPlayers = 1 Then
@@ -793,6 +793,7 @@ int GameMain(int argc, char**argv)
             SetupPlayers(); // Setup Players for the level
 //            qScreen = False
             qScreen = false;
+
 //'for warp entrances
 //            If (ReturnWarp > 0 And FileName = StartLevel) Or StartWarp > 0 Then
             if((ReturnWarp > 0 && FileName == StartLevel) || (StartWarp > 0))
@@ -820,7 +821,7 @@ int GameMain(int argc, char**argv)
 //                                .Location.X = Warp(.Warp).Exit.X + Warp(.Warp).Exit.Width / 2 - .Location.Width / 2
                             p.Location.X = Warp[p.Warp].Exit.X + Warp[p.Warp].Exit.Width / 2 - p.Location.Width / 2;
 //                                .Location.Y = Warp(.Warp).Exit.Y - .Location.Height - 8
-                            p.Location.Y = Warp[p.Warp].Exit.Y + Warp[p.Warp].Exit.Height - 8;
+                            p.Location.Y = Warp[p.Warp].Exit.Y - Warp[p.Warp].Exit.Height - 8;
                         }
 //                            ElseIf Warp(.Warp).Direction2 = 3 Then
                         if(Warp[p.Warp].Direction2 == 3)
@@ -836,9 +837,9 @@ int GameMain(int argc, char**argv)
 //                                If .Mount = 3 Then .Duck = True
                             if(p.Mount == 3) p.Duck = true;
 //                                .Location.X = Warp(.Warp).Exit.X - .Location.Width - 8
-                            p.Location.X = Warp[p.Warp].Exit.X + Warp[p.Warp].Exit.Width - 8;
+                            p.Location.X = Warp[p.Warp].Exit.X - Warp[p.Warp].Exit.Width - 8;
 //                                .Location.Y = Warp(.Warp).Exit.Y + Warp(.Warp).Exit.Height - .Location.Height - 2
-                            p.Location.Y = Warp[p.Warp].Exit.Y + Warp[p.Warp].Exit.Height / 2 - p.Location.Height / 2;
+                            p.Location.Y = Warp[p.Warp].Exit.Y + Warp[p.Warp].Exit.Height - p.Location.Height - 2;
                         }
 //                            ElseIf Warp(.Warp).Direction2 = 4 Then
                         if(Warp[p.Warp].Direction2 == 4)
@@ -848,7 +849,7 @@ int GameMain(int argc, char**argv)
 //                                .Location.X = Warp(.Warp).Exit.X + Warp(.Warp).Exit.Width + 8
                             p.Location.X = Warp[p.Warp].Exit.X + Warp[p.Warp].Exit.Width + 8;
 //                                .Location.Y = Warp(.Warp).Exit.Y + Warp(.Warp).Exit.Height - .Location.Height - 2
-                            p.Location.Y = Warp[p.Warp].Exit.Y + Warp[p.Warp].Exit.Height / 2 - p.Location.Height / 2;
+                            p.Location.Y = Warp[p.Warp].Exit.Y + Warp[p.Warp].Exit.Height - p.Location.Height - 2;
 //                            End If
                         }
 //                            PlayerFrame A
@@ -868,7 +869,7 @@ int GameMain(int argc, char**argv)
 //                            .Location.X = Warp(.Warp).Exit.X + Warp(.Warp).Exit.Width / 2 - .Location.Width / 2
                         p.Location.X = Warp[p.Warp].Exit.X + Warp[p.Warp].Exit.Width / 2 - p.Location.Width / 2;
 //                            .Location.Y = Warp(.Warp).Exit.Y + Warp(.Warp).Exit.Height - .Location.Height
-                        p.Location.Y = Warp[p.Warp].Exit.Y + Warp[p.Warp].Exit.Height / 2 - p.Location.Height / 2;
+                        p.Location.Y = Warp[p.Warp].Exit.Y + Warp[p.Warp].Exit.Height - p.Location.Height;
 //                            CheckSection A
                         CheckSection(A);
 //                            .Effect = 8
