@@ -903,7 +903,7 @@ void UpdateNPCs()
                         }
                         if(NPC[A].Type == 91)
                         {
-                            if(NPC[A].Special == 0)
+                            if(NPC[A].Special == 0.0)
                                 NPC[A].Special = 147;
                             NPC[A].Generator = false;
                             NPC[A].Frame = 0;
@@ -964,7 +964,7 @@ void UpdateNPCs()
                                     NPC[B].Type != 32 && NPC[B].Type != 238 && NPC[B].Type != 239 && NPC[B].Type != 191 &&
                                     NPC[B].Type != 35 && !(NPC[B].Type == 193 && NPC[A].Type == 193) &&
                                     !(NPC[B].Type == 37) && !(NPC[B].Type == 180) && !(NPC[B].Type == 38) &&
-                                    !(NPC[B].Type == 39) && !(NPC[B].Type == 45 && NPC[B].Special == 0) &&
+                                    !(NPC[B].Type == 39) && !(NPC[B].Type == 45 && NPC[B].Special == 0.0) &&
                                     !(NPC[B].Type == 91) && !(NPC[B].Type == 159) && !(NPC[B].Type == 195) &&
                                     !(NPC[B].Type == 30 && NPC[B].Projectile == true) && NPC[B].Type != 241 && NPC[B].Type != 263 && NPC[B].Type != 291)
                                 {
