@@ -938,10 +938,10 @@ void FrmMain::renderRectBR(int _left, int _top, int _right, int _bottom, float r
     SDL_RenderFillRect(m_gRenderer, &aRect);
 }
 
-void FrmMain::renderTexture(int xDst, int yDst, int wDst, int hDst,
-                            const StdPicture &tx,
-                            int xSrc, int ySrc,
-                            float red, float green, float blue, float alpha)
+void FrmMain::renderTextureI(int xDst, int yDst, int wDst, int hDst,
+                             const StdPicture &tx,
+                             int xSrc, int ySrc,
+                             float red, float green, float blue, float alpha)
 {
     const unsigned int flip = SDL_FLIP_NONE;
 
@@ -975,6 +975,21 @@ void FrmMain::renderTexture(int xDst, int yDst, int wDst, int hDst,
     SDL_SetTextureAlphaMod(tx.texture, static_cast<unsigned char>(255.f * alpha));
     SDL_RenderCopyEx(m_gRenderer, tx.texture, &sourceRect, &destRect,
                      0.0, nullptr, static_cast<SDL_RendererFlip>(flip));
+}
+
+void FrmMain::renderTexture(double xDst, double yDst, double wDst, double hDst,
+                            const StdPicture &tx,
+                            int xSrc, int ySrc,
+                            float red, float green, float blue, float alpha)
+{
+    renderTextureI(Maths::iRound(xDst),
+                   Maths::iRound(yDst),
+                   Maths::iRound(wDst),
+                   Maths::iRound(hDst),
+                   tx,
+                   xSrc,
+                   ySrc,
+                   red, green, blue, alpha);
 }
 
 void FrmMain::renderTexture(int xDst, int yDst, const StdPicture &tx, float red, float green, float blue, float alpha)

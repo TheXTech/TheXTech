@@ -5825,7 +5825,7 @@ void DrawInterface(int Z, int numScreens)
 
     std::string scoreStr = std::to_string(Score);
     std::string coinsStr = std::to_string(Coins);
-    std::string livesStr = std::to_string(Lives);
+    std::string livesStr = std::to_string(int(Lives));
     std::string numStarsStr = std::to_string(numStars);
 
     if(ScreenType == 5 || ScreenType == 6) // 2 Players
@@ -5838,6 +5838,7 @@ void DrawInterface(int Z, int numScreens)
                     C = -40;
                 else
                     C = 40;
+
                 if(Player[B].Character == 3 || Player[B].Character == 4 || Player[B].Character == 5)
                 {
                     if(B == 1)
@@ -5892,7 +5893,9 @@ void DrawInterface(int Z, int numScreens)
                 {
                     frmMain.renderTexture(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 - 34 + C, 52, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[8], 0, 0);
                     frmMain.renderTexture(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 - 10 + C, 53, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
-                    SuperPrint(std::to_string(Player[B].Bombs), 1, 20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 12 + C, 53);
+                    SuperPrint(std::to_string(Player[B].Bombs), 1,
+                               float(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 12 + C),
+                               53);
                 }
             }
             C = 40;
@@ -5916,38 +5919,44 @@ void DrawInterface(int Z, int numScreens)
                 frmMain.renderTexture(40 + 20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96 + 8 + GFX.Interface[2].w, 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
 
                 SuperPrint(coinsStr, 1,
-                           40 + 20 - (coinsStr.size() - 1) * 18 +
-                           float(vScreen[Z].Width) / 2.0f - GFX.Container[1].w / 2 + 80 + 4 + 12 + 18 + 32 + GFX.Interface[3].w,
+                           40 + 20 - ((int(coinsStr.size()) - 1) * 18) +
+                           (float(vScreen[Z].Width) / 2.0f) - (GFX.Container[1].w / 2) + 80 + 4 + 12 + 18 + 32 + GFX.Interface[3].w,
                            16 + 11);
                 // Print Score
                 SuperPrint(scoreStr, 1,
-                           40 + 20 - (int(scoreStr.size()) - 1) * 18 +
-                           float(vScreen[Z].Width) / 2.0f - GFX.Container[1].w / 2 + 80 + 12 + 4 + 18 + 32 + GFX.Interface[3].w,
+                           40 + 20 - (((int(scoreStr.size()) - 1)) * 18) +
+                           (float(vScreen[Z].Width) / 2.0f) - (GFX.Container[1].w / 2) + 80 + 12 + 4 + 18 + 32 + GFX.Interface[3].w,
                            16 + 31);
                 // Print lives on the screen
                 frmMain.renderTexture(-80 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 - 16, 16 + 10, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0);
                 frmMain.renderTexture(-80 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 10 + GFX.Interface[1].w, 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
-                SuperPrint(livesStr, 1, -80 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 12 + 18 + GFX.Interface[5].w, 16 + 11);
+                SuperPrint(livesStr, 1,
+                           float(-80 + (vScreen[Z].Width / 2.0) - (GFX.Container[1].w / 2) + C - 122 + 12 + 18 + GFX.Interface[5].w),
+                           16 + 11);
                 // Print stars on the screen
                 if(numStars > 0)
                 {
-
                     frmMain.renderTexture(-80 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122, 16 + 30, GFX.Interface[5].w, GFX.Interface[5].h, GFX.Interface[5], 0, 0);
                     frmMain.renderTexture(-80 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 10 + GFX.Interface[1].w, 16 + 31, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
-                    SuperPrint(numStarsStr, 1, -80 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 12 + 18 + GFX.Interface[5].w, 16 + 31);
+                    SuperPrint(numStarsStr, 1,
+                               float(-80 + (vScreen[Z].Width / 2.0) - (GFX.Container[1].w / 2) + C - 122 + 12 + 18 + GFX.Interface[5].w),
+                               16 + 31);
                 }
             }
             else
             {
             // plr 1 score
-
-                    frmMain.renderTexture(-80 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 - 16, 16 + 10, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0);
-                    frmMain.renderTexture(-80 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 10 + GFX.Interface[1].w, 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
-                    SuperPrint(std::to_string(BattleLives[1]), 1, -80 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 12 + 18 + GFX.Interface[5].w, 16 + 11);
+                frmMain.renderTexture(-80 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 - 16, 16 + 10, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0);
+                frmMain.renderTexture(-80 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 10 + GFX.Interface[1].w, 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+                SuperPrint(std::to_string(BattleLives[1]), 1,
+                           float(-80 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 12 + 18 + GFX.Interface[5].w),
+                           16 + 11);
             // plr 2 score
-                    frmMain.renderTexture(40 + 20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96 - 16, 16 + 10, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[7], 0, 0);
-                    frmMain.renderTexture(40 + 20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96 + 8 + GFX.Interface[2].w, 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
-                    SuperPrint(std::to_string(BattleLives[2]), 1, 24 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 80 + 4 + 12 + 18 + 32 + GFX.Interface[3].w, 16 + 11);
+                frmMain.renderTexture(40 + 20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96 - 16, 16 + 10, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[7], 0, 0);
+                frmMain.renderTexture(40 + 20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96 + 8 + GFX.Interface[2].w, 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+                SuperPrint(std::to_string(BattleLives[2]), 1,
+                           float(24 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 80 + 4 + 12 + 18 + 32 + GFX.Interface[3].w),
+                           16 + 11);
             }
         }
         else // Split screen
@@ -6017,22 +6026,29 @@ void DrawInterface(int Z, int numScreens)
 
 
                 frmMain.renderTexture(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96 + 8 + GFX.Interface[2].w, 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
-                SuperPrint(coinsStr, 1, 20 - (coinsStr.size() - 1) * 18 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 80 + 4 + 12 + 18 + 32 + GFX.Interface[3].w, 16 + 11);
+                SuperPrint(coinsStr, 1,
+                           float(20 - (coinsStr.size() - 1) * 18 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 80 + 4 + 12 + 18 + 32 + GFX.Interface[3].w),
+                           16 + 11);
                 // Print Score
-                SuperPrint(scoreStr, 1, 20 - (scoreStr.size() - 1) * 18 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 80 + 12 + 4 + 18 + 32 + GFX.Interface[3].w, 16 + 31);
+                SuperPrint(scoreStr,
+                           1,
+                           float(20 - (int(scoreStr.size()) - 1) * 18 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 80 + 12 + 4 + 18 + 32 + GFX.Interface[3].w),
+                           16 + 31);
                 // Print lives on the screen
 
                 frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 - 16, 16 + 10, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0);
                 frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 10 + GFX.Interface[1].w, 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
-                SuperPrint(livesStr, 1, vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 12 + 18 + GFX.Interface[5].w, 16 + 11);
+                SuperPrint(livesStr, 1,
+                           float(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 12 + 18 + GFX.Interface[5].w),
+                           16 + 11);
                 // Print stars on the screen
                 if(numStars > 0)
                 {
-
                     frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122, 16 + 30, GFX.Interface[5].w, GFX.Interface[5].h, GFX.Interface[5], 0, 0);
-
                     frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 10 + GFX.Interface[1].w, 16 + 31, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
-                    SuperPrint(numStarsStr, 1, vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 12 + 18 + GFX.Interface[5].w, 16 + 31);
+                    SuperPrint(numStarsStr, 1,
+                               float(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 12 + 18 + GFX.Interface[5].w),
+                               16 + 31);
                 }
             }
             else
@@ -6164,22 +6180,28 @@ void DrawInterface(int Z, int numScreens)
             frmMain.renderTexture(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96, 16 + 10, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[2], 0, 0);
         }
         frmMain.renderTexture(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96 + 8 + GFX.Interface[2].w, 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
-        SuperPrint(std::to_string(Coins), 1, 20 - (std::to_string(Coins).size() - 1) * 18 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 80 + 4 + 12 + 18 + 32 + GFX.Interface[3].w, 16 + 11);
+        SuperPrint(coinsStr, 1,
+                   20 - (int(coinsStr.size()) - 1) * 18 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 80 + 4 + 12 + 18 + 32 + GFX.Interface[3].w,
+                   16 + 11);
         // Print Score
-        SuperPrint(std::to_string(Score), 1,
-                   20 - (std::to_string(Score).size() - 1) * 18 +
+        SuperPrint(scoreStr, 1,
+                   20 - (int(scoreStr.size()) - 1) * 18 +
                    float(vScreen[Z].Width) / 2.0f - GFX.Container[1].w / 2 + 80 + 12 + 4 + 18 + 32 + GFX.Interface[3].w,
                    16 + 31);
         // Print lives on the screen
         frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 - 16, 16 + 10, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0);
         frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 10 + GFX.Interface[1].w, 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
-        SuperPrint(std::to_string(int(Lives)), 1, vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 12 + 18 + GFX.Interface[5].w, 16 + 11);
+        SuperPrint(livesStr, 1,
+                   vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 12 + 18 + GFX.Interface[5].w,
+                   16 + 11);
         // Print stars on the screen
         if(numStars > 0)
         {
             frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122, 16 + 30, GFX.Interface[5].w, GFX.Interface[5].h, GFX.Interface[5], 0, 0);
             frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 10 + GFX.Interface[1].w, 16 + 31, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
-            SuperPrint(std::to_string(numStars), 1, vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 12 + 18 + GFX.Interface[5].w, 16 + 31);
+            SuperPrint(numStarsStr, 1,
+                       vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 12 + 18 + GFX.Interface[5].w,
+                       16 + 31);
         }
     }
     if(BattleIntro > 0)
