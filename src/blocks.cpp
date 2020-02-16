@@ -617,8 +617,8 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             NPC[numNPCs].Location.Width = NPCWidth[C];
             if(int(b.Location.Width * 1000.0) == 32000) // Make block a bit smaller to allow player take a bonus easier (Redigit's idea)
             {
-                b.Location.Width = b.Location.Width - 0.01;
-                b.Location.X = b.Location.X + 0.005;
+                b.Location.Width = b.Location.Width - 0.1;
+                b.Location.X = b.Location.X + 0.05;
             }
             NPC[numNPCs].Location.Height = 0;
             NPC[numNPCs].Location.X = (b.Location.X + b.Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0);
