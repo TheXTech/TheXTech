@@ -1157,9 +1157,8 @@ void KillNPC(int A, int B)
             tempLocation = NPC[A].Location;
             if(NPC[A].Type == 257)
             {
-// VB TO C++ CONVERTER NOTE: The ending condition of VB 'For' loops is tested only on entry to the loop. VB to C++ Converter has created a temporary variable in order to use the initial value of NPC(A).Location.Height for every iteration:
-                int tempVar = NPC[A].Location.Height;
-                for(C = 0; C <= tempVar; C += 32)
+                int npcH = NPC[A].Location.Height;
+                for(C = 0; C <= npcH; C += 32)
                 {
                     if(NPC[A].Location.Height - C > 16)
                     {
@@ -1170,9 +1169,8 @@ void KillNPC(int A, int B)
             }
             else
             {
-// VB TO C++ CONVERTER NOTE: The ending condition of VB 'For' loops is tested only on entry to the loop. VB to C++ Converter has created a temporary variable in order to use the initial value of NPC(A).Location.Height for every iteration:
-                int tempVar2 = NPC[A].Location.Height;
-                for(C = 0; C <= tempVar2; C += 32)
+                int npcH = NPC[A].Location.Height;
+                for(C = 0; C <= npcH; C += 32)
                 {
                     if(NPC[A].Location.Height - C > 16)
                     {

@@ -815,7 +815,7 @@ void UpdatePlayer()
                             NPC[numNPCs].Location.SpeedX = 0;
                             NPC[numNPCs].CantHurt = 10;
                             NPC[numNPCs].CantHurtPlayer = A;
-                            Player[A].Location.SpeedY = Physics.PlayerJumpVelocity - tempSpeed;
+                            Player[A].Location.SpeedY = double(Physics.PlayerJumpVelocity) - tempSpeed;
                             Player[A].Location.Height = Physics.PlayerHeight[Player[A].Character][Player[A].State];
                             Player[A].Location.Width = Physics.PlayerWidth[Player[A].Character][Player[A].State];
                             Player[A].Location.X = Player[A].Location.X + 64 - Physics.PlayerWidth[Player[A].Character][Player[A].State] / 2;
@@ -825,6 +825,7 @@ void UpdatePlayer()
                             Player[A].Dismount = 30;
                             Player[A].Slope = 0;
                             Player[A].Location.Y = NPC[numNPCs].Location.Y - Player[A].Location.Height;
+
                             for(B = 1; B <= numPlayers; B++)
                             {
                                 if(B != A && Player[B].Mount != 2 && CheckCollision(Player[A].Location, Player[B].Location) == true)
@@ -835,9 +836,8 @@ void UpdatePlayer()
                                     Player[B].StandingOnTempNPC = 0;
                                 }
                             }
-                            // VB TO C++ CONVERTER NOTE: The ending condition of VB 'For' loops is tested only on entry to the loop. VB to C++ Converter has created a temporary variable in order to use the initial value of numNPCs for every iteration:
-                            int tempVar = numNPCs;
-                            for(B = 1; B <= tempVar; B++)
+
+                            for(B = 1; B <= numNPCs; B++)
                             {
                                 if(NPC[B].standingOnPlayer == A)
                                 {
@@ -2532,9 +2532,7 @@ void UpdatePlayer()
                 fBlock = FirstBlock[(Player[A].Location.X / 32) - 1];
                 lBlock = LastBlock[((Player[A].Location.X + Player[A].Location.Width) / 32.0) + 1];
 
-                // VB TO C++ CONVERTER NOTE: The ending condition of VB 'For' loops is tested only on entry to the loop. VB to C++ Converter has created a temporary variable in order to use the initial value of lBlock for every iteration:
-                int tempVar2 = lBlock;
-                for(B = (int)fBlock; B <= tempVar2; B++)
+                for(B = (int)fBlock; B <= lBlock; B++)
                 {
 
                     // checks to see if a collision happened
@@ -3522,9 +3520,8 @@ void UpdatePlayer()
                 }
                 tempHit = false; // Used for JUMP detection
                 tempHit2 = false;
-                // VB TO C++ CONVERTER NOTE: The ending condition of VB 'For' loops is tested only on entry to the loop. VB to C++ Converter has created a temporary variable in order to use the initial value of numNPCs for every iteration:
-                int tempVar3 = numNPCs;
-                for(B = 1; B <= tempVar3; B++)
+
+                for(B = 1; B <= numNPCs; B++)
                 {
                     if(NPC[B].Active == true && NPC[B].Killed == 0 && NPC[B].Effect != 5 && NPC[B].Effect != 6)
                     {
@@ -7500,6 +7497,7 @@ void ClownCar()
             NPC[numNPCs].Active = true;
             NPC[numNPCs].TimeLeft = 100;
             NPC[numNPCs].Location = Player[A].Location;
+
             if(Player[A].Effect != 0)
             {
                 NPC[numNPCs].Location.SpeedX = 0;
@@ -7513,7 +7511,7 @@ void ClownCar()
                 if(Player[B].StandingOnTempNPC == 56)
                 {
                     Player[B].StandingOnNPC = numNPCs;
-                    Player[B].Location.X = Player[B].Location.X + Player[A].mountBump;
+                    Player[B].Location.X = Player[B].Location.X + double(Player[A].mountBump);
                     if(Player[B].Effect != 0)
                     {
                         Player[B].Location.Y = Player[A].Location.Y - Player[B].Location.Height;
@@ -7521,14 +7519,13 @@ void ClownCar()
                     }
                 }
             }
-// VB TO C++ CONVERTER NOTE: The ending condition of VB 'For' loops is tested only on entry to the loop. VB to C++ Converter has created a temporary variable in order to use the initial value of numNPCs for every iteration:
-            int tempVar = numNPCs;
-            for(B = 1; B <= tempVar; B++)
+
+            for(B = 1; B <= numNPCs; B++)
             {
                 if(NPC[B].standingOnPlayer == A && NPC[B].Type != 50)
                 {
                     if(Player[A].Effect == 0)
-                        NPC[B].Location.X = NPC[B].Location.X + Player[A].Location.SpeedX + Player[A].mountBump;
+                        NPC[B].Location.X = NPC[B].Location.X + Player[A].Location.SpeedX + double(Player[A].mountBump);
                     NPC[B].TimeLeft = 100;
                     NPC[B].Location.SpeedY = Player[A].Location.SpeedY;
                     NPC[B].Location.SpeedX = 0;
@@ -7539,7 +7536,7 @@ void ClownCar()
                     {
                         if(NPC[B].Type == 49)
                         {
-                            if(NPC[B].Special == 0)
+                            if(NPC[B].Special == 0.0)
                             {
                                 NPC[B].Special = 1;
                                 numNPCs = numNPCs + 1;
