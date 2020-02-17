@@ -456,6 +456,7 @@ int SyncCount = 0;
 bool noUpdate = false;
 double gameTime = 0.0;
 bool noSound = false;
+bool neverPause = false;
 double tempTime = 0.0;
 bool BattleMode = false;
 int BattleWinner = 0;

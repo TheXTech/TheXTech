@@ -26,19 +26,51 @@
 #include "game_main.h"
 #include <SDL2/SDL.h>
 #include <AppPath/app_path.h>
+#include <tclap/CmdLine.h>
 
 extern "C"
 int main(int argc, char**argv)
 {
+    CmdLineSetup_t setup;
+
+    try
+    {
+        // Define the command line object.
+        TCLAP::CmdLine  cmd("A2xTech\n"
+                            "Copyright (c) 2020-2020 Vitaly Novichkov <admin@wohlnet.ru>\n"
+                            "This program is distributed under the MIT license\n", ' ', "1.3");
+
+        TCLAP::SwitchArg switchFrameSkip("f", "frameskip", "Enable frame skipping mode", false);
+        TCLAP::SwitchArg switchNoSound("s", "no-sound", "Disable sound", false);
+        TCLAP::SwitchArg switchNoPause("p", "never-pause", "Never pause game when window losts a focus", false);
+
+        cmd.add(&switchFrameSkip);
+        cmd.add(&switchNoSound);
+        cmd.add(&switchNoPause);
+
+        cmd.parse(argc, argv);
+
+        setup.frameSkip = switchFrameSkip.getValue();
+        setup.noSound   = switchNoSound.getValue();
+        setup.neverPause = switchNoPause.getValue();
+    }
+    catch(TCLAP::ArgException &e)   // catch any exceptions
+    {
+        std::cerr << "Error: " << e.error() << " for arg " << e.argId() << std::endl;
+        return 2;
+    }
+
     AppPathManager::initAppPath();
     AppPath = AppPathManager::userAppDirSTD();
+
     if(frmMain.initSDL())
     {
         frmMain.freeSDL();
         return 1;
     }
 
-    int ret = GameMain(argc, argv);
+    int ret = GameMain(setup);
     frmMain.freeSDL();
+
     return ret;
 }

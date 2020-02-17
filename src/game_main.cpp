@@ -27,6 +27,7 @@
 
 #include <AppPath/app_path.h>
 #include <Logger/logger.h>
+#include <tclap/CmdLine.h>
 
 #include "globals.h"
 #include "game_main.h"
@@ -53,7 +54,7 @@ void SizableBlocks();
 
 // game_main_setupphysics.cpp
 
-int GameMain(int argc, char**argv)
+int GameMain(const CmdLineSetup_t &setup)
 {
     Player_t blankPlayer;
 //    int A = 0;
@@ -63,20 +64,19 @@ int GameMain(int argc, char**argv)
     LB = "\n";
     EoT = "";
     std::srand(static_cast<unsigned int>(std::time(nullptr)));
-    FrameSkip = false;
+
+    FrameSkip = setup.frameSkip;
+    noSound = setup.noSound;
+    neverPause = setup.neverPause;
 
     // [ !Here was a starting dialog! ]
 
-    // TODO: Use TClap to handle command line arguments like "--no-frame-skip and --no-sound" and something also
-
-//    frmLoader.Show 'show the Splash screen
-//    Do
-//        DoEvents
-//    Loop While StartMenu = False 'wait until the player clicks a button
+    //    frmLoader.Show 'show the Splash screen
+    //    Do
+    //        DoEvents
+    //    Loop While StartMenu = False 'wait until the player clicks a button
 
     StartMenu = true;
-    FrameSkip = false;
-    noSound = false;
 
     initAll();
 
@@ -1165,6 +1165,10 @@ void CheckActive()
 {
     bool MusicPaused = false;
     bool focusLost = false;
+
+    if(neverPause)
+        return;
+
 //    If nPlay.Online = True Then Exit Sub
     // If LevelEditor = False And TestLevel = False Then Exit Sub
     // If LevelEditor = False Then Exit Sub

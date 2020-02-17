@@ -32,7 +32,17 @@ void SetupPhysics();
 
 void initAll();
 
-int GameMain(int argc, char**argv);
+struct CmdLineSetup_t
+{
+    //! Disable game sound
+    bool noSound = false;
+    //! Skip frames when laggy rendering is
+    bool frameSkip = false;
+    //! Don't pause game while window is not active
+    bool neverPause = false;
+};
+
+int GameMain(const CmdLineSetup_t &setup);
 //! Set up object sizes and frame offsets for blocks/npcs/effects
 void SetupVars();
 //! The loop for the game

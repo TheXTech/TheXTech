@@ -2174,6 +2174,7 @@ extern bool noUpdate;
 extern double gameTime;
 //Public noSound As Boolean
 extern bool noSound;
+extern bool neverPause;
 //Public tempTime As Double
 extern double tempTime;
 //Dim ScrollDelay As Integer [in main.cpp]
