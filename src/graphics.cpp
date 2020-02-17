@@ -629,19 +629,14 @@ void UpdateGraphics()
 {
 //    On Error Resume Next
     float c = ShadowMode ? 0.f : 1.f;
-//    Dim A As Integer
     int A = 0;
-//    Dim timeStr As String
     std::string timeStr;
-//    Dim Z As Integer
     int Z = 0;
-//    Dim numScreens As Integer
     int numScreens = 0;
 
-//'frame skip code
-//    cycleCount = cycleCount + 1
+    // frame skip code
     cycleCount += 1;
-//    If FrameSkip = True And TakeScreen = False Then
+
     if(FrameSkip && !TakeScreen)
     {
         if(SDL_GetTicks() + floor(1000 * (1 - (cycleCount / 63.0))) > GoalTime) // Don't draw this frame
@@ -736,29 +731,25 @@ void UpdateGraphics()
     int fBlock = 0;
     int lBlock = 0;
     Location_t tempLocation;
-//    Dim S As Integer 'Level section to display
     int S = 0; // Level section to display
-//    If Score > 9999990 Then Score = 9999990
+
     if(Score > 9999990)
         Score = 9999990;
-//    If Lives > 99 Then Lives = 99
+
     if(Lives > 99)
         Lives = 99;
-//    numScreens = 1
+
     numScreens = 1;
-//    If TakeScreen = True Then
-    if(TakeScreen) // DUMMY
-    {
+
+//    If TakeScreen = True Then // Useless
 //        If LevelEditor = True Or MagicHand = True Then
 //            frmLevelWindow.vScreen(1).AutoRedraw = True
 //        Else
 //            frmMain.AutoRedraw = True
 //        End If
 //    End If
-    }
 
-//    'Background frames
-//    If FreezeNPCs = False Then
+    // Background frames
     if(!FreezeNPCs)
     {
         BackgroundFrameCount[26]++;
@@ -841,11 +832,9 @@ void UpdateGraphics()
         SpecialFrames();
     }
 
-//        BackgroundFrame(172) = BackgroundFrame(66)
     BackgroundFrame[172] = BackgroundFrame[66];
-//    BackgroundFrameCount(158) = BackgroundFrameCount(158) + 1
     BackgroundFrameCount[158] += 1;
-//    If BackgroundFrameCount(158) >= 6 Then
+
     if(BackgroundFrameCount[158] >= 6)
     {
         BackgroundFrameCount[158] = 0;
@@ -913,22 +902,20 @@ void UpdateGraphics()
         frmMain.clearBuffer();
     }
 
-//    If SingleCoop = 2 Then numScreens = 2
     if(SingleCoop == 2)
         numScreens = 2;
-//    For Z = 1 To numScreens
+
     For(Z, 1, numScreens)
     {
-//        If SingleCoop = 2 Then Z = 2
         if(SingleCoop == 2)
             Z = 2;
+
 //        If LevelEditor = True Then
 //            S = curSection
 //        ElseIf nPlay.Online = True Then
 //            S = Player(nPlay.MySlot + 1).Section
 //        Else
         {
-//            S = Player(Z).Section
             S = Player[Z].Section;
 //        End If
         }
@@ -938,24 +925,14 @@ void UpdateGraphics()
             ScreenType = 7;
 //        If LevelEditor = False Then
         {
-//            If ScreenType = 2 Or ScreenType = 3 Then
             if(ScreenType == 2 || ScreenType == 3)
-//                GetvScreenAverage
                 GetvScreenAverage();
-//            ElseIf ScreenType = 5 And vScreen(2).Visible = False Then
             else if(ScreenType == 5 && !vScreen[2].Visible)
-//                GetvScreenAverage
                 GetvScreenAverage();
-//            ElseIf ScreenType = 7 Then
             else if(ScreenType == 7)
-//                GetvScreenCredits
                 GetvScreenCredits();
-//            Else
             else
-//                GetvScreen Z
                 GetvScreen(Z);
-//            End If
-//            If Background2(S) = 0 Then BitBlt myBackBuffer, 0, 0, ScreenW, ScreenH, 0, 0, 0, vbWhiteness
             if(Background2[S] == 0)
                 frmMain.clearBuffer();
         }
@@ -1000,7 +977,7 @@ void UpdateGraphics()
                 }
                 if(-vScreenX[A] > level[S].X)
                 {
-                    LevelChop[S] = LevelChop[S] + -vScreenX[A] - level[S].X;
+                    LevelChop[S] += float(-vScreenX[A] - level[S].X);
                     level[S].X = -vScreenX[A];
                 }
             }
@@ -1146,14 +1123,12 @@ void UpdateGraphics()
                                           BackgroundHeight[Background[A].Type] *
                                           BackgroundFrame[Background[A].Type]);
                 }
-//                }
             }
-//        End If
         }
 
         tempLocation.Width = 32;
         tempLocation.Height = 32;
-//        For A = 1 To sBlockNum 'Display sizable blocks
+
         For(A, 1, sBlockNum) // Display sizable blocks
         {
             if(BlockIsSizable[Block[sBlockArray[A]].Type] && (!(Block[sBlockArray[A]].Invis == true) || LevelEditor == true))
@@ -1174,7 +1149,7 @@ void UpdateGraphics()
                                 E = B;
                                 if(!(D == 0))
                                 {
-                                    if(D == (Block[sBlockArray[A]].Location.Width / 32.0) - 1)
+                                    if(fEqual(D, (Block[sBlockArray[A]].Location.Width / 32.0) - 1))
                                         D = 2;
                                     else
                                     {
@@ -1184,7 +1159,7 @@ void UpdateGraphics()
                                 }
                                 if(!(E == 0))
                                 {
-                                    if(E == (Block[sBlockArray[A]].Location.Height / 32.0) - 1)
+                                    if(fEqual(E, (Block[sBlockArray[A]].Location.Height / 32.0) - 1))
                                         E = 2;
                                     else
                                         E = 1;
@@ -1227,7 +1202,12 @@ void UpdateGraphics()
                 {
                     if(BackgroundHasNoMask[Background[A].Type] == false)
                     {
-                        frmMain.renderTexture(vScreenX[Z] + Background[A].Location.X, vScreenY[Z] + Background[A].Location.Y, BackgroundWidth[Background[A].Type], BackgroundHeight[Background[A].Type], GFXBackgroundBMP[Background[A].Type], 0, BackgroundHeight[Background[A].Type] * BackgroundFrame[Background[A].Type]);
+                        frmMain.renderTexture(vScreenX[Z] + Background[A].Location.X,
+                                              vScreenY[Z] + Background[A].Location.Y,
+                                              BackgroundWidth[Background[A].Type],
+                                              BackgroundHeight[Background[A].Type],
+                                              GFXBackgroundBMP[Background[A].Type],
+                                              0, BackgroundHeight[Background[A].Type] * BackgroundFrame[Background[A].Type]);
                     }
                     else
                     {
@@ -1237,14 +1217,17 @@ void UpdateGraphics()
             }
         }
 
-//        For A = numBackground + 1 To numBackground + numLocked 'Locked doors
-        For(A, numBackground + 1, numBackground + numLocked)
+        For(A, numBackground + 1, numBackground + numLocked) // Locked doors
         {
             if(vScreenCollision(Z, Background[A].Location) && (Background[A].Type == 98 || Background[A].Type == 160) && Background[A].Hidden == false)
             {
                 if(BackgroundHasNoMask[Background[A].Type] == false)
                 {
-                    frmMain.renderTexture(vScreenX[Z] + Background[A].Location.X, vScreenY[Z] + Background[A].Location.Y, BackgroundWidth[Background[A].Type], BackgroundHeight[Background[A].Type], GFXBackgroundBMP[Background[A].Type], 0, BackgroundHeight[Background[A].Type] * BackgroundFrame[Background[A].Type]);
+                    frmMain.renderTexture(vScreenX[Z] + Background[A].Location.X,
+                                          vScreenY[Z] + Background[A].Location.Y,
+                                          BackgroundWidth[Background[A].Type], BackgroundHeight[Background[A].Type],
+                                          GFXBackgroundBMP[Background[A].Type],
+                                          0, BackgroundHeight[Background[A].Type] * BackgroundFrame[Background[A].Type]);
                 }
                 else
                 {
