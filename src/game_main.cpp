@@ -134,7 +134,8 @@ int GameMain(int argc, char**argv)
 //        If LevelEditor = True Then 'Load the level editor
 //            [USELESS!]
 
-        if(GameOutro) // SMBX Credits
+        // A2xTech Credits
+        if(GameOutro)
         {
             ShadowMode = false;
             GodMode = false;

@@ -107,13 +107,13 @@ void SetupCredits()
     AddCredit("");
     AddCredit("");
     AddCredit("");
-    AddCredit("VB6 SMBX By:");
+    AddCredit("Original VB6 code By:");
     AddCredit("");
     AddCredit("Andrew Spinks");
     AddCredit("'Redigit'");
     AddCredit("");
     AddCredit("");
-    AddCredit("C++ A2xTech port By:");
+    AddCredit("C++ port By:");
     AddCredit("");
     AddCredit("Vitaly Novichkov");
     AddCredit("'Wohlstand'");
