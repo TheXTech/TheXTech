@@ -59,7 +59,10 @@ struct GFXBackup_t
 };
 
 static std::vector<GFXBackup_t> g_defaultLevelGfxBackup;
+static std::set<std::string> g_customLevelCGFXPathsCache;
+
 static std::vector<GFXBackup_t> g_defaultWorldGfxBackup;
+static std::set<std::string> g_customWorldCGFXPathsCache;
 
 static void loadCGFX(const std::set<std::string> &files,
                      const std::string &origPath,
@@ -76,6 +79,7 @@ static void loadCGFX(const std::set<std::string> &files,
     std::string imgPathC = dEpisode + dData + "/" + fName + ".png";
     std::string gifPathC = dEpisode + dData + "/" + fName + ".gif";
     std::string maskPathC = dEpisode + dData + "/" + fName + "m.gif";
+    bool alreadyLoaded = false;
 
     std::string loadedPath;
     bool success = false;
@@ -111,6 +115,14 @@ static void loadCGFX(const std::set<std::string> &files,
     if(imgToUse.empty())
         return; // Nothing to do
 
+    if(world)
+        alreadyLoaded = g_customWorldCGFXPathsCache.find(imgToUse) != g_customWorldCGFXPathsCache.end();
+    else
+        alreadyLoaded = g_customLevelCGFXPathsCache.find(imgToUse) != g_customLevelCGFXPathsCache.end();
+
+    if(alreadyLoaded)
+        return; // This texture is already loaded
+
     if(isGif)
     {
         if(files.find(maskPathC) != files.end())
@@ -145,9 +157,15 @@ static void loadCGFX(const std::set<std::string> &files,
         if(height)
             *height = newTexture.h;
         if(world)
+        {
             g_defaultWorldGfxBackup.push_back(backup);
+            g_customWorldCGFXPathsCache.insert(loadedPath);
+        }
         else
+        {
             g_defaultLevelGfxBackup.push_back(backup);
+            g_customLevelCGFXPathsCache.insert(loadedPath);
+        }
     }
 }
 
@@ -161,10 +179,11 @@ static void restoreLevelBackupTextures()
             *t.remote_height = t.height;
         if(t.remote_isCustom)
             *t.remote_isCustom = false;
-        assert(t.remote_texture);
+        SDL_assert_release(t.remote_texture);
         frmMain.deleteTexture(*t.remote_texture);
         *t.remote_texture = t.texture;
     }
+    g_customLevelCGFXPathsCache.clear();
     g_defaultLevelGfxBackup.clear();
 }
 
@@ -178,10 +197,11 @@ static void restoreWorldBackupTextures()
             *t.remote_height = t.height;
         if(t.remote_isCustom)
             *t.remote_isCustom = false;
-        assert(t.remote_texture);
+        SDL_assert_release(t.remote_texture);
         frmMain.deleteTexture(*t.remote_texture);
         *t.remote_texture = t.texture;
     }
+    g_customWorldCGFXPathsCache.clear();
     g_defaultWorldGfxBackup.clear();
 }
 
