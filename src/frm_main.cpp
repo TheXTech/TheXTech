@@ -29,6 +29,11 @@ FrmMain::FrmMain()
     ScaleHeight = ScreenH;
 }
 
+SDL_Window *FrmMain::getWindow()
+{
+    return m_window;
+}
+
 Uint8 FrmMain::getKeyState(SDL_Scancode key)
 {
     if(m_keyboardState)
@@ -71,7 +76,7 @@ bool FrmMain::initSDL()
 
     SDL_GL_ResetAttributes();
 
-    window = SDL_CreateWindow(WindowTitle.c_str(),
+    m_window = SDL_CreateWindow(m_windowTitle.c_str(),
                               SDL_WINDOWPOS_CENTERED,
                               SDL_WINDOWPOS_CENTERED,
                           #ifdef __EMSCRIPTEN__ //Set canvas be 1/2 size for a faster rendering
@@ -83,7 +88,7 @@ bool FrmMain::initSDL()
                               SDL_WINDOW_HIDDEN |
                               SDL_WINDOW_ALLOW_HIGHDPI);
 
-    if(window == nullptr)
+    if(m_window == nullptr)
     {
         pLogCritical("Unable to create window!");
         SDL_ClearError();
@@ -100,7 +105,7 @@ bool FrmMain::initSDL()
 #ifdef __EMSCRIPTEN__ //Set canvas be 1/2 size for a faster rendering
     SDL_SetWindowMinimumSize(window, ScaleWidth / 2, ScaleHeight / 2);
 #else
-    SDL_SetWindowMinimumSize(window, ScaleWidth, ScaleHeight);
+    SDL_SetWindowMinimumSize(m_window, ScaleWidth, ScaleHeight);
 #endif //__EMSCRIPTEN__
 
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
@@ -137,7 +142,7 @@ bool FrmMain::initSDL()
     if(img)
     {
         SDL_Surface *sIcon = GraphicsHelps::fi2sdl(img);
-        SDL_SetWindowIcon(window, sIcon);
+        SDL_SetWindowIcon(m_window, sIcon);
         GraphicsHelps::closeImage(img);
         SDL_FreeSurface(sIcon);
 
@@ -151,7 +156,7 @@ bool FrmMain::initSDL()
 
     pLogDebug("Init renderer settings...");
 
-    m_gRenderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    m_gRenderer = SDL_CreateRenderer(m_window, -1, SDL_RENDERER_ACCELERATED);
     if(!m_gRenderer)
     {
         pLogCritical("Unable to create renderer!");
@@ -177,26 +182,26 @@ void FrmMain::freeSDL()
     clearAllTextures();
     if(m_gRenderer)
         SDL_DestroyRenderer(m_gRenderer);
-    if(window)
-        SDL_DestroyWindow(window);
+    if(m_window)
+        SDL_DestroyWindow(m_window);
     SDL_Quit();
     CloseLog();
 }
 
 void FrmMain::show()
 {
-    SDL_ShowWindow(window);
+    SDL_ShowWindow(m_window);
 }
 
 void FrmMain::hide()
 {
-    SDL_HideWindow(window);
+    SDL_HideWindow(m_window);
     ShowCursor(1);
 }
 
 void FrmMain::doEvents()
 {
-    while(SDL_PollEvent(&event))
+    while(SDL_PollEvent(&m_event))
     {
         processEvent();
     }
@@ -204,47 +209,47 @@ void FrmMain::doEvents()
 
 void FrmMain::processEvent()
 {
-    switch(event.type)
+    switch(m_event.type)
     {
     case SDL_QUIT:
         ShowCursor(1);
         KillIt();
         break;
     case SDL_WINDOWEVENT:
-        if((event.window.event == SDL_WINDOWEVENT_RESIZED) || (event.window.event == SDL_WINDOWEVENT_MOVED))
+        if((m_event.window.event == SDL_WINDOWEVENT_RESIZED) || (m_event.window.event == SDL_WINDOWEVENT_MOVED))
             eventResize();
         break;
     case SDL_KEYDOWN:
-        eventKeyDown(event.key);
-        eventKeyPress(event.key.keysym.sym);
+        eventKeyDown(m_event.key);
+        eventKeyPress(m_event.key.keysym.sym);
         break;
     case SDL_KEYUP:
-        eventKeyUp(event.key);
+        eventKeyUp(m_event.key);
         break;
     case SDL_MOUSEBUTTONDOWN:
-        eventMouseDown(event.button);
+        eventMouseDown(m_event.button);
         break;
     case SDL_MOUSEBUTTONUP:
-        eventMouseUp(event.button);
+        eventMouseUp(m_event.button);
         break;
     case SDL_MOUSEMOTION:
-        eventMouseMove(event.motion);
+        eventMouseMove(m_event.motion);
         break;
     }
 }
 
 void FrmMain::waitEvents()
 {
-    if(SDL_WaitEventTimeout(&event, 1000))
+    if(SDL_WaitEventTimeout(&m_event, 1000))
         processEvent();
     doEvents();
 }
 
 bool FrmMain::isWindowActive()
 {
-    if(!window)
+    if(!m_window)
         return false;
-    Uint32 flags = SDL_GetWindowFlags(window);
+    Uint32 flags = SDL_GetWindowFlags(m_window);
     return (flags & SDL_WINDOW_INPUT_FOCUS) != 0;
 }
 
@@ -351,15 +356,15 @@ void FrmMain::eventResize()
 
 int FrmMain::setFullScreen(bool fs)
 {
-    if(window == nullptr)
+    if(m_window == nullptr)
         return -1;
 
-    if(fs != IsFullScreen(window))
+    if(fs != IsFullScreen(m_window))
     {
         if(fs)
         {
             // Swith to FULLSCREEN mode
-            if(SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP) < 0)
+            if(SDL_SetWindowFullscreen(m_window, SDL_WINDOW_FULLSCREEN_DESKTOP) < 0)
             {
                 //Hide mouse cursor in full screen mdoe
                 pLogWarning("Setting fullscreen failed: %s", SDL_GetError());
@@ -372,7 +377,7 @@ int FrmMain::setFullScreen(bool fs)
         else
         {
             // Swith to WINDOWED mode
-            if(SDL_SetWindowFullscreen(window, SDL_FALSE) < 0)
+            if(SDL_SetWindowFullscreen(m_window, SDL_FALSE) < 0)
             {
                 pLogWarning("Setting windowed failed: %s", SDL_GetError());
                 return -1;
@@ -400,7 +405,7 @@ void FrmMain::updateViewport()
 {
     float w, w1, h, h1;
     int   wi, hi;
-    SDL_GetWindowSize(window, &wi, &hi);
+    SDL_GetWindowSize(m_window, &wi, &hi);
     w = wi;
     h = hi;
     w1 = w;
@@ -447,7 +452,7 @@ void FrmMain::resetViewport()
 {
     float w, w1, h, h1;
     int   wi, hi;
-    SDL_GetWindowSize(window, &wi, &hi);
+    SDL_GetWindowSize(m_window, &wi, &hi);
     w = wi;
     h = hi;
     w1 = w;
@@ -671,7 +676,7 @@ void FrmMain::makeShot()
     // Make the BYTE array, factor of 3 because it's RBG.
     int w, h;
     float wF, hF;
-    SDL_GetWindowSize(window, &w, &h);
+    SDL_GetWindowSize(m_window, &w, &h);
 
     if((w == 0) || (h == 0))
     {

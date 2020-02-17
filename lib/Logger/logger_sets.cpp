@@ -289,6 +289,10 @@ void WriteToLog(PGE_LogLevel type, const std::string &msg)
     LogWriter::WriteToLog(type, msg);
 }
 
+std::string getLogFilePath()
+{
+    return LogWriter::m_logFilePath;
+}
 
 void LogWriter::WriteToLog(PGE_LogLevel type, const std::string &msg)
 {

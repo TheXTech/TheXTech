@@ -10,9 +10,10 @@ class GFX_t
 {
     std::vector<StdPicture*> m_loadedImages;
     void loadImage(StdPicture &img, std::string path);
+    int loadErrors = 0;
 public:
     GFX_t();
-    void load();
+    bool load();
     void unLoad();
 
     StdPicture BMVs;

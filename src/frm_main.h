@@ -9,9 +9,9 @@
 
 class FrmMain
 {
-    SDL_Event event;
-    std::string WindowTitle = "A2xTech v1.3";
-    SDL_Window *window = nullptr;
+    SDL_Event m_event;
+    std::string m_windowTitle = "A2xTech v1.3";
+    SDL_Window *m_window = nullptr;
     SDL_Renderer *m_gRenderer = nullptr;
     std::set<SDL_Texture *> m_textureBank;
     bool m_sdlLoaded = false;
@@ -20,10 +20,11 @@ public:
     int ScaleWidth = 800;
     int ScaleHeight = 600;
 
-    bool LockSize = false;
     int MousePointer = 0;
 
     FrmMain();
+
+    SDL_Window *getWindow();
 
     Uint8 getKeyState(SDL_Scancode key);
 
@@ -41,9 +42,9 @@ public:
     void eventKeyDown(SDL_KeyboardEvent &evt);
     void eventKeyPress(SDL_Keycode KeyASCII);
     void eventKeyUp(SDL_KeyboardEvent &evt);
-    void eventMouseDown(SDL_MouseButtonEvent &event);
-    void eventMouseMove(SDL_MouseMotionEvent &event);
-    void eventMouseUp(SDL_MouseButtonEvent &event);
+    void eventMouseDown(SDL_MouseButtonEvent &m_event);
+    void eventMouseMove(SDL_MouseMotionEvent &m_event);
+    void eventMouseUp(SDL_MouseButtonEvent &m_event);
     void eventResize();
     int setFullScreen(bool fs);
     bool isSdlError();

@@ -62,11 +62,12 @@ int GameMain(int argc, char**argv)
 
 //    Unload frmLoader
 
-    GFX.load(); // Load UI graphics
+    if(!GFX.load()) // Load UI graphics
+        return 1;
 
 //    If LevelEditor = False Then
-//        frmMain.Show
-    frmMain.show();
+//        frmMain.Show // Show window a bit later
+//    frmMain.show();
 //        GameMenu = True
     GameMenu = true;
 //    Else
@@ -82,6 +83,8 @@ int GameMain(int argc, char**argv)
         InitMixerX();
         PlayInitSound();
     }
+
+    frmMain.show(); // Don't show window until playing an initial sound
 
     InitSound(); // Setup sound effects
     LevelSelect = true; // world map is to be shown

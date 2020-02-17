@@ -53,6 +53,7 @@ extern void pLogFatal(const char *format, ...);
 
 #ifdef __cplusplus
 extern void WriteToLog(PGE_LogLevel type, const std::string &msg);
+extern std::string getLogFilePath();
 #endif
 
 #ifdef DEBUG_BUILD

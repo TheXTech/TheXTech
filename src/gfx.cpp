@@ -4,20 +4,24 @@
 #include <AppPath/app_path.h>
 #include <fmt_format_ne.h>
 #include <Logger/logger.h>
+#include <SDL2/SDL_messagebox.h>
 
 void GFX_t::loadImage(StdPicture &img, std::string path)
 {
     pLogDebug("Loading texture %s...", path.c_str());
     img = frmMain.LoadPicture(path);
     if(!img.texture)
+    {
         pLogWarning("Failed to load texture: %s...", path.c_str());
+        loadErrors++;
+    }
     m_loadedImages.push_back(&img);
 }
 
 GFX_t::GFX_t()
 {}
 
-void GFX_t::load()
+bool GFX_t::load()
 {
     std::string uiPath = AppPath + "graphics/ui/";
 
@@ -73,6 +77,15 @@ void GFX_t::load()
     loadImage(Warp, uiPath + "Warp.png");
 
     loadImage(YoshiWings, uiPath + "YoshiWings.png");
+
+    if(loadErrors > 0)
+    {
+        std::string msg = fmt::format_ne("Failed to load an UI image assets. Loo a log file to get more details:\n{0}", getLogFilePath());
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "UI image assets loading error", msg.c_str(), nullptr);
+        return false;
+    }
+
+    return true;
 }
 
 void GFX_t::unLoad()
