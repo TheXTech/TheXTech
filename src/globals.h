@@ -90,9 +90,9 @@ extern int numSavedEvents;
 //Public SavedEvents(1 To MaxSavedEvents) As String
 extern RangeArr<std::string, 1, MaxSavedEvents> SavedEvents;
 //Public BlockSwitch(1 To 4) As Boolean
-extern RangeArr<bool, 1, 4> BlockSwitch;
+extern RangeArrI<bool, 1, 4, false> BlockSwitch;
 //'Public PowerUpUnlock(2 To 7) As Boolean
-extern RangeArr<bool, 2, 7> PowerUpUnlock;
+extern RangeArrI<bool, 2, 7, false> PowerUpUnlock;
 
 
 //Public Const ScreenW As Integer = 800  'Game Screen Width
@@ -278,7 +278,7 @@ extern RangeArr<ConKeyboard_t, 1, 2> conKeyboard;
 extern RangeArr<ConJoystick_t, 1, 2> conJoystick;
 
 //Public useJoystick(1 To 2) As Integer
-extern RangeArr<int, 1, 2> useJoystick;
+extern RangeArrI<int, 1, 2, 0> useJoystick;
 
 //Public Type NPC 'The NPC Type
 struct NPC_t
@@ -412,7 +412,7 @@ struct NPC_t
 //    Active As Boolean 'If on screen
     bool Active = false;
 //    Reset(1 To 2) As Boolean 'If it can display the NPC
-    RangeArr<bool, 1, 2> Reset;
+    RangeArrI<bool, 1, 2, false> Reset;
 //    TimeLeft As Integer 'Time left before reset when not on screen
     int TimeLeft = 0;
 //    HoldingPlayer As Integer 'Who is holding it
@@ -839,7 +839,7 @@ struct WorldLevel_t
 //    FileName As String 'level's file
     std::string FileName;
 //    LevelExit(1 To 4) As Integer ' For the direction each type of exit opens the path
-    RangeArr<int, 1, 4> LevelExit;
+    RangeArrI<int, 1, 4, 0> LevelExit;
 //    Active As Boolean
     bool Active = false;
 //    LevelName As String 'The name of the level
@@ -1146,7 +1146,7 @@ const int maxScenes = 5000;
 //Public Const frameRate As Double = 15 'for controlling game speed
 const int frameRate = 15;
 //Public blockCharacter(0 To 20) As Boolean
-extern RangeArr<bool, 0, 20> blockCharacter;
+extern RangeArrI<bool, 0, 20, false> blockCharacter;
 
 //Public Type SelectWorld
 struct SelectWorld_t
@@ -1158,14 +1158,14 @@ struct SelectWorld_t
 //    WorldFile As String
     std::string WorldFile;
 //    blockChar(1 To numCharacters) As Boolean
-    RangeArr<bool, 1, numCharacters> blockChar;
+    RangeArrI<bool, 1, numCharacters, false> blockChar;
 //End Type
 };
 
 //Public OwedMount(0 To maxPlayers) As Integer 'when a yoshi/boot is taken from the player this returns after going back to the world map
-extern RangeArr<int, 0, maxPlayers> OwedMount;
+extern RangeArrI<int, 0, maxPlayers, 0> OwedMount;
 //Public OwedMountType(0 To maxPlayers) As Integer
-extern RangeArr<int, 0, maxPlayers> OwedMountType;
+extern RangeArrI<int, 0, maxPlayers, 0> OwedMountType;
 //Public AutoX(0 To maxSections) As Single 'for autoscroll
 extern RangeArr<float, 0, maxSections> AutoX;
 //Public AutoY(0 To maxSections) As Single 'for autoscroll
@@ -1214,7 +1214,7 @@ extern int LastBackground;
 //Public iBlocks As Integer 'blocks that are doing something. this keeps the number of interesting blocks
 extern int iBlocks;
 //Public iBlock(0 To maxBlocks) As Integer 'references a block #
-extern RangeArr<int, 0, maxBlocks> iBlock;
+extern RangeArrI<int, 0, maxBlocks, 0> iBlock;
 //Public numTiles As Integer 'number of map tiles
 extern int numTiles;
 //Public numScenes As Integer 'number of scense
@@ -1224,23 +1224,23 @@ extern RangeArr<std::string, 0, maxSections> CustomMusic;
 //Public level(0 To maxSections) As Location 'sections
 extern RangeArr<Location_t, 0, maxSections> level;
 //Public LevelWrap(0 To maxSections) As Boolean 'Wrap around the level
-extern RangeArr<bool, 0, maxSections> LevelWrap;
+extern RangeArrI<bool, 0, maxSections, false> LevelWrap;
 //Public OffScreenExit(0 To maxSections) As Boolean 'walk offscreen to end the level
-extern RangeArr<bool, 0, maxSections> OffScreenExit;
+extern RangeArrI<bool, 0, maxSections, false> OffScreenExit;
 //Public bgMusic(0 To maxSections) As Integer 'music
-extern RangeArr<int, 0, maxSections> bgMusic;
+extern RangeArrI<int, 0, maxSections, 0> bgMusic;
 //Public bgMusicREAL(0 To maxSections) As Integer 'default music
-extern RangeArr<int, 0, maxSections> bgMusicREAL;
+extern RangeArrI<int, 0, maxSections, 0> bgMusicREAL;
 //Public Background2REAL(0 To maxSections) As Integer 'background
-extern RangeArr<int, 0, maxSections> Background2REAL;
+extern RangeArrI<int, 0, maxSections, 0> Background2REAL;
 //Public LevelREAL(0 To maxSections) As Location 'default background
 extern RangeArr<Location_t, 0, maxSections> LevelREAL;
 //Public curMusic As Integer 'current music playing
 extern int curMusic;
 //Public bgColor(0 To maxSections) As Long 'obsolete
-extern RangeArr<long, 0, maxSections> bgColor;
+extern RangeArrI<long, 0, maxSections, 0> bgColor;
 //Public Background2(0 To maxSections) As Integer 'level background
-extern RangeArr<int, 0, maxSections> Background2;
+extern RangeArrI<int, 0, maxSections, 0> Background2;
 //Public WorldPath(1 To maxWorldPaths) As WorldPath
 extern RangeArr<WorldPath_t, 1, maxWorldPaths> WorldPath;
 //Public numWorldPaths As Integer
@@ -1286,197 +1286,197 @@ extern RangeArr<Block_t, 0, maxBlocks> Block;
 //Public Player(0 To maxPlayers) As Player
 extern RangeArr<Player_t, 0, maxPlayers> Player;
 //Public MarioFrameX(0 To maxPlayerFrames) As Integer 'Player frame offset X
-extern RangeArr<int, 0, maxPlayerFrames> MarioFrameX;
+extern RangeArrI<int, 0, maxPlayerFrames, 0> MarioFrameX;
 //Public MarioFrameY(0 To maxPlayerFrames) As Integer 'Player frame offset Y
-extern RangeArr<int, 0, maxPlayerFrames> MarioFrameY;
+extern RangeArrI<int, 0, maxPlayerFrames, 0> MarioFrameY;
 //Public LuigiFrameX(0 To maxPlayerFrames) As Integer 'Player frame offset X
-extern RangeArr<int, 0, maxPlayerFrames> LuigiFrameX;
+extern RangeArrI<int, 0, maxPlayerFrames, 0> LuigiFrameX;
 //Public LuigiFrameY(0 To maxPlayerFrames) As Integer 'Player frame offset Y
-extern RangeArr<int, 0, maxPlayerFrames> LuigiFrameY;
+extern RangeArrI<int, 0, maxPlayerFrames, 0> LuigiFrameY;
 //Public PeachFrameX(0 To maxPlayerFrames) As Integer 'Player frame offset X
-extern RangeArr<int, 0, maxPlayerFrames> PeachFrameX;
+extern RangeArrI<int, 0, maxPlayerFrames, 0> PeachFrameX;
 //Public PeachFrameY(0 To maxPlayerFrames) As Integer 'Player frame offset Y
-extern RangeArr<int, 0, maxPlayerFrames> PeachFrameY;
+extern RangeArrI<int, 0, maxPlayerFrames, 0> PeachFrameY;
 //Public ToadFrameX(0 To maxPlayerFrames) As Integer 'Player frame offset X
-extern RangeArr<int, 0, maxPlayerFrames> ToadFrameX;
+extern RangeArrI<int, 0, maxPlayerFrames, 0> ToadFrameX;
 //Public ToadFrameY(0 To maxPlayerFrames) As Integer 'Player frame offset Y
-extern RangeArr<int, 0, maxPlayerFrames> ToadFrameY;
+extern RangeArrI<int, 0, maxPlayerFrames, 0> ToadFrameY;
 //Public LinkFrameX(0 To maxPlayerFrames) As Integer 'Player frame offset X
-extern RangeArr<int, 0, maxPlayerFrames> LinkFrameX;
+extern RangeArrI<int, 0, maxPlayerFrames, 0> LinkFrameX;
 //Public LinkFrameY(0 To maxPlayerFrames) As Integer 'Player frame offset Y
-extern RangeArr<int, 0, maxPlayerFrames> LinkFrameY;
+extern RangeArrI<int, 0, maxPlayerFrames, 0> LinkFrameY;
 //Public BackgroundFence(0 To maxBackgroundType) As Boolean
-extern RangeArr<bool, 0, maxBackgroundType> BackgroundFence;
+extern RangeArrI<bool, 0, maxBackgroundType, false> BackgroundFence;
 //Public NPCFrameOffsetX(0 To maxNPCType) As Integer 'NPC frame offset X
-extern RangeArr<int, 0, maxNPCType> NPCFrameOffsetX;
+extern RangeArrI<int, 0, maxNPCType, 0> NPCFrameOffsetX;
 //Public NPCFrameOffsetY(0 To maxNPCType) As Integer 'NPC frame offset Y
-extern RangeArr<int, 0, maxNPCType> NPCFrameOffsetY;
+extern RangeArrI<int, 0, maxNPCType, 0> NPCFrameOffsetY;
 //Public NPCWidth(0 To maxNPCType) As Integer 'NPC width
-extern RangeArr<int, 0, maxNPCType> NPCWidth;
+extern RangeArrI<int, 0, maxNPCType, 0> NPCWidth;
 //Public NPCHeight(0 To maxNPCType) As Integer 'NPC height
-extern RangeArr<int, 0, maxNPCType> NPCHeight;
+extern RangeArrI<int, 0, maxNPCType, 0> NPCHeight;
 //Public NPCWidthGFX(0 To maxNPCType) As Integer 'NPC gfx width
-extern RangeArr<int, 0, maxNPCType> NPCWidthGFX;
+extern RangeArrI<int, 0, maxNPCType, 0> NPCWidthGFX;
 //Public NPCHeightGFX(0 To maxNPCType) As Integer 'NPC gfx height
-extern RangeArr<int, 0, maxNPCType> NPCHeightGFX;
+extern RangeArrI<int, 0, maxNPCType, 0> NPCHeightGFX;
 //Public NPCSpeedvar(0 To maxNPCType) As Single 'NPC Speed Change
 extern RangeArr<float, 0, maxNPCType> NPCSpeedvar;
 //Public NPCIsAShell(0 To maxNPCType) As Boolean 'Flags the NPC type if it is a shell
-extern RangeArr<bool, 0, maxNPCType> NPCIsAShell;
+extern RangeArrI<bool, 0, maxNPCType, false> NPCIsAShell;
 //Public NPCIsABlock(0 To maxNPCType) As Boolean 'Flag NPC as a block
-extern RangeArr<bool, 0, maxNPCType> NPCIsABlock;
+extern RangeArrI<bool, 0, maxNPCType, false> NPCIsABlock;
 //Public NPCIsAHit1Block(0 To maxNPCType) As Boolean 'Flag NPC as a hit1 block
-extern RangeArr<bool, 0, maxNPCType> NPCIsAHit1Block;
+extern RangeArrI<bool, 0, maxNPCType, false> NPCIsAHit1Block;
 //Public NPCIsABonus(0 To maxNPCType) As Boolean 'Flags the NPC type if it is a bonus
-extern RangeArr<bool, 0, maxNPCType> NPCIsABonus;
+extern RangeArrI<bool, 0, maxNPCType, false> NPCIsABonus;
 //Public NPCIsACoin(0 To maxNPCType) As Boolean 'Flags the NPC type if it is a coin
-extern RangeArr<bool, 0, maxNPCType> NPCIsACoin;
+extern RangeArrI<bool, 0, maxNPCType, false> NPCIsACoin;
 //Public NPCIsAVine(0 To maxNPCType) As Boolean 'Flags the NPC type if it is a vine
-extern RangeArr<bool, 0, maxNPCType> NPCIsAVine;
+extern RangeArrI<bool, 0, maxNPCType, false> NPCIsAVine;
 //Public NPCIsAnExit(0 To maxNPCType) As Boolean 'Flags the NPC type if it is a level exit
-extern RangeArr<bool, 0, maxNPCType> NPCIsAnExit;
+extern RangeArrI<bool, 0, maxNPCType, false> NPCIsAnExit;
 //Public NPCIsAParaTroopa(0 To maxNPCType) As Boolean 'Flags the NPC type as a para-troopa
-extern RangeArr<bool, 0, maxNPCType> NPCIsAParaTroopa;
+extern RangeArrI<bool, 0, maxNPCType, false> NPCIsAParaTroopa;
 //Public NPCIsCheep(0 To maxNPCType) As Boolean 'Flags the NPC type as a cheep cheep
-extern RangeArr<bool, 0, maxNPCType> NPCIsCheep;
+extern RangeArrI<bool, 0, maxNPCType, false> NPCIsCheep;
 //Public NPCJumpHurt(0 To maxNPCType) As Boolean 'Hurts the player even if it jumps on the NPC
-extern RangeArr<bool, 0, maxNPCType> NPCJumpHurt;
+extern RangeArrI<bool, 0, maxNPCType, false> NPCJumpHurt;
 //Public NPCNoClipping(0 To maxNPCType) As Boolean 'NPC can go through blocks
-extern RangeArr<bool, 0, maxNPCType> NPCNoClipping;
+extern RangeArrI<bool, 0, maxNPCType, false> NPCNoClipping;
 //Public NPCScore(0 To maxNPCType) As Integer 'NPC score value
-extern RangeArr<int, 0, maxNPCType> NPCScore;
+extern RangeArrI<int, 0, maxNPCType, 0> NPCScore;
 //Public NPCCanWalkOn(0 To maxNPCType) As Boolean  'NPC can be walked on
-extern RangeArr<bool, 0, maxNPCType> NPCCanWalkOn;
+extern RangeArrI<bool, 0, maxNPCType, false> NPCCanWalkOn;
 //Public NPCGrabFromTop(0 To maxNPCType) As Boolean  'NPC can be grabbed from the top
-extern RangeArr<bool, 0, maxNPCType> NPCGrabFromTop;
+extern RangeArrI<bool, 0, maxNPCType, false> NPCGrabFromTop;
 //Public NPCTurnsAtCliffs(0 To maxNPCType) As Boolean  'NPC turns around at cliffs
-extern RangeArr<bool, 0, maxNPCType> NPCTurnsAtCliffs;
+extern RangeArrI<bool, 0, maxNPCType, false> NPCTurnsAtCliffs;
 //Public NPCWontHurt(0 To maxNPCType) As Boolean  'NPC wont hurt the player
-extern RangeArr<bool, 0, maxNPCType> NPCWontHurt;
+extern RangeArrI<bool, 0, maxNPCType, false> NPCWontHurt;
 //Public NPCMovesPlayer(0 To maxNPCType) As Boolean 'Player can not walk through the NPC
-extern RangeArr<bool, 0, maxNPCType> NPCMovesPlayer;
+extern RangeArrI<bool, 0, maxNPCType, false> NPCMovesPlayer;
 //Public NPCStandsOnPlayer(0 To maxNPCType) As Boolean 'for the clown car
-extern RangeArr<bool, 0, maxNPCType> NPCStandsOnPlayer;
+extern RangeArrI<bool, 0, maxNPCType, false> NPCStandsOnPlayer;
 //Public NPCIsGrabbable(0 To maxNPCType) As Boolean 'Player can grab the NPC
-extern RangeArr<bool, 0, maxNPCType> NPCIsGrabbable;
+extern RangeArrI<bool, 0, maxNPCType, false> NPCIsGrabbable;
 //Public NPCIsBoot(0 To maxNPCType) As Boolean 'npc is a kurbo's shoe
-extern RangeArr<bool, 0, maxNPCType> NPCIsBoot;
+extern RangeArrI<bool, 0, maxNPCType, false> NPCIsBoot;
 //Public NPCIsYoshi(0 To maxNPCType) As Boolean 'npc is a yoshi
-extern RangeArr<bool, 0, maxNPCType> NPCIsYoshi;
+extern RangeArrI<bool, 0, maxNPCType, false> NPCIsYoshi;
 //Public NPCIsToad(0 To maxNPCType) As Boolean 'npc is a toad
-extern RangeArr<bool, 0, maxNPCType> NPCIsToad;
+extern RangeArrI<bool, 0, maxNPCType, false> NPCIsToad;
 //Public NPCNoYoshi(0 To maxNPCType) As Boolean 'Player can't eat the NPC
-extern RangeArr<bool, 0, maxNPCType> NPCNoYoshi;
+extern RangeArrI<bool, 0, maxNPCType, false> NPCNoYoshi;
 //Public NPCForeground(0 To maxNPCType) As Boolean 'draw the npc in front
-extern RangeArr<bool, 0, maxNPCType> NPCForeground;
+extern RangeArrI<bool, 0, maxNPCType, false> NPCForeground;
 //Public NPCIsABot(0 To maxNPCType) As Boolean 'Zelda 2 Bot monster
-extern RangeArr<bool, 0, maxNPCType> NPCIsABot;
+extern RangeArrI<bool, 0, maxNPCType, false> NPCIsABot;
 //Public NPCDefaultMovement(0 To maxNPCType) As Boolean 'default NPC movement
-extern RangeArr<bool, 0, maxNPCType> NPCDefaultMovement;
+extern RangeArrI<bool, 0, maxNPCType, false> NPCDefaultMovement;
 //Public NPCIsVeggie(0 To maxNPCType) As Boolean 'turnips
-extern RangeArr<bool, 0, maxNPCType> NPCIsVeggie;
+extern RangeArrI<bool, 0, maxNPCType, false> NPCIsVeggie;
 //Public NPCNoFireBall(0 To maxNPCType) As Boolean 'not hurt by fireball
-extern RangeArr<bool, 0, maxNPCType> NPCNoFireBall;
+extern RangeArrI<bool, 0, maxNPCType, false> NPCNoFireBall;
 //Public NPCNoIceBall(0 To maxNPCType) As Boolean 'not hurt by fireball
-extern RangeArr<bool, 0, maxNPCType> NPCNoIceBall;
+extern RangeArrI<bool, 0, maxNPCType, false> NPCNoIceBall;
 //Public NPCNoGravity(0 To maxNPCType) As Boolean 'not affected by gravity
-extern RangeArr<bool, 0, maxNPCType> NPCNoGravity;
+extern RangeArrI<bool, 0, maxNPCType, false> NPCNoGravity;
 
 //Public NPCFrame(0 To maxNPCType) As Integer
-extern RangeArr<int, 0, maxNPCType> NPCFrame;
+extern RangeArrI<int, 0, maxNPCType, 0> NPCFrame;
 //Public NPCFrameSpeed(0 To maxNPCType) As Integer
-extern RangeArr<int, 0, maxNPCType> NPCFrameSpeed;
+extern RangeArrI<int, 0, maxNPCType, 0> NPCFrameSpeed;
 //Public NPCFrameStyle(0 To maxNPCType) As Integer
-extern RangeArr<int, 0, maxNPCType> NPCFrameStyle;
+extern RangeArrI<int, 0, maxNPCType, 0> NPCFrameStyle;
 
 //Public Type NPCDefaults 'Default NPC Settings
 struct NPCDefaults_t
 {
 //    NPCFrameOffsetX(0 To maxNPCType) As Integer
-    RangeArr<int, 0, maxNPCType> NPCFrameOffsetX;
+    RangeArrI<int, 0, maxNPCType, 0> NPCFrameOffsetX;
 //    NPCFrameOffsetY(0 To maxNPCType) As Integer
-    RangeArr<int, 0, maxNPCType> NPCFrameOffsetY;
+    RangeArrI<int, 0, maxNPCType, 0> NPCFrameOffsetY;
 //    NPCWidth(0 To maxNPCType) As Integer
-    RangeArr<int, 0, maxNPCType> NPCWidth;
+    RangeArrI<int, 0, maxNPCType, 0> NPCWidth;
 //    NPCHeight(0 To maxNPCType) As Integer
-    RangeArr<int, 0, maxNPCType> NPCHeight;
+    RangeArrI<int, 0, maxNPCType, 0> NPCHeight;
 //    NPCWidthGFX(0 To maxNPCType) As Integer
-    RangeArr<int, 0, maxNPCType> NPCWidthGFX;
+    RangeArrI<int, 0, maxNPCType, 0> NPCWidthGFX;
 //    NPCHeightGFX(0 To maxNPCType) As Integer
-    RangeArr<int, 0, maxNPCType> NPCHeightGFX;
+    RangeArrI<int, 0, maxNPCType, 0> NPCHeightGFX;
 //    NPCIsAShell(0 To maxNPCType) As Boolean
-    RangeArr<bool, 0, maxNPCType> NPCIsAShell;
+    RangeArrI<bool, 0, maxNPCType, false> NPCIsAShell;
 //    NPCIsABlock(0 To maxNPCType) As Boolean
-    RangeArr<bool, 0, maxNPCType> NPCIsABlock;
+    RangeArrI<bool, 0, maxNPCType, false> NPCIsABlock;
 //    NPCIsAHit1Block(0 To maxNPCType) As Boolean
-    RangeArr<bool, 0, maxNPCType> NPCIsAHit1Block;
+    RangeArrI<bool, 0, maxNPCType, false> NPCIsAHit1Block;
 //    NPCIsABonus(0 To maxNPCType) As Boolean
-    RangeArr<bool, 0, maxNPCType> NPCIsABonus;
+    RangeArrI<bool, 0, maxNPCType, false> NPCIsABonus;
 //    NPCIsACoin(0 To maxNPCType) As Boolean
-    RangeArr<bool, 0, maxNPCType> NPCIsACoin;
+    RangeArrI<bool, 0, maxNPCType, false> NPCIsACoin;
 //    NPCIsAVine(0 To maxNPCType) As Boolean
-    RangeArr<bool, 0, maxNPCType> NPCIsAVine;
+    RangeArrI<bool, 0, maxNPCType, false> NPCIsAVine;
 //    NPCIsAnExit(0 To maxNPCType) As Boolean
-    RangeArr<bool, 0, maxNPCType> NPCIsAnExit;
+    RangeArrI<bool, 0, maxNPCType, false> NPCIsAnExit;
 //    NPCIsAParaTroopa(0 To maxNPCType) As Boolean
-    RangeArr<bool, 0, maxNPCType> NPCIsAParaTroopa;
+    RangeArrI<bool, 0, maxNPCType, false> NPCIsAParaTroopa;
 //    NPCIsCheep(0 To maxNPCType) As Boolean
-    RangeArr<bool, 0, maxNPCType> NPCIsCheep;
+    RangeArrI<bool, 0, maxNPCType, false> NPCIsCheep;
 //    NPCJumpHurt(0 To maxNPCType) As Boolean
-    RangeArr<bool, 0, maxNPCType> NPCJumpHurt;
+    RangeArrI<bool, 0, maxNPCType, false> NPCJumpHurt;
 //    NPCNoClipping(0 To maxNPCType) As Boolean
-    RangeArr<bool, 0, maxNPCType> NPCNoClipping;
+    RangeArrI<bool, 0, maxNPCType, false> NPCNoClipping;
 //    NPCScore(0 To maxNPCType) As Integer
-    RangeArr<int, 0, maxNPCType> NPCScore;
+    RangeArrI<int, 0, maxNPCType, 0> NPCScore;
 //    NPCCanWalkOn(0 To maxNPCType) As Boolean
-    RangeArr<bool, 0, maxNPCType> NPCCanWalkOn;
+    RangeArrI<bool, 0, maxNPCType, false> NPCCanWalkOn;
 //    NPCGrabFromTop(0 To maxNPCType) As Boolean
-    RangeArr<bool, 0, maxNPCType> NPCGrabFromTop;
+    RangeArrI<bool, 0, maxNPCType, false> NPCGrabFromTop;
 //    NPCTurnsAtCliffs(0 To maxNPCType) As Boolean
-    RangeArr<bool, 0, maxNPCType> NPCTurnsAtCliffs;
+    RangeArrI<bool, 0, maxNPCType, false> NPCTurnsAtCliffs;
 //    NPCWontHurt(0 To maxNPCType) As Boolean
-    RangeArr<bool, 0, maxNPCType> NPCWontHurt;
+    RangeArrI<bool, 0, maxNPCType, false> NPCWontHurt;
 //    NPCMovesPlayer(0 To maxNPCType) As Boolean
-    RangeArr<bool, 0, maxNPCType> NPCMovesPlayer;
+    RangeArrI<bool, 0, maxNPCType, false> NPCMovesPlayer;
 //    NPCStandsOnPlayer(0 To maxNPCType) As Boolean
-    RangeArr<bool, 0, maxNPCType> NPCStandsOnPlayer;
+    RangeArrI<bool, 0, maxNPCType, false> NPCStandsOnPlayer;
 //    NPCIsGrabbable(0 To maxNPCType) As Boolean
-    RangeArr<bool, 0, maxNPCType> NPCIsGrabbable;
+    RangeArrI<bool, 0, maxNPCType, false> NPCIsGrabbable;
 //    NPCIsBoot(0 To maxNPCType) As Boolean
-    RangeArr<bool, 0, maxNPCType> NPCIsBoot;
+    RangeArrI<bool, 0, maxNPCType, false> NPCIsBoot;
 //    NPCIsYoshi(0 To maxNPCType) As Boolean
-    RangeArr<bool, 0, maxNPCType> NPCIsYoshi;
+    RangeArrI<bool, 0, maxNPCType, false> NPCIsYoshi;
 //    NPCIsToad(0 To maxNPCType) As Boolean
-    RangeArr<bool, 0, maxNPCType> NPCIsToad;
+    RangeArrI<bool, 0, maxNPCType, false> NPCIsToad;
 //    NPCNoYoshi(0 To maxNPCType) As Boolean
-    RangeArr<bool, 0, maxNPCType> NPCNoYoshi;
+    RangeArrI<bool, 0, maxNPCType, false> NPCNoYoshi;
 //    NPCForeground(0 To maxNPCType) As Boolean
-    RangeArr<bool, 0, maxNPCType> NPCForeground;
+    RangeArrI<bool, 0, maxNPCType, false> NPCForeground;
 //    NPCIsABot(0 To maxNPCType) As Boolean
-    RangeArr<bool, 0, maxNPCType> NPCIsABot;
+    RangeArrI<bool, 0, maxNPCType, false> NPCIsABot;
 //    NPCDefaultMovement(0 To maxNPCType) As Boolean
-    RangeArr<bool, 0, maxNPCType> NPCDefaultMovement;
+    RangeArrI<bool, 0, maxNPCType, false> NPCDefaultMovement;
 //    NPCIsVeggie(0 To maxNPCType) As Boolean
-    RangeArr<bool, 0, maxNPCType> NPCIsVeggie;
+    RangeArrI<bool, 0, maxNPCType, false> NPCIsVeggie;
 //    NPCSpeedvar(0 To maxNPCType) As Single
     RangeArr<float, 0, maxNPCType> NPCSpeedvar;
 //    NPCNoFireBall(0 To maxNPCType) As Boolean
-    RangeArr<bool, 0, maxNPCType> NPCNoFireBall;
+    RangeArrI<bool, 0, maxNPCType, false> NPCNoFireBall;
 //    NPCNoIceBall(0 To maxNPCType) As Boolean
-    RangeArr<bool, 0, maxNPCType> NPCNoIceBall;
+    RangeArrI<bool, 0, maxNPCType, false> NPCNoIceBall;
 //    NPCNoGravity(0 To maxNPCType) As Boolean
-    RangeArr<bool, 0, maxNPCType> NPCNoGravity;
+    RangeArrI<bool, 0, maxNPCType, false> NPCNoGravity;
 //End Type
 };
 //Public NPCDefaults As NPCDefaults
 extern NPCDefaults_t NPCDefaults;
 
 //Public BlockIsSizable(0 To maxBlockType) As Boolean 'Flags block if it is sizable
-extern RangeArr<bool, 0, maxBlockType> BlockIsSizable;
+extern RangeArrI<bool, 0, maxBlockType, false> BlockIsSizable;
 //Public BlockSlope(0 To maxBlockType) As Integer 'block is sloped on top. -1 of block has an upward slope, 1 for downward
-extern RangeArr<int, 0, maxBlockType> BlockSlope;
+extern RangeArrI<int, 0, maxBlockType, 0> BlockSlope;
 //Public BlockSlope2(0 To maxBlockType) As Integer 'block is sloped on the bottom.
-extern RangeArr<int, 0, maxBlockType> BlockSlope2;
+extern RangeArrI<int, 0, maxBlockType, 0> BlockSlope2;
 //Public vScreenX(0 To maxPlayers) As Double  'vScreen offset
 extern RangeArr<double, 0, maxPlayers> vScreenX;
 //Public vScreenY(0 To maxPlayers) As Double 'vScreen offset
@@ -1490,103 +1490,103 @@ extern RangeArr<double, 0, maxPlayers> qScreenY;
 extern bool qScreen;
 
 //Public BlockWidth(0 To maxBlockType) As Integer 'Block type width
-extern RangeArr<int, 0, maxBlockType> BlockWidth;
+extern RangeArrI<int, 0, maxBlockType, 0> BlockWidth;
 //Public BlockHeight(0 To maxBlockType) As Integer 'Block type height
-extern RangeArr<int, 0, maxBlockType> BlockHeight;
+extern RangeArrI<int, 0, maxBlockType, 0> BlockHeight;
 //Public BonusWidth(1 To 100) As Integer 'Bonus type width
-extern RangeArr<int, 0, maxBlockType> BonusWidth;
+extern RangeArrI<int, 0, maxBlockType, 0> BonusWidth;
 //Public BonusHeight(1 To 100) As Integer 'Bonus type height
-extern RangeArr<int, 0, maxBlockType> BonusHeight;
+extern RangeArrI<int, 0, maxBlockType, 0> BonusHeight;
 //Public EffectWidth(1 To maxEffectType) As Integer 'Effect width
-extern RangeArr<int, 0, maxBlockType> EffectWidth;
+extern RangeArrI<int, 0, maxBlockType, 0> EffectWidth;
 //Public EffectHeight(1 To maxEffectType) As Integer 'Effect height
-extern RangeArr<int, 0, maxBlockType> EffectHeight;
+extern RangeArrI<int, 0, maxBlockType, 0> EffectHeight;
 
 //Public Type EffectDefaults
 struct EffectDefaults
 {
 //    EffectWidth(1 To maxEffectType) As Integer
-    RangeArr<int, 1, maxEffectType> EffectWidth;
+    RangeArrI<int, 1, maxEffectType, 0> EffectWidth;
 //    EffectHeight(1 To maxEffectType) As Integer
-    RangeArr<int, 1, maxEffectType> EffectHeight;
+    RangeArrI<int, 1, maxEffectType, 0> EffectHeight;
 //End Type
 };
 
 //Public EffectDefaults As EffectDefaults
 extern EffectDefaults effectDefaults;
 //Public SceneWidth(1 To 100) As Integer 'Scene width
-extern RangeArr<int, 1, maxSceneType> SceneWidth;
+extern RangeArrI<int, 1, maxSceneType, 0> SceneWidth;
 //Public SceneHeight(1 To 100) As Integer 'Scene height
-extern RangeArr<int, 1, maxSceneType> SceneHeight;
+extern RangeArrI<int, 1, maxSceneType, 0> SceneHeight;
 //Public BackgroundHasNoMask(1 To maxBackgroundType) As Boolean
-extern RangeArr<bool, 1, maxBackgroundType> BackgroundHasNoMask;
+extern RangeArrI<bool, 1, maxBackgroundType, false> BackgroundHasNoMask;
 //Public Foreground(0 To maxBackgroundType) As Boolean 'flags the background object to be drawn in front of everything else
-extern RangeArr<bool, 0, maxBackgroundType> Foreground;
+extern RangeArrI<bool, 0, maxBackgroundType, false> Foreground;
 //Public BackgroundWidth(1 To maxBackgroundType) As Integer
-extern RangeArr<int, 1, maxBackgroundType> BackgroundWidth;
+extern RangeArrI<int, 1, maxBackgroundType, 0> BackgroundWidth;
 //Public BackgroundHeight(1 To maxBackgroundType) As Integer
-extern RangeArr<int, 1, maxBackgroundType> BackgroundHeight;
+extern RangeArrI<int, 1, maxBackgroundType, 0> BackgroundHeight;
 //Public BackgroundFrame(1 To maxBackgroundType) As Integer
-extern RangeArr<int, 1, maxBackgroundType> BackgroundFrame;
+extern RangeArrI<int, 1, maxBackgroundType, 0> BackgroundFrame;
 //Public BackgroundFrameCount(1 To maxBackgroundType) As Integer
-extern RangeArr<int, 1, maxBackgroundType> BackgroundFrameCount;
+extern RangeArrI<int, 1, maxBackgroundType, 0> BackgroundFrameCount;
 //Public BlockFrame(1 To maxBlockType) As Integer 'What frame the block is on
-extern RangeArr<int, 1, maxBlockType> BlockFrame;
+extern RangeArrI<int, 1, maxBlockType, 0> BlockFrame;
 //Public BlockFrame2(1 To maxBlockType) As Integer 'Counter to update the blocks frame
-extern RangeArr<int, 1, maxBlockType> BlockFrame2;
+extern RangeArrI<int, 1, maxBlockType, 0> BlockFrame2;
 //Public sBlockArray(1 To 1000) As Integer 'sizable block array
-extern RangeArr<int, 1, 1000> sBlockArray;
+extern RangeArrI<int, 1, 1000, 0> sBlockArray;
 //Public sBlockNum As Integer
 extern int sBlockNum;
 //Public SceneFrame(1 To maxSceneType) As Integer 'What frame the scene is on
-extern RangeArr<int, 1, maxSceneType> SceneFrame;
+extern RangeArrI<int, 1, maxSceneType, 0> SceneFrame;
 //Public SceneFrame2(1 To maxSceneType) As Integer 'Counter to update the scene frames
-extern RangeArr<int, 1, maxSceneType> SceneFrame2;
+extern RangeArrI<int, 1, maxSceneType, 0> SceneFrame2;
 //Public SpecialFrame(100) As Integer 'misc frames for things like coins and the kurbi shoe
-extern RangeArr<int, 0, 100> SpecialFrame;
+extern RangeArrI<int, 0, 100, 0> SpecialFrame;
 //Public SpecialFrameCount(100) As Single
 extern RangeArr<float, 0, 100> SpecialFrameCount;
 //Public TileWidth(1 To maxTileType) As Integer
-extern RangeArr<int, 1, maxTileType> TileWidth;
+extern RangeArrI<int, 1, maxTileType, 0> TileWidth;
 //Public TileHeight(1 To maxTileType) As Integer
-extern RangeArr<int, 1, maxTileType> TileHeight;
+extern RangeArrI<int, 1, maxTileType, 0> TileHeight;
 //Public TileFrame(1 To maxTileType) As Integer
-extern RangeArr<int, 1, maxTileType> TileFrame;
+extern RangeArrI<int, 1, maxTileType, 0> TileFrame;
 //Public TileFrame2(1 To maxTileType) As Integer
-extern RangeArr<int, 1, maxTileType> TileFrame2;
+extern RangeArrI<int, 1, maxTileType, 0> TileFrame2;
 //Public LevelFrame(1 To 100) As Integer 'What frame the scene is on
-extern RangeArr<int, 1, 100> LevelFrame;
+extern RangeArrI<int, 1, 100, 0> LevelFrame;
 //Public LevelFrame2(1 To 100) As Integer 'Counter to update the scene frames
-extern RangeArr<int, 1, 100> LevelFrame2;
+extern RangeArrI<int, 1, 100, 0> LevelFrame2;
 //Public BlockHasNoMask(1 To maxBlockType) As Boolean
-extern RangeArr<bool, 1, maxBlockType> BlockHasNoMask;
+extern RangeArrI<bool, 1, maxBlockType, false> BlockHasNoMask;
 //Public LevelHasNoMask(1 To 100) As Boolean
-extern RangeArr<bool, 1, 100> LevelHasNoMask;
+extern RangeArrI<bool, 1, 100, false> LevelHasNoMask;
 //Public BlockOnlyHitspot1(0 To maxBlockType) As Boolean
-extern RangeArr<bool, 0, maxBlockType> BlockOnlyHitspot1;
+extern RangeArrI<bool, 0, maxBlockType, false> BlockOnlyHitspot1;
 //Public BlockKills(0 To maxBlockType) As Boolean 'block is lava
-extern RangeArr<bool, 0, maxBlockType> BlockKills;
+extern RangeArrI<bool, 0, maxBlockType, false> BlockKills;
 //Public BlockKills2(0 To maxBlockType) As Boolean
-extern RangeArr<bool, 0, maxBlockType> BlockKills2;
+extern RangeArrI<bool, 0, maxBlockType, false> BlockKills2;
 //Public BlockHurts(0 To maxBlockType) As Boolean 'block hurts the player
-extern RangeArr<bool, 0, maxBlockType> BlockHurts;
+extern RangeArrI<bool, 0, maxBlockType, false> BlockHurts;
 //Public BlockPSwitch(0 To maxBlockType) As Boolean 'block is affected by the p switch
-extern RangeArr<bool, 0, maxBlockType> BlockPSwitch;
+extern RangeArrI<bool, 0, maxBlockType, false> BlockPSwitch;
 //Public BlockNoClipping(0 To maxBlockType) As Boolean 'player/npcs can walk throught the block
-extern RangeArr<bool, 0, maxBlockType> BlockNoClipping;
+extern RangeArrI<bool, 0, maxBlockType, false> BlockNoClipping;
 //Public CoinFrame(1 To 10) As Integer 'What frame the coin is on
-extern RangeArr<int, 1, 10> CoinFrame;
+extern RangeArrI<int, 1, 10, 0> CoinFrame;
 //Public CoinFrame2(1 To 10) As Integer 'Counter to update the coin frames
-extern RangeArr<int, 1, 10> CoinFrame2;
+extern RangeArrI<int, 1, 10, 0> CoinFrame2;
 //Public EditorCursor As EditorCursor
 extern EditorCursor_t EditorCursor;
 //Public EditorControls As EditorControls
 extern EditorControls_t EditorControls;
 
 //Public Sound(1 To numSounds) As Integer
-extern RangeArr<int, 1, numSounds> Sound;
+extern RangeArrI<int, 1, numSounds, 0> Sound;
 //Public SoundPause(1 To numSounds) As Integer
-extern RangeArr<int, 1, numSounds> SoundPause;
+extern RangeArrI<int, 1, numSounds, 0> SoundPause;
 //Public EndLevel As Boolean 'End the level and move to the next
 extern bool EndLevel;
 //Public LevelMacro As Integer 'Shows a level outro when beat
@@ -1616,9 +1616,9 @@ extern int curWorldLevel;
 //Public curWorldMusic As Integer
 extern int curWorldMusic;
 //Public NoTurnBack(0 To maxSections) As Boolean
-extern RangeArr<bool, 0, maxSections> NoTurnBack;
+extern RangeArrI<bool, 0, maxSections, false> NoTurnBack;
 //Public UnderWater(0 To maxSections) As Boolean
-extern RangeArr<bool, 0, maxSections> UnderWater;
+extern RangeArrI<bool, 0, maxSections, false> UnderWater;
 //Public TestLevel As Boolean
 extern bool TestLevel;
 //Public FullFileName As String
@@ -1641,9 +1641,9 @@ extern int PSwitchStop;
 extern int PSwitchPlayer;
 const int maxSaveSlots = 3;
 //Public SaveSlot(1 To 3) As Integer
-extern RangeArr<int, 1, maxSaveSlots> SaveSlot;
+extern RangeArrI<int, 1, maxSaveSlots, 0> SaveSlot;
 //Public SaveStars(1 To 3) As Integer
-extern RangeArr<int, 1, maxSaveSlots> SaveStars;
+extern RangeArrI<int, 1, maxSaveSlots, 0> SaveStars;
 //Public BeltDirection As Integer 'direction of the converyer belt blocks
 extern int BeltDirection;
 //Public BeatTheGame As Boolean 'true if the game has been beaten
@@ -1693,15 +1693,15 @@ struct Physics_t
 //    PlayerGravity As Single
     float PlayerGravity = 0.0f;
 //    PlayerHeight(1 To numCharacters, 1 To numStates) As Integer
-    RangeArr<RangeArr<int, 1, numStates>, 1, numCharacters> PlayerHeight;
+    RangeArr<RangeArrI<int, 1, numStates, 0>, 1, numCharacters> PlayerHeight;
 //    PlayerDuckHeight(1 To numCharacters, 1 To numStates) As Integer
-    RangeArr<RangeArr<int, 1, numStates>, 1, numCharacters> PlayerDuckHeight;
+    RangeArr<RangeArrI<int, 1, numStates, 0>, 1, numCharacters> PlayerDuckHeight;
 //    PlayerWidth(1 To numCharacters, 1 To numStates) As Integer
-    RangeArr<RangeArr<int, 1, numStates>, 1, numCharacters> PlayerWidth;
+    RangeArr<RangeArrI<int, 1, numStates, 0>, 1, numCharacters> PlayerWidth;
 //    PlayerGrabSpotX(1 To numCharacters, 1 To numStates) As Integer
-    RangeArr<RangeArr<int, 1, numStates>, 1, numCharacters> PlayerGrabSpotX;
+    RangeArr<RangeArrI<int, 1, numStates, 0>, 1, numCharacters> PlayerGrabSpotX;
 //    PlayerGrabSpotY(1 To numCharacters, 1 To numStates) As Integer
-    RangeArr<RangeArr<int, 1, numStates>, 1, numCharacters> PlayerGrabSpotY;
+    RangeArr<RangeArrI<int, 1, numStates, 0>, 1, numCharacters> PlayerGrabSpotY;
 //    NPCTimeOffScreen As Integer
     int NPCTimeOffScreen = 0;
 //    NPCCanHurtWait As Integer
@@ -1747,9 +1747,9 @@ struct Events_t
 //    ToggleLayer(0 To 20) As String
     RangeArr<std::string, 0, 20> ToggleLayer;
 //    Music(0 To maxSections) As Integer
-    RangeArr<int, 0, maxSections> Music;
+    RangeArrI<int, 0, maxSections, 0> Music;
 //    Background(0 To maxSections) As Integer
-    RangeArr<int, 0, maxSections> Background;
+    RangeArrI<int, 0, maxSections, 0> Background;
 //    level(0 To maxSections) As Location
     RangeArr<Location_t, 0, maxSections> level;
 //    EndGame As Integer
@@ -1863,7 +1863,7 @@ extern RangeArr<std::string, 1, maxWorldCredits> WorldCredits;
 //Public Score As Long 'player's score
 extern int Score;
 //Public Points(1 To 13) As Integer
-extern RangeArr<int, 1, 13> Points;
+extern RangeArrI<int, 1, 13, 0> Points;
 //Public oldJumpJoy As Integer
 extern int oldJumpJoy;
 //Public MaxWorldStars As Integer 'maximum number of world stars
@@ -1880,247 +1880,247 @@ extern float LoadCoinsT;
 
 //'Game Graphics
 //Public GFXBlockCustom(1 To maxBlockType) As Boolean
-extern RangeArr<bool, 1, maxBlockType> GFXBlockCustom;
+extern RangeArrI<bool, 1, maxBlockType, false> GFXBlockCustom;
 //Public GFXBlock(1 To maxBlockType) As Long
-//extern RangeArr<long, 1, maxBlockType> GFXBlock;
+//extern RangeArrI<long, 1, maxBlockType, 0> GFXBlock;
 #define GFXBlock GFXBlockBMP
 //Public GFXBlockMask(1 To maxBlockType) As Long
-extern RangeArr<long, 1, maxBlockType> GFXBlockMask;
+extern RangeArrI<long, 1, maxBlockType, 0> GFXBlockMask;
 //Public GFXBlockBMP(1 To maxBlockType) As StdPicture
 extern RangeArr<StdPicture, 1, maxBlockType> GFXBlockBMP;
 //Public GFXBlockMaskBMP(1 To maxBlockType) As StdPicture
 extern RangeArr<StdPicture, 1, maxBlockType> GFXBlockMaskBMP;
 //Public GFXBackground2Custom(1 To numBackground2) As Boolean
-extern RangeArr<bool, 1, numBackground2> GFXBackground2Custom;
+extern RangeArrI<bool, 1, numBackground2, false> GFXBackground2Custom;
 //Public GFXBackground2(1 To numBackground2) As Long
-//extern RangeArr<long, 1, numBackground2> GFXBackground2;
+//extern RangeArrI<long, 1, numBackground2, 0> GFXBackground2;
 #define GFXBackground2 GFXBackground2BMP
 //Public GFXBackground2BMP(1 To numBackground2) As StdPicture
 extern RangeArr<StdPicture, 1, numBackground2> GFXBackground2BMP;
 //Public GFXBackground2Height(1 To numBackground2) As Integer
-extern RangeArr<int, 1, numBackground2> GFXBackground2Height;
+extern RangeArrI<int, 1, numBackground2, 0> GFXBackground2Height;
 //Public GFXBackground2Width(1 To numBackground2) As Integer
-extern RangeArr<int, 1, numBackground2> GFXBackground2Width;
+extern RangeArrI<int, 1, numBackground2, 0> GFXBackground2Width;
 //Public GFXNPCCustom(1 To maxNPCType) As Boolean
-extern RangeArr<bool, 1, maxNPCType> GFXNPCCustom;
+extern RangeArrI<bool, 1, maxNPCType, false> GFXNPCCustom;
 //Public GFXNPC(1 To maxNPCType) As Long
-//extern RangeArr<long, 1, maxNPCType> GFXNPC;
+//extern RangeArrI<long, 1, maxNPCType, 0> GFXNPC;
 #define GFXNPC GFXNPCBMP
 //Public GFXNPCMask(1 To maxNPCType) As Long
-extern RangeArr<long, 1, maxNPCType> GFXNPCMask;
+extern RangeArrI<long, 1, maxNPCType, 0> GFXNPCMask;
 //Public GFXNPCBMP(1 To maxNPCType) As StdPicture
 extern RangeArr<StdPicture, 1, maxNPCType> GFXNPCBMP;
 //Public GFXNPCMaskBMP(1 To maxNPCType) As StdPicture
 extern RangeArr<StdPicture, 1, maxNPCType> GFXNPCMaskBMP;
 //Public GFXNPCHeight(1 To maxNPCType) As Integer
-extern RangeArr<int, 1, maxNPCType> GFXNPCHeight;
+extern RangeArrI<int, 1, maxNPCType, 0> GFXNPCHeight;
 //Public GFXNPCWidth(1 To maxNPCType) As Integer
-extern RangeArr<int, 1, maxNPCType> GFXNPCWidth;
+extern RangeArrI<int, 1, maxNPCType, 0> GFXNPCWidth;
 //Public GFXEffectCustom(1 To maxEffectType) As Boolean
-extern RangeArr<bool, 1, maxEffectType> GFXEffectCustom;
+extern RangeArrI<bool, 1, maxEffectType, false> GFXEffectCustom;
 //Public GFXEffect(1 To maxEffectType) As Long
-//extern RangeArr<long, 1, maxEffectType> GFXEffect;
+//extern RangeArrI<long, 1, maxEffectType, 0> GFXEffect;
 #define GFXEffect GFXEffectBMP
 //Public GFXEffectMask(1 To maxEffectType) As Long
-extern RangeArr<long, 1, maxEffectType> GFXEffectMask;
+extern RangeArrI<long, 1, maxEffectType, 0> GFXEffectMask;
 //Public GFXEffectBMP(1 To maxEffectType) As StdPicture
 extern RangeArr<StdPicture, 1, maxEffectType> GFXEffectBMP;
 //Public GFXEffectMaskBMP(1 To maxEffectType) As StdPicture
 extern RangeArr<StdPicture, 1, maxEffectType> GFXEffectMaskBMP;
 //Public GFXEffectHeight(1 To maxEffectType) As Integer
-extern RangeArr<int, 1, maxEffectType> GFXEffectHeight;
+extern RangeArrI<int, 1, maxEffectType, 0> GFXEffectHeight;
 //Public GFXEffectWidth(1 To maxEffectType) As Integer
-extern RangeArr<int, 1, maxEffectType> GFXEffectWidth;
+extern RangeArrI<int, 1, maxEffectType, 0> GFXEffectWidth;
 //Public GFXBackgroundCustom(1 To maxBackgroundType) As Boolean
-extern RangeArr<bool, 1, maxBackgroundType> GFXBackgroundCustom;
+extern RangeArrI<bool, 1, maxBackgroundType, false> GFXBackgroundCustom;
 //Public GFXBackground(1 To maxBackgroundType) As Long
-//extern RangeArr<long, 1, maxBackgroundType> GFXBackground;
+//extern RangeArrI<long, 1, maxBackgroundType, 0> GFXBackground;
 #define GFXBackground GFXBackgroundBMP
 //Public GFXBackgroundMask(1 To maxBackgroundType) As Long
-extern RangeArr<long, 1, maxBackgroundType> GFXBackgroundMask;
+extern RangeArrI<long, 1, maxBackgroundType, 0> GFXBackgroundMask;
 //Public GFXBackgroundBMP(1 To maxBackgroundType) As StdPicture
 extern RangeArr<StdPicture, 1, maxBackgroundType> GFXBackgroundBMP;
 //Public GFXBackgroundMaskBMP(1 To maxBackgroundType) As StdPicture
 extern RangeArr<StdPicture, 1, maxBackgroundType> GFXBackgroundMaskBMP;
 //Public GFXBackgroundHeight(1 To maxBackgroundType) As Integer
-extern RangeArr<int, 1, maxBackgroundType> GFXBackgroundHeight;
+extern RangeArrI<int, 1, maxBackgroundType, 0> GFXBackgroundHeight;
 //Public GFXBackgroundWidth(1 To maxBackgroundType) As Integer
-extern RangeArr<int, 1, maxBackgroundType> GFXBackgroundWidth;
+extern RangeArrI<int, 1, maxBackgroundType, 0> GFXBackgroundWidth;
 //Public GFXMarioCustom(1 To 10) As Boolean
-extern RangeArr<bool, 1, 10> GFXMarioCustom;
+extern RangeArrI<bool, 1, 10, false> GFXMarioCustom;
 //Public GFXMario(1 To 10) As Long
-//extern RangeArr<long, 1, 10> GFXMario;
+//extern RangeArrI<long, 1, 10, 0> GFXMario;
 #define GFXMario GFXMarioBMP
 //Public GFXMarioMask(1 To 10) As Long
-extern RangeArr<long, 1, 10> GFXMarioMask;
+extern RangeArrI<long, 1, 10, 0> GFXMarioMask;
 //Public GFXMarioBMP(1 To 10) As StdPicture
 extern RangeArr<StdPicture, 1, 10> GFXMarioBMP;
 //Public GFXMarioMaskBMP(1 To 10) As StdPicture
 extern RangeArr<StdPicture, 1, 10> GFXMarioMaskBMP;
 //Public GFXMarioHeight(1 To 10) As Integer
-extern RangeArr<int, 1, 10> GFXMarioHeight;
+extern RangeArrI<int, 1, 10, 0> GFXMarioHeight;
 //Public GFXMarioWidth(1 To 10) As Integer
-extern RangeArr<int, 1, 10> GFXMarioWidth;
+extern RangeArrI<int, 1, 10, 0> GFXMarioWidth;
 //Public GFXLuigiCustom(1 To 10) As Boolean
-extern RangeArr<bool, 1, 10> GFXLuigiCustom;
+extern RangeArrI<bool, 1, 10, false> GFXLuigiCustom;
 //Public GFXLuigi(1 To 10) As Long
-//extern RangeArr<long, 1, 10> GFXLuigi;
+//extern RangeArrI<long, 1, 10, 0> GFXLuigi;
 #define GFXLuigi GFXLuigiBMP
 //Public GFXLuigiMask(1 To 10) As Long
-extern RangeArr<long, 1, 10> GFXLuigiMask;
+extern RangeArrI<long, 1, 10, 0> GFXLuigiMask;
 //Public GFXLuigiBMP(1 To 10) As StdPicture
 extern RangeArr<StdPicture, 1, 10> GFXLuigiBMP;
 //Public GFXLuigiMaskBMP(1 To 10) As StdPicture
 extern RangeArr<StdPicture, 1, 10> GFXLuigiMaskBMP;
 //Public GFXLuigiHeight(1 To 10) As Integer
-extern RangeArr<int, 1, 10> GFXLuigiHeight;
+extern RangeArrI<int, 1, 10, 0> GFXLuigiHeight;
 //Public GFXLuigiWidth(1 To 10) As Integer
-extern RangeArr<int, 1, 10> GFXLuigiWidth;
+extern RangeArrI<int, 1, 10, 0> GFXLuigiWidth;
 //Public GFXPeachCustom(1 To 10) As Boolean
-extern RangeArr<bool, 1, 10> GFXPeachCustom;
+extern RangeArrI<bool, 1, 10, false> GFXPeachCustom;
 //Public GFXPeach(1 To 10) As Long
-//extern RangeArr<long, 1, 10> GFXPeach;
+//extern RangeArrI<long, 1, 10, 0> GFXPeach;
 #define GFXPeach GFXPeachBMP
 //Public GFXPeachMask(1 To 10) As Long
-extern RangeArr<long, 1, 10> GFXPeachMask;
+extern RangeArrI<long, 1, 10, 0> GFXPeachMask;
 //Public GFXPeachBMP(1 To 10) As StdPicture
 extern RangeArr<StdPicture, 1, 10> GFXPeachBMP;
 //Public GFXPeachMaskBMP(1 To 10) As StdPicture
 extern RangeArr<StdPicture, 1, 10> GFXPeachMaskBMP;
 //Public GFXPeachHeight(1 To 10) As Integer
-extern RangeArr<int, 1, 10> GFXPeachHeight;
+extern RangeArrI<int, 1, 10, 0> GFXPeachHeight;
 //Public GFXPeachWidth(1 To 10) As Integer
-extern RangeArr<int, 1, 10> GFXPeachWidth;
+extern RangeArrI<int, 1, 10, 0> GFXPeachWidth;
 //Public GFXToadCustom(1 To 10) As Boolean
-extern RangeArr<bool, 1, 10> GFXToadCustom;
+extern RangeArrI<bool, 1, 10, false> GFXToadCustom;
 //Public GFXToad(1 To 10) As Long
-//extern RangeArr<long, 1, 10> GFXToad;
+//extern RangeArrI<long, 1, 10, 0> GFXToad;
 #define GFXToad GFXToadBMP
 //Public GFXToadMask(1 To 10) As Long
-extern RangeArr<long, 1, 10> GFXToadMask;
+extern RangeArrI<long, 1, 10, 0> GFXToadMask;
 //Public GFXToadBMP(1 To 10) As StdPicture
 extern RangeArr<StdPicture, 1, 10> GFXToadBMP;
 //Public GFXToadMaskBMP(1 To 10) As StdPicture
 extern RangeArr<StdPicture, 1, 10> GFXToadMaskBMP;
 //Public GFXToadHeight(1 To 10) As Integer
-extern RangeArr<int, 1, 10> GFXToadHeight;
+extern RangeArrI<int, 1, 10, 0> GFXToadHeight;
 //Public GFXToadWidth(1 To 10) As Integer
-extern RangeArr<int, 1, 10> GFXToadWidth;
+extern RangeArrI<int, 1, 10, 0> GFXToadWidth;
 
 //Public GFXLinkCustom(1 To 10) As Boolean
-extern RangeArr<bool, 1, 10> GFXLinkCustom;
+extern RangeArrI<bool, 1, 10, false> GFXLinkCustom;
 //Public GFXLink(1 To 10) As Long
-//extern RangeArr<long, 1, 10> GFXLink;
+//extern RangeArrI<long, 1, 10, 0> GFXLink;
 #define GFXLink GFXLinkBMP
 //Public GFXLinkMask(1 To 10) As Long
-extern RangeArr<long, 1, 10> GFXLinkMask;
+extern RangeArrI<long, 1, 10, 0> GFXLinkMask;
 //Public GFXLinkBMP(1 To 10) As StdPicture
 extern RangeArr<StdPicture, 1, 10> GFXLinkBMP;
 //Public GFXLinkMaskBMP(1 To 10) As StdPicture
 extern RangeArr<StdPicture, 1, 10> GFXLinkMaskBMP;
 //Public GFXLinkHeight(1 To 10) As Integer
-extern RangeArr<int, 1, 10> GFXLinkHeight;
+extern RangeArrI<int, 1, 10, 0> GFXLinkHeight;
 //Public GFXLinkWidth(1 To 10) As Integer
-extern RangeArr<int, 1, 10> GFXLinkWidth;
+extern RangeArrI<int, 1, 10, 0> GFXLinkWidth;
 
 const int maxYoshiGfx = 10;
 //Public GFXYoshiBCustom(1 To 10) As Boolean
-extern RangeArr<bool, 1, maxYoshiGfx> GFXYoshiBCustom;
+extern RangeArrI<bool, 1, maxYoshiGfx, false> GFXYoshiBCustom;
 //Public GFXYoshiB(1 To 10) As Long
-//extern RangeArr<long, 1, maxYoshiGfx> GFXYoshiB;
+//extern RangeArrI<long, 1, maxYoshiGfx, 0> GFXYoshiB;
 #define GFXYoshiB GFXYoshiBBMP
 //Public GFXYoshiBMask(1 To 10) As Long
-extern RangeArr<long, 1, maxYoshiGfx> GFXYoshiBMask;
+extern RangeArrI<long, 1, maxYoshiGfx, 0> GFXYoshiBMask;
 //Public GFXYoshiBBMP(1 To 10) As StdPicture
 extern RangeArr<StdPicture, 1, maxYoshiGfx> GFXYoshiBBMP;
 //Public GFXYoshiBMaskBMP(1 To 10) As StdPicture
 extern RangeArr<StdPicture, 1, maxYoshiGfx> GFXYoshiBMaskBMP;
 //Public GFXYoshiTCustom(1 To 10) As Boolean
-extern RangeArr<bool, 1, maxYoshiGfx> GFXYoshiTCustom;
+extern RangeArrI<bool, 1, maxYoshiGfx, false> GFXYoshiTCustom;
 //Public GFXYoshiT(1 To 10) As Long
-//extern RangeArr<long, 1, maxYoshiGfx> GFXYoshiT;
+//extern RangeArrI<long, 1, maxYoshiGfx, 0> GFXYoshiT;
 #define GFXYoshiT GFXYoshiTBMP
 //Public GFXYoshiTMask(1 To 10) As Long
-extern RangeArr<long, 1, maxYoshiGfx> GFXYoshiTMask;
+extern RangeArrI<long, 1, maxYoshiGfx, 0> GFXYoshiTMask;
 //Public GFXYoshiTBMP(1 To 10) As StdPicture
 extern RangeArr<StdPicture, 1, maxYoshiGfx> GFXYoshiTBMP;
 //Public GFXYoshiTMaskBMP(1 To 10) As StdPicture
 extern RangeArr<StdPicture, 1, maxYoshiGfx> GFXYoshiTMaskBMP;
 //'World Map Graphics
 //Public GFXTileCustom(1 To maxTileType) As Long
-extern RangeArr<bool, 1, maxTileType> GFXTileCustom;
+extern RangeArrI<bool, 1, maxTileType, false> GFXTileCustom;
 //Public GFXTile(1 To maxTileType) As Long
-//extern RangeArr<long, 1, maxTileType> GFXTile;
+//extern RangeArrI<long, 1, maxTileType, 0> GFXTile;
 #define GFXTile GFXTileBMP
 //Public GFXTileBMP(1 To maxTileType) As StdPicture
 extern RangeArr<StdPicture, 1, maxTileType> GFXTileBMP;
 //Public GFXTileHeight(1 To maxTileType) As Integer
-extern RangeArr<int, 1, maxTileType> GFXTileHeight;
+extern RangeArrI<int, 1, maxTileType, 0> GFXTileHeight;
 //Public GFXTileWidth(1 To maxTileType) As Integer
-extern RangeArr<int, 1, maxTileType> GFXTileWidth;
+extern RangeArrI<int, 1, maxTileType, 0> GFXTileWidth;
 //Public GFXLevelCustom(0 To maxLevelType) As Long
-extern RangeArr<bool, 0, maxLevelType> GFXLevelCustom;
+extern RangeArrI<bool, 0, maxLevelType, false> GFXLevelCustom;
 //Public GFXLevel(0 To maxLevelType) As Long
-//extern RangeArr<long, 0, maxLevelType> GFXLevel;
+//extern RangeArrI<long, 0, maxLevelType, 0> GFXLevel;
 #define GFXLevel GFXLevelBMP
 //Public GFXLevelMask(0 To maxLevelType) As Long
-extern RangeArr<long, 0, maxLevelType> GFXLevelMask;
+extern RangeArrI<long, 0, maxLevelType, 0> GFXLevelMask;
 //Public GFXLevelBMP(0 To maxLevelType) As StdPicture
 extern RangeArr<StdPicture, 0, maxLevelType> GFXLevelBMP;
 //Public GFXLevelMaskBMP(0 To maxLevelType) As StdPicture
 extern RangeArr<StdPicture, 0, maxLevelType> GFXLevelMaskBMP;
 //Public GFXLevelHeight(0 To maxLevelType) As Integer
-extern RangeArr<int, 0, maxLevelType> GFXLevelHeight;
+extern RangeArrI<int, 0, maxLevelType, 0> GFXLevelHeight;
 //Public GFXLevelWidth(0 To maxLevelType) As Integer
-extern RangeArr<int, 0, maxLevelType> GFXLevelWidth;
+extern RangeArrI<int, 0, maxLevelType, 0> GFXLevelWidth;
 //Public GFXLevelBig(0 To maxLevelType) As Boolean
-extern RangeArr<bool, 0, maxLevelType> GFXLevelBig;
+extern RangeArrI<bool, 0, maxLevelType, false> GFXLevelBig;
 //Public GFXSceneCustom(1 To maxSceneType) As Long
-extern RangeArr<bool, 1, maxSceneType> GFXSceneCustom;
+extern RangeArrI<bool, 1, maxSceneType, false> GFXSceneCustom;
 //Public GFXScene(1 To maxSceneType) As Long
-//extern RangeArr<long, 1, maxSceneType> GFXScene;
+//extern RangeArrI<long, 1, maxSceneType, 0> GFXScene;
 #define GFXScene GFXSceneBMP
 //Public GFXSceneMask(1 To maxSceneType) As Long
-extern RangeArr<long, 1, maxSceneType> GFXSceneMask;
+extern RangeArrI<long, 1, maxSceneType, 0> GFXSceneMask;
 //Public GFXSceneBMP(1 To maxSceneType) As StdPicture
 extern RangeArr<StdPicture, 1, maxSceneType> GFXSceneBMP;
 //Public GFXSceneMaskBMP(1 To maxSceneType) As StdPicture
 extern RangeArr<StdPicture, 1, maxSceneType> GFXSceneMaskBMP;
 //Public GFXSceneHeight(1 To maxSceneType) As Integer
-extern RangeArr<int, 1, maxSceneType> GFXSceneHeight;
+extern RangeArrI<int, 1, maxSceneType, 0> GFXSceneHeight;
 //Public GFXSceneWidth(1 To maxSceneType) As Integer
-extern RangeArr<int, 1, maxSceneType> GFXSceneWidth;
+extern RangeArrI<int, 1, maxSceneType, 0> GFXSceneWidth;
 //Public GFXPathCustom(1 To maxPathType) As Long
-extern RangeArr<bool, 1, maxPathType> GFXPathCustom;
+extern RangeArrI<bool, 1, maxPathType, false> GFXPathCustom;
 //Public GFXPath(1 To maxPathType) As Long
-//extern RangeArr<long, 1, maxPathType> GFXPath;
+//extern RangeArrI<long, 1, maxPathType, 0> GFXPath;
 #define GFXPath GFXPathBMP
 //Public GFXPathMask(1 To maxPathType) As Long
-extern RangeArr<long, 1, maxPathType> GFXPathMask;
+extern RangeArrI<long, 1, maxPathType, 0> GFXPathMask;
 //Public GFXPathBMP(1 To maxPathType) As StdPicture
 extern RangeArr<StdPicture, 1, maxPathType> GFXPathBMP;
 //Public GFXPathMaskBMP(1 To maxPathType) As StdPicture
 extern RangeArr<StdPicture, 1, maxPathType> GFXPathMaskBMP;
 //Public GFXPathHeight(1 To maxPathType) As Integer
-extern RangeArr<int, 1, maxPathType> GFXPathHeight;
+extern RangeArrI<int, 1, maxPathType, 0> GFXPathHeight;
 //Public GFXPathWidth(1 To maxPathType) As Integer
-extern RangeArr<int, 1, maxPathType> GFXPathWidth;
+extern RangeArrI<int, 1, maxPathType, 0> GFXPathWidth;
 
 //Public GFXPlayerCustom(1 To numCharacters) As Long
-extern RangeArr<bool, 1, numCharacters> GFXPlayerCustom;
+extern RangeArrI<bool, 1, numCharacters, false> GFXPlayerCustom;
 //Public GFXPlayer(1 To numCharacters) As Long
-//extern RangeArr<long, 1, numCharacters> GFXPlayer;
+//extern RangeArrI<long, 1, numCharacters, 0> GFXPlayer;
 #define GFXPlayer GFXPlayerBMP
 //Public GFXPlayerMask(1 To numCharacters) As Long
-extern RangeArr<long, 1, numCharacters> GFXPlayerMask;
+extern RangeArrI<long, 1, numCharacters, 0> GFXPlayerMask;
 //Public GFXPlayerBMP(1 To numCharacters) As StdPicture
 extern RangeArr<StdPicture, 1, numCharacters> GFXPlayerBMP;
 //Public GFXPlayerMaskBMP(1 To numCharacters) As StdPicture
 extern RangeArr<StdPicture, 1, numCharacters> GFXPlayerMaskBMP;
 //Public GFXPlayerHeight(1 To numCharacters) As Integer
-extern RangeArr<int, 1, numCharacters> GFXPlayerHeight;
+extern RangeArrI<int, 1, numCharacters, 0> GFXPlayerHeight;
 //Public GFXPlayerWidth(1 To numCharacters) As Integer
-extern RangeArr<int, 1, numCharacters> GFXPlayerWidth;
+extern RangeArrI<int, 1, numCharacters, 0> GFXPlayerWidth;
 
 //Public PlayerCharacter As Integer
 extern int PlayerCharacter;
@@ -2143,9 +2143,9 @@ extern bool MenuMouseClick;
 
 //' event stuff
 //Public NewEvent(1 To 100) As String
-extern RangeArr<std::string, 1, 100> NewEvent;
+extern RangeArr<std::string, 1, maxEvents> NewEvent;
 //Public newEventDelay(1 To 100) As Integer
-extern RangeArr<int, 1, 100> newEventDelay;
+extern RangeArrI<int, 1, maxEvents, 0> newEventDelay;
 //Public newEventNum As Integer
 extern int newEventNum;
 //Public ForcedControls As Boolean
@@ -2169,7 +2169,7 @@ extern bool BattleMode;
 //Public BattleWinner As Integer
 extern int BattleWinner;
 //Public BattleLives(1 To maxPlayers) As Integer
-extern RangeArr<int, 1, maxPlayers> BattleLives;
+extern RangeArrI<int, 1, maxPlayers, 0> BattleLives;
 //Public BattleIntro As Integer
 extern int BattleIntro;
 //Public BattleOutro As Integer
