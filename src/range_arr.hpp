@@ -28,7 +28,7 @@
 
 #include <cstddef>
 #include <cstring>
-#include <cassert>
+#include <SDL2/SDL_assert.h>
 
 #define For(A, From, To) for(int A = From; A <= To; ++A)
 
@@ -64,10 +64,10 @@ public:
 
     T& operator[](long index)
     {
-        assert(index <= end);
-        assert(index >= begin);
-        assert(offset + index < static_cast<long>(size));
-        assert(offset + index >= 0);
+        SDL_assert_release(index <= end);
+        SDL_assert_release(index >= begin);
+        SDL_assert_release(offset + index < static_cast<long>(size));
+        SDL_assert_release(offset + index >= 0);
         return array[offset + index];
     }
 };
