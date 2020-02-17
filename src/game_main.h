@@ -104,6 +104,6 @@ void SetupPlayerFrames();
 
 void StartBattleMode();
 
-std::string FixComma(std::string newStr);
+// std::string FixComma(std::string newStr); // USELESS
 
 #endif // MAIN_H

@@ -1687,8 +1687,3 @@ void StartBattleMode()
     BattleWinner = 0;
     BattleOutro = 0;
 }
-
-std::string FixComma(std::string newStr)
-{
-    return newStr; // TODO IT
-}

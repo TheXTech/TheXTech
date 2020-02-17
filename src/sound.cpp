@@ -52,7 +52,7 @@ static int g_customWldMusicId = 17;
 static int g_reservedChannels = 0;
 
 static int g_errorsSfx = 0;
-static int g_errorsMusic = 0;
+// static int g_errorsMusic = 0; // Unued yet
 
 static std::string MusicRoot;
 static std::string SfxRoot;
