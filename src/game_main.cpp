@@ -1328,12 +1328,14 @@ void UpdateMacro()
 void InitControls()
 {
     int A = 0;
-    int B = 0;
+//    int B = 0;
     bool newJoystick = false;
 
-    while(true)
+    int joysticksCount = InitJoysticks();
+
+    for(int i = 0; i < joysticksCount; ++i)
     {
-        newJoystick = StartJoystick(A);
+        newJoystick = StartJoystick(i);
         if(newJoystick) {
             A += 1;
         } else {

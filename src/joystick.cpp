@@ -1,3 +1,5 @@
+#include <Logger/logger.h>
+
 #include "globals.h"
 #include "joystick.h"
 
@@ -19,13 +21,15 @@ RangeArr<long, 0, 7> CenterX;
 // Public CenterY(0 To 7) As Long
 RangeArr<long, 0, 7> CenterY;
 // Public JoyButtons(-15 To 15) As Boolean
-RangeArr<bool, -15, 15> JoyButtons;
+RangeArr<bool, -255, 255> JoyButtons;
 // Public CurrentJoyX As Long
 long CurrentJoyX = 0;
 // Public CurrentJoyY As Long
 long CurrentJoyY = 0;
 // Public CurrentJoyPOV As Long
 long CurrentJoyPOV = 0;
+
+static std::vector<SDL_Joystick*> g_joysticks;
 
 
 void UpdateControls()
@@ -50,6 +54,8 @@ void UpdateControls()
 //    End If
     }
 
+    if(numJoysticks > 0 && (useJoystick[1] || useJoystick[2]))
+        SDL_JoystickUpdate();
 
 //    For B = 1 To numPlayers
     For(B, 1, numPlayers)
@@ -83,7 +89,7 @@ void UpdateControls()
 //                JoyNum = useJoystick(A) - 1
                 JoyNum = useJoystick[A] - 1;
 //                PollJoystick
-                PollJoystick();
+                PollJoystick(useJoystick[A] - 1);
 //                If CurrentJoyX < CenterX(JoyNum) - CenterX(JoyNum) * 0.3 Or (CurrentJoyPOV >= 22500 And CurrentJoyPOV <= 31500) Then
                 if(CurrentJoyX < CenterX[JoyNum] - CenterX[JoyNum] * 0.3 ||
                    (CurrentJoyPOV >= 22500 && CurrentJoyPOV <= 31500)) {
@@ -329,12 +335,201 @@ void UpdateControls()
     }
 }
 
-bool StartJoystick(int JoystickNumber)
+
+int InitJoysticks()
 {
-    return false; // WIP
+    SDL_JoystickEventState(SDL_ENABLE);
+    int num = SDL_NumJoysticks();
+
+    for(int i = 0; i < num; ++i)
+    {
+        SDL_Joystick *joy = SDL_JoystickOpen(i);
+        if(joy)
+        {
+            pLogDebug("==========================");
+            pLogDebug("Josytick %s", SDL_JoystickName(joy));
+            pLogDebug("--------------------------");
+            pLogDebug("Axes:    %d", SDL_JoystickNumAxes(joy));
+            pLogDebug("Balls:   %d", SDL_JoystickNumBalls(joy));
+            pLogDebug("Hats:    %d", SDL_JoystickNumHats(joy));
+            pLogDebug("Buttons: %d", SDL_JoystickNumButtons(joy));
+            if(SDL_IsGameController(i))
+                pLogDebug("Supported by the game controller interface!");
+            pLogDebug("==========================");
+
+            g_joysticks.push_back(joy);
+        }
+        else
+        {
+            pLogWarning("==========================");
+            pLogWarning("Can't open joystick #%d", i);
+            pLogWarning("==========================");
+            return false;
+        }
+    }
+
+    return int(g_joysticks.size());
 }
 
-void PollJoystick()
-{
 
+bool StartJoystick(int JoystickNumber)
+{
+    Sint32 val = 0;
+    Sint16 val_initial = 0;
+    if(JoystickNumber < 0 || JoystickNumber >= int(g_joysticks.size()))
+        return false;
+
+    JoyNum = JoystickNumber;
+    SDL_Joystick *joy = g_joysticks[size_t(JoystickNumber)];
+    if(joy)
+    {
+        int balls = SDL_JoystickNumBalls(joy);
+        int hats = SDL_JoystickNumHats(joy);
+        int buttons = SDL_JoystickNumButtons(joy);
+        int axes = SDL_JoystickNumAxes(joy);
+
+        pLogDebug("==========================");
+        pLogDebug("Josytick %s", SDL_JoystickName(joy));
+        pLogDebug("--------------------------");
+        pLogDebug("Axes:    %d", axes);
+        pLogDebug("Balls:   %d", balls);
+        pLogDebug("Hats:    %d", hats);
+        pLogDebug("Buttons: %d", buttons);
+        if(SDL_IsGameController(JoystickNumber))
+            pLogDebug("Supported by the game controller interface!");
+        pLogDebug("==========================");
+
+        CenterX[JoystickNumber] = 0;
+        CenterY[JoystickNumber] = 0;
+        CurrentJoyX = 0;
+        CurrentJoyY = 0;
+        CurrentJoyPOV = -1;
+
+        for(int i = 0; i < axes; i++)
+        {
+            val_initial = 0;
+            val = 0;
+            //Note: The SDL 2.0.6 and higher is requires to support this function
+            if(SDL_JoystickGetAxisInitialState(joy, i, &val_initial) == SDL_FALSE)
+                break;
+            val = SDL_JoystickGetAxis(joy, i);
+            if(i == 0)
+            {
+                CenterX[JoystickNumber] = val_initial;
+                CurrentJoyX = val;
+            }
+            else if(i == 1)
+            {
+                CenterY[JoystickNumber] = val_initial;
+                CurrentJoyY = val;
+            }
+        }
+
+        for(int i = 0; i < buttons && i < 255; i++)
+        {
+            val = SDL_JoystickGetButton(joy, i);
+            JoyButtons[i] = (val != 0);
+        }
+
+        return true;
+    }
+    else
+    {
+        pLogWarning("==========================");
+        pLogWarning("Can't open joystick #%d", JoystickNumber);
+        pLogWarning("==========================");
+        return false;
+    }
+}
+
+void PollJoystick(int joystick)
+{
+    Sint32 val = 0;
+//    int dx = 0, dy = 0;
+
+    if(joystick < 0 || joystick >= int(g_joysticks.size()))
+        return;
+
+    SDL_Joystick *joy = g_joysticks[size_t(joystick)];
+
+//    int balls = SDL_JoystickNumBalls(joy);
+    int buttons = SDL_JoystickNumButtons(joy);
+    int axes = SDL_JoystickNumAxes(joy);
+    int hats = SDL_JoystickNumHats(joy);
+
+    // Reset to zero until scan
+    CurrentJoyX = 0;
+    CurrentJoyY = 0;
+
+    for(int i = 0; i < hats; ++i) // scan hats first
+    {
+        val = SDL_JoystickGetHat(joy, i);
+        switch(val)
+        {
+        default:
+        case SDL_HAT_CENTERED:
+            CurrentJoyX = 0;
+            CurrentJoyY = 0;
+            break;
+        case SDL_HAT_LEFT:
+            CurrentJoyX = -1;
+            CurrentJoyY = 0;
+            break;
+        case SDL_HAT_RIGHT:
+            CurrentJoyX = 1;
+            CurrentJoyY = 0;
+            break;
+        case SDL_HAT_UP:
+            CurrentJoyX = 0;
+            CurrentJoyY = -1;
+            break;
+        case SDL_HAT_DOWN:
+            CurrentJoyX = 0;
+            CurrentJoyY = 1;
+            break;
+        case SDL_HAT_LEFTUP:
+            CurrentJoyX = -1;
+            CurrentJoyY = -1;
+            break;
+        case SDL_HAT_LEFTDOWN:
+            CurrentJoyX = -1;
+            CurrentJoyY = 1;
+            break;
+        case SDL_HAT_RIGHTUP:
+            CurrentJoyX = 1;
+            CurrentJoyY = -1;
+            break;
+        case SDL_HAT_RIGHTDOWN:
+            CurrentJoyX = 1;
+            CurrentJoyY = 1;
+            break;
+        }
+
+        if(CurrentJoyX != 0 || CurrentJoyY != 0)
+            break;
+    }
+
+    if(CurrentJoyX == 0 || CurrentJoyY == 0) // Scan axes if no hats toggled
+    {
+        for(int i = 0; i < axes; ++i)
+        {
+            val = SDL_JoystickGetAxis(joy, i);
+            if(i == 0)
+            {
+                CurrentJoyX = val;
+            }
+            else if(i == 1)
+            {
+                CurrentJoyY = val;
+            }
+            else
+                break;
+        }
+    }
+
+    for(int i = 0; i < buttons && i < 255; i++) // Scan buttons
+    {
+        val = SDL_JoystickGetButton(joy, i);
+        JoyButtons[i] = (val != 0);
+    }
 }

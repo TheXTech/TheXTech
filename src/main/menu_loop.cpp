@@ -1305,7 +1305,8 @@ void MenuLoop()
                 else if(getNewJoystick)
                 {
                     JoyNum = useJoystick[MenuMode - 30] - 1;
-                    PollJoystick();
+                    SDL_JoystickUpdate();
+                    PollJoystick(useJoystick[MenuMode - 30] - 1);
                     if(JoyButtons[oldJumpJoy] == true)
                     {
                     }

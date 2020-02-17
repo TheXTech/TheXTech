@@ -98,7 +98,7 @@ extern RangeArr<long, 0, 7> CenterX;
 // Public CenterY(0 To 7) As Long
 extern RangeArr<long, 0, 7> CenterY;
 // Public JoyButtons(-15 To 15) As Boolean
-extern RangeArr<bool, -15, 15> JoyButtons;
+extern RangeArr<bool, -255, 255> JoyButtons;
 // Public CurrentJoyX As Long
 extern long CurrentJoyX;
 // Public CurrentJoyY As Long
@@ -110,10 +110,12 @@ extern long CurrentJoyPOV;
 // Public Sub UpdateControls() 'Gets players controls
 // Gets players controls
 void UpdateControls();
+
+int InitJoysticks();
 // Public Function StartJoystick(Optional ByVal JoystickNumber As Integer = 0) As Boolean
 bool StartJoystick(int JoystickNumber);
 // Public Sub PollJoystick()
-void PollJoystick();
+void PollJoystick(int joystick);
 
 
 #endif // JOYSTICK_H
