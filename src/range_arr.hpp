@@ -39,6 +39,7 @@ class RangeArr
     static constexpr size_t size = (range_diff < 0 ? -range_diff : range_diff) + 1;
     static const long offset = -begin;
     T array[size];
+
 public:
     RangeArr()
     {}
@@ -50,6 +51,50 @@ public:
     }
 
     RangeArr& operator=(const RangeArr &o)
+    {
+        for(size_t i = 0; i < size; i++)
+            array[i] = o.array[i];
+        return *this;
+    }
+
+    void fill(const T &o)
+    {
+        for(size_t i = 0; i < size; i++)
+            array[i] = o;
+    }
+
+    T& operator[](long index)
+    {
+        SDL_assert_release(index <= end);
+        SDL_assert_release(index >= begin);
+        SDL_assert_release(offset + index < static_cast<long>(size));
+        SDL_assert_release(offset + index >= 0);
+        return array[offset + index];
+    }
+};
+
+template <class T, long begin, long end, T defaultValue>
+class RangeArrI
+{
+    static constexpr long range_diff = begin - end;
+    static constexpr size_t size = (range_diff < 0 ? -range_diff : range_diff) + 1;
+    static const long offset = -begin;
+    T array[size];
+
+public:
+    RangeArrI()
+    {
+        for(size_t i = 0; i < size; i++)
+            array[i] = defaultValue;
+    }
+
+    RangeArrI(const RangeArrI &o)
+    {
+        for(size_t i = 0; i < size; i++)
+            array[i] = o.array[i];
+    }
+
+    RangeArrI& operator=(const RangeArrI &o)
     {
         for(size_t i = 0; i < size; i++)
             array[i] = o.array[i];
