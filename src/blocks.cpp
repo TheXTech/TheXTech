@@ -1743,6 +1743,7 @@ void UpdateBlocks()
             Block[iBlock[A]].ShakeY2 = Block[iBlock[A]].ShakeY2 + 2;
             Block[iBlock[A]].ShakeY3 = Block[iBlock[A]].ShakeY3 - 2;
         }
+
         if(Block[iBlock[A]].ShakeY3 != 0)
         {
             for(auto B = 1; B <= numNPCs; B++)
@@ -1787,7 +1788,7 @@ void UpdateBlocks()
                         {
                             if(BlockIsSizable[Block[iBlock[A]].Type] == false && BlockOnlyHitspot1[Block[iBlock[A]].Type] == false)
                             {
-                                Player[B].Location.SpeedY = Physics.PlayerJumpVelocity;
+                                Player[B].Location.SpeedY = double(Physics.PlayerJumpVelocity);
                                 Player[B].StandUp = true;
                                 PlaySound(2);
                             }
@@ -1795,7 +1796,7 @@ void UpdateBlocks()
                             {
                                 if(Block[iBlock[A]].Location.Y + 1 >= Player[B].Location.Y + Player[B].Location.Height - 1)
                                 {
-                                    Player[B].Location.SpeedY = Physics.PlayerJumpVelocity;
+                                    Player[B].Location.SpeedY = double(Physics.PlayerJumpVelocity);
                                     Player[B].StandUp = true;
                                     PlaySound(2);
                                 }
@@ -1805,6 +1806,7 @@ void UpdateBlocks()
                 }
             }
         }
+
         if(Block[iBlock[A]].Kill == true) // See if block should be broke
         {
             Block[iBlock[A]].Kill = false;

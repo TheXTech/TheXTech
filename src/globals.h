@@ -82,6 +82,20 @@ static SDL_INLINE double dRand()
     return static_cast <double>(std::rand()) / static_cast<double>(RAND_MAX);
 }
 
+static SDL_INLINE bool fEqual(double a, double b)
+{
+    Sint64 ai = Sint64(a * 1000000.0);
+    Sint64 bi = Sint64(b * 1000000.0);
+    return ai == bi;
+}
+
+static SDL_INLINE bool fEqual(float a, float b)
+{
+    Sint64 ai = Sint64(a * 10000.0f);
+    Sint64 bi = Sint64(b * 10000.0f);
+    return ai == bi;
+}
+
 //'Saved Events
 //Public Const MaxSavedEvents As Integer = 200
 const int MaxSavedEvents = 200;

@@ -350,6 +350,7 @@ void ProcEvent(std::string EventName, bool NoEffect)
                             // End If
                         }
                     }
+
                     if(Events[A].Name != "Level - Start")
                     {
                         C = plr;
@@ -395,6 +396,7 @@ void ProcEvent(std::string EventName, bool NoEffect)
                             qScreenX[1] = vScreenX[1];
                             qScreenY[1] = vScreenY[1];
                         }
+
                         overTime = 0;
                         GoalTime = SDL_GetTicks() + 1000;
                         fpsCount = 0;
@@ -532,7 +534,7 @@ void ProcEvent(std::string EventName, bool NoEffect)
                 }
                 else
                 {
-                    newEventNum = newEventNum + 1;
+                    newEventNum++;
                     NewEvent[newEventNum] = Events[A].TriggerEvent;
                     newEventDelay[newEventNum] = Events[A].TriggerDelay * 6.5;
                 }
@@ -564,13 +566,13 @@ void UpdateEvents()
         for(A = 1; A <= newEventNum; A++)
         {
             if(newEventDelay[A] > 0)
-                newEventDelay[A] = newEventDelay[A] - 1;
+                newEventDelay[A]--;
             else
             {
                 ProcEvent(NewEvent[A]);
                 newEventDelay[A] = newEventDelay[newEventNum];
                 NewEvent[A] = NewEvent[newEventNum];
-                newEventNum = newEventNum - 1;
+                newEventNum--;
             }
         }
     }
@@ -677,10 +679,10 @@ void UpdateLayers()
                                 BlocksSorted = false;
                             }
                         }
-                        Block[B].Location.X = Block[B].Location.X + Layer[A].SpeedX;
-                        Block[B].Location.Y = Block[B].Location.Y + Layer[A].SpeedY;
-                        Block[B].Location.SpeedX = Layer[A].SpeedX;
-                        Block[B].Location.SpeedY = Layer[A].SpeedY;
+                        Block[B].Location.X += double(Layer[A].SpeedX);
+                        Block[B].Location.Y += double(Layer[A].SpeedY);
+                        Block[B].Location.SpeedX = double(Layer[A].SpeedX);
+                        Block[B].Location.SpeedY = double(Layer[A].SpeedY);
                     }
                 }
 
@@ -689,8 +691,8 @@ void UpdateLayers()
                 {
                     if(Background[B].Layer == Layer[A].Name)
                     {
-                        Background[B].Location.X = Background[B].Location.X + Layer[A].SpeedX;
-                        Background[B].Location.Y = Background[B].Location.Y + Layer[A].SpeedY;
+                        Background[B].Location.X += double(Layer[A].SpeedX);
+                        Background[B].Location.Y += double(Layer[A].SpeedY);
                     }
                 }
 
@@ -698,8 +700,8 @@ void UpdateLayers()
                 {
                     if(Water[B].Layer == Layer[A].Name)
                     {
-                        Water[B].Location.X = Water[B].Location.X + Layer[A].SpeedX;
-                        Water[B].Location.Y = Water[B].Location.Y + Layer[A].SpeedY;
+                        Water[B].Location.X += double(Layer[A].SpeedX);
+                        Water[B].Location.Y += double(Layer[A].SpeedY);
                     }
                 }
 
@@ -707,42 +709,50 @@ void UpdateLayers()
                 {
                     if(NPC[B].Layer == Layer[A].Name)
                     {
-                        NPC[B].DefaultLocation.X = NPC[B].DefaultLocation.X + Layer[A].SpeedX;
-                        NPC[B].DefaultLocation.Y = NPC[B].DefaultLocation.Y + Layer[A].SpeedY;
-                        if(NPC[B].Active == false || NPC[B].Generator == true || NPC[B].Effect != 0 || NPCIsACoin[NPC[B].Type] || NPC[B].Type == 8 || NPC[B].Type == 37 || NPC[B].Type == 51 || NPC[B].Type == 52 || NPC[B].Type == 46 || NPC[B].Type == 93 || NPC[B].Type == 74 || NPCIsAVine[NPC[B].Type] || NPC[B].Type == 192 || NPC[B].Type == 197 || NPC[B].Type == 91 || NPC[B].Type == 211 || NPC[B].Type == 256 || NPC[B].Type == 257 || NPC[B].Type == 245)
+                        NPC[B].DefaultLocation.X += double(Layer[A].SpeedX);
+                        NPC[B].DefaultLocation.Y += double(Layer[A].SpeedY);
+
+                        if(!NPC[B].Active || NPC[B].Generator || NPC[B].Effect != 0 ||
+                           NPCIsACoin[NPC[B].Type] || NPC[B].Type == 8 || NPC[B].Type == 37 ||
+                           NPC[B].Type == 51 || NPC[B].Type == 52 || NPC[B].Type == 46 ||
+                           NPC[B].Type == 93 || NPC[B].Type == 74 || NPCIsAVine[NPC[B].Type] ||
+                           NPC[B].Type == 192 || NPC[B].Type == 197 || NPC[B].Type == 91 ||
+                           NPC[B].Type == 211 || NPC[B].Type == 256 || NPC[B].Type == 257 ||
+                           NPC[B].Type == 245)
                         {
                             if(NPC[B].Type == 91 || NPC[B].Type == 211)
                             {
-                                NPC[B].Location.SpeedX = Layer[A].SpeedX;
-                                NPC[B].Location.SpeedY = Layer[A].SpeedY;
+                                NPC[B].Location.SpeedX = double(Layer[A].SpeedX);
+                                NPC[B].Location.SpeedY = double(Layer[A].SpeedY);
                             }
-                            else if(NPCIsAVine[NPC[B].Type] == true)
+                            else if(NPCIsAVine[NPC[B].Type])
                             {
-                                NPC[B].Location.SpeedX = Layer[A].SpeedX;
-                                NPC[B].Location.SpeedY = Layer[A].SpeedY;
+                                NPC[B].Location.SpeedX = double(Layer[A].SpeedX);
+                                NPC[B].Location.SpeedY = double(Layer[A].SpeedY);
                             }
 
                             if(!NPC[B].Active)
                             {
                                 NPC[B].Location.X = NPC[B].DefaultLocation.X;
                                 NPC[B].Location.Y = NPC[B].DefaultLocation.Y;
-                                if(NPC[B].Type == 8 || NPC[B].Type == 74 || NPC[B].Type == 93 || NPC[B].Type == 256 || NPC[B].Type == 245)
-                                    NPC[B].Location.Y = NPC[B].Location.Y + NPC[B].DefaultLocation.Height;
+                                if(NPC[B].Type == 8 || NPC[B].Type == 74 || NPC[B].Type == 93 ||
+                                   NPC[B].Type == 256 || NPC[B].Type == 245)
+                                    NPC[B].Location.Y += NPC[B].DefaultLocation.Height;
                                 else if(NPC[B].Type == 52 && NPC[B].Direction == -1)
-                                    NPC[B].Location.X = NPC[B].Location.X + NPC[B].DefaultLocation.Width;
+                                    NPC[B].Location.X += NPC[B].DefaultLocation.Width;
                             }
                             else
                             {
-                                NPC[B].Location.X = NPC[B].Location.X + Layer[A].SpeedX;
-                                NPC[B].Location.Y = NPC[B].Location.Y + Layer[A].SpeedY;
+                                NPC[B].Location.X += double(Layer[A].SpeedX);
+                                NPC[B].Location.Y += double(Layer[A].SpeedY);
                             }
 
                             if(NPC[B].Effect == 4)
                             {
                                 if(NPC[B].Effect3 == 1 || NPC[B].Effect3 == 3)
-                                    NPC[B].Effect2 = NPC[B].Effect2 + Layer[A].SpeedY;
+                                    NPC[B].Effect2 += double(Layer[A].SpeedY);
                                 else
-                                    NPC[B].Effect2 = NPC[B].Effect2 + Layer[A].SpeedX;
+                                    NPC[B].Effect2 += double(Layer[A].SpeedX);
                             }
 
                             if(!NPC[B].Active)
@@ -767,10 +777,10 @@ void UpdateLayers()
                 {
                     if(Warp[B].Layer == Layer[A].Name)
                     {
-                        Warp[B].Entrance.X = Warp[B].Entrance.X + Layer[A].SpeedX;
-                        Warp[B].Entrance.Y = Warp[B].Entrance.Y + Layer[A].SpeedY;
-                        Warp[B].Exit.X = Warp[B].Exit.X + Layer[A].SpeedX;
-                        Warp[B].Exit.Y = Warp[B].Exit.Y + Layer[A].SpeedY;
+                        Warp[B].Entrance.X += double(Layer[A].SpeedX);
+                        Warp[B].Entrance.Y += double(Layer[A].SpeedY);
+                        Warp[B].Exit.X += double(Layer[A].SpeedX);
+                        Warp[B].Exit.Y += double(Layer[A].SpeedY);
                     }
                 }
             }

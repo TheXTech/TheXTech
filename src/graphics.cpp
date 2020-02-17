@@ -2253,13 +2253,15 @@ void UpdateGraphics()
                 {
                     if(Player[A].ShowWarp > 0)
                     {
-                        std::string tempString = "";
+                        std::string tempString;
                         if(Warp[Player[A].ShowWarp].maxStars > 0 && Player[A].Mount != 2)
                         {
                             tempString = fmt::format_ne("{0}/{0}", Warp[Player[A].ShowWarp].curStars, Warp[Player[A].ShowWarp].maxStars);
                             frmMain.renderTexture(Player[A].Location.X + Player[A].Location.Width / 2.0 + vScreenX[Z] - tempString.length() * 9, Player[A].Location.Y + Player[A].Location.Height - 96 + vScreenY[Z] + 1, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
                             frmMain.renderTexture(Player[A].Location.X + Player[A].Location.Width / 2.0 + vScreenX[Z] - tempString.length() * 9 - 20, Player[A].Location.Y + Player[A].Location.Height - 96 + vScreenY[Z], GFX.Interface[5].w, GFX.Interface[5].h, GFX.Interface[5], 0, 0);
-                            SuperPrint(tempString, 3, Player[A].Location.X + Player[A].Location.Width / 2.0 + vScreenX[Z] - tempString.length() * 9 + 18, Player[A].Location.Y + Player[A].Location.Height - 96 + vScreenY[Z]);
+                            SuperPrint(tempString, 3,
+                                       float(Player[A].Location.X + Player[A].Location.Width / 2.0 + vScreenX[Z] - tempString.length() * 9 + 18),
+                                       float(Player[A].Location.Y + Player[A].Location.Height - 96 + vScreenY[Z]));
                         }
                     }
                 }
