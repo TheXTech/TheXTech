@@ -176,6 +176,8 @@ void SetMusicVolume(std::string Alias, long Volume)
 
 void SoundPauseAll()
 {
+    if(noSound)
+        return;
     pLogDebug("Pause all sound");
     Mix_Pause(-1);
     Mix_PauseMusic();
@@ -183,6 +185,8 @@ void SoundPauseAll()
 
 void SoundResumeAll()
 {
+    if(noSound)
+        return;
     pLogDebug("Resume all sound");
     Mix_Resume(-1);
     Mix_ResumeMusic();
@@ -190,6 +194,8 @@ void SoundResumeAll()
 
 void PlayMusic(std::string Alias)
 {
+    if(noSound)
+        return;
     if(g_curMusic)
     {
         Mix_HaltMusic();

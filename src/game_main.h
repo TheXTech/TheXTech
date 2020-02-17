@@ -28,8 +28,6 @@
 
 #include "globals.h"
 
-bool FileExists(const std::string &fileName);
-
 void SetupPhysics();
 
 void initAll();

@@ -65,7 +65,8 @@ int EditorNPCFrame(int A, float C, int N)
                                  std::abs(NPC[N].Location.Y + NPC[N].Location.Height / 2.0 -
                                           (Player[D].Location.Y + Player[D].Location.Height / 2.0)) < D)
                     {
-                        E = std::abs(NPC[N].Location.X + NPC[N].Location.Width / 2.0 - (Player[D].Location.X + Player[D].Location.Width / 2.0)) + Abs(NPC[N].Location.Y + NPC[N].Location.Height / 2.0 - (Player[D].Location.Y + Player[D].Location.Height / 2.0));
+                        E = CInt(std::abs(NPC[N].Location.X + NPC[N].Location.Width / 2.0 - (Player[D].Location.X + Player[D].Location.Width / 2.0)) +
+                                 std::abs(NPC[N].Location.Y + NPC[N].Location.Height / 2.0 - (Player[D].Location.Y + Player[D].Location.Height / 2.0)));
                         if(Player[D].Character == 5)
                             ret = 1;
                         else

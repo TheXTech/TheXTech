@@ -3660,46 +3660,10 @@ void SuperPrint(std::string SuperWords, int Font, float X, float Y,
 
 void SetRes()
 {
-    GetCurrentRes();
+//    GetCurrentRes(); // Dummy, useless
     resChanged = true;
     ChangeRes(800, 600, 16, 60); // 800x600 pixels, 16 bit Color, 60Hz
     ShowCursor(0);
-}
-
-std::string CheckKey(std::string newStrizzle)
-{
-    return newStrizzle; // DUMMY
-//    CheckKey = newStrizzle
-//    If newStrizzle = Chr(vbKeyUp) Then CheckKey = "UP"
-//    If newStrizzle = Chr(vbKeyDown) Then CheckKey = "DOWN"
-//    If newStrizzle = Chr(vbKeyLeft) Then CheckKey = "LEFT"
-//    If newStrizzle = Chr(vbKeyRight) Then CheckKey = "RIGHT"
-//    If newStrizzle = Chr(vbKeyEscape) Then CheckKey = "ESCAPE"
-//    If newStrizzle = Chr(vbKeyShift) Then CheckKey = "SHIFT"
-//    If newStrizzle = Chr(vbKeyReturn) Then CheckKey = "RETURN"
-//    If newStrizzle = Chr(vbKeyControl) Then CheckKey = "CONTROL"
-//    If newStrizzle = Chr(vbKeySpace) Then CheckKey = "SPACE"
-//    If newStrizzle = Chr(vbKeyMenu) Then CheckKey = "ALT"
-//    If newStrizzle = Chr(vbKeyF1) Then CheckKey = "F1"
-//    If newStrizzle = Chr(vbKeyF2) Then CheckKey = "F2"
-//    If newStrizzle = Chr(vbKeyF3) Then CheckKey = "F3"
-//    If newStrizzle = Chr(vbKeyF4) Then CheckKey = "F4"
-//    If newStrizzle = Chr(vbKeyF5) Then CheckKey = "F5"
-//    If newStrizzle = Chr(vbKeyF6) Then CheckKey = "F6"
-//    If newStrizzle = Chr(vbKeyF7) Then CheckKey = "F7"
-//    If newStrizzle = Chr(vbKeyF8) Then CheckKey = "F8"
-//    If newStrizzle = Chr(vbKeyF9) Then CheckKey = "F9"
-//    If newStrizzle = Chr(vbKeyF10) Then CheckKey = "F10"
-//    If newStrizzle = Chr(vbKeyF11) Then CheckKey = "F11"
-//    If newStrizzle = Chr(vbKeyF12) Then CheckKey = "F12"
-//    If newStrizzle = Chr(vbKeyBack) Then CheckKey = "BACKSPACE"
-//    If newStrizzle = Chr(vbKeyTab) Then CheckKey = "TAB"
-//    If newStrizzle = Chr(vbKeyInsert) Then CheckKey = "INSERT"
-//    If newStrizzle = Chr(vbKeyDelete) Then CheckKey = "DELETE"
-//    If newStrizzle = Chr(vbKeyHome) Then CheckKey = "HOME"
-//    If newStrizzle = Chr(vbKeyEnd) Then CheckKey = "END"
-//    If newStrizzle = Chr(vbKeyPageUp) Then CheckKey = "PAGE UP"
-//    If newStrizzle = Chr(vbKeyPageDown) Then CheckKey = "PAGE DOWN"
 }
 
 /*Private*/

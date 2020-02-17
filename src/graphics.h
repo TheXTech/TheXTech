@@ -61,7 +61,7 @@ void SuperPrint(std::string SuperWords, int Font, float X, float Y, float r = 1.
 // Public Sub SetRes()
 void SetRes();
 // Public Function CheckKey(newStrizzle As String) As String
-std::string CheckKey(std::string newStrizzle);
+//std::string CheckKey(std::string newStrizzle); // USELESS
 // Private Sub SpecialFrames() 'update frames for special things such as coins and kuribo's shoe
 // update frames for special things such as coins and kuribo's shoe
 

@@ -51,17 +51,6 @@ void CheckActive();
 // set up sizable blocks
 void SizableBlocks();
 
-bool FileExists(const std::string &fileName)
-{
-    SDL_RWops*test = SDL_RWFromFile(fileName.c_str(), "rb");
-    if(test)
-    {
-        SDL_FreeRW(test);
-        return true;
-    }
-    return false;
-}
-
 // game_main_setupphysics.cpp
 
 int GameMain(int argc, char**argv)
@@ -75,10 +64,16 @@ int GameMain(int argc, char**argv)
     EoT = "";
     std::srand(static_cast<unsigned int>(std::time(nullptr)));
     FrameSkip = false;
+
+    // [ !Here was a starting dialog! ]
+
+    // TODO: Use TClap to handle command line arguments like "--no-frame-skip and --no-sound" and something also
+
 //    frmLoader.Show 'show the Splash screen
 //    Do
 //        DoEvents
 //    Loop While StartMenu = False 'wait until the player clicks a button
+
     StartMenu = true;
     FrameSkip = false;
     noSound = false;
@@ -113,743 +108,483 @@ int GameMain(int argc, char**argv)
 
     InitSound(); // Setup sound effects
     LevelSelect = true; // world map is to be shown
-//    DoEvents
     DoEvents();
-//    SetupPhysics 'Setup Physics
     SetupPhysics(); // Setup Physics
-//    SetupGraphics 'setup graphics
     SetupGraphics(); // setup graphics
 //    Load GFX 'load the graphics form
 //    GFX.load(); // load the graphics form // Moved to before sound load
-//    SizableBlocks
     SizableBlocks();
-//    LoadGFX 'load the graphics from file
     LoadGFX(); // load the graphics from file
-//    SetupVars 'Setup Variables
     SetupVars(); //Setup Variables
-//    frmMain.AutoRedraw = False
-//    frmMain.Picture = GFX.Picture
-//    frmMain.LoadCoin.Visible = False
-//    frmMain.Loader.Visible = False
 
     GameIsActive = true;
-//    Do
     do
     {
-//        If GameMenu = True Then
         if(GameMenu)
         {
-//            frmMain.MousePointer = 99
             frmMain.MousePointer = 99;
             ShowCursor(0);
         }
-//        ElseIf resChanged = False And TestLevel = False And LevelEditor = False Then
         else if(!resChanged && !TestLevel && !LevelEditor)
         {
-//            frmMain.MousePointer = 0
             frmMain.MousePointer = 0;
             ShowCursor(1);
-//        End If
         }
 
 //        If LevelEditor = True Then 'Load the level editor
+//            [USELESS!]
 
-//        ElseIf GameOutro = True Then 'SMBX Credits
         if(GameOutro) // SMBX Credits
         {
-//            ShadowMode = False
             ShadowMode = false;
-//            GodMode = False
             GodMode = false;
-//            GrabAll = False
             GrabAll= false;
-//            CaptainN = False
             CaptainN = false;
-//            FlameThrower = False
             FlameThrower = false;
-//            FreezeNPCs = False
             FreezeNPCs = false;
-//            WalkAnywhere = False
             WalkAnywhere = false;
-//            MultiHop = False
             MultiHop = false;
-//            SuperSpeed = False
             SuperSpeed = false;
-//            FlyForever = False
             FlyForever = false;
-//            For A = 1 To maxPlayers
+
             for(int A = 1; A <= maxPlayers; A++)
             {
-//                Player(A) = blankPlayer
                 Player[A] = blankPlayer;
-//            Next A
             }
-//            numPlayers = 5
+
             numPlayers = 5;
-//            GameMenu = False
             GameMenu = false;
-//            StopMusic
             StopMusic();
-//            OpenLevel App.Path & "\outro.lvl"
             OpenLevel(AppPath + "outro.lvl");
-//            ScreenType = 7
             ScreenType = 7;
-//            SetupScreens
             SetupScreens();
-//            ClearBuffer = True
             ClearBuffer = true;
-//            For A = 1 To numPlayers
+
             for(int A = 1; A <= numPlayers; ++A)
             {
-//                With Player(A)
                 Player_t &p = Player[A];
-//                    If A = 1 Then
-                if(A == 1)
-//                        .State = 4
-                    p.State = 4;
-//                    ElseIf A = 2 Then
-                else if(A == 2)
-//                        .State = 7
-                    p.State = 7;
-//                    ElseIf A = 3 Then
-                else if(A == 3)
-//                        .State = 5
-                    p.State = 5;
-//                    ElseIf A = 4 Then
-                else if(A == 4)
-//                        .State = 3
-                    p.State = 3;
-//                    Else
-                else
-//                        .State = 6
-                    p.State = 6;
-//                    End If
 
-//                    If A = 4 Then
+                if(A == 1)
+                    p.State = 4;
+                else if(A == 2)
+                    p.State = 7;
+                else if(A == 3)
+                    p.State = 5;
+                else if(A == 4)
+                    p.State = 3;
+                else
+                    p.State = 6;
+
                 if(A == 4)
                 {
-//                        .Mount = 1
                     p.Mount = 1;
-//                        .MountType = Int(Rnd * 3) + 1
                     p.MountType = int(std::rand() % 3) + 1;
-//                    End If
                 }
-//                    .Character = A
+
                 p.Character = A;
-//                    If A = 2 Then
                 if(A == 2)
                 {
-//                        .Mount = 3
                     p.Mount = 3;
-//                        .MountType = Int(Rnd * 8) + 1
                     p.MountType = int(std::rand() % 8) + 1;
-//                    End If
                 }
-//                    .HeldBonus = 0
+
                 p.HeldBonus = 0;
-//                    .Section = 0
                 p.Section = 0;
-//                    .Location.Height = Physics.PlayerHeight(.Character, .State)
                 p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
-//                    .Location.Width = Physics.PlayerWidth(.Character, .State)
                 p.Location.Width = Physics.PlayerWidth[p.Character][p.State];
-//                End With
-//            Next A
             }
-//            SetupPlayers
+
             SetupPlayers();
-//            CreditChop = 300 '100
             CreditChop = 300; // 100
-//            EndCredits = 0
             EndCredits = 0;
-//            SetupCredits
             SetupCredits();
-//            overTime = 0
             overTime = 0;
-//            GoalTime = GetTickCount + 1000
             GoalTime = SDL_GetTicks() + 1000;
-//            fpsCount = 0
             fpsCount = 0;
-//            fpsTime = 0
             fpsTime = 0;
-//            cycleCount = 0
             cycleCount = 0;
-//            gameTime = 0
             gameTime = 0;
-//            Do
+
             do
             {
-//                DoEvents
                 DoEvents();
-//                tempTime = GetTickCount
                 tempTime = SDL_GetTicks();
-//                ScreenType = 0
                 ScreenType = 0;
-//                SetupScreens
                 SetupScreens();
-//                If tempTime >= gameTime + frameRate Or tempTime < gameTime Then
                 if(tempTime >= gameTime + frameRate || tempTime < gameTime)
                 {
-//                    CheckActive
                     CheckActive();
-//                    OutroLoop
                     OutroLoop();
-//                    If fpsCount >= 32000 Then fpsCount = 0 'Fixes Overflow bug
-                    if(fpsCount >= 32000) fpsCount = 0; // Fixes Overflow bug
-//                    If cycleCount >= 32000 Then cycleCount = 0 'Fixes Overflow bug
-                    if(cycleCount >= 32000) cycleCount = 0; // Fixes Overflow bug
-//                    overTime = overTime + (tempTime - (gameTime + frameRate))
+
+                    if(fpsCount >= 32000)
+                        fpsCount = 0; // Fixes Overflow bug
+
+                    if(cycleCount >= 32000)
+                        cycleCount = 0; // Fixes Overflow bug
+
                     overTime = overTime + (tempTime - (gameTime + frameRate));
-//                    If gameTime = 0 Then overTime = 0
-                    if(gameTime == 0.0) overTime = 0;
-//                    If overTime <= 1 Then
-                    if(overTime <= 1)
-                    {
-//                        overTime = 0
+
+                    if(gameTime == 0.0)
                         overTime = 0;
-                    }
-//                    ElseIf overTime > 1000 Then
+
+                    if(overTime <= 1)
+                        overTime = 0;
                     else if(overTime > 1000)
-                    {
-//                        overTime = 1000
                         overTime = 1000;
-//                    End If
-                    }
-//                    gameTime = tempTime - overTime
+
                     gameTime = tempTime - overTime;
-//                    overTime = (overTime - (tempTime - gameTime))
                     overTime = (overTime - (tempTime - gameTime));
-//                    DoEvents
                     DoEvents();
-//                    If GetTickCount > fpsTime Then
                     if(SDL_GetTicks() > fpsTime)
                     {
-//                        If cycleCount >= 65 Then
                         if(cycleCount >= 65)
                         {
-//                            overTime = 0
                             overTime = 0;
-//                            gameTime = tempTime
                             gameTime = 0;
-//                        End If
                         }
-//                        cycleCount = 0
+
                         cycleCount = 0;
-//                        fpsTime = GetTickCount + 1000
                         fpsTime = SDL_GetTicks() + 1000;
-//                        GoalTime = fpsTime
                         GoalTime = fpsTime;
 //                        If Debugger = True Then frmLevelDebugger.lblFPS = fpsCount
-//                        If ShowFPS = True Then
+
                         if(ShowFPS)
                         {
-//                            PrintFPS = fpsCount
                             PrintFPS = fpsCount;
-//                        End If
                         }
-//                        fpsCount = 0
                         fpsCount = 0;
-//                    End If
                     }
-//                End If
                 }
 
                 SDL_Delay(1);
                 if(!GameIsActive) break;// Break on quit
-//            Loop While GameOutro = True
             } while(GameOutro);
         }
-//        ElseIf GameMenu = True Then 'The Game Menu
-        else if(GameMenu) // The Game Menu
+
+        // The Game Menu
+        else if(GameMenu)
         {
-//            BattleIntro = 0
             BattleIntro = 0;
-//            BattleOutro = 0
             BattleOutro = 0;
-//            AllCharBlock = 0
             AllCharBlock = 0;
-//            Cheater = False
             Cheater = false;
-//            For A = 1 To maxPlayers
+
             for(int A = 1; A <= maxPlayers; ++A)
             {
-//                OwedMount(A) = 0
                 OwedMount[A] = 0;
-//                OwedMountType(A) = 0
                 OwedMountType[A] = 0;
-//            Next A
             }
-//            MenuMouseMove = False
+
             MenuMouseMove = false;
-//            MenuMouseRelease = False
             MenuMouseRelease = false;
-//            MenuMouseClick = False
             MenuMouseClick = false;
-//            MenuMouseBack = False
             MenuMouseBack = false;
-//            BattleMode = False
             BattleMode = false;
-//            If MenuMode <> 4 Then
+
             if(MenuMode != 4)
             {
-//                PlayerCharacter = 0
                 PlayerCharacter = 0;
-//                PlayerCharacter2 = 0
                 PlayerCharacter2 = 0;
-//            End If
             }
-//            Checkpoint = ""
+
             Checkpoint = "";
-//            WorldPlayer(1).Frame = 0
             WorldPlayer[1].Frame = 0;
-//            CheatString = ""
             CheatString = "";
-//            LevelBeatCode = 0
             LevelBeatCode = 0;
-//            curWorldLevel = 0
             curWorldLevel = 0;
-//            ClearWorld
+
             ClearWorld();
-//            ReturnWarp = 0
+
             ReturnWarp = 0;
-//            ShadowMode = False
             ShadowMode = false;
-//            GodMode = False
             GodMode = false;
-//            GrabAll = False
             GrabAll = false;
-//            CaptainN = False
             CaptainN = false;
-//            FlameThrower = False
             FlameThrower = false;
-//            FreezeNPCs = False
             FreezeNPCs = false;
-//            WalkAnywhere = False
             WalkAnywhere = false;
-//            MultiHop = False
             MultiHop = false;
-//            SuperSpeed = False
             SuperSpeed = false;
-//            FlyForever = False
             FlyForever = false;
-//            BeatTheGame = False
             BeatTheGame = false;
-//            ScreenType = 2
             ScreenType = 2;
-//            SetupScreens
+
             SetupScreens();
-//            BattleOutro = 0
+
             BattleOutro = 0;
-//            BattleIntro = 0
             BattleIntro = 0;
-//            For A = 1 To maxPlayers
+
             for(int A = 1; A <= maxPlayers; ++A)
             {
-//                Player(A) = blankPlayer
                 Player[A] = blankPlayer;
-//            Next A
             }
-//            numPlayers = 6
+
             numPlayers = 6;
-//            OpenLevel App.Path & "\intro.lvl"
             OpenLevel(AppPath + "intro.lvl");
-//            vScreenX(1) = -level(0).X
             vScreenX[1] = -level[0].X;
-//            StartMusic 0
+
             StartMusic(0);
-//            SetupPlayers
             SetupPlayers();
-//            For A = 1 To numPlayers
+
             For(A, 1, numPlayers)
             {
-//                With Player(A)
                 Player_t &p = Player[A];
-//                    .State = Int(Rnd * 6) + 2
                 p.State = int(std::rand() % 6) + 2;
-//                    .Character = Int(Rnd * 5) + 1
                 p.Character = int(std::rand() % 5) + 1;
-//                    If A >= 1 And A <= 5 Then .Character = A
+
                 if(A >= 1 && A <= 5)
                     p.Character = A;
-//                    .HeldBonus = 0
+
                 p.HeldBonus = 0;
-//                    .Section = 0
                 p.Section = 0;
-//                    .Location.Height = Physics.PlayerHeight(.Character, .State)
                 p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
-//                    .Location.Width = Physics.PlayerWidth(.Character, .State)
                 p.Location.Width = Physics.PlayerWidth[p.Character][p.State];
-//                    .Location.X = level(.Section).X + ((128 + Rnd * 64) * A)
                 p.Location.X = level[p.Section].X + ((128 + std::rand() % 64) * A);
-//                    .Location.Y = level(.Section).Height - .Location.Height - 65
                 p.Location.Y = level[p.Section].Height - p.Location.Height - 65;
-//                    Do
+
                 do
                 {
-//                        tempBool = True
                     tempBool = true;
-//                        For B = 1 To numBlock
                     for(int B = 1; B <= numBlock; ++B)
                     {
-//                            If CheckCollision(.Location, Block(B).Location) = True Then
                         if(CheckCollision(p.Location, Block[B].Location))
                         {
-//                                .Location.Y = Block(B).Location.Y - .Location.Height - 0.1
                             p.Location.Y = Block[B].Location.Y - p.Location.Height - 0.1;
-//                                tempBool = False
                             tempBool = false;
-//                            End If
                         }
-//                        Next B
                     }
-//                    Loop While tempBool = False
                 } while(!tempBool);
-//                    .Dead = True
                 p.Dead = true;
-//                End With
-//            Next A
             }
-//            ProcEvent "Level - Start", True
+
             ProcEvent("Level - Start", true);
-//            For A = 2 To 100
             For(A, 2, 100)
             {
-//                If Events(A).AutoStart = True Then ProcEvent Events(A).Name, True
                 if(Events[A].AutoStart) ProcEvent(Events[A].Name, true);
-//            Next A
             }
-//            overTime = 0
+
             overTime = 0;
-//            GoalTime = GetTickCount + 1000
             GoalTime = SDL_GetTicks() + 1000;
-//            fpsCount = 0
             fpsCount = 0;
-//            fpsTime = 0
             fpsTime = 0;
-//            cycleCount = 0
             cycleCount = 0;
-//            gameTime = 0
             gameTime = 0;
-//            Do
+
             do
             {
-//                DoEvents
                 DoEvents();
-//                tempTime = GetTickCount
                 tempTime = SDL_GetTicks();
-//                If tempTime >= gameTime + frameRate Or tempTime < gameTime Then
                 if(tempTime >= gameTime + frameRate || tempTime < gameTime)
                 {
-//                    CheckActive
                     CheckActive();
-//                    MenuLoop    'Run the menu loop
                     MenuLoop();   // Run the menu loop
-//                    If fpsCount >= 32000 Then fpsCount = 0 'Fixes Overflow bug
-                    if(fpsCount >= 32000) fpsCount = 0; // Fixes Overflow bug
-//                    If cycleCount >= 32000 Then cycleCount = 0 'Fixes Overflow bug
-                    if(cycleCount >= 32000) cycleCount = 0; // Fixes Overflow bug
-//                    overTime = overTime + (tempTime - (gameTime + frameRate))
+
+                    if(fpsCount >= 32000)
+                        fpsCount = 0; // Fixes Overflow bug
+
+                    if(cycleCount >= 32000)
+                        cycleCount = 0; // Fixes Overflow bug
+
                     overTime = overTime + (tempTime - (gameTime + frameRate));
-//                    If gameTime = 0 Then overTime = 0
-                    if(gameTime == 0.0) overTime = 0;
-//                    If overTime <= 1 Then
-                    if(overTime <= 1)
-                    {
-//                        overTime = 0
+                    if(gameTime == 0.0)
                         overTime = 0;
-                    }
-//                    ElseIf overTime > 1000 Then
+
+                    if(overTime <= 1)
+                        overTime = 0;
                     else if(overTime > 1000)
-                    {
-//                        overTime = 1000
                         overTime = 1000;
-//                    End If
-                    }
-//                    gameTime = tempTime - overTime
+
                     gameTime = tempTime - overTime;
-//                    overTime = (overTime - (tempTime - gameTime))
                     overTime = (overTime - (tempTime - gameTime));
-//                    DoEvents
+
                     DoEvents();
-//                    If GetTickCount > fpsTime Then
+
                     if(SDL_GetTicks() > fpsTime)
                     {
-//                        If cycleCount >= 65 Then
                         if(cycleCount >= 65)
                         {
-//                            overTime = 0
                             overTime = 0;
-//                            gameTime = tempTime
                             gameTime = 0;
-//                        End If
                         }
-//                        cycleCount = 0
+
                         cycleCount = 0;
-//                        fpsTime = GetTickCount + 1000
                         fpsTime = SDL_GetTicks() + 1000;
-//                        GoalTime = fpsTime
                         GoalTime = fpsTime;
 //                        If Debugger = True Then frmLevelDebugger.lblFPS = fpsCount
-//                        If ShowFPS = True Then
+
                         if(ShowFPS)
                         {
-//                            PrintFPS = fpsCount
                             PrintFPS = fpsCount;
-//                        End If
                         }
-//                        fpsCount = 0
                         fpsCount = 0;
-//                    End If
                     }
-//                End If
                 }
 
                 SDL_Delay(1);
                 if(!GameIsActive) return 0;// Break on quit
-//            Loop While GameMenu = True
+
             } while(GameMenu);
         }
-//        ElseIf LevelSelect = True Then 'World Map
+
+        // World Map
         else if(LevelSelect)
         {
-//            CheatString = ""
             CheatString = "";
-//            For A = 1 To numPlayers
             For(A, 1, numPlayers)
             {
-//                If Player(A).Mount = 0 Or Player(A).Mount = 2 Then
                 if(Player[A].Mount == 0 || Player[A].Mount == 2)
                 {
-//                    If OwedMount(A) > 0 Then
                     if(OwedMount[A] > 0)
                     {
-//                        Player(A).Mount = OwedMount(A)
                         Player[A].Mount = OwedMount[A];
-//                        If OwedMountType(A) > 0 Then
                         if(OwedMountType[A] > 0)
-//                            Player(A).MountType = OwedMountType(A)
                             Player[A].MountType = OwedMountType[A];
-//                        Else
                         else
-//                            Player(A).MountType = 1
                             Player[A].MountType = 1;
-//                        End If
-//                    End If
                     }
-//                End If
                 }
-//                OwedMount(A) = 0
                 OwedMount[A] = 0;
-//                OwedMountType(A) = 0
                 OwedMountType[A] = 0;
-//            Next A
             }
-//            LoadCustomGFX
+
             LoadCustomGFX();
-//            SetupPlayers
             SetupPlayers();
-//            If (StartLevel <> "" And NoMap = True) Or GoToLevel <> "" Then
-            if((StartLevel != "" && NoMap) || GoToLevel != "")
+
+            if((!StartLevel.empty() && NoMap) || !GoToLevel.empty())
             {
-//                If NoMap = True Then SaveGame
-                if(NoMap) SaveGame();
-//                Player(1).Vine = 0
+                if(NoMap)
+                    SaveGame();
+
                 Player[1].Vine = 0;
-//                Player(2).Vine = 0
                 Player[2].Vine = 0;
-//                PlaySound 28
+
                 PlaySound(28);
-//                SoundPause(26) = 200
                 SoundPause[26] = 2000;
-//                LevelSelect = False
+
                 LevelSelect = false;
 
-//                GameThing
                 GameThing();
-//                ClearLevel
                 ClearLevel();
-
-//                Sleep 1000
                 SDL_Delay(1000);
-//                If GoToLevel = "" Then
-                if(GoToLevel == "")
-//                    OpenLevel SelectWorld(selWorld).WorldPath & StartLevel
+
+                if(GoToLevel.empty())
                     OpenLevel(SelectWorld[selWorld].WorldPath + StartLevel);
-//                Else
                 else
                 {
-//                    OpenLevel SelectWorld(selWorld).WorldPath & GoToLevel
                     OpenLevel(SelectWorld[selWorld].WorldPath + GoToLevel);
-//                    GoToLevel = ""
-                    GoToLevel = "";
-//                End If
+                    GoToLevel.clear();
                 }
-//            Else
             }
             else
             {
-//                If curWorldMusic > 0 Then StartMusic curWorldMusic
                 if(curWorldMusic > 0)
                     StartMusic(curWorldMusic);
-//                overTime = 0
                 overTime = 0;
-//                GoalTime = GetTickCount + 1000
                 GoalTime = SDL_GetTicks() + 1000;
-//                fpsCount = 0
                 fpsCount = 0;
-//                fpsTime = 0
                 fpsTime = 0;
-//                cycleCount = 0
                 cycleCount = 0;
-//                gameTime = 0
                 gameTime = 0;
-//                Do 'level select loop
+
                 do // 'level select loop
                 {
-//                    FreezeNPCs = False
                     FreezeNPCs = false;
-//                    DoEvents
                     DoEvents();
-//                    tempTime = GetTickCount
                     tempTime = SDL_GetTicks();
-//                    If tempTime >= gameTime + frameRate Or tempTime < gameTime Or MaxFPS = True Then
                     if(tempTime >= gameTime + frameRate || tempTime < gameTime || MaxFPS)
                     {
-//                        If fpsCount >= 32000 Then fpsCount = 0 'Fixes Overflow bug
-                        if(fpsCount >= 32000) fpsCount = 0; // Fixes Overflow bug
-//                        If cycleCount >= 32000 Then cycleCount = 0 'Fixes Overflow bug
-                        if(cycleCount >= 32000) cycleCount = 0; // Fixes Overflow bug
-//                        overTime = overTime + (tempTime - (gameTime + frameRate))
+                        if(fpsCount >= 32000)
+                            fpsCount = 0; // Fixes Overflow bug
+
+                        if(cycleCount >= 32000)
+                            cycleCount = 0; // Fixes Overflow bug
+
                         overTime = overTime + (tempTime - (gameTime + frameRate));
-//                        If gameTime = 0 Then overTime = 0
-                        if(gameTime == 0.0) overTime = 0;
-//                        If overTime <= 1 Then
-                        if(overTime <= 1)
-                        {
-//                            overTime = 0
+
+                        if(gameTime == 0.0)
                             overTime = 0;
-                        }
-//                        ElseIf overTime > 1000 Then
+
+                        if(overTime <= 1)
+                            overTime = 0;
                         else if(overTime > 1000)
-                        {
-//                            overTime = 1000
                             overTime = 1000;
-//                        End If
-                        }
-//                        gameTime = tempTime - overTime
+
                         gameTime = tempTime - overTime;
-//                        overTime = (overTime - (tempTime - gameTime))
                         overTime = (overTime - (tempTime - gameTime));
 
-//                        CheckActive
                         CheckActive();
-//                        WorldLoop
                         WorldLoop();
-//                        DoEvents
                         DoEvents();
-//                        If GetTickCount > fpsTime Then
+
                         if(SDL_GetTicks() > fpsTime)
                         {
-//                            If cycleCount >= 65 Then
                             if(cycleCount >= 65)
                             {
-    //                            overTime = 0
                                 overTime = 0;
-    //                            gameTime = tempTime
                                 gameTime = 0;
-    //                        End If
                             }
-//                            cycleCount = 0
                             cycleCount = 0;
-//                            fpsTime = GetTickCount + 1000
                             fpsTime = SDL_GetTicks() + 1000;
-//                            GoalTime = fpsTime
                             GoalTime = fpsTime;
 //                            If Debugger = True Then frmLevelDebugger.lblFPS = fpsCount
-//                            If ShowFPS = True Then
+
                             if(ShowFPS)
-                            {
-    //                            PrintFPS = fpsCount
                                 PrintFPS = fpsCount;
-    //                        End If
-                            }
-    //                        fpsCount = 0
+
                             fpsCount = 0;
-//                        End If
                         }
-//                    End If
                     }
 
                     SDL_Delay(1);
-                    if(!GameIsActive) return 0;// Break on quit
-//                Loop While LevelSelect = True
+                    if(!GameIsActive)
+                        return 0;// Break on quit
                 } while(LevelSelect);
-//            End If
             }
-//        Else 'MAIN GAME
         }
+
+        // MAIN GAME
         else
         {
-
-//            CheatString = "" 'clear the cheat codes
             CheatString.clear();
-//            EndLevel = False
             EndLevel = false;
-//            If numPlayers = 1 Then
+
             if(numPlayers == 1)
-//                ScreenType = 0 'Follow 1 player
                 ScreenType = 0; // Follow 1 player
-//            ElseIf numPlayers = 2 Then
             else if(numPlayers == 2)
-//                ScreenType = 5 'Dynamic screen
                 ScreenType = 5; // Dynamic screen
-//            Else
             else
             {
-//                'ScreenType = 3 'Average, no one leaves the screen
-//                ScreenType = 2 'Average
+                // ScreenType = 3 'Average, no one leaves the screen
                 ScreenType = 2; // Average
-//            End If
             }
-//            If SingleCoop > 0 Then ScreenType = 6
+
             if(SingleCoop > 0)
                 ScreenType = 6;
 //            If nPlay.Online = True Then ScreenType = 8 'Online
-//            For A = 1 To numPlayers
+
             for(int A = 1; A <= numPlayers; ++A)
             {
-//                If Player(A).Mount = 2 Then Player(A).Mount = 0 'take players off the clown car
                 if(Player[A].Mount == 2)
                     Player[A].Mount = 0; // take players off the clown car
-//            Next A
             }
-//            SetupPlayers 'Setup Players for the level
+
             SetupPlayers(); // Setup Players for the level
-//            qScreen = False
             qScreen = false;
 
-//'for warp entrances
-//            If (ReturnWarp > 0 And FileName = StartLevel) Or StartWarp > 0 Then
+// for warp entrances
             if((ReturnWarp > 0 && FileName == StartLevel) || (StartWarp > 0))
             {
-//                For A = 1 To numPlayers
                 for(int A = 1; A <= numPlayers; ++A)
                 {
-//                    With Player(A)
                     Player_t &p = Player[A];
-//                        If StartWarp > 0 Then
+
                     if(StartWarp > 0)
-//                            .Warp = StartWarp
                         p.Warp = StartWarp;
-//                        Else
                     else
-//                            .Warp = ReturnWarp
                         p.Warp = ReturnWarp;
-//                        End If
-//                        If Warp(.Warp).Effect = 1 Then
+
                     if(Warp[p.Warp].Effect == 1)
                     {
-//                            If Warp(.Warp).Direction2 = 1 Then
                         if(Warp[p.Warp].Direction2 == 1)
                         {
 //                                .Location.X = Warp(.Warp).Exit.X + Warp(.Warp).Exit.Width / 2 - .Location.Width / 2
@@ -886,150 +621,105 @@ int GameMain(int argc, char**argv)
                             p.Location.Y = Warp[p.Warp].Exit.Y + Warp[p.Warp].Exit.Height - p.Location.Height - 2;
 //                            End If
                         }
-//                            PlayerFrame A
+
                         PlayerFrame(A);
-//                            CheckSection A
                         CheckSection(A);
-//                            SoundPause(17) = 0
                         SoundPause[17] = 0;
-//                            .Effect = 8
                         p.Effect = 8;
-//                            .Effect2 = 950
                         p.Effect2 = 950;
                     }
-//                        ElseIf Warp(.Warp).Effect = 2 Then
                     else if(Warp[p.Warp].Effect == 2)
                     {
 //                            .Location.X = Warp(.Warp).Exit.X + Warp(.Warp).Exit.Width / 2 - .Location.Width / 2
                         p.Location.X = Warp[p.Warp].Exit.X + Warp[p.Warp].Exit.Width / 2 - p.Location.Width / 2;
 //                            .Location.Y = Warp(.Warp).Exit.Y + Warp(.Warp).Exit.Height - .Location.Height
                         p.Location.Y = Warp[p.Warp].Exit.Y + Warp[p.Warp].Exit.Height - p.Location.Height;
-//                            CheckSection A
+
                         CheckSection(A);
-//                            .Effect = 8
                         p.Effect = 8;
-//                            .Effect2 = 2000
                         p.Effect2 = 2000;
-//                        End If
                     }
-//                    End With
-//                Next A
                 }
-//                If StartWarp > 0 Then
+
                 if(StartWarp > 0)
-//                    StartWarp = 0
                     StartWarp = 0;
-//                Else
                 else
-//                    ReturnWarp = 0
                     ReturnWarp = 0;
-//                End If
-//            End If
             }
 //'--------------------------------------------
-//            ProcEvent "Level - Start", True
             ProcEvent("Level - Start", true);
-//            For A = 2 To 100
+
             for(int A = 2; A <= 100; ++A)
             {
-//                If Events(A).AutoStart = True Then ProcEvent Events(A).Name, True
                 if(Events[A].AutoStart)
                     ProcEvent(Events[A].Name, true);
-//            Next A
             }
-//            overTime = 0
+
             overTime = 0;
-//            GoalTime = GetTickCount + 1000
             GoalTime = SDL_GetTicks() + 1000;
-//            fpsCount = 0
             fpsCount = 0;
-//            fpsTime = 0
             fpsTime = 0;
-//            cycleCount = 0
             cycleCount = 0;
-//            gameTime = 0
             gameTime = 0;
-//            Do 'MAIN GAME LOOP
-            do
+
+            do // MAIN GAME LOOP
             {
-//                DoEvents
                 DoEvents();
-//                tempTime = GetTickCount
                 tempTime = SDL_GetTicks();
-//                If tempTime >= gameTime + frameRate Or tempTime < gameTime Or MaxFPS = True Then
+
                 if(tempTime >= gameTime + frameRate || tempTime < gameTime || MaxFPS)
                 {
-//                    CheckActive
                     CheckActive();
-//                    If fpsCount >= 32000 Then fpsCount = 0 'Fixes Overflow bug
                     if(fpsCount >= 32000) fpsCount = 0; // Fixes Overflow bug
-//                    If cycleCount >= 32000 Then cycleCount = 0 'Fixes Overflow bug
                     if(cycleCount >= 32000) cycleCount = 0; // Fixes Overflow bug
-//                    overTime = overTime + (tempTime - (gameTime + frameRate))
                     overTime = overTime + (tempTime - (gameTime + frameRate));
-//                    If gameTime = 0 Then overTime = 0
-                    if(gameTime == 0.0) overTime = 0;
-//                    If overTime <= 1 Then
-                    if(overTime <= 1)
-//                        overTime = 0
+                    if(gameTime == 0.0)
                         overTime = 0;
-//                    ElseIf overTime > 1000 Then
+                    if(overTime <= 1)
+                        overTime = 0;
                     else if(overTime > 1000)
-//                        overTime = 1000
                         overTime = 1000;
-//                    End If
-//                    gameTime = tempTime - overTime
+
                     gameTime = tempTime - overTime;
-//                    overTime = (overTime - (tempTime - gameTime))
                     overTime = (overTime - (tempTime - gameTime));
-//                    GameLoop    'Run the game loop
-                    GameLoop();
-//                    DoEvents
+
+                    GameLoop(); // Run the game loop
                     DoEvents();
-//                    If GetTickCount > fpsTime Then
+
                     if(SDL_GetTicks() > fpsTime)
                     {
-//                        If cycleCount >= 65 Then
                         if(cycleCount >= 65)
                         {
-//                            overTime = 0
                             overTime = 0;
-//                            gameTime = tempTime
                             gameTime = tempTime;
-//                        End If
                         }
-//                        cycleCount = 0
+
                         cycleCount = 0;
-//                        fpsTime = GetTickCount + 1000
                         fpsTime = SDL_GetTicks() + 1000;
-//                        GoalTime = fpsTime
                         GoalTime = fpsTime;
-//                        If Debugger = True Then frmLevelDebugger.lblFPS = fpsCount
-//                        If ShowFPS = True Then
+
+
                         if(ShowFPS)
                         {
-//                            PrintFPS = fpsCount
                             PrintFPS = fpsCount;
-//                        End If
                         }
-//                        fpsCount = 0
                         fpsCount = 0;
-//                    End If
                     }
-//                    If LivingPlayers = False Then
+
                     if(!LivingPlayers())
                     {
-//                        EveryonesDead
                         EveryonesDead();
-//                    End If
                     }
-//                End If
                 }
 
                 SDL_Delay(1);
                 if(!GameIsActive) return 0;// Break on quit
-//            Loop While LevelSelect = False And GameMenu = False
-            } while(!LevelSelect && !GameMenu);
+            }
+            while(!LevelSelect && !GameMenu);
+
+            // TODO: Utilize this and any TestLevel/MagicHand related code to allow PGE Editor integration
+            // (do any code without interaction of no more existnig Editor VB forms, keep IPS with PGE Editor instead)
+
 //            If TestLevel = True Then
 //                TestLevel = False
 //                LevelEditor = True
@@ -1056,12 +746,10 @@ int GameMain(int argc, char**argv)
 //                End If
 //                LevelSelect = False
 //            Else
-//                ClearLevel
             ClearLevel();
 //            End If
-//        End If
         }
-//    Loop
+
     } while(GameIsActive);
 
     return 0;
@@ -1475,6 +1163,7 @@ void NPCyFix()
 void CheckActive()
 {
     bool MusicPaused = false;
+    bool focusLost = false;
 //    If nPlay.Online = True Then Exit Sub
     // If LevelEditor = False And TestLevel = False Then Exit Sub
     // If LevelEditor = False Then Exit Sub
@@ -1491,43 +1180,44 @@ void CheckActive()
         tempTime = 0;
         keyDownEnter = false;
         keyDownAlt = false;
-        if(musicPlaying == true && !MusicPaused)
+
+        if(!focusLost)
         {
             pLogDebug("Window Focus lost");
+            focusLost = true;
+        }
+
+        if(musicPlaying && !MusicPaused)
+        {
             MusicPaused = true;
-            // If noSound = False Then mciSendString "pause all", 0, 0, 0
-            if(noSound == false)
-                SoundPauseAll();
+            SoundPauseAll();
         }
 
         if(!GameIsActive)
             break;
     }
 
-    if(MusicPaused)
+    if(focusLost)
         pLogDebug("Window Focus got back");
 
-    if(noSound == false)
+    if(MusicPaused)
+        SoundResumeAll();
+
+/* // Useless condition
+    if(!noSound && MusicPaused)
     {
-        if(MusicPaused == true)
+        if(MusicPaused)
         {
+            SoundResumeAll();
             if(GameOutro == true)
-            {
-                // mciSendString "resume tmusic", 0, 0, 0
                 SoundResumeAll();
-            }
             else if(LevelSelect == true && GameMenu == false && LevelEditor == false)
-            {
-                // mciSendString "resume wmusic" & curWorldMusic, 0, 0, 0
                 SoundResumeAll();
-            }
             else if(curMusic > 0)
-            {
-                // mciSendString "resume music" & curMusic, 0, 0, 0
                 SoundResumeAll();
-            }
             else if(curMusic < 0)
             {
+                SoundResumeAll();
                 if(PSwitchStop > 0)
                 {
                     // mciSendString "resume stmusic", 0, 0, 0
@@ -1541,6 +1231,7 @@ void CheckActive()
             }
         }
     }
+    */
 //    If LevelEditor = True Or MagicHand = True Then frmLevelWindow.vScreen(1).MousePointer = 99
 }
 
