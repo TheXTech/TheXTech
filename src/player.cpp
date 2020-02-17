@@ -140,6 +140,7 @@ void SetupPlayers()
         if(Player[A].Character == 5)
             Player[A].Mount = 0;
 
+        Player[A].Direction = 1; // Moved from below to here
         Player[A].Location.Width = Physics.PlayerWidth[Player[A].Character][Player[A].State]; // set height
         Player[A].Location.Height = Physics.PlayerHeight[Player[A].Character][Player[A].State]; // set width
         if(Player[A].State == 1 && Player[A].Mount == 1) // if small and in a shoe then set the height to super mario
@@ -152,11 +153,13 @@ void SetupPlayers()
         {
             Player[A].Location.X = PlayerStart[1].X + PlayerStart[1].Width * 0.5 - Player[A].Location.Width * 0.5;
             Player[A].Location.Y = PlayerStart[1].Y + PlayerStart[1].Height - Player[A].Location.Height; // - 2
+            Player[A].Direction = PlayerStart[1].Direction; // manually defined direction of player
         }
         else
         {
             Player[A].Location.X = PlayerStart[B].X + PlayerStart[B].Width * 0.5 - Player[A].Location.Width * 0.5;
             Player[A].Location.Y = PlayerStart[B].Y + PlayerStart[B].Height - Player[A].Location.Height; // - 2
+            Player[A].Direction = PlayerStart[B].Direction; // manually defined direction of player
         }
         if(GrabAll == true)
             Player[A].CanGrabNPCs = true;
@@ -214,7 +217,7 @@ void SetupPlayers()
         Player[A].Duck = false;
         Player[A].MountSpecial = 0;
         Player[A].YoshiTongueLength = 0;
-        Player[A].Direction = 1;
+//        Player[A].Direction = 1; // Moved to above
         Player[A].Location.SpeedX = 0;
         Player[A].Location.SpeedY = 2;
         Player[A].Frame = 1;
@@ -282,8 +285,11 @@ void SetupPlayers()
             Player[A].Section = 0;
             CheckSection(A);
         }
+
+        // Set player's direction to left automatically when a start point is located at right side of the section
         if(Player[A].Location.X + Player[A].Location.Width / 2.0 > level[Player[A].Section].X + (level[Player[A].Section].Width - level[Player[A].Section].X) / 2)
             Player[A].Direction = -1;
+
         //        if(nPlay.Online == true && A <= 15)
         //        {
         //            if(nPlay.Player[A - 1].Active == false && A != 1)

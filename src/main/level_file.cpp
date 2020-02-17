@@ -107,6 +107,7 @@ void OpenLevel(std::string FilePath)
         PlayerStart[A].Y = p.y;
         PlayerStart[A].Width = p.w;
         PlayerStart[A].Height = p.h;
+        PlayerStart[A].Direction = p.direction;
         A++;
         if(A > 2)
             break;

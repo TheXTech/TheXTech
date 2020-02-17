@@ -16,6 +16,8 @@ struct Location_t
     double SpeedX = 0.0;
 //    SpeedY As Double
     double SpeedY = 0.0;
+    //! Initial direction [New-added]
+    int Direction = 1;
 //End Type
 };
 
