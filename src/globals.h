@@ -430,7 +430,7 @@ struct NPC_t
 //    Effect As Integer 'For starting / stopping effects
     int Effect = 0;
 //    Effect2 As Double
-    int Effect2 = 0;
+    double Effect2 = 0.0; // When Effect 4, Used to store a destination position, must be in double!
 //    Effect3 As Integer
     int Effect3 = 0;
 //    Section As Integer 'what section of the level the NPC is in

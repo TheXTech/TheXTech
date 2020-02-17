@@ -2271,7 +2271,7 @@ void UpdateGraphics()
                 {
                     if(NPC[A].Effect == 2)
                     {
-                        if(NPC[A].Effect2 % 3 != 0)
+                        if(std::fmod(NPC[A].Effect2, 3) != 0.0)
                         {
                             if(vScreenCollision(Z, NPC[A].Location))
                             {
