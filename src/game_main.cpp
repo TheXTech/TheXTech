@@ -116,10 +116,16 @@ int GameMain(int argc, char**argv)
         {
 //            frmMain.MousePointer = 99
             frmMain.MousePointer = 99;
+            ShowCursor(0);
         }
 //        ElseIf resChanged = False And TestLevel = False And LevelEditor = False Then
+        else if(!resChanged && !TestLevel && !LevelEditor)
+        {
 //            frmMain.MousePointer = 0
+            frmMain.MousePointer = 0;
+            ShowCursor(1);
 //        End If
+        }
 
 //        If LevelEditor = True Then 'Load the level editor
 
