@@ -26,6 +26,7 @@
 #include "globals.h"
 #include "game_main.h"
 #include "graphics.h"
+#include "joystick.h"
 #include <AppPath/app_path.h>
 #include <Logger/logger.h>
 #include <Utils/files.h>
@@ -205,6 +206,7 @@ void FrmMain::freeSDL()
 {
     GFX.unLoad();
     clearAllTextures();
+    CloseJoysticks();
     if(m_gRenderer)
         SDL_DestroyRenderer(m_gRenderer);
     if(m_window)

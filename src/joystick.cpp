@@ -370,6 +370,13 @@ bool StartJoystick(int JoystickNumber)
     }
 }
 
+void CloseJoysticks()
+{
+    for(size_t i = 0; i < g_joysticks.size(); ++i) // scan hats first
+        SDL_JoystickClose(g_joysticks[i]);
+    g_joysticks.clear();
+}
+
 void PollJoystick(int joystick)
 {
     Sint32 val = 0;

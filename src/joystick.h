@@ -50,6 +50,8 @@ extern long CurrentJoyPOV;  // Also looks like useless, kept be a constant -1
 void UpdateControls();
 
 int InitJoysticks();
+
+void CloseJoysticks();
 // Public Function StartJoystick(Optional ByVal JoystickNumber As Integer = 0) As Boolean
 bool StartJoystick(int JoystickNumber);
 // Public Sub PollJoystick()
