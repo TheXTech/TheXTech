@@ -34,6 +34,8 @@
 #include "../blocks.h"
 #include "../graphics.h"
 
+#include <Logger/logger.h>
+
 void NPCHit(int A, int B, int C)
 {
     NPC_t tempNPC;
@@ -1236,8 +1238,8 @@ void NPCHit(int A, int B, int C)
         if(B == 1)
         {
             PlaySound(2);
-            NPC[A].Location.Y = NPC[A].Location.Y + NPC[A].Location.Height;
-            NPC[A].Location.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0;
+            NPC[A].Location.Y += NPC[A].Location.Height;
+            NPC[A].Location.X += NPC[A].Location.Width / 2.0;
             if(NPC[A].Type == 4)
                 NPC[A].Type = 5;
             else if(NPC[A].Type == 6)
@@ -1273,13 +1275,13 @@ void NPCHit(int A, int B, int C)
             {
                 numNPCs++;
                 NPC[numNPCs].Location = NPC[A].Location;
-                NPC[numNPCs].Location.Y = NPC[numNPCs].Location.Y - 32;
+                NPC[numNPCs].Location.Y -= 32.1;
                 NPC[numNPCs].Type = NPC[A].Type + 8;
                 NPC[numNPCs].Projectile = true;
                 NPC[numNPCs].Direction = Player[C].Direction;
                 NPC[numNPCs].Location.SpeedY = 0;
                 NPC[numNPCs].Location.SpeedX = double(Physics.NPCShellSpeed * NPC[numNPCs].Direction);
-                NPC[numNPCs].Location.X = NPC[numNPCs].Location.X - 16 + NPC[numNPCs].Location.SpeedX;
+                NPC[numNPCs].Location.X = NPC[numNPCs].Location.X - 16.0 + NPC[numNPCs].Location.SpeedX;
                 CheckSectionNPC(numNPCs);
                 NPC[numNPCs].CantHurtPlayer = C;
                 NPC[numNPCs].CantHurt = 6;
@@ -1290,12 +1292,13 @@ void NPCHit(int A, int B, int C)
             NPC[A].Location.Height = NPCHeight[NPC[A].Type];
             NPC[A].Location.Width = NPCWidth[NPC[A].Type];
             NPC[A].Location.Y = NPC[A].Location.Y - NPC[A].Location.Height;
-            NPC[A].Location.X = NPC[A].Location.X - (NPC[A].Location.Width / 2.0) - (NPC[A].Direction * 2);
+            NPC[A].Location.X = NPC[A].Location.X - (NPC[A].Location.Width / 2.0) - double(NPC[A].Direction * 2.f);
             NPC[A].Location.SpeedX = 0;
             NPC[A].Location.SpeedY = 0;
             NPC[A].RealSpeedX = 0;
             NPC[A].Special = 0;
             NPC[A].Frame = 0;
+            pLogDebug("Shell stomp, X distance: [%g], Y=[%g]", std::abs(NPC[numNPCs].Location.X - NPC[A].Location.X), NPC[numNPCs].Location.Y);
             if(NPC[A].Type >= 109 && NPC[A].Type <= 120)
                 NewEffect(10, NPC[A].Location);
         }
@@ -1344,15 +1347,15 @@ void NPCHit(int A, int B, int C)
                 NPC[A].Type = NPC[A].Type + 4;
             if(B == 7 && NPC[A].Type >= 113 && NPC[A].Type <= 117)
             {
-                numNPCs = numNPCs + 1;
+                numNPCs++;
                 NPC[numNPCs].Location = NPC[A].Location;
-                NPC[numNPCs].Location.Y = NPC[numNPCs].Location.Y - 32;
+                NPC[numNPCs].Location.Y -= 32.0;
                 NPC[numNPCs].Type = NPC[A].Type + 4;
                 NPC[numNPCs].Projectile = true;
                 NPC[numNPCs].Direction = Player[C].Direction;
                 NPC[numNPCs].Location.SpeedY = 0;
-                NPC[numNPCs].Location.SpeedX = Physics.NPCShellSpeed * NPC[numNPCs].Direction;
-                NPC[numNPCs].Location.X = NPC[numNPCs].Location.X - 16 + 32 * NPC[numNPCs].Direction;
+                NPC[numNPCs].Location.SpeedX = double(Physics.NPCShellSpeed * NPC[numNPCs].Direction);
+                NPC[numNPCs].Location.X = NPC[numNPCs].Location.X - (16.0 + double(32.0f * NPC[numNPCs].Direction));
                 CheckSectionNPC(numNPCs);
                 NPC[numNPCs].CantHurtPlayer = C;
                 NPC[numNPCs].CantHurt = 6;
@@ -1361,8 +1364,8 @@ void NPCHit(int A, int B, int C)
             }
             NPC[A].Location.Height = NPCHeight[NPC[A].Type];
             NPC[A].Location.Width = NPCWidth[NPC[A].Type];
-            NPC[A].Location.Y = NPC[A].Location.Y - NPC[A].Location.Height;
-            NPC[A].Location.X = NPC[A].Location.X - (NPC[A].Location.Width / 2.0) - (NPC[A].Direction * 2);
+            NPC[A].Location.Y -= NPC[A].Location.Height;
+            NPC[A].Location.X = NPC[A].Location.X - (NPC[A].Location.Width / 2.0) - double(NPC[A].Direction * 2.f);
             NPC[A].Location.SpeedX = 0;
             NPC[A].Special = 0;
             NPC[A].Frame = 0;

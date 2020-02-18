@@ -3018,15 +3018,17 @@ void UpdateNPCs()
                                                                         }
                                                                         // NPC is a projectile
                                                                     }
-                                                                    else if(NPC[A].Projectile == true && !(NPC[B].Type == 45 && NPC[B].Special == 0) && !(NPC[A].Type == 266))
+                                                                    else if(NPC[A].Projectile && !(NPC[B].Type == 45 && NPC[B].Special == 0.0) && NPC[A].Type != 266)
                                                                     {
-                                                                        if(!(NPC[A].Projectile == true && NPC[B].Projectile == true && NPC[A].Type == 17 && NPC[B].Type == 17 && NPC[A].CantHurtPlayer != NPC[B].CantHurtPlayer))
+                                                                        if(!(NPC[A].Projectile && NPC[B].Projectile && NPC[A].Type == 17 && NPC[B].Type == 17 && NPC[A].CantHurtPlayer != NPC[B].CantHurtPlayer))
                                                                         {
                                                                             if(!((NPC[A].Type == 13 && NPCIsABonus[NPC[B].Type]) || NPC[B].Type == 13 || NPC[B].Type == 87))
                                                                             {
-                                                                                if(NPCIsAShell[NPC[A].Type] && (NPC[B].Type == 55 || NPC[B].Type == 119) && (NPC[A].Direction != NPC[B].Direction || NPC[A].Special > 0) && NPC[B].Projectile == false)
+                                                                                if(NPCIsAShell[NPC[A].Type] &&
+                                                                                        (NPC[B].Type == 55 || NPC[B].Type == 119) &&
+                                                                                        (int(NPC[A].Direction) != int(NPC[B].Direction) || NPC[A].Special > 0) && !NPC[B].Projectile)
                                                                                 {
-                                                                                    if(NPC[A].Direction == -1)
+                                                                                    if(int(NPC[A].Direction) == -1)
                                                                                     {
                                                                                         NPC[B].Frame = 3;
                                                                                         if(NPC[B].Type == 119)
@@ -3058,8 +3060,8 @@ void UpdateNPCs()
                                                                                         NPC[A].Special = 2;
                                                                                     NPC[B].Special = 0;
                                                                                     tempLocation = NPC[B].Location;
-                                                                                    tempLocation.Y = tempLocation.Y + 1;
-                                                                                    tempLocation.Height = tempLocation.Height - 2;
+                                                                                    tempLocation.Y += 1;
+                                                                                    tempLocation.Height -= 2;
                                                                                     for(bCheck2 = 1; bCheck2 <= 2; bCheck2++)
                                                                                     {
                                                                                         if(bCheck2 == 1)
@@ -3078,7 +3080,7 @@ void UpdateNPCs()
                                                                                             {
                                                                                                 if(CheckCollision(tempLocation, Block[C].Location) == true)
                                                                                                 {
-                                                                                                    if(NPC[A].Direction == -1)
+                                                                                                    if(int(NPC[A].Direction) == -1)
                                                                                                     {
                                                                                                         NPC[B].Location.X = Block[C].Location.X + Block[C].Location.Width + 0.1;
                                                                                                         NPC[A].Location.X = NPC[B].Location.X + NPC[B].Location.Width + 0.1;
