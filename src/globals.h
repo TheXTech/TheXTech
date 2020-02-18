@@ -405,7 +405,7 @@ struct NPC_t
 //    FrameCount As Single 'The counter for incrementing the frames
     float FrameCount = 0.0f;
 //    Direction As Single 'The direction the NPC is walking
-    int Direction = 0;/*!!!!!!WAS FLOAT!!!!!!!*/
+    float Direction = 0.0f;
 //'Secial - misc variables used for NPC AI
 //    Special As Double
     double Special = 0.0;

@@ -385,7 +385,7 @@ void NPCHit(int A, int B, int C)
             NPC[A].Immune = 10;
         if(B == 1 || B == 2 || B == 8)
         {
-            NPC[A].Damage = NPC[A].Damage + 5;
+            NPC[A].Damage += 5;
             PlaySound(2);
             NPC[A].Special = 5;
         }
@@ -400,20 +400,20 @@ void NPCHit(int A, int B, int C)
             {
                 NPCHit(C, 3, B);
                 NPC[A].Special = 5;
-                NPC[A].Damage = NPC[A].Damage + 5;
+                NPC[A].Damage += 5;
                 PlaySound(39);
             }
         }
         else if(B == 10)
         {
-            NPC[A].Damage = NPC[A].Damage + 2;
+            NPC[A].Damage += 2;
             PlaySound(89);
         }
         else if(B == 6)
             NPC[A].Killed = B;
         if(NPC[A].Damage >= 15)
             NPC[A].Killed = B;
-        else if(NPC[A].Special == 5 && !(NPC[A].Type == 268 || NPC[A].Type == 281))
+        else if(fEqual(NPC[A].Special, 5) && !(NPC[A].Type == 268 || NPC[A].Type == 281))
         {
             NPC[A].Special = 0;
             NPC[A].Special2 = 0;
@@ -1264,21 +1264,21 @@ void NPCHit(int A, int B, int C)
             }
             else if(NPC[A].Type == 23)
                 NPC[A].Type = 24;
-            else if(NPC[A].Type >= 121 && NPC[A].Type <= 124)
+            else if(NPC[A].Type >= 121 && NPC[A].Type <= 124) // smw winged koopas
             {
                 NPC[A].Type = NPC[A].Type - 12;
                 NPC[A].Special = 0;
             }
             else
             {
-                numNPCs = numNPCs + 1;
+                numNPCs++;
                 NPC[numNPCs].Location = NPC[A].Location;
                 NPC[numNPCs].Location.Y = NPC[numNPCs].Location.Y - 32;
                 NPC[numNPCs].Type = NPC[A].Type + 8;
                 NPC[numNPCs].Projectile = true;
                 NPC[numNPCs].Direction = Player[C].Direction;
                 NPC[numNPCs].Location.SpeedY = 0;
-                NPC[numNPCs].Location.SpeedX = Physics.NPCShellSpeed * NPC[numNPCs].Direction;
+                NPC[numNPCs].Location.SpeedX = double(Physics.NPCShellSpeed * NPC[numNPCs].Direction);
                 NPC[numNPCs].Location.X = NPC[numNPCs].Location.X - 16 + NPC[numNPCs].Location.SpeedX;
                 CheckSectionNPC(numNPCs);
                 NPC[numNPCs].CantHurtPlayer = C;
