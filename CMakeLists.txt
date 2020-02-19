@@ -21,6 +21,8 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE FALSE)
 
+include(cmake/build_props.cmake)
+
 if(WIN32 AND NOT EMSCRIPTEN)
     set(CMAKE_SHARED_LIBRARY_PREFIX "")
 endif()
@@ -123,9 +125,7 @@ set(A2XTECH_SRC
     src/npc/npc_frames.cpp
 )
 
-add_executable(a2xtech)
+add_executable(a2xtech ${A2XTECH_SRC} ${LIB_SRC})
 pge_set_nopie(a2xtech)
-target_sources(a2xtech PRIVATE ${A2XTECH_SRC} ${LIB_SRC})
 target_include_directories(a2xtech PRIVATE src lib ${SDL2_INCLUDE_DIRS} ${MIXERX_HEAD_DIR} ${FREEIMAGELITE_HEAD_DIR})
 target_link_libraries(a2xtech PRIVATE pgefl ${UTILS_LIBS} ${FREEIMAGELITE_LIB} ${MIXERX_LIB} ${SDL2_LIBRARIES})
-
