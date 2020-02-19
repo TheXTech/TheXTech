@@ -422,7 +422,7 @@ void UpdatePlayer()
     int blockPushX = 0;
     Location_t oldLoc;
 //    Location_t curLoc;
-    int oldGrab = 0;
+//    int oldGrab = 0; // SET BUT NOT USED
     bool DontResetGrabTime = false; // helps with grabbing things from the top
     double SlippySpeedX = 0;
     bool wasSlippy = false;
@@ -482,7 +482,7 @@ void UpdatePlayer()
 //        }
         // reset variables from the previous player
         DontResetGrabTime = false;
-        oldGrab = Player[A].HoldingNPC;
+//        oldGrab = Player[A].HoldingNPC; // SET BUT NOT UNUSED
         movingBlock = false;
         blockPushX = 0;
         Player[A].ShowWarp = 0;
@@ -5216,7 +5216,7 @@ bool LivingPlayers()
 
 void EveryonesDead()
 {
-    int A = 0;
+//    int A = 0; // UNUSED
     if(BattleMode == true)
         return;
     LevelMacro = 0;
@@ -7397,10 +7397,13 @@ void StealBonus()
     int A = 0;
     int B = 0;
     int C = 0;
-    Location_t tempLocation;
+    UNUSED(C);
+//    Location_t tempLocation;
+
     // dead players steal life
     if(BattleMode == true)
         return;
+
     if(numPlayers == 2 /*&& nPlay.Online == false*/)
     {
         if((Player[1].Dead == true || Player[1].TimeToLive > 0) && (Player[2].Dead == true || Player[2].TimeToLive > 0))

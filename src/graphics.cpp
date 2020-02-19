@@ -720,12 +720,12 @@ void UpdateGraphics()
     int BoxY = 0;
     bool tempBool = false;
     int B = 0;
-    int B2 = 0;
+//    int B2 = 0;
     int C = 0;
     int D = 0;
     int E = 0;
     int d2 = 0;
-    int e2 = 0;
+//    int e2 = 0;
     int X = 0;
     int Y = 0;
     int fBlock = 0;
@@ -1155,6 +1155,7 @@ void UpdateGraphics()
                                     {
                                         D = 1;
                                         d2 = int(0.5);
+                                        UNUSED(d2);
                                     }
                                 }
                                 if(!(E == 0))
@@ -3150,6 +3151,7 @@ void GetvScreenAverage()
     double OldY = 0;
     OldX = vScreenX[1];
     OldY = vScreenY[1];
+    UNUSED(OldY);
     vScreenX[1] = 0;
     vScreenY[1] = 0;
     for(A = 1; A <= numPlayers; A++)

@@ -57,6 +57,8 @@
 //Public Declare Function GetTickCount& Lib "kernel32" ()
 //Public OnlineDisc As Boolean
 
+#define UNUSED(x) (void)x
+
 extern FrmMain frmMain;
 extern GFX_t GFX;
 

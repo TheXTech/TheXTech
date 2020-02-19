@@ -45,8 +45,8 @@ void UpdateNPCs()
     int B = 0;
     float C = 0;
     float D = 0;
-    double E = 0;
-    float F = 0;
+//    double E = 0;
+//    float F = 0;
 
     std::string tempStr;
     int oldSlope = 0; // previous sloped block the npc was on
@@ -56,7 +56,7 @@ void UpdateNPCs()
     Block_t tmpBlock;
     int tempHitBlock = 0;
     float tempSpeedA = 0;
-    float tempSpeedB = 0;
+//    float tempSpeedB = 0;
     bool tempTurn = false; // used for turning the npc around
     Location_t tempLocation;
     Location_t tempLocation2;
@@ -68,14 +68,14 @@ void UpdateNPCs()
     float speedVar = 0; // percent of the NPC it should actually moved. this helps when underwater
 
     bool tempBool = false;
-    bool tempBool2 = false;
-    bool tempBool3 = false;
+//    bool tempBool2 = false;
+//    bool tempBool3 = false;
     float newY = 0;
-    bool straightLine = false;
+//    bool straightLine = false;
     Block_t blankBlock;
-    bool noBelt = false;
+//    bool noBelt = false;
     float oldBeltSpeed = 0;
-    float beltFixX = 0;
+//    float beltFixX = 0;
     int oldDirection = 0;
 
     // used for collision detection
@@ -869,6 +869,7 @@ void UpdateNPCs()
                 }
             }
             oldDirection = NPC[A].Direction;
+            UNUSED(oldDirection);
             if(NPC[A].Type == 17 || NPC[A].Type == 18)
             {
                 if(NPC[A].CantHurt > 0)
@@ -1808,6 +1809,7 @@ void UpdateNPCs()
                         NPC[A].MovingPinched = NPC[A].MovingPinched - 1;
 
                     newY = 0;
+                    UNUSED(newY);
                     oldBeltSpeed = NPC[A].BeltSpeed;
                     resetBeltSpeed = false;
                     beltClear = false;

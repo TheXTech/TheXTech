@@ -56,7 +56,7 @@ void MenuLoop()
 //    Dim tempLocation As Location
     Location_t tempLocation;
 //    Dim newJoystick As Boolean
-    bool newJoystick;
+//    bool newJoystick; // UNUSED
 //    Dim tempBool As Boolean
     bool tempBool;
 //    Dim menuLen As Integer

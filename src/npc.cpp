@@ -878,7 +878,7 @@ void NPCSpecial(int A)
     double F = 0;
     double fBlock = 0;
     double lBlock = 0;
-    bool straightLine = false;
+    bool straightLine = false; // SET BUT NOT USED
     bool tempBool = false;
     bool tempBool2 = false;
     Location_t tempLocation;
@@ -2608,7 +2608,8 @@ void NPCSpecial(int A)
     }
     else if(NPC[A].Type == 60 || NPC[A].Type == 62 || NPC[A].Type == 64 || NPC[A].Type == 66 || NPC[A].Type == 104 || NPC[A].Type == 179)
     {
-        straightLine = false;
+        straightLine = false; // SET BUT NOT USED
+        UNUSED(straightLine);
         tempBool = false;
         for(B = 1; B <= numPlayers; B++)
         {
