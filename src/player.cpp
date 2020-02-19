@@ -3565,7 +3565,7 @@ void UpdatePlayer()
                                 {
                                     if((NPC[B].Type == 58 || NPC[B].Type == 21 || NPC[B].Type == 67 || NPC[B].Type == 68 || NPC[B].Type == 69 || NPC[B].Type == 70) && NPC[B].Projectile == true)
                                         PlayerHurt(A);
-                                    if((Player[A].Mount == 1 || Player[A].Mount == 3 || Player[A].SpinJump == true || (Player[A].ShellSurf == true && NPCIsAShell[NPC[B].Type] == true) || (Player[A].Stoned == true && NPCCanWalkOn[NPC[B].Type] == false)) && NPCMovesPlayer[NPC[B].Type] == false)
+                                    if((Player[A].Mount == 1 || Player[A].Mount == 3 || Player[A].SpinJump || (Player[A].ShellSurf && NPCIsAShell[NPC[B].Type]) || (Player[A].Stoned && !NPCCanWalkOn[NPC[B].Type])) && !NPCMovesPlayer[NPC[B].Type])
                                         HitSpot = BootCollision(Player[A].Location, NPC[B].Location, NPCCanWalkOn[NPC[B].Type]); // find the hitspot for normal mario
                                     else
                                         HitSpot = EasyModeCollision(Player[A].Location, NPC[B].Location, NPCCanWalkOn[NPC[B].Type]); // find the hitspot when in a shoe or on a yoshi
@@ -4052,10 +4052,10 @@ void UpdatePlayer()
                                                     }
                                                 }
                                                 if(
-                                                    !((Player[A].WetFrame == true &&
-                                                       (NPC[B].Type == 229 || NPC[B].Type == 230)) ||
-                                                       NPCIsAVine[NPC[B].Type]
-                                                    ) && Player[A].HoldingNPC != B
+                                                    !(Player[A].WetFrame &&
+                                                        (NPC[B].Type == 229 || NPC[B].Type == 230 ||
+                                                         NPCIsAVine[NPC[B].Type])) &&
+                                                    Player[A].HoldingNPC != B
                                                 )
                                                 {
                                                     if(Player[A].Vine > 0)

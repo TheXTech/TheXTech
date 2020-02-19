@@ -495,7 +495,12 @@ void NPCHit(int A, int B, int C)
         }
         // Goomba / Nekkid Koopa
     }
-    else if(NPC[A].Type == 1 || NPC[A].Type == 2 || NPC[A].Type == 242 || NPC[A].Type == 27 || NPC[A].Type == 55 || NPC[A].Type == 59 || NPC[A].Type == 61 || NPC[A].Type == 63 || NPC[A].Type == 65 || NPC[A].Type == 71 || NPC[A].Type == 77 || NPC[A].Type == 271 || NPC[A].Type == 89 || (NPC[A].Type >= 117 && NPC[A].Type <= 120) || NPC[A].Type == 162 || NPC[A].Type == 163 || NPC[A].Type == 229 || NPC[A].Type == 236 || NPC[A].Type == 230 || NPC[A].Type == 232 || NPC[A].Type == 233 || NPC[A].Type == 234)
+    else if(NPC[A].Type == 1 || NPC[A].Type == 2 || NPC[A].Type == 242 || NPC[A].Type == 27 ||
+            NPC[A].Type == 55 || NPC[A].Type == 59 || NPC[A].Type == 61 || NPC[A].Type == 63 ||
+            NPC[A].Type == 65 || NPC[A].Type == 71 || NPC[A].Type == 77 || NPC[A].Type == 271 ||
+            NPC[A].Type == 89 || (NPC[A].Type >= 117 && NPC[A].Type <= 120) || NPC[A].Type == 162 ||
+            NPC[A].Type == 163 || NPC[A].Type == 229 || NPC[A].Type == 236 || NPC[A].Type == 230 ||
+            NPC[A].Type == 232 || NPC[A].Type == 233 || NPC[A].Type == 234)
     {
         if(B == 1)
         {
@@ -1275,7 +1280,7 @@ void NPCHit(int A, int B, int C)
             {
                 numNPCs++;
                 NPC[numNPCs].Location = NPC[A].Location;
-                NPC[numNPCs].Location.Y -= 32.1;
+                NPC[numNPCs].Location.Y -= NPCHeight[NPC[numNPCs].Type];
                 NPC[numNPCs].Type = NPC[A].Type + 8;
                 NPC[numNPCs].Projectile = true;
                 NPC[numNPCs].Direction = Player[C].Direction;
@@ -1291,7 +1296,7 @@ void NPCHit(int A, int B, int C)
             }
             NPC[A].Location.Height = NPCHeight[NPC[A].Type];
             NPC[A].Location.Width = NPCWidth[NPC[A].Type];
-            NPC[A].Location.Y = NPC[A].Location.Y - NPC[A].Location.Height;
+            NPC[A].Location.Y -= NPC[A].Location.Height;
             NPC[A].Location.X = NPC[A].Location.X - (NPC[A].Location.Width / 2.0) - double(NPC[A].Direction * 2.f);
             NPC[A].Location.SpeedX = 0;
             NPC[A].Location.SpeedY = 0;
@@ -1349,7 +1354,7 @@ void NPCHit(int A, int B, int C)
             {
                 numNPCs++;
                 NPC[numNPCs].Location = NPC[A].Location;
-                NPC[numNPCs].Location.Y -= 32.0;
+                NPC[numNPCs].Location.Y -= NPCHeight[NPC[numNPCs].Type];
                 NPC[numNPCs].Type = NPC[A].Type + 4;
                 NPC[numNPCs].Projectile = true;
                 NPC[numNPCs].Direction = Player[C].Direction;
@@ -2181,12 +2186,12 @@ void NPCHit(int A, int B, int C)
 
     if(NPC[A].Type != oldNPC.Type)
     {
-        NPC[A].Location.Y = NPC[A].Location.Y + NPC[A].Location.Height;
+        NPC[A].Location.Y += NPC[A].Location.Height;
         NPC[A].Location.Height = NPCHeight[NPC[A].Type];
-        NPC[A].Location.Y = NPC[A].Location.Y - NPC[A].Location.Height;
-        NPC[A].Location.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0;
+        NPC[A].Location.Y -= NPC[A].Location.Height;
+        NPC[A].Location.X += (NPC[A].Location.Width / 2.0);
         NPC[A].Location.Width = NPCWidth[NPC[A].Type];
-        NPC[A].Location.X = NPC[A].Location.X - NPC[A].Location.Width / 2.0;
+        NPC[A].Location.X -= (NPC[A].Location.Width / 2.0);
     }
 
     StopHit = 0;
