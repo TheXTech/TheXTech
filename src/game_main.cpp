@@ -117,7 +117,6 @@ int GameMain(const CmdLineSetup_t &setup)
     LoadGFX(); // load the graphics from file
     SetupVars(); //Setup Variables
 
-    GameIsActive = true;
     do
     {
         if(GameMenu)

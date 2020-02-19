@@ -63,6 +63,9 @@ int main(int argc, char**argv)
     AppPathManager::initAppPath();
     AppPath = AppPathManager::userAppDirSTD();
 
+    // set this flag before SDL initialization to allow game be quit when closing a window before a loading process will be completed
+    GameIsActive = true;
+
     if(frmMain.initSDL())
     {
         frmMain.freeSDL();

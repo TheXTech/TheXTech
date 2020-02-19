@@ -551,6 +551,9 @@ StdPicture FrmMain::LoadPicture(std::string path, std::string maskPath, std::str
     StdPicture target;
     FIBITMAP *sourceImage;
 
+    if(!GameIsActive)
+        return target; // do nothing when game is closed
+
     if(path.empty())
         return target;
 
