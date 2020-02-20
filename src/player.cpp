@@ -10292,7 +10292,7 @@ void PlayerEffects(int A)
         tempBool = true;
         for(B = 1; B <= numPlayers; B++)
         {
-            if(B != A && (Player[B].Effect == 0 || B == Player[A].Effect2) && Player[B].Dead == false && Player[B].TimeToLive == 0 && CheckCollision(Player[A].Location, Player[B].Location) == true)
+            if(B != A && (Player[B].Effect == 0 || fEqual(B, Player[A].Effect2)) && !Player[B].Dead && Player[B].TimeToLive == 0 && CheckCollision(Player[A].Location, Player[B].Location))
                 tempBool = false;
         }
         if(tempBool == true)
@@ -10305,7 +10305,7 @@ void PlayerEffects(int A)
         }
         else if(Player[A].Effect2 > 0)
         {
-            D = Player[A].Effect2;
+            D = float(Player[A].Effect2);
             if(Player[D].Effect == 0)
                 Player[A].Effect2 = 0;
             Player[A].Immune2 = true;

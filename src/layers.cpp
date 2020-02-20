@@ -306,47 +306,47 @@ void ProcEvent(std::string EventName, bool NoEffect)
                         {
                             // If .Section = B Then
                             Player[C].Section = B;
-                                tempBool = false;
-                                if(Player[C].Location.X + Player[C].Location.Width >= level[B].X)
+                            tempBool = false;
+                            if(Player[C].Location.X + Player[C].Location.Width >= level[B].X)
+                            {
+                                if(Player[C].Location.X <= level[B].Width)
                                 {
-                                    if(Player[C].Location.X <= level[B].Width)
+                                    if(Player[C].Location.Y + Player[C].Location.Height >= level[B].Y)
                                     {
-                                        if(Player[C].Location.Y + Player[C].Location.Height >= level[B].Y)
+                                        if(Player[C].Location.Y <= level[B].Height)
                                         {
-                                            if(Player[C].Location.Y <= level[B].Height)
-                                            {
-                                                tempBool = true; // Check to see if player is still in section after resizing
-                                                plr = C;
-                                            }
+                                            tempBool = true; // Check to see if player is still in section after resizing
+                                            plr = C;
                                         }
                                     }
                                 }
-                                if(tempBool == false)
+                            }
+                            if(tempBool == false)
+                            {
+                                for(D = 1; D <= numPlayers; D++)
                                 {
-                                    for(D = 1; D <= numPlayers; D++)
+                                    if(D != C && Player[D].Section == B)
                                     {
-                                        if(D != C && Player[D].Section == B)
+                                        if(Player[D].Location.X + Player[D].Location.Width >= level[B].X)
                                         {
-                                            if(Player[D].Location.X + Player[D].Location.Width >= level[B].X)
+                                            if(Player[D].Location.X <= level[B].Width)
                                             {
-                                                if(Player[D].Location.X <= level[B].Width)
+                                                if(Player[D].Location.Y + Player[D].Location.Height >= level[B].Y)
                                                 {
-                                                    if(Player[D].Location.Y + Player[D].Location.Height >= level[B].Y)
+                                                    if(Player[D].Location.Y <= level[B].Height) // Move to another player who is still in the section
                                                     {
-                                                        if(Player[D].Location.Y <= level[B].Height) // Move to another player who is still in the section
-                                                        {
-                                                            Player[C].Location.X = Player[D].Location.X + Player[D].Location.Width / 2.0 - Player[C].Location.Width / 2.0;
-                                                            Player[C].Location.Y = Player[D].Location.Y + Player[D].Location.Height - Player[C].Location.Height;
-                                                            Player[C].Effect = 9;
-                                                            Player[C].Effect2 = D;
-                                                            break;
-                                                        }
+                                                        Player[C].Location.X = Player[D].Location.X + Player[D].Location.Width / 2.0 - Player[C].Location.Width / 2.0;
+                                                        Player[C].Location.Y = Player[D].Location.Y + Player[D].Location.Height - Player[C].Location.Height;
+                                                        Player[C].Effect = 9;
+                                                        Player[C].Effect2 = D;
+                                                        break;
                                                     }
                                                 }
                                             }
                                         }
                                     }
                                 }
+                            }
                             // End If
                         }
                     }
@@ -738,7 +738,7 @@ void UpdateLayers()
                                 if(NPC[B].Type == 8 || NPC[B].Type == 74 || NPC[B].Type == 93 ||
                                    NPC[B].Type == 256 || NPC[B].Type == 245)
                                     NPC[B].Location.Y += NPC[B].DefaultLocation.Height;
-                                else if(NPC[B].Type == 52 && NPC[B].Direction == -1)
+                                else if(NPC[B].Type == 52 && fEqual(NPC[B].Direction, -1))
                                     NPC[B].Location.X += NPC[B].DefaultLocation.Width;
                             }
                             else
