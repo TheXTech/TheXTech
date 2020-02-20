@@ -3022,11 +3022,16 @@ void UpdateGraphics()
             if(ScreenShake > 0)
             {
                 ScreenShake--;
-                A = (std::rand() % ScreenShake * 4) - ScreenShake * 2;
-                B = (std::rand() % ScreenShake * 4) - ScreenShake * 2;
-                frmMain.offsetViewport(A, B);
                 if(ScreenShake == 0)
+                {
                     frmMain.offsetViewport(0, 0);
+                }
+                else
+                {
+                    A = (std::rand() % ScreenShake * 4) - ScreenShake * 2;
+                    B = (std::rand() % ScreenShake * 4) - ScreenShake * 2;
+                    frmMain.offsetViewport(A, B);
+                }
             }
             frmMain.repaint();
         }
