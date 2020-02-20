@@ -214,7 +214,7 @@ void NPCHit(int A, int B, int C)
     }
 
 
-    if(B == 1 && NPCJumpHurt[NPC[A].Type] == true && NPC[A].Type != 283) // Things that don't die from jumping
+    if(B == 1 && NPCJumpHurt[NPC[A].Type] && NPC[A].Type != 283) // Things that don't die from jumping
         return;
 
     if(B == 10 && NPC[A].Type == 31)
@@ -1292,7 +1292,7 @@ void NPCHit(int A, int B, int C)
                 NPC[numNPCs].CantHurt = 6;
                 NPC[numNPCs].Active = true;
                 NPC[numNPCs].TimeLeft = 100;
-                NPC[A].Type = NPC[A].Type + 4;
+                NPC[A].Type +=  4;
             }
             NPC[A].Location.Height = NPCHeight[NPC[A].Type];
             NPC[A].Location.Width = NPCWidth[NPC[A].Type];

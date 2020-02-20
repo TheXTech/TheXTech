@@ -3554,7 +3554,7 @@ void UpdatePlayer()
 
                 for(B = 1; B <= numNPCs; B++)
                 {
-                    if(NPC[B].Active == true && NPC[B].Killed == 0 && NPC[B].Effect != 5 && NPC[B].Effect != 6)
+                    if(NPC[B].Active && NPC[B].Killed == 0 && NPC[B].Effect != 5 && NPC[B].Effect != 6)
                     {
                         // If Not (NPC(B).Type = 17 And NPC(B).CantHurt > 0) And Not (.Mount = 2 And NPC(B).Type = 56) And Not NPC(B).standingOnPlayer = A And Not NPC(B).Type = 197 And Not NPC(B).Type = 237 Then
                         if(!(Player[A].Mount == 2 && NPC[B].Type == 56) && !(NPC[B].standingOnPlayer == A) && !(NPC[B].Type == 197) && !(NPC[B].Type == 237))
@@ -4051,6 +4051,7 @@ void UpdatePlayer()
                                                         Player[A].Location.SpeedY = -Physics.PlayerGravity;
                                                     }
                                                 }
+
                                                 if(
                                                     !(Player[A].WetFrame &&
                                                         (NPC[B].Type == 229 || NPC[B].Type == 230 ||

@@ -61,7 +61,8 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         else
         {
             b.Special = 0;
-            for(auto B = 1; B <= numPlayers; B++)
+            auto tmpNumPlayers = numPlayers;
+            for(auto B = 1; B <= tmpNumPlayers; B++)
             {
                 SavedChar[Player[whatPlayer].Character] = Player[whatPlayer];
                 if(Player[B].Character == 1)
@@ -158,7 +159,8 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
     if(HitDown == true && b.Special > 0)
     {
         tempBool = false;
-        for(auto B = 1; B <= numBlock; B++)
+        auto tmpNumBlocks = numBlock;
+        for(auto B = 1; B <= tmpNumBlocks; B++)
         {
             if(B != A)
             {
