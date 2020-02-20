@@ -3552,7 +3552,8 @@ void UpdatePlayer()
                 tempHit = false; // Used for JUMP detection
                 tempHit2 = false;
 
-                for(B = 1; B <= numNPCs; B++)
+                int tempNumNPCsMax = numNPCs;
+                for(B = 1; B <= tempNumNPCsMax; B++)
                 {
                     if(NPC[B].Active && NPC[B].Killed == 0 && NPC[B].Effect != 5 && NPC[B].Effect != 6)
                     {

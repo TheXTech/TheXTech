@@ -1280,7 +1280,7 @@ void NPCHit(int A, int B, int C)
             {
                 numNPCs++;
                 NPC[numNPCs].Location = NPC[A].Location;
-                NPC[numNPCs].Location.Y -= NPCHeight[NPC[numNPCs].Type];
+                NPC[numNPCs].Location.Y -= 32.0;
                 NPC[numNPCs].Type = NPC[A].Type + 8;
                 NPC[numNPCs].Projectile = true;
                 NPC[numNPCs].Direction = Player[C].Direction;
@@ -1354,7 +1354,7 @@ void NPCHit(int A, int B, int C)
             {
                 numNPCs++;
                 NPC[numNPCs].Location = NPC[A].Location;
-                NPC[numNPCs].Location.Y -= NPCHeight[NPC[numNPCs].Type];
+                NPC[numNPCs].Location.Y -= 32.0;
                 NPC[numNPCs].Type = NPC[A].Type + 4;
                 NPC[numNPCs].Projectile = true;
                 NPC[numNPCs].Direction = Player[C].Direction;
