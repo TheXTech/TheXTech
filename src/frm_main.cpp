@@ -688,12 +688,16 @@ void FrmMain::loadTexture(StdPicture &target, uint32_t width, uint32_t height, u
                                        FI_RGBA_BLUE_MASK,
                                        FI_RGBA_ALPHA_MASK);
     texture = SDL_CreateTextureFromSurface(m_gRenderer, surface);
-    SDL_FreeSurface(surface);
     if(!texture)
     {
-        pLogWarning("Render SW-SDL: Failed to load texture!");
+        pLogWarning("Render SW-SDL: Failed to load texture! (%s)", SDL_GetError());
+        SDL_FreeSurface(surface);
+        target.texture = nullptr;
+        target.inited = false;
         return;
     }
+
+    SDL_FreeSurface(surface);
 
     target.texture = texture;
     m_textureBank.insert(texture);
@@ -984,6 +988,17 @@ void FrmMain::renderTextureI(int xDst, int yDst, int wDst, int hDst,
 {
     const unsigned int flip = SDL_FLIP_NONE;
 
+    if(!tx.inited)
+        return;
+
+    if(!tx.texture)
+    {
+        D_pLogWarningNA("Attempt to render an empty texture!");
+        return;
+    }
+
+    SDL_assert_release(tx.texture);
+
     // Don't go more than size of texture
     if(xSrc + wDst > tx.w)
     {
@@ -1083,7 +1098,7 @@ int FrmMain::getPixelDataSize(const StdPicture &tx)
 
 void FrmMain::getPixelData(const StdPicture &tx, unsigned char *pixelData)
 {
-    if(tx.texture)
+    if(!tx.texture)
         return;
     int pitch, w, h, a;
     void *pixels;

@@ -5367,6 +5367,7 @@ void DrawBackground(int S, int Z)
             }
         }
     }
+
     A = 55; // SMW Water
     if(Background2[S] == 55)
     {
@@ -5391,6 +5392,7 @@ void DrawBackground(int S, int Z)
             }
         }
     }
+
     A = 56; // SMB3 Water
     if(Background2[S] == 56)
     {
@@ -5450,10 +5452,10 @@ void DrawBackground(int S, int Z)
             }
         }
     }
+
     A = 57; // Warehouse
     if(Background2[S] == 57)
     {
-
         int tempVar96 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 2;
         for(B = 0; B <= tempVar96; B++)
         {
@@ -5470,14 +5472,19 @@ void DrawBackground(int S, int Z)
             tempLocation.Width = GFXBackground2Width[A];
             if(vScreenCollision(Z, tempLocation))
             {
-                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X,
+                                      vScreenY[Z] + tempLocation.Y,
+                                      GFXBackground2Width[A],
+                                      GFXBackground2Height[A],
+                                      GFXBackground2[A],
+                                      0, 0);
             }
         }
     }
+
     A = 58; // SMW Night
     if(Background2[S] == 58)
     {
-
         int tempVar97 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
         for(B = 0; B <= tempVar97; B++)
         {
@@ -5495,7 +5502,14 @@ void DrawBackground(int S, int Z)
             tempLocation.Width = GFXBackground2Width[A];
             if(vScreenCollision(Z, tempLocation))
             {
-                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A] / 4.0, GFXBackground2[A], 0, (GFXBackground2Height[A] / 4.0) * SpecialFrame[6]);
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X,
+                                      vScreenY[Z] + tempLocation.Y,
+                                      GFXBackground2Width[A],
+                                      GFXBackground2Height[A] / 4.0,
+                                      GFXBackground2[A],
+                                      0,
+                                      (GFXBackground2Height[A] / 4.0) * SpecialFrame[6]
+                );
             }
         }
     }
