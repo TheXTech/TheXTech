@@ -696,7 +696,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                     NPC[numNPCs].Location.Y = b.Location.Y - 32;
                     NPC[numNPCs].Location.SpeedY = -6;
                     NPC[numNPCs].Location.Height = NPCHeight[C];
-                    PlaySound(7);
+                    // PlaySound(7); // Don't play mushroom sound on leaf, like in original SMB3
                 }
                 else
                 {
