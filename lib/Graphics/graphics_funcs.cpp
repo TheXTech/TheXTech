@@ -99,10 +99,11 @@ FIBITMAP *GraphicsHelps::loadImage(std::string file, bool convertTo32bit)
         FIBITMAP *temp;
         temp = FreeImage_ConvertTo32Bits(img);
 
+        FreeImage_Unload(img);
+
         if(!temp)
             return nullptr;
 
-        FreeImage_Unload(img);
         img = temp;
 #ifdef DEBUG_BUILD
         imgConvertElapsed = static_cast<long long>(imgConvTime.nanoelapsed());
