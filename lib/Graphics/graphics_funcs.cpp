@@ -322,17 +322,17 @@ bool GraphicsHelps::setWindowIcon(SDL_Window *window, FIBITMAP *img, int iconSiz
 {
 #ifdef _WIN32
     struct SDL_SysWMinfo wmInfo;
-    SDL_VERSION(&wmInfo.version);
+    SDL_VERSION(&wmInfo.version)
 
-    if(-1 == SDL_GetWindowWMInfo(window, &wmInfo))
+    if(SDL_FALSE == SDL_GetWindowWMInfo(window, &wmInfo))
         return false;
 
     if(wmInfo.subsystem != SDL_SYSWM_WINDOWS)
         return false;
 
     HWND windowH = wmInfo.info.win.window;
-    HICON hicon = NULL;
-    BYTE *icon_bmp;
+    HICON hicon = nullptr;
+    BYTE *icon_bmp = nullptr;
     unsigned int icon_len, y;
     SDL_RWops *dst;
     unsigned int w = FreeImage_GetWidth(img);
