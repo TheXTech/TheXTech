@@ -72,5 +72,9 @@ void BlockSound();
 // checks to loop music and update the soundpause variable
 void UpdateSound();
 
+// EXTRA: load custom sounds.ini and music.ini from episode and custom folder!
+void LoadCustomSound();
+// EXTRA: Unload custom-loaded music and sounds, and restore originals
+void UnloadCustomSound();
 
 #endif // SOUND_H

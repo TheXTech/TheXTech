@@ -449,6 +449,7 @@ int GameMain(const CmdLineSetup_t &setup)
             }
 
             LoadCustomGFX();
+            LoadCustomSound();
             SetupPlayers();
 
             if((!StartLevel.empty() && NoMap) || !GoToLevel.empty())

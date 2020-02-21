@@ -51,11 +51,19 @@ static int g_customLvlMusicId = 24;
 static int g_customWldMusicId = 17;
 static int g_reservedChannels = 0;
 
+static unsigned int g_totalSounds = 0;
+static unsigned int g_totalMusicLevel = 0;
+static unsigned int g_totalMusicWorld = 0;
+static unsigned int g_totalMusicSpecial = 0;
+
 static int g_errorsSfx = 0;
 // static int g_errorsMusic = 0; // Unued yet
 
 static std::string MusicRoot;
 static std::string SfxRoot;
+
+static std::string musicIni = "music.ini";
+static std::string sfxIni = "sounds.ini";
 
 struct Music_t
 {
@@ -66,7 +74,10 @@ struct Music_t
 struct SFX_t
 {
     std::string path;
+    std::string customPath;
     Mix_Chunk *chunk = nullptr;
+    Mix_Chunk *chunkOrig = nullptr;
+    bool isCustom = false;
     int volume = 128;
     int channel = -1;
 };
@@ -119,7 +130,11 @@ void QuitMixerX()
     Mix_Quit();
 }
 
-static void AddMusic(IniProcessing &ini, std::string alias, std::string group, int volume)
+static void AddMusic(const std::string &root,
+                     IniProcessing &ini,
+                     std::string alias,
+                     std::string group,
+                     int volume)
 {
     std::string f;
     ini.beginGroup(group);
@@ -127,39 +142,96 @@ static void AddMusic(IniProcessing &ini, std::string alias, std::string group, i
     if(!f.empty())
     {
         Music_t m;
-        m.path = MusicRoot + f;
+        m.path = root + f;
         m.volume = volume;
         pLogDebug("Adding music [%s] '%s'", alias.c_str(), m.path.c_str());
-        music.insert({alias, m});
+        auto a = music.find(alias);
+        if(a == music.end())
+            music.insert({alias, m});
+        else
+            a->second = m;
     }
     ini.endGroup();
 }
 
-static void AddSfx(IniProcessing &ini, std::string alias, std::string group)
+static void RestoreSfx(SFX_t &u)
+{
+    if(u.isCustom)
+    {
+        if(u.chunk && u.chunkOrig)
+        {
+            Mix_FreeChunk(u.chunk);
+            u.chunk = u.chunkOrig;
+            u.chunkOrig = nullptr;
+        }
+        u.isCustom = false;
+    }
+}
+
+static void AddSfx(const std::string &root,
+                   IniProcessing &ini,
+                   std::string alias,
+                   std::string group,
+                   bool isCustom = false)
 {
     std::string f;
     ini.beginGroup(group);
     ini.read("file", f, std::string());
     if(!f.empty())
     {
-        SFX_t m;
-        m.path = SfxRoot + f;
-        m.volume = 128;
-        pLogDebug("Adding SFX [%s] '%s'", alias.c_str(), m.path.c_str());
-        m.chunk = Mix_LoadWAV(m.path.c_str());
-        m.channel = -1;
-        if(m.chunk)
+        if(isCustom)
         {
-            bool isSingleChannel = false;
-            ini.read("single-channel", isSingleChannel, false);
-            if(isSingleChannel)
-                m.channel = g_reservedChannels++;
-            sound.insert({alias, m});
+            auto s = sound.find(alias);
+            if(s != sound.end())
+            {
+                auto &m = s->second;
+                std::string newPath = root + f;
+                if(m.isCustom && newPath == m.customPath)
+                {
+                    ini.endGroup();
+                    return;  // Don't load same file twice!
+                }
+
+                Mix_Chunk *backup = m.chunk;
+                m.customPath = newPath;
+                m.chunk = Mix_LoadWAV((root + f).c_str());
+                if(m.chunk)
+                {
+                    if(!m.isCustom && !m.chunkOrig)
+                        m.chunkOrig = backup;
+                    else
+                        Mix_FreeChunk(backup);
+                    m.isCustom = true;
+                }
+                else
+                {
+                    m.chunk = backup;
+                    pLogWarning("ERROR: SFX '%s' loading error: %s", m.path.c_str(), Mix_GetError());
+                }
+            }
         }
         else
         {
-            pLogWarning("ERROR: SFX '%s' loading error: %s", m.path.c_str(), Mix_GetError());
-            g_errorsSfx++;
+            SFX_t m;
+            m.path = root + f;
+            m.volume = 128;
+            pLogDebug("Adding SFX [%s] '%s'", alias.c_str(), m.path.c_str());
+            m.chunk = Mix_LoadWAV(m.path.c_str());
+            m.channel = -1;
+            if(m.chunk)
+            {
+                bool isSingleChannel = false;
+                ini.read("single-channel", isSingleChannel, false);
+                if(isSingleChannel)
+                    m.channel = g_reservedChannels++;
+                sound.insert({alias, m});
+            }
+            else
+            {
+                pLogWarning("ERROR: SFX '%s' loading error: %s", m.path.c_str(), Mix_GetError());
+                if(!isCustom)
+                    g_errorsSfx++;
+            }
         }
     }
     ini.endGroup();
@@ -331,13 +403,85 @@ void PlayInitSound()
     }
 }
 
+static void loadMusicIni(const std::string &root, const std::string &path, bool isLoadingCustom)
+{
+    IniProcessing musicSetup(path);
+    if(!isLoadingCustom)
+    {
+        music.clear();
+        g_totalMusicLevel = 0;
+        g_totalMusicWorld = 0;
+        g_totalMusicSpecial = 0;
+        musicSetup.beginGroup("music-main");
+        musicSetup.read("total-level", g_totalMusicLevel, 0);
+        musicSetup.read("total-world", g_totalMusicWorld, 0);
+        musicSetup.read("total-special", g_totalMusicSpecial, 0);
+        musicSetup.read("level-custom-music-id", g_customLvlMusicId, 0);
+        musicSetup.read("world-custom-music-id", g_customWldMusicId, 0);
+        musicSetup.endGroup();
+    }
+
+    if(!isLoadingCustom)
+        UpdateLoad();
+    for(unsigned int i = 1; i <= g_totalMusicLevel; ++i)
+    {
+        std::string alias = fmt::format_ne("music{0}", i);
+        std::string group = fmt::format_ne("level-music-{0}", i);
+        AddMusic(root, musicSetup, alias, group, 52);
+    }
+
+    if(!isLoadingCustom)
+        UpdateLoad();
+    for(unsigned int i = 1; i <= g_totalMusicWorld; ++i)
+    {
+        std::string alias = fmt::format_ne("wmusic{0}", i);
+        std::string group = fmt::format_ne("world-music-{0}", i);
+        AddMusic(root, musicSetup, alias, group, 64);
+    }
+
+    if(!isLoadingCustom)
+        UpdateLoad();
+    for(unsigned int i = 1; i <= g_totalMusicSpecial; ++i)
+    {
+        std::string alias = fmt::format_ne("smusic{0}", i);
+        if(i == 1)
+            alias = "smusic";
+        else if(i == 2)
+            alias = "stmusic";
+        else if(i == 3)
+            alias = "tmusic";
+        std::string group = fmt::format_ne("special-music-{0}", i);
+        AddMusic(root, musicSetup, alias, group, 64);
+    }
+}
+
+static void loadCustomSfxIni(const std::string &root, const std::string &path)
+{
+    IniProcessing sounds(path);
+    for(unsigned int i = 1; i <= g_totalSounds; ++i)
+    {
+        std::string alias = fmt::format_ne("sound{0}", i);
+        std::string group = fmt::format_ne("sound-{0}", i);
+        AddSfx(root, sounds, alias, group, true);
+    }
+}
+
+static void restoreDefaultSfx()
+{
+    for(auto &s : sound)
+    {
+        auto &u = s.second;
+        RestoreSfx(u);
+    }
+}
+
 void InitSound()
 {
     if(noSound)
         return;
 
-    std::string musicIni = AppPath + "music.ini";
-    std::string sfxIni = AppPath + "sounds.ini";
+    musicIni = AppPath + "music.ini";
+    sfxIni = AppPath + "sounds.ini";
 
     UpdateLoad();
     if(!Files::fileExists(musicIni) && !Files::fileExists(sfxIni))
@@ -368,61 +512,20 @@ void InitSound()
                                  frmMain.getWindow());
     }
 
-    IniProcessing music(musicIni);
-    unsigned int totalLevel;
-    unsigned int totalWorld;
-    unsigned int totalSpecial;
-    music.beginGroup("music-main");
-    music.read("total-level", totalLevel, 0);
-    music.read("total-world", totalWorld, 0);
-    music.read("total-special", totalSpecial, 0);
-    music.read("level-custom-music-id", g_customLvlMusicId, 0);
-    music.read("world-custom-music-id", g_customWldMusicId, 0);
-    music.endGroup();
-
-    UpdateLoad();
-    for(unsigned int i = 1; i <= totalLevel; ++i)
-    {
-        std::string alias = fmt::format_ne("music{0}", i);
-        std::string group = fmt::format_ne("level-music-{0}", i);
-        AddMusic(music, alias, group, 52);
-    }
-
-    UpdateLoad();
-    for(unsigned int i = 1; i <= totalWorld; ++i)
-    {
-        std::string alias = fmt::format_ne("wmusic{0}", i);
-        std::string group = fmt::format_ne("world-music-{0}", i);
-        AddMusic(music, alias, group, 64);
-    }
-
-    UpdateLoad();
-    for(unsigned int i = 1; i <= totalSpecial; ++i)
-    {
-        std::string alias = fmt::format_ne("smusic{0}", i);
-        if(i == 1)
-            alias = "smusic";
-        else if(i == 2)
-            alias = "stmusic";
-        else if(i == 3)
-            alias = "tmusic";
-        std::string group = fmt::format_ne("special-music-{0}", i);
-        AddMusic(music, alias, group, 64);
-    }
+    loadMusicIni(MusicRoot, musicIni, false);
 
     UpdateLoad();
     IniProcessing sounds(sfxIni);
-    unsigned int totalSounds;
     sounds.beginGroup("sound-main");
-    sounds.read("total", totalSounds, 0);
+    sounds.read("total", g_totalSounds, 0);
     sounds.endGroup();
 
     UpdateLoad();
-    for(unsigned int i = 1; i <= totalSounds; ++i)
+    for(unsigned int i = 1; i <= g_totalSounds; ++i)
     {
         std::string alias = fmt::format_ne("sound{0}", i);
         std::string group = fmt::format_ne("sound-{0}", i);
-        AddSfx(sounds, alias, group);
+        AddSfx(SfxRoot, sounds, alias, group);
     }
     UpdateLoad();
     Mix_ReserveChannels(g_reservedChannels);
@@ -494,4 +597,35 @@ void UpdateSound()
         if(SoundPause[A] > 0)
             SoundPause[A] -= 1;
     }
+}
+
+void LoadCustomSound()
+{
+    if(noSound)
+        return;
+
+    if(GameMenu)
+        return; // Don't load custom music in menu mode
+
+    std::string mIni = FileNamePath + "music.ini";
+    std::string sIni = FileNamePath + "sounds.ini";
+    std::string mIniC = FileNamePath + FileName + "/music.ini";
+    std::string sIniC = FileNamePath + FileName + "/sounds.ini";
+
+    if(Files::fileExists(mIni))
+        loadMusicIni(FileNamePath, mIni, true);
+    if(Files::fileExists(mIniC))
+        loadMusicIni(FileNamePath + FileName, mIniC, true);
+    if(Files::fileExists(sIni))
+        loadCustomSfxIni(FileNamePath, sIni);
+    if(Files::fileExists(sIniC))
+        loadCustomSfxIni(FileNamePath + FileName, sIniC);
+}
+
+void UnloadCustomSound()
+{
+    if(noSound)
+        return;
+    loadMusicIni(MusicRoot, musicIni, true);
+    restoreDefaultSfx();
 }

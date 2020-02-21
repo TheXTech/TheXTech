@@ -189,6 +189,7 @@ void OpenWorld(std::string FilePath)
     }
 
     LoadCustomGFX();
+    LoadCustomSound();
 
 //    if(LevelEditor == false)
     {
@@ -283,6 +284,7 @@ void ClearWorld()
         WorldCredits[A] = "";
     UnloadCustomGFX();
     UnloadWorldCustomGFX();
+    UnloadCustomSound();
 //    if(LevelEditor == true)
 //    {
 //        frmLevelEditor::optCursor(14).Value = true;

@@ -85,6 +85,7 @@ void OpenLevel(std::string FilePath)
 //    else
     FindCustomNPCs();
     LoadCustomGFX();
+    LoadCustomSound();
 //    if(DirMan::exists(FileNamePath + FileName)) // Useless now
 //        LoadCustomGFX2(FileNamePath + FileName);
 // Blah
