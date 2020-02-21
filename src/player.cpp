@@ -471,7 +471,7 @@ void UpdatePlayer()
 
 
     // A is the current player, numPlayers is the last player. this loop updates all the players
-    for(A = 1; A <= numPlayers; A++)
+    for(int tmpNumPlayers = numPlayers, A = 1; A <= tmpNumPlayers; A++)
     {
 //        if(nPlay.Online == true && A > 1)
 //        {
@@ -1346,7 +1346,7 @@ void UpdatePlayer()
                 }
                 else
                     Player[A].FairyTime = 0;
-                if(Player[A].FairyCD != 0 && (Player[A].Location.SpeedY == 0 || Player[A].Slope != 0 || Player[A].StandingOnNPC != 0 || Player[A].WetFrame == true))
+                if(Player[A].FairyCD != 0 && (Player[A].Location.SpeedY == 0.0 || Player[A].Slope != 0 || Player[A].StandingOnNPC != 0 || Player[A].WetFrame))
                     Player[A].FairyCD = Player[A].FairyCD - 1;
 
 
@@ -1357,7 +1357,7 @@ void UpdatePlayer()
                     Player[A].Location.SpeedX = Player[A].Location.SpeedX + NPC[Player[A].StandingOnNPC].Location.SpeedX + NPC[Player[A].StandingOnNPC].BeltSpeed;
                 }
 
-                if(GameOutro == true) // force the player to walk a specific speed during the credits
+                if(GameOutro) // force the player to walk a specific speed during the credits
                 {
                     if(Player[A].Location.SpeedX < -2)
                         Player[A].Location.SpeedX = -2;
@@ -1368,7 +1368,7 @@ void UpdatePlayer()
 
 
                 // slippy code
-                if(Player[A].Slippy == true && (Player[A].Slide == false || Player[A].Slope == 0))
+                if(Player[A].Slippy == true && (!Player[A].Slide || Player[A].Slope == 0))
                 {
                     if(Player[A].Slope > 0)
                     {
@@ -3803,7 +3803,7 @@ void UpdatePlayer()
                                     }
 
 
-                                    if(NPCIsAVine[NPC[B].Type] == true) // if the player collided with a vine then see if he should climb it
+                                    if(NPCIsAVine[NPC[B].Type]) // if the player collided with a vine then see if he should climb it
                                     {
                                         if(Player[A].Character == 5)
                                         {
@@ -3824,22 +3824,26 @@ void UpdatePlayer()
                                                     Player[A].FairyTime = 20;
                                             }
                                         }
-                                        else if(Player[A].Fairy == false && Player[A].Stoned == false)
+                                        else if(!Player[A].Fairy && !Player[A].Stoned)
                                         {
                                             if(Player[A].Mount == 0 && Player[A].HoldingNPC <= 0)
                                             {
                                                 if(Player[A].Vine > 0)
                                                 {
-                                                    if(Player[A].Duck == true)
+                                                    if(Player[A].Duck)
                                                         UnDuck(A);
                                                     if(Player[A].Location.Y >= NPC[B].Location.Y - 20 && Player[A].Vine < 2)
                                                         Player[A].Vine = 2;
                                                     if(Player[A].Location.Y >= NPC[B].Location.Y - 18)
                                                         Player[A].Vine = 3;
                                                 }
-                                                else if((Player[A].Controls.Up == true || (Player[A].Controls.Down == true && !(Player[A].Location.SpeedY == 0) && !(Player[A].StandingOnNPC != 0) && !(Player[A].Slope > 0))) && Player[A].Jump == 0)
+                                                else if((Player[A].Controls.Up ||
+                                                         (Player[A].Controls.Down &&
+                                                          Player[A].Location.SpeedY != 0.0 &&
+                                                          !(Player[A].StandingOnNPC != 0) &&
+                                                          !(Player[A].Slope > 0))) && Player[A].Jump == 0)
                                                 {
-                                                    if(Player[A].Duck == true)
+                                                    if(Player[A].Duck)
                                                         UnDuck(A);
                                                     if(Player[A].Location.Y >= NPC[B].Location.Y - 20 && Player[A].Vine < 2)
                                                         Player[A].Vine = 2;
@@ -3853,7 +3857,7 @@ void UpdatePlayer()
                                     }
 
                                     // subcon warps
-                                    if(NPC[B].Type == 289 && HitSpot > 0 && Player[A].Controls.Up == true)
+                                    if(NPC[B].Type == 289 && HitSpot > 0 && Player[A].Controls.Up)
                                     {
                                         if(NPC[B].Special2 >= 0)
                                         {
@@ -5418,7 +5422,7 @@ void PlayerFrame(int A)
     Location_t tempLocation;
 
 // cause the flicker when he is immune
-    if(!(Player[A].Effect == 9))
+    if(Player[A].Effect != 9)
     {
         if(Player[A].Immune > 0)
         {
@@ -5434,12 +5438,14 @@ void PlayerFrame(int A)
         else
             Player[A].Immune2 = false;
     }
+
 // find frames for link
     if(Player[A].Character == 5)
     {
         LinkFrame(A);
         return;
     }
+
 // for the grab animation when picking something up from the top
     if(Player[A].GrabTime > 0)
     {
@@ -5455,14 +5461,15 @@ void PlayerFrame(int A)
         }
         return;
     }
+
 // statue frames
     if(Player[A].Stoned == true)
     {
         Player[A].Frame = 0;
         Player[A].FrameCount = 0;
-        if(Player[A].Location.SpeedX != 0)
+        if(Player[A].Location.SpeedX != 0.0)
         {
-            if(Player[A].Location.SpeedY == 0 || Player[A].Slope > 0 || Player[A].StandingOnNPC != 0)
+            if(Player[A].Location.SpeedY == 0.0 || Player[A].Slope > 0 || Player[A].StandingOnNPC != 0)
             {
                 if(Player[A].SlideCounter <= 0)
                 {
@@ -5475,6 +5482,7 @@ void PlayerFrame(int A)
         }
         return;
     }
+
 // sliding frames
     if(Player[A].Slide == true && (Player[A].Character == 1 || Player[A].Character == 2))
     {
@@ -5497,10 +5505,11 @@ void PlayerFrame(int A)
         Player[A].Frame = 24;
         return;
     }
+
 // climbing a vine/ladder
     if(Player[A].Vine > 0)
     {
-        if(Player[A].Location.SpeedX != NPC[Player[A].VineNPC].Location.SpeedX ||
+        if(!fEqual(Player[A].Location.SpeedX, NPC[Player[A].VineNPC].Location.SpeedX) ||
            Player[A].Location.SpeedY < NPC[Player[A].VineNPC].Location.SpeedY - 0.1) // Or .Location.SpeedY > 0.1 Then
         {
             Player[A].FrameCount = Player[A].FrameCount + 1;
@@ -5517,6 +5526,7 @@ void PlayerFrame(int A)
             Player[A].Frame = 25;
         return;
     }
+
 // this finds the players direction
     if(LevelSelect == false && Player[A].Effect != 3)
     {
@@ -5542,13 +5552,13 @@ void PlayerFrame(int A)
     Player[A].MountOffsetY = 0;
 
 // for the spinjump/shellsurf
-    if((Player[A].SpinJump == true || Player[A].ShellSurf == true) && Player[A].Mount == 0)
+    if((Player[A].SpinJump || Player[A].ShellSurf) && Player[A].Mount == 0)
     {
         if(Player[A].SpinFrame < 4 || Player[A].SpinFrame >= 9)
             Player[A].Direction = -1;
         else
             Player[A].Direction = 1;
-        if(Player[A].ShellSurf == true)
+        if(Player[A].ShellSurf)
         {
             if(NPC[Player[A].StandingOnNPC].Location.SpeedX > 0)
                 Player[A].Direction = -Player[A].Direction;

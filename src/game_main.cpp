@@ -358,9 +358,10 @@ int GameMain(const CmdLineSetup_t &setup)
             }
 
             ProcEvent("Level - Start", true);
-            For(A, 2, 100)
+            For(A, 2, maxEvents)
             {
-                if(Events[A].AutoStart) ProcEvent(Events[A].Name, true);
+                if(Events[A].AutoStart)
+                    ProcEvent(Events[A].Name, true);
             }
 
             overTime = 0;
