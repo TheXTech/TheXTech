@@ -56,7 +56,7 @@ void PlayerEffects(int A);
 void SetupPlayers()
 {
     Location_t tempLocation;
-    Controls_t blankControls;
+//    Controls_t blankControls;
     int A = 0;
     int B = 0;
     int C = 0;
@@ -186,15 +186,15 @@ void SetupPlayers()
             Player[A].Location.Y = PlayerStart[B].Y + PlayerStart[B].Height - Player[A].Location.Height; // - 2
             Player[A].Direction = PlayerStart[B].Direction; // manually defined direction of player
         }
-        if(GrabAll == true)
-            Player[A].CanGrabNPCs = true;
-        else
-            Player[A].CanGrabNPCs = false;
+
+        Player[A].CanGrabNPCs = GrabAll;
+
         // reset all variables
         if(Player[A].Mount == 2)
             Player[A].Mount = 0;
         if(Player[A].Character >= 3 && Player[A].Mount == 3)
             Player[A].Mount = 0;
+
         Player[A].Slippy = false;
         Player[A].DoubleJump = false;
         Player[A].FlySparks = false;
@@ -242,6 +242,7 @@ void SetupPlayers()
         Player[A].Duck = false;
         Player[A].MountSpecial = 0;
         Player[A].YoshiTongueLength = 0;
+
 //        Player[A].Direction = 1; // Moved to above
         Player[A].Location.SpeedX = 0;
         Player[A].Location.SpeedY = 2;
@@ -274,8 +275,10 @@ void SetupPlayers()
         Player[A].RunRelease = false;
         Player[A].FloatTime = 0;
         Player[A].CanFloat = false;
+
         if(Player[A].Character == 3)
             Player[A].CanFloat = true;
+
         if(Player[A].Character == 3 || Player[A].Character == 4)
         {
             if(Player[A].State == 1)
@@ -292,7 +295,7 @@ void SetupPlayers()
                 Player[A].Location.X = Player[A].Location.X + A * 32 - 32;
             }
             else*/
-            if(GameOutro == true)
+            if(GameOutro)
             {
                 Player[A].Location = Player[1].Location;
                 Player[A].Location.X = Player[A].Location.X + A * 52 - 52;
@@ -368,7 +371,7 @@ void SetupPlayers()
         }
     }
     else if(StartLevel != FileName) // if not in the level for the checkpoint, blank the checkpoint
-        Checkpoint = "";
+        Checkpoint.clear();
 }
 
 void UpdatePlayer()
@@ -377,7 +380,7 @@ void UpdatePlayer()
     int B = 0;
     float C = 0;
     float D = 0;
-    Controls_t blankControls;
+//    Controls_t blankControls;
     float speedVar = 0; // adjusts the players speed by percentages
     long long fBlock = 0; // for collision detection optimizations
     long long lBlock = 0;
@@ -590,7 +593,7 @@ void UpdatePlayer()
                     KillPlayer(A); // Time to die
             }
         }
-        else if(Player[A].Dead == true)
+        else if(Player[A].Dead)
         {
             if(numPlayers > 2)
             {
@@ -615,7 +618,7 @@ void UpdatePlayer()
                 }
             }
         }
-        else if(Player[A].Dead == false)
+        else if(!Player[A].Dead)
         {
             oldLoc = Player[A].Location;
             if(Player[A].SlideCounter > 0) // for making the slide Effect
@@ -639,9 +642,9 @@ void UpdatePlayer()
                 }
                 else
                     Player[A].CanPound = false;
-                if(Player[A].GroundPound == true)
+                if(Player[A].GroundPound)
                 {
-                    if(Player[A].CanPound == false && Player[A].Location.SpeedY < 0)
+                    if(!Player[A].CanPound && Player[A].Location.SpeedY < 0)
                         Player[A].GroundPound = false;
                     Player[A].Controls.Down = true;
                     Player[A].CanJump = false;
@@ -662,7 +665,7 @@ void UpdatePlayer()
                 {
                     if(Player[A].Location.SpeedY < -5 && ((Player[A].Jump < 15 && Player[A].Jump != 0) || Player[A].CanFly == true))
                         Player[A].CanPound = true;
-                    if(Player[A].GroundPound2 == true)
+                    if(Player[A].GroundPound2)
                     {
                         Player[A].Location.SpeedY = -4;
                         Player[A].StandingOnNPC = 0;
@@ -688,7 +691,10 @@ void UpdatePlayer()
                 // let the player slide if not on a mount and holding something
                 if(Player[A].GrabTime > 0)
                     Player[A].Slide = false;
-                if(Player[A].Slope > 0 && Player[A].Controls.Down == true && Player[A].Mount == 0 && Player[A].HoldingNPC == 0 && !(Player[A].Character == 3 || Player[A].Character == 4 || Player[A].Character == 5) && Player[A].GrabTime == 0)
+                if(Player[A].Slope > 0 && Player[A].Controls.Down &&
+                   Player[A].Mount == 0 && Player[A].HoldingNPC == 0 &&
+                   !(Player[A].Character == 3 || Player[A].Character == 4 || Player[A].Character == 5) &&
+                   Player[A].GrabTime == 0)
                 {
                     if(Player[A].Duck == true)
                         UnDuck(A);
@@ -9426,7 +9432,7 @@ void PlayerEffects(int A)
         Player[A].SpinJump = false;
         Player[A].TailCount = 0;
         Player[A].Location.SpeedY = 0;
-        if(Player[A].Effect2 == 0)
+        if(Player[A].Effect2 == 0.0)
         {
             if(Warp[Player[A].Warp].Direction == 3)
             {
@@ -9505,7 +9511,7 @@ void PlayerEffects(int A)
                 Player[A].Location.SpeedX = 0;
             }
         }
-        else if(Player[A].Effect2 == 1)
+        else if(fEqual(Player[A].Effect2, 1))
         {
             if(Warp[Player[A].Warp].NoYoshi == true)
             {
@@ -9654,7 +9660,7 @@ void PlayerEffects(int A)
                 PlaySound(17);
             }
         }
-        else if(Player[A].Effect2 == 2)
+        else if(fEqual(Player[A].Effect2, 2))
         {
             if(Warp[Player[A].Warp].Direction2 == 1)
             {
@@ -9761,7 +9767,7 @@ void PlayerEffects(int A)
                 }
             }
         }
-        else if(Player[A].Effect2 == 3)
+        else if(fEqual(Player[A].Effect2, 3))
         {
             if(Player[A].HoldingNPC > 0)
             {
@@ -9898,13 +9904,13 @@ void PlayerEffects(int A)
         else if(Player[A].Effect2 <= 30)
         {
             Player[A].Effect2 = Player[A].Effect2 - 1;
-            if(Player[A].Effect2 == 0)
+            if(Player[A].Effect2 == 0.0)
             {
                 Player[A].Effect = 0;
                 Player[A].Effect2 = 0;
             }
         }
-        else if(Player[A].Effect2 == 131)
+        else if(fEqual(Player[A].Effect2, 131))
         {
             tempBool = false;
             for(B = 1; B <= numPlayers; B++)
@@ -9934,7 +9940,7 @@ void PlayerEffects(int A)
         else if(Player[A].Effect2 <= 130)
         {
             Player[A].Effect2 = Player[A].Effect2 - 1;
-            if(Player[A].Effect2 == 100)
+            if(fEqual(Player[A].Effect2, 100))
             {
                 Player[A].Effect = 0;
                 Player[A].Effect2 = 0;
@@ -9943,7 +9949,7 @@ void PlayerEffects(int A)
         else if(Player[A].Effect2 <= 300)
         {
             Player[A].Effect2 = Player[A].Effect2 - 1;
-            if(Player[A].Effect2 == 200)
+            if(fEqual(Player[A].Effect2, 200))
             {
                 Player[A].Effect2 = 100;
                 Player[A].Effect = 3;
@@ -9952,7 +9958,7 @@ void PlayerEffects(int A)
         else if(Player[A].Effect2 <= 1000) // Start Wait
         {
             Player[A].Effect2 = Player[A].Effect2 - 1;
-            if(Player[A].Effect2 == 900)
+            if(fEqual(Player[A].Effect2, 900))
             {
                 Player[A].Effect = 3;
                 Player[A].Effect2 = 100;
@@ -9966,7 +9972,7 @@ void PlayerEffects(int A)
         else if(Player[A].Effect2 <= 2000) // Start Wait
         {
             Player[A].Effect2 = Player[A].Effect2 - 1;
-            if(Player[A].Effect2 == 1900)
+            if(fEqual(Player[A].Effect2, 1900))
             {
                 for(C = 1; C <= numBackground; C++)
                 {
@@ -9994,7 +10000,7 @@ void PlayerEffects(int A)
         else if(Player[A].Effect2 <= 3000) // warp wait
         {
             Player[A].Effect2 = Player[A].Effect2 - 1;
-            if(Player[A].Effect2 == 2920)
+            if(fEqual(Player[A].Effect2, 2920))
             {
                 if(Warp[Player[A].Warp].MapWarp == true)
                 {
@@ -10020,13 +10026,13 @@ void PlayerEffects(int A)
     }
     else if(Player[A].Effect == 4) // Player got fire power
     {
-        if(Player[A].Duck == true && Player[A].Character != 5)
+        if(Player[A].Duck && Player[A].Character != 5)
         {
             UnDuck(A);
             Player[A].Frame = 1;
         }
         Player[A].Effect2 = Player[A].Effect2 + 1;
-        if(Player[A].Effect2 / 5 == static_cast<int>(floor(static_cast<double>(Player[A].Effect2 / 5))))
+        if(fEqual(Player[A].Effect2 / 5, std::floor(Player[A].Effect2 / 5.0)))
         {
             if(Player[A].State == 1 && Player[A].Character != 5)
             {
@@ -10072,7 +10078,7 @@ void PlayerEffects(int A)
             Player[A].Frame = 1;
         }
         Player[A].Effect2 = Player[A].Effect2 + 1;
-        if(Player[A].Effect2 / 5 == static_cast<int>(floor(static_cast<double>(Player[A].Effect2 / 5))))
+        if(fEqual(Player[A].Effect2 / 5, std::floor(Player[A].Effect2 / 5.0)))
         {
             if(Player[A].State == 1 && Player[A].Character != 5)
             {
@@ -10113,7 +10119,7 @@ void PlayerEffects(int A)
     else if(Player[A].Effect == 5) // Player got a leaf
     {
         Player[A].Frame = 1;
-        if(Player[A].Effect2 == 0)
+        if(Player[A].Effect2 == 0.0)
         {
             if(Player[A].State == 1 && Player[A].Mount == 0)
             {
@@ -10140,7 +10146,7 @@ void PlayerEffects(int A)
             NewEffect(131, tempLocation, 1, 0, ShadowMode);
         }
         Player[A].Effect2 = Player[A].Effect2 + 1;
-        if(Player[A].Effect2 == 14)
+        if(fEqual(Player[A].Effect2, 14))
         {
             Player[A].Immune = Player[A].Immune + 50;
             Player[A].Immune2 = true;
@@ -10153,7 +10159,7 @@ void PlayerEffects(int A)
     {
         Player[A].Frame = 1;
         Player[A].Immune2 = true;
-        if(Player[A].Effect2 == 0)
+        if(Player[A].Effect2 == 0.0)
         {
             if(Player[A].State == 1 && Player[A].Mount == 0)
             {
@@ -10180,7 +10186,7 @@ void PlayerEffects(int A)
             NewEffect(131, tempLocation, 1, 0, ShadowMode);
         }
         Player[A].Effect2 = Player[A].Effect2 + 1;
-        if(Player[A].Effect2 == 14)
+        if(fEqual(Player[A].Effect2, 14))
         {
             Player[A].Immune = Player[A].Immune + 50;
             Player[A].Immune2 = true;
@@ -10193,7 +10199,7 @@ void PlayerEffects(int A)
     {
         Player[A].Frame = 1;
         Player[A].Immune2 = true;
-        if(Player[A].Effect2 == 0)
+        if(Player[A].Effect2 == 0.0)
         {
             if(Player[A].State == 1 && Player[A].Mount == 0)
             {
