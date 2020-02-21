@@ -1059,6 +1059,8 @@ struct CreditLine_t
 
 //Public ScreenShake As Integer
 extern int ScreenShake;
+// TODO: Make it have multiple checkpoints and assign each one with different NPCs,
+// last one should resume player at given position
 //Public Checkpoint As String 'the filename of the level the player has a checkpoint in
 extern std::string Checkpoint;
 //Public MagicHand As Boolean 'true if playing a level in the editor while not in fullscreen mode
