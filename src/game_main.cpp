@@ -576,7 +576,7 @@ int GameMain(const CmdLineSetup_t &setup)
 // for warp entrances
             if((ReturnWarp > 0 && FileName == StartLevel) || (StartWarp > 0))
             {
-                for(int A = 1; A <= numPlayers; ++A)
+                for(int numPlayersMax = numPlayers, A = 1; A <= numPlayersMax; ++A)
                 {
                     Player_t &p = Player[A];
 
@@ -587,33 +587,33 @@ int GameMain(const CmdLineSetup_t &setup)
 
                     if(Warp[p.Warp].Effect == 1)
                     {
-                        if(Warp[p.Warp].Direction2 == 1)
+                        if(Warp[p.Warp].Direction2 == 1) // DOWN
                         {
 //                                .Location.X = Warp(.Warp).Exit.X + Warp(.Warp).Exit.Width / 2 - .Location.Width / 2
-                            p.Location.X = Warp[p.Warp].Exit.X + Warp[p.Warp].Exit.Width / 2 - p.Location.Width / 2;
+                            p.Location.X = Warp[p.Warp].Exit.X + (Warp[p.Warp].Exit.Width / 2) - (p.Location.Width / 2);
 //                                .Location.Y = Warp(.Warp).Exit.Y - .Location.Height - 8
-                            p.Location.Y = Warp[p.Warp].Exit.Y - Warp[p.Warp].Exit.Height - 8;
+                            p.Location.Y = Warp[p.Warp].Exit.Y - p.Location.Height - 8;
                         }
 //                            ElseIf Warp(.Warp).Direction2 = 3 Then
-                        if(Warp[p.Warp].Direction2 == 3)
+                        if(Warp[p.Warp].Direction2 == 3) // UP
                         {
 //                                .Location.X = Warp(.Warp).Exit.X + Warp(.Warp).Exit.Width / 2 - .Location.Width / 2
-                            p.Location.X = Warp[p.Warp].Exit.X + Warp[p.Warp].Exit.Width / 2 - p.Location.Width / 2;
+                            p.Location.X = Warp[p.Warp].Exit.X + (Warp[p.Warp].Exit.Width / 2) - (p.Location.Width / 2);
 //                                .Location.Y = Warp(.Warp).Exit.Y + Warp(.Warp).Exit.Height + 8
                             p.Location.Y = Warp[p.Warp].Exit.Y + Warp[p.Warp].Exit.Height + 8;
                         }
 //                            ElseIf Warp(.Warp).Direction2 = 2 Then
-                        if(Warp[p.Warp].Direction2 == 2)
+                        if(Warp[p.Warp].Direction2 == 2) // RIGHT
                         {
 //                                If .Mount = 3 Then .Duck = True
                             if(p.Mount == 3) p.Duck = true;
 //                                .Location.X = Warp(.Warp).Exit.X - .Location.Width - 8
-                            p.Location.X = Warp[p.Warp].Exit.X - Warp[p.Warp].Exit.Width - 8;
+                            p.Location.X = Warp[p.Warp].Exit.X - p.Location.Width - 8;
 //                                .Location.Y = Warp(.Warp).Exit.Y + Warp(.Warp).Exit.Height - .Location.Height - 2
                             p.Location.Y = Warp[p.Warp].Exit.Y + Warp[p.Warp].Exit.Height - p.Location.Height - 2;
                         }
 //                            ElseIf Warp(.Warp).Direction2 = 4 Then
-                        if(Warp[p.Warp].Direction2 == 4)
+                        if(Warp[p.Warp].Direction2 == 4) // LEFT
                         {
 //                                If .Mount = 3 Then .Duck = True
                             if(p.Mount == 3) p.Duck = true;
@@ -651,7 +651,7 @@ int GameMain(const CmdLineSetup_t &setup)
 //'--------------------------------------------
             ProcEvent("Level - Start", true);
 
-            for(int A = 2; A <= 100; ++A)
+            for(int A = 2; A <= maxEvents; ++A)
             {
                 if(Events[A].AutoStart)
                     ProcEvent(Events[A].Name, true);
