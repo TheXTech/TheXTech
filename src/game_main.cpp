@@ -122,12 +122,12 @@ int GameMain(const CmdLineSetup_t &setup)
         if(GameMenu)
         {
             frmMain.MousePointer = 99;
-            ShowCursor(0);
+            showCursor(0);
         }
         else if(!resChanged && !TestLevel && !LevelEditor)
         {
             frmMain.MousePointer = 0;
-            ShowCursor(1);
+            showCursor(1);
         }
 
 //        If LevelEditor = True Then 'Load the level editor
@@ -775,7 +775,7 @@ void KillIt()
         SetOrigRes();
     QuitMixerX();
     UnloadGFX();
-    ShowCursor(1);
+    showCursor(1);
 }
 
 

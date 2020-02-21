@@ -470,7 +470,7 @@ void DoEvents()
     frmMain.doEvents();
 }
 
-int ShowCursor(int show)
+int showCursor(int show)
 {
     return SDL_ShowCursor(show);
 }

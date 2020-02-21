@@ -76,7 +76,7 @@ void MenuLoop()
         {
 //        frmMain.MousePointer = 99
             frmMain.MousePointer = 99;
-            ShowCursor(0);
+            showCursor(0);
 //    End If
         }
 //    If .Up = False And .Down = False And .Jump = False And .Run = False And .Start = False Then

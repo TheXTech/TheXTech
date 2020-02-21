@@ -129,7 +129,7 @@ bool FrmMain::initSDL()
     }
 
 #ifdef __EMSCRIPTEN__ //Set canvas be 1/2 size for a faster rendering
-    SDL_SetWindowMinimumSize(window, ScaleWidth / 2, ScaleHeight / 2);
+    SDL_SetWindowMinimumSize(m_window, ScaleWidth / 2, ScaleHeight / 2);
 #else
     SDL_SetWindowMinimumSize(m_window, ScaleWidth, ScaleHeight);
 #endif //__EMSCRIPTEN__
@@ -142,13 +142,13 @@ bool FrmMain::initSDL()
     img[0] = GraphicsHelps::loadImage(AppPath + "/graphics/common/icon/cat_16.png");
     img[1] = GraphicsHelps::loadImage(AppPath + "/graphics/common/icon/cat_32.png");
 
-    if(!GraphicsHelps::setWindowIcon(window, img[0], 16))
+    if(!GraphicsHelps::setWindowIcon(m_window, img[0], 16))
     {
         pLogWarning("Unable to setup window icon!");
         SDL_ClearError();
     }
 
-    if(!GraphicsHelps::setWindowIcon(window, img[1], 32))
+    if(!GraphicsHelps::setWindowIcon(m_window, img[1], 32))
     {
         pLogWarning("Unable to setup window icon!");
         SDL_ClearError();
@@ -223,7 +223,7 @@ void FrmMain::show()
 void FrmMain::hide()
 {
     SDL_HideWindow(m_window);
-    ShowCursor(1);
+    showCursor(1);
 }
 
 void FrmMain::doEvents()
@@ -239,7 +239,7 @@ void FrmMain::processEvent()
     switch(m_event.type)
     {
     case SDL_QUIT:
-        ShowCursor(1);
+        showCursor(1);
         KillIt();
         break;
     case SDL_WINDOWEVENT:

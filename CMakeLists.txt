@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.5)
 project(A2xTech LANGUAGES CXX)
 
 include(CheckCXXCompilerFlag)
+include(ExternalProject)
 
 if(NOT WIN32 AND CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
     check_cxx_compiler_flag("-no-pie" HAS_NO_PIE)
@@ -20,6 +21,11 @@ endfunction()
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE FALSE)
+
+set(CMAKE_OSX_DEPLOYMENT_TARGET "10.12")
+set(DEPENDENCIES_INSTALL_DIR ${CMAKE_BINARY_DIR}/deps)
+
+set(PGE_INSTALL_DIRECTORY ${CMAKE_INSTALL_PATH})
 
 include(cmake/build_props.cmake)
 
@@ -46,15 +52,21 @@ endif()
 option(USE_SYSTEM_LIBS "Use dependent libraries like SDL2, FreeImageLite and MixerX, installed in the system" ${USE_SYSTEM_LIBS_DEFAULT})
 option(USE_SYSTEM_SDL2 "Use SDL2 from a system even prefering system libraries" ${USE_SYSTEM_LIBS_DEFAULT})
 
-set(PGEFL_QT_SUPPORT OFF)
+option(PGEFL_QT_SUPPORT "Build PGE-FL with Qt support [Unneeded]" OFF)
 add_subdirectory(lib/PGE_File_Formats)
-mark_as_advanced(WITH_UNIT_TESTS)
+mark_as_advanced(WITH_UNIT_TESTS PGEFL_QT_SUPPORT)
 
 include(lib/DirManager/dirman.cmake)
 include(lib/FileMapper/FileMapper.cmake)
 include(lib/fmt/fmt.cmake)
 include(lib/IniProcessor/IniProcessor.cmake)
 include(lib/Utils/Utils.cmake)
+
+set(A2XT_LIBS pgefl ${UTILS_LIBS})
+set(A2XT_INCS src lib)
+set(A2XT_DEPS)
+
+add_library(A2XT_Int INTERFACE)
 
 if(USE_SYSTEM_LIBS)
     find_package(SDL2)
@@ -64,10 +76,20 @@ if(USE_SYSTEM_LIBS)
 
     find_library(FREEIMAGELITE_LIB NAMES FreeImageLite)
     find_path(FREEIMAGELITE_HEAD_DIR NAMES FreeImageLite.h)
+
+    list(APPEND A2XT_LIBS ${FREEIMAGELITE_LIB} ${MIXERX_LIB} "${SDL2_LIBRARIES}")
+    list(APPEND A2XT_INCS ${SDL2_INCLUDE_DIRS} ${MIXERX_HEAD_DIR} ${FREEIMAGELITE_HEAD_DIR})
+    target_link_libraries(A2XT_Int INTERFACE ${A2XT_LIBS})
 else()
-    # TODO: Make downloading and building of MixerX and FreeImageLite here
-    message(FATAL_ERROR "Not implemented yet")
+    include(cmake/library_FreeImage.cmake)
+    include(cmake/library_SDLMixerX.cmake)
+    list(APPEND A2XT_LIBS PGE_FreeImage PGE_SDLMixerX)
+    list(APPEND A2XT_INCS "${DEPENDENCIES_INSTALL_DIR}/include" ${SDL2_INCLUDE_DIRS})
+    target_link_libraries(A2XT_Int INTERFACE ${A2XT_LIBS})
+    list(APPEND A2XT_DEPS FreeImage_Local SDLMixerX_Local)
 endif()
+
+target_include_directories(A2XT_Int INTERFACE ${A2XT_INCS})
 
 set(LIB_SRC
     lib/AppPath/app_path.cpp
@@ -127,5 +149,9 @@ set(A2XTECH_SRC
 
 add_executable(a2xtech ${A2XTECH_SRC} ${LIB_SRC})
 pge_set_nopie(a2xtech)
-target_include_directories(a2xtech PRIVATE src lib ${SDL2_INCLUDE_DIRS} ${MIXERX_HEAD_DIR} ${FREEIMAGELITE_HEAD_DIR})
-target_link_libraries(a2xtech PRIVATE pgefl ${UTILS_LIBS} ${FREEIMAGELITE_LIB} ${MIXERX_LIB} ${SDL2_LIBRARIES})
+target_include_directories(a2xtech PRIVATE src lib ${A2XT_INCS})
+target_link_libraries(a2xtech PRIVATE A2XT_Int)
+add_dependencies(a2xtech ${A2XT_DEPS})
+if(WIN32)
+    set_target_properties(a2xtech PROPERTIES WIN32_EXECUTABLE ON)
+endif()

@@ -67,7 +67,7 @@ extern std::string AppPath;
 
 extern void DoEvents();
 
-extern int ShowCursor(int show);
+extern int showCursor(int show);
 
 extern Uint8 getKeyState(SDL_Scancode key);
 extern Uint8 getKeyStateI(int key);

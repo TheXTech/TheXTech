@@ -105,7 +105,7 @@ bool GFX_t::load()
 
     if(loadErrors > 0)
     {
-        std::string msg = fmt::format_ne("Failed to load an UI image assets. Loo a log file to get more details:\n{0}", getLogFilePath());
+        std::string msg = fmt::format_ne("Failed to load an UI image assets. Look a log file to get more details:\n{0}", getLogFilePath());
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "UI image assets loading error", msg.c_str(), nullptr);
         return false;
     }
