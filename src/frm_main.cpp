@@ -77,6 +77,9 @@ bool FrmMain::initSDL()
 
     g_ScreenshotPath = AppPath + "screenshots/";
 
+    //Initialize FreeImage
+    GraphicsHelps::initFreeImage();
+
     Uint32 sdlInitFlags = 0;
     // Prepare flags for SDL initialization
     sdlInitFlags |= SDL_INIT_TIMER;
@@ -212,6 +215,7 @@ void FrmMain::freeSDL()
     if(m_window)
         SDL_DestroyWindow(m_window);
     SDL_Quit();
+    GraphicsHelps::closeFreeImage();
     CloseLog();
 }
 
