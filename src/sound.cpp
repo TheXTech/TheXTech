@@ -51,9 +51,17 @@ static int g_customLvlMusicId = 24;
 static int g_customWldMusicId = 17;
 static int g_reservedChannels = 0;
 
+//! Total count of loaded default sounds
 static unsigned int g_totalSounds = 0;
+//! Are custom sounds was loaded from the level/world data folder?
+static bool g_customSoundsInDataFolder = false;
+//! Are custom music files was loaded from the level/world data folder?
+static bool g_customMusicInDataFolder = false;
+//! Total count of level music
 static unsigned int g_totalMusicLevel = 0;
+//! Total count of world map music
 static unsigned int g_totalMusicWorld = 0;
+//! Total count of special music
 static unsigned int g_totalMusicSpecial = 0;
 
 static int g_errorsSfx = 0;
@@ -612,14 +620,35 @@ void LoadCustomSound()
     std::string mIniC = FileNamePath + FileName + "/music.ini";
     std::string sIniC = FileNamePath + FileName + "/sounds.ini";
 
-    if(Files::fileExists(mIni))
+    // To avoid bugs like custom local sounds was transferred into another level, it's need to clean-up old one if that was
+    if(g_customMusicInDataFolder)
+    {
+        loadMusicIni(MusicRoot, musicIni, true);
+        g_customMusicInDataFolder = false;
+    }
+
+    if(g_customSoundsInDataFolder)
+    {
+        restoreDefaultSfx();
+        g_customSoundsInDataFolder = false;
+    }
+
+    if(Files::fileExists(mIni)) // Load music.ini from an episode folder
         loadMusicIni(FileNamePath, mIni, true);
-    if(Files::fileExists(mIniC))
+
+    if(Files::fileExists(mIniC)) // Load music.ini from a level/world custom folder
+    {
         loadMusicIni(FileNamePath + FileName, mIniC, true);
-    if(Files::fileExists(sIni))
+        g_customMusicInDataFolder = true;
+    }
+    if(Files::fileExists(sIni)) // Load sounds.ini from an episode folder
         loadCustomSfxIni(FileNamePath, sIni);
-    if(Files::fileExists(sIniC))
+
+    if(Files::fileExists(sIniC)) // Load music.ini from a level/world custom folder
+    {
         loadCustomSfxIni(FileNamePath + FileName, sIniC);
+        g_customSoundsInDataFolder = true;
+    }
 }
 
 void UnloadCustomSound()
@@ -628,4 +657,6 @@ void UnloadCustomSound()
         return;
     loadMusicIni(MusicRoot, musicIni, true);
     restoreDefaultSfx();
+    g_customMusicInDataFolder = false;
+    g_customSoundsInDataFolder = false;
 }
