@@ -104,6 +104,7 @@ void OpenLevel(std::string FilePath)
         level[B].Width = s.size_right;
         LevelREAL[B] = level[B];
         bgMusic[B] = int(s.music_id);
+        bgMusicREAL[B] = bgMusic[B];
         bgColor[B] = s.bgcolor;
         LevelWrap[B] = s.wrap_h;
         OffScreenExit[B] = s.OffScreenEn;
