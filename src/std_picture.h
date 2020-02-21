@@ -26,6 +26,8 @@
 #ifndef STD_PICTURE_H
 #define STD_PICTURE_H
 
+#include <vector>
+
 typedef unsigned int    GLenum;
 typedef int             GLint;
 typedef unsigned int    GLuint;
@@ -45,6 +47,9 @@ struct StdPicture
     int h = 0;
     int frame_w = 0;
     int frame_h = 0;
+    bool lazyLoaded = false;
+    std::vector<char> raw;
+    std::vector<char> rawMask;
     SDL_Texture *texture = nullptr;
     GLenum format = 0;
     GLint  nOfColors = 0;

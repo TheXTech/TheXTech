@@ -112,6 +112,9 @@ private:
     void processEvent();
     void loadTexture(StdPicture &target, uint32_t width, uint32_t height, uint8_t *RGBApixels);
 
+    void lazyLoad(StdPicture &target);
+    void lazyUnLoad(StdPicture &target);
+
     struct PGE_GL_shoot
     {
         FrmMain *me = nullptr;

@@ -705,6 +705,16 @@ void FrmMain::loadTexture(StdPicture &target, uint32_t width, uint32_t height, u
     target.inited = true;
 }
 
+void FrmMain::lazyLoad(StdPicture &target)
+{
+    // TODO: Implement this
+}
+
+void FrmMain::lazyUnLoad(StdPicture &target)
+{
+    // TODO: Implement this
+}
+
 
 void FrmMain::makeShot()
 {
