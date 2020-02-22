@@ -51,7 +51,7 @@ void DropBonus(int A)
         if(Player[A].HeldBonus > 0)
         {
             PlaySound(11);
-            numNPCs = numNPCs + 1;
+            numNPCs++;
             NPC[numNPCs].Type = Player[A].HeldBonus;
             NPC[numNPCs].Location.Width = NPCWidth[Player[A].HeldBonus];
             NPC[numNPCs].Location.Height = 32;
@@ -773,7 +773,7 @@ void DropNPC(int A, int NPCType)
     if(A == 1 || numPlayers == 2)
     {
         PlaySound(11);
-        numNPCs = numNPCs + 1;
+        numNPCs++;
         NPC[numNPCs].Type = NPCType;
         NPC[numNPCs].Location.Width = NPCWidth[NPCType];
         NPC[numNPCs].Location.Height = NPCHeight[NPCType];
@@ -932,7 +932,7 @@ void NPCSpecial(int A)
 
         if(tempBool == false || NPC[A].Special == 1.0)
         {
-            numNPCs = numNPCs + 1;
+            numNPCs++;
             if(NPC[A].Type == 225)
                 NPC[numNPCs].Type = 214;
             else if(NPC[A].Type == 226)
@@ -1219,7 +1219,7 @@ void NPCSpecial(int A)
             {
                 for(B = 1; B <= 4; B++)
                 {
-                    numNPCs = numNPCs + 1;
+                    numNPCs++;
                     NPC[numNPCs].Type = 276;
                     NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
                     NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
@@ -1584,7 +1584,7 @@ void NPCSpecial(int A)
 
                 if(NPC[A].Special3 == 0)
                     PlaySound(34);
-                numNPCs = numNPCs + 1;
+                numNPCs++;
                 NPC[numNPCs].Active = true;
                 NPC[numNPCs].TimeLeft = 100;
                 NPC[numNPCs].Direction = NPC[A].Direction;
@@ -1737,7 +1737,7 @@ void NPCSpecial(int A)
             if(NPC[A].Special3 == 20) // shoot
             {
                 PlaySound(42);
-                numNPCs = numNPCs + 1;
+                numNPCs++;
                 NPC[numNPCs].Active = true;
                 NPC[numNPCs].TimeLeft = 100;
                 NPC[numNPCs].Direction = NPC[A].Direction;
@@ -1877,7 +1877,7 @@ void NPCSpecial(int A)
             if(NPC[A].Special == -1)
             {
                 NPC[A].Special = 20;
-                numNPCs = numNPCs + 1;
+                numNPCs++;
                 NPC[numNPCs].Layer = "Spawned NPCs";
                 NPC[numNPCs].Active = true;
                 NPC[numNPCs].Direction = NPC[A].Direction;
@@ -2188,7 +2188,7 @@ void NPCSpecial(int A)
         if(NPC[A].Special >= 200 + std::rand() % 200)
         {
             NPC[A].Special = 0;
-            numNPCs = numNPCs + 1;
+            numNPCs++;
             NPC[numNPCs].Inert = NPC[A].Inert;
             NPC[numNPCs].Location.Height = 32;
             NPC[numNPCs].Location.Width = 28;
@@ -2565,7 +2565,7 @@ void NPCSpecial(int A)
             NPC[A].Special3 = NPC[A].Special3 + 1;
             if((int(NPC[A].Special3) % 10) == 0)
             {
-                numNPCs = numNPCs + 1;
+                numNPCs++;
                 NPC[numNPCs].Inert = NPC[A].Inert;
                 NPC[numNPCs].Location.Height = 32;
                 NPC[numNPCs].Location.Width = 32;
@@ -2793,7 +2793,7 @@ void NPCSpecial(int A)
             if((std::rand() % 100 > 40) && int(NPC[A].Special4) % 16 == 0)
             {
                 PlaySound(25);
-                numNPCs = numNPCs + 1;
+                numNPCs++;
                 NPC[numNPCs].Inert = NPC[A].Inert;
                 NPC[numNPCs].Location.Height = 32;
                 NPC[numNPCs].Location.Width = 32;
@@ -2821,7 +2821,7 @@ void NPCSpecial(int A)
             {
                 if(NPC[A].Special3 == 40)
                 {
-                    numNPCs = numNPCs + 1;
+                    numNPCs++;
                     NPC[numNPCs].Active = true;
                     NPC[numNPCs].TimeLeft = 100;
                     NPC[numNPCs].Direction = NPC[A].Direction;
@@ -3079,7 +3079,7 @@ void NPCSpecial(int A)
         }
         if(tempBool == true)
         {
-            numNPCs = numNPCs + 1;
+            numNPCs++;
             NPC[numNPCs].Active = true;
             NPC[numNPCs].Section = NPC[A].Section;
             NPC[numNPCs].TimeLeft = 100;
@@ -3517,7 +3517,7 @@ void SpecialNPC(int A)
                 }
                 else if(fEqual(NPC[A].Special, 50))
                 {
-                    numNPCs = numNPCs + 1;
+                    numNPCs++;
                     NPC[numNPCs].Active = true;
                     NPC[numNPCs].TimeLeft = 100;
                     NPC[numNPCs].Direction = NPC[A].Direction;
@@ -4329,7 +4329,7 @@ void SpecialNPC(int A)
         if(NPC[A].Special >= 200 + std::rand() % 200)
         {
             NPC[A].Special = 0;
-            numNPCs = numNPCs + 1;
+            numNPCs++;
             NPC[numNPCs].Inert = NPC[A].Inert;
             NPC[numNPCs].Type = 85;
             NPC[numNPCs].Direction = NPC[A].Direction;
@@ -4404,7 +4404,7 @@ void SpecialNPC(int A)
             }
             PlaySound(25);
             NPC[A].Special3 = -15;
-            numNPCs = numNPCs + 1;
+            numNPCs++;
             NPC[numNPCs].Inert = NPC[A].Inert;
             NPC[numNPCs].Location.Height = 32;
             NPC[numNPCs].Location.Width = 32;
@@ -4660,7 +4660,7 @@ void SpecialNPC(int A)
                 NPC[A].Special3 = 3;
                 NPC[A].FrameCount = 0;
                 NPC[A].Special5 = 0;
-                numNPCs = numNPCs + 1;
+                numNPCs++;
                 if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > Player[C].Location.X + Player[C].Location.Width / 2.0)
                     NPC[numNPCs].Direction = -1;
                 else
@@ -4963,7 +4963,7 @@ void SpecialNPC(int A)
             {
                 if(NPC[A].Special2 == 260)
                 {
-                    numNPCs = numNPCs + 1;
+                    numNPCs++;
                     NPC[numNPCs].Active = true;
                     NPC[numNPCs].Direction = NPC[A].Direction;
                     NPC[numNPCs].Type = 40;
@@ -5174,7 +5174,7 @@ void SpecialNPC(int A)
                 NPC[A].FrameCount = 100;
                 NPC[A].Special3 = 3;
                 NPC[A].Special5 = 0;
-                numNPCs = numNPCs + 1;
+                numNPCs++;
                 if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > Player[C].Location.X + Player[C].Location.Width / 2.0)
                     NPC[numNPCs].Direction = -1;
                 else

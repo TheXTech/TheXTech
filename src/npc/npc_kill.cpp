@@ -198,7 +198,7 @@ void KillNPC(int A, int B)
             B = 9;
             if(std::rand() % 10 <= 3)
             {
-                numNPCs = numNPCs + 1;
+                numNPCs++;
                 NPC[numNPCs].Type = 251;
                 if(std::rand() % 15 <= 3)
                     NPC[numNPCs].Type = 252;
@@ -1046,7 +1046,7 @@ void KillNPC(int A, int B)
                 }
                 if(DontSpawnExit == false)
                 {
-                    numNPCs = numNPCs + 1;
+                    numNPCs++;
                     NPC[numNPCs].Type = 41;
                     NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
                     NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];

@@ -1963,7 +1963,7 @@ void UpdateNPCs()
                                                                 {
                                                                     Block[B].Layer = "Destroyed Blocks";
                                                                     Block[B].Hidden = true;
-                                                                    numNPCs = numNPCs + 1;
+                                                                    numNPCs++;
                                                                     NPC[numNPCs].Location.Width = 28;
                                                                     NPC[numNPCs].Location.Height = 32;
                                                                     NPC[numNPCs].Type = 10;
@@ -4083,7 +4083,7 @@ void UpdateNPCs()
                                 NPC[A].Frame = 7;
                             if(NPC[A].Special3 == 29)
                             {
-                                numNPCs = numNPCs + 1;
+                                numNPCs++;
                                 NPC[numNPCs].Active = true;
                                 NPC[numNPCs].TimeLeft = 100;
                                 NPC[numNPCs].Direction = NPC[A].Direction;
@@ -4129,7 +4129,7 @@ void UpdateNPCs()
                     {
                         PlaySound(25);
                         NPC[A].Special3 = 0; // -15
-                        numNPCs = numNPCs + 1;
+                        numNPCs++;
                         NPC[numNPCs].Location.Height = 32;
                         NPC[numNPCs].Location.Width = 32;
                         NPC[numNPCs].Location.X = NPC[A].Location.X;
@@ -4216,7 +4216,7 @@ void UpdateNPCs()
                             else if(Player[NPC[A].standingOnPlayer].Controls.Run == true || NPC[A].standingOnPlayer == 0)
                             {
                                 NPC[A].Special = 0;
-                                numNPCs = numNPCs + 1;
+                                numNPCs++;
                                 NPC[numNPCs].Inert = NPC[A].Inert;
                                 tempBool = false;
                                 NPC[numNPCs].Direction = NPC[A].Direction;
@@ -4315,7 +4315,7 @@ void UpdateNPCs()
                         NPC[A].Special = 0;
                     if(NPC[A].Projectile == true && NPC[A].Special2 == 0 && NPC[A].Special == 0 && false)
                     {
-                        numNPCs = numNPCs + 1;
+                        numNPCs++;
                         NPC[A].Special2 = numNPCs;
                         NPC[numNPCs].Active = true;
                         NPC[numNPCs].Section = NPC[A].Section;

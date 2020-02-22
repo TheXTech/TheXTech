@@ -1488,10 +1488,10 @@ void NPCHit(int A, int B, int C)
                 NPC[A].Effect = 0;
             if(Player[C].Dismount <= 0 && Player[C].Mount != 2)
             {
-                if(NPC[A].Location.SpeedX == 0 && NPC[A].CantHurtPlayer != C)
+                if(NPC[A].Location.SpeedX == 0.0 && NPC[A].CantHurtPlayer != C)
                 {
                     PlaySound(9);
-                    NPC[A].Location.SpeedX = Physics.NPCShellSpeed * Player[C].Direction;
+                    NPC[A].Location.SpeedX = double(Physics.NPCShellSpeed * Player[C].Direction);
                     NPC[A].CantHurt = Physics.NPCCanHurtWait;
                     NPC[A].CantHurtPlayer = C;
                     NPC[A].Projectile = true;

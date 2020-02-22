@@ -107,7 +107,7 @@ void SetupPlayers()
     }
 
 
-    for(A = 1; A <= numPlayers; A++) // set up players
+    for(int numPlayersMax = numPlayers, A = 1; A <= numPlayersMax; A++) // set up players
     {
         if(Player[A].Character == 0) // player has no character
         {
@@ -336,7 +336,7 @@ void SetupPlayers()
 
     if(Checkpoint == FullFileName && Checkpoint != "") // if this level has a checkpoint the put the player in the correct position
     {
-        for(A = 1; A <= numNPCs; A++)
+        for(int numNPCsMax = numNPCs, A = 1; A <= numNPCsMax; A++)
         {
             if(NPC[A].Type == 192)
             {
@@ -676,7 +676,7 @@ void UpdatePlayer()
 
                 SizeCheck(A); // check that the player is the correct size for it's character/state/mount and set it if not
 
-                if(Player[A].Stoned == true) // stop the player from climbing/spinning/jumping when in tanooki statue form
+                if(Player[A].Stoned) // stop the player from climbing/spinning/jumping when in tanooki statue form
                 {
                     Player[A].Jump = 0;
                     Player[A].Vine = 0;
@@ -817,7 +817,7 @@ void UpdatePlayer()
                             }
                         }
 
-                        for(B = 1; B <= numNPCs; B++)
+                        for(int numNPCsMax2 = numNPCs, B = 1; B <= numNPCsMax2; B++)
                         {
                             if(NPCIsABlock[NPC[B].Type] == true && NPCStandsOnPlayer[NPC[B].Type] == false && NPC[B].Active == true && NPC[B].Type != 56)
                             {
@@ -840,7 +840,7 @@ void UpdatePlayer()
                             if(Player[A].SpinJump == true)
                                 Player[A].Jump = Player[A].Jump - 6;
                             Player[A].Mount = 0;
-                            numNPCs = numNPCs + 1;
+                            numNPCs += 1;
                             NPC[numNPCs].Direction = Player[A].Direction;
                             if(Maths::iRound(NPC[numNPCs].Direction) == 1)
                                 NPC[numNPCs].Frame = 4;
@@ -878,7 +878,7 @@ void UpdatePlayer()
                                 }
                             }
 
-                            for(B = 1; B <= numNPCs; B++)
+                            for(int numNPCsMax3 = numNPCs, B = 1; B <= numNPCsMax3; B++)
                             {
                                 if(NPC[B].standingOnPlayer == A)
                                 {
@@ -956,15 +956,15 @@ void UpdatePlayer()
                     Player[A].CanFly2 = false;
                     Player[A].RunCount = 0;
                     Player[A].SpinJump = false;
-                    if(Player[A].Controls.Left == true)
+                    if(Player[A].Controls.Left)
                         Player[A].Location.SpeedX = -1.5;
-                    else if(Player[A].Controls.Right == true)
+                    else if(Player[A].Controls.Right)
                         Player[A].Location.SpeedX = 1.5;
                     else
                         Player[A].Location.SpeedX = 0;
                     if(Player[A].Controls.Up == true && Player[A].Vine > 2)
                         Player[A].Location.SpeedY = -2;
-                    else if(Player[A].Controls.Down == true)
+                    else if(Player[A].Controls.Down)
                         Player[A].Location.SpeedY = 3;
                     else
                         Player[A].Location.SpeedY = 0;
@@ -1306,7 +1306,7 @@ void UpdatePlayer()
                         Player[A].FairyTime = Player[A].FairyTime - 1;
                     if(Player[A].FairyTime != -1 && Player[A].FairyTime < 20 && Player[A].Character == 5)
                     {
-                        for(B = 1; B <= numNPCs; B++)
+                        for(int numNPCsMax4 = numNPCs, B = 1; B <= numNPCsMax4; B++)
                         {
                             if(NPC[B].Active == true)
                             {
@@ -1487,7 +1487,7 @@ void UpdatePlayer()
                                 Player[A].Jump = Player[A].Jump - 6;
                             Player[A].Mount = 0;
                             Player[A].StandingOnNPC = 0;
-                            numNPCs = numNPCs + 1;
+                            numNPCs++;
                             Player[A].FlyCount = 0;
                             Player[A].RunCount = 0;
                             Player[A].CanFly = false;
@@ -1524,7 +1524,7 @@ void UpdatePlayer()
                             Player[A].CanJump = false;
                             Player[A].StandingOnNPC = 0;
                             Player[A].Mount = 0;
-                            numNPCs = numNPCs + 1;
+                            numNPCs++;
                             NPC[numNPCs].Direction = Player[A].Direction;
                             NPC[numNPCs].Active = true;
                             NPC[numNPCs].TimeLeft = 100;
@@ -1717,7 +1717,7 @@ void UpdatePlayer()
                                     Player[A].Jump = Player[A].Jump - 6;
                                 Player[A].Mount = 0;
                                 Player[A].StandingOnNPC = 0;
-                                numNPCs = numNPCs + 1;
+                                numNPCs++;
                                 Player[A].FlyCount = 0;
                                 Player[A].RunCount = 0;
                                 Player[A].CanFly = false;
@@ -1761,7 +1761,7 @@ void UpdatePlayer()
                                 if(Player[A].SpinJump == true)
                                     Player[A].Jump = Player[A].Jump - 6;
                                 Player[A].Mount = 0;
-                                numNPCs = numNPCs + 1;
+                                numNPCs++;
                                 NPC[numNPCs].Direction = Player[A].Direction;
                                 NPC[numNPCs].Active = true;
                                 NPC[numNPCs].TimeLeft = 100;
@@ -2343,7 +2343,7 @@ void UpdatePlayer()
                                 else
                                     PlaySound(82);
 
-                                numNPCs = numNPCs + 1;
+                                numNPCs++;
                                 if(ShadowMode == true)
                                     NPC[numNPCs].Shadow = true;
                                 NPC[numNPCs].Type = 13;
@@ -3488,7 +3488,11 @@ void UpdatePlayer()
 
                 // Check NPC collisions
                 if(Player[A].Vine > 0)
+                {
                     Player[A].Vine = Player[A].Vine - 1;
+                    if(Player[A].Vine == 0)
+                        pLogDebug("Kek");
+                }
                 tempBlockHit[1] = 0;
                 tempBlockHit[2] = 0;
                 tempHitSpeed = 0;
@@ -3724,7 +3728,7 @@ void UpdatePlayer()
                                             {
                                                 if(NPC[B].Killed == 8 && Player[A].Mount == 1 && Player[A].MountType == 2)
                                                 {
-                                                    numNPCs = numNPCs + 1;
+                                                    numNPCs++;
                                                     NPC[numNPCs].Active = true;
                                                     NPC[numNPCs].TimeLeft = 100;
                                                     NPC[numNPCs].Section = Player[A].Section;
@@ -3736,7 +3740,7 @@ void UpdatePlayer()
                                                     NPC[numNPCs].Location.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
                                                     NPC[numNPCs].Location.SpeedX = 4;
                                                     NPC[numNPCs].Location.SpeedY = 10;
-                                                    numNPCs = numNPCs + 1;
+                                                    numNPCs++;
                                                     NPC[numNPCs].Active = true;
                                                     NPC[numNPCs].TimeLeft = 100;
                                                     NPC[numNPCs].Section = Player[A].Section;
@@ -4861,7 +4865,7 @@ void PlayerHurt(int A)
                 Player[A].GroundPound2 = false;
                 Player[A].YoshiYellow = false;
                 Player[A].Dismount = Player[A].Immune;
-                numNPCs = numNPCs + 1;
+                numNPCs++;
                 if(Player[A].YoshiNPC > 0 || Player[A].YoshiPlayer > 0)
                 {
                     YoshiSpit(A);
@@ -4971,7 +4975,7 @@ void PlayerHurt(int A)
                     if(Player[A].Mount == 2)
                     {
                         Player[A].Mount = 0;
-                        numNPCs = numNPCs + 1;
+                        numNPCs++;
                         NPC[numNPCs].Direction = Player[A].Direction;
                         if(NPC[numNPCs].Direction == 1)
                             NPC[numNPCs].Frame = 4;
@@ -5068,9 +5072,9 @@ void PlayerDead(int A)
     Player[A].Fairy = false;
     if(Player[A].Mount == 2)
     {
-        numNPCs = numNPCs + 1;
+        numNPCs++;
         NPC[numNPCs].Direction = Player[A].Direction;
-        if(NPC[numNPCs].Direction == 1)
+        if(Maths::iRound(NPC[numNPCs].Direction) == 1)
             NPC[numNPCs].Frame = 4;
         NPC[numNPCs].Frame = NPC[numNPCs].Frame + SpecialFrame[2];
         NPC[numNPCs].Active = true;
@@ -6496,7 +6500,7 @@ void TailSwipe(int plr, bool boo, bool Stab, int StabDir)
             }
         }
     }
-    for(A = 1; A <= numNPCs; A++)
+    for(int numNPCsMax5 = numNPCs, A = 1; A <= numNPCsMax5; A++)
     {
         if(NPC[A].Active == true && NPC[A].Effect == 0 && !(NPCIsAnExit[NPC[A].Type] || (NPCIsACoin[NPC[A].Type] && Stab == false)) && NPC[A].CantHurtPlayer != plr && !(Player[plr].StandingOnNPC == A && Player[plr].ShellSurf == true))
         {
@@ -6637,7 +6641,7 @@ void YoshiEat(int A)
             }
         }
     }
-    for(B = 1; B <= numNPCs; B++)
+    for(int numNPCsMax6 = numNPCs, B = 1; B <= numNPCsMax6; B++)
     {
         if(((NPCIsACoin[NPC[B].Type] && NPC[B].Special == 1) || NPCNoYoshi[NPC[B].Type] == false) && NPC[B].Active == true && ((NPCIsACoin[NPC[B].Type] == false || NPC[B].Special == 1) || NPC[B].Type == 103) && NPCIsAnExit[NPC[B].Type] == false && NPC[B].Generator == false && NPC[B].Inert == false && NPCIsYoshi[NPC[B].Type] == false && NPC[B].Effect != 5 && NPC[B].Immune == 0 && NPC[B].Type != 91 && !(NPC[B].Projectile == true && NPC[B].Type == 17) && NPC[B].HoldingPlayer == 0)
         {
@@ -6754,7 +6758,7 @@ void YoshiSpit(int A)
             PlaySound(42);
             for(B = 1; B <= 3; B++)
             {
-                numNPCs = numNPCs + 1;
+                numNPCs++;
                 NPC[numNPCs].Direction = Player[A].Direction;
                 NPC[numNPCs].Type = 108;
                 NPC[numNPCs].Frame = EditorNPCFrame(NPC[numNPCs].Type, NPC[numNPCs].Direction);
@@ -6859,7 +6863,7 @@ void YoshiPound(int A, int /*C*/, bool BreakBlocks)
         tempLocation.Height = 32;
         tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height - 16;
 
-        for(B = 1; B <= numNPCs; B++)
+        for(int numNPCsMax7 = numNPCs, B = 1; B <= numNPCsMax7; B++)
         {
             if(NPC[B].Hidden == false && NPC[B].Active == true && NPC[B].Effect == 0)
             {
@@ -7494,7 +7498,7 @@ void ClownCar()
     // for when the player is in the clown car
     int A = 0;
     int B = 0;
-    int C = 0;
+//    int C = 0;
     NPC_t blankNPC;
     bool tempBool = false;
     Location_t tempLocation;
@@ -7558,7 +7562,7 @@ void ClownCar()
                 else if(Player[A].Location.SpeedY < -4)
                     Player[A].Location.SpeedY = -4;
             }
-            numNPCs = numNPCs + 1;
+            numNPCs++;
             NPC[numNPCs] = blankNPC;
             NPC[numNPCs].playerTemp = true;
             NPC[numNPCs].Type = 56;
@@ -7588,7 +7592,7 @@ void ClownCar()
                 }
             }
 
-            for(B = 1; B <= numNPCs; B++)
+            for(int numNPCsMax8 = numNPCs, B = 1; B <= numNPCsMax8; B++)
             {
                 if(NPC[B].standingOnPlayer == A && NPC[B].Type != 50)
                 {
@@ -7607,7 +7611,7 @@ void ClownCar()
                             if(NPC[B].Special == 0.0)
                             {
                                 NPC[B].Special = 1;
-                                numNPCs = numNPCs + 1;
+                                numNPCs++;
                                 NPC[B].Special2 = numNPCs;
                                 NPC[numNPCs].Active = true;
                                 NPC[numNPCs].Section = Player[A].Section;
@@ -7618,12 +7622,12 @@ void ClownCar()
                                 NPC[numNPCs].Special = A;
                                 NPC[numNPCs].Special2 = B;
                                 NPC[numNPCs].Direction = NPC[B].Direction;
-                                if(NPC[numNPCs].Direction == 1)
+                                if(Maths::iRound(NPC[numNPCs].Direction) == 1)
                                     NPC[numNPCs].Frame = 2;
                             }
-                            for(C = 1; C <= numNPCs; C++)
+                            for(int numNPCsMax9 = numNPCs, C = 1; C <= numNPCsMax9; C++)
                             {
-                                if(NPC[C].Type == 50 && NPC[C].Special == A && NPC[C].Special2 == B)
+                                if(NPC[C].Type == 50 && Maths::iRound(NPC[C].Special) == A && Maths::iRound(NPC[C].Special2) == B)
                                 {
                                     NPC[C].standingOnPlayer = A;
                                     NPC[C].Projectile = true;
@@ -7645,7 +7649,7 @@ void ClownCar()
                     tempLocation.X = tempLocation.X + 0.5;
                     tempLocation.Width = tempLocation.Width - 1;
                     tempLocation.Height = 1;
-                    for(C = 1; C <= numNPCs; C++)
+                    for(int numNPCsMax10 = numNPCs, C = 1; C <= numNPCsMax10; C++)
                     {
                         if(B != C && (NPC[C].standingOnPlayer == A || NPC[C].playerTemp == true))
                         {
@@ -7670,26 +7674,30 @@ void WaterCheck(int A)
 {
     Location_t tempLocation;
     int B = 0;
+
     if(Player[A].Wet > 0)
     {
         Player[A].Wet = Player[A].Wet - 1;
         Player[A].Multiplier = 0;
     }
+
     if(Player[A].Quicksand > 0)
     {
         Player[A].Quicksand = Player[A].Quicksand - 1;
         if(Player[A].Quicksand == 0)
             Player[A].WetFrame = false;
     }
-    if(UnderWater[Player[A].Section] == true)
+
+    if(UnderWater[Player[A].Section])
         Player[A].Wet = 2;
+
     if(Player[A].Wet > 0)
     {
         Player[A].SpinJump = false;
         Player[A].WetFrame = true;
         Player[A].Slide = false;
     }
-    else if(Player[A].WetFrame == true)
+    else if(Player[A].WetFrame)
     {
         if(Player[A].Location.SpeedY >= 3.1 || Player[A].Location.SpeedY <= -3.1)
         {
@@ -7701,7 +7709,8 @@ void WaterCheck(int A)
             NewEffect(114, tempLocation);
         }
     }
-    for(B = 1; B <= numWater; B++)
+
+    for(int numWaterMax = numWater, B = 1; B <= numWaterMax; B++)
     {
         if(Water[B].Hidden == false)
         {
@@ -7742,17 +7751,19 @@ void WaterCheck(int A)
             }
         }
     }
+
     if(Player[A].Mount == 2)
     {
         Player[A].Wet = 0;
         Player[A].WetFrame = 0;
     }
+
     if(Player[A].Wet == 1)
     {
-        if(Player[A].Location.SpeedY < 0 && (Player[A].Controls.AltJump == true || Player[A].Controls.Jump == true) && Player[A].Controls.Down == false)
+        if(Player[A].Location.SpeedY < 0 && (Player[A].Controls.AltJump || Player[A].Controls.Jump) && !Player[A].Controls.Down)
         {
             Player[A].Jump = 12;
-            Player[A].Location.SpeedY = Physics.PlayerJumpVelocity;
+            Player[A].Location.SpeedY = double(Physics.PlayerJumpVelocity);
         }
     }
     else if(Player[A].Wet == 2 && Player[A].Quicksand == 0)
@@ -7763,7 +7774,7 @@ void WaterCheck(int A)
                 tempLocation = newLoc(Player[A].Location.X + Player[A].Location.Width - std::rand() % 8, Player[A].Location.Y + 4 + std::rand() % 8, 8, 8);
             else
                 tempLocation = newLoc(Player[A].Location.X - 8 + std::rand() % 8, Player[A].Location.Y + 4 + std::rand() % 8, 8, 8);
-            if(UnderWater[Player[A].Section] == false)
+            if(!UnderWater[Player[A].Section])
             {
                 for(B = 1; B <= numWater; B++)
                 {
@@ -7782,10 +7793,10 @@ void WaterCheck(int A)
 
 void Tanooki(int A)
 {
-    if(Player[A].Fairy == true)
+    if(Player[A].Fairy)
            return;
 // tanooki
-    if(Player[A].Stoned == true && Player[A].Controls.Down == true && Player[A].StandingOnNPC == 0)
+    if(Player[A].Stoned && Player[A].Controls.Down && Player[A].StandingOnNPC == 0)
     {
         Player[A].Location.SpeedX = Player[A].Location.SpeedX * 0.8;
         if(Player[A].Location.SpeedX >= -0.5 && Player[A].Location.SpeedX <= 0.5)
@@ -7797,17 +7808,18 @@ void Tanooki(int A)
     if(Player[A].StonedCD == 0)
     {
         // If .Mount = 0 And .State = 5 And .Controls.Run = True And .Controls.Down = True Then
-        if(Player[A].Mount == 0 && Player[A].State == 5 && Player[A].Controls.AltRun == true && Player[A].Bombs == 0)
+        if(Player[A].Mount == 0 && Player[A].State == 5 && Player[A].Controls.AltRun && Player[A].Bombs == 0)
         {
-            if(Player[A].Stoned == false)
+            if(!Player[A].Stoned)
                 Player[A].Effect = 500;
         }
-        else if(Player[A].Stoned == true)
+        else if(Player[A].Stoned)
             Player[A].Effect = 500;
     }
     else
         Player[A].StonedCD = Player[A].StonedCD - 1;
-    if(Player[A].Stoned == true)
+
+    if(Player[A].Stoned)
     {
         Player[A].StonedTime = Player[A].StonedTime + 1;
         if(Player[A].StonedTime >= 240)
@@ -7820,10 +7832,11 @@ void Tanooki(int A)
             Player[A].Immune = Player[A].Immune + 1;
             if(Player[A].Immune % 3 == 0)
             {
-                if(Player[A].Immune2 == true)
-                    Player[A].Immune2 = false;
-                else
-                    Player[A].Immune2 = true;
+                Player[A].Immune2 = !Player[A].Immune2;
+//                if(Player[A].Immune2 == true)
+//                    Player[A].Immune2 = false;
+//                else
+//                    Player[A].Immune2 = true;
             }
         }
     }
@@ -7832,9 +7845,9 @@ void Tanooki(int A)
 void PowerUps(int A)
 {
     bool BoomOut = false;
-    int B = 0;
+    //int B = 0;
 
-    if(Player[A].Fairy == true)
+    if(Player[A].Fairy)
     {
         Player[A].SwordPoke = 0;
         Player[A].FireBallCD = 0;
@@ -7846,13 +7859,13 @@ void PowerUps(int A)
 
     if(Player[A].State == 6 && Player[A].Character == 4 && Player[A].Controls.Run == true && Player[A].RunRelease == true)
     {
-        for(B = 1; B <= numNPCs; B++)
+        for(int numNPCsMax11 = numNPCs, B = 1; B <= numNPCsMax11; B++)
         {
-            if(NPC[B].Active == true)
+            if(NPC[B].Active)
             {
                 if(NPC[B].Type == 292)
                 {
-                    if(NPC[B].Special5 == A)
+                    if(Maths::iRound(NPC[B].Special5) == A)
                         BoomOut = true;
                 }
             }
@@ -7860,7 +7873,7 @@ void PowerUps(int A)
     }
 
 // Hammer Throw Code
-        if(Player[A].Slide == false && Player[A].Vine == 0 && Player[A].State == 6 && Player[A].Duck == false && Player[A].Mount != 2 && Player[A].Mount != 3 && Player[A].HoldingNPC <= 0 && Player[A].Character != 5)
+        if(!Player[A].Slide && Player[A].Vine == 0 && Player[A].State == 6 && Player[A].Duck == false && Player[A].Mount != 2 && Player[A].Mount != 3 && Player[A].HoldingNPC <= 0 && Player[A].Character != 5)
         {
             if(Player[A].Controls.Run == true && Player[A].SpinJump == false && Player[A].FireBallCD <= 0 && BoomOut == false)
             {
@@ -7872,7 +7885,7 @@ void PowerUps(int A)
 //                            Netplay::sendData Netplay::PutPlayerControls(nPlay.MySlot) + "1f" + std::to_string(A) + "|" + Player[A].FireBallCD - 1;
                         Player[A].FrameCount = 110;
                         Player[A].FireBallCD = 25;
-                        numNPCs = numNPCs + 1;
+                        numNPCs++;
                         if(ShadowMode == true)
                             NPC[numNPCs].Shadow = true;
                         NPC[numNPCs].Type = 171;
@@ -7975,7 +7988,7 @@ void PowerUps(int A)
 //                            Netplay::sendData Netplay::PutPlayerControls(nPlay.MySlot) + "1f" + std::to_string(A) + "|" + Player[A].FireBallCD - 1;
                         if(Player[A].SpinJump == false)
                             Player[A].FrameCount = 110;
-                        numNPCs = numNPCs + 1;
+                        numNPCs++;
                         if(ShadowMode == true)
                             NPC[numNPCs].Shadow = true;
                         NPC[numNPCs].Type = 13;
@@ -7999,11 +8012,11 @@ void PowerUps(int A)
                             Player[A].HoldingNPC = numNPCs;
                             NPC[numNPCs].HoldingPlayer = A;
                         }
-                        if(NPC[numNPCs].Special == 2)
+                        if(Maths::iRound(NPC[numNPCs].Special) == 2)
                             NPC[numNPCs].Frame = 4;
-                        if(NPC[numNPCs].Special == 3)
+                        if(Maths::iRound(NPC[numNPCs].Special) == 3)
                             NPC[numNPCs].Frame = 8;
-                        if(NPC[numNPCs].Special == 4)
+                        if(Maths::iRound(NPC[numNPCs].Special) == 4)
                             NPC[numNPCs].Frame = 12;
                         CheckSectionNPC(numNPCs);
                         Player[A].FireBallCD = 30;
@@ -8039,8 +8052,9 @@ void PowerUps(int A)
                         }
                         else
                         {
-                            if(NPC[numNPCs].Special == 2)
+                            if(Maths::iRound(NPC[numNPCs].Special) == 2)
                                 NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 0.85;
+
                             if(Player[A].Controls.Up == true)
                             {
                                 if(Player[A].StandingOnNPC != 0)
@@ -8049,11 +8063,13 @@ void PowerUps(int A)
                                     NPC[numNPCs].Location.SpeedY = -6 + Player[A].Location.SpeedY * 0.1;
                                 NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 0.9;
                             }
-                            if(FlameThrower == true)
+
+                            if(FlameThrower)
                             {
                                 NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 1.5;
                                 NPC[numNPCs].Location.SpeedY = NPC[numNPCs].Location.SpeedY * 1.5;
                             }
+
                             if(Player[A].StandingOnNPC != 0)
                                 NPC[numNPCs].Location.SpeedX = 5 * Player[A].Direction + (Player[A].Location.SpeedX / 3.5) + NPC[Player[A].StandingOnNPC].Location.SpeedX / 3.5;
                             PlaySound(18);
@@ -8103,7 +8119,7 @@ void PowerUps(int A)
         {
             Player[A].FireBallCD = 10;
             Player[A].Bombs = Player[A].Bombs - 1;
-            numNPCs = numNPCs + 1;
+            numNPCs++;
             NPC[numNPCs].Active = true;
             NPC[numNPCs].TimeLeft = Physics.NPCTimeOffScreen;
             NPC[numNPCs].Section = Player[A].Section;
@@ -8700,7 +8716,7 @@ void PlayerGrabCode(int A, bool DontResetGrabTime)
                         PlaySound(82);
 
                     // For B = 1 To 3
-                        numNPCs = numNPCs + 1;
+                        numNPCs++;
                         NPC[numNPCs].CantHurt = 10000;
                         NPC[numNPCs].CantHurtPlayer = A;
                         NPC[numNPCs].BattleOwner = A;
@@ -8790,7 +8806,7 @@ void PlayerGrabCode(int A, bool DontResetGrabTime)
                 {
                     NPC[Player[A].HoldingNPC].Special = 1;
                     NPC[Player[A].HoldingNPC].Special2 = numNPCs + 1;
-                    numNPCs = numNPCs + 1;
+                    numNPCs++;
                     NPC[numNPCs].Active = true;
                     NPC[numNPCs].Section = Player[A].Section;
                     NPC[numNPCs].TimeLeft = 100;
