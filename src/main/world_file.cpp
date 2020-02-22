@@ -32,6 +32,7 @@
 
 #include <DirManager/dirman.h>
 #include <Utils/files.h>
+#include <Utils/strings.h>
 #include <PGE_File_Formats/file_formats.h>
 
 void OpenWorld(std::string FilePath)
@@ -81,7 +82,9 @@ void OpenWorld(std::string FilePath)
         WorldCredits[i].clear();
 
     B = 0;
-    for(auto &c : wld.authors)
+    std::vector<std::string> authorsList;
+    Strings::split(authorsList, wld.authors, "\n");
+    for(auto &c : authorsList)
     {
         B++;
         if(B > maxWorldCredits)
