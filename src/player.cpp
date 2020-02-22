@@ -4013,6 +4013,7 @@ void UpdatePlayer()
                                         {
                                             if(NPC[B].CantHurtPlayer == A && Player[A].NoShellKick > 0)
                                             {
+                                                // Do nothing!
                                             }
                                             else
                                             {
