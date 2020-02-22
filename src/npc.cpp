@@ -3538,14 +3538,15 @@ void SpecialNPC(int A)
                         NPC[numNPCs].Location.Y = NPC[A].Location.Y;
                     }
 
-                    NPC[numNPCs].Location.SpeedX = 3 * NPC[numNPCs].Direction;
+                    NPC[numNPCs].Location.SpeedX = double(3.f * NPC[numNPCs].Direction);
                     C = float(NPC[numNPCs].Location.X + NPC[numNPCs].Location.Width / 2.0) -
                         float(Player[NPC[A].Special4].Location.X + Player[NPC[A].Special4].Location.Width / 2.0);
                     D = float(NPC[numNPCs].Location.Y + NPC[numNPCs].Location.Height / 2.0) -
                         float(Player[NPC[A].Special4].Location.Y + Player[NPC[A].Special4].Location.Height / 2.0);
 
-                    double Cd = double(C) * NPC[numNPCs].Location.SpeedX;
-                    NPC[numNPCs].Location.SpeedY = double(D) / (Cd != 0.0 ? Cd : 0.00001);
+                    if(C == 0.0f)
+                        C = -0.00001f;
+                    NPC[numNPCs].Location.SpeedY = (double(D) / double(C)) * NPC[numNPCs].Location.SpeedX;
 
                     if(NPC[numNPCs].Location.SpeedY > 2)
                         NPC[numNPCs].Location.SpeedY = 2;
