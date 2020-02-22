@@ -3489,7 +3489,7 @@ void UpdatePlayer()
                 // Check NPC collisions
                 if(Player[A].Vine > 0)
                 {
-                    Player[A].Vine = Player[A].Vine - 1;
+                    Player[A].Vine -= 1;
                     if(Player[A].Vine == 0)
                         pLogDebug("Kek");
                 }
@@ -3553,6 +3553,7 @@ void UpdatePlayer()
                                             if(Player[A].Location.Y >= Background[B].Location.Y - 18)
                                                 Player[A].Vine = 3;
                                         }
+
                                         if(Player[A].Vine > 0)
                                             Player[A].VineNPC = -1;
                                     }
@@ -3573,8 +3574,7 @@ void UpdatePlayer()
                 tempHit = false; // Used for JUMP detection
                 tempHit2 = false;
 
-                int tempNumNPCsMax = numNPCs;
-                for(B = 1; B <= tempNumNPCsMax; B++)
+                for(int tempNumNPCsMax = numNPCs, B = 1; B <= tempNumNPCsMax; B++)
                 {
                     if(NPC[B].Active && NPC[B].Killed == 0 && NPC[B].Effect != 5 && NPC[B].Effect != 6)
                     {
@@ -3860,9 +3860,10 @@ void UpdatePlayer()
                                                 }
                                                 else if((Player[A].Controls.Up ||
                                                          (Player[A].Controls.Down &&
-                                                          Player[A].Location.SpeedY != 0.0 &&
-                                                          !(Player[A].StandingOnNPC != 0) &&
-                                                          !(Player[A].Slope > 0))) && Player[A].Jump == 0)
+                                                         !fEqual(Player[A].Location.SpeedY, 0.0) && // Not .Location.SpeedY = 0
+                                                          Player[A].StandingOnNPC == 0 && // Not .StandingOnNPC <> 0
+                                                          Player[A].Slope <= 0) // Not .Slope > 0
+                                                         ) && Player[A].Jump == 0)
                                                 {
                                                     if(Player[A].Duck)
                                                         UnDuck(A);
@@ -4009,7 +4010,9 @@ void UpdatePlayer()
                                                 }
                                             }
                                         }
-                                        else if(!(NPC[B].Type == 22) && !(NPC[B].Type == 31) && !(NPC[B].Type == 49) && !(NPC[B].Type == 50) && (Player[A].SlideKill == false || NPCWontHurt[NPC[B].Type] == true)) // NPCs that cannot be walked on
+                                        else if(NPC[B].Type != 22 && NPC[B].Type != 31 &&
+                                                NPC[B].Type != 49 && NPC[B].Type != 50 &&
+                                                (!Player[A].SlideKill || NPCWontHurt[NPC[B].Type])) // NPCs that cannot be walked on
                                         {
                                             if(NPC[B].CantHurtPlayer == A && Player[A].NoShellKick > 0)
                                             {
