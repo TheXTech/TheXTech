@@ -584,6 +584,10 @@ StdPicture FrmMain::LoadPicture(std::string path, std::string maskPath, std::str
     if(path.empty())
         return target;
 
+#ifdef DEBUG_BUILD
+    target.origPath = path;
+#endif
+
     sourceImage = GraphicsHelps::loadImage(path);
 
     // Don't load mask if PNG image is used
@@ -732,6 +736,10 @@ StdPicture FrmMain::lazyLoadPicture(std::string path, std::string maskPath, std:
 
     if(path.empty())
         return target;
+
+#ifdef DEBUG_BUILD
+    target.origPath = path;
+#endif
 
     // Don't load mask if PNG image is used
     if(Files::hasSuffix(path, ".png"))

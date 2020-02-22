@@ -27,6 +27,9 @@
 #define STD_PICTURE_H
 
 #include <vector>
+#ifdef DEBUG_BUILD
+#include <string>
+#endif
 
 typedef unsigned int    GLenum;
 typedef int             GLint;
@@ -42,6 +45,9 @@ struct PGEColor
 struct SDL_Texture;
 struct StdPicture
 {
+#ifdef DEBUG_BUILD
+    std::string origPath;
+#endif
     bool inited = false;
     int w = 0;
     int h = 0;

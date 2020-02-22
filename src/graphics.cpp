@@ -43,6 +43,9 @@ void SpecialFrames();
 // draws GFX to screen when on the world map/world map editor
 void UpdateGraphics2()
 {
+    if(!GameIsActive)
+        return;
+
     float c = ShadowMode ? 0.f : 1.f;
     cycleCount = cycleCount + 1;
     if(FrameSkip == true)
@@ -633,6 +636,9 @@ void UpdateGraphics(bool skipRepaint)
     std::string timeStr;
     int Z = 0;
     int numScreens = 0;
+
+    if(!GameIsActive)
+        return;
 
     // frame skip code
     cycleCount += 1;

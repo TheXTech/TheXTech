@@ -478,7 +478,7 @@ void LoadGFX()
 
 void UnloadGFX()
 {
-    frmMain.clearAllTextures();
+    // Do nothing
 }
 
 static SDL_INLINE void getExistingFiles(std::set<std::string> &existingFiles)
