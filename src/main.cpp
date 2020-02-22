@@ -43,6 +43,10 @@ int main(int argc, char**argv)
         TCLAP::SwitchArg switchFrameSkip("f", "frameskip", "Enable frame skipping mode", false);
         TCLAP::SwitchArg switchNoSound("s", "no-sound", "Disable sound", false);
         TCLAP::SwitchArg switchNoPause("p", "never-pause", "Never pause game when window losts a focus", false);
+        TCLAP::ValueArg<std::string> renderType("r", "render", "Render mode: sw (software), hw (hardware), vsync (hardware with vsync)",
+                                                false, "",
+                                                "render type",
+                                                cmd);
 
         cmd.add(&switchFrameSkip);
         cmd.add(&switchNoSound);
@@ -53,6 +57,13 @@ int main(int argc, char**argv)
         setup.frameSkip = switchFrameSkip.getValue();
         setup.noSound   = switchNoSound.getValue();
         setup.neverPause = switchNoPause.getValue();
+        std::string rt = renderType.getValue();
+        if(rt == "sw")
+            setup.renderType = CmdLineSetup_t::RENDER_SW;
+        else if(rt == "vsync")
+            setup.renderType = CmdLineSetup_t::RENDER_VSYNC;
+        else
+            setup.renderType = CmdLineSetup_t::RENDER_HW;
     }
     catch(TCLAP::ArgException &e)   // catch any exceptions
     {
@@ -66,7 +77,7 @@ int main(int argc, char**argv)
     // set this flag before SDL initialization to allow game be quit when closing a window before a loading process will be completed
     GameIsActive = true;
 
-    if(frmMain.initSDL())
+    if(frmMain.initSDL(setup))
     {
         frmMain.freeSDL();
         return 1;

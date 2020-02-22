@@ -67,7 +67,7 @@ Uint8 FrmMain::getKeyState(SDL_Scancode key)
     return 0;
 }
 
-bool FrmMain::initSDL()
+bool FrmMain::initSDL(const CmdLineSetup_t &setup)
 {
     bool res = false;
 
@@ -185,7 +185,18 @@ bool FrmMain::initSDL()
 
     pLogDebug("Init renderer settings...");
 
-    m_gRenderer = SDL_CreateRenderer(m_window, -1, SDL_RENDERER_ACCELERATED);
+    Uint32 renderFlags = 0;
+    if(setup.renderType == CmdLineSetup_t::RENDER_SW)
+        renderFlags = SDL_RENDERER_SOFTWARE;
+    else if(setup.renderType == CmdLineSetup_t::RENDER_HW)
+        renderFlags = SDL_RENDERER_ACCELERATED;
+    else if(setup.renderType == CmdLineSetup_t::RENDER_VSYNC)
+    {
+        renderFlags = SDL_RENDERER_ACCELERATED|SDL_RENDERER_PRESENTVSYNC;
+        MaxFPS = true;
+    }
+
+    m_gRenderer = SDL_CreateRenderer(m_window, -1, renderFlags);
     if(!m_gRenderer)
     {
         pLogCritical("Unable to create renderer!");

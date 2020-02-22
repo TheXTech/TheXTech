@@ -31,6 +31,7 @@
 #include <SDL2/SDL.h>
 
 #include "std_picture.h"
+#include "cmd_line_setup.h"
 
 class FrmMain
 {
@@ -53,7 +54,7 @@ public:
 
     Uint8 getKeyState(SDL_Scancode key);
 
-    bool initSDL();
+    bool initSDL(const CmdLineSetup_t &setup);
     void freeSDL();
 
     void show();
