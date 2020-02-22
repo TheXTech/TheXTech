@@ -4078,11 +4078,12 @@ void UpdatePlayer()
                                                     }
                                                 }
 
+                                                // If Not (.WetFrame = True And (NPC(B).Type = 229 Or NPC(B).Type = 230) Or NPCIsAVine(NPC(B).Type)) And .HoldingNPC <> B Then
                                                 if(
-                                                    !(Player[A].WetFrame &&
-                                                        (NPC[B].Type == 229 || NPC[B].Type == 230 ||
-                                                         NPCIsAVine[NPC[B].Type])) &&
-                                                    Player[A].HoldingNPC != B
+                                                    !(
+                                                       (Player[A].WetFrame && (NPC[B].Type == 229 || NPC[B].Type == 230)) ||
+                                                       NPCIsAVine[NPC[B].Type]
+                                                     ) && (Player[A].HoldingNPC != B)
                                                 )
                                                 {
                                                     if(Player[A].Vine > 0)
@@ -4090,6 +4091,7 @@ void UpdatePlayer()
                                                         Player[A].Vine = 0;
                                                         Player[A].Jump = 1;
                                                     }
+
                                                     if(!(NPCIsAShell[NPC[B].Type] && NPC[B].CantHurtPlayer == A))
                                                         NPCHit(B, 1, A); // NPC 'B' was jumped on '1' by player 'A'
                                                 }
