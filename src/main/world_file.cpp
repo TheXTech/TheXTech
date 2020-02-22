@@ -83,13 +83,16 @@ void OpenWorld(std::string FilePath)
 
     B = 0;
     std::vector<std::string> authorsList;
-    Strings::split(authorsList, wld.authors, "\n");
-    for(auto &c : authorsList)
+    if(!wld.authors.empty())
     {
-        B++;
-        if(B > maxWorldCredits)
-            break;
-        WorldCredits[B] = c;
+        Strings::split(authorsList, wld.authors, "\n");
+        for(auto &c : authorsList)
+        {
+            B++;
+            if(B > maxWorldCredits)
+                break;
+            WorldCredits[B] = c;
+        }
     }
 
     for(auto &t : wld.tiles)
