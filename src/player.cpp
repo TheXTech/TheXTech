@@ -3488,11 +3488,7 @@ void UpdatePlayer()
 
                 // Check NPC collisions
                 if(Player[A].Vine > 0)
-                {
                     Player[A].Vine -= 1;
-                    if(Player[A].Vine == 0)
-                        pLogDebug("Kek");
-                }
                 tempBlockHit[1] = 0;
                 tempBlockHit[2] = 0;
                 tempHitSpeed = 0;
