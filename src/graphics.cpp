@@ -625,7 +625,7 @@ void UpdateGraphics2()
 }
 
 // This draws the graphic to the screen when in a level/game menu/outro/level editor
-void UpdateGraphics()
+void UpdateGraphics(bool skipRepaint)
 {
 //    On Error Resume Next
     float c = ShadowMode ? 0.f : 1.f;
@@ -3033,7 +3033,9 @@ void UpdateGraphics()
                     frmMain.offsetViewport(A, B);
                 }
             }
-            frmMain.repaint();
+
+            if(!skipRepaint)
+                frmMain.repaint();
         }
 //    Next Z
     }

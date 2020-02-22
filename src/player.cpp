@@ -6448,7 +6448,7 @@ void TailSwipe(int plr, bool boo, bool Stab, int StabDir)
                             PlaySound(3);
 //                        if(nPlay.Online == true && plr - 1 == nPlay.MySlot)
 //                            Netplay::sendData Netplay::PutPlayerLoc(nPlay.MySlot) + "1g" + std::to_string(plr) + "|" + Player[plr].TailCount - 1;
-                        UpdateGraphics();
+                        UpdateGraphics(true);
                         if(StabDir == 2)
                         {
                             BlockHit(A, true, plr);
