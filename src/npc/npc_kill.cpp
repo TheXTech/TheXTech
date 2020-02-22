@@ -1502,7 +1502,7 @@ void KillNPC(int A, int B)
                 Player[B].StandingOnNPC = A;
             if(Player[B].YoshiNPC == numNPCs)
                 Player[B].YoshiNPC = A;
-            if(Player[B].VineNPC == numNPCs)
+            if(fEqual(Player[B].VineNPC, numNPCs))
                 Player[B].VineNPC = A;
         }
         NPC[A] = NPC[numNPCs];

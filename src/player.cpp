@@ -37,6 +37,7 @@
 #include "blocks.h"
 #include "editor.h"
 #include "layers.h"
+#include <Utils/maths.h>
 
 #include <fmt_format_ne.h>
 
@@ -741,20 +742,20 @@ void UpdatePlayer()
                 if(Player[A].Stoned == true) // if statue form reset to normal
                     speedVar = 1;
                 if(Player[A].Character == 3)
-                    speedVar = (float)(speedVar * 0.93);
+                    speedVar = (float)(speedVar * 0.93f);
                 if(Player[A].Character == 4)
-                    speedVar = (float)(speedVar * 1.07);
+                    speedVar = (float)(speedVar * 1.07f);
 
                 // modify speedvar to slow the player down under water
                 if(Player[A].Wet > 0)
                 {
-                    if(Player[A].Location.SpeedY == 0 || Player[A].Slope > 0 || Player[A].StandingOnNPC != 0)
-                        speedVar = (float)(speedVar * 0.25); // if walking go really slow
+                    if(Player[A].Location.SpeedY == 0.0 || Player[A].Slope > 0 || Player[A].StandingOnNPC != 0)
+                        speedVar = (float)(speedVar * 0.25f); // if walking go really slow
                     else
-                        speedVar = (float)(speedVar * 0.5); // if swimming go slower faster the walking
+                        speedVar = (float)(speedVar * 0.5f); // if swimming go slower faster the walking
                 }
 
-                if(Player[A].Slide == true) // Code used to move the player while sliding down a slope
+                if(Player[A].Slide) // Code used to move the player while sliding down a slope
                 {
                     if(Player[A].Slope > 0)
                     {
@@ -767,7 +768,7 @@ void UpdatePlayer()
                         else
                             Player[A].Location.SpeedX = Player[A].Location.SpeedX + slideSpeed;
                     }
-                    else if(Player[A].Location.SpeedY == 0 || Player[A].StandingOnNPC != 0)
+                    else if(Player[A].Location.SpeedY == 0.0 || Player[A].StandingOnNPC != 0)
                     {
                         if(Player[A].Location.SpeedX > 0.2)
                             Player[A].Location.SpeedX = Player[A].Location.SpeedX - 0.1;
@@ -790,9 +791,9 @@ void UpdatePlayer()
                 }
                 else if(Player[A].Mount == 2)
                 {
-                    if(Player[A].Controls.Jump == false)
+                    if(!Player[A].Controls.Jump)
                         Player[A].CanJump = true;
-                    if(Player[A].Controls.AltJump == true && Player[A].CanAltJump == true) // Jump out of the Clown Car
+                    if(Player[A].Controls.AltJump && Player[A].CanAltJump) // Jump out of the Clown Car
                     {
                         Player[A].CanJump = false;
                         tempBool = true;
@@ -803,6 +804,7 @@ void UpdatePlayer()
                         tempLocation.X = tempLocation.X + 64 - tempLocation.Width / 2.0;
                         fBlock = FirstBlock[(tempLocation.X / 32) - 1];
                         lBlock = LastBlock[((tempLocation.X + tempLocation.Width) / 32.0) + 1];
+
                         for(B = (int)fBlock; B <= lBlock; B++)
                         {
                             if(Block[B].Invis == false && BlockIsSizable[Block[B].Type] == false && BlockOnlyHitspot1[Block[B].Type] == false && BlockNoClipping[Block[B].Type] == false && Block[B].Hidden == false)
@@ -814,6 +816,7 @@ void UpdatePlayer()
                                 }
                             }
                         }
+
                         for(B = 1; B <= numNPCs; B++)
                         {
                             if(NPCIsABlock[NPC[B].Type] == true && NPCStandsOnPlayer[NPC[B].Type] == false && NPC[B].Active == true && NPC[B].Type != 56)
@@ -825,6 +828,7 @@ void UpdatePlayer()
                                 }
                             }
                         }
+
                         if(tempBool == true)
                         {
                             Player[A].CanJump = false;
@@ -838,7 +842,7 @@ void UpdatePlayer()
                             Player[A].Mount = 0;
                             numNPCs = numNPCs + 1;
                             NPC[numNPCs].Direction = Player[A].Direction;
-                            if(NPC[numNPCs].Direction == 1)
+                            if(Maths::iRound(NPC[numNPCs].Direction) == 1)
                                 NPC[numNPCs].Frame = 4;
                             NPC[numNPCs].Frame = NPC[numNPCs].Frame + SpecialFrame[2];
                             NPC[numNPCs].Active = true;
@@ -942,11 +946,11 @@ void UpdatePlayer()
                         Player[A].Location.SpeedX = Player[A].Location.SpeedX + 0.1;
                     else
                         Player[A].Location.SpeedX = 0;
-                    // if the player is climbing a vine
                 }
+                // if the player is climbing a vine
                 else if(Player[A].Vine > 0)
                 {
-                    if(Player[A].StandingOnNPC > 0 && Player[A].Controls.Up == false)
+                    if(Player[A].StandingOnNPC > 0 && !Player[A].Controls.Up)
                         Player[A].Vine = 0;
                     Player[A].CanFly = false;
                     Player[A].CanFly2 = false;
@@ -964,8 +968,8 @@ void UpdatePlayer()
                         Player[A].Location.SpeedY = 3;
                     else
                         Player[A].Location.SpeedY = 0;
-                    Player[A].Location.SpeedX = Player[A].Location.SpeedX + NPC[Player[A].VineNPC].Location.SpeedX;
-                    Player[A].Location.SpeedY = Player[A].Location.SpeedY + NPC[Player[A].VineNPC].Location.SpeedY;
+                    Player[A].Location.SpeedX += NPC[Player[A].VineNPC].Location.SpeedX;
+                    Player[A].Location.SpeedY += NPC[Player[A].VineNPC].Location.SpeedY;
                 }
                 else
                 {
@@ -976,13 +980,20 @@ void UpdatePlayer()
                     // ducking for link
                     if(Player[A].Duck == true && Player[A].WetFrame == true)
                     {
-                        if(Player[A].Location.SpeedY != 0 && Player[A].Slope == 0 && Player[A].StandingOnNPC == 0)
+                        if(Player[A].Location.SpeedY != 0.0 && Player[A].Slope == 0 && Player[A].StandingOnNPC == 0)
                             UnDuck(A);
                     }
                     // the following code controls the players ability to duck
-                    if(!(Player[A].Character == 5 && ((Player[A].Location.SpeedY != 0 && Player[A].Slope == 0 && Player[A].StandingOnNPC == 0) || Player[A].FireBallCD != 0))) // Link can't duck/unduck in air
+                    if(!(Player[A].Character == 5 && ((Player[A].Location.SpeedY != 0.0 && Player[A].Slope == 0 && Player[A].StandingOnNPC == 0) || Player[A].FireBallCD != 0))) // Link can't duck/unduck in air
                     {
-                        if(Player[A].Controls.Down == true && Player[A].SpinJump == false && Player[A].Stoned == false && Player[A].Vine == 0 && Player[A].Slide == false && (Player[A].Slope == 0 || Player[A].Mount > 0 || Player[A].WetFrame == true || Player[A].Character >= 3 || Player[A].GrabTime > 0) && ((Player[A].WetFrame == false || Player[A].Character >= 3) || Player[A].Location.SpeedY == 0 || Player[A].StandingOnNPC != 0 || Player[A].Slope != 0 || Player[A].Mount == 1) && Player[A].Fairy == false && Player[A].ShellSurf == false && Player[A].Driving == false)
+                        if(Player[A].Controls.Down && !Player[A].SpinJump &&
+                          !Player[A].Stoned && Player[A].Vine == 0 && !Player[A].Slide &&
+                              (Player[A].Slope == 0 || Player[A].Mount > 0 || Player[A].WetFrame ||
+                               Player[A].Character >= 3 || Player[A].GrabTime > 0) &&
+                              ((Player[A].WetFrame == false || Player[A].Character >= 3) ||
+                               Player[A].Location.SpeedY == 0.0 || Player[A].StandingOnNPC != 0 ||
+                               Player[A].Slope != 0 || Player[A].Mount == 1) &&
+                          !Player[A].Fairy && !Player[A].ShellSurf && !Player[A].Driving)
                         {
                             Player[A].Bumped = false;
                             if(Player[A].Mount != 2) // cant duck in the clown car
@@ -1047,7 +1058,7 @@ void UpdatePlayer()
                     )
                     {
                         Player[A].Bumped = false;
-                        if(Player[A].Controls.Run == true || Player[A].Location.SpeedX > -Physics.PlayerWalkSpeed * speedVar || Player[A].Character == 5)
+                        if(Player[A].Controls.Run || Player[A].Location.SpeedX > -Physics.PlayerWalkSpeed * speedVar || Player[A].Character == 5)
                         {
                             if(Player[A].Location.SpeedX > -Physics.PlayerWalkSpeed * speedVar * C)
                             {
@@ -1081,14 +1092,14 @@ void UpdatePlayer()
                                     Player[A].Location.SpeedX = Player[A].Location.SpeedX + 0.09 * 0.29;
                                 if(Player[A].Character == 4) // toad
                                     Player[A].Location.SpeedX = Player[A].Location.SpeedX - 0.09 * 0.29;
-                                if(SuperSpeed == true)
+                                if(SuperSpeed)
                                     Player[A].Location.SpeedX = Player[A].Location.SpeedX * 0.95;
                             }
                         }
-                        if(SuperSpeed == true && Player[A].Controls.Run == true)
-                            Player[A].Location.SpeedX = Player[A].Location.SpeedX - 0.1;
+                        if(SuperSpeed && Player[A].Controls.Run)
+                            Player[A].Location.SpeedX -= 0.1;
                     }
-                    else if(Player[A].Controls.Right == true && ((Player[A].Duck == false && Player[A].GrabTime == 0) || (Player[A].Location.SpeedY != 0 && Player[A].StandingOnNPC == 0 && Player[A].Slope == 0) || Player[A].Mount == 1))
+                    else if(Player[A].Controls.Right && ((!Player[A].Duck && Player[A].GrabTime == 0) || (Player[A].Location.SpeedY != 0 && Player[A].StandingOnNPC == 0 && Player[A].Slope == 0) || Player[A].Mount == 1))
                     {
                         Player[A].Bumped = false;
                         if(Player[A].Controls.Run == true || Player[A].Location.SpeedX < Physics.PlayerWalkSpeed * speedVar || Player[A].Character == 5)
@@ -1134,7 +1145,7 @@ void UpdatePlayer()
                     }
                     else
                     {
-                        if(Player[A].Location.SpeedY == 0 || Player[A].StandingOnNPC != 0 || Player[A].Slope > 0 || Player[A].WetFrame == true) // Only lose speed when not in the air
+                        if(Player[A].Location.SpeedY == 0.0 || Player[A].StandingOnNPC != 0 || Player[A].Slope > 0 || Player[A].WetFrame == true) // Only lose speed when not in the air
                         {
                             if(Player[A].Location.SpeedX > 0)
                                 Player[A].Location.SpeedX = Player[A].Location.SpeedX - 0.07 * speedVar;
@@ -1213,7 +1224,7 @@ void UpdatePlayer()
                     // Racoon/Tanooki Mario.  this handles the ability to fly after running
                     if((Player[A].State == 4 || Player[A].State == 5) && Player[A].Wet == 0)
                     {
-                        if((Player[A].Location.SpeedY == 0 || Player[A].CanFly2 == true ||
+                        if((Player[A].Location.SpeedY == 0.0 || Player[A].CanFly2 == true ||
                             Player[A].StandingOnNPC != 0 || Player[A].Slope > 0) &&
                                 (std::abs(Player[A].Location.SpeedX) >= Physics.PlayerRunSpeed ||
                                  (Player[A].Character == 3 && std::abs(Player[A].Location.SpeedX) >= 5.58)))
@@ -1403,7 +1414,7 @@ void UpdatePlayer()
                 Player[A].Location.X = Player[A].Location.X + Player[A].Location.SpeedX; // This is where the actual movement happens
 
                 // Players Y movement.
-                if(Block[Player[A].Slope].Location.SpeedY != 0 && Player[A].Slope != 0)
+                if(Block[Player[A].Slope].Location.SpeedY != 0.0 && Player[A].Slope != 0)
                     Player[A].Location.Y = Player[A].Location.Y + Block[Player[A].Slope].Location.SpeedY;
 
                 if(Player[A].Fairy == true) // the player is a fairy
@@ -1421,10 +1432,10 @@ void UpdatePlayer()
                         else if(Player[A].Location.SpeedY < -0.1 || Player[A].Controls.Down == true)
                         {
                             if(Player[A].Location.SpeedY < 3)
-                                Player[A].Location.SpeedY = Player[A].Location.SpeedY + Physics.PlayerGravity * 0.05;
+                                Player[A].Location.SpeedY = Player[A].Location.SpeedY + double(Physics.PlayerGravity * 0.05f);
                             if(Player[A].Location.SpeedY < 0)
-                                Player[A].Location.SpeedY = Player[A].Location.SpeedY + Physics.PlayerGravity * 0.05;
-                            Player[A].Location.SpeedY = Player[A].Location.SpeedY + Physics.PlayerGravity * 0.1;
+                                Player[A].Location.SpeedY = Player[A].Location.SpeedY + double(Physics.PlayerGravity * 0.05f);
+                            Player[A].Location.SpeedY = Player[A].Location.SpeedY + double(Physics.PlayerGravity * 0.1f);
                             if(Player[A].Controls.Down == true)
                                 Player[A].Location.SpeedY = Player[A].Location.SpeedY + 0.05;
                         }
@@ -1782,7 +1793,7 @@ void UpdatePlayer()
                             }
                         }
 
-                        if((Player[A].Location.SpeedY == 0 || Player[A].Jump > 0 || Player[A].Vine > 0) && Player[A].FloatTime == 0) // princess float
+                        if((Player[A].Location.SpeedY == 0.0 || Player[A].Jump > 0 || Player[A].Vine > 0) && Player[A].FloatTime == 0) // princess float
                             Player[A].CanFloat = true;
                         if(Player[A].Wet > 0 || Player[A].WetFrame == true)
                             Player[A].CanFloat = false;
@@ -5469,7 +5480,7 @@ void PlayerFrame(int A)
     }
 
 // statue frames
-    if(Player[A].Stoned == true)
+    if(Player[A].Stoned)
     {
         Player[A].Frame = 0;
         Player[A].FrameCount = 0;
@@ -5490,7 +5501,7 @@ void PlayerFrame(int A)
     }
 
 // sliding frames
-    if(Player[A].Slide == true && (Player[A].Character == 1 || Player[A].Character == 2))
+    if(Player[A].Slide && (Player[A].Character == 1 || Player[A].Character == 2))
     {
         if(Player[A].Location.SpeedX != 0.0)
         {
@@ -5518,23 +5529,25 @@ void PlayerFrame(int A)
         if(!fEqual(Player[A].Location.SpeedX, NPC[Player[A].VineNPC].Location.SpeedX) ||
            Player[A].Location.SpeedY < NPC[Player[A].VineNPC].Location.SpeedY - 0.1) // Or .Location.SpeedY > 0.1 Then
         {
-            Player[A].FrameCount = Player[A].FrameCount + 1;
+            Player[A].FrameCount += 1;
             if(Player[A].FrameCount >= 8)
             {
-                Player[A].Frame = Player[A].Frame + 1;
+                Player[A].Frame += 1;
                 Player[A].FrameCount = 0;
             }
             PlaySound(71);
         }
+
         if(Player[A].Frame < 25)
             Player[A].Frame = 26;
         else if(Player[A].Frame > 26)
             Player[A].Frame = 25;
+
         return;
     }
 
 // this finds the players direction
-    if(LevelSelect == false && Player[A].Effect != 3)
+    if(!LevelSelect && Player[A].Effect != 3)
     {
         if(!(Player[A].Mount == 3 && Player[A].MountSpecial > 0))
         {
@@ -5544,10 +5557,13 @@ void PlayerFrame(int A)
                 Player[A].Direction = 1;
         }
     }
+
     if(Player[A].Driving == true && Player[A].StandingOnNPC > 0)
         Player[A].Direction = NPC[Player[A].StandingOnNPC].DefaultDirection;
+
     if(Player[A].Fairy == true)
         return;
+
 // ducking and holding
     if(Player[A].HoldingNPC > 0 && Player[A].Duck == true)
     {
