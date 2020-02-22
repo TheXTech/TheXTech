@@ -697,6 +697,84 @@ StdPicture FrmMain::LoadPicture(std::string path, std::string maskPath, std::str
     return target;
 }
 
+static void dumpFullFile(std::vector<char> &dst, const std::string &path)
+{
+    dst.clear();
+    SDL_RWops *f;
+
+    f = SDL_RWFromFile(path.c_str(), "rb");
+    if(!f)
+        return;
+
+    Sint64 fSize = SDL_RWsize(f);
+    if(fSize < 0)
+    {
+        pLogWarning("Failed to get size of the file: %s", path.c_str());
+        SDL_RWclose(f);
+        return;
+    }
+
+    dst.resize(size_t(fSize));
+    if(SDL_RWread(f, dst.data(), 1, fSize) != size_t(fSize))
+    {
+        pLogWarning("Failed to dump file on read operation: %s", path.c_str());
+    }
+
+    SDL_RWclose(f);
+}
+
+StdPicture FrmMain::lazyLoadPicture(std::string path, std::string maskPath, std::string maskFallbackPath)
+{
+    StdPicture target;
+    PGE_Size tSize;
+    if(!GameIsActive)
+        return target; // do nothing when game is closed
+
+    if(path.empty())
+        return target;
+
+    // Don't load mask if PNG image is used
+    if(Files::hasSuffix(path, ".png"))
+    {
+        maskPath.clear();
+        maskFallbackPath.clear();
+    }
+
+    if(!GraphicsHelps::getImageMetrics(path, &tSize))
+    {
+        pLogWarning("Error loading of image file:\n"
+                    "%s\n"
+                    "Reason: %s.",
+                    path.c_str(),
+                    (Files::fileExists(path) ? "wrong image format" : "file not exist"));
+        // target = g_renderer->getDummyTexture();
+        return target;
+    }
+
+    target.w = tSize.w();
+    target.h = tSize.h();
+
+    dumpFullFile(target.raw, path);
+
+    //Apply Alpha mask
+    if(!maskPath.empty() && Files::fileExists(maskPath))
+    {
+        dumpFullFile(target.rawMask, maskPath);
+        target.isMaskPng = false;
+    }
+    else if(!maskFallbackPath.empty())
+    {
+        dumpFullFile(target.rawMask, maskFallbackPath);
+        target.isMaskPng = true;
+    }
+
+    target.inited = true;
+    target.lazyLoaded = true;
+    target.texture = nullptr;
+
+    return target;
+}
+
 void FrmMain::loadTexture(StdPicture &target, uint32_t width, uint32_t height, uint8_t *RGBApixels)
 {
     SDL_Surface *surface;
@@ -728,16 +806,65 @@ void FrmMain::loadTexture(StdPicture &target, uint32_t width, uint32_t height, u
     target.inited = true;
 }
 
+
 void FrmMain::lazyLoad(StdPicture &target)
 {
-    // TODO: Implement this
+    if(!target.inited || !target.lazyLoaded || target.texture)
+        return;
+
+    FIBITMAP *sourceImage = GraphicsHelps::loadImage(target.raw);
+    if(!sourceImage)
+    {
+        pLogCritical("Lazy-decompress has failed: invalid image data");
+        return;
+    }
+
+    if(!target.rawMask.empty())
+        GraphicsHelps::mergeWithMask(sourceImage, target.rawMask, target.isMaskPng);
+
+    uint32_t w = static_cast<uint32_t>(FreeImage_GetWidth(sourceImage));
+    uint32_t h = static_cast<uint32_t>(FreeImage_GetHeight(sourceImage));
+
+    if((w == 0) || (h == 0))
+    {
+        FreeImage_Unload(sourceImage);
+        pLogWarning("Error lazy-decompressing of image file:\n"
+                    "Reason: %s."
+                    "Zero image size!");
+        //target = g_renderer->getDummyTexture();
+        return;
+    }
+
+    RGBQUAD upperColor;
+    FreeImage_GetPixelColor(sourceImage, 0, 0, &upperColor);
+    target.ColorUpper.r = float(upperColor.rgbRed) / 255.0f;
+    target.ColorUpper.b = float(upperColor.rgbBlue) / 255.0f;
+    target.ColorUpper.g = float(upperColor.rgbGreen) / 255.0f;
+    RGBQUAD lowerColor;
+    FreeImage_GetPixelColor(sourceImage, 0, static_cast<unsigned int>(h - 1), &lowerColor);
+    target.ColorLower.r = float(lowerColor.rgbRed) / 255.0f;
+    target.ColorLower.b = float(lowerColor.rgbBlue) / 255.0f;
+    target.ColorLower.g = float(lowerColor.rgbGreen) / 255.0f;
+    FreeImage_FlipVertical(sourceImage);
+    target.nOfColors = GL_RGBA;
+    target.format = GL_BGRA;
+    target.w = static_cast<int>(w);
+    target.h = static_cast<int>(h);
+    target.frame_w = static_cast<int>(w);
+    target.frame_h = static_cast<int>(h);
+
+    GLubyte *textura = reinterpret_cast<GLubyte *>(FreeImage_GetBits(sourceImage));
+    loadTexture(target, w, h, textura);
+
+    GraphicsHelps::closeImage(sourceImage);
 }
 
 void FrmMain::lazyUnLoad(StdPicture &target)
 {
-    // TODO: Implement this
+    if(!target.inited || !target.lazyLoaded || !target.texture)
+        return;
+    deleteTexture(target, true);
 }
-
 
 void FrmMain::makeShot()
 {
@@ -927,17 +1054,19 @@ SDL_Point FrmMain::MapToScr(int x, int y)
     };
 }
 
-void FrmMain::deleteTexture(StdPicture &tx)
+void FrmMain::deleteTexture(StdPicture &tx, bool lazyUnload)
 {
     if(!tx.inited || !tx.texture)
     {
-        tx.inited = false;
+        if(!lazyUnload)
+            tx.inited = false;
         return;
     }
 
     if(!tx.texture)
     {
-        tx.inited = false;
+        if(!lazyUnload)
+            tx.inited = false;
         return;
     }
 
@@ -947,7 +1076,8 @@ void FrmMain::deleteTexture(StdPicture &tx)
         if(tx.texture)
             SDL_DestroyTexture(tx.texture);
         tx.texture = nullptr;
-        tx.inited = false;
+        if(!lazyUnload)
+            tx.inited = false;
         return;
     }
 
@@ -957,12 +1087,20 @@ void FrmMain::deleteTexture(StdPicture &tx)
     m_textureBank.erase(corpse);
 
     tx.texture = nullptr;
-    tx.inited = false;
+    if(!lazyUnload)
+        tx.inited = false;
 
-    tx.w = 0;
-    tx.h = 0;
-    tx.frame_w = 0;
-    tx.frame_h = 0;
+    if(!lazyUnload)
+    {
+        tx.raw.clear();
+        tx.rawMask.clear();
+        tx.lazyLoaded = false;
+        tx.isMaskPng = false;
+        tx.w = 0;
+        tx.h = 0;
+        tx.frame_w = 0;
+        tx.frame_h = 0;
+    }
     tx.format = 0;
     tx.nOfColors = 0;
     tx.ColorUpper.r = 0;
@@ -1015,7 +1153,7 @@ void FrmMain::renderRectBR(int _left, int _top, int _right, int _bottom, float r
 }
 
 void FrmMain::renderTextureI(int xDst, int yDst, int wDst, int hDst,
-                             const StdPicture &tx,
+                             StdPicture &tx,
                              int xSrc, int ySrc,
                              float red, float green, float blue, float alpha)
 {
@@ -1023,6 +1161,9 @@ void FrmMain::renderTextureI(int xDst, int yDst, int wDst, int hDst,
 
     if(!tx.inited)
         return;
+
+    if(!tx.texture && tx.lazyLoaded)
+        lazyLoad(tx);
 
     if(!tx.texture)
     {
@@ -1065,7 +1206,7 @@ void FrmMain::renderTextureI(int xDst, int yDst, int wDst, int hDst,
 }
 
 void FrmMain::renderTexture(double xDst, double yDst, double wDst, double hDst,
-                            const StdPicture &tx,
+                            StdPicture &tx,
                             int xSrc, int ySrc,
                             float red, float green, float blue, float alpha)
 {
@@ -1079,9 +1220,22 @@ void FrmMain::renderTexture(double xDst, double yDst, double wDst, double hDst,
                    red, green, blue, alpha);
 }
 
-void FrmMain::renderTexture(int xDst, int yDst, const StdPicture &tx, float red, float green, float blue, float alpha)
+void FrmMain::renderTexture(int xDst, int yDst, StdPicture &tx, float red, float green, float blue, float alpha)
 {
     const unsigned int flip = SDL_FLIP_NONE;
+
+    if(!tx.inited)
+        return;
+
+    if(!tx.texture && tx.lazyLoaded)
+        lazyLoad(tx);
+
+    if(!tx.texture)
+    {
+        D_pLogWarningNA("Attempt to render an empty texture!");
+        return;
+    }
+
     SDL_Rect destRect = scaledRect(xDst, yDst, tx.w, tx.h);
     SDL_Rect sourceRect = {0, 0, tx.w, tx.h};
 

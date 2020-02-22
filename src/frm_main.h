@@ -82,7 +82,8 @@ public:
     void offsetViewport(int x, int y); // for screen-shaking
 
     StdPicture LoadPicture(std::string path, std::string maskPath = std::string(), std::string maskFallbackPath = std::string());
-    void deleteTexture(StdPicture &tx);
+    StdPicture lazyLoadPicture(std::string path, std::string maskPath = std::string(), std::string maskFallbackPath = std::string());
+    void deleteTexture(StdPicture &tx, bool lazyUnload = false);
     void clearAllTextures();
 
     void clearBuffer();
@@ -91,15 +92,15 @@ public:
 
     // Similar to BitBlt, but without masks, just draw a texture or it's fragment!
     void renderTextureI(int xDst, int yDst, int wDst, int hDst,
-                        const StdPicture &tx,
+                        StdPicture &tx,
                         int xSrc, int ySrc,
                         float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f);
     void renderTexture(double xDst, double yDst, double wDst, double hDst,
-                       const StdPicture &tx,
+                       StdPicture &tx,
                        int xSrc, int ySrc,
                        float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f);
 
-    void renderTexture(int xDst, int yDst, const StdPicture &tx,
+    void renderTexture(int xDst, int yDst, StdPicture &tx,
                        float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f);
 
     void getScreenPixels(int x, int y, int w, int h, unsigned char *pixels);

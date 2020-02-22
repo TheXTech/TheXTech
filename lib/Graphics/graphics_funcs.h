@@ -22,6 +22,7 @@
 #include <SDL2/SDL_opengl.h>
 
 #include <string>
+#include <vector>
 
 #ifndef GRAPHICS_FUNCS_H
 #define GRAPHICS_FUNCS_H
@@ -56,6 +57,7 @@ public:
      * \return FreeImage descriptor to loaded image
      */
     static FIBITMAP *loadImage(std::string file, bool convertTo32bit = true);
+    static FIBITMAP *loadImage(std::vector<char> &raw, bool convertTo32bit = true);
     /*!
      * \brief Loads image from application resources
      * \param file in-resource path to the file
@@ -94,6 +96,8 @@ public:
      * \param pathToMaskFallback
      */
     static void mergeWithMask(FIBITMAP *image, std::string pathToMask, std::string pathToMaskFallback = "");
+    static void mergeWithMask(FIBITMAP *image, std::vector<char> &maskRaw, bool maskIsPng = false);
+    static void mergeWithMask(FIBITMAP *image, FIBITMAP *mask);
     /*!
      * \brief Gets metric from image file
      * \param [__in] imageFile Path to image file

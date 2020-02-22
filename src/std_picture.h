@@ -50,6 +50,7 @@ struct StdPicture
     bool lazyLoaded = false;
     std::vector<char> raw;
     std::vector<char> rawMask;
+    bool isMaskPng = false;
     SDL_Texture *texture = nullptr;
     GLenum format = 0;
     GLint  nOfColors = 0;

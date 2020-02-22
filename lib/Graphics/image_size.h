@@ -25,6 +25,8 @@ typedef std::string PGEString;
 #define PGEStringToStd(x) (x)
 #define StdToPGEString(x) (x)
 
+struct SDL_RWops;
+
 /**
  * @brief Basic image information misc. functions
  */
@@ -46,6 +48,8 @@ enum ErrCodes
     ERR_CANT_OPEN
 };
 
+bool getImageSizeRW(SDL_RWops *image, uint32_t *w, uint32_t *h, int *errCode=nullptr);
+
 /**
  * @brief Quickly get image size (width and height) from image file.
  * @param [in] imagePath Path to image file
@@ -55,6 +59,8 @@ enum ErrCodes
  * @return true if successfully finished, false if error occouped
  */
 bool getImageSize(PGEString imagePath, uint32_t *w, uint32_t *h, int *errCode=nullptr);
+
+bool getImageSizeFromMem(const char *mem, size_t size, uint32_t *w, uint32_t *h, int *errCode=nullptr);
 
 /**
  * @brief Returns filename of masked image

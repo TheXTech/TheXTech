@@ -115,9 +115,31 @@ static bool tryPNG(SDL_RWops* file, uint32_t *w, uint32_t *h)
     return true;
 }
 
-bool PGE_ImageInfo::getImageSize(PGEString imagePath, uint32_t *w, uint32_t *h, int *errCode)
+bool PGE_ImageInfo::getImageSizeRW(SDL_RWops *image, uint32_t *w, uint32_t *h, int *errCode)
 {
     bool ret = false;
+    if(tryGIF(image, w, h))
+        ret = true;
+    else
+    if(tryPNG(image, w, h))
+        ret = true;
+    else
+    if(tryBMP(image, w, h))
+        ret = true;
+
+    SDL_RWclose(image);
+
+    if(!ret)
+    {
+        if(errCode)
+            *errCode = ERR_UNSUPPORTED_FILETYPE;
+    }
+
+    return ret;
+}
+
+bool PGE_ImageInfo::getImageSize(PGEString imagePath, uint32_t *w, uint32_t *h, int *errCode)
+{
     if(errCode)
         *errCode = ERR_OK;
 
@@ -141,25 +163,27 @@ bool PGE_ImageInfo::getImageSize(PGEString imagePath, uint32_t *w, uint32_t *h, 
         return false;
     }
 
-    if(tryGIF(image, w, h))
-        ret = true;
-    else
-    if(tryPNG(image, w, h))
-        ret = true;
-    else
-    if(tryBMP(image, w, h))
-        ret = true;
+    return getImageSizeRW(image, w, h, errCode);
+}
 
-    SDL_RWclose(image);
+bool PGE_ImageInfo::getImageSizeFromMem(const char *mem, size_t size, uint32_t *w, uint32_t *h, int *errCode)
+{
+    if(errCode)
+        *errCode = ERR_OK;
 
-    if(!ret)
+    SDL_RWops* image = SDL_RWFromConstMem(mem, int(size));
+
+    if(!image)
     {
         if(errCode)
-            *errCode = ERR_UNSUPPORTED_FILETYPE;
+            *errCode = ERR_CANT_OPEN;
+
+        return false;
     }
 
-    return ret;
+    return getImageSizeRW(image, w, h, errCode);
 }
+
 
 PGEString PGE_ImageInfo::getMaskName(PGEString imageFileName)
 {
@@ -169,6 +193,8 @@ PGEString PGE_ImageInfo::getMaskName(PGEString imageFileName)
     if(dotPos == std::string::npos)
         mask.push_back('m');
     else
-        mask.insert(mask.begin() + dotPos, 'm');
+        mask.insert(mask.begin() + std::string::difference_type(dotPos), 'm');
     return StdToPGEString(mask);
 }
+
+

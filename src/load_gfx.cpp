@@ -133,7 +133,7 @@ static void loadCGFX(const std::set<std::string> &files,
 #ifdef DEBUG_BUILD
         pLogDebug("Trying to load custom GFX: %s with mask %s", imgToUse.c_str(), maskToUse.c_str());
 #endif
-        newTexture = frmMain.LoadPicture(imgToUse, maskToUse, origPath);
+        newTexture = frmMain.lazyLoadPicture(imgToUse, maskToUse, origPath);
         success = newTexture.inited;
         loadedPath = imgToUse;
     }
@@ -142,7 +142,7 @@ static void loadCGFX(const std::set<std::string> &files,
 #ifdef DEBUG_BUILD
         pLogDebug("Trying to load custom GFX: %s", imgToUse.c_str());
 #endif
-        newTexture = frmMain.LoadPicture(imgToUse);
+        newTexture = frmMain.lazyLoadPicture(imgToUse);
         success = newTexture.inited;
         loadedPath = imgToUse;
     }
@@ -216,7 +216,7 @@ void LoadGFX()
         p = GfxRoot + fmt::format_ne("mario/mario-{0}.png", A);
         if(Files::fileExists(p))
         {
-            GFXMarioBMP[A] = frmMain.LoadPicture(p);
+            GFXMarioBMP[A] = frmMain.lazyLoadPicture(p);
             GFXMarioWidth[A] = GFXMarioBMP[A].w;
             GFXMarioHeight[A] = GFXMarioBMP[A].h;
         }
@@ -224,7 +224,7 @@ void LoadGFX()
         p = GfxRoot + fmt::format_ne("luigi/luigi-{0}.png", A);
         if(Files::fileExists(p))
         {
-            GFXLuigiBMP[A] = frmMain.LoadPicture(p);
+            GFXLuigiBMP[A] = frmMain.lazyLoadPicture(p);
             GFXLuigiWidth[A] = GFXLuigiBMP[A].w;
             GFXLuigiHeight[A] = GFXLuigiBMP[A].h;
         }
@@ -232,7 +232,7 @@ void LoadGFX()
         p = GfxRoot + fmt::format_ne("peach/peach-{0}.png", A);
         if(Files::fileExists(p))
         {
-            GFXPeachBMP[A] = frmMain.LoadPicture(p);
+            GFXPeachBMP[A] = frmMain.lazyLoadPicture(p);
             GFXPeachWidth[A] = GFXPeachBMP[A].w;
             GFXPeachHeight[A] = GFXPeachBMP[A].h;
         }
@@ -240,7 +240,7 @@ void LoadGFX()
         p = GfxRoot + fmt::format_ne("toad/toad-{0}.png", A);
         if(Files::fileExists(p))
         {
-            GFXToadBMP[A] = frmMain.LoadPicture(p);
+            GFXToadBMP[A] = frmMain.lazyLoadPicture(p);
             GFXToadWidth[A] = GFXToadBMP[A].w;
             GFXToadHeight[A] = GFXToadBMP[A].h;
         }
@@ -248,7 +248,7 @@ void LoadGFX()
         p = GfxRoot + fmt::format_ne("link/link-{0}.png", A);
         if(Files::fileExists(p))
         {
-            GFXLinkBMP[A] = frmMain.LoadPicture(p);
+            GFXLinkBMP[A] = frmMain.lazyLoadPicture(p);
             GFXLinkWidth[A] = GFXLinkBMP[A].w;
             GFXLinkHeight[A] = GFXLinkBMP[A].h;
         }
@@ -261,7 +261,7 @@ void LoadGFX()
         p = GfxRoot + fmt::format_ne("block/block-{0}.png", A);
         if(Files::fileExists(p))
         {
-            GFXBlockBMP[A] = frmMain.LoadPicture(p);
+            GFXBlockBMP[A] = frmMain.lazyLoadPicture(p);
         }
         else
         {
@@ -277,7 +277,7 @@ void LoadGFX()
         p = GfxRoot + fmt::format_ne("background2/background2-{0}.png", A);
         if(Files::fileExists(p))
         {
-            GFXBackground2BMP[A] = frmMain.LoadPicture(p);
+            GFXBackground2BMP[A] = frmMain.lazyLoadPicture(p);
             GFXBackground2Width[A] = GFXBackground2BMP[A].w;
             GFXBackground2Height[A] = GFXBackground2BMP[A].h;
         }
@@ -296,7 +296,7 @@ void LoadGFX()
         p = GfxRoot + fmt::format_ne("npc/npc-{0}.png", A);
         if(Files::fileExists(p))
         {
-            GFXNPCBMP[A] = frmMain.LoadPicture(p);
+            GFXNPCBMP[A] = frmMain.lazyLoadPicture(p);
             GFXNPCWidth[A] = GFXNPCBMP[A].w;
             GFXNPCHeight[A] = GFXNPCBMP[A].h;
             if(A % 20 == 0)
@@ -316,7 +316,7 @@ void LoadGFX()
         p = GfxRoot + fmt::format_ne("effect/effect-{0}.png", A);
         if(Files::fileExists(p))
         {
-            GFXEffectBMP[A] = frmMain.LoadPicture(p);
+            GFXEffectBMP[A] = frmMain.lazyLoadPicture(p);
             GFXEffectWidth[A] = GFXEffectBMP[A].w;
             GFXEffectHeight[A] = GFXEffectBMP[A].h;
             if(A % 20 == 0)
@@ -336,7 +336,7 @@ void LoadGFX()
         p = GfxRoot + fmt::format_ne("yoshi/yoshib-{0}.png", A);
         if(Files::fileExists(p))
         {
-            GFXYoshiBBMP[A] = frmMain.LoadPicture(p);
+            GFXYoshiBBMP[A] = frmMain.lazyLoadPicture(p);
             if(A % 20 == 0)
                 UpdateLoad();
         }
@@ -352,7 +352,7 @@ void LoadGFX()
         p = GfxRoot + fmt::format_ne("yoshi/yoshit-{0}.png", A);
         if(Files::fileExists(p))
         {
-            GFXYoshiTBMP[A] = frmMain.LoadPicture(p);
+            GFXYoshiTBMP[A] = frmMain.lazyLoadPicture(p);
             if(A % 20 == 0)
                 UpdateLoad();
         }
@@ -368,7 +368,7 @@ void LoadGFX()
         p = GfxRoot + fmt::format_ne("background/background-{0}.png", A);
         if(Files::fileExists(p))
         {
-            GFXBackgroundBMP[A] = frmMain.LoadPicture(p);
+            GFXBackgroundBMP[A] = frmMain.lazyLoadPicture(p);
             GFXBackgroundWidth[A] = GFXBackgroundBMP[A].w;
             GFXBackgroundHeight[A] = GFXBackgroundBMP[A].h;
             BackgroundWidth[A] = GFXBackgroundWidth[A];
@@ -390,7 +390,7 @@ void LoadGFX()
         p = GfxRoot + fmt::format_ne("tile/tile-{0}.png", A);
         if(Files::fileExists(p))
         {
-            GFXTileBMP[A] = frmMain.LoadPicture(p);
+            GFXTileBMP[A] = frmMain.lazyLoadPicture(p);
             GFXTileWidth[A] = GFXTileBMP[A].w;
             GFXTileHeight[A] = GFXTileBMP[A].h;
             if(A % 20 == 0)
@@ -408,7 +408,7 @@ void LoadGFX()
         p = GfxRoot + fmt::format_ne("level/level-{0}.png", A);
         if(Files::fileExists(p))
         {
-            GFXLevelBMP[A] = frmMain.LoadPicture(p);
+            GFXLevelBMP[A] = frmMain.lazyLoadPicture(p);
             GFXLevelWidth[A] = GFXLevelBMP[A].w;
             GFXLevelHeight[A] = GFXLevelBMP[A].h;
             if(A % 20 == 0)
@@ -426,7 +426,7 @@ void LoadGFX()
         p = GfxRoot + fmt::format_ne("scene/scene-{0}.png", A);
         if(Files::fileExists(p))
         {
-            GFXSceneBMP[A] = frmMain.LoadPicture(p);
+            GFXSceneBMP[A] = frmMain.lazyLoadPicture(p);
             GFXSceneWidth[A] = GFXSceneBMP[A].w;
             GFXSceneHeight[A] = GFXSceneBMP[A].h;
             if(A % 20 == 0)
@@ -444,7 +444,7 @@ void LoadGFX()
         p = GfxRoot + fmt::format_ne("player/player-{0}.png", A);
         if(Files::fileExists(p))
         {
-            GFXPlayerBMP[A] = frmMain.LoadPicture(p);
+            GFXPlayerBMP[A] = frmMain.lazyLoadPicture(p);
             GFXPlayerWidth[A] = GFXPlayerBMP[A].w;
             GFXPlayerHeight[A] = GFXPlayerBMP[A].h;
             if(A % 20 == 0)
@@ -462,7 +462,7 @@ void LoadGFX()
         p = GfxRoot + fmt::format_ne("path/path-{0}.png", A);
         if(Files::fileExists(p))
         {
-            GFXPathBMP[A] = frmMain.LoadPicture(p);
+            GFXPathBMP[A] = frmMain.lazyLoadPicture(p);
             GFXPathWidth[A] = GFXPathBMP[A].w;
             GFXPathHeight[A] = GFXPathBMP[A].h;
             if(A % 20 == 0)

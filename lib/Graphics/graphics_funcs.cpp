@@ -118,6 +118,36 @@ FIBITMAP *GraphicsHelps::loadImage(std::string file, bool convertTo32bit)
     return img;
 }
 
+FIBITMAP *GraphicsHelps::loadImage(std::vector<char> &raw, bool convertTo32bit)
+{
+    FIMEMORY *imgMEM = FreeImage_OpenMemory(reinterpret_cast<unsigned char *>(raw.data()),
+                                            static_cast<unsigned int>(raw.size()));
+    FREE_IMAGE_FORMAT formato = FreeImage_GetFileTypeFromMemory(imgMEM);
+
+    if(formato  == FIF_UNKNOWN)
+        return nullptr;
+
+    FIBITMAP *img = FreeImage_LoadFromMemory(formato, imgMEM, 0);
+    FreeImage_CloseMemory(imgMEM);
+
+    if(!img)
+        return nullptr;
+
+    if(convertTo32bit)
+    {
+        FIBITMAP *temp;
+        temp = FreeImage_ConvertTo32Bits(img);
+
+        FreeImage_Unload(img);
+
+        if(!temp)
+            return nullptr;
+        img = temp;
+    }
+
+    return img;
+}
+
 //FIBITMAP *GraphicsHelps::loadImageRC(const char *file)
 //{
 //    unsigned char *memory = nullptr;
@@ -216,6 +246,38 @@ void GraphicsHelps::mergeWithMask(FIBITMAP *image, std::string pathToMask, std::
     if(!mask)
         return;//Nothing to do
 
+    mergeWithMask(image, mask);
+
+    FreeImage_Unload(mask);
+}
+
+void GraphicsHelps::mergeWithMask(FIBITMAP *image, std::vector<char> &maskRaw, bool maskIsPng)
+{
+    if(!image)
+        return;
+
+    if(maskRaw.empty())
+        return; //Nothing to do
+
+    FIBITMAP *mask = loadImage(maskRaw, true);
+
+    if(!mask)
+        return;//Nothing to do
+
+    if(maskIsPng)
+    {
+        FIBITMAP *front = FreeImage_Copy(mask, 0, 0, int(FreeImage_GetWidth(mask)), int(FreeImage_GetHeight(mask)));
+        getMaskFromRGBA(front, mask);
+        closeImage(front);
+    }
+
+    mergeWithMask(image, mask);
+
+    FreeImage_Unload(mask);
+}
+
+void GraphicsHelps::mergeWithMask(FIBITMAP *image, FIBITMAP *mask)
+{
     unsigned int img_w = FreeImage_GetWidth(image);
     unsigned int img_h = FreeImage_GetHeight(image);
     unsigned int mask_w = FreeImage_GetWidth(mask);
@@ -265,13 +327,10 @@ void GraphicsHelps::mergeWithMask(FIBITMAP *image, std::string pathToMask, std::
             break;
         y--; ym--;
     }
-
-    FreeImage_Unload(mask);
 }
 
 bool GraphicsHelps::getImageMetrics(std::string imageFile, PGE_Size* imgSize)
 {
-
     if(!imgSize)
         return false;
 
