@@ -272,7 +272,7 @@ void SoundResumeAll()
     Mix_ResumeMusic();
 }
 
-void PlayMusic(std::string Alias)
+void PlayMusic(std::string Alias, int fadeInMs)
 {
     if(noSound)
         return;
@@ -294,8 +294,11 @@ void PlayMusic(std::string Alias)
         }
         else
         {
-            Mix_PlayMusic(g_curMusic, -1);
-            Mix_VolumeMusic(m.volume);
+            Mix_VolumeMusicStream(g_curMusic, m.volume);
+            if(fadeInMs > 0)
+                Mix_FadeInMusic(g_curMusic, -1, fadeInMs);
+            else
+                Mix_PlayMusic(g_curMusic, -1);
         }
     }
 }
@@ -320,7 +323,7 @@ void StopSfx(std::string Alias)
     }
 }
 
-void StartMusic(int A)
+void StartMusic(int A, int fadeInMs)
 {
     if(noSound)
         return;
@@ -330,7 +333,7 @@ void StartMusic(int A)
         StopMusic();
         std::string mus = fmt::format_ne("wmusic{0}", A);
         pLogDebug("Starting world music [%s]", mus.c_str());
-        PlayMusic(mus);
+        PlayMusic(mus, fadeInMs);
         musicName = mus;
         curWorldMusic = A;
     }
@@ -339,11 +342,11 @@ void StartMusic(int A)
         StopMusic();
         if(FreezeNPCs) {
             pLogDebug("Starting special music [stmusic]");
-            PlayMusic("stmusic");
+            PlayMusic("stmusic", fadeInMs);
             musicName = "stmusic";
         } else {
             pLogDebug("Starting special music [smusic]");
-            PlayMusic("smusic");
+            PlayMusic("smusic", fadeInMs);
             musicName = "smusic";
         }
         curMusic = -1;
@@ -359,8 +362,11 @@ void StartMusic(int A)
             if(g_curMusic)
                 Mix_FreeMusic(g_curMusic);
             g_curMusic = Mix_LoadMUS((FileNamePath + "/" + CustomMusic[A]).c_str());
-            Mix_PlayMusic(g_curMusic, -1);
-            Mix_VolumeMusic(52);
+            Mix_VolumeMusicStream(g_curMusic, 52);
+            if(fadeInMs > 0)
+                Mix_FadeInMusic(g_curMusic, -1, fadeInMs);
+            else
+                Mix_PlayMusic(g_curMusic, -1);
         }
         else
         {
@@ -386,6 +392,16 @@ void StopMusic()
     g_curMusic = nullptr;
     musicPlaying = false;
 }
+
+void FadeOutMusic(int ms)
+{
+    if(!musicPlaying || noSound)
+        return;
+    pLogDebug("Fading out music");
+    Mix_FadeOutMusic(ms);
+    musicPlaying = false;
+}
+
 
 void PlayInitSound()
 {
@@ -632,6 +648,9 @@ void LoadCustomSound()
         restoreDefaultSfx();
         g_customSoundsInDataFolder = false;
     }
+
+    if(FileNamePath == AppPath)
+        return; // Don't treat default music/sounds ini as custom
 
     if(Files::fileExists(mIni)) // Load music.ini from an episode folder
         loadMusicIni(FileNamePath, mIni, true);

@@ -5762,16 +5762,24 @@ void DoCredits()
 
     for(A = 1; A <= numCredits; A++)
     {
-        Credit[A].Location.Y = Credit[A].Location.Y - 0.8;
+        Credit[A].Location.Y -= 0.8;
 
+        // Printing lines of credits
         if(Credit[A].Location.Y <= 600 && Credit[A].Location.Y + Credit[A].Location.Height >= 0)
         {
             SuperPrint(Credit[A].Text, 4, static_cast<float>(Credit[A].Location.X), static_cast<float>(Credit[A].Location.Y));
         }
 
+        // Closing screen
         else if(A == numCredits && Credit[A].Location.Y + Credit[A].Location.Height < -100)
         {
-            CreditChop = (float)(CreditChop + 0.4f);
+            if(musicPlaying)
+            {
+                FadeOutMusic(11000);
+                musicPlaying = false;
+            }
+
+            CreditChop += 0.4f;
             if(CreditChop >= 300)
             {
                 CreditChop = 300;
@@ -5786,20 +5794,24 @@ void DoCredits()
             else
                 EndCredits = 0;
         }
+
+        // Opening screen
         else if(CreditChop > 100 && Credit[numCredits].Location.Y + Credit[numCredits].Location.Height > 0)
         {
-            CreditChop = (float)(CreditChop - 0.02f);
+            CreditChop -= 0.02f;
             if(CreditChop < 100)
                 CreditChop = 100;
-        }
-        else if(musicPlaying == false)
-        {
-            musicName = "tmusic";
-            // mciSendString "play tmusic from 10", 0, 0, 0
-            PlayMusic("tmusic");
-            musicPlaying = true;
+
+            if(CreditChop < 250 && !musicPlaying)
+            {
+                musicName = "tmusic";
+                // mciSendString "play tmusic from 10", 0, 0, 0
+                PlayMusic("tmusic", 2000);
+                musicPlaying = true;
+            }
         }
     }
+
     if(CreditChop <= 100 || EndCredits > 0)
     {
         for(A = 1; A <= 2; A++)

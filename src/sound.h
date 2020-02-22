@@ -46,14 +46,14 @@ void SoundPauseAll();
 // Public Sub SoundResumeAll()
 void SoundResumeAll();
 // Public Sub PlayMusic(Alias As String)
-void PlayMusic(std::string Alias);
+void PlayMusic(std::string Alias, int fadeInMs = 0);
 // Public Sub PlaySfx(Alias As String)
 void PlaySfx(std::string Alias);
 // Public Sub StopSfx(Alias As String)
 void StopSfx(std::string Alias);
 // Public Sub StartMusic(A As Integer) 'play music
 // play music
-void StartMusic(int A);
+void StartMusic(int A, int fadeInMs = 0);
 // Public Sub StopMusic() 'stop playing music
 // stop playing music
 void StopMusic();
@@ -71,7 +71,8 @@ void BlockSound();
 // Public Sub UpdateSound() 'checks to loop music and update the soundpause variable
 // checks to loop music and update the soundpause variable
 void UpdateSound();
-
+// EXTRA: Fade out music
+void FadeOutMusic(int ms);
 // EXTRA: load custom sounds.ini and music.ini from episode and custom folder!
 void LoadCustomSound();
 // EXTRA: Unload custom-loaded music and sounds, and restore originals

@@ -228,7 +228,7 @@ void SetupCredits()
     {
         Credit[A].Location.Width = Credit[A].Text.size() * 18;
         Credit[A].Location.Height = 16;
-        Credit[A].Location.X = 400 - Credit[A].Location.Width / 2.0;
+        Credit[A].Location.X = 400 - (Credit[A].Location.Width / 2.0);
         Credit[A].Location.Y = 640 + 32 * A;
     }
 }
