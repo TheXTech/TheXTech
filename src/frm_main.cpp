@@ -252,7 +252,7 @@ void FrmMain::processEvent()
         break;
     case SDL_KEYDOWN:
         eventKeyDown(m_event.key);
-        eventKeyPress(m_event.key.keysym.sym);
+        eventKeyPress(m_event.key.keysym.scancode);
         break;
     case SDL_KEYUP:
         eventKeyUp(m_event.key);
@@ -309,36 +309,36 @@ void FrmMain::eventKeyDown(SDL_KeyboardEvent &evt)
         TakeScreen = true;
 }
 
-void FrmMain::eventKeyPress(SDL_Keycode KeyASCII)
+void FrmMain::eventKeyPress(SDL_Scancode KeyASCII)
 {
     switch(KeyASCII)
     {
-    case SDLK_a: CheatCode('a'); break;
-    case SDLK_b: CheatCode('b'); break;
-    case SDLK_c: CheatCode('c'); break;
-    case SDLK_d: CheatCode('d'); break;
-    case SDLK_e: CheatCode('e'); break;
-    case SDLK_f: CheatCode('f'); break;
-    case SDLK_g: CheatCode('g'); break;
-    case SDLK_h: CheatCode('h'); break;
-    case SDLK_i: CheatCode('i'); break;
-    case SDLK_j: CheatCode('j'); break;
-    case SDLK_k: CheatCode('k'); break;
-    case SDLK_l: CheatCode('l'); break;
-    case SDLK_m: CheatCode('m'); break;
-    case SDLK_n: CheatCode('n'); break;
-    case SDLK_o: CheatCode('o'); break;
-    case SDLK_p: CheatCode('p'); break;
-    case SDLK_q: CheatCode('q'); break;
-    case SDLK_r: CheatCode('r'); break;
-    case SDLK_s: CheatCode('s'); break;
-    case SDLK_t: CheatCode('t'); break;
-    case SDLK_u: CheatCode('u'); break;
-    case SDLK_v: CheatCode('v'); break;
-    case SDLK_w: CheatCode('w'); break;
-    case SDLK_x: CheatCode('x'); break;
-    case SDLK_y: CheatCode('y'); break;
-    case SDLK_z: CheatCode('z'); break;
+    case SDL_SCANCODE_A: CheatCode('a'); break;
+    case SDL_SCANCODE_B: CheatCode('b'); break;
+    case SDL_SCANCODE_C: CheatCode('c'); break;
+    case SDL_SCANCODE_D: CheatCode('d'); break;
+    case SDL_SCANCODE_E: CheatCode('e'); break;
+    case SDL_SCANCODE_F: CheatCode('f'); break;
+    case SDL_SCANCODE_G: CheatCode('g'); break;
+    case SDL_SCANCODE_H: CheatCode('h'); break;
+    case SDL_SCANCODE_I: CheatCode('i'); break;
+    case SDL_SCANCODE_J: CheatCode('j'); break;
+    case SDL_SCANCODE_K: CheatCode('k'); break;
+    case SDL_SCANCODE_L: CheatCode('l'); break;
+    case SDL_SCANCODE_M: CheatCode('m'); break;
+    case SDL_SCANCODE_N: CheatCode('n'); break;
+    case SDL_SCANCODE_O: CheatCode('o'); break;
+    case SDL_SCANCODE_P: CheatCode('p'); break;
+    case SDL_SCANCODE_Q: CheatCode('q'); break;
+    case SDL_SCANCODE_R: CheatCode('r'); break;
+    case SDL_SCANCODE_S: CheatCode('s'); break;
+    case SDL_SCANCODE_T: CheatCode('t'); break;
+    case SDL_SCANCODE_U: CheatCode('u'); break;
+    case SDL_SCANCODE_V: CheatCode('v'); break;
+    case SDL_SCANCODE_W: CheatCode('w'); break;
+    case SDL_SCANCODE_X: CheatCode('x'); break;
+    case SDL_SCANCODE_Y: CheatCode('y'); break;
+    case SDL_SCANCODE_Z: CheatCode('z'); break;
     default: CheatCode(' '); break;
     }
 }

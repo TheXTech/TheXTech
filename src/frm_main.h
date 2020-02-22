@@ -65,7 +65,7 @@ public:
 
     void eventDoubleClick();
     void eventKeyDown(SDL_KeyboardEvent &evt);
-    void eventKeyPress(SDL_Keycode KeyASCII);
+    void eventKeyPress(SDL_Scancode KeyASCII);
     void eventKeyUp(SDL_KeyboardEvent &evt);
     void eventMouseDown(SDL_MouseButtonEvent &m_event);
     void eventMouseMove(SDL_MouseMotionEvent &m_event);
