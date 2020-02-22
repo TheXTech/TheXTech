@@ -222,12 +222,14 @@ void GraphicsHelps::mergeWithMask(FIBITMAP *image, std::string pathToMask, std::
     unsigned int mask_h = FreeImage_GetHeight(mask);
     BYTE *img_bits  = FreeImage_GetBits(image);
     BYTE *mask_bits = FreeImage_GetBits(mask);
-    BYTE *FPixP = img_bits;
-    BYTE *SPixP = mask_bits;
+    BYTE *FPixP = img_bits + (img_w * img_h * 4) - 4;
+    BYTE *SPixP = mask_bits + (mask_w * mask_h * 4) - 4;
     RGBQUAD Npix = {0x00, 0x00, 0x00, 0xFF};   //Destination pixel color
     unsigned short newAlpha = 0xFF; //Calculated destination alpha-value
 
-    for(unsigned int y = 0; (y < img_h) && (y < mask_h); y++)
+    unsigned int ym = mask_h - 1;
+    unsigned int y = img_h - 1;
+    while(1)
     {
         for(unsigned int x = 0; (x < img_w) && (x < mask_w); x++)
         {
@@ -253,9 +255,13 @@ void GraphicsHelps::mergeWithMask(FIBITMAP *image, std::string pathToMask, std::
             FPixP[FI_RGBA_GREEN] = Npix.rgbGreen;
             FPixP[FI_RGBA_RED]   = Npix.rgbRed;
             FPixP[FI_RGBA_ALPHA] = static_cast<BYTE>(newAlpha);
-            FPixP += 4;
-            SPixP += 4;
+            FPixP -= 4;
+            SPixP -= 4;
         }
+
+        y--; ym--;
+        if(y == 0 || ym == 0)
+            break;
     }
 
     FreeImage_Unload(mask);
