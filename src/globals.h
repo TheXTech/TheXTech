@@ -966,6 +966,8 @@ struct WorldMusic_t
     Location_t Location;
 //    Type As Integer
     int Type = 0;
+//    EXTRA: Custom Music
+    std::string MusicFile;
 //End Type
 };
 
@@ -1633,6 +1635,8 @@ extern int LevelBeatCode;
 extern int curWorldLevel;
 //Public curWorldMusic As Integer
 extern int curWorldMusic;
+//EXTRA: Custom world music
+extern std::string curWorldMusicFile;
 //Public NoTurnBack(0 To maxSections) As Boolean
 extern RangeArrI<bool, 0, maxSections, false> NoTurnBack;
 //Public UnderWater(0 To maxSections) As Boolean

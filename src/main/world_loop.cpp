@@ -390,8 +390,10 @@ void WorldLoop()
         {
             if(CheckCollision(WorldPlayer[1].Location, WorldMusic[A].Location))
             {
-                if(curWorldMusic != WorldMusic[A].Type)
+                if((curWorldMusic != WorldMusic[A].Type) ||
+                   (WorldMusic[A].Type == CustomWorldMusicId() && curWorldMusicFile != WorldMusic[A].MusicFile))
                 {
+                    curWorldMusicFile = WorldMusic[A].MusicFile;
                     StartMusic(WorldMusic[A].Type);
                 }
             }

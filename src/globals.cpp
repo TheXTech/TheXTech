@@ -249,6 +249,7 @@ RangeArr<WorldPlayer_t, 0, 1> WorldPlayer;
 int LevelBeatCode = 0;
 int curWorldLevel = 0;
 int curWorldMusic = 0;
+std::string curWorldMusicFile;
 RangeArrI<bool, 0, maxSections, false> NoTurnBack;
 RangeArrI<bool, 0, maxSections, false> UnderWater;
 bool TestLevel = false;

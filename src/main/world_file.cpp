@@ -186,6 +186,7 @@ void OpenWorld(std::string FilePath)
         WorldMusic[numWorldMusic].Location.X = m.x;
         WorldMusic[numWorldMusic].Location.Y = m.y;
         WorldMusic[numWorldMusic].Type = int(m.id);
+        WorldMusic[numWorldMusic].MusicFile = m.music_file;
 
         // In game they are smaller (30x30), in world they are 32x32
         WorldMusic[numWorldMusic].Location.Width = 30;

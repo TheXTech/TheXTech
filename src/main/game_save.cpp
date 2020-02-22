@@ -72,6 +72,7 @@ void SaveGame()
         sav.characterStates.push_back(c);
     }
     sav.musicID = uint32_t(curWorldMusic);
+    sav.musicFile = curWorldMusicFile;
 
     // ABOVE GETS SKIPPED BY FINDSAVES
     sav.gameCompleted = BeatTheGame; // Can only get 99% until you finish the game;
@@ -125,6 +126,7 @@ void LoadGame()
     WorldPlayer[1].Location.Y = sav.worldPosY;
 
     curWorldMusic = int(sav.musicID);
+    curWorldMusicFile = sav.musicFile;
 
     for(A = 1, i = 0; A <= 5; A++, i++)
     {

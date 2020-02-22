@@ -35,6 +35,8 @@ extern int musicLoop;
 // Public musicName As String
 extern std::string musicName;
 
+int CustomWorldMusicId();
+
 // Public Sub InitMixerX()
 void InitMixerX();
 // Public Sub QuitMixerX()

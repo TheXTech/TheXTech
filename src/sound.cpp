@@ -95,6 +95,11 @@ static std::unordered_map<std::string, SFX_t>   sound;
 
 static const int maxSfxChannels = 91;
 
+int CustomWorldMusicId()
+{
+    return g_customWldMusicId;
+}
+
 void InitMixerX()
 {
     MusicRoot = AppPath + "music/";
@@ -331,11 +336,26 @@ void StartMusic(int A, int fadeInMs)
     if(LevelSelect && !GameMenu) // music on the world map
     {
         StopMusic();
-        std::string mus = fmt::format_ne("wmusic{0}", A);
-        pLogDebug("Starting world music [%s]", mus.c_str());
-        PlayMusic(mus, fadeInMs);
-        musicName = mus;
         curWorldMusic = A;
+        std::string mus = fmt::format_ne("wmusic{0}", A);
+        if(curWorldMusic == g_customWldMusicId)
+        {
+            pLogDebug("Starting custom music [%s]", curWorldMusicFile.c_str());
+            if(g_curMusic)
+                Mix_FreeMusic(g_curMusic);
+            g_curMusic = Mix_LoadMUS((FileNamePath + "/" + curWorldMusicFile).c_str());
+            Mix_VolumeMusicStream(g_curMusic, 64);
+            if(fadeInMs > 0)
+                Mix_FadeInMusic(g_curMusic, -1, fadeInMs);
+            else
+                Mix_PlayMusic(g_curMusic, -1);
+        }
+        else
+        {
+            pLogDebug("Starting world music [%s]", mus.c_str());
+            PlayMusic(mus, fadeInMs);
+        }
+        musicName = mus;
     }
     else if(A == -1) // P switch music
     {
