@@ -79,6 +79,8 @@ void PauseGame(int plr);
 
 void InitControls();
 
+void OpenConfig_preSetup();
+
 void OpenConfig();
 
 void SaveConfig();

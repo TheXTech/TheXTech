@@ -33,6 +33,13 @@ int main(int argc, char**argv)
 {
     CmdLineSetup_t setup;
 
+    AppPathManager::initAppPath();
+    AppPath = AppPathManager::userAppDirSTD();
+
+    OpenConfig_preSetup();
+
+    setup.renderType = CmdLineSetup_t::RenderType(RenderMode);
+
     try
     {
         // Define the command line object.
@@ -62,7 +69,7 @@ int main(int argc, char**argv)
             setup.renderType = CmdLineSetup_t::RENDER_SW;
         else if(rt == "vsync")
             setup.renderType = CmdLineSetup_t::RENDER_VSYNC;
-        else
+        else if(rt == "hw")
             setup.renderType = CmdLineSetup_t::RENDER_HW;
     }
     catch(TCLAP::ArgException &e)   // catch any exceptions
@@ -70,9 +77,6 @@ int main(int argc, char**argv)
         std::cerr << "Error: " << e.error() << " for arg " << e.argId() << std::endl;
         return 2;
     }
-
-    AppPathManager::initAppPath();
-    AppPath = AppPathManager::userAppDirSTD();
 
     // set this flag before SDL initialization to allow game be quit when closing a window before a loading process will be completed
     GameIsActive = true;

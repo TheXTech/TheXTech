@@ -36,6 +36,9 @@
 
 #include "../pseudo_vb.h"
 
+#include <Utils/maths.h>
+
+
 void UpdateNPCs()
 {
     // this is 1 of the 2 clusterfuck subs in the code, be weary
@@ -1537,7 +1540,7 @@ void UpdateNPCs()
 
                         else if((NPCIsCheep[NPC[A].Type] && NPC[A].Special == 2) && NPC[A].Projectile == false)
                         {
-                            if(NPC[A].Special5 == 1)
+                            if(Maths::iRound(NPC[A].Special5) == 1)
                             {
                                 if(NPC[A].Location.Y > NPC[A].DefaultLocation.Y)
                                     NPC[A].Location.SpeedY = -4 - (NPC[A].Location.Y - NPC[A].DefaultLocation.Y) * 0.02;

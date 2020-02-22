@@ -1874,6 +1874,8 @@ extern bool GodMode;
 extern bool GrabAll;
 //Public Cheater As Boolean 'if the player is a cheater
 extern bool Cheater;
+//EXTRA
+extern Uint32 RenderMode;
 //'--------------------------------
 //Public WorldCredits(1 To 5) As String
 const int maxWorldCredits = 100;

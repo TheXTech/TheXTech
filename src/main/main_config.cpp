@@ -31,6 +31,22 @@
 #include <IniProcessor/ini_processing.h>
 #include <fmt_format_ne.h>
 
+
+void OpenConfig_preSetup()
+{
+    std::string configPath = AppPath + "config.ini";
+    if(Files::fileExists(configPath))
+    {
+        IniProcessing config(configPath);
+        config.beginGroup("main");
+        config.read("render", RenderMode, 1);
+        if(RenderMode > 2) // Allowed values: 0, 1 and 2
+            RenderMode = 2;
+        config.endGroup();
+    }
+}
+
+
 void OpenConfig()
 {
     int FileRelease = 0;

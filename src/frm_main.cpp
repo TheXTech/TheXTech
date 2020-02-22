@@ -187,13 +187,20 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
 
     Uint32 renderFlags = 0;
     if(setup.renderType == CmdLineSetup_t::RENDER_SW)
+    {
         renderFlags = SDL_RENDERER_SOFTWARE;
+        pLogDebug("Using software rendering");
+    }
     else if(setup.renderType == CmdLineSetup_t::RENDER_HW)
+    {
         renderFlags = SDL_RENDERER_ACCELERATED;
+        pLogDebug("Using accelerated rendering");
+    }
     else if(setup.renderType == CmdLineSetup_t::RENDER_VSYNC)
     {
         renderFlags = SDL_RENDERER_ACCELERATED|SDL_RENDERER_PRESENTVSYNC;
         MaxFPS = true;
+        pLogDebug("Using accelerated rendering with a vertical synchronization");
     }
 
     m_gRenderer = SDL_CreateRenderer(m_window, -1, renderFlags);
@@ -221,12 +228,17 @@ void FrmMain::freeSDL()
     GFX.unLoad();
     clearAllTextures();
     CloseJoysticks();
+
     if(m_gRenderer)
         SDL_DestroyRenderer(m_gRenderer);
+
     if(m_window)
         SDL_DestroyWindow(m_window);
+
     SDL_Quit();
     GraphicsHelps::closeFreeImage();
+
+    pLogDebug("<Application closed>");
     CloseLog();
 }
 

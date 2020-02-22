@@ -13,8 +13,8 @@ struct CmdLineSetup_t
     enum RenderType
     {
         RENDER_SW = 0,
-        RENDER_HW,
-        RENDER_VSYNC
+        RENDER_HW = 1,
+        RENDER_VSYNC = 2
     } renderType;
 };
 
