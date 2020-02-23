@@ -510,12 +510,13 @@ void UpdateNPCs()
         {
             if(!(NPC[A].Type == 57) && !(NPC[A].Type == 84))
             {
-
-
                 // If .Type = 58 Or .Type = 21 Then
-                if(!(NPCIsAnExit[NPC[A].Type] || NPC[A].Type == 8 || NPC[A].Type == 51 || NPC[A].Type == 52 || NPC[A].Type == 74 || NPC[A].Type == 256 || NPC[A].Type == 257 || NPC[A].Type == 93 || NPC[A].Type == 245))
+                if(!(NPCIsAnExit[NPC[A].Type] || NPC[A].Type == 8 || NPC[A].Type == 51 ||
+                     NPC[A].Type == 52 || NPC[A].Type == 74 || NPC[A].Type == 256 ||
+                     NPC[A].Type == 257 || NPC[A].Type == 93 || NPC[A].Type == 245))
+                {
                     NPC[A].Location.X = NPC[A].Location.X + 0.015;
-
+                }
 
                 NPC[A].Location.Width = NPC[A].Location.Width - 0.03;
             }
