@@ -76,3 +76,7 @@ build/
 *.dll
 *.exe
 
+# CLion and like environments
+.idea/*
+cmake-build-*/*
+
