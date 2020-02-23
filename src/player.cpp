@@ -206,6 +206,8 @@ void SetupPlayers()
         Player[A].WetFrame = false;
         Player[A].Slide = false;
         Player[A].Vine = 0;
+        Player[A].VineNPC = 0.0;
+        Player[A].VineBGO = 0.0;
         Player[A].Fairy = false;
         Player[A].GrabSpeed = 0;
         Player[A].GrabTime = 0;
@@ -968,8 +970,16 @@ void UpdatePlayer()
                         Player[A].Location.SpeedY = 3;
                     else
                         Player[A].Location.SpeedY = 0;
-                    Player[A].Location.SpeedX += NPC[Player[A].VineNPC].Location.SpeedX;
-                    Player[A].Location.SpeedY += NPC[Player[A].VineNPC].Location.SpeedY;
+                    if(Player[A].VineBGO > 0)
+                    {
+                        Player[A].Location.SpeedX += Background[Player[A].VineBGO].Location.SpeedX;
+                        Player[A].Location.SpeedY += Background[Player[A].VineBGO].Location.SpeedY;
+                    }
+                    else
+                    {
+                        Player[A].Location.SpeedX += NPC[Player[A].VineNPC].Location.SpeedX;
+                        Player[A].Location.SpeedY += NPC[Player[A].VineNPC].Location.SpeedY;
+                    }
                 }
                 else
                 {
@@ -978,7 +988,7 @@ void UpdatePlayer()
 
 
                     // ducking for link
-                    if(Player[A].Duck == true && Player[A].WetFrame == true)
+                    if(Player[A].Duck && Player[A].WetFrame)
                     {
                         if(Player[A].Location.SpeedY != 0.0 && Player[A].Slope == 0 && Player[A].StandingOnNPC == 0)
                             UnDuck(A);
@@ -2707,7 +2717,7 @@ void UpdatePlayer()
                                                         PlayerDead(A);
                                                 }
                                                 if(Player[A].Location.SpeedY == 0.0 ||
-                                                   Player[A].Location.SpeedY == Physics.PlayerGravity || Player[A].Slope > 0 || Player[A].StandingOnNPC != 0)
+                                                   fEqual(float(Player[A].Location.SpeedY), Physics.PlayerGravity) || Player[A].Slope > 0 || Player[A].StandingOnNPC != 0)
                                                 {
                                                     PlrMid = Player[A].Location.Y;
                                                     Slope = (PlrMid - Block[B].Location.Y) / Block[B].Location.Height;
@@ -3550,6 +3560,7 @@ void UpdatePlayer()
 
                                         if(Player[A].Vine > 0)
                                             Player[A].VineNPC = -1;
+                                        Player[A].VineBGO = B;
                                     }
                                 }
                             }
@@ -3866,6 +3877,8 @@ void UpdatePlayer()
                                                     if(Player[A].Location.Y >= NPC[B].Location.Y - 18)
                                                         Player[A].Vine = 3;
                                                 }
+
+                                                Player[A].VineBGO = 0.0;
                                                 if(Player[A].Vine > 0)
                                                     Player[A].VineNPC = B;
                                             }
@@ -5530,8 +5543,20 @@ void PlayerFrame(int A)
 // climbing a vine/ladder
     if(Player[A].Vine > 0)
     {
-        if(!fEqual(Player[A].Location.SpeedX, NPC[Player[A].VineNPC].Location.SpeedX) ||
-           Player[A].Location.SpeedY < NPC[Player[A].VineNPC].Location.SpeedY - 0.1) // Or .Location.SpeedY > 0.1 Then
+        bool doesPlayerMoves = false;
+
+        if(Player[A].VineBGO > 0)
+        {
+            doesPlayerMoves = !fEqual(Player[A].Location.SpeedX,  Background[Player[A].VineBGO].Location.SpeedX) ||
+                               Player[A].Location.SpeedY < Background[Player[A].VineBGO].Location.SpeedY - 0.1;
+        }
+        else
+        {
+            doesPlayerMoves = !fEqual(Player[A].Location.SpeedX,  NPC[Player[A].VineNPC].Location.SpeedX) ||
+                               Player[A].Location.SpeedY < NPC[Player[A].VineNPC].Location.SpeedY - 0.1;
+        }
+
+        if(doesPlayerMoves) // Or .Location.SpeedY > 0.1 Then
         {
             Player[A].FrameCount += 1;
             if(Player[A].FrameCount >= 8)

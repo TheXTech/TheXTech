@@ -511,6 +511,8 @@ struct Player_t
     float GrabSpeed = 0.0f;
 //    VineNPC As Double 'the NPC that the player is climbing
     double VineNPC = 0.0;
+//  EXTRA:  Fence BGO
+    double VineBGO = 0.0;
 //    Wet As Integer 'weather or not the player is under water
     int Wet = 0;
 //    WetFrame As Boolean 'true if the play should be swimming
