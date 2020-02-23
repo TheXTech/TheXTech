@@ -3208,16 +3208,17 @@ void SpecialNPC(int A)
         {
             if(NPC[A].Special2 == 0 && !NPC[A].Inert)
             {
-                NPC[A].Location.Y = NPC[A].Location.Y + NPCHeight[NPC[A].Type] + 1.5;
+                NPC[A].Location.Y += NPCHeight[NPC[A].Type] + 1.5;
                 NPC[A].Special2 = 4;
                 NPC[A].Special = 70;
             }
             if(NPC[A].Special2 == 1)
             {
                 NPC[A].Special = NPC[A].Special + 1;
-                NPC[A].Location.Y = NPC[A].Location.Y - 1.5;
+                NPC[A].Location.Y -= 1.5;
                 if(NPC[A].Special >= NPCHeight[NPC[A].Type] * 0.65 + 1)
                 {
+                    NPC[A].Location.Y = std::floor(NPC[A].Location.Y);
                     NPC[A].Special2 = 2;
                     NPC[A].Special = 0;
                 }
@@ -3234,8 +3235,8 @@ void SpecialNPC(int A)
             }
             else if(NPC[A].Special2 == 3)
             {
-                NPC[A].Special = NPC[A].Special + 1;
-                NPC[A].Location.Y = NPC[A].Location.Y + 1.5;
+                NPC[A].Special += 1;
+                NPC[A].Location.Y += 1.5;
                 if(NPC[A].Special >= NPCHeight[NPC[A].Type] * 0.65 + 1)
                 {
                     NPC[A].Special2 = 4;
@@ -3287,7 +3288,7 @@ void SpecialNPC(int A)
     else if(NPC[A].Type == 51 || NPC[A].Type == 257)
     {
         if(NPC[A].Special3 > 0)
-            NPC[A].Special3 = NPC[A].Special3 - 1;
+            NPC[A].Special3 -= 1;
         if(NPC[A].Location.X != NPC[A].DefaultLocation.X)
         {
             NPC[A].Killed = 2;
@@ -3304,11 +3305,12 @@ void SpecialNPC(int A)
             }
             else if(NPC[A].Special2 == 1)
             {
-                NPC[A].Special = NPC[A].Special + 1;
+                NPC[A].Special += 1;
                 // .Location.Y = .Location.Y + 1.5
-                NPC[A].Location.Height = NPC[A].Location.Height + 1.5;
+                NPC[A].Location.Height += 1.5;
                 if(NPC[A].Special >= NPCHeight[NPC[A].Type] * 0.65 + 1)
                 {
+                    NPC[A].Location.Height = std::floor(NPC[A].Location.Height);
                     NPC[A].Special2 = 2;
                     NPC[A].Special = 0;
                 }
@@ -3325,15 +3327,18 @@ void SpecialNPC(int A)
             }
             else if(NPC[A].Special2 == 3)
             {
-                NPC[A].Special = NPC[A].Special + 1;
+                NPC[A].Special += 1;
                 // .Location.Y = .Location.Y - 1.5
-                NPC[A].Location.Height = NPC[A].Location.Height - 1.5;
+                NPC[A].Location.Height -= 1.5;
                 if(NPC[A].Special >= NPCHeight[NPC[A].Type] * 0.65 + 1)
+                {
+                    NPC[A].Location.Height = 0;
                     NPC[A].Special2 = 4;
+                }
             }
             else if(NPC[A].Special2 == 4)
             {
-                NPC[A].Special = NPC[A].Special + 1;
+                NPC[A].Special += 1;
                 if(NPC[A].Special >= 110)
                 {
                     NPC[A].Special2 = 1;
@@ -3373,11 +3378,12 @@ void SpecialNPC(int A)
             {
                 NPC[A].Special = NPC[A].Special + 1;
                 if(NPC[A].Direction == -1)
-                    NPC[A].Location.X = NPC[A].Location.X + 1.5 * NPC[A].Direction;
+                    NPC[A].Location.X += 1.5 * NPC[A].Direction;
                 else
-                    NPC[A].Location.Width = NPC[A].Location.Width + 1.5 * NPC[A].Direction;
+                    NPC[A].Location.Width += 1.5 * NPC[A].Direction;
                 if(NPC[A].Special >= NPCWidth[NPC[A].Type] * 0.65 + 1)
                 {
+                    NPC[A].Location.Width = std::floor(NPC[A].Location.Width);
                     NPC[A].Special2 = 2;
                     NPC[A].Special = 0;
                 }
@@ -3395,11 +3401,14 @@ void SpecialNPC(int A)
             {
                 NPC[A].Special = NPC[A].Special + 1;
                 if(NPC[A].Direction == -1)
-                    NPC[A].Location.X = NPC[A].Location.X - 1.5 * NPC[A].Direction;
+                    NPC[A].Location.X -= 1.5 * NPC[A].Direction;
                 else
-                    NPC[A].Location.Width = NPC[A].Location.Width - 1.5 * NPC[A].Direction;
+                    NPC[A].Location.Width -= 1.5 * NPC[A].Direction;
                 if(NPC[A].Special >= NPCWidth[NPC[A].Type] * 0.65 + 1)
+                {
                     NPC[A].Special2 = 4;
+                    NPC[A].Location.Width = 0;
+                }
             }
             else if(NPC[A].Special2 == 4)
             {
