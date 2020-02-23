@@ -1022,6 +1022,8 @@ void NPCHit(int A, int B, int C)
             NPC[A].Location.SpeedY = -3;
             NPC[A].Projectile = true;
         }
+        // Because C++, second part of this condition never gets checked
+        // in VB6, it does check and causes a crash, because C is an index of block when B is 4
         else if(B == 4 && (NPC[C].Type != NPC[A].Type || A == C))
         {
             if(!(NPC[C].Type == 202) && !(NPC[C].Type == 201))
