@@ -27,7 +27,6 @@
 #include <SDL2/SDL.h>
 
 #include "../globals.h"
-#include "../game_main.h"
 #include "../sound.h"
 #include "../graphics.h"
 #include "../collision.h"

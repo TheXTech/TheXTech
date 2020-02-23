@@ -30,11 +30,8 @@
 #include "../effect.h"
 #include "../layers.h"
 #include "../editor.h"
-#include "../game_main.h"
 #include "../blocks.h"
 #include "../sorting.h"
-
-#include "../pseudo_vb.h"
 
 #include <Utils/maths.h>
 

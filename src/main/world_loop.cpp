@@ -31,12 +31,7 @@
 #include "../joystick.h"
 #include "../effect.h"
 #include "../graphics.h"
-#include "../blocks.h"
 #include "../collision.h"
-#include "../npc.h"
-#include "../layers.h"
-#include "../player.h"
-#include "../sound.h"
 
 #include "../pseudo_vb.h"
 

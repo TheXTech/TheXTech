@@ -86,11 +86,17 @@ void YoshiEatCode(int A);
 void StealBonus();
 // Public Sub ClownCar()
 void ClownCar();
+
 // Private Sub WaterCheck(A As Integer)
+void WaterCheck(int A); //PRIVATE
 // Private Sub Tanooki(A As Integer)
+void Tanooki(int A); //PRIVATE
 // Private Sub PowerUps(A As Integer)
+void PowerUps(int A); //PRIVATE
 // Private Sub SuperWarp(A As Integer)
+void SuperWarp(int A); //PRIVATE
 // Private Sub PlayerCollide(A As Integer)
+void PlayerCollide(int A); //PRIVATE
 
 // Public Sub PlayerGrabCode(A As Integer, Optional DontResetGrabTime As Boolean = False)
 void PlayerGrabCode(int A, bool DontResetGrabTime = false);

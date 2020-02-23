@@ -27,14 +27,8 @@
 #include "graphics.h"
 #include "collision.h"
 #include "game_main.h"
-#include "gfx.h"
-#include "player.h"
-#include "npc.h"
-#include "editor.h"
 #include "sound.h"
 #include "change_res.h"
-#include <fmt_format_ne.h>
-#include <algorithm>
 
 #include "pseudo_vb.h"
 

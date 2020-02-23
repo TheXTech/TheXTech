@@ -25,9 +25,7 @@
 
 #include <ctime>
 
-#include <AppPath/app_path.h>
 #include <Logger/logger.h>
-#include <tclap/CmdLine.h>
 
 #include "globals.h"
 #include "game_main.h"
@@ -35,15 +33,12 @@
 #include "blocks.h"
 #include "change_res.h"
 #include "collision.h"
-#include "custom.h"
 #include "effect.h"
 #include "graphics.h"
 #include "joystick.h"
 #include "layers.h"
 #include "load_gfx.h"
-#include "npc.h"
 #include "player.h"
-#include "sorting.h"
 #include "sound.h"
 
 #include "pseudo_vb.h"

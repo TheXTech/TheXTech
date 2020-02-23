@@ -29,7 +29,6 @@
 #include "graphics.h"
 #include "effect.h"
 #include "collision.h"
-#include "game_main.h"
 #include "npc.h"
 #include "player.h"
 #include "sorting.h"

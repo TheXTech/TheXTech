@@ -33,13 +33,13 @@
 void SaveGame()
 {
     int A = 0;
-    if(Cheater == true)
+    if(Cheater)
         return;
     for(A = numPlayers; A >= 1; A--)
         SavedChar[Player[A].Character] = Player[A];
     for(A = numStars; A >= 1; A--)
     {
-        if(Star[A].level == "")
+        if(Star[A].level.empty())
         {
             if(numStars > A)
             {
@@ -55,7 +55,7 @@ void SaveGame()
     std::string savePath = SelectWorld[selWorld].WorldPath + fmt::format_ne("save{0}.savx", selSave);
 
 //    Open SelectWorld[selWorld].WorldPath + "save" + selSave + ".sav" For Output As #1;
-    sav.lives = Lives;
+    sav.lives = int(Lives);
     sav.coins = uint32_t(Coins);
     sav.worldPosX = WorldPlayer[1].Location.X;
     sav.worldPosY = WorldPlayer[1].Location.Y;
@@ -78,16 +78,16 @@ void SaveGame()
     sav.gameCompleted = BeatTheGame; // Can only get 99% until you finish the game;
 
     for(A = 1; A <= numWorldLevels; A++)
-        sav.visibleLevels.push_back({A, WorldLevel[A].Active});
+        sav.visibleLevels.emplace_back(A, WorldLevel[A].Active);
 
     for(A = 1; A <= numWorldPaths; A++)
-        sav.visiblePaths.push_back({A, WorldPath[A].Active});
+        sav.visiblePaths.emplace_back(A, WorldPath[A].Active);
 
     for(A = 1; A <= numScenes; A++)
-        sav.visibleScenery.push_back({A, Scene[A].Active});
+        sav.visibleScenery.emplace_back(A, Scene[A].Active);
 
     for(A = 1; A <= numStars; A++)
-        sav.gottenStars.push_back({Star[A].level, Star[A].Section});
+        sav.gottenStars.emplace_back(Star[A].level, Star[A].Section);
 
     sav.totalStars = uint32_t(MaxWorldStars);
 
@@ -98,7 +98,7 @@ void LoadGame()
 {
     int A = 0;
     size_t i = 0;
-    std::string newInput = "";
+    std::string newInput;
 
     GamesaveData sav;
     std::string savePath = SelectWorld[selWorld].WorldPath + fmt::format_ne("save{0}.savx", selSave);
@@ -120,10 +120,10 @@ void LoadGame()
         return;
     }
 
-    Lives = sav.lives;
+    Lives = float(sav.lives);
     Coins = int(sav.coins);
-    WorldPlayer[1].Location.X = sav.worldPosX;
-    WorldPlayer[1].Location.Y = sav.worldPosY;
+    WorldPlayer[1].Location.X = double(sav.worldPosX);
+    WorldPlayer[1].Location.Y = double(sav.worldPosY);
 
     curWorldMusic = int(sav.musicID);
     curWorldMusicFile = sav.musicFile;

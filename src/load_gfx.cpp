@@ -29,7 +29,6 @@
 #include <DirManager/dirman.h>
 #include <fmt_format_ne.h>
 
-#include <ctime>
 #include <set>
 
 //// Private Sub cBlockGFX(A As Integer)

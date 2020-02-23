@@ -394,7 +394,7 @@ void OpenLevel(std::string FilePath)
 
         Layer[A].Name = l.name;
         Layer[A].Hidden = l.hidden;
-        if(Layer[A].Hidden == true)
+        if(Layer[A].Hidden)
         {
             HideLayer(Layer[A].Name, true);
         }
@@ -589,7 +589,7 @@ void OpenLevel(std::string FilePath)
                 Background[B].Location.X = Warp[A].Entrance.X + Warp[A].Entrance.Width / 2.0 - Background[B].Location.Width / 2.0;
                 Background[B].Type = 160;
             }
-            else if(Warp[A].Effect == 2 && Warp[A].Locked == true) // For locks
+            else if(Warp[A].Effect == 2 && Warp[A].Locked) // For locks
             {
                 B++;
                 numLocked = numLocked + 1;
@@ -616,13 +616,13 @@ void ClearLevel()
 {
     int A = 0;
     int B = 0;
-    NPC_t blankNPC;
-    Water_t blankwater;
-    Warp_t blankWarp;
-    Block_t blankBlock;
-    Background_t BlankBackground;
-    Location_t BlankLocation;
-    Events_t blankEvent;
+    NPC_t blankNPC = NPC_t();
+    Water_t blankwater = Water_t();
+    Warp_t blankWarp = Warp_t();
+    Block_t blankBlock = Block_t();
+    Background_t BlankBackground = Background_t();
+    Location_t BlankLocation = Location_t();
+    Events_t blankEvent = Events_t();
     NPCScore[274] = 6;
     LevelName = "";
     LoadNPCDefaults();
@@ -669,15 +669,19 @@ void ClearLevel()
     PSwitchStop = 0;
     BeltDirection = 1;
     StopMusic();
+    Layer[0] = Layer_t();
     Layer[0].Name = "Default";
     Layer[0].Hidden = false;
+    Layer[1] = Layer_t();
     Layer[1].Name = "Destroyed Blocks";
     Layer[1].Hidden = true;
+    Layer[2] = Layer_t();
     Layer[2].Name = "Spawned NPCs";
     Layer[2].Hidden = false;
 
     for(A = 0; A <= maxLayers; A++)
     {
+        Layer[A] = Layer_t();
         if(A > 2)
         {
             Layer[A].Name = "";
@@ -776,13 +780,13 @@ void FindStars()
 {
     int A = 0;
     int B = 0;
-    std::string newInput = "";
+    std::string newInput;
     LevelData head;
 
     for(A = 1; A <= numWarps; A++)
     {
         auto &tempVar = Warp[A];
-        if(tempVar.level != "")
+        if(!tempVar.level.empty())
         {
             std::string lFile = FileNamePath + tempVar.level;
             if(Files::fileExists(lFile))

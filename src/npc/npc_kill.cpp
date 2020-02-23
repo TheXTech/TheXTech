@@ -26,12 +26,9 @@
 #include "../globals.h"
 #include "../npc.h"
 #include "../sound.h"
-#include "../collision.h"
 #include "../effect.h"
 #include "../layers.h"
-#include "../editor.h"
 #include "../game_main.h"
-#include "../blocks.h"
 
 
 void KillNPC(int A, int B)
