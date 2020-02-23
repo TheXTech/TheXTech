@@ -205,6 +205,9 @@ int GameMain(const CmdLineSetup_t &setup)
             cycleCount = 0;
             gameTime = 0;
 
+            // Update graphics before loop begin (to process inital lazy-unpacking of used sprites)
+            UpdateGraphics();
+
             do
             {
                 DoEvents();
@@ -371,6 +374,9 @@ int GameMain(const CmdLineSetup_t &setup)
             cycleCount = 0;
             gameTime = 0;
 
+            // Update graphics before loop begin (to process inital lazy-unpacking of used sprites)
+            UpdateGraphics();
+
             do
             {
                 DoEvents();
@@ -487,6 +493,9 @@ int GameMain(const CmdLineSetup_t &setup)
                 fpsTime = 0;
                 cycleCount = 0;
                 gameTime = 0;
+
+                // Update graphics before loop begin (to process inital lazy-unpacking of used sprites)
+                UpdateGraphics2();
 
                 do // 'level select loop
                 {
@@ -663,6 +672,9 @@ int GameMain(const CmdLineSetup_t &setup)
             fpsTime = 0;
             cycleCount = 0;
             gameTime = 0;
+
+            // Update graphics before loop begin (to process inital lazy-unpacking of used sprites)
+            UpdateGraphics();
 
             do // MAIN GAME LOOP
             {
