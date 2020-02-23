@@ -284,6 +284,7 @@ void OpenLevel(std::string FilePath)
         {
             checkPointId++;
             NPC[numNPCs].Special = checkPointId;
+            NPC[numNPCs].DefaultSpecial = NPC[numNPCs].Special;
         }
         else if(NPC[numNPCs].Type == 97 || NPC[numNPCs].Type == 196) // Is a star
         {
