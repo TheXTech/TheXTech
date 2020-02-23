@@ -2033,9 +2033,14 @@ void NPCHit(int A, int B, int C)
             NPC[A].Location.SpeedY = -5;
             NPC[A].Location.Y = Block[C].Location.Y - NPC[A].Location.Height - 0.01;
         }
-        else if(B == 6 || B == 5 || B == 4)
+        else if(B == 6)
         {
-            if(!(NPC[A].Type == 13 || NPC[A].Type == 108 || NPC[A].Type == 171 || NPCIsVeggie[NPC[A].Type]))
+            NPC[A].Killed = B;
+        }
+        else if(B == 5 || B == 4)
+        {
+            // B == 6 - touched a lava block, C is a block, not NPC!!!
+            if(!(NPC[C].Type == 13 || NPC[C].Type == 108 || NPC[C].Type == 171 || NPCIsVeggie[NPC[C].Type]))
                 NPC[A].Killed = B;
         }
         else if(B == 7)
