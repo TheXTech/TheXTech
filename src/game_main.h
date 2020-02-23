@@ -96,8 +96,6 @@ void SetupCredits();
 void FindStars();
 // for settings up the game's credits
 void AddCredit(std::string newCredit);
-// creates a temp Location
-Location_t newLoc(double X, double Y, double Width = 0, double Height = 0);
 // calcualtes scores based on the multiplyer and how much the NPC is worth
 void MoreScore(int addScore, Location_t Loc, int Multiplier = 0);
 // sets up player frame offsets so they are displayed correctly on the screen

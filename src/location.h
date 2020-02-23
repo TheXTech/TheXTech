@@ -46,4 +46,7 @@ struct Location_t
 //End Type
 };
 
+// creates a temp Location
+Location_t newLoc(double X, double Y, double Width = 0, double Height = 0);
+
 #endif // LOCATION_H

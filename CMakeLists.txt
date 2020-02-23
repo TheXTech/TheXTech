@@ -126,6 +126,16 @@ set(A2XTECH_SRC
     src/main/menu_loop.cpp
     src/main/cheat_code.cpp
     src/main/outro_loop.cpp
+    src/graphics/gfx_update2.cpp
+    src/graphics/gfx_update.cpp
+    src/graphics/gfx_background.cpp
+    src/graphics/gfx_print.cpp
+    src/graphics/gfx_credits.cpp
+    src/graphics/gfx_hud.cpp
+    src/graphics/gfx_enter_screen.cpp
+    src/graphics/gfx_draw_player.cpp
+    src/graphics/gfx_special_frames.cpp
+    src/graphics/gfx_screen.cpp
     src/change_res.cpp
     src/effect.cpp
     src/collision.cpp
