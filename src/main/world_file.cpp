@@ -104,6 +104,8 @@ void OpenWorld(std::string FilePath)
             break;
         }
 
+        Tile[numTiles] = Tile_t();
+
         Tile[numTiles].Location.X = t.x;
         Tile[numTiles].Location.Y = t.y;
         Tile[numTiles].Type = int(t.id);
@@ -119,6 +121,9 @@ void OpenWorld(std::string FilePath)
             numScenes = maxScenes;
             break;
         }
+
+        Scene[numScenes] = Scene_t();
+
         Scene[numScenes].Type = int(s.id);
         Scene[numScenes].Location.X = s.x;
         Scene[numScenes].Location.Y = s.y;
@@ -135,6 +140,9 @@ void OpenWorld(std::string FilePath)
             numWorldPaths = maxWorldPaths;
             break;
         }
+
+        WorldPath[numWorldPaths] = WorldPath_t();
+
         WorldPath[numWorldPaths].Location.X = p.x;
         WorldPath[numWorldPaths].Location.Y = p.y;
         WorldPath[numWorldPaths].Type = int(p.id);
@@ -152,6 +160,8 @@ void OpenWorld(std::string FilePath)
             numWorldLevels = maxWorldLevels;
             break;
         }
+
+        WorldLevel[numWorldLevels] = WorldLevel_t();
 
         WorldLevel[numWorldLevels].Location.X = l.x;
         WorldLevel[numWorldLevels].Location.Y = l.y;
@@ -182,6 +192,8 @@ void OpenWorld(std::string FilePath)
             numWorldMusic = maxWorldMusic;
             break;
         }
+
+        WorldMusic[numWorldMusic] = WorldMusic_t();
 
         WorldMusic[numWorldMusic].Location.X = m.x;
         WorldMusic[numWorldMusic].Location.Y = m.y;

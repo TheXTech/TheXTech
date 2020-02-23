@@ -150,6 +150,8 @@ void OpenLevel(std::string FilePath)
             break;
         }
 
+        Block[numBlock] = Block_t();
+
         Block[numBlock].Location.X = b.x;
         Block[numBlock].Location.Y = b.y;
         Block[numBlock].Location.Height = b.h;
@@ -182,6 +184,9 @@ void OpenLevel(std::string FilePath)
             numBackground = maxBackgrounds;
             break;
         }
+
+        Background[numBackground] = Background_t();
+
         Background[numBackground].Location.X = b.x;
         Background[numBackground].Location.Y = b.y;
         Background[numBackground].Type = int(b.id);
@@ -199,6 +204,8 @@ void OpenLevel(std::string FilePath)
             numNPCs = maxNPCs;
             break;
         }
+
+        NPC[numNPCs] = NPC_t();
 
         NPC[numNPCs].Location.X = n.x;
         NPC[numNPCs].Location.Y = n.y;
@@ -301,6 +308,8 @@ void OpenLevel(std::string FilePath)
             break;
         }
 
+        Warp[numWarps] = Warp_t();
+
         Warp[numWarps].PlacedEnt = true;
         Warp[numWarps].PlacedExit = true;
         Warp[numWarps].Entrance.X = w.ix;
@@ -344,6 +353,7 @@ void OpenLevel(std::string FilePath)
                 numWarps = maxWarps;
                 break;
             }
+
             Warp[numWarps] = Warp[tww];
             Warp[numWarps].Exit = Warp[tww].Entrance;
             Warp[numWarps].Entrance = Warp[tww].Exit;
@@ -361,6 +371,8 @@ void OpenLevel(std::string FilePath)
             break;
         }
 
+        Water[numWater] = Water_t();
+
         Water[numWater].Location.X = w.x;
         Water[numWater].Location.Y = w.y;
         Water[numWater].Location.Width = w.w;
@@ -373,6 +385,8 @@ void OpenLevel(std::string FilePath)
     A = 0;
     for(auto &l : lvl.layers)
     {
+        Layer[A] = Layer_t();
+
         Layer[A].Name = l.name;
         Layer[A].Hidden = l.hidden;
         if(Layer[A].Hidden == true)
@@ -391,6 +405,8 @@ void OpenLevel(std::string FilePath)
     A = 0;
     for(auto &e : lvl.events)
     {
+        Events[A] = Events_t();
+
         Events[A].Name = e.name;
         Events[A].Text = e.msg;
         Events[A].Sound = int(e.sound_id);
@@ -557,8 +573,9 @@ void OpenLevel(std::string FilePath)
         {
             if(Warp[A].Effect == 2 && Warp[A].Stars > numStars)
             {
-                B = B + 1;
+                B++;
                 numLocked = numLocked + 1;
+                Background[B] = Background_t();
                 Background[B].Layer = Warp[A].Layer;
                 Background[B].Hidden = Warp[A].Hidden;
                 Background[B].Location.Width = 24;
@@ -569,8 +586,9 @@ void OpenLevel(std::string FilePath)
             }
             else if(Warp[A].Effect == 2 && Warp[A].Locked == true) // For locks
             {
-                B = B + 1;
+                B++;
                 numLocked = numLocked + 1;
+                Background[B] = Background_t();
                 Background[B].Layer = Warp[A].Layer;
                 Background[B].Hidden = Warp[A].Hidden;
                 Background[B].Location = Warp[A].Entrance;
