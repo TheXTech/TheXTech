@@ -508,7 +508,7 @@ void UpdateNPCs()
 
         if(NPC[A].Location.Width == 32)
         {
-            if(!(NPC[A].Type == 57) && !(NPC[A].Type == 84))
+            if(NPC[A].Type != 57 && NPC[A].Type != 84)
             {
                 // If .Type = 58 Or .Type = 21 Then
                 if(!(NPCIsAnExit[NPC[A].Type] || NPC[A].Type == 8 || NPC[A].Type == 51 ||

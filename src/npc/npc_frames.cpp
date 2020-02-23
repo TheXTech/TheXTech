@@ -40,7 +40,7 @@ void NPCFrames(int A)
     if(NPCFrame[NPC[A].Type] > 0) // custom frames
     {
         NPC[A].FrameCount = NPC[A].FrameCount + 1;
-        if(NPCFrameStyle[NPC[A].Type] == 2 && (NPC[A].Projectile == true || NPC[A].HoldingPlayer > 0))
+        if(NPCFrameStyle[NPC[A].Type] == 2 && (NPC[A].Projectile != 0 || NPC[A].HoldingPlayer > 0))
             NPC[A].FrameCount = NPC[A].FrameCount + 1;
         if(NPC[A].FrameCount >= NPCFrameSpeed[NPC[A].Type])
         {
@@ -76,7 +76,7 @@ void NPCFrames(int A)
         }
         else if(NPCFrameStyle[NPC[A].Type] == 2)
         {
-            if(NPC[A].HoldingPlayer == 0 && NPC[A].Projectile == false)
+            if(NPC[A].HoldingPlayer == 0 && NPC[A].Projectile == 0)
             {
                 if(NPC[A].Direction == -1)
                 {
@@ -130,7 +130,7 @@ void NPCFrames(int A)
         C = 0;
         for(B = 1; B <= numPlayers; B++)
         {
-            if(Player[B].Dead == false && Player[B].Section == NPC[A].Section && Player[B].TimeToLive == 0)
+            if(!Player[B].Dead && Player[B].Section == NPC[A].Section && Player[B].TimeToLive == 0)
             {
                 if(C == 0 || std::abs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0)) + std::abs(NPC[A].Location.Y + NPC[A].Location.Height / 2.0 - (Player[B].Location.Y + Player[B].Location.Height / 2.0)) < C)
                 {
@@ -238,7 +238,7 @@ void NPCFrames(int A)
     }
     else if(NPC[A].Type == 272) // spider
     {
-        if(NPC[A].Projectile == true || NPC[A].Location.SpeedY >= 0 || NPC[A].HoldingPlayer > 0)
+        if(NPC[A].Projectile != 0 || NPC[A].Location.SpeedY >= 0 || NPC[A].HoldingPlayer > 0)
             NPC[A].Frame = 0;
         else
             NPC[A].Frame = 2;
@@ -561,7 +561,7 @@ void NPCFrames(int A)
     {
         if(NPC[A].Special < 0 && NPC[A].Location.SpeedY == 0)
             NPC[A].Special = NPC[A].Special + 1;
-        if(NPC[A].Projectile == true || NPC[A].HoldingPlayer > 0)
+        if(NPC[A].Projectile != 0 || NPC[A].HoldingPlayer > 0)
             NPC[A].Frame = 4;
         else
         {
@@ -575,7 +575,7 @@ void NPCFrames(int A)
             NPC[A].FrameCount = 0;
         else if(NPC[A].FrameCount > 8)
         {
-            if(NPC[A].Projectile == true || NPC[A].HoldingPlayer > 0)
+            if(NPC[A].Projectile != 0 || NPC[A].HoldingPlayer > 0)
                 NPC[A].Frame = NPC[A].Frame + 1;
             else
                 NPC[A].Frame = NPC[A].Frame + 2;
@@ -843,21 +843,21 @@ void NPCFrames(int A)
     {
         NPC[A].Frame = 0;
         C = 0;
-        for(B = 1; B <= numPlayers; B++)
+        for(B = 1; B <= numPlayers; ++B)
         {
-            if(CanComeOut(NPC[A].Location, Player[B].Location) == false && Player[B].Location.Y >= NPC[A].Location.Y)
+            if(!CanComeOut(NPC[A].Location, Player[B].Location) && Player[B].Location.Y >= NPC[A].Location.Y)
                 C = B;
         }
         if(C > 0)
             NPC[A].Frame = 2;
         else
         {
-            for(B = 1; B <= numPlayers; B++)
+            for(B = 1; B <= numPlayers; ++B)
             {
                 tempLocation = NPC[A].Location;
                 tempLocation.Width = NPC[A].Location.Width * 2;
                 tempLocation.X = NPC[A].Location.X - NPC[A].Location.Width / 2.0;
-                if(CanComeOut(tempLocation, Player[B].Location) == false && Player[B].Location.Y >= NPC[A].Location.Y)
+                if(!CanComeOut(tempLocation, Player[B].Location) && Player[B].Location.Y >= NPC[A].Location.Y)
                     C = B;
             }
             if(C > 0)
@@ -905,7 +905,7 @@ void NPCFrames(int A)
                 NPC[A].Frame = 3;
         }
 
-        if(static_cast<int>(floor(static_cast<double>(std::rand() % 4))) == 0)
+        if(std::rand() % 4 == 0)
         {
             NewEffect(80, newLoc(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - 4, NPC[A].Location.Y + NPC[A].Location.Height / 2.0 - 4), 1, 0, NPC[A].Shadow);
             Effect[numEffects].Location.SpeedX = std::rand() % 1 - 0.5;
@@ -1057,21 +1057,19 @@ void NPCFrames(int A)
         }
         NPC[A].Special3 = NPC[A].Special3 + 1;
         if(NPC[A].Special3 < 4)
-        {
-        }
+        {}
         else if(NPC[A].Special3 < 8)
             NPC[A].Frame = NPC[A].Frame + 3;
         else if(NPC[A].Special3 < 12)
             NPC[A].Frame = NPC[A].Frame + 6;
         else // If .Special3 >= 16 Then
             NPC[A].Special3 = 0;
-        if(std::rand() % 10 > 9.2)
+        if(fRand() * 10 > 9.2)
         {
             NewEffect(80, newLoc(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - 4, NPC[A].Location.Y + NPC[A].Location.Height / 2.0 - 6), 1, 0, NPC[A].Shadow);
-            Effect[numEffects].Location.SpeedX = std::rand() % 1 - 0.5;
-            Effect[numEffects].Location.SpeedY = std::rand() % 1 - 0.5;
+            Effect[numEffects].Location.SpeedX = std::fmod(fRand(), 1.0) - 0.5;
+            Effect[numEffects].Location.SpeedY = std::fmod(fRand(), 1.0) - 0.5;
         }
-
     }
     else if(NPC[A].Type == 91)
         NPC[A].Frame = SpecialFrame[5];
@@ -1200,7 +1198,7 @@ void NPCFrames(int A)
         if(NPC[A].Direction == 1)
             NPC[A].Frame = NPC[A].Frame + 3;
 
-        if(NPC[A].Projectile == true || NPC[A].Special2 != 0)
+        if(NPC[A].Projectile != 0 || NPC[A].Special2 != 0)
         {
             NPC[A].Frame = NPC[A].Frame + 2;
             NPC[A].FrameCount = 0;
@@ -1253,7 +1251,7 @@ void NPCFrames(int A)
     }
     else if(NPC[A].Type >= 117 && NPC[A].Type <= 120) // beach koopa
     {
-        if(NPC[A].Projectile == true)
+        if(NPC[A].Projectile != 0)
         {
             if(NPC[A].Location.SpeedX < -0.5 || NPC[A].Location.SpeedX > 0.5)
                 NPC[A].Frame = 3;
@@ -1575,7 +1573,7 @@ void NPCFrames(int A)
     }
     else if(NPC[A].Type == 49) // killer pipe
     {
-        if(NPC[A].HoldingPlayer == 0 && Player[NPC[A].standingOnPlayer].Controls.Run == false && NPC[A].Projectile == false)
+        if(NPC[A].HoldingPlayer == 0 && !Player[NPC[A].standingOnPlayer].Controls.Run && NPC[A].Projectile == 0)
         {
             NPC[A].FrameCount = NPC[A].FrameCount + 1;
             if(NPC[A].FrameCount >= 4)
@@ -1640,7 +1638,7 @@ void NPCFrames(int A)
                 if(std::rand() % 100 > 95)
                 {
                     tempLocation = newLoc(NPC[A].Location.X + 4, NPC[A].Location.Y + 4, 8, 8);
-                    if(UnderWater[NPC[A].Section] == false)
+                    if(!UnderWater[NPC[A].Section])
                         NewEffect(113, tempLocation, 1, 0, NPC[A].Shadow);
                     else
                         NewEffect(113, tempLocation, 1, 1, NPC[A].Shadow);
@@ -1664,7 +1662,7 @@ void NPCFrames(int A)
                                 NewEffect(80, tempLocation);
                                 Effect[numEffects].Location.SpeedX = NPC[A].Location.SpeedX * 0.5;
                                 Effect[numEffects].Location.SpeedY = NPC[A].Location.SpeedY * 0.5;
-                                Effect[numEffects].Frame = static_cast<int>(floor(static_cast<double>(std::rand() % 3)));
+                                Effect[numEffects].Frame = std::rand() % 3;
                             }
                         }
                         else if(std::rand() % 10 > 6)
@@ -1678,7 +1676,7 @@ void NPCFrames(int A)
                             NewEffect(80, tempLocation, 1, 0, NPC[A].Shadow);
                             Effect[numEffects].Location.SpeedX = NPC[A].Location.SpeedX * 0.25;
                             Effect[numEffects].Location.SpeedY = NPC[A].Location.SpeedY * 0.25;
-                            Effect[numEffects].Frame = static_cast<int>(floor(static_cast<double>(std::rand() % 3)));
+                            Effect[numEffects].Frame = std::rand() % 3;
                         }
                     }
                     else
@@ -1703,7 +1701,7 @@ void NPCFrames(int A)
                             NewEffect(80, tempLocation);
                             Effect[numEffects].Location.SpeedX = NPC[A].Location.SpeedX * 0.5;
                             Effect[numEffects].Location.SpeedY = NPC[A].Location.SpeedY * 0.5;
-                            Effect[numEffects].Frame = static_cast<int>(floor(static_cast<double>(std::rand() % 3)));
+                            Effect[numEffects].Frame = std::rand() % 3;
                         }
                     }
                     else if(std::rand() % 10 > 6)
@@ -1717,7 +1715,7 @@ void NPCFrames(int A)
                         NewEffect(80, tempLocation, 1, 0, NPC[A].Shadow);
                         Effect[numEffects].Location.SpeedX = NPC[A].Location.SpeedX * 0.25;
                         Effect[numEffects].Location.SpeedY = NPC[A].Location.SpeedY * 0.25;
-                        Effect[numEffects].Frame = static_cast<int>(floor(static_cast<double>(std::rand() % 3)));
+                        Effect[numEffects].Frame = std::rand() % 3;
                     }
                 }
                 else
@@ -1855,14 +1853,14 @@ void NPCFrames(int A)
             NPC[A].Frame = 10;
             NPC[A].FrameCount = 0;
         }
-        if(NPC[A].HoldingPlayer > 0 || NPC[A].Projectile == true)
+        if(NPC[A].HoldingPlayer > 0 || NPC[A].Projectile != 0)
             NPC[A].Frame = NPC[A].Frame + 6;
         if(NPC[A].Direction == 1)
             NPC[A].Frame = NPC[A].Frame + 3;
     }
     else if(NPC[A].Type == 19 || NPC[A].Type == 20 || NPC[A].Type == 28 || (NPC[A].Type >= 129 && NPC[A].Type <= 132) || NPC[A].Type == 135 || NPC[A].Type == 158) // Shy guys / Jumping Fish
     {
-        if(NPC[A].HoldingPlayer == 0 && NPC[A].Projectile == false)
+        if(NPC[A].HoldingPlayer == 0 && NPC[A].Projectile == 0)
         {
             NPC[A].FrameCount = NPC[A].FrameCount + 1;
             if(NPC[A].Direction == -1 && NPC[A].Frame >= 2)
@@ -1915,7 +1913,7 @@ void NPCFrames(int A)
     }
     else if(NPC[A].Type == 25) // Bouncy Star things
     {
-        if(NPC[A].HoldingPlayer == 0 && NPC[A].Projectile == false)
+        if(NPC[A].HoldingPlayer == 0 && NPC[A].Projectile == 0)
         {
             if(NPC[A].Location.SpeedY == 0 || NPC[A].Slope > 0)
             {
@@ -2005,7 +2003,7 @@ void NPCFrames(int A)
     }
     else if(NPC[A].Type == 26) // Spring thing
     {
-        if(LevelEditor == false)
+        if(!LevelEditor)
         {
             if(NPC[A].Location.Height == 32)
             {
@@ -2020,9 +2018,9 @@ void NPCFrames(int A)
                 tempLocation = NPC[A].Location;
                 tempLocation.Height = 24;
                 tempLocation.Y = tempLocation.Y - 8;
-                for(B = 1; B <= numPlayers; B++)
+                for(B = 1; B <= numPlayers; ++B)
                 {
-                    if(CheckCollision(tempLocation, Player[B].Location) == true && Player[B].Mount != 2 && (Player[B].Location.SpeedY > 0 || Player[B].Location.SpeedY < Physics.PlayerJumpVelocity))
+                    if(CheckCollision(tempLocation, Player[B].Location) && Player[B].Mount != 2 && (Player[B].Location.SpeedY > 0 || Player[B].Location.SpeedY < Physics.PlayerJumpVelocity))
                     {
                         C = 2;
                         break;
@@ -2033,9 +2031,9 @@ void NPCFrames(int A)
                     tempLocation = NPC[A].Location;
                     tempLocation.Height = 32;
                     tempLocation.Y = tempLocation.Y - 16;
-                    for(B = 1; B <= numPlayers; B++)
+                    for(B = 1; B <= numPlayers; ++B)
                     {
-                        if(CheckCollision(tempLocation, Player[B].Location) == true && Player[B].Mount != 2 && (Player[B].Location.SpeedY > 0 || Player[B].Location.SpeedY < Physics.PlayerJumpVelocity))
+                        if(CheckCollision(tempLocation, Player[B].Location) && Player[B].Mount != 2 && (Player[B].Location.SpeedY > 0 || Player[B].Location.SpeedY < Physics.PlayerJumpVelocity))
                         {
                             C = 1;
                             break;
