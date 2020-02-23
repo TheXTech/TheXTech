@@ -574,7 +574,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                         makeShroom = true;
                     }
                 }
-                if(makeShroom == false)
+                if(!makeShroom)
                 {
                     NPC[numNPCs].Type = C;
                 }
@@ -592,7 +592,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                         makeShroom = true;
                     }
                 }
-                if(makeShroom == false)
+                if(!makeShroom)
                 {
                     NPC[numNPCs].Type = C;
                 }
@@ -610,7 +610,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                         makeShroom = true;
                     }
                 }
-                if(makeShroom == false)
+                if(!makeShroom)
                 {
                     NPC[numNPCs].Type = C;
                 }
@@ -624,13 +624,13 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                 NPC[numNPCs].Type = C;
             }
 
-            if(makeShroom == true && whatPlayer > 0 &&
+            if(makeShroom && whatPlayer > 0 &&
                (Player[whatPlayer].State > 1 || Player[whatPlayer].Character == 5)) // set the NPC type if the conditions are met
             {
                 NPC[numNPCs].Type = C;
             }
 
-            if(makeShroom == true && BattleMode == true) // always spawn the item in battlemode
+            if(makeShroom && BattleMode) // always spawn the item in battlemode
             {
                 NPC[numNPCs].Type = C;
             }
@@ -864,7 +864,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                     makeShroom = true;
                 }
             }
-            if(makeShroom == false)
+            if(!makeShroom)
             {
                 NPC[numNPCs].Type = 14;
             }
@@ -954,7 +954,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                     makeShroom = true;
                 }
             }
-            if(makeShroom == false)
+            if(!makeShroom)
             {
                 NPC[numNPCs].Type = 34;
             }
