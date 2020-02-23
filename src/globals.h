@@ -798,6 +798,8 @@ struct Block_t
     int standingOnPlayerY = 0;
 //    noProjClipping As Boolean
     bool noProjClipping = false;
+// EXTRA: Indicate the fact that block was resized by a hit
+    bool wasShrinkResized = false;
 //    IsReally As Integer 'the NPC that is this block
     int IsReally = 0;
 //End Type
