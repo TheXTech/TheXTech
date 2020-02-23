@@ -4347,7 +4347,7 @@ void UpdateNPCs()
                             NPC[numNPCs].Location.X = NPC[A].Location.X - NPC[numNPCs].Location.Width;
                         NPC[numNPCs].Location.Y = NPC[A].Location.Y;
                     }
-                    if(NPC[NPC[A].Special2].Type == 50 && NPC[NPC[A].Special2].Special2 == A)
+                    if(NPC[NPC[A].Special2].Type == 50 && fEqual(NPC[NPC[A].Special2].Special2, A))
                     {
                         NPC[NPC[A].Special2].Projectile = true;
                         NPC[NPC[A].Special2].Direction = NPC[A].Direction;
