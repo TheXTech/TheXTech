@@ -29,8 +29,6 @@
 #include "../load_gfx.h"
 #include "../custom.h"
 #include "../sound.h"
-#include "../blocks.h"
-#include "../graphics.h"
 #include "../sorting.h"
 #include "../layers.h"
 
@@ -40,7 +38,7 @@
 
 void OpenLevel(std::string FilePath)
 {
-    std::string newInput = "";
+    std::string newInput;
 //    int FileRelease = 0;
     int A = 0;
     int B = 0;
@@ -100,10 +98,10 @@ void OpenLevel(std::string FilePath)
     B = 0;
     for(auto & s : lvl.sections)
     {
-        level[B].X = s.size_left;
-        level[B].Y = s.size_top;
-        level[B].Height = s.size_bottom;
-        level[B].Width = s.size_right;
+        level[B].X = double(s.size_left);
+        level[B].Y = double(s.size_top);
+        level[B].Height = double(s.size_bottom);
+        level[B].Width = double(s.size_right);
         LevelREAL[B] = level[B];
         bgMusic[B] = int(s.music_id);
         bgMusicREAL[B] = bgMusic[B];
@@ -131,10 +129,10 @@ void OpenLevel(std::string FilePath)
     A = 1;
     for(auto &p : lvl.players)
     {
-        PlayerStart[A].X = p.x;
-        PlayerStart[A].Y = p.y;
-        PlayerStart[A].Width = p.w;
-        PlayerStart[A].Height = p.h;
+        PlayerStart[A].X = double(p.x);
+        PlayerStart[A].Y = double(p.y);
+        PlayerStart[A].Width = double(p.w);
+        PlayerStart[A].Height = double(p.h);
         PlayerStart[A].Direction = p.direction;
         A++;
         if(A > 2)
@@ -153,10 +151,10 @@ void OpenLevel(std::string FilePath)
 
         Block[numBlock] = Block_t();
 
-        Block[numBlock].Location.X = b.x;
-        Block[numBlock].Location.Y = b.y;
-        Block[numBlock].Location.Height = b.h;
-        Block[numBlock].Location.Width = b.w;
+        Block[numBlock].Location.X = double(b.x);
+        Block[numBlock].Location.Y = double(b.y);
+        Block[numBlock].Location.Height = double(b.h);
+        Block[numBlock].Location.Width = double(b.w);
         Block[numBlock].Type = int(b.id);
         Block[numBlock].DefaultType = Block[numBlock].Type;
         Block[numBlock].Special = int(b.npc_id > 0 ? b.npc_id + 1000 : -1 * b.npc_id);
@@ -188,8 +186,8 @@ void OpenLevel(std::string FilePath)
 
         Background[numBackground] = Background_t();
 
-        Background[numBackground].Location.X = b.x;
-        Background[numBackground].Location.Y = b.y;
+        Background[numBackground].Location.X = double(b.x);
+        Background[numBackground].Location.Y = double(b.y);
         Background[numBackground].Type = int(b.id);
         Background[numBackground].Layer = b.layer;
         Background[numBackground].Location.Width = GFXBackgroundWidth[Background[numBackground].Type];
@@ -210,7 +208,7 @@ void OpenLevel(std::string FilePath)
 
         NPC[numNPCs].Location.X = n.x;
         NPC[numNPCs].Location.Y = n.y;
-        if(LevelEditor == false)
+        if(!LevelEditor)
             NPC[numNPCs].Location.Y = NPC[numNPCs].Location.Y - 0.01;
         NPC[numNPCs].Direction = n.direct;
         NPC[numNPCs].Type = int(n.id);
@@ -226,13 +224,13 @@ void OpenLevel(std::string FilePath)
             NPC[numNPCs].DefaultSpecial2 = NPC[numNPCs].Special2;
         }
 
-        if(NPCIsAParaTroopa[NPC[numNPCs].Type] == true)
+        if(NPCIsAParaTroopa[NPC[numNPCs].Type])
         {
             NPC[numNPCs].Special = n.special_data;
             NPC[numNPCs].DefaultSpecial = NPC[numNPCs].Special;
         }
 
-        if(NPCIsCheep[NPC[numNPCs].Type] == true)
+        if(NPCIsCheep[NPC[numNPCs].Type])
         {
             NPC[numNPCs].Special = n.special_data;
             NPC[numNPCs].DefaultSpecial = NPC[numNPCs].Special;
@@ -245,7 +243,7 @@ void OpenLevel(std::string FilePath)
         }
 
         NPC[numNPCs].Generator = n.generator;
-        if(NPC[numNPCs].Generator == true)
+        if(NPC[numNPCs].Generator)
         {
             NPC[numNPCs].GeneratorDirection = n.generator_direct;
             NPC[numNPCs].GeneratorEffect = n.generator_type;

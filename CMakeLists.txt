@@ -155,6 +155,7 @@ set(A2XTECH_SRC
     src/npc/npc_kill.cpp
     src/npc/npc_update.cpp
     src/npc/npc_frames.cpp
+    src/npc/npc_bonus.cpp
 )
 
 add_executable(a2xtech ${A2XTECH_SRC} ${LIB_SRC})
