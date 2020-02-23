@@ -1028,9 +1028,9 @@ void NPCHit(int A, int B, int C)
             {
                 if(NPC[A].Location.SpeedY > -4)
                     NPC[A].Location.SpeedY = -4;
-                if(NPC[A].Location.SpeedX == 0)
+                if(NPC[A].Location.SpeedX == 0.0)
                 {
-                    if(std::rand() % 2 > 1)
+                    if(std::rand() % 2 == 1)
                         NPC[A].Location.SpeedX = 2;
                     else
                         NPC[A].Location.SpeedX = -2;
@@ -1442,7 +1442,7 @@ void NPCHit(int A, int B, int C)
         if(NPC[A].Damage >= 200)
         {
             NPC[A].Location.SpeedY = -13;
-            NPC[A].Location.SpeedX = 4 * NPC[C].Direction;
+            NPC[A].Location.SpeedX = double(4 * NPC[C].Direction);
             NPC[A].Killed = B;
             if(NPC[A].Legacy == true)
             {

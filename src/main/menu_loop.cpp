@@ -2113,9 +2113,9 @@ void MenuLoop()
         if(NPC[Player[A].HoldingNPC].Type == 13 && std::rand() % 100 > 95)
         {
             Player[A].Controls.Run = false;
-            if(std::rand() % 2 > 1)
+            if(std::rand() % 2 == 1)
                 Player[A].Controls.Up = true;
-            if(std::rand() % 2 > 1)
+            if(std::rand() % 2 == 1)
                 Player[A].Controls.Right = false;
         }
 

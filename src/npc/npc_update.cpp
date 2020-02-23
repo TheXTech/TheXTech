@@ -666,17 +666,17 @@ void UpdateNPCs()
                         NPC[A].Active = false;
                         NPC[A].TimeLeft = 0;
                     }
-                    else if(NPC[A].Direction == -1 && NPC[A].Location.X < Player[NPC[A].JustActivated].Location.X)
+                    else if(Maths::iRound(NPC[A].Direction) == -1 && NPC[A].Location.X < Player[NPC[A].JustActivated].Location.X)
                     {
                         NPC[A].Active = false;
                         NPC[A].TimeLeft = 0;
                     }
-                    else if(NPC[A].Direction == 1 && NPC[A].Location.X > Player[NPC[A].JustActivated].Location.X)
+                    else if(Maths::iRound(NPC[A].Direction) == 1 && NPC[A].Location.X > Player[NPC[A].JustActivated].Location.X)
                     {
                         NPC[A].Active = false;
                         NPC[A].TimeLeft = 0;
                     }
-                    else if(NPCIsCheep[NPC[A].Type] && NPC[A].Special == 2)
+                    else if(NPCIsCheep[NPC[A].Type] && Maths::iRound(NPC[A].Special) == 2)
                     {
                         NPC[A].Location.Y = level[Player[NPC[A].JustActivated].Section].Height - 0.1;
                         NPC[A].Location.SpeedX = (1 + (NPC[A].Location.Y - NPC[A].DefaultLocation.Y) * 0.005) * NPC[A].Direction;
@@ -698,7 +698,7 @@ void UpdateNPCs()
             if(NPC[A].Type == 22)
                 NPC[A].Projectile = false;
         }
-        else if(!(NPCIsCheep[NPC[A].Type] && NPC[A].Special == 2) && !(NPC[A].Type == 12))
+        else if(!(NPCIsCheep[NPC[A].Type] && Maths::iRound(NPC[A].Special) == 2) && !(NPC[A].Type == 12))
         {
             if(GameMenu == false && NPC[A].Location.Y > level[NPC[A].Section].Height + 16)
                 NPCHit(A, 9);
