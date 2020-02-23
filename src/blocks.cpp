@@ -349,7 +349,8 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             {
                 for(auto B = 1; B <= b.Special; B++)
                 {
-                    numNPCs = numNPCs + 1;
+                    numNPCs++;
+                    NPC[numNPCs] = NPC_t();
                     NPC[numNPCs].Active = true;
                     NPC[numNPCs].TimeLeft = 100;
                     if(newBlock == 89)
@@ -439,7 +440,8 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             }
             if(tempBool == false)
             {
-                numNPCs = numNPCs + 1;
+                numNPCs++;
+                NPC[numNPCs] = NPC_t();
                 NPC[numNPCs].Active = true;
                 NPC[numNPCs].TimeLeft = 100;
                 if(newBlock == 89)
@@ -778,7 +780,8 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         PlaySound(7);
         if(tempPlayer == 0)
         {
-            numNPCs = numNPCs + 1;
+            numNPCs++;
+            NPC[numNPCs] = NPC_t();
             NPC[numNPCs].Active = true;
             NPC[numNPCs].TimeLeft = 1000;
             NPC[numNPCs].Type = 9;
@@ -854,7 +857,8 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         PlaySound(7);
         if(tempPlayer == 0)
         {
-            numNPCs = numNPCs + 1;
+            numNPCs++;
+            NPC[numNPCs] = NPC_t();
             NPC[numNPCs].Active = true;
             NPC[numNPCs].TimeLeft = 1000;
             for(auto B = 1; B <= numPlayers; B++)
@@ -944,7 +948,8 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         PlaySound(7);
         if(tempPlayer == 0)
         {
-            numNPCs = numNPCs + 1;
+            numNPCs++;
+            NPC[numNPCs] = NPC_t();
             NPC[numNPCs].Active = true;
             NPC[numNPCs].TimeLeft = 1000;
             for(auto B = 1; B <= numPlayers; B++)
@@ -1036,7 +1041,8 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             BlockShakeDown(A);
         }
         PlaySound(7);
-        numNPCs = numNPCs + 1;
+        numNPCs++;
+        NPC[numNPCs] = NPC_t();
         NPC[numNPCs].Active = true;
         NPC[numNPCs].TimeLeft = 100;
         NPC[numNPCs].Type = 35;
@@ -1089,7 +1095,8 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         {
             BlockShakeDown(A);
         }
-        numNPCs = numNPCs + 1;
+        numNPCs++;
+        NPC[numNPCs] = NPC_t();
         NPC[numNPCs].Active = true;
         NPC[numNPCs].TimeLeft = 100;
         NPC[numNPCs].Type = 96;
@@ -1142,7 +1149,8 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             BlockShakeDown(A);
         }
         PlaySound(7);
-        numNPCs = numNPCs + 1;
+        numNPCs++;
+        NPC[numNPCs] = NPC_t();
         NPC[numNPCs].Active = true;
         NPC[numNPCs].TimeLeft = 100;
         NPC[numNPCs].Type = 1;
@@ -1192,7 +1200,8 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             BlockShakeDown(A);
         }
         PlaySound(7);
-        numNPCs = numNPCs + 1;
+        numNPCs++;
+        NPC[numNPCs] = NPC_t();
         NPC[numNPCs].Active = true;
         NPC[numNPCs].TimeLeft = 100;
         NPC[numNPCs].Type = 90;
@@ -1219,19 +1228,20 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
     if(PSwitchTime > 0 && newBlock == 89 && b.Special == 0 && oldSpecial > 0)
     {
-        numNPCs = numNPCs + 1;
-           NPC[numNPCs].Active = true;
-           NPC[numNPCs].TimeLeft = 1;
-           NPC[numNPCs].Type = 33;
-           NPC[numNPCs].Block = 89;
-           NPC[numNPCs].Location = b.Location;
-           NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
-           NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
-           NPC[numNPCs].Location.X = NPC[numNPCs].Location.X + (b.Location.Width - NPC[numNPCs].Location.Width) / 2.0;
-           NPC[numNPCs].Location.Y = NPC[numNPCs].Location.Y - 0.01;
-           NPC[numNPCs].DefaultLocation = NPC[numNPCs].Location;
-           NPC[numNPCs].DefaultType = NPC[numNPCs].Type;
-           CheckSectionNPC(numNPCs);
+        numNPCs++;
+        NPC[numNPCs] = NPC_t();
+        NPC[numNPCs].Active = true;
+        NPC[numNPCs].TimeLeft = 1;
+        NPC[numNPCs].Type = 33;
+        NPC[numNPCs].Block = 89;
+        NPC[numNPCs].Location = b.Location;
+        NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
+        NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
+        NPC[numNPCs].Location.X = NPC[numNPCs].Location.X + (b.Location.Width - NPC[numNPCs].Location.Width) / 2.0;
+        NPC[numNPCs].Location.Y = NPC[numNPCs].Location.Y - 0.01;
+        NPC[numNPCs].DefaultLocation = NPC[numNPCs].Location;
+        NPC[numNPCs].DefaultType = NPC[numNPCs].Type;
+        CheckSectionNPC(numNPCs);
         b = blankBlock;
     }
     if(b.Type == 90)
@@ -1910,7 +1920,8 @@ void PSwitch(bool Bool)
             {
                 if(numNPCs < maxNPCs)
                 {
-                    numNPCs = numNPCs + 1;
+                    numNPCs++;
+                    NPC[numNPCs] = NPC_t();
                     NPC[numNPCs].Active = true;
                     NPC[numNPCs].TimeLeft = 1;
                     if(Block[A].Type == 89)
@@ -1981,7 +1992,8 @@ void PSwitch(bool Bool)
             {
                 if(numNPCs < maxNPCs)
                 {
-                    numNPCs = numNPCs + 1;
+                    numNPCs++;
+                    NPC[numNPCs] = NPC_t();
                     NPC[numNPCs].Layer = Block[A].Layer;
                     NPC[numNPCs].TriggerDeath = Block[A].TriggerDeath;
                     NPC[numNPCs].TriggerLast = Block[A].TriggerLast;

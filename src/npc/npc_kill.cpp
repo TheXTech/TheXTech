@@ -199,6 +199,7 @@ void KillNPC(int A, int B)
             if(std::rand() % 10 <= 3)
             {
                 numNPCs++;
+                NPC[numNPCs] = NPC_t();
                 NPC[numNPCs].Type = 251;
                 if(std::rand() % 15 <= 3)
                     NPC[numNPCs].Type = 252;
@@ -1047,6 +1048,7 @@ void KillNPC(int A, int B)
                 if(DontSpawnExit == false)
                 {
                     numNPCs++;
+                    NPC[numNPCs] = NPC_t();
                     NPC[numNPCs].Type = 41;
                     NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
                     NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
@@ -1432,7 +1434,7 @@ void KillNPC(int A, int B)
             if(B == 6)
             {
                 NewEffect(10 , NPC[A].Location);
-                if(NPC[A].NoLavaSplash == false)
+                if(!NPC[A].NoLavaSplash)
                     NewEffect(13 , NPC[A].Location);
                 PlaySound(16);
             }
@@ -1446,7 +1448,7 @@ void KillNPC(int A, int B)
         {
             if(B == 3 || B == 4 || B == 5)
             {
-                if(NPCIsACoin[NPC[A].Type] == false || LevelEditor == true || TestLevel == true) // Shell hit sound
+                if(!NPCIsACoin[NPC[A].Type] || LevelEditor || TestLevel) // Shell hit sound
                     PlaySound(9);
                  NPC[A].Location.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0 - EffectWidth[10] / 2.0;
                  NPC[A].Location.Y = NPC[A].Location.Y + NPC[A].Location.Height / 2.0 - EffectHeight[10] / 2.0;
@@ -1462,7 +1464,7 @@ void KillNPC(int A, int B)
                     NewEffect(13 , NPC[A].Location);
             }
         }
-        else if(LevelEditor == true || MagicHand == true)
+        else if(LevelEditor || MagicHand)
         {
             if(!(NPC[A].Type == 32 && B == 1))
             {
@@ -1478,7 +1480,7 @@ void KillNPC(int A, int B)
 
     if(NPC[A].AttLayer != "")
     {
-        for(C = 1; C <= 100; C++)
+        for(C = 1; C <= maxLayers; C++)
         {
             if(NPC[A].AttLayer == Layer[C].Name)
             {
@@ -1488,7 +1490,7 @@ void KillNPC(int A, int B)
         }
     }
 
-    if((GameMenu == false && BattleMode == false) || NPC[A].DefaultType == 0)
+    if((!GameMenu && !BattleMode) || NPC[A].DefaultType == 0)
     {
         for(B = 1; B <= numPlayers; B++) // Tell the player to stop standing on me because im dead kthnx
         {
