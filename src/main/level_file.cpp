@@ -44,6 +44,7 @@ void OpenLevel(std::string FilePath)
 //    int FileRelease = 0;
     int A = 0;
     int B = 0;
+    int checkPointId = 0;
 //    int C = 0;
 //    bool tempBool = false;
 //    int mSections = 0;
@@ -279,7 +280,12 @@ void OpenLevel(std::string FilePath)
 
         CheckSectionNPC(numNPCs);
 
-        if(NPC[numNPCs].Type == 97 || NPC[numNPCs].Type == 196)
+        if(NPC[numNPCs].Type == 192) // Is a checkpoint
+        {
+            checkPointId++;
+            NPC[numNPCs].Special = checkPointId;
+        }
+        else if(NPC[numNPCs].Type == 97 || NPC[numNPCs].Type == 196) // Is a star
         {
             bool tempBool = false;
             for(B = 1; B <= numStars; B++)

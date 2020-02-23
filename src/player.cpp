@@ -98,7 +98,7 @@ void SetupPlayers()
             Player[A].State = 2;
             Player[A].Hearts = 2;
         }
-        Checkpoint = "";
+        Checkpoint.clear();
     }
     else
     {
@@ -336,45 +336,68 @@ void SetupPlayers()
     SetupScreens(); // setup the screen depending on how many players there are
 
 
-    if(Checkpoint == FullFileName && Checkpoint != "") // if this level has a checkpoint the put the player in the correct position
+    if(Checkpoint == FullFileName && !Checkpoint.empty()) // if this level has a checkpoint the put the player in the correct position
     {
-        for(int numNPCsMax = numNPCs, A = 1; A <= numNPCsMax; A++)
+        for(int cpId = 0; cpId < int(CheckpointsList.size()); cpId++)
         {
-            if(NPC[A].Type == 192)
+            auto &cp = CheckpointsList[size_t(cpId)];
+
+            for(int numNPCsMax = numNPCs, A = 1; A <= numNPCsMax; A++)
             {
+                if(NPC[A].Type != 192)
+                    continue;
+
+                if(cp.id != Maths::iRound(NPC[A].Special))
+                    continue;
+
                 NPC[A].Killed = 9;
-                tempLocation = NPC[A].Location;
-                tempLocation.Height = 600;
-                C = 0;
-                for(B = 1; B <= numBlock; B++)
+
+                // found a last id, leave player here
+                if(cpId == int(CheckpointsList.size() - 1))
                 {
-                    if(CheckCollision(tempLocation, Block[B].Location) == true)
+                    tempLocation = NPC[A].Location;
+                    tempLocation.Height = 600;
+
+
+                    C = 0;
+                    for(B = 1; B <= numBlock; B++)
                     {
-                        if(C == 0)
-                            C = B;
-                        else
+                        if(CheckCollision(tempLocation, Block[B].Location) == true)
                         {
-                            if(Block[B].Location.Y < Block[C].Location.Y)
+                            if(C == 0)
                                 C = B;
+                            else
+                            {
+                                if(Block[B].Location.Y < Block[C].Location.Y)
+                                    C = B;
+                            }
                         }
                     }
+
+                    for(B = 1; B <= numPlayers; B++)
+                    {
+                        Player[B].Location.Y = Block[C].Location.Y - Player[B].Location.Height;
+                        Player[B].Location.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0 - Player[B].Location.Width / 2.0;
+                        CheckSection(B);
+                        pLogDebug("Restore player %d at checkpoint ID=%d by X=%g, Y=%g",
+                                  B, cp.id, Player[B].Location.X, Player[B].Location.Y);
+                    }
+
+                    if(numPlayers > 1)
+                    {
+                        Player[1].Location.X = Player[1].Location.X - 16;
+                        Player[2].Location.X = Player[2].Location.X + 16;
+                    }
+                    break;// Stop to find NPCs
                 }
-                for(B = 1; B <= numPlayers; B++)
-                {
-                    Player[B].Location.Y = Block[C].Location.Y - Player[B].Location.Height;
-                    Player[B].Location.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0 - Player[B].Location.Width / 2.0;
-                    CheckSection(B);
-                }
-                if(numPlayers > 1)
-                {
-                    Player[1].Location.X = Player[1].Location.X - 16;
-                    Player[2].Location.X = Player[2].Location.X + 16;
-                }
-            }
-        }
+            }// for NPCs
+        } // for Check points
     }
     else if(StartLevel != FileName) // if not in the level for the checkpoint, blank the checkpoint
+    {
         Checkpoint.clear();
+        CheckpointsList.clear();
+    }
 }
 
 void UpdatePlayer()

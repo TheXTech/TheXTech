@@ -200,6 +200,9 @@ void TouchBonus(int A, int B)
             NPC[B].Killed = 9;
             PlaySound(58);
             Checkpoint = FullFileName;
+            Checkpoint_t cp;
+            cp.id = NPC[B].Special;
+            CheckpointsList.push_back(cp);
             return;
         }
         if(NPC[B].Type == 188) // player touched the 3up moon

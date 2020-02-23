@@ -61,7 +61,8 @@ void GameLoop()
         {
             if(Checkpoint == FullFileName)
             {
-                Checkpoint = "";
+                Checkpoint.clear();
+                CheckpointsList.clear();
             }
         }
         NextLevel();

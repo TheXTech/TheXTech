@@ -290,7 +290,8 @@ int GameMain(const CmdLineSetup_t &setup)
                 PlayerCharacter2 = 0;
             }
 
-            Checkpoint = "";
+            Checkpoint.clear();
+            CheckpointsList.clear();
             WorldPlayer[1].Frame = 0;
             CheatString = "";
             LevelBeatCode = 0;

@@ -50,6 +50,7 @@ RangeArrI<int, 1, 2, 0> useJoystick;
 
 int ScreenShake = 0;
 std::string Checkpoint;
+std::vector<Checkpoint_t> CheckpointsList;
 bool MagicHand = false;
 RangeArr<Player_t, 1, 2> testPlayer;
 bool ClearBuffer = false;
