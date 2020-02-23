@@ -1328,6 +1328,7 @@ void UpdatePlayer()
                                 }
                             }
                         }
+
                         for(B = 1; B <= numBackground; B++)
                         {
                             if(BackgroundFence[Background[B].Type])
@@ -3498,7 +3499,7 @@ void UpdatePlayer()
                 // check vine backgrounds
                 for(B = 1; B <= numBackground; B++)
                 {
-                    if(BackgroundFence[Background[B].Type] == true)
+                    if(BackgroundFence[Background[B].Type] && !Background[B].Hidden)
                     {
                         if(CheckCollision(Player[A].Location, Background[B].Location))
                         {
