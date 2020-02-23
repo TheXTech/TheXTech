@@ -1519,6 +1519,7 @@ void UpdatePlayer()
                             Player[A].Mount = 0;
                             Player[A].StandingOnNPC = 0;
                             numNPCs++;
+                            NPC[numNPCs] = NPC_t();
                             Player[A].FlyCount = 0;
                             Player[A].RunCount = 0;
                             Player[A].CanFly = false;
@@ -1556,6 +1557,7 @@ void UpdatePlayer()
                             Player[A].StandingOnNPC = 0;
                             Player[A].Mount = 0;
                             numNPCs++;
+                            NPC[numNPCs] = NPC_t();
                             NPC[numNPCs].Direction = Player[A].Direction;
                             NPC[numNPCs].Active = true;
                             NPC[numNPCs].TimeLeft = 100;
@@ -1749,6 +1751,7 @@ void UpdatePlayer()
                                 Player[A].Mount = 0;
                                 Player[A].StandingOnNPC = 0;
                                 numNPCs++;
+                                NPC[numNPCs] = NPC_t();
                                 Player[A].FlyCount = 0;
                                 Player[A].RunCount = 0;
                                 Player[A].CanFly = false;
@@ -1793,6 +1796,7 @@ void UpdatePlayer()
                                     Player[A].Jump = Player[A].Jump - 6;
                                 Player[A].Mount = 0;
                                 numNPCs++;
+                                NPC[numNPCs] = NPC_t();
                                 NPC[numNPCs].Direction = Player[A].Direction;
                                 NPC[numNPCs].Active = true;
                                 NPC[numNPCs].TimeLeft = 100;
@@ -2375,6 +2379,7 @@ void UpdatePlayer()
                                     PlaySound(82);
 
                                 numNPCs++;
+                                NPC[numNPCs] = NPC_t();
                                 if(ShadowMode == true)
                                     NPC[numNPCs].Shadow = true;
                                 NPC[numNPCs].Type = 13;
@@ -3759,6 +3764,7 @@ void UpdatePlayer()
                                                 if(NPC[B].Killed == 8 && Player[A].Mount == 1 && Player[A].MountType == 2)
                                                 {
                                                     numNPCs++;
+                                                    NPC[numNPCs] = NPC_t();
                                                     NPC[numNPCs].Active = true;
                                                     NPC[numNPCs].TimeLeft = 100;
                                                     NPC[numNPCs].Section = Player[A].Section;
@@ -3771,6 +3777,7 @@ void UpdatePlayer()
                                                     NPC[numNPCs].Location.SpeedX = 4;
                                                     NPC[numNPCs].Location.SpeedY = 10;
                                                     numNPCs++;
+                                                    NPC[numNPCs] = NPC_t();
                                                     NPC[numNPCs].Active = true;
                                                     NPC[numNPCs].TimeLeft = 100;
                                                     NPC[numNPCs].Section = Player[A].Section;
@@ -4906,6 +4913,7 @@ void PlayerHurt(int A)
                 Player[A].YoshiYellow = false;
                 Player[A].Dismount = Player[A].Immune;
                 numNPCs++;
+                NPC[numNPCs] = NPC_t();
                 if(Player[A].YoshiNPC > 0 || Player[A].YoshiPlayer > 0)
                 {
                     YoshiSpit(A);
@@ -5016,6 +5024,7 @@ void PlayerHurt(int A)
                     {
                         Player[A].Mount = 0;
                         numNPCs++;
+                        NPC[numNPCs] = NPC_t();
                         NPC[numNPCs].Direction = Player[A].Direction;
                         if(NPC[numNPCs].Direction == 1)
                             NPC[numNPCs].Frame = 4;
@@ -5113,6 +5122,7 @@ void PlayerDead(int A)
     if(Player[A].Mount == 2)
     {
         numNPCs++;
+        NPC[numNPCs] = NPC_t();
         NPC[numNPCs].Direction = Player[A].Direction;
         if(Maths::iRound(NPC[numNPCs].Direction) == 1)
             NPC[numNPCs].Frame = 4;
@@ -6811,6 +6821,7 @@ void YoshiSpit(int A)
             for(B = 1; B <= 3; B++)
             {
                 numNPCs++;
+                NPC[numNPCs] = NPC_t();
                 NPC[numNPCs].Direction = Player[A].Direction;
                 NPC[numNPCs].Type = 108;
                 NPC[numNPCs].Frame = EditorNPCFrame(NPC[numNPCs].Type, NPC[numNPCs].Direction);
@@ -7615,7 +7626,7 @@ void ClownCar()
                     Player[A].Location.SpeedY = -4;
             }
             numNPCs++;
-            NPC[numNPCs] = blankNPC;
+            NPC[numNPCs] = NPC_t();
             NPC[numNPCs].playerTemp = true;
             NPC[numNPCs].Type = 56;
             NPC[numNPCs].Active = true;
@@ -7664,6 +7675,7 @@ void ClownCar()
                             {
                                 NPC[B].Special = 1;
                                 numNPCs++;
+                                NPC[numNPCs] = NPC_t();
                                 NPC[B].Special2 = numNPCs;
                                 NPC[numNPCs].Active = true;
                                 NPC[numNPCs].Section = Player[A].Section;
@@ -7938,6 +7950,7 @@ void PowerUps(int A)
                         Player[A].FrameCount = 110;
                         Player[A].FireBallCD = 25;
                         numNPCs++;
+                        NPC[numNPCs] = NPC_t();
                         if(ShadowMode == true)
                             NPC[numNPCs].Shadow = true;
                         NPC[numNPCs].Type = 171;
@@ -8041,6 +8054,7 @@ void PowerUps(int A)
                         if(Player[A].SpinJump == false)
                             Player[A].FrameCount = 110;
                         numNPCs++;
+                        NPC[numNPCs] = NPC_t();
                         if(ShadowMode == true)
                             NPC[numNPCs].Shadow = true;
                         NPC[numNPCs].Type = 13;
@@ -8172,6 +8186,7 @@ void PowerUps(int A)
             Player[A].FireBallCD = 10;
             Player[A].Bombs = Player[A].Bombs - 1;
             numNPCs++;
+            NPC[numNPCs] = NPC_t();
             NPC[numNPCs].Active = true;
             NPC[numNPCs].TimeLeft = Physics.NPCTimeOffScreen;
             NPC[numNPCs].Section = Player[A].Section;
@@ -8769,6 +8784,7 @@ void PlayerGrabCode(int A, bool DontResetGrabTime)
 
                     // For B = 1 To 3
                         numNPCs++;
+                        NPC[numNPCs] = NPC_t();
                         NPC[numNPCs].CantHurt = 10000;
                         NPC[numNPCs].CantHurtPlayer = A;
                         NPC[numNPCs].BattleOwner = A;
@@ -8859,6 +8875,7 @@ void PlayerGrabCode(int A, bool DontResetGrabTime)
                     NPC[Player[A].HoldingNPC].Special = 1;
                     NPC[Player[A].HoldingNPC].Special2 = numNPCs + 1;
                     numNPCs++;
+                    NPC[numNPCs] = NPC_t();
                     NPC[numNPCs].Active = true;
                     NPC[numNPCs].Section = Player[A].Section;
                     NPC[numNPCs].TimeLeft = 100;

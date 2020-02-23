@@ -186,7 +186,8 @@ void CheatCode(char NewKey)
             {
                 for(B = -100; B <= 900; B += 34)
                 {
-                    numNPCs = numNPCs + 1;
+                    numNPCs++;
+                    NPC[numNPCs] = NPC_t();
                     NPC[numNPCs].Type = 90;
                     NPC[numNPCs].Location.Y = Player[C].Location.Y - 600;
                     NPC[numNPCs].Location.X = Player[C].Location.X - 400 + B;
@@ -208,7 +209,8 @@ void CheatCode(char NewKey)
             {
                 for(B = -100; B <= 900; B += 34)
                 {
-                    numNPCs = numNPCs + 1;
+                    numNPCs++;
+                    NPC[numNPCs] = NPC_t();
                     NPC[numNPCs].Type = 134;
                     NPC[numNPCs].Location.Y = Player[C].Location.Y - 600;
                     NPC[numNPCs].Location.X = Player[C].Location.X - 400 + B;
@@ -1035,7 +1037,8 @@ void CheatCode(char NewKey)
             {
                 if(Player[B].Mount == 0 && Player[B].Dead == false && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
                 {
-                    numNPCs = numNPCs + 1;
+                    numNPCs++;
+                    NPC[numNPCs] = NPC_t();
                     NPC[numNPCs].Type = 31;
                     NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
                     NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
@@ -1059,7 +1062,8 @@ void CheatCode(char NewKey)
             {
                 if(Player[B].Mount == 0 && Player[B].Dead == false && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
                 {
-                    numNPCs = numNPCs + 1;
+                    numNPCs++;
+                    NPC[numNPCs] = NPC_t();
                     NPC[numNPCs].Type = 26;
                     NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
                     NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
@@ -1083,7 +1087,8 @@ void CheatCode(char NewKey)
             {
                 if(Player[B].Mount == 0 && Player[B].Dead == false && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
                 {
-                    numNPCs = numNPCs + 1;
+                    numNPCs++;
+                    NPC[numNPCs] = NPC_t();
                     NPC[numNPCs].Type = 134;
                     NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
                     NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
@@ -1109,7 +1114,8 @@ void CheatCode(char NewKey)
             {
                 if(Player[B].Mount == 0 && Player[B].Dead == false && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
                 {
-                    numNPCs = numNPCs + 1;
+                    numNPCs++;
+                    NPC[numNPCs] = NPC_t();
                     NPC[numNPCs].Type = 17;
                     NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
                     NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
@@ -1133,7 +1139,8 @@ void CheatCode(char NewKey)
             {
                 if(Player[B].Mount == 0 && Player[B].Dead == false && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
                 {
-                    numNPCs = numNPCs + 1;
+                    numNPCs++;
+                    NPC[numNPCs] = NPC_t();
                     NPC[numNPCs].Type = 279;
                     NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
                     NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
@@ -1159,7 +1166,8 @@ void CheatCode(char NewKey)
             {
                 if(Player[B].Mount == 0 && Player[B].Dead == false && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
                 {
-                    numNPCs = numNPCs + 1;
+                    numNPCs++;
+                    NPC[numNPCs] = NPC_t();
                     NPC[numNPCs].Type = 278;
                     NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
                     NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
@@ -1185,7 +1193,8 @@ void CheatCode(char NewKey)
             {
                 if(Player[B].Mount == 0 && Player[B].Dead == false && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
                 {
-                    numNPCs = numNPCs + 1;
+                    numNPCs++;
+                    NPC[numNPCs] = NPC_t();
                     NPC[numNPCs].Type = 241;
                     NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
                     NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
@@ -1211,7 +1220,8 @@ void CheatCode(char NewKey)
             {
                 if(Player[B].Mount == 0 && Player[B].Dead == false && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
                 {
-                    numNPCs = numNPCs + 1;
+                    numNPCs++;
+                    NPC[numNPCs] = NPC_t();
                     NPC[numNPCs].Type = 29;
                     NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
                     NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
@@ -1237,7 +1247,8 @@ void CheatCode(char NewKey)
             {
                 if(Player[B].Mount == 0 && Player[B].Dead == false && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
                 {
-                    numNPCs = numNPCs + 1;
+                    numNPCs++;
+                    NPC[numNPCs] = NPC_t();
                     NPC[numNPCs].Type = 195;
                     NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
                     NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
@@ -1263,7 +1274,8 @@ void CheatCode(char NewKey)
             {
                 if(Player[B].Mount == 0 && Player[B].Dead == false && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
                 {
-                    numNPCs = numNPCs + 1;
+                    numNPCs++;
+                    NPC[numNPCs] = NPC_t();
                     NPC[numNPCs].Type = 96;
                     NPC[numNPCs].Special = 95;
                     NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
@@ -1288,7 +1300,8 @@ void CheatCode(char NewKey)
             {
                 if(Player[B].Mount == 0 && Player[B].Dead == false && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
                 {
-                    numNPCs = numNPCs + 1;
+                    numNPCs++;
+                    NPC[numNPCs] = NPC_t();
                     NPC[numNPCs].Type = 96;
                     NPC[numNPCs].Frame = 1;
                     NPC[numNPCs].Special = 98;
@@ -1314,7 +1327,8 @@ void CheatCode(char NewKey)
             {
                 if(Player[B].Mount == 0 && Player[B].Dead == false && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
                 {
-                    numNPCs = numNPCs + 1;
+                    numNPCs++;
+                    NPC[numNPCs] = NPC_t();
                     NPC[numNPCs].Type = 96;
                     NPC[numNPCs].Special = 99;
                     NPC[numNPCs].Frame = 2;
@@ -1341,7 +1355,8 @@ void CheatCode(char NewKey)
             {
                 if(Player[B].Mount == 0 && Player[B].Dead == false && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
                 {
-                    numNPCs = numNPCs + 1;
+                    numNPCs++;
+                    NPC[numNPCs] = NPC_t();
                     NPC[numNPCs].Type = 96;
                     NPC[numNPCs].Special = 100;
                     NPC[numNPCs].Frame = 3;
@@ -1367,7 +1382,8 @@ void CheatCode(char NewKey)
             {
                 if(Player[B].Mount == 0 && Player[B].Dead == false && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
                 {
-                    numNPCs = numNPCs + 1;
+                    numNPCs++;
+                    NPC[numNPCs] = NPC_t();
                     NPC[numNPCs].Type = 96;
                     NPC[numNPCs].Special = 148;
                     NPC[numNPCs].Frame = 4;
@@ -1393,7 +1409,8 @@ void CheatCode(char NewKey)
             {
                 if(Player[B].Mount == 0 && Player[B].Dead == false && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
                 {
-                    numNPCs = numNPCs + 1;
+                    numNPCs++;
+                    NPC[numNPCs] = NPC_t();
                     NPC[numNPCs].Type = 96;
                     NPC[numNPCs].Special = 149;
                     NPC[numNPCs].Frame = 5;
@@ -1420,7 +1437,8 @@ void CheatCode(char NewKey)
             {
                 if(Player[B].Mount == 0 && Player[B].Dead == false && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
                 {
-                    numNPCs = numNPCs + 1;
+                    numNPCs++;
+                    NPC[numNPCs] = NPC_t();
                     NPC[numNPCs].Type = 96;
                     NPC[numNPCs].Special = 150;
                     NPC[numNPCs].Frame = 6;
@@ -1446,7 +1464,8 @@ void CheatCode(char NewKey)
             {
                 if(Player[B].Mount == 0 && Player[B].Dead == false && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
                 {
-                    numNPCs = numNPCs + 1;
+                    numNPCs++;
+                    NPC[numNPCs] = NPC_t();
                     NPC[numNPCs].Type = 96;
                     NPC[numNPCs].Special = 228;
                     NPC[numNPCs].Frame = 6;

@@ -1967,6 +1967,7 @@ void UpdateNPCs()
                                                                     Block[B].Layer = "Destroyed Blocks";
                                                                     Block[B].Hidden = true;
                                                                     numNPCs++;
+                                                                    NPC[numNPCs] = NPC_t();
                                                                     NPC[numNPCs].Location.Width = 28;
                                                                     NPC[numNPCs].Location.Height = 32;
                                                                     NPC[numNPCs].Type = 10;
@@ -4087,6 +4088,7 @@ void UpdateNPCs()
                             if(NPC[A].Special3 == 29)
                             {
                                 numNPCs++;
+                                NPC[numNPCs] = NPC_t();
                                 NPC[numNPCs].Active = true;
                                 NPC[numNPCs].TimeLeft = 100;
                                 NPC[numNPCs].Direction = NPC[A].Direction;
@@ -4133,6 +4135,7 @@ void UpdateNPCs()
                         PlaySound(25);
                         NPC[A].Special3 = 0; // -15
                         numNPCs++;
+                        NPC[numNPCs] = NPC_t();
                         NPC[numNPCs].Location.Height = 32;
                         NPC[numNPCs].Location.Width = 32;
                         NPC[numNPCs].Location.X = NPC[A].Location.X;
@@ -4220,6 +4223,7 @@ void UpdateNPCs()
                             {
                                 NPC[A].Special = 0;
                                 numNPCs++;
+                                NPC[numNPCs] = NPC_t();
                                 NPC[numNPCs].Inert = NPC[A].Inert;
                                 tempBool = false;
                                 NPC[numNPCs].Direction = NPC[A].Direction;
@@ -4316,9 +4320,13 @@ void UpdateNPCs()
                         NPC[NPC[A].Special2].Direction = NPC[A].Direction;
                     if(Player[NPC[A].HoldingPlayer].Effect != 0)
                         NPC[A].Special = 0;
-                    if(NPC[A].Projectile == true && NPC[A].Special2 == 0 && NPC[A].Special == 0 && false)
+                    // FIXME: In original game, this is a dead code because of "And 0" condition at end.
+                    // In this sample, the "& false" was been commented, still idk for what this logic needs
+                    // the NPC-49 is a "toothy's pipe"
+                    if(NPC[A].Projectile && NPC[A].Special2 == 0.0 && NPC[A].Special == 0.0 /*&& false*/)
                     {
                         numNPCs++;
+                        NPC[numNPCs] = NPC_t();
                         NPC[A].Special2 = numNPCs;
                         NPC[numNPCs].Active = true;
                         NPC[numNPCs].Section = NPC[A].Section;
@@ -4339,7 +4347,7 @@ void UpdateNPCs()
                             NPC[numNPCs].Location.X = NPC[A].Location.X - NPC[numNPCs].Location.Width;
                         NPC[numNPCs].Location.Y = NPC[A].Location.Y;
                     }
-                    if(NPC[NPC[A].Special2].Type == 50 && NPC[NPC[A].Special2].Special2 == A)
+                    if(NPC[NPC[A].Special2].Type == 50 && fEqual(NPC[NPC[A].Special2].Special2, A))
                     {
                         NPC[NPC[A].Special2].Projectile = true;
                         NPC[NPC[A].Special2].Direction = NPC[A].Direction;

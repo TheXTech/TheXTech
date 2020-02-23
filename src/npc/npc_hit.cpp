@@ -1018,10 +1018,12 @@ void NPCHit(int A, int B, int C)
             NPC[A].CantHurtPlayer = NPC[A].HoldingPlayer;
             NPC[A].HoldingPlayer = 0;
             NPC[A].CantHurt = 1000;
-            NPC[A].Location.SpeedX = 3 * -NPC[A].Direction;
+            NPC[A].Location.SpeedX = double(3 * -NPC[A].Direction);
             NPC[A].Location.SpeedY = -3;
             NPC[A].Projectile = true;
         }
+        // Because C++, second part of this condition never gets checked
+        // in VB6, it does check and causes a crash, because C is an index of block when B is 4
         else if(B == 4 && (NPC[C].Type != NPC[A].Type || A == C))
         {
             if(!(NPC[C].Type == 202) && !(NPC[C].Type == 201))
@@ -1279,6 +1281,7 @@ void NPCHit(int A, int B, int C)
             else
             {
                 numNPCs++;
+                NPC[numNPCs] = NPC_t();
                 NPC[numNPCs].Location = NPC[A].Location;
                 NPC[numNPCs].Location.Y -= 32.0;
                 NPC[numNPCs].Type = NPC[A].Type + 8;
@@ -1353,6 +1356,7 @@ void NPCHit(int A, int B, int C)
             if(B == 7 && NPC[A].Type >= 113 && NPC[A].Type <= 117)
             {
                 numNPCs++;
+                NPC[numNPCs] = NPC_t();
                 NPC[numNPCs].Location = NPC[A].Location;
                 NPC[numNPCs].Location.Y -= 32.0;
                 NPC[numNPCs].Type = NPC[A].Type + 4;
@@ -2033,9 +2037,14 @@ void NPCHit(int A, int B, int C)
             NPC[A].Location.SpeedY = -5;
             NPC[A].Location.Y = Block[C].Location.Y - NPC[A].Location.Height - 0.01;
         }
-        else if(B == 6 || B == 5 || B == 4)
+        else if(B == 6)
         {
-            if(!(NPC[A].Type == 13 || NPC[A].Type == 108 || NPC[A].Type == 171 || NPCIsVeggie[NPC[A].Type]))
+            NPC[A].Killed = B;
+        }
+        else if(B == 5 || B == 4)
+        {
+            // B == 6 - touched a lava block, C is a block, not NPC!!!
+            if(!(NPC[C].Type == 13 || NPC[C].Type == 108 || NPC[C].Type == 171 || NPCIsVeggie[NPC[C].Type]))
                 NPC[A].Killed = B;
         }
         else if(B == 7)
@@ -2045,7 +2054,7 @@ void NPCHit(int A, int B, int C)
                (NPC[A].Type >= 182 && NPC[A].Type <= 188) || NPC[A].Type == 170)
             {
                 NPC[A].Direction = Player[C].Direction;
-                NPC[A].Location.SpeedX = std::abs(NPC[A].Location.SpeedX) * NPC[A].Direction;
+                NPC[A].Location.SpeedX = std::abs(NPC[A].Location.SpeedX) * double(NPC[A].Direction);
                 NPC[A].TurnAround = false;
                 NPC[A].Location.SpeedY = -6;
                 PlaySound(2);

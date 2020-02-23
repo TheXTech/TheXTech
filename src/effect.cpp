@@ -56,7 +56,8 @@ void UpdateEffects()
             {
                 if(e.NewNpc > 0)
                 {
-                    numNPCs = numNPCs + 1;
+                    numNPCs++;
+                    NPC[numNPCs] = NPC_t();
                     NPC[numNPCs].Type = e.NewNpc;
                     NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
                     NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
@@ -695,7 +696,8 @@ void UpdateEffects()
                         NewEffect(58, e.Location, 1, static_cast<float>(e.NewNpc));
                     else if(e.NewNpc > 0)
                     {
-                        numNPCs = numNPCs + 1;
+                        numNPCs++;
+                        NPC[numNPCs] = NPC_t();
                         NPC[numNPCs].Location = e.Location;
                         NPC[numNPCs].Active = true;
                         NPC[numNPCs].TimeLeft = 100;
@@ -742,7 +744,8 @@ void UpdateEffects()
             {
                 e.Frame = 1;
                 e.Life = 0;
-                numNPCs = numNPCs + 1;
+                numNPCs++;
+                NPC[numNPCs] = NPC_t();
                 NPC[numNPCs].Location = e.Location;
                 NPC[numNPCs].Active = true;
                 NPC[numNPCs].TimeLeft = 100;
