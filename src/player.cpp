@@ -1331,20 +1331,17 @@ void UpdatePlayer()
 
                         for(B = 1; B <= numBackground; B++)
                         {
-                            if(BackgroundFence[Background[B].Type])
+                            if(BackgroundFence[Background[B].Type] && !Background[B].Hidden)
                             {
-                                if(Background[B].Hidden == false)
+                                tempLocation = Background[B].Location;
+                                tempLocation.Width = tempLocation.Width + 32;
+                                tempLocation.Height = tempLocation.Height + 32;
+                                tempLocation.X = tempLocation.X - 16;
+                                tempLocation.Y = tempLocation.Y - 16;
+                                if(CheckCollision(tempLocation, Player[A].Location))
                                 {
-                                    tempLocation = Background[B].Location;
-                                    tempLocation.Width = tempLocation.Width + 32;
-                                    tempLocation.Height = tempLocation.Height + 32;
-                                    tempLocation.X = tempLocation.X - 16;
-                                    tempLocation.Y = tempLocation.Y - 16;
-                                    if(CheckCollision(tempLocation, Player[A].Location))
-                                    {
-                                        Player[A].FairyTime = 20;
-                                        Player[A].FairyCD = 0;
-                                    }
+                                    Player[A].FairyTime = 20;
+                                    Player[A].FairyCD = 0;
                                 }
                             }
                         }
