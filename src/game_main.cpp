@@ -1260,28 +1260,29 @@ Location_t newLoc(double X, double Y, double Width, double Height)
     return ret;
 }
 
-void MoreScore(int addScore, Location_t Loc, int *Multiplier)
+void MoreScore(int addScore, Location_t Loc)
+{
+    int mult = 0; // dummy
+    MoreScore(addScore, Loc, mult);
+}
+
+void MoreScore(int addScore, Location_t Loc, int &Multiplier)
 {
     //int oldM = 0;
     int A = 0;
-    int mult = 0;
-    if(Multiplier)
-        mult = *Multiplier;
 
     if(GameMenu || GameOutro || BattleMode)
         return;
-    A = addScore + mult;
+    A = addScore + Multiplier;
     if(A == 0)
         return;
-    mult++;
-    if(Multiplier)
-        (*Multiplier)++;
+    Multiplier++;
     if(A > 13)
         A = 13;
     if(A < addScore)
         A = addScore;
-    if(mult > 9 && Multiplier)
-        *Multiplier = 8;
+    if(Multiplier > 9)
+        Multiplier = 8;
     if(A > 13)
         A = 13;
     if(Points[A] <= 5)

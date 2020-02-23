@@ -1464,7 +1464,7 @@ void NPCHit(int A, int B, int C)
             {
                 NPC[A].Type = 195;
                 NPC[A].Location.SpeedX = 0;
-                MoreScore(6, NPC[A].Location, &Player[C].Multiplier);
+                MoreScore(6, NPC[A].Location, Player[C].Multiplier);
             }
         }
         else if(B == 6)
@@ -2074,9 +2074,9 @@ void NPCHit(int A, int B, int C)
     if(NPC[A].Killed == 10)
     {
         if(tempBool == true)
-            MoreScore(NPCScore[NPC[A].Type], NPC[A].Location, &NPC[C].Multiplier);
+            MoreScore(NPCScore[NPC[A].Type], NPC[A].Location, NPC[C].Multiplier);
         else
-            MoreScore(NPCScore[NPC[A].Type], NPC[A].Location, &Player[C].Multiplier);
+            MoreScore(NPCScore[NPC[A].Type], NPC[A].Location, Player[C].Multiplier);
     }
     // Calculate Score
     Player[0].Multiplier = 0;
@@ -2101,13 +2101,13 @@ void NPCHit(int A, int B, int C)
         {
             if(NPC[A].Type == 15 && NPC[A].Killed == 0)
             {
-                MoreScore(2, NPC[A].Location, &Player[C].Multiplier);
+                MoreScore(2, NPC[A].Location, Player[C].Multiplier);
                 if(Player[C].Multiplier > NPC[A].Multiplier)
                     NPC[A].Multiplier = Player[C].Multiplier;
             }
             else
             {
-                MoreScore(NPCScore[NPC[A].Type], NPC[A].Location, &Player[C].Multiplier);
+                MoreScore(NPCScore[NPC[A].Type], NPC[A].Location, Player[C].Multiplier);
                 if(Player[C].Multiplier > NPC[A].Multiplier)
                     NPC[A].Multiplier = Player[C].Multiplier;
             }
@@ -2136,7 +2136,7 @@ void NPCHit(int A, int B, int C)
             {
                 if(NPC[C].Multiplier < NPC[A].Multiplier)
                     NPC[C].Multiplier = NPC[A].Multiplier;
-                MoreScore(NPCScore[NPC[A].Type], NPC[A].Location, &NPC[C].Multiplier);
+                MoreScore(NPCScore[NPC[A].Type], NPC[A].Location, NPC[C].Multiplier);
             }
         }
     }
@@ -2144,7 +2144,7 @@ void NPCHit(int A, int B, int C)
     {
         if(NPC[A].Multiplier < NPC[C].Multiplier)
             NPC[A].Multiplier = NPC[C].Multiplier;
-        MoreScore(NPCScore[NPC[A].Type], NPC[A].Location, &NPC[A].Multiplier);
+        MoreScore(NPCScore[NPC[A].Type], NPC[A].Location, NPC[A].Multiplier);
     }
     if(B == 6 && NPC[A].Killed == 6 && (NPC[A].Type == 209 || NPC[A].Type == 200 || NPC[A].Type == 201 || NPC[A].Type == 15 || NPC[A].Type == 39 || NPC[A].Type == 86))
     {
@@ -2160,7 +2160,7 @@ void NPCHit(int A, int B, int C)
         {
             if(NPC[C].Multiplier < NPC[A].Multiplier)
                 NPC[C].Multiplier = NPC[A].Multiplier;
-            MoreScore(NPCScore[NPC[A].Type], NPC[A].Location, &NPC[C].Multiplier);
+            MoreScore(NPCScore[NPC[A].Type], NPC[A].Location, NPC[C].Multiplier);
         }
         if(NPC[A].Type != 208 && NPC[A].Type != 209)
         {

@@ -73,11 +73,11 @@ void KillNPC(int A, int B)
         NPC[A].Type = NPC[A].Special;
         if(B != 10)
         {
-            MoreScore(NPCScore[NPC[A].Type], NPC[A].Location, &NPC[A].Multiplier);
+            MoreScore(NPCScore[NPC[A].Type], NPC[A].Location, NPC[A].Multiplier);
         }
         NPC[A].Location.SpeedX = NPC[A].Location.SpeedX * 0.4;
         if(NPC[A].Location.SpeedX < 2 && NPC[A].Location.SpeedX > -2)
-            NPC[A].Location.SpeedX = 2 * NPC[A].Direction;
+            NPC[A].Location.SpeedX = double(2 * NPC[A].Direction);
     }
     if(NPC[A].Killed == 8 && NPC[A].Type != 13 && NPC[A].Type != 125 && NPCIsABot[NPC[A].Type] == false && NPC[A].Type != 203 && NPC[A].Type != 204 && NPC[A].Type != 205 && NPC[A].Type != 210)
         NewEffect(76, NPC[A].Location);
