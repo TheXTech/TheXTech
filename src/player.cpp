@@ -3535,7 +3535,7 @@ void UpdatePlayer()
                                             Player[A].FairyTime = 20;
                                     }
                                 }
-                                else if(Player[A].Fairy == false && Player[A].Stoned == false)
+                                else if(!Player[A].Fairy && !Player[A].Stoned)
                                 {
                                     if(Player[A].Mount == 0 && Player[A].HoldingNPC <= 0)
                                     {
@@ -3559,14 +3559,16 @@ void UpdatePlayer()
                                         }
 
                                         if(Player[A].Vine > 0)
+                                        {
                                             Player[A].VineNPC = -1;
-                                        Player[A].VineBGO = B;
+                                            Player[A].VineBGO = B;
+                                        }
                                     }
-                                }
-                            }
-                        }
-                    }
-                }
+                                } // !Fairy & !Stoned
+                            } // Collide player and temp location
+                        }// Collide player and BGO
+                    } // Is BGO climbable and visible?
+                } // Next A
 
                 if(Player[A].StandingOnNPC != 0)
                 {
@@ -3878,9 +3880,11 @@ void UpdatePlayer()
                                                         Player[A].Vine = 3;
                                                 }
 
-                                                Player[A].VineBGO = 0.0;
                                                 if(Player[A].Vine > 0)
+                                                {
                                                     Player[A].VineNPC = B;
+                                                    Player[A].VineBGO = 0.0;
+                                                }
                                             }
                                         }
                                     }
