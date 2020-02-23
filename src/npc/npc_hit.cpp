@@ -2035,7 +2035,7 @@ void NPCHit(int A, int B, int C)
         }
         else if(B == 6 || B == 5 || B == 4)
         {
-            if(!(NPC[C].Type == 13 || NPC[C].Type == 108 || NPC[C].Type == 171 || NPCIsVeggie[NPC[C].Type]))
+            if(!(NPC[A].Type == 13 || NPC[A].Type == 108 || NPC[A].Type == 171 || NPCIsVeggie[NPC[A].Type]))
                 NPC[A].Killed = B;
         }
         else if(B == 7)
