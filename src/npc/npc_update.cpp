@@ -4320,7 +4320,10 @@ void UpdateNPCs()
                         NPC[NPC[A].Special2].Direction = NPC[A].Direction;
                     if(Player[NPC[A].HoldingPlayer].Effect != 0)
                         NPC[A].Special = 0;
-                    if(NPC[A].Projectile == true && NPC[A].Special2 == 0 && NPC[A].Special == 0 && false)
+                    // FIXME: In original game, this is a dead code because of "And 0" condition at end.
+                    // In this sample, the "& false" was been commented, still idk for what this logic needs
+                    // the NPC-49 is a "toothy's pipe"
+                    if(NPC[A].Projectile && NPC[A].Special2 == 0.0 && NPC[A].Special == 0.0 /*&& false*/)
                     {
                         numNPCs++;
                         NPC[numNPCs] = NPC_t();
