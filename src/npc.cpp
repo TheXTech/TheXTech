@@ -2930,7 +2930,7 @@ void NPCSpecial(int A)
                             LevelMacro = 7;
                             for(C = 1; C <= numPlayers; C++)
                             {
-                                if(B != C) // And DScreenType <> 5 Then
+                                if(!fEqual(B, C)) // And DScreenType <> 5 Then
                                 {
                                     Player[C].Section = Player[B].Section;
                                     Player[C].Location.Y = Player[B].Location.Y + Player[B].Location.Height - Player[B].Location.Height;
@@ -2954,7 +2954,7 @@ void NPCSpecial(int A)
     }
     else if(NPC[A].Type == 105)
     {
-        if(NPC[A].Special == 1)
+        if(fEqual(NPC[A].Special, 1))
         {
             NPC[A].Location.SpeedY = NPC[A].Location.SpeedY + Physics.NPCGravity / 4;
             NPC[A].Special = 0;
@@ -2967,7 +2967,7 @@ void NPCSpecial(int A)
 
     else if(NPC[A].Type == 199)
     {
-        if(NPC[A].Special == 0)
+        if(NPC[A].Special == 0.0)
         {
             tempLocation = NPC[A].Location;
             tempLocation.Height = 400;
@@ -3564,7 +3564,7 @@ void SpecialNPC(int A)
                 if(NPC[A].Special >= NPCHeight[NPC[A].Type] * 0.65 + 1)
                     NPC[A].Special2 = 4;
             }
-            else if(NPC[A].Special2 == 4)
+            else if(fEqual(NPC[A].Special2, 4))
             {
                 NPC[A].Special = NPC[A].Special + 1;
                 if(NPC[A].Special >= 150)

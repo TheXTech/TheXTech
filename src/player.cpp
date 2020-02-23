@@ -4224,7 +4224,7 @@ void UpdatePlayer()
                                                                 }
                                                             }
                                                             else
-                                                                MoreScore(NPCScore[NPC[B].Type], NPC[B].Location, Player[A].Multiplier);
+                                                                MoreScore(NPCScore[NPC[B].Type], NPC[B].Location, &Player[A].Multiplier);
                                                         }
                                                     }
                                                 }
@@ -7401,7 +7401,7 @@ void YoshiEatCode(int A)
                 }
                 else
                 {
-                    MoreScore(NPCScore[NPC[Player[A].YoshiNPC].Type], NPC[Player[A].YoshiNPC].Location, Player[A].Multiplier);
+                    MoreScore(NPCScore[NPC[Player[A].YoshiNPC].Type], NPC[Player[A].YoshiNPC].Location, &Player[A].Multiplier);
                     NPC[Player[A].YoshiNPC].Killed = 9;
                     Player[A].YoshiNPC = 0;
                     Player[A].FireBallCD = 30;

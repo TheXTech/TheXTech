@@ -73,7 +73,7 @@ void KillNPC(int A, int B)
         NPC[A].Type = NPC[A].Special;
         if(B != 10)
         {
-            MoreScore(NPCScore[NPC[A].Type], NPC[A].Location, NPC[A].Multiplier);
+            MoreScore(NPCScore[NPC[A].Type], NPC[A].Location, &NPC[A].Multiplier);
         }
         NPC[A].Location.SpeedX = NPC[A].Location.SpeedX * 0.4;
         if(NPC[A].Location.SpeedX < 2 && NPC[A].Location.SpeedX > -2)

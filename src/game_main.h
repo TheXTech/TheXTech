@@ -97,7 +97,7 @@ void FindStars();
 // for settings up the game's credits
 void AddCredit(std::string newCredit);
 // calcualtes scores based on the multiplyer and how much the NPC is worth
-void MoreScore(int addScore, Location_t Loc, int Multiplier = 0);
+void MoreScore(int addScore, Location_t Loc, int *Multiplier = nullptr);
 // sets up player frame offsets so they are displayed correctly on the screen
 void SetupPlayerFrames();
 
