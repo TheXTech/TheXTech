@@ -3770,6 +3770,7 @@ void DrawBackground(int S, int Z)
     if(LevelEditor == true)
         LevelREAL[S] = level[S];
     level[S] = LevelREAL[S];
+
     A = 1; // Blocks
     if(Background2[S] == 1)
     {
@@ -3786,6 +3787,7 @@ void DrawBackground(int S, int Z)
             }
         }
     }
+
     A = 2; // Clouds
     if(Background2[S] == 1 || Background2[S] == 2 || Background2[S] == 22)
     {
@@ -3802,6 +3804,7 @@ void DrawBackground(int S, int Z)
             }
         }
     }
+
     if(Background2[S] == 13)
     {
 
@@ -3825,6 +3828,7 @@ void DrawBackground(int S, int Z)
             }
         }
     }
+
     A = 3; // Hills
     if(Background2[S] == 2)
     {
@@ -3842,6 +3846,7 @@ void DrawBackground(int S, int Z)
             }
         }
     }
+
     A = 4; // Castle
     if(Background2[S] == 3)
     {
@@ -3866,6 +3871,7 @@ void DrawBackground(int S, int Z)
             }
         }
     }
+
     A = 5; // Pipes
     if(Background2[S] == 4)
     {
@@ -3889,6 +3895,7 @@ void DrawBackground(int S, int Z)
             }
         }
     }
+
     A = 6; // Trees
     if(Background2[S] == 5)
     {
@@ -3913,6 +3920,7 @@ void DrawBackground(int S, int Z)
             }
         }
     }
+
     A = 7; // Bonus
     if(Background2[S] == 6)
     {
@@ -3937,6 +3945,7 @@ void DrawBackground(int S, int Z)
             }
         }
     }
+
     A = 8; // SMB Underground
     if(Background2[S] == 7)
     {
@@ -3954,6 +3963,7 @@ void DrawBackground(int S, int Z)
             }
         }
     }
+
     A = 9; // Night
     if(Background2[S] == 8 || Background2[S] == 9)
     {
@@ -3978,6 +3988,7 @@ void DrawBackground(int S, int Z)
             }
         }
     }
+
     A = 10; // Night 2
     if(Background2[S] == 9)
     {
@@ -3995,6 +4006,7 @@ void DrawBackground(int S, int Z)
             }
         }
     }
+
     A = 11; // Overworld
     if(Background2[S] == 10)
     {
@@ -4019,6 +4031,7 @@ void DrawBackground(int S, int Z)
             }
         }
     }
+
     A = 12; // SMW Hills
     if(Background2[S] == 11)
     {
@@ -4043,6 +4056,7 @@ void DrawBackground(int S, int Z)
             }
         }
     }
+
     A = 13; // SMW Trees
     if(Background2[S] == 12)
     {
@@ -4067,6 +4081,7 @@ void DrawBackground(int S, int Z)
             }
         }
     }
+
     A = 14; // SMB3 Desert
     if(Background2[S] == 14)
     {
@@ -4091,6 +4106,7 @@ void DrawBackground(int S, int Z)
             }
         }
     }
+
     A = 15; // SMB3 Dungeon
     if(Background2[S] == 15)
     {
@@ -4115,6 +4131,7 @@ void DrawBackground(int S, int Z)
             }
         }
     }
+
     A = 16; // Crateria
     if(Background2[S] == 16)
     {
@@ -4139,6 +4156,7 @@ void DrawBackground(int S, int Z)
             }
         }
     }
+
     A = 17; // smb3 ship
     if(Background2[S] == 17)
     {
@@ -4156,6 +4174,7 @@ void DrawBackground(int S, int Z)
             }
         }
     }
+
     A = 18; // SMW ghost house
     if(Background2[S] == 18)
     {
@@ -4181,6 +4200,7 @@ void DrawBackground(int S, int Z)
             }
         }
     }
+
     A = 19; // smw forest
     if(Background2[S] == 19)
     {
@@ -4205,6 +4225,7 @@ void DrawBackground(int S, int Z)
             }
         }
     }
+
     A = 20; // smb3 forest
     if(Background2[S] == 20)
     {
@@ -4229,6 +4250,7 @@ void DrawBackground(int S, int Z)
             }
         }
     }
+
     A = 21; // smb3 battle game
     if(Background2[S] == 21)
     {
@@ -4253,6 +4275,7 @@ void DrawBackground(int S, int Z)
             }
         }
     }
+
     A = 22; // SMB3 Waterfall
     if(Background2[S] == 22)
     {
@@ -4270,6 +4293,7 @@ void DrawBackground(int S, int Z)
             }
         }
     }
+
     A = 23; // SMB3 Tank
     if(Background2[S] == 23)
     {
@@ -4294,6 +4318,7 @@ void DrawBackground(int S, int Z)
             }
         }
     }
+
     A = 24; // smb3 bowsers castle
     if(Background2[S] == 24)
     {
@@ -4311,6 +4336,7 @@ void DrawBackground(int S, int Z)
             }
         }
     }
+
     A = 25; // SMB2 Underground
     if(Background2[S] == 25)
     {
@@ -4336,11 +4362,11 @@ void DrawBackground(int S, int Z)
             }
         }
     }
+
     A = 26; // Toad's House
     if(Background2[S] == 26)
     {
-
-        int tempVar27 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
+        int tempVar27 = int(std::ceil((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5)) + 1;
         for(B = 0; B <= tempVar27; B++)
         {
             tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
@@ -4349,10 +4375,16 @@ void DrawBackground(int S, int Z)
             tempLocation.Width = GFXBackground2Width[A];
             if(vScreenCollision(Z, tempLocation))
             {
-                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X,
+                                      vScreenY[Z] + tempLocation.Y,
+                                      GFXBackground2Width[A],
+                                      GFXBackground2Height[A],
+                                      GFXBackground2[A],
+                                      0, 0);
             }
         }
     }
+
     A = 27; // SMB3 Castle
     if(Background2[S] == 27)
     {
@@ -4377,6 +4409,7 @@ void DrawBackground(int S, int Z)
             }
         }
     }
+
     A = 28; // SMW Bonus
     if(Background2[S] == 28)
     {
@@ -4401,6 +4434,7 @@ void DrawBackground(int S, int Z)
             }
         }
     }
+
     A = 29; // SMW Night
     if(Background2[S] == 29)
     {
@@ -4426,6 +4460,7 @@ void DrawBackground(int S, int Z)
             }
         }
     }
+
     A = 30; // SMW Cave
     if(Background2[S] == 30)
     {
@@ -4454,6 +4489,7 @@ void DrawBackground(int S, int Z)
 
         }
     }
+
     A = 31; // SMW Hills 2
     if(Background2[S] == 31)
     {
@@ -4478,6 +4514,7 @@ void DrawBackground(int S, int Z)
             }
         }
     }
+
     A = 32; // SMW Clouds
     if(Background2[S] == 32)
     {
@@ -4502,6 +4539,7 @@ void DrawBackground(int S, int Z)
             }
         }
     }
+
     A = 33; // SMW Snow
     if(Background2[S] == 33)
     {
@@ -4526,6 +4564,7 @@ void DrawBackground(int S, int Z)
             }
         }
     }
+
     A = 34; // SMW Hills 3
     if(Background2[S] == 34)
     {
@@ -4550,6 +4589,7 @@ void DrawBackground(int S, int Z)
             }
         }
     }
+
     A = 35; // SMB 3 Snow Trees
     if(Background2[S] == 35)
     {
@@ -4567,6 +4607,7 @@ void DrawBackground(int S, int Z)
             }
         }
     }
+
     A = 36; // Snow Clouds
     if(Background2[S] == 35 || Background2[S] == 37)
     {
@@ -4584,6 +4625,7 @@ void DrawBackground(int S, int Z)
             }
         }
     }
+
     if(Background2[S] == 36)
     {
 
@@ -4607,6 +4649,7 @@ void DrawBackground(int S, int Z)
             }
         }
     }
+
     A = 37; // SMB 3 Snow Hills
     if(Background2[S] == 37)
     {
@@ -4624,6 +4667,7 @@ void DrawBackground(int S, int Z)
             }
         }
     }
+
     A = 38; // SMB3 Cave with Sky
     if(Background2[S] == 38)
     {
@@ -4641,6 +4685,7 @@ void DrawBackground(int S, int Z)
             }
         }
     }
+
     A = 39; // SMB3 Cave no Sky
     if(Background2[S] == 39)
     {
@@ -4665,6 +4710,7 @@ void DrawBackground(int S, int Z)
             }
         }
     }
+
     A = 40; // Mystic Cave Zone
     if(Background2[S] == 40)
     {
@@ -4846,6 +4892,7 @@ void DrawBackground(int S, int Z)
             }
         }
     }
+
     A = 41; // SMB 1 Castle
     if(Background2[S] == 41)
     {
