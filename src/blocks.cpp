@@ -709,7 +709,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                 NPC[numNPCs].Location.Y = b.Location.Y + 4;
                 NPC[numNPCs].Location.Height = NPCHeight[C];
                 NPC[numNPCs].Effect = 3;
-                PlaySound(70);
+                PlaySound(7);
             }
 
             NPC[numNPCs].Effect2 = 0;
