@@ -148,13 +148,13 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
     img[0] = GraphicsHelps::loadImage(AppPath + "/graphics/ui/icon/a2xtech_16.png");
     img[1] = GraphicsHelps::loadImage(AppPath + "/graphics/ui/icon/a2xtech_32.png");
 
-    if(!GraphicsHelps::setWindowIcon(m_window, img[0], 16))
+    if(img[0] && !GraphicsHelps::setWindowIcon(m_window, img[0], 16))
     {
         pLogWarning("Unable to setup window icon!");
         SDL_ClearError();
     }
 
-    if(!GraphicsHelps::setWindowIcon(m_window, img[1], 32))
+    if(img[1] && !GraphicsHelps::setWindowIcon(m_window, img[1], 32))
     {
         pLogWarning("Unable to setup window icon!");
         SDL_ClearError();
