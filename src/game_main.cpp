@@ -292,6 +292,7 @@ int GameMain(const CmdLineSetup_t &setup)
             ClearWorld();
 
             ReturnWarp = 0;
+            ReturnWarpSaved = 0;
             ShadowMode = false;
             GodMode = false;
             GrabAll = false;
@@ -429,7 +430,7 @@ int GameMain(const CmdLineSetup_t &setup)
         // World Map
         else if(LevelSelect)
         {
-            CheatString = "";
+            CheatString.clear();
             For(A, 1, numPlayers)
             {
                 if(Player[A].Mount == 0 || Player[A].Mount == 2)
@@ -576,7 +577,7 @@ int GameMain(const CmdLineSetup_t &setup)
             qScreen = false;
 
 // for warp entrances
-            if((ReturnWarp > 0 && FileName == StartLevel) || (StartWarp > 0))
+            if((ReturnWarp > 0 && IsEpisodeIntro/*FileName == StartLevel*/) || (StartWarp > 0))
             {
                 for(int numPlayersMax = numPlayers, A = 1; A <= numPlayersMax; ++A)
                 {

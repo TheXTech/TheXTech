@@ -44,7 +44,7 @@ void SaveGame()
             if(numStars > A)
             {
                 Star[A] = Star[numStars];
-                Star[numStars].level = "";
+                Star[numStars].level.clear();
                 Star[numStars].Section = 0;
             }
             numStars = numStars - 1;
@@ -57,6 +57,7 @@ void SaveGame()
 //    Open SelectWorld[selWorld].WorldPath + "save" + selSave + ".sav" For Output As #1;
     sav.lives = int(Lives);
     sav.coins = uint32_t(Coins);
+    sav.points = uint32_t(Score);
     sav.worldPosX = WorldPlayer[1].Location.X;
     sav.worldPosY = WorldPlayer[1].Location.Y;
 
@@ -73,6 +74,7 @@ void SaveGame()
     }
     sav.musicID = uint32_t(curWorldMusic);
     sav.musicFile = curWorldMusicFile;
+    sav.last_hub_warp = static_cast<unsigned long>(ReturnWarpSaved);
 
     // ABOVE GETS SKIPPED BY FINDSAVES
     sav.gameCompleted = BeatTheGame; // Can only get 99% until you finish the game;
@@ -122,11 +124,15 @@ void LoadGame()
 
     Lives = float(sav.lives);
     Coins = int(sav.coins);
+    Score = int(sav.points);
     WorldPlayer[1].Location.X = double(sav.worldPosX);
     WorldPlayer[1].Location.Y = double(sav.worldPosY);
 
     curWorldMusic = int(sav.musicID);
     curWorldMusicFile = sav.musicFile;
+
+    ReturnWarp = int(sav.last_hub_warp);
+    ReturnWarpSaved = ReturnWarp;
 
     for(A = 1, i = 0; A <= 5; A++, i++)
     {

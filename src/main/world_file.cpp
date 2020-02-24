@@ -29,6 +29,7 @@
 #include "../sound.h"
 
 #include <Utils/strings.h>
+#include <Utils/files.h>
 #include <PGE_File_Formats/file_formats.h>
 
 void OpenWorld(std::string FilePath)
@@ -50,6 +51,7 @@ void OpenWorld(std::string FilePath)
 //            break;
 //    }
 
+    FileNameFull = Files::basename(FilePath);
     FileName = wld.meta.filename; //FilePath.substr(FilePath.length() - (FilePath.length() - A));
     FileNamePath = wld.meta.path + "/"; //FilePath.substr(0, (A));
 
@@ -73,6 +75,8 @@ void OpenWorld(std::string FilePath)
     RestartLevel = wld.restartlevel;
 
     MaxWorldStars = int(wld.stars);
+
+    addMissingLvlSuffix(StartLevel);
 
     for(int i = 1; i <= maxWorldCredits; i++)
         WorldCredits[i].clear();
@@ -259,11 +263,6 @@ void OpenWorld(std::string FilePath)
 
 void ClearWorld()
 {
-    Tile_t blankTile;
-    WorldPath_t blankPath;
-    Scene_t blankScene;
-    WorldLevel_t blankLevel;
-    WorldMusic_t blankMusic;
     int A = 0;
 
     for(A = 1; A <= numCharacters; A++)
@@ -274,15 +273,15 @@ void ClearWorld()
     }
 
     for(A = 1; A <= numTiles; A++)
-        Tile[A] = blankTile;
+        Tile[A] = Tile_t();
     for(A = 1; A <= numWorldPaths; A++)
-        WorldPath[A] = blankPath;
+        WorldPath[A] = WorldPath_t();
     for(A = 1; A <= numScenes; A++)
-        Scene[A] = blankScene;
+        Scene[A] = Scene_t();
     for(A = 1; A <= numWorldLevels; A++)
-        WorldLevel[A] = blankLevel;
+        WorldLevel[A] = WorldLevel_t();
     for(A = 1; A <= numWorldMusic; A++)
-        WorldMusic[A] = blankMusic;
+        WorldMusic[A] = WorldMusic_t();
 
     MaxWorldStars = 0;
     numTiles = 0;
@@ -293,10 +292,11 @@ void ClearWorld()
     numWorldMusic = 0;
     RestartLevel = false;
     NoMap = false;
-    StartLevel = "";
+    IsEpisodeIntro = false;
+    StartLevel.clear();
     BeatTheGame = false;
-    for(A = 1; A <= 5; A++)
-        WorldCredits[A] = "";
+    for(int A = 1; A <= maxWorldCredits; A++)
+        WorldCredits[A].clear();
     UnloadCustomGFX();
     UnloadWorldCustomGFX();
     UnloadCustomSound();

@@ -33,6 +33,8 @@ void SetupPhysics();
 
 void initAll();
 
+extern void addMissingLvlSuffix(std::string &fileName);
+
 int GameMain(const CmdLineSetup_t &setup);
 //! Set up object sizes and frame offsets for blocks/npcs/effects
 void SetupVars();

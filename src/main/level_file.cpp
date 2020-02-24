@@ -36,6 +36,27 @@
 #include <Utils/files.h>
 #include <PGE_File_Formats/file_formats.h>
 
+
+void addMissingLvlSuffix(std::string &fileName)
+{
+    if(!fileName.empty() && !Files::hasSuffix(fileName, ".lvl") && !Files::hasSuffix(fileName, ".lvlx"))
+    {
+        bool isAbsolute = Files::isAbsolute(fileName);
+        bool lvlxExists;
+
+        if(isAbsolute)
+            lvlxExists = Files::fileExists(fileName + ".lvlx");
+        else
+            lvlxExists = Files::fileExists(FileNamePath + fileName + ".lvlx");
+
+        if(lvlxExists)
+            fileName += ".lvlx";
+        else
+            fileName += ".lvl";
+    }
+}
+
+
 void OpenLevel(std::string FilePath)
 {
     std::string newInput;
@@ -55,24 +76,29 @@ void OpenLevel(std::string FilePath)
     CoinMode = false;
     LevelData lvl;
 
-    if(!Files::hasSuffix(FilePath, ".lvl") && !Files::hasSuffix(FilePath, ".lvlx"))
-    {
-        if(Files::fileExists(FilePath + ".lvlx"))
-            FilePath += ".lvlx";
-        else
-            FilePath += ".lvl";
-    }
+    addMissingLvlSuffix(FilePath);
+//    if(!Files::hasSuffix(FilePath, ".lvl") && !Files::hasSuffix(FilePath, ".lvlx"))
+//    {
+//        if(Files::fileExists(FilePath + ".lvlx"))
+//            FilePath += ".lvlx";
+//        else
+//            FilePath += ".lvl";
+//    }
 
     FileFormats::OpenLevelFile(FilePath, lvl);
     FileFormats::smbx64LevelPrepare(lvl);
     FileFormats::smbx64LevelSortBlocks(lvl);
     FileFormats::smbx64LevelSortBGOs(lvl);
 
+    FileNameFull = Files::basename(FilePath);
     FileName = lvl.meta.filename;
     FileNamePath = lvl.meta.path + "/";
 //    if(FileNamePath.substr(FileNamePath.length() - 2) == "/")
 //        FileNamePath = FileNamePath.substr(0, FileNamePath.length() - 1);
     FullFileName = FilePath;
+
+    IsEpisodeIntro = (StartLevel == FileNameFull);
+
     numBlock = 0;
     numBackground = 0;
     numNPCs = 0;
@@ -579,7 +605,7 @@ void OpenLevel(std::string FilePath)
             if(Warp[A].Effect == 2 && Warp[A].Stars > numStars)
             {
                 B++;
-                numLocked = numLocked + 1;
+                numLocked++;
                 Background[B] = Background_t();
                 Background[B].Layer = Warp[A].Layer;
                 Background[B].Hidden = Warp[A].Hidden;
@@ -592,7 +618,7 @@ void OpenLevel(std::string FilePath)
             else if(Warp[A].Effect == 2 && Warp[A].Locked) // For locks
             {
                 B++;
-                numLocked = numLocked + 1;
+                numLocked++;
                 Background[B] = Background_t();
                 Background[B].Layer = Warp[A].Layer;
                 Background[B].Hidden = Warp[A].Hidden;
@@ -785,20 +811,21 @@ void FindStars()
 
     for(A = 1; A <= numWarps; A++)
     {
-        auto &tempVar = Warp[A];
-        if(!tempVar.level.empty())
+        auto &warp = Warp[A];
+        if(!warp.level.empty())
         {
-            std::string lFile = FileNamePath + tempVar.level;
+            std::string lFile = FileNamePath + warp.level;
+            addMissingLvlSuffix(lFile);
             if(Files::fileExists(lFile))
             {
                 if(FileFormats::OpenLevelFileHeader(lFile, head))
                 {
-                    tempVar.maxStars = head.stars;
-                    tempVar.curStars = 0;
+                    warp.maxStars = head.stars;
+                    warp.curStars = 0;
                     for(B = 1; B <= numStars; B++)
                     {
-                        if(SDL_strcasecmp(Star[B].level.c_str(), tempVar.level.c_str()) == 0)
-                            tempVar.curStars++;
+                        if(SDL_strcasecmp(Star[B].level.c_str(), warp.level.c_str()) == 0)
+                            warp.curStars++;
                     }
                 }
             }

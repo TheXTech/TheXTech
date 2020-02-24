@@ -897,92 +897,61 @@ void MenuLoop()
                     {
 //                        If NoMap = False Then StartLevel = ""
                         if(!NoMap)
-                            StartLevel = "";
+                            StartLevel.clear();
 //                        LoadGame
                         LoadGame();
 //                    End If
                     }
-//                    If WorldUnlock = True Then
+
                     if(WorldUnlock)
                     {
-//                        For A = 1 To numWorldPaths
                         For(A, 1, numWorldPaths)
                         {
-//                        tempLocation = WorldPath(A).Location
                             tempLocation = WorldPath[A].Location;
                             {
-//                        With tempLocation
                                 Location_t &l =tempLocation;
-//                            .X = .X + 4
                                 l.X = l.X + 4;
-//                            .Y = .Y + 4
                                 l.Y = l.Y + 4;
-//                            .Width = .Width - 8
                                 l.Width = l.Width - 8;
-//                            .Height = .Height - 8
                                 l.Height = l.Height - 8;
-//                        End With
                             }
-//                            WorldPath(A).Active = True
+
                             WorldPath[A].Active = true;
-//                            For B = 1 To numScenes
+
                             For(B, 1, numScenes)
                             {
-//                                If CheckCollision(tempLocation, Scene(B).Location) Then Scene(B).Active = False
                                 if(CheckCollision(tempLocation, Scene[B].Location))
                                     Scene[B].Active = false;
-//                            Next B
                             }
-//                        Next A
                         }
-//                        For A = 1 To numWorldLevels
+
                         For(A, 1, numWorldLevels)
-                        {
-//                            WorldLevel(A).Active = True
                             WorldLevel[A].Active = true;
-//                        Next A
-                        }
-//                    End If
                     }
-//                    SetupPlayers
+
                     SetupPlayers();
-//                    If StartLevel <> "" Then
-                    if(StartLevel != "")
+
+                    if(!StartLevel.empty())
                     {
-//                        PlaySound 28
                         PlaySound(28);
-//                        SoundPause(26) = 200
                         SoundPause[26] = 200;
-//                        LevelSelect = False
                         LevelSelect = false;
 
-//                        GameThing
                         GameThing();
-//                        ClearLevel
                         ClearLevel();
 
-//                        Sleep 1000
                         SDL_Delay(1000);
-//                        OpenLevel SelectWorld(selWorld).WorldPath & StartLevel
                         OpenLevel(SelectWorld[selWorld].WorldPath + StartLevel);
-//                    End If
                     }
-//                    Exit Sub
                     return;
-//                End If
                 }
-//            End If
             }
-//            If MenuMode < 100 Then
+
             if(MenuMode < 100)
             {
-//                If MenuCursor > 2 Then MenuCursor = 0
                 if(MenuCursor > 2) MenuCursor = 0;
-//                If MenuCursor < 0 Then MenuCursor = 2
                 if(MenuCursor < 0) MenuCursor = 2;
-//            End If
             }
-//        ElseIf MenuMode = 3 Then 'Options
         }
 
         // Options

@@ -1628,6 +1628,10 @@ extern int LevelMacroCounter;
 extern int numJoysticks;
 //Public FileName As String
 extern std::string FileName;
+//! EXTRA: A full filename (the "FileName" is now has the "base name" sense)
+extern std::string FileNameFull;
+//! EXTRA: Identify that episode is an intro level
+extern bool IsEpisodeIntro;
 //Public Coins As Integer 'number of coins
 extern int Coins;
 //Public Lives As Single 'number of lives
@@ -1820,6 +1824,8 @@ extern RangeArr<Events_t, 0, maxEvents> Events;
 
 //Public ReturnWarp As Integer 'for when the player returns from a warp
 extern int ReturnWarp;
+//! EXTRA: Used to be captured into game save
+extern int ReturnWarpSaved;
 //Public StartWarp As Integer
 extern int StartWarp;
 //Public Physics As Physics

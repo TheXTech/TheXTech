@@ -393,7 +393,8 @@ void SetupPlayers()
             }// for NPCs
         } // for Check points
     }
-    else if(StartLevel != FileName) // if not in the level for the checkpoint, blank the checkpoint
+    // if not in the level for the checkpoint, blank the checkpoint
+    else if(StartLevel != FileNameFull)
     {
         Checkpoint.clear();
         CheckpointsList.clear();
@@ -891,13 +892,15 @@ void EveryonesDead()
 //        BitBlt frmLevelWindow::vScreen[1].hdc, 0, 0, frmLevelWindow::vScreen[1].ScaleWidth, frmLevelWindow::vScreen[1].ScaleHeight, 0, 0, 0, vbWhiteness;
 
     SDL_Delay(500);
-    Lives = Lives - 1;
+
+    Lives--;
     if(Lives >= 0.f)
     {
         LevelMacro = 0;
         LevelMacroCounter = 0;
+
         ClearLevel();
-        if(RestartLevel == true)
+        if(RestartLevel)
         {
             OpenLevel(FullFileName);
             LevelSelect = false;
@@ -911,6 +914,7 @@ void EveryonesDead()
 // GAME OVER
         Lives = 3;
         Coins = 0;
+        Score = 0;
         SaveGame();
         LevelMacro = 0;
         LevelMacroCounter = 0;
@@ -5324,12 +5328,14 @@ void PlayerEffects(int A)
                     }
                 }
             }
-            if(Warp[Player[A].Warp].level != "")
+
+            if(!Warp[Player[A].Warp].level.empty())
             {
                 GoToLevel = Warp[Player[A].Warp].level;
                 Player[A].Effect = 8;
                 Player[A].Effect2 = 2970;
                 ReturnWarp = Player[A].Warp;
+                ReturnWarpSaved = ReturnWarp;
                 StartWarp = Warp[Player[A].Warp].LevelWarp;
             }
             else if(Warp[Player[A].Warp].MapWarp == true)
@@ -5542,12 +5548,14 @@ void PlayerEffects(int A)
             Player[A].Effect = 0;
             Player[A].Effect2 = 0;
             Player[A].WarpCD = 40;
-            if(Warp[Player[A].Warp].level != "")
+
+            if(!Warp[Player[A].Warp].level.empty())
             {
                 GoToLevel = Warp[Player[A].Warp].level;
                 Player[A].Effect = 8;
                 Player[A].Effect2 = 3000;
                 ReturnWarp = Player[A].Warp;
+                ReturnWarpSaved = ReturnWarp;
                 StartWarp = Warp[Player[A].Warp].LevelWarp;
             }
             else if(Warp[Player[A].Warp].MapWarp == true)
@@ -5555,6 +5563,7 @@ void PlayerEffects(int A)
                 Player[A].Effect = 8;
                 Player[A].Effect2 = 2970;
             }
+
             if(numPlayers > 2 /*&& nPlay.Online == false*/)
             {
                 for(B = 1; B <= numPlayers; B++)

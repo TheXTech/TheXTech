@@ -507,13 +507,14 @@ void TouchBonus(int A, int B)
             {
                 for(C = 1; C <= numStars; C++)
                 {
-                    if(Star[C].level == FileName && (Star[C].Section == NPC[B].Section || Star[C].Section == -1))
+                    if(Star[C].level == FileNameFull && (Star[C].Section == NPC[B].Section || Star[C].Section == -1))
                         tempBool = true;
                 }
+
                 if(!tempBool)
                 {
                     numStars = numStars + 1;
-                    Star[numStars].level = FileName;
+                    Star[numStars].level = FileNameFull;
                     Star[numStars].Section = NPC[B].Section;
                     for(C = 1; C <= numWarps; C++)
                     {
@@ -526,7 +527,7 @@ void TouchBonus(int A, int B)
                                 {
                                     if(CheckCollision(Warp[C].Entrance, Background[D].Location))
                                     {
-                                        Background[D].Layer = "";
+                                        Background[D].Layer.clear();
                                         Background[D].Hidden = true;
                                     }
                                 }
@@ -534,6 +535,7 @@ void TouchBonus(int A, int B)
                         }
                     }
                 }
+
                 if(NPC[B].Type == 97)
                 {
                     LevelMacro = 6;

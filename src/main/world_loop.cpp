@@ -333,8 +333,9 @@ void WorldLoop()
                         }
                     }
 
-                    if(WorldLevel[A].FileName != "" && WorldLevel[A].FileName != ".lvl" && WorldLevel[A].FileName != ".lvlx")
+                    if(!WorldLevel[A].FileName.empty() && WorldLevel[A].FileName != ".lvl" && WorldLevel[A].FileName != ".lvlx")
                     {
+                        addMissingLvlSuffix(WorldLevel[A].FileName);
                         if(Files::fileExists(SelectWorld[selWorld].WorldPath + WorldLevel[A].FileName))
                         {
                             StartWarp = WorldLevel[A].StartWarp;

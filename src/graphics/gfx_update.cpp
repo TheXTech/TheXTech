@@ -1653,7 +1653,7 @@ void UpdateGraphics(bool skipRepaint)
                         std::string tempString;
                         if(Warp[Player[A].ShowWarp].maxStars > 0 && Player[A].Mount != 2)
                         {
-                            tempString = fmt::format_ne("{0}/{0}", Warp[Player[A].ShowWarp].curStars, Warp[Player[A].ShowWarp].maxStars);
+                            tempString = fmt::format_ne("{0}/{1}", Warp[Player[A].ShowWarp].curStars, Warp[Player[A].ShowWarp].maxStars);
                             frmMain.renderTexture(Player[A].Location.X + Player[A].Location.Width / 2.0 + vScreenX[Z] - tempString.length() * 9, Player[A].Location.Y + Player[A].Location.Height - 96 + vScreenY[Z] + 1, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
                             frmMain.renderTexture(Player[A].Location.X + Player[A].Location.Width / 2.0 + vScreenX[Z] - tempString.length() * 9 - 20, Player[A].Location.Y + Player[A].Location.Height - 96 + vScreenY[Z], GFX.Interface[5].w, GFX.Interface[5].h, GFX.Interface[5], 0, 0);
                             SuperPrint(tempString, 3,
@@ -1714,7 +1714,7 @@ void UpdateGraphics(bool skipRepaint)
                         else if((DScreenType == 6 && Z == 2) || (DScreenType == 4 && Z == 2) || (DScreenType == 3 && Z == 1))
                             Y = -300;
                         frmMain.renderRect(210 + X, 200 + Y, 380, 200, 0.f, 0.f, 0.f);
-                        if(!Cheater && (LevelSelect || (StartLevel == FileName && NoMap)))
+                        if(!Cheater && (LevelSelect || (/*StartLevel == FileName*/IsEpisodeIntro && NoMap)))
                         {
                             SuperPrint("CONTINUE", 3, 272 + X, 257 + Y);
                             SuperPrint("SAVE & CONTINUE", 3, 272 + X, 292 + Y);
@@ -1762,8 +1762,8 @@ void UpdateGraphics(bool skipRepaint)
                             if(B == 0)
                                 B = A;
 
-                            tempText = SuperText.substr(0, B);
-                            SuperText = SuperText.substr(B, SuperText.length());
+                            tempText = SuperText.substr(0, size_t(B));
+                            SuperText = SuperText.substr(size_t(B), SuperText.length());
                             frmMain.renderTexture(400 - GFX.TextBox.w / 2 + X, BoxY + Y + Y,
                                                   GFX.TextBox.w, 20, GFX.TextBox, 0, 20);
                             if(SuperText.length() == 0 && !tempBool)
@@ -1812,6 +1812,8 @@ void UpdateGraphics(bool skipRepaint)
                     A = 0;
                     B = 0;
                     C = 0;
+
+                    // TODO: Make a custom playable character names print here
                     if(!blockCharacter[1])
                         SuperPrint("MARIO GAME", 3, 300, 350);
                     else
@@ -1822,6 +1824,7 @@ void UpdateGraphics(bool skipRepaint)
                         if(PlayerCharacter >= 1)
                             C = C - 30;
                     }
+
                     if(!blockCharacter[2])
                         SuperPrint("LUIGI GAME", 3, 300, 380 + A);
                     else
@@ -1832,6 +1835,7 @@ void UpdateGraphics(bool skipRepaint)
                         if(PlayerCharacter >= 2)
                             C = C - 30;
                     }
+
                     if(!blockCharacter[3])
                         SuperPrint("PEACH GAME", 3, 300, 410 + A);
                     else
@@ -1842,6 +1846,7 @@ void UpdateGraphics(bool skipRepaint)
                         if(PlayerCharacter >= 3)
                             C = C - 30;
                     }
+
                     if(!blockCharacter[4])
                         SuperPrint("TOAD GAME", 3, 300, 440 + A);
                     else
@@ -1852,6 +1857,7 @@ void UpdateGraphics(bool skipRepaint)
                         if(PlayerCharacter >= 4)
                             C = C - 30;
                     }
+
                     if(!blockCharacter[5])
                         SuperPrint("LINK GAME", 3, 300, 470 + A);
                     else
@@ -1862,6 +1868,7 @@ void UpdateGraphics(bool skipRepaint)
                         if(PlayerCharacter >= 5)
                             C = C - 30;
                     }
+
                     if(MenuMode == 300 || MenuMode == 500)
                     {
                         frmMain.renderTexture(300 - 20, B + 350 + (MenuCursor * 30), GFX.MCursor[3]);

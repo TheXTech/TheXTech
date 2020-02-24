@@ -383,16 +383,15 @@ void PauseGame(int plr)
                     {
                         if(MenuCursor == 0)
                             stopPause = true;
-                        else if(MenuCursor == 1 && (LevelSelect == true ||
-                                (StartLevel == FileName && NoMap == true)) && !Cheater)
+                        else if(MenuCursor == 1 && (LevelSelect ||
+                                (/*StartLevel == FileName*/IsEpisodeIntro && NoMap)) && !Cheater)
                         {
                             SaveGame();
                             stopPause = true;
                         }
                         else
                         {
-                            if(!Cheater && (LevelSelect ||
-                              (StartLevel == FileName && NoMap)))
+                            if(!Cheater && (LevelSelect || (/*StartLevel == FileName*/IsEpisodeIntro && NoMap)))
                             {
                                 SaveGame();
                             }
@@ -414,7 +413,7 @@ void PauseGame(int plr)
                             SDL_Delay(500);
                         }
                     }
-                    if(Cheater || !(LevelSelect || (StartLevel == FileName && NoMap)))
+                    if(Cheater || !(LevelSelect || (/*StartLevel == FileName*/IsEpisodeIntro && NoMap)))
                     {
                         if(MenuCursor > 1)
                             MenuCursor = 0;
