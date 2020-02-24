@@ -41,6 +41,8 @@
 
 #include <SDL2/SDL_thread.h>
 
+#include "../version.h"
+
 #include "frm_main.h"
 
 static SDL_bool IsFullScreen(SDL_Window *win)
@@ -53,6 +55,7 @@ FrmMain::FrmMain()
 {
     ScaleWidth = ScreenW;
     ScaleHeight = ScreenH;
+    m_windowTitle = fmt::format_ne("A2xTech v{0}", V_LATEST_STABLE);
 }
 
 SDL_Window *FrmMain::getWindow()

@@ -43,6 +43,12 @@ if(CMAKE_BUILD_TYPE_LOWER STREQUAL "debug")
     add_definitions(-DDEBUG_BUILD)
 endif()
 
+# Version
+include(version.cmake)
+# Default GIT version
+include(cmake/git_version.cmake)
+
+
 if(WIN32)
     set(USE_SYSTEM_LIBS_DEFAULT OFF)
 else()
@@ -159,6 +165,10 @@ set(A2XTECH_SRC
     src/npc/npc_bonus.cpp
     src/player/player_update.cpp
 )
+
+if(WIN32 AND NOT EMSCRIPTEN)
+    list(APPEND A2XTECH_SRC resources/a2xtech.rc)
+endif()
 
 add_executable(a2xtech ${A2XTECH_SRC} ${LIB_SRC})
 pge_set_nopie(a2xtech)
