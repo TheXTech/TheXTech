@@ -85,7 +85,8 @@ void UpdateEffects()
         {
             if(e.Life % 5 == 0)
             {
-                NewEffect(108, newLoc(e.Location.X + std::fmod(std::rand(), e.Location.Width), e.Location.Y + std::fmod(std::rand(), e.Location.Height)));
+                NewEffect(108, newLoc(e.Location.X + (dRand() * e.Location.Width),
+                                      e.Location.Y + (dRand() * e.Location.Height)));
             }
         }
         else if(e.Type == 111)
@@ -212,8 +213,8 @@ void UpdateEffects()
                 e.FrameCount = 0;
                 e.Frame = 0;
             }
-            e.Location.Y = e.Location.Y - 2;
-            e.Location.X = e.Location.X + std::rand() % 2 - 1;
+            e.Location.Y -= 2;
+            e.Location.X += dRand() * 2.0 - 1.0;
         }
         else if(e.Type == 57) // egg shells
         {
@@ -513,8 +514,8 @@ void UpdateEffects()
         }
         else if(e.Type == 77 || e.Type == 139) // Small Fireball Tail
         {
-            e.Location.X = e.Location.X + std::rand() % 2 - 1;
-            e.Location.Y = e.Location.Y + std::rand() % 2 - 1;
+            e.Location.X += dRand() * 2 - 1;
+            e.Location.Y += dRand() * 2 - 1;
             e.FrameCount += 1;
             if(e.FrameCount >= 4)
             {
@@ -573,11 +574,11 @@ void UpdateEffects()
                     if(e.Frame >= 4)
                         e.Frame = 0;
                 }
-            if(e.Type == 148 && std::rand() % 10 > 8)
+            if(e.Type == 148 && (dRand() * 10.0) > 8.0)
             {
                 NewEffect(77, e.Location, 3);
-                Effect[numEffects].Location.SpeedX = std::rand() % 3 - 1.5;
-                Effect[numEffects].Location.SpeedY = std::rand() % 3 - 1.5;
+                Effect[numEffects].Location.SpeedX = dRand() * 3 - 1.5;
+                Effect[numEffects].Location.SpeedY = dRand() * 3 - 1.5;
             }
         }
         else if(e.Type == 125) // POW Block
@@ -811,8 +812,8 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
                 Effect[numEffects].Location.SpeedY = -11;
             else
                 Effect[numEffects].Location.SpeedY = -7;
-            Effect[numEffects].Location.SpeedX = Effect[numEffects].Location.SpeedX + std::rand() % 2 - 1;
-            Effect[numEffects].Location.SpeedY = Effect[numEffects].Location.SpeedY + std::rand() % 4 - 2;
+            Effect[numEffects].Location.SpeedX += dRand() * 2 - 1;
+            Effect[numEffects].Location.SpeedY += dRand() * 4 - 2;
             if(B == 1)
             {
                 Effect[numEffects].Location.X = Location.X;
@@ -968,8 +969,8 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
             }
             if(B == 1 || B == 3)
                 Effect[numEffects].Location.SpeedX = -Effect[numEffects].Location.SpeedX;
-            Effect[numEffects].Location.SpeedX = Effect[numEffects].Location.SpeedX + (std::fmod(std::rand(), 0.5) - 0.25);
-            Effect[numEffects].Location.SpeedY = Effect[numEffects].Location.SpeedY + (std::fmod(std::rand(), 1) - 0.5);
+            Effect[numEffects].Location.SpeedX += ((dRand() * 0.5) - 0.25);
+            Effect[numEffects].Location.SpeedY += ((dRand() * 1) - 0.5);
             if(B == 1)
                 Effect[numEffects].Frame = 0;
             else if(B == 2)
@@ -1155,8 +1156,8 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
         Effect[numEffects].Location.Height = EffectHeight[Effect[numEffects].Type];
         Effect[numEffects].Location.X = Location.X - Effect[numEffects].Location.Width * 0.5 + Location.Width * 0.5;
         Effect[numEffects].Location.Y = Location.Y - Effect[numEffects].Location.Height * 0.5 + Location.Height * 0.5;
-        Effect[numEffects].Location.X = Effect[numEffects].Location.X + std::rand() % 32 - 16;
-        Effect[numEffects].Location.Y = Effect[numEffects].Location.Y + std::rand() % 32 - 16;
+        Effect[numEffects].Location.X = Effect[numEffects].Location.X + dRand() * 32 - 16;
+        Effect[numEffects].Location.Y = Effect[numEffects].Location.Y + dRand() * 32 - 16;
         Effect[numEffects].Location.SpeedY = -2;
         Effect[numEffects].Location.SpeedX = 0;
         Effect[numEffects].Frame = 0;
@@ -1274,7 +1275,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
                 Effect[numEffects].Location.X = Effect[numEffects].Location.X + Effect[numEffects].Location.SpeedX * 3;
                 Effect[numEffects].Location.Y = Effect[numEffects].Location.Y + Effect[numEffects].Location.SpeedY * 3;
 
-                Effect[numEffects].Frame = static_cast<int>(floor(static_cast<double>(std::rand() % 4)));
+                Effect[numEffects].Frame = iRand() % 4;
                 Effect[numEffects].Type = A;
             }
         }
@@ -1403,8 +1404,8 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
         Effect[numEffects].Location.SpeedX = 0;
         if(A == 132)
         {
-            Effect[numEffects].Location.Y = Effect[numEffects].Location.Y + std::rand() % 16 - 8;
-            Effect[numEffects].Location.X = Effect[numEffects].Location.X + std::rand() % 16 - 8;
+            Effect[numEffects].Location.Y += dRand() * 16 - 8;
+            Effect[numEffects].Location.X += dRand() * 16 - 8;
         }
         Effect[numEffects].Frame = 0;
         Effect[numEffects].Life = 12;
@@ -1413,13 +1414,13 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
             Effect[numEffects].Life = 24;
         if(A == 73 || A == 75)
         {
-            Effect[numEffects].Location.X = Effect[numEffects].Location.X + std::rand() % 16 - 8;
-            Effect[numEffects].Location.Y = Effect[numEffects].Location.Y + std::rand() % 16 - 8;
+            Effect[numEffects].Location.X += dRand() * 16 - 8;
+            Effect[numEffects].Location.Y += dRand() * 16 - 8;
         }
         else if(A == 74)
         {
-            Effect[numEffects].Location.X = Effect[numEffects].Location.X + std::rand() % 4 - 2;
-            Effect[numEffects].Location.Y = Effect[numEffects].Location.Y + std::rand() % 4 - 2;
+            Effect[numEffects].Location.X += dRand() * 4 - 2;
+            Effect[numEffects].Location.Y += dRand() * 4 - 2;
         }
     }
     else if(A == 144) // bubble pop
@@ -1470,8 +1471,8 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
         Effect[numEffects].Shadow = Shadow;
         Effect[numEffects].Location.Width = 8;
         Effect[numEffects].Location.Height = 8;
-        Effect[numEffects].Location.X = Location.X + 4 + std::rand() % 12;
-        Effect[numEffects].Location.Y = Location.Y + 40;
+        Effect[numEffects].Location.X += 4 + dRand() * 12;
+        Effect[numEffects].Location.Y += 40;
         // .Location.SpeedY = -8
         Effect[numEffects].Location.SpeedX = 0;
         Effect[numEffects].Frame = 0;
@@ -1486,12 +1487,12 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
         Effect[numEffects].Location.Height = 16;
         Effect[numEffects].Location.X = Location.X;
         Effect[numEffects].Location.Y = Location.Y;
-        Effect[numEffects].Location.SpeedY = -2 - std::rand() % 10;
-        Effect[numEffects].Location.SpeedX = std::rand() % 8 - 4;
+        Effect[numEffects].Location.SpeedY = -2 - dRand() * 10;
+        Effect[numEffects].Location.SpeedX = dRand() * 8 - 4;
         Effect[numEffects].Frame = 0;
-        if(static_cast<int>(floor(static_cast<double>(std::rand() % 2))) == 1)
+        if((iRand() % 2) == 1)
             Effect[numEffects].Frame = 7;
-        Effect[numEffects].Frame = Effect[numEffects].Frame + static_cast<int>(floor(static_cast<double>(std::rand() % 7)));
+        Effect[numEffects].Frame += iRand() % 7;
         Effect[numEffects].Life = 300;
         Effect[numEffects].Type = A;
     }
@@ -1517,8 +1518,8 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
         Effect[numEffects].Shadow = Shadow;
         Effect[numEffects].Location.Width = EffectWidth[A];
         Effect[numEffects].Location.Height = EffectHeight[A];
-        Effect[numEffects].Location.X = Location.X + Location.Width / 2.0 - EffectWidth[A] / 2.0 + std::rand() % 4 - 2;
-        Effect[numEffects].Location.Y = Location.Y + Location.Height / 2.0 - EffectHeight[A] / 2.0 + std::rand() % 4 - 2;
+        Effect[numEffects].Location.X = Location.X + Location.Width / 2.0 - EffectWidth[A] / 2.0 + dRand() * 4 - 2;
+        Effect[numEffects].Location.Y = Location.Y + Location.Height / 2.0 - EffectHeight[A] / 2.0 + dRand() * 4 - 2;
         Effect[numEffects].Location.SpeedY = 0;
         Effect[numEffects].Location.SpeedX = 0;
         Effect[numEffects].Frame = 0;
@@ -1539,8 +1540,8 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
         Effect[numEffects].Shadow = Shadow;
         Effect[numEffects].Location.Width = 16;
         Effect[numEffects].Location.Height = 16;
-        Effect[numEffects].Location.X = Location.X + Location.Width / 2.0 - 4 + std::rand() % 4 - 2;
-        Effect[numEffects].Location.Y = Location.Y + Location.Height / 2.0 - 4 + std::rand() % 4 - 2;
+        Effect[numEffects].Location.X = Location.X + Location.Width / 2.0 - 4 + dRand() * 4 - 2;
+        Effect[numEffects].Location.Y = Location.Y + Location.Height / 2.0 - 4 + dRand() * 4 - 2;
         Effect[numEffects].Location.SpeedY = 0;
         Effect[numEffects].Location.SpeedX = 0;
         Effect[numEffects].Frame = 0;

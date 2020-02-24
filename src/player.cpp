@@ -306,7 +306,7 @@ void SetupPlayers()
             else
             {
                 Player[A].Location = Player[1].Location;
-                Player[A].Location.SpeedY = std::rand() % -12 - 6;
+                Player[A].Location.SpeedY = dRand() * -12 - 6;
             }
         }
         Player[A].Section = -1;
@@ -1130,7 +1130,7 @@ void PlayerFrame(int A)
             {
                 if(Player[A].SlideCounter <= 0)
                 {
-                    Player[A].SlideCounter = 2 + std::rand() % 2;
+                    Player[A].SlideCounter = 2 + dRand() * 2;
                     tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height - 5;
                     tempLocation.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - 4;
                     NewEffect(74, tempLocation, 1, 0, ShadowMode);
@@ -1149,7 +1149,7 @@ void PlayerFrame(int A)
             {
                 if(Player[A].SlideCounter <= 0 && Player[A].SlideKill == true)
                 {
-                    Player[A].SlideCounter = 2 + std::rand() % 2;
+                    Player[A].SlideCounter = 2 + dRand() * 2;
                     tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height - 4;
                     if(Player[A].Location.SpeedX < 0)
                         tempLocation.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - 4 + 6;
@@ -1328,7 +1328,7 @@ void PlayerFrame(int A)
                                     PlaySound(10);
                                     if(Player[A].SlideCounter <= 0)
                                     {
-                                        Player[A].SlideCounter = 2 + std::rand() % 2;
+                                        Player[A].SlideCounter = 2 + dRand() * 2;
                                         tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height - 5;
                                         tempLocation.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - 4 + 8 * -Player[A].Direction;
                                         NewEffect(74, tempLocation, 1, 0, ShadowMode);
@@ -1346,7 +1346,7 @@ void PlayerFrame(int A)
                                     PlaySound(10);
                                     if(Player[A].SlideCounter <= 0)
                                     {
-                                        Player[A].SlideCounter = 2 + std::rand() % 2;
+                                        Player[A].SlideCounter = 2 + iRand() % 2;
                                         tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height - 5;
                                         tempLocation.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - 4 + 8 * -Player[A].Direction;
                                         NewEffect(74, tempLocation, 1, 0, ShadowMode);
@@ -1397,7 +1397,7 @@ void PlayerFrame(int A)
                         PlaySound(10);
                         if(Player[A].SlideCounter <= 0)
                         {
-                            Player[A].SlideCounter = 2 + std::rand() % 2;
+                            Player[A].SlideCounter = 2 + iRand() % 2;
                             tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height - 5;
                             tempLocation.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - 4 + 10 * -Player[A].Direction;
                             NewEffect(74, tempLocation, 1, 0, ShadowMode);
@@ -1542,7 +1542,7 @@ void PlayerFrame(int A)
                                     PlaySound(10);
                                     if(Player[A].SlideCounter <= 0)
                                     {
-                                        Player[A].SlideCounter = 2 + std::rand() % 2;
+                                        Player[A].SlideCounter = 2 + iRand() % 2;
                                         tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height - 5;
                                         tempLocation.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - 4 + 6 * -Player[A].Direction;
                                         NewEffect(74, tempLocation, 1, 0, ShadowMode);
@@ -1560,7 +1560,7 @@ void PlayerFrame(int A)
                                     PlaySound(10);
                                     if(Player[A].SlideCounter <= 0)
                                     {
-                                        Player[A].SlideCounter = 2 + std::rand() % 2;
+                                        Player[A].SlideCounter = 2 + iRand() % 2;
                                         tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height - 5;
                                         tempLocation.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - 4 + 10 * -Player[A].Direction;
                                         NewEffect(74, tempLocation, 1, 0, ShadowMode);
@@ -1683,7 +1683,7 @@ void PlayerFrame(int A)
                         PlaySound(10);
                         if(Player[A].SlideCounter <= 0)
                         {
-                            Player[A].SlideCounter = 2 + std::rand() % 2;
+                            Player[A].SlideCounter = 2 + iRand() % 2;
                             tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height - 5;
                             tempLocation.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - 4 + 10 * -Player[A].Direction;
                             NewEffect(74, tempLocation, 1, 0, ShadowMode);
@@ -2253,9 +2253,9 @@ void TailSwipe(int plr, bool boo, bool Stab, int StabDir)
     {
         if(((Player[plr].TailCount) % 10 == 0 && Player[plr].SpinJump == false) || ((Player[plr].TailCount) % 5 == 0 && Player[plr].SpinJump == true))
         {
-            NewEffect (80, newLoc(tailLoc.X + std::fmod(std::rand(), tailLoc.Width) - 4, tailLoc.Y + std::fmod(std::rand(), tailLoc.Height)), 1, 0, ShadowMode);
-            Effect[numEffects].Location.SpeedX = (0.5 + std::rand() % 1) * Player[plr].Direction;
-            Effect[numEffects].Location.SpeedY = std::rand() % 1 - 0.5;
+            NewEffect (80, newLoc(tailLoc.X + (dRand() * tailLoc.Width) - 4, tailLoc.Y + (dRand() * tailLoc.Height)), 1, 0, ShadowMode);
+            Effect[numEffects].Location.SpeedX = (0.5 + dRand() * 1) * Player[plr].Direction;
+            Effect[numEffects].Location.SpeedY = dRand() * 1 - 0.5;
         }
     }
 }
@@ -2334,7 +2334,7 @@ void YoshiEat(int A)
                 }
                 if(NPC[B].Type == 147)
                 {
-                    NPC[B].Type = 139 + static_cast<int>(floor(static_cast<double>(std::rand() % 9)));
+                    NPC[B].Type = 139 + (iRand() % 9);
                     if(NPC[B].Type == 147)
                         NPC[B].Type = 92;
                     NPC[B].Location.X = NPC[B].Location.X + NPC[B].Location.Width / 2.0;
@@ -3012,7 +3012,7 @@ void YoshiEatCode(int A)
             }
             else if(Player[A].MountType == 7 && NPCIsABonus[NPC[Player[A].YoshiNPC].Type] == false)
             {
-                B = static_cast<int>(floor(static_cast<double>(std::rand() % 9)));
+                B = (iRand() % 9);
                 NPC[Player[A].YoshiNPC].Type = 139 + B;
                 if(NPC[Player[A].YoshiNPC].Type == 147)
                     NPC[Player[A].YoshiNPC].Type = 92;
@@ -3418,12 +3418,12 @@ void WaterCheck(int A)
     }
     else if(Player[A].Wet == 2 && Player[A].Quicksand == 0)
     {
-        if(std::rand() % 100 > 97)
+        if(dRand() * 100.0 > 97.0)
         {
             if(Player[A].Direction == 1)
-                tempLocation = newLoc(Player[A].Location.X + Player[A].Location.Width - std::rand() % 8, Player[A].Location.Y + 4 + std::rand() % 8, 8, 8);
+                tempLocation = newLoc(Player[A].Location.X + Player[A].Location.Width - dRand() * 8, Player[A].Location.Y + 4 + dRand() * 8, 8, 8);
             else
-                tempLocation = newLoc(Player[A].Location.X - 8 + std::rand() % 8, Player[A].Location.Y + 4 + std::rand() % 8, 8, 8);
+                tempLocation = newLoc(Player[A].Location.X - 8 + dRand() * 8, Player[A].Location.Y + 4 + dRand() * 8, 8, 8);
             if(!UnderWater[Player[A].Section])
             {
                 for(B = 1; B <= numWater; B++)
@@ -4181,7 +4181,7 @@ void PlayerCollide(int A)
                         Player[A].Bumped2 = -1;
                         Player[B].Bumped2 = 1;
                     }
-                    else if(static_cast<int>(floor(static_cast<double>(std::rand() % 2))) == 1)
+                    else if(iRand() % 2 == 1)
                     {
                         Player[A].Bumped2 = -1;
                         Player[B].Bumped2 = 1;
@@ -4281,7 +4281,7 @@ void PlayerGrabCode(int A, bool DontResetGrabTime)
                         NPC[Player[A].StandingOnNPC].Location.Width = NPCWidth[NPC[Player[A].StandingOnNPC].Type];
                         if(NPC[Player[A].StandingOnNPC].Type == 147)
                         {
-                            B = static_cast<int>(floor(static_cast<double>(std::rand() % 9)));
+                            B = (iRand() % 9);
                             NPC[Player[A].StandingOnNPC].Type = 139 + B;
                             if(NPC[Player[A].StandingOnNPC].Type == 147)
                                 NPC[Player[A].StandingOnNPC].Type = 92;
@@ -4438,8 +4438,8 @@ void PlayerGrabCode(int A, bool DontResetGrabTime)
                     {
                         if(NPC[Player[A].HoldingNPC].Type == 13 || NPC[Player[A].HoldingNPC].Type == 265)
                         {
-                            NPC[Player[A].HoldingNPC].Location.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - NPC[Player[A].HoldingNPC].Location.Width / 2.0 + std::rand() % 4 - 2;
-                            NPC[Player[A].HoldingNPC].Location.Y = Player[A].Location.Y - NPC[Player[A].HoldingNPC].Location.Height - 4 + std::rand() % 4 - 2;
+                            NPC[Player[A].HoldingNPC].Location.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - NPC[Player[A].HoldingNPC].Location.Width / 2.0 + dRand() * 4 - 2;
+                            NPC[Player[A].HoldingNPC].Location.Y = Player[A].Location.Y - NPC[Player[A].HoldingNPC].Location.Height - 4 + dRand() * 4 - 2;
                         }
                         else
                             NPC[Player[A].HoldingNPC].Location.Y = Player[A].Location.Y - NPC[Player[A].HoldingNPC].Location.Height + 10;
@@ -4788,7 +4788,7 @@ void LinkFrame(int A)
             {
                 if(Player[A].SlideCounter <= 0)
                 {
-                    Player[A].SlideCounter = 2 + std::rand() % 2;
+                    Player[A].SlideCounter = 2 + dRand() * 2;
                     tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height - 5;
                     tempLocation.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - 4;
                     NewEffect(74, tempLocation, 1, 0, ShadowMode);
@@ -4897,7 +4897,7 @@ void LinkFrame(int A)
             if(Player[A].SlideCounter <= 0)
             {
                 PlaySound(86);
-                Player[A].SlideCounter = 2 + std::rand() % 2;
+                Player[A].SlideCounter = 2 + dRand() * 2;
                 tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height - 4;
                 if(Player[A].Location.SpeedX < 0)
                     tempLocation.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - 6 - 4;
@@ -5313,7 +5313,7 @@ void PlayerEffects(int A)
                         else
                             Player[B].Location.Y = Player[A].Location.Y;
                         Player[B].Location.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - Player[B].Location.Width / 2.0;
-                        Player[B].Location.SpeedY = std::rand() % 24 - 12;
+                        Player[B].Location.SpeedY = dRand() * 24 - 12;
                         Player[B].Effect = 8;
                         Player[B].Effect2 = 0;
                         CheckSection(B);
@@ -5494,7 +5494,7 @@ void PlayerEffects(int A)
                         else
                             Player[B].Location.Y = Player[A].Location.Y;
                         Player[B].Location.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - Player[B].Location.Width / 2.0;
-                        Player[B].Location.SpeedY = std::rand() % 24 - 12;
+                        Player[B].Location.SpeedY = dRand() * 24 - 12;
                         Player[B].Effect = 0;
                         Player[B].Effect2 = 0;
                         CheckSection(B);
@@ -5563,7 +5563,7 @@ void PlayerEffects(int A)
                     {
                         Player[B].Location.Y = Player[A].Location.Y + Player[A].Location.Height - Player[B].Location.Height;
                         Player[B].Location.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - Player[B].Location.Width / 2.0;
-                        Player[B].Location.SpeedY = std::rand() % 24 - 12;
+                        Player[B].Location.SpeedY = dRand() * 24 - 12;
                         CheckSection(B);
                         if(Player[B].HoldingNPC > 0)
                         {
@@ -5926,10 +5926,10 @@ void PlayerEffects(int A)
     {
         for(B = 1; B <= 2; B++)
         {
-            NewEffect(80, newLoc(Player[A].Location.X + std::fmod(std::rand(), Player[A].Location.Width + 8) - 8,
-                                 Player[A].Location.Y + std::fmod(std::rand(), Player[A].Location.Height + 8) - 4), 1, 0, ShadowMode);
-            Effect[numEffects].Location.SpeedX = std::rand() % 2 - 1;
-            Effect[numEffects].Location.SpeedY = std::rand() % 2 - 1;
+            NewEffect(80, newLoc(Player[A].Location.X + dRand() * (Player[A].Location.Width + 8) - 8,
+                                 Player[A].Location.Y + dRand() * (Player[A].Location.Height + 8) - 4), 1, 0, ShadowMode);
+            Effect[numEffects].Location.SpeedX = dRand() * 2 - 1;
+            Effect[numEffects].Location.SpeedY = dRand() * 2 - 1;
         }
 
         if(Player[A].Effect2 == 0.0)

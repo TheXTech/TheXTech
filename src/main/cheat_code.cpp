@@ -726,10 +726,10 @@ void CheatCode(char NewKey)
                     if(C != B)
                     {
                         Player[C] = Player[B];
-                        Player[C].Location.SpeedY = std::rand() % 24 - 12;
+                        Player[C].Location.SpeedY = dRand() * 24 - 12;
                     }
                 }
-                Bomb(Player[B].Location, (std::rand() % 2) + 2);
+                Bomb(Player[B].Location, (iRand() % 2) + 2);
             }
             CheatString.clear();
             cheated = true;
@@ -750,10 +750,10 @@ void CheatCode(char NewKey)
                     if(C != B)
                     {
                         Player[C] = Player[B];
-                        Player[C].Location.SpeedY = std::rand() % 24 - 12;
+                        Player[C].Location.SpeedY = dRand() * 24 - 12;
                     }
                 }
-                Bomb(Player[B].Location, (std::rand() % 2) + 2);
+                Bomb(Player[B].Location, (iRand() % 2) + 2);
             }
             CheatString.clear();
             cheated = true;
@@ -774,10 +774,10 @@ void CheatCode(char NewKey)
                     if(C != B)
                     {
                         Player[C] = Player[B];
-                        Player[C].Location.SpeedY = std::rand() % 24 - 12;
+                        Player[C].Location.SpeedY = dRand() * 24 - 12;
                     }
                 }
-                Bomb(Player[B].Location, (std::rand() % 2) + 2);
+                Bomb(Player[B].Location, (iRand() % 2) + 2);
             }
             CheatString.clear();
             cheated = true;
@@ -798,10 +798,10 @@ void CheatCode(char NewKey)
                     if(C != B)
                     {
                         Player[C] = Player[B];
-                        Player[C].Location.SpeedY = std::rand() % 24 - 12;
+                        Player[C].Location.SpeedY = dRand() * 24 - 12;
                     }
                 }
-                Bomb(Player[B].Location, (std::rand() % 2) + 2);
+                Bomb(Player[B].Location, (iRand() % 2) + 2);
             }
             CheatString.clear();
             cheated = true;
@@ -822,10 +822,10 @@ void CheatCode(char NewKey)
                     if(C != B)
                     {
                         Player[C] = Player[B];
-                        Player[C].Location.SpeedY = std::rand() % 24 - 12;
+                        Player[C].Location.SpeedY = dRand() * 24 - 12;
                     }
                 }
-                Bomb(Player[B].Location, (std::rand() % 2) + 2);
+                Bomb(Player[B].Location, (iRand() % 2) + 2);
             }
             CheatString.clear();
             cheated = true;
@@ -846,10 +846,10 @@ void CheatCode(char NewKey)
                     if(C != B)
                     {
                         Player[C] = Player[B];
-                        Player[C].Location.SpeedY = std::rand() % 24 - 12;
+                        Player[C].Location.SpeedY = dRand() * 24 - 12;
                     }
                 }
-                Bomb(Player[B].Location, (std::rand() % 2) + 2);
+                Bomb(Player[B].Location, (iRand() % 2) + 2);
             }
             CheatString.clear();
             cheated = true;
@@ -871,7 +871,7 @@ void CheatCode(char NewKey)
                     if(C != B)
                     {
                         Player[C] = Player[B];
-                        Player[C].Location.SpeedY = std::rand() % 24 - 12;
+                        Player[C].Location.SpeedY = dRand() * 24 - 12;
                     }
                     if(C == 1)
                     {
@@ -900,7 +900,7 @@ void CheatCode(char NewKey)
                         }
                     }
                 }
-                Bomb(Player[B].Location, (std::rand() % 2) + 2);
+                Bomb(Player[B].Location, (iRand() % 2) + 2);
             }
             CheatString.clear();
             cheated = true;
@@ -916,7 +916,7 @@ void CheatCode(char NewKey)
                 {
                     if(C != B)
                     {
-                        Bomb(Player[C].Location, (std::rand() % 2) + 2);
+                        Bomb(Player[C].Location, (iRand() % 2) + 2);
                     }
                 }
                 numPlayers = 1;
@@ -961,7 +961,7 @@ void CheatCode(char NewKey)
                     if(C != B)
                     {
                         Player[C] = Player[B];
-                        Player[C].Location.SpeedY = std::rand() % -12;
+                        Player[C].Location.SpeedY = dRand() * -12;
                     }
                     if(C == 1)
                     {
@@ -990,7 +990,7 @@ void CheatCode(char NewKey)
                         }
                     }
                 }
-                Bomb(Player[B].Location, (std::rand() % 2) + 2);
+                Bomb(Player[B].Location, (iRand() % 2) + 2);
             }
             CheatString.clear();
             cheated = true;

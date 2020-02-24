@@ -62,9 +62,9 @@ void KillNPC(int A, int B)
             tempLocation.X = NPC[A].Location.X - tempLocation.Width / 2.0 + dRand() * NPC[A].Location.Width;
             tempLocation.Y = NPC[A].Location.Y - tempLocation.Height / 2.0 + dRand() * NPC[A].Location.Height;
             NewEffect(80, tempLocation);
-            Effect[numEffects].Location.SpeedX = std::rand() % 4 - 2 - NPC[A].Location.SpeedX * 0.2;
-            Effect[numEffects].Location.SpeedY = std::rand() % 4 - 2 + NPC[A].Location.SpeedY * 0.2;
-            Effect[numEffects].Frame = static_cast<int>(floor(static_cast<double>(std::rand() % 3)));
+            Effect[numEffects].Location.SpeedX = dRand() * 4 - 2 - NPC[A].Location.SpeedX * 0.2;
+            Effect[numEffects].Location.SpeedY = dRand() * 4 - 2 + NPC[A].Location.SpeedY * 0.2;
+            Effect[numEffects].Frame = (iRand() % 3);
         }
         PlaySound(9);
         NPC[A].Type = NPC[A].Special;
@@ -193,14 +193,14 @@ void KillNPC(int A, int B)
             PlaySound(53);
             NewEffect(63 , NPC[A].Location);
             B = 9;
-            if(std::rand() % 10 <= 3)
+            if(dRand() * 10 <= 3)
             {
                 numNPCs++;
                 NPC[numNPCs] = NPC_t();
                 NPC[numNPCs].Type = 251;
-                if(std::rand() % 15 <= 3)
+                if(dRand() * 15 <= 3)
                     NPC[numNPCs].Type = 252;
-                if(std::rand() % 40 <= 3)
+                if(dRand() * 40 <= 3)
                     NPC[numNPCs].Type = 253;
                 NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
                 NPC[numNPCs].Location.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
@@ -325,9 +325,9 @@ void KillNPC(int A, int B)
                         tempLocation.X = NPC[A].Location.X - tempLocation.Width / 2.0 + dRand() * NPC[A].Location.Width;
                         tempLocation.Y = NPC[A].Location.Y - tempLocation.Height / 2.0 + dRand() * NPC[A].Location.Height;
                         NewEffect(80, tempLocation);
-                        Effect[numEffects].Location.SpeedX = std::rand() % 2 - 1 - NPC[A].Location.SpeedX * 0.3;
-                        Effect[numEffects].Location.SpeedY = std::rand() % 2 - 1 + NPC[A].Location.SpeedY * 0.3;
-                        Effect[numEffects].Frame = static_cast<int>(floor(static_cast<double>(std::rand() % 3)));
+                        Effect[numEffects].Location.SpeedX = dRand() * 2 - 1 - NPC[A].Location.SpeedX * 0.3;
+                        Effect[numEffects].Location.SpeedY = dRand() * 2 - 1 + NPC[A].Location.SpeedY * 0.3;
+                        Effect[numEffects].Frame = iRand() % 3;
                     }
                 }
                 else
@@ -1236,8 +1236,8 @@ void KillNPC(int A, int B)
                         NewEffect(139, NPC[A].Location, static_cast<float>(NPC[A].Special), 0, NPC[A].Shadow);
                     else
                         NewEffect(77, NPC[A].Location, static_cast<float>(NPC[A].Special), 0, NPC[A].Shadow);
-                    Effect[numEffects].Location.SpeedX = std::rand() % 3 - 1.5 + NPC[A].Location.SpeedX * 0.1;
-                    Effect[numEffects].Location.SpeedY = std::rand() % 3 - 1.5 - NPC[A].Location.SpeedY * 0.1;
+                    Effect[numEffects].Location.SpeedX = dRand() * 3 - 1.5 + NPC[A].Location.SpeedX * 0.1;
+                    Effect[numEffects].Location.SpeedY = dRand() * 3 - 1.5 - NPC[A].Location.SpeedY * 0.1;
                 }
                 NPC[A].Location.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0 - EffectWidth[10] / 2.0;
                 NPC[A].Location.Y = NPC[A].Location.Y + NPC[A].Location.Height / 2.0 - EffectHeight[10] / 2.0;

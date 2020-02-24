@@ -480,7 +480,7 @@ void UpdateGraphics(bool skipRepaint)
                         Player[A].Section = Player[D].Section;
                         Player[A].Location.SpeedX = Player[D].Location.SpeedX;
                         Player[A].Location.SpeedY = Player[D].Location.SpeedY;
-                        Player[A].Location.SpeedY = std::rand() % 12 - 6;
+                        Player[A].Location.SpeedY = dRand() * 12 - 6;
                         Player[A].CanJump = true;
                     }
 //                    End With
@@ -2451,8 +2451,8 @@ void UpdateGraphics(bool skipRepaint)
                 }
                 else
                 {
-                    A = (std::rand() % ScreenShake * 4) - ScreenShake * 2;
-                    B = (std::rand() % ScreenShake * 4) - ScreenShake * 2;
+                    A = (iRand() % ScreenShake * 4) - ScreenShake * 2;
+                    B = (iRand() % ScreenShake * 4) - ScreenShake * 2;
                     frmMain.offsetViewport(A, B);
                 }
             }

@@ -155,7 +155,7 @@ void UpdateNPCs()
             {
                 if(NPC[A].Location.SpeedX == 0.0)
                 {
-                    NPC[A].Location.SpeedX = std::rand() % 2 - 1;
+                    NPC[A].Location.SpeedX = dRand() * 2 - 1;
                     if(NPC[A].Location.SpeedX < 0)
                         NPC[A].Location.SpeedX = NPC[A].Location.SpeedX - 0.5;
                     else
@@ -333,7 +333,7 @@ void UpdateNPCs()
                                     NPC[numNPCs].Location.SpeedX = 0;
                                     NewEffect(10, newLoc(NPC[A].Location.X, NPC[A].Location.Y + 16, 32, 32));
                                     if(NPCIsVeggie[NPC[numNPCs].Type] == true)
-                                        NPC[numNPCs].Location.SpeedX = std::rand() % 2 - 1;
+                                        NPC[numNPCs].Location.SpeedX = dRand() * 2 - 1;
                                     // NPC(numNPCs).Location.SpeedY = -1
                                 }
                                 else if(NPC[A].GeneratorDirection == 2)
@@ -687,7 +687,7 @@ void UpdateNPCs()
                     NPC[A].Special = 100;
             }
             if(NPC[A].Type == 84 || NPC[A].Type == 181)
-                NPC[A].Special = static_cast<int>(floor(static_cast<double>(std::rand() % 200)));
+                NPC[A].Special = iRand() % 200;
             NPC[A].JustActivated = 0;
             NPC[A].CantHurt = 0;
             NPC[A].CantHurtPlayer = 0;
@@ -844,7 +844,7 @@ void UpdateNPCs()
 
             if(NPC[A].Type == 147)
             {
-                B = static_cast<int>(floor(static_cast<double>(std::rand() % 9)));
+                B = iRand() % 9;
                 NPC[A].Type = 139 + B;
                 if(NPC[A].Type == 147)
                     NPC[A].Type = 92;
@@ -960,7 +960,7 @@ void UpdateNPCs()
                             NPC[A].Location.Width = NPCWidth[NPC[A].Type];
                             if(NPC[A].Type == 147)
                             {
-                                B = static_cast<int>(floor(static_cast<double>(std::rand() % 9)));
+                                B = iRand() % 9;
                                 NPC[A].Type = 139 + B;
                                 if(NPC[A].Type == 147)
                                     NPC[A].Type = 92;
@@ -1028,7 +1028,7 @@ void UpdateNPCs()
                         }
                         if(NPC[A].Type == 237 || NPC[A].Type == 263) // Yoshi Ice
                         {
-                            if(std::rand() % 100 > 93)
+                            if(dRand() * 100 > 93)
                             {
                                 tempLocation.Height = EffectHeight[80];
                                 tempLocation.Width = EffectWidth[80];
@@ -1158,7 +1158,7 @@ void UpdateNPCs()
                     {
                         if(NPC[A].Direction == 0)
                         {
-                            if(static_cast<int>(floor(static_cast<double>(std::rand() % 2))) == 0)
+                            if(iRand() % 2 == 0)
                                 NPC[A].Direction = -1;
                             else
                                 NPC[A].Direction = 1;
@@ -3765,13 +3765,13 @@ void UpdateNPCs()
                     NPC[A].Special2 = NPC[A].Special2 + dRand();
                     if(NPC[A].Special4 == 0 && tempBool == true)
                     {
-                        if(NPC[A].Special2 >= 200 + std::rand() % 400 - std::rand() % 200) // hop on player
+                        if(NPC[A].Special2 >= 200 + dRand() * 400 - dRand() * 200) // hop on player
                         {
-                            if(NPC[A].Special2 >= 200 + std::rand() % 600)
+                            if(NPC[A].Special2 >= 200 + dRand() * 600)
                                 NPC[A].Special2 = 0;
                             NPC[A].Special4 = 3;
                         }
-                        else if((NPC[A].Special2 >= 80 && NPC[A].Special2 <= 130) || (NPC[A].Special2 >= 160 + std::rand() % 300 && NPC[A].Special2 <= 180 + std::rand() % 800)) // shoot fireball
+                        else if((NPC[A].Special2 >= 80 && NPC[A].Special2 <= 130) || (NPC[A].Special2 >= 160 + dRand() * 300 && NPC[A].Special2 <= 180 + dRand() * 800)) // shoot fireball
                             NPC[A].Special4 = 4;
                     }
                     if(NPC[A].Inert == true)
@@ -4416,7 +4416,7 @@ void UpdateNPCs()
                         {
                             NPC[A].Location.SpeedX = 0;
                             if(NPC[A].Special == 0)
-                                NPC[A].Special = static_cast<int>(floor(static_cast<double>(std::rand() % 3))) + 1;
+                                NPC[A].Special = (iRand() % 3) + 1;
                             if(NPC[A].Special == 1)
                             {
                                 NPC[A].FrameCount = NPC[A].FrameCount + 1;
@@ -4762,7 +4762,7 @@ void UpdateNPCs()
         {
             if(NPC[A].Location.SpeedX == 0.0)
             {
-                NPC[A].Location.SpeedX = std::rand() % 2 - 1;
+                NPC[A].Location.SpeedX = dRand() * 2 - 1;
                 if(NPC[A].Location.SpeedX < 0)
                     NPC[A].Location.SpeedX = NPC[A].Location.SpeedX - 0.5;
                 else

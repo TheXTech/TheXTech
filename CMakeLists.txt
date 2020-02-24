@@ -150,6 +150,7 @@ set(A2XTECH_SRC
     src/gfx.cpp
     src/frm_main.cpp
     src/player.cpp
+    src/rand.cpp
     src/sorting.cpp
     src/npc/npc_hit.cpp
     src/npc/npc_kill.cpp

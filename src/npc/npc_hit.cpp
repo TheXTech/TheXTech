@@ -155,9 +155,9 @@ void NPCHit(int A, int B, int C)
                 tempLocation.X = NPC[A].Location.X - tempLocation.Width / 2.0 + dRand() * NPC[A].Location.Width - 4;
                 tempLocation.Y = NPC[A].Location.Y - tempLocation.Height / 2.0 + dRand() * NPC[A].Location.Height - 4;
                 NewEffect(80, tempLocation);
-                Effect[numEffects].Location.SpeedX = std::rand() % 2 - 1;
-                Effect[numEffects].Location.SpeedY = std::rand() % 2 - 1;
-                Effect[numEffects].Frame = static_cast<int>(floor(static_cast<double>(std::rand() % 3)));
+                Effect[numEffects].Location.SpeedX = dRand() * 2 - 1;
+                Effect[numEffects].Location.SpeedY = dRand() * 2 - 1;
+                Effect[numEffects].Frame = iRand() % 3;
             }
 
             PlaySound(9);
@@ -335,7 +335,7 @@ void NPCHit(int A, int B, int C)
         NPC[A].Location.Height = NPCHeight[NPC[A].Type];
         NPC[A].Location.Width = NPCWidth[NPC[A].Type];
         NPC[A].Location.Y = NPC[A].Location.Y - NPC[A].Location.Height;
-        NPC[A].Location.SpeedX = (3 + std::rand() % 1) * Player[C].Direction;
+        NPC[A].Location.SpeedX = (3 + dRand() * 1) * Player[C].Direction;
         if(NPC[A].Type == 17)
             NPC[A].Location.SpeedX = 5 * Player[C].Direction;
         NPC[A].Location.SpeedY = -4;
@@ -347,9 +347,9 @@ void NPCHit(int A, int B, int C)
                 NPC[A].Type = 251;
             NPC[A].Location.SpeedX = (1 + dRand() * 0.5) * Player[C].Direction;
             NPC[A].Location.SpeedY = -5;
-            if(std::rand() % 20 < 3)
+            if(dRand() * 20 < 3)
                 NPC[A].Type = 252;
-            if(std::rand() % 40 < 3)
+            if(dRand() * 40 < 3)
                 NPC[A].Type = 253;
             NPC[A].Location.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0;
             NPC[A].Location.Y = NPC[A].Location.Y + NPC[A].Location.Height;
@@ -1031,7 +1031,7 @@ void NPCHit(int A, int B, int C)
                     NPC[A].Location.SpeedY = -4;
                 if(NPC[A].Location.SpeedX == 0.0)
                 {
-                    if(std::rand() % 2 == 1)
+                    if(iRand() % 2 == 1)
                         NPC[A].Location.SpeedX = 2;
                     else
                         NPC[A].Location.SpeedX = -2;

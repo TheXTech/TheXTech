@@ -1652,7 +1652,7 @@ void MenuLoop()
         if(p.HoldingNPC ==0)
         {
 //                If (.State = 3 Or .State = 6 Or .State = 7) And Rnd * 100 > 90 Then
-            if((p.State ==3 || p.State == 6 || p.State == 7) && std::rand() % 100 > 90)
+            if((p.State ==3 || p.State == 6 || p.State == 7) && (dRand() * 100.0) > 90.0)
             {
 //                    If .FireBallCD = 0 And .RunRelease = False Then
                 if(p.FireBallCD == 0 && !p.RunRelease) {
@@ -1838,7 +1838,7 @@ void MenuLoop()
 //                .ForceHold = 65
             p.ForceHold = 65;
 //                .State = Int(Rnd * 6) + 2
-            p.State = (std::rand() % 6) + 2;
+            p.State = (iRand() % 6) + 2;
 //                .CanFly = False
             p.CanFly = false;
 //                .CanFly2 = False
@@ -1850,7 +1850,7 @@ void MenuLoop()
 //                .TimeToLive = 0
             p.TimeToLive = 0;
 //                .Character = Int(Rnd * 5) + 1
-            p.Character = (std::rand() % 5) + 1;
+            p.Character = (iRand() % 5) + 1;
 //                If A >= 1 And A <= 5 Then .Character = A
             if(A >= 1 && A <= 5) p.Character = A;
 //                .HeldBonus = 0
@@ -1956,12 +1956,12 @@ void MenuLoop()
             if(!UnderWater[p.Section])
             {
 //                    If Int(Rnd * 25) + 1 = 25 Then
-                if((std::rand() % 25) + 1 == 25)
+                if((iRand() % 25) + 1 == 25)
                 {
 //                        .Mount = 1
                     p.Mount = 1;
 //                        .MountType = Int(Rnd * 3) + 1
-                    p.MountType = (std::rand() % 3) + 1;
+                    p.MountType = (iRand() % 3) + 1;
 //                        If .State = 1 Then
                     if(p.State == 1)
                     {
@@ -1980,12 +1980,12 @@ void MenuLoop()
             if(p.Mount == 0 && p.Character <= 2)
             {
 //                    If Int(Rnd * 15) + 1 = 15 Then
-                if((std::rand() % 15) + 1 == 15)
+                if((iRand() % 15) + 1 == 15)
                 {
 //                        .Mount = 3
                     p.Mount = 3;
 //                        .MountType = Int(Rnd * 7) + 1
-                    p.MountType = (std::rand() % 7) + 1;
+                    p.MountType = (iRand() % 7) + 1;
 //                        .Location.Y = .Location.Y + .Location.Height
                     p.Location.Y = p.Location.Y + p.Location.Height;
 //                        .Location.Height = Physics.PlayerHeight(2, 2)
@@ -2022,7 +2022,7 @@ void MenuLoop()
                         do
                         {
 //                                .Type = Int(Rnd * 286) + 1
-                            n.Type = (std::rand() % 286) + 1;
+                            n.Type = (iRand() % 286) + 1;
 //                            Loop While .Type = 11 Or .Type = 16 Or .Type = 18 Or .Type = 15 Or .Type = 21 Or .Type = 12 Or .Type = 13 Or .Type = 30 Or .Type = 17 Or .Type = 31 Or .Type = 32 Or (.Type >= 37 And .Type <= 44) Or .Type = 46 Or .Type = 47 Or .Type = 50 Or (.Type >= 56 And .Type <= 70) Or .Type = 8 Or .Type = 74 Or .Type = 51 Or .Type = 52 Or .Type = 75 Or .Type = 34 Or NPCIsToad(.Type) Or NPCIsAnExit(.Type) Or NPCIsYoshi(.Type) Or (.Type >= 78 And .Type <= 87) Or .Type = 91 Or .Type = 93 Or (.Type >= 104 And .Type <= 108) Or .Type = 125 Or .Type = 133 Or (.Type >= 148 And .Type <= 151) Or .Type = 159 Or .Type = 160 Or .Type = 164 Or .Type = 168 Or (.Type >= 154 And .Type <= 157) Or .Type = 159 Or .Type = 160 Or .Type = 164 Or .Type = 165 Or .Type = 171 Or .Type = 178 Or .Type = 197 Or .Type = 180 Or .Type = 181 Or .Type = 190 Or .Type = 192 Or .Type = 196 Or .Type = 197 Or (UnderWater(0) = True And NPCIsBoot(.Type) = True) Or (.Type >= 198 And .Type <= 228) Or .Type = 234
                         } while(n.Type == 11 || n.Type == 16 || n.Type == 18 || n.Type == 15 ||
                                 n.Type == 21 || n.Type == 12 || n.Type == 13 || n.Type == 30 ||
@@ -2083,16 +2083,16 @@ void MenuLoop()
             if(p.Location.SpeedY == 0.0 || p.Slope > 0)
                 p.CanJump = true;
 //                If Rnd * 100 > 98 Or .Location.SpeedY = 0 Or .Slope > 0 Then .Controls.Jump = True
-            if(std::rand() % 100 > 98 || p.Location.SpeedY == 0.0 || p.Slope > 0)
+            if((dRand() * 100) > 98.0 || p.Location.SpeedY == 0.0 || p.Slope > 0)
                 p.Controls.Jump = true;
 //            End If
         }
 
-        if(std::rand() % 100 > 95 && Player[A].HoldingNPC == 0 && Player[A].Slide == false && Player[A].CanAltJump == true && Player[A].Mount == 0)
+        if((dRand() * 100) > 95.0 && Player[A].HoldingNPC == 0 && Player[A].Slide == false && Player[A].CanAltJump == true && Player[A].Mount == 0)
             Player[A].Controls.AltJump = true;
-        if(std::rand() % 1000 >= 999 && Player[A].CanFly2 == false)
+        if(dRand() * 1000 >= 999 && Player[A].CanFly2 == false)
             Player[A].Controls.Run = false;
-        if(Player[A].Mount == 3 && std::rand() % 100 >= 98 && Player[A].RunRelease == false)
+        if(Player[A].Mount == 3 && dRand() * 100 >= 98 && Player[A].RunRelease == false)
             Player[A].Controls.Run = false;
         if(NPC[Player[A].HoldingNPC].Type == 22 || NPC[Player[A].HoldingNPC].Type == 49)
             Player[A].Controls.Run = true;
@@ -2108,14 +2108,14 @@ void MenuLoop()
             Player[A].CanJump = true;
             Player[A].Controls.Jump = true;
         }
-        if(Player[A].FloatTime > 0 || (Player[A].CanFloat == true && Player[A].FloatRelease == true && Player[A].Jump == 0 && Player[A].Location.SpeedY > 0 && std::rand() % 100 > 95))
+        if(Player[A].FloatTime > 0 || (Player[A].CanFloat == true && Player[A].FloatRelease == true && Player[A].Jump == 0 && Player[A].Location.SpeedY > 0 && (dRand() * 100) > 95.0))
             Player[A].Controls.Jump = true;
-        if(NPC[Player[A].HoldingNPC].Type == 13 && std::rand() % 100 > 95)
+        if(NPC[Player[A].HoldingNPC].Type == 13 && (dRand() * 100) > 95.0)
         {
             Player[A].Controls.Run = false;
-            if(std::rand() % 2 == 1)
+            if(iRand() % 2 == 1)
                 Player[A].Controls.Up = true;
-            if(std::rand() % 2 == 1)
+            if(iRand() % 2 == 1)
                 Player[A].Controls.Right = false;
         }
 
@@ -2195,14 +2195,14 @@ void MenuLoop()
     if(MenuMouseDown)
     {
 //        If Rnd * 100 > 40 Then
-        if(std::rand() % 100 > 40)
+        if(dRand() * 100 > 40.0)
         {
 //            NewEffect 80, newLoc(MenuMouseX - vScreenX(1), MenuMouseY - vScreenY(1))
             NewEffect(80, newLoc(MenuMouseX - vScreenX[1], MenuMouseY - vScreenY[1]));
 //            Effect(numEffects).Location.SpeedX = Rnd * 4 - 2
-            Effect[numEffects].Location.SpeedX = std::rand() % 4 - 2;
+            Effect[numEffects].Location.SpeedX = dRand() * 4 - 2;
 //            Effect(numEffects).Location.SpeedY = Rnd * 4 - 2
-            Effect[numEffects].Location.SpeedY = std::rand() % 4 - 2;
+            Effect[numEffects].Location.SpeedY = dRand() * 4 - 2;
 //        End If
         }
 //        For A = 1 To numNPCs

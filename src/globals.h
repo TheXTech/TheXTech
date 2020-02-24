@@ -35,6 +35,7 @@
 
 #include "location.h"
 #include "range_arr.hpp"
+#include "rand.h"
 
 //Option Explicit
 //Public Declare Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As Long)
@@ -59,31 +60,47 @@
 
 #define UNUSED(x) (void)x
 
+//! Main window
 extern FrmMain frmMain;
+//! Container of "hardcoded" (no more) graphics
 extern GFX_t GFX;
 
+//! Showing that game is works. It gets false when closing a window or exiting a game by menu. To mean that application must be closed.
 extern bool GameIsActive;
+//! Path to game resources assets (by default it's ~/.PGE_Project/a2xtech/)
 extern std::string AppPath;
 
+/**
+ * @brief Process internal events (mouse, keyboard, joysticks, window's update, OS communications, etc.)
+ */
 extern void DoEvents();
 
+/**
+ *  \brief Toggle whether or not the cursor is shown.
+ *
+ *  \param toggle 1 to show the cursor, 0 to hide it, -1 to query the current
+ *                state.
+ *
+ *  \return 1 if the cursor is shown, or 0 if the cursor is hidden.
+ */
 extern int showCursor(int show);
 
 extern Uint8 getKeyState(SDL_Scancode key);
 extern Uint8 getKeyStateI(int key);
 
+/**
+ * @brief Get name of key from a keycode
+ * @param key Key code
+ * @return Human-readable key name
+ */
 const char *getKeyName(int key);
 
-static SDL_INLINE float fRand()
-{
-    return static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX);
-}
-
-static SDL_INLINE double dRand()
-{
-    return static_cast <double>(std::rand()) / static_cast<double>(RAND_MAX);
-}
-
+/**
+ * @brief Comparison of two floating point numbers
+ * @param a First argument
+ * @param b Second argument
+ * @return true whe both arguments are equal (almost)
+ */
 static SDL_INLINE bool fEqual(double a, double b)
 {
     Sint64 ai = Sint64(a * 1000000.0);
@@ -91,6 +108,12 @@ static SDL_INLINE bool fEqual(double a, double b)
     return ai == bi;
 }
 
+/**
+ * @brief Comparison of two floating point numbers
+ * @param a First argument
+ * @param b Second argument
+ * @return true whe both arguments are equal (almost)
+ */
 static SDL_INLINE bool fEqual(float a, float b)
 {
     Sint64 ai = Sint64(a * 10000.0f);

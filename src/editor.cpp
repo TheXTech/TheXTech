@@ -40,7 +40,7 @@ int EditorNPCFrame(int A, float C, int N)
     int E = 0;
     B = C;
     while(int(B) == 0)
-        B = (std::rand() % 3) - 1;
+        B = (iRand() % 3) - 1;
 
     if(LevelEditor == false)
         C = B;

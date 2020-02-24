@@ -185,7 +185,8 @@ void Bomb(Location_t Location, int Game, int ImmunePlayer)
                 A = std::abs(NPC[i].Location.X + NPC[i].Location.Width / 2.0 - X);
                 B = std::abs(NPC[i].Location.Y + NPC[i].Location.Height / 2.0 - Y);
                 C = std::sqrt(std::pow(A, 2) + std::pow(B, 2));
-                if((float)C <= Radius + (NPC[i].Location.Width / 4.0 + NPC[i].Location.Height / 4.0))
+
+                if(static_cast<float>(C) <= static_cast<float>(Radius) + static_cast<float>(NPC[i].Location.Width / 4.0 + NPC[i].Location.Height / 4.0))
                 {
                     NPC[0].Location = NPC[i].Location;
                     NPCHit(i, 3, 0);
@@ -193,7 +194,7 @@ void Bomb(Location_t Location, int Game, int ImmunePlayer)
                     {
                         NPC[i].Projectile = true;
                         NPC[i].Location.SpeedY = -5;
-                        NPC[i].Location.SpeedX = std::rand() % 4 - 2;
+                        NPC[i].Location.SpeedX = dRand() * 4 - 2;
                     }
                 }
             }
@@ -502,9 +503,9 @@ void NPCSpecial(int A)
             for(B = 1; B <= 5; B++)
             {
                 NewEffect(80, newLoc(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - 4, NPC[A].Location.Y + NPC[A].Location.Height / 2.0 - 6), 1, 0, NPC[A].Shadow);
-                Effect[numEffects].Location.SpeedX = std::rand() % 6 - 3;
-                Effect[numEffects].Location.SpeedY = std::rand() % 6 - 3;
-                Effect[numEffects].Frame = static_cast<int>(floor(static_cast<double>(std::rand() % 3)));
+                Effect[numEffects].Location.SpeedX = dRand() * 6 - 3;
+                Effect[numEffects].Location.SpeedY = dRand() * 6 - 3;
+                Effect[numEffects].Frame = (iRand() % 3);
             }
         }
     }
@@ -658,12 +659,12 @@ void NPCSpecial(int A)
             if(NPCIsACoin[NPC[A].Type])
             {
                 NPC[A].Special = 1;
-                NPC[A].Location.SpeedX = std::rand() % 1 - 0.5;
+                NPC[A].Location.SpeedX = dRand() * 1 - 0.5;
             }
 
             if(Maths::iRound(NPC[A].Direction) == 0)
             {
-                if(std::rand() % 2 == 1)
+                if(iRand() % 2 == 1)
                     NPC[A].Direction = 1;
                 else
                     NPC[A].Direction = -1;
@@ -855,7 +856,7 @@ void NPCSpecial(int A)
             C = 0;
             do
             {
-                B = (std::rand() % numPlayers) + 1;
+                B = (iRand() % numPlayers) + 1;
                 if(Player[B].Dead == false && Player[B].Section == NPC[A].Section && Player[B].TimeToLive == 0)
                     NPC[A].Special5 = B;
                 C = C + 1;
@@ -914,7 +915,7 @@ void NPCSpecial(int A)
                     if(NPC[A].Special3 >= 20 - NPC[A].Damage * 2)
                     {
                         NPC[A].Special3 = 0;
-                        NPC[A].Location.SpeedY = -3 - std::rand() % 2;
+                        NPC[A].Location.SpeedY = -3 - dRand() * 2;
                     }
                 }
             }
@@ -929,7 +930,7 @@ void NPCSpecial(int A)
         }
         else if(NPC[A].Special == 2)
         {
-            NPC[A].Location.SpeedY = -5 - std::rand() % 3;
+            NPC[A].Location.SpeedY = -5 - dRand() * 3;
             if(NPC[A].Type == 281)
                 NPC[A].Location.SpeedY = NPC[A].Location.SpeedY - 2;
             NPC[A].Special = 3;
@@ -988,7 +989,7 @@ void NPCSpecial(int A)
             C = 0;
             do
             {
-                B = (std::rand() % numPlayers) + 1;
+                B = (iRand() % numPlayers) + 1;
                 if(Player[B].Dead == false && Player[B].Section == NPC[A].Section && Player[B].TimeToLive == 0)
                     NPC[A].Special5 = B;
                 C = C + 1;
@@ -1020,17 +1021,17 @@ void NPCSpecial(int A)
             if(NPC[A].Location.SpeedY == Physics.NPCGravity)
             {
                 NPC[A].Special3 = NPC[A].Special3 + 1;
-                if(NPC[A].Special3 >= 30 + std::rand() % 100)
+                if(NPC[A].Special3 >= 30 + dRand() * 100)
                 {
                     NPC[A].Special3 = 0;
-                    NPC[A].Location.SpeedY = -5 - std::rand() % 4;
+                    NPC[A].Location.SpeedY = -5 - dRand() * 4;
                 }
             }
             else
                 NPC[A].Special3 = 0;
             // attack timer
             NPC[A].Special4 = NPC[A].Special4 + 1;
-            if(NPC[A].Special4 >= 100 + std::rand() % 100 && NPC[A].Location.SpeedY == Physics.NPCGravity)
+            if(NPC[A].Special4 >= 100 + dRand() * 100 && NPC[A].Location.SpeedY == Physics.NPCGravity)
             {
                 NPC[A].Special = 1;
                 NPC[A].Special5 = 0;
@@ -1125,7 +1126,7 @@ void NPCSpecial(int A)
             C = 0;
             do
             {
-                B = (std::rand() % numPlayers) + 1;
+                B = (iRand() % numPlayers) + 1;
                 if(Player[B].Dead == false && Player[B].Section == NPC[A].Section && Player[B].TimeToLive == 0)
                     NPC[A].Special5 = B;
                 C = C + 1;
@@ -1180,7 +1181,7 @@ void NPCSpecial(int A)
                 NPC[A].Special6 = 0;
                 NPC[A].Special = 3;
                 PlaySound(24);
-                NPC[A].Location.SpeedY = -7 - std::rand() % 2;
+                NPC[A].Location.SpeedY = -7 - dRand() * 2;
             }
         }
         else if(NPC[A].Special == 3)
@@ -1275,27 +1276,27 @@ void NPCSpecial(int A)
                 tempLocation.Width = EffectWidth[80];
                 tempLocation.SpeedX = 0;
                 tempLocation.SpeedY = 0;
-                tempLocation.X = NPC[A].Location.X + std::rand() % 16 - EffectWidth[80] / 2.0 - 4; // + .Location.SpeedX
-                tempLocation.Y = NPC[A].Location.Y + std::rand() % 4 - EffectHeight[80] / 2.0 - 2;
+                tempLocation.X = NPC[A].Location.X + dRand() * 16 - EffectWidth[80] / 2.0 - 4; // + .Location.SpeedX
+                tempLocation.Y = NPC[A].Location.Y + dRand() * 4 - EffectHeight[80] / 2.0 - 2;
                 NewEffect(80, tempLocation);
-                Effect[numEffects].Location.SpeedX = NPC[A].Location.SpeedX * 0.3 + std::rand() % 2 - 1;
-                Effect[numEffects].Location.SpeedY = std::rand() % 1 - 0.5;
-                Effect[numEffects].Frame = static_cast<int>(floor(static_cast<double>(std::rand() % 3)));
+                Effect[numEffects].Location.SpeedX = NPC[A].Location.SpeedX * 0.3 + dRand() * 2 - 1;
+                Effect[numEffects].Location.SpeedY = dRand() * 1 - 0.5;
+                Effect[numEffects].Frame = (iRand() % 3);
             }
-
         }
-        if(std::rand() % 10 > 5)
+
+        if(dRand() * 10 > 5.0)
         {
             tempLocation.Height = EffectHeight[80];
             tempLocation.Width = EffectWidth[80];
             tempLocation.SpeedX = 0;
             tempLocation.SpeedY = 0;
-            tempLocation.X = NPC[A].Location.X + std::rand() % 16 - EffectWidth[80] / 2.0 - 4; // + .Location.SpeedX
-            tempLocation.Y = NPC[A].Location.Y + std::rand() % 4 - EffectHeight[80] / 2.0 - 2;
+            tempLocation.X = NPC[A].Location.X + dRand() * 16 - EffectWidth[80] / 2.0 - 4; // + .Location.SpeedX
+            tempLocation.Y = NPC[A].Location.Y + dRand() * 4 - EffectHeight[80] / 2.0 - 2;
             NewEffect(80, tempLocation);
             Effect[numEffects].Location.SpeedX = NPC[A].Location.SpeedX * 0.15;
             Effect[numEffects].Location.SpeedY = NPC[A].Location.SpeedY; // + Rnd * 2 - 1
-            Effect[numEffects].Frame = static_cast<int>(floor(static_cast<double>(std::rand() % 2))) + 1;
+            Effect[numEffects].Frame = (iRand() % 2) + 1;
         }
 
 
@@ -1322,7 +1323,7 @@ void NPCSpecial(int A)
         }
         else
         {
-            if(std::rand() % 100 > 90)
+            if(dRand() * 100 > 90)
                 NPC[A].Direction = -NPC[A].Direction;
             NPC[A].Special3 = 0;
             NPC[A].Special4 = 0;
@@ -1342,13 +1343,13 @@ void NPCSpecial(int A)
                     NPC[A].Special2 = -1;
                 NPC[A].Special3 = NPC[A].Special3 + 1;
                 NPC[A].Special4 = NPC[A].Special4 + 1;
-                if(NPC[A].Special3 >= 100 + std::rand() % 200)
+                if(NPC[A].Special3 >= 100 + dRand() * 200)
                 {
                     NPC[A].Special3 = 0;
                     NPC[A].Location.SpeedX = 0;
                     NPC[A].Location.SpeedY = -5;
                 }
-                else if(NPC[A].Special4 >= 20 + std::rand() % 200)
+                else if(NPC[A].Special4 >= 20 + dRand() * 200)
                 {
                     NPC[A].Special4 = 0;
                     NPC[A].Special = -10;
@@ -1374,8 +1375,8 @@ void NPCSpecial(int A)
                 NPC[numNPCs].Location.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0 - 12 * NPC[numNPCs].Direction;
                 NPC[numNPCs].TimeLeft = 100;
                 NPC[numNPCs].Section = NPC[A].Section;
-                NPC[numNPCs].Location.SpeedX = (5 + std::rand() % 3) * NPC[numNPCs].Direction;
-                NPC[numNPCs].Location.SpeedY = -5 - (std::rand() % 3);
+                NPC[numNPCs].Location.SpeedX = (5 + dRand() * 3) * NPC[numNPCs].Direction;
+                NPC[numNPCs].Location.SpeedY = -5 - (dRand() * 3);
             }
             NPC[A].Location.SpeedX = 0;
             if(NPC[A].Special < 0)
@@ -1641,7 +1642,7 @@ void NPCSpecial(int A)
         if(NPC[A].Special == 0)
         {
             NPC[A].Special2 = NPC[A].Special2 + 1;
-            if(NPC[A].Special2 >= 80 + std::rand() % 20)
+            if(NPC[A].Special2 >= 80 + dRand() * 20)
             {
                 NPC[A].Special = 1;
                 C = 0;
@@ -1671,7 +1672,7 @@ void NPCSpecial(int A)
     else if(NPC[A].Type == 211) // Metroid O shooter thing
     {
         NPC[A].Special = NPC[A].Special + 1 + dRand();
-        if(NPC[A].Special >= 200 + std::rand() % 200)
+        if(NPC[A].Special >= 200 + dRand() * 200)
         {
             NPC[A].Special = 0;
             numNPCs++;
@@ -1700,7 +1701,7 @@ void NPCSpecial(int A)
         {
             if(Maths::iRound(NPC[A].Direction) == 0)
             {
-                if(std::rand() % 2 == 1)
+                if(iRand() % 2 == 1)
                     NPC[A].Direction = 1;
                 else
                     NPC[A].Direction = -1;
@@ -2023,7 +2024,7 @@ void NPCSpecial(int A)
         if(NPC[A].Special == 0)
         {
             NPC[A].Special3 = NPC[A].Special3 + 1;
-            if(NPC[A].Special3 >= 160 + std::rand() % 140)
+            if(NPC[A].Special3 >= 160 + dRand() * 140)
             {
                 NPC[A].Special = 1;
                 NPC[A].Special3 = 0;
@@ -2065,10 +2066,10 @@ void NPCSpecial(int A)
                 NPC[numNPCs].TimeLeft = 50;
                 NPC[numNPCs].Location.SpeedY = -7;
                 NPC[numNPCs].Location.SpeedX = 7 * NPC[numNPCs].Direction;
-                NPC[numNPCs].Location.SpeedY = NPC[numNPCs].Location.SpeedY + std::rand() % 6 - 3;
+                NPC[numNPCs].Location.SpeedY = NPC[numNPCs].Location.SpeedY + dRand() * 6 - 3;
                 NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * (1 - (NPC[A].Special3 / 140));
             }
-            if(NPC[A].Special3 >= 120 + std::rand() % 40)
+            if(NPC[A].Special3 >= 120 + dRand() * 40)
             {
                 NPC[A].Special = 0;
                 NPC[A].Special3 = 0;
@@ -2271,15 +2272,15 @@ void NPCSpecial(int A)
             NPC[A].Direction = -1;
         NPC[A].Special5 = D;
 
-        if(std::rand() % 300 > 297 && NPC[A].Special == 0.0)
+        if(dRand() * 300 > 297 && NPC[A].Special == 0.0)
             NPC[A].Special = 1;
         NPC[A].Special4 = NPC[A].Special4 + 1;
         if(NPC[A].Inert == true)
             NPC[A].Special4 = 150;
 
-        if(NPC[A].Special4 <= 80 + std::rand() % 40)
+        if(NPC[A].Special4 <= 80 + dRand() * 40)
         {
-            if((std::rand() % 100 > 40) && int(NPC[A].Special4) % 16 == 0)
+            if((dRand() * 100 > 40) && int(NPC[A].Special4) % 16 == 0)
             {
                 PlaySound(25);
                 numNPCs++;
@@ -2298,7 +2299,7 @@ void NPCSpecial(int A)
                 NPC[numNPCs].Location.SpeedX = 3 * NPC[numNPCs].Direction;
             }
         }
-        else if(NPC[A].Special4 > 300 + std::rand() % 50)
+        else if(NPC[A].Special4 > 300 + dRand() * 50)
             NPC[A].Special4 = 0;
         if(NPC[A].Inert == true)
             NPC[A].Special = 0;
@@ -2360,9 +2361,9 @@ void NPCSpecial(int A)
                 if(NPC[A].Location.X > NPC[A].DefaultLocation.X + NPC[A].Location.Width * 1.5)
                     NPC[A].Special2 = 0;
             }
-            if(NPC[A].Location.SpeedY == Physics.NPCGravity || NPC[A].Slope > 0)
+            if(fEqual(NPC[A].Location.SpeedY, double(Physics.NPCGravity)) || NPC[A].Slope > 0)
             {
-                if(std::rand() % 200 >= 198)
+                if(dRand() * 200 >= 198)
                     NPC[A].Location.SpeedY = -8;
             }
         }
@@ -2636,12 +2637,12 @@ void SpecialNPC(int A)
                             for(int Ci = 1; Ci <= 10; Ci++)
                             {
                                 NewEffect(77, NPC[A].Location, static_cast<float>(NPC[A].Special));
-                                Effect[numEffects].Location.SpeedX = std::rand() % 3 - 1.5 + NPC[A].Location.SpeedX * 0.1;
-                                Effect[numEffects].Location.SpeedY = std::rand() % 3 - 1.5 - NPC[A].Location.SpeedY * 0.1;
+                                Effect[numEffects].Location.SpeedX = dRand() * 3 - 1.5 + NPC[A].Location.SpeedX * 0.1;
+                                Effect[numEffects].Location.SpeedY = dRand() * 3 - 1.5 - NPC[A].Location.SpeedY * 0.1;
                                 if(Effect[numEffects].Frame == 0)
-                                    Effect[numEffects].Frame = -static_cast<int>(floor(static_cast<double>(std::rand() % 3)));
+                                    Effect[numEffects].Frame = -(iRand() % 3);
                                 else
-                                    Effect[numEffects].Frame = 5 + static_cast<int>(floor(static_cast<double>(std::rand() % 3)));
+                                    Effect[numEffects].Frame = 5 + (iRand() % 3);
                             }
                         }
                         if(NPC[A].Type != 13 && NPC[A].Type != 265)
@@ -2799,7 +2800,7 @@ void SpecialNPC(int A)
     }
     else if(NPC[A].Type == 237 || NPC[A].Type == 263) // Yoshi Ice
     {
-        if(std::rand() % 100 > 93)
+        if(dRand() * 100 > 93)
         {
             tempLocation.Height = EffectHeight[80];
             tempLocation.Width = EffectWidth[80];
@@ -2811,7 +2812,7 @@ void SpecialNPC(int A)
         }
         if(NPC[A].Projectile != 0)
         {
-            if(std::rand() % 100 > 80)
+            if(dRand() * 100 > 80)
             {
                 tempLocation.Height = EffectHeight[80];
                 tempLocation.Width = EffectWidth[80];
@@ -2930,7 +2931,7 @@ void SpecialNPC(int A)
                     NPC[A].Special3 = 0;
                 if(NPC[A].Special3 == 1 && NPC[A].Wet == 0)
                 {
-                    NPC[A].Location.SpeedY = -(NPC[A].Location.Y - Player[B].Location.Y + Player[B].Location.Height / 2.0) * 0.05 + std::rand() % 4 - 2;
+                    NPC[A].Location.SpeedY = -(NPC[A].Location.Y - Player[B].Location.Y + Player[B].Location.Height / 2.0) * 0.05 + dRand() * 4 - 2;
                     if(NPC[A].Location.SpeedY < -9)
                         NPC[A].Location.SpeedY = -9;
                     NPC[A].Special3 = 0;
@@ -3573,8 +3574,8 @@ void SpecialNPC(int A)
                 NPC[A].Location.Y = NPC[A].Location.Y + NPC[A].Location.Height - 54;
                 NPC[A].Location.Height = 54;
             }
-            NPC[A].Special2 = NPC[A].Special2 + std::rand() % 2;
-            if(NPC[A].Special2 >= 250 + static_cast<int>(floor(static_cast<double>(std::rand() % 250))))
+            NPC[A].Special2 = NPC[A].Special2 + dRand() * 2;
+            if(NPC[A].Special2 >= 250 + (iRand() % 250))
             {
                 NPC[A].Special = 2;
                 NPC[A].Special2 = 0;
@@ -3596,8 +3597,8 @@ void SpecialNPC(int A)
                 NPC[A].Location.Y = NPC[A].Location.Y + NPC[A].Location.Height - 40;
                 NPC[A].Location.Height = 40;
             }
-            NPC[A].Special2 = NPC[A].Special2 + std::rand() % 2;
-            if(NPC[A].Special2 >= 100 + static_cast<int>(floor(static_cast<double>(std::rand() % 100))))
+            NPC[A].Special2 = NPC[A].Special2 + dRand() * 2;
+            if(NPC[A].Special2 >= 100 + (iRand() % 100))
             {
                 NPC[A].Special = 3;
                 NPC[A].Special2 = 0;
@@ -3834,7 +3835,7 @@ void SpecialNPC(int A)
     else if(NPC[A].Type == 84 || NPC[A].Type == 181)
     {
         NPC[A].Special = NPC[A].Special + 1;
-        if(NPC[A].Special >= 200 + std::rand() % 200)
+        if(NPC[A].Special >= 200 + dRand() * 200)
         {
             NPC[A].Special = 0;
             numNPCs++;
@@ -3857,7 +3858,7 @@ void SpecialNPC(int A)
             NPC[numNPCs].Location.SpeedX = 4 * NPC[numNPCs].Direction;
             if(NPC[numNPCs].Direction == 1)
                 NPC[numNPCs].Frame = 4;
-            NPC[numNPCs].FrameCount = std::rand() % 8;
+            NPC[numNPCs].FrameCount = iRand() % 8;
             PlaySound(42);
         }
     // Hammer Bro
@@ -3869,7 +3870,7 @@ void SpecialNPC(int A)
         {
             if(!Player[B].Dead && Player[B].Section == NPC[A].Section)
             {
-                if(C == 0 || std::abs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0)) < C)
+                if(C == 0.f || std::abs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0)) < C)
                 {
                     C = std::abs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0));
                     if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > Player[B].Location.X + Player[B].Location.Width / 2.0)
@@ -3903,8 +3904,8 @@ void SpecialNPC(int A)
                 NPC[A].Special2 = 0;
             }
         }
-        NPC[A].Special3 = NPC[A].Special3 + std::rand() % 2;
-        if(NPC[A].Special3 >= 50 + std::rand() % 1000)
+        NPC[A].Special3 = NPC[A].Special3 + dRand() * 2;
+        if(NPC[A].Special3 >= 50 + dRand() * 1000)
         {
             if(NPC[A].Location.SpeedY == Physics.NPCGravity)
             {
@@ -4395,8 +4396,8 @@ void SpecialNPC(int A)
             {
                 NPC[A].Special4 = 0;
                 NewEffect(80, newLoc(NPC[A].Location.X + dRand() * NPC[A].Location.Width - 2, NPC[A].Location.Y + dRand() * NPC[A].Location.Height));
-                Effect[numEffects].Location.SpeedX = std::rand() % 1 - 0.5;
-                Effect[numEffects].Location.SpeedY = std::rand() % 1 - 0.5;
+                Effect[numEffects].Location.SpeedX = dRand() * 1.0 - 0.5;
+                Effect[numEffects].Location.SpeedY = dRand() * 1.0 - 0.5;
             }
         }
         else
@@ -4406,8 +4407,8 @@ void SpecialNPC(int A)
             {
                 NPC[A].Special4 = 0;
                 NewEffect(80, newLoc(NPC[A].Location.X + dRand() * NPC[A].Location.Width - 2, NPC[A].Location.Y + dRand() * NPC[A].Location.Height));
-                Effect[numEffects].Location.SpeedX = std::rand() % 1 - 0.5;
-                Effect[numEffects].Location.SpeedY = std::rand() % 1 - 0.5;
+                Effect[numEffects].Location.SpeedX = dRand() * 1.0 - 0.5;
+                Effect[numEffects].Location.SpeedY = dRand() * 1.0 - 0.5;
                 Effect[numEffects].Frame = 1;
             }
         }
@@ -4705,7 +4706,7 @@ void SpecialNPC(int A)
                     NPC[numNPCs].CantHurtPlayer = NPC[A].CantHurtPlayer;
                 }
                 NPC[numNPCs].Location.Y = NPC[numNPCs].Location.Y + 8;
-                NPC[numNPCs].Location.SpeedX = (1 + std::rand() % 2) * NPC[numNPCs].Direction;
+                NPC[numNPCs].Location.SpeedX = (1 + dRand() * 2) * double(NPC[numNPCs].Direction);
                 NPC[numNPCs].Location.SpeedY = -7;
                 NPC[numNPCs].Active = true;
                 NPC[numNPCs].Section = NPC[A].Section;
@@ -4897,7 +4898,7 @@ void CharStuff(int WhatNPC, bool CheckEggs)
 
 int RandomBonus()
 {
-    int B = std::rand() % 6;
+    int B = iRand() % 6;
     switch(B)
     {
     case 0:

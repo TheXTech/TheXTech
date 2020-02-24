@@ -150,7 +150,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
     {
         if(b.RapidHit > 0 && Player[whatPlayer].Character == 4 && whatPlayer > 0)
         {
-            b.RapidHit = static_cast<int>(floor(static_cast<double>(std::rand() % 3))) + 1;
+            b.RapidHit = (iRand() % 3) + 1;
         }
         return;
     }
@@ -318,7 +318,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
     {
         if(whatPlayer > 0 && Player[whatPlayer].Character == 4)
         {
-            b.RapidHit = static_cast<int>(floor(static_cast<double>(std::rand() % 3))) + 1;
+            b.RapidHit = (iRand() % 3) + 1;
         }
         if(HitDown == false)
         {
@@ -367,14 +367,10 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                     if(Player[whatPlayer].Character == 5)
                     {
                         NPC[numNPCs].Type = 251;
-                        if(std::rand() % 20 <= 3)
-                        {
+                        if(dRand() * 20 <= 3.0)
                             NPC[numNPCs].Type = 252;
-                        }
-                        if(std::rand() % 60 <= 3)
-                        {
+                        if(dRand() * 60 <= 3.0)
                             NPC[numNPCs].Type = 253;
-                        }
                         PlaySound(81);
                     }
                     else
@@ -385,8 +381,8 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                     NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
                     NPC[numNPCs].Location.X = b.Location.X + b.Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
                     NPC[numNPCs].Location.Y = b.Location.Y - NPC[numNPCs].Location.Height - 0.01;
-                    NPC[numNPCs].Location.SpeedX = std::rand() % 3 - 1.5;
-                    NPC[numNPCs].Location.SpeedY = -std::rand() % 4 - 3;
+                    NPC[numNPCs].Location.SpeedX = dRand() * 3 - 1.5;
+                    NPC[numNPCs].Location.SpeedY = -(dRand() * 4) - 3;
                     if(HitDown == true)
                     {
                         NPC[numNPCs].Location.SpeedY = -NPC[numNPCs].Location.SpeedY * 0.5;
@@ -460,8 +456,8 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                 NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
                 NPC[numNPCs].Location.X = b.Location.X + b.Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
                 NPC[numNPCs].Location.Y = b.Location.Y - NPC[numNPCs].Location.Height - 0.01;
-                NPC[numNPCs].Location.SpeedX = std::rand() % 3 - 1.5;
-                NPC[numNPCs].Location.SpeedY = -std::rand() % 4 - 3;
+                NPC[numNPCs].Location.SpeedX = dRand() * 3.0 - 1.5;
+                NPC[numNPCs].Location.SpeedY = -(dRand() * 4) - 3;
                 NPC[numNPCs].Special = 1;
                 NPC[numNPCs].Immune = 20;
                 PlaySound(14);
@@ -2086,7 +2082,7 @@ void PowBlock()
             if(NPCIsACoin[NPC[A].Type])
             {
                 NPC[A].Special = 1;
-                NPC[A].Location.SpeedX = std::rand() % 1 - 0.5;
+                NPC[A].Location.SpeedX = (dRand() * 1.0) - 0.5;
             }
         }
     }

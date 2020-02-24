@@ -23,8 +23,6 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#include <ctime>
-
 #include <Logger/logger.h>
 
 #include "globals.h"
@@ -58,7 +56,6 @@ int GameMain(const CmdLineSetup_t &setup)
     bool tempBool = false;
     LB = "\n";
     EoT = "";
-    std::srand(static_cast<unsigned int>(std::time(nullptr)));
 
     FrameSkip = setup.frameSkip;
     noSound = setup.noSound;
@@ -173,14 +170,14 @@ int GameMain(const CmdLineSetup_t &setup)
                 if(A == 4)
                 {
                     p.Mount = 1;
-                    p.MountType = int(std::rand() % 3) + 1;
+                    p.MountType = int(iRand() % 3) + 1;
                 }
 
                 p.Character = A;
                 if(A == 2)
                 {
                     p.Mount = 3;
-                    p.MountType = int(std::rand() % 8) + 1;
+                    p.MountType = int(iRand() % 8) + 1;
                 }
 
                 p.HeldBonus = 0;
@@ -328,8 +325,8 @@ int GameMain(const CmdLineSetup_t &setup)
             For(A, 1, numPlayers)
             {
                 Player_t &p = Player[A];
-                p.State = int(std::rand() % 6) + 2;
-                p.Character = int(std::rand() % 5) + 1;
+                p.State = (iRand() % 6) + 2;
+                p.Character = (iRand() % 5) + 1;
 
                 if(A >= 1 && A <= 5)
                     p.Character = A;
@@ -338,7 +335,7 @@ int GameMain(const CmdLineSetup_t &setup)
                 p.Section = 0;
                 p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
                 p.Location.Width = Physics.PlayerWidth[p.Character][p.State];
-                p.Location.X = level[p.Section].X + ((128 + std::rand() % 64) * A);
+                p.Location.X = level[p.Section].X + ((128 + dRand() * 64) * A);
                 p.Location.Y = level[p.Section].Height - p.Location.Height - 65;
 
                 do
@@ -1390,11 +1387,13 @@ void StartBattleMode()
     DoEvents();
     SDL_Delay(500);
     ClearLevel();
+
     if(selWorld == 1)
-        selWorld = (std::rand() % (NumSelectWorld - 1)) + 2;
+        selWorld = (iRand() % (NumSelectWorld - 1)) + 2;
 
     OpenLevel(SelectWorld[selWorld].WorldPath + SelectWorld[selWorld].WorldFile);
     SetupPlayers();
+
     BattleIntro = 150;
     BattleWinner = 0;
     BattleOutro = 0;
