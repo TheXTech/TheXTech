@@ -36,6 +36,7 @@
 #include "location.h"
 #include "range_arr.hpp"
 #include "rand.h"
+#include "floats.h"
 
 //Option Explicit
 //Public Declare Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As Long)
@@ -95,31 +96,6 @@ extern Uint8 getKeyStateI(int key);
  */
 const char *getKeyName(int key);
 
-/**
- * @brief Comparison of two floating point numbers
- * @param a First argument
- * @param b Second argument
- * @return true whe both arguments are equal (almost)
- */
-static SDL_INLINE bool fEqual(double a, double b)
-{
-    Sint64 ai = Sint64(a * 1000000.0);
-    Sint64 bi = Sint64(b * 1000000.0);
-    return ai == bi;
-}
-
-/**
- * @brief Comparison of two floating point numbers
- * @param a First argument
- * @param b Second argument
- * @return true whe both arguments are equal (almost)
- */
-static SDL_INLINE bool fEqual(float a, float b)
-{
-    Sint64 ai = Sint64(a * 10000.0f);
-    Sint64 bi = Sint64(b * 10000.0f);
-    return ai == bi;
-}
 
 //'Saved Events
 //Public Const MaxSavedEvents As Integer = 200
