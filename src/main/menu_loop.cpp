@@ -2353,8 +2353,6 @@ void FindLevels()
 
 void FindSaves()
 {
-    int curActive = 0;
-    int maxActive = 0;
     std::string newInput = "";
 
     std::string episode = SelectWorld[selWorld].WorldPath;
@@ -2363,29 +2361,42 @@ void FindSaves()
     {
         SaveSlot[A] = -1;
         SaveStars[A] = 0;
+
         std::string saveFile = episode + fmt::format_ne("save{0}.savx", A);
         std::string saveFileOld = episode + fmt::format_ne("save{0}.sav", A);
+
         if((Files::fileExists(saveFile) && FileFormats::ReadExtendedSaveFileF(saveFile, f)) ||
            (Files::fileExists(saveFileOld) && FileFormats::ReadSMBX64SavFileF(saveFileOld, f)))
         {
+            int curActive = 0;
+            int maxActive = 0;
+
+            // "game beat flag"
+            maxActive++;
+            if(f.gameCompleted)
+                curActive++;
+
+            // How much paths open
+            maxActive += f.visiblePaths.size();
             for(auto &p : f.visiblePaths)
             {
-                maxActive++;
                 if(p.second)
                     curActive++;
             }
 
+            // How much levels opened
+            maxActive += f.visibleLevels.size();
             for(auto &p : f.visibleLevels)
             {
-                maxActive++;
                 if(p.second)
                     curActive++;
             }
 
+            // How many stars collected
+            maxActive += (int(f.totalStars) * 4);
             SaveStars[A] = int(f.gottenStars.size());
 
-            maxActive = maxActive + (int(f.totalStars) * 4);
-            curActive = curActive + (SaveStars[A] * 4);
+            curActive += (SaveStars[A] * 4);
 
             if(maxActive > 0)
                 SaveSlot[A] = int((float(curActive) / float(maxActive)) * 100);
