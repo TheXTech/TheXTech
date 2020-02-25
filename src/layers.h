@@ -28,6 +28,21 @@
 
 #include <string>
 
+//Public Layer(0 To 100) As Layer
+const int maxLayers = 100;
+extern RangeArr<Layer_t, 0, maxLayers> Layer;
+
+//Public Events(0 To 100) As Events
+const int maxEvents = 100;
+extern RangeArr<Events_t, 0, maxEvents> Events;
+
+//Public NewEvent(1 To 100) As String
+extern RangeArr<std::string, 1, maxEvents> NewEvent;
+//Public newEventDelay(1 To 100) As Integer
+extern RangeArrI<int, 1, maxEvents, 0> newEventDelay;
+//Public newEventNum As Integer
+extern int newEventNum;
+
 // Public Sub ShowLayer(LayerName As String, Optional NoEffect As Boolean = False) 'shows a layer
 // shows a layer
 void ShowLayer(std::string LayerName, bool NoEffect = false);

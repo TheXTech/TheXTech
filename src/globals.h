@@ -1815,14 +1815,6 @@ struct Events_t
 //End Type
 };
 
-//Public Layer(0 To 100) As Layer
-const int maxLayers = 100;
-extern RangeArr<Layer_t, 0, maxLayers> Layer;
-
-//Public Events(0 To 100) As Events
-const int maxEvents = 100;
-extern RangeArr<Events_t, 0, maxEvents> Events;
-
 //Public ReturnWarp As Integer 'for when the player returns from a warp
 extern int ReturnWarp;
 //! EXTRA: Used to be captured into game save
@@ -2184,12 +2176,8 @@ extern bool MenuMouseMove;
 extern bool MenuMouseClick;
 
 //' event stuff
-//Public NewEvent(1 To 100) As String
-extern RangeArr<std::string, 1, maxEvents> NewEvent;
-//Public newEventDelay(1 To 100) As Integer
-extern RangeArrI<int, 1, maxEvents, 0> newEventDelay;
-//Public newEventNum As Integer
-extern int newEventNum;
+// Moved into "layers.h"
+
 //Public ForcedControls As Boolean
 extern bool ForcedControls;
 //Public ForcedControl As Controls

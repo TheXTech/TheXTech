@@ -279,8 +279,6 @@ int worldCurs = 0;
 int minShow = 0;
 int maxShow = 0;
 
-RangeArr<Layer_t, 0, maxLayers> Layer;
-RangeArr<Events_t, 0, maxEvents> Events;
 int ReturnWarp = 0;
 int ReturnWarpSaved = 0;
 int StartWarp = 0;
@@ -453,9 +451,6 @@ bool MenuMouseRelease = false;
 bool MenuMouseMove = false;
 bool MenuMouseClick = false;
 
-RangeArr<std::string, 1, maxEvents> NewEvent;
-RangeArrI<int, 1, maxEvents, 0> newEventDelay;
-int newEventNum = 0;
 bool ForcedControls = false;
 Controls_t ForcedControl;
 int SyncCount = 0;

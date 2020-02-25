@@ -33,6 +33,13 @@
 #include "game_main.h"
 
 
+RangeArr<Layer_t, 0, maxLayers> Layer;
+RangeArr<Events_t, 0, maxEvents> Events;
+
+RangeArr<std::string, 1, maxEvents> NewEvent;
+RangeArrI<int, 1, maxEvents, 0> newEventDelay;
+int newEventNum = 0;
+
 static SDL_INLINE bool equalCase(const std::string &x, const std::string &y)
 {
     return (SDL_strcasecmp(x.c_str(), y.c_str()) == 0);
