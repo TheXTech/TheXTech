@@ -128,10 +128,19 @@ void LoadGame()
     WorldPlayer[1].Location.X = double(sav.worldPosX);
     WorldPlayer[1].Location.Y = double(sav.worldPosY);
 
+    if(Lives > 99)
+        Lives = 99;
+    if(Coins > 99)
+        Coins = 0;
+    if(Score > 9999990)
+        Score = 9999990;
+
     curWorldMusic = int(sav.musicID);
     curWorldMusicFile = sav.musicFile;
 
     ReturnWarp = int(sav.last_hub_warp);
+    if(ReturnWarp > maxWarps)
+        ReturnWarp = 0; // Invalid value
     ReturnWarpSaved = ReturnWarp;
 
     for(A = 1, i = 0; A <= 5; A++, i++)
