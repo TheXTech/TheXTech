@@ -1584,7 +1584,7 @@ void BlockFrames()
         BlockFrame2[530] = 0;
     }
 
-    if(LevelEditor == true && TestLevel == false)
+    if(LevelEditor == true && !TestLevel)
         BlockFrame[458] = 5;
     else
     {

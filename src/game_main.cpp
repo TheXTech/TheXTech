@@ -729,11 +729,17 @@ int GameMain(const CmdLineSetup_t &setup)
             // (do any code without interaction of no more existnig Editor VB forms, keep IPS with PGE Editor instead)
 
 //            If TestLevel = True Then
+            if(TestLevel)
+            {
 //                TestLevel = False
+                TestLevel = false;
 //                LevelEditor = True
 //                LevelEditor = true;
+                LevelEditor = true; //FIXME: Restart level testing or quit a game instead of THIS
+
 //                If nPlay.Online = False Then
 //                    OpenLevel FullFileName
+                OpenLevel(FullFileName);
 //                Else
 //                    If nPlay.Mode = 1 Then
 //                        Netplay.sendData "H0" & LB
@@ -752,10 +758,16 @@ int GameMain(const CmdLineSetup_t &setup)
 //                        End If
 //                    End If
 //                End If
+
 //                LevelSelect = False
+                LevelSelect = false;
+            }
 //            Else
-            ClearLevel();
+            else
+            {
+                ClearLevel();
 //            End If
+            } // TestLevel
         }
 
     } while(GameIsActive);
@@ -798,7 +810,7 @@ void NextLevel()
     frmMain.clearBuffer();
     frmMain.repaint();
     DoEvents();
-    if(!TestLevel && GoToLevel == "" && !NoMap)
+    if(!TestLevel && GoToLevel.empty() && !NoMap)
         SDL_Delay(500);
     if(BattleMode && !LevelEditor)
     {
@@ -977,7 +989,7 @@ void UpdateMacro()
             EndLevel = true;
             LevelMacro = 0;
             LevelMacroCounter = 0;
-            if(TestLevel == false)
+            if(!TestLevel)
             {
                 GameOutro = true;
                 BeatTheGame = true;
@@ -1183,6 +1195,8 @@ void CheckActive()
     {
         frmMain.waitEvents();
 //        If LevelEditor = True Or MagicHand = True Then frmLevelWindow.vScreen(1).MousePointer = 0
+        if(LevelEditor || MagicHand)
+            showCursor(0);
         overTime = 0;
         GoalTime = SDL_GetTicks() + 1000;
         fpsCount = 0;
