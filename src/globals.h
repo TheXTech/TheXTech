@@ -39,6 +39,7 @@
 #include "floats.h"
 
 #include "global_constants.h"
+#include "controls.h"
 
 //Option Explicit
 //Public Declare Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As Long)
@@ -151,30 +152,7 @@ extern std::string LB;
 extern std::string EoT;
 
 //Public Type Controls 'Controls for the player
-struct Controls_t
-{
-//    Up As Boolean
-    bool Up = false;
-//    Down As Boolean
-    bool Down = false;
-//    Left As Boolean
-    bool Left = false;
-//    Right As Boolean
-    bool Right = false;
-//    Jump As Boolean
-    bool Jump = false;
-//    AltJump As Boolean
-    bool AltJump = false;
-//    Run As Boolean
-    bool Run = false;
-//    AltRun As Boolean
-    bool AltRun = false;
-//    Drop As Boolean
-    bool Drop = false;
-//    Start As Boolean
-    bool Start = false;
-//End Type
-};
+//moved into "controls.h"
 
 //Public Type nPlayer  'online player type
 //    Controls As Controls  'online players controls
