@@ -29,6 +29,13 @@ set(PGE_INSTALL_DIRECTORY ${CMAKE_INSTALL_PATH})
 
 include(cmake/build_props.cmake)
 
+if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
+    # Update if necessary
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ffloat-store")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffloat-store")
+endif()
+
+
 if(WIN32 AND NOT EMSCRIPTEN)
     set(CMAKE_SHARED_LIBRARY_PREFIX "")
 endif()

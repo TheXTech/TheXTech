@@ -968,7 +968,7 @@ void UpdatePlayer()
                 // stop link when stabbing
                 if(Player[A].Character == 5)
                 {
-                    if(Player[A].FireBallCD > 0 && (Player[A].Location.SpeedY == 0 || Player[A].Slope != 0 || Player[A].StandingOnNPC != 0))
+                    if(Player[A].FireBallCD > 0 && (Player[A].Location.SpeedY == 0.0 || Player[A].Slope != 0 || Player[A].StandingOnNPC != 0))
                     {
                         if(Player[A].Slippy)
                             Player[A].Location.SpeedX = Player[A].Location.SpeedX * 0.75;
