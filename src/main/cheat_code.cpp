@@ -47,7 +47,7 @@ void CheatCode(char NewKey)
     std::string oldString;
     bool cheated = false;
 
-    if(LevelEditor == true || GameMenu == true || /*nPlay.Online == true ||*/ BattleMode == true)
+    if(LevelEditor || GameMenu || /*nPlay.Online ||*/ BattleMode)
     {
         CheatString.clear();
         return;
