@@ -33,6 +33,7 @@
 #include "../npc.h"
 #include "../layers.h"
 #include "../player.h"
+#include "../editor.h"
 
 #include "../pseudo_vb.h"
 
@@ -102,6 +103,8 @@ void GameLoop()
         UpdateSound();
         UpdateEvents();
 //        If MagicHand = True Then UpdateEditor
+        if(MagicHand)
+            UpdateEditor();
 
         if(Player[1].Controls.Start || (getKeyState(SDL_SCANCODE_ESCAPE) == KEY_PRESSED))
         {

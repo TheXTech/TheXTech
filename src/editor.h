@@ -26,6 +26,30 @@
 #ifndef EDITOR_H
 #define EDITOR_H
 
+#include "location.h"
+
+// this sub handles the level editor
+// it is still called when the player is testing a level in the editor in windowed mode
+extern void UpdateEditor();
+
 extern int EditorNPCFrame(int A, float C, int N = 0);
+
+extern void GetEditorControls();
+
+extern void SetCursor();
+
+extern void PositionCursor();
+
+extern void HideCursor();
+
+extern void KillWarp(int A);
+
+extern void zTestLevel();
+
+extern void MouseMove(float X, float Y, bool nCur = false);
+
+extern void ResetNPC(int A);
+
+extern void BlockFill(Location_t Loc);
 
 #endif // EDITOR_H

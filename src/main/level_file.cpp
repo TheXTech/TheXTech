@@ -718,11 +718,15 @@ void ClearLevel()
     }
 
 //    If LevelEditor = True Or MagicHand = True Then
+    if(LevelEditor || MagicHand)
+    {
 //        MessageText = ""
+        MessageText.clear();
 //        frmNPCs.chkMessage.Value = 0
 //        frmBlocks.chkFill.Value = 0
 //        frmEvents.txtEvent.Text = ""
 //        noUpdate = True
+        noUpdate = true;
 //        frmEvents.RefreshEvents
 //        frmLayers.lstLayer.Clear
 //        frmLayers.lstLayer.AddItem "Default"
@@ -735,6 +739,7 @@ void ClearLevel()
 //        frmLayers.txtLayer.Enabled = False
 //        frmLevelEditor.optCursor(13).Value = True
 //    End If
+    }
 
     for(A = -128; A <= maxNPCs; A++)
         NPC[A] = blankNPC;

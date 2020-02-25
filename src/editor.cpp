@@ -28,6 +28,13 @@
 
 #include "pseudo_vb.h"
 
+// this sub handles the level editor
+// it is still called when the player is testing a level in the editor in windowed mode
+void UpdateEditor()
+{
+    // Make MagicHand only functionality
+}
+
 int EditorNPCFrame(int A, float C, int N)
 {
     int ret = 0;
@@ -185,4 +192,49 @@ int EditorNPCFrame(int A, float C, int N)
     }
 
     return ret;
+}
+
+void GetEditorControls()
+{
+
+}
+
+void SetCursor()
+{
+
+}
+
+void PositionCursor()
+{
+
+}
+
+void HideCursor()
+{
+
+}
+
+void KillWarp(int A)
+{
+
+}
+
+void zTestLevel()
+{
+
+}
+
+void MouseMove(float X, float Y, bool nCur)
+{
+
+}
+
+void ResetNPC(int A)
+{
+
+}
+
+void BlockFill(Location_t Loc)
+{
+
 }
