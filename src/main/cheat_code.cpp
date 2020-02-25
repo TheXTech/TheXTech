@@ -93,15 +93,18 @@ void CheatCode(char NewKey)
         {
             Player[A].State = 0;
             Player[A].Hearts = 1;
-            PlayerHurt(A);
+            if(!LevelSelect)
+                PlayerHurt(A);
+            else
+                KillPlayer(A);
         }
 
         if(LevelSelect)
         {
+            LevelSelect = false;
             GameMenu = true;
             MenuMode = 0;
             MenuCursor = 0;
-            LevelSelect = false;
             frmMain.clearBuffer();
             frmMain.repaint();
             StopMusic();
