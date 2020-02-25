@@ -290,7 +290,7 @@ void SetupPlayers()
                 Player[A].Hearts = 2;
         }
 
-        if(numPlayers > 2 && GameMenu == false) // online stuff
+        if(numPlayers > 2 && !GameMenu) // online stuff
         {
             /*if(nPlay.Online == true)
             {

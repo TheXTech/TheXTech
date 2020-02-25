@@ -873,13 +873,16 @@ void UpdatePlayer()
                                 Player[A].Location.SpeedX = -Physics.PlayerWalkSpeed * speedVar;
                         }
                     }
+
                     if(Player[A].Mount == 1 && Player[A].MountType == 3)
                     {
                         Player[A].CanFly2 = true;
                         Player[A].FlyCount = 1000;
                     }
+
                     if(Player[A].Mount != 3)
                         Player[A].YoshiBlue = false;
+
                     if(FlyForever && !Player[A].GroundPound)
                     {
                         if(Player[A].Mount == 3)
@@ -894,20 +897,28 @@ void UpdatePlayer()
                             Player[A].YoshiBlue = false;
                         }
                     }
+
                     // Racoon/Tanooki Mario.  this handles the ability to fly after running
                     if((Player[A].State == 4 || Player[A].State == 5) && Player[A].Wet == 0)
                     {
-                        if((Player[A].Location.SpeedY == 0.0 || Player[A].CanFly2 ||
-                            Player[A].StandingOnNPC != 0 || Player[A].Slope > 0) &&
-                           (std::abs(Player[A].Location.SpeedX) >= Physics.PlayerRunSpeed ||
+                        if( (Player[A].Location.SpeedY == 0.0 ||
+                             Player[A].CanFly2 ||
+                             Player[A].StandingOnNPC != 0 ||
+                             Player[A].Slope > 0) &&
+                            (std::abs(Player[A].Location.SpeedX) >= double(Physics.PlayerRunSpeed) ||
                             (Player[A].Character == 3 && std::abs(Player[A].Location.SpeedX) >= 5.58)))
-                            Player[A].RunCount = Player[A].RunCount + 1;
+                        {
+                            Player[A].RunCount += 1;
+                        }
                         else
                         {
-                            if(!(std::abs(Player[A].Location.SpeedX) >= Physics.PlayerRunSpeed ||
-                                 (Player[A].Character == 3 && std::abs(Player[A].Location.SpeedX) >= 5.58)))
-                                Player[A].RunCount = Player[A].RunCount - 0.3;
+                            if(!(std::abs(Player[A].Location.SpeedX) >= double(Physics.PlayerRunSpeed) ||
+                                 (Player[A].Character == 3 && std::abs(Player[A].Location.SpeedX) >= 5.58)) )
+                            {
+                                Player[A].RunCount -= 0.3f;
+                            }
                         }
+
                         if(Player[A].RunCount >= 35 && Player[A].Character == 1)
                         {
                             Player[A].CanFly = true;
@@ -940,10 +951,12 @@ void UpdatePlayer()
                                 Player[A].RunCount = 0;
                         }
                     }
-                    if(Player[A].Location.SpeedY == 0 || Player[A].StandingOnNPC != 0 || Player[A].Slope > 0)
+
+                    if(Player[A].Location.SpeedY == 0.0 || Player[A].StandingOnNPC != 0 || Player[A].Slope > 0)
                         Player[A].FlyCount = 1;
+
                     if(Player[A].FlyCount > 1)
-                        Player[A].FlyCount = Player[A].FlyCount - 1;
+                        Player[A].FlyCount -= 1;
                     else if(Player[A].FlyCount == 1)
                     {
                         Player[A].CanFly2 = false;
