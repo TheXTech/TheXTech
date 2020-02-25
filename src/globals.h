@@ -38,6 +38,8 @@
 #include "rand.h"
 #include "floats.h"
 
+#include "global_constants.h"
+
 //Option Explicit
 //Public Declare Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As Long)
 //Public Declare Function BitBlt Lib "gdi32" (ByVal hDestDC As Long, ByVal X As Long, ByVal Y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal dwRop As Long) As Long
@@ -89,6 +91,9 @@ extern int showCursor(int show);
 extern Uint8 getKeyState(SDL_Scancode key);
 extern Uint8 getKeyStateI(int key);
 
+//Public Const KEY_PRESSED As Integer = &H1000    'For control information
+const int KEY_PRESSED = 1;
+
 /**
  * @brief Get name of key from a keycode
  * @param key Key code
@@ -98,8 +103,6 @@ const char *getKeyName(int key);
 
 
 //'Saved Events
-//Public Const MaxSavedEvents As Integer = 200
-const int MaxSavedEvents = 200;
 //Public numSavedEvents As Integer
 extern int numSavedEvents;
 //Public SavedEvents(1 To MaxSavedEvents) As String
@@ -109,23 +112,18 @@ extern RangeArrI<bool, 1, 4, false> BlockSwitch;
 //'Public PowerUpUnlock(2 To 7) As Boolean
 extern RangeArrI<bool, 2, 7, false> PowerUpUnlock;
 
-
-//Public Const ScreenW As Integer = 800  'Game Screen Width
-const int ScreenW = 800;
-//Public Const ScreenH As Integer = 600  'Game Screen Height
-const int ScreenH = 600;
 //Public Const SWP_SHOWWINDOW = &H40
-const int SWP_SHOWWINDOW = 0x40;
+//const int SWP_SHOWWINDOW = 0x40;
 //Public Const SWP_NOMOVE As Long = 2
-const long SWP_NOMOVE = 2;
+//const long SWP_NOMOVE = 2;
 //Public Const SWP_NOSIZE As Long = 1
-const long SWP_NOSIZE = 1;
+//const long SWP_NOSIZE = 1;
 //Public Const FLAGS = SWP_NOMOVE Or SWP_NOSIZE
-const long FLAGS = SWP_NOMOVE | SWP_NOSIZE;
+//const long FLAGS = SWP_NOMOVE | SWP_NOSIZE;
 //Public Const HWND_TOPMOST As Long = -1
-const long HWND_TOPMOST = -1;
+//const long HWND_TOPMOST = -1;
 //Public Const HWND_NOTOPMOST As Long = -2
-const long HWND_NOTOPMOST  = -2;
+//const long HWND_NOTOPMOST  = -2;
 //Public myBackBuffer As Long 'Backbuffer
 extern long myBackBuffer;
 //Public myBufferBMP As Long 'Backbuffer
@@ -133,9 +131,7 @@ extern long myBufferBMP;
 //Public AllCharBlock As Integer
 extern int AllCharBlock;
 //Public Const KEY_TOGGLED As Integer = &H1   'For control information
-const int KEY_TOGGLED = 0x01;
-//Public Const KEY_PRESSED As Integer = &H1000    'For control information
-const int KEY_PRESSED = 1;
+//const int KEY_TOGGLED = 0x01;
 //Public LocalNick As String  'Online Nickname
 //Public LocalCursor As Integer  'Online Cursor color
 //Public ClientPassword As String  'Password client is connecting with
@@ -1089,7 +1085,6 @@ extern std::string MessageText;
 extern int NumSelectWorld;
 //Public SelectWorld(1 To 100) As SelectWorld
 struct SelectWorld_t;
-const int maxSelectWorlds = 100;
 extern RangeArr<SelectWorld_t, 1, maxSelectWorlds> SelectWorld;
 //Public ShowFPS As Boolean
 extern bool ShowFPS;
@@ -1107,62 +1102,7 @@ extern bool LevelEditor;
 extern bool WorldEditor;
 //Public PlayerStart(1 To 2) As Location
 extern RangeArr<Location_t, 1, 2> PlayerStart;
-//Public Const vScreenYOffset As Integer = 0     'Players Y on the screen
-const int vScreenYOffset = 0;
-//Public Const maxBlocks As Integer = 20000  'Max # of blocks
-const int maxBlocks = 20000;
-//Public Const maxPlayers As Integer = 200  'Holds the max number of players
-const int maxPlayers = 200;
-//Public Const maxEffects As Integer = 1000    'Max # of effects
-const int maxEffects = 1000;
-//Public Const maxNPCs As Integer = 5000    'Max # of NPCs
-const int maxNPCs = 5000;
-//Public Const maxBackgrounds As Integer = 8000    'Max # of background objects
-const int maxBackgrounds = 8000;
-//Public Const maxPlayerFrames As Integer = 750 'Maximum number of player frames
-const int maxPlayerFrames = 750;
-//Public Const maxBlockType As Integer = 700 'Maximum number of block types
-const int maxBlockType = 700;
-//Public Const maxBackgroundType As Integer = 200 'Maximum number of background types
-const int maxBackgroundType = 200;
-//Public Const maxSceneType As Integer = 100 'Maximum number of scenetypes
-const int maxSceneType = 100;
-//Public Const maxNPCType As Integer = 300 'Maximum number of NPC types
-const int maxNPCType = 300;
-//Public Const maxEffectType As Integer = 200 'Maximum number of effect types
-const int maxEffectType = 200;
-//Public Const maxWarps As Integer = 200 'Maximum number of warps
-const int maxWarps = 2000; // 200
-//Public Const numBackground2 As Integer = 100  'Total # of backgrounds
-const int numBackground2 = 100;
-//Public Const numCharacters As Integer = 5 'Maximum number of player characters
-const int numCharacters = 5;
-//Public Const numStates As Integer = 7   'Maximum number of player states
-const int numStates = 7;
-//Public Const maxWater As Integer = 1000
-const int maxWater = 1000;
-//Public Const maxWorldLevels As Integer = 400   'Maximum number of levels
-const int maxWorldLevels = 400;
-//Public Const maxWorldPaths As Integer = 2000   'Maximum number of paths
-const int maxWorldPaths = 2000;
-//Public Const maxWorldMusic As Integer = 1000   'Maximum number of musics
-const int maxWorldMusic = 1000;
-//Public Const numSounds As Integer = 100
-const int numSounds = 100;
-//Public Const maxSections As Integer = 20
-const int maxSections = 20;
-//Public Const maxTileType As Integer = 400
-const int maxTileType = 400;
-//Public Const maxLevelType As Integer = 100
-const int maxLevelType = 100;
-//Public Const maxPathType As Integer = 100
-const int maxPathType = 100;
-//Public Const maxTiles As Integer = 20000
-const int maxTiles = 20000;
-//Public Const maxScenes As Integer = 5000
-const int maxScenes = 5000;
-//Public Const frameRate As Double = 15 'for controlling game speed
-const int frameRate = 15;
+
 //Public blockCharacter(0 To 20) As Boolean
 extern RangeArrI<bool, 0, 20, false> blockCharacter;
 
@@ -1272,7 +1212,6 @@ extern RangeArr<Tile_t, 1, maxTiles> Tile;
 //Public Scene(1 To maxScenes) As Scene
 extern RangeArr<Scene_t, 1, maxScenes> Scene;
 //Public Credit(1 To 200) As CreditLine 'for end game credits
-const int maxCreditsLines = 200;
 extern RangeArr<CreditLine_t, 1, maxCreditsLines> Credit;
 //Public numCredits As Integer 'number of credits
 extern int numCredits;
@@ -1664,7 +1603,6 @@ extern int PSwitchTime;
 extern int PSwitchStop;
 //Public PSwitchPlayer As Integer
 extern int PSwitchPlayer;
-const int maxSaveSlots = 3;
 //Public SaveSlot(1 To 3) As Integer
 extern RangeArrI<int, 1, maxSaveSlots, 0> SaveSlot;
 //Public SaveStars(1 To 3) As Integer
@@ -1830,7 +1768,6 @@ extern bool Cheater;
 extern Uint32 RenderMode;
 //'--------------------------------
 //Public WorldCredits(1 To 5) As String
-const int maxWorldCredits = 100;
 extern RangeArr<std::string, 1, maxWorldCredits> WorldCredits;
 //Public Score As Long 'player's score
 extern int Score;
@@ -1994,8 +1931,6 @@ extern RangeArr<StdPicture, 1, 10> GFXLinkMaskBMP;
 extern RangeArrI<int, 1, 10, 0> GFXLinkHeight;
 //Public GFXLinkWidth(1 To 10) As Integer
 extern RangeArrI<int, 1, 10, 0> GFXLinkWidth;
-
-const int maxYoshiGfx = 10;
 //Public GFXYoshiBCustom(1 To 10) As Boolean
 extern RangeArrI<bool, 1, maxYoshiGfx, false> GFXYoshiBCustom;
 //Public GFXYoshiB(1 To 10) As Long
