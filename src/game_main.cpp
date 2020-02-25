@@ -1253,6 +1253,12 @@ void CheckActive()
 void AddCredit(std::string newCredit)
 {
     numCredits += 1;
+    if(numCredits > maxCreditsLines)
+    {
+        numCredits = maxCreditsLines;
+        pLogWarning("Can't add more credits lines: max limit has been excited ({0} linex maximum)", maxCreditsLines);
+        return;
+    }
     Credit[numCredits].Text = newCredit;
 }
 

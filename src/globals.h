@@ -1285,7 +1285,8 @@ extern RangeArr<Tile_t, 1, maxTiles> Tile;
 //Public Scene(1 To maxScenes) As Scene
 extern RangeArr<Scene_t, 1, maxScenes> Scene;
 //Public Credit(1 To 200) As CreditLine 'for end game credits
-extern RangeArr<CreditLine_t, 1, 200> Credit;
+const int maxCreditsLines = 200;
+extern RangeArr<CreditLine_t, 1, maxCreditsLines> Credit;
 //Public numCredits As Integer 'number of credits
 extern int numCredits;
 //Public numBlock As Integer 'number of blocks

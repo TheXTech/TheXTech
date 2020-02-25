@@ -111,7 +111,7 @@ int numWarps = 0;
 RangeArr<Warp_t, 1, maxWarps> Warp;
 RangeArr<Tile_t, 1, maxTiles> Tile;
 RangeArr<Scene_t, 1, maxScenes> Scene;
-RangeArr<CreditLine_t, 1, 200> Credit;
+RangeArr<CreditLine_t, 1, maxCreditsLines> Credit;
 int numCredits = 0;
 int numBlock = 0;
 int numBackground = 0;
