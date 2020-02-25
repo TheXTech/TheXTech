@@ -32,6 +32,8 @@
 
 #include "pseudo_vb.h"
 
+#include <Utils/maths.h>
+
 
 //  Get the screen position
 void GetvScreen(int A)
@@ -110,14 +112,17 @@ void GetvScreenAverage()
     int B = 0;
     double OldX = 0;
     double OldY = 0;
+
     OldX = vScreenX[1];
     OldY = vScreenY[1];
     UNUSED(OldY);
+
     vScreenX[1] = 0;
     vScreenY[1] = 0;
+
     for(A = 1; A <= numPlayers; A++)
     {
-        if(Player[A].Dead == false && Player[A].Effect != 6)
+        if(!Player[A].Dead && Player[A].Effect != 6)
         {
             vScreenX[1] = vScreenX[1] - Player[A].Location.X - Player[A].Location.Width / 2.0;
             if(Player[A].Mount == 2)
@@ -127,10 +132,11 @@ void GetvScreenAverage()
             B = B + 1;
         }
     }
+
     A = 1;
     if(B == 0)
     {
-        if(GameMenu == true)
+        if(GameMenu)
         {
             vScreenX[1] = -level[0].X;
             B = 1;
@@ -140,6 +146,7 @@ void GetvScreenAverage()
     }
     vScreenX[1] = (vScreenX[1] / B) + (ScreenW * 0.5);
     vScreenY[1] = (vScreenY[1] / B) + (ScreenH * 0.5) - vScreenYOffset;
+
     if(-vScreenX[A] < level[Player[1].Section].X)
         vScreenX[A] = -level[Player[1].Section].X;
     if(-vScreenX[A] + ScreenW > level[Player[1].Section].Width)
@@ -148,11 +155,12 @@ void GetvScreenAverage()
         vScreenY[A] = -level[Player[1].Section].Y;
     if(-vScreenY[A] + ScreenH > level[Player[1].Section].Height)
         vScreenY[A] = -(level[Player[1].Section].Height - ScreenH);
-    if(GameMenu == true)
+
+    if(GameMenu)
     {
         if(vScreenX[1] > OldX)
         {
-            if(vScreenX[1] == -level[0].X)
+            if(fEqual(vScreenX[1], -level[0].X))
                 vScreenX[1] = OldX + 20;
             else
                 vScreenX[1] = OldX;
@@ -229,7 +237,7 @@ void SetupEditorGraphics()
 //    GFX.BackgroundColor(2).Height = frmLevelWindow.vScreen(1).Height
 }
 
-void PlayerWarpGFX(int A, Location_t tempLocation, float X2, float Y2)
+void PlayerWarpGFX(int A, Location_t &tempLocation, float &X2, float &Y2)
 {
     // .Effect = 3      -- Warp Pipe
     // .Effect2 = 0     -- Entering
@@ -248,7 +256,7 @@ void PlayerWarpGFX(int A, Location_t tempLocation, float X2, float Y2)
         {
             if(Warp[Player[A].Warp].Entrance.Y > tempLocation.Y)
             {
-                Y2 = (Warp[Player[A].Warp].Entrance.Y - tempLocation.Y);
+                Y2 = float(Warp[Player[A].Warp].Entrance.Y - tempLocation.Y);
                 tempLocation.Y = Warp[Player[A].Warp].Entrance.Y;
                 tempLocation.Height = tempLocation.Height - Y2;
             }
@@ -257,14 +265,14 @@ void PlayerWarpGFX(int A, Location_t tempLocation, float X2, float Y2)
             tempLocation.Width = (Warp[Player[A].Warp].Entrance.X + Warp[Player[A].Warp].Entrance.Width) - (tempLocation.X);
         else if(Warp[Player[A].Warp].Direction == 2) // Moving left
         {
-            X2 = (Warp[Player[A].Warp].Entrance.X - tempLocation.X);
+            X2 = float(Warp[Player[A].Warp].Entrance.X - tempLocation.X);
             if(X2 < 0)
                 X2 = 0;
             else
                 tempLocation.X = Warp[Player[A].Warp].Entrance.X;
         }
     }
-    else if(Player[A].Effect2 == 2)
+    else if(Maths::iRound(Player[A].Effect2) == 2)
     {
         if(Warp[Player[A].Warp].Direction2 == 3) // Moving up
         {
@@ -275,33 +283,36 @@ void PlayerWarpGFX(int A, Location_t tempLocation, float X2, float Y2)
         {
             if(Warp[Player[A].Warp].Exit.Y > tempLocation.Y)
             {
-                Y2 = (Warp[Player[A].Warp].Exit.Y - tempLocation.Y);
+                Y2 = float(Warp[Player[A].Warp].Exit.Y - tempLocation.Y);
                 tempLocation.Y = Warp[Player[A].Warp].Exit.Y;
-                tempLocation.Height = tempLocation.Height - Y2;
+                tempLocation.Height = tempLocation.Height - double(Y2);
             }
         }
         else if(Warp[Player[A].Warp].Direction2 == 4) // Moving left
             tempLocation.Width = (Warp[Player[A].Warp].Exit.X + Warp[Player[A].Warp].Exit.Width) - (tempLocation.X);
         else if(Warp[Player[A].Warp].Direction2 == 2) // Moving right
         {
-            X2 = (Warp[Player[A].Warp].Exit.X - tempLocation.X);
+            X2 = float(Warp[Player[A].Warp].Exit.X - tempLocation.X);
             if(X2 < 0)
                 X2 = 0;
             else
                 tempLocation.X = Warp[Player[A].Warp].Exit.X;
         }
     }
-    if(Player[A].Effect2 == 1 || Player[A].Effect2 >= 100)
+
+    if(Maths::iRound(Player[A].Effect2) == 1 || Player[A].Effect2 >= 100)
         tempLocation.Height = 0;
+
     if(tempLocation.Height < 0)
     {
         tempLocation.Height = 0;
         tempLocation.Width = 0;
     }
-    tempLocation.Width = tempLocation.Width - X2;
+
+    tempLocation.Width -= double(X2);
 }
 
-void NPCWarpGFX(int A, Location_t tempLocation, float X2, float Y2)
+void NPCWarpGFX(int A, Location_t &tempLocation, float &X2, float &Y2)
 {
     // player(a).effect = 3      -- Warp Pipe
     // player(a).effect2 = 0     -- Entering
@@ -309,7 +320,7 @@ void NPCWarpGFX(int A, Location_t tempLocation, float X2, float Y2)
     // player(a).effect2 => 100  -- Delay at next spot
     // player(a).effect2 = 2     -- Exiting
     // player(a).effect2 = 3     -- Done
-    if(Player[A].Effect2 == 0)
+    if(Player[A].Effect2 == 0.0)
     {
         if(Warp[Player[A].Warp].Direction == 3) // Moving down
         {
@@ -320,23 +331,23 @@ void NPCWarpGFX(int A, Location_t tempLocation, float X2, float Y2)
         {
             if(Warp[Player[A].Warp].Entrance.Y > tempLocation.Y)
             {
-                Y2 = (Warp[Player[A].Warp].Entrance.Y - tempLocation.Y);
+                Y2 = float(Warp[Player[A].Warp].Entrance.Y - tempLocation.Y);
                 tempLocation.Y = Warp[Player[A].Warp].Entrance.Y;
-                tempLocation.Height = tempLocation.Height - Y2;
+                tempLocation.Height = tempLocation.Height - double(Y2);
             }
         }
         else if(Warp[Player[A].Warp].Direction == 4) // Moving right
             tempLocation.Width = (Warp[Player[A].Warp].Entrance.X + Warp[Player[A].Warp].Entrance.Width) - (tempLocation.X);
         else if(Warp[Player[A].Warp].Direction == 2) // Moving left
         {
-            X2 = (Warp[Player[A].Warp].Entrance.X - tempLocation.X);
+            X2 = float(Warp[Player[A].Warp].Entrance.X - tempLocation.X);
             if(X2 < 0)
                 X2 = 0;
             else
                 tempLocation.X = Warp[Player[A].Warp].Entrance.X;
         }
     }
-    else if(Player[A].Effect2 == 2)
+    else if(Maths::iRound(Player[A].Effect2) == 2)
     {
         if(Warp[Player[A].Warp].Direction2 == 3) // Moving up
         {
@@ -347,24 +358,26 @@ void NPCWarpGFX(int A, Location_t tempLocation, float X2, float Y2)
         {
             if(Warp[Player[A].Warp].Exit.Y > tempLocation.Y)
             {
-                Y2 = (Warp[Player[A].Warp].Exit.Y - tempLocation.Y);
+                Y2 = float(Warp[Player[A].Warp].Exit.Y - tempLocation.Y);
                 tempLocation.Y = Warp[Player[A].Warp].Exit.Y;
-                tempLocation.Height = tempLocation.Height - Y2;
+                tempLocation.Height = tempLocation.Height - double(Y2);
             }
         }
         else if(Warp[Player[A].Warp].Direction2 == 4) // Moving left
             tempLocation.Width = (Warp[Player[A].Warp].Exit.X + Warp[Player[A].Warp].Exit.Width) - (tempLocation.X);
         else if(Warp[Player[A].Warp].Direction2 == 2) // Moving right
         {
-            X2 = (Warp[Player[A].Warp].Exit.X - tempLocation.X);
+            X2 = float(Warp[Player[A].Warp].Exit.X - tempLocation.X);
             if(X2 < 0)
                 X2 = 0;
             else
                 tempLocation.X = Warp[Player[A].Warp].Exit.X;
         }
     }
-    if(Player[A].Effect2 == 1 || Player[A].Effect2 >= 100)
+
+    if(Maths::iRound(Player[A].Effect2) == 1 || Player[A].Effect2 >= 100)
         tempLocation.Height = 0;
+
     if(tempLocation.Height < 0)
     {
         tempLocation.Height = 0;
