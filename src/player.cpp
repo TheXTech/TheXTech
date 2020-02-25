@@ -4712,15 +4712,15 @@ void PlayerGrabCode(int A, bool DontResetGrabTime)
 
     if(LayerNPC > 0)
     {
-        for(B = 1; B <= 100; B++)
+        for(B = 1; B <= maxLayers; B++)
         {
-            if(Layer[B].Name != "")
+            if(!Layer[B].Name.empty())
             {
                 if(Layer[B].Name == NPC[LayerNPC].AttLayer)
                 {
-                    if(NPC[LayerNPC].Location.X - lyrX == 0 && NPC[LayerNPC].Location.Y - lyrY == 0)
+                    if(NPC[LayerNPC].Location.X - lyrX == 0.0 && NPC[LayerNPC].Location.Y - lyrY == 0.0)
                     {
-                        if(Layer[B].SpeedX != 0 || Layer[B].SpeedY != 0)
+                        if(Layer[B].SpeedX != 0.0f || Layer[B].SpeedY != 0.0f)
                         {
                             Layer[B].EffectStop = true;
                             Layer[B].SpeedX = 0;

@@ -670,7 +670,7 @@ void ClearLevel()
     }
 
     newEventNum = 0;
-    for(A = 0; A <= 100; A++)
+    for(A = 0; A <= maxEvents; A++)
     {
         Events[A] = blankEvent;
         for(B = 0; B <= maxSections; B++)

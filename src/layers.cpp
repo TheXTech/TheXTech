@@ -422,7 +422,7 @@ void ProcEvent(std::string EventName, bool NoEffect)
 
                 if(!(Events[A].ToggleLayer[B] == ""))
                 {
-                    for(C = 0; C <= 100; C++)
+                    for(C = 0; C <= maxLayers; C++)
                     {
                         if(Layer[C].Name == Events[A].ToggleLayer[B])
                         {

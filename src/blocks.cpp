@@ -1653,7 +1653,7 @@ void UpdateBlocks()
                                 Block[A].Layer = "Default";
                             if(Block[A].Hidden == true)
                             {
-                                for(B = 0; B <= 100; B++)
+                                for(B = 0; B <= maxLayers; B++)
                                 {
                                     if(Layer[B].Name == Block[A].Layer)
                                         Block[A].Hidden = Layer[B].Hidden;
