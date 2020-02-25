@@ -406,9 +406,9 @@ void UpdatePlayer()
                 if(Player[A].Stoned) // if statue form reset to normal
                     speedVar = 1;
                 if(Player[A].Character == 3)
-                    speedVar = (float)(speedVar * 0.93f);
+                    speedVar = (speedVar * 0.93f);
                 if(Player[A].Character == 4)
-                    speedVar = (float)(speedVar * 1.07f);
+                    speedVar = (speedVar * 1.07f);
 
                 // modify speedvar to slow the player down under water
                 if(Player[A].Wet > 0)
@@ -906,14 +906,14 @@ void UpdatePlayer()
                              Player[A].StandingOnNPC != 0 ||
                              Player[A].Slope > 0) &&
                             (std::abs(Player[A].Location.SpeedX) >= double(Physics.PlayerRunSpeed) ||
-                            (Player[A].Character == 3 && std::abs(Player[A].Location.SpeedX) >= 5.58)))
+                            (Player[A].Character == 3 && std::abs(Player[A].Location.SpeedX) >= 5.58 - 0.001))) // Rounding error of SpeedX makes an evil here
                         {
                             Player[A].RunCount += 1;
                         }
                         else
                         {
                             if(!(std::abs(Player[A].Location.SpeedX) >= double(Physics.PlayerRunSpeed) ||
-                                 (Player[A].Character == 3 && std::abs(Player[A].Location.SpeedX) >= 5.58)) )
+                                 (Player[A].Character == 3 && std::abs(Player[A].Location.SpeedX) >= 5.58 - 0.001)) )
                             {
                                 Player[A].RunCount -= 0.3f;
                             }
