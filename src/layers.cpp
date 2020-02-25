@@ -33,7 +33,10 @@
 #include "game_main.h"
 
 
+int numLayers = 0;
 RangeArr<Layer_t, 0, maxLayers> Layer;
+
+int numEvents = 0;
 RangeArr<Events_t, 0, maxEvents> Events;
 
 RangeArr<std::string, 1, maxEvents> NewEvent;

@@ -104,6 +104,9 @@ void OpenLevel(std::string FilePath)
     numNPCs = 0;
     numWarps = 0;
 
+    numLayers = 0;
+    numEvents = 0;
+
 // Load Custom Stuff
 //    if(DirMan::exists(FileNamePath + FileName))
 //        FindCustomNPCs(FileNamePath + FileName);
@@ -429,8 +432,12 @@ void OpenLevel(std::string FilePath)
 //            // Add into listbox
 //        }
         A++;
-        if(A > maxLayers)
+        numLayers++;
+        if(numLayers > maxLayers)
+        {
+            numLayers = maxLayers;
             break;
+        }
     }
 
     A = 0;
@@ -515,8 +522,12 @@ void OpenLevel(std::string FilePath)
         Events[A].AutoSection = int(e.scroll_section);
 
         A++;
-        if(A > maxEvents)
+        numEvents++;
+        if(numEvents > maxEvents)
+        {
+            numEvents = maxEvents;
             break;
+        }
     }
 
     FindBlocks();
@@ -650,7 +661,7 @@ void ClearLevel()
     Location_t BlankLocation = Location_t();
     Events_t blankEvent = Events_t();
     NPCScore[274] = 6;
-    LevelName = "";
+    LevelName.clear();
     LoadNPCDefaults();
     noUpdate = true;
     BlocksSorted = true;
@@ -669,6 +680,7 @@ void ClearLevel()
         AutoY[A] = 0;
     }
 
+    numEvents = 0;
     newEventNum = 0;
     for(A = 0; A <= maxEvents; A++)
     {
@@ -705,6 +717,7 @@ void ClearLevel()
     Layer[2].Name = "Spawned NPCs";
     Layer[2].Hidden = false;
 
+    numLayers = 0;
     for(A = 0; A <= maxLayers; A++)
     {
         Layer[A] = Layer_t();

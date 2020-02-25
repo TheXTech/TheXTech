@@ -102,10 +102,12 @@ struct Events_t
 
 //Public Layer(0 To 100) As Layer
 const int maxLayers = 255; // 100
+extern int numLayers;
 extern RangeArr<Layer_t, 0, maxLayers> Layer;
 
 //Public Events(0 To 100) As Events
 const int maxEvents = 255; // 100
+extern int numEvents;
 extern RangeArr<Events_t, 0, maxEvents> Events;
 
 //Public NewEvent(1 To 100) As String
