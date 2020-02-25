@@ -3219,7 +3219,7 @@ void SpecialNPC(int A)
                 NPC[A].Location.Y -= 1.5;
                 if(NPC[A].Special >= NPCHeight[NPC[A].Type] * 0.65 + 1)
                 {
-                    NPC[A].Location.Y = std::floor(NPC[A].Location.Y);
+                    NPC[A].Location.Y = std::round(NPC[A].Location.Y);
                     NPC[A].Special2 = 2;
                     NPC[A].Special = 0;
                 }
