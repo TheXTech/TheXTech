@@ -80,7 +80,7 @@ RangeArr<float, 0, maxSections> AutoY;
 int numStars = 0;
 RangeArr<Water_t, 0, maxWater> Water;
 int numWater = 0;
-RangeArr<Star_t, 1, 1000> Star;
+RangeArr<Star_t, 1, maxStarsNum> Star;
 std::string GoToLevel;
 std::string StartLevel;
 bool NoMap = false;

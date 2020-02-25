@@ -34,6 +34,7 @@
 #include "../player.h"
 #include "../npc.h"
 #include "../layers.h"
+#include "../game_main.h"
 
 
 void CheatCode(char NewKey)
@@ -66,11 +67,57 @@ void CheatCode(char NewKey)
 
     if(SDL_strstr(CheatString.c_str(), "redigitiscool"))
     {
+        pLogCritical("redigitiscool code was been used, player got a punish!");
+        PlaySound(70);
+        Score = 0; // Being very evil here, mu-ha-ha-ha-ha! >:D
+        Lives = 0;
+        Coins = 0;
+        GodMode = false;
+        ClearGame(); // As a penalty, remove the saved game
+        Cheater = true;
+        CheatString.clear();
+
+        if(!LevelSelect)
+        {
+            MessageText = "       Die, cheater!       "
+                          "Now play the game all over "
+                          "    from the beginning!    "
+                          "                           "
+                          "     Time to be evil!      "
+                          "      Mu-ha-ha-ha-ha!      ";
+            PauseGame(1);
+            MessageText.clear();
+        }
+
+        for(int A = 1; A <= numPlayers; ++A)
+        {
+            Player[A].State = 0;
+            Player[A].Hearts = 1;
+            PlayerHurt(A);
+        }
+
+        if(LevelSelect)
+        {
+            GameMenu = true;
+            MenuMode = 0;
+            MenuCursor = 0;
+            LevelSelect = false;
+            frmMain.clearBuffer();
+            frmMain.repaint();
+            StopMusic();
+            DoEvents();
+            SDL_Delay(500);
+        }
+        return;
+    }
+    else if(SDL_strstr(CheatString.c_str(), "\x77\x6f\x68\x6c\x73\x74\x61\x6e\x64\x69\x73\x74\x73\x65\x68\x72\x67\x75\x74"))
+    {
         PlaySound(69);
         Cheater = false;
         CheatString.clear();
         return;
     }
+
 
     if(LevelSelect) // On world map
     {

@@ -1125,7 +1125,7 @@ extern RangeArr<Water_t, 0, maxWater> Water;
 //Public numWater As Integer 'number of water
 extern int numWater;
 //Public Star(1 To 1000) As Star
-extern RangeArr<Star_t, 1, 1000> Star;
+extern RangeArr<Star_t, 1, maxStarsNum> Star;
 //Public GoToLevel As String
 extern std::string GoToLevel;
 //Public StartLevel As String 'start level for an episode

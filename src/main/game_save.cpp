@@ -231,3 +231,50 @@ void LoadGame()
     for(A = 1; A <= numPlayers; A++)
         Player[A] = SavedChar[Player[A].Character];
 }
+
+void ClearGame()
+{
+    curWorldMusic = 0;
+    curWorldMusicFile.clear();
+
+    ReturnWarp = 0;
+    ReturnWarpSaved = ReturnWarp;
+
+    WorldPlayer[1].Location.X = -1;
+    WorldPlayer[1].Location.Y = -1;
+
+    for(int A = 1, i = 0; A <= 5; A++, i++)
+    {
+        SavedChar[A].State = 1;
+        SavedChar[A].HeldBonus = 0;
+        SavedChar[A].Mount = 0;
+        SavedChar[A].MountType = 0;
+        SavedChar[A].Hearts = 1;
+        SavedChar[A].Character = A;
+    }
+
+    for(int A = 1; A <= maxWorldPaths; ++A)
+        WorldPath[A].Active = false;
+
+    for(int A = 1; A <= maxWorldLevels; ++A)
+        WorldLevel[A].Active = false;
+
+    for(int A = 1; A <= maxScenes; ++A)
+        Scene[A].Active = true;
+
+    for(int A = 1; A <= maxStarsNum; ++A)
+    {
+        Star[A].level.clear();
+        Star[A].Section = 0;
+    }
+
+    maxStars = 0;
+    numStars = 0;
+
+    std::string savePath = SelectWorld[selWorld].WorldPath + fmt::format_ne("save{0}.savx", selSave);
+    std::string savePathOld = SelectWorld[selWorld].WorldPath + fmt::format_ne("save{0}.sav", selSave);
+    if(Files::fileExists(savePath))
+        Files::deleteFile(savePath);
+    if(Files::fileExists(savePathOld))
+        Files::deleteFile(savePathOld);
+}

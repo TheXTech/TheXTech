@@ -76,6 +76,8 @@ void FindSaves();
 void SaveGame();
 
 void LoadGame();
+//! Removes gamesave file and restores initial state of all level objects
+void ClearGame();
 
 void PauseGame(int plr);
 
