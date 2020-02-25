@@ -25,6 +25,7 @@
 
 #include <Logger/logger.h>
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_messagebox.h>
 
 #include "../globals.h"
 #include "../sound.h"
@@ -87,6 +88,18 @@ void CheatCode(char NewKey)
                           "      Mu-ha-ha-ha-ha!      ";
             PauseGame(1);
             MessageText.clear();
+        }
+        else
+        {
+            SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,
+                                     "Die, cheater!",
+                                     "       Die, cheater!       \n"
+                                     "Now play the game all over \n"
+                                     "    from the beginning!    \n"
+                                     "                           \n"
+                                     "     Time to be evil!      \n"
+                                     "      Mu-ha-ha-ha-ha!      ",
+                                     frmMain.getWindow());
         }
 
         for(int A = 1; A <= numPlayers; ++A)
