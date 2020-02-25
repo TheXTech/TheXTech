@@ -27,6 +27,76 @@
 #define LAYERS_H
 
 #include <string>
+#include "range_arr.hpp"
+#include "globals.h"
+
+//Public Type Layer
+struct Layer_t
+{
+//    EffectStop As Boolean
+    bool EffectStop = false;
+//    Name As String
+    std::string Name;
+//    Hidden As Boolean
+    bool Hidden = false;
+//    SpeedX As Single
+    float SpeedX = 0.0f;
+//    SpeedY As Single
+    float SpeedY = 0.0f;
+//End Type
+};
+
+//Public Type Events
+struct Events_t
+{
+//    addSavedEvent As String
+    std::string addSavedEvent;
+//    RemoveSavedEvent As String
+    std::string RemoveSavedEvent;
+//    LayerSmoke As Boolean
+    bool LayerSmoke = false;
+//    Sound As Integer
+    int Sound = 0;
+//    Name As String
+    std::string Name;
+//    Text As String
+    std::string Text;
+//    HideLayer(0 To 20) As String
+    RangeArr<std::string, 0, 20> HideLayer;
+//    ShowLayer(0 To 20) As String
+    RangeArr<std::string, 0, 20> ShowLayer;
+//    ToggleLayer(0 To 20) As String
+    RangeArr<std::string, 0, 20> ToggleLayer;
+//    Music(0 To maxSections) As Integer
+    RangeArrI<int, 0, maxSections, 0> Music;
+//    Background(0 To maxSections) As Integer
+    RangeArrI<int, 0, maxSections, 0> Background;
+//    level(0 To maxSections) As Location
+    RangeArr<Location_t, 0, maxSections> level;
+//    EndGame As Integer
+    int EndGame = 0;
+//    TriggerEvent As String
+    std::string TriggerEvent;
+//    TriggerDelay As Double
+    double TriggerDelay = 0.0;
+//    Controls As Controls
+    Controls_t Controls;
+//    MoveLayer As String
+    std::string MoveLayer;
+//    SpeedX As Single
+    float SpeedX = 0.0f;
+//    SpeedY As Single
+    float SpeedY = 0.0f;
+//    AutoX As Single
+    float AutoX = 0.0f;
+//    AutoY As Single
+    float AutoY = 0.0f;
+//    AutoSection As Integer
+    int AutoSection = 0;
+//    AutoStart As Boolean
+    bool AutoStart = false;
+//End Type
+};
 
 //Public Layer(0 To 100) As Layer
 const int maxLayers = 100;
