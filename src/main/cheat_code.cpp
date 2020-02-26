@@ -66,6 +66,7 @@ void CheatCode(char NewKey)
 //    std::printf("Cheat string: [%s]\n", CheatString.c_str());
 //    std::fflush(stdout);
 
+#ifdef ENABLE_ANTICHEAT_TRAP
     if(SDL_strstr(CheatString.c_str(), "redigitiscool"))
     {
         pLogCritical("redigitiscool code was been used, player got a punish!");
@@ -127,6 +128,9 @@ void CheatCode(char NewKey)
         return;
     }
     else if(SDL_strstr(CheatString.c_str(), "\x77\x6f\x68\x6c\x73\x74\x61\x6e\x64\x69\x73\x74\x73\x65\x68\x72\x67\x75\x74"))
+#else
+    if(SDL_strstr(CheatString.c_str(), "redigitiscool"))
+#endif
     {
         PlaySound(69);
         Cheater = false;
