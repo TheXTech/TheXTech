@@ -1030,7 +1030,16 @@ void UpdateGraphics(bool skipRepaint)
             {
                 if(vScreenCollision(Z, Block[A].Location) && !Block[A].Hidden)
                 {
-                    frmMain.renderTexture(vScreenX[Z] + Block[A].Location.X, vScreenY[Z] + Block[A].Location.Y + Block[A].ShakeY3, Block[A].Location.Width, Block[A].Location.Height, GFXBlock[Block[A].Type], 0, BlockFrame[Block[A].Type] * 32);
+                    // Don't show a visual difference of hit-resized block in a comparison to original state
+                    double offX = Block[A].wasShrinkResized ? 0.05 : 0.0;
+                    double offW = Block[A].wasShrinkResized ? 0.1 : 0.0;
+                    frmMain.renderTexture(vScreenX[Z] + Block[A].Location.X - offX,
+                                          vScreenY[Z] + Block[A].Location.Y + Block[A].ShakeY3,
+                                          Block[A].Location.Width + offW,
+                                          Block[A].Location.Height,
+                                          GFXBlock[Block[A].Type],
+                                          0,
+                                          BlockFrame[Block[A].Type] * 32);
                 }
             }
         }
@@ -1545,7 +1554,16 @@ void UpdateGraphics(bool skipRepaint)
             {
                 if(vScreenCollision(Z, Block[A].Location) && !Block[A].Hidden)
                 {
-                    frmMain.renderTexture(vScreenX[Z] + Block[A].Location.X, vScreenY[Z] + Block[A].Location.Y + Block[A].ShakeY3, Block[A].Location.Width, Block[A].Location.Height, GFXBlock[Block[A].Type], 0, BlockFrame[Block[A].Type] * 32);
+                    // Don't show a visual difference of hit-resized block in a comparison to original state
+                    double offX = Block[A].wasShrinkResized ? 0.05 : 0.0;
+                    double offW = Block[A].wasShrinkResized ? 0.1 : 0.0;
+                    frmMain.renderTexture(vScreenX[Z] + Block[A].Location.X - offX,
+                                          vScreenY[Z] + Block[A].Location.Y + Block[A].ShakeY3,
+                                          Block[A].Location.Width + offW,
+                                          Block[A].Location.Height,
+                                          GFXBlock[Block[A].Type],
+                                          0,
+                                          BlockFrame[Block[A].Type] * 32);
                 }
             }
         }
