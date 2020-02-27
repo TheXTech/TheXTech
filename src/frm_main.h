@@ -110,7 +110,13 @@ public:
 
     void makeShot();
 
+    bool recordInProcess();
+    void toggleGifRecorder();
+    void processRecorder();
+
 private:
+    static int  processRecorder_action(void *_pixels);
+
     void processEvent();
     void loadTexture(StdPicture &target, uint32_t width, uint32_t height, uint8_t *RGBApixels);
 

@@ -27,6 +27,8 @@
 #include "game_main.h"
 #include "graphics.h"
 #include "joystick.h"
+#include "sound.h"
+
 #include <AppPath/app_path.h>
 #include <Logger/logger.h>
 #include <Utils/files.h>
@@ -38,6 +40,7 @@
 #include <chrono>
 #include <fmt_time_ne.h>
 #include <fmt_format_ne.h>
+#include <gif.h>
 
 #include <SDL2/SDL_thread.h>
 
@@ -349,6 +352,8 @@ void FrmMain::eventKeyDown(SDL_KeyboardEvent &evt)
 
     if(KeyCode == SDL_SCANCODE_F12)
         TakeScreen = true;
+    else if(KeyCode == SDL_SCANCODE_F11)
+        toggleGifRecorder();
 }
 
 void FrmMain::eventKeyPress(SDL_Scancode KeyASCII)
@@ -472,6 +477,7 @@ bool FrmMain::isSdlError()
 void FrmMain::repaint()
 {
     SDL_RenderPresent(m_gRenderer);
+    processRecorder();
 }
 
 void FrmMain::updateViewport()
@@ -961,6 +967,141 @@ static std::string shoot_getTimedString(std::string path, const char *ext = "png
                                prevSecCounter,
                                ext);
     }
+}
+
+static struct gifRecord
+{
+    GIF_H::GifWriter  writer      = {nullptr, nullptr, true, false};
+    SDL_Thread *worker      = nullptr;
+    SDL_mutex  *mutex       = nullptr;
+    uint32_t    delay       = 4;
+    uint32_t    delayTimer  = 0;
+    bool        enabled     = false;
+    unsigned char padding[7] = {0, 0, 0, 0, 0, 0, 0};
+} g_gif;
+
+bool FrmMain::recordInProcess()
+{
+    return g_gif.enabled;
+}
+
+void FrmMain::toggleGifRecorder()
+{
+    (void)GIF_H::GifOverwriteLastDelay;// shut up a warning about unused function
+
+    if(!g_gif.enabled)
+    {
+        if(!DirMan::exists(g_ScreenshotPath))
+            DirMan::mkAbsDir(g_ScreenshotPath);
+
+        std::string saveTo = shoot_getTimedString(g_ScreenshotPath, "gif");
+
+        FILE *gifFile = Files::utf8_fopen(saveTo.data(), "wb");
+        if(GIF_H::GifBegin(&g_gif.writer,
+                    gifFile,
+                    static_cast<uint32_t>(viewport_w),
+                    static_cast<uint32_t>(viewport_h), g_gif.delay, false))
+        {
+            g_gif.enabled = true;
+            PlaySound(6);
+        }
+    }
+    else
+    {
+#ifndef PGE_NO_THREADING
+        if(g_gif.worker)
+            SDL_WaitThread(g_gif.worker, nullptr);
+        g_gif.worker = nullptr;
+#endif
+        //if(g_gif.mutex)
+        //    SDL_DestroyMutex(g_gif.mutex);
+        //g_gif.mutex = nullptr;
+        GIF_H::GifEnd(&g_gif.writer);
+        g_gif.enabled = false;
+        PlaySound(5);
+    }
+}
+
+void FrmMain::processRecorder()
+{
+    if(!g_gif.enabled)
+        return;
+
+    g_gif.delayTimer += 1000.0 / 65.0;
+    if(g_gif.delayTimer >= g_gif.delay * 10)
+        g_gif.delayTimer = 0.0;
+    if(g_gif.delayTimer != 0.0)
+        return;
+
+    // Make the BYTE array, factor of 3 because it's RBG.
+    int w, h;
+    SDL_GetWindowSize(m_window, &w, &h);
+
+    if((w == 0) || (h == 0))
+    {
+        PlaySound(18);
+        return;
+    }
+
+    w = w - static_cast<int>(offset_x) * 2;
+    h = h - static_cast<int>(offset_y) * 2;
+    uint8_t *pixels = new uint8_t[size_t(4 * w * h)];
+    getScreenPixelsRGBA(static_cast<int>(offset_x), static_cast<int>(offset_y), w, h, pixels);
+
+    PGE_GL_shoot *shoot = new PGE_GL_shoot();
+    shoot->pixels = pixels;
+    shoot->w = w;
+    shoot->h = h;
+    shoot->me = this;
+#ifndef PGE_NO_THREADING
+    if(g_gif.worker)
+        SDL_WaitThread(g_gif.worker, nullptr);
+    g_gif.worker = SDL_CreateThread(processRecorder_action, "gif_recorder", reinterpret_cast<void *>(shoot));
+#else
+    processRecorder_action(reinterpret_cast<void *>(shoot));
+#endif
+}
+
+int FrmMain::processRecorder_action(void *_pixels)
+{
+    //SDL_LockMutex(g_gif.mutex);
+    PGE_GL_shoot *shoot = reinterpret_cast<PGE_GL_shoot *>(_pixels);
+    FrmMain *me = shoot->me;
+    FIBITMAP *shotImg = FreeImage_ConvertFromRawBitsEx(false, reinterpret_cast<BYTE *>(shoot->pixels), FIT_BITMAP,
+                        shoot->w, shoot->h,
+                        4 * shoot->w, 32,
+                        0xFF000000, 0x00FF0000, 0x0000FF00, false);
+    if((shoot->w != me->viewport_w) || (shoot->h != me->viewport_h))
+    {
+        FIBITMAP *temp;
+        temp = FreeImage_Rescale(shotImg, me->viewport_w, me->viewport_h, FILTER_BOX);
+        if(!temp)
+        {
+            FreeImage_Unload(shotImg);
+            delete []shoot->pixels;
+            shoot->pixels = nullptr;
+            delete []shoot;
+            SDL_UnlockMutex(g_gif.mutex);
+            return 0;
+        }
+        FreeImage_Unload(shotImg);
+        shotImg = temp;
+    }
+
+    if(FreeImage_HasPixels(shotImg) == FALSE)
+        pLogWarning("Can't save gif frame: no pixel data!");
+
+    uint8_t *img = FreeImage_GetBits(shotImg);
+    GifWriteFrame(&g_gif.writer, img,
+                  static_cast<uint32_t>(me->viewport_w),
+                  static_cast<uint32_t>(me->viewport_h),
+                  g_gif.delay/*uint32_t((ticktime)/10.0)*/, 8, false);
+    FreeImage_Unload(shotImg);
+    delete[] shoot->pixels;
+    shoot->pixels = nullptr;
+    delete []shoot;
+    //SDL_UnlockMutex(g_gif.mutex);
+    return 0;
 }
 
 int FrmMain::makeShot_action(void *_pixels)
