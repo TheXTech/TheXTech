@@ -33,12 +33,14 @@ inline std::tm localtime_ne(std::time_t time)
     catch(const FormatError &e)
     {
         std::tm t;
+        std::memset(&t, 0, sizeof(std::tm));
         pLogFatal("fmt::format error: Thrown exception [%s] on attempt to process localtime", e.what());
         return t;
     }
     catch(...)
     {
         std::tm t;
+        std::memset(&t, 0, sizeof(std::tm));
         pLogFatal("fmt::format error: Thrown unknown exception on attempt to process localtime");
         return t;
     }
