@@ -119,6 +119,13 @@ void SetupCredits()
     AddCredit("'Wohlstand'");
     AddCredit("");
     AddCredit("");
+    AddCredit("NSMBX By:");
+    AddCredit("");
+    AddCredit("Ekaterina Bolyakova");
+    AddCredit("'Core'");
+    AddCredit("");
+    AddCredit("");
+
 
     if(!WorldCredits[1].empty())
     {

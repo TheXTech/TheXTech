@@ -373,6 +373,14 @@ void SetupVars()
     NPCWidthGFX[289] = 32;
     NPCHeightGFX[289] = 64;
 
+    //SMM2 Spike (& Spike ball)
+    NPCWidth[293] = 32;
+    NPCHeight[293] = 32;
+    NPCWidthGFX[293] = 36;
+    NPCHeightGFX[293] = 34;
+    NPCWidth[294] = 32;
+    NPCHeight[294] = 32;
+    NPCJumpHurt[294] = true;
 
     NPCWidth[283] = 48;
     NPCHeight[283] = 48;

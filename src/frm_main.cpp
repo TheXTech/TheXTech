@@ -58,7 +58,7 @@ FrmMain::FrmMain()
 {
     ScaleWidth = ScreenW;
     ScaleHeight = ScreenH;
-    m_windowTitle = fmt::format_ne("A2xTech v{0}", V_LATEST_STABLE);
+    m_windowTitle = fmt::format_ne("New Super Mario Bros. X - 1.0", V_LATEST_STABLE);
 }
 
 SDL_Window *FrmMain::getWindow()

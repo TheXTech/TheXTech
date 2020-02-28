@@ -2078,6 +2078,26 @@ void NPCFrames(int A)
         if(NPC[A].Direction == 1)
             NPC[A].Frame = NPC[A].Frame + 2;
     }
+    else if(NPC[A].Type == 293) //SMM2 Spike
+    {
+        if(NPC[A].Special == 1)
+            NPC[A].Frame = 2;
+        else if(NPC[A].Special == 2)
+            NPC[A].Frame = 3;
+        else if(NPC[A].Special == 3)
+            NPC[A].Frame = 4;
+        else if (NPC[A].Special == 0)
+        {
+            NPC[A].Frame = 0;
+            NPC[A].FrameCount = NPC[A].FrameCount + 1;
+            if(NPC[A].FrameCount > 32)
+                NPC[A].FrameCount = 0;
+            else if(NPC[A].FrameCount >= 16)
+                NPC[A].Frame = 1;
+        }
+        if(NPC[A].Direction == 1)
+            NPC[A].Frame = NPC[A].Frame + 3;
+    }
     else if(NPC[A].Type == 29) // SMB Hammer Bro
     {
         if(NPC[A].Special3 >= 0)
