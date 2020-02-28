@@ -97,6 +97,7 @@ int numScenes = 0;
 RangeArr<std::string, 0, maxSections> CustomMusic;
 RangeArr<Location_t, 0, maxSections> level;
 RangeArrI<bool, 0, maxSections, false> LevelWrap;
+RangeArrI<bool, 0, maxSections, false> LevelVWrap;
 RangeArrI<bool, 0, maxSections, false> OffScreenExit;
 RangeArrI<int, 0, maxSections, 0> bgMusic;
 RangeArrI<int, 0, maxSections, 0> bgMusicREAL;

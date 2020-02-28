@@ -1161,6 +1161,8 @@ extern RangeArr<std::string, 0, maxSections> CustomMusic;
 extern RangeArr<Location_t, 0, maxSections> level;
 //Public LevelWrap(0 To maxSections) As Boolean 'Wrap around the level
 extern RangeArrI<bool, 0, maxSections, false> LevelWrap;
+//EXTRA: Wrap vertically around the level
+extern RangeArrI<bool, 0, maxSections, false> LevelVWrap;
 //Public OffScreenExit(0 To maxSections) As Boolean 'walk offscreen to end the level
 extern RangeArrI<bool, 0, maxSections, false> OffScreenExit;
 //Public bgMusic(0 To maxSections) As Integer 'music

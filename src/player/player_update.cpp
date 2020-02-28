@@ -2143,14 +2143,28 @@ void UpdatePlayer()
                     Player[A].YoshiYellow = false;
 
                 // level wrap
-                if(LevelWrap[Player[A].Section])
+                if(LevelWrap[Player[A].Section] || LevelVWrap[Player[A].Section])
                 {
-                    if(Player[A].Location.X + Player[A].Location.Width < level[Player[A].Section].X)
-                        Player[A].Location.X = level[Player[A].Section].Width - 1;
-                    else if(Player[A].Location.X > level[Player[A].Section].Width)
-                        Player[A].Location.X = level[Player[A].Section].X - Player[A].Location.Width + 1;
-                    // Walk offscreen exit
+                    // horizontally
+                    if(LevelWrap[Player[A].Section])
+                    {
+                        if(Player[A].Location.X + Player[A].Location.Width < level[Player[A].Section].X)
+                            Player[A].Location.X = level[Player[A].Section].Width - 1;
+                        else if(Player[A].Location.X > level[Player[A].Section].Width)
+                            Player[A].Location.X = level[Player[A].Section].X - Player[A].Location.Width + 1;
+                    }
+
+                    // vertically
+                    if(LevelVWrap[Player[A].Section])
+                    {
+                        if(Player[A].Location.Y + Player[A].Location.Height < level[Player[A].Section].Y)
+                            Player[A].Location.Y = level[Player[A].Section].Height - 1;
+                        else if(Player[A].Location.Y > level[Player[A].Section].Height)
+                            Player[A].Location.Y = level[Player[A].Section].Y - Player[A].Location.Height + 1;
+                    }
                 }
+
+                // Walk offscreen exit
                 else if(OffScreenExit[Player[A].Section])
                 {
                     if(Player[A].Location.X + Player[A].Location.Width < level[Player[A].Section].X)
