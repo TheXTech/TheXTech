@@ -899,6 +899,9 @@ struct Warp_t
     int curStars = 0;
 //    maxStars As Integer
     int maxStars = 0;
+//EXTRA:
+    bool cannonExit = false;
+    double cannonExitSpeed = 10.0;
     std::string eventEnter;
     std::string StarsMsg;
 //End Type
