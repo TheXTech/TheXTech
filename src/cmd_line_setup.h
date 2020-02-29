@@ -22,6 +22,10 @@ struct CmdLineSetup_t
     bool testLevelMode = false;
     //! Level file to test
     std::string testLevel;
+    //! Number of players for level test
+    int testNumPlayers = 1;
+    //! Run a test in battle mode
+    bool testBattleMode = false;
 };
 
 #endif // CMD_LINE_SETUP_H

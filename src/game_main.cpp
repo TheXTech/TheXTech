@@ -117,6 +117,18 @@ int GameMain(const CmdLineSetup_t &setup)
         GameMenu = false;
         LevelSelect = false;
         FullFileName = setup.testLevel;
+        if(setup.testBattleMode)
+        {
+            numPlayers = 2;
+            BattleMode = true;
+            BattleIntro = 150;
+        }
+        else
+        {
+            numPlayers = setup.testNumPlayers;
+            BattleMode = false;
+            BattleIntro = 0;
+        }
         zTestLevel();
     }
 

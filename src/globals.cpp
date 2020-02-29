@@ -507,7 +507,6 @@ void initAll()
     conKeyboard.fill(ConKeyboard_t());
     conJoystick.fill(ConJoystick_t());
     useJoystick.fill(0);
-    testPlayer.fill(Player_t());
     SelectWorld.fill(SelectWorld_t());
     vScreen.fill(vScreen_t());
     PlayerStart.fill(Location_t());
