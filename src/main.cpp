@@ -141,10 +141,20 @@ int main(int argc, char**argv)
                                                        "с1;s2;m0;t0 : c - character, s - state, m - mount, t - mount type",
                                                        cmd);
 
+        TCLAP::SwitchArg switchTestGodMode("g", "god-mode", "Enable god mode in level testing", false);
+        TCLAP::SwitchArg switchTestGrabAll("a", "grab-all", "Enable ability to grab everything while level testing", false);
+        TCLAP::SwitchArg switchTestShowFPS("m", "show-fps", "Show FPS counter on the screen", false);
+        TCLAP::SwitchArg switchTestMaxFPS("x", "max-fps", "Run FPS as fast as possible", false);
+
         cmd.add(&switchFrameSkip);
         cmd.add(&switchNoSound);
         cmd.add(&switchNoPause);
         cmd.add(&switchBattleMode);
+
+        cmd.add(&switchTestGodMode);
+        cmd.add(&switchTestGrabAll);
+        cmd.add(&switchTestShowFPS);
+        cmd.add(&switchTestMaxFPS);
 
         cmd.parse(argc, argv);
 
@@ -171,6 +181,10 @@ int main(int argc, char**argv)
             strToPlayerSetup(2, playerCharacter2.getValue());
         }
 
+        setup.testGodMode = switchTestGodMode.getValue();
+        setup.testGrabAll = switchTestGrabAll.getValue();
+        setup.testShowFPS = switchTestShowFPS.getValue();
+        setup.testMaxFPS = switchTestMaxFPS.getValue();
     }
     catch(TCLAP::ArgException &e)   // catch any exceptions
     {

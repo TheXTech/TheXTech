@@ -26,6 +26,15 @@ struct CmdLineSetup_t
     int testNumPlayers = 1;
     //! Run a test in battle mode
     bool testBattleMode = false;
+
+    //! Allow playable character grab everything
+    bool testGrabAll = false;
+    //! Make playable character be inmortal
+    bool testGodMode = false;
+    //! Make playable character be inmortal
+    bool testShowFPS = false;
+    //! Make playable character be inmortal
+    bool testMaxFPS = false;
 };
 
 #endif // CMD_LINE_SETUP_H

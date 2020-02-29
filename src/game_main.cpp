@@ -112,6 +112,9 @@ int GameMain(const CmdLineSetup_t &setup)
     LoadGFX(); // load the graphics from file
     SetupVars(); //Setup Variables
 
+    ShowFPS = setup.testShowFPS;
+    MaxFPS = setup.testMaxFPS;
+
     if(!setup.testLevel.empty()) // Start level testing immediately!
     {
         GameMenu = false;
@@ -129,6 +132,8 @@ int GameMain(const CmdLineSetup_t &setup)
             BattleMode = false;
             BattleIntro = 0;
         }
+        GodMode = setup.testGodMode;
+        GrabAll = setup.testGrabAll;
         zTestLevel();
     }
 
