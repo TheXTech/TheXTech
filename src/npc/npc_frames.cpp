@@ -1228,7 +1228,7 @@ void NPCFrames(int A)
         if(NPC[A].Direction == 1)
             NPC[A].Frame = NPC[A].Frame + 3;
     }
-    else if(NPC[A].Type == 294)
+    else if(NPC[A].Type == 294 || NPC[A].Type == 295)
     {
         NPC[A].Frame = 0;
     }

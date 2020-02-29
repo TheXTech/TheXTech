@@ -2286,7 +2286,7 @@ void NPCSpecial(int A)
             {
                 NPC[A].Special = 3;
             }
-            else if(NPC[A].Special2 == 208)
+            else if(NPC[A].Special2 == 224)
             {
                 NPC[A].Special = 0;
                 NPC[A].Special2 = 0;
@@ -2319,7 +2319,7 @@ void NPCSpecial(int A)
             }
             else if(NPC[A].Special2 < 50)
             {
-                NPC[A].Location.SpeedY = -0.69;
+                NPC[A].Location.SpeedY = -0.65;
             }
         }
         else
@@ -2532,7 +2532,17 @@ void NPCSpecial(int A)
     }
     else if(NPC[A].Type == 106)
         NPC[A].Location.SpeedY = NPC[A].Direction * 2;
-
+    else if(NPC[A].Type == 295)
+    {
+      if(fEqual(NPC[A].Special, 1))
+      {
+        NPC[A].Special2 = NPC[A].Special2 + 1;
+        if(NPC[A].Special2 <= 50)
+            NPC[A].Location.SpeedY = 1;
+        else if(NPC[A].Special2 >= 51)
+            NPC[A].Location.SpeedY = NPC[A].Location.SpeedY + Physics.NPCGravity;
+      }
+    }
     else if(NPC[A].Type == 199)
     {
         if(NPC[A].Special == 0.0)

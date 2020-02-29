@@ -47,6 +47,9 @@ void SetupVars()
     GFXLevelBig[24] = true;
     GFXLevelBig[28] = true;
 
+    EffectWidth[149] = 34;
+    EffectHeight[149] = 34;
+
     EffectWidth[145] = 32;
     EffectHeight[145] = 60;
 
@@ -953,7 +956,10 @@ void SetupVars()
     NPCWidth[105] = 128; // SMW Falling Platform
     NPCHeight[105] = 22;
     NPCNoYoshi[105] = true;
-    NPCWidth[106] = 128; // SMB Platform
+    NPCWidth[295] = 96; // SMW Gray Platform
+    NPCHeight[295] = 22;
+    NPCNoYoshi[295] = true;
+    NPCWidth[106] = 128; // SMB1 Platform
     NPCHeight[106] = 16;
     NPCNoYoshi[106] = true;
     NPCWidth[107] = 24; // Bob-omb buddy
@@ -1533,6 +1539,7 @@ void SetupVars()
     NPCCanWalkOn[92] = true;
     NPCCanWalkOn[104] = true;
     NPCCanWalkOn[105] = true;
+    NPCCanWalkOn[295] = true;
     NPCCanWalkOn[106] = true;
     NPCGrabFromTop[19] = true;
     NPCGrabFromTop[20] = true;
@@ -1578,6 +1585,7 @@ void SetupVars()
     NPCNoClipping[93] = true;
     NPCNoClipping[104] = true;
     NPCNoClipping[105] = true;
+    NPCNoClipping[295] = true;
     NPCNoClipping[106] = true;
     NPCNoClipping[108] = true;
     NPCTurnsAtCliffs[6] = true;
@@ -1653,6 +1661,7 @@ void SetupVars()
     NPCWontHurt[100] = true;
     NPCWontHurt[104] = true;
     NPCWontHurt[105] = true;
+    NPCWontHurt[295] = true;
     NPCWontHurt[106] = true;
     NPCWontHurt[107] = true;
     NPCWontHurt[108] = true;
@@ -1709,6 +1718,7 @@ void SetupVars()
     NPCIsAHit1Block[66] = true;
     NPCIsAHit1Block[104] = true;
     NPCIsAHit1Block[105] = true;
+    NPCIsAHit1Block[295] = true;
     NPCIsAHit1Block[106] = true;
     NPCWontHurt[190] = true;
     NPCCanWalkOn[190] = true;

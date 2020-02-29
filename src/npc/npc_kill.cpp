@@ -232,6 +232,8 @@ void KillNPC(int A, int B)
                     NewEffect(2, NPC[A].Location);
                 else if(NPC[A].Type == 242)
                     NewEffect(126, NPC[A].Location);
+                else if(NPC[A].Type == 293)
+                    NewEffect(149, NPC[A].Location);
                 else
                     NewEffect(84, NPC[A].Location, NPC[A].Direction);
             }
@@ -271,6 +273,8 @@ void KillNPC(int A, int B)
                     NewEffect(87, NPC[A].Location, NPC[A].Direction);
                 else if(NPC[A].Type == 163)
                     NewEffect(85, NPC[A].Location, NPC[A].Direction);
+                else if(NPC[A].Type == 293)
+                    NewEffect(149, NPC[A].Location, NPC[A].Direction);
                 else if(NPC[A].Type == 229)
                 {
                     NPC[A].Location.SpeedY = -11;

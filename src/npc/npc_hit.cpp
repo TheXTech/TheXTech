@@ -499,7 +499,7 @@ void NPCHit(int A, int B, int C)
             NPC[A].Type == 65 || NPC[A].Type == 71 || NPC[A].Type == 77 || NPC[A].Type == 271 ||
             NPC[A].Type == 89 || (NPC[A].Type >= 117 && NPC[A].Type <= 120) || NPC[A].Type == 162 ||
             NPC[A].Type == 163 || NPC[A].Type == 229 || NPC[A].Type == 236 || NPC[A].Type == 230 ||
-            NPC[A].Type == 232 || NPC[A].Type == 233 || NPC[A].Type == 234)
+            NPC[A].Type == 232 || NPC[A].Type == 233 || NPC[A].Type == 234 || NPC[A].Type == 293)
     {
         if(B == 1)
         {
