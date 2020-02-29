@@ -3907,10 +3907,15 @@ void SuperWarp(int A)
 
                 if(Warp[B].Stars > numStars && canWarp)
                 {
-                    if(Warp[B].Stars == 1)
-                        MessageText = "You need 1 star to enter.";
-                    else
-                        MessageText = fmt::format_ne("You need {0} stars to enter.", Warp[B].Stars);
+                    if(Warp[B].StarsMsg.empty())
+                    {
+                        if(Warp[B].Stars == 1)
+                            MessageText = "You need 1 star to enter.";
+                        else
+                            MessageText = fmt::format_ne("You need {0} stars to enter.", Warp[B].Stars);
+                    } else {
+                        MessageText = Warp[B].StarsMsg;
+                    }
                     PauseGame(A);
                     MessageText = "";
                     canWarp = false;

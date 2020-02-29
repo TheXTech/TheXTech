@@ -370,6 +370,8 @@ void OpenLevel(std::string FilePath)
         Warp[numWarps].WarpNPC = w.allownpc;
         Warp[numWarps].Locked = w.locked;
 
+        Warp[numWarps].StarsMsg = w.stars_msg;
+
         Warp[numWarps].Entrance.Height = 32;
         Warp[numWarps].Entrance.Width = 32;
         Warp[numWarps].Exit.Height = 32;
