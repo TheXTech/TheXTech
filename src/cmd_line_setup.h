@@ -1,6 +1,8 @@
 #ifndef CMD_LINE_SETUP_H
 #define CMD_LINE_SETUP_H
 
+#include <string>
+
 struct CmdLineSetup_t
 {
     //! Disable game sound
@@ -16,6 +18,23 @@ struct CmdLineSetup_t
         RENDER_HW = 1,
         RENDER_VSYNC = 2
     } renderType;
+    //! Is a level testing mode
+    bool testLevelMode = false;
+    //! Level file to test
+    std::string testLevel;
+    //! Number of players for level test
+    int testNumPlayers = 1;
+    //! Run a test in battle mode
+    bool testBattleMode = false;
+
+    //! Allow playable character grab everything
+    bool testGrabAll = false;
+    //! Make playable character be inmortal
+    bool testGodMode = false;
+    //! Make playable character be inmortal
+    bool testShowFPS = false;
+    //! Make playable character be inmortal
+    bool testMaxFPS = false;
 };
 
 #endif // CMD_LINE_SETUP_H

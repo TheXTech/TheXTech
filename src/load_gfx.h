@@ -28,6 +28,8 @@
 
 #include <string>
 
+extern bool gfxLoaderTestMode;
+
 // Public Sub LoadGFX()
 void LoadGFX();
 // Public Sub UnloadGFX()

@@ -51,5 +51,7 @@ const SDL_Scancode vbKeyZ = SDL_SCANCODE_Z;
 const SDL_Scancode vbKeyX = SDL_SCANCODE_X;
 const SDL_Scancode vbKeyA = SDL_SCANCODE_A;
 const SDL_Scancode vbKeyS = SDL_SCANCODE_S;
+const SDL_Scancode vbKeyPageUp = SDL_SCANCODE_PAGEUP;
+const SDL_Scancode vbKeyPageDown = SDL_SCANCODE_PAGEDOWN;
 
 #endif // PSEUDO_VB_H

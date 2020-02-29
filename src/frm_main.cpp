@@ -28,6 +28,7 @@
 #include "graphics.h"
 #include "joystick.h"
 #include "sound.h"
+#include "editor.h"
 
 #include <AppPath/app_path.h>
 #include <Logger/logger.h>
@@ -329,6 +330,14 @@ bool FrmMain::isWindowActive()
     return (flags & SDL_WINDOW_INPUT_FOCUS) != 0;
 }
 
+bool FrmMain::hasWindowMouseFocus()
+{
+    if(!m_window)
+        return false;
+    Uint32 flags = SDL_GetWindowFlags(m_window);
+    return (flags & SDL_WINDOW_MOUSE_FOCUS) != 0;
+}
+
 void FrmMain::eventDoubleClick()
 {
 
@@ -343,7 +352,7 @@ void FrmMain::eventKeyDown(SDL_KeyboardEvent &evt)
     else if(KeyCode == SDL_SCANCODE_LALT || KeyCode == SDL_SCANCODE_RALT)
         keyDownAlt = true;
 
-    if(keyDownAlt && keyDownEnter && !TestLevel)
+    if(keyDownAlt && keyDownEnter/* && !TestLevel*/)
     {
         keyDownAlt = false;
         keyDownEnter = false;
@@ -405,10 +414,27 @@ void FrmMain::eventMouseDown(SDL_MouseButtonEvent &event)
     {
         MenuMouseDown = true;
         MenuMouseMove = true;
+        if(LevelEditor || MagicHand || TestLevel)
+            EditorControls.Mouse1 = true;
     }
     else if(event.button == SDL_BUTTON_RIGHT)
     {
         MenuMouseBack = true;
+        if(LevelEditor || MagicHand || TestLevel)
+        {
+            optCursor.current = 13;
+            MouseMove(float(MenuMouseX), float(MenuMouseY));
+            SetCursor();
+        }
+    }
+    else if(event.button == SDL_BUTTON_MIDDLE)
+    {
+        if(LevelEditor || MagicHand || TestLevel)
+        {
+            optCursor.current = 6;
+            MouseMove(float(MenuMouseX), float(MenuMouseY));
+            SetCursor();
+        }
     }
 }
 
@@ -418,12 +444,21 @@ void FrmMain::eventMouseMove(SDL_MouseMotionEvent &event)
     MenuMouseX = p.x;// int(event.x * ScreenW / ScaleWidth);
     MenuMouseY = p.y;//int(event.y * ScreenH / ScaleHeight);
     MenuMouseMove = true;
+    if(LevelEditor || MagicHand || TestLevel)
+    {
+        EditorCursor.X = CursorPos.X;
+        EditorCursor.Y = CursorPos.Y;
+        MouseMove(EditorCursor.X, EditorCursor.Y, true);
+        MouseRelease = true;
+    }
 }
 
 void FrmMain::eventMouseUp(SDL_MouseButtonEvent &)
 {
     MenuMouseDown = false;
     MenuMouseRelease = true;
+    if(LevelEditor || MagicHand || TestLevel)
+        EditorControls.Mouse1 = false;
 }
 
 void FrmMain::eventResize()

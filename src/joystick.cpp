@@ -58,13 +58,13 @@ void UpdateControls()
 //    int C = 0;
 
 //    If TestLevel = True And Not (nPlay.Online = True And nPlay.Mode = 0) Then
-    if(TestLevel)
-    {
-        if(getKeyState(vbKeyEscape) == KEY_PRESSED)
-        {
-            EndLevel = true;
-        }
-    }
+//    if(TestLevel)
+//    {
+//        if(getKeyState(vbKeyEscape) == KEY_PRESSED)
+//        {
+//            EndLevel = true;
+//        }
+//    }
 
     if(numJoysticks > 0 && (useJoystick[1] || useJoystick[2]))
         SDL_JoystickUpdate();
