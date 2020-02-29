@@ -2078,7 +2078,7 @@ void UpdateGraphics(bool skipRepaint)
         }
 
 //        If LevelEditor = True Or MagicHand = True Then
-        if(LevelEditor || MagicHand)
+        if((LevelEditor || MagicHand) && !GamePaused)
         {
 
 #if 0 //.Useless editor-only stuff
@@ -2316,7 +2316,7 @@ void UpdateGraphics(bool skipRepaint)
                     {
                         SuperPrint(tempText,
                                    4,
-                                   162 + X + (27 * 9) - (tempText.length() * 9),
+                                   float(162 + X + (27 * 9)) - (tempText.length() * 9),
                                    Y + BoxY);
                     }
                     else
@@ -2335,9 +2335,9 @@ void UpdateGraphics(bool skipRepaint)
             {
                 auto &e = EditorCursor;
 
-                if(e.Mode == 1) // Blocks
+                if(e.Mode == OptCursor_t::LVL_BLOCKS) // Blocks
                 {
-                    auto &b = EditorCursor.Block;
+                    auto &b = e.Block;
                     if(BlockIsSizable[b.Type])
                     {
                         if(vScreenCollision(Z, b.Location))
@@ -2351,7 +2351,7 @@ void UpdateGraphics(bool skipRepaint)
 
                                     if(D != 0)
                                     {
-                                        if(D == (b.Location.Width / 32) - 1)
+                                        if(fEqual(D, (b.Location.Width / 32) - 1))
                                             D = 2;
                                         else
                                         {
@@ -2362,7 +2362,7 @@ void UpdateGraphics(bool skipRepaint)
 
                                     if(E != 0)
                                     {
-                                        if(E == (b.Location.Height / 32) - 1)
+                                        if(fEqual(E, (b.Location.Height / 32) - 1))
                                             E = 2;
                                         else
                                             E = 1;
@@ -2395,7 +2395,7 @@ void UpdateGraphics(bool skipRepaint)
                     }
                 }
 
-                else if(e.Mode == 2) // Player start points
+                else if(e.Mode == OptCursor_t::LVL_SETTINGS) // Player start points
                 {
 //                    If frmLevelSettings.optLevel(4).Value = True Or frmLevelSettings.optLevel(5).Value = True Then
 //                        If frmLevelSettings.optLevel(4).Value = True Then
@@ -2427,7 +2427,7 @@ void UpdateGraphics(bool skipRepaint)
 //                    End If
                 }
 
-                else if(e.Mode == 3) // BGOs
+                else if(e.Mode == OptCursor_t::LVL_BGOS) // BGOs
                 {
                     auto &b = e.Background;
                     if(vScreenCollision(Z, b.Location))
@@ -2441,7 +2441,7 @@ void UpdateGraphics(bool skipRepaint)
                     }
                 }
 
-                else if(e.Mode == 4) // NPCs
+                else if(e.Mode == OptCursor_t::LVL_NPCS) // NPCs
                 {
                     e.NPC.Frame = NPC[0].Frame;
                     e.NPC.FrameCount = NPC[0].FrameCount;

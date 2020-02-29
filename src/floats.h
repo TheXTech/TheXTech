@@ -27,6 +27,7 @@
 #define FLOATS_H
 
 #include <SDL2/SDL_types.h>
+#include <Utils/maths.h>
 
 /**
  * @brief Comparison of two floating point numbers
@@ -36,8 +37,8 @@
  */
 SDL_INLINE bool fEqual(double a, double b)
 {
-    Sint64 ai = Sint64(a * 1000000.0);
-    Sint64 bi = Sint64(b * 1000000.0);
+    Sint64 ai = Sint64(Maths::lRound(a * 1000000.0));
+    Sint64 bi = Sint64(Maths::lRound(b * 1000000.0));
     return ai == bi;
 }
 
@@ -49,8 +50,8 @@ SDL_INLINE bool fEqual(double a, double b)
  */
 SDL_INLINE bool fEqual(float a, float b)
 {
-    Sint64 ai = Sint64(a * 10000.0f);
-    Sint64 bi = Sint64(b * 10000.0f);
+    Sint64 ai = Sint64(Maths::lRound(a * 10000.0f));
+    Sint64 bi = Sint64(Maths::lRound(b * 10000.0f));
     return ai == bi;
 }
 

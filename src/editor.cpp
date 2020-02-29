@@ -213,7 +213,8 @@ void UpdateEditor()
             CanPlace = true;
             if(EditorCursor.Mode == OptCursor_t::LVL_SELECT || EditorCursor.Mode == 14)
             {
-                if(MouseRelease)
+#if 0 // Forbidden while level testing
+                if(MouseRelease && !MagicHand) // Player start points
                 {
                     for(A = 1; A <= 2; A++)
                     {
@@ -233,14 +234,17 @@ void UpdateEditor()
                         }
                     }
                 }
+#endif
 
-                if(MouseRelease)
+                if(MouseRelease) // NPCs
                 {
                     for(A = 1; A <= numNPCs; A++)
                     {
                         tempLocation = NPC[A].Location;
-                        if(NPC[A].Type == 91)
+
+                        if(NPC[A].Type == 91) // Herb's container offset
                             tempLocation.Y -= 16;
+
                         if(CursorCollision(EditorCursor.Location, tempLocation) && !NPC[A].Hidden)
                         {
                             PlaySound(23);
@@ -248,30 +252,32 @@ void UpdateEditor()
 //                            frmLevelEditor::optCursor(4).Value = true;
                             optCursor.current = 4;
                             OptCursorSync();
-                            if(NPC[A].Type == 91 || NPC[A].Type == 284 || NPC[A].Type == 283 ||
-                               (NPC[A].Type == 96 && NPC[A].Special != 0.0 && !fEqual(NPC[A].Special, 96)))
-                            {
-                                if(NPC[A].Special > 0)
-                                {
-//                                    while(frmNPCs::NPC(NPC[A].Special).Visible == false)
-//                                    {
-//                                        frmNPCs::optGame(B).Value = true;
-//                                        B = B + 1;
-//                                        if(B > frmNPCs::optGame.Count - 1)
-//                                            break;
-//                                    }
-                                }
-                            }
-                            else
-                            {
-//                                while(frmNPCs::NPC(NPC[A].Type).Visible == false)
+
+//                            if(NPC[A].Type == 91 || NPC[A].Type == 284 || NPC[A].Type == 283 ||
+//                               (NPC[A].Type == 96 && NPC[A].Special != 0.0 && !fEqual(NPC[A].Special, 96)))
+//                            {
+//                                if(NPC[A].Special > 0)
 //                                {
-//                                    frmNPCs::optGame(B).Value = true;
-//                                    B = B + 1;
-//                                    if(B > frmNPCs::optGame.Count - 1)
-//                                        break;
+////                                    while(frmNPCs::NPC(NPC[A].Special).Visible == false)
+////                                    {
+////                                        frmNPCs::optGame(B).Value = true;
+////                                        B = B + 1;
+////                                        if(B > frmNPCs::optGame.Count - 1)
+////                                            break;
+////                                    }
 //                                }
-                            }
+//                            }
+//                            else
+//                            {
+////                                while(frmNPCs::NPC(NPC[A].Type).Visible == false)
+////                                {
+////                                    frmNPCs::optGame(B).Value = true;
+////                                    B = B + 1;
+////                                    if(B > frmNPCs::optGame.Count - 1)
+////                                        break;
+////                                }
+//                            }
+
 //                            frmNPCs::NPC(NPC[A].Type).Value = true;
 //                            frmNPCs.NPCText = NPC[A].Text;
 //                            if(NPC[A].Inert == true)
@@ -379,6 +385,10 @@ void UpdateEditor()
 //                            }
 //                            frmNPCs::optNPCDirection(NPC[A].Direction + 1).Value = true;
                             EditorCursor.Mode = 4;
+                            ResetNPC(A);
+                            EditorCursor.NPC = NPC[A];
+                            EditorCursor.NPC.Hidden = false;
+                            EditorCursor.Location = NPC[A].Location;
                             EditorCursor.Location.X = NPC[A].Location.X;
                             EditorCursor.Location.Y = NPC[A].Location.Y;
                             SetCursor();
@@ -387,12 +397,13 @@ void UpdateEditor()
                             MouseRelease = false;
                             EditorControls.Mouse1 = false; /* Simulate "Focus out" inside of SMBX Editor */
                             tempBool = true;
+                            UNUSED(tempBool);
                             break;
                         }
                     }
                 }
 
-                if(MouseRelease)
+                if(MouseRelease) // non-sizable blocks
                 {
                     for(A = 1; A <= numBlock; A++)
                     {
@@ -499,7 +510,8 @@ void UpdateEditor()
                     }
                 }
 
-                if(MouseRelease && !MagicHand)
+#if 0 // Forbidded in level testing
+                if(MouseRelease && !MagicHand) // Warps
                 {
                     for(A = 1; A <= numWarps; A++)
                     {
@@ -605,8 +617,9 @@ void UpdateEditor()
                         }
                     }
                 }
+#endif
 
-                if(MouseRelease)
+                if(MouseRelease) // BGOs
                 {
                     for(A = numBackground; A >= 1; A--)
                     {
@@ -639,7 +652,10 @@ void UpdateEditor()
                             Background[A] = Background[numBackground];
                             numBackground = numBackground - 1;
                             if(MagicHand)
+                            {
+                                qSortBackgrounds(1, numBackground);
                                 UpdateBackgrounds();
+                            }
                             MouseRelease = false;
                             EditorControls.Mouse1 = false; /* Simulate "Focus out" inside of SMBX Editor */
                             break;
@@ -647,7 +663,7 @@ void UpdateEditor()
                     }
                 }
 
-                if(MouseRelease)
+                if(MouseRelease) // Sizable blocks
                 {
                     for(A = 1; A <= numBlock; A++)
                     {
@@ -756,7 +772,8 @@ void UpdateEditor()
                     }
                 }
 
-                if(MouseRelease)
+#if 0 // Unsupported
+                if(MouseRelease) // Water boxes
                 {
                     for(int numWaterMax = numWater, A = 1; A <= numWaterMax; A++)
                     {
@@ -782,8 +799,10 @@ void UpdateEditor()
                         }
                     }
                 }
+#endif
 
-                if(MouseRelease)
+#if 0 // Unused
+                if(MouseRelease && !MagicHand) // World map music
                 {
                     for(int numWorldMusicMax = numWorldMusic, A = 1; A <= numWorldMusicMax; A++)
                     {
@@ -806,7 +825,7 @@ void UpdateEditor()
                     }
                 }
 
-                if(MouseRelease)
+                if(MouseRelease && !MagicHand) // World paths
                 {
                     for(int numWorldPathsMax = numWorldPaths, A = 1; A <= numWorldPathsMax; A++)
                     {
@@ -829,7 +848,7 @@ void UpdateEditor()
                     }
                 }
 
-                if(MouseRelease)
+                if(MouseRelease && !MagicHand) // World sceneries
                 {
                     for(A = numScenes; A >= 1; A--)
                     {
@@ -854,7 +873,7 @@ void UpdateEditor()
                     }
                 }
 
-                if(MouseRelease)
+                if(MouseRelease && !MagicHand) // World map level points
                 {
                     for(int numWorldLevelsMax = numWorldLevels, A = 1; A <= numWorldLevelsMax; A++)
                     {
@@ -907,7 +926,7 @@ void UpdateEditor()
                     }
                 }
 
-                if(MouseRelease)
+                if(MouseRelease && !MagicHand) // Terrain tiles
                 {
                     for(int numTilesMax = numTiles, A = 1; A <= numTilesMax; A++)
                     {
@@ -938,6 +957,7 @@ void UpdateEditor()
                         }
                     }
                 }
+#endif
             }
             else if(EditorCursor.Mode == OptCursor_t::LVL_WATER) // Water
             {
@@ -1273,6 +1293,7 @@ void UpdateEditor()
 
                 }
             }
+#if 0
             else if(EditorCursor.Mode == 2 && !MagicHand) // Level
             {
 //                if(frmLevelSettings::optLevel(0).Value == true) // Top
@@ -1332,6 +1353,7 @@ void UpdateEditor()
 //                if(frmLevelSettings::optLevel(0).Value == true || frmLevelSettings::optLevel(1).Value == true || frmLevelSettings::optLevel(2).Value == true || frmLevelSettings::optLevel(3).Value == true)
 //                    Netplay::sendData "g" + curSection + "|" + level(curSection).X + "|" + level(curSection).Y + "|" + std::to_string(level(curSection).Width) + "|" + std::to_string(level(curSection).Height);
             }
+#endif
             else if(EditorCursor.Mode == OptCursor_t::LVL_BGOS) // Backgrounds
             {
                 for(A = 1; A <= numBackground; A++)
@@ -1394,15 +1416,15 @@ void UpdateEditor()
                         CanPlace = false;
                 }
 
-                if(MouseRelease == false)
+                if(!MouseRelease)
                     CanPlace = false;
 
-                if(CanPlace == true) // Nothing is in the way
+                if(CanPlace) // Nothing is in the way
                 {
                     if(numNPCs < maxNPCs - 20) // Not out of npcs
                     {
                         MouseRelease = false;
-                        numNPCs += 1;
+                        numNPCs++;
 //                        if(frmNPCs::Bubble.Caption == "Yes" && frmNPCs::optNPCDirection(1).Value == true)
 //                        {
 //                            EditorCursor.NPC.Direction = 0;
@@ -1485,11 +1507,12 @@ void UpdateEditor()
                     if(CursorCollision(EditorCursor.Location, Tile[A].Location) == true)
                         CanPlace = false;
                 }
-                if(CanPlace == true) // Nothing is in the way
+
+                if(CanPlace) // Nothing is in the way
                 {
                     if(numTiles < maxTiles) // Not out of blocks
                     {
-                        numTiles = numTiles + 1;
+                        numTiles++;
                         Tile[numTiles] = EditorCursor.Tile;
                     }
                 }
@@ -1508,16 +1531,18 @@ void UpdateEditor()
                         }
                     }
                 }
+
                 for(A = 1; A <= numWorldLevels; A++)
                 {
                     if(CursorCollision(EditorCursor.Location, WorldLevel[A].Location) == true)
                         CanPlace = false;
                 }
-                if(CanPlace == true)
+
+                if(CanPlace)
                 {
                     if(numScenes < maxScenes)
                     {
-                        numScenes = numScenes + 1;
+                        numScenes++;
                         Scene[numScenes] = EditorCursor.Scene;
                     }
                 }
@@ -1529,24 +1554,28 @@ void UpdateEditor()
                     if(CursorCollision(EditorCursor.Location, WorldPath[A].Location) == true)
                         CanPlace = false;
                 }
+
                 for(A = 1; A <= numScenes; A++)
                 {
                     if(CursorCollision(EditorCursor.Location, Scene[A].Location) == true)
                         CanPlace = false;
                 }
+
                 for(A = 1; A <= numWorldLevels; A++)
                 {
                     if(CursorCollision(EditorCursor.Location, WorldLevel[A].Location) == true)
                     {
                         CanPlace = false;
                         qLevel = A;
+                        UNUSED(qLevel);
                     }
                 }
-                if(CanPlace == true)
+
+                if(CanPlace)
                 {
                     if(numWorldLevels < maxWorldLevels)
                     {
-                        numWorldLevels = numWorldLevels + 1;
+                        numWorldLevels++;
                         WorldLevel[numWorldLevels] = EditorCursor.WorldLevel;
                     }
                 }
@@ -1558,16 +1587,18 @@ void UpdateEditor()
                     if(CursorCollision(EditorCursor.Location, WorldPath[A].Location) == true)
                         CanPlace = false;
                 }
+
                 for(A = 1; A <= numWorldLevels; A++)
                 {
                     if(CursorCollision(EditorCursor.Location, WorldLevel[A].Location) == true)
                         CanPlace = false;
                 }
-                if(CanPlace == true)
+
+                if(CanPlace)
                 {
                     if(numWorldPaths < maxWorldPaths)
                     {
-                        numWorldPaths = numWorldPaths + 1;
+                        numWorldPaths++;
                         WorldPath[numWorldPaths] = EditorCursor.WorldPath;
                     }
                 }
@@ -1579,10 +1610,11 @@ void UpdateEditor()
                     if(CursorCollision(EditorCursor.Location, WorldMusic[A].Location) == true)
                         CanPlace = false;
                 }
-                if(CanPlace == true)
+
+                if(CanPlace)
                 {
                     EditorCursor.WorldMusic.Location = EditorCursor.Location;
-                    numWorldMusic = numWorldMusic + 1;
+                    numWorldMusic++;
                     WorldMusic[numWorldMusic] = EditorCursor.WorldMusic;
                 }
             }
@@ -1943,8 +1975,16 @@ void SetCursor()
     }
     else if(EditorCursor.Mode == 4) // NPCs
     {
-//        EditorCursor.NPC.Special = 0;
-//        EditorCursor.NPC.Layer = EditorCursor.Layer;
+        int t = EditorCursor.NPC.Type;
+        if(t != 91 && t != 96 && t != 283 && t != 284)
+            EditorCursor.NPC.Special = 0;
+        if(t != 288 && t != 289 && t != 91 && t != 260)
+            EditorCursor.NPC.Special2 = 0.0;
+        EditorCursor.NPC.Special3 = 0.0;
+        EditorCursor.NPC.Special4 = 0.0;
+        EditorCursor.NPC.Special5 = 0.0;
+        EditorCursor.NPC.Special6 = 0.0;
+        EditorCursor.NPC.Layer = EditorCursor.Layer;
         EditorCursor.NPC.Location = EditorCursor.Location;
 //        for(A = 1; A <= frmNPCs::NPC.Count; A++)
 //        {
@@ -2022,6 +2062,10 @@ void SetCursor()
             EditorCursor.NPC.Location.Height = 32;
         EditorCursor.Location.Width = EditorCursor.NPC.Location.Width;
         EditorCursor.Location.Height = EditorCursor.NPC.Location.Height;
+
+        EditorCursor.Location.SpeedX = 0.0;
+        EditorCursor.Location.SpeedY = 0.0;
+
 //        if(frmNPCs::optNPCDirection(2).Value == true)
 //            EditorCursor.NPC.Direction = 1;
 //        else if(frmNPCs::optNPCDirection(0).Value == true)
@@ -2040,6 +2084,7 @@ void SetCursor()
 //            EditorCursor.NPC.Legacy = true;
 //        else
 //            EditorCursor.NPC.Legacy = false;
+
 //        EditorCursor.NPC.TriggerActivate = frmAdvanced::TriggerActivate.Text;
 //        EditorCursor.NPC.TriggerDeath = frmAdvanced::TriggerDeath.Text;
 //        EditorCursor.NPC.TriggerTalk = frmAdvanced::TriggerTalk.Text;
@@ -2220,7 +2265,7 @@ void PositionCursor()
 //        frmLevels.lblY = EditorCursor.Location.Y;
     }
 
-    if(EditorCursor.Mode == 13 || EditorCursor.Mode == 14 ||
+    if(EditorCursor.Mode == OptCursor_t::LVL_SELECT || EditorCursor.Mode == 14 ||
       (EditorCursor.Mode == 2 /*&& frmLevelSettings::optLevel(4).Value == false && frmLevelSettings::optLevel(5).Value == false*/))
         return;
 
@@ -2231,12 +2276,12 @@ void PositionCursor()
         return;
     }
 
-    if(EditorCursor.Mode == 2 /*&& (frmLevelSettings::optLevel(4).Value == true || frmLevelSettings::optLevel(5).Value == true)*/)
+    if(EditorCursor.Mode == OptCursor_t::LVL_SETTINGS /*&& (frmLevelSettings::optLevel(4).Value == true || frmLevelSettings::optLevel(5).Value == true)*/)
         EditorCursor.Location.X = EditorCursor.Location.X - 14;
 
-    if(EditorCursor.Mode == 2 || EditorCursor.Mode == 4)
+    if(EditorCursor.Mode == OptCursor_t::LVL_SETTINGS || EditorCursor.Mode == OptCursor_t::LVL_NPCS)
     {
-        if(!(EditorCursor.Mode == 4 && EditorCursor.NPC.Type == 52))
+        if(!(EditorCursor.Mode == OptCursor_t::LVL_NPCS && EditorCursor.NPC.Type == 52))
         {
             if(std::fmod(EditorCursor.Location.Width, 32) != 0.0)
             {
@@ -2258,7 +2303,7 @@ void PositionCursor()
         }
     }
 
-    if(EditorCursor.Mode == 3)
+    if(EditorCursor.Mode == OptCursor_t::LVL_BGOS)
     {
         if(EditorCursor.Background.Type == 13) // End level container
         {
@@ -2269,7 +2314,7 @@ void PositionCursor()
             EditorCursor.Location.Y = EditorCursor.Location.Y + 16;
     }
 
-    else if(EditorCursor.Mode == 4)
+    else if(EditorCursor.Mode == OptCursor_t::LVL_NPCS)
     {
         if(EditorCursor.NPC.Type == 245 || EditorCursor.NPC.Type == 8 ||
            EditorCursor.NPC.Type == 270 || EditorCursor.NPC.Type == 93 ||
@@ -2283,14 +2328,14 @@ void PositionCursor()
         }
 
 //        if(frmNPCs::Buried.Caption == "Yes")
-//        {
-//            if(!enableAutoAlign)
-//                EditorCursor.Location.Y = EditorCursor.Location.Y + 16;
-//            else
-//                EditorCursor.Location.Y = EditorCursor.Location.Y + 32;
-//        }
-        /*else */
-        if(EditorCursor.NPC.Type == 105)
+        if(EditorCursor.NPC.Type == 91)
+        {
+            if(!enableAutoAlign)
+                EditorCursor.Location.Y = EditorCursor.Location.Y + 0/*16*/;
+            else
+                EditorCursor.Location.Y = EditorCursor.Location.Y + 16/*32*/;
+        }
+        else if(EditorCursor.NPC.Type == 105)
             EditorCursor.Location.Y = EditorCursor.Location.Y + 22;
         else if(EditorCursor.NPC.Type == 106)
             EditorCursor.Location.Y = EditorCursor.Location.Y + 16;
@@ -2462,7 +2507,7 @@ void MouseMove(float X, float Y, bool /*nCur*/)
     }
     else
     {
-        if(MagicHand == true)
+        if(MagicHand)
         {
             if(std::fmod((vScreenY[A] + 8), 32) != 0.0)
                 vScreenY[A] = static_cast<int>(floor(static_cast<double>(vScreenY[A] / 32))) * 32 - 8;
@@ -2470,17 +2515,42 @@ void MouseMove(float X, float Y, bool /*nCur*/)
                 vScreenX[A] = static_cast<int>(floor(static_cast<double>(vScreenX[A] / 32))) * 32;
         }
 
-        /*if((EditorCursor.Mode == 1 && (frmBlocks::Block(534).Value == true || frmBlocks::Block(535).Value == true || frmBlocks::Block(536).Value == true || frmBlocks::Block(537).Value == true)) || EditorCursor.Mode == 5 || (EditorCursor.Mode == 4 && frmNPCs::NPC(52).Value == true) || (EditorCursor.Mode == 3 && (frmBackgrounds::Background(71).Value == true || frmBackgrounds::Background(72).Value == true || frmBackgrounds::Background(73).Value == true || frmBackgrounds::Background(141).Value == true || frmBackgrounds::Background(74).Value == true || frmBackgrounds::Background(70).Value == true || frmBackgrounds::Background(100).Value == true)) || (EditorCursor.Mode == 4 && (frmGenerator::Spawn.Caption == "Yes" || frmNPCs::NPC(209).Value == true || frmNPCs::NPC(256).Value == true || frmNPCs::NPC(257).Value == true || frmNPCs::NPC(260).Value == true)))
+        // 16x16 alignment
+        if(
+            (EditorCursor.Mode == OptCursor_t::LVL_BLOCKS &&
+            (EditorCursor.Block.Type == 534 || EditorCursor.Block.Type == 535 ||
+             EditorCursor.Block.Type == 536 || EditorCursor.Block.Type == 537)) ||
+
+             EditorCursor.Mode == OptCursor_t::LVL_WARPS ||
+
+            (EditorCursor.Mode == OptCursor_t::LVL_NPCS &&
+             EditorCursor.NPC.Type == 52) ||
+
+            (EditorCursor.Mode == OptCursor_t::LVL_BGOS &&
+             (EditorCursor.Background.Type == 71 ||
+              EditorCursor.Background.Type == 72 ||
+              EditorCursor.Background.Type == 73 ||
+              EditorCursor.Background.Type == 141 ||
+              EditorCursor.Background.Type == 74 ||
+              EditorCursor.Background.Type == 70 ||
+              EditorCursor.Background.Type == 100)) ||
+
+              (EditorCursor.Mode == OptCursor_t::LVL_NPCS &&
+               (EditorCursor.NPC.Generator ||
+                EditorCursor.NPC.Type == 209 || EditorCursor.NPC.Type == 256 ||
+                EditorCursor.NPC.Type == 257 || EditorCursor.NPC.Type == 260))
+        )
         {
-            if(!(EditorCursor.Location.X == static_cast<float>(floor(X / 16)) * 16 - vScreenX(A) && EditorCursor.Location.Y + 8 == static_cast<float>(floor(Y / 16)) * 16 - vScreenY(A)))
+            if(!(fEqual(EditorCursor.Location.X, double(std::floor(X / 16)) * 16 - vScreenX[A]) &&
+                 fEqual(EditorCursor.Location.Y + 8, double(std::floor(Y / 16)) * 16 - vScreenY[A])) )
             {
-                EditorCursor.Location.X = static_cast<float>(floor(X / 16)) * 16 - vScreenX(A);
-                EditorCursor.Location.Y = static_cast<float>(floor(Y / 16)) * 16 - vScreenY(A);
+                EditorCursor.Location.X = double(std::floor(X / 16)) * 16 - vScreenX[A];
+                EditorCursor.Location.Y = double(std::floor(Y / 16)) * 16 - vScreenY[A];
                 EditorCursor.Location.Y = EditorCursor.Location.Y - 8;
                 PositionCursor();
             }
         }
-        else*/ if(EditorCursor.Mode == 2)
+        else if(EditorCursor.Mode == OptCursor_t::LVL_SETTINGS)
         {
 //            if(frmLevelSettings::optLevel(4).Value == false && frmLevelSettings::optLevel(5).Value == false)
 //            {
@@ -2502,14 +2572,14 @@ void MouseMove(float X, float Y, bool /*nCur*/)
             EditorCursor.Location.Y = EditorCursor.Location.Y - 8;
             PositionCursor();
         }
-        else if(EditorCursor.Mode == 15)
+        else if(EditorCursor.Mode == OptCursor_t::LVL_WATER)
         {
             EditorCursor.Location.X = double(std::floor(X / 16)) * 16 - vScreenX[A];
             EditorCursor.Location.Y = double(std::floor(Y / 16)) * 16 - vScreenY[A];
             EditorCursor.Location.Y = EditorCursor.Location.Y - 8;
             PositionCursor();
         }
-        else
+        else // Everything also align as 32x32
         {
             EditorCursor.Location.X = double(std::floor(X / 32)) * 32 - vScreenX[A];
             EditorCursor.Location.Y = double(std::floor(Y / 32)) * 32 - vScreenY[A];
