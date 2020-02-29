@@ -38,6 +38,7 @@
 #include "load_gfx.h"
 #include "player.h"
 #include "sound.h"
+#include "editor.h"
 
 #include "pseudo_vb.h"
 
@@ -73,6 +74,7 @@ int GameMain(const CmdLineSetup_t &setup)
     initAll();
 
 //    Unload frmLoader
+    gfxLoaderTestMode = setup.testLevelMode;
 
     if(!GFX.load()) // Load UI graphics
         return 1;
@@ -93,7 +95,8 @@ int GameMain(const CmdLineSetup_t &setup)
     if(!noSound)
     {
         InitMixerX();
-        PlayInitSound();
+        if(!setup.testLevelMode)
+            PlayInitSound();
     }
 
     frmMain.show(); // Don't show window until playing an initial sound
@@ -109,14 +112,22 @@ int GameMain(const CmdLineSetup_t &setup)
     LoadGFX(); // load the graphics from file
     SetupVars(); //Setup Variables
 
+    if(!setup.testLevel.empty()) // Start level testing immediately!
+    {
+        GameMenu = false;
+        LevelSelect = false;
+        FullFileName = setup.testLevel;
+        zTestLevel();
+    }
+
     do
     {
-        if(GameMenu)
+        if(GameMenu || MagicHand || LevelEditor)
         {
             frmMain.MousePointer = 99;
             showCursor(0);
         }
-        else if(!resChanged && !TestLevel && !LevelEditor)
+        else if(!resChanged)
         {
             frmMain.MousePointer = 0;
             showCursor(1);
@@ -732,14 +743,18 @@ int GameMain(const CmdLineSetup_t &setup)
             if(TestLevel)
             {
 //                TestLevel = False
-                TestLevel = false;
+//                TestLevel = false;
 //                LevelEditor = True
 //                LevelEditor = true;
-                LevelEditor = true; //FIXME: Restart level testing or quit a game instead of THIS
+//                LevelEditor = true; //FIXME: Restart level testing or quit a game instead of THIS
+
+                GameThing();
+                SDL_Delay(500);
+                zTestLevel(); // Restart level
 
 //                If nPlay.Online = False Then
 //                    OpenLevel FullFileName
-                OpenLevel(FullFileName);
+//                OpenLevel(FullFileName);
 //                Else
 //                    If nPlay.Mode = 1 Then
 //                        Netplay.sendData "H0" & LB

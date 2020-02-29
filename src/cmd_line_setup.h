@@ -1,6 +1,8 @@
 #ifndef CMD_LINE_SETUP_H
 #define CMD_LINE_SETUP_H
 
+#include <string>
+
 struct CmdLineSetup_t
 {
     //! Disable game sound
@@ -16,6 +18,10 @@ struct CmdLineSetup_t
         RENDER_HW = 1,
         RENDER_VSYNC = 2
     } renderType;
+    //! Is a level testing mode
+    bool testLevelMode = false;
+    //! Level file to test
+    std::string testLevel;
 };
 
 #endif // CMD_LINE_SETUP_H

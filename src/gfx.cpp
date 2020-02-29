@@ -38,7 +38,7 @@ void GFX_t::loadImage(StdPicture &img, std::string path)
     if(!img.texture)
     {
         pLogWarning("Failed to load texture: %s...", path.c_str());
-        loadErrors++;
+        m_loadErrors++;
     }
     m_loadedImages.push_back(&img);
 }
@@ -103,7 +103,7 @@ bool GFX_t::load()
 
     loadImage(YoshiWings, uiPath + "YoshiWings.png");
 
-    if(loadErrors > 0)
+    if(m_loadErrors > 0)
     {
         std::string msg = fmt::format_ne("Failed to load an UI image assets. Look a log file to get more details:\n{0}", getLogFilePath());
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "UI image assets loading error", msg.c_str(), nullptr);

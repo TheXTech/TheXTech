@@ -234,6 +234,7 @@ RangeArrI<bool, 0, maxBlockType, false> BlockNoClipping;
 RangeArrI<int, 1, 10, 0> CoinFrame;
 RangeArrI<int, 1, 10, 0> CoinFrame2;
 EditorCursor_t EditorCursor;
+EditorControls_t EditorControls;
 
 RangeArrI<int, 1, numSounds, 0> Sound;
 RangeArrI<int, 1, numSounds, 0> SoundPause;
@@ -341,8 +342,8 @@ RangeArrI<int, 1, numBackground2, 0> GFXBackground2Width;
 RangeArrI<bool, 1, maxNPCType, false> GFXNPCCustom;
 //RangeArrI<long, 1, maxNPCType, 0> GFXNPC;
 RangeArrI<long, 1, maxNPCType, 0> GFXNPCMask;
-RangeArr<StdPicture, 1, maxNPCType> GFXNPCBMP;
-RangeArr<StdPicture, 1, maxNPCType> GFXNPCMaskBMP;
+RangeArr<StdPicture, 0, maxNPCType> GFXNPCBMP;
+RangeArr<StdPicture, 0, maxNPCType> GFXNPCMaskBMP;
 RangeArrI<int, 1, maxNPCType, 0> GFXNPCHeight;
 RangeArrI<int, 1, maxNPCType, 0> GFXNPCWidth;
 RangeArrI<bool, 1, maxEffectType, false> GFXEffectCustom;

@@ -55,6 +55,11 @@ int main(int argc, char**argv)
                                                 "render type",
                                                 cmd);
 
+        TCLAP::ValueArg<std::string> testLevel("l", "leveltest", "Start a level test of given file",
+                                                false, "",
+                                                "file path",
+                                                cmd);
+
         cmd.add(&switchFrameSkip);
         cmd.add(&switchNoSound);
         cmd.add(&switchNoPause);
@@ -71,6 +76,9 @@ int main(int argc, char**argv)
             setup.renderType = CmdLineSetup_t::RENDER_VSYNC;
         else if(rt == "hw")
             setup.renderType = CmdLineSetup_t::RENDER_HW;
+
+        setup.testLevel = testLevel.getValue();
+        setup.testLevelMode = !setup.testLevel.empty();
     }
     catch(TCLAP::ArgException &e)   // catch any exceptions
     {

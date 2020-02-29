@@ -537,8 +537,8 @@ void OpenLevel(std::string FilePath)
     }
 
     FindBlocks();
+    qSortBackgrounds(1, numBackground);
     UpdateBackgrounds();
-    qSortBackgrounds(1, numBackground);//A SMALL TEST
     FindSBlocks();
 
 

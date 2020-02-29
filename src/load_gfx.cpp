@@ -31,6 +31,9 @@
 
 #include <set>
 
+
+bool gfxLoaderTestMode = false;
+
 //// Private Sub cBlockGFX(A As Integer)
 //void cBlockGFX(int A);
 //// Private Sub cNPCGFX(A As Integer)
@@ -669,7 +672,8 @@ void UpdateLoad()
             LoadCoins = 0;
 
         frmMain.clearBuffer();
-        frmMain.renderTexture(0, 0, GFX.MenuGFX[4]);
+        if(!gfxLoaderTestMode)
+            frmMain.renderTexture(0, 0, GFX.MenuGFX[4]);
         frmMain.renderTexture(632, 576, GFX.Loader);
         frmMain.renderTexture(760, 560, GFX.LoadCoin.w, GFX.LoadCoin.h / 4, GFX.LoadCoin, 0, 32 * LoadCoins);
 

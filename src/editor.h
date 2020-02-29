@@ -28,6 +28,37 @@
 
 #include "location.h"
 
+struct Point_t
+{
+    int X = 0;
+    int Y = 0;
+};
+
+extern Point_t CursorPos;
+extern bool HasCursor;
+extern bool NoReallyKillIt;
+extern int curSection;
+
+extern bool enableAutoAlign;
+
+struct OptCursor_t
+{
+    enum Level {
+        LVL_SELECT = 13,
+        LVL_ERASER0 = 0,
+        LVL_ERASER = 6,
+        LVL_BLOCKS = 1,
+        LVL_BGOS = 3,
+        LVL_NPCS = 4,
+        LVL_SETTINGS = 2,
+        LVL_WARPS = 5,
+        LVL_WATER = 15
+    };
+    int current = LVL_SELECT;
+};
+
+extern OptCursor_t optCursor;
+
 // this sub handles the level editor
 // it is still called when the player is testing a level in the editor in windowed mode
 extern void UpdateEditor();
@@ -35,6 +66,8 @@ extern void UpdateEditor();
 extern int EditorNPCFrame(int A, float C, int N = 0);
 
 extern void GetEditorControls();
+
+extern void OptCursorSync();
 
 extern void SetCursor();
 

@@ -63,6 +63,7 @@ public:
     void waitEvents();
 
     bool isWindowActive();
+    bool hasWindowMouseFocus();
 
     void eventDoubleClick();
     void eventKeyDown(SDL_KeyboardEvent &evt);
