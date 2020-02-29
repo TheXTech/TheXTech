@@ -166,6 +166,7 @@ int GameMain(const CmdLineSetup_t &setup)
             MultiHop = false;
             SuperSpeed = false;
             FlyForever = false;
+            GoToLevelNoGameThing = false;
 
             for(int A = 1; A <= maxPlayers; A++)
             {
@@ -291,6 +292,9 @@ int GameMain(const CmdLineSetup_t &setup)
             BattleOutro = 0;
             AllCharBlock = 0;
             Cheater = false;
+
+            // in a main menu, reset this into initial state
+            GoToLevelNoGameThing = false;
 
             for(int A = 1; A <= maxPlayers; ++A)
             {
@@ -488,12 +492,19 @@ int GameMain(const CmdLineSetup_t &setup)
                 Player[1].Vine = 0;
                 Player[2].Vine = 0;
 
-                PlaySound(28);
+                if(!GoToLevelNoGameThing)
+                    PlaySound(28);
                 SoundPause[26] = 2000;
 
                 LevelSelect = false;
 
-                GameThing();
+                if(!GoToLevelNoGameThing)
+                    GameThing();
+                else
+                {
+                    frmMain.clearBuffer();
+                    frmMain.repaint();
+                }
                 ClearLevel();
                 SDL_Delay(1000);
 
@@ -515,6 +526,9 @@ int GameMain(const CmdLineSetup_t &setup)
                 fpsTime = 0;
                 cycleCount = 0;
                 gameTime = 0;
+
+                // On a world map, reset this into default state
+                GoToLevelNoGameThing = false;
 
                 // Update graphics before loop begin (to process inital lazy-unpacking of used sprites)
                 UpdateGraphics2();

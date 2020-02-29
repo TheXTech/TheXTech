@@ -5351,6 +5351,7 @@ void PlayerEffects(int A)
             if(!Warp[Player[A].Warp].level.empty())
             {
                 GoToLevel = Warp[Player[A].Warp].level;
+                GoToLevelNoGameThing = Warp[Player[A].Warp].noEntranceScene;
                 Player[A].Effect = 8;
                 Player[A].Effect2 = 2970;
                 ReturnWarp = Player[A].Warp;
@@ -5571,6 +5572,7 @@ void PlayerEffects(int A)
             if(!Warp[Player[A].Warp].level.empty())
             {
                 GoToLevel = Warp[Player[A].Warp].level;
+                GoToLevelNoGameThing = Warp[Player[A].Warp].noEntranceScene;
                 Player[A].Effect = 8;
                 Player[A].Effect2 = 3000;
                 ReturnWarp = Player[A].Warp;

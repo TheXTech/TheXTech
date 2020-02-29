@@ -900,6 +900,8 @@ struct Warp_t
 //    maxStars As Integer
     int maxStars = 0;
 //EXTRA:
+    bool noPrintStars = false;
+    bool noEntranceScene = false;
     bool cannonExit = false;
     double cannonExitSpeed = 10.0;
     std::string eventEnter;
@@ -1133,6 +1135,8 @@ extern int numWater;
 extern RangeArr<Star_t, 1, maxStarsNum> Star;
 //Public GoToLevel As String
 extern std::string GoToLevel;
+//! EXTRA: Hide entrance screen
+extern bool GoToLevelNoGameThing;
 //Public StartLevel As String 'start level for an episode
 extern std::string StartLevel;
 //Public NoMap As Boolean 'episode has no world map
