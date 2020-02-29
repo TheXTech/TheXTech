@@ -348,7 +348,13 @@ void UpdateGraphics(bool skipRepaint)
             else
                 GetvScreen(Z);
             if(Background2[S] == 0)
-                frmMain.clearBuffer();
+            {
+                if(numScreens > 1)
+                    frmMain.renderRect(vScreen[Z].Left, vScreen[Z].Top,
+                                       vScreen[Z].Width, vScreen[Z].Height, 0.f, 0.f, 0.f, 1.f, true);
+                else
+                    frmMain.clearBuffer();
+            }
         }
 //        Else
 //            If Background2(S) = 0 Then BitBlt myBackBuffer, 0, 0, ScreenW, ScreenH, 0, 0, 0, vbWhiteness
