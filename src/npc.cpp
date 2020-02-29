@@ -371,7 +371,7 @@ void NPCSpecial(int A)
     }
     // '''''''''''''
 
-    if(NPC[A].Type == 5 || NPC[A].Type == 226 || NPC[A].Type == 227) // Vine Maker
+    if(NPC[A].Type == 225 || NPC[A].Type == 226 || NPC[A].Type == 227) // Vine Maker
     {
         NPC[A].Location.SpeedY = -2;
         tempLocation.Height = 28;
