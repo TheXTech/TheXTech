@@ -381,6 +381,7 @@ void SetupVars()
     NPCWidth[294] = 32;
     NPCHeight[294] = 32;
     NPCJumpHurt[294] = true;
+    NPCNoGravity[294] = true;
 
     NPCWidth[283] = 48;
     NPCHeight[283] = 48;

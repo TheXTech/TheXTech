@@ -1228,6 +1228,10 @@ void NPCFrames(int A)
         if(NPC[A].Direction == 1)
             NPC[A].Frame = NPC[A].Frame + 3;
     }
+    else if(NPC[A].Type == 294)
+    {
+        NPC[A].Frame = 0;
+    }
     else if(NPC[A].Type == 55) // nekkid koopa
     {
         if(NPC[A].Special == 0)
@@ -2090,13 +2094,13 @@ void NPCFrames(int A)
         {
             NPC[A].Frame = 0;
             NPC[A].FrameCount = NPC[A].FrameCount + 1;
-            if(NPC[A].FrameCount > 32)
+            if(NPC[A].FrameCount > 24)
                 NPC[A].FrameCount = 0;
-            else if(NPC[A].FrameCount >= 16)
+            else if(NPC[A].FrameCount >= 12)
                 NPC[A].Frame = 1;
         }
         if(NPC[A].Direction == 1)
-            NPC[A].Frame = NPC[A].Frame + 3;
+            NPC[A].Frame = NPC[A].Frame + 5;
     }
     else if(NPC[A].Type == 29) // SMB Hammer Bro
     {

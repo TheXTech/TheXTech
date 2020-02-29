@@ -1078,6 +1078,13 @@ void UpdateNPCs()
                         else if(NPC[A].Location.X > level[NPC[A].Section].Width)
                             NPC[A].Location.X = level[NPC[A].Section].X - NPC[A].Location.Width + 1;
                     }
+                    if(LevelVWrap[NPC[A].Section] == true && NPC[A].Type != 30 && NPC[A].Type != 108) // Level wraparound
+                    {
+                        if(NPC[A].Location.Y + NPC[A].Location.Height < level[NPC[A].Section].Y)
+                            NPC[A].Location.Y = level[NPC[A].Section].Height - 1;
+                        else if(NPC[A].Location.Y > level[NPC[A].Section].Height)
+                            NPC[A].Location.Y = level[NPC[A].Section].Y - NPC[A].Location.Height + 1;
+                    }
                     if(NoTurnBack[NPC[A].Section] == true && NPC[A].Location.X < level[NPC[A].Section].X - NPC[A].Location.Width - 32)
                         NPCHit(A, 9);
                     if(NPC[A].CantHurt > 0)
