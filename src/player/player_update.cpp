@@ -2142,6 +2142,9 @@ void UpdatePlayer()
                 if(Player[A].Mount == 0)
                     Player[A].YoshiYellow = false;
 
+                // When it's true - don't check horizonta' section's bounds
+                bool hBoundsHandled = false;
+
                 // level wrap
                 if(LevelWrap[Player[A].Section] || LevelVWrap[Player[A].Section])
                 {
@@ -2152,6 +2155,7 @@ void UpdatePlayer()
                             Player[A].Location.X = level[Player[A].Section].Width - 1;
                         else if(Player[A].Location.X > level[Player[A].Section].Width)
                             Player[A].Location.X = level[Player[A].Section].X - Player[A].Location.Width + 1;
+                        hBoundsHandled = true;
                     }
 
                     // vertically
@@ -2165,7 +2169,7 @@ void UpdatePlayer()
                 }
 
                 // Walk offscreen exit
-                else if(OffScreenExit[Player[A].Section])
+                if(!hBoundsHandled && OffScreenExit[Player[A].Section])
                 {
                     if(Player[A].Location.X + Player[A].Location.Width < level[Player[A].Section].X)
                     {
@@ -2187,8 +2191,10 @@ void UpdatePlayer()
                         frmMain.clearBuffer();
                         frmMain.repaint();
                     }
+                    hBoundsHandled = true;
                 }
-                else if(LevelMacro != 1 && LevelMacro != 7 && !GameMenu)
+
+                if(!hBoundsHandled && LevelMacro != 1 && LevelMacro != 7 && !GameMenu)
                 {
                     // Check edge of levels
                     if(Player[A].Location.X < level[Player[A].Section].X)
@@ -2210,6 +2216,7 @@ void UpdatePlayer()
                             Player[A].NPCPinched = 2;
                     }
                 }
+
                 if(Player[A].Location.Y < level[Player[A].Section].Y - Player[A].Location.Height - 32 && Player[A].StandingOnTempNPC == 0)
                 {
                     Player[A].Location.Y = level[Player[A].Section].Y - Player[A].Location.Height - 32;

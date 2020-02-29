@@ -370,6 +370,11 @@ void OpenLevel(std::string FilePath)
         Warp[numWarps].WarpNPC = w.allownpc;
         Warp[numWarps].Locked = w.locked;
 
+        Warp[numWarps].cannonExit = w.cannon_exit;
+        Warp[numWarps].cannonExitSpeed = w.cannon_exit_speed;
+        Warp[numWarps].eventEnter = w.event_enter;
+        Warp[numWarps].StarsMsg = w.stars_msg;
+
         Warp[numWarps].Entrance.Height = 32;
         Warp[numWarps].Entrance.Width = 32;
         Warp[numWarps].Exit.Height = 32;
@@ -773,6 +778,7 @@ void ClearLevel()
         bgMusic[A] = 0;
         level[A] = BlankLocation;
         LevelWrap[A] = false;
+        LevelVWrap[A] = false;
         LevelChop[A] = 0;
         NoTurnBack[A] = false;
         UnderWater[A] = false;

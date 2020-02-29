@@ -3871,54 +3871,62 @@ void SuperWarp(int A)
     Location_t tempLocation;
     bool canWarp = false;
 
-    if(Player[A].WarpCD <= 0 && Player[A].Mount != 2 && Player[A].GroundPound == false && Player[A].GroundPound2 == false)
+    if(Player[A].WarpCD <= 0 && Player[A].Mount != 2 && !Player[A].GroundPound && !Player[A].GroundPound2)
     {
         for(B = 1; B <= numWarps; B++)
         {
-            if(CheckCollision(Player[A].Location, Warp[B].Entrance) && Warp[B].Hidden == false)
+            if(CheckCollision(Player[A].Location, Warp[B].Entrance) && !Warp[B].Hidden)
             {
                 Player[A].ShowWarp = B;
                 canWarp = false;
-                if(Warp[B].Direction == 1 && Player[A].Controls.Up == true)
+                if(Warp[B].Direction == 1 && Player[A].Controls.Up)
                 {
-                    if(WarpCollision(Player[A].Location, B) == true)
+                    if(WarpCollision(Player[A].Location, B))
                         canWarp = true;
                 }
-                else if(Warp[B].Direction == 2 && Player[A].Controls.Left == true)
+                else if(Warp[B].Direction == 2 && Player[A].Controls.Left)
                 {
-                    if(WarpCollision(Player[A].Location, B) == true)
+                    if(WarpCollision(Player[A].Location, B))
                         canWarp = true;
                 }
-                else if(Warp[B].Direction == 3 && Player[A].Controls.Down == true)
+                else if(Warp[B].Direction == 3 && Player[A].Controls.Down)
                 {
-                    if(WarpCollision(Player[A].Location, B) == true)
+                    if(WarpCollision(Player[A].Location, B))
                         canWarp = true;
                 }
-                else if(Warp[B].Direction == 4 && Player[A].Controls.Right == true)
+                else if(Warp[B].Direction == 4 && Player[A].Controls.Right)
                 {
-                    if(WarpCollision(Player[A].Location, B) == true)
+                    if(WarpCollision(Player[A].Location, B))
                         canWarp = true;
                 }
-                else if(Warp[B].Effect == 0)
+                else if(Warp[B].Effect == 0 || Warp[B].Effect == 3)
                     canWarp = true;
-                if(Warp[B].LevelEnt == true)
+
+                if(Warp[B].LevelEnt)
                     canWarp = false;
-                if(Warp[B].Stars > numStars && canWarp == true)
+
+                if(Warp[B].Stars > numStars && canWarp)
                 {
-                    if(Warp[B].Stars == 1)
-                        MessageText = "You need 1 star to enter.";
-                    else
-                        MessageText = fmt::format_ne("You need {0} stars to enter.", Warp[B].Stars);
+                    if(Warp[B].StarsMsg.empty())
+                    {
+                        if(Warp[B].Stars == 1)
+                            MessageText = "You need 1 star to enter.";
+                        else
+                            MessageText = fmt::format_ne("You need {0} stars to enter.", Warp[B].Stars);
+                    } else {
+                        MessageText = Warp[B].StarsMsg;
+                    }
                     PauseGame(A);
                     MessageText = "";
                     canWarp = false;
                 }
 
-                if(canWarp == true)
+                if(canWarp)
                 {
                     Player[A].Slide = false;
-                    Player[A].Stoned = false;
-                    if(Warp[B].Locked == true)
+                    if(Warp[B].Effect != 3)
+                        Player[A].Stoned = false;
+                    if(Warp[B].Locked)
                     {
                         if(Player[A].HoldingNPC > 0 && NPC[Player[A].HoldingNPC].Type == 31)
                         {
@@ -3930,7 +3938,7 @@ void SuperWarp(int A)
                             {
                                 if(Background[C].Type == 98)
                                 {
-                                    if(CheckCollision(Warp[B].Entrance, Background[C].Location) == true)
+                                    if(CheckCollision(Warp[B].Entrance, Background[C].Location))
                                     {
                                         Background[C].Layer = "";
                                         Background[C].Hidden = true;
@@ -3948,7 +3956,7 @@ void SuperWarp(int A)
                             {
                                 if(Background[C].Type == 98)
                                 {
-                                    if(CheckCollision(Warp[B].Entrance, Background[C].Location) == true)
+                                    if(CheckCollision(Warp[B].Entrance, Background[C].Location))
                                     {
                                         Background[C].Layer = "";
                                         Background[C].Hidden = true;
@@ -3956,7 +3964,7 @@ void SuperWarp(int A)
                                 }
                             }
                         }
-                        else if(Player[A].HasKey == true)
+                        else if(Player[A].HasKey)
                         {
                             Player[A].HasKey = false;
                             Warp[B].Locked = false;
@@ -3965,7 +3973,7 @@ void SuperWarp(int A)
                             {
                                 if(Background[C].Type == 98)
                                 {
-                                    if(CheckCollision(Warp[B].Entrance, Background[C].Location) == true)
+                                    if(CheckCollision(Warp[B].Entrance, Background[C].Location))
                                     {
                                         Background[C].Layer = "";
                                         Background[C].Hidden = true;
@@ -3978,7 +3986,7 @@ void SuperWarp(int A)
                     }
                 }
 
-                if(canWarp == true)
+                if(canWarp)
                 {
                     UnDuck(A);
                     Player[A].YoshiTongueLength = 0;
@@ -3988,11 +3996,13 @@ void SuperWarp(int A)
                     Player[A].CanFly = false;
                     Player[A].CanFly2 = false;
                     Player[A].RunCount = 0;
-                    if(Warp[B].NoYoshi == true && Player[A].YoshiPlayer > 0)
+
+                    if(Warp[B].NoYoshi && Player[A].YoshiPlayer > 0)
                     {
                         YoshiSpit(A);
                     }
-                    if(Warp[B].WarpNPC == false || (Player[A].Mount == 3 && (Player[A].YoshiNPC != 0 || Player[A].YoshiPlayer != 0) && Warp[B].NoYoshi == true))
+
+                    if(!Warp[B].WarpNPC || (Player[A].Mount == 3 && (Player[A].YoshiNPC != 0 || Player[A].YoshiPlayer != 0) && Warp[B].NoYoshi))
                     {
                         if(Player[A].HoldingNPC > 0)
                         {
@@ -4010,6 +4020,7 @@ void SuperWarp(int A)
                             YoshiSpit(A);
                         }
                     }
+
                     if(Player[A].HoldingNPC > 0)
                     {
                         if(NPC[Player[A].HoldingNPC].Type == 263) // can't bring ice through warps
@@ -4018,10 +4029,18 @@ void SuperWarp(int A)
                             Player[A].HoldingNPC = 0;
                         }
                     }
+
                     Player[A].StandingOnNPC = 0;
-                    Player[A].Location.SpeedX = 0;
-                    Player[A].Location.SpeedY = 0;
-                    if(Warp[B].Effect == 0)
+                    if(Warp[B].Effect != 3) // Don't zero speed when passing a portal warp
+                    {
+                        Player[A].Location.SpeedX = 0;
+                        Player[A].Location.SpeedY = 0;
+                    }
+
+                    if(!Warp[B].eventEnter.empty())
+                        ProcEvent(Warp[B].eventEnter);
+
+                    if(Warp[B].Effect == 0 || Warp[B].Effect == 3)
                     {
                         Player[A].Location.X = Warp[B].Exit.X + Warp[B].Exit.Width / 2.0 - Player[A].Location.Width / 2.0;
                         Player[A].Location.Y = Warp[B].Exit.Y + Warp[B].Exit.Height - Player[A].Location.Height - 0.1;

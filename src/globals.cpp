@@ -523,6 +523,7 @@ void initAll()
     CustomMusic.fill(std::string());
     level.fill(Location_t());
     LevelWrap.fill(false);
+    LevelVWrap.fill(false);
     OffScreenExit.fill(false);
     bgMusic.fill(0);
     bgMusicREAL.fill(0);
