@@ -5236,6 +5236,7 @@ void PlayerEffects(int A)
                 Player[A].MountOffsetY = 0;
                 SizeCheck(A);
             }
+
             if(Warp[Player[A].Warp].Direction2 == 1)
             {
                 Player[A].Location.X = Warp[Player[A].Warp].Exit.X + Warp[Player[A].Warp].Exit.Width / 2.0 - Player[A].Location.Width / 2.0;
@@ -5312,19 +5313,22 @@ void PlayerEffects(int A)
                         NPC[Player[A].HoldingNPC].Location.X = Player[A].Location.X + Player[A].Location.Width - Physics.PlayerGrabSpotX[Player[A].Character][Player[A].State] - NPC[Player[A].HoldingNPC].Location.Width;
                 }
             }
+
             Player[A].Effect2 = 100;
-            if(Player[A].Duck == true)
+            if(Player[A].Duck)
             {
                 if(Warp[Player[A].Warp].Direction2 == 1 || Warp[Player[A].Warp].Direction2 == 3)
                 {
                     UnDuck(A);
                 }
             }
+
             CheckSection(A);
             if(Player[A].HoldingNPC > 0)
             {
                 CheckSectionNPC(Player[A].HoldingNPC);
             }
+
             if(numPlayers > 2/* && nPlay.Online == false*/)
             {
                 for(B = 1; B <= numPlayers; B++)
