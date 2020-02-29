@@ -4037,6 +4037,9 @@ void SuperWarp(int A)
                         Player[A].Location.SpeedY = 0;
                     }
 
+                    if(!Warp[B].eventEnter.empty())
+                        ProcEvent(Warp[B].eventEnter);
+
                     if(Warp[B].Effect == 0 || Warp[B].Effect == 3)
                     {
                         Player[A].Location.X = Warp[B].Exit.X + Warp[B].Exit.Width / 2.0 - Player[A].Location.Width / 2.0;
