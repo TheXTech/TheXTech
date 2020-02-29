@@ -3899,7 +3899,7 @@ void SuperWarp(int A)
                     if(WarpCollision(Player[A].Location, B) == true)
                         canWarp = true;
                 }
-                else if(Warp[B].Effect == 0)
+                else if(Warp[B].Effect == 0 || Warp[B].Effect == 3)
                     canWarp = true;
                 if(Warp[B].LevelEnt == true)
                     canWarp = false;
@@ -3914,11 +3914,12 @@ void SuperWarp(int A)
                     canWarp = false;
                 }
 
-                if(canWarp == true)
+                if(canWarp)
                 {
                     Player[A].Slide = false;
-                    Player[A].Stoned = false;
-                    if(Warp[B].Locked == true)
+                    if(Warp[B].Effect != 3)
+                        Player[A].Stoned = false;
+                    if(Warp[B].Locked)
                     {
                         if(Player[A].HoldingNPC > 0 && NPC[Player[A].HoldingNPC].Type == 31)
                         {
@@ -3956,7 +3957,7 @@ void SuperWarp(int A)
                                 }
                             }
                         }
-                        else if(Player[A].HasKey == true)
+                        else if(Player[A].HasKey)
                         {
                             Player[A].HasKey = false;
                             Warp[B].Locked = false;
@@ -3978,7 +3979,7 @@ void SuperWarp(int A)
                     }
                 }
 
-                if(canWarp == true)
+                if(canWarp)
                 {
                     UnDuck(A);
                     Player[A].YoshiTongueLength = 0;
@@ -3988,11 +3989,13 @@ void SuperWarp(int A)
                     Player[A].CanFly = false;
                     Player[A].CanFly2 = false;
                     Player[A].RunCount = 0;
-                    if(Warp[B].NoYoshi == true && Player[A].YoshiPlayer > 0)
+
+                    if(Warp[B].NoYoshi && Player[A].YoshiPlayer > 0)
                     {
                         YoshiSpit(A);
                     }
-                    if(Warp[B].WarpNPC == false || (Player[A].Mount == 3 && (Player[A].YoshiNPC != 0 || Player[A].YoshiPlayer != 0) && Warp[B].NoYoshi == true))
+
+                    if(!Warp[B].WarpNPC || (Player[A].Mount == 3 && (Player[A].YoshiNPC != 0 || Player[A].YoshiPlayer != 0) && Warp[B].NoYoshi))
                     {
                         if(Player[A].HoldingNPC > 0)
                         {
@@ -4010,6 +4013,7 @@ void SuperWarp(int A)
                             YoshiSpit(A);
                         }
                     }
+
                     if(Player[A].HoldingNPC > 0)
                     {
                         if(NPC[Player[A].HoldingNPC].Type == 263) // can't bring ice through warps
@@ -4018,10 +4022,15 @@ void SuperWarp(int A)
                             Player[A].HoldingNPC = 0;
                         }
                     }
+
                     Player[A].StandingOnNPC = 0;
-                    Player[A].Location.SpeedX = 0;
-                    Player[A].Location.SpeedY = 0;
-                    if(Warp[B].Effect == 0)
+                    if(Warp[B].Effect != 3) // Don't zero speed when passing a portal warp
+                    {
+                        Player[A].Location.SpeedX = 0;
+                        Player[A].Location.SpeedY = 0;
+                    }
+
+                    if(Warp[B].Effect == 0 || Warp[B].Effect == 3)
                     {
                         Player[A].Location.X = Warp[B].Exit.X + Warp[B].Exit.Width / 2.0 - Player[A].Location.Width / 2.0;
                         Player[A].Location.Y = Warp[B].Exit.Y + Warp[B].Exit.Height - Player[A].Location.Height - 0.1;

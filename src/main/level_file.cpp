@@ -773,6 +773,7 @@ void ClearLevel()
         bgMusic[A] = 0;
         level[A] = BlankLocation;
         LevelWrap[A] = false;
+        LevelVWrap[A] = false;
         LevelChop[A] = 0;
         NoTurnBack[A] = false;
         UnderWater[A] = false;

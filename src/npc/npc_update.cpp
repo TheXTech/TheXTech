@@ -1071,15 +1071,29 @@ void UpdateNPCs()
                     tempBlockHit[1] = 0;
                     tempBlockHit[2] = 0;
                     winningBlock = 0;
-                    if(LevelWrap[NPC[A].Section] == true && NPC[A].Type != 30 && NPC[A].Type != 108) // Level wraparound
+
+                    if((LevelWrap[NPC[A].Section] || LevelVWrap[NPC[A].Section]) && NPC[A].Type != 30 && NPC[A].Type != 108) // Level wraparound
                     {
-                        if(NPC[A].Location.X + NPC[A].Location.Width < level[NPC[A].Section].X)
-                            NPC[A].Location.X = level[NPC[A].Section].Width - 1;
-                        else if(NPC[A].Location.X > level[NPC[A].Section].Width)
-                            NPC[A].Location.X = level[NPC[A].Section].X - NPC[A].Location.Width + 1;
+                        if(LevelWrap[NPC[A].Section])
+                        {
+                            if(NPC[A].Location.X + NPC[A].Location.Width < level[NPC[A].Section].X)
+                                NPC[A].Location.X = level[NPC[A].Section].Width - 1;
+                            else if(NPC[A].Location.X > level[NPC[A].Section].Width)
+                                NPC[A].Location.X = level[NPC[A].Section].X - NPC[A].Location.Width + 1;
+                        }
+
+                        if(LevelVWrap[NPC[A].Section])
+                        {
+                            if(NPC[A].Location.Y + NPC[A].Location.Height < level[NPC[A].Section].Y)
+                                NPC[A].Location.Y = level[NPC[A].Section].Height - 1;
+                            else if(NPC[A].Location.Y > level[NPC[A].Section].Height)
+                                NPC[A].Location.Y = level[NPC[A].Section].Y - NPC[A].Location.Height + 1;
+                        }
                     }
-                    if(NoTurnBack[NPC[A].Section] == true && NPC[A].Location.X < level[NPC[A].Section].X - NPC[A].Location.Width - 32)
+
+                    if(NoTurnBack[NPC[A].Section] && NPC[A].Location.X < level[NPC[A].Section].X - NPC[A].Location.Width - 32)
                         NPCHit(A, 9);
+
                     if(NPC[A].CantHurt > 0)
                     {
                         if(!(NPC[A].Type == 21))
