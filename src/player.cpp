@@ -3871,39 +3871,41 @@ void SuperWarp(int A)
     Location_t tempLocation;
     bool canWarp = false;
 
-    if(Player[A].WarpCD <= 0 && Player[A].Mount != 2 && Player[A].GroundPound == false && Player[A].GroundPound2 == false)
+    if(Player[A].WarpCD <= 0 && Player[A].Mount != 2 && !Player[A].GroundPound && !Player[A].GroundPound2)
     {
         for(B = 1; B <= numWarps; B++)
         {
-            if(CheckCollision(Player[A].Location, Warp[B].Entrance) && Warp[B].Hidden == false)
+            if(CheckCollision(Player[A].Location, Warp[B].Entrance) && !Warp[B].Hidden)
             {
                 Player[A].ShowWarp = B;
                 canWarp = false;
-                if(Warp[B].Direction == 1 && Player[A].Controls.Up == true)
+                if(Warp[B].Direction == 1 && Player[A].Controls.Up)
                 {
-                    if(WarpCollision(Player[A].Location, B) == true)
+                    if(WarpCollision(Player[A].Location, B))
                         canWarp = true;
                 }
-                else if(Warp[B].Direction == 2 && Player[A].Controls.Left == true)
+                else if(Warp[B].Direction == 2 && Player[A].Controls.Left)
                 {
-                    if(WarpCollision(Player[A].Location, B) == true)
+                    if(WarpCollision(Player[A].Location, B))
                         canWarp = true;
                 }
-                else if(Warp[B].Direction == 3 && Player[A].Controls.Down == true)
+                else if(Warp[B].Direction == 3 && Player[A].Controls.Down)
                 {
-                    if(WarpCollision(Player[A].Location, B) == true)
+                    if(WarpCollision(Player[A].Location, B))
                         canWarp = true;
                 }
-                else if(Warp[B].Direction == 4 && Player[A].Controls.Right == true)
+                else if(Warp[B].Direction == 4 && Player[A].Controls.Right)
                 {
-                    if(WarpCollision(Player[A].Location, B) == true)
+                    if(WarpCollision(Player[A].Location, B))
                         canWarp = true;
                 }
                 else if(Warp[B].Effect == 0 || Warp[B].Effect == 3)
                     canWarp = true;
-                if(Warp[B].LevelEnt == true)
+
+                if(Warp[B].LevelEnt)
                     canWarp = false;
-                if(Warp[B].Stars > numStars && canWarp == true)
+
+                if(Warp[B].Stars > numStars && canWarp)
                 {
                     if(Warp[B].Stars == 1)
                         MessageText = "You need 1 star to enter.";
@@ -3931,7 +3933,7 @@ void SuperWarp(int A)
                             {
                                 if(Background[C].Type == 98)
                                 {
-                                    if(CheckCollision(Warp[B].Entrance, Background[C].Location) == true)
+                                    if(CheckCollision(Warp[B].Entrance, Background[C].Location))
                                     {
                                         Background[C].Layer = "";
                                         Background[C].Hidden = true;
@@ -3949,7 +3951,7 @@ void SuperWarp(int A)
                             {
                                 if(Background[C].Type == 98)
                                 {
-                                    if(CheckCollision(Warp[B].Entrance, Background[C].Location) == true)
+                                    if(CheckCollision(Warp[B].Entrance, Background[C].Location))
                                     {
                                         Background[C].Layer = "";
                                         Background[C].Hidden = true;
@@ -3966,7 +3968,7 @@ void SuperWarp(int A)
                             {
                                 if(Background[C].Type == 98)
                                 {
-                                    if(CheckCollision(Warp[B].Entrance, Background[C].Location) == true)
+                                    if(CheckCollision(Warp[B].Entrance, Background[C].Location))
                                     {
                                         Background[C].Layer = "";
                                         Background[C].Hidden = true;
