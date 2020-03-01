@@ -5110,22 +5110,25 @@ void PlayerEffects(int A)
     }
     else if(Player[A].Effect == 228) // Player losing icepower
     {
-        if(Player[A].Duck == true)
+        if(Player[A].Duck)
         {
             Player[A].StandUp = true; // Fixes a block collision bug
             Player[A].Duck = false;
             Player[A].Location.Height = Physics.PlayerHeight[Player[A].Character][Player[A].State];
             Player[A].Location.Y = Player[A].Location.Y - Physics.PlayerHeight[Player[A].Character][Player[A].State] + Physics.PlayerDuckHeight[Player[A].Character][Player[A].State];
         }
+
         Player[A].Frame = 1;
         Player[A].Effect2 = Player[A].Effect2 + 1;
-        if(Player[A].Effect2 / 5 == static_cast<int>(floor(static_cast<double>(Player[A].Effect2 / 5))))
+
+        if(fEqual(Player[A].Effect2 / 5, std::floor(Player[A].Effect2 / 5)))
         {
             if(Player[A].State == 2)
                 Player[A].State = 7;
             else
                 Player[A].State = 2;
         }
+
         if(Player[A].Effect2 >= 50)
         {
             if(Player[A].State == 7)
