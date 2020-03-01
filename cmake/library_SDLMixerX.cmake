@@ -76,7 +76,7 @@ else()
     target_link_libraries(PGE_SDLMixerX INTERFACE "${SDL2_SO_Lib}")
 endif()
 
-target_link_libraries(PGE_SDLMixerX_static INTERFACE 
+target_link_libraries(PGE_SDLMixerX_static INTERFACE
     "${SDL_MixerX_A_Lib}"
     "${SDL2_A_Lib}"
 )
