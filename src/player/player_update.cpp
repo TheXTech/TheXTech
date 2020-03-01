@@ -4301,7 +4301,9 @@ void UpdatePlayer()
                     Player[A].Location.Y = NPC[B].Location.Y - Player[A].Location.Height;
                     if(NPC[B].Type == 46 || NPC[B].Type == 212)
                         NPC[B].Special2 = 1;
-                    if(NPC[B].Type == 105)
+                    if(NPC[B].Type == 105 )
+                        NPC[B].Special = 1;
+                    if(NPC[B].Type == 295 && Player[A].Location.SpeedY > 0)
                         NPC[B].Special = 1;
                     if(NPC[B].Type == 104 && Player[A].Location.SpeedY > 0)
                         NPC[B].Direction = 1;

@@ -2534,13 +2534,17 @@ void NPCSpecial(int A)
         NPC[A].Location.SpeedY = NPC[A].Direction * 2;
     else if(NPC[A].Type == 295)
     {
-      if(fEqual(NPC[A].Special, 1))
+      if(fEqual(NPC[A].Special, 1) && NPC[A].Special3 == 0)
+      {
+        NPC[A].Special3 = 1;
+      }
+      if(NPC[A].Special3 == 1)
       {
         NPC[A].Special2 = NPC[A].Special2 + 1;
-        if(NPC[A].Special2 <= 50)
+        if(NPC[A].Special2 <= 25)
             NPC[A].Location.SpeedY = 1;
-        else if(NPC[A].Special2 >= 51)
-            NPC[A].Location.SpeedY = NPC[A].Location.SpeedY + Physics.NPCGravity;
+        else if(NPC[A].Special2 >= 26)
+            NPC[A].Location.SpeedY = NPC[A].Location.SpeedY + Physics.NPCGravity * 0.95;
       }
     }
     else if(NPC[A].Type == 199)
