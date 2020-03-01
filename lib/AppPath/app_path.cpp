@@ -42,8 +42,52 @@
 #include <algorithm> // std::replace from \\ into /
 #endif
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+
+static bool loadingLocked = false;
+
+extern "C" void unlockLoadingCustomState()
+{
+    loadingLocked = false;
+}
+
+static void loadCustomState()
+{
+    loadingLocked = true;
+    EM_ASM(
+        FS.mkdir('/settings');
+        FS.mount(IDBFS, {}, '/settings');
+
+        // sync from persisted state into memory and then
+        // run the 'test' function
+        FS.syncfs(true, function (err) {
+            assert(!err);
+            ccall('unlockLoadingCustomState', 'v');
+        });
+    );
+
+    while(loadingLocked)
+        emscripten_sleep(10);
+}
+
+static void saveCustomState()
+{
+    loadingLocked = true;
+    EM_ASM(
+        FS.syncfs(function (err) {
+            assert(!err);
+            ccall('unlockLoadingCustomState', 'v');
+        });
+    );
+
+    while(loadingLocked)
+        emscripten_sleep(10);
+}
+#endif
+
 #include "app_path.h"
-//#include "../version.h"
+#include "../version.h"
 
 #include <SDL2/SDL.h>
 
@@ -135,6 +179,10 @@ void AppPathManager::initAppPath()
     SDL_free(path);
 #endif
 
+#ifdef __EMSCRIPTEN__
+    loadCustomState();
+#endif
+
     if(isPortable())
         return;
 
@@ -211,7 +259,7 @@ std::string AppPathManager::languagesDir()
 std::string AppPathManager::screenshotsDir()
 {
 #ifndef __APPLE__
-    return m_userPath + "/screenshots";
+    return m_userPath + "screenshots";
 #else
     std::string path = m_userPath;
     char *base_path = getScreenCaptureDir();
@@ -222,6 +270,11 @@ std::string AppPathManager::screenshotsDir()
     }
     return path + "/A2xTech Game Screenshots";
 #endif
+}
+
+std::string AppPathManager::gameSaveRootDir()
+{
+    return m_settingsPath + "gamesaves";
 }
 
 void AppPathManager::install()
@@ -275,4 +328,8 @@ void AppPathManager::initSettingsPath()
 
     if(!DirMan::exists(m_settingsPath))
         DirMan::mkAbsPath(m_settingsPath);
+
+    // Also make the gamesaves root folder to be exist
+    if(!DirMan::exists(gameSaveRootDir()))
+        DirMan::mkAbsPath(gameSaveRootDir());
 }

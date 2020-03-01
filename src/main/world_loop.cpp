@@ -24,6 +24,7 @@
  */
 
 #include <Utils/files.h>
+#include <pge_delay.h>
 
 #include "../globals.h"
 #include "../game_main.h"
@@ -346,7 +347,7 @@ void WorldLoop()
                             LevelSelect = false;
                             GameThing();
                             ClearLevel();
-                            SDL_Delay(1000);
+                            PGE_Delay(1000);
                             OpenLevel(SelectWorld[selWorld].WorldPath + WorldLevel[A].FileName);
                             break;
                         }
@@ -358,7 +359,7 @@ void WorldLoop()
                         frmMain.clearBuffer();
                         frmMain.repaint();
                         DoEvents();
-                        SDL_Delay(1000);
+                        PGE_Delay(1000);
 
                         overTime = 0;
                         GoalTime = SDL_GetTicks() + 1000;
@@ -671,7 +672,7 @@ void PathWait()
                 fpsCount = 0;
             }
         }
-        SDL_Delay(1);
+        PGE_Delay(1);
     } while(!(C >= 24));
 
     overTime = 0;

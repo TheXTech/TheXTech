@@ -25,6 +25,9 @@
 
 #include <cmath>
 #include <ctime>
+#include <Utils/maths.h>
+#include <fmt_format_ne.h>
+#include <pge_delay.h>
 
 #include "globals.h"
 #include "player.h"
@@ -37,9 +40,7 @@
 #include "blocks.h"
 #include "editor.h"
 #include "layers.h"
-#include <Utils/maths.h>
 
-#include <fmt_format_ne.h>
 
 
 void WaterCheck(int A);
@@ -891,7 +892,7 @@ void EveryonesDead()
 //    if(MagicHand == true)
 //        BitBlt frmLevelWindow::vScreen[1].hdc, 0, 0, frmLevelWindow::vScreen[1].ScaleWidth, frmLevelWindow::vScreen[1].ScaleHeight, 0, 0, 0, vbWhiteness;
 
-    SDL_Delay(500);
+    PGE_Delay(500);
 
     Lives--;
     if(Lives >= 0.f)

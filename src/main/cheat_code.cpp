@@ -26,6 +26,7 @@
 #include <Logger/logger.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_messagebox.h>
+#include <pge_delay.h>
 
 #include "../globals.h"
 #include "../sound.h"
@@ -123,7 +124,7 @@ void CheatCode(char NewKey)
             frmMain.repaint();
             StopMusic();
             DoEvents();
-            SDL_Delay(500);
+            PGE_Delay(500);
         }
         return;
     }
