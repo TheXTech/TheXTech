@@ -95,11 +95,18 @@ public:
     void renderTextureI(int xDst, int yDst, int wDst, int hDst,
                         StdPicture &tx,
                         int xSrc, int ySrc,
+                        double rotateAngle = 0.0, SDL_Point *center = nullptr, unsigned int flip = SDL_FLIP_NONE,
                         float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f);
     void renderTexture(double xDst, double yDst, double wDst, double hDst,
                        StdPicture &tx,
                        int xSrc, int ySrc,
                        float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f);
+
+    void renderTextureFL(double xDst, double yDst, double wDst, double hDst,
+                         StdPicture &tx,
+                         int xSrc, int ySrc,
+                         double rotateAngle = 0.0, SDL_Point *center = nullptr, unsigned int flip = SDL_FLIP_NONE,
+                         float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f);
 
     void renderTexture(int xDst, int yDst, StdPicture &tx,
                        float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f);
