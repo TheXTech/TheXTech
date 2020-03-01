@@ -196,7 +196,7 @@ void DrawPlayer(int A, int Z)
                 }
                 else
                 {
-                    DrawFrozenNPC( Z, Player[A].HoldingNPC);
+                    DrawFrozenNPC(Z, Player[A].HoldingNPC);
                 }
             }
             if(Player[A].Fairy == false)

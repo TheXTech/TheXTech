@@ -1358,10 +1358,9 @@ void FrmMain::renderRectBR(int _left, int _top, int _right, int _bottom, float r
 void FrmMain::renderTextureI(int xDst, int yDst, int wDst, int hDst,
                              StdPicture &tx,
                              int xSrc, int ySrc,
+                             double rotateAngle, SDL_Point *center, unsigned int flip,
                              float red, float green, float blue, float alpha)
 {
-    const unsigned int flip = SDL_FLIP_NONE;
-
     if(!tx.inited)
         return;
 
@@ -1405,13 +1404,31 @@ void FrmMain::renderTextureI(int xDst, int yDst, int wDst, int hDst,
                            static_cast<unsigned char>(255.f * blue));
     SDL_SetTextureAlphaMod(tx.texture, static_cast<unsigned char>(255.f * alpha));
     SDL_RenderCopyEx(m_gRenderer, tx.texture, &sourceRect, &destRect,
-                     0.0, nullptr, static_cast<SDL_RendererFlip>(flip));
+                     rotateAngle, center, static_cast<SDL_RendererFlip>(flip));
 }
 
 void FrmMain::renderTexture(double xDst, double yDst, double wDst, double hDst,
                             StdPicture &tx,
                             int xSrc, int ySrc,
                             float red, float green, float blue, float alpha)
+{
+    const unsigned int flip = SDL_FLIP_NONE;
+    renderTextureI(Maths::iRound(xDst),
+                   Maths::iRound(yDst),
+                   Maths::iRound(wDst),
+                   Maths::iRound(hDst),
+                   tx,
+                   xSrc,
+                   ySrc,
+                   0.0, nullptr, flip,
+                   red, green, blue, alpha);
+}
+
+void FrmMain::renderTextureFL(double xDst, double yDst, double wDst, double hDst,
+                              StdPicture &tx,
+                              int xSrc, int ySrc,
+                              double rotateAngle, SDL_Point *center, unsigned int flip,
+                              float red, float green, float blue, float alpha)
 {
     renderTextureI(Maths::iRound(xDst),
                    Maths::iRound(yDst),
@@ -1420,6 +1437,7 @@ void FrmMain::renderTexture(double xDst, double yDst, double wDst, double hDst,
                    tx,
                    xSrc,
                    ySrc,
+                   rotateAngle, center, flip,
                    red, green, blue, alpha);
 }
 

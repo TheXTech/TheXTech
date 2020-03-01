@@ -82,6 +82,7 @@ RangeArr<Water_t, 0, maxWater> Water;
 int numWater = 0;
 RangeArr<Star_t, 1, maxStarsNum> Star;
 std::string GoToLevel;
+bool GoToLevelNoGameThing = false;
 std::string StartLevel;
 bool NoMap = false;
 bool RestartLevel = false;

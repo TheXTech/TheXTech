@@ -161,6 +161,7 @@ int main(int argc, char**argv)
         setup.frameSkip = switchFrameSkip.getValue();
         setup.noSound   = switchNoSound.getValue();
         setup.neverPause = switchNoPause.getValue();
+
         std::string rt = renderType.getValue();
         if(rt == "sw")
             setup.renderType = CmdLineSetup_t::RENDER_SW;
