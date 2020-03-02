@@ -2331,11 +2331,15 @@ void FindSaves()
         SaveSlot[A] = -1;
         SaveStars[A] = 0;
 
-        std::string saveFile = episode + fmt::format_ne("save{0}.savx", A);
-        std::string saveFileOld = episode + fmt::format_ne("save{0}.sav", A);
+        std::string saveFile = makeGameSavePath(episode,
+                                                SelectWorld[selWorld].WorldFile,
+                                                fmt::format_ne("save{0}.savx", A));
+        std::string saveFileOld = episode + fmt::format_ne("save{0}.savx", A);
+        std::string saveFileAncient = episode + fmt::format_ne("save{0}.sav", A);
 
         if((Files::fileExists(saveFile) && FileFormats::ReadExtendedSaveFileF(saveFile, f)) ||
-           (Files::fileExists(saveFileOld) && FileFormats::ReadSMBX64SavFileF(saveFileOld, f)))
+           (Files::fileExists(saveFileOld) && FileFormats::ReadExtendedSaveFileF(saveFileOld, f)) ||
+           (Files::fileExists(saveFileAncient) && FileFormats::ReadSMBX64SavFileF(saveFileAncient, f)))
         {
             int curActive = 0;
             int maxActive = 0;

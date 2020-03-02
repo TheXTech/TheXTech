@@ -73,6 +73,8 @@ void FindLevels();
 
 void FindSaves();
 
+extern std::string makeGameSavePath(std::string episode, std::string world, std::string saveFile);
+
 void SaveGame();
 
 void LoadGame();
