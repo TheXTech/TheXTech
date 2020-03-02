@@ -23,6 +23,8 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#include <pge_delay.h>
+
 #include "../globals.h"
 #include "../game_main.h"
 #include "../sound.h"
@@ -511,7 +513,7 @@ void PauseGame(int plr)
 
         if(qScreen)
             stopPause = false;
-        SDL_Delay(1);
+        PGE_Delay(1);
     } while(!(stopPause == true));
 
     GamePaused = false;

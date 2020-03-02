@@ -59,7 +59,11 @@ FrmMain::FrmMain()
 {
     ScaleWidth = ScreenW;
     ScaleHeight = ScreenH;
-    m_windowTitle = fmt::format_ne("New Super Mario Bros. X - 1.0", V_LATEST_STABLE);
+#ifdef ENABLE_OLD_CREDITS
+    m_windowTitle = "Super Mario Bros. X - Version 1.3 - www.SuperMarioBrothers.org";
+#else
+    m_windowTitle = fmt::format_ne("New Super Mario Bros. X - 1.0");
+#endif
 }
 
 SDL_Window *FrmMain::getWindow()
@@ -89,7 +93,9 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
 
     Uint32 sdlInitFlags = 0;
     // Prepare flags for SDL initialization
+#ifndef __EMSCRIPTEN__
     sdlInitFlags |= SDL_INIT_TIMER;
+#endif
     sdlInitFlags |= SDL_INIT_AUDIO;
     sdlInitFlags |= SDL_INIT_VIDEO;
     sdlInitFlags |= SDL_INIT_EVENTS;
@@ -115,11 +121,7 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
     m_window = SDL_CreateWindow(m_windowTitle.c_str(),
                               SDL_WINDOWPOS_CENTERED,
                               SDL_WINDOWPOS_CENTERED,
-                          #ifdef __EMSCRIPTEN__ //Set canvas be 1/2 size for a faster rendering
-                              ScaleWidth / 2, ScaleHeight / 2,
-                          #else
                               ScaleWidth, ScaleHeight,
-                          #endif //__EMSCRIPTEN__
                               SDL_WINDOW_RESIZABLE |
                               SDL_WINDOW_HIDDEN |
                               SDL_WINDOW_ALLOW_HIGHDPI);

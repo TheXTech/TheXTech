@@ -17,6 +17,9 @@
  * or see <http://www.gnu.org/licenses/>.
  */
 
+#include "logger_sets.h"
+
+#ifndef DISABLE_LOGGING
 #include <IniProcessor/ini_processing.h>
 #include <fmt_format_ne.h>
 #include <fmt/fmt_printf.h>
@@ -30,7 +33,6 @@
 #include <sstream>
 
 #include <AppPath/app_path.h>
-#include "logger_sets.h"
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten/trace.h>
@@ -356,3 +358,49 @@ void LogWriter::WriteToLog(PGE_LogLevel type, const std::string &msg)
         return;
     }
 }
+
+#else // DISABLE_LOGGING
+
+/* Dummies  */
+
+std::string  LogWriter::m_logFilePath;
+PGE_LogLevel LogWriter::m_logLevel = PGE_LogLevel::NoLog;
+bool  LogWriter::m_enabled = false;
+bool  LogWriter::m_enabledStdOut = false;
+bool  LogWriter::m_logIsOpened = false;
+SDL_RWops *LogWriter::m_logout = nullptr;
+
+
+void LogWriter::LoadLogSettings(bool)
+{}
+
+void LoadLogSettings(bool)
+{}
+
+void CloseLog()
+{}
+
+void pLogDebug(const char *, ...)
+{}
+
+void pLogWarning(const char *, ...)
+{}
+
+void pLogCritical(const char *, ...)
+{}
+
+void pLogFatal(const char *, ...)
+{}
+
+void pLogInfo(const char *, ...)
+{}
+
+std::string getLogFilePath()
+{
+    return "<No log file: Logging was been disabled in this build>";
+}
+
+void LogWriter::WriteToLog(PGE_LogLevel, const std::string &)
+{}
+
+#endif // DISABLE_LOGGING

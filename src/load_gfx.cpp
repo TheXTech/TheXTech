@@ -28,6 +28,9 @@
 #include <Utils/files.h>
 #include <DirManager/dirman.h>
 #include <fmt_format_ne.h>
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 
 #include <set>
 
@@ -679,5 +682,8 @@ void UpdateLoad()
 
         frmMain.repaint();
         DoEvents();
+#ifdef __EMSCRIPTEN__
+        emscripten_sleep(1); // To repaint screenn, it's required to send a sleep signal
+#endif
     }
 }

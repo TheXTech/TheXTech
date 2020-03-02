@@ -27,8 +27,20 @@
 #include "../game_main.h"
 
 #include <Utils/files.h>
+#include <DirManager/dirman.h>
+#include <AppPath/app_path.h>
 #include <PGE_File_Formats/file_formats.h>
 #include <fmt_format_ne.h>
+
+
+std::string makeGameSavePath(std::string episode, std::string world, std::string saveFile)
+{
+    std::string gameSaveDir = AppPathManager::gameSaveRootDir() + "/"+ Files::basename(Files::dirname(episode + world));
+    if(!DirMan::exists(gameSaveDir))
+        DirMan::mkAbsPath(gameSaveDir);
+
+    return gameSaveDir + "/"+ world + "-" + saveFile;
+}
 
 void SaveGame()
 {
@@ -52,7 +64,10 @@ void SaveGame()
     }
 
     GamesaveData sav;
-    std::string savePath = SelectWorld[selWorld].WorldPath + fmt::format_ne("save{0}.savx", selSave);
+//    std::string savePath = SelectWorld[selWorld].WorldPath + fmt::format_ne("save{0}.savx", selSave);
+    std::string savePath = makeGameSavePath(SelectWorld[selWorld].WorldPath,
+                                            SelectWorld[selWorld].WorldFile,
+                                            fmt::format_ne("save{0}.savx", selSave));
 
 //    Open SelectWorld[selWorld].WorldPath + "save" + selSave + ".sav" For Output As #1;
     sav.lives = int(Lives);
@@ -94,6 +109,10 @@ void SaveGame()
     sav.totalStars = uint32_t(MaxWorldStars);
 
     FileFormats::WriteExtendedSaveFileF(savePath, sav);
+
+#ifdef __EMSCRIPTEN__
+    AppPathManager::syncFs();
+#endif
 }
 
 void LoadGame()
@@ -103,13 +122,18 @@ void LoadGame()
     std::string newInput;
 
     GamesaveData sav;
-    std::string savePath = SelectWorld[selWorld].WorldPath + fmt::format_ne("save{0}.savx", selSave);
-    std::string savePathOld = SelectWorld[selWorld].WorldPath + fmt::format_ne("save{0}.sav", selSave);
+    std::string savePath = makeGameSavePath(SelectWorld[selWorld].WorldPath,
+                                            SelectWorld[selWorld].WorldFile,
+                                            fmt::format_ne("save{0}.savx", selSave));
+    std::string savePathOld = SelectWorld[selWorld].WorldPath + fmt::format_ne("save{0}.savx", selSave);
+    std::string savePathAncient = SelectWorld[selWorld].WorldPath + fmt::format_ne("save{0}.sav", selSave);
 
-    if(!Files::fileExists(savePath) && Files::fileExists(savePathOld))
-        FileFormats::ReadSMBX64SavFileF(savePathOld, sav);
-    else if(Files::fileExists(savePath))
+    if(Files::fileExists(savePath))
         FileFormats::ReadExtendedSaveFileF(savePath, sav);
+    else if(Files::fileExists(savePathOld))
+        FileFormats::ReadExtendedSaveFileF(savePathOld, sav);
+    else if(Files::fileExists(savePathAncient))
+        FileFormats::ReadSMBX64SavFileF(savePathAncient, sav);
     else
     {
         pLogDebug("Game save file not found: %s", savePath.c_str());
@@ -271,10 +295,19 @@ void ClearGame()
     maxStars = 0;
     numStars = 0;
 
-    std::string savePath = SelectWorld[selWorld].WorldPath + fmt::format_ne("save{0}.savx", selSave);
-    std::string savePathOld = SelectWorld[selWorld].WorldPath + fmt::format_ne("save{0}.sav", selSave);
+    std::string savePath = makeGameSavePath(SelectWorld[selWorld].WorldPath,
+                                            SelectWorld[selWorld].WorldFile,
+                                            fmt::format_ne("save{0}.savx", selSave));
+    std::string savePathOld = SelectWorld[selWorld].WorldPath + fmt::format_ne("save{0}.savx", selSave);
+    std::string savePathAncient = SelectWorld[selWorld].WorldPath + fmt::format_ne("save{0}.sav", selSave);
     if(Files::fileExists(savePath))
         Files::deleteFile(savePath);
     if(Files::fileExists(savePathOld))
         Files::deleteFile(savePathOld);
+    if(Files::fileExists(savePathAncient))
+        Files::deleteFile(savePathAncient);
+
+#ifdef __EMSCRIPTEN__
+    AppPathManager::syncFs();
+#endif
 }

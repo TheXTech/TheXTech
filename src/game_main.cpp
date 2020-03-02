@@ -24,6 +24,7 @@
  */
 
 #include <Logger/logger.h>
+#include <pge_delay.h>
 
 #include "globals.h"
 #include "game_main.h"
@@ -280,7 +281,7 @@ int GameMain(const CmdLineSetup_t &setup)
                     }
                 }
 
-                SDL_Delay(1);
+                PGE_Delay(1);
                 if(!GameIsActive) break;// Break on quit
             } while(GameOutro);
         }
@@ -453,7 +454,7 @@ int GameMain(const CmdLineSetup_t &setup)
                     }
                 }
 
-                SDL_Delay(1);
+                PGE_Delay(1);
                 if(!GameIsActive) return 0;// Break on quit
 
             } while(GameMenu);
@@ -506,7 +507,7 @@ int GameMain(const CmdLineSetup_t &setup)
                     frmMain.repaint();
                 }
                 ClearLevel();
-                SDL_Delay(1000);
+                PGE_Delay(1000);
 
                 if(GoToLevel.empty())
                     OpenLevel(SelectWorld[selWorld].WorldPath + StartLevel);
@@ -582,7 +583,7 @@ int GameMain(const CmdLineSetup_t &setup)
                         }
                     }
 
-                    SDL_Delay(1);
+                    PGE_Delay(1);
                     if(!GameIsActive)
                         return 0;// Break on quit
                 } while(LevelSelect);
@@ -762,7 +763,7 @@ int GameMain(const CmdLineSetup_t &setup)
                     }
                 }
 
-                SDL_Delay(1);
+                PGE_Delay(1);
                 if(!GameIsActive) return 0;// Break on quit
             }
             while(!LevelSelect && !GameMenu);
@@ -780,7 +781,7 @@ int GameMain(const CmdLineSetup_t &setup)
 //                LevelEditor = true; //FIXME: Restart level testing or quit a game instead of THIS
 
                 GameThing();
-                SDL_Delay(500);
+                PGE_Delay(500);
                 zTestLevel(); // Restart level
 
 //                If nPlay.Online = False Then
@@ -857,7 +858,7 @@ void NextLevel()
     frmMain.repaint();
     DoEvents();
     if(!TestLevel && GoToLevel.empty() && !NoMap)
-        SDL_Delay(500);
+        PGE_Delay(500);
     if(BattleMode && !LevelEditor)
     {
         EndLevel = false;
@@ -1228,6 +1229,7 @@ void NPCyFix()
 
 void CheckActive()
 {
+#ifndef __EMSCRIPTEN__
     bool MusicPaused = false;
     bool focusLost = false;
 
@@ -1305,6 +1307,7 @@ void CheckActive()
     }
     */
 //    If LevelEditor = True Or MagicHand = True Then frmLevelWindow.vScreen(1).MousePointer = 99
+#endif // not def __EMSCRIPTEN__
 }
 
 
@@ -1452,7 +1455,7 @@ void StartBattleMode()
     frmMain.repaint();
     StopMusic();
     DoEvents();
-    SDL_Delay(500);
+    PGE_Delay(500);
     ClearLevel();
 
     if(selWorld == 1)
