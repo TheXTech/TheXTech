@@ -295,10 +295,15 @@ void ClearGame()
     maxStars = 0;
     numStars = 0;
 
-    std::string savePath = SelectWorld[selWorld].WorldPath + fmt::format_ne("save{0}.savx", selSave);
-    std::string savePathOld = SelectWorld[selWorld].WorldPath + fmt::format_ne("save{0}.sav", selSave);
+    std::string savePath = makeGameSavePath(SelectWorld[selWorld].WorldPath,
+                                            SelectWorld[selWorld].WorldFile,
+                                            fmt::format_ne("save{0}.savx", selSave));
+    std::string savePathOld = SelectWorld[selWorld].WorldPath + fmt::format_ne("save{0}.savx", selSave);
+    std::string savePathAncient = SelectWorld[selWorld].WorldPath + fmt::format_ne("save{0}.sav", selSave);
     if(Files::fileExists(savePath))
         Files::deleteFile(savePath);
     if(Files::fileExists(savePathOld))
         Files::deleteFile(savePathOld);
+    if(Files::fileExists(savePathAncient))
+        Files::deleteFile(savePathAncient);
 }
