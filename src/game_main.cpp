@@ -918,7 +918,8 @@ void UpdateMacro()
                 Player[A].Controls.AltRun = false;
             }
         }
-        if(OnScreen == false)
+
+        if(!OnScreen)
         {
             LevelMacroCounter = LevelMacroCounter + 1;
             if(LevelMacroCounter >= 100)
@@ -979,6 +980,7 @@ void UpdateMacro()
             if(!GameIsActive)
                 return;
 
+            PGE_Delay(1);
         } while(true);
 
         LevelBeatCode = 4;
