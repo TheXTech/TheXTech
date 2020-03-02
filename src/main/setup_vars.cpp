@@ -777,6 +777,10 @@ void SetupVars()
     NPCWidth[58] = 32; // smb3 barrel
     NPCHeight[58] = 32;
     NPCNoYoshi[58] = true;
+    NPCWidth[296] = 96; // on/off platform
+    NPCHeight[296] = 32;
+    NPCNoYoshi[296] = true;
+    NPCNoGravity[296] = true;
     NPCWidth[59] = 32; // purple goomba
     NPCHeight[59] = 32;
     NPCFrameOffsetY[59] = 2;
@@ -953,12 +957,17 @@ void SetupVars()
     NPCWidth[104] = 96; // SMB3 Platform
     NPCHeight[104] = 32;
     NPCNoYoshi[104] = true;
+    NPCWidth[297] = 96; // SMB3 Platform
+    NPCHeight[297] = 32;
+    NPCNoYoshi[297] = true;
+    NPCNoGravity[297] = true;
     NPCWidth[105] = 128; // SMW Falling Platform
     NPCHeight[105] = 22;
     NPCNoYoshi[105] = true;
     NPCWidth[295] = 96; // SMW Gray Platform
     NPCHeight[295] = 22;
     NPCNoYoshi[295] = true;
+    NPCNoGravity[295] = true;
     NPCWidth[106] = 128; // SMB1 Platform
     NPCHeight[106] = 16;
     NPCNoYoshi[106] = true;
@@ -1520,6 +1529,7 @@ void SetupVars()
     NPCCanWalkOn[56] = true;
     NPCCanWalkOn[57] = true;
     NPCCanWalkOn[58] = true;
+    NPCCanWalkOn[296] = true;
     NPCCanWalkOn[60] = true;
     NPCCanWalkOn[62] = true;
     NPCCanWalkOn[64] = true;
@@ -1538,6 +1548,7 @@ void SetupVars()
     NPCCanWalkOn[91] = true;
     NPCCanWalkOn[92] = true;
     NPCCanWalkOn[104] = true;
+    NPCCanWalkOn[297] = true;
     NPCCanWalkOn[105] = true;
     NPCCanWalkOn[295] = true;
     NPCCanWalkOn[106] = true;
@@ -1573,6 +1584,7 @@ void SetupVars()
     // NPCNoClipping[56] = true;
     NPCNoClipping[57] = true;
     NPCNoClipping[60] = true;
+    NPCNoClipping[296] = true;
     NPCNoClipping[62] = true;
     NPCNoClipping[64] = true;
     NPCNoClipping[66] = true;
@@ -1584,6 +1596,7 @@ void SetupVars()
     NPCNoClipping[91] = true;
     NPCNoClipping[93] = true;
     NPCNoClipping[104] = true;
+    NPCNoClipping[297] = true;
     NPCNoClipping[105] = true;
     NPCNoClipping[295] = true;
     NPCNoClipping[106] = true;
@@ -1638,6 +1651,7 @@ void SetupVars()
     NPCWontHurt[57] = true;
     NPCWontHurt[58] = true;
     NPCWontHurt[60] = true;
+    NPCWontHurt[296] = true;
     NPCWontHurt[62] = true;
     NPCWontHurt[64] = true;
     NPCWontHurt[66] = true;
@@ -1660,6 +1674,7 @@ void SetupVars()
     NPCWontHurt[99] = true;
     NPCWontHurt[100] = true;
     NPCWontHurt[104] = true;
+    NPCWontHurt[297] = true;
     NPCWontHurt[105] = true;
     NPCWontHurt[295] = true;
     NPCWontHurt[106] = true;
@@ -1713,10 +1728,12 @@ void SetupVars()
     NPCIsAHit1Block[49] = true;
     NPCIsAHit1Block[26] = true;
     NPCIsAHit1Block[60] = true;
+    NPCIsAHit1Block[296] = true;
     NPCIsAHit1Block[62] = true;
     NPCIsAHit1Block[64] = true;
     NPCIsAHit1Block[66] = true;
     NPCIsAHit1Block[104] = true;
+    NPCIsAHit1Block[297] = true;
     NPCIsAHit1Block[105] = true;
     NPCIsAHit1Block[295] = true;
     NPCIsAHit1Block[106] = true;
@@ -1944,6 +1961,7 @@ void SetupVars()
     {
         NPCNoIceBall[A] = true;
     }
+    NPCNoIceBall[296] = true;
     NPCNoIceBall[171] = true;
     NPCNoIceBall[178] = true;
     NPCNoIceBall[179] = true;
@@ -2416,6 +2434,7 @@ void SetupVars()
     BlockNoClipping[175] = true;
     BlockNoClipping[178] = true;
     BlockNoClipping[181] = true;
+    BlockPlayerNoClipping[639] = true;
     BlockSlope[299] = -1;
     BlockSlope[300] = 1;
     BlockSlope[301] = 1;

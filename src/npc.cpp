@@ -2259,8 +2259,11 @@ void NPCSpecial(int A)
             NPC[A].Special2 = NPC[A].Special2 + 1;
             if(NPC[A].Special2 == 120)
             {
+                NPC[A].Location.SpeedX = 0;
                 NPC[A].Special = 1;
             }
+            else if(NPC[A].Special2 < 120)
+                NPC[A].Location.SpeedX = 1 * NPC[A].Direction;
             else if(NPC[A].Special2 == 132)
             {
                 NPC[A].Special = 2;
@@ -2291,14 +2294,6 @@ void NPCSpecial(int A)
                 NPC[A].Special = 0;
                 NPC[A].Special2 = 0;
             }
-        }
-        if(NPC[A].Special2 == 0)
-        {
-             NPC[A].Location.SpeedX = 1 * NPC[A].Direction;
-        }
-        else if(NPC[A].Special2 != 0)
-        {
-             NPC[A].Location.SpeedX = 0;
         }
     }
     else if(NPC[A].Type == 294) //Spiky Ball
@@ -2546,6 +2541,24 @@ void NPCSpecial(int A)
         else if(NPC[A].Special2 >= 26)
             NPC[A].Location.SpeedY = NPC[A].Location.SpeedY + Physics.NPCGravity * 0.95;
       }
+    }
+    else if(NPC[A].Type == 296)
+    {
+        if(NPC[A].Direction == -1)
+            NPC[A].Location.SpeedY = 0;
+        else
+            NPC[A].Location.SpeedY = NPC[A].Location.SpeedY + Physics.NPCGravity;
+    }
+    else if(NPC[A].Type == 297)
+    {
+        if(fEqual(NPC[A].Special, 1) && NPC[A].Special3 == 0)
+        {
+            NPC[A].Special3 = 1;
+        }
+        if(NPC[A].Special3 == 1)
+        {
+            NPC[A].Location.SpeedY = NPC[A].Location.SpeedY + Physics.NPCGravity * 0.2;
+        }
     }
     else if(NPC[A].Type == 199)
     {

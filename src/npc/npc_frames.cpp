@@ -1228,7 +1228,7 @@ void NPCFrames(int A)
         if(NPC[A].Direction == 1)
             NPC[A].Frame = NPC[A].Frame + 3;
     }
-    else if(NPC[A].Type == 294 || NPC[A].Type == 295)
+    else if(NPC[A].Type == 294 || NPC[A].Type == 295 || NPC[A].Type == 297)
     {
         NPC[A].Frame = 0;
     }
@@ -1484,6 +1484,13 @@ void NPCFrames(int A)
         if(NPC[A].FrameCount > 32)
             NPC[A].FrameCount = 0;
 
+    }
+    else if(NPC[A].Type == 296) //platform (on/off)
+    {
+        if(NPC[A].Direction == 1)
+            NPC[A].Frame = 1;
+        else
+            NPC[A].Frame = 0;
     }
     else if(NPC[A].Type == 189) // dry bones
     {

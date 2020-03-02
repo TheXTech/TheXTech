@@ -1416,6 +1416,8 @@ extern NPCDefaults_t NPCDefaults;
 
 //Public BlockIsSizable(0 To maxBlockType) As Boolean 'Flags block if it is sizable
 extern RangeArrI<bool, 0, maxBlockType, false> BlockIsSizable;
+//Public BlockIsSizable(0 To maxBlockType) As Boolean 'Flags block if it is sizable
+extern RangeArrI<bool, 0, maxBlockType, false> BlockPlayerNoClipping;
 //Public BlockSlope(0 To maxBlockType) As Integer 'block is sloped on top. -1 of block has an upward slope, 1 for downward
 extern RangeArrI<int, 0, maxBlockType, 0> BlockSlope;
 //Public BlockSlope2(0 To maxBlockType) As Integer 'block is sloped on the bottom.

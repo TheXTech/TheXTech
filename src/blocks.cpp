@@ -1490,7 +1490,18 @@ void BlockFrames()
         if(Player[A].Character == 5)
             BlockFrame[631] = 4;
     }
-
+    BlockFrame2[639] = BlockFrame2[639] + 1;
+    if(BlockFrame2[639] < 8)
+        BlockFrame[639] = 0;
+    else if(BlockFrame2[639] < 16)
+        BlockFrame[639] = 1;
+    else if(BlockFrame2[639] < 24)
+        BlockFrame[639] = 2;
+    else if(BlockFrame2[639] < 32)
+    {
+        BlockFrame2[639] = 0;
+        BlockFrame[639] = 0;
+    }
     BlockFrame2[626] = BlockFrame2[626] + 1;
     if(BlockFrame2[626] < 8)
         BlockFrame[626] = 3;
@@ -1700,9 +1711,27 @@ void UpdateBlocks()
                     ProcEvent(Block[iBlock[A]].TriggerHit);
                 }
                 if(Block[iBlock[A]].Type == 282)
+                {
                     Block[iBlock[A]].Type = 283;
+                    for(auto B = 1; B <= numNPCs; B++)
+                    {
+                        if(NPC[B].Type == 296 && NPC[B].Direction == -1)
+                        {
+                           NPC[B].Direction = -NPC[B].Direction;
+                        }
+                    }
+                }
                 else if(Block[iBlock[A]].Type == 283)
+                {
                     Block[iBlock[A]].Type = 282;
+                    for(auto B = 1; B <= numNPCs; B++)
+                    {
+                        if(NPC[B].Type == 296 && NPC[B].Direction == 1)
+                        {
+                           NPC[B].Direction = -NPC[B].Direction;
+                        }
+                    }
+                }
                 if(Block[iBlock[A]].Type == 90 && Block[iBlock[A]].Special == 0)
                 {
                     Block[iBlock[A]].Hidden = true;

@@ -472,7 +472,7 @@ void UpdatePlayer()
                         for(B = (int)fBlock; B <= lBlock; B++)
                         {
                             if(!Block[B].Invis && !BlockIsSizable[Block[B].Type] && !BlockOnlyHitspot1[Block[B].Type] &&
-                               !BlockNoClipping[Block[B].Type] && !Block[B].Hidden)
+                               !BlockNoClipping[Block[B].Type] && !BlockPlayerNoClipping[Block[B].Type] && !Block[B].Hidden)
                             {
                                 if(CheckCollision(tempLocation, Block[B].Location))
                                 {
@@ -2314,9 +2314,8 @@ void UpdatePlayer()
                                     {
                                         HitSpot = FindRunningCollision(Player[A].Location, Block[B].Location); // this finds what part of the block the player collided
 
-                                        if(BlockNoClipping[Block[B].Type]) // blocks that the player can't touch are forced to hitspot 0 (which means no collision)
+                                        if(BlockNoClipping[Block[B].Type] || BlockPlayerNoClipping[Block[B].Type]) // blocks that the player can't touch are forced to hitspot 0 (which means no collision)
                                             HitSpot = 0;
-
                                         if(BlockIsSizable[Block[B].Type] || BlockOnlyHitspot1[Block[B].Type]) // for sizable blocks, if the player didn't land on them from the top then he can walk through them
                                         {
                                             if(HitSpot != 1)
@@ -4303,7 +4302,7 @@ void UpdatePlayer()
                         NPC[B].Special2 = 1;
                     if(NPC[B].Type == 105 )
                         NPC[B].Special = 1;
-                    if(NPC[B].Type == 295 && Player[A].Location.SpeedY > 0)
+                    if((NPC[B].Type == 295 || NPC[B].Type == 297) && Player[A].Location.SpeedY > 0)
                         NPC[B].Special = 1;
                     if(NPC[B].Type == 104 && Player[A].Location.SpeedY > 0)
                         NPC[B].Direction = 1;
