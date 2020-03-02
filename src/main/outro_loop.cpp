@@ -101,24 +101,34 @@ void SetupCredits()
     int A = 0;
     numCredits = 0;
 
+#ifdef ENABLE_OLD_CREDITS
+    AddCredit("Super Mario Bros. X");
+#else
     AddCredit("A2xTech");
+#endif
     AddCredit("");
     AddCredit("");
     AddCredit("");
     AddCredit("");
     AddCredit("");
+#ifdef ENABLE_OLD_CREDITS
+    AddCredit("Created By:");
+#else
     AddCredit("Original VB6 code By:");
+#endif
     AddCredit("");
     AddCredit("Andrew Spinks");
     AddCredit("'Redigit'");
     AddCredit("");
     AddCredit("");
+#ifndef ENABLE_OLD_CREDITS
     AddCredit("C++ port By:");
     AddCredit("");
     AddCredit("Vitaly Novichkov");
     AddCredit("'Wohlstand'");
     AddCredit("");
     AddCredit("");
+#endif
 
     if(!WorldCredits[1].empty())
     {
@@ -150,12 +160,14 @@ void SetupCredits()
     AddCredit("");
     AddCredit("");
     AddCredit("Special Thanks:");
+#ifndef ENABLE_OLD_CREDITS
     AddCredit("");
     AddCredit("Kevsoft");
     AddCredit("Rednaxela");
     AddCredit("Aero");
     AddCredit("Kley");
     AddCredit("ShadowYoshi (Joey)");
+#endif
     AddCredit("");
     AddCredit("4matsy");
     AddCredit("AndyDark");
@@ -222,7 +234,11 @@ void SetupCredits()
     AddCredit("");
     AddCredit("");
     AddCredit("");
+#ifdef ENABLE_OLD_CREDITS
+    AddCredit("www.SuperMarioBrothers.org");
+#else
     AddCredit("wohlsoft.ru");
+#endif
 
     for(A = 1; A <= numCredits; A++)
     {

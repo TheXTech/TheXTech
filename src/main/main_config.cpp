@@ -30,11 +30,13 @@
 #include <Utils/files.h>
 #include <IniProcessor/ini_processing.h>
 #include <fmt_format_ne.h>
+#include <AppPath/app_path.h>
+#include <Logger/logger.h>
 
 
 void OpenConfig_preSetup()
 {
-    std::string configPath = AppPath + "config.ini";
+    std::string configPath = AppPathManager::settingsFileSTD();
     if(Files::fileExists(configPath))
     {
         IniProcessing config(configPath);
@@ -51,7 +53,7 @@ void OpenConfig()
 {
     int FileRelease = 0;
     bool resBool = false;
-    std::string configPath = AppPath + "config.ini";
+    std::string configPath = AppPathManager::settingsFileSTD();
 
     if(Files::fileExists(configPath))
     {
@@ -90,16 +92,20 @@ void OpenConfig()
 //    If resBool = True And resChanged = False And LevelEditor = False Then ChangeScreen
     if(resBool && !resChanged)
         ChangeScreen();
+
+    pLogDebug("Loaded config: %s", configPath.c_str());
 }
 
 void SaveConfig()
 {
 //    Dim A As Integer
-    std::string configPath = AppPath + "config.ini";
+    std::string configPath = AppPathManager::settingsFileSTD();
     IniProcessing config(configPath);
     config.beginGroup("main");
     config.setValue("release", curRelease);
+#ifndef __EMSCRIPTEN__ // Don't remember fullscreen state for Emscripten!
     config.setValue("full-screen", resChanged);
+#endif
     config.endGroup();
 
     For(A, 1, 2)
@@ -129,4 +135,9 @@ void SaveConfig()
     }
 
     config.writeIniFile();
+#ifdef __EMSCRIPTEN__
+    AppPathManager::syncFs();
+#endif
+
+    pLogDebug("Saved config: %s", configPath.c_str());
 }

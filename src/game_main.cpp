@@ -1229,6 +1229,7 @@ void NPCyFix()
 
 void CheckActive()
 {
+#ifndef __EMSCRIPTEN__
     bool MusicPaused = false;
     bool focusLost = false;
 
@@ -1306,6 +1307,7 @@ void CheckActive()
     }
     */
 //    If LevelEditor = True Or MagicHand = True Then frmLevelWindow.vScreen(1).MousePointer = 99
+#endif // not def __EMSCRIPTEN__
 }
 
 

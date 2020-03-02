@@ -134,7 +134,7 @@ static std::string getPgeUserDirectory()
     path = "/sdcard/";
 #elif defined(__gnu_linux__)
     {
-        passwd* pw = getpwuid(getuid());
+        passwd *pw = getpwuid(getuid());
         path.append(pw->pw_dir);
     }
 #endif
@@ -165,7 +165,7 @@ void AppPathManager::initAppPath()
         CFRelease(appUrlRef);
     }
 #else //__APPLE__
-    char* path = SDL_GetBasePath();
+    char *path = SDL_GetBasePath();
     if(!path)
     {
         std::fprintf(stderr, "== Failed to recogonize application path by using of SDL_GetBasePath! Using current working directory \"./\" instead.\n");
@@ -201,13 +201,17 @@ void AppPathManager::initAppPath()
         std::string noMediaFile = userDirPath + "/.nomedia";
         if(!Files::fileExists(noMediaFile))
         {
-            SDL_RWops* noMediaRWops = SDL_RWFromFile(noMediaFile.c_str(), "wb");
+            SDL_RWops *noMediaRWops = SDL_RWFromFile(noMediaFile.c_str(), "wb");
             if(noMediaRWops)
                 SDL_RWclose(noMediaRWops);
         }
 #endif
         m_userPath = appDir.absolutePath();
+#ifndef __EMSCRIPTEN__
         m_userPath.append("/a2xtech/");
+#else
+        m_userPath.append("/");
+#endif
         initSettingsPath();
     }
     else
@@ -317,6 +321,13 @@ bool AppPathManager::userDirIsAvailable()
 {
     return (m_userPath != ApplicationPathSTD);
 }
+
+#ifdef __EMSCRIPTEN__
+void AppPathManager::syncFs()
+{
+    saveCustomState();
+}
+#endif
 
 
 void AppPathManager::initSettingsPath()
