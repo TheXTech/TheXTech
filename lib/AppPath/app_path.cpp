@@ -168,8 +168,10 @@ void AppPathManager::initAppPath()
     char *path = SDL_GetBasePath();
     if(!path)
     {
+#ifndef DISABLE_LOGGING
         std::fprintf(stderr, "== Failed to recogonize application path by using of SDL_GetBasePath! Using current working directory \"./\" instead.\n");
         std::fflush(stderr);
+#endif
         path = SDL_strdup("./");
     }
     ApplicationPathSTD = std::string(path);
@@ -223,9 +225,9 @@ void AppPathManager::initAppPath()
 defaultSettingsPath:
     m_userPath = ApplicationPathSTD;
     initSettingsPath();
-#ifdef __EMSCRIPTEN__
-    printf("== App Path is %s\n", ApplicationPathSTD.c_str());
-    printf("== User Path is %s\n", m_userPath.c_str());
+#if defined(__EMSCRIPTEN__) && !defined(DISABLE_LOGGING)
+    std::printf("== App Path is %s\n", ApplicationPathSTD.c_str());
+    std::printf("== User Path is %s\n", m_userPath.c_str());
     fflush(stdout);
 #endif
 }
