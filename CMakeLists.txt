@@ -76,6 +76,7 @@ option(USE_SYSTEM_SDL2 "Use SDL2 from a system even prefering system libraries" 
 
 option(ENABLE_ANTICHEAT_TRAP "Enable anti-cheating trap for the \"redigitiscool\" cheat code" OFF)
 option(ENABLE_OLD_CREDITS "Use original Redigit's credits without changes" OFF)
+option(ENABLE_LOGGING "Enable debug logging" ON)
 
 option(PGEFL_QT_SUPPORT "Build PGE-FL with Qt support [Unneeded]" OFF)
 add_subdirectory(lib/PGE_File_Formats)
@@ -225,6 +226,9 @@ if(ENABLE_ANTICHEAT_TRAP)
 endif()
 if(ENABLE_OLD_CREDITS)
     target_compile_definitions(a2xtech PRIVATE -DENABLE_OLD_CREDITS)
+endif()
+if(NOT ENABLE_LOGGING)
+    target_compile_definitions(a2xtech PRIVATE -DDISABLE_LOGGING)
 endif()
 if(EMSCRIPTEN)
     target_compile_definitions(a2xtech PRIVATE -DPGE_NO_THREADING)
