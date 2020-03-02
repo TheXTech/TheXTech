@@ -4306,7 +4306,7 @@ void UpdatePlayer()
                         NPC[B].Special = 1;
                     if(NPC[B].Type == 104 && Player[A].Location.SpeedY > 0)
                         NPC[B].Direction = 1;
-                    if(NPC[B].Type == 190 && NPC[B].Special == 0)
+                    if((NPC[B].Type == 190 || NPC[B].Type == 298) && NPC[B].Special == 0)
                     {
                         NPC[B].Special = 1;
                         SkullRide(B);

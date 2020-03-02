@@ -1357,6 +1357,8 @@ void SetupVars()
 
     NPCWidthGFX[190] = 32;
     NPCHeightGFX[190] = 32;
+    NPCWidthGFX[298] = 32;
+    NPCHeightGFX[298] = 32;
 
     NPCWidth[234] = 48;
 
@@ -1368,10 +1370,13 @@ void SetupVars()
     NPCJumpHurt[234] = true;
 
     NPCHeight[190] = 20;
+    NPCHeight[298] = 20;
     NPCFrameOffsetY[190] = 12;
+    NPCFrameOffsetY[298] = 12;
     NPCFrameOffsetY[194] = 2;
 
     NPCMovesPlayer[190] = true;
+    NPCMovesPlayer[298] = true;
 
     NPCTurnsAtCliffs[175] = true;
 
@@ -1382,6 +1387,7 @@ void SetupVars()
     NPCNoYoshi[189] = true;
 
     NPCNoYoshi[190] = true;
+    NPCNoYoshi[298] = true;
     NPCNoYoshi[192] = true;
     NPCIsABonus[192] = true;
 
@@ -1721,6 +1727,7 @@ void SetupVars()
     NPCIsABlock[83] = true;
     NPCIsABlock[84] = true;
     NPCIsABlock[190] = true;
+    NPCIsABlock[298] = true;
     NPCIsAHit1Block[35] = true;
     NPCIsAHit1Block[191] = true;
     NPCIsAHit1Block[193] = true;
@@ -1738,7 +1745,9 @@ void SetupVars()
     NPCIsAHit1Block[295] = true;
     NPCIsAHit1Block[106] = true;
     NPCWontHurt[190] = true;
+    NPCWontHurt[298] = true;
     NPCCanWalkOn[190] = true;
+    NPCCanWalkOn[298] = true;
     NPCStandsOnPlayer[22] = true;
     NPCStandsOnPlayer[26] = true;
     NPCStandsOnPlayer[31] = true;
@@ -1968,6 +1977,7 @@ void SetupVars()
     NPCNoIceBall[180] = true;
     NPCNoIceBall[181] = true;
     NPCNoIceBall[190] = true;
+    NPCNoIceBall[298] = true;
     NPCNoIceBall[191] = true;
     NPCNoIceBall[192] = true;
     NPCNoIceBall[193] = true;

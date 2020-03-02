@@ -814,7 +814,7 @@ void UpdateNPCs()
                     Physics.NPCGravity = Physics.NPCGravityReal * 0.2;
                 if(NPC[A].Type == 195 && NPC[A].Special4 == 1)
                     NPC[A].Special5 = 0;
-                else if(!NPCIsCheep[NPC[A].Type] && NPC[A].Type != 190 && NPC[A].Type != 205 && NPC[A].Type != 206 && NPC[A].Type != 207)
+                else if(!NPCIsCheep[NPC[A].Type] && NPC[A].Type != 190 && NPC[A].Type != 298 && NPC[A].Type != 205 && NPC[A].Type != 206 && NPC[A].Type != 207)
                     speedVar = (float)(speedVar * 0.5);
                 else if(NPCIsCheep[NPC[A].Type] && NPC[A].Special == 2 && NPC[A].Location.SpeedY > 0)
                     speedVar = (float)(speedVar * 0.5);
@@ -823,7 +823,7 @@ void UpdateNPCs()
                 if(NPC[A].Location.SpeedY < -3)
                     NPC[A].Location.SpeedY = -3;
             }
-            else if(!(NPC[A].Type != 190 && NPCIsCheep[NPC[A].Type] == false))
+            else if(!((NPC[A].Type != 190 || NPC[A].Type != 298) && NPCIsCheep[NPC[A].Type] == false))
             {
                 NPC[A].WallDeath = NPC[A].WallDeath + 2;
                 if(NPC[A].WallDeath >= 10)
@@ -1358,6 +1358,13 @@ void UpdateNPCs()
                             if(NPC[A].Location.SpeedX >= -0.1 && NPC[A].Location.SpeedX <= 0.1)
                                 NPC[A].Special2 = 0;
                         }
+                    }
+                    else if(NPC[A].Type == 298)
+                    {
+                        if(NPC[A].Special == 1)
+                            NPC[A].Location.SpeedX = 3 * NPC[A].Direction;
+
+                        // Big Koopa Movement Code
                     }
                     else if(NPC[A].Type == 190)
                     {

@@ -331,7 +331,7 @@ void SkullRide(int A)
 
     for(B = 1; B <= numNPCs; B++) // Recursively activate all neihbour skull-ride segments
     {
-        if(NPC[B].Type == 190)
+        if(NPC[B].Type == 190 || NPC[B].Type == 298)
         {
             if(NPC[B].Active)
             {
