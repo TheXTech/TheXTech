@@ -308,7 +308,7 @@ void OpenLevel(std::string FilePath)
 
         CheckSectionNPC(numNPCs);
 
-        if(NPC[numNPCs].Type == 192) // Is a checkpoint
+        if(NPC[numNPCs].Type == 192 || NPC[numNPCs].Type == 299) // Is a checkpoint
         {
             checkPointId++;
             NPC[numNPCs].Special = checkPointId;

@@ -204,6 +204,22 @@ void TouchBonus(int A, int B)
             CheckpointsList.push_back(cp);
             return;
         }
+        if(NPC[B].Type == 299 && NPC[B].Special2 == 0) // player touched the chekpoint
+        {
+            if(Player[A].State == 1)
+                Player[A].State = 2;
+            if(Player[A].Hearts == 1)
+                Player[A].Hearts = 2;
+            SizeCheck(A);
+            PlaySound(58);
+            Checkpoint = FullFileName;
+            Checkpoint_t cp;
+            NPC[B].Special2 = 1;
+            NPC[B].Frame = 3;
+            cp.id = Maths::iRound(NPC[B].Special);
+            CheckpointsList.push_back(cp);
+            return;
+        }
         if(NPC[B].Type == 188) // player touched the 3up moon
         {
             NPC[B].Killed = 9;
@@ -220,7 +236,7 @@ void TouchBonus(int A, int B)
             toadBool = NPC[B].Type;
             NPC[B].Type = 9;
         }
-        if(NPC[B].Type == 153) // Bonus is a POISON mushroom
+        if(NPC[B].Type == 153 || NPC[B].Type == 300) // Bonus is a POISON mushroom
             PlayerHurt(A);
         else if(NPC[B].Type == 9 || NPC[B].Type == 184 || NPC[B].Type == 185 || NPC[B].Type == 249 || NPC[B].Type == 250) // Bonus is a mushroom
         {

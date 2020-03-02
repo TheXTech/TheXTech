@@ -347,7 +347,8 @@ void SetupPlayers()
             {
                 if(NPC[A].Type != 192)
                     continue;
-
+                if(NPC[A].Type != 299)
+                    continue;
                 if(cp.id != Maths::iRound(NPC[A].Special))
                     continue;
 
@@ -2157,7 +2158,7 @@ void TailSwipe(int plr, bool boo, bool Stab, int StabDir)
     {
         if(NPC[A].Active == true && NPC[A].Effect == 0 && !(NPCIsAnExit[NPC[A].Type] || (NPCIsACoin[NPC[A].Type] && Stab == false)) && NPC[A].CantHurtPlayer != plr && !(Player[plr].StandingOnNPC == A && Player[plr].ShellSurf == true))
         {
-            if(NPC[A].Type != 13 && NPC[A].Type != 265 && !(NPC[A].Type == 17 && NPC[A].Projectile == true) && NPC[A].Type != 108 && NPC[A].Type != 197 && NPC[A].Type != 192)
+            if(NPC[A].Type != 13 && NPC[A].Type != 265 && !(NPC[A].Type == 17 && NPC[A].Projectile == true) && NPC[A].Type != 108 && NPC[A].Type != 197 && NPC[A].Type != 192 && NPC[A].Type != 299)
             {
                 stabLoc = NPC[A].Location;
                 if(NPCHeightGFX[NPC[A].Type] > NPC[A].Location.Height && NPC[A].Type != 8 && NPC[A].Type != 15 && NPC[A].Type != 205 && NPC[A].Type != 9 && NPC[A].Type != 51 && NPC[A].Type != 52 && NPC[A].Type != 74 && NPC[A].Type != 93 && NPC[A].Type != 245)

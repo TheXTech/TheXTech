@@ -512,6 +512,8 @@ void SetupVars()
 
     NPCWidth[153] = 32; // Poison Mushroom
     NPCHeight[153] = 32;
+    NPCWidth[300] = 32; // Rotten Mushroom
+    NPCHeight[300] = 32;
     NPCFrameOffsetY[153] = 2;
 
     NPCWidth[242] = 32; // SML2 Goomba
@@ -1182,6 +1184,9 @@ void SetupVars()
     NPCNoYoshi[151] = true;
     NPCWontHurt[151] = true;
     NPCNoClipping[151] = true;
+    NPCWidth[299] = 64; // SMM Checkpoint
+    NPCHeight[299] = 64;
+    NPCNoGravity[299] = true;
     NPCWidth[154] = 32; // SMB2 Mushroom Block
     NPCHeight[154] = 32;
     NPCWidth[155] = 32; // SMB2 Mushroom Block
@@ -1390,7 +1395,8 @@ void SetupVars()
     NPCNoYoshi[298] = true;
     NPCNoYoshi[192] = true;
     NPCIsABonus[192] = true;
-
+    NPCNoYoshi[299] = true;
+    NPCIsABonus[299] = true;
 
 
     NPCIsAParaTroopa[176] = true;
@@ -1486,6 +1492,7 @@ void SetupVars()
     NPCIsABonus[103] = true;
     NPCIsABonus[107] = true;
     NPCIsABonus[153] = true;
+    NPCIsABonus[300] = true;
     NPCIsABonus[196] = true;
     NPCIsACoin[10] = true;
     NPCIsACoin[33] = true;
@@ -1923,6 +1930,7 @@ void SetupVars()
 // set ice
     NPCNoIceBall[197] = true;
     NPCNoIceBall[192] = true;
+    NPCNoIceBall[299] = true;
 
     NPCNoIceBall[267] = true;
     NPCNoIceBall[268] = true;
@@ -1980,6 +1988,7 @@ void SetupVars()
     NPCNoIceBall[298] = true;
     NPCNoIceBall[191] = true;
     NPCNoIceBall[192] = true;
+    NPCNoIceBall[299] = true;
     NPCNoIceBall[193] = true;
     NPCNoIceBall[195] = true;
     NPCNoIceBall[199] = true;
