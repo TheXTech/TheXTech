@@ -23,6 +23,8 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#include <pge_delay.h>
+
 #include "../globals.h"
 #include "../game_main.h"
 #include "../sound.h"
@@ -187,8 +189,8 @@ void PauseGame(int plr)
     for(A = numPlayers; A >= 1; A--)
         SavedChar[Player[A].Character] = Player[A];
 
-    if(TestLevel == true && MessageText.empty())
-        return;
+//    if(TestLevel && MessageText.empty())
+//        return;
     if(MessageText.empty())
         PlaySound(30);
     else
@@ -218,7 +220,7 @@ void PauseGame(int plr)
     do
     {
         tempTime = SDL_GetTicks();
-        if(tempTime >= gameTime + frameRate || tempTime < gameTime || MaxFPS == true)
+        if(tempTime >= gameTime + frameRate || tempTime < gameTime || MaxFPS)
         {
             if(fpsCount >= 32000) // Fixes Overflow bug
                 fpsCount = 0;
@@ -271,7 +273,8 @@ void PauseGame(int plr)
 
             if(MessageText.empty())
             {
-                if(noButtons == false)
+                // Pause menu
+                if(!noButtons)
                 {
                     if(!Player[plr].Controls.Down && !Player[plr].Controls.Up &&
                        !Player[plr].Controls.Run && !Player[plr].Controls.Jump &&
@@ -303,16 +306,16 @@ void PauseGame(int plr)
                         }
                         noButtons = false;
                     }
-                    else if(Player[plr].Controls.Start == true)
+                    else if(Player[plr].Controls.Start)
                         stopPause = true;
 
-                    if(Player[plr].Controls.Up == true || getKeyState(vbKeyUp) == KEY_PRESSED)
+                    if(Player[plr].Controls.Up || getKeyState(vbKeyUp) == KEY_PRESSED)
                     {
                         PlaySound(26);
                         MenuCursor = MenuCursor - 1;
                         noButtons = false;
                     }
-                    else if(Player[plr].Controls.Down == true || getKeyState(vbKeyDown) == KEY_PRESSED)
+                    else if(Player[plr].Controls.Down || getKeyState(vbKeyDown) == KEY_PRESSED)
                     {
                         PlaySound(26);
                         MenuCursor = MenuCursor + 1;
@@ -335,7 +338,7 @@ void PauseGame(int plr)
                                 AllCharBlock = 0;
                                 for(B = 1; B <= numCharacters; B++)
                                 {
-                                    if(blockCharacter[B] == false)
+                                    if(!blockCharacter[B])
                                     {
                                         if(AllCharBlock == 0)
                                             AllCharBlock = B;
@@ -357,7 +360,7 @@ void PauseGame(int plr)
                                     if(numPlayers == 1)
                                         B = 0;
                                     Player[0].Character = 0;
-                                    if(Player[A].Controls.Left == true)
+                                    if(Player[A].Controls.Left)
                                     {
                                         do
                                         {
@@ -384,25 +387,66 @@ void PauseGame(int plr)
 
                     if(Player[plr].Controls.Jump || getKeyState(vbKeySpace) || getKeyState(vbKeyReturn))
                     {
-                        if(MenuCursor == 0)
+                        if(TestLevel) // Pause menu of a level testing
+                        {
+                            switch(MenuCursor)
+                            {
+                            case 0: // Continue
+                                stopPause = true;
+                                break;
+                            case 1: // Restart level
+                                stopPause = true;
+                                MenuMode = 0;
+                                MenuCursor = 0;
+                                frmMain.clearBuffer();
+                                frmMain.repaint();
+                                EndLevel = true;
+                                StopMusic();
+                                DoEvents();
+                                break;
+                            case 2: // Reset checkpoints
+                                stopPause = true;
+                                Checkpoint.clear();
+                                CheckpointsList.clear();
+                                numStars = 0;
+                                numSavedEvents = 0;
+                                BlockSwitch.fill(false);
+                                PlaySound(22);
+                                break;
+                            case 3: // Quit testing
+                                stopPause = true;
+                                MenuMode = 0;
+                                MenuCursor = 0;
+                                frmMain.clearBuffer();
+                                frmMain.repaint();
+                                EndLevel = true;
+                                StopMusic();
+                                DoEvents();
+                                KillIt(); // Quit the game entirely
+                                break;
+                            default:
+                                break;
+                            }
+                        }
+                        else if(MenuCursor == 0) // Contunue
+                        {
                             stopPause = true;
-                        else if(MenuCursor == 1 && (LevelSelect ||
-                                (/*StartLevel == FileName*/IsEpisodeIntro && NoMap)) && !Cheater)
+                        }
+                        else if(MenuCursor == 1 && (LevelSelect || (/*StartLevel == FileName*/IsEpisodeIntro && NoMap)) && !Cheater) // "Save and continue"
                         {
                             SaveGame();
                             stopPause = true;
                         }
-                        else
+                        else // "Quit" or "Save & Quit"
                         {
                             if(!Cheater && (LevelSelect || (/*StartLevel == FileName*/IsEpisodeIntro && NoMap)))
-                            {
-                                SaveGame();
-                            }
+                                SaveGame(); // "Save & Quit"
                             stopPause = true;
                             GameMenu = true;
+
                             MenuMode = 0;
                             MenuCursor = 0;
-                            if(LevelSelect == false)
+                            if(!LevelSelect)
                             {
                                 LevelSelect = true;
                                 EndLevel = true;
@@ -413,17 +457,24 @@ void PauseGame(int plr)
                             frmMain.repaint();
                             StopMusic();
                             DoEvents();
-                            SDL_Delay(500);
                         }
                     }
-                    if(Cheater || !(LevelSelect || (/*StartLevel == FileName*/IsEpisodeIntro && NoMap)))
+
+                    if(TestLevel) // Level test pause menu (4 items)
+                    {
+                        if(MenuCursor > 3)
+                            MenuCursor = 0;
+                        if(MenuCursor < 0)
+                            MenuCursor = 3;
+                    }
+                    else if(Cheater || !(LevelSelect || (/*StartLevel == FileName*/IsEpisodeIntro && NoMap))) // Level play menu (2 items)
                     {
                         if(MenuCursor > 1)
                             MenuCursor = 0;
                         if(MenuCursor < 0)
                             MenuCursor = 1;
                     }
-                    else
+                    else // World map or HUB (3 items)
                     {
                         if(MenuCursor > 2)
                             MenuCursor = 0;
@@ -432,9 +483,9 @@ void PauseGame(int plr)
                     }
                 }
             }
-            else
+            else // Message box
             {
-                if(noButtons == false)
+                if(!noButtons)
                 {
                     if(!Player[plr].Controls.Down && !Player[plr].Controls.Up &&
                        !Player[plr].Controls.Run && !Player[plr].Controls.Jump &&
@@ -459,14 +510,16 @@ void PauseGame(int plr)
                 }
             }
         }
-        if(qScreen == true)
+
+        if(qScreen)
             stopPause = false;
-        SDL_Delay(1);
+        PGE_Delay(1);
     } while(!(stopPause == true));
+
     GamePaused = false;
     Player[plr].UnStart = false;
     Player[plr].CanJump = false;
-    if(MessageText.empty())
+    if(!TestLevel && MessageText.empty())
         PlaySound(30);
     if(PSwitchTime > 0)
     {

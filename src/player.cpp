@@ -25,6 +25,9 @@
 
 #include <cmath>
 #include <ctime>
+#include <Utils/maths.h>
+#include <fmt_format_ne.h>
+#include <pge_delay.h>
 
 #include "globals.h"
 #include "player.h"
@@ -37,9 +40,7 @@
 #include "blocks.h"
 #include "editor.h"
 #include "layers.h"
-#include <Utils/maths.h>
 
-#include <fmt_format_ne.h>
 
 
 void WaterCheck(int A);
@@ -891,7 +892,7 @@ void EveryonesDead()
 //    if(MagicHand == true)
 //        BitBlt frmLevelWindow::vScreen[1].hdc, 0, 0, frmLevelWindow::vScreen[1].ScaleWidth, frmLevelWindow::vScreen[1].ScaleHeight, 0, 0, 0, vbWhiteness;
 
-    SDL_Delay(500);
+    PGE_Delay(500);
 
     Lives--;
     if(Lives >= 0.f)
@@ -5110,22 +5111,25 @@ void PlayerEffects(int A)
     }
     else if(Player[A].Effect == 228) // Player losing icepower
     {
-        if(Player[A].Duck == true)
+        if(Player[A].Duck)
         {
             Player[A].StandUp = true; // Fixes a block collision bug
             Player[A].Duck = false;
             Player[A].Location.Height = Physics.PlayerHeight[Player[A].Character][Player[A].State];
             Player[A].Location.Y = Player[A].Location.Y - Physics.PlayerHeight[Player[A].Character][Player[A].State] + Physics.PlayerDuckHeight[Player[A].Character][Player[A].State];
         }
+
         Player[A].Frame = 1;
         Player[A].Effect2 = Player[A].Effect2 + 1;
-        if(Player[A].Effect2 / 5 == static_cast<int>(floor(static_cast<double>(Player[A].Effect2 / 5))))
+
+        if(fEqual(Player[A].Effect2 / 5, std::floor(Player[A].Effect2 / 5)))
         {
             if(Player[A].State == 2)
                 Player[A].State = 7;
             else
                 Player[A].State = 2;
         }
+
         if(Player[A].Effect2 >= 50)
         {
             if(Player[A].State == 7)
@@ -5236,6 +5240,7 @@ void PlayerEffects(int A)
                 Player[A].MountOffsetY = 0;
                 SizeCheck(A);
             }
+
             if(Warp[Player[A].Warp].Direction2 == 1)
             {
                 Player[A].Location.X = Warp[Player[A].Warp].Exit.X + Warp[Player[A].Warp].Exit.Width / 2.0 - Player[A].Location.Width / 2.0;
@@ -5312,19 +5317,22 @@ void PlayerEffects(int A)
                         NPC[Player[A].HoldingNPC].Location.X = Player[A].Location.X + Player[A].Location.Width - Physics.PlayerGrabSpotX[Player[A].Character][Player[A].State] - NPC[Player[A].HoldingNPC].Location.Width;
                 }
             }
+
             Player[A].Effect2 = 100;
-            if(Player[A].Duck == true)
+            if(Player[A].Duck)
             {
                 if(Warp[Player[A].Warp].Direction2 == 1 || Warp[Player[A].Warp].Direction2 == 3)
                 {
                     UnDuck(A);
                 }
             }
+
             CheckSection(A);
             if(Player[A].HoldingNPC > 0)
             {
                 CheckSectionNPC(Player[A].HoldingNPC);
             }
+
             if(numPlayers > 2/* && nPlay.Online == false*/)
             {
                 for(B = 1; B <= numPlayers; B++)
@@ -5351,6 +5359,7 @@ void PlayerEffects(int A)
             if(!Warp[Player[A].Warp].level.empty())
             {
                 GoToLevel = Warp[Player[A].Warp].level;
+                GoToLevelNoGameThing = Warp[Player[A].Warp].noEntranceScene;
                 Player[A].Effect = 8;
                 Player[A].Effect2 = 2970;
                 ReturnWarp = Player[A].Warp;
@@ -5571,6 +5580,7 @@ void PlayerEffects(int A)
             if(!Warp[Player[A].Warp].level.empty())
             {
                 GoToLevel = Warp[Player[A].Warp].level;
+                GoToLevelNoGameThing = Warp[Player[A].Warp].noEntranceScene;
                 Player[A].Effect = 8;
                 Player[A].Effect2 = 3000;
                 ReturnWarp = Player[A].Warp;

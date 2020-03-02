@@ -28,8 +28,14 @@
 #include <Utils/files.h>
 #include <DirManager/dirman.h>
 #include <fmt_format_ne.h>
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 
 #include <set>
+
+
+bool gfxLoaderTestMode = false;
 
 //// Private Sub cBlockGFX(A As Integer)
 //void cBlockGFX(int A);
@@ -669,11 +675,15 @@ void UpdateLoad()
             LoadCoins = 0;
 
         frmMain.clearBuffer();
-        frmMain.renderTexture(0, 0, GFX.MenuGFX[4]);
+        if(!gfxLoaderTestMode)
+            frmMain.renderTexture(0, 0, GFX.MenuGFX[4]);
         frmMain.renderTexture(632, 576, GFX.Loader);
         frmMain.renderTexture(760, 560, GFX.LoadCoin.w, GFX.LoadCoin.h / 4, GFX.LoadCoin, 0, 32 * LoadCoins);
 
         frmMain.repaint();
         DoEvents();
+#ifdef __EMSCRIPTEN__
+        emscripten_sleep(1); // To repaint screenn, it's required to send a sleep signal
+#endif
     }
 }

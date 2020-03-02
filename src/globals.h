@@ -900,6 +900,8 @@ struct Warp_t
 //    maxStars As Integer
     int maxStars = 0;
 //EXTRA:
+    bool noPrintStars = false;
+    bool noEntranceScene = false;
     bool cannonExit = false;
     double cannonExitSpeed = 10.0;
     std::string eventEnter;
@@ -971,21 +973,21 @@ struct EditorCursor_t
 //    Mode As Integer
     int Mode = 0;
 //    Block As Block
-    Block_t block;
+    Block_t Block;
 //    Water As Water
-    Water_t water;
+    Water_t Water;
 //    Background As Background
-    Background_t background;
+    Background_t Background;
 //    NPC As NPC
-    NPC_t npc;
+    NPC_t NPC;
 //    Warp As Warp
-    Warp_t warp;
+    Warp_t Warp;
 //    Tile As Tile
-    Tile_t tile;
+    Tile_t Tile;
 //    Scene As Scene
-    Scene_t scene;
+    Scene_t Scene;
 //    WorldLevel As WorldLevel
-    WorldLevel_t worldLevel;
+    WorldLevel_t WorldLevel;
 //    WorldPath As WorldPath
     WorldPath_t WorldPath;
 //    WorldMusic As WorldMusic
@@ -1133,6 +1135,8 @@ extern int numWater;
 extern RangeArr<Star_t, 1, maxStarsNum> Star;
 //Public GoToLevel As String
 extern std::string GoToLevel;
+//! EXTRA: Hide entrance screen
+extern bool GoToLevelNoGameThing;
 //Public StartLevel As String 'start level for an episode
 extern std::string StartLevel;
 //Public NoMap As Boolean 'episode has no world map
@@ -1805,9 +1809,9 @@ extern RangeArrI<bool, 1, maxNPCType, false> GFXNPCCustom;
 //Public GFXNPCMask(1 To maxNPCType) As Long
 extern RangeArrI<long, 1, maxNPCType, 0> GFXNPCMask;
 //Public GFXNPCBMP(1 To maxNPCType) As StdPicture
-extern RangeArr<StdPicture, 1, maxNPCType> GFXNPCBMP;
+extern RangeArr<StdPicture, 0, maxNPCType> GFXNPCBMP;
 //Public GFXNPCMaskBMP(1 To maxNPCType) As StdPicture
-extern RangeArr<StdPicture, 1, maxNPCType> GFXNPCMaskBMP;
+extern RangeArr<StdPicture, 0, maxNPCType> GFXNPCMaskBMP;
 //Public GFXNPCHeight(1 To maxNPCType) As Integer
 extern RangeArrI<int, 1, maxNPCType, 0> GFXNPCHeight;
 //Public GFXNPCWidth(1 To maxNPCType) As Integer

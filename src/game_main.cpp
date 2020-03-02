@@ -24,6 +24,7 @@
  */
 
 #include <Logger/logger.h>
+#include <pge_delay.h>
 
 #include "globals.h"
 #include "game_main.h"
@@ -38,6 +39,7 @@
 #include "load_gfx.h"
 #include "player.h"
 #include "sound.h"
+#include "editor.h"
 
 #include "pseudo_vb.h"
 
@@ -73,6 +75,7 @@ int GameMain(const CmdLineSetup_t &setup)
     initAll();
 
 //    Unload frmLoader
+    gfxLoaderTestMode = setup.testLevelMode;
 
     if(!GFX.load()) // Load UI graphics
         return 1;
@@ -93,7 +96,8 @@ int GameMain(const CmdLineSetup_t &setup)
     if(!noSound)
     {
         InitMixerX();
-        PlayInitSound();
+        if(!setup.testLevelMode)
+            PlayInitSound();
     }
 
     frmMain.show(); // Don't show window until playing an initial sound
@@ -109,14 +113,39 @@ int GameMain(const CmdLineSetup_t &setup)
     LoadGFX(); // load the graphics from file
     SetupVars(); //Setup Variables
 
+    ShowFPS = setup.testShowFPS;
+    MaxFPS = setup.testMaxFPS;
+
+    if(!setup.testLevel.empty()) // Start level testing immediately!
+    {
+        GameMenu = false;
+        LevelSelect = false;
+        FullFileName = setup.testLevel;
+        if(setup.testBattleMode)
+        {
+            numPlayers = 2;
+            BattleMode = true;
+            BattleIntro = 150;
+        }
+        else
+        {
+            numPlayers = setup.testNumPlayers;
+            BattleMode = false;
+            BattleIntro = 0;
+        }
+        GodMode = setup.testGodMode;
+        GrabAll = setup.testGrabAll;
+        zTestLevel();
+    }
+
     do
     {
-        if(GameMenu)
+        if(GameMenu || MagicHand || LevelEditor)
         {
             frmMain.MousePointer = 99;
             showCursor(0);
         }
-        else if(!resChanged && !TestLevel && !LevelEditor)
+        else if(!resChanged)
         {
             frmMain.MousePointer = 0;
             showCursor(1);
@@ -138,6 +167,7 @@ int GameMain(const CmdLineSetup_t &setup)
             MultiHop = false;
             SuperSpeed = false;
             FlyForever = false;
+            GoToLevelNoGameThing = false;
 
             for(int A = 1; A <= maxPlayers; A++)
             {
@@ -251,7 +281,7 @@ int GameMain(const CmdLineSetup_t &setup)
                     }
                 }
 
-                SDL_Delay(1);
+                PGE_Delay(1);
                 if(!GameIsActive) break;// Break on quit
             } while(GameOutro);
         }
@@ -263,6 +293,9 @@ int GameMain(const CmdLineSetup_t &setup)
             BattleOutro = 0;
             AllCharBlock = 0;
             Cheater = false;
+
+            // in a main menu, reset this into initial state
+            GoToLevelNoGameThing = false;
 
             for(int A = 1; A <= maxPlayers; ++A)
             {
@@ -421,7 +454,7 @@ int GameMain(const CmdLineSetup_t &setup)
                     }
                 }
 
-                SDL_Delay(1);
+                PGE_Delay(1);
                 if(!GameIsActive) return 0;// Break on quit
 
             } while(GameMenu);
@@ -460,14 +493,21 @@ int GameMain(const CmdLineSetup_t &setup)
                 Player[1].Vine = 0;
                 Player[2].Vine = 0;
 
-                PlaySound(28);
+                if(!GoToLevelNoGameThing)
+                    PlaySound(28);
                 SoundPause[26] = 2000;
 
                 LevelSelect = false;
 
-                GameThing();
+                if(!GoToLevelNoGameThing)
+                    GameThing();
+                else
+                {
+                    frmMain.clearBuffer();
+                    frmMain.repaint();
+                }
                 ClearLevel();
-                SDL_Delay(1000);
+                PGE_Delay(1000);
 
                 if(GoToLevel.empty())
                     OpenLevel(SelectWorld[selWorld].WorldPath + StartLevel);
@@ -487,6 +527,9 @@ int GameMain(const CmdLineSetup_t &setup)
                 fpsTime = 0;
                 cycleCount = 0;
                 gameTime = 0;
+
+                // On a world map, reset this into default state
+                GoToLevelNoGameThing = false;
 
                 // Update graphics before loop begin (to process inital lazy-unpacking of used sprites)
                 UpdateGraphics2();
@@ -540,7 +583,7 @@ int GameMain(const CmdLineSetup_t &setup)
                         }
                     }
 
-                    SDL_Delay(1);
+                    PGE_Delay(1);
                     if(!GameIsActive)
                         return 0;// Break on quit
                 } while(LevelSelect);
@@ -720,7 +763,7 @@ int GameMain(const CmdLineSetup_t &setup)
                     }
                 }
 
-                SDL_Delay(1);
+                PGE_Delay(1);
                 if(!GameIsActive) return 0;// Break on quit
             }
             while(!LevelSelect && !GameMenu);
@@ -732,14 +775,18 @@ int GameMain(const CmdLineSetup_t &setup)
             if(TestLevel)
             {
 //                TestLevel = False
-                TestLevel = false;
+//                TestLevel = false;
 //                LevelEditor = True
 //                LevelEditor = true;
-                LevelEditor = true; //FIXME: Restart level testing or quit a game instead of THIS
+//                LevelEditor = true; //FIXME: Restart level testing or quit a game instead of THIS
+
+                GameThing();
+                PGE_Delay(500);
+                zTestLevel(); // Restart level
 
 //                If nPlay.Online = False Then
 //                    OpenLevel FullFileName
-                OpenLevel(FullFileName);
+//                OpenLevel(FullFileName);
 //                Else
 //                    If nPlay.Mode = 1 Then
 //                        Netplay.sendData "H0" & LB
@@ -811,7 +858,7 @@ void NextLevel()
     frmMain.repaint();
     DoEvents();
     if(!TestLevel && GoToLevel.empty() && !NoMap)
-        SDL_Delay(500);
+        PGE_Delay(500);
     if(BattleMode && !LevelEditor)
     {
         EndLevel = false;
@@ -1182,6 +1229,7 @@ void NPCyFix()
 
 void CheckActive()
 {
+#ifndef __EMSCRIPTEN__
     bool MusicPaused = false;
     bool focusLost = false;
 
@@ -1259,6 +1307,7 @@ void CheckActive()
     }
     */
 //    If LevelEditor = True Or MagicHand = True Then frmLevelWindow.vScreen(1).MousePointer = 99
+#endif // not def __EMSCRIPTEN__
 }
 
 
@@ -1406,7 +1455,7 @@ void StartBattleMode()
     frmMain.repaint();
     StopMusic();
     DoEvents();
-    SDL_Delay(500);
+    PGE_Delay(500);
     ClearLevel();
 
     if(selWorld == 1)

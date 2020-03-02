@@ -35,7 +35,7 @@ class GFX_t
 {
     std::vector<StdPicture*> m_loadedImages;
     void loadImage(StdPicture &img, std::string path);
-    int loadErrors = 0;
+    int m_loadErrors = 0;
 public:
     GFX_t();
     bool load();

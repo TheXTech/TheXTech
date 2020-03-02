@@ -374,6 +374,8 @@ void OpenLevel(std::string FilePath)
         Warp[numWarps].cannonExitSpeed = w.cannon_exit_speed;
         Warp[numWarps].eventEnter = w.event_enter;
         Warp[numWarps].StarsMsg = w.stars_msg;
+        Warp[numWarps].noPrintStars = w.star_num_hide;
+        Warp[numWarps].noEntranceScene = w.hide_entering_scene;
 
         Warp[numWarps].Entrance.Height = 32;
         Warp[numWarps].Entrance.Width = 32;
@@ -537,8 +539,8 @@ void OpenLevel(std::string FilePath)
     }
 
     FindBlocks();
+    qSortBackgrounds(1, numBackground);
     UpdateBackgrounds();
-    qSortBackgrounds(1, numBackground);//A SMALL TEST
     FindSBlocks();
 
 

@@ -23,6 +23,12 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#include <DirManager/dirman.h>
+#include <Utils/files.h>
+#include <PGE_File_Formats/file_formats.h>
+#include <pge_delay.h>
+#include <fmt_format_ne.h>
+
 #include "../globals.h"
 #include "../game_main.h"
 #include "../sound.h"
@@ -35,13 +41,7 @@
 #include "../player.h"
 #include "../collision.h"
 
-#include <DirManager/dirman.h>
-#include <Utils/files.h>
-#include <PGE_File_Formats/file_formats.h>
-
 #include "../pseudo_vb.h"
-
-#include <fmt_format_ne.h>
 
 //Dim ScrollDelay As Integer
 static int ScrollDelay = 0;
@@ -328,7 +328,7 @@ void MenuLoop()
                     frmMain.repaint();
                     DoEvents();
 //                    Sleep 500
-                    SDL_Delay(500);
+                    PGE_Delay(500);
 //                    KillIt
                     KillIt();
 //                End If
@@ -889,7 +889,7 @@ void MenuLoop()
 //                    DoEvents
                     DoEvents();
 //                    Sleep 500
-                    SDL_Delay(500);
+                    PGE_Delay(500);
 //                    OpenWorld SelectWorld(selWorld).WorldPath & SelectWorld(selWorld).WorldFile
                     OpenWorld(SelectWorld[selWorld].WorldPath + SelectWorld[selWorld].WorldFile);
 //                    If SaveSlot(selSave) >= 0 Then
@@ -940,7 +940,7 @@ void MenuLoop()
                         GameThing();
                         ClearLevel();
 
-                        SDL_Delay(1000);
+                        PGE_Delay(1000);
                         OpenLevel(SelectWorld[selWorld].WorldPath + StartLevel);
                     }
                     return;
@@ -2331,11 +2331,15 @@ void FindSaves()
         SaveSlot[A] = -1;
         SaveStars[A] = 0;
 
-        std::string saveFile = episode + fmt::format_ne("save{0}.savx", A);
-        std::string saveFileOld = episode + fmt::format_ne("save{0}.sav", A);
+        std::string saveFile = makeGameSavePath(episode,
+                                                SelectWorld[selWorld].WorldFile,
+                                                fmt::format_ne("save{0}.savx", A));
+        std::string saveFileOld = episode + fmt::format_ne("save{0}.savx", A);
+        std::string saveFileAncient = episode + fmt::format_ne("save{0}.sav", A);
 
         if((Files::fileExists(saveFile) && FileFormats::ReadExtendedSaveFileF(saveFile, f)) ||
-           (Files::fileExists(saveFileOld) && FileFormats::ReadSMBX64SavFileF(saveFileOld, f)))
+           (Files::fileExists(saveFileOld) && FileFormats::ReadExtendedSaveFileF(saveFileOld, f)) ||
+           (Files::fileExists(saveFileAncient) && FileFormats::ReadSMBX64SavFileF(saveFileAncient, f)))
         {
             int curActive = 0;
             int maxActive = 0;

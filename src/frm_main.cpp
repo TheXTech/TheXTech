@@ -28,6 +28,7 @@
 #include "graphics.h"
 #include "joystick.h"
 #include "sound.h"
+#include "editor.h"
 
 #include <AppPath/app_path.h>
 #include <Logger/logger.h>
@@ -58,7 +59,11 @@ FrmMain::FrmMain()
 {
     ScaleWidth = ScreenW;
     ScaleHeight = ScreenH;
-    m_windowTitle = fmt::format_ne("New Super Mario Bros. X - 1.0", V_LATEST_STABLE);
+#ifdef ENABLE_OLD_CREDITS
+    m_windowTitle = "Super Mario Bros. X - Version 1.3 - www.SuperMarioBrothers.org";
+#else
+    m_windowTitle = fmt::format_ne("New Super Mario Bros. X - 1.0");
+#endif
 }
 
 SDL_Window *FrmMain::getWindow()
@@ -88,7 +93,9 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
 
     Uint32 sdlInitFlags = 0;
     // Prepare flags for SDL initialization
+#ifndef __EMSCRIPTEN__
     sdlInitFlags |= SDL_INIT_TIMER;
+#endif
     sdlInitFlags |= SDL_INIT_AUDIO;
     sdlInitFlags |= SDL_INIT_VIDEO;
     sdlInitFlags |= SDL_INIT_EVENTS;
@@ -114,11 +121,7 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
     m_window = SDL_CreateWindow(m_windowTitle.c_str(),
                               SDL_WINDOWPOS_CENTERED,
                               SDL_WINDOWPOS_CENTERED,
-                          #ifdef __EMSCRIPTEN__ //Set canvas be 1/2 size for a faster rendering
-                              ScaleWidth / 2, ScaleHeight / 2,
-                          #else
                               ScaleWidth, ScaleHeight,
-                          #endif //__EMSCRIPTEN__
                               SDL_WINDOW_RESIZABLE |
                               SDL_WINDOW_HIDDEN |
                               SDL_WINDOW_ALLOW_HIGHDPI);
@@ -329,6 +332,14 @@ bool FrmMain::isWindowActive()
     return (flags & SDL_WINDOW_INPUT_FOCUS) != 0;
 }
 
+bool FrmMain::hasWindowMouseFocus()
+{
+    if(!m_window)
+        return false;
+    Uint32 flags = SDL_GetWindowFlags(m_window);
+    return (flags & SDL_WINDOW_MOUSE_FOCUS) != 0;
+}
+
 void FrmMain::eventDoubleClick()
 {
 
@@ -343,7 +354,7 @@ void FrmMain::eventKeyDown(SDL_KeyboardEvent &evt)
     else if(KeyCode == SDL_SCANCODE_LALT || KeyCode == SDL_SCANCODE_RALT)
         keyDownAlt = true;
 
-    if(keyDownAlt && keyDownEnter && !TestLevel)
+    if(keyDownAlt && keyDownEnter/* && !TestLevel*/)
     {
         keyDownAlt = false;
         keyDownEnter = false;
@@ -405,10 +416,27 @@ void FrmMain::eventMouseDown(SDL_MouseButtonEvent &event)
     {
         MenuMouseDown = true;
         MenuMouseMove = true;
+        if(LevelEditor || MagicHand || TestLevel)
+            EditorControls.Mouse1 = true;
     }
     else if(event.button == SDL_BUTTON_RIGHT)
     {
         MenuMouseBack = true;
+        if(LevelEditor || MagicHand || TestLevel)
+        {
+            optCursor.current = 13;
+            MouseMove(float(MenuMouseX), float(MenuMouseY));
+            SetCursor();
+        }
+    }
+    else if(event.button == SDL_BUTTON_MIDDLE)
+    {
+        if(LevelEditor || MagicHand || TestLevel)
+        {
+            optCursor.current = 6;
+            MouseMove(float(MenuMouseX), float(MenuMouseY));
+            SetCursor();
+        }
     }
 }
 
@@ -418,12 +446,21 @@ void FrmMain::eventMouseMove(SDL_MouseMotionEvent &event)
     MenuMouseX = p.x;// int(event.x * ScreenW / ScaleWidth);
     MenuMouseY = p.y;//int(event.y * ScreenH / ScaleHeight);
     MenuMouseMove = true;
+    if(LevelEditor || MagicHand || TestLevel)
+    {
+        EditorCursor.X = CursorPos.X;
+        EditorCursor.Y = CursorPos.Y;
+        MouseMove(EditorCursor.X, EditorCursor.Y, true);
+        MouseRelease = true;
+    }
 }
 
 void FrmMain::eventMouseUp(SDL_MouseButtonEvent &)
 {
     MenuMouseDown = false;
     MenuMouseRelease = true;
+    if(LevelEditor || MagicHand || TestLevel)
+        EditorControls.Mouse1 = false;
 }
 
 void FrmMain::eventResize()
@@ -1323,10 +1360,9 @@ void FrmMain::renderRectBR(int _left, int _top, int _right, int _bottom, float r
 void FrmMain::renderTextureI(int xDst, int yDst, int wDst, int hDst,
                              StdPicture &tx,
                              int xSrc, int ySrc,
+                             double rotateAngle, SDL_Point *center, unsigned int flip,
                              float red, float green, float blue, float alpha)
 {
-    const unsigned int flip = SDL_FLIP_NONE;
-
     if(!tx.inited)
         return;
 
@@ -1370,13 +1406,31 @@ void FrmMain::renderTextureI(int xDst, int yDst, int wDst, int hDst,
                            static_cast<unsigned char>(255.f * blue));
     SDL_SetTextureAlphaMod(tx.texture, static_cast<unsigned char>(255.f * alpha));
     SDL_RenderCopyEx(m_gRenderer, tx.texture, &sourceRect, &destRect,
-                     0.0, nullptr, static_cast<SDL_RendererFlip>(flip));
+                     rotateAngle, center, static_cast<SDL_RendererFlip>(flip));
 }
 
 void FrmMain::renderTexture(double xDst, double yDst, double wDst, double hDst,
                             StdPicture &tx,
                             int xSrc, int ySrc,
                             float red, float green, float blue, float alpha)
+{
+    const unsigned int flip = SDL_FLIP_NONE;
+    renderTextureI(Maths::iRound(xDst),
+                   Maths::iRound(yDst),
+                   Maths::iRound(wDst),
+                   Maths::iRound(hDst),
+                   tx,
+                   xSrc,
+                   ySrc,
+                   0.0, nullptr, flip,
+                   red, green, blue, alpha);
+}
+
+void FrmMain::renderTextureFL(double xDst, double yDst, double wDst, double hDst,
+                              StdPicture &tx,
+                              int xSrc, int ySrc,
+                              double rotateAngle, SDL_Point *center, unsigned int flip,
+                              float red, float green, float blue, float alpha)
 {
     renderTextureI(Maths::iRound(xDst),
                    Maths::iRound(yDst),
@@ -1385,6 +1439,7 @@ void FrmMain::renderTexture(double xDst, double yDst, double wDst, double hDst,
                    tx,
                    xSrc,
                    ySrc,
+                   rotateAngle, center, flip,
                    red, green, blue, alpha);
 }
 
