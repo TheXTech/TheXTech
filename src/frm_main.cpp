@@ -497,7 +497,9 @@ int FrmMain::setFullScreen(bool fs)
                 pLogWarning("Setting windowed failed: %s", SDL_GetError());
                 return -1;
             }
-
+#ifdef __EMSCRIPTEN__
+            SDL_SetWindowSize(m_window, ScaleWidth, ScaleHeight);
+#endif
             return 0;
         }
     }
