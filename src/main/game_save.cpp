@@ -306,4 +306,8 @@ void ClearGame()
         Files::deleteFile(savePathOld);
     if(Files::fileExists(savePathAncient))
         Files::deleteFile(savePathAncient);
+
+#ifdef __EMSCRIPTEN__
+    AppPathManager::syncFs();
+#endif
 }
