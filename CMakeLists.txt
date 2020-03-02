@@ -221,22 +221,28 @@ add_executable(a2xtech ${A2XTECH_SRC} ${LIB_SRC})
 pge_set_nopie(a2xtech)
 target_include_directories(a2xtech PRIVATE src lib ${A2XT_INCS})
 target_link_libraries(a2xtech PRIVATE A2XT_Int)
+
 if(ENABLE_ANTICHEAT_TRAP)
     target_compile_definitions(a2xtech PRIVATE -DENABLE_ANTICHEAT_TRAP)
 endif()
+
 if(ENABLE_OLD_CREDITS)
     target_compile_definitions(a2xtech PRIVATE -DENABLE_OLD_CREDITS)
     set_target_properties(a2xtech PROPERTIES OUTPUT_NAME "smbx")
 endif()
+
 if(NOT ENABLE_LOGGING)
     target_compile_definitions(a2xtech PRIVATE -DDISABLE_LOGGING)
 endif()
+
 if(EMSCRIPTEN)
     target_compile_definitions(a2xtech PRIVATE -DPGE_NO_THREADING)
 endif()
+
 if(NOT USE_SYSTEM_LIBS)
     add_dependencies(a2xtech ${A2XT_DEPS})
 endif()
+
 if(WIN32)
     set_target_properties(a2xtech PROPERTIES WIN32_EXECUTABLE ON)
 endif()
