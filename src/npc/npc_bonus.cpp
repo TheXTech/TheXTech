@@ -107,7 +107,7 @@ void TouchBonus(int A, int B)
         //            Netplay::sendData "1k" + std::to_string(A) + "|" + std::to_string(B) + "|" + NPC[B].Type + LB;
         if(Player[A].Character == 3 || Player[A].Character == 4 || Player[A].Character == 5) // for link give hearts
         {
-            if(NPC[B].Type == 34 || NPC[B].Type == 169 || NPC[B].Type == 170)
+            if(NPC[B].Type == 34 || NPC[B].Type == 169 || NPC[B].Type == 170 || NPC[B].Type == 304)
             {
                 Player[A].Hearts = Player[A].Hearts + 1;
                 if(Player[A].Hearts > 3)
@@ -391,6 +391,32 @@ void TouchBonus(int A, int B)
             {
                 Player[A].Frame = 1;
                 Player[A].Effect = 12;
+                Player[A].Effect2 = 0;
+                if(Player[A].Mount > 0)
+                    UnDuck(A);
+                if(Player[A].Character == 5)
+                    PlaySound(83);
+                else
+                    PlaySound(34);
+            }
+            else
+            {
+                if(Player[A].Character == 5)
+                    PlaySound(79);
+                else
+                    PlaySound(12);
+            }
+            if(NPC[B].Effect != 2)
+                MoreScore(6, NPC[B].Location);
+        }
+        else if(NPC[B].Type == 304) // Bonus is a Frog Suit
+        {
+            UpdatePlayerBonus(A, NPC[B].Type);
+            Player[A].StateNPC = NPC[B].Type;
+            if(Player[A].State != 8)
+            {
+                Player[A].Frame = 1;
+                Player[A].Effect = 42;
                 Player[A].Effect2 = 0;
                 if(Player[A].Mount > 0)
                     UnDuck(A);

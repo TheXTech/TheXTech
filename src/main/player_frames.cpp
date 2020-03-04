@@ -1214,6 +1214,20 @@ void SetupPlayerFrames()
         LinkFrameY[A] = LinkFrameY[A - 400];
     }
 
+    For(A, 850, maxPlayerFrames)
+    {
+        MarioFrameX[A] = MarioFrameX[A - 500];
+        MarioFrameY[A] = MarioFrameY[A - 500];
+        LuigiFrameX[A] = LuigiFrameX[A - 500];
+        LuigiFrameY[A] = LuigiFrameY[A - 500];
+        PeachFrameX[A] = PeachFrameX[A - 500];
+        PeachFrameY[A] = PeachFrameY[A - 500];
+        ToadFrameX[A] = ToadFrameX[A - 500];
+        ToadFrameY[A] = ToadFrameY[A - 500];
+        LinkFrameX[A] = LinkFrameX[A - 500];
+        LinkFrameY[A] = LinkFrameY[A - 500];
+    }
+
     PeachFrameX[401] = -16;
     PeachFrameY[401] = -2;
     PeachFrameX[399] = -4;

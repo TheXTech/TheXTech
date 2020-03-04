@@ -849,7 +849,7 @@ void NPCSpecial(int A)
             }
         }
     }
-    else if(NPC[A].Type == 268 || NPC[A].Type == 281) // larry/ludwig shell
+    else if(NPC[A].Type == 268 || NPC[A].Type == 281 || NPC[A].Type == 302) // larry/ludwig shell
     {
         if(NPC[A].Special5 == 0) // Target a Random Player
         {
@@ -970,7 +970,7 @@ void NPCSpecial(int A)
             NPC[A].Special = 0;
 
     }
-    else if(NPC[A].Type == 267) // larry koopa
+    else if(NPC[A].Type == 267 || NPC[A].Type == 301) // larry koopa
     {
         // special is phase
         // special5 is targetted player
@@ -1074,20 +1074,35 @@ void NPCSpecial(int A)
                 NPC[numNPCs].TimeLeft = 100;
                 NPC[numNPCs].Direction = NPC[A].Direction;
                 NPC[numNPCs].Section = NPC[A].Section;
-                NPC[numNPCs].Type = 269;
-                NPC[numNPCs].Location.Width = 10;
-                NPC[numNPCs].Location.Height = 8;
-                NPC[numNPCs].Frame = 3;
-                NPC[numNPCs].Special2 = NPC[A].Special3;
+                if(NPC[A].Type == 267)
+                {
+                    NPC[numNPCs].Type = 269;
+                    NPC[numNPCs].Location.Width = 10;
+                    NPC[numNPCs].Location.Height = 8;
+                    NPC[numNPCs].Frame = 3;
+                    NPC[numNPCs].Special2 = NPC[A].Special3;
+                }
+                else if(NPC[A].Type == 301)
+                {
+                    NPC[numNPCs].Type = 303;
+                    NPC[numNPCs].Location.Width = 32;
+                    NPC[numNPCs].Location.Height = 32;
+                }
                 if(Maths::iRound(NPC[numNPCs].Direction) == -1)
                     NPC[numNPCs].Location.X = NPC[A].Location.X - 20;
                 else
                     NPC[numNPCs].Location.X = NPC[A].Location.X + NPC[A].Location.Width - NPC[numNPCs].Location.Width + 20;
-                NPC[numNPCs].Location.Y = NPC[A].Location.Y + 47;
+                if(NPC[A].Type == 267)
+                    NPC[numNPCs].Location.Y = NPC[A].Location.Y + 47;
+                else
+                    NPC[numNPCs].Location.Y = NPC[A].Location.Y - NPC[A].Location.Height / 2;
                 NPC[numNPCs].Location.SpeedX = 3 * NPC[numNPCs].Direction;
                 C = (NPC[numNPCs].Location.X + NPC[numNPCs].Location.Width / 2.0) - NPC[A].Special6;
                 D = (NPC[numNPCs].Location.Y + NPC[numNPCs].Location.Height / 2.0) - NPC[A].Special4;
-                NPC[numNPCs].Location.SpeedY = D / C * NPC[numNPCs].Location.SpeedX;
+                if(NPC[A].Type == 267)
+                    NPC[numNPCs].Location.SpeedY = D / C * NPC[numNPCs].Location.SpeedX;
+                else
+                    NPC[numNPCs].Location.SpeedY = -3;
                 if(NPC[numNPCs].Location.SpeedY > 3)
                     NPC[numNPCs].Location.SpeedY = 3;
                 else if(NPC[numNPCs].Location.SpeedY < -3)
@@ -1104,6 +1119,25 @@ void NPCSpecial(int A)
         }
 
         // ludwig koopa
+    }
+    else if(NPC[A].Type == 303)
+    {
+        NPC[A].Location.SpeedX = 3 * NPC[A].Direction;
+        for(B = 1; B <= numBlock; B++)
+        {
+            if(CheckCollision(NPC[A].Location, Block[B].Location) == true && NPC[A].Location.SpeedY < Physics.NPCGravity)
+            {
+                NPC[A].Location.SpeedY = 3;
+                NPC[A].Location.Y = NPC[A].Location.Y + 3;
+            }
+            else if(CheckCollision(NPC[A].Location, Block[B].Location) == true && NPC[A].Location.SpeedY > Physics.NPCGravity)
+            {
+                NPC[A].Location.SpeedY = -3;
+                NPC[A].Location.Y = NPC[A].Location.Y - 3;
+            }
+        }
+
+
     }
     else if(NPC[A].Type == 280)
     {
@@ -5001,7 +5035,7 @@ void CharStuff(int WhatNPC, bool CheckEggs)
 
 int RandomBonus()
 {
-    int B = iRand() % 6;
+    int B = iRand() % 7;
     switch(B)
     {
     case 0:
@@ -5016,6 +5050,8 @@ int RandomBonus()
         return 170;
     case 5:
         return 264;
+    case 6:
+        return 304;
     }
     return 0;
 }

@@ -380,7 +380,7 @@ void NPCHit(int A, int B, int C)
         NPC[A].Special3 = 1;
 
     // Larry Koopa
-    else if(NPC[A].Type == 267 || NPC[A].Type == 280)
+    else if(NPC[A].Type == 267 || NPC[A].Type == 280 || NPC[A].Type == 301)
     {
         if(B != 7)
             NPC[A].Immune = 10;
@@ -414,7 +414,7 @@ void NPCHit(int A, int B, int C)
             NPC[A].Killed = B;
         if(NPC[A].Damage >= 15)
             NPC[A].Killed = B;
-        else if(fEqual(NPC[A].Special, 5) && !(NPC[A].Type == 268 || NPC[A].Type == 281))
+        else if(fEqual(NPC[A].Special, 5) && !(NPC[A].Type == 268 || NPC[A].Type == 281 || NPC[A].Type == 302))
         {
             NPC[A].Special = 0;
             NPC[A].Special2 = 0;
@@ -426,8 +426,10 @@ void NPCHit(int A, int B, int C)
             NPC[A].Location.Y = NPC[A].Location.Y + NPC[A].Location.Height;
             if(NPC[A].Type == 267)
                 NPC[A].Type = 268;
-            else
+            else if(NPC[A].Type == 280)
                 NPC[A].Type = 281;
+            else
+                NPC[A].Type = 302;
             NPC[A].Location.Width = NPCWidth[NPC[A].Type];
             NPC[A].Location.Height = NPCHeight[NPC[A].Type];
             NPC[A].Location.X = NPC[A].Location.X - NPC[A].Location.Width / 2.0;
@@ -439,7 +441,7 @@ void NPCHit(int A, int B, int C)
 
         // Larry Koop Shell
     }
-    else if(NPC[A].Type == 268 || NPC[A].Type == 281)
+    else if(NPC[A].Type == 268 || NPC[A].Type == 281 || NPC[A].Type == 302)
     {
         if(B != 7 && B != 1 && B != 2 && B != 8)
             NPC[A].Immune = 10;
@@ -2050,7 +2052,7 @@ void NPCHit(int A, int B, int C)
         {
             if(NPC[A].Type == 9 || NPC[A].Type == 273 || NPC[A].Type == 14 ||
                NPC[A].Type == 90 || NPC[A].Type == 153 || NPC[A].Type == 169 ||
-               (NPC[A].Type >= 182 && NPC[A].Type <= 188) || NPC[A].Type == 170)
+               (NPC[A].Type >= 182 && NPC[A].Type <= 188) || NPC[A].Type == 170 || NPC[A].Type == 304)
             {
                 NPC[A].Direction = Player[C].Direction;
                 NPC[A].Location.SpeedX = std::abs(NPC[A].Location.SpeedX) * double(NPC[A].Direction);

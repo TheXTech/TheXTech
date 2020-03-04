@@ -125,7 +125,7 @@ void NPCFrames(int A)
         if(!(NPC[A].Type == 86 || NPC[A].Type == 284 || NPC[A].Type == 47) && A == 0) // Reset Frame to 0 unless a specific NPC type
             NPC[A].Frame = 0;
     }
-    else if(NPC[A].Type == 169 || NPC[A].Type == 170)
+    else if(NPC[A].Type == 169 || NPC[A].Type == 170 ||  NPC[A].Type == 304)
     {
         C = 0;
         for(B = 1; B <= numPlayers; B++)
@@ -407,7 +407,7 @@ void NPCFrames(int A)
         else
             NPC[A].Frame = 0;
     }
-    else if(NPC[A].Type == 268) // larry shell
+    else if(NPC[A].Type == 268 || NPC[A].Type == 302) // larry/wendy shell
     {
         NPC[A].FrameCount = NPC[A].FrameCount + 1;
         if(NPC[A].FrameCount >= 4)
@@ -420,7 +420,7 @@ void NPCFrames(int A)
         if(NPC[A].Frame > 5)
             NPC[A].Frame = 0;
     }
-    else if(NPC[A].Type == 267) // larry koopa
+    else if(NPC[A].Type == 267 || NPC[A].Type == 301) // larry/wendy koopa
     {
 
         NPC[A].Frame = 0;

@@ -60,7 +60,7 @@ FrmMain::FrmMain()
     ScaleWidth = ScreenW;
     ScaleHeight = ScreenH;
 #ifdef ENABLE_OLD_CREDITS
-    m_windowTitle = "Super Mario Bros. X - Version 1.3 - www.SuperMarioBrothers.org";
+    m_windowTitle = "New Super Mario Bros. X - Version 1.0";
 #else
     m_windowTitle = fmt::format_ne("New Super Mario Bros. X - 1.0");
 #endif

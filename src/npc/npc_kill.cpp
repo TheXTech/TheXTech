@@ -599,7 +599,7 @@ void KillNPC(int A, int B)
             }
 
         }
-        else if(NPC[A].Type == 267 || NPC[A].Type == 268 || NPC[A].Type == 280 || NPC[A].Type == 281) // larry koopa
+        else if(NPC[A].Type == 267 || NPC[A].Type == 268 || NPC[A].Type == 280 || NPC[A].Type == 281 || NPC[A].Type == 301 || NPC[A].Type == 302) // larry koopa
         {
             if(B == 6)
             {
@@ -610,9 +610,10 @@ void KillNPC(int A, int B)
             }
             else if(NPC[A].Type == 280 || NPC[A].Type == 281)
                 NewEffect(143 , NPC[A].Location);
-            else
+            else if(NPC[A].Type == 267 || NPC[A].Type == 268)
                 NewEffect(140 , NPC[A].Location);
-
+            else
+                NewEffect(150 , NPC[A].Location);
         }
         else if(NPC[A].Type == 201 || NPC[A].Type == 262) // wart, smb2 bosses
         {

@@ -149,7 +149,7 @@ void UpdateEffects()
                     e.Frame = 0;
             }
         }
-        else if(e.Type == 140) // larry shell
+        else if(e.Type == 140 || e.Type == 150) // larry & wendy's shell
         {
             e.FrameCount += 1;
             if(e.FrameCount >= 4)
@@ -836,7 +836,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
             }
         }
     }
-    else if(A == 140) // larry shell
+    else if(A == 140 || A == 150) // larry & wendy's shell
     {
         numEffects = numEffects + 1;
         Effect[numEffects].NewNpc = NewNpc;

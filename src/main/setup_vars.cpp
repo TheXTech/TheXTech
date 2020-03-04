@@ -287,6 +287,8 @@ void SetupVars()
     EffectWidth[140] = 32;
     EffectHeight[140] = 40;
 
+    EffectWidth[150] = 32;
+    EffectHeight[150] = 40;
 
     EffectWidth[114] = 32;
     EffectHeight[114] = 32;
@@ -342,7 +344,9 @@ void SetupVars()
     NPCScore[257] = 5;
     NPCScore[262] = 8;
     NPCScore[267] = 8;
+    NPCScore[301] = 8;
     NPCScore[268] = 8;
+    NPCScore[302] = 8;
     NPCScore[280] = 8;
     NPCScore[281] = 8;
     NPCFrameOffsetY[251] = 2;
@@ -586,6 +590,10 @@ void SetupVars()
     NPCWidth[9] = 32; // Mushroom
     NPCHeight[9] = 32;
     NPCFrameOffsetY[9] = 2;
+
+    NPCWidth[304] = 32; // Frog Suit
+    NPCHeight[304] = 32;
+    NPCFrameOffsetY[304] = 2;
 
     NPCWidth[273] = 32; // ? Mushroom
     NPCHeight[273] = 32;
@@ -1470,6 +1478,7 @@ void SetupVars()
     NPCIsAShell[24] = true;
     NPCIsAShell[73] = true;
     NPCIsABonus[9] = true;
+    NPCIsABonus[304] = true;
     NPCIsABonus[273] = true;
     NPCIsABonus[10] = true;
     NPCIsABonus[11] = true;
@@ -1892,7 +1901,9 @@ void SetupVars()
     NPCNoGravity[266] = true;
 
     NPCNoYoshi[267] = true;
+    NPCNoYoshi[301] = true;
     NPCNoYoshi[268] = true;
+    NPCNoYoshi[302] = true;
     NPCNoYoshi[269] = true;
     NPCNoYoshi[280] = true;
     NPCNoYoshi[281] = true;
@@ -1933,7 +1944,9 @@ void SetupVars()
     NPCNoIceBall[299] = true;
 
     NPCNoIceBall[267] = true;
+    NPCNoIceBall[301] = true;
     NPCNoIceBall[268] = true;
+    NPCNoIceBall[302] = true;
     NPCNoIceBall[269] = true;
     NPCNoIceBall[275] = true;
     NPCNoIceBall[280] = true;
@@ -2038,14 +2051,25 @@ void SetupVars()
 
 
     NPCWidthGFX[267] = 84;
-    NPCHeightGFX[267] = 62;
+    NPCHeightGFX[267] = 64;
     NPCWidth[267] = 44;
-    NPCHeight[267] = 50;
+    NPCHeight[267] = 52;
+
+
+    NPCWidthGFX[301] = 84;
+    NPCHeightGFX[301] = 64;
+    NPCWidth[301] = 44;
+    NPCHeight[301] = 52;
 
     NPCWidthGFX[268] = 44;
     NPCHeightGFX[268] = 32;
     NPCWidth[268] = 32;
     NPCHeight[268] = 28;
+
+    NPCWidthGFX[302] = 44;
+    NPCHeightGFX[302] = 32;
+    NPCWidth[302] = 32;
+    NPCHeight[302] = 28;
 
     NPCWidthGFX[269] = 16;
     NPCHeightGFX[269] = 32;
@@ -2053,6 +2077,14 @@ void SetupVars()
     NPCHeight[269] = 32;
     NPCNoClipping[269] = true;
     NPCJumpHurt[269] = true;
+
+    NPCWidthGFX[303] = 32;
+    NPCHeightGFX[303] = 32;
+    NPCWidth[303] = 32;
+    NPCHeight[303] = 32;
+    NPCJumpHurt[303] = true;
+    NPCNoGravity[303] = true;
+    NPCDefaultMovement[303] = true;
 
     NPCWidthGFX[280] = 64;
     NPCHeightGFX[280] = 64;

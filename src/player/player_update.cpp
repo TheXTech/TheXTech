@@ -897,7 +897,42 @@ void UpdatePlayer()
                             Player[A].YoshiBlue = false;
                         }
                     }
-
+                    // Frog Suit things
+                    if(Player[A].State == 8 && Player[A].Wet == 0 && Player[A].Duck == false && Player[A].Character != 5)
+                    {
+                        if((Player[A].Location.SpeedX > 1.5 || Player[A].Location.SpeedX < -1.5) && Player[A].Location.SpeedY == 0)
+                        {
+                            Player[A].Location.SpeedY = -4.5;
+                            PlaySound(92);
+                        }
+                    }
+                    else if(Player[A].State == 8 && Player[A].Wet != 0 && Player[A].Character != 5)
+                    {
+                        if(Player[A].Controls.Down && Player[A].Location.SpeedY < 2.25)
+                        {
+                            PlaySound(72);
+                            Player[A].Location.SpeedY = 5;
+                            Player[A].Location.SpeedX = 0;
+                        }
+                        else if(Player[A].Controls.Up && Player[A].Location.SpeedY > -2.25)
+                        {
+                            PlaySound(72);
+                            Player[A].Location.SpeedY = -5;
+                            Player[A].Location.SpeedX = 0;
+                        }
+                        else if(Player[A].Controls.Left && Player[A].Location.SpeedX > -2.25)
+                        {
+                            PlaySound(72);
+                            Player[A].Location.SpeedX = -5;
+                            Player[A].Location.SpeedY = 0;
+                        }
+                        else if(Player[A].Controls.Right && Player[A].Location.SpeedX < 2.25)
+                        {
+                            PlaySound(72);
+                            Player[A].Location.SpeedX = 5;
+                            Player[A].Location.SpeedY = 0;
+                        }
+                    }
                     // Racoon/Tanooki Mario.  this handles the ability to fly after running
                     if((Player[A].State == 4 || Player[A].State == 5) && Player[A].Wet == 0)
                     {
@@ -1658,7 +1693,7 @@ void UpdatePlayer()
                                 tempSpeed = Player[A].Location.SpeedX * 0.2;
                             else
                                 tempSpeed = -Player[A].Location.SpeedX * 0.2;
-                            if((Player[A].Vine > 0 || Player[A].Location.SpeedY == 0 || Player[A].StandingOnNPC != 0 || Player[A].Slope > 0 || MultiHop == true) && Player[A].CanAltJump == true) // Player Jumped
+                            if((Player[A].Vine > 0 || Player[A].Location.SpeedY == 0 || Player[A].StandingOnNPC != 0 || Player[A].Slope > 0 || MultiHop == true) && Player[A].CanAltJump == true && Player[A].State != 8) // Player Jumped
                             {
                                 if(!Player[A].Duck)
                                 {

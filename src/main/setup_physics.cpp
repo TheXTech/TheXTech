@@ -67,11 +67,12 @@ void SetupPhysics()
     Physics.PlayerDuckHeight[1][5] = 30;    // ---------
     Physics.PlayerGrabSpotX[1][5] = 18;     // ---------
     Physics.PlayerGrabSpotY[1][5] = 16;     // ---------
-    Physics.PlayerHeight[1][6] = 54;        // Hammer Mario
-    Physics.PlayerWidth[1][6] = 24;         // ---------
-    Physics.PlayerDuckHeight[1][6] = 30;    // ---------
-    Physics.PlayerGrabSpotX[1][6] = 18;     // ---------
-    Physics.PlayerGrabSpotY[1][6] = 16;     // ---------
+    Physics.PlayerHeight[1][8] = 48;        // Frog Mario
+    Physics.PlayerWidth[1][8] = 32;         // ---------
+    Physics.PlayerDuckHeight[1][8] = 46;    // ---------
+    Physics.PlayerGrabSpotX[1][8] = 18;     // ---------
+    Physics.PlayerGrabSpotY[1][8] = 16;     // ---------
+
 
     Physics.PlayerHeight[2][1] = 30;        // Little Luigi
     Physics.PlayerWidth[2][1] = 24;         // ------------
@@ -107,6 +108,12 @@ void SetupPhysics()
     Physics.PlayerDuckHeight[2][7] = 30;    // ---------
     Physics.PlayerGrabSpotX[2][7] = 18;     // ---------
     Physics.PlayerGrabSpotY[2][7] = 16;     // ---------
+
+    Physics.PlayerHeight[2][8] = 48;        // Frog Luigi
+    Physics.PlayerWidth[2][8] = 40;         // ---------
+    Physics.PlayerDuckHeight[2][8] = 48;    // ---------
+    Physics.PlayerGrabSpotX[2][8] = 18;     // ---------
+    Physics.PlayerGrabSpotY[2][8] = 16;     // ---------
 
     Physics.PlayerHeight[3][1] = 38;        // Little Peach
     Physics.PlayerDuckHeight[3][1] = 26;    // ---------
@@ -149,6 +156,12 @@ void SetupPhysics()
     Physics.PlayerGrabSpotX[3][7] = 18;
     Physics.PlayerGrabSpotY[3][7] = 16;
 
+    Physics.PlayerHeight[3][8] = 46;        // Frog Peach
+    Physics.PlayerWidth[3][8] = 36;         // ---------
+    Physics.PlayerDuckHeight[3][8] = 46;    // ---------
+    Physics.PlayerGrabSpotX[3][8] = 18;
+    Physics.PlayerGrabSpotY[3][8] = 16;
+
     Physics.PlayerHeight[4][1] = 30;        // Little Toad
     Physics.PlayerWidth[4][1] = 24;         // ------------
     Physics.PlayerDuckHeight[4][1] = 26;    // ---------
@@ -188,6 +201,12 @@ void SetupPhysics()
     Physics.PlayerDuckHeight[4][7] = 30;    // ---------
     Physics.PlayerGrabSpotX[4][7] = 18;     // ---------
     Physics.PlayerGrabSpotY[4][7] = 16;     // ---------
+
+    Physics.PlayerHeight[4][8] = 48;        // Frog Toad
+    Physics.PlayerWidth[4][8] = 38;         // ---------
+    Physics.PlayerDuckHeight[4][8] = 44;    // ---------
+    Physics.PlayerGrabSpotX[4][8] = 18;     // ---------
+    Physics.PlayerGrabSpotY[4][8] = 16;     // ---------
 
     Physics.PlayerHeight[5][1] = 54;        // Green Link
     Physics.PlayerWidth[5][1] = 22;         // ---------
@@ -230,6 +249,13 @@ void SetupPhysics()
     Physics.PlayerDuckHeight[5][7] = 44;    // ---------
     Physics.PlayerGrabSpotX[5][7] = 18;     // ---------
     Physics.PlayerGrabSpotY[5][7] = 16;     // ---------
+
+    Physics.PlayerHeight[5][8] = 54;        // Frog Link
+    Physics.PlayerWidth[5][8] = 22;         // ---------
+    Physics.PlayerDuckHeight[5][8] = 44;    // ---------
+    Physics.PlayerGrabSpotX[5][8] = 18;     // ---------
+    Physics.PlayerGrabSpotY[5][8] = 16;     // ---------
+
 
     Physics.NPCTimeOffScreen = 180;         // How long NPCs are active offscreen before being reset
     Physics.NPCShellSpeed = 7.1f;            // Speed of kicked shells
