@@ -290,6 +290,9 @@ void SetupVars()
     EffectWidth[150] = 32;
     EffectHeight[150] = 40;
 
+    EffectWidth[151] = 128;
+    EffectHeight[151] = 128;
+
     EffectWidth[114] = 32;
     EffectHeight[114] = 32;
 
@@ -546,6 +549,17 @@ void SetupVars()
 
     NPCIsAParaTroopa[244] = true;
     NPCIsAParaTroopa[243] = true;
+
+    NPCWidth[305] = 32; // Red pow block
+    NPCHeight[305] = 32;
+    NPCWidth[305] = 32; // POW
+    NPCHeight[305] = 32; // POW
+    NPCCanWalkOn[305] = true;
+    NPCMovesPlayer[305] = true;
+    NPCWontHurt[305] = true;
+    NPCIsABlock[305] = true;
+    NPCGrabFromTop[305] = true;
+    NPCIsGrabbable[305] = true;
 
     NPCWidth[1] = 32; // Goomba
     NPCHeight[1] = 32;
@@ -2018,6 +2032,7 @@ void SetupVars()
     NPCNoIceBall[238] = true;
     NPCNoIceBall[239] = true;
     NPCNoIceBall[241] = true;
+    NPCNoIceBall[305] = true;
     NPCNoIceBall[246] = true;
     NPCNoIceBall[254] = true;
     NPCNoIceBall[255] = true;

@@ -1006,7 +1006,7 @@ void UpdateNPCs()
                                     !(NPC[B].Type == 37) && !(NPC[B].Type == 180) && !(NPC[B].Type == 38) &&
                                     !(NPC[B].Type == 39) && !(NPC[B].Type == 45 && NPC[B].Special == 0.0) &&
                                     !(NPC[B].Type == 91) && !(NPC[B].Type == 159) && !(NPC[B].Type == 195) &&
-                                    !(NPC[B].Type == 30 && NPC[B].Projectile == true) && NPC[B].Type != 241 && NPC[B].Type != 263 && NPC[B].Type != 291)
+                                    !(NPC[B].Type == 30 && NPC[B].Projectile == true) && NPC[B].Type != 241 && NPC[B].Type != 305 && NPC[B].Type != 263 && NPC[B].Type != 291 && NPC[B].Type != 305)
                                 {
                                     if(NPC[A].CantHurtPlayer != NPC[B].CantHurtPlayer && NPC[B].Killed == 0 && (Player[NPC[A].HoldingPlayer].StandingOnNPC != B) && NPC[B].Inert == false)
                                     {
@@ -1232,7 +1232,7 @@ void UpdateNPCs()
 
                         // Slow things down that shouldnt move
                     }
-                    else if(NPC[A].Type == 21 || NPC[A].Type == 22 || NPC[A].Type == 25 || NPC[A].Type == 26 || NPC[A].Type == 31 || NPC[A].Type == 32 || NPC[A].Type == 238 || NPC[A].Type == 239 || NPC[A].Type == 35 || NPC[A].Type == 191 || NPC[A].Type == 193 || (NPC[A].Type == 40 && NPC[A].Projectile == true) || NPC[A].Type == 49 || NPC[A].Type == 58 || NPC[A].Type == 67 || NPC[A].Type == 68 || NPC[A].Type == 69 || NPC[A].Type == 70 || (NPCIsVeggie[NPC[A].Type] && NPC[A].Projectile == false) || (NPC[A].Type == 29 && NPC[A].Projectile == true) || (NPC[A].Projectile == true && (NPC[A].Type == 54 && NPC[A].Type == 15)) || NPC[A].Type == 75 || NPC[A].Type == 84 || NPC[A].Type == 181 || NPC[A].Type == 94 || NPC[A].Type == 198 || NPC[A].Type == 96 || NPC[A].Type == 134 || NPC[A].Type == 137 || NPC[A].Type == 101 || NPC[A].Type == 102 || (NPCIsYoshi[NPC[A].Type] && NPC[A].Special == 0) || (NPC[A].Type >= 154 && NPC[A].Type <= 157) || NPC[A].Type == 166 || (NPC[A].Type == 39 && NPC[A].Projectile == true) || NPC[A].Type == 170 || NPC[A].Type == 169 || NPC[A].Type == 183 || NPC[A].Type == 188 || NPC[A].Type == 97 || NPC[A].Type == 196 || NPC[A].Type == 182 || NPC[A].Type == 240 || NPC[A].Type == 241 || NPC[A].Type == 249 || NPC[A].Type == 250 || NPC[A].Type == 254 || NPC[A].Type == 255 || NPC[A].Type == 278 || NPC[A].Type == 279 || NPC[A].Type == 277 || NPC[A].Type == 264 || NPC[A].Type == 288 || NPC[A].Type == 275)
+                    else if(NPC[A].Type == 21 || NPC[A].Type == 22 || NPC[A].Type == 25 || NPC[A].Type == 26 || NPC[A].Type == 31 || NPC[A].Type == 32 || NPC[A].Type == 238 || NPC[A].Type == 239 || NPC[A].Type == 35 || NPC[A].Type == 191 || NPC[A].Type == 193 || (NPC[A].Type == 40 && NPC[A].Projectile == true) || NPC[A].Type == 49 || NPC[A].Type == 58 || NPC[A].Type == 67 || NPC[A].Type == 68 || NPC[A].Type == 69 || NPC[A].Type == 70 || (NPCIsVeggie[NPC[A].Type] && NPC[A].Projectile == false) || (NPC[A].Type == 29 && NPC[A].Projectile == true) || (NPC[A].Projectile == true && (NPC[A].Type == 54 && NPC[A].Type == 15)) || NPC[A].Type == 75 || NPC[A].Type == 84 || NPC[A].Type == 181 || NPC[A].Type == 94 || NPC[A].Type == 198 || NPC[A].Type == 96 || NPC[A].Type == 134 || NPC[A].Type == 137 || NPC[A].Type == 101 || NPC[A].Type == 102 || (NPCIsYoshi[NPC[A].Type] && NPC[A].Special == 0) || (NPC[A].Type >= 154 && NPC[A].Type <= 157) || NPC[A].Type == 166 || (NPC[A].Type == 39 && NPC[A].Projectile == true) || NPC[A].Type == 170 || NPC[A].Type == 169 || NPC[A].Type == 183 || NPC[A].Type == 188 || NPC[A].Type == 97 || NPC[A].Type == 196 || NPC[A].Type == 182 || NPC[A].Type == 240 || NPC[A].Type == 241 || NPC[A].Type == 305 || NPC[A].Type == 249 || NPC[A].Type == 250 || NPC[A].Type == 254 || NPC[A].Type == 255 || NPC[A].Type == 278 || NPC[A].Type == 279 || NPC[A].Type == 277 || NPC[A].Type == 264 || NPC[A].Type == 288 || NPC[A].Type == 275)
                     {
                         if(NPC[A].Location.SpeedX > 0)
                             NPC[A].Location.SpeedX = NPC[A].Location.SpeedX - 0.05;
@@ -1844,7 +1844,7 @@ void UpdateNPCs()
                     }
                     if(NPC[A].Type == 78)
                         NPC[A].Projectile = true;
-                    if(NPC[A].Type == 241 && (NPC[A].Location.SpeedY > 2 || NPC[A].Location.SpeedY < -2))
+                    if((NPC[A].Type == 241 || NPC[A].Type == 305)&& (NPC[A].Location.SpeedY > 2 || NPC[A].Location.SpeedY < -2))
                         NPC[A].Projectile = true;
                     // Special NPCs code
                     SpecialNPC(A);
@@ -2263,7 +2263,7 @@ void UpdateNPCs()
                                                                     }
                                                                     if(NPC[A].Location.Y >= Block[B].Location.Y + (Block[B].Location.Height * Slope) - NPC[A].Location.Height - 0.1)
                                                                     {
-                                                                        if(NPC[A].Type == 241 && NPC[A].Location.SpeedY > 2)
+                                                                        if((NPC[A].Type == 241 || NPC[A].Type == 305) && NPC[A].Location.SpeedY > 2)
                                                                             NPCHit(A, 4, A);
                                                                         if((NPC[A].Type == 205 || NPC[A].Type == 206 || NPC[A].Type == 207) && NPC[A].Special == 3)
                                                                         {
@@ -2475,7 +2475,7 @@ void UpdateNPCs()
                                                             }
                                                         }
 
-                                                        if(HitSpot == 1 && NPC[A].Type == 241 && NPC[A].Location.SpeedY > 2)
+                                                        if(HitSpot == 1 && (NPC[A].Type == 241 || NPC[A].Type == 305) && NPC[A].Location.SpeedY > 2)
                                                             NPCHit(A, 4, A);
                                                         if(HitSpot == 1 && NPC[A].Type == 247 && Block[B].IsNPC == 247)
                                                         {
@@ -2774,7 +2774,7 @@ void UpdateNPCs()
                                                             if(NPC[A].Type == 86)
                                                                 NPC[A].Location.SpeedX = 0;
                                                             NPC[A].onWall = true;
-                                                            if(NPC[A].WallDeath >= 5 && !(NPCIsABonus[NPC[A].Type] == true) && NPC[A].Type != 278 && NPC[A].Type != 279 && NPC[A].Type != 191 && NPC[A].Type != 21 && NPC[A].Type != 22 && NPC[A].Type != 26 && NPC[A].Type != 29 && NPC[A].Type != 31 && NPC[A].Type != 32 && NPC[A].Type != 35 && NPC[A].Type != 191 && NPC[A].Type != 193 && NPC[A].Type != 49 && NPC[A].Type != 134 && !(NPC[A].Type == 158) && !(NPC[A].Type == 195) && !(NPC[A].Type == 241) && !((NPC[A].Type >= 154 && NPC[A].Type <= 157))) // walldeath stuff
+                                                            if(NPC[A].WallDeath >= 5 && !(NPCIsABonus[NPC[A].Type] == true) && NPC[A].Type != 278 && NPC[A].Type != 279 && NPC[A].Type != 191 && NPC[A].Type != 21 && NPC[A].Type != 22 && NPC[A].Type != 26 && NPC[A].Type != 29 && NPC[A].Type != 31 && NPC[A].Type != 32 && NPC[A].Type != 35 && NPC[A].Type != 191 && NPC[A].Type != 193 && NPC[A].Type != 49 && NPC[A].Type != 134 && !(NPC[A].Type == 158) && !(NPC[A].Type == 195) && !(NPC[A].Type == 241) && !(NPC[A].Type == 305) && !((NPC[A].Type >= 154 && NPC[A].Type <= 157))) // walldeath stuff
                                                             {
                                                                 NPC[A].Location.SpeedX = Physics.NPCShellSpeed * 0.5 * NPC[A].Direction;
                                                                 if(NPCIsVeggie[NPC[A].Type])

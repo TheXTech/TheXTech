@@ -1830,9 +1830,6 @@ void UpdateGraphics(bool skipRepaint)
                 frmMain.renderTexture(ScreenW / 2 - GFX.MenuGFX[2].w / 2, 70,
                         GFX.MenuGFX[2].w, GFX.MenuGFX[2].h, GFX.MenuGFX[2], 0, 0);
 
-                frmMain.renderTexture(ScreenW / 2 - GFX.MenuGFX[3].w / 2, 576,
-                        GFX.MenuGFX[3].w, GFX.MenuGFX[3].h, GFX.MenuGFX[3], 0, 0);
-
                 if(MenuMode == 0)
                 {
                     SuperPrint("1 PLAYER GAME", 3, 300, 350);

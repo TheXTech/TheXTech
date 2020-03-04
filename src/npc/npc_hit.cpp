@@ -279,7 +279,7 @@ void NPCHit(int A, int B, int C)
         NPC[A].Killed = 9;
         PlaySound(79);
     }
-    else if(B == 10 && ((NPC[A].Type >= 154 && NPC[A].Type <= 157) || NPC[A].Type == 26 || NPC[A].Type == 32 || NPC[A].Type == 238 || NPC[A].Type == 241 || NPC[A].Type == 96 || NPC[A].Type == 22 || NPC[A].Type == 134))
+    else if(B == 10 && ((NPC[A].Type >= 154 && NPC[A].Type <= 157) || NPC[A].Type == 26 || NPC[A].Type == 32 || NPC[A].Type == 238 || NPC[A].Type == 241 || NPC[A].Type == 305 || NPC[A].Type == 96 || NPC[A].Type == 22 || NPC[A].Type == 134))
     {
         PlaySound(9);
         NPC[A].Bouce = true;
@@ -1802,12 +1802,27 @@ void NPCHit(int A, int B, int C)
         }
         // Indestructable Objects
     }
-    else if(NPC[A].Type == 21 || NPC[A].Type == 22 || NPC[A].Type == 26 || NPC[A].Type == 31 || NPC[A].Type == 32 || NPC[A].Type == 238 || NPC[A].Type == 239 || NPC[A].Type == 35 || NPC[A].Type == 191 || NPC[A].Type == 193 || NPC[A].Type == 49 || NPCIsYoshi[NPC[A].Type] || NPC[A].Type == 96 || (NPC[A].Type >= 154 && NPC[A].Type <= 157) || NPC[A].Type == 240 || NPC[A].Type == 241 || NPC[A].Type == 278 || NPC[A].Type == 279)
+    else if(NPC[A].Type == 21 || NPC[A].Type == 22 || NPC[A].Type == 26 || NPC[A].Type == 31 || NPC[A].Type == 32 || NPC[A].Type == 238 || NPC[A].Type == 239 || NPC[A].Type == 35 || NPC[A].Type == 191 || NPC[A].Type == 193 || NPC[A].Type == 49 || NPCIsYoshi[NPC[A].Type] || NPC[A].Type == 96 || (NPC[A].Type >= 154 && NPC[A].Type <= 157) || NPC[A].Type == 240 || NPC[A].Type == 241 || NPC[A].Type == 278 || NPC[A].Type == 279 || NPC[A].Type == 305)
     {
         if(NPC[A].Type == 241 && (B == 4 || B == 5 || B == 10))
         {
             NPC[A].Killed = 4;
             PowBlock();
+        }
+        if(NPC[A].Type == 305 && (B == 3 || B == 4 || B == 5 || B == 10 || B == 2))
+        {
+            C = NPC[A].BattleOwner;
+            if(NPC[A].CantHurtPlayer > 0)
+                C = NPC[A].CantHurtPlayer;
+            NPC[A].Killed = 4;
+            PowBlock();
+            tempLocation.Height = NPC[A].Location.Height;
+            tempLocation.Width = NPC[A].Location.Width;
+            tempLocation.SpeedX = 0;
+            tempLocation.SpeedY = 0;
+            tempLocation.X = NPC[A].Location.X - tempLocation.Width;
+            tempLocation.Y = NPC[A].Location.Y - tempLocation.Height;
+            Bomb(tempLocation, 4, floor(C));
         }
         if(NPC[A].Type == 96 && (B == 4 || B == 5))
         {
@@ -2123,7 +2138,7 @@ void NPCHit(int A, int B, int C)
             }
         }
     }
-    if((B == 2 || B == 7) && NPCIsABonus[NPC[A].Type] == false && oldNPC.Type != 194 && NPC[A].Type != 241)
+    if((B == 2 || B == 7) && NPCIsABonus[NPC[A].Type] == false && oldNPC.Type != 194 && NPC[A].Type != 241 && NPC[A].Type != 305)
     {
         if(NPC[A].Killed != 0 || NPC[A].Type != oldNPC.Type)
         {
@@ -2138,7 +2153,7 @@ void NPCHit(int A, int B, int C)
                 NewEffect(75, newLoc(NPC[A].Location.X, NPC[A].Location.Y + NPC[A].Location.Height - 16));
         }
     }
-    if(B == 4 && NPC[A].Killed == 4 && NPCIsACoin[NPC[A].Type] == false && C != A && NPC[A].Type != 13 && NPC[A].Type != 265 && NPC[A].Type != 108 && NPC[A].Type != 241)
+    if(B == 4 && NPC[A].Killed == 4 && NPCIsACoin[NPC[A].Type] == false && C != A && NPC[A].Type != 13 && NPC[A].Type != 265 && NPC[A].Type != 108 && NPC[A].Type != 241 && NPC[A].Type != 305)
     {
         if(NPC[C].Type != 208)
         {
@@ -2164,7 +2179,7 @@ void NPCHit(int A, int B, int C)
     if(!NPCIsACoin[NPC[A].Type] && B == 3 && C != A &&
        (NPC[A].Killed == B || !fEqual(NPC[A].Damage, oldNPC.Damage)) &&
         NPC[A].Type != 13 && NPC[A].Type != 108 && NPC[A].Type != 45 &&
-        NPC[A].Type != 210 && NPC[A].Type != 241)
+        NPC[A].Type != 210 && NPC[A].Type != 241 && NPC[A].Type != 305)
     {
         if(NPC[A].Killed == B)
         {

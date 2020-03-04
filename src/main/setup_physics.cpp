@@ -57,6 +57,13 @@ void SetupPhysics()
     Physics.PlayerDuckHeight[1][7] = 30;    // ---------
     Physics.PlayerGrabSpotX[1][7] = 18;     // ---------
     Physics.PlayerGrabSpotY[1][7] = 16;     // ---------
+
+    Physics.PlayerHeight[1][6] = 54;        // Hammer Mario
+    Physics.PlayerWidth[1][6] = 24;         // ---------
+    Physics.PlayerDuckHeight[1][6] = 30;    // ---------
+    Physics.PlayerGrabSpotX[1][6] = 18;     // ---------
+    Physics.PlayerGrabSpotY[1][6] = 16;     // ---------
+
     Physics.PlayerHeight[1][4] = 54;        // Racoon Mario
     Physics.PlayerWidth[1][4] = 24;         // ---------
     Physics.PlayerDuckHeight[1][4] = 30;    // ---------

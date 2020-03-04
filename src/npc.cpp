@@ -172,7 +172,12 @@ void Bomb(Location_t Location, int Game, int ImmunePlayer)
         PlaySound(43);
         Radius = 64;
     }
-
+    if(Game == 4)
+    {
+        NewEffect(151, Location);
+        PlaySound(93);
+        Radius = 128;
+    }
     X = Location.X + Location.Width / 2.0;
     Y = Location.Y + Location.Height / 2.0;
 

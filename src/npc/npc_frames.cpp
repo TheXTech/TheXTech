@@ -420,6 +420,17 @@ void NPCFrames(int A)
         if(NPC[A].Frame > 5)
             NPC[A].Frame = 0;
     }
+    else if(NPC[A].Type == 305) // red pow block
+    {
+        NPC[A].FrameCount = NPC[A].FrameCount + 1;
+        if(NPC[A].FrameCount >= 4)
+        {
+            NPC[A].Frame = NPC[A].Frame + 1;
+            NPC[A].FrameCount = 0;
+        }
+        if(NPC[A].Frame > 3)
+            NPC[A].Frame = 0;
+    }
     else if(NPC[A].Type == 267 || NPC[A].Type == 301) // larry/wendy koopa
     {
 

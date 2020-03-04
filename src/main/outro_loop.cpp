@@ -102,9 +102,9 @@ void SetupCredits()
     numCredits = 0;
 
 #ifdef ENABLE_OLD_CREDITS
-    AddCredit("Super Mario Bros. X");
+    AddCredit("New Super Mario Bros. X");
 #else
-    AddCredit("A2xTech");
+    AddCredit("New Super Mario Bros. X");
 #endif
     AddCredit("");
     AddCredit("");

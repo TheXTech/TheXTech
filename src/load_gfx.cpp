@@ -671,14 +671,13 @@ void UpdateLoad()
     {
         LoadCoinsT = SDL_GetTicks() + 100;
         LoadCoins += 1;
-        if(LoadCoins > 3)
+        if(LoadCoins > 7)
             LoadCoins = 0;
 
         frmMain.clearBuffer();
         if(!gfxLoaderTestMode)
             frmMain.renderTexture(0, 0, GFX.MenuGFX[4]);
-        frmMain.renderTexture(632, 576, GFX.Loader);
-        frmMain.renderTexture(760, 560, GFX.LoadCoin.w, GFX.LoadCoin.h / 4, GFX.LoadCoin, 0, 32 * LoadCoins);
+        frmMain.renderTexture(760, 560, GFX.LoadCoin.w, GFX.LoadCoin.h / 8, GFX.LoadCoin, 0, 32 * LoadCoins);
 
         frmMain.repaint();
         DoEvents();

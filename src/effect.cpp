@@ -167,6 +167,17 @@ void UpdateEffects()
             }
 
         }
+        else if(e.Type == 151) // Red pow
+        {
+            e.FrameCount += 1;
+            if(e.FrameCount >= 4)
+            {
+                e.FrameCount = 0;
+                e.Frame = e.Frame + 1;
+                if(e.Frame == 5)
+                    e.Life = 0;
+            }
+        }
         else if(e.Type == 114) // Splash
         {
             e.FrameCount += 1;
@@ -1392,7 +1403,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
             Effect[numEffects].Type = A;
         }
     }
-    else if(A == 10 || A == 73 || A == 74 || A == 75 || A == 131 || A == 132 || A == 147) // Puff of smoke
+    else if(A == 10 || A == 73 || A == 74 || A == 75 || A == 131 || A == 151 || A == 132 || A == 147) // Puff of smoke
     {
         numEffects = numEffects + 1;
         Effect[numEffects].Shadow = Shadow;

@@ -997,7 +997,7 @@ void KillNPC(int A, int B)
                 NewEffect(96 , NPC[A].Location);
             }
         }
-        else if(NPC[A].Type == 241)
+        else if(NPC[A].Type == 241 || NPC[A].Type == 305)
         {
             if(B == 6)
             {
@@ -1007,7 +1007,12 @@ void KillNPC(int A, int B)
                     NewEffect(13 , NPC[A].Location);
             }
             else
-                NewEffect(125 , NPC[A].Location);
+            {
+                if(NPC[A].Type != 305)
+                    NewEffect(125 , NPC[A].Location);
+                else
+                    NewEffect(131 , NPC[A].Location);
+            }
         }
         else if(NPC[A].Type == 72 || NPC[A].Type == 73) // giant Green Koopa
         {
