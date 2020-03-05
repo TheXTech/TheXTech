@@ -1919,7 +1919,7 @@ void UpdateNPCs()
 
 
 
-                                                    if(!(NPC[A].Block == B) && !(NPC[A].tempBlock == B) && !(NPC[A].Projectile == true && Block[B].noProjClipping == true) && BlockNoClipping[Block[B].Type] == false && Block[B].Hidden == false)
+                                                    if(!(NPC[A].Block == B) && !(NPC[A].tempBlock == B) && !(NPC[A].Projectile == true && Block[B].noProjClipping == true) && BlockNoClipping[Block[B].Type] == false && BlockNPCNoClipping[Block[B].Type] == false && Block[B].Hidden == false)
                                                     {
                                                         if(Block[B].IsNPC == 78 && NPCNoClipping[NPC[A].Type] == false && NPC[A].Type != 17)
                                                             NPCHit(A, 8);
@@ -3440,7 +3440,7 @@ void UpdateNPCs()
                                                 {
                                                     if(tempLocation.Y <= Block[B].Location.Y + Block[B].Location.Height)
                                                     {
-                                                        if(BlockNoClipping[Block[B].Type] == false && Block[B].Invis == false && Block[B].Hidden == false && !(BlockIsSizable[Block[B].Type] && Block[B].Location.Y < NPC[A].Location.Y + NPC[A].Location.Height - 3))
+                                                        if(BlockNoClipping[Block[B].Type] == false && BlockNPCNoClipping[Block[B].Type] == false && Block[B].Invis == false && Block[B].Hidden == false && !(BlockIsSizable[Block[B].Type] && Block[B].Location.Y < NPC[A].Location.Y + NPC[A].Location.Height - 3))
                                                         {
                                                             // If CheckCollision(tempLocation, Block(B).Location) = True Then
                                                             tempTurn = false;
@@ -3503,7 +3503,7 @@ void UpdateNPCs()
                                     }
                                     for(B = (int)fBlock2; B <= lBlock2; B++)
                                     {
-                                        if(BlockNoClipping[Block[B].Type] == false && Block[B].Invis == false && Block[B].Hidden == false && !(BlockIsSizable[Block[B].Type] && Block[B].Location.Y < NPC[A].Location.Y + NPC[A].Location.Height - 3))
+                                        if(BlockNoClipping[Block[B].Type] == false && BlockNPCNoClipping[Block[B].Type] == false && Block[B].Invis == false && Block[B].Hidden == false && !(BlockIsSizable[Block[B].Type] && Block[B].Location.Y < NPC[A].Location.Y + NPC[A].Location.Height - 3))
                                         {
                                             if(CheckCollision(tempLocation, Block[B].Location) == true)
                                             {
@@ -3537,7 +3537,7 @@ void UpdateNPCs()
                                     }
                                     for(B = (int)fBlock2; B <= lBlock2; B++)
                                     {
-                                        if(BlockNoClipping[Block[B].Type] == false && Block[B].Invis == false && Block[B].Hidden == false && !(BlockIsSizable[Block[B].Type] && Block[B].Location.Y < NPC[A].Location.Y + NPC[A].Location.Height - 1))
+                                        if(BlockNoClipping[Block[B].Type] == false && BlockNoClipping[Block[B].Type] == false && Block[B].Invis == false && Block[B].Hidden == false && !(BlockIsSizable[Block[B].Type] && Block[B].Location.Y < NPC[A].Location.Y + NPC[A].Location.Height - 1))
                                         {
                                             if(CheckCollision(tempLocation, Block[B].Location) == true)
                                             {

@@ -479,6 +479,19 @@ void SetupVars()
         NPCWidthGFX[A] = 32;
         NPCHeightGFX[A] = 32;
     }
+
+    // spiky spheres
+    for(int A = 306; A <= 308; ++A)
+    {
+        NPCWidth[A] = 26;
+        NPCHeight[A] = 26;
+        NPCWidthGFX[A] = 52;
+        NPCHeightGFX[A] = 52;
+        NPCNoClipping[A] = true;
+        NPCNoGravity[A] = true;
+        NPCFrameOffsetY[A] = 13;
+    }
+    NPCJumpHurt[307] = true;
     NPCHeight[223] = 24;
     NPCHeightGFX[223] = 24;
     NPCJumpHurt[231] = true;
@@ -2202,6 +2215,33 @@ void SetupVars()
     BlockSlope[638] = 1;
     BlockWidth[638] = 64;
 
+    BlockSlope[677] = -1;
+    BlockSlope[678] = 1;
+    BlockSlope2[679] = 1;
+    BlockSlope2[680] = -1;
+
+    BlockSlope[681] = -1;
+    BlockWidth[681] = 64;
+    BlockSlope[682] = 1;
+    BlockWidth[682] = 64;
+    BlockSlope2[683] = 1;
+    BlockWidth[683] = 64;
+    BlockSlope2[684] = -1;
+    BlockWidth[684] = 64;
+
+    BlockSlope[650] = -1;
+    BlockSlope[651] = 1;
+    BlockSlope2[652] = 1;
+    BlockSlope2[653] = -1;
+
+    BlockSlope[658] = -1;
+    BlockWidth[658] = 64;
+    BlockSlope[659] = 1;
+    BlockWidth[659] = 64;
+    BlockSlope2[660] = 1;
+    BlockWidth[660] = 64;
+    BlockSlope2[661] = -1;
+    BlockWidth[661] = 64;
 
     For(A, 137, 146)
     {
@@ -2485,6 +2525,7 @@ void SetupVars()
     BlockKills[30] = true;
     BlockHurts[109] = true;
     BlockHurts[598] = true;
+    BlockHurts[640] = true;
     BlockHurts[110] = true;
     BlockHurts[267] = true;
     BlockHurts[268] = true;
@@ -2501,6 +2542,7 @@ void SetupVars()
     BlockNoClipping[178] = true;
     BlockNoClipping[181] = true;
     BlockPlayerNoClipping[639] = true;
+    BlockNPCNoClipping[686] = true;
     BlockSlope[299] = -1;
     BlockSlope[300] = 1;
     BlockSlope[301] = 1;
@@ -2753,6 +2795,7 @@ void SetupVars()
     BackgroundWidth[173] = 112;
     BackgroundHeight[173] = 120;
 
+    BackgroundWidth[197] = 96;
 
     BackgroundWidth[160] = 24;
     BackgroundHeight[160] = 24;

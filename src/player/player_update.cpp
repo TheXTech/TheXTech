@@ -2365,7 +2365,8 @@ void UpdatePlayer()
                                             if(Player[A].Mount == 2 ||
                                                (
                                                    (HitSpot == 1 && Player[A].Mount != 0) &&
-                                                   Block[B].Type != 598
+                                                   Block[B].Type != 598 &&
+                                                   Block[B].Type != 640
                                                )
                                              )
                                             {}
@@ -2381,7 +2382,7 @@ void UpdatePlayer()
                                                     PlayerHurt(A);
                                                 if(Block[B].Type == 109)
                                                     PlayerHurt(A);
-                                                if(Block[B].Type == 598)
+                                                if(Block[B].Type == 598 || Block[B].Type == 640)
                                                 {
                                                     if(Player[A].Mount > 0 && HitSpot == 1)
                                                     {
@@ -3432,7 +3433,7 @@ void UpdatePlayer()
 
                                         if(BattleMode && NPC[B].HoldingPlayer > 0 && NPC[B].HoldingPlayer != A)
                                         {
-                                            if(NPCWontHurt[NPC[B].Type])
+                                            if(NPCWontHurt[NPC[B].Type] || (NPC[B].Type == 308 && NPC[B].Special2 != 2))
                                                 HitSpot = 0;
                                             else
                                                 HitSpot = 5;
@@ -3801,6 +3802,7 @@ void UpdatePlayer()
                                         }
                                         else if(NPC[B].Type != 22 && NPC[B].Type != 31 &&
                                                 NPC[B].Type != 49 && NPC[B].Type != 50 &&
+                                                NPC[B].Type != 308 &&
                                                 (!Player[A].SlideKill || NPCWontHurt[NPC[B].Type])) // NPCs that cannot be walked on
                                         {
                                             if(NPC[B].CantHurtPlayer == A && Player[A].NoShellKick > 0)
@@ -3836,6 +3838,11 @@ void UpdatePlayer()
                                                         if(n00bCollision(Player[A].Location, NPC[B].Location))
                                                             PlayerHurt(A);
                                                     }
+                                                }
+                                                else if(NPC[B].Type == 308 && NPC[B].Special2 == 2) // Also special code for Spiky Sphere (yellow)
+                                                {
+                                                     if(n00bCollision(Player[A].Location, NPC[B].Location))
+                                                         PlayerHurt(A);
                                                 }
                                                 else if(NPC[B].Type == 15) // Special code for BOOM BOOM
                                                 {

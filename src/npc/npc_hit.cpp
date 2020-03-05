@@ -1802,6 +1802,17 @@ void NPCHit(int A, int B, int C)
         }
         // Indestructable Objects
     }
+    else if(NPC[A].Type == 307 && (B == 3 || B == 4 || B == 5 || B == 10 || B == 2 || B == 1))
+    {
+        NPC[A].Killed = 9;
+        tempLocation.Height = NPC[A].Location.Height;
+        tempLocation.Width = NPC[A].Location.Width;
+        tempLocation.SpeedX = 0;
+        tempLocation.SpeedY = 0;
+        tempLocation.X = NPC[A].Location.X - tempLocation.Width / 4;
+        tempLocation.Y = NPC[A].Location.Y - tempLocation.Height / 4;
+        Bomb(tempLocation, 3, 0);
+    }
     else if(NPC[A].Type == 21 || NPC[A].Type == 22 || NPC[A].Type == 26 || NPC[A].Type == 31 || NPC[A].Type == 32 || NPC[A].Type == 238 || NPC[A].Type == 239 || NPC[A].Type == 35 || NPC[A].Type == 191 || NPC[A].Type == 193 || NPC[A].Type == 49 || NPCIsYoshi[NPC[A].Type] || NPC[A].Type == 96 || (NPC[A].Type >= 154 && NPC[A].Type <= 157) || NPC[A].Type == 240 || NPC[A].Type == 241 || NPC[A].Type == 278 || NPC[A].Type == 279 || NPC[A].Type == 305)
     {
         if(NPC[A].Type == 241 && (B == 4 || B == 5 || B == 10))

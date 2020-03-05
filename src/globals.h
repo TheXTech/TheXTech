@@ -1523,6 +1523,7 @@ extern RangeArrI<bool, 0, maxBlockType, false> BlockHurts;
 extern RangeArrI<bool, 0, maxBlockType, false> BlockPSwitch;
 //Public BlockNoClipping(0 To maxBlockType) As Boolean 'player/npcs can walk throught the block
 extern RangeArrI<bool, 0, maxBlockType, false> BlockNoClipping;
+extern RangeArrI<bool, 0, maxBlockType, false> BlockNPCNoClipping;
 //Public CoinFrame(1 To 10) As Integer 'What frame the coin is on
 extern RangeArrI<int, 1, 10, 0> CoinFrame;
 //Public CoinFrame2(1 To 10) As Integer 'Counter to update the coin frames

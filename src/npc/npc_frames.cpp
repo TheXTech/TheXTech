@@ -120,7 +120,8 @@ void NPCFrames(int A)
             NPC[A].Type == 105 || NPC[A].Type == 106 || NPC[A].Type == 133 || NPC[A].Type == 151 ||
             (NPC[A].Type >= 154 && NPC[A].Type <= 157) || NPC[A].Type == 159 || NPC[A].Type == 192 ||
             NPC[A].Type == 197 || NPCIsAVine[NPC[A].Type] || NPC[A].Type == 237 || NPC[A].Type == 239 ||
-            NPC[A].Type == 240 || NPC[A].Type == 250 || NPC[A].Type == 289 || NPC[A].Type == 290 || NPC[A].Type == 300) // no frames
+            NPC[A].Type == 240 || NPC[A].Type == 250 || NPC[A].Type == 289 || NPC[A].Type == 290 || NPC[A].Type == 300 ||
+            NPC[A].Type == 306 || NPC[A].Type == 307) // no frames
     {
         if(!(NPC[A].Type == 86 || NPC[A].Type == 284 || NPC[A].Type == 47) && A == 0) // Reset Frame to 0 unless a specific NPC type
             NPC[A].Frame = 0;
@@ -430,6 +431,10 @@ void NPCFrames(int A)
         }
         if(NPC[A].Frame > 3)
             NPC[A].Frame = 0;
+    }
+    else if(NPC[A].Type == 308) // spiky sphere
+    {
+        NPC[A].Frame = NPC[A].Special2;
     }
     else if(NPC[A].Type == 267 || NPC[A].Type == 301) // larry/wendy koopa
     {

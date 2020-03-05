@@ -86,7 +86,7 @@ bool GFX_t::load()
     For(i, 0, 3)
         loadImage(MCursor[i], uiPath + fmt::format_ne("MCursor{0}.png", i));
 
-    For(i, 1, 4)
+    For(i, 1, 5)
         loadImage(MenuGFX[i], uiPath + fmt::format_ne("MenuGFX{0}.png", i));
 
     loadImage(Mount[2], uiPath + "Mount.png");

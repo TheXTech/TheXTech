@@ -1947,7 +1947,13 @@ void UpdateGraphics(bool skipRepaint)
                     {
                         B = A - minShow + 1;
                         tempStr = SelectWorld[A].WorldName;
-                        SuperPrint(tempStr, 3, 300, 320 + (B * 30));
+                        if(tempStr == "The Invasion 3" || tempStr == "The Invasion 2" || tempStr == "The Princess Cliche")
+                        {
+                            SuperPrint(tempStr, 3, 300, 320 + (B * 30), 255);
+                            frmMain.renderTexture(300 + (tempStr.size()*18), 320 + (B * 30), GFX.MenuGFX[5]);
+                        }
+                        else
+                            SuperPrint(tempStr, 3, 300, 320 + (B * 30));
                     }
 
                     if(minShow > 1)

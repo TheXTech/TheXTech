@@ -1490,18 +1490,34 @@ void BlockFrames()
         if(Player[A].Character == 5)
             BlockFrame[631] = 4;
     }
+
     BlockFrame2[639] = BlockFrame2[639] + 1;
-    if(BlockFrame2[639] < 8)
-        BlockFrame[639] = 0;
-    else if(BlockFrame2[639] < 16)
-        BlockFrame[639] = 1;
-    else if(BlockFrame2[639] < 24)
-        BlockFrame[639] = 2;
-    else if(BlockFrame2[639] < 32)
+    if(BlockFrame2[639] > 8)
     {
+        BlockFrame[639] = BlockFrame[639] + 1;
         BlockFrame2[639] = 0;
-        BlockFrame[639] = 0;
+        if(BlockFrame[639] >= 3)
+            BlockFrame[639] = 0;
     }
+
+    BlockFrame2[686] = BlockFrame2[686] + 1;
+    if(BlockFrame2[686] > 8)
+    {
+        BlockFrame[686] = BlockFrame[639] + 1;
+        BlockFrame2[686] = 0;
+        if(BlockFrame[686] >= 3)
+            BlockFrame[686] = 0;
+    }
+
+    BlockFrame2[640] = BlockFrame2[640] + 1;
+    if(BlockFrame2[640] > 6)
+    {
+        BlockFrame[640] = BlockFrame[640] + 1;
+        BlockFrame2[640] = 0;
+        if(BlockFrame[640] >= 2)
+            BlockFrame[640] = 0;
+    }
+
     BlockFrame2[626] = BlockFrame2[626] + 1;
     if(BlockFrame2[626] < 8)
         BlockFrame[626] = 3;

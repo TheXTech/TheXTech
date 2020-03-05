@@ -1405,6 +1405,7 @@ void SizableBlocks()
     BlockIsSizable[439] = true;
     BlockIsSizable[440] = true;
     BlockIsSizable[445] = true;
+    BlockIsSizable[685] = true;
 }
 
 void StartBattleMode()

@@ -75,7 +75,7 @@ void SetupPhysics()
     Physics.PlayerGrabSpotX[1][5] = 18;     // ---------
     Physics.PlayerGrabSpotY[1][5] = 16;     // ---------
     Physics.PlayerHeight[1][8] = 48;        // Frog Mario
-    Physics.PlayerWidth[1][8] = 32;         // ---------
+    Physics.PlayerWidth[1][8] = 24;         // ---------
     Physics.PlayerDuckHeight[1][8] = 46;    // ---------
     Physics.PlayerGrabSpotX[1][8] = 18;     // ---------
     Physics.PlayerGrabSpotY[1][8] = 16;     // ---------
@@ -117,7 +117,7 @@ void SetupPhysics()
     Physics.PlayerGrabSpotY[2][7] = 16;     // ---------
 
     Physics.PlayerHeight[2][8] = 48;        // Frog Luigi
-    Physics.PlayerWidth[2][8] = 40;         // ---------
+    Physics.PlayerWidth[2][8] = 24;         // ---------
     Physics.PlayerDuckHeight[2][8] = 48;    // ---------
     Physics.PlayerGrabSpotX[2][8] = 18;     // ---------
     Physics.PlayerGrabSpotY[2][8] = 16;     // ---------
@@ -164,7 +164,7 @@ void SetupPhysics()
     Physics.PlayerGrabSpotY[3][7] = 16;
 
     Physics.PlayerHeight[3][8] = 46;        // Frog Peach
-    Physics.PlayerWidth[3][8] = 36;         // ---------
+    Physics.PlayerWidth[3][8] = 24;         // ---------
     Physics.PlayerDuckHeight[3][8] = 46;    // ---------
     Physics.PlayerGrabSpotX[3][8] = 18;
     Physics.PlayerGrabSpotY[3][8] = 16;
@@ -210,7 +210,7 @@ void SetupPhysics()
     Physics.PlayerGrabSpotY[4][7] = 16;     // ---------
 
     Physics.PlayerHeight[4][8] = 48;        // Frog Toad
-    Physics.PlayerWidth[4][8] = 38;         // ---------
+    Physics.PlayerWidth[4][8] = 25;         // ---------
     Physics.PlayerDuckHeight[4][8] = 44;    // ---------
     Physics.PlayerGrabSpotX[4][8] = 18;     // ---------
     Physics.PlayerGrabSpotY[4][8] = 16;     // ---------
