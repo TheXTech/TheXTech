@@ -434,6 +434,16 @@ void FrmMain::eventKeyPress(SDL_Scancode KeyASCII)
     case SDL_SCANCODE_X: CheatCode('x'); break;
     case SDL_SCANCODE_Y: CheatCode('y'); break;
     case SDL_SCANCODE_Z: CheatCode('z'); break;
+    case SDL_SCANCODE_1: CheatCode('1'); break;
+    case SDL_SCANCODE_2: CheatCode('2'); break;
+    case SDL_SCANCODE_3: CheatCode('3'); break;
+    case SDL_SCANCODE_4: CheatCode('4'); break;
+    case SDL_SCANCODE_5: CheatCode('5'); break;
+    case SDL_SCANCODE_6: CheatCode('6'); break;
+    case SDL_SCANCODE_7: CheatCode('7'); break;
+    case SDL_SCANCODE_8: CheatCode('8'); break;
+    case SDL_SCANCODE_9: CheatCode('9'); break;
+    case SDL_SCANCODE_0: CheatCode('0'); break;
     default: CheatCode(' '); break;
     }
 }
