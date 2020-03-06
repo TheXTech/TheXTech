@@ -2503,8 +2503,8 @@ void UpdateNPCs()
                                                                 NPCHit(A, 4, A);
                                                             if(NPC[A].Type == 303)
                                                             {
-                                                                NPC[A].Location.SpeedY = -3 - Block[B].Location.SpeedY;
                                                                 NPC[A].Location.Y = Block[B].Location.Y - Block[B].Location.Height - 0.2;
+                                                                NPC[A].Special2 = -1;
                                                             }
                                                             if(NPC[A].Type == 197)
                                                                 NPC[A].Special = 1;
@@ -2771,8 +2771,8 @@ void UpdateNPCs()
                                                             }
                                                             if(NPC[A].Type == 303)
                                                             {
-                                                                NPC[A].Location.SpeedY = 3 + Block[B].Location.SpeedY;
-                                                                NPC[A].Location.Y = Block[B].Location.Y + Block[B].Location.Height + 0.1;
+                                                                NPC[A].Location.Y = Block[B].Location.Y + Block[B].Location.Height + 0.5;
+                                                                NPC[A].Special2 = 1;
                                                             }
                                                         }
                                                         else if(HitSpot == 5) // Hitspot 5

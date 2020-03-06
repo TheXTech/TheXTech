@@ -1107,19 +1107,32 @@ void NPCSpecial(int A)
                 if(NPC[A].Type == 267)
                     NPC[numNPCs].Location.SpeedY = D / C * NPC[numNPCs].Location.SpeedX;
                 else
-                    NPC[numNPCs].Location.SpeedY = -3;
+                    NPC[numNPCs].Special2 = -1;
                 if(NPC[numNPCs].Location.SpeedY > 3)
                     NPC[numNPCs].Location.SpeedY = 3;
                 else if(NPC[numNPCs].Location.SpeedY < -3)
                     NPC[numNPCs].Location.SpeedY = -3;
             }
             NPC[A].Special3 = NPC[A].Special3 + 1;
-            if(NPC[A].Special3 >= 30)
+            if(NPC[A].Type != 301)
             {
-                NPC[A].Special = 0;
-                NPC[A].Special4 = 0;
-                NPC[A].Special5 = 0;
-                NPC[A].Special6 = 0;
+                if(NPC[A].Special3 >= 30)
+                {
+                    NPC[A].Special = 0;
+                    NPC[A].Special4 = 0;
+                    NPC[A].Special5 = 0;
+                    NPC[A].Special6 = 0;
+                }
+            }
+            else
+            {
+                if(NPC[A].Special3 >= 9)
+                {
+                    NPC[A].Special = 0;
+                    NPC[A].Special4 = 0;
+                    NPC[A].Special5 = 0;
+                    NPC[A].Special6 = 0;
+                }
             }
         }
 
@@ -1128,11 +1141,22 @@ void NPCSpecial(int A)
     else if(NPC[A].Type == 303)
     {
         NPC[A].Location.SpeedX = 3 * NPC[A].Direction;
+        NPC[A].Location.SpeedY = 3 * NPC[A].Special2;
         NPC[A].Special++;
         if(NPC[A].Special > 200)
         {
             NPC[A].Killed = 9;
             NewEffect(131, NPC[A].Location);
+        }
+        if(dRand() * 100 > 93)
+        {
+            tempLocation.Height = EffectHeight[80];
+            tempLocation.Width = EffectWidth[80];
+            tempLocation.SpeedX = 0;
+            tempLocation.SpeedY = 0;
+            tempLocation.X = NPC[A].Location.X - tempLocation.Width / 2.0 + dRand() * NPC[A].Location.Width - 4;
+            tempLocation.Y = NPC[A].Location.Y - tempLocation.Height / 2.0 + dRand() * NPC[A].Location.Height - 4;
+            NewEffect(152, tempLocation);
         }
     }
     else if(NPC[A].Type == 280)
