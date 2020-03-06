@@ -212,21 +212,21 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
         pLogDebug("Using accelerated rendering with a vertical synchronization");
     }
 
-    m_gRenderer = SDL_CreateRenderer(m_window, -1, renderFlags); // Try to make renderer
+    m_gRenderer = SDL_CreateRenderer(m_window, -1, renderFlags | SDL_RENDERER_TARGETTEXTURE); // Try to make renderer
 
     if(!m_gRenderer && setup.renderType == CmdLineSetup_t::RENDER_VSYNC) // If was a V-Sync renderer, use non-V-Synced
     {
         pLogWarning("Failed to initialize V-Synced renderer, trying to create accelerated renderer...");
         renderFlags = SDL_RENDERER_ACCELERATED;
         MaxFPS = false;
-        m_gRenderer = SDL_CreateRenderer(m_window, -1, renderFlags);
+        m_gRenderer = SDL_CreateRenderer(m_window, -1, renderFlags | SDL_RENDERER_TARGETTEXTURE);
     }
 
     if(!m_gRenderer && setup.renderType != CmdLineSetup_t::RENDER_SW) // Fall back to software
     {
         pLogWarning("Failed to initialize accelerated renderer, trying to create a software renderer...");
         renderFlags = SDL_RENDERER_SOFTWARE;
-        m_gRenderer = SDL_CreateRenderer(m_window, -1, renderFlags);
+        m_gRenderer = SDL_CreateRenderer(m_window, -1, renderFlags | SDL_RENDERER_TARGETTEXTURE);
     }
 
     if(!m_gRenderer)
@@ -235,6 +235,16 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
         freeSDL();
         return false;
     }
+
+    m_tBuffer = SDL_CreateTexture(m_gRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, ScreenW, ScreenH);
+    if(!m_tBuffer)
+    {
+        pLogCritical("Unable to create texture render buffer!");
+        freeSDL();
+        return false;
+    }
+
+    SDL_SetRenderTarget(m_gRenderer, m_tBuffer);
 
     SDL_SetRenderDrawBlendMode(m_gRenderer, SDL_BLENDMODE_BLEND);
 
@@ -254,11 +264,17 @@ void FrmMain::freeSDL()
     clearAllTextures();
     CloseJoysticks();
 
+    if(m_tBuffer)
+        SDL_DestroyTexture(m_tBuffer);
+    m_tBuffer = nullptr;
+
     if(m_gRenderer)
         SDL_DestroyRenderer(m_gRenderer);
+    m_gRenderer = nullptr;
 
     if(m_window)
         SDL_DestroyWindow(m_window);
+    m_window = nullptr;
 
     SDL_Quit();
     GraphicsHelps::closeFreeImage();
@@ -296,7 +312,14 @@ void FrmMain::processEvent()
         break;
     case SDL_WINDOWEVENT:
         if((m_event.window.event == SDL_WINDOWEVENT_RESIZED) || (m_event.window.event == SDL_WINDOWEVENT_MOVED))
+        {
             eventResize();
+        }
+        else if(m_event.window.event == SDL_WINDOWEVENT_MAXIMIZED)
+        {
+            SDL_RestoreWindow(m_window);
+            SetRes();
+        }
         break;
     case SDL_KEYDOWN:
         eventKeyDown(m_event.key);
@@ -342,7 +365,15 @@ bool FrmMain::hasWindowMouseFocus()
 
 void FrmMain::eventDoubleClick()
 {
-
+    if(resChanged)
+    {
+        frmMain.setFullScreen(false);
+        resChanged = false;
+        SDL_RestoreWindow(m_window);
+        SDL_SetWindowSize(m_window, ScreenW, ScreenH);
+    }
+    else
+        SetRes();
 }
 
 void FrmMain::eventKeyDown(SDL_KeyboardEvent &evt)
@@ -455,12 +486,25 @@ void FrmMain::eventMouseMove(SDL_MouseMotionEvent &event)
     }
 }
 
-void FrmMain::eventMouseUp(SDL_MouseButtonEvent &)
+void FrmMain::eventMouseUp(SDL_MouseButtonEvent &event)
 {
+    bool doubleClick = false;
     MenuMouseDown = false;
     MenuMouseRelease = true;
     if(LevelEditor || MagicHand || TestLevel)
         EditorControls.Mouse1 = false;
+
+    if(event.button == SDL_BUTTON_LEFT)
+    {
+        doubleClick = (m_lastMousePress + 300) >= SDL_GetTicks();
+        m_lastMousePress = SDL_GetTicks();
+    }
+
+    if(doubleClick)
+    {
+        eventDoubleClick();
+        m_lastMousePress = 0;
+    }
 }
 
 void FrmMain::eventResize()
@@ -497,7 +541,9 @@ int FrmMain::setFullScreen(bool fs)
                 pLogWarning("Setting windowed failed: %s", SDL_GetError());
                 return -1;
             }
-
+#ifdef __EMSCRIPTEN__
+            SDL_SetWindowSize(m_window, ScaleWidth, ScaleHeight);
+#endif
             return 0;
         }
     }
@@ -513,7 +559,21 @@ bool FrmMain::isSdlError()
 
 void FrmMain::repaint()
 {
+    SDL_SetRenderTarget(m_gRenderer, nullptr);
+
+    SDL_SetRenderDrawColor(m_gRenderer, 0, 0, 0, 255);
+    SDL_RenderClear(m_gRenderer);
+
+    SDL_Rect destRect = scaledRect(0, 0, ScreenW, ScreenH);
+    SDL_Rect sourceRect = { 0, 0, ScreenW, ScreenH };
+
+    SDL_SetTextureColorMod(m_tBuffer, 255, 255, 255);
+    SDL_SetTextureAlphaMod(m_tBuffer, 255);
+    SDL_RenderCopyEx(m_gRenderer, m_tBuffer, &sourceRect, &destRect, 0.0, nullptr, SDL_FLIP_NONE);
+
     SDL_RenderPresent(m_gRenderer);
+    SDL_SetRenderTarget(m_gRenderer, m_tBuffer);
+
     processRecorder();
 }
 
@@ -522,10 +582,12 @@ void FrmMain::updateViewport()
     float w, w1, h, h1;
     int   wi, hi;
     SDL_GetWindowSize(m_window, &wi, &hi);
+
     w = wi;
     h = hi;
     w1 = w;
     h1 = h;
+
     scale_x = w / ScaleWidth;
     scale_y = h / ScaleHeight;
     viewport_scale_x = scale_x;
@@ -552,16 +614,6 @@ void FrmMain::updateViewport()
     viewport_y = 0;
     viewport_w = static_cast<int>(w1);
     viewport_h = static_cast<int>(h1);
-
-    SDL_Rect topLeftViewport = {0, 0, wi, hi};
-    SDL_RenderSetViewport(m_gRenderer, &topLeftViewport);
-    clearBuffer();
-
-    topLeftViewport.x = static_cast<int>(offset_x);
-    topLeftViewport.y = static_cast<int>(offset_y);
-    topLeftViewport.w = viewport_w;
-    topLeftViewport.h = viewport_h;
-    SDL_RenderSetViewport(m_gRenderer, &topLeftViewport);
 }
 
 void FrmMain::resetViewport()
@@ -614,16 +666,12 @@ void FrmMain::setViewport(int x, int y, int w, int h)
     auto yF = static_cast<float>(y);
     auto wF = static_cast<float>(w);
     auto hF = static_cast<float>(h);
-    SDL_Rect topLeftViewport;
-    topLeftViewport.x = Maths::iRound(offset_x + std::ceil(xF * viewport_scale_x));
-    topLeftViewport.y = Maths::iRound(offset_y + std::ceil(yF * viewport_scale_y));
-    topLeftViewport.w = Maths::iRound(wF * viewport_scale_x);
-    topLeftViewport.h = Maths::iRound(hF * viewport_scale_y);
+    SDL_Rect topLeftViewport = {x, y, w, h};
     SDL_RenderSetViewport(m_gRenderer, &topLeftViewport);
-    viewport_x = xF;
-    viewport_y = yF;
-    viewport_w = wF;
-    viewport_h = hF;
+    viewport_x = int(xF);
+    viewport_y = int(yF);
+    viewport_w = int(wF);
+    viewport_h = int(hF);
 }
 
 void FrmMain::offsetViewport(int x, int y)
@@ -938,38 +986,27 @@ void FrmMain::lazyUnLoad(StdPicture &target)
 
 void FrmMain::makeShot()
 {
-    if(!m_gRenderer)
+#ifndef __EMSCRIPTEN__
+    if(!m_gRenderer || !m_tBuffer)
         return;
 
-    // Make the BYTE array, factor of 3 because it's RBG.
-    int w, h;
-    float wF, hF;
-    SDL_GetWindowSize(m_window, &w, &h);
-
-    if((w == 0) || (h == 0))
-    {
-        pLogWarning("Can't make screenshot: invalid width(%d) or height(%d).", w, h);
-        return;
-    }
-
-    wF = static_cast<float>(w);
-    hF = static_cast<float>(h);
-    wF = wF - offset_x * 2.0f;
-    hF = hF - offset_y * 2.0f;
-    w = static_cast<int>(wF);
-    h = static_cast<int>(hF);
+    const int w = ScreenW, h = ScreenH;
     uint8_t *pixels = new uint8_t[size_t(4 * w * h)];
-    getScreenPixels(static_cast<int>(offset_x), static_cast<int>(offset_y), w, h, pixels);
+    getScreenPixelsRGBA(0, 0, w, h, pixels);
     PGE_GL_shoot *shoot = new PGE_GL_shoot();
     shoot->pixels = pixels;
     shoot->w = w;
     shoot->h = h;
+    shoot->pitch = w * 4;
     shoot->me = this;
+
 #ifndef PGE_NO_THREADING
     m_screenshot_thread = SDL_CreateThread(makeShot_action, "scrn_maker", reinterpret_cast<void *>(shoot));
 #else
     makeShot_action(reinterpret_cast<void *>(shoot));
 #endif
+
+#endif // __EMSCRIPTEN__
 }
 
 static std::string shoot_getTimedString(std::string path, const char *ext = "png")
@@ -1034,10 +1071,7 @@ void FrmMain::toggleGifRecorder()
         std::string saveTo = shoot_getTimedString(g_ScreenshotPath, "gif");
 
         FILE *gifFile = Files::utf8_fopen(saveTo.data(), "wb");
-        if(GIF_H::GifBegin(&g_gif.writer,
-                    gifFile,
-                    static_cast<uint32_t>(viewport_w),
-                    static_cast<uint32_t>(viewport_h), g_gif.delay, false))
+        if(GIF_H::GifBegin(&g_gif.writer, gifFile, ScreenW, ScreenH, g_gif.delay, false))
         {
             g_gif.enabled = true;
             PlaySound(6);
@@ -1064,31 +1098,22 @@ void FrmMain::processRecorder()
     if(!g_gif.enabled)
         return;
 
-    g_gif.delayTimer += 1000.0 / 65.0;
+    g_gif.delayTimer += int(1000.0 / 65.0);
     if(g_gif.delayTimer >= g_gif.delay * 10)
         g_gif.delayTimer = 0.0;
     if(g_gif.delayTimer != 0.0)
         return;
 
-    // Make the BYTE array, factor of 3 because it's RBG.
-    int w, h;
-    SDL_GetWindowSize(m_window, &w, &h);
+    const int w = ScreenW, h = ScreenH;
 
-    if((w == 0) || (h == 0))
-    {
-        PlaySound(18);
-        return;
-    }
-
-    w = w - static_cast<int>(offset_x) * 2;
-    h = h - static_cast<int>(offset_y) * 2;
-    uint8_t *pixels = new uint8_t[size_t(4 * w * h)];
-    getScreenPixelsRGBA(static_cast<int>(offset_x), static_cast<int>(offset_y), w, h, pixels);
+    uint8_t *pixels = new uint8_t[size_t(4 * w * h) + 42];
+    getScreenPixelsRGBA(0, 0, w, h, pixels);
 
     PGE_GL_shoot *shoot = new PGE_GL_shoot();
     shoot->pixels = pixels;
     shoot->w = w;
     shoot->h = h;
+    shoot->pitch = w * 4;
     shoot->me = this;
 #ifndef PGE_NO_THREADING
     if(g_gif.worker)
@@ -1102,42 +1127,19 @@ void FrmMain::processRecorder()
 int FrmMain::processRecorder_action(void *_pixels)
 {
     //SDL_LockMutex(g_gif.mutex);
+
     PGE_GL_shoot *shoot = reinterpret_cast<PGE_GL_shoot *>(_pixels);
-    FrmMain *me = shoot->me;
-    FIBITMAP *shotImg = FreeImage_ConvertFromRawBitsEx(false, reinterpret_cast<BYTE *>(shoot->pixels), FIT_BITMAP,
-                        shoot->w, shoot->h,
-                        4 * shoot->w, 32,
-                        0xFF000000, 0x00FF0000, 0x0000FF00, false);
-    if((shoot->w != me->viewport_w) || (shoot->h != me->viewport_h))
-    {
-        FIBITMAP *temp;
-        temp = FreeImage_Rescale(shotImg, me->viewport_w, me->viewport_h, FILTER_BOX);
-        if(!temp)
-        {
-            FreeImage_Unload(shotImg);
-            delete []shoot->pixels;
-            shoot->pixels = nullptr;
-            delete []shoot;
-            SDL_UnlockMutex(g_gif.mutex);
-            return 0;
-        }
-        FreeImage_Unload(shotImg);
-        shotImg = temp;
-    }
-
-    if(FreeImage_HasPixels(shotImg) == FALSE)
-        pLogWarning("Can't save gif frame: no pixel data!");
-
-    uint8_t *img = FreeImage_GetBits(shotImg);
-    GifWriteFrame(&g_gif.writer, img,
-                  static_cast<uint32_t>(me->viewport_w),
-                  static_cast<uint32_t>(me->viewport_h),
+//    FrmMain *me = shoot->me;
+    GifWriteFrame(&g_gif.writer, shoot->pixels,
+                  unsigned(shoot->w),
+                  unsigned(shoot->h),
                   g_gif.delay/*uint32_t((ticktime)/10.0)*/, 8, false);
-    FreeImage_Unload(shotImg);
     delete[] shoot->pixels;
     shoot->pixels = nullptr;
     delete []shoot;
+
     //SDL_UnlockMutex(g_gif.mutex);
+    g_gif.worker = nullptr;
     return 0;
 }
 
@@ -1145,8 +1147,7 @@ int FrmMain::makeShot_action(void *_pixels)
 {
     PGE_GL_shoot *shoot = reinterpret_cast<PGE_GL_shoot *>(_pixels);
     FrmMain *me = shoot->me;
-    FIBITMAP *shotImg = FreeImage_ConvertFromRawBits(reinterpret_cast<BYTE *>(shoot->pixels), shoot->w, shoot->h,
-                        3 * shoot->w + shoot->w % 4, 24, 0xFF0000, 0x00FF00, 0x0000FF, true);
+    FIBITMAP *shotImg = FreeImage_AllocateT(FIT_BITMAP, shoot->w, shoot->h, 32);
 
     if(!shotImg)
     {
@@ -1157,37 +1158,22 @@ int FrmMain::makeShot_action(void *_pixels)
         return 0;
     }
 
-    FIBITMAP *temp;
-    temp = FreeImage_ConvertTo32Bits(shotImg);
+    uint8_t *px = shoot->pixels;
+    unsigned w = unsigned(shoot->w), x = 0;
+    unsigned h = unsigned(shoot->h), y = 0;
+    RGBQUAD p;
 
-    if(!temp)
+    for(y = 0; y < h; ++y)
     {
-        FreeImage_Unload(shotImg);
-        delete []shoot->pixels;
-        shoot->pixels = nullptr;
-        delete []shoot;
-        me->m_screenshot_thread = nullptr;
-        return 0;
-    }
-
-    FreeImage_Unload(shotImg);
-    shotImg = temp;
-
-    if((shoot->w != ScreenW) || (shoot->h != ScreenH))
-    {
-        FIBITMAP *temp = FreeImage_Rescale(shotImg, ScreenW, ScreenH, FILTER_BOX);
-        if(!temp)
+        for(x = 0; x < w; ++x)
         {
-            FreeImage_Unload(shotImg);
-            delete []shoot->pixels;
-            shoot->pixels = nullptr;
-            delete []shoot;
-            me->m_screenshot_thread = nullptr;
-            return 0;
+            p.rgbRed = px[0];
+            p.rgbGreen = px[1];
+            p.rgbBlue = px[2];
+            p.rgbReserved = px[3];
+            FreeImage_SetPixelColor(shotImg, x, (h - 1) - y, &p);
+            px += 4;
         }
-
-        FreeImage_Unload(shotImg);
-        shotImg = temp;
     }
 
     if(!DirMan::exists(me->g_ScreenshotPath))
@@ -1210,44 +1196,14 @@ int FrmMain::makeShot_action(void *_pixels)
     return 0;
 }
 
-SDL_Rect FrmMain::scaledRectIS(float x, float y, int w, int h)
-{
-    x += viewport_offset_x;
-    y += viewport_offset_y;
-    return
-    {
-        static_cast<int>(std::ceil(x * viewport_scale_x)),
-        static_cast<int>(std::ceil(y * viewport_scale_y)),
-        static_cast<int>(std::ceil(static_cast<float>(w) * viewport_scale_x)),
-        static_cast<int>(std::ceil(static_cast<float>(h) * viewport_scale_y))
-    };
-}
-
 SDL_Rect FrmMain::scaledRect(float x, float y, float w, float h)
 {
-    x += viewport_offset_x;
-    y += viewport_offset_y;
     return
     {
-        static_cast<int>(std::ceil(x * viewport_scale_x)),
-        static_cast<int>(std::ceil(y * viewport_scale_y)),
+        static_cast<int>(std::ceil(x * viewport_scale_x) + offset_x),
+        static_cast<int>(std::ceil(y * viewport_scale_y) + offset_y),
         static_cast<int>(std::ceil(w * viewport_scale_x)),
         static_cast<int>(std::ceil(h * viewport_scale_y))
-    };
-}
-
-SDL_Rect FrmMain::scaledRectS(float left, float top, float right, float bottom)
-{
-    left += viewport_offset_x;
-    top += viewport_offset_y;
-    right += viewport_offset_x;
-    bottom += viewport_offset_y;
-    return
-    {
-        static_cast<int>(std::ceil(left * viewport_scale_x)),
-        static_cast<int>(std::ceil(top * viewport_scale_y)),
-        static_cast<int>(std::ceil((right - left)*viewport_scale_x)),
-        static_cast<int>(std::ceil((bottom - top)*viewport_scale_y))
     };
 }
 
@@ -1255,7 +1211,7 @@ SDL_Point FrmMain::MapToScr(int x, int y)
 {
     return {
         static_cast<int>((static_cast<float>(x) - offset_x) / viewport_scale_x),
-                static_cast<int>((static_cast<float>(y) - offset_y) / viewport_scale_y)
+        static_cast<int>((static_cast<float>(y) - offset_y) / viewport_scale_y)
     };
 }
 
@@ -1331,7 +1287,7 @@ void FrmMain::clearBuffer()
 
 void FrmMain::renderRect(int x, int y, int w, int h, float red, float green, float blue, float alpha, bool filled)
 {
-    SDL_Rect aRect = scaledRect(x, y, w, h);
+    SDL_Rect aRect = {x + viewport_offset_x, y + viewport_offset_x, w, h};
     SDL_SetRenderDrawColor(m_gRenderer,
                            static_cast<unsigned char>(255.f * red),
                            static_cast<unsigned char>(255.f * green),
@@ -1347,7 +1303,7 @@ void FrmMain::renderRect(int x, int y, int w, int h, float red, float green, flo
 
 void FrmMain::renderRectBR(int _left, int _top, int _right, int _bottom, float red, float green, float blue, float alpha)
 {
-    SDL_Rect aRect = scaledRectS(_left, _top, _right, _bottom);
+    SDL_Rect aRect = {_left + viewport_offset_x, _top + viewport_offset_y, _right - _left, _bottom - _top};
     SDL_SetRenderDrawColor(m_gRenderer,
                            static_cast<unsigned char>(255.f * red),
                            static_cast<unsigned char>(255.f * green),
@@ -1391,14 +1347,8 @@ void FrmMain::renderTextureI(int xDst, int yDst, int wDst, int hDst,
             hDst = 0;
     }
 
-    SDL_Rect destRect = scaledRect(xDst, yDst, wDst, hDst);
-    SDL_Rect sourceRect =
-    {
-        xSrc,
-        ySrc,
-        wDst,
-        hDst
-    };
+    SDL_Rect destRect = { xDst + viewport_offset_x, yDst + viewport_offset_y, wDst, hDst };
+    SDL_Rect sourceRect = { xSrc, ySrc, wDst, hDst };
 
     SDL_SetTextureColorMod(tx.texture,
                            static_cast<unsigned char>(255.f * red),
@@ -1459,7 +1409,7 @@ void FrmMain::renderTexture(int xDst, int yDst, StdPicture &tx, float red, float
         return;
     }
 
-    SDL_Rect destRect = scaledRect(xDst, yDst, tx.w, tx.h);
+    SDL_Rect destRect = {xDst, yDst, tx.w, tx.h};
     SDL_Rect sourceRect = {0, 0, tx.w, tx.h};
 
     SDL_SetTextureColorMod(tx.texture,

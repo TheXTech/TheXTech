@@ -93,6 +93,19 @@ int GameMain(const CmdLineSetup_t &setup)
     InitControls(); // init player's controls
     DoEvents();
 
+#ifdef __EMSCRIPTEN__ // Workaround for a recent Chrome's policy to avoid sudden sound without user's interaction
+    frmMain.show(); // Don't show window until playing an initial sound
+
+    while(!MenuMouseDown)
+    {
+        frmMain.clearBuffer();
+        SuperPrint("Click to start a game", 3, 230, 280);
+        frmMain.repaint();
+        DoEvents();
+        PGE_Delay(10);
+    }
+#endif
+
     if(!noSound)
     {
         InitMixerX();
@@ -918,7 +931,8 @@ void UpdateMacro()
                 Player[A].Controls.AltRun = false;
             }
         }
-        if(OnScreen == false)
+
+        if(!OnScreen)
         {
             LevelMacroCounter = LevelMacroCounter + 1;
             if(LevelMacroCounter >= 100)
@@ -979,6 +993,7 @@ void UpdateMacro()
             if(!GameIsActive)
                 return;
 
+            PGE_Delay(1);
         } while(true);
 
         LevelBeatCode = 4;

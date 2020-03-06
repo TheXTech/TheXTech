@@ -39,9 +39,11 @@ class FrmMain
     std::string m_windowTitle;
     SDL_Window *m_window = nullptr;
     SDL_Renderer *m_gRenderer = nullptr;
+    SDL_Texture  *m_tBuffer = nullptr;
     std::set<SDL_Texture *> m_textureBank;
     bool m_sdlLoaded = false;
     const Uint8 *m_keyboardState = nullptr;
+    Uint32 m_lastMousePress = 0;
 public:
     int ScaleWidth = 800;
     int ScaleHeight = 600;
@@ -134,6 +136,7 @@ private:
     {
         FrmMain *me = nullptr;
         uint8_t *pixels = nullptr;
+        int pitch = 0;
         int w = 0, h = 0;
     };
 
@@ -161,10 +164,7 @@ private:
     int viewport_w = 0;
     int viewport_h = 0;
 
-    SDL_Rect   scaledRectIS(float x, float y, int w, int h);
     SDL_Rect   scaledRect(float x, float y, float w, float h);
-    SDL_Rect   scaledRectS(float left, float top, float right, float bottom);
-
     SDL_Point MapToScr(int x, int y);
 };
 
