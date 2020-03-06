@@ -312,7 +312,14 @@ void FrmMain::processEvent()
         break;
     case SDL_WINDOWEVENT:
         if((m_event.window.event == SDL_WINDOWEVENT_RESIZED) || (m_event.window.event == SDL_WINDOWEVENT_MOVED))
+        {
             eventResize();
+        }
+        else if(m_event.window.event == SDL_WINDOWEVENT_MAXIMIZED)
+        {
+            SDL_RestoreWindow(m_window);
+            SetRes();
+        }
         break;
     case SDL_KEYDOWN:
         eventKeyDown(m_event.key);
@@ -358,7 +365,15 @@ bool FrmMain::hasWindowMouseFocus()
 
 void FrmMain::eventDoubleClick()
 {
-
+    if(resChanged)
+    {
+        frmMain.setFullScreen(false);
+        resChanged = false;
+        SDL_RestoreWindow(m_window);
+        SDL_SetWindowSize(m_window, ScreenW, ScreenH);
+    }
+    else
+        SetRes();
 }
 
 void FrmMain::eventKeyDown(SDL_KeyboardEvent &evt)
@@ -471,12 +486,25 @@ void FrmMain::eventMouseMove(SDL_MouseMotionEvent &event)
     }
 }
 
-void FrmMain::eventMouseUp(SDL_MouseButtonEvent &)
+void FrmMain::eventMouseUp(SDL_MouseButtonEvent &event)
 {
+    bool doubleClick = false;
     MenuMouseDown = false;
     MenuMouseRelease = true;
     if(LevelEditor || MagicHand || TestLevel)
         EditorControls.Mouse1 = false;
+
+    if(event.button == SDL_BUTTON_LEFT)
+    {
+        doubleClick = (m_lastMousePress + 300) >= SDL_GetTicks();
+        m_lastMousePress = SDL_GetTicks();
+    }
+
+    if(doubleClick)
+    {
+        eventDoubleClick();
+        m_lastMousePress = 0;
+    }
 }
 
 void FrmMain::eventResize()

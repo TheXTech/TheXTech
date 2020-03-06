@@ -30,6 +30,7 @@ void SetOrigRes()
 {
     frmMain.setFullScreen(false);
     resChanged = false;
+    SDL_SetWindowSize(frmMain.getWindow(), ScreenW, ScreenH);
 }
 
 void ChangeRes(int, int, int, int)

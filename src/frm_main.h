@@ -43,6 +43,7 @@ class FrmMain
     std::set<SDL_Texture *> m_textureBank;
     bool m_sdlLoaded = false;
     const Uint8 *m_keyboardState = nullptr;
+    Uint32 m_lastMousePress = 0;
 public:
     int ScaleWidth = 800;
     int ScaleHeight = 600;
