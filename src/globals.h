@@ -1774,6 +1774,7 @@ extern bool Debugger;
 //Public SavedChar(0 To 10) As Player 'Saves the Player's Status
 extern RangeArr<Player_t, 0, 10> SavedChar;
 
+extern bool LoadingInProcess;
 //Public LoadCoins As Integer
 extern int LoadCoins;
 //Public LoadCoinsT As Single

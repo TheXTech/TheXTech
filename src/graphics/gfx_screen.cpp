@@ -28,6 +28,7 @@
 #include "../player.h"
 #include "../sound.h"
 #include "../change_res.h"
+#include "../load_gfx.h"
 
 
 // Sets up the split lines

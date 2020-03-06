@@ -93,6 +93,8 @@ public:
     void renderRect(int x, int y, int w, int h, float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f, bool filled = true);
     void renderRectBR(int _left, int _top, int _right, int _bottom, float red, float green, float blue, float alpha);
 
+    void renderCircle(int cx, int cy, int radius, float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f, bool filled = true);
+
     // Similar to BitBlt, but without masks, just draw a texture or it's fragment!
     void renderTextureI(int xDst, int yDst, int wDst, int hDst,
                         StdPicture &tx,
@@ -118,13 +120,17 @@ public:
     int  getPixelDataSize(const StdPicture &tx);
     void getPixelData(const StdPicture &tx, unsigned char *pixelData);
 
+#ifndef __EMSCRIPTEN__
     void makeShot();
+#endif
 
 private:
+#ifndef __EMSCRIPTEN__
     bool recordInProcess();
     void toggleGifRecorder();
     void processRecorder();
     static int processRecorder_action(void *_pixels);
+#endif
 
     void processEvent();
     void loadTexture(StdPicture &target, uint32_t width, uint32_t height, uint8_t *RGBApixels);
@@ -132,6 +138,7 @@ private:
     void lazyLoad(StdPicture &target);
     void lazyUnLoad(StdPicture &target);
 
+#ifndef __EMSCRIPTEN__
     struct PGE_GL_shoot
     {
         FrmMain *me = nullptr;
@@ -139,12 +146,14 @@ private:
         int pitch = 0;
         int w = 0, h = 0;
     };
+#endif
 
     std::string g_ScreenshotPath;
 
+#ifndef __EMSCRIPTEN__
     static int makeShot_action(void *_pixels);
-
     SDL_Thread *m_screenshot_thread = nullptr;
+#endif
 
     //Scale of virtual and window resolutuins
     float scale_x = 1.f;

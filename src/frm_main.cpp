@@ -392,10 +392,12 @@ void FrmMain::eventKeyDown(SDL_KeyboardEvent &evt)
         ChangeScreen();
     }
 
+#ifndef __EMSCRIPTEN__
     if(KeyCode == SDL_SCANCODE_F12)
         TakeScreen = true;
     else if(KeyCode == SDL_SCANCODE_F11)
         toggleGifRecorder();
+#endif
 }
 
 void FrmMain::eventKeyPress(SDL_Scancode KeyASCII)
@@ -559,6 +561,10 @@ bool FrmMain::isSdlError()
 
 void FrmMain::repaint()
 {
+#ifndef __EMSCRIPTEN__
+    processRecorder();
+#endif
+
     SDL_SetRenderTarget(m_gRenderer, nullptr);
 
     SDL_SetRenderDrawColor(m_gRenderer, 0, 0, 0, 255);
@@ -573,8 +579,6 @@ void FrmMain::repaint()
 
     SDL_RenderPresent(m_gRenderer);
     SDL_SetRenderTarget(m_gRenderer, m_tBuffer);
-
-    processRecorder();
 }
 
 void FrmMain::updateViewport()
@@ -984,9 +988,11 @@ void FrmMain::lazyUnLoad(StdPicture &target)
     deleteTexture(target, true);
 }
 
+
+#ifndef __EMSCRIPTEN__
+
 void FrmMain::makeShot()
 {
-#ifndef __EMSCRIPTEN__
     if(!m_gRenderer || !m_tBuffer)
         return;
 
@@ -1006,7 +1012,6 @@ void FrmMain::makeShot()
     makeShot_action(reinterpret_cast<void *>(shoot));
 #endif
 
-#endif // __EMSCRIPTEN__
 }
 
 static std::string shoot_getTimedString(std::string path, const char *ext = "png")
@@ -1052,6 +1057,34 @@ static struct gifRecord
     uint32_t    delayTimer  = 0;
     bool        enabled     = false;
     unsigned char padding[7] = {0, 0, 0, 0, 0, 0, 0};
+    bool        fadeForward = true;
+    float       fadeValue = 0.5f;
+
+    void drawRecCircle()
+    {
+        if(fadeForward)
+        {
+            fadeValue += 0.01f;
+            if(fadeValue >= 1.0f)
+            {
+                fadeValue = 1.0f;
+                fadeForward = !fadeForward;
+            }
+        }
+        else
+        {
+            fadeValue -= 0.01f;
+            if(fadeValue < 0.5f)
+            {
+                fadeValue = 0.5f;
+                fadeForward = !fadeForward;
+            }
+        }
+
+        frmMain.renderCircle(50, 50, 20, 1.f, 0.f, 0.f, fadeValue, true);
+        SuperPrint("REC", 3, 25, 80, 1.f, 0.f, 0.f, fadeValue);
+    }
+
 } g_gif;
 
 bool FrmMain::recordInProcess()
@@ -1102,7 +1135,10 @@ void FrmMain::processRecorder()
     if(g_gif.delayTimer >= g_gif.delay * 10)
         g_gif.delayTimer = 0.0;
     if(g_gif.delayTimer != 0.0)
+    {
+        g_gif.drawRecCircle();
         return;
+    }
 
     const int w = ScreenW, h = ScreenH;
 
@@ -1122,6 +1158,8 @@ void FrmMain::processRecorder()
 #else
     processRecorder_action(reinterpret_cast<void *>(shoot));
 #endif
+
+    g_gif.drawRecCircle();
 }
 
 int FrmMain::processRecorder_action(void *_pixels)
@@ -1195,6 +1233,9 @@ int FrmMain::makeShot_action(void *_pixels)
     me->m_screenshot_thread = nullptr;
     return 0;
 }
+
+#endif // __EMSCRIPTEN__
+
 
 SDL_Rect FrmMain::scaledRect(float x, float y, float w, float h)
 {
@@ -1311,6 +1352,36 @@ void FrmMain::renderRectBR(int _left, int _top, int _right, int _bottom, float r
                            static_cast<unsigned char>(255.f * alpha)
                           );
     SDL_RenderFillRect(m_gRenderer, &aRect);
+}
+
+void FrmMain::renderCircle(int cx, int cy, int radius, float red, float green, float blue, float alpha, bool filled)
+{
+    UNUSED(filled);
+
+    SDL_SetRenderDrawColor(m_gRenderer,
+                               static_cast<unsigned char>(255.f * red),
+                               static_cast<unsigned char>(255.f * green),
+                               static_cast<unsigned char>(255.f * blue),
+                               static_cast<unsigned char>(255.f * alpha)
+                          );
+
+    for(double dy = 1; dy <= radius; dy += 1.0)
+    {
+        double dx = std::floor(std::sqrt((2.0 * radius * dy) - (dy * dy)));
+        SDL_RenderDrawLine(m_gRenderer,
+                           cx - dx,
+                           cy + dy - radius,
+                           cx + dx,
+                           cy + dy - radius);
+        if(dy < radius) // Don't cross lines
+        {
+            SDL_RenderDrawLine(m_gRenderer,
+                               cx - dx,
+                               cy - dy + radius,
+                               cx + dx,
+                               cy - dy + radius);
+        }
+    }
 }
 
 void FrmMain::renderTextureI(int xDst, int yDst, int wDst, int hDst,

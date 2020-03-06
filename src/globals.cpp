@@ -329,6 +329,7 @@ int MaxWorldStars = 0;
 bool Debugger = false;
 RangeArr<Player_t, 0, 10> SavedChar;
 
+bool LoadingInProcess = false;
 int LoadCoins = 0;
 float LoadCoinsT = 0.0f;
 

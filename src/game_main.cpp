@@ -90,6 +90,8 @@ int GameMain(const CmdLineSetup_t &setup)
 //        BlocksSorted = True
 //    End If
 
+    LoadingInProcess = true;
+
     InitControls(); // init player's controls
     DoEvents();
 
@@ -125,6 +127,8 @@ int GameMain(const CmdLineSetup_t &setup)
     SizableBlocks();
     LoadGFX(); // load the graphics from file
     SetupVars(); //Setup Variables
+
+    LoadingInProcess = false;
 
     ShowFPS = setup.testShowFPS;
     MaxFPS = setup.testMaxFPS;
