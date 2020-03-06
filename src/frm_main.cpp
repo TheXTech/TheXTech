@@ -554,10 +554,12 @@ void FrmMain::updateViewport()
     float w, w1, h, h1;
     int   wi, hi;
     SDL_GetWindowSize(m_window, &wi, &hi);
+
     w = wi;
     h = hi;
     w1 = w;
     h1 = h;
+
     scale_x = w / ScaleWidth;
     scale_y = h / ScaleHeight;
     viewport_scale_x = scale_x;
@@ -584,16 +586,6 @@ void FrmMain::updateViewport()
     viewport_y = 0;
     viewport_w = static_cast<int>(w1);
     viewport_h = static_cast<int>(h1);
-
-    SDL_Rect topLeftViewport = {0, 0, wi, hi};
-    SDL_RenderSetViewport(m_gRenderer, &topLeftViewport);
-    clearBuffer();
-
-    topLeftViewport.x = static_cast<int>(offset_x);
-    topLeftViewport.y = static_cast<int>(offset_y);
-    topLeftViewport.w = viewport_w;
-    topLeftViewport.h = viewport_h;
-//    SDL_RenderSetViewport(m_gRenderer, &topLeftViewport);
 }
 
 void FrmMain::resetViewport()
@@ -647,10 +639,6 @@ void FrmMain::setViewport(int x, int y, int w, int h)
     auto wF = static_cast<float>(w);
     auto hF = static_cast<float>(h);
     SDL_Rect topLeftViewport = {x, y, w, h};
-//    topLeftViewport.x = Maths::iRound(offset_x + std::ceil(xF * viewport_scale_x));
-//    topLeftViewport.y = Maths::iRound(offset_y + std::ceil(yF * viewport_scale_y));
-//    topLeftViewport.w = Maths::iRound(wF * viewport_scale_x);
-//    topLeftViewport.h = Maths::iRound(hF * viewport_scale_y);
     SDL_RenderSetViewport(m_gRenderer, &topLeftViewport);
     viewport_x = int(xF);
     viewport_y = int(yF);
@@ -1132,9 +1120,7 @@ int FrmMain::makeShot_action(void *_pixels)
     PGE_GL_shoot *shoot = reinterpret_cast<PGE_GL_shoot *>(_pixels);
     FrmMain *me = shoot->me;
     FIBITMAP *shotImg = FreeImage_AllocateT(FIT_BITMAP, shoot->w, shoot->h, 32);
-            /*FreeImage_ConvertFromRawBitsEx(false, reinterpret_cast<BYTE *>(shoot->pixels), FIT_BITMAP,
-                        shoot->w, shoot->h, shoot->pitch, 32,
-                        0xFF000000, 0x00FF0000, 0x0000FF00, true);*/
+
     if(!shotImg)
     {
         delete []shoot->pixels;
@@ -1197,7 +1183,7 @@ SDL_Point FrmMain::MapToScr(int x, int y)
 {
     return {
         static_cast<int>((static_cast<float>(x) - offset_x) / viewport_scale_x),
-                static_cast<int>((static_cast<float>(y) - offset_y) / viewport_scale_y)
+        static_cast<int>((static_cast<float>(y) - offset_y) / viewport_scale_y)
     };
 }
 
