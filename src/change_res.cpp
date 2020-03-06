@@ -25,17 +25,22 @@
 
 #include "globals.h"
 #include "change_res.h"
+#include "load_gfx.h"
 
 void SetOrigRes()
 {
     frmMain.setFullScreen(false);
     resChanged = false;
     SDL_SetWindowSize(frmMain.getWindow(), ScreenW, ScreenH);
+    if(LoadingInProcess)
+        UpdateLoad();
 }
 
 void ChangeRes(int, int, int, int)
 {
     frmMain.setFullScreen(true);
+    if(LoadingInProcess)
+        UpdateLoad();
 }
 
 //void SaveIt(int ScX, int ScY, int ScC, int ScF, std::string ScreenChanged)
