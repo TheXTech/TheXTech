@@ -1,4 +1,4 @@
-/*
+﻿/*
  * A2xTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
@@ -315,11 +315,13 @@ void FrmMain::processEvent()
         {
             eventResize();
         }
+#ifndef __EMSCRIPTEN__
         else if(m_event.window.event == SDL_WINDOWEVENT_MAXIMIZED)
         {
             SDL_RestoreWindow(m_window);
             SetRes();
         }
+#endif
         break;
     case SDL_KEYDOWN:
         eventKeyDown(m_event.key);
@@ -365,6 +367,7 @@ bool FrmMain::hasWindowMouseFocus()
 
 void FrmMain::eventDoubleClick()
 {
+#ifndef __EMSCRIPTEN__
     if(resChanged)
     {
         frmMain.setFullScreen(false);
@@ -374,6 +377,7 @@ void FrmMain::eventDoubleClick()
     }
     else
         SetRes();
+#endif
 }
 
 void FrmMain::eventKeyDown(SDL_KeyboardEvent &evt)
@@ -430,6 +434,16 @@ void FrmMain::eventKeyPress(SDL_Scancode KeyASCII)
     case SDL_SCANCODE_X: CheatCode('x'); break;
     case SDL_SCANCODE_Y: CheatCode('y'); break;
     case SDL_SCANCODE_Z: CheatCode('z'); break;
+    case SDL_SCANCODE_1: CheatCode('1'); break;
+    case SDL_SCANCODE_2: CheatCode('2'); break;
+    case SDL_SCANCODE_3: CheatCode('3'); break;
+    case SDL_SCANCODE_4: CheatCode('4'); break;
+    case SDL_SCANCODE_5: CheatCode('5'); break;
+    case SDL_SCANCODE_6: CheatCode('6'); break;
+    case SDL_SCANCODE_7: CheatCode('7'); break;
+    case SDL_SCANCODE_8: CheatCode('8'); break;
+    case SDL_SCANCODE_9: CheatCode('9'); break;
+    case SDL_SCANCODE_0: CheatCode('0'); break;
     default: CheatCode(' '); break;
     }
 }
@@ -585,7 +599,17 @@ void FrmMain::updateViewport()
 {
     float w, w1, h, h1;
     int   wi, hi;
+#ifndef __EMSCRIPTEN__
     SDL_GetWindowSize(m_window, &wi, &hi);
+#else
+    if(IsFullScreen(m_window))
+        SDL_GetWindowSize(m_window, &wi, &hi);
+    else
+    {
+        wi = ScreenW;
+        hi = ScreenH;
+    }
+#endif
 
     w = wi;
     h = hi;
@@ -624,7 +648,17 @@ void FrmMain::resetViewport()
 {
     float w, w1, h, h1;
     int   wi, hi;
+#ifndef __EMSCRIPTEN__
     SDL_GetWindowSize(m_window, &wi, &hi);
+#else
+    if(IsFullScreen(m_window))
+        SDL_GetWindowSize(m_window, &wi, &hi);
+    else
+    {
+        wi = ScreenW;
+        hi = ScreenH;
+    }
+#endif
     w = wi;
     h = hi;
     w1 = w;
