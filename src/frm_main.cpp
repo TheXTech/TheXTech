@@ -1055,10 +1055,7 @@ void FrmMain::toggleGifRecorder()
         std::string saveTo = shoot_getTimedString(g_ScreenshotPath, "gif");
 
         FILE *gifFile = Files::utf8_fopen(saveTo.data(), "wb");
-        if(GIF_H::GifBegin(&g_gif.writer,
-                    gifFile,
-                    static_cast<uint32_t>(viewport_w),
-                    static_cast<uint32_t>(viewport_h), g_gif.delay, false))
+        if(GIF_H::GifBegin(&g_gif.writer, gifFile, ScreenW, ScreenH, g_gif.delay, false))
         {
             g_gif.enabled = true;
             PlaySound(6);
