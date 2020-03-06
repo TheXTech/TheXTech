@@ -392,10 +392,12 @@ void FrmMain::eventKeyDown(SDL_KeyboardEvent &evt)
         ChangeScreen();
     }
 
+#ifndef __EMSCRIPTEN__
     if(KeyCode == SDL_SCANCODE_F12)
         TakeScreen = true;
     else if(KeyCode == SDL_SCANCODE_F11)
         toggleGifRecorder();
+#endif
 }
 
 void FrmMain::eventKeyPress(SDL_Scancode KeyASCII)
@@ -559,7 +561,9 @@ bool FrmMain::isSdlError()
 
 void FrmMain::repaint()
 {
+#ifndef __EMSCRIPTEN__
     processRecorder();
+#endif
 
     SDL_SetRenderTarget(m_gRenderer, nullptr);
 
@@ -984,9 +988,11 @@ void FrmMain::lazyUnLoad(StdPicture &target)
     deleteTexture(target, true);
 }
 
+
+#ifndef __EMSCRIPTEN__
+
 void FrmMain::makeShot()
 {
-#ifndef __EMSCRIPTEN__
     if(!m_gRenderer || !m_tBuffer)
         return;
 
@@ -1006,7 +1012,6 @@ void FrmMain::makeShot()
     makeShot_action(reinterpret_cast<void *>(shoot));
 #endif
 
-#endif // __EMSCRIPTEN__
 }
 
 static std::string shoot_getTimedString(std::string path, const char *ext = "png")
@@ -1228,6 +1233,9 @@ int FrmMain::makeShot_action(void *_pixels)
     me->m_screenshot_thread = nullptr;
     return 0;
 }
+
+#endif // __EMSCRIPTEN__
+
 
 SDL_Rect FrmMain::scaledRect(float x, float y, float w, float h)
 {

@@ -526,8 +526,10 @@ int pfrY(int plrFrame)
 
 void ScreenShot()
 {
+#ifndef __EMSCRIPTEN__
     frmMain.makeShot();
     PlaySound(12);
+#endif
     TakeScreen = false;
 }
 
