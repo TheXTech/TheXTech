@@ -559,6 +559,8 @@ bool FrmMain::isSdlError()
 
 void FrmMain::repaint()
 {
+    processRecorder();
+
     SDL_SetRenderTarget(m_gRenderer, nullptr);
 
     SDL_SetRenderDrawColor(m_gRenderer, 0, 0, 0, 255);
@@ -573,8 +575,6 @@ void FrmMain::repaint()
 
     SDL_RenderPresent(m_gRenderer);
     SDL_SetRenderTarget(m_gRenderer, m_tBuffer);
-
-    processRecorder();
 }
 
 void FrmMain::updateViewport()
@@ -1052,6 +1052,34 @@ static struct gifRecord
     uint32_t    delayTimer  = 0;
     bool        enabled     = false;
     unsigned char padding[7] = {0, 0, 0, 0, 0, 0, 0};
+    bool        fadeForward = true;
+    float       fadeValue = 0.5f;
+
+    void drawRecCircle()
+    {
+        if(fadeForward)
+        {
+            fadeValue += 0.01f;
+            if(fadeValue >= 1.0f)
+            {
+                fadeValue = 1.0f;
+                fadeForward = !fadeForward;
+            }
+        }
+        else
+        {
+            fadeValue -= 0.01f;
+            if(fadeValue < 0.5f)
+            {
+                fadeValue = 0.5f;
+                fadeForward = !fadeForward;
+            }
+        }
+
+        frmMain.renderCircle(50, 50, 20, 1.f, 0.f, 0.f, fadeValue, true);
+        SuperPrint("REC", 3, 25, 80, 1.f, 0.f, 0.f, fadeValue);
+    }
+
 } g_gif;
 
 bool FrmMain::recordInProcess()
@@ -1102,7 +1130,10 @@ void FrmMain::processRecorder()
     if(g_gif.delayTimer >= g_gif.delay * 10)
         g_gif.delayTimer = 0.0;
     if(g_gif.delayTimer != 0.0)
+    {
+        g_gif.drawRecCircle();
         return;
+    }
 
     const int w = ScreenW, h = ScreenH;
 
@@ -1122,6 +1153,8 @@ void FrmMain::processRecorder()
 #else
     processRecorder_action(reinterpret_cast<void *>(shoot));
 #endif
+
+    g_gif.drawRecCircle();
 }
 
 int FrmMain::processRecorder_action(void *_pixels)
@@ -1311,6 +1344,36 @@ void FrmMain::renderRectBR(int _left, int _top, int _right, int _bottom, float r
                            static_cast<unsigned char>(255.f * alpha)
                           );
     SDL_RenderFillRect(m_gRenderer, &aRect);
+}
+
+void FrmMain::renderCircle(int cx, int cy, int radius, float red, float green, float blue, float alpha, bool filled)
+{
+    UNUSED(filled);
+
+    SDL_SetRenderDrawColor(m_gRenderer,
+                               static_cast<unsigned char>(255.f * red),
+                               static_cast<unsigned char>(255.f * green),
+                               static_cast<unsigned char>(255.f * blue),
+                               static_cast<unsigned char>(255.f * alpha)
+                          );
+
+    for(double dy = 1; dy <= radius; dy += 1.0)
+    {
+        double dx = std::floor(std::sqrt((2.0 * radius * dy) - (dy * dy)));
+        SDL_RenderDrawLine(m_gRenderer,
+                           cx - dx,
+                           cy + dy - radius,
+                           cx + dx,
+                           cy + dy - radius);
+        if(dy < radius) // Don't cross lines
+        {
+            SDL_RenderDrawLine(m_gRenderer,
+                               cx - dx,
+                               cy - dy + radius,
+                               cx + dx,
+                               cy - dy + radius);
+        }
+    }
 }
 
 void FrmMain::renderTextureI(int xDst, int yDst, int wDst, int hDst,
