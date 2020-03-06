@@ -1,4 +1,4 @@
-/*
+﻿/*
  * A2xTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
@@ -315,11 +315,13 @@ void FrmMain::processEvent()
         {
             eventResize();
         }
+#ifndef __EMSCRIPTEN__
         else if(m_event.window.event == SDL_WINDOWEVENT_MAXIMIZED)
         {
             SDL_RestoreWindow(m_window);
             SetRes();
         }
+#endif
         break;
     case SDL_KEYDOWN:
         eventKeyDown(m_event.key);
@@ -365,6 +367,7 @@ bool FrmMain::hasWindowMouseFocus()
 
 void FrmMain::eventDoubleClick()
 {
+#ifndef __EMSCRIPTEN__
     if(resChanged)
     {
         frmMain.setFullScreen(false);
@@ -374,6 +377,7 @@ void FrmMain::eventDoubleClick()
     }
     else
         SetRes();
+#endif
 }
 
 void FrmMain::eventKeyDown(SDL_KeyboardEvent &evt)
@@ -585,7 +589,17 @@ void FrmMain::updateViewport()
 {
     float w, w1, h, h1;
     int   wi, hi;
+#ifndef __EMSCRIPTEN__
     SDL_GetWindowSize(m_window, &wi, &hi);
+#else
+    if(IsFullScreen(m_window))
+        SDL_GetWindowSize(m_window, &wi, &hi);
+    else
+    {
+        wi = ScreenW;
+        hi = ScreenH;
+    }
+#endif
 
     w = wi;
     h = hi;
@@ -624,7 +638,17 @@ void FrmMain::resetViewport()
 {
     float w, w1, h, h1;
     int   wi, hi;
+#ifndef __EMSCRIPTEN__
     SDL_GetWindowSize(m_window, &wi, &hi);
+#else
+    if(IsFullScreen(m_window))
+        SDL_GetWindowSize(m_window, &wi, &hi);
+    else
+    {
+        wi = ScreenW;
+        hi = ScreenH;
+    }
+#endif
     w = wi;
     h = hi;
     w1 = w;
