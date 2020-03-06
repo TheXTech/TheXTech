@@ -1066,7 +1066,14 @@ void UpdateGraphics(bool skipRepaint)
             }
         }
 
-
+        for(A = 1; A <= numNPCs; A++)
+        {
+            float cn = NPC[A].Shadow ? 0.f : 1.f;
+            if(NPC[A].Type == 294)
+            {
+                frmMain.renderTextureFL(vScreenX[Z] + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type], vScreenY[Z] + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type], NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, 0, NPC[A].Special6, nullptr, SDL_FLIP_NONE, cn, cn, cn);
+            }
+        }
         for(A = 1; A <= numNPCs; A++) // Display NPCs that should be behind other npcs
         {
             float cn = NPC[A].Shadow ? 0.f : 1.f;
@@ -1950,7 +1957,7 @@ void UpdateGraphics(bool skipRepaint)
                         if(tempStr == "The Invasion 3" || tempStr == "The Invasion 2" || tempStr == "The Princess Cliche")
                         {
                             SuperPrint(tempStr, 3, 300, 320 + (B * 30), 255);
-                            frmMain.renderTexture(300 + (tempStr.size()*18), 320 + (B * 30), GFX.MenuGFX[5]);
+                            frmMain.renderTexture(310 + (tempStr.size()*18), 320 + (B * 30), GFX.MenuGFX[5]);
                         }
                         else
                             SuperPrint(tempStr, 3, 300, 320 + (B * 30));

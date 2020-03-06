@@ -2397,7 +2397,6 @@ void UpdateNPCs()
                                                                     NPCHit(A, 3, A);
                                                             }
                                                         }
-
                                                         if(NPCIsACoin[NPC[A].Type] && NPC[A].Special == 0 && HitSpot > 0)
                                                             NPCHit(A, 3, A);
 
@@ -2502,8 +2501,11 @@ void UpdateNPCs()
                                                         {
                                                             if((NPC[A].Type == 13 || NPC[A].Type == 265) && NPC[A].Location.SpeedX == 0)
                                                                 NPCHit(A, 4, A);
-
-
+                                                            if(NPC[A].Type == 303)
+                                                            {
+                                                                NPC[A].Location.SpeedY = -3 - Block[B].Location.SpeedY;
+                                                                NPC[A].Location.Y = Block[B].Location.Y - Block[B].Location.Height - 0.2;
+                                                            }
                                                             if(NPC[A].Type == 197)
                                                                 NPC[A].Special = 1;
                                                             if(NPC[A].Type == 231 || NPC[A].Type == 235)
@@ -2748,6 +2750,8 @@ void UpdateNPCs()
                                                                 NPC[A].Location.SpeedX = NPC[A].Location.SpeedX - Block[B].Location.SpeedX * 1.2;
                                                             if(NPCIsAShell[NPC[A].Type] == true)
                                                                 NPC[A].Location.SpeedX = -NPC[A].Location.SpeedX;
+                                                            if(NPC[A].Type == 300 && NPC[A].Location.SpeedY == 0)
+                                                                NPC[A].Location.SpeedY = -7;
                                                             addBelt = NPC[A].Location.X - addBelt;
                                                         }
                                                         else if(HitSpot == 3) // Hitspot 3
@@ -2763,6 +2767,11 @@ void UpdateNPCs()
                                                             if(NPCIsAParaTroopa[NPC[A].Type])
                                                             {
                                                                 NPC[A].Location.SpeedY = 2 + Block[B].Location.SpeedY;
+                                                                NPC[A].Location.Y = Block[B].Location.Y + Block[B].Location.Height + 0.1;
+                                                            }
+                                                            if(NPC[A].Type == 303)
+                                                            {
+                                                                NPC[A].Location.SpeedY = 3 + Block[B].Location.SpeedY;
                                                                 NPC[A].Location.Y = Block[B].Location.Y + Block[B].Location.Height + 0.1;
                                                             }
                                                         }
@@ -2811,6 +2820,8 @@ void UpdateNPCs()
                                                                     else if(NPC[A].Location.X + NPC[A].Location.Width > Block[B].Location.X + Block[B].Location.Width && NPC[A].Location.SpeedX < 0)
                                                                         NPC[A].Location.SpeedX = -NPC[A].Location.SpeedX;
                                                                 }
+                                                                if(NPC[A].Type == 300 && NPC[A].Location.SpeedY == 0)
+                                                                    NPC[A].Location.SpeedY = -7;
                                                             }
                                                         }
                                                         if((NPC[A].Projectile & !(NPC[A].Type == 13)) != 0 && !(NPC[A].Type == 265) && !(NPC[A].Type == 58) && !(NPC[A].Type == 21 || NPC[A].Type == 67 || NPC[A].Type == 68 || NPC[A].Type == 69 || NPC[A].Type == 70)) // Hit the block if the NPC is a projectile

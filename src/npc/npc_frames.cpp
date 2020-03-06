@@ -1285,9 +1285,13 @@ void NPCFrames(int A)
         if(NPC[A].Direction == 1)
             NPC[A].Frame = NPC[A].Frame + 3;
     }
-    else if(NPC[A].Type == 294 || NPC[A].Type == 295 || NPC[A].Type == 297)
+    else if(NPC[A].Type == 295 || NPC[A].Type == 297)
     {
         NPC[A].Frame = 0;
+    }
+    else if(NPC[A].Type == 294)
+    {
+        NPC[A].Frame = -1;
     }
     else if(NPC[A].Type == 55) // nekkid koopa
     {

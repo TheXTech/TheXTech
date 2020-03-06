@@ -1388,6 +1388,7 @@ void MoreScore(int addScore, Location_t Loc, int &Multiplier)
 
 void SizableBlocks()
 {
+    BlockIsSizable[698] = true;
     BlockIsSizable[568] = true;
     BlockIsSizable[579] = true;
     BlockIsSizable[575] = true;

@@ -2243,6 +2243,17 @@ void SetupVars()
     BlockSlope2[661] = -1;
     BlockWidth[661] = 64;
 
+    For(A, 687, 690)
+    {
+        BlockWidth[A] = 64;
+    }
+
+
+    For(A, 692, 694)
+    {
+        BlockHeight[A] = 64;
+    }
+
     For(A, 137, 146)
     {
         BlockWidth[A] = 64;

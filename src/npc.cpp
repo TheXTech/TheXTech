@@ -1128,21 +1128,12 @@ void NPCSpecial(int A)
     else if(NPC[A].Type == 303)
     {
         NPC[A].Location.SpeedX = 3 * NPC[A].Direction;
-        for(B = 1; B <= numBlock; B++)
+        NPC[A].Special++;
+        if(NPC[A].Special > 200)
         {
-            if(CheckCollision(NPC[A].Location, Block[B].Location) == true && NPC[A].Location.SpeedY < Physics.NPCGravity)
-            {
-                NPC[A].Location.SpeedY = 3;
-                NPC[A].Location.Y = NPC[A].Location.Y + 3;
-            }
-            else if(CheckCollision(NPC[A].Location, Block[B].Location) == true && NPC[A].Location.SpeedY > Physics.NPCGravity)
-            {
-                NPC[A].Location.SpeedY = -3;
-                NPC[A].Location.Y = NPC[A].Location.Y - 3;
-            }
+            NPC[A].Killed = 9;
+            NewEffect(131, NPC[A].Location);
         }
-
-
     }
     else if(NPC[A].Type == 280)
     {
@@ -2361,6 +2352,7 @@ void NPCSpecial(int A)
             NPC[A].Location.SpeedX = 2.42 * NPC[A].Direction;
             NPC[A].Location.SpeedY = NPC[A].Location.SpeedY + Physics.NPCGravity;
         }
+        NPC[A].Special6 = NPC[A].Special6 + NPC[A].Location.SpeedX * 1.5;
     }
     else if(NPC[A].Type == 200) // King Koopa
     {
