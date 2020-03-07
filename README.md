@@ -48,6 +48,7 @@ Here are many ways to play games with it:
 - For music and SFX, the MixerX library is used to give a support for a wide amount of sound and music formats!
 - It doesn't embeds any graphics: here is NO any trurely hardcoded graphics, everything now representing as an external graphics!
 - Some internal limits was been expanded.
+- Built-in GIF recorder by F11 key (F10 on macOS, F11 is reserved by system UI for a "show desktop" action)
 
 ## How to build it?
 To build it, you need to have next things:
