@@ -890,6 +890,8 @@ void MenuLoop()
                     DoEvents();
 //                    Sleep 500
                     PGE_Delay(500);
+
+                    ClearGame();
 //                    OpenWorld SelectWorld(selWorld).WorldPath & SelectWorld(selWorld).WorldFile
                     OpenWorld(SelectWorld[selWorld].WorldPath + SelectWorld[selWorld].WorldFile);
 //                    If SaveSlot(selSave) >= 0 Then

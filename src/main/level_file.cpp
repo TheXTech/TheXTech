@@ -239,7 +239,7 @@ void OpenLevel(std::string FilePath)
         NPC[numNPCs].Location.X = n.x;
         NPC[numNPCs].Location.Y = n.y;
         if(!LevelEditor)
-            NPC[numNPCs].Location.Y = NPC[numNPCs].Location.Y - 0.01;
+            NPC[numNPCs].Location.Y -= 0.01;
         NPC[numNPCs].Direction = n.direct;
         NPC[numNPCs].Type = int(n.id);
 
@@ -317,7 +317,7 @@ void OpenLevel(std::string FilePath)
         else if(NPC[numNPCs].Type == 97 || NPC[numNPCs].Type == 196) // Is a star
         {
             bool tempBool = false;
-            for(B = 1; B <= numStars; B++)
+            for(B = 1; B <= numStars; ++B)
             {
                 if(Star[B].level == FileName && (Star[B].Section == NPC[numNPCs].Section || Star[B].Section == -1))
                     tempBool = true;
