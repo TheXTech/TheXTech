@@ -36,7 +36,7 @@ void OpenWorld(std::string FilePath)
 {
     // USE PGE-FL here
     std::string newInput = "";
-    int FileRelease = 0;
+    int FileRelease = 64;
     int A = 0;
     int B = 0;
     WorldData wld;
@@ -54,6 +54,9 @@ void OpenWorld(std::string FilePath)
     FileNameFull = Files::basename(FilePath);
     FileName = wld.meta.filename; //FilePath.substr(FilePath.length() - (FilePath.length() - A));
     FileNamePath = wld.meta.path + "/"; //FilePath.substr(0, (A));
+
+    if(wld.meta.RecentFormat == LevelData::SMBX64)
+        FileRelease = int(wld.meta.RecentFormatVersion);
 
     LoadWorldCustomGFX();
 
@@ -148,6 +151,7 @@ void OpenWorld(std::string FilePath)
         WorldPath[numWorldPaths].Type = int(p.id);
         WorldPath[numWorldPaths].Location.Width = 32;
         WorldPath[numWorldPaths].Location.Height = 32;
+        WorldPath[numWorldPaths].Active = false;
 //        if(LevelEditor == true)
 //            WorldPath[numWorldPaths].Active = true;
     }
@@ -214,16 +218,17 @@ void OpenWorld(std::string FilePath)
     {
         for(A = 1; A <= numWorldLevels; A++)
         {
-            if((FileRelease <= 20 && WorldLevel[A].Type == 1) || (FileRelease > 20 && WorldLevel[A].Start == true))
+            if((FileRelease <= 20 && WorldLevel[A].Type == 1) || (FileRelease > 20 && WorldLevel[A].Start))
             {
                 WorldPlayer[1].Type = 1;
                 WorldPlayer[1].Location = WorldLevel[A].Location;
                 break;
             }
         }
+
         for(A = 1; A <= numWorldLevels; A++)
         {
-            if((FileRelease <= 20 && WorldLevel[A].Type == 1) || (FileRelease > 20 && WorldLevel[A].Start == true))
+            if((FileRelease <= 20 && WorldLevel[A].Type == 1) || (FileRelease > 20 && WorldLevel[A].Start))
             {
                 WorldLevel[A].Active = true;
                 LevelPath(A, 5, true);
