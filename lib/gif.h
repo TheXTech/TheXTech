@@ -55,6 +55,8 @@
 #define GIF_FREE free
 #endif
 
+#include "gif_writer.h"
+
 namespace GIF_H
 {
 
@@ -747,13 +749,8 @@ static void GifWriteLzwImage(FILE* f, uint8_t* image, uint32_t left, uint32_t to
     GIF_TEMP_FREE(codetree);
 }
 
-struct GifWriter
-{
-    FILE* f;
-    uint8_t* oldImage;
-    bool firstFrame;
-    long int delaypos;
-};
+
+// GifWriter moved into the own header
 
 // Creates a gif file.
 // The input GIFWriter is assumed to be uninitialized.

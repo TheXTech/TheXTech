@@ -30,8 +30,11 @@
 #include <set>
 #include <SDL2/SDL.h>
 
+#include <gif_writer.h>
+
 #include "std_picture.h"
 #include "cmd_line_setup.h"
+
 
 class FrmMain
 {
@@ -126,6 +129,24 @@ public:
 
 private:
 #ifndef __EMSCRIPTEN__
+
+    struct GifRecorder
+    {
+        GIF_H::GifWriter  writer      = {nullptr, nullptr, true, false};
+        SDL_Thread *worker      = nullptr;
+        SDL_mutex  *mutex       = nullptr;
+        uint32_t    delay       = 4;
+        uint32_t    delayTimer  = 0;
+        bool        enabled     = false;
+        unsigned char padding[7] = {0, 0, 0, 0, 0, 0, 0};
+        bool        fadeForward = true;
+        float       fadeValue = 0.5f;
+
+        void drawRecCircle();
+    };
+
+    GifRecorder m_gif;
+
     bool recordInProcess();
     void toggleGifRecorder();
     void processRecorder();
