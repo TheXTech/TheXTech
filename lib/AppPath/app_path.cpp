@@ -194,10 +194,10 @@ void AppPathManager::initAppPath()
         DirMan appDir(userDirPath);
         if(!appDir.exists() && !appDir.mkpath(userDirPath))
             goto defaultSettingsPath;
-#ifdef __APPLE__
-        if(!DirMan::exists(ApplicationPathSTD + "/Data directory"))
-            symlink((userDirPath).c_str(), (ApplicationPathSTD + "/Data directory").c_str());
-#endif
+// #ifdef __APPLE__
+//         if(!DirMan::exists(ApplicationPathSTD + "/Data directory"))
+//             symlink((userDirPath).c_str(), (ApplicationPathSTD + "/Data directory").c_str());
+// #endif
 
 #ifdef __ANDROID__
         std::string noMediaFile = userDirPath + "/.nomedia";
