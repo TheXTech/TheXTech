@@ -366,6 +366,7 @@ void NPCSpecial(int A)
     bool tempBool = false;
     bool tempBool2 = false;
     Location_t tempLocation;
+    Location_t tempLocation2;
     NPC_t tempNPC;
 
     // dont despawn
@@ -1137,6 +1138,57 @@ void NPCSpecial(int A)
         }
 
         // ludwig koopa
+    }
+    else if(NPC[A].Type == 309) // chomp rock
+    {
+        for(B = 1; B <= numPlayers; B++)
+        {
+            tempLocation.Height = NPC[A].Location.Height - 3;
+            tempLocation.Width = NPC[A].Location.Width / 2;
+            tempLocation.SpeedX = NPC[A].Location.SpeedX;
+            tempLocation.SpeedY = NPC[A].Location.SpeedY;
+            tempLocation.X = NPC[A].Location.X - 1;
+            tempLocation.Y = NPC[A].Location.Y + 1;
+
+            tempLocation2.Height = NPC[A].Location.Height - 3;
+            tempLocation2.Width = NPC[A].Location.Width / 2;
+            tempLocation2.SpeedX = NPC[A].Location.SpeedX;
+            tempLocation2.SpeedY = NPC[A].Location.SpeedY;
+            tempLocation2.X = NPC[A].Location.X + (NPC[A].Location.Width / 2) + 1;
+            tempLocation2.Y = NPC[A].Location.Y + 1;
+            if(Player[B].Dead == false && Player[B].Section == NPC[A].Section)
+            {
+                if(CheckCollision(tempLocation, Player[B].Location) == true)
+                {
+                    if(Player[B].Location.SpeedX > 0)
+                    {
+                        NPC[A].Location.SpeedX = std::abs(Player[B].Location.SpeedX / 1.32) * 1;
+                    }
+                }
+                else
+                    NPC[A].Location.SpeedX = 0;
+                if(CheckCollision(tempLocation2, Player[B].Location) == true)
+                {
+                    if(Player[B].Location.SpeedX != 0)
+                    {
+                        NPC[A].Location.SpeedX = std::abs(Player[B].Location.SpeedX / 1.32) * -1;
+                    }
+                }
+                else
+                    NPC[A].Location.SpeedX = 0;
+            }
+        }
+        if(NPC[A].Location.SpeedX > 5)
+            NPC[A].Location.SpeedX = 5;
+        else if(NPC[A].Location.SpeedX < -5)
+            NPC[A].Location.SpeedX = -5;
+
+        const double rad2deg = 180.0 / M_PI;
+        NPC[A].Special6 +=  (NPC[A].Location.SpeedX / (0.5 * NPC[A].Location.Height)) * rad2deg;
+        while(NPC[A].Special6 >= 360)
+        NPC[A].Special6 -= 360;
+        while(NPC[A].Special6 < 0)
+        NPC[A].Special6 += 360;
     }
     else if(NPC[A].Type == 303)
     {
@@ -2376,7 +2428,12 @@ void NPCSpecial(int A)
             NPC[A].Location.SpeedX = 2.42 * NPC[A].Direction;
             NPC[A].Location.SpeedY = NPC[A].Location.SpeedY + Physics.NPCGravity;
         }
-        NPC[A].Special6 = NPC[A].Special6 + NPC[A].Location.SpeedX * 1.5;
+        const double rad2deg = 180.0 / M_PI;
+        NPC[A].Special6 +=  (NPC[A].Location.SpeedX / (0.5 * NPC[A].Location.Height)) * rad2deg;
+        while(NPC[A].Special6 >= 360)
+        NPC[A].Special6 -= 360;
+        while(NPC[A].Special6 < 0)
+        NPC[A].Special6 += 360;
     }
     else if(NPC[A].Type == 200) // King Koopa
     {

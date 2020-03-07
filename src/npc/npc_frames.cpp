@@ -1289,7 +1289,7 @@ void NPCFrames(int A)
     {
         NPC[A].Frame = 0;
     }
-    else if(NPC[A].Type == 294)
+    else if(NPC[A].Type == 294 || NPC[A].Type == 309)
     {
         NPC[A].Frame = -1;
     }

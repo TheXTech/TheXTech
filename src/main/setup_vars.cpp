@@ -844,6 +844,9 @@ void SetupVars()
     NPCWidth[66] = 96; // red platform
     NPCHeight[66] = 32;
     NPCNoYoshi[66] = true;
+    NPCWidth[309] = 64; // chomp rock
+    NPCHeight[309] = 64;
+    NPCNoYoshi[309] = true;
     NPCWidth[67] = 128; // grey pipe x
     NPCHeight[67] = 32;
     NPCNoYoshi[67] = true;
@@ -1586,6 +1589,7 @@ void SetupVars()
     NPCCanWalkOn[64] = true;
     NPCCanWalkOn[66] = true;
     NPCCanWalkOn[67] = true;
+    NPCCanWalkOn[309] = true;
     NPCCanWalkOn[68] = true;
     NPCCanWalkOn[69] = true;
     NPCCanWalkOn[70] = true;
@@ -1672,7 +1676,7 @@ void SetupVars()
     NPCMovesPlayer[212] = true;
     NPCMovesPlayer[57] = true;
     NPCMovesPlayer[58] = true;
-    NPCMovesPlayer[67] = true;
+    NPCMovesPlayer[309] = true;
     NPCMovesPlayer[68] = true;
     NPCMovesPlayer[69] = true;
     NPCMovesPlayer[70] = true;
@@ -1707,6 +1711,7 @@ void SetupVars()
     NPCWontHurt[64] = true;
     NPCWontHurt[66] = true;
     NPCWontHurt[67] = true;
+    NPCWontHurt[309] = true;
     NPCWontHurt[68] = true;
     NPCWontHurt[69] = true;
     NPCWontHurt[70] = true;
@@ -1761,6 +1766,7 @@ void SetupVars()
     NPCIsABlock[57] = true;
     NPCIsABlock[58] = true;
     NPCIsABlock[67] = true;
+    NPCIsABlock[309] = true;
     NPCIsABlock[68] = true;
     NPCIsABlock[69] = true;
     NPCIsABlock[70] = true;
