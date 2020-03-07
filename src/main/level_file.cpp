@@ -319,7 +319,7 @@ void OpenLevel(std::string FilePath)
             bool tempBool = false;
             for(B = 1; B <= numStars; ++B)
             {
-                if(Star[B].level == FileName && (Star[B].Section == NPC[numNPCs].Section || Star[B].Section == -1))
+                if(Star[B].level == FileNameFull && (Star[B].Section == NPC[numNPCs].Section || Star[B].Section == -1))
                     tempBool = true;
             }
 
