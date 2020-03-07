@@ -30,6 +30,10 @@
 #include <set>
 #include <SDL2/SDL.h>
 
+#ifndef __EMSCRIPTEN__
+#include <deque>
+#endif
+
 #include <gif_writer.h>
 
 #include "std_picture.h"
@@ -130,11 +134,18 @@ public:
 private:
 #ifndef __EMSCRIPTEN__
 
+    struct PGE_GL_shoot
+    {
+        FrmMain *me = nullptr;
+        uint8_t *pixels = nullptr;
+        int pitch = 0;
+        int w = 0, h = 0;
+    };
+
     struct GifRecorder
     {
         GIF_H::GifWriter  writer      = {nullptr, nullptr, true, false};
         SDL_Thread *worker      = nullptr;
-        SDL_mutex  *mutex       = nullptr;
         uint32_t    delay       = 4;
         uint32_t    delayTimer  = 0;
         bool        enabled     = false;
@@ -142,7 +153,17 @@ private:
         bool        fadeForward = true;
         float       fadeValue = 0.5f;
 
+        std::deque<PGE_GL_shoot> queue;
+        SDL_mutex  *mutex = nullptr;
+        bool        doFinalize = false;
+
+        void init();
+        void quit();
+
         void drawRecCircle();
+        bool hasSome();
+        void enqueue(const PGE_GL_shoot &entry);
+        PGE_GL_shoot dequeue();
     };
 
     GifRecorder m_gif;
@@ -158,16 +179,6 @@ private:
 
     void lazyLoad(StdPicture &target);
     void lazyUnLoad(StdPicture &target);
-
-#ifndef __EMSCRIPTEN__
-    struct PGE_GL_shoot
-    {
-        FrmMain *me = nullptr;
-        uint8_t *pixels = nullptr;
-        int pitch = 0;
-        int w = 0, h = 0;
-    };
-#endif
 
     std::string g_ScreenshotPath;
 
