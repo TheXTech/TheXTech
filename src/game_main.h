@@ -79,7 +79,7 @@ void SaveGame();
 
 void LoadGame();
 //! Removes gamesave file and restores initial state of all level objects
-void ClearGame();
+void ClearGame(bool punnish = false);
 
 void PauseGame(int plr);
 

@@ -76,7 +76,7 @@ void CheatCode(char NewKey)
         Lives = 0;
         Coins = 0;
         GodMode = false;
-        ClearGame(); // As a penalty, remove the saved game
+        ClearGame(true); // As a penalty, remove the saved game
         Cheater = true;
         CheatString.clear();
 
