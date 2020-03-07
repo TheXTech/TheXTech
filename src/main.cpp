@@ -32,6 +32,7 @@
 
 #ifdef __APPLE__
 #include <Utils/files.h>
+#include <Logger/logger.h>
 
 static std::string g_fileToOpen;
 /**
@@ -41,7 +42,7 @@ static void macosReceiveOpenFile()
 {
     if(g_fileToOpen.empty())
     {
-        // pLogDebug("Attempt to take Finder args...");
+        pLogDebug("Attempt to take Finder args...");
         SDL_EventState(SDL_DROPFILE, SDL_ENABLE);
         SDL_Event event;
         while(SDL_PollEvent(&event))
@@ -52,10 +53,10 @@ static void macosReceiveOpenFile()
                 if(Files::fileExists(file))
                 {
                     g_fileToOpen = file;
-                    //pLogDebug("Got file path: [%s]", file.c_str());
+                    pLogDebug("Got file path: [%s]", file.c_str());
                 }
-                //else
-                //    pLogWarning("Invalid file path, sent by Mac OS X Finder event: [%s]", file.c_str());
+                else
+                    pLogWarning("Invalid file path, sent by Mac OS X Finder event: [%s]", file.c_str());
             }
         }
         SDL_EventState(SDL_DROPFILE, SDL_DISABLE);
@@ -228,6 +229,15 @@ int main(int argc, char**argv)
         return 2;
     }
 
+    // set this flag before SDL initialization to allow game be quit when closing a window before a loading process will be completed
+    GameIsActive = true;
+
+    if(frmMain.initSDL(setup))
+    {
+        frmMain.freeSDL();
+        return 1;
+    }
+
 #ifdef __APPLE__
     macosReceiveOpenFile();
     if(!g_fileToOpen.empty())
@@ -241,15 +251,6 @@ int main(int argc, char**argv)
         setup.testMaxFPS = false;
     }
 #endif
-
-    // set this flag before SDL initialization to allow game be quit when closing a window before a loading process will be completed
-    GameIsActive = true;
-
-    if(frmMain.initSDL(setup))
-    {
-        frmMain.freeSDL();
-        return 1;
-    }
 
     int ret = GameMain(setup);
     frmMain.freeSDL();
