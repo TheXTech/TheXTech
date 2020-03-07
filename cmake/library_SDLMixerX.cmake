@@ -39,6 +39,63 @@ endif()
 set(SDL2_INCLUDE_DIRS ${DEPENDENCIES_INSTALL_DIR}/include/SDL2)
 set(SDL2_LIBRARIES ${DEPENDENCIES_INSTALL_DIR}/lib)
 
+set(MixerX_SysLibs)
+
+if(WIN32 AND NOT EMSCRIPTEN)
+    list(APPEND MixerX_SysLibs
+        version opengl32 dbghelp advapi32 kernel32 winmm imm32 setupapi
+    )
+endif()
+
+if(NOT WIN32 AND NOT EMSCRIPTEN AND NOT APPLE AND NOT ANDROID)
+    find_library(_LIB_GL GL)
+    if(_LIB_GL)
+        list(APPEND MixerX_SysLibs ${_LIB_GL})
+    endif()
+
+    find_library(_lib_dl dl)
+    if(_lib_dl)
+        list(APPEND MixerX_SysLibs ${_lib_dl})
+    endif()
+endif()
+
+if(ANDROID)
+    list(APPEND MixerX_SysLibs
+        GLESv1_CM GLESv2 OpenSLES log dl hidapi android
+    )
+endif()
+
+if(HAIKU)
+    list(APPEND MixerX_SysLibs
+        be device game media
+    )
+endif()
+
+if(APPLE)
+    find_library(COREAUDIO_LIBRARY CoreAudio)
+    list(APPEND MixerX_SysLibs ${COREAUDIO_LIBRARY})
+    find_library(COREVIDEO_LIBRARY CoreVideo)
+    list(APPEND MixerX_SysLibs ${COREVIDEO_LIBRARY})
+    find_library(IOKIT_LIBRARY IOKit)
+    list(APPEND MixerX_SysLibs ${IOKIT_LIBRARY})
+    find_library(CARBON_LIBRARY Carbon)
+    list(APPEND MixerX_SysLibs ${CARBON_LIBRARY})
+    find_library(COCOA_LIBRARY Cocoa)
+    list(APPEND MixerX_SysLibs ${COCOA_LIBRARY})
+    find_library(FORCEFEEDBAK_LIBRARY ForceFeedback)
+    list(APPEND MixerX_SysLibs ${FORCEFEEDBAK_LIBRARY})
+    find_library(METAL_LIBRARY Metal)
+    list(APPEND MixerX_SysLibs ${METAL_LIBRARY})
+    find_library(COREFOUNDATION_LIBRARY CoreFoundation)
+    list(APPEND MixerX_SysLibs ${COREFOUNDATION_LIBRARY})
+    find_library(AUDIOTOOLBOX_LIBRARY AudioToolbox)
+    list(APPEND MixerX_SysLibs ${AUDIOTOOLBOX_LIBRARY})
+    find_library(AUDIOUNIT_LIBRARY AudioUnit)
+    list(APPEND MixerX_SysLibs ${AUDIOUNIT_LIBRARY})
+    find_library(OPENGL_LIBRARY OpenGL)
+    list(APPEND MixerX_SysLibs ${OPENGL_LIBRARY})
+endif()
+
 set(MixerX_CodecLibs
     "${SDL2_LIBRARIES}/${CMAKE_STATIC_LIBRARY_PREFIX}FLAC${CMAKE_STATIC_LIBRARY_SUFFIX}"
     "${SDL2_LIBRARIES}/${CMAKE_STATIC_LIBRARY_PREFIX}vorbisfile${CMAKE_STATIC_LIBRARY_SUFFIX}"
@@ -103,6 +160,7 @@ target_link_libraries(PGE_SDLMixerX_static INTERFACE
     "${SDL_MixerX_A_Lib}"
     ${MixerX_CodecLibs}
     "${SDL2_A_Lib}"
+    "${MixerX_SysLibs}"
 )
 
 if(PGE_SHARED_SDLMIXER AND NOT WIN32)
