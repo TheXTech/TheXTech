@@ -159,7 +159,7 @@ set(LIB_SRC
 )
 
 if(APPLE)
-    list(APPEND LIB_SRC lib/AppPath/app_path_macos.m)
+    list(APPEND LIB_SRC lib/AppPath/app_path_macosx.m)
 endif()
 
 set(A2XTECH_SRC
