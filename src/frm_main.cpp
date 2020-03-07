@@ -399,7 +399,11 @@ void FrmMain::eventKeyDown(SDL_KeyboardEvent &evt)
 #ifndef __EMSCRIPTEN__
     if(KeyCode == SDL_SCANCODE_F12)
         TakeScreen = true;
+#   ifdef __APPLE__
+    else if(KeyCode == SDL_SCANCODE_F10) // Reserved by macOS as "show desktop"
+#   else
     else if(KeyCode == SDL_SCANCODE_F11)
+#   endif
         toggleGifRecorder();
 #endif
 }
@@ -1082,55 +1086,41 @@ static std::string shoot_getTimedString(std::string path, const char *ext = "png
     }
 }
 
-static struct gifRecord
+void FrmMain::GifRecorder::drawRecCircle()
 {
-    GIF_H::GifWriter  writer      = {nullptr, nullptr, true, false};
-    SDL_Thread *worker      = nullptr;
-    SDL_mutex  *mutex       = nullptr;
-    uint32_t    delay       = 4;
-    uint32_t    delayTimer  = 0;
-    bool        enabled     = false;
-    unsigned char padding[7] = {0, 0, 0, 0, 0, 0, 0};
-    bool        fadeForward = true;
-    float       fadeValue = 0.5f;
-
-    void drawRecCircle()
+    if(fadeForward)
     {
-        if(fadeForward)
+        fadeValue += 0.01f;
+        if(fadeValue >= 1.0f)
         {
-            fadeValue += 0.01f;
-            if(fadeValue >= 1.0f)
-            {
-                fadeValue = 1.0f;
-                fadeForward = !fadeForward;
-            }
+            fadeValue = 1.0f;
+            fadeForward = !fadeForward;
         }
-        else
+    }
+    else
+    {
+        fadeValue -= 0.01f;
+        if(fadeValue < 0.5f)
         {
-            fadeValue -= 0.01f;
-            if(fadeValue < 0.5f)
-            {
-                fadeValue = 0.5f;
-                fadeForward = !fadeForward;
-            }
+            fadeValue = 0.5f;
+            fadeForward = !fadeForward;
         }
-
-        frmMain.renderCircle(50, 50, 20, 1.f, 0.f, 0.f, fadeValue, true);
-        SuperPrint("REC", 3, 25, 80, 1.f, 0.f, 0.f, fadeValue);
     }
 
-} g_gif;
+    frmMain.renderCircle(50, 50, 20, 1.f, 0.f, 0.f, fadeValue, true);
+    SuperPrint("REC", 3, 25, 80, 1.f, 0.f, 0.f, fadeValue);
+}
 
 bool FrmMain::recordInProcess()
 {
-    return g_gif.enabled;
+    return m_gif.enabled;
 }
 
 void FrmMain::toggleGifRecorder()
 {
     (void)GIF_H::GifOverwriteLastDelay;// shut up a warning about unused function
 
-    if(!g_gif.enabled)
+    if(!m_gif.enabled)
     {
         if(!DirMan::exists(g_ScreenshotPath))
             DirMan::mkAbsDir(g_ScreenshotPath);
@@ -1138,39 +1128,39 @@ void FrmMain::toggleGifRecorder()
         std::string saveTo = shoot_getTimedString(g_ScreenshotPath, "gif");
 
         FILE *gifFile = Files::utf8_fopen(saveTo.data(), "wb");
-        if(GIF_H::GifBegin(&g_gif.writer, gifFile, ScreenW, ScreenH, g_gif.delay, false))
+        if(GIF_H::GifBegin(&m_gif.writer, gifFile, ScreenW, ScreenH, m_gif.delay, false))
         {
-            g_gif.enabled = true;
+            m_gif.enabled = true;
             PlaySound(6);
         }
     }
     else
     {
 #ifndef PGE_NO_THREADING
-        if(g_gif.worker)
-            SDL_WaitThread(g_gif.worker, nullptr);
-        g_gif.worker = nullptr;
+        if(m_gif.worker)
+            SDL_WaitThread(m_gif.worker, nullptr);
+        m_gif.worker = nullptr;
 #endif
         //if(g_gif.mutex)
         //    SDL_DestroyMutex(g_gif.mutex);
         //g_gif.mutex = nullptr;
-        GIF_H::GifEnd(&g_gif.writer);
-        g_gif.enabled = false;
+        GIF_H::GifEnd(&m_gif.writer);
+        m_gif.enabled = false;
         PlaySound(5);
     }
 }
 
 void FrmMain::processRecorder()
 {
-    if(!g_gif.enabled)
+    if(!m_gif.enabled)
         return;
 
-    g_gif.delayTimer += int(1000.0 / 65.0);
-    if(g_gif.delayTimer >= g_gif.delay * 10)
-        g_gif.delayTimer = 0.0;
-    if(g_gif.delayTimer != 0.0)
+    m_gif.delayTimer += int(1000.0 / 65.0);
+    if(m_gif.delayTimer >= m_gif.delay * 10)
+        m_gif.delayTimer = 0.0;
+    if(m_gif.delayTimer != 0.0)
     {
-        g_gif.drawRecCircle();
+        m_gif.drawRecCircle();
         return;
     }
 
@@ -1186,32 +1176,32 @@ void FrmMain::processRecorder()
     shoot->pitch = w * 4;
     shoot->me = this;
 #ifndef PGE_NO_THREADING
-    if(g_gif.worker)
-        SDL_WaitThread(g_gif.worker, nullptr);
-    g_gif.worker = SDL_CreateThread(processRecorder_action, "gif_recorder", reinterpret_cast<void *>(shoot));
+    if(m_gif.worker)
+        SDL_WaitThread(m_gif.worker, nullptr);
+    m_gif.worker = SDL_CreateThread(processRecorder_action, "gif_recorder", reinterpret_cast<void *>(shoot));
 #else
     processRecorder_action(reinterpret_cast<void *>(shoot));
 #endif
 
-    g_gif.drawRecCircle();
+    m_gif.drawRecCircle();
 }
 
 int FrmMain::processRecorder_action(void *_pixels)
 {
-    //SDL_LockMutex(g_gif.mutex);
-
     PGE_GL_shoot *shoot = reinterpret_cast<PGE_GL_shoot *>(_pixels);
-//    FrmMain *me = shoot->me;
-    GifWriteFrame(&g_gif.writer, shoot->pixels,
+    FrmMain *me = shoot->me;
+
+    //SDL_LockMutex(me->m_gif.mutex);
+    GifWriteFrame(&me->m_gif.writer, shoot->pixels,
                   unsigned(shoot->w),
                   unsigned(shoot->h),
-                  g_gif.delay/*uint32_t((ticktime)/10.0)*/, 8, false);
+                  me->m_gif.delay/*uint32_t((ticktime)/10.0)*/, 8, false);
     delete[] shoot->pixels;
     shoot->pixels = nullptr;
     delete []shoot;
 
-    //SDL_UnlockMutex(g_gif.mutex);
-    g_gif.worker = nullptr;
+    //SDL_UnlockMutex(me->m_gif.mutex);
+    me->m_gif.worker = nullptr;
     return 0;
 }
 

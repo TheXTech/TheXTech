@@ -29,6 +29,41 @@
 #include <tclap/CmdLine.h>
 #include <Utils/strings.h>
 
+
+#ifdef __APPLE__
+#include <Utils/files.h>
+#include <Logger/logger.h>
+
+static std::string g_fileToOpen;
+/**
+ * @brief Receive an opened file from the Finder (Must be created at least one window!)
+ */
+static void macosReceiveOpenFile()
+{
+    if(g_fileToOpen.empty())
+    {
+        pLogDebug("Attempt to take Finder args...");
+        SDL_EventState(SDL_DROPFILE, SDL_ENABLE);
+        SDL_Event event;
+        while(SDL_PollEvent(&event))
+        {
+            if(event.type == SDL_DROPFILE)
+            {
+                std::string file(event.drop.file);
+                if(Files::fileExists(file))
+                {
+                    g_fileToOpen = file;
+                    pLogDebug("Got file path: [%s]", file.c_str());
+                }
+                else
+                    pLogWarning("Invalid file path, sent by Mac OS X Finder event: [%s]", file.c_str());
+            }
+        }
+        SDL_EventState(SDL_DROPFILE, SDL_DISABLE);
+    }
+}
+#endif
+
 static void strToPlayerSetup(int player, const std::string &setupString)
 {
     if(setupString.empty())
@@ -202,6 +237,20 @@ int main(int argc, char**argv)
         frmMain.freeSDL();
         return 1;
     }
+
+#ifdef __APPLE__
+    macosReceiveOpenFile();
+    if(!g_fileToOpen.empty())
+    {
+        setup.testLevel = g_fileToOpen;
+        setup.testLevelMode = !setup.testLevel.empty();
+        setup.testNumPlayers = 1;
+        setup.testGodMode = false;
+        setup.testGrabAll = false;
+        setup.testShowFPS = false;
+        setup.testMaxFPS = false;
+    }
+#endif
 
     int ret = GameMain(setup);
     frmMain.freeSDL();

@@ -79,3 +79,4 @@ build/
 .idea/*
 cmake-build-*/*
 
+.vscode/*

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(A2xTech LANGUAGES CXX)
+project(A2xTech LANGUAGES C CXX)
 
 include(CheckCXXCompilerFlag)
 include(ExternalProject)
@@ -159,7 +159,12 @@ set(LIB_SRC
 )
 
 if(APPLE)
-    list(APPEND LIB_SRC lib/AppPath/app_path_macosx.m)
+    file(GLOB PGE_FILE_ICONS "${CMAKE_CURRENT_SOURCE_DIR}/resources/file_icons/*.icns")
+    list(APPEND LIB_SRC 
+        lib/AppPath/app_path_macosx.m
+        resources/a2xtech.icns
+        ${PGE_FILE_ICONS}
+    )
 endif()
 
 set(A2XTECH_SRC
@@ -219,6 +224,33 @@ endif()
 
 add_executable(a2xtech ${A2XTECH_SRC} ${LIB_SRC})
 pge_set_nopie(a2xtech)
+
+if(APPLE)
+    set_target_properties(a2xtech PROPERTIES
+        OUTPUT_NAME "A2xTech"
+        MACOSX_BUNDLE TRUE
+        MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/resources/a2xtech.plist.in"
+        MACOSX_BUNDLE_EXECUTABLE_NAME "a2xtech"
+        MACOSX_BUNDLE_GUI_IDENTIFIER "ru.wohlsoft.a2xtech"
+        MACOSX_BUNDLE_SHORT_VERSION_STRING "${A2XTECH_VERSION_STRING}"
+        MACOSX_BUNDLE_LONG_VERSION_STRING "${A2XTECH_VERSION_STRING}"
+        MACOSX_BUNDLE_ICON_FILE "a2xtech.icns"
+        CPACK_BUNDLE_NAME "A2xTech"
+        MACOSX_BUNDLE_INFO_STRING "A2xTech classic game engine"
+    )
+    set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/resources/a2xtech.icns" PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+    set_source_files_properties(${PGE_FILE_ICONS} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+
+    target_link_libraries(A2XT_Int INTERFACE iconv)
+    if(PGE_USE_LUAJIT)
+        # Required to link on 64-bit macOS
+        # See: http://luajit.org/install.html
+        set_property(TARGET a2xtech APPEND_STRING PROPERTY
+            LINK_FLAGS " -pagezero_size 10000 -image_base 100000000"
+        )
+    endif()
+endif()
+
 target_include_directories(a2xtech PRIVATE src lib ${A2XT_INCS})
 target_link_libraries(a2xtech PRIVATE A2XT_Int)
 
