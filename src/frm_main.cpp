@@ -399,11 +399,11 @@ void FrmMain::eventKeyDown(SDL_KeyboardEvent &evt)
 #ifndef __EMSCRIPTEN__
     if(KeyCode == SDL_SCANCODE_F12)
         TakeScreen = true;
-#ifdef __APPLE__
-    else if(KeyCode == SDL_SCANCODE_F10) // Reserved by OS as "show desktop"
-#else
+#   ifdef __APPLE__
+    else if(KeyCode == SDL_SCANCODE_F10) // Reserved by macOS as "show desktop"
+#   else
     else if(KeyCode == SDL_SCANCODE_F11)
-#endif
+#   endif
         toggleGifRecorder();
 #endif
 }
