@@ -3741,7 +3741,7 @@ void SpecialNPC(int A)
         if(NPC[A].Location.Y > level[NPC[A].Section].Height + 1)
             NPC[A].Location.Y = level[NPC[A].Section].Height;
     }
-    else if((NPC[A].Type == 46 || NPC[A].Type == 212) && LevelMacro == 0)
+    else if((NPC[A].Type == 46 || NPC[A].Type == 212 || NPC[A].Type == 311) && LevelMacro == 0)
     {
         if(NPC[A].Special == 0)
         {
@@ -3761,7 +3761,7 @@ void SpecialNPC(int A)
                     NPC[A].Special3 = NPC[A].Special3 - 1;
                 NPC[A].Location.X = NPC[A].DefaultLocation.X;
             }
-            if((NPC[A].Special3 >= 5 && NPC[A].Type == 46) || (NPC[A].Special3 >= 30 && NPC[A].Type == 212))
+            if((NPC[A].Special3 >= 5 && NPC[A].Type == 46) || (NPC[A].Special3 >= 30 && (NPC[A].Type == 212 || NPC[A].Type == 311)))
             {
                 NPC[A].Special = 1;
                 NPC[A].Location.X = NPC[A].DefaultLocation.X;

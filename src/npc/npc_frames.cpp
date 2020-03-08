@@ -1293,6 +1293,13 @@ void NPCFrames(int A)
     {
         NPC[A].Frame = -1;
     }
+    else if(NPC[A].Type == 311)
+    {
+       if(NPC[A].Special2 == 0 && NPC[A].Special == 1)
+            NPC[A].Frame = 1;
+       else if(NPC[A].Special2 == 0 && NPC[A].Special == 0)
+            NPC[A].Frame = 0;
+    }
     else if(NPC[A].Type == 55) // nekkid koopa
     {
         if(NPC[A].Special == 0)

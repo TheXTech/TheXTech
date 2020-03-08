@@ -775,6 +775,7 @@ void SetupVars()
     NPCHeight[46] = 32;
     NPCNoYoshi[46] = true;
     NPCNoYoshi[212] = true;
+    NPCNoYoshi[311] = true;
     NPCWidth[47] = 32; // lakitu
     NPCHeight[47] = 48;
     NPCWidthGFX[47] = 32;
@@ -1580,6 +1581,7 @@ void SetupVars()
     NPCCanWalkOn[45] = true;
     NPCCanWalkOn[46] = true;
     NPCCanWalkOn[212] = true;
+    NPCCanWalkOn[311] = true;
     NPCCanWalkOn[56] = true;
     NPCCanWalkOn[57] = true;
     NPCCanWalkOn[58] = true;
@@ -1631,6 +1633,7 @@ void SetupVars()
     NPCNoClipping[44] = true;
     NPCNoClipping[46] = true;
     NPCNoClipping[212] = true;
+    NPCNoClipping[311] = true;
     NPCNoClipping[47] = true;
     NPCNoClipping[284] = true;
     NPCNoClipping[50] = true;
@@ -1700,6 +1703,8 @@ void SetupVars()
     NPCWontHurt[45] = true;
     NPCWontHurt[46] = true;
     NPCWontHurt[212] = true;
+    NPCWontHurt[311] = true;
+    NPCNoClipping[311] = true;
     NPCWontHurt[49] = true;
     NPCWontHurt[50] = true;
     NPCWontHurt[56] = true;

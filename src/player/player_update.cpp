@@ -3741,6 +3741,8 @@ void UpdatePlayer()
                                                     tempBlockHit[2] = B;
                                                 else
                                                     tempBlockHit[1] = B;
+                                                if(NPC[B].Type == 311)
+                                                    Player[A].Slippy = true;
                                             }
                                             else
                                                 tempBlockHit[2] = B;
@@ -4340,8 +4342,10 @@ void UpdatePlayer()
                     if(Player[A].Location.SpeedY >= 0)
                         Player[A].StandingOnNPC = B;
                     Player[A].Location.Y = NPC[B].Location.Y - Player[A].Location.Height;
-                    if(NPC[B].Type == 46 || NPC[B].Type == 212)
+                    if(NPC[B].Type == 46 || NPC[B].Type == 212 || NPC[B].Type == 311)
                         NPC[B].Special2 = 1;
+                    if(NPC[B].Type == 311 && NPC[B].Special == 0)
+                        NPC[B].Frame = 1;
                     if(NPC[B].Type == 105 )
                         NPC[B].Special = 1;
                     if((NPC[B].Type == 295 || NPC[B].Type == 297) && Player[A].Location.SpeedY > 0)
