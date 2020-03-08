@@ -6,7 +6,7 @@ Vanilla engine, rewritten into C++ from VB6
 # Frequently Asking Questions
 
 ## What is this?
-It's an implementation of an old VB6 engine, purely written in C++. It reproduces an old engine completely (except an Editor), includes lots of its logical bugs (crashy bugs where they were found got being fixed).
+It's an port of an old VB6 engine, purely written in C++. It reproduces an old engine completely (except an Editor), includes lots of its logical bugs (crashy bugs where they were found got being fixed).
 
 ## Why you made it?
 Why? I have several purposes for what I made it:
