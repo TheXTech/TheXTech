@@ -1162,12 +1162,10 @@ void NPCSpecial(int A)
                 {
                     if(Player[B].Location.SpeedX > 0)
                     {
-                        NPC[A].Location.SpeedX = std::abs(Player[B].Location.SpeedX / 1.32) * 1;
+                        NPC[A].Location.SpeedX = std::abs(Player[B].Location.SpeedX / 1.32);
                     }
                 }
-                else
-                    NPC[A].Location.SpeedX = 0;
-                if(CheckCollision(tempLocation2, Player[B].Location) == true)
+                else if(CheckCollision(tempLocation2, Player[B].Location) == true)
                 {
                     if(Player[B].Location.SpeedX != 0)
                     {
@@ -1184,7 +1182,7 @@ void NPCSpecial(int A)
             NPC[A].Location.SpeedX = -5;
 
         const double rad2deg = 180.0 / M_PI;
-        NPC[A].Special6 +=  (NPC[A].Location.SpeedX / (0.5 * NPC[A].Location.Height)) * rad2deg;
+        NPC[A].Special6 += (NPC[A].Location.SpeedX / (0.5 * NPC[A].Location.Height)) * rad2deg;
         while(NPC[A].Special6 >= 360)
         NPC[A].Special6 -= 360;
         while(NPC[A].Special6 < 0)

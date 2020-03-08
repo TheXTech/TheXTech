@@ -383,7 +383,7 @@ void UpdatePlayer()
 
                 if(Player[A].StandingOnNPC > 0)
                 {
-                    if(NPC[Player[A].StandingOnNPC].Type == 263 && NPC[Player[A].StandingOnNPC].Location.SpeedX == 0.0)
+                    if((NPC[Player[A].StandingOnNPC].Type == 263 || NPC[Player[A].StandingOnNPC].Type == 311) && NPC[Player[A].StandingOnNPC].Location.SpeedX == 0.0)
                         Player[A].Slippy = true;
                 }
                 SlippySpeedX = Player[A].Location.SpeedX;
@@ -3741,8 +3741,6 @@ void UpdatePlayer()
                                                     tempBlockHit[2] = B;
                                                 else
                                                     tempBlockHit[1] = B;
-                                                if(NPC[B].Type == 311)
-                                                    Player[A].Slippy = true;
                                             }
                                             else
                                                 tempBlockHit[2] = B;
