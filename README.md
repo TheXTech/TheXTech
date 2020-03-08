@@ -27,8 +27,13 @@ Potentially this thing will make any future DLL-injection hacks over old EXE be 
 ## How to use this?
 Here are many ways to play games with it:
 - there are some ready for use packages, just take and use as you did it with SMBX.
-- use by the same way as an original game: put an executible file into the game root folder with an "a2xtech.ini" that contains "[Main]\nforce-portable = true" text, music.ini, sounds.ini and additional "graphics/ui" folder.
-- use it for debug mode: in your home directory, create the ".PGE_Project/a2xtech" folder where you should put a full set of game resources and worlds stuff, this folder will work like a game root in original game. This mode allow you to run an executible file from any folder location of your computer and use the same resources location for all builds (except of these are marked as portable).
+- use by the same way as an original game: put an executible file into the game root folder with an "a2xtech.ini" that contains next text:
+```
+[Main]
+force-portable = true
+```
+, music.ini, sounds.ini and additional "graphics/ui" folder. An important note: all set of default graphics must be converted into PNG, use GIFs2PNG tool from PGE Project over your "graphics" folder with a "-d" switch. Don't use "-r" switch to keep original GIFs together with new made PNGs if you plan to continue use of original VB6-written SMBX.
+- use it for debug mode: in your home directory, create the ".PGE_Project/a2xtech" folder where you should put a full set of game resources and worlds stuff, this folder will work like a game root in original game. This mode allow you to run an executible file from any folder location of your computer and use the same resources location for all builds (except of these are marked as portable by an INI file).
 
 ## What differences of this thing in comparison to original VB6 build?
 - First off, it's written in C++ while original (as we already know) is written in VB6.
