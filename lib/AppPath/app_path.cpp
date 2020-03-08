@@ -278,6 +278,22 @@ std::string AppPathManager::screenshotsDir()
 #endif
 }
 
+std::string AppPathManager::gifRecordsDir()
+{
+#ifndef __APPLE__
+    return m_userPath + "gif-recordings";
+#else
+    std::string path = m_userPath;
+    char *base_path = getScreenCaptureDir();
+    if(base_path)
+    {
+        path = base_path;
+        SDL_free(base_path);
+    }
+    return path + "/A2xTech Game Screenshots/gif-recordings";
+#endif
+}
+
 std::string AppPathManager::gameSaveRootDir()
 {
     return m_settingsPath + "gamesaves";

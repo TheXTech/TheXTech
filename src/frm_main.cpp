@@ -86,7 +86,8 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
     //Write into log the application start event
     pLogDebug("<Application started>");
 
-    g_ScreenshotPath = AppPathManager::screenshotsDir();
+    m_screenshotPath = AppPathManager::screenshotsDir();
+    m_gifRecordPath = AppPathManager::gifRecordsDir();
 
     //Initialize FreeImage
     GraphicsHelps::initFreeImage();
@@ -1182,10 +1183,10 @@ void FrmMain::toggleGifRecorder()
 
     if(!m_gif.enabled)
     {
-        if(!DirMan::exists(g_ScreenshotPath))
-            DirMan::mkAbsDir(g_ScreenshotPath);
+        if(!DirMan::exists(m_gifRecordPath))
+            DirMan::mkAbsPath(m_gifRecordPath);
 
-        std::string saveTo = shoot_getTimedString(g_ScreenshotPath, "gif");
+        std::string saveTo = shoot_getTimedString(m_gifRecordPath, "gif");
 
         if(m_gif.worker)
             SDL_WaitThread(m_gif.worker, nullptr);
@@ -1316,10 +1317,10 @@ int FrmMain::makeShot_action(void *_pixels)
         }
     }
 
-    if(!DirMan::exists(me->g_ScreenshotPath))
-        DirMan::mkAbsDir(me->g_ScreenshotPath);
+    if(!DirMan::exists(me->m_screenshotPath))
+        DirMan::mkAbsPath(me->m_screenshotPath);
 
-    std::string saveTo = shoot_getTimedString(me->g_ScreenshotPath, "png");
+    std::string saveTo = shoot_getTimedString(me->m_screenshotPath, "png");
     pLogDebug("%s %d %d", saveTo.c_str(), shoot->w, shoot->h);
 
     if(FreeImage_HasPixels(shotImg) == FALSE)
