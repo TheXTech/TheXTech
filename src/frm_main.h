@@ -180,7 +180,8 @@ private:
     void lazyLoad(StdPicture &target);
     void lazyUnLoad(StdPicture &target);
 
-    std::string g_ScreenshotPath;
+    std::string m_screenshotPath;
+    std::string m_gifRecordPath;
 
 #ifndef __EMSCRIPTEN__
     static int makeShot_action(void *_pixels);

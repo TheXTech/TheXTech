@@ -32,6 +32,7 @@ public:
     static std::string userAppDirSTD();
     static std::string languagesDir();
     static std::string screenshotsDir();
+    static std::string gifRecordsDir();
     static std::string gameSaveRootDir();
     static void install();
     static bool isPortable();
