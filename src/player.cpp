@@ -5378,7 +5378,8 @@ void PlayerEffects(int A)
                 Player[A].Effect = 8;
                 Player[A].Effect2 = 2970;
                 ReturnWarp = Player[A].Warp;
-                ReturnWarpSaved = ReturnWarp;
+                if(IsEpisodeIntro && NoMap)
+                    ReturnWarpSaved = ReturnWarp;
                 StartWarp = Warp[Player[A].Warp].LevelWarp;
             }
             else if(Warp[Player[A].Warp].MapWarp == true)
@@ -5599,7 +5600,8 @@ void PlayerEffects(int A)
                 Player[A].Effect = 8;
                 Player[A].Effect2 = 3000;
                 ReturnWarp = Player[A].Warp;
-                ReturnWarpSaved = ReturnWarp;
+                if(IsEpisodeIntro && NoMap)
+                    ReturnWarpSaved = ReturnWarp;
                 StartWarp = Warp[Player[A].Warp].LevelWarp;
             }
             else if(Warp[Player[A].Warp].MapWarp == true)

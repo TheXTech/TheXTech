@@ -86,7 +86,7 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
     //Write into log the application start event
     pLogDebug("<Application started>");
 
-    g_ScreenshotPath = AppPath + "screenshots/";
+    g_ScreenshotPath = AppPathManager::screenshotsDir();
 
     //Initialize FreeImage
     GraphicsHelps::initFreeImage();
@@ -1077,7 +1077,7 @@ static std::string shoot_getTimedString(std::string path, const char *ext = "png
 
     if(!prevSecCounter)
     {
-        return fmt::sprintf_ne("%sScr_%04d-%02d-%02d_%02d-%02d-%02d.%s",
+        return fmt::sprintf_ne("%s/Scr_%04d-%02d-%02d_%02d-%02d-%02d.%s",
                                path,
                                (1900 + t.tm_year), (1 + t.tm_mon), t.tm_mday,
                                t.tm_hour, t.tm_min, t.tm_sec,
@@ -1085,7 +1085,7 @@ static std::string shoot_getTimedString(std::string path, const char *ext = "png
     }
     else
     {
-        return fmt::sprintf_ne("%sScr_%04d-%02d-%02d_%02d-%02d-%02d_(%d).%s",
+        return fmt::sprintf_ne("%s/Scr_%04d-%02d-%02d_%02d-%02d-%02d_(%d).%s",
                                path,
                                (1900 + t.tm_year), (1 + t.tm_mon), t.tm_mday,
                                t.tm_hour, t.tm_min, t.tm_sec,
