@@ -10,7 +10,7 @@ else()
     set(PGE_SHARED_SDLMIXER_DEFAULT ON)
 endif()
 
-set(PGE_SHARED_SDLMIXER ${PGE_SHARED_SDLMIXER_DEFAULT})
+option(PGE_SHARED_SDLMIXER "Link MixerX as a shared library (dll/so/dylib)" ${PGE_SHARED_SDLMIXER_DEFAULT})
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(MIX_DEBUG_SUFFIX "d")
@@ -56,6 +56,11 @@ if(NOT WIN32 AND NOT EMSCRIPTEN AND NOT APPLE AND NOT ANDROID)
     find_library(_lib_dl dl)
     if(_lib_dl)
         list(APPEND MixerX_SysLibs ${_lib_dl})
+    endif()
+
+    find_library(_lib_pthread pthread)
+    if(_lib_pthread)
+        list(APPEND MixerX_SysLibs ${_lib_pthread})
     endif()
 endif()
 
