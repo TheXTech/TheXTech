@@ -236,7 +236,7 @@ pge_set_nopie(a2xtech)
 
 if(APPLE)
     set_target_properties(a2xtech PROPERTIES
-        OUTPUT_NAME "A2xTech"
+        OUTPUT_NAME "${A2XTECH_BUNDLE_NAME}"
         MACOSX_BUNDLE TRUE
         MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/resources/a2xtech.plist.in"
         MACOSX_BUNDLE_EXECUTABLE_NAME "a2xtech"
