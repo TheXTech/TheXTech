@@ -171,7 +171,7 @@ if(APPLE)
     set(A2XTECH_CUSTOM_ICON_PATH "" CACHE STRING "Name of icon file to pack into the bundle")
     if(NOT A2XTECH_CUSTOM_ICON_PATH STREQUAL "")
         list(APPEND LIB_SRC
-            ${PGE_CUSTOM_ICON_PATH}
+            ${A2XTECH_CUSTOM_ICON_PATH}
         )
     endif()
 endif()
