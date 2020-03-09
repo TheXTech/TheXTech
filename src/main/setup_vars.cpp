@@ -690,6 +690,12 @@ void SetupVars()
     NPCWidth[24] = 32; // Hard Thing shell
     NPCHeight[24] = 32;
     NPCFrameOffsetY[24] = 2;
+    NPCWidth[313] = 32; // smb3 spiny shell
+    NPCHeight[313] = 32;
+    NPCFrameOffsetY[313] = 2;
+    NPCWidth[312] = 32; // smb2 shell
+    NPCHeight[312] = 28;
+    NPCFrameOffsetY[312] = 2;
     NPCWidth[25] = 32; // Bouncy Start Thing
     NPCHeight[25] = 32;
     NPCWidth[26] = 32; // Spring
@@ -1509,6 +1515,8 @@ void SetupVars()
     NPCIsAShell[5] = true;
     NPCIsAShell[7] = true;
     NPCIsAShell[24] = true;
+    NPCIsAShell[312] = true;
+    NPCIsAShell[313] = true;
     NPCIsAShell[73] = true;
     NPCIsABonus[9] = true;
     NPCIsABonus[304] = true;
@@ -1548,6 +1556,7 @@ void SetupVars()
     NPCIsAnExit[196] = true;
     NPCJumpHurt[8] = true;
     NPCJumpHurt[245] = true;
+    NPCJumpHurt[313] = true;
     NPCJumpHurt[12] = true;
     NPCJumpHurt[30] = true;
     NPCJumpHurt[36] = true;

@@ -3103,6 +3103,13 @@ void SpecialNPC(int A)
         if(Player[NPC[A].Special].Dead || Player[NPC[A].Special].Section != NPC[A].Section)
             NPC[A].Special = 0;
     }
+    else if(NPC[A].Type == 312)
+    {
+        if(NPC[A].Location.SpeedX > 3)
+            NPC[A].Location.SpeedX = 3;
+        else if(NPC[A].Location.SpeedX < -3)
+            NPC[A].Location.SpeedX = -3;
+    }
     else if(NPCIsCheep[NPC[A].Type] && NPC[A].Special == 1) // Red SMB3 Cheep
     {
         if(NPC[A].Projectile == 0)
