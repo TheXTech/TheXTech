@@ -24,6 +24,7 @@
  */
 
 #include <DirManager/dirman.h>
+#include <AppPath/app_path.h>
 #include <Utils/files.h>
 #include <PGE_File_Formats/file_formats.h>
 #include <pge_delay.h>
@@ -2256,68 +2257,84 @@ void MenuLoop()
 void FindWorlds()
 {
     NumSelectWorld = 0;
-    std::string worldsRoot = AppPath + "worlds/";
 
-    DirMan episodes(worldsRoot);
+    std::vector<std::string> worldRoots;
+    worldRoots.push_back(AppPath + "worlds/");
+#if defined(__APPLE__) && defined(USE_BUNDLED_ASSETS)
+    worldRoots.push_back(AppPathManager::userWorldsRootDir() + "/");
+#endif
 
-    std::vector<std::string> dirs;
-    std::vector<std::string> files;
-    episodes.getListOfFolders(dirs);
-    WorldData head;
-
-    for(auto &dir : dirs)
+    for(auto worldsRoot : worldRoots)
     {
-        std::string epDir = worldsRoot + dir + "/";
-        DirMan episode(epDir);
-        episode.getListOfFiles(files, {".wld", ".wldx"});
+        DirMan episodes(worldsRoot);
 
-        for(std::string &fName : files)
+        std::vector<std::string> dirs;
+        std::vector<std::string> files;
+        episodes.getListOfFolders(dirs);
+        WorldData head;
+
+        for(auto &dir : dirs)
         {
-            std::string wPath = epDir + fName;
-            if(FileFormats::OpenWorldFileHeader(wPath, head))
+            std::string epDir = worldsRoot + dir + "/";
+            DirMan episode(epDir);
+            episode.getListOfFiles(files, {".wld", ".wldx"});
+
+            for(std::string &fName : files)
             {
-                NumSelectWorld += 1;
-                auto &w = SelectWorld[NumSelectWorld];
-                w.WorldName = head.EpisodeTitle;
-                head.charactersToS64();
-                w.WorldPath = epDir;
-                w.WorldFile = fName;
-                w.blockChar[1] = head.nocharacter1;
-                w.blockChar[2] = head.nocharacter2;
-                w.blockChar[3] = head.nocharacter3;
-                w.blockChar[4] = head.nocharacter4;
-                w.blockChar[5] = head.nocharacter5;
+                std::string wPath = epDir + fName;
+                if(FileFormats::OpenWorldFileHeader(wPath, head))
+                {
+                    NumSelectWorld += 1;
+                    auto &w = SelectWorld[NumSelectWorld];
+                    w.WorldName = head.EpisodeTitle;
+                    head.charactersToS64();
+                    w.WorldPath = epDir;
+                    w.WorldFile = fName;
+                    w.blockChar[1] = head.nocharacter1;
+                    w.blockChar[2] = head.nocharacter2;
+                    w.blockChar[3] = head.nocharacter3;
+                    w.blockChar[4] = head.nocharacter4;
+                    w.blockChar[5] = head.nocharacter5;
 
-                if(NumSelectWorld >= maxSelectWorlds)
-                    break;
+                    if(NumSelectWorld >= maxSelectWorlds)
+                        break;
+                }
             }
-        }
 
-        if(NumSelectWorld >= maxSelectWorlds)
-            break;
+            if(NumSelectWorld >= maxSelectWorlds)
+                break;
+        }
     }
 }
 
 void FindLevels()
 {
-    std::string FileName = "";
-    std::string battleRoot = AppPath + "battle/";
+    std::vector<std::string> battleRoots;
+    battleRoots.push_back(AppPath + "battle/");
+#if defined(__APPLE__) && defined(USE_BUNDLED_ASSETS)
+    battleRoots.push_back(AppPathManager::userBattleRootDir() + "/");
+#endif
+
     NumSelectWorld = 1;
+    std::string FileName = "";
     SelectWorld[1].WorldName = "Random Level";
-    std::vector<std::string> files;
-    DirMan battleLvls(battleRoot);
     LevelData head;
 
-    battleLvls.getListOfFiles(files, {".lvl", ".lvlx"});
-    for(std::string &fName : files)
+    for(auto battleRoot : battleRoots)
     {
-        std::string wPath = battleRoot + fName;
-        if(FileFormats::OpenLevelFileHeader(wPath, head))
+        std::vector<std::string> files;
+        DirMan battleLvls(battleRoot);
+        battleLvls.getListOfFiles(files, {".lvl", ".lvlx"});
+        for(std::string &fName : files)
         {
-            NumSelectWorld++;
-            SelectWorld[NumSelectWorld].WorldPath = battleRoot;
-            SelectWorld[NumSelectWorld].WorldFile = fName;
-            SelectWorld[NumSelectWorld].WorldName = head.LevelName;
+            std::string wPath = battleRoot + fName;
+            if(FileFormats::OpenLevelFileHeader(wPath, head))
+            {
+                NumSelectWorld++;
+                SelectWorld[NumSelectWorld].WorldPath = battleRoot;
+                SelectWorld[NumSelectWorld].WorldFile = fName;
+                SelectWorld[NumSelectWorld].WorldName = head.LevelName;
+            }
         }
     }
 }

@@ -95,6 +95,7 @@ std::string  ApplicationPathSTD;
 
 std::string AppPathManager::m_settingsPath;
 std::string AppPathManager::m_userPath;
+bool AppPathManager::m_isPortable = false;
 
 #if defined(__ANDROID__) || defined(__APPLE__)
 #define UserDirName "/PGE Project"
@@ -185,7 +186,7 @@ void AppPathManager::initAppPath()
     loadCustomState();
 #endif
 
-    if(isPortable())
+    if(checkPortable())
         return;
 
     std::string userDirPath = getPgeUserDirectory();
@@ -240,6 +241,26 @@ std::string AppPathManager::settingsFileSTD()
 std::string AppPathManager::userAppDirSTD()
 {
     return m_userPath;
+}
+
+std::string AppPathManager::assetsRoot()
+{
+#if defined(__APPLE__) && defined(USE_BUNDLED_ASSETS)
+    CFURLRef appUrlRef;
+    appUrlRef = CFBundleCopyResourceURL(CFBundleGetMainBundle(), CFSTR("assets"), NULL, NULL);
+    CFStringRef filePathRef = CFURLGetString(appUrlRef);
+    char temporaryCString[PATH_MAX];
+    bzero(temporaryCString, PATH_MAX);
+    CFStringGetCString(filePathRef, temporaryCString, PATH_MAX, kCFStringEncodingUTF8);
+    std::string path = PGE_URLDEC(std::string(temporaryCString));
+    if(path.compare(0, 7, "file://") == 0)
+        path.erase(0, 7);
+    return path;
+#elif defined(__ANDROID__)
+    return "assets";
+#else
+    return m_userPath
+#endif
 }
 
 std::string AppPathManager::languagesDir()
@@ -299,6 +320,16 @@ std::string AppPathManager::gameSaveRootDir()
     return m_settingsPath + "gamesaves";
 }
 
+std::string AppPathManager::userWorldsRootDir()
+{
+    return m_userPath + "worlds";
+}
+
+std::string AppPathManager::userBattleRootDir()
+{
+    return m_userPath + "battle";
+}
+
 void AppPathManager::install()
 {
     std::string path = getPgeUserDirectory();
@@ -313,6 +344,11 @@ void AppPathManager::install()
 
 bool AppPathManager::isPortable()
 {
+    return m_isPortable;
+}
+
+bool AppPathManager::checkPortable()
+{
     if(m_settingsPath.empty())
         m_settingsPath = ApplicationPathSTD;
 
@@ -322,17 +358,17 @@ bool AppPathManager::isPortable()
     if(!Files::fileExists(settingsFileSTD()))
         return false;
 
-    bool forcePortable = false;
+    m_isPortable = false;
 
     IniProcessing checkForPort(settingsFileSTD());
     checkForPort.beginGroup("Main");
-    forcePortable = checkForPort.value("force-portable", false).toBool();
+    m_isPortable = checkForPort.value("force-portable", false).toBool();
     checkForPort.endGroup();
 
-    if(forcePortable)
+    if(m_isPortable)
         initSettingsPath();
 
-    return forcePortable;
+    return m_isPortable;
 }
 
 bool AppPathManager::userDirIsAvailable()

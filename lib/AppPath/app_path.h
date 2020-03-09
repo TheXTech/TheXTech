@@ -30,11 +30,15 @@ public:
     static void initAppPath();
     static std::string settingsFileSTD();
     static std::string userAppDirSTD();
+    static std::string assetsRoot();
     static std::string languagesDir();
     static std::string screenshotsDir();
     static std::string gifRecordsDir();
     static std::string gameSaveRootDir();
+    static std::string userWorldsRootDir();
+    static std::string userBattleRootDir();
     static void install();
+    static bool checkPortable();
     static bool isPortable();
     static bool userDirIsAvailable();
 #ifdef __EMSCRIPTEN__
@@ -49,6 +53,7 @@ private:
     //! Full path to settings INI file
     static std::string m_settingsPath;
     static std::string m_userPath;
+    static bool m_isPortable;
 };
 
 #endif // APP_PATH_H

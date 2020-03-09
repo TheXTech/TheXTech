@@ -165,6 +165,7 @@ if(APPLE)
         resources/a2xtech.icns
         ${PGE_FILE_ICONS}
     )
+    set(PGE_PRELOAD_ENVIRONMENT "" CACHE STRING "Path to resources root to pack")
 endif()
 
 set(A2XTECH_SRC
@@ -240,6 +241,13 @@ if(APPLE)
     )
     set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/resources/a2xtech.icns" PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
     set_source_files_properties(${PGE_FILE_ICONS} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+    if(NOT PGE_PRELOAD_ENVIRONMENT STREQUAL "")
+        add_custom_command(TARGET a2xtech POST_BUILD 
+            COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:a2xtech>/../Resources/assets"
+            COMMAND ${CMAKE_COMMAND} -E copy_directory "${PGE_PRELOAD_ENVIRONMENT}" "$<TARGET_FILE_DIR:a2xtech>/../Resources/assets"
+        )
+        target_compile_definitions(a2xtech PRIVATE -DUSE_BUNDLED_ASSETS)
+    endif()
 
     target_link_libraries(A2XT_Int INTERFACE iconv)
     if(PGE_USE_LUAJIT)
