@@ -165,7 +165,15 @@ if(APPLE)
         resources/a2xtech.icns
         ${PGE_FILE_ICONS}
     )
-    set(PGE_PRELOAD_ENVIRONMENT "" CACHE STRING "Path to resources root to pack")
+    set(A2XTECH_PRELOAD_ENVIRONMENT "" CACHE STRING "Path to resources root to pack")
+    set(A2XTECH_BUNDLE_NAME "A2xTech" CACHE STRING "Name of bundle folder")
+    set(A2XTECH_ICON_NAME "a2xtech.icns" CACHE STRING "Name of bundle icon file")
+    set(A2XTECH_CUSTOM_ICON_PATH "" CACHE STRING "Name of icon file to pack into the bundle")
+    if(NOT A2XTECH_CUSTOM_ICON_PATH STREQUAL "")
+        list(APPEND LIB_SRC
+            ${PGE_CUSTOM_ICON_PATH}
+        )
+    endif()
 endif()
 
 set(A2XTECH_SRC
@@ -235,16 +243,21 @@ if(APPLE)
         MACOSX_BUNDLE_GUI_IDENTIFIER "ru.wohlsoft.a2xtech"
         MACOSX_BUNDLE_SHORT_VERSION_STRING "${A2XTECH_VERSION_STRING}"
         MACOSX_BUNDLE_LONG_VERSION_STRING "${A2XTECH_VERSION_STRING}"
-        MACOSX_BUNDLE_ICON_FILE "a2xtech.icns"
-        CPACK_BUNDLE_NAME "A2xTech"
+        MACOSX_BUNDLE_ICON_FILE "${A2XTECH_ICON_NAME}"
+        CPACK_BUNDLE_NAME "${A2XTECH_BUNDLE_NAME}"
         MACOSX_BUNDLE_INFO_STRING "A2xTech classic game engine"
     )
     set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/resources/a2xtech.icns" PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
     set_source_files_properties(${PGE_FILE_ICONS} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
-    if(NOT PGE_PRELOAD_ENVIRONMENT STREQUAL "")
+
+    if(NOT A2XTECH_CUSTOM_ICON_PATH STREQUAL "")
+        set_source_files_properties("${A2XTECH_CUSTOM_ICON_PATH}" PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+    endif()
+
+    if(NOT A2XTECH_PRELOAD_ENVIRONMENT STREQUAL "")
         add_custom_command(TARGET a2xtech POST_BUILD 
             COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:a2xtech>/../Resources/assets"
-            COMMAND ${CMAKE_COMMAND} -E copy_directory "${PGE_PRELOAD_ENVIRONMENT}" "$<TARGET_FILE_DIR:a2xtech>/../Resources/assets"
+            COMMAND ${CMAKE_COMMAND} -E copy_directory "${A2XTECH_PRELOAD_ENVIRONMENT}" "$<TARGET_FILE_DIR:a2xtech>/../Resources/assets"
         )
         target_compile_definitions(a2xtech PRIVATE -DUSE_BUNDLED_ASSETS)
     endif()
