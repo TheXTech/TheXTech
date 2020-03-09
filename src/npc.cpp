@@ -1093,6 +1093,13 @@ void NPCSpecial(int A)
                     NPC[numNPCs].Type = 303;
                     NPC[numNPCs].Location.Width = 32;
                     NPC[numNPCs].Location.Height = 32;
+                    tempLocation.Height = EffectHeight[80];
+                    tempLocation.Width = EffectWidth[80];
+                    tempLocation.SpeedX = 0;
+                    tempLocation.SpeedY = 0;
+                    tempLocation.X = NPC[numNPCs].Location.X - tempLocation.Width / 2.0 + dRand() * NPC[numNPCs].Location.Width - 4;
+                    tempLocation.Y = NPC[numNPCs].Location.Y - tempLocation.Height / 2.0 + dRand() * NPC[numNPCs].Location.Height - 4;
+                    NewEffect(152, tempLocation);
                 }
                 if(Maths::iRound(NPC[numNPCs].Direction) == -1)
                     NPC[numNPCs].Location.X = NPC[A].Location.X - 20;
@@ -1127,7 +1134,11 @@ void NPCSpecial(int A)
             }
             else
             {
-                if(NPC[A].Special3 >= 9)
+                if(NPC[A].Special3 == 5)
+                {
+                    NPC[A].Special3 = 13;
+                }
+                else if(NPC[A].Special3 >= 30)
                 {
                     NPC[A].Special = 0;
                     NPC[A].Special4 = 0;
@@ -1193,7 +1204,7 @@ void NPCSpecial(int A)
         NPC[A].Location.SpeedX = 3 * NPC[A].Direction;
         NPC[A].Location.SpeedY = 3 * NPC[A].Special2;
         NPC[A].Special++;
-        if(NPC[A].Special > 200)
+        if(NPC[A].Special > 500)
         {
             NPC[A].Killed = 9;
             NewEffect(131, NPC[A].Location);
