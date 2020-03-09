@@ -79,6 +79,7 @@ option(ENABLE_OLD_CREDITS "Use original Redigit's credits without changes" OFF)
 option(ENABLE_LOGGING "Enable debug logging" ON)
 
 option(PGEFL_QT_SUPPORT "Build PGE-FL with Qt support [Unneeded]" OFF)
+set(Moondust_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}) # Don't install PGE-FL libraries
 add_subdirectory(lib/PGE_File_Formats)
 mark_as_advanced(WITH_UNIT_TESTS PGEFL_QT_SUPPORT)
 
@@ -263,6 +264,15 @@ if(APPLE)
         target_compile_definitions(a2xtech PRIVATE -DUSE_BUNDLED_ASSETS)
     endif()
 
+    set(CPACK_PACKAGE_NAME "${A2XTECH_BUNDLE_NAME}")
+    set(CPACK_PACKAGE_VERSION "${A2XTECH_VERSION_STRING}")
+    set(CPACK_PACKAGE_VENDOR "Wohlstand")
+    set(CPACK_PACKAGE_CONTACT "admin@wohlnet.ru")
+    set(CPACK_DMG_FORMAT "UDBZ")
+    set(CPACK_DMG_VOLUME_NAME "${A2XTECH_BUNDLE_NAME}")
+    set(CPACK_PACKAGE_FILE_NAME "${A2XTECH_BUNDLE_NAME}-${A2XTECH_VERSION_STRING}")
+    include(CPack)
+
     target_link_libraries(A2XT_Int INTERFACE iconv)
     if(PGE_USE_LUAJIT)
         # Required to link on 64-bit macOS
@@ -299,4 +309,18 @@ endif()
 
 if(WIN32)
     set_target_properties(a2xtech PROPERTIES WIN32_EXECUTABLE ON)
+endif()
+
+if(APPLE)
+    install(TARGETS a2xtech DESTINATION .)
+elseif(WIN32)
+    install(TARGETS a2xtech DESTINATION .)
+    file(GLOB BUILT_DLLS "${DEPENDENCIES_INSTALL_DIR}/bin/*.dll")
+    install(FILES ${BUILT_DLLS} DESTINATION .)
+else()
+    install(TARGETS a2xtech
+        RUNTIME DESTINATION bin
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib
+    )
 endif()
