@@ -5,6 +5,9 @@ project(A2xTech LANGUAGES C CXX)
 include(CheckCXXCompilerFlag)
 include(ExternalProject)
 
+include(cmake/git_info.cmake)
+message("== Current GIT hash [${GIT_COMMIT_HASH}], branch [${GIT_BRANCH}], package [${PACKAGE_SUFFIX}] ==")
+
 if(NOT WIN32 AND CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
     check_cxx_compiler_flag("-no-pie" HAS_NO_PIE)
 endif()
@@ -94,6 +97,10 @@ include(lib/FileMapper/FileMapper.cmake)
 include(lib/fmt/fmt.cmake)
 include(lib/IniProcessor/IniProcessor.cmake)
 include(lib/Utils/Utils.cmake)
+if(WIN32)
+    include(lib/CrashHandler/StackWalker/StackWalker.cmake)
+endif()
+
 
 if(EMSCRIPTEN)
     message("Is EMSCRIPTEN!")
@@ -156,6 +163,8 @@ set(LIB_SRC
     ${DIRMANAGER_SRCS}
     ${FILEMAPPER_SRCS}
     ${FMT_SRCS}
+    ${STACK_WALKER_SRCS}
+    lib/CrashHandler/crash_handler.cpp
     lib/Graphics/graphics_funcs.cpp
     lib/Graphics/image_size.cpp
     lib/Graphics/size.cpp
