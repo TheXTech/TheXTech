@@ -1,0 +1,360 @@
+A2xTech Changelog.
+
+Changes for 1.3.1 (First version made by Wohlstand in March 2020):
+
+Technical stuff
+-The whole code has been ported into C++, taking use of libFreeImageLite, SDL2, and MixerX.
+-Built-in Editor has been removed in favor of PGE devkit
+-Full support of UTF-8 in filename paths and internal text data (original game had the only 8bit ANSI support).
+-For graphics and controlling, it uses an SDL2 library while original game have used WinAPI calls and GDI library.
+-It uses PGE-FL that has a better file formats support.
+-A support for WLDX world maps are allowing unlimited credits lines and custom music without necessary to use a music.ini for music replacements.
+-Some LVLX exclusive features now working: vertical section wrap, two-way warps, custom "star needed" message, warp enter event, ability to disable stars printing in HUB episodes for specific door, ability to disable interscene showing when going to another level through a warp.
+-Built-in support for episide and level wide music.ini and sounds.ini to override default music and sounds assets.
+-World maps now supports a custom directory to store any specific resources like custom tiles/scenes/paths/levels and don't spam the episode root folder with wolrd map resources anymore.
+-Default config format is INI, old config.dat format is no more supported, mainly because of incompatible key code values (SDL_Scancode versus VirtualKeys enum of Windows API).
+-Game saves now using the SAVX format instead of a classic SAV. However, if you already have an old gamesave, you still can resume your game with using of a new engine now (next gamesave attempt will result a SAVX file, old gamesave in SAV format will be kept untouched).
+-Game saves now saving in the "settings/gamesaves" folder instead of episode root to allow them be read-only.
+-Built-in PNG support for custom and default graphics. Masked GIFs are still supported for backward compatibility, however, without making an unexpected auto-conversion.
+-Checkpoints now multi-points! You can use them in your levels multiple times without limits!
+-Make the use of lazy-decompress algorithm to speed-up the loading of a game and reduce the whole memory usage.
+-For music and SFX, the MixerX library is used to give a support for a wide amount of sound and music formats!
+-It doesn't embeds any graphics: here is NO any trurely hardcoded graphics, everything now representing as an external graphics!
+-Some internal limits was been expanded.
+-Built-in GIF recorder by F11 key (F10 on macOS, F11 is reserved by system UI for a "show desktop" action)
+
+Bugfixes
+-Fixed a crash when mushroom falls into the lava
+-Fixed a division by zero error caused by match of player and Venus Firetrap NPC centers
+-Fixed an unnecessary ability to climb invisible fences
+-Fixed a mystical speed-adding while climbing fences, caused by after standing on any moving layers
+-Attempt to fix the level data initialization which was been incomplete and caused various issues like incorrect position of moving layers
+
+
+
+Super Mario Bros. X Changelog.
+
+Changes for 1.3 (last version made by Redigit in October 2010):
+
+Players
+-Peach, Toad, and Link can now make use of the Leaf, Tanooki Suit, and Hammer Suit power-ups.
+-Toad can spin jump.
+-Link now moves a little bit quicker.
+
+Misc.
+-Quicksand
+-Attach Layers to NPCs
+-Fleet Glide Galaxy Music
+-SMW Desert Night Background
+-Block Fill Tool
+-NPC Text Preview
+-Custumizable NPCs
+-Screen Shot capturing (F12)
+-Slippery Blocks
+-Battle Mode
+-NPC generators can now be up to 60 second delay
+
+New Items
+-Ice Flower
+-Bubbles
+-SMB2 Door Potion
+-Propeller Block
+-Flame Thrower
+-Dragon Coins
+-? Mushroom
+-Random Power-ups
+-Toad's Boomerang
+-Peach's Heart Bombs.
+
+New Enemies
+-Roto-Disc
+-Firebar
+-Nipper
+-Mouser
+-Larry Koopa
+-Ludwig Koopa
+-Swooper
+-Hoopster
+-Volcano Lotus
+-SMW Lakitu (with the ability to choose what he throws)
+-SMW Spineys
+
+
+
+Changes for 1.2.2:
+
+Players
+-Link has been added as a playable character.
+-Toad has been added as a playable character.
+-Peach has been added as a playable character.
+-Mario and Luigi no longer automatically drop their reserve item when hurt.
+
+NPCs
+-The Silver SMW P-Switch has been replaced with a Green SMB3 P-Switch
+-All times stop effects play the SMB3 switch song
+-Added green, blue, and red rupees.
+-Added the heart piece.
+-Added the fairy pendant that turns the user into a fairy.
+-Added the SMB2 mushroom.
+-Added a Zelda 2 style lock.
+-Turtle shells now have a 'spark' effect when kicked/hit.
+-Red Yoshi fireballs no longer die when they hit an enemy.
+-Added a blue SMW coin that is worth 5 coins.
+-Fireballs have a different smoke effect when they 'die.'
+-Added a giant Piranha Plant that takes multiple hits to kill.
+-Max time for NPC generators has been raised to 60 seconds.
+-NPCs in the level editor are now animated.
+
+Blocks
+-Added blocks that change the player's character when hit.
+-Added blocks that only allows specific characters through them.
+-The SMB2 cracked block now has it's own smash graphic.
+
+Misc
+-The game window is now resizable.
+-Playable characters can be blocked in the world editor.
+-The player can switch characters on the world map by pressing pause and then tapping left or right.
+-The editor now shows what is inside blocks.
+-The debugger displays information about what NPCs are in the level.
+-You can now use PageUp and PageDown to change your current section in the editor.
+-There is now a menu option that brings up the help file.
+-The Level Settings tab no longer defaults to the level size cursor.
+-When using custom graphics, the icons in the editor now show the correct picture.
+-Added an option to play the game without sound.
+-Added an option to turn of the frame skip.
+-The editor now shows the contents of Eggs and Burried Items.
+
+Bug Fixes
+-Fixed a bug that would cause sound/music not to load in the game.
+-Fixed the bug that caused NPCs to get 'smashed' when they shouldn't have.
+-The level background is now drawn correctly when the screen splits horizontally.
+-Several small bug fixes.
+
+Cheat Codes
+-Added 'anothercastle'
+-Added 'ibakedacakeforyou'
+-Added 'iamerror'
+-Added 'fairymagic'
+
+
+
+Changes for 1.2.1:
+
+Engine Updates
+-NPCs can now be crushed by moving blocks.
+-Added SMB2 throw sound for SMB2 enemies that are thrown.
+-You are now given the option to chose between Mario and Luigi in 1 player mode.
+-Cheat codes are now back in the main game, but you can no longer save after using them.
+-You can no longer save the game while playing a level.
+-Added the cheat code wetwater.
+-Added the cheat code istillplaywithlegos.
+-The cheat sonicstoslow has become sonicstooslow.
+-Added the cheat code itsrainingmen.
+-Added the cheat code donttypethis.
+-Several cheat codes have been fixed.
+-The test settings window has been updated to include the new power ups.
+-The hot box for lava tiles has been pushed down by 6 pixels.
+-Now you can use the mouse to select the options on the menu screen.
+-Hit detection is now a little bit more lenient when deciding if a player should be hurt by an NPC.
+-Added the cheat code needaclock.
+-Added the cheat code powhammer.
+-Revived the cheat code imtiredofallthiswalking.
+
+Player
+-The player now sticks to downward slopes instead of falling over them. This should make it easier to jump over cliffs when running down a slope.
+-There is now a brief animation and delay when picking things up SMB2 style.
+-The player now spins while shell surfing.
+-The player no longer falls off a shell when it bounces off a wall.
+-The player can now grab shells from above.
+-The player now has walking animations when using a warp pipe.
+-The player can now swim upward fast by holding up while swimming.
+-The distance needed to fly was shortened very slightly.
+-Luigi's fireballs now go up steep slopes.
+-Luigi's controls have been tightened slightly.
+-When the first player is Luigi, he appears instead of Mario on the world map.
+-The player gets a slight speed boost when running down a slope.
+-Yoshi will be returned to you after you complete a level that takes him away.
+-Dead players no longer spawn from blocks containing the Hammer Suit or Tanooki Suit.
+-Luigi now causes all the coins to pop out of coin blocks after he hits them.
+
+NPCs
+-The SMW Goomba and SMB3 Bob-omb have been updated to more accurately reflect the games they're from. SMB3 Bob-ombs go farther when kicked.
+-Boom Boom now has a brief period of immunity when hit by objects. This stops him from being insta-killed.
+-After a veggie has been thrown up it will change speed if it hits an enemy. This prevents a single veggie from killing bosses.
+-The smashed Rex and Mega Mole now move faster. The SMB1 and SMW 1-ups now move the correct speed.
+-The Ice Block now melts 7 seconds after being picked up, unless thrown.
+-Only bosses now give points when falling into lava.
+-Wart now gives the correct amount of points when killed.
+-SMB1 Bowser now has a more predictable hammer throwing pattern.
+-NPCs now have walking animations and will walk out of a pipe when spawned with a warp generator.
+-Grass and turnips now have a higher pitched grab sound.
+-SMW saws now make the 'ticking' sound when on screen, are drawn behind blocks, and only stick out of the ground halfway.
+-Thwomps now create 'smoke effect' after hitting the ground.
+-The Ice Block now breaks bricks when thrown up.
+-Switch goombas and platforms have been recolored to match the SMW switch blocks.
+-Paratroopas set to hover left/right now flutter up and down.
+-Yoshi, Kuribo's shoe, and several other power-ups can now be off screen for 60 seconds before being reset.
+-The off screen timer of shells now resets after they break a block. Now you don't have to supervise them to make sure they are doing there job.
+-Sonic rings have been changed to a graphic style that fits the game better.
+-Mr. Saturn is now indestructible.
+-Blaarg's hit box has been fixed.
+-The Clown car now checks for collisions against blocks.
+-Added a silver P Switch that stops time for a short while when hit.
+-Added a red switch used for triggering events.
+-Added the stop watch from SMB2.
+-Added the POW block from SMB2.
+-Added the brown Paragoomba from SMB3 with Paratroopa AI.
+-Added the Paragoomba from SML2 with Paratroopa AI.
+-Added the goomba from SML2.
+-Added the venus fire trap from SMB3
+-Added pokey from SMB2.
+-Added the stop watch power-up.
+
+Blocks
+-Digable dirt now behaves correctly.
+-Munchers hurt from all sides.
+-SMW switch blocks have been recolored to look like they did in SMW.
+
+Backgrounds
+-SMW Ghost House background is now animated.
+-SMW Castle background is now properly animated.
+
+Bug Fixes
+-Fixed a bug that stopped the game from actually skipping frames when it was supposed to.
+-The yellow Yoshi now correctly ground pounds enemies on slopes.
+-The world map no longer unloads custom graphics after playing a level.
+-The Billy Gun and Hammer Bros. no longer keep shooting when the player loses control of himself.
+-The game more accurately decides which block the player should stand on while on multiple blocks. This mainly affects note blocks.
+-Fixed a bug that would push the player through blocks when standing on a falling block. (As seen in the last fight of The Invasion 2)
+-The game no longer freezes when using events to takeover the players controls and opening a message window.
+-The player can no longer climb vines while in Tanooki form.
+-NPC speed is now calculated correctly when walking on another NPC while underwater.
+-Checkpoints now work on episodes that use a hub world.
+
+
+
+Changes for 1.2:
+
+Engine Updates
+-Sloped tiles have been fully implemented, including the ability to slide down slopes.
+-New "projectile" spawn point that allows NPCs to be shot out of pipes.
+-Updated the graphics engine, allowing for custom graphics.
+-Spikes only hurt when hit from the correct angle
+-Keys can be used to unlock doors.
+-Swimmable water has been implemented.
+-The title screen now plays a level.
+-You can now use events to move layers.
+-Added online level edit mode.
+-Cheat codes now only work in the level editor.
+-Added auto frame skip.
+
+Players
+-Added the Tanooki Suit.
+-Added the Hammer Suit.
+-Added Fire Shoe Power-up that turns stomped enemies into fireballs and allows the wearer to walk on lava.
+-Added Blue Shoe Power-up that allows the wearer infinite flight.
+-There is a longer delay between eating enemies with Yoshi.
+-You can no longer spit and eat a shell in midair to fly indefinitely.
+-The player now needs to run longer before he can fly.
+-Players now "slide" when spit out of Yoshi.
+-Players can use lives to come back to life instantly in 2 player mode.
+
+Tiles/Backgrounds
+-Added cave tiles and two backgrounds (SMB3)
+-Added Mystic Cave Zone background (Sonic 2).
+-Added the underwater block (SMB1).
+-Added sloped grass (SMW, SMB3, SMB2) and cave (SMW, SMB3 & SMB1) tiles.
+-Added castle tiles and background (SMB1).
+-Added several tiles (SMB1) (SMB2).
+-Added coral block (SMB1).
+-Added fence and tree backgrounds (SMB1).
+-Added several castle tiles and backgrounds (SMW).
+-Added various blocks (SMW).
+-Added multiple lava tiles (SMW).
+-Added Ghost House background (SMW).
+-Added Wart's Throne Room tileset (SMB2).
+-Added several new Super Metroid tilesets.
+-Added 2 Super Metroid backgrounds.
+-Added clouds background (SMB2).
+-Added several new blocks. (Multiple)
+-Added six backgrounds. (SMB1 & SMB2)
+-Add table and chair background objects. (SMA4)
+-Added underwater backgrounds. (SMB3, SMW)
+-Added water dirt blocks (SMB3)
+-Added giant wood blocks (SMB3)
+-Added giant coral (SMB3)
+-Added water backgrounds objects (SMB1, SMB3)
+-Added bubble background.
+-Added the frozen coin and chomper blocks.
+
+NPCs
+-Added Goomba and Paragoomba (SMW).
+-Added Rex (SMW).
+-Added Mega Mole (SMW).
+-Added Poison Mushroom (SMB).
+-Added rings that act like coins (Sonic the Hedgehog)
+-Added Mushroom Blocks (SMB2).
+-Added Digable Dirt (SMB2).
+-Added flying Airship part (SMB3).
+-Added Mister Saturn (Earthbound).
+-Changed the Cheep Cheep (SMB1) to die when jumped on.
+-Blue Beach Koopas (SMW) can now kick Ice Blocks (SMB3).
+-Added Bullies (SM64). Sprites by LuigiFan.
+-Thwomp and the Boos can now be killed.
+-Added both normal Koopas and Parakoopas (SMB1)
+-Added Axe, which dies on contact with the player, that can be used to start events. (SMB1)
+-Added Thwomp (SMW)
+-Added Grinder (SMW)
+-Added Dry Bones. (SMW)
+-Added Mushroom, Fire Flower, 1-Up, and 3-Up Moon (SMW) (SMB1).
+-Added skull ride. (SMW)
+-Added the Rainbow shell, which when hit by a tail becomes a powerful item and allows Mario to ride it. (SMW)
+-Added Princess Peach. (SMB3)
+-Added collectible stars that don't end the level. (SMW)
+-Add the King Koopa. (SMB1)
+-Added Wart (SMB2)
+-Added Spark (SMB2).
+-Added 3 Super Metroid monsters.
+-Added Spike Top (SMW).
+-Added Mother Brain
+-Added Green Cheep Cheeps (SMB1, SMB3)
+-Added Red Cheep Cheeps that jump out of the water at the player (SMB3)
+-Added Bloopers (SMB1, SMB3)
+-Added some misc. Sushi from SMW
+-SMB2 enemies are now immune to fireballs
+-Podoboos are immune to fire and no longer kill enemy NPCs
+-Yoshi now run away faster when the player is hit.
+-The Billy Gun now shoots roughly twice as fast.
+
+World Map
+-Added several tiles and scenery objects (SMW).
+-Ability to choose start point.
+-Added level path background options.
+-Added several level icons. (SMBA4) (SMB3) (SMW
+-Instant warp zones.
+-Player faces the direction he is walking.
+-Added new levels and path graphics.
+
+Music
+-Added Meta Knight's Revenge (SSBB).
+-Added Castle music (SMW).
+-Added Castle music (SMB1).
+-Added Wart battle music (SMB2).
+-Added Item Room music (Super Metroid).
+-Added Underwater music (SMB1, SMB3, SMW, SM64)
+-Added Waluigi Pinball and SSBB Underground themes.
+-Added SM64 cave theme.
+-Added SMB3 hammer bros. theme.
+
+Bug Fixes
+-The player now correctly changes sections when he enters a door while standing on a NPC.
+-Fixed a bug that would cause the map to scroll to a location other then 0, 0 when changing modes to the world editor.
+-Added an auto-align toggle to the world editor.
+-Fixed several bugs with the conveyor belts.
+-Exits no longer despawn when they go off-screen.
+-World editor now plays sounds when the user saves and erases the map.
+-Player stops ducking when leaving a vertical pipe warp.
+-Spin Jump has been toned down.
+-Platform now properly pass through cross sections.
+-Fixed a bug that prevented music from playing in the 'intro.lvl"
+-P switch is no longer linked to music.

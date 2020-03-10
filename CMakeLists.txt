@@ -79,6 +79,7 @@ option(ENABLE_OLD_CREDITS "Use original Redigit's credits without changes" OFF)
 option(ENABLE_LOGGING "Enable debug logging" ON)
 
 option(PGEFL_QT_SUPPORT "Build PGE-FL with Qt support [Unneeded]" OFF)
+set(Moondust_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}) # Don't install PGE-FL libraries
 add_subdirectory(lib/PGE_File_Formats)
 mark_as_advanced(WITH_UNIT_TESTS PGEFL_QT_SUPPORT)
 
@@ -165,6 +166,15 @@ if(APPLE)
         resources/a2xtech.icns
         ${PGE_FILE_ICONS}
     )
+    set(A2XTECH_PRELOAD_ENVIRONMENT "" CACHE STRING "Path to resources root to pack")
+    set(A2XTECH_BUNDLE_NAME "A2xTech" CACHE STRING "Name of bundle folder")
+    set(A2XTECH_ICON_NAME "a2xtech.icns" CACHE STRING "Name of bundle icon file")
+    set(A2XTECH_CUSTOM_ICON_PATH "" CACHE STRING "Name of icon file to pack into the bundle")
+    if(NOT A2XTECH_CUSTOM_ICON_PATH STREQUAL "")
+        list(APPEND LIB_SRC
+            ${A2XTECH_CUSTOM_ICON_PATH}
+        )
+    endif()
 endif()
 
 set(A2XTECH_SRC
@@ -227,19 +237,41 @@ pge_set_nopie(a2xtech)
 
 if(APPLE)
     set_target_properties(a2xtech PROPERTIES
-        OUTPUT_NAME "A2xTech"
+        OUTPUT_NAME "${A2XTECH_BUNDLE_NAME}"
         MACOSX_BUNDLE TRUE
         MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/resources/a2xtech.plist.in"
         MACOSX_BUNDLE_EXECUTABLE_NAME "a2xtech"
         MACOSX_BUNDLE_GUI_IDENTIFIER "ru.wohlsoft.a2xtech"
         MACOSX_BUNDLE_SHORT_VERSION_STRING "${A2XTECH_VERSION_STRING}"
         MACOSX_BUNDLE_LONG_VERSION_STRING "${A2XTECH_VERSION_STRING}"
-        MACOSX_BUNDLE_ICON_FILE "a2xtech.icns"
-        CPACK_BUNDLE_NAME "A2xTech"
+        MACOSX_BUNDLE_ICON_FILE "${A2XTECH_ICON_NAME}"
+        CPACK_BUNDLE_NAME "${A2XTECH_BUNDLE_NAME}"
         MACOSX_BUNDLE_INFO_STRING "A2xTech classic game engine"
     )
     set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/resources/a2xtech.icns" PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
     set_source_files_properties(${PGE_FILE_ICONS} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+
+    if(NOT A2XTECH_CUSTOM_ICON_PATH STREQUAL "")
+        set_source_files_properties("${A2XTECH_CUSTOM_ICON_PATH}" PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+    endif()
+
+    if(NOT A2XTECH_PRELOAD_ENVIRONMENT STREQUAL "")
+        add_custom_command(TARGET a2xtech POST_BUILD 
+            COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:a2xtech>/../Resources/assets"
+            COMMAND ${CMAKE_COMMAND} -E copy_directory "${A2XTECH_PRELOAD_ENVIRONMENT}" "$<TARGET_FILE_DIR:a2xtech>/../Resources/assets"
+            COMMENT "Copying assets into bundle..."
+        )
+        target_compile_definitions(a2xtech PRIVATE -DUSE_BUNDLED_ASSETS)
+    endif()
+
+    set(CPACK_PACKAGE_NAME "${A2XTECH_BUNDLE_NAME}")
+    set(CPACK_PACKAGE_VERSION "${A2XTECH_VERSION_STRING}")
+    set(CPACK_PACKAGE_VENDOR "Wohlstand")
+    set(CPACK_PACKAGE_CONTACT "admin@wohlnet.ru")
+    set(CPACK_DMG_FORMAT "UDBZ")
+    set(CPACK_DMG_VOLUME_NAME "${A2XTECH_BUNDLE_NAME}")
+    set(CPACK_PACKAGE_FILE_NAME "${A2XTECH_BUNDLE_NAME}-${A2XTECH_VERSION_STRING}")
+    include(CPack)
 
     target_link_libraries(A2XT_Int INTERFACE iconv)
     if(PGE_USE_LUAJIT)
@@ -277,4 +309,18 @@ endif()
 
 if(WIN32)
     set_target_properties(a2xtech PROPERTIES WIN32_EXECUTABLE ON)
+endif()
+
+if(APPLE)
+    install(TARGETS a2xtech DESTINATION .)
+elseif(WIN32)
+    install(TARGETS a2xtech DESTINATION .)
+    file(GLOB BUILT_DLLS "${DEPENDENCIES_INSTALL_DIR}/bin/*.dll")
+    install(FILES ${BUILT_DLLS} DESTINATION .)
+else()
+    install(TARGETS a2xtech
+        RUNTIME DESTINATION bin
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib
+    )
 endif()

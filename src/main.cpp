@@ -131,7 +131,7 @@ int main(int argc, char**argv)
     CmdLineSetup_t setup;
 
     AppPathManager::initAppPath();
-    AppPath = AppPathManager::userAppDirSTD();
+    AppPath = AppPathManager::assetsRoot();
 
     OpenConfig_preSetup();
 
