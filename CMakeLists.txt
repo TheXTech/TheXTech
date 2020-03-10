@@ -5,6 +5,9 @@ project(A2xTech LANGUAGES C CXX)
 include(CheckCXXCompilerFlag)
 include(ExternalProject)
 
+include(cmake/git_info.cmake)
+message("== Current GIT hash [${GIT_COMMIT_HASH}], branch [${GIT_BRANCH}], package [${PACKAGE_SUFFIX}] ==")
+
 if(NOT WIN32 AND CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
     check_cxx_compiler_flag("-no-pie" HAS_NO_PIE)
 endif()
@@ -68,11 +71,13 @@ include(cmake/git_version.cmake)
 if(WIN32 OR EMSCRIPTEN)
     set(USE_SYSTEM_LIBS_DEFAULT OFF)
 else()
-    set(USE_SYSTEM_LIBS_DEFAULT ON)
+    set(USE_SYSTEM_LIBS_DEFAULT ON) # Should be used on Haiku, own SDL2 Haiku build on CMake is broken
 endif()
 
 option(USE_SYSTEM_LIBS "Use dependent libraries like SDL2, FreeImageLite and MixerX, installed in the system" ${USE_SYSTEM_LIBS_DEFAULT})
 option(USE_SYSTEM_SDL2 "Use SDL2 from a system even prefering system libraries" ${USE_SYSTEM_LIBS_DEFAULT})
+
+option(USE_STATIC_LIBC "Link libc and libstdc++ statically" OFF)
 
 option(ENABLE_ANTICHEAT_TRAP "Enable anti-cheating trap for the \"redigitiscool\" cheat code" OFF)
 option(ENABLE_OLD_CREDITS "Use original Redigit's credits without changes" OFF)
@@ -83,11 +88,19 @@ set(Moondust_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}) # Don't install PGE-FL libr
 add_subdirectory(lib/PGE_File_Formats)
 mark_as_advanced(WITH_UNIT_TESTS PGEFL_QT_SUPPORT)
 
+if(USE_STATIC_LIBC)
+    set(BUILD_SHARED_LIBS OFF)
+endif()
+
 include(lib/DirManager/dirman.cmake)
 include(lib/FileMapper/FileMapper.cmake)
 include(lib/fmt/fmt.cmake)
 include(lib/IniProcessor/IniProcessor.cmake)
 include(lib/Utils/Utils.cmake)
+if(WIN32)
+    include(lib/CrashHandler/StackWalker/StackWalker.cmake)
+endif()
+
 
 if(EMSCRIPTEN)
     message("Is EMSCRIPTEN!")
@@ -118,7 +131,7 @@ set(A2XT_DEPS)
 add_library(A2XT_Int INTERFACE)
 
 if(USE_SYSTEM_LIBS)
-    find_package(SDL2)
+    find_package(SDL2 REQUIRED)
 
     find_library(MIXERX_LIB NAMES SDL2_mixer_ext)
     find_path(MIXERX_HEAD_DIR SDL_mixer_ext.h PATH_SUFFIXES SDL2)
@@ -150,6 +163,8 @@ set(LIB_SRC
     ${DIRMANAGER_SRCS}
     ${FILEMAPPER_SRCS}
     ${FMT_SRCS}
+    ${STACK_WALKER_SRCS}
+    lib/CrashHandler/crash_handler.cpp
     lib/Graphics/graphics_funcs.cpp
     lib/Graphics/image_size.cpp
     lib/Graphics/size.cpp
@@ -161,7 +176,7 @@ set(LIB_SRC
 
 if(APPLE)
     file(GLOB PGE_FILE_ICONS "${CMAKE_CURRENT_SOURCE_DIR}/resources/file_icons/*.icns")
-    list(APPEND LIB_SRC 
+    list(APPEND LIB_SRC
         lib/AppPath/app_path_macosx.m
         resources/a2xtech.icns
         ${PGE_FILE_ICONS}
@@ -256,7 +271,7 @@ if(APPLE)
     endif()
 
     if(NOT A2XTECH_PRELOAD_ENVIRONMENT STREQUAL "")
-        add_custom_command(TARGET a2xtech POST_BUILD 
+        add_custom_command(TARGET a2xtech POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:a2xtech>/../Resources/assets"
             COMMAND ${CMAKE_COMMAND} -E copy_directory "${A2XTECH_PRELOAD_ENVIRONMENT}" "$<TARGET_FILE_DIR:a2xtech>/../Resources/assets"
             COMMENT "Copying assets into bundle..."
@@ -307,8 +322,22 @@ if(NOT USE_SYSTEM_LIBS)
     add_dependencies(a2xtech ${A2XT_DEPS})
 endif()
 
+if(USE_STATIC_LIBC AND NOT USE_SYSTEM_LIBS)
+    if(NOT APPLE AND NOT MSVC)
+#        target_link_libraries(a2xtech PRIVATE -static)
+        set_property(TARGET a2xtech APPEND_STRING PROPERTY LINK_FLAGS " -static-libgcc -static-libstdc++")
+    endif()
+
+    if(MSVC)
+        target_compile_options(a2xtech PRIVATE /MT)
+        target_link_options(a2xtech PRIVATE /INCREMENTAL:NO /NODEFAULTLIB:MSVCRT)
+    endif()
+endif()
+
 if(WIN32)
     set_target_properties(a2xtech PROPERTIES WIN32_EXECUTABLE ON)
+    target_compile_definitions(a2xtech PRIVATE -DNOMINMAX)
+    target_link_libraries(a2xtech PRIVATE "version" dbghelp) # needed by StackWalker
 endif()
 
 if(APPLE)

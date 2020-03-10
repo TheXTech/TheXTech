@@ -28,6 +28,7 @@
 #include <AppPath/app_path.h>
 #include <tclap/CmdLine.h>
 #include <Utils/strings.h>
+#include <CrashHandler/crash_handler.h>
 
 
 #ifdef __APPLE__
@@ -129,6 +130,8 @@ extern "C"
 int main(int argc, char**argv)
 {
     CmdLineSetup_t setup;
+
+    CrashHandler::initSigs();
 
     AppPathManager::initAppPath();
     AppPath = AppPathManager::assetsRoot();

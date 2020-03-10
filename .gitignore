@@ -80,3 +80,5 @@ build/
 cmake-build-*/*
 
 .vscode/*
+.vs/*
+CMakeSettings.json
