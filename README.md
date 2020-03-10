@@ -55,10 +55,16 @@ force-portable = true
 - Some internal limits was been expanded.
 - Built-in GIF recorder by F11 key (F10 on macOS, F11 is reserved by system UI for a "show desktop" action)
 
+## How to add custom episodes for the macOS version?
+If you have a bundled build of A2xTech, all default resources are inside your .app: "Content/Resources/assets/". You can modify the content, but it's not recommended! Instead, after the first run, in your "~/Library/Application Support" path will appear the next directory:
+"~/Library/Application Support/PGE Project/a2xtech"
+Inside of this directory, you can make "battle" and "worlds" folders to put your custom stuff.
+If you want to replace default assets with your own, you can modify the content of the app bundle or compile a new build with giving of the necessary CMake arguments which needed to pack your custom assets root and icon into the new bundle or make the assets-less build (if you will give no arguments, the assets-less build will result). Therefore, you need to put the full content of the game root into the "~/Library/Application Support/PGE Project/a2xtech" folder, include default assets (graphics, music, sounds, intro and outro levels).
+
 ## How to build it?
 To build it, you need to have next things:
 - CMake
-- Ninja optionally (speeds-up a build process)
+- Ninja optionally (to speeds-up a build process)
 - Compatible C/C++ compiler (GCC, Clang, MSVC didn't tested yet)
 - Git (required to pull submodules and clone source of dependent libraries to build them in a place)
 - Mercurial (required to clone an official SDL2 repository to build it in a place here)
