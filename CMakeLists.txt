@@ -71,7 +71,7 @@ include(cmake/git_version.cmake)
 if(WIN32 OR EMSCRIPTEN)
     set(USE_SYSTEM_LIBS_DEFAULT OFF)
 else()
-    set(USE_SYSTEM_LIBS_DEFAULT ON)
+    set(USE_SYSTEM_LIBS_DEFAULT ON) # Should be used on Haiku, own SDL2 Haiku build on CMake is broken
 endif()
 
 option(USE_SYSTEM_LIBS "Use dependent libraries like SDL2, FreeImageLite and MixerX, installed in the system" ${USE_SYSTEM_LIBS_DEFAULT})
@@ -131,7 +131,7 @@ set(A2XT_DEPS)
 add_library(A2XT_Int INTERFACE)
 
 if(USE_SYSTEM_LIBS)
-    find_package(SDL2)
+    find_package(SDL2 REQUIRED)
 
     find_library(MIXERX_LIB NAMES SDL2_mixer_ext)
     find_path(MIXERX_HEAD_DIR SDL_mixer_ext.h PATH_SUFFIXES SDL2)
