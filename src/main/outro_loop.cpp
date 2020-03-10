@@ -122,12 +122,12 @@ void SetupCredits()
     AddCredit("");
     AddCredit("");
 #ifndef ENABLE_OLD_CREDITS
-    AddCredit("C++ port By:");
-    AddCredit("");
-    AddCredit("Vitaly Novichkov");
-    AddCredit("'Wohlstand'");
-    AddCredit("");
-    AddCredit("");
+//AddCredit("C++ port By:");
+//AddCredit("");
+//AddCredit("Vitaly Novichkov");
+//AddCredit("'Wohlstand'");
+//AddCredit("");
+//AddCredit("");
     AddCredit("NSMBX By:");
     AddCredit("");
     AddCredit("Ekaterina Bolyakova");
@@ -250,7 +250,7 @@ void SetupCredits()
     {
         Credit[A].Location.Width = Credit[A].Text.size() * 18;
         Credit[A].Location.Height = 16;
-        Credit[A].Location.X = 400 - (Credit[A].Location.Width / 2.0);
+        Credit[A].Location.X = 760 - (Credit[A].Location.Width);
         Credit[A].Location.Y = 640 + 32 * A;
     }
 }

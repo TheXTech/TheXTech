@@ -43,7 +43,7 @@ void DoCredits()
         // Printing lines of credits
         if(Credit[A].Location.Y <= 600 && Credit[A].Location.Y + Credit[A].Location.Height >= 0)
         {
-            SuperPrint(Credit[A].Text, 4, static_cast<float>(Credit[A].Location.X), static_cast<float>(Credit[A].Location.Y));
+            SuperPrint(Credit[A].Text, 3, static_cast<float>(Credit[A].Location.X), static_cast<float>(Credit[A].Location.Y));
         }
 
         // Closing screen

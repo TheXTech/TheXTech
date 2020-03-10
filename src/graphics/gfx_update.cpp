@@ -203,6 +203,15 @@ void UpdateGraphics(bool skipRepaint)
             BackgroundFrameCount[65] = 0;
         }
 
+        BackgroundFrameCount[202] = BackgroundFrameCount[202] + 1;
+        if(BackgroundFrameCount[202] >= 8)
+        {
+            BackgroundFrame[202] = BackgroundFrame[202] + 1;
+            if(BackgroundFrame[202] >= 4)
+                BackgroundFrame[202] = 0;
+            BackgroundFrameCount[202] = 0;
+        }
+
         BackgroundFrame[66] = BackgroundFrame[65];
 
         BackgroundFrame[70] = BackgroundFrame[65];

@@ -2276,6 +2276,12 @@ void SetupVars()
         BlockHeight[A] = 64;
     }
 
+    For(A, 701, 705)
+    {
+        BlockHeight[A] = 64;
+        BlockWidth[A] = 64;
+    }
+
     For(A, 137, 146)
     {
         BlockWidth[A] = 64;
@@ -2763,7 +2769,7 @@ void SetupVars()
     BackgroundHasNoMask[144] = true;
     BackgroundHasNoMask[145] = true;
     BlockOnlyHitspot1[69] = true;
-
+    BlockOnlyHitspot1[706] = true;
 
     Foreground[187] = true;
     Foreground[188] = true;
@@ -2809,6 +2815,10 @@ void SetupVars()
     BackgroundHeight[20] = 32;
     BackgroundHeight[36] = 96;
     BackgroundHeight[65] = 96;
+    BackgroundHeight[202] = 96;
+
+    BackgroundHeight[203] = 14;
+    BackgroundWidth[203] = 64;
 
     BackgroundHeight[66] = 32;
 
