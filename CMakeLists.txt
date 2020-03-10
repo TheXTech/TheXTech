@@ -74,6 +74,8 @@ endif()
 option(USE_SYSTEM_LIBS "Use dependent libraries like SDL2, FreeImageLite and MixerX, installed in the system" ${USE_SYSTEM_LIBS_DEFAULT})
 option(USE_SYSTEM_SDL2 "Use SDL2 from a system even prefering system libraries" ${USE_SYSTEM_LIBS_DEFAULT})
 
+option(USE_STATIC_LIBC "Link libc and libstdc++ statically" OFF)
+
 option(ENABLE_ANTICHEAT_TRAP "Enable anti-cheating trap for the \"redigitiscool\" cheat code" OFF)
 option(ENABLE_OLD_CREDITS "Use original Redigit's credits without changes" OFF)
 option(ENABLE_LOGGING "Enable debug logging" ON)
@@ -82,6 +84,10 @@ option(PGEFL_QT_SUPPORT "Build PGE-FL with Qt support [Unneeded]" OFF)
 set(Moondust_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}) # Don't install PGE-FL libraries
 add_subdirectory(lib/PGE_File_Formats)
 mark_as_advanced(WITH_UNIT_TESTS PGEFL_QT_SUPPORT)
+
+if(USE_STATIC_LIBC)
+    set(BUILD_SHARED_LIBS OFF)
+endif()
 
 include(lib/DirManager/dirman.cmake)
 include(lib/FileMapper/FileMapper.cmake)
@@ -161,7 +167,7 @@ set(LIB_SRC
 
 if(APPLE)
     file(GLOB PGE_FILE_ICONS "${CMAKE_CURRENT_SOURCE_DIR}/resources/file_icons/*.icns")
-    list(APPEND LIB_SRC 
+    list(APPEND LIB_SRC
         lib/AppPath/app_path_macosx.m
         resources/a2xtech.icns
         ${PGE_FILE_ICONS}
@@ -256,7 +262,7 @@ if(APPLE)
     endif()
 
     if(NOT A2XTECH_PRELOAD_ENVIRONMENT STREQUAL "")
-        add_custom_command(TARGET a2xtech POST_BUILD 
+        add_custom_command(TARGET a2xtech POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:a2xtech>/../Resources/assets"
             COMMAND ${CMAKE_COMMAND} -E copy_directory "${A2XTECH_PRELOAD_ENVIRONMENT}" "$<TARGET_FILE_DIR:a2xtech>/../Resources/assets"
             COMMENT "Copying assets into bundle..."
@@ -305,6 +311,18 @@ endif()
 
 if(NOT USE_SYSTEM_LIBS)
     add_dependencies(a2xtech ${A2XT_DEPS})
+endif()
+
+if(USE_STATIC_LIBC AND NOT USE_SYSTEM_LIBS)
+    if(NOT APPLE AND NOT MSVC)
+#        target_link_libraries(a2xtech PRIVATE -static)
+        set_property(TARGET a2xtech APPEND_STRING PROPERTY LINK_FLAGS " -static-libgcc -static-libstdc++")
+    endif()
+
+    if(MSVC)
+        target_compile_options(a2xtech PRIVATE /MT)
+        target_link_options(a2xtech PRIVATE /INCREMENTAL:NO /NODEFAULTLIB:MSVCRT)
+    endif()
 endif()
 
 if(WIN32)

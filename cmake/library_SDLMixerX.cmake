@@ -53,14 +53,14 @@ if(NOT WIN32 AND NOT EMSCRIPTEN AND NOT APPLE AND NOT ANDROID)
         list(APPEND MixerX_SysLibs ${_LIB_GL})
     endif()
 
-    find_library(_lib_dl dl)
-    if(_lib_dl)
-        list(APPEND MixerX_SysLibs ${_lib_dl})
-    endif()
-
     find_library(_lib_pthread pthread)
     if(_lib_pthread)
         list(APPEND MixerX_SysLibs ${_lib_pthread})
+    endif()
+
+    find_library(_lib_dl dl)
+    if(_lib_dl)
+        list(APPEND MixerX_SysLibs ${_lib_dl})
     endif()
 endif()
 
