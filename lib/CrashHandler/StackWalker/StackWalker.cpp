@@ -344,9 +344,9 @@ public:
                 {
                     szTemp += L"\\Debugging Tools for Windows (x64)\\dbghelp.dll";
                     // now check if the file exists:
-                    if(GetFileAttributes(szTemp.c_str()) != INVALID_FILE_ATTRIBUTES)
+                    if(GetFileAttributesW(szTemp.c_str()) != INVALID_FILE_ATTRIBUTES)
                     {
-                        m_hDbhHelp = LoadLibrary(szTemp.c_str());
+                        m_hDbhHelp = LoadLibraryW(szTemp.c_str());
                     }
                 }
                 #elif _M_IA64
@@ -386,9 +386,9 @@ public:
                 {
                     szTemp += L"\\Debugging Tools for Windows 64-Bit\\dbghelp.dll";
                     const wchar_t *szTempS = (wchar_t *)szTemp.c_str();
-                    if(GetFileAttributes(szTempS) != INVALID_FILE_ATTRIBUTES)
+                    if(GetFileAttributesW(szTempS) != INVALID_FILE_ATTRIBUTES)
                     {
-                        m_hDbhHelp = LoadLibrary(szTempS);
+                        m_hDbhHelp = LoadLibraryW(szTempS);
                     }
                 }
                 #endif
@@ -775,7 +775,7 @@ cleanup:
                         {
                             UINT len;
                             wchar_t szSubBlock[] = L"\\";
-                            if(VerQueryValue(vData, szSubBlock, (LPVOID *) &fInfo, &len) == 0)
+                            if(VerQueryValueW(vData, szSubBlock, (LPVOID *) &fInfo, &len) == 0)
                                 fInfo = NULL;
                             else
                             {
