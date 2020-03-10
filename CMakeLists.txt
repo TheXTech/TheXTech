@@ -336,6 +336,7 @@ endif()
 
 if(WIN32)
     set_target_properties(a2xtech PROPERTIES WIN32_EXECUTABLE ON)
+    target_compile_definitions(a2xtech PRIVATE -DNOMINMAX)
 endif()
 
 if(APPLE)
