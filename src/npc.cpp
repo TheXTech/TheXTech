@@ -4696,7 +4696,7 @@ void SpecialNPC(int A)
                 NPC[A].Special3 = 0;
         }
     }
-    else if(NPC[A].Type == 39 && NPC[A].Projectile == 0) // birdo
+    else if((NPC[A].Type == 39 || NPC[A].Type == 315 || NPC[A].Type == 316) && NPC[A].Projectile == 0) // birdos
     {
         if(NPC[A].Legacy)
         {
@@ -4727,7 +4727,7 @@ void SpecialNPC(int A)
                 }
             }
             NPC[A].Special2 = NPC[A].Special2 + 1;
-            if(NPC[A].Special2 == 125)
+            if(NPC[A].Special2 == 125 && NPC[A].Location.SpeedY == 0)
             {
                 NPC[A].Location.Y = NPC[A].Location.Y - 1;
                 NPC[A].Location.SpeedY = -5;
@@ -4742,8 +4742,18 @@ void SpecialNPC(int A)
                     NPC[numNPCs] = NPC_t();
                     NPC[numNPCs].Active = true;
                     NPC[numNPCs].Direction = NPC[A].Direction;
-                    NPC[numNPCs].Type = 40;
-
+                    if(NPC[A].Type == 39)
+                        NPC[numNPCs].Type = 40;
+                    else if(NPC[A].Type == 315)
+                    {
+                        C = iRand() % 10;
+                        if(C <= 2.5)
+                            NPC[numNPCs].Type = 314;
+                        else if(C > 2.5)
+                            NPC[numNPCs].Type = 40;
+                    }
+                    else
+                        NPC[numNPCs].Type = 314;
                     NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
                     NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
                     NPC[numNPCs].Location.Y = NPC[A].Location.Y + 14 - NPC[numNPCs].Location.Height / 2.0;
@@ -4762,8 +4772,31 @@ void SpecialNPC(int A)
                 NPC[A].Special = 1;
                 if(NPC[A].Special2 > 280)
                 {
-                    NPC[A].Special2 = 0;
-                    NPC[A].Special = 0;
+                    if(NPC[A].Type == 39)
+                    {
+                        NPC[A].Special2 = 0;
+                        NPC[A].Special = 0;
+                    }
+                    else
+                    {
+                        B = iRand() % 10;
+                        if(B <= 5 && NPC[A].Special4 != 2)
+                        {
+                            NPC[A].Special2 = 240;
+                            NPC[A].Special4++;
+                        }
+                        else if(B <= 5 && NPC[A].Special4 == 2)
+                        {
+                            NPC[A].Special4 = 0;
+                            NPC[A].Special2 = 0;
+                            NPC[A].Special = 0;
+                        }
+                        else if(B > 5)
+                        {
+                            NPC[A].Special2 = 0;
+                            NPC[A].Special = 0;
+                        }
+                    }
                 }
             }
             if(NPC[A].Special == 0 && NPC[A].Location.SpeedY == Physics.NPCGravity)

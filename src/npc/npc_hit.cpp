@@ -1485,7 +1485,7 @@ void NPCHit(int A, int B, int C)
         }
         // Shells
     }
-    else if(NPC[A].Type == 5 || NPC[A].Type == 7 || NPC[A].Type == 24 || NPC[A].Type == 73 || (NPC[A].Type >= 113 && NPC[A].Type <= 116) || NPC[A].Type == 174 || NPC[A].Type == 172 || NPC[A].Type == 195)
+    else if(NPC[A].Type == 5 || NPC[A].Type == 7 || NPC[A].Type == 24 || NPC[A].Type == 73 || (NPC[A].Type >= 113 && NPC[A].Type <= 116) || NPC[A].Type == 174 || NPC[A].Type == 172 || NPC[A].Type == 195 || NPC[A].Type == 312 || NPC[A].Type == 313)
     {
         if(B == 1)
         {
@@ -1749,7 +1749,42 @@ void NPCHit(int A, int B, int C)
         }
         // Birdo
     }
-    else if(NPC[A].Type == 39)
+    else if(NPC[A].Type == 317)
+    {
+        if(NPC[A].Special >= 0)
+        {
+            if(B == 3)
+            {
+                if(NPC[C].Type != 13)
+                {
+                    NPC[A].Special = -45;
+                    NPC[A].Damage = NPC[A].Damage + 1;
+                    NPC[A].Direction = -NPC[A].Direction;
+                    PlaySound(39);
+                }
+            }
+            else if(B == 4)
+                NPC[A].Damage = 3;
+            else if(B == 10)
+            {
+                NPC[A].Special = -45;
+                NPC[A].Damage = NPC[A].Damage + 1;
+                NPC[A].Direction = -NPC[A].Direction;
+                PlaySound(39);
+            }
+            if(NPC[A].Damage >= 3)
+            {
+                NPC[A].Special = -64;
+                NPC[A].Special2 = 1;
+            }
+        }
+        if(B == 6)
+        {
+            NPC[A].Killed = B;
+            PlaySound(39);
+        }
+    }
+    else if(NPC[A].Type == 39 || NPC[A].Type == 315 || NPC[A].Type == 316)
     {
         if(NPC[A].Special >= 0)
         {

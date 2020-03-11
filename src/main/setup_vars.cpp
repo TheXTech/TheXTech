@@ -96,6 +96,8 @@ void SetupVars()
     EffectWidth[1] = 16;
     EffectHeight[1] = 16;
 
+    EffectHeight[158] = 28;
+
     EffectWidth[135] = 16;
     EffectHeight[135] = 16;
 
@@ -158,6 +160,13 @@ void SetupVars()
     EffectHeight[26] = 32;
     EffectWidth[29] = 40;
     EffectHeight[29] = 64;
+
+    for(int A = 153; A <= 154; ++A)
+    {
+        EffectWidth[A] = 40;
+        EffectHeight[A] = 64;
+    }
+
     EffectWidth[30] = 16;
     EffectHeight[30] = 16;
     EffectWidth[31] = 32;
@@ -395,6 +404,8 @@ void SetupVars()
     NPCJumpHurt[294] = true;
     NPCNoGravity[294] = true;
 
+    NPCNoGravity[314] = true;
+
     NPCWidth[283] = 48;
     NPCHeight[283] = 48;
     NPCWidthGFX[283] = 64;
@@ -526,10 +537,16 @@ void SetupVars()
     NPCJumpHurt[200] = true;
     NPCJumpHurt[210] = true;
     NPCNoClipping[259] = true;
+    NPCNoClipping[317] = true;
     NPCNoYoshi[259] = true;
+    NPCNoYoshi[317] = true;
     NPCJumpHurt[259] = true;
+    NPCJumpHurt[317] = true;
+    NPCJumpHurt[318] = true;
     NPCWidth[260] = 16;
     NPCHeight[260] = 16;
+    NPCWidth[317] = 64;
+    NPCHeight[317] = 64;
     NPCNoClipping[260] = true;
 
     NPCWidth[153] = 32; // Poison Mushroom
@@ -760,6 +777,21 @@ void SetupVars()
     NPCFrameOffsetY[39] = 2;
     NPCFrameOffsetX[39] = 3;
     NPCNoYoshi[39] = true;
+
+    for(int A = 315; A <= 316; ++A)
+    {
+        NPCWidth[A] = 32;
+        NPCHeight[A] = 60;
+        NPCWidthGFX[A] = 40;
+        NPCHeightGFX[A] = 72;
+        NPCFrameOffsetX[A] = 3;
+        NPCFrameOffsetY[A] = 2;
+        NPCScore[A] = 7;
+        NPCCanWalkOn[A] = true;
+        NPCNoIceBall[A] = true;
+        NPCNoYoshi[A] = true;
+    }
+
     NPCWidth[40] = 32; // egg
     NPCHeight[40] = 24;
     NPCWidth[41] = 32; // smb2 exit(birdo)
@@ -1122,6 +1154,9 @@ void SetupVars()
     NPCFrameOffsetY[125] = 2;
     NPCJumpHurt[261] = true;
     NPCNoFireBall[261] = true;
+    NPCNoFireBall[318] = true;
+    NPCNoGravity[314] = true;
+    NPCNoGravity[317] = true;
     NPCNoFireBall[17] = true;
     NPCDefaultMovement[125] = true;
     NPCNoYoshi[125] = true;
@@ -1301,6 +1336,7 @@ void SetupVars()
     NPCNoYoshi[292] = true;
     NPCForeground[292] = true;
     NPCNoIceBall[292] = true;
+    NPCNoIceBall[314] = true;
 
     NPCNoIceBall[247] = true;
 
@@ -1309,6 +1345,7 @@ void SetupVars()
     NPCWontHurt[171] = true;
     NPCNoClipping[171] = true;
     NPCNoYoshi[171] = true;
+    NPCNoYoshi[314] = true;
 
     NPCHeight[172] = 28; //  Green SMB1 Shell
     NPCIsAShell[172] = true;
@@ -1366,6 +1403,8 @@ void SetupVars()
     NPCHeightGFX[199] = 64;
     NPCJumpHurt[199] = true;
     NPCNoClipping[199] = true;
+    NPCNoClipping[314] = true;
+    NPCJumpHurt[314] = true;
     NPCNoYoshi[203] = true;
     NPCNoYoshi[204] = true;
     NPCNoYoshi[205] = true;
@@ -2074,6 +2113,7 @@ void SetupVars()
     NPCNoIceBall[256] = true;
     NPCNoIceBall[257] = true;
     NPCNoIceBall[259] = true;
+    NPCNoIceBall[317] = true;
     NPCNoIceBall[260] = true;
     NPCNoIceBall[262] = true;
     NPCNoIceBall[251] = true;

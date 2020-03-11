@@ -188,7 +188,7 @@ void KillNPC(int A, int B)
     }
     if(NPC[A].Killed == 10) // Things that die by Link's sword
     {
-        if(!(NPC[A].Type == 15 || NPC[A].Type == 39 || NPC[A].Type == 86 || NPC[A].Type == 209 || NPC[A].Type == 200 || NPC[A].Type == 201 || NPC[A].Type == 203 || NPC[A].Type == 204 || NPC[A].Type == 205 || NPC[A].Type == 210 || NPC[A].Type == 208))
+        if(!(NPC[A].Type == 15 || NPC[A].Type == 39 || NPC[A].Type == 315 || NPC[A].Type == 316 || NPC[A].Type == 86 || NPC[A].Type == 209 || NPC[A].Type == 200 || NPC[A].Type == 201 || NPC[A].Type == 203 || NPC[A].Type == 204 || NPC[A].Type == 205 || NPC[A].Type == 210 || NPC[A].Type == 208))
         {
             PlaySound(53);
             NewEffect(63 , NPC[A].Location);
@@ -1042,7 +1042,7 @@ void KillNPC(int A, int B)
                 NewEffect(47 , NPC[A].Location);
             }
         }
-        else if(NPC[A].Type == 39) // Birdo
+        else if(NPC[A].Type == 39 || NPC[A].Type == 315 || NPC[A].Type == 316) // Birdos
         {
             PlaySound(39);
             if(NPC[A].Legacy == true && LevelEditor == false)
@@ -1085,7 +1085,12 @@ void KillNPC(int A, int B)
             }
              NPC[A].Location.Y = NPC[A].Location.Y - NPC[A].Location.Height / 2.0 + 32;
              NPC[A].Location.X = NPC[A].Location.X - NPC[A].Location.Width / 2.0 + 20;
-             NewEffect(29, NPC[A].Location, NPC[A].Direction);
+             if(NPC[A].Type == 39)
+                 NewEffect(29, NPC[A].Location, NPC[A].Direction);
+             else if(NPC[A].Type == 315)
+                 NewEffect(153, NPC[A].Location, NPC[A].Direction);
+             else
+                 NewEffect(154, NPC[A].Location, NPC[A].Direction);
         }
         else if(NPC[A].Type == 40) // Egg
         {

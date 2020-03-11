@@ -288,7 +288,7 @@ void UpdateEffects()
             else if(e.FrameCount == 8)
                 e.Frame = e.Frame + 1;
         }
-        else if(e.Type == 8 || e.Type == 9 || e.Type == 15 || e.Type == 16 || e.Type == 19 || e.Type == 27 || e.Type == 146 || e.Type == 28 || e.Type == 29 || e.Type == 32 || e.Type == 36 || e.Type == 47 || e.Type == 60 || e.Type == 95 || e.Type == 96 || e.Type == 109) // Flying turtle shell / Bullet bill /hard thing
+        else if(e.Type == 8 || e.Type == 158 || e.Type == 159 || e.Type == 9 || e.Type == 15 || e.Type == 16 || e.Type == 19 || e.Type == 27 || e.Type == 146 || e.Type == 28 || e.Type == 29 || e.Type == 153 || e.Type == 154 || e.Type == 32 || e.Type == 36 || e.Type == 47 || e.Type == 60 || e.Type == 95 || e.Type == 96 || e.Type == 109) // Flying turtle shell / Bullet bill /hard thing
         {
             e.Location.SpeedY = e.Location.SpeedY + 0.5;
             if(e.Location.SpeedY >= 10)
@@ -523,6 +523,17 @@ void UpdateEffects()
                     e.Life = 0;
             }
         }
+        else if(e.Type == 80 || e.Type == 160) // Twinkle
+        {
+            e.FrameCount += 1;
+            if(e.FrameCount >= 8)
+            {
+                e.FrameCount = 0;
+                e.Frame = e.Frame + 1;
+                if(e.Frame == 3)
+                    e.Life = 0;
+            }
+        }
         else if(e.Type == 77 || e.Type == 139) // Small Fireball Tail
         {
             e.Location.X += dRand() * 2 - 1;
@@ -628,7 +639,7 @@ void UpdateEffects()
             else if(e.FrameCount > 5)
                 e.Frame = 1;
         }
-        else if(e.Type == 15 || e.Type == 16 || e.Type == 25 || e.Type == 48 || e.Type == 49 || e.Type == 50 || e.Type == 68 || e.Type == 72 || e.Type == 89 || e.Type == 90 || e.Type == 91 || e.Type == 92 || e.Type == 93 || e.Type == 94 || e.Type == 98 || e.Type == 99 || e.Type == 105 || e.Type == 138 || e.Type == 106 || e.Type == 141) // Bullet Bill / Hammer Bro
+        else if(e.Type == 15 || e.Type == 16 || e.Type == 25 || e.Type == 48 || e.Type == 49 || e.Type == 50 || e.Type == 68 || e.Type == 72 || e.Type == 89 || e.Type == 155 || e.Type == 156 || e.Type == 157 || e.Type == 90 || e.Type == 91 || e.Type == 92 || e.Type == 93 || e.Type == 94 || e.Type == 98 || e.Type == 99 || e.Type == 105 || e.Type == 138 || e.Type == 106 || e.Type == 141) // Bullet Bill / Hammer Bro
         {
             e.Location.SpeedY = e.Location.SpeedY + 0.5;
             if(e.Location.SpeedY >= 10)
@@ -1350,7 +1361,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
         Effect[numEffects].Life = 150;
         Effect[numEffects].Type = A;
     }
-    else if(A == 4 || A == 7 || A == 8 || A == 9 || A == 19 || A == 22 || A == 26 || A == 101 || A == 102 || A == 27 || A == 146 || A == 28 || A == 29 || A == 31 || A == 32 || A == 145 || A == 33 || A == 34 || A == 36 || A == 38 || A == 40 || A == 42 || A == 44 || A == 46 || A == 47 || A == 53 || A == 60 || A == 9 || A == 6 || A == 95 || A == 96 || A == 110 || A == 117 || A == 121 || A == 127 || A == 142) // Flying goomba / turtle shell / hard thing shell
+    else if(A == 4 || A == 7 || A == 8 || A == 158 || A == 159 || A == 9 || A == 19 || A == 22 || A == 26 || A == 101 || A == 102 || A == 27 || A == 146 || A == 28 || A == 29 || A == 153 || A == 154 || A == 31 || A == 32 || A == 145 || A == 33 || A == 34 || A == 36 || A == 38 || A == 40 || A == 42 || A == 44 || A == 46 || A == 47 || A == 53 || A == 60 || A == 9 || A == 6 || A == 95 || A == 96 || A == 110 || A == 117 || A == 121 || A == 127 || A == 142) // Flying goomba / turtle shell / hard thing shell
     {
         numEffects = numEffects + 1;
         Effect[numEffects].Shadow = Shadow;
@@ -1371,7 +1382,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
         Effect[numEffects].Frame = 0;
         Effect[numEffects].Life = 150;
         Effect[numEffects].Type = A;
-        if(Effect[numEffects].Type == 29 && Direction == -1)
+        if((Effect[numEffects].Type == 29 || Effect[numEffects].Type == 153 || Effect[numEffects].Type == 154) && Direction == -1)
             Effect[numEffects].Frame = 1;
         if((Effect[numEffects].Type == 27 || Effect[numEffects].Type == 146) && Direction == 1)
             Effect[numEffects].Frame = 2;
@@ -1545,7 +1556,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
         Effect[numEffects].Life = 60;
         Effect[numEffects].Type = A;
     }
-    else if(A == 80 || A == 152) // Twinkle
+    else if(A == 80 || A == 152 || A == 160) // Twinkle
     {
         numEffects = numEffects + 1;
         Effect[numEffects].Shadow = Shadow;
@@ -1752,7 +1763,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
         Effect[numEffects].Life = 120;
         Effect[numEffects].Type = A;
     }
-    else if(A == 25 || A == 49 || A == 50 || A == 72 || A == 89 || A == 105 || A == 106 || A == 138 || A == 141) // Hammer Bro
+    else if(A == 25 || A == 49 || A == 50 || A == 72 || A == 89 || A == 155 || A == 156 || A == 157 || A == 105 || A == 106 || A == 138 || A == 141) // Hammer Bro
     {
         numEffects = numEffects + 1;
         Effect[numEffects].Shadow = Shadow;

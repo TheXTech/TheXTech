@@ -1598,6 +1598,42 @@ void NPCFrames(int A)
                 NPC[A].Frame = NPC[A].Frame + 2;
         }
     }
+    else if(NPC[A].Type == 314) // smb2 fireball
+    {
+        NPC[A].FrameCount = NPC[A].FrameCount + 1;
+        if(NPC[A].FrameCount > 4)
+        {
+            NPC[A].FrameCount = 0;
+            NPC[A].Frame++;
+            if(NPC[A].Frame >= 3)
+                NPC[A].Frame = 0;
+        }
+    }
+    else if(NPC[A].Type == 314) // fry guy
+    {
+        if(NPC[A].Special >= 0)
+        {
+            NPC[A].FrameCount = NPC[A].FrameCount + 1;
+            if(NPC[A].FrameCount > 4)
+            {
+                NPC[A].FrameCount = 0;
+                NPC[A].Frame++;
+                if(NPC[A].Frame >= 4)
+                    NPC[A].Frame = 0;
+            }
+        }
+        else if(NPC[A].Special < 0)
+        {
+            NPC[A].FrameCount = NPC[A].FrameCount + 1;
+            if(NPC[A].FrameCount > 4)
+            {
+                NPC[A].FrameCount = 0;
+                NPC[A].Frame++;
+                if(NPC[A].Frame >= 7)
+                    NPC[A].Frame = 4;
+            }
+        }
+    }
     else if(NPC[A].Type == 274) // dragon coin
     {
         NPC[A].FrameCount = NPC[A].FrameCount + 1;
@@ -2123,7 +2159,7 @@ void NPCFrames(int A)
             }
         }
     }
-    else if(NPC[A].Type == 39) // birdo
+    else if(NPC[A].Type == 39 || NPC[A].Type == 315 || NPC[A].Type == 316) // birdo
     {
         NPC[A].Frame = 0;
         if(NPC[A].Direction == 1)
