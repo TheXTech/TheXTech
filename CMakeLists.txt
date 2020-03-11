@@ -189,6 +189,7 @@ if(APPLE)
     set(A2XTECH_BUNDLE_NAME "A2xTech" CACHE STRING "Name of bundle folder")
     set(A2XTECH_ICON_NAME "a2xtech.icns" CACHE STRING "Name of bundle icon file")
     set(A2XTECH_CUSTOM_ICON_PATH "" CACHE STRING "Name of icon file to pack into the bundle")
+    set(A2XTECH_CUSTOM_USERDATA_DIR_NAME "" CACHE STRING "A custom name for user data in a home directory, by default the name is 'A2xTech Episodes'.")
     if(NOT A2XTECH_CUSTOM_ICON_PATH STREQUAL "")
         list(APPEND LIB_SRC
             ${A2XTECH_CUSTOM_ICON_PATH}
@@ -281,6 +282,10 @@ if(APPLE)
             COMMENT "Copying assets into bundle..."
         )
         target_compile_definitions(a2xtech PRIVATE -DUSE_BUNDLED_ASSETS)
+    endif()
+
+    if(NOT A2XTECH_CUSTOM_USERDATA_DIR_NAME STREQUAL "")
+        target_compile_definitions(a2xtech PRIVATE -DUSERDATA_ROOT_NAME="${A2XTECH_CUSTOM_USERDATA_DIR_NAME}")
     endif()
 
     set(CPACK_PACKAGE_NAME "${A2XTECH_BUNDLE_NAME}")
