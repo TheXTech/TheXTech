@@ -588,17 +588,46 @@ bool FrmMain::isSdlError()
 
 void FrmMain::repaint()
 {
+    int w, h, off_x, off_y, wDst, hDst;
+    float scale_x, scale_y;
+
 #ifndef __EMSCRIPTEN__
     processRecorder();
 #endif
 
     SDL_SetRenderTarget(m_gRenderer, nullptr);
 
+    // Get the size of surface where to draw the scene
+    SDL_GetRendererOutputSize(m_gRenderer, &w, &h);
+
+    // Calculate the size difference factor
+    scale_x = float(w) / ScaleWidth;
+    scale_y = float(h) / ScaleHeight;
+
+    wDst = w;
+    hDst = h;
+
+    // Keep aspect ratio
+    if(scale_x > scale_y) // Width more than height
+    {
+        wDst = int(scale_y * ScaleWidth);
+        hDst = int(scale_y * ScaleHeight);
+    }
+    else if(scale_x < scale_y) // Height more than width
+    {
+        hDst = int(scale_x * ScaleHeight);
+        wDst = int(scale_x * ScaleWidth);
+    }
+
+    // Align the rendering scene to the center of screen
+    off_x = (w - wDst) / 2;
+    off_y = (h - hDst) / 2;
+
     SDL_SetRenderDrawColor(m_gRenderer, 0, 0, 0, 255);
     SDL_RenderClear(m_gRenderer);
 
-    SDL_Rect destRect = scaledRect(0, 0, ScreenW, ScreenH);
-    SDL_Rect sourceRect = {0, 0, ScreenW, ScreenH};
+    SDL_Rect destRect = {off_x, off_y, wDst, hDst};
+    SDL_Rect sourceRect = {0, 0, ScaleWidth, ScaleHeight};
 
     SDL_SetTextureColorMod(m_tBuffer, 255, 255, 255);
     SDL_SetTextureAlphaMod(m_tBuffer, 255);
@@ -617,7 +646,9 @@ void FrmMain::updateViewport()
     SDL_GetWindowSize(m_window, &wi, &hi);
 #else
     if(IsFullScreen(m_window))
+    {
         SDL_GetWindowSize(m_window, &wi, &hi);
+    }
     else
     {
         wi = ScreenW;
