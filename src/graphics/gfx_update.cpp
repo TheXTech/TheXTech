@@ -2594,12 +2594,12 @@ void UpdateGraphics(bool skipRepaint)
                     frmMain.offsetViewport(A, B);
                 }
             }
-
-            if(!skipRepaint)
-                frmMain.repaint();
         }
 //    Next Z
     }
+
+    if(!skipRepaint)
+        frmMain.repaint();
 
 //    If TakeScreen = True Then ScreenShot
     if(TakeScreen)
