@@ -598,7 +598,7 @@ void FrmMain::repaint()
     SDL_RenderClear(m_gRenderer);
 
     SDL_Rect destRect = scaledRect(0, 0, ScreenW, ScreenH);
-    SDL_Rect sourceRect = { 0, 0, ScreenW, ScreenH };
+    SDL_Rect sourceRect = {0, 0, ScreenW, ScreenH};
 
     SDL_SetTextureColorMod(m_tBuffer, 255, 255, 255);
     SDL_SetTextureAlphaMod(m_tBuffer, 255);
@@ -612,6 +612,7 @@ void FrmMain::updateViewport()
 {
     float w, w1, h, h1;
     int   wi, hi;
+
 #ifndef __EMSCRIPTEN__
     SDL_GetWindowSize(m_window, &wi, &hi);
 #else
@@ -659,70 +660,27 @@ void FrmMain::updateViewport()
 
 void FrmMain::resetViewport()
 {
-    float w, w1, h, h1;
-    int   wi, hi;
-#ifndef __EMSCRIPTEN__
-    SDL_GetWindowSize(m_window, &wi, &hi);
-#else
-    if(IsFullScreen(m_window))
-        SDL_GetWindowSize(m_window, &wi, &hi);
-    else
+    updateViewport();
+
+    SDL_Rect topLeftViewport =
     {
-        wi = ScreenW;
-        hi = ScreenH;
-    }
-#endif
-    w = wi;
-    h = hi;
-    w1 = w;
-    h1 = h;
-    scale_x = w / ScaleWidth;
-    scale_y = h / ScaleHeight;
-    viewport_scale_x = scale_x;
-    viewport_scale_y = scale_y;
-
-    viewport_offset_x = 0;
-    viewport_offset_y = 0;
-
-    if(scale_x > scale_y)
-    {
-        w1 = scale_y * ScaleWidth;
-        viewport_scale_x = w1 / ScaleWidth;
-    }
-    else if(scale_x < scale_y)
-    {
-        h1 = scale_x * ScaleHeight;
-        viewport_scale_y = h1 / ScaleHeight;
-    }
-
-    offset_x = (w - w1) / 2;
-    offset_y = (h - h1) / 2;
-
-    viewport_x = 0;
-    viewport_y = 0;
-    viewport_w = static_cast<int>(w1);
-    viewport_h = static_cast<int>(h1);
-
-    SDL_Rect topLeftViewport = {0, 0, wi, hi};
-    topLeftViewport.x = static_cast<int>(offset_x);
-    topLeftViewport.y = static_cast<int>(offset_y);
-    topLeftViewport.w = viewport_w;
-    topLeftViewport.h = viewport_h;
+        static_cast<int>(offset_x),
+        static_cast<int>(offset_y),
+        viewport_w,
+        viewport_h
+    };
     SDL_RenderSetViewport(m_gRenderer, &topLeftViewport);
 }
 
 void FrmMain::setViewport(int x, int y, int w, int h)
 {
-    auto xF = static_cast<float>(x);
-    auto yF = static_cast<float>(y);
-    auto wF = static_cast<float>(w);
-    auto hF = static_cast<float>(h);
     SDL_Rect topLeftViewport = {x, y, w, h};
     SDL_RenderSetViewport(m_gRenderer, &topLeftViewport);
-    viewport_x = int(xF);
-    viewport_y = int(yF);
-    viewport_w = int(wF);
-    viewport_h = int(hF);
+
+    viewport_x = x;
+    viewport_y = y;
+    viewport_w = w;
+    viewport_h = h;
 }
 
 void FrmMain::offsetViewport(int x, int y)
