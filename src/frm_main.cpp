@@ -588,17 +588,46 @@ bool FrmMain::isSdlError()
 
 void FrmMain::repaint()
 {
+    int w, h, off_x, off_y, wDst, hDst;
+    float scale_x, scale_y;
+
 #ifndef __EMSCRIPTEN__
     processRecorder();
 #endif
 
     SDL_SetRenderTarget(m_gRenderer, nullptr);
 
+    // Get the size of surface where to draw the scene
+    SDL_GetRendererOutputSize(m_gRenderer, &w, &h);
+
+    // Calculate the size difference factor
+    scale_x = float(w) / ScaleWidth;
+    scale_y = float(h) / ScaleHeight;
+
+    wDst = w;
+    hDst = h;
+
+    // Keep aspect ratio
+    if(scale_x > scale_y) // Width more than height
+    {
+        wDst = int(scale_y * ScaleWidth);
+        hDst = int(scale_y * ScaleHeight);
+    }
+    else if(scale_x < scale_y) // Height more than width
+    {
+        hDst = int(scale_x * ScaleHeight);
+        wDst = int(scale_x * ScaleWidth);
+    }
+
+    // Align the rendering scene to the center of screen
+    off_x = (w - wDst) / 2;
+    off_y = (h - hDst) / 2;
+
     SDL_SetRenderDrawColor(m_gRenderer, 0, 0, 0, 255);
     SDL_RenderClear(m_gRenderer);
 
-    SDL_Rect destRect = scaledRect(0, 0, ScreenW, ScreenH);
-    SDL_Rect sourceRect = { 0, 0, ScreenW, ScreenH };
+    SDL_Rect destRect = {off_x, off_y, wDst, hDst};
+    SDL_Rect sourceRect = {0, 0, ScaleWidth, ScaleHeight};
 
     SDL_SetTextureColorMod(m_tBuffer, 255, 255, 255);
     SDL_SetTextureAlphaMod(m_tBuffer, 255);
@@ -612,11 +641,14 @@ void FrmMain::updateViewport()
 {
     float w, w1, h, h1;
     int   wi, hi;
+
 #ifndef __EMSCRIPTEN__
     SDL_GetWindowSize(m_window, &wi, &hi);
 #else
     if(IsFullScreen(m_window))
+    {
         SDL_GetWindowSize(m_window, &wi, &hi);
+    }
     else
     {
         wi = ScreenW;
@@ -659,70 +691,27 @@ void FrmMain::updateViewport()
 
 void FrmMain::resetViewport()
 {
-    float w, w1, h, h1;
-    int   wi, hi;
-#ifndef __EMSCRIPTEN__
-    SDL_GetWindowSize(m_window, &wi, &hi);
-#else
-    if(IsFullScreen(m_window))
-        SDL_GetWindowSize(m_window, &wi, &hi);
-    else
+    updateViewport();
+
+    SDL_Rect topLeftViewport =
     {
-        wi = ScreenW;
-        hi = ScreenH;
-    }
-#endif
-    w = wi;
-    h = hi;
-    w1 = w;
-    h1 = h;
-    scale_x = w / ScaleWidth;
-    scale_y = h / ScaleHeight;
-    viewport_scale_x = scale_x;
-    viewport_scale_y = scale_y;
-
-    viewport_offset_x = 0;
-    viewport_offset_y = 0;
-
-    if(scale_x > scale_y)
-    {
-        w1 = scale_y * ScaleWidth;
-        viewport_scale_x = w1 / ScaleWidth;
-    }
-    else if(scale_x < scale_y)
-    {
-        h1 = scale_x * ScaleHeight;
-        viewport_scale_y = h1 / ScaleHeight;
-    }
-
-    offset_x = (w - w1) / 2;
-    offset_y = (h - h1) / 2;
-
-    viewport_x = 0;
-    viewport_y = 0;
-    viewport_w = static_cast<int>(w1);
-    viewport_h = static_cast<int>(h1);
-
-    SDL_Rect topLeftViewport = {0, 0, wi, hi};
-    topLeftViewport.x = static_cast<int>(offset_x);
-    topLeftViewport.y = static_cast<int>(offset_y);
-    topLeftViewport.w = viewport_w;
-    topLeftViewport.h = viewport_h;
+        static_cast<int>(offset_x),
+        static_cast<int>(offset_y),
+        viewport_w,
+        viewport_h
+    };
     SDL_RenderSetViewport(m_gRenderer, &topLeftViewport);
 }
 
 void FrmMain::setViewport(int x, int y, int w, int h)
 {
-    auto xF = static_cast<float>(x);
-    auto yF = static_cast<float>(y);
-    auto wF = static_cast<float>(w);
-    auto hF = static_cast<float>(h);
     SDL_Rect topLeftViewport = {x, y, w, h};
     SDL_RenderSetViewport(m_gRenderer, &topLeftViewport);
-    viewport_x = int(xF);
-    viewport_y = int(yF);
-    viewport_w = int(wF);
-    viewport_h = int(hF);
+
+    viewport_x = x;
+    viewport_y = y;
+    viewport_w = w;
+    viewport_h = h;
 }
 
 void FrmMain::offsetViewport(int x, int y)
@@ -1340,17 +1329,6 @@ int FrmMain::makeShot_action(void *_pixels)
 #endif // __EMSCRIPTEN__
 
 
-SDL_Rect FrmMain::scaledRect(float x, float y, float w, float h)
-{
-    return
-    {
-        static_cast<int>(std::ceil(x * viewport_scale_x) + offset_x),
-        static_cast<int>(std::ceil(y * viewport_scale_y) + offset_y),
-        static_cast<int>(std::ceil(w * viewport_scale_x)),
-        static_cast<int>(std::ceil(h * viewport_scale_y))
-    };
-}
-
 SDL_Point FrmMain::MapToScr(int x, int y)
 {
     return {
@@ -1472,17 +1450,17 @@ void FrmMain::renderCircle(int cx, int cy, int radius, float red, float green, f
     {
         double dx = std::floor(std::sqrt((2.0 * radius * dy) - (dy * dy)));
         SDL_RenderDrawLine(m_gRenderer,
-                           cx - dx,
-                           cy + dy - radius,
-                           cx + dx,
-                           cy + dy - radius);
+                           int(cx - dx),
+                           int(cy + dy - radius),
+                           int(cx + dx),
+                           int(cy + dy - radius));
         if(dy < radius) // Don't cross lines
         {
             SDL_RenderDrawLine(m_gRenderer,
-                               cx - dx,
-                               cy - dy + radius,
-                               cx + dx,
-                               cy - dy + radius);
+                               int(cx - dx),
+                               int(cy - dy + radius),
+                               int(cx + dx),
+                               int(cy - dy + radius));
         }
     }
 }
@@ -1521,8 +1499,8 @@ void FrmMain::renderTextureI(int xDst, int yDst, int wDst, int hDst,
             hDst = 0;
     }
 
-    SDL_Rect destRect = { xDst + viewport_offset_x, yDst + viewport_offset_y, wDst, hDst };
-    SDL_Rect sourceRect = { xSrc, ySrc, wDst, hDst };
+    SDL_Rect destRect = {xDst + viewport_offset_x, yDst + viewport_offset_y, wDst, hDst};
+    SDL_Rect sourceRect = {xSrc, ySrc, wDst, hDst};
 
     SDL_SetTextureColorMod(tx.texture,
                            static_cast<unsigned char>(255.f * red),
