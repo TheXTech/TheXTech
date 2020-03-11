@@ -206,7 +206,6 @@ private:
     int viewport_w = 0;
     int viewport_h = 0;
 
-    SDL_Rect   scaledRect(float x, float y, float w, float h);
     SDL_Point MapToScr(int x, int y);
 };
 

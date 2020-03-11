@@ -1329,17 +1329,6 @@ int FrmMain::makeShot_action(void *_pixels)
 #endif // __EMSCRIPTEN__
 
 
-SDL_Rect FrmMain::scaledRect(float x, float y, float w, float h)
-{
-    return
-    {
-        static_cast<int>(std::ceil(x * viewport_scale_x) + offset_x),
-        static_cast<int>(std::ceil(y * viewport_scale_y) + offset_y),
-        static_cast<int>(std::ceil(w * viewport_scale_x)),
-        static_cast<int>(std::ceil(h * viewport_scale_y))
-    };
-}
-
 SDL_Point FrmMain::MapToScr(int x, int y)
 {
     return {
@@ -1461,17 +1450,17 @@ void FrmMain::renderCircle(int cx, int cy, int radius, float red, float green, f
     {
         double dx = std::floor(std::sqrt((2.0 * radius * dy) - (dy * dy)));
         SDL_RenderDrawLine(m_gRenderer,
-                           cx - dx,
-                           cy + dy - radius,
-                           cx + dx,
-                           cy + dy - radius);
+                           int(cx - dx),
+                           int(cy + dy - radius),
+                           int(cx + dx),
+                           int(cy + dy - radius));
         if(dy < radius) // Don't cross lines
         {
             SDL_RenderDrawLine(m_gRenderer,
-                               cx - dx,
-                               cy - dy + radius,
-                               cx + dx,
-                               cy - dy + radius);
+                               int(cx - dx),
+                               int(cy - dy + radius),
+                               int(cx + dx),
+                               int(cy - dy + radius));
         }
     }
 }
@@ -1510,8 +1499,8 @@ void FrmMain::renderTextureI(int xDst, int yDst, int wDst, int hDst,
             hDst = 0;
     }
 
-    SDL_Rect destRect = { xDst + viewport_offset_x, yDst + viewport_offset_y, wDst, hDst };
-    SDL_Rect sourceRect = { xSrc, ySrc, wDst, hDst };
+    SDL_Rect destRect = {xDst + viewport_offset_x, yDst + viewport_offset_y, wDst, hDst};
+    SDL_Rect sourceRect = {xSrc, ySrc, wDst, hDst};
 
     SDL_SetTextureColorMod(tx.texture,
                            static_cast<unsigned char>(255.f * red),
