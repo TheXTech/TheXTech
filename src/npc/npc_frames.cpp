@@ -1609,6 +1609,22 @@ void NPCFrames(int A)
                 NPC[A].Frame = 0;
         }
     }
+    else if(NPC[A].Type == 319 || NPC[A].Type == 320 || NPC[A].Type == 321)
+    {
+        if(NPC[A].Special <= 100)
+        {
+            NPC[A].FrameCount = NPC[A].FrameCount + 1;
+            if(NPC[A].FrameCount > 4)
+            {
+                NPC[A].FrameCount = 0;
+                NPC[A].Frame++;
+                if(NPC[A].Frame >= 2)
+                    NPC[A].Frame = 0;
+            }
+        }
+        else if(NPC[A].Special > 100)
+            NPC[A].Frame = 2;
+    }
     else if(NPC[A].Type == 317) // fry guy
     {
         if(NPC[A].Special >= 0)
@@ -1977,7 +1993,7 @@ void NPCFrames(int A)
         if(NPC[A].Direction == 1)
             NPC[A].Frame = NPC[A].Frame + 3;
     }
-    else if(NPC[A].Type == 19 || NPC[A].Type == 20 || NPC[A].Type == 28 || (NPC[A].Type >= 129 && NPC[A].Type <= 132) || NPC[A].Type == 135 || NPC[A].Type == 158) // Shy guys / Jumping Fish
+    else if(NPC[A].Type == 19 || NPC[A].Type == 20 || NPC[A].Type == 28 || (NPC[A].Type >= 129 && NPC[A].Type <= 132) || NPC[A].Type == 135 || NPC[A].Type == 158 || NPC[A].Type == 322) // Shy guys / Jumping Fish
     {
         if(NPC[A].HoldingPlayer == 0 && NPC[A].Projectile == 0)
         {

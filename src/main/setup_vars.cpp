@@ -1195,6 +1195,10 @@ void SetupVars()
     NPCCanWalkOn[132] = true;
     NPCGrabFromTop[132] = true;
     NPCDefaultMovement[132] = true;
+    NPCWidth[322] = 32; // Flurry
+    NPCHeight[322] = 32;
+    NPCCanWalkOn[322] = true;
+    NPCGrabFromTop[322] = true;
     NPCWidth[133] = 16; // Bullet
     NPCHeight[133] = 16;
     NPCNoYoshi[133] = true;
@@ -1239,6 +1243,12 @@ void SetupVars()
         NPCIsGrabbable[A] = true;
         NPCIsVeggie[A] = true;
     }
+
+    For(A, 319, 321) // Pansers
+    {
+        NPCJumpHurt[A] = true;
+    }
+
     NPCWidth[148] = 32; // Black Yoshi
     NPCHeight[148] = 32;
     NPCWidthGFX[148] = 74;
@@ -1977,6 +1987,7 @@ void SetupVars()
     NPCNoFireBall[130] = true;
     NPCNoFireBall[131] = true;
     NPCNoFireBall[132] = true;
+    NPCNoFireBall[322] = true;
     NPCNoFireBall[12] = true;
     NPCNoFireBall[25] = true;
 

@@ -2001,7 +2001,7 @@ void NPCHit(int A, int B, int C)
         }
         // Misc. Things With No Jump Death (SMB2 Shy Guys, SMB2 Ninji, SMB2 Pokey)
     }
-    else if(NPC[A].Type == 19 || NPC[A].Type == 20 || NPC[A].Type == 247 || NPC[A].Type == 25 || NPC[A].Type == 28 || NPC[A].Type == 36 || NPC[A].Type == 285 || NPC[A].Type == 286 || NPC[A].Type == 47 || NPC[A].Type == 284 || NPC[A].Type == 48 || NPC[A].Type == 53 || NPC[A].Type == 54 || NPC[A].Type == 318 || (NPC[A].Type >= 129 && NPC[A].Type <= 132) || NPC[A].Type == 158 || NPC[A].Type == 231 || NPC[A].Type == 235 || NPC[A].Type == 261 || NPC[A].Type == 272)
+    else if(NPC[A].Type == 19 || NPC[A].Type == 20 || NPC[A].Type == 247 || NPC[A].Type == 25 || NPC[A].Type == 28 || NPC[A].Type == 36 || NPC[A].Type == 285 || NPC[A].Type == 286 || NPC[A].Type == 47 || NPC[A].Type == 284 || NPC[A].Type == 48 || NPC[A].Type == 53 || NPC[A].Type == 54 || NPC[A].Type == 318 || (NPC[A].Type >= 129 && NPC[A].Type <= 132) || NPC[A].Type == 158 || NPC[A].Type == 231 || NPC[A].Type == 235 || NPC[A].Type == 261 || NPC[A].Type == 272 || NPC[A].Type == 319 || NPC[A].Type == 320 || NPC[A].Type == 321 || NPC[A].Type == 322)
     {
         if(B == 10 && NPC[A].Type != 158)
             NPC[A].Killed = B;

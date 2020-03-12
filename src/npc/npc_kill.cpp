@@ -1149,7 +1149,7 @@ void KillNPC(int A, int B)
                     Effect[numEffects].Frame = NPC[A].Type - 121;
             }
         }
-        else if(NPC[A].Type == 23 || NPC[A].Type == 24 || NPC[A].Type == 36 || NPC[A].Type == 53 || NPC[A].Type == 54 || NPC[A].Type == 285 || NPC[A].Type == 286 || NPC[A].Type == 318 || NPC[A].Type == 313) // Hard thing / Spiney
+        else if(NPC[A].Type == 23 || NPC[A].Type == 24 || NPC[A].Type == 36 || NPC[A].Type == 53 || NPC[A].Type == 54 || NPC[A].Type == 285 || NPC[A].Type == 286 || NPC[A].Type == 318 || NPC[A].Type == 313 || NPC[A].Type == 312) // Hard thing / Spiney
         {
              NPC[A].Location.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0 - EffectWidth[9] / 2.0;
              NPC[A].Location.Y = NPC[A].Location.Y + NPC[A].Location.Height / 2.0 - EffectHeight[9] / 2.0;
@@ -1182,6 +1182,8 @@ void KillNPC(int A, int B)
                     NewEffect(160 , NPC[A].Location);
                 else if(NPC[A].Type == 313)
                     NewEffect(159 , NPC[A].Location);
+                else if(NPC[A].Type == 312)
+                    NewEffect(158 , NPC[A].Location);
                 else
                     NewEffect(19 , NPC[A].Location);
             }
@@ -1328,7 +1330,7 @@ void KillNPC(int A, int B)
                     NewEffect(16, NPC[A].Location, NPC[A].Direction);
             }
         }
-        else if(NPC[A].Type == 247 || NPC[A].Type == 19 || NPC[A].Type == 20 || NPC[A].Type == 25 || NPC[A].Type == 28 || NPC[A].Type == 29 || NPC[A].Type == 47 || NPC[A].Type == 284 || NPC[A].Type == 48 || NPC[A].Type == 77 || NPC[A].Type == 271 || (NPC[A].Type >= 129 && NPC[A].Type <= 132) || NPC[A].Type == 158 || NPC[A].Type == 261 || NPC[A].Type == 272) // Misc Things
+        else if(NPC[A].Type == 247 || NPC[A].Type == 19 || NPC[A].Type == 20 || NPC[A].Type == 25 || NPC[A].Type == 28 || NPC[A].Type == 29 || NPC[A].Type == 47 || NPC[A].Type == 284 || NPC[A].Type == 48 || NPC[A].Type == 77 || NPC[A].Type == 271 || (NPC[A].Type >= 129 && NPC[A].Type <= 132) || NPC[A].Type == 158 || NPC[A].Type == 261 || NPC[A].Type == 272 || NPC[A].Type == 319 || NPC[A].Type == 320 || NPC[A].Type == 321 || NPC[A].Type == 322) // Misc Things
         {
             if(B == 6)
             {
@@ -1351,6 +1353,14 @@ void KillNPC(int A, int B)
                     NewEffect(64 + NPC[A].Type - 129, NPC[A].Location, NPC[A].Direction);
                 else if(NPC[A].Type == 19)
                     NewEffect(17, NPC[A].Location, NPC[A].Direction);
+                else if(NPC[A].Type == 319)
+                    NewEffect(155, NPC[A].Location, NPC[A].Direction);
+                else if(NPC[A].Type == 320)
+                    NewEffect(156, NPC[A].Location, NPC[A].Direction);
+                else if(NPC[A].Type == 321)
+                    NewEffect(157, NPC[A].Location, NPC[A].Direction);
+                else if(NPC[A].Type == 322)
+                    NewEffect(161, NPC[A].Location, NPC[A].Direction);
                 else if(NPC[A].Type == 20)
                     NewEffect(18, NPC[A].Location, NPC[A].Direction);
                 else if(NPC[A].Type == 261)

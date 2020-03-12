@@ -679,7 +679,7 @@ void UpdateEffects()
                     e.Frame = 6;
             }
         }
-        else if(e.Type == 85 || e.Type == 86 || e.Type == 87 || e.Type == 88 || e.Type == 97 || e.Type == 115 || e.Type == 122 || e.Type == 116 || e.Type == 118 || e.Type == 119 || e.Type == 120 || e.Type == 121 || e.Type == 137) // Rex / mega mole / smw goomba free falling
+        else if(e.Type == 85 || e.Type == 86 || e.Type == 161 || e.Type == 87 || e.Type == 88 || e.Type == 97 || e.Type == 115 || e.Type == 122 || e.Type == 116 || e.Type == 118 || e.Type == 119 || e.Type == 120 || e.Type == 121 || e.Type == 137) // Rex / mega mole / smw goomba free falling
         {
             e.Location.SpeedY = e.Location.SpeedY + 0.5;
             if(e.Location.SpeedY >= 10)
@@ -1697,7 +1697,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
         Effect[numEffects].Frame = 5;
 
     }
-    else if(A == 17 || A == 18 || A == 20 || A == 24 || (A >= 64 && A <= 67) || A == 83 || A == 85 || A == 86 || A == 87 || A == 88 || A == 97 || A == 115 || A == 122 || A == 116 || A == 118 || A == 119 || A == 120 || A == 137) // Shy guy / Star Thing /Red Jumping Fish
+    else if(A == 17 || A == 18 || A == 20 || A == 24 || (A >= 64 && A <= 67) || A == 83 || A == 85 || A == 86 || A == 161 || A == 87 || A == 88 || A == 97 || A == 115 || A == 122 || A == 116 || A == 118 || A == 119 || A == 120 || A == 137) // Shy guy / Star Thing /Red Jumping Fish
     {
         numEffects = numEffects + 1;
         Effect[numEffects].Shadow = Shadow;
@@ -1718,14 +1718,14 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
         }
         if(int(Direction) == -1)
         {
-            if(A == 85 || A == 86 || A == 87 || A == 88 || A == 97 || A == 115 || A == 116 || A == 118 || A == 119 || A == 120 || A == 122 || A == 137)
+            if(A == 85 || A == 86 || A == 161 || A == 87 || A == 88 || A == 97 || A == 115 || A == 116 || A == 118 || A == 119 || A == 120 || A == 122 || A == 137)
                 Effect[numEffects].Frame = 0;
             else
                 Effect[numEffects].Frame = 4;
         }
         else
         {
-            if(A == 85 || A == 86 || A == 87 || A == 88 || A == 97 || A == 115 || A == 116 || A == 118 || A == 119 || A == 120 || A == 122 || A == 137)
+            if(A == 85 || A == 86 || A == 161 || A == 87 || A == 88 || A == 97 || A == 115 || A == 116 || A == 118 || A == 119 || A == 120 || A == 122 || A == 137)
                 Effect[numEffects].Frame = 2;
             else
                 Effect[numEffects].Frame = 6;
