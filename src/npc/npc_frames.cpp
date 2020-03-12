@@ -1609,7 +1609,7 @@ void NPCFrames(int A)
                 NPC[A].Frame = 0;
         }
     }
-    else if(NPC[A].Type == 314) // fry guy
+    else if(NPC[A].Type == 317) // fry guy
     {
         if(NPC[A].Special >= 0)
         {
@@ -1625,12 +1625,16 @@ void NPCFrames(int A)
         else if(NPC[A].Special < 0)
         {
             NPC[A].FrameCount = NPC[A].FrameCount + 1;
-            if(NPC[A].FrameCount > 4)
+            if(NPC[A].FrameCount < 6)
+                NPC[A].Frame = 4;
+            else if(NPC[A].FrameCount < 12)
+                NPC[A].Frame = 5;
+            else if(NPC[A].FrameCount < 18)
+                NPC[A].Frame = 6;
+            else
             {
+                NPC[A].Frame = 0;
                 NPC[A].FrameCount = 0;
-                NPC[A].Frame++;
-                if(NPC[A].Frame >= 7)
-                    NPC[A].Frame = 4;
             }
         }
     }

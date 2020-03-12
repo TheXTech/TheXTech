@@ -3490,7 +3490,7 @@ void UpdatePlayer()
                                         {
                                             if(Player[A].Mount == 1 || Player[A].Mount == 2 || Player[A].Stoned)
                                                 NPCHit(B, 8, A);
-                                            else if(!(NPC[B].Type == 245 || NPC[B].Type == 275 || NPC[B].Type == 8 || NPC[B].Type == 12 || NPC[B].Type == 36 || NPC[B].Type == 294 || NPC[B].Type == 285 || NPC[B].Type == 286 || NPC[B].Type == 51 || NPC[B].Type == 52 || NPC[B].Type == 53 || NPC[B].Type == 54 || NPC[B].Type == 74 || NPC[B].Type == 93 || NPC[B].Type == 200 || NPC[B].Type == 205 || NPC[B].Type == 207 || NPC[B].Type == 201 || NPC[B].Type == 261 || NPC[B].Type == 270) && NPCCanWalkOn[NPC[B].Type] == false)
+                                            else if(!(NPC[B].Type == 245 || NPC[B].Type == 275 || NPC[B].Type == 318 || NPC[B].Type == 319 || NPC[B].Type == 320 || NPC[B].Type == 321 || NPC[B].Type == 8 || NPC[B].Type == 12 || NPC[B].Type == 36 || NPC[B].Type == 294 || NPC[B].Type == 285 || NPC[B].Type == 286 || NPC[B].Type == 51 || NPC[B].Type == 52 || NPC[B].Type == 53 || NPC[B].Type == 54 || NPC[B].Type == 74 || NPC[B].Type == 93 || NPC[B].Type == 200 || NPC[B].Type == 205 || NPC[B].Type == 207 || NPC[B].Type == 201 || NPC[B].Type == 261 || NPC[B].Type == 270) && NPCCanWalkOn[NPC[B].Type] == false)
                                             {
                                                 if(Player[A].Wet > 0 && (NPCIsCheep[NPC[B].Type] || NPC[B].Type == 231 || NPC[B].Type == 235))
                                                 {

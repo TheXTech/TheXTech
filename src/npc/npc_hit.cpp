@@ -1485,7 +1485,57 @@ void NPCHit(int A, int B, int C)
         }
         // Shells
     }
-    else if(NPC[A].Type == 5 || NPC[A].Type == 7 || NPC[A].Type == 24 || NPC[A].Type == 73 || (NPC[A].Type >= 113 && NPC[A].Type <= 116) || NPC[A].Type == 174 || NPC[A].Type == 172 || NPC[A].Type == 195 || NPC[A].Type == 312 || NPC[A].Type == 313)
+    else if(NPC[A].Type == 313)
+    {
+        if(B == 1)
+        {
+            if(NPC[A].Effect == 2)
+                NPC[A].Effect = 0;
+            if(Player[C].Dismount <= 0 && Player[C].Mount != 2)
+            {
+                if(NPC[A].Location.SpeedX == 0.0)
+                {
+                    PlaySound(9);
+                    NPC[A].Location.SpeedX = double(Physics.NPCShellSpeed * Player[C].Direction);
+                    NPC[A].CantHurt = Physics.NPCCanHurtWait;
+                    NPC[A].CantHurtPlayer = C;
+                    NPC[A].Projectile = true;
+                    NPC[A].Location.SpeedY = 0;
+                }
+                else if(NPC[A].Slope == 0 && Player[C].Vine == 0)
+                {
+                    PlaySound(2);
+                    NPC[A].Location.SpeedX = 0;
+                    NPC[A].Location.SpeedY = 0;
+                    if(NPC[A].Wet > 0)
+                    {
+                        NPC[A].RealSpeedX = 0;
+                        NPC[A].Projectile = false;
+                    }
+                }
+            }
+        }
+        else if(B == 2 || B == 7)
+        {
+            PlaySound(9);
+            NPC[A].Projectile = true;
+            NPC[A].Location.SpeedY = -5;
+            NPC[A].Location.SpeedX = 0;
+        }
+        else if(B == 6)
+        {
+            NPC[A].Killed = B;
+        }
+        else if(!(B == 4))
+        {
+            NPC[A].Killed = B;
+        }
+        else if(B == 4)
+        {
+            NPC[A].Killed = B;
+        }
+    }
+    else if(NPC[A].Type == 5 || NPC[A].Type == 7 || NPC[A].Type == 24 || NPC[A].Type == 73 || (NPC[A].Type >= 113 && NPC[A].Type <= 116) || NPC[A].Type == 174 || NPC[A].Type == 172 || NPC[A].Type == 195 || NPC[A].Type == 312)
     {
         if(B == 1)
         {
@@ -1758,8 +1808,12 @@ void NPCHit(int A, int B, int C)
                 if(NPC[C].Type != 13)
                 {
                     NPC[A].Special = -45;
+                    NPC[A].Special3 = 0;
+                    NPC[A].Special4 = 0;
+                    NPC[A].Special5 = 0;
                     NPC[A].Damage = NPC[A].Damage + 1;
                     NPC[A].Direction = -NPC[A].Direction;
+                    NPC[A].Location.SpeedX = 0;
                     PlaySound(39);
                 }
             }
@@ -1768,19 +1822,27 @@ void NPCHit(int A, int B, int C)
             else if(B == 10)
             {
                 NPC[A].Special = -45;
+                NPC[A].Special3 = 0;
+                NPC[A].Special4 = 0;
+                NPC[A].Special5 = 0;
                 NPC[A].Damage = NPC[A].Damage + 1;
                 NPC[A].Direction = -NPC[A].Direction;
+                NPC[A].Location.SpeedX = 0;
                 PlaySound(39);
             }
             if(NPC[A].Damage >= 3)
             {
                 NPC[A].Special = -64;
-                NPC[A].Special2 = 1;
+                NPC[A].Special3 = 0;
+                NPC[A].Special4 = 0;
+                NPC[A].Special5 = 0;
+                NPC[A].Special6 = 1;
             }
         }
         if(B == 6)
         {
-            NPC[A].Killed = B;
+            NPC[A].Special = -64;
+            NPC[A].Special6 = 1;
             PlaySound(39);
         }
     }
@@ -1848,7 +1910,8 @@ void NPCHit(int A, int B, int C)
         tempLocation.Y = NPC[A].Location.Y - tempLocation.Height / 4;
         Bomb(tempLocation, 3, 0);
     }
-    else if(NPC[A].Type == 21 || NPC[A].Type == 22 || NPC[A].Type == 26 || NPC[A].Type == 31 || NPC[A].Type == 32 || NPC[A].Type == 238 || NPC[A].Type == 239 || NPC[A].Type == 35 || NPC[A].Type == 191 || NPC[A].Type == 193 || NPC[A].Type == 49 || NPCIsYoshi[NPC[A].Type] || NPC[A].Type == 96 || (NPC[A].Type >= 154 && NPC[A].Type <= 157) || NPC[A].Type == 240 || NPC[A].Type == 241 || NPC[A].Type == 278 || NPC[A].Type == 279 || NPC[A].Type == 305)
+    else if(NPC[A].Type == 21 || NPC[A].Type == 22 || NPC[A].Type == 26 || NPC[A].Type == 31 || NPC[A].Type == 32 || NPC[A].Type == 238 || NPC[A].Type == 239 || NPC[A].Type == 35 || NPC[A].Type == 191 || NPC[A].Type == 193 || NPC[A].Type == 49 || NPCIsYoshi[NPC[A].Type] || NPC[A].Type == 96 || (NPC[A].Type >= 1
+                                                                                                                                                                                                                                                                                                        && NPC[A].Type <= 157) || NPC[A].Type == 240 || NPC[A].Type == 241 || NPC[A].Type == 278 || NPC[A].Type == 279 || NPC[A].Type == 305)
     {
         if(NPC[A].Type == 241 && (B == 4 || B == 5 || B == 10))
         {
@@ -1938,7 +2001,7 @@ void NPCHit(int A, int B, int C)
         }
         // Misc. Things With No Jump Death (SMB2 Shy Guys, SMB2 Ninji, SMB2 Pokey)
     }
-    else if(NPC[A].Type == 19 || NPC[A].Type == 20 || NPC[A].Type == 247 || NPC[A].Type == 25 || NPC[A].Type == 28 || NPC[A].Type == 36 || NPC[A].Type == 285 || NPC[A].Type == 286 || NPC[A].Type == 47 || NPC[A].Type == 284 || NPC[A].Type == 48 || NPC[A].Type == 53 || NPC[A].Type == 54 || (NPC[A].Type >= 129 && NPC[A].Type <= 132) || NPC[A].Type == 158 || NPC[A].Type == 231 || NPC[A].Type == 235 || NPC[A].Type == 261 || NPC[A].Type == 272)
+    else if(NPC[A].Type == 19 || NPC[A].Type == 20 || NPC[A].Type == 247 || NPC[A].Type == 25 || NPC[A].Type == 28 || NPC[A].Type == 36 || NPC[A].Type == 285 || NPC[A].Type == 286 || NPC[A].Type == 47 || NPC[A].Type == 284 || NPC[A].Type == 48 || NPC[A].Type == 53 || NPC[A].Type == 54 || NPC[A].Type == 318 || (NPC[A].Type >= 129 && NPC[A].Type <= 132) || NPC[A].Type == 158 || NPC[A].Type == 231 || NPC[A].Type == 235 || NPC[A].Type == 261 || NPC[A].Type == 272)
     {
         if(B == 10 && NPC[A].Type != 158)
             NPC[A].Killed = B;

@@ -1149,7 +1149,7 @@ void KillNPC(int A, int B)
                     Effect[numEffects].Frame = NPC[A].Type - 121;
             }
         }
-        else if(NPC[A].Type == 23 || NPC[A].Type == 24 || NPC[A].Type == 36 || NPC[A].Type == 53 || NPC[A].Type == 54 || NPC[A].Type == 285 || NPC[A].Type == 286) // Hard thing / Spiney
+        else if(NPC[A].Type == 23 || NPC[A].Type == 24 || NPC[A].Type == 36 || NPC[A].Type == 53 || NPC[A].Type == 54 || NPC[A].Type == 285 || NPC[A].Type == 286 || NPC[A].Type == 318 || NPC[A].Type == 313) // Hard thing / Spiney
         {
              NPC[A].Location.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0 - EffectWidth[9] / 2.0;
              NPC[A].Location.Y = NPC[A].Location.Y + NPC[A].Location.Height / 2.0 - EffectHeight[9] / 2.0;
@@ -1178,6 +1178,10 @@ void KillNPC(int A, int B)
                     NewEffect(33 , NPC[A].Location);
                 else if(NPC[A].Type == 54)
                     NewEffect(34 , NPC[A].Location);
+                else if(NPC[A].Type == 318)
+                    NewEffect(160 , NPC[A].Location);
+                else if(NPC[A].Type == 313)
+                    NewEffect(159 , NPC[A].Location);
                 else
                     NewEffect(19 , NPC[A].Location);
             }
