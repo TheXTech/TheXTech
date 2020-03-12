@@ -95,6 +95,14 @@ std::string  ApplicationPathSTD;
 
 std::string AppPathManager::m_settingsPath;
 std::string AppPathManager::m_userPath;
+#ifdef __APPLE__
+
+#   ifndef USERDATA_ROOT_NAME
+#       define USERDATA_ROOT_NAME "A2xTech Episodes"
+#   endif
+
+std::string AppPathManager::m_userDataRoot;
+#endif
 bool AppPathManager::m_isPortable = false;
 
 #if defined(__ANDROID__) || defined(__APPLE__)
@@ -322,12 +330,20 @@ std::string AppPathManager::gameSaveRootDir()
 
 std::string AppPathManager::userWorldsRootDir()
 {
+#ifdef __APPLE__
+    return m_userDataRoot + "worlds";
+#else
     return m_userPath + "worlds";
+#endif
 }
 
 std::string AppPathManager::userBattleRootDir()
 {
+#ifdef __APPLE__
+    return m_userDataRoot + "battle";
+#else
     return m_userPath + "battle";
+#endif
 }
 
 void AppPathManager::install()
@@ -387,6 +403,26 @@ void AppPathManager::syncFs()
 void AppPathManager::initSettingsPath()
 {
     m_settingsPath = m_userPath + "settings/";
+
+#ifdef __APPLE__
+    {
+        const char *homeDir = std::getenv("HOME");
+        if(homeDir)
+        {
+            m_userDataRoot = std::string(homeDir) + "/" USERDATA_ROOT_NAME;
+            m_userDataRoot.append("/");
+            // Automatically create an infrastructure
+            if(!DirMan::exists(m_userDataRoot))
+                DirMan::mkAbsPath(m_userDataRoot);
+            if(!DirMan::exists(m_userDataRoot + "worlds"))
+                DirMan::mkAbsPath(m_userDataRoot + "worlds");
+            if(!DirMan::exists(m_userDataRoot + "battle"))
+                DirMan::mkAbsPath(m_userDataRoot + "battle");
+        }
+        else
+            m_userDataRoot = m_userPath;
+    }
+#endif
 
     if(Files::fileExists(m_settingsPath))
         Files::deleteFile(m_settingsPath);//Just in case, avoid mad jokes with making same-named file as settings folder

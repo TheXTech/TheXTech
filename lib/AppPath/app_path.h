@@ -53,6 +53,9 @@ private:
     //! Full path to settings INI file
     static std::string m_settingsPath;
     static std::string m_userPath;
+#ifdef __APPLE__
+    static std::string m_userDataRoot; // A game media root at home directory
+#endif
     static bool m_isPortable;
 };
 
