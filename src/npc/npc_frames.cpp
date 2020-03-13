@@ -1625,6 +1625,30 @@ void NPCFrames(int A)
         else if(NPC[A].Special > 100)
             NPC[A].Frame = 2;
     }
+    else if(NPC[A].Type == 323) // arrow platform hor
+    {
+        if(NPC[A].Direction == 1)
+            NPC[A].Frame = 1;
+        else
+            NPC[A].Frame = 0;
+    }
+    else if(NPC[A].Type == 324 || NPC[A].Type == 325) // arrow platform ver
+    {
+        NPC[A].Frame = 0;
+    }
+    else if(NPC[A].Type == 326)
+    {
+        if(NPC[A].Special3 > -1150)
+            NPC[A].Frame = NPC[A].Special;
+        else if(NPC[A].Special3 <= -1150)
+        {
+            B = dRand() * 10;
+            if(B < 5)
+                NPC[A].Frame = NPC[A].Special;
+            else if(B >= 5)
+                NPC[A].Frame = -1;
+        }
+    }
     else if(NPC[A].Type == 317) // fry guy
     {
         if(NPC[A].Special >= 0)

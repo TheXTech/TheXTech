@@ -989,6 +989,9 @@ void SetupVars()
     NPCWidth[92] = 32; // turnip
     NPCHeight[92] = 32;
     NPCIsVeggie[92] = true;
+    NPCWidth[327] = 64; // giant turnip
+    NPCHeight[327] = 64;
+    NPCIsVeggie[327] = true;
     NPCWidth[93] = 32; // SMB1 Plant
     NPCHeight[93] = 48;
     NPCWidth[94] = 32; // Inert Toad
@@ -1243,6 +1246,23 @@ void SetupVars()
         NPCIsGrabbable[A] = true;
         NPCIsVeggie[A] = true;
     }
+
+    For(A, 323, 325) // arrow platform
+    {
+        NPCWidth[A] = 64;
+        NPCCanWalkOn[A] = true;
+        NPCWontHurt[A] = true;
+        NPCIsABlock[A] = true;
+        NPCNoClipping[A] = true;
+        NPCNoGravity[A] = true;
+        NPCMovesPlayer[A] = true;
+    }
+
+    NPCWidth[326] = 64;
+    NPCCanWalkOn[326] = true;
+    NPCWontHurt[326] = true;
+    NPCNoClipping[326] = true;
+    NPCNoGravity[326] = true;
 
     For(A, 319, 321) // Pansers
     {
@@ -1662,6 +1682,7 @@ void SetupVars()
     NPCCanWalkOn[84] = true;
     NPCCanWalkOn[91] = true;
     NPCCanWalkOn[92] = true;
+    NPCCanWalkOn[327] = true;
     NPCCanWalkOn[104] = true;
     NPCCanWalkOn[297] = true;
     NPCCanWalkOn[105] = true;
@@ -1677,6 +1698,7 @@ void SetupVars()
     NPCGrabFromTop[45] = true;
     NPCGrabFromTop[91] = true;
     NPCGrabFromTop[92] = true;
+    NPCGrabFromTop[327] = true;
     NPCNoClipping[8] = true;
     NPCNoClipping[245] = true;
     // NPCNoClipping[10] = true;
@@ -1787,6 +1809,7 @@ void SetupVars()
     NPCWontHurt[84] = true;
     NPCWontHurt[91] = true;
     NPCWontHurt[92] = true;
+    NPCWontHurt[327] = true;
     NPCWontHurt[95] = true;
     NPCWontHurt[96] = true;
     NPCWontHurt[98] = true;
@@ -1815,6 +1838,7 @@ void SetupVars()
     NPCIsGrabbable[45] = true;
     NPCIsGrabbable[49] = true;
     NPCIsGrabbable[92] = true;
+    NPCIsGrabbable[327] = true;
     NPCIsGrabbable[96] = true;
     NPCIsGrabbable[158] = true;
     NPCIsABlock[21] = true;
@@ -2079,6 +2103,7 @@ void SetupVars()
     }
     NPCNoIceBall[91] = true;
     NPCNoIceBall[92] = true;
+    NPCNoIceBall[327] = true;
     NPCNoIceBall[94] = true;
     For(A, 95, 108)
     {

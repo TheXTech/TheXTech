@@ -4342,6 +4342,40 @@ void UpdatePlayer()
                     Player[A].Location.Y = NPC[B].Location.Y - Player[A].Location.Height;
                     if(NPC[B].Type == 46 || NPC[B].Type == 212 || NPC[B].Type == 311)
                         NPC[B].Special2 = 1;
+                    if((NPC[B].Type == 323 || NPC[B].Type == 324 || NPC[B].Type == 325) && Player[A].Location.SpeedY > 0)
+                    {
+                    numNPCs++;
+                    NPC[numNPCs] = NPC_t();
+                    NPC[numNPCs].Active = true;
+                    NPC[numNPCs].Direction = NPC[B].Direction;
+                    NPC[numNPCs].Type = 326;
+                    NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
+                    NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
+                    NPC[numNPCs].Location.X = NPC[B].Location.X;
+                    NPC[numNPCs].Location.Y = NPC[B].Location.Y - 2;
+                    Player[A].Location.Y = Player[A].Location.Y - 2;
+                    if(NPC[B].Type == 323)
+                    {
+                        NPC[numNPCs].Location.SpeedX = 2 * NPC[B].Direction;
+                        if(NPC[B].Direction == -1)
+                            NPC[numNPCs].Special = 1;
+                        else
+                            NPC[numNPCs].Special = 2;
+                    }
+                    else
+                    {
+                        NPC[numNPCs].Location.SpeedY = -2;
+                        NPC[numNPCs].Special = 0;
+                    }
+
+                    if(NPC[B].Type == 325)
+                    {
+                        NPC[numNPCs].Special2 = 1;
+                        NPC[numNPCs].Special4 = -1;
+                    }
+                    NPC[numNPCs].TimeLeft = 100;
+                    NPC[numNPCs].Section = NPC[B].Section;
+                    }
                     if(NPC[B].Type == 311 && NPC[B].Special == 0)
                         NPC[B].Frame = 1;
                     if(NPC[B].Type == 105 )

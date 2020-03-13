@@ -947,6 +947,8 @@ void UpdateNPCs()
                         {
                             if(NPC[A].Special == 0.0)
                                 NPC[A].Special = 147;
+                            if(NPC[A].Special == 327)
+                                NPC[A].Special6 = 1;
                             NPC[A].Generator = false;
                             NPC[A].Frame = 0;
                             NPC[A].Type = NPC[A].Special;

@@ -4347,7 +4347,10 @@ void PlayerGrabCode(int A, bool DontResetGrabTime)
                         Player[A].GrabSpeed = Player[A].Location.SpeedX;
                     }
                     Player[A].Location.SpeedX = 0;
-                    Player[A].GrabTime = Player[A].GrabTime + 1;
+                    if(NPC[Player[A].StandingOnNPC].Type != 327 || (NPC[Player[A].StandingOnNPC].Type != 91 && NPC[Player[A].StandingOnNPC].Special6 != 1))
+                        Player[A].GrabTime = Player[A].GrabTime + 1;
+                    else
+                        Player[A].GrabTime = Player[A].GrabTime + 0.1;
                     Player[A].Slide = false;
                 }
             }

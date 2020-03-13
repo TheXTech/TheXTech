@@ -3785,6 +3785,86 @@ void SpecialNPC(int A)
         }
     // Big Koopa Code
     }
+    else if(NPC[A].Type == 326)
+    {
+     for(B = 1; B <= numPlayers; B++)
+      {
+      if(!Player[B].Dead && Player[B].Section == NPC[A].Section)
+       {
+        if(Player[B].StandingOnNPC == A)
+            NPC[A].Special3--;
+        else if(Player[B].StandingOnNPC != A && NPC[A].Special2 == 0)
+            NPC[A].Special3 = NPC[A].Special3 - 20;
+        else if(Player[B].StandingOnNPC != A && NPC[A].Special2 != 0)
+            NPC[A].Special3--;
+
+        if(NPC[A].Special3 < -1280)
+           NPC[A].Killed = 9;
+
+        if(NPC[A].Special2 == 1)
+        {
+            if(Player[B].StandingOnNPC != A && NPC[A].Special4 != -1)
+            {
+                NPC[A].Special4 = 0;
+            }
+            else if(Player[B].StandingOnNPC == A && NPC[A].Special4 == 0)
+            {
+                PlaySound(26);
+                NPC[A].Special4 = 1;
+                NPC[A].Special = 4;
+            }
+            else if(Player[B].StandingOnNPC == A && NPC[A].Special4 == -1)
+            {
+                NPC[A].Special4 = 1;
+            }
+            if(NPC[A].Special == 4)
+            {
+                NPC[A].Location.SpeedX = 0;
+                NPC[A].Location.SpeedY = 0;
+                NPC[A].Special5++;
+                if(NPC[A].Special5 > 10)
+                {
+                    NPC[A].Special6++;
+                    NPC[A].Special5 = 0;
+                    if(NPC[A].Special6 == 0)
+                        NPC[A].Special = 0;
+                    else if(NPC[A].Special6 == 1)
+                        NPC[A].Special = 1;
+                    else if(NPC[A].Special6 == 2)
+                        NPC[A].Special = 0;
+                    else if(NPC[A].Special6 == 3)
+                        NPC[A].Special = 2;
+                    else if(NPC[A].Special6 > 3)
+                    {
+                        NPC[A].Special = 0;
+                        NPC[A].Special6 = 0;
+                    }
+                }
+            }
+            else if(NPC[A].Special == 0)
+            {
+                NPC[A].Location.SpeedX = 0;
+                NPC[A].Location.SpeedY = -2;
+            }
+            else if(NPC[A].Special == 3)
+            {
+                NPC[A].Location.SpeedX = 0;
+                NPC[A].Location.SpeedY = 2;
+            }
+            else if(NPC[A].Special == 1)
+            {
+                NPC[A].Location.SpeedX = -2;
+                NPC[A].Location.SpeedY = 0;
+            }
+            else if(NPC[A].Special == 2)
+            {
+                NPC[A].Location.SpeedX = 2;
+                NPC[A].Location.SpeedY = 0;
+            }
+        }
+      }
+     }
+    }
     else if(NPC[A].Type == 308)
     {
         NPC[A].Special = NPC[A].Special + 1;
@@ -4298,9 +4378,9 @@ void SpecialNPC(int A)
             if(!Player[B].Dead && Player[B].Section == NPC[A].Section && B != NPC[A].CantHurtPlayer && NPC[A].Location.SpeedY == Physics.NPCGravity)
             {
                 if(Player[B].Location.X > NPC[A].Location.X)
-                    NPC[A].Location.SpeedX = NPC[A].Location.SpeedX + 0.09;
+                    NPC[A].Location.SpeedX = NPC[A].Location.SpeedX + 0.12;
                 else if(Player[B].Location.X < NPC[A].Location.X)
-                    NPC[A].Location.SpeedX = NPC[A].Location.SpeedX - 0.09;
+                    NPC[A].Location.SpeedX = NPC[A].Location.SpeedX - 0.12;
 
                 if(NPC[A].Location.SpeedX > 4)
                     NPC[A].Location.SpeedX = 4;
