@@ -68,14 +68,20 @@ include(version.cmake)
 include(cmake/git_version.cmake)
 
 
-if(WIN32 OR EMSCRIPTEN)
+if(WIN32 OR EMSCRIPTEN OR HAIKU)
     set(USE_SYSTEM_LIBS_DEFAULT OFF)
 else()
-    set(USE_SYSTEM_LIBS_DEFAULT ON) # Should be used on Haiku, own SDL2 Haiku build on CMake is broken
+    set(USE_SYSTEM_LIBS_DEFAULT ON)
+endif()
+
+if(HAIKU)
+    set(USE_SYSTEM_SDL2_DEFAULT ON)  # Should be used on Haiku, own SDL2 Haiku build on CMake is broken
+else()
+    set(USE_SYSTEM_SDL2_DEFAULT ${USE_SYSTEM_LIBS_DEFAULT})
 endif()
 
 option(USE_SYSTEM_LIBS "Use dependent libraries like SDL2, FreeImageLite and MixerX, installed in the system" ${USE_SYSTEM_LIBS_DEFAULT})
-option(USE_SYSTEM_SDL2 "Use SDL2 from a system even prefering system libraries" ${USE_SYSTEM_LIBS_DEFAULT})
+option(USE_SYSTEM_SDL2 "Use SDL2 from a system even prefering system libraries" ${USE_SYSTEM_SDL2_DEFAULT})
 
 option(USE_STATIC_LIBC "Link libc and libstdc++ statically" OFF)
 
