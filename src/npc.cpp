@@ -497,13 +497,77 @@ void NPCSpecial(int A)
             NPC[A].Location.SpeedX = -6;
 
     }
+    else if(NPC[A].Type == 332 || NPC[A].Type == 333)
+    {
+        NPC[A].Special = NPC[A].Special + 0.1;
+        NPC[A].Location.SpeedY = sin(NPC[A].Special);
+
+        NPC[A].Special2++;
+        if(NPC[A].Special2 == 150)
+        {
+            for(int C = 0; C < 4; C++)
+            {
+                numNPCs++;
+                NPC[numNPCs] = NPC_t();
+                NPC[numNPCs].Active = true;
+                NPC[numNPCs].Direction = NPC[A].Direction;
+                NPC[numNPCs].Type = 334;
+                NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
+                NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
+                NPC[numNPCs].Location.X = NPC[A].Location.X + (NPC[A].Location.Width / 2);
+                NPC[numNPCs].Location.Y = NPC[A].Location.Y + NPC[A].Location.Height / 2;
+                NPC[numNPCs].Special = C;
+                NPC[numNPCs].TimeLeft = 100;
+                NPC[numNPCs].Section = NPC[A].Section;
+            }
+        }
+        else if(NPC[A].Special2 >= 200)
+        {
+            NPC[A].Special2 = 0;
+            NPC[A].Location.SpeedX = 1 * NPC[A].Direction;
+        }
+
+        if(NPC[A].Special2 >= 100 && NPC[A].Type == 332)
+            NPC[A].Location.SpeedX = 0;
+    }
+    else if(NPC[A].Type == 334) // spiny's spike
+    {
+        if(NPC[A].Special == 0)
+        {
+            NPC[A].Location.SpeedX = -2;
+            NPC[A].Location.SpeedY = -2;
+        }
+        else if(NPC[A].Special == 1)
+        {
+            NPC[A].Location.SpeedX = 2;
+            NPC[A].Location.SpeedY = -2;
+        }
+        else if(NPC[A].Special == 2)
+        {
+            NPC[A].Location.SpeedX = 2;
+            NPC[A].Location.SpeedY = 2;
+        }
+        else if(NPC[A].Special == 3)
+        {
+            NPC[A].Location.SpeedX = -2;
+            NPC[A].Location.SpeedY = 2;
+        }
+        else if(NPC[A].Special == 4)
+            NPC[A].Location.SpeedX = -2;
+        else if(NPC[A].Special == 5)
+            NPC[A].Location.SpeedX = 2;
+        else if(NPC[A].Special == 6)
+            NPC[A].Location.SpeedY = 2;
+        else if(NPC[A].Special == 7)
+            NPC[A].Location.SpeedY = -2;
+    }
     else if(NPC[A].Type == 330) // Yellow beezo
     {
         NPC[A].Location.SpeedX = 3.5 * NPC[A].Direction;
         if(NPC[A].Special == 0)
         {
             NPC[A].Location.SpeedY = 2;
-            NPC[A].Special == 1;
+            NPC[A].Special = 1;
         }
         if(NPC[A].Location.SpeedY > 0)
             NPC[A].Location.SpeedY = NPC[A].Location.SpeedY - 0.1;

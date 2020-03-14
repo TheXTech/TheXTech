@@ -1281,6 +1281,25 @@ void SetupVars()
         NPCNoClipping[A] = true;
     }
 
+
+    For(A, 332, 333) // flying spiny
+    {
+        NPCWidth[A] = 32;
+        NPCHeight[A] = 32;
+        NPCWidthGFX[A] = 48;
+        NPCHeightGFX[A] = 40;
+        NPCFrameOffsetY[A] = -2;
+        NPCJumpHurt[A] = true;
+        NPCNoGravity[A] = true;
+    }
+
+    NPCWidth[334] = 22; // Spiny's spike
+    NPCHeight[334] = 22;
+    NPCWidthGFX[334] = 22;
+    NPCHeightGFX[334] = 22;
+    NPCJumpHurt[334] = true;
+    NPCNoGravity[334] = true;
+
     NPCWidth[148] = 32; // Black Yoshi
     NPCHeight[148] = 32;
     NPCWidthGFX[148] = 74;

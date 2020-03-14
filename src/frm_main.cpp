@@ -152,8 +152,8 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
 
 #ifdef _WIN32
     FIBITMAP *img[2];
-    img[0] = GraphicsHelps::loadImage(AppPath + "/graphics/ui/icon/thextech_16.png");
-    img[1] = GraphicsHelps::loadImage(AppPath + "/graphics/ui/icon/thextech_32.png");
+    img[0] = GraphicsHelps::loadImage(AppPath + "/graphics/ui/icon/nsmbx_16.png");
+    img[1] = GraphicsHelps::loadImage(AppPath + "/graphics/ui/icon/nsmbx_32.png");
 
     if(img[0] && !GraphicsHelps::setWindowIcon(m_window, img[0], 16))
     {
@@ -173,9 +173,9 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
 
     FIBITMAP *img;
 #   ifdef __APPLE__
-    img = GraphicsHelps::loadImage(AppPath + "/graphics/ui/icon/thextech_256.png");
+    img = GraphicsHelps::loadImage(AppPath + "/graphics/ui/icon/nsmbx_256.png");
 #   else
-    img = GraphicsHelps::loadImage(AppPath + "/graphics/ui/icon/thextech_32.png");
+    img = GraphicsHelps::loadImage(AppPath + "/graphics/ui/icon/nsmbx_32.png");
 #   endif //__APPLE__
 
     if(img)

@@ -1,5 +1,5 @@
 /*
- * TheXTech - A platform game engine ported from old source code for VB6
+ * A2xTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
  * Copyright (c) 2020-2020 Vitaly Novichkov <admin@wohlnet.ru>
@@ -2065,6 +2065,67 @@ void NPCFrames(int A)
             NPC[A].Frame = NPC[A].Frame + 6;
         if(NPC[A].Direction == 1)
             NPC[A].Frame = NPC[A].Frame + 3;
+    }
+    else if(NPC[A].Type == 334)
+    {
+        NPC[A].Frame = NPC[A].Special;
+    }
+    else if(NPC[A].Type == 332 || NPC[A].Type == 333)
+    {
+        if(NPC[A].Special2 < 100)
+        {
+            NPC[A].FrameCount = NPC[A].FrameCount + 0.5;
+            if(NPC[A].FrameCount < 6)
+            {
+                if(NPC[A].Direction == -1)
+                    NPC[A].Frame = 0;
+                else
+                    NPC[A].Frame = 4;
+            }
+            else if(NPC[A].FrameCount < 12)
+            {
+                if(NPC[A].Direction == -1)
+                    NPC[A].Frame = 1;
+                else
+                    NPC[A].Frame = 5;
+            }
+            else
+            {
+                if(NPC[A].Direction == -1)
+                    NPC[A].Frame = 0;
+                else
+                    NPC[A].Frame = 4;
+
+                NPC[A].FrameCount = 0;
+            }
+        }
+        else if(NPC[A].Special2 >= 100)
+        {
+            NPC[A].FrameCount = NPC[A].FrameCount + 0.5;
+            if(NPC[A].FrameCount < 6)
+            {
+                if(NPC[A].Direction == -1)
+                    NPC[A].Frame = 2;
+                else
+                    NPC[A].Frame = 6;
+            }
+            else if(NPC[A].FrameCount < 12)
+            {
+                if(NPC[A].Direction == -1)
+                    NPC[A].Frame = 3;
+                else
+                    NPC[A].Frame = 7;
+            }
+            else
+            {
+                if(NPC[A].Direction == -1)
+                    NPC[A].Frame = 2;
+                else
+                    NPC[A].Frame = 6;
+
+                NPC[A].FrameCount = 0;
+            }
+        }
     }
     else if(NPC[A].Type == 19 || NPC[A].Type == 20 || NPC[A].Type == 28 || (NPC[A].Type >= 129 && NPC[A].Type <= 132) || NPC[A].Type == 135 || NPC[A].Type == 158 || NPC[A].Type == 322 || NPC[A].Type == 330 || NPC[A].Type == 331) // Shy guys / Jumping Fish
     {

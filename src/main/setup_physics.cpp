@@ -1,5 +1,5 @@
 /*
- * TheXTech - A platform game engine ported from old source code for VB6
+ * A2xTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
  * Copyright (c) 2020-2020 Vitaly Novichkov <admin@wohlnet.ru>
