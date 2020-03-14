@@ -94,7 +94,7 @@ void LogWriter::LoadLogSettings(bool disableStdOut)
     m_enabled = true;
     std::fprintf(stdout, "Emscripten logs stdout.\n");
 #else
-    std::string logFileName = fmt::format_ne("A2XT_Tech_log_{0}.txt", return_current_time_and_date());
+    std::string logFileName = fmt::format_ne("TheXTech_log_{0}.txt", return_current_time_and_date());
 
     m_enabledStdOut = !disableStdOut;
     m_logLevel = PGE_LogLevel::Debug;

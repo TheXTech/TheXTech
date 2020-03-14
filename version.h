@@ -1,5 +1,5 @@
 /*
- * A2xTech - A platform game engine ported from old source code for VB6
+ * TheXTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
  * Copyright (c) 2020-2020 Vitaly Novichkov <admin@wohlnet.ru>
@@ -26,8 +26,8 @@
 
 #include "pge_version.h" //Global Project version file
 
-#ifndef A2XTECH_VERSION_H
-#define A2XTECH_VERSION_H
+#ifndef THEXTECH_VERSION_H
+#define THEXTECH_VERSION_H
 
 #ifdef GIT_VERSION
 #define V_BUILD_VER GIT_VERSION
@@ -41,32 +41,32 @@
 #define V_BUILD_BRANCH "<unknown>"
 #endif
 
-#ifdef A2XTECH_VERSION_1
-#   define V_VF1 A2XTECH_VERSION_1
+#ifdef THEXTECH_VERSION_1
+#   define V_VF1 THEXTECH_VERSION_1
 #else
 #   define V_VF1 0
 #endif
 
-#ifdef A2XTECH_VERSION_2
-#   define V_VF2 A2XTECH_VERSION_2
+#ifdef THEXTECH_VERSION_2
+#   define V_VF2 THEXTECH_VERSION_2
 #else
 #   define V_VF2 0
 #endif
 
-#ifdef A2XTECH_VERSION_3
-#   define V_VF3 A2XTECH_VERSION_3
+#ifdef THEXTECH_VERSION_3
+#   define V_VF3 THEXTECH_VERSION_3
 #else
 #   define V_VF3 0
 #endif
 
-#ifdef A2XTECH_VERSION_4
-#   define V_VF4 A2XTECH_VERSION_4
+#ifdef THEXTECH_VERSION_4
+#   define V_VF4 THEXTECH_VERSION_4
 #else
 #   define V_VF4 0
 #endif
 
-#ifdef A2XTECH_VERSION_REL
-#   define V_FILE_RELEASE STR_VALUE(A2XTECH_VERSION_REL)
+#ifdef THEXTECH_VERSION_REL
+#   define V_FILE_RELEASE STR_VALUE(THEXTECH_VERSION_REL)
 #else
 #   define V_FILE_RELEASE "-unk" //"-alpha","-beta","-dev", or "" aka "release"
 #endif
@@ -89,14 +89,14 @@
 //Version of this program
 #define V_LATEST_STABLE V_FILE_VERSION_NUM V_FILE_RELEASE
 
-#define V_FILE_DESC "A2xTech - a C++ source port of a vanilla Engine"
+#define V_FILE_DESC "TheXTech - a C++ source port of a vanilla Engine"
 
-#define V_INTERNAL_NAME "a2xtech"
+#define V_INTERNAL_NAME "thextech"
 
 #ifdef _WIN32
-    #define V_ORIGINAL_NAME "a2xtech.exe" // for Windows platforms
+    #define V_ORIGINAL_NAME "thextech.exe" // for Windows platforms
 #else
-    #define V_ORIGINAL_NAME "a2xtech" // for any other platforms
+    #define V_ORIGINAL_NAME "thextech" // for any other platforms
 #endif
 
 //Uncomment this for enable detal logging
