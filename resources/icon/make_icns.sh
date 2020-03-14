@@ -1,6 +1,6 @@
 #!/bin/bash
 
-TYPE="a2xtech"
+TYPE="thextech"
 if [[ "$TYPE" == "" ]]; then
 echo "Error: empty name!"
 exit 1

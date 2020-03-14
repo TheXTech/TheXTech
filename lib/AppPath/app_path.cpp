@@ -98,7 +98,7 @@ std::string AppPathManager::m_userPath;
 #ifdef __APPLE__
 
 #   ifndef USERDATA_ROOT_NAME
-#       define USERDATA_ROOT_NAME "A2xTech Episodes"
+#       define USERDATA_ROOT_NAME "TheXTech Episodes"
 #   endif
 
 std::string AppPathManager::m_userDataRoot;
@@ -219,7 +219,7 @@ void AppPathManager::initAppPath()
 #endif
         m_userPath = appDir.absolutePath();
 #ifndef __EMSCRIPTEN__
-        m_userPath.append("/a2xtech/");
+        m_userPath.append("/thextech/");
 #else
         m_userPath.append("/");
 #endif
@@ -243,7 +243,7 @@ defaultSettingsPath:
 
 std::string AppPathManager::settingsFileSTD()
 {
-    return m_settingsPath + "a2xtech.ini";
+    return m_settingsPath + "thextech.ini";
 }
 
 std::string AppPathManager::userAppDirSTD()
@@ -303,7 +303,7 @@ std::string AppPathManager::screenshotsDir()
         path = base_path;
         SDL_free(base_path);
     }
-    return path + "/A2xTech Game Screenshots";
+    return path + "/TheXTech Game Screenshots";
 #endif
 }
 
@@ -319,7 +319,7 @@ std::string AppPathManager::gifRecordsDir()
         path = base_path;
         SDL_free(base_path);
     }
-    return path + "/A2xTech Game Screenshots/gif-recordings";
+    return path + "/TheXTech Game Screenshots/gif-recordings";
 #endif
 }
 

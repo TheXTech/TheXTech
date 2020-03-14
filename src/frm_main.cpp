@@ -1,5 +1,5 @@
 ﻿/*
- * A2xTech - A platform game engine ported from old source code for VB6
+ * TheXTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
  * Copyright (c) 2020-2020 Vitaly Novichkov <admin@wohlnet.ru>
@@ -62,7 +62,7 @@ FrmMain::FrmMain()
 #ifdef ENABLE_OLD_CREDITS
     m_windowTitle = "Super Mario Bros. X - Version 1.3 - www.SuperMarioBrothers.org";
 #else
-    m_windowTitle = fmt::format_ne("A2xTech v{0}", V_LATEST_STABLE);
+    m_windowTitle = fmt::format_ne("TheXTech v{0}", V_LATEST_STABLE);
 #endif
 }
 
@@ -152,8 +152,8 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
 
 #ifdef _WIN32
     FIBITMAP *img[2];
-    img[0] = GraphicsHelps::loadImage(AppPath + "/graphics/ui/icon/a2xtech_16.png");
-    img[1] = GraphicsHelps::loadImage(AppPath + "/graphics/ui/icon/a2xtech_32.png");
+    img[0] = GraphicsHelps::loadImage(AppPath + "/graphics/ui/icon/thextech_16.png");
+    img[1] = GraphicsHelps::loadImage(AppPath + "/graphics/ui/icon/thextech_32.png");
 
     if(img[0] && !GraphicsHelps::setWindowIcon(m_window, img[0], 16))
     {
@@ -173,9 +173,9 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
 
     FIBITMAP *img;
 #   ifdef __APPLE__
-    img = GraphicsHelps::loadImage(AppPath + "/graphics/ui/icon/a2xtech_256.png");
+    img = GraphicsHelps::loadImage(AppPath + "/graphics/ui/icon/thextech_256.png");
 #   else
-    img = GraphicsHelps::loadImage(AppPath + "/graphics/ui/icon/a2xtech_32.png");
+    img = GraphicsHelps::loadImage(AppPath + "/graphics/ui/icon/thextech_32.png");
 #   endif //__APPLE__
 
     if(img)

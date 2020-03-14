@@ -82,7 +82,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>NSPrincipalClass</key>
-	<string>A2xTechApplication</string>
+	<string>TheXTechApplication</string>
 	<key>NSHighResolutionCapable</key>
 	<true/>
 	<key>CFBundleGetInfoString</key>

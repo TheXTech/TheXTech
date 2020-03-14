@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(A2xTech LANGUAGES C CXX)
+project(TheXTech LANGUAGES C CXX)
 
 include(CheckCXXCompilerFlag)
 include(ExternalProject)
@@ -37,7 +37,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/output/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/output/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/output/bin)
 
-set(PGE_INSTALL_DIRECTORY "A2xTech")
+set(PGE_INSTALL_DIRECTORY "TheXTech")
 
 include(cmake/build_props.cmake)
 
@@ -104,7 +104,7 @@ endif()
 
 if(EMSCRIPTEN)
     message("Is EMSCRIPTEN!")
-    set(PGE_PRELOAD_ENVIRONMENT "/home/vitaly/.PGE_Project/_emscripten/a2xtech" CACHE STRING "Path to resources root to pack")
+    set(PGE_PRELOAD_ENVIRONMENT "/home/vitaly/.PGE_Project/_emscripten/thextech" CACHE STRING "Path to resources root to pack")
     set(CMAKE_EXECUTABLE_SUFFIX ".html")
 #    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -msse -msse2")
     # -DIS_CXX -s USE_PTHREADS=1
@@ -182,22 +182,22 @@ if(APPLE)
     file(GLOB PGE_FILE_ICONS "${CMAKE_CURRENT_SOURCE_DIR}/resources/file_icons/*.icns")
     list(APPEND LIB_SRC
         lib/AppPath/app_path_macosx.m
-        resources/a2xtech.icns
+        resources/thextech.icns
         ${PGE_FILE_ICONS}
     )
-    set(A2XTECH_PRELOAD_ENVIRONMENT "" CACHE STRING "Path to resources root to pack")
-    set(A2XTECH_BUNDLE_NAME "A2xTech" CACHE STRING "Name of bundle folder")
-    set(A2XTECH_ICON_NAME "a2xtech.icns" CACHE STRING "Name of bundle icon file")
-    set(A2XTECH_CUSTOM_ICON_PATH "" CACHE STRING "Name of icon file to pack into the bundle")
-    set(A2XTECH_CUSTOM_USERDATA_DIR_NAME "" CACHE STRING "A custom name for user data in a home directory, by default the name is 'A2xTech Episodes'.")
-    if(NOT A2XTECH_CUSTOM_ICON_PATH STREQUAL "")
+    set(THEXTECH_PRELOAD_ENVIRONMENT "" CACHE STRING "Path to resources root to pack")
+    set(THEXTECH_BUNDLE_NAME "TheXTech" CACHE STRING "Name of bundle folder")
+    set(THEXTECH_ICON_NAME "thextech.icns" CACHE STRING "Name of bundle icon file")
+    set(THEXTECH_CUSTOM_ICON_PATH "" CACHE STRING "Name of icon file to pack into the bundle")
+    set(THEXTECH_CUSTOM_USERDATA_DIR_NAME "" CACHE STRING "A custom name for user data in a home directory, by default the name is 'TheXTech Episodes'.")
+    if(NOT THEXTECH_CUSTOM_ICON_PATH STREQUAL "")
         list(APPEND LIB_SRC
-            ${A2XTECH_CUSTOM_ICON_PATH}
+            ${THEXTECH_CUSTOM_ICON_PATH}
         )
     endif()
 endif()
 
-set(A2XTECH_SRC
+set(THEXTECH_SRC
     src/game_main.cpp
     src/globals.cpp
     src/npc.cpp
@@ -249,117 +249,117 @@ set(A2XTECH_SRC
 )
 
 if(WIN32 AND NOT EMSCRIPTEN)
-    list(APPEND A2XTECH_SRC resources/a2xtech.rc)
+    list(APPEND THEXTECH_SRC resources/thextech.rc)
 endif()
 
-add_executable(a2xtech ${A2XTECH_SRC} ${LIB_SRC})
-pge_set_nopie(a2xtech)
+add_executable(thextech ${THEXTECH_SRC} ${LIB_SRC})
+pge_set_nopie(thextech)
 
 if(APPLE)
-    set_target_properties(a2xtech PROPERTIES
-        OUTPUT_NAME "${A2XTECH_BUNDLE_NAME}"
+    set_target_properties(thextech PROPERTIES
+        OUTPUT_NAME "${THEXTECH_BUNDLE_NAME}"
         MACOSX_BUNDLE TRUE
-        MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/resources/a2xtech.plist.in"
-        MACOSX_BUNDLE_EXECUTABLE_NAME "a2xtech"
-        MACOSX_BUNDLE_GUI_IDENTIFIER "ru.wohlsoft.a2xtech"
-        MACOSX_BUNDLE_SHORT_VERSION_STRING "${A2XTECH_VERSION_STRING}"
-        MACOSX_BUNDLE_LONG_VERSION_STRING "${A2XTECH_VERSION_STRING}"
-        MACOSX_BUNDLE_ICON_FILE "${A2XTECH_ICON_NAME}"
-        CPACK_BUNDLE_NAME "${A2XTECH_BUNDLE_NAME}"
-        MACOSX_BUNDLE_INFO_STRING "A2xTech classic game engine"
+        MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/resources/thextech.plist.in"
+        MACOSX_BUNDLE_EXECUTABLE_NAME "thextech"
+        MACOSX_BUNDLE_GUI_IDENTIFIER "ru.wohlsoft.thextech"
+        MACOSX_BUNDLE_SHORT_VERSION_STRING "${THEXTECH_VERSION_STRING}"
+        MACOSX_BUNDLE_LONG_VERSION_STRING "${THEXTECH_VERSION_STRING}"
+        MACOSX_BUNDLE_ICON_FILE "${THEXTECH_ICON_NAME}"
+        CPACK_BUNDLE_NAME "${THEXTECH_BUNDLE_NAME}"
+        MACOSX_BUNDLE_INFO_STRING "TheXTech classic game engine"
     )
-    set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/resources/a2xtech.icns" PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+    set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/resources/thextech.icns" PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
     set_source_files_properties(${PGE_FILE_ICONS} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 
-    if(NOT A2XTECH_CUSTOM_ICON_PATH STREQUAL "")
-        set_source_files_properties("${A2XTECH_CUSTOM_ICON_PATH}" PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+    if(NOT THEXTECH_CUSTOM_ICON_PATH STREQUAL "")
+        set_source_files_properties("${THEXTECH_CUSTOM_ICON_PATH}" PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
     endif()
 
-    if(NOT A2XTECH_PRELOAD_ENVIRONMENT STREQUAL "")
-        add_custom_command(TARGET a2xtech POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:a2xtech>/../Resources/assets"
-            COMMAND ${CMAKE_COMMAND} -E copy_directory "${A2XTECH_PRELOAD_ENVIRONMENT}" "$<TARGET_FILE_DIR:a2xtech>/../Resources/assets"
+    if(NOT THEXTECH_PRELOAD_ENVIRONMENT STREQUAL "")
+        add_custom_command(TARGET thextech POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:thextech>/../Resources/assets"
+            COMMAND ${CMAKE_COMMAND} -E copy_directory "${THEXTECH_PRELOAD_ENVIRONMENT}" "$<TARGET_FILE_DIR:thextech>/../Resources/assets"
             COMMENT "Copying assets into bundle..."
         )
-        target_compile_definitions(a2xtech PRIVATE -DUSE_BUNDLED_ASSETS)
+        target_compile_definitions(thextech PRIVATE -DUSE_BUNDLED_ASSETS)
     endif()
 
-    if(NOT A2XTECH_CUSTOM_USERDATA_DIR_NAME STREQUAL "")
-        target_compile_definitions(a2xtech PRIVATE -DUSERDATA_ROOT_NAME="${A2XTECH_CUSTOM_USERDATA_DIR_NAME}")
+    if(NOT THEXTECH_CUSTOM_USERDATA_DIR_NAME STREQUAL "")
+        target_compile_definitions(thextech PRIVATE -DUSERDATA_ROOT_NAME="${THEXTECH_CUSTOM_USERDATA_DIR_NAME}")
     endif()
 
-    set(CPACK_PACKAGE_NAME "${A2XTECH_BUNDLE_NAME}")
-    set(CPACK_PACKAGE_VERSION "${A2XTECH_VERSION_STRING}")
+    set(CPACK_PACKAGE_NAME "${THEXTECH_BUNDLE_NAME}")
+    set(CPACK_PACKAGE_VERSION "${THEXTECH_VERSION_STRING}")
     set(CPACK_PACKAGE_VENDOR "Wohlstand")
     set(CPACK_PACKAGE_CONTACT "admin@wohlnet.ru")
     set(CPACK_DMG_FORMAT "UDBZ")
-    set(CPACK_DMG_VOLUME_NAME "${A2XTECH_BUNDLE_NAME}")
-    set(CPACK_PACKAGE_FILE_NAME "${A2XTECH_BUNDLE_NAME}-${A2XTECH_VERSION_STRING}")
+    set(CPACK_DMG_VOLUME_NAME "${THEXTECH_BUNDLE_NAME}")
+    set(CPACK_PACKAGE_FILE_NAME "${THEXTECH_BUNDLE_NAME}-${THEXTECH_VERSION_STRING}")
     include(CPack)
 
     target_link_libraries(A2XT_Int INTERFACE iconv)
     if(PGE_USE_LUAJIT)
         # Required to link on 64-bit macOS
         # See: http://luajit.org/install.html
-        set_property(TARGET a2xtech APPEND_STRING PROPERTY
+        set_property(TARGET thextech APPEND_STRING PROPERTY
             LINK_FLAGS " -pagezero_size 10000 -image_base 100000000"
         )
     endif()
 endif()
 
-target_include_directories(a2xtech PRIVATE src lib ${A2XT_INCS})
-target_link_libraries(a2xtech PRIVATE A2XT_Int)
+target_include_directories(thextech PRIVATE src lib ${A2XT_INCS})
+target_link_libraries(thextech PRIVATE A2XT_Int)
 
 if(ENABLE_ANTICHEAT_TRAP)
-    target_compile_definitions(a2xtech PRIVATE -DENABLE_ANTICHEAT_TRAP)
+    target_compile_definitions(thextech PRIVATE -DENABLE_ANTICHEAT_TRAP)
 endif()
 
 if(ENABLE_OLD_CREDITS)
-    target_compile_definitions(a2xtech PRIVATE -DENABLE_OLD_CREDITS)
-    set_target_properties(a2xtech PROPERTIES OUTPUT_NAME "smbx")
+    target_compile_definitions(thextech PRIVATE -DENABLE_OLD_CREDITS)
+    set_target_properties(thextech PROPERTIES OUTPUT_NAME "smbx")
 endif()
 
 if(NOT ENABLE_LOGGING)
-    target_compile_definitions(a2xtech PRIVATE -DDISABLE_LOGGING)
+    target_compile_definitions(thextech PRIVATE -DDISABLE_LOGGING)
 endif()
 
 if(EMSCRIPTEN)
-    target_compile_definitions(a2xtech PRIVATE -DPGE_NO_THREADING)
+    target_compile_definitions(thextech PRIVATE -DPGE_NO_THREADING)
 endif()
 
 if(NOT USE_SYSTEM_LIBS)
-    add_dependencies(a2xtech ${A2XT_DEPS})
+    add_dependencies(thextech ${A2XT_DEPS})
 endif()
 
 if(USE_STATIC_LIBC AND NOT USE_SYSTEM_LIBS)
     if(NOT APPLE AND NOT MSVC)
-#        target_link_libraries(a2xtech PRIVATE -static)
-        set_property(TARGET a2xtech APPEND_STRING PROPERTY LINK_FLAGS " -static-libgcc -static-libstdc++")
+#        target_link_libraries(thextech PRIVATE -static)
+        set_property(TARGET thextech APPEND_STRING PROPERTY LINK_FLAGS " -static-libgcc -static-libstdc++")
     endif()
 
     if(MSVC)
-        target_compile_options(a2xtech PRIVATE /MT)
-        target_link_options(a2xtech PRIVATE /INCREMENTAL:NO /NODEFAULTLIB:MSVCRT)
+        target_compile_options(thextech PRIVATE /MT)
+        target_link_options(thextech PRIVATE /INCREMENTAL:NO /NODEFAULTLIB:MSVCRT)
     endif()
 endif()
 
 if(WIN32)
-    set_target_properties(a2xtech PROPERTIES WIN32_EXECUTABLE ON)
-    target_compile_definitions(a2xtech PRIVATE -DNOMINMAX)
-    target_link_libraries(a2xtech PRIVATE "version" dbghelp) # needed by StackWalker
+    set_target_properties(thextech PROPERTIES WIN32_EXECUTABLE ON)
+    target_compile_definitions(thextech PRIVATE -DNOMINMAX)
+    target_link_libraries(thextech PRIVATE "version" dbghelp) # needed by StackWalker
 endif()
 
 if(APPLE)
-    install(TARGETS a2xtech DESTINATION .)
+    install(TARGETS thextech DESTINATION .)
     install(FILES changelog.txt DESTINATION .)
     install(FILES README.md DESTINATION . RENAME ReadMe.txt)
     install(FILES LICENSE DESTINATION . RENAME License.txt)
 elseif(WIN32)
-    install(TARGETS a2xtech DESTINATION .)
+    install(TARGETS thextech DESTINATION .)
     file(GLOB BUILT_DLLS "${DEPENDENCIES_INSTALL_DIR}/bin/*.dll")
     install(FILES ${BUILT_DLLS} DESTINATION .)
 else()
-    install(TARGETS a2xtech
+    install(TARGETS thextech
         RUNTIME DESTINATION bin
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib

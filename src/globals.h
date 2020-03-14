@@ -1,5 +1,5 @@
 /*
- * A2xTech - A platform game engine ported from old source code for VB6
+ * TheXTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
  * Copyright (c) 2020-2020 Vitaly Novichkov <admin@wohlnet.ru>
@@ -71,7 +71,7 @@ extern GFX_t GFX;
 
 //! Showing that game is works. It gets false when closing a window or exiting a game by menu. To mean that application must be closed.
 extern bool GameIsActive;
-//! Path to game resources assets (by default it's ~/.PGE_Project/a2xtech/)
+//! Path to game resources assets (by default it's ~/.PGE_Project/thextech/)
 extern std::string AppPath;
 
 /**

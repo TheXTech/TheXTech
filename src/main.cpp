@@ -1,5 +1,5 @@
 /*
- * A2xTech - A platform game engine ported from old source code for VB6
+ * TheXTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
  * Copyright (c) 2020-2020 Vitaly Novichkov <admin@wohlnet.ru>
@@ -145,7 +145,7 @@ int main(int argc, char**argv)
     try
     {
         // Define the command line object.
-        TCLAP::CmdLine  cmd("A2xTech\n"
+        TCLAP::CmdLine  cmd("TheXTech\n"
                             "Copyright (c) 2020-2020 Vitaly Novichkov <admin@wohlnet.ru>\n"
                             "This program is distributed under the MIT license\n", ' ', "1.3");
 

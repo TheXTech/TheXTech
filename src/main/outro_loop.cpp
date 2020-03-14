@@ -1,5 +1,5 @@
 /*
- * A2xTech - A platform game engine ported from old source code for VB6
+ * TheXTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
  * Copyright (c) 2020-2020 Vitaly Novichkov <admin@wohlnet.ru>
@@ -104,7 +104,7 @@ void SetupCredits()
 #ifdef ENABLE_OLD_CREDITS
     AddCredit("Super Mario Bros. X");
 #else
-    AddCredit("A2xTech");
+    AddCredit("TheXTech");
 #endif
     AddCredit("");
     AddCredit("");

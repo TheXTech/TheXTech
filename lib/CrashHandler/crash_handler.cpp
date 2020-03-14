@@ -120,7 +120,7 @@ static const char *g_messageToUser =
     " Please send this log file to the developers by one of ways:\n"
     " - Via contact form:          http://wohlsoft.ru/forum/memberlist.php?mode=contactadmin\n"
     " - Official forums:           http://wohlsoft.ru/forum/\n"
-    " - Make issue at GitHub repo: https://github.com/Wohlstand/a2xtech\n\n"
+    " - Make issue at GitHub repo: https://github.com/Wohlstand/TheXTech\n\n"
     "================================================\n";
 
 #ifdef _WIN32
