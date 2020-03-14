@@ -1649,6 +1649,55 @@ void NPCFrames(int A)
                 NPC[A].Frame = -1;
         }
     }
+    else if(NPC[A].Type == 328) // clawgrip
+    {
+        if(NPC[A].Special >= 0)
+        {
+            if(NPC[A].Special2 == 0)
+            {
+                NPC[A].FrameCount = NPC[A].FrameCount + 1;
+                if(NPC[A].FrameCount > 4)
+                {
+                    NPC[A].FrameCount = 0;
+                    NPC[A].Frame++;
+                    if(NPC[A].Frame >= 2)
+                        NPC[A].Frame = 0;
+                }
+            }
+            else if(NPC[A].Special2 == 1)
+            {
+                if(NPC[A].Direction == -1)
+                    NPC[A].Frame = 2;
+                else
+                    NPC[A].Frame = 3;
+            }
+            else if(NPC[A].Special2 == 2)
+            {
+                    NPC[A].Frame = 4;
+            }
+            else if(NPC[A].Special2 == 3)
+            {
+                    NPC[A].Frame = 5;
+            }
+        }
+        else if(NPC[A].Special < 0)
+        {
+            NPC[A].FrameCount = NPC[A].FrameCount + 1;
+            if(NPC[A].FrameCount < 6)
+                NPC[A].Frame = 6;
+            else if(NPC[A].FrameCount < 12)
+                NPC[A].Frame = 7;
+            else
+            {
+                NPC[A].Frame = 6;
+                NPC[A].FrameCount = 0;
+            }
+        }
+    }
+    else if(NPC[A].Type == 329) // smb2 stone
+    {
+        NPC[A].Frame = -1;
+    }
     else if(NPC[A].Type == 317) // fry guy
     {
         if(NPC[A].Special >= 0)
@@ -1673,7 +1722,7 @@ void NPCFrames(int A)
                 NPC[A].Frame = 6;
             else
             {
-                NPC[A].Frame = 0;
+                NPC[A].Frame = 4;
                 NPC[A].FrameCount = 0;
             }
         }
@@ -2017,7 +2066,7 @@ void NPCFrames(int A)
         if(NPC[A].Direction == 1)
             NPC[A].Frame = NPC[A].Frame + 3;
     }
-    else if(NPC[A].Type == 19 || NPC[A].Type == 20 || NPC[A].Type == 28 || (NPC[A].Type >= 129 && NPC[A].Type <= 132) || NPC[A].Type == 135 || NPC[A].Type == 158 || NPC[A].Type == 322) // Shy guys / Jumping Fish
+    else if(NPC[A].Type == 19 || NPC[A].Type == 20 || NPC[A].Type == 28 || (NPC[A].Type >= 129 && NPC[A].Type <= 132) || NPC[A].Type == 135 || NPC[A].Type == 158 || NPC[A].Type == 322 || NPC[A].Type == 330 || NPC[A].Type == 331) // Shy guys / Jumping Fish
     {
         if(NPC[A].HoldingPlayer == 0 && NPC[A].Projectile == 0)
         {

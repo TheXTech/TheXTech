@@ -53,6 +53,9 @@ void SetupVars()
     EffectWidth[145] = 32;
     EffectHeight[145] = 60;
 
+    EffectWidth[162] = 64;
+    EffectHeight[162] = 64;
+
     EffectWidth[71] = 16;
     EffectHeight[71] = 16;
     EffectWidth[148] = 16;
@@ -1269,6 +1272,15 @@ void SetupVars()
         NPCJumpHurt[A] = true;
     }
 
+    For(A, 330, 331) // beezos
+    {
+        NPCCanWalkOn[A] = true;
+        NPCGrabFromTop[A] = true;
+        NPCNoFireBall[A] = true;
+        NPCNoGravity[A] = true;
+        NPCNoClipping[A] = true;
+    }
+
     NPCWidth[148] = 32; // Black Yoshi
     NPCHeight[148] = 32;
     NPCWidthGFX[148] = 74;
@@ -1422,10 +1434,14 @@ void SetupVars()
     NPCWidth[189] = 32;
 
     NPCNoYoshi[201] = true;
+    NPCNoYoshi[328] = true;
+    NPCTurnsAtCliffs[328] = true;
     NPCNoYoshi[202] = true;
     NPCJumpHurt[202] = true;
     NPCWidth[201] = 80;
     NPCHeight[201] = 94;
+    NPCWidth[328] = 64;
+    NPCHeight[328] = 64;
 
     NPCWidth[199] = 56;
     NPCHeight[199] = 60;
@@ -1447,6 +1463,7 @@ void SetupVars()
     NPCNoYoshi[204] = true;
     NPCCanWalkOn[204] = true;
     NPCJumpHurt[201] = true;
+    NPCJumpHurt[328] = true;
 
     NPCNoYoshi[208] = true;
     NPCNoYoshi[209] = true;
@@ -1459,6 +1476,7 @@ void SetupVars()
 
     NPCNoYoshi[202] = true;
     NPCNoYoshi[201] = true;
+    NPCNoYoshi[328] = true;
     NPCNoYoshi[200] = true;
 
     NPCWidthGFX[189] = 48;
@@ -1683,6 +1701,9 @@ void SetupVars()
     NPCCanWalkOn[91] = true;
     NPCCanWalkOn[92] = true;
     NPCCanWalkOn[327] = true;
+    NPCCanWalkOn[329] = true;
+    NPCMovesPlayer[329] = true;
+    NPCIsABlock[329] = true;
     NPCCanWalkOn[104] = true;
     NPCCanWalkOn[297] = true;
     NPCCanWalkOn[105] = true;
@@ -1699,6 +1720,7 @@ void SetupVars()
     NPCGrabFromTop[91] = true;
     NPCGrabFromTop[92] = true;
     NPCGrabFromTop[327] = true;
+    NPCGrabFromTop[329] = true;
     NPCNoClipping[8] = true;
     NPCNoClipping[245] = true;
     // NPCNoClipping[10] = true;
@@ -1810,6 +1832,7 @@ void SetupVars()
     NPCWontHurt[91] = true;
     NPCWontHurt[92] = true;
     NPCWontHurt[327] = true;
+    NPCWontHurt[329] = true;
     NPCWontHurt[95] = true;
     NPCWontHurt[96] = true;
     NPCWontHurt[98] = true;
@@ -1839,6 +1862,7 @@ void SetupVars()
     NPCIsGrabbable[49] = true;
     NPCIsGrabbable[92] = true;
     NPCIsGrabbable[327] = true;
+    NPCIsGrabbable[329] = true;
     NPCIsGrabbable[96] = true;
     NPCIsGrabbable[158] = true;
     NPCIsABlock[21] = true;
@@ -2104,6 +2128,7 @@ void SetupVars()
     NPCNoIceBall[91] = true;
     NPCNoIceBall[92] = true;
     NPCNoIceBall[327] = true;
+    NPCNoIceBall[329] = true;
     NPCNoIceBall[94] = true;
     For(A, 95, 108)
     {
@@ -2131,6 +2156,7 @@ void SetupVars()
     NPCNoIceBall[199] = true;
     NPCNoIceBall[200] = true;
     NPCNoIceBall[201] = true;
+    NPCNoIceBall[328] = true;
     NPCNoIceBall[208] = true;
     NPCNoIceBall[209] = true;
     NPCNoIceBall[210] = true;

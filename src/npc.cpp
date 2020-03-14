@@ -497,6 +497,33 @@ void NPCSpecial(int A)
             NPC[A].Location.SpeedX = -6;
 
     }
+    else if(NPC[A].Type == 330) // Yellow beezo
+    {
+        NPC[A].Location.SpeedX = 3.5 * NPC[A].Direction;
+        if(NPC[A].Special == 0)
+        {
+            NPC[A].Location.SpeedY = 2;
+            NPC[A].Special == 1;
+        }
+        if(NPC[A].Location.SpeedY > 0)
+            NPC[A].Location.SpeedY = NPC[A].Location.SpeedY - 0.1;
+    }
+    else if(NPC[A].Type == 331) // red beezo
+    {
+        NPC[A].Location.SpeedX = 3.5 * NPC[A].Direction;
+        for(B = 1; B <= numPlayers; B++)
+        {
+            if(!Player[B].Dead && Player[B].Section == NPC[A].Section && B != NPC[A].CantHurtPlayer && NPC[A].Special > -1)
+            {
+                if(Player[B].Location.Y > NPC[A].Location.Y && NPC[A].Special == 0)
+                    NPC[A].Location.SpeedY = 2;
+                else if(Player[B].Location.Y < NPC[A].Location.Y && NPC[A].Special == 0)
+                    NPC[A].Special = 1;
+            }
+        }
+        if(NPC[A].Location.SpeedY > 0 && NPC[A].Special == 1)
+            NPC[A].Location.SpeedY = NPC[A].Location.SpeedY - 0.1;
+    }
     else if(NPC[A].Type == 291) // heart bomb
     {
         if(NPC[A].Special4 != 0.0)
@@ -4534,6 +4561,99 @@ void SpecialNPC(int A)
             NPC[A].Special2 = 0;
             NPC[A].Special3 = 0;
             NPC[A].Special = 0;
+        }
+    }
+    else if(NPC[A].Type == 329) // smb2 stone
+    {
+        if(NPC[A].Location.SpeedY == Physics.NPCGravity && NPC[A].Location.SpeedX != 0)
+        {
+            NPC[A].Location.Y = NPC[A].Location.Y - 2;
+            NPC[A].Location.SpeedY = -4;
+        }
+        const double rad2deg = 180.0 / M_PI;
+        NPC[A].Special6 +=  (NPC[A].Location.SpeedX / (0.5 * NPC[A].Location.Height)) * rad2deg;
+        while(NPC[A].Special6 >= 360)
+        NPC[A].Special6 -= 360;
+        while(NPC[A].Special6 < 0)
+        NPC[A].Special6 += 360;
+
+        if(NPC[A].Special2 == 1)
+        {
+        tempLocation.Width = NPC[A].Location.Width;
+        tempLocation.Height = NPC[A].Location.Height - 2;
+        tempLocation.X = NPC[A].Location.X;
+        tempLocation.Y = NPC[A].Location.Y + 4;
+        for(B = 1; B <= numPlayers; B++)
+        {
+            if(!Player[B].Dead && Player[B].Section == NPC[A].Section && B != NPC[A].CantHurtPlayer && NPC[A].Special > -1)
+            {
+                if(CheckCollision(Player[B].Location, tempLocation) == true)
+                    PlayerHurt(B);
+            }
+        }
+        }
+    }
+    else if(NPC[A].Type == 328) // clawgrip
+    {
+        if(NPC[A].Legacy)
+        {
+            if(NPC[A].TimeLeft > 1)
+                NPC[A].TimeLeft = 100;
+            if(bgMusic[NPC[A].Section] != 6 && bgMusic[NPC[A].Section] != 15 && bgMusic[NPC[A].Section] != 21 && NPC[A].TimeLeft > 1)
+            {
+                bgMusic[NPC[A].Section] = 15;
+                StopMusic();
+                StartMusic(NPC[A].Section);
+            }
+        }
+        if(NPC[A].Special >= 0)
+            NPC[A].Special3++;
+        else if(NPC[A].Special < 0)
+            NPC[A].Special++;
+        if(NPC[A].Special3 == 100)
+        {
+            NPC[A].Special2 = 1;
+            NPC[A].Location.SpeedX = 0;
+        }
+        else if(NPC[A].Special3 == 110)
+            NPC[A].Special2 = 2;
+        else if(NPC[A].Special3 == 120)
+            NPC[A].Special2 = 3;
+        else if(NPC[A].Special3 == 130)
+        {
+            PlaySound(25);
+            numNPCs++;
+            NPC[numNPCs] = NPC_t();
+            NPC[numNPCs].Active = true;
+            NPC[numNPCs].Direction = NPC[A].Direction;
+            NPC[numNPCs].Type = 329;
+            NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.X = NPC[A].Location.X + NPC[A].Location.Width / 2;
+            NPC[numNPCs].Location.Y = NPC[A].Location.Y - NPC[numNPCs].Location.Height;
+            for(B = 1; B <= numPlayers; B++)
+            {
+                if(!Player[B].Dead && Player[B].Section == NPC[A].Section && B != NPC[A].CantHurtPlayer && NPC[A].Special > -1)
+                {
+                    if(Player[B].Location.X > NPC[A].Location.X)
+                        NPC[numNPCs].Location.SpeedX = 6;
+                    else if(Player[B].Location.X < NPC[A].Location.X)
+                        NPC[numNPCs].Location.SpeedX = -6;
+                }
+            }
+            NPC[numNPCs].Location.SpeedY = -7;
+            NPC[numNPCs].TimeLeft = 100;
+            NPC[numNPCs].Section = NPC[A].Section;
+            NPC[numNPCs].Special2 = 1;
+            NPC[A].Special3 = 0;
+            NPC[A].Special2 = 0;
+        }
+        else if(NPC[A].Special3 < 100)
+        {
+            if(NPC[A].Special >= 0)
+                NPC[A].Location.SpeedX = 2.5 * NPC[A].Direction;
+            else if(NPC[A].Special < 0)
+                NPC[A].Location.SpeedX = 0;
         }
     }
     else if(NPC[A].Type == 317) // fry guy

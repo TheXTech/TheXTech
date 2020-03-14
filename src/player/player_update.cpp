@@ -4344,6 +4344,13 @@ void UpdatePlayer()
                         NPC[B].Special2 = 1;
                     if((NPC[B].Type == 323 || NPC[B].Type == 324 || NPC[B].Type == 325) && Player[A].Location.SpeedY > 0)
                     {
+                        for(D = 1; D <= numNPCs; D++)
+                        {
+                            if(NPC[D].Type == 326)
+                            {
+                                NPC[D].Killed = 9;
+                            }
+                        }
                     numNPCs++;
                     NPC[numNPCs] = NPC_t();
                     NPC[numNPCs].Active = true;
