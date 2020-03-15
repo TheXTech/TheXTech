@@ -799,7 +799,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
     {
         for(B = 1; B <= 4; B++)
         {
-            numEffects = numEffects + 1;
+            numEffects++;
             Effect[numEffects].Shadow = Shadow;
             Effect[numEffects].Location.Width = EffectWidth[A];
             Effect[numEffects].Location.Height = EffectHeight[A];
@@ -838,7 +838,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
     }
     else if(A == 140) // larry shell
     {
-        numEffects = numEffects + 1;
+        numEffects++;
         Effect[numEffects].NewNpc = NewNpc;
         Effect[numEffects].Shadow = Shadow;
         Effect[numEffects].Location.Width = EffectWidth[A];
@@ -854,7 +854,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
     }
     else if(A == 104) // Blaarg eyes
     {
-        numEffects = numEffects + 1;
+        numEffects++;
         Effect[numEffects].NewNpc = NewNpc;
         Effect[numEffects].Shadow = Shadow;
         if(Effect[numEffects].NewNpc == 96)
@@ -876,7 +876,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
     }
     else if(A == 56 || A == 58) // Egg break / Yoshi grow
     {
-        numEffects = numEffects + 1;
+        numEffects++;
         Effect[numEffects].Shadow = Shadow;
         Effect[numEffects].NewNpc = NewNpc;
         if(Effect[numEffects].NewNpc == 96)
@@ -903,7 +903,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
     }
     else if(A == 136) // Roto Disk
     {
-        numEffects = numEffects + 1;
+        numEffects++;
         Effect[numEffects].Shadow = Shadow;
         Effect[numEffects].Location.X = Location.X;
         Effect[numEffects].Location.Y = Location.Y;
@@ -919,7 +919,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
     }
     else if(A == 125) // pow
     {
-        numEffects = numEffects + 1;
+        numEffects++;
         Effect[numEffects].Shadow = Shadow;
         Effect[numEffects].NewNpc = NewNpc;
         Effect[numEffects].Location.Width = EffectWidth[A];
@@ -935,7 +935,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
     }
     else if(A == 107) // Metroid Block
     {
-        numEffects = numEffects + 1;
+        numEffects++;
         Effect[numEffects].Shadow = Shadow;
         Effect[numEffects].NewNpc = NewNpc;
         Effect[numEffects].Location.X = Location.X;
@@ -953,7 +953,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
     {
         for(B = 1; B <= 4; B++)
         {
-            numEffects = numEffects + 1;
+            numEffects++;
             Effect[numEffects].Shadow = Shadow;
             Effect[numEffects].Location.Width = EffectWidth[A];
             Effect[numEffects].Location.Height = EffectHeight[A];
@@ -1007,7 +1007,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
     else if(A == 2 || A == 6 || A == 23 || A == 35 || A == 37 || A == 39 || A == 41 || A == 43 || A == 45 || A == 52 || A == 62 || A == 84 || A == 126) // Goomba smash effect
     {
         PlaySound(2); // Stomp sound
-        numEffects = numEffects + 1;
+        numEffects++;
         Effect[numEffects].Shadow = Shadow;
         Effect[numEffects].Location.X = Location.X;
         Effect[numEffects].Location.Y = Location.Y;
@@ -1031,7 +1031,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
     }
     else if(A == 81 || A == 123 || A == 124) // P Switch
     {
-        numEffects = numEffects + 1;
+        numEffects++;
         Effect[numEffects].Shadow = Shadow;
         Effect[numEffects].Location.Width = EffectWidth[A];
         Effect[numEffects].Location.Height = EffectHeight[A];
@@ -1045,7 +1045,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
     }
     else if(A == 113 || A == 114) // Water Bubble / Splash
     {
-        numEffects = numEffects + 1;
+        numEffects++;
         Effect[numEffects].Location.Width = EffectWidth[A];
         Effect[numEffects].Location.Height = EffectWidth[A];
         Effect[numEffects].Location.X = Location.X;
@@ -1087,7 +1087,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
     }
     else if(A == 109) // Spike Top
     {
-        numEffects = numEffects + 1;
+        numEffects++;
         Effect[numEffects].Shadow = Shadow;
         Effect[numEffects].Location.Width = 32;
         Effect[numEffects].Location.Height = 32;
@@ -1101,7 +1101,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
     }
     else if(A == 108) // Metroid
     {
-        numEffects = numEffects + 1;
+        numEffects++;
         Effect[numEffects].Shadow = Shadow;
         Effect[numEffects].Location.Width = 64;
         Effect[numEffects].Location.Height = 64;
@@ -1115,7 +1115,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
     }
     else if(A == 82) // Block Spin
     {
-        numEffects = numEffects + 1;
+        numEffects++;
         Effect[numEffects].Shadow = Shadow;
         Effect[numEffects].NewNpc = NewNpc;
         Effect[numEffects].Location.Width = 32;
@@ -1130,7 +1130,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
     }
     else if(A == 3 || A == 5 || A == 129 || A == 130 || A == 134) // Mario & Luigi died effect
     {
-        numEffects = numEffects + 1;
+        numEffects++;
         Effect[numEffects].Shadow = Shadow;
         Effect[numEffects].Location.Width = EffectWidth[A];
         Effect[numEffects].Location.Height = EffectHeight[A];
@@ -1149,7 +1149,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
     }
     else if(A == 79) // Score
     {
-        numEffects = numEffects + 1;
+        numEffects++;
         Effect[numEffects].Type = A;
         Effect[numEffects].Shadow = Shadow;
         Effect[numEffects].Location.Width = EffectWidth[Effect[numEffects].Type];
@@ -1169,7 +1169,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
         {
             if(numEffects < maxEffects)
             {
-            numEffects = numEffects + 1;
+            numEffects++;
                 Effect[numEffects].Shadow = Shadow;
                 Effect[numEffects].Type = A;
                 Effect[numEffects].Location.Width = EffectWidth[A];
@@ -1198,7 +1198,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
         {
             if(numEffects < maxEffects)
             {
-            numEffects = numEffects + 1;
+            numEffects++;
                 Effect[numEffects].Shadow = Shadow;
                 Effect[numEffects].Type = A;
                 Effect[numEffects].Location.Width = EffectWidth[A];
@@ -1220,7 +1220,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
     }
     else if(A == 70) // SMB3 Bomb Part 1
     {
-        numEffects = numEffects + 1;
+        numEffects++;
         Effect[numEffects].Shadow = Shadow;
         Effect[numEffects].Location.Width = 16;
         Effect[numEffects].Location.Height = 16;
@@ -1239,7 +1239,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
         {
             if(numEffects < maxEffects)
             {
-            numEffects = numEffects + 1;
+            numEffects++;
                 Effect[numEffects].Shadow = Shadow;
                 Effect[numEffects].Location.Width = EffectWidth[A];
                 Effect[numEffects].Location.Height = EffectHeight[A];
@@ -1288,7 +1288,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
         {
             if(numEffects < maxEffects)
             {
-            numEffects = numEffects + 1;
+            numEffects++;
                 Effect[numEffects].Shadow = Shadow;
                 Effect[numEffects].Location.Width = 16;
                 Effect[numEffects].Location.Height = 16;
@@ -1327,7 +1327,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
     }
     else if(A == 54 || A == 55 || A == 59 || A == 103) // Door Effect
     {
-        numEffects = numEffects + 1;
+        numEffects++;
         Effect[numEffects].Shadow = Shadow;
         Effect[numEffects].Location.Width = Location.Width;
         Effect[numEffects].Location.Height = Location.Height;
@@ -1341,7 +1341,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
     }
     else if(A == 4 || A == 7 || A == 8 || A == 9 || A == 19 || A == 22 || A == 26 || A == 101 || A == 102 || A == 27 || A == 146 || A == 28 || A == 29 || A == 31 || A == 32 || A == 145 || A == 33 || A == 34 || A == 36 || A == 38 || A == 40 || A == 42 || A == 44 || A == 46 || A == 47 || A == 53 || A == 60 || A == 9 || A == 6 || A == 95 || A == 96 || A == 110 || A == 117 || A == 121 || A == 127 || A == 142) // Flying goomba / turtle shell / hard thing shell
     {
-        numEffects = numEffects + 1;
+        numEffects++;
         Effect[numEffects].Shadow = Shadow;
         Effect[numEffects].Location.Width = EffectWidth[A];
         Effect[numEffects].Location.Height = EffectHeight[A];
@@ -1371,7 +1371,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
     {
         for(B = 1; B <= 4; B++)
         {
-            numEffects = numEffects + 1;
+            numEffects++;
             Effect[numEffects].Shadow = Shadow;
             Effect[numEffects].Location.Width = EffectWidth[A];
             Effect[numEffects].Location.Height = EffectHeight[A];
@@ -1394,7 +1394,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
     }
     else if(A == 10 || A == 73 || A == 74 || A == 75 || A == 131 || A == 132 || A == 147) // Puff of smoke
     {
-        numEffects = numEffects + 1;
+        numEffects++;
         Effect[numEffects].Shadow = Shadow;
         Effect[numEffects].Location.Width = EffectWidth[A];
         Effect[numEffects].Location.Height = EffectHeight[A];
@@ -1425,7 +1425,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
     }
     else if(A == 144) // bubble pop
     {
-        numEffects = numEffects + 1;
+        numEffects++;
         Effect[numEffects].Shadow = Shadow;
         Effect[numEffects].Location.Width = EffectWidth[A];
         Effect[numEffects].Location.Height = EffectHeight[A];
@@ -1439,7 +1439,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
     }
     else if(A == 63) // Zelda Style Smoke
     {
-        numEffects = numEffects + 1;
+        numEffects++;
         Effect[numEffects].Shadow = Shadow;
         Effect[numEffects].Location.Width = 48;
         Effect[numEffects].Location.Height = 48;
@@ -1453,7 +1453,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
     }
     else if(A == 11) // Coin hit out of block
     {
-        numEffects = numEffects + 1;
+        numEffects++;
         Effect[numEffects].Shadow = Shadow;
         Effect[numEffects].Location.Width = 32;
         Effect[numEffects].Location.Height = 32;
@@ -1467,7 +1467,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
     }
     else if(A == 12) // Big Fireball Tail
     {
-        numEffects = numEffects + 1;
+        numEffects++;
         Effect[numEffects].Shadow = Shadow;
         Effect[numEffects].Location.Width = 8;
         Effect[numEffects].Location.Height = 8;
@@ -1481,7 +1481,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
     }
     else if(A == 111) // Glass Shatter
     {
-        numEffects = numEffects + 1;
+        numEffects++;
         Effect[numEffects].Shadow = Shadow;
         Effect[numEffects].Location.Width = 16;
         Effect[numEffects].Location.Height = 16;
@@ -1498,7 +1498,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
     }
     else if(A == 112) // Mother Brain
     {
-        numEffects = numEffects + 1;
+        numEffects++;
         Effect[numEffects].Shadow = Shadow;
         Effect[numEffects].Location.Width = Location.Width;
         Effect[numEffects].Location.Height = Location.Height;
@@ -1514,7 +1514,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
     }
     else if(A == 77 || A == 139) // Small Fireball Tail
     {
-            numEffects = numEffects + 1;
+        numEffects++;
         Effect[numEffects].Shadow = Shadow;
         Effect[numEffects].Location.Width = EffectWidth[A];
         Effect[numEffects].Location.Height = EffectHeight[A];
@@ -1536,7 +1536,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
     }
     else if(A == 80) // Twinkle
     {
-        numEffects = numEffects + 1;
+        numEffects++;
         Effect[numEffects].Shadow = Shadow;
         Effect[numEffects].Location.Width = 16;
         Effect[numEffects].Location.Height = 16;
@@ -1550,7 +1550,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
     }
     else if(A == 13) // Lava Splash
     {
-        numEffects = numEffects + 1;
+        numEffects++;
         Effect[numEffects].Shadow = Shadow;
         Effect[numEffects].Location.Width = EffectWidth[13];
         Effect[numEffects].Location.Height = EffectHeight[13];
@@ -1564,7 +1564,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
     }
     else if(A == 14) // Dead Big Koopa
     {
-        numEffects = numEffects + 1;
+        numEffects++;
         Effect[numEffects].Shadow = Shadow;
         Effect[numEffects].Location.Width = EffectWidth[A];
         Effect[numEffects].Location.Height = EffectHeight[A];
@@ -1579,7 +1579,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
     }
     else if(A == 15 || A == 68) // Dead Bullet Bill
     {
-        numEffects = numEffects + 1;
+        numEffects++;
         Effect[numEffects].Shadow = Shadow;
         Effect[numEffects].Location.Width = Location.Width;
         Effect[numEffects].Location.Height = Location.Height;
@@ -1598,7 +1598,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
     }
     else if(A == 61) // Flying Beach Koopa
     {
-        numEffects = numEffects + 1;
+        numEffects++;
         Effect[numEffects].Shadow = Shadow;
         Effect[numEffects].Location.Width = Location.Width;
         Effect[numEffects].Location.Height = Location.Height;
@@ -1611,7 +1611,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
     }
     else if(A == 48) // Dead toad
     {
-        numEffects = numEffects + 1;
+        numEffects++;
         Effect[numEffects].Shadow = Shadow;
         Effect[numEffects].Location.Width = Location.Width;
         Effect[numEffects].Location.Height = Location.Height;
@@ -1630,7 +1630,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
     }
     else if(A == 16) // Dead Giant Bullet Bill
     {
-        numEffects = numEffects + 1;
+        numEffects++;
         Effect[numEffects].Shadow = Shadow;
         Effect[numEffects].Location.Width = Location.Width;
         Effect[numEffects].Location.Height = Location.Height;
@@ -1649,7 +1649,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
     }
     else if(A == 69) // Bomb
     {
-        numEffects = numEffects + 1;
+        numEffects++;
         Effect[numEffects].Shadow = Shadow;
         Effect[numEffects].Location.Width = 64;
         Effect[numEffects].Location.Height = 64;
@@ -1662,7 +1662,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
     }
     else if(A == 128) // pokey
     {
-        numEffects = numEffects + 1;
+        numEffects++;
         Effect[numEffects].Shadow = Shadow;
         Effect[numEffects].Location.Width = Location.Width;
         Effect[numEffects].Location.Height = Location.Height;
@@ -1677,7 +1677,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
     }
     else if(A == 17 || A == 18 || A == 20 || A == 24 || (A >= 64 && A <= 67) || A == 83 || A == 85 || A == 86 || A == 87 || A == 88 || A == 97 || A == 115 || A == 122 || A == 116 || A == 118 || A == 119 || A == 120 || A == 137) // Shy guy / Star Thing /Red Jumping Fish
     {
-        numEffects = numEffects + 1;
+        numEffects++;
         Effect[numEffects].Shadow = Shadow;
         Effect[numEffects].Location.Width = EffectWidth[A];
         Effect[numEffects].Location.Height = EffectHeight[A];
@@ -1713,7 +1713,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
     }
     else if(A == 90 || A == 91 || A == 92 || A == 93 || A == 94 || A == 98 || A == 99) // Boo / thwomps
     {
-        numEffects = numEffects + 1;
+        numEffects++;
         Effect[numEffects].Shadow = Shadow;
         Effect[numEffects].Location.Width = Location.Width;
         Effect[numEffects].Location.Height = Location.Height;
@@ -1743,7 +1743,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
     }
     else if(A == 25 || A == 49 || A == 50 || A == 72 || A == 89 || A == 105 || A == 106 || A == 138 || A == 141) // Hammer Bro
     {
-        numEffects = numEffects + 1;
+        numEffects++;
         Effect[numEffects].Shadow = Shadow;
 
         Effect[numEffects].Location.Width = EffectWidth[A];
@@ -1767,7 +1767,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
     }
     else if(A == 143) // ludwig dead
     {
-        numEffects = numEffects + 1;
+        numEffects++;
         Effect[numEffects].Shadow = Shadow;
         Effect[numEffects].Location.Width = EffectWidth[A];
         Effect[numEffects].Location.Height = EffectHeight[A];
