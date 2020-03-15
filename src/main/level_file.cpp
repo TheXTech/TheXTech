@@ -222,6 +222,33 @@ void OpenLevel(std::string FilePath)
         Background[numBackground].Layer = b.layer;
         Background[numBackground].Location.Width = GFXBackgroundWidth[Background[numBackground].Type];
         Background[numBackground].Location.Height = BackgroundHeight[Background[numBackground].Type];
+
+        Background[numBackground].uid = int(b.meta.array_id);
+
+        Background[numBackground].zOffset = b.z_offset;
+
+        if(b.z_mode == LevelBGO::ZDefault)
+            Background[numBackground].SortPriority = int(b.smbx64_sp);
+        else
+        {
+            switch(b.z_mode)
+            {
+            case LevelBGO::Background2:
+                Background[numBackground].SortPriority = 10;
+                break;
+            case LevelBGO::Background1:
+                Background[numBackground].SortPriority = 30;
+                break;
+            case LevelBGO::Foreground1:
+                Background[numBackground].SortPriority = 125;
+                break;
+            case LevelBGO::Foreground2:
+                Background[numBackground].SortPriority = 200;
+                break;
+            default:
+                break;
+            }
+        }
     }
 
 
