@@ -1471,8 +1471,8 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
         Effect[numEffects].Shadow = Shadow;
         Effect[numEffects].Location.Width = 8;
         Effect[numEffects].Location.Height = 8;
-        Effect[numEffects].Location.X += 4 + dRand() * 12;
-        Effect[numEffects].Location.Y += 40;
+        Effect[numEffects].Location.X = Location.X + 4 + (dRand() * 12.0);
+        Effect[numEffects].Location.Y = Location.Y + 40;
         // .Location.SpeedY = -8
         Effect[numEffects].Location.SpeedX = 0;
         Effect[numEffects].Frame = 0;
