@@ -703,6 +703,12 @@ struct Background_t
     int Type = 0;
 //    Location As Location
     Location_t Location;
+//EXTRA: make a custom sorting priority
+    int SortPriority = -1;
+//EXTRA: sub-priority
+    double zOffset = 0.0;
+//EXTRA: UID
+    int uid = 0;
 //End Type
 };
 

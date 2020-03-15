@@ -321,8 +321,11 @@ double BackGroundPri(int A)
 {
     double tempBackGroundPri = 0;
 
+
+    if(Background[A].SortPriority > 0) // Custom priority per every BGO
+        tempBackGroundPri = Background[A].SortPriority;
     // Lower Numbers get drawn first
-    if(Background[A].Type == 11 || Background[A].Type == 12 || Background[A].Type == 60 || Background[A].Type == 61)
+    else if(Background[A].Type == 11 || Background[A].Type == 12 || Background[A].Type == 60 || Background[A].Type == 61)
         tempBackGroundPri = 20;
     else if(Background[A].Type == 65 || Background[A].Type == 26 || Background[A].Type == 82 || Background[A].Type == 83 || Background[A].Type == 164 || Background[A].Type == 165 || Background[A].Type == 166 || Background[A].Type == 167 || Background[A].Type == 168 || Background[A].Type == 169) // WATER
 
@@ -353,7 +356,12 @@ double BackGroundPri(int A)
         tempBackGroundPri = 77;
     else
         tempBackGroundPri = 75;
-    tempBackGroundPri = tempBackGroundPri + Background[A].Location.X / 10000000;
+
+    //tempBackGroundPri += Background[A].Location.X / 10000000.0;
+    tempBackGroundPri += Background[A].uid / 100000000000.0;
+    tempBackGroundPri += Background[A].zOffset;
+
+
     return tempBackGroundPri;
 }
 
