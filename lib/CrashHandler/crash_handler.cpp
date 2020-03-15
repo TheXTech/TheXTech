@@ -229,7 +229,7 @@ static std::string getCurrentUserName()
     size_t nCnt = WideCharToMultiByte(CP_UTF8, 0, userNameW, usernameLen, userName, 256, 0, 0);
     userName[nCnt] = '\0';
     user = std::string(userName);
-#elif defined(__EMSCRIPTEN__) || defined(__ANDROID__)
+#elif defined(__EMSCRIPTEN__) || defined(__ANDROID__) || defined(__HAIKU__)
     user = "user"; // No way to get user, here is SINGLE generic user
 #else
     struct passwd *pwd = getpwuid(getuid());
@@ -254,6 +254,13 @@ static std::string getCurrentHomePath()
     homedir = std::string(homeDir);
 #elif defined(__EMSCRIPTEN__) || defined(__ANDROID__)
     homedir = "/"; // No way to get user, here is SINGLE generic user
+#elif defined(__HAIKU__)
+    {
+        const char *home = SDL_getenv("HOME");
+        if(home == nullptr)
+            return "/home/<unknown>"; // Failed to get a user name!
+        homedir = std::string(home);
+    }
 #else
     struct passwd *pwd = getpwuid(getuid());
     if(pwd == nullptr)

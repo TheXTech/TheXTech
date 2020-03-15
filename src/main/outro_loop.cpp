@@ -101,8 +101,8 @@ void SetupCredits()
     int A = 0;
     numCredits = 0;
 
-#ifdef ENABLE_OLD_CREDITS
-    AddCredit("New Super Mario Bros. X");
+#ifdef CUSTOM_CREDITS_TITLE
+    AddCredit(CUSTOM_CREDITS_TITLE);
 #else
     AddCredit("New Super Mario Bros. X");
 #endif
@@ -240,10 +240,14 @@ void SetupCredits()
     AddCredit("");
     AddCredit("");
     AddCredit("");
-#ifdef ENABLE_OLD_CREDITS
-    AddCredit("www.SuperMarioBrothers.org");
+#ifdef CUSTOM_CREDITS_URL
+    AddCredit(CUSTOM_CREDITS_URL);
 #else
+#   ifdef ENABLE_OLD_CREDITS
+    AddCredit("www.SuperMarioBrothers.org");
+#   else
     AddCredit("wohlsoft.ru");
+#   endif
 #endif
 
     for(A = 1; A <= numCredits; A++)

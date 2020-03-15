@@ -105,7 +105,7 @@ std::string AppPathManager::m_userDataRoot;
 #endif
 bool AppPathManager::m_isPortable = false;
 
-#if defined(__ANDROID__) || defined(__APPLE__)
+#if defined(__ANDROID__) || defined(__APPLE__) || defined(__HAIKU__)
 #define UserDirName "/PGE Project"
 #else
 #define UserDirName "/.PGE_Project"
@@ -141,6 +141,11 @@ static std::string getPgeUserDirectory()
     }
 #elif defined(__ANDROID__)
     path = "/sdcard/";
+#elif defined(__HAIKU__)
+    {
+        const char *home = SDL_getenv("HOME");
+        path.append(home);
+    }
 #elif defined(__gnu_linux__)
     {
         passwd *pw = getpwuid(getuid());

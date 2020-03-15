@@ -1900,7 +1900,12 @@ void UpdateBlocks()
             PlaySound(32);
             PSwitch(true);
         }
-        PSwitchTime = PSwitchTime - 1;
+
+        PSwitchTime--;
+
+        if(PSwitchTime == 195)
+            PlaySound(92);
+
         if(PSwitchTime <= 1)
         {
             PSwitch(false);

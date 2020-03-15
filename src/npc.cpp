@@ -3795,56 +3795,63 @@ void SpecialNPC(int A)
         }
         if(NPC[A].Direction == 1)
             NPC[A].Frame = NPC[A].Frame + 3;
-    // Fireball code
     }
+    // Fireball code (Podoboo)
     else if(NPC[A].Type == 12)
     {
         if(NPC[A].Location.Y > NPC[A].DefaultLocation.Y + NPC[A].Location.Height + 16)
             NPC[A].Location.Y = NPC[A].DefaultLocation.Y + NPC[A].DefaultLocation.Height + 16;
+
         NPC[A].Projectile = true;
+
         // If .Location.X <> .DefaultLocation.X Then .Killed = 2
-        if(NPC[A].Special2 == 0)
+        if(NPC[A].Special2 == 0.0)
         {
             NPC[A].Location.Y = NPC[A].DefaultLocation.Y + NPC[A].Location.Height + 1.5;
             NPC[A].Special2 = 1;
             NPC[A].Special = 0;
             PlaySound(16);
             tempLocation = NPC[A].Location;
-            tempLocation.Y = tempLocation.Y - 32;
+            tempLocation.Y -= 32;
             NewEffect(13, tempLocation);
         }
-        else if(NPC[A].Special2 == 1)
+        else if(fEqual(NPC[A].Special2, 1))
         {
-            NPC[A].Special = NPC[A].Special + 1;
+            NPC[A].Special += 1;
             NPC[A].Location.SpeedY = -6;
+
             if(NPC[A].Location.Y < NPC[A].DefaultLocation.Y - 10)
             {
                 if(int(NPC[A].Special) % 5 == 0) {
                     NewEffect(12, NPC[A].Location);
                 }
             }
+
             if(NPC[A].Special >= 30)
             {
                 NPC[A].Special2 = 2;
                 NPC[A].Special = 0;
             }
         }
-        else if(NPC[A].Special2 == 2)
+        else if(fEqual(NPC[A].Special2, 2))
         {
-            NPC[A].Special = NPC[A].Special + 1;
-            if(NPC[A].Special == 61)
+            NPC[A].Special += 1;
+
+            if(fEqual(NPC[A].Special, 61))
             {
                 tempLocation = NPC[A].Location;
                 tempLocation.Y = tempLocation.Y + 2;
                 NewEffect(13, tempLocation);
                 PlaySound(16);
             }
+
             if(NPC[A].Special >= 150)
             {
                 NPC[A].Special2 = 0;
                 NPC[A].Special = 0;
             }
         }
+
         if(NPC[A].Location.Y > level[NPC[A].Section].Height + 1)
             NPC[A].Location.Y = level[NPC[A].Section].Height;
     }

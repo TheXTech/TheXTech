@@ -59,11 +59,12 @@ FrmMain::FrmMain()
 {
     ScaleWidth = ScreenW;
     ScaleHeight = ScreenH;
-#ifdef ENABLE_OLD_CREDITS
-    m_windowTitle = "New Super Mario Bros. X - Version 1.0";
+
+#ifdef CUSTOM_GAME_NAME_TITLE
+    m_windowTitle = CUSTOM_GAME_NAME_TITLE;
 #else
     m_windowTitle = "New Super Mario Bros. X - Version 1.0";
-#endif
+#endif /* CUSTOM_GAME_NAME_TITLE */
 }
 
 SDL_Window *FrmMain::getWindow()
