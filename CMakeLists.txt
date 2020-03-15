@@ -68,11 +68,12 @@ include(version.cmake)
 include(cmake/git_version.cmake)
 
 
-if(WIN32 OR EMSCRIPTEN OR HAIKU)
-    set(USE_SYSTEM_LIBS_DEFAULT OFF)
-else()
-    set(USE_SYSTEM_LIBS_DEFAULT ON)
-endif()
+#if(WIN32 OR EMSCRIPTEN OR HAIKU)
+#    set(USE_SYSTEM_LIBS_DEFAULT OFF)
+#else()
+#    set(USE_SYSTEM_LIBS_DEFAULT ON)
+#endif()
+set(USE_SYSTEM_LIBS_DEFAULT OFF)
 
 if(HAIKU)
     set(USE_SYSTEM_SDL2_DEFAULT ON)  # Should be used on Haiku, own SDL2 Haiku build on CMake is broken
