@@ -59,11 +59,15 @@ FrmMain::FrmMain()
 {
     ScaleWidth = ScreenW;
     ScaleHeight = ScreenH;
-#ifdef ENABLE_OLD_CREDITS
-    m_windowTitle = "Super Mario Bros. X - Version 1.3 - www.SuperMarioBrothers.org";
+#ifdef CUSTOM_GAME_NAME_TITLE
+    m_windowTitle = CUSTOM_GAME_NAME_TITLE;
 #else
+#   ifdef ENABLE_OLD_CREDITS
+    m_windowTitle = "Super Mario Bros. X - Version 1.3 - www.SuperMarioBrothers.org";
+#   else
     m_windowTitle = fmt::format_ne("TheXTech v{0}", V_LATEST_STABLE);
-#endif
+#   endif
+#endif /* CUSTOM_GAME_NAME_TITLE */
 }
 
 SDL_Window *FrmMain::getWindow()

@@ -89,6 +89,25 @@ option(ENABLE_ANTICHEAT_TRAP "Enable anti-cheating trap for the \"redigitiscool\
 option(ENABLE_OLD_CREDITS "Use original Redigit's credits without changes" OFF)
 option(ENABLE_LOGGING "Enable debug logging" ON)
 
+# ============ Customization ==============
+set(THEXTECH_GAME_NAME_TITLE "" CACHE STRING "Custom game title, shown in the titlebar of window")
+set(THEXTECH_CREDITS_URL "" CACHE STRING "Custom URL title, shown at the outro screen")
+set(THEXTECH_CREDITS_TITLE "" CACHE STRING "Custom game title, shown at the outro screen")
+
+if(APPLE)
+    set(THEXTECH_PRELOAD_ENVIRONMENT "" CACHE STRING "Path to resources root to pack")
+    set(THEXTECH_BUNDLE_NAME "TheXTech" CACHE STRING "Name of bundle folder")
+    set(THEXTECH_ICON_NAME "thextech.icns" CACHE STRING "Name of bundle icon file")
+    set(THEXTECH_CUSTOM_ICON_PATH "" CACHE STRING "Name of icon file to pack into the bundle")
+    set(THEXTECH_CUSTOM_USERDATA_DIR_NAME "" CACHE STRING "A custom name for user data in a home directory, by default the name is 'TheXTech Episodes'.")
+    if(NOT THEXTECH_CUSTOM_ICON_PATH STREQUAL "")
+        list(APPEND LIB_SRC
+            ${THEXTECH_CUSTOM_ICON_PATH}
+        )
+    endif()
+endif()
+# ============ Customization ==end=========
+
 option(PGEFL_QT_SUPPORT "Build PGE-FL with Qt support [Unneeded]" OFF)
 set(Moondust_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}) # Don't install PGE-FL libraries
 add_subdirectory(lib/PGE_File_Formats)
@@ -191,16 +210,6 @@ if(APPLE)
         resources/thextech.icns
         ${PGE_FILE_ICONS}
     )
-    set(THEXTECH_PRELOAD_ENVIRONMENT "" CACHE STRING "Path to resources root to pack")
-    set(THEXTECH_BUNDLE_NAME "TheXTech" CACHE STRING "Name of bundle folder")
-    set(THEXTECH_ICON_NAME "thextech.icns" CACHE STRING "Name of bundle icon file")
-    set(THEXTECH_CUSTOM_ICON_PATH "" CACHE STRING "Name of icon file to pack into the bundle")
-    set(THEXTECH_CUSTOM_USERDATA_DIR_NAME "" CACHE STRING "A custom name for user data in a home directory, by default the name is 'TheXTech Episodes'.")
-    if(NOT THEXTECH_CUSTOM_ICON_PATH STREQUAL "")
-        list(APPEND LIB_SRC
-            ${THEXTECH_CUSTOM_ICON_PATH}
-        )
-    endif()
 endif()
 
 set(THEXTECH_SRC
@@ -312,6 +321,19 @@ if(APPLE)
         )
     endif()
 endif()
+
+if(NOT THEXTECH_GAME_NAME_TITLE STREQUAL "")
+    target_compile_definitions(thextech PRIVATE -DCUSTOM_GAME_NAME_TITLE="${THEXTECH_GAME_NAME_TITLE}")
+endif()
+
+if(NOT THEXTECH_CREDITS_URL STREQUAL "")
+    target_compile_definitions(thextech PRIVATE -DCUSTOM_CREDITS_URL="${THEXTECH_CREDITS_URL}")
+endif()
+
+if(NOT THEXTECH_CREDITS_TITLE STREQUAL "")
+    target_compile_definitions(thextech PRIVATE -DCUSTOM_CREDITS_TITLE="${THEXTECH_CREDITS_TITLE}")
+endif()
+
 
 target_include_directories(thextech PRIVATE src lib ${A2XT_INCS})
 target_link_libraries(thextech PRIVATE A2XT_Int)
