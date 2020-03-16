@@ -30,6 +30,16 @@ Since foundation, PGE Project had two goals: 1) save SMBX; 2) give a flexible to
 No, LunaLua won't work: this project is binary-incompatible with LunaLua. This also means that SMBX2 content is incompatible.
 
 
+## Why code here is so bad?
+Originally, a most of code in "src" folder was writtein in VB6 by it's original author. I did the whole conversion of code with an effort on accurate reproduction. So, the rest of code is identical to the code that was written in VB6 originally. VB6 platform had a lot of challenges and limitations where are:
+- All variables are global and accessible from every module and form by default without any includes or imports. The reason why "globals.h" exist: it has a full list of globally available variables.
+- Limited and inconvenient support for classes, therefore a rest of code did abused a ton of global variables and arrays (also an initial lack of experience of original author was an another factor why this mess is exist here).
+- All functions in all modules are global and can be called from each module directly. Except calls where marked as "private". Therefore I had an additional work to provide inclusions into files where these calls requested.
+- Why so much `if-elseif-elseif-elseif-elseif-....?` Yes, here probably will be correct to use `switch()` (in VB6 the `Select Case` analogue) operator. One another factor that explains that original author had a low experience while coded this project.
+- Why so deep `if() { if {} if { .... } }` lasanha? Two cases: 1) low experinece of original author, 2) workaround to don't check all conditions of expression which may cause a crash. In C++ with multiple conditions splitted by `&&` operator, never executing when one of them gets a false result. In VB6, ALL conditions in expression getting be always executed. This difference caused the next situation: in VB6, an expression `if A < 5 And Array(A) = 1 Then` will cause a crash wheb A is more than 5. In C++ the same `if(A < 5 && Array[A] == 1)` expression will never crash because a second check gets be never executed if a first check gave a false result.
+- Why so long expressions like `if(id == 1 || id == 3 || id == 4 || ... id == N)`? Rather making a ton of conditions like this, it's would be better to use classes with a polymorphism and separate the logic of every object between different classes. Also should be solvable with having to use of function pointers (which aren't possible in VB6 without workaronds, but possible in C++). However again, a low experience of original author together with a bunch of VB6 limits did caused these construction.
+
+
 ## How to use this?
 Here are many ways to play games with it:
 - there are some ready for use packages, just take and use as you did it with SMBX.
@@ -39,7 +49,7 @@ Here are many ways to play games with it:
 force-portable = true
 ```
 , music.ini, sounds.ini and additional "graphics/ui" folder. An important note: all default graphics must be converted into PNG, use GIFs2PNG tool from PGE Project over your "graphics" folder with a "-d" switch. Don't use "-r" switch to keep original GIFs together with new-made PNGs if you plan to continue the use of original VB6-written SMBX.
-- use it for debug mode: in your home directory, create the ".PGE_Project/thextech" folder (on macOS the "~/Library/Application Support/PGE Project/thextech") where you should put a full set of game resources and worlds stuff, this folder will work like a game root in the original game. This mode allows you to run an executable file from any folder location of your computer and use the same location of resources for all builds (except these are marked as portable by an INI file).
+- use it for debug mode: in your home directory, create the ".PGE_Project/thextech" folder (on macOS the "`~/Library/Application Support/PGE Project/thextech`") where you should put a full set of game resources and worlds stuff, this folder will work like a game root in the original game. This mode allows you to run an executable file from any folder location of your computer and use the same location of resources for all builds (except these are marked as portable by an INI file).
 
 
 ## How to add custom episodes for the macOS version?
@@ -47,8 +57,8 @@ If you have a bundled build of TheXTech, all default resources are inside your .
 ```
    ~/TheXTech Episodes
 ```
-In this directory, you will find an empty "battle" and "worlds" folder to put your custom stuff. At the "~/Library/Application Support/PGE Project/thextech" path logs, settings and game saves will be stored.
-If you want to replace default assets with your own, you can modify the content of the app bundle or compile a new build with giving of the necessary CMake arguments which needed to pack your custom assets root and icon into the new bundle or make the assets-less build (if you give no arguments, the assets-less build will result). Therefore, you need to put the full content of the game root into the "~/Library/Application Support/PGE Project/thextech" folder, include default assets (graphics, music, sounds, intro and outro levels, default battle and worlds folders).
+In this directory, you will find an empty "battle" and "worlds" folder to put your custom stuff. At the "`~/Library/Application Support/PGE Project/thextech`" path logs, settings and game saves will be stored.
+If you want to replace default assets with your own, you can modify the content of the app bundle or compile a new build with giving of the necessary CMake arguments which needed to pack your custom assets root and icon into the new bundle or make the assets-less build (if you give no arguments, the assets-less build will result). Therefore, you need to put the full content of the game root into the "`~/Library/Application Support/PGE Project/thextech`" folder, include default assets (graphics, music, sounds, intro and outro levels, default battle and worlds folders).
 
 
 ## What is different with this thing in comparison to the original VB6 build?
