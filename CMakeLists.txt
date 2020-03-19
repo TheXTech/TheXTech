@@ -305,6 +305,7 @@ if(APPLE)
     endif()
 
     set(CPACK_PACKAGE_NAME "${THEXTECH_BUNDLE_NAME}")
+    set(CPACK_GENERATOR "DragNDrop")
     set(CPACK_PACKAGE_VERSION "${THEXTECH_VERSION_STRING}")
     set(CPACK_PACKAGE_VENDOR "Wohlstand")
     set(CPACK_PACKAGE_CONTACT "admin@wohlnet.ru")
