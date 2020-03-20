@@ -95,6 +95,9 @@ set(THEXTECH_GAME_NAME_TITLE "" CACHE STRING "Custom game title, shown in the ti
 set(THEXTECH_CREDITS_URL "" CACHE STRING "Custom URL title, shown at the outro screen")
 set(THEXTECH_CREDITS_TITLE "" CACHE STRING "Custom game title, shown at the outro screen")
 
+set(THEXTECH_PACKAGE_NAME "thextech" CACHE STRING "Name of package archive file")
+set(THEXTECH_EXECUTABLE_NAME "thextech" CACHE STRING "Name of executable file")
+
 if(APPLE)
     set(THEXTECH_PRELOAD_ENVIRONMENT "" CACHE STRING "Path to resources root to pack")
     set(THEXTECH_BUNDLE_NAME "TheXTech" CACHE STRING "Name of bundle folder")
@@ -271,12 +274,16 @@ endif()
 add_executable(thextech ${THEXTECH_SRC} ${LIB_SRC})
 pge_set_nopie(thextech)
 
+set_target_properties(thextech PROPERTIES
+    OUTPUT_NAME "${THEXTECH_EXECUTABLE_NAME}"
+)
+
 if(APPLE)
     set_target_properties(thextech PROPERTIES
         OUTPUT_NAME "${THEXTECH_BUNDLE_NAME}"
         MACOSX_BUNDLE TRUE
         MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/resources/thextech.plist.in"
-        MACOSX_BUNDLE_EXECUTABLE_NAME "thextech"
+        MACOSX_BUNDLE_EXECUTABLE_NAME "${THEXTECH_EXECUTABLE_NAME}"
         MACOSX_BUNDLE_GUI_IDENTIFIER "ru.wohlsoft.thextech"
         MACOSX_BUNDLE_SHORT_VERSION_STRING "${THEXTECH_VERSION_STRING}"
         MACOSX_BUNDLE_LONG_VERSION_STRING "${THEXTECH_VERSION_STRING}"
@@ -303,16 +310,6 @@ if(APPLE)
     if(NOT THEXTECH_CUSTOM_USERDATA_DIR_NAME STREQUAL "")
         target_compile_definitions(thextech PRIVATE -DUSERDATA_ROOT_NAME="${THEXTECH_CUSTOM_USERDATA_DIR_NAME}")
     endif()
-
-    set(CPACK_PACKAGE_NAME "${THEXTECH_BUNDLE_NAME}")
-    set(CPACK_GENERATOR "DragNDrop")
-    set(CPACK_PACKAGE_VERSION "${THEXTECH_VERSION_STRING}")
-    set(CPACK_PACKAGE_VENDOR "Wohlstand")
-    set(CPACK_PACKAGE_CONTACT "admin@wohlnet.ru")
-    set(CPACK_DMG_FORMAT "UDBZ")
-    set(CPACK_DMG_VOLUME_NAME "${THEXTECH_BUNDLE_NAME}")
-    set(CPACK_PACKAGE_FILE_NAME "${THEXTECH_BUNDLE_NAME}-${THEXTECH_VERSION_STRING}")
-    include(CPack)
 
     target_link_libraries(A2XT_Int INTERFACE iconv)
     if(PGE_USE_LUAJIT)
@@ -378,6 +375,8 @@ if(WIN32)
     target_compile_definitions(thextech PRIVATE -DNOMINMAX)
     target_link_libraries(thextech PRIVATE "version" dbghelp) # needed by StackWalker
 endif()
+
+include(cmake/deploy.cmake)
 
 if(APPLE)
     install(TARGETS thextech DESTINATION .)
