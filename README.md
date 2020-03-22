@@ -69,8 +69,8 @@ If you want to replace default assets with your own, you can modify the content 
 - It uses PGE-FL that has better file formats support.
 - A support for WLDX world maps are allowing unlimited credits lines and custom music without it being necessary to use a music.ini for music replacements.
 - Some LVLX exclusive features now working: vertical section wrap, two-way warps, custom "star needed" message, warp enter event, ability to disable stars printing in HUB episodes for specific doors, ability to disable interscene showing when going to another level through a warp.
-- Built-in support for episide and level wide music.ini and sounds.ini to override default music and sounds assets.
-- World maps now supports a custom directory to store any specific resources like custom tiles/scenes/paths/levels and not spam the episode root folder with wolrd map resources anymore.
+- Built-in support for episode and level wide music.ini and sounds.ini to override default music and sounds assets.
+- World maps now supports a custom directory to store any specific resources like custom tiles/scenes/paths/levels and not spam the episode root folder with world map resources anymore.
 - Default config format is INI, old config.dat format is no longer supported, mainly because of incompatible key code values (SDL_Scancode versus VirtualKeys enum of Windows API).
 - Game saves now using the SAVX format instead of a classic SAV. However, if you already have an old gamesave, you still can resume your game by using a new engine now (next gamesave attempt will result a SAVX file, old gamesave in SAV format will be kept untouched).
 - Built-in PNG support for custom and default graphics. Masked GIFs are still supported for backward compatibility, however, without making an unexpected auto-conversion like SMBX-38A does.
