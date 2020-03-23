@@ -77,7 +77,7 @@ extern void HideCursor();
 
 extern void KillWarp(int A);
 
-extern void zTestLevel();
+extern void zTestLevel(bool magicHand = false);
 
 extern void MouseMove(float X, float Y, bool nCur = false);
 

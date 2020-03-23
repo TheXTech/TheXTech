@@ -152,7 +152,7 @@ int GameMain(const CmdLineSetup_t &setup)
         }
         GodMode = setup.testGodMode;
         GrabAll = setup.testGrabAll;
-        zTestLevel();
+        zTestLevel(setup.testMagicHand);
     }
 
     do

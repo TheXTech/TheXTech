@@ -2372,7 +2372,7 @@ void KillWarp(int A)
     numWarps--;
 }
 
-void zTestLevel()
+void zTestLevel(bool magicHand)
 {
     int A = 0;
     Player_t blankPlayer;
@@ -2445,7 +2445,7 @@ void zTestLevel()
 
     LevelEditor = false;
     SetupPlayers();
-    MagicHand = true;
+    MagicHand = magicHand;
 
     if(TestFullscreen)
     {

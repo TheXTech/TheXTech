@@ -183,6 +183,7 @@ int main(int argc, char**argv)
         TCLAP::SwitchArg switchTestGrabAll("a", "grab-all", "Enable ability to grab everything while level testing", false);
         TCLAP::SwitchArg switchTestShowFPS("m", "show-fps", "Show FPS counter on the screen", false);
         TCLAP::SwitchArg switchTestMaxFPS("x", "max-fps", "Run FPS as fast as possible", false);
+        TCLAP::SwitchArg switchTestMagicHand("k", "magic-hand", "Enable magic hand functionality while level test running", false);
 
         cmd.add(&switchFrameSkip);
         cmd.add(&switchNoSound);
@@ -193,6 +194,7 @@ int main(int argc, char**argv)
         cmd.add(&switchTestGrabAll);
         cmd.add(&switchTestShowFPS);
         cmd.add(&switchTestMaxFPS);
+        cmd.add(&switchTestMagicHand);
 
         cmd.parse(argc, argv);
 
@@ -224,6 +226,7 @@ int main(int argc, char**argv)
         setup.testGrabAll = switchTestGrabAll.getValue();
         setup.testShowFPS = switchTestShowFPS.getValue();
         setup.testMaxFPS = switchTestMaxFPS.getValue();
+        setup.testMagicHand = switchTestMagicHand.getValue();
     }
     catch(TCLAP::ArgException &e)   // catch any exceptions
     {

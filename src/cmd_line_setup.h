@@ -35,6 +35,8 @@ struct CmdLineSetup_t
     bool testShowFPS = false;
     //! Make playable character be inmortal
     bool testMaxFPS = false;
+    //! Enable magic-hand functionality
+    bool testMagicHand = false;
 };
 
 #endif // CMD_LINE_SETUP_H
