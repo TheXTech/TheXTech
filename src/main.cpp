@@ -171,12 +171,12 @@ int main(int argc, char**argv)
 
         TCLAP::ValueArg<std::string> playerCharacter1("1", "player1", "Setup of playable character for player 1",
                                                         false, "",
-                                                       "с1;s2;m0;t0 : c - character, s - state, m - mount, t - mount type",
+                                                       "c1;s2;m0;t0 : c - character, s - state, m - mount, t - mount type",
                                                        cmd);
 
         TCLAP::ValueArg<std::string> playerCharacter2("2", "player2", "Setup of playable character for player 1",
                                                         false, "",
-                                                       "с1;s2;m0;t0 : c - character, s - state, m - mount, t - mount type",
+                                                       "c1;s2;m0;t0 : c - character, s - state, m - mount, t - mount type",
                                                        cmd);
 
         TCLAP::SwitchArg switchTestGodMode("g", "god-mode", "Enable god mode in level testing", false);
