@@ -184,6 +184,7 @@ int main(int argc, char**argv)
         TCLAP::SwitchArg switchTestShowFPS("m", "show-fps", "Show FPS counter on the screen", false);
         TCLAP::SwitchArg switchTestMaxFPS("x", "max-fps", "Run FPS as fast as possible", false);
         TCLAP::SwitchArg switchTestMagicHand("k", "magic-hand", "Enable magic hand functionality while level test running", false);
+        TCLAP::SwitchArg switchTestInterprocess("i", "interprocessing", "Enable an interprocessing mode with Editor", false);
 
         cmd.add(&switchFrameSkip);
         cmd.add(&switchNoSound);
@@ -195,6 +196,7 @@ int main(int argc, char**argv)
         cmd.add(&switchTestShowFPS);
         cmd.add(&switchTestMaxFPS);
         cmd.add(&switchTestMagicHand);
+        cmd.add(&switchTestInterprocess);
 
         cmd.parse(argc, argv);
 
@@ -211,7 +213,8 @@ int main(int argc, char**argv)
             setup.renderType = CmdLineSetup_t::RENDER_HW;
 
         setup.testLevel = testLevel.getValue();
-        setup.testLevelMode = !setup.testLevel.empty();
+        setup.interprocess = switchTestInterprocess.getValue();
+        setup.testLevelMode = !setup.testLevel.empty() || setup.interprocess;
         setup.testNumPlayers = int(numPlayers.getValue());
         if(setup.testNumPlayers > 2)
             setup.testNumPlayers = 2;

@@ -25,8 +25,10 @@
 
 #include "globals.h"
 #include "load_gfx.h"
+#include "graphics.h" // SuperPrint
 #include <Utils/files.h>
 #include <DirManager/dirman.h>
+#include <InterProcess/intproc.h>
 #include <fmt_format_ne.h>
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
@@ -667,16 +669,30 @@ void UnloadWorldCustomGFX()
 
 void UpdateLoad()
 {
+    std::string state;
+    bool draw = false;
+    if(IntProc::isEnabled())
+    {
+        state = IntProc::getState();
+        draw = true;
+    }
+
     if(LoadCoinsT <= SDL_GetTicks())
     {
         LoadCoinsT = SDL_GetTicks() + 100;
         LoadCoins += 1;
         if(LoadCoins > 3)
             LoadCoins = 0;
+        draw = true;
+    }
 
+    if(draw)
+    {
         frmMain.clearBuffer();
         if(!gfxLoaderTestMode)
             frmMain.renderTexture(0, 0, GFX.MenuGFX[4]);
+        if(!state.empty())
+            SuperPrint(state, 3, 10, 10);
         frmMain.renderTexture(632, 576, GFX.Loader);
         frmMain.renderTexture(760, 560, GFX.LoadCoin.w, GFX.LoadCoin.h / 4, GFX.LoadCoin, 0, 32 * LoadCoins);
 

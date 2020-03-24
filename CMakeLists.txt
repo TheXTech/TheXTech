@@ -192,6 +192,7 @@ endif()
 target_include_directories(A2XT_Int INTERFACE ${A2XT_INCS})
 
 set(LIB_SRC
+    lib/util.cpp
     lib/AppPath/app_path.cpp
     ${DIRMANAGER_SRCS}
     ${FILEMAPPER_SRCS}
@@ -202,6 +203,8 @@ set(LIB_SRC
     lib/Graphics/image_size.cpp
     lib/Graphics/size.cpp
     lib/Graphics/sizef.cpp
+    lib/InterProcess/editor_pipe.cpp
+    lib/InterProcess/intproc.cpp
     ${INIPROCESSOR_SRCS}
     lib/Logger/logger_sets.cpp
     ${UTILS_SRCS}

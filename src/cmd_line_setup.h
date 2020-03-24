@@ -27,6 +27,9 @@ struct CmdLineSetup_t
     //! Run a test in battle mode
     bool testBattleMode = false;
 
+    //! Enable interprocessing communication with the Moondust Editor
+    bool interprocess = false;
+
     //! Allow playable character grab everything
     bool testGrabAll = false;
     //! Make playable character be inmortal

@@ -33,6 +33,7 @@
 #include "../game_main.h"
 
 #include <Utils/maths.h>
+#include <Logger/logger.h>
 
 
 void DropBonus(int A)
@@ -202,6 +203,7 @@ void TouchBonus(int A, int B)
             Checkpoint_t cp;
             cp.id = Maths::iRound(NPC[B].Special);
             CheckpointsList.push_back(cp);
+            pLogDebug("Added checkpoint ID %d", cp.id);
             return;
         }
         if(NPC[B].Type == 188) // player touched the 3up moon

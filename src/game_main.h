@@ -33,8 +33,6 @@ void SetupPhysics();
 
 void initAll();
 
-extern void addMissingLvlSuffix(std::string &fileName);
-
 int GameMain(const CmdLineSetup_t &setup);
 //! Set up object sizes and frame offsets for blocks/npcs/effects
 void SetupVars();
@@ -46,10 +44,8 @@ void MenuLoop();
 void EditorLoop();
 //! Cleans up the buffer before ending the program
 void KillIt();
-//! loads the level
-void OpenLevel(std::string FilePath);
-//! Reset everything to zero
-void ClearLevel();
+
+// OpenLevel() and ClearLevel() moved into main/level_file.h
 
 void NextLevel();
 //! macros mainly used for end of level stuffs. takes over the players controls
@@ -98,8 +94,9 @@ void CheatCode(char NewKey);
 void OutroLoop();
 
 void SetupCredits();
-//! checks for stars in warps the lead to another level
-void FindStars();
+
+// FindStars() moved into main/level_file.h
+
 // for settings up the game's credits
 void AddCredit(std::string newCredit);
 // calcualtes scores based on the multiplyer and how much the NPC is worth
