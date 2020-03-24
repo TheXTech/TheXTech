@@ -882,7 +882,7 @@ void NextLevel()
     DoEvents();
     if(!TestLevel && GoToLevel.empty() && !NoMap)
         PGE_Delay(500);
-    if(BattleMode && !LevelEditor)
+    if(BattleMode && !LevelEditor && !TestLevel)
     {
         EndLevel = false;
         GameMenu = true;
@@ -895,6 +895,11 @@ void NextLevel()
     {
         LevelSelect = true;
         EndLevel = false;
+        if(TestLevel && BattleMode)
+        {
+            BattleIntro = 150;
+            GameIsActive = false; // Quit game
+        }
     }
 }
 
