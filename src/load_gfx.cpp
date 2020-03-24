@@ -693,6 +693,8 @@ void UpdateLoad()
             frmMain.renderTexture(0, 0, GFX.MenuGFX[4]);
         if(!state.empty())
             SuperPrint(state, 3, 10, 10);
+        else
+            SuperPrint("Loading data...", 3, 10, 10);
         frmMain.renderTexture(632, 576, GFX.Loader);
         frmMain.renderTexture(760, 560, GFX.LoadCoin.w, GFX.LoadCoin.h / 4, GFX.LoadCoin, 0, 32 * LoadCoins);
 

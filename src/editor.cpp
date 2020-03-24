@@ -2677,6 +2677,7 @@ void zTestLevel(bool magicHand, bool interProcess)
         int attempts = 0;
 
         pLogDebug("ICP: Waiting reply....");
+        IntProc::setState("Waiting for input data...");
         while(!IntProc::editor->levelIsLoad())
         {
             UpdateLoad();
@@ -2696,10 +2697,13 @@ void zTestLevel(bool magicHand, bool interProcess)
             {
                 pLogWarning("ICP: Wait timeout");
                 timeOut = true;
+                IntProc::setState("ERROR: Wait time out.");
+                UpdateLoad();
+                PGE_Delay(1000);
                 GameIsActive = false;
                 return;
             }
-            PGE_Delay(30);
+            PGE_Delay(2);
         }
 
         data = IntProc::editor->m_acceptedLevel;
