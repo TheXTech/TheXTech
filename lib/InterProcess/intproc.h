@@ -37,8 +37,11 @@ namespace IntProc
 
     enum ExternalCommands
     {
+        //! Show messag ebox
         MsgBox = 0,
+        //! Cheat code proxy
         Cheat = 1,
+        //! Place item (magic-hand only)
         PlaceItem = 2
     };
 

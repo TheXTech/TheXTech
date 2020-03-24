@@ -1454,7 +1454,7 @@ void UpdateEditor()
                             n.TimeLeft = 10;
                             n.DefaultDirection = n.Direction;
                             n.DefaultLocation = n.Location;
-                            n.DefaultSpecial = n.Special;
+                            n.DefaultSpecial = int(n.Special);
                             CheckSectionNPC(numNPCs);
                         }
                     }
@@ -1658,7 +1658,11 @@ void UpdateInterprocess()
         }
 
         case IntProc::Cheat:
+        {
+            CheatString = IntProc::getCMD();
+            CheatCode(CheatString[0]);
             break;
+        }
 
         case IntProc::PlaceItem:
         {
@@ -1674,8 +1678,6 @@ void UpdateInterprocess()
                 break;
             }
 
-            PlaySound(23);
-
             if(raw.compare(0, 11, "BLOCK_PLACE") == 0)
             {
                 if(got.blocks.empty())
@@ -1684,8 +1686,13 @@ void UpdateInterprocess()
                 optCursor.current = 1;
                 OptCursorSync();
 
-                EditorCursor.Mode = 1;
-                LevelBlock b = got.blocks[0];
+                const LevelBlock &b = got.blocks[0];
+
+                if(EditorCursor.Mode != OptCursor_t::LVL_BLOCKS ||
+                   EditorCursor.Block.Type != int(b.id))
+                    PlaySound(23);
+
+                EditorCursor.Mode = OptCursor_t::LVL_BLOCKS;
                 EditorCursor.Block = Block_t();
                 EditorCursor.Block.Type = int(b.id);
                 EditorCursor.Location.X = b.x;
@@ -1715,7 +1722,14 @@ void UpdateInterprocess()
 
                 optCursor.current = 3;
                 OptCursorSync();
-                LevelBGO b = got.bgo[0];
+
+                const LevelBGO &b = got.bgo[0];
+
+                if(EditorCursor.Mode != OptCursor_t::LVL_BGOS ||
+                   EditorCursor.Background.Type != int(b.id))
+                    PlaySound(23);
+
+                EditorCursor.Mode = OptCursor_t::LVL_BGOS;
                 EditorCursor.Background = Background_t();
                 EditorCursor.Background.Type = int(b.id);
                 EditorCursor.Location.X = b.x;
@@ -1755,43 +1769,48 @@ void UpdateInterprocess()
 
                 optCursor.current = 4;
                 OptCursorSync();
-                LevelNPC n = got.npc[0];
 
-                EditorCursor.Mode = 4;
+                const LevelNPC &n = got.npc[0];
+
+                if(EditorCursor.Mode != OptCursor_t::LVL_NPCS ||
+                   EditorCursor.NPC.Type != int(n.id))
+                    PlaySound(23);
+
+                EditorCursor.Mode = OptCursor_t::LVL_NPCS;
                 EditorCursor.NPC = NPC_t();
+                EditorCursor.NPC.Type = int(n.id);
                 EditorCursor.NPC.Hidden = false;
                 EditorCursor.Location.X = n.x;
                 EditorCursor.Location.Y = n.y;
                 EditorCursor.NPC.Direction = n.direct;
-                EditorCursor.NPC.Type = int(n.id);
 
                 if(EditorCursor.NPC.Type == 91 || EditorCursor.NPC.Type == 96 || EditorCursor.NPC.Type == 283 || EditorCursor.NPC.Type == 284)
                 {
                     EditorCursor.NPC.Special = n.contents;
-                    EditorCursor.NPC.DefaultSpecial = EditorCursor.NPC.Special;
+                    EditorCursor.NPC.DefaultSpecial = int(EditorCursor.NPC.Special);
                 }
                 if(EditorCursor.NPC.Type == 288 || EditorCursor.NPC.Type == 289 || (EditorCursor.NPC.Type == 91 && int(EditorCursor.NPC.Special) == 288))
                 {
                     EditorCursor.NPC.Special2 = n.special_data2;
-                    EditorCursor.NPC.DefaultSpecial2 = EditorCursor.NPC.Special2;
+                    EditorCursor.NPC.DefaultSpecial2 = int(EditorCursor.NPC.Special2);
                 }
 
                 if(NPCIsAParaTroopa[EditorCursor.NPC.Type])
                 {
                     EditorCursor.NPC.Special = n.special_data;
-                    EditorCursor.NPC.DefaultSpecial = EditorCursor.NPC.Special;
+                    EditorCursor.NPC.DefaultSpecial = int(EditorCursor.NPC.Special);
                 }
 
                 if(NPCIsCheep[EditorCursor.NPC.Type])
                 {
                     EditorCursor.NPC.Special = n.special_data;
-                    EditorCursor.NPC.DefaultSpecial = EditorCursor.NPC.Special;
+                    EditorCursor.NPC.DefaultSpecial = int(EditorCursor.NPC.Special);
                 }
 
                 if(EditorCursor.NPC.Type == 260)
                 {
                     EditorCursor.NPC.Special = n.special_data;
-                    EditorCursor.NPC.DefaultSpecial = EditorCursor.NPC.Special;
+                    EditorCursor.NPC.DefaultSpecial = int(EditorCursor.NPC.Special);
                 }
 
                 EditorCursor.NPC.Generator = n.generator;
