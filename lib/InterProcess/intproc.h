@@ -51,6 +51,17 @@ namespace IntProc
         ExternalCommands type;
     };
 
+    /**
+     * @brief IPC interface has accepted level data
+     * @return true if IPC interface keeps a complete level data buffer
+     */
+    bool hasLevelData();
+    /**
+     * @brief Is level data in process of receiving
+     * @return true if receiving is in process
+     */
+    bool levelReceivingInProcess();
+
     bool sendMessage(const char *command);
     bool sendMessageS(const std::string &command);
     bool sendMessage(const std::string &command);

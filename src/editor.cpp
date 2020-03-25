@@ -2697,7 +2697,7 @@ void zTestLevel(bool magicHand, bool interProcess)
 
         pLogDebug("ICP: Waiting reply....");
         IntProc::setState("Waiting for input data...");
-        while(!IntProc::editor->levelIsLoad())
+        while(!IntProc::hasLevelData())
         {
             UpdateLoad();
 
@@ -2705,9 +2705,10 @@ void zTestLevel(bool magicHand, bool interProcess)
             if(!GameIsActive)
                 return;
 
-            if(time.elapsed() > 1500)
+            if(!IntProc::levelReceivingInProcess() && time.elapsed() > 1500)
             {
                 pLogDebug("ICP: Waiting #%d....", attempts);
+                IntProc::sendMessage("CMD:CONNECT_TO_ENGINE"); // Re-ask again
                 time.restart();
                 attempts += 1;
             }

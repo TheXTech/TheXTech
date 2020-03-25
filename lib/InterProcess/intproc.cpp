@@ -174,3 +174,17 @@ bool IntProc::sendMessage(const char *command)
     editor->sendMessage(command);
     return true;
 }
+
+bool IntProc::hasLevelData()
+{
+    if(!editor)
+        return false;
+    return editor->hasLevelData();
+}
+
+bool IntProc::levelReceivingInProcess()
+{
+    if(!editor)
+        return false;
+    return editor->levelReceivingInProcess();
+}

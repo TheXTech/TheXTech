@@ -29,7 +29,8 @@ public:
     bool            m_doParseLevelData;
     LevelData       m_acceptedLevel;    // When accepted PARSE_LVLX\n\n, parse data and call signal
 
-    bool levelIsLoad();
+    bool hasLevelData();
+    bool levelReceivingInProcess();
 
     void sendMessage(const std::string &in);
     void sendMessage(const char *in);

@@ -105,13 +105,18 @@ void EditorPipe::shut()
     stop();
 }
 
-bool EditorPipe::levelIsLoad()
+bool EditorPipe::hasLevelData()
 {
     m_levelAccepted_lock.lock();
     bool state = m_levelAccepted;
     m_levelAccepted = false;
     m_levelAccepted_lock.unlock();
     return state;
+}
+
+bool EditorPipe::levelReceivingInProcess()
+{
+    return m_doAcceptLevelData;
 }
 
 void EditorPipe::icomingData(const std::string &in)
