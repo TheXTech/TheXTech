@@ -27,6 +27,7 @@
 #define GLOBALS_H
 
 #include <string>
+#include <cstdlib>
 #include <SDL2/SDL.h>
 
 #include "frm_main.h"
