@@ -287,30 +287,30 @@ void OpenLevelData(LevelData &lvl, const std::string FilePath)
         if(NPC[numNPCs].Type == 91 || NPC[numNPCs].Type == 96 || NPC[numNPCs].Type == 283 || NPC[numNPCs].Type == 284)
         {
             NPC[numNPCs].Special = n.contents;
-            NPC[numNPCs].DefaultSpecial = NPC[numNPCs].Special;
+            NPC[numNPCs].DefaultSpecial = int(NPC[numNPCs].Special);
         }
         if(NPC[numNPCs].Type == 288 || NPC[numNPCs].Type == 289 || (NPC[numNPCs].Type == 91 && int(NPC[numNPCs].Special) == 288))
         {
             NPC[numNPCs].Special2 = n.special_data2;
-            NPC[numNPCs].DefaultSpecial2 = NPC[numNPCs].Special2;
+            NPC[numNPCs].DefaultSpecial2 = int(NPC[numNPCs].Special2);
         }
 
         if(NPCIsAParaTroopa[NPC[numNPCs].Type])
         {
             NPC[numNPCs].Special = n.special_data;
-            NPC[numNPCs].DefaultSpecial = NPC[numNPCs].Special;
+            NPC[numNPCs].DefaultSpecial = int(NPC[numNPCs].Special);
         }
 
         if(NPCIsCheep[NPC[numNPCs].Type])
         {
             NPC[numNPCs].Special = n.special_data;
-            NPC[numNPCs].DefaultSpecial = NPC[numNPCs].Special;
+            NPC[numNPCs].DefaultSpecial = int(NPC[numNPCs].Special);
         }
 
         if(NPC[numNPCs].Type == 260)
         {
             NPC[numNPCs].Special = n.special_data;
-            NPC[numNPCs].DefaultSpecial = NPC[numNPCs].Special;
+            NPC[numNPCs].DefaultSpecial = int(NPC[numNPCs].Special);
         }
 
         NPC[numNPCs].Generator = n.generator;
@@ -353,7 +353,7 @@ void OpenLevelData(LevelData &lvl, const std::string FilePath)
         {
             checkPointId++;
             NPC[numNPCs].Special = checkPointId;
-            NPC[numNPCs].DefaultSpecial = NPC[numNPCs].Special;
+            NPC[numNPCs].DefaultSpecial = int(NPC[numNPCs].Special);
         }
         else if(NPC[numNPCs].Type == 97 || NPC[numNPCs].Type == 196) // Is a star
         {

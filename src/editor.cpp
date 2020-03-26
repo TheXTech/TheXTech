@@ -1708,7 +1708,7 @@ void UpdateInterprocess()
                 }
                 EditorCursor.Block.Invis = b.invisible;
                 EditorCursor.Block.Slippy = b.slippery;
-                EditorCursor.Block.NPC = b.npc_id > 0 ? int(b.npc_id + 1000) : int(-b.npc_id);
+                EditorCursor.Block.Special = b.npc_id > 0 ? int(b.npc_id + 1000) : int(-b.npc_id);
                 EditorCursor.Block.Layer = b.layer;
                 EditorCursor.Block.TriggerHit = b.event_hit;
                 EditorCursor.Block.TriggerLast = b.event_emptylayer;
