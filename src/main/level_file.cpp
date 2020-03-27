@@ -31,6 +31,7 @@
 #include "../sound.h"
 #include "../sorting.h"
 #include "../layers.h"
+#include "level_file.h"
 
 #include <DirManager/dirman.h>
 #include <Utils/files.h>
@@ -59,6 +60,23 @@ void addMissingLvlSuffix(std::string &fileName)
 
 void OpenLevel(std::string FilePath)
 {
+    addMissingLvlSuffix(FilePath);
+//    if(!Files::hasSuffix(FilePath, ".lvl") && !Files::hasSuffix(FilePath, ".lvlx"))
+//    {
+//        if(Files::fileExists(FilePath + ".lvlx"))
+//            FilePath += ".lvlx";
+//        else
+//            FilePath += ".lvl";
+//    }
+
+    LevelData lvl;
+    FileFormats::OpenLevelFile(FilePath, lvl);
+
+    OpenLevelData(lvl, FilePath);
+}
+
+void OpenLevelData(LevelData &lvl, const std::string FilePath)
+{
     std::string newInput;
 //    int FileRelease = 0;
     int A = 0;
@@ -74,28 +92,24 @@ void OpenLevel(std::string FilePath)
     BlockSound();
     FreezeNPCs = false;
     CoinMode = false;
-    LevelData lvl;
 
-    addMissingLvlSuffix(FilePath);
-//    if(!Files::hasSuffix(FilePath, ".lvl") && !Files::hasSuffix(FilePath, ".lvlx"))
-//    {
-//        if(Files::fileExists(FilePath + ".lvlx"))
-//            FilePath += ".lvlx";
-//        else
-//            FilePath += ".lvl";
-//    }
-
-    FileFormats::OpenLevelFile(FilePath, lvl);
     FileFormats::smbx64LevelPrepare(lvl);
     FileFormats::smbx64LevelSortBlocks(lvl);
     FileFormats::smbx64LevelSortBGOs(lvl);
 
-    FileNameFull = Files::basename(FilePath);
     FileName = lvl.meta.filename;
     FileNamePath = lvl.meta.path + "/";
-//    if(FileNamePath.substr(FileNamePath.length() - 2) == "/")
-//        FileNamePath = FileNamePath.substr(0, FileNamePath.length() - 1);
-    FullFileName = FilePath;
+
+    if(!FilePath.empty())
+    {
+        FileNameFull = Files::basename(FilePath);
+        FullFileName = FilePath;
+    }
+    else
+    {
+        FileNameFull = FileName + ".lvlx";
+        FullFileName = FileNamePath + FileName + ".lvlx";
+    }
 
     IsEpisodeIntro = (StartLevel == FileNameFull);
 
@@ -273,30 +287,30 @@ void OpenLevel(std::string FilePath)
         if(NPC[numNPCs].Type == 91 || NPC[numNPCs].Type == 96 || NPC[numNPCs].Type == 283 || NPC[numNPCs].Type == 284)
         {
             NPC[numNPCs].Special = n.contents;
-            NPC[numNPCs].DefaultSpecial = NPC[numNPCs].Special;
+            NPC[numNPCs].DefaultSpecial = int(NPC[numNPCs].Special);
         }
         if(NPC[numNPCs].Type == 288 || NPC[numNPCs].Type == 289 || (NPC[numNPCs].Type == 91 && int(NPC[numNPCs].Special) == 288))
         {
             NPC[numNPCs].Special2 = n.special_data2;
-            NPC[numNPCs].DefaultSpecial2 = NPC[numNPCs].Special2;
+            NPC[numNPCs].DefaultSpecial2 = int(NPC[numNPCs].Special2);
         }
 
         if(NPCIsAParaTroopa[NPC[numNPCs].Type])
         {
             NPC[numNPCs].Special = n.special_data;
-            NPC[numNPCs].DefaultSpecial = NPC[numNPCs].Special;
+            NPC[numNPCs].DefaultSpecial = int(NPC[numNPCs].Special);
         }
 
         if(NPCIsCheep[NPC[numNPCs].Type])
         {
             NPC[numNPCs].Special = n.special_data;
-            NPC[numNPCs].DefaultSpecial = NPC[numNPCs].Special;
+            NPC[numNPCs].DefaultSpecial = int(NPC[numNPCs].Special);
         }
 
         if(NPC[numNPCs].Type == 260)
         {
             NPC[numNPCs].Special = n.special_data;
-            NPC[numNPCs].DefaultSpecial = NPC[numNPCs].Special;
+            NPC[numNPCs].DefaultSpecial = int(NPC[numNPCs].Special);
         }
 
         NPC[numNPCs].Generator = n.generator;
@@ -339,7 +353,7 @@ void OpenLevel(std::string FilePath)
         {
             checkPointId++;
             NPC[numNPCs].Special = checkPointId;
-            NPC[numNPCs].DefaultSpecial = NPC[numNPCs].Special;
+            NPC[numNPCs].DefaultSpecial = int(NPC[numNPCs].Special);
         }
         else if(NPC[numNPCs].Type == 97 || NPC[numNPCs].Type == 196) // Is a star
         {
@@ -887,4 +901,3 @@ void FindStars()
         }
     }
 }
-

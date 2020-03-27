@@ -27,6 +27,7 @@
 #define GLOBALS_H
 
 #include <string>
+#include <cstdlib>
 #include <SDL2/SDL.h>
 
 #include "frm_main.h"
@@ -965,9 +966,9 @@ struct WorldMusic_t
 struct EditorCursor_t
 {
 //    X As Single
-    float X = 0.0f;
+    float X = -50.0f;
 //    Y As Single
-    float Y = 0.0f;
+    float Y = -50.0f;
 //    SelectedMode As Integer 'cursor mode. eraser/npc/block/background
     int SelectedMode = 0;
 //    Selected As Integer

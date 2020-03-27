@@ -23,68 +23,23 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef EDITOR_H
-#define EDITOR_H
 
-#include "location.h"
+#ifndef LEVEL_FILE_H
+#define LEVEL_FILE_H
 
-struct Point_t
-{
-    int X = 0;
-    int Y = 0;
-};
+#include <string>
+#include <PGE_File_Formats/lvl_filedata.h>
 
-extern Point_t CursorPos;
-extern bool HasCursor;
-extern bool NoReallyKillIt;
-extern int curSection;
+extern void addMissingLvlSuffix(std::string &fileName);
 
-extern bool enableAutoAlign;
+//! loads the level
+void OpenLevel(std::string FilePath);
+void OpenLevelData(LevelData &lvl, const std::string FilePath = std::string());
+//! Reset everything to zero
+void ClearLevel();
 
-struct OptCursor_t
-{
-    enum Level {
-        LVL_SELECT = 13,
-        LVL_ERASER0 = 0,
-        LVL_ERASER = 6,
-        LVL_BLOCKS = 1,
-        LVL_BGOS = 3,
-        LVL_NPCS = 4,
-        LVL_SETTINGS = 2,
-        LVL_WARPS = 5,
-        LVL_WATER = 15
-    };
-    int current = LVL_SELECT;
-};
+//! checks for stars in warps the lead to another level
+void FindStars();
 
-extern OptCursor_t optCursor;
+#endif // LEVEL_FILE_H
 
-// this sub handles the level editor
-// it is still called when the player is testing a level in the editor in windowed mode
-extern void UpdateEditor();
-
-extern void UpdateInterprocess();
-
-extern int EditorNPCFrame(int A, float C, int N = 0);
-
-extern void GetEditorControls();
-
-extern void OptCursorSync();
-
-extern void SetCursor();
-
-extern void PositionCursor();
-
-extern void HideCursor();
-
-extern void KillWarp(int A);
-
-extern void zTestLevel(bool magicHand = false, bool interProcess = false);
-
-extern void MouseMove(float X, float Y, bool nCur = false);
-
-extern void ResetNPC(int A);
-
-extern void BlockFill(Location_t Loc);
-
-#endif // EDITOR_H

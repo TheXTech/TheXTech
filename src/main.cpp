@@ -171,18 +171,20 @@ int main(int argc, char**argv)
 
         TCLAP::ValueArg<std::string> playerCharacter1("1", "player1", "Setup of playable character for player 1",
                                                         false, "",
-                                                       "с1;s2;m0;t0 : c - character, s - state, m - mount, t - mount type",
+                                                       "c1;s2;m0;t0 : c - character, s - state, m - mount, t - mount type",
                                                        cmd);
 
         TCLAP::ValueArg<std::string> playerCharacter2("2", "player2", "Setup of playable character for player 1",
                                                         false, "",
-                                                       "с1;s2;m0;t0 : c - character, s - state, m - mount, t - mount type",
+                                                       "c1;s2;m0;t0 : c - character, s - state, m - mount, t - mount type",
                                                        cmd);
 
         TCLAP::SwitchArg switchTestGodMode("g", "god-mode", "Enable god mode in level testing", false);
         TCLAP::SwitchArg switchTestGrabAll("a", "grab-all", "Enable ability to grab everything while level testing", false);
         TCLAP::SwitchArg switchTestShowFPS("m", "show-fps", "Show FPS counter on the screen", false);
         TCLAP::SwitchArg switchTestMaxFPS("x", "max-fps", "Run FPS as fast as possible", false);
+        TCLAP::SwitchArg switchTestMagicHand("k", "magic-hand", "Enable magic hand functionality while level test running", false);
+        TCLAP::SwitchArg switchTestInterprocess("i", "interprocessing", "Enable an interprocessing mode with Editor", false);
 
         cmd.add(&switchFrameSkip);
         cmd.add(&switchNoSound);
@@ -193,6 +195,8 @@ int main(int argc, char**argv)
         cmd.add(&switchTestGrabAll);
         cmd.add(&switchTestShowFPS);
         cmd.add(&switchTestMaxFPS);
+        cmd.add(&switchTestMagicHand);
+        cmd.add(&switchTestInterprocess);
 
         cmd.parse(argc, argv);
 
@@ -209,7 +213,8 @@ int main(int argc, char**argv)
             setup.renderType = CmdLineSetup_t::RENDER_HW;
 
         setup.testLevel = testLevel.getValue();
-        setup.testLevelMode = !setup.testLevel.empty();
+        setup.interprocess = switchTestInterprocess.getValue();
+        setup.testLevelMode = !setup.testLevel.empty() || setup.interprocess;
         setup.testNumPlayers = int(numPlayers.getValue());
         if(setup.testNumPlayers > 2)
             setup.testNumPlayers = 2;
@@ -224,6 +229,7 @@ int main(int argc, char**argv)
         setup.testGrabAll = switchTestGrabAll.getValue();
         setup.testShowFPS = switchTestShowFPS.getValue();
         setup.testMaxFPS = switchTestMaxFPS.getValue();
+        setup.testMagicHand = switchTestMagicHand.getValue();
     }
     catch(TCLAP::ArgException &e)   // catch any exceptions
     {

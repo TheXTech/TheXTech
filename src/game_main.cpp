@@ -24,6 +24,7 @@
  */
 
 #include <Logger/logger.h>
+#include <InterProcess/intproc.h>
 #include <pge_delay.h>
 
 #include "globals.h"
@@ -40,6 +41,7 @@
 #include "player.h"
 #include "sound.h"
 #include "editor.h"
+#include "main/level_file.h"
 
 #include "pseudo_vb.h"
 
@@ -128,12 +130,15 @@ int GameMain(const CmdLineSetup_t &setup)
     LoadGFX(); // load the graphics from file
     SetupVars(); //Setup Variables
 
+    if(setup.interprocess)
+        IntProc::init();
+
     LoadingInProcess = false;
 
     ShowFPS = setup.testShowFPS;
     MaxFPS = setup.testMaxFPS;
 
-    if(!setup.testLevel.empty()) // Start level testing immediately!
+    if(!setup.testLevel.empty() || setup.interprocess) // Start level testing immediately!
     {
         GameMenu = false;
         LevelSelect = false;
@@ -152,7 +157,7 @@ int GameMain(const CmdLineSetup_t &setup)
         }
         GodMode = setup.testGodMode;
         GrabAll = setup.testGrabAll;
-        zTestLevel();
+        zTestLevel(setup.testMagicHand, setup.interprocess);
     }
 
     do
@@ -332,6 +337,7 @@ int GameMain(const CmdLineSetup_t &setup)
                 PlayerCharacter2 = 0;
             }
 
+            pLogDebug("Clear check-points at Game Menu start");
             Checkpoint.clear();
             CheckpointsList.clear();
             WorldPlayer[1].Frame = 0;
@@ -799,7 +805,7 @@ int GameMain(const CmdLineSetup_t &setup)
 
                 GameThing();
                 PGE_Delay(500);
-                zTestLevel(); // Restart level
+                zTestLevel(setup.testMagicHand, setup.interprocess); // Restart level
 
 //                If nPlay.Online = False Then
 //                    OpenLevel FullFileName
@@ -876,7 +882,7 @@ void NextLevel()
     DoEvents();
     if(!TestLevel && GoToLevel.empty() && !NoMap)
         PGE_Delay(500);
-    if(BattleMode && !LevelEditor)
+    if(BattleMode && !LevelEditor && !TestLevel)
     {
         EndLevel = false;
         GameMenu = true;
@@ -889,6 +895,11 @@ void NextLevel()
     {
         LevelSelect = true;
         EndLevel = false;
+        if(TestLevel && BattleMode)
+        {
+            BattleIntro = 150;
+            GameIsActive = false; // Quit game
+        }
     }
 }
 

@@ -1,0 +1,53 @@
+version: build-{build}
+
+environment:
+  global:
+    PLATFORMTOOLSET: "v140"
+    CMAKEPREFIXPATH: "."
+    SEVENZIP: "C:\\Program Files\\7-Zip\\7z.exe"
+    WGET_BIN: "C:\\msys64\\usr\\bin\\wget.exe"
+    APPVEYOR_BUILD_WORKER_IMAGE: "Visual Studio 2015"
+  matrix:
+    - BUILD_TYPE: Release
+      COMPILER: MinGW-w32
+      COMPILER_FAMILY: MinGW
+      GENERATOR: "MinGW Makefiles"
+      PLATFORM: Win32
+      CMAKEPREFIXPATH: "C:/mingw-w64/i686-6.3.0-posix-dwarf-rt_v5-rev1/mingw32"
+      TOOLCHAIN_BIN: "C:\\mingw-w64\\i686-6.3.0-posix-dwarf-rt_v5-rev1\\mingw32\\bin"
+      VLC_PLUGIN: ON
+      BUILD_SHARED: OFF
+      BUILD_MIDIPLAY: OFF
+      VLC_TARBALL: ${VLC_TARBALL_x32}
+    - BUILD_TYPE: Release
+      COMPILER: MinGW-w64
+      COMPILER_FAMILY: MinGW
+      GENERATOR: "MinGW Makefiles"
+      PLATFORM: x64
+      CMAKEPREFIXPATH: "C:/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64"
+      TOOLCHAIN_BIN: "C:\\mingw-w64\\x86_64-8.1.0-posix-seh-rt_v6-rev0\\mingw64\\bin"
+      VLC_PLUGIN: ON
+      BUILD_SHARED: OFF
+      BUILD_MIDIPLAY: OFF
+      VLC_TARBALL: ${VLC_TARBALL_x64}
+
+
+build_script:
+  - git submodule init
+  - git submodule update
+  - md b
+  - cd b
+  - if NOT [%TOOLCHAIN_BIN%]==[] set PATH=%TOOLCHAIN_BIN%;%PATH:C:\Program Files\Git\usr\bin;=%
+  - cmake -G "%GENERATOR%" -DCMAKE_BUILD_TYPE=%BUILD_TYPE% -DCMAKE_PREFIX_PATH=%CMAKEPREFIXPATH% ..
+  - cmake --build . --config %BUILD_TYPE% -- -j 2
+  - cpack ..
+  - move thextech-1.3.1.7z thextech-%COMPILER%-%BUILD_TYPE%-%PLATFORM%.7z
+  - appveyor PushArtifact "thextech-%COMPILER%-%BUILD_TYPE%-%PLATFORM%.7z"
+
+deploy:
+  - provider: Environment
+    name: WohlnetFTP
+
+#on_finish:
+#  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+

@@ -31,7 +31,7 @@ if(EMSCRIPTEN)
     set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 endif()
 
-set(CMAKE_OSX_DEPLOYMENT_TARGET "10.12")
+set(CMAKE_OSX_DEPLOYMENT_TARGET "10.5")
 set(DEPENDENCIES_INSTALL_DIR ${CMAKE_BINARY_DIR}/output)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/output/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/output/lib)
@@ -94,6 +94,9 @@ option(ENABLE_LOGGING "Enable debug logging" ON)
 set(THEXTECH_GAME_NAME_TITLE "" CACHE STRING "Custom game title, shown in the titlebar of window")
 set(THEXTECH_CREDITS_URL "" CACHE STRING "Custom URL title, shown at the outro screen")
 set(THEXTECH_CREDITS_TITLE "" CACHE STRING "Custom game title, shown at the outro screen")
+
+set(THEXTECH_PACKAGE_NAME "thextech" CACHE STRING "Name of package archive file")
+set(THEXTECH_EXECUTABLE_NAME "thextech" CACHE STRING "Name of executable file")
 
 if(APPLE)
     set(THEXTECH_PRELOAD_ENVIRONMENT "" CACHE STRING "Path to resources root to pack")
@@ -189,6 +192,7 @@ endif()
 target_include_directories(A2XT_Int INTERFACE ${A2XT_INCS})
 
 set(LIB_SRC
+    lib/util.cpp
     lib/AppPath/app_path.cpp
     ${DIRMANAGER_SRCS}
     ${FILEMAPPER_SRCS}
@@ -199,6 +203,8 @@ set(LIB_SRC
     lib/Graphics/image_size.cpp
     lib/Graphics/size.cpp
     lib/Graphics/sizef.cpp
+    lib/InterProcess/editor_pipe.cpp
+    lib/InterProcess/intproc.cpp
     ${INIPROCESSOR_SRCS}
     lib/Logger/logger_sets.cpp
     ${UTILS_SRCS}
@@ -271,12 +277,16 @@ endif()
 add_executable(thextech ${THEXTECH_SRC} ${LIB_SRC})
 pge_set_nopie(thextech)
 
+set_target_properties(thextech PROPERTIES
+    OUTPUT_NAME "${THEXTECH_EXECUTABLE_NAME}"
+)
+
 if(APPLE)
     set_target_properties(thextech PROPERTIES
         OUTPUT_NAME "${THEXTECH_BUNDLE_NAME}"
         MACOSX_BUNDLE TRUE
         MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/resources/thextech.plist.in"
-        MACOSX_BUNDLE_EXECUTABLE_NAME "thextech"
+        MACOSX_BUNDLE_EXECUTABLE_NAME "${THEXTECH_EXECUTABLE_NAME}"
         MACOSX_BUNDLE_GUI_IDENTIFIER "ru.wohlsoft.thextech"
         MACOSX_BUNDLE_SHORT_VERSION_STRING "${THEXTECH_VERSION_STRING}"
         MACOSX_BUNDLE_LONG_VERSION_STRING "${THEXTECH_VERSION_STRING}"
@@ -303,15 +313,6 @@ if(APPLE)
     if(NOT THEXTECH_CUSTOM_USERDATA_DIR_NAME STREQUAL "")
         target_compile_definitions(thextech PRIVATE -DUSERDATA_ROOT_NAME="${THEXTECH_CUSTOM_USERDATA_DIR_NAME}")
     endif()
-
-    set(CPACK_PACKAGE_NAME "${THEXTECH_BUNDLE_NAME}")
-    set(CPACK_PACKAGE_VERSION "${THEXTECH_VERSION_STRING}")
-    set(CPACK_PACKAGE_VENDOR "Wohlstand")
-    set(CPACK_PACKAGE_CONTACT "admin@wohlnet.ru")
-    set(CPACK_DMG_FORMAT "UDBZ")
-    set(CPACK_DMG_VOLUME_NAME "${THEXTECH_BUNDLE_NAME}")
-    set(CPACK_PACKAGE_FILE_NAME "${THEXTECH_BUNDLE_NAME}-${THEXTECH_VERSION_STRING}")
-    include(CPack)
 
     target_link_libraries(A2XT_Int INTERFACE iconv)
     if(PGE_USE_LUAJIT)
@@ -378,13 +379,39 @@ if(WIN32)
     target_link_libraries(thextech PRIVATE "version" dbghelp) # needed by StackWalker
 endif()
 
+include(cmake/deploy.cmake)
+
 if(APPLE)
     install(TARGETS thextech DESTINATION .)
     install(FILES changelog.txt DESTINATION .)
     install(FILES README.md DESTINATION . RENAME ReadMe.txt)
     install(FILES LICENSE DESTINATION . RENAME License.txt)
 elseif(WIN32)
-    install(TARGETS thextech DESTINATION .)
+    # For MinGW toolchain, copy missing DLLs
+    if(MINGW)
+        function(find_mingw_dll _FieldName _FileName _DestList _SearchPaths)
+            find_file(MINGWDLL_${_FieldName} ${_FileName} PATHS "${_SearchPaths}")
+            if(MINGWDLL_${_FieldName})
+                list(APPEND ${_DestList} "${MINGWDLL_${_FieldName}}")
+                set(${_DestList} ${${_DestList}} PARENT_SCOPE)
+            endif()
+        endfunction()
+
+        set(MINGW_BIN_PATH "")
+        set(MINGW_DLLS)
+
+        find_mingw_dll(LIBGCCDW         "libgcc_s_dw2-1.dll" MINGW_DLLS "${MINGW_BIN_PATH}")
+        find_mingw_dll(LIBGCCSEC        "libgcc_s_seh-1.dll" MINGW_DLLS "${MINGW_BIN_PATH}")
+        find_mingw_dll(MINGWEX          "libmingwex-0.dll" MINGW_DLLS "${MINGW_BIN_PATH}")
+        find_mingw_dll(WINPTHREAD       "libwinpthread-1.dll" MINGW_DLLS "${MINGW_BIN_PATH}")
+        find_mingw_dll(WINPTHREADGC3    "pthreadGC-3.dll" MINGW_DLLS "${MINGW_BIN_PATH}")
+        find_mingw_dll(STDCPP           "libstdc++-6.dll" MINGW_DLLS "${MINGW_BIN_PATH}")
+
+        message("MinGW DLLs: [${MINGW_DLLS}]")
+        file(COPY ${MINGW_DLLS} DESTINATION "${DEPENDENCIES_INSTALL_DIR}/bin/")
+    endif()
+
+    install(TARGETS thextech DESTINATION ."")
     file(GLOB BUILT_DLLS "${DEPENDENCIES_INSTALL_DIR}/bin/*.dll")
     install(FILES ${BUILT_DLLS} DESTINATION .)
 else()

@@ -33,6 +33,7 @@
 #include "../effect.h"
 #include "../graphics.h"
 #include "../collision.h"
+#include "level_file.h"
 
 #include "../pseudo_vb.h"
 

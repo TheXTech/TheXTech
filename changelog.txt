@@ -1,5 +1,12 @@
 TheXTech Changelog.
 
+Changes for 1.3.2
+-Added an own timeout sound-92 for P-Switch timer (will be played with 3 seconds before end)
+-Added a level testing interprocess interface to work with PGE Editor
+-Fixed the podoboo's tail effect glitch
+-Fixed an incorrect priodoty of BGO65 in level file of SMBX prior to 10 format
+
+
 Changes for 1.3.1 (First version made by Wohlstand in March 2020):
 
 Technical stuff

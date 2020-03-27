@@ -83,7 +83,7 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
 {
     bool res = false;
 
-    LoadLogSettings(false);
+    LoadLogSettings(setup.interprocess);
     //Write into log the application start event
     pLogDebug("<Application started>");
 
@@ -377,6 +377,8 @@ bool FrmMain::hasWindowMouseFocus()
 
 void FrmMain::eventDoubleClick()
 {
+    if(MagicHand)
+        return; // Don't toggle fullscreen/window when magic hand is active
 #ifndef __EMSCRIPTEN__
     if(resChanged)
     {
