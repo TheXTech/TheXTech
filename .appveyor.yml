@@ -35,8 +35,8 @@ environment:
 build_script:
   - git submodule init
   - git submodule update
-  - md build-%COMPILER%-%BUILD_TYPE%-%PLATFORM%
-  - cd build-%COMPILER%-%BUILD_TYPE%-%PLATFORM%
+  - md b
+  - cd b
   - if NOT [%TOOLCHAIN_BIN%]==[] set PATH=%TOOLCHAIN_BIN%;%PATH:C:\Program Files\Git\usr\bin;=%
   - cmake -G "%GENERATOR%" -DCMAKE_BUILD_TYPE=%BUILD_TYPE% -DCMAKE_PREFIX_PATH=%CMAKEPREFIXPATH% ..
   - cmake --build . --config %BUILD_TYPE% -- -j 2
