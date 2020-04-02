@@ -49,10 +49,19 @@ struct StdPicture
     std::string origPath;
 #endif
     bool inited = false;
+    // Width and height
     int w = 0;
     int h = 0;
+    // Frame width and height (for animation sprite textures)
     int frame_w = 0;
     int frame_h = 0;
+    // Original size (if texture got scaled while loading)
+    int w_orig = 0;
+    int h_orig = 0;
+    // Difference between original and initial size
+    float w_scale = 1.0f;
+    float h_scale = 1.0f;
+
     bool lazyLoaded = false;
     std::vector<char> raw;
     std::vector<char> rawMask;
