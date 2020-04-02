@@ -412,7 +412,13 @@ elseif(WIN32)
     endif()
 
     install(TARGETS thextech DESTINATION .)
-    file(GLOB BUILT_DLLS "${DEPENDENCIES_INSTALL_DIR}/bin/*.dll")
+    file(GLOB BUILT_DLLS "${DEPENDENCIES_INSTALL_DIR}/bin/*-*.dll")
+    if(NOT USE_SYSTEM_SDL2)
+        list(APPEND GLOB BUILT_DLLS
+            "${DEPENDENCIES_INSTALL_DIR}/bin/SDL2.dll"
+            "${DEPENDENCIES_INSTALL_DIR}/bin/SDL2_mixer_ext.dll"
+        )
+    endif()
     install(FILES ${BUILT_DLLS} DESTINATION .)
 else()
     install(TARGETS thextech
