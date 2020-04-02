@@ -15,22 +15,13 @@ environment:
       PLATFORM: Win32
       CMAKEPREFIXPATH: "C:/Qt/Tools/mingw730_32"
       TOOLCHAIN_BIN: "C:\\Qt\\Tools\\mingw730_32\\bin"
-      VLC_PLUGIN: ON
-      BUILD_SHARED: OFF
-      BUILD_MIDIPLAY: OFF
-      VLC_TARBALL: ${VLC_TARBALL_x32}
     - BUILD_TYPE: Release
       COMPILER: MinGW-w64
       COMPILER_FAMILY: MinGW
       GENERATOR: "MinGW Makefiles"
       PLATFORM: x64
-      CMAKEPREFIXPATH: "C:/Qt/Tools/mingw730_32"
+      CMAKEPREFIXPATH: "C:/Qt/Tools/mingw730_64"
       TOOLCHAIN_BIN: "C:\\Qt\\Tools\\mingw730_64\\bin"
-      VLC_PLUGIN: ON
-      BUILD_SHARED: OFF
-      BUILD_MIDIPLAY: OFF
-      VLC_TARBALL: ${VLC_TARBALL_x64}
-
 
 build_script:
   - git submodule init
