@@ -38,7 +38,7 @@ build_script:
   - md b
   - cd b
   - if NOT [%TOOLCHAIN_BIN%]==[] set PATH=%TOOLCHAIN_BIN%;%PATH:C:\Program Files\Git\usr\bin;=%
-  - cmake -G "%GENERATOR%" -DCPACK_ARCHIVE_FILE_NAME=thextech-%COMPILER%-%BUILD_TYPE%-%PLATFORM%.7z -DCMAKE_BUILD_TYPE=%BUILD_TYPE% -DCMAKE_PREFIX_PATH=%CMAKEPREFIXPATH% ..
+  - cmake -G "%GENERATOR%" -DCPACK_PACKAGE_FILE_NAME=thextech-%COMPILER%-%BUILD_TYPE%-%PLATFORM%.7z -DCMAKE_BUILD_TYPE=%BUILD_TYPE% -DCMAKE_PREFIX_PATH=%CMAKEPREFIXPATH% ..
   - cmake --build . --config %BUILD_TYPE% -- -j 2
   - cpack ..
   - appveyor PushArtifact "thextech-%COMPILER%-%BUILD_TYPE%-%PLATFORM%.7z"
