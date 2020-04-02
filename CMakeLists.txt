@@ -411,7 +411,7 @@ elseif(WIN32)
         file(COPY ${MINGW_DLLS} DESTINATION "${DEPENDENCIES_INSTALL_DIR}/bin/")
     endif()
 
-    install(TARGETS thextech DESTINATION ."")
+    install(TARGETS thextech DESTINATION .)
     file(GLOB BUILT_DLLS "${DEPENDENCIES_INSTALL_DIR}/bin/*.dll")
     install(FILES ${BUILT_DLLS} DESTINATION .)
 else()
