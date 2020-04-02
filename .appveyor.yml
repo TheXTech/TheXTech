@@ -13,8 +13,8 @@ environment:
       COMPILER_FAMILY: MinGW
       GENERATOR: "MinGW Makefiles"
       PLATFORM: Win32
-      CMAKEPREFIXPATH: "C:/mingw-w64/i686-6.3.0-posix-dwarf-rt_v5-rev1/mingw32"
-      TOOLCHAIN_BIN: "C:\\mingw-w64\\i686-6.3.0-posix-dwarf-rt_v5-rev1\\mingw32\\bin"
+      CMAKEPREFIXPATH: "C:/Qt/Tools/mingw730_32"
+      TOOLCHAIN_BIN: "C:\\Qt\\Tools\\mingw730_32\\bin"
       VLC_PLUGIN: ON
       BUILD_SHARED: OFF
       BUILD_MIDIPLAY: OFF
@@ -24,8 +24,8 @@ environment:
       COMPILER_FAMILY: MinGW
       GENERATOR: "MinGW Makefiles"
       PLATFORM: x64
-      CMAKEPREFIXPATH: "C:/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64"
-      TOOLCHAIN_BIN: "C:\\mingw-w64\\x86_64-8.1.0-posix-seh-rt_v6-rev0\\mingw64\\bin"
+      CMAKEPREFIXPATH: "C:/Qt/Tools/mingw730_32"
+      TOOLCHAIN_BIN: "C:\\Qt\\Tools\\mingw730_64\\bin"
       VLC_PLUGIN: ON
       BUILD_SHARED: OFF
       BUILD_MIDIPLAY: OFF
