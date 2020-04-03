@@ -313,6 +313,15 @@ void OpenLevelData(LevelData &lvl, const std::string FilePath)
             NPC[numNPCs].DefaultSpecial = int(NPC[numNPCs].Special);
         }
 
+        if(NPC[numNPCs].Type == 86)
+        {
+            if(lvl.meta.RecentFormat == LevelData::SMBX64 &&
+               lvl.meta.RecentFormatVersion < 9)
+                NPC[numNPCs].Special7 = 1.0; // Keep original behavior of Bowser as in SMBX 1.0
+            else
+                NPC[numNPCs].Special7 = n.special_data;
+        }
+
         NPC[numNPCs].Generator = n.generator;
         if(NPC[numNPCs].Generator)
         {

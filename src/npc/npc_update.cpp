@@ -4007,7 +4007,8 @@ void UpdateNPCs()
                                     if(Block[B].Type == 186 && CheckCollision(tempLocation, Block[B].Location) == true && Block[B].Hidden == false)
                                         KillBlock(B);
                                 }
-                                if(NPC[A].Legacy == true && 1 == 2)
+
+                                if(NPC[A].Legacy && fEqual(NPC[A].Special7, 1.0)) // Classic SMBX 1.0's behavior when Bowser stomps a floor
                                 {
                                     fBlock = FirstBlock[(level[NPC[A].Section].X / 32) - 1];
                                     lBlock = LastBlock[((level[NPC[A].Section].Width) / 32.0) + 2];
