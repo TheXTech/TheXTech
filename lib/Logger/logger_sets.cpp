@@ -120,14 +120,17 @@ void LogWriter::LoadLogSettings(bool disableStdOut)
     }
     logSettings.endGroup();
 
-    try
+    if(!disableStdOut)
     {
-        fmt::print("LogLevel {0}, log file {1}\n\n", static_cast<int>(m_logLevel), m_logFilePath);
-    }
-    catch(const fmt::FormatError &err)
-    {
-        std::fprintf(stderr, "fmt::print failed with exception: %s\n", err.what());
-        abort();
+        try
+        {
+            fmt::print("LogLevel {0}, log file {1}\n\n", static_cast<int>(m_logLevel), m_logFilePath);
+        }
+        catch(const fmt::FormatError &err)
+        {
+            std::fprintf(stderr, "fmt::print failed with exception: %s\n", err.what());
+            abort();
+        }
     }
 
     if(m_enabled)

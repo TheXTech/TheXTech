@@ -31,7 +31,7 @@ if(EMSCRIPTEN)
     set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 endif()
 
-set(CMAKE_OSX_DEPLOYMENT_TARGET "10.5")
+set(CMAKE_OSX_DEPLOYMENT_TARGET "10.11")
 set(DEPENDENCIES_INSTALL_DIR ${CMAKE_BINARY_DIR}/output)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/output/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/output/lib)
@@ -411,8 +411,14 @@ elseif(WIN32)
         file(COPY ${MINGW_DLLS} DESTINATION "${DEPENDENCIES_INSTALL_DIR}/bin/")
     endif()
 
-    install(TARGETS thextech DESTINATION ."")
-    file(GLOB BUILT_DLLS "${DEPENDENCIES_INSTALL_DIR}/bin/*.dll")
+    install(TARGETS thextech DESTINATION .)
+    file(GLOB BUILT_DLLS "${DEPENDENCIES_INSTALL_DIR}/bin/*-*.dll")
+    if(NOT USE_SYSTEM_SDL2)
+        list(APPEND BUILT_DLLS
+            "${DEPENDENCIES_INSTALL_DIR}/bin/SDL2.dll"
+            "${DEPENDENCIES_INSTALL_DIR}/bin/SDL2_mixer_ext.dll"
+        )
+    endif()
     install(FILES ${BUILT_DLLS} DESTINATION .)
 else()
     install(TARGETS thextech

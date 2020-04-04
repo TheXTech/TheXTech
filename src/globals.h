@@ -395,6 +395,8 @@ struct NPC_t
     double Special5 = 0.0;
 //    Special6 As Double
     double Special6 = 0.0;
+// EXTRA: Special7 As Double
+    double Special7 = 0.0;
 //    TurnAround As Boolean 'if the NPC needs to turn around
     bool TurnAround = false;
 //    Killed As Integer 'Flags the NPC to die a specific way.

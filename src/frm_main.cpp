@@ -238,6 +238,8 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
         return false;
     }
 
+    SDL_GetRendererInfo(m_gRenderer, &m_ri);
+
     m_tBuffer = SDL_CreateTexture(m_gRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, ScreenW, ScreenH);
     if(!m_tBuffer)
     {
@@ -1014,6 +1016,31 @@ void FrmMain::lazyLoad(StdPicture &target)
     target.frame_w = static_cast<int>(w);
     target.frame_h = static_cast<int>(h);
 
+    if(w > Uint32(m_ri.max_texture_width) || h > Uint32(m_ri.max_texture_height))
+    {
+        target.w_orig = int(w);
+        target.h_orig = int(h);
+
+        // WORKAROUND: down-scale too big textures
+        if(w > Uint32(m_ri.max_texture_width))
+            w = Uint32(m_ri.max_texture_width);
+        if(h > Uint32(m_ri.max_texture_height))
+            h = Uint32(m_ri.max_texture_height);
+
+        pLogWarning("Texture is too big for a given hardware limit (%dx$d). Shrinking texture to %dx%d, quality may be distorted!",
+                    m_ri.max_texture_width, m_ri.max_texture_height,
+                    w, h);
+
+        FIBITMAP *d = FreeImage_Rescale(sourceImage, int(w), int(h));
+        if(d)
+        {
+            FreeImage_Unload(sourceImage);
+            sourceImage = d;
+        }
+        target.w_scale = float(w) / float(target.w_orig);
+        target.h_scale = float(h) / float(target.h_orig);
+    }
+
     GLubyte *textura = reinterpret_cast<GLubyte *>(FreeImage_GetBits(sourceImage));
     loadTexture(target, w, h, textura);
 
@@ -1503,7 +1530,11 @@ void FrmMain::renderTextureI(int xDst, int yDst, int wDst, int hDst,
     }
 
     SDL_Rect destRect = {xDst + viewport_offset_x, yDst + viewport_offset_y, wDst, hDst};
-    SDL_Rect sourceRect = {xSrc, ySrc, wDst, hDst};
+    SDL_Rect sourceRect;
+    if(tx.w_orig == 0 && tx.h_orig == 0)
+        sourceRect = {xSrc, ySrc, wDst, hDst};
+    else
+        sourceRect = {int(tx.w_scale * xSrc), int(tx.h_scale * ySrc), int(tx.w_scale * wDst), int(tx.h_scale * hDst)};
 
     SDL_SetTextureColorMod(tx.texture,
                            static_cast<unsigned char>(255.f * red),
@@ -1565,7 +1596,11 @@ void FrmMain::renderTexture(int xDst, int yDst, StdPicture &tx, float red, float
     }
 
     SDL_Rect destRect = {xDst, yDst, tx.w, tx.h};
-    SDL_Rect sourceRect = {0, 0, tx.w, tx.h};
+    SDL_Rect sourceRect;
+    if(tx.w_orig == 0 && tx.h_orig == 0)
+        sourceRect = {0, 0, tx.w, tx.h};
+    else
+        sourceRect = {0, 0, tx.w_orig, tx.h_orig};
 
     SDL_SetTextureColorMod(tx.texture,
                            static_cast<unsigned char>(255.f * red),

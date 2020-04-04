@@ -51,6 +51,7 @@ class FrmMain
     bool m_sdlLoaded = false;
     const Uint8 *m_keyboardState = nullptr;
     Uint32 m_lastMousePress = 0;
+    SDL_RendererInfo m_ri;
 public:
     int ScaleWidth = 800;
     int ScaleHeight = 600;

@@ -3776,7 +3776,7 @@ void UpdateNPCs()
                     // special4 - what bowser is doing
                     // special3 - counter for what bowser is doing
                     // special2 - counter for what bowser needs to do
-                    if(NPC[A].Legacy == true)
+                    if(NPC[A].Legacy)
                     {
                         if(NPC[A].TimeLeft > 1)
                         {
@@ -3789,7 +3789,8 @@ void UpdateNPCs()
                             }
                         }
                     }
-                    if(NPC[A].Special4 == 0)
+
+                    if(NPC[A].Special4 == 0.0)
                     {
                         NPC[A].Special3 = 0; // reset counter when done
                         if(NPC[A].Direction < 0)
@@ -3797,7 +3798,8 @@ void UpdateNPCs()
                         else
                             NPC[A].Frame = 5;
                     }
-                    if(NPC[A].Special5 == 0) // find player
+
+                    if(NPC[A].Special5 == 0.0) // find player
                     {
                         tempBool = false;
                         for(B = 1; B <= numPlayers; B++)
@@ -3805,7 +3807,8 @@ void UpdateNPCs()
                             if(Player[B].Dead == false && Player[B].TimeToLive == 0)
                                 tempBool = true;
                         }
-                        if(tempBool == false)
+
+                        if(!tempBool)
                         {
                             NPC[A].Special5 = 0;
                             NPC[A].Special4 = 2;
@@ -3818,11 +3821,12 @@ void UpdateNPCs()
                             NPC[A].Special5 = B;
                         }
                     }
+
                     // see if facing the player
                     tempBool = false;
                     if(NPC[A].Special5 > 0)
                     {
-                        if(Player[NPC[A].Special5].Location.X + Player[NPC[A].Special5].Location.Width / 2.0 < NPC[A].Location.X + NPC[A].Location.Width / 2.0)
+                        if(Player[long(NPC[A].Special5)].Location.X + Player[long(NPC[A].Special5)].Location.Width / 2.0 < NPC[A].Location.X + NPC[A].Location.Width / 2.0)
                         {
                             if(NPC[A].Direction < 0)
                                 tempBool = true;
@@ -3833,8 +3837,9 @@ void UpdateNPCs()
                                 tempBool = true;
                         }
                     }
+
                     NPC[A].Special2 = NPC[A].Special2 + dRand();
-                    if(NPC[A].Special4 == 0 && tempBool == true)
+                    if(NPC[A].Special4 == 0.0 && tempBool == true)
                     {
                         if(NPC[A].Special2 >= 200 + dRand() * 400 - dRand() * 200) // hop on player
                         {
@@ -3845,11 +3850,13 @@ void UpdateNPCs()
                         else if((NPC[A].Special2 >= 80 && NPC[A].Special2 <= 130) || (NPC[A].Special2 >= 160 + dRand() * 300 && NPC[A].Special2 <= 180 + dRand() * 800)) // shoot fireball
                             NPC[A].Special4 = 4;
                     }
+
                     if(NPC[A].Inert == true)
                     {
                         if(NPC[A].Special4 == 4 || NPC[A].Special4 == 3)
                             NPC[A].Special4 = 0;
                     }
+
                     if(NPC[A].Special4 == 0) // when not doing anything turn to player
                     {
                         if(tempBool == false)
@@ -3860,8 +3867,10 @@ void UpdateNPCs()
                                 NPC[A].Special4 = 1;
                         }
                     }
+
                     if(NPC[A].Special4 == 0) // hop
                         NPC[A].Special4 = 2;
+
                     if(NPC[A].HoldingPlayer > 0)
                     {
                         if(NPC[A].Direction == -1)
@@ -3877,6 +3886,7 @@ void UpdateNPCs()
                         NPC[A].Location.SpeedX = 0;
                         NPC[A].Location.SpeedY = 0;
                     }
+
                     if(NPC[A].Special4 == -1) // turn left
                     {
                         NPC[A].Special3 = NPC[A].Special3 - 1;
@@ -4057,57 +4067,63 @@ void UpdateNPCs()
                                 tempLocation.Width = tempLocation.Width; // - 32
                                 tempLocation.Y = tempLocation.Y + tempLocation.Height - 8;
                                 tempLocation.Height = 16;
-                                fBlock = FirstBlock[(NPC[A].Location.X / 32) - 1];
-                                lBlock = LastBlock[((NPC[A].Location.X + NPC[A].Location.Width) / 32.0) + 1];
+                                fBlock = FirstBlock[long(NPC[A].Location.X / 32) - 1];
+                                lBlock = LastBlock[long((NPC[A].Location.X + NPC[A].Location.Width) / 32.0) + 1];
+
                                 for(B = (int)fBlock; B <= lBlock; B++)
                                 {
-                                    if(Block[B].Type == 186 && CheckCollision(tempLocation, Block[B].Location) == true && Block[B].Hidden == false)
+                                    if(Block[B].Type == 186 && CheckCollision(tempLocation, Block[B].Location) && !Block[B].Hidden)
                                         KillBlock(B);
                                 }
-                                if(NPC[A].Legacy == true && 1 == 2)
+
+                                if(NPC[A].Legacy && fEqual(NPC[A].Special7, 1.0)) // Classic SMBX 1.0's behavior when Bowser stomps a floor
                                 {
-                                    fBlock = FirstBlock[(level[NPC[A].Section].X / 32) - 1];
-                                    lBlock = LastBlock[((level[NPC[A].Section].Width) / 32.0) + 2];
-                                    for(B = (int)fBlock; B <= lBlock; B++)
+                                    fBlock = FirstBlock[long(level[NPC[A].Section].X / 32) - 1];
+                                    lBlock = LastBlock[long((level[NPC[A].Section].Width) / 32.0) + 2];
+
+                                    // Shake all blocks up
+                                    for(int B = (int)fBlock; B <= lBlock; B++)
                                         BlockShakeUp(B);
-                                    for(B = 0; B <= maxSections; B++)
+
+                                    // expand down a section at the bottom of destroyed blocks
+                                    for(int B = 0; B <= maxSections; B++)
                                     {
-                                        if(NPC[A].Location.X >= level[B].X)
+                                        auto &n = NPC[A];
+                                        auto &s = level[B];
+
+                                        if(n.Location.X >= s.X &&
+                                           n.Location.X + n.Location.Width <= s.Width &&
+                                           n.Location.Y + n.Location.Height + 48 >= s.Y &&
+                                           n.Location.Y + n.Location.Height + 48 <= s.Height &&
+                                           B != n.Section)
                                         {
-                                            if(NPC[A].Location.X + NPC[A].Location.Width <= level[B].Width)
+                                            n.Special2 = 0;
+                                            n.Special3 = 0;
+                                            n.Special4 = 2;
+
+                                            auto &ns = level[n.Section];
+                                            if(s.X < ns.X)
+                                                ns.X = s.X;
+                                            if(s.Y < ns.Y)
+                                                ns.Y = s.Y;
+                                            if(s.Width > ns.Width)
+                                                ns.Width = s.Width;
+                                            if(s.Height > ns.Height)
+                                                ns.Height = s.Height;
+
+                                            s.X = 0;
+                                            s.Y = 0;
+                                            s.Width = 0;
+                                            s.Height = 0;
+
+                                            for(int C = 1; C <= numNPCs; C++)
                                             {
-                                                if(NPC[A].Location.Y + NPC[A].Location.Height + 48 >= level[B].Y)
-                                                {
-                                                    if(NPC[A].Location.Y + NPC[A].Location.Height + 48 <= level[B].Height)
-                                                    {
-                                                        if(B != NPC[A].Section)
-                                                        {
-                                                            NPC[A].Special2 = 0;
-                                                            NPC[A].Special3 = 0;
-                                                            NPC[A].Special4 = 2;
-                                                            if(level[B].X < level[NPC[A].Section].X)
-                                                                level[NPC[A].Section].X = level[B].X;
-                                                            if(level[B].Y < level[NPC[A].Section].Y)
-                                                                level[NPC[A].Section].Y = level[B].Y;
-                                                            if(level[B].Width > level[NPC[A].Section].Width)
-                                                                level[NPC[A].Section].Width = level[B].Width;
-                                                            if(level[B].Height > level[NPC[A].Section].Height)
-                                                                level[NPC[A].Section].Height = level[B].Height;
-                                                            level[B].X = 0;
-                                                            level[B].Y = 0;
-                                                            level[B].Width = 0;
-                                                            level[B].Height = 0;
-                                                            for(C = 1; C <= numNPCs; C++)
-                                                            {
-                                                                if(NPC[C].Section == B)
-                                                                    NPC[C].Section = NPC[A].Section;
-                                                            }
-                                                        }
-                                                    }
-                                                }
+                                                auto &nc = NPC[C];
+                                                if(nc.Section == B)
+                                                    nc.Section = n.Section;
                                             }
                                         }
-                                    }
+                                    } // for
                                     SoundPause[2] = 12;
                                 }
                             }
