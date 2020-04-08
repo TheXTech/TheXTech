@@ -20,10 +20,7 @@
 #ifndef IMAGESIZE_H
 #define IMAGESIZE_H
 
-#include <string>
-typedef std::string PGEString;
-#define PGEStringToStd(x) (x)
-#define StdToPGEString(x) (x)
+#include "PGEString.h"
 
 struct SDL_RWops;
 
