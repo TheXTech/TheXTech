@@ -8,14 +8,14 @@ environment:
     WGET_BIN: "C:\\msys64\\usr\\bin\\wget.exe"
     APPVEYOR_BUILD_WORKER_IMAGE: "Visual Studio 2015"
   matrix:
-    - BUILD_TYPE: Release
+    - BUILD_TYPE: MinSizeRel
       COMPILER: MinGW-w32
       COMPILER_FAMILY: MinGW
       GENERATOR: "MinGW Makefiles"
       PLATFORM: Win32
       CMAKEPREFIXPATH: "C:/Qt/Tools/mingw730_32"
       TOOLCHAIN_BIN: "C:\\Qt\\Tools\\mingw730_32\\bin"
-    - BUILD_TYPE: Release
+    - BUILD_TYPE: MinSizeRel
       COMPILER: MinGW-w64
       COMPILER_FAMILY: MinGW
       GENERATOR: "MinGW Makefiles"
