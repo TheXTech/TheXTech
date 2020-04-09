@@ -27,7 +27,6 @@
 #include "../game_main.h"
 #include "../load_gfx.h"
 #include "../sound.h"
-#include "level_file.h"
 
 #include <Utils/strings.h>
 #include <Utils/files.h>

@@ -1658,6 +1658,12 @@ void UpdateBlocks()
     {
         for(A = 1; A <= numBlock; A++)
         {
+            if(Block[A].Type == 707)
+            {
+                Block[A].Special = Block[A].Special + 0.1;
+                Block[A].Location.SpeedX = std::cos(Block[A].Special);
+                Block[A].Location.SpeedX = std::sin(Block[A].Special);
+            }
             // respawn
             if(Block[A].RespawnDelay > 0)
             {
@@ -1900,12 +1906,7 @@ void UpdateBlocks()
             PlaySound(32);
             PSwitch(true);
         }
-
-        PSwitchTime--;
-
-        if(PSwitchTime == 195)
-            PlaySound(92);
-
+        PSwitchTime = PSwitchTime - 1;
         if(PSwitchTime <= 1)
         {
             PSwitch(false);

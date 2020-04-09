@@ -1842,6 +1842,49 @@ void NPCHit(int A, int B, int C)
             PlaySound(39);
         }
     }
+    else if(NPC[A].Type == 335)
+    {
+        if(NPC[A].Special5 >= 0)
+        {
+            if(B == 3)
+            {
+                if(NPC[C].Type != 13)
+                {
+                    NPC[A].Special = 1;
+                    NPC[A].Special3 = 200;
+                    NPC[A].Special4 = 0;
+                    NPC[A].Special5 = -50;
+                    NPC[A].Damage = NPC[A].Damage + 1;
+                    NPC[A].Direction = -NPC[A].Direction;
+                    NPC[A].Location.SpeedX = 0;
+                    PlaySound(39);
+                }
+            }
+            else if(B == 4)
+                NPC[A].Damage = 2;
+            else if(B == 10)
+            {
+                NPC[A].Special = 1;
+                NPC[A].Special3 = 200;
+                NPC[A].Special4 = 0;
+                NPC[A].Special5 = -50;
+                NPC[A].Damage = NPC[A].Damage + 1;
+                NPC[A].Direction = -NPC[A].Direction;
+                NPC[A].Location.SpeedX = 0;
+                PlaySound(39);
+            }
+            if(NPC[A].Damage >= 3)
+            {
+                NPC[A].Killed = B;
+                NewEffect(166, NPC[A].Location);
+            }
+        }
+        if(B == 6)
+        {
+            NPC[A].Killed = B;
+            PlaySound(39);
+        }
+    }
     else if(NPC[A].Type == 317)
     {
         if(NPC[A].Special >= 0)
@@ -1922,7 +1965,7 @@ void NPCHit(int A, int B, int C)
         }
         // Eggs
     }
-    else if(NPC[A].Type == 40)
+    else if(NPC[A].Type == 40 || NPC[A].Type == 336)
     {
         if(B == 3)
         {

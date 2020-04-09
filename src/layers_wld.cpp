@@ -32,6 +32,10 @@
 #include "graphics.h"
 #include "game_main.h"
 
+#include <Utils/strings.h>
+#include <Utils/files.h>
+#include <PGE_File_Formats/file_formats.h>
+
 int numLayers = 0;
 RangeArr<Layer_t, 0, maxLayers> Layer;
 
@@ -47,8 +51,9 @@ static SDL_INLINE bool equalCase(const std::string &x, const std::string &y)
     return (SDL_strcasecmp(x.c_str(), y.c_str()) == 0);
 }
 
-void ShowLayer(std::string LayerName, bool NoEffect)
+void ShowLayerWLD(std::string LayerName, bool NoEffect)
 {
+    WorldData wld;
     int A = 0;
     int B = 0;
     Location_t tempLocation;
@@ -59,120 +64,104 @@ void ShowLayer(std::string LayerName, bool NoEffect)
     for(A = 0; A <= maxLayers; A++)
     {
         if(equalCase(Layer[A].Name, LayerName))
-        {
-            Layer[A].Hidden = false;
-            if(Layer[A].Name == "Destroyed Blocks")
-                Layer[A].Hidden = true;
-            if(Layer[A].Name == "Spawned NPCs")
-                Layer[A].Hidden = false;
-        }
+            Layer[A].Hidden = true;
     }
 
-    for(A = 1; A <= numNPCs; A++)
+    for(auto &t : wld.tiles)
     {
-        if(equalCase(NPC[A].Layer, LayerName))
+        if(equalCase(Tile[A].Layer, LayerName))
         {
-            if(NPC[A].Hidden == true)
+            if(Tile[A].Hidden == true)
             {
                 if(NoEffect == false && NPC[A].Generator == false)
                 {
-                    tempLocation = NPC[A].Location;
-                    tempLocation.X = tempLocation.X + tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
-                    tempLocation.Y = tempLocation.Y + tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
-                    NewEffect(10, tempLocation);
-                }
-
-                if(LevelEditor == false)
-                {
-                    if(NPCWontHurt[NPC[A].Type] == false && NPCIsABonus[NPC[A].Type] == false && NPC[A].Active == true)
-                    {
-                        for(B = 1; B <= numPlayers; B++)
-                        {
-                            if(CheckCollision(Player[B].Location, NPC[A].Location) == true)
-                                Player[B].Immune = 120;
-                        }
-                    }
-                }
-            }
-            NPC[A].Hidden = false;
-            NPC[A].GeneratorActive = true;
-            NPC[A].Reset[1] = true;
-            NPC[A].Reset[2] = true;
-            if(NPC[A].Generator == false)
-            {
-                NPC[A].Active = true;
-                NPC[A].TimeLeft = 1;
-            }
-            CheckSectionNPC(A);
-        }
-    }
-
-    for(A = 1; A <= numBlock; A++)
-    {
-        if(equalCase(Block[A].Layer, LayerName))
-        {
-            // If Not (Block(A).DefaultType = 0 And Block(A).Layer = "Destroyed Blocks") Then
-            if(Block[A].Hidden == true)
-            {
-                if(NoEffect == false && Block[A].Invis == false)
-                {
-                    tempLocation = Block[A].Location;
+                    tempLocation = Tile[A].Location;
                     tempLocation.X = tempLocation.X + tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
                     tempLocation.Y = tempLocation.Y + tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
                     NewEffect(10, tempLocation);
                 }
             }
-            Block[A].Hidden = false;
+            Tile[A].Hidden = false;
         }
-
-        if(LayerName == "Destroyed Blocks")
-        {
-            if(Block[A].DefaultType > 0)
-            {
-                if(Block[A].Layer == LayerName)
-                    Block[A].Layer = "Default";
-                Block[A].Special = Block[A].DefaultSpecial;
-                Block[A].Type = Block[A].DefaultType;
-            }
-        }
-        // End If
     }
 
-    int allBgos = numBackground + numLocked;
-    for(A = 1; A <= allBgos; A++)
+    for(auto &s : wld.scenery)
     {
-        if(equalCase(Background[A].Layer, LayerName))
+        if(equalCase(Scene[A].Layer, LayerName))
         {
-            if(Background[A].Hidden == true)
+            if(Scene[A].Hidden == true)
             {
                 if(NoEffect == false)
                 {
-                    tempLocation = Background[A].Location;
+                    tempLocation = Scene[A].Location;
                     tempLocation.X = tempLocation.X + tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
                     tempLocation.Y = tempLocation.Y + tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
                     NewEffect(10, tempLocation);
                 }
             }
-            Background[A].Hidden = false;
+            Scene[A].Hidden = false;
         }
     }
 
-    for(A = 1; A <= numWarps; A++)
+    for(auto &p : wld.paths)
     {
-        if(equalCase(Warp[A].Layer, LayerName))
-            Warp[A].Hidden = false;
+        if(equalCase(WorldPath[A].Layer, LayerName))
+        {
+            if(WorldPath[A].Hidden == true)
+            {
+                if(NoEffect == false)
+                {
+                    tempLocation = WorldPath[A].Location;
+                    tempLocation.X = tempLocation.X + tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
+                    tempLocation.Y = tempLocation.Y + tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
+                    NewEffect(10, tempLocation);
+                }
+            }
+            WorldPath[A].Hidden = false;
+        }
     }
 
-    for(A = 1; A <= numWater; A++)
+    for(auto &l : wld.levels)
     {
-        if(equalCase(Water[A].Layer, LayerName))
-            Water[A].Hidden = false;
+        if(equalCase(WorldLevel[A].Layer, LayerName))
+        {
+            if(WorldLevel[A].Hidden == true)
+            {
+                if(NoEffect == false)
+                {
+                    tempLocation = WorldLevel[A].Location;
+                    tempLocation.X = tempLocation.X + tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
+                    tempLocation.Y = tempLocation.Y + tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
+                    NewEffect(10, tempLocation);
+                }
+            }
+            WorldLevel[A].Hidden = false;
+        }
+    }
+
+    for(auto &m : wld.music)
+    {
+        if(equalCase(WorldMusic[A].Layer, LayerName))
+        {
+            if(WorldMusic[A].Hidden == true)
+            {
+                if(NoEffect == false)
+                {
+                    tempLocation = WorldMusic[A].Location;
+                    tempLocation.X = tempLocation.X + tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
+                    tempLocation.Y = tempLocation.Y + tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
+                    NewEffect(10, tempLocation);
+                }
+            }
+            WorldMusic[A].Hidden = false;
+        }
     }
 }
 
-void HideLayer(std::string LayerName, bool NoEffect)
+void HideLayerWLD(std::string LayerName, bool NoEffect)
 {
     int A = 0;
+    WorldData wld;
     Location_t tempLocation;
     if(LayerName.empty())
         return;
@@ -183,84 +172,98 @@ void HideLayer(std::string LayerName, bool NoEffect)
             Layer[A].Hidden = true;
     }
 
-    for(A = 1; A <= numNPCs; A++)
+    for(auto &t : wld.tiles)
     {
-        if(equalCase(NPC[A].Layer, LayerName))
+        if(equalCase(Tile[A].Layer, LayerName))
         {
-            if(NPC[A].Hidden == false)
+            if(Tile[A].Hidden == false)
             {
                 if(NoEffect == false && NPC[A].Generator == false)
                 {
-                    tempLocation = NPC[A].Location;
+                    tempLocation = Tile[A].Location;
                     tempLocation.X = tempLocation.X + tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
                     tempLocation.Y = tempLocation.Y + tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
                     NewEffect(10, tempLocation);
                 }
             }
-            NPC[A].Hidden = true;
-            if(NPC[A].Generator == false)
-            {
-                Deactivate(A);
-            }
+            Tile[A].Hidden = true;
         }
     }
 
-    for(A = 1; A <= numBlock; A++)
+    for(auto &s : wld.scenery)
     {
-        if(equalCase(Block[A].Layer, LayerName))
+        if(equalCase(Scene[A].Layer, LayerName))
         {
-            if(Block[A].Hidden == false)
-            {
-                if(NoEffect == false && Block[A].Invis == false)
-                {
-                    tempLocation = Block[A].Location;
-                    tempLocation.X = tempLocation.X + tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
-                    tempLocation.Y = tempLocation.Y + tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
-                    NewEffect(10, tempLocation);
-                }
-            }
-            Block[A].Hidden = true;
-        }
-    }
-
-    int allBgos = numBackground + numLocked;
-    for(A = 1; A <= allBgos; A++)
-    {
-        if(equalCase(Background[A].Layer, LayerName))
-        {
-            if(Background[A].Hidden == false)
+            if(Scene[A].Hidden == false)
             {
                 if(NoEffect == false)
                 {
-                    tempLocation = Background[A].Location;
+                    tempLocation = Scene[A].Location;
                     tempLocation.X = tempLocation.X + tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
                     tempLocation.Y = tempLocation.Y + tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
                     NewEffect(10, tempLocation);
                 }
             }
-            Background[A].Hidden = true;
+            Scene[A].Hidden = true;
         }
     }
 
-    for(A = 1; A <= numWarps; A++)
+    for(auto &p : wld.paths)
     {
-        if(equalCase(Warp[A].Layer, LayerName))
-            Warp[A].Hidden = true;
+        if(equalCase(WorldPath[A].Layer, LayerName))
+        {
+            if(WorldPath[A].Hidden == false)
+            {
+                if(NoEffect == false)
+                {
+                    tempLocation = WorldPath[A].Location;
+                    tempLocation.X = tempLocation.X + tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
+                    tempLocation.Y = tempLocation.Y + tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
+                    NewEffect(10, tempLocation);
+                }
+            }
+            WorldPath[A].Hidden = true;
+        }
     }
 
-    for(A = 1; A <= numWater; A++)
+    for(auto &l : wld.levels)
     {
-        if(equalCase(Water[A].Layer, LayerName))
-            Water[A].Hidden = true;
+        if(equalCase(WorldLevel[A].Layer, LayerName))
+        {
+            if(WorldLevel[A].Hidden == false)
+            {
+                if(NoEffect == false)
+                {
+                    tempLocation = WorldLevel[A].Location;
+                    tempLocation.X = tempLocation.X + tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
+                    tempLocation.Y = tempLocation.Y + tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
+                    NewEffect(10, tempLocation);
+                }
+            }
+            WorldLevel[A].Hidden =  true;
+        }
+    }
+
+    for(auto &m : wld.music)
+    {
+        if(equalCase(WorldMusic[A].Layer, LayerName))
+        {
+            if(WorldMusic[A].Hidden == false)
+            {
+                if(NoEffect == false)
+                {
+                    tempLocation = WorldMusic[A].Location;
+                    tempLocation.X = tempLocation.X + tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
+                    tempLocation.Y = tempLocation.Y + tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
+                    NewEffect(10, tempLocation);
+                }
+            }
+            WorldMusic[A].Hidden = true;
+        }
     }
 }
 
-void SetLayer(std::string /*LayerName*/)
-{
-    // Unused
-}
-
-void ProcEvent(std::string EventName, bool NoEffect)
+void ProcEventWLD(std::string EventName, bool NoEffect)
 {
     // this is for events that have just been triggered
     int A = 0;
@@ -552,7 +555,7 @@ void ProcEvent(std::string EventName, bool NoEffect)
     }
 }
 
-void UpdateEvents()
+void UpdateEventsWLD()
 {
     // this is for evetns that have a delay to call other events
     // this sub also updates the screen position for autoscroll levels
@@ -617,7 +620,7 @@ void UpdateEvents()
     }
 }
 
-void UpdateLayers()
+void UpdateLayersWLD()
 {
     // this is mainly for moving layers
     int A = 0;

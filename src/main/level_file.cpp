@@ -31,7 +31,6 @@
 #include "../sound.h"
 #include "../sorting.h"
 #include "../layers.h"
-#include "level_file.h"
 
 #include <DirManager/dirman.h>
 #include <Utils/files.h>
@@ -60,23 +59,6 @@ void addMissingLvlSuffix(std::string &fileName)
 
 void OpenLevel(std::string FilePath)
 {
-    addMissingLvlSuffix(FilePath);
-//    if(!Files::hasSuffix(FilePath, ".lvl") && !Files::hasSuffix(FilePath, ".lvlx"))
-//    {
-//        if(Files::fileExists(FilePath + ".lvlx"))
-//            FilePath += ".lvlx";
-//        else
-//            FilePath += ".lvl";
-//    }
-
-    LevelData lvl;
-    FileFormats::OpenLevelFile(FilePath, lvl);
-
-    OpenLevelData(lvl, FilePath);
-}
-
-void OpenLevelData(LevelData &lvl, const std::string FilePath)
-{
     std::string newInput;
 //    int FileRelease = 0;
     int A = 0;
@@ -92,24 +74,28 @@ void OpenLevelData(LevelData &lvl, const std::string FilePath)
     BlockSound();
     FreezeNPCs = false;
     CoinMode = false;
+    LevelData lvl;
 
+    addMissingLvlSuffix(FilePath);
+//    if(!Files::hasSuffix(FilePath, ".lvl") && !Files::hasSuffix(FilePath, ".lvlx"))
+//    {
+//        if(Files::fileExists(FilePath + ".lvlx"))
+//            FilePath += ".lvlx";
+//        else
+//            FilePath += ".lvl";
+//    }
+
+    FileFormats::OpenLevelFile(FilePath, lvl);
     FileFormats::smbx64LevelPrepare(lvl);
     FileFormats::smbx64LevelSortBlocks(lvl);
     FileFormats::smbx64LevelSortBGOs(lvl);
 
+    FileNameFull = Files::basename(FilePath);
     FileName = lvl.meta.filename;
     FileNamePath = lvl.meta.path + "/";
-
-    if(!FilePath.empty())
-    {
-        FileNameFull = Files::basename(FilePath);
-        FullFileName = FilePath;
-    }
-    else
-    {
-        FileNameFull = FileName + ".lvlx";
-        FullFileName = FileNamePath + FileName + ".lvlx";
-    }
+//    if(FileNamePath.substr(FileNamePath.length() - 2) == "/")
+//        FileNamePath = FileNamePath.substr(0, FileNamePath.length() - 1);
+    FullFileName = FilePath;
 
     IsEpisodeIntro = (StartLevel == FileNameFull);
 
@@ -236,33 +222,6 @@ void OpenLevelData(LevelData &lvl, const std::string FilePath)
         Background[numBackground].Layer = b.layer;
         Background[numBackground].Location.Width = GFXBackgroundWidth[Background[numBackground].Type];
         Background[numBackground].Location.Height = BackgroundHeight[Background[numBackground].Type];
-
-        Background[numBackground].uid = int(b.meta.array_id);
-
-        Background[numBackground].zOffset = b.z_offset;
-
-        if(b.z_mode == LevelBGO::ZDefault)
-            Background[numBackground].SortPriority = int(b.smbx64_sp);
-        else
-        {
-            switch(b.z_mode)
-            {
-            case LevelBGO::Background2:
-                Background[numBackground].SortPriority = 10;
-                break;
-            case LevelBGO::Background1:
-                Background[numBackground].SortPriority = 30;
-                break;
-            case LevelBGO::Foreground1:
-                Background[numBackground].SortPriority = 125;
-                break;
-            case LevelBGO::Foreground2:
-                Background[numBackground].SortPriority = 200;
-                break;
-            default:
-                break;
-            }
-        }
     }
 
 
@@ -287,39 +246,30 @@ void OpenLevelData(LevelData &lvl, const std::string FilePath)
         if(NPC[numNPCs].Type == 91 || NPC[numNPCs].Type == 96 || NPC[numNPCs].Type == 283 || NPC[numNPCs].Type == 284)
         {
             NPC[numNPCs].Special = n.contents;
-            NPC[numNPCs].DefaultSpecial = int(NPC[numNPCs].Special);
+            NPC[numNPCs].DefaultSpecial = NPC[numNPCs].Special;
         }
         if(NPC[numNPCs].Type == 288 || NPC[numNPCs].Type == 289 || (NPC[numNPCs].Type == 91 && int(NPC[numNPCs].Special) == 288))
         {
             NPC[numNPCs].Special2 = n.special_data2;
-            NPC[numNPCs].DefaultSpecial2 = int(NPC[numNPCs].Special2);
+            NPC[numNPCs].DefaultSpecial2 = NPC[numNPCs].Special2;
         }
 
         if(NPCIsAParaTroopa[NPC[numNPCs].Type])
         {
             NPC[numNPCs].Special = n.special_data;
-            NPC[numNPCs].DefaultSpecial = int(NPC[numNPCs].Special);
+            NPC[numNPCs].DefaultSpecial = NPC[numNPCs].Special;
         }
 
         if(NPCIsCheep[NPC[numNPCs].Type])
         {
             NPC[numNPCs].Special = n.special_data;
-            NPC[numNPCs].DefaultSpecial = int(NPC[numNPCs].Special);
+            NPC[numNPCs].DefaultSpecial = NPC[numNPCs].Special;
         }
 
         if(NPC[numNPCs].Type == 260)
         {
             NPC[numNPCs].Special = n.special_data;
-            NPC[numNPCs].DefaultSpecial = int(NPC[numNPCs].Special);
-        }
-
-        if(NPC[numNPCs].Type == 86)
-        {
-            if(lvl.meta.RecentFormat == LevelData::SMBX64 &&
-               lvl.meta.RecentFormatVersion < 9)
-                NPC[numNPCs].Special7 = 1.0; // Keep original behavior of Bowser as in SMBX 1.0
-            else
-                NPC[numNPCs].Special7 = n.special_data;
+            NPC[numNPCs].DefaultSpecial = NPC[numNPCs].Special;
         }
 
         NPC[numNPCs].Generator = n.generator;
@@ -362,7 +312,7 @@ void OpenLevelData(LevelData &lvl, const std::string FilePath)
         {
             checkPointId++;
             NPC[numNPCs].Special = checkPointId;
-            NPC[numNPCs].DefaultSpecial = int(NPC[numNPCs].Special);
+            NPC[numNPCs].DefaultSpecial = NPC[numNPCs].Special;
         }
         else if(NPC[numNPCs].Type == 97 || NPC[numNPCs].Type == 196) // Is a star
         {
@@ -910,3 +860,4 @@ void FindStars()
         }
     }
 }
+

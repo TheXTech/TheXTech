@@ -85,7 +85,7 @@ void OutroLoop()
             }
         }
         if(jumpBool == true || Player[A].Jump > 0)
-            Player[A].Controls.Jump = true;
+            Player[A].Controls.Jump = false;
     }
     UpdateNPCs();
     UpdateBlocks();
@@ -101,8 +101,8 @@ void SetupCredits()
     int A = 0;
     numCredits = 0;
 
-#ifdef CUSTOM_CREDITS_TITLE
-    AddCredit(CUSTOM_CREDITS_TITLE);
+#ifdef ENABLE_OLD_CREDITS
+    AddCredit("New Super Mario Bros. X");
 #else
     AddCredit("New Super Mario Bros. X");
 #endif
@@ -122,12 +122,12 @@ void SetupCredits()
     AddCredit("");
     AddCredit("");
 #ifndef ENABLE_OLD_CREDITS
-//AddCredit("C++ port By:");
-//AddCredit("");
-//AddCredit("Vitaly Novichkov");
-//AddCredit("'Wohlstand'");
-//AddCredit("");
-//AddCredit("");
+    AddCredit("Original C++ port By:");
+    AddCredit("");
+    AddCredit("Vitaly Novichkov");
+    AddCredit("'Wohlstand'");
+    AddCredit("");
+    AddCredit("");
     AddCredit("NSMBX By:");
     AddCredit("");
     AddCredit("Ekaterina Bolyakova");
@@ -154,6 +154,14 @@ void SetupCredits()
     AddCredit("");
     AddCredit("");
     AddCredit("");
+    AddCredit("Old NSMBX Team:");
+    AddCredit("");
+    AddCredit("XerX");
+    AddCredit("supermarioman");
+    AddCredit("Mr game&watch42");
+    AddCredit("");
+    AddCredit("");
+    AddCredit("");
     AddCredit("Custom Sprites:");
     AddCredit("");
     AddCredit("Blue");
@@ -162,6 +170,7 @@ void SetupCredits()
     AddCredit("NameUser");
     AddCredit("Redigit");
     AddCredit("Valtteri");
+    AddCredit("Core");
     AddCredit("");
     AddCredit("");
     AddCredit("");
@@ -217,39 +226,15 @@ void SetupCredits()
     AddCredit("");
     AddCredit("");
     AddCredit("");
-    AddCredit("'He has delivered us from the power");
-    AddCredit("of darkness and conveyed us into");
-    AddCredit("the kingdom of the Son of His love.'");
+    AddCredit("For in him all things were created:");
+    AddCredit("things in heaven and on earth,");
+    AddCredit("visible and invisible,");
+    AddCredit("whether thrones or powers");
+    AddCredit("or rulers or authorities;");
+    AddCredit("all things have been created through him");
+    AddCredit("and for him.");
     AddCredit("");
-    AddCredit("Colossians 1:13");
-    AddCredit("");
-    AddCredit("");
-    AddCredit("");
-    AddCredit("");
-    AddCredit("");
-    AddCredit("");
-    AddCredit("");
-    AddCredit("");
-    AddCredit("");
-    AddCredit("");
-    AddCredit("");
-    AddCredit("");
-    AddCredit("");
-    AddCredit("");
-    AddCredit("");
-    AddCredit("");
-    AddCredit("");
-    AddCredit("");
-#ifdef CUSTOM_CREDITS_URL
-    AddCredit(CUSTOM_CREDITS_URL);
-#else
-#   ifdef ENABLE_OLD_CREDITS
-    AddCredit("www.SuperMarioBrothers.org");
-#   else
-    AddCredit("wohlsoft.ru");
-#   endif
-#endif
-
+    AddCredit("Colossians 1:16");
     for(A = 1; A <= numCredits; A++)
     {
         Credit[A].Location.Width = Credit[A].Text.size() * 18;

@@ -163,6 +163,10 @@ void SetupVars()
     EffectHeight[26] = 32;
     EffectWidth[29] = 40;
     EffectHeight[29] = 64;
+    EffectWidth[166] = 70;
+    EffectHeight[166] = 122;
+    EffectWidth[165] = 64;
+    EffectHeight[165] = 48;
 
     for(int A = 153; A <= 154; ++A)
     {
@@ -350,6 +354,7 @@ void SetupVars()
     NPCScore[208] = 0;
     NPCScore[15] = 7;
     NPCScore[39] = 7;
+    NPCScore[335] = 9;
     NPCScore[86] = 9;
     NPCScore[200] = 9;
     NPCScore[201] = 9;
@@ -780,6 +785,14 @@ void SetupVars()
     NPCFrameOffsetY[39] = 2;
     NPCFrameOffsetX[39] = 3;
     NPCNoYoshi[39] = true;
+
+    NPCWidth[335] = 70; // Robirdo
+    NPCHeight[335] = 138;
+    NPCWidthGFX[335] = 70;
+    NPCHeightGFX[335] = 138;
+    NPCFrameOffsetY[335] = 2;
+    NPCFrameOffsetX[335] = 3;
+    NPCNoYoshi[335] = true;
 
     for(int A = 315; A <= 316; ++A)
     {
@@ -1299,6 +1312,9 @@ void SetupVars()
     NPCHeightGFX[334] = 22;
     NPCJumpHurt[334] = true;
     NPCNoGravity[334] = true;
+    NPCNoClipping[334] = true;
+
+    NPCDefaultMovement[333] = true;
 
     NPCWidth[148] = 32; // Black Yoshi
     NPCHeight[148] = 32;
@@ -1518,6 +1534,13 @@ void SetupVars()
     NPCWidthGFX[298] = 32;
     NPCHeightGFX[298] = 32;
 
+
+    NPCWidthGFX[336] = 64;
+    NPCHeightGFX[336] = 48;
+    NPCWidth[336] = 64;
+    NPCHeight[336] = 48;
+    NPCNoGravity[336] = true;
+
     NPCWidth[234] = 48;
 
     NPCHeightGFX[235] = 48;
@@ -1692,7 +1715,9 @@ void SetupVars()
     // NPCCanWalkOn[28] = true;
     NPCCanWalkOn[31] = true;
     NPCCanWalkOn[39] = true;
+    NPCCanWalkOn[335] = true;
     NPCCanWalkOn[40] = true;
+    NPCCanWalkOn[336] = true;
     NPCCanWalkOn[45] = true;
     NPCCanWalkOn[46] = true;
     NPCCanWalkOn[212] = true;
@@ -1735,6 +1760,7 @@ void SetupVars()
     // NPCGrabFromTop[28] = true;
     NPCGrabFromTop[31] = true;
     NPCGrabFromTop[40] = true;
+    NPCGrabFromTop[336] = true;
     NPCGrabFromTop[45] = true;
     NPCGrabFromTop[91] = true;
     NPCGrabFromTop[92] = true;
@@ -1949,6 +1975,12 @@ void SetupVars()
     NPCStandsOnPlayer[150] = true;
     NPCStandsOnPlayer[228] = true;
 
+    NPCWidth[337] = 180;
+    NPCHeight[337] = 180;
+    NPCNoGravity[337] = true;
+    NPCNoClipping[337] = true;
+    NPCJumpHurt[337] = true;
+    NPCWontHurt[337] = true;
 
     NPCCanWalkOn[272] = true;
     NPCGrabFromTop[272] = true;
@@ -2128,7 +2160,9 @@ void SetupVars()
     NPCNoIceBall[37] = true;
     NPCNoIceBall[38] = true;
     NPCNoIceBall[39] = true;
+    NPCNoIceBall[335] = true;
     NPCNoIceBall[40] = true;
+
     NPCNoIceBall[42] = true;
     NPCNoIceBall[43] = true;
     NPCNoIceBall[44] = true;
@@ -2283,6 +2317,9 @@ void SetupVars()
 
     BlockWidth[571] = 64;
     BlockWidth[572] = 64;
+    BlockWidth[707] = 64;
+    BlockHeight[707] = 32;
+    BlockOnlyHitspot1[707] = true;
     BlockWidth[615] = 64;
 
     BlockWidth[634] = 64;
@@ -2973,6 +3010,9 @@ void SetupVars()
     BackgroundHeight[169] = 64;
     BackgroundWidth[169] = 64;
     BackgroundHasNoMask[169] = true;
+
+    BackgroundWidth[204] = 374;
+    BackgroundHeight[204] = 250;
 
 
 

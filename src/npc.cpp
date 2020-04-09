@@ -499,7 +499,7 @@ void NPCSpecial(int A)
     }
     else if(NPC[A].Type == 332 || NPC[A].Type == 333)
     {
-        NPC[A].Special = NPC[A].Special + 0.1;
+        NPC[A].Special = NPC[A].Special + 0.08;
         NPC[A].Location.SpeedY = sin(NPC[A].Special);
 
         NPC[A].Special2++;
@@ -514,9 +514,9 @@ void NPCSpecial(int A)
                 NPC[numNPCs].Type = 334;
                 NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
                 NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
-                NPC[numNPCs].Location.X = NPC[A].Location.X + (NPC[A].Location.Width / 2);
-                NPC[numNPCs].Location.Y = NPC[A].Location.Y + NPC[A].Location.Height / 2;
-                NPC[numNPCs].Special = C;
+                NPC[numNPCs].Location.X = NPC[A].Location.X;
+                NPC[numNPCs].Location.Y = NPC[A].Location.Y;
+                NPC[numNPCs].Special = C + NPC[A].Special4;
                 NPC[numNPCs].TimeLeft = 100;
                 NPC[numNPCs].Section = NPC[A].Section;
             }
@@ -524,11 +524,15 @@ void NPCSpecial(int A)
         else if(NPC[A].Special2 >= 200)
         {
             NPC[A].Special2 = 0;
-            NPC[A].Location.SpeedX = 1 * NPC[A].Direction;
+            NPC[A].Special4 = NPC[A].Special4 + 4;
+            if(NPC[A].Special4 > 4)
+                NPC[A].Special4 = 0;
         }
 
         if(NPC[A].Special2 >= 100 && NPC[A].Type == 332)
             NPC[A].Location.SpeedX = 0;
+        else if(NPC[A].Special2 < 100 && NPC[A].Type == 332)
+            NPC[A].Location.SpeedX = 1.2 * NPC[A].Direction;
     }
     else if(NPC[A].Type == 334) // spiny's spike
     {
@@ -2818,6 +2822,23 @@ void NPCSpecial(int A)
         // End If
         // Sniffits
     }
+    else if(NPC[A].Type == 337)
+    {
+        const double rad2deg = 180.0 / M_PI;
+        NPC[A].Special6 += 2.5 / (0.5 * NPC[A].Location.Height) * rad2deg;
+        while(NPC[A].Special6 >= 360)
+        NPC[A].Special6 -= 360;
+        while(NPC[A].Special6 < 0)
+        NPC[A].Special6 += 360;
+        if(NPC[A].Special == 0)
+        {
+            numBlocks++;
+            Block[numBlocks] = Block_t();
+            Block[numBlocks].Active = true;
+            Block[numBlocks].Direction = NPC[A].Direction;
+            Block[numBlocks].Type = 707;
+        }
+    }
     else if(NPC[A].Type >= 130 && NPC[A].Type <= 132)
     {
         if(NPC[A].Projectile == true)
@@ -3795,63 +3816,56 @@ void SpecialNPC(int A)
         }
         if(NPC[A].Direction == 1)
             NPC[A].Frame = NPC[A].Frame + 3;
+    // Fireball code
     }
-    // Fireball code (Podoboo)
     else if(NPC[A].Type == 12)
     {
         if(NPC[A].Location.Y > NPC[A].DefaultLocation.Y + NPC[A].Location.Height + 16)
             NPC[A].Location.Y = NPC[A].DefaultLocation.Y + NPC[A].DefaultLocation.Height + 16;
-
         NPC[A].Projectile = true;
-
         // If .Location.X <> .DefaultLocation.X Then .Killed = 2
-        if(NPC[A].Special2 == 0.0)
+        if(NPC[A].Special2 == 0)
         {
             NPC[A].Location.Y = NPC[A].DefaultLocation.Y + NPC[A].Location.Height + 1.5;
             NPC[A].Special2 = 1;
             NPC[A].Special = 0;
             PlaySound(16);
             tempLocation = NPC[A].Location;
-            tempLocation.Y -= 32;
+            tempLocation.Y = tempLocation.Y - 32;
             NewEffect(13, tempLocation);
         }
-        else if(fEqual(NPC[A].Special2, 1))
+        else if(NPC[A].Special2 == 1)
         {
-            NPC[A].Special += 1;
+            NPC[A].Special = NPC[A].Special + 1;
             NPC[A].Location.SpeedY = -6;
-
             if(NPC[A].Location.Y < NPC[A].DefaultLocation.Y - 10)
             {
                 if(int(NPC[A].Special) % 5 == 0) {
                     NewEffect(12, NPC[A].Location);
                 }
             }
-
             if(NPC[A].Special >= 30)
             {
                 NPC[A].Special2 = 2;
                 NPC[A].Special = 0;
             }
         }
-        else if(fEqual(NPC[A].Special2, 2))
+        else if(NPC[A].Special2 == 2)
         {
-            NPC[A].Special += 1;
-
-            if(fEqual(NPC[A].Special, 61))
+            NPC[A].Special = NPC[A].Special + 1;
+            if(NPC[A].Special == 61)
             {
                 tempLocation = NPC[A].Location;
                 tempLocation.Y = tempLocation.Y + 2;
                 NewEffect(13, tempLocation);
                 PlaySound(16);
             }
-
             if(NPC[A].Special >= 150)
             {
                 NPC[A].Special2 = 0;
                 NPC[A].Special = 0;
             }
         }
-
         if(NPC[A].Location.Y > level[NPC[A].Section].Height + 1)
             NPC[A].Location.Y = level[NPC[A].Section].Height;
     }
@@ -5258,6 +5272,104 @@ void SpecialNPC(int A)
             NPC[A].Location.SpeedX = NPC[A].Location.SpeedX + 0.03;
             if(NPC[A].Location.SpeedX >= 0.6)
                 NPC[A].Special3 = 0;
+        }
+    }
+    else if(NPC[A].Type == 335 && NPC[A].Projectile == 0)
+    {
+        if(NPC[A].Special5 < 0)
+            NPC[A].Special5++;
+        if(NPC[A].Special2 == 0)
+            NPC[A].Special2 = 1;
+        if(NPC[A].Legacy)
+        {
+            if(NPC[A].TimeLeft > 1)
+                NPC[A].TimeLeft = 100;
+            if(bgMusic[NPC[A].Section] != 6 && bgMusic[NPC[A].Section] != 15 && bgMusic[NPC[A].Section] != 21 && NPC[A].TimeLeft > 1)
+            {
+                bgMusic[NPC[A].Section] = 15;
+                StopMusic();
+                StartMusic(NPC[A].Section);
+            }
+        }
+        if(NPC[A].Location.SpeedY == Physics.NPCGravity && NPC[A].Special < 2)
+            NPC[A].Special3++;
+        if(NPC[A].Special3 == 125)
+        {
+            C = (dRand() * 10);
+            if(C <= 5)
+               NPC[A].Special = 1;
+            if(C > 5)
+               NPC[A].Special = 2;
+        }
+        else if(NPC[A].Special3 == 150 && NPC[A].Location.SpeedY == Physics.NPCGravity)
+        {
+            NPC[A].Location.Y = NPC[A].Location.Y - 2;
+            NPC[A].Location.SpeedY = -6;
+            NPC[A].Special3 = 200;
+        }
+        else if(NPC[A].Special3 == 200 && NPC[A].Location.SpeedY == Physics.NPCGravity)
+        {
+            PlaySound(37);
+        }
+        else if(NPC[A].Special3 == 250)
+        {
+            NPC[A].Location.SpeedX = 5 * NPC[A].Direction;
+        }
+        else if(NPC[A].Special3 == 350)
+        {
+            NPC[A].Special = 0;
+            NPC[A].Special3 = 0;
+        }
+        if(NPC[A].Special == 0)
+        {
+            C = 0;
+            for(B = 1; B <= numPlayers; B++)
+            {
+                if(!Player[B].Dead && Player[B].Section == NPC[A].Section)
+                {
+                    if(C == 0 || std::abs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0)) < C)
+                    {
+                        C = std::abs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0));
+                        if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > Player[B].Location.X + Player[B].Location.Width / 2.0)
+                            NPC[A].Direction = -1;
+                        else
+                            NPC[A].Direction = 1;
+                    }
+                }
+            }
+            NPC[A].Location.SpeedX = 0.75 * NPC[A].Direction;
+        }
+        else if(NPC[A].Special == 1 && NPC[A].Special3 < 200)
+            NPC[A].Location.SpeedX = 0;
+        else if(NPC[A].Special == 2)
+        {
+            NPC[A].Special3 = 0;
+            NPC[A].Special4++;
+            NPC[A].Location.SpeedX = 0;
+            if(NPC[A].Special4 == 25 || NPC[A].Special4 == 75)
+            {
+                numNPCs++;
+                NPC[numNPCs] = NPC_t();
+                NPC[numNPCs].Active = true;
+                NPC[numNPCs].Direction = NPC[A].Direction;
+                NPC[numNPCs].Type = 336;
+                NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
+                NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
+                NPC[numNPCs].Location.Y = NPC[A].Location.Y + 52 - NPC[numNPCs].Location.Height / 2.0;
+                if(NPC[numNPCs].Direction == 1)
+                    NPC[numNPCs].Location.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0;
+                else
+                    NPC[numNPCs].Location.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0 - NPC[numNPCs].Location.Width;
+                NPC[numNPCs].TimeLeft = 100;
+                NPC[numNPCs].Section = NPC[A].Section;
+                NPC[numNPCs].Location.SpeedX = 4 * NPC[numNPCs].Direction;
+                PlaySound(38);
+            }
+            else if(NPC[A].Special4 > 125)
+            {
+                NPC[A].Special4 = 0;
+                NPC[A].Special = 0;
+            }
         }
     }
     else if((NPC[A].Type == 39 || NPC[A].Type == 315 || NPC[A].Type == 316) && NPC[A].Projectile == 0) // birdos

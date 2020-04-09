@@ -252,6 +252,7 @@ set(THEXTECH_SRC
     src/joystick.cpp
     src/load_gfx.cpp
     src/layers.cpp
+    src/layers_wld.cpp
     src/custom.cpp
     src/graphics.cpp
     src/editor.cpp

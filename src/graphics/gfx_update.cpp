@@ -1078,7 +1078,7 @@ void UpdateGraphics(bool skipRepaint)
         for(A = 1; A <= numNPCs; A++)
         {
             float cn = NPC[A].Shadow ? 0.f : 1.f;
-            if((NPC[A].Type == 294 || NPC[A].Type == 309 || NPC[A].Type == 329) && NPC[A].Active == true)
+            if((NPC[A].Type == 294 || NPC[A].Type == 309 || NPC[A].Type == 329 || NPC[A].Type == 337) && NPC[A].Active == true)
             {
                 frmMain.renderTextureFL(vScreenX[Z] + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type], vScreenY[Z] + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type], NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, 0, NPC[A].Special6, nullptr, SDL_FLIP_NONE, cn, cn, cn);
             }
@@ -1845,7 +1845,8 @@ void UpdateGraphics(bool skipRepaint)
                 frmMain.renderTexture(0, 0, GFX.MenuGFX[1].w, GFX.MenuGFX[1].h, GFX.MenuGFX[1], 0, 0);
                 frmMain.renderTexture(ScreenW / 2 - GFX.MenuGFX[2].w / 2, 70,
                         GFX.MenuGFX[2].w, GFX.MenuGFX[2].h, GFX.MenuGFX[2], 0, 0);
-
+                SuperPrint("Made By Core", 3, 20, 545);
+                SuperPrint("Version 1.0", 3, 20, 570);
                 if(MenuMode == 0)
                 {
                     SuperPrint("1 PLAYER GAME", 3, 300, 350);

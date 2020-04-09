@@ -1092,11 +1092,14 @@ void KillNPC(int A, int B)
              else
                  NewEffect(154, NPC[A].Location, NPC[A].Direction);
         }
-        else if(NPC[A].Type == 40) // Egg
+        else if(NPC[A].Type == 40 || NPC[A].Type == 336) // Egg
         {
             if(NPC[A].Special == 1)
                 NPC[A].Location.SpeedY = -5.1;
-            NewEffect(28 , NPC[A].Location);
+            if(NPC[A].Type == 40)
+                NewEffect(28 , NPC[A].Location);
+            else
+                NewEffect(165 , NPC[A].Location);
         }
         else if(NPC[A].Type == 6 || NPC[A].Type == 7 || NPC[A].Type == 161) // Red Koopa
         {

@@ -38,7 +38,7 @@ void DoCredits()
 
     for(A = 1; A <= numCredits; A++)
     {
-        Credit[A].Location.Y -= 0.8;
+        Credit[A].Location.Y -= 0.9;
 
         // Printing lines of credits
         if(Credit[A].Location.Y <= 600 && Credit[A].Location.Y + Credit[A].Location.Height >= 0)
@@ -47,7 +47,7 @@ void DoCredits()
         }
 
         // Closing screen
-        else if(A == numCredits && Credit[A].Location.Y + Credit[A].Location.Height < -100)
+        else if(A == numCredits && Credit[A].Location.Y + Credit[A].Location.Height < 0)
         {
             if(musicPlaying)
             {

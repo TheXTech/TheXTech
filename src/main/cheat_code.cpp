@@ -57,10 +57,15 @@ void CheatCode(char NewKey)
 
     CheatString.push_back(NewKey);
     if(CheatString.size() > 23)
-        CheatString.erase(0, 1);
+    {
+        for(size_t A = 2; A <= CheatString.size(); A++)
+            newCheat += CheatString.substr(A - 1, 1);
+        CheatString = newCheat;
+    }
     oldString = CheatString;
 
-//    D_pLogDebug("Cheat string: [%s]\n", CheatString.c_str());
+//    std::printf("Cheat string: [%s]\n", CheatString.c_str());
+//    std::fflush(stdout);
 
 #ifdef ENABLE_ANTICHEAT_TRAP
     if(SDL_strstr(CheatString.c_str(), "redigitiscool"))
