@@ -28,6 +28,7 @@
 #include "effect.h"
 #include "collision.h"
 #include "npc.h"
+#include "player.h"
 #include "sound.h"
 #include "graphics.h"
 #include "game_main.h"
@@ -65,6 +66,14 @@ void ShowLayer(std::string LayerName, bool NoEffect)
                 Layer[A].Hidden = true;
             if(Layer[A].Name == "Spawned NPCs")
                 Layer[A].Hidden = false;
+        }
+        for(int I = 1; I <= maxPlayers; I++)
+        {
+            if(Layer[A].Name == "Att-Player" + I)
+            {
+                Layer[A].SpeedX = Player[I].Location.SpeedX;
+                Layer[A].SpeedY = Player[I].Location.SpeedX;
+            }
         }
     }
 

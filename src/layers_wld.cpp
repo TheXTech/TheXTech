@@ -257,19 +257,16 @@ void HideLayerWLD(std::string LayerName, bool NoEffect)
 void ProcEventWLD(std::string EventName, bool NoEffect)
 {
     // this is for events that have just been triggered
-    int A = 0;
-    int B = 0;
-    int C = 0;
     bool tempBool = false;
 
     if(EventName.empty() || LevelEditor == true)
         return;
 
-    for(A = 0; A <= maxEventsWld; A++)
+    for(int A = 0; A <= maxEventsWld; A++)
     {
         if(equalCase(EventName, EventsWld[A].Name))
         {
-            for(B = 0; B <= 20; B++)
+            for(int B = 0; B <= 20; B++)
             {
                 if(NoEffect == true)
                 {
@@ -284,7 +281,7 @@ void ProcEventWLD(std::string EventName, bool NoEffect)
 
                 if(!(EventsWld[A].ToggleLayer[B].empty()))
                 {
-                    for(C = 0; C <= maxLayersWld; C++)
+                    for(int C = 0; C <= maxLayersWld; C++)
                     {
                         if(LayerWld[C].Name == EventsWld[A].ToggleLayer[B])
                         {
@@ -303,7 +300,7 @@ void ProcEventWLD(std::string EventName, bool NoEffect)
 
             if(!EventsWld[A].MoveLayer.empty())
             {
-                for(B = 0; B <= maxLayersWld; B++)
+                for(int B = 0; B <= maxLayersWld; B++)
                 {
                     if(LayerWld[B].Name == EventsWld[A].MoveLayer)
                     {
@@ -314,23 +311,48 @@ void ProcEventWLD(std::string EventName, bool NoEffect)
                         {
                             // stop layer
                             LayerWld[B].EffectStop = false;
-                            for(C = 1; C <= numBlock; C++)
+                            for(int I = 1; I <= numTiles; I++)
                             {
-                                if(Block[C].Layer == LayerWld[B].Name)
+                                if(Tile[I].Layer == LayerWld[B].Name)
                                 {
-                                    Block[C].Location.SpeedX = double(LayerWld[B].SpeedX);
-                                    Block[C].Location.SpeedY = double(LayerWld[B].SpeedY);
+                                    Tile[I].Location.X = double(LayerWld[B].SpeedX);
+                                    Tile[I].Location.Y = double(LayerWld[B].SpeedY);
                                 }
                             }
-                            for(C = 1; C <= numNPCs; C++)
+
+                            for(int I = 1; I <= numScenes; I++)
                             {
-                                if(NPC[C].Layer == LayerWld[B].Name)
+                                if(Scene[I].Layer == LayerWld[B].Name)
                                 {
-                                    if(NPCIsAVine[NPC[C].Type] || NPC[C].Type == 91)
-                                    {
-                                        NPC[C].Location.SpeedX = 0;
-                                        NPC[C].Location.SpeedY = 0;
-                                    }
+                                     Scene[I].Location.X = double(LayerWld[B].SpeedX);
+                                     Scene[I].Location.Y = double(LayerWld[B].SpeedY);
+                                }
+                            }
+
+                            for(int I = 1; I <= numWorldPaths; I++)
+                            {
+                                if(WorldPath[I].Layer == LayerWld[B].Name)
+                                {
+                                     WorldPath[I].Location.X = double(LayerWld[B].SpeedX);
+                                     WorldPath[I].Location.Y = double(LayerWld[B].SpeedY);
+                                }
+                            }
+
+                            for(int I = 1; I <= numWorldLevels; I++)
+                            {
+                                if(WorldLevel[I].Layer == LayerWld[B].Name)
+                                {
+                                     WorldLevel[I].Location.X = double(LayerWld[B].SpeedX);
+                                     WorldLevel[I].Location.Y = double(LayerWld[B].SpeedY);
+                                }
+                            }
+
+                            for(int I = 1; I <= numWorldMusic; I++)
+                            {
+                                if(WorldMusic[I].Layer == LayerWld[B].Name)
+                                {
+                                      WorldMusic[I].Location.X = double(LayerWld[B].SpeedX);
+                                      WorldMusic[I].Location.Y = double(LayerWld[B].SpeedY);
                                 }
                             }
                         }
@@ -366,7 +388,7 @@ void ProcEventWLD(std::string EventName, bool NoEffect)
             {
                 if(int(EventsWld[A].TriggerDelay) == 0)
                 {
-                    for(B = 0; B <= maxEventsWld; B++)
+                    for(int B = 0; B <= maxEventsWld; B++)
                     {
                         if(EventsWld[B].Name == EventsWld[A].TriggerEvent)
                         {
@@ -395,11 +417,10 @@ void UpdateEventsWLD()
 {
     // this is for evetns that have a delay to call other events
     // this sub also updates the screen position for autoscroll levels
-    int A = 0;
 
     if(newEventWldNum > 0)
     {
-        for(A = 1; A <= newEventWldNum; A++)
+        for(int A = 1; A <= newEventWldNum; A++)
         {
             if(newEventWldDelay[A] > 0)
                 newEventWldDelay[A]--;
@@ -409,36 +430,6 @@ void UpdateEventsWLD()
                 newEventWldDelay[A] = newEventWldDelay[newEventWldNum];
                 NewEventWld[A] = NewEventWld[newEventWldNum];
                 newEventWldNum--;
-            }
-        }
-    }
-    for(A = 0; A <= maxSections; A++)
-    {
-        if(AutoX[A] != 0.0f || AutoY[A] != 0.0f)
-        {
-            level[A].X += double(AutoX[A]);
-            level[A].Width += double(AutoX[A]);
-            level[A].Y += double(AutoY[A]);
-            level[A].Height += double(AutoY[A]);
-            if(level[A].Width > LevelREAL[A].Width)
-            {
-                level[A].Width = LevelREAL[A].Width;
-                level[A].X = LevelREAL[A].Width - 800;
-            }
-            if(level[A].X < LevelREAL[A].X)
-            {
-                level[A].Width = LevelREAL[A].X + 800;
-                level[A].X = LevelREAL[A].X;
-            }
-            if(level[A].Height > LevelREAL[A].Height)
-            {
-                level[A].Height = LevelREAL[A].Height;
-                level[A].Y = LevelREAL[A].Height - 800;
-            }
-            if(level[A].Y < LevelREAL[A].Y)
-            {
-                level[A].Height = LevelREAL[A].Y + 800;
-                level[A].Y = LevelREAL[A].Y;
             }
         }
     }
