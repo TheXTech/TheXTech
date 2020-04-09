@@ -860,6 +860,8 @@ struct WorldLevel_t
     bool Start = false;
 //    Visible As Boolean 'true if it should be shown on the map
     bool Visible = false;
+    std::string Layer;
+    bool Hidden = false;
 //End Type
 };
 
@@ -925,6 +927,8 @@ struct Tile_t
     Location_t Location;
 //    Type As Integer
     int Type = 0;
+    std::string Layer;
+    bool Hidden = false;
 //End Type
 };
 
@@ -937,6 +941,8 @@ struct Scene_t
     int Type = 0;
 //    Active As Boolean 'if false this won't be shown. used for paths that become available on a scene
     bool Active = false;
+    std::string Layer;
+    bool Hidden = false;
 //End Type
 };
 
@@ -949,6 +955,8 @@ struct WorldPath_t
     bool Active = false;
 //    Type As Integer
     int Type = 0;
+    std::string Layer;
+    bool Hidden = false;
 //End Type
 };
 
@@ -961,6 +969,8 @@ struct WorldMusic_t
     int Type = 0;
 //    EXTRA: Custom Music
     std::string MusicFile;
+    std::string Layer;
+    bool Hidden = false;
 //End Type
 };
 

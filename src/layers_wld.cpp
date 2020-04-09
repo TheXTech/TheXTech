@@ -32,10 +32,6 @@
 #include "graphics.h"
 #include "game_main.h"
 
-#include <Utils/strings.h>
-#include <Utils/files.h>
-#include <PGE_File_Formats/file_formats.h>
-
 int numLayers = 0;
 RangeArr<Layer_t, 0, maxLayers> Layer;
 
@@ -53,21 +49,18 @@ static SDL_INLINE bool equalCase(const std::string &x, const std::string &y)
 
 void ShowLayerWLD(std::string LayerName, bool NoEffect)
 {
-    WorldData wld;
-    int A = 0;
-    int B = 0;
     Location_t tempLocation;
 
     if(LayerName.empty())
         return;
 
-    for(A = 0; A <= maxLayers; A++)
+    for(int A = 0; A <= maxLayers; A++)
     {
         if(equalCase(Layer[A].Name, LayerName))
             Layer[A].Hidden = true;
     }
 
-    for(auto &t : wld.tiles)
+    for(int A = 1; A <= numTiles; A++)
     {
         if(equalCase(Tile[A].Layer, LayerName))
         {
@@ -85,7 +78,7 @@ void ShowLayerWLD(std::string LayerName, bool NoEffect)
         }
     }
 
-    for(auto &s : wld.scenery)
+    for(int A = 1; A <= numScenes; A++)
     {
         if(equalCase(Scene[A].Layer, LayerName))
         {
@@ -103,7 +96,7 @@ void ShowLayerWLD(std::string LayerName, bool NoEffect)
         }
     }
 
-    for(auto &p : wld.paths)
+    for(int A = 1; A <= numWorldPaths; A++)
     {
         if(equalCase(WorldPath[A].Layer, LayerName))
         {
@@ -121,7 +114,7 @@ void ShowLayerWLD(std::string LayerName, bool NoEffect)
         }
     }
 
-    for(auto &l : wld.levels)
+    for(int A = 1; A <= numWorldLevels; A++)
     {
         if(equalCase(WorldLevel[A].Layer, LayerName))
         {
@@ -139,7 +132,7 @@ void ShowLayerWLD(std::string LayerName, bool NoEffect)
         }
     }
 
-    for(auto &m : wld.music)
+    for(int A = 1; A <= numWorldMusic; A++)
     {
         if(equalCase(WorldMusic[A].Layer, LayerName))
         {
@@ -160,19 +153,17 @@ void ShowLayerWLD(std::string LayerName, bool NoEffect)
 
 void HideLayerWLD(std::string LayerName, bool NoEffect)
 {
-    int A = 0;
-    WorldData wld;
     Location_t tempLocation;
     if(LayerName.empty())
         return;
 
-    for(A = 0; A <= maxLayers; A++)
+    for(int A = 0; A <= maxLayers; A++)
     {
         if(equalCase(Layer[A].Name, LayerName))
             Layer[A].Hidden = true;
     }
 
-    for(auto &t : wld.tiles)
+    for(int A = 1; A <= numTiles; A++)
     {
         if(equalCase(Tile[A].Layer, LayerName))
         {
@@ -190,7 +181,7 @@ void HideLayerWLD(std::string LayerName, bool NoEffect)
         }
     }
 
-    for(auto &s : wld.scenery)
+    for(int A = 1; A <= numScenes; A++)
     {
         if(equalCase(Scene[A].Layer, LayerName))
         {
@@ -208,7 +199,7 @@ void HideLayerWLD(std::string LayerName, bool NoEffect)
         }
     }
 
-    for(auto &p : wld.paths)
+    for(int A = 1; A <= numWorldPaths; A++)
     {
         if(equalCase(WorldPath[A].Layer, LayerName))
         {
@@ -226,7 +217,7 @@ void HideLayerWLD(std::string LayerName, bool NoEffect)
         }
     }
 
-    for(auto &l : wld.levels)
+    for(int A = 1; A <= numWorldLevels; A++)
     {
         if(equalCase(WorldLevel[A].Layer, LayerName))
         {
@@ -244,7 +235,7 @@ void HideLayerWLD(std::string LayerName, bool NoEffect)
         }
     }
 
-    for(auto &m : wld.music)
+    for(int A = 1; A <= numWorldMusic; A++)
     {
         if(equalCase(WorldMusic[A].Layer, LayerName))
         {
@@ -312,7 +303,7 @@ void ProcEventWLD(std::string EventName, bool NoEffect)
                 {
                     tempLevel = level[B];
                     level[B] = Events[A].level[B];
-                    if(Events[A].AutoStart == false && Events[A].Name != "Level - Start")
+                    if(Events[A].AutoStart == false && Events[A].Name != "World - Start")
                     {
                         for(C = 1; C <= numPlayers; C++)
                         {
@@ -512,14 +503,9 @@ void ProcEventWLD(std::string EventName, bool NoEffect)
                 LevelMacro = 5;
             }
 
-            ForcedControls = (Events[A].Controls.AltJump ||
-                              Events[A].Controls.AltRun ||
-                              Events[A].Controls.Down ||
-                              Events[A].Controls.Drop ||
-                              Events[A].Controls.Jump ||
+            ForcedControls = (Events[A].Controls.Down ||
                               Events[A].Controls.Left ||
                               Events[A].Controls.Right ||
-                              Events[A].Controls.Run ||
                               Events[A].Controls.Start ||
                               Events[A].Controls.Up);
 
@@ -560,18 +546,6 @@ void UpdateEventsWLD()
     // this is for evetns that have a delay to call other events
     // this sub also updates the screen position for autoscroll levels
     int A = 0;
-    int B = 0;
-    if(FreezeNPCs == true)
-        return;
-
-    if(GameMenu == false)
-    {
-        for(B = 1; B <= numPlayers; B++)
-        {
-            if(!(Player[B].Effect == 0 || Player[B].Effect == 3 || Player[B].Effect == 9 || Player[B].Effect == 10))
-                return;
-        }
-    }
 
     if(newEventNum > 0)
     {
@@ -622,180 +596,51 @@ void UpdateEventsWLD()
 
 void UpdateLayersWLD()
 {
-    // this is mainly for moving layers
-    int A = 0;
-    int B = 0;
-    int C = 0;
-
-    bool FreezeLayers = false;
-
-    if(!GameMenu)
+    for(int A = 0; A <= maxLayers; A++)
     {
-        for(B = 1; B <= numPlayers; B++)
-        {
-            if(!(Player[B].Effect == 0 || Player[B].Effect == 3 || Player[B].Effect == 9 || Player[B].Effect == 10))
-            {
-                for(A = 0; A <= maxLayers; A++)
-                {
-                    if(Layer[A].Name != "" && (Layer[A].SpeedX != 0.f || Layer[A].SpeedY != 0.f) && Layer[A].EffectStop)
-                    {
-                        for(C = 1; C <= numBlock; C++)
-                        {
-                            if(Block[C].Layer == Layer[A].Name)
-                            {
-                                Block[C].Location.SpeedX = 0;
-                                Block[C].Location.SpeedY = 0;
-                            }
-                        }
-                    }
-                }
-                FreezeLayers = true;
-            }
-        }
-    }
+         for(int B = 1; A <= numTiles; A++)
+         {
+             if(Tile[B].Layer == Layer[A].Name)
+             {
+                 Tile[B].Location.X += double(Layer[A].SpeedX);
+                 Tile[B].Location.Y += double(Layer[A].SpeedY);
+             }
+         }
 
-    for(A = 0; A <= maxLayers; A++)
-    {
-        if(FreezeNPCs == true)
-        {
-            if(Layer[A].Name != "" && (Layer[A].SpeedX != 0.f || Layer[A].SpeedY != 0.f))
-            {
-                for(B = 1; B <= numBlock; B++)
-                {
-                    if(Block[B].Layer == Layer[A].Name)
-                    {
-                        Block[B].Location.SpeedX = 0;
-                        Block[B].Location.SpeedY = 0;
-                    }
-                }
-            }
-        }
-        else
-        {
-            if(!Layer[A].Name.empty() && (Layer[A].SpeedX != 0.f || Layer[A].SpeedY != 0.f) &&
-               !(FreezeLayers && Layer[A].EffectStop))
-            {
-                for(B = 1; B <= numBlock; B++)
-                {
-                    if(Block[B].Layer == Layer[A].Name)
-                    {
-                        if(Layer[A].SpeedX != 0.f)
-                        {
-                            if(BlocksSorted == true)
-                            {
-                                for(C = (int)(-FLBlocks); C <= FLBlocks; C++)
-                                {
-                                    FirstBlock[C] = 1;
-                                    LastBlock[C] = numBlock;
-                                }
-                                BlocksSorted = false;
-                            }
-                        }
-                        Block[B].Location.X += double(Layer[A].SpeedX);
-                        Block[B].Location.Y += double(Layer[A].SpeedY);
-                        Block[B].Location.SpeedX = double(Layer[A].SpeedX);
-                        Block[B].Location.SpeedY = double(Layer[A].SpeedY);
-                    }
-                }
+         for(int B = 1; A <= numScenes; A++)
+         {
+             if(Scene[B].Layer == Layer[A].Name)
+             {
+                  Scene[B].Location.X += double(Layer[A].SpeedX);
+                  Scene[B].Location.Y += double(Layer[A].SpeedY);
+             }
+         }
 
-                int allBGOs = numBackground + numLocked;
-                for(B = 1; B <= allBGOs; B++)
-                {
-                    if(Background[B].Layer == Layer[A].Name)
-                    {
-                        Background[B].Location.X += double(Layer[A].SpeedX);
-                        Background[B].Location.Y += double(Layer[A].SpeedY);
-                    }
-                }
+         for(int B = 1; A <= numWorldPaths; A++)
+         {
+             if(WorldPath[B].Layer == Layer[A].Name)
+             {
+                  WorldPath[B].Location.X += double(Layer[A].SpeedX);
+                  WorldPath[B].Location.Y += double(Layer[A].SpeedY);
+             }
+         }
 
-                for(B = 1; B <= numWater; B++)
-                {
-                    if(Water[B].Layer == Layer[A].Name)
-                    {
-                        Water[B].Location.X += double(Layer[A].SpeedX);
-                        Water[B].Location.Y += double(Layer[A].SpeedY);
-                    }
-                }
+         for(int B = 1; A <= numWorldLevels; A++)
+         {
+             if(WorldLevel[B].Layer == Layer[A].Name)
+             {
+                  WorldLevel[B].Location.X += double(Layer[A].SpeedX);
+                  WorldLevel[B].Location.Y += double(Layer[A].SpeedY);
+             }
+         }
 
-                for(B = 1; B <= numNPCs; B++)
-                {
-                    if(NPC[B].Layer == Layer[A].Name)
-                    {
-                        NPC[B].DefaultLocation.X += double(Layer[A].SpeedX);
-                        NPC[B].DefaultLocation.Y += double(Layer[A].SpeedY);
-
-                        if(!NPC[B].Active || NPC[B].Generator || NPC[B].Effect != 0 ||
-                           NPCIsACoin[NPC[B].Type] || NPC[B].Type == 8 || NPC[B].Type == 37 ||
-                           NPC[B].Type == 51 || NPC[B].Type == 52 || NPC[B].Type == 46 ||
-                           NPC[B].Type == 93 || NPC[B].Type == 74 || NPCIsAVine[NPC[B].Type] ||
-                           NPC[B].Type == 192 || NPC[B].Type == 197 || NPC[B].Type == 91 ||
-                           NPC[B].Type == 211 || NPC[B].Type == 256 || NPC[B].Type == 257 ||
-                           NPC[B].Type == 245)
-                        {
-                            if(NPC[B].Type == 91 || NPC[B].Type == 211)
-                            {
-                                NPC[B].Location.SpeedX = double(Layer[A].SpeedX);
-                                NPC[B].Location.SpeedY = double(Layer[A].SpeedY);
-                            }
-                            else if(NPCIsAVine[NPC[B].Type])
-                            {
-                                NPC[B].Location.SpeedX = double(Layer[A].SpeedX);
-                                NPC[B].Location.SpeedY = double(Layer[A].SpeedY);
-                            }
-
-                            if(!NPC[B].Active)
-                            {
-                                NPC[B].Location.X = NPC[B].DefaultLocation.X;
-                                NPC[B].Location.Y = NPC[B].DefaultLocation.Y;
-                                if(NPC[B].Type == 8 || NPC[B].Type == 74 || NPC[B].Type == 93 ||
-                                   NPC[B].Type == 256 || NPC[B].Type == 245)
-                                    NPC[B].Location.Y += NPC[B].DefaultLocation.Height;
-                                else if(NPC[B].Type == 52 && fEqual(NPC[B].Direction, -1))
-                                    NPC[B].Location.X += NPC[B].DefaultLocation.Width;
-                            }
-                            else
-                            {
-                                NPC[B].Location.X += double(Layer[A].SpeedX);
-                                NPC[B].Location.Y += double(Layer[A].SpeedY);
-                            }
-
-                            if(NPC[B].Effect == 4)
-                            {
-                                if(NPC[B].Effect3 == 1 || NPC[B].Effect3 == 3)
-                                    NPC[B].Effect2 += double(Layer[A].SpeedY);
-                                else
-                                    NPC[B].Effect2 += double(Layer[A].SpeedX);
-                            }
-
-                            if(!NPC[B].Active)
-                            {
-                                if(!NPC[B].AttLayer.empty())
-                                {
-                                     for(C = 1; C <= maxLayers; C++)
-                                     {
-                                         if(NPC[B].AttLayer == Layer[C].Name)
-                                         {
-                                             Layer[C].SpeedX = Layer[A].SpeedX;
-                                             Layer[C].SpeedY = Layer[A].SpeedY;
-                                         }
-                                     }
-                                 }
-                             }
-                        }
-                    }
-                }
-
-                for(B = 1; B <= numWarps; B++)
-                {
-                    if(Warp[B].Layer == Layer[A].Name)
-                    {
-                        Warp[B].Entrance.X += double(Layer[A].SpeedX);
-                        Warp[B].Entrance.Y += double(Layer[A].SpeedY);
-                        Warp[B].Exit.X += double(Layer[A].SpeedX);
-                        Warp[B].Exit.Y += double(Layer[A].SpeedY);
-                    }
-                }
-            }
-        }
+         for(int B = 1; A <= numWorldMusic; A++)
+         {
+             if(WorldMusic[B].Layer == Layer[A].Name)
+             {
+                   WorldMusic[B].Location.X += double(Layer[A].SpeedX);
+                   WorldMusic[B].Location.Y += double(Layer[A].SpeedY);
+             }
+         }
     }
 }

@@ -64,11 +64,11 @@ struct Events_t
 //    Text As String
     std::string Text;
 //    HideLayer(0 To 20) As String
-    RangeArr<std::string, 0, 20> HideLayer;
+    RangeArr<std::string, 0, 20> HideLayerWLD;
 //    ShowLayer(0 To 20) As String
-    RangeArr<std::string, 0, 20> ShowLayer;
+    RangeArr<std::string, 0, 20> ShowLayerWLD;
 //    ToggleLayer(0 To 20) As String
-    RangeArr<std::string, 0, 20> ToggleLayer;
+    RangeArr<std::string, 0, 20> ToggleLayerWLD;
 //    TriggerEvent As String
     std::string TriggerEvent;
 //    TriggerDelay As Double
