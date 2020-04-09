@@ -2832,11 +2832,15 @@ void NPCSpecial(int A)
         NPC[A].Special6 += 360;
         if(NPC[A].Special == 0)
         {
-            numBlocks++;
-            Block[numBlocks] = Block_t();
-            Block[numBlocks].Active = true;
-            Block[numBlocks].Direction = NPC[A].Direction;
-            Block[numBlocks].Type = 707;
+            numBlock++;
+            Block[numBlock] = Block_t();
+#if 0 // TODO: Указать позицию и обязательно РАЗМЕР блока
+            Block[numBlock].Location.X = ;
+            Block[numBlock].Location.Y = ;
+            Block[numBlock].Location.Width = ;
+            Block[numBlock].Location.Height = ;
+#endif
+            Block[numBlock].Type = 707;
         }
     }
     else if(NPC[A].Type >= 130 && NPC[A].Type <= 132)

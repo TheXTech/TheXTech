@@ -23,8 +23,8 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef LAYERS_H
-#define LAYERS_H
+#ifndef LAYERS_WLD_H
+#define LAYERS_WLD_H
 
 #include <string>
 #include "range_arr.hpp"
@@ -33,7 +33,7 @@
 #include "controls.h"
 
 //Public Type Layer
-struct Layer_t
+struct LayerWld_t
 {
 //    EffectStop As Boolean
     bool EffectStop = false;
@@ -49,12 +49,8 @@ struct Layer_t
 };
 
 //Public Type Events
-struct Events_t
+struct EventsWld_t
 {
-//    addSavedEvent As String
-    std::string addSavedEvent;
-//    RemoveSavedEvent As String
-    std::string RemoveSavedEvent;
 //    LayerSmoke As Boolean
     bool LayerSmoke = false;
 //    Sound As Integer
@@ -64,11 +60,11 @@ struct Events_t
 //    Text As String
     std::string Text;
 //    HideLayer(0 To 20) As String
-    RangeArr<std::string, 0, 20> HideLayerWLD;
+    RangeArr<std::string, 0, 20> HideLayer;
 //    ShowLayer(0 To 20) As String
-    RangeArr<std::string, 0, 20> ShowLayerWLD;
+    RangeArr<std::string, 0, 20> ShowLayer;
 //    ToggleLayer(0 To 20) As String
-    RangeArr<std::string, 0, 20> ToggleLayerWLD;
+    RangeArr<std::string, 0, 20> ToggleLayer;
 //    TriggerEvent As String
     std::string TriggerEvent;
 //    TriggerDelay As Double
@@ -81,33 +77,27 @@ struct Events_t
     float SpeedX = 0.0f;
 //    SpeedY As Single
     float SpeedY = 0.0f;
-//    AutoX As Single
-    float AutoX = 0.0f;
-//    AutoY As Single
-    float AutoY = 0.0f;
-//    AutoSection As Integer
-    int AutoSection = 0;
 //    AutoStart As Boolean
     bool AutoStart = false;
 //End Type
 };
 
 //Public Layer(0 To 100) As Layer
-const int maxLayers = 255; // 100
-extern int numLayers;
-extern RangeArr<Layer_t, 0, maxLayers> Layer;
+const int maxLayersWld = 255; // 100
+extern int numLayersWld;
+extern RangeArr<LayerWld_t, 0, maxLayersWld> LayerWld;
 
 //Public Events(0 To 100) As Events
-const int maxEvents = 255; // 100
-extern int numEvents;
-extern RangeArr<Events_t, 0, maxEvents> Events;
+const int maxEventsWld = 255; // 100
+extern int numEventsWld;
+extern RangeArr<EventsWld_t, 0, maxEventsWld> EventsWld;
 
 //Public NewEvent(1 To 100) As String
-extern RangeArr<std::string, 1, maxEvents> NewEvent;
+extern RangeArr<std::string, 1, maxEventsWld> NewEventWld;
 //Public newEventDelay(1 To 100) As Integer
-extern RangeArrI<int, 1, maxEvents, 0> newEventDelay;
+extern RangeArrI<int, 1, maxEventsWld, 0> newEventWldDelay;
 //Public newEventNum As Integer
-extern int newEventNum;
+extern int newEventWldNum;
 
 // Public Sub ShowLayer(LayerName As String, Optional NoEffect As Boolean = False) 'shows a layer
 // shows a layer

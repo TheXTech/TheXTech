@@ -24,7 +24,7 @@
  */
 
 #include "globals.h"
-#include "layers.h"
+#include "layers_wld.h"
 #include "effect.h"
 #include "collision.h"
 #include "npc.h"
@@ -32,15 +32,15 @@
 #include "graphics.h"
 #include "game_main.h"
 
-int numLayers = 0;
-RangeArr<Layer_t, 0, maxLayers> Layer;
+int numLayersWld = 0;
+RangeArr<LayerWld_t, 0, maxLayersWld> LayerWld;
 
-int numEvents = 0;
-RangeArr<Events_t, 0, maxEvents> Events;
+int numEventsWld = 0;
+RangeArr<EventsWld_t, 0, maxEventsWld> EventsWld;
 
-RangeArr<std::string, 1, maxEvents> NewEvent;
-RangeArrI<int, 1, maxEvents, 0> newEventDelay;
-int newEventNum = 0;
+RangeArr<std::string, 1, maxEventsWld> NewEventWld;
+RangeArrI<int, 1, maxEventsWld, 0> newEventWldDelay;
+int newEventWldNum = 0;
 
 static SDL_INLINE bool equalCase(const std::string &x, const std::string &y)
 {
@@ -54,10 +54,10 @@ void ShowLayerWLD(std::string LayerName, bool NoEffect)
     if(LayerName.empty())
         return;
 
-    for(int A = 0; A <= maxLayers; A++)
+    for(int A = 0; A <= maxLayersWld; A++)
     {
-        if(equalCase(Layer[A].Name, LayerName))
-            Layer[A].Hidden = true;
+        if(equalCase(LayerWld[A].Name, LayerName))
+            LayerWld[A].Hidden = true;
     }
 
     for(int A = 1; A <= numTiles; A++)
@@ -157,10 +157,10 @@ void HideLayerWLD(std::string LayerName, bool NoEffect)
     if(LayerName.empty())
         return;
 
-    for(int A = 0; A <= maxLayers; A++)
+    for(int A = 0; A <= maxLayersWld; A++)
     {
-        if(equalCase(Layer[A].Name, LayerName))
-            Layer[A].Hidden = true;
+        if(equalCase(LayerWld[A].Name, LayerName))
+            LayerWld[A].Hidden = true;
     }
 
     for(int A = 1; A <= numTiles; A++)
@@ -260,212 +260,71 @@ void ProcEventWLD(std::string EventName, bool NoEffect)
     int A = 0;
     int B = 0;
     int C = 0;
-    int D = 0;
-    int plr = 0;
     bool tempBool = false;
-    Location_t tempLevel;
-    vScreen_t screenLoc;
-    double tX = 0;
-    double tY = 0;
 
     if(EventName.empty() || LevelEditor == true)
         return;
 
-    for(A = 0; A <= maxEvents; A++)
+    for(A = 0; A <= maxEventsWld; A++)
     {
-        if(equalCase(EventName, Events[A].Name))
+        if(equalCase(EventName, EventsWld[A].Name))
         {
-            for(B = 0; B <= maxSections; B++)
-            {
-                if(Events[A].Music[B] == -2)
-                {
-                    bgMusic[B] = bgMusicREAL[B];
-                    if(B == Player[1].Section || (numPlayers == 2 && B == Player[2].Section))
-                    {
-                        StartMusic(B);
-                    }
-                }
-                else if(Events[A].Music[B] != -1)
-                {
-                    bgMusic[B] = Events[A].Music[B];
-                    if(B == Player[1].Section || (numPlayers == 2 && B == Player[2].Section))
-                    {
-                        StartMusic(B);
-                    }
-                }
-                if(Events[A].Background[B] == -2)
-                    Background2[B] = Background2REAL[B];
-                else if(Events[A].Background[B] != -1)
-                    Background2[B] = Events[A].Background[B];
-                if(int(Events[A].level[B].X) == -2)
-                    level[B] = LevelREAL[B];
-                else if(int(Events[A].level[B].X) != -1)
-                {
-                    tempLevel = level[B];
-                    level[B] = Events[A].level[B];
-                    if(Events[A].AutoStart == false && Events[A].Name != "World - Start")
-                    {
-                        for(C = 1; C <= numPlayers; C++)
-                        {
-                            // If .Section = B Then
-                            Player[C].Section = B;
-                            tempBool = false;
-                            if(Player[C].Location.X + Player[C].Location.Width >= level[B].X)
-                            {
-                                if(Player[C].Location.X <= level[B].Width)
-                                {
-                                    if(Player[C].Location.Y + Player[C].Location.Height >= level[B].Y)
-                                    {
-                                        if(Player[C].Location.Y <= level[B].Height)
-                                        {
-                                            tempBool = true; // Check to see if player is still in section after resizing
-                                            plr = C;
-                                        }
-                                    }
-                                }
-                            }
-                            if(tempBool == false)
-                            {
-                                for(D = 1; D <= numPlayers; D++)
-                                {
-                                    if(D != C && Player[D].Section == B)
-                                    {
-                                        if(Player[D].Location.X + Player[D].Location.Width >= level[B].X)
-                                        {
-                                            if(Player[D].Location.X <= level[B].Width)
-                                            {
-                                                if(Player[D].Location.Y + Player[D].Location.Height >= level[B].Y)
-                                                {
-                                                    if(Player[D].Location.Y <= level[B].Height) // Move to another player who is still in the section
-                                                    {
-                                                        Player[C].Location.X = Player[D].Location.X + Player[D].Location.Width / 2.0 - Player[C].Location.Width / 2.0;
-                                                        Player[C].Location.Y = Player[D].Location.Y + Player[D].Location.Height - Player[C].Location.Height;
-                                                        Player[C].Effect = 9;
-                                                        Player[C].Effect2 = D;
-                                                        break;
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            // End If
-                        }
-                    }
-
-                    if(Events[A].Name != "Level - Start")
-                    {
-                        C = plr;
-                        if(numPlayers == 2 && DScreenType != 5)
-                        {
-                            tX = vScreenX[C];
-                            tY = vScreenY[C];
-                            level[B] = tempLevel;
-                            screenLoc = vScreen[C];
-                            SoundPause[13] = 10;
-                            DynamicScreen();
-                            GetvScreenAverage();
-                            qScreen = true;
-                            qScreenX[1] = vScreenX[1];
-                            qScreenY[1] = vScreenY[1];
-                            if(int(screenLoc.Width) == 400)
-                            {
-                                if(qScreenX[1] < tX + screenLoc.Left)
-                                    qScreenX[1] = qScreenX[1] + 200;
-                                else
-                                    qScreenX[1] = qScreenX[1] - 200;
-                            }
-                            if(int(screenLoc.Height) == 300)
-                            {
-                                if(qScreenY[1] < tY + screenLoc.Top)
-                                    qScreenY[1] = qScreenY[1] + 150;
-                                else
-                                    qScreenY[1] = qScreenY[1] - 150;
-                            }
-                            if(-qScreenX[1] < level[Player[C].Section].X)
-                                qScreenX[1] = -level[Player[C].Section].X;
-                            if(-qScreenX[1] + frmMain.ScaleWidth > level[Player[C].Section].Width)
-                                qScreenX[1] = -(level[Player[C].Section].Width - ScreenW);
-                            if(-qScreenY[1] < level[Player[C].Section].Y)
-                                qScreenY[1] = -level[Player[C].Section].Y;
-                            if(-qScreenY[1] + frmMain.ScaleHeight > level[Player[C].Section].Height)
-                                qScreenY[1] = -(level[Player[C].Section].Height - ScreenH);
-                            level[B] = Events[A].level[B];
-                        }
-                        else
-                        {
-                            qScreen = true;
-                            qScreenX[1] = vScreenX[1];
-                            qScreenY[1] = vScreenY[1];
-                        }
-
-                        overTime = 0;
-                        GoalTime = SDL_GetTicks() + 1000;
-                        fpsCount = 0;
-                        cycleCount = 0;
-                        gameTime = 0;
-                        fpsTime = 0;
-                    }
-                }
-            }
-
             for(B = 0; B <= 20; B++)
             {
                 if(NoEffect == true)
                 {
-                    HideLayer(Events[A].HideLayer[B], NoEffect);
-                    ShowLayer(Events[A].ShowLayer[B], NoEffect);
+                    HideLayerWLD(EventsWld[A].HideLayer[B], NoEffect);
+                    ShowLayerWLD(EventsWld[A].ShowLayer[B], NoEffect);
                 }
                 else
                 {
-                    HideLayer(Events[A].HideLayer[B], Events[A].LayerSmoke);
-                    ShowLayer(Events[A].ShowLayer[B], Events[A].LayerSmoke);
+                    HideLayerWLD(EventsWld[A].HideLayer[B], EventsWld[A].LayerSmoke);
+                    ShowLayerWLD(EventsWld[A].ShowLayer[B], EventsWld[A].LayerSmoke);
                 }
 
-                if(!(Events[A].ToggleLayer[B] == ""))
+                if(!(EventsWld[A].ToggleLayer[B].empty()))
                 {
-                    for(C = 0; C <= maxLayers; C++)
+                    for(C = 0; C <= maxLayersWld; C++)
                     {
-                        if(Layer[C].Name == Events[A].ToggleLayer[B])
+                        if(LayerWld[C].Name == EventsWld[A].ToggleLayer[B])
                         {
-                            if(Layer[C].Hidden == true)
+                            if(LayerWld[C].Hidden == true)
                             {
-                                ShowLayer(Layer[C].Name, Events[A].LayerSmoke);
+                                ShowLayerWLD(LayerWld[C].Name, EventsWld[A].LayerSmoke);
                             }
                             else
                             {
-                                HideLayer(Layer[C].Name, Events[A].LayerSmoke);
+                                HideLayerWLD(LayerWld[C].Name, EventsWld[A].LayerSmoke);
                             }
                         }
                     }
                 }
             }
 
-            if(!Events[A].MoveLayer.empty())
+            if(!EventsWld[A].MoveLayer.empty())
             {
-                for(B = 0; B <= maxLayers; B++)
+                for(B = 0; B <= maxLayersWld; B++)
                 {
-                    if(Layer[B].Name == Events[A].MoveLayer)
+                    if(LayerWld[B].Name == EventsWld[A].MoveLayer)
                     {
-                        Layer[B].EffectStop = true;
-                        Layer[B].SpeedX = Events[A].SpeedX;
-                        Layer[B].SpeedY = Events[A].SpeedY;
-                        if(Layer[B].SpeedX == 0.f && Layer[B].SpeedY == 0.f)
+                        LayerWld[B].EffectStop = true;
+                        LayerWld[B].SpeedX = EventsWld[A].SpeedX;
+                        LayerWld[B].SpeedY = EventsWld[A].SpeedY;
+                        if(LayerWld[B].SpeedX == 0.f && LayerWld[B].SpeedY == 0.f)
                         {
                             // stop layer
-                            Layer[B].EffectStop = false;
+                            LayerWld[B].EffectStop = false;
                             for(C = 1; C <= numBlock; C++)
                             {
-                                if(Block[C].Layer == Layer[B].Name)
+                                if(Block[C].Layer == LayerWld[B].Name)
                                 {
-                                    Block[C].Location.SpeedX = double(Layer[B].SpeedX);
-                                    Block[C].Location.SpeedY = double(Layer[B].SpeedY);
+                                    Block[C].Location.SpeedX = double(LayerWld[B].SpeedX);
+                                    Block[C].Location.SpeedY = double(LayerWld[B].SpeedY);
                                 }
                             }
                             for(C = 1; C <= numNPCs; C++)
                             {
-                                if(NPC[C].Layer == Layer[B].Name)
+                                if(NPC[C].Layer == LayerWld[B].Name)
                                 {
                                     if(NPCIsAVine[NPC[C].Type] || NPC[C].Type == 91)
                                     {
@@ -478,63 +337,54 @@ void ProcEventWLD(std::string EventName, bool NoEffect)
                     }
                 }
             }
-            AutoX[Events[A].AutoSection] = Events[Events[A].AutoSection].AutoX;
-            AutoY[Events[A].AutoSection] = Events[Events[A].AutoSection].AutoY;
 
-            if(!Events[A].Text.empty())
+#if 0 // оно не работает пока что
+            if(!EventsWld[A].Text.empty())
             {
-                MessageText = Events[A].Text;
+                MessageText = EventsWld[A].Text;
                 PauseGame(1);
                 MessageText = "";
             }
+#endif
 
-            if(Events[A].Sound > 0)
+            if(EventsWld[A].Sound > 0)
             {
-                SoundPause[Events[A].Sound] = 0;
-                PlaySound(Events[A].Sound);
+                SoundPause[EventsWld[A].Sound] = 0;
+                PlaySound(EventsWld[A].Sound);
             }
 
-            if(Events[A].EndGame == 1)
-            {
-                for(B = 0; B <= maxSections; B++)
-                    bgMusic[B] = 0;
-                StopMusic();
-                LevelMacroCounter = 0;
-                LevelMacro = 5;
-            }
+            ForcedControls = (EventsWld[A].Controls.Down ||
+                              EventsWld[A].Controls.Left ||
+                              EventsWld[A].Controls.Right ||
+                              EventsWld[A].Controls.Start ||
+                              EventsWld[A].Controls.Up);
 
-            ForcedControls = (Events[A].Controls.Down ||
-                              Events[A].Controls.Left ||
-                              Events[A].Controls.Right ||
-                              Events[A].Controls.Start ||
-                              Events[A].Controls.Up);
-
-            ForcedControl = Events[A].Controls;
+            ForcedControl = EventsWld[A].Controls;
 
             tempBool = false;
-            if(!Events[A].TriggerEvent.empty())
+            if(!EventsWld[A].TriggerEvent.empty())
             {
-                if(int(Events[A].TriggerDelay) == 0)
+                if(int(EventsWld[A].TriggerDelay) == 0)
                 {
-                    for(B = 0; B <= maxEvents; B++)
+                    for(B = 0; B <= maxEventsWld; B++)
                     {
-                        if(Events[B].Name == Events[A].TriggerEvent)
+                        if(EventsWld[B].Name == EventsWld[A].TriggerEvent)
                         {
-                            if(Events[B].TriggerEvent == Events[A].Name)
+                            if(EventsWld[B].TriggerEvent == EventsWld[A].Name)
                                 tempBool = true;
                             break;
                         }
                     }
                     if(tempBool == false)
                     {
-                        ProcEvent(Events[A].TriggerEvent);
+                        ProcEventWLD(EventsWld[A].TriggerEvent);
                     }
                 }
                 else
                 {
-                    newEventNum++;
-                    NewEvent[newEventNum] = Events[A].TriggerEvent;
-                    newEventDelay[newEventNum] = Events[A].TriggerDelay * 6.5;
+                    newEventWldNum++;
+                    NewEventWld[newEventWldNum] = EventsWld[A].TriggerEvent;
+                    newEventWldDelay[newEventWldNum] = EventsWld[A].TriggerDelay * 6.5;
                 }
             }
         }
@@ -547,18 +397,18 @@ void UpdateEventsWLD()
     // this sub also updates the screen position for autoscroll levels
     int A = 0;
 
-    if(newEventNum > 0)
+    if(newEventWldNum > 0)
     {
-        for(A = 1; A <= newEventNum; A++)
+        for(A = 1; A <= newEventWldNum; A++)
         {
-            if(newEventDelay[A] > 0)
-                newEventDelay[A]--;
+            if(newEventWldDelay[A] > 0)
+                newEventWldDelay[A]--;
             else
             {
-                ProcEvent(NewEvent[A]);
-                newEventDelay[A] = newEventDelay[newEventNum];
-                NewEvent[A] = NewEvent[newEventNum];
-                newEventNum--;
+                ProcEventWLD(NewEventWld[A]);
+                newEventWldDelay[A] = newEventWldDelay[newEventWldNum];
+                NewEventWld[A] = NewEventWld[newEventWldNum];
+                newEventWldNum--;
             }
         }
     }
@@ -596,50 +446,50 @@ void UpdateEventsWLD()
 
 void UpdateLayersWLD()
 {
-    for(int A = 0; A <= maxLayers; A++)
+    for(int A = 0; A <= maxLayersWld; A++)
     {
          for(int B = 1; A <= numTiles; A++)
          {
-             if(Tile[B].Layer == Layer[A].Name)
+             if(Tile[B].Layer == LayerWld[A].Name)
              {
-                 Tile[B].Location.X += double(Layer[A].SpeedX);
-                 Tile[B].Location.Y += double(Layer[A].SpeedY);
+                 Tile[B].Location.X += double(LayerWld[A].SpeedX);
+                 Tile[B].Location.Y += double(LayerWld[A].SpeedY);
              }
          }
 
          for(int B = 1; A <= numScenes; A++)
          {
-             if(Scene[B].Layer == Layer[A].Name)
+             if(Scene[B].Layer == LayerWld[A].Name)
              {
-                  Scene[B].Location.X += double(Layer[A].SpeedX);
-                  Scene[B].Location.Y += double(Layer[A].SpeedY);
+                  Scene[B].Location.X += double(LayerWld[A].SpeedX);
+                  Scene[B].Location.Y += double(LayerWld[A].SpeedY);
              }
          }
 
          for(int B = 1; A <= numWorldPaths; A++)
          {
-             if(WorldPath[B].Layer == Layer[A].Name)
+             if(WorldPath[B].Layer == LayerWld[A].Name)
              {
-                  WorldPath[B].Location.X += double(Layer[A].SpeedX);
-                  WorldPath[B].Location.Y += double(Layer[A].SpeedY);
+                  WorldPath[B].Location.X += double(LayerWld[A].SpeedX);
+                  WorldPath[B].Location.Y += double(LayerWld[A].SpeedY);
              }
          }
 
          for(int B = 1; A <= numWorldLevels; A++)
          {
-             if(WorldLevel[B].Layer == Layer[A].Name)
+             if(WorldLevel[B].Layer == LayerWld[A].Name)
              {
-                  WorldLevel[B].Location.X += double(Layer[A].SpeedX);
-                  WorldLevel[B].Location.Y += double(Layer[A].SpeedY);
+                  WorldLevel[B].Location.X += double(LayerWld[A].SpeedX);
+                  WorldLevel[B].Location.Y += double(LayerWld[A].SpeedY);
              }
          }
 
          for(int B = 1; A <= numWorldMusic; A++)
          {
-             if(WorldMusic[B].Layer == Layer[A].Name)
+             if(WorldMusic[B].Layer == LayerWld[A].Name)
              {
-                   WorldMusic[B].Location.X += double(Layer[A].SpeedX);
-                   WorldMusic[B].Location.Y += double(Layer[A].SpeedY);
+                   WorldMusic[B].Location.X += double(LayerWld[A].SpeedX);
+                   WorldMusic[B].Location.Y += double(LayerWld[A].SpeedY);
              }
          }
     }

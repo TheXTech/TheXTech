@@ -41,6 +41,7 @@
 #include "../layers.h"
 #include "../player.h"
 #include "../collision.h"
+#include "level_file.h"
 
 #include "../pseudo_vb.h"
 
