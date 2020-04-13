@@ -945,7 +945,13 @@ void MenuLoop()
                         ClearLevel();
 
                         PGE_Delay(1000);
-                        OpenLevel(SelectWorld[selWorld].WorldPath + StartLevel);
+                        std::string levelPath = SelectWorld[selWorld].WorldPath + StartLevel;
+                        if(!OpenLevel(levelPath))
+                        {
+                            MessageText = fmt::format_ne("ERROR: Can't open \"{0}\": file doesn't exist or corrupted.", StartLevel);
+                            PauseGame(1);
+                            ErrorQuit = true;
+                        }
                     }
                     return;
                 }

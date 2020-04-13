@@ -43,7 +43,6 @@ void CheckActive();//in game_main.cpp
 
 void GameLoop()
 {
-
     UpdateControls();
     if(LevelMacro > 0)
         UpdateMacro();
@@ -57,6 +56,13 @@ void GameLoop()
         }
     }
 
+    if(ErrorQuit)
+    {
+        EndLevel = true;
+        ErrorQuit = false;
+        pLogWarning("Quit level because of an error");
+        frmMain.clearBuffer();
+    }
 
     if(EndLevel)
     {

@@ -1345,7 +1345,14 @@ int FrmMain::makeShot_action(void *_pixels)
     if(FreeImage_HasPixels(shotImg) == FALSE)
         pLogWarning("Can't save screenshot: no pixel data!");
     else
-        FreeImage_Save(FIF_PNG, shotImg, saveTo.data(), PNG_Z_BEST_COMPRESSION);
+    {
+        BOOL ret = FreeImage_Save(FIF_PNG, shotImg, saveTo.data(), PNG_Z_BEST_COMPRESSION);
+        if(!ret)
+        {
+            pLogWarning("Failed to save screenshot!");
+            Files::deleteFile(saveTo);
+        }
+    }
 
     FreeImage_Unload(shotImg);
     delete []shoot->pixels;

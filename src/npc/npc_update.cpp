@@ -4071,7 +4071,9 @@ void UpdateNPCs()
                                     lBlock = LastBlock[((level[NPC[A].Section].Width) / 32.0) + 2];
                                     for(B = (int)fBlock; B <= lBlock; B++)
                                         BlockShakeUp(B);
-                                    for(B = 0; B <= maxSections; B++)
+
+                                    // expand down a section at the bottom of destroyed blocks
+                                    for(int B = 0; B <= numSections; B++)
                                     {
                                         if(NPC[A].Location.X >= level[B].X)
                                         {

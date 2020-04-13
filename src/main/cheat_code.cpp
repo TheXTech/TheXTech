@@ -300,7 +300,7 @@ void CheatCode(char NewKey)
                 if(Effect[B].Type == 113)
                     Effect[B].Life = 0;
             }
-            for(B = 0; B <= maxSections; B++)
+            for(B = 0; B <= numSections; B++)
             {
                 if(UnderWater[B] == true)
                 {
