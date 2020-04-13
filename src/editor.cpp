@@ -27,6 +27,7 @@
 #include <Logger/logger.h>
 #include <Utils/elapsed_timer.h>
 #include <pge_delay.h>
+#include <fmt_format_ne.h>
 
 #include "globals.h"
 #include "editor.h"
@@ -2740,7 +2741,14 @@ void zTestLevel(bool magicHand, bool interProcess)
         IntProc::setState("Done. Starting game...");
     }
     else
-        OpenLevel(FullFileName);
+    {
+        if(!OpenLevel(FullFileName))
+        {
+            MessageText = fmt::format_ne("ERROR: Can't open \"{0}\": file doesn't exist or corrupted.", FullFileName);
+            PauseGame(1);
+            ErrorQuit = true;
+        }
+    }
 
     if(SingleCoop > 0)
         ScreenType = 6;

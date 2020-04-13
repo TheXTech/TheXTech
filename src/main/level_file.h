@@ -33,8 +33,8 @@
 extern void addMissingLvlSuffix(std::string &fileName);
 
 //! loads the level
-void OpenLevel(std::string FilePath);
-void OpenLevelData(LevelData &lvl, const std::string FilePath = std::string());
+bool OpenLevel(std::string FilePath);
+bool OpenLevelData(LevelData &lvl, const std::string FilePath = std::string());
 //! Reset everything to zero
 void ClearLevel();
 

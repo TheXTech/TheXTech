@@ -25,6 +25,7 @@
 
 #include <Utils/files.h>
 #include <pge_delay.h>
+#include <fmt_format_ne.h>
 
 #include "../globals.h"
 #include "../game_main.h"
@@ -349,7 +350,13 @@ void WorldLoop()
                             GameThing();
                             ClearLevel();
                             PGE_Delay(1000);
-                            OpenLevel(SelectWorld[selWorld].WorldPath + WorldLevel[A].FileName);
+                            std::string levelPath = SelectWorld[selWorld].WorldPath + WorldLevel[A].FileName;
+                            if(!OpenLevel(levelPath))
+                            {
+                                MessageText = fmt::format_ne("ERROR: Can't open \"{0}\": file doesn't exist or corrupted.", WorldLevel[A].FileName);
+                                PauseGame(1);
+                                ErrorQuit = true;
+                            }
                             break;
                         }
                     }

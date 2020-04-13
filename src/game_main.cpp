@@ -26,6 +26,7 @@
 #include <Logger/logger.h>
 #include <InterProcess/intproc.h>
 #include <pge_delay.h>
+#include <fmt_format_ne.h>
 
 #include "globals.h"
 #include "game_main.h"
@@ -532,12 +533,20 @@ int GameMain(const CmdLineSetup_t &setup)
                 ClearLevel();
                 PGE_Delay(1000);
 
+                std::string levelPath;
                 if(GoToLevel.empty())
-                    OpenLevel(SelectWorld[selWorld].WorldPath + StartLevel);
+                    levelPath = SelectWorld[selWorld].WorldPath + StartLevel;
                 else
                 {
-                    OpenLevel(SelectWorld[selWorld].WorldPath + GoToLevel);
+                    levelPath = SelectWorld[selWorld].WorldPath + GoToLevel;
                     GoToLevel.clear();
+                }
+
+                if(!OpenLevel(levelPath))
+                {
+                    MessageText = fmt::format_ne("ERROR: Can't open \"{0}\": file doesn't exist or corrupted.", levelPath);
+                    PauseGame(1);
+                    ErrorQuit = true;
                 }
             }
             else
@@ -1488,10 +1497,25 @@ void StartBattleMode()
     PGE_Delay(500);
     ClearLevel();
 
-    if(selWorld == 1)
-        selWorld = (iRand() % (NumSelectWorld - 1)) + 2;
+    if(NumSelectWorld <= 1)
+    {
+        MessageText = "Can't start battle because of no levels available";
+        PauseGame(1);
+        ErrorQuit = true;
+    }
+    else
+    {
+        if(selWorld == 1)
+            selWorld = (iRand() % (NumSelectWorld - 1)) + 2;
+    }
 
-    OpenLevel(SelectWorld[selWorld].WorldPath + SelectWorld[selWorld].WorldFile);
+    std::string levelPath = SelectWorld[selWorld].WorldPath + SelectWorld[selWorld].WorldFile;
+    if(!OpenLevel(levelPath))
+    {
+        MessageText = fmt::format_ne("ERROR: Can't open \"{0}\": file doesn't exist or corrupted.", SelectWorld[selWorld].WorldFile);
+        PauseGame(1);
+        ErrorQuit = true;
+    }
     SetupPlayers();
 
     BattleIntro = 150;

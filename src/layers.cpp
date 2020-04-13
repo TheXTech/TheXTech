@@ -278,11 +278,11 @@ void ProcEvent(std::string EventName, bool NoEffect)
     if(EventName.empty() || LevelEditor == true)
         return;
 
-    for(A = 0; A <= maxEvents; A++)
+    for(A = 0; A <= numEvents; A++)
     {
         if(equalCase(EventName, Events[A].Name))
         {
-            for(B = 0; B <= maxSections; B++)
+            for(B = 0; B <= numSections; B++)
             {
                 if(Events[A].Music[B] == -2)
                 {
@@ -417,6 +417,34 @@ void ProcEvent(std::string EventName, bool NoEffect)
                 }
             }
 
+            for(auto &l : Events[A].HideLayer)
+            {
+                HideLayer(l, NoEffect ? true : Events[A].LayerSmoke);
+            }
+
+            for(auto &l : Events[A].ShowLayer)
+            {
+                ShowLayer(l, NoEffect ? true : Events[A].LayerSmoke);
+            }
+
+            for(auto &l : Events[A].ToggleLayer)
+            {
+                if(l.empty())
+                    continue;
+
+                for(C = 0; C <= numLayers; C++)
+                {
+                    if(Layer[C].Name == l)
+                    {
+                        if(Layer[C].Hidden)
+                            ShowLayer(Layer[C].Name, Events[A].LayerSmoke);
+                        else
+                            HideLayer(Layer[C].Name, Events[A].LayerSmoke);
+                    }
+                }
+            }
+
+#if 0 // Obsolete, replaced with a code above
             for(B = 0; B <= 20; B++)
             {
                 if(NoEffect == true)
@@ -436,7 +464,7 @@ void ProcEvent(std::string EventName, bool NoEffect)
                     {
                         if(Layer[C].Name == Events[A].ToggleLayer[B])
                         {
-                            if(Layer[C].Hidden == true)
+                            if(Layer[C].Hidden)
                             {
                                 ShowLayer(Layer[C].Name, Events[A].LayerSmoke);
                             }
@@ -448,6 +476,7 @@ void ProcEvent(std::string EventName, bool NoEffect)
                     }
                 }
             }
+#endif
 
             if(!Events[A].MoveLayer.empty())
             {
@@ -503,7 +532,7 @@ void ProcEvent(std::string EventName, bool NoEffect)
 
             if(Events[A].EndGame == 1)
             {
-                for(B = 0; B <= maxSections; B++)
+                for(B = 0; B <= numSections; B++)
                     bgMusic[B] = 0;
                 StopMusic();
                 LevelMacroCounter = 0;
@@ -586,7 +615,8 @@ void UpdateEvents()
             }
         }
     }
-    for(A = 0; A <= maxSections; A++)
+
+    for(A = 0; A <= numSections; A++)
     {
         if(AutoX[A] != 0.0f || AutoY[A] != 0.0f)
         {

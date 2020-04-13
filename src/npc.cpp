@@ -67,7 +67,7 @@ void CheckSectionNPC(int A)
             }
         }
     }
-    for(B = 0; B <= maxSections; B++)
+    for(B = 0; B <= numSections; B++)
     {
         if(NPC[A].Location.X >= level[B].X)
         {

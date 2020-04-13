@@ -27,6 +27,7 @@
 #define LAYERS_H
 
 #include <string>
+#include <vector>
 #include "range_arr.hpp"
 #include "location.h"
 #include "global_constants.h"
@@ -64,11 +65,11 @@ struct Events_t
 //    Text As String
     std::string Text;
 //    HideLayer(0 To 20) As String
-    RangeArr<std::string, 0, 20> HideLayer;
+    std::vector<std::string> HideLayer;
 //    ShowLayer(0 To 20) As String
-    RangeArr<std::string, 0, 20> ShowLayer;
+    std::vector<std::string> ShowLayer;
 //    ToggleLayer(0 To 20) As String
-    RangeArr<std::string, 0, 20> ToggleLayer;
+    std::vector<std::string> ToggleLayer;
 //    Music(0 To maxSections) As Integer
     RangeArrI<int, 0, maxSections, 0> Music;
 //    Background(0 To maxSections) As Integer

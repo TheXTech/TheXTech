@@ -977,10 +977,13 @@ void CheckSection(int A)
     int C = 0;
     int oldSection = 0;
     bool foundSection = false;
-    if(LevelSelect == true)
+
+    if(LevelSelect)
         return;
+
     oldSection = Player[A].Section;
-    for(B = 0; B <= maxSections; B++)
+
+    for(B = 0; B <= numSections; B++)
     {
         if(Player[A].Location.X + Player[A].Location.Width >= level[B].X)
         {
@@ -1027,9 +1030,10 @@ void CheckSection(int A)
             }
         }
     }
-    if(foundSection == false)
+
+    if(!foundSection)
     {
-        for(B = 0; B <= maxSections; B++)
+        for(B = 0; B <= numSections; B++)
         {
             if(Player[A].Location.X + Player[A].Location.Width >= LevelREAL[B].X)
             {

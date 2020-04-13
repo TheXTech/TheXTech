@@ -96,6 +96,7 @@ RangeArrI<int, 0, maxBlocks, 0> iBlock;
 int numTiles = 0;
 int numScenes = 0;
 RangeArr<std::string, 0, maxSections> CustomMusic;
+int numSections = 0;
 RangeArr<Location_t, 0, maxSections> level;
 RangeArrI<bool, 0, maxSections, false> LevelWrap;
 RangeArrI<bool, 0, maxSections, false> LevelVWrap;
@@ -239,6 +240,7 @@ EditorControls_t EditorControls;
 
 RangeArrI<int, 1, numSounds, 0> Sound;
 RangeArrI<int, 1, numSounds, 0> SoundPause;
+bool ErrorQuit = false;
 bool EndLevel = false;
 int LevelMacro = 0;
 int LevelMacroCounter = 0;

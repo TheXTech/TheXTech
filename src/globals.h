@@ -1156,7 +1156,7 @@ extern bool RestartLevel;
 extern float LevelChop[maxSections + 1];
 //'collision detection optimization. creates a table of contents for blocks
 //Public Const FLBlocks As Long = 8000
-const long FLBlocks = 8000;
+const long FLBlocks = 10000;
 //Public FirstBlock(-FLBlocks To FLBlocks) As Integer
 extern RangeArr<int, -FLBlocks, FLBlocks> FirstBlock;
 //Public LastBlock(-FLBlocks To FLBlocks) As Integer
@@ -1175,6 +1175,8 @@ extern int numTiles;
 extern int numScenes;
 //Public CustomMusic(0 To maxSections) As String 'section's custom music
 extern RangeArr<std::string, 0, maxSections> CustomMusic;
+//EXTRA: Max count of used sections
+extern int numSections;
 //Public level(0 To maxSections) As Location 'sections
 extern RangeArr<Location_t, 0, maxSections> level;
 //Public LevelWrap(0 To maxSections) As Boolean 'Wrap around the level
@@ -1543,6 +1545,8 @@ extern EditorControls_t EditorControls;
 extern RangeArrI<int, 1, numSounds, 0> Sound;
 //Public SoundPause(1 To numSounds) As Integer
 extern RangeArrI<int, 1, numSounds, 0> SoundPause;
+//EXTRA: Immediately quit level because of a fatal error
+extern bool ErrorQuit;
 //Public EndLevel As Boolean 'End the level and move to the next
 extern bool EndLevel;
 //Public LevelMacro As Integer 'Shows a level outro when beat

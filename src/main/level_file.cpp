@@ -35,6 +35,7 @@
 
 #include <DirManager/dirman.h>
 #include <Utils/files.h>
+#include <Logger/logger.h>
 #include <PGE_File_Formats/file_formats.h>
 
 
@@ -58,7 +59,7 @@ void addMissingLvlSuffix(std::string &fileName)
 }
 
 
-void OpenLevel(std::string FilePath)
+bool OpenLevel(std::string FilePath)
 {
     addMissingLvlSuffix(FilePath);
 //    if(!Files::hasSuffix(FilePath, ".lvl") && !Files::hasSuffix(FilePath, ".lvlx"))
@@ -70,12 +71,19 @@ void OpenLevel(std::string FilePath)
 //    }
 
     LevelData lvl;
-    FileFormats::OpenLevelFile(FilePath, lvl);
+    if(!FileFormats::OpenLevelFile(FilePath, lvl))
+    {
+        pLogWarning("Error of level \"%s\" file loading: %s (line %d).",
+                    FilePath.c_str(),
+                    lvl.meta.ERROR_info.c_str(),
+                    lvl.meta.ERROR_linenum);
+        return false;
+    }
 
-    OpenLevelData(lvl, FilePath);
+    return OpenLevelData(lvl, FilePath);
 }
 
-void OpenLevelData(LevelData &lvl, const std::string FilePath)
+bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 {
     std::string newInput;
 //    int FileRelease = 0;
@@ -133,11 +141,12 @@ void OpenLevelData(LevelData &lvl, const std::string FilePath)
 // Blah
 
     if(FilePath == ".lvl" || FilePath == ".lvlx")
-        return;
+        return false;
 
     maxStars = lvl.stars;
     LevelName = lvl.LevelName;
 
+    numSections = 0;
     B = 0;
     for(auto & s : lvl.sections)
     {
@@ -160,6 +169,7 @@ void OpenLevelData(LevelData &lvl, const std::string FilePath)
         B++;
         if(B > maxSections)
             break;
+        numSections++;
     }
 
     for(A = 1; A <= 2; A++) // Fill with zeroes
@@ -508,32 +518,40 @@ void OpenLevelData(LevelData &lvl, const std::string FilePath)
         Events[A].Sound = int(e.sound_id);
         Events[A].EndGame = int(e.end_game);
 
-        int hideLayersNum = int(e.layers_hide.size());
-        int showLayersNum = int(e.layers_show.size());
-        int toggleLayersNum = int(e.layers_toggle.size());
+//        int hideLayersNum = int(e.layers_hide.size());
+//        int showLayersNum = int(e.layers_show.size());
+//        int toggleLayersNum = int(e.layers_toggle.size());
 
-        for(B = 0; B <= maxSections; B++)
-        {
-            Events[A].HideLayer[B].clear();
-            Events[A].ShowLayer[B].clear();
-            Events[A].ToggleLayer[B].clear();
-        }
+        Events[A].HideLayer.clear();
+        Events[A].ShowLayer.clear();
+        Events[A].ToggleLayer.clear();
 
-        for(B = 0; B <= maxSections; B++)
-        {
-            if(B < hideLayersNum)
-                Events[A].HideLayer[B] = e.layers_hide[size_t(B)];
-            if(B < showLayersNum)
-                Events[A].ShowLayer[B] = e.layers_show[size_t(B)];
-            if(B < toggleLayersNum)
-                Events[A].ToggleLayer[B] = e.layers_toggle[size_t(B)];
-        }
+//        for(B = 0; B <= maxSections; B++)
+//        {
+//            Events[A].HideLayer[B].clear();
+//            Events[A].ShowLayer[B].clear();
+//            Events[A].ToggleLayer[B].clear();
+//        }
+
+        Events[A].HideLayer = e.layers_hide;
+        Events[A].ShowLayer = e.layers_show;
+        Events[A].ToggleLayer = e.layers_toggle;
+
+//        for(B = 0; B <= maxSections; B++)
+//        {
+//            if(B < hideLayersNum)
+//                Events[A].HideLayer[B] = e.layers_hide[size_t(B)];
+//            if(B < showLayersNum)
+//                Events[A].ShowLayer[B] = e.layers_show[size_t(B)];
+//            if(B < toggleLayersNum)
+//                Events[A].ToggleLayer[B] = e.layers_toggle[size_t(B)];
+//        }
 
         int maxSets = int(e.sets.size());
-        if(maxSets > maxSections)
-            maxSets = maxSections;
+        if(maxSets > numSections)
+            maxSets = numSections;
 
-        for(B = 0; B <= maxSections; B++)
+        for(B = 0; B <= numSections; B++)
         {
             Events[A].Music[B] = LevelEvent_Sets::LESet_Nothing;
             Events[A].Background[B] = LevelEvent_Sets::LESet_Nothing;
@@ -543,7 +561,7 @@ void OpenLevelData(LevelData &lvl, const std::string FilePath)
             Events[A].level[B].Width = 0;
         }
 
-        for(B = 0; B <= maxSets; B++)
+        for(B = 0; B < maxSets; B++)
         {
             auto &s = e.sets[size_t(B)];
             Events[A].Music[B] = int(s.music_id);
@@ -659,7 +677,7 @@ void OpenLevelData(LevelData &lvl, const std::string FilePath)
     {
         FindStars();
         LevelMacro = 0;
-        for(A = 0; A <= maxSections; A++) // Automatically correct 608 section height to 600
+        for(A = 0; A <= numSections; A++) // Automatically correct 608 section height to 600
         {
 //            if(int(level[A].Height - level[A].Y) == 608)
 //                level[A].Y = level[A].Y + 8;
@@ -705,6 +723,8 @@ void OpenLevelData(LevelData &lvl, const std::string FilePath)
     fpsTime = 0;
     cycleCount = 0;
     gameTime = 0;
+
+    return true;
 }
 
 void ClearLevel()
@@ -725,6 +745,8 @@ void ClearLevel()
     BlocksSorted = true;
     qScreen = false;
     UnloadCustomGFX();
+
+    numSections = 0;
 
     for(A = 1; A <= newEventNum; A++)
     {
@@ -843,6 +865,8 @@ void ClearLevel()
 
     numEffects = 0;
     numBackground = 0;
+    MidBackground = 1;
+    LastBackground = 0;
     PlayerStart[1] = BlankLocation;
     PlayerStart[2] = BlankLocation;
 

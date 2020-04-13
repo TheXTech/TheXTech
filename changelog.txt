@@ -5,6 +5,9 @@ Changes for 1.3.2
 -Added a level testing interprocess interface to work with PGE Editor
 -Fixed the podoboo's tail effect glitch
 -Fixed an incorrect priodoty of BGO65 in level file of SMBX prior to 10 format
+-Removed 20 layers limit to show/hide/toggle per event
+-Extended limit to use up to 200 sections in one level
+-Added an error message on attempt to open an invalid level file
 
 
 Changes for 1.3.1 (First version made by Wohlstand in March 2020):
