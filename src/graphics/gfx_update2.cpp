@@ -393,6 +393,7 @@ void UpdateGraphics2()
                               GFXPlayerBMP[WorldPlayer[1].Type], 0, WPHeight * WorldPlayer[1].Frame);
 
 //        frmMain.renderTexture(0, 0, 800, 130, GFX.Interface[4], 0, 0);
+
         frmMain.renderTexture(0, 0, 800, 130, GFX.Interface[4], 0, 0);
         frmMain.renderTexture(0, 534, 800, 66, GFX.Interface[4], 0, 534);
         frmMain.renderTexture(0, 130, 66, 404, GFX.Interface[4], 0, 130);

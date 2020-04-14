@@ -59,6 +59,7 @@ FrmMain::FrmMain()
 {
     ScaleWidth = ScreenW;
     ScaleHeight = ScreenH;
+
 #ifdef CUSTOM_GAME_NAME_TITLE
     m_windowTitle = CUSTOM_GAME_NAME_TITLE;
 #else

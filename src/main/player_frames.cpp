@@ -1200,7 +1200,7 @@ void SetupPlayerFrames()
     LuigiFrameY[307] = -6;
     LuigiFrameY[293] = -6;
 
-    For(A, 650, 750)
+    For(A, 650, maxPlayerFrames)
     {
         MarioFrameX[A] = MarioFrameX[A - 400];
         MarioFrameY[A] = MarioFrameY[A - 400];

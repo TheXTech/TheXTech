@@ -86,6 +86,7 @@ void SpecialFrames()
             SpecialFrame[6] = 0;
         SpecialFrameCount[6] = 0;
     }
+
     SpecialFrameCount[7] = SpecialFrameCount[7] + 1;
     if(SpecialFrameCount[7] < 8)
         SpecialFrame[7] = 0;
