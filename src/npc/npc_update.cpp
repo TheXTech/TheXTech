@@ -1095,8 +1095,10 @@ void UpdateNPCs()
                                 NPC[A].Location.Y = level[NPC[A].Section].Y - NPC[A].Location.Height + 1;
                         }
                     }
+
                     if(NoTurnBack[NPC[A].Section] && NPC[A].Location.X < level[NPC[A].Section].X - NPC[A].Location.Width - 32)
                         NPCHit(A, 9);
+
                     if(NPC[A].CantHurt > 0)
                     {
                         if(!(NPC[A].Type == 21))
@@ -2403,6 +2405,7 @@ void UpdateNPCs()
                                                                     NPCHit(A, 3, A);
                                                             }
                                                         }
+
                                                         if(NPCIsACoin[NPC[A].Type] && NPC[A].Special == 0 && HitSpot > 0)
                                                             NPCHit(A, 3, A);
 
@@ -3777,7 +3780,7 @@ void UpdateNPCs()
                     // special4 - what bowser is doing
                     // special3 - counter for what bowser is doing
                     // special2 - counter for what bowser needs to do
-                    if(NPC[A].Legacy == true)
+                    if(NPC[A].Legacy)
                     {
                         if(NPC[A].TimeLeft > 1)
                         {
@@ -3790,7 +3793,8 @@ void UpdateNPCs()
                             }
                         }
                     }
-                    if(NPC[A].Special4 == 0)
+
+                    if(NPC[A].Special4 == 0.0)
                     {
                         NPC[A].Special3 = 0; // reset counter when done
                         if(NPC[A].Direction < 0)
@@ -3798,7 +3802,8 @@ void UpdateNPCs()
                         else
                             NPC[A].Frame = 5;
                     }
-                    if(NPC[A].Special5 == 0) // find player
+
+                    if(NPC[A].Special5 == 0.0) // find player
                     {
                         tempBool = false;
                         for(B = 1; B <= numPlayers; B++)
@@ -3806,7 +3811,8 @@ void UpdateNPCs()
                             if(Player[B].Dead == false && Player[B].TimeToLive == 0)
                                 tempBool = true;
                         }
-                        if(tempBool == false)
+
+                        if(!tempBool)
                         {
                             NPC[A].Special5 = 0;
                             NPC[A].Special4 = 2;
@@ -3819,11 +3825,12 @@ void UpdateNPCs()
                             NPC[A].Special5 = B;
                         }
                     }
+
                     // see if facing the player
                     tempBool = false;
                     if(NPC[A].Special5 > 0)
                     {
-                        if(Player[NPC[A].Special5].Location.X + Player[NPC[A].Special5].Location.Width / 2.0 < NPC[A].Location.X + NPC[A].Location.Width / 2.0)
+                        if(Player[long(NPC[A].Special5)].Location.X + Player[long(NPC[A].Special5)].Location.Width / 2.0 < NPC[A].Location.X + NPC[A].Location.Width / 2.0)
                         {
                             if(NPC[A].Direction < 0)
                                 tempBool = true;
@@ -3834,8 +3841,9 @@ void UpdateNPCs()
                                 tempBool = true;
                         }
                     }
+
                     NPC[A].Special2 = NPC[A].Special2 + dRand();
-                    if(NPC[A].Special4 == 0 && tempBool == true)
+                    if(NPC[A].Special4 == 0.0 && tempBool == true)
                     {
                         if(NPC[A].Special2 >= 200 + dRand() * 400 - dRand() * 200) // hop on player
                         {
@@ -3846,11 +3854,13 @@ void UpdateNPCs()
                         else if((NPC[A].Special2 >= 80 && NPC[A].Special2 <= 130) || (NPC[A].Special2 >= 160 + dRand() * 300 && NPC[A].Special2 <= 180 + dRand() * 800)) // shoot fireball
                             NPC[A].Special4 = 4;
                     }
+
                     if(NPC[A].Inert == true)
                     {
                         if(NPC[A].Special4 == 4 || NPC[A].Special4 == 3)
                             NPC[A].Special4 = 0;
                     }
+
                     if(NPC[A].Special4 == 0) // when not doing anything turn to player
                     {
                         if(tempBool == false)
@@ -3861,8 +3871,10 @@ void UpdateNPCs()
                                 NPC[A].Special4 = 1;
                         }
                     }
+
                     if(NPC[A].Special4 == 0) // hop
                         NPC[A].Special4 = 2;
+
                     if(NPC[A].HoldingPlayer > 0)
                     {
                         if(NPC[A].Direction == -1)
@@ -3878,6 +3890,7 @@ void UpdateNPCs()
                         NPC[A].Location.SpeedX = 0;
                         NPC[A].Location.SpeedY = 0;
                     }
+
                     if(NPC[A].Special4 == -1) // turn left
                     {
                         NPC[A].Special3 = NPC[A].Special3 - 1;
@@ -4058,12 +4071,12 @@ void UpdateNPCs()
                                 tempLocation.Width = tempLocation.Width; // - 32
                                 tempLocation.Y = tempLocation.Y + tempLocation.Height - 8;
                                 tempLocation.Height = 16;
-                                fBlock = FirstBlock[(NPC[A].Location.X / 32) - 1];
-                                lBlock = LastBlock[((NPC[A].Location.X + NPC[A].Location.Width) / 32.0) + 1];
+                                fBlock = FirstBlock[long(NPC[A].Location.X / 32) - 1];
+                                lBlock = LastBlock[long((NPC[A].Location.X + NPC[A].Location.Width) / 32.0) + 1];
 
                                 for(B = (int)fBlock; B <= lBlock; B++)
                                 {
-                                    if(Block[B].Type == 186 && CheckCollision(tempLocation, Block[B].Location) == true && Block[B].Hidden == false)
+                                    if(Block[B].Type == 186 && CheckCollision(tempLocation, Block[B].Location) && !Block[B].Hidden)
                                         KillBlock(B);
                                 }
 
