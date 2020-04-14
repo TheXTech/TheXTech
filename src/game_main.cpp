@@ -1275,6 +1275,9 @@ void CheckActive()
     if(neverPause)
         return;
 
+    if(!GameIsActive)
+        return;
+
 //    If nPlay.Online = True Then Exit Sub
     // If LevelEditor = False And TestLevel = False Then Exit Sub
     // If LevelEditor = False Then Exit Sub

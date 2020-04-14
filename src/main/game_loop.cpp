@@ -523,6 +523,8 @@ void PauseGame(int plr)
         if(qScreen)
             stopPause = false;
         PGE_Delay(1);
+        if(!GameIsActive)
+            break;
     } while(!(stopPause == true));
 
     GamePaused = false;
