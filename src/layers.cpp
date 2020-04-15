@@ -33,6 +33,7 @@
 #include "graphics.h"
 #include "game_main.h"
 
+
 int numLayers = 0;
 RangeArr<Layer_t, 0, maxLayers> Layer;
 
