@@ -33,6 +33,7 @@
 #include "../layers.h"
 #include "level_file.h"
 
+#include <json.hpp>
 #include <DirManager/dirman.h>
 #include <Utils/files.h>
 #include <Logger/logger.h>

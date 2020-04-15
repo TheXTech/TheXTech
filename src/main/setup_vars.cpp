@@ -512,7 +512,20 @@ void SetupVars()
         NPCNoGravity[A] = true;
         NPCFrameOffsetY[A] = 13;
     }
-    NPCJumpHurt[307] = true;
+    NPCWidth[339] = 26;
+    NPCHeight[339] = 26;
+    NPCWidthGFX[339] = 52;
+    NPCHeightGFX[339] = 52;
+    NPCNoClipping[339] = true;
+    NPCNoGravity[339] = true;
+    NPCJumpHurt[339] = true;
+
+    NPCJumpHurt[340] = true;
+
+    NPCNoClipping[341] = true;
+    NPCNoGravity[341] = true;
+    NPCNoYoshi[341] = true;
+
     NPCHeight[223] = 24;
     NPCHeightGFX[223] = 24;
     NPCJumpHurt[231] = true;

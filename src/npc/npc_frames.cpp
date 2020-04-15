@@ -2383,7 +2383,7 @@ void NPCFrames(int A)
         if(NPC[A].Direction == 1)
             NPC[A].Frame = NPC[A].Frame + 2;
     }
-    else if(NPC[A].Type == 293) //SMM2 Spike
+    else if(NPC[A].Type == 293 || NPC[A].Type == 338) //SMM2 Spike & SMB3 Spike
     {
         if(NPC[A].Special == 1)
             NPC[A].Frame = 2;

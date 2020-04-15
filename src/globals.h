@@ -216,6 +216,13 @@ struct EditorControls_t
 //End Type
 };
 
+struct SectionExtras_t
+{
+    bool blinking_enabled = false;
+    bool timer_enabled = false;
+    double blinking_timer = 60.0;
+    int s_timer = 300;
+};
 
 //Public Type conKeyboard  'Input settings for the keyboard
 struct ConKeyboard_t
@@ -764,6 +771,10 @@ struct Block_t
     Location_t Location;
 //    Special As Integer 'what is in the block?
     int Special = 0;
+    int Special2 = 0;
+    int Special3 = 0;
+    int Special4 = 0;
+    int Special5 = 0;
 //'for the shake effect after hitting ablock
 //    ShakeY As Integer
     int ShakeY = 0;
@@ -1135,6 +1146,8 @@ extern RangeArrI<int, 0, maxPlayers, 0> OwedMountType;
 extern RangeArr<float, 0, maxSections> AutoX;
 //Public AutoY(0 To maxSections) As Single 'for autoscroll
 extern RangeArr<float, 0, maxSections> AutoY;
+extern RangeArr<float, 0, maxSections> Section_Blink_Timer;
+extern RangeArr<float, 0, maxSections> Section_Blinking;
 //Public numStars As Integer 'the number of stars the player has
 extern int numStars;
 

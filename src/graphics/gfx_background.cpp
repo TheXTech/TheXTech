@@ -57,7 +57,7 @@ void DrawBackground(int S, int Z)
     }
 
     A = 2; // Clouds
-    if(Background2[S] == 1 || Background2[S] == 2 || Background2[S] == 22)
+    if(Background2[S] == 1 || Background2[S] == 2 || Background2[S] == 22 || Background2[S] == 60)
     {
         int tempVar2 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.75))) + 1;
         for(B = 0; B <= tempVar2; B++)
@@ -1844,16 +1844,16 @@ void DrawBackground(int S, int Z)
         for(B = 0; B <= tempVar98; B++)
         {
             tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
-            if(level[S].Height - level[S].Y > GFXBackground2Height[A] / 4.0)
+            if(level[S].Height - level[S].Y > GFXBackground2Height[A] / 3.0)
             {
                 // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - (600 - vScreen(Z).Top)) * (GFXBackground2Height(A) / 4 - (600 - vScreen(Z).Top))
                 // .Y = -vScreenY(Z) - .Y
-                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] / 4.0 - ScreenH) + vScreen[Z].Top;
+                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] / 3.0 - ScreenH) + vScreen[Z].Top;
                 tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
             }
             else
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A] / 4.0;
-            tempLocation.Height = GFXBackground2Height[A] / 4;
+                tempLocation.Y = level[S].Height - GFXBackground2Height[A] / 3.0;
+            tempLocation.Height = GFXBackground2Height[A] / 3;
             tempLocation.Width = GFXBackground2Width[A];
             if(vScreenCollision(Z, tempLocation))
             {
@@ -1865,6 +1865,23 @@ void DrawBackground(int S, int Z)
                                       0,
                                       (GFXBackground2Height[A] / 3.0) * SpecialFrame[10]
                 );
+            }
+        }
+    }
+
+    A = 60; // SMB3 Giant Hills
+    if(Background2[S] == 60)
+    {
+        int tempVar99 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
+        for(B = 0; B <= tempVar99; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+            tempLocation.Height = GFXBackground2Height[A];
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
             }
         }
     }

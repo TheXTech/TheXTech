@@ -121,6 +121,8 @@ if(USE_STATIC_LIBC)
     set(BUILD_SHARED_LIBS OFF)
 endif()
 
+include(common/library_luajit.cmake)
+include(common/library_luabind.cmake)
 include(lib/DirManager/dirman.cmake)
 include(lib/FileMapper/FileMapper.cmake)
 include(lib/fmt/fmt.cmake)
