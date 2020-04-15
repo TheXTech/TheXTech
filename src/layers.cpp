@@ -67,14 +67,6 @@ void ShowLayer(std::string LayerName, bool NoEffect)
             if(Layer[A].Name == "Spawned NPCs")
                 Layer[A].Hidden = false;
         }
-        for(int I = 1; I <= maxPlayers; I++)
-        {
-            if(Layer[A].Name == "Att-Player" + I)
-            {
-                Layer[A].SpeedX = Player[I].Location.SpeedX;
-                Layer[A].SpeedY = Player[I].Location.SpeedX;
-            }
-        }
     }
 
     for(A = 1; A <= numNPCs; A++)

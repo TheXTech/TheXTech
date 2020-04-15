@@ -1860,10 +1860,10 @@ void DrawBackground(int S, int Z)
                 frmMain.renderTexture(vScreenX[Z] + tempLocation.X,
                                       vScreenY[Z] + tempLocation.Y,
                                       GFXBackground2Width[A],
-                                      GFXBackground2Height[A] / 4.0,
+                                      GFXBackground2Height[A] / 3.0,
                                       GFXBackground2[A],
                                       0,
-                                      (GFXBackground2Height[A] / 4.0) * SpecialFrame[10]
+                                      (GFXBackground2Height[A] / 3.0) * SpecialFrame[10]
                 );
             }
         }
