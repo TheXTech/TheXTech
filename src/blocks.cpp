@@ -1388,10 +1388,10 @@ void BlockFrames()
 {
     int A = 0;
 
-    RangeArr<bool, 0, 5> pChar;
-    pChar.fill(false);
-
+    bool pChar[maxPlayers] = {false};
     bool tempBool = false;
+    SDL_memset(pChar, 0, sizeof(pChar));
+
     if(FreezeNPCs == true)
         return;
     // Update block frame counter

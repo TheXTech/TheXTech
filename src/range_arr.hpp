@@ -38,20 +38,41 @@ class RangeArr
     static constexpr long range_diff = begin - end;
     static constexpr size_t size = (range_diff < 0 ? -range_diff : range_diff) + 1;
     static const long offset = -begin;
+#ifdef RANGE_ARR_USE_HEAP
+    T *array = nullptr;
+#else
     T array[size];
+#endif
 
 public:
     RangeArr()
-    {}
+    {
+#ifdef RANGE_ARR_USE_HEAP
+        array = new T[size];
+#endif
+    }
+
+#ifdef RANGE_ARR_USE_HEAP
+    ~RangeArr()
+    {
+        delete[] array;
+    }
+#endif
 
     RangeArr(const RangeArr &o)
     {
+#ifdef RANGE_ARR_USE_HEAP
+        array = new T[size];
+#endif
         for(size_t i = 0; i < size; i++)
             array[i] = o.array[i];
     }
 
     RangeArr& operator=(const RangeArr &o)
     {
+#ifdef RANGE_ARR_USE_HEAP
+        array = new T[size];
+#endif
         for(size_t i = 0; i < size; i++)
             array[i] = o.array[i];
         return *this;
@@ -65,6 +86,9 @@ public:
 
     T& operator[](long index)
     {
+#ifdef RANGE_ARR_USE_HEAP
+        SDL_assert_release(array); // When array won't initialize
+#endif
         SDL_assert_release(index <= end);
         SDL_assert_release(index >= begin);
         SDL_assert_release(offset + index < static_cast<long>(size));
@@ -79,23 +103,43 @@ class RangeArrI
     static constexpr long range_diff = begin - end;
     static constexpr size_t size = (range_diff < 0 ? -range_diff : range_diff) + 1;
     static const long offset = -begin;
+#ifdef RANGE_ARR_USE_HEAP
+    T *array = nullptr;
+#else
     T array[size];
+#endif
 
 public:
     RangeArrI()
     {
+#ifdef RANGE_ARR_USE_HEAP
+        array = new T[size];
+#endif
         for(size_t i = 0; i < size; i++)
             array[i] = defaultValue;
     }
 
+#ifdef RANGE_ARR_USE_HEAP
+    ~RangeArrI()
+    {
+        delete[] array;
+    }
+#endif
+
     RangeArrI(const RangeArrI &o)
     {
+#ifdef RANGE_ARR_USE_HEAP
+        array = new T[size];
+#endif
         for(size_t i = 0; i < size; i++)
             array[i] = o.array[i];
     }
 
     RangeArrI& operator=(const RangeArrI &o)
     {
+#ifdef RANGE_ARR_USE_HEAP
+        array = new T[size];
+#endif
         for(size_t i = 0; i < size; i++)
             array[i] = o.array[i];
         return *this;
@@ -109,6 +153,9 @@ public:
 
     T& operator[](long index)
     {
+#ifdef RANGE_ARR_USE_HEAP
+        SDL_assert_release(array); // When array won't initialize
+#endif
         SDL_assert_release(index <= end);
         SDL_assert_release(index >= begin);
         SDL_assert_release(offset + index < static_cast<long>(size));

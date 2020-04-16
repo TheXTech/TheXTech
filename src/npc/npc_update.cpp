@@ -35,6 +35,8 @@
 
 #include <Utils/maths.h>
 
+static RangeArr<int, 0, maxNPCs> newAct;
+// Why this array is here? to don't reallocate it every call of UpdateNPCs()
 
 void UpdateNPCs()
 {
@@ -62,7 +64,7 @@ void UpdateNPCs()
     Location_t tempLocation2;
     Location_t preBeltLoc;
     float beltCount = 0;
-    RangeArr<int, 1, 2> tempBlockHit; // Hit block from below code
+    int tempBlockHit[3] = {0}; // Hit block from below code
     int winningBlock = 0; // More code for hitting the block from below
     int numTempBlock = 0;
     float speedVar = 0; // percent of the NPC it should actually moved. this helps when underwater
@@ -85,7 +87,6 @@ void UpdateNPCs()
     long long lBlock2 = 0;
     int bCheck2 = 0;
     int bCheck = 0;
-    RangeArr<int, 1, maxNPCs> newAct;
     float addBelt = 0;
     int numAct = 0;
     bool beltClear = false; // stops belt movement when on a wall
@@ -97,6 +98,8 @@ void UpdateNPCs()
 
     double lyrX = 0; // for attaching to layers
     double lyrY = 0; // for attaching to layers
+
+    newAct.fill(0);
 
     NPC[0].Location.SpeedX = 0;
     NPC[0].Location.SpeedY = 0;
