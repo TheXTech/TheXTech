@@ -2462,7 +2462,7 @@ void NPCSpecial(int A)
 
         }
     }
-    else if(NPC[A].Type == 293)
+    else if(NPC[A].Type == 293 || NPC[A].Type == 338)
     {
         if(NPC[A].Location.SpeedY == Physics.NPCGravity || NPC[A].Slope > 0)
         {
@@ -2486,7 +2486,10 @@ void NPCSpecial(int A)
                 NPC[numNPCs].Special = 1;
                 NPC[numNPCs].Active = true;
                 NPC[numNPCs].Section = NPC[A].Section;
-                NPC[numNPCs].Type = 294;
+                if(NPC[A].Type == 293)
+                    NPC[numNPCs].Type = 294;
+                else
+                    NPC[numNPCs].Type = 339;
                 tempNPC = NPC[A];
                 NPC[A] = NPC[numNPCs];
                 NPC[numNPCs] = tempNPC;
@@ -2506,7 +2509,7 @@ void NPCSpecial(int A)
             }
         }
     }
-    else if(NPC[A].Type == 294) //Spiky Ball
+    else if(NPC[A].Type == 294 || NPC[A].Type == 339) //Spiky Ball
     {
         if(NPC[A].Special != 0)
         {
@@ -2520,7 +2523,8 @@ void NPCSpecial(int A)
             {
                 NPC[A].Special2 = 0;
                 NPC[A].Special = 0;
-                NPC[A].Location.SpeedY = -5.5;
+                if(NPC[A].Type != 339)
+                    NPC[A].Location.SpeedY = -5.5;
             }
             else if(NPC[A].Special2 < 50)
             {
@@ -2530,7 +2534,8 @@ void NPCSpecial(int A)
         else
         {
             NPC[A].Location.SpeedX = 2.42 * NPC[A].Direction;
-            NPC[A].Location.SpeedY = NPC[A].Location.SpeedY + Physics.NPCGravity;
+            if(NPC[A].Type != 339)
+                NPC[A].Location.SpeedY = NPC[A].Location.SpeedY + Physics.NPCGravity;
         }
         const double rad2deg = 180.0 / M_PI;
         NPC[A].Special6 +=  (NPC[A].Location.SpeedX / (0.5 * NPC[A].Location.Height)) * rad2deg;

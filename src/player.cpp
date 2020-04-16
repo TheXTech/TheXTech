@@ -480,8 +480,10 @@ void PlayerHurt(int A)
                     NewEffect(26, tempLocation);
                 else if(Player[A].MountType == 2)
                     NewEffect(101, tempLocation);
-                else
+                else if(Player[A].MountType == 3)
                     NewEffect(102, tempLocation);
+                else
+                    NewEffect(167, tempLocation);
                 Player[A].Location.Y = Player[A].Location.Y + Player[A].Location.Height;
                 Player[A].Location.Height = Physics.PlayerHeight[Player[A].Character][Player[A].State];
                 Player[A].Location.Y = Player[A].Location.Y - Player[A].Location.Height;

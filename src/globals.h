@@ -1325,6 +1325,7 @@ extern RangeArrI<bool, 0, maxNPCType, false> NPCIsAParaTroopa;
 extern RangeArrI<bool, 0, maxNPCType, false> NPCIsCheep;
 //Public NPCJumpHurt(0 To maxNPCType) As Boolean 'Hurts the player even if it jumps on the NPC
 extern RangeArrI<bool, 0, maxNPCType, false> NPCJumpHurt;
+extern RangeArrI<bool, 0, maxNPCType, false> NPCSpinJumpHurt;
 //Public NPCNoClipping(0 To maxNPCType) As Boolean 'NPC can go through blocks
 extern RangeArrI<bool, 0, maxNPCType, false> NPCNoClipping;
 //Public NPCScore(0 To maxNPCType) As Integer 'NPC score value
@@ -1408,6 +1409,7 @@ struct NPCDefaults_t
     RangeArrI<bool, 0, maxNPCType, false> NPCIsCheep;
 //    NPCJumpHurt(0 To maxNPCType) As Boolean
     RangeArrI<bool, 0, maxNPCType, false> NPCJumpHurt;
+    RangeArrI<bool, 0, maxNPCType, false> NPCSpinJumpHurt;
 //    NPCNoClipping(0 To maxNPCType) As Boolean
     RangeArrI<bool, 0, maxNPCType, false> NPCNoClipping;
 //    NPCScore(0 To maxNPCType) As Integer

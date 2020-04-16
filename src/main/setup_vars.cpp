@@ -512,23 +512,35 @@ void SetupVars()
         NPCNoGravity[A] = true;
         NPCFrameOffsetY[A] = 13;
     }
-    NPCWidth[339] = 26;
-    NPCHeight[339] = 26;
-    NPCWidthGFX[339] = 52;
-    NPCHeightGFX[339] = 52;
+    NPCWidth[339] = 28;
+    NPCHeight[339] = 28;
+    NPCWidthGFX[339] = 28;
+    NPCHeightGFX[339] = 28;
     NPCNoClipping[339] = true;
     NPCNoGravity[339] = true;
     NPCJumpHurt[339] = true;
 
     NPCJumpHurt[340] = true;
 
+    NPCJumpHurt[343] = true;
+
     NPCNoClipping[341] = true;
     NPCNoGravity[341] = true;
     NPCNoYoshi[341] = true;
+    NPCCanWalkOn[341] = true;
+    NPCMovesPlayer[341] = true;
+    NPCNoIceBall[341] = true;
 
-    NPCHeight[223] = 24;
-    NPCHeightGFX[223] = 24;
-    NPCJumpHurt[231] = true;
+    NPCWidth[342] = 32; // Hefty Shoe
+    NPCHeight[342] = 32;
+    NPCFrameOffsetY[342] = 2;
+    NPCIsBoot[342] = true;
+    NPCWontHurt[342] = true;
+    NPCIsGrabbable[342] = true;
+    NPCIsAHit1Block[342] = true;
+    NPCStandsOnPlayer[342] = true;
+    NPCNoIceBall[342] = true;
+
     NPCWontHurt[225] = true;
     NPCJumpHurt[225] = true;
     NPCNoYoshi[225] = true;
@@ -2321,6 +2333,40 @@ void SetupVars()
     NPCFrameOffsetY[282] = 4;
     NPCNoClipping[282] = true;
     NPCJumpHurt[282] = true;
+
+    NPCSpinJumpHurt[245] = true;
+    NPCSpinJumpHurt[275] = true;
+    for(int A = 318; A <= 321; ++A)
+    {
+        NPCSpinJumpHurt[A] = true;
+    }
+    NPCSpinJumpHurt[8] = true;
+    NPCSpinJumpHurt[12] = true;
+    NPCSpinJumpHurt[36] = true;
+    NPCSpinJumpHurt[294] = true;
+    for(int A = 285; A <= 286; ++A)
+    {
+        NPCSpinJumpHurt[A] = true;
+    }
+    for(int A = 332; A <= 333; ++A)
+    {
+        NPCSpinJumpHurt[A] = true;
+    }
+    for(int A = 51; A <= 54; ++A)
+    {
+        NPCSpinJumpHurt[A] = true;
+    }
+    NPCSpinJumpHurt[74] = true;
+    NPCSpinJumpHurt[93] = true;
+    NPCSpinJumpHurt[205] = true;
+    NPCSpinJumpHurt[207] = true;
+    NPCSpinJumpHurt[261] = true;
+    NPCSpinJumpHurt[270] = true;
+    NPCSpinJumpHurt[340] = true;
+    for(int A = 200; A <= 201; ++A)
+    {
+        NPCSpinJumpHurt[A] = true;
+    }
 
     For(A, 1, maxBlockType)
     {

@@ -1148,6 +1148,10 @@ void NPCFrames(int A)
         else if(NPC[A].Special == 228)
             NPC[A].Frame = 7;
     }
+    else if(NPC[A].Type == 340)
+    {
+        NPC[A].Frame = 0;
+    }
     else if(NPC[A].Type == 194 || NPC[A].Type == 195) // Glowy Shell
     {
         NPC[A].Special5 = NPC[A].Special5 + 1;

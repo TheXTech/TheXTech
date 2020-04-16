@@ -43,7 +43,7 @@ public:
 
     StdPicture BMVs;
     StdPicture BMWin;
-    RangeArr<StdPicture, 1, 3> Boot;
+    RangeArr<StdPicture, 1, 4> Boot;
     RangeArr<StdPicture, 1, 5> CharacterName;
     StdPicture Chat;
     RangeArr<StdPicture, 0, 2> Container;

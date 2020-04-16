@@ -296,13 +296,13 @@ void UpdateEffects()
             else if(e.FrameCount == 8)
                 e.Frame = e.Frame + 1;
         }
-        else if(e.Type == 8 || e.Type == 158 || e.Type == 159 || e.Type == 162 || e.Type == 9 || e.Type == 15 || e.Type == 16 || e.Type == 19 || e.Type == 27 || e.Type == 146 || e.Type == 28 || e.Type == 165 || e.Type == 29 || e.Type == 153 || e.Type == 154 || e.Type == 32 || e.Type == 36 || e.Type == 47 || e.Type == 60 || e.Type == 95 || e.Type == 96 || e.Type == 109) // Flying turtle shell / Bullet bill /hard thing
+        else if(e.Type == 8 || e.Type == 158 || e.Type == 159 || e.Type == 162 || e.Type == 9 || e.Type == 15 || e.Type == 16 || e.Type == 19 || e.Type == 27 || e.Type == 146 || e.Type == 28 || e.Type == 165 || e.Type == 29 || e.Type == 153 || e.Type == 154 || e.Type == 32 || e.Type == 36 || e.Type == 47 || e.Type == 60 || e.Type == 95 || e.Type == 169 || e.Type == 96 || e.Type == 109) // Flying turtle shell / Bullet bill /hard thing
         {
             e.Location.SpeedY = e.Location.SpeedY + 0.5;
             if(e.Location.SpeedY >= 10)
                 e.Location.SpeedY = 10;
         }
-        else if(e.Type == 26 || e.Type == 101 || e.Type == 102) // Goombas shoes
+        else if(e.Type == 26 || e.Type == 101 || e.Type == 102 || e.Type == 167) // Goombas shoes
         {
             e.Location.SpeedY = e.Location.SpeedY + 0.5;
             if(e.Location.SpeedY >= 10)
@@ -1369,7 +1369,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
         Effect[numEffects].Life = 150;
         Effect[numEffects].Type = A;
     }
-    else if(A == 4 || A == 7 || A == 8 || A == 158 || A == 162 || A == 159 || A == 9 || A == 19 || A == 22 || A == 26 || A == 101 || A == 102 || A == 27 || A == 146 || A == 28 || A == 165 || A == 29 || A == 153 || A == 154 || A == 31 || A == 32 || A == 145 || A == 33 || A == 34 || A == 36 || A == 38 || A == 40 || A == 42 || A == 44 || A == 46 || A == 47 || A == 53 || A == 60 || A == 9 || A == 6 || A == 95 || A == 96 || A == 110 || A == 117 || A == 121 || A == 127 || A == 142) // Flying goomba / turtle shell / hard thing shell
+    else if(A == 4 || A == 7 || A == 8 || A == 158 || A == 162 || A == 159 || A == 9 || A == 19 || A == 22 || A == 26 || A == 101 || A == 102 || A == 27 || A == 168 || A == 146 || A == 28 || A == 165 || A == 29 || A == 153 || A == 154 || A == 31 || A == 32 || A == 145 || A == 33 || A == 34 || A == 36 || A == 38 || A == 40 || A == 42 || A == 44 || A == 46 || A == 47 || A == 53 || A == 60 || A == 9 || A == 6 || A == 95 || A == 169 || A == 96 || A == 110 || A == 117 || A == 121 || A == 127 || A == 142) // Flying goomba / turtle shell / hard thing shell
     {
         numEffects++;
         Effect[numEffects].Shadow = Shadow;
@@ -1392,7 +1392,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
         Effect[numEffects].Type = A;
         if((Effect[numEffects].Type == 29 || Effect[numEffects].Type == 153 || Effect[numEffects].Type == 154) && Direction == -1)
             Effect[numEffects].Frame = 1;
-        if((Effect[numEffects].Type == 27 || Effect[numEffects].Type == 146) && Direction == 1)
+        if((Effect[numEffects].Type == 27 || Effect[numEffects].Type == 146 || Effect[numEffects].Type == 168) && Direction == 1)
             Effect[numEffects].Frame = 2;
         if(Effect[numEffects].Type == 36 && Direction == 1)
             Effect[numEffects].Frame = 1;

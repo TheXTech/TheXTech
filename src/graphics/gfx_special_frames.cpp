@@ -120,13 +120,22 @@ void SpecialFrames()
         SpecialFrameCount[9] = 0;
     }
 
-    SpecialFrameCount[10] = SpecialFrameCount[6] + 1;
+    SpecialFrameCount[10] = SpecialFrameCount[10] + 1;
     if(SpecialFrameCount[10] >= 12)
     {
-        SpecialFrame[10] = SpecialFrame[6] + 1;
+        SpecialFrame[10] = SpecialFrame[10] + 1;
         if(SpecialFrame[10] >= 3)
             SpecialFrame[10] = 0;
         SpecialFrameCount[10] = 0;
+    }
+
+    SpecialFrameCount[11] = SpecialFrameCount[11] + 1;
+    if(SpecialFrameCount[11] >= 10)
+    {
+        SpecialFrame[11] = SpecialFrame[11] + 1;
+        if(SpecialFrame[11] >= 2)
+            SpecialFrame[11] = 0;
+        SpecialFrameCount[11] = 0;
     }
 }
 

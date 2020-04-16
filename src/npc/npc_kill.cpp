@@ -224,7 +224,7 @@ void KillNPC(int A, int B)
     if(!(B == 9))
     {
         NPC[A].Location.SpeedX = -NPC[A].Location.SpeedX;
-        if(NPC[A].Type == 235 || NPC[A].Type == 231 || NPC[A].Type == 1 || NPC[A].Type == 242 || NPC[A].Type == 243 || NPC[A].Type == 244 || NPC[A].Type == 162 || NPC[A].Type == 163 || NPC[A].Type == 164 || NPC[A].Type == 165 || NPC[A].Type == 166 || NPC[A].Type == 167 || NPC[A].Type == 229 || NPC[A].Type == 236 || NPC[A].Type == 230 || NPC[A].Type == 232 || NPC[A].Type == 233 || NPC[A].Type == 234 || NPC[A].Type == 237 || NPC[A].Type == 263) // Goomba / Rex
+        if(NPC[A].Type == 235 || NPC[A].Type == 231 || NPC[A].Type == 1 || NPC[A].Type == 242 || NPC[A].Type == 243 || NPC[A].Type == 244 || NPC[A].Type == 162 || NPC[A].Type == 163 || NPC[A].Type == 164 || NPC[A].Type == 165 || NPC[A].Type == 166 || NPC[A].Type == 167 || NPC[A].Type == 229 || NPC[A].Type == 236 || NPC[A].Type == 230 || NPC[A].Type == 232 || NPC[A].Type == 233 || NPC[A].Type == 234 || NPC[A].Type == 237 || NPC[A].Type == 263 || NPC[A].Type == 338) // Goomba / Rex
         {
             if(B == 1 && NPC[A].Type != 229 && NPC[A].Type != 236 && NPC[A].Type != 230 && NPC[A].Type != 232 && NPC[A].Type != 233 && NPC[A].Type != 234)
             {
@@ -232,6 +232,8 @@ void KillNPC(int A, int B)
                     NewEffect(2, NPC[A].Location);
                 else if(NPC[A].Type == 242)
                     NewEffect(126, NPC[A].Location);
+                else if(NPC[A].Type == 338)
+                    NewEffect(168, NPC[A].Location);
                 else if(NPC[A].Type == 293)
                     NewEffect(149, NPC[A].Location);
                 else
@@ -267,6 +269,8 @@ void KillNPC(int A, int B)
                     NewEffect(117, NPC[A].Location);
                 else if(NPC[A].Type == 235)
                     NewEffect(121, NPC[A].Location);
+                else if(NPC[A].Type == 338)
+                    NewEffect(168, NPC[A].Location);
                 else if(NPC[A].Type == 162)
                     NewEffect(86, NPC[A].Location, NPC[A].Direction);
                 else if(NPC[A].Type == 164)
@@ -1152,7 +1156,7 @@ void KillNPC(int A, int B)
                     Effect[numEffects].Frame = NPC[A].Type - 121;
             }
         }
-        else if(NPC[A].Type == 23 || NPC[A].Type == 24 || NPC[A].Type == 36 || NPC[A].Type == 53 || NPC[A].Type == 54 || NPC[A].Type == 285 || NPC[A].Type == 286 || NPC[A].Type == 318 || NPC[A].Type == 313 || NPC[A].Type == 312) // Hard thing / Spiney
+        else if(NPC[A].Type == 23 || NPC[A].Type == 24 || NPC[A].Type == 36 || NPC[A].Type == 53 || NPC[A].Type == 54 || NPC[A].Type == 340 || NPC[A].Type == 285 || NPC[A].Type == 286 || NPC[A].Type == 318 || NPC[A].Type == 313 || NPC[A].Type == 312) // Hard thing / Spiney
         {
              NPC[A].Location.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0 - EffectWidth[9] / 2.0;
              NPC[A].Location.Y = NPC[A].Location.Y + NPC[A].Location.Height / 2.0 - EffectHeight[9] / 2.0;
@@ -1181,6 +1185,8 @@ void KillNPC(int A, int B)
                     NewEffect(33 , NPC[A].Location);
                 else if(NPC[A].Type == 54)
                     NewEffect(34 , NPC[A].Location);
+                else if(NPC[A].Type == 340)
+                    NewEffect(169, NPC[A].Location);
                 else if(NPC[A].Type == 318)
                     NewEffect(160 , NPC[A].Location);
                 else if(NPC[A].Type == 313)

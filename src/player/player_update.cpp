@@ -1123,7 +1123,6 @@ void UpdatePlayer()
                         Player[A].Location.SpeedX = Player[A].Location.SpeedX * 0.5;
                 }
 
-
                 Player[A].Location.X = Player[A].Location.X + Player[A].Location.SpeedX; // This is where the actual movement happens
 
                 // Players Y movement.
@@ -1215,6 +1214,8 @@ void UpdatePlayer()
                                 NPC[numNPCs].Type = 191;
                             else if(Player[A].MountType == 3)
                                 NPC[numNPCs].Type = 193;
+                            else if(Player[A].MountType == 4)
+                                NPC[numNPCs].Type = 342;
                             NPC[numNPCs].Location.Height = 32;
                             NPC[numNPCs].Location.Width = 32;
                             NPC[numNPCs].Location.Y = Player[A].Location.Y + Player[A].Location.Height - 32;
@@ -1447,6 +1448,8 @@ void UpdatePlayer()
                                     NPC[numNPCs].Type = 191;
                                 else if(Player[A].MountType == 3)
                                     NPC[numNPCs].Type = 193;
+                                else if(Player[A].MountType == 4)
+                                    NPC[numNPCs].Type = 342;
                                 NPC[numNPCs].Location.Height = 32;
                                 NPC[numNPCs].Location.Width = 32;
                                 NPC[numNPCs].Location.Y = Player[A].Location.Y + Player[A].Location.Height - 32;
@@ -2716,6 +2719,14 @@ void UpdatePlayer()
                                                     YoshiPound(A, B, true);
                                                 }
                                             }
+                                            else if(Player[A].Mount == 1)
+                                            {
+                                                if(Player[A].MountType == 4 && Player[A].Location.SpeedY > 5.5)
+                                                {
+                                                    PlaySound(37);
+                                                    YoshiPound(A, B, true);
+                                                }
+                                            }
                                             if(tempHit3 == 0) // For walking
                                             {
                                                 tempHit3 = B;
@@ -3490,7 +3501,7 @@ void UpdatePlayer()
                                         {
                                             if(Player[A].Mount == 1 || Player[A].Mount == 2 || Player[A].Stoned)
                                                 NPCHit(B, 8, A);
-                                            else if(!(NPC[B].Type == 245 || NPC[B].Type == 275 || NPC[B].Type == 318 || NPC[B].Type == 319 || NPC[B].Type == 320 || NPC[B].Type == 321 || NPC[B].Type == 8 || NPC[B].Type == 12 || NPC[B].Type == 36 || NPC[B].Type == 294 || NPC[B].Type == 285 || NPC[B].Type == 332 || NPC[B].Type == 333 || NPC[B].Type == 286 || NPC[B].Type == 51 || NPC[B].Type == 52 || NPC[B].Type == 53 || NPC[B].Type == 54 || NPC[B].Type == 74 || NPC[B].Type == 93 || NPC[B].Type == 200 || NPC[B].Type == 205 || NPC[B].Type == 207 || NPC[B].Type == 201 || NPC[B].Type == 261 || NPC[B].Type == 270) && NPCCanWalkOn[NPC[B].Type] == false)
+                                            else if(NPCSpinJumpHurt[NPC[B].Type] == false && NPCCanWalkOn[NPC[B].Type] == false)
                                             {
                                                 if(Player[A].Wet > 0 && (NPCIsCheep[NPC[B].Type] || NPC[B].Type == 231 || NPC[B].Type == 235))
                                                 {
@@ -3767,6 +3778,8 @@ void UpdatePlayer()
                                                         Player[A].MountType = 2;
                                                     if(NPC[B].Type == 193)
                                                         Player[A].MountType = 3;
+                                                    if(NPC[B].Type == 342)
+                                                        Player[A].MountType = 4;
                                                     PlaySound(2);
                                                 }
                                                 else if(NPCIsYoshi[NPC[B].Type] && (Player[A].Character == 1 || Player[A].Character == 2))

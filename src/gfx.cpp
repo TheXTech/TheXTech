@@ -52,7 +52,7 @@ bool GFX_t::load()
 
     loadImage(BMVs, uiPath + "BMVs.png");
     loadImage(BMWin, uiPath + "BMWin.png");
-    For(i, 1, 3)
+    For(i, 1, 4)
         loadImage(Boot[i], uiPath + fmt::format_ne("Boot{0}.png", i));
 
     For(i, 1, 5)
