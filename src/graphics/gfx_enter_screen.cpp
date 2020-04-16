@@ -32,7 +32,7 @@ void GameThing()
 {
     int A = 0;
 //    int B = 0;
-    RangeArr<Player_t, 1, 2> tempPlayer;
+    Player_t tempPlayer[3];
     tempPlayer[1] = Player[1];
     tempPlayer[2] = Player[2];
 

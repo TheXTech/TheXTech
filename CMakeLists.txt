@@ -86,6 +86,8 @@ option(USE_SYSTEM_SDL2 "Use SDL2 from a system even prefering system libraries" 
 
 option(USE_STATIC_LIBC "Link libc and libstdc++ statically" OFF)
 
+option(RANGE_ARR_USE_HEAP "Store data of RangeArr<> template in a heap" OFF)
+
 option(ENABLE_ANTICHEAT_TRAP "Enable anti-cheating trap for the \"redigitiscool\" cheat code" OFF)
 option(ENABLE_OLD_CREDITS "Use original Redigit's credits without changes" OFF)
 option(ENABLE_LOGGING "Enable debug logging" ON)
@@ -342,6 +344,10 @@ endif()
 
 target_include_directories(thextech PRIVATE src lib ${A2XT_INCS})
 target_link_libraries(thextech PRIVATE A2XT_Int)
+
+if(RANGE_ARR_USE_HEAP)
+    target_compile_definitions(thextech PRIVATE -DRANGE_ARR_USE_HEAP)
+endif()
 
 if(ENABLE_ANTICHEAT_TRAP)
     target_compile_definitions(thextech PRIVATE -DENABLE_ANTICHEAT_TRAP)

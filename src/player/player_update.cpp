@@ -55,8 +55,8 @@ void UpdatePlayer()
     // 2 is from the right
     // 3 is from the bottom
     // 4 is from the left
-    RangeArr<int, 1, 2> tempBlockHit;
-    RangeArr<double, 1, 2> tempBlockA;
+    int tempBlockHit[3] = {0};
+//    double tempBlockA[3] = {0};
     bool tempHit = false;
     bool tempSpring = false;
     bool tempShell = false;
@@ -159,8 +159,8 @@ void UpdatePlayer()
         tempHit3 = 0;
         tempBlockHit[1] = 0;
         tempBlockHit[2] = 0;
-        tempBlockA[1] = 0;
-        tempBlockA[2] = 0;
+//        tempBlockA[1] = 0; // Unused
+//        tempBlockA[2] = 0;
         if(Player[A].GrabTime > 0) // if grabbing something, take control away from the player
         {
             Player[A].Slide = false;
