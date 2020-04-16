@@ -2535,6 +2535,15 @@ void NPCSpecial(int A)
         {
             if(NPC[A].Type != 339)
             {
+                for(int B = 1; B <= numBlock; B++)
+                {
+                    if(CheckCollision(NPC[A].Location, Block[B].Location) && NPC[A].Slope > 0)
+                    {
+                        if(BlockSlope[B] == -1)
+                        {
+                        }
+                    }
+                }
                 if(NPC[A].Special5 == 0)
                 {
                     NPC[A].Special5 = NPC[A].DefaultDirection;
@@ -2547,7 +2556,7 @@ void NPCSpecial(int A)
                 }
                 else
                 {
-                    NPC[A].Special4 += 0.0005 * -NPC[A].Direction;
+                    NPC[A].Special4 += 0.00099 * -NPC[A].Direction;
                     NPC[A].Location.SpeedX += NPC[A].Special4;
                     if(NPC[A].Location.SpeedX > 0)
                         NPC[A].Special5 = 1;
