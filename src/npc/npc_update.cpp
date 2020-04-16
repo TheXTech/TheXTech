@@ -1011,7 +1011,8 @@ void UpdateNPCs()
                                     !(NPC[B].Type == 39) && !(NPC[B].Type == 315) && !(NPC[B].Type == 316) &&
                                     !(NPC[B].Type == 45 && NPC[B].Special == 0.0) &&
                                     !(NPC[B].Type == 91) && !(NPC[B].Type == 159) && !(NPC[B].Type == 195) &&
-                                    !(NPC[B].Type == 30 && NPC[B].Projectile == true) && NPC[B].Type != 241 && NPC[B].Type != 305 && NPC[B].Type != 263 && NPC[B].Type != 291 && NPC[B].Type != 305)
+                                    !(NPC[B].Type == 30 && NPC[B].Projectile == true) && NPC[B].Type != 241 && NPC[B].Type != 305 && NPC[B].Type != 263 &&
+                                    NPC[B].Type != 291 && NPC[B].Type != 305)
                                 {
                                     if(NPC[A].CantHurtPlayer != NPC[B].CantHurtPlayer && NPC[B].Killed == 0 && (Player[NPC[A].HoldingPlayer].StandingOnNPC != B) && NPC[B].Inert == false)
                                     {
@@ -1508,7 +1509,7 @@ void UpdateNPCs()
                             }
                         }
                     }
-                    if(!(NPC[A].Type == 39) && !(NPC[A].Type == 315) && !(NPC[A].Type == 316) && !(NPC[A].Type == 46) && !(NPC[A].Type == 311) && !(NPC[A].Type == 212) && !(NPC[A].Type == 56) && !(NPC[A].Type == 57) && !(NPC[A].Type == 60) && !(NPC[A].Type == 62) && !(NPC[A].Type == 64) && !(NPC[A].Type == 66) && !(NPC[A].Type == 84) && !(NPC[A].Type == 181) && !(NPC[A].Type == 85) && !(NPC[A].Type == 22) && !(NPC[A].Type == 49) && !(NPC[A].Type == 50) && !(NPC[A].Type >= 104 && NPC[A].Type <= 106))
+                    if(!(NPC[A].Type == 39) && !(NPC[A].Type == 294) && !(NPC[A].Type == 315) && !(NPC[A].Type == 316) && !(NPC[A].Type == 46) && !(NPC[A].Type == 311) && !(NPC[A].Type == 212) && !(NPC[A].Type == 56) && !(NPC[A].Type == 57) && !(NPC[A].Type == 60) && !(NPC[A].Type == 62) && !(NPC[A].Type == 64) && !(NPC[A].Type == 66) && !(NPC[A].Type == 84) && !(NPC[A].Type == 181) && !(NPC[A].Type == 85) && !(NPC[A].Type == 22) && !(NPC[A].Type == 49) && !(NPC[A].Type == 50) && !(NPC[A].Type >= 104 && NPC[A].Type <= 106))
                     {
                         if(NPC[A].Location.SpeedX < 0) // Find the NPCs direction
                             NPC[A].Direction = -1;

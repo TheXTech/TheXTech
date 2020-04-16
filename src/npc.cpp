@@ -2533,9 +2533,32 @@ void NPCSpecial(int A)
         }
         else
         {
-            NPC[A].Location.SpeedX = 2.42 * NPC[A].Direction;
             if(NPC[A].Type != 339)
+            {
+                if(NPC[A].Special5 == 0)
+                {
+                    NPC[A].Special5 = NPC[A].DefaultDirection;
+                }
                 NPC[A].Location.SpeedY = NPC[A].Location.SpeedY + Physics.NPCGravity;
+                if(NPC[A].Slope == 0)
+                {
+                    NPC[A].Special4 = 0;
+                    NPC[A].Location.SpeedX = 2.42 * NPC[A].Special5;
+                }
+                else
+                {
+                    NPC[A].Special4 += 0.0005 * -NPC[A].Direction;
+                    NPC[A].Location.SpeedX += NPC[A].Special4;
+                    if(NPC[A].Location.SpeedX > 0)
+                        NPC[A].Special5 = 1;
+                    else if(NPC[A].Location.SpeedX < 0)
+                        NPC[A].Special5 = -1;
+                }
+                if(NPC[A].Special4 > 2.42)
+                    NPC[A].Special4 = 2.42;
+            }
+            else
+                NPC[A].Location.SpeedX = 2.42 * NPC[A].Direction;
         }
         const double rad2deg = 180.0 / M_PI;
         NPC[A].Special6 +=  (NPC[A].Location.SpeedX / (0.5 * NPC[A].Location.Height)) * rad2deg;
