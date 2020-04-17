@@ -191,8 +191,8 @@ void LoadCustomNPC(int A, std::string cFileName)
         NPCGrabFromTop[A] = npc.grabtop;
     if(npc.en_jumphurt)
         NPCJumpHurt[A] = npc.jumphurt;
-    if(npc.en_spinjump)
-        NPCSpinJumpHurt[A] = npc.spinjump;
+//    if(npc.en_spinjump) // FIXME: реализовать, как только будет нужное обновление в PGE-FL
+//        NPCSpinJumpHurt[A] = npc.spinjump;
     if(npc.en_nohurt)
         NPCWontHurt[A] = npc.nohurt;
     if(npc.en_noblockcollision)

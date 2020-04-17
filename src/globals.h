@@ -404,6 +404,8 @@ struct NPC_t
     double Special6 = 0.0;
 // EXTRA: Special7 As Double
     double Special7 = 0.0;
+    double Special8 = 0.0;
+    double Special9 = 0.0;
 //    TurnAround As Boolean 'if the NPC needs to turn around
     bool TurnAround = false;
 //    Killed As Integer 'Flags the NPC to die a specific way.
@@ -928,6 +930,7 @@ struct Warp_t
     bool noPrintStars = false;
     bool noEntranceScene = false;
     bool cannonExit = false;
+    bool bombExit = false;
     double cannonExitSpeed = 10.0;
     std::string eventEnter;
     std::string StarsMsg;

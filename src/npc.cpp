@@ -223,6 +223,36 @@ void Bomb(Location_t Location, int Game, int ImmunePlayer)
         }
     }
 
+    for(int i = 1; i <= numWarps; i++)
+    {
+        if(Warp[i].bombExit)
+        {
+            A = std::abs(Warp[i].Entrance.X + Warp[i].Entrance.Width / 2.0 - X);
+            B = std::abs(Warp[i].Entrance.Y + Warp[i].Entrance.Height / 2.0 - Y);
+            C = std::sqrt(std::pow(A, 2) + std::pow(B, 2));
+            if((float)C <= Radius + (Warp[i].Entrance.Width / 4.0 + Warp[i].Entrance.Height / 4.0))
+            {
+                Warp[i].bombExit = false;
+            }
+        }
+    }
+
+    for(int i = 1; i <= numBackground + numLocked; i++)
+    {
+        if(Background[i].Type == 205 && Background[i].Hidden == false)
+        {
+            A = std::abs(Background[i].Location.X + Background[i].Location.Width / 2.0 - X);
+            B = std::abs(Background[i].Location.Y + Background[i].Location.Height / 2.0 - Y);
+            C = std::sqrt(std::pow(A, 2) + std::pow(B, 2));
+            if((float)C <= Radius + (Background[i].Location.Width / 2.0 + Background[i].Location.Height / 2.0))
+            {
+                Background[i].Hidden = true;
+                Background[i].Layer = "";
+                NewEffect(170, Background[i].Location);
+            }
+        }
+    }
+
     if(Game != 0)
     {
         for(i = 1; i <= numPlayers; i++)
@@ -2537,11 +2567,12 @@ void NPCSpecial(int A)
             {
                 for(int B = 1; B <= numBlock; B++)
                 {
-                    if(CheckCollision(NPC[A].Location, Block[B].Location) && NPC[A].Slope > 0)
+                    if(CheckCollision(NPC[A].Location, Block[B].Location) && BlockSlope[B] != 0)
                     {
-                        if(BlockSlope[B] == -1)
-                        {
-                        }
+                        const double rad2deg = 180.0 / M_PI;
+                        NPC[A].Special7 = SDL_atan2(Block[B].Location.Width, Block[B].Location.Height) * rad2deg;
+                        if(NPC[A].Special7 != 0)
+                            NPC[A].Special8 = NPC[A].Special7 / 100;
                     }
                 }
                 if(NPC[A].Special5 == 0)
@@ -2551,12 +2582,17 @@ void NPCSpecial(int A)
                 NPC[A].Location.SpeedY = NPC[A].Location.SpeedY + Physics.NPCGravity;
                 if(NPC[A].Slope == 0)
                 {
+                    NPC[A].Special9 = 0;
                     NPC[A].Special4 = 0;
                     NPC[A].Location.SpeedX = 2.42 * NPC[A].Special5;
                 }
                 else
                 {
-                    NPC[A].Special4 += 0.00099 * -NPC[A].Direction;
+                    if(NPC[A].Special8 != 0)
+                        NPC[A].Special9 = NPC[A].Special8;
+                    else
+                        NPC[A].Special9 = 0.45;
+                    NPC[A].Special4 += (0.0009 / NPC[A].Special9) * -NPC[A].Direction;
                     NPC[A].Location.SpeedX += NPC[A].Special4;
                     if(NPC[A].Location.SpeedX > 0)
                         NPC[A].Special5 = 1;

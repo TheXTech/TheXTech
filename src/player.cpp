@@ -3953,6 +3953,10 @@ void SuperWarp(int A)
                     Player[A].Slide = false;
                     if(Warp[B].Effect != 3)
                         Player[A].Stoned = false;
+                    if(Warp[B].bombExit)
+                    {
+                        canWarp = false;
+                    }
                     if(Warp[B].Locked)
                     {
                         if(Player[A].HoldingNPC > 0 && NPC[Player[A].HoldingNPC].Type == 31)

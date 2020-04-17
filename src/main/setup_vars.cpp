@@ -56,6 +56,9 @@ void SetupVars()
     EffectWidth[162] = 64;
     EffectHeight[162] = 64;
 
+    EffectWidth[170] = 16;
+    EffectHeight[170] = 16;
+
     EffectWidth[71] = 16;
     EffectHeight[71] = 16;
     EffectWidth[148] = 16;

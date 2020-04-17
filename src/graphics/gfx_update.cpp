@@ -648,7 +648,7 @@ void UpdateGraphics(bool skipRepaint)
         For(A, numBackground + 1, numBackground + numLocked) // Locked doors
         {
             if(vScreenCollision(Z, Background[A].Location) &&
-                (Background[A].Type == 98 || Background[A].Type == 160) && !Background[A].Hidden)
+                (Background[A].Type == 98 || Background[A].Type == 160 || Background[A].Type == 205) && !Background[A].Hidden)
             {
                 frmMain.renderTexture(vScreenX[Z] + Background[A].Location.X,
                                       vScreenY[Z] + Background[A].Location.Y,

@@ -96,6 +96,9 @@ void UpdateEffects()
                 NewEffect(147, newLoc(e.Location.X + (dRand() * e.Location.Width),
                                       e.Location.Y + (dRand() * e.Location.Height)));
             }
+            e.Location.SpeedY += 0.5;
+            if(e.Location.SpeedY > 12)
+                e.Location.SpeedY = 12;
         }
         else if(e.Type == 111)
         {
@@ -142,7 +145,7 @@ void UpdateEffects()
                     e.Frame = 0;
             }
         }
-        else if(e.Type == 1 || e.Type == 21 || e.Type == 30 || e.Type == 51 || e.Type == 100 || e.Type == 135) // Block break
+        else if(e.Type == 1 || e.Type == 21 || e.Type == 30 || e.Type == 51 || e.Type == 100 || e.Type == 135 || e.Type == 170) // Block break
         {
             e.Location.SpeedY = e.Location.SpeedY + 0.6;
             e.Location.SpeedX = e.Location.SpeedX * 0.99;
@@ -296,7 +299,7 @@ void UpdateEffects()
             else if(e.FrameCount == 8)
                 e.Frame = e.Frame + 1;
         }
-        else if(e.Type == 8 || e.Type == 158 || e.Type == 159 || e.Type == 162 || e.Type == 9 || e.Type == 15 || e.Type == 16 || e.Type == 19 || e.Type == 27 || e.Type == 146 || e.Type == 28 || e.Type == 165 || e.Type == 29 || e.Type == 153 || e.Type == 154 || e.Type == 32 || e.Type == 36 || e.Type == 47 || e.Type == 60 || e.Type == 95 || e.Type == 169 || e.Type == 96 || e.Type == 109) // Flying turtle shell / Bullet bill /hard thing
+        else if(e.Type == 8 || e.Type == 158 || e.Type == 159 || e.Type == 162 || e.Type == 9 || e.Type == 15 || e.Type == 16 || e.Type == 19 || e.Type == 27 || e.Type == 146 || e.Type == 28 || e.Type == 165 || e.Type == 29 || e.Type == 153 || e.Type == 154 || e.Type == 32 || e.Type == 36 || e.Type == 47 || e.Type == 60 || e.Type == 95 || e.Type == 169 || e.Type == 168 || e.Type == 96 || e.Type == 109) // Flying turtle shell / Bullet bill /hard thing
         {
             e.Location.SpeedY = e.Location.SpeedY + 0.5;
             if(e.Location.SpeedY >= 10)
@@ -825,9 +828,12 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
     if(numEffects >= maxEffects - 4)
         return;
 
-    if(A == 1 || A == 21 || A == 30 || A == 51 || A == 100 || A == 135) // Block break effect
+    if(A == 1 || A == 21 || A == 30 || A == 51 || A == 100 || A == 135 || A == 170) // Block break effect
     {
-        for(B = 1; B <= 4; B++)
+        int C = 4;
+        if(A == 170)
+            C = 8;
+        for(B = 1; B <= C; B++)
         {
             numEffects++;
             Effect[numEffects].Shadow = Shadow;
@@ -1369,7 +1375,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
         Effect[numEffects].Life = 150;
         Effect[numEffects].Type = A;
     }
-    else if(A == 4 || A == 7 || A == 8 || A == 158 || A == 162 || A == 159 || A == 9 || A == 19 || A == 22 || A == 26 || A == 101 || A == 102 || A == 27 || A == 168 || A == 146 || A == 28 || A == 165 || A == 29 || A == 153 || A == 154 || A == 31 || A == 32 || A == 145 || A == 33 || A == 34 || A == 36 || A == 38 || A == 40 || A == 42 || A == 44 || A == 46 || A == 47 || A == 53 || A == 60 || A == 9 || A == 6 || A == 95 || A == 169 || A == 96 || A == 110 || A == 117 || A == 121 || A == 127 || A == 142) // Flying goomba / turtle shell / hard thing shell
+    else if(A == 4 || A == 7 || A == 8 || A == 158 || A == 162 || A == 167 || A == 159 || A == 9 || A == 19 || A == 22 || A == 26 || A == 101 || A == 102 || A == 27 || A == 168 || A == 146 || A == 28 || A == 165 || A == 29 || A == 153 || A == 154 || A == 31 || A == 32 || A == 145 || A == 33 || A == 34 || A == 36 || A == 38 || A == 40 || A == 42 || A == 44 || A == 46 || A == 47 || A == 53 || A == 60 || A == 9 || A == 6 || A == 95 || A == 169 || A == 96 || A == 110 || A == 117 || A == 121 || A == 127 || A == 142) // Flying goomba / turtle shell / hard thing shell
     {
         numEffects++;
         Effect[numEffects].Shadow = Shadow;

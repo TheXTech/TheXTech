@@ -1399,7 +1399,7 @@ void UpdateNPCs()
                     {
                         if(NPC[A].Projectile == false && NPC[A].Special2 == 0)
                         {
-                            C = 0;
+                            int C = 0;
                             for(B = 1; B <= numPlayers; B++)
                             {
                                 if(Player[B].Dead == false && Player[B].Section == NPC[A].Section)

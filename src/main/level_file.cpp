@@ -430,6 +430,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         Warp[numWarps].NoYoshi = w.novehicles;
         Warp[numWarps].WarpNPC = w.allownpc;
         Warp[numWarps].Locked = w.locked;
+        Warp[numWarps].bombExit = w.need_a_bomb;
 
         Warp[numWarps].cannonExit = w.cannon_exit;
         Warp[numWarps].cannonExitSpeed = w.cannon_exit_speed;
@@ -713,6 +714,20 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
                 Background[B].Location = Warp[A].Entrance;
                 Background[B].Type = 98;
                 Background[B].Location.Width = 16;
+            }
+            else if(Warp[A].Effect == 2 && Warp[A].bombExit) // For bomb-exits
+            {
+                B++;
+                numLocked++;
+                Background[B] = Background_t();
+                Background[B].Layer = Warp[A].Layer;
+                Background[B].Hidden = Warp[A].Hidden;
+                Background[B].Location = Warp[A].Entrance;
+                Background[B].Type = 205;
+                Background[B].Location.Width = 32;
+                Background[B].Location.Height = 32;
+                Background[B].Location.Y = Warp[A].Entrance.Y - Background[B].Location.Height / 2.0;
+                Background[B].Location.X = Warp[A].Entrance.X + Warp[A].Entrance.Width / 2.0 - Background[B].Location.Width / 2.0;
             }
         }
     }
