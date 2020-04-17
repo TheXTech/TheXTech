@@ -3889,7 +3889,10 @@ void SuperWarp(int A)
             {
                 Player[A].ShowWarp = B;
                 canWarp = false;
-                if(Warp[B].Direction == 1 && Player[A].Controls.Up)
+
+                if(Warp[B].Effect == 3) // Portal
+                    canWarp = true;
+                else if(Warp[B].Direction == 1 && Player[A].Controls.Up) // Pipe
                 {
                     if(WarpCollision(Player[A].Location, B))
                         canWarp = true;
@@ -3909,7 +3912,8 @@ void SuperWarp(int A)
                     if(WarpCollision(Player[A].Location, B))
                         canWarp = true;
                 }
-                else if(Warp[B].Effect == 0 || Warp[B].Effect == 3)
+                // NOTE: Would be correct to move this up, but leave this here for a compatibility to keep the same behavior
+                else if(Warp[B].Effect == 0) // Instant
                     canWarp = true;
 
                 if(Warp[B].LevelEnt)
