@@ -3938,8 +3938,10 @@ void SuperWarp(int A)
                 if(canWarp)
                 {
                     plr.Slide = false;
+
                     if(warp.Effect != 3)
                         plr.Stoned = false;
+
                     if(warp.Locked)
                     {
                         if(plr.HoldingNPC > 0 && NPC[plr.HoldingNPC].Type == 31)
