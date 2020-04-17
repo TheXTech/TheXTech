@@ -29,6 +29,7 @@
 #include <DirManager/dirman.h>
 #include <Utils/files.h>
 #include <PGE_File_Formats/file_formats.h>
+#include <PGE_File_Formats/smbx64.h>
 #include <fmt_format_ne.h>
 
 
@@ -158,6 +159,13 @@ void FindCustomNPCs(/*std::string cFilePath*/)
     }
 }
 
+static inline void boolVAR(NPCConfigFile npc, const char *key, bool &dst)
+{
+    auto i = npc.entries.find(key);
+    if(i != npc.entries.end() && SMBX64::IsBool(i->second))
+        dst = static_cast<bool>(toInt(i->second));
+}
+
 void LoadCustomNPC(int A, std::string cFileName)
 {
     NPCConfigFile npc;
@@ -191,8 +199,9 @@ void LoadCustomNPC(int A, std::string cFileName)
         NPCGrabFromTop[A] = npc.grabtop;
     if(npc.en_jumphurt)
         NPCJumpHurt[A] = npc.jumphurt;
-//    if(npc.en_spinjump) // FIXME: реализовать, как только будет нужное обновление в PGE-FL
-//        NPCSpinJumpHurt[A] = npc.spinjump;
+
+    boolVAR(npc, "spinjump", NPCSpinJumpHurt[A]);
+
     if(npc.en_nohurt)
         NPCWontHurt[A] = npc.nohurt;
     if(npc.en_noblockcollision)
