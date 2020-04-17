@@ -3876,59 +3876,59 @@ void PowerUps(int A)
 
 void SuperWarp(int A)
 {
-    int B = 0;
-    int C = 0;
-    Location_t tempLocation;
     bool canWarp = false;
 
-    if(Player[A].WarpCD <= 0 && Player[A].Mount != 2 && !Player[A].GroundPound && !Player[A].GroundPound2)
+    auto &plr = Player[A];
+
+    if(plr.WarpCD <= 0 && plr.Mount != 2 && !plr.GroundPound && !plr.GroundPound2)
     {
-        for(B = 1; B <= numWarps; B++)
+        for(int B = 1; B <= numWarps; B++)
         {
-            if(CheckCollision(Player[A].Location, Warp[B].Entrance) && !Warp[B].Hidden)
+            auto &warp = Warp[B];
+            if(CheckCollision(plr.Location, warp.Entrance) && !warp.Hidden)
             {
-                Player[A].ShowWarp = B;
+                plr.ShowWarp = B;
                 canWarp = false;
 
-                if(Warp[B].Effect == 3) // Portal
+                if(warp.Effect == 3) // Portal
                     canWarp = true;
-                else if(Warp[B].Direction == 1 && Player[A].Controls.Up) // Pipe
+                else if(warp.Direction == 1 && plr.Controls.Up) // Pipe
                 {
-                    if(WarpCollision(Player[A].Location, B))
+                    if(WarpCollision(plr.Location, B))
                         canWarp = true;
                 }
-                else if(Warp[B].Direction == 2 && Player[A].Controls.Left)
+                else if(warp.Direction == 2 && plr.Controls.Left)
                 {
-                    if(WarpCollision(Player[A].Location, B))
+                    if(WarpCollision(plr.Location, B))
                         canWarp = true;
                 }
-                else if(Warp[B].Direction == 3 && Player[A].Controls.Down)
+                else if(warp.Direction == 3 && plr.Controls.Down)
                 {
-                    if(WarpCollision(Player[A].Location, B))
+                    if(WarpCollision(plr.Location, B))
                         canWarp = true;
                 }
-                else if(Warp[B].Direction == 4 && Player[A].Controls.Right)
+                else if(warp.Direction == 4 && plr.Controls.Right)
                 {
-                    if(WarpCollision(Player[A].Location, B))
+                    if(WarpCollision(plr.Location, B))
                         canWarp = true;
                 }
                 // NOTE: Would be correct to move this up, but leave this here for a compatibility to keep the same behavior
-                else if(Warp[B].Effect == 0) // Instant
+                else if(warp.Effect == 0) // Instant
                     canWarp = true;
 
-                if(Warp[B].LevelEnt)
+                if(warp.LevelEnt)
                     canWarp = false;
 
-                if(Warp[B].Stars > numStars && canWarp)
+                if(warp.Stars > numStars && canWarp)
                 {
-                    if(Warp[B].StarsMsg.empty())
+                    if(warp.StarsMsg.empty())
                     {
-                        if(Warp[B].Stars == 1)
+                        if(warp.Stars == 1)
                             MessageText = "You need 1 star to enter.";
                         else
-                            MessageText = fmt::format_ne("You need {0} stars to enter.", Warp[B].Stars);
+                            MessageText = fmt::format_ne("You need {0} stars to enter.", warp.Stars);
                     } else {
-                        MessageText = Warp[B].StarsMsg;
+                        MessageText = warp.StarsMsg;
                     }
                     PauseGame(A);
                     MessageText = "";
@@ -3937,59 +3937,59 @@ void SuperWarp(int A)
 
                 if(canWarp)
                 {
-                    Player[A].Slide = false;
-                    if(Warp[B].Effect != 3)
-                        Player[A].Stoned = false;
-                    if(Warp[B].Locked)
+                    plr.Slide = false;
+                    if(warp.Effect != 3)
+                        plr.Stoned = false;
+                    if(warp.Locked)
                     {
-                        if(Player[A].HoldingNPC > 0 && NPC[Player[A].HoldingNPC].Type == 31)
+                        if(plr.HoldingNPC > 0 && NPC[plr.HoldingNPC].Type == 31)
                         {
-                            NPC[Player[A].HoldingNPC].Killed = 9;
-                            NewEffect(10, NPC[Player[A].HoldingNPC].Location);
-                            Warp[B].Locked = false;
-                            int tempVar = numBackground + numLocked;
-                            for(C = numBackground; C <= tempVar; C++)
+                            NPC[plr.HoldingNPC].Killed = 9;
+                            NewEffect(10, NPC[plr.HoldingNPC].Location);
+                            warp.Locked = false;
+                            int allBGOs = numBackground + numLocked;
+                            for(int C = numBackground; C <= allBGOs; C++)
                             {
                                 if(Background[C].Type == 98)
                                 {
-                                    if(CheckCollision(Warp[B].Entrance, Background[C].Location))
+                                    if(CheckCollision(warp.Entrance, Background[C].Location))
                                     {
-                                        Background[C].Layer = "";
+                                        Background[C].Layer.clear();
                                         Background[C].Hidden = true;
                                     }
                                 }
                             }
                         }
-                        else if(Player[A].Mount == 3 && Player[A].YoshiNPC > 0 && NPC[Player[A].YoshiNPC].Type == 31)
+                        else if(plr.Mount == 3 && plr.YoshiNPC > 0 && NPC[plr.YoshiNPC].Type == 31)
                         {
-                            NPC[Player[A].YoshiNPC].Killed = 9;
-                            Player[A].YoshiNPC = 0;
-                            Warp[B].Locked = false;
-                            int tempVar2 = numBackground + numLocked;
-                            for(C = numBackground; C <= tempVar2; C++)
+                            NPC[plr.YoshiNPC].Killed = 9;
+                            plr.YoshiNPC = 0;
+                            warp.Locked = false;
+                            int allBGOs = numBackground + numLocked;
+                            for(int C = numBackground; C <= allBGOs; C++)
                             {
                                 if(Background[C].Type == 98)
                                 {
-                                    if(CheckCollision(Warp[B].Entrance, Background[C].Location))
+                                    if(CheckCollision(warp.Entrance, Background[C].Location))
                                     {
-                                        Background[C].Layer = "";
+                                        Background[C].Layer.clear();
                                         Background[C].Hidden = true;
                                     }
                                 }
                             }
                         }
-                        else if(Player[A].HasKey)
+                        else if(plr.HasKey)
                         {
-                            Player[A].HasKey = false;
-                            Warp[B].Locked = false;
-                            int tempVar3 = numBackground + numLocked;
-                            for(C = numBackground; C <= tempVar3; C++)
+                            plr.HasKey = false;
+                            warp.Locked = false;
+                            int allBGOs = numBackground + numLocked;
+                            for(int C = numBackground; C <= allBGOs; C++)
                             {
                                 if(Background[C].Type == 98)
                                 {
-                                    if(CheckCollision(Warp[B].Entrance, Background[C].Location))
+                                    if(CheckCollision(warp.Entrance, Background[C].Location))
                                     {
-                                        Background[C].Layer = "";
+                                        Background[C].Layer.clear();
                                         Background[C].Hidden = true;
                                     }
                                 }
@@ -4003,85 +4003,85 @@ void SuperWarp(int A)
                 if(canWarp)
                 {
                     UnDuck(A);
-                    Player[A].YoshiTongueLength = 0;
-                    Player[A].MountSpecial = 0;
-                    Player[A].FrameCount = 0;
-                    Player[A].TailCount = 0;
-                    Player[A].CanFly = false;
-                    Player[A].CanFly2 = false;
-                    Player[A].RunCount = 0;
+                    plr.YoshiTongueLength = 0;
+                    plr.MountSpecial = 0;
+                    plr.FrameCount = 0;
+                    plr.TailCount = 0;
+                    plr.CanFly = false;
+                    plr.CanFly2 = false;
+                    plr.RunCount = 0;
 
-                    if(Warp[B].NoYoshi && Player[A].YoshiPlayer > 0)
+                    if(warp.NoYoshi && plr.YoshiPlayer > 0)
                     {
                         YoshiSpit(A);
                     }
 
-                    if(!Warp[B].WarpNPC || (Player[A].Mount == 3 && (Player[A].YoshiNPC != 0 || Player[A].YoshiPlayer != 0) && Warp[B].NoYoshi))
+                    if(!warp.WarpNPC || (plr.Mount == 3 && (plr.YoshiNPC != 0 || plr.YoshiPlayer != 0) && warp.NoYoshi))
                     {
-                        if(Player[A].HoldingNPC > 0)
+                        if(plr.HoldingNPC > 0)
                         {
-                            if(NPC[Player[A].HoldingNPC].Type == 29)
+                            if(NPC[plr.HoldingNPC].Type == 29)
                             {
-                                NPCHit(Player[A].HoldingNPC, 3, Player[A].HoldingNPC);
+                                NPCHit(plr.HoldingNPC, 3, plr.HoldingNPC);
                             }
                         }
-                        if(Player[A].Character == 3 ||
-                          (Player[A].Character == 4 && Warp[B].Effect == 1 && Warp[B].Direction == 1))
-                            NPC[Player[A].HoldingNPC].Location.Y = Warp[B].Entrance.Y;
-                        Player[A].HoldingNPC = 0;
-                        if(Player[A].YoshiNPC > 0)
+                        if(plr.Character == 3 ||
+                          (plr.Character == 4 && warp.Effect == 1 && warp.Direction == 1))
+                            NPC[plr.HoldingNPC].Location.Y = warp.Entrance.Y;
+                        plr.HoldingNPC = 0;
+                        if(plr.YoshiNPC > 0)
                         {
                             YoshiSpit(A);
                         }
                     }
 
-                    if(Player[A].HoldingNPC > 0)
+                    if(plr.HoldingNPC > 0)
                     {
-                        if(NPC[Player[A].HoldingNPC].Type == 263) // can't bring ice through warps
+                        if(NPC[plr.HoldingNPC].Type == 263) // can't bring ice through warps
                         {
-                            NPC[Player[A].HoldingNPC].HoldingPlayer = 0;
-                            Player[A].HoldingNPC = 0;
+                            NPC[plr.HoldingNPC].HoldingPlayer = 0;
+                            plr.HoldingNPC = 0;
                         }
                     }
 
-                    Player[A].StandingOnNPC = 0;
-                    if(Warp[B].Effect != 3) // Don't zero speed when passing a portal warp
+                    plr.StandingOnNPC = 0;
+                    if(warp.Effect != 3) // Don't zero speed when passing a portal warp
                     {
-                        Player[A].Location.SpeedX = 0;
-                        Player[A].Location.SpeedY = 0;
+                        plr.Location.SpeedX = 0;
+                        plr.Location.SpeedY = 0;
                     }
 
-                    if(!Warp[B].eventEnter.empty())
-                        ProcEvent(Warp[B].eventEnter);
+                    if(!warp.eventEnter.empty())
+                        ProcEvent(warp.eventEnter);
 
-                    if(Warp[B].Effect == 0 || Warp[B].Effect == 3)
+                    if(warp.Effect == 0 || warp.Effect == 3)
                     {
-                        Player[A].Location.X = Warp[B].Exit.X + Warp[B].Exit.Width / 2.0 - Player[A].Location.Width / 2.0;
-                        Player[A].Location.Y = Warp[B].Exit.Y + Warp[B].Exit.Height - Player[A].Location.Height - 0.1;
+                        plr.Location.X = warp.Exit.X + warp.Exit.Width / 2.0 - plr.Location.Width / 2.0;
+                        plr.Location.Y = warp.Exit.Y + warp.Exit.Height - plr.Location.Height - 0.1;
                         CheckSection(A);
-                        Player[A].WarpCD = 50;
+                        plr.WarpCD = (warp.Effect == 3) ? 10 : 50;
                         break;
                     }
-                    else if(Warp[B].Effect == 1)
+                    else if(warp.Effect == 1)
                     {
                         PlaySound(17);
-                        Player[A].Effect = 3;
-                        Player[A].Warp = B;
+                        plr.Effect = 3;
+                        plr.Warp = B;
 //                        if(nPlay.Online == true && A == nPlay.MySlot + 1)
-//                            Netplay::sendData Netplay::PutPlayerLoc(nPlay.MySlot) + "1j" + std::to_string(A) + "|" + Player[A].Warp + LB;
+//                            Netplay::sendData Netplay::PutPlayerLoc(nPlay.MySlot) + "1j" + std::to_string(A) + "|" + plr.Warp + LB;
                     }
-                    else if(Warp[B].Effect == 2)
+                    else if(warp.Effect == 2)
                     {
                         PlaySound(46);
-                        Player[A].Effect = 7;
-                        Player[A].Warp = B;
+                        plr.Effect = 7;
+                        plr.Warp = B;
 //                        if(nPlay.Online == true && A == nPlay.MySlot + 1)
-//                            Netplay::sendData Netplay::PutPlayerLoc(nPlay.MySlot) + "1j" + std::to_string(A) + "|" + Player[A].Warp + LB;
-                        Player[A].Location.X = Warp[Player[A].Warp].Entrance.X + Warp[Player[A].Warp].Entrance.Width / 2.0 - Player[A].Location.Width / 2.0;
-                        Player[A].Location.Y = Warp[Player[A].Warp].Entrance.Y + Warp[Player[A].Warp].Entrance.Height - Player[A].Location.Height;
-                        for(C = 1; C <= numBackground; C++)
+//                            Netplay::sendData Netplay::PutPlayerLoc(nPlay.MySlot) + "1j" + std::to_string(A) + "|" + plr.Warp + LB;
+                        plr.Location.X = Warp[plr.Warp].Entrance.X + Warp[plr.Warp].Entrance.Width / 2.0 - plr.Location.Width / 2.0;
+                        plr.Location.Y = Warp[plr.Warp].Entrance.Y + Warp[plr.Warp].Entrance.Height - plr.Location.Height;
+                        for(int C = 1; C <= numBackground; C++)
                         {
-                            if((CheckCollision(Warp[B].Entrance, Background[C].Location) | CheckCollision(Warp[B].Exit, Background[C].Location)) != 0)
+                            if((CheckCollision(warp.Entrance, Background[C].Location) | CheckCollision(warp.Exit, Background[C].Location)) != 0)
                             {
                                 if(Background[C].Type == 88)
                                     NewEffect(54, Background[C].Location);
@@ -4091,11 +4091,11 @@ void SuperWarp(int A)
                                     NewEffect(59, Background[C].Location);
                                 else if(Background[C].Type == 141)
                                 {
-                                    tempLocation = Background[C].Location;
-                                    tempLocation.X = tempLocation.X + tempLocation.Width / 2.0;
-                                    tempLocation.Width = 104;
-                                    tempLocation.X = tempLocation.X - tempLocation.Width / 2.0;
-                                    NewEffect(103, tempLocation);
+                                    Location_t bLoc = Background[C].Location;
+                                    bLoc.X = bLoc.X + bLoc.Width / 2.0;
+                                    bLoc.Width = 104;
+                                    bLoc.X = bLoc.X - bLoc.Width / 2.0;
+                                    NewEffect(103, bLoc);
                                 }
                             }
                         }
@@ -4104,8 +4104,8 @@ void SuperWarp(int A)
             }
         }
     }
-    else if(Player[A].Mount != 2)
-        Player[A].WarpCD = Player[A].WarpCD - 1;
+    else if(plr.Mount != 2)
+        plr.WarpCD--;
 }
 
 void PlayerCollide(int A)
