@@ -2361,6 +2361,8 @@ void UpdateGraphics(bool skipRepaint)
             // Display the cursor
             {
                 auto &e = EditorCursor;
+                int curX = int(double(e.X) - vScreen[Z].Left);
+                int curY = int(double(e.Y) - vScreen[Z].Top);
 
                 if(e.Mode == OptCursor_t::LVL_BLOCKS) // Blocks
                 {
@@ -2518,24 +2520,18 @@ void UpdateGraphics(bool skipRepaint)
 
                 if(EditorCursor.Mode == 0 || EditorCursor.Mode == 6) // Eraser
                 {
-                    frmMain.renderTexture(double(EditorCursor.X) - vScreen[Z].Left - 2,
-                                          double(EditorCursor.Y) - vScreen[Z].Top,
-                                          GFX.ECursor[3]);
+                    frmMain.renderTexture(curX - 2, curY, GFX.ECursor[3]);
                 }
 
                 else if(EditorCursor.Mode == 13 || EditorCursor.Mode == 14) // Selector
                 {
-                    frmMain.renderTexture(double(EditorCursor.X) - vScreen[Z].Left,
-                                          double(EditorCursor.Y) - vScreen[Z].Top,
-                                          GFX.ECursor[2]);
+                    frmMain.renderTexture(curX, curY, GFX.ECursor[2]);
                 }
 
                 // ElseIf .Mode = 2 And (frmLevelSettings.optLevel(0).Value = True Or frmLevelSettings.optLevel(1).Value = True Or frmLevelSettings.optLevel(2).Value = True Or frmLevelSettings.optLevel(3).Value = True) Then
                 else if(EditorCursor.Mode == 2)
                 {
-                    frmMain.renderTexture(double(EditorCursor.X) - vScreen[Z].Left,
-                                          double(EditorCursor.Y) - vScreen[Z].Top,
-                                          GFX.ECursor[1]);
+                    frmMain.renderTexture(curX, curY, GFX.ECursor[1]);
                 }
 
                 else if(EditorCursor.Mode == 15) // Water
@@ -2550,18 +2546,18 @@ void UpdateGraphics(bool skipRepaint)
 //                    Next A
 //                    BitBlt myBackBuffer, .X - vScreen(Z).Left, .Y - vScreen(Z).Top, 32, 32, GFX.ECursorMask(2).hdc, 0, 0, vbSrcAnd
 //                    BitBlt myBackBuffer, .X - vScreen(Z).Left, .Y - vScreen(Z).Top, 32, 32, GFX.ECursor(2).hdc, 0, 0, vbSrcPaint
-                    frmMain.renderTexture(double(EditorCursor.X) - vScreen[Z].Left,
-                                          double(EditorCursor.Y) - vScreen[Z].Top,
-                                          GFX.ECursor[2]);
+                    frmMain.renderTexture(curX, curY, GFX.ECursor[2]);
 //                    If LCase(frmLayers.lstLayer.List(frmLayers.lstLayer.ListIndex)) <> "default" Then
+                    if(!e.Layer.empty() && SDL_strcasecmp(e.Layer.c_str(), "Default") != 0)
 //                        SuperPrint UCase(frmLayers.lstLayer.List(frmLayers.lstLayer.ListIndex)), 3, .X + 28, .Y + 34
+                        SuperPrint(e.Layer, 3, X + 28, Y + 34);
 //                    End If
                 }
 //                Else
                 else
                 {
 //                    If .Mode = 5 Then
-                    if(EditorCursor.Mode == 5)
+                    if(EditorCursor.Mode == OptCursor_t::LVL_WARPS)
                     {
 //                        BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, .Location.Width, 2, GFX.Split(1).hdc, 0, 0, vbSrcCopy
 //                        BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y + .Location.Height - 2, .Location.Width, 2, GFX.Split(1).hdc, 0, 0, vbSrcCopy
@@ -2571,11 +2567,11 @@ void UpdateGraphics(bool skipRepaint)
                     }
 //                    BitBlt myBackBuffer, .X - vScreen(Z).Left, .Y - vScreen(Z).Top, 32, 32, GFX.ECursorMask(2).hdc, 0, 0, vbSrcAnd
 //                    BitBlt myBackBuffer, .X - vScreen(Z).Left, .Y - vScreen(Z).Top, 32, 32, GFX.ECursor(2).hdc, 0, 0, vbSrcPaint
-                    frmMain.renderTexture(double(EditorCursor.X) - vScreen[Z].Left,
-                                          double(EditorCursor.Y) - vScreen[Z].Top,
-                                          GFX.ECursor[2]);
+                    frmMain.renderTexture(curX, curY, GFX.ECursor[2]);
 //                    If LCase(frmLayers.lstLayer.List(frmLayers.lstLayer.ListIndex)) <> "default" Then
+                    if(!e.Layer.empty() && SDL_strcasecmp(e.Layer.c_str(), "Default") != 0)
 //                        SuperPrint UCase(frmLayers.lstLayer.List(frmLayers.lstLayer.ListIndex)), 3, .X + 28, .Y + 34
+                        SuperPrint(EditorCursor.Layer, 3, curX + 28 , curY + 34);
 //                    End If
 //                End If
                 }

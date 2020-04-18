@@ -399,6 +399,7 @@ void UpdateEditor()
                             ResetNPC(A);
                             EditorCursor.NPC = NPC[A];
                             EditorCursor.NPC.Hidden = false;
+                            EditorCursor.Layer = NPC[A].Layer;
                             EditorCursor.Location = NPC[A].Location;
                             EditorCursor.Location.X = NPC[A].Location.X;
                             EditorCursor.Location.Y = NPC[A].Location.Y;
@@ -505,6 +506,7 @@ void UpdateEditor()
 //                                }
                                 EditorCursor.Mode = 1;
                                 EditorCursor.Block = Block[A];
+                                EditorCursor.Layer = Block[A].Layer;
                                 EditorCursor.Location.X = Block[A].Location.X;
                                 EditorCursor.Location.Y = Block[A].Location.Y;
                                 EditorCursor.Location.Width = Block[A].Location.Width;
@@ -656,6 +658,7 @@ void UpdateEditor()
 //                            }
 //                            frmBackgrounds::Background(Background[A].Type).Value = true;
                             EditorCursor.Background = Background[A];
+                            EditorCursor.Layer = Background[A].Layer;
                             EditorCursor.Location.X = Background[A].Location.X;
                             EditorCursor.Location.Y = Background[A].Location.Y;
                             SetCursor();
@@ -767,6 +770,7 @@ void UpdateEditor()
 //                                frmBlocks::BlockH.Value = Block[A].Location.Height / 32.0;
                                 EditorCursor.Mode = 1;
                                 EditorCursor.Block = Block[A];
+                                EditorCursor.Layer = Block[A].Layer;
                                 EditorCursor.Location.X = Block[A].Location.X;
                                 EditorCursor.Location.Y = Block[A].Location.Y;
                                 EditorCursor.Location.Width = Block[A].Location.Width;
@@ -1665,6 +1669,16 @@ void UpdateInterprocess()
             break;
         }
 
+        case IntProc::SetLayer:
+        {
+            EditorCursor.Layer = IntProc::getCMD();
+
+            EditorCursor.Block.Layer = EditorCursor.Layer;
+            EditorCursor.Background.Layer = EditorCursor.Layer;
+            EditorCursor.NPC.Layer = EditorCursor.Layer;
+            break;
+        }
+
         case IntProc::PlaceItem:
         {
             std::string raw = IntProc::getCMD();
@@ -1692,6 +1706,8 @@ void UpdateInterprocess()
                 if(EditorCursor.Mode != OptCursor_t::LVL_BLOCKS ||
                    EditorCursor.Block.Type != int(b.id))
                     PlaySound(23);
+
+                EditorCursor.Layer = b.layer;
 
                 EditorCursor.Mode = OptCursor_t::LVL_BLOCKS;
                 EditorCursor.Block = Block_t();
@@ -1729,6 +1745,8 @@ void UpdateInterprocess()
                 if(EditorCursor.Mode != OptCursor_t::LVL_BGOS ||
                    EditorCursor.Background.Type != int(b.id))
                     PlaySound(23);
+
+                EditorCursor.Layer = b.layer;
 
                 EditorCursor.Mode = OptCursor_t::LVL_BGOS;
                 EditorCursor.Background = Background_t();
@@ -1776,6 +1794,8 @@ void UpdateInterprocess()
                 if(EditorCursor.Mode != OptCursor_t::LVL_NPCS ||
                    EditorCursor.NPC.Type != int(n.id))
                     PlaySound(23);
+
+                EditorCursor.Layer = n.layer;
 
                 EditorCursor.Mode = OptCursor_t::LVL_NPCS;
                 EditorCursor.NPC = NPC_t();
