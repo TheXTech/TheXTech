@@ -59,6 +59,7 @@ void UpdatePlayer()
 //    double tempBlockA[3] = {0};
     bool tempHit = false;
     bool tempSpring = false;
+    bool tempTroop = false;
     bool tempShell = false;
     bool tempHit2 = false;
     int tempHit3 = 0;
@@ -997,6 +998,8 @@ void UpdatePlayer()
                         Player[A].CanFly2 = false;
                         Player[A].FlyCount = 0;
                     }
+                    if(Player[A].CanFly3)
+                        Player[A].CanFly = true;
                 }
 
 
@@ -3501,7 +3504,7 @@ void UpdatePlayer()
                                         {
                                             if(Player[A].Mount == 1 || Player[A].Mount == 2 || Player[A].Stoned)
                                                 NPCHit(B, 8, A);
-                                            else if(NPCSpinJumpHurt[NPC[B].Type] == false && NPCCanWalkOn[NPC[B].Type] == false)
+                                            else if(NPCSpinJumpHurt[NPC[B].Type] == true && NPCCanWalkOn[NPC[B].Type] == false)
                                             {
                                                 if(Player[A].Wet > 0 && (NPCIsCheep[NPC[B].Type] || NPC[B].Type == 231 || NPC[B].Type == 235))
                                                 {
@@ -3878,6 +3881,11 @@ void UpdatePlayer()
                                                 {
                                                     if(NPC[B].Type == 26)
                                                         tempSpring = true;
+                                                    if(NPC[B].Type == 345)
+                                                    {
+                                                        tempTroop = true;
+                                                        PlaySound(96);
+                                                    }
                                                     if(NPCIsAShell[NPC[B].Type] && NPC[B].Location.SpeedX == 0 && NPC[B].Location.SpeedY == 0)
                                                         tempShell = true;
                                                     tempHit = true;
@@ -4221,8 +4229,14 @@ void UpdatePlayer()
                     Player[A].Location.Y = tempLocation.Y;
                     if(tempShell)
                         NewEffect(132, newLoc(Player[A].Location.X + Player[A].Location.Width / 2.0 - EffectWidth[132] / 2.0, Player[A].Location.Y + Player[A].Location.Height - EffectHeight[132] / 2.0));
-                    else if(!tempSpring)
+                    else if(!tempSpring && !tempTroop)
                         NewEffect(75, newLoc(Player[A].Location.X + Player[A].Location.Width / 2.0 - 16, Player[A].Location.Y + Player[A].Location.Height - 16));
+                    else if(!tempSpring && tempTroop)
+                    {
+                        if(Player[A].Controls.Jump)
+                            PlaySound(97);
+                        Player[A].Jump = Physics.PlayerSpringJumpHeight / 2;
+                    }
                     else
                         tempSpring = false;
                     PlayerPush(A, 3);

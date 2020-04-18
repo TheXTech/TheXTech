@@ -50,6 +50,9 @@ void SetupVars()
     EffectWidth[149] = 34;
     EffectHeight[149] = 34;
 
+    EffectWidth[171] = 80;
+    EffectHeight[171] = 96;
+
     EffectWidth[145] = 32;
     EffectHeight[145] = 60;
 
@@ -72,6 +75,9 @@ void SetupVars()
     EffectWidth[144] = 54;
     EffectHeight[144] = 42;
 
+
+    EffectWidth[172] = 42;
+    EffectHeight[172] = 22;
 
     EffectWidth[143] = 64;
     EffectHeight[143] = 64;
@@ -472,6 +478,11 @@ void SetupVars()
     NPCWidth[246] = 16;
     NPCHeight[246] = 16;
 
+    NPCWidth[310] = 32; // P-wing
+    NPCHeight[310] = 32;
+    NPCFrameOffsetY[310] = 2;
+    NPCIsABonus[310] = true;
+
     NPCWidth[251] = 18; // TLOZ Rupee
     NPCHeight[251] = 32;
     NPCIsABonus[251] = true;
@@ -524,6 +535,8 @@ void SetupVars()
     NPCJumpHurt[339] = true;
 
     NPCJumpHurt[340] = true;
+    NPCNoYoshi[340] = true;
+    NPCNoGravity[340] = true;
 
     NPCJumpHurt[343] = true;
 
@@ -1302,6 +1315,11 @@ void SetupVars()
         NPCMovesPlayer[A] = true;
     }
 
+    NPCWidth[346] = 32; // Starman
+    NPCHeight[346] = 32;
+    NPCFrameOffsetY[346] = 2;
+    NPCIsABonus[346] = true;
+
     NPCWidth[326] = 64;
     NPCCanWalkOn[326] = true;
     NPCWontHurt[326] = true;
@@ -1333,6 +1351,13 @@ void SetupVars()
         NPCJumpHurt[A] = true;
         NPCNoGravity[A] = true;
     }
+    NPCWidth[344] = 80; // Tryclyde
+    NPCHeight[344] = 96;
+    NPCNoYoshi[344] = true;
+    NPCTurnsAtCliffs[344] = true;
+    NPCJumpHurt[344] = true;
+    NPCNoYoshi[344] = true;
+    NPCNoIceBall[344] = true;
 
     NPCWidth[334] = 22; // Spiny's spike
     NPCHeight[334] = 22;
@@ -2010,6 +2035,9 @@ void SetupVars()
     NPCJumpHurt[337] = true;
     NPCWontHurt[337] = true;
 
+    NPCWidth[345] = 46;
+    NPCHeight[345] = 46;
+
     NPCCanWalkOn[272] = true;
     NPCGrabFromTop[272] = true;
     NPCNoFireBall[272] = true;
@@ -2337,38 +2365,38 @@ void SetupVars()
     NPCNoClipping[282] = true;
     NPCJumpHurt[282] = true;
 
-    NPCSpinJumpHurt[245] = true;
-    NPCSpinJumpHurt[275] = true;
+    NPCSpinJumpHurt[245] = false;
+    NPCSpinJumpHurt[275] = false;
     for(int A = 318; A <= 321; ++A)
     {
-        NPCSpinJumpHurt[A] = true;
+        NPCSpinJumpHurt[A] = false;
     }
-    NPCSpinJumpHurt[8] = true;
-    NPCSpinJumpHurt[12] = true;
-    NPCSpinJumpHurt[36] = true;
-    NPCSpinJumpHurt[294] = true;
+    NPCSpinJumpHurt[8] = false;
+    NPCSpinJumpHurt[12] = false;
+    NPCSpinJumpHurt[36] = false;
+    NPCSpinJumpHurt[294] = false;
     for(int A = 285; A <= 286; ++A)
     {
-        NPCSpinJumpHurt[A] = true;
+        NPCSpinJumpHurt[A] = false;
     }
     for(int A = 332; A <= 333; ++A)
     {
-        NPCSpinJumpHurt[A] = true;
+        NPCSpinJumpHurt[A] = false;
     }
     for(int A = 51; A <= 54; ++A)
     {
-        NPCSpinJumpHurt[A] = true;
+        NPCSpinJumpHurt[A] = false;
     }
-    NPCSpinJumpHurt[74] = true;
-    NPCSpinJumpHurt[93] = true;
-    NPCSpinJumpHurt[205] = true;
-    NPCSpinJumpHurt[207] = true;
-    NPCSpinJumpHurt[261] = true;
-    NPCSpinJumpHurt[270] = true;
-    NPCSpinJumpHurt[340] = true;
+    NPCSpinJumpHurt[74] = false;
+    NPCSpinJumpHurt[93] = false;
+    NPCSpinJumpHurt[205] = false;
+    NPCSpinJumpHurt[207] = false;
+    NPCSpinJumpHurt[261] = false;
+    NPCSpinJumpHurt[270] = false;
+    NPCSpinJumpHurt[340] = false;
     for(int A = 200; A <= 201; ++A)
     {
-        NPCSpinJumpHurt[A] = true;
+        NPCSpinJumpHurt[A] = false;
     }
 
     For(A, 1, maxBlockType)

@@ -626,7 +626,7 @@ void NPCHit(int A, int B, int C)
             NPC[A].Killed = B;
         // Spike Top
     }
-    else if(NPC[A].Type == 207)
+    else if(NPC[A].Type == 207 || NPC[A].Type == 345)
     {
         if(B == 3)
         {
@@ -1843,6 +1843,40 @@ void NPCHit(int A, int B, int C)
             PlaySound(39);
         }
     }
+    else if(NPC[A].Type == 344)
+    {
+        if(NPC[A].Special2 >= 0)
+        {
+            if(B == 3)
+            {
+                NPC[A].Special2 = -50;
+                NPC[A].Damage = NPC[A].Damage + 1;
+                NPC[A].Direction = -NPC[A].Direction;
+                NPC[A].Location.SpeedX = 0;
+                PlaySound(39);
+            }
+            else if(B == 4)
+                NPC[A].Damage += 2;
+            else if(B == 10)
+            {
+                NPC[A].Special2 = -50;
+                NPC[A].Damage = NPC[A].Damage + 1;
+                NPC[A].Direction = -NPC[A].Direction;
+                NPC[A].Location.SpeedX = 0;
+                PlaySound(39);
+            }
+            if(NPC[A].Damage >= 3)
+            {
+                NewEffect(171, NPC[A].Location);
+                NPC[A].Killed = 3;
+            }
+        }
+        if(B == 6)
+        {
+            NPC[A].Killed = B;
+            PlaySound(39);
+        }
+    }
     else if(NPC[A].Type == 335)
     {
         if(NPC[A].Special5 >= 0)
@@ -1862,7 +1896,7 @@ void NPCHit(int A, int B, int C)
                 }
             }
             else if(B == 4)
-                NPC[A].Damage = 2;
+                NPC[A].Damage += 2;
             else if(B == 10)
             {
                 NPC[A].Special = 1;
@@ -1876,7 +1910,7 @@ void NPCHit(int A, int B, int C)
             }
             if(NPC[A].Damage >= 3)
             {
-                NPC[A].Killed = B;
+                NPC[A].Killed = 3;
                 NewEffect(166, NPC[A].Location);
             }
         }

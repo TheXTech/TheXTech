@@ -406,6 +406,7 @@ struct NPC_t
     double Special7 = 0.0;
     double Special8 = 0.0;
     double Special9 = 0.0;
+    double Special10 = 0.0;
 //    TurnAround As Boolean 'if the NPC needs to turn around
     bool TurnAround = false;
 //    Killed As Integer 'Flags the NPC to die a specific way.
@@ -688,6 +689,7 @@ struct Player_t
     bool CanFly = false;
 //    CanFly2 As Boolean
     bool CanFly2 = false;
+    bool CanFly3 = false;
 //    FlyCount As Integer 'length of time the player can fly
     int FlyCount = 0;
 //    RunRelease As Boolean 'The player let go of run and pressed again
@@ -1328,7 +1330,7 @@ extern RangeArrI<bool, 0, maxNPCType, false> NPCIsAParaTroopa;
 extern RangeArrI<bool, 0, maxNPCType, false> NPCIsCheep;
 //Public NPCJumpHurt(0 To maxNPCType) As Boolean 'Hurts the player even if it jumps on the NPC
 extern RangeArrI<bool, 0, maxNPCType, false> NPCJumpHurt;
-extern RangeArrI<bool, 0, maxNPCType, false> NPCSpinJumpHurt;
+extern RangeArrI<bool, 0, maxNPCType, true> NPCSpinJumpHurt;
 //Public NPCNoClipping(0 To maxNPCType) As Boolean 'NPC can go through blocks
 extern RangeArrI<bool, 0, maxNPCType, false> NPCNoClipping;
 //Public NPCScore(0 To maxNPCType) As Integer 'NPC score value

@@ -1909,6 +1909,12 @@ void NPCSpecial(int A)
         }
 
     }
+    else if(NPC[A].Type == 346)
+    {
+        NPC[A].Location.SpeedX = 1 * NPC[A].Direction;
+        if(NPC[A].Location.SpeedY == Physics.NPCGravity || NPC[A].Slope > 0)
+            NPC[A].Location.SpeedY = -8;
+    }
     else if(NPC[A].Type == 211) // Metroid O shooter thing
     {
         NPC[A].Special = NPC[A].Special + 1 + dRand();
@@ -1929,7 +1935,7 @@ void NPCSpecial(int A)
             NPC[numNPCs].TimeLeft = 50;
         }
     }
-    else if(NPC[A].Type == 206 || NPC[A].Type == 205 || NPC[A].Type == 207) // sparky
+    else if(NPC[A].Type == 206 || NPC[A].Type == 205 || NPC[A].Type == 207 || NPC[A].Type == 345) // sparky
     {
         if(NPC[A].Type == 206)
             F = 2;
@@ -2571,6 +2577,7 @@ void NPCSpecial(int A)
                     {
                         const double rad2deg = 180.0 / M_PI;
                         NPC[A].Special7 = SDL_atan2(Block[B].Location.Width, Block[B].Location.Height) * rad2deg;
+                        NPC[A].Special10 = BlockSlope[B];
                         if(NPC[A].Special7 != 0)
                             NPC[A].Special8 = NPC[A].Special7 / 100;
                     }
@@ -2611,6 +2618,63 @@ void NPCSpecial(int A)
         NPC[A].Special6 -= 360;
         while(NPC[A].Special6 < 0)
         NPC[A].Special6 += 360;
+    }
+    else if(NPC[A].Type == 344) // Tryclyde
+    {
+        C = 0;
+        for(B = 1; B <= numPlayers; B++)
+        {
+            if(Player[B].Dead == false && Player[B].Section == NPC[A].Section)
+            {
+                if(C == 0.0 || std::abs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0)) < C)
+                {
+                    if(NPC[A].Special2 < 115)
+                        C = std::abs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0));
+                    D = B;
+                }
+            }
+        }
+        NPC[A].Special5 = D;
+        NPC[A].Special2++;
+        if(NPC[A].Special2 > 110)
+        {
+            NPC[A].Special3++;
+            if(NPC[A].Special3 > 5)
+            {
+                numNPCs++;
+                NPC[numNPCs] = NPC_t();
+                NPC[numNPCs].Active = true;
+                NPC[numNPCs].TimeLeft = 100;
+                NPC[numNPCs].Direction = NPC[A].Direction;
+                NPC[numNPCs].Section = NPC[A].Section;
+                NPC[numNPCs].Layer = "Spawned NPCs";
+                NPC[numNPCs].Type = 314;
+                NPC[numNPCs].Location.Height = 32;
+                NPC[numNPCs].Location.Width = 32;
+                if(NPC[numNPCs].Direction == -1)
+                    NPC[numNPCs].Location.X = NPC[A].Location.X + 16;
+                else
+                    NPC[numNPCs].Location.X = NPC[A].Location.X + NPC[A].Location.Width - 16;
+                NPC[numNPCs].Location.Y = NPC[A].Location.Y + 32;
+                NPC[numNPCs].Location.SpeedX = 4 * NPC[numNPCs].Direction;
+                C = (NPC[numNPCs].Location.X + NPC[numNPCs].Location.Width / 2.0) - (Player[NPC[A].Special5].Location.X + Player[NPC[A].Special5].Location.Width / 2.0);
+                D = (NPC[numNPCs].Location.Y + NPC[numNPCs].Location.Height / 2.0) - (Player[NPC[A].Special5].Location.Y + Player[NPC[A].Special5].Location.Height / 2.0);
+                NPC[numNPCs].Location.SpeedY = D / C * NPC[numNPCs].Location.SpeedX;
+                if(NPC[numNPCs].Location.SpeedY > 1)
+                    NPC[numNPCs].Location.SpeedY = 1;
+                else if(NPC[numNPCs].Location.SpeedY < -1)
+                    NPC[numNPCs].Location.SpeedY = -1;
+                PlaySound(38);
+                NPC[A].Special3 = 0;
+                NPC[A].Special4++;
+            }
+        }
+        if(NPC[A].Special4 > (2 + NPC[A].Damage))
+        {
+            NPC[A].Special4 = 0;
+            NPC[A].Special3 = 0;
+            NPC[A].Special2 = 0;
+        }
     }
     else if(NPC[A].Type == 200) // King Koopa
     {
@@ -4328,6 +4392,34 @@ void SpecialNPC(int A)
         }
     // Bouncy Star thing code
     }
+    else if(NPC[A].Type == 340)
+    {
+        NPC[A].Location.SpeedY += 0.4;
+        if(NPC[A].Location.SpeedY == 0.4|| NPC[A].Slope > 0)
+        {
+            if(NPC[A].Special == 0)
+                PlaySound(37);
+            NPC[A].Location.SpeedX = 0;
+            NPC[A].Special = NPC[A].Special + 1;
+            if(NPC[A].Special == 65)
+            {
+                NPC[A].Special2++;
+                if(NPC[A].Special2 == 1)
+                    NPC[A].Special3 = NPC[A].DefaultDirection;
+                else if(NPC[A].Special2 == 2)
+                    NPC[A].Special3 = -NPC[A].DefaultDirection;
+                else if(NPC[A].Special2 > 2)
+                {
+                    NPC[A].Special3 = NPC[A].DefaultDirection;
+                    NPC[A].Special2 = 1;
+                }
+                NPC[A].Special = 0;
+                NPC[A].Location.Y = NPC[A].Location.Y - 1;
+                NPC[A].Location.SpeedY = -12;
+                NPC[A].Location.SpeedX = 2.4 * NPC[A].Special3;
+            }
+        }
+    }
     else if(NPC[A].Type == 25)
     {
         C = 0;
@@ -4888,7 +4980,7 @@ void SpecialNPC(int A)
            NPC[numNPCs].Type = 314;
            NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
            NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
-           NPC[numNPCs].Location.X = NPC[A].Location.X + (NPC[A].Location.Width / 2);
+           NPC[numNPCs].Location.X = NPC[A].Location.X + (NPC[A].Location.Width / 4);
            NPC[numNPCs].Location.Y = NPC[A].Location.Y + NPC[A].Location.Height / 2;
            NPC[numNPCs].Location.SpeedX = 0;
            NPC[numNPCs].TimeLeft = 100;

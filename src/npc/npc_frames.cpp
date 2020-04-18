@@ -601,6 +601,17 @@ void NPCFrames(int A)
         if(NPC[A].Frame >= 5)
             NPC[A].Frame = 0;
     }
+    else if(NPC[A].Type == 346)
+    {
+        NPC[A].FrameCount = NPC[A].FrameCount + 1;
+        if(NPC[A].FrameCount >= 4)
+        {
+            NPC[A].FrameCount = 0;
+            NPC[A].Frame = NPC[A].Frame + 1;
+        }
+        if(NPC[A].Frame >= 4)
+            NPC[A].Frame = 0;
+    }
     else if(NPC[A].Type == 251 || NPC[A].Type == 252 || NPC[A].Type == 253)
         NPC[A].Frame = SpecialFrame[8];
     else if(NPC[A].Type == 238)
@@ -742,7 +753,7 @@ void NPCFrames(int A)
         if(NPC[A].Direction == 1)
             NPC[A].Frame = NPC[A].Frame + 5;
     }
-    else if(NPC[A].Type == 207)
+    else if(NPC[A].Type == 207 || NPC[A].Type == 345)
     {
         NPC[A].FrameCount = NPC[A].FrameCount + 1;
         NPC[A].Frame = 0;
@@ -1214,6 +1225,33 @@ void NPCFrames(int A)
                 if(NPC[A].Frame >= 4)
                     NPC[A].Frame = 0;
             }
+        }
+    }
+    else if(NPC[A].Type == 344)
+    {
+        if(NPC[A].Special2 > 100)
+            NPC[A].Frame = 2;
+        else if(NPC[A].Special2 <= 100)
+        {
+            NPC[A].Frame = 0;
+            if(NPC[A].Special2 >= 0)
+                NPC[A].FrameCount = NPC[A].FrameCount + 1;
+            else if(NPC[A].Special2 < 0)
+                NPC[A].FrameCount = NPC[A].FrameCount + 4;
+            if(NPC[A].FrameCount > 24)
+                NPC[A].FrameCount = 0;
+            else if(NPC[A].FrameCount >= 12)
+                NPC[A].Frame = 1;
+        }
+        if(NPC[A].Direction == 1 && NPC[A].Special2 >= 0)
+            NPC[A].Frame = NPC[A].Frame + 3;
+        else if(NPC[A].Direction == -1 && NPC[A].Special2 < 0)
+        {
+            NPC[A].Frame = NPC[A].Frame + 6;
+        }
+        else if(NPC[A].Direction == 1 && NPC[A].Special2 < 0)
+        {
+            NPC[A].Frame = NPC[A].Frame + 8;
         }
     }
     else if(NPC[A].Type == 77) // black ninja

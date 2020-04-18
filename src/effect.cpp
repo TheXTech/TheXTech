@@ -650,7 +650,7 @@ void UpdateEffects()
             else if(e.FrameCount > 5)
                 e.Frame = 1;
         }
-        else if(e.Type == 15 || e.Type == 16 || e.Type == 25 || e.Type == 48 || e.Type == 49 || e.Type == 50 || e.Type == 166 || e.Type == 68 || e.Type == 72 || e.Type == 89 || e.Type == 155 || e.Type == 156 || e.Type == 157 || e.Type == 90 || e.Type == 91 || e.Type == 92 || e.Type == 93 || e.Type == 94 || e.Type == 98 || e.Type == 99 || e.Type == 105 || e.Type == 138 || e.Type == 106 || e.Type == 141) // Bullet Bill / Hammer Bro
+        else if(e.Type == 15 || e.Type == 16 || e.Type == 25 || e.Type == 48 || e.Type == 172 || e.Type == 49 || e.Type == 171 || e.Type == 50 || e.Type == 166 || e.Type == 68 || e.Type == 72 || e.Type == 89 || e.Type == 155 || e.Type == 156 || e.Type == 157 || e.Type == 90 || e.Type == 91 || e.Type == 92 || e.Type == 93 || e.Type == 94 || e.Type == 98 || e.Type == 99 || e.Type == 105 || e.Type == 138 || e.Type == 106 || e.Type == 141) // Bullet Bill / Hammer Bro
         {
             e.Location.SpeedY = e.Location.SpeedY + 0.5;
             if(e.Location.SpeedY >= 10)
@@ -1645,7 +1645,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
         Effect[numEffects].Life = 120;
         Effect[numEffects].Type = A;
     }
-    else if(A == 48) // Dead toad
+    else if(A == 48 || A == 172) // Dead toad
     {
         numEffects++;
         Effect[numEffects].Shadow = Shadow;
@@ -1678,7 +1678,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
             Effect[numEffects].Frame = 0;
         else
             Effect[numEffects].Frame = 1;
-        if(A == 48)
+        if(A == 48 || A == 172)
             Effect[numEffects].Location.SpeedY = -8;
         Effect[numEffects].Life = 120;
         Effect[numEffects].Type = A;
@@ -1777,7 +1777,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
         Effect[numEffects].Life = 120;
         Effect[numEffects].Type = A;
     }
-    else if(A == 25 || A == 49 || A == 50 || A == 166 || A == 72 || A == 89 || A == 155 || A == 156 || A == 157 || A == 105 || A == 106 || A == 138 || A == 141) // Hammer Bro
+    else if(A == 25 || A == 49 || A == 50 || A == 171 || A == 166 || A == 72 || A == 89 || A == 155 || A == 156 || A == 157 || A == 105 || A == 106 || A == 138 || A == 141) // Hammer Bro
     {
         numEffects++;
         Effect[numEffects].Shadow = Shadow;

@@ -953,6 +953,30 @@ void KillNPC(int A, int B)
                 NewEffect(109, NPC[A].Location, static_cast<double>(NPC[A].Frame));
             }
         }
+        else if(NPC[A].Type == 345) // ant trooper
+        {
+            if(B == 6)
+            {
+                NPC[A].Location.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0 - EffectWidth[8] / 2.0;
+                NPC[A].Location.Y = NPC[A].Location.Y + NPC[A].Location.Height / 2.0 - EffectHeight[8] / 2.0;
+                PlaySound(16);
+                NewEffect(10 , NPC[A].Location);
+                if(NPC[A].NoLavaSplash == false)
+                    NewEffect(13 , NPC[A].Location);
+            }
+            else if(B == 8)
+            {
+                 NPC[A].Location.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0 - EffectWidth[10] / 2.0;
+                 NPC[A].Location.Y = NPC[A].Location.Y + NPC[A].Location.Height / 2.0 - EffectHeight[10] / 2.0;
+                NewEffect(10 , NPC[A].Location);
+                PlaySound(36);
+            }
+            else
+            {
+                PlaySound(9); // Shell hit sound
+                NewEffect(172, NPC[A].Location);
+            }
+        }
         else if(NPC[A].Type == 172 || NPC[A].Type == 173 || NPC[A].Type == 176) // smb1 Green Koopa
         {
              NPC[A].Location.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0 - EffectWidth[8] / 2.0;

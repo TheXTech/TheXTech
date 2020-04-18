@@ -1468,6 +1468,7 @@ void StartBattleMode()
     Player[1].HeldBonus = 0;
     Player[1].CanFly = false;
     Player[1].CanFly2 = false;
+    Player[1].CanFly3 = false;
     Player[1].TailCount = 0;
     Player[1].YoshiBlue = false;
     Player[1].YoshiRed = false;
@@ -1479,6 +1480,7 @@ void StartBattleMode()
     Player[2].HeldBonus = 0;
     Player[2].CanFly = false;
     Player[2].CanFly2 = false;
+    Player[2].CanFly3 = false;
     Player[2].TailCount = 0;
     Player[2].YoshiBlue = false;
     Player[2].YoshiRed = false;
