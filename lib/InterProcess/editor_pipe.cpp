@@ -175,6 +175,11 @@ void EditorPipe::icomingData(const std::string &in)
         D_pLogDebugNA("Accepted Placing item!");
         IntProc::storeCommand(in.c_str() + 11, in.size() - 11, IntProc::PlaceItem);
     }
+    else if(in.compare(0, 11, "SET_LAYER: ") == 0)
+    {
+        D_pLogDebugNA("Accepted layer change!");
+        IntProc::storeCommand(in.c_str() + 11, in.size() - 11, IntProc::SetLayer);
+    }
     else if(in.compare(0, 8, "MSGBOX: ") == 0)
     {
         pLogDebug("Accepted Message box: %s", in.c_str());

@@ -42,7 +42,9 @@ namespace IntProc
         //! Cheat code proxy
         Cheat = 1,
         //! Place item (magic-hand only)
-        PlaceItem = 2
+        PlaceItem = 2,
+        //! Toggle a name of current
+        SetLayer = 3
     };
 
     struct cmdEntry
