@@ -441,10 +441,8 @@ void NPCHit(int A, int B, int C)
 
         // Larry Koop Shell
     }
-    else if(NPC[A].Type == 268 || NPC[A].Type == 281 || NPC[A].Type == 302)
+    else if(NPCJumpBounce[NPC[A].Type] == true)
     {
-        if(B != 7 && B != 1 && B != 2 && B != 8)
-            NPC[A].Immune = 10;
         if(B == 1 || B == 2 || B == 8)
         {
             if(B == 1 || B == 8)
@@ -458,6 +456,11 @@ void NPCHit(int A, int B, int C)
             }
             PlaySound(2);
         }
+    }
+    else if(NPC[A].Type == 268 || NPC[A].Type == 281 || NPC[A].Type == 302)
+    {
+        if(B != 7 && B != 1 && B != 2 && B != 8)
+            NPC[A].Immune = 10;
         else if(B == 3 || B == 4 || B == 5)
         {
             if(NPC[C].Type == 13 || NPC[C].Type == 108)
@@ -1486,57 +1489,7 @@ void NPCHit(int A, int B, int C)
         }
         // Shells
     }
-    else if(NPC[A].Type == 313)
-    {
-        if(B == 1)
-        {
-            if(NPC[A].Effect == 2)
-                NPC[A].Effect = 0;
-            if(Player[C].Dismount <= 0 && Player[C].Mount != 2)
-            {
-                if(NPC[A].Location.SpeedX == 0.0)
-                {
-                    PlaySound(9);
-                    NPC[A].Location.SpeedX = double(Physics.NPCShellSpeed * Player[C].Direction);
-                    NPC[A].CantHurt = Physics.NPCCanHurtWait;
-                    NPC[A].CantHurtPlayer = C;
-                    NPC[A].Projectile = true;
-                    NPC[A].Location.SpeedY = 0;
-                }
-                else if(NPC[A].Slope == 0 && Player[C].Vine == 0)
-                {
-                    PlaySound(2);
-                    NPC[A].Location.SpeedX = 0;
-                    NPC[A].Location.SpeedY = 0;
-                    if(NPC[A].Wet > 0)
-                    {
-                        NPC[A].RealSpeedX = 0;
-                        NPC[A].Projectile = false;
-                    }
-                }
-            }
-        }
-        else if(B == 2 || B == 7)
-        {
-            PlaySound(9);
-            NPC[A].Projectile = true;
-            NPC[A].Location.SpeedY = -5;
-            NPC[A].Location.SpeedX = 0;
-        }
-        else if(B == 6)
-        {
-            NPC[A].Killed = B;
-        }
-        else if(!(B == 4))
-        {
-            NPC[A].Killed = B;
-        }
-        else if(B == 4)
-        {
-            NPC[A].Killed = B;
-        }
-    }
-    else if(NPC[A].Type == 5 || NPC[A].Type == 7 || NPC[A].Type == 24 || NPC[A].Type == 73 || (NPC[A].Type >= 113 && NPC[A].Type <= 116) || NPC[A].Type == 174 || NPC[A].Type == 172 || NPC[A].Type == 195 || NPC[A].Type == 312)
+    else if(NPC[A].Type == 5 || NPC[A].Type == 7 || NPC[A].Type == 24 || NPC[A].Type == 73 || (NPC[A].Type >= 113 && NPC[A].Type <= 116) || NPC[A].Type == 174 || NPC[A].Type == 172 || NPC[A].Type == 195 || NPC[A].Type == 312 || NPC[A].Type == 313)
     {
         if(B == 1)
         {

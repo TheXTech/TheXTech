@@ -160,6 +160,7 @@ RangeArrI<bool, 0, maxNPCType, false> NPCIsAParaTroopa;
 RangeArrI<bool, 0, maxNPCType, false> NPCIsCheep;
 RangeArrI<bool, 0, maxNPCType, false> NPCJumpHurt;
 RangeArrI<bool, 0, maxNPCType, true> NPCSpinJumpHurt;
+RangeArrI<bool, 0, maxNPCType, false> NPCJumpBounce;
 RangeArrI<bool, 0, maxNPCType, false> NPCNoClipping;
 RangeArrI<int, 0, maxNPCType, 0> NPCScore;
 RangeArrI<bool, 0, maxNPCType, false> NPCCanWalkOn;

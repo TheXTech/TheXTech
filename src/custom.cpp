@@ -57,6 +57,7 @@ void SaveNPCDefaults()
         NPCDefaults.NPCIsCheep[A] = NPCIsCheep[A];
         NPCDefaults.NPCJumpHurt[A] = NPCJumpHurt[A];
         NPCDefaults.NPCSpinJumpHurt[A] = NPCSpinJumpHurt[A];
+        NPCDefaults.NPCJumpBounce[A] = NPCJumpBounce[A];
         NPCDefaults.NPCNoClipping[A] = NPCNoClipping[A];
         NPCDefaults.NPCScore[A] = NPCScore[A];
         NPCDefaults.NPCCanWalkOn[A] = NPCCanWalkOn[A];
@@ -104,6 +105,7 @@ void LoadNPCDefaults()
         NPCIsCheep[A] = NPCDefaults.NPCIsCheep[A];
         NPCJumpHurt[A] = NPCDefaults.NPCJumpHurt[A];
         NPCSpinJumpHurt[A] = NPCDefaults.NPCSpinJumpHurt[A];
+        NPCJumpBounce[A] = NPCDefaults.NPCJumpBounce[A];
         NPCNoClipping[A] = NPCDefaults.NPCNoClipping[A];
         NPCScore[A] = NPCDefaults.NPCScore[A];
         NPCCanWalkOn[A] = NPCDefaults.NPCCanWalkOn[A];
@@ -201,6 +203,7 @@ void LoadCustomNPC(int A, std::string cFileName)
         NPCJumpHurt[A] = npc.jumphurt;
 
     boolVAR(npc, "spinjump", NPCSpinJumpHurt[A]);
+    boolVAR(npc, "jumpbounce", NPCJumpBounce[A]);
 
     if(npc.en_nohurt)
         NPCWontHurt[A] = npc.nohurt;

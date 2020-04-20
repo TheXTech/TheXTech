@@ -1298,18 +1298,37 @@ void NPCSpecial(int A)
                 {
                     if(Player[B].Location.SpeedX > 0)
                     {
-                        NPC[A].Location.SpeedX = std::abs(Player[B].Location.SpeedX / 1.32);
+                        NPC[A].Location.SpeedX += 0.05;
                     }
                 }
                 else if(CheckCollision(tempLocation2, Player[B].Location) == true)
                 {
-                    if(Player[B].Location.SpeedX != 0)
+                    if(Player[B].Location.SpeedX < 0)
                     {
-                        NPC[A].Location.SpeedX = std::abs(Player[B].Location.SpeedX / 1.32) * -1;
+                        NPC[A].Location.SpeedX -= 0.05;
                     }
                 }
                 else
                     NPC[A].Location.SpeedX = 0;
+            }
+            if(NPC[A].Slope == 0 && (CheckCollision(tempLocation, Player[B].Location) == false || CheckCollision(tempLocation2, Player[B].Location) == false))
+            {
+                if(NPC[A].Location.SpeedX < 0)
+                {
+                      NPC[A].Location.SpeedX += 0.01;
+                }
+                else if(NPC[A].Location.SpeedX > 0)
+                {
+                      NPC[A].Location.SpeedX -= 0.01;
+                }
+            }
+            if(NPC[A].Location.SpeedX > 7)
+            {
+                NPC[A].Location.SpeedX = 7;
+            }
+            if(NPC[A].Location.SpeedX < -7)
+            {
+                NPC[A].Location.SpeedX = -7;
             }
         }
         if(NPC[A].Location.SpeedX > 5)

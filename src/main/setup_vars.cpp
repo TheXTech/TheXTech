@@ -1098,10 +1098,11 @@ void SetupVars()
     NPCWidth[104] = 96; // SMB3 Platform
     NPCHeight[104] = 32;
     NPCNoYoshi[104] = true;
-    NPCWidth[297] = 96; // SMB3 Platform
+    NPCWidth[297] = 96; // Flimsy Lift Platform
     NPCHeight[297] = 32;
     NPCNoYoshi[297] = true;
     NPCNoGravity[297] = true;
+    NPCNoIceBall[297] = true;
     NPCWidth[105] = 128; // SMW Falling Platform
     NPCHeight[105] = 22;
     NPCNoYoshi[105] = true;
@@ -1313,6 +1314,7 @@ void SetupVars()
         NPCNoClipping[A] = true;
         NPCNoGravity[A] = true;
         NPCMovesPlayer[A] = true;
+        NPCNoIceBall[A] = true;
     }
 
     NPCWidth[346] = 32; // Starman
@@ -1775,6 +1777,7 @@ void SetupVars()
     NPCCanWalkOn[46] = true;
     NPCCanWalkOn[212] = true;
     NPCCanWalkOn[311] = true;
+    NPCNoIceBall[311] = true;
     NPCCanWalkOn[56] = true;
     NPCCanWalkOn[57] = true;
     NPCCanWalkOn[58] = true;
@@ -2312,9 +2315,9 @@ void SetupVars()
 
 
     NPCWidthGFX[267] = 84;
-    NPCHeightGFX[267] = 64;
+    NPCHeightGFX[267] = 62;
     NPCWidth[267] = 44;
-    NPCHeight[267] = 52;
+    NPCHeight[267] = 50;
 
 
     NPCWidthGFX[301] = 84;
@@ -2398,6 +2401,10 @@ void SetupVars()
     {
         NPCSpinJumpHurt[A] = false;
     }
+
+    NPCJumpBounce[268] = true;
+    NPCJumpBounce[281] = true;
+    NPCJumpBounce[302] = true;
 
     For(A, 1, maxBlockType)
     {
@@ -2828,6 +2835,7 @@ void SetupVars()
     BlockNoClipping[175] = true;
     BlockNoClipping[178] = true;
     BlockNoClipping[181] = true;
+    BlockNoClipping[711] = true;
     BlockPlayerNoClipping[639] = true;
     BlockNPCNoClipping[686] = true;
     BlockSlope[299] = -1;

@@ -1967,6 +1967,13 @@ void PSwitch(bool Bool)
         }
         for(A = numBlock; A >= 1; A--)
         {
+            if(Block[A].Type == 710 || Block[A].Type == 711)
+            {
+                    if(Block[A].Type == 710)
+                        Block[A].Type = 711;
+                    else if(Block[A].Type == 711)
+                        Block[A].Type = 710;
+            }
             if(BlockPSwitch[Block[A].Type] == true && Block[A].Special == 0 && Block[A].NPC == 0 && Block[A].Hidden == false)
             {
                 if(numNPCs < maxNPCs)
