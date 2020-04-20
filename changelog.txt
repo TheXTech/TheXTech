@@ -9,6 +9,7 @@ Changes for 1.3.2
 -Removed 20 layers limit to show/hide/toggle per event
 -Extended limit to use up to 200 sections in one level
 -Added an error message on attempt to open an invalid level file
+-Fixed a glitch of rendering of two-camera screen caused by an incorrect SDL_RenderSetViewport() call usage
 
 
 Changes for 1.3.1 (First version made by Wohlstand in March 2020):
