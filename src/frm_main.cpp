@@ -701,15 +701,7 @@ void FrmMain::updateViewport()
 void FrmMain::resetViewport()
 {
     updateViewport();
-
-    SDL_Rect topLeftViewport =
-    {
-        static_cast<int>(offset_x),
-        static_cast<int>(offset_y),
-        viewport_w,
-        viewport_h
-    };
-    SDL_RenderSetViewport(m_gRenderer, &topLeftViewport);
+    SDL_RenderSetViewport(m_gRenderer, nullptr);
 }
 
 void FrmMain::setViewport(int x, int y, int w, int h)
@@ -1450,7 +1442,9 @@ void FrmMain::clearBuffer()
 
 void FrmMain::renderRect(int x, int y, int w, int h, float red, float green, float blue, float alpha, bool filled)
 {
-    SDL_Rect aRect = {x + viewport_offset_x, y + viewport_offset_x, w, h};
+    SDL_Rect aRect = {x + viewport_offset_x,
+                      y + viewport_offset_y,
+                      w, h};
     SDL_SetRenderDrawColor(m_gRenderer,
                            static_cast<unsigned char>(255.f * red),
                            static_cast<unsigned char>(255.f * green),
@@ -1466,7 +1460,9 @@ void FrmMain::renderRect(int x, int y, int w, int h, float red, float green, flo
 
 void FrmMain::renderRectBR(int _left, int _top, int _right, int _bottom, float red, float green, float blue, float alpha)
 {
-    SDL_Rect aRect = {_left + viewport_offset_x, _top + viewport_offset_y, _right - _left, _bottom - _top};
+    SDL_Rect aRect = {_left + viewport_offset_x,
+                      _top + viewport_offset_y,
+                      _right - _left, _bottom - _top};
     SDL_SetRenderDrawColor(m_gRenderer,
                            static_cast<unsigned char>(255.f * red),
                            static_cast<unsigned char>(255.f * green),
@@ -1486,6 +1482,9 @@ void FrmMain::renderCircle(int cx, int cy, int radius, float red, float green, f
                                static_cast<unsigned char>(255.f * blue),
                                static_cast<unsigned char>(255.f * alpha)
                           );
+
+    cx += viewport_offset_x;
+    cy += viewport_offset_y;
 
     for(double dy = 1; dy <= radius; dy += 1.0)
     {
