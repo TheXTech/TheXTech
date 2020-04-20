@@ -24,6 +24,7 @@
  */
 
 #include <Logger/logger.h>
+#include <Utils/files.h>
 #include <InterProcess/intproc.h>
 #include <pge_delay.h>
 #include <fmt_format_ne.h>
@@ -200,7 +201,12 @@ int GameMain(const CmdLineSetup_t &setup)
             numPlayers = 5;
             GameMenu = false;
             StopMusic();
-            OpenLevel(AppPath + "outro.lvl");
+
+            auto outroPath = AppPath + "outro.lvlx";
+            if(!Files::fileExists(outroPath))
+                outroPath = AppPath + "outro.lvl";
+            OpenLevel(outroPath);
+
             ScreenType = 7;
             SetupScreens();
             ClearBuffer = true;
@@ -374,7 +380,11 @@ int GameMain(const CmdLineSetup_t &setup)
             }
 
             numPlayers = 6;
-            OpenLevel(AppPath + "intro.lvl");
+
+            auto introPath = AppPath + "intro.lvlx";
+            if(!Files::fileExists(introPath))
+                introPath = AppPath + "intro.lvl";
+            OpenLevel(introPath);
             vScreenX[1] = -level[0].X;
 
             StartMusic(0);
