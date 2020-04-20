@@ -4675,7 +4675,7 @@ void SpecialNPC(int A)
     {
         for(B = 1; B <= numPlayers; B++)
         {
-            if(!Player[B].Dead && Player[B].Section == NPC[A].Section && B != NPC[A].CantHurtPlayer && NPC[A].Location.SpeedY == Physics.NPCGravity)
+            if(!Player[B].Dead && Player[B].Section == NPC[A].Section && B != NPC[A].CantHurtPlayer && NPC[A].Location.SpeedY == Physics.NPCGravity || NPC[A].Slope > 0)
             {
                 if(Player[B].Location.X > NPC[A].Location.X)
                     NPC[A].Location.SpeedX = NPC[A].Location.SpeedX + 0.12;

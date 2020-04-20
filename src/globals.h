@@ -745,6 +745,13 @@ struct Water_t
 //End Type
 };
 
+struct BlockDefaults_t
+{
+
+};
+
+extern BlockDefaults_t BlockDefaults;
+
 //Public Type Block   'Blocks
 struct Block_t
 {

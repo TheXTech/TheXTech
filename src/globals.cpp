@@ -243,6 +243,8 @@ RangeArrI<int, 1, 10, 0> CoinFrame2;
 EditorCursor_t EditorCursor;
 EditorControls_t EditorControls;
 
+BlockDefaults_t BlockDefaults;
+
 RangeArrI<int, 1, numSounds, 0> Sound;
 RangeArrI<int, 1, numSounds, 0> SoundPause;
 bool ErrorQuit = false;
