@@ -202,7 +202,7 @@ void LoadCustomNPC(int A, std::string cFileName)
     if(npc.en_jumphurt)
         NPCJumpHurt[A] = npc.jumphurt;
 
-    boolVAR(npc, "spinjump", NPCSpinJumpHurt[A]);
+    boolVAR(npc, "spinjumphurt", NPCSpinJumpHurt[A]);
     boolVAR(npc, "jumpbounce", NPCJumpBounce[A]);
 
     if(npc.en_nohurt)
@@ -229,4 +229,17 @@ void LoadCustomNPC(int A, std::string cFileName)
         NPCFrameSpeed[A] = int(npc.framespeed);
     if(npc.en_framestyle)
         NPCFrameStyle[A] = int(npc.framestyle);
+
+    boolVAR(npc, "isabot", NPCIsABot[A]);
+    boolVAR(npc, "isboot", NPCIsBoot[A]);
+    boolVAR(npc, "isacoin", NPCIsACoin[A]);
+    boolVAR(npc, "isabonus", NPCIsABonus[A]);
+    boolVAR(npc, "isanexit", NPCIsAnExit[A]);
+    boolVAR(npc, "isaparatroopa", NPCIsAParaTroopa[A]);
+    boolVAR(npc, "isashell", NPCIsAShell[A]);
+    boolVAR(npc, "isavine", NPCIsAVine[A]);
+    boolVAR(npc, "ischeep", NPCIsCheep[A]);
+    boolVAR(npc, "istoad", NPCIsToad[A]);
+    boolVAR(npc, "isveggie", NPCIsVeggie[A]);
+    boolVAR(npc, "isyoshi", NPCIsYoshi[A]);
 }

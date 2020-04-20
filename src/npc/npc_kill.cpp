@@ -1070,7 +1070,7 @@ void KillNPC(int A, int B)
                 NewEffect(47 , NPC[A].Location);
             }
         }
-        else if(NPC[A].Type == 39 || NPC[A].Type == 315 || NPC[A].Type == 316) // Birdos
+        else if(NPC[A].Type == 39 || NPC[A].Type == 315 || NPC[A].Type == 316 || NPC[A].Type == 328 || NPC[A].Type == 344) // SMB2 Bosses
         {
             PlaySound(39);
             if(NPC[A].Legacy == true && LevelEditor == false)
@@ -1100,7 +1100,7 @@ void KillNPC(int A, int B)
                 {
                     for(C = 1; C <= numNPCs; C++)
                     {
-                        if(NPC[C].Type == 39 && NPC[C].Active == true && C != A)
+                        if(NPC[C].Active == true && C != A)
                             DontResetMusic = true;
                     }
                     if(DontResetMusic == false)
@@ -1117,7 +1117,7 @@ void KillNPC(int A, int B)
                  NewEffect(29, NPC[A].Location, NPC[A].Direction);
              else if(NPC[A].Type == 315)
                  NewEffect(153, NPC[A].Location, NPC[A].Direction);
-             else
+             else if(NPC[A].Type == 316)
                  NewEffect(154, NPC[A].Location, NPC[A].Direction);
         }
         else if(NPC[A].Type == 40 || NPC[A].Type == 336) // Egg

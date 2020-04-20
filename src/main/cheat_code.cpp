@@ -632,7 +632,14 @@ void CheatCode(char NewKey)
             CheatString.clear();
             cheated = true;
         }
-
+        else if(SDL_strstr(CheatString.c_str(), "needayellowshoe"))
+        {
+            PlaySound(12);
+            for(B = 1; B <= numPlayers; B++)
+                Player[B].HeldBonus = 342;
+            CheatString.clear();
+            cheated = true;
+        }
 
         else if(SDL_strstr(CheatString.c_str(), "shadowstar"))
         {

@@ -3151,6 +3151,7 @@ void SetupVars()
     SceneHeight[60] = 48;
     SceneWidth[61] = 64;
     SceneHeight[61] = 76;
+    SceneWidth[68] = 48;
 
     For(A, 1, maxTileType)
     {

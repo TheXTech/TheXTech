@@ -73,6 +73,7 @@ void UpdateGraphics2()
         SceneFrame[53] = SceneFrame[1];
         SceneFrame[54] = SceneFrame[1];
         SceneFrame[55] = SceneFrame[1];
+        SceneFrame[66] = SceneFrame[1];
     }
     SceneFrame2[27] = SceneFrame2[27] + 1;
     if(SceneFrame2[27] >= 8)

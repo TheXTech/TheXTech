@@ -2640,6 +2640,17 @@ void NPCSpecial(int A)
     }
     else if(NPC[A].Type == 344) // Tryclyde
     {
+        if(NPC[A].Legacy)
+        {
+            if(NPC[A].TimeLeft > 1)
+                NPC[A].TimeLeft = 100;
+            if(bgMusic[NPC[A].Section] != 6 && bgMusic[NPC[A].Section] != 15 && bgMusic[NPC[A].Section] != 21 && bgMusic[NPC[A].Section] != 43 && NPC[A].TimeLeft > 1)
+            {
+                bgMusic[NPC[A].Section] = 43;
+                StopMusic();
+                StartMusic(NPC[A].Section);
+            }
+        }
         C = 0;
         for(B = 1; B <= numPlayers; B++)
         {
@@ -4675,7 +4686,7 @@ void SpecialNPC(int A)
     {
         for(B = 1; B <= numPlayers; B++)
         {
-            if(!Player[B].Dead && Player[B].Section == NPC[A].Section && B != NPC[A].CantHurtPlayer && NPC[A].Location.SpeedY == Physics.NPCGravity || NPC[A].Slope > 0)
+            if(!Player[B].Dead && Player[B].Section == NPC[A].Section && B != NPC[A].CantHurtPlayer && (NPC[A].Location.SpeedY == Physics.NPCGravity || NPC[A].Slope > 0))
             {
                 if(Player[B].Location.X > NPC[A].Location.X)
                     NPC[A].Location.SpeedX = NPC[A].Location.SpeedX + 0.12;
