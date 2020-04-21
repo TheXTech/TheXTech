@@ -747,7 +747,18 @@ struct Water_t
 
 struct BlockDefaults_t
 {
-
+    RangeArrI<bool, 0, maxBlockType, false> BlockIsSizable;
+    RangeArrI<bool, 0, maxBlockType, false> BlockPlayerNoClipping;
+    RangeArrI<int, 0, maxBlockType, 0> BlockSlope;
+    RangeArrI<int, 0, maxBlockType, 0> BlockSlope2;
+    RangeArrI<int, 0, maxBlockType, 0> BlockWidth;
+    RangeArrI<int, 0, maxBlockType, 0> BlockHeight;
+    RangeArrI<bool, 0, maxBlockType, false> BlockOnlyHitspot1;
+    RangeArrI<bool, 0, maxBlockType, false> BlockKills;
+    RangeArrI<bool, 0, maxBlockType, false> BlockHurts;
+    RangeArrI<bool, 0, maxBlockType, false> BlockPSwitch;
+    RangeArrI<bool, 0, maxBlockType, false> BlockNoClipping;
+    RangeArrI<bool, 0, maxBlockType, false> BlockNPCNoClipping;
 };
 
 extern BlockDefaults_t BlockDefaults;
@@ -755,6 +766,8 @@ extern BlockDefaults_t BlockDefaults;
 //Public Type Block   'Blocks
 struct Block_t
 {
+    int Frame = 0;
+    int FrameCount = 0;
 //    Slippy As Boolean
     bool Slippy = false;
 //    RespawnDelay As Integer
@@ -1532,10 +1545,9 @@ extern RangeArrI<int, 1, maxBackgroundType, 0> BackgroundHeight;
 extern RangeArrI<int, 1, maxBackgroundType, 0> BackgroundFrame;
 //Public BackgroundFrameCount(1 To maxBackgroundType) As Integer
 extern RangeArrI<int, 1, maxBackgroundType, 0> BackgroundFrameCount;
-//Public BlockFrame(1 To maxBlockType) As Integer 'What frame the block is on
-extern RangeArrI<int, 1, maxBlockType, 0> BlockFrame;
-//Public BlockFrame2(1 To maxBlockType) As Integer 'Counter to update the blocks frame
-extern RangeArrI<int, 1, maxBlockType, 0> BlockFrame2;
+
+extern RangeArrI<int, 0, maxBlockType, 0> BlockFrame;
+extern RangeArrI<int, 0, maxBlockType, 0> BlockFrameSpeed;
 //Public sBlockArray(1 To 1000) As Integer 'sizable block array
 extern RangeArrI<int, 1, 1000, 0> sBlockArray;
 //Public sBlockNum As Integer

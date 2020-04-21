@@ -27,6 +27,7 @@
 #include "../graphics.h"
 #include "../collision.h"
 
+#include <IniProcessor/ini_processing.h>
 
 void DrawBackground(int S, int Z)
 {

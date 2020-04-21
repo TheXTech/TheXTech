@@ -1054,7 +1054,7 @@ void UpdateGraphics(bool skipRepaint)
                                           Block[A].Location.Height,
                                           GFXBlock[Block[A].Type],
                                           0,
-                                          BlockFrame[Block[A].Type] * 32);
+                                          Block[A].Frame * Block[A].Location.Height);
                 }
             }
         }
@@ -1585,7 +1585,7 @@ void UpdateGraphics(bool skipRepaint)
                                           Block[A].Location.Height,
                                           GFXBlock[Block[A].Type],
                                           0,
-                                          BlockFrame[Block[A].Type] * 32);
+                                          Block[A].Frame * Block[A].Location.Height);
                 }
             }
         }
@@ -2419,7 +2419,7 @@ void UpdateGraphics(bool skipRepaint)
                                                   vScreenY[Z] + b.Location.Y + b.ShakeY3,
                                                   b.Location.Width,
                                                   b.Location.Height,
-                                                  GFXBlock[b.Type], 0, BlockFrame[b.Type] * 32);
+                                                  GFXBlock[b.Type], 0, b.Frame * b.Location.Height);
                         }
                     }
                 }
