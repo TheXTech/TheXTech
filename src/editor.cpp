@@ -1730,6 +1730,10 @@ void UpdateInterprocess()
                 EditorCursor.Block.TriggerHit = b.event_hit;
                 EditorCursor.Block.TriggerLast = b.event_emptylayer;
                 EditorCursor.Block.TriggerDeath = b.event_destroy;
+
+                if(EditorCursor.Block.Type > maxBlockType) // Avoid out of range crash
+                    EditorCursor.Block.Type = 1;
+
                 SetCursor();
             }
             else if(raw.compare(0, 9, "BGO_PLACE") == 0)
@@ -1779,6 +1783,10 @@ void UpdateInterprocess()
                         break;
                     }
                 }
+
+                if(EditorCursor.Background.Type > maxBackgroundType) // Avoid out of range crash
+                    EditorCursor.Background.Type = 1;
+
                 SetCursor();
             }
             else if(raw.compare(0, 9, "NPC_PLACE") == 0)
@@ -1804,6 +1812,9 @@ void UpdateInterprocess()
                 EditorCursor.Location.X = n.x;
                 EditorCursor.Location.Y = n.y;
                 EditorCursor.NPC.Direction = n.direct;
+
+                if(EditorCursor.NPC.Type > maxNPCType) // Avoid out of range crash
+                    EditorCursor.NPC.Type = 1;
 
                 if(EditorCursor.NPC.Type == 91 || EditorCursor.NPC.Type == 96 || EditorCursor.NPC.Type == 283 || EditorCursor.NPC.Type == 284)
                 {

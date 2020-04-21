@@ -31,6 +31,7 @@
 
 #include <Utils/strings.h>
 #include <Utils/files.h>
+#include <Logger/logger.h>
 #include <PGE_File_Formats/file_formats.h>
 
 void OpenWorld(std::string FilePath)
@@ -117,6 +118,12 @@ void OpenWorld(std::string FilePath)
         terra.Type = int(t.id);
         terra.Location.Width = TileWidth[terra.Type];
         terra.Location.Height = TileHeight[terra.Type];
+
+        if(terra.Type > maxTileType) // Drop ID to 1 for Tiles of out of range IDs
+        {
+            pLogWarning("TILE-%d ID is out of range (max types %d), reset to TILE-1", terra.Type, maxTileType);
+            terra.Type = 1;
+        }
     }
 
     for(auto &s : wld.scenery)
@@ -138,6 +145,12 @@ void OpenWorld(std::string FilePath)
         scene.Location.Width = SceneWidth[scene.Type];
         scene.Location.Height = SceneHeight[scene.Type];
         scene.Active = true;
+
+        if(scene.Type > maxSceneType) // Drop ID to 1 for Scenery of out of range IDs
+        {
+            pLogWarning("TILE-%d ID is out of range (max types %d), reset to TILE-1", scene.Type, maxSceneType);
+            scene.Type = 1;
+        }
     }
 
     for(auto &p : wld.paths)
@@ -161,6 +174,12 @@ void OpenWorld(std::string FilePath)
         pp.Active = false;
 //        if(LevelEditor == true)
 //            pp.Active = true;
+
+        if(pp.Type > maxPathType) // Drop ID to 1 for Path of out of range IDs
+        {
+            pLogWarning("PATH-%d ID is out of range (max types %d), reset to PATH-1", pp.Type, maxPathType);
+            pp.Type = 1;
+        }
     }
 
     for(auto &l : wld.levels)
@@ -195,6 +214,12 @@ void OpenWorld(std::string FilePath)
         ll.WarpX = l.gotox;
         ll.WarpY = l.gotoy;
         ll.Path2 = l.bigpathbg;
+
+        if(ll.Type > maxLevelType) // Drop ID to 1 for Levels of out of range IDs
+        {
+            pLogWarning("PATH-%d ID is out of range (max types %d), reset to PATH-1", ll.Type, maxLevelType);
+            ll.Type = 1;
+        }
     }
 
     for(auto &m : wld.music)
