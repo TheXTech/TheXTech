@@ -6,7 +6,7 @@
 #include <PGE_File_Formats/file_formats.h>
 #include <PGE_File_Formats/smbx64.h>
 #include <fmt_format_ne.h>
-
+#include <IniProcessor/ini_processing.h>
 
 void LoadCustomBlock(int A, std::string cFileName);
 
@@ -82,5 +82,22 @@ void FindCustomBlocks(/*std::string cFilePath*/)
 
 void LoadCustomBlock(int A, std::string cFileName)
 {
-
+    IniProcessing config(cFileName);
+    if(!config.beginGroup("block"))
+           config.beginGroup("General");
+    config.read("issizeable", BlockIsSizable[A], false);
+    config.read("playernoclipping", BlockPlayerNoClipping[A], false);
+    config.read("npcnoclipping", BlockNPCNoClipping[A], false);
+    config.read("noclipping", BlockNoClipping[A], false);
+    config.read("floorslope", BlockSlope[A], 0);
+    config.read("cellingslope", BlockSlope2[A], 0);
+    config.read("width", BlockWidth[A], 32);
+    config.read("height", BlockHeight[A], 32);
+    config.read("hitspot1", BlockOnlyHitspot1[A], false);
+    config.read("kills", BlockKills[A], false);
+    config.read("hurts", BlockHurts[A], false);
+    config.read("pswitch", BlockPSwitch[A], false);
+    config.read("frames", BlockFrame[A], 0);
+    config.read("framespeed", BlockFrameSpeed[A], 8);
+    config.endGroup();
 }
