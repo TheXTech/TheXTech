@@ -1331,9 +1331,12 @@ void NPCFrames(int A)
     {
         NPC[A].Frame = 0;
     }
-    else if(NPC[A].Type == 294 || NPC[A].Type == 309 || NPC[A].Type == 337)
+    else if(NPC[A].Type == 294 || NPC[A].Type == 309 || NPC[A].Type == 337 || NPC[A].Type == 329)
     {
-        NPC[A].Frame = -1;
+        if(NPC[A].Special6 != 0)
+            NPC[A].Frame = -1;
+        else
+            NPC[A].Frame = 0;
     }
     else if(NPC[A].Type == 311)
     {
@@ -1735,10 +1738,6 @@ void NPCFrames(int A)
                 NPC[A].FrameCount = 0;
             }
         }
-    }
-    else if(NPC[A].Type == 329) // smb2 stone
-    {
-        NPC[A].Frame = -1;
     }
     else if(NPC[A].Type == 317) // fry guy
     {

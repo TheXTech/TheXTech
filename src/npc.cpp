@@ -1308,20 +1308,33 @@ void NPCSpecial(int A)
                         NPC[A].Location.SpeedX -= 0.05;
                     }
                 }
-                else
-                    NPC[A].Location.SpeedX = 0;
             }
             if(NPC[A].Slope == 0 && (CheckCollision(tempLocation, Player[B].Location) == false || CheckCollision(tempLocation2, Player[B].Location) == false))
             {
                 if(NPC[A].Location.SpeedX < 0)
                 {
-                      NPC[A].Location.SpeedX += 0.01;
+                      NPC[A].Location.SpeedX += 0.009;
                 }
                 else if(NPC[A].Location.SpeedX > 0)
                 {
-                      NPC[A].Location.SpeedX -= 0.01;
+                      NPC[A].Location.SpeedX -= 0.009;
                 }
             }
+            else if(NPC[A].Slope == -1)
+            {
+                if(NPC[A].Location.SpeedX < 0)
+                {
+                      NPC[A].Location.SpeedX += 0.009;
+                }
+            }
+            else if(NPC[A].Slope == 1)
+            {
+                if(NPC[A].Location.SpeedX > 0)
+                {
+                      NPC[A].Location.SpeedX -= 0.009;
+                }
+            }
+
             if(NPC[A].Location.SpeedX > 7)
             {
                 NPC[A].Location.SpeedX = 7;

@@ -904,7 +904,7 @@ void UpdatePlayer()
                         if((Player[A].Location.SpeedX > 1.5 || Player[A].Location.SpeedX < -1.5) && Player[A].Location.SpeedY == 0)
                         {
                             Player[A].Location.SpeedY = -4.5;
-                            PlaySound(92);
+                            PlaySound(98);
                         }
                     }
                     else if(Player[A].State == 8 && Player[A].Wet != 0 && Player[A].Character != 5)

@@ -159,6 +159,8 @@ void SetupCredits()
     AddCredit("XerX");
     AddCredit("supermarioman");
     AddCredit("Mr game&watch42");
+    AddCredit("Rexx")
+    AddCredit("Spike")
     AddCredit("");
     AddCredit("");
     AddCredit("");
@@ -210,7 +212,7 @@ void SetupCredits()
     AddCredit("Valtteri");
     AddCredit("Vandarx");
     AddCredit("Zephyr");
-    AddCredit("");
+    AddCredit("Eclipsed");
     AddCredit("");
     AddCredit("");
     AddCredit("");
