@@ -66,26 +66,26 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                 SavedChar[Player[whatPlayer].Character] = Player[whatPlayer];
                 if(Player[B].Character == 1)
                 {
-                    Block[622].Frame = 4;
+                    BlockFrame[622] = 4;
                 }
                 if(Player[B].Character == 2)
                 {
-                    Block[623].Frame = 4;
+                    BlockFrame[623] = 4;
                 }
                 if(Player[B].Character == 3)
                 {
-                    Block[624].Frame = 4;
+                    BlockFrame[624] = 4;
                 }
                 if(Player[B].Character == 4)
                 {
-                    Block[625].Frame = 4;
+                    BlockFrame[625]= 4;
                 }
                 if(Player[B].Character == 5)
                 {
-                    Block[631].Frame = 4;
+                    BlockFrame[631] = 4;
                 }
             }
-            if(b.Frame < 4)
+            if(BlockFrame[b.Type] < 4)
             {
                 PlaySound(34);
                 // UnDuck whatPlayer
@@ -1386,153 +1386,264 @@ void KillBlock(int A, bool Splode)
 
 void BlockFrames()
 {
+    int A = 0;
+
     bool pChar[maxPlayers] = {false};
+    bool tempBool = false;
     SDL_memset(pChar, 0, sizeof(pChar));
 
     if(FreezeNPCs == true)
         return;
-
-    for(int A = 1; A <= numBlock; A++)
+    // Update block frame counter
+    BlockFrame2[4] = BlockFrame2[4] + 1;
+    if(BlockFrame2[4] == 8)
+        BlockFrame2[4] = 0;
+    BlockFrame2[5] = BlockFrame2[5] + 1;
+    if(BlockFrame2[5] == 8)
+        BlockFrame2[5] = 0;
+    BlockFrame2[30] = BlockFrame2[30] + 1;
+    if(BlockFrame2[30] == 8)
+        BlockFrame2[30] = 0;
+    BlockFrame2[55] = BlockFrame2[55] + 1;
+    if(BlockFrame2[55] == 8)
+        BlockFrame2[55] = 0;
+    BlockFrame2[88] = BlockFrame2[88] + 1;
+    if(BlockFrame2[88] == 8)
+        BlockFrame2[88] = 0;
+    BlockFrame2[109] = BlockFrame2[109] + 1;
+    if(BlockFrame2[109] == 4)
+        BlockFrame2[109] = 0;
+    BlockFrame2[371] = BlockFrame2[371] + 1;
+    if(BlockFrame2[371] == 8)
+        BlockFrame2[371] = 0;
+    BlockFrame2[379] = BlockFrame2[379] + 1;
+    if(BlockFrame2[379] >= 12)
+        BlockFrame2[379] = 0;
+    // Check if the block type is ready for the next frame
+    if(BlockFrame2[4] == 0)
     {
-        if(BlockFrame[Block[A].Type] > 0) // custom block frames
-        {
-            Block[A].FrameCount++;
-            if(Block[A].FrameCount >= BlockFrameSpeed[Block[A].Type])
-            {
-                if(Block[A].Frame >= BlockFrame[Block[A].Type])
-                    Block[A].Frame = 0;
-                if(Block[A].Frame < BlockFrame[Block[A].Type])
-                    Block[A].Frame++;
+        BlockFrame[4] = BlockFrame[4] + 1;
+        if(BlockFrame[4] == 4)
+            BlockFrame[4] = 0;
+    }
+    if(BlockFrame2[5] == 0)
+    {
+        BlockFrame[5] = BlockFrame[5] + 1;
+        if(BlockFrame[5] == 4)
+            BlockFrame[5] = 0;
+    }
+    BlockFrame[598] = BlockFrame[5];
+    BlockFrame[511] = BlockFrame[5];
+    BlockFrame[169] = BlockFrame[5];
+    BlockFrame[173] = BlockFrame[5];
+    BlockFrame[176] = BlockFrame[5];
+    BlockFrame[179] = BlockFrame[5];
+    BlockFrame[193] = BlockFrame[5];
+    BlockFrame[389] = BlockFrame[5];
+    BlockFrame[391] = BlockFrame[5];
+    BlockFrame[392] = BlockFrame[5];
+    BlockFrame[404] = BlockFrame[5];
+    BlockFrame[459] = BlockFrame[5];
+    BlockFrame[460] = BlockFrame[5];
+    BlockFrame[461] = BlockFrame[5];
+    BlockFrame[462] = BlockFrame[5];
+    BlockFrame[463] = BlockFrame[5];
+    BlockFrame[464] = BlockFrame[5];
+    BlockFrame[465] = BlockFrame[5];
+    BlockFrame[466] = BlockFrame[5];
+    BlockFrame[468] = BlockFrame[5];
+    BlockFrame[469] = BlockFrame[5];
+    BlockFrame[470] = BlockFrame[5];
+    BlockFrame[471] = BlockFrame[5];
+    BlockFrame[472] = BlockFrame[5];
+    BlockFrame[473] = BlockFrame[5];
+    BlockFrame[474] = BlockFrame[5];
+    BlockFrame[475] = BlockFrame[5];
+    BlockFrame[476] = BlockFrame[5];
+    BlockFrame[477] = BlockFrame[5];
+    BlockFrame[478] = BlockFrame[5];
+    BlockFrame[479] = BlockFrame[5];
+    BlockFrame[480] = BlockFrame[5];
+    BlockFrame[481] = BlockFrame[5];
+    BlockFrame[482] = BlockFrame[5];
+    BlockFrame[483] = BlockFrame[5];
+    BlockFrame[484] = BlockFrame[5];
+    BlockFrame[485] = BlockFrame[5];
+    BlockFrame[486] = BlockFrame[5];
+    BlockFrame[487] = BlockFrame[5];
+    BlockFrame[622] = BlockFrame[5];
+    BlockFrame[623] = BlockFrame[5];
+    BlockFrame[624] = BlockFrame[5];
+    BlockFrame[625] = BlockFrame[5];
+    BlockFrame[631] = BlockFrame[5];
 
-                Block[A].FrameCount = 0;
-            }
-        }
-        else if(Block[A].Type == 4 || Block[A].Type == 5 || Block[A].Type == 30 || Block[A].Type == 55 ||
-                  Block[A].Type == 88 || Block[A].Type == 109 || Block[A].Type == 169 || Block[A].Type == 170 ||
-                  Block[A].Type == 173 || Block[A].Type == 176 || Block[A].Type == 179 || Block[A].Type == 193 ||
-                  Block[A].Type == 371 || Block[A].Type == 404 || (Block[A].Type >= 459 && Block[A].Type <= 487) ||
-                  Block[A].Type == 511 || Block[A].Type == 530 || Block[A].Type == 598 ||
-                  (Block[A].Type >= 622 && Block[A].Type <= 629) || (Block[A].Type >= 631 && Block[A].Type <= 632) ||
-                  Block[A].Type == 639 || Block[A].Type == 640 || Block[A].Type == 686 ||
-                  (Block[A].Type >= 379 && Block[A].Type <= 382) || (Block[A].Type >= 391 && Block[A].Type <= 392) ||
-                  Block[A].Type == 389)
+    for(A = 1; A <= numPlayers; A++)
+    {
+        if(Player[A].Character == 1)
+            BlockFrame[622] = 4;
+        if(Player[A].Character == 2)
+            BlockFrame[623] = 4;
+        if(Player[A].Character == 3)
+            BlockFrame[624] = 4;
+        if(Player[A].Character == 4)
+            BlockFrame[625] = 4;
+        if(Player[A].Character == 5)
+            BlockFrame[631] = 4;
+    }
+
+    BlockFrame2[626] = BlockFrame2[626] + 1;
+    if(BlockFrame2[626] < 8)
+        BlockFrame[626] = 3;
+    else if(BlockFrame2[626] < 16)
+        BlockFrame[626] = 2;
+    else if(BlockFrame2[626] < 23)
+        BlockFrame[626] = 1;
+    else
+    {
+        BlockFrame2[626] = 0;
+        BlockFrame[626] = 1;
+    }
+
+    BlockFrame2[639] = BlockFrame2[639] + 1;
+    if(BlockFrame2[639] < 8)
+        BlockFrame[639] = 0;
+    else if(BlockFrame2[626] < 16)
+        BlockFrame[639] = 1;
+    else if(BlockFrame2[626] < 23)
+        BlockFrame[639] = 2;
+    else
+    {
+        BlockFrame2[626] = 0;
+        BlockFrame[626] = 0;
+    }
+
+    BlockFrame2[640] = BlockFrame2[640] + 1;
+    if(BlockFrame2[640] < 8)
+        BlockFrame[640] = 0;
+    else if(BlockFrame2[626] < 16)
+        BlockFrame[640] = 1;
+    else
+    {
+        BlockFrame2[626] = 0;
+        BlockFrame[626] = 0;
+    }
+
+    BlockFrame[686] = BlockFrame[639];
+
+    BlockFrame[627] = BlockFrame[626];
+    BlockFrame[628] = BlockFrame[626];
+    BlockFrame[629] = BlockFrame[626];
+    BlockFrame[632] = BlockFrame[626];
+    for(A = 1; A <= numPlayers; A++)
+    {
+        if(Player[A].Character <= 5)
+            pChar[Player[A].Character] = true;
+    }
+
+    if(pChar[1] == false)
+        BlockFrame[626] = 0;
+    if(pChar[2] == false)
+        BlockFrame[627] = 0;
+    if(pChar[3] == false)
+        BlockFrame[628] = 0;
+    if(pChar[4] == false)
+        BlockFrame[629] = 0;
+    if(pChar[5] == false)
+        BlockFrame[632] = 0;
+
+    if(BlockFrame2[30] == 0)
+    {
+        BlockFrame[30] = BlockFrame[30] + 1;
+        if(BlockFrame[30] == 4)
+            BlockFrame[30] = 0;
+    }
+    if(BlockFrame2[55] == 0)
+    {
+        BlockFrame[55] = BlockFrame[55] + 1;
+        if(BlockFrame[55] == 4)
+            BlockFrame[55] = 0;
+    }
+    if(BlockFrame2[88] == 0)
+    {
+        BlockFrame[88] = BlockFrame[88] + 1;
+        if(BlockFrame[88] == 4)
+            BlockFrame[88] = 0;
+    }
+    BlockFrame[170] = BlockFrame[88];
+    if(BlockFrame2[109] == 0)
+    {
+        BlockFrame[109] = BlockFrame[109] + 1;
+        if(BlockFrame[109] == 8)
+            BlockFrame[109] = 0;
+    }
+    if(BlockFrame2[371] == 0)
+    {
+        BlockFrame[371] = BlockFrame[371] + 1;
+        if(BlockFrame[371] == 8)
+            BlockFrame[371] = 0;
+    }
+    if(BlockFrame2[379] == 0)
+    {
+        BlockFrame[379] = BlockFrame[379] + 1;
+        if(BlockFrame[379] == 4)
+            BlockFrame[379] = 0;
+    }
+    BlockFrame[380] = BlockFrame[379];
+    BlockFrame[381] = BlockFrame[379];
+    BlockFrame[382] = BlockFrame[379];
+
+    BlockFrame2[530] = BlockFrame2[530] + 1;
+    if(BlockFrame2[530] <= 8)
+        BlockFrame[530] = 0;
+    else if(BlockFrame2[530] <= 16)
+        BlockFrame[530] = 1;
+    else if(BlockFrame2[530] <= 24)
+        BlockFrame[530] = 2;
+    else if(BlockFrame2[530] <= 32)
+        BlockFrame[530] = 3;
+    else if(BlockFrame2[530] <= 40)
+        BlockFrame[530] = 2;
+    else if(BlockFrame2[530] <= 48)
+        BlockFrame[530] = 1;
+    else
+    {
+        BlockFrame[530] = 0;
+        BlockFrame2[530] = 0;
+    }
+
+    if(LevelEditor && !TestLevel)
+        BlockFrame[458] = 5;
+    else
+    {
+        tempBool = false;
+        for(A = 1; A <= numPlayers; A++)
         {
-            //Block Max.frames
-            if(!(Block[A].Type == 371 && Block[A].Type == 109 && (Block[A].Type >= 622 && Block[A].Type <= 629) &&
-                (Block[A].Type >= 631 && Block[A].Type <= 632) && Block[A].Type == 639 && Block[A].Type == 640 &&
-                Block[A].Type == 686))
+            if(Player[A].Stoned == true)
             {
-                Block[A].FrameCount++;
-                if(Block[A].FrameCount >= 8)
-                {
-                    if(Block[A].Frame >= 3)
-                        Block[A].Frame = 0;
-                    if(Block[A].Frame < 3)
-                        Block[A].Frame++;
-                    Block[A].FrameCount = 0;
-                }
-            }
-            else
-            {
-                if(Block[A].Type == 109 || Block[A].Type == 371)
-                {
-                    Block[A].FrameCount++;
-                    if(Block[A].FrameCount >= 8)
-                    {
-                        if(Block[A].Frame >= 8)
-                            Block[A].Frame = 0;
-                        if(Block[A].Frame < 8)
-                            Block[A].Frame++;
-                        Block[A].FrameCount = 0;
-                    }
-                }
-                else if(Block[A].Type == 639 || Block[A].Type == 686)
-                {
-                    Block[A].FrameCount++;
-                    if(Block[A].FrameCount >= 8)
-                    {
-                        if(Block[A].Frame >= 3)
-                            Block[A].Frame = 0;
-                        if(Block[A].Frame < 3)
-                            Block[A].Frame++;
-                        Block[A].FrameCount = 0;
-                    }
-                }
-                else if(Block[A].Type == 640)
-                {
-                    Block[A].FrameCount++;
-                    if(Block[A].FrameCount >= 8)
-                    {
-                        if(Block[A].Frame >= 2)
-                            Block[A].Frame = 0;
-                        if(Block[A].Frame < 2)
-                            Block[A].Frame++;
-                        Block[A].FrameCount = 0;
-                    }
-                }
-                else if((Block[A].Type >= 622 && Block[A].Type <= 625) || Block[A].Type == 631)
-                {
-                    Block[A].FrameCount++;
-                    if(Block[A].FrameCount >= 8)
-                    {
-                        if(Block[A].Frame == 4)
-                            Block[A].Frame = 0;
-                        if(Block[A].Frame < 4)
-                            Block[A].Frame++;
-                        Block[A].FrameCount = 0;
-                    }
-                    for(int P = 1; P <= numPlayers; P++)
-                    {
-                        if(Player[P].Character == 1)
-                            Block[622].Frame = 4;
-                        else
-                            Block[622].FrameCount++;
-                        if(Player[P].Character == 2)
-                            Block[623].Frame = 4;
-                        else
-                            Block[623].FrameCount++;
-                        if(Player[P].Character == 3)
-                            Block[624].Frame = 4;
-                        else
-                            Block[624].FrameCount++;
-                        if(Player[P].Character == 4)
-                            Block[625].Frame = 4;
-                        else
-                            Block[625].FrameCount++;
-                        if(Player[P].Character == 5)
-                            Block[631].Frame = 4;
-                        else
-                            Block[631].FrameCount++;
-                    }
-                }
-                else if((Block[A].Type >= 626 && Block[A].Type <= 629) || Block[A].Type == 632)
-                {
-                            if(pChar[1] == false)
-                                Block[626].Frame = 0;
-                            if(pChar[2] == false)
-                                Block[627].Frame = 0;
-                            if(pChar[3] == false)
-                                Block[628].Frame = 0;
-                            if(pChar[4] == false)
-                                Block[629].Frame = 0;
-                            if(pChar[5] == false)
-                                Block[632].Frame = 0;
-                            if(pChar[1] == true || pChar[2] == true || pChar[3] == true ||
-                               pChar[4] == true || pChar[5] == true)
-                            {
-                                Block[A].FrameCount++;
-                                if(Block[A].FrameCount >= 8)
-                                {
-                                    if(Block[A].Frame == 4)
-                                        Block[A].Frame = 1;
-                                    if(Block[A].Frame < 4)
-                                        Block[A].Frame++;
-                                    Block[A].FrameCount = 0;
-                                }
-                            }
-                }
+                tempBool = true;
+                break;
             }
         }
+        if(BlockFrame[458] < 5 && tempBool == true)
+        {
+            BlockFrame2[458] = BlockFrame2[458] + 1;
+            if(BlockFrame2[458] >= 4)
+            {
+                BlockFrame2[458] = 0;
+                BlockFrame[458] = BlockFrame[458] + 1;
+            }
+        }
+        else if(BlockFrame[458] > 0 && tempBool == false)
+        {
+            BlockFrame2[458] = BlockFrame2[458] + 1;
+            if(BlockFrame2[458] >= 4)
+            {
+                BlockFrame2[458] = 0;
+                BlockFrame[458] = BlockFrame[458] - 1;
+            }
+        }
+        else
+            BlockFrame2[458] = 0;
     }
 }
 

@@ -1547,7 +1547,7 @@ extern RangeArrI<int, 1, maxBackgroundType, 0> BackgroundFrame;
 extern RangeArrI<int, 1, maxBackgroundType, 0> BackgroundFrameCount;
 
 extern RangeArrI<int, 0, maxBlockType, 0> BlockFrame;
-extern RangeArrI<int, 0, maxBlockType, 0> BlockFrameSpeed;
+extern RangeArrI<int, 0, maxBlockType, 0> BlockFrame2;
 //Public sBlockArray(1 To 1000) As Integer 'sizable block array
 extern RangeArrI<int, 1, 1000, 0> sBlockArray;
 //Public sBlockNum As Integer

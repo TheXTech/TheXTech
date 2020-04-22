@@ -26,7 +26,6 @@ void SaveBlockDefaults()
         BlockDefaults.BlockPSwitch[A] = BlockPSwitch[A];
         BlockDefaults.BlockNoClipping[A] = BlockNoClipping[A];
         BlockDefaults.BlockNPCNoClipping[A] = BlockNPCNoClipping[A];
-        BlockFrameSpeed[A] = 8;
     }
 }
 
@@ -46,8 +45,6 @@ void LoadBlockDefaults()
         BlockPSwitch[A] = BlockDefaults.BlockPSwitch[A];
         BlockNoClipping[A] = BlockDefaults.BlockNoClipping[A];
         BlockNPCNoClipping[A] = BlockDefaults.BlockNPCNoClipping[A];
-        BlockFrame[A] = 0;
-        BlockFrameSpeed[A] = 8;
     }
 }
 
@@ -97,7 +94,5 @@ void LoadCustomBlock(int A, std::string cFileName)
     config.read("kills", BlockKills[A], false);
     config.read("hurts", BlockHurts[A], false);
     config.read("pswitch", BlockPSwitch[A], false);
-    config.read("frames", BlockFrame[A], 0);
-    config.read("framespeed", BlockFrameSpeed[A], 8);
     config.endGroup();
 }

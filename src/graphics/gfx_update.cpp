@@ -1054,7 +1054,7 @@ void UpdateGraphics(bool skipRepaint)
                                           Block[A].Location.Height,
                                           GFXBlock[Block[A].Type],
                                           0,
-                                          Block[A].Frame * Block[A].Location.Height);
+                                          BlockFrame[Block[A].Type] * Block[A].Location.Height);
                 }
             }
         }
@@ -1585,7 +1585,7 @@ void UpdateGraphics(bool skipRepaint)
                                           Block[A].Location.Height,
                                           GFXBlock[Block[A].Type],
                                           0,
-                                          Block[A].Frame * Block[A].Location.Height);
+                                          BlockFrame[Block[A].Type] * Block[A].Location.Height);
                 }
             }
         }
