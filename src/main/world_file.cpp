@@ -31,6 +31,7 @@
 
 #include <Utils/strings.h>
 #include <Utils/files.h>
+#include <Logger/logger.h>
 #include <PGE_File_Formats/file_formats.h>
 
 void OpenWorld(std::string FilePath)
@@ -108,13 +109,21 @@ void OpenWorld(std::string FilePath)
             break;
         }
 
-        Tile[numTiles] = Tile_t();
+        auto &terra = Tile[numTiles];
 
-        Tile[numTiles].Location.X = t.x;
-        Tile[numTiles].Location.Y = t.y;
-        Tile[numTiles].Type = int(t.id);
-        Tile[numTiles].Location.Width = TileWidth[Tile[numTiles].Type];
-        Tile[numTiles].Location.Height = TileHeight[Tile[numTiles].Type];
+        terra = Tile_t();
+
+        terra.Location.X = t.x;
+        terra.Location.Y = t.y;
+        terra.Type = int(t.id);
+        terra.Location.Width = TileWidth[terra.Type];
+        terra.Location.Height = TileHeight[terra.Type];
+
+        if(terra.Type > maxTileType) // Drop ID to 1 for Tiles of out of range IDs
+        {
+            pLogWarning("TILE-%d ID is out of range (max types %d), reset to TILE-1", terra.Type, maxTileType);
+            terra.Type = 1;
+        }
     }
 
     for(auto &s : wld.scenery)
@@ -126,14 +135,22 @@ void OpenWorld(std::string FilePath)
             break;
         }
 
-        Scene[numScenes] = Scene_t();
+        auto &scene = Scene[numScenes];
 
-        Scene[numScenes].Type = int(s.id);
-        Scene[numScenes].Location.X = s.x;
-        Scene[numScenes].Location.Y = s.y;
-        Scene[numScenes].Location.Width = SceneWidth[Scene[numScenes].Type];
-        Scene[numScenes].Location.Height = SceneHeight[Scene[numScenes].Type];
-        Scene[numScenes].Active = true;
+        scene = Scene_t();
+
+        scene.Type = int(s.id);
+        scene.Location.X = s.x;
+        scene.Location.Y = s.y;
+        scene.Location.Width = SceneWidth[scene.Type];
+        scene.Location.Height = SceneHeight[scene.Type];
+        scene.Active = true;
+
+        if(scene.Type > maxSceneType) // Drop ID to 1 for Scenery of out of range IDs
+        {
+            pLogWarning("TILE-%d ID is out of range (max types %d), reset to TILE-1", scene.Type, maxSceneType);
+            scene.Type = 1;
+        }
     }
 
     for(auto &p : wld.paths)
@@ -145,16 +162,24 @@ void OpenWorld(std::string FilePath)
             break;
         }
 
-        WorldPath[numWorldPaths] = WorldPath_t();
+        auto &pp = WorldPath[numWorldPaths];
 
-        WorldPath[numWorldPaths].Location.X = p.x;
-        WorldPath[numWorldPaths].Location.Y = p.y;
-        WorldPath[numWorldPaths].Type = int(p.id);
-        WorldPath[numWorldPaths].Location.Width = 32;
-        WorldPath[numWorldPaths].Location.Height = 32;
-        WorldPath[numWorldPaths].Active = false;
+        pp = WorldPath_t();
+
+        pp.Location.X = p.x;
+        pp.Location.Y = p.y;
+        pp.Type = int(p.id);
+        pp.Location.Width = 32;
+        pp.Location.Height = 32;
+        pp.Active = false;
 //        if(LevelEditor == true)
-//            WorldPath[numWorldPaths].Active = true;
+//            pp.Active = true;
+
+        if(pp.Type > maxPathType) // Drop ID to 1 for Path of out of range IDs
+        {
+            pLogWarning("PATH-%d ID is out of range (max types %d), reset to PATH-1", pp.Type, maxPathType);
+            pp.Type = 1;
+        }
     }
 
     for(auto &l : wld.levels)
@@ -166,27 +191,35 @@ void OpenWorld(std::string FilePath)
             break;
         }
 
-        WorldLevel[numWorldLevels] = WorldLevel_t();
+        auto &ll = WorldLevel[numWorldLevels];
 
-        WorldLevel[numWorldLevels].Location.X = l.x;
-        WorldLevel[numWorldLevels].Location.Y = l.y;
-        WorldLevel[numWorldLevels].Type = int(l.id);
-        WorldLevel[numWorldLevels].FileName = l.lvlfile;
-        WorldLevel[numWorldLevels].LevelName = l.title;
-        WorldLevel[numWorldLevels].LevelExit[1] = l.top_exit;
-        WorldLevel[numWorldLevels].LevelExit[2] = l.left_exit;
-        WorldLevel[numWorldLevels].LevelExit[3] = l.bottom_exit;
-        WorldLevel[numWorldLevels].LevelExit[4] = l.right_exit;
-        WorldLevel[numWorldLevels].Location.Width = 32;
-        WorldLevel[numWorldLevels].Location.Height = 32;
-        WorldLevel[numWorldLevels].StartWarp = int(l.entertowarp);
-        WorldLevel[numWorldLevels].Visible = l.alwaysVisible;
-        WorldLevel[numWorldLevels].Active = WorldLevel[numWorldLevels].Visible;
-        WorldLevel[numWorldLevels].Path = l.pathbg;
-        WorldLevel[numWorldLevels].Start = l.gamestart;
-        WorldLevel[numWorldLevels].WarpX = l.gotox;
-        WorldLevel[numWorldLevels].WarpY = l.gotoy;
-        WorldLevel[numWorldLevels].Path2 = l.bigpathbg;
+        ll = WorldLevel_t();
+
+        ll.Location.X = l.x;
+        ll.Location.Y = l.y;
+        ll.Type = int(l.id);
+        ll.FileName = l.lvlfile;
+        ll.LevelName = l.title;
+        ll.LevelExit[1] = l.top_exit;
+        ll.LevelExit[2] = l.left_exit;
+        ll.LevelExit[3] = l.bottom_exit;
+        ll.LevelExit[4] = l.right_exit;
+        ll.Location.Width = 32;
+        ll.Location.Height = 32;
+        ll.StartWarp = int(l.entertowarp);
+        ll.Visible = l.alwaysVisible;
+        ll.Active = ll.Visible;
+        ll.Path = l.pathbg;
+        ll.Start = l.gamestart;
+        ll.WarpX = l.gotox;
+        ll.WarpY = l.gotoy;
+        ll.Path2 = l.bigpathbg;
+
+        if(ll.Type > maxLevelType) // Drop ID to 1 for Levels of out of range IDs
+        {
+            pLogWarning("PATH-%d ID is out of range (max types %d), reset to PATH-1", ll.Type, maxLevelType);
+            ll.Type = 1;
+        }
     }
 
     for(auto &m : wld.music)
@@ -198,18 +231,20 @@ void OpenWorld(std::string FilePath)
             break;
         }
 
-        WorldMusic[numWorldMusic] = WorldMusic_t();
+        auto &box = WorldMusic[numWorldMusic];
 
-        WorldMusic[numWorldMusic].Location.X = m.x;
-        WorldMusic[numWorldMusic].Location.Y = m.y;
-        WorldMusic[numWorldMusic].Type = int(m.id);
-        WorldMusic[numWorldMusic].MusicFile = m.music_file;
+        box = WorldMusic_t();
+
+        box.Location.X = m.x;
+        box.Location.Y = m.y;
+        box.Type = int(m.id);
+        box.MusicFile = m.music_file;
 
         // In game they are smaller (30x30), in world they are 32x32
-        WorldMusic[numWorldMusic].Location.Width = 30;
-        WorldMusic[numWorldMusic].Location.Height = 30;
-        WorldMusic[numWorldMusic].Location.Y = WorldMusic[numWorldMusic].Location.Y + 1;
-        WorldMusic[numWorldMusic].Location.X = WorldMusic[numWorldMusic].Location.X + 1;
+        box.Location.Width = 30;
+        box.Location.Height = 30;
+        box.Location.Y = box.Location.Y + 1;
+        box.Location.X = box.Location.X + 1;
     }
 
     LoadCustomGFX();
@@ -219,7 +254,8 @@ void OpenWorld(std::string FilePath)
     {
         for(A = 1; A <= numWorldLevels; A++)
         {
-            if((FileRelease <= 20 && WorldLevel[A].Type == 1) || (FileRelease > 20 && WorldLevel[A].Start))
+            auto &ll = WorldLevel[A];
+            if((FileRelease <= 20 && ll.Type == 1) || (FileRelease > 20 && ll.Start))
             {
                 WorldPlayer[1].Type = 1;
                 WorldPlayer[1].Location = WorldLevel[A].Location;
@@ -229,9 +265,10 @@ void OpenWorld(std::string FilePath)
 
         for(A = 1; A <= numWorldLevels; A++)
         {
-            if((FileRelease <= 20 && WorldLevel[A].Type == 1) || (FileRelease > 20 && WorldLevel[A].Start))
+            auto &ll = WorldLevel[A];
+            if((FileRelease <= 20 && ll.Type == 1) || (FileRelease > 20 && ll.Start))
             {
-                WorldLevel[A].Active = true;
+                ll.Active = true;
                 LevelPath(A, 5, true);
             }
         }

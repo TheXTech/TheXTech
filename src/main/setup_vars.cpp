@@ -3051,6 +3051,8 @@ void SetupVars()
     Foreground[155] = true;
     Foreground[156] = true;
     Foreground[157] = true;
+    Foreground[202] = true;
+    Foreground[201] = true;
 
     BackgroundHeight[158] = 32;
     BackgroundHeight[159] = 32;

@@ -1511,10 +1511,10 @@ void BlockFrames()
         BlockFrame[639] = 1;
     else if(BlockFrame2[626] < 23)
         BlockFrame[639] = 2;
-    else
+    else if(BlockFrame2[639] > 32)
     {
-        BlockFrame2[626] = 0;
-        BlockFrame[626] = 0;
+        BlockFrame2[639] = 0;
+        BlockFrame[639] = 0;
     }
 
     BlockFrame2[640] = BlockFrame2[640] + 1;
@@ -1522,10 +1522,10 @@ void BlockFrames()
         BlockFrame[640] = 0;
     else if(BlockFrame2[626] < 16)
         BlockFrame[640] = 1;
-    else
+    else if(BlockFrame2[640] > 23)
     {
-        BlockFrame2[626] = 0;
-        BlockFrame[626] = 0;
+        BlockFrame2[640] = 0;
+        BlockFrame[640] = 0;
     }
 
     BlockFrame[686] = BlockFrame[639];

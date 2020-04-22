@@ -204,30 +204,38 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             break;
         }
 
-        Block[numBlock] = Block_t();
+        auto &block = Block[numBlock];
 
-        Block[numBlock].Location.X = double(b.x);
-        Block[numBlock].Location.Y = double(b.y);
-        Block[numBlock].Location.Height = double(b.h);
-        Block[numBlock].Location.Width = double(b.w);
-        Block[numBlock].Type = int(b.id);
-        Block[numBlock].DefaultType = Block[numBlock].Type;
-        Block[numBlock].Special = int(b.npc_id > 0 ? b.npc_id + 1000 : -1 * b.npc_id);
-        if(Block[numBlock].Special == 100)
-            Block[numBlock].Special = 1009;
-        if(Block[numBlock].Special == 102)
-            Block[numBlock].Special = 1014;
-        if(Block[numBlock].Special == 103)
-            Block[numBlock].Special = 1034;
-        if(Block[numBlock].Special == 105)
-            Block[numBlock].Special = 1095;
-        Block[numBlock].DefaultSpecial = Block[numBlock].Special;
-        Block[numBlock].Invis = b.invisible;
-        Block[numBlock].Slippy = b.slippery;
-        Block[numBlock].Layer = b.layer;
-        Block[numBlock].TriggerDeath = b.event_destroy;
-        Block[numBlock].TriggerHit = b.event_hit;
-        Block[numBlock].TriggerLast = b.event_emptylayer;
+        block = Block_t();
+
+        block.Location.X = double(b.x);
+        block.Location.Y = double(b.y);
+        block.Location.Height = double(b.h);
+        block.Location.Width = double(b.w);
+        block.Type = int(b.id);
+        block.DefaultType = block.Type;
+        block.Special = int(b.npc_id > 0 ? b.npc_id + 1000 : -1 * b.npc_id);
+        if(block.Special == 100)
+            block.Special = 1009;
+        if(block.Special == 102)
+            block.Special = 1014;
+        if(block.Special == 103)
+            block.Special = 1034;
+        if(block.Special == 105)
+            block.Special = 1095;
+        block.DefaultSpecial = block.Special;
+        block.Invis = b.invisible;
+        block.Slippy = b.slippery;
+        block.Layer = b.layer;
+        block.TriggerDeath = b.event_destroy;
+        block.TriggerHit = b.event_hit;
+        block.TriggerLast = b.event_emptylayer;
+
+        if(block.Type > maxBlockType) // Drop ID to 1 for blocks of out of range IDs
+        {
+            pLogWarning("Block-%d ID is out of range (max types %d), reset to Block-1", block.Type, maxBlockType);
+            block.Type = 1;
+        }
     }
 
     for(auto &b : lvl.bgo)
@@ -239,40 +247,48 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             break;
         }
 
-        Background[numBackground] = Background_t();
+        auto &bgo = Background[numBackground];
 
-        Background[numBackground].Location.X = double(b.x);
-        Background[numBackground].Location.Y = double(b.y);
-        Background[numBackground].Type = int(b.id);
-        Background[numBackground].Layer = b.layer;
-        Background[numBackground].Location.Width = GFXBackgroundWidth[Background[numBackground].Type];
-        Background[numBackground].Location.Height = BackgroundHeight[Background[numBackground].Type];
+        bgo = Background_t();
 
-        Background[numBackground].uid = int(b.meta.array_id);
+        bgo.Location.X = double(b.x);
+        bgo.Location.Y = double(b.y);
+        bgo.Type = int(b.id);
+        bgo.Layer = b.layer;
+        bgo.Location.Width = GFXBackgroundWidth[bgo.Type];
+        bgo.Location.Height = BackgroundHeight[bgo.Type];
 
-        Background[numBackground].zOffset = b.z_offset;
+        bgo.uid = int(b.meta.array_id);
+
+        bgo.zOffset = b.z_offset;
 
         if(b.z_mode == LevelBGO::ZDefault)
-            Background[numBackground].SortPriority = int(b.smbx64_sp);
+            bgo.SortPriority = int(b.smbx64_sp);
         else
         {
             switch(b.z_mode)
             {
             case LevelBGO::Background2:
-                Background[numBackground].SortPriority = 10;
+                bgo.SortPriority = 10;
                 break;
             case LevelBGO::Background1:
-                Background[numBackground].SortPriority = 30;
+                bgo.SortPriority = 30;
                 break;
             case LevelBGO::Foreground1:
-                Background[numBackground].SortPriority = 125;
+                bgo.SortPriority = 125;
                 break;
             case LevelBGO::Foreground2:
-                Background[numBackground].SortPriority = 200;
+                bgo.SortPriority = 200;
                 break;
             default:
                 break;
             }
+        }
+
+        if(bgo.Type > maxBackgroundType) // Drop ID to 1 for BGOs of out of range IDs
+        {
+            pLogWarning("BGO-%d ID is out of range (max types %d), reset to BGO-1", bgo.Type, maxBackgroundType);
+            bgo.Type = 1;
         }
     }
 
@@ -286,110 +302,118 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             break;
         }
 
-        NPC[numNPCs] = NPC_t();
+        auto &npc = NPC[numNPCs];
 
-        NPC[numNPCs].Location.X = n.x;
-        NPC[numNPCs].Location.Y = n.y;
+        npc = NPC_t();
+
+        npc.Location.X = n.x;
+        npc.Location.Y = n.y;
         if(!LevelEditor)
-            NPC[numNPCs].Location.Y -= 0.01;
-        NPC[numNPCs].Direction = n.direct;
-        NPC[numNPCs].Type = int(n.id);
+            npc.Location.Y -= 0.01;
+        npc.Direction = n.direct;
+        npc.Type = int(n.id);
 
-        if(NPC[numNPCs].Type == 91 || NPC[numNPCs].Type == 96 || NPC[numNPCs].Type == 283 || NPC[numNPCs].Type == 284)
+        if(npc.Type > maxNPCType) // Drop ID to 1 for NPCs of out of range IDs
         {
-            NPC[numNPCs].Special = n.contents;
-            NPC[numNPCs].DefaultSpecial = int(NPC[numNPCs].Special);
-        }
-        if(NPC[numNPCs].Type == 288 || NPC[numNPCs].Type == 289 || (NPC[numNPCs].Type == 91 && int(NPC[numNPCs].Special) == 288))
-        {
-            NPC[numNPCs].Special2 = n.special_data2;
-            NPC[numNPCs].DefaultSpecial2 = int(NPC[numNPCs].Special2);
+            pLogWarning("NPC-%d ID is out of range (max types %d), reset to NPC-1", npc.Type, maxNPCType);
+            npc.Type = 1;
         }
 
-        if(NPCIsAParaTroopa[NPC[numNPCs].Type])
+        if(npc.Type == 91 || npc.Type == 96 || npc.Type == 283 || npc.Type == 284)
         {
-            NPC[numNPCs].Special = n.special_data;
-            NPC[numNPCs].DefaultSpecial = int(NPC[numNPCs].Special);
+            npc.Special = n.contents;
+            npc.DefaultSpecial = int(npc.Special);
+        }
+        if(npc.Type == 288 || npc.Type == 289 || (npc.Type == 91 && int(npc.Special) == 288))
+        {
+            npc.Special2 = n.special_data2;
+            npc.DefaultSpecial2 = int(npc.Special2);
         }
 
-        if(NPCIsCheep[NPC[numNPCs].Type])
+        if(NPCIsAParaTroopa[npc.Type])
         {
-            NPC[numNPCs].Special = n.special_data;
-            NPC[numNPCs].DefaultSpecial = int(NPC[numNPCs].Special);
+            npc.Special = n.special_data;
+            npc.DefaultSpecial = int(npc.Special);
         }
 
-        if(NPC[numNPCs].Type == 260)
+        if(NPCIsCheep[npc.Type])
         {
-            NPC[numNPCs].Special = n.special_data;
-            NPC[numNPCs].DefaultSpecial = int(NPC[numNPCs].Special);
+            npc.Special = n.special_data;
+            npc.DefaultSpecial = int(npc.Special);
         }
 
-        if(NPC[numNPCs].Type == 86)
+        if(npc.Type == 260)
+        {
+            npc.Special = n.special_data;
+            npc.DefaultSpecial = int(npc.Special);
+        }
+
+        if(npc.Type == 86)
         {
             if(lvl.meta.RecentFormat == LevelData::SMBX64 &&
                lvl.meta.RecentFormatVersion < 9)
-                NPC[numNPCs].Special7 = 1.0; // Keep original behavior of Bowser as in SMBX 1.0
+                npc.Special7 = 1.0; // Keep original behavior of Bowser as in SMBX 1.0
             else
-                NPC[numNPCs].Special7 = n.special_data;
+                npc.Special7 = n.special_data;
         }
 
-        NPC[numNPCs].Generator = n.generator;
-        if(NPC[numNPCs].Generator)
+        npc.Generator = n.generator;
+        if(npc.Generator)
         {
-            NPC[numNPCs].GeneratorDirection = n.generator_direct;
-            NPC[numNPCs].GeneratorEffect = n.generator_type;
-            NPC[numNPCs].GeneratorTimeMax = n.generator_period;
+            npc.GeneratorDirection = n.generator_direct;
+            npc.GeneratorEffect = n.generator_type;
+            npc.GeneratorTimeMax = n.generator_period;
         }
 
-        NPC[numNPCs].Text = n.msg;
+        npc.Text = n.msg;
 
-        NPC[numNPCs].Inert = n.friendly;
-        if(NPC[numNPCs].Type == 151)
-            NPC[numNPCs].Inert = true;
-        NPC[numNPCs].Stuck = n.nomove;
-        NPC[numNPCs].DefaultStuck = NPC[numNPCs].Stuck;
+        npc.Inert = n.friendly;
+        if(npc.Type == 151)
+            npc.Inert = true;
+        npc.Stuck = n.nomove;
+        npc.DefaultStuck = npc.Stuck;
 
-        NPC[numNPCs].Legacy = n.is_boss;
+        npc.Legacy = n.is_boss;
 
-        NPC[numNPCs].Layer = n.layer;
-        NPC[numNPCs].TriggerActivate = n.event_activate;
-        NPC[numNPCs].TriggerDeath = n.event_die;
-        NPC[numNPCs].TriggerTalk = n.event_talk;
-        NPC[numNPCs].TriggerLast = n.event_emptylayer;
-        NPC[numNPCs].AttLayer = n.attach_layer;
+        npc.Layer = n.layer;
+        npc.TriggerActivate = n.event_activate;
+        npc.TriggerDeath = n.event_die;
+        npc.TriggerTalk = n.event_talk;
+        npc.TriggerLast = n.event_emptylayer;
+        npc.AttLayer = n.attach_layer;
 
-        NPC[numNPCs].DefaultType = NPC[numNPCs].Type;
-        NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
-        NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
-        NPC[numNPCs].DefaultLocation = NPC[numNPCs].Location;
-        NPC[numNPCs].DefaultDirection = NPC[numNPCs].Direction;
-        NPC[numNPCs].TimeLeft = 1;
-        NPC[numNPCs].Active = true;
-        NPC[numNPCs].JustActivated = 1;
+        npc.DefaultType = npc.Type;
+        npc.Location.Width = NPCWidth[npc.Type];
+        npc.Location.Height = NPCHeight[npc.Type];
+        npc.DefaultLocation = npc.Location;
+        npc.DefaultDirection = npc.Direction;
+        npc.TimeLeft = 1;
+        npc.Active = true;
+        npc.JustActivated = 1;
 
         CheckSectionNPC(numNPCs);
 
-        if(NPC[numNPCs].Type == 192 || NPC[numNPCs].Type == 299) // Is a checkpoint
+        if(npc.Type == 192) // Is a checkpoint
         {
             checkPointId++;
-            NPC[numNPCs].Special = checkPointId;
-            NPC[numNPCs].DefaultSpecial = int(NPC[numNPCs].Special);
+            npc.Special = checkPointId;
+            npc.DefaultSpecial = int(npc.Special);
         }
-        else if(NPC[numNPCs].Type == 97 || NPC[numNPCs].Type == 196) // Is a star
+        else if(npc.Type == 97 || npc.Type == 196) // Is a star
         {
             bool tempBool = false;
             for(B = 1; B <= numStars; ++B)
             {
-                if(Star[B].level == FileNameFull && (Star[B].Section == NPC[numNPCs].Section || Star[B].Section == -1))
+                if(Star[B].level == FileNameFull && (Star[B].Section == npc.Section || Star[B].Section == -1))
                     tempBool = true;
             }
 
             if(tempBool)
             {
-                NPC[numNPCs].Special = 1;
-                NPC[numNPCs].DefaultSpecial = 1;
-                if(NPC[numNPCs].Type == 196)
-                    NPC[numNPCs].Killed = 9;
+                npc.Special = 1;
+                npc.DefaultSpecial = 1;
+                if(npc.Type == 196)
+                    npc.Killed = 9;
             }
         }
     }
@@ -404,45 +428,47 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             break;
         }
 
-        Warp[numWarps] = Warp_t();
+        auto &warp = Warp[numWarps];
 
-        Warp[numWarps].PlacedEnt = true;
-        Warp[numWarps].PlacedExit = true;
-        Warp[numWarps].Entrance.X = w.ix;
-        Warp[numWarps].Entrance.Y = w.iy;
-        Warp[numWarps].Exit.X = w.ox;
-        Warp[numWarps].Exit.Y = w.oy;
-        Warp[numWarps].Direction = w.idirect;
-        Warp[numWarps].Direction2 = w.odirect;
-        Warp[numWarps].Effect = w.type;
-        Warp[numWarps].level = w.lname;
-        Warp[numWarps].LevelWarp = int(w.warpto);
-        Warp[numWarps].LevelEnt = w.lvl_i;
+        warp = Warp_t();
 
-        Warp[numWarps].MapWarp = w.lvl_o;
-        Warp[numWarps].MapX = int(w.world_x);
-        Warp[numWarps].MapY = int(w.world_y);
+        warp.PlacedEnt = true;
+        warp.PlacedExit = true;
+        warp.Entrance.X = w.ix;
+        warp.Entrance.Y = w.iy;
+        warp.Exit.X = w.ox;
+        warp.Exit.Y = w.oy;
+        warp.Direction = w.idirect;
+        warp.Direction2 = w.odirect;
+        warp.Effect = w.type;
+        warp.level = w.lname;
+        warp.LevelWarp = int(w.warpto);
+        warp.LevelEnt = w.lvl_i;
 
-        Warp[numWarps].Stars = w.stars;
-        Warp[numWarps].Layer = w.layer;
-        Warp[numWarps].Hidden = w.unknown;
+        warp.MapWarp = w.lvl_o;
+        warp.MapX = int(w.world_x);
+        warp.MapY = int(w.world_y);
 
-        Warp[numWarps].NoYoshi = w.novehicles;
-        Warp[numWarps].WarpNPC = w.allownpc;
-        Warp[numWarps].Locked = w.locked;
-        Warp[numWarps].bombExit = w.need_a_bomb;
+        warp.Stars = w.stars;
+        warp.Layer = w.layer;
+        warp.Hidden = w.unknown;
 
-        Warp[numWarps].cannonExit = w.cannon_exit;
-        Warp[numWarps].cannonExitSpeed = w.cannon_exit_speed;
-        Warp[numWarps].eventEnter = w.event_enter;
-        Warp[numWarps].StarsMsg = w.stars_msg;
-        Warp[numWarps].noPrintStars = w.star_num_hide;
-        Warp[numWarps].noEntranceScene = w.hide_entering_scene;
+        warp.NoYoshi = w.novehicles;
+        warp.WarpNPC = w.allownpc;
+        warp.Locked = w.locked;
 
-        Warp[numWarps].Entrance.Height = 32;
-        Warp[numWarps].Entrance.Width = 32;
-        Warp[numWarps].Exit.Height = 32;
-        Warp[numWarps].Exit.Width = 32;
+        warp.bombExit = w.need_a_bomb;
+        warp.cannonExit = w.cannon_exit;
+        warp.cannonExitSpeed = w.cannon_exit_speed;
+        warp.eventEnter = w.event_enter;
+        warp.StarsMsg = w.stars_msg;
+        warp.noPrintStars = w.star_num_hide;
+        warp.noEntranceScene = w.hide_entering_scene;
+
+        warp.Entrance.Height = 32;
+        warp.Entrance.Width = 32;
+        warp.Exit.Height = 32;
+        warp.Exit.Width = 32;
         if(w.two_way)
             twoWayWarps.push_back(numWarps);
     }
@@ -458,11 +484,14 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
                 break;
             }
 
-            Warp[numWarps] = Warp[tww];
-            Warp[numWarps].Exit = Warp[tww].Entrance;
-            Warp[numWarps].Entrance = Warp[tww].Exit;
-            Warp[numWarps].Direction2 = Warp[tww].Direction;
-            Warp[numWarps].Direction = Warp[tww].Direction2;
+            auto &w = Warp[tww];
+            auto &warp = Warp[numWarps];
+
+            warp = w;
+            warp.Exit = w.Entrance;
+            warp.Entrance = w.Exit;
+            warp.Direction2 = w.Direction;
+            warp.Direction = w.Direction2;
         }
     }
 
@@ -475,27 +504,31 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             break;
         }
 
-        Water[numWater] = Water_t();
+        auto &water = Water[numWater];
 
-        Water[numWater].Location.X = w.x;
-        Water[numWater].Location.Y = w.y;
-        Water[numWater].Location.Width = w.w;
-        Water[numWater].Location.Height = w.h;
-        Water[numWater].Buoy = w.buoy;
-        Water[numWater].Quicksand = w.env_type;
-        Water[numWater].Layer = w.layer;
+        water = Water_t();
+
+        water.Location.X = w.x;
+        water.Location.Y = w.y;
+        water.Location.Width = w.w;
+        water.Location.Height = w.h;
+        water.Buoy = w.buoy;
+        water.Quicksand = w.env_type;
+        water.Layer = w.layer;
     }
 
     A = 0;
     for(auto &l : lvl.layers)
     {
-        Layer[A] = Layer_t();
+        auto &layer = Layer[A];
 
-        Layer[A].Name = l.name;
-        Layer[A].Hidden = l.hidden;
-        if(Layer[A].Hidden)
+        layer = Layer_t();
+
+        layer.Name = l.name;
+        layer.Hidden = l.hidden;
+        if(layer.Hidden)
         {
-            HideLayer(Layer[A].Name, true);
+            HideLayer(layer.Name, true);
         }
 //        if(LevelEditor == true || MagicHand == true)
 //        {
@@ -513,40 +546,42 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
     A = 0;
     for(auto &e : lvl.events)
     {
-        Events[A] = Events_t();
+        auto &event = Events[A];
 
-        Events[A].Name = e.name;
-        Events[A].Text = e.msg;
-        Events[A].Sound = int(e.sound_id);
-        Events[A].EndGame = int(e.end_game);
+        event = Events_t();
+
+        event.Name = e.name;
+        event.Text = e.msg;
+        event.Sound = int(e.sound_id);
+        event.EndGame = int(e.end_game);
 
 //        int hideLayersNum = int(e.layers_hide.size());
 //        int showLayersNum = int(e.layers_show.size());
 //        int toggleLayersNum = int(e.layers_toggle.size());
 
-        Events[A].HideLayer.clear();
-        Events[A].ShowLayer.clear();
-        Events[A].ToggleLayer.clear();
+        event.HideLayer.clear();
+        event.ShowLayer.clear();
+        event.ToggleLayer.clear();
 
 //        for(B = 0; B <= maxSections; B++)
 //        {
-//            Events[A].HideLayer[B].clear();
-//            Events[A].ShowLayer[B].clear();
-//            Events[A].ToggleLayer[B].clear();
+//            event.HideLayer[B].clear();
+//            event.ShowLayer[B].clear();
+//            event.ToggleLayer[B].clear();
 //        }
 
-        Events[A].HideLayer = e.layers_hide;
-        Events[A].ShowLayer = e.layers_show;
-        Events[A].ToggleLayer = e.layers_toggle;
+        event.HideLayer = e.layers_hide;
+        event.ShowLayer = e.layers_show;
+        event.ToggleLayer = e.layers_toggle;
 
 //        for(B = 0; B <= maxSections; B++)
 //        {
 //            if(B < hideLayersNum)
-//                Events[A].HideLayer[B] = e.layers_hide[size_t(B)];
+//                event.HideLayer[B] = e.layers_hide[size_t(B)];
 //            if(B < showLayersNum)
-//                Events[A].ShowLayer[B] = e.layers_show[size_t(B)];
+//                event.ShowLayer[B] = e.layers_show[size_t(B)];
 //            if(B < toggleLayersNum)
-//                Events[A].ToggleLayer[B] = e.layers_toggle[size_t(B)];
+//                event.ToggleLayer[B] = e.layers_toggle[size_t(B)];
 //        }
 
         int maxSets = int(e.sets.size());
@@ -555,49 +590,49 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 
         for(B = 0; B <= numSections; B++)
         {
-            Events[A].Music[B] = LevelEvent_Sets::LESet_Nothing;
-            Events[A].Background[B] = LevelEvent_Sets::LESet_Nothing;
-            Events[A].level[B].X = LevelEvent_Sets::LESet_Nothing;
-            Events[A].level[B].Y = 0;
-            Events[A].level[B].Height = 0;
-            Events[A].level[B].Width = 0;
+            event.Music[B] = LevelEvent_Sets::LESet_Nothing;
+            event.Background[B] = LevelEvent_Sets::LESet_Nothing;
+            event.level[B].X = LevelEvent_Sets::LESet_Nothing;
+            event.level[B].Y = 0;
+            event.level[B].Height = 0;
+            event.level[B].Width = 0;
         }
 
         for(B = 0; B < maxSets; B++)
         {
             auto &s = e.sets[size_t(B)];
-            Events[A].Music[B] = int(s.music_id);
-            Events[A].Background[B] = int(s.background_id);
-            Events[A].level[B].X = s.position_left;
-            Events[A].level[B].Y = s.position_top;
-            Events[A].level[B].Height = s.position_bottom;
-            Events[A].level[B].Width = s.position_right;
+            event.Music[B] = int(s.music_id);
+            event.Background[B] = int(s.background_id);
+            event.level[B].X = s.position_left;
+            event.level[B].Y = s.position_top;
+            event.level[B].Height = s.position_bottom;
+            event.level[B].Width = s.position_right;
         }
 
-        Events[A].TriggerEvent = e.trigger;
-        Events[A].TriggerDelay = e.trigger_timer;
+        event.TriggerEvent = e.trigger;
+        event.TriggerDelay = e.trigger_timer;
 
-        Events[A].LayerSmoke = e.nosmoke;
+        event.LayerSmoke = e.nosmoke;
 
-        Events[A].Controls.AltJump = e.ctrl_altjump;
-        Events[A].Controls.AltRun = e.ctrl_altrun;
-        Events[A].Controls.Down = e.ctrl_down;
-        Events[A].Controls.Drop = e.ctrl_drop;
-        Events[A].Controls.Jump = e.ctrl_jump;
-        Events[A].Controls.Left = e.ctrl_left;
-        Events[A].Controls.Right = e.ctrl_right;
-        Events[A].Controls.Run = e.ctrl_run;
-        Events[A].Controls.Start = e.ctrl_start;
-        Events[A].Controls.Up = e.ctrl_up;
+        event.Controls.AltJump = e.ctrl_altjump;
+        event.Controls.AltRun = e.ctrl_altrun;
+        event.Controls.Down = e.ctrl_down;
+        event.Controls.Drop = e.ctrl_drop;
+        event.Controls.Jump = e.ctrl_jump;
+        event.Controls.Left = e.ctrl_left;
+        event.Controls.Right = e.ctrl_right;
+        event.Controls.Run = e.ctrl_run;
+        event.Controls.Start = e.ctrl_start;
+        event.Controls.Up = e.ctrl_up;
 
-        Events[A].AutoStart = e.autostart;
-        Events[A].MoveLayer = e.movelayer;
-        Events[A].SpeedX = float(e.layer_speed_x);
-        Events[A].SpeedY = float(e.layer_speed_y);
+        event.AutoStart = e.autostart;
+        event.MoveLayer = e.movelayer;
+        event.SpeedX = float(e.layer_speed_x);
+        event.SpeedY = float(e.layer_speed_y);
 
-        Events[A].AutoX = float(e.move_camera_x);
-        Events[A].AutoY = float(e.move_camera_y);
-        Events[A].AutoSection = int(e.scroll_section);
+        event.AutoX = float(e.move_camera_x);
+        event.AutoY = float(e.move_camera_y);
+        event.AutoSection = int(e.scroll_section);
 
         A++;
         numEvents++;
@@ -695,25 +730,27 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             {
                 B++;
                 numLocked++;
-                Background[B] = Background_t();
-                Background[B].Layer = Warp[A].Layer;
-                Background[B].Hidden = Warp[A].Hidden;
-                Background[B].Location.Width = 24;
-                Background[B].Location.Height = 24;
-                Background[B].Location.Y = Warp[A].Entrance.Y - Background[B].Location.Height;
-                Background[B].Location.X = Warp[A].Entrance.X + Warp[A].Entrance.Width / 2.0 - Background[B].Location.Width / 2.0;
-                Background[B].Type = 160;
+                auto &bgo = Background[B];
+                bgo = Background_t();
+                bgo.Layer = Warp[A].Layer;
+                bgo.Hidden = Warp[A].Hidden;
+                bgo.Location.Width = 24;
+                bgo.Location.Height = 24;
+                bgo.Location.Y = Warp[A].Entrance.Y - bgo.Location.Height;
+                bgo.Location.X = Warp[A].Entrance.X + Warp[A].Entrance.Width / 2.0 - bgo.Location.Width / 2.0;
+                bgo.Type = 160;
             }
             else if(Warp[A].Effect == 2 && Warp[A].Locked) // For locks
             {
                 B++;
                 numLocked++;
-                Background[B] = Background_t();
-                Background[B].Layer = Warp[A].Layer;
-                Background[B].Hidden = Warp[A].Hidden;
-                Background[B].Location = Warp[A].Entrance;
-                Background[B].Type = 98;
-                Background[B].Location.Width = 16;
+                auto &bgo = Background[B];
+                bgo = Background_t();
+                bgo.Layer = Warp[A].Layer;
+                bgo.Hidden = Warp[A].Hidden;
+                bgo.Location = Warp[A].Entrance;
+                bgo.Type = 98;
+                bgo.Location.Width = 16;
             }
             else if(Warp[A].Effect == 2 && Warp[A].bombExit) // For bomb-exits
             {
