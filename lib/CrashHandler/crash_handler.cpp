@@ -109,6 +109,7 @@ static const char *g_messageToUser =
     "            Additional information:\n"
     "================================================\n"
     V_FILE_DESC " version: " V_FILE_VERSION V_FILE_RELEASE "\n"
+    "NSMBX Version " NSMBX_VERSION_STRING "\n"
     "Architecture: " FILE_CPU "\n"
     "GIT Revision code: " V_BUILD_VER "\n"
     "GIT branch: " V_BUILD_BRANCH "\n"

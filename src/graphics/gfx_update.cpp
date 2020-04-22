@@ -1846,7 +1846,7 @@ void UpdateGraphics(bool skipRepaint)
                 frmMain.renderTexture(ScreenW / 2 - GFX.MenuGFX[2].w / 2, 70,
                         GFX.MenuGFX[2].w, GFX.MenuGFX[2].h, GFX.MenuGFX[2], 0, 0);
                 SuperPrint("Made By Core", 3, 20, 545);
-                SuperPrint("Version 1.0", 3, 20, 570);
+                SuperPrint("Version " NSMBX_VERSION_STRING, 3, 20, 570);
                 if(MenuMode == 0)
                 {
                     SuperPrint("1 PLAYER GAME", 3, 300, 350);

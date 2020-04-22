@@ -63,7 +63,7 @@ FrmMain::FrmMain()
 #ifdef CUSTOM_GAME_NAME_TITLE
     m_windowTitle = CUSTOM_GAME_NAME_TITLE;
 #else
-    m_windowTitle = "New Super Mario Bros. X - Version 1.0";
+    m_windowTitle = "New Super Mario Bros. X - Version " NSMBX_VERSION_STRING;
 #endif /* CUSTOM_GAME_NAME_TITLE */
 }
 
