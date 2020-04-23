@@ -254,6 +254,8 @@ void TouchBonus(int A, int B)
             UpdatePlayerBonus(A, NPC[B].Type);
             if(Player[A].State == 1 && Player[A].Character != 5)
             {
+                Player[A].CanFly3 = false;
+                Player[A].CanFly = false;
                 if(Player[A].Duck)
                     UnDuck(A);
                 Player[A].StateNPC = NPC[B].Type;
@@ -282,6 +284,8 @@ void TouchBonus(int A, int B)
             Player[A].StateNPC = NPC[B].Type;
             if(Player[A].State != 3)
             {
+                Player[A].CanFly3 = false;
+                Player[A].CanFly = false;
                 Player[A].Frame = 1;
                 Player[A].Effect = 4;
                 if(Player[A].Mount > 0)
@@ -314,6 +318,8 @@ void TouchBonus(int A, int B)
             Player[A].StateNPC = NPC[B].Type;
             if(Player[A].State != 7)
             {
+                Player[A].CanFly3 = false;
+                Player[A].CanFly = false;
                 Player[A].Frame = 1;
                 Player[A].Effect = 41;
                 if(Player[A].Mount > 0)
@@ -339,6 +345,8 @@ void TouchBonus(int A, int B)
             Player[A].StateNPC = NPC[B].Type;
             if(Player[A].State != 4)
             {
+                Player[A].CanFly3 = false;
+                Player[A].CanFly = false;
                 Player[A].Frame = 1;
                 Player[A].Effect = 5;
                 Player[A].Effect2 = 0;
@@ -392,6 +400,8 @@ void TouchBonus(int A, int B)
             Player[A].StateNPC = NPC[B].Type;
             if(Player[A].State != 5)
             {
+                if(Player[A].CanFly3)
+                    Player[A].CanFly3 = false;
                 Player[A].Frame = 1;
                 Player[A].Effect = 11;
                 Player[A].Effect2 = 0;
@@ -418,6 +428,8 @@ void TouchBonus(int A, int B)
             Player[A].StateNPC = NPC[B].Type;
             if(Player[A].State != 6)
             {
+                Player[A].CanFly3 = false;
+                Player[A].CanFly = false;
                 Player[A].Frame = 1;
                 Player[A].Effect = 12;
                 Player[A].Effect2 = 0;
@@ -444,6 +456,8 @@ void TouchBonus(int A, int B)
             Player[A].StateNPC = NPC[B].Type;
             if(Player[A].State != 8)
             {
+                Player[A].CanFly3 = false;
+                Player[A].CanFly = false;
                 Player[A].Frame = 1;
                 Player[A].Effect = 42;
                 Player[A].Effect2 = 0;

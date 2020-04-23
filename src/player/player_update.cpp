@@ -998,6 +998,7 @@ void UpdatePlayer()
                         Player[A].CanFly2 = false;
                         Player[A].FlyCount = 0;
                     }
+
                     if(Player[A].CanFly3)
                         Player[A].CanFly = true;
                 }

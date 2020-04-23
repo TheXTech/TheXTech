@@ -159,8 +159,8 @@ void SetupCredits()
     AddCredit("XerX");
     AddCredit("supermarioman");
     AddCredit("Mr game&watch42");
-    AddCredit("Rexx")
-    AddCredit("Spike")
+    AddCredit("Rexx");
+    AddCredit("Spike");
     AddCredit("");
     AddCredit("");
     AddCredit("");
