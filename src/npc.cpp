@@ -1343,6 +1343,13 @@ void NPCSpecial(int A)
             {
                 NPC[A].Location.SpeedX = -7;
             }
+
+            if(NPC[A].Location.SpeedX > 2 || NPC[A].Location.SpeedX < -2)
+            {
+                C = dRand() * 7;
+                if(C > 6)
+                    PlaySound(99);
+            }
         }
         if(NPC[A].Location.SpeedX > 5)
             NPC[A].Location.SpeedX = 5;

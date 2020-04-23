@@ -2203,7 +2203,7 @@ void TailSwipe(int plr, bool boo, bool Stab, int StabDir)
                     {
                         B = NPC[A].Damage;
                         C = NPC[A].Type;
-                        if(StabDir == 2 && ((NPC[A].Type >= 154 && NPC[A].Type <= 157) || NPC[A].Type == 26 || NPC[A].Type == 32 || NPC[A].Type == 238 || NPC[A].Type == 241))
+                        if(StabDir == 2 && ((NPC[A].Type >= 154 && NPC[A].Type <= 157) || NPC[A].Type == 26 || NPC[A].Type == 32 || NPC[A].Type == 238 || NPC[A].Type == 241 || NPC[A].Type == 327 || NPC[A].Type == 329))
                         {
                         }
                         else

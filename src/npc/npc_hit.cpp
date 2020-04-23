@@ -279,7 +279,7 @@ void NPCHit(int A, int B, int C)
         NPC[A].Killed = 9;
         PlaySound(79);
     }
-    else if(B == 10 && ((NPC[A].Type >= 154 && NPC[A].Type <= 157) || NPC[A].Type == 26 || NPC[A].Type == 32 || NPC[A].Type == 238 || NPC[A].Type == 241 || NPC[A].Type == 305 || NPC[A].Type == 96 || NPC[A].Type == 22 || NPC[A].Type == 134))
+    else if(B == 10 && ((NPC[A].Type >= 154 && NPC[A].Type <= 157) || NPC[A].Type == 26 || NPC[A].Type == 32 || NPC[A].Type == 238 || NPC[A].Type == 241 || NPC[A].Type == 305 || NPC[A].Type == 96 || NPC[A].Type == 22 || NPC[A].Type == 134 || NPC[A].Type == 327 || NPC[A].Type == 329))
     {
         PlaySound(9);
         NPC[A].Bouce = true;
@@ -1245,7 +1245,7 @@ void NPCHit(int A, int B, int C)
         }
         // Things With Shells (Koopa Troopa, Buzzy Beetle, Etc.)
     }
-    else if(NPC[A].Type == 4 || NPC[A].Type == 6 || NPC[A].Type == 23 || NPC[A].Type == 72 || NPCIsAParaTroopa[NPC[A].Type] || (NPC[A].Type >= 109 && NPC[A].Type <= 112) || NPC[A].Type == 173 || NPC[A].Type == 175 || NPC[A].Type == 176 || NPC[A].Type == 177)
+    else if(NPC[A].Type == 4 || NPC[A].Type == 6 || NPC[A].Type == 23 || NPC[A].Type == 343 || NPC[A].Type == 72 || NPCIsAParaTroopa[NPC[A].Type] || (NPC[A].Type >= 109 && NPC[A].Type <= 112) || NPC[A].Type == 173 || NPC[A].Type == 175 || NPC[A].Type == 176 || NPC[A].Type == 177)
     {
         if(B == 1)
         {

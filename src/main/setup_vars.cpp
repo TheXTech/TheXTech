@@ -525,6 +525,7 @@ void SetupVars()
         NPCNoClipping[A] = true;
         NPCNoGravity[A] = true;
         NPCFrameOffsetY[A] = 13;
+        NPCNoYoshi[A] = true;
     }
     NPCWidth[339] = 28;
     NPCHeight[339] = 28;
@@ -533,12 +534,16 @@ void SetupVars()
     NPCNoClipping[339] = true;
     NPCNoGravity[339] = true;
     NPCJumpHurt[339] = true;
+    NPCNoYoshi[339] = true;
 
     NPCJumpHurt[340] = true;
     NPCNoYoshi[340] = true;
     NPCNoGravity[340] = true;
 
     NPCJumpHurt[343] = true;
+    NPCIsABlock[343] = true;
+    NPCIsAHit1Block[343] = true;
+    NPCMovesPlayer[343] = true;
 
     NPCNoClipping[341] = true;
     NPCNoGravity[341] = true;
@@ -1315,6 +1320,7 @@ void SetupVars()
         NPCNoGravity[A] = true;
         NPCMovesPlayer[A] = true;
         NPCNoIceBall[A] = true;
+        NPCNoYoshi[A] = true;
     }
 
     NPCWidth[346] = 32; // Starman
@@ -1327,6 +1333,7 @@ void SetupVars()
     NPCWontHurt[326] = true;
     NPCNoClipping[326] = true;
     NPCNoGravity[326] = true;
+    NPCNoYoshi[326] = true;
 
     For(A, 319, 321) // Pansers
     {
@@ -1368,6 +1375,7 @@ void SetupVars()
     NPCJumpHurt[334] = true;
     NPCNoGravity[334] = true;
     NPCNoClipping[334] = true;
+    NPCNoYoshi[334] = true;
 
     NPCDefaultMovement[333] = true;
 
@@ -1594,7 +1602,7 @@ void SetupVars()
     NPCHeightGFX[336] = 48;
     NPCWidth[336] = 64;
     NPCHeight[336] = 48;
-    NPCNoGravity[336] = true;
+    NPCNoYoshi[336] = true;
 
     NPCWidth[234] = 48;
 
@@ -2349,6 +2357,7 @@ void SetupVars()
     NPCJumpHurt[303] = true;
     NPCNoGravity[303] = true;
     NPCDefaultMovement[303] = true;
+    NPCNoYoshi[303] = true;
 
     NPCWidthGFX[280] = 64;
     NPCHeightGFX[280] = 64;

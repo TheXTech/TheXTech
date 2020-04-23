@@ -618,6 +618,7 @@ void PlaySound(int A)
             case 74: SoundPause[A] = 8; break;
             case 81: SoundPause[A] = 5; break;
             case 86: SoundPause[A] = 8; break;
+            case 99: SoundPause[A] = 16; break;
             default: SoundPause[A] = 4; break;
             }
         }
