@@ -1700,7 +1700,7 @@ void NPCFrames(int A)
         {
             if(NPC[A].Special2 == 0)
             {
-                NPC[A].FrameCount = NPC[A].FrameCount + 1;
+                NPC[A].FrameCount = NPC[A].FrameCount + 0.64;
                 if(NPC[A].FrameCount > 4)
                 {
                     NPC[A].FrameCount = 0;

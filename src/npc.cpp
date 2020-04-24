@@ -2689,7 +2689,7 @@ void NPCSpecial(int A)
         if(NPC[A].Special2 > 110)
         {
             NPC[A].Special3++;
-            if(NPC[A].Special3 > 5)
+            if(NPC[A].Special3 > 6)
             {
                 numNPCs++;
                 NPC[numNPCs] = NPC_t();
@@ -2701,6 +2701,7 @@ void NPCSpecial(int A)
                 NPC[numNPCs].Type = 314;
                 NPC[numNPCs].Location.Height = 32;
                 NPC[numNPCs].Location.Width = 32;
+                NPC[numNPCs].Special2 = 3;
                 if(NPC[numNPCs].Direction == -1)
                     NPC[numNPCs].Location.X = NPC[A].Location.X + 16;
                 else
@@ -2714,7 +2715,7 @@ void NPCSpecial(int A)
                     NPC[numNPCs].Location.SpeedY = 1;
                 else if(NPC[numNPCs].Location.SpeedY < -1)
                     NPC[numNPCs].Location.SpeedY = -1;
-                PlaySound(38);
+                PlaySound(42);
                 NPC[A].Special3 = 0;
                 NPC[A].Special4++;
             }
@@ -4919,11 +4920,11 @@ void SpecialNPC(int A)
             NPC[A].Special2 = 1;
             NPC[A].Location.SpeedX = 0;
         }
-        else if(NPC[A].Special3 == 110)
+        else if(NPC[A].Special3 == 115)
             NPC[A].Special2 = 2;
-        else if(NPC[A].Special3 == 120)
-            NPC[A].Special2 = 3;
         else if(NPC[A].Special3 == 130)
+            NPC[A].Special2 = 3;
+        else if(NPC[A].Special3 == 145)
         {
             PlaySound(25);
             numNPCs++;
@@ -5057,11 +5058,36 @@ void SpecialNPC(int A)
             if(NPC[A].Location.SpeedY > 7.5)
                 NPC[A].Location.SpeedY = 7.5;
         }
-        else if(NPC[A].Special2 == 2)
+        else if(NPC[A].Special2 == 2 || NPC[A].Special2 == 0)
         {
             NPC[A].Location.SpeedY = NPC[A].Location.SpeedY + Physics.NPCGravity;
             if(NPC[A].Location.SpeedY > 12)
                 NPC[A].Location.SpeedY = 12;
+        }
+        else if(NPC[A].Special2 == 3)
+        {
+            for(int B = 1; B <= numBlock; B++)
+            {
+                if(BlockNoClipping[Block[B].Type] == false &&
+                BlockNPCNoClipping[Block[B].Type] == false &&
+                Block[B].Hidden == false &&
+                CheckCollision(NPC[A].Location, Block[B].Location) == true)
+                {
+                    NPC[A].Killed = 9;
+                    NewEffect(147, NPC[A].Location);
+                    NewEffect(160, NPC[A].Location);
+                }
+            }
+            for(int B = 1; B <= numNPCs; B++)
+            {
+                if(NPCIsABlock[NPC[B].Type] == true &&
+                CheckCollision(NPC[A].Location, NPC[B].Location) == true)
+                {
+                    NPC[A].Killed = 9;
+                    NewEffect(147, NPC[A].Location);
+                    NewEffect(160, NPC[A].Location);
+                }
+            }
         }
     }
     else if(NPC[A].Type == 47) // lakitu

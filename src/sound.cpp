@@ -610,7 +610,7 @@ void PlaySound(int A)
             case 26: SoundPause[A] = 8; break;
             case 31: SoundPause[A] = 20; break;
             case 37: SoundPause[A] = 10; break;
-            case 42: SoundPause[A] = 16; break;
+            case 42: SoundPause[A] = 2; break;
             case 72: SoundPause[A] = 16; break;
             case 50: SoundPause[A] = 8; break;
             case 54: SoundPause[A] = 8; break;
