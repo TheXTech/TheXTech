@@ -93,6 +93,7 @@ option(ENABLE_OLD_CREDITS "Use original Redigit's credits without changes" OFF)
 option(ENABLE_LOGGING "Enable debug logging" ON)
 
 # ============ Customization ==============
+set(LIB_SRC_EXTRA)
 set(THEXTECH_GAME_NAME_TITLE "" CACHE STRING "Custom game title, shown in the titlebar of window")
 set(THEXTECH_CREDITS_URL "" CACHE STRING "Custom URL title, shown at the outro screen")
 set(THEXTECH_CREDITS_TITLE "" CACHE STRING "Custom game title, shown at the outro screen")
@@ -107,8 +108,9 @@ if(APPLE)
     set(THEXTECH_CUSTOM_ICON_PATH "" CACHE STRING "Name of icon file to pack into the bundle")
     set(THEXTECH_CUSTOM_USERDATA_DIR_NAME "" CACHE STRING "A custom name for user data in a home directory, by default the name is 'TheXTech Episodes'.")
     if(NOT THEXTECH_CUSTOM_ICON_PATH STREQUAL "")
-        list(APPEND LIB_SRC
-            ${THEXTECH_CUSTOM_ICON_PATH}
+        message("Use custom macOS icon: ${THEXTECH_CUSTOM_ICON_PATH}")
+        list(APPEND LIB_SRC_EXTRA
+            "${THEXTECH_CUSTOM_ICON_PATH}"
         )
     endif()
 endif()
@@ -210,6 +212,7 @@ set(LIB_SRC
     ${INIPROCESSOR_SRCS}
     lib/Logger/logger_sets.cpp
     ${UTILS_SRCS}
+    ${LIB_SRC_EXTRA}
 )
 
 if(APPLE)
