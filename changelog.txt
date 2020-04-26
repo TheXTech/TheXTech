@@ -1,15 +1,15 @@
 TheXTech Changelog.
 
 Changes for 1.3.2
--Added an own timeout sound-92 for P-Switch timer (will be played with 3 seconds before end)
+-Added an own timeout sound-92 for P-Switch timer (will be played with 3 seconds before the end)
 -Added a level testing interprocess interface to work with PGE Editor
 -Fixed the Podoboo's tail effect glitch
--Fixed an incorrect priodoty of BGO65 in level file of SMBX prior to 10 format
+-Fixed an incorrect priority of BGO65 in the level file of SMBX prior to 10 format
 -Fixed a classic Bowser's behavior in "The Invasion 1" episode from SMBX 1.0.x
 -Removed 20 layers limit to show/hide/toggle per event
 -Extended limit to use up to 200 sections in one level
 -Added an error message on attempt to open an invalid level file
--Fixed a glitch of rendering of two-camera screen caused by an incorrect SDL_RenderSetViewport() call usage
+-Fixed a glitch of the rendering of the two-camera screen caused by an incorrect SDL_RenderSetViewport() call usage
 
 
 Changes for 1.3.1 (First version made by Wohlstand in March 2020):
