@@ -185,7 +185,7 @@ void Bomb(Location_t Location, int Game, int ImmunePlayer)
     {
         if(NPC[i].Hidden == false && NPC[i].Active == true && NPC[i].Inert == false && NPC[i].Generator == false && NPCIsABonus[NPC[i].Type] == false)
         {
-            if(NPC[i].Type != 13 && NPC[i].Type != 291)
+            if(NPC[i].Type != 13 && NPC[i].Type != 291 && NPC[i].Type != 305)
             {
                 A = std::abs(NPC[i].Location.X + NPC[i].Location.Width / 2.0 - X);
                 B = std::abs(NPC[i].Location.Y + NPC[i].Location.Height / 2.0 - Y);
@@ -5678,7 +5678,7 @@ void SpecialNPC(int A)
                     NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
                     NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
                     NPC[numNPCs].Location.Y = NPC[A].Location.Y + 14 - NPC[numNPCs].Location.Height / 2.0;
-
+                    NPC[numNPCs].Special2 = 4;
 
 
                     if(NPC[numNPCs].Direction == 1)

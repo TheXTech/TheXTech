@@ -457,7 +457,6 @@ struct NPC_t
 //Public Type Player              'The player data type.
 struct Player_t
 {
-    bool StarMan = false;
     int StarManTimer = 0;
 
 //    DoubleJump As Boolean

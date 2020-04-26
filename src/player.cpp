@@ -234,6 +234,7 @@ void SetupPlayers()
         Player[A].CanFly = false;
         Player[A].CanFly2 = false;
         Player[A].CanFly3 = false;
+        Player[A].StarManTimer = 0;
         Player[A].RunCount = 0;
         Player[A].FlyCount = 0;
         Player[A].ForceHitSpot3 = false;

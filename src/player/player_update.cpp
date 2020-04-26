@@ -67,6 +67,7 @@ void UpdatePlayer()
     float oldSpeedY = 0; // holds the players previous Y speed
     Location_t tempLocation;
     Location_t tempLocation3;
+    Location_t tempLocation4;
     bool spinKill = false;
     int oldSlope = 0;
     float A1 = 0;
@@ -162,6 +163,25 @@ void UpdatePlayer()
         tempBlockHit[2] = 0;
 //        tempBlockA[1] = 0; // Unused
 //        tempBlockA[2] = 0;
+        if(Player[A].StarManTimer > 0)
+        {
+            Player[A].StarManTimer--;
+            tempLocation3.Height = Player[A].Location.Height + 4;
+            tempLocation3.Width = Player[A].Location.Width + 4;
+            tempLocation3.X = Player[A].Location.X - 4;
+            tempLocation3.Y = Player[A].Location.Y - 4;
+            for(int i = 1; i <= numNPCs; i++)
+            {
+                if(NPCIsABonus[NPC[i].Type] != true && NPCIsACoin[NPC[i].Type] != true &&
+                   NPCIsVeggie[NPC[i].Type] != true && NPCIsToad[NPC[i].Type] != true &&
+                   NPCIsAnExit[NPC[i].Type] != true && NPCIsAVine[NPC[i].Type] != true &&
+                   NPCIsYoshi[NPC[i].Type] != true && NPCIsBoot[NPC[i].Type] != true)
+                {
+                    if(CheckCollision(NPC[i].Location, tempLocation4) == true)
+                        NPC[i].Killed = 3;
+                }
+            }
+        }
         if(Player[A].GrabTime > 0) // if grabbing something, take control away from the player
         {
             Player[A].Slide = false;

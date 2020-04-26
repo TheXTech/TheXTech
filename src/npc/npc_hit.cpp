@@ -1804,7 +1804,6 @@ void NPCHit(int A, int B, int C)
             {
                 NPC[A].Special2 = -50;
                 NPC[A].Damage = NPC[A].Damage + 1;
-                NPC[A].Direction = -NPC[A].Direction;
                 NPC[A].Location.SpeedX = 0;
                 PlaySound(39);
             }
@@ -1814,7 +1813,6 @@ void NPCHit(int A, int B, int C)
             {
                 NPC[A].Special2 = -50;
                 NPC[A].Damage = NPC[A].Damage + 1;
-                NPC[A].Direction = -NPC[A].Direction;
                 NPC[A].Location.SpeedX = 0;
                 PlaySound(39);
             }
@@ -1994,9 +1992,6 @@ void NPCHit(int A, int B, int C)
         }
         if(NPC[A].Type == 305 && (B == 3 || B == 4 || B == 5 || B == 10 || B == 2))
         {
-            C = NPC[A].BattleOwner;
-            if(NPC[A].CantHurtPlayer > 0)
-                C = NPC[A].CantHurtPlayer;
             NPC[A].Killed = 4;
             PowBlock();
             tempLocation.Height = NPC[A].Location.Height;
@@ -2005,6 +2000,9 @@ void NPCHit(int A, int B, int C)
             tempLocation.SpeedY = 0;
             tempLocation.X = NPC[A].Location.X - tempLocation.Width;
             tempLocation.Y = NPC[A].Location.Y - tempLocation.Height;
+            C = NPC[A].BattleOwner;
+            if(NPC[A].CantHurtPlayer > 0)
+                C = NPC[A].CantHurtPlayer;
             Bomb(tempLocation, 4, floor(C));
         }
         if(NPC[A].Type == 96 && (B == 4 || B == 5))
