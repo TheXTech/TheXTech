@@ -131,3 +131,30 @@ function(pge_cxx_standard STDVER)
         set(CMAKE_CXX_STANDARD ${STDVER} PARENT_SCOPE)
     endif()
 endfunction()
+
+if(UNIX) # When include/library/binary directory name is not usual in a system, make symbolic links for them
+    if(NOT "${CMAKE_INSTALL_LIBDIR}" STREQUAL "lib")
+        file(MAKE_DIRECTORY "${DEPENDENCIES_INSTALL_DIR}")
+        execute_process(COMMAND ln -s "lib" "${DEPENDENCIES_INSTALL_DIR}/${CMAKE_INSTALL_LIBDIR}")
+    endif()
+    if(NOT "${CMAKE_INSTALL_BINDIR}" STREQUAL "bin")
+        file(MAKE_DIRECTORY "${DEPENDENCIES_INSTALL_DIR}")
+        execute_process(COMMAND ln -s "bin" "${DEPENDENCIES_INSTALL_DIR}/${CMAKE_INSTALL_BINDIR}")
+    endif()
+    if(NOT "${CMAKE_INSTALL_INCLUDEDIR}" STREQUAL "include")
+        file(MAKE_DIRECTORY "${DEPENDENCIES_INSTALL_DIR}")
+        execute_process(COMMAND ln -s "include" "${DEPENDENCIES_INSTALL_DIR}/${CMAKE_INSTALL_INCLUDEDIR}")
+    endif()
+endif()
+
+if(APPLE)
+    # Prevent "directory not exists" warnings when building XCode as project
+    file(MAKE_DIRECTORY ${DEPENDENCIES_INSTALL_DIR}/lib/Debug)
+    file(MAKE_DIRECTORY ${DEPENDENCIES_INSTALL_DIR}/lib/Release)
+    # Don't store built executables into "Debug" and "Release" folders
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/bin)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/bin)
+    set(CMAKE_BUNDLE_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/bin)
+    set(CMAKE_BUNDLE_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/bin)
+endif()
+

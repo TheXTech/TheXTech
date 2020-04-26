@@ -4,6 +4,7 @@ project(TheXTech LANGUAGES C CXX)
 
 include(CheckCXXCompilerFlag)
 include(ExternalProject)
+include(GNUInstallDirs)
 
 include(cmake/git_info.cmake)
 message("== Current GIT hash [${GIT_COMMIT_HASH}], branch [${GIT_BRANCH}], package [${PACKAGE_SUFFIX}] ==")
@@ -429,10 +430,16 @@ elseif(WIN32)
         )
     endif()
     install(FILES ${BUILT_DLLS} DESTINATION .)
+    install(FILES changelog.txt DESTINATION .)
+    install(FILES README.md DESTINATION . RENAME ReadMe.txt)
+    install(FILES LICENSE DESTINATION . RENAME License.TheXTech.txt)
 else()
     install(TARGETS thextech
-        RUNTIME DESTINATION bin
-        LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     )
+    install(FILES changelog.txt DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/thextech)
+    install(FILES README.md DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/thextech RENAME ReadMe.txt)
+    install(FILES LICENSE DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/thextech RENAME License.TheXTech.txt)
 endif()
