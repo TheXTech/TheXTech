@@ -70,11 +70,11 @@ void DrawPlayer(int A, int Z)
                 {
                     if(Player[A].Direction == 1)
                     {
-                        frmMain.renderTexture(vScreenX[Z] + Player[A].Location.X - 5, vScreenY[Z] + Player[A].Location.Y - 2, 32, 32, GFXNPC[254], 0, (SpecialFrame[9] + 1) * 32, s, s, s);
+                        frmMain.renderTexture(vScreenX[Z] + Player[A].Location.X - 5, vScreenY[Z] + Player[A].Location.Y - 2, 32, 32, GFXNPC[254], 0, (SpecialFrame[9] + 1) * 32, Player[A].Red, Player[A].Green, Player[A].Blue);
                     }
                     else
                     {
-                        frmMain.renderTexture(vScreenX[Z] + Player[A].Location.X - 5, vScreenY[Z] + Player[A].Location.Y - 2, 32, 32, GFXNPC[254], 0, (SpecialFrame[9] + 3) * 32, s, s, s);
+                        frmMain.renderTexture(vScreenX[Z] + Player[A].Location.X - 5, vScreenY[Z] + Player[A].Location.Y - 2, 32, 32, GFXNPC[254], 0, (SpecialFrame[9] + 3) * 32, Player[A].Red, Player[A].Green, Player[A].Blue);
                     }
                 }
             }
@@ -82,7 +82,7 @@ void DrawPlayer(int A, int Z)
             {
                 if(Player[A].Mount == 0)
                 {
-                    frmMain.renderTexture(vScreenX[Z] + static_cast<int>(floor(static_cast<double>(Player[A].Location.X))) + MarioFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], vScreenY[Z] + Player[A].Location.Y + MarioFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], 99, 99, GFXMario[Player[A].State], pfrX(100 + Player[A].Frame * Player[A].Direction), pfrY(100 + Player[A].Frame * Player[A].Direction), s, s, s);
+                    frmMain.renderTexture(vScreenX[Z] + static_cast<int>(floor(static_cast<double>(Player[A].Location.X))) + MarioFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], vScreenY[Z] + Player[A].Location.Y + MarioFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], 99, 99, GFXMario[Player[A].State], pfrX(100 + Player[A].Frame * Player[A].Direction), pfrY(100 + Player[A].Frame * Player[A].Direction), Player[A].Red, Player[A].Green, Player[A].Blue);
                 }
                 else if(Player[A].Mount == 1)
                 {

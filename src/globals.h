@@ -458,7 +458,9 @@ struct NPC_t
 struct Player_t
 {
     int StarManTimer = 0;
-
+    float Red = 1.0f;
+    float Green = 1.0f;
+    float Blue = 1.0f;
 //    DoubleJump As Boolean
     bool DoubleJump = false;
 //    FlySparks As Boolean
@@ -829,6 +831,9 @@ struct Block_t
 //Public Type Effect  'Special effects
 struct Effect_t
 {
+    float Red = 1.0f;
+    float Green = 1.0f;
+    float Blue = 1.0f;
 //    Type As Integer
     int Type = 0;
 //    Location As Location

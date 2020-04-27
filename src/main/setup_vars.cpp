@@ -269,6 +269,8 @@ void SetupVars()
     EffectHeight[79] = 24;
     EffectWidth[80] = 16;
     EffectHeight[80] = 16;
+    EffectWidth[174] = 16;
+    EffectHeight[174] = 16;
     EffectWidth[152] = 16;
     EffectHeight[152] = 16;
     EffectWidth[81] = 32;
@@ -526,6 +528,10 @@ void SetupVars()
         NPCNoGravity[A] = true;
         NPCFrameOffsetY[A] = 13;
         NPCNoYoshi[A] = true;
+    }
+    for(int A = 306; A <= 307; ++A)
+    {
+        NPCJumpHurt[A] = true;
     }
     NPCWidth[339] = 28;
     NPCHeight[339] = 28;
@@ -2046,8 +2052,10 @@ void SetupVars()
     NPCJumpHurt[337] = true;
     NPCWontHurt[337] = true;
 
-    NPCWidth[345] = 46;
-    NPCHeight[345] = 46;
+    NPCWidthGFX[345] = 46;
+    NPCHeightGFX[345] = 46;
+    NPCFrameOffsetX[345] = 7;
+    NPCFrameOffsetY[345] = 2;
 
     NPCCanWalkOn[272] = true;
     NPCGrabFromTop[272] = true;

@@ -523,7 +523,7 @@ void UpdateEffects()
                     e.Life = 10;
             }
         }
-        else if(e.Type == 80 || e.Type == 152) // Twinkle
+        else if(e.Type == 80 || e.Type == 152 || e.Type == 174) // Twinkle
         {
             e.FrameCount += 1;
             if(e.FrameCount >= 8)
@@ -1570,7 +1570,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
         Effect[numEffects].Life = 60;
         Effect[numEffects].Type = A;
     }
-    else if(A == 80 || A == 152 || A == 160) // Twinkle
+    else if(A == 80 || A == 152 || A == 160 || A == 174) // Twinkle
     {
         numEffects++;
         Effect[numEffects].Shadow = Shadow;

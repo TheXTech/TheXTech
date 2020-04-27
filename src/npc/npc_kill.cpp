@@ -1180,7 +1180,7 @@ void KillNPC(int A, int B)
                     Effect[numEffects].Frame = NPC[A].Type - 121;
             }
         }
-        else if(NPC[A].Type == 23 || NPC[A].Type == 343 || NPC[A].Type == 24 || NPC[A].Type == 36 || NPC[A].Type == 53 || NPC[A].Type == 54 || NPC[A].Type == 340 || NPC[A].Type == 285 || NPC[A].Type == 286 || NPC[A].Type == 318 || NPC[A].Type == 313 || NPC[A].Type == 312) // Hard thing / Spiney
+        else if(NPC[A].Type == 23 || NPC[A].Type == 343 || NPC[A].Type == 24 || NPC[A].Type == 36 || NPC[A].Type == 53 || NPC[A].Type == 54 || NPC[A].Type == 340 || NPC[A].Type == 285 || NPC[A].Type == 286 || NPC[A].Type == 318 || NPC[A].Type == 313 || NPC[A].Type == 312 || NPC[A].Type == 332 || NPC[A].Type == 333) // Hard thing / Spiney
         {
              NPC[A].Location.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0 - EffectWidth[9] / 2.0;
              NPC[A].Location.Y = NPC[A].Location.Y + NPC[A].Location.Height / 2.0 - EffectHeight[9] / 2.0;
@@ -1203,7 +1203,7 @@ void KillNPC(int A, int B)
                 PlaySound(9); // Shell hit sound
                 if(NPC[A].Type == 36)
                     NewEffect(27, NPC[A].Location, NPC[A].Direction);
-                else if(NPC[A].Type == 285 || NPC[A].Type == 286)
+                else if(NPC[A].Type == 285 || NPC[A].Type == 286 || NPC[A].Type == 332 || NPC[A].Type == 333)
                     NewEffect(146, NPC[A].Location, NPC[A].Direction);
                 else if(NPC[A].Type == 53)
                     NewEffect(33 , NPC[A].Location);

@@ -2119,49 +2119,7 @@ void UpdateNPCs()
 
 
 
-                                                        if(NPC[A].Type == 345)
-                                                        {
-                                                            NPC[A].Special5 = 0;
-                                                            if(HitSpot == 1)
-                                                            {
-                                                                if(NPC[A].Special == 4 && NPC[A].Location.X + 1.99 == Block[B].Location.X + Block[B].Location.Width)
-                                                                    HitSpot = 0;
-                                                                if(NPC[A].Special == 2 && NPC[A].Location.X + NPC[A].Location.Width - 1.99 == Block[B].Location.X)
-                                                                    HitSpot = 0;
-                                                            }
-                                                            if(BlockIsSizable[Block[B].Type] == true || BlockOnlyHitspot1[Block[B].Type] == true)
-                                                                HitSpot = 0;
-                                                            if(BlockSlope2[Block[B].Type] != 0 && HitSpot == 3)
-                                                            {
-                                                                if(NPC[A].Special == 4 && NPC[A].Special2 == -1)
-                                                                {
-                                                                    if(NPC[A].Location.X - 0.05 == Block[B].Location.X)
-                                                                    {
-                                                                        NPC[A].Special = 3;
-                                                                        NPC[A].Special2 = 1;
-                                                                        NPC[A].Location.SpeedX = -NPC[A].Location.SpeedY;
-                                                                    }
-                                                                }
-                                                            }
-                                                            if(BlockSlope2[Block[B].Type] != 0 && HitSpot == 1)
-                                                            {
-                                                                if(NPC[A].Special == 4)
-                                                                    HitSpot = 2;
-                                                                if(NPC[A].Special == 2)
-                                                                    HitSpot = 4;
-                                                            }
-                                                            if(NPC[A].Special == 3)
-                                                            {
-                                                                if(BlockSlope2[Block[B].Type] != 0)
-                                                                {
-                                                                    if(HitSpot == 2 || HitSpot == 4)
-                                                                        HitSpot = 0;
-                                                                }
-                                                                else if(HitSpot == 2 || HitSpot == 4)
-                                                                    HitSpot = 0;
-                                                            }
-                                                        }
-                                                        if(NPC[A].Type == 205 || NPC[A].Type == 206 || NPC[A].Type == 207)
+                                                        if(NPC[A].Type == 205 || NPC[A].Type == 206 || NPC[A].Type == 207 || NPC[A].Type == 345)
                                                         {
                                                             NPC[A].Special5 = 0;
                                                             if(HitSpot == 1)

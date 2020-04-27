@@ -119,7 +119,10 @@ void TouchBonus(int A, int B)
         // If .Character = 3 Or .Character = 4 Then  'for peach and toad turn leaf and suits into a mushroom
         // If NPC(B).Type = 34 Or NPC(B).Type = 169 Or NPC(B).Type = 170 Then NPC(B).Type = 9
         // End If
-
+        if(NPC[B].Type == 346)
+        {
+            Player[A].StarManTimer = 777;
+        }
         if(NPC[B].Type == 273 && numPlayers > 1) // ? mushroom
         {
             if(!Player[1].Dead && Player[1].TimeToLive == 0 && !Player[2].Dead &&

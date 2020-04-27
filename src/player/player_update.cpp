@@ -68,6 +68,7 @@ void UpdatePlayer()
     Location_t tempLocation;
     Location_t tempLocation3;
     Location_t tempLocation4;
+    Location_t tempLocation5;
     bool spinKill = false;
     int oldSlope = 0;
     float A1 = 0;
@@ -165,17 +166,34 @@ void UpdatePlayer()
 //        tempBlockA[2] = 0;
         if(Player[A].StarManTimer > 0)
         {
+            Player[A].Red = (fRand() * 8.0f) + 2.0f;
+            Player[A].Green = (fRand() * 8.0f) + 2.0f;
+            Player[A].Blue = (fRand() * 8.0f) + 2.0f;
+            Player[A].Immune = 50;
             Player[A].StarManTimer--;
-            tempLocation3.Height = Player[A].Location.Height + 4;
-            tempLocation3.Width = Player[A].Location.Width + 4;
-            tempLocation3.X = Player[A].Location.X - 4;
-            tempLocation3.Y = Player[A].Location.Y - 4;
+            tempLocation4.Height = Player[A].Location.Height + 9;
+            tempLocation4.Width = Player[A].Location.Width + 9;
+            tempLocation4.X = Player[A].Location.X - 9;
+            tempLocation4.Y = Player[A].Location.Y - 9;
+            tempLocation5.Height =  EffectHeight[80];
+            tempLocation5.Width = EffectWidth[80];
+            tempLocation5.X = Player[A].Location.X + dRand() * Player[A].Location.Width;
+            tempLocation5.Y = Player[A].Location.Y + dRand() * Player[A].Location.Height;
+            int D = dRand() * 10;
+            if(D > 5)
+            {
+                NewEffect(174, tempLocation5);
+                Effect[numNPCs].Red = Player[A].Red;
+                Effect[numNPCs].Blue = Player[A].Blue;
+                Effect[numNPCs].Green = Player[A].Green;
+            }
             for(int i = 1; i <= numNPCs; i++)
             {
                 if(NPCIsABonus[NPC[i].Type] != true && NPCIsACoin[NPC[i].Type] != true &&
                    NPCIsVeggie[NPC[i].Type] != true && NPCIsToad[NPC[i].Type] != true &&
                    NPCIsAnExit[NPC[i].Type] != true && NPCIsAVine[NPC[i].Type] != true &&
-                   NPCIsYoshi[NPC[i].Type] != true && NPCIsBoot[NPC[i].Type] != true)
+                   NPCIsYoshi[NPC[i].Type] != true && NPCIsBoot[NPC[i].Type] != true &&
+                   NPC[i].CantHurtPlayer != A && NPC[i].Type != 91)
                 {
                     if(CheckCollision(NPC[i].Location, tempLocation4) == true)
                         NPC[i].Killed = 3;

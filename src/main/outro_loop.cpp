@@ -213,8 +213,8 @@ void SetupCredits()
     AddCredit("Vandarx");
     AddCredit("Zephyr");
     AddCredit("Eclipsed");
-    AddCredit("");
-    AddCredit("");
+    AddCredit("1230m 1");
+    AddCredit("FireSeraphim");
     AddCredit("");
     AddCredit("");
     AddCredit("");
