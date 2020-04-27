@@ -21,6 +21,7 @@ ExternalProject_Add(
     FreeImage_Local
     PREFIX ${CMAKE_BINARY_DIR}/external/FreeImage
     GIT_REPOSITORY https://github.com/WohlSoft/libFreeImage.git
+    UPDATE_COMMAND ""
     CMAKE_ARGS
         "-DCMAKE_INSTALL_PREFIX=${DEPENDENCIES_INSTALL_DIR}"
         "-DFREEIMAGE_SHARED=${USE_SHARED_FREEIMAGE}"
