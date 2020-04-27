@@ -139,6 +139,7 @@ ExternalProject_Add(
     SDLMixerX_Local
     PREFIX ${CMAKE_BINARY_DIR}/external/SDLMixerX
     GIT_REPOSITORY https://github.com/WohlSoft/SDL-Mixer-X.git
+    UPDATE_COMMAND ""
     CMAKE_ARGS
         "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}"
         "-DCMAKE_INSTALL_PREFIX=${DEPENDENCIES_INSTALL_DIR}"
