@@ -213,7 +213,7 @@ void UpdateNPCs()
 
         if(A > maxNPCs - 100)
             NPC[A].Killed = 9;
-
+        if(NPC[A].Projectile)
         // generator code
         if(NPC[A].Generator == true)
         {

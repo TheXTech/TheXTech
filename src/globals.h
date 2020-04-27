@@ -1980,6 +1980,29 @@ extern RangeArrI<int, 1, 10, 0> GFXToadHeight;
 //Public GFXToadWidth(1 To 10) As Integer
 extern RangeArrI<int, 1, 10, 0> GFXToadWidth;
 
+extern StdPicture BMVs;
+extern StdPicture BMWin;
+extern RangeArr<StdPicture, 1, 4> Boot;
+extern RangeArr<StdPicture, 1, 5> CharacterName;
+extern StdPicture Chat;
+extern RangeArr<StdPicture, 0, 2> Container;
+extern RangeArr<StdPicture, 1, 3> ECursor;
+extern RangeArr<StdPicture, 0, 9> Font1;
+extern RangeArr<StdPicture, 1, 3> Font2;
+extern StdPicture Font2S;
+extern RangeArr<StdPicture, 1, 2> Heart;
+extern RangeArr<StdPicture, 0, 8> Interface;
+extern StdPicture LoadCoin;
+extern StdPicture Loader;
+extern RangeArr<StdPicture, 0, 3> MCursor;
+extern RangeArr<StdPicture, 1, 5> MenuGFX;
+extern RangeArr<StdPicture, 2, 2> Mount;
+extern RangeArr<StdPicture, 0, 7> nCursor;
+extern StdPicture TextBox;
+extern RangeArr<StdPicture, 1, 2> Tongue;
+extern StdPicture WarpGFX;
+extern StdPicture YoshiWings;
+
 //Public GFXLinkCustom(1 To 10) As Boolean
 extern RangeArrI<bool, 1, 10, false> GFXLinkCustom;
 //Public GFXLink(1 To 10) As Long

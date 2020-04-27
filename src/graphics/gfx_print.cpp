@@ -41,7 +41,7 @@ void SuperPrint(std::string SuperWords, int Font, float X, float Y,
         for(auto c : SuperWords)
         {
             if(c >= '0' && c <= '9')
-                frmMain.renderTexture(int(X + B), int(Y), 16, 14, GFX.Font1[c - '0'], 0, 0, r, g, b, a);
+                frmMain.renderTexture(int(X + B), int(Y), 16, 14, Font1[c - '0'], 0, 0, r, g, b, a);
             B += 18;
         }
     }
@@ -51,31 +51,31 @@ void SuperPrint(std::string SuperWords, int Font, float X, float Y,
         {
             if(c >= 48 && c <= 57) {
                 C = (c - 48) * 16;
-                frmMain.renderTexture(int(X + B), int(Y), 15, 17, GFX.Font2[1], C, 0, r, g, b, a);
+                frmMain.renderTexture(int(X + B), int(Y), 15, 17, Font2[1], C, 0, r, g, b, a);
                 B += 16;
             } else if(c >= 65 && c <= 90) {
                 C = (c - 55) * 16;
-                frmMain.renderTexture(int(X + B), int(Y), 15, 17, GFX.Font2[1], C, 0, r, g, b, a);
+                frmMain.renderTexture(int(X + B), int(Y), 15, 17, Font2[1], C, 0, r, g, b, a);
                 B += 16;
             } else if(c >= 97 && c <= 122) {
                 C = (c - 61) * 16;
-                frmMain.renderTexture(int(X + B), int(Y), 15, 17, GFX.Font2[1], C, 0, r, g, b, a);
+                frmMain.renderTexture(int(X + B), int(Y), 15, 17, Font2[1], C, 0, r, g, b, a);
                 B += 16;
             } else if(c >= 33 && c <= 47) {
                 C = (c - 33) * 16;
-                frmMain.renderTexture(int(X + B), int(Y), 15, 17, GFX.Font2S, C, 0, r, g, b, a);
+                frmMain.renderTexture(int(X + B), int(Y), 15, 17, Font2S, C, 0, r, g, b, a);
                 B += 16;
             } else if(c >= 58 && c <= 64) {
                 C = (c - 58 + 15) * 16;
-                frmMain.renderTexture(int(X + B), int(Y), 15, 17, GFX.Font2S, C, 0, r, g, b, a);
+                frmMain.renderTexture(int(X + B), int(Y), 15, 17, Font2S, C, 0, r, g, b, a);
                 B += 16;
             } else if(c >= 91 && c <= 96) {
                 C = (c - 91 + 22) * 16;
-                frmMain.renderTexture(int(X + B), int(Y), 15, 17, GFX.Font2S, C, 0, r, g, b, a);
+                frmMain.renderTexture(int(X + B), int(Y), 15, 17, Font2S, C, 0, r, g, b, a);
                 B += 16;
             } else if(c >= 123 && c <= 125) {
                 C = (c - 123 + 28) * 16;
-                frmMain.renderTexture(int(X + B), int(Y), 15, 17, GFX.Font2S, C, 0, r, g, b, a);
+                frmMain.renderTexture(int(X + B), int(Y), 15, 17, Font2S, C, 0, r, g, b, a);
                 B += 16;
             } else {
                 B += 16;
@@ -95,9 +95,9 @@ void SuperPrint(std::string SuperWords, int Font, float X, float Y,
             {
 //                C = (Asc(Left(Words, 1)) - 33) * 32
                 C = (c - 33) * 32;
-//                BitBlt myBackBuffer, X + B, Y, 18, 16, GFX.Font2Mask(2).hdc, 2, C, vbSrcAnd
-//                BitBlt myBackBuffer, X + B, Y, 18, 16, GFX.Font2(2).hdc, 2, C, vbSrcPaint
-                frmMain.renderTexture(int(X + B), int(Y), 18, 16, GFX.Font2[2], 2, C, r, g, b, a);
+//                BitBlt myBackBuffer, X + B, Y, 18, 16, Font2Mask(2).hdc, 2, C, vbSrcAnd
+//                BitBlt myBackBuffer, X + B, Y, 18, 16, Font2(2).hdc, 2, C, vbSrcPaint
+                frmMain.renderTexture(int(X + B), int(Y), 18, 16, Font2[2], 2, C, r, g, b, a);
 //                B = B + 18
                 B += 18;
 //                If Left(Words, 1) = "M" Then B = B + 2
@@ -124,8 +124,8 @@ void SuperPrint(std::string SuperWords, int Font, float X, float Y,
             {
 //                C = (Asc(Left(Words, 1)) - 33) * 16
                 C = (c - 33) * 16;
-//                BitBlt myBackBuffer, X + B, Y, 18, 16, GFX.Font2(3).hdc, 2, C, vbSrcPaint
-                frmMain.renderTexture(int(X + B), int(Y), 18, 16, GFX.Font2[3], 2, C, r, g, b, a);
+//                BitBlt myBackBuffer, X + B, Y, 18, 16, Font2(3).hdc, 2, C, vbSrcPaint
+                frmMain.renderTexture(int(X + B), int(Y), 18, 16, Font2[3], 2, C, r, g, b, a);
 //                B = B + 18
                 B += 18;
 //            Else

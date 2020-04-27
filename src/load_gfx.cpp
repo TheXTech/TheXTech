@@ -23,6 +23,10 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#include "frm_main.h"
+#include <AppPath/app_path.h>
+#include <Logger/logger.h>
+#include <SDL2/SDL_messagebox.h>
 #include "globals.h"
 #include "load_gfx.h"
 #include "graphics.h" // SuperPrint
@@ -216,7 +220,78 @@ static void restoreWorldBackupTextures()
 void LoadGFX()
 {
     std::string p;
+
     std::string GfxRoot = AppPath + "graphics/";
+
+    p = GfxRoot + fmt::format_ne("ui/BMVs.png");
+    if(Files::fileExists(p))
+    {
+        BMVs = frmMain.lazyLoadPicture(p);
+    }
+    UpdateLoad();
+
+    p = GfxRoot + fmt::format_ne("ui/BMWin.png");
+    if(Files::fileExists(p))
+    {
+        BMWin = frmMain.lazyLoadPicture(p);
+    }
+    UpdateLoad();
+
+    p = GfxRoot + fmt::format_ne("ui/Chat.png");
+    if(Files::fileExists(p))
+    {
+        Chat = frmMain.lazyLoadPicture(p);
+    }
+    UpdateLoad();
+
+    p = GfxRoot + fmt::format_ne("ui/Font2S.png");
+    if(Files::fileExists(p))
+    {
+        Font2S = frmMain.lazyLoadPicture(p);
+    }
+    UpdateLoad();
+
+    p = GfxRoot + fmt::format_ne("ui/LoadCoin.png");
+    if(Files::fileExists(p))
+    {
+        LoadCoin = frmMain.lazyLoadPicture(p);
+    }
+    UpdateLoad();
+
+    p = GfxRoot + fmt::format_ne("ui/Loader.png");
+    if(Files::fileExists(p))
+    {
+        Loader = frmMain.lazyLoadPicture(p);
+    }
+    UpdateLoad();
+
+    p = GfxRoot + fmt::format_ne("ui/Mount.png");
+    if(Files::fileExists(p))
+    {
+        Mount[2] = frmMain.lazyLoadPicture(p);
+    }
+    UpdateLoad();
+
+    p = GfxRoot + fmt::format_ne("ui/TextBox.png");
+    if(Files::fileExists(p))
+    {
+        TextBox = frmMain.lazyLoadPicture(p);
+    }
+    UpdateLoad();
+
+    p = GfxRoot + fmt::format_ne("ui/Warp.png");
+    if(Files::fileExists(p))
+    {
+        WarpGFX = frmMain.lazyLoadPicture(p);
+    }
+    UpdateLoad();
+
+    p = GfxRoot + fmt::format_ne("ui/YoshiWings.png");
+    if(Files::fileExists(p))
+    {
+        YoshiWings = frmMain.lazyLoadPicture(p);
+    }
+    UpdateLoad();
 
     For(A, 1, 10)
     {
@@ -276,6 +351,174 @@ void LoadGFX()
         }
         if(A % 20 == 0)
             UpdateLoad();
+    }
+    UpdateLoad();
+
+    for(int A = 1; A <= 4; ++A)
+    {
+        p = GfxRoot + fmt::format_ne("ui/Boot{0}.png", A);
+        if(Files::fileExists(p))
+        {
+            Boot[A] = frmMain.lazyLoadPicture(p);
+        }
+        else
+        {
+            break;
+        }
+    }
+    UpdateLoad();
+
+    for(int A = 1; A <= 5; ++A)
+    {
+        p = GfxRoot + fmt::format_ne("ui/CharacterName{0}.png", A);
+        if(Files::fileExists(p))
+        {
+            CharacterName[A] = frmMain.lazyLoadPicture(p);
+        }
+        else
+        {
+            break;
+        }
+    }
+    UpdateLoad();
+
+    for(int A = 0; A <= 2; ++A)
+    {
+        p = GfxRoot + fmt::format_ne("ui/Container{0}.png", A);
+        if(Files::fileExists(p))
+        {
+            Container[A] = frmMain.lazyLoadPicture(p);
+        }
+        else
+        {
+            break;
+        }
+    }
+    UpdateLoad();
+
+    for(int A = 1; A <= 3; ++A)
+    {
+        p = GfxRoot + fmt::format_ne("ui/ECursor{0}.png", A);
+        if(Files::fileExists(p))
+        {
+            ECursor[A] = frmMain.lazyLoadPicture(p);
+        }
+        else
+        {
+            break;
+        }
+    }
+    UpdateLoad();
+
+    for(int A = 0; A <= 9; ++A)
+    {
+        p = GfxRoot + fmt::format_ne("ui/Font1_{0}.png", A);
+        if(Files::fileExists(p))
+        {
+            Font1[A] = frmMain.lazyLoadPicture(p);
+        }
+        else
+        {
+            break;
+        }
+    }
+    UpdateLoad();
+
+    for(int A = 1; A <= 3; ++A)
+    {
+        p = GfxRoot + fmt::format_ne("ui/Font2_{0}.png", A);
+        if(Files::fileExists(p))
+        {
+            Font2[A] = frmMain.lazyLoadPicture(p);
+        }
+        else
+        {
+            break;
+        }
+    }
+    UpdateLoad();
+
+    for(int A = 1; A <= 2; ++A)
+    {
+        p = GfxRoot + fmt::format_ne("ui/Heart{0}.png", A);
+        if(Files::fileExists(p))
+        {
+            Heart[A] = frmMain.lazyLoadPicture(p);
+        }
+        else
+        {
+            break;
+        }
+    }
+    UpdateLoad();
+
+    for(int A = 0; A <= 6; ++A)
+    {
+        p = GfxRoot + fmt::format_ne("ui/Interface{0}.png", A);
+        if(Files::fileExists(p))
+        {
+            Interface[A] = frmMain.lazyLoadPicture(p);
+        }
+        else
+        {
+            break;
+        }
+    }
+    UpdateLoad();
+
+    for(int A = 0; A <= 3; ++A)
+    {
+        p = GfxRoot + fmt::format_ne("ui/MCursor{0}.png", A);
+        if(Files::fileExists(p))
+        {
+            MCursor[A] = frmMain.lazyLoadPicture(p);
+        }
+        else
+        {
+            break;
+        }
+    }
+    UpdateLoad();
+
+    for(int A = 1; A <= 5; ++A)
+    {
+        p = GfxRoot + fmt::format_ne("ui/MenuGFX{0}.png", A);
+        if(Files::fileExists(p))
+        {
+            MenuGFX[A] = frmMain.lazyLoadPicture(p);
+        }
+        else
+        {
+            break;
+        }
+    }
+    UpdateLoad();
+
+    for(int A = 0; A <= 7; ++A)
+    {
+        p = GfxRoot + fmt::format_ne("ui/nCursor{0}.png", A);
+        if(Files::fileExists(p))
+        {
+            nCursor[A] = frmMain.lazyLoadPicture(p);
+        }
+        else
+        {
+            break;
+        }
+    }
+    UpdateLoad();
+
+    for(int A = 1; A <= 2; ++A)
+    {
+        p = GfxRoot + fmt::format_ne("ui/Tongue{0}.png", A);
+        if(Files::fileExists(p))
+        {
+            Tongue[A] = frmMain.lazyLoadPicture(p);
+        }
+        else
+        {
+            break;
+        }
     }
     UpdateLoad();
 
@@ -690,7 +933,7 @@ void UpdateLoad()
     {
         frmMain.clearBuffer();
         if(!gfxLoaderTestMode)
-            frmMain.renderTexture(0, 0, GFX.MenuGFX[4]);
+            frmMain.renderTexture(0, 0, MenuGFX[4]);
         else
         {
             if(!state.empty())
@@ -698,7 +941,7 @@ void UpdateLoad()
             else
                 SuperPrint("Loading data...", 3, 10, 10);
         }
-        frmMain.renderTexture(760, 560, GFX.LoadCoin.w, GFX.LoadCoin.h / 8, GFX.LoadCoin, 0, 32 * LoadCoins);
+        frmMain.renderTexture(760, 560, LoadCoin.w, LoadCoin.h / 8, LoadCoin, 0, 32 * LoadCoins);
 
         frmMain.repaint();
         DoEvents();

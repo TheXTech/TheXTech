@@ -48,68 +48,6 @@ GFX_t::GFX_t()
 
 bool GFX_t::load()
 {
-    std::string uiPath = AppPath + "graphics/ui/";
-
-    loadImage(BMVs, uiPath + "BMVs.png");
-    loadImage(BMWin, uiPath + "BMWin.png");
-    For(i, 1, 4)
-        loadImage(Boot[i], uiPath + fmt::format_ne("Boot{0}.png", i));
-
-    For(i, 1, 5)
-        loadImage(CharacterName[i], uiPath + fmt::format_ne("CharacterName{0}.png", i));
-
-    loadImage(Chat, uiPath + "Chat.png");
-
-    For(i, 0, 2)
-        loadImage(Container[i], uiPath + fmt::format_ne("Container{0}.png", i));
-
-    For(i, 1, 3)
-        loadImage(ECursor[i], uiPath + fmt::format_ne("ECursor{0}.png", i));
-
-    For(i, 0, 9)
-        loadImage(Font1[i], uiPath + fmt::format_ne("Font1_{0}.png", i));
-
-    For(i, 1, 3)
-        loadImage(Font2[i], uiPath + fmt::format_ne("Font2_{0}.png", i));
-
-    loadImage(Font2S, uiPath + "Font2S.png");
-
-    For(i, 1, 2)
-        loadImage(Heart[i], uiPath + fmt::format_ne("Heart{0}.png", i));
-
-    For(i, 0, 8)
-        loadImage(Interface[i], uiPath + fmt::format_ne("Interface{0}.png", i));
-
-    loadImage(LoadCoin, uiPath + "LoadCoin.png");
-    loadImage(Loader, uiPath + "Loader.png");
-
-    For(i, 0, 3)
-        loadImage(MCursor[i], uiPath + fmt::format_ne("MCursor{0}.png", i));
-
-    For(i, 1, 5)
-        loadImage(MenuGFX[i], uiPath + fmt::format_ne("MenuGFX{0}.png", i));
-
-    loadImage(Mount[2], uiPath + "Mount.png");
-
-    For(i, 0, 7)
-        loadImage(nCursor[i], uiPath + fmt::format_ne("nCursor{0}.png", i));
-
-    loadImage(TextBox, uiPath + "TextBox.png");
-
-    For(i, 1, 2)
-        loadImage(Tongue[i], uiPath + fmt::format_ne("Tongue{0}.png", i));
-
-    loadImage(Warp, uiPath + "Warp.png");
-
-    loadImage(YoshiWings, uiPath + "YoshiWings.png");
-
-    if(m_loadErrors > 0)
-    {
-        std::string msg = fmt::format_ne("Failed to load an UI image assets. Look a log file to get more details:\n{0}", getLogFilePath());
-        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "UI image assets loading error", msg.c_str(), nullptr);
-        return false;
-    }
-
     return true;
 }
 

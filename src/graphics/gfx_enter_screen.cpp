@@ -73,8 +73,8 @@ void GameThing()
     }
     else
     {
-        frmMain.renderTexture(ScreenW / 2.0 - 46, ScreenH / 2.0 + 31, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0);
-        frmMain.renderTexture(ScreenW / 2.0 - GFX.Interface[1].w / 2, ScreenH / 2.0 + 32, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+        frmMain.renderTexture(ScreenW / 2.0 - 46, ScreenH / 2.0 + 31, Interface[3].w, Interface[3].h, Interface[3], 0, 0);
+        frmMain.renderTexture(ScreenW / 2.0 - Interface[1].w / 2, ScreenH / 2.0 + 32, Interface[1].w, Interface[1].h, Interface[1], 0, 0);
         SuperPrint(std::to_string(int(Lives)), 1, ScreenW / 2.0 + 12, ScreenH / 2.0 + 32);
     }
 

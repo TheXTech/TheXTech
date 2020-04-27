@@ -303,8 +303,8 @@ void UpdateGraphics2()
 //        Next A
 //        For A = 1 To numWorldMusic
 //            With WorldMusic(A).Location
-//                BitBlt myBackBuffer, vScreenX(Z) + .X, vScreenY(Z) + .Y, .Width, .Height, GFX.WarpMask(1).hdc, 0, 0, vbSrcAnd
-//                BitBlt myBackBuffer, vScreenX(Z) + .X, vScreenY(Z) + .Y, .Width, .Height, GFX.Warp(1).hdc, 0, 0, vbSrcPaint
+//                BitBlt myBackBuffer, vScreenX(Z) + .X, vScreenY(Z) + .Y, .Width, .Height, WarpMask(1).hdc, 0, 0, vbSrcAnd
+//                BitBlt myBackBuffer, vScreenX(Z) + .X, vScreenY(Z) + .Y, .Width, .Height, Warp(1).hdc, 0, 0, vbSrcPaint
 //                SuperPrint Str(WorldMusic(A).Type), 1, Int(.X + 2 + vScreenX(Z)), Int(.Y + 2 + vScreenY(Z))
 //            End With
 //        Next A
@@ -346,22 +346,22 @@ void UpdateGraphics2()
 //        End If
 //        With EditorCursor
 //                If .Mode = 6 Then
-//                    BitBlt myBackBuffer, vScreenX(Z) + .Location.X - 2, vScreenY(Z) + .Location.Y, 22, 30, GFX.ECursorMask(3).hdc, 0, 0, vbSrcAnd
-//                    BitBlt myBackBuffer, vScreenX(Z) + .Location.X - 2, vScreenY(Z) + .Location.Y, 22, 30, GFX.ECursor(3).hdc, 0, 0, vbSrcPaint
+//                    BitBlt myBackBuffer, vScreenX(Z) + .Location.X - 2, vScreenY(Z) + .Location.Y, 22, 30, ECursorMask(3).hdc, 0, 0, vbSrcAnd
+//                    BitBlt myBackBuffer, vScreenX(Z) + .Location.X - 2, vScreenY(Z) + .Location.Y, 22, 30, ECursor(3).hdc, 0, 0, vbSrcPaint
 //                Else
 //                    If .Mode = 11 Then
 
-//                BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, .Location.Width, .Location.Height, GFX.WarpMask(1).hdc, 0, 0, vbSrcAnd
-//                BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, .Location.Width, .Location.Height, GFX.Warp(1).hdc, 0, 0, vbSrcPaint
+//                BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, .Location.Width, .Location.Height, WarpMask(1).hdc, 0, 0, vbSrcAnd
+//                BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, .Location.Width, .Location.Height, Warp(1).hdc, 0, 0, vbSrcPaint
 //                SuperPrint Str(.WorldMusic.Type), 1, Int(.Location.X + 2 + vScreenX(Z)), Int(.Location.Y + 2 + vScreenY(Z))
 
-//                        'BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, .Location.Width, 2, GFX.Split(1).hdc, 0, 0, vbSrcCopy
-//                        'BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y + .Location.Height - 2, .Location.Width, 2, GFX.Split(1).hdc, 0, 0, vbSrcCopy
-//                        'BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, 2, .Location.Height, GFX.Split(1).hdc, 0, 0, vbSrcCopy
-//                        'BitBlt myBackBuffer, vScreenX(Z) + .Location.X + .Location.Width - 2, vScreenY(Z) + .Location.Y, 2, .Location.Height, GFX.Split(1).hdc, 0, 0, vbSrcCopy
+//                        'BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, .Location.Width, 2, Split(1).hdc, 0, 0, vbSrcCopy
+//                        'BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y + .Location.Height - 2, .Location.Width, 2, Split(1).hdc, 0, 0, vbSrcCopy
+//                        'BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, 2, .Location.Height, Split(1).hdc, 0, 0, vbSrcCopy
+//                        'BitBlt myBackBuffer, vScreenX(Z) + .Location.X + .Location.Width - 2, vScreenY(Z) + .Location.Y, 2, .Location.Height, Split(1).hdc, 0, 0, vbSrcCopy
 //                    End If
-//                    BitBlt myBackBuffer, .X, .Y + 8, 32, 32, GFX.ECursorMask(2).hdc, 0, 0, vbSrcAnd
-//                    BitBlt myBackBuffer, .X, .Y + 8, 32, 32, GFX.ECursor(2).hdc, 0, 0, vbSrcPaint
+//                    BitBlt myBackBuffer, .X, .Y + 8, 32, 32, ECursorMask(2).hdc, 0, 0, vbSrcAnd
+//                    BitBlt myBackBuffer, .X, .Y + 8, 32, 32, ECursor(2).hdc, 0, 0, vbSrcPaint
 //                End If
 //        End With
 //        'BitBlt frmLevelWindow.vScreen(Z).hdc, 0, 0, frmLevelWindow.vScreen(Z).ScaleWidth, frmLevelWindow.vScreen(Z).ScaleHeight, myBackBuffer, 0, 0, vbSrcCopy
@@ -393,12 +393,12 @@ void UpdateGraphics2()
                               WorldPlayer[1].Location.Width, WPHeight,
                               GFXPlayerBMP[WorldPlayer[1].Type], 0, WPHeight * WorldPlayer[1].Frame);
 
-//        frmMain.renderTexture(0, 0, 800, 130, GFX.Interface[4], 0, 0);
+//        frmMain.renderTexture(0, 0, 800, 130, Interface[4], 0, 0);
 
-        frmMain.renderTexture(0, 0, 800, 130, GFX.Interface[4], 0, 0);
-        frmMain.renderTexture(0, 534, 800, 66, GFX.Interface[4], 0, 534);
-        frmMain.renderTexture(0, 130, 66, 404, GFX.Interface[4], 0, 130);
-        frmMain.renderTexture(734, 130, 66, 404, GFX.Interface[4], 734, 130);
+        frmMain.renderTexture(0, 0, 800, 130, Interface[4], 0, 0);
+        frmMain.renderTexture(0, 534, 800, 66, Interface[4], 0, 534);
+        frmMain.renderTexture(0, 130, 66, 404, Interface[4], 0, 130);
+        frmMain.renderTexture(734, 130, 66, 404, Interface[4], 734, 130);
         for(A = 1; A <= numPlayers; A++)
         {
             Player[A].Direction = -1;
@@ -446,7 +446,7 @@ void UpdateGraphics2()
                                           pfrY(100 + Player[A].Frame * Player[A].Direction), c, c, c);
 
                     frmMain.renderTexture(32 + (48 * A) + Player[A].Location.Width / 2.0 - 16, 124 - 30, 32, 32,
-                                          GFX.Boot[Player[A].MountType], 0, 32 * Player[A].MountFrame, c, c, c);
+                                          Boot[Player[A].MountType], 0, 32 * Player[A].MountFrame, c, c, c);
 
                     if(Player[A].MountType == 3)
                     {
@@ -458,7 +458,7 @@ void UpdateGraphics2()
                             Player[A].YoshiWingsFrameCount = 0;
 
                         frmMain.renderTexture(32 + (48 * A) + Player[A].Location.Width / 2.0 - 16 + 20, 124 - 30 - 10, 32, 32,
-                                              GFX.YoshiWings, 0, 0 + 32 * Player[A].YoshiWingsFrame);
+                                              YoshiWings, 0, 0 + 32 * Player[A].YoshiWingsFrame);
                     }
                 }
             }
@@ -484,7 +484,7 @@ void UpdateGraphics2()
                                           pfrX(100 + Player[A].Frame * Player[A].Direction),
                                           pfrY(100 + Player[A].Frame * Player[A].Direction), c, c, c);
 
-                    frmMain.renderTexture(32 + (48 * A) + Player[A].Location.Width / 2.0 - 16, 124 - 30, 32, 32, GFX.Boot[Player[A].MountType], 0, 32 * Player[A].MountFrame, c, c, c);
+                    frmMain.renderTexture(32 + (48 * A) + Player[A].Location.Width / 2.0 - 16, 124 - 30, 32, 32, Boot[Player[A].MountType], 0, 32 * Player[A].MountFrame, c, c, c);
 
                     if(Player[A].MountType == 3)
                     {
@@ -495,7 +495,7 @@ void UpdateGraphics2()
                         else if(Player[A].YoshiWingsFrameCount >= 24)
                             Player[A].YoshiWingsFrameCount = 0;
 
-                        frmMain.renderTexture(32 + (48 * A) + Player[A].Location.Width / 2.0 - 16 + 20, 124 - 30 - 10, 32, 32, GFX.YoshiWings, 0, 0 + 32 * Player[A].YoshiWingsFrame, c, c, c);
+                        frmMain.renderTexture(32 + (48 * A) + Player[A].Location.Width / 2.0 - 16 + 20, 124 - 30 - 10, 32, 32, YoshiWings, 0, 0 + 32 * Player[A].YoshiWingsFrame, c, c, c);
                     }
                 }
             }
@@ -509,7 +509,7 @@ void UpdateGraphics2()
                 {
                     frmMain.renderTexture(32 + (48 * A) + PeachFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], 124 - Player[A].Location.Height + PeachFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], 99, Player[A].Location.Height - 24, GFXPeachBMP[Player[A].State], pfrX(100 + Player[A].Frame * Player[A].Direction), pfrY(100 + Player[A].Frame * Player[A].Direction), c, c, c);
 
-                    frmMain.renderTexture(32 + (48 * A) + Player[A].Location.Width / 2.0 - 16, 124 - 30, 32, 32, GFX.Boot[Player[A].MountType], 0, 32 * Player[A].MountFrame, c, c, c);
+                    frmMain.renderTexture(32 + (48 * A) + Player[A].Location.Width / 2.0 - 16, 124 - 30, 32, 32, Boot[Player[A].MountType], 0, 32 * Player[A].MountFrame, c, c, c);
 
                     if(Player[A].MountType == 3)
                     {
@@ -520,7 +520,7 @@ void UpdateGraphics2()
                         else if(Player[A].YoshiWingsFrameCount >= 24)
                             Player[A].YoshiWingsFrameCount = 0;
 
-                        frmMain.renderTexture(32 + (48 * A) + Player[A].Location.Width / 2.0 - 16 + 20, 124 - 30 - 10, 32, 32, GFX.YoshiWings, 0, 0 + 32 * Player[A].YoshiWingsFrame, c, c, c);
+                        frmMain.renderTexture(32 + (48 * A) + Player[A].Location.Width / 2.0 - 16 + 20, 124 - 30 - 10, 32, 32, YoshiWings, 0, 0 + 32 * Player[A].YoshiWingsFrame, c, c, c);
                     }
                 }
             }
@@ -540,7 +540,7 @@ void UpdateGraphics2()
                     {
                         frmMain.renderTexture(32 + (48 * A) + ToadFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], 124 - Player[A].Location.Height + ToadFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], 99, Player[A].Location.Height - 24, GFXToadBMP[Player[A].State], pfrX(100 + Player[A].Frame * Player[A].Direction), pfrY(100 + Player[A].Frame * Player[A].Direction), c, c, c);
                     }
-                    frmMain.renderTexture(32 + (48 * A) + Player[A].Location.Width / 2.0 - 16, 124 - 30, 32, 32, GFX.Boot[Player[A].MountType], 0, 32 * Player[A].MountFrame, c, c, c);
+                    frmMain.renderTexture(32 + (48 * A) + Player[A].Location.Width / 2.0 - 16, 124 - 30, 32, 32, Boot[Player[A].MountType], 0, 32 * Player[A].MountFrame, c, c, c);
 
                     if(Player[A].MountType == 3)
                     {
@@ -550,7 +550,7 @@ void UpdateGraphics2()
                             Player[A].YoshiWingsFrame = 1;
                         else if(Player[A].YoshiWingsFrameCount >= 24)
                             Player[A].YoshiWingsFrameCount = 0;
-                        frmMain.renderTexture(32 + (48 * A) + Player[A].Location.Width / 2.0 - 16 + 20, 124 - 30 - 10, 32, 32, GFX.YoshiWings, 0, 0 + 32 * Player[A].YoshiWingsFrame, c, c, c);
+                        frmMain.renderTexture(32 + (48 * A) + Player[A].Location.Width / 2.0 - 16 + 20, 124 - 30 - 10, 32, 32, YoshiWings, 0, 0 + 32 * Player[A].YoshiWingsFrame, c, c, c);
                     }
                 }
             }
@@ -561,27 +561,27 @@ void UpdateGraphics2()
         }
         A = numPlayers + 1;
         // Print lives on the screen
-        frmMain.renderTexture(32 + (48 * A), 126 - GFX.Interface[3].h, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0);
-        frmMain.renderTexture(32 + (48 * A) + 40, 128 - GFX.Interface[3].h, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+        frmMain.renderTexture(32 + (48 * A), 126 - Interface[3].h, Interface[3].w, Interface[3].h, Interface[3], 0, 0);
+        frmMain.renderTexture(32 + (48 * A) + 40, 128 - Interface[3].h, Interface[1].w, Interface[1].h, Interface[1], 0, 0);
 
         SuperPrint(std::to_string(int(Lives)), 1, 32 + (48 * A) + 62, 112);
         // Print coins on the screen
         if(Player[1].Character == 5)
         {
-            frmMain.renderTexture(32 + (48 * A) + 16, 88, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[6], 0, 0);
+            frmMain.renderTexture(32 + (48 * A) + 16, 88, Interface[2].w, Interface[2].h, Interface[6], 0, 0);
         }
         else
         {
-            frmMain.renderTexture(32 + (48 * A) + 16, 88, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[2], 0, 0);
+            frmMain.renderTexture(32 + (48 * A) + 16, 88, Interface[2].w, Interface[2].h, Interface[2], 0, 0);
         }
-        frmMain.renderTexture(32 + (48 * A) + 40, 90, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+        frmMain.renderTexture(32 + (48 * A) + 40, 90, Interface[1].w, Interface[1].h, Interface[1], 0, 0);
 
         SuperPrint(std::to_string(Coins), 1, 32 + (48 * A) + 62, 90);
         // Print stars on the screen
         if(numStars > 0)
         {
-            frmMain.renderTexture(32 + (48 * A) + 16, 66, GFX.Interface[5].w, GFX.Interface[5].h, GFX.Interface[5], 0, 0);
-            frmMain.renderTexture(32 + (48 * A) + 40, 68, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+            frmMain.renderTexture(32 + (48 * A) + 16, 66, Interface[5].w, Interface[5].h, Interface[5], 0, 0);
+            frmMain.renderTexture(32 + (48 * A) + 40, 68, Interface[1].w, Interface[1].h, Interface[1], 0, 0);
             SuperPrint(std::to_string(numStars), 1, 32 + (48 * A) + 62, 68);
         }
         // Print the level's name
@@ -597,13 +597,13 @@ void UpdateGraphics2()
                 SuperPrint("CONTINUE", 3, 272, 257);
                 SuperPrint("SAVE & CONTINUE", 3, 272, 292);
                 SuperPrint("SAVE & QUIT", 3, 272, 327);
-                frmMain.renderTexture(252, 257 + (MenuCursor * 35), 16, 16, GFX.MCursor[0], 0, 0);
+                frmMain.renderTexture(252, 257 + (MenuCursor * 35), 16, 16, MCursor[0], 0, 0);
             }
             else
             {
                 SuperPrint("CONTINUE", 3, 272 + 56, 275);
                 SuperPrint("QUIT", 3, 272 + 56, 310);
-                frmMain.renderTexture(252 + 56, 275 + (MenuCursor * 35), 16, 16, GFX.MCursor[0], 0, 0);
+                frmMain.renderTexture(252 + 56, 275 + (MenuCursor * 35), 16, 16, MCursor[0], 0, 0);
             }
         }
         if(PrintFPS > 0)

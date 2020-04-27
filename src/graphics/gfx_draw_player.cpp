@@ -48,13 +48,13 @@ void DrawPlayer(int A, int Z)
                     if(Player[A].Direction == -1)
                         C = Player[A].YoshiTongueLength;
 
-                    frmMain.renderTexture(vScreenX[Z] + double(Player[A].YoshiTongueX) - C - 1, vScreenY[Z] + Player[A].YoshiTongue.Y, Player[A].YoshiTongueLength + 2, 16, GFX.Tongue[2], 0, 0, s, s, s);
+                    frmMain.renderTexture(vScreenX[Z] + double(Player[A].YoshiTongueX) - C - 1, vScreenY[Z] + Player[A].YoshiTongue.Y, Player[A].YoshiTongueLength + 2, 16, Tongue[2], 0, 0, s, s, s);
 
                     C = 1;
                     if(Player[A].Direction == 1)
                         C = 0;
 
-                    frmMain.renderTexture(vScreenX[Z] + static_cast<int>(floor(static_cast<double>(Player[A].YoshiTongue.X))), vScreenY[Z] + Player[A].YoshiTongue.Y, 16, 16, GFX.Tongue[1], 0, 16 * C, s, s, s);
+                    frmMain.renderTexture(vScreenX[Z] + static_cast<int>(floor(static_cast<double>(Player[A].YoshiTongue.X))), vScreenY[Z] + Player[A].YoshiTongue.Y, 16, 16, Tongue[1], 0, 16 * C, s, s, s);
 
                 }
                 // Yoshi's Body
@@ -90,7 +90,7 @@ void DrawPlayer(int A, int Z)
                     {
                         frmMain.renderTexture(vScreenX[Z] + static_cast<int>(floor(static_cast<double>(Player[A].Location.X))) + MarioFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], vScreenY[Z] + Player[A].Location.Y + MarioFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], 99, Player[A].Location.Height - 26 - Player[A].MountOffsetY - MarioFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], GFXMario[Player[A].State], pfrX(100 + Player[A].Frame * Player[A].Direction), pfrY(100 + Player[A].Frame * Player[A].Direction), s, s, s);
                     }
-                    frmMain.renderTexture(vScreenX[Z] + static_cast<int>(floor(static_cast<double>(Player[A].Location.X))) + Player[A].Location.Width / 2.0 - 16, vScreenY[Z] + Player[A].Location.Y + Player[A].Location.Height - 30, 32, 32, GFX.Boot[Player[A].MountType], 0, 32 * Player[A].MountFrame, s, s, s);
+                    frmMain.renderTexture(vScreenX[Z] + static_cast<int>(floor(static_cast<double>(Player[A].Location.X))) + Player[A].Location.Width / 2.0 - 16, vScreenY[Z] + Player[A].Location.Y + Player[A].Location.Height - 30, 32, 32, Boot[Player[A].MountType], 0, 32 * Player[A].MountFrame, s, s, s);
                 }
                 else if(Player[A].Mount == 3)
                 {
@@ -109,7 +109,7 @@ void DrawPlayer(int A, int Z)
                     {
                         frmMain.renderTexture(vScreenX[Z] + static_cast<int>(floor(static_cast<double>(Player[A].Location.X))) + LuigiFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], vScreenY[Z] + Player[A].Location.Y + LuigiFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], 99, Player[A].Location.Height - 26 - Player[A].MountOffsetY - LuigiFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], GFXLuigi[Player[A].State], pfrX(100 + Player[A].Frame * Player[A].Direction), pfrY(100 + Player[A].Frame * Player[A].Direction), s, s, s);
                     }
-                    frmMain.renderTexture(vScreenX[Z] + static_cast<int>(floor(static_cast<double>(Player[A].Location.X))) + Player[A].Location.Width / 2.0 - 16, vScreenY[Z] + Player[A].Location.Y + Player[A].Location.Height - 30, 32, 32, GFX.Boot[Player[A].MountType], 0, 32 * Player[A].MountFrame);
+                    frmMain.renderTexture(vScreenX[Z] + static_cast<int>(floor(static_cast<double>(Player[A].Location.X))) + Player[A].Location.Width / 2.0 - 16, vScreenY[Z] + Player[A].Location.Y + Player[A].Location.Height - 30, 32, 32, Boot[Player[A].MountType], 0, 32 * Player[A].MountFrame);
                 }
                 else if(Player[A].Mount == 3)
                 {
@@ -128,7 +128,7 @@ void DrawPlayer(int A, int Z)
                     {
                         frmMain.renderTexture(vScreenX[Z] + static_cast<int>(floor(static_cast<double>(Player[A].Location.X))) + PeachFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], vScreenY[Z] + Player[A].Location.Y + PeachFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], 99, Player[A].Location.Height - 26 - PeachFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] - 2, GFXPeach[Player[A].State], pfrX(100 + Player[A].Frame * Player[A].Direction), pfrY(100 + Player[A].Frame * Player[A].Direction), s, s, s);
                     }
-                    frmMain.renderTexture(vScreenX[Z] + static_cast<int>(floor(static_cast<double>(Player[A].Location.X))) + Player[A].Location.Width / 2.0 - 16, vScreenY[Z] + Player[A].Location.Y + Player[A].Location.Height - 30, 32, 32, GFX.Boot[Player[A].MountType], 0, 32 * Player[A].MountFrame, s, s, s);
+                    frmMain.renderTexture(vScreenX[Z] + static_cast<int>(floor(static_cast<double>(Player[A].Location.X))) + Player[A].Location.Width / 2.0 - 16, vScreenY[Z] + Player[A].Location.Y + Player[A].Location.Height - 30, 32, 32, Boot[Player[A].MountType], 0, 32 * Player[A].MountFrame, s, s, s);
                 }
             }
             else if(Player[A].Character == 4) // draw Toad
@@ -150,7 +150,7 @@ void DrawPlayer(int A, int Z)
                             frmMain.renderTexture(vScreenX[Z] + static_cast<int>(floor(static_cast<double>(Player[A].Location.X))) + ToadFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], vScreenY[Z] + Player[A].Location.Y + ToadFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], 99, Player[A].Location.Height - 26 - Player[A].MountOffsetY - ToadFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], GFXToad[Player[A].State], pfrX(100 + Player[A].Frame * Player[A].Direction), pfrY(100 + Player[A].Frame * Player[A].Direction), s, s, s);
                         }
                     }
-                    frmMain.renderTexture(vScreenX[Z] + static_cast<int>(floor(static_cast<double>(Player[A].Location.X))) + Player[A].Location.Width / 2.0 - 16, vScreenY[Z] + Player[A].Location.Y + Player[A].Location.Height - 30, 32, 32, GFX.Boot[Player[A].MountType], 0, 32 * Player[A].MountFrame, s, s, s);
+                    frmMain.renderTexture(vScreenX[Z] + static_cast<int>(floor(static_cast<double>(Player[A].Location.X))) + Player[A].Location.Width / 2.0 - 16, vScreenY[Z] + Player[A].Location.Y + Player[A].Location.Height - 30, 32, 32, Boot[Player[A].MountType], 0, 32 * Player[A].MountFrame, s, s, s);
                 }
             }
             else if(Player[A].Character == 5) // draw link
@@ -205,22 +205,22 @@ void DrawPlayer(int A, int Z)
                 {
                     if(Player[A].Direction == 1)
                     {
-                        frmMain.renderTexture(vScreenX[Z] + static_cast<int>(floor(static_cast<double>(Player[A].Location.X))) + Player[A].YoshiBX - 12, vScreenY[Z] + Player[A].Location.Y + Player[A].YoshiBY - 16, 32, 32, GFX.YoshiWings, 0, 0 + 32 * Player[A].YoshiWingsFrame, s, s, s);
+                        frmMain.renderTexture(vScreenX[Z] + static_cast<int>(floor(static_cast<double>(Player[A].Location.X))) + Player[A].YoshiBX - 12, vScreenY[Z] + Player[A].Location.Y + Player[A].YoshiBY - 16, 32, 32, YoshiWings, 0, 0 + 32 * Player[A].YoshiWingsFrame, s, s, s);
                     }
                     else
                     {
-                        frmMain.renderTexture(vScreenX[Z] + static_cast<int>(floor(static_cast<double>(Player[A].Location.X))) + Player[A].YoshiBX + 12, vScreenY[Z] + Player[A].Location.Y + Player[A].YoshiBY - 16, 32, 32, GFX.YoshiWings, 0, 0 + 32 * Player[A].YoshiWingsFrame, s, s, s);
+                        frmMain.renderTexture(vScreenX[Z] + static_cast<int>(floor(static_cast<double>(Player[A].Location.X))) + Player[A].YoshiBX + 12, vScreenY[Z] + Player[A].Location.Y + Player[A].YoshiBY - 16, 32, 32, YoshiWings, 0, 0 + 32 * Player[A].YoshiWingsFrame, s, s, s);
                     }
                 }
                 if(Player[A].Mount == 1 && Player[A].MountType == 3)
                 {
                     if(Player[A].Direction == 1)
                     {
-                        frmMain.renderTexture(vScreenX[Z] + static_cast<int>(floor(static_cast<double>(Player[A].Location.X))) - 24, vScreenY[Z] + Player[A].Location.Y + Player[A].Location.Height - 40, 32, 32, GFX.YoshiWings, 0, 0 + 32 * Player[A].YoshiWingsFrame, s, s, s);
+                        frmMain.renderTexture(vScreenX[Z] + static_cast<int>(floor(static_cast<double>(Player[A].Location.X))) - 24, vScreenY[Z] + Player[A].Location.Y + Player[A].Location.Height - 40, 32, 32, YoshiWings, 0, 0 + 32 * Player[A].YoshiWingsFrame, s, s, s);
                     }
                     else
                     {
-                        frmMain.renderTexture(vScreenX[Z] + static_cast<int>(floor(static_cast<double>(Player[A].Location.X))) + 16, vScreenY[Z] + Player[A].Location.Y + Player[A].Location.Height - 40, 32, 32, GFX.YoshiWings, 0, 0 + 32 * Player[A].YoshiWingsFrame, s, s, s);
+                        frmMain.renderTexture(vScreenX[Z] + static_cast<int>(floor(static_cast<double>(Player[A].Location.X))) + 16, vScreenY[Z] + Player[A].Location.Y + Player[A].Location.Height - 40, 32, 32, YoshiWings, 0, 0 + 32 * Player[A].YoshiWingsFrame, s, s, s);
                     }
                 }
             }
