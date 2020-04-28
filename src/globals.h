@@ -103,6 +103,9 @@ const int KEY_PRESSED = 1;
  */
 const char *getKeyName(int key);
 
+struct KM_Key;
+std::string getJoyKeyName(const KM_Key &key);
+
 
 //'Saved Events
 //Public numSavedEvents As Integer
@@ -243,21 +246,43 @@ struct ConKeyboard_t
 //End Type
 };
 
+struct KM_Key
+{
+    int val = -1;
+    int id = -1;
+    int type = -1;
+};
+
 //Public Type conJoystick   'Input settings for the joystick
 struct ConJoystick_t
 {
+// EXTRA
+    enum CtrlTypes
+    {
+        NoControl=-1,
+        JoyAxis=0,
+        JoyBallX,
+        JoyBallY,
+        JoyHat,
+        JoyButton
+    };
+    KM_Key Up;
+    KM_Key Down;
+    KM_Key Left;
+    KM_Key Right;
+
 //    Jump As Integer
-    int Jump = 0;
+    KM_Key Jump;
 //    Run As Integer
-    int Run = 0;
+    KM_Key Run;
 //    Drop As Integer
-    int Drop = 0;
+    KM_Key Drop;
 //    Start As Integer
-    int Start = 0;
+    KM_Key Start;
 //    AltJump As Integer
-    int AltJump = 0;
+    KM_Key AltJump;
 //    AltRun As Integer
-    int AltRun = 0;
+    KM_Key AltRun;
 //End Type
 };
 
@@ -1070,7 +1095,7 @@ extern bool getNewKeyboard;
 //Public getNewJoystick As Boolean
 extern bool getNewJoystick;
 //Public lastJoyButton As Integer
-extern int lastJoyButton;
+extern KM_Key lastJoyButton;
 //Public GamePaused As Boolean 'true if the game is paused
 extern bool GamePaused;
 //Public MessageText As String 'when talking to an npc
@@ -1776,7 +1801,7 @@ extern int Score;
 //Public Points(1 To 13) As Integer
 extern RangeArrI<int, 1, 13, 0> Points;
 //Public oldJumpJoy As Integer
-extern int oldJumpJoy;
+extern KM_Key oldJumpJoy;
 //Public MaxWorldStars As Integer 'maximum number of world stars
 extern int MaxWorldStars;
 //Public Debugger As Boolean 'if the debugger window is open

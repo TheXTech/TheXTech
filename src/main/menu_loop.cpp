@@ -1212,7 +1212,7 @@ void MenuLoop()
 //                Else
                 } else {
 //                    For A = 0 To 6
-                    For(A, 0, 6)
+                    For(A, 0, 10)
                     {
 //                        If MenuMouseY >= 260 - 44 + A * 30 And MenuMouseY <= 276 + A * 30 - 44 Then
                         if(MenuMouseY >= 260 - 44 + A * 30 && MenuMouseY <= 276 + A * 30 - 44)
@@ -1309,53 +1309,68 @@ void MenuLoop()
                 }
                 else if(getNewJoystick)
                 {
-                    JoyNum = useJoystick[MenuMode - 30] - 1;
+                    int JoyNum = useJoystick[MenuMode - 30] - 1;
                     SDL_JoystickUpdate();
-                    PollJoystick(useJoystick[MenuMode - 30] - 1);
-                    if(JoyButtons[oldJumpJoy] == true)
+                    KM_Key joyKey;
+                    bool gotNewKey = PollJoystick(JoyNum, joyKey);
+
+//                    if(JoyButtons[oldJumpJoy] == true)
+                    if(JoyIsKeyDown(JoyNum, oldJumpJoy))
                     {
                     }
                     else
                     {
-                        oldJumpJoy = -1;
-                        for(auto A = 0; A <= 15; A++)
+                        oldJumpJoy.type = -1;
+                        if(gotNewKey)
                         {
-                            if(JoyButtons[A] == true)
-                            {
-                                PlaySound(29);
-                                if(MenuCursor == 1)
-                                    conJoystick[MenuMode - 30].Run = A;
-                                else if(MenuCursor == 2)
-                                    conJoystick[MenuMode - 30].AltRun = A;
-                                else if(MenuCursor == 3)
-                                    conJoystick[MenuMode - 30].Jump = A;
-                                else if(MenuCursor == 4)
-                                    conJoystick[MenuMode - 30].AltJump = A;
-                                else if(MenuCursor == 5)
-                                    conJoystick[MenuMode - 30].Drop = A;
-                                else if(MenuCursor == 6)
-                                    conJoystick[MenuMode - 30].Start = A;
-                                getNewJoystick = false;
-                                MenuCursorCanMove = false;
-                                break;
-                            }
-                            else if(getKeyState(vbKeyEscape) == KEY_PRESSED)
-                            {
-                                if(MenuCursor == 1)
-                                    conJoystick[MenuMode - 30].Run = lastJoyButton;
-                                else if(MenuCursor == 2)
-                                    conJoystick[MenuMode - 30].AltRun = lastJoyButton;
-                                else if(MenuCursor == 3)
-                                    conJoystick[MenuMode - 30].AltJump = lastJoyButton;
-                                else if(MenuCursor == 4)
-                                    conJoystick[MenuMode - 30].Jump = lastJoyButton;
-                                else if(MenuCursor == 5)
-                                    conJoystick[MenuMode - 30].Drop = lastJoyButton;
-                                else if(MenuCursor == 6)
-                                    conJoystick[MenuMode - 30].Start = lastJoyButton;
-                                getNewJoystick = false;
-                                MenuCursorCanMove = false;
-                            }
+                            PlaySound(29);
+                            if(MenuCursor == 1)
+                                conJoystick[MenuMode - 30].Up = joyKey;
+                            else if(MenuCursor == 2)
+                                conJoystick[MenuMode - 30].Down = joyKey;
+                            else if(MenuCursor == 3)
+                                conJoystick[MenuMode - 30].Left = joyKey;
+                            else if(MenuCursor == 4)
+                                conJoystick[MenuMode - 30].Right = joyKey;
+                            else if(MenuCursor == 5)
+                                conJoystick[MenuMode - 30].Run = joyKey;
+                            else if(MenuCursor == 6)
+                                conJoystick[MenuMode - 30].AltRun = joyKey;
+                            else if(MenuCursor == 7)
+                                conJoystick[MenuMode - 30].Jump = joyKey;
+                            else if(MenuCursor == 8)
+                                conJoystick[MenuMode - 30].AltJump = joyKey;
+                            else if(MenuCursor == 9)
+                                conJoystick[MenuMode - 30].Drop = joyKey;
+                            else if(MenuCursor == 10)
+                                conJoystick[MenuMode - 30].Start = joyKey;
+                            getNewJoystick = false;
+                            MenuCursorCanMove = false;
+                        }
+                        else if(getKeyState(vbKeyEscape) == KEY_PRESSED)
+                        {
+                            if(MenuCursor == 1)
+                                conJoystick[MenuMode - 30].Up = lastJoyButton;
+                            else if(MenuCursor == 2)
+                                conJoystick[MenuMode - 30].Down = lastJoyButton;
+                            else if(MenuCursor == 3)
+                                conJoystick[MenuMode - 30].Left = lastJoyButton;
+                            else if(MenuCursor == 4)
+                                conJoystick[MenuMode - 30].Right = lastJoyButton;
+                            else if(MenuCursor == 5)
+                                conJoystick[MenuMode - 30].Run = lastJoyButton;
+                            else if(MenuCursor == 6)
+                                conJoystick[MenuMode - 30].AltRun = lastJoyButton;
+                            else if(MenuCursor == 7)
+                                conJoystick[MenuMode - 30].AltJump = lastJoyButton;
+                            else if(MenuCursor == 8)
+                                conJoystick[MenuMode - 30].Jump = lastJoyButton;
+                            else if(MenuCursor == 9)
+                                conJoystick[MenuMode - 30].Drop = lastJoyButton;
+                            else if(MenuCursor == 10)
+                                conJoystick[MenuMode - 30].Start = lastJoyButton;
+                            getNewJoystick = false;
+                            MenuCursorCanMove = false;
                         }
                     }
 
@@ -1372,7 +1387,7 @@ void MenuLoop()
                         MenuCursorCanMove = false;
                         PlaySound(26);
                     }
-                    else if(c.Jump == true || c.Start == true ||
+                    else if(c.Jump || c.Start ||
                             (getKeyState(vbKeySpace) == KEY_PRESSED) ||
                             (getKeyState(vbKeyReturn) == KEY_PRESSED) ||
                             MenuMouseClick == true)
@@ -1430,34 +1445,54 @@ void MenuLoop()
                             {
                                 if(MenuCursor == 1)
                                 {
-                                    lastJoyButton = conJoystick[MenuMode - 30].Run;
-                                    conJoystick[MenuMode - 30].Run = -1;
+                                    lastJoyButton = conJoystick[MenuMode - 30].Up;
+                                    conJoystick[MenuMode - 30].Up.type = -1;
                                 }
                                 else if(MenuCursor == 2)
                                 {
-                                    lastJoyButton = conJoystick[MenuMode - 30].AltRun;
-                                    conJoystick[MenuMode - 30].AltRun = -1;
+                                    lastJoyButton = conJoystick[MenuMode - 30].Down;
+                                    conJoystick[MenuMode - 30].Down.type = -1;
                                 }
                                 else if(MenuCursor == 3)
                                 {
-                                    lastJoyButton = conJoystick[MenuMode - 30].Jump;
-                                    oldJumpJoy = conJoystick[MenuMode - 30].Jump;
-                                    conJoystick[MenuMode - 30].Jump = -1;
+                                    lastJoyButton = conJoystick[MenuMode - 30].Left;
+                                    conJoystick[MenuMode - 30].Left.type = -1;
                                 }
                                 else if(MenuCursor == 4)
                                 {
-                                    lastJoyButton = conJoystick[MenuMode - 30].AltJump;
-                                    conJoystick[MenuMode - 30].AltJump = -1;
+                                    lastJoyButton = conJoystick[MenuMode - 30].Right;
+                                    conJoystick[MenuMode - 30].Right.type = -1;
                                 }
                                 else if(MenuCursor == 5)
                                 {
-                                    lastJoyButton = conJoystick[MenuMode - 30].Drop;
-                                    conJoystick[MenuMode - 30].Drop = -1;
+                                    lastJoyButton = conJoystick[MenuMode - 30].Run;
+                                    conJoystick[MenuMode - 30].Run.type = -1;
                                 }
                                 else if(MenuCursor == 6)
                                 {
+                                    lastJoyButton = conJoystick[MenuMode - 30].AltRun;
+                                    conJoystick[MenuMode - 30].AltRun.type = -1;
+                                }
+                                else if(MenuCursor == 7)
+                                {
+                                    lastJoyButton = conJoystick[MenuMode - 30].Jump;
+                                    oldJumpJoy = conJoystick[MenuMode - 30].Jump;
+                                    conJoystick[MenuMode - 30].Jump.type = -1;
+                                }
+                                else if(MenuCursor == 8)
+                                {
+                                    lastJoyButton = conJoystick[MenuMode - 30].AltJump;
+                                    conJoystick[MenuMode - 30].AltJump.type = -1;
+                                }
+                                else if(MenuCursor == 9)
+                                {
+                                    lastJoyButton = conJoystick[MenuMode - 30].Drop;
+                                    conJoystick[MenuMode - 30].Drop.type = -1;
+                                }
+                                else if(MenuCursor == 10)
+                                {
                                     lastJoyButton = conJoystick[MenuMode - 30].Start;
-                                    conJoystick[MenuMode - 30].Start = -1;
+                                    conJoystick[MenuMode - 30].Start.type = -1;
                                 }
                                 getNewJoystick = true;
                                 MenuCursorCanMove = false;
@@ -1472,6 +1507,11 @@ void MenuLoop()
 //            If MenuMode <> 3 Then
             if(MenuMode != 3)
             {
+                if(MenuCursor > 10)
+                    MenuCursor = 0;
+                if(MenuCursor < 0)
+                    MenuCursor = 10;
+#if 0
 //                If useJoystick(MenuMode - 30) = 0 Then
                 if(useJoystick[MenuMode - 30] == 0) {
 //                    If MenuCursor > 10 Then MenuCursor = 0
@@ -1483,14 +1523,15 @@ void MenuLoop()
 //                Else
                 } else {
 //                    If MenuCursor > 6 Then MenuCursor = 0
-                    if(MenuCursor > 6)
+                    if(MenuCursor > 10)
                         MenuCursor = 0;
 //                    If MenuCursor < 0 Then MenuCursor = 6
                     if(MenuCursor < 0)
-                        MenuCursor = 6;
+                        MenuCursor = 10;
 //                End If
                 }
 //            End If
+#endif
             }
 //        End If
         }

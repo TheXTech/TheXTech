@@ -48,6 +48,22 @@ void OpenConfig_preSetup()
     }
 }
 
+static void readJoyKey(IniProcessing &setup, const char *n, KM_Key &key)
+{
+    std::string joyKey(n);
+    setup.read((joyKey + "-val").c_str(), key.val, key.val);
+    setup.read((joyKey + "-id").c_str(), key.id, key.id);
+    setup.read((joyKey + "-type").c_str(), key.type, key.type);
+}
+
+static void writeJoyKey(IniProcessing &setup, const char *n, KM_Key &key)
+{
+    std::string joyKey(n);
+    setup.setValue((joyKey + "-val").c_str(), key.val);
+    setup.setValue((joyKey + "-id").c_str(), key.id);
+    setup.setValue((joyKey + "-type").c_str(), key.type);
+}
+
 
 void OpenConfig()
 {
@@ -80,12 +96,16 @@ void OpenConfig()
             config.endGroup();
 
             config.beginGroup(fmt::format_ne("player-{0}-joystick", A));
-            config.read("Run", conJoystick[A].Run, conJoystick[A].Run);
-            config.read("Jump", conJoystick[A].Jump, conJoystick[A].Jump);
-            config.read("Drop", conJoystick[A].Drop, conJoystick[A].Drop);
-            config.read("Start", conJoystick[A].Start, conJoystick[A].Start);
-            config.read("AltJump", conJoystick[A].AltJump, conJoystick[A].AltJump);
-            config.read("AltRun", conJoystick[A].AltRun, conJoystick[A].AltRun);
+            readJoyKey(config, "Up", conJoystick[A].Up);
+            readJoyKey(config, "Down", conJoystick[A].Down);
+            readJoyKey(config, "Left", conJoystick[A].Left);
+            readJoyKey(config, "Right", conJoystick[A].Right);
+            readJoyKey(config, "Run", conJoystick[A].Run);
+            readJoyKey(config, "Jump", conJoystick[A].Jump);
+            readJoyKey(config, "Drop", conJoystick[A].Drop);
+            readJoyKey(config, "Start", conJoystick[A].Start);
+            readJoyKey(config, "AltJump", conJoystick[A].AltJump);
+            readJoyKey(config, "AltRun", conJoystick[A].AltRun);
             config.endGroup();
         }
     }
@@ -125,12 +145,16 @@ void SaveConfig()
         config.endGroup();
 
         config.beginGroup(fmt::format_ne("player-{0}-joystick", A));
-        config.setValue("Run", conJoystick[A].Run);
-        config.setValue("Jump", conJoystick[A].Jump);
-        config.setValue("Drop", conJoystick[A].Drop);
-        config.setValue("Start", conJoystick[A].Start);
-        config.setValue("AltJump", conJoystick[A].AltJump);
-        config.setValue("AltRun", conJoystick[A].AltRun);
+        writeJoyKey(config, "Up", conJoystick[A].Up);
+        writeJoyKey(config, "Down", conJoystick[A].Down);
+        writeJoyKey(config, "Left", conJoystick[A].Left);
+        writeJoyKey(config, "Right", conJoystick[A].Right);
+        writeJoyKey(config, "Run", conJoystick[A].Run);
+        writeJoyKey(config, "Jump", conJoystick[A].Jump);
+        writeJoyKey(config, "Drop", conJoystick[A].Drop);
+        writeJoyKey(config, "Start", conJoystick[A].Start);
+        writeJoyKey(config, "AltJump", conJoystick[A].AltJump);
+        writeJoyKey(config, "AltRun", conJoystick[A].AltRun);
         config.endGroup();
     }
 
