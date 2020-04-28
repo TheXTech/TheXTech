@@ -67,8 +67,8 @@ void FindCustomBlocks(/*std::string cFilePath*/)
 
     for(int A = 1; A < maxBlockType; ++A)
     {
-        std::string BlockPath = FileNamePath + fmt::format_ne("Block-{0}.txt", A);
-        std::string BlockPathC = FileNamePath + FileName + fmt::format_ne("/Block-{0}.txt", A);
+        std::string BlockPath = FileNamePath + fmt::format_ne("block-{0}.txt", A);
+        std::string BlockPathC = FileNamePath + FileName + fmt::format_ne("/block-{0}.txt", A);
         if(Files::fileExists(BlockPath))
             LoadCustomBlock(A, BlockPath);
         if(Files::fileExists(BlockPathC))
