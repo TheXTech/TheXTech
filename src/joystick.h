@@ -29,33 +29,19 @@
 #include <string>
 #include "range_arr.hpp"
 
-// Public JoyNum As Long
-extern long JoyNum;
-// Public CenterX(0 To 7) As Long
-extern RangeArr<long, 0, 7> CenterX;
-// Public CenterY(0 To 7) As Long
-extern RangeArr<long, 0, 7> CenterY;
-// Public JoyButtons(-15 To 15) As Boolean
-extern RangeArr<bool, -255, 255> JoyButtons;
-// Public CurrentJoyX As Long
-extern long CurrentJoyX;
-// Public CurrentJoyY As Long
-extern long CurrentJoyY;
-// Public CurrentJoyPOV As Long
-extern long CurrentJoyPOV;  // Also looks like useless, kept be a constant -1
-
-
 // Public Sub UpdateControls() 'Gets players controls
 // Gets players controls
 void UpdateControls();
 
 int InitJoysticks();
 
+bool JoyIsKeyDown(int JoystickNumber, const KM_Key &key);
+
 void CloseJoysticks();
 // Public Function StartJoystick(Optional ByVal JoystickNumber As Integer = 0) As Boolean
 bool StartJoystick(int JoystickNumber);
 // Public Sub PollJoystick()
-void PollJoystick(int joystick);
+bool PollJoystick(int joystick, KM_Key &key);
 
 
 #endif // JOYSTICK_H

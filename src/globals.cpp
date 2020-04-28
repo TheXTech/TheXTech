@@ -24,6 +24,7 @@
  */
 
 #include "globals.h"
+#include <fmt_format_ne.h>
 
 FrmMain frmMain;
 GFX_t GFX;
@@ -59,7 +60,7 @@ bool resChanged = false;
 int inputKey = 0;
 bool getNewKeyboard = false;
 bool getNewJoystick = false;
-int lastJoyButton = 0;
+KM_Key lastJoyButton;
 bool GamePaused = false;
 std::string MessageText;
 int NumSelectWorld  = 0;
@@ -332,7 +333,7 @@ Uint32 RenderMode = 1;
 RangeArr<std::string, 1, maxWorldCredits> WorldCredits;
 int Score = 0;
 RangeArrI<int, 1, 13, 0> Points;
-int oldJumpJoy = 0;
+KM_Key oldJumpJoy;
 int MaxWorldStars = 0;
 bool Debugger = false;
 RangeArr<Player_t, 0, 10> SavedChar;
@@ -533,6 +534,13 @@ const char *getKeyName(int key)
     return SDL_GetScancodeName(k);
 }
 
+std::string getJoyKeyName(const KM_Key &key)
+{
+    if(key.type < 0)
+        return "_";
+    return fmt::format_ne("K={0} ID={1} T={2}", key.val, key.id, key.type);
+}
+
 
 void initAll()
 {
@@ -575,3 +583,4 @@ void initAll()
     Background.fill(Background_t());
     NPC.fill(NPC_t());
 }
+

@@ -1214,12 +1214,42 @@ void InitControls()
     {
         {
             auto &j = conJoystick[A];
-            j.Run = 2;
-            j.AltRun = 3;
-            j.Jump = 0;
-            j.AltJump = 1;
-            j.Drop = 6;
-            j.Start = 7;
+            j.Up.val = SDL_HAT_UP;
+            j.Up.type = ConJoystick_t::JoyHat;
+            j.Up.id = 0;
+            j.Down.val = SDL_HAT_DOWN;
+            j.Down.type = ConJoystick_t::JoyHat;
+            j.Down.id = 0;
+            j.Left.val = SDL_HAT_LEFT;
+            j.Left.id = 0;
+            j.Left.type = ConJoystick_t::JoyHat;
+            j.Right.val = SDL_HAT_RIGHT;
+            j.Right.type = ConJoystick_t::JoyHat;
+            j.Right.id = 0;
+
+            j.Run.id = 2;
+            j.Run.val = 1;
+            j.Run.type = ConJoystick_t::JoyButton;
+
+            j.AltRun.id = 3;
+            j.AltRun.val = 1;
+            j.AltRun.type = ConJoystick_t::JoyButton;
+
+            j.Jump.id = 0;
+            j.Jump.val = 1;
+            j.Jump.type = ConJoystick_t::JoyButton;
+
+            j.AltJump.id = 1;
+            j.AltJump.val = 1;
+            j.AltJump.type = ConJoystick_t::JoyButton;
+
+            j.Drop.id = 6;
+            j.Drop.val = 1;
+            j.Drop.type = ConJoystick_t::JoyButton;
+
+            j.Start.id = 7;
+            j.Start.val = 1;
+            j.Start.type = ConJoystick_t::JoyButton;
         }
     }
 
