@@ -28,6 +28,7 @@
 #include "../npc.h"
 #include "../load_gfx.h"
 #include "../custom.h"
+#include "../custom_blocks.h"
 #include "../sound.h"
 #include "../sorting.h"
 #include "../layers.h"
@@ -135,6 +136,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 //        FindCustomNPCs(FileNamePath + FileName);
 //    else
     FindCustomNPCs();
+    FindCustomBlocks();
     LoadCustomGFX();
     LoadCustomSound();
 //    if(DirMan::exists(FileNamePath + FileName)) // Useless now
@@ -794,6 +796,7 @@ void ClearLevel()
     NPCScore[274] = 6;
     LevelName.clear();
     LoadNPCDefaults();
+    LoadBlockDefaults();
     noUpdate = true;
     BlocksSorted = true;
     qScreen = false;
