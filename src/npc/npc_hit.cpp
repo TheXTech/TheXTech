@@ -457,6 +457,13 @@ void NPCHit(int A, int B, int C)
             PlaySound(2);
         }
     }
+    else if(NPCNoLava[NPC[A].Type] == true)
+    {
+        if(B == 6)
+        {
+            NPC[A].Immune = 10;
+        }
+    }
     else if(NPC[A].Type == 268 || NPC[A].Type == 281 || NPC[A].Type == 302)
     {
         if(B != 7 && B != 1 && B != 2 && B != 8)
@@ -2073,93 +2080,113 @@ void NPCHit(int A, int B, int C)
         }
         // Misc. Things With No Jump Death (SMB2 Shy Guys, SMB2 Ninji, SMB2 Pokey)
     }
-    else if(NPC[A].Type == 19 || NPC[A].Type == 20 || NPC[A].Type == 247 || NPC[A].Type == 25 || NPC[A].Type == 28 || NPC[A].Type == 36 || NPC[A].Type == 285 || NPC[A].Type == 286 || NPC[A].Type == 47 || NPC[A].Type == 284 || NPC[A].Type == 48 || NPC[A].Type == 53 || NPC[A].Type == 54 || NPC[A].Type == 340 || NPC[A].Type == 318 || (NPC[A].Type >= 129 && NPC[A].Type <= 132) || NPC[A].Type == 158 || NPC[A].Type == 231 || NPC[A].Type == 235 || NPC[A].Type == 261 || NPC[A].Type == 272 || NPC[A].Type == 319 || NPC[A].Type == 320 || NPC[A].Type == 321 || NPC[A].Type == 322 || NPC[A].Type == 330 || NPC[A].Type == 331 || NPC[A].Type == 332 || NPC[A].Type == 333)
+    else if(NPC[A].Type == 158)
     {
-        if(B == 10 && NPC[A].Type != 158)
+        // B = 1      Jumped on by a player (or kicked)
+        // B = 2      Hit by a shaking block
+        // B = 3      Hit by projectile
+        // B = 4      Hit something as a projectile
+        // B = 5      Hit something while being held
+        // B = 6      Touched a lava block
+        // B = 8      Stomped by boot
+        // B = 9      Time to DIE
+        // B = 10     Zelda Stab
+       if(B == 6)
+           NPC[A].Killed = B;
+       else if(B == 2)
+       {
+           if(NPC[A].CantHurt == 0)
+           {
+               NPC[A].CantHurt = 10;
+               PlaySound(2);
+               NPC[A].Location.SpeedY = -5;
+               NPC[A].Location.Y = Block[C].Location.Y - NPC[A].Location.Height - 0.01;
+               NPC[A].Projectile = true;
+               NPC[A].Location.SpeedX = NPC[A].Location.SpeedX * 0.5;
+           }
+       }
+       else if(B == 5)
+       {
+           Player[NPC[A].HoldingPlayer].HoldingNPC = 0;
+           NPC[A].Projectile = true;
+           NPC[A].Location.SpeedX = 3 * -Player[NPC[A].HoldingPlayer].Direction;
+           NPC[A].Location.SpeedY = -4;
+           NPC[A].WallDeath = 0;
+           NPC[A].HoldingPlayer = 0;
+       }
+       else if(B == 3)
+       {
+           if(NPC[C].HoldingPlayer == 0 && NPC[C].Type != NPC[A].Type)
+           {
+               NPC[A].Immune = 30;
+               NPC[A].Projectile = true;
+               NPC[A].Location.SpeedY = -5;
+               NPC[A].Location.SpeedX = (NPC[C].Location.SpeedX + NPC[A].Location.SpeedX) * 0.5;
+               if(NPC[A].Location.SpeedX < 1.2 && NPC[A].Location.SpeedX > -1.2)
+               {
+                   if(NPC[C].Direction == -1)
+                       NPC[A].Location.SpeedX = 3;
+                   else
+                       NPC[A].Location.SpeedX = -3;
+               }
+               PlaySound(9);
+           }
+       }
+       else if(B == 10)
+       {
+           NPC[A].Immune = 30;
+           NPC[A].Projectile = true;
+           NPC[A].Location.SpeedY = -5;
+           NPC[A].Location.SpeedX = Player[C].Location.SpeedX + 4 * Player[C].Direction;
+           PlaySound(9);
+       }
+       else if(B == 7)
+       {
+           NPC[A].Direction = Player[C].Direction;
+           NPC[A].Location.SpeedX = std::abs(NPC[A].Location.SpeedX) * NPC[A].Direction;
+           NPC[A].TurnAround = false;
+           NPC[A].Location.SpeedY = -6;
+           NPC[A].Projectile = true;
+           PlaySound(2);
+       }
+       else if(B == 1)
+       {
+           PlaySound(2);
+       }
+    }
+    else if(NPC[A].Type == 28)
+    {
+        if(B == 10 || B == 6 || B == 3 || B == 4)
             NPC[A].Killed = B;
-        else if(B != 1)
-        {
-            if(B == 6)
-                NPC[A].Killed = B;
-            else if(B == 2 && NPC[A].Type == 158)
-            {
-                if(NPC[A].CantHurt == 0)
-                {
-                    NPC[A].CantHurt = 10;
-                    PlaySound(2);
-                    NPC[A].Location.SpeedY = -5;
-                    NPC[A].Location.Y = Block[C].Location.Y - NPC[A].Location.Height - 0.01;
-                    NPC[A].Projectile = true;
-                    NPC[A].Location.SpeedX = NPC[A].Location.SpeedX * 0.5;
-                }
-            }
-            else if(NPC[A].Type == 158 && B == 5)
-            {
-                Player[NPC[A].HoldingPlayer].HoldingNPC = 0;
-                NPC[A].Projectile = true;
-                NPC[A].Location.SpeedX = 3 * -Player[NPC[A].HoldingPlayer].Direction;
-                NPC[A].Location.SpeedY = -4;
-                NPC[A].WallDeath = 0;
-                NPC[A].HoldingPlayer = 0;
-            }
-            else if(NPC[A].Type == 158 && B == 3)
-            {
-                if(NPC[C].HoldingPlayer == 0 && NPC[C].Type != NPC[A].Type)
-                {
-                    NPC[A].Immune = 30;
-                    NPC[A].Projectile = true;
-                    NPC[A].Location.SpeedY = -5;
-                    NPC[A].Location.SpeedX = (NPC[C].Location.SpeedX + NPC[A].Location.SpeedX) * 0.5;
-                    if(NPC[A].Location.SpeedX < 1.2 && NPC[A].Location.SpeedX > -1.2)
-                    {
-                        if(NPC[C].Direction == -1)
-                            NPC[A].Location.SpeedX = 3;
-                        else
-                            NPC[A].Location.SpeedX = -3;
-                    }
-                    PlaySound(9);
-                }
-            }
-            else if(NPC[A].Type == 158 && B == 10)
-            {
-                NPC[A].Immune = 30;
-                NPC[A].Projectile = true;
-                NPC[A].Location.SpeedY = -5;
-                NPC[A].Location.SpeedX = Player[C].Location.SpeedX + 4 * Player[C].Direction;
-                PlaySound(9);
-            }
-            else if(!(NPC[A].Type == 158 && (B == 4 || B == 8 || (B == 3 && NPC[C].Type == 13))))
-            {
-                if(NPC[A].Type == 158 && B == 7)
-                {
-                    NPC[A].Direction = Player[C].Direction;
-                    NPC[A].Location.SpeedX = std::abs(NPC[A].Location.SpeedX) * NPC[A].Direction;
-                    NPC[A].TurnAround = false;
-                    NPC[A].Location.SpeedY = -6;
-                    NPC[A].Projectile = true;
-                    PlaySound(2);
-                }
-                else
-                    NPC[A].Killed = B;
-            }
-        }
-        else if(B == 1 && NPC[A].Type == 28)
+        else if(B == 1)
         {
             NPC[A].Killed = B;
             NPC[A].Location.SpeedY = 0;
             NPC[A].Location.SpeedX = 0;
         }
+    }
+    else if(NPC[A].Type == 47 || NPC[A].Type == 284)
+    {
+        if(B == 10 || B == 6 || B == 3 || B == 4)
+            NPC[A].Killed = B;
+        else if(B == 1 || B == 8)
+            NPC[A].Killed = B;
+    }
+    else if(NPC[A].Type == 19 || NPC[A].Type == 20 || NPC[A].Type == 247 || NPC[A].Type == 25 ||
+            NPC[A].Type == 36 || NPC[A].Type == 285 || NPC[A].Type == 286 ||
+            NPC[A].Type == 48 || NPC[A].Type == 53 || NPC[A].Type == 54 || NPC[A].Type == 340 || NPC[A].Type == 318 ||
+            (NPC[A].Type >= 129 && NPC[A].Type <= 132) || NPC[A].Type == 231 || NPC[A].Type == 235 ||
+            NPC[A].Type == 261 || NPC[A].Type == 272 || NPC[A].Type == 319 || NPC[A].Type == 320 || NPC[A].Type == 321 ||
+            NPC[A].Type == 322 || NPC[A].Type == 330 || NPC[A].Type == 331 || NPC[A].Type == 332 || NPC[A].Type == 333)
+    {
+        if(B == 10 || B == 6 || B == 3 || B == 4)
+            NPC[A].Killed = B;
         else if(B == 1 && NPCCanWalkOn[NPC[A].Type] == false && NPCJumpHurt[NPC[A].Type] == false)
         {
             NPC[A].Killed = B;
             NPC[A].Location.SpeedY = 0.123;
             NPC[A].Location.SpeedX = 0;
         }
-        if(B == 1 && NPC[A].Type == 158)
-            PlaySound(2);
-        if((B == 1 || B == 8) && (NPC[A].Type == 47 || NPC[A].Type == 284))
-            NPC[A].Killed = B;
-        // Exits
     }
     else if(NPCIsAnExit[NPC[A].Type])
     {

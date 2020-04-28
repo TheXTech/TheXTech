@@ -179,6 +179,7 @@ RangeArrI<bool, 0, maxNPCType, false> NPCIsABot;
 RangeArrI<bool, 0, maxNPCType, false> NPCDefaultMovement;
 RangeArrI<bool, 0, maxNPCType, false> NPCIsVeggie;
 RangeArrI<bool, 0, maxNPCType, false> NPCNoFireBall;
+RangeArrI<bool, 0, maxNPCType, false> NPCNoLava;
 RangeArrI<bool, 0, maxNPCType, false> NPCNoIceBall;
 RangeArrI<bool, 0, maxNPCType, false> NPCNoGravity;
 

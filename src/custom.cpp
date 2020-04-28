@@ -204,6 +204,7 @@ void LoadCustomNPC(int A, std::string cFileName)
 
     boolVAR(npc, "spinjumphurt", NPCSpinJumpHurt[A]);
     boolVAR(npc, "jumpbounce", NPCJumpBounce[A]);
+    boolVAR(npc, "nolava", NPCNoLava[A]);
 
     if(npc.en_nohurt)
         NPCWontHurt[A] = npc.nohurt;
@@ -242,4 +243,5 @@ void LoadCustomNPC(int A, std::string cFileName)
     boolVAR(npc, "istoad", NPCIsToad[A]);
     boolVAR(npc, "isveggie", NPCIsVeggie[A]);
     boolVAR(npc, "isyoshi", NPCIsYoshi[A]);
+    boolVAR(npc, "defalutmovement", NPCDefaultMovement[A]);
 }

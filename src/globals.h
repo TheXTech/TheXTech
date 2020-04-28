@@ -1392,6 +1392,7 @@ extern RangeArrI<bool, 0, maxNPCType, false> NPCDefaultMovement;
 extern RangeArrI<bool, 0, maxNPCType, false> NPCIsVeggie;
 //Public NPCNoFireBall(0 To maxNPCType) As Boolean 'not hurt by fireball
 extern RangeArrI<bool, 0, maxNPCType, false> NPCNoFireBall;
+extern RangeArrI<bool, 0, maxNPCType, false> NPCNoLava;
 //Public NPCNoIceBall(0 To maxNPCType) As Boolean 'not hurt by fireball
 extern RangeArrI<bool, 0, maxNPCType, false> NPCNoIceBall;
 //Public NPCNoGravity(0 To maxNPCType) As Boolean 'not affected by gravity
@@ -1440,6 +1441,7 @@ struct NPCDefaults_t
 //    NPCJumpHurt(0 To maxNPCType) As Boolean
     RangeArrI<bool, 0, maxNPCType, false> NPCJumpHurt;
     RangeArrI<bool, 0, maxNPCType, true> NPCSpinJumpHurt;
+    RangeArrI<bool, 0, maxNPCType, true> NPCNoLava;
     RangeArrI<bool, 0, maxNPCType, false> NPCJumpBounce;
 //    NPCNoClipping(0 To maxNPCType) As Boolean
     RangeArrI<bool, 0, maxNPCType, false> NPCNoClipping;
