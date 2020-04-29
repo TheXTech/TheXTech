@@ -1560,6 +1560,8 @@ void BlockFrames()
     BlockFrame[624] = BlockFrame[5];
     BlockFrame[625] = BlockFrame[5];
     BlockFrame[631] = BlockFrame[5];
+    BlockFrame[715] = BlockFrame[5];
+    BlockFrame[716] = BlockFrame[5];
 
     for(A = 1; A <= numPlayers; A++)
     {
