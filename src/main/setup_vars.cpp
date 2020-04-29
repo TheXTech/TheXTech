@@ -2969,7 +2969,11 @@ void SetupVars()
 
 
     BlockBouncy[55] = true;
+    BlockBouncy[715] = true;
+    BlockBouncy[716] = true;
 
+    BlockBouncyHorizontal[714] = true;
+    BlockBouncyHorizontal[715] = true;
 
     BlockWidth[604] = 64;
     BlockWidth[605] = 64;
@@ -2987,6 +2991,41 @@ void SetupVars()
         BlockKills[A] = true;
     }
 
+
+    BlockIsSizable[698] = true;
+    BlockIsSizable[568] = true;
+    BlockIsSizable[579] = true;
+    BlockIsSizable[575] = true;
+    BlockIsSizable[25] = true;
+    BlockIsSizable[26] = true;
+    BlockIsSizable[27] = true;
+    BlockIsSizable[28] = true;
+    BlockIsSizable[38] = true;
+    BlockIsSizable[79] = true;
+    BlockIsSizable[108] = true;
+    BlockIsSizable[130] = true;
+    BlockIsSizable[161] = true;
+    BlockIsSizable[240] = true;
+    BlockIsSizable[241] = true;
+    BlockIsSizable[242] = true;
+    BlockIsSizable[243] = true;
+    BlockIsSizable[244] = true;
+    BlockIsSizable[245] = true;
+    BlockIsSizable[259] = true;
+    BlockIsSizable[260] = true;
+    BlockIsSizable[261] = true;
+    BlockIsSizable[287] = true;
+    BlockIsSizable[288] = true;
+    BlockIsSizable[437] = true;
+    BlockIsSizable[441] = true;
+    BlockIsSizable[442] = true;
+    BlockIsSizable[443] = true;
+    BlockIsSizable[444] = true;
+    BlockIsSizable[438] = true;
+    BlockIsSizable[439] = true;
+    BlockIsSizable[440] = true;
+    BlockIsSizable[445] = true;
+    BlockIsSizable[685] = true;
 
 
     BackgroundHasNoMask[187] = true;

@@ -788,6 +788,7 @@ struct BlockDefaults_t
     RangeArrI<bool, 0, maxBlockType, false> BlockNoClipping;
     RangeArrI<bool, 0, maxBlockType, false> BlockNPCNoClipping;
     RangeArrI<bool, 0, maxBlockType, false> BlockBouncy;
+    RangeArrI<bool, 0, maxBlockType, false> BlockBouncyHorizontal;
 };
 
 extern BlockDefaults_t BlockDefaults;
@@ -1633,6 +1634,8 @@ extern RangeArrI<bool, 0, maxBlockType, false> BlockNoClipping;
 extern RangeArrI<bool, 0, maxBlockType, false> BlockNPCNoClipping;
 //Public BlockBouncy(0 To maxBlockType) As Boolean 'block is bouncy like noteblock
 extern RangeArrI<bool, 0, maxBlockType, false> BlockBouncy;
+//Public BlockBouncyHorizontal(0 To maxBlockType) as Boolean 'block bounces player horizontally
+extern RangeArrI<bool, 0, maxBlockType, false> BlockBouncyHorizontal;
 //Public CoinFrame(1 To 10) As Integer 'What frame the coin is on
 extern RangeArrI<int, 1, 10, 0> CoinFrame;
 //Public CoinFrame2(1 To 10) As Integer 'Counter to update the coin frames

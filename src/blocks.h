@@ -34,6 +34,10 @@ void BlockShakeUp(int A);
 void BlockShakeUpPow(int A);
 //! Shake the block down
 void BlockShakeDown(int A);
+//! Shake the block left
+void BlockShakeLeft(int A);
+//! Shake the block right
+void BlockShakeRight(int A);
 
 void BlockHitHard(int A);
 //! Destroy a block

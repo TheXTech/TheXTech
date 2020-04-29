@@ -28,6 +28,7 @@ void SaveBlockDefaults()
         BlockDefaults.BlockNoClipping[A] = BlockNoClipping[A];
         BlockDefaults.BlockNPCNoClipping[A] = BlockNPCNoClipping[A];
         BlockDefaults.BlockBouncy[A] = BlockBouncy[A];
+        BlockDefaults.BlockBouncyHorizontal[A] = BlockBouncyHorizontal[A];
     }
 }
 
@@ -48,40 +49,7 @@ void LoadBlockDefaults()
         BlockNoClipping[A] = BlockDefaults.BlockNoClipping[A];
         BlockNPCNoClipping[A] = BlockDefaults.BlockNPCNoClipping[A];
         BlockBouncy[A] = BlockDefaults.BlockBouncy[A];
-        BlockIsSizable[698] = true;
-        BlockIsSizable[568] = true;
-        BlockIsSizable[579] = true;
-        BlockIsSizable[575] = true;
-        BlockIsSizable[25] = true;
-        BlockIsSizable[26] = true;
-        BlockIsSizable[27] = true;
-        BlockIsSizable[28] = true;
-        BlockIsSizable[38] = true;
-        BlockIsSizable[79] = true;
-        BlockIsSizable[108] = true;
-        BlockIsSizable[130] = true;
-        BlockIsSizable[161] = true;
-        BlockIsSizable[240] = true;
-        BlockIsSizable[241] = true;
-        BlockIsSizable[242] = true;
-        BlockIsSizable[243] = true;
-        BlockIsSizable[244] = true;
-        BlockIsSizable[245] = true;
-        BlockIsSizable[259] = true;
-        BlockIsSizable[260] = true;
-        BlockIsSizable[261] = true;
-        BlockIsSizable[287] = true;
-        BlockIsSizable[288] = true;
-        BlockIsSizable[437] = true;
-        BlockIsSizable[441] = true;
-        BlockIsSizable[442] = true;
-        BlockIsSizable[443] = true;
-        BlockIsSizable[444] = true;
-        BlockIsSizable[438] = true;
-        BlockIsSizable[439] = true;
-        BlockIsSizable[440] = true;
-        BlockIsSizable[445] = true;
-        BlockIsSizable[685] = true;
+        BlockBouncyHorizontal[A] = BlockDefaults.BlockBouncyHorizontal[A];
     }
 }
 
@@ -132,5 +100,6 @@ void LoadCustomBlock(int A, std::string cFileName)
     config.read("hurts", BlockHurts[A], BlockHurts[A]);
     config.read("switch-id", BlockPSwitch[A], BlockPSwitch[A]);
     config.read("bounce", BlockBouncy[A], BlockBouncy[A]);
+    config.read("bounce-side", BlockBouncyHorizontal[A], BlockBouncyHorizontal[A]);
     config.endGroup();
 }

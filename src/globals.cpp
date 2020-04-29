@@ -245,6 +245,7 @@ RangeArrI<bool, 0, maxBlockType, false> BlockHurts;
 RangeArrI<bool, 0, maxBlockType, false> BlockPSwitch;
 RangeArrI<bool, 0, maxBlockType, false> BlockNoClipping;
 RangeArrI<bool, 0, maxBlockType, false> BlockBouncy;
+RangeArrI<bool, 0, maxBlockType, false> BlockBouncyHorizontal;
 RangeArrI<int, 1, 10, 0> CoinFrame;
 RangeArrI<int, 1, 10, 0> CoinFrame2;
 EditorCursor_t EditorCursor;

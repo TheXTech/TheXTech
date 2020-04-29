@@ -46,7 +46,15 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
     int oldSpecial = 0; // previous .Special
     Location_t tempLocation;
 
+
     auto &b = Block[A];
+
+    bool HitSide = false;
+
+    if(b.ShakeX3 != 0 && b.ShakeX2 == 0)
+        HitSide = true;
+
+
     if(BattleMode == true && b.RespawnDelay == 0)
     {
         b.RespawnDelay = 1;
@@ -178,12 +186,12 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
     }
 
     // Shake the block
-    if(b.Type == 4 || b.Type == 615 || b.Type == 55 ||
+    if((b.Type == 4 || b.Type == 615 || b.Type == 55 ||
        b.Type == 60 || b.Type == 90 || b.Type == 159 ||
        b.Type == 169 || b.Type == 170 || b.Type == 173 ||
        b.Type == 176 || b.Type == 179 || b.Type == 188 ||
        b.Type == 226 || b.Type == 281 || b.Type == 282 ||
-       b.Type == 283 || (b.Type >= 622 && b.Type <= 625) || BlockBouncy[b.Type] == true)
+       b.Type == 283 || (b.Type >= 622 && b.Type <= 625) || BlockBouncy[b.Type] == true) && HitSide == false)
     {
         if(HitDown == false)
             BlockShakeUp(A);
@@ -310,7 +318,8 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         newBlock = 2;
     }
 
-
+    if(HitSide == true)
+        newBlock = b.Type;
 
 
 
@@ -320,13 +329,16 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         {
             b.RapidHit = (iRand() % 3) + 1;
         }
-        if(HitDown == false)
+        if(HitSide == false)
         {
-            BlockShakeUp(A);
-        }
-        else
-        {
-            BlockShakeDown(A);
+            if(HitDown == false)
+            {
+                BlockShakeUp(A);
+            }
+            else
+            {
+                BlockShakeDown(A);
+            }
         }
 
 
@@ -521,13 +533,16 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
     else if(b.Special >= 1000) // New spawn code
     {
         C = b.Special - 1000; // this finds the NPC type and puts in the variable C
-        if(HitDown == false)
+        if(HitSide == false)
         {
-            BlockShakeUp(A);
-        }
-        else
-        {
-            BlockShakeDown(A);
+            if(HitDown == false)
+            {
+                BlockShakeUp(A);
+            }
+            else
+            {
+                BlockShakeDown(A);
+            }
         }
         b.Special = 0;
         if(BlockBouncy[b.Type] == false)
@@ -752,13 +767,16 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
     }
     else if(b.Special == 100) // Block contains a mushroom
     {
-        if(HitDown == false)
+        if(HitSide == false)
         {
-            BlockShakeUp(A);
-        }
-        else
-        {
-            BlockShakeDown(A);
+            if(HitDown == false)
+            {
+                BlockShakeUp(A);
+            }
+            else
+            {
+                BlockShakeDown(A);
+            }
         }
         b.Special = 0;
         if(BlockBouncy[b.Type] == false)
@@ -821,13 +839,16 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
     }
     else if(b.Special == 102) // Block contains a fire flower
     {
-        if(HitDown == false)
+        if(HitSide == false)
         {
-            BlockShakeUp(A);
-        }
-        else
-        {
-            BlockShakeDown(A);
+            if(HitDown == false)
+            {
+                BlockShakeUp(A);
+            }
+            else
+            {
+                BlockShakeDown(A);
+            }
         }
         b.Special = 0;
         if(BlockBouncy[b.Type] == false)
@@ -836,13 +857,16 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             b.Location.Height = BlockHeight[newBlock];
             b.Location.Width = BlockWidth[newBlock];
         }
-        if(HitDown == false)
+        if(HitSide == false)
         {
-            BlockShakeUp(A);
-        }
-        else
-        {
-            BlockShakeDown(A);
+            if(HitDown == false)
+            {
+                BlockShakeUp(A);
+            }
+            else
+            {
+                BlockShakeDown(A);
+            }
         }
         tempPlayer = CheckDead();
         if(numPlayers > 2 /*&& nPlay.Online == false*/)
@@ -912,13 +936,16 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
     }
     else if(b.Special == 103) // Block contains a Leaf
     {
-        if(HitDown == false)
+        if(HitSide == false)
         {
-            BlockShakeUp(A);
-        }
-        else
-        {
-            BlockShakeDown(A);
+            if(HitDown == false)
+            {
+                BlockShakeUp(A);
+            }
+            else
+            {
+                BlockShakeDown(A);
+            }
         }
         b.Special = 0;
         if(BlockBouncy[b.Type] == false)
@@ -927,13 +954,16 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             b.Location.Height = BlockHeight[b.Type];
             b.Location.Width = BlockWidth[b.Type];
         }
-        if(HitDown == false)
+        if(HitSide == false)
         {
-            BlockShakeUp(A);
-        }
-        else
-        {
-            BlockShakeDown(A);
+            if(HitDown == false)
+            {
+                BlockShakeUp(A);
+            }
+            else
+            {
+                BlockShakeDown(A);
+            }
         }
         tempPlayer = CheckDead();
         if(numPlayers > 2/*&& nPlay.Online == false*/)
@@ -1012,13 +1042,16 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
     }
     else if(b.Special == 104) // Block contains a Shoe
     {
-        if(HitDown == false)
+        if(HitSide == false)
         {
-            BlockShakeUp(A);
-        }
-        else
-        {
-            BlockShakeDown(A);
+            if(HitDown == false)
+            {
+                BlockShakeUp(A);
+            }
+            else
+            {
+                BlockShakeDown(A);
+            }
         }
         b.Special = 0;
         if(BlockBouncy[b.Type] == false)
@@ -1027,13 +1060,16 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             b.Location.Height = BlockHeight[newBlock];
             b.Location.Width = BlockWidth[newBlock];
         }
-        if(HitDown == false)
+        if(HitSide == false)
         {
-            BlockShakeUp(A);
-        }
-        else
-        {
-            BlockShakeDown(A);
+            if(HitDown == false)
+            {
+                BlockShakeUp(A);
+            }
+            else
+            {
+                BlockShakeDown(A);
+            }
         }
         PlaySound(7);
         numNPCs++;
@@ -1067,13 +1103,16 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         SoundPause[2] = 2;
         PlaySound(7);
 
-        if(HitDown == false)
+        if(HitSide == false)
         {
-            BlockShakeUp(A);
-        }
-        else
-        {
-            BlockShakeDown(A);
+            if(HitDown == false)
+            {
+                BlockShakeUp(A);
+            }
+            else
+            {
+                BlockShakeDown(A);
+            }
         }
         b.Special = 0;
         if(BlockBouncy[b.Type] == false)
@@ -1082,13 +1121,16 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             b.Location.Height = BlockHeight[newBlock];
             b.Location.Width = BlockWidth[newBlock];
         }
-        if(HitDown == false)
+        if(HitSide == false)
         {
-            BlockShakeUp(A);
-        }
-        else
-        {
-            BlockShakeDown(A);
+            if(HitDown == false)
+            {
+                BlockShakeUp(A);
+            }
+            else
+            {
+                BlockShakeDown(A);
+            }
         }
         numNPCs++;
         NPC[numNPCs] = NPC_t();
@@ -1120,13 +1162,16 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
     }
     else if(b.Special == 101) // Block contains a Goomba
     {
-        if(HitDown == false)
+        if(HitSide == false)
         {
-            BlockShakeUp(A);
-        }
-        else
-        {
-            BlockShakeDown(A);
+            if(HitDown == false)
+            {
+                BlockShakeUp(A);
+            }
+            else
+            {
+                BlockShakeDown(A);
+            }
         }
         b.Special = 0;
         if(BlockBouncy[b.Type] == false)
@@ -1135,13 +1180,16 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             b.Location.Height = BlockHeight[newBlock];
             b.Location.Width = BlockWidth[newBlock];
         }
-        if(HitDown == false)
+        if(HitSide == false)
         {
-            BlockShakeUp(A);
-        }
-        else
-        {
-            BlockShakeDown(A);
+            if(HitDown == false)
+            {
+                BlockShakeUp(A);
+            }
+            else
+            {
+                BlockShakeDown(A);
+            }
         }
         PlaySound(7);
         numNPCs++;
@@ -1171,13 +1219,16 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
     }
     else if(b.Special == 201) // Block contains a 1-up
     {
-        if(HitDown == false)
+        if(HitSide == false)
         {
-            BlockShakeUp(A);
-        }
-        else
-        {
-            BlockShakeDown(A);
+            if(HitDown == false)
+            {
+                BlockShakeUp(A);
+            }
+            else
+            {
+                BlockShakeDown(A);
+            }
         }
         b.Special = 0;
         if(BlockBouncy[b.Type] == false)
@@ -1186,13 +1237,16 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             b.Location.Height = BlockHeight[newBlock];
             b.Location.Width = BlockWidth[newBlock];
         }
-        if(HitDown == false)
+        if(HitSide == false)
         {
-            BlockShakeUp(A);
-        }
-        else
-        {
-            BlockShakeDown(A);
+            if(HitDown == false)
+            {
+                BlockShakeUp(A);
+            }
+            else
+            {
+                BlockShakeDown(A);
+            }
         }
         PlaySound(7);
         numNPCs++;
@@ -1838,6 +1892,34 @@ void UpdateBlocks()
             Block[iBlock[A]].ShakeY3 = Block[iBlock[A]].ShakeY3 - 2;
         }
 
+        if(Block[iBlock[A]].ShakeX > 0)
+        {
+            Block[iBlock[A]].ShakeX = Block[iBlock[A]].ShakeX - 2;
+            Block[iBlock[A]].ShakeX3 = Block[iBlock[A]].ShakeX3 + 2;
+        }
+        else if(Block[iBlock[A]].ShakeX2 < 0)
+        {
+            Block[iBlock[A]].ShakeX2 = Block[iBlock[A]].ShakeX2 + 2;
+            if(Block[iBlock[A]].ShakeX3 != 0 && Block[iBlock[A]].ShakeX2 == 0 && Block[iBlock[A]].Special > 0)
+                BlockHit(iBlock[A]);
+            Block[iBlock[A]].ShakeX3 = Block[iBlock[A]].ShakeX3 - 2;
+        }
+
+
+        if(Block[iBlock[A]].ShakeX < 0)
+        {
+            Block[iBlock[A]].ShakeX = Block[iBlock[A]].ShakeX + 2;
+            Block[iBlock[A]].ShakeX3 = Block[iBlock[A]].ShakeX3 - 2;
+        }
+        else if(Block[iBlock[A]].ShakeX2 > 0)
+        {
+            Block[iBlock[A]].ShakeX2 = Block[iBlock[A]].ShakeX2 - 2;
+            if(Block[iBlock[A]].ShakeX3 != 0 && Block[iBlock[A]].ShakeX2 == 0 && Block[iBlock[A]].Special > 0)
+                BlockHit(iBlock[A]);
+            Block[iBlock[A]].ShakeX3 = Block[iBlock[A]].ShakeX3 + 2;
+        }
+
+
         if(Block[iBlock[A]].ShakeY3 != 0)
         {
             for(auto B = 1; B <= numNPCs; B++)
@@ -1876,7 +1958,7 @@ void UpdateBlocks()
             {
                 if(Player[B].Dead == false)
                 {
-                    if(Player[B].Effect == 0 && BlockBouncy[Block[B].Type] == false)
+                    if(Player[B].Effect == 0 && BlockBouncy[Block[iBlock[A]].Type] == false)
                     {
                         if(ShakeCollision(Player[B].Location, Block[iBlock[A]].Location, Block[iBlock[A]].ShakeY3) == true)
                         {
@@ -1917,16 +1999,10 @@ void UpdateBlocks()
 
     for(auto A = iBlocks; A >= 1; A--)
     {
-        if(Block[iBlock[A]].ShakeY == 0)
+        if(Block[iBlock[A]].ShakeY == 0 && Block[iBlock[A]].ShakeY2 == 0 && Block[iBlock[A]].ShakeY3 == 0 && Block[iBlock[A]].ShakeX == 0 && Block[iBlock[A]].ShakeX2 == 0 && Block[iBlock[A]].ShakeX3 == 0)
         {
-            if(Block[iBlock[A]].ShakeY2 == 0)
-            {
-                if(Block[iBlock[A]].ShakeY3 == 0)
-                {
-                    iBlock[A] = iBlock[iBlocks];
-                    iBlocks = iBlocks - 1;
-                }
-            }
+            iBlock[A] = iBlock[iBlocks];
+            iBlocks = iBlocks - 1;
         }
     }
 

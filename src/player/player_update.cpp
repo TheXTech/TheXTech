@@ -2446,6 +2446,7 @@ void UpdatePlayer()
                                             }
                                         }
 
+
                                         // hitspot 5 means the game doesn't know where the collision happened
                                         // if the player just stopped ducking and there is a hitspot 5 then force hitspot 3 (hit block from below)
                                         if(HitSpot == 5 && (Player[A].StandUp || NPC[Player[A].StandingOnNPC].Location.SpeedY < 0))
@@ -2481,6 +2482,8 @@ void UpdatePlayer()
                                         // shadowmode is a cheat that allows the player to walk through walls
                                         if(ShadowMode && HitSpot != 1 && !(Block[B].Special > 0 && HitSpot == 3))
                                             HitSpot = 0;
+
+
 
                                         // this handles the collision for blocks that are sloped on the bottom
                                         if(BlockSlope2[Block[B].Type] != 0 && (Player[A].Location.Y > Block[B].Location.Y || (HitSpot != 2 && HitSpot != 4)) && HitSpot != 1 && ShadowMode == false)
@@ -2824,13 +2827,21 @@ void UpdatePlayer()
                                                 Player[A].Location.X = Block[B].Location.X + Block[B].Location.Width + 0.01;
                                                 tempSlope2 = B;
                                                 tempHit2 = true;
-                                                blockPushX = Block[B].Location.SpeedX;
+
+
+
                                                 if(Player[A].Mount == 2)
                                                     Player[A].mountBump = -Player[A].mountBump + Player[A].Location.X;
                                                 Player[A].Pinched2 = 2;
                                                 if(Block[B].Location.SpeedX != 0)
                                                     Player[A].NPCPinched = 2;
+
+
+
                                             }
+
+
+
                                         }
                                         else if(HitSpot == 4) // hit the block from the left -------.
                                         {
@@ -2841,11 +2852,16 @@ void UpdatePlayer()
                                             tempSlope2 = B;
                                             tempHit2 = true;
                                             blockPushX = Block[B].Location.SpeedX;
+
+
                                             if(Player[A].Mount == 2)
                                                 Player[A].mountBump = -Player[A].mountBump + Player[A].Location.X;
                                             Player[A].Pinched4 = 2;
                                             if(Block[B].Location.SpeedX != 0)
                                                 Player[A].NPCPinched = 2;
+
+
+
                                         }
                                         else if(HitSpot == 3) // hit the block from below
                                         {
@@ -2957,6 +2973,7 @@ void UpdatePlayer()
                     }
                 }
 
+
                 if(tempHit3 > 0) // For walking
                 {
 
@@ -3040,7 +3057,7 @@ void UpdatePlayer()
                                 Player[A].Location.SpeedY = 12;
                             }
 
-                            if(Block[tempHit3].Type == 55 && !FreezeNPCs) // Make the player jump if the block is bouncy
+                            if(BlockBouncy[Block[tempHit3].Type] == true && !FreezeNPCs) // Make the player jump if the block is bouncy
                             {
                                 if(!Player[A].Slide)
                                     Player[A].Multiplier = 0;
@@ -3204,11 +3221,26 @@ void UpdatePlayer()
                     {
                         if(Player[A].Controls.Right || Player[A].Controls.Left)
                             Player[A].Location.SpeedX = -NPC[Player[A].StandingOnNPC].Location.SpeedX + 0.2 * Player[A].Direction;
-                        else
+                        else if(BlockBouncyHorizontal[Block[tempSlope2].Type] == false)
                             Player[A].Location.SpeedX = 0;
                     }
                     if(Player[A].Mount == 2)
                         Player[A].Location.SpeedX = 0;
+
+
+                    if(BlockBouncyHorizontal[Block[tempSlope2].Type] == true && tempHit3 == 0)
+                    {
+                        if(Player[A].Location.X > tempSlope2X)
+                        {
+                            Player[A].Location.SpeedX = Player[A].Location.SpeedX * -0.2 + 3;
+                            BlockShakeLeft(tempSlope2);
+                        }
+                        if(Player[A].Location.X < tempSlope2X)
+                        {
+                            Player[A].Location.SpeedX = Player[A].Location.SpeedX * -0.2 - 3;
+                            BlockShakeRight(tempSlope2);
+                        }
+                    }
                 }
                 if(tempBlockHit[2] != 0) // Hitting a block from below
                 {
@@ -3228,6 +3260,7 @@ void UpdatePlayer()
                 else if(tempBlockHit[1] != 0)
                 {
                     B = tempBlockHit[1];
+
                     if(Block[B].Location.X + Block[B].Location.Width - Player[A].Location.X <= 4)
                     {
                         Player[A].Location.X = Block[B].Location.X + Block[B].Location.Width + 0.1;
@@ -3265,7 +3298,7 @@ void UpdatePlayer()
                         Player[A].Location.SpeedY = 2;
                     if(Player[A].CanFly2)
                         Player[A].Location.SpeedY = 2;
-                    if(Player[A].Mount != 2) // Tell the block it was hit
+                    if(Player[A].Mount != 2 && !(BlockBouncy[Block[B].Type] == false && BlockBouncyHorizontal[Block[B].Type] == true)) // Tell the block it was hit
                         BlockHit(B, false, A);
                     if(BlockBouncy[Block[B].Type] == true) // If it is a bouncy block the knock the player down
                         Player[A].Location.SpeedY = 3;
@@ -3295,7 +3328,10 @@ void UpdatePlayer()
 //                    Player[A].SlideKill = false;
                 Player[A].SlideKill = Player[A].Slide && (std::abs(Player[A].Location.SpeedX) > 1);
 
+                if(fBlock)
+                {
 
+                }
 
 
 
