@@ -202,8 +202,8 @@ RangeArr<double, 0, maxPlayers> qScreenX;
 RangeArr<double, 0, maxPlayers> qScreenY;
 bool qScreen = false;
 
-RangeArrI<int, 0, maxBlockType, 0> BlockWidth;
-RangeArrI<int, 0, maxBlockType, 0> BlockHeight;
+RangeArrI<int, 0, maxBlockType, 32> BlockWidth;
+RangeArrI<int, 0, maxBlockType, 32> BlockHeight;
 RangeArrI<int, 0, maxBlockType, 0> BonusWidth;
 RangeArrI<int, 0, maxBlockType, 0> BonusHeight;
 RangeArrI<int, 0, maxBlockType, 0> EffectWidth;
@@ -240,6 +240,7 @@ RangeArrI<bool, 0, maxBlockType, false> BlockKills2;
 RangeArrI<bool, 0, maxBlockType, false> BlockHurts;
 RangeArrI<bool, 0, maxBlockType, false> BlockPSwitch;
 RangeArrI<bool, 0, maxBlockType, false> BlockNoClipping;
+RangeArrI<bool, 0, maxBlockType, false> BlockBouncy;
 RangeArrI<int, 1, 10, 0> CoinFrame;
 RangeArrI<int, 1, 10, 0> CoinFrame2;
 EditorCursor_t EditorCursor;

@@ -26,6 +26,7 @@ void SaveBlockDefaults()
         BlockDefaults.BlockPSwitch[A] = BlockPSwitch[A];
         BlockDefaults.BlockNoClipping[A] = BlockNoClipping[A];
         BlockDefaults.BlockNPCNoClipping[A] = BlockNPCNoClipping[A];
+        BlockDefaults.BlockBouncy[A] = BlockBouncy[A];
     }
 }
 
@@ -45,6 +46,7 @@ void LoadBlockDefaults()
         BlockPSwitch[A] = BlockDefaults.BlockPSwitch[A];
         BlockNoClipping[A] = BlockDefaults.BlockNoClipping[A];
         BlockNPCNoClipping[A] = BlockDefaults.BlockNPCNoClipping[A];
+        BlockBouncy[A] = BlockDefaults.BlockBouncy[A];
     }
 }
 
@@ -76,23 +78,23 @@ void FindCustomBlocks(/*std::string cFilePath*/)
     }
 }
 
-
 void LoadCustomBlock(int A, std::string cFileName)
 {
     IniProcessing config(cFileName);
     if(!config.beginGroup("block"))
            config.beginGroup("General");
-    config.read("issizeable", BlockIsSizable[A], false);
-    config.read("playernoclipping", BlockPlayerNoClipping[A], false);
-    config.read("npcnoclipping", BlockNPCNoClipping[A], false);
-    config.read("noclipping", BlockNoClipping[A], false);
-    config.read("floorslope", BlockSlope[A], 0);
-    config.read("cellingslope", BlockSlope2[A], 0);
-    config.read("width", BlockWidth[A], 32);
-    config.read("height", BlockHeight[A], 32);
-    config.read("hitspot1", BlockOnlyHitspot1[A], false);
-    config.read("kills", BlockKills[A], false);
-    config.read("hurts", BlockHurts[A], false);
-    config.read("pswitch", BlockPSwitch[A], false);
+    config.read("issizeable", BlockIsSizable[A], BlockIsSizable[A]);
+    config.read("playernoclipping", BlockPlayerNoClipping[A], BlockPlayerNoClipping[A]);
+    config.read("npcnoclipping", BlockNPCNoClipping[A], BlockNPCNoClipping[A]);
+    config.read("noclipping", BlockNoClipping[A], BlockNoClipping[A]);
+    config.read("floorslope", BlockSlope[A], BlockSlope[A]);
+    config.read("cellingslope", BlockSlope2[A], BlockSlope2[A]);
+    config.read("width", BlockWidth[A], BlockWidth[A]);
+    config.read("height", BlockHeight[A], BlockHeight[A]);
+    config.read("hitspot1", BlockOnlyHitspot1[A], BlockOnlyHitspot1[A]);
+    config.read("kills", BlockKills[A], BlockKills[A]);
+    config.read("hurts", BlockHurts[A], BlockHurts[A]);
+    config.read("pswitch", BlockPSwitch[A], BlockPSwitch[A]);
+    config.read("bouncy", BlockBouncy[A], BlockBouncy[A]);
     config.endGroup();
 }

@@ -183,7 +183,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
        b.Type == 169 || b.Type == 170 || b.Type == 173 ||
        b.Type == 176 || b.Type == 179 || b.Type == 188 ||
        b.Type == 226 || b.Type == 281 || b.Type == 282 ||
-       b.Type == 283 || (b.Type >= 622 && b.Type <= 625))
+       b.Type == 283 || (b.Type >= 622 && b.Type <= 625) || BlockBouncy[b.Type] == true)
     {
         if(HitDown == false)
             BlockShakeUp(A);
@@ -507,7 +507,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             b.Special = b.Special - 1;
         }
 
-        if(b.Special == 0 && !(b.Type == 55))
+        if(b.Special == 0 && BlockBouncy[b.Type] == false)
         {
             b.Type = newBlock;
             b.Location.Height = BlockHeight[newBlock];
@@ -530,7 +530,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             BlockShakeDown(A);
         }
         b.Special = 0;
-        if(!(b.Type == 55)) // 55 is the bouncy note block
+        if(BlockBouncy[b.Type] == false)
         {
             b.Type = newBlock;
             b.Location.Height = BlockHeight[newBlock];
@@ -761,7 +761,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             BlockShakeDown(A);
         }
         b.Special = 0;
-        if(!(b.Type == 55))
+        if(BlockBouncy[b.Type] == false)
         {
             b.Type = newBlock;
             b.Location.Height = BlockHeight[newBlock];
@@ -830,7 +830,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             BlockShakeDown(A);
         }
         b.Special = 0;
-        if(!(b.Type == 55))
+        if(BlockBouncy[b.Type] == false)
         {
             b.Type = newBlock;
             b.Location.Height = BlockHeight[newBlock];
@@ -921,7 +921,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             BlockShakeDown(A);
         }
         b.Special = 0;
-        if(!(b.Type == 55))
+        if(BlockBouncy[b.Type] == false)
         {
             b.Type = newBlock;
             b.Location.Height = BlockHeight[b.Type];
@@ -1021,7 +1021,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             BlockShakeDown(A);
         }
         b.Special = 0;
-        if(!(b.Type == 55))
+        if(BlockBouncy[b.Type] == false)
         {
             b.Type = newBlock;
             b.Location.Height = BlockHeight[newBlock];
@@ -1076,7 +1076,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             BlockShakeDown(A);
         }
         b.Special = 0;
-        if(!(b.Type == 55))
+        if(BlockBouncy[b.Type] == false)
         {
             b.Type = newBlock;
             b.Location.Height = BlockHeight[newBlock];
@@ -1129,7 +1129,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             BlockShakeDown(A);
         }
         b.Special = 0;
-        if(!(b.Type == 55))
+        if(BlockBouncy[b.Type] == false)
         {
             b.Type = newBlock;
             b.Location.Height = BlockHeight[newBlock];
@@ -1180,7 +1180,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             BlockShakeDown(A);
         }
         b.Special = 0;
-        if(!(b.Type == 55))
+        if(BlockBouncy[b.Type] == false)
         {
             b.Type = newBlock;
             b.Location.Height = BlockHeight[newBlock];
@@ -1843,7 +1843,7 @@ void UpdateBlocks()
             {
                 if(Player[B].Dead == false)
                 {
-                    if(Player[B].Effect == 0 && Block[iBlock[A]].Type != 55)
+                    if(Player[B].Effect == 0 && BlockBouncy[Block[B].Type] == false)
                     {
                         if(ShakeCollision(Player[B].Location, Block[iBlock[A]].Location, Block[iBlock[A]].ShakeY3) == true)
                         {

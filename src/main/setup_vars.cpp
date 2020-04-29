@@ -2968,6 +2968,7 @@ void SetupVars()
     BlockOnlyHitspot1[448] = true;
 
 
+    BlockBouncy[55] = true;
 
 
     BlockWidth[604] = 64;
@@ -2985,6 +2986,9 @@ void SetupVars()
     {
         BlockKills[A] = true;
     }
+
+
+
     BackgroundHasNoMask[187] = true;
     BackgroundHasNoMask[188] = true;
     BackgroundHasNoMask[189] = true;

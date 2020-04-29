@@ -785,6 +785,7 @@ struct BlockDefaults_t
     RangeArrI<bool, 0, maxBlockType, false> BlockPSwitch;
     RangeArrI<bool, 0, maxBlockType, false> BlockNoClipping;
     RangeArrI<bool, 0, maxBlockType, false> BlockNPCNoClipping;
+    RangeArrI<bool, 0, maxBlockType, false> BlockBouncy;
 };
 
 extern BlockDefaults_t BlockDefaults;
@@ -1536,9 +1537,9 @@ extern RangeArr<double, 0, maxPlayers> qScreenY;
 extern bool qScreen;
 
 //Public BlockWidth(0 To maxBlockType) As Integer 'Block type width
-extern RangeArrI<int, 0, maxBlockType, 0> BlockWidth;
+extern RangeArrI<int, 0, maxBlockType, 32> BlockWidth;
 //Public BlockHeight(0 To maxBlockType) As Integer 'Block type height
-extern RangeArrI<int, 0, maxBlockType, 0> BlockHeight;
+extern RangeArrI<int, 0, maxBlockType, 32> BlockHeight;
 //Public BonusWidth(1 To 100) As Integer 'Bonus type width
 extern RangeArrI<int, 0, maxBlockType, 0> BonusWidth;
 //Public BonusHeight(1 To 100) As Integer 'Bonus type height
@@ -1620,6 +1621,8 @@ extern RangeArrI<bool, 0, maxBlockType, false> BlockPSwitch;
 //Public BlockNoClipping(0 To maxBlockType) As Boolean 'player/npcs can walk throught the block
 extern RangeArrI<bool, 0, maxBlockType, false> BlockNoClipping;
 extern RangeArrI<bool, 0, maxBlockType, false> BlockNPCNoClipping;
+//Public BlockBouncy(0 To maxBlockType) As Boolean 'block is bouncy like noteblock
+extern RangeArrI<bool, 0, maxBlockType, false> BlockBouncy;
 //Public CoinFrame(1 To 10) As Integer 'What frame the coin is on
 extern RangeArrI<int, 1, 10, 0> CoinFrame;
 //Public CoinFrame2(1 To 10) As Integer 'Counter to update the coin frames

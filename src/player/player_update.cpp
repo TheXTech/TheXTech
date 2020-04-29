@@ -3143,7 +3143,7 @@ void UpdatePlayer()
                                 Player[A].Location.SpeedY = 0;
                         }
 
-                        if(Block[tempHit3].Type == 55 && !FreezeNPCs) // Make the player jump if the block is bouncy
+                        if(BlockBouncy[Block[tempHit3].Type] == true && !FreezeNPCs) // Make the player jump if the block is bouncy
                         {
                             BlockHit(tempHit3, true);
                             if(!Player[A].Slide)
@@ -3267,7 +3267,7 @@ void UpdatePlayer()
                         Player[A].Location.SpeedY = 2;
                     if(Player[A].Mount != 2) // Tell the block it was hit
                         BlockHit(B, false, A);
-                    if(Block[B].Type == 55) // If it is a bouncy block the knock the player down
+                    if(BlockBouncy[Block[B].Type] == true) // If it is a bouncy block the knock the player down
                         Player[A].Location.SpeedY = 3;
                     if(Player[A].State > 1 && Player[A].Character != 5) // If the player was big ask the block nicely to die
                     {

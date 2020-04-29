@@ -135,6 +135,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 //    if(DirMan::exists(FileNamePath + FileName))
 //        FindCustomNPCs(FileNamePath + FileName);
 //    else
+    SetupVars();
     FindCustomNPCs();
     FindCustomBlocks();
     LoadCustomGFX();
