@@ -1046,9 +1046,8 @@ void UpdateGraphics(bool skipRepaint)
                 if(vScreenCollision(Z, Block[A].Location) && !Block[A].Hidden)
                 {
                     // Don't show a visual difference of hit-resized block in a comparison to original state
-                    double offX = Block[A].wasShrinkResized ? 0.05 : 0.0;
                     double offW = Block[A].wasShrinkResized ? 0.1 : 0.0;
-                    frmMain.renderTexture(vScreenX[Z] + Block[A].Location.X - offX,
+                    frmMain.renderTexture(vScreenX[Z] + Block[A].Location.X + Block[A].ShakeX3,
                                           vScreenY[Z] + Block[A].Location.Y + Block[A].ShakeY3,
                                           Block[A].Location.Width + offW,
                                           Block[A].Location.Height,
@@ -1584,9 +1583,8 @@ void UpdateGraphics(bool skipRepaint)
                 if(vScreenCollision(Z, Block[A].Location) && !Block[A].Hidden)
                 {
                     // Don't show a visual difference of hit-resized block in a comparison to original state
-                    double offX = Block[A].wasShrinkResized ? 0.05 : 0.0;
                     double offW = Block[A].wasShrinkResized ? 0.1 : 0.0;
-                    frmMain.renderTexture(vScreenX[Z] + Block[A].Location.X - offX,
+                    frmMain.renderTexture(vScreenX[Z] + Block[A].Location.X - Block[A].ShakeX3,
                                           vScreenY[Z] + Block[A].Location.Y + Block[A].ShakeY3,
                                           Block[A].Location.Width + offW,
                                           Block[A].Location.Height,
@@ -2442,7 +2440,7 @@ void UpdateGraphics(bool skipRepaint)
                     {
                         if(vScreenCollision(Z, b.Location))
                         {
-                            frmMain.renderTexture(vScreenX[Z] + b.Location.X,
+                            frmMain.renderTexture(vScreenX[Z] + b.Location.X + b.ShakeX3,
                                                   vScreenY[Z] + b.Location.Y + b.ShakeY3,
                                                   b.Location.Width,
                                                   b.Location.Height,

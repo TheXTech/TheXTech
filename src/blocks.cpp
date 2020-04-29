@@ -1275,6 +1275,36 @@ void BlockShakeUpPow(int A)
     }
 }
 
+void BlockShakeLeft(int A)
+{
+    if(Block[A].Hidden == false)
+    {
+        Block[A].ShakeX = -12; // Go left
+        Block[A].ShakeX2 = 12; // Come back right
+        Block[A].ShakeX3 = 0;
+        if(A != iBlock[iBlocks])
+        {
+            iBlocks = iBlocks + 1;
+            iBlock[iBlocks] = A;
+        }
+    }
+}
+
+void BlockShakeRight(int A)
+{
+    if(Block[A].Hidden == false)
+    {
+        Block[A].ShakeX = 12; // Go right
+        Block[A].ShakeX2 = -12; // Come back left
+        Block[A].ShakeX3 = 0;
+        if(A != iBlock[iBlocks])
+        {
+            iBlocks = iBlocks + 1;
+            iBlock[iBlocks] = A;
+        }
+    }
+}
+
 void BlockShakeDown(int A)
 {
     if(Block[A].Hidden == false)
@@ -1721,6 +1751,9 @@ void UpdateBlocks()
             Block[iBlock[A]].ShakeY = 0;
             Block[iBlock[A]].ShakeY2 = 0;
             Block[iBlock[A]].ShakeY3 = 0;
+            Block[iBlock[A]].ShakeX = 0;
+            Block[iBlock[A]].ShakeX2 = 0;
+            Block[iBlock[A]].ShakeX3 = 0;
         }
         if(Block[iBlock[A]].ShakeY < 0) // Block Shake Up
         {

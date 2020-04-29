@@ -237,6 +237,7 @@ RangeArrI<bool, 1, 100, false> LevelHasNoMask;
 RangeArrI<bool, 0, maxBlockType, false> BlockOnlyHitspot1;
 RangeArrI<bool, 0, maxBlockType, false> BlockKills;
 RangeArrI<bool, 0, maxBlockType, false> BlockKills2;
+RangeArrI<bool, 0, maxBlockType, false> BlockKills3;
 RangeArrI<bool, 0, maxBlockType, false> BlockHurts;
 RangeArrI<bool, 0, maxBlockType, false> BlockPSwitch;
 RangeArrI<bool, 0, maxBlockType, false> BlockNoClipping;

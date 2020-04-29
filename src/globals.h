@@ -781,6 +781,8 @@ struct BlockDefaults_t
     RangeArrI<int, 0, maxBlockType, 0> BlockHeight;
     RangeArrI<bool, 0, maxBlockType, false> BlockOnlyHitspot1;
     RangeArrI<bool, 0, maxBlockType, false> BlockKills;
+    RangeArrI<bool, 0, maxBlockType, false> BlockKills2;
+    RangeArrI<bool, 0, maxBlockType, false> BlockKills3;
     RangeArrI<bool, 0, maxBlockType, false> BlockHurts;
     RangeArrI<bool, 0, maxBlockType, false> BlockPSwitch;
     RangeArrI<bool, 0, maxBlockType, false> BlockNoClipping;
@@ -833,6 +835,10 @@ struct Block_t
     int ShakeY2 = 0;
 //    ShakeY3 As Integer
     int ShakeY3 = 0;
+
+    int ShakeX = 0;
+    int ShakeX2 = 0;
+    int ShakeX3 = 0;
 //    Kill As Boolean 'if true the game will destroy the block
     bool Kill = false;
 //    Invis As Boolean 'for invisible blocks
@@ -1614,6 +1620,7 @@ extern RangeArrI<bool, 0, maxBlockType, false> BlockOnlyHitspot1;
 extern RangeArrI<bool, 0, maxBlockType, false> BlockKills;
 //Public BlockKills2(0 To maxBlockType) As Boolean
 extern RangeArrI<bool, 0, maxBlockType, false> BlockKills2;
+extern RangeArrI<bool, 0, maxBlockType, false> BlockKills3;
 //Public BlockHurts(0 To maxBlockType) As Boolean 'block hurts the player
 extern RangeArrI<bool, 0, maxBlockType, false> BlockHurts;
 //Public BlockPSwitch(0 To maxBlockType) As Boolean 'block is affected by the p switch
