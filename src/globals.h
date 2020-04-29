@@ -1554,6 +1554,9 @@ extern RangeArrI<int, 0, maxBlockType, 0> BonusHeight;
 extern RangeArrI<int, 0, maxBlockType, 0> EffectWidth;
 //Public EffectHeight(1 To maxEffectType) As Integer 'Effect height
 extern RangeArrI<int, 0, maxBlockType, 0> EffectHeight;
+extern RangeArrI<int, 0, maxNPCType, 0> EffectFrame;
+extern RangeArrI<int, 0, maxNPCType, 0> EffectFrameSpeed;
+extern RangeArrI<int, 0, maxNPCType, 0> EffectFrameStyle;
 
 //Public Type EffectDefaults
 struct EffectDefaults

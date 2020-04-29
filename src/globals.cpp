@@ -208,6 +208,9 @@ RangeArrI<int, 0, maxBlockType, 0> BonusWidth;
 RangeArrI<int, 0, maxBlockType, 0> BonusHeight;
 RangeArrI<int, 0, maxBlockType, 0> EffectWidth;
 RangeArrI<int, 0, maxBlockType, 0> EffectHeight;
+RangeArrI<int, 0, maxNPCType, 0> EffectFrame;
+RangeArrI<int, 0, maxNPCType, 0> EffectFrameSpeed;
+RangeArrI<int, 0, maxNPCType, 0> EffectFrameStyle;
 
 EffectDefaults effectDefaults;
 RangeArrI<int, 1, maxSceneType, 0> SceneWidth;

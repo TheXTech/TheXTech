@@ -118,19 +118,19 @@ void LoadCustomBlock(int A, std::string cFileName)
     IniProcessing config(cFileName);
     if(!config.beginGroup("block"))
            config.beginGroup("General");
-    config.read("issizeable", BlockIsSizable[A], BlockIsSizable[A]);
-    config.read("playernoclipping", BlockPlayerNoClipping[A], BlockPlayerNoClipping[A]);
-    config.read("npcnoclipping", BlockNPCNoClipping[A], BlockNPCNoClipping[A]);
-    config.read("noclipping", BlockNoClipping[A], BlockNoClipping[A]);
-    config.read("floorslope", BlockSlope[A], BlockSlope[A]);
-    config.read("cellingslope", BlockSlope2[A], BlockSlope2[A]);
+    config.read("sizeable", BlockIsSizable[A], BlockIsSizable[A]);
+    config.read("player-no-clipping", BlockPlayerNoClipping[A], BlockPlayerNoClipping[A]);
+    config.read("npc-no-clipping", BlockNPCNoClipping[A], BlockNPCNoClipping[A]);
+    config.read("no-clipping", BlockNoClipping[A], BlockNoClipping[A]);
+    config.read("floor-slope", BlockSlope[A], BlockSlope[A]);
+    config.read("celling-slope", BlockSlope2[A], BlockSlope2[A]);
     config.read("width", BlockWidth[A], BlockWidth[A]);
     config.read("height", BlockHeight[A], BlockHeight[A]);
-    config.read("hitspot1", BlockOnlyHitspot1[A], BlockOnlyHitspot1[A]);
+    config.read("semi-solid", BlockOnlyHitspot1[A], BlockOnlyHitspot1[A]);
     config.read("lava", BlockKills[A], BlockKills[A]);
     config.read("kills", BlockKills3[A], BlockKills3[A]);
     config.read("hurts", BlockHurts[A], BlockHurts[A]);
-    config.read("pswitch", BlockPSwitch[A], BlockPSwitch[A]);
-    config.read("bouncy", BlockBouncy[A], BlockBouncy[A]);
+    config.read("switch-id", BlockPSwitch[A], BlockPSwitch[A]);
+    config.read("bounce", BlockBouncy[A], BlockBouncy[A]);
     config.endGroup();
 }
