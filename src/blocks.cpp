@@ -1481,11 +1481,11 @@ void BlockFrames()
     // Update block frame
     for(A = 0; A <= maxBlockType; A++)
     {
-        BlockFrame2[A] = BlockFrame2[A] + 1;
+        BlockFrame2[A]++;
         if(BlockFrame2[A] >= BlockFrameSpeed[A])
         {
             BlockFrame2[A] = 0;
-            BlockFrame[A] = BlockFrame[A] + 1;
+            BlockFrame[A]++;
             if(BlockFrame[A] >= BlockFrameCount[A])
             {
                 BlockFrame[A] = 0;
