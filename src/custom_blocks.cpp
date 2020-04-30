@@ -106,6 +106,7 @@ void LoadCustomBlock(int A, std::string cFileName)
 
     config.read("npc-passthrough", BlockNPCNoClipping[A], BlockNPCNoClipping[A]);
     config.read("npcpassthrough", BlockNPCNoClipping[A], BlockNPCNoClipping[A]); // alias
+
     config.read("passthrough", BlockNoClipping[A], BlockNoClipping[A]);
 
     config.read("floorslope", BlockSlope[A], BlockSlope[A]);
@@ -177,6 +178,7 @@ void LoadCustomBlock(int A, std::string cFileName)
     config.read("pswitch", BlockPSwitch[A], BlockPSwitch[A]); // alias
 
     config.read("bounce", BlockBouncy[A], BlockBouncy[A]);
+
     config.read("bounce-side", BlockBouncyHorizontal[A], BlockBouncyHorizontal[A]);
     config.read("bounceside", BlockBouncyHorizontal[A], BlockBouncyHorizontal[A]);//alias
 
