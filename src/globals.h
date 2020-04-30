@@ -789,6 +789,8 @@ struct BlockDefaults_t
     RangeArrI<bool, 0, maxBlockType, false> BlockNPCNoClipping;
     RangeArrI<bool, 0, maxBlockType, false> BlockBouncy;
     RangeArrI<bool, 0, maxBlockType, false> BlockBouncyHorizontal;
+    RangeArrI<bool, 0, maxBlockType, 1> BlockFrameCount;
+    RangeArrI<bool, 0, maxBlockType, 8> BlockFrameSpeed;
 };
 
 extern BlockDefaults_t BlockDefaults;
@@ -1636,6 +1638,10 @@ extern RangeArrI<bool, 0, maxBlockType, false> BlockNPCNoClipping;
 extern RangeArrI<bool, 0, maxBlockType, false> BlockBouncy;
 //Public BlockBouncyHorizontal(0 To maxBlockType) as Boolean 'block bounces player horizontally
 extern RangeArrI<bool, 0, maxBlockType, false> BlockBouncyHorizontal;
+//Public BlockFrameCount(0 To maxBlockType) As Integer 'how many frames of animation does this block have
+extern RangeArrI<int, 0, maxBlockType, 1> BlockFrameCount;
+//Public BlockFrameSpeed(0 To maxBlockType) As Integer 'how many frames before the next block frane
+extern RangeArrI<int, 0, maxBlockType, 8> BlockFrameSpeed;
 //Public CoinFrame(1 To 10) As Integer 'What frame the coin is on
 extern RangeArrI<int, 1, 10, 0> CoinFrame;
 //Public CoinFrame2(1 To 10) As Integer 'Counter to update the coin frames

@@ -225,6 +225,8 @@ RangeArrI<int, 1, maxBackgroundType, 0> BackgroundFrame;
 RangeArrI<int, 1, maxBackgroundType, 0> BackgroundFrameCount;
 RangeArrI<int, 0, maxBlockType, 0> BlockFrame;
 RangeArrI<int, 0, maxBlockType, 0> BlockFrame2;
+RangeArrI<int, 0, maxBlockType, 1> BlockFrameCount;
+RangeArrI<int, 0, maxBlockType, 8> BlockFrameSpeed;
 RangeArrI<int, 1, 1000, 0> sBlockArray;
 int sBlockNum = 0;
 RangeArrI<int, 1, maxSceneType, 0> SceneFrame;

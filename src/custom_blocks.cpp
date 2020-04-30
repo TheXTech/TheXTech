@@ -29,6 +29,8 @@ void SaveBlockDefaults()
         BlockDefaults.BlockNPCNoClipping[A] = BlockNPCNoClipping[A];
         BlockDefaults.BlockBouncy[A] = BlockBouncy[A];
         BlockDefaults.BlockBouncyHorizontal[A] = BlockBouncyHorizontal[A];
+        BlockDefaults.BlockFrameCount[A] = BlockFrameCount[A];
+        BlockDefaults.BlockFrameSpeed[A] = BlockFrameSpeed[A];
     }
 }
 
@@ -50,6 +52,8 @@ void LoadBlockDefaults()
         BlockNPCNoClipping[A] = BlockDefaults.BlockNPCNoClipping[A];
         BlockBouncy[A] = BlockDefaults.BlockBouncy[A];
         BlockBouncyHorizontal[A] = BlockDefaults.BlockBouncyHorizontal[A];
+        BlockFrameCount[A] = BlockDefaults.BlockFrameCount[A];
+        BlockFrameSpeed[A] = BlockDefaults.BlockFrameSpeed[A];
     }
 }
 
@@ -101,5 +105,7 @@ void LoadCustomBlock(int A, std::string cFileName)
     config.read("switch-id", BlockPSwitch[A], BlockPSwitch[A]);
     config.read("bounce", BlockBouncy[A], BlockBouncy[A]);
     config.read("bounce-side", BlockBouncyHorizontal[A], BlockBouncyHorizontal[A]);
+    config.read("frames", BlockFrameCount[A], BlockFrameCount[A]);
+    config.read("frame-speed", BlockFrameSpeed[A], BlockFrameSpeed[A]);
     config.endGroup();
 }

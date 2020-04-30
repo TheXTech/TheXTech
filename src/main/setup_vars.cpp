@@ -2427,6 +2427,7 @@ void SetupVars()
     {
         BlockWidth[A] = 32;
         BlockHeight[A] = 32;
+        BlockFrameSpeed[A] = 8;
     }
 
     BlockWidth[571] = 64;
@@ -2990,6 +2991,69 @@ void SetupVars()
     {
         BlockKills[A] = true;
     }
+
+
+    BlockFrameCount[4] = 4;
+    BlockFrameCount[5] = 4;
+    BlockFrameCount[30] = 4;
+    BlockFrameCount[55] = 4;
+    BlockFrameCount[88] = 4;
+    BlockFrameCount[109] = 8;
+    BlockFrameCount[169] = 4;
+    BlockFrameCount[170] = 4;
+    BlockFrameCount[173] = 4;
+    BlockFrameCount[176] = 4;
+    BlockFrameCount[179] = 4;
+    BlockFrameCount[193] = 4;
+    BlockFrameCount[371] = 8;
+    BlockFrameCount[379] = 4;
+    BlockFrameCount[380] = 4;
+    BlockFrameCount[381] = 4;
+    BlockFrameCount[382] = 4;
+    BlockFrameCount[389] = 4;
+    BlockFrameCount[391] = 4;
+    BlockFrameCount[392] = 4;
+    BlockFrameCount[404] = 4;
+    BlockFrameCount[459] = 4;
+    BlockFrameCount[460] = 4;
+    BlockFrameCount[461] = 4;
+    BlockFrameCount[462] = 4;
+    BlockFrameCount[463] = 4;
+    BlockFrameCount[464] = 4;
+    BlockFrameCount[465] = 4;
+    BlockFrameCount[466] = 4;
+    BlockFrameCount[468] = 4;
+    BlockFrameCount[469] = 4;
+    BlockFrameCount[470] = 4;
+    BlockFrameCount[471] = 4;
+    BlockFrameCount[472] = 4;
+    BlockFrameCount[473] = 4;
+    BlockFrameCount[474] = 4;
+    BlockFrameCount[475] = 4;
+    BlockFrameCount[476] = 4;
+    BlockFrameCount[477] = 4;
+    BlockFrameCount[478] = 4;
+    BlockFrameCount[479] = 4;
+    BlockFrameCount[480] = 4;
+    BlockFrameCount[481] = 4;
+    BlockFrameCount[482] = 4;
+    BlockFrameCount[483] = 4;
+    BlockFrameCount[484] = 4;
+    BlockFrameCount[485] = 4;
+    BlockFrameCount[486] = 4;
+    BlockFrameCount[487] = 4;
+    BlockFrameCount[511] = 4;
+    BlockFrameCount[598] = 4;
+    BlockFrameCount[622] = 4;
+    BlockFrameCount[623] = 4;
+    BlockFrameCount[624] = 4;
+    BlockFrameCount[625] = 4;
+    BlockFrameCount[631] = 4;
+    BlockFrameCount[715] = 4;
+    BlockFrameCount[716] = 4;
+
+    BlockFrameSpeed[109] = 4;
+    BlockFrameSpeed[379] = 12;
 
 
     BlockIsSizable[698] = true;

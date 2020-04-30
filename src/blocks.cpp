@@ -1478,91 +1478,23 @@ void BlockFrames()
 
     if(FreezeNPCs == true)
         return;
-    // Update block frame counter
-    BlockFrame2[4] = BlockFrame2[4] + 1;
-    if(BlockFrame2[4] == 8)
-        BlockFrame2[4] = 0;
-    BlockFrame2[5] = BlockFrame2[5] + 1;
-    if(BlockFrame2[5] == 8)
-        BlockFrame2[5] = 0;
-    BlockFrame2[30] = BlockFrame2[30] + 1;
-    if(BlockFrame2[30] == 8)
-        BlockFrame2[30] = 0;
-    BlockFrame2[55] = BlockFrame2[55] + 1;
-    if(BlockFrame2[55] == 8)
-        BlockFrame2[55] = 0;
-    BlockFrame2[88] = BlockFrame2[88] + 1;
-    if(BlockFrame2[88] == 8)
-        BlockFrame2[88] = 0;
-    BlockFrame2[109] = BlockFrame2[109] + 1;
-    if(BlockFrame2[109] == 4)
-        BlockFrame2[109] = 0;
-    BlockFrame2[371] = BlockFrame2[371] + 1;
-    if(BlockFrame2[371] == 8)
-        BlockFrame2[371] = 0;
-    BlockFrame2[379] = BlockFrame2[379] + 1;
-    if(BlockFrame2[379] >= 12)
-        BlockFrame2[379] = 0;
-    // Check if the block type is ready for the next frame
-    if(BlockFrame2[4] == 0)
+    // Update block frame
+    for(A = 0; A <= maxBlockType; A++)
     {
-        BlockFrame[4] = BlockFrame[4] + 1;
-        if(BlockFrame[4] == 4)
-            BlockFrame[4] = 0;
+        BlockFrame2[A] = BlockFrame2[A] + 1;
+        if(BlockFrame2[A] >= BlockFrameSpeed[A])
+        {
+            BlockFrame2[A] = 0;
+            BlockFrame[A] = BlockFrame[A] + 1;
+            if(BlockFrame[A] >= BlockFrameCount[A])
+            {
+                BlockFrame[A] = 0;
+            }
+        }
     }
-    if(BlockFrame2[5] == 0)
-    {
-        BlockFrame[5] = BlockFrame[5] + 1;
-        if(BlockFrame[5] == 4)
-            BlockFrame[5] = 0;
-    }
-    BlockFrame[598] = BlockFrame[5];
-    BlockFrame[511] = BlockFrame[5];
-    BlockFrame[169] = BlockFrame[5];
-    BlockFrame[173] = BlockFrame[5];
-    BlockFrame[176] = BlockFrame[5];
-    BlockFrame[179] = BlockFrame[5];
-    BlockFrame[193] = BlockFrame[5];
-    BlockFrame[389] = BlockFrame[5];
-    BlockFrame[391] = BlockFrame[5];
-    BlockFrame[392] = BlockFrame[5];
-    BlockFrame[404] = BlockFrame[5];
-    BlockFrame[459] = BlockFrame[5];
-    BlockFrame[460] = BlockFrame[5];
-    BlockFrame[461] = BlockFrame[5];
-    BlockFrame[462] = BlockFrame[5];
-    BlockFrame[463] = BlockFrame[5];
-    BlockFrame[464] = BlockFrame[5];
-    BlockFrame[465] = BlockFrame[5];
-    BlockFrame[466] = BlockFrame[5];
-    BlockFrame[468] = BlockFrame[5];
-    BlockFrame[469] = BlockFrame[5];
-    BlockFrame[470] = BlockFrame[5];
-    BlockFrame[471] = BlockFrame[5];
-    BlockFrame[472] = BlockFrame[5];
-    BlockFrame[473] = BlockFrame[5];
-    BlockFrame[474] = BlockFrame[5];
-    BlockFrame[475] = BlockFrame[5];
-    BlockFrame[476] = BlockFrame[5];
-    BlockFrame[477] = BlockFrame[5];
-    BlockFrame[478] = BlockFrame[5];
-    BlockFrame[479] = BlockFrame[5];
-    BlockFrame[480] = BlockFrame[5];
-    BlockFrame[481] = BlockFrame[5];
-    BlockFrame[482] = BlockFrame[5];
-    BlockFrame[483] = BlockFrame[5];
-    BlockFrame[484] = BlockFrame[5];
-    BlockFrame[485] = BlockFrame[5];
-    BlockFrame[486] = BlockFrame[5];
-    BlockFrame[487] = BlockFrame[5];
-    BlockFrame[622] = BlockFrame[5];
-    BlockFrame[623] = BlockFrame[5];
-    BlockFrame[624] = BlockFrame[5];
-    BlockFrame[625] = BlockFrame[5];
-    BlockFrame[631] = BlockFrame[5];
-    BlockFrame[715] = BlockFrame[5];
-    BlockFrame[716] = BlockFrame[5];
 
+
+    // special frame handling
     for(A = 1; A <= numPlayers; A++)
     {
         if(Player[A].Character == 1)
@@ -1576,6 +1508,10 @@ void BlockFrames()
         if(Player[A].Character == 5)
             BlockFrame[631] = 4;
     }
+
+
+
+
 
     BlockFrame2[626] = BlockFrame2[626] + 1;
     if(BlockFrame2[626] < 8)
@@ -1637,46 +1573,6 @@ void BlockFrames()
     if(pChar[5] == false)
         BlockFrame[632] = 0;
 
-    if(BlockFrame2[30] == 0)
-    {
-        BlockFrame[30] = BlockFrame[30] + 1;
-        if(BlockFrame[30] == 4)
-            BlockFrame[30] = 0;
-    }
-    if(BlockFrame2[55] == 0)
-    {
-        BlockFrame[55] = BlockFrame[55] + 1;
-        if(BlockFrame[55] == 4)
-            BlockFrame[55] = 0;
-    }
-    if(BlockFrame2[88] == 0)
-    {
-        BlockFrame[88] = BlockFrame[88] + 1;
-        if(BlockFrame[88] == 4)
-            BlockFrame[88] = 0;
-    }
-    BlockFrame[170] = BlockFrame[88];
-    if(BlockFrame2[109] == 0)
-    {
-        BlockFrame[109] = BlockFrame[109] + 1;
-        if(BlockFrame[109] == 8)
-            BlockFrame[109] = 0;
-    }
-    if(BlockFrame2[371] == 0)
-    {
-        BlockFrame[371] = BlockFrame[371] + 1;
-        if(BlockFrame[371] == 8)
-            BlockFrame[371] = 0;
-    }
-    if(BlockFrame2[379] == 0)
-    {
-        BlockFrame[379] = BlockFrame[379] + 1;
-        if(BlockFrame[379] == 4)
-            BlockFrame[379] = 0;
-    }
-    BlockFrame[380] = BlockFrame[379];
-    BlockFrame[381] = BlockFrame[379];
-    BlockFrame[382] = BlockFrame[379];
 
     BlockFrame2[530] = BlockFrame2[530] + 1;
     if(BlockFrame2[530] <= 8)
