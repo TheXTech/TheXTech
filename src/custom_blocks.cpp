@@ -91,21 +91,21 @@ void LoadCustomBlock(int A, std::string cFileName)
     if(!config.beginGroup("block"))
            config.beginGroup("General");
     config.read("sizeable", BlockIsSizable[A], BlockIsSizable[A]);
-    config.read("player-no-clipping", BlockPlayerNoClipping[A], BlockPlayerNoClipping[A]);
-    config.read("npc-no-clipping", BlockNPCNoClipping[A], BlockNPCNoClipping[A]);
-    config.read("no-clipping", BlockNoClipping[A], BlockNoClipping[A]);
-    config.read("floor-slope", BlockSlope[A], BlockSlope[A]);
-    config.read("celling-slope", BlockSlope2[A], BlockSlope2[A]);
+    config.read("playerpassthrough", BlockPlayerNoClipping[A], BlockPlayerNoClipping[A]);
+    config.read("npcpassthrough", BlockNPCNoClipping[A], BlockNPCNoClipping[A]);
+    config.read("passthrough", BlockNoClipping[A], BlockNoClipping[A]);
+    config.read("floorslope", BlockSlope[A], BlockSlope[A]);
+    config.read("cellingslope", BlockSlope2[A], BlockSlope2[A]);
     config.read("width", BlockWidth[A], BlockWidth[A]);
     config.read("height", BlockHeight[A], BlockHeight[A]);
-    config.read("semi-solid", BlockOnlyHitspot1[A], BlockOnlyHitspot1[A]);
+    config.read("semisolid", BlockOnlyHitspot1[A], BlockOnlyHitspot1[A]);
     config.read("lava", BlockKills[A], BlockKills[A]);
     config.read("kills", BlockKills3[A], BlockKills3[A]);
     config.read("hurts", BlockHurts[A], BlockHurts[A]);
-    config.read("switch-id", BlockPSwitch[A], BlockPSwitch[A]);
+    config.read("switchid", BlockPSwitch[A], BlockPSwitch[A]);
     config.read("bounce", BlockBouncy[A], BlockBouncy[A]);
-    config.read("bounce-side", BlockBouncyHorizontal[A], BlockBouncyHorizontal[A]);
+    config.read("bounceside", BlockBouncyHorizontal[A], BlockBouncyHorizontal[A]);
     config.read("frames", BlockFrameCount[A], BlockFrameCount[A]);
-    config.read("frame-speed", BlockFrameSpeed[A], BlockFrameSpeed[A]);
+    config.read("framespeed", BlockFrameSpeed[A], BlockFrameSpeed[A]);
     config.endGroup();
 }
