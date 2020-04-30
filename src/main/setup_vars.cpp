@@ -3296,6 +3296,22 @@ void SetupVars()
     TileHeight[27] = 128;
     TileWidth[325] = 64;
     TileHeight[325] = 64;
+
+
+    For(A, 1, maxPathType)
+    {
+        PathWidth[A] = 32;
+        PathHeight[A] = 32;
+        PathFrameCount[A] = 1;
+        PathFrameSpeed[A] = 8;
+    }
+
+    PathFrameCount[35] = 4;
+    PathFrameCount[36] = 4;
+    PathFrameCount[37] = 4;
+    PathFrameCount[38] = 4;
+
+
     Points[1] = 10;
     Points[2] = 100;
     Points[3] = 200;

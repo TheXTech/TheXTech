@@ -154,6 +154,23 @@ void UpdateGraphics2()
         TileFrame[241] = TileFrame[14];
     }
 
+
+
+    // Update path frames
+    for(A = 1; A <= maxPathType; A++)
+    {
+        PathFrame2[A]++;
+        if(PathFrame2[A] >= PathFrameSpeed[A])
+        {
+            PathFrame2[A] = 0;
+            PathFrame[A]++;
+            if(PathFrame[A] >= PathFrameCount[A])
+            {
+                PathFrame[A] = 0;
+            }
+        }
+    }
+
 //    if(WorldEditor == true)
 //    {
 //        frmMain.renderTexture(0, 0, ScreenW, ScreenH, 0, 0, 0);
@@ -252,9 +269,10 @@ void UpdateGraphics2()
                 frmMain.renderTexture(vScreenX[Z] + WorldPath[A].Location.X,
                                       vScreenY[Z] + WorldPath[A].Location.Y,
                                       WorldPath[A].Location.Width, WorldPath[A].Location.Height,
-                                      GFXPathBMP[WorldPath[A].Type], 0, 0);
+                                      GFXPathBMP[WorldPath[A].Type], 0, PathHeight[WorldPath[A].Type] * PathFrame[WorldPath[A].Type]);
             }
         }
+
         for(A = 1; A <= numWorldLevels; A++)
         {
             if(vScreenCollision2(1, WorldLevel[A].Location) == true && WorldLevel[A].Active == true)

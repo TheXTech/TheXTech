@@ -1612,6 +1612,22 @@ extern RangeArrI<int, 1, maxTileType, 0> TileHeight;
 extern RangeArrI<int, 1, maxTileType, 0> TileFrame;
 //Public TileFrame2(1 To maxTileType) As Integer
 extern RangeArrI<int, 1, maxTileType, 0> TileFrame2;
+
+
+
+//Public PathWidth(1 To maxTileType) As Integer
+extern RangeArrI<int, 1, maxPathType, 32> PathWidth;
+//Public PathHeight(1 To maxTileType) As Integer
+extern RangeArrI<int, 1, maxPathType, 32> PathHeight;
+//Public PathFrame(1 To maxTileType) As Integer
+extern RangeArrI<int, 1, maxPathType, 0> PathFrame;
+//Public PathFrame2(1 To maxTileType) As Integer
+extern RangeArrI<int, 1, maxPathType, 0> PathFrame2;
+//Public PathFrameCount(1 To maxTileType) As Integer
+extern RangeArrI<int, 1, maxPathType, 1> PathFrameCount;
+//Public PathFrameSpeed(1 To maxTileType) As Integer
+extern RangeArrI<int, 1, maxPathType, 8> PathFrameSpeed;
+
 //Public LevelFrame(1 To 100) As Integer 'What frame the scene is on
 extern RangeArrI<int, 1, 100, 0> LevelFrame;
 //Public LevelFrame2(1 To 100) As Integer 'Counter to update the scene frames
