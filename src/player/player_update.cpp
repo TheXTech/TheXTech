@@ -3205,13 +3205,13 @@ void UpdatePlayer()
                 }
                 if(!tempHit && tempHit2)
                 {
-                    if(Player[A].Location.SpeedX + NPC[Player[A].StandingOnNPC].Location.SpeedX > 0 && Player[A].Controls.Right)
+                    if(Player[A].Location.SpeedX + NPC[Player[A].StandingOnNPC].Location.SpeedX > 0 && Player[A].Controls.Right && BlockBouncyHorizontal[Block[tempSlope2].Type] == false)
                     {
                         Player[A].Location.SpeedX = 0.2 * Player[A].Direction;
                         if(blockPushX > 0)
                             Player[A].Location.SpeedX = Player[A].Location.SpeedX + blockPushX;
                     }
-                    else if(Player[A].Location.SpeedX + NPC[Player[A].StandingOnNPC].Location.SpeedX < 0 && Player[A].Controls.Left)
+                    else if(Player[A].Location.SpeedX + NPC[Player[A].StandingOnNPC].Location.SpeedX < 0 && Player[A].Controls.Left && BlockBouncyHorizontal[Block[tempSlope2].Type] == false)
                     {
                         Player[A].Location.SpeedX = 0.2 * Player[A].Direction;
                         if(blockPushX < 0)
@@ -3227,18 +3227,23 @@ void UpdatePlayer()
                     if(Player[A].Mount == 2)
                         Player[A].Location.SpeedX = 0;
 
+                }
 
-                    if(BlockBouncyHorizontal[Block[tempSlope2].Type] == true && tempHit3 == 0)
+                if(tempSlope2 > 0)
+                {
+                    if(BlockBouncyHorizontal[Block[tempSlope2].Type] == true)
                     {
                         if(Player[A].Location.X > tempSlope2X)
                         {
                             Player[A].Location.SpeedX = Player[A].Location.SpeedX * -0.2 + 3;
                             BlockShakeLeft(tempSlope2);
+                            PlaySound(3);
                         }
                         if(Player[A].Location.X < tempSlope2X)
                         {
                             Player[A].Location.SpeedX = Player[A].Location.SpeedX * -0.2 - 3;
                             BlockShakeRight(tempSlope2);
+                            PlaySound(3);
                         }
                     }
                 }
