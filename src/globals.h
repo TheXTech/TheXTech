@@ -789,11 +789,22 @@ struct BlockDefaults_t
     RangeArrI<bool, 0, maxBlockType, false> BlockNPCNoClipping;
     RangeArrI<bool, 0, maxBlockType, false> BlockBouncy;
     RangeArrI<bool, 0, maxBlockType, false> BlockBouncyHorizontal;
-    RangeArrI<bool, 0, maxBlockType, 1> BlockFrameCount;
-    RangeArrI<bool, 0, maxBlockType, 8> BlockFrameSpeed;
+    RangeArrI<int, 0, maxBlockType, 1> BlockFrameCount;
+    RangeArrI<int, 0, maxBlockType, 8> BlockFrameSpeed;
 };
 
 extern BlockDefaults_t BlockDefaults;
+
+
+struct PathDefaults_t
+{
+    RangeArrI<int, 1, maxPathType, 32> PathWidth;
+    RangeArrI<int, 1, maxPathType, 32> PathHeight;
+    RangeArrI<int, 1, maxPathType, 1> PathFrameCount;
+    RangeArrI<int, 1, maxPathType, 8> PathFrameSpeed;
+};
+
+extern PathDefaults_t PathDefaults;
 
 //Public Type Block   'Blocks
 struct Block_t

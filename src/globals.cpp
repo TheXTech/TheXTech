@@ -260,6 +260,7 @@ EditorCursor_t EditorCursor;
 EditorControls_t EditorControls;
 
 BlockDefaults_t BlockDefaults;
+PathDefaults_t PathDefaults;
 
 RangeArrI<int, 1, numSounds, 0> Sound;
 RangeArrI<int, 1, numSounds, 0> SoundPause;
