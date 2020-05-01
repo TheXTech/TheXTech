@@ -2430,7 +2430,20 @@ void SetupVars()
         BlockWidth[A] = 32;
         BlockHeight[A] = 32;
         BlockFrameSpeed[A] = 8;
+        BlockBrick[A] = false;
+        BlockBrickEffect[A] = 1;
     }
+
+    BlockBrick[60] = true;
+    BlockBrick[188] = true;
+    BlockBrick[457] = true;
+    BlockBrick[526] = true;
+    BlockBrick[293] = true;
+    BlockBrickEffect[60] = 21;
+    BlockBrickEffect[188] = 51;
+    BlockBrickEffect[457] = 100;
+    BlockBrickEffect[526] = 107;
+    BlockBrickEffect[293] = 135;
 
     BlockWidth[571] = 64;
     BlockWidth[572] = 64;

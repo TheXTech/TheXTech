@@ -186,12 +186,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
     }
 
     // Shake the block
-    if((b.Type == 4 || b.Type == 615 || b.Type == 55 ||
-       b.Type == 60 || b.Type == 90 || b.Type == 159 ||
-       b.Type == 169 || b.Type == 170 || b.Type == 173 ||
-       b.Type == 176 || b.Type == 179 || b.Type == 188 ||
-       b.Type == 226 || b.Type == 281 || b.Type == 282 ||
-       b.Type == 283 || (b.Type >= 622 && b.Type <= 625) || BlockBouncy[b.Type] == true) && HitSide == false)
+    if((BlockBrick[b.Type] == true || BlockBouncy[b.Type] == true) && HitSide == false)
     {
         if(HitDown == false)
             BlockShakeUp(A);
@@ -1404,25 +1399,10 @@ void KillBlock(int A, bool Splode)
         Block[A].RespawnDelay = 1;
     if(Splode == true)
     {
-        if(Block[A].Type == 526)
-            PlaySound(64);
-        else if(Block[A].Type == 186)
-            PlaySound(43);
-        else
-            PlaySound(4); // Block smashed
-        // Create the break effect
-        if(Block[A].Type == 60)
-            NewEffect(21, Block[A].Location);
-        else if(Block[A].Type == 188)
-            NewEffect(51, Block[A].Location);
-        else if(Block[A].Type == 457)
-            NewEffect(100, Block[A].Location);
-        else if(Block[A].Type == 526)
-            NewEffect(107, Block[A].Location);
-        else if(Block[A].Type == 293)
-            NewEffect(135, Block[A].Location);
-        else
-            NewEffect(1, Block[A].Location);
+        if(BlockBrick[Block[A].Type] == true)
+        {
+            NewEffect(BlockBrickEffect[Block[A].Type], Block[A].Location);
+        }
     }
     if(LevelEditor == true)
     {
@@ -1886,10 +1866,7 @@ void UpdateBlocks()
             Block[iBlock[A]].Kill = false;
             if(Block[iBlock[A]].Special == 0)
             {
-                if(Block[iBlock[A]].Type == 4 || Block[iBlock[A]].Type == 60 ||
-                   Block[iBlock[A]].Type == 90 || Block[iBlock[A]].Type == 188 ||
-                   Block[iBlock[A]].Type == 226 || Block[iBlock[A]].Type == 293 ||
-                   Block[iBlock[A]].Type == 526) // Check to see if it is breakable
+                if(BlockBrick[iBlock[A]] == true) // Check to see if it is breakable
                     KillBlock(iBlock[A]); // Destroy the block
             }
         }

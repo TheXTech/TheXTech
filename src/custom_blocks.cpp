@@ -29,6 +29,8 @@ void SaveBlockDefaults()
         BlockDefaults.BlockNPCNoClipping[A] = BlockNPCNoClipping[A];
         BlockDefaults.BlockBouncy[A] = BlockBouncy[A];
         BlockDefaults.BlockBouncyHorizontal[A] = BlockBouncyHorizontal[A];
+        BlockDefaults.BlockBrick[A] = BlockBrick[A];
+        BlockDefaults.BlockBrickEffect[A] = BlockBrickEffect[A];
         BlockDefaults.BlockFrameCount[A] = BlockFrameCount[A];
         BlockDefaults.BlockFrameSpeed[A] = BlockFrameSpeed[A];
     }
@@ -52,6 +54,8 @@ void LoadBlockDefaults()
         BlockNPCNoClipping[A] = BlockDefaults.BlockNPCNoClipping[A];
         BlockBouncy[A] = BlockDefaults.BlockBouncy[A];
         BlockBouncyHorizontal[A] = BlockDefaults.BlockBouncyHorizontal[A];
+        BlockBrick[A] = BlockDefaults.BlockBrick[A];
+        BlockBrickEffect[A] = BlockDefaults.BlockBrickEffect[A];
         BlockFrameCount[A] = BlockDefaults.BlockFrameCount[A];
         BlockFrameSpeed[A] = BlockDefaults.BlockFrameSpeed[A];
     }
@@ -178,6 +182,10 @@ void LoadCustomBlock(int A, std::string cFileName)
     config.read("pswitch", BlockPSwitch[A], BlockPSwitch[A]); // alias
 
     config.read("bounce", BlockBouncy[A], BlockBouncy[A]);
+
+    config.read("smashable", BlockBrick[A], BlockBrick[A]);
+    config.read("destroyeffect", BlockBrickEffect[A], BlockBrickEffect[A]);
+    config.read("destroy-effect", BlockBrickEffect[A], BlockBrickEffect[A]);
 
     config.read("bounce-side", BlockBouncyHorizontal[A], BlockBouncyHorizontal[A]);
     config.read("bounceside", BlockBouncyHorizontal[A], BlockBouncyHorizontal[A]);//alias

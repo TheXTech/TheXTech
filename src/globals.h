@@ -219,14 +219,6 @@ struct EditorControls_t
 //End Type
 };
 
-struct SectionExtras_t
-{
-    bool blinking_enabled = false;
-    bool timer_enabled = false;
-    double blinking_timer = 60.0;
-    int s_timer = 300;
-};
-
 //Public Type conKeyboard  'Input settings for the keyboard
 struct ConKeyboard_t
 {
@@ -787,6 +779,8 @@ struct BlockDefaults_t
     RangeArrI<bool, 0, maxBlockType, false> BlockPSwitch;
     RangeArrI<bool, 0, maxBlockType, false> BlockNoClipping;
     RangeArrI<bool, 0, maxBlockType, false> BlockNPCNoClipping;
+    RangeArrI<bool, 0, maxBlockType, false> BlockBrick;
+    RangeArrI<int, 0, maxBlockType, 0> BlockBrickEffect;
     RangeArrI<bool, 0, maxBlockType, false> BlockBouncy;
     RangeArrI<bool, 0, maxBlockType, false> BlockBouncyHorizontal;
     RangeArrI<int, 0, maxBlockType, 1> BlockFrameCount;
@@ -1300,6 +1294,8 @@ extern int curMusic;
 extern RangeArrI<long, 0, maxSections, 0> bgColor;
 //Public Background2(0 To maxSections) As Integer 'level background
 extern RangeArrI<int, 0, maxSections, 0> Background2;
+extern RangeArrI<int, 0, maxSections, 0> SectionTimer;
+extern RangeArrI<int, 0, maxSections, 0> SectionTimerTurn;
 //Public WorldPath(1 To maxWorldPaths) As WorldPath
 extern RangeArr<WorldPath_t, 1, maxWorldPaths> WorldPath;
 //Public numWorldPaths As Integer
@@ -1642,6 +1638,7 @@ extern RangeArrI<int, 1, maxPathType, 0> PathFrame2;
 extern RangeArrI<int, 1, maxPathType, 1> PathFrameCount;
 //Public PathFrameSpeed(1 To maxPathType) As Integer
 extern RangeArrI<int, 1, maxPathType, 14> PathFrameSpeed;
+extern RangeArrI<int, 1, maxPathType, 2> PathPlayerSpeed;
 
 //Public LevelFrame(1 To 100) As Integer 'What frame the scene is on
 extern RangeArrI<int, 1, 100, 0> LevelFrame;
@@ -1669,6 +1666,8 @@ extern RangeArrI<bool, 0, maxBlockType, false> BlockNPCNoClipping;
 extern RangeArrI<bool, 0, maxBlockType, false> BlockBouncy;
 //Public BlockBouncyHorizontal(0 To maxBlockType) as Boolean 'block bounces player horizontally
 extern RangeArrI<bool, 0, maxBlockType, false> BlockBouncyHorizontal;
+extern RangeArrI<bool, 0, maxBlockType, false> BlockBrick;
+extern RangeArrI<int, 0, maxBlockType, 0> BlockBrickEffect;
 //Public BlockFrameCount(0 To maxBlockType) As Integer 'how many frames of animation does this block have
 extern RangeArrI<int, 0, maxBlockType, 1> BlockFrameCount;
 //Public BlockFrameSpeed(0 To maxBlockType) As Integer 'how many frames before the next block frane
@@ -2071,7 +2070,7 @@ extern RangeArr<StdPicture, 0, 9> Font1;
 extern RangeArr<StdPicture, 1, 3> Font2;
 extern StdPicture Font2S;
 extern RangeArr<StdPicture, 1, 2> Heart;
-extern RangeArr<StdPicture, 0, 8> Interface;
+extern RangeArr<StdPicture, 0, 9> Interface;
 extern StdPicture LoadCoin;
 extern StdPicture Loader;
 extern RangeArr<StdPicture, 0, 3> MCursor;

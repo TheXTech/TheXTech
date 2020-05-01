@@ -2171,6 +2171,22 @@ void NPCHit(int A, int B, int C)
         else if(B == 1 || B == 8)
             NPC[A].Killed = B;
     }
+    else if(NPC[A].Type == 19 || NPC[A].Type == 20 || NPC[A].Type == 247 || NPC[A].Type == 25 ||
+            NPC[A].Type == 36 || NPC[A].Type == 285 || NPC[A].Type == 286 ||
+            NPC[A].Type == 48 || NPC[A].Type == 53 || NPC[A].Type == 54 || NPC[A].Type == 340 || NPC[A].Type == 318 ||
+            (NPC[A].Type >= 129 && NPC[A].Type <= 132) || NPC[A].Type == 231 || NPC[A].Type == 235 ||
+            NPC[A].Type == 261 || NPC[A].Type == 272 || NPC[A].Type == 319 || NPC[A].Type == 320 || NPC[A].Type == 321 ||
+            NPC[A].Type == 322 || NPC[A].Type == 330 || NPC[A].Type == 331 || NPC[A].Type == 332 || NPC[A].Type == 333)
+    {
+        if(B == 10 || B == 6 || B == 3 || B == 4)
+            NPC[A].Killed = B;
+        else if(B == 1 && NPCCanWalkOn[NPC[A].Type] == false && NPCJumpHurt[NPC[A].Type] == false)
+        {
+            NPC[A].Killed = 1;
+            NPC[A].Location.SpeedY = 0.123;
+            NPC[A].Location.SpeedX = 0;
+        }
+    }
     else if(NPCIsAnExit[NPC[A].Type])
     {
         if(B == 6)
