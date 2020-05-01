@@ -1989,8 +1989,7 @@ void NPCHit(int A, int B, int C)
         tempLocation.Y = NPC[A].Location.Y - tempLocation.Height / 4;
         Bomb(tempLocation, 3, 0);
     }
-    else if(NPC[A].Type == 21 || NPC[A].Type == 22 || NPC[A].Type == 26 || NPC[A].Type == 31 || NPC[A].Type == 32 || NPC[A].Type == 238 || NPC[A].Type == 239 || NPC[A].Type == 35 || NPC[A].Type == 191 || NPC[A].Type == 193 || NPC[A].Type == 49 || NPCIsYoshi[NPC[A].Type] || NPC[A].Type == 96 || (NPC[A].Type >= 1
-                                                                                                                                                                                                                                                                                                        && NPC[A].Type <= 157) || NPC[A].Type == 240 || NPC[A].Type == 241 || NPC[A].Type == 278 || NPC[A].Type == 279 || NPC[A].Type == 305)
+    else if(NPC[A].Type == 21 || NPC[A].Type == 22 || NPC[A].Type == 26 || NPC[A].Type == 31 || NPC[A].Type == 32 || NPC[A].Type == 238 || NPC[A].Type == 239 || NPC[A].Type == 35 || NPC[A].Type == 191 || NPC[A].Type == 193 || NPC[A].Type == 49 || NPCIsYoshi[NPC[A].Type] || NPC[A].Type == 96 || NPC[A].Type == 240 || NPC[A].Type == 241 || NPC[A].Type == 278 || NPC[A].Type == 279 || NPC[A].Type == 305)
     {
         if(NPC[A].Type == 241 && (B == 4 || B == 5 || B == 10))
         {
@@ -2172,22 +2171,6 @@ void NPCHit(int A, int B, int C)
         else if(B == 1 || B == 8)
             NPC[A].Killed = B;
     }
-    else if(NPC[A].Type == 19 || NPC[A].Type == 20 || NPC[A].Type == 247 || NPC[A].Type == 25 ||
-            NPC[A].Type == 36 || NPC[A].Type == 285 || NPC[A].Type == 286 ||
-            NPC[A].Type == 48 || NPC[A].Type == 53 || NPC[A].Type == 54 || NPC[A].Type == 340 || NPC[A].Type == 318 ||
-            (NPC[A].Type >= 129 && NPC[A].Type <= 132) || NPC[A].Type == 231 || NPC[A].Type == 235 ||
-            NPC[A].Type == 261 || NPC[A].Type == 272 || NPC[A].Type == 319 || NPC[A].Type == 320 || NPC[A].Type == 321 ||
-            NPC[A].Type == 322 || NPC[A].Type == 330 || NPC[A].Type == 331 || NPC[A].Type == 332 || NPC[A].Type == 333)
-    {
-        if(B == 10 || B == 6 || B == 3 || B == 4)
-            NPC[A].Killed = B;
-        else if(B == 1 && NPCCanWalkOn[NPC[A].Type] == false && NPCJumpHurt[NPC[A].Type] == false)
-        {
-            NPC[A].Killed = B;
-            NPC[A].Location.SpeedY = 0.123;
-            NPC[A].Location.SpeedX = 0;
-        }
-    }
     else if(NPCIsAnExit[NPC[A].Type])
     {
         if(B == 6)
@@ -2288,6 +2271,25 @@ void NPCHit(int A, int B, int C)
         {
             if(C > 0 && NPC[A].Effect == 0)
                 TouchBonus(C, A);
+        }
+    }
+
+    if(NPC[A].Type == 19 || NPC[A].Type == 20 || NPC[A].Type == 247 || NPC[A].Type == 25 ||
+            NPC[A].Type == 36 || NPC[A].Type == 285 || NPC[A].Type == 286 ||
+            NPC[A].Type == 48 || NPC[A].Type == 53 || NPC[A].Type == 54 || NPC[A].Type == 340 || NPC[A].Type == 318 ||
+            (NPC[A].Type >= 129 && NPC[A].Type <= 132) || NPC[A].Type == 231 || NPC[A].Type == 235 ||
+            NPC[A].Type == 261 || NPC[A].Type == 272 || NPC[A].Type == 319 || NPC[A].Type == 320 || NPC[A].Type == 321 ||
+            NPC[A].Type == 322 || NPC[A].Type == 330 || NPC[A].Type == 331 || NPC[A].Type == 332 || NPC[A].Type == 333)
+    {
+        if(B == 10 || B == 6 || B == 3 || B == 4)
+        {
+            NPC[A].Killed = B;
+        }
+        else if(B == 1 && NPCCanWalkOn[NPC[A].Type] == false && NPCJumpHurt[NPC[A].Type] == false)
+        {
+            NPC[A].Killed = B;
+            NPC[A].Location.SpeedY = 0.123;
+            NPC[A].Location.SpeedX = 0;
         }
     }
 

@@ -2315,7 +2315,7 @@ void SetupVars()
     NPCNoIceBall[278] = true;
     NPCNoIceBall[279] = true;
 
-    for(int A = 282; A <=292; ++A)
+    for(int A = 282; A <= 292; ++A)
     {
         if(A != 285 && A != 286)
             NPCNoIceBall[A] = true;
@@ -2395,10 +2395,8 @@ void SetupVars()
     NPCSpinJumpHurt[12] = false;
     NPCSpinJumpHurt[36] = false;
     NPCSpinJumpHurt[294] = false;
-    for(int A = 285; A <= 286; ++A)
-    {
-        NPCSpinJumpHurt[A] = false;
-    }
+    NPCSpinJumpHurt[285] = false;
+    NPCSpinJumpHurt[286] = false;
     for(int A = 332; A <= 333; ++A)
     {
         NPCSpinJumpHurt[A] = false;
@@ -2422,6 +2420,10 @@ void SetupVars()
     NPCJumpBounce[268] = true;
     NPCJumpBounce[281] = true;
     NPCJumpBounce[302] = true;
+
+
+
+
 
     For(A, 1, maxBlockType)
     {
