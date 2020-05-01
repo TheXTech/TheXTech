@@ -3307,10 +3307,13 @@ void UpdatePlayer()
                         BlockHit(B, false, A);
                     if(BlockBouncy[Block[B].Type] == true) // If it is a bouncy block the knock the player down
                         Player[A].Location.SpeedY = 3;
-                    if(Player[A].State > 1 && Player[A].Character != 5) // If the player was big ask the block nicely to die
+                    if(Player[A].State > 1 && Player[A].Character != 5 && BlockBrick[Block[B].Type] == true) // If the player was big ask the block nicely to die
                     {
                         if(Player[A].Mount != 2 && Block[B].Type != 293)
-                            BlockHitHard(B);
+                        {
+                            KillBlock(B);
+                            PlaySound(4);
+                        }
                     }
                 }
 

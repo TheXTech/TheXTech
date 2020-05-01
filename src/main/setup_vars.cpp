@@ -2434,6 +2434,7 @@ void SetupVars()
         BlockBrickEffect[A] = 1;
     }
 
+    BlockBrick[4] = true;
     BlockBrick[60] = true;
     BlockBrick[188] = true;
     BlockBrick[457] = true;
