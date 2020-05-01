@@ -801,7 +801,7 @@ struct PathDefaults_t
     RangeArrI<int, 1, maxPathType, 32> PathWidth;
     RangeArrI<int, 1, maxPathType, 32> PathHeight;
     RangeArrI<int, 1, maxPathType, 1> PathFrameCount;
-    RangeArrI<int, 1, maxPathType, 8> PathFrameSpeed;
+    RangeArrI<int, 1, maxPathType, 14> PathFrameSpeed;
 };
 
 extern PathDefaults_t PathDefaults;
@@ -1623,21 +1623,25 @@ extern RangeArrI<int, 1, maxTileType, 0> TileHeight;
 extern RangeArrI<int, 1, maxTileType, 0> TileFrame;
 //Public TileFrame2(1 To maxTileType) As Integer
 extern RangeArrI<int, 1, maxTileType, 0> TileFrame2;
+//Public TileFrameCount(1 To maxTileType) As Integer
+extern RangeArrI<int, 1, maxTileType, 1> TileFrameCount;
+//Public TileFrameSpeed(1 To maxTileType) As Integer
+extern RangeArrI<int, 1, maxTileType, 14> TileFrameSpeed;
 
 
 
-//Public PathWidth(1 To maxTileType) As Integer
+//Public PathWidth(1 To maxPathType) As Integer
 extern RangeArrI<int, 1, maxPathType, 32> PathWidth;
-//Public PathHeight(1 To maxTileType) As Integer
+//Public PathHeight(1 To maxPathType) As Integer
 extern RangeArrI<int, 1, maxPathType, 32> PathHeight;
-//Public PathFrame(1 To maxTileType) As Integer
+//Public PathFrame(1 To maxPathType) As Integer
 extern RangeArrI<int, 1, maxPathType, 0> PathFrame;
-//Public PathFrame2(1 To maxTileType) As Integer
+//Public PathFrame2(1 To maxPathType) As Integer
 extern RangeArrI<int, 1, maxPathType, 0> PathFrame2;
-//Public PathFrameCount(1 To maxTileType) As Integer
+//Public PathFrameCount(1 To maxPathType) As Integer
 extern RangeArrI<int, 1, maxPathType, 1> PathFrameCount;
-//Public PathFrameSpeed(1 To maxTileType) As Integer
-extern RangeArrI<int, 1, maxPathType, 8> PathFrameSpeed;
+//Public PathFrameSpeed(1 To maxPathType) As Integer
+extern RangeArrI<int, 1, maxPathType, 14> PathFrameSpeed;
 
 //Public LevelFrame(1 To 100) As Integer 'What frame the scene is on
 extern RangeArrI<int, 1, 100, 0> LevelFrame;

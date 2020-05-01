@@ -3283,7 +3283,10 @@ void SetupVars()
     {
         TileWidth[A] = 32;
         TileHeight[A] = 32;
+        TileFrameCount[A] = 1;
+        TileFrameSpeed[A] = 14;
     }
+
     TileWidth[8] = 64;
     TileHeight[8] = 64;
     TileWidth[9] = 96;
@@ -3297,20 +3300,43 @@ void SetupVars()
     TileWidth[325] = 64;
     TileHeight[325] = 64;
 
+    TileFrameCount[14] = 4;
+    TileFrameCount[27] = 4;
+    TileFrameCount[241] = 4;
+
+    TileFrameCount[355] = 4;
+    TileFrameCount[356] = 4;
+    TileFrameCount[357] = 4;
+    TileFrameCount[358] = 4;
+    TileFrameCount[359] = 4;
+    TileFrameCount[360] = 4;
+    TileFrameCount[361] = 4;
+    TileFrameCount[362] = 4;
+    TileFrameCount[363] = 4;
+    TileFrameCount[364] = 4;
+    TileFrameCount[365] = 4;
+    TileFrameCount[366] = 4;
+    TileFrameCount[369] = 4;
+    TileFrameCount[370] = 4;
+    TileFrameCount[371] = 4;
+    TileFrameCount[372] = 4;
 
     For(A, 1, maxPathType)
     {
         PathWidth[A] = 32;
         PathHeight[A] = 32;
         PathFrameCount[A] = 1;
-        PathFrameSpeed[A] = 8;
+        PathFrameSpeed[A] = 14;
     }
 
     PathFrameCount[35] = 4;
     PathFrameCount[36] = 4;
     PathFrameCount[37] = 4;
     PathFrameCount[38] = 4;
-
+    PathFrameCount[55] = 4;
+    PathFrameCount[56] = 4;
+    PathFrameCount[57] = 4;
+    PathFrameCount[58] = 4;
 
     Points[1] = 10;
     Points[2] = 100;

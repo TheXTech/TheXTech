@@ -143,17 +143,22 @@ void UpdateGraphics2()
             LevelFrame[25] = 0;
         LevelFrame[26] = LevelFrame[25];
     }
-    TileFrame2[14] = TileFrame2[14] + 1;
-    if(TileFrame2[14] >= 14)
-    {
-        TileFrame2[14] = 0;
-        TileFrame[14] = TileFrame[14] + 1;
-        if(TileFrame[14] >= 4)
-            TileFrame[14] = 0;
-        TileFrame[27] = TileFrame[14];
-        TileFrame[241] = TileFrame[14];
-    }
 
+
+    // Update tile frames
+    for(A = 1; A <= maxTileType; A++)
+    {
+        TileFrame2[A]++;
+        if(TileFrame2[A] >= TileFrameSpeed[A])
+        {
+            TileFrame2[A] = 0;
+            TileFrame[A]++;
+            if(TileFrame[A] >= TileFrameCount[A])
+            {
+                TileFrame[A] = 0;
+            }
+        }
+    }
 
 
     // Update path frames
