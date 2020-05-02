@@ -265,7 +265,7 @@ void UpdateGraphics2()
                     frmMain.renderTexture(vScreenX[Z] + WorldLevel[A].Location.X - (GFXLevelWidth[29] - LevelWidth[WorldLevel[A].Type]) * 0.5,
                                           vScreenY[Z] + WorldLevel[A].Location.Y,
                                           GFXLevelWidth[0], GFXLevelHeight[0],
-                                          GFXLevelBMP[0], 0, GFXLevelHeight[0] * LevelFrame[0]);
+                                          GFXLevelBMP[0], 0, 0);
                 }
                 if(WorldLevel[A].Path2 == true)
                 {
