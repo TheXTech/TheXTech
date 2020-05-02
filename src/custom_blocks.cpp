@@ -80,10 +80,15 @@ void FindCustomBlocks(/*std::string cFilePath*/)
 
     for(int A = 1; A < maxBlockType; ++A)
     {
+        std::string BlockPathBasegame = AppPath + fmt::format_ne("/config/block/block-{0}.txt", A);
+
         std::string BlockIniPath = FileNamePath + fmt::format_ne("block-{0}.ini", A);
         std::string BlockIniPathC = FileNamePath + FileName + fmt::format_ne("/block-{0}.ini", A);
         std::string BlockPath = FileNamePath + fmt::format_ne("block-{0}.txt", A);
         std::string BlockPathC = FileNamePath + FileName + fmt::format_ne("/block-{0}.txt", A);
+
+        if(Files::fileExists(BlockPathBasegame))
+            LoadCustomBlock(A, BlockPathBasegame);
 
         if(Files::fileExists(BlockIniPath))
             LoadCustomBlock(A, BlockIniPath);
@@ -205,6 +210,11 @@ void LoadCustomBlock(int A, std::string cFileName)
 
     if(BlockFrameSpeed[A] <= 0) // validate
         BlockFrameSpeed[A] = 1;
+
+
+    if(BlockKills[A] == true && BlockSlope[A] != 0)
+        BlockKills2[A] = true;
+
 
     config.endGroup();
 }
