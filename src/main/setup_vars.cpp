@@ -26,11 +26,18 @@
 #include "../globals.h"
 #include "../game_main.h"
 #include "../custom.h"
+#include "../custom_blocks.h"
+#include "../custom_bgo.h"
+#include "../custom_tiles.h"
+#include "../custom_paths.h"
+#include "../custom_levels.h"
+#include "../custom_scene.h"
 
 void SetupVars()
 {
     //int A;
     SetupPlayerFrames();
+
     for(int A = 1; A <= maxEffectType; A++)
     {
         EffectWidth[A] = 32;
@@ -2435,6 +2442,7 @@ void SetupVars()
     BlockBrick[457] = true;
     BlockBrick[526] = true;
     BlockBrick[293] = true;
+
     BlockBrickEffect[60] = 21;
     BlockBrickEffect[188] = 51;
     BlockBrickEffect[457] = 100;
@@ -3441,4 +3449,13 @@ void SetupVars()
         effectDefaults.EffectWidth[A] = EffectWidth[A];
     }
     SaveNPCDefaults();
+
+    FindCustomNPCs();
+    FindCustomBlocks();
+    FindCustomBGOs();
+
+    FindCustomTiles();
+    FindCustomPaths();
+    FindCustomLevels();
+    FindCustomScenery();
 }

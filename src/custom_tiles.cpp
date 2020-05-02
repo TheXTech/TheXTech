@@ -52,7 +52,7 @@ void FindCustomTiles(/*std::string cFilePath*/)
     for(int A = 1; A < maxTileType; ++A)
     {
 
-        std::string TilePathBasegame = AppPath + fmt::format_ne("config/tile/tile-{0}.txt", A);
+        std::string TilePathBasegame = AppPath + fmt::format_ne("/config/tile/tile-{0}.txt", A);
 
         std::string TileIniPath = FileNamePath + fmt::format_ne("tile-{0}.ini", A);
         std::string TileIniPathC = FileNamePath + FileName + fmt::format_ne("/tile-{0}.ini", A);
