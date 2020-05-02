@@ -797,6 +797,9 @@ struct BlockDefaults_t
     RangeArrI<int, 0, maxBlockType, 0> BlockBrickEffect;
     RangeArrI<bool, 0, maxBlockType, false> BlockBouncy;
     RangeArrI<bool, 0, maxBlockType, false> BlockBouncyHorizontal;
+    RangeArrI<bool, 0, maxBlockType, false> BlockDiggable;
+    RangeArrI<bool, 0, maxBlockType, false> BlockHitable;
+    RangeArrI<int, 0, maxBlockType, 2> BlockHitTransform;
     RangeArrI<int, 0, maxBlockType, 1> BlockFrameCount;
     RangeArrI<int, 0, maxBlockType, 8> BlockFrameSpeed;
 };
@@ -1733,6 +1736,12 @@ extern RangeArrI<bool, 0, maxBlockType, false> BlockNPCNoClipping;
 extern RangeArrI<bool, 0, maxBlockType, false> BlockBouncy;
 //Public BlockBouncyHorizontal(0 To maxBlockType) as Boolean 'block bounces player horizontally
 extern RangeArrI<bool, 0, maxBlockType, false> BlockBouncyHorizontal;
+//Public BlockHitable(0 to maxBlockType) as Boolean 'block can be bumped
+extern RangeArrI<bool, 0, maxBlockType, false> BlockHitable;
+extern RangeArrI<int, 0, maxBlockType, 2> BlockHitTransform;
+//Public BlockDiggable(0 to maxBlockType) as Boolean 'block can be dug like smb2 sand
+extern RangeArrI<bool, 0, maxBlockType, false> BlockDiggable;
+//Public BlockBrick(0 to maxBlockType) as Boolean 'block is smashable like a brick
 extern RangeArrI<bool, 0, maxBlockType, false> BlockBrick;
 extern RangeArrI<int, 0, maxBlockType, 0> BlockBrickEffect;
 //Public BlockFrameCount(0 To maxBlockType) As Integer 'how many frames of animation does this block have

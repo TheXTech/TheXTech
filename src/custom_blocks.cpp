@@ -33,6 +33,9 @@ void SaveBlockDefaults()
         BlockDefaults.BlockBrickEffect[A] = BlockBrickEffect[A];
         BlockDefaults.BlockFrameCount[A] = BlockFrameCount[A];
         BlockDefaults.BlockFrameSpeed[A] = BlockFrameSpeed[A];
+        BlockDefaults.BlockDiggable[A] = BlockDiggable[A];
+        BlockDefaults.BlockHitable[A] = BlockHitable[A];
+        BlockDefaults.BlockHitTransform[A] = BlockHitTransform[A];
     }
 }
 
@@ -58,6 +61,9 @@ void LoadBlockDefaults()
         BlockBrickEffect[A] = BlockDefaults.BlockBrickEffect[A];
         BlockFrameCount[A] = BlockDefaults.BlockFrameCount[A];
         BlockFrameSpeed[A] = BlockDefaults.BlockFrameSpeed[A];
+        BlockDiggable[A] = BlockDefaults.BlockDiggable[A];
+        BlockHitable[A] = BlockDefaults.BlockHitable[A];
+        BlockHitTransform[A] = BlockDefaults.BlockHitTransform[A];
     }
 }
 
@@ -188,12 +194,20 @@ void LoadCustomBlock(int A, std::string cFileName)
 
     config.read("bounce", BlockBouncy[A], BlockBouncy[A]);
 
+    config.read("bumpable", BlockHitable[A], BlockHitable[A]);
+    config.read("hitable", BlockHitable[A], BlockHitable[A]); // alias
+
+    config.read("transform", BlockHitTransform[A], BlockHitTransform[A]);
+    config.read("transform-onhit-into", BlockHitTransform[A], BlockHitTransform[A]); // alias
+
     config.read("smashable", BlockBrick[A], BlockBrick[A]);
     config.read("destroyeffect", BlockBrickEffect[A], BlockBrickEffect[A]);
     config.read("destroy-effect", BlockBrickEffect[A], BlockBrickEffect[A]);
 
     config.read("bounce-side", BlockBouncyHorizontal[A], BlockBouncyHorizontal[A]);
     config.read("bounceside", BlockBouncyHorizontal[A], BlockBouncyHorizontal[A]);//alias
+
+    config.read("diggable", BlockDiggable[A], BlockDiggable[A]);
 
     config.read("frames", BlockFrameCount[A], BlockFrameCount[A]);
     if(BlockFrameCount[A] <= 0) // Validate
@@ -214,7 +228,6 @@ void LoadCustomBlock(int A, std::string cFileName)
 
     if(BlockKills[A] == true && BlockSlope[A] != 0)
         BlockKills2[A] = true;
-
 
     config.endGroup();
 }

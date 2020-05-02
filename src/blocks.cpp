@@ -186,7 +186,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
     }
 
     // Shake the block
-    if((BlockBrick[b.Type] == true || BlockBouncy[b.Type] == true) && HitSide == false)
+    if((BlockBrick[b.Type] == true || BlockBouncy[b.Type] == true || BlockHitable[b.Type] == true) && HitSide == false)
     {
         if(HitDown == false)
             BlockShakeUp(A);
@@ -292,31 +292,17 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
     }
 
     // Find out what the block should turn into
-    if(b.Type == 88 || b.Type == 90 || b.Type == 89 || b.Type == 171 || b.Type == 174 || b.Type == 177 || b.Type == 180) // SMW
-    {
-        newBlock = 89;
-    }
-    else if(b.Type == 188 || b.Type == 192 || b.Type == 193 || b.Type == 60 || b.Type == 369) // SMB1
-    {
-        newBlock = 192;
-    }
-    else if(b.Type == 224 || b.Type == 225 || b.Type == 226) // Large SMB3 blocks
-    {
-        newBlock = 225;
-    }
-    else if(b.Type == 159) // SMB3 Battle Block
-    {
-        newBlock = 159;
-    }
-    else // Everything else defaults to SMB3
-    {
-        newBlock = 2;
-    }
+    newBlock = BlockHitTransform[b.Type];
 
-    if(HitSide == true)
+    if(HitSide == true || BlockBouncy[b.Type] || BlockBouncyHorizontal[b.Type])
         newBlock = b.Type;
 
-
+    if(BlockHitable[b.Type])
+    {
+        b.Type = newBlock;
+        b.Location.Height = BlockHeight[newBlock];
+        b.Location.Width = BlockWidth[newBlock];
+    }
 
     if(b.Special > 0 && b.Special < 100) // Block has coins
     {
@@ -514,7 +500,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             b.Special = b.Special - 1;
         }
 
-        if(b.Special == 0 && BlockBouncy[b.Type] == false)
+        if((b.Special == 0 && BlockBouncy[b.Type] == false) || BlockHitable[b.Type])
         {
             b.Type = newBlock;
             b.Location.Height = BlockHeight[newBlock];
@@ -540,7 +526,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             }
         }
         b.Special = 0;
-        if(BlockBouncy[b.Type] == false)
+        if(BlockBouncy[b.Type] == false || BlockHitable[b.Type])
         {
             b.Type = newBlock;
             b.Location.Height = BlockHeight[newBlock];
@@ -774,7 +760,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             }
         }
         b.Special = 0;
-        if(BlockBouncy[b.Type] == false)
+        if(BlockBouncy[b.Type] == false || BlockHitable[b.Type])
         {
             b.Type = newBlock;
             b.Location.Height = BlockHeight[newBlock];
@@ -846,7 +832,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             }
         }
         b.Special = 0;
-        if(BlockBouncy[b.Type] == false)
+        if(BlockBouncy[b.Type] == false || BlockHitable[b.Type])
         {
             b.Type = newBlock;
             b.Location.Height = BlockHeight[newBlock];
@@ -943,7 +929,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             }
         }
         b.Special = 0;
-        if(BlockBouncy[b.Type] == false)
+        if(BlockBouncy[b.Type] == false || BlockHitable[b.Type])
         {
             b.Type = newBlock;
             b.Location.Height = BlockHeight[b.Type];
@@ -1049,7 +1035,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             }
         }
         b.Special = 0;
-        if(BlockBouncy[b.Type] == false)
+        if(BlockBouncy[b.Type] == false || BlockHitable[b.Type])
         {
             b.Type = newBlock;
             b.Location.Height = BlockHeight[newBlock];
@@ -1110,7 +1096,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             }
         }
         b.Special = 0;
-        if(BlockBouncy[b.Type] == false)
+        if(BlockBouncy[b.Type] == false || BlockHitable[b.Type])
         {
             b.Type = newBlock;
             b.Location.Height = BlockHeight[newBlock];
@@ -1169,7 +1155,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             }
         }
         b.Special = 0;
-        if(BlockBouncy[b.Type] == false)
+        if(BlockBouncy[b.Type] == false || BlockHitable[b.Type])
         {
             b.Type = newBlock;
             b.Location.Height = BlockHeight[newBlock];
@@ -1226,7 +1212,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             }
         }
         b.Special = 0;
-        if(BlockBouncy[b.Type] == false)
+        if(BlockBouncy[b.Type] == false || BlockHitable[b.Type])
         {
             b.Type = newBlock;
             b.Location.Height = BlockHeight[newBlock];

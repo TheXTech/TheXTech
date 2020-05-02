@@ -2434,6 +2434,7 @@ void SetupVars()
         BlockFrameSpeed[A] = 8;
         BlockBrick[A] = false;
         BlockBrickEffect[A] = 1;
+        BlockHitTransform[A] = 2;
     }
 
     For(A, 1, maxBackgroundType)

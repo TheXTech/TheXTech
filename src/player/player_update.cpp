@@ -2682,14 +2682,14 @@ void UpdatePlayer()
 
                                         // this is a fix to help the player deal with lava blocks a bit easier
                                         // it moves the blocks hitbox down a few pixels
-                                        if(BlockKills[Block[B].Type] && BlockKills3[Block[B].Type] && BlockSlope[Block[B].Type] == 0 && !GodMode && !(Player[A].Mount == 1 && Player[A].MountType == 2))
+                                        if((BlockKills[Block[B].Type] || BlockKills3[Block[B].Type]) && BlockSlope[Block[B].Type] == 0 && !GodMode && !(Player[A].Mount == 1 && Player[A].MountType == 2))
                                         {
                                             if(Player[A].Location.Y + Player[A].Location.Height < Block[B].Location.Y + 6)
                                                 HitSpot = 0;
                                         }
 
                                         // kill the player if touching a lava block
-                                        if(BlockKills[Block[B].Type] && BlockKills3[Block[B].Type] && (HitSpot > 0 || Player[A].Slope == B))
+                                        if((BlockKills[Block[B].Type] || BlockKills3[Block[B].Type]) && (HitSpot > 0 || Player[A].Slope == B))
                                         {
                                             if(!GodMode)
                                             {
@@ -2991,7 +2991,7 @@ void UpdatePlayer()
                     }
 
                     // diggable dirt
-                    if(Block[tempHit3].Type == 370 && Player[A].StandingOnNPC <= 0) // dig dirt
+                    if(BlockDiggable[Block[tempHit3].Type] == true && Player[A].StandingOnNPC <= 0) // dig dirt
                     {
                         DontResetGrabTime = true;
                         B = tempHit3;
@@ -3306,7 +3306,7 @@ void UpdatePlayer()
                         Player[A].Location.SpeedY = 2;
                     if(Player[A].CanFly2)
                         Player[A].Location.SpeedY = 2;
-                    if(Player[A].Mount != 2 && !(BlockBouncy[Block[B].Type] == false && BlockBouncyHorizontal[Block[B].Type] == true)) // Tell the block it was hit
+                    if(Player[A].Mount != 2 && (!(BlockBouncy[Block[B].Type] == false && BlockBouncyHorizontal[Block[B].Type] == true) || BlockHitable[Block[B].Type] == true)) // Tell the block it was hit
                         BlockHit(B, false, A);
                     if(BlockBouncy[Block[B].Type] == true) // If it is a bouncy block the knock the player down
                         Player[A].Location.SpeedY = 3;
