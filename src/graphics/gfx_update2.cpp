@@ -104,44 +104,22 @@ void UpdateGraphics2()
             SceneFrame[62] = 0;
         SceneFrame[63] = SceneFrame[62];
     }
-    LevelFrame2[2] = LevelFrame2[2] + 1;
-    if(LevelFrame2[2] >= 6)
+
+
+
+    // Update level frames
+    for(A = 1; A <= maxLevelType; A++)
     {
-        LevelFrame2[2] = 0;
-        LevelFrame[2] = LevelFrame[2] + 1;
-        if(LevelFrame[2] >= 6)
-            LevelFrame[2] = 0;
-        LevelFrame[9] = LevelFrame[2];
-        LevelFrame[13] = LevelFrame[2];
-        LevelFrame[14] = LevelFrame[2];
-        LevelFrame[15] = LevelFrame[2];
-        LevelFrame[31] = LevelFrame[2];
-        LevelFrame[32] = LevelFrame[2];
-    }
-    LevelFrame2[8] = LevelFrame2[8] + 1;
-    if(LevelFrame2[8] >= 12)
-    {
-        LevelFrame2[8] = 0;
-        LevelFrame[8] = LevelFrame[8] + 1;
-        if(LevelFrame[8] >= 4)
-            LevelFrame[8] = 0;
-    }
-    LevelFrame2[12] = LevelFrame2[12] + 1;
-    if(LevelFrame2[12] >= 8)
-    {
-        LevelFrame2[12] = 0;
-        LevelFrame[12] = LevelFrame[12] + 1;
-        if(LevelFrame[12] >= 2)
-            LevelFrame[12] = 0;
-    }
-    LevelFrame2[25] = LevelFrame2[25] + 1;
-    if(LevelFrame2[25] >= 8)
-    {
-        LevelFrame2[25] = 0;
-        LevelFrame[25] = LevelFrame[25] + 1;
-        if(LevelFrame[25] >= 4)
-            LevelFrame[25] = 0;
-        LevelFrame[26] = LevelFrame[25];
+        LevelFrame2[A]++;
+        if(LevelFrame2[A] >= LevelFrameSpeed[A])
+        {
+            LevelFrame2[A] = 0;
+            LevelFrame[A]++;
+            if(LevelFrame[A] >= LevelFrameCount[A])
+            {
+                LevelFrame[A] = 0;
+            }
+        }
     }
 
 
@@ -284,33 +262,22 @@ void UpdateGraphics2()
             {
                 if(WorldLevel[A].Path == true)
                 {
-                    frmMain.renderTexture(vScreenX[Z] + WorldLevel[A].Location.X,
+                    frmMain.renderTexture(vScreenX[Z] + WorldLevel[A].Location.X - (GFXLevelWidth[29] - LevelWidth[WorldLevel[A].Type]) * 0.5,
                                           vScreenY[Z] + WorldLevel[A].Location.Y,
-                                          WorldLevel[A].Location.Width,
-                                          WorldLevel[A].Location.Height,
-                                          GFXLevelBMP[0], 0, 0);
+                                          GFXLevelWidth[0], GFXLevelHeight[0],
+                                          GFXLevelBMP[0], 0, GFXLevelHeight[0] * LevelFrame[0]);
                 }
                 if(WorldLevel[A].Path2 == true)
                 {
-                    frmMain.renderTexture(vScreenX[Z] + WorldLevel[A].Location.X - 16,
+                    frmMain.renderTexture(vScreenX[Z] + WorldLevel[A].Location.X - (GFXLevelWidth[29] - LevelWidth[WorldLevel[A].Type]) * 0.5,
                                           vScreenY[Z] + 8 + WorldLevel[A].Location.Y,
-                                          64, 32,
-                                          GFXLevelBMP[29], 0, 0);
+                                          GFXLevelWidth[29], GFXLevelHeight[29],
+                                          GFXLevelBMP[29], 0,  GFXLevelHeight[29] * LevelFrame[29]);
                 }
-                if(GFXLevelBig[WorldLevel[A].Type] == true)
-                {
-                    frmMain.renderTexture(vScreenX[Z] + WorldLevel[A].Location.X - (GFXLevelWidth[WorldLevel[A].Type] - 32) / 2.0,
-                                          vScreenY[Z] + WorldLevel[A].Location.Y - GFXLevelHeight[WorldLevel[A].Type] + 32,
-                                          GFXLevelWidth[WorldLevel[A].Type], GFXLevelHeight[WorldLevel[A].Type],
-                                          GFXLevelBMP[WorldLevel[A].Type], 0, 32 * LevelFrame[WorldLevel[A].Type]);
-                }
-                else
-                {
-                    frmMain.renderTexture(vScreenX[Z] + WorldLevel[A].Location.X,
-                                          vScreenY[Z] + WorldLevel[A].Location.Y,
-                                          WorldLevel[A].Location.Width, WorldLevel[A].Location.Height,
-                                          GFXLevelBMP[WorldLevel[A].Type], 0, 32 * LevelFrame[WorldLevel[A].Type]);
-                }
+                frmMain.renderTexture(vScreenX[Z] + WorldLevel[A].Location.X - (LevelWidth[WorldLevel[A].Type] - 32) / 2.0,
+                                      vScreenY[Z] + WorldLevel[A].Location.Y - LevelHeight[WorldLevel[A].Type] + 32,
+                                      LevelWidth[WorldLevel[A].Type], LevelHeight[WorldLevel[A].Type],
+                                      GFXLevelBMP[WorldLevel[A].Type], 0, LevelHeight[WorldLevel[A].Type] * LevelFrame[WorldLevel[A].Type]);
             }
         }
     }

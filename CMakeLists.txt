@@ -263,6 +263,7 @@ set(THEXTECH_SRC
     src/custom_blocks.cpp
     src/custom_tiles.cpp
     src/custom_paths.cpp
+    src/custom_levels.cpp
     src/graphics.cpp
     src/editor.cpp
     src/main.cpp

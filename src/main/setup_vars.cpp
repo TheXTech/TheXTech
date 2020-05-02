@@ -41,11 +41,6 @@ void SetupVars()
     for(int A = 174; A <= 186; ++A)
         BackgroundFence[A] = true;
 
-    GFXLevelBig[21] = true;
-    GFXLevelBig[22] = true;
-    GFXLevelBig[23] = true;
-    GFXLevelBig[24] = true;
-    GFXLevelBig[28] = true;
 
     EffectWidth[149] = 34;
     EffectHeight[149] = 34;

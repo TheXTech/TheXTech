@@ -810,6 +810,16 @@ struct PathDefaults_t
 
 extern PathDefaults_t PathDefaults;
 
+struct LevelDefaults_t
+{
+    RangeArrI<int, 1, maxLevelType, 32> LevelWidth;
+    RangeArrI<int, 1, maxLevelType, 32> LevelHeight;
+    RangeArrI<int, 1, maxLevelType, 1> LevelFrameCount;
+    RangeArrI<int, 1, maxLevelType, 12> LevelFrameSpeed;
+};
+
+extern LevelDefaults_t LevelDefaults;
+
 //Public Type Block   'Blocks
 struct Block_t
 {
@@ -1650,10 +1660,20 @@ extern RangeArrI<int, 1, maxPathType, 1> PathFrameCount;
 extern RangeArrI<int, 1, maxPathType, 14> PathFrameSpeed;
 extern RangeArrI<int, 1, maxPathType, 2> PathPlayerSpeed;
 
-//Public LevelFrame(1 To 100) As Integer 'What frame the scene is on
-extern RangeArrI<int, 1, 100, 0> LevelFrame;
-//Public LevelFrame2(1 To 100) As Integer 'Counter to update the scene frames
-extern RangeArrI<int, 1, 100, 0> LevelFrame2;
+//Public LevelWidth(1 To maxLevelType) As Integer
+extern RangeArrI<int, 1, maxLevelType, 32> LevelWidth;
+//Public LevelHeight(1 To maxLevelType) As Integer
+extern RangeArrI<int, 1, maxLevelType, 32> LevelHeight;
+//Public LevelFrame(1 To maxLevelType) As Integer 'What frame the scene is on
+extern RangeArrI<int, 1, maxLevelType, 0> LevelFrame;
+//Public LevelFrame2(1 To maxLevelType) As Integer 'Counter to update the scene frames
+extern RangeArrI<int, 1, maxLevelType, 0> LevelFrame2;
+//Public LevelFrameCount(1 To maxLevelType) As Integer
+extern RangeArrI<int, 1, maxLevelType, 1> LevelFrameCount;
+//Public levelFrameSpeed(1 To maxLevelType) As Integer
+extern RangeArrI<int, 1, maxLevelType, 12> LevelFrameSpeed;
+
+
 //Public BlockHasNoMask(1 To maxBlockType) As Boolean
 extern RangeArrI<bool, 1, maxBlockType, false> BlockHasNoMask;
 //Public LevelHasNoMask(1 To 100) As Boolean
