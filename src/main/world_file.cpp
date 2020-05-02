@@ -30,6 +30,7 @@
 #include "../custom_tiles.h"
 #include "../custom_paths.h"
 #include "../custom_levels.h"
+#include "../custom_scene.h"
 #include "level_file.h"
 
 #include <Utils/strings.h>
@@ -67,6 +68,7 @@ void OpenWorld(std::string FilePath)
     FindCustomTiles();
     FindCustomPaths();
     FindCustomLevels();
+    FindCustomScenery();
     LoadWorldCustomGFX();
 
     numTiles = 0;

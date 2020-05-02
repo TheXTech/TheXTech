@@ -264,6 +264,8 @@ set(THEXTECH_SRC
     src/custom_tiles.cpp
     src/custom_paths.cpp
     src/custom_levels.cpp
+    src/custom_scene.cpp
+    src/custom_bgo.cpp
     src/graphics.cpp
     src/editor.cpp
     src/main.cpp

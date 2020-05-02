@@ -29,6 +29,7 @@
 #include "../load_gfx.h"
 #include "../custom.h"
 #include "../custom_blocks.h"
+#include "../custom_bgo.h"
 #include "../sound.h"
 #include "../sorting.h"
 #include "../layers.h"
@@ -138,6 +139,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
     SetupVars();
     FindCustomNPCs();
     FindCustomBlocks();
+    FindCustomBGOs();
     LoadCustomGFX();
     LoadCustomSound();
 //    if(DirMan::exists(FileNamePath + FileName)) // Useless now

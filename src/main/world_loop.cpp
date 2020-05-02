@@ -122,6 +122,7 @@ void WorldLoop()
         Player[A].Bumped2 = 0;
         Player[A].CanFly = false;
         Player[A].CanFly2 = false;
+        Player[A].CanFly3 = false;
         Player[A].Effect = 0;
         Player[A].Effect2 = 0;
         Player[A].FlyCount = 0;
@@ -129,6 +130,37 @@ void WorldLoop()
         Player[A].Stoned = false;
     }
 
+    for(A = 1; A <= numScenes; A++)
+    {
+        if(SceneMovement[Scene[A].Type] == 1)
+        {
+            SceneSpecial[Scene[A].Type] += 0.01;
+            Scene[A].Location.SpeedY = sin(SceneSpecial[Scene[A].Type]);
+            Scene[A].Location.SpeedX = cos(SceneSpecial[Scene[A].Type]);
+        }
+        else if(SceneMovement[Scene[A].Type] == 2)
+        {
+            SceneSpecial[Scene[A].Type] += 0.01;
+            Scene[A].Location.SpeedY = sin(SceneSpecial[Scene[A].Type]);
+        }
+        else if(SceneMovement[Scene[A].Type] == 3)
+        {
+            SceneSpecial[Scene[A].Type] += 0.01;
+            Scene[A].Location.SpeedY = cos(SceneSpecial[Scene[A].Type]);
+        }
+        else if(SceneMovement[Scene[A].Type] == 4)
+        {
+            SceneSpecial[Scene[A].Type] += 0.01;
+            Scene[A].Location.SpeedY = sin(SceneSpecial[Scene[A].Type]) / 2;
+            Scene[A].Location.SpeedX = cos(SceneSpecial[Scene[A].Type]);
+        }
+        else if(SceneMovement[Scene[A].Type] == 5)
+        {
+            SceneSpecial[Scene[A].Type] += 0.01;
+            Scene[A].Location.SpeedY = sin(SceneSpecial[Scene[A].Type]);
+            Scene[A].Location.SpeedX = cos(SceneSpecial[Scene[A].Type]) / 2;
+        }
+    }
     if(WorldPlayer[1].Move > 0)
     {
         WorldPlayer[1].Frame2 = WorldPlayer[1].Frame2 + 1;
@@ -568,7 +600,7 @@ void PathPath(int Pth, bool Skp)
     {
         if(Scene[A].Active == true)
         {
-            if(CheckCollision(tempLocation, Scene[A].Location) == true)
+            if(CheckCollision(tempLocation, Scene[A].Location) == true && SceneMovement[Scene[A].Type] == 0)
                 Scene[A].Active = false;
         }
     }

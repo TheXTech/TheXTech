@@ -18,6 +18,7 @@ void SavePathDefaults()
         PathDefaults.PathHeight[A] = PathHeight[A];
         PathDefaults.PathFrameCount[A] = PathFrameCount[A];
         PathDefaults.PathFrameSpeed[A] = PathFrameSpeed[A];
+        PathDefaults.PathPlayerSpeed[A] = PathPlayerSpeed[A];
     }
 }
 
@@ -29,6 +30,7 @@ void LoadPathDefaults()
         PathHeight[A] = PathDefaults.PathHeight[A];
         PathFrameCount[A] = PathDefaults.PathFrameCount[A];
         PathFrameSpeed[A] = PathDefaults.PathFrameSpeed[A];
+        PathPlayerSpeed[A] = PathDefaults.PathPlayerSpeed[A];
     }
 }
 
@@ -81,6 +83,8 @@ void LoadCustomPath(int A, std::string cFileName)
 
     config.read("width", PathWidth[A], PathWidth[A]);
     config.read("height", PathHeight[A], PathHeight[A]);
+    config.read("playerspeed", PathPlayerSpeed[A], PathPlayerSpeed[A]);
+    config.read("player-speed", PathPlayerSpeed[A], PathPlayerSpeed[A]); // alias
 
     if(PathWidth[A] <= 0) // Validate
         PathWidth[A] = 32;
@@ -102,6 +106,5 @@ void LoadCustomPath(int A, std::string cFileName)
 
     if(PathFrameSpeed[A] <= 0) // validate
         PathFrameSpeed[A] = 1;
-
     config.endGroup();
 }

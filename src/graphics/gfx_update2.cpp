@@ -55,58 +55,6 @@ void UpdateGraphics2()
     vScreen[Z].Width = ScreenW;
     vScreen[Z].Height = ScreenH;
     SpecialFrames();
-    SceneFrame2[1] = SceneFrame2[1] + 1;
-    if(SceneFrame2[1] >= 12)
-    {
-        SceneFrame2[1] = 0;
-        SceneFrame[1] = SceneFrame[1] + 1;
-        if(SceneFrame[1] >= 4)
-            SceneFrame[1] = 0;
-        SceneFrame[4] = SceneFrame[1];
-        SceneFrame[5] = SceneFrame[1];
-        SceneFrame[6] = SceneFrame[1];
-        SceneFrame[9] = SceneFrame[1];
-        SceneFrame[10] = SceneFrame[1];
-        SceneFrame[12] = SceneFrame[1];
-        SceneFrame[51] = SceneFrame[1];
-        SceneFrame[52] = SceneFrame[1];
-        SceneFrame[53] = SceneFrame[1];
-        SceneFrame[54] = SceneFrame[1];
-        SceneFrame[55] = SceneFrame[1];
-        SceneFrame[66] = SceneFrame[1];
-    }
-    SceneFrame2[27] = SceneFrame2[27] + 1;
-    if(SceneFrame2[27] >= 8)
-    {
-        SceneFrame2[27] = 0;
-        SceneFrame[27] = SceneFrame[27] + 1;
-        if(SceneFrame[27] >= 12)
-            SceneFrame[27] = 0;
-        SceneFrame[28] = SceneFrame[27];
-        SceneFrame[29] = SceneFrame[27];
-        SceneFrame[30] = SceneFrame[27];
-    }
-    SceneFrame2[33] = SceneFrame2[33] + 1;
-    if(SceneFrame2[33] >= 4)
-    {
-        SceneFrame2[33] = 0;
-        SceneFrame[33] = SceneFrame[27] + 1;
-        if(SceneFrame[33] >= 14)
-            SceneFrame[33] = 0;
-        SceneFrame[34] = SceneFrame[33];
-    }
-    SceneFrame2[62] = SceneFrame2[62] + 1;
-    if(SceneFrame2[62] >= 8)
-    {
-        SceneFrame2[62] = 0;
-        SceneFrame[62] = SceneFrame[62] + 1;
-        if(SceneFrame[62] >= 8)
-            SceneFrame[62] = 0;
-        SceneFrame[63] = SceneFrame[62];
-    }
-
-
-
     // Update level frames
     for(A = 1; A <= maxLevelType; A++)
     {
@@ -150,6 +98,20 @@ void UpdateGraphics2()
             if(PathFrame[A] >= PathFrameCount[A])
             {
                 PathFrame[A] = 0;
+            }
+        }
+    }
+    // Update scene frames
+    for(A = 1; A <= maxSceneType; A++)
+    {
+        SceneFrame2[A]++;
+        if(SceneFrame2[A] >= SceneFrameSpeed[A])
+        {
+            SceneFrame2[A] = 0;
+            SceneFrame[A]++;
+            if(SceneFrame[A] >= SceneFrameCount[A])
+            {
+                SceneFrame[A] = 0;
             }
         }
     }

@@ -763,6 +763,19 @@ struct Water_t
 //End Type
 };
 
+struct BackgroundDefaults_t
+{
+    RangeArrI<bool, 0, maxBackgroundType, false> BackgroundFreeze;
+    RangeArrI<bool, 0, maxBackgroundType, false> BackgroundFence;
+    RangeArrI<bool, 0, maxBackgroundType, false> Foreground;
+    RangeArrI<int, 1, maxBackgroundType, 0> BackgroundWidth;
+    RangeArrI<int, 1, maxBackgroundType, 0> BackgroundHeight;
+    RangeArrI<int, 0, maxBackgroundType, 1> BackgroundFrameAmount;
+    RangeArrI<int, 0, maxBackgroundType, 8> BackgroundFrameSpeed;
+};
+
+extern BackgroundDefaults_t BackgroundDefaults;
+
 struct BlockDefaults_t
 {
     RangeArrI<bool, 0, maxBlockType, false> BlockIsSizable;
@@ -806,6 +819,7 @@ struct PathDefaults_t
     RangeArrI<int, 1, maxPathType, 32> PathHeight;
     RangeArrI<int, 1, maxPathType, 1> PathFrameCount;
     RangeArrI<int, 1, maxPathType, 14> PathFrameSpeed;
+    RangeArrI<int, 1, maxPathType, 2> PathPlayerSpeed;
 };
 
 extern PathDefaults_t PathDefaults;
@@ -820,6 +834,17 @@ struct LevelDefaults_t
 
 extern LevelDefaults_t LevelDefaults;
 
+struct SceneDefaults_t
+{
+    RangeArrI<int, 1, maxSceneType, 32> SceneWidth;
+    RangeArrI<int, 1, maxSceneType, 32> SceneHeight;
+    RangeArrI<int, 1, maxSceneType, 32> SceneFrameCount;
+    RangeArrI<int, 1, maxSceneType, 32> SceneFrameSpeed;
+    RangeArrI<int, 0, maxSceneType, 0> SceneMovement;
+    RangeArrI<int, 1, maxSceneType, 1> SceneMovementSpeed;
+};
+
+extern SceneDefaults_t SceneDefaults;
 //Public Type Block   'Blocks
 struct Block_t
 {
@@ -1060,6 +1085,7 @@ struct WorldPath_t
     int Type = 0;
     std::string Layer;
     bool Hidden = false;
+
 //End Type
 };
 
@@ -1382,6 +1408,7 @@ extern RangeArrI<int, 0, maxPlayerFrames, 0> LinkFrameX;
 extern RangeArrI<int, 0, maxPlayerFrames, 0> LinkFrameY;
 //Public BackgroundFence(0 To maxBackgroundType) As Boolean
 extern RangeArrI<bool, 0, maxBackgroundType, false> BackgroundFence;
+extern RangeArrI<bool, 0, maxBackgroundType, false> BackgroundFreeze;
 //Public NPCFrameOffsetX(0 To maxNPCType) As Integer 'NPC frame offset X
 extern RangeArrI<int, 0, maxNPCType, 0> NPCFrameOffsetX;
 //Public NPCFrameOffsetY(0 To maxNPCType) As Integer 'NPC frame offset Y
@@ -1616,6 +1643,8 @@ extern RangeArrI<int, 1, maxBackgroundType, 0> BackgroundHeight;
 extern RangeArrI<int, 1, maxBackgroundType, 0> BackgroundFrame;
 //Public BackgroundFrameCount(1 To maxBackgroundType) As Integer
 extern RangeArrI<int, 1, maxBackgroundType, 0> BackgroundFrameCount;
+extern RangeArrI<int, 0, maxBackgroundType, 1> BackgroundFrameAmount;
+extern RangeArrI<int, 0, maxBackgroundType, 8> BackgroundFrameSpeed;
 
 extern RangeArrI<int, 0, maxBlockType, 0> BlockFrame;
 extern RangeArrI<int, 0, maxBlockType, 0> BlockFrame2;
@@ -1627,6 +1656,12 @@ extern int sBlockNum;
 extern RangeArrI<int, 1, maxSceneType, 0> SceneFrame;
 //Public SceneFrame2(1 To maxSceneType) As Integer 'Counter to update the scene frames
 extern RangeArrI<int, 1, maxSceneType, 0> SceneFrame2;
+extern RangeArrI<int, 1, maxSceneType, 1> SceneFrameCount;
+extern RangeArrI<int, 1, maxSceneType, 12> SceneFrameSpeed;
+extern RangeArrI<int, 0, maxSceneType, 0> SceneMovement;
+extern RangeArrI<int, 1, maxSceneType, 1> SceneMovementSpeed;
+extern RangeArr<double, 0, maxSceneType> SceneSpecial;
+extern RangeArr<double, 0, maxSceneType> SceneSpecial2;
 //Public SpecialFrame(100) As Integer 'misc frames for things like coins and the kurbi shoe
 extern RangeArrI<int, 0, 100, 0> SpecialFrame;
 //Public SpecialFrameCount(100) As Single

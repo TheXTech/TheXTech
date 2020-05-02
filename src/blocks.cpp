@@ -1866,7 +1866,7 @@ void UpdateBlocks()
             Block[iBlock[A]].Kill = false;
             if(Block[iBlock[A]].Special == 0)
             {
-                if(BlockBrick[iBlock[A]] == true) // Check to see if it is breakable
+                if(BlockBrick[Block[iBlock[A]].Type] == true) // Check to see if it is breakable
                     KillBlock(iBlock[A]); // Destroy the block
             }
         }

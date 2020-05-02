@@ -3102,6 +3102,51 @@ void SetupVars()
     BlockIsSizable[445] = true;
     BlockIsSizable[685] = true;
 
+    For(A, 1, maxBackgroundType)
+    {
+        BackgroundFrameAmount[A] = 0;
+        BackgroundFrameSpeed[A] = 8;
+    }
+
+    BackgroundFrameAmount[158] = 4;
+    BackgroundFrameAmount[172] = 4;
+    BackgroundFrameAmount[159] = 8;
+    BackgroundFrameAmount[168] = BackgroundFrameAmount[159];
+    BackgroundFrameAmount[173] = 2;
+    BackgroundFrameAmount[187] = 4;
+    BackgroundFrameAmount[188] = BackgroundFrameAmount[187];
+    BackgroundFrameAmount[189] = BackgroundFrameAmount[187];
+    BackgroundFrameAmount[190] = BackgroundFrameAmount[187];
+    BackgroundFrameAmount[26] = 8;
+    BackgroundFrameAmount[18] = 4;
+    BackgroundFrameAmount[36] = BackgroundFrameAmount[18];
+    BackgroundFrameAmount[65] = BackgroundFrameAmount[18];
+    BackgroundFrameAmount[68] = BackgroundFrameAmount[18];
+    BackgroundFrameAmount[202] = BackgroundFrameAmount[18];
+    BackgroundFrameAmount[66] = BackgroundFrameAmount[18];
+    BackgroundFrameAmount[70] = BackgroundFrameAmount[18];
+    BackgroundFrameAmount[100] = BackgroundFrameAmount[18];
+    BackgroundFrameAmount[134] = BackgroundFrameAmount[18];
+    BackgroundFrameAmount[135] = BackgroundFrameAmount[18];
+    BackgroundFrameAmount[136] = BackgroundFrameAmount[18];
+    BackgroundFrameAmount[137] = BackgroundFrameAmount[18];
+    BackgroundFrameAmount[138] = BackgroundFrameAmount[18];
+    BackgroundFrameAmount[82] = BackgroundFrameAmount[18];
+    BackgroundFrameAmount[170] = BackgroundFrameAmount[18];
+    BackgroundFrameAmount[125] = 2;
+
+
+    BackgroundFrameSpeed[18] = 12;
+    BackgroundFrameSpeed[36] = 2;
+    BackgroundFrameSpeed[68] = 2;
+    BackgroundFrameSpeed[82] = 10;
+    BackgroundFrameSpeed[125] = 4;
+    BackgroundFrameSpeed[158] = 6;
+    BackgroundFrameSpeed[159] = BackgroundFrameSpeed[158];
+    BackgroundFrameSpeed[187] = BackgroundFrameSpeed[158];
+    BackgroundFrameSpeed[188] = BackgroundFrameSpeed[158];
+    BackgroundFrameSpeed[189] = BackgroundFrameSpeed[158];
+    BackgroundFrameSpeed[190] = BackgroundFrameSpeed[158];
 
     BackgroundHasNoMask[187] = true;
     BackgroundHasNoMask[188] = true;
@@ -3260,7 +3305,53 @@ void SetupVars()
             SceneWidth[A] = 16;
             SceneHeight[A] = 16;
         }
+        SceneFrameCount[A] = 1;
+        SceneFrameSpeed[A] = 12;
     }
+    SceneFrameCount[1] = 4;
+    SceneFrameCount[4] = SceneFrameCount[1];
+    SceneFrameCount[5] = SceneFrameCount[1];
+    SceneFrameCount[6] = SceneFrameCount[1];
+    SceneFrameCount[9] = SceneFrameCount[1];
+    SceneFrameCount[10] = SceneFrameCount[1];
+    SceneFrameCount[12] = SceneFrameCount[1];
+    SceneFrameCount[51] = SceneFrameCount[1];
+    SceneFrameCount[52] = SceneFrameCount[1];
+    SceneFrameCount[53] = SceneFrameCount[1];
+    SceneFrameCount[54] = SceneFrameCount[1];
+    SceneFrameCount[55] = SceneFrameCount[1];
+    SceneFrameCount[66] = SceneFrameCount[1];
+    SceneFrameCount[27] = 12;
+    SceneFrameCount[28] = SceneFrameCount[27];
+    SceneFrameCount[29] = SceneFrameCount[27];
+    SceneFrameCount[30] = SceneFrameCount[27];
+    SceneFrameCount[33] = 14;
+    SceneFrameCount[34] = SceneFrameCount[33];
+    SceneFrameCount[62] = 8;
+    SceneFrameCount[63] = SceneFrameCount[62];
+
+    SceneFrameSpeed[1] = 12;
+    SceneFrameSpeed[4] = SceneFrameSpeed[1];
+    SceneFrameSpeed[5] = SceneFrameSpeed[1];
+    SceneFrameSpeed[6] = SceneFrameSpeed[1];
+    SceneFrameSpeed[9] = SceneFrameSpeed[1];
+    SceneFrameSpeed[10] = SceneFrameSpeed[1];
+    SceneFrameSpeed[12] = SceneFrameSpeed[1];
+    SceneFrameSpeed[51] = SceneFrameSpeed[1];
+    SceneFrameSpeed[52] = SceneFrameSpeed[1];
+    SceneFrameSpeed[53] = SceneFrameSpeed[1];
+    SceneFrameSpeed[54] = SceneFrameSpeed[1];
+    SceneFrameSpeed[55] = SceneFrameSpeed[1];
+    SceneFrameSpeed[66] = SceneFrameSpeed[1];
+    SceneFrameSpeed[27] = 8;
+    SceneFrameSpeed[28] = SceneFrameSpeed[27];
+    SceneFrameSpeed[29] = SceneFrameSpeed[27];
+    SceneFrameSpeed[30] = SceneFrameSpeed[27];
+    SceneFrameSpeed[33] = 4;
+    SceneFrameSpeed[34] = SceneFrameSpeed[33];
+    SceneFrameSpeed[62] = SceneFrameSpeed[27];
+    SceneFrameSpeed[63] = SceneFrameSpeed[27];
+
     SceneWidth[20] = 64;
     SceneHeight[20] = 64;
     SceneWidth[27] = 48;
@@ -3296,6 +3387,19 @@ void SetupVars()
         TileHeight[A] = 32;
         TileFrameCount[A] = 1;
         TileFrameSpeed[A] = 14;
+    }
+
+    TileFrameCount[14] = 4;
+    TileFrameCount[241] = 4;
+
+    For(A, 355, 366)
+    {
+        TileFrameCount[A] = 4;
+    }
+
+    For(A, 369, 372)
+    {
+        TileFrameCount[A] = 4;
     }
 
     For(A, 1, maxPathType)

@@ -1245,8 +1245,11 @@ void UpdatePlayer()
                             NPC[numNPCs] = NPC_t();
                             Player[A].FlyCount = 0;
                             Player[A].RunCount = 0;
-                            Player[A].CanFly = false;
-                            Player[A].CanFly2 = false;
+                            if(Player[A].CanFly3 == false)
+                            {
+                                Player[A].CanFly = false;
+                                Player[A].CanFly2 = false;
+                            }
                             NPC[numNPCs].Direction = Player[A].Direction;
                             NPC[numNPCs].Active = true;
                             NPC[numNPCs].TimeLeft = 100;

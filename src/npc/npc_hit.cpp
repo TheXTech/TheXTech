@@ -461,7 +461,7 @@ void NPCHit(int A, int B, int C)
     {
         if(B == 6)
         {
-            NPC[A].Immune = 10;
+            return;
         }
     }
     else if(NPC[A].Type == 268 || NPC[A].Type == 281 || NPC[A].Type == 302)
