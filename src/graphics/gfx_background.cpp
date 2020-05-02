@@ -1944,6 +1944,28 @@ void DrawBackground(int S, int Z)
         }
     }
 
+    A = 63; // smb3 pyramid
+    if(Background2[S] == 63)
+    {
+
+        int tempVar102 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A]))) + 2;
+        int tempVar103 = static_cast<int>(floor(static_cast<double>((level[S].Height - level[S].Y) / GFXBackground2Height[A]))) + 2;
+        for(B = 0; B <= tempVar102; B++)
+        {
+            for(int C = 0; C <= tempVar103; C++)
+            {
+                tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+                tempLocation.Y = level[S].Y + ((C * GFXBackground2Height[A]) - (vScreenY[Z] + vScreen[Z].Top + level[S].Y) * 0.5);
+                tempLocation.Height = GFXBackground2Height[A];
+                tempLocation.Width = GFXBackground2Width[A];
+                if(vScreenCollision(Z, tempLocation))
+                {
+                    frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+                }
+            }
+        }
+    }
+
 
     level[S] = tempLevel;
 
