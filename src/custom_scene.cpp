@@ -54,7 +54,7 @@ void FindCustomScenery(/*std::string cFilePath*/)
     for(int A = 1; A < maxSceneType; ++A)
     {
 
-        std::string ScenePathBasegame = AppPath + fmt::format_ne("config/scene/scene-{0}.txt", A);
+        std::string ScenePathBasegame = AppPath + fmt::format_ne("/config/scene/scene-{0}.txt", A);
 
         std::string SceneIniPath = FileNamePath + fmt::format_ne("scene-{0}.ini", A);
         std::string SceneIniPathC = FileNamePath + FileName + fmt::format_ne("/scene-{0}.ini", A);

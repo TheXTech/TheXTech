@@ -52,7 +52,7 @@ void FindCustomLevels(/*std::string cFilePath*/)
     for(int A = 1; A < maxLevelType; ++A)
     {
 
-        std::string LevelPathBasegame = AppPath + fmt::format_ne("config/level/level-{0}.txt", A);
+        std::string LevelPathBasegame = AppPath + fmt::format_ne("/config/level/level-{0}.txt", A);
 
         std::string LevelIniPath = FileNamePath + fmt::format_ne("level-{0}.ini", A);
         std::string LevelIniPathC = FileNamePath + FileName + fmt::format_ne("/level-{0}.ini", A);

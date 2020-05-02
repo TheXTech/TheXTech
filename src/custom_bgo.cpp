@@ -60,7 +60,7 @@ void FindCustomBGOs(/*std::string cFilePath*/)
     for(int A = 1; A < maxBackgroundType; ++A)
     {
 
-        std::string BGOPathBasegame = AppPath + fmt::format_ne("config/background/background-{0}.txt", A);
+        std::string BGOPathBasegame = AppPath + fmt::format_ne("/config/background/background-{0}.txt", A);
 
         std::string BGOIniPath = FileNamePath + fmt::format_ne("background-{0}.ini", A);
         std::string BGOIniPathC = FileNamePath + FileName + fmt::format_ne("/background-{0}.ini", A);
