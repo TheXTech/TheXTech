@@ -119,7 +119,7 @@ void LoadCustomBlock(int A, std::string cFileName)
     config.read("passthrough", BlockNoClipping[A], BlockNoClipping[A]);
 
     config.read("floorslope", BlockSlope[A], BlockSlope[A]);
-    config.read("cellingslope", BlockSlope2[A], BlockSlope2[A]);
+    config.read("ceilingslope", BlockSlope2[A], BlockSlope2[A]);
 
     if(BlockSlope[A] != 0 && BlockSlope2[A] != 0) // Validate input
     {
