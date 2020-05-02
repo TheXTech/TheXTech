@@ -264,6 +264,7 @@ EditorCursor_t EditorCursor;
 EditorControls_t EditorControls;
 
 BlockDefaults_t BlockDefaults;
+TileDefaults_t TileDefaults;
 PathDefaults_t PathDefaults;
 
 RangeArrI<int, 1, numSounds, 0> Sound;

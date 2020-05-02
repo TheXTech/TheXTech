@@ -790,6 +790,16 @@ struct BlockDefaults_t
 extern BlockDefaults_t BlockDefaults;
 
 
+struct TileDefaults_t
+{
+    RangeArrI<int, 1, maxTileType, 32> TileWidth;
+    RangeArrI<int, 1, maxTileType, 32> TileHeight;
+    RangeArrI<int, 1, maxTileType, 1> TileFrameCount;
+    RangeArrI<int, 1, maxTileType, 14> TileFrameSpeed;
+};
+
+extern TileDefaults_t TileDefaults;
+
 struct PathDefaults_t
 {
     RangeArrI<int, 1, maxPathType, 32> PathWidth;

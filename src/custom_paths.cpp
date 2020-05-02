@@ -51,10 +51,14 @@ void FindCustomPaths(/*std::string cFilePath*/)
 
     for(int A = 1; A < maxPathType; ++A)
     {
+        std::string PathPathBasegame = AppPath + fmt::format_ne("config/path/path-{0}.txt", A);
         std::string PathIniPath = FileNamePath + fmt::format_ne("path-{0}.ini", A);
         std::string PathIniPathC = FileNamePath + FileName + fmt::format_ne("/path-{0}.ini", A);
         std::string PathPath = FileNamePath + fmt::format_ne("path-{0}.txt", A);
         std::string PathPathC = FileNamePath + FileName + fmt::format_ne("/path-{0}.txt", A);
+
+        if(Files::fileExists(PathPathBasegame))
+            LoadCustomPath(A, PathPathBasegame);
 
         if(Files::fileExists(PathIniPath))
             LoadCustomPath(A, PathIniPath);

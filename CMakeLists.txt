@@ -261,6 +261,7 @@ set(THEXTECH_SRC
     src/layers_wld.cpp
     src/custom.cpp
     src/custom_blocks.cpp
+    src/custom_tiles.cpp
     src/custom_paths.cpp
     src/graphics.cpp
     src/editor.cpp

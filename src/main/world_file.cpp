@@ -27,6 +27,7 @@
 #include "../game_main.h"
 #include "../load_gfx.h"
 #include "../sound.h"
+#include "../custom_tiles.h"
 #include "../custom_paths.h"
 #include "level_file.h"
 
@@ -62,6 +63,7 @@ void OpenWorld(std::string FilePath)
         FileRelease = int(wld.meta.RecentFormatVersion);
 
     SetupVars();
+    FindCustomTiles();
     FindCustomPaths();
     LoadWorldCustomGFX();
 
