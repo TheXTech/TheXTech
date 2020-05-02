@@ -447,14 +447,16 @@ void UpdateGraphics(bool skipRepaint)
             {
                 if(vScreenCollision(Z, Block[sBlockArray[A]].Location) && !Block[sBlockArray[A]].Hidden)
                 {
-                    int bHeight = Block[sBlockArray[A]].Location.Height / 32.0;
+                    int bHeight = Block[sBlockArray[A]].Location.Height / BlockHeight[Block[sBlockArray[A]].Type];
                     for(B = 0; B < bHeight; B++)
                     {
-                        int bWidth = Block[sBlockArray[A]].Location.Width / 32.0;
+                        int bWidth = Block[sBlockArray[A]].Location.Width / BlockWidth[Block[sBlockArray[A]].Type];
                         for(C = 0; C < bWidth; C++)
                         {
-                            tempLocation.X = Block[sBlockArray[A]].Location.X + C * 32;
-                            tempLocation.Y = Block[sBlockArray[A]].Location.Y + B * 32;
+                            tempLocation.Width = BlockWidth[Block[sBlockArray[A]].Type];
+                            tempLocation.Height = BlockHeight[Block[sBlockArray[A]].Type];
+                            tempLocation.X = Block[sBlockArray[A]].Location.X + C * BlockWidth[Block[sBlockArray[A]].Type];;
+                            tempLocation.Y = Block[sBlockArray[A]].Location.Y + B * BlockHeight[Block[sBlockArray[A]].Type];
                             if(vScreenCollision(Z, tempLocation))
                             {
                                 D = C;
@@ -462,7 +464,7 @@ void UpdateGraphics(bool skipRepaint)
 
                                 if(D != 0)
                                 {
-                                    if(fEqual(D, (Block[sBlockArray[A]].Location.Width / 32.0) - 1))
+                                    if(fEqual(D, (Block[sBlockArray[A]].Location.Width / BlockWidth[Block[sBlockArray[A]].Type]) - 1))
                                         D = 2;
                                     else
                                     {
@@ -474,7 +476,7 @@ void UpdateGraphics(bool skipRepaint)
 
                                 if(E != 0)
                                 {
-                                    if(fEqual(E, (Block[sBlockArray[A]].Location.Height / 32.0) - 1))
+                                    if(fEqual(E, (Block[sBlockArray[A]].Location.Height / BlockHeight[Block[sBlockArray[A]].Type]) - 1))
                                         E = 2;
                                     else
                                         E = 1;
@@ -489,7 +491,27 @@ void UpdateGraphics(bool skipRepaint)
                                     frmMain.renderTexture(vScreenX[Z] + Block[sBlockArray[A]].Location.X + C * 32, vScreenY[Z] + Block[sBlockArray[A]].Location.Y + B * 32, 32, 32, GFXBlockBMP[Block[sBlockArray[A]].Type], D * 32, E * 32);
                                 }
 #endif
-                                frmMain.renderTexture(vScreenX[Z] + Block[sBlockArray[A]].Location.X + C * 32, vScreenY[Z] + Block[sBlockArray[A]].Location.Y + B * 32, 32, 32, GFXBlockBMP[Block[sBlockArray[A]].Type], D * 32, E * 32);
+                                // extra handling for 1 width or 1 height sizables
+                                int W = 1;
+                                int H = 1;
+                                if(bWidth == 1)
+                                    W = 2;
+                                if(bHeight == 1)
+                                    H = 2;
+
+                                for(int w = 0; w < W; w++)
+                                {
+                                    for(int h = 0; h < H; h++)
+                                    {
+                                        frmMain.renderTexture(vScreenX[Z] + Block[sBlockArray[A]].Location.X + C * BlockWidth[Block[sBlockArray[A]].Type] + w * BlockWidth[Block[sBlockArray[A]].Type] * 0.5,
+                                                              vScreenY[Z] + Block[sBlockArray[A]].Location.Y + B * BlockHeight[Block[sBlockArray[A]].Type] + h * BlockHeight[Block[sBlockArray[A]].Type] * 0.5,
+                                                              BlockWidth[Block[sBlockArray[A]].Type] / W + Block[sBlockArray[A]].ShakeX3,
+                                                              BlockHeight[Block[sBlockArray[A]].Type] / H + Block[sBlockArray[A]].ShakeY3,
+                                                              GFXBlockBMP[Block[sBlockArray[A]].Type],
+                                                              D * BlockWidth[Block[sBlockArray[A]].Type] + w * (GFXBlockBMP[Block[sBlockArray[A]].Type].w - BlockWidth[Block[sBlockArray[A]].Type] * 0.5),
+                                                              E * BlockHeight[Block[sBlockArray[A]].Type] + h * (GFXBlockBMP[Block[sBlockArray[A]].Type].h - BlockHeight[Block[sBlockArray[A]].Type] * 0.5));
+                                    }
+                                }
                             }
                         }
                     }

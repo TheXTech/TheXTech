@@ -510,7 +510,7 @@ void UpdatePlayer()
 
                         for(B = (int)fBlock; B <= lBlock; B++)
                         {
-                            if(!Block[B].Invis && !BlockIsSizable[Block[B].Type] && !BlockOnlyHitspot1[Block[B].Type] &&
+                            if(!Block[B].Invis && !BlockOnlyHitspot1[Block[B].Type] &&
                                !BlockNoClipping[Block[B].Type] && !BlockPlayerNoClipping[Block[B].Type] && !Block[B].Hidden)
                             {
                                 if(CheckCollision(tempLocation, Block[B].Location))
@@ -2399,7 +2399,7 @@ void UpdatePlayer()
 
                                         if(BlockNoClipping[Block[B].Type] || BlockPlayerNoClipping[Block[B].Type]) // blocks that the player can't touch are forced to hitspot 0 (which means no collision)
                                             HitSpot = 0;
-                                        if(BlockIsSizable[Block[B].Type] || BlockOnlyHitspot1[Block[B].Type]) // for sizable blocks, if the player didn't land on them from the top then he can walk through them
+                                        if(BlockOnlyHitspot1[Block[B].Type]) // for semisolid blocks, if the player didn't land on them from the top then he can walk through them
                                         {
                                             if(HitSpot != 1)
                                                 HitSpot = 0;
@@ -4159,8 +4159,7 @@ void UpdatePlayer()
                                                     for(C = fBlock; C <= lBlock; C++)
                                                     {
                                                         if(CheckCollision(Player[A].Location, Block[C].Location) &&
-                                                           !Block[C].Hidden && !BlockIsSizable[Block[C].Type] &&
-                                                           !BlockOnlyHitspot1[Block[C].Type])
+                                                           !Block[C].Hidden && !BlockOnlyHitspot1[Block[C].Type])
                                                             Player[A].Location = tempLocation;
                                                     }
                                                     PlaySound(3);

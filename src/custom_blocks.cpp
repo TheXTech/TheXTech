@@ -182,8 +182,8 @@ void LoadCustomBlock(int A, std::string cFileName)
     if(BlockHeight[A] <= 0)
         BlockHeight[A] = 32;
 
-    config.read("semi-solid", BlockOnlyHitspot1[A], BlockOnlyHitspot1[A]);
-    config.read("semisolid", BlockOnlyHitspot1[A], BlockOnlyHitspot1[A]); // alias
+    config.read("semi-solid", BlockOnlyHitspot1[A], BlockIsSizable[A]);
+    config.read("semisolid", BlockOnlyHitspot1[A], BlockIsSizable[A]); // alias
 
     config.read("lava", BlockKills[A], BlockKills[A]);
     config.read("kills", BlockKills3[A], BlockKills3[A]);
