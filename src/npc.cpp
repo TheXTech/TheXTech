@@ -679,7 +679,7 @@ void NPCSpecial(int A)
                 {
                     if(Background[B].Hidden == false)
                     {
-                        if((Background[B].Type >= 174 && Background[B].Type <= 186) || Background[B].Type == 63)
+                        if(BackgroundNPCFence[Background[B].Type] == true)
                         {
                             if(CheckCollision(tempLocation, Background[B].Location))
                             {

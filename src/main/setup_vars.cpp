@@ -3108,6 +3108,13 @@ void SetupVars()
         BackgroundFrameSpeed[A] = 8;
     }
 
+
+    For(A, 174, 187)
+    {
+        BackgroundNPCFence[A] = true;
+    }
+
+    BackgroundNPCFence[63] = true;
     BackgroundFrameAmount[158] = 4;
     BackgroundFrameAmount[172] = 4;
     BackgroundFrameAmount[159] = 8;

@@ -767,6 +767,7 @@ struct BackgroundDefaults_t
 {
     RangeArrI<bool, 0, maxBackgroundType, false> BackgroundFreeze;
     RangeArrI<bool, 0, maxBackgroundType, false> BackgroundFence;
+    RangeArrI<bool, 0, maxBackgroundType, false> BackgroundNPCFence;
     RangeArrI<bool, 0, maxBackgroundType, false> Foreground;
     RangeArrI<int, 1, maxBackgroundType, 0> BackgroundWidth;
     RangeArrI<int, 1, maxBackgroundType, 0> BackgroundHeight;
@@ -1408,6 +1409,7 @@ extern RangeArrI<int, 0, maxPlayerFrames, 0> LinkFrameX;
 extern RangeArrI<int, 0, maxPlayerFrames, 0> LinkFrameY;
 //Public BackgroundFence(0 To maxBackgroundType) As Boolean
 extern RangeArrI<bool, 0, maxBackgroundType, false> BackgroundFence;
+extern RangeArrI<bool, 0, maxBackgroundType, false> BackgroundNPCFence;
 extern RangeArrI<bool, 0, maxBackgroundType, false> BackgroundFreeze;
 //Public NPCFrameOffsetX(0 To maxNPCType) As Integer 'NPC frame offset X
 extern RangeArrI<int, 0, maxNPCType, 0> NPCFrameOffsetX;

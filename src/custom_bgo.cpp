@@ -19,6 +19,7 @@ void SaveBackgroundDefaults()
         BackgroundDefaults.BackgroundFrameAmount[A] = BackgroundFrameAmount[A];
         BackgroundDefaults.BackgroundFrameSpeed[A] = BackgroundFrameSpeed[A];
 		BackgroundDefaults.BackgroundFence[A] = BackgroundFence[A];
+        BackgroundDefaults.BackgroundNPCFence[A] = BackgroundNPCFence[A];
         BackgroundDefaults.BackgroundFreeze[A] = BackgroundFreeze[A];
 		BackgroundDefaults.Foreground[A] = Foreground[A];
     }
@@ -33,6 +34,7 @@ void LoadBackgroundDefaults()
         BackgroundFrameAmount[A] = BackgroundDefaults.BackgroundFrameAmount[A];
         BackgroundFrameSpeed[A] = BackgroundDefaults.BackgroundFrameSpeed[A];
 		BackgroundFence[A] = BackgroundDefaults.BackgroundFence[A];
+        BackgroundNPCFence[A] = BackgroundDefaults.BackgroundNPCFence[A];
         BackgroundFreeze[A] = BackgroundDefaults.BackgroundFreeze[A];
 		Foreground[A] = BackgroundDefaults.Foreground[A];
     }
@@ -112,6 +114,7 @@ void LoadCustomBGO(int A, std::string cFileName)
         BackgroundFrameSpeed[A] = 1;
 
     config.read("climbable", BackgroundFence[A], BackgroundFence[A]);
+    config.read("npcclimbable", BackgroundNPCFence[A], BackgroundNPCFence[A]);
     config.read("foreground", Foreground[A], Foreground[A]);
     config.read("stoponfreeze", BackgroundFreeze[A], BackgroundFreeze[A]);
     config.read("stop-on-freeze", BackgroundFreeze[A], BackgroundFreeze[A]);

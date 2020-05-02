@@ -160,6 +160,11 @@ void WorldLoop()
             Scene[A].Location.SpeedY = sin(SceneSpecial[Scene[A].Type]);
             Scene[A].Location.SpeedX = cos(SceneSpecial[Scene[A].Type]) / 2;
         }
+        if(SceneMovement[Scene[A].Type] != 0)
+        {
+            Scene[A].Location.SpeedY *= SceneMovementSpeed[Scene[A].Type];
+            Scene[A].Location.SpeedX *= SceneMovementSpeed[Scene[A].Type];
+        }
     }
     if(WorldPlayer[1].Move > 0)
     {

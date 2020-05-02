@@ -108,5 +108,7 @@ void LoadCustomScenery(int A, std::string cFileName)
         SceneFrameSpeed[A] = 1;
 
     config.read("movement", SceneMovement[A], SceneMovement[A]);
+    config.read("movementspeed", SceneMovementSpeed[A], SceneMovementSpeed[A]);
+    config.read("movement-speed", SceneMovementSpeed[A], SceneMovementSpeed[A]);
     config.endGroup();
 }
