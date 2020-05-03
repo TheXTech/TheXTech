@@ -3306,18 +3306,10 @@ void UpdatePlayer()
                         Player[A].Location.SpeedY = 2;
                     if(Player[A].CanFly2)
                         Player[A].Location.SpeedY = 2;
-                    if(Player[A].Mount != 2 && (!(BlockBouncy[Block[B].Type] == false && BlockBouncyHorizontal[Block[B].Type] == true) || BlockHitable[Block[B].Type] == true)) // Tell the block it was hit
+                    if(Player[A].Mount != 2 && (!(BlockBouncy[Block[B].Type] == false && BlockBouncyHorizontal[Block[B].Type] == true) || BlockHitable[Block[B].Type] == true || BlockBrick[Block[B].Type] == true)) // Tell the block it was hit
                         BlockHit(B, false, A);
                     if(BlockBouncy[Block[B].Type] == true) // If it is a bouncy block the knock the player down
                         Player[A].Location.SpeedY = 3;
-                    if(Player[A].State > 1 && Player[A].Character != 5 && BlockBrick[Block[B].Type] == true) // If the player was big ask the block nicely to die
-                    {
-                        if(Player[A].Mount != 2 && Block[B].Type != 293)
-                        {
-                            KillBlock(B);
-                            PlaySound(4);
-                        }
-                    }
                 }
 
                 if(Player[A].Slide && oldSlope > 0 && Player[A].Slope == 0 && Player[A].Location.SpeedY < 0)

@@ -194,7 +194,6 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             BlockShakeDown(A);
     }
 
-
     if(Block[A].Type == 169)
     {
         PlaySound(32);
@@ -1278,6 +1277,11 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
     {
         BlockHitHard(A);
     }
+    if(BlockBrick[b.Type] == true && whatPlayer > 0 && Player[whatPlayer].State > 1 && b.Special == 0)
+    {
+        b.Kill = true;
+        PlaySound(4);
+    }
 }
 
 void BlockShakeUp(int A)
@@ -1431,6 +1435,7 @@ void KillBlock(int A, bool Splode)
         Block[A].Layer = "Destroyed Blocks";
         Block[A].Kill = false;
     }
+
 
 }
 
@@ -1852,8 +1857,8 @@ void UpdateBlocks()
             Block[iBlock[A]].Kill = false;
             if(Block[iBlock[A]].Special == 0)
             {
-                if(BlockBrick[Block[iBlock[A]].Type] == true) // Check to see if it is breakable
-                    KillBlock(iBlock[A]); // Destroy the block
+                KillBlock(iBlock[A]); // Destroy the block
+                PlaySound(4);
             }
         }
     }
