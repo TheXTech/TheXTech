@@ -1434,6 +1434,10 @@ void KillBlock(int A, bool Splode)
         Block[A].Hidden = true;
         Block[A].Layer = "Destroyed Blocks";
         Block[A].Kill = false;
+        if(BattleMode == true)
+        {
+            Block[A].RespawnDelay = 65 * 30;
+        }
     }
 
 
@@ -1615,7 +1619,7 @@ void UpdateBlocks()
             {
                 Block[A].Special = Block[A].Special + 0.1;
                 Block[A].Location.SpeedX = std::cos(Block[A].Special);
-                Block[A].Location.SpeedX = std::sin(Block[A].Special);
+                Block[A].Location.SpeedY = std::sin(Block[A].Special);
             }
             // respawn
             if(Block[A].RespawnDelay > 0)
