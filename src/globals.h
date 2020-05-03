@@ -1164,6 +1164,7 @@ struct WorldPlayer_t
     int Move2 = 0;
 //    Move3 As Boolean
     int Move3 = 0;
+    int Move4 = 2;
 //    LevelName As String
     std::string LevelName;
 //End Type

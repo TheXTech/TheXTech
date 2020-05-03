@@ -234,6 +234,7 @@ void WorldLoop()
                 if(CheckCollision(tempLocation, WorldPath[A].Location) == true && WorldPath[A].Active == true)
                 {
                     WorldPlayer[1].Move = 1;
+                    WorldPlayer[1].Move4 = PathPlayerSpeed[WorldPath[A].Type];
                     break;
                 }
             }
@@ -244,6 +245,7 @@ void WorldLoop()
                     if(CheckCollision(tempLocation, WorldLevel[A].Location) == true && WorldLevel[A].Active == true)
                     {
                         WorldPlayer[1].Move = 1;
+                        WorldPlayer[1].Move4 = 2;
                         break;
                     }
                 }
@@ -265,6 +267,7 @@ void WorldLoop()
                 if(CheckCollision(tempLocation, WorldPath[A].Location) == true && WorldPath[A].Active == true)
                 {
                     WorldPlayer[1].Move = 2;
+                    WorldPlayer[1].Move4 = PathPlayerSpeed[WorldPath[A].Type];
                     break;
                 }
             }
@@ -275,6 +278,7 @@ void WorldLoop()
                     if(CheckCollision(tempLocation, WorldLevel[A].Location) == true && WorldLevel[A].Active == true)
                     {
                         WorldPlayer[1].Move = 2;
+                        WorldPlayer[1].Move4 = 2;
                         break;
                     }
                 }
@@ -295,6 +299,7 @@ void WorldLoop()
             {
                 if(CheckCollision(tempLocation, WorldPath[A].Location) == true && WorldPath[A].Active == true)
                 {
+                    WorldPlayer[1].Move4 = PathPlayerSpeed[WorldPath[A].Type];
                     WorldPlayer[1].Move = 3;
                     break;
                 }
@@ -306,6 +311,7 @@ void WorldLoop()
                     if(CheckCollision(tempLocation, WorldLevel[A].Location) == true && WorldLevel[A].Active == true)
                     {
                         WorldPlayer[1].Move = 3;
+                        WorldPlayer[1].Move4 = 2;
                         break;
                     }
                 }
@@ -327,6 +333,7 @@ void WorldLoop()
                 if(CheckCollision(tempLocation, WorldPath[A].Location) == true && WorldPath[A].Active == true)
                 {
                     WorldPlayer[1].Move = 4;
+                    WorldPlayer[1].Move4 = PathPlayerSpeed[WorldPath[A].Type];
                     break;
                 }
             }
@@ -337,6 +344,7 @@ void WorldLoop()
                     if(CheckCollision(tempLocation, WorldLevel[A].Location) == true && WorldLevel[A].Active == true)
                     {
                         WorldPlayer[1].Move = 4;
+                        WorldPlayer[1].Move4 = 2;
                         break;
                     }
                 }
@@ -443,12 +451,12 @@ void WorldLoop()
     }
     else if(WorldPlayer[1].Move == 1)
     {
-        WorldPlayer[1].Move2 = WorldPlayer[1].Move2 + 2;
-        WorldPlayer[1].Location.Y = WorldPlayer[1].Location.Y - 2;
+        WorldPlayer[1].Move2 = WorldPlayer[1].Move2 + WorldPlayer[1].Move4;
+        WorldPlayer[1].Location.Y = WorldPlayer[1].Location.Y - WorldPlayer[1].Move4;
         if(WalkAnywhere == true)
         {
-            WorldPlayer[1].Move2 = WorldPlayer[1].Move2 + 2;
-            WorldPlayer[1].Location.Y = WorldPlayer[1].Location.Y - 2;
+            WorldPlayer[1].Move2 = WorldPlayer[1].Move2 + WorldPlayer[1].Move4;
+            WorldPlayer[1].Location.Y = WorldPlayer[1].Location.Y - WorldPlayer[1].Move4;
         }
         if(WorldPlayer[1].Move2 >= 32)
         {
@@ -459,12 +467,12 @@ void WorldLoop()
     }
     else if(WorldPlayer[1].Move == 2)
     {
-        WorldPlayer[1].Move2 = WorldPlayer[1].Move2 + 2;
-        WorldPlayer[1].Location.X = WorldPlayer[1].Location.X - 2;
+        WorldPlayer[1].Move2 = WorldPlayer[1].Move2 + WorldPlayer[1].Move4;
+        WorldPlayer[1].Location.X = WorldPlayer[1].Location.X - WorldPlayer[1].Move4;
         if(WalkAnywhere == true)
         {
             WorldPlayer[1].Move2 = WorldPlayer[1].Move2 + 2;
-            WorldPlayer[1].Location.X = WorldPlayer[1].Location.X - 2;
+            WorldPlayer[1].Location.X = WorldPlayer[1].Location.X - WorldPlayer[1].Move4;
         }
         if(WorldPlayer[1].Move2 >= 32)
         {
@@ -475,12 +483,12 @@ void WorldLoop()
     }
     else if(WorldPlayer[1].Move == 3)
     {
-        WorldPlayer[1].Move2 = WorldPlayer[1].Move2 + 2;
-        WorldPlayer[1].Location.Y = WorldPlayer[1].Location.Y + 2;
+        WorldPlayer[1].Move2 = WorldPlayer[1].Move2 + WorldPlayer[1].Move4;
+        WorldPlayer[1].Location.Y = WorldPlayer[1].Location.Y + WorldPlayer[1].Move4;
         if(WalkAnywhere == true)
         {
-            WorldPlayer[1].Move2 = WorldPlayer[1].Move2 + 2;
-            WorldPlayer[1].Location.Y = WorldPlayer[1].Location.Y + 2;
+            WorldPlayer[1].Move2 = WorldPlayer[1].Move2 + WorldPlayer[1].Move4;
+            WorldPlayer[1].Location.Y = WorldPlayer[1].Location.Y + WorldPlayer[1].Move4;
         }
         if(WorldPlayer[1].Move2 >= 32)
         {
@@ -491,12 +499,12 @@ void WorldLoop()
     }
     else if(WorldPlayer[1].Move == 4)
     {
-        WorldPlayer[1].Move2 = WorldPlayer[1].Move2 + 2;
-        WorldPlayer[1].Location.X = WorldPlayer[1].Location.X + 2;
+        WorldPlayer[1].Move2 = WorldPlayer[1].Move2 + WorldPlayer[1].Move4;
+        WorldPlayer[1].Location.X = WorldPlayer[1].Location.X + WorldPlayer[1].Move4;
         if(WalkAnywhere == true)
         {
-            WorldPlayer[1].Move2 = WorldPlayer[1].Move2 + 2;
-            WorldPlayer[1].Location.X = WorldPlayer[1].Location.X + 2;
+            WorldPlayer[1].Move2 = WorldPlayer[1].Move2 + WorldPlayer[1].Move4;
+            WorldPlayer[1].Location.X = WorldPlayer[1].Location.X + WorldPlayer[1].Move4;
         }
         if(WorldPlayer[1].Move2 >= 32)
         {
