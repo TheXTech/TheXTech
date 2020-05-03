@@ -1217,7 +1217,7 @@ void KillNPC(int A, int B)
                     NewEffect(159 , NPC[A].Location);
                 else if(NPC[A].Type == 312)
                     NewEffect(158 , NPC[A].Location);
-                else if(NPC[A].Type == 23)
+                else if(NPC[A].Type == 24)
                     NewEffect(19 , NPC[A].Location);
                 else
                     NewEffect(173, NPC[A].Location);
