@@ -170,8 +170,6 @@ void UpdateGraphics(bool skipRepaint)
         {
             if(BackgroundFreeze[A] == false)
                 BackgroundFrameCount[A]++;
-            else
-                SpecialFrames();
         }
         if(BackgroundFrameCount[A] >= BackgroundFrameSpeed[A])
         {
@@ -183,6 +181,8 @@ void UpdateGraphics(bool skipRepaint)
             }
         }
     }
+    if(!FreezeNPCs)
+        SpecialFrames();
 
 //    If LevelEditor = False Then  'Sets up the screens if not in level editor
     { // NOT AN EDITOR

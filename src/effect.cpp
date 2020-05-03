@@ -497,7 +497,11 @@ void UpdateEffects()
         }
         else if(e.Type == 82) // Spinning block
         {
-            e.Frame = SpecialFrame[3];
+            if(e.Life % 8 == 0) {
+                e.Frame = e.Frame + 1;
+                if(e.Frame >= 4)
+                    e.Frame = 0;
+            }
             if(e.Life < 10)
             {
                 tempBool = false;
@@ -1160,7 +1164,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
         Effect[numEffects].Location.Y = Location.Y;
         Effect[numEffects].Location.SpeedY = 0;
         Effect[numEffects].Location.SpeedX = 0;
-        Effect[numEffects].Frame = 0;
+        Effect[numEffects].Frame = 3;
         Effect[numEffects].Life = 300;
         Effect[numEffects].Type = A;
     }

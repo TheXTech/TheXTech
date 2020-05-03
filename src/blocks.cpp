@@ -296,7 +296,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
     if(HitSide == true || BlockBouncy[b.Type] || BlockBouncyHorizontal[b.Type])
         newBlock = b.Type;
 
-    if(BlockHitable[b.Type])
+    if(BlockHitable[b.Type] && b.Type != 90)
     {
         b.Type = newBlock;
         b.Location.Height = BlockHeight[newBlock];
