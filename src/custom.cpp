@@ -79,6 +79,7 @@ void SaveNPCDefaults()
         NPCDefaults.NPCNoFireBall[A] = NPCNoFireBall[A];
         NPCDefaults.NPCNoIceBall[A] = NPCNoIceBall[A];
         NPCDefaults.NPCNoGravity[A] = NPCNoGravity[A];
+        NPCDefaults.NPCDespawn[A] = NPCDespawn[A];
         NPCFrameSpeed[A] = 8;
     }
 }
@@ -127,6 +128,7 @@ void LoadNPCDefaults()
         NPCNoFireBall[A] = NPCDefaults.NPCNoFireBall[A];
         NPCNoIceBall[A] = NPCDefaults.NPCNoIceBall[A];
         NPCNoGravity[A] = NPCDefaults.NPCNoGravity[A];
+        NPCDespawn[A] = NPCDefaults.NPCDespawn[A];
         NPCFrame[A] = 0;
         NPCFrameSpeed[A] = 8;
         NPCFrameStyle[A] = 0;
@@ -205,6 +207,7 @@ void LoadCustomNPC(int A, std::string cFileName)
     boolVAR(npc, "spinjumphurt", NPCSpinJumpHurt[A]);
     boolVAR(npc, "jumpbounce", NPCJumpBounce[A]);
     boolVAR(npc, "nolava", NPCNoLava[A]);
+    boolVAR(npc, "despawn", NPCDespawn[A]);
 
     if(npc.en_nohurt)
         NPCWontHurt[A] = npc.nohurt;

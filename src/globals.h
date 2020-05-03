@@ -1491,6 +1491,7 @@ extern RangeArrI<bool, 0, maxNPCType, false> NPCNoLava;
 extern RangeArrI<bool, 0, maxNPCType, false> NPCNoIceBall;
 //Public NPCNoGravity(0 To maxNPCType) As Boolean 'not affected by gravity
 extern RangeArrI<bool, 0, maxNPCType, false> NPCNoGravity;
+extern RangeArrI<bool, 0, maxNPCType, true> NPCDespawn;
 
 //Public NPCFrame(0 To maxNPCType) As Integer
 extern RangeArrI<int, 0, maxNPCType, 0> NPCFrame;
@@ -1579,6 +1580,7 @@ struct NPCDefaults_t
     RangeArrI<bool, 0, maxNPCType, false> NPCNoIceBall;
 //    NPCNoGravity(0 To maxNPCType) As Boolean
     RangeArrI<bool, 0, maxNPCType, false> NPCNoGravity;
+    RangeArrI<bool, 0, maxNPCType, true> NPCDespawn;
 //End Type
 };
 //Public NPCDefaults As NPCDefaults

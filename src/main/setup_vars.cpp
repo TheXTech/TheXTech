@@ -2449,6 +2449,11 @@ void SetupVars()
         BackgroundNPCFence[A] = true;
     }
 
+    For(A, 207, 208)
+    {
+        BackgroundWidth[A] = 64;
+    }
+
     BackgroundNPCFence[63] = true;
     BackgroundFrameAmount[158] = 4;
     BackgroundFrameAmount[172] = 4;
@@ -2576,6 +2581,8 @@ void SetupVars()
     Foreground[202] = true;
     Foreground[201] = true;
 
+    BackgroundWidth[206] = 384;
+    BackgroundHeight[206] = 64;
     BackgroundHeight[158] = 32;
     BackgroundHeight[159] = 32;
 

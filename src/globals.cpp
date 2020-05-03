@@ -184,6 +184,7 @@ RangeArrI<bool, 0, maxNPCType, false> NPCNoFireBall;
 RangeArrI<bool, 0, maxNPCType, false> NPCNoLava;
 RangeArrI<bool, 0, maxNPCType, false> NPCNoIceBall;
 RangeArrI<bool, 0, maxNPCType, false> NPCNoGravity;
+RangeArrI<bool, 0, maxNPCType, true> NPCDespawn;
 
 RangeArrI<int, 0, maxNPCType, 0> NPCFrame;
 RangeArrI<int, 0, maxNPCType, 0> NPCFrameSpeed;

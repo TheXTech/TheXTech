@@ -1966,6 +1966,125 @@ void DrawBackground(int S, int Z)
         }
     }
 
+    A = 64; // smb3 ice cave
+    if(Background2[S] == 64)
+    {
+
+        int tempVar104 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A]))) + 2;
+        int tempVar105 = static_cast<int>(floor(static_cast<double>((level[S].Height - level[S].Y) / GFXBackground2Height[A] / 6.0))) + 6.0;
+        for(B = 0; B <= tempVar104; B++)
+        {
+            for(int C = 0; C <= tempVar105; C++)
+            {
+                tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+                tempLocation.Y = level[S].Y + ((C * GFXBackground2Height[A] / 6.0) - (vScreenY[Z] + vScreen[Z].Top + level[S].Y) * 0.5);
+                tempLocation.Height = GFXBackground2Height[A] / 6.0;
+                tempLocation.Width = GFXBackground2Width[A];
+                if(vScreenCollision(Z, tempLocation))
+                {
+                    frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A] / 6.0, GFXBackground2[A], 0, (GFXBackground2Height[A] / 6.0) * SpecialFrame[12]);
+                }
+            }
+        }
+    }
+
+    A = 65; // sma4 metalic
+    if(Background2[S] == 63)
+    {
+
+        int tempVar106 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A]))) + 2;
+        int tempVar107 = static_cast<int>(floor(static_cast<double>((level[S].Height - level[S].Y) / GFXBackground2Height[A]))) + 2;
+        for(B = 0; B <= tempVar106; B++)
+        {
+            for(int C = 0; C <= tempVar107; C++)
+            {
+                tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+                tempLocation.Y = level[S].Y + ((C * GFXBackground2Height[A]) - (vScreenY[Z] + vScreen[Z].Top + level[S].Y) * 0.5);
+                tempLocation.Height = GFXBackground2Height[A];
+                tempLocation.Width = GFXBackground2Width[A];
+                if(vScreenCollision(Z, tempLocation))
+                {
+                    frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+                }
+            }
+        }
+    }
+
+
+    A = 66; // smb2 snow hills
+    if(Background2[S] == 66)
+    {
+
+        int tempVar108 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
+        for(B = 0; B <= tempVar108; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
+            {
+                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
+                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
+                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
+            }
+            else
+                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+            tempLocation.Height = GFXBackground2Height[A];
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            }
+        }
+    }
+
+    A = 67; // smb2 snow mountains
+    if(Background2[S] == 67)
+    {
+
+        int tempVar109 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
+        for(B = 0; B <= tempVar109; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
+            {
+                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
+                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
+                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
+            }
+            else
+                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+            tempLocation.Height = GFXBackground2Height[A];
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            }
+        }
+    }
+
+    A = 68; // smb2 mountains
+    if(Background2[S] == 68)
+    {
+
+        int tempVar110 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
+        for(B = 0; B <= tempVar110; B++)
+        {
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
+            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
+            {
+                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
+                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
+                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
+            }
+            else
+                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+            tempLocation.Height = GFXBackground2Height[A];
+            tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            }
+        }
+    }
 
     level[S] = tempLevel;
 

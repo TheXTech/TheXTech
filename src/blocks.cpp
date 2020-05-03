@@ -388,7 +388,8 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                         break;
                     }
                 }
-                b.Special = 0;
+                if(b.Type != 717)
+                    b.Special = 0;
             }
             else
             {
@@ -524,7 +525,8 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                 BlockShakeDown(A);
             }
         }
-        b.Special = 0;
+        if(b.Type != 717)
+            b.Special = 0;
         if(BlockBouncy[b.Type] == false || BlockHitable[b.Type])
         {
             b.Type = newBlock;
@@ -758,7 +760,8 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                 BlockShakeDown(A);
             }
         }
-        b.Special = 0;
+        if(b.Type != 717)
+            b.Special = 0;
         if(BlockBouncy[b.Type] == false || BlockHitable[b.Type])
         {
             b.Type = newBlock;
@@ -830,7 +833,8 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                 BlockShakeDown(A);
             }
         }
-        b.Special = 0;
+        if(b.Type != 717)
+            b.Special = 0;
         if(BlockBouncy[b.Type] == false || BlockHitable[b.Type])
         {
             b.Type = newBlock;
@@ -927,7 +931,8 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                 BlockShakeDown(A);
             }
         }
-        b.Special = 0;
+        if(b.Type != 717)
+            b.Special = 0;
         if(BlockBouncy[b.Type] == false || BlockHitable[b.Type])
         {
             b.Type = newBlock;
@@ -1033,7 +1038,8 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                 BlockShakeDown(A);
             }
         }
-        b.Special = 0;
+        if(b.Type != 717)
+            b.Special = 0;
         if(BlockBouncy[b.Type] == false || BlockHitable[b.Type])
         {
             b.Type = newBlock;
@@ -1094,7 +1100,8 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                 BlockShakeDown(A);
             }
         }
-        b.Special = 0;
+        if(b.Type != 717)
+            b.Special = 0;
         if(BlockBouncy[b.Type] == false || BlockHitable[b.Type])
         {
             b.Type = newBlock;
@@ -1153,7 +1160,8 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                 BlockShakeDown(A);
             }
         }
-        b.Special = 0;
+        if(b.Type != 717)
+            b.Special = 0;
         if(BlockBouncy[b.Type] == false || BlockHitable[b.Type])
         {
             b.Type = newBlock;
@@ -1210,7 +1218,8 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                 BlockShakeDown(A);
             }
         }
-        b.Special = 0;
+        if(b.Type != 717)
+            b.Special = 0;
         if(BlockBouncy[b.Type] == false || BlockHitable[b.Type])
         {
             b.Type = newBlock;
@@ -1937,7 +1946,8 @@ void PSwitch(bool Bool)
                     Block[numBlock].Location.X = Block[numBlock].Location.X + (NPC[A].Location.Width - Block[numBlock].Location.Width) / 2.0;
                     Block[numBlock].Location.SpeedX = 0;
                     Block[numBlock].Location.SpeedY = 0;
-                    Block[numBlock].Special = 0;
+                    if(Block[numBlock].Type != 717)
+                        Block[numBlock].Special = 0;
                     Block[numBlock].Kill = false;
                     Block[numBlock].NPC = NPC[A].Type;
                 }

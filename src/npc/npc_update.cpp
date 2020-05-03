@@ -152,7 +152,7 @@ void UpdateNPCs()
                 NPC[A].Immune = NPC[A].Immune - 1;
             NPC[A].JustActivated = 0;
             NPC[A].Chat = false;
-            if(NPC[A].TimeLeft == 0)
+            if(NPC[A].TimeLeft == 0 && NPCDespawn[NPC[A].Type] == true)
                 Deactivate(A);
             if(NPC[A].Killed > 0)
             {
@@ -930,7 +930,7 @@ void UpdateNPCs()
                 NPC[A].TimeLeft = 100;
             if(NPC[A].TimeLeft > 10 && NoTurnBack[NPC[A].Section] == true)
                 NPC[A].TurnBackWipe = true;
-            if(NPC[A].TimeLeft < 1)
+            if(NPC[A].TimeLeft < 1 && NPCDespawn[NPC[A].Type])
                 Deactivate(A);
             NPC[A].TimeLeft = NPC[A].TimeLeft - 1;
             if(NPC[A].Effect == 0)

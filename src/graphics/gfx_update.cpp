@@ -1674,7 +1674,10 @@ void UpdateGraphics(bool skipRepaint)
                             X = -400;
                         else if((DScreenType == 6 && Z == 2) || (DScreenType == 4 && Z == 2) || (DScreenType == 3 && Z == 1))
                             Y = -300;
-                        frmMain.renderRect(210 + X, 200 + Y, 380, 200, 0.f, 0.f, 0.f, 0.5);
+                        if(TestLevel)
+                            frmMain.renderRect(210 + X, 200 + Y, 380, 200, 0.f, 0.f, 0.f, 0.5);
+                        else
+                            frmMain.renderRect(210 + X, 200 + Y, 380, 200, 0.f, 0.f, 0.f);
                         if(TestLevel)
                         {
                             SuperPrint("CONTINUE", 3, 272 + X, 237 + Y);
