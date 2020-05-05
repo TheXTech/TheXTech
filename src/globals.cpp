@@ -233,6 +233,7 @@ RangeArrI<int, 0, maxBlockType, 0> BlockFrame;
 RangeArrI<int, 0, maxBlockType, 0> BlockFrame2;
 RangeArrI<int, 0, maxBlockType, 1> BlockFrameCount;
 RangeArrI<int, 0, maxBlockType, 8> BlockFrameSpeed;
+RangeArrI<bool, 0, maxBlockType, false> BlockConnecting;
 RangeArrI<int, 1, 1000, 0> sBlockArray;
 int sBlockNum = 0;
 RangeArrI<int, 1, maxSceneType, 0> SceneFrame;

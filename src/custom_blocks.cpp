@@ -15,6 +15,7 @@ void SaveBlockDefaults()
     for(int A = 1; A <= maxBlockType; A++)
     {
         BlockDefaults.BlockIsSizable[A] = BlockIsSizable[A];
+        BlockDefaults.BlockConnecting[A] = BlockConnecting[A];
         BlockDefaults.BlockPlayerNoClipping[A] = BlockPlayerNoClipping[A];
         BlockDefaults.BlockSlope[A] = BlockSlope[A];
         BlockDefaults.BlockSlope2[A] = BlockSlope2[A];
@@ -43,6 +44,7 @@ void LoadBlockDefaults()
 {
     for(int A = 1; A <= maxBlockType; A++)
     {
+        BlockConnecting[A] = BlockDefaults.BlockConnecting[A];
         BlockPlayerNoClipping[A] = BlockDefaults.BlockPlayerNoClipping[A];
         BlockSlope[A] = BlockDefaults.BlockSlope[A];
         BlockSlope2[A] = BlockDefaults.BlockSlope2[A];
@@ -115,6 +117,7 @@ void LoadCustomBlock(int A, std::string cFileName)
            config.beginGroup("General");
 
     config.read("sizeable", BlockIsSizable[A], BlockIsSizable[A]);
+    config.read("connecting", BlockConnecting[A], BlockConnecting[A]);
 
     config.read("player-passthrough", BlockPlayerNoClipping[A], BlockPlayerNoClipping[A]);
     config.read("playerpassthrough", BlockPlayerNoClipping[A], BlockPlayerNoClipping[A]);//Alias

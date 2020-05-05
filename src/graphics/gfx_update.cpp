@@ -950,17 +950,152 @@ void UpdateGraphics(bool skipRepaint)
             {
                 if(vScreenCollision(Z, Block[A].Location) && !Block[A].Hidden)
                 {
-                    // Don't show a visual difference of hit-resized block in a comparison to original state
-                    double offW = Block[A].wasShrinkResized ? 0.1 : 0.0;
-                    frmMain.renderTexture(vScreenX[Z] + Block[A].Location.X + Block[A].ShakeX3,
-                                          vScreenY[Z] + Block[A].Location.Y + Block[A].ShakeY3,
-                                          Block[A].Location.Width + offW,
-                                          Block[A].Location.Height,
-                                          GFXBlock[Block[A].Type],
-                                          0,
-                                          BlockFrame[Block[A].Type] * Block[A].Location.Height);
+                    if(!BlockConnecting[Block[A].Type])
+                    {
+                        // Normal block Rendering
+                        // Don't show a visual difference of hit-resized block in a comparison to original state
+                        double offW = Block[A].wasShrinkResized ? 0.1 : 0.0;
+                        frmMain.renderTexture(vScreenX[Z] + Block[A].Location.X + Block[A].ShakeX3,
+                                              vScreenY[Z] + Block[A].Location.Y + Block[A].ShakeY3,
+                                              Block[A].Location.Width + offW,
+                                              Block[A].Location.Height,
+                                              GFXBlock[Block[A].Type],
+                                              0,
+                                              BlockFrame[Block[A].Type] * Block[A].Location.Height);
+                    }
+                    else
+                    {
+                        // Connecting block Rendering
+                        double offW = Block[A].wasShrinkResized ? 0.1 : 0.0;
+
+                        // corner frames
+                        int cornerTL = 0;
+                        int cornerTR = 0;
+                        int cornerBL = 0;
+                        int cornerBR = 0;
+
+                        //                  t      tr     r      br     b      bl     l      tl
+                        bool neighbors[] = {false, false, false, false, false, false, false, false};
+
+                        // get neighbors
+                        For(B, fBlock, lBlock)
+                        {
+                            if(B != A && Block[B].Type == Block[A].Type && Block[B].Layer == Block[A].Layer)
+                            {
+                                signed int offX = round((Block[B].Location.X - Block[A].Location.X));
+                                signed int offY = round((Block[B].Location.Y - Block[A].Location.Y));
+                                if(offX == 0 && offY == -32)
+                                    neighbors[0] = true;
+                                else if(offX == 32 && offY == -32)
+                                    neighbors[1] = true;
+                                else if(offX == 32 && offY == 0)
+                                    neighbors[2] = true;
+                                else if(offX == 32 && offY == 32)
+                                    neighbors[3] = true;
+                                else if(offX == 0 && offY == 32)
+                                    neighbors[4] = true;
+                                else if(offX == -32 && offY == 32)
+                                    neighbors[5] = true;
+                                else if(offX == -32 && offY == 0)
+                                    neighbors[6] = true;
+                                else if(offX == -32 && offY == -32)
+                                    neighbors[7] = true;
+                            }
+                        }
+
+
+                        // set corner frames based on neighbors
+                        if(neighbors[6])
+                        {
+                            if(!neighbors[0])
+                                cornerTL = 1;
+                            if(!neighbors[4])
+                                cornerBL = 1;
+                        }
+                        if(neighbors[2])
+                        {
+                            if(!neighbors[0])
+                                cornerTR = 1;
+                            if(!neighbors[4])
+                                cornerBR = 1;
+                        }
+                        if(neighbors[0])
+                        {
+                            if(!neighbors[2])
+                                cornerTR = 2;
+                            if(!neighbors[6])
+                                cornerTL = 2;
+                        }
+                        if(neighbors[4])
+                        {
+                            if(!neighbors[2])
+                                cornerBR = 2;
+                            if(!neighbors[6])
+                                cornerBL = 2;
+                        }
+                        if(!neighbors[0])
+                        {
+                            if(!neighbors[6])
+                                cornerTL = 3;
+                            if(!neighbors[2])
+                                cornerTR = 3;
+                        }
+                        else
+                        {
+                            if(neighbors[6] && !neighbors[7])
+                                cornerTL = 4;
+                            if(neighbors[2] && !neighbors[1])
+                                cornerTR = 4;
+                        }
+                        if(!neighbors[4])
+                        {
+                            if(!neighbors[6])
+                                cornerBL = 3;
+                            if(!neighbors[2])
+                                cornerBR = 3;
+                        }
+                        else
+                        {
+                            if(neighbors[6] && !neighbors[5])
+                                cornerBL = 4;
+                            if(neighbors[2] && !neighbors[3])
+                                cornerBR = 4;
+                        }
+
+
+                        // render corners
+                        frmMain.renderTexture(vScreenX[Z] + Block[A].Location.X + Block[A].ShakeX3,
+                                              vScreenY[Z] + Block[A].Location.Y + Block[A].ShakeY3,
+                                              (Block[A].Location.Width + offW) / 2,
+                                              (Block[A].Location.Height) / 2,
+                                              GFXBlock[Block[A].Type],
+                                              0,
+                                              BlockFrame[Block[A].Type] * Block[A].Location.Height + Block[A].Location.Height * cornerTL);
+                        frmMain.renderTexture(vScreenX[Z] + Block[A].Location.X + Block[A].ShakeX3 + (Block[A].Location.Width) / 2,
+                                              vScreenY[Z] + Block[A].Location.Y + Block[A].ShakeY3,
+                                              (Block[A].Location.Width + offW) / 2,
+                                              (Block[A].Location.Height) / 2,
+                                              GFXBlock[Block[A].Type],
+                                              (Block[A].Location.Width) / 2,
+                                              BlockFrame[Block[A].Type] * Block[A].Location.Height + Block[A].Location.Height * cornerTR);
+                        frmMain.renderTexture(vScreenX[Z] + Block[A].Location.X + Block[A].ShakeX3,
+                                              vScreenY[Z] + Block[A].Location.Y + Block[A].ShakeY3 + (Block[A].Location.Height) / 2,
+                                              (Block[A].Location.Width + offW) / 2,
+                                              (Block[A].Location.Height) / 2,
+                                              GFXBlock[Block[A].Type],
+                                              0,
+                                              BlockFrame[Block[A].Type] * Block[A].Location.Height + Block[A].Location.Height * cornerBL + (Block[A].Location.Height) / 2);
+                        frmMain.renderTexture(vScreenX[Z] + Block[A].Location.X + Block[A].ShakeX3 + (Block[A].Location.Width) / 2,
+                                              vScreenY[Z] + Block[A].Location.Y + Block[A].ShakeY3 + (Block[A].Location.Height) / 2,
+                                              (Block[A].Location.Width + offW) / 2,
+                                              (Block[A].Location.Height) / 2,
+                                              GFXBlock[Block[A].Type],
+                                              (Block[A].Location.Width) / 2,
+                                              BlockFrame[Block[A].Type] * Block[A].Location.Height + Block[A].Location.Height * cornerBR + (Block[A].Location.Height) / 2);
+                    }
                 }
             }
+
         }
 
 //'effects in back
