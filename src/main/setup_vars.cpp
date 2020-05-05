@@ -2455,6 +2455,7 @@ void SetupVars()
     }
 
     BackgroundNPCFence[63] = true;
+    BackgroundFrameAmount[161] = 4;
     BackgroundFrameAmount[158] = 4;
     BackgroundFrameAmount[172] = 4;
     BackgroundFrameAmount[159] = 8;
@@ -2466,6 +2467,8 @@ void SetupVars()
     BackgroundFrameAmount[190] = BackgroundFrameAmount[187];
     BackgroundFrameAmount[26] = 8;
     BackgroundFrameAmount[18] = 4;
+    BackgroundFrameAmount[19] = BackgroundFrameAmount[18];
+    BackgroundFrameAmount[20] = BackgroundFrameAmount[18];
     BackgroundFrameAmount[36] = BackgroundFrameAmount[18];
     BackgroundFrameAmount[65] = BackgroundFrameAmount[18];
     BackgroundFrameAmount[68] = BackgroundFrameAmount[18];
@@ -2484,6 +2487,8 @@ void SetupVars()
 
 
     BackgroundFrameSpeed[18] = 12;
+    BackgroundFrameSpeed[19] = BackgroundFrameSpeed[18];
+    BackgroundFrameSpeed[20] = BackgroundFrameSpeed[18];
     BackgroundFrameSpeed[36] = 2;
     BackgroundFrameSpeed[68] = 2;
     BackgroundFrameSpeed[82] = 10;
