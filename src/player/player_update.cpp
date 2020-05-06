@@ -4676,8 +4676,9 @@ void UpdatePlayer()
                 if(Player[A].ForceHold > 0)
                     Player[A].ForceHold = Player[A].ForceHold - 1;
             }
-            else // Player special effects
+            else// Player special effects
                 PlayerEffects(A);
+
 //            if(nPlay.Online == true)
 //            {
 //                if(A == nPlay.MySlot + 1)

@@ -1070,28 +1070,28 @@ void UpdateGraphics(bool skipRepaint)
                                               (Block[A].Location.Height) / 2,
                                               GFXBlock[Block[A].Type],
                                               0,
-                                              BlockFrame[Block[A].Type] * Block[A].Location.Height + Block[A].Location.Height * cornerTL);
+                                              BlockFrame[Block[A].Type] * Block[A].Location.Height * 5 + Block[A].Location.Height * cornerTL);
                         frmMain.renderTexture(vScreenX[Z] + Block[A].Location.X + Block[A].ShakeX3 + (Block[A].Location.Width) / 2,
                                               vScreenY[Z] + Block[A].Location.Y + Block[A].ShakeY3,
                                               (Block[A].Location.Width + offW) / 2,
                                               (Block[A].Location.Height) / 2,
                                               GFXBlock[Block[A].Type],
                                               (Block[A].Location.Width) / 2,
-                                              BlockFrame[Block[A].Type] * Block[A].Location.Height + Block[A].Location.Height * cornerTR);
+                                              BlockFrame[Block[A].Type] * Block[A].Location.Height * 5 + Block[A].Location.Height * cornerTR);
                         frmMain.renderTexture(vScreenX[Z] + Block[A].Location.X + Block[A].ShakeX3,
                                               vScreenY[Z] + Block[A].Location.Y + Block[A].ShakeY3 + (Block[A].Location.Height) / 2,
                                               (Block[A].Location.Width + offW) / 2,
                                               (Block[A].Location.Height) / 2,
                                               GFXBlock[Block[A].Type],
                                               0,
-                                              BlockFrame[Block[A].Type] * Block[A].Location.Height + Block[A].Location.Height * cornerBL + (Block[A].Location.Height) / 2);
+                                              BlockFrame[Block[A].Type] * Block[A].Location.Height * 5 + Block[A].Location.Height * cornerBL + (Block[A].Location.Height) / 2);
                         frmMain.renderTexture(vScreenX[Z] + Block[A].Location.X + Block[A].ShakeX3 + (Block[A].Location.Width) / 2,
                                               vScreenY[Z] + Block[A].Location.Y + Block[A].ShakeY3 + (Block[A].Location.Height) / 2,
                                               (Block[A].Location.Width + offW) / 2,
                                               (Block[A].Location.Height) / 2,
                                               GFXBlock[Block[A].Type],
                                               (Block[A].Location.Width) / 2,
-                                              BlockFrame[Block[A].Type] * Block[A].Location.Height + Block[A].Location.Height * cornerBR + (Block[A].Location.Height) / 2);
+                                              BlockFrame[Block[A].Type] * Block[A].Location.Height * 5 + Block[A].Location.Height * cornerBR + (Block[A].Location.Height) / 2);
                     }
                 }
             }

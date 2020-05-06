@@ -5405,8 +5405,6 @@ void PlayerEffects(int A)
             {
                 GoToLevel = Warp[Player[A].Warp].level;
                 GoToLevelNoGameThing = Warp[Player[A].Warp].noEntranceScene;
-                OpenLevel(GoToLevel);
-                EndLevel = true;
                 Player[A].Effect = 8;
                 Player[A].Effect2 = 2970;
                 ReturnWarp = Player[A].Warp;
@@ -5414,11 +5412,10 @@ void PlayerEffects(int A)
                     ReturnWarpSaved = ReturnWarp;
                 StartWarp = Warp[Player[A].Warp].LevelWarp;
             }
-            else if(Warp[Player[A].Warp].MapWarp == true)
+            if(Warp[Player[A].Warp].MapWarp == true)
             {
                 Player[A].Effect = 8;
                 Player[A].Effect2 = 2970;
-                EndLevel = true;
             }
         }
         else if(Player[A].Effect2 >= 100)
@@ -5630,8 +5627,6 @@ void PlayerEffects(int A)
             {
                 GoToLevel = Warp[Player[A].Warp].level;
                 GoToLevelNoGameThing = Warp[Player[A].Warp].noEntranceScene;
-                OpenLevel(GoToLevel);
-                EndLevel = true;
                 Player[A].Effect = 8;
                 Player[A].Effect2 = 3000;
                 ReturnWarp = Player[A].Warp;
@@ -5643,7 +5638,6 @@ void PlayerEffects(int A)
             {
                 Player[A].Effect = 8;
                 Player[A].Effect2 = 2970;
-                EndLevel = true;
             }
 
             if(numPlayers > 2 /*&& nPlay.Online == false*/)
@@ -5778,7 +5772,7 @@ void PlayerEffects(int A)
         else if(Player[A].Effect2 <= 3000) // warp wait
         {
             Player[A].Effect2 = Player[A].Effect2 - 1;
-            if(fEqual(Player[A].Effect2, 2920))
+            if(Player[A].Effect2 <= 2920)
             {
                 if(Warp[Player[A].Warp].MapWarp == true)
                 {
