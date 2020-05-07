@@ -56,7 +56,7 @@ const int maxBackgrounds = 8000;
 //Public Const maxPlayerFrames As Integer = 750 'Maximum number of player frames
 const int maxPlayerFrames = 950;
 //Public Const maxBlockType As Integer = 700 'Maximum number of block types
-const int BlockTypes = 745;
+const int BlockTypes = 2000;
 const int UserBlockTypes = 1000;
 const int maxBlockType = BlockTypes + UserBlockTypes;
 
