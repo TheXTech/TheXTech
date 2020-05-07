@@ -196,7 +196,9 @@ void UpdatePlayer()
                    NPC[i].CantHurtPlayer != A && NPC[i].Type != 91)
                 {
                     if(CheckCollision(NPC[i].Location, tempLocation4) == true)
+                    {
                         NPC[i].Killed = 3;
+                    }
                 }
             }
         }

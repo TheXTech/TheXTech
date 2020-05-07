@@ -2186,6 +2186,10 @@ void NPCHit(int A, int B, int C)
             NPC[A].Location.SpeedY = 0.123;
             NPC[A].Location.SpeedX = 0;
         }
+        else if(B == 5)
+        {
+            NPC[A].Killed = B;
+        }
     }
     else if(NPCIsAnExit[NPC[A].Type])
     {
@@ -2306,6 +2310,10 @@ void NPCHit(int A, int B, int C)
             NPC[A].Killed = B;
             NPC[A].Location.SpeedY = 0.123;
             NPC[A].Location.SpeedX = 0;
+        }
+        else if(B == 5)
+        {
+            NPC[A].Killed = B;
         }
     }
 

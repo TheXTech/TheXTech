@@ -4714,7 +4714,9 @@ void PlayerGrabCode(int A, bool DontResetGrabTime)
                 }
                 NPC[Player[A].HoldingNPC].Projectile = true;
                 if(NPCIsVeggie[NPC[Player[A].HoldingNPC].Type] == true || NPC[Player[A].HoldingNPC].Type == 19 || NPC[Player[A].HoldingNPC].Type == 20 || NPC[Player[A].HoldingNPC].Type == 25 || NPC[Player[A].HoldingNPC].Type == 129 || NPC[Player[A].HoldingNPC].Type == 130 || NPC[Player[A].HoldingNPC].Type == 131 || NPC[Player[A].HoldingNPC].Type == 132 || NPC[Player[A].HoldingNPC].Type == 134 || NPC[Player[A].HoldingNPC].Type == 135 || NPC[Player[A].HoldingNPC].Type == 154 || NPC[Player[A].HoldingNPC].Type == 155 || NPC[Player[A].HoldingNPC].Type == 156 || NPC[Player[A].HoldingNPC].Type == 157 || NPC[Player[A].HoldingNPC].Type == 40 || NPC[Player[A].HoldingNPC].Type == 240 || NPC[Player[A].HoldingNPC].Type == 13 || NPC[Player[A].HoldingNPC].Type == 265 || NPC[Player[A].HoldingNPC].Type == 288 || NPC[Player[A].HoldingNPC].Type == 291)
+                {
                     PlaySound(75);
+                }
                 else if(NPC[Player[A].HoldingNPC].Type == 17)
                     PlaySound(22);
                 else
