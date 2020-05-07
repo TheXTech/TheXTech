@@ -338,9 +338,23 @@ void LoadGFX()
         UpdateLoad();
     }
 
-    for(int A = 1; A <= maxBlockType; ++A)
+    for(int A = 1; A <= BlockTypes; ++A)
     {
         p = GfxRoot + fmt::format_ne("block/block-{0}.png", A);
+        if(Files::fileExists(p))
+        {
+            GFXBlockBMP[A] = frmMain.lazyLoadPicture(p);
+        }
+        else
+        {
+            break;
+        }
+        if(A % 20 == 0)
+            UpdateLoad();
+    }
+    for(int A = BlockTypes; A <= UserBlockTypes; ++A)
+    {
+        p = GfxRoot + fmt::format_ne("block/block-{0}u.png", A-BlockTypes+1);
         if(Files::fileExists(p))
         {
             GFXBlockBMP[A] = frmMain.lazyLoadPicture(p);
@@ -754,11 +768,18 @@ void LoadCustomGFX()
     std::set<std::string> existingFiles;
     getExistingFiles(existingFiles);
 
-    for(int A = 1; A < maxBlockType; ++A)
+    for(int A = 1; A < BlockTypes; ++A)
     {
         loadCGFX(existingFiles, GfxRoot + fmt::format_ne("block/block-{0}.png", A),
                  FileNamePath, FileName,
                  fmt::format_ne("block-{0}", A),
+                 nullptr, nullptr, GFXBlockCustom[A], GFXBlockBMP[A]);
+    }
+    for(int A = BlockTypes; A < UserBlockTypes; ++A)
+    {
+        loadCGFX(existingFiles, GfxRoot + fmt::format_ne("block/block-{0}u.png", A-BlockTypes+1),
+                 FileNamePath, FileName,
+                 fmt::format_ne("block-{0}u", A-BlockTypes+1),
                  nullptr, nullptr, GFXBlockCustom[A], GFXBlockBMP[A]);
     }
 

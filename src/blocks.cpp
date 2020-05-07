@@ -1370,7 +1370,7 @@ void BlockShakeDown(int A)
 
 void BlockHitHard(int A)
 {
-    if(Block[A].Hidden == false && Block[A].Special == 0 && BlockBrick[Block[A].Type] == true)
+    if(Block[A].Hidden == false && Block[A].Special == 0 && (BlockBrick[Block[A].Type] == true || BlockExplodable[Block[A].Type] == true))
     {
         if(Block[A].Type == 90)
         {

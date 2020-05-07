@@ -37,6 +37,7 @@ void SaveBlockDefaults()
         BlockDefaults.BlockDiggable[A] = BlockDiggable[A];
         BlockDefaults.BlockHitable[A] = BlockHitable[A];
         BlockDefaults.BlockHitTransform[A] = BlockHitTransform[A];
+        BlockDefaults.BlockExplodable[A] = BlockExplodable[A];
     }
 }
 
@@ -66,6 +67,7 @@ void LoadBlockDefaults()
         BlockDiggable[A] = BlockDefaults.BlockDiggable[A];
         BlockHitable[A] = BlockDefaults.BlockHitable[A];
         BlockHitTransform[A] = BlockDefaults.BlockHitTransform[A];
+        BlockExplodable[A] = BlockDefaults.BlockExplodable[A];
     }
 }
 
@@ -86,7 +88,7 @@ void FindCustomBlocks(/*std::string cFilePath*/)
             existingFiles.insert(FileNamePath + FileName  + "/"+ p);
     }
 
-    for(int A = 1; A < maxBlockType; ++A)
+    for(int A = 1; A < BlockTypes; ++A)
     {
         std::string BlockPathBasegame = AppPath + fmt::format_ne("/config/block/block-{0}.txt", A);
 
@@ -97,6 +99,24 @@ void FindCustomBlocks(/*std::string cFilePath*/)
 
         if(Files::fileExists(BlockPathBasegame))
             LoadCustomBlock(A, BlockPathBasegame);
+
+        if(Files::fileExists(BlockIniPath))
+            LoadCustomBlock(A, BlockIniPath);
+        if(Files::fileExists(BlockPath))
+            LoadCustomBlock(A, BlockPath);
+
+        if(Files::fileExists(BlockIniPathC))
+            LoadCustomBlock(A, BlockIniPathC);
+        if(Files::fileExists(BlockPathC))
+            LoadCustomBlock(A, BlockPathC);
+    }
+    for(int A = BlockTypes; A < maxBlockType; ++A)
+    {
+        std::string BlockIniPath = FileNamePath + fmt::format_ne("block-{0}u.ini", A-BlockTypes+1);
+        std::string BlockIniPathC = FileNamePath + FileName + fmt::format_ne("/block-{0}u.ini", A-BlockTypes+1);
+        std::string BlockPath = FileNamePath + fmt::format_ne("block-{0}u.txt", A-BlockTypes+1);
+        std::string BlockPathC = FileNamePath + FileName + fmt::format_ne("/block-{0}u.txt", A-BlockTypes+1);
+
 
         if(Files::fileExists(BlockIniPath))
             LoadCustomBlock(A, BlockIniPath);
@@ -206,6 +226,8 @@ void LoadCustomBlock(int A, std::string cFileName)
     config.read("smashable", BlockBrick[A], BlockBrick[A]);
     config.read("destroyeffect", BlockBrickEffect[A], BlockBrickEffect[A]);
     config.read("destroy-effect", BlockBrickEffect[A], BlockBrickEffect[A]);
+
+    config.read("explodable", BlockExplodable[A], BlockExplodable[A]);
 
     config.read("bounce-side", BlockBouncyHorizontal[A], BlockBouncyHorizontal[A]);
     config.read("bounceside", BlockBouncyHorizontal[A], BlockBouncyHorizontal[A]);//alias

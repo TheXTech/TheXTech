@@ -803,6 +803,7 @@ struct BlockDefaults_t
     RangeArrI<int, 0, maxBlockType, 1> BlockFrameCount;
     RangeArrI<int, 0, maxBlockType, 8> BlockFrameSpeed;
     RangeArrI<bool, 0, maxBlockType, false> BlockConnecting;
+    RangeArrI<bool, 0, maxBlockType, false> BlockExplodable;
 };
 
 extern BlockDefaults_t BlockDefaults;
@@ -1754,6 +1755,8 @@ extern RangeArrI<int, 0, maxBlockType, 1> BlockFrameCount;
 extern RangeArrI<int, 0, maxBlockType, 8> BlockFrameSpeed;
 //Public BlockConnecting(0 to maxBlockType) As Boolean 'block connects to itself like in mario maker
 extern RangeArrI<bool, 0, maxBlockType, false> BlockConnecting;
+//Public BlockConnecting(0 to maxBlockType) As Boolean 'block is explodable by bombs
+extern RangeArrI<bool, 0, maxBlockType, false> BlockExplodable;
 //Public CoinFrame(1 To 10) As Integer 'What frame the coin is on
 extern RangeArrI<int, 1, 10, 0> CoinFrame;
 //Public CoinFrame2(1 To 10) As Integer 'Counter to update the coin frames
