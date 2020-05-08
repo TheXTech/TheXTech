@@ -913,7 +913,7 @@ void NPCFrames(int A)
         C = 0;
         for(B = 1; B <= numPlayers; ++B)
         {
-            if(!CanComeOut(NPC[A].Location, Player[B].Location) && Player[B].Location.Y >= NPC[A].Location.Y)
+            if(!CanComeOut(NPC[A].Location, Player[B].Location, NPC[A].Section) && Player[B].Location.Y >= NPC[A].Location.Y)
                 C = B;
         }
         if(C > 0)
@@ -925,7 +925,7 @@ void NPCFrames(int A)
                 tempLocation = NPC[A].Location;
                 tempLocation.Width = NPC[A].Location.Width * 2;
                 tempLocation.X = NPC[A].Location.X - NPC[A].Location.Width / 2.0;
-                if(!CanComeOut(tempLocation, Player[B].Location) && Player[B].Location.Y >= NPC[A].Location.Y)
+                if(!CanComeOut(tempLocation, Player[B].Location, NPC[A].Section) && Player[B].Location.Y >= NPC[A].Location.Y)
                     C = B;
             }
             if(C > 0)
@@ -2330,7 +2330,7 @@ void NPCFrames(int A)
                 tempLocation.Y = tempLocation.Y - 8;
                 for(B = 1; B <= numPlayers; ++B)
                 {
-                    if(CheckCollision(tempLocation, Player[B].Location) && Player[B].Mount != 2 && (Player[B].Location.SpeedY > 0 || Player[B].Location.SpeedY < Physics.PlayerJumpVelocity))
+                    if(CheckCollision(tempLocation, Player[B].Location, NPC[A].Section) && Player[B].Mount != 2 && (Player[B].Location.SpeedY > 0 || Player[B].Location.SpeedY < Physics.PlayerJumpVelocity))
                     {
                         C = 2;
                         break;
@@ -2343,7 +2343,7 @@ void NPCFrames(int A)
                     tempLocation.Y = tempLocation.Y - 16;
                     for(B = 1; B <= numPlayers; ++B)
                     {
-                        if(CheckCollision(tempLocation, Player[B].Location) && Player[B].Mount != 2 && (Player[B].Location.SpeedY > 0 || Player[B].Location.SpeedY < Physics.PlayerJumpVelocity))
+                        if(CheckCollision(tempLocation, Player[B].Location, NPC[A].Section) && Player[B].Mount != 2 && (Player[B].Location.SpeedY > 0 || Player[B].Location.SpeedY < Physics.PlayerJumpVelocity))
                         {
                             C = 1;
                             break;

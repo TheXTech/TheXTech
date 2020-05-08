@@ -560,7 +560,7 @@ void NPCHit(int A, int B, int C)
                 {
                     if(NPC[D].Section == NPC[A].Section)
                     {
-                        if(CheckCollision(NPC[A].Location, NPC[D].Location))
+                        if(CheckCollision(NPC[A].Location, NPC[D].Location, NPC[A].Section))
                         {
                             tempBool = true;
                             NPC[A].Immune = 65;

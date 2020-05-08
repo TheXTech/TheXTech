@@ -372,7 +372,7 @@ void SkullRide(int A)
             {
                 if(NPC[B].Special == 0.0)
                 {
-                    if(CheckCollision(tempLocation, NPC[B].Location) == true)
+                    if(CheckCollision(tempLocation, NPC[B].Location, NPC[A].Section) == true)
                     {
                         NPC[B].Special = 1;
                         SkullRide(B);
@@ -421,7 +421,7 @@ void NPCSpecial(int A)
             {
                 if(NPC[B].Hidden == false)
                 {
-                    if(CheckCollision(tempLocation, NPC[B].Location) == true)
+                    if(CheckCollision(tempLocation, NPC[B].Location, NPC[A].Section) == true)
                     {
                         tempBool = true;
                         break;
@@ -437,7 +437,7 @@ void NPCSpecial(int A)
             {
                 if(Block[B].Hidden == false && BlockNoClipping[Block[B].Type] == false && BlockNPCNoClipping[Block[B].Type] == false && BlockIsSizable[Block[B].Type] == false && BlockOnlyHitspot1[Block[B].Type] == false)
                 {
-                    if(CheckCollision(tempLocation, Block[B].Location) == true && BlockSlope[Block[B].Type] == 0)
+                    if(CheckCollision(tempLocation, Block[B].Location, NPC[A].Section) == true && BlockSlope[Block[B].Type] == 0)
                     {
                         // tempBool = True
                     }
@@ -664,7 +664,7 @@ void NPCSpecial(int A)
                     {
                         if(NPCIsAVine[NPC[B].Type])
                         {
-                            if(CheckCollision(tempLocation, NPC[B].Location))
+                            if(CheckCollision(tempLocation, NPC[B].Location, NPC[A].Section))
                             {
                                 tempBool = true;
                                 break;
@@ -681,7 +681,7 @@ void NPCSpecial(int A)
                     {
                         if(BackgroundNPCFence[Background[B].Type] == true)
                         {
-                            if(CheckCollision(tempLocation, Background[B].Location))
+                            if(CheckCollision(tempLocation, Background[B].Location, NPC[A].Section))
                             {
                                 tempBool = true;
                                 break;
@@ -917,7 +917,7 @@ void NPCSpecial(int A)
                     tempLocation.Height = 800;
                     tempLocation.X = tempLocation.X - tempLocation.Width / 2.0;
                     tempLocation.Y = tempLocation.Y - tempLocation.Height / 2.0;
-                    if(CheckCollision(tempLocation, Player[B].Location))
+                    if(CheckCollision(tempLocation, Player[B].Location, NPC[A].Section))
                     {
                         NPC[A].Special = 1;
                         if(Player[B].Location.X < NPC[A].Location.X)
@@ -1294,14 +1294,14 @@ void NPCSpecial(int A)
             tempLocation2.Y = NPC[A].Location.Y + 1;
             if(Player[B].Dead == false && Player[B].Section == NPC[A].Section)
             {
-                if(CheckCollision(tempLocation, Player[B].Location) == true)
+                if(CheckCollision(tempLocation, Player[B].Location, NPC[A].Section) == true)
                 {
                     if(Player[B].Location.SpeedX > 0)
                     {
                         NPC[A].Location.SpeedX += 0.05;
                     }
                 }
-                else if(CheckCollision(tempLocation2, Player[B].Location) == true)
+                else if(CheckCollision(tempLocation2, Player[B].Location, NPC[A].Section) == true)
                 {
                     if(Player[B].Location.SpeedX < 0)
                     {
@@ -1309,7 +1309,7 @@ void NPCSpecial(int A)
                     }
                 }
             }
-            if(NPC[A].Slope == 0 && (CheckCollision(tempLocation, Player[B].Location) == false || CheckCollision(tempLocation2, Player[B].Location) == false))
+            if(NPC[A].Slope == 0 && (CheckCollision(tempLocation, Player[B].Location, NPC[A].Section) == false || CheckCollision(tempLocation2, Player[B].Location, NPC[A].Section) == false))
             {
                 if(NPC[A].Location.SpeedX < 0)
                 {
@@ -1676,7 +1676,7 @@ void NPCSpecial(int A)
                     tempLocation = NPC[A].Location;
                     tempLocation.Height = 256;
                     tempLocation.Y = NPC[A].Location.Y - tempLocation.Height;
-                    if(CheckCollision(tempLocation, Player[B].Location))
+                    if(CheckCollision(tempLocation, Player[B].Location, NPC[A].Section))
                     {
                         NPC[A].Special = 1;
                         NPC[A].Location.SpeedY = -7;
@@ -1888,7 +1888,7 @@ void NPCSpecial(int A)
                 {
                     if(NPC[B].HoldingPlayer != 0)
                     {
-                        if(CheckCollision(NPC[A].Location, NPC[B].Location))
+                        if(CheckCollision(NPC[A].Location, NPC[B].Location, NPC[A].Section))
                         {
                             NPC[B].Killed = 9;
                             NewEffect(10, NPC[B].Location);
@@ -2033,7 +2033,7 @@ void NPCSpecial(int A)
             {
                 if(Block[B].Hidden == false && BlockNoClipping[Block[B].Type] == false && BlockNPCNoClipping[Block[B].Type] == false && BlockIsSizable[Block[B].Type] == false && BlockOnlyHitspot1[Block[B].Type] == false)
                 {
-                    if(CheckCollision(tempLocation, Block[B].Location) == true && BlockSlope[Block[B].Type] == 0)
+                    if(CheckCollision(tempLocation, Block[B].Location, NPC[A].Section) == true && BlockSlope[Block[B].Type] == 0)
                     {
                         if(NPC[A].Special2 == 1)
                         {
@@ -2064,7 +2064,7 @@ void NPCSpecial(int A)
                 {
                     if(Block[B].Hidden == false && BlockNoClipping[Block[B].Type] == false && BlockNPCNoClipping[Block[B].Type] == false && BlockIsSizable[Block[B].Type] == false && BlockOnlyHitspot1[Block[B].Type] == false)
                     {
-                        if(CheckCollision(tempLocation, Block[B].Location) == true)
+                        if(CheckCollision(tempLocation, Block[B].Location, NPC[A].Section) == true)
                         {
                             NPC[A].Special3 = B;
                             tempBool2 = true;
@@ -2107,7 +2107,7 @@ void NPCSpecial(int A)
             {
                 if(Block[B].Hidden == false && BlockNoClipping[Block[B].Type] == false && BlockNPCNoClipping[Block[B].Type] == false && BlockIsSizable[Block[B].Type] == false && BlockOnlyHitspot1[Block[B].Type] == false)
                 {
-                    if(CheckCollision(tempLocation, Block[B].Location) == true)
+                    if(CheckCollision(tempLocation, Block[B].Location, NPC[A].Section) == true)
                     {
                         if(NPC[A].Special2 == 1)
                         {
@@ -2136,7 +2136,7 @@ void NPCSpecial(int A)
                 {
                     if(Block[B].Hidden == false && BlockNoClipping[Block[B].Type] == false && BlockNPCNoClipping[Block[B].Type] == false && BlockIsSizable[Block[B].Type] == false && BlockOnlyHitspot1[Block[B].Type] == false)
                     {
-                        if(CheckCollision(tempLocation, Block[B].Location) == true)
+                        if(CheckCollision(tempLocation, Block[B].Location, NPC[A].Section) == true)
                         {
                             tempBool2 = true;
                             break;
@@ -2173,7 +2173,7 @@ void NPCSpecial(int A)
             {
                 if(Block[B].Hidden == false && BlockNoClipping[Block[B].Type] == false && BlockNPCNoClipping[Block[B].Type] == false && BlockIsSizable[Block[B].Type] == false && BlockOnlyHitspot1[Block[B].Type] == false)
                 {
-                    if(CheckCollision(tempLocation, Block[B].Location) == true && BlockSlope2[Block[B].Type] == 0)
+                    if(CheckCollision(tempLocation, Block[B].Location, NPC[A].Section) == true && BlockSlope2[Block[B].Type] == 0)
                     {
                         if(NPC[A].Special2 == 1)
                         {
@@ -2202,7 +2202,7 @@ void NPCSpecial(int A)
                 {
                     if(Block[B].Hidden == false && BlockNoClipping[Block[B].Type] == false && BlockNPCNoClipping[Block[B].Type] == false && BlockIsSizable[Block[B].Type] == false && BlockOnlyHitspot1[Block[B].Type] == false)
                     {
-                        if(CheckCollision(tempLocation, Block[B].Location) == true)
+                        if(CheckCollision(tempLocation, Block[B].Location, NPC[A].Section) == true)
                         {
                             tempBool2 = true;
                             if(BlockSlope2[Block[B].Type] != 0)
@@ -2240,7 +2240,7 @@ void NPCSpecial(int A)
             {
                 if(Block[B].Hidden == false && BlockNoClipping[Block[B].Type] == false && BlockNPCNoClipping[Block[B].Type] == false && BlockIsSizable[Block[B].Type] == false && BlockOnlyHitspot1[Block[B].Type] == false)
                 {
-                    if(CheckCollision(tempLocation, Block[B].Location) == true && BlockSlope2[Block[B].Type] == 0)
+                    if(CheckCollision(tempLocation, Block[B].Location, NPC[A].Section) == true && BlockSlope2[Block[B].Type] == 0)
                     {
                         if(NPC[A].Special2 == 1)
                         {
@@ -2269,7 +2269,7 @@ void NPCSpecial(int A)
                 {
                     if(Block[B].Hidden == false && BlockNoClipping[Block[B].Type] == false && BlockNPCNoClipping[Block[B].Type] == false && BlockIsSizable[Block[B].Type] == false && BlockOnlyHitspot1[Block[B].Type] == false)
                     {
-                        if(CheckCollision(tempLocation, Block[B].Location) == true)
+                        if(CheckCollision(tempLocation, Block[B].Location, NPC[A].Section) == true)
                         {
                             tempBool2 = true;
                             break;
@@ -2420,7 +2420,7 @@ void NPCSpecial(int A)
                 {
                     if(Background[B].Hidden == false)
                     {
-                        if(CheckCollision(tempLocation, Background[B].Location))
+                        if(CheckCollision(tempLocation, Background[B].Location, NPC[A].Section))
                         {
                             if(F > 0)
                             {
@@ -2612,7 +2612,7 @@ void NPCSpecial(int A)
             {
                 for(int B = 1; B <= numBlock; B++)
                 {
-                    if(CheckCollision(NPC[A].Location, Block[B].Location) && BlockSlope[B] != 0)
+                    if(CheckCollision(NPC[A].Location, Block[B].Location, NPC[A].Section) && BlockSlope[B] != 0)
                     {
                         const double rad2deg = 180.0 / M_PI;
                         NPC[A].Special7 = SDL_atan2(Block[B].Location.Width, Block[B].Location.Height) * rad2deg;
@@ -2860,7 +2860,7 @@ void NPCSpecial(int A)
             C = 0;
             for(B = 1; B <= numBlock; B++)
             {
-                if(CheckCollision(tempLocation, Block[B].Location) == true)
+                if(CheckCollision(tempLocation, Block[B].Location, NPC[A].Section) == true)
                 {
                     if(C == 0)
                         C = B;
@@ -2884,7 +2884,7 @@ void NPCSpecial(int A)
                     {
                         if(Player[B].Location.X <= NPC[A].Location.X + 80)
                         {
-                            if(CheckCollision(Player[B].Location, NPC[A].Location) == true)
+                            if(CheckCollision(Player[B].Location, NPC[A].Location, NPC[A].Section) == true)
                             {
                                 MoreScore(static_cast<int>(floor(static_cast<double>((1 - (NPC[A].Location.Y - NPC[A].DefaultLocation.Y) / (NPC[A].Special2 - NPC[A].DefaultLocation.Y)) * 10))) + 1, NPC[A].Location);
                                 NPC[A].Killed = 9;
@@ -2976,7 +2976,7 @@ void NPCSpecial(int A)
             tempLocation.X = tempLocation.X - tempLocation.Width / 2.0;
             for(B = 1; B <= numPlayers; B++)
             {
-                if(CheckCollision(tempLocation, Player[B].Location) == true)
+                if(CheckCollision(tempLocation, Player[B].Location, NPC[A].Section) == true)
                 {
                     if(Player[B].Location.X + Player[B].Location.Width / 2.0 < NPC[A].Location.X + NPC[A].Location.Width / 2.0)
                         NPC[A].Direction = -1;
@@ -3149,7 +3149,7 @@ void SpecialNPC(int A)
                     tempLocation.X = Player[B].Location.X + Player[B].Location.Width - 2;
                 else
                     tempLocation.X = Player[B].Location.X - tempLocation.Width + 4;
-                if(CheckCollision(NPC[A].Location, tempLocation))
+                if(CheckCollision(NPC[A].Location, tempLocation, NPC[A].Section))
                 {
                     UpdateGraphics(true);
                     PlaySound(85);
@@ -3245,7 +3245,7 @@ void SpecialNPC(int A)
             {
                 if(NPCIsACoin[NPC[B].Type])
                 {
-                    if(CheckCollision(NPC[A].Location, NPC[B].Location))
+                    if(CheckCollision(NPC[A].Location, NPC[B].Location, NPC[A].Section))
                     {
                         NPC[B].Location.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0 - NPC[B].Location.Width / 2.0;
                         NPC[B].Location.Y = NPC[A].Location.Y + NPC[A].Location.Height / 2.0 - NPC[B].Location.Height / 2.0;
@@ -3262,7 +3262,7 @@ void SpecialNPC(int A)
         else
         {
             NPC[A].Special2 = 1;
-            if(CheckCollision(NPC[A].Location, Player[NPC[A].Special5].Location))
+            if(CheckCollision(NPC[A].Location, Player[NPC[A].Special5].Location, NPC[A].Section))
             {
                 NPC[A].Killed = 9;
                 Player[NPC[A].Special5].FrameCount = 115;
@@ -3273,7 +3273,7 @@ void SpecialNPC(int A)
                     {
                         if(NPCIsACoin[NPC[B].Type])
                         {
-                            if(CheckCollision(NPC[A].Location, NPC[B].Location))
+                            if(CheckCollision(NPC[A].Location, NPC[B].Location, NPC[A].Section))
                             {
                                 NPC[B].Location.X = Player[NPC[A].Special5].Location.X + Player[NPC[A].Special5].Location.Width / 2.0 - NPC[B].Location.Width / 2.0;
                                 NPC[B].Location.Y = Player[NPC[A].Special5].Location.Y + Player[NPC[A].Special5].Location.Height / 2.0 - NPC[B].Location.Height / 2.0;
@@ -3608,7 +3608,7 @@ void SpecialNPC(int A)
                         {
                             if(!Player[B].Dead && Player[B].TimeToLive == 0)
                             {
-                                if(!CanComeOut(NPC[A].Location, Player[B].Location))
+                                if(!CanComeOut(NPC[A].Location, Player[B].Location, NPC[A].Section))
                                 {
                                     tempTurn = false;
                                     break;
@@ -3660,7 +3660,7 @@ void SpecialNPC(int A)
                         {
                             if(!Player[B].Dead && Player[B].TimeToLive == 0)
                             {
-                                if(!CanComeOut(NPC[A].Location, Player[B].Location))
+                                if(!CanComeOut(NPC[A].Location, Player[B].Location, NPC[A].Section))
                                 {
                                     tempTurn = false;
                                     break;
@@ -3792,7 +3792,7 @@ void SpecialNPC(int A)
                         {
                             if(!Player[B].Dead && Player[B].TimeToLive == 0)
                             {
-                                if(!CanComeOut(NPC[A].Location, Player[B].Location))
+                                if(!CanComeOut(NPC[A].Location, Player[B].Location, NPC[A].Section))
                                 {
                                     tempTurn = false;
                                     break;
@@ -4892,7 +4892,7 @@ void SpecialNPC(int A)
         {
             if(!Player[B].Dead && Player[B].Section == NPC[A].Section && B != NPC[A].CantHurtPlayer && NPC[A].Special > -1)
             {
-                if(CheckCollision(Player[B].Location, tempLocation) == true)
+                if(CheckCollision(Player[B].Location, tempLocation, NPC[A].Section) == true)
                     PlayerHurt(B);
             }
         }
@@ -5071,7 +5071,7 @@ void SpecialNPC(int A)
                 if(BlockNoClipping[Block[B].Type] == false &&
                 BlockNPCNoClipping[Block[B].Type] == false &&
                 Block[B].Hidden == false &&
-                CheckCollision(NPC[A].Location, Block[B].Location) == true)
+                CheckCollision(NPC[A].Location, Block[B].Location, NPC[A].Section) == true)
                 {
                     NPC[A].Killed = 9;
                     NewEffect(147, NPC[A].Location);
@@ -5081,7 +5081,7 @@ void SpecialNPC(int A)
             for(int B = 1; B <= numNPCs; B++)
             {
                 if(NPCIsABlock[NPC[B].Type] == true &&
-                CheckCollision(NPC[A].Location, NPC[B].Location) == true)
+                CheckCollision(NPC[A].Location, NPC[B].Location, NPC[A].Section) == true)
                 {
                     NPC[A].Killed = 9;
                     NewEffect(147, NPC[A].Location);
@@ -5246,7 +5246,7 @@ void SpecialNPC(int A)
                        !BlockOnlyHitspot1[Block[E].Type] &&
                        !BlockNPCNoClipping[Block[E].Type])
                     {
-                        if(CheckCollision(tempLocation, Block[Ei].Location))
+                        if(CheckCollision(tempLocation, Block[Ei].Location, NPC[A].Section))
                             D = 1;
                     }
                 }
@@ -5308,7 +5308,7 @@ void SpecialNPC(int A)
                 C = 0;
                 for(B = 1; B <= numPlayers; B++)
                 {
-                    if(!CanComeOut(NPC[A].Location, Player[B].Location) && Player[B].Location.Y >= NPC[A].Location.Y)
+                    if(!CanComeOut(NPC[A].Location, Player[B].Location, NPC[A].Section) && Player[B].Location.Y >= NPC[A].Location.Y)
                         C = B;
                 }
                 if(C > 0)
@@ -5891,7 +5891,7 @@ void SpecialNPC(int A)
             {
                 for(int Ei = 1; Ei <= numBlock; Ei++)
                 {
-                    if(CheckCollision(tempLocation, Block[Ei].Location) && !BlockNoClipping[Block[E].Type] && !BlockNPCNoClipping[Block[E].Type])
+                    if(CheckCollision(tempLocation, Block[Ei].Location, NPC[A].Section) && !BlockNoClipping[Block[E].Type] && !BlockNPCNoClipping[Block[E].Type])
                         D = 1;
                 }
             }
@@ -5984,7 +5984,7 @@ void SpecialNPC(int A)
                                 tempLocation2 = NPC[B].Location;
                                 tempLocation.Width = tempLocation.Width + 32;
                                 tempLocation.X = tempLocation.X - 16;
-                                if(CheckCollision(tempLocation, tempLocation2))
+                                if(CheckCollision(tempLocation, tempLocation2, NPC[A].Section))
                                 {
                                     NPC[A].Location.Y = NPC[A].Location.Y - Physics.NPCGravity;
                                     NPC[A].Location.SpeedY = -4;
@@ -6012,7 +6012,7 @@ void SpecialNPC(int A)
     {
         for(B = 1; B <= numBlock; B++)
         {
-            if(CheckCollision(NPC[A].Location, Block[B].Location))
+            if(CheckCollision(NPC[A].Location, Block[B].Location, NPC[A].Section))
             {
                 BlockHitHard(B);
             }

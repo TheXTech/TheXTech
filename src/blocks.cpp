@@ -171,7 +171,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         {
             if(B != A)
             {
-                if(CheckCollision(b.Location, newLoc(Block[B].Location.X + 4, Block[B].Location.Y - 16, Block[B].Location.Width - 8, Block[B].Location.Height)))
+                if(CheckCollision(b.Location, newLoc(Block[B].Location.X + 4, Block[B].Location.Y - 16, Block[B].Location.Width - 8, Block[B].Location.Height), Player[whatPlayer].Section))
                 {
                     HitDown = false;
                     break;
@@ -329,7 +329,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             {
                 if(B != A && Block[B].Hidden == false && (BlockOnlyHitspot1[Block[B].Type] & !BlockIsSizable[Block[B].Type]) == 0)
                 {
-                    if(CheckCollision(Block[B].Location, newLoc(b.Location.X + 1, b.Location.Y - 31, 30, 30)))
+                    if(CheckCollision(Block[B].Location, newLoc(b.Location.X + 1, b.Location.Y - 31, 30, 30), Player[whatPlayer].Section))
                     {
                         tempBool = true;
                         break;
@@ -419,7 +419,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             {
                 if(B != A && Block[B].Hidden == false && (BlockOnlyHitspot1[Block[B].Type] & !BlockIsSizable[Block[B].Type]) == 0)
                 {
-                    if(CheckCollision(Block[B].Location, newLoc(b.Location.X + 1, b.Location.Y - 31, 30, 30)))
+                    if(CheckCollision(Block[B].Location, newLoc(b.Location.X + 1, b.Location.Y - 31, 30, 30), Player[whatPlayer].Section))
                     {
                         tempBool = true;
                         break;
@@ -1640,7 +1640,7 @@ void UpdateBlocks()
                     {
                         for(B = 1; B <= numPlayers; B++)
                         {
-                            if(CheckCollision(Block[A].Location, newLoc(Player[B].Location.X - 64, Player[B].Location.Y - 64, 128, 128)))
+                            if(CheckCollision(Block[A].Location, newLoc(Player[B].Location.X - 64, Player[B].Location.Y - 64, 128, 128), Player[B].Section))
                             {
                                 B = 0;
                                 break;
@@ -1812,7 +1812,7 @@ void UpdateBlocks()
                     {
                         if(!(Block[iBlock[A]].ShakeY3 > 0) || NPCIsACoin[NPC[B].Type])
                         {
-                            if(ShakeCollision(NPC[B].Location, Block[iBlock[A]].Location, Block[iBlock[A]].ShakeY3) == true)
+                            if(ShakeCollision(NPC[B].Location, Block[iBlock[A]].Location, Block[iBlock[A]].ShakeY3, NPC[B].Section) == true)
                             {
                                 if(iBlock[A] != NPC[B].tempBlock)
                                 {
@@ -1842,7 +1842,7 @@ void UpdateBlocks()
                 {
                     if(Player[B].Effect == 0 && BlockBouncy[Block[iBlock[A]].Type] == false)
                     {
-                        if(ShakeCollision(Player[B].Location, Block[iBlock[A]].Location, Block[iBlock[A]].ShakeY3) == true)
+                        if(ShakeCollision(Player[B].Location, Block[iBlock[A]].Location, Block[iBlock[A]].ShakeY3, Player[B].Section) == true)
                         {
                             if(BlockIsSizable[Block[iBlock[A]].Type] == false && BlockOnlyHitspot1[Block[iBlock[A]].Type] == false)
                             {

@@ -90,7 +90,7 @@ void ShowLayer(std::string LayerName, bool NoEffect)
                     {
                         for(B = 1; B <= numPlayers; B++)
                         {
-                            if(CheckCollision(Player[B].Location, NPC[A].Location) == true)
+                            if(CheckCollision(Player[B].Location, NPC[A].Location, NPC[A].Section) == true)
                                 Player[B].Immune = 120;
                         }
                     }

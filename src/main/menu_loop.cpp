@@ -924,7 +924,7 @@ void MenuLoop()
 
                             For(B, 1, numScenes)
                             {
-                                if(CheckCollision(tempLocation, Scene[B].Location))
+                                if(CheckCollision(tempLocation, Scene[B].Location, 0))
                                     Scene[B].Active = false;
                             }
                         }
@@ -1702,7 +1702,7 @@ void MenuLoop()
                        !NPCWontHurt[NPC[B].Type] && NPC[B].HoldingPlayer == 0)
                     {
 //                            If CheckCollision(tempLocation, NPC(B).Location) Then
-                        if(CheckCollision(tempLocation, NPC[B].Location)) {
+                        if(CheckCollision(tempLocation, NPC[B].Location, NPC[B].Section)) {
 //                                .Controls.Run = False
                             p.Controls.Run = false;
 //                            End If
@@ -1753,7 +1753,7 @@ void MenuLoop()
                       !NPCWontHurt[NPC[B].Type] && NPC[B].HoldingPlayer == 0)
                     {
 //                            If CheckCollision(tempLocation, NPC(B).Location) Then
-                        if(CheckCollision(tempLocation, NPC[B].Location))
+                        if(CheckCollision(tempLocation, NPC[B].Location, NPC[B].Section))
                         {
 //                                .RunRelease = True
                             p.RunRelease = true;
@@ -1793,7 +1793,7 @@ void MenuLoop()
                            !NPCWontHurt[NPC[B].Type] && NPC[B].HoldingPlayer == 0)
                         {
 //                                If CheckCollision(tempLocation, NPC(B).Location) Then
-                            if(CheckCollision(tempLocation, NPC[B].Location))
+                            if(CheckCollision(tempLocation, NPC[B].Location, NPC[B].Section))
                             {
 //                                    .Controls.Up = True
                                 p.Controls.Up = true;
@@ -1823,7 +1823,7 @@ void MenuLoop()
                            !NPCWontHurt[NPC[B].Type] && NPC[B].HoldingPlayer == 0)
                         {
 //                                If CheckCollision(tempLocation, NPC(B).Location) Then
-                            if(CheckCollision(tempLocation, NPC[B].Location))
+                            if(CheckCollision(tempLocation, NPC[B].Location, NPC[B].Section))
                             {
 //                                    .Controls.Down = True
                                 p.Controls.Down = true;
@@ -1959,7 +1959,7 @@ void MenuLoop()
                 For(B, 1, numBlock)
                 {
 //                        If CheckCollision(.Location, Block(B).Location) = True Then
-                    if(CheckCollision(p.Location, Block[B].Location))
+                    if(CheckCollision(p.Location, Block[B].Location, p.Section))
                     {
 //                            .Location.Y = Block(B).Location.Y - .Location.Height - 0.1
                         p.Location.Y = Block[B].Location.Y - p.Location.Height - 0.1;
@@ -2148,7 +2148,7 @@ void MenuLoop()
             {
                 if(BlockSlope[Block[B].Type] == 0 && BlockIsSizable[Block[B].Type] == false && BlockOnlyHitspot1[Block[B].Type] == false && Block[B].Hidden == false)
                 {
-                    if(CheckCollision(Block[B].Location, tempLocation) == true)
+                    if(CheckCollision(Block[B].Location, tempLocation, Player[A].Section) == true)
                     {
                         Player[A].CanJump = true;
                         Player[A].SpinJump = false;
@@ -2170,7 +2170,7 @@ void MenuLoop()
             {
                 if((BlockIsSizable[Block[B].Type] == false || Block[B].Location.Y > Player[A].Location.Y + Player[A].Location.Height - 1) && BlockOnlyHitspot1[Block[B].Type] == false && Block[B].Hidden == false)
                 {
-                    if(CheckCollision(Block[B].Location, tempLocation) == true)
+                    if(CheckCollision(Block[B].Location, tempLocation, Player[A].Section) == true)
                     {
                         tempBool = true;
                         break;
@@ -2232,7 +2232,7 @@ void MenuLoop()
             if(NPC[A].Active)
             {
 //                If CheckCollision(newLoc(MenuMouseX - vScreenX(1), MenuMouseY - vScreenY(1)), NPC(A).Location) = True Then
-                if(CheckCollision(newLoc(MenuMouseX - vScreenX[1], MenuMouseY - vScreenY[1]), NPC[A].Location))
+                if(CheckCollision(newLoc(MenuMouseX - vScreenX[1], MenuMouseY - vScreenY[1]), NPC[A].Location, NPC[A].Section))
                 {
 //                    If NPCIsACoin(NPC(A).Type) = False Then
                     if(!NPCIsACoin[NPC[A].Type])
@@ -2266,7 +2266,7 @@ void MenuLoop()
             if(!Block[A].Hidden)
             {
 //                If CheckCollision(newLoc(MenuMouseX - vScreenX(1), MenuMouseY - vScreenY(1)), Block(A).Location) = True Then
-                if(CheckCollision(newLoc(MenuMouseX - vScreenX[1], MenuMouseY - vScreenY[1]), Block[A].Location))
+                if(CheckCollision(newLoc(MenuMouseX - vScreenX[1], MenuMouseY - vScreenY[1]), Block[A].Location, 0))
                 {
 //                    BlockHit A
                     BlockHit(A);

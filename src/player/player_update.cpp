@@ -195,7 +195,7 @@ void UpdatePlayer()
                    NPCIsYoshi[NPC[i].Type] != true && NPCIsBoot[NPC[i].Type] != true &&
                    NPC[i].CantHurtPlayer != A && NPC[i].Type != 91)
                 {
-                    if(CheckCollision(NPC[i].Location, tempLocation4) == true)
+                    if(CheckCollision(NPC[i].Location, tempLocation4, NPC[i].Section) == true)
                     {
                         NPC[i].Killed = 3;
                     }
@@ -509,13 +509,18 @@ void UpdatePlayer()
                         tempLocation.X = tempLocation.X + 64 - tempLocation.Width / 2.0;
                         fBlock = FirstBlock[(tempLocation.X / 32) - 1];
                         lBlock = LastBlock[((tempLocation.X + tempLocation.Width) / 32.0) + 1];
+                        if(LevelWrap2[Player[A].Section])
+                        {
+                            fBlock = 0;
+                            lBlock = numBlock;
+                        }
 
                         for(B = (int)fBlock; B <= lBlock; B++)
                         {
                             if(!Block[B].Invis && !BlockOnlyHitspot1[Block[B].Type] &&
                                !BlockNoClipping[Block[B].Type] && !BlockPlayerNoClipping[Block[B].Type] && !Block[B].Hidden)
                             {
-                                if(CheckCollision(tempLocation, Block[B].Location))
+                                if(CheckCollision(tempLocation, Block[B].Location, Player[A].Section))
                                 {
                                     tempBool = false;
                                     PlaySound(3);
@@ -527,7 +532,7 @@ void UpdatePlayer()
                         {
                             if(NPCIsABlock[NPC[B].Type] && !NPCStandsOnPlayer[NPC[B].Type] && NPC[B].Active && NPC[B].Type != 56)
                             {
-                                if(CheckCollision(tempLocation, NPC[B].Location))
+                                if(CheckCollision(tempLocation, NPC[B].Location, Player[A].Section))
                                 {
                                     tempBool = false;
                                     PlaySound(3);
@@ -575,7 +580,7 @@ void UpdatePlayer()
 
                             for(B = 1; B <= numPlayers; B++)
                             {
-                                if(B != A && Player[B].Mount != 2 && CheckCollision(Player[A].Location, Player[B].Location))
+                                if(B != A && Player[B].Mount != 2 && CheckCollision(Player[A].Location, Player[B].Location, Player[A].Section))
                                     Player[B].Location.Y = Player[A].Location.Y - Player[B].Location.Height;
                                 if(Player[B].StandingOnTempNPC == 56)
                                 {
@@ -1080,7 +1085,7 @@ void UpdatePlayer()
                                 tempLocation.Height = tempLocation.Height + 32;
                                 tempLocation.X = tempLocation.X - 16;
                                 tempLocation.Y = tempLocation.Y - 16;
-                                if(CheckCollision(tempLocation, Player[A].Location))
+                                if(CheckCollision(tempLocation, Player[A].Location, Player[A].Section))
                                 {
                                     Player[A].FairyTime = 20;
                                     Player[A].FairyCD = 0;
@@ -1097,7 +1102,7 @@ void UpdatePlayer()
                                 tempLocation.Height = tempLocation.Height + 32;
                                 tempLocation.X = tempLocation.X - 16;
                                 tempLocation.Y = tempLocation.Y - 16;
-                                if(CheckCollision(tempLocation, Player[A].Location))
+                                if(CheckCollision(tempLocation, Player[A].Location, Player[A].Section))
                                 {
                                     Player[A].FairyTime = 20;
                                     Player[A].FairyCD = 0;
@@ -2086,7 +2091,7 @@ void UpdatePlayer()
                                 tempLocation.X = tempLocation.X + 8;
                                 tempLocation.Height = 26;
                                 tempLocation.Y = tempLocation.Y + 2;
-                                if(CheckCollision(Player[A].Location, tempLocation))
+                                if(CheckCollision(Player[A].Location, tempLocation, Player[A].Section))
                                 {
                                     PlaySound(31);
                                     StopMusic();
@@ -2227,19 +2232,33 @@ void UpdatePlayer()
                 if(Player[A].Mount == 0)
                     Player[A].YoshiYellow = false;
 
-                // When it's true - don't check horizonta' section's bounds
+                // When it's true - don't check horizontal' section's bounds
                 bool hBoundsHandled = false;
 
                 // level wrap
                 if(LevelWrap[Player[A].Section] || LevelVWrap[Player[A].Section])
                 {
                     // horizontally
-                    if(LevelWrap[Player[A].Section])
+                    if(LevelWrap[Player[A].Section] && !LevelWrap2[Player[A].Section])
                     {
                         if(Player[A].Location.X + Player[A].Location.Width < level[Player[A].Section].X)
                             Player[A].Location.X = level[Player[A].Section].Width - 1;
                         else if(Player[A].Location.X > level[Player[A].Section].Width)
                             Player[A].Location.X = level[Player[A].Section].X - Player[A].Location.Width + 1;
+                        hBoundsHandled = true;
+                    }
+                    if(LevelWrap2[Player[A].Section])
+                    {
+                        if(Player[A].Location.X < level[Player[A].Section].X)
+                        {
+                            Player[A].Location.X = level[Player[A].Section].Width - 1;
+                            BGOffset--;
+                        }
+                        else if(Player[A].Location.X > level[Player[A].Section].Width)
+                        {
+                            Player[A].Location.X = level[Player[A].Section].X + 1;
+                            BGOffset++;
+                        }
                         hBoundsHandled = true;
                     }
 
@@ -2382,6 +2401,12 @@ void UpdatePlayer()
                 fBlock = FirstBlock[(Player[A].Location.X / 32) - 1];
                 lBlock = LastBlock[((Player[A].Location.X + Player[A].Location.Width) / 32.0) + 1];
 
+                if(LevelWrap2[Player[A].Section])
+                {
+                    fBlock = 0;
+                    lBlock = numBlock;
+                }
+
                 for(B = (int)fBlock; B <= lBlock; B++)
                 {
 
@@ -2397,7 +2422,7 @@ void UpdatePlayer()
 
                                     if(!Block[B].Hidden)
                                     {
-                                        HitSpot = FindRunningCollision(Player[A].Location, Block[B].Location); // this finds what part of the block the player collided
+                                        HitSpot = FindRunningCollision(Player[A].Location, Block[B].Location, Player[A].Section); // this finds what part of the block the player collided
 
                                         if(BlockNoClipping[Block[B].Type] || BlockPlayerNoClipping[Block[B].Type]) // blocks that the player can't touch are forced to hitspot 0 (which means no collision)
                                             HitSpot = 0;
@@ -2913,9 +2938,14 @@ void UpdatePlayer()
                                                 tempBool = false;
                                                 fBlock = FirstBlock[(tempLocation.X / 32) - 1];
                                                 lBlock = LastBlock[((tempLocation.X + tempLocation.Width) / 32.0) + 1];
+                                                if(LevelWrap2[Player[A].Section])
+                                                {
+                                                    fBlock = 0;
+                                                    lBlock = numBlock;
+                                                }
                                                 for(auto C = fBlock; C <= lBlock; C++)
                                                 {
-                                                    if(CheckCollision(tempLocation, Block[C].Location) && !Block[C].Hidden)
+                                                    if(CheckCollision(tempLocation, Block[C].Location, Player[A].Section) && !Block[C].Hidden)
                                                     {
                                                         if(BlockSlope[Block[C].Type] == 0)
                                                             tempBool = true;
@@ -3025,7 +3055,7 @@ void UpdatePlayer()
                     }
                     if(tempHit2)
                     {
-                        if(WalkingCollision(Player[A].Location, Block[tempHit3].Location))
+                        if(WalkingCollision(Player[A].Location, Block[tempHit3].Location, Player[A].Section))
                         {
 //                            if(nPlay.Online == true && A == nPlay.MySlot + 1) // online stuffs
 //                            {
@@ -3354,13 +3384,13 @@ void UpdatePlayer()
                 {
                     if(BackgroundFence[Background[B].Type] && !Background[B].Hidden)
                     {
-                        if(CheckCollision(Player[A].Location, Background[B].Location))
+                        if(CheckCollision(Player[A].Location, Background[B].Location, Player[A].Section))
                         {
                             tempLocation = Background[B].Location;
                             tempLocation.Height = tempLocation.Height - 16;
                             tempLocation.Width = tempLocation.Width - 20;
                             tempLocation.X = tempLocation.X + 10;
-                            if(CheckCollision(Player[A].Location, tempLocation))
+                            if(CheckCollision(Player[A].Location, tempLocation, Player[A].Section))
                             {
                                 if(Player[A].Character == 5)
                                 {
@@ -3443,14 +3473,14 @@ void UpdatePlayer()
                         {
                             if(NPC[B].HoldingPlayer == 0 || NPCIsABonus[NPC[B].Type] || (BattleMode && NPC[B].HoldingPlayer != A))
                             {
-                                if(CheckCollision(Player[A].Location, NPC[B].Location))
+                                if(CheckCollision(Player[A].Location, NPC[B].Location, Player[A].Section))
                                 {
                                     if((NPC[B].Type == 58 || NPC[B].Type == 21 || NPC[B].Type == 67 || NPC[B].Type == 68 || NPC[B].Type == 69 || NPC[B].Type == 70) && NPC[B].Projectile == true)
                                         PlayerHurt(A);
                                     if((Player[A].Mount == 1 || Player[A].Mount == 3 || Player[A].SpinJump || (Player[A].ShellSurf && NPCIsAShell[NPC[B].Type]) || (Player[A].Stoned && !NPCCanWalkOn[NPC[B].Type])) && !NPCMovesPlayer[NPC[B].Type])
-                                        HitSpot = BootCollision(Player[A].Location, NPC[B].Location, NPCCanWalkOn[NPC[B].Type]); // find the hitspot for normal mario
+                                        HitSpot = BootCollision(Player[A].Location, NPC[B].Location, NPCCanWalkOn[NPC[B].Type], Player[A].Section); // find the hitspot for normal mario
                                     else
-                                        HitSpot = EasyModeCollision(Player[A].Location, NPC[B].Location, NPCCanWalkOn[NPC[B].Type]); // find the hitspot when in a shoe or on a yoshi
+                                        HitSpot = EasyModeCollision(Player[A].Location, NPC[B].Location, NPCCanWalkOn[NPC[B].Type], Player[A].Section); // find the hitspot when in a shoe or on a yoshi
 
                                     if(!NPC[B].Inert)
                                     {
@@ -3931,13 +3961,13 @@ void UpdatePlayer()
                                                     {
 
                                                         // the n00bcollision function reduces the size of the npc's hit box before it damages the player
-                                                        if(n00bCollision(Player[A].Location, NPC[B].Location))
+                                                        if(n00bCollision(Player[A].Location, NPC[B].Location, Player[A].Section))
                                                             PlayerHurt(A);
                                                     }
                                                 }
                                                 else if(NPC[B].Type == 308 && NPC[B].Special2 == 2) // Also special code for Spiky Sphere (yellow)
                                                 {
-                                                     if(n00bCollision(Player[A].Location, NPC[B].Location))
+                                                     if(n00bCollision(Player[A].Location, NPC[B].Location, Player[A].Section))
                                                          PlayerHurt(A);
                                                 }
                                                 else if(NPC[B].Type == 15) // Special code for BOOM BOOM
@@ -3951,7 +3981,7 @@ void UpdatePlayer()
                                                     }
                                                     else if(NPC[B].Special != 4)
                                                     {
-                                                        if(n00bCollision(Player[A].Location, NPC[B].Location))
+                                                        if(n00bCollision(Player[A].Location, NPC[B].Location, Player[A].Section))
                                                             PlayerHurt(A);
                                                     }
                                                 }
@@ -4084,7 +4114,7 @@ void UpdatePlayer()
                                             {
                                                 if(NPC[B].CantHurtPlayer != A && !FreezeNPCs && NPC[B].Type != 195)
                                                 {
-                                                    if(n00bCollision(Player[A].Location, NPC[B].Location))
+                                                    if(n00bCollision(Player[A].Location, NPC[B].Location, Player[A].Section))
                                                         PlayerHurt(A);
                                                 }
                                             }
@@ -4117,7 +4147,7 @@ void UpdatePlayer()
                                                                 NPCHit(B, 3, B);
                                                             if(NPC[B].Killed == 0)
                                                             {
-                                                                if(n00bCollision(Player[A].Location, NPC[B].Location))
+                                                                if(n00bCollision(Player[A].Location, NPC[B].Location, Player[A].Section))
                                                                 {
                                                                     if(BattleMode && NPC[B].HoldingPlayer != A && NPC[B].HoldingPlayer > 0 && Player[A].Immune == 0)
                                                                         NPCHit(B, 5, B);
@@ -4150,9 +4180,14 @@ void UpdatePlayer()
                                                     Player[A].Location.Y = NPC[B].Location.Y + NPC[B].Location.Height + 0.1;
                                                     fBlock = FirstBlock[(Player[A].Location.X / 32) - 1];
                                                     lBlock = LastBlock[((Player[A].Location.X + Player[A].Location.Width) / 32.0) + 1];
+                                                    if(LevelWrap2[Player[A].Section])
+                                                    {
+                                                        fBlock = 0;
+                                                        lBlock = numBlock;
+                                                    }
                                                     for(C = fBlock; C <= lBlock; C++)
                                                     {
-                                                        if(CheckCollision(Player[A].Location, Block[C].Location) &&
+                                                        if(CheckCollision(Player[A].Location, Block[C].Location, Player[A].Section) &&
                                                            !Block[C].Hidden && !BlockOnlyHitspot1[Block[C].Type])
                                                             Player[A].Location = tempLocation;
                                                     }

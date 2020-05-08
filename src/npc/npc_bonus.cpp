@@ -613,7 +613,7 @@ void TouchBonus(int A, int B)
                             {
                                 if(Background[D].Type == 160)
                                 {
-                                    if(CheckCollision(Warp[C].Entrance, Background[D].Location))
+                                    if(CheckCollision(Warp[C].Entrance, Background[D].Location, NPC[B].Section))
                                     {
                                         Background[D].Layer.clear();
                                         Background[D].Hidden = true;

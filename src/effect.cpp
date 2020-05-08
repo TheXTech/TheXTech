@@ -216,11 +216,16 @@ void UpdateEffects()
                 tempBool = false;
                 for(B = 1; B <= numWater; B++)
                 {
-                    if(CheckCollision(e.Location, Water[B].Location) && Water[B].Hidden == false)
+                    for(int C = 1; C <= numPlayers; C++)
                     {
-                        tempBool = true;
-                        break;
+                        if(CheckCollision(e.Location, Water[B].Location, Player[C].Section) && Water[B].Hidden == false)
+                        {
+                            tempBool = true;
+                            break;
+                        }
                     }
+                    if(tempBool)
+                        break;
                 }
                 if(tempBool == false)
                     e.Life = 0;
@@ -509,7 +514,7 @@ void UpdateEffects()
                 {
                     if(Player[B].Dead == false && Player[B].TimeToLive == 0)
                     {
-                        if(CheckCollision(e.Location, Player[B].Location))
+                        if(CheckCollision(e.Location, Player[B].Location, Player[B].Section))
                         {
                             tempBool = true;
                             break;
@@ -1100,21 +1105,26 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
             {
                 if(Background[B].Type == 82 || Background[B].Type == 26 || Background[B].Type == 65 || Background[B].Type == 159 || Background[B].Type == 166 || Background[B].Type == 168)
                 {
-                    if(CheckCollision(Effect[numEffects].Location, Background[B].Location) == true)
+                    for(int C = 1; C <= numPlayers; C++)
                     {
-                        if(Background[B].Type == 82 || Background[B].Type == 159)
-                            Effect[numEffects].Location.Y = Background[B].Location.Y - Effect[numEffects].Location.Height + 12;
-                        if(Background[B].Type == 26)
-                            Effect[numEffects].Location.Y = Background[B].Location.Y - Effect[numEffects].Location.Height + 6;
-                        if(Background[B].Type == 168)
-                            Effect[numEffects].Location.Y = Background[B].Location.Y - Effect[numEffects].Location.Height + 8;
-                        if(Background[B].Type == 166)
-                            Effect[numEffects].Location.Y = Background[B].Location.Y - Effect[numEffects].Location.Height + 10;
-                        if(Background[B].Type == 65)
-                            Effect[numEffects].Location.Y = Background[B].Location.Y - Effect[numEffects].Location.Height + 16;
-                        tempBool = true;
-                        break;
+                        if(CheckCollision(Effect[numEffects].Location, Background[B].Location, Player[C].Section) == true)
+                        {
+                            if(Background[B].Type == 82 || Background[B].Type == 159)
+                                Effect[numEffects].Location.Y = Background[B].Location.Y - Effect[numEffects].Location.Height + 12;
+                            if(Background[B].Type == 26)
+                                Effect[numEffects].Location.Y = Background[B].Location.Y - Effect[numEffects].Location.Height + 6;
+                            if(Background[B].Type == 168)
+                                Effect[numEffects].Location.Y = Background[B].Location.Y - Effect[numEffects].Location.Height + 8;
+                            if(Background[B].Type == 166)
+                                Effect[numEffects].Location.Y = Background[B].Location.Y - Effect[numEffects].Location.Height + 10;
+                            if(Background[B].Type == 65)
+                                Effect[numEffects].Location.Y = Background[B].Location.Y - Effect[numEffects].Location.Height + 16;
+                            tempBool = true;
+                            break;
+                        }
                     }
+                    if(tempBool)
+                        break;
                 }
             }
         }

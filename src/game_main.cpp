@@ -411,7 +411,7 @@ int GameMain(const CmdLineSetup_t &setup)
                     tempBool = true;
                     for(int B = 1; B <= numBlock; ++B)
                     {
-                        if(CheckCollision(p.Location, Block[B].Location))
+                        if(CheckCollision(p.Location, Block[B].Location, p.Section))
                         {
                             p.Location.Y = Block[B].Location.Y - p.Location.Height - 0.1;
                             tempBool = false;

@@ -38,6 +38,8 @@ void SetupVars()
     //int A;
     SetupPlayerFrames();
 
+    BGOffset = 0;
+
     for(int A = 1; A <= maxEffectType; A++)
     {
         EffectWidth[A] = 32;

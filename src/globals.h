@@ -1240,6 +1240,8 @@ extern int DScreenType;
 extern bool LevelEditor;
 //Public WorldEditor As Boolean
 extern bool WorldEditor;
+//Public BGOffset As Float 'a background offset for wrap type 2
+extern int BGOffset;
 //Public PlayerStart(1 To 2) As Location
 extern RangeArr<Location_t, 1, 2> PlayerStart;
 
@@ -1329,6 +1331,8 @@ extern int numSections;
 extern RangeArr<Location_t, 0, maxSections> level;
 //Public LevelWrap(0 To maxSections) As Boolean 'Wrap around the level
 extern RangeArrI<bool, 0, maxSections, false> LevelWrap;
+//Public LevelWrap2(0 To maxSections) As Boolean 'Screen wrap
+extern RangeArrI<bool, 0, maxSections, false> LevelWrap2;
 //EXTRA: Wrap vertically around the level
 extern RangeArrI<bool, 0, maxSections, false> LevelVWrap;
 //Public OffScreenExit(0 To maxSections) As Boolean 'walk offscreen to end the level

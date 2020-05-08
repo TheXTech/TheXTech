@@ -373,7 +373,7 @@ void SetupPlayers()
                     C = 0;
                     for(B = 1; B <= numBlock; B++)
                     {
-                        if(CheckCollision(tempLocation, Block[B].Location) == true)
+                        if(CheckCollision(tempLocation, Block[B].Location, NPC[A].Section) == true)
                         {
                             if(C == 0)
                                 C = B;
@@ -2120,11 +2120,18 @@ void TailSwipe(int plr, bool boo, bool Stab, int StabDir)
     {
         fBlock = FirstBlock[(tailLoc.X / 32) - 1];
         lBlock = LastBlock[((tailLoc.X + tailLoc.Width) / 32.0) + 1];
+
+        if(LevelWrap2[Player[plr].Section])
+        {
+            fBlock = 0;
+            lBlock = numBlock;
+        }
+
         for(A = fBlock; A <= lBlock; A++)
         {
             if(!BlockIsSizable[Block[A].Type] && Block[A].Hidden == false && (Block[A].Type != 293 || Stab == true) && Block[A].Invis == false && BlockNoClipping[Block[A].Type] == false)
             {
-                if(CheckCollision(tailLoc, Block[A].Location) == true)
+                if(CheckCollision(tailLoc, Block[A].Location, Player[plr].Section) == true)
                 {
                     if(Block[A].ShakeY == 0 && Block[A].ShakeY2 == 0 && Block[A].ShakeY3 == 0)
                     {
@@ -2201,7 +2208,7 @@ void TailSwipe(int plr, bool boo, bool Stab, int StabDir)
                 }
                 if(NPC[A].Type == 91 && Stab == true)
                     stabLoc.Y = stabLoc.Y - stabLoc.Height;
-                if(CheckCollision(tailLoc, stabLoc) == true && NPC[A].Killed == 0 && NPC[A].TailCD == 0 && !(StabDir != 0 && NPC[A].Type == 91))
+                if(CheckCollision(tailLoc, stabLoc, Player[plr].Section) == true && NPC[A].Killed == 0 && NPC[A].TailCD == 0 && !(StabDir != 0 && NPC[A].Type == 91))
                 {
                     oldNPC = NPC[A];
                     if(Stab == true)
@@ -2262,7 +2269,7 @@ void TailSwipe(int plr, bool boo, bool Stab, int StabDir)
             if(A != plr)
             {
                 stabLoc = Player[A].Location;
-                if(CheckCollision(tailLoc, stabLoc) == true && Player[A].Effect == 0 && Player[A].Immune == 0 && Player[A].Dead == false && Player[A].TimeToLive == 0)
+                if(CheckCollision(tailLoc, stabLoc, Player[plr].Section) == true && Player[A].Effect == 0 && Player[A].Immune == 0 && Player[A].Dead == false && Player[A].TimeToLive == 0)
                 {
                     if(Stab == true)
                     {
@@ -2319,7 +2326,7 @@ void YoshiEat(int A)
     {
         if(B != A && Player[B].Effect == 0 && Player[B].Dead == false && Player[B].TimeToLive == 0 && Player[B].Mount == 0)
         {
-            if(CheckCollision(Player[A].YoshiTongue, Player[B].Location) == true)
+            if(CheckCollision(Player[A].YoshiTongue, Player[B].Location, Player[A].Section) == true)
             {
                 Player[A].YoshiPlayer = B;
                 Player[B].HoldingNPC = 0;
@@ -2334,7 +2341,7 @@ void YoshiEat(int A)
             tempLocation = NPC[B].Location;
             if(NPC[B].Type == 91)
                 tempLocation.Y = NPC[B].Location.Y - 16;
-            if(CheckCollision(Player[A].YoshiTongue, tempLocation))
+            if(CheckCollision(Player[A].YoshiTongue, tempLocation, Player[A].Section))
             {
                 if(NPC[B].Type == 91)
                 {
@@ -2557,7 +2564,7 @@ void YoshiPound(int A, int /*C*/, bool BreakBlocks)
                 tempLocation2 = NPC[B].Location;
                 tempLocation2.Y = tempLocation2.Y + tempLocation2.Height - 4;
                 tempLocation2.Height = 8;
-                if(CheckCollision(tempLocation, tempLocation2) == true)
+                if(CheckCollision(tempLocation, tempLocation2, Player[A].Section) == true)
                 {
                     Block[0].Location.Y = NPC[B].Location.Y + NPC[B].Location.Height;
                     NPCHit(B, 2, 0);
@@ -2572,7 +2579,7 @@ void YoshiPound(int A, int /*C*/, bool BreakBlocks)
             {
                 if(Block[B].Hidden == false && Block[B].Invis == false && BlockNoClipping[Block[B].Type] == false && BlockIsSizable[Block[B].Type] == false)
                 {
-                    if(CheckCollision(Player[A].Location, Block[B].Location) == true)
+                    if(CheckCollision(Player[A].Location, Block[B].Location, Player[A].Section) == true)
                     {
                         BlockHit(B, true, A);
                         BlockHitHard(B);
@@ -2631,6 +2638,11 @@ void PlayerPush(int A, int HitSpot)
         return;
     fBlock = FirstBlock[(Player[A].Location.X / 32) - 1];
     lBlock = LastBlock[((Player[A].Location.X + Player[A].Location.Width) / 32.0) + 1];
+    if(LevelWrap2[Player[A].Section])
+    {
+        fBlock = 0;
+        lBlock = numBlock;
+    }
     for(B = int(fBlock); B <= lBlock; B++)
     {
         if(Block[B].Hidden == false)
@@ -2641,7 +2653,7 @@ void PlayerPush(int A, int HitSpot)
                 {
                     tempLocation = Player[A].Location;
                     tempLocation.Height = tempLocation.Height - 1;
-                    if(CheckCollision(tempLocation, Block[B].Location) == true)
+                    if(CheckCollision(tempLocation, Block[B].Location, Player[A].Section) == true)
                     {
                         if(BlockOnlyHitspot1[Block[B].Type] == false)
                         {
@@ -2873,7 +2885,7 @@ void YoshiEatCode(int A)
                         tempLocation.X = tempLocation.X + 8;
                         tempLocation.Height = 26;
                         tempLocation.Y = tempLocation.Y + 2;
-                        if(CheckCollision(Player[A].Location, tempLocation) == true)
+                        if(CheckCollision(Player[A].Location, tempLocation, Player[A].Section) == true)
                         {
                             PlaySound(31);
                             StopMusic();
@@ -3341,7 +3353,7 @@ void ClownCar()
                     {
                         if(B != C && (NPC[C].standingOnPlayer == A || NPC[C].playerTemp == true))
                         {
-                            if(CheckCollision(tempLocation, NPC[C].Location) == true)
+                            if(CheckCollision(tempLocation, NPC[C].Location, Player[A].Section) == true)
                                 tempBool = true;
                         }
                     }
@@ -3402,7 +3414,7 @@ void WaterCheck(int A)
     {
         if(Water[B].Hidden == false)
         {
-            if(CheckCollision(Player[A].Location, Water[B].Location) == true)
+            if(CheckCollision(Player[A].Location, Water[B].Location, Player[A].Section) == true)
             {
                 if(Player[A].Wet == 0 && Player[A].Mount != 2)
                 {
@@ -3466,7 +3478,7 @@ void WaterCheck(int A)
             {
                 for(B = 1; B <= numWater; B++)
                 {
-                    if(CheckCollision(Water[B].Location, tempLocation))
+                    if(CheckCollision(Water[B].Location, tempLocation, Player[A].Section))
                     {
                         NewEffect(113, tempLocation, 1, 0, ShadowMode);
                         break;
@@ -3909,7 +3921,7 @@ void SuperWarp(int A)
         for(int B = 1; B <= numWarps; B++)
         {
             auto &warp = Warp[B];
-            if(CheckCollision(plr.Location, warp.Entrance) && !warp.Hidden)
+            if(CheckCollision(plr.Location, warp.Entrance, plr.Section) && !warp.Hidden)
             {
                 plr.ShowWarp = B;
                 canWarp = false;
@@ -3918,22 +3930,22 @@ void SuperWarp(int A)
                     canWarp = true;
                 else if(warp.Direction == 1 && plr.Controls.Up) // Pipe
                 {
-                    if(WarpCollision(plr.Location, B))
+                    if(WarpCollision(plr.Location, B, plr.Section))
                         canWarp = true;
                 }
                 else if(warp.Direction == 2 && plr.Controls.Left)
                 {
-                    if(WarpCollision(plr.Location, B))
+                    if(WarpCollision(plr.Location, B, plr.Section))
                         canWarp = true;
                 }
                 else if(warp.Direction == 3 && plr.Controls.Down)
                 {
-                    if(WarpCollision(plr.Location, B))
+                    if(WarpCollision(plr.Location, B, plr.Section))
                         canWarp = true;
                 }
                 else if(warp.Direction == 4 && plr.Controls.Right)
                 {
-                    if(WarpCollision(plr.Location, B))
+                    if(WarpCollision(plr.Location, B, plr.Section))
                         canWarp = true;
                 }
                 // NOTE: Would be correct to move this up, but leave this here for a compatibility to keep the same behavior
@@ -3981,7 +3993,7 @@ void SuperWarp(int A)
                             {
                                 if(Background[C].Type == 98)
                                 {
-                                    if(CheckCollision(warp.Entrance, Background[C].Location))
+                                    if(CheckCollision(warp.Entrance, Background[C].Location, plr.Section))
                                     {
                                         Background[C].Layer.clear();
                                         Background[C].Hidden = true;
@@ -3999,7 +4011,7 @@ void SuperWarp(int A)
                             {
                                 if(Background[C].Type == 98)
                                 {
-                                    if(CheckCollision(warp.Entrance, Background[C].Location))
+                                    if(CheckCollision(warp.Entrance, Background[C].Location, plr.Section))
                                     {
                                         Background[C].Layer.clear();
                                         Background[C].Hidden = true;
@@ -4016,7 +4028,7 @@ void SuperWarp(int A)
                             {
                                 if(Background[C].Type == 98)
                                 {
-                                    if(CheckCollision(warp.Entrance, Background[C].Location))
+                                    if(CheckCollision(warp.Entrance, Background[C].Location, plr.Section))
                                     {
                                         Background[C].Layer.clear();
                                         Background[C].Hidden = true;
@@ -4110,7 +4122,7 @@ void SuperWarp(int A)
                         plr.Location.Y = Warp[plr.Warp].Entrance.Y + Warp[plr.Warp].Entrance.Height - plr.Location.Height;
                         for(int C = 1; C <= numBackground; C++)
                         {
-                            if((CheckCollision(warp.Entrance, Background[C].Location) | CheckCollision(warp.Exit, Background[C].Location)) != 0)
+                            if((CheckCollision(warp.Entrance, Background[C].Location, plr.Section) | CheckCollision(warp.Exit, Background[C].Location, plr.Section)) != 0)
                             {
                                 if(Background[C].Type == 88)
                                     NewEffect(54, Background[C].Location);
@@ -4155,9 +4167,9 @@ void PlayerCollide(int A)
             tempLocation3 = Player[B].Location;
             if(Player[B].StandingOnNPC != 0 && FreezeNPCs == false)
                 tempLocation3.SpeedY = NPC[Player[B].StandingOnNPC].Location.SpeedY;
-            if(CheckCollision(tempLocation, tempLocation3) == true)
+            if(CheckCollision(tempLocation, tempLocation3, Player[A].Section) == true)
             {
-                HitSpot = FindCollision(tempLocation, tempLocation3);
+                HitSpot = FindCollision(tempLocation, tempLocation3, Player[A].Section);
                 if(HitSpot == 5)
                 {
                     if(Player[A].StandUp2 == true && Player[A].Location.Y > Player[B].Location.Y)
@@ -5689,7 +5701,7 @@ void PlayerEffects(int A)
             tempBool = false;
             for(B = 1; B <= numPlayers; B++)
             {
-                if(B != A && CheckCollision(Player[A].Location, Player[B].Location))
+                if(B != A && CheckCollision(Player[A].Location, Player[B].Location, Player[A].Section))
                     tempBool = true;
             }
             if(tempBool == false)
@@ -5697,7 +5709,7 @@ void PlayerEffects(int A)
                 Player[A].Effect2 = 130;
                 for(C = 1; C <= numBackground; C++)
                 {
-                    if(CheckCollision(Warp[Player[A].Warp].Exit, Background[C].Location))
+                    if(CheckCollision(Warp[Player[A].Warp].Exit, Background[C].Location, Player[A].Section))
                     {
                         if(Background[C].Type == 88)
                             NewEffect(54, Background[C].Location);
@@ -5750,7 +5762,7 @@ void PlayerEffects(int A)
             {
                 for(C = 1; C <= numBackground; C++)
                 {
-                    if(CheckCollision(Warp[Player[A].Warp].Exit, Background[C].Location))
+                    if(CheckCollision(Warp[Player[A].Warp].Exit, Background[C].Location, Player[A].Section))
                     {
                         if(Background[C].Type == 88)
                             NewEffect(54, Background[C].Location);
@@ -5785,7 +5797,7 @@ void PlayerEffects(int A)
                         WorldPlayer[1].Location.Y = Warp[Player[A].Warp].MapY;
                         for(B = 1; B <= numWorldLevels; B++)
                         {
-                            if(CheckCollision(WorldPlayer[1].Location, WorldLevel[B].Location) == true)
+                            if(CheckCollision(WorldPlayer[1].Location, WorldLevel[B].Location, Player[A].Section) == true)
                             {
                                 WorldLevel[B].Active = true;
                                 curWorldLevel = B;
@@ -6122,7 +6134,7 @@ void PlayerEffects(int A)
         tempBool = true;
         for(B = 1; B <= numPlayers; B++)
         {
-            if(B != A && (Player[B].Effect == 0 || fEqual(B, Player[A].Effect2)) && !Player[B].Dead && Player[B].TimeToLive == 0 && CheckCollision(Player[A].Location, Player[B].Location))
+            if(B != A && (Player[B].Effect == 0 || fEqual(B, Player[A].Effect2)) && !Player[B].Dead && Player[B].TimeToLive == 0 && CheckCollision(Player[A].Location, Player[B].Location, Player[A].Section))
                 tempBool = false;
         }
         if(tempBool == true)
@@ -6184,7 +6196,7 @@ void PlayerEffects(int A)
             tempBool = true;
             for(B = 1; B <= numPlayers; B++)
             {
-                if(B != A && Player[B].Effect != 6 && CheckCollision(Player[A].Location, Player[B].Location) == true)
+                if(B != A && Player[B].Effect != 6 && CheckCollision(Player[A].Location, Player[B].Location, Player[A].Section) == true)
                     tempBool = false;
                 // tempBool = False
             }
@@ -6199,7 +6211,7 @@ void PlayerEffects(int A)
         }
         for(B = 1; B <= numPlayers; B++)
         {
-            if(B != A && CheckCollision(Player[A].Location, Player[B].Location) == true)
+            if(B != A && CheckCollision(Player[A].Location, Player[B].Location, Player[A].Section) == true)
             {
                 if(Player[B].Mount == 2)
                 {

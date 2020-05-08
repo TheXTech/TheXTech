@@ -235,7 +235,7 @@ void UpdateNPCs()
                         {
                             if(B != A && NPC[B].Active == true && NPC[B].Type != 57)
                             {
-                                if(CheckCollision(NPC[A].Location, NPC[B].Location))
+                                if(CheckCollision(NPC[A].Location, NPC[B].Location, NPC[A].Section))
                                     tempBool = true;
                             }
                         }
@@ -248,7 +248,7 @@ void UpdateNPCs()
                                 {
                                     if(CheckCollision(NPC[A].Location,
                                                       newLoc(Block[B].Location.X + 0.1, Block[B].Location.Y + 0.1,
-                                                             Block[B].Location.Width - 0.2, Block[B].Location.Height - 0.2)))
+                                                             Block[B].Location.Width - 0.2, Block[B].Location.Height - 0.2), NPC[A].Section))
                                         tempBool = true;
                                 }
                             }
@@ -256,7 +256,7 @@ void UpdateNPCs()
                             {
                                 if(!Player[B].Dead && Player[B].TimeToLive == 0)
                                 {
-                                    if(CheckCollision(NPC[A].Location, Player[B].Location) == true)
+                                    if(CheckCollision(NPC[A].Location, Player[B].Location, NPC[A].Section) == true)
                                         tempBool = true;
                                 }
                             }
@@ -406,9 +406,9 @@ void UpdateNPCs()
 
         if(NPC[A].JustActivated != 0)
         {
-            if(NPC[A].Active && NPC[A].TimeLeft > 1 && 
-               NPC[A].Type != 57 && NPC[A].Type != 46 && 
-               NPC[A].Type != 311 && 
+            if(NPC[A].Active && NPC[A].TimeLeft > 1 &&
+               NPC[A].Type != 57 && NPC[A].Type != 46 &&
+               NPC[A].Type != 311 &&
                NPC[A].Type != 212 && !NPCIsACoin[NPC[A].Type]) // And .Type <> 47
             {
                 if(NPC[A].TriggerActivate != "")
@@ -422,7 +422,7 @@ void UpdateNPCs()
                 {
                     if((NPC[B].Active == false) && B != A && NPC[B].Reset[1] == true && NPC[B].Reset[2] == true)
                     {
-                        if(CheckCollision(tempLocation, NPC[B].Location) == true)
+                        if(CheckCollision(tempLocation, NPC[B].Location, NPC[A].Section) == true)
                         {
                             numAct++;
                             SDL_assert_release(numAct <= maxNPCs);
@@ -440,7 +440,7 @@ void UpdateNPCs()
                     }
                     else if(B != A && NPC[B].Active == true && NPC[B].TimeLeft < NPC[A].TimeLeft - 1)
                     {
-                        if(CheckCollision(tempLocation, NPC[B].Location) == true)
+                        if(CheckCollision(tempLocation, NPC[B].Location, NPC[A].Section) == true)
                             NPC[B].TimeLeft = NPC[A].TimeLeft - 1;
                     }
                 }
@@ -450,9 +450,9 @@ void UpdateNPCs()
                 while(numAct > C)
                 {
                     C++;
-                    if(NPC[newAct[C]].Type != 57 && NPC[newAct[C]].Type != 46 && 
-                       NPC[newAct[C]].Type != 212 && NPC[newAct[C]].Type != 311 && 
-                       NPC[newAct[C]].Type != 47 && NPC[newAct[C]].Type != 317 && 
+                    if(NPC[newAct[C]].Type != 57 && NPC[newAct[C]].Type != 46 &&
+                       NPC[newAct[C]].Type != 212 && NPC[newAct[C]].Type != 311 &&
+                       NPC[newAct[C]].Type != 47 && NPC[newAct[C]].Type != 317 &&
                        !NPCIsACoin[NPC[newAct[C]].Type])
                     {
                         tempLocation = NPC[newAct[C]].Location;
@@ -464,7 +464,7 @@ void UpdateNPCs()
                         {
                             if((NPC[B].Active == false) && B != A && NPC[B].Reset[1] == true && NPC[B].Reset[2] == true)
                             {
-                                if(CheckCollision(tempLocation, NPC[B].Location) == true)
+                                if(CheckCollision(tempLocation, NPC[B].Location, NPC[A].Section) == true)
                                 {
                                     numAct = numAct + 1;
                                     SDL_assert_release(numAct <= maxNPCs);
@@ -651,7 +651,7 @@ void UpdateNPCs()
                     int C = 0;
                     for(B = 1; B <= numBlock; B++)
                     {
-                        if(CheckCollision(tempLocation, Block[B].Location) == true)
+                        if(CheckCollision(tempLocation, Block[B].Location, NPC[A].Section) == true)
                         {
                             if(C == 0)
                                 C = B;
@@ -774,7 +774,7 @@ void UpdateNPCs()
                 {
                     if(Water[B].Hidden == false)
                     {
-                        if(CheckCollision(NPC[A].Location, Water[B].Location) == true)
+                        if(CheckCollision(NPC[A].Location, Water[B].Location, NPC[A].Section) == true)
                         {
                             if(NPC[A].Wet == 0 && NPCIsACoin[NPC[A].Type] == false)
                             {
@@ -882,7 +882,7 @@ void UpdateNPCs()
                 tempLocation.Width = tempLocation.Width + 50;
                 for(B = 1; B <= numPlayers; B++)
                 {
-                    if(CheckCollision(tempLocation, Player[B].Location) == true)
+                    if(CheckCollision(tempLocation, Player[B].Location, NPC[A].Section) == true)
                         NPC[A].Chat = true;
                 }
             }
@@ -1036,7 +1036,7 @@ void UpdateNPCs()
                                 {
                                     if(NPC[A].CantHurtPlayer != NPC[B].CantHurtPlayer && NPC[B].Killed == 0 && (Player[NPC[A].HoldingPlayer].StandingOnNPC != B) && NPC[B].Inert == false)
                                     {
-                                        if(CheckCollision(NPC[A].Location, NPC[B].Location) == true)
+                                        if(CheckCollision(NPC[A].Location, NPC[B].Location, NPC[A].Section) == true)
                                         {
                                             NPCHit(B, 3, A);
                                             if(NPC[B].Killed > 0)
@@ -1100,12 +1100,20 @@ void UpdateNPCs()
 
                     if((LevelWrap[NPC[A].Section] || LevelVWrap[NPC[A].Section]) && NPC[A].Type != 30 && NPC[A].Type != 108) // Level wraparound
                     {
-                        if(LevelWrap[NPC[A].Section])
+                        if(LevelWrap[NPC[A].Section] && !LevelWrap2[NPC[A].Section])
                         {
                             if(NPC[A].Location.X + NPC[A].Location.Width < level[NPC[A].Section].X)
                                 NPC[A].Location.X = level[NPC[A].Section].Width - 1;
                             else if(NPC[A].Location.X > level[NPC[A].Section].Width)
                                 NPC[A].Location.X = level[NPC[A].Section].X - NPC[A].Location.Width + 1;
+                        }
+
+                        if(LevelWrap2[NPC[A].Section])
+                        {
+                            if(NPC[A].Location.X + NPC[A].Location.Width * 0.5 < level[NPC[A].Section].X)
+                                NPC[A].Location.X = level[NPC[A].Section].Width - NPC[A].Location.Width * 0.5 - 1;
+                            else if(NPC[A].Location.X + NPC[A].Location.Width * 0.5 > level[NPC[A].Section].Width)
+                                NPC[A].Location.X = level[NPC[A].Section].X - NPC[A].Location.Width * 0.5 + 1;
                         }
 
                         if(LevelVWrap[NPC[A].Section])
@@ -1960,9 +1968,9 @@ void UpdateNPCs()
                                                             NPCHit(A, 8);
 
                                                         if(Block[B].IsNPC != 57 && (NPCIsABlock[Block[B].IsNPC] || NPCIsAHit1Block[Block[B].IsNPC] || NPCCanWalkOn[Block[B].IsNPC]))
-                                                            HitSpot = NPCFindCollision(NPC[A].Location, Block[B].Location);
+                                                            HitSpot = NPCFindCollision(NPC[A].Location, Block[B].Location, NPC[A].Section);
                                                         else
-                                                            HitSpot = FindCollisionBelt(NPC[A].Location, Block[B].Location, oldBeltSpeed);
+                                                            HitSpot = FindCollisionBelt(NPC[A].Location, Block[B].Location, oldBeltSpeed, NPC[A].Section);
                                                         if(NPCIsCheep[NPC[A].Type])
                                                         {
                                                             if(NPC[A].Wet == 0)
@@ -2561,7 +2569,7 @@ void UpdateNPCs()
                                                             if(NPC[A].Type == 78 && NPC[A].Location.SpeedY > Physics.NPCGravity * 10)
                                                                 PlaySound(37);
 
-                                                            if(WalkingCollision3(NPC[A].Location, Block[B].Location, oldBeltSpeed) == true || NPC[A].Location.Width > 32)
+                                                            if(WalkingCollision3(NPC[A].Location, Block[B].Location, oldBeltSpeed, NPC[A].Section) == true || NPC[A].Location.Width > 32)
                                                             {
                                                                 resetBeltSpeed = true;
 
@@ -2702,7 +2710,7 @@ void UpdateNPCs()
                                                                                 tempBool = false;
                                                                                 for(int C = 1; C <= numPlayers; C++)
                                                                                 {
-                                                                                    if(CheckCollision(NPC[A].Location, Player[C].Location) == true)
+                                                                                    if(CheckCollision(NPC[A].Location, Player[C].Location, NPC[A].Section) == true)
                                                                                     {
                                                                                         tempBool = true;
                                                                                         break;
@@ -3007,9 +3015,9 @@ void UpdateNPCs()
                                             tempLocation2 = preBeltLoc;
                                             tempLocation2.Width = tempLocation2.Width - 4;
                                             tempLocation2.X = tempLocation2.X + 2;
-                                            if(CheckCollision(tempLocation, NPC[C].Location))
+                                            if(CheckCollision(tempLocation, NPC[C].Location, NPC[A].Section))
                                             {
-                                                if(!CheckCollision(tempLocation2, NPC[C].Location))
+                                                if(!CheckCollision(tempLocation2, NPC[C].Location, NPC[A].Section))
                                                 {
                                                     if(NPC[A].TimeLeft - 1 > NPC[C].TimeLeft)
                                                         NPC[C].TimeLeft = NPC[A].TimeLeft - 1;
@@ -3067,7 +3075,7 @@ void UpdateNPCs()
                                     {
                                         if(!NPCIsACoin[NPC[B].Type])
                                         {
-                                            if(CheckCollision(NPC[A].Location, NPC[B].Location) == true)
+                                            if(CheckCollision(NPC[A].Location, NPC[B].Location, NPC[A].Section) == true)
                                             {
                                                 if(B != A)
                                                 {
@@ -3121,7 +3129,7 @@ void UpdateNPCs()
                                                                         tempLocation.X = tempLocation.X + 12;
                                                                         tempLocation2.Width = 8;
                                                                         tempLocation2.X = tempLocation2.X + 12;
-                                                                        if(CheckCollision(tempLocation, tempLocation2))
+                                                                        if(CheckCollision(tempLocation, tempLocation2, NPC[A].Section))
                                                                         {
                                                                             NPC[B].Type = NPC[B].Type - 4;
                                                                             if(NPC[B].Type == 112)
@@ -3193,7 +3201,7 @@ void UpdateNPCs()
                                                                                         {
                                                                                             if(!BlockIsSizable[Block[C].Type] && !BlockOnlyHitspot1[Block[C].Type] && Block[C].Hidden == false && BlockSlope[Block[C].Type] == 0)
                                                                                             {
-                                                                                                if(CheckCollision(tempLocation, Block[C].Location) == true)
+                                                                                                if(CheckCollision(tempLocation, Block[C].Location, NPC[A].Section) == true)
                                                                                                 {
                                                                                                     if(int(NPC[A].Direction) == -1)
                                                                                                     {
@@ -3280,7 +3288,7 @@ void UpdateNPCs()
                                                                     }
                                                                     else if(!((NPC[B].Type == 40 || NPC[B].Type == 336) && NPC[B].Projectile == false))
                                                                     {
-                                                                        HitSpot = FindCollision(NPC[A].Location, NPC[B].Location);
+                                                                        HitSpot = FindCollision(NPC[A].Location, NPC[B].Location, NPC[A].Section);
                                                                         if(NPCIsToad[NPC[A].Type] && NPC[A].Killed > 0)
                                                                             HitSpot = 0;
                                                                         if(NPCIsAParaTroopa[NPC[A].Type] && NPCIsAParaTroopa[NPC[B].Type])
@@ -3561,7 +3569,7 @@ void UpdateNPCs()
                                     {
                                         if(BlockNoClipping[Block[B].Type] == false && BlockNPCNoClipping[Block[B].Type] == false && Block[B].Invis == false && Block[B].Hidden == false && !(BlockIsSizable[Block[B].Type] && Block[B].Location.Y < NPC[A].Location.Y + NPC[A].Location.Height - 3))
                                         {
-                                            if(CheckCollision(tempLocation, Block[B].Location) == true)
+                                            if(CheckCollision(tempLocation, Block[B].Location, NPC[A].Section) == true)
                                             {
                                                 tempTurn = false;
                                                 break;
@@ -3595,7 +3603,7 @@ void UpdateNPCs()
                                     {
                                         if(BlockNoClipping[Block[B].Type] == false && BlockNoClipping[Block[B].Type] == false && Block[B].Invis == false && Block[B].Hidden == false && !(BlockIsSizable[Block[B].Type] && Block[B].Location.Y < NPC[A].Location.Y + NPC[A].Location.Height - 1))
                                         {
-                                            if(CheckCollision(tempLocation, Block[B].Location) == true)
+                                            if(CheckCollision(tempLocation, Block[B].Location, NPC[A].Section) == true)
                                             {
                                                 if(NPC[A].Slope > 0)
                                                 {
@@ -4119,7 +4127,7 @@ void UpdateNPCs()
 
                                 for(B = (int)fBlock; B <= lBlock; B++)
                                 {
-                                    if(Block[B].Type == 186 && CheckCollision(tempLocation, Block[B].Location) && !Block[B].Hidden)
+                                    if(Block[B].Type == 186 && CheckCollision(tempLocation, Block[B].Location, NPC[A].Section) && !Block[B].Hidden)
                                         KillBlock(B);
                                 }
 
@@ -4342,7 +4350,7 @@ void UpdateNPCs()
                                             NPC[A].Direction = -1;
                                         else
                                             NPC[A].Direction = 1;
-                                        if(CanComeOut(NPC[A].Location, Player[B].Location) == false)
+                                        if(CanComeOut(NPC[A].Location, Player[B].Location, NPC[A].Section) == false)
                                             C = -1;
                                     }
                                 }
@@ -4507,7 +4515,7 @@ void UpdateNPCs()
                                 tempLocation.X = tempLocation.X + 8;
                                 tempLocation.Height = 26;
                                 tempLocation.Y = tempLocation.Y + 2;
-                                if(CheckCollision(NPC[A].Location, tempLocation) == true)
+                                if(CheckCollision(NPC[A].Location, tempLocation, NPC[A].Section) == true)
                                 {
                                     PlaySound(31);
                                     StopMusic();
@@ -4670,7 +4678,7 @@ void UpdateNPCs()
                 {
                     if(NPC[B].Type == 208)
                     {
-                        if(CheckCollision(NPC[A].Location, NPC[B].Location) == true)
+                        if(CheckCollision(NPC[A].Location, NPC[B].Location, NPC[A].Section) == true)
                         {
                             tempBool = true;
                             break;
@@ -4731,7 +4739,7 @@ void UpdateNPCs()
                         {
                             if(Block[B].Invis == false && !(BlockIsSizable[Block[B].Type] == true && NPC[A].Location.Y > Block[B].Location.Y) && Block[B].Hidden == false)
                             {
-                                if(CheckCollision(NPC[A].Location, Block[B].Location) == true)
+                                if(CheckCollision(NPC[A].Location, Block[B].Location, NPC[A].Section) == true)
                                 {
                                     NPC[A].Location.Y = Block[B].Location.Y - NPC[A].Location.Height - 0.1;
                                     break;

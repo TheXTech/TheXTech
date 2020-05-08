@@ -30,37 +30,37 @@
 
 // Public Function CheckCollision(Loc1 As Location, Loc2 As Location) As Boolean 'Normal collisions
 // Normal collisions
-bool CheckCollision(const Location_t &Loc1, const Location_t &Loc2);
+bool CheckCollision(const Location_t &Loc1, const Location_t &Loc2, int section);
 // Public Function n00bCollision(Loc1 As Location, Loc2 As Location) As Boolean 'Make the game easier for the people who whine about the detection being 'off'
 // Make the game easier for the people who whine about the detection being 'off'
-bool n00bCollision(const Location_t &Loc1, const Location_t &Loc2);
+bool n00bCollision(const Location_t &Loc1, const Location_t &Loc2, int section);
 // Public Function NPCStartCollision(Loc1 As Location, Loc2 As Location) As Boolean 'Used when a NPC is activated to see if it should spawn
 // Used when a NPC is activated to see if it should spawn
-bool NPCStartCollision(const Location_t &Loc1, const Location_t &Loc2);
+bool NPCStartCollision(const Location_t &Loc1, const Location_t &Loc2, int section);
 // Public Function WarpCollision(Loc1 As Location, A As Integer) As Boolean  'Warp point collisions
 // Warp point collisions
-bool WarpCollision(const Location_t &Loc1, int A);
+bool WarpCollision(const Location_t &Loc1, int A, int section);
 // Public Function FindCollision(Loc1 As Location, Loc2 As Location) As Integer 'Whats side the collision happened
 // Whats side the collision happened
-int FindCollision(const Location_t &Loc1, const Location_t &Loc2);
+int FindCollision(const Location_t &Loc1, const Location_t &Loc2, int section);
 // Public Function FindCollisionBelt(Loc1 As Location, Loc2 As Location, BeltSpeed As Single) As Integer  'Whats side the collision happened for belts
 // Whats side the collision happened for belts
-int FindCollisionBelt(const Location_t &Loc1, const Location_t &Loc2, float BeltSpeed);
+int FindCollisionBelt(const Location_t &Loc1, const Location_t &Loc2, float BeltSpeed, int section);
 // Public Function NPCFindCollision(Loc1 As Location, Loc2 As Location) As Integer 'Whats side the collision happened for NPCs
 // Whats side the collision happened for NPCs
-int NPCFindCollision(const Location_t &Loc1, const Location_t &Loc2);
+int NPCFindCollision(const Location_t &Loc1, const Location_t &Loc2, int section);
 // Public Function EasyModeCollision(Loc1 As Location, Loc2 As Location, Optional StandOn As Boolean = False) As Integer  'Easy mode collision for jumping on NPCs
 // Easy mode collision for jumping on NPCs
-int EasyModeCollision(const Location_t &Loc1, const Location_t &Loc2, bool StandOn);
+int EasyModeCollision(const Location_t &Loc1, const Location_t &Loc2, bool StandOn, int section);
 // Public Function BootCollision(Loc1 As Location, Loc2 As Location, Optional StandOn As Boolean = False) As Integer 'Easy mode collision for jumping on NPCs while on yoshi/boot
 // Easy mode collision for jumping on NPCs while on yoshi/boot
-int BootCollision(const Location_t &Loc1, const Location_t &Loc2, bool StandOn);
+int BootCollision(const Location_t &Loc1, const Location_t &Loc2, bool StandOn, int section);
 // Public Function CursorCollision(Loc1 As Location, Loc2 As Location) As Boolean 'Cursor collision
 // Cursor collision
 bool CursorCollision(const Location_t &Loc1, const Location_t &Loc2);
 // Public Function ShakeCollision(Loc1 As Location, Loc2 As Location, ShakeY3 As Integer) As Boolean 'Shakey block collision
 // Shakey block collision
-bool ShakeCollision(const Location_t &Loc1, const Location_t &Loc2, int ShakeY3);
+bool ShakeCollision(const Location_t &Loc1, const Location_t &Loc2, int ShakeY3, int section);
 // Public Function vScreenCollision(A As Integer, Loc2 As Location) As Boolean  'vScreen collisions
 // vScreen collisions
 bool vScreenCollision(int A, const Location_t &Loc2);
@@ -69,22 +69,22 @@ bool vScreenCollision(int A, const Location_t &Loc2);
 bool vScreenCollision2(int A, const Location_t &Loc2);
 // Public Function WalkingCollision(Loc1 As Location, Loc2 As Location) As Boolean 'Collision detection for blocks. Prevents walking on walls.
 // Collision detection for blocks. Prevents walking on walls.
-bool WalkingCollision(const Location_t &Loc1, const Location_t &Loc2);
+bool WalkingCollision(const Location_t &Loc1, const Location_t &Loc2, int section);
 // Public Function WalkingCollision2(Loc1 As Location, Loc2 As Location) As Boolean 'Collision detection for blocks. Lets NPCs fall through cracks.
 // Collision detection for blocks. Lets NPCs fall through cracks.
-bool WalkingCollision2(const Location_t &Loc1, const Location_t &Loc2);
+bool WalkingCollision2(const Location_t &Loc1, const Location_t &Loc2, int section);
 // Public Function WalkingCollision3(Loc1 As Location, Loc2 As Location, BeltSpeed As Single) As Boolean 'Factors in beltspeed
 // Factors in beltspeed
-bool WalkingCollision3(const Location_t &Loc1, const Location_t &Loc2, float BeltSpeed);
+bool WalkingCollision3(const Location_t &Loc1, const Location_t &Loc2, float BeltSpeed, int section);
 // Public Function FindRunningCollision(Loc1 As Location, Loc2 As Location) As Integer 'Helps the player to walk over 1 unit cracks
 // Helps the player to walk over 1 unit cracks
-int FindRunningCollision(const Location_t &Loc1, const Location_t &Loc2);
+int FindRunningCollision(const Location_t &Loc1, const Location_t &Loc2, int section);
 // Public Function ShouldTurnAround(Loc1 As Location, Loc2 As Location, Direction As Single) As Boolean  'Determines if an NPC should turnaround
 // Determines if an NPC should turnaround
-bool ShouldTurnAround(const Location_t &Loc1, const Location_t &Loc2, float Direction);
+bool ShouldTurnAround(const Location_t &Loc1, const Location_t &Loc2, float Direction, int section);
 // Public Function CanComeOut(Loc1 As Location, Loc2 As Location) As Boolean  'Determines if an NPC can come out of a pipe
 // Determines if an NPC can come out of a pipe
-bool CanComeOut(const Location_t &Loc1, const Location_t &Loc2);
+bool CanComeOut(const Location_t &Loc1, const Location_t &Loc2, int section);
 // Public Function CheckHitSpot1(Loc1 As Location, Loc2 As Location) As Boolean  'Fixes NPCs sinking through the ground
 // Fixes NPCs sinking through the ground
 bool CheckHitSpot1(const Location_t &Loc1, const Location_t &Loc2);

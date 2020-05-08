@@ -245,9 +245,9 @@ void DynamicScreen()
                     vScreen[A].TempY = (vScreen[A].Height * 0.25);
                 if(vScreen[A].TempY < -(vScreen[A].Height * 0.25))
                     vScreen[A].TempY = -(vScreen[A].Height * 0.25);
-                if(vScreen[A].tempX > (vScreen[A].Width * 0.25))
+                if(vScreen[A].tempX > (vScreen[A].Width * 0.25) && !LevelWrap2[Player[A].Section])
                     vScreen[A].tempX = (vScreen[A].Width * 0.25);
-                if(vScreen[A].tempX < -(vScreen[A].Width * 0.25))
+                if(vScreen[A].tempX < -(vScreen[A].Width * 0.25) && !LevelWrap2[Player[A].Section])
                     vScreen[A].tempX = -(vScreen[A].Width * 0.25);
             }
         }

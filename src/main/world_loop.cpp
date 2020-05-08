@@ -66,7 +66,7 @@ void WorldLoop()
         {
             for(A = 1; A <= numWorldMusic; A++)
             {
-                if(CheckCollision(WorldPlayer[1].Location, WorldMusic[A].Location))
+                if(CheckCollision(WorldPlayer[1].Location, WorldMusic[A].Location, 0))
                 {
                     if(curWorldMusic != WorldMusic[A].Type)
                     {
@@ -89,7 +89,7 @@ void WorldLoop()
         {
             for(A = 1; A <= numWorldMusic; A++)
             {
-                if(CheckCollision(WorldPlayer[1].Location, WorldMusic[A].Location))
+                if(CheckCollision(WorldPlayer[1].Location, WorldMusic[A].Location, 0))
                 {
                     if(curWorldMusic != WorldMusic[A].Type)
                     {
@@ -99,7 +99,7 @@ void WorldLoop()
             }
             for(A = 1; A <= numWorldLevels; A++)
             {
-                if(CheckCollision(WorldPlayer[1].Location, WorldLevel[A].Location))
+                if(CheckCollision(WorldPlayer[1].Location, WorldLevel[A].Location, 0))
                 {
                     curWorldLevel = A;
                     WorldPlayer[1].LevelName = WorldLevel[A].LevelName;
@@ -215,7 +215,7 @@ void WorldLoop()
         WorldPlayer[1].LevelName = "";
         for(A = 1; A <= numWorldLevels; A++)
         {
-            if(CheckCollision(tempLocation, WorldLevel[A].Location) == true)
+            if(CheckCollision(tempLocation, WorldLevel[A].Location, 0) == true)
             {
                 WorldPlayer[1].LevelName = WorldLevel[A].LevelName;
                 break;
@@ -231,7 +231,7 @@ void WorldLoop()
             tempLocation.Y = tempLocation.Y - 32;
             for(A = 1; A <= numWorldPaths; A++)
             {
-                if(CheckCollision(tempLocation, WorldPath[A].Location) == true && WorldPath[A].Active == true)
+                if(CheckCollision(tempLocation, WorldPath[A].Location, 0) == true && WorldPath[A].Active == true)
                 {
                     WorldPlayer[1].Move = 1;
                     WorldPlayer[1].Move4 = PathPlayerSpeed[WorldPath[A].Type];
@@ -242,7 +242,7 @@ void WorldLoop()
             {
                 if(WorldPlayer[1].Move == 0)
                 {
-                    if(CheckCollision(tempLocation, WorldLevel[A].Location) == true && WorldLevel[A].Active == true)
+                    if(CheckCollision(tempLocation, WorldLevel[A].Location, 0) == true && WorldLevel[A].Active == true)
                     {
                         WorldPlayer[1].Move = 1;
                         WorldPlayer[1].Move4 = 2;
@@ -264,7 +264,7 @@ void WorldLoop()
             tempLocation.X = tempLocation.X - 32;
             for(A = 1; A <= numWorldPaths; A++)
             {
-                if(CheckCollision(tempLocation, WorldPath[A].Location) == true && WorldPath[A].Active == true)
+                if(CheckCollision(tempLocation, WorldPath[A].Location, 0) == true && WorldPath[A].Active == true)
                 {
                     WorldPlayer[1].Move = 2;
                     WorldPlayer[1].Move4 = PathPlayerSpeed[WorldPath[A].Type];
@@ -275,7 +275,7 @@ void WorldLoop()
             {
                 if(WorldPlayer[1].Move == 0)
                 {
-                    if(CheckCollision(tempLocation, WorldLevel[A].Location) == true && WorldLevel[A].Active == true)
+                    if(CheckCollision(tempLocation, WorldLevel[A].Location, 0) == true && WorldLevel[A].Active == true)
                     {
                         WorldPlayer[1].Move = 2;
                         WorldPlayer[1].Move4 = 2;
@@ -297,7 +297,7 @@ void WorldLoop()
             tempLocation.Y = tempLocation.Y + 32;
             for(A = 1; A <= numWorldPaths; A++)
             {
-                if(CheckCollision(tempLocation, WorldPath[A].Location) == true && WorldPath[A].Active == true)
+                if(CheckCollision(tempLocation, WorldPath[A].Location, 0) == true && WorldPath[A].Active == true)
                 {
                     WorldPlayer[1].Move4 = PathPlayerSpeed[WorldPath[A].Type];
                     WorldPlayer[1].Move = 3;
@@ -308,7 +308,7 @@ void WorldLoop()
             {
                 if(WorldPlayer[1].Move == 0)
                 {
-                    if(CheckCollision(tempLocation, WorldLevel[A].Location) == true && WorldLevel[A].Active == true)
+                    if(CheckCollision(tempLocation, WorldLevel[A].Location, 0) == true && WorldLevel[A].Active == true)
                     {
                         WorldPlayer[1].Move = 3;
                         WorldPlayer[1].Move4 = 2;
@@ -330,7 +330,7 @@ void WorldLoop()
             tempLocation.X = tempLocation.X + 32;
             for(A = 1; A <= numWorldPaths; A++)
             {
-                if(CheckCollision(tempLocation, WorldPath[A].Location) == true && WorldPath[A].Active == true)
+                if(CheckCollision(tempLocation, WorldPath[A].Location, 0) == true && WorldPath[A].Active == true)
                 {
                     WorldPlayer[1].Move = 4;
                     WorldPlayer[1].Move4 = PathPlayerSpeed[WorldPath[A].Type];
@@ -341,7 +341,7 @@ void WorldLoop()
             {
                 if(WorldPlayer[1].Move == 0)
                 {
-                    if(CheckCollision(tempLocation, WorldLevel[A].Location) == true && WorldLevel[A].Active == true)
+                    if(CheckCollision(tempLocation, WorldLevel[A].Location, 0) == true && WorldLevel[A].Active == true)
                     {
                         WorldPlayer[1].Move = 4;
                         WorldPlayer[1].Move4 = 2;
@@ -362,7 +362,7 @@ void WorldLoop()
         {
             for(A = 1; A <= numWorldLevels; A++)
             {
-                if(CheckCollision(tempLocation, WorldLevel[A].Location) == true)
+                if(CheckCollision(tempLocation, WorldLevel[A].Location, 0) == true)
                 {
                     if(int(WorldLevel[A].WarpX) != -1)
                         WorldPlayer[1].Location.X = WorldLevel[A].WarpX;
@@ -373,7 +373,7 @@ void WorldLoop()
                         LevelBeatCode = 6;
                         for(B = 1; B <= numWorldLevels; B++)
                         {
-                            if(CheckCollision(WorldPlayer[1].Location, WorldLevel[B].Location) == true)
+                            if(CheckCollision(WorldPlayer[1].Location, WorldLevel[B].Location, 0) == true)
                             {
                                 WorldLevel[B].Active = true;
                                 curWorldLevel = B;
@@ -438,7 +438,7 @@ void WorldLoop()
         }
         for(A = 1; A <= numWorldMusic; A++)
         {
-            if(CheckCollision(WorldPlayer[1].Location, WorldMusic[A].Location))
+            if(CheckCollision(WorldPlayer[1].Location, WorldMusic[A].Location, 0))
             {
                 if((curWorldMusic != WorldMusic[A].Type) ||
                    (WorldMusic[A].Type == CustomWorldMusicId() && curWorldMusicFile != WorldMusic[A].MusicFile))
@@ -533,7 +533,7 @@ void LevelPath(int Lvl, int Direction, bool Skp)
         {
             if(WorldPath[A].Active == false)
             {
-                if(CheckCollision(tempLocation, WorldPath[A].Location) == true)
+                if(CheckCollision(tempLocation, WorldPath[A].Location, 0) == true)
                 {
                     PathPath(A, Skp);
                 }
@@ -552,7 +552,7 @@ void LevelPath(int Lvl, int Direction, bool Skp)
         {
             if(WorldPath[A].Active == false)
             {
-                if(CheckCollision(tempLocation, WorldPath[A].Location) == true)
+                if(CheckCollision(tempLocation, WorldPath[A].Location, 0) == true)
                 {
                     PathPath(A, Skp);
                 }
@@ -571,7 +571,7 @@ void LevelPath(int Lvl, int Direction, bool Skp)
         {
             if(WorldPath[A].Active == false)
             {
-                if(CheckCollision(tempLocation, WorldPath[A].Location) == true)
+                if(CheckCollision(tempLocation, WorldPath[A].Location, 0) == true)
                 {
                     PathPath(A, Skp);
                 }
@@ -590,7 +590,7 @@ void LevelPath(int Lvl, int Direction, bool Skp)
         {
             if(WorldPath[A].Active == false)
             {
-                if(CheckCollision(tempLocation, WorldPath[A].Location) == true)
+                if(CheckCollision(tempLocation, WorldPath[A].Location, 0) == true)
                 {
                     PathPath(A, Skp);
                 }
@@ -613,7 +613,7 @@ void PathPath(int Pth, bool Skp)
     {
         if(Scene[A].Active == true)
         {
-            if(CheckCollision(tempLocation, Scene[A].Location) == true && SceneMovement[Scene[A].Type] == 0)
+            if(CheckCollision(tempLocation, Scene[A].Location, 0) == true && SceneMovement[Scene[A].Type] == 0)
                 Scene[A].Active = false;
         }
     }
@@ -649,7 +649,7 @@ void PathPath(int Pth, bool Skp)
         {
             if(WorldPath[A].Active == false)
             {
-                if(CheckCollision(tempLocation, WorldPath[A].Location) == true)
+                if(CheckCollision(tempLocation, WorldPath[A].Location, 0) == true)
                 {
                     PathPath(A, Skp);
                 }
@@ -659,7 +659,7 @@ void PathPath(int Pth, bool Skp)
         {
             if(WorldLevel[A].Active == false)
             {
-                if(CheckCollision(tempLocation, WorldLevel[A].Location) == true)
+                if(CheckCollision(tempLocation, WorldLevel[A].Location, 0) == true)
                 {
                     WorldLevel[A].Active = true;
                     if(Skp == false)

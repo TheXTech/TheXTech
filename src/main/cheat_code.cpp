@@ -149,7 +149,7 @@ void CheatCode(char NewKey)
                 WorldPath[B].Active = true;
                 for(C = 1; C <= numScenes; C++)
                 {
-                    if(CheckCollision(tempLocation, Scene[C].Location))
+                    if(CheckCollision(tempLocation, Scene[C].Location, 0))
                         Scene[C].Active = false;
                 }
             }

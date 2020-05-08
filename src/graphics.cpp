@@ -79,9 +79,9 @@ void GetvScreen(int A)
         vScreenY[A] = -Player[A].Location.Y + (vScreen[A].Height * 0.5) - vScreenYOffset - Player[A].Location.Height;
         vScreenX[A] = vScreenX[A] - vScreen[A].tempX;
         vScreenY[A] = vScreenY[A] - vScreen[A].TempY;
-        if(-vScreenX[A] < level[Player[A].Section].X)
+        if(-vScreenX[A] < level[Player[A].Section].X && !LevelWrap2[Player[A].Section])
             vScreenX[A] = -level[Player[A].Section].X;
-        if(-vScreenX[A] + vScreen[A].Width > level[Player[A].Section].Width)
+        if(-vScreenX[A] + vScreen[A].Width > level[Player[A].Section].Width && !LevelWrap2[Player[A].Section])
             vScreenX[A] = -(level[Player[A].Section].Width - vScreen[A].Width);
         if(-vScreenY[A] < level[Player[A].Section].Y)
             vScreenY[A] = -level[Player[A].Section].Y;
@@ -103,6 +103,26 @@ void GetvScreen(int A)
         if(Player[A].Mount == 2)
             Player[A].Location.Height = 128;
     }
+}
+
+
+float GetOptimalWrappingPlayerPosX(int A)
+{
+    if(numPlayers == 1 || !LevelWrap2[Player[A].Section])
+        return Player[A].Location.X;
+    float averageXElse = 0;
+    float sectionWidth = level[Player[A].Section].Width - level[Player[A].Section].X;
+    for(int B = 1; B <= numPlayers; B++)
+    {
+        if(B != A && !Player[B].Dead && Player[B].Effect != 6)
+            averageXElse = Player[B].Location.X / (numPlayers - 1);
+    }
+    if(std::abs(Player[A].Location.X - sectionWidth - averageXElse) < std::abs(Player[A].Location.X - averageXElse))
+        return Player[A].Location.X - sectionWidth;
+    else if(std::abs(Player[A].Location.X + sectionWidth - averageXElse) < std::abs(Player[A].Location.X - averageXElse))
+        return Player[A].Location.X + sectionWidth;
+    else
+        return Player[A].Location.X;
 }
 
 // Get the average screen position for all players
@@ -147,9 +167,9 @@ void GetvScreenAverage()
     vScreenX[1] = (vScreenX[1] / B) + (ScreenW * 0.5);
     vScreenY[1] = (vScreenY[1] / B) + (ScreenH * 0.5) - vScreenYOffset;
 
-    if(-vScreenX[A] < level[Player[1].Section].X)
+    if(-vScreenX[A] < level[Player[1].Section].X && !LevelWrap2[Player[A].Section])
         vScreenX[A] = -level[Player[1].Section].X;
-    if(-vScreenX[A] + ScreenW > level[Player[1].Section].Width)
+    if(-vScreenX[A] + ScreenW > level[Player[1].Section].Width && !LevelWrap2[Player[A].Section])
         vScreenX[A] = -(level[Player[1].Section].Width - ScreenW);
     if(-vScreenY[A] < level[Player[1].Section].Y)
         vScreenY[A] = -level[Player[1].Section].Y;
@@ -177,6 +197,7 @@ void GetvScreenAverage2()
     int B = 0;
     vScreenX[1] = 0;
     vScreenY[1] = 0;
+
     for(A = 1; A <= numPlayers; A++)
     {
         if(Player[A].Dead == false)
