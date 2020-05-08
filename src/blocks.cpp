@@ -1398,7 +1398,7 @@ void KillBlock(int A, bool Splode)
         Block[A].RespawnDelay = 1;
     if(Splode == true)
     {
-        if(BlockBrick[Block[A].Type] == true)
+        if(BlockBrick[Block[A].Type] == true || BlockExplodable[Block[A].Type] == true)
         {
             NewEffect(BlockBrickEffect[Block[A].Type], Block[A].Location);
         }
