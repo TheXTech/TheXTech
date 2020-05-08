@@ -775,7 +775,7 @@ void LoadCustomGFX()
                  fmt::format_ne("block-{0}", A),
                  nullptr, nullptr, GFXBlockCustom[A], GFXBlockBMP[A]);
     }
-    for(int A = BlockTypes; A < UserBlockTypes; ++A)
+    for(int A = BlockTypes; A < maxBlockType; ++A)
     {
         loadCGFX(existingFiles, GfxRoot + fmt::format_ne("block/block-{0}u.png", A-BlockTypes+1),
                  FileNamePath, FileName,
