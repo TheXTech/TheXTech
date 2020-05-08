@@ -815,6 +815,8 @@ struct TileDefaults_t
     RangeArrI<int, 1, maxTileType, 32> TileHeight;
     RangeArrI<int, 1, maxTileType, 1> TileFrameCount;
     RangeArrI<int, 1, maxTileType, 14> TileFrameSpeed;
+    RangeArrI<bool, 1, maxTileType, false> TileConnecting;
+    RangeArrI<int, 1, maxTileType, 14> TileConnect;
 };
 
 extern TileDefaults_t TileDefaults;
@@ -1692,7 +1694,10 @@ extern RangeArrI<int, 1, maxTileType, 0> TileFrame2;
 extern RangeArrI<int, 1, maxTileType, 1> TileFrameCount;
 //Public TileFrameSpeed(1 To maxTileType) As Integer
 extern RangeArrI<int, 1, maxTileType, 14> TileFrameSpeed;
-
+//Public TileConnecting(1 To maxTileType) As Boolean
+extern RangeArrI<bool, 1, maxTileType, false> TileConnecting;
+//Public TileConnect(1 To maxTileType) As Int
+extern RangeArrI<int, 1, maxTileType, 14> TileConnect;
 
 
 //Public PathWidth(1 To maxPathType) As Integer

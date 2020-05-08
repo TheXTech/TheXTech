@@ -185,12 +185,144 @@ void UpdateGraphics2()
         {
             if(vScreenCollision2(1, Tile[A].Location) == true)
             {
+
+                if(TileConnecting[Tile[A].Type] == false)
+                {
 //                frmMain.renderTexture(vScreenX[Z] + Tile[A].Location.X, vScreenY[Z] + Tile[A].Location.Y, Tile[A].Location.Width, Tile[A].Location.Height, GFXTile[Tile[A].Type], 0, TileHeight[Tile[A].Type] * TileFrame[Tile[A].Type]);
                 frmMain.renderTexture(vScreenX[Z] + Tile[A].Location.X,
                                       vScreenY[Z] + Tile[A].Location.Y,
                                       Tile[A].Location.Width,
                                       Tile[A].Location.Height,
                                       GFXTileBMP[Tile[A].Type], 0, TileHeight[Tile[A].Type] * TileFrame[Tile[A].Type]);
+                }
+                else
+                {
+
+                    // corner frames
+                    int cornerTL = 0;
+                    int cornerTR = 0;
+                    int cornerBL = 0;
+                    int cornerBR = 0;
+
+                    //                  t      tr     r      br     b      bl     l      tl
+                    bool neighbors[] = {false, false, false, false, false, false, false, false};
+
+                    // get neighbors
+                    For(B, 1, numTiles)
+                    {
+                        if(B != A && (Tile[B].Type == Tile[A].Type || Tile[B].Type == TileConnect[Tile[A].Type]))
+                        {
+                            signed int offX = round((Tile[B].Location.X - Tile[A].Location.X));
+                            signed int offY = round((Tile[B].Location.Y - Tile[A].Location.Y));
+                            if(offX == 0 && offY == -32)
+                                neighbors[0] = true;
+                            else if(offX == 32 && offY == -32)
+                                neighbors[1] = true;
+                            else if(offX == 32 && offY == 0)
+                                neighbors[2] = true;
+                            else if(offX == 32 && offY == 32)
+                                neighbors[3] = true;
+                            else if(offX == 0 && offY == 32)
+                                neighbors[4] = true;
+                            else if(offX == -32 && offY == 32)
+                                neighbors[5] = true;
+                            else if(offX == -32 && offY == 0)
+                                neighbors[6] = true;
+                            else if(offX == -32 && offY == -32)
+                                neighbors[7] = true;
+                        }
+                    }
+
+
+                    // set corner frames based on neighbors
+                    if(neighbors[6])
+                    {
+                        if(!neighbors[0])
+                            cornerTL = 1;
+                        if(!neighbors[4])
+                            cornerBL = 1;
+                    }
+                    if(neighbors[2])
+                    {
+                        if(!neighbors[0])
+                            cornerTR = 1;
+                        if(!neighbors[4])
+                            cornerBR = 1;
+                    }
+                    if(neighbors[0])
+                    {
+                        if(!neighbors[2])
+                            cornerTR = 2;
+                        if(!neighbors[6])
+                            cornerTL = 2;
+                    }
+                    if(neighbors[4])
+                    {
+                        if(!neighbors[2])
+                            cornerBR = 2;
+                        if(!neighbors[6])
+                            cornerBL = 2;
+                    }
+                    if(!neighbors[0])
+                    {
+                        if(!neighbors[6])
+                            cornerTL = 3;
+                        if(!neighbors[2])
+                            cornerTR = 3;
+                    }
+                    else
+                    {
+                        if(neighbors[6] && !neighbors[7])
+                            cornerTL = 4;
+                        if(neighbors[2] && !neighbors[1])
+                            cornerTR = 4;
+                    }
+                    if(!neighbors[4])
+                    {
+                        if(!neighbors[6])
+                            cornerBL = 3;
+                        if(!neighbors[2])
+                            cornerBR = 3;
+                    }
+                    else
+                    {
+                        if(neighbors[6] && !neighbors[5])
+                            cornerBL = 4;
+                        if(neighbors[2] && !neighbors[3])
+                            cornerBR = 4;
+                    }
+
+
+                    // render corners
+                    frmMain.renderTexture(vScreenX[Z] + Tile[A].Location.X,
+                                          vScreenY[Z] + Tile[A].Location.Y,
+                                          (Tile[A].Location.Width) / 2,
+                                          (Tile[A].Location.Height) / 2,
+                                          GFXTileBMP[Tile[A].Type],
+                                          0,
+                                          TileFrame[Tile[A].Type] * Tile[A].Location.Height * 5 + Tile[A].Location.Height * cornerTL);
+                    frmMain.renderTexture(vScreenX[Z] + Tile[A].Location.X + (Tile[A].Location.Width) / 2,
+                                          vScreenY[Z] + Tile[A].Location.Y,
+                                          (Tile[A].Location.Width) / 2,
+                                          (Tile[A].Location.Height) / 2,
+                                          GFXTileBMP[Tile[A].Type],
+                                          (Tile[A].Location.Width) / 2,
+                                          TileFrame[Tile[A].Type] * Tile[A].Location.Height * 5 + Tile[A].Location.Height * cornerTR);
+                    frmMain.renderTexture(vScreenX[Z] + Tile[A].Location.X,
+                                          vScreenY[Z] + Tile[A].Location.Y + (Tile[A].Location.Height) / 2,
+                                          (Tile[A].Location.Width) / 2,
+                                          (Tile[A].Location.Height) / 2,
+                                          GFXTileBMP[Tile[A].Type],
+                                          0,
+                                          TileFrame[Tile[A].Type] * Tile[A].Location.Height * 5 + Tile[A].Location.Height * cornerBL + (Tile[A].Location.Height) / 2);
+                    frmMain.renderTexture(vScreenX[Z] + Tile[A].Location.X + (Tile[A].Location.Width) / 2,
+                                          vScreenY[Z] + Tile[A].Location.Y + (Tile[A].Location.Height) / 2,
+                                          (Tile[A].Location.Width) / 2,
+                                          (Tile[A].Location.Height) / 2,
+                                          GFXTileBMP[Tile[A].Type],
+                                          (Tile[A].Location.Width) / 2,
+                                          TileFrame[Tile[A].Type] * Tile[A].Location.Height * 5 + Tile[A].Location.Height * cornerBR + (Tile[A].Location.Height) / 2);
+                }
             }
         }
         for(A = 1; A <= numScenes; A++)

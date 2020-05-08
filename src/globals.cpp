@@ -253,6 +253,8 @@ RangeArrI<int, 1, maxTileType, 0> TileFrame;
 RangeArrI<int, 1, maxTileType, 0> TileFrame2;
 RangeArrI<int, 1, maxTileType, 1> TileFrameCount;
 RangeArrI<int, 1, maxTileType, 14> TileFrameSpeed;
+RangeArrI<bool, 1, maxTileType, false> TileConnecting;
+RangeArrI<int, 1, maxTileType, 14> TileConnect;
 RangeArrI<int, 1, maxPathType, 32> PathWidth;
 RangeArrI<int, 1, maxPathType, 32> PathHeight;
 RangeArrI<int, 1, maxPathType, 0> PathFrame;

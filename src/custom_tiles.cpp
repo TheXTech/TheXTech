@@ -18,6 +18,8 @@ void SaveTileDefaults()
         TileDefaults.TileHeight[A] = TileHeight[A];
         TileDefaults.TileFrameCount[A] = TileFrameCount[A];
         TileDefaults.TileFrameSpeed[A] = TileFrameSpeed[A];
+        TileDefaults.TileConnecting[A] = TileConnecting[A];
+        TileDefaults.TileConnect[A] = TileConnect[A];
     }
 }
 
@@ -29,6 +31,8 @@ void LoadTileDefaults()
         TileHeight[A] = TileDefaults.TileHeight[A];
         TileFrameCount[A] = TileDefaults.TileFrameCount[A];
         TileFrameSpeed[A] = TileDefaults.TileFrameSpeed[A];
+        TileConnecting[A] = TileDefaults.TileConnecting[A];
+        TileConnect[A] = TileDefaults.TileConnect[A];
     }
 }
 
@@ -104,6 +108,10 @@ void LoadCustomTile(int A, std::string cFileName)
 
     if(TileFrameSpeed[A] <= 0) // validate
         TileFrameSpeed[A] = 1;
+
+    config.read("connecting", TileConnecting[A], TileConnecting[A]);
+    config.read("connect", TileConnect[A], TileConnect[A]);
+
 
     config.endGroup();
 }

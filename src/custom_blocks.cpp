@@ -88,7 +88,7 @@ void FindCustomBlocks(/*std::string cFilePath*/)
             existingFiles.insert(FileNamePath + FileName  + "/"+ p);
     }
 
-    for(int A = 1; A < BlockTypes; ++A)
+    for(int A = 1; A <= BlockTypes; ++A)
     {
         std::string BlockPathBasegame = AppPath + fmt::format_ne("/config/block/block-{0}.txt", A);
 
@@ -110,12 +110,12 @@ void FindCustomBlocks(/*std::string cFilePath*/)
         if(Files::fileExists(BlockPathC))
             LoadCustomBlock(A, BlockPathC);
     }
-    for(int A = BlockTypes; A < maxBlockType; ++A)
+    for(int A = BlockTypes + 1; A <= maxBlockType; ++A)
     {
-        std::string BlockIniPath = FileNamePath + fmt::format_ne("block-{0}u.ini", A-BlockTypes+1);
-        std::string BlockIniPathC = FileNamePath + FileName + fmt::format_ne("/block-{0}u.ini", A-BlockTypes+1);
-        std::string BlockPath = FileNamePath + fmt::format_ne("block-{0}u.txt", A-BlockTypes+1);
-        std::string BlockPathC = FileNamePath + FileName + fmt::format_ne("/block-{0}u.txt", A-BlockTypes+1);
+        std::string BlockIniPath = FileNamePath + fmt::format_ne("block-{0}u.ini", A-BlockTypes);
+        std::string BlockIniPathC = FileNamePath + FileName + fmt::format_ne("/block-{0}u.ini", A-BlockTypes);
+        std::string BlockPath = FileNamePath + fmt::format_ne("block-{0}u.txt", A-BlockTypes);
+        std::string BlockPathC = FileNamePath + FileName + fmt::format_ne("/block-{0}u.txt", A-BlockTypes);
 
 
         if(Files::fileExists(BlockIniPath))
