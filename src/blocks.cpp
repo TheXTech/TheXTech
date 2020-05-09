@@ -296,12 +296,6 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
     if(HitSide == true || BlockBouncy[b.Type] || BlockBouncyHorizontal[b.Type])
         newBlock = b.Type;
 
-    if(BlockHitable[b.Type] && b.Type != 90)
-    {
-        b.Type = newBlock;
-        b.Location.Height = BlockHeight[newBlock];
-        b.Location.Width = BlockWidth[newBlock];
-    }
 
     if(b.Special > 0 && b.Special < 100) // Block has coins
     {
@@ -1290,6 +1284,13 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
     {
         b.Kill = true;
         PlaySound(4);
+    }
+
+    if(BlockHitable[b.Type] && b.Type != 90 && b.Special == 0)
+    {
+        b.Type = newBlock;
+        b.Location.Height = BlockHeight[newBlock];
+        b.Location.Width = BlockWidth[newBlock];
     }
 }
 
