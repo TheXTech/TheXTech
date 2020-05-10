@@ -400,7 +400,7 @@ void NPCSpecial(int A)
     NPC_t tempNPC;
 
     // dont despawn
-    if(NPC[A].Type == 200 || NPC[A].Type == 201 || NPC[A].Type == 209 || NPC[A].Type == 208 || NPC[A].Type == 262)
+    if(NPC[A].Type == 200 || NPC[A].Type == 201 || NPC[A].Type == 209 || NPC[A].Type == 208 || NPC[A].Type == 262 || NPC[A].Type == 39)
     {
         if(NPC[A].TimeLeft > 1)
             NPC[A].TimeLeft = 100;
