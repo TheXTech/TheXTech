@@ -1284,7 +1284,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
     {
         b.Kill = true;
         PlaySound(3);
-        if(BlockBrickEffect[Block[A].Type] == 1 || BlockBrickEffect[Block[A].Type] == 21 || BlockBrickEffect[Block[A].Type] == 30)
+        if(BlockBrickEffect[Block[A].Type] == 1 || BlockBrickEffect[Block[A].Type] == 21 || BlockBrickEffect[Block[A].Type] == 30 || BlockBrickEffect[Block[A].Type] == 51)
             PlaySound(4);
     }
 
@@ -1869,7 +1869,7 @@ void UpdateBlocks()
             {
                 KillBlock(iBlock[A]); // Destroy the block
                 PlaySound(3);
-                if(BlockBrickEffect[Block[iBlock[A]].Type] == 1 || BlockBrickEffect[Block[iBlock[A]].Type] == 21 || BlockBrickEffect[Block[iBlock[A]].Type] == 30)
+                if(BlockBrickEffect[Block[iBlock[A]].Type] == 1 || BlockBrickEffect[Block[iBlock[A]].Type] == 21 || BlockBrickEffect[Block[iBlock[A]].Type] == 30 || BlockBrickEffect[Block[A].Type] == 51)
                     PlaySound(4);
             }
         }
