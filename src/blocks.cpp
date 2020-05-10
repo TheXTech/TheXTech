@@ -1286,12 +1286,6 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         PlaySound(4);
     }
 
-    if(BlockHitable[b.Type] && b.Type != 90 && b.Special == 0)
-    {
-        b.Type = newBlock;
-        b.Location.Height = BlockHeight[newBlock];
-        b.Location.Width = BlockWidth[newBlock];
-    }
 }
 
 void BlockShakeUp(int A)
