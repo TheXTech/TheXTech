@@ -1276,14 +1276,16 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         CheckSectionNPC(numNPCs);
         b = blankBlock;
     }
-    if(b.Type == 90)
+    if(b.Type == 90 || b.Type == 526)
     {
         BlockHitHard(A);
     }
     if(BlockBrick[b.Type] == true && whatPlayer > 0 && Player[whatPlayer].State > 1 && b.Special == 0)
     {
         b.Kill = true;
-        PlaySound(4);
+        PlaySound(3);
+        if(BlockBrickEffect[Block[A].Type] == 1 || BlockBrickEffect[Block[A].Type] == 21 || BlockBrickEffect[Block[A].Type] == 30)
+            PlaySound(4);
     }
 
 }
@@ -1365,7 +1367,7 @@ void BlockShakeDown(int A)
 
 void BlockHitHard(int A)
 {
-    if(Block[A].Hidden == false && Block[A].Special == 0 && (BlockBrick[Block[A].Type] == true || BlockExplodable[Block[A].Type] == true))
+    if(Block[A].Hidden == false && Block[A].Special == 0 && (BlockBrick[Block[A].Type] == true || BlockExplodable[Block[A].Type] == true || BlockHammer[Block[A].Type] == true))
     {
         if(Block[A].Type == 90)
         {
@@ -1866,7 +1868,9 @@ void UpdateBlocks()
             if(Block[iBlock[A]].Special == 0)
             {
                 KillBlock(iBlock[A]); // Destroy the block
-                PlaySound(4);
+                PlaySound(3);
+                if(BlockBrickEffect[Block[iBlock[A]].Type] == 1 || BlockBrickEffect[Block[iBlock[A]].Type] == 21 || BlockBrickEffect[Block[iBlock[A]].Type] == 30)
+                    PlaySound(4);
             }
         }
     }
