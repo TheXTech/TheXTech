@@ -133,6 +133,9 @@ void SetupCredits()
     AddCredit("Ekaterina Bolyakova");
     AddCredit("'Core'");
     AddCredit("");
+    AddCredit("Josh Oliver");
+    AddCredit("'Josh Oliver'");
+    AddCredit("");
     AddCredit("");
 #endif
 
