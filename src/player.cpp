@@ -2180,7 +2180,7 @@ void TailSwipe(int plr, bool boo, bool Stab, int StabDir)
                                 NewEffect(10, Block[A].Location);
                                 Effect[numEffects].Location.SpeedY = -2;
                             }
-                            if(Block[A].Type == 457 && Player[plr].State == 6)
+                            if(BlockHammer[Block[A].Type] == true && Player[plr].State == 6)
                             {
                                 KillBlock(A);
                             }

@@ -282,6 +282,7 @@ RangeArrI<bool, 0, maxBlockType, false> BlockBouncyHorizontal;
 RangeArrI<bool, 0, maxBlockType, false> BlockDiggable;
 RangeArrI<bool, 0, maxBlockType, false> BlockHitable;
 RangeArrI<bool, 0, maxBlockType, false> BlockExplodable;
+RangeArrI<bool, 0, maxBlockType, false> BlockHammer;
 RangeArrI<int, 0, maxBlockType, 2> BlockHitTransform;
 RangeArrI<int, 1, 10, 0> CoinFrame;
 RangeArrI<int, 1, 10, 0> CoinFrame2;

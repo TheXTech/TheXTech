@@ -217,7 +217,7 @@ void Bomb(Location_t Location, int Game, int ImmunePlayer)
             {
                 BlockHit(i);
                 BlockHitHard(i);
-                if(Game == 0 && Block[i].Type == 457)
+                if(Game == 0 && BlockHammer[Block[i].Type] == true)
                     KillBlock(i);
             }
         }

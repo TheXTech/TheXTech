@@ -1981,7 +1981,7 @@ void UpdateNPCs()
                                                         }
                                                         if(NPC[A].Type == 171 || NPC[A].Type == 266 || NPC[A].Type == 292)
                                                         {
-                                                            if(Block[B].Type == 457)
+                                                            if(BlockHammer[Block[B].Type] == true)
                                                                 KillBlock(B);
                                                             HitSpot = 0;
                                                         }

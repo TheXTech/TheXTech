@@ -804,6 +804,7 @@ struct BlockDefaults_t
     RangeArrI<int, 0, maxBlockType, 8> BlockFrameSpeed;
     RangeArrI<bool, 0, maxBlockType, false> BlockConnecting;
     RangeArrI<bool, 0, maxBlockType, false> BlockExplodable;
+    RangeArrI<bool, 0, maxBlockType, false> BlockHammer;
 };
 
 extern BlockDefaults_t BlockDefaults;
@@ -1766,6 +1767,8 @@ extern RangeArrI<int, 0, maxBlockType, 8> BlockFrameSpeed;
 extern RangeArrI<bool, 0, maxBlockType, false> BlockConnecting;
 //Public BlockConnecting(0 to maxBlockType) As Boolean 'block is explodable by bombs
 extern RangeArrI<bool, 0, maxBlockType, false> BlockExplodable;
+//Public BlockHammer(0 to maxBlockType) As Boolean 'block is destroyable with hammer or tanooki suit
+extern RangeArrI<bool, 0, maxBlockType, false> BlockHammer;
 //Public CoinFrame(1 To 10) As Integer 'What frame the coin is on
 extern RangeArrI<int, 1, 10, 0> CoinFrame;
 //Public CoinFrame2(1 To 10) As Integer 'Counter to update the coin frames

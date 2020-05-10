@@ -2503,7 +2503,7 @@ void UpdatePlayer()
                                         }
 
                                         // destroy some blocks if the player is touching it as a statue
-                                        if(Block[B].Type == 457 && Player[A].Stoned)
+                                        if(BlockHammer[Block[B].Type] == true && Player[A].Stoned)
                                         {
                                             HitSpot = 0;
                                             KillBlock(B);

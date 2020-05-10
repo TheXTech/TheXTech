@@ -38,6 +38,7 @@ void SaveBlockDefaults()
         BlockDefaults.BlockHitable[A] = BlockHitable[A];
         BlockDefaults.BlockHitTransform[A] = BlockHitTransform[A];
         BlockDefaults.BlockExplodable[A] = BlockExplodable[A];
+        BlockDefaults.BlockHammer[A] = BlockHammer[A];
     }
 }
 
@@ -68,6 +69,7 @@ void LoadBlockDefaults()
         BlockHitable[A] = BlockDefaults.BlockHitable[A];
         BlockHitTransform[A] = BlockDefaults.BlockHitTransform[A];
         BlockExplodable[A] = BlockDefaults.BlockExplodable[A];
+        BlockHammer[A] = BlockDefaults.BlockHammer[A];
     }
 }
 
@@ -228,6 +230,7 @@ void LoadCustomBlock(int A, std::string cFileName)
     config.read("destroy-effect", BlockBrickEffect[A], BlockBrickEffect[A]);
 
     config.read("explodable", BlockExplodable[A], BlockExplodable[A]);
+    config.read("hammer", BlockHammer[A], BlockHammer[A]);
 
     config.read("bounce-side", BlockBouncyHorizontal[A], BlockBouncyHorizontal[A]);
     config.read("bounceside", BlockBouncyHorizontal[A], BlockBouncyHorizontal[A]);//alias
