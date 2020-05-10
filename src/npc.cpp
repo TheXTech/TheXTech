@@ -2336,7 +2336,7 @@ void NPCSpecial(int A)
             if(NPC[A].Special3 == 0)
                 PlaySound(62);
             NPC[A].Special3 = NPC[A].Special3 + 1;
-            if((int(NPC[A].Special3) % 10) == 0)
+            if((int(NPC[A].Special3) % 20 /*10*/) == 0)
             {
                 numNPCs++;
                 NPC[numNPCs] = NPC_t();
@@ -2351,7 +2351,7 @@ void NPCSpecial(int A)
                 NPC[numNPCs].TimeLeft = 50;
                 NPC[numNPCs].Location.SpeedY = -7;
                 NPC[numNPCs].Location.SpeedX = 7 * NPC[numNPCs].Direction;
-                NPC[numNPCs].Location.SpeedY = NPC[numNPCs].Location.SpeedY + dRand() * 6 - 3;
+                NPC[numNPCs].Location.SpeedY = NPC[numNPCs].Location.SpeedY;// + dRand() * 6 - 3;
                 NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * (1 - (NPC[A].Special3 / 140));
             }
             if(NPC[A].Special3 >= 120 + dRand() * 40)
