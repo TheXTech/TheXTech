@@ -354,9 +354,7 @@ void SetupPlayers()
 
             for(int numNPCsMax = numNPCs, A = 1; A <= numNPCsMax; A++)
             {
-                if(NPC[A].Type != 192)
-                    continue;
-                if(NPC[A].Type != 299)
+                if(NPC[A].Type != 192 && NPC[A].Type != 299)
                     continue;
                 if(cp.id != Maths::iRound(NPC[A].Special))
                     continue;
@@ -399,7 +397,7 @@ void SetupPlayers()
                         Player[1].Location.X = Player[1].Location.X - 16;
                         Player[2].Location.X = Player[2].Location.X + 16;
                     }
-                    break;// Stop to find NPCs
+                    break;// Stop finding NPCs
                 }
             }// for NPCs
         } // for Check points
