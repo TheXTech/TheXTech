@@ -494,7 +494,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             b.Special = b.Special - 1;
         }
 
-        if((b.Special == 0 && BlockBouncy[b.Type] == false) || BlockHitable[b.Type])
+        if(b.Special == 0 && (BlockBouncy[b.Type] == false || BlockHitable[b.Type]))
         {
             b.Type = newBlock;
             b.Location.Height = BlockHeight[newBlock];
