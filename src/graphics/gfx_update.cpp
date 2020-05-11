@@ -2079,10 +2079,6 @@ void UpdateGraphics(bool skipRepaint)
                             SuperPrint(tempStr, 3, 300, 320 + (B * 30), 255);
                             DrawTexture(310 + (tempStr.size()*18), 320 + (B * 30), MenuGFX[5]);
                         }
-                        else if(tempStr.rfind("Challenge World ",0) == 0)
-                        {
-                            SuperPrint(tempStr, 3, 300, 320 + (B * 30), 1.f, 1.f, 0.f, 1.f);
-                        }
                         else
                             SuperPrint(tempStr, 3, 300, 320 + (B * 30));
                     }
