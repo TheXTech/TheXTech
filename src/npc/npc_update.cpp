@@ -210,7 +210,55 @@ void UpdateNPCs()
 
         if(NPC[A].TailCD > 0)
             NPC[A].TailCD = NPC[A].TailCD - 1;
-
+        // workaround for koopaling shells so far
+        if(NPC[A].Type == 268 || NPC[A].Type == 281 || NPC[A].Type == 302)
+        {
+            tempLocation = NPC[A].Location;
+            tempLocation.Y = tempLocation.Y + 6;
+            tempLocation.X = tempLocation.X + 6;
+            tempLocation.Width = tempLocation.Width + 6;
+            tempLocation.Height = tempLocation.Height + 6;
+            tempLocation2 = NPC[A].Location;
+            tempLocation2.Y = tempLocation.Y - 6;
+            tempLocation2.X = tempLocation.X - 6;
+            tempLocation2.Width = tempLocation.Width - 6;
+            tempLocation2.Height = tempLocation.Height - 6;
+            for(int i = 1; i <= numBlock; i++)
+            {
+                if(CheckCollision(tempLocation, Block[i].Location, NPC[A].Section) == true && BlockKills[Block[i].Type] == true)
+                {
+                    NPC[A].Killed = 6;
+                }
+                else if(CheckCollision(tempLocation2, Block[i].Location, NPC[A].Section) == true && BlockKills[Block[i].Type] == true)
+                {
+                    NPC[A].Killed = 6;
+                }
+            }
+            for(int i = 1; i <= numNPCs; i++)
+            {
+                if(NPC[i].Projectile == true && CheckCollision(NPC[A].Location, NPC[i].Location, NPC[A].Section) == true)
+                {
+                    if(NPC[i].Type == 13 || NPC[i].Type == 108)
+                    {
+                        NPC[A].Damage = NPC[A].Damage + 1;
+                        PlaySound(9);
+                    }
+                    else
+                    {
+                        if(NPC[i].Type != 45)
+                            NewEffect(75, NPC[i].Location);
+                        else
+                            NewEffect(73, NPC[i].Location);
+                        NPCHit(i, 3, A);
+                        NPC[A].Special = 5;
+                        NPC[A].Damage = NPC[A].Damage + 5;
+                        PlaySound(39);
+                    }
+                    if(NPC[A].Damage >= 15)
+                        NPC[A].Killed = B;
+                }
+            }
+        }
         if(A > maxNPCs - 100)
             NPC[A].Killed = 9;
         // generator code

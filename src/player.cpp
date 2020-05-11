@@ -2230,6 +2230,12 @@ void TailSwipe(int plr, bool boo, bool Stab, int StabDir)
                             }
                             else
                             {
+                                // workaround for koopaling shells
+                                if(NPC[A].Type == 268 || NPC[A].Type == 281 || NPC[A].Type == 302)
+                                {
+                                    NPC[A].Damage = NPC[A].Damage + 2;
+                                    PlaySound(89);
+                                }
                                 NPCHit(A, 10, plr);
                             }
                             if(StabDir == 2 && (NPC[A].Killed == 10 || NPC[A].Damage != B || NPC[A].Type != C))

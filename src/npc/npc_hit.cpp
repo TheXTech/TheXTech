@@ -470,14 +470,18 @@ void NPCHit(int A, int B, int C)
             NPC[A].Immune = 10;
         else if(B == 3 || B == 4 || B == 5)
         {
-            if(NPC[C].Type == 13 || NPC[C].Type == 108)
+            if(NPC[C].Type == 13)
+            {
+                NPC[A].Damage = NPC[A].Damage + 1;
+                PlaySound(9);
+            }
+            else if(NPC[C].Type == 108)
             {
                 NPC[A].Damage = NPC[A].Damage + 1;
                 PlaySound(9);
             }
             else
             {
-                NPCHit(C, 3, B);
                 NPC[A].Special = 5;
                 NPC[A].Damage = NPC[A].Damage + 5;
                 PlaySound(39);

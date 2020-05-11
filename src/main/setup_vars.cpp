@@ -470,7 +470,7 @@ void SetupVars()
     NPCJumpHurt[260] = true;
 
 
-
+    NPCNoYoshi[262] = true;
     NPCNoYoshi[263] = true;
     NPCNoYoshi[265] = true;
     NPCNoYoshi[260] = true;
