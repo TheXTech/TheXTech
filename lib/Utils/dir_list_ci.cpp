@@ -41,7 +41,9 @@ static void replaceSlashes(std::string &str, const std::string &from)
 std::string DirListCI::resolveFileCase(const std::string &in_name)
 {
 #ifdef _WIN32
-    return in_name; // no need on Windows
+    std::string name;
+    replaceSlashes(name, in_name);
+    return name;
 #else
     if(in_name.empty())
         return in_name;
