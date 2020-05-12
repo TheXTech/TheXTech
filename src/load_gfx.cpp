@@ -27,6 +27,7 @@
 #include "load_gfx.h"
 #include "graphics.h" // SuperPrint
 #include <Utils/files.h>
+#include <Utils/dir_list_ci.h>
 #include <DirManager/dirman.h>
 #include <InterProcess/intproc.h>
 #include <fmt_format_ne.h>
@@ -36,6 +37,8 @@
 
 #include <set>
 
+static DirListCI s_dirEpisode;
+static DirListCI s_dirCustom;
 
 bool gfxLoaderTestMode = false;
 
@@ -79,13 +82,13 @@ static void loadCGFX(const std::set<std::string> &files,
                      int *width, int *height, bool& isCustom, StdPicture &texture,
                      bool world = false)
 {
-    std::string imgPath = dEpisode + fName + ".png";
-    std::string gifPath = dEpisode + fName + ".gif";
-    std::string maskPath = dEpisode + fName + "m.gif";
+    std::string imgPath = dEpisode + s_dirEpisode.resolveFileCase(fName + ".png");
+    std::string gifPath = dEpisode + s_dirEpisode.resolveFileCase(fName + ".gif");
+    std::string maskPath = dEpisode + s_dirEpisode.resolveFileCase(fName + "m.gif");
 
-    std::string imgPathC = dEpisode + dData + "/" + fName + ".png";
-    std::string gifPathC = dEpisode + dData + "/" + fName + ".gif";
-    std::string maskPathC = dEpisode + dData + "/" + fName + "m.gif";
+    std::string imgPathC = dEpisode + dData + "/" + s_dirEpisode.resolveFileCase(fName + ".png");
+    std::string gifPathC = dEpisode + dData + "/" + s_dirCustom.resolveFileCase(fName + ".gif");
+    std::string maskPathC = dEpisode + dData + "/" + s_dirCustom.resolveFileCase(fName + "m.gif");
     bool alreadyLoaded = false;
 
     std::string loadedPath;
@@ -511,6 +514,9 @@ void LoadCustomGFX()
     std::set<std::string> existingFiles;
     getExistingFiles(existingFiles);
 
+    s_dirEpisode.setCurDir(FileNamePath);
+    s_dirCustom.setCurDir(FileNamePath + FileName);
+
     for(int A = 1; A < maxBlockType; ++A)
     {
         loadCGFX(existingFiles, GfxRoot + fmt::format_ne("block/block-{0}.png", A),
@@ -620,6 +626,9 @@ void LoadWorldCustomGFX()
     std::string GfxRoot = AppPath + "graphics/";
     std::set<std::string> existingFiles;
     getExistingFiles(existingFiles);
+
+    s_dirEpisode.setCurDir(FileNamePath);
+    s_dirCustom.setCurDir(FileNamePath + FileName);
 
     for(int A = 1; A < maxTileType; ++A)
     {

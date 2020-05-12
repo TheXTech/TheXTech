@@ -9,6 +9,7 @@ list(APPEND UTILS_SRCS
     ${CMAKE_CURRENT_LIST_DIR}/files.cpp
     ${CMAKE_CURRENT_LIST_DIR}/strings.cpp
     ${CMAKE_CURRENT_LIST_DIR}/elapsed_timer.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/dir_list_ci.cpp
 )
 
 if(WIN32)
