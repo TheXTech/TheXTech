@@ -38,6 +38,7 @@
 #include <json.hpp>
 #include <DirManager/dirman.h>
 #include <Utils/files.h>
+#include <Utils/dir_list_ci.h>
 #include <Logger/logger.h>
 #include <PGE_File_Formats/file_formats.h>
 
@@ -98,6 +99,8 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 //    int mSections = 0;
 //    Location_t tempLocation;
 
+    DirListCI dirEpisode;
+
     qScreen = false;
     ClearLevel();
     BlockSound();
@@ -108,8 +111,10 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
     FileFormats::smbx64LevelSortBlocks(lvl);
     FileFormats::smbx64LevelSortBGOs(lvl);
 
-    FileName = lvl.meta.filename;
+    dirEpisode.setCurDir(lvl.meta.path);
+    FileName = dirEpisode.resolveDirCase(lvl.meta.filename);
     FileNamePath = lvl.meta.path + "/";
+
 
     if(!FilePath.empty())
     {
@@ -168,7 +173,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         Background2REAL[B] = Background2[B];
         NoTurnBack[B] = s.lock_left_scroll;
         UnderWater[B] = s.underwater;
-        CustomMusic[B] = s.music_file;
+        CustomMusic[B] = dirEpisode.resolveFileCase(s.music_file);
         B++;
         if(B > maxSections)
             break;
@@ -443,7 +448,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         warp.Direction = w.idirect;
         warp.Direction2 = w.odirect;
         warp.Effect = w.type;
-        warp.level = w.lname;
+        warp.level = dirEpisode.resolveFileCase(w.lname);
         warp.LevelWarp = int(w.warpto);
         warp.LevelEnt = w.lvl_i;
 

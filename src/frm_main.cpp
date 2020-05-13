@@ -1008,7 +1008,10 @@ void FrmMain::lazyLoad(StdPicture &target)
     target.frame_w = static_cast<int>(w);
     target.frame_h = static_cast<int>(h);
 
-    if(w > Uint32(m_ri.max_texture_width) || h > Uint32(m_ri.max_texture_height))
+    bool wLimitExcited = m_ri.max_texture_width > 0 && w > Uint32(m_ri.max_texture_width);
+    bool hLimitExcited = m_ri.max_texture_height > 0 && h > Uint32(m_ri.max_texture_height);
+
+    if(wLimitExcited || hLimitExcited)
     {
         target.w_orig = int(w);
         target.h_orig = int(h);
@@ -1019,7 +1022,8 @@ void FrmMain::lazyLoad(StdPicture &target)
         if(h > Uint32(m_ri.max_texture_height))
             h = Uint32(m_ri.max_texture_height);
 
-        pLogWarning("Texture is too big for a given hardware limit (%dx$d). Shrinking texture to %dx%d, quality may be distorted!",
+        pLogWarning("Texture is too big for a given hardware limit (%dx%d). "
+                    "Shrinking texture to %dx%d, quality may be distorted!",
                     m_ri.max_texture_width, m_ri.max_texture_height,
                     w, h);
 

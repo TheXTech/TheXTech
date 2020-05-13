@@ -28,10 +28,13 @@
 
 #include <DirManager/dirman.h>
 #include <Utils/files.h>
+#include <Utils/dir_list_ci.h>
 #include <PGE_File_Formats/file_formats.h>
 #include <PGE_File_Formats/smbx64.h>
 #include <fmt_format_ne.h>
 
+static DirListCI s_dirEpisode;
+static DirListCI s_dirCustom;
 
 void LoadCustomNPC(int A, std::string cFileName);
 
@@ -144,6 +147,9 @@ void FindCustomNPCs(/*std::string cFilePath*/)
     for(auto &p : files)
         existingFiles.insert(FileNamePath + p);
 
+    s_dirEpisode.setCurDir(FileNamePath);
+    s_dirCustom.setCurDir(FileNamePath + FileName);
+
     if(DirMan::exists(FileNamePath + FileName))
     {
         DirMan searchDataDir(FileNamePath + FileName);
@@ -154,8 +160,8 @@ void FindCustomNPCs(/*std::string cFilePath*/)
 
     for(int A = 1; A < maxNPCType; ++A)
     {
-        std::string npcPath = FileNamePath + fmt::format_ne("npc-{0}.txt", A);
-        std::string npcPathC = FileNamePath + FileName + fmt::format_ne("/npc-{0}.txt", A);
+        std::string npcPath = FileNamePath + s_dirEpisode.resolveFileCase(fmt::format_ne("npc-{0}.txt", A));
+        std::string npcPathC = FileNamePath + FileName + "/" + s_dirCustom.resolveFileCase(fmt::format_ne("npc-{0}.txt", A));
         if(Files::fileExists(npcPath))
             LoadCustomNPC(A, npcPath);
         if(Files::fileExists(npcPathC))

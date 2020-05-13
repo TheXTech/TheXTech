@@ -31,6 +31,7 @@
 
 #include <Utils/strings.h>
 #include <Utils/files.h>
+#include <Utils/dir_list_ci.h>
 #include <Logger/logger.h>
 #include <PGE_File_Formats/file_formats.h>
 
@@ -42,6 +43,7 @@ void OpenWorld(std::string FilePath)
     int A = 0;
     int B = 0;
     WorldData wld;
+    DirListCI dirEpisode;
 
     ClearWorld();
 
@@ -53,8 +55,9 @@ void OpenWorld(std::string FilePath)
 //            break;
 //    }
 
+    dirEpisode.setCurDir(wld.meta.path);
     FileNameFull = Files::basename(FilePath);
-    FileName = wld.meta.filename; //FilePath.substr(FilePath.length() - (FilePath.length() - A));
+    FileName = dirEpisode.resolveDirCase(wld.meta.filename); //FilePath.substr(FilePath.length() - (FilePath.length() - A));
     FileNamePath = wld.meta.path + "/"; //FilePath.substr(0, (A));
 
     if(wld.meta.RecentFormat == LevelData::SMBX64)
@@ -76,7 +79,7 @@ void OpenWorld(std::string FilePath)
     blockCharacter[3] = wld.nocharacter3;
     blockCharacter[4] = wld.nocharacter4;
     blockCharacter[5] = wld.nocharacter5;
-    StartLevel = wld.IntroLevel_file;
+    StartLevel = dirEpisode.resolveFileCase(wld.IntroLevel_file);
     NoMap = wld.HubStyledWorld;
     RestartLevel = wld.restartlevel;
 
@@ -199,7 +202,7 @@ void OpenWorld(std::string FilePath)
         ll.Location.X = l.x;
         ll.Location.Y = l.y;
         ll.Type = int(l.id);
-        ll.FileName = l.lvlfile;
+        ll.FileName = dirEpisode.resolveFileCase(l.lvlfile);
         ll.LevelName = l.title;
         ll.LevelExit[1] = l.top_exit;
         ll.LevelExit[2] = l.left_exit;
@@ -239,7 +242,7 @@ void OpenWorld(std::string FilePath)
         box.Location.X = m.x;
         box.Location.Y = m.y;
         box.Type = int(m.id);
-        box.MusicFile = m.music_file;
+        box.MusicFile = dirEpisode.resolveFileCase(m.music_file);
 
         // In game they are smaller (30x30), in world they are 32x32
         box.Location.Width = 30;
