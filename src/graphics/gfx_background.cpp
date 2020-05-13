@@ -1989,7 +1989,7 @@ void DrawBackground(int S, int Z)
     }
 
     A = 65; // sma4 metalic
-    if(Background2[S] == 63)
+    if(Background2[S] == 65)
     {
 
         int tempVar106 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A]))) + 2;
