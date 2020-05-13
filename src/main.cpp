@@ -28,6 +28,7 @@
 #include <AppPath/app_path.h>
 #include <tclap/CmdLine.h>
 #include <Utils/strings.h>
+#include <Utils/files.h>
 #include <CrashHandler/crash_handler.h>
 
 
@@ -157,7 +158,7 @@ int main(int argc, char**argv)
                                                 "render type",
                                                 cmd);
 
-        TCLAP::ValueArg<std::string> testLevel("l", "leveltest", "Start a level test of given file",
+        TCLAP::ValueArg<std::string> testLevel("l", "leveltest", "Start a level test of given file. OBSOLETE OPTION: now you able to specify the file path without -l or --leveltest argument.",
                                                 false, "",
                                                 "file path",
                                                 cmd);
@@ -186,6 +187,8 @@ int main(int argc, char**argv)
         TCLAP::SwitchArg switchTestMagicHand("k", "magic-hand", "Enable magic hand functionality while level test running", false);
         TCLAP::SwitchArg switchTestInterprocess("i", "interprocessing", "Enable an interprocessing mode with Editor", false);
 
+        TCLAP::UnlabeledValueArg<std::string> inputFileNames("levelpath", "Path to level file to run the test", false, std::string(), "path to file");
+
         cmd.add(&switchFrameSkip);
         cmd.add(&switchNoSound);
         cmd.add(&switchNoPause);
@@ -197,6 +200,7 @@ int main(int argc, char**argv)
         cmd.add(&switchTestMaxFPS);
         cmd.add(&switchTestMagicHand);
         cmd.add(&switchTestInterprocess);
+        cmd.add(&inputFileNames);
 
         cmd.parse(argc, argv);
 
@@ -213,6 +217,22 @@ int main(int argc, char**argv)
             setup.renderType = CmdLineSetup_t::RENDER_HW;
 
         setup.testLevel = testLevel.getValue();
+
+        if(!inputFileNames.getValue().empty())
+        {
+            auto fpath = inputFileNames.getValue();
+            if(Files::hasSuffix(fpath, ".lvl") || Files::hasSuffix(fpath, ".lvlx"))
+            {
+                setup.testLevel = fpath;
+            }
+
+            //TODO: Implement a world map running and testing
+//            if(Files::hasSuffix(fpath, ".wld") || Files::hasSuffix(fpath, ".wldx"))
+//            {
+//
+//            }
+        }
+
         setup.interprocess = switchTestInterprocess.getValue();
         setup.testLevelMode = !setup.testLevel.empty() || setup.interprocess;
         setup.testNumPlayers = int(numPlayers.getValue());
