@@ -158,7 +158,7 @@ int main(int argc, char**argv)
                                                 "render type",
                                                 cmd);
 
-        TCLAP::ValueArg<std::string> testLevel("l", "leveltest", "Start a level test of given file. OBSOLETE OPTION: now you able to specify the file path without -l or --leveltest argument.",
+        TCLAP::ValueArg<std::string> testLevel("l", "leveltest", "Start a level test of a given level file. OBSOLETE OPTION: now you able to specify the file path without -l or --leveltest argument.",
                                                 false, "",
                                                 "file path",
                                                 cmd);
