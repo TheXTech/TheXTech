@@ -29,8 +29,10 @@
 class LogWriter
 {
 public:
+    static std::string  m_logDirPath;
     static std::string  m_logFilePath;
     static PGE_LogLevel m_logLevel;
+    static int          m_maxFilesCount;
     //! Is logging system is enabled
     static bool  m_enabled;
     //! Is logging system allowed to output into `stdout`
