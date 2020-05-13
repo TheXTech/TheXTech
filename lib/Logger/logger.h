@@ -34,7 +34,7 @@ enum class PGE_LogLevel
     NoLog    = 0,
 };
 
-extern void LoadLogSettings(bool disableStdOut = false);
+extern void LoadLogSettings(bool disableStdOut = false, bool verboseLogs = false);
 extern void CloseLog();
 #endif//__cplusplus
 

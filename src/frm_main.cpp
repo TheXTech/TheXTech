@@ -87,7 +87,7 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
 {
     bool res = false;
 
-    LoadLogSettings(setup.interprocess);
+    LoadLogSettings(setup.interprocess, setup.verboseLogging);
     //Write into log the application start event
     pLogDebug("<Application started>");
 

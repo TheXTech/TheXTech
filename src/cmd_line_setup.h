@@ -40,6 +40,9 @@ struct CmdLineSetup_t
     bool testMaxFPS = false;
     //! Enable magic-hand functionality
     bool testMagicHand = false;
+
+    //! Force log output into console
+    bool verboseLogging = false;
 };
 
 #endif // CMD_LINE_SETUP_H

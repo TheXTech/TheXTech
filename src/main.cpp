@@ -187,6 +187,8 @@ int main(int argc, char**argv)
         TCLAP::SwitchArg switchTestMagicHand("k", "magic-hand", "Enable magic hand functionality while level test running", false);
         TCLAP::SwitchArg switchTestInterprocess("i", "interprocessing", "Enable an interprocessing mode with Editor", false);
 
+        TCLAP::SwitchArg switchVerboseLog("e", "verbose", "Enable log output into the terminal", false);
+
         TCLAP::UnlabeledValueArg<std::string> inputFileNames("levelpath", "Path to level file to run the test", false, std::string(), "path to file");
 
         cmd.add(&switchFrameSkip);
@@ -200,6 +202,7 @@ int main(int argc, char**argv)
         cmd.add(&switchTestMaxFPS);
         cmd.add(&switchTestMagicHand);
         cmd.add(&switchTestInterprocess);
+        cmd.add(&switchVerboseLog);
         cmd.add(&inputFileNames);
 
         cmd.parse(argc, argv);
@@ -233,6 +236,7 @@ int main(int argc, char**argv)
 //            }
         }
 
+        setup.verboseLogging = switchVerboseLog.getValue();
         setup.interprocess = switchTestInterprocess.getValue();
         setup.testLevelMode = !setup.testLevel.empty() || setup.interprocess;
         setup.testNumPlayers = int(numPlayers.getValue());

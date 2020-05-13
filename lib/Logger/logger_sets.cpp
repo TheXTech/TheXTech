@@ -66,6 +66,7 @@ std::string     LogWriter::m_logFilePath;
 PGE_LogLevel    LogWriter::m_logLevel;
 bool            LogWriter::m_enabled = false;
 bool            LogWriter::m_enabledStdOut = false;
+bool            LogWriter::m_enabledVerboseLogs = false;
 
 bool  LogWriter::m_logIsOpened = false;
 SDL_RWops *LogWriter::m_logout = nullptr;
@@ -84,7 +85,7 @@ static std::string return_current_time_and_date()
 }
 #endif//__EMSCRIPTEN__
 
-void LogWriter::LoadLogSettings(bool disableStdOut)
+void LogWriter::LoadLogSettings(bool disableStdOut, bool verboseLogs)
 {
     MutexLocker mutex(&g_lockLocker);
     (void)(mutex);
@@ -96,6 +97,12 @@ void LogWriter::LoadLogSettings(bool disableStdOut)
 #else
     std::string logFileName = fmt::format_ne("TheXTech_log_{0}.txt", return_current_time_and_date());
 
+#if defined(DEBUG_BUILD)
+    (void)verboseLogs; // unused
+    m_enabledVerboseLogs = true; // Enforce verbose log for debug builds
+#else
+    m_enabledVerboseLogs = verboseLogs;
+#endif
     m_enabledStdOut = !disableStdOut;
     m_logLevel = PGE_LogLevel::Debug;
     std::string mainIniFile = AppPathManager::settingsFileSTD();
@@ -149,9 +156,9 @@ void LogWriter::LoadLogSettings(bool disableStdOut)
 #endif
 }
 
-void LoadLogSettings(bool disableStdOut)
+void LoadLogSettings(bool disableStdOut, bool verboseLogs)
 {
-    LogWriter::LoadLogSettings(disableStdOut);
+    LogWriter::LoadLogSettings(disableStdOut, verboseLogs);
 }
 
 void CloseLog()
@@ -202,8 +209,8 @@ static void pLogGeneric(PGE_LogLevel level, const char *label, const char *forma
 {
     va_list arg_in;
 
-#if defined(DEBUG_BUILD) && !defined(__ANDROID__)
-    if(LogWriter::m_enabledStdOut)
+#if !defined(__ANDROID__)
+    if(LogWriter::m_enabledStdOut && LogWriter::m_enabledVerboseLogs)
     {
         va_copy(arg_in, arg);
         std::fprintf(stdout, "%s: ", label);
