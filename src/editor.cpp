@@ -1823,7 +1823,7 @@ void UpdateInterprocess()
                 }
                 if(EditorCursor.NPC.Type == 288 || EditorCursor.NPC.Type == 289 || (EditorCursor.NPC.Type == 91 && int(EditorCursor.NPC.Special) == 288))
                 {
-                    EditorCursor.NPC.Special2 = n.special_data2;
+                    EditorCursor.NPC.Special2 = n.special_data;
                     EditorCursor.NPC.DefaultSpecial2 = int(EditorCursor.NPC.Special2);
                 }
 

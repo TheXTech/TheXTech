@@ -328,9 +328,10 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             npc.Special = n.contents;
             npc.DefaultSpecial = int(npc.Special);
         }
-        if(npc.Type == 288 || npc.Type == 289 || (npc.Type == 91 && int(npc.Special) == 288))
+
+        if(npc.Type == 288 || npc.Type == 289 || (npc.Type == 91 && n.contents == 288))
         {
-            npc.Special2 = n.special_data2;
+            npc.Special2 = n.special_data;
             npc.DefaultSpecial2 = int(npc.Special2);
         }
 
