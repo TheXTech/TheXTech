@@ -1445,7 +1445,7 @@ void MoreScore(int addScore, Location_t Loc, int &Multiplier)
     if(Points[A] <= 5)
     {
         Lives += Points[A];
-        PlaySound(15);
+        PlaySound(15, Points[A] - 1);
     }
     else
         Score += Points[A];

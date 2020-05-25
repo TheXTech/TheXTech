@@ -308,13 +308,13 @@ void PlayMusic(std::string Alias, int fadeInMs)
     }
 }
 
-void PlaySfx(std::string Alias)
+void PlaySfx(std::string Alias, int loops)
 {
     auto sfx = sound.find(Alias);
     if(sfx != sound.end())
     {
         auto &s = sfx->second;
-        Mix_PlayChannel(s.channel, s.chunk, 0);
+        Mix_PlayChannel(s.channel, s.chunk, loops);
     }
 }
 
@@ -581,7 +581,7 @@ void InitSound()
     }
 }
 
-void PlaySound(int A)
+void PlaySound(int A, int loops)
 {
     if(noSound)
         return;
@@ -594,7 +594,7 @@ void PlaySound(int A)
         if(SoundPause[A] == 0) // if the sound wasn't just played
         {
             std::string alias = fmt::format_ne("sound{0}", A);
-            PlaySfx(alias);
+            PlaySfx(alias, loops);
 
             switch(A) // set the delay before a sound can be played again
             {
