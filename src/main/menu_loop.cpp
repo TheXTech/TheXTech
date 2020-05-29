@@ -70,9 +70,24 @@ void MenuLoop()
 //    SingleCoop = 0
     SingleCoop = 0;
 
+    bool altPressed = getKeyState(SDL_SCANCODE_LALT) == KEY_PRESSED ||
+                      getKeyState(SDL_SCANCODE_RALT) == KEY_PRESSED;
+    bool escPressed = getKeyState(SDL_SCANCODE_ESCAPE) == KEY_PRESSED;
+    bool spacePressed = getKeyState(SDL_SCANCODE_SPACE) == KEY_PRESSED;
+    bool returnPressed = getKeyState(SDL_SCANCODE_RETURN) == KEY_PRESSED;
+    bool upPressed = getKeyState(SDL_SCANCODE_UP) == KEY_PRESSED;
+    bool downPressed = getKeyState(SDL_SCANCODE_DOWN) == KEY_PRESSED;
+
+    bool menuDoPress = (returnPressed && !altPressed) || spacePressed;
+    bool menuBackPress = (escPressed && !altPressed);
+
 //    With Player(1).Controls
     {
         Controls_t &c = Player[1].Controls;
+
+        menuDoPress |= (c.Start || c.Jump) && !altPressed;
+        menuBackPress |= c.Run && !altPressed;
+
 //    If frmMain.MousePointer <> 99 Then
         if(frmMain.MousePointer != 99)
         {
@@ -84,25 +99,14 @@ void MenuLoop()
 //    If .Up = False And .Down = False And .Jump = False And .Run = False And .Start = False Then
         if(!c.Up && !c.Down && !c.Jump && !c.Run && !c.Start)
         {
-//        If (GetKeyState(vbKeySpace) And KEY_PRESSED) Or _
-//           (GetKeyState(vbKeyReturn) And KEY_PRESSED) Or _
-//           (GetKeyState(vbKeyUp) And KEY_PRESSED) Or _
-//           (GetKeyState(vbKeyDown) And KEY_PRESSED) Or _
-//           (GetKeyState(vbKeyEscape) And KEY_PRESSED) Then
-            if(getKeyState(SDL_SCANCODE_SPACE) == KEY_PRESSED ||
-               getKeyState(SDL_SCANCODE_RETURN) == KEY_PRESSED ||
-               getKeyState(SDL_SCANCODE_UP) == KEY_PRESSED ||
-               getKeyState(SDL_SCANCODE_DOWN) == KEY_PRESSED ||
-               getKeyState(SDL_SCANCODE_ESCAPE) == KEY_PRESSED
-            ){
-//        Else
-            }
-            else
-            {
-//            MenuCursorCanMove = True
+            bool k = false;
+            k |= menuDoPress;
+            k |= upPressed;
+            k |= downPressed;
+            k |= escPressed;
+
+            if(!k)
                 MenuCursorCanMove = true;
-//        End If
-            }
 //    End If
         }
 //    'For the menu controls
@@ -110,7 +114,7 @@ void MenuLoop()
         if(!getNewKeyboard && !getNewJoystick)
         {
 //            If .Up = True Or (GetKeyState(vbKeyUp) And KEY_PRESSED) Then
-            if(c.Up || (getKeyState(SDL_SCANCODE_UP) == KEY_PRESSED))
+            if(c.Up || upPressed)
             {
 //                If MenuCursorCanMove = True Then
                 if(MenuCursorCanMove)
@@ -144,7 +148,7 @@ void MenuLoop()
                 MenuCursorCanMove = false;
 //            ElseIf .Down = True Or (GetKeyState(vbKeyDown) And KEY_PRESSED) Then
             }
-            else if(c.Down || getKeyState(vbKeyDown) == KEY_PRESSED)
+            else if(c.Down || downPressed)
             {
 //                If MenuCursorCanMove = True Then
                 if(MenuCursorCanMove)
@@ -240,7 +244,7 @@ void MenuLoop()
             }
 
 //            If (GetKeyState(vbKeyEscape) And KEY_PRESSED) And MenuCursorCanMove = True Then
-            if(getKeyState(SDL_SCANCODE_ESCAPE) == KEY_PRESSED && MenuCursorCanMove)
+            if(escPressed && MenuCursorCanMove)
             {
 //                If MenuCursor <> 4 Then
                 if(MenuCursor != 4)
@@ -257,12 +261,7 @@ void MenuLoop()
 //                      (GetKeyState(vbKeyReturn) And KEY_PRESSED)) And _
 //                       MenuCursorCanMove = True) Or MenuMouseClick = True Then
             }
-            else if(
-                ((c.Jump || c.Start ||
-                  getKeyState(SDL_SCANCODE_SPACE) == KEY_PRESSED ||
-                  getKeyState(SDL_SCANCODE_RETURN) == KEY_PRESSED) &&
-                  MenuCursorCanMove) || MenuMouseClick
-            )
+            else if((menuDoPress && MenuCursorCanMove) || MenuMouseClick)
             {
 //                MenuCursorCanMove = False
                 MenuCursorCanMove = false;
@@ -426,7 +425,7 @@ void MenuLoop()
             if(MenuCursorCanMove || MenuMouseClick || MenuMouseBack)
             {
 //                If .Run = True Or (GetKeyState(vbKeyEscape) And KEY_PRESSED) Or MenuMouseBack = True Then
-                if(c.Run || getKeyState(SDL_SCANCODE_ESCAPE) == KEY_PRESSED || MenuMouseBack)
+                if(menuBackPress || MenuMouseBack)
                 {
 //                    If MenuMode = 300 Then
                     if(MenuMode == 300)
@@ -457,10 +456,9 @@ void MenuLoop()
 //                        (GetKeyState(vbKeySpace) And KEY_PRESSED) Or _
 //                        (GetKeyState(vbKeyReturn) And KEY_PRESSED) Or _
 //                         MenuMouseClick = True Then
-                } else if(c.Jump || c.Start ||
-                          getKeyState(SDL_SCANCODE_SPACE) == KEY_PRESSED ||
-                          getKeyState(SDL_SCANCODE_RETURN) == KEY_PRESSED ||
-                          MenuMouseClick) {
+                }
+                else if(menuDoPress || MenuMouseClick)
+                {
 //                    PlaySound 29
                     PlaySound(29);
 //                    If MenuMode = 100 Then
@@ -656,7 +654,7 @@ void MenuLoop()
             if(MenuCursorCanMove || MenuMouseClick || MenuMouseBack)
             {
 //                If .Run = True Or (GetKeyState(vbKeyEscape) And KEY_PRESSED) Or MenuMouseBack = True Then
-                if(c.Run || getKeyState(SDL_SCANCODE_ESCAPE) == KEY_PRESSED || MenuMouseBack)
+                if(menuBackPress || MenuMouseBack)
                 {
 //                    MenuCursor = MenuMode - 1
                     MenuCursor = MenuMode - 1;
@@ -674,10 +672,8 @@ void MenuLoop()
 //                ElseIf .Jump = True Or .Start = True Or _
 //                       (GetKeyState(vbKeySpace) And KEY_PRESSED) Or _
 //                       (GetKeyState(vbKeyReturn) And KEY_PRESSED) Or MenuMouseClick = True Then
-                } else if(c.Jump || c.Start ||
-                          getKeyState(SDL_SCANCODE_SPACE) == KEY_PRESSED ||
-                          getKeyState(SDL_SCANCODE_RETURN) == KEY_PRESSED ||
-                          MenuMouseClick)
+                }
+                else if(menuDoPress || MenuMouseClick)
                 {
 //                    PlaySound 29
                     PlaySound(29);
@@ -774,7 +770,7 @@ void MenuLoop()
             if(MenuCursorCanMove || MenuMouseClick || MenuMouseBack)
             {
 //                If .Run = True Or (GetKeyState(vbKeyEscape) And KEY_PRESSED) Or MenuMouseBack = True Then
-                if(c.Run || getKeyState(SDL_SCANCODE_ESCAPE) == KEY_PRESSED || MenuMouseBack)
+                if(menuBackPress || MenuMouseBack)
                 {
 //'save select back
 //                    If AllCharBlock > 0 Then
@@ -809,10 +805,8 @@ void MenuLoop()
 //                       (GetKeyState(vbKeySpace) And KEY_PRESSED) Or _
 //                       (GetKeyState(vbKeyReturn) And KEY_PRESSED) Or _
 //                       MenuMouseClick = True Then
-                } else if(c.Jump || c.Start ||
-                          getKeyState(SDL_SCANCODE_SPACE) == KEY_PRESSED ||
-                          getKeyState(SDL_SCANCODE_RETURN) == KEY_PRESSED ||
-                          MenuMouseClick)
+                }
+                else if(menuDoPress || MenuMouseClick)
                 {
 //                    PlaySound 29
                     PlaySound(29);
@@ -1028,7 +1022,7 @@ void MenuLoop()
 //            If MenuCursorCanMove = True Or MenuMouseClick = True Or MenuMouseBack = True Then
             if(MenuCursorCanMove || MenuMouseClick || MenuMouseBack) {
 //                If .Run = True Or (GetKeyState(vbKeyEscape) And KEY_PRESSED) Or MenuMouseBack = True Then
-                if(c.Run || getKeyState(vbKeyEscape) == KEY_PRESSED || MenuMouseBack)
+                if(menuBackPress || MenuMouseBack)
                 {
 //                    MenuMode = 0
                     MenuMode = 0;
@@ -1040,10 +1034,7 @@ void MenuLoop()
                     PlaySound(26);
 //                ElseIf .Jump = True Or .Start = True Or (GetKeyState(vbKeySpace) And KEY_PRESSED) Or (GetKeyState(vbKeyReturn) And KEY_PRESSED) Or MenuMouseClick = True Then
                 }
-                else if(c.Jump || c.Start ||
-                        (getKeyState(vbKeySpace) == KEY_PRESSED) ||
-                        (getKeyState(vbKeyReturn) == KEY_PRESSED) ||
-                        MenuMouseClick)
+                else if(menuDoPress || MenuMouseClick)
                 {
 //                    MenuCursorCanMove = False
                     MenuCursorCanMove = false;
@@ -1210,7 +1201,9 @@ void MenuLoop()
 //                    Next A
                     }
 //                Else
-                } else {
+                }
+                else
+                {
 //                    For A = 0 To 6
                     For(A, 0, 10)
                     {
@@ -1314,11 +1307,7 @@ void MenuLoop()
                     KM_Key joyKey;
                     bool gotNewKey = PollJoystick(JoyNum, joyKey);
 
-//                    if(JoyButtons[oldJumpJoy] == true)
-                    if(JoyIsKeyDown(JoyNum, oldJumpJoy))
-                    {
-                    }
-                    else
+                    if(!JoyIsKeyDown(JoyNum, oldJumpJoy))
                     {
                         oldJumpJoy.type = -1;
                         if(gotNewKey)
@@ -1373,13 +1362,10 @@ void MenuLoop()
                             MenuCursorCanMove = false;
                         }
                     }
-
                 }
                 else
                 {
-                    if(c.Run == true ||
-                       getKeyState(vbKeyEscape) == KEY_PRESSED ||
-                       MenuMouseBack == true)
+                    if(menuBackPress || MenuMouseBack)
                     {
                         SaveConfig();
                         MenuCursor = MenuMode - 31;
@@ -1387,10 +1373,7 @@ void MenuLoop()
                         MenuCursorCanMove = false;
                         PlaySound(26);
                     }
-                    else if(c.Jump || c.Start ||
-                            (getKeyState(vbKeySpace) == KEY_PRESSED) ||
-                            (getKeyState(vbKeyReturn) == KEY_PRESSED) ||
-                            MenuMouseClick == true)
+                    else if(menuDoPress || MenuMouseClick)
                     {
                         if(MenuCursor == 0)
                         {

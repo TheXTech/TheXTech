@@ -47,6 +47,7 @@ void GameLoop()
     UpdateControls();
     if(LevelMacro > 0)
         UpdateMacro();
+
     if(BattleMode)
     {
         if(BattleOutro > 0)
@@ -116,7 +117,14 @@ void GameLoop()
         if(MagicHand)
             UpdateEditor();
 
-        if(Player[1].Controls.Start || (getKeyState(SDL_SCANCODE_ESCAPE) == KEY_PRESSED))
+        bool altPressed = getKeyState(SDL_SCANCODE_LALT) == KEY_PRESSED ||
+                          getKeyState(SDL_SCANCODE_RALT) == KEY_PRESSED;
+
+        bool escPressed = getKeyState(SDL_SCANCODE_ESCAPE) == KEY_PRESSED;
+
+        bool pausePress = (Player[1].Controls.Start || escPressed) && !altPressed;
+
+        if(pausePress)
         {
             if(LevelMacro == 0 && CheckLiving() > 0)
             {
@@ -124,7 +132,7 @@ void GameLoop()
                 {
                     if((CaptainN || FreezeNPCs) && PSwitchStop == 0)
                     {
-                        if(getKeyState(SDL_SCANCODE_ESCAPE) == KEY_PRESSED)
+                        if(escPressed)
                         {
                             FreezeNPCs = false;
                             PauseGame(1);
@@ -273,32 +281,45 @@ void PauseGame(int plr)
             BlockFrames();
             UpdateEffects();
 
+            bool altPressed = getKeyState(SDL_SCANCODE_LALT) == KEY_PRESSED ||
+                              getKeyState(SDL_SCANCODE_RALT) == KEY_PRESSED;
+            bool escPressed = getKeyState(SDL_SCANCODE_ESCAPE) == KEY_PRESSED;
+            bool spacePressed = getKeyState(SDL_SCANCODE_SPACE) == KEY_PRESSED;
+            bool returnPressed = getKeyState(SDL_SCANCODE_RETURN) == KEY_PRESSED;
+            bool upPressed = getKeyState(SDL_SCANCODE_UP) == KEY_PRESSED;
+            bool downPressed = getKeyState(SDL_SCANCODE_DOWN) == KEY_PRESSED;
+
+            bool menuDoPress = (returnPressed && !altPressed) || spacePressed;
+            bool menuBackPress = (escPressed && !altPressed);
+
             if(SingleCoop > 0 || numPlayers > 2)
             {
                 for(A = 1; A <= numPlayers; A++)
                     Player[A].Controls = Player[1].Controls;
             }
 
+            auto &c = Player[plr].Controls;
+
+            menuDoPress |= (c.Start || c.Jump) && !altPressed;
+            menuBackPress |= c.Run && !altPressed;
+
+            upPressed |= (c.Up && !altPressed);
+            downPressed |= (c.Down && !altPressed);
+
             if(MessageText.empty())
             {
                 // Pause menu
                 if(!noButtons)
                 {
-                    if(!Player[plr].Controls.Down && !Player[plr].Controls.Up &&
-                       !Player[plr].Controls.Run && !Player[plr].Controls.Jump &&
-                       !Player[plr].Controls.Start)
+                    if(!c.Down && !c.Up && !c.Run && !c.Jump && !c.Start &&
+                       !menuDoPress && !menuBackPress && !upPressed && !downPressed)
                     {
-                        if(!getKeyState(vbKeyEscape) && !getKeyState(vbKeySpace) &&
-                           !getKeyState(vbKeyReturn) && !getKeyState(vbKeyDown) &&
-                           !getKeyState(vbKeyUp))
-                        {
-                            noButtons = true;
-                        }
+                        noButtons = true;
                     }
                 }
                 else
                 {
-                    if(getKeyState(vbKeyEscape) == KEY_PRESSED)
+                    if(menuBackPress)
                     {
                         if(LevelSelect && !Cheater)
                         {
@@ -314,16 +335,16 @@ void PauseGame(int plr)
                         }
                         noButtons = false;
                     }
-                    else if(Player[plr].Controls.Start)
+                    else if(menuDoPress)
                         stopPause = true;
 
-                    if(Player[plr].Controls.Up || getKeyState(vbKeyUp) == KEY_PRESSED)
+                    if(upPressed)
                     {
                         PlaySound(26);
                         MenuCursor = MenuCursor - 1;
                         noButtons = false;
                     }
-                    else if(Player[plr].Controls.Down || getKeyState(vbKeyDown) == KEY_PRESSED)
+                    else if(downPressed)
                     {
                         PlaySound(26);
                         MenuCursor = MenuCursor + 1;
@@ -393,7 +414,7 @@ void PauseGame(int plr)
                         }
                     }
 
-                    if(Player[plr].Controls.Jump || getKeyState(vbKeySpace) || getKeyState(vbKeyReturn))
+                    if(menuDoPress)
                     {
                         if(TestLevel) // Pause menu of a level testing
                         {
@@ -496,23 +517,15 @@ void PauseGame(int plr)
             {
                 if(!noButtons)
                 {
-                    if(!Player[plr].Controls.Down && !Player[plr].Controls.Up &&
-                       !Player[plr].Controls.Run && !Player[plr].Controls.Jump &&
-                       !Player[plr].Controls.Start)
+                    if(!c.Down && !c.Up && !c.Run && !c.Jump && !c.Start &&
+                       !menuDoPress && !menuBackPress && !upPressed && !downPressed)
                     {
-                        if(!getKeyState(vbKeyEscape) && !getKeyState(vbKeySpace) &&
-                           !getKeyState(vbKeyReturn) && !getKeyState(vbKeyDown) &&
-                            !getKeyState(vbKeyUp))
-                        {
-                            noButtons = true;
-                        }
+                        noButtons = true;
                     }
                 }
                 else
                 {
-                    if(getKeyState(vbKeyEscape) || Player[plr].Controls.Jump ||
-                       Player[plr].Controls.Run == true || Player[plr].Controls.Start == true ||
-                       getKeyState(vbKeySpace) || getKeyState(vbKeyReturn))
+                    if(menuBackPress || menuDoPress)
                     {
                         stopPause = true;
                     }

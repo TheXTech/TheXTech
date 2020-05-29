@@ -1742,10 +1742,10 @@ extern int StopHit;
 extern bool MouseRelease;
 //Public TestFullscreen As Boolean
 extern bool TestFullscreen;
-//Public keyDownAlt As Boolean 'for alt/enter fullscreen
-extern bool keyDownAlt;
-//Public keyDownEnter As Boolean
-extern bool keyDownEnter;
+////Public keyDownAlt As Boolean 'for alt/enter fullscreen
+//extern bool keyDownAlt;
+////Public keyDownEnter As Boolean
+//extern bool keyDownEnter;
 //Public BlocksSorted As Boolean 'if using block optimization it requires the locks to be sorted
 extern bool BlocksSorted;
 //Public SingleCoop As Integer 'cheat code

@@ -176,15 +176,24 @@ void WorldLoop()
         tempLocation.X = tempLocation.X + 4;
         tempLocation.Y = tempLocation.Y + 4;
         WorldPlayer[1].LevelName = "";
+
+        bool altPressed = getKeyState(SDL_SCANCODE_LALT) == KEY_PRESSED ||
+                          getKeyState(SDL_SCANCODE_RALT) == KEY_PRESSED;
+
+        bool escPressed = getKeyState(SDL_SCANCODE_ESCAPE) == KEY_PRESSED;
+
+        bool pausePress = (Player[1].Controls.Start || escPressed) && !altPressed;
+
         for(A = 1; A <= numWorldLevels; A++)
         {
-            if(CheckCollision(tempLocation, WorldLevel[A].Location) == true)
+            if(CheckCollision(tempLocation, WorldLevel[A].Location))
             {
                 WorldPlayer[1].LevelName = WorldLevel[A].LevelName;
                 break;
             }
         }
-        if(Player[1].Controls.Start == true || (getKeyState(vbKeyEscape) == KEY_PRESSED) != 0)
+
+        if(pausePress)
         {
             if(Player[1].UnStart == true)
                 PauseGame(1);
