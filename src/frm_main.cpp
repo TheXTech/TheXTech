@@ -331,13 +331,13 @@ void FrmMain::processEvent()
         {
             eventResize();
         }
-#ifndef __EMSCRIPTEN__
-        else if(m_event.window.event == SDL_WINDOWEVENT_MAXIMIZED)
-        {
-            SDL_RestoreWindow(m_window);
-            SetRes();
-        }
-#endif
+//#ifndef __EMSCRIPTEN__
+//        else if(m_event.window.event == SDL_WINDOWEVENT_MAXIMIZED)
+//        {
+//            SDL_RestoreWindow(m_window);
+//            SetRes();
+//        }
+//#endif
         break;
     case SDL_KEYDOWN:
         eventKeyDown(m_event.key);
