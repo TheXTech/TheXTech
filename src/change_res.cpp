@@ -37,6 +37,8 @@ void SetOrigRes()
 #endif
     if(LoadingInProcess)
         UpdateLoad();
+    if(!GameMenu && !MagicHand)
+        showCursor(1);
 }
 
 void ChangeRes(int, int, int, int)

@@ -392,6 +392,8 @@ void FrmMain::eventDoubleClick()
         resChanged = false;
         SDL_RestoreWindow(m_window);
         SDL_SetWindowSize(m_window, ScreenW, ScreenH);
+        if(!GameMenu && !MagicHand)
+            showCursor(1);
     }
     else
         SetRes();
