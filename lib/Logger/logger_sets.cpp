@@ -105,14 +105,14 @@ static void cleanUpLogs(const std::string &logsPath, int maxLogs)
     }
 
     // nothing to do, count of log files is fine
-    if(static_cast<int>(files.size()) <= maxLogs)
+    if(static_cast<int>(files.size()) <= (maxLogs - 1))
         return;
 
     // Sort array
     std::sort(files.begin(), files.end());
 
     // Keep these files (remove from a deletion list)
-    files.erase(files.end() - maxLogs, files.end());
+    files.erase(files.end() - (maxLogs - 1), files.end());
 
     for(auto &s : files)
         Files::deleteFile(logsPath + "/" + s);
