@@ -25,6 +25,8 @@
 
 #include "globals.h"
 #include <fmt_format_ne.h>
+#include <cmath>
+#include <cfenv>
 
 FrmMain frmMain;
 GFX_t GFX;
@@ -589,27 +591,31 @@ int vb6Round(double x)
     return static_cast<int>(vb6Round(x, 0));
 }
 
+static SDL_INLINE double toNearest(double x)
+{
+    int round_old = std::fegetround();
+    if(round_old == FE_TONEAREST)
+        return std::nearbyint(x);
+    else
+    {
+        std::fesetround(FE_TONEAREST);
+        x = std::nearbyint(x);
+        std::fesetround(round_old);
+        return x;
+    }
+}
+
 double vb6Round(double x, int decimals)
 {
-    double res;
+    double res = x, decmul;
+
     if(decimals < 0 || decimals > 22)
         decimals = 0;
 
-    res = x;
-
     if(SDL_fabs(x) < 1.0e16)
     {
-        double v4 = power10[decimals];
-        double st = x * v4;
-
-        int intpart = static_cast<int>(SDL_floor(st));
-        int iseven = intpart % 2;
-        if(iseven)
-            st += 0.00000001;
-        else
-            st -= 0.00000001;
-        st = std::round(st);
-        res = st / v4;
+        decmul = power10[decimals];
+        res = toNearest(x * decmul) / decmul;
     }
 
     return res;
