@@ -553,3 +553,64 @@ void initAll()
     NPC.fill(NPC_t());
 }
 
+
+const double power10[] =
+{
+    1.0,
+    10.0,
+    100.0,
+    1000.0,
+    10000.0,
+
+    100000.0,
+    1000000.0,
+    10000000.0,
+    100000000.0,
+    1000000000.0,
+
+    10000000000.0,
+    100000000000.0,
+    1000000000000.0,
+    10000000000000.0,
+    100000000000000.0,
+
+    1000000000000000.0,
+    10000000000000000.0,
+    100000000000000000.0,
+    1000000000000000000.0,
+    10000000000000000000.0,
+
+    100000000000000000000.0,
+    1000000000000000000000.0
+};
+
+int vb6Round(double x)
+{
+    return static_cast<int>(vb6Round(x, 0));
+}
+
+double vb6Round(double x, int decimals)
+{
+    double res;
+    if(decimals < 0 || decimals > 22)
+        decimals = 0;
+
+    res = x;
+
+    if(SDL_fabs(x) < 1.0e16)
+    {
+        double v4 = power10[decimals];
+        double st = x * v4;
+
+        int intpart = static_cast<int>(SDL_floor(st));
+        int iseven = intpart % 2;
+        if(iseven)
+            st += 0.00000001;
+        else
+            st -= 0.00000001;
+        st = std::round(st);
+        res = st / v4;
+    }
+
+    return res;
+}

@@ -106,6 +106,20 @@ const char *getKeyName(int key);
 struct KM_Key;
 std::string getJoyKeyName(const KM_Key &key);
 
+/**
+ * @brief Rounding function that works same as in VB6
+ * @param x Floating point value to round
+ * @return rounded result
+ */
+extern int vb6Round(double x);
+
+/**
+ * @brief Rounding function that works same as in VB6
+ * @param x Floating point value to round
+ * @param decimals Round to a specific number of decimals
+ * @return rounded result
+ */
+extern double vb6Round(double x, int decimals);
 
 //'Saved Events
 //Public numSavedEvents As Integer

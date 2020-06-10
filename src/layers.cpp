@@ -555,7 +555,7 @@ void ProcEvent(std::string EventName, bool NoEffect)
             tempBool = false;
             if(!Events[A].TriggerEvent.empty())
             {
-                if(int(Events[A].TriggerDelay) == 0)
+                if(std::round(Events[A].TriggerDelay) == 0.0)
                 {
                     for(B = 0; B <= maxEvents; B++)
                     {
@@ -566,16 +566,15 @@ void ProcEvent(std::string EventName, bool NoEffect)
                             break;
                         }
                     }
-                    if(tempBool == false)
-                    {
+
+                    if(!tempBool)
                         ProcEvent(Events[A].TriggerEvent);
-                    }
                 }
                 else
                 {
                     newEventNum++;
                     NewEvent[newEventNum] = Events[A].TriggerEvent;
-                    newEventDelay[newEventNum] = Events[A].TriggerDelay * 6.5;
+                    newEventDelay[newEventNum] = vb6Round(Events[A].TriggerDelay * 6.5);
                 }
             }
         }
