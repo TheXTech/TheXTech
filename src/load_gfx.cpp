@@ -80,7 +80,8 @@ static void loadCGFX(const std::set<std::string> &files,
                      const std::string &dData,
                      const std::string &fName,
                      int *width, int *height, bool& isCustom, StdPicture &texture,
-                     bool world = false)
+                     bool world = false,
+                     bool skipMask = false)
 {
     std::string imgPath = dEpisode + s_dirEpisode.resolveFileCase(fName + ".png");
     std::string gifPath = dEpisode + s_dirEpisode.resolveFileCase(fName + ".gif");
@@ -133,7 +134,7 @@ static void loadCGFX(const std::set<std::string> &files,
     if(alreadyLoaded)
         return; // This texture is already loaded
 
-    if(isGif)
+    if(isGif && !skipMask)
     {
         if(files.find(maskPathC) != files.end())
             maskToUse = maskPathC;
@@ -530,7 +531,8 @@ void LoadCustomGFX()
         loadCGFX(existingFiles, GfxRoot + fmt::format_ne("background2/background2-{0}.png", A),
                  FileNamePath, FileName,
                  fmt::format_ne("background2-{0}", A),
-                 &GFXBackground2Width[A], &GFXBackground2Height[A], GFXBackground2Custom[A], GFXBackground2BMP[A]);
+                 &GFXBackground2Width[A], &GFXBackground2Height[A], GFXBackground2Custom[A], GFXBackground2BMP[A],
+                 false, true);
     }
 
     for(int A = 1; A < maxNPCType; ++A)
