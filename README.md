@@ -63,7 +63,7 @@ If you want to replace default assets with your own, you can modify the content 
 
 ## What is different with this thing in comparison to the original VB6 build?
 - First off, it's written in C++ while original (as we already know) is written in VB6.
-- Doesn't have an Editor. Instead, in nearest future it will have a deep integration with PGE Editor that will allow to use it with the same functionality as in original editor (the "magic hand" functionality was kept to allow real-time editing of the level while testing, it's needed to use IPC communication with PGE Editor to get the ability to use it better).
+- Doesn't have an Editor. Instead, in has a deep integration with PGE Editor that allows to use it with the same functionality as in original editor (the "magic hand" functionality was kept to allow real-time editing of the level while testing, it's needed to use IPC communication with PGE Editor to get the ability to use it better).
 - Full support of UTF-8 in filename paths and internal text data (original game had the only 8bit ANSI support).
 - For graphics and controlling, it uses an SDL2 library while original game have used WinAPI calls and GDI library.
 - It uses PGE-FL that has better file formats support.
