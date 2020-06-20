@@ -83,7 +83,7 @@ If you want to replace default assets with your own, you can modify the content 
 - It starts faster: the loading of the game is almost instant (depend on a computer and it's HDD/SSD performance).
 - It uses less RAM (80...150 MB instead of 600...800 MB like usually), and it's free from memory leaks given by the MCI interface used by VB6 SMBX originally.
 - it doesn't overload CPU (the reason was a bad way to process infinite loops, I did the fix of VB6 build too at my "smbx-experiments" branch)
-- it able to work on ass-machine (a weak computer) while VB6-SMBX won't work.
+- it able to work on "toaster" (a weak computer) while VB6-SMBX won't work.
 - it's fully cross-platform and doesn't depend on Windows, and it no longer depends on x86 processor: it can work on ARM and MIPS processors too (VB6-SMBX won't work on ARM at all, with x86 emulator it will 20x times slower than usual).
 
 
