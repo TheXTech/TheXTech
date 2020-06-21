@@ -1,6 +1,6 @@
 # TheXTech
 
-Vanilla engine, rewritten into C++ from VB6
+SMBX engine, rewritten into C++ from VisualBasic 6.
 
 
 # Frequently Asking Questions
@@ -13,6 +13,7 @@ It's a port of an old VB6 engine, purely written in C++. It reproduces an old en
 ## Why did you make it?
 Why? I have several purposes for why I made it:
 - It's a very convenient life model for research I want to use in PGE Engine development.
+- To provide a fully-compatible replica of the old engine for modern platforms to allow playing of old levels and episodes with the same feeling as they was played on original VB6-based SMBX game.
 - To make it work without it being necessary to use Wine on non-Windows platforms and allow it to run on any other than x86 platforms.
 - To be able to optimize it to make it use fewer hardware resources than the original VB6-based build of a game.
 
@@ -37,7 +38,7 @@ Originally, a most of code in "src" folder was writtein in VB6 by it's original 
 - All functions in all modules are global and can be called from each module directly. Except calls where marked as "private". Therefore I had an additional work to provide inclusions into files where these calls requested.
 - Why so much `if-elseif-elseif-elseif-elseif-....?` Yes, here probably will be correct to use `switch()` (in VB6 the `Select Case` analogue) operator. One another factor that explains that original author had a low experience while coded this project.
 - Why so deep `if() { if {} if { .... } }` lasanha? Two cases: 1) low experinece of original author, 2) workaround to don't check all conditions of expression which may cause a crash. In C++ with multiple conditions splitted by `&&` operator, never executing when one of them gets a false result. In VB6, ALL conditions in expression getting be always executed. This difference caused the next situation: in VB6, an expression `if A < 5 And Array(A) = 1 Then` will cause a crash when A is more than 5. In C++ the same `if(A < 5 && Array[A] == 1)` expression will never crash because a second check gets be never executed if a first check gave a false result.
-- Why so long expressions like `if(id == 1 || id == 3 || id == 4 || ... id == N)`? Rather making a ton of conditions like this, it's would be better to use classes with a polymorphism and separate the logic of every object between different classes. Also should be solvable with having to use of function pointers (which aren't possible in VB6 without workaronds, but possible in C++). However again, a low experience of original author together with a bunch of VB6 limits did caused these construction.
+- Why so long expressions like `if(id == 1 || id == 3 || id == 4 || ... id == N)`? Rather making a ton of conditions like this, it's would be better to use classes with a polymorphism and separate the logic of every object between different classes. Also should be solvable with having to use of function pointers (which aren't possible in VB6 without workaronds, but possible in C++). However again, a low experience of original author together with a bunch of VB6 limits did caused these constructions.
 
 
 ## How to use this?
