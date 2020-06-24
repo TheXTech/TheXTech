@@ -46,7 +46,6 @@ SMBX-движок, переписанный на C++ с VisualBasic 6
 ## Как пользоваться игрой?
 Имеется несколько способов, как пользоваться этой игрой:
 - Имеются уже готовые к работе сборки, просто взять использовать также, как SMBX.
-- [macOS users, skip this]: use by the same way as an original game: put an executable file into the game root folder with an "thextech.ini" that contains next text:
 - [Пропустить этот пункт пользователям macOS]: Использовать тем же способом, что и оригинальная игра: положить исполняемый файл в кореневую папку игры совместно с INI-файлом "thextech.ini", содержащим следующий текст:
 ```
 [Main]
