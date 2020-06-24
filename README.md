@@ -94,7 +94,7 @@ You can read a guide how to build this project from a source code which you can 
 To build it, you need to have next things:
 - CMake
 - Ninja optionally (to speeds-up the build process)
-- Compatible C/C++ compiler (GCC, Clang, MSVC haven't tested yet)
+- Compatible C/C++ compiler (GCC, Clang, MinGW, MSVC haven't tested yet)
 - Git (required to pull submodules and clone source of dependent libraries to build them in place)
 - Mercurial (required to clone an official SDL2 repository to build it in place here)
 - Optionally: system-wide installed dependencies: SDL2, libFreeImageLite (a modded implementation of the FreeImage), MixerX sound library, AudioCodecs collection of libraries. Having them be installed in a system gives a major build speed up. However, it's possible to build all these dependencies in place here with a cost of extra build time being added.
