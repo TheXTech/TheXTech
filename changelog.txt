@@ -6,6 +6,7 @@ Changes for 1.3.2.1
 -The 1up sound now playing multiple times if the player has got more than 1 life (for example, a 3-up moon)
 -Fixed a broken work of magic potion warp packed inside of a grass container
 -Fixed a minor inaccuracy of the moving layers system
+-Fixed an incorrect process of blocked playable characters while loaiding the episodes list
 
 
 Changes for 1.3.2
