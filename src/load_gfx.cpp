@@ -549,6 +549,12 @@ void LoadCustomGFX()
                  FileNamePath, FileName,
                  fmt::format_ne("effect-{0}", A),
                  &GFXEffectWidth[A], &GFXEffectHeight[A], GFXEffectCustom[A], GFXEffectBMP[A]);
+
+        if(GFXEffectCustom[A])
+        {
+            EffectWidth[A] = GFXEffectWidth[A];
+            EffectHeight[A] = GFXEffectHeight[A] / EffectDefaults.EffectFrames[A];
+        }
     }
 
     for(int A = 1; A < maxBackgroundType; ++A)
@@ -618,6 +624,13 @@ void LoadCustomGFX()
 
 void UnloadCustomGFX()
 {
+    // Restore default sizes of custom effects
+    for(int A = 1; A < maxEffectType; ++A)
+    {
+        EffectWidth[A] = EffectDefaults.EffectWidth[A];
+        EffectHeight[A] = EffectDefaults.EffectHeight[A];
+    }
+
     restoreLevelBackupTextures();
 }
 

@@ -2740,8 +2740,12 @@ void SetupVars()
     }
     For(A, 1, maxEffectType)
     {
-        effectDefaults.EffectHeight[A] = EffectHeight[A];
-        effectDefaults.EffectWidth[A] = EffectWidth[A];
+        EffectDefaults.EffectHeight[A] = EffectHeight[A];
+        EffectDefaults.EffectWidth[A] = EffectWidth[A];
+        if(EffectHeight[A] > 0)
+            EffectDefaults.EffectFrames[A] = GFXEffectHeight[A] / EffectHeight[A];
+        else
+            EffectDefaults.EffectFrames[A] = 1;
     }
     SaveNPCDefaults();
 }

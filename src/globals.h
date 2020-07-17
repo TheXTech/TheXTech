@@ -1500,17 +1500,19 @@ extern RangeArrI<int, 0, maxBlockType, 0> EffectWidth;
 extern RangeArrI<int, 0, maxBlockType, 0> EffectHeight;
 
 //Public Type EffectDefaults
-struct EffectDefaults
+struct EffectDefaults_t
 {
 //    EffectWidth(1 To maxEffectType) As Integer
     RangeArrI<int, 1, maxEffectType, 0> EffectWidth;
 //    EffectHeight(1 To maxEffectType) As Integer
     RangeArrI<int, 1, maxEffectType, 0> EffectHeight;
+//EXTRA: count of frames (compute from the GFX height)
+    RangeArrI<int, 1, maxEffectType, 0> EffectFrames;
 //End Type
 };
 
 //Public EffectDefaults As EffectDefaults
-extern EffectDefaults effectDefaults;
+extern EffectDefaults_t EffectDefaults;
 //Public SceneWidth(1 To 100) As Integer 'Scene width
 extern RangeArrI<int, 1, maxSceneType, 0> SceneWidth;
 //Public SceneHeight(1 To 100) As Integer 'Scene height
