@@ -2743,7 +2743,11 @@ void SetupVars()
         EffectDefaults.EffectHeight[A] = EffectHeight[A];
         EffectDefaults.EffectWidth[A] = EffectWidth[A];
         if(EffectHeight[A] > 0)
+        {
             EffectDefaults.EffectFrames[A] = GFXEffectHeight[A] / EffectHeight[A];
+            if(EffectDefaults.EffectFrames[A] <= 0)
+                EffectDefaults.EffectFrames[A] = 1;
+        }
         else
             EffectDefaults.EffectFrames[A] = 1;
     }
