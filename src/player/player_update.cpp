@@ -3863,19 +3863,20 @@ void UpdatePlayer()
                                     }
                                     else if(!(NPC[B].Type == 15 && NPC[B].Special == 4)) // Player touched an NPC
                                     {
+
+/* If (.CanGrabNPCs = True Or NPCIsGrabbable(NPC(B).Type) = True Or (NPC(B).Effect = 2 And NPCIsABonus(NPC(B).Type) = False)) And (NPC(B).Effect = 0 Or NPC(B).Effect = 2) Or (NPCIsAShell(NPC(B).Type) And FreezeNPCs = True) Then      'GRAB EVERYTHING
+*/
                                         // grab code
                                         if(
-                                                ((
-                                                         Player[A].CanGrabNPCs ||
-                                                         NPCIsGrabbable[NPC[B].Type] ||
-                                                         (NPC[B].Effect == 2 && !NPCIsABonus[NPC[B].Type])
-                                                 ) && (NPC[B].Effect == 0 || NPC[B].Effect == 2)) ||
-                                                (NPCIsAShell[NPC[B].Type] && FreezeNPCs)
-                                                ) // GRAB EVERYTHING
+                                            ((Player[A].CanGrabNPCs || NPCIsGrabbable[NPC[B].Type] || (NPC[B].Effect == 2 && !NPCIsABonus[NPC[B].Type])) && (NPC[B].Effect == 0 || NPC[B].Effect == 2)) ||
+                                             (NPCIsAShell[NPC[B].Type] && FreezeNPCs)
+                                        ) // GRAB EVERYTHING
                                         {
                                             if(Player[A].Controls.Run)
                                             {
-                                                if((HitSpot == 2 && Player[A].Direction == -1) || (HitSpot == 4 && Player[A].Direction == 1) || (NPC[B].Type == 22 || NPC[B].Type == 49 || NPC[B].Effect == 2 || (NPCIsVeggie[NPC[B].Type && NPC[B].CantHurtPlayer != A])))
+                                                if((HitSpot == 2 && Player[A].Direction == -1) ||
+                                                   (HitSpot == 4 && Player[A].Direction == 1) ||
+                                                   (NPC[B].Type == 22 || NPC[B].Type == 49 || NPC[B].Effect == 2 || (NPCIsVeggie[NPC[B].Type] && NPC[B].CantHurtPlayer != A)))
                                                 {
                                                     if(Player[A].HoldingNPC == 0)
                                                     {
