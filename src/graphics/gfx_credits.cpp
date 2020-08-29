@@ -80,10 +80,15 @@ void DoCredits()
 
             if(CreditChop < 250 && !musicPlaying)
             {
-                musicName = "tmusic";
-                // mciSendString "play tmusic from 10", 0, 0, 0
-                PlayMusic("tmusic", 2000);
-                musicPlaying = true;
+                if(bgMusic[0] <= 0) // Play default music if no music set in outro level
+                {
+                    musicName = "tmusic";
+                    PlayMusic("tmusic", 2000);
+                    musicPlaying = true;
+                }
+                else // Otherwise, play the music that set by level
+                    StartMusic(0, 2000);
+
             }
         }
     }

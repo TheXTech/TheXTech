@@ -333,7 +333,7 @@ void StartMusic(int A, int fadeInMs)
     if(noSound)
         return;
 
-    if(LevelSelect && !GameMenu) // music on the world map
+    if(LevelSelect && !GameMenu && !GameOutro) // music on the world map
     {
         StopMusic();
         curWorldMusic = A;
