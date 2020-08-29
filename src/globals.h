@@ -27,6 +27,7 @@
 #define GLOBALS_H
 
 #include <string>
+#include <vector>
 #include <cstdlib>
 #include <SDL2/SDL.h>
 
@@ -1118,7 +1119,8 @@ extern std::string MessageText;
 extern int NumSelectWorld;
 //Public SelectWorld(1 To 100) As SelectWorld
 struct SelectWorld_t;
-extern RangeArr<SelectWorld_t, 1, maxSelectWorlds> SelectWorld;
+//extern RangeArr<SelectWorld_t, 1, maxSelectWorlds> SelectWorld;
+extern std::vector<SelectWorld_t> SelectWorld;
 //Public ShowFPS As Boolean
 extern bool ShowFPS;
 //Public PrintFPS As Double

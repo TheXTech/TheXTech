@@ -2295,6 +2295,9 @@ void FindWorlds()
     worldRoots.push_back(AppPathManager::userWorldsRootDir() + "/");
 #endif
 
+    SelectWorld.clear();
+    SelectWorld.push_back(SelectWorld_t()); // Dummy entry
+
     for(auto worldsRoot : worldRoots)
     {
         DirMan episodes(worldsRoot);
@@ -2315,8 +2318,7 @@ void FindWorlds()
                 std::string wPath = epDir + fName;
                 if(FileFormats::OpenWorldFileHeader(wPath, head))
                 {
-                    NumSelectWorld += 1;
-                    auto &w = SelectWorld[NumSelectWorld];
+                    SelectWorld_t w;
                     w.WorldName = head.EpisodeTitle;
                     head.charactersToS64();
                     w.WorldPath = epDir;
@@ -2327,15 +2329,13 @@ void FindWorlds()
                     w.blockChar[4] = head.nocharacter4;
                     w.blockChar[5] = head.nocharacter5;
 
-                    if(NumSelectWorld >= maxSelectWorlds)
-                        break;
+                    SelectWorld.push_back(w);
                 }
             }
-
-            if(NumSelectWorld >= maxSelectWorlds)
-                break;
         }
     }
+
+    NumSelectWorld = (SelectWorld.size() - 1);
 }
 
 void FindLevels()
@@ -2346,8 +2346,11 @@ void FindLevels()
     battleRoots.push_back(AppPathManager::userBattleRootDir() + "/");
 #endif
 
+    SelectWorld.clear();
+    SelectWorld.push_back(SelectWorld_t()); // Dummy entry
+
     NumSelectWorld = 1;
-    std::string FileName = "";
+    SelectWorld.push_back(SelectWorld_t()); // "random level" entry
     SelectWorld[1].WorldName = "Random Level";
     LevelData head;
 
@@ -2361,13 +2364,16 @@ void FindLevels()
             std::string wPath = battleRoot + fName;
             if(FileFormats::OpenLevelFileHeader(wPath, head))
             {
-                NumSelectWorld++;
-                SelectWorld[NumSelectWorld].WorldPath = battleRoot;
-                SelectWorld[NumSelectWorld].WorldFile = fName;
-                SelectWorld[NumSelectWorld].WorldName = head.LevelName;
+                SelectWorld_t w;
+                w.WorldPath = battleRoot;
+                w.WorldFile = fName;
+                w.WorldName = head.LevelName;
+                SelectWorld.push_back(w);
             }
         }
     }
+
+    NumSelectWorld = (SelectWorld.size() - 1);
 }
 
 void FindSaves()

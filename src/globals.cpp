@@ -66,7 +66,7 @@ KM_Key lastJoyButton;
 bool GamePaused = false;
 std::string MessageText;
 int NumSelectWorld  = 0;
-RangeArr<SelectWorld_t, 1, maxSelectWorlds> SelectWorld;
+std::vector<SelectWorld_t> SelectWorld;
 bool ShowFPS = false;
 double PrintFPS = 0.0;
 RangeArr<vScreen_t, 0, 2> vScreen;
@@ -521,7 +521,6 @@ void initAll()
     conKeyboard.fill(ConKeyboard_t());
     conJoystick.fill(ConJoystick_t());
     useJoystick.fill(0);
-    SelectWorld.fill(SelectWorld_t());
     vScreen.fill(vScreen_t());
     PlayerStart.fill(Location_t());
     blockCharacter.fill(false);

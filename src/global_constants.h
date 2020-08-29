@@ -29,7 +29,7 @@
 //Public Const MaxSavedEvents As Integer = 200
 const int MaxSavedEvents = 200;
 
-const int maxSelectWorlds = 100;
+//const int maxSelectWorlds = 100;
 
 const int maxCreditsLines = 200;
 
