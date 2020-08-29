@@ -5,7 +5,7 @@ set(THEXTECH_VERSION_2 3)
 # Revision
 set(THEXTECH_VERSION_3 2)
 # Patch
-set(THEXTECH_VERSION_4 3)
+set(THEXTECH_VERSION_4 4)
 # Type of version: "-alpha","-beta","-dev", or "" aka "release"
 set(THEXTECH_VERSION_REL "")
 

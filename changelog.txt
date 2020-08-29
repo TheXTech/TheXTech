@@ -1,5 +1,8 @@
 TheXTech Changelog.
 
+Changes for 1.3.2.4
+-Allow music change for outro level (if outro level has non-silent music, it will be played instead of built-in)
+
 Changes for 1.3.2.3
 -Fixed a SIGFPE crash, caused by an attempt to load some custom effects
 -Resolved the inability to grab vegetables normally, caused by an incorrect porting of logical expression
