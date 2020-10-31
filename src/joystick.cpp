@@ -171,7 +171,7 @@ static bool bindJoystickKey(SDL_Joystick *joy, KM_Key &k)
 
         val = SDL_JoystickGetAxis(joy, i);
 
-        if(val != (Sint32)val_initial)
+        if(SDL_abs(val) > 15000 && val != (Sint32)val_initial)
         {
             k.val = val;
             k.id = i;
