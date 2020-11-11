@@ -419,10 +419,10 @@ bool  LogWriter::m_logIsOpened = false;
 SDL_RWops *LogWriter::m_logout = nullptr;
 
 
-void LogWriter::LoadLogSettings(bool)
+void LogWriter::LoadLogSettings(bool, bool)
 {}
 
-void LoadLogSettings(bool)
+void LoadLogSettings(bool, bool)
 {}
 
 void CloseLog()

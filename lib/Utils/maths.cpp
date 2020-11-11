@@ -69,12 +69,12 @@ uint32_t Maths::urand32()
 
 int64_t Maths::rand64()
 {
-    return static_cast<int64_t>(((osRandom() * 2.0) - 1.0) * INT64_MAX);
+    return static_cast<int64_t>(((osRandom() * 2.0) - 1.0) * static_cast<long double>(INT64_MAX));
 }
 
 uint64_t Maths::urand64()
 {
-    return static_cast<uint64_t>(osRandom() * UINT64_MAX);
+    return static_cast<uint64_t>(osRandom() * static_cast<long double>(UINT64_MAX));
 }
 
 float Maths::frand()
