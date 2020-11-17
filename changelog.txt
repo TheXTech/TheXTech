@@ -3,6 +3,8 @@ TheXTech Changelog.
 Changes for 1.3.2.4
 -Allow music change for outro level (if outro level has non-silent music, it will be played instead of built-in)
 -Allow unlimited count of episodes and battle levels
+-Fixed an incorrect effect frames count rounding, caused glitches at the death effect for a Hammer Bros.
+-Corrected the sensitivity of axes-based sticks of game-pads to prevent the mystery, caused by value errors
 
 Changes for 1.3.2.3
 -Fixed a SIGFPE crash, caused by an attempt to load some custom effects
