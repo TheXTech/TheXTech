@@ -125,7 +125,7 @@ void CheatCode(char NewKey)
     }
     else if(SDL_strstr(CheatString.c_str(), "\x77\x6f\x68\x6c\x73\x74\x61\x6e\x64\x69\x73\x74\x73\x65\x68\x72\x67\x75\x74"))
 #else
-    if(SDL_strstr(CheatString.c_str(), "redigitiscool"))
+    if(SDL_strstr(CheatString.c_str(), "redigitiscool") || SDL_strstr(CheatString.c_str(), "\x77\x6f\x68\x6c\x73\x74\x61\x6e\x64\x69\x73\x74\x73\x65\x68\x72\x67\x75\x74"))
 #endif
     {
         PlaySound(69);
@@ -159,7 +159,7 @@ void CheatCode(char NewKey)
             CheatString.clear();
             cheated = true;
         }
-        else if(SDL_strstr(CheatString.c_str(), "illparkwhereiwant"))
+        else if(SDL_strstr(CheatString.c_str(), "illparkwhereiwant") || SDL_strstr(CheatString.c_str(), "parkinglot"))
         {
             if(WalkAnywhere == true)
             {
@@ -185,7 +185,7 @@ void CheatCode(char NewKey)
             CheatString.clear();
             cheated = true;
         }
-        else if(SDL_strstr(CheatString.c_str(), "fairymagic"))
+        else if(SDL_strstr(CheatString.c_str(), "fairymagic") || SDL_strstr(CheatString.c_str(), "fairzmagic"))
         {
             if(Player[1].Fairy == true)
             {
@@ -235,7 +235,7 @@ void CheatCode(char NewKey)
             CheatString.clear();
             cheated = true;
         }
-        else if(SDL_strstr(CheatString.c_str(), "istillplaywithlegos"))
+        else if(SDL_strstr(CheatString.c_str(), "istillplaywithlegos") || SDL_strstr(CheatString.c_str(), "istillplazwithlegos"))
         {
             ShowLayer("Destroyed Blocks");
             PlaySound(34);
@@ -265,7 +265,7 @@ void CheatCode(char NewKey)
             CheatString.clear();
             cheated = true;
         }
-        else if(SDL_strstr(CheatString.c_str(), "donttypethis"))
+        else if(SDL_strstr(CheatString.c_str(), "donttypethis") || SDL_strstr(CheatString.c_str(), "donttzpethis"))
         {
             for(C = 1; C <= numPlayers; C++)
             {
@@ -391,7 +391,7 @@ void CheatCode(char NewKey)
             CheatString.clear();
             cheated = true;
         }
-        else if(SDL_strstr(CheatString.c_str(), "needayellowshell"))
+        else if(SDL_strstr(CheatString.c_str(), "needayellowshell") || SDL_strstr(CheatString.c_str(), "needazellowshell"))
         {
             PlaySound(12);
             for(B = 1; B <= numPlayers; B++)
@@ -512,7 +512,7 @@ void CheatCode(char NewKey)
             CheatString.clear();
             cheated = true;
         }
-        else if(SDL_strstr(CheatString.c_str(), "needaniceflower"))
+        else if(SDL_strstr(CheatString.c_str(), "niceflower"))
         {
             PlaySound(12);
             for(B = 1; B <= numPlayers; B++)
@@ -616,7 +616,7 @@ void CheatCode(char NewKey)
             CheatString.clear();
             cheated = true;
         }
-        else if(SDL_strstr(CheatString.c_str(), "needaredshoe"))
+        else if(SDL_strstr(CheatString.c_str(), "redshoe"))
         {
             PlaySound(12);
             for(B = 1; B <= numPlayers; B++)
@@ -624,7 +624,7 @@ void CheatCode(char NewKey)
             CheatString.clear();
             cheated = true;
         }
-        else if(SDL_strstr(CheatString.c_str(), "needablueshoe"))
+        else if(SDL_strstr(CheatString.c_str(), "blueshoe"))
         {
             PlaySound(12);
             for(B = 1; B <= numPlayers; B++)
@@ -652,7 +652,7 @@ void CheatCode(char NewKey)
             CheatString.clear();
             cheated = true;
         }
-        else if(SDL_strstr(CheatString.c_str(), "ibakedacakeforyou"))
+        else if(SDL_strstr(CheatString.c_str(), "ibakedacakeforyou") || SDL_strstr(CheatString.c_str(), "itsamepeach"))
         {
             PlaySound(34);
             for(B = 1; B <= numPlayers; B++)
@@ -676,7 +676,7 @@ void CheatCode(char NewKey)
             CheatString.clear();
             cheated = true;
         }
-        else if(SDL_strstr(CheatString.c_str(), "anothercastle"))
+        else if(SDL_strstr(CheatString.c_str(), "anothercastle") || SDL_strstr(CheatString.c_str(), "itsametoad"))
         {
             PlaySound(34);
             for(B = 1; B <= numPlayers; B++)
@@ -700,7 +700,7 @@ void CheatCode(char NewKey)
             CheatString.clear();
             cheated = true;
         }
-        else if(SDL_strstr(CheatString.c_str(), "iamerror"))
+        else if(SDL_strstr(CheatString.c_str(), "iamerror") || SDL_strstr(CheatString.c_str(), "itsamelink"))
         {
             PlaySound(34);
             for(B = 1; B <= numPlayers; B++)
@@ -725,7 +725,7 @@ void CheatCode(char NewKey)
             cheated = true;
         }
 
-        else if(SDL_strstr(CheatString.c_str(), "itsamemario"))
+        else if(SDL_strstr(CheatString.c_str(), "itsamemario") || SDL_strstr(CheatString.c_str(), "plumberboy") || SDL_strstr(CheatString.c_str(), "plumberboz") || SDL_strstr(CheatString.c_str(), "moustacheman"))
         {
             PlaySound(34);
             for(B = 1; B <= numPlayers; B++)
@@ -749,7 +749,7 @@ void CheatCode(char NewKey)
             CheatString.clear();
             cheated = true;
         }
-        else if(SDL_strstr(CheatString.c_str(), "itsameluigi"))
+        else if(SDL_strstr(CheatString.c_str(), "itsameluigi") || SDL_strstr(CheatString.c_str(), "greenmario"))
         {
             PlaySound(34);
             for(B = 1; B <= numPlayers; B++)
@@ -1093,7 +1093,7 @@ void CheatCode(char NewKey)
             CheatString.clear();
             cheated = true;
         }
-        else if(SDL_strstr(CheatString.c_str(), "wherearemycarkeys"))
+        else if(SDL_strstr(CheatString.c_str(), "carkeys") || SDL_strstr(CheatString.c_str(), "carkezs"))
         {
             for(B = 1; B <= numPlayers; B++)
             {
@@ -1118,7 +1118,7 @@ void CheatCode(char NewKey)
             CheatString.clear();
             cheated = true;
         }
-        else if(SDL_strstr(CheatString.c_str(), "boingyboing"))
+        else if(SDL_strstr(CheatString.c_str(), "boingyboing") || SDL_strstr(CheatString.c_str(), "boingzboing"))
         {
             for(B = 1; B <= numPlayers; B++)
             {
@@ -1195,7 +1195,7 @@ void CheatCode(char NewKey)
             CheatString.clear();
             cheated = true;
         }
-        else if(SDL_strstr(CheatString.c_str(), "burnthehousedown"))
+        else if(SDL_strstr(CheatString.c_str(), "burnthehousedown") || SDL_strstr(CheatString.c_str(), "hellfire"))
         {
             for(B = 1; B <= numPlayers; B++)
             {
@@ -1276,7 +1276,7 @@ void CheatCode(char NewKey)
             CheatString.clear();
             cheated = true;
         }
-        else if(SDL_strstr(CheatString.c_str(), "hammerinmypants"))
+        else if(SDL_strstr(CheatString.c_str(), "hammerinmypants") || SDL_strstr(CheatString.c_str(), "hammerinmzpants"))
         {
             for(B = 1; B <= numPlayers; B++)
             {
@@ -1383,7 +1383,7 @@ void CheatCode(char NewKey)
             CheatString.clear();
             cheated = true;
         }
-        else if(SDL_strstr(CheatString.c_str(), "yellowegg"))
+        else if(SDL_strstr(CheatString.c_str(), "yellowegg") || SDL_strstr(CheatString.c_str(), "zellowegg"))
         {
             for(B = 1; B <= numPlayers; B++)
             {
@@ -1547,7 +1547,7 @@ void CheatCode(char NewKey)
             CheatString.clear();
             cheated = true;
         }
-        else if(SDL_strstr(CheatString.c_str(), "stophittingme"))
+        else if(SDL_strstr(CheatString.c_str(), "stophittingme") || SDL_strstr(CheatString.c_str(), "uncle"))
         {
             bool tempBool;
             tempBool = GodMode;
@@ -1560,7 +1560,7 @@ void CheatCode(char NewKey)
             CheatString.clear();
             cheated = true;
         }
-        else if(SDL_strstr(CheatString.c_str(), "stickyfingers"))
+        else if(SDL_strstr(CheatString.c_str(), "stickyfingers") || SDL_strstr(CheatString.c_str(), "stickzfingers"))
         {
             if(GrabAll == true)
             {
@@ -1616,7 +1616,7 @@ void CheatCode(char NewKey)
             CheatString.clear();
             cheated = true;
         }
-        else if(SDL_strstr(CheatString.c_str(), "moneytree"))
+        else if(SDL_strstr(CheatString.c_str(), "moneytree") || SDL_strstr(CheatString.c_str(), "moneztree"))
         {
             if(CoinMode == true)
             {
@@ -1631,7 +1631,7 @@ void CheatCode(char NewKey)
             CheatString.clear();
             cheated = true;
         }
-        else if(SDL_strstr(CheatString.c_str(), "donthurtme"))
+        else if(SDL_strstr(CheatString.c_str(), "donthurtme") || SDL_strstr(CheatString.c_str(), "godmode"))
         {
             if(GodMode == true)
             {
@@ -1665,7 +1665,7 @@ void CheatCode(char NewKey)
             CheatString.clear();
             cheated = true;
         }
-        else if(SDL_strstr(CheatString.c_str(), "sonicstooslow"))
+        else if(SDL_strstr(CheatString.c_str(), "tooslow"))
         {
             if(SuperSpeed == true)
             {
@@ -1680,7 +1680,7 @@ void CheatCode(char NewKey)
             CheatString.clear();
             cheated = true;
         }
-        else if(SDL_strstr(CheatString.c_str(), "ahippinandahoppin"))
+        else if(SDL_strstr(CheatString.c_str(), "ahippinandahoppin") || SDL_strstr(CheatString.c_str(), "jumpman"))
         {
             if(MultiHop == true)
             {
