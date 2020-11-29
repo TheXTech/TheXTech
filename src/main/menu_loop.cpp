@@ -2291,7 +2291,7 @@ void FindWorlds()
 
     std::vector<std::string> worldRoots;
     worldRoots.push_back(AppPath + "worlds/");
-#if defined(__APPLE__) && defined(USE_BUNDLED_ASSETS)
+#if (defined(__APPLE__) && defined(USE_BUNDLED_ASSETS)) || defined(FIXED_ASSETS_PATH)
     worldRoots.push_back(AppPathManager::userWorldsRootDir() + "/");
 #endif
 
@@ -2342,7 +2342,7 @@ void FindLevels()
 {
     std::vector<std::string> battleRoots;
     battleRoots.push_back(AppPath + "battle/");
-#if defined(__APPLE__) && defined(USE_BUNDLED_ASSETS)
+#if (defined(__APPLE__) && defined(USE_BUNDLED_ASSETS)) || defined(FIXED_ASSETS_PATH)
     battleRoots.push_back(AppPathManager::userBattleRootDir() + "/");
 #endif
 

@@ -105,7 +105,9 @@ std::string AppPathManager::m_userDataRoot;
 #endif
 bool AppPathManager::m_isPortable = false;
 
-#if defined(__ANDROID__) || defined(__APPLE__) || defined(__HAIKU__)
+#if defined(USER_DIR_NAME)
+#define UserDirName "/" USER_DIR_NAME
+#elif defined(__ANDROID__) || defined(__APPLE__) || defined(__HAIKU__)
 #define UserDirName "/PGE Project"
 #else
 #define UserDirName "/.PGE_Project"
@@ -223,7 +225,7 @@ void AppPathManager::initAppPath()
         }
 #endif
         m_userPath = appDir.absolutePath();
-#ifndef __EMSCRIPTEN__
+#if !defined(__EMSCRIPTEN__) && !defined(USER_DIR_NAME)
         m_userPath.append("/thextech/");
 #else
         m_userPath.append("/");
@@ -258,7 +260,13 @@ std::string AppPathManager::userAppDirSTD()
 
 std::string AppPathManager::assetsRoot()
 {
-#if defined(__APPLE__) && defined(USE_BUNDLED_ASSETS)
+#if defined(FIXED_ASSETS_PATH) // Fixed assets path, for the rest of UNIX-like OS packages
+    std::string assets(FIXED_ASSETS_PATH);
+    if(!assets.empty() && assets.back() != '/')
+        assets.push_back('/');
+    return assets;
+
+#elif defined(__APPLE__) && defined(USE_BUNDLED_ASSETS)
     CFURLRef appUrlRef;
     appUrlRef = CFBundleCopyResourceURL(CFBundleGetMainBundle(), CFSTR("assets"), NULL, NULL);
     CFStringRef filePathRef = CFURLGetString(appUrlRef);
@@ -269,10 +277,13 @@ std::string AppPathManager::assetsRoot()
     if(path.compare(0, 7, "file://") == 0)
         path.erase(0, 7);
     return path;
+
 #elif defined(__ANDROID__)
     return "assets";
+
 #else
     return m_userPath;
+
 #endif
 }
 

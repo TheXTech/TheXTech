@@ -115,6 +115,12 @@ if(APPLE)
         )
     endif()
 endif()
+
+if(NOT APPLE AND NOT ANDROID AND NOT EMSCRIPTEN)
+    set(THEXTECH_FIXED_ASSETS_PATH "" CACHE STRING "Fixed assets path (The '/usr/share/games/<game-name>/' suggested). Unused by default.")
+    set(THEXTECH_USER_DIR_NAME "" CACHE STRING "The name of the user directory at user's home to store settings/episodes/etc. The 'PGE_Project/thextech' will be used by default.")
+endif()
+
 # ============ Customization ==end=========
 
 option(PGEFL_QT_SUPPORT "Build PGE-FL with Qt support [Unneeded]" OFF)
@@ -328,6 +334,14 @@ if(APPLE)
             LINK_FLAGS " -pagezero_size 10000 -image_base 100000000"
         )
     endif()
+endif()
+
+if(NOT THEXTECH_FIXED_ASSETS_PATH STREQUAL "")
+    target_compile_definitions(thextech PRIVATE -DFIXED_ASSETS_PATH="${THEXTECH_FIXED_ASSETS_PATH}")
+endif()
+
+if(NOT THEXTECH_USER_DIR_NAME STREQUAL "")
+    target_compile_definitions(thextech PRIVATE -DUSER_DIR_NAME="${THEXTECH_USER_DIR_NAME}")
 endif()
 
 if(NOT THEXTECH_GAME_NAME_TITLE STREQUAL "")
