@@ -85,7 +85,5 @@
 	<string>TheXTechApplication</string>
 	<key>NSHighResolutionCapable</key>
 	<true/>
-	<key>CFBundleGetInfoString</key>
-	<string>${MACOSX_BUNDLE_INFO_STRING}</string>
 </dict>
 </plist>
