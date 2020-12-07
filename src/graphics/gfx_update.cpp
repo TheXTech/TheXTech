@@ -29,6 +29,7 @@
 #include "../editor.h"
 #include "../npc.h"
 #include "../location.h"
+#include "../main/menu_main.h"
 
 #include <fmt_format_ne.h>
 #include <Utils/maths.h>
@@ -1835,11 +1836,11 @@ void UpdateGraphics(bool skipRepaint)
 
                 if(MenuMode == 0)
                 {
-                    SuperPrint("1 PLAYER GAME", 3, 300, 350);
-                    SuperPrint("2 PLAYER GAME", 3, 300, 380);
-                    SuperPrint("BATTLE GAME", 3, 300, 410);
-                    SuperPrint("OPTIONS", 3, 300, 440);
-                    SuperPrint("EXIT", 3, 300, 470);
+                    SuperPrint(g_mainMenu.main1PlayerGame, 3, 300, 350);
+                    SuperPrint(g_mainMenu.main2PlayerGame, 3, 300, 380);
+                    SuperPrint(g_mainMenu.mainBattleGame, 3, 300, 410);
+                    SuperPrint(g_mainMenu.mainOptions, 3, 300, 440);
+                    SuperPrint(g_mainMenu.mainExit, 3, 300, 470);
                     frmMain.renderTexture(300 - 20, 350 + (MenuCursor * 30), 16, 16, GFX.MCursor[0], 0, 0);
                 }
                 // Character select
@@ -1851,7 +1852,7 @@ void UpdateGraphics(bool skipRepaint)
 
                     // TODO: Make a custom playable character names print here
                     if(!blockCharacter[1])
-                        SuperPrint("MARIO GAME", 3, 300, 350);
+                        SuperPrint(g_mainMenu.selectPlayer[1], 3, 300, 350);
                     else
                     {
                         A = A - 30;
@@ -1862,7 +1863,7 @@ void UpdateGraphics(bool skipRepaint)
                     }
 
                     if(!blockCharacter[2])
-                        SuperPrint("LUIGI GAME", 3, 300, 380 + A);
+                        SuperPrint(g_mainMenu.selectPlayer[2], 3, 300, 380 + A);
                     else
                     {
                         A = A - 30;
@@ -1873,7 +1874,7 @@ void UpdateGraphics(bool skipRepaint)
                     }
 
                     if(!blockCharacter[3])
-                        SuperPrint("PEACH GAME", 3, 300, 410 + A);
+                        SuperPrint(g_mainMenu.selectPlayer[3], 3, 300, 410 + A);
                     else
                     {
                         A = A - 30;
@@ -1884,7 +1885,7 @@ void UpdateGraphics(bool skipRepaint)
                     }
 
                     if(!blockCharacter[4])
-                        SuperPrint("TOAD GAME", 3, 300, 440 + A);
+                        SuperPrint(g_mainMenu.selectPlayer[4], 3, 300, 440 + A);
                     else
                     {
                         A = A - 30;
@@ -1895,7 +1896,7 @@ void UpdateGraphics(bool skipRepaint)
                     }
 
                     if(!blockCharacter[5])
-                        SuperPrint("LINK GAME", 3, 300, 470 + A);
+                        SuperPrint(g_mainMenu.selectPlayer[5], 3, 300, 470 + A);
                     else
                     {
                         A = A - 30;

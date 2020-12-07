@@ -24,6 +24,7 @@
  */
 
 #include "game_main.h"
+#include "main/game_info.h"
 #include <SDL2/SDL.h>
 #include <AppPath/app_path.h>
 #include <tclap/CmdLine.h>
@@ -136,6 +137,8 @@ int main(int argc, char**argv)
 
     AppPathManager::initAppPath();
     AppPath = AppPathManager::assetsRoot();
+
+    initGameInfo();
 
     OpenConfig_preSetup();
 

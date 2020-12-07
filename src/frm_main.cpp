@@ -48,6 +48,8 @@
 #include "../version.h"
 
 #include "frm_main.h"
+#include "main/game_info.h"
+
 
 static SDL_bool IsFullScreen(SDL_Window *win)
 {
@@ -59,16 +61,6 @@ FrmMain::FrmMain()
 {
     ScaleWidth = ScreenW;
     ScaleHeight = ScreenH;
-
-#ifdef CUSTOM_GAME_NAME_TITLE
-    m_windowTitle = CUSTOM_GAME_NAME_TITLE;
-#else
-#   ifdef ENABLE_OLD_CREDITS
-    m_windowTitle = "Super Mario Bros. X - Version 1.3 - www.SuperMarioBrothers.org";
-#   else
-    m_windowTitle = fmt::format_ne("TheXTech v{0}", V_LATEST_STABLE);
-#   endif
-#endif /* CUSTOM_GAME_NAME_TITLE */
 }
 
 SDL_Window *FrmMain::getWindow()
@@ -86,6 +78,8 @@ Uint8 FrmMain::getKeyState(SDL_Scancode key)
 bool FrmMain::initSDL(const CmdLineSetup_t &setup)
 {
     bool res = false;
+
+    m_windowTitle = g_gameInfo.titleWindow;
 
     LoadLogSettings(setup.interprocess, setup.verboseLogging);
     //Write into log the application start event

@@ -32,6 +32,7 @@
 #include "../player.h"
 #include "../graphics.h"
 #include "../sound.h"
+#include "game_info.h"
 
 void OutroLoop()
 {
@@ -100,15 +101,9 @@ void SetupCredits()
 {
     int A = 0;
     numCredits = 0;
-#ifdef CUSTOM_CREDITS_TITLE
-    AddCredit(CUSTOM_CREDITS_TITLE);
-#else
-#   ifdef ENABLE_OLD_CREDITS
-    AddCredit("Super Mario Bros. X");
-#   else
-    AddCredit("TheXTech");
-#   endif
-#endif
+
+    AddCredit(g_gameInfo.title);
+
     AddCredit("");
     AddCredit("");
     AddCredit("");
@@ -117,6 +112,17 @@ void SetupCredits()
 #ifdef ENABLE_OLD_CREDITS
     AddCredit("Created By:");
 #else
+    if(!g_gameInfo.creditsGame.empty())
+    {
+        AddCredit("Game credits:");
+        for(auto &s : g_gameInfo.creditsGame)
+            AddCredit(s);
+        AddCredit("");
+        AddCredit("");
+        AddCredit("Engine credits:");
+        AddCredit("");
+    }
+
     AddCredit("Original VB6 code By:");
 #endif
     AddCredit("");
@@ -237,15 +243,7 @@ void SetupCredits()
     AddCredit("");
     AddCredit("");
     AddCredit("");
-#ifdef CUSTOM_CREDITS_URL
-    AddCredit(CUSTOM_CREDITS_URL);
-#else
-#   ifdef ENABLE_OLD_CREDITS
-    AddCredit("www.SuperMarioBrothers.org");
-#   else
-    AddCredit("wohlsoft.ru");
-#   endif
-#endif
+    AddCredit(g_gameInfo.creditsHomePage);
 
     for(A = 1; A <= numCredits; A++)
     {

@@ -28,6 +28,7 @@
 #include "../sound.h"
 #include "../game_main.h"
 #include "../pseudo_vb.h"
+#include "main/game_info.h"
 
 
 void DoCredits()
@@ -43,7 +44,10 @@ void DoCredits()
         // Printing lines of credits
         if(Credit[A].Location.Y <= 600 && Credit[A].Location.Y + Credit[A].Location.Height >= 0)
         {
-            SuperPrint(Credit[A].Text, 4, static_cast<float>(Credit[A].Location.X), static_cast<float>(Credit[A].Location.Y));
+            SuperPrint(Credit[A].Text,
+                       g_gameInfo.creditsFont,
+                       static_cast<float>(Credit[A].Location.X),
+                       static_cast<float>(Credit[A].Location.Y));
         }
 
         // Closing screen

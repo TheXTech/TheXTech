@@ -238,6 +238,7 @@ set(THEXTECH_SRC
     src/sound.cpp
     src/main/world_loop.cpp
     src/main/world_file.cpp
+    src/main/game_info.cpp
     src/main/game_loop.cpp
     src/main/player_frames.cpp
     src/main/setup_vars.cpp
@@ -246,6 +247,7 @@ set(THEXTECH_SRC
     src/main/main_config.cpp
     src/main/level_file.cpp
     src/main/menu_loop.cpp
+    src/main/menu_main.cpp
     src/main/cheat_code.cpp
     src/main/outro_loop.cpp
     src/graphics/gfx_update2.cpp

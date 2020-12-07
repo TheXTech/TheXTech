@@ -42,6 +42,7 @@
 #include "../player.h"
 #include "../collision.h"
 #include "level_file.h"
+#include "menu_main.h"
 
 #include "../pseudo_vb.h"
 
@@ -69,6 +70,8 @@ void MenuLoop()
     UpdateControls();
 //    SingleCoop = 0
     SingleCoop = 0;
+
+    initMainMenu();
 
     bool altPressed = getKeyState(SDL_SCANCODE_LALT) == KEY_PRESSED ||
                       getKeyState(SDL_SCANCODE_RALT) == KEY_PRESSED;
@@ -201,23 +204,23 @@ void MenuLoop()
 //                        If A = 0 Then
                         if(A == 0)
 //                            menuLen = 18 * Len("1 player game") - 2
-                            menuLen = 18 * std::strlen("1 player game") - 2;
+                            menuLen = 18 * g_mainMenu.main1PlayerGame.size() - 2;
 //                        ElseIf A = 1 Then
                         else if(A == 1)
 //                            menuLen = 18 * Len("2 player game") - 2
-                            menuLen = 18 * std::strlen("2 player game") - 2;
+                            menuLen = 18 * g_mainMenu.main2PlayerGame.size() - 2;
 //                        ElseIf A = 2 Then
                         else if(A == 2)
 //                            menuLen = 18 * Len("battle game")
-                            menuLen = 18 * std::strlen("battle game");
+                            menuLen = 18 * g_mainMenu.mainBattleGame.size();
 //                        ElseIf A = 3 Then
                         else if(A == 3)
 //                            menuLen = 18 * Len("options")
-                            menuLen = 18 * std::strlen("options");
+                            menuLen = 18 * g_mainMenu.mainOptions.size();
 //                        Else
                         else
 //                            menuLen = 18 * Len("exit")
-                            menuLen = 18 * std::strlen("exit");
+                            menuLen = 18 * g_mainMenu.mainExit.size();
 //                        End If
 
 //                        If MenuMouseX >= 300 And MenuMouseX <= 300 + menuLen Then
@@ -366,21 +369,17 @@ void MenuLoop()
 //                        If MenuMouseY >= 350 + A * 30 + B And MenuMouseY <= 366 + A * 30 + B Then
                         if(MenuMouseY >= 350 + A * 30 + B && MenuMouseY <= 366 + A * 30 + B)
                         {
-//                            If A = 0 Then
-                            if(A == 0)
+                            if(A >= 0 && A < numCharacters)
                             {
-//                                menuLen = 18 * Len("mario game") + 2
-                                menuLen = 18 * std::strlen("mario game") + 2;
-//                            ElseIf A = 3 Or A = 5 Then
-                            } else if(A == 3 || A == 5) {
-//                                menuLen = 18 * Len("toad game")
-                                menuLen = 18 * std::strlen("toad game");
-//                            Else
-                            } else {
-//                                menuLen = 18 * Len("luigi game")
-                                menuLen = 18 * std::strlen("luigi game");
-//                            End If
+                                menuLen = 18 * g_mainMenu.selectPlayer[A + 1].size();
+                                if(A == 0)
+                                    menuLen += 2;
                             }
+                            else
+                            {
+                                menuLen = 180;
+                            }
+
 //                            If MenuMouseX >= 300 And MenuMouseX <= 300 + menuLen Then
                             if(MenuMouseX >= 300 && MenuMouseX <= 300 + menuLen)
                             {
