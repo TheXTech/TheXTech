@@ -1,0 +1,84 @@
+name: Continuous Integration
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    name: ${{ matrix.config.name }} | ${{ matrix.config.build_type }}
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+        - {
+            name: "Super Mario Bros. X - macOS",
+            os: macos-latest,
+            extra_options: "-DTHEXTECH_PRELOAD_ENVIRONMENT=\"`pwd`/assets/\" -DTHEXTECH_CUSTOM_ICON_PATH=\"`pwd`/assets/graphics/ui/icon/smbx.icns\" -DTHEXTECH_ICON_NAME=smbx.icns -DTHEXTECH_BUNDLE_NAME=\"Super Mario Bros. X\" -DTHEXTECH_EXECUTABLE_NAME=\"thextech\"",
+            deps_cmdline: "brew install ninja wget p7zip",
+            build_type: "MinSizeRel",
+            assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-smbx13-assets-full.7z"
+          }
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Install Dependencies
+      shell: bash
+      run: |
+        if [[ ! -z "${{ matrix.config.deps_cmdline }}" ]]; then
+          eval ${{ matrix.config.deps_cmdline }}
+        fi
+        # Pull submodules
+        git submodule init
+        git submodule update
+
+    - name: Download assets
+      shell: bash
+      run: |
+        wget "${{ matrix.config.assets_url }}" -O assets.7z
+        mkdir -p assets
+        cd assets
+        7z x ../assets.7z
+        cd ..
+        rm assets.7z
+
+    - name: Configure
+      shell: bash
+      run: |
+        cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} ${{ matrix.config.extra_options }} .
+
+    - name: Build
+      shell: bash
+      run: |
+        export MAKEFLAGS=--keep-going
+        cmake --build build --config ${{ matrix.config.build_type }} --parallel 3
+
+    - name: Create Package
+      if: runner.os == 'Windows'  # Remove to make packages of all targets
+      shell: bash
+      run: |
+        cd build
+        mkdir package
+        cd ..
+        if [[ "${{ runner.os }}" == 'Windows' ]]; then
+          echo "WIP"
+        elif [[ "${{ runner.os }}" == 'macOS' ]]; then
+          cpack -B build .
+          cp -r build/*.dmg package
+        elif [[ "${{ runner.os }}" == 'Linux' ]]; then
+          echo "WIP"
+        fi
+
+    - name: Upload Package
+      if: runner.os == 'macOS'  # Remove to store packages of all targets
+      uses: actions/upload-artifact@v1
+      with:
+        path: build/package
+        name: ${{ matrix.config.name }} ${{ matrix.config.build_type }}
+
+    - name: List Build Directory
+      if: always()
+      shell: bash
+      run: |
+        git status
+        ls -lR build
