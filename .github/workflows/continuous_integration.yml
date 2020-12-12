@@ -59,15 +59,15 @@ jobs:
       run: |
         cd build
         mkdir package
-        cd ..
         if [[ "${{ runner.os }}" == 'Windows' ]]; then
           echo "WIP"
         elif [[ "${{ runner.os }}" == 'macOS' ]]; then
-          cpack -B build .
-          cp -r build/*.dmg package
+          cpack ..
+          mv -r *.dmg package
         elif [[ "${{ runner.os }}" == 'Linux' ]]; then
           echo "WIP"
         fi
+        cd ..
 
     - name: Upload Package
       if: runner.os == 'macOS'  # Remove to store packages of all targets
