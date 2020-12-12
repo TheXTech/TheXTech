@@ -2,6 +2,7 @@ TheXTech Changelog.
 
 Changes for DEV
 -Added the "gameinfo.ini" to give the support for the partial customization of internals (window/game title, character names in menu, credits, etc.)
+-Added an ability to globally override NPC settings by placing of npc-*.txt file into graphics/npc directlry of assets
 
 Changes for 1.3.2.4
 -Allow music change for outro level (if outro level has non-silent music, it will be played instead of built-in)

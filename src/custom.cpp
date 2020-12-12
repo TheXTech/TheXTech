@@ -133,6 +133,8 @@ void LoadNPCDefaults()
 
 void FindCustomNPCs(/*std::string cFilePath*/)
 {
+    const std::string GfxRoot = AppPath + "graphics/";
+    std::string npcPathG, npcPath, npcPathC;
     DirMan searchDir(FileNamePath);
     std::set<std::string> existingFiles;
     std::vector<std::string> files;
@@ -153,8 +155,14 @@ void FindCustomNPCs(/*std::string cFilePath*/)
 
     for(int A = 1; A < maxNPCType; ++A)
     {
-        std::string npcPath = FileNamePath + s_dirEpisode.resolveFileCase(fmt::format_ne("npc-{0}.txt", A));
-        std::string npcPathC = FileNamePath + FileName + "/" + s_dirCustom.resolveFileCase(fmt::format_ne("npc-{0}.txt", A));
+        // Global override of NPC setup
+        npcPathG = GfxRoot + fmt::format_ne("npc/npc-{0}.txt", A);
+        // Episode-wide custom NPC setup
+        npcPath = FileNamePath + s_dirEpisode.resolveFileCase(fmt::format_ne("npc-{0}.txt", A));
+        // Level-wide custom NPC setup
+        npcPathC = FileNamePath + FileName + "/" + s_dirCustom.resolveFileCase(fmt::format_ne("npc-{0}.txt", A));
+        if(Files::fileExists(npcPathG))
+            LoadCustomNPC(A, npcPathG);
         if(Files::fileExists(npcPath))
             LoadCustomNPC(A, npcPath);
         if(Files::fileExists(npcPathC))
