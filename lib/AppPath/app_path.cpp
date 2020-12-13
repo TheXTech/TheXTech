@@ -95,6 +95,8 @@ std::string  ApplicationPathSTD;
 
 std::string AppPathManager::m_settingsPath;
 std::string AppPathManager::m_userPath;
+std::string AppPathManager::m_customAssetsRoot;
+
 #ifdef __APPLE__
 
 #   ifndef USERDATA_ROOT_NAME
@@ -260,6 +262,8 @@ std::string AppPathManager::userAppDirSTD()
 
 std::string AppPathManager::assetsRoot()
 {
+    if(!m_customAssetsRoot.empty())
+        return m_customAssetsRoot;
 #if defined(FIXED_ASSETS_PATH) // Fixed assets path, for the rest of UNIX-like OS packages
     std::string assets(FIXED_ASSETS_PATH);
     if(!assets.empty() && assets.back() != '/')
@@ -285,6 +289,13 @@ std::string AppPathManager::assetsRoot()
     return m_userPath;
 
 #endif
+}
+
+void AppPathManager::setAssetsRoot(const std::string &root)
+{
+    m_customAssetsRoot = root;
+    if(!m_customAssetsRoot.empty() && m_customAssetsRoot.back() != '/')
+        m_customAssetsRoot.push_back('/');
 }
 
 std::string AppPathManager::languagesDir()

@@ -31,6 +31,7 @@ public:
     static std::string settingsFileSTD();
     static std::string userAppDirSTD();
     static std::string assetsRoot();
+    static void setAssetsRoot(const std::string &root);
     static std::string languagesDir();
     static std::string screenshotsDir();
     static std::string gifRecordsDir();
@@ -53,6 +54,7 @@ private:
     //! Full path to settings INI file
     static std::string m_settingsPath;
     static std::string m_userPath;
+    static std::string m_customAssetsRoot;
 #ifdef __APPLE__
     static std::string m_userDataRoot; // A game media root at home directory
 #endif
