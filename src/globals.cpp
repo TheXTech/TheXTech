@@ -186,8 +186,6 @@ RangeArrI<int, 0, maxNPCType, 0> NPCFrame;
 RangeArrI<int, 0, maxNPCType, 0> NPCFrameSpeed;
 RangeArrI<int, 0, maxNPCType, 0> NPCFrameStyle;
 
-NPCDefaults_t NPCDefaults;
-
 RangeArrI<bool, 0, maxBlockType, false> BlockIsSizable;
 RangeArrI<int, 0, maxBlockType, 0> BlockSlope;
 RangeArrI<int, 0, maxBlockType, 0> BlockSlope2;

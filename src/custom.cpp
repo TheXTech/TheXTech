@@ -66,6 +66,86 @@ static PlayerOffsetArray *s_playerFrameY[numCharacters + 1] = {
 const char *s_playerFileName[] = {nullptr, "mario", "luigi", "peach", "toad", "link"};
 
 
+static struct NPCDefaults_t
+{
+//    NPCFrameOffsetX(0 To maxNPCType) As Integer
+    RangeArrI<int, 0, maxNPCType, 0> NPCFrameOffsetX;
+//    NPCFrameOffsetY(0 To maxNPCType) As Integer
+    RangeArrI<int, 0, maxNPCType, 0> NPCFrameOffsetY;
+//    NPCWidth(0 To maxNPCType) As Integer
+    RangeArrI<int, 0, maxNPCType, 0> NPCWidth;
+//    NPCHeight(0 To maxNPCType) As Integer
+    RangeArrI<int, 0, maxNPCType, 0> NPCHeight;
+//    NPCWidthGFX(0 To maxNPCType) As Integer
+    RangeArrI<int, 0, maxNPCType, 0> NPCWidthGFX;
+//    NPCHeightGFX(0 To maxNPCType) As Integer
+    RangeArrI<int, 0, maxNPCType, 0> NPCHeightGFX;
+//    NPCIsAShell(0 To maxNPCType) As Boolean
+    RangeArrI<bool, 0, maxNPCType, false> NPCIsAShell;
+//    NPCIsABlock(0 To maxNPCType) As Boolean
+    RangeArrI<bool, 0, maxNPCType, false> NPCIsABlock;
+//    NPCIsAHit1Block(0 To maxNPCType) As Boolean
+    RangeArrI<bool, 0, maxNPCType, false> NPCIsAHit1Block;
+//    NPCIsABonus(0 To maxNPCType) As Boolean
+    RangeArrI<bool, 0, maxNPCType, false> NPCIsABonus;
+//    NPCIsACoin(0 To maxNPCType) As Boolean
+    RangeArrI<bool, 0, maxNPCType, false> NPCIsACoin;
+//    NPCIsAVine(0 To maxNPCType) As Boolean
+    RangeArrI<bool, 0, maxNPCType, false> NPCIsAVine;
+//    NPCIsAnExit(0 To maxNPCType) As Boolean
+    RangeArrI<bool, 0, maxNPCType, false> NPCIsAnExit;
+//    NPCIsAParaTroopa(0 To maxNPCType) As Boolean
+    RangeArrI<bool, 0, maxNPCType, false> NPCIsAParaTroopa;
+//    NPCIsCheep(0 To maxNPCType) As Boolean
+    RangeArrI<bool, 0, maxNPCType, false> NPCIsCheep;
+//    NPCJumpHurt(0 To maxNPCType) As Boolean
+    RangeArrI<bool, 0, maxNPCType, false> NPCJumpHurt;
+//    NPCNoClipping(0 To maxNPCType) As Boolean
+    RangeArrI<bool, 0, maxNPCType, false> NPCNoClipping;
+//    NPCScore(0 To maxNPCType) As Integer
+    RangeArrI<int, 0, maxNPCType, 0> NPCScore;
+//    NPCCanWalkOn(0 To maxNPCType) As Boolean
+    RangeArrI<bool, 0, maxNPCType, false> NPCCanWalkOn;
+//    NPCGrabFromTop(0 To maxNPCType) As Boolean
+    RangeArrI<bool, 0, maxNPCType, false> NPCGrabFromTop;
+//    NPCTurnsAtCliffs(0 To maxNPCType) As Boolean
+    RangeArrI<bool, 0, maxNPCType, false> NPCTurnsAtCliffs;
+//    NPCWontHurt(0 To maxNPCType) As Boolean
+    RangeArrI<bool, 0, maxNPCType, false> NPCWontHurt;
+//    NPCMovesPlayer(0 To maxNPCType) As Boolean
+    RangeArrI<bool, 0, maxNPCType, false> NPCMovesPlayer;
+//    NPCStandsOnPlayer(0 To maxNPCType) As Boolean
+    RangeArrI<bool, 0, maxNPCType, false> NPCStandsOnPlayer;
+//    NPCIsGrabbable(0 To maxNPCType) As Boolean
+    RangeArrI<bool, 0, maxNPCType, false> NPCIsGrabbable;
+//    NPCIsBoot(0 To maxNPCType) As Boolean
+    RangeArrI<bool, 0, maxNPCType, false> NPCIsBoot;
+//    NPCIsYoshi(0 To maxNPCType) As Boolean
+    RangeArrI<bool, 0, maxNPCType, false> NPCIsYoshi;
+//    NPCIsToad(0 To maxNPCType) As Boolean
+    RangeArrI<bool, 0, maxNPCType, false> NPCIsToad;
+//    NPCNoYoshi(0 To maxNPCType) As Boolean
+    RangeArrI<bool, 0, maxNPCType, false> NPCNoYoshi;
+//    NPCForeground(0 To maxNPCType) As Boolean
+    RangeArrI<bool, 0, maxNPCType, false> NPCForeground;
+//    NPCIsABot(0 To maxNPCType) As Boolean
+    RangeArrI<bool, 0, maxNPCType, false> NPCIsABot;
+//    NPCDefaultMovement(0 To maxNPCType) As Boolean
+    RangeArrI<bool, 0, maxNPCType, false> NPCDefaultMovement;
+//    NPCIsVeggie(0 To maxNPCType) As Boolean
+    RangeArrI<bool, 0, maxNPCType, false> NPCIsVeggie;
+//    NPCSpeedvar(0 To maxNPCType) As Single
+    RangeArr<float, 0, maxNPCType> NPCSpeedvar;
+//    NPCNoFireBall(0 To maxNPCType) As Boolean
+    RangeArrI<bool, 0, maxNPCType, false> NPCNoFireBall;
+//    NPCNoIceBall(0 To maxNPCType) As Boolean
+    RangeArrI<bool, 0, maxNPCType, false> NPCNoIceBall;
+//    NPCNoGravity(0 To maxNPCType) As Boolean
+    RangeArrI<bool, 0, maxNPCType, false> NPCNoGravity;
+//End Type
+} s_NPCDefaults;
+
+
 void LoadCustomNPC(int A, std::string cFileName);
 void LoadCustomPlayer(int character, int state, std::string cFileName);
 
@@ -151,43 +231,43 @@ void SaveNPCDefaults()
 
     for(int A = 1; A <= maxNPCType; A++)
     {
-        NPCDefaults.NPCFrameOffsetX[A] = NPCFrameOffsetX[A];
-        NPCDefaults.NPCFrameOffsetY[A] = NPCFrameOffsetY[A];
-        NPCDefaults.NPCWidth[A] = NPCWidth[A];
-        NPCDefaults.NPCHeight[A] = NPCHeight[A];
-        NPCDefaults.NPCWidthGFX[A] = NPCWidthGFX[A];
-        NPCDefaults.NPCHeightGFX[A] = NPCHeightGFX[A];
-        NPCDefaults.NPCIsAShell[A] = NPCIsAShell[A];
-        NPCDefaults.NPCIsABlock[A] = NPCIsABlock[A];
-        NPCDefaults.NPCIsAHit1Block[A] = NPCIsAHit1Block[A];
-        NPCDefaults.NPCIsABonus[A] = NPCIsABonus[A];
-        NPCDefaults.NPCIsACoin[A] = NPCIsACoin[A];
-        NPCDefaults.NPCIsAVine[A] = NPCIsAVine[A];
-        NPCDefaults.NPCIsAnExit[A] = NPCIsAnExit[A];
-        NPCDefaults.NPCIsAParaTroopa[A] = NPCIsAParaTroopa[A];
-        NPCDefaults.NPCIsCheep[A] = NPCIsCheep[A];
-        NPCDefaults.NPCJumpHurt[A] = NPCJumpHurt[A];
-        NPCDefaults.NPCNoClipping[A] = NPCNoClipping[A];
-        NPCDefaults.NPCScore[A] = NPCScore[A];
-        NPCDefaults.NPCCanWalkOn[A] = NPCCanWalkOn[A];
-        NPCDefaults.NPCGrabFromTop[A] = NPCGrabFromTop[A];
-        NPCDefaults.NPCTurnsAtCliffs[A] = NPCTurnsAtCliffs[A];
-        NPCDefaults.NPCWontHurt[A] = NPCWontHurt[A];
-        NPCDefaults.NPCMovesPlayer[A] = NPCMovesPlayer[A];
-        NPCDefaults.NPCStandsOnPlayer[A] = NPCStandsOnPlayer[A];
-        NPCDefaults.NPCIsGrabbable[A] = NPCIsGrabbable[A];
-        NPCDefaults.NPCIsBoot[A] = NPCIsBoot[A];
-        NPCDefaults.NPCIsYoshi[A] = NPCIsYoshi[A];
-        NPCDefaults.NPCIsToad[A] = NPCIsToad[A];
-        NPCDefaults.NPCNoYoshi[A] = NPCNoYoshi[A];
-        NPCDefaults.NPCForeground[A] = NPCForeground[A];
-        NPCDefaults.NPCIsABot[A] = NPCIsABot[A];
-        NPCDefaults.NPCDefaultMovement[A] = NPCDefaultMovement[A];
-        NPCDefaults.NPCIsVeggie[A] = NPCIsVeggie[A];
-        NPCDefaults.NPCSpeedvar[A] = NPCSpeedvar[A];
-        NPCDefaults.NPCNoFireBall[A] = NPCNoFireBall[A];
-        NPCDefaults.NPCNoIceBall[A] = NPCNoIceBall[A];
-        NPCDefaults.NPCNoGravity[A] = NPCNoGravity[A];
+        s_NPCDefaults.NPCFrameOffsetX[A] = NPCFrameOffsetX[A];
+        s_NPCDefaults.NPCFrameOffsetY[A] = NPCFrameOffsetY[A];
+        s_NPCDefaults.NPCWidth[A] = NPCWidth[A];
+        s_NPCDefaults.NPCHeight[A] = NPCHeight[A];
+        s_NPCDefaults.NPCWidthGFX[A] = NPCWidthGFX[A];
+        s_NPCDefaults.NPCHeightGFX[A] = NPCHeightGFX[A];
+        s_NPCDefaults.NPCIsAShell[A] = NPCIsAShell[A];
+        s_NPCDefaults.NPCIsABlock[A] = NPCIsABlock[A];
+        s_NPCDefaults.NPCIsAHit1Block[A] = NPCIsAHit1Block[A];
+        s_NPCDefaults.NPCIsABonus[A] = NPCIsABonus[A];
+        s_NPCDefaults.NPCIsACoin[A] = NPCIsACoin[A];
+        s_NPCDefaults.NPCIsAVine[A] = NPCIsAVine[A];
+        s_NPCDefaults.NPCIsAnExit[A] = NPCIsAnExit[A];
+        s_NPCDefaults.NPCIsAParaTroopa[A] = NPCIsAParaTroopa[A];
+        s_NPCDefaults.NPCIsCheep[A] = NPCIsCheep[A];
+        s_NPCDefaults.NPCJumpHurt[A] = NPCJumpHurt[A];
+        s_NPCDefaults.NPCNoClipping[A] = NPCNoClipping[A];
+        s_NPCDefaults.NPCScore[A] = NPCScore[A];
+        s_NPCDefaults.NPCCanWalkOn[A] = NPCCanWalkOn[A];
+        s_NPCDefaults.NPCGrabFromTop[A] = NPCGrabFromTop[A];
+        s_NPCDefaults.NPCTurnsAtCliffs[A] = NPCTurnsAtCliffs[A];
+        s_NPCDefaults.NPCWontHurt[A] = NPCWontHurt[A];
+        s_NPCDefaults.NPCMovesPlayer[A] = NPCMovesPlayer[A];
+        s_NPCDefaults.NPCStandsOnPlayer[A] = NPCStandsOnPlayer[A];
+        s_NPCDefaults.NPCIsGrabbable[A] = NPCIsGrabbable[A];
+        s_NPCDefaults.NPCIsBoot[A] = NPCIsBoot[A];
+        s_NPCDefaults.NPCIsYoshi[A] = NPCIsYoshi[A];
+        s_NPCDefaults.NPCIsToad[A] = NPCIsToad[A];
+        s_NPCDefaults.NPCNoYoshi[A] = NPCNoYoshi[A];
+        s_NPCDefaults.NPCForeground[A] = NPCForeground[A];
+        s_NPCDefaults.NPCIsABot[A] = NPCIsABot[A];
+        s_NPCDefaults.NPCDefaultMovement[A] = NPCDefaultMovement[A];
+        s_NPCDefaults.NPCIsVeggie[A] = NPCIsVeggie[A];
+        s_NPCDefaults.NPCSpeedvar[A] = NPCSpeedvar[A];
+        s_NPCDefaults.NPCNoFireBall[A] = NPCNoFireBall[A];
+        s_NPCDefaults.NPCNoIceBall[A] = NPCNoIceBall[A];
+        s_NPCDefaults.NPCNoGravity[A] = NPCNoGravity[A];
         NPCFrameSpeed[A] = 8;
     }
 }
@@ -197,43 +277,43 @@ void LoadNPCDefaults()
     int A = 0;
     for(A = 1; A <= maxNPCType; A++)
     {
-        NPCFrameOffsetX[A] = NPCDefaults.NPCFrameOffsetX[A];
-        NPCFrameOffsetY[A] = NPCDefaults.NPCFrameOffsetY[A];
-        NPCWidth[A] = NPCDefaults.NPCWidth[A];
-        NPCHeight[A] = NPCDefaults.NPCHeight[A];
-        NPCWidthGFX[A] = NPCDefaults.NPCWidthGFX[A];
-        NPCHeightGFX[A] = NPCDefaults.NPCHeightGFX[A];
-        NPCIsAShell[A] = NPCDefaults.NPCIsAShell[A];
-        NPCIsABlock[A] = NPCDefaults.NPCIsABlock[A];
-        NPCIsAHit1Block[A] = NPCDefaults.NPCIsAHit1Block[A];
-        NPCIsABonus[A] = NPCDefaults.NPCIsABonus[A];
-        NPCIsACoin[A] = NPCDefaults.NPCIsACoin[A];
-        NPCIsAVine[A] = NPCDefaults.NPCIsAVine[A];
-        NPCIsAnExit[A] = NPCDefaults.NPCIsAnExit[A];
-        NPCIsAParaTroopa[A] = NPCDefaults.NPCIsAParaTroopa[A];
-        NPCIsCheep[A] = NPCDefaults.NPCIsCheep[A];
-        NPCJumpHurt[A] = NPCDefaults.NPCJumpHurt[A];
-        NPCNoClipping[A] = NPCDefaults.NPCNoClipping[A];
-        NPCScore[A] = NPCDefaults.NPCScore[A];
-        NPCCanWalkOn[A] = NPCDefaults.NPCCanWalkOn[A];
-        NPCGrabFromTop[A] = NPCDefaults.NPCGrabFromTop[A];
-        NPCTurnsAtCliffs[A] = NPCDefaults.NPCTurnsAtCliffs[A];
-        NPCWontHurt[A] = NPCDefaults.NPCWontHurt[A];
-        NPCMovesPlayer[A] = NPCDefaults.NPCMovesPlayer[A];
-        NPCStandsOnPlayer[A] = NPCDefaults.NPCStandsOnPlayer[A];
-        NPCIsGrabbable[A] = NPCDefaults.NPCIsGrabbable[A];
-        NPCIsBoot[A] = NPCDefaults.NPCIsBoot[A];
-        NPCIsYoshi[A] = NPCDefaults.NPCIsYoshi[A];
-        NPCIsToad[A] = NPCDefaults.NPCIsToad[A];
-        NPCNoYoshi[A] = NPCDefaults.NPCNoYoshi[A];
-        NPCForeground[A] = NPCDefaults.NPCForeground[A];
-        NPCIsABot[A] = NPCDefaults.NPCIsABot[A];
-        NPCDefaultMovement[A] = NPCDefaults.NPCDefaultMovement[A];
-        NPCIsVeggie[A] = NPCDefaults.NPCIsVeggie[A];
-        NPCSpeedvar[A] = NPCDefaults.NPCSpeedvar[A];
-        NPCNoFireBall[A] = NPCDefaults.NPCNoFireBall[A];
-        NPCNoIceBall[A] = NPCDefaults.NPCNoIceBall[A];
-        NPCNoGravity[A] = NPCDefaults.NPCNoGravity[A];
+        NPCFrameOffsetX[A] = s_NPCDefaults.NPCFrameOffsetX[A];
+        NPCFrameOffsetY[A] = s_NPCDefaults.NPCFrameOffsetY[A];
+        NPCWidth[A] = s_NPCDefaults.NPCWidth[A];
+        NPCHeight[A] = s_NPCDefaults.NPCHeight[A];
+        NPCWidthGFX[A] = s_NPCDefaults.NPCWidthGFX[A];
+        NPCHeightGFX[A] = s_NPCDefaults.NPCHeightGFX[A];
+        NPCIsAShell[A] = s_NPCDefaults.NPCIsAShell[A];
+        NPCIsABlock[A] = s_NPCDefaults.NPCIsABlock[A];
+        NPCIsAHit1Block[A] = s_NPCDefaults.NPCIsAHit1Block[A];
+        NPCIsABonus[A] = s_NPCDefaults.NPCIsABonus[A];
+        NPCIsACoin[A] = s_NPCDefaults.NPCIsACoin[A];
+        NPCIsAVine[A] = s_NPCDefaults.NPCIsAVine[A];
+        NPCIsAnExit[A] = s_NPCDefaults.NPCIsAnExit[A];
+        NPCIsAParaTroopa[A] = s_NPCDefaults.NPCIsAParaTroopa[A];
+        NPCIsCheep[A] = s_NPCDefaults.NPCIsCheep[A];
+        NPCJumpHurt[A] = s_NPCDefaults.NPCJumpHurt[A];
+        NPCNoClipping[A] = s_NPCDefaults.NPCNoClipping[A];
+        NPCScore[A] = s_NPCDefaults.NPCScore[A];
+        NPCCanWalkOn[A] = s_NPCDefaults.NPCCanWalkOn[A];
+        NPCGrabFromTop[A] = s_NPCDefaults.NPCGrabFromTop[A];
+        NPCTurnsAtCliffs[A] = s_NPCDefaults.NPCTurnsAtCliffs[A];
+        NPCWontHurt[A] = s_NPCDefaults.NPCWontHurt[A];
+        NPCMovesPlayer[A] = s_NPCDefaults.NPCMovesPlayer[A];
+        NPCStandsOnPlayer[A] = s_NPCDefaults.NPCStandsOnPlayer[A];
+        NPCIsGrabbable[A] = s_NPCDefaults.NPCIsGrabbable[A];
+        NPCIsBoot[A] = s_NPCDefaults.NPCIsBoot[A];
+        NPCIsYoshi[A] = s_NPCDefaults.NPCIsYoshi[A];
+        NPCIsToad[A] = s_NPCDefaults.NPCIsToad[A];
+        NPCNoYoshi[A] = s_NPCDefaults.NPCNoYoshi[A];
+        NPCForeground[A] = s_NPCDefaults.NPCForeground[A];
+        NPCIsABot[A] = s_NPCDefaults.NPCIsABot[A];
+        NPCDefaultMovement[A] = s_NPCDefaults.NPCDefaultMovement[A];
+        NPCIsVeggie[A] = s_NPCDefaults.NPCIsVeggie[A];
+        NPCSpeedvar[A] = s_NPCDefaults.NPCSpeedvar[A];
+        NPCNoFireBall[A] = s_NPCDefaults.NPCNoFireBall[A];
+        NPCNoIceBall[A] = s_NPCDefaults.NPCNoIceBall[A];
+        NPCNoGravity[A] = s_NPCDefaults.NPCNoGravity[A];
         NPCFrame[A] = 0;
         NPCFrameSpeed[A] = 8;
         NPCFrameStyle[A] = 0;
