@@ -138,8 +138,6 @@ int main(int argc, char**argv)
     AppPathManager::initAppPath();
     AppPath = AppPathManager::assetsRoot();
 
-    initGameInfo();
-
     OpenConfig_preSetup();
 
     setup.renderType = CmdLineSetup_t::RenderType(RenderMode);
@@ -278,6 +276,8 @@ int main(int argc, char**argv)
         std::cerr.flush();
         return 2;
     }
+
+    initGameInfo();
 
     // set this flag before SDL initialization to allow game be quit when closing a window before a loading process will be completed
     GameIsActive = true;
