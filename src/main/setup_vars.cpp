@@ -2752,4 +2752,5 @@ void SetupVars()
             EffectDefaults.EffectFrames[A] = 1;
     }
     SaveNPCDefaults();
+    SavePlayerDefaults();
 }

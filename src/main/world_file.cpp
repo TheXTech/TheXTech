@@ -27,6 +27,7 @@
 #include "../game_main.h"
 #include "../load_gfx.h"
 #include "../sound.h"
+#include "../custom.h"
 #include "level_file.h"
 
 #include <Utils/strings.h>
@@ -63,6 +64,7 @@ void OpenWorld(std::string FilePath)
     if(wld.meta.RecentFormat == LevelData::SMBX64)
         FileRelease = int(wld.meta.RecentFormatVersion);
 
+    FindCustomPlayers();
     LoadWorldCustomGFX();
 
     numTiles = 0;
@@ -346,6 +348,7 @@ void ClearWorld()
     UnloadCustomGFX();
     UnloadWorldCustomGFX();
     UnloadCustomSound();
+    LoadPlayerDefaults();
 //    if(LevelEditor == true)
 //    {
 //        frmLevelEditor::optCursor(14).Value = true;

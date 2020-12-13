@@ -908,7 +908,13 @@ void UpdateGraphics(bool skipRepaint)
                             Y2 = 0;
                             X2 = 0;
                             PlayerWarpGFX(A, tempLocation, X2, Y2);
-                            frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, tempLocation.Width, tempLocation.Height, GFX.Boot[Player[A].MountType], X2, Y2 + 32 * Player[A].MountFrame, c, c, c);
+                            frmMain.renderTexture(vScreenX[Z] + tempLocation.X,
+                                                  vScreenY[Z] + tempLocation.Y,
+                                                  tempLocation.Width,
+                                                  tempLocation.Height,
+                                                  GFX.Boot[Player[A].MountType],
+                                                  X2,
+                                                  Y2 + 32 * Player[A].MountFrame, c, c, c);
                         }
                         else
                         {

@@ -26,6 +26,7 @@
 #include "globals.h"
 #include "custom.h"
 
+#include <IniProcessor/ini_processing.h>
 #include <DirManager/dirman.h>
 #include <Utils/files.h>
 #include <Utils/dir_list_ci.h>
@@ -35,7 +36,86 @@
 static DirListCI s_dirEpisode;
 static DirListCI s_dirCustom;
 
+static struct PlayerBackup
+{
+    struct FramePos
+    {
+        int x;
+        int y;
+    } p[maxPlayerFrames + 1];
+
+    struct Calibration
+    {
+        int w;
+        int h;
+        int h_duck;
+        int grubX;
+        int grubY;
+    } c[numStates];
+} s_playerFramesBackup[numCharacters];
+
+typedef RangeArrI<int, 0, maxPlayerFrames, 0> PlayerOffsetArray;
+
+static PlayerOffsetArray *s_playerFrameX[numCharacters + 1] = {
+    nullptr, &MarioFrameX, &LuigiFrameX, &PeachFrameX, &ToadFrameX, &LinkFrameX
+};
+static PlayerOffsetArray *s_playerFrameY[numCharacters + 1] = {
+    nullptr, &MarioFrameY, &LuigiFrameY, &PeachFrameY, &ToadFrameY, &LinkFrameY
+};
+
+
 void LoadCustomNPC(int A, std::string cFileName);
+void LoadCustomPlayer(int character, int state, std::string cFileName);
+
+
+
+void SavePlayerDefaults()
+{
+    pLogDebug("Saving Player defaults...");
+
+    for(int p = 1; p <= numCharacters; ++p)
+    {
+        auto &pb = s_playerFramesBackup[p - 1];
+        for(int j = 0; j <= maxPlayerFrames; ++j)
+        {
+            pb.p[j].x = (*s_playerFrameX[p])[j];
+            pb.p[j].y = (*s_playerFrameY[p])[j];
+        }
+
+        for(int j = 1; j <= numStates; ++j)
+        {
+            pb.c[j - 1].w = Physics.PlayerWidth[p][j];
+            pb.c[j - 1].h = Physics.PlayerHeight[p][j];
+            pb.c[j - 1].h_duck = Physics.PlayerDuckHeight[p][j];
+            pb.c[j - 1].grubX = Physics.PlayerGrabSpotX[p][j];
+            pb.c[j - 1].grubY = Physics.PlayerGrabSpotY[p][j];
+        }
+    }
+}
+
+void LoadPlayerDefaults()
+{
+    pLogDebug("Restoring Player defaults...");
+
+    for(int p = 1; p <= numCharacters; ++p)
+    {
+        auto &pb = s_playerFramesBackup[p - 1];
+        for(int j = 0; j <= maxPlayerFrames; ++j)
+        {
+            (*s_playerFrameX[p])[j] = pb.p[j].x;
+            (*s_playerFrameY[p])[j] = pb.p[j].y;
+        }
+
+        for(int j = 1; j <= numStates; ++j)
+        {
+            Physics.PlayerWidth[p][j] = pb.c[j - 1].w;
+            Physics.PlayerHeight[p][j] = pb.c[j - 1].h;
+            Physics.PlayerDuckHeight[p][j] = pb.c[j - 1].h_duck;
+            Physics.PlayerGrabSpotX[p][j] = pb.c[j - 1].grubX;
+            Physics.PlayerGrabSpotY[p][j] = pb.c[j - 1].grubY;
+        }
+    }
+}
 
 void SaveNPCDefaults()
 {
@@ -131,8 +211,123 @@ void LoadNPCDefaults()
     }
 }
 
+void FindCustomPlayers()
+{
+    pLogDebug("Trying to load custom Player configs...");
+
+    const std::string GfxRoot = AppPath + "graphics/";
+    std::string playerPathG, playerPath, playerPathC;
+    s_dirEpisode.setCurDir(FileNamePath);
+    s_dirCustom.setCurDir(FileNamePath + FileName);
+
+    const char *playerFileName[] = {nullptr, "mario", "luigi", "peach", "toad", "link"};
+
+    for(int C = 1; C <= numCharacters; ++C)
+    {
+        for(int S = 1; S <= numStates; ++S)
+        {
+            // Global override of player setup
+            playerPathG = GfxRoot + fmt::format_ne("{1}/{1}-{0}.ini", S, playerFileName[C]);
+            // Episode-wide custom player setup
+            playerPath = FileNamePath + s_dirEpisode.resolveFileCase(fmt::format_ne("{1}-{0}.ini", S, playerFileName[C]));
+            // Level-wide custom player setup
+            playerPathC = FileNamePath + FileName + "/" + s_dirCustom.resolveFileCase(fmt::format_ne("{1}-{0}.ini", S, playerFileName[C]));
+
+            if(Files::fileExists(playerPathG))
+                LoadCustomPlayer(C, S, playerPathG);
+            if(Files::fileExists(playerPath))
+                LoadCustomPlayer(C, S, playerPath);
+            if(Files::fileExists(playerPathC))
+                LoadCustomPlayer(C, S, playerPathC);
+        }
+    }
+}
+
+static inline int convIndexCoorToSpriteIndex(short x, short y)
+{
+    return (y + 10 * x) - 49;
+}
+
+void LoadCustomPlayer(int character, int state, std::string cFileName)
+{
+    pLogDebug("Loading %s...", cFileName.c_str());
+
+    IniProcessing hitBoxFile(cFileName);
+    if(!hitBoxFile.isOpened())
+    {
+        pLogWarning("Can't open the player calibration file: %s", cFileName.c_str());
+        return;
+    }
+
+    const short UNDEFINED = 0x7FFF;
+    short width = UNDEFINED;
+    short height = UNDEFINED;
+    short height_duck = UNDEFINED;
+    short grab_offset_x = UNDEFINED;
+    short grab_offset_y = UNDEFINED;
+    bool isUsed = true;
+    short offsetX = UNDEFINED;
+    short offsetY = UNDEFINED;
+
+    hitBoxFile.beginGroup("common");
+    //normal
+    hitBoxFile.read("width", width, UNDEFINED);
+    hitBoxFile.read("height", height, UNDEFINED);
+    //duck
+    hitBoxFile.read("height-duck", height_duck, UNDEFINED);
+
+    //grab offsets
+    hitBoxFile.read("grab-offset-x", grab_offset_x, UNDEFINED);
+    hitBoxFile.read("grab-offset-y", grab_offset_y, UNDEFINED);
+
+    hitBoxFile.endGroup();
+
+    for (int x = 0; x < 10; x++)
+    {
+        for (int y = 0; y < 10; y++)
+        {
+            isUsed = true;
+            offsetX = UNDEFINED;
+            offsetY = UNDEFINED;
+
+            std::string tFrame = fmt::format("frame-{0}-{1}", x, y);
+
+            if(!hitBoxFile.contains(tFrame))
+                continue; // Skip not existing frame
+
+            hitBoxFile.beginGroup(tFrame);
+            hitBoxFile.read("used", isUsed, true);
+            if(isUsed) //--> skip this frame
+            {
+                //Offset relative to
+                hitBoxFile.read("offsetX", offsetX, UNDEFINED);
+                hitBoxFile.read("offsetY", offsetY, UNDEFINED);
+                if(offsetX != UNDEFINED && offsetY != UNDEFINED)
+                {
+                    (*s_playerFrameX[character])[convIndexCoorToSpriteIndex(x, y) + state * 100] = -offsetX;
+                    (*s_playerFrameY[character])[convIndexCoorToSpriteIndex(x, y) + state * 100] = -offsetY;
+                }
+            }
+            hitBoxFile.endGroup();
+        }
+    }
+
+    if(width != UNDEFINED)
+        Physics.PlayerWidth[character][state] = width;
+    if(height != UNDEFINED)
+        Physics.PlayerHeight[character][state] = height;
+    if(height_duck != UNDEFINED)
+        Physics.PlayerDuckHeight[character][state] = height_duck;
+    if(grab_offset_x != UNDEFINED)
+        Physics.PlayerGrabSpotX[character][state] = grab_offset_x;
+    if(grab_offset_y != UNDEFINED)
+        Physics.PlayerGrabSpotY[character][state] = grab_offset_y;
+}
+
 void FindCustomNPCs(/*std::string cFilePath*/)
 {
+    pLogDebug("Trying to load custom NPC configs...");
+
     const std::string GfxRoot = AppPath + "graphics/";
     std::string npcPathG, npcPath, npcPathC;
     DirMan searchDir(FileNamePath);

@@ -138,6 +138,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 //    if(DirMan::exists(FileNamePath + FileName))
 //        FindCustomNPCs(FileNamePath + FileName);
 //    else
+    FindCustomPlayers();
     FindCustomNPCs();
     LoadCustomGFX();
     LoadCustomSound();
@@ -784,6 +785,7 @@ void ClearLevel()
     NPCScore[274] = 6;
     LevelName.clear();
     LoadNPCDefaults();
+    LoadPlayerDefaults();
     noUpdate = true;
     BlocksSorted = true;
     qScreen = false;
