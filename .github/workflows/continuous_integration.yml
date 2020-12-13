@@ -16,7 +16,8 @@ jobs:
             extra_options: "-DTHEXTECH_PRELOAD_ENVIRONMENT=\"`pwd`/assets/\" -DTHEXTECH_CUSTOM_ICON_PATH=\"`pwd`/assets/graphics/ui/icon/smbx.icns\" -DTHEXTECH_ICON_NAME=smbx.icns -DTHEXTECH_BUNDLE_NAME=\"Super Mario Bros. X\" -DTHEXTECH_EXECUTABLE_NAME=\"thextech\"",
             deps_cmdline: "brew install ninja wget p7zip",
             build_type: "MinSizeRel",
-            assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-smbx13-assets-full.7z"
+            assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-smbx13-assets-full.7z",
+            package_filename: "thextech-super-mario-bros-x.dmg"
           }
 
     steps:
@@ -63,7 +64,7 @@ jobs:
           echo "WIP"
         elif [[ "${{ runner.os }}" == 'macOS' ]]; then
           cpack ..
-          mv *.dmg package
+          mv *.dmg package/${{ matrix.config.package_filename }}
         elif [[ "${{ runner.os }}" == 'Linux' ]]; then
           echo "WIP"
         fi
@@ -73,7 +74,7 @@ jobs:
       if: runner.os == 'macOS'  # Remove to store packages of all targets
       uses: actions/upload-artifact@v2
       with:
-        path: build/package/*.dmg
+        path: build/package/${{ matrix.config.package_filename }}
         name: ${{ matrix.config.name }} ${{ matrix.config.build_type }}
 
     - name: List Build Directory
