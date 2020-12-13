@@ -405,11 +405,10 @@ void UpdateGraphics2()
             Player[A].Location.SpeedX = -1;
             Player[A].Controls.Left = false;
             Player[A].Controls.Right = false;
-            if(Player[A].Duck == true)
-            {
+            if(Player[A].Duck)
                 UnDuck(A);
-            }
             PlayerFrame(A);
+
             if(Player[A].Mount == 3)
             {
                 if(Player[A].MountType == 0)
@@ -424,6 +423,7 @@ void UpdateGraphics2()
                                       124 - Player[A].Location.Height + Player[A].YoshiTY,
                                       32, 32, GFXYoshiTBMP[B], 0, 32 * Player[A].YoshiTFrame, c, c, c);
             }
+
             if(Player[A].Character == 1)
             {
                 if(Player[A].Mount == 0 || Player[A].Mount == 3)
@@ -436,12 +436,17 @@ void UpdateGraphics2()
                 }
                 else if(Player[A].Mount == 1)
                 {
-                    frmMain.renderTexture(32 + (48 * A) + MarioFrameX[(Player[A].State * 100) +
-                                            (Player[A].Frame * Player[A].Direction)],
-                                          124 - Player[A].Location.Height + MarioFrameY[(Player[A].State * 100) +
-                                            (Player[A].Frame * Player[A].Direction)],
-                                          99, Player[A].Location.Height - 26,
-                                          GFXMarioBMP[Player[A].State], pfrX(100 + Player[A].Frame * Player[A].Direction),
+                    int height;
+                    if(Player[A].State == 1)
+                        height = Player[A].Location.Height - MarioFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
+                    else
+                        height = Player[A].Location.Height - MarioFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] - 30;
+                    frmMain.renderTexture(32 + (48 * A) + MarioFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
+                                          124 - Player[A].Location.Height + MarioFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
+                                          99,
+                                          height,
+                                          GFXMarioBMP[Player[A].State],
+                                          pfrX(100 + Player[A].Frame * Player[A].Direction),
                                           pfrY(100 + Player[A].Frame * Player[A].Direction), c, c, c);
 
                     frmMain.renderTexture(32 + (48 * A) + Player[A].Location.Width / 2.0 - 16, 124 - 30, 32, 32,
@@ -474,11 +479,15 @@ void UpdateGraphics2()
                 }
                 else if(Player[A].Mount == 1)
                 {
-                    frmMain.renderTexture(32 + (48 * A) + LuigiFrameX[(Player[A].State * 100) +
-                                            (Player[A].Frame * Player[A].Direction)],
-                                          124 - Player[A].Location.Height +
-                                            LuigiFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
-                                          99, Player[A].Location.Height - 24,
+                    int height;
+                    if(Player[A].State == 1)
+                        height = Player[A].Location.Height - LuigiFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
+                    else
+                        height = Player[A].Location.Height - LuigiFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] - 30;
+                    frmMain.renderTexture(32 + (48 * A) + LuigiFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
+                                          124 - Player[A].Location.Height + LuigiFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
+                                          99,
+                                          height,
                                           GFXLuigiBMP[Player[A].State],
                                           pfrX(100 + Player[A].Frame * Player[A].Direction),
                                           pfrY(100 + Player[A].Frame * Player[A].Direction), c, c, c);
@@ -502,13 +511,24 @@ void UpdateGraphics2()
             {
                 if(Player[A].Mount == 0 || Player[A].Mount == 3)
                 {
-                    frmMain.renderTexture(32 + (48 * A) + PeachFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], 124 - Player[A].Location.Height + PeachFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] + Player[A].MountOffsetY, 99, 99, GFXPeachBMP[Player[A].State], pfrX(100 + Player[A].Frame * Player[A].Direction), pfrY(100 + Player[A].Frame * Player[A].Direction), c, c, c);
+                    frmMain.renderTexture(32 + (48 * A) + PeachFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
+                                          124 - Player[A].Location.Height + PeachFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] + Player[A].MountOffsetY,
+                                          99, 99,
+                                          GFXPeachBMP[Player[A].State],
+                                          pfrX(100 + Player[A].Frame * Player[A].Direction),
+                                          pfrY(100 + Player[A].Frame * Player[A].Direction), c, c, c);
                 }
                 else if(Player[A].Mount == 1)
                 {
+                    int height;
+                    if(Player[A].State == 1)
+                        height = Player[A].Location.Height - PeachFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
+                    else
+                        height = Player[A].Location.Height - PeachFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] - 30;
                     frmMain.renderTexture(32 + (48 * A) + PeachFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
                                           124 - Player[A].Location.Height + PeachFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
-                                          99, Player[A].Location.Height - 24,
+                                          99,
+                                          height,
                                           GFXPeachBMP[Player[A].State],
                                           pfrX(100 + Player[A].Frame * Player[A].Direction),
                                           pfrY(100 + Player[A].Frame * Player[A].Direction), c, c, c);
@@ -542,7 +562,16 @@ void UpdateGraphics2()
                     }
                     else
                     {
-                        frmMain.renderTexture(32 + (48 * A) + ToadFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], 124 - Player[A].Location.Height + ToadFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], 99, Player[A].Location.Height - 24, GFXToadBMP[Player[A].State], pfrX(100 + Player[A].Frame * Player[A].Direction), pfrY(100 + Player[A].Frame * Player[A].Direction), c, c, c);
+                        int height;
+                        if(Player[A].State == 1)
+                            height = Player[A].Location.Height - ToadFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
+                        else
+                            height = Player[A].Location.Height - ToadFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] - 26;
+                        frmMain.renderTexture(32 + (48 * A) + ToadFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
+                                              124 - Player[A].Location.Height + ToadFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
+                                              99,
+                                              height,
+                                              GFXToadBMP[Player[A].State], pfrX(100 + Player[A].Frame * Player[A].Direction), pfrY(100 + Player[A].Frame * Player[A].Direction), c, c, c);
                     }
                     frmMain.renderTexture(32 + (48 * A) + Player[A].Location.Width / 2.0 - 16, 124 - 30, 32, 32, GFX.Boot[Player[A].MountType], 0, 32 * Player[A].MountFrame, c, c, c);
 

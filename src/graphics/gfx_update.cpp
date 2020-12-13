@@ -806,6 +806,7 @@ void UpdateGraphics(bool skipRepaint)
                         PlayerWarpGFX(A, tempLocation, X2, Y2);
                         frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, tempLocation.Width, tempLocation.Height, GFXYoshiT[B], X2, Y2 + 32 * Player[A].YoshiTFrame);
                     }
+
                     if(Player[A].Character == 1)
                     {
                         if(Player[A].Mount == 1)
@@ -899,7 +900,13 @@ void UpdateGraphics(bool skipRepaint)
                             Y2 = 0;
                             X2 = 0;
                             PlayerWarpGFX(A, tempLocation, X2, Y2);
-                            frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, tempLocation.Width, tempLocation.Height, GFXPeach[Player[A].State], pfrX(100 + Player[A].Frame * Player[A].Direction) + X2, pfrY(100 + Player[A].Frame * Player[A].Direction) + Y2);
+                            frmMain.renderTexture(vScreenX[Z] + tempLocation.X,
+                                                  vScreenY[Z] + tempLocation.Y,
+                                                  tempLocation.Width,
+                                                  tempLocation.Height,
+                                                  GFXPeach[Player[A].State],
+                                                  pfrX(100 + Player[A].Frame * Player[A].Direction) + X2,
+                                                  pfrY(100 + Player[A].Frame * Player[A].Direction) + Y2);
                             tempLocation = Player[A].Location;
                             tempLocation.Height = 32;
                             tempLocation.Width = 32;
