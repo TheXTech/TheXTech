@@ -71,9 +71,9 @@ jobs:
 
     - name: Upload Package
       if: runner.os == 'macOS'  # Remove to store packages of all targets
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v2
       with:
-        path: build/package
+        path: build/package/*.dmg
         name: ${{ matrix.config.name }} ${{ matrix.config.build_type }}
 
     - name: List Build Directory
