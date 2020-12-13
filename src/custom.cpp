@@ -68,80 +68,47 @@ const char *s_playerFileName[] = {nullptr, "mario", "luigi", "peach", "toad", "l
 
 static struct NPCDefaults_t
 {
-//    NPCFrameOffsetX(0 To maxNPCType) As Integer
     RangeArrI<int, 0, maxNPCType, 0> NPCFrameOffsetX;
-//    NPCFrameOffsetY(0 To maxNPCType) As Integer
     RangeArrI<int, 0, maxNPCType, 0> NPCFrameOffsetY;
-//    NPCWidth(0 To maxNPCType) As Integer
     RangeArrI<int, 0, maxNPCType, 0> NPCWidth;
-//    NPCHeight(0 To maxNPCType) As Integer
     RangeArrI<int, 0, maxNPCType, 0> NPCHeight;
-//    NPCWidthGFX(0 To maxNPCType) As Integer
     RangeArrI<int, 0, maxNPCType, 0> NPCWidthGFX;
-//    NPCHeightGFX(0 To maxNPCType) As Integer
     RangeArrI<int, 0, maxNPCType, 0> NPCHeightGFX;
-//    NPCIsAShell(0 To maxNPCType) As Boolean
     RangeArrI<bool, 0, maxNPCType, false> NPCIsAShell;
-//    NPCIsABlock(0 To maxNPCType) As Boolean
     RangeArrI<bool, 0, maxNPCType, false> NPCIsABlock;
-//    NPCIsAHit1Block(0 To maxNPCType) As Boolean
     RangeArrI<bool, 0, maxNPCType, false> NPCIsAHit1Block;
-//    NPCIsABonus(0 To maxNPCType) As Boolean
     RangeArrI<bool, 0, maxNPCType, false> NPCIsABonus;
-//    NPCIsACoin(0 To maxNPCType) As Boolean
     RangeArrI<bool, 0, maxNPCType, false> NPCIsACoin;
-//    NPCIsAVine(0 To maxNPCType) As Boolean
     RangeArrI<bool, 0, maxNPCType, false> NPCIsAVine;
-//    NPCIsAnExit(0 To maxNPCType) As Boolean
     RangeArrI<bool, 0, maxNPCType, false> NPCIsAnExit;
-//    NPCIsAParaTroopa(0 To maxNPCType) As Boolean
     RangeArrI<bool, 0, maxNPCType, false> NPCIsAParaTroopa;
-//    NPCIsCheep(0 To maxNPCType) As Boolean
     RangeArrI<bool, 0, maxNPCType, false> NPCIsCheep;
-//    NPCJumpHurt(0 To maxNPCType) As Boolean
     RangeArrI<bool, 0, maxNPCType, false> NPCJumpHurt;
-//    NPCNoClipping(0 To maxNPCType) As Boolean
     RangeArrI<bool, 0, maxNPCType, false> NPCNoClipping;
-//    NPCScore(0 To maxNPCType) As Integer
     RangeArrI<int, 0, maxNPCType, 0> NPCScore;
-//    NPCCanWalkOn(0 To maxNPCType) As Boolean
     RangeArrI<bool, 0, maxNPCType, false> NPCCanWalkOn;
-//    NPCGrabFromTop(0 To maxNPCType) As Boolean
     RangeArrI<bool, 0, maxNPCType, false> NPCGrabFromTop;
-//    NPCTurnsAtCliffs(0 To maxNPCType) As Boolean
     RangeArrI<bool, 0, maxNPCType, false> NPCTurnsAtCliffs;
-//    NPCWontHurt(0 To maxNPCType) As Boolean
     RangeArrI<bool, 0, maxNPCType, false> NPCWontHurt;
-//    NPCMovesPlayer(0 To maxNPCType) As Boolean
     RangeArrI<bool, 0, maxNPCType, false> NPCMovesPlayer;
-//    NPCStandsOnPlayer(0 To maxNPCType) As Boolean
     RangeArrI<bool, 0, maxNPCType, false> NPCStandsOnPlayer;
-//    NPCIsGrabbable(0 To maxNPCType) As Boolean
     RangeArrI<bool, 0, maxNPCType, false> NPCIsGrabbable;
-//    NPCIsBoot(0 To maxNPCType) As Boolean
     RangeArrI<bool, 0, maxNPCType, false> NPCIsBoot;
-//    NPCIsYoshi(0 To maxNPCType) As Boolean
     RangeArrI<bool, 0, maxNPCType, false> NPCIsYoshi;
-//    NPCIsToad(0 To maxNPCType) As Boolean
     RangeArrI<bool, 0, maxNPCType, false> NPCIsToad;
-//    NPCNoYoshi(0 To maxNPCType) As Boolean
     RangeArrI<bool, 0, maxNPCType, false> NPCNoYoshi;
-//    NPCForeground(0 To maxNPCType) As Boolean
     RangeArrI<bool, 0, maxNPCType, false> NPCForeground;
-//    NPCIsABot(0 To maxNPCType) As Boolean
     RangeArrI<bool, 0, maxNPCType, false> NPCIsABot;
-//    NPCDefaultMovement(0 To maxNPCType) As Boolean
     RangeArrI<bool, 0, maxNPCType, false> NPCDefaultMovement;
-//    NPCIsVeggie(0 To maxNPCType) As Boolean
     RangeArrI<bool, 0, maxNPCType, false> NPCIsVeggie;
-//    NPCSpeedvar(0 To maxNPCType) As Single
     RangeArr<float, 0, maxNPCType> NPCSpeedvar;
-//    NPCNoFireBall(0 To maxNPCType) As Boolean
     RangeArrI<bool, 0, maxNPCType, false> NPCNoFireBall;
-//    NPCNoIceBall(0 To maxNPCType) As Boolean
     RangeArrI<bool, 0, maxNPCType, false> NPCNoIceBall;
-//    NPCNoGravity(0 To maxNPCType) As Boolean
     RangeArrI<bool, 0, maxNPCType, false> NPCNoGravity;
+
+    RangeArrI<int, 0, maxNPCType, 0> NPCFrame;
+    RangeArrI<int, 0, maxNPCType, 0> NPCFrameSpeed;
+    RangeArrI<int, 0, maxNPCType, 0> NPCFrameStyle;
 //End Type
 } s_NPCDefaults;
 
@@ -219,18 +186,18 @@ void SaveNPCDefaults()
     const std::string GfxRoot = AppPath + "graphics/";
     std::string npcPathG;
 
-    for(int A = 1; A < maxNPCType; ++A)
+    NPCFrame.fill(0);
+    NPCFrameSpeed.fill(8);
+    NPCFrameStyle.fill(0);
+
+    for(int A = 1; A <= maxNPCType; A++)
     {
         // Global override of NPC setup
         npcPathG = GfxRoot + fmt::format_ne("npc/npc-{0}.txt", A);
 
         if(Files::fileExists(npcPathG))
             LoadCustomNPC(A, npcPathG);
-    }
 
-
-    for(int A = 1; A <= maxNPCType; A++)
-    {
         s_NPCDefaults.NPCFrameOffsetX[A] = NPCFrameOffsetX[A];
         s_NPCDefaults.NPCFrameOffsetY[A] = NPCFrameOffsetY[A];
         s_NPCDefaults.NPCWidth[A] = NPCWidth[A];
@@ -268,7 +235,10 @@ void SaveNPCDefaults()
         s_NPCDefaults.NPCNoFireBall[A] = NPCNoFireBall[A];
         s_NPCDefaults.NPCNoIceBall[A] = NPCNoIceBall[A];
         s_NPCDefaults.NPCNoGravity[A] = NPCNoGravity[A];
-        NPCFrameSpeed[A] = 8;
+
+        s_NPCDefaults.NPCFrame[A] = NPCFrame[A];
+        s_NPCDefaults.NPCFrameSpeed[A] = NPCFrameSpeed[A];
+        s_NPCDefaults.NPCFrameStyle[A] = NPCFrameStyle[A];
     }
 }
 
@@ -314,9 +284,10 @@ void LoadNPCDefaults()
         NPCNoFireBall[A] = s_NPCDefaults.NPCNoFireBall[A];
         NPCNoIceBall[A] = s_NPCDefaults.NPCNoIceBall[A];
         NPCNoGravity[A] = s_NPCDefaults.NPCNoGravity[A];
-        NPCFrame[A] = 0;
-        NPCFrameSpeed[A] = 8;
-        NPCFrameStyle[A] = 0;
+
+        NPCFrame[A] = s_NPCDefaults.NPCFrame[A];
+        NPCFrameSpeed[A] = s_NPCDefaults.NPCFrameSpeed[A];
+        NPCFrameStyle[A] = s_NPCDefaults.NPCFrameStyle[A];
     }
 }
 
