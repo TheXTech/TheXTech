@@ -63,7 +63,7 @@ jobs:
           echo "WIP"
         elif [[ "${{ runner.os }}" == 'macOS' ]]; then
           cpack ..
-          mv -r *.dmg package
+          mv *.dmg package
         elif [[ "${{ runner.os }}" == 'Linux' ]]; then
           echo "WIP"
         fi
