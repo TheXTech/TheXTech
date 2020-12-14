@@ -1795,6 +1795,7 @@ void UpdateGraphics(bool skipRepaint)
                         do
                         {
                             B = 0;
+#if 0 // Old line breaking algorithm
                             for(A = 1; A <= int(SuperText.size()); A++)
                             {
                                 if(SuperText[size_t(A) - 1] == ' ' || A == int(SuperText.size()))
@@ -1805,12 +1806,32 @@ void UpdateGraphics(bool skipRepaint)
                                         break;
                                 }
                             }
+#else // Better line breaking algorithm
+                            for(A = 1; A <= int(SuperText.size()) && A < 27; A++)
+                            {
+                                auto c = SuperText[size_t(A) - 1];
+                                if(A == int(SuperText.size()))
+                                {
+                                    if(A < 28)
+                                        B = A;
+                                }
+                                else if(c == ' ')
+                                    B = A;
+                                else if(c == '\n')
+                                {
+                                    B = A;
+                                    break;
+                                }
+                            }
+#endif
 
                             if(B == 0)
                                 B = A;
 
                             tempText = SuperText.substr(0, size_t(B));
-                            SuperText = SuperText.substr(size_t(B), SuperText.length());
+//                            SuperText = SuperText.substr(size_t(B), SuperText.length());
+                            SuperText.erase(0, size_t(B));
+
                             frmMain.renderTexture(400 - GFX.TextBox.w / 2 + X, BoxY + Y + Y,
                                                   GFX.TextBox.w, 20, GFX.TextBox, 0, 20);
                             if(SuperText.length() == 0 && !tempBool)
