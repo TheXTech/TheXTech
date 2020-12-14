@@ -139,6 +139,7 @@ jobs:
         protocol: ftps
         local-dir: ./build/package/
         server-dir: ${{ matrix.config.upload_directory }}
+        security: loose
 
     - name: List Build Directory
       if: always()
