@@ -23,7 +23,7 @@ jobs:
             deps_cmdline: "brew install ninja wget p7zip lftp",
             build_type: "MinSizeRel",
             assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-smbx13-assets-full.7z",
-            package_filename: "thextech-super-mario-bros-x-dev.dmg",
+            package_filename: "thextech-super-mario-bros-x-intel-dev.dmg",
             upload_directory: "www/macosx/"
           }
         - {
@@ -34,7 +34,7 @@ jobs:
             build_type: "MinSizeRel",
             assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-smbx13-assets-full.7z",
             subdir_name: "thextech-super-mario-bros-x",
-            package_filename: "thextech-super-mario-bros-x-ubuntu-16-04-dev.tar.gz",
+            package_filename: "thextech-super-mario-bros-x-ubuntu-16-04-amd64-dev.tar.gz",
             upload_directory: "www/ubuntu-16-04/"
           }
         - {
@@ -45,7 +45,7 @@ jobs:
             build_type: "MinSizeRel",
             assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-smbx13-assets-full.7z",
             subdir_name: "thextech-super-mario-bros-x",
-            package_filename: "thextech-super-mario-bros-x-ubuntu-18-04-dev.tar.gz",
+            package_filename: "thextech-super-mario-bros-x-ubuntu-18-04-amd64-dev.tar.gz",
             upload_directory: "www/ubuntu-18-04/"
           }
         - {
@@ -56,7 +56,7 @@ jobs:
             build_type: "MinSizeRel",
             assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-smbx13-assets-full.7z",
             subdir_name: "thextech-super-mario-bros-x",
-            package_filename: "thextech-super-mario-bros-x-ubuntu-20-04--dev.tar.gz",
+            package_filename: "thextech-super-mario-bros-x-ubuntu-20-04-amd64-dev.tar.gz",
             upload_directory: "www/ubuntu-20-04/"
           }
 
