@@ -23,7 +23,8 @@ jobs:
             deps_cmdline: "brew install ninja wget p7zip",
             build_type: "MinSizeRel",
             assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-smbx13-assets-full.7z",
-            package_filename: "thextech-super-mario-bros-x.dmg"
+            package_filename: "thextech-super-mario-bros-x-dev.dmg",
+            upload_directory: "www/macosx/"
           }
         - {
             name: "Super Mario Bros. X - Ubuntu 16.04",
@@ -33,7 +34,8 @@ jobs:
             build_type: "MinSizeRel",
             assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-smbx13-assets-full.7z",
             subdir_name: "thextech-super-mario-bros-x",
-            package_filename: "thextech-super-mario-bros-x.tar.gz"
+            package_filename: "thextech-super-mario-bros-x-ubuntu-16-04-dev.tar.gz",
+            upload_directory: "www/ubuntu-16-04/"
           }
         - {
             name: "Super Mario Bros. X - Ubuntu 18.04",
@@ -43,7 +45,8 @@ jobs:
             build_type: "MinSizeRel",
             assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-smbx13-assets-full.7z",
             subdir_name: "thextech-super-mario-bros-x",
-            package_filename: "thextech-super-mario-bros-x.tar.gz"
+            package_filename: "thextech-super-mario-bros-x-ubuntu-18-04-dev.tar.gz",
+            upload_directory: "www/ubuntu-18-04/"
           }
         - {
             name: "Super Mario Bros. X - Ubuntu 20.04",
@@ -53,7 +56,8 @@ jobs:
             build_type: "MinSizeRel",
             assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-smbx13-assets-full.7z",
             subdir_name: "thextech-super-mario-bros-x",
-            package_filename: "thextech-super-mario-bros-x.tar.gz"
+            package_filename: "thextech-super-mario-bros-x-ubuntu-20-04--dev.tar.gz",
+            upload_directory: "www/ubuntu-20-04/"
           }
 
     steps:
@@ -114,16 +118,27 @@ jobs:
           cp -r ../assets/* "package/${{ matrix.config.subdir_name }}/"
           cd package
           tar -cvzf "${{ matrix.config.package_filename }}" "${{ matrix.config.subdir_name }}"
+          rm -Rf "${{ matrix.config.subdir_name }}"
           cd ..
         fi
         cd ..
 
-    - name: Upload Package
+    - name: Upload artifact
       if: runner.os == 'macOS' || runner.os == 'Linux'  # Remove to store packages of all targets
       uses: actions/upload-artifact@v2
       with:
         path: build/package/${{ matrix.config.package_filename }}
         name: ${{ matrix.config.name }} ${{ matrix.config.build_type }}
+
+    - name: Deploy to builds.wohlsoft.ru
+      uses: SamKirkland/FTP-Deploy-Action@4.0.0
+      with:
+        server: ${{ secrets.builds_host }}
+        username: ${{ secrets.builds_login }}
+        password: ${{ secrets.builds_password }}
+        protocol: ftps
+        local-dir: ./build/package/
+        server-dir: ${{ matrix.config.upload_directory }}
 
     - name: List Build Directory
       if: always()
