@@ -110,7 +110,7 @@ jobs:
         if [[ "${{ runner.os }}" == 'Windows' ]]; then
           echo "WIP"
         elif [[ "${{ runner.os }}" == 'macOS' ]]; then
-          cpack ..
+          cpack
           mv *.dmg package/${{ matrix.config.package_filename }}
         elif [[ "${{ runner.os }}" == 'Linux' ]]; then
           mkdir "package/${{ matrix.config.subdir_name }}"
@@ -131,14 +131,12 @@ jobs:
         name: ${{ matrix.config.name }} ${{ matrix.config.build_type }}
 
     - name: Deploy to builds.wohlsoft.ru
-      uses: MajorVengeance/Ftp-Deploy-Action@v0.2.3-alpha
-      with:
-        ftp_host: ${{ secrets.builds_host }}
-        ftp_username: ${{ secrets.builds_login }}
-        ftp_password: ${{ secrets.builds_password }}
-        local_source_dir: ./build/package/
-        dist_target_dir: ${{ matrix.config.upload_directory }}
-        disable_ssl_certificate_verification: true
+      if: runner.os == 'macOS' || runner.os == 'Linux'
+      shell: bash
+      run: |
+        UPLOAD_LIST="set ssl:verify-certificate no;"
+        UPLOAD_LIST="${UPLOAD_LIST} put -O ${{ matrix.config.upload_directory }} ./build/package/${{ matrix.config.package_filename }};"
+        lftp -e "${UPLOAD_LIST} exit" -u ${{ secrets.builds_login }},${{ secrets.builds_password }} ${{ secrets.builds_host }}
 
     - name: List Build Directory
       if: always()
