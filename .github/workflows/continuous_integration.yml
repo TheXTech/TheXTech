@@ -20,7 +20,7 @@ jobs:
             name: "Super Mario Bros. X - macOS",
             os: macos-latest,
             extra_options: "-DTHEXTECH_PRELOAD_ENVIRONMENT=\"`pwd`/assets/\" -DTHEXTECH_CUSTOM_ICON_PATH=\"`pwd`/assets/graphics/ui/icon/smbx.icns\" -DTHEXTECH_ICON_NAME=smbx.icns -DTHEXTECH_BUNDLE_NAME=\"Super Mario Bros. X\" -DTHEXTECH_EXECUTABLE_NAME=\"thextech\"",
-            deps_cmdline: "brew install ninja wget p7zip",
+            deps_cmdline: "brew install ninja wget p7zip lftp",
             build_type: "MinSizeRel",
             assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-smbx13-assets-full.7z",
             package_filename: "thextech-super-mario-bros-x-dev.dmg",
@@ -30,7 +30,7 @@ jobs:
             name: "Super Mario Bros. X - Ubuntu 16.04",
             os: ubuntu-16.04,
             extra_options: "-DUSE_STATIC_LIBC=ON -DUSE_SYSTEM_LIBS=OFF -DUSE_SYSTEM_SDL2=OFF -DUSE_SHARED_FREEIMAGE=OFF -DPGE_SHARED_SDLMIXER=OFF",
-            deps_cmdline: "sudo apt-get update -qq && sudo apt-get install -qq cmake ninja-build cmake ninja-build \"^libxcb.*\" libx11-dev libx11-xcb-dev libgtk-3-dev libgegl-dev libxcursor-dev libxrender-dev libxrandr-dev libxext-dev libxi-dev libxss-dev libxt-dev libxv-dev libxxf86vm-dev libxinerama-dev libxkbcommon-dev libfontconfig1-dev libasound2-dev libpulse-dev libdbus-1-dev udev mtdev-tools webp libudev-dev libglm-dev libwayland-dev libegl1-mesa-dev mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev libgles2-mesa libgles2-mesa-dev libmirclient-dev libproxy-dev",
+            deps_cmdline: "sudo apt-get update -qq && sudo apt-get install -qq cmake ninja-build cmake ninja-build lftp \"^libxcb.*\" libx11-dev libx11-xcb-dev libgtk-3-dev libgegl-dev libxcursor-dev libxrender-dev libxrandr-dev libxext-dev libxi-dev libxss-dev libxt-dev libxv-dev libxxf86vm-dev libxinerama-dev libxkbcommon-dev libfontconfig1-dev libasound2-dev libpulse-dev libdbus-1-dev udev mtdev-tools webp libudev-dev libglm-dev libwayland-dev libegl1-mesa-dev mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev libgles2-mesa libgles2-mesa-dev libmirclient-dev libproxy-dev",
             build_type: "MinSizeRel",
             assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-smbx13-assets-full.7z",
             subdir_name: "thextech-super-mario-bros-x",
@@ -41,7 +41,7 @@ jobs:
             name: "Super Mario Bros. X - Ubuntu 18.04",
             os: ubuntu-18.04,
             extra_options: "-DUSE_STATIC_LIBC=ON -DUSE_SYSTEM_LIBS=OFF -DUSE_SYSTEM_SDL2=OFF -DUSE_SHARED_FREEIMAGE=OFF -DPGE_SHARED_SDLMIXER=OFF",
-            deps_cmdline: "sudo apt-get update -qq && sudo apt-get install -qq cmake ninja-build cmake ninja-build \"^libxcb.*\" libx11-dev libx11-xcb-dev libgtk-3-dev libgegl-dev libxcursor-dev libxrender-dev libxrandr-dev libxext-dev libxi-dev libxss-dev libxt-dev libxv-dev libxxf86vm-dev libxinerama-dev libxkbcommon-dev libfontconfig1-dev libasound2-dev libpulse-dev libdbus-1-dev udev mtdev-tools webp libudev-dev libglm-dev libwayland-dev libegl1-mesa-dev mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev libgles2-mesa libgles2-mesa-dev libmirclient-dev libproxy-dev",
+            deps_cmdline: "sudo apt-get update -qq && sudo apt-get install -qq cmake ninja-build cmake ninja-build lftp \"^libxcb.*\" libx11-dev libx11-xcb-dev libgtk-3-dev libgegl-dev libxcursor-dev libxrender-dev libxrandr-dev libxext-dev libxi-dev libxss-dev libxt-dev libxv-dev libxxf86vm-dev libxinerama-dev libxkbcommon-dev libfontconfig1-dev libasound2-dev libpulse-dev libdbus-1-dev udev mtdev-tools webp libudev-dev libglm-dev libwayland-dev libegl1-mesa-dev mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev libgles2-mesa libgles2-mesa-dev libmirclient-dev libproxy-dev",
             build_type: "MinSizeRel",
             assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-smbx13-assets-full.7z",
             subdir_name: "thextech-super-mario-bros-x",
@@ -52,7 +52,7 @@ jobs:
             name: "Super Mario Bros. X - Ubuntu 20.04",
             os: ubuntu-20.04,
             extra_options: "-DUSE_STATIC_LIBC=ON -DUSE_SYSTEM_LIBS=OFF -DUSE_SYSTEM_SDL2=OFF -DUSE_SHARED_FREEIMAGE=OFF -DPGE_SHARED_SDLMIXER=OFF",
-            deps_cmdline: "sudo apt-get update -qq && sudo apt-get install -qq cmake ninja-build cmake ninja-build \"^libxcb.*\" libx11-dev libx11-xcb-dev libgtk-3-dev libgegl-dev libxcursor-dev libxrender-dev libxrandr-dev libxext-dev libxi-dev libxss-dev libxt-dev libxv-dev libxxf86vm-dev libxinerama-dev libxkbcommon-dev libfontconfig1-dev libasound2-dev libpulse-dev libdbus-1-dev udev mtdev-tools webp libudev-dev libglm-dev libwayland-dev libegl1-mesa-dev mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev libgles2-mesa libgles2-mesa-dev libmirclient-dev libproxy-dev",
+            deps_cmdline: "sudo apt-get update -qq && sudo apt-get install -qq cmake ninja-build cmake ninja-build lftp \"^libxcb.*\" libx11-dev libx11-xcb-dev libgtk-3-dev libgegl-dev libxcursor-dev libxrender-dev libxrandr-dev libxext-dev libxi-dev libxss-dev libxt-dev libxv-dev libxxf86vm-dev libxinerama-dev libxkbcommon-dev libfontconfig1-dev libasound2-dev libpulse-dev libdbus-1-dev udev mtdev-tools webp libudev-dev libglm-dev libwayland-dev libegl1-mesa-dev mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev libgles2-mesa libgles2-mesa-dev libmirclient-dev libproxy-dev",
             build_type: "MinSizeRel",
             assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-smbx13-assets-full.7z",
             subdir_name: "thextech-super-mario-bros-x",
@@ -131,15 +131,14 @@ jobs:
         name: ${{ matrix.config.name }} ${{ matrix.config.build_type }}
 
     - name: Deploy to builds.wohlsoft.ru
-      uses: SamKirkland/FTP-Deploy-Action@4.0.0
+      uses: MajorVengeance/Ftp-Deploy-Action@v0.2.3-alpha
       with:
-        server: ${{ secrets.builds_host }}
-        username: ${{ secrets.builds_login }}
-        password: ${{ secrets.builds_password }}
-        protocol: ftps
-        local-dir: ./build/package/
-        server-dir: ${{ matrix.config.upload_directory }}
-        security: loose
+        ftp_host: ${{ secrets.builds_host }}
+        ftp_username: ${{ secrets.builds_login }}
+        ftp_password: ${{ secrets.builds_password }}
+        local_source_dir: ./build/package/
+        dist_target_dir: ${{ matrix.config.upload_directory }}
+        disable_ssl_certificate_verification: true
 
     - name: List Build Directory
       if: always()
