@@ -35,6 +35,26 @@ jobs:
             subdir_name: "thextech-super-mario-bros-x",
             package_filename: "thextech-super-mario-bros-x.tar.gz"
           }
+        - {
+            name: "Super Mario Bros. X - Ubuntu 18.04",
+            os: ubuntu-18.04,
+            extra_options: "-DUSE_STATIC_LIBC=ON -DUSE_SYSTEM_LIBS=OFF -DUSE_SYSTEM_SDL2=OFF -DUSE_SHARED_FREEIMAGE=OFF",
+            deps_cmdline: "sudo apt update && sudo apt install cmake ninja-build",
+            build_type: "MinSizeRel",
+            assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-smbx13-assets-full.7z",
+            subdir_name: "thextech-super-mario-bros-x",
+            package_filename: "thextech-super-mario-bros-x.tar.gz"
+          }
+        - {
+            name: "Super Mario Bros. X - Ubuntu 20.04",
+            os: ubuntu-20.04,
+            extra_options: "-DUSE_STATIC_LIBC=ON -DUSE_SYSTEM_LIBS=OFF -DUSE_SYSTEM_SDL2=OFF -DUSE_SHARED_FREEIMAGE=OFF",
+            deps_cmdline: "sudo apt update && sudo apt install cmake ninja-build",
+            build_type: "MinSizeRel",
+            assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-smbx13-assets-full.7z",
+            subdir_name: "thextech-super-mario-bros-x",
+            package_filename: "thextech-super-mario-bros-x.tar.gz"
+          }
 
     steps:
     - uses: actions/checkout@v1
@@ -70,8 +90,15 @@ jobs:
         export MAKEFLAGS=--keep-going
         cmake --build build --config ${{ matrix.config.build_type }} --parallel 3
 
+    - name: List dependent libraries
+      if: runner.os == 'Linux'
+      shell: bash
+      run: |
+        file build/output/bin/thextech
+        ldd build/output/bin/thextech
+
     - name: Create Package
-      if: runner.os == 'macOS'  # Remove to make packages of all targets
+      if: runner.os == 'macOS' || runner.os == 'Linux'  # Remove to make packages of all targets
       shell: bash
       run: |
         cd build
@@ -84,13 +111,13 @@ jobs:
         elif [[ "${{ runner.os }}" == 'Linux' ]]; then
           mkdir "package/${{ matrix.config.subdir_name }}"
           cp output/bin/thextech "package/${{ matrix.config.subdir_name }}/thextech"
-          cp -r assets/* "package/${{ matrix.config.subdir_name }}/"
+          cp -r ../assets/* "package/${{ matrix.config.subdir_name }}/"
           tar -cvzf -C package "${{ matrix.config.package_filename }}" "${{ matrix.config.subdir_name }}"
         fi
         cd ..
 
     - name: Upload Package
-      if: runner.os == 'macOS'  # Remove to store packages of all targets
+      if: runner.os == 'macOS' || runner.os == 'Linux'  # Remove to store packages of all targets
       uses: actions/upload-artifact@v2
       with:
         path: build/package/${{ matrix.config.package_filename }}
