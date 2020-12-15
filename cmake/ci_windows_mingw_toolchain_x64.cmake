@@ -1,4 +1,6 @@
-set(CMAKE_SYSROOT "C:/WohlMinGWw64/mingw64")
+set(CMAKE_SYSROOT "C:/WohlMinGWw64/mingw64/")
+
+set(CMAKE_SYSTEM_PREFIX_PATH "C:/WohlMinGWw64/mingw64/")
 
 set(CMAKE_C_COMPILER "C:/WohlMinGWw64/mingw64/bin/gcc.exe")
 set(CMAKE_CXX_COMPILER "C:/WohlMinGWw64/mingw64/bin/g++.exe")

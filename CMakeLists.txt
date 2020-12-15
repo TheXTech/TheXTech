@@ -416,7 +416,7 @@ elseif(WIN32)
     # For MinGW toolchain, copy missing DLLs
     if(MINGW)
         function(find_mingw_dll _FieldName _FileName _DestList _SearchPaths)
-            find_file(MINGWDLL_${_FieldName} ${_FileName} PATHS "${_SearchPaths}")
+            find_file(MINGWDLL_${_FieldName} ${_FileName} PATH_SUFFIXES bin PATHS "${_SearchPaths}")
             if(MINGWDLL_${_FieldName})
                 list(APPEND ${_DestList} "${MINGWDLL_${_FieldName}}")
                 set(${_DestList} ${${_DestList}} PARENT_SCOPE)
