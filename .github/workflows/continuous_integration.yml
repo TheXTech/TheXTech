@@ -161,8 +161,8 @@ jobs:
         mkdir package
         if [[ "${{ runner.os }}" == 'Windows' ]]; then
           mkdir "package/${{ matrix.config.subdir_name }}"
-          cp output/bin/thextech.exe "package/${{ matrix.config.subdir_name }}/
-          cp output/bin/*.dll "package/${{ matrix.config.subdir_name }}/
+          cp output/bin/thextech.exe "package/${{ matrix.config.subdir_name }}/"
+          cp output/bin/*.dll "package/${{ matrix.config.subdir_name }}/"
           cp -r ../assets/* "package/${{ matrix.config.subdir_name }}/"
           cd package
           7z a "${{ matrix.config.package_filename }}" "${{ matrix.config.subdir_name }}"
