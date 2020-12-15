@@ -38,7 +38,7 @@ jobs:
             upload_directory: "www/win32/",
             extra_path: "C:/msys64/usr/bin:C:/Qt/Tools/mingw730_64/bin",
             ninja_download: "https://wohlsoft.ru/docs/Software/Ninja-Build/ninja-win.zip",
-            ninja_install_dir: C:/Qt/Tools/mingw730_64/bin
+            ninja_install_dir: "C:/Qt/Tools/mingw730_64/bin"
           }
         - {
             name: "Super Mario Bros. X - Ubuntu 16.04",
