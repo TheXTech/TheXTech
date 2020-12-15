@@ -36,7 +36,7 @@ jobs:
             subdir_name: "thextech-super-mario-bros-x",
             package_filename: "thextech-super-mario-bros-x-win64-dev.7z",
             upload_directory: "www/win32/",
-            extra_path: "C:/Qt/Tools/mingw730_64/bin"
+            extra_path: "C:/msys64/usr/bin:C:/Qt/Tools/mingw730_64/bin"
           }
         - {
             name: "Super Mario Bros. X - Ubuntu 16.04",
@@ -86,9 +86,14 @@ jobs:
         git submodule update
 
     - name: Download assets
+      uses: carlosperate/download-file-action@v1.0.3
+      with:
+        file-url: "${{ matrix.config.assets_url }}"
+        file-name: assets.7z
+    
+    - name: Unpack assets
       shell: bash
       run: |
-        wget "${{ matrix.config.assets_url }}" -O assets.7z
         mkdir -p assets
         cd assets
         7z x ../assets.7z
