@@ -127,12 +127,6 @@ jobs:
       run: |
         7z x ninja.zip -o"${{ matrix.config.ninja_install_dir }}"
 
-    - name: Download assets
-      uses: carlosperate/download-file-action@v1.0.3
-      with:
-        file-url: "${{ matrix.config.assets_url }}"
-        file-name: assets.7z
-
     - name: Download LFTP
       if: matrix.config.lftp_download
       uses: carlosperate/download-file-action@v1.0.3
@@ -145,6 +139,12 @@ jobs:
       shell: bash
       run: |
         7z x lftp.7z bin etc -o"${{ matrix.config.lftp_install_dir }}"
+
+    - name: Download assets
+      uses: carlosperate/download-file-action@v1.0.3
+      with:
+        file-url: "${{ matrix.config.assets_url }}"
+        file-name: assets.7z
 
     - name: Unpack assets
       shell: bash
