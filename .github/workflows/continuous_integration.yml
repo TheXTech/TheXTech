@@ -88,14 +88,14 @@ jobs:
         git submodule update
     
     - name: Download Ninja
-      if: matrix.config.ninja_download != Null
+      if: matrix.config.ninja_download
       uses: carlosperate/download-file-action@v1.0.3
       with:
         file-url: "${{ matrix.config.ninja_download }}"
         file-name: ninja.zip
         
     - name: Extract Ninja
-      if: matrix.config.ninja_install_dir != Null
+      if: matrix.config.ninja_install_dir
       shell: bash
       run: |
         7z x ninja.zip -o"${{ matrix.config.ninja_install_dir }}"
