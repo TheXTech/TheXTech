@@ -81,7 +81,7 @@ jobs:
             assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-smbx13-assets-full.7z",
             subdir_name: "thextech-super-mario-bros-x",
             extra_path: "/c/WohlMinGWw64/mingw32/bin",
-            package_filename: "thextech-super-mario-bros-x-win64-dev.7z",
+            package_filename: "thextech-super-mario-bros-x-win32-dev.7z",
             upload_directory: "www/win32/",
             mingw_download: "https://wohlsoft.ru/docs/Software/MinGW/i686-8.1.0-release-posix-dwarf-rt_v6-rev0.7z", mingw_install_dir: "C:/WohlMinGWw64/",
             ninja_download: "https://wohlsoft.ru/docs/Software/Ninja-Build/ninja-win.zip", ninja_install_dir: "C:/WohlMinGWw64/mingw32/bin",
