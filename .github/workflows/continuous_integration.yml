@@ -29,7 +29,7 @@ jobs:
         - {
             name: "Windows - 64-bit",
             os: windows-latest,
-            extra_options: "-DCMAKE_PREFIX_PATH=C:/WohlMinGWw64/mingw64 -DCMAKE_MAKE_PROGRAM=C:/WohlMinGWw64/mingw64/bin/ninja.exe -DCMAKE_C_COMPILER=C:/WohlMinGWw64/mingw64/bin/gcc.exe -DCMAKE_CXX_COMPILER=C:/WohlMinGWw64/mingw64/bin/g++.exe",
+            extra_options: "-DCMAKE_PREFIX_PATH=C:/WohlMinGWw64/mingw64 -DCMAKE_TOOLCHAIN_FILE=`pwd`/cmake/ci_windows_mingw_toolchain_x64.cmake",
 #             deps_cmdline: "wget https://wohlsoft.ru/docs/Software/lftp-4.4.15.win64-openssl-1.0.1g.7z -O lftp.7z && 7z x lftp.7z -oC:/lftp",
             build_type: "MinSizeRel",
             assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-smbx13-assets-full.7z",
@@ -86,7 +86,7 @@ jobs:
         # Pull submodules
         git submodule init
         git submodule update
-    
+
     - name: Download MinGW
       if: matrix.config.mingw_download
       uses: carlosperate/download-file-action@v1.0.3
@@ -106,7 +106,7 @@ jobs:
       with:
         file-url: "${{ matrix.config.ninja_download }}"
         file-name: ninja.zip
-        
+
     - name: Extract Ninja
       if: matrix.config.ninja_install_dir
       shell: bash
@@ -118,7 +118,7 @@ jobs:
       with:
         file-url: "${{ matrix.config.assets_url }}"
         file-name: assets.7z
-    
+
     - name: Unpack assets
       shell: bash
       run: |
