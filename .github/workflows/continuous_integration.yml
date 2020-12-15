@@ -36,7 +36,9 @@ jobs:
             subdir_name: "thextech-super-mario-bros-x",
             package_filename: "thextech-super-mario-bros-x-win64-dev.7z",
             upload_directory: "www/win32/",
-            extra_path: "C:/msys64/usr/bin:C:/Qt/Tools/mingw730_64/bin"
+            extra_path: "C:/msys64/usr/bin:C:/Qt/Tools/mingw730_64/bin",
+            ninja_download: "https://wohlsoft.ru/docs/Software/Ninja-Build/ninja-win.zip",
+            ninja_install_dir: C:/Qt/Tools/mingw730_64/bin
           }
         - {
             name: "Super Mario Bros. X - Ubuntu 16.04",
@@ -84,6 +86,19 @@ jobs:
         # Pull submodules
         git submodule init
         git submodule update
+    
+    - name: Download Ninja
+      if: matrix.config.ninja_download != Null
+      uses: carlosperate/download-file-action@v1.0.3
+      with:
+        file-url: "${{ matrix.config.ninja_download }}"
+        file-name: ninja.zip
+        
+    - name: Extract Ninja
+      if: matrix.config.ninja_install_dir != Null
+      shell: bash
+      run: |
+        7z x ninja.zip -o"${{ matrix.config.ninja_install_dir }}"
 
     - name: Download assets
       uses: carlosperate/download-file-action@v1.0.3
