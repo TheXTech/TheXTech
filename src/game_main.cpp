@@ -97,6 +97,9 @@ int GameMain(const CmdLineSetup_t &setup)
 
     LoadingInProcess = true;
 
+    ShowFPS = setup.testShowFPS;
+    MaxFPS = setup.testMaxFPS;
+
     InitControls(); // init player's controls
     DoEvents();
 
@@ -137,9 +140,6 @@ int GameMain(const CmdLineSetup_t &setup)
         IntProc::init();
 
     LoadingInProcess = false;
-
-    ShowFPS = setup.testShowFPS;
-    MaxFPS = setup.testMaxFPS;
 
     if(!setup.testLevel.empty() || setup.interprocess) // Start level testing immediately!
     {
