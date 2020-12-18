@@ -77,6 +77,8 @@ void OpenConfig()
         config.beginGroup("main");
         config.read("release", FileRelease, curRelease);
         config.read("full-screen", resBool, false);
+        config.read("frame-skip", FrameSkip, FrameSkip);
+        config.read("show-fps", ShowFPS, ShowFPS);
         config.endGroup();
 
         config.beginGroup("gameplay");
@@ -131,6 +133,9 @@ void SaveConfig()
 #ifndef __EMSCRIPTEN__ // Don't remember fullscreen state for Emscripten!
     config.setValue("full-screen", resChanged);
 #endif
+    // TODO: Make sure, saving of those settings will not been confused by line arguments
+//    config.setValue("frame-skip", FrameSkip);
+//    config.setValue("show-fps", ShowFPS);
     config.endGroup();
 
     config.beginGroup("gameplay");
