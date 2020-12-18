@@ -1125,6 +1125,8 @@ extern std::vector<SelectWorld_t> SelectWorld;
 extern bool ShowFPS;
 //Public PrintFPS As Double
 extern double PrintFPS;
+// Do ground-point by alt-run key instead of down
+extern bool GameplayPoundByAltRun;
 //Public vScreen(0 To 2) As vScreen 'Sets up the players screens
 extern RangeArr<vScreen_t, 0, 2> vScreen;
 //Public ScreenType As Integer 'The screen/view type

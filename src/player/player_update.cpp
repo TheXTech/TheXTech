@@ -296,7 +296,8 @@ void UpdatePlayer()
                 {
                     if(Player[A].Mount == 3 && Player[A].MountType == 6) // Purple Yoshi Pound
                     {
-                        if(Player[A].Controls.AltRun && Player[A].DuckRelease && Player[A].CanPound)
+                        bool poundKeyPressed = GameplayPoundByAltRun ? Player[A].Controls.AltRun : Player[A].Controls.Down;
+                        if(poundKeyPressed && Player[A].DuckRelease && Player[A].CanPound)
                         {
                             Player[A].GroundPound = true;
                             Player[A].GroundPound2 = true;
@@ -307,11 +308,17 @@ void UpdatePlayer()
                 }
                 else
                     Player[A].CanPound = false;
+
                 if(Player[A].GroundPound)
                 {
                     if(!Player[A].CanPound && Player[A].Location.SpeedY < 0)
                         Player[A].GroundPound = false;
-                    Player[A].Controls.AltRun = true;
+
+                    if(GameplayPoundByAltRun)
+                        Player[A].Controls.AltRun = true;
+                    else
+                        Player[A].Controls.Down = true;
+
                     Player[A].CanJump = false;
                     Player[A].Controls.Left = false;
                     Player[A].Controls.Up = false;

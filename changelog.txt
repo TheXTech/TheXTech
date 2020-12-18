@@ -6,6 +6,7 @@ Changes for 1.3.3
 -Added an ability to run executable with a different assets directory specified
 -Added the support for playable character custom INI calibrations
 -Message box line breaking algorithm has been improved, added support for new-line characters
+-Settings now can remember the initial state of the frame-skip and show-fps options
 
 Changes for 1.3.2.4
 -Allow music change for outro level (if outro level has non-silent music, it will be played instead of built-in)

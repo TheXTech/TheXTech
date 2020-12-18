@@ -79,6 +79,10 @@ void OpenConfig()
         config.read("full-screen", resBool, false);
         config.endGroup();
 
+        config.beginGroup("gameplay");
+        config.read("ground-pound-by-alt-run", GameplayPoundByAltRun, false);
+        config.endGroup();
+
         For(A, 1, 2)
         {
             config.beginGroup(fmt::format_ne("player-{0}-keyboard", A));
@@ -121,11 +125,16 @@ void SaveConfig()
 //    Dim A As Integer
     std::string configPath = AppPathManager::settingsFileSTD();
     IniProcessing config(configPath);
+
     config.beginGroup("main");
     config.setValue("release", curRelease);
 #ifndef __EMSCRIPTEN__ // Don't remember fullscreen state for Emscripten!
     config.setValue("full-screen", resChanged);
 #endif
+    config.endGroup();
+
+    config.beginGroup("gameplay");
+    config.setValue("ground-pound-by-alt-run", GameplayPoundByAltRun);
     config.endGroup();
 
     For(A, 1, 2)

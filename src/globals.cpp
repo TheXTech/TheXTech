@@ -69,6 +69,7 @@ int NumSelectWorld  = 0;
 std::vector<SelectWorld_t> SelectWorld;
 bool ShowFPS = false;
 double PrintFPS = 0.0;
+bool GameplayPoundByAltRun = false;
 RangeArr<vScreen_t, 0, 2> vScreen;
 int ScreenType = 0;
 int DScreenType = 0;
