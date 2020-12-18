@@ -137,7 +137,7 @@ void CheatCode(char NewKey)
 
     if(LevelSelect) // On world map
     {
-        if(SDL_strstr(CheatString.c_str(), "imtiredofallthiswalking"))
+        if(SDL_strstr(CheatString.c_str(), "imtiredofallthiswalking") || SDL_strstr(CheatString.c_str(), "moonwalk") || SDL_strstr(CheatString.c_str(), "skywalk") || SDL_strstr(CheatString.c_str(), "skzwalk"))
         {
             for(B = 1; B <= numWorldPaths; B++)
             {
