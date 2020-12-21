@@ -50,6 +50,20 @@ target_link_libraries(PGE_FreeImage INTERFACE
     "${libFreeImage_Libs}"
 )
 
+if(USE_FREEIMAGE_SYSTEM_LIBS AND NOT USE_SHARED_FREEIMAGE)
+    find_library(LIBRARY_PNG png)
+    find_library(LIBRARY_JPEG jpeg)
+
+    if(NOT LIBRARY_PNG OR NOT LIBRARY_JPEG)
+        message(FATAL_ERROR "Required libPNG and libJPEG libraries are not found!")
+    endif()
+
+    target_link_libraries(PGE_FreeImage INTERFACE
+        "${LIBRARY_PNG}"
+        "${LIBRARY_JPEG}"
+    )
+endif()
+
 if(USE_SHARED_FREEIMAGE AND NOT WIN32)
     install(FILES ${libFreeImage_Libs} DESTINATION ${PGE_INSTALL_DIRECTORY})
 endif()
