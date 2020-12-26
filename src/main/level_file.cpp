@@ -128,6 +128,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 
     numBlock = 0;
     numBackground = 0;
+    numLocked = 0;
     numNPCs = 0;
     numWarps = 0;
 
@@ -760,6 +761,9 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         }
     }
 
+    // If too much locks
+    SDL_assert_release(numBackground + numLocked <= (maxBackgrounds + maxWarps));
+
     SoundPause[13] = 100;
     overTime = 0;
     GoalTime = SDL_GetTicks() + 1000;
@@ -881,12 +885,12 @@ void ClearLevel()
 
     for(A = -128; A <= maxNPCs; A++)
         NPC[A] = blankNPC;
-
     numNPCs = 0;
+
     for(A = 1; A <= maxBlocks; A++)
         Block[A] = blankBlock;
-
     numBlock = 0;
+
     for(A = 1; A <= maxBackgrounds; A++)
         Background[A] = BlankBackground;
 
@@ -910,6 +914,7 @@ void ClearLevel()
 
     numEffects = 0;
     numBackground = 0;
+    numLocked = 0;
     MidBackground = 1;
     LastBackground = 0;
     PlayerStart[1] = BlankLocation;

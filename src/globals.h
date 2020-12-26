@@ -1277,7 +1277,7 @@ extern int numWorldMusic;
 //Public WorldLevel(1 To maxWorldLevels) As WorldLevel
 extern RangeArr<WorldLevel_t, 1, maxWorldLevels> WorldLevel;
 //Public Background(1 To maxBackgrounds) As Background
-extern RangeArr<Background_t, 1, maxBackgrounds> Background;
+extern RangeArr<Background_t, 1, (maxBackgrounds + maxWarps)> Background;
 //Public Effect(1 To maxEffects) As Effect
 extern RangeArr<Effect_t, 1, maxEffects> Effect;
 //Public NPC(-128 To maxNPCs) As NPC
