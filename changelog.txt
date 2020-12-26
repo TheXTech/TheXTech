@@ -1,5 +1,8 @@
 TheXTech Changelog.
 
+Changes for 1.3.3.1
+-Fixed a crash, caused by the incremental locked warps counter that leads BGO array exciting
+
 Changes for 1.3.3
 -Added the "gameinfo.ini" to give the support for the partial customization of internals (window/game title, character names in menu, credits, etc.)
 -Added an ability to globally override NPC settings by placing of npc-*.txt file into graphics/npc directlry of assets
