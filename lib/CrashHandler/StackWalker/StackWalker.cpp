@@ -763,7 +763,7 @@ cleanup:
             if((this->m_parent->m_options & StackWalker::RetrieveFileVersion) != 0)
             {
                 VS_FIXEDFILEINFO *fInfo = NULL;
-                DWORD dwHandle;
+                DWORD dwHandle = 0;
                 DWORD dwSize = GetFileVersionInfoSizeA(szImg, &dwHandle);
                 if(dwSize > 0)
                 {
@@ -1136,6 +1136,14 @@ BOOL StackWalker::ShowCallstack(HANDLE hThread, const CONTEXT *context, PReadPro
     s.AddrBStore.Offset = c.RsBSP;
     s.AddrBStore.Mode = AddrModeFlat;
     s.AddrStack.Offset = c.IntSp;
+    s.AddrStack.Mode = AddrModeFlat;
+    #elif _M_ARM64
+    imageType = IMAGE_FILE_MACHINE_ARM64;
+    s.AddrPC.Offset = c.Pc;
+    s.AddrPC.Mode = AddrModeFlat;
+    s.AddrFrame.Offset = c.Fp;
+    s.AddrFrame.Mode = AddrModeFlat;
+    s.AddrStack.Offset = c.Sp;
     s.AddrStack.Mode = AddrModeFlat;
     #else
 #error "Platform not supported!"
