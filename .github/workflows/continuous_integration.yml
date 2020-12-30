@@ -195,7 +195,7 @@ jobs:
             subdir_name: "thextech-super-mario-bros-x",
             extra_path: "/c/WohlLFTP/bin",
             executable_name: "smbx-arm64.exe",
-            package_filename: "thextech-super-mario-bros-x-win32-dev.7z",
+            package_filename: "thextech-super-mario-bros-x-arm64-dev.7z",
             upload_directory: "www/win-arm/",
             lftp_download: "https://wohlsoft.ru/docs/Software/lftp-4.4.15.win64-openssl-1.0.1g.7z", lftp_install_dir: "C:/WohlLFTP/"
           }
