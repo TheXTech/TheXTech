@@ -186,20 +186,6 @@ jobs:
             lftp_download: "https://wohlsoft.ru/docs/Software/lftp-4.4.15.win64-openssl-1.0.1g.7z", lftp_install_dir: "C:/WohlMinGWw64/mingw32/"
           }
         - {
-            name: "Super Mario Bros. X - Windows - ARM32",
-            os: windows-latest,
-            extra_options: "-A ARM -DTHEXTECH_EXECUTABLE_NAME=smbx-arm",
-            generator: "Visual Studio 16 2019",
-            build_type: "MinSizeRel",
-            assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-smbx13-assets-full.7z",
-            subdir_name: "thextech-super-mario-bros-x",
-            extra_path: "/c/WohlLFTP/bin",
-            executable_name: "smbx-arm.exe",
-            package_filename: "thextech-super-mario-bros-x-win32-dev.7z",
-            upload_directory: "www/win-arm/",
-            lftp_download: "https://wohlsoft.ru/docs/Software/lftp-4.4.15.win64-openssl-1.0.1g.7z", lftp_install_dir: "C:/WohlLFTP/"
-          }
-        - {
             name: "Super Mario Bros. X - Windows - ARM64",
             os: windows-latest,
             extra_options: "-A ARM64 -DTHEXTECH_EXECUTABLE_NAME=smbx-arm64",
