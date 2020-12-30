@@ -100,6 +100,20 @@ jobs:
             ninja_download: "https://wohlsoft.ru/docs/Software/Ninja-Build/ninja-win.zip", ninja_install_dir: "C:/WohlMinGWw64/mingw32/bin",
             lftp_download: "https://wohlsoft.ru/docs/Software/lftp-4.4.15.win64-openssl-1.0.1g.7z", lftp_install_dir: "C:/WohlMinGWw64/mingw32/"
           }
+        - {
+            name: "Adventures of Demo - Windows - ARM64",
+            os: windows-latest,
+            extra_options: "-A ARM64 -DTHEXTECH_EXECUTABLE_NAME=advdemo-arm64",
+            generator: "Visual Studio 16 2019",
+            build_type: "MinSizeRel",
+            assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-adventure-of-demo-assets-full.7z",
+            subdir_name: "thextech-adventures-of-demo",
+            extra_path: "/c/WohlLFTP/bin",
+            executable_name: "advdemo-arm64.exe",
+            package_filename: "thextech-adventures-of-demo-arm64-dev.7z",
+            upload_directory: "www/win-arm/",
+            lftp_download: "https://wohlsoft.ru/docs/Software/lftp-4.4.15.win64-openssl-1.0.1g.7z", lftp_install_dir: "C:/WohlLFTP/"
+          }
 
         # ======================================= Super Mario Bros. X - a fan-game =======================================
         # Was made in 2009 by Andrew Spinks "Redigit", and supported up to 2011 by it's original author.
