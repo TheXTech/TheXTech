@@ -185,6 +185,32 @@ jobs:
             ninja_download: "https://wohlsoft.ru/docs/Software/Ninja-Build/ninja-win.zip", ninja_install_dir: "C:/WohlMinGWw64/mingw32/bin",
             lftp_download: "https://wohlsoft.ru/docs/Software/lftp-4.4.15.win64-openssl-1.0.1g.7z", lftp_install_dir: "C:/WohlMinGWw64/mingw32/"
           }
+        - {
+            name: "Super Mario Bros. X - Windows - ARM32",
+            os: windows-latest,
+            extra_options: "-A ARM -DTHEXTECH_EXECUTABLE_NAME=smbx-arm",
+            generator: "Visual Studio 16 2019",
+            build_type: "MinSizeRel",
+            assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-smbx13-assets-full.7z",
+            subdir_name: "thextech-super-mario-bros-x",
+            executable_name: "smbx.exe",
+            package_filename: "thextech-super-mario-bros-x-win32-dev.7z",
+            upload_directory: "www/win-arm/",
+            lftp_download: "https://wohlsoft.ru/docs/Software/lftp-4.4.15.win64-openssl-1.0.1g.7z", lftp_install_dir: "C:/WohlMinGWw64/mingw32/"
+          }
+        - {
+            name: "Super Mario Bros. X - Windows - ARM64",
+            os: windows-latest,
+            extra_options: "-A ARM64 -DTHEXTECH_EXECUTABLE_NAME=smbx-arm64",
+            generator: "Visual Studio 16 2019",
+            build_type: "MinSizeRel",
+            assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-smbx13-assets-full.7z",
+            subdir_name: "thextech-super-mario-bros-x",
+            executable_name: "smbx.exe",
+            package_filename: "thextech-super-mario-bros-x-win32-dev.7z",
+            upload_directory: "www/win-arm/",
+            lftp_download: "https://wohlsoft.ru/docs/Software/lftp-4.4.15.win64-openssl-1.0.1g.7z", lftp_install_dir: "C:/WohlMinGWw64/mingw32/"
+          }
 
     steps:
     - uses: actions/checkout@v1
