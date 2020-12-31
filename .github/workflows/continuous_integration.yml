@@ -19,7 +19,7 @@ jobs:
         # ======================================= Adventures of Demo =======================================
         # The side game about Demo and siblings from the A2XT universe by raocow and his fan community.
         - {
-            name: "Adventures of Demo - macOS",
+            name: "Adventures of Demo - macOS Intel",
             os: macos-latest,
             extra_options: "-DTHEXTECH_PRELOAD_ENVIRONMENT=\"`pwd`/assets/\" -DTHEXTECH_CUSTOM_ICON_PATH=\"`pwd`/assets/graphics/ui/icon/advdemo.icns\" -DTHEXTECH_ICON_NAME=advdemo.icns -DTHEXTECH_BUNDLE_NAME=\"Adventures of Demo\" -DTHEXTECH_EXECUTABLE_NAME=\"advdemo\"",
             deps_cmdline: "brew install ninja wget p7zip lftp",
@@ -27,6 +27,17 @@ jobs:
             build_type: "MinSizeRel",
             assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-adventure-of-demo-assets-full.7z",
             package_filename: "thextech-adventures-of-demo-intel-dev.dmg",
+            upload_directory: "www/macosx/"
+          }
+        - {
+            name: "Adventures of Demo - macOS ARM",
+            os: macos-latest,
+            extra_options: "-DCMAKE_OSX_ARCHITECTURES="arm64" -DTHEXTECH_PRELOAD_ENVIRONMENT=\"`pwd`/assets/\" -DTHEXTECH_CUSTOM_ICON_PATH=\"`pwd`/assets/graphics/ui/icon/advdemo.icns\" -DTHEXTECH_ICON_NAME=advdemo.icns -DTHEXTECH_BUNDLE_NAME=\"Adventures of Demo\" -DTHEXTECH_EXECUTABLE_NAME=\"advdemo\"",
+            deps_cmdline: "brew install ninja wget p7zip lftp",
+            generator: "Ninja",
+            build_type: "MinSizeRel",
+            assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-adventure-of-demo-assets-full.7z",
+            package_filename: "thextech-adventures-of-demo-arm-dev.dmg",
             upload_directory: "www/macosx/"
           }
         - {
@@ -118,7 +129,7 @@ jobs:
         # ======================================= Super Mario Bros. X - a fan-game =======================================
         # Was made in 2009 by Andrew Spinks "Redigit", and supported up to 2011 by it's original author.
         - {
-            name: "Super Mario Bros. X - macOS",
+            name: "Super Mario Bros. X - macOS Intel",
             os: macos-latest,
             extra_options: "-DTHEXTECH_PRELOAD_ENVIRONMENT=\"`pwd`/assets/\" -DTHEXTECH_CUSTOM_ICON_PATH=\"`pwd`/assets/graphics/ui/icon/smbx.icns\" -DTHEXTECH_ICON_NAME=smbx.icns -DTHEXTECH_BUNDLE_NAME=\"Super Mario Bros. X\" -DTHEXTECH_EXECUTABLE_NAME=\"thextech\"",
             deps_cmdline: "brew install ninja wget p7zip lftp",
@@ -126,6 +137,17 @@ jobs:
             build_type: "MinSizeRel",
             assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-smbx13-assets-full.7z",
             package_filename: "thextech-super-mario-bros-x-intel-dev.dmg",
+            upload_directory: "www/macosx/"
+          }
+        - {
+            name: "Super Mario Bros. X - macOS ARM",
+            os: macos-latest,
+            extra_options: "-DCMAKE_OSX_ARCHITECTURES="arm64" -DTHEXTECH_PRELOAD_ENVIRONMENT=\"`pwd`/assets/\" -DTHEXTECH_CUSTOM_ICON_PATH=\"`pwd`/assets/graphics/ui/icon/smbx.icns\" -DTHEXTECH_ICON_NAME=smbx.icns -DTHEXTECH_BUNDLE_NAME=\"Super Mario Bros. X\" -DTHEXTECH_EXECUTABLE_NAME=\"thextech\"",
+            deps_cmdline: "brew install ninja wget p7zip lftp",
+            generator: "Ninja",
+            build_type: "MinSizeRel",
+            assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-smbx13-assets-full.7z",
+            package_filename: "thextech-super-mario-bros-x-arm-dev.dmg",
             upload_directory: "www/macosx/"
           }
         - {
