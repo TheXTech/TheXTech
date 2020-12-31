@@ -32,7 +32,7 @@ jobs:
         - {
             name: "Adventures of Demo - macOS ARM",
             os: macos-latest,
-            extra_options: "-DCMAKE_OSX_ARCHITECTURES="arm64" -DTHEXTECH_PRELOAD_ENVIRONMENT=\"`pwd`/assets/\" -DTHEXTECH_CUSTOM_ICON_PATH=\"`pwd`/assets/graphics/ui/icon/advdemo.icns\" -DTHEXTECH_ICON_NAME=advdemo.icns -DTHEXTECH_BUNDLE_NAME=\"Adventures of Demo\" -DTHEXTECH_EXECUTABLE_NAME=\"advdemo\"",
+            extra_options: "-DCMAKE_OSX_ARCHITECTURES=\"arm64\" -DTHEXTECH_PRELOAD_ENVIRONMENT=\"`pwd`/assets/\" -DTHEXTECH_CUSTOM_ICON_PATH=\"`pwd`/assets/graphics/ui/icon/advdemo.icns\" -DTHEXTECH_ICON_NAME=advdemo.icns -DTHEXTECH_BUNDLE_NAME=\"Adventures of Demo\" -DTHEXTECH_EXECUTABLE_NAME=\"advdemo\"",
             deps_cmdline: "brew install ninja wget p7zip lftp",
             generator: "Ninja",
             build_type: "MinSizeRel",
@@ -142,7 +142,7 @@ jobs:
         - {
             name: "Super Mario Bros. X - macOS ARM",
             os: macos-latest,
-            extra_options: "-DCMAKE_OSX_ARCHITECTURES="arm64" -DTHEXTECH_PRELOAD_ENVIRONMENT=\"`pwd`/assets/\" -DTHEXTECH_CUSTOM_ICON_PATH=\"`pwd`/assets/graphics/ui/icon/smbx.icns\" -DTHEXTECH_ICON_NAME=smbx.icns -DTHEXTECH_BUNDLE_NAME=\"Super Mario Bros. X\" -DTHEXTECH_EXECUTABLE_NAME=\"thextech\"",
+            extra_options: "-DCMAKE_OSX_ARCHITECTURES=\"arm64\" -DTHEXTECH_PRELOAD_ENVIRONMENT=\"`pwd`/assets/\" -DTHEXTECH_CUSTOM_ICON_PATH=\"`pwd`/assets/graphics/ui/icon/smbx.icns\" -DTHEXTECH_ICON_NAME=smbx.icns -DTHEXTECH_BUNDLE_NAME=\"Super Mario Bros. X\" -DTHEXTECH_EXECUTABLE_NAME=\"thextech\"",
             deps_cmdline: "brew install ninja wget p7zip lftp",
             generator: "Ninja",
             build_type: "MinSizeRel",
