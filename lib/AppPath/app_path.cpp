@@ -89,7 +89,8 @@ static void saveCustomState()
 #include "app_path.h"
 #include "../version.h"
 
-#include <SDL2/SDL.h>
+#include <SDL2/SDL_stdinc.h>
+#include <SDL2/SDL_filesystem.h>
 
 std::string  ApplicationPathSTD;
 

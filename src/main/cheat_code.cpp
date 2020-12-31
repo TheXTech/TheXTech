@@ -23,9 +23,10 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#include <Logger/logger.h>
-#include <SDL2/SDL.h>
+#include <SDL2/SDL_stdinc.h>
 #include <SDL2/SDL_messagebox.h>
+
+#include <Logger/logger.h>
 #include <pge_delay.h>
 
 #include "../globals.h"

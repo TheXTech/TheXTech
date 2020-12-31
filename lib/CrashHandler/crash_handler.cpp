@@ -17,6 +17,10 @@
  * or see <http://www.gnu.org/licenses/>.
  */
 
+#if defined(__APPLE__) && defined(__aarch64__)
+#define SDL_cpuinfo_h_ // Workaround for SDL_cpuinfo.h
+#endif
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_messagebox.h>
 #include <SDL2/SDL_version.h>

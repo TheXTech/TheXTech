@@ -23,9 +23,14 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#if defined(__APPLE__) && defined(__aarch64__)
+#define SDL_cpuinfo_h_ // Workaround for SDL_cpuinfo.h
+#endif
+
+#include <SDL2/SDL.h>
+
 #include "game_main.h"
 #include "main/game_info.h"
-#include <SDL2/SDL.h>
 #include <AppPath/app_path.h>
 #include <tclap/CmdLine.h>
 #include <Utils/strings.h>
