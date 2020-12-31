@@ -23,10 +23,6 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#if defined(__APPLE__) && defined(__aarch64__)
-#define SDL_cpuinfo_h_ // Workaround for SDL_cpuinfo.h
-#endif
-
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_thread.h>
 #include <SDL2/SDL_opengl.h>
