@@ -26,10 +26,11 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
+#include <SDL2/SDL_scancode.h>
+
 #include <string>
 #include <vector>
 #include <cstdlib>
-#include <SDL2/SDL.h>
 
 #include "frm_main.h"
 #include "std_picture.h"

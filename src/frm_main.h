@@ -26,9 +26,13 @@
 #ifndef FRMMAIN_H
 #define FRMMAIN_H
 
+#include <SDL2/SDL_stdinc.h>
+#include <SDL2/SDL_scancode.h>
+#include <SDL2/SDL_events.h>
+#include <SDL2/SDL_render.h>
+
 #include <string>
 #include <set>
-#include <SDL2/SDL.h>
 
 #ifndef __EMSCRIPTEN__
 #include <deque>
@@ -39,10 +43,11 @@
 #include "std_picture.h"
 #include "cmd_line_setup.h"
 
+typedef struct SDL_Thread SDL_Thread;
+typedef struct SDL_mutex SDL_mutex;
 
 class FrmMain
 {
-    SDL_Event m_event;
     std::string m_windowTitle;
     SDL_Window *m_window = nullptr;
     SDL_Renderer *m_gRenderer = nullptr;
@@ -51,7 +56,9 @@ class FrmMain
     bool m_sdlLoaded = false;
     const Uint8 *m_keyboardState = nullptr;
     Uint32 m_lastMousePress = 0;
+    SDL_Event m_event;
     SDL_RendererInfo m_ri;
+
 public:
     int ScaleWidth = 800;
     int ScaleHeight = 600;
@@ -76,8 +83,8 @@ public:
     bool hasWindowMouseFocus();
 
     void eventDoubleClick();
-    void eventKeyDown(SDL_KeyboardEvent &evt);
     void eventKeyPress(SDL_Scancode KeyASCII);
+    void eventKeyDown(SDL_KeyboardEvent &evt);
     void eventKeyUp(SDL_KeyboardEvent &evt);
     void eventMouseDown(SDL_MouseButtonEvent &m_event);
     void eventMouseMove(SDL_MouseMotionEvent &m_event);

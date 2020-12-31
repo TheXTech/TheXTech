@@ -17,9 +17,11 @@
  * or see <http://www.gnu.org/licenses/>.
  */
 
+#include <SDL2/SDL.h>
 #include <SDL2/SDL_messagebox.h>
 #include <SDL2/SDL_version.h>
 #include <SDL2/SDL_mixer_ext.h>
+
 #include <cstdlib>
 #include <signal.h>
 

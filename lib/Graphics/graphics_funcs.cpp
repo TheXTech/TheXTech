@@ -16,6 +16,9 @@
  * You can see text of GPLv3 license in the LICENSE.gpl3 file you can see in Engine folder,
  * or see <http://www.gnu.org/licenses/>.
  */
+
+#include <SDL2/SDL_video.h>
+
 #include <Utils/files.h>
 #include <FileMapper/file_mapper.h>
 

@@ -17,12 +17,12 @@
  * or see <http://www.gnu.org/licenses/>.
  */
 
-#include "size.h"
-#include <SDL2/SDL.h> // SDL 2 Library
-#include <SDL2/SDL_opengl.h>
+#include <SDL2/SDL_stdinc.h>
 
 #include <string>
 #include <vector>
+
+#include "size.h"
 
 #ifndef GRAPHICS_FUNCS_H
 #define GRAPHICS_FUNCS_H
@@ -34,6 +34,9 @@ struct PGE_Pix
     Uint8 b;
     Uint8 a;
 };
+
+typedef struct SDL_Window SDL_Window;
+typedef struct SDL_Surface SDL_Surface;
 
 /*!
  * \brief Helpful graphical functions which are doing various work: I/O, Front+Mask blending, etc.

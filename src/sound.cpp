@@ -23,6 +23,8 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#include <SDL2/SDL_messagebox.h>
+
 #include "globals.h"
 #include "load_gfx.h"
 

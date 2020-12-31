@@ -23,6 +23,10 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_thread.h>
+#include <SDL2/SDL_opengl.h>
+
 #include "globals.h"
 #include "game_main.h"
 #include "graphics.h"
@@ -43,7 +47,6 @@
 #include <fmt_format_ne.h>
 #include <gif.h>
 
-#include <SDL2/SDL_thread.h>
 
 #include "../version.h"
 
