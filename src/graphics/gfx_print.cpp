@@ -28,6 +28,12 @@
 #include "../globals.h"
 #include "../graphics.h"
 
+#if defined(_MSC_VER) && _MSC_VER <= 1900 // Workaround for MSVC 2015
+namespace std
+{
+    using ::toupper;
+}
+#endif
 
 void SuperPrint(std::string SuperWords, int Font, float X, float Y,
                 float r, float g, float b, float a)
