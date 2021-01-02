@@ -88,14 +88,14 @@ jobs:
       shell: bash
       run: |
         source ../emsdk/emsdk_env.sh
-        emcmake -B build -G "${{ matrix.config.generator }}" -DENABLE_LOGGING=OFF -DENABLE_ANTICHEAT_TRAP=ON -DPGE_PRELOAD_ENVIRONMENT="`pwd`/assets" -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} ${{ matrix.config.extra_options }} .
+        emcmake cmake -B build -G "${{ matrix.config.generator }}" -DENABLE_LOGGING=OFF -DENABLE_ANTICHEAT_TRAP=ON -DPGE_PRELOAD_ENVIRONMENT="`pwd`/assets" -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} ${{ matrix.config.extra_options }} .
 
     - name: Build
       shell: bash
       run: |
         source ../emsdk/emsdk_env.sh
         export MAKEFLAGS=--keep-going
-        emcmake --build build --config ${{ matrix.config.build_type }} --parallel 3
+        emcmake cmake --build build --config ${{ matrix.config.build_type }} --parallel 3
 
     - name: Create Package
       if: always()
