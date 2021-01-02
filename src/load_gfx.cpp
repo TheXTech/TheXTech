@@ -224,48 +224,18 @@ void LoadGFX()
     std::string p;
     std::string GfxRoot = AppPath + "graphics/";
 
-    For(A, 1, 10)
+    for(int c = 0; c < numCharacters; ++c)
     {
-        p = GfxRoot + fmt::format_ne("mario/mario-{0}.png", A);
-        if(Files::fileExists(p))
+        For(A, 1, 10)
         {
-            GFXMarioBMP[A] = frmMain.lazyLoadPicture(p);
-            GFXMarioWidth[A] = GFXMarioBMP[A].w;
-            GFXMarioHeight[A] = GFXMarioBMP[A].h;
+            p = GfxRoot + fmt::format_ne("{1}/{1}-{0}.png", A, GFXPlayerNames[c]);
+            if(Files::fileExists(p))
+            {
+                (*GFXCharacterBMP[c])[A] = frmMain.lazyLoadPicture(p);
+                (*GFXCharacterWidth[c])[A] = GFXMarioBMP[A].w;
+                (*GFXCharacterHeight[c])[A] = GFXMarioBMP[A].h;
+            }
         }
-
-        p = GfxRoot + fmt::format_ne("luigi/luigi-{0}.png", A);
-        if(Files::fileExists(p))
-        {
-            GFXLuigiBMP[A] = frmMain.lazyLoadPicture(p);
-            GFXLuigiWidth[A] = GFXLuigiBMP[A].w;
-            GFXLuigiHeight[A] = GFXLuigiBMP[A].h;
-        }
-
-        p = GfxRoot + fmt::format_ne("peach/peach-{0}.png", A);
-        if(Files::fileExists(p))
-        {
-            GFXPeachBMP[A] = frmMain.lazyLoadPicture(p);
-            GFXPeachWidth[A] = GFXPeachBMP[A].w;
-            GFXPeachHeight[A] = GFXPeachBMP[A].h;
-        }
-
-        p = GfxRoot + fmt::format_ne("toad/toad-{0}.png", A);
-        if(Files::fileExists(p))
-        {
-            GFXToadBMP[A] = frmMain.lazyLoadPicture(p);
-            GFXToadWidth[A] = GFXToadBMP[A].w;
-            GFXToadHeight[A] = GFXToadBMP[A].h;
-        }
-
-        p = GfxRoot + fmt::format_ne("link/link-{0}.png", A);
-        if(Files::fileExists(p))
-        {
-            GFXLinkBMP[A] = frmMain.lazyLoadPicture(p);
-            GFXLinkWidth[A] = GFXLinkBMP[A].w;
-            GFXLinkHeight[A] = GFXLinkBMP[A].h;
-        }
-
         UpdateLoad();
     }
 
@@ -583,89 +553,16 @@ void LoadCustomGFX()
                  nullptr, nullptr, GFXYoshiTCustom[A], GFXYoshiTBMP[A]);
     }
 
-    for(int A = 1; A < 10; ++A)
+    for(int c = 0; c < numCharacters; ++c)
     {
-        loadCGFX(existingFiles, GfxRoot + fmt::format_ne("mario/mario-{0}.png", A),
-                 FileNamePath, FileName,
-                 fmt::format_ne("mario-{0}", A),
-                 &GFXMarioWidth[A], &GFXMarioHeight[A], GFXMarioCustom[A], GFXMarioBMP[A]);
-
-        // 'This is a REALLY drunken code, why it was here mixed with CGFX loading when different array is fetched?!
-        // 'By this condition, B will always 1, because array can't go more than maximum players
-        //If A < 150 Then
-        //    B = 1
-        //Else
-        //    B = 2
-        //End If
-
-        // ' This code has no sense as it affects currently usued frames of a "state 1" of this character
-        //MarioFrameX(A) = -(GFXMarioWidth(A) / 2 - Physics.PlayerWidth(1, B) / 2)
-        //MarioFrameY(A) = -(GFXMarioHeight(A) - Physics.PlayerHeight(1, B) - 2)
-    }
-
-    for(int A = 1; A < 10; ++A)
-    {
-        loadCGFX(existingFiles, GfxRoot + fmt::format_ne("luigi/luigi-{0}.png", A),
-                 FileNamePath, FileName,
-                 fmt::format_ne("luigi-{0}", A),
-                 &GFXLuigiWidth[A], &GFXLuigiHeight[A], GFXLuigiCustom[A], GFXLuigiBMP[A]);
-
-        // ' Same as above at Mario
-        //If A < 150 Then
-        //    B = 1
-        //Else
-        //    B = 2
-        //End If
-        //LuigiFrameX(A) = -(GFXLuigiWidth(A) / 2 - Physics.PlayerWidth(1, B) / 2)
-        //LuigiFrameY(A) = -(GFXLuigiHeight(A) - Physics.PlayerHeight(1, B) - 2)
-    }
-
-    for(int A = 1; A < 10; ++A)
-    {
-        loadCGFX(existingFiles, GfxRoot + fmt::format_ne("peach/peach-{0}.png", A),
-                 FileNamePath, FileName,
-                 fmt::format_ne("peach-{0}", A),
-                 &GFXPeachWidth[A], &GFXPeachHeight[A], GFXPeachCustom[A], GFXPeachBMP[A]);
-        // ' Same as above at Mario
-        //If A < 150 Then
-        //    B = 1
-        //Else
-        //    B = 2
-        //End If
-        //PeachFrameX(A) = -(GFXPeachWidth(A) / 2 - Physics.PlayerWidth(1, B) / 2)
-        //PeachFrameY(A) = -(GFXPeachHeight(A) - Physics.PlayerHeight(1, B) - 2)
-    }
-
-    for(int A = 1; A < 10; ++A)
-    {
-        loadCGFX(existingFiles, GfxRoot + fmt::format_ne("toad/toad-{0}.png", A),
-                 FileNamePath, FileName,
-                 fmt::format_ne("toad-{0}", A),
-                 &GFXToadWidth[A], &GFXToadHeight[A], GFXToadCustom[A], GFXToadBMP[A]);
-        // ' Same as above at Mario
-        //If A < 150 Then
-        //    B = 1
-        //Else
-        //    B = 2
-        //End If
-        //ToadFrameX(A) = -(GFXToadWidth(A) / 2 - Physics.PlayerWidth(1, B) / 2)
-        //ToadFrameY(A) = -(GFXToadHeight(A) - Physics.PlayerHeight(1, B) - 2)
-    }
-
-    for(int A = 1; A < 10; ++A)
-    {
-        loadCGFX(existingFiles, GfxRoot + fmt::format_ne("link/link-{0}.png", A),
-                 FileNamePath, FileName,
-                 fmt::format_ne("link-{0}", A),
-                 &GFXLinkWidth[A], &GFXLinkHeight[A], GFXLinkCustom[A], GFXLinkBMP[A]);
-        // ' Same as above at Mario
-        //If A < 150 Then
-        //    B = 1
-        //Else
-        //    B = 2
-        //End If
-        //LinkFrameX(A) = -(GFXLinkWidth(A) / 2 - Physics.PlayerWidth(1, B) / 2)
-        //LinkFrameY(A) = -(GFXLinkHeight(A) - Physics.PlayerHeight(1, B) - 2)
+        for(int A = 1; A < 10; ++A)
+        {
+            loadCGFX(existingFiles, GfxRoot + fmt::format_ne("{1}/{1}-{0}.png", A, GFXPlayerNames[c]),
+                     FileNamePath, FileName,
+                     fmt::format_ne("{1}-{0}", A, GFXPlayerNames[c]),
+                     &(*GFXCharacterWidth[c])[A], &(*GFXCharacterHeight[c])[A],
+                     (*GFXCharacterCustom[c])[A], (*GFXCharacterBMP[c])[A]);
+        }
     }
 }
 

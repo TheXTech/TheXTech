@@ -366,6 +366,28 @@ RangeArr<StdPicture, 1, maxBackgroundType> GFXBackgroundBMP;
 RangeArr<StdPicture, 1, maxBackgroundType> GFXBackgroundMaskBMP;
 RangeArrI<int, 1, maxBackgroundType, 0> GFXBackgroundHeight;
 RangeArrI<int, 1, maxBackgroundType, 0> GFXBackgroundWidth;
+
+const char *GFXPlayerNames[numCharacters] =
+{
+    "mario", "luigi", "peach", "toad", "link"
+};
+RangeArr<StdPicture, 1, 10> *GFXCharacterBMP[numCharacters] =
+{
+    &GFXMarioBMP, &GFXLuigiBMP, &GFXPeachBMP, &GFXToadBMP, &GFXLinkBMP
+};
+RangeArrI<int, 1, 10, 0> *GFXCharacterWidth[numCharacters] =
+{
+    &GFXMarioWidth, &GFXLuigiWidth, &GFXPeachHeight, &GFXToadWidth, &GFXLinkWidth
+};
+RangeArrI<int, 1, 10, 0> *GFXCharacterHeight[numCharacters] =
+{
+    &GFXMarioHeight, &GFXLuigiHeight, &GFXPeachHeight, &GFXToadHeight, &GFXLinkHeight
+};
+RangeArrI<bool, 1, 10, false> *GFXCharacterCustom[numCharacters] =
+{
+    &GFXMarioCustom, &GFXLuigiCustom, &GFXPeachCustom, &GFXToadCustom, &GFXLinkCustom
+};
+
 RangeArrI<bool, 1, 10, false> GFXMarioCustom;
 //RangeArrI<long, 1, 10, 0> GFXMario;
 RangeArrI<long, 1, 10, 0> GFXMarioMask;

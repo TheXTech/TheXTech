@@ -1825,6 +1825,13 @@ extern RangeArr<StdPicture, 1, maxBackgroundType> GFXBackgroundMaskBMP;
 extern RangeArrI<int, 1, maxBackgroundType, 0> GFXBackgroundHeight;
 //Public GFXBackgroundWidth(1 To maxBackgroundType) As Integer
 extern RangeArrI<int, 1, maxBackgroundType, 0> GFXBackgroundWidth;
+
+extern const char *GFXPlayerNames[numCharacters];
+extern RangeArr<StdPicture, 1, 10> *GFXCharacterBMP[numCharacters];
+extern RangeArrI<int, 1, 10, 0> *GFXCharacterWidth[numCharacters];
+extern RangeArrI<int, 1, 10, 0> *GFXCharacterHeight[numCharacters];
+extern RangeArrI<bool, 1, 10, false> *GFXCharacterCustom[numCharacters];
+
 //Public GFXMarioCustom(1 To 10) As Boolean
 extern RangeArrI<bool, 1, 10, false> GFXMarioCustom;
 //Public GFXMario(1 To 10) As Long
