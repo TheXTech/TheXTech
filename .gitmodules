@@ -1,3 +1,9 @@
 [submodule "lib/PGE_File_Formats"]
 	path = lib/PGE_File_Formats
 	url = https://github.com/WohlSoft/PGE-File-Library-STL.git
+[submodule "lib/LuaJIT"]
+	path = lib/LuaJIT
+	url = https://github.com/WohlSoft/LuaJIT.git
+[submodule "lib/luabind"]
+	path = lib/luabind
+	url = https://github.com/WohlSoft/luabind-deboostified.git
