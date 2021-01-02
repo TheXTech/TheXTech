@@ -23,6 +23,8 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#include <SDL2/SDL_timer.h>
+
 #include <Logger/logger.h>
 #include <Utils/files.h>
 #include <InterProcess/intproc.h>

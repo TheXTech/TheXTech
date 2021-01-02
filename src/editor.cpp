@@ -23,6 +23,8 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#include <SDL2/SDL_timer.h>
+
 #include <InterProcess/intproc.h>
 #include <Logger/logger.h>
 #include <Utils/elapsed_timer.h>

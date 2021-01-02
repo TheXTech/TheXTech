@@ -23,6 +23,8 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#include <SDL2/SDL_timer.h>
+
 #include <Utils/files.h>
 #include <pge_delay.h>
 #include <fmt_format_ne.h>
