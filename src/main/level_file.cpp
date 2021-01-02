@@ -37,6 +37,7 @@
 
 #include <DirManager/dirman.h>
 #include <Utils/files.h>
+#include <Utils/strings.h>
 #include <Utils/dir_list_ci.h>
 #include <Logger/logger.h>
 #include <PGE_File_Formats/file_formats.h>
@@ -450,7 +451,22 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         warp.Direction = w.idirect;
         warp.Direction2 = w.odirect;
         warp.Effect = w.type;
-        warp.level = dirEpisode.resolveFileCase(w.lname);
+
+        // Work around filenames with no extension suffix and case missmatch
+        if(!Strings::endsWith(w.lname, ".lvl") && !Strings::endsWith(w.lname, ".lvlx"))
+        {
+            std::string lx = dirEpisode.resolveFileCase(w.lname + ".lvlx"),
+                        lo = dirEpisode.resolveFileCase(w.lname + ".lvl");
+            if(Files::fileExists(FileNamePath + lx))
+                warp.level = lx;
+            else if(Files::fileExists(FileNamePath + lo))
+                warp.level = lo;
+            else
+                warp.level = dirEpisode.resolveFileCase(w.lname);
+        }
+        else
+            warp.level = dirEpisode.resolveFileCase(w.lname);
+
         warp.LevelWarp = int(w.warpto);
         warp.LevelEnt = w.lvl_i;
 
