@@ -94,7 +94,7 @@ jobs:
       shell: bash
       run: |
         source ../emsdk/emsdk_env.sh
-        emcmake cmake --build build --target all
+        emmake cmake --build build --target all
 
     - name: Create Package
       if: always()
