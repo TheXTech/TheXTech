@@ -94,8 +94,7 @@ jobs:
       shell: bash
       run: |
         source ../emsdk/emsdk_env.sh
-        export MAKEFLAGS=--keep-going
-        emcmake cmake --build build --config ${{ matrix.config.build_type }} --parallel 3
+        emcmake cmake --build build --target all
 
     - name: Create Package
       if: always()
