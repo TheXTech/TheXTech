@@ -1,0 +1,142 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    name: ${{ matrix.config.name }} | ${{ matrix.config.build_type }}
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+        # ======================================= Adventures of Demo =======================================
+        # The side game about Demo and siblings from the A2XT universe by raocow and his fan community.
+        - {
+            name: "Adventures of Demo",
+            os: ubuntu-20.04,
+            extra_options: "-DTHEXTECH_EXECUTABLE_NAME=advdemo -DTHEXTECH_GAME_NAME_TITLE=\"Adventures of Demo - Web Edition\" -DTHEXTECH_CREDITS_URL=\"wohlsoft.ru\" -DTHEXTECH_CREDITS_TITLE=\"Adventures of Demo\"",
+            deps_cmdline: "sudo apt-get update -qq && sudo apt-get install -qq cmake ninja-build cmake ninja-build lftp",
+            generator: "Ninja",
+            build_type: "MinSizeRel",
+            executable_name: "advdemo",
+            assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-adventure-of-demo-assets-full.7z",
+            subdir_name: "thextech-adventures-of-demo",
+            package_filename: "thextech-adventures-of-demo-webassembly-dev.tar.gz",
+            upload_directory: "www/webassembly/"
+          }
+
+        # ======================================= Super Mario Bros. X - a fan-game =======================================
+        # Was made in 2009 by Andrew Spinks "Redigit", and supported up to 2011 by it's original author.
+        - {
+            name: "Super Mario Bros. X",
+            os: ubuntu-20.04,
+            extra_options: "-DTHEXTECH_EXECUTABLE_NAME=smbx -DTHEXTECH_GAME_NAME_TITLE=\"Super Mario Bros. X - Web Edition\" -DTHEXTECH_CREDITS_URL=\"www.SuperMarioBrosX.org\" -DTHEXTECH_CREDITS_TITLE=\"Super Mario Bros. X\"",
+            deps_cmdline: "sudo apt-get update -qq && sudo apt-get install -qq cmake ninja-build cmake ninja-build lftp",
+            generator: "Ninja",
+            build_type: "MinSizeRel",
+            executable_name: "smbx",
+            assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-smbx13-assets-full.7z",
+            subdir_name: "thextech-super-mario-bros-x",
+            package_filename: "thextech-super-mario-bros-x-webassembly-dev.tar.gz",
+            upload_directory: "www/webassembly/"
+          }
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Install Dependencies
+      shell: bash
+      run: |
+        if [[ ! -z "${{ matrix.config.deps_cmdline }}" ]]; then
+          eval ${{ matrix.config.deps_cmdline }}
+        fi
+        # Pull submodules
+        git submodule init
+        git submodule update
+
+    - name: Install emscripten
+      run: |
+        cd ..
+        git clone https://github.com/emscripten-core/emsdk.git
+        cd emsdk
+        ./emsdk install latest
+        ./emsdk activate latest
+
+    - name: Download assets
+      uses: carlosperate/download-file-action@v1.0.3
+      with:
+        file-url: "${{ matrix.config.assets_url }}"
+        file-name: assets.7z
+
+    - name: Unpack assets
+      shell: bash
+      run: |
+        mkdir -p assets
+        cd assets
+        7z x ../assets.7z
+        cd ..
+        rm assets.7z
+
+    - name: Configure
+      shell: bash
+      run: |
+        source ../emsdk/emsdk_env.sh
+        emcmake -B build -G "${{ matrix.config.generator }}" -DENABLE_LOGGING=OFF -DENABLE_ANTICHEAT_TRAP=ON -DPGE_PRELOAD_ENVIRONMENT="`pwd`/assets" -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} ${{ matrix.config.extra_options }} .
+
+    - name: Build
+      shell: bash
+      run: |
+        source ../emsdk/emsdk_env.sh
+        export MAKEFLAGS=--keep-going
+        emcmake --build build --config ${{ matrix.config.build_type }} --parallel 3
+
+    - name: Create Package
+      if: always()
+      shell: bash
+      run: |
+        cd build
+        mkdir package
+        mkdir "package/${{ matrix.config.subdir_name }}"
+        cp ../changelog.txt "package/${{ matrix.config.subdir_name }}/"
+        cp ../LICENSE "package/${{ matrix.config.subdir_name }}/License.TheXTech.txt"
+        cp ../README.md "package/${{ matrix.config.subdir_name }}/"
+        cp ../README.RUS.md "package/${{ matrix.config.subdir_name }}/"
+        cp output/bin/${{ matrix.config.executable_name }}.* "package/${{ matrix.config.subdir_name }}/
+        cp -r ../assets/* "package/${{ matrix.config.subdir_name }}/"
+        cd package
+        tar -cvzf "${{ matrix.config.package_filename }}" "${{ matrix.config.subdir_name }}"
+        rm -Rf "${{ matrix.config.subdir_name }}"
+        cd ..
+        cd ..
+
+    - name: Upload artifact
+      if: always()
+      uses: actions/upload-artifact@v2
+      with:
+        path: build/package/${{ matrix.config.package_filename }}
+        name: ${{ matrix.config.name }} ${{ matrix.config.build_type }}
+
+    - name: Deploy to builds.wohlsoft.ru
+      if: always()
+      shell: bash
+      run: |
+        if [[ ! -z "${{ matrix.config.extra_path }}" ]]; then
+          export PATH=${{ matrix.config.extra_path }}:${PATH}
+        fi
+        UPLOAD_LIST="set ssl:verify-certificate no;"
+        UPLOAD_LIST="${UPLOAD_LIST} put -O ${{ matrix.config.upload_directory }} ./build/package/${{ matrix.config.package_filename }};"
+        lftp -e "${UPLOAD_LIST} exit" -u ${{ secrets.builds_login }},${{ secrets.builds_password }} ${{ secrets.builds_host }}
+
+    - name: List Build Directory
+      if: always()
+      shell: bash
+      run: |
+        git status
+        ls -lR build
