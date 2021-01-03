@@ -31,6 +31,10 @@
 #include <pge_delay.h>
 #include <fmt_format_ne.h>
 
+#ifdef ENABLE_XTECH_LUA
+#include "xtech_lua_main.h"
+#endif
+
 #include "globals.h"
 #include "game_main.h"
 

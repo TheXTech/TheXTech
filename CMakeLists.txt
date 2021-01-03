@@ -101,6 +101,8 @@ option(ENABLE_ANTICHEAT_TRAP "Enable anti-cheating trap for the \"redigitiscool\
 option(ENABLE_OLD_CREDITS "Use original Redigit's credits without changes" OFF)
 option(ENABLE_LOGGING "Enable debug logging" ON)
 
+option(THEXTECH_ENABLE_LUA "Enable lua scripting support" OFF)
+
 # ============ Customization ==============
 set(LIB_SRC_EXTRA)
 set(THEXTECH_GAME_NAME_TITLE "" CACHE STRING "Custom game title, shown in the titlebar of window")
@@ -149,6 +151,11 @@ if(WIN32)
     include(lib/CrashHandler/StackWalker/StackWalker.cmake)
 endif()
 
+if(THEXTECH_ENABLE_LUA)
+    include(cmake/library_luajit.cmake)
+    include(cmake/library_luabind.cmake)
+endif()
+
 
 if(EMSCRIPTEN)
     message("Is EMSCRIPTEN!")
@@ -177,6 +184,11 @@ set(A2XT_INCS src lib)
 set(A2XT_DEPS)
 
 add_library(A2XT_Int INTERFACE)
+
+if(THEXTECH_ENABLE_LUA)
+    list(APPEND A2XT_DEPS LuaBind_Local)
+    list(APPEND A2XT_INCS script/include)
+endif()
 
 if(USE_SYSTEM_LIBS)
     find_package(SDL2 REQUIRED)
@@ -296,6 +308,17 @@ if(WIN32 AND NOT EMSCRIPTEN)
     list(APPEND THEXTECH_SRC resources/thextech.rc)
 endif()
 
+if(THEXTECH_ENABLE_LUA)
+    add_subdirectory(script)
+    target_link_libraries(A2XT_Int INTERFACE XTechLua ${libLuaBind_Lib} ${libLuaJit_Lib})
+    if(UNIX)
+        find_library(LIB_DL_PATH dl)
+        if(LIB_DL_PATH)
+            target_link_libraries(A2XT_Int INTERFACE ${LIB_DL_PATH})
+        endif()
+    endif()
+endif()
+
 add_executable(thextech ${THEXTECH_SRC} ${LIB_SRC})
 pge_set_nopie(thextech)
 
@@ -364,6 +387,10 @@ endif()
 
 if(THEXTECH_CREDITS_TITLE AND NOT THEXTECH_CREDITS_TITLE STREQUAL "")
     target_compile_definitions(thextech PRIVATE -DCUSTOM_CREDITS_TITLE="${THEXTECH_CREDITS_TITLE}")
+endif()
+
+if(THEXTECH_ENABLE_LUA)
+    target_compile_definitions(thextech PRIVATE -DENABLE_XTECH_LUA)
 endif()
 
 

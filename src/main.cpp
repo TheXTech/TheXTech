@@ -33,6 +33,9 @@
 #include <Utils/files.h>
 #include <CrashHandler/crash_handler.h>
 
+#ifdef ENABLE_XTECH_LUA
+#include "xtech_lua_main.h"
+#endif
 
 #ifdef __APPLE__
 #include <Utils/files.h>
@@ -303,7 +306,18 @@ int main(int argc, char**argv)
     }
 #endif
 
+#ifdef ENABLE_XTECH_LUA
+    if(!xtech_lua_init())
+        return 1;
+#endif
+
     int ret = GameMain(setup);
+
+#ifdef ENABLE_XTECH_LUA
+    if(!xtech_lua_quit())
+        return 1;
+#endif
+
     frmMain.freeSDL();
 
     return ret;
