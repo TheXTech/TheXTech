@@ -20,11 +20,12 @@
 #ifndef LOGGER_SETS_H
 #define LOGGER_SETS_H
 
-#include <SDL2/SDL_rwops.h>
 #include <string>
 #include <memory>
 
 #include "logger.h"
+
+typedef struct SDL_RWops SDL_RWops;
 
 class LogWriter
 {

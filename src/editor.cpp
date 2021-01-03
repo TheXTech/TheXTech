@@ -1691,7 +1691,7 @@ void UpdateInterprocess()
 
             if(!got.meta.ReadFileValid)
             {
-                LogDebug(got.meta.ERROR_info);
+                pLogDebug(got.meta.ERROR_info.c_str());
                 break;
             }
 

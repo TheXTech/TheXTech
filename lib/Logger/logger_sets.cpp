@@ -20,6 +20,9 @@
 #include "logger_sets.h"
 
 #ifndef DISABLE_LOGGING
+
+#include <SDL2/SDL_rwops.h>
+
 #include <IniProcessor/ini_processing.h>
 #include <fmt_format_ne.h>
 #include <fmt/fmt_printf.h>
@@ -449,6 +452,9 @@ std::string getLogFilePath()
 }
 
 void LogWriter::WriteToLog(PGE_LogLevel, const std::string &)
+{}
+
+void WriteToLog(PGE_LogLevel, const std::string &)
 {}
 
 #endif // DISABLE_LOGGING
