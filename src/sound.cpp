@@ -679,15 +679,16 @@ void LoadCustomSound()
 
     if(Files::fileExists(mIniC)) // Load music.ini from a level/world custom folder
     {
-        loadMusicIni(FileNamePath + FileName, mIniC, true);
+        loadMusicIni(FileNamePath + FileName + "/", mIniC, true);
         g_customMusicInDataFolder = true;
     }
+
     if(Files::fileExists(sIni)) // Load sounds.ini from an episode folder
         loadCustomSfxIni(FileNamePath, sIni);
 
-    if(Files::fileExists(sIniC)) // Load music.ini from a level/world custom folder
+    if(Files::fileExists(sIniC)) // Load sounds.ini from a level/world custom folder
     {
-        loadCustomSfxIni(FileNamePath + FileName, sIniC);
+        loadCustomSfxIni(FileNamePath + FileName + "/", sIniC);
         g_customSoundsInDataFolder = true;
     }
 }
