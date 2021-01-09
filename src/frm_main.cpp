@@ -1049,6 +1049,22 @@ void FrmMain::lazyUnLoad(StdPicture &target)
     deleteTexture(target, true);
 }
 
+void FrmMain::lazyPreLoad(StdPicture &target)
+{
+    if(!target.texture && target.lazyLoaded)
+        lazyLoad(target);
+}
+
+size_t FrmMain::lazyLoadedBytes()
+{
+    return m_lazyLoadedBytes;
+}
+
+void FrmMain::lazyLoadedBytesReset()
+{
+    m_lazyLoadedBytes = 0;
+}
+
 
 #ifndef __EMSCRIPTEN__
 
@@ -1073,22 +1089,6 @@ void FrmMain::makeShot()
     makeShot_action(reinterpret_cast<void *>(shoot));
 #endif
 
-}
-
-void FrmMain::lazyPreLoad(StdPicture &target)
-{
-    if(!target.texture && target.lazyLoaded)
-        lazyLoad(target);
-}
-
-size_t FrmMain::lazyLoadedBytes()
-{
-    return m_lazyLoadedBytes;
-}
-
-void FrmMain::lazyLoadedBytesReset()
-{
-    m_lazyLoadedBytes = 0;
 }
 
 static std::string shoot_getTimedString(std::string path, const char *ext = "png")

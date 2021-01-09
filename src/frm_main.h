@@ -137,14 +137,14 @@ public:
     int  getPixelDataSize(const StdPicture &tx);
     void getPixelData(const StdPicture &tx, unsigned char *pixelData);
 
-#ifndef __EMSCRIPTEN__
-    void makeShot();
-#endif
-
     void lazyPreLoad(StdPicture &target);
 
     size_t lazyLoadedBytes();
     void lazyLoadedBytesReset();
+
+#ifndef __EMSCRIPTEN__
+    void makeShot();
+#endif
 
 private:
 #ifndef __EMSCRIPTEN__
