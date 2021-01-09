@@ -35,6 +35,15 @@ extern int musicLoop;
 // Public musicName As String
 extern std::string musicName;
 
+extern struct AudioSetup_t
+{
+    int sampleRate = 44100;
+    uint16_t format = 0x8120;
+    int channels = 2;
+    int bufferSize = 512;
+} g_audioSetup;
+
+
 int CustomWorldMusicId();
 
 // Public Sub InitMixerX()

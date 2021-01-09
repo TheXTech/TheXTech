@@ -24,6 +24,7 @@
  */
 
 #include <SDL2/SDL_messagebox.h>
+#include <SDL2/SDL_mixer_ext.h>
 
 #include "globals.h"
 #include "load_gfx.h"
@@ -32,7 +33,6 @@
 
 #include <Logger/logger.h>
 #include <IniProcessor/ini_processing.h>
-#include <SDL2/SDL_mixer_ext.h>
 #include <Utils/files.h>
 #include <unordered_map>
 #include <fmt_format_ne.h>
@@ -45,6 +45,8 @@ bool musicPlaying = false;
 int musicLoop = 0;
 // Public musicName As String
 std::string musicName;
+
+AudioSetup_t g_audioSetup;
 
 static Mix_Music *g_curMusic = nullptr;
 static bool g_mixerLoaded = false;
@@ -104,22 +106,50 @@ int CustomWorldMusicId()
 
 void InitMixerX()
 {
+    int ret;
+    const int initFlags = MIX_INIT_MID|MIX_INIT_MOD|MIX_INIT_FLAC|MIX_INIT_OGG|MIX_INIT_OPUS|MIX_INIT_MP3;
     MusicRoot = AppPath + "music/";
     SfxRoot = AppPath + "sound/";
 
     if(g_mixerLoaded)
         return;
+
     pLogDebug("Opening sound...");
-    Mix_Init(MIX_INIT_MID|MIX_INIT_MOD|MIX_INIT_FLAC|MIX_INIT_OGG|MIX_INIT_OPUS|MIX_INIT_MP3);
-    if(Mix_OpenAudio(44100, AUDIO_S16LSB, 2, 2048) < 0)
+    ret = Mix_Init(initFlags);
+
+    if(ret != initFlags)
+    {
+        pLogWarning("MixerX: Some modules aren't properly initialized");
+        if((initFlags & MIX_INIT_MID) != MIX_INIT_MID)
+            pLogWarning("MixerX: Failed to initialize MIDI module");
+        if((initFlags & MIX_INIT_MOD) != MIX_INIT_MOD)
+            pLogWarning("MixerX: Failed to initialize Tracker music module");
+        if((initFlags & MIX_INIT_FLAC) != MIX_INIT_FLAC)
+            pLogWarning("MixerX: Failed to initialize FLAC module");
+        if((initFlags & MIX_INIT_OGG) != MIX_INIT_OGG)
+            pLogWarning("MixerX: Failed to initialize OGG Vorbis module");
+        if((initFlags & MIX_INIT_OPUS) != MIX_INIT_OPUS)
+            pLogWarning("MixerX: Failed to initialize Opus module");
+        if((initFlags & MIX_INIT_MP3) != MIX_INIT_MP3)
+            pLogWarning("MixerX: Failed to initialize MP3 module");
+    }
+
+    ret = Mix_OpenAudio(g_audioSetup.sampleRate,
+                        g_audioSetup.format,
+                        g_audioSetup.channels,
+                        g_audioSetup.bufferSize);
+
+    if(ret < 0)
     {
         std::string msg = fmt::format_ne("Can't open audio stream, continuing without audio: ({0})", Mix_GetError());
         pLogCritical(msg.c_str());
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Sound opening error", msg.c_str(), nullptr);
         noSound = true;
     }
+
     Mix_VolumeMusic(MIX_MAX_VOLUME);
     Mix_AllocateChannels(maxSfxChannels);
+
     g_mixerLoaded = true;
 }
 

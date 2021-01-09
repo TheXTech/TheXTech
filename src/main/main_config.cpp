@@ -23,9 +23,12 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#include <SDL2/SDL_audio.h>
+
 #include "../globals.h"
 #include "../game_main.h"
 #include "../graphics.h"
+#include "../sound.h"
 
 #include <Utils/files.h>
 #include <IniProcessor/ini_processing.h>
@@ -44,6 +47,28 @@ void OpenConfig_preSetup()
         config.read("render", RenderMode, 1);
         if(RenderMode > 2) // Allowed values: 0, 1 and 2
             RenderMode = 2;
+        config.endGroup();
+
+        config.beginGroup("sound");
+        config.read("sample-rate", g_audioSetup.sampleRate, 44100);
+        config.read("channels", g_audioSetup.channels, 2);
+        IniProcessing::StrEnumMap sampleFormats =
+        {
+            {"s8", AUDIO_S8},
+            {"pcm_s8", AUDIO_S8},
+            {"u8", AUDIO_U8},
+            {"pcm_u8", AUDIO_U8},
+            {"s16", AUDIO_S16},
+            {"pcm_s16", AUDIO_S16},
+            {"u16", AUDIO_U16},
+            {"pcm_u16", AUDIO_U16},
+            {"s32", AUDIO_S32},
+            {"pcm_s32", AUDIO_S32},
+            {"float32", AUDIO_F32},
+            {"pcm_f32", AUDIO_F32}
+        };
+        config.readEnum("format", g_audioSetup.format, (uint16_t)AUDIO_F32, sampleFormats);
+        config.read("buffer-size", g_audioSetup.bufferSize, 512);
         config.endGroup();
     }
 }
