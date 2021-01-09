@@ -38,6 +38,7 @@
 #include "globals.h"
 #include "game_main.h"
 
+#include "frame_timer.h"
 #include "blocks.h"
 #include "change_res.h"
 #include "collision.h"
@@ -256,12 +257,8 @@ int GameMain(const CmdLineSetup_t &setup)
             CreditChop = 300; // 100
             EndCredits = 0;
             SetupCredits();
-            overTime = 0;
-            GoalTime = SDL_GetTicks() + 1000;
-            fpsCount = 0;
-            fpsTime = 0;
-            cycleCount = 0;
-            gameTime = 0;
+
+            resetFrameTimer();
 
             // Update graphics before loop begin (to process inital lazy-unpacking of used sprites)
             UpdateGraphics();
@@ -435,12 +432,7 @@ int GameMain(const CmdLineSetup_t &setup)
                     ProcEvent(Events[A].Name, true);
             }
 
-            overTime = 0;
-            GoalTime = SDL_GetTicks() + 1000;
-            fpsCount = 0;
-            fpsTime = 0;
-            cycleCount = 0;
-            gameTime = 0;
+            resetFrameTimer();
 
             // Update graphics before loop begin (to process inital lazy-unpacking of used sprites)
             UpdateGraphics();
@@ -571,12 +563,8 @@ int GameMain(const CmdLineSetup_t &setup)
             {
                 if(curWorldMusic > 0)
                     StartMusic(curWorldMusic);
-                overTime = 0;
-                GoalTime = SDL_GetTicks() + 1000;
-                fpsCount = 0;
-                fpsTime = 0;
-                cycleCount = 0;
-                gameTime = 0;
+
+                resetFrameTimer();
 
                 // On a world map, reset this into default state
                 GoToLevelNoGameThing = false;
@@ -753,12 +741,7 @@ int GameMain(const CmdLineSetup_t &setup)
                     ProcEvent(Events[A].Name, true);
             }
 
-            overTime = 0;
-            GoalTime = SDL_GetTicks() + 1000;
-            fpsCount = 0;
-            fpsTime = 0;
-            cycleCount = 0;
-            gameTime = 0;
+            resetFrameTimer();
 
             // Update graphics before loop begin (to process inital lazy-unpacking of used sprites)
             UpdateGraphics();
@@ -1335,12 +1318,9 @@ void CheckActive()
 //        If LevelEditor = True Or MagicHand = True Then frmLevelWindow.vScreen(1).MousePointer = 0
         if(LevelEditor || MagicHand)
             showCursor(0);
-        overTime = 0;
-        GoalTime = SDL_GetTicks() + 1000;
-        fpsCount = 0;
-        fpsTime = 0;
-        cycleCount = 0;
-        gameTime = 0;
+
+        resetFrameTimer();
+
         tempTime = 0;
         //keyDownEnter = false;
         //keyDownAlt = false;

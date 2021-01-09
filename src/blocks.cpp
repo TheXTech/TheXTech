@@ -26,6 +26,7 @@
 #include <SDL2/SDL_timer.h>
 
 #include "globals.h"
+#include "frame_timer.h"
 #include "blocks.h"
 #include "sound.h"
 #include "graphics.h"
@@ -1872,12 +1873,13 @@ void UpdateBlocks()
     }
 }
 
-void PSwitch(bool Bool)
+void PSwitch(bool enabled)
 {
     int A = 0;
     int B = 0;
     Block_t blankBlock;
-    if(Bool == true)
+
+    if(enabled)
     {
         for(A = 1; A <= numNPCs; A++)
         {
@@ -2021,8 +2023,10 @@ void PSwitch(bool Bool)
 
         ProcEvent("P Switch - End", true);
     }
+
     qSortBlocksX(1, numBlock);
     B = 1;
+
     for(A = 2; A <= numBlock; A++)
     {
         if(Block[A].Location.X > Block[B].Location.X)
@@ -2031,18 +2035,16 @@ void PSwitch(bool Bool)
             B = A;
         }
     }
+
     qSortBlocksY(B, A - 1);
     FindSBlocks();
     FindBlocks();
+
     iBlocks = numBlock;
     for(A = 1; A <= numBlock; A++)
         iBlock[A] = A;
-    overTime = 0;
-    GoalTime = SDL_GetTicks() + 1000;
-    fpsCount = 0;
-    fpsTime = 0;
-    cycleCount = 0;
-    gameTime = 0;
+
+    resetFrameTimer();
 }
 
 void PowBlock()

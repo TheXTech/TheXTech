@@ -26,6 +26,7 @@
 #include <SDL2/SDL_timer.h>
 
 #include "../globals.h"
+#include "../frame_timer.h"
 #include "../game_main.h"
 #include "../load_gfx.h"
 #include "../sound.h"
@@ -303,12 +304,7 @@ void OpenWorld(std::string FilePath)
 //            frmWorld::txtCredits(A).Text = WorldCredits[A];
 //        frmWorld.txtStars = MaxWorldStars;
 //    }
-    overTime = 0;
-    GoalTime = SDL_GetTicks() + 1000;
-    fpsCount = 0;
-    fpsTime = 0;
-    cycleCount = 0;
-    gameTime = 0;
+    resetFrameTimer();
 }
 
 void ClearWorld()

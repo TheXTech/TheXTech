@@ -59,6 +59,8 @@ class FrmMain
     SDL_Event m_event;
     SDL_RendererInfo m_ri;
 
+    size_t m_lazyLoadedBytes = 0;
+
 public:
     int ScaleWidth = 800;
     int ScaleHeight = 600;
@@ -138,6 +140,11 @@ public:
 #ifndef __EMSCRIPTEN__
     void makeShot();
 #endif
+
+    void lazyPreLoad(StdPicture &target);
+
+    size_t lazyLoadedBytes();
+    void lazyLoadedBytesReset();
 
 private:
 #ifndef __EMSCRIPTEN__

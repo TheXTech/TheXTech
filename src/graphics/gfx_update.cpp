@@ -26,6 +26,7 @@
 #include <SDL2/SDL_timer.h>
 
 #include "../globals.h"
+#include "../frame_timer.h"
 #include "../graphics.h"
 #include "../collision.h"
 #include "../editor.h"
@@ -55,7 +56,7 @@ void UpdateGraphics(bool skipRepaint)
 
     if(FrameSkip && !TakeScreen)
     {
-        if(SDL_GetTicks() + floor(1000 * (1 - (cycleCount / 63.0))) > GoalTime) // Don't draw this frame
+        if(frameSkipNeeded()) // Don't draw this frame
         {
             numScreens = 1;
             if(!LevelEditor)
@@ -2682,4 +2683,8 @@ void UpdateGraphics(bool skipRepaint)
 //        if(timeStr != "")
 //            Netplay::sendData timeStr + LB;
 //    }
+
+    if(frmMain.lazyLoadedBytes() > 200000) // Reset timer while loading many pictures at the same time
+        resetFrameTimer();
+    frmMain.lazyLoadedBytesReset();
 }

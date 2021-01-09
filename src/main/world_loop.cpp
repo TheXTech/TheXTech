@@ -30,6 +30,7 @@
 #include <fmt_format_ne.h>
 
 #include "../globals.h"
+#include "../frame_timer.h"
 #include "../game_main.h"
 #include "../sound.h"
 #include "../joystick.h"
@@ -380,13 +381,7 @@ void WorldLoop()
                         frmMain.repaint();
                         DoEvents();
                         PGE_Delay(1000);
-
-                        overTime = 0;
-                        GoalTime = SDL_GetTicks() + 1000;
-                        fpsCount = 0;
-                        fpsTime = 0;
-                        cycleCount = 0;
-                        gameTime = 0;
+                        resetFrameTimer();
                     }
                 }
             }
@@ -645,12 +640,8 @@ void PathPath(int Pth, bool Skp)
 void PathWait()
 {
     int C = 0;
-    overTime = 0;
-    GoalTime = SDL_GetTicks() + 1000;
-    fpsCount = 0;
-    cycleCount = 0;
-    gameTime = 0;
-    fpsTime = 0;
+
+    resetFrameTimer();
 
     do
     {
@@ -695,10 +686,5 @@ void PathWait()
         PGE_Delay(1);
     } while(!(C >= 24));
 
-    overTime = 0;
-    GoalTime = SDL_GetTicks() + 1000;
-    fpsCount = 0;
-    cycleCount = 0;
-    gameTime = 0;
-    fpsTime = 0;
+    resetFrameTimer();
 }

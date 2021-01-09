@@ -555,7 +555,7 @@ void LoadCustomGFX()
 
     for(int c = 0; c < numCharacters; ++c)
     {
-        for(int A = 1; A < 10; ++A)
+        for(int A = 1; A <= numStates; ++A)
         {
             loadCGFX(existingFiles, GfxRoot + fmt::format_ne("{1}/{1}-{0}.png", A, GFXPlayerNames[c]),
                      FileNamePath, FileName,

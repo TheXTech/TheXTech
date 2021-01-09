@@ -23,29 +23,25 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef BLOCKS_H
-#define BLOCKS_H
+#include <SDL2/SDL_timer.h>
 
-//! The block was hit by a player
-void BlockHit(int A, bool HitDown = false, int whatPlayer = 0);
-//! Shake the block up
-void BlockShakeUp(int A);
-//! Shake the block up
-void BlockShakeUpPow(int A);
-//! Shake the block down
-void BlockShakeDown(int A);
+#include <Logger/logger.h>
 
-void BlockHitHard(int A);
-//! Destroy a block
-void KillBlock(int A, bool Splode = true);
-// update the frames for animated blocks
-void BlockFrames();
-//! Update the blocks
-void UpdateBlocks();
+#include "frame_timer.h"
+#include "globals.h"
 
-//! turns all the blocks to coins and vice versa
-void PSwitch(bool enabled);
-//! drops coins and shakes all blocks on screen when player throws a POW block
-void PowBlock();
+void resetFrameTimer()
+{
+    overTime = 0;
+    GoalTime = SDL_GetTicks() + 1000;
+    fpsCount = 0;
+    fpsTime = 0;
+    cycleCount = 0;
+    gameTime = 0;
+    D_pLogDebugNA("Time counter reset was called");
+}
 
-#endif // BLOCKS_H
+bool frameSkipNeeded()
+{
+    return SDL_GetTicks() + SDL_floor(1000 * (1 - (cycleCount / 63.0))) > GoalTime;
+}

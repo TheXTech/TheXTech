@@ -28,6 +28,7 @@
 #include <SDL2/SDL_opengl.h>
 
 #include "globals.h"
+#include "frame_timer.h"
 #include "game_main.h"
 #include "graphics.h"
 #include "joystick.h"
@@ -984,6 +985,10 @@ void FrmMain::lazyLoad(StdPicture &target)
         return;
     }
 
+    m_lazyLoadedBytes += (w * h * 4);
+    if(!target.rawMask.empty())
+        m_lazyLoadedBytes += (w * h * 4);
+
     RGBQUAD upperColor;
     FreeImage_GetPixelColor(sourceImage, 0, 0, &upperColor);
     target.ColorUpper.r = float(upperColor.rgbRed) / 255.0f;
@@ -1068,6 +1073,22 @@ void FrmMain::makeShot()
     makeShot_action(reinterpret_cast<void *>(shoot));
 #endif
 
+}
+
+void FrmMain::lazyPreLoad(StdPicture &target)
+{
+    if(!target.texture && target.lazyLoaded)
+        lazyLoad(target);
+}
+
+size_t FrmMain::lazyLoadedBytes()
+{
+    return m_lazyLoadedBytes;
+}
+
+void FrmMain::lazyLoadedBytesReset()
+{
+    m_lazyLoadedBytes = 0;
 }
 
 static std::string shoot_getTimedString(std::string path, const char *ext = "png")

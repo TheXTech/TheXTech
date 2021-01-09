@@ -256,6 +256,7 @@ set(THEXTECH_SRC
     src/globals.cpp
     src/npc.cpp
     src/sound.cpp
+    src/frame_timer.cpp
     src/main/world_loop.cpp
     src/main/world_file.cpp
     src/main/game_info.cpp

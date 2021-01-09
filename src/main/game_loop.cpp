@@ -29,6 +29,7 @@
 #include <pge_delay.h>
 
 #include "../globals.h"
+#include "../frame_timer.h"
 #include "../game_main.h"
 #include "../sound.h"
 #include "../joystick.h"
@@ -228,12 +229,7 @@ void PauseGame(int plr)
             SoundPauseAll();
     }
 
-    overTime = 0;
-    GoalTime = SDL_GetTicks() + 1000;
-    fpsCount = 0;
-    fpsTime = 0;
-    cycleCount = 0;
-    gameTime = 0;
+    resetFrameTimer();
 
     do
     {
@@ -555,11 +551,6 @@ void PauseGame(int plr)
     }
     MessageText.clear();
 
-    overTime = 0;
-    GoalTime = SDL_GetTicks() + 1000;
-    fpsCount = 0;
-    cycleCount = 0;
-    gameTime = 0;
-    fpsTime = 0;
+    resetFrameTimer();
 }
 

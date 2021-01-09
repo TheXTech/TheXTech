@@ -23,9 +23,8 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#include <SDL2/SDL_timer.h>
-
 #include "../globals.h"
+#include "../frame_timer.h"
 #include "../graphics.h"
 #include "../collision.h"
 #include "../player.h"
@@ -39,11 +38,10 @@ void UpdateGraphics2()
 
     float c = ShadowMode ? 0.f : 1.f;
     cycleCount = cycleCount + 1;
-    if(FrameSkip == true)
-    {
-        if(SDL_GetTicks() + floor(1000 * (1 - (cycleCount / 63.0))) > GoalTime)
-            return;
-    }
+
+    if(FrameSkip && frameSkipNeeded())
+        return;
+
     fpsCount = fpsCount + 1;
     int A = 0;
     int B = 0;
@@ -651,4 +649,8 @@ void UpdateGraphics2()
 
     if(TakeScreen)
         ScreenShot();
+
+    if(frmMain.lazyLoadedBytes() > 200000) // Reset timer while loading many pictures at the same time
+        resetFrameTimer();
+    frmMain.lazyLoadedBytesReset();
 }
