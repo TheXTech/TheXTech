@@ -220,11 +220,17 @@ void SetupCredits()
     AddCredit("");
     AddCredit("");
     AddCredit("");
+#ifndef ENABLE_OLD_CREDITS
+    AddCredit("'It just works!'");
+    AddCredit("");
+    AddCredit("Todd Howard");
+#else
     AddCredit("'He has delivered us from the power");
     AddCredit("of darkness and conveyed us into");
     AddCredit("the kingdom of the Son of His love.'");
     AddCredit("");
     AddCredit("Colossians 1:13");
+#endif
     AddCredit("");
     AddCredit("");
     AddCredit("");
