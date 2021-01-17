@@ -2093,30 +2093,49 @@ void NPCSpecial(int A)
                 NPC[A].Killed = 3;
         }
 
-        // Platform movement
     }
+    // Platform movement
     else if(NPC[A].Type == 60 || NPC[A].Type == 62 || NPC[A].Type == 64 ||
             NPC[A].Type == 66 || NPC[A].Type == 104 || NPC[A].Type == 179)
     {
         straightLine = false; // SET BUT NOT USED
         UNUSED(straightLine);
         tempBool = false;
-        for(B = 1; B <= numPlayers; B++)
+
+        for(int B = 1; B <= numPlayers; B++)
         {
             if(Player[B].Section == NPC[A].Section)
                 tempBool = true;
         }
-        if(NPC[A].Type == 179)
+
+        if(NPC[A].Type == 179) // Grinder
         {
-            NPC[A].Location.X = NPC[A].Location.X - 24;
+            NPC[A].Location.X -= 24;
             NPC[A].Location.Width = 96;
-            NPC[A].Location.Y = NPC[A].Location.Y + 8;
+            NPC[A].Location.Y += 8;
             NPC[A].Location.Height = 32;
         }
-        if((NPC[A].Direction == 1 && tempBool) || NPC[A].Type == 179)
+
+        if((NPC[A].Direction == 1 && tempBool) || NPC[A].Type == 179) // Player in same section, enabled, or, grinder
         {
-            NPC[A].Location.SpeedY = NPC[A].Special;
-            NPC[A].Location.SpeedX = NPC[A].Special2;
+            bool pausePlatforms = false;
+            for(int B = 1; B <= numPlayers; B++)
+            {
+                if(!(Player[B].Effect == 0 || Player[B].Effect == 3 || Player[B].Effect == 9 || Player[B].Effect == 10))
+                {
+                    pausePlatforms = true;
+                }
+            }
+
+#ifndef XTECH_BUG_PLATFORMS_GRAVITY
+            if(!pausePlatforms) // Keep zeroed speed when player required the pause of the move effect
+#endif
+            {
+
+                NPC[A].Location.SpeedY = NPC[A].Special;
+                NPC[A].Location.SpeedX = NPC[A].Special2;
+            }
+
             tempBool = false;
             tempBool2 = false;
             tempLocation = NPC[A].Location;
@@ -2124,16 +2143,20 @@ void NPCSpecial(int A)
             tempLocation.Height = 2;
             tempLocation.X = NPC[A].Location.X + 47;
             tempLocation.Width = 2;
+
             C = 2; // The Speed
             D = 0;
             E = 0;
             F = 0;
             tempNPC = NPC[A];
-            for(B = 1; B <= numBackground; B++)
+
+            for(int B = 1; B <= numBackground; B++)
             {
+                // Any nearest BGO touched? (rails and reverse buffers)
                 if((Background[B].Type >= 70 && Background[B].Type <= 74) || Background[B].Type == 100)
                 {
-                    if(Background[B].Hidden == false)
+                    // Not hidden
+                    if(!Background[B].Hidden)
                     {
                         if(CheckCollision(tempLocation, Background[B].Location))
                         {
@@ -2147,8 +2170,10 @@ void NPCSpecial(int A)
                                     NPC[A] = tempNPC;
                                 }
                             }
+
                             if(F == 0)
                             {
+                                // Vertical rail
                                 if(Background[B].Type == 72)
                                 {
                                     if(NPC[A].Location.SpeedY <= 0)
@@ -2158,6 +2183,7 @@ void NPCSpecial(int A)
                                     NPC[A].Location.SpeedX = 0;
                                     E = -NPC[A].Location.X + Background[B].Location.X - 32;
                                 }
+                                // Horizontal rail
                                 else if(Background[B].Type == 71)
                                 {
                                     if(NPC[A].Location.SpeedX >= 0)
@@ -2167,6 +2193,7 @@ void NPCSpecial(int A)
                                     NPC[A].Location.SpeedY = 0;
                                     D = -NPC[A].Location.Y + Background[B].Location.Y;
                                 }
+                                // Diagonal rail left-bottom, right-top
                                 else if(Background[B].Type == 73)
                                 {
                                     if(NPC[A].Location.SpeedY < 0)
@@ -2178,6 +2205,7 @@ void NPCSpecial(int A)
                                     else if(NPC[A].Location.SpeedX < 0)
                                         NPC[A].Location.SpeedY = C;
                                 }
+                                // Diagonal rail left-top, right-bottom
                                 else if(Background[B].Type == 74)
                                 {
                                     if(NPC[A].Location.SpeedY < 0)
@@ -2189,6 +2217,7 @@ void NPCSpecial(int A)
                                     else if(NPC[A].Location.SpeedX < 0)
                                         NPC[A].Location.SpeedY = -C;
                                 }
+                                // Reverse buffer
                                 else if(Background[B].Type == 70 || Background[B].Type == 100)
                                 {
                                     NPC[A].Location.SpeedX = -NPC[A].Location.SpeedX;
@@ -2196,52 +2225,73 @@ void NPCSpecial(int A)
                                     tempBool = true;
                                     break;
                                 }
+
                                 tempBool = true;
                                 F = Background[B].Type;
                             }
                         }
-                    }
-                }
-            }
-            NPC[A].Special5 = F;
-            if(tempBool == false)
-            {
+                    }//Not hidden
+                } // any important BGO?
+            } // for BGOs
 
+            NPC[A].Special5 = F;
+
+            if(!tempBool)
+            {
                 if(NPC[A].Type == 104 && NPC[A].Wet == 2)
-                    NPC[A].Location.SpeedY = NPC[A].Location.SpeedY - Physics.NPCGravity * 0.25;
+                    NPC[A].Location.SpeedY -= Physics.NPCGravity * 0.25;
                 else
-                    NPC[A].Location.SpeedY = NPC[A].Location.SpeedY + Physics.NPCGravity;
+                    NPC[A].Location.SpeedY += Physics.NPCGravity;
             }
             else
             {
-                NPC[A].Location.SpeedX = NPC[A].Location.SpeedX + E;
-                NPC[A].Location.SpeedY = NPC[A].Location.SpeedY + D;
+                NPC[A].Location.SpeedX += E;
+                NPC[A].Location.SpeedY += D;
             }
-            NPC[A].Special = NPC[A].Location.SpeedY;
-            NPC[A].Special2 = NPC[A].Location.SpeedX;
-            for(B = 1; B <= numPlayers; B++)
+
+#ifndef XTECH_BUG_PLATFORMS_GRAVITY
+            if(!pausePlatforms) // Process the code normally
+#endif
             {
-                if(!(Player[B].Effect == 0 || Player[B].Effect == 3 || Player[B].Effect == 9 || Player[B].Effect == 10))
-                {
-                    NPC[A].Location.SpeedX = 0;
-                    NPC[A].Location.SpeedY = 0;
-                }
+                NPC[A].Special = NPC[A].Location.SpeedY;
+                NPC[A].Special2 = NPC[A].Location.SpeedX;
             }
+#ifndef XTECH_BUG_PLATFORMS_GRAVITY
+            else // Or zero the speed and don't change special values
+#else
+            if(pausePlatforms) // Process the code normally
+#endif
+            {
+                NPC[A].Location.SpeedX = 0;
+                NPC[A].Location.SpeedY = 0;
+            }
+
+//            for(B = 1; B <= numPlayers; B++) // Move this code to up
+//            {
+//                if(!(Player[B].Effect == 0 || Player[B].Effect == 3 || Player[B].Effect == 9 || Player[B].Effect == 10))
+//                {
+//                    NPC[A].Location.SpeedX = 0;
+//                    NPC[A].Location.SpeedY = 0;
+//                }
+//            }
         }
         else
         {
             NPC[A].Location.SpeedX = 0;
             NPC[A].Location.SpeedY = 0;
         }
+
         Block[NPC[A].tempBlock].Location = NPC[A].Location;
         Block[NPC[A].tempBlock].Location.X = Block[NPC[A].tempBlock].Location.X + NPC[A].Location.SpeedX;
+
         if(NPC[A].Location.SpeedY < 0)
-            Block[NPC[A].tempBlock].Location.Y = Block[NPC[A].tempBlock].Location.Y + NPC[A].Location.SpeedY;
+            Block[NPC[A].tempBlock].Location.Y += NPC[A].Location.SpeedY;
+
         if(NPC[A].Type == 179)
         {
-            NPC[A].Location.X = NPC[A].Location.X + 24;
+            NPC[A].Location.X += 24;
             NPC[A].Location.Width = 48;
-            NPC[A].Location.Y = NPC[A].Location.Y - 8;
+            NPC[A].Location.Y -= 8;
             NPC[A].Location.Height = 48;
 
             if(NPC[A].Location.SpeedX == 0 && NPC[A].Location.SpeedY == Physics.NPCGravity)
@@ -2249,7 +2299,6 @@ void NPCSpecial(int A)
                 NPC[A].Location.SpeedX = C * NPC[A].Direction;
                 NPC[A].Special2 = NPC[A].Location.SpeedX;
             }
-
         }
     }
     else if(NPC[A].Type == 200) // King Koopa
