@@ -2605,34 +2605,35 @@ void PlayerPush(int A, int HitSpot)
     Location_t tempLocation;
     double fBlock = 0;
     double lBlock = 0;
-    int B = 0;
-    if(ShadowMode == true)
+
+    if(ShadowMode)
         return;
-    fBlock = FirstBlock[(Player[A].Location.X / 32) - 1];
-    lBlock = LastBlock[((Player[A].Location.X + Player[A].Location.Width) / 32.0) + 1];
-    for(B = int(fBlock); B <= lBlock; B++)
+
+    auto &p = Player[A];
+
+    fBlock = FirstBlock[(p.Location.X / 32) - 1];
+    lBlock = LastBlock[((p.Location.X + p.Location.Width) / 32.0) + 1];
+    for(int B = int(fBlock); B <= lBlock; B++)
     {
-        if(Block[B].Hidden == false)
+        auto &b = Block[B];
+        if(!b.Hidden)
         {
-            if(BlockIsSizable[Block[B].Type] == false)
+            if(!BlockIsSizable[b.Type])
             {
-                if(BlockSlope[Block[B].Type] == 0 && BlockSlope2[Block[B].Type] == 0)
+                if(BlockSlope[b.Type] == 0 && BlockSlope2[b.Type] == 0)
                 {
-                    tempLocation = Player[A].Location;
-                    tempLocation.Height = tempLocation.Height - 1;
-                    if(CheckCollision(tempLocation, Block[B].Location) == true)
+                    tempLocation = p.Location;
+                    tempLocation.Height -= 1;
+                    if(CheckCollision(tempLocation, b.Location))
                     {
-                        if(BlockOnlyHitspot1[Block[B].Type] == false)
+                        if(!BlockOnlyHitspot1[b.Type] && !BlockNoClipping[b.Type])
                         {
-                            if(BlockNoClipping[Block[B].Type] == false)
-                            {
-                                if(HitSpot == 2)
-                                    Player[A].Location.X = Block[B].Location.X - Player[A].Location.Height - 0.01;
-                                else if(HitSpot == 3)
-                                    Player[A].Location.Y = Block[B].Location.Y + Block[B].Location.Height + 0.01;
-                                else if(HitSpot == 4)
-                                    Player[A].Location.X = Block[B].Location.X + Block[B].Location.Width + 0.01;
-                            }
+                            if(HitSpot == 2)
+                                p.Location.X = b.Location.X - p.Location.Height - 0.01;
+                            else if(HitSpot == 3)
+                                p.Location.Y = b.Location.Y + b.Location.Height + 0.01;
+                            else if(HitSpot == 4)
+                                p.Location.X = b.Location.X + b.Location.Width + 0.01;
                         }
                     }
                 }
