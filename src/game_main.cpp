@@ -68,6 +68,8 @@ int GameMain(const CmdLineSetup_t &setup)
 //    int B = 0;
 //    int C = 0;
     bool tempBool = false;
+    int lastWarpEntered = 0;
+
     LB = "\n";
     EoT = "";
 
@@ -655,7 +657,12 @@ int GameMain(const CmdLineSetup_t &setup)
             }
 
             SetupPlayers(); // Setup Players for the level
+
+            if(LevelRestartRequested && Checkpoint.empty())
+                StartWarp = lastWarpEntered; // When restarting a level (after death), don't restore an entered warp on checkpoints
+
             qScreen = false;
+            LevelRestartRequested = false;
 
 // for warp entrances
             if((ReturnWarp > 0 && IsEpisodeIntro/*FileName == StartLevel*/) || (StartWarp > 0))
@@ -728,7 +735,10 @@ int GameMain(const CmdLineSetup_t &setup)
                 }
 
                 if(StartWarp > 0)
+                {
+                    lastWarpEntered = StartWarp; // Re-use it when player re-enters a level after death (when option is toggled on)
                     StartWarp = 0;
+                }
                 else
                     ReturnWarp = 0;
             }
@@ -793,6 +803,7 @@ int GameMain(const CmdLineSetup_t &setup)
                     if(!LivingPlayers())
                     {
                         EveryonesDead();
+                        break;
                     }
                 }
 
@@ -843,7 +854,7 @@ int GameMain(const CmdLineSetup_t &setup)
                 LevelSelect = false;
             }
 //            Else
-            else
+            else if(!LevelRestartRequested)
             {
                 ClearLevel();
 //            End If

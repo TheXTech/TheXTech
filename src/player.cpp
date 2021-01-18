@@ -912,7 +912,8 @@ void EveryonesDead()
         {
             OpenLevel(FullFileName);
             LevelSelect = false;
-            SetupPlayers();
+            LevelRestartRequested = true;
+//            SetupPlayers();
         }
         else
             LevelSelect = true;

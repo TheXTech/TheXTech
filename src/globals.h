@@ -1538,6 +1538,8 @@ extern bool EndIntro;
 extern bool ExitMenu;
 //Public LevelSelect As Boolean 'true if game should load the world map
 extern bool LevelSelect;
+
+extern bool LevelRestartRequested;
 //Public WorldPlayer(1) As WorldPlayer
 extern RangeArr<WorldPlayer_t, 0, 1> WorldPlayer;
 //Public LevelBeatCode As Integer ' code for the way the plauer beat the level
