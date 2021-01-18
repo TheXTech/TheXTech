@@ -559,8 +559,9 @@ void NPCFrames(int A)
     }
     else if(NPC[A].Type == 247)
     {
+        // Special less than zero - body, zero - head
         if(NPC[A].Special < 0 && NPC[A].Location.SpeedY == 0)
-            NPC[A].Special = NPC[A].Special + 1;
+            NPC[A].Special += 1;
         if(NPC[A].Projectile != 0 || NPC[A].HoldingPlayer > 0)
             NPC[A].Frame = 4;
         else
@@ -576,9 +577,9 @@ void NPCFrames(int A)
         else if(NPC[A].FrameCount > 8)
         {
             if(NPC[A].Projectile != 0 || NPC[A].HoldingPlayer > 0)
-                NPC[A].Frame = NPC[A].Frame + 1;
+                NPC[A].Frame += 1;
             else
-                NPC[A].Frame = NPC[A].Frame + 2;
+                NPC[A].Frame += 2;
         }
     }
     else if(NPC[A].Type == 245)

@@ -1779,13 +1779,13 @@ void UpdateNPCs()
                     }
 
 
-                    if(NPC[A].Type == 247 && NPC[A].Projectile == false)
+                    if(NPC[A].Type == 247 && !NPC[A].Projectile)
                     {
                         speedVar = (float)(speedVar * 0.7);
                         if(NPC[A].Special2 < 2)
                         {
                             speedVar = (float)(speedVar * 0.7);
-                            NPC[A].Special2 = NPC[A].Special2 + 1;
+                            NPC[A].Special2 += 1;
                         }
                     }
 
@@ -1912,6 +1912,7 @@ void UpdateNPCs()
                                                             HitSpot = NPCFindCollision(NPC[A].Location, Block[B].Location);
                                                         else
                                                             HitSpot = FindCollisionBelt(NPC[A].Location, Block[B].Location, oldBeltSpeed);
+
                                                         if(NPCIsCheep[NPC[A].Type])
                                                         {
                                                             if(NPC[A].Wet == 0)
@@ -1920,12 +1921,14 @@ void UpdateNPCs()
                                                                     HitSpot = 0;
                                                             }
                                                         }
+
                                                         if(NPC[A].Type == 171 || NPC[A].Type == 266 || NPC[A].Type == 292)
                                                         {
                                                             if(Block[B].Type == 457)
                                                                 KillBlock(B);
                                                             HitSpot = 0;
                                                         }
+
                                                         if(NPC[A].Type == 266)
                                                             HitSpot = 0;
                                                         if(Block[B].IsPlayer > 0 && ((NPCStandsOnPlayer[NPC[A].Type] == false && NPC[A].Type != 13) || NPC[A].Inert == true))
@@ -2457,11 +2460,14 @@ void UpdateNPCs()
 
                                                         if(HitSpot == 1 && NPC[A].Type == 241 && NPC[A].Location.SpeedY > 2)
                                                             NPCHit(A, 4, A);
+
+                                                        // If a Pokey head stands on a top of another Pokey segment
                                                         if(HitSpot == 1 && NPC[A].Type == 247 && Block[B].IsNPC == 247)
                                                         {
                                                             NPC[Block[B].IsReally].Special = -3;
                                                             NPC[A].Special2 = 0;
                                                         }
+
                                                         if((NPC[A].Type == 13 || NPC[A].Type == 265) && NPC[A].Special == 5 && HitSpot > 0)
                                                             NPCHit(A, 3, A);
                                                         if(NPC[A].Type == 265 && HitSpot > 1)
@@ -3423,6 +3429,7 @@ void UpdateNPCs()
                                         fBlock2 = numBlock - numTempBlock;
                                         lBlock2 = numBlock;
                                     }
+
                                     for(B = (int)fBlock2; B <= lBlock2; B++)
                                     {
                                         //                                            If BlockNoClipping(Block(B).Type) = False And Block(B).Invis = False And Block(B).Hidden = False And Not (BlockIsSizable(Block(B).Type) And Block(B).Location.Y < .Location.Y + .Location.Height - 3) Then
