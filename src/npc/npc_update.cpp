@@ -3399,21 +3399,21 @@ void UpdateNPCs()
                                     tempLocation.Height = 32;
                                 tempLocation.Width = 16;
 
+                                bool isPokeyHead = (NPC[A].Type == 247 && NPC[A].Special2 == 0);
+
                                 // If .Location.SpeedX > 0 Then
                                 if(NPC[A].Direction > 0)
                                 {
                                     tempLocation.X = tempLocation.X + NPC[A].Location.Width - 20;
-                                    if(NPC[A].Type == 247 && NPC[A].Special2 == 0)
+                                    if(isPokeyHead)
                                         tempLocation.X += 16;
-
                                     // If .Type = 189 Then tempLocation.X = tempLocation.X - 10
                                 }
                                 else
                                 {
                                     tempLocation.X = tempLocation.X - tempLocation.Width + 20;
-                                    if(NPC[A].Type == 247 && NPC[A].Special2 == 0)
+                                    if(isPokeyHead)
                                         tempLocation.X -= 16;
-
                                     // If .Type = 189 Then tempLocation.X = tempLocation.X + 10
                                 }
 
@@ -3434,6 +3434,9 @@ void UpdateNPCs()
                                     {
                                         //                                            If BlockNoClipping(Block(B).Type) = False And Block(B).Invis = False And Block(B).Hidden = False And Not (BlockIsSizable(Block(B).Type) And Block(B).Location.Y < .Location.Y + .Location.Height - 3) Then
 
+                                        // Don't collapse Pokey during walking on slopes and other touching surfaces
+                                        if(isPokeyHead && Block[B].IsNPC != 247)
+                                            continue;
 
                                         if(tempLocation.X + tempLocation.Width >= Block[B].Location.X)
                                         {
