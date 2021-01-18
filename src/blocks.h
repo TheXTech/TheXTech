@@ -26,6 +26,9 @@
 #ifndef BLOCKS_H
 #define BLOCKS_H
 
+// Check is this a player filter block that matches a character and must be ignored in checks
+bool BlockCheckPlayerFilter(int blockIdx, int playerIdx);
+
 //! The block was hit by a player
 void BlockHit(int A, bool HitDown = false, int whatPlayer = 0);
 //! Shake the block up

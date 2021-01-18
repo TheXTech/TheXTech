@@ -2098,3 +2098,25 @@ void PowBlock()
     if(GameMenu == false)
         ScreenShake = 20;
 }
+
+bool BlockCheckPlayerFilter(int blockIdx, int playerIdx)
+{
+    auto block = Block[blockIdx].Type;
+    auto player = Player[playerIdx].Character;
+
+    switch(block)
+    {
+    case 626:
+        return (player == 1);
+    case 627:
+        return (player == 2);
+    case 628:
+        return (player == 3);
+    case 629:
+        return (player == 4);
+    case 632:
+        return (player == 5);
+    }
+
+    return false;
+}

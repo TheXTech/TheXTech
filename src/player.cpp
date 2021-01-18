@@ -2613,29 +2613,28 @@ void PlayerPush(int A, int HitSpot)
 
     fBlock = FirstBlock[(p.Location.X / 32) - 1];
     lBlock = LastBlock[((p.Location.X + p.Location.Width) / 32.0) + 1];
+
     for(int B = int(fBlock); B <= lBlock; B++)
     {
         auto &b = Block[B];
-        if(!b.Hidden)
+
+        if(b.Hidden || BlockIsSizable[b.Type])
+            continue;
+
+        if(BlockSlope[b.Type] == 0 && BlockSlope2[b.Type] == 0)
         {
-            if(!BlockIsSizable[b.Type])
+            tempLocation = p.Location;
+            tempLocation.Height -= 1;
+            if(CheckCollision(tempLocation, b.Location))
             {
-                if(BlockSlope[b.Type] == 0 && BlockSlope2[b.Type] == 0)
+                if(!BlockOnlyHitspot1[b.Type] && !BlockNoClipping[b.Type])
                 {
-                    tempLocation = p.Location;
-                    tempLocation.Height -= 1;
-                    if(CheckCollision(tempLocation, b.Location))
-                    {
-                        if(!BlockOnlyHitspot1[b.Type] && !BlockNoClipping[b.Type])
-                        {
-                            if(HitSpot == 2)
-                                p.Location.X = b.Location.X - p.Location.Height - 0.01;
-                            else if(HitSpot == 3)
-                                p.Location.Y = b.Location.Y + b.Location.Height + 0.01;
-                            else if(HitSpot == 4)
-                                p.Location.X = b.Location.X + b.Location.Width + 0.01;
-                        }
-                    }
+                    if(HitSpot == 2)
+                        p.Location.X = b.Location.X - p.Location.Height - 0.01;
+                    else if(HitSpot == 3)
+                        p.Location.Y = b.Location.Y + b.Location.Height + 0.01;
+                    else if(HitSpot == 4)
+                        p.Location.X = b.Location.X + b.Location.Width + 0.01;
                 }
             }
         }

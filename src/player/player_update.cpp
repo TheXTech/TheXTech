@@ -2646,16 +2646,18 @@ void UpdatePlayer()
                                             PlaySound(3);
                                         }
 
-                                        if(Block[B].Type == 626 && Player[A].Character == 1)
+                                        if(BlockCheckPlayerFilter(B, A))  // Optmizied
                                             HitSpot = 0;
-                                        if(Block[B].Type == 627 && Player[A].Character == 2)
-                                            HitSpot = 0;
-                                        if(Block[B].Type == 628 && Player[A].Character == 3)
-                                            HitSpot = 0;
-                                        if(Block[B].Type == 629 && Player[A].Character == 4)
-                                            HitSpot = 0;
-                                        if(Block[B].Type == 632 && Player[A].Character == 5)
-                                            HitSpot = 0;
+                                        //if(Block[B].Type == 626 && Player[A].Character == 1)
+                                        //    HitSpot = 0;
+                                        //if(Block[B].Type == 627 && Player[A].Character == 2)
+                                        //    HitSpot = 0;
+                                        //if(Block[B].Type == 628 && Player[A].Character == 3)
+                                        //    HitSpot = 0;
+                                        //if(Block[B].Type == 629 && Player[A].Character == 4)
+                                        //    HitSpot = 0;
+                                        //if(Block[B].Type == 632 && Player[A].Character == 5)
+                                        //    HitSpot = 0;
 
                                         // the following code is where the collisions are handled
 
