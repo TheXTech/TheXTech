@@ -75,9 +75,9 @@ void ShowLayer(std::string LayerName, bool NoEffect)
     {
         if(equalCase(NPC[A].Layer, LayerName))
         {
-            if(NPC[A].Hidden == true)
+            if(NPC[A].Hidden)
             {
-                if(NoEffect == false && NPC[A].Generator == false)
+                if(!NoEffect && !NPC[A].Generator)
                 {
                     tempLocation = NPC[A].Location;
                     tempLocation.X = tempLocation.X + tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
@@ -85,13 +85,13 @@ void ShowLayer(std::string LayerName, bool NoEffect)
                     NewEffect(10, tempLocation);
                 }
 
-                if(LevelEditor == false)
+                if(!LevelEditor)
                 {
-                    if(NPCWontHurt[NPC[A].Type] == false && NPCIsABonus[NPC[A].Type] == false && NPC[A].Active == true)
+                    if(!NPCWontHurt[NPC[A].Type] && !NPCIsABonus[NPC[A].Type] && NPC[A].Active)
                     {
                         for(B = 1; B <= numPlayers; B++)
                         {
-                            if(CheckCollision(Player[B].Location, NPC[A].Location) == true)
+                            if(CheckCollision(Player[B].Location, NPC[A].Location))
                                 Player[B].Immune = 120;
                         }
                     }
@@ -117,7 +117,7 @@ void ShowLayer(std::string LayerName, bool NoEffect)
             // If Not (Block(A).DefaultType = 0 And Block(A).Layer = "Destroyed Blocks") Then
             if(Block[A].Hidden == true)
             {
-                if(NoEffect == false && Block[A].Invis == false)
+                if(!NoEffect && !Block[A].Invis)
                 {
                     tempLocation = Block[A].Location;
                     tempLocation.X = tempLocation.X + tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
@@ -146,9 +146,9 @@ void ShowLayer(std::string LayerName, bool NoEffect)
     {
         if(equalCase(Background[A].Layer, LayerName))
         {
-            if(Background[A].Hidden == true)
+            if(Background[A].Hidden)
             {
-                if(NoEffect == false)
+                if(!NoEffect)
                 {
                     tempLocation = Background[A].Location;
                     tempLocation.X = tempLocation.X + tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
@@ -190,9 +190,9 @@ void HideLayer(std::string LayerName, bool NoEffect)
     {
         if(equalCase(NPC[A].Layer, LayerName))
         {
-            if(NPC[A].Hidden == false)
+            if(!NPC[A].Hidden)
             {
-                if(NoEffect == false && NPC[A].Generator == false)
+                if(!NoEffect && !NPC[A].Generator)
                 {
                     tempLocation = NPC[A].Location;
                     tempLocation.X = tempLocation.X + tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
@@ -201,7 +201,7 @@ void HideLayer(std::string LayerName, bool NoEffect)
                 }
             }
             NPC[A].Hidden = true;
-            if(NPC[A].Generator == false)
+            if(!NPC[A].Generator)
             {
                 Deactivate(A);
             }
@@ -212,9 +212,9 @@ void HideLayer(std::string LayerName, bool NoEffect)
     {
         if(equalCase(Block[A].Layer, LayerName))
         {
-            if(Block[A].Hidden == false)
+            if(!Block[A].Hidden)
             {
-                if(NoEffect == false && Block[A].Invis == false)
+                if(!NoEffect && !Block[A].Invis)
                 {
                     tempLocation = Block[A].Location;
                     tempLocation.X = tempLocation.X + tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
@@ -231,9 +231,9 @@ void HideLayer(std::string LayerName, bool NoEffect)
     {
         if(equalCase(Background[A].Layer, LayerName))
         {
-            if(Background[A].Hidden == false)
+            if(!Background[A].Hidden)
             {
-                if(NoEffect == false)
+                if(!NoEffect)
                 {
                     tempLocation = Background[A].Location;
                     tempLocation.X = tempLocation.X + tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
@@ -277,7 +277,7 @@ void ProcEvent(std::string EventName, bool NoEffect)
     double tX = 0;
     double tY = 0;
 
-    if(EventName.empty() || LevelEditor == true)
+    if(EventName.empty() || LevelEditor)
         return;
 
     for(A = 0; A <= numEvents; A++)
@@ -312,7 +312,7 @@ void ProcEvent(std::string EventName, bool NoEffect)
                 {
                     tempLevel = level[B];
                     level[B] = Events[A].level[B];
-                    if(Events[A].AutoStart == false && Events[A].Name != "Level - Start")
+                    if(!Events[A].AutoStart && !equalCase(Events[A].Name, "Level - Start"))
                     {
                         for(C = 1; C <= numPlayers; C++)
                         {
@@ -333,7 +333,7 @@ void ProcEvent(std::string EventName, bool NoEffect)
                                     }
                                 }
                             }
-                            if(tempBool == false)
+                            if(!tempBool)
                             {
                                 for(D = 1; D <= numPlayers; D++)
                                 {
@@ -363,7 +363,7 @@ void ProcEvent(std::string EventName, bool NoEffect)
                         }
                     }
 
-                    if(Events[A].Name != "Level - Start")
+                    if(!equalCase(Events[A].Name, "Level - Start"))
                     {
                         C = plr;
                         if(numPlayers == 2 && DScreenType != 5)
@@ -589,10 +589,10 @@ void UpdateEvents()
     // this sub also updates the screen position for autoscroll levels
     int A = 0;
     int B = 0;
-    if(FreezeNPCs == true)
+    if(FreezeNPCs)
         return;
 
-    if(GameMenu == false)
+    if(!GameMenu)
     {
         for(B = 1; B <= numPlayers; B++)
         {
@@ -685,7 +685,7 @@ void UpdateLayers()
 
     for(A = 0; A <= maxLayers; A++)
     {
-        if(FreezeNPCs == true)
+        if(FreezeNPCs)
         {
             if(Layer[A].Name != "" && (Layer[A].SpeedX != 0.f || Layer[A].SpeedY != 0.f))
             {
