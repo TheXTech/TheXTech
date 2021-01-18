@@ -33,6 +33,7 @@
 #include "collision.h"
 #include "editor.h"
 #include "blocks.h"
+#include "compat.h"
 
 #include <Utils/maths.h>
 
@@ -2127,11 +2128,8 @@ void NPCSpecial(int A)
                 }
             }
 
-#ifndef XTECH_BUG_PLATFORMS_GRAVITY
-            if(!pausePlatforms) // Keep zeroed speed when player required the pause of the move effect
-#endif
+            if(!g_compatibility.fix_platforms_acceleration || !pausePlatforms) // Keep zeroed speed when player required the pause of the move effect
             {
-
                 NPC[A].Location.SpeedY = NPC[A].Special;
                 NPC[A].Location.SpeedX = NPC[A].Special2;
             }
@@ -2249,18 +2247,13 @@ void NPCSpecial(int A)
                 NPC[A].Location.SpeedY += D;
             }
 
-#ifndef XTECH_BUG_PLATFORMS_GRAVITY
-            if(!pausePlatforms) // Process the code normally
-#endif
+            if(!g_compatibility.fix_platforms_acceleration || !pausePlatforms)
             {
                 NPC[A].Special = NPC[A].Location.SpeedY;
                 NPC[A].Special2 = NPC[A].Location.SpeedX;
             }
-#ifndef XTECH_BUG_PLATFORMS_GRAVITY
-            else // Or zero the speed and don't change special values
-#else
-            if(pausePlatforms) // Process the code normally
-#endif
+
+            if(pausePlatforms) // Or zero the speed and don't change special values
             {
                 NPC[A].Location.SpeedX = 0;
                 NPC[A].Location.SpeedY = 0;

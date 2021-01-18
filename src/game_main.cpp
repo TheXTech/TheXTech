@@ -39,6 +39,7 @@
 #include "game_main.h"
 
 #include "frame_timer.h"
+#include "compat.h"
 #include "blocks.h"
 #include "change_res.h"
 #include "collision.h"
@@ -76,6 +77,8 @@ int GameMain(const CmdLineSetup_t &setup)
     FrameSkip = setup.frameSkip;
     noSound = setup.noSound;
     neverPause = setup.neverPause;
+
+    compatInit(g_compatibility);
 
     // [ !Here was a starting dialog! ]
 

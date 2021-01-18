@@ -32,6 +32,7 @@
 #include "../editor.h"
 #include "../blocks.h"
 #include "../sorting.h"
+#include "../compat.h"
 
 #include <Utils/maths.h>
 
@@ -3435,7 +3436,7 @@ void UpdateNPCs()
                                         //                                            If BlockNoClipping(Block(B).Type) = False And Block(B).Invis = False And Block(B).Hidden = False And Not (BlockIsSizable(Block(B).Type) And Block(B).Location.Y < .Location.Y + .Location.Height - 3) Then
 
                                         // Don't collapse Pokey during walking on slopes and other touching surfaces
-                                        if(isPokeyHead && Block[B].IsNPC != 247)
+                                        if(g_compatibility.fix_pokey_collapse && isPokeyHead && Block[B].IsNPC != 247)
                                             continue;
 
                                         if(tempLocation.X + tempLocation.Width >= Block[B].Location.X)

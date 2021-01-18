@@ -133,16 +133,6 @@ endif()
 
 # ============ Customization ==end=========
 
-# ============ Compatibility ==============
-set(BUGS_ENABLE_FLAGS)
-
-option(XTECH_BUG_PLATFORMS_GRAVITY "Enable vanilla bug: free-falling platforms getting confused when player changes their power-up state" OFF)
-if(XTECH_BUG_PLATFORMS_GRAVITY)
-    list(APPEND BUGS_ENABLE_FLAGS -DXTECH_BUG_PLATFORMS_GRAVITY)
-endif()
-
-# ============ Compatibility ==end=========
-
 option(PGEFL_QT_SUPPORT "Build PGE-FL with Qt support [Unneeded]" OFF)
 set(Moondust_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}) # Don't install PGE-FL libraries
 add_subdirectory(lib/PGE_File_Formats)
@@ -262,6 +252,7 @@ if(APPLE)
 endif()
 
 set(THEXTECH_SRC
+    src/compat.cpp
     src/game_main.cpp
     src/globals.cpp
     src/npc.cpp
@@ -423,10 +414,6 @@ endif()
 
 if(NOT ENABLE_LOGGING)
     target_compile_definitions(thextech PRIVATE -DDISABLE_LOGGING)
-endif()
-
-if(BUGS_ENABLE_FLAGS)
-    target_compile_definitions(thextech PRIVATE ${BUGS_ENABLE_FLAGS})
 endif()
 
 if(EMSCRIPTEN)
