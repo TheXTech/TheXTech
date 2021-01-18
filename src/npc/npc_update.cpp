@@ -3381,7 +3381,7 @@ void UpdateNPCs()
                                     NPC[A].Location.SpeedY = -7;
                                 }
                             }
-                            else if(NPCTurnsAtCliffs[NPC[A].Type] == true && NPC[A].Projectile == false) // Walking code NPCs that turn
+                            else if(NPCTurnsAtCliffs[NPC[A].Type] && !NPC[A].Projectile) // Walking code NPCs that turn
                             {
                                 tempTurn = true;
                                 tempLocation = NPC[A].Location;
@@ -3392,12 +3392,13 @@ void UpdateNPCs()
                                 if(NPC[A].Slope > 0)
                                     tempLocation.Height = 32;
                                 tempLocation.Width = 16;
+
                                 // If .Location.SpeedX > 0 Then
                                 if(NPC[A].Direction > 0)
                                 {
                                     tempLocation.X = tempLocation.X + NPC[A].Location.Width - 20;
                                     if(NPC[A].Type == 247 && NPC[A].Special2 == 0)
-                                        tempLocation.X = tempLocation.X + 16;
+                                        tempLocation.X += 16;
 
                                     // If .Type = 189 Then tempLocation.X = tempLocation.X - 10
                                 }
@@ -3405,10 +3406,11 @@ void UpdateNPCs()
                                 {
                                     tempLocation.X = tempLocation.X - tempLocation.Width + 20;
                                     if(NPC[A].Type == 247 && NPC[A].Special2 == 0)
-                                        tempLocation.X = tempLocation.X - 16;
+                                        tempLocation.X -= 16;
 
                                     // If .Type = 189 Then tempLocation.X = tempLocation.X + 10
                                 }
+
                                 for(bCheck2 = 1; bCheck2 <= 2; bCheck2++)
                                 {
                                     if(bCheck2 == 1)
