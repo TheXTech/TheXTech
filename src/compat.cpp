@@ -34,4 +34,5 @@ void compatInit(Compatibility_t &c)
 {
     c.fix_platforms_acceleration = true;
     c.fix_pokey_collapse = true;
+    c.fix_player_filter_bounce = true;
 }

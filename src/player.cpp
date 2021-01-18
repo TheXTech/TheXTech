@@ -43,6 +43,7 @@
 #include "editor.h"
 #include "layers.h"
 #include "main/level_file.h"
+#include "compat.h"
 
 
 
@@ -2619,6 +2620,9 @@ void PlayerPush(int A, int HitSpot)
         auto &b = Block[B];
 
         if(b.Hidden || BlockIsSizable[b.Type])
+            continue;
+
+        if(g_compatibility.fix_player_filter_bounce && BlockCheckPlayerFilter(B, A))
             continue;
 
         if(BlockSlope[b.Type] == 0 && BlockSlope2[b.Type] == 0)
