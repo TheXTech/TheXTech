@@ -563,3 +563,122 @@ bool CheckHitSpot1(const Location_t &Loc1, const Location_t &Loc2)
     return tempCheckHitSpot1;
 }
 
+static inline double blockGetTopYTouching(const Block_t &block, const Location_t& loc)
+{
+    // Get slope type
+    int blockType = block.Type;
+    int slopeDirection;
+
+    if((blockType >= 1) && (blockType <= maxBlockType))
+    {
+        slopeDirection = BlockSlope[blockType];
+    }
+    else
+    {
+        slopeDirection = 0;
+    }
+
+    // The simple case, no slope
+    if(slopeDirection == 0)
+    {
+        return block.Location.Y;
+    }
+
+    // The degenerate case, no width
+    if(block.Location.Width <= 0)
+    {
+        return block.Location.Y;
+    }
+
+    // The following uses a slope calculation like 1.3 does
+
+    // Get right or left x coordinate as relevant for the slope direction
+    double refX = loc.X;
+    if(slopeDirection > 0)
+        refX += loc.Width;
+
+    // Get how far along the slope we are in the x direction
+    double slope = (refX - block.Location.X) / block.Location.Width;
+    if(slopeDirection > 0) slope = 1.0 - slope;
+    if(slope < 0.0) slope = 0.0;
+    if(slope > 1.0) slope = 1.0;
+
+    // Determine the y coordinate
+    return block.Location.Y + block.Location.Height - (block.Location.Height * slope);
+}
+
+bool CompareWalkBlock(int oldBlockIdx, int newBlockIdx, const Location_t &referenceLoc)
+{
+    if(oldBlockIdx > numBlock)
+        return false;
+    if(newBlockIdx > numBlock)
+        return false;
+
+    const Block_t& oldBlock = Block[oldBlockIdx];
+    const Block_t& newBlock = Block[newBlockIdx];
+
+    double newBlockY = blockGetTopYTouching(newBlock, referenceLoc);
+    double oldBlockY = blockGetTopYTouching(oldBlock, referenceLoc);
+
+    if(newBlockY < oldBlockY)
+    {
+        // New block is higher, replace
+        return true;
+    }
+    else if(newBlockY > oldBlockY)
+    {
+        // New block is lower, don't replace
+        return false;
+    }
+
+    // Break tie based on if one is moving upward faster
+    double newBlockSpeedY = newBlock.Location.SpeedY;
+    double oldBlockSpeedY = oldBlock.Location.SpeedY;
+
+    if(newBlockSpeedY < oldBlockSpeedY)
+    {
+        // New block is moving more upward, replace
+        return true;
+    }
+    else if(newBlockSpeedY > oldBlockSpeedY)
+    {
+        // New block is moving more downward, don't replace
+        return false;
+    }
+
+    // Break tie based on x-proximity
+    double refX = referenceLoc.X + referenceLoc.Width * 0.5;
+    double newBlockDist = abs((newBlock.Location.X + newBlock.Location.Width * 0.5) - refX);
+    double oldBlockDist = abs((oldBlock.Location.X + oldBlock.Location.Width * 0.5) - refX);
+
+    if(newBlockDist < oldBlockDist)
+    {
+        // New block is closer, replace
+        return true;
+    }
+    if(newBlockDist > oldBlockDist)
+    {
+        // New block further, don't replace
+        return false;
+    }
+
+    // Break tie based on narrower width (more specific match)
+    double newBlockWidth = newBlock.Location.Width;
+    double oldBlockWidth = oldBlock.Location.Width;
+
+    if(newBlockWidth < oldBlockWidth)
+    {
+        // New block is narrower, replace
+        return true;
+    }
+
+    if(newBlockWidth > oldBlockWidth)
+    {
+        // New block wider, don't replace
+        return false;
+    }
+
+    // Still tied? Let's just not replace
+    return false;
+}
+

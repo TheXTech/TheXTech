@@ -31,6 +31,7 @@ struct Compatibility_t
     bool fix_pokey_collapse;
     bool fix_platforms_acceleration;
     bool fix_player_filter_bounce;
+    bool fix_player_downward_clip;
 };
 
 extern Compatibility_t g_compatibility;

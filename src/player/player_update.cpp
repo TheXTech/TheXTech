@@ -33,6 +33,7 @@
 #include "../layers.h"
 #include "../editor.h"
 #include "../game_main.h"
+#include "../compat.h"
 
 #include <Utils/maths.h>
 
@@ -2690,6 +2691,7 @@ void UpdatePlayer()
                                                     YoshiPound(A, B, true);
                                                 }
                                             }
+
                                             if(tempHit3 == 0) // For walking
                                             {
                                                 tempHit3 = B;
@@ -2697,36 +2699,46 @@ void UpdatePlayer()
                                             }
                                             else // Find the best block to walk on if touching multiple blocks
                                             {
-                                                if(Block[B].Location.SpeedY != 0 && Block[tempHit3].Location.SpeedY == 0)
+                                                if(g_compatibility.fix_player_downward_clip)
                                                 {
-                                                    tempHit3 = B;
-                                                    tempLocation3 = Block[B].Location;
-                                                }
-                                                else if(Block[B].Location.SpeedY == 0 && Block[tempHit3].Location.SpeedY != 0)
-                                                {
-                                                }
-                                                else
-                                                {
-                                                    C = Block[B].Location.X + Block[B].Location.Width * 0.5;
-                                                    D = Block[tempHit3].Location.X + Block[tempHit3].Location.Width * 0.5;
-
-                                                    C = C - (Player[A].Location.X + Player[A].Location.Width * 0.5);
-                                                    D = D - (Player[A].Location.X + Player[A].Location.Width * 0.5);
-                                                    if(C < 0)
-                                                        C = -C;
-                                                    if(D < 0)
-                                                        D = -D;
-                                                    if(C < D)
+                                                    if(CompareWalkBlock(tempHit3, B, Player[A].Location))
+                                                    {
                                                         tempHit3 = B;
+                                                        tempLocation3 = Block[B].Location;
+                                                    }
                                                 }
-
-                                                // if this block is moving up give it priority
-                                                if(Block[B].Location.SpeedY < 0 && Block[B].Location.Y < Block[tempHit3].Location.Y)
+                                                else // Using old code
                                                 {
-                                                    tempHit3 = B;
-                                                    tempLocation3 = Block[B].Location;
-                                                }
+                                                    if(Block[B].Location.SpeedY != 0 && Block[tempHit3].Location.SpeedY == 0)
+                                                    {
+                                                        tempHit3 = B;
+                                                        tempLocation3 = Block[B].Location;
+                                                    }
+                                                    else if(Block[B].Location.SpeedY == 0 && Block[tempHit3].Location.SpeedY != 0)
+                                                    {
+                                                    }
+                                                    else
+                                                    {
+                                                        C = Block[B].Location.X + Block[B].Location.Width * 0.5;
+                                                        D = Block[tempHit3].Location.X + Block[tempHit3].Location.Width * 0.5;
 
+                                                        C = C - (Player[A].Location.X + Player[A].Location.Width * 0.5);
+                                                        D = D - (Player[A].Location.X + Player[A].Location.Width * 0.5);
+                                                        if(C < 0)
+                                                            C = -C;
+                                                        if(D < 0)
+                                                            D = -D;
+                                                        if(C < D)
+                                                            tempHit3 = B;
+                                                    }
+
+                                                    // if this block is moving up give it priority
+                                                    if(Block[B].Location.SpeedY < 0 && Block[B].Location.Y < Block[tempHit3].Location.Y)
+                                                    {
+                                                        tempHit3 = B;
+                                                        tempLocation3 = Block[B].Location;
+                                                    }
+                                                }
                                             }
 
                                         }
@@ -2922,6 +2934,7 @@ void UpdatePlayer()
                             }
                         }
                     }
+
                     if(tempHit2)
                     {
                         if(WalkingCollision(Player[A].Location, Block[tempHit3].Location))
