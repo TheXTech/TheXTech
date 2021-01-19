@@ -35,6 +35,7 @@ struct Compatibility_t
 
 extern Compatibility_t g_compatibility;
 
-void compatInit(Compatibility_t &c);
+void LoadCustomCompat();
+void ResetCompat();
 
 #endif // COMPAT_H

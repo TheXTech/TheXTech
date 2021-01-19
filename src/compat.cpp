@@ -23,16 +23,64 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#include <Logger/logger.h>
+#include <IniProcessor/ini_processing.h>
+#include <Utils/files.h>
+#include <Utils/dir_list_ci.h>
+#include "globals.h"
 #include "compat.h"
+
 
 Compatibility_t g_compatibility;
 
-
-// TODO: Make the INI loading/saving to specify compatibility specs
-
-void compatInit(Compatibility_t &c)
+static void compatInit(Compatibility_t &c)
 {
     c.fix_platforms_acceleration = true;
     c.fix_pokey_collapse = true;
     c.fix_player_filter_bounce = true;
+}
+
+static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
+{
+    pLogDebug("Loading %s...", fileName.c_str());
+
+    IniProcessing compat(fileName);
+    if(!compat.isOpened())
+    {
+        pLogWarning("Can't open the compat.ini file: %s", fileName.c_str());
+        return;
+    }
+
+    compat.beginGroup("compatibility");
+    compat.read("fix-platform-acceleration", c.fix_platforms_acceleration, c.fix_platforms_acceleration);
+    compat.read("fix-pokey-collapse", c.fix_pokey_collapse, c.fix_pokey_collapse);
+    compat.read("fix-player-filter-bounce", c.fix_player_filter_bounce, c.fix_player_filter_bounce);
+    compat.endGroup();
+}
+
+void LoadCustomCompat()
+{
+    DirListCI s_dirEpisode;
+    DirListCI s_dirCustom;
+    std::string episodeCompat, customCompat;
+
+    s_dirEpisode.setCurDir(FileNamePath);
+    s_dirCustom.setCurDir(FileNamePath + FileName);
+
+    // Episode-wide custom player setup
+    episodeCompat = FileNamePath + s_dirEpisode.resolveFileCase("compat.ini");
+    // Level-wide custom player setup
+    customCompat = FileNamePath + FileName + "/" + s_dirCustom.resolveFileCase("compat.ini");
+
+    compatInit(g_compatibility);
+
+    if(Files::fileExists(episodeCompat))
+        loadCompatIni(g_compatibility, episodeCompat);
+    if(Files::fileExists(customCompat))
+        loadCompatIni(g_compatibility, customCompat);
+}
+
+void ResetCompat()
+{
+    compatInit(g_compatibility);
 }

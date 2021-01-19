@@ -31,6 +31,7 @@
 #include "../load_gfx.h"
 #include "../sound.h"
 #include "../custom.h"
+#include "../compat.h"
 #include "level_file.h"
 
 #include <Utils/strings.h>
@@ -67,6 +68,7 @@ void OpenWorld(std::string FilePath)
     if(wld.meta.RecentFormat == LevelData::SMBX64)
         FileRelease = int(wld.meta.RecentFormatVersion);
 
+    LoadCustomCompat();
     FindCustomPlayers();
     LoadWorldCustomGFX();
 

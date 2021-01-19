@@ -32,6 +32,7 @@
 #include "../sound.h"
 #include "../sorting.h"
 #include "../layers.h"
+#include "../compat.h"
 #include "level_file.h"
 
 #include <DirManager/dirman.h>
@@ -141,6 +142,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 //    if(DirMan::exists(FileNamePath + FileName))
 //        FindCustomNPCs(FileNamePath + FileName);
 //    else
+    LoadCustomCompat();
     FindCustomPlayers();
     FindCustomNPCs();
     LoadCustomGFX();
@@ -800,6 +802,7 @@ void ClearLevel()
     Events_t blankEvent = Events_t();
     NPCScore[274] = 6;
     LevelName.clear();
+    ResetCompat();
     LoadNPCDefaults();
     LoadPlayerDefaults();
     noUpdate = true;

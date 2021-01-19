@@ -9,6 +9,7 @@ Changes for 1.3.3.2
 -Fixed an inability to autostart events when "restart level after death" mode is enabled on the world map
 -Fixed the case when Pokey getting collapsed during walking on slopes
 -Fixed an unwanted player bounce by a filter block after NPC stomp
+-Added the "compat.ini" support for episode and level specific to enable/disable certain bugs of the old game
 
 Changes for 1.3.3.1
 -Fixed a crash, caused by the incremental locked warps counter that leads BGO array exciting

@@ -78,7 +78,7 @@ int GameMain(const CmdLineSetup_t &setup)
     noSound = setup.noSound;
     neverPause = setup.neverPause;
 
-    compatInit(g_compatibility);
+    ResetCompat();
 
     // [ !Here was a starting dialog! ]
 
@@ -519,6 +519,7 @@ int GameMain(const CmdLineSetup_t &setup)
                 OwedMountType[A] = 0;
             }
 
+            LoadCustomCompat();
             FindCustomPlayers();
             LoadCustomGFX();
             LoadCustomSound();
