@@ -2333,7 +2333,7 @@ void UpdateNPCs()
                                                             }
                                                         }
                                                         // beech koopa kicking an ice block
-                                                        if((NPC[A].Type == 55 || NPC[A].Type == 119) && Block[B].IsNPC == 45)
+                                                        if(((g_compatibility.fix_npc55_kick_ice_blocks && NPC[A].Type == 55) || NPC[A].Type == 119) && Block[B].IsNPC == 45)
                                                         {
                                                             if(HitSpot == 2 || HitSpot == 4)
                                                             {

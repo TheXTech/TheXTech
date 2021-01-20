@@ -33,6 +33,7 @@ struct Compatibility_t
     bool fix_player_filter_bounce;
     bool fix_player_downward_clip;
     bool fix_npc_downward_clip;
+    bool fix_npc55_kick_ice_blocks;
 };
 
 extern Compatibility_t g_compatibility;
