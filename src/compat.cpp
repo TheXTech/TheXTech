@@ -39,6 +39,7 @@ static void compatInit(Compatibility_t &c)
     c.fix_pokey_collapse = true;
     c.fix_player_filter_bounce = true;
     c.fix_player_downward_clip = true;
+    c.fix_npc_downward_clip = true;
 }
 
 static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
@@ -57,6 +58,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
     compat.read("fix-pokey-collapse", c.fix_pokey_collapse, c.fix_pokey_collapse);
     compat.read("fix-player-filter-bounce", c.fix_player_filter_bounce, c.fix_player_filter_bounce);
     compat.read("fix-player-downward-clip", c.fix_player_downward_clip, c.fix_player_downward_clip);
+    compat.read("fix-npc-downward-clip", c.fix_npc_downward_clip, c.fix_npc_downward_clip);
     compat.endGroup();
 }
 

@@ -682,3 +682,49 @@ bool CompareWalkBlock(int oldBlockIdx, int newBlockIdx, const Location_t &refere
     return false;
 }
 
+void CompareNpcWalkBlock(int &tempHitBlock, int &tempHitOldBlock,
+                         double &tempHit,   double &tempHitOld,
+                         int &tempHitIsSlope, NPC_t *npc)
+{
+    int oldBlockIdx  = tempHitOldBlock;
+    int newBlockIdx  = tempHitBlock;
+    Location_t &loc = npc->Location;
+
+    // If no temp block was already set, just exit
+    if(tempHitOldBlock == 0)
+    {
+        // tempHitBlock is set, don't revert
+        tempHitIsSlope = 0;
+        if(npc->Slope && (npc->Slope != newBlockIdx))
+        {
+            if(CompareWalkBlock(npc->Slope, newBlockIdx, loc) != 0)
+            {
+                npc->Slope = 0;
+            }
+        }
+        return;
+    }
+
+    // Compare blocks
+    int compareResult = CompareWalkBlock(oldBlockIdx, newBlockIdx, loc);
+
+    // Revert to the old block if the comparison says we shouldn't replace
+    if(compareResult == 0)
+    {
+        // We shouldn't replace, so revert variables
+        tempHitBlock = tempHitOldBlock;
+        tempHit = tempHitOld;
+    }
+    else
+    {
+        // tempHitBlock is set, don't revert
+        tempHitIsSlope = 0;
+        if(npc->Slope && (npc->Slope != newBlockIdx))
+        {
+            if(CompareWalkBlock(npc->Slope, newBlockIdx, loc) != 0)
+            {
+                npc->Slope = 0;
+            }
+        }
+    }
+}

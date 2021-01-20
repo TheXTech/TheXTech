@@ -28,6 +28,8 @@
 
 #include "location.h"
 
+struct NPC_t;
+
 // Public Function CheckCollision(Loc1 As Location, Loc2 As Location) As Boolean 'Normal collisions
 // Normal collisions
 bool CheckCollision(const Location_t &Loc1, const Location_t &Loc2);
@@ -90,5 +92,9 @@ bool CanComeOut(const Location_t &Loc1, const Location_t &Loc2);
 bool CheckHitSpot1(const Location_t &Loc1, const Location_t &Loc2);
 
 bool CompareWalkBlock(int oldBlockIdx, int newBlockIdx, const Location_t &referenceLoc);
+
+void CompareNpcWalkBlock(int &tempHitBlock, int &tempHitOldBlock,
+                         double &tempHit,   double &tempHitOld,
+                         int &tempHitIsSlope, NPC_t *npc);
 
 #endif // COLLISION_H

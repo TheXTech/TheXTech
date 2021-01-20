@@ -56,8 +56,11 @@ void UpdateNPCs()
 //    NPC_t tempNPC;
     int HitSpot = 0; // used for collision detection
     double tempHit = 0;
+    double tempHitOld = 0;
     Block_t tmpBlock;
     int tempHitBlock = 0;
+    int tempHitOldBlock = 0;
+    int tempHitIsSlope = 0;
     float tempSpeedA = 0;
 //    float tempSpeedB = 0;
     bool tempTurn = false; // used for turning the npc around
@@ -1088,6 +1091,7 @@ void UpdateNPCs()
                     if(NPC[A].CantHurt <= 0)
                         NPC[A].CantHurtPlayer = 0;
                     tempHit = 0;
+                    tempHitBlock = 0;
                     tempBlockHit[1] = 0;
                     tempBlockHit[2] = 0;
                     winningBlock = 0;
@@ -2484,6 +2488,13 @@ void UpdateNPCs()
                                                         }
                                                         if(NPC[A].Type == 291 && HitSpot > 0)
                                                             NPCHit(A, 3, A);
+
+                                                        if(g_compatibility.fix_npc_downward_clip)
+                                                        {
+                                                            tempHitOld = tempHit;
+                                                            tempHitOldBlock = tempHitBlock;
+                                                        }
+
                                                         // hitspot 1
                                                         if(HitSpot == 1) // Hitspot 1
                                                         {
@@ -2599,6 +2610,7 @@ void UpdateNPCs()
                                                                         if(NPC[A].Slope == 0)
                                                                             NPC[A].Location.Y = Block[B].Location.Y - NPC[A].Location.Height - 0.01;
                                                                         tempHit = 0;
+                                                                        tempHitOld = 0;
                                                                     }
                                                                     else if(NPC[A].Type == 265)
                                                                     {
@@ -2606,6 +2618,7 @@ void UpdateNPCs()
                                                                         if(NPC[A].Slope == 0)
                                                                             NPC[A].Location.Y = Block[B].Location.Y - NPC[A].Location.Height - 0.01;
                                                                         tempHit = 0;
+                                                                        tempHitOld = 0;
                                                                         if(Block[B].Slippy == false)
                                                                             NPC[A].Special5 = NPC[A].Special5 + 1;
                                                                         if(NPC[A].Special5 >= 3)
@@ -2646,6 +2659,7 @@ void UpdateNPCs()
                                                                         if(NPC[A].Slope == 0)
                                                                             NPC[A].Location.Y = Block[B].Location.Y - NPC[A].Location.Height - 0.01;
                                                                         tempHit = 0;
+                                                                        tempHitOld = 0;
                                                                     }
                                                                     else if(NPC[A].Type != 78 && NPC[A].Type != 17 && NPC[A].Type != 13)
                                                                     {
@@ -2810,6 +2824,15 @@ void UpdateNPCs()
                                                                 }
                                                             }
                                                         }
+
+                                                        // Find best block here
+                                                        if(g_compatibility.fix_npc_downward_clip && (tempHitBlock != tempHitOldBlock))
+                                                        {
+                                                            CompareNpcWalkBlock(tempHitBlock, tempHitOldBlock,
+                                                                                tempHit, tempHitOld,
+                                                                                tempHitIsSlope, &NPC[A]);
+                                                        }
+
                                                         if((NPC[A].Projectile & !(NPC[A].Type == 13)) != 0 && !(NPC[A].Type == 265) && !(NPC[A].Type == 58) && !(NPC[A].Type == 21 || NPC[A].Type == 67 || NPC[A].Type == 68 || NPC[A].Type == 69 || NPC[A].Type == 70)) // Hit the block if the NPC is a projectile
                                                         {
                                                             if(HitSpot == 2 || HitSpot == 4 || HitSpot == 5)
@@ -3302,6 +3325,7 @@ void UpdateNPCs()
                                 }
                             }
                         }
+
                         if(NPC[A].WallDeath > 0)
                         {
                             if(NPCIsCheep[NPC[A].Type] == true)
@@ -3309,6 +3333,7 @@ void UpdateNPCs()
                             else
                                 NPC[A].WallDeath = 0;
                         }
+
                         if(tempHit != 0) // Walking
                         {
                             if(NPC[A].Type == 3) // Walking code for Flying Goomba
@@ -3626,6 +3651,7 @@ void UpdateNPCs()
                             if(NPC[A].Slope == 0)
                                 NPC[A].Location.Y = tempHit;
                             tempHit = 0;
+                            tempHitBlock = 0;
                             if(Block[tempHitBlock].IsNPC > 0 && NPC[Block[tempHitBlock].IsReally].Slope > 0)
                             {
                                 // .Location.SpeedY = 0
