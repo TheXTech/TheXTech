@@ -641,7 +641,8 @@ void UpdatePlayer()
                         Player[A].Location.SpeedY = 3;
                     else
                         Player[A].Location.SpeedY = 0;
-                    if(Player[A].VineBGO > 0)
+
+                    if(g_compatibility.fix_climb_bgo_speed_adding && Player[A].VineBGO > 0)
                     {
                         Player[A].Location.SpeedX += Background[Player[A].VineBGO].Location.SpeedX;
                         Player[A].Location.SpeedY += Background[Player[A].VineBGO].Location.SpeedY;
@@ -3303,7 +3304,8 @@ void UpdatePlayer()
                                         if(Player[A].Vine > 0)
                                         {
                                             Player[A].VineNPC = -1;
-                                            Player[A].VineBGO = B;
+                                            if(g_compatibility.fix_climb_bgo_speed_adding)
+                                                Player[A].VineBGO = B;
                                         }
                                     }
                                 } // !Fairy & !Stoned
@@ -3648,7 +3650,8 @@ void UpdatePlayer()
                                                 if(Player[A].Vine > 0)
                                                 {
                                                     Player[A].VineNPC = B;
-                                                    Player[A].VineBGO = 0.0;
+                                                    if(g_compatibility.fix_climb_bgo_speed_adding)
+                                                        Player[A].VineBGO = 0.0;
                                                 }
                                             }
                                         }

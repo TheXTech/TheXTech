@@ -1186,7 +1186,7 @@ void PlayerFrame(int A)
     {
         bool doesPlayerMoves = false;
 
-        if(Player[A].VineBGO > 0)
+        if(g_compatibility.fix_climb_bgo_speed_adding && Player[A].VineBGO > 0)
         {
             doesPlayerMoves = !fEqual(Player[A].Location.SpeedX,  Background[Player[A].VineBGO].Location.SpeedX) ||
                                Player[A].Location.SpeedY < Background[Player[A].VineBGO].Location.SpeedY - 0.1;
