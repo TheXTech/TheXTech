@@ -2228,16 +2228,19 @@ void UpdateNPCs()
                                                                         PlrMid = NPC[A].Location.X;
                                                                     else
                                                                         PlrMid = NPC[A].Location.X + NPC[A].Location.Width;
+
                                                                     Slope = (PlrMid - Block[B].Location.X) / Block[B].Location.Width;
+
                                                                     if(BlockSlope[Block[B].Type] < 0)
                                                                         Slope = 1 - Slope;
                                                                     if(Slope < 0)
                                                                         Slope = 0;
                                                                     if(Slope > 100)
                                                                         Slope = 100;
-                                                                    if(tempHitBlock > 0)
+
+                                                                    if(tempHitBlock > 0) // VERIFY ME
                                                                     {
-                                                                        if(BlockIsSizable[Block[tempHitBlock].Type] == false)
+                                                                        if(!BlockIsSizable[Block[tempHitBlock].Type])
                                                                         {
                                                                             if(Block[tempHitBlock].Location.Y != Block[B].Location.Y)
                                                                             {
@@ -2246,6 +2249,7 @@ void UpdateNPCs()
                                                                             }
                                                                         }
                                                                     }
+
                                                                     if(NPC[A].Location.Y >= Block[B].Location.Y + (Block[B].Location.Height * Slope) - NPC[A].Location.Height - 0.1)
                                                                     {
                                                                         if(NPC[A].Type == 241 && NPC[A].Location.SpeedY > 2)
@@ -3334,7 +3338,7 @@ void UpdateNPCs()
                                 NPC[A].WallDeath = 0;
                         }
 
-                        if(tempHit != 0) // Walking
+                        if(tempHit != 0) // Walking   // VERIFY ME
                         {
                             if(NPC[A].Type == 3) // Walking code for Flying Goomba
                             {
