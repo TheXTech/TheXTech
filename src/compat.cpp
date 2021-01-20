@@ -41,6 +41,7 @@ static void compatInit(Compatibility_t &c)
     c.fix_player_downward_clip = true;
     c.fix_npc_downward_clip = true;
     c.fix_npc55_kick_ice_blocks = false;
+    c.fix_climb_invisible_fences = true;
 }
 
 static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
@@ -61,6 +62,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
     compat.read("fix-player-downward-clip", c.fix_player_downward_clip, c.fix_player_downward_clip);
     compat.read("fix-npc-downward-clip", c.fix_npc_downward_clip, c.fix_npc_downward_clip);
     compat.read("fix-npc55-kick-ice-blocks", c.fix_npc55_kick_ice_blocks, c.fix_npc55_kick_ice_blocks);
+    compat.read("fix-climb-invisible-fences", c.fix_climb_invisible_fences, c.fix_climb_invisible_fences);
     compat.endGroup();
 }
 

@@ -34,6 +34,7 @@ struct Compatibility_t
     bool fix_player_downward_clip;
     bool fix_npc_downward_clip;
     bool fix_npc55_kick_ice_blocks;
+    bool fix_climb_invisible_fences;
 };
 
 extern Compatibility_t g_compatibility;

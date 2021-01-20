@@ -3245,7 +3245,7 @@ void UpdatePlayer()
                 // check vine backgrounds
                 for(B = 1; B <= numBackground; B++)
                 {
-                    if(BackgroundFence[Background[B].Type] && !Background[B].Hidden)
+                    if(BackgroundFence[Background[B].Type] && (!g_compatibility.fix_climb_invisible_fences || !Background[B].Hidden))
                     {
                         if(CheckCollision(Player[A].Location, Background[B].Location))
                         {
