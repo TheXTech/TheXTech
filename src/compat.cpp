@@ -40,7 +40,7 @@ static void compatInit(Compatibility_t &c)
     c.fix_player_filter_bounce = true;
     c.fix_player_downward_clip = true;
     c.fix_npc_downward_clip = true;
-    c.fix_npc55_kick_ice_blocks = true;
+    c.fix_npc55_kick_ice_blocks = false;
 }
 
 static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
