@@ -36,6 +36,7 @@ struct Compatibility_t
     bool fix_npc55_kick_ice_blocks;
     bool fix_climb_invisible_fences;
     bool fix_climb_bgo_speed_adding;
+    bool enable_climb_bgo_layer_move;
 };
 
 extern Compatibility_t g_compatibility;

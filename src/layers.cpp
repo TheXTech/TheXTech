@@ -33,6 +33,7 @@
 #include "sound.h"
 #include "graphics.h"
 #include "game_main.h"
+#include "compat.h"
 
 
 int numLayers = 0;
@@ -501,6 +502,18 @@ void ProcEvent(std::string EventName, bool NoEffect)
                                     Block[C].Location.SpeedY = double(Layer[B].SpeedY);
                                 }
                             }
+                            if(g_compatibility.enable_climb_bgo_layer_move)
+                            {
+                                int allBGOs = numBackground + numLocked;
+                                for(C = 1; C <= allBGOs; C++)
+                                {
+                                    if(BackgroundFence[Background[C].Type] && Background[C].Layer == Layer[B].Name)
+                                    {
+                                        Background[C].Location.SpeedX = double(Layer[B].SpeedX);
+                                        Background[C].Location.SpeedY = double(Layer[B].SpeedY);
+                                    }
+                                }
+                            }
                             for(C = 1; C <= numNPCs; C++)
                             {
                                 if(NPC[C].Layer == Layer[B].Name)
@@ -697,6 +710,19 @@ void UpdateLayers()
                         Block[B].Location.SpeedY = 0;
                     }
                 }
+
+                if(g_compatibility.enable_climb_bgo_layer_move)
+                {
+                    int allBGOs = numBackground + numLocked;
+                    for(B = 1; B <= allBGOs; B++)
+                    {
+                        if(BackgroundFence[Background[B].Type] && Background[B].Layer == Layer[A].Name)
+                        {
+                            Background[B].Location.SpeedX = double(Layer[A].SpeedX);
+                            Background[B].Location.SpeedY = double(Layer[A].SpeedY);
+                        }
+                    }
+                }
             }
         }
         else
@@ -734,6 +760,11 @@ void UpdateLayers()
                     {
                         Background[B].Location.X += double(Layer[A].SpeedX);
                         Background[B].Location.Y += double(Layer[A].SpeedY);
+                        if(g_compatibility.enable_climb_bgo_layer_move && BackgroundFence[Background[B].Type])
+                        {
+                            Background[B].Location.SpeedX = double(Layer[A].SpeedX);
+                            Background[B].Location.SpeedY = double(Layer[A].SpeedY);
+                        }
                     }
                 }
 
