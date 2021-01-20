@@ -37,6 +37,7 @@ struct Compatibility_t
     bool fix_climb_invisible_fences;
     bool fix_climb_bgo_speed_adding;
     bool enable_climb_bgo_layer_move;
+    bool fix_player_clip_wall_at_npc;
 };
 
 extern Compatibility_t g_compatibility;

@@ -23,6 +23,10 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+
+#include <Logger/logger.h>
+#include <Utils/maths.h>
+
 #include "../globals.h"
 #include "../player.h"
 #include "../collision.h"
@@ -34,8 +38,6 @@
 #include "../editor.h"
 #include "../game_main.h"
 #include "../compat.h"
-
-#include <Utils/maths.h>
 
 
 void UpdatePlayer()
@@ -65,6 +67,7 @@ void UpdatePlayer()
     int tempHit3 = 0;
     float tempHitSpeed = 0;
     float oldSpeedY = 0; // holds the players previous Y speed
+    int oldStandingOnNpc = 0;
     Location_t tempLocation;
     Location_t tempLocation3;
     bool spinKill = false;
@@ -160,6 +163,7 @@ void UpdatePlayer()
         tempHit3 = 0;
         tempBlockHit[1] = 0;
         tempBlockHit[2] = 0;
+        oldStandingOnNpc = Player[A].StandingOnNPC;
 //        tempBlockA[1] = 0; // Unused
 //        tempBlockA[2] = 0;
         if(Player[A].GrabTime > 0) // if grabbing something, take control away from the player
@@ -2661,9 +2665,16 @@ void UpdatePlayer()
                                         //if(Block[B].Type == 632 && Player[A].Character == 5)
                                         //    HitSpot = 0;
 
+                                        if(g_compatibility.fix_player_clip_wall_at_npc && HitSpot == 5 && oldStandingOnNpc > 0 && Player[A].Jump)
+                                        {
+                                            // Re-compute the collision with a block to avoid the unnecessary clipping through the wall
+                                            auto pLoc = Player[A].Location;
+                                            pLoc.SpeedX += NPC[oldStandingOnNpc].Location.SpeedX;
+                                            pLoc.SpeedY += NPC[oldStandingOnNpc].Location.SpeedY;
+                                            HitSpot = FindRunningCollision(pLoc, Block[B].Location);
+                                        }
+
                                         // the following code is where the collisions are handled
-
-
 
 
                                         if((HitSpot == 1 || Player[A].Slope == B) && Block[B].Slippy)

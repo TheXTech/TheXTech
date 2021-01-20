@@ -44,6 +44,7 @@ static void compatInit(Compatibility_t &c)
     c.fix_climb_invisible_fences = true;
     c.fix_climb_bgo_speed_adding = true;
     c.enable_climb_bgo_layer_move = true;
+    c.fix_player_clip_wall_at_npc = true;
 }
 
 static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
@@ -67,6 +68,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
     compat.read("fix-climb-invisible-fences", c.fix_climb_invisible_fences, c.fix_climb_invisible_fences);
     compat.read("fix-climb-bgo-speed-adding", c.fix_climb_bgo_speed_adding, c.fix_climb_bgo_speed_adding);
     compat.read("enable-climb-bgo-layer-move", c.enable_climb_bgo_layer_move, c.enable_climb_bgo_layer_move);
+    compat.read("fix-player-clip-wall-at-npc", c.fix_player_clip_wall_at_npc, c.fix_player_clip_wall_at_npc);
     compat.endGroup();
 }
 
