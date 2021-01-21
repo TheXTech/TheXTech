@@ -1,0 +1,16 @@
+# Folders
+/.idea/*
+/.gradle/*
+/build/*
+/local.properties
+/SDL-default/*
+/thextech/jni/SDL/*
+/thextech/build/*
+/thextech/release/*
+/thextech/.cxx/*
+.externalNativeBuild
+/thextech/src/main/assets/languages/*
+
+# Files
+*.iml
+*.apk
