@@ -1771,7 +1771,8 @@ void UpdateNPCs()
                         NPC[A].Location.SpeedX = 0;
                         NPC[A].Location.SpeedY = 0;
                     }
-                    if(NPC[A].Type == 190)
+
+                    if(NPC[A].Type == 190) // Skull raft
                     {
                         for(B = 1; B <= numPlayers; B++)
                         {
@@ -1779,6 +1780,45 @@ void UpdateNPCs()
                             {
                                 NPC[A].Location.SpeedX = 0;
                                 NPC[A].Location.SpeedY = 0;
+                            }
+                        }
+
+                        if((NPC[A].Special == 2 || NPC[A].Special == 3) && (NPC[A].Special3 != 0))
+                        {
+                            NPC[A].Location.X = NPC[A].Special3; // Finish alignment
+                            NPC[A].Special3 = 0;
+                        }
+
+                        if(NPC[A].Special == 3) // Watch for wall collisions. If one got dissappear (hidden layer, toggled switch), resume a ride
+                        {
+                            auto loc = NPC[A].Location;
+                            loc.X += 1 * NPC[A].Direction;
+                            loc.SpeedX += 2 * NPC[A].Direction;
+
+                            int fBlock = FirstBlock[static_cast<int>(floor(static_cast<double>(loc.X / 32))) - 1];
+                            int lBlock = LastBlock[floor((loc.X + loc.Width) / 32.0) + 1];
+                            bool stillCollide = false;
+
+                            for(int B = (int)fBlock; B <= lBlock; B++)
+                            {
+                                if(!CheckCollision(loc, Block[B].Location))
+                                    continue;
+                                if(NPC[A].Block == B || Block[B].noProjClipping ||
+                                   BlockOnlyHitspot1[Block[B].Type] || BlockIsSizable[Block[B].Type] ||
+                                   BlockNoClipping[Block[B].Type] || Block[B].Hidden)
+                                    continue;
+
+                                int hs = NPCFindCollision(loc, Block[B].Location);
+                                if(Block[B].IsNPC > 0)
+                                    hs = 0;
+                                if(hs == 2 || hs == 4)
+                                    stillCollide = true;
+                            }
+
+                            if(!stillCollide)
+                            {
+                                NPC[A].Special = 2;
+                                SkullRide(A, true);
                             }
                         }
                     }
@@ -1962,8 +2002,25 @@ void UpdateNPCs()
                                                             HitSpot = 0;
                                                         if(NPC[A].Type == 48 && (Block[B].IsNPC == 22 || Block[B].IsNPC == 49)) // spiney eggs don't walk on special items
                                                             HitSpot = 0;
-                                                        if(NPC[A].Type == 190 && Block[B].IsNPC > 0)
-                                                            HitSpot = 0;
+
+                                                        if(NPC[A].Type == 190) // Skull raft
+                                                        {
+                                                            if(Block[B].IsNPC > 0)
+                                                                HitSpot = 0;
+
+                                                            if(g_compatibility.fix_skull_raft) // reached a solid wall
+                                                            {
+                                                                auto bt = Block[B].Type;
+                                                                if(Block[B].IsNPC <= 0 && NPC[A].Special == 1 &&
+                                                                  ((HitSpot == 4 && BlockSlope[bt] == 0) || (HitSpot == 2 && BlockSlope[bt] == 0)) &&
+                                                                   !BlockOnlyHitspot1[bt] && !BlockIsSizable[bt])
+                                                                {
+                                                                    SkullRideDone(A, Block[B].Location);
+                                                                    NPC[A].Special = 3; // 3 - watcher, 2 - waiter
+                                                                }
+                                                            }
+                                                        }
+
                                                         if(NPC[A].Type == 86)
                                                         {
                                                             if(HitSpot != 1 && NPC[A].Special > 0)

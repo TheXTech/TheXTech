@@ -322,26 +322,90 @@ void TurnNPCsIntoCoins()
     }
 }
 
-void SkullRide(int A)
+void SkullRide(int A, bool reEnable)
 {
-    int B = 0;
-    Location_t tempLocation;
-    tempLocation = NPC[A].Location;
-    tempLocation.Width = tempLocation.Width + 16;
-    tempLocation.X = tempLocation.X - 8;
-
-    for(B = 1; B <= numNPCs; B++) // Recursively activate all neihbour skull-ride segments
+    Location_t loc = NPC[A].Location;
+    loc.Width += 16;
+    loc.X -= 8;
+    if(g_compatibility.fix_skull_raft) // Detect by height in condition skull ruft cells were on slopes
     {
-        if(NPC[B].Type == 190)
+        loc.Height += 30;
+        loc.Y -= 15;
+    }
+
+    int spec = reEnable ? 2 : 0;
+
+    for(int B = 1; B <= numNPCs; B++) // Recursively activate all neihbour skull-ride segments
+    {
+        auto &npc = NPC[B];
+        if(npc.Type == 190)
         {
-            if(NPC[B].Active)
+            if(npc.Active)
             {
-                if(NPC[B].Special == 0.0)
+                if(npc.Special == spec)
                 {
-                    if(CheckCollision(tempLocation, NPC[B].Location) == true)
+                    if(CheckCollision(loc, npc.Location))
                     {
-                        NPC[B].Special = 1;
-                        SkullRide(B);
+                        npc.Special = 1;
+                        SkullRide(B, reEnable);
+                    }
+                }
+            }
+        }
+    }
+}
+
+static void s_alignRuftCell(NPC_t &me, const Location_t &alignAt)
+{
+    int w = me.Location.Width;
+    me.Location.SpeedX = 0.0;
+    me.RealSpeedX = 0.0;
+    if(me.Direction > 0)
+    {
+        auto p = alignAt.X;
+        do
+        {
+            p -= w;
+        } while(std::abs(p - me.Location.X) >= w / 2 && p > me.Location.X);
+        me.Location.X = p;
+    }
+    else
+    {
+        auto p = alignAt.X + alignAt.Width;
+        while(std::abs(p - me.Location.X) >= w / 2 && p < me.Location.X + me.Location.Width)
+        {
+            p += w;
+        }
+        me.Location.X = p;
+    }
+    me.Special3 = me.Location.X;
+}
+
+void SkullRideDone(int A, const Location_t &alignAt)
+{
+    auto &me = NPC[A];
+
+    Location_t loc = me.Location;
+    loc.Width += 16;
+    loc.X -= 8;
+    loc.Height += 30;
+    loc.Y -= 15;
+
+    for(int B = 1; B <= numNPCs; B++) // Recursively DE-activate all neihbour skull-ride segments
+    {
+        auto &npc = NPC[B];
+        if(npc.Type == 190)
+        {
+            if(npc.Active)
+            {
+                if(npc.Special == 1.0)
+                {
+                    if(CheckCollision(loc , npc.Location))
+                    {
+                        npc.Special = 2;
+                        npc.Location.SpeedX = 0.0;
+                        s_alignRuftCell(npc, alignAt);
+                        SkullRideDone(B, alignAt);
                     }
                 }
             }

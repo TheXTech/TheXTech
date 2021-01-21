@@ -61,7 +61,8 @@ void TurnNPCsIntoCoins();
 // updates the NPCs graphics
 void NPCFrames(int A);
 // Public Sub SkullRide(A As Integer)
-void SkullRide(int A);
+void SkullRide(int A, bool reEnable = false);
+void SkullRideDone(int A, const Location_t &alignAt);
 // Public Sub NPCSpecial(A As Integer)
 void NPCSpecial(int A);
 // Public Sub SpecialNPC(A As Integer)
