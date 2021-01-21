@@ -321,8 +321,18 @@ if(THEXTECH_ENABLE_LUA)
     endif()
 endif()
 
-add_executable(thextech ${THEXTECH_SRC} ${LIB_SRC})
-pge_set_nopie(thextech)
+if(ANDROID)
+    set(CMAKE_DEBUG_POSTFIX "")
+    add_library(thextech SHARED ${THEXTECH_SRC} ${LIB_SRC})
+    target_compile_options(thextech PRIVATE -fPIC)
+    add_library(SDL2 SHARED IMPORTED DEPENDS SDLMixerX_Local)
+    set_target_properties(SDL2 PROPERTIES IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/output/lib/libSDL2.so)
+    add_library(hidapi SHARED IMPORTED DEPENDS SDLMixerX_Local)
+    set_target_properties(hidapi PROPERTIES IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/output/lib/libhidapi.so)
+else()
+    add_executable(thextech ${THEXTECH_SRC} ${LIB_SRC})
+    pge_set_nopie(thextech)
+endif()
 
 set_target_properties(thextech PROPERTIES
     OUTPUT_NAME "${THEXTECH_EXECUTABLE_NAME}"
@@ -395,8 +405,7 @@ if(THEXTECH_ENABLE_LUA)
     target_compile_definitions(thextech PRIVATE -DENABLE_XTECH_LUA)
 endif()
 
-
-target_include_directories(thextech PRIVATE src lib ${A2XT_INCS})
+target_include_directories(thextech PRIVATE ${A2XT_INCS})
 target_link_libraries(thextech PRIVATE A2XT_Int)
 
 if(RANGE_ARR_USE_HEAP)

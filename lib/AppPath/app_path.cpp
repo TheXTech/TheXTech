@@ -17,6 +17,11 @@
  * or see <http://www.gnu.org/licenses/>.
  */
 
+
+#include <SDL2/SDL_stdinc.h>
+#include <SDL2/SDL_rwops.h>
+#include <SDL2/SDL_filesystem.h>
+
 #include <DirManager/dirman.h>
 #include <Utils/files.h>
 #include <IniProcessor/ini_processing.h>
@@ -88,9 +93,6 @@ static void saveCustomState()
 
 #include "app_path.h"
 #include "../version.h"
-
-#include <SDL2/SDL_stdinc.h>
-#include <SDL2/SDL_filesystem.h>
 
 std::string  ApplicationPathSTD;
 

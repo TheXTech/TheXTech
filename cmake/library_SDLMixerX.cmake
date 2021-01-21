@@ -15,12 +15,6 @@ endif()
 
 option(PGE_SHARED_SDLMIXER "Link MixerX as a shared library (dll/so/dylib)" ${PGE_SHARED_SDLMIXER_DEFAULT})
 
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set(MIX_DEBUG_SUFFIX "d")
-else()
-    set(MIX_DEBUG_SUFFIX "")
-endif()
-
 if(WIN32)
     if(MSVC)
         set(SDL_MixerX_SO_Lib "${DEPENDENCIES_INSTALL_DIR}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}SDL2_mixer_ext${PGE_LIBS_DEBUG_SUFFIX}.lib")
@@ -148,7 +142,7 @@ ExternalProject_Add(
         "-DDOWNLOAD_AUDIO_CODECS_DEPENDENCY=ON"
         "-DAUDIO_CODECS_BUILD_LOCAL_SDL2=ON"
         "-DUSE_SYSTEM_SDL2=${USE_SYSTEM_SDL2}"
-        "-DCMAKE_DEBUG_POSTFIX=d"
+        "-DCMAKE_DEBUG_POSTFIX=${PGE_LIBS_DEBUG_SUFFIX}"
         "-DSDL_MIXER_X_SHARED=${PGE_SHARED_SDLMIXER}"
         "-DAUDIO_CODECS_SDL2_HG_BRANCH=${SDL_BRANCH}"
         "-DAUDIO_CODECS_SDL2_GIT_BRANCH=${SDL_GIT_BRANCH}"
@@ -164,6 +158,7 @@ ExternalProject_Add(
         "${SDL2_SO_Lib}"
         "${SDL2_A_Lib}"
         "${SDL2_main_A_Lib}"
+        "${CMAKE_BINARY_DIR}/output/lib/libhidapi.so"
         ${MixerX_CodecLibs}
 )
 
