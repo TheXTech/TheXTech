@@ -127,6 +127,34 @@ set(MixerX_CodecLibs
 )
 
 set(MixerX_Deps)
+set(AudioCodecs_Deps)
+
+ExternalProject_Add(
+    AudioCodecs_Local
+    PREFIX ${CMAKE_BINARY_DIR}/external/AudioCodecs
+    GIT_REPOSITORY https://github.com/WohlSoft/AudioCodecs.git
+    UPDATE_COMMAND ""
+    CMAKE_ARGS
+        "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}"
+        "-DCMAKE_INSTALL_PREFIX=${DEPENDENCIES_INSTALL_DIR}"
+        "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
+        "-DCMAKE_CONFIGURATION_TYPES=${CMAKE_CONFIGURATION_TYPES}"
+        "-DUSE_LOCAL_SDL2=ON"
+        $<$<BOOL:APPLE>:-DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}>
+        "-DCMAKE_DEBUG_POSTFIX=${PGE_LIBS_DEBUG_SUFFIX}"
+        "-DBUILD_MIKMOD=OFF"
+        ${ANDROID_CMAKE_FLAGS}
+        $<$<STREQUAL:${CMAKE_SYSTEM_NAME},Emscripten>:-DADLMIDI_USE_DOSBOX_EMULATOR=ON>
+    DEPENDS ${AudioCodecs_Deps}
+    BUILD_BYPRODUCTS
+        "${SDL2_SO_Lib}"
+        "${SDL2_A_Lib}"
+        "${SDL2_main_A_Lib}"
+        "${CMAKE_BINARY_DIR}/output/lib/libhidapi.so"
+        ${MixerX_CodecLibs}
+)
+
+list(APPEND MixerX_Deps AudioCodecs_Local)
 
 # SDL Mixer X - an audio library, fork of SDL Mixer
 ExternalProject_Add(
@@ -139,8 +167,8 @@ ExternalProject_Add(
         "-DCMAKE_INSTALL_PREFIX=${DEPENDENCIES_INSTALL_DIR}"
         "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
         "-DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}"
-        "-DDOWNLOAD_AUDIO_CODECS_DEPENDENCY=ON"
-        "-DAUDIO_CODECS_BUILD_LOCAL_SDL2=ON"
+        "-DAUDIO_CODECS_REPO_PATH=${CMAKE_BINARY_DIR}/external/AudioCodecs"
+        "-DAUDIO_CODECS_INSTALL_PATH=${DEPENDENCIES_INSTALL_DIR}"
         "-DUSE_SYSTEM_SDL2=${USE_SYSTEM_SDL2}"
         "-DCMAKE_DEBUG_POSTFIX=${PGE_LIBS_DEBUG_SUFFIX}"
         "-DSDL_MIXER_X_SHARED=${PGE_SHARED_SDLMIXER}"
@@ -155,11 +183,6 @@ ExternalProject_Add(
     BUILD_BYPRODUCTS
         "${SDL_MixerX_SO_Lib}"
         "${SDL_MixerX_A_Lib}"
-        "${SDL2_SO_Lib}"
-        "${SDL2_A_Lib}"
-        "${SDL2_main_A_Lib}"
-        "${CMAKE_BINARY_DIR}/output/lib/libhidapi.so"
-        ${MixerX_CodecLibs}
 )
 
 target_link_libraries(PGE_SDLMixerX INTERFACE "${SDL_MixerX_SO_Lib}")
