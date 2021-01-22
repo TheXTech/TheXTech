@@ -7,7 +7,7 @@ add_library(PGE_SDLMixerX_static INTERFACE)
 set(SDL_BRANCH "release-2.0.12")
 set(SDL_GIT_BRANCH "origin/release-2.0.12")
 
-if(EMSCRIPTEN OR ANDROID OR APPLE)
+if(EMSCRIPTEN OR APPLE)
     set(PGE_SHARED_SDLMIXER_DEFAULT OFF)
 else()
     set(PGE_SHARED_SDLMIXER_DEFAULT ON)
@@ -28,6 +28,8 @@ else()
     set(SDL_MixerX_SO_Lib "${DEPENDENCIES_INSTALL_DIR}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}SDL2_mixer_ext${PGE_LIBS_DEBUG_SUFFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}")
     set(SDL2_SO_Lib "${DEPENDENCIES_INSTALL_DIR}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}SDL2${PGE_LIBS_DEBUG_SUFFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}")
 endif()
+
+set(SDLHIDAPI_SO_Lib "${DEPENDENCIES_INSTALL_DIR}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}hidapi${PGE_LIBS_DEBUG_SUFFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}")
 
 set(SDL2_main_A_Lib "${DEPENDENCIES_INSTALL_DIR}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}SDL2main${PGE_LIBS_DEBUG_SUFFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}")
 
@@ -74,7 +76,7 @@ endif()
 
 if(ANDROID)
     list(APPEND MixerX_SysLibs
-        GLESv1_CM GLESv2 OpenSLES log dl hidapi android
+        GLESv1_CM GLESv2 OpenSLES log dl android
     )
 endif()
 
@@ -150,7 +152,7 @@ ExternalProject_Add(
         "${SDL2_SO_Lib}"
         "${SDL2_A_Lib}"
         "${SDL2_main_A_Lib}"
-        "${CMAKE_BINARY_DIR}/output/lib/libhidapi.so"
+        "${SDLHIDAPI_SO_Lib}"
         ${MixerX_CodecLibs}
 )
 
@@ -193,6 +195,8 @@ elseif(WIN32 AND MINGW)
     target_link_libraries(PGE_SDLMixerX INTERFACE mingw32 "${SDL2_main_A_Lib}" "${SDL2_SO_Lib}" )
 elseif(WIN32 AND MSVC)
     target_link_libraries(PGE_SDLMixerX INTERFACE "${SDL2_main_A_Lib}" "${SDL2_SO_Lib}")
+elseif(ANDROID)
+    target_link_libraries(PGE_SDLMixerX INTERFACE "${SDL2_SO_Lib}" "${SDLHIDAPI_SO_Lib}")
 else()
     target_link_libraries(PGE_SDLMixerX INTERFACE "${SDL2_SO_Lib}")
 endif()
@@ -203,6 +207,10 @@ target_link_libraries(PGE_SDLMixerX_static INTERFACE
     "${SDL2_A_Lib}"
     "${MixerX_SysLibs}"
 )
+
+if(ANDROID)
+    target_link_libraries(PGE_SDLMixerX_static INTERFACE "${SDLHIDAPI_SO_Lib}")
+endif()
 
 if(PGE_SHARED_SDLMIXER AND NOT WIN32)
     install(FILES ${SDL_MixerX_SO_Lib} DESTINATION "${PGE_INSTALL_DIRECTORY}")
