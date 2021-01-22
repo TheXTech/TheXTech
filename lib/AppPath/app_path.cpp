@@ -286,7 +286,7 @@ std::string AppPathManager::assetsRoot()
     return path;
 
 #elif defined(__ANDROID__)
-    return "assets";
+    return m_userPath; //"assets/";
 
 #else
     return m_userPath;

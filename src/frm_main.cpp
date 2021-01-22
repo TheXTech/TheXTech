@@ -406,8 +406,10 @@ void FrmMain::eventKeyDown(SDL_KeyboardEvent &evt)
     bool ctrlF = ((evt.keysym.mod & KMOD_CTRL) != 0 && evt.keysym.scancode == SDL_SCANCODE_F);
     bool altEnter = ((evt.keysym.mod & KMOD_ALT) != 0 && (evt.keysym.scancode == SDL_SCANCODE_RETURN || evt.keysym.scancode == SDL_SCANCODE_KP_ENTER));
 
+#ifndef __ANDROID__
     if(ctrlF || altEnter)
         ChangeScreen();
+#endif
 
 #ifndef __EMSCRIPTEN__
     if(KeyCode == SDL_SCANCODE_F12)

@@ -184,6 +184,9 @@ void WorldLoop()
                           getKeyState(SDL_SCANCODE_RALT) == KEY_PRESSED;
 
         bool escPressed = getKeyState(SDL_SCANCODE_ESCAPE) == KEY_PRESSED;
+#ifdef __ANDROID__
+        escPressed |= getKeyState(SDL_SCANCODE_AC_BACK) == KEY_PRESSED;
+#endif
 
         bool pausePress = (Player[1].Controls.Start || escPressed) && !altPressed;
 

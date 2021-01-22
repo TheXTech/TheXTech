@@ -2711,7 +2711,9 @@ void zTestLevel(bool magicHand, bool interProcess)
 
     if(TestFullscreen)
     {
+#ifndef __ANDROID__
         ChangeScreen();
+#endif
         DoEvents();
         MagicHand = false;
     }

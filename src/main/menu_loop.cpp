@@ -78,6 +78,9 @@ void MenuLoop()
     bool altPressed = getKeyState(SDL_SCANCODE_LALT) == KEY_PRESSED ||
                       getKeyState(SDL_SCANCODE_RALT) == KEY_PRESSED;
     bool escPressed = getKeyState(SDL_SCANCODE_ESCAPE) == KEY_PRESSED;
+#ifdef __ANDROID__
+    escPressed |= getKeyState(SDL_SCANCODE_AC_BACK) == KEY_PRESSED;
+#endif
     bool spacePressed = getKeyState(SDL_SCANCODE_SPACE) == KEY_PRESSED;
     bool returnPressed = getKeyState(SDL_SCANCODE_RETURN) == KEY_PRESSED;
     bool upPressed = getKeyState(SDL_SCANCODE_UP) == KEY_PRESSED;
@@ -1060,7 +1063,9 @@ void MenuLoop()
 //                        PlaySound 29
                         PlaySound(29);
 //                        ChangeScreen
+#ifndef __ANDROID__ // on Android run the always full-screen
                         ChangeScreen();
+#endif
 //                    ElseIf MenuCursor = 3 Then
                     } else if(MenuCursor == 3) {
 //                        PlaySound 29
@@ -1337,7 +1342,8 @@ void MenuLoop()
                             getNewJoystick = false;
                             MenuCursorCanMove = false;
                         }
-                        else if(getKeyState(vbKeyEscape) == KEY_PRESSED)
+//                        else if(getKeyState(vbKeyEscape) == KEY_PRESSED)
+                        else if(escPressed)
                         {
                             if(MenuCursor == 1)
                                 conJoystick[MenuMode - 30].Up = lastJoyButton;

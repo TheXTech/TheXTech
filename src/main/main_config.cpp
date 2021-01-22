@@ -141,8 +141,10 @@ void OpenConfig()
         }
     }
 //    If resBool = True And resChanged = False And LevelEditor = False Then ChangeScreen
+#ifndef __ANDROID__
     if(resBool && !resChanged)
         ChangeScreen();
+#endif
 
     pLogDebug("Loaded config: %s", configPath.c_str());
 }
