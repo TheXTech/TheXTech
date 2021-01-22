@@ -61,16 +61,17 @@ android {
         abortOnError false
     }
 
-    packagingOptions {
-        pickFirst 'lib/armeabi-v7a/libhidapi.so'
-        pickFirst 'lib/arm64-v8a/libhidapi.so'
-        pickFirst 'lib/x86/libhidapi.so'
-        pickFirst 'lib/x86_64/libhidapi.so'
-        pickFirst 'lib/armeabi-v7a/libSDL2.so'
-        pickFirst 'lib/arm64-v8a/libSDL2.so'
-        pickFirst 'lib/x86/libSDL2.so'
-        pickFirst 'lib/x86_64/libSDL2.so'
-    }
+//    packagingOptions {
+//        pickFirst 'lib/armeabi-v7a/libhidapi.so'
+//        pickFirst 'lib/arm64-v8a/libhidapi.so'
+//        pickFirst 'lib/x86/libhidapi.so'
+//        pickFirst 'lib/x86_64/libhidapi.so'
+//
+//        pickFirst 'lib/armeabi-v7a/libSDL2.so'
+//        pickFirst 'lib/arm64-v8a/libSDL2.so'
+//        pickFirst 'lib/x86/libSDL2.so'
+//        pickFirst 'lib/x86_64/libSDL2.so'
+//    }
 
     if (buildAsLibrary) {
         libraryVariants.all { variant ->

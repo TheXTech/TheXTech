@@ -43,8 +43,7 @@ public class thextechActivity extends SDLActivity
     {
         return new String[] {
             "hidapi",
-            "SDL2",
-            "SDL2_mixer_ext",
+//            "SDL2",
             "thextech"
         };
     }
