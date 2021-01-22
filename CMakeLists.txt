@@ -333,14 +333,36 @@ if(ANDROID)
     set(CMAKE_DEBUG_POSTFIX "")
     add_library(thextech SHARED ${THEXTECH_SRC} ${LIB_SRC})
     target_compile_options(thextech PRIVATE -fPIC)
+
+    # Include own-built libraries into the APK
+    set(APK_PACK_LIBS ${CMAKE_SOURCE_DIR}/android-project/thextech/jniLibs/${CMAKE_BUILD_TYPE_LOWER}/${ANDROID_ABI})
+    add_custom_target(SDL_ApkPackLibs_makeDir ALL COMMAND ${CMAKE_COMMAND} -E make_directory "${APK_PACK_LIBS}")
+
     if(PGE_SHARED_SDLMIXER)
-        add_library(SDL2_mixer_ext SHARED IMPORTED DEPENDS SDLMixerX_Local AudioCodecs_Local)
-        set_target_properties(SDL2_mixer_ext PROPERTIES IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/output-deps/lib/libSDL2_mixer_ext.so)
-        add_library(SDL2 SHARED IMPORTED DEPENDS AudioCodecs_Local)
-        set_target_properties(SDL2 PROPERTIES IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/output-deps/lib/libSDL2.so)
+#        add_library(SDL2_mixer_ext SHARED IMPORTED DEPENDS SDLMixerX_Local AudioCodecs_Local)
+#        set_target_properties(SDL2_mixer_ext PROPERTIES IMPORTED_LOCATION "${DEPENDENCIES_INSTALL_DIR}/lib/libSDL2_mixer_ext.so")
+        add_custom_target(SDL_ApkPackLibs_mixerx ALL
+            COMMAND ${CMAKE_COMMAND} -E copy "${DEPENDENCIES_INSTALL_DIR}/lib/libSDL2_mixer_ext.so" "${APK_PACK_LIBS}"
+            DEPENDS SDL_ApkPackLibs_makeDir ${DEPENDENCIES_INSTALL_DIR}/lib/libSDL2_mixer_ext.so
+        )
+        add_dependencies(thextech SDL_ApkPackLibs_mixerx)
+
+#        add_library(SDL2 SHARED IMPORTED DEPENDS AudioCodecs_Local)
+#        set_target_properties(SDL2 PROPERTIES IMPORTED_LOCATION "${DEPENDENCIES_INSTALL_DIR}/lib/libSDL2.so")
+        add_custom_target(SDL_ApkPackLibs_sdl2 ALL
+            COMMAND ${CMAKE_COMMAND} -E copy "${DEPENDENCIES_INSTALL_DIR}/lib/libSDL2.so" "${APK_PACK_LIBS}"
+            DEPENDS SDL_ApkPackLibs_makeDir ${DEPENDENCIES_INSTALL_DIR}/lib/libSDL2.so
+        )
+        add_dependencies(thextech SDL_ApkPackLibs_sdl2)
     endif()
-    add_library(hidapi SHARED IMPORTED DEPENDS AudioCodecs_Local)
-    set_target_properties(hidapi PROPERTIES IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/output-deps/lib/libhidapi.so)
+
+#    add_library(hidapi SHARED IMPORTED DEPENDS AudioCodecs_Local)
+#    set_target_properties(hidapi PROPERTIES IMPORTED_LOCATION "${DEPENDENCIES_INSTALL_DIR}/lib/libhidapi.so")
+    add_custom_target(SDL_ApkPackLibs_hidapi ALL
+        COMMAND ${CMAKE_COMMAND} -E copy "${DEPENDENCIES_INSTALL_DIR}/lib/libhidapi.so" "${APK_PACK_LIBS}"
+        DEPENDS SDL_ApkPackLibs_makeDir "${DEPENDENCIES_INSTALL_DIR}/lib/libhidapi.so"
+    )
+    add_dependencies(thextech SDL_ApkPackLibs_hidapi)
 else()
     add_executable(thextech ${THEXTECH_SRC} ${LIB_SRC})
     pge_set_nopie(thextech)
@@ -497,15 +519,17 @@ elseif(WIN32)
         find_mingw_dll(STDCPP           "libstdc++-6.dll" MINGW_DLLS "${MINGW_BIN_PATH}")
 
         message("MinGW DLLs: [${MINGW_DLLS}]")
-        file(COPY ${MINGW_DLLS} DESTINATION "${DEPENDENCIES_INSTALL_DIR}/bin/")
+        file(COPY ${MINGW_DLLS} DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/")
     endif()
 
     install(TARGETS thextech DESTINATION .)
     file(GLOB BUILT_DLLS "${DEPENDENCIES_INSTALL_DIR}/bin/*-*.dll")
+    file(GLOB BUILT_DLLS2 "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/*-*.dll")
+    list(APPEND BUILT_DLLS ${BUILT_DLLS2})
     if(NOT USE_SYSTEM_SDL2)
         list(APPEND BUILT_DLLS
-            "${DEPENDENCIES_INSTALL_DIR}/bin/SDL2.dll"
-            "${DEPENDENCIES_INSTALL_DIR}/bin/SDL2_mixer_ext.dll"
+            "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/SDL2.dll"
+            "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/SDL2_mixer_ext.dll"
         )
     endif()
     install(FILES ${BUILT_DLLS} DESTINATION .)
