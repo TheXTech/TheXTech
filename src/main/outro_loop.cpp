@@ -57,12 +57,14 @@ void OutroLoop()
         tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height - 8;
         tempLocation.Height = 16;
         tempLocation.Width = 16;
+
         if(Player[A].Location.SpeedX > 0)
             tempLocation.X = Player[A].Location.X + Player[A].Location.Width + 20;
         else
             tempLocation.X = Player[A].Location.X - tempLocation.Width - 20;
-        fBlock = FirstBlock[(tempLocation.X / 32) - 1];
-        lBlock = LastBlock[((tempLocation.X + tempLocation.Width) / 32.0) + 1];
+        fBlock = FirstBlock[long(tempLocation.X / 32) - 1];
+        lBlock = LastBlock[long((tempLocation.X + tempLocation.Width) / 32.0) + 1];
+
         for(B = (int)fBlock; B <= lBlock; B++)
         {
             if(tempLocation.X + tempLocation.Width >= Block[B].Location.X)
@@ -73,7 +75,7 @@ void OutroLoop()
                     {
                         if(tempLocation.Y <= Block[B].Location.Y + Block[B].Location.Height)
                         {
-                            if(BlockNoClipping[Block[B].Type] == false && Block[B].Invis == false && Block[B].Hidden == false && !(BlockIsSizable[Block[B].Type] && Block[B].Location.Y < Player[A].Location.Y + Player[A].Location.Height - 3))
+                            if(!BlockNoClipping[Block[B].Type] && !Block[B].Invis && !Block[B].Hidden && !(BlockIsSizable[Block[B].Type] && Block[B].Location.Y < Player[A].Location.Y + Player[A].Location.Height - 3))
                                 jumpBool = false;
                         }
                     }
@@ -81,13 +83,15 @@ void OutroLoop()
             }
             else
             {
-                if(BlocksSorted == true)
+                if(BlocksSorted)
                     break;
             }
         }
-        if(jumpBool == true || Player[A].Jump > 0)
+
+        if(jumpBool || Player[A].Jump > 0)
             Player[A].Controls.Jump = true;
     }
+
     UpdateNPCs();
     UpdateBlocks();
     UpdateEffects();
