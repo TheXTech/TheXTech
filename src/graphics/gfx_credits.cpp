@@ -34,7 +34,7 @@
 void DoCredits()
 {
     int A = 0;
-    if(GameMenu == true)
+    if(GameMenu)
         return;
 
     for(A = 1; A <= numCredits; A++)
@@ -42,7 +42,7 @@ void DoCredits()
         Credit[A].Location.Y -= 0.8;
 
         // Printing lines of credits
-        if(Credit[A].Location.Y <= 600 && Credit[A].Location.Y + Credit[A].Location.Height >= 0)
+        if(Credit[A].Location.Y <= ScreenH && Credit[A].Location.Y + Credit[A].Location.Height >= 0)
         {
             SuperPrint(Credit[A].Text,
                        g_gameInfo.creditsFont,
@@ -99,16 +99,20 @@ void DoCredits()
 
     if(CreditChop <= 100 || EndCredits > 0)
     {
-        for(A = 1; A <= 2; A++)
+//        for(A = 1; A <= 2; A++) // Useless loop
+//        {
+        bool quitKey = false;
+        quitKey |= (getKeyState(vbKeyEscape) == KEY_PRESSED);
+        quitKey |= (getKeyState(vbKeySpace) == KEY_PRESSED);
+        quitKey |= (getKeyState(vbKeyReturn) == KEY_PRESSED);
+        if(quitKey)
         {
-            if(((getKeyState(vbKeyEscape) == KEY_PRESSED) | (getKeyState(vbKeySpace) == KEY_PRESSED) | (getKeyState(vbKeyReturn) == KEY_PRESSED)) != 0)
-            {
-                CreditChop = 300;
-                EndCredits = 0;
-                SetupCredits();
-                GameMenu = true;
-                GameOutro = false;
-            }
+            CreditChop = 300;
+            EndCredits = 0;
+            SetupCredits();
+            GameMenu = true;
+            GameOutro = false;
         }
+//        }
     }
 }

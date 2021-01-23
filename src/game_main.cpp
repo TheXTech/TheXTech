@@ -265,7 +265,7 @@ int GameMain(const CmdLineSetup_t &setup)
 
             resetFrameTimer();
 
-            // Update graphics before loop begin (to process inital lazy-unpacking of used sprites)
+            // Update graphics before loop begin (to process an initial lazy-unpacking of used sprites)
             UpdateGraphics();
 
             do
@@ -274,6 +274,7 @@ int GameMain(const CmdLineSetup_t &setup)
                 tempTime = SDL_GetTicks();
                 ScreenType = 0;
                 SetupScreens();
+
                 if(tempTime >= gameTime + frameRate || tempTime < gameTime)
                 {
                     CheckActive();
@@ -298,6 +299,7 @@ int GameMain(const CmdLineSetup_t &setup)
                     gameTime = tempTime - overTime;
                     overTime = (overTime - (tempTime - gameTime));
                     DoEvents();
+
                     if(SDL_GetTicks() > fpsTime)
                     {
                         if(cycleCount >= 65)

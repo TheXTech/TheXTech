@@ -98,7 +98,6 @@ void OutroLoop()
     UpdatePlayer();
     UpdateGraphics();
     UpdateSound();
-
 }
 
 void SetupCredits()
