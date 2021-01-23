@@ -261,6 +261,10 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
         return false;
     }
 
+    // Clean-up from a possible start-up junk
+    SDL_SetRenderDrawColor(m_gRenderer, 0, 0, 0, 255);
+    SDL_RenderClear(m_gRenderer);
+
     SDL_SetRenderTarget(m_gRenderer, m_tBuffer);
 
     SDL_SetRenderDrawBlendMode(m_gRenderer, SDL_BLENDMODE_BLEND);
