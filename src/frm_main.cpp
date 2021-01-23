@@ -388,7 +388,7 @@ void FrmMain::eventDoubleClick()
 {
     if(MagicHand)
         return; // Don't toggle fullscreen/window when magic hand is active
-#ifndef __EMSCRIPTEN__
+#if !defined(__EMSCRIPTEN__) && !defined(__ANDROID__)
     if(resChanged)
     {
         frmMain.setFullScreen(false);
