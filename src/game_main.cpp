@@ -1282,9 +1282,6 @@ void InitControls()
     conKeyboard[2].AltRun = vbKeyS;
 
     OpenConfig();
-#ifdef __ANDROID__
-    ChangeScreen();
-#endif
 
     if(useJoystick[1] > numJoysticks)
         useJoystick[1] = 0;

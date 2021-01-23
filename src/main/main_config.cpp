@@ -157,7 +157,7 @@ void SaveConfig()
 
     config.beginGroup("main");
     config.setValue("release", curRelease);
-#ifndef __EMSCRIPTEN__ // Don't remember fullscreen state for Emscripten!
+#if !defined(__EMSCRIPTEN__) && !defined(__ANDROID__) // Don't remember fullscreen state for Emscripten!
     config.setValue("full-screen", resChanged);
 #endif
     // TODO: Make sure, saving of those settings will not been confused by line arguments

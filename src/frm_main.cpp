@@ -151,11 +151,17 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
 
 #ifdef __EMSCRIPTEN__ //Set canvas be 1/2 size for a faster rendering
     SDL_SetWindowMinimumSize(m_window, ScaleWidth / 2, ScaleHeight / 2);
+#elif defined(__ANDROID__) // Set as small as possible
+    SDL_SetWindowMinimumSize(m_window, 200, 150);
 #else
     SDL_SetWindowMinimumSize(m_window, ScaleWidth, ScaleHeight);
 #endif //__EMSCRIPTEN__
 
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
+
+#if defined(__ANDROID__) // Use a full-screen on Android mode by default
+    setFullScreen(true);
+#endif
 
 
 #ifdef _WIN32
