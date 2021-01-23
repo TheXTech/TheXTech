@@ -2040,6 +2040,9 @@ void UpdateGraphics(bool skipRepaint)
                     SuperPrint("PLAYER 1 CONTROLS", 3, 300, 350);
     //                    SuperPrint "PLAYER 2 CONTROLS", 3, 300, 380
                     SuperPrint("PLAYER 2 CONTROLS", 3, 300, 380);
+#ifdef __ANDROID__
+                    SuperPrint("<MOBILE MODE>", 3, 300, 410, 0.5, 0.5, 0.5, 1.0);
+#else
     //                    If resChanged = True Then
                     if(resChanged)
     //                        SuperPrint "WINDOWED MODE", 3, 300, 410
@@ -2048,6 +2051,7 @@ void UpdateGraphics(bool skipRepaint)
                     else
     //                        SuperPrint "FULLSCREEN MODE", 3, 300, 410
                         SuperPrint("FULLSCREEN MODE", 3, 300, 410);
+#endif
     //                    End If
     //                    SuperPrint "VIEW CREDITS", 3, 300, 440
                     SuperPrint("VIEW CREDITS", 3, 300, 440);

@@ -966,7 +966,7 @@ void MenuLoop()
         else if(MenuMode == 3)
         {
 //            If MenuMouseMove = True Then
-            if(MenuMouseMove == true)
+            if(MenuMouseMove)
             {
 //                For A = 0 To 3
                 For(A, 0, 3)
@@ -986,7 +986,7 @@ void MenuLoop()
                         else if(A == 2)
                         {
 //                            If resChanged = True Then
-                            if(resChanged == true)
+                            if(resChanged)
 //                                menuLen = 18 * Len("windowed mode")
                                 menuLen = 18 * std::strlen("windowed mode");
 //                            Else
