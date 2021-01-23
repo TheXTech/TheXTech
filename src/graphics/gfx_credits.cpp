@@ -105,6 +105,9 @@ void DoCredits()
         quitKey |= (getKeyState(vbKeyEscape) == KEY_PRESSED);
         quitKey |= (getKeyState(vbKeySpace) == KEY_PRESSED);
         quitKey |= (getKeyState(vbKeyReturn) == KEY_PRESSED);
+#ifdef __ANDROID__ // Quit credits on BACK key press
+        quitKey |= (getKeyState(SDL_SCANCODE_AC_BACK) == KEY_PRESSED);
+#endif
         if(quitKey)
         {
             CreditChop = 300;
