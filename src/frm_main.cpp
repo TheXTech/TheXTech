@@ -95,6 +95,11 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
     //Initialize FreeImage
     GraphicsHelps::initFreeImage();
 
+#if defined(__ANDROID__) || (defined(__APPLE__) && (defined(TARGET_IPHONE_SIMULATOR) || defined(TARGET_OS_IPHONE)))
+    // Restrict the landscape orientation only
+    SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight");
+#endif
+
     Uint32 sdlInitFlags = 0;
     // Prepare flags for SDL initialization
 #ifndef __EMSCRIPTEN__
