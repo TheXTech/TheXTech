@@ -2041,7 +2041,7 @@ void UpdateGraphics(bool skipRepaint)
     //                    SuperPrint "PLAYER 2 CONTROLS", 3, 300, 380
                     SuperPrint("PLAYER 2 CONTROLS", 3, 300, 380);
 #ifdef __ANDROID__
-                    SuperPrint("<MOBILE MODE>", 3, 300, 410, 0.5, 0.5, 0.5, 1.0);
+                    SuperPrint("VIEW CREDITS", 3, 300, 410);
 #else
     //                    If resChanged = True Then
                     if(resChanged)
@@ -2051,10 +2051,11 @@ void UpdateGraphics(bool skipRepaint)
                     else
     //                        SuperPrint "FULLSCREEN MODE", 3, 300, 410
                         SuperPrint("FULLSCREEN MODE", 3, 300, 410);
-#endif
+
     //                    End If
     //                    SuperPrint "VIEW CREDITS", 3, 300, 440
                     SuperPrint("VIEW CREDITS", 3, 300, 440);
+#endif
     //                    BitBlt myBackBuffer, 300 - 20, 350 + (MenuCursor * 30), 16, 16, GFX.MCursorMask(0).hdc, 0, 0, vbSrcAnd
     //                    BitBlt myBackBuffer, 300 - 20, 350 + (MenuCursor * 30), 16, 16, GFX.MCursor(0).hdc, 0, 0, vbSrcPaint
                     frmMain.renderTexture(300 - 20, 350 + (MenuCursor * 30),

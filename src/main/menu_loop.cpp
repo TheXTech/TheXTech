@@ -965,11 +965,16 @@ void MenuLoop()
         // Options
         else if(MenuMode == 3)
         {
+#ifndef __ANDROID__
+            const int optionsMenuLength = 3;
+#else
+            const int optionsMenuLength = 2;
+#endif
 //            If MenuMouseMove = True Then
             if(MenuMouseMove)
             {
 //                For A = 0 To 3
-                For(A, 0, 3)
+                For(A, 0, optionsMenuLength)
                 {
 //                    If MenuMouseY >= 350 + A * 30 And MenuMouseY <= 366 + A * 30 Then
                     if(MenuMouseY >= 350 + A * 30 && MenuMouseY <= 366 + A * 30)
@@ -980,9 +985,12 @@ void MenuLoop()
                             menuLen = 18 * std::strlen("player 1 controls") - 4;
 //                        ElseIf A = 1 Then
                         else if(A == 1)
+                        {
 //                            menuLen = 18 * Len("player 2 controls") - 4
                             menuLen = 18 * std::strlen("player 2 controls") - 4;
 //                        ElseIf A = 2 Then
+                        }
+#ifndef __ANDROID__
                         else if(A == 2)
                         {
 //                            If resChanged = True Then
@@ -995,7 +1003,10 @@ void MenuLoop()
                                 menuLen = 18 * std::strlen("fullscreen mode");
 //                            End If
 //                        Else
-                        } else {
+                        }
+#endif
+                        else
+                        {
 //                            menuLen = 18 * Len("view credits") - 2
                             menuLen = 18 * std::strlen("view credits") - 2;
 //                        End If
@@ -1059,15 +1070,17 @@ void MenuLoop()
 //                        PlaySound 26
                         PlaySound(26);
 //                    ElseIf MenuCursor = 2 Then
+#ifndef __ANDROID__ // on Android run the always full-screen
                     } else if(MenuCursor == 2) {
 //                        PlaySound 29
                         PlaySound(29);
 //                        ChangeScreen
-#ifndef __ANDROID__ // on Android run the always full-screen
                         ChangeScreen();
+                    } else if(MenuCursor == 3) {
+#else
+                    } else if(MenuCursor == 2) {
 #endif
 //                    ElseIf MenuCursor = 3 Then
-                    } else if(MenuCursor == 3) {
 //                        PlaySound 29
                         PlaySound(29);
 //                        GameMenu = False
@@ -1089,11 +1102,11 @@ void MenuLoop()
 //            If MenuMode = 3 Then
             if(MenuMode == 3) {
 //                If MenuCursor > 3 Then MenuCursor = 0
-                if(MenuCursor > 3)
+                if(MenuCursor > optionsMenuLength)
                     MenuCursor = 0;
 //                If MenuCursor < 0 Then MenuCursor = 3
                 if(MenuCursor < 0)
-                    MenuCursor = 3;
+                    MenuCursor = optionsMenuLength;
 //            End If
             }
 
