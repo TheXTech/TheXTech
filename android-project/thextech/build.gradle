@@ -26,7 +26,7 @@ android {
 //            }
             cmake {
                 abiFilters "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
-                arguments "-DANDROID_PLATFORM=16"
+                arguments "-DANDROID_PLATFORM=16 -DAPP_PLATFORM=android-16"
             }
         }
         ndk{
