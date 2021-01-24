@@ -2,7 +2,6 @@ package ru.wohlsoft.thextech;
 
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
-import android.widget.LinearLayout;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -83,6 +82,14 @@ public class thextechActivity extends SDLActivity
 //        addContentView(ll, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
 //                LinearLayout.LayoutParams.MATCH_PARENT));
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+    }
+
+    @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
+        // Completely close the application.
+        System.exit(0);
     }
 
     public static native void setKeyPos(int cmd, float left, float top, float right, float bottom);
