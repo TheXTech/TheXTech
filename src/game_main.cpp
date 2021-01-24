@@ -261,6 +261,7 @@ int GameMain(const CmdLineSetup_t &setup)
             SetupPlayers();
             CreditChop = 300; // 100
             EndCredits = 0;
+            GameOutroDoQuit = false;
             SetupCredits();
 
             resetFrameTimer();
@@ -1397,20 +1398,6 @@ void CheckActive()
 #endif // not def __EMSCRIPTEN__
 }
 
-
-
-
-void AddCredit(std::string newCredit)
-{
-    numCredits += 1;
-    if(numCredits > maxCreditsLines)
-    {
-        numCredits = maxCreditsLines;
-        pLogWarning("Can't add more credits lines: max limit has been excited ({0} linex maximum)", maxCreditsLines);
-        return;
-    }
-    Credit[numCredits].Text = newCredit;
-}
 
 Location_t newLoc(double X, double Y, double Width, double Height)
 {

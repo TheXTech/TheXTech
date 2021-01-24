@@ -23,6 +23,9 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+
+#include <Logger/logger.h>
+
 #include "../globals.h"
 #include "../game_main.h"
 #include "../joystick.h"
@@ -32,7 +35,89 @@
 #include "../player.h"
 #include "../graphics.h"
 #include "../sound.h"
+#include "../pseudo_vb.h"
 #include "game_info.h"
+
+
+void DoCredits()
+{
+    if(GameMenu)
+        return;
+
+    int screenH_half = ScreenH / 2;
+
+    CreditOffsetY -= 0.8;
+//    if(CreditOffsetY > ScreenH || CreditOffsetY + CreditTotalHeight < 0)
+//    {}
+
+    // Closing screen
+    if((CreditOffsetY + CreditTotalHeight) < -100)
+    {
+        if(musicPlaying)
+        {
+            FadeOutMusic(11000);
+            musicPlaying = false;
+        }
+
+        CreditChop += 0.4f;
+        if(CreditChop >= static_cast<float>(screenH_half))
+        {
+            CreditChop = static_cast<float>(screenH_half);
+            EndCredits++;
+            if(EndCredits == screenH_half)
+            {
+                SetupCredits();
+                GameOutroDoQuit = true;
+                GameMenu = true;
+            }
+        }
+        else
+            EndCredits = 0;
+    }
+
+        // Opening screen
+    else if(CreditChop > 100 && CreditOffsetY + CreditTotalHeight > 0)
+    {
+        CreditChop -= 2.0f;
+        if(CreditChop < 100)
+            CreditChop = 100;
+
+        if(CreditChop < 250 && !musicPlaying)
+        {
+            if(bgMusic[0] <= 0) // Play default music if no music set in outro level
+            {
+                musicName = "tmusic";
+                PlayMusic("tmusic", 2000);
+                musicPlaying = true;
+            }
+            else // Otherwise, play the music that set by level
+                StartMusic(0, 2000);
+        }
+    }
+
+    if(CreditChop <= 100 || EndCredits > 0)
+    {
+//        for(A = 1; A <= 2; A++) // Useless loop
+//        {
+        bool quitKey = false;
+        quitKey |= (getKeyState(vbKeyEscape) == KEY_PRESSED);
+        quitKey |= (getKeyState(vbKeySpace) == KEY_PRESSED);
+        quitKey |= (getKeyState(vbKeyReturn) == KEY_PRESSED);
+#ifdef __ANDROID__ // Quit credits on BACK key press
+        quitKey |= (getKeyState(SDL_SCANCODE_AC_BACK) == KEY_PRESSED);
+#endif
+        if(quitKey)
+        {
+            CreditChop = static_cast<float>(screenH_half);
+            EndCredits = 0;
+            frmMain.clearBuffer();
+            SetupCredits();
+            GameMenu = true;
+            GameOutroDoQuit = true;
+        }
+//        }
+    }
+}
 
 void OutroLoop()
 {
@@ -96,8 +181,26 @@ void OutroLoop()
     UpdateBlocks();
     UpdateEffects();
     UpdatePlayer();
+    DoCredits();
     UpdateGraphics();
     UpdateSound();
+    if(GameOutroDoQuit) // Don't unset the GameOutro before GFX update, otherwise a glitch will happen
+    {
+        GameOutro = false;
+        GameOutroDoQuit = false;
+    }
+}
+
+void AddCredit(std::string newCredit)
+{
+    numCredits += 1;
+    if(numCredits > maxCreditsLines)
+    {
+        numCredits = maxCreditsLines;
+        pLogWarning("Can't add more credits lines: max limit has been excited ({0} linex maximum)", maxCreditsLines);
+        return;
+    }
+    Credit[numCredits].Text = newCredit;
 }
 
 void SetupCredits()
@@ -254,11 +357,16 @@ void SetupCredits()
     AddCredit("");
     AddCredit(g_gameInfo.creditsHomePage);
 
+    CreditOffsetY = (ScreenH + 40);
+    CreditTotalHeight = 32.0;
+
     for(A = 1; A <= numCredits; A++)
     {
-        Credit[A].Location.Width = Credit[A].Text.size() * 18;
-        Credit[A].Location.Height = 16;
-        Credit[A].Location.X = 400 - (Credit[A].Location.Width / 2.0);
-        Credit[A].Location.Y = 640 + 32 * A;
+        auto &cr = Credit[A];
+        cr.Location.Width = cr.Text.size() * 18;
+        cr.Location.Height = 16;
+        cr.Location.X = (double(ScreenW) / 2) - (cr.Location.Width / 2.0);
+        cr.Location.Y = 32 * A;
+        CreditTotalHeight += 32.0;
     }
 }

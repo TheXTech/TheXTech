@@ -2619,11 +2619,7 @@ void UpdateGraphics(bool skipRepaint)
             frmMain.resetViewport();
 
         if(GameOutro)
-        {
-            frmMain.renderRect(0, 0, 800, Maths::iRound(CreditChop), 0.f, 0.f, 0.f);
-            frmMain.renderRect(0, 600 - Maths::iRound(CreditChop), 800, 600, 0.f, 0.f, 0.f);
-            DoCredits();
-        }
+            DrawCredits();
 
 //        If LevelEditor = True Then
 //            StretchBlt frmLevelWindow.vScreen(Z).hdc, 0, 0, frmLevelWindow.vScreen(Z).ScaleWidth, frmLevelWindow.vScreen(Z).ScaleHeight, myBackBuffer, 0, 0, 800, 600, vbSrcCopy

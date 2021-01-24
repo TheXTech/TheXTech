@@ -1257,6 +1257,8 @@ extern RangeArr<Tile_t, 1, maxTiles> Tile;
 extern RangeArr<Scene_t, 1, maxScenes> Scene;
 //Public Credit(1 To 200) As CreditLine 'for end game credits
 extern RangeArr<CreditLine_t, 1, maxCreditsLines> Credit;
+extern double CreditOffsetY;
+extern double CreditTotalHeight;
 //Public numCredits As Integer 'number of credits
 extern int numCredits;
 //Public numBlock As Integer 'number of blocks
@@ -1698,6 +1700,7 @@ extern int SingleCoop;
 extern std::string CheatString;
 //Public GameOutro As Boolean 'true if showing credits
 extern bool GameOutro;
+extern bool GameOutroDoQuit;
 //Public CreditChop As Single
 extern float CreditChop;
 //Public EndCredits As Integer

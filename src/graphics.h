@@ -82,6 +82,7 @@ void GetvScreenCredits();
 // Public Sub DoCredits() 'print credits
 // print credits
 void DoCredits();
+void DrawCredits();
 // Public Sub DrawInterface(Z As Integer, numScreens) 'draws the games interface
 // draws the games interface
 void DrawInterface(int Z, int numScreens);

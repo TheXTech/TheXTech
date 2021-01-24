@@ -25,97 +25,80 @@
 
 #include "../globals.h"
 #include "../graphics.h"
-#include "../sound.h"
 #include "../game_main.h"
-#include "../pseudo_vb.h"
 #include "main/game_info.h"
 
 
-void DoCredits()
+static float s_alphaFromY(double y)
 {
-    int A = 0;
-    if(GameMenu)
-        return;
+    const int tb = 8;
+    int h = 32; // An approximate height of one text line
+    int b = static_cast<int>(y + h);
+    int t = static_cast<int>(y);
 
-    for(A = 1; A <= numCredits; A++)
+    if(t >= ScreenH) // The line at bottom
     {
-        Credit[A].Location.Y -= 0.8;
-
-        // Printing lines of credits
-        if(Credit[A].Location.Y <= ScreenH && Credit[A].Location.Y + Credit[A].Location.Height >= 0)
-        {
-            SuperPrint(Credit[A].Text,
-                       g_gameInfo.creditsFont,
-                       static_cast<float>(Credit[A].Location.X),
-                       static_cast<float>(Credit[A].Location.Y));
-        }
-
-        // Closing screen
-        else if(A == numCredits && Credit[A].Location.Y + Credit[A].Location.Height < -100)
-        {
-            if(musicPlaying)
-            {
-                FadeOutMusic(11000);
-                musicPlaying = false;
-            }
-
-            CreditChop += 0.4f;
-            if(CreditChop >= 300)
-            {
-                CreditChop = 300;
-                EndCredits = EndCredits + 1;
-                if(EndCredits == 300)
-                {
-                    SetupCredits();
-                    GameOutro = false;
-                    GameMenu = true;
-                }
-            }
-            else
-                EndCredits = 0;
-        }
-
-        // Opening screen
-        else if(CreditChop > 100 && Credit[numCredits].Location.Y + Credit[numCredits].Location.Height > 0)
-        {
-            CreditChop -= 0.02f;
-            if(CreditChop < 100)
-                CreditChop = 100;
-
-            if(CreditChop < 250 && !musicPlaying)
-            {
-                if(bgMusic[0] <= 0) // Play default music if no music set in outro level
-                {
-                    musicName = "tmusic";
-                    PlayMusic("tmusic", 2000);
-                    musicPlaying = true;
-                }
-                else // Otherwise, play the music that set by level
-                    StartMusic(0, 2000);
-
-            }
-        }
+        return 0.0f;
     }
 
-    if(CreditChop <= 100 || EndCredits > 0)
+    if(b > ScreenH) // The line enters the screen
     {
-//        for(A = 1; A <= 2; A++) // Useless loop
-//        {
-        bool quitKey = false;
-        quitKey |= (getKeyState(vbKeyEscape) == KEY_PRESSED);
-        quitKey |= (getKeyState(vbKeySpace) == KEY_PRESSED);
-        quitKey |= (getKeyState(vbKeyReturn) == KEY_PRESSED);
-#ifdef __ANDROID__ // Quit credits on BACK key press
-        quitKey |= (getKeyState(SDL_SCANCODE_AC_BACK) == KEY_PRESSED);
-#endif
-        if(quitKey)
-        {
-            CreditChop = 300;
-            EndCredits = 0;
-            SetupCredits();
-            GameMenu = true;
-            GameOutro = false;
-        }
-//        }
+        return 1.0f - static_cast<float>(b - ScreenH) / static_cast<float>(h);
+    }
+
+    if(t < tb) // The line quits the screen
+    {
+        return static_cast<float>(t - tb) / static_cast<float>(h);
+    }
+
+    if(b <= tb) // The line at the top
+    {
+        return 0.0f;
+    }
+
+    return 1.0f;
+}
+
+void DrawCredits()
+{
+    frmMain.renderRect(0, 0, ScreenW, Maths::iRound(CreditChop), 0.f, 0.f, 0.f);
+    frmMain.renderRect(0, ScreenH - Maths::iRound(CreditChop), ScreenW, std::ceil(CreditChop), 0.f, 0.f, 0.f);
+
+    if(CreditChop > 100)
+    {
+        float chop = CreditChop- 100;
+        float chop_max = (static_cast<float>(ScreenH) / 2.f) - 100;
+        float alpha = chop / chop_max;
+        frmMain.renderRect(0, 0, ScreenW, ScreenH, 0.f, 0.f, 0.f, alpha);
+    }
+
+    int A;
+
+    // Find the highest
+    for(A = 1; A <= numCredits; A++)
+    {
+        auto &c = Credit[A];
+        auto &l = c.Location;
+        auto y = static_cast<float>(l.Y) + CreditOffsetY;
+        if(y + l.Height >= 0)
+            break; // found!
+    }
+
+    // Draw that actually visible
+    for(; A <= numCredits; A++)
+    {
+        auto &c = Credit[A];
+        auto &l = c.Location;
+        auto y = static_cast<float>(l.Y) + CreditOffsetY;
+
+        if(y > ScreenH)
+            break; // Nothing also to draw
+
+        // Printing lines of credits
+        SuperPrint(c.Text,
+                   g_gameInfo.creditsFont,
+                   static_cast<float>(l.X),
+                   y,
+                   1.0f, 1.0f, 1.0f, s_alphaFromY(y));
     }
 }
