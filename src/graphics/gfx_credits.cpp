@@ -31,8 +31,8 @@
 
 static float s_alphaFromY(double y)
 {
-    const int tb = 8;
-    int h = 32; // An approximate height of one text line
+    const int h = 32; // An approximate height of one text line
+    const int tb = 16;
     int b = static_cast<int>(y + h);
     int t = static_cast<int>(y);
 
@@ -46,14 +46,14 @@ static float s_alphaFromY(double y)
         return 1.0f - static_cast<float>(b - ScreenH) / static_cast<float>(h);
     }
 
-    if(t < tb) // The line quits the screen
-    {
-        return static_cast<float>(t - tb) / static_cast<float>(h);
-    }
-
     if(b <= tb) // The line at the top
     {
         return 0.0f;
+    }
+
+    if(t < tb) // The line quits the screen
+    {
+        return static_cast<float>(b - tb) / static_cast<float>(h);
     }
 
     return 1.0f;
@@ -79,8 +79,8 @@ void DrawCredits()
     {
         auto &c = Credit[A];
         auto &l = c.Location;
-        auto y = static_cast<float>(l.Y) + CreditOffsetY;
-        if(y + l.Height >= 0)
+        auto bottom = static_cast<float>(l.Y) + l.Height + CreditOffsetY;
+        if(bottom >= 0)
             break; // found!
     }
 
