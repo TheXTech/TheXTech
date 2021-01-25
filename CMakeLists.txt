@@ -290,10 +290,10 @@ set(THEXTECH_SRC
     src/graphics/gfx_draw_player.cpp
     src/graphics/gfx_special_frames.cpp
     src/graphics/gfx_screen.cpp
+    src/control/joystick.cpp
     src/change_res.cpp
     src/effect.cpp
     src/collision.cpp
-    src/joystick.cpp
     src/load_gfx.cpp
     src/layers.cpp
     src/custom.cpp

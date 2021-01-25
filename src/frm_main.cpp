@@ -31,7 +31,7 @@
 #include "frame_timer.h"
 #include "game_main.h"
 #include "graphics.h"
-#include "joystick.h"
+#include "control/joystick.h"
 #include "sound.h"
 #include "editor.h"
 

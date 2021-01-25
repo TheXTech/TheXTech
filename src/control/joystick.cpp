@@ -25,10 +25,9 @@
 
 #include <Logger/logger.h>
 
-#include "globals.h"
+#include "../globals.h"
 #include "joystick.h"
-
-#include "pseudo_vb.h"
+#include "../pseudo_vb.h"
 
 // this module handles the players controls, both keyboard and joystick
 

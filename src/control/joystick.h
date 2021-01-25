@@ -27,7 +27,7 @@
 #define JOYSTICK_H
 
 #include <string>
-#include "range_arr.hpp"
+#include "../range_arr.hpp"
 
 // Public Sub UpdateControls() 'Gets players controls
 // Gets players controls

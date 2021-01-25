@@ -45,7 +45,7 @@
 #include "collision.h"
 #include "effect.h"
 #include "graphics.h"
-#include "joystick.h"
+#include "control/joystick.h"
 #include "layers.h"
 #include "load_gfx.h"
 #include "player.h"

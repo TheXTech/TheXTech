@@ -28,7 +28,7 @@
 
 #include "../globals.h"
 #include "../game_main.h"
-#include "../joystick.h"
+#include "../control/joystick.h"
 #include "../npc.h"
 #include "../blocks.h"
 #include "../effect.h"
