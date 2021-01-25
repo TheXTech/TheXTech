@@ -46,6 +46,7 @@ static void compatInit(Compatibility_t &c)
     c.enable_climb_bgo_layer_move = true;
     c.fix_player_clip_wall_at_npc = true;
     c.fix_skull_raft = true;
+    c.fix_peach_escape_shell_surf = true;
 }
 
 static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
@@ -71,6 +72,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
     compat.read("enable-climb-bgo-layer-move", c.enable_climb_bgo_layer_move, c.enable_climb_bgo_layer_move);
     compat.read("fix-player-clip-wall-at-npc", c.fix_player_clip_wall_at_npc, c.fix_player_clip_wall_at_npc);
     compat.read("fix-skull-raft", c.fix_skull_raft, c.fix_skull_raft);
+    compat.read("fix-peach-escape-shell-surf", c.fix_peach_escape_shell_surf, c.fix_peach_escape_shell_surf);
     compat.endGroup();
 }
 

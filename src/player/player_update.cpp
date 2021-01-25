@@ -1665,7 +1665,8 @@ void UpdatePlayer()
                         }
 
                         // START ALT JUMP - this code does the player's spin jump
-                        if(Player[A].Controls.AltJump && (Player[A].Character == 1 || Player[A].Character == 2 || Player[A].Character == 4))
+                        if(Player[A].Controls.AltJump && (Player[A].Character == 1 || Player[A].Character == 2 || Player[A].Character == 4 ||
+                                                          (g_compatibility.fix_peach_escape_shell_surf && Player[A].Character == 3)))
                         {
                             if(Player[A].Location.SpeedX > 0)
                                 tempSpeed = Player[A].Location.SpeedX * 0.2;

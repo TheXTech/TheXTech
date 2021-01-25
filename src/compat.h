@@ -39,6 +39,7 @@ struct Compatibility_t
     bool enable_climb_bgo_layer_move;
     bool fix_player_clip_wall_at_npc;
     bool fix_skull_raft;
+    bool fix_peach_escape_shell_surf;
 };
 
 extern Compatibility_t g_compatibility;
