@@ -884,9 +884,16 @@ int GameMain(const CmdLineSetup_t &setup)
 //                LevelEditor = true;
 //                LevelEditor = true; //FIXME: Restart level testing or quit a game instead of THIS
 
-                GameThing();
-                PGE_Delay(500);
-                zTestLevel(setup.testMagicHand, setup.interprocess); // Restart level
+                if(LevelBeatCode != 0)
+                    GameIsActive = false;
+                else
+                {
+                    GameThing();
+                    PGE_Delay(500);
+                    zTestLevel(setup.testMagicHand, setup.interprocess); // Restart level
+                }
+
+                LevelBeatCode = 0;
 
 //                If nPlay.Online = False Then
 //                    OpenLevel FullFileName
@@ -989,6 +996,7 @@ void UpdateMacro()
 {
     int A = 0;
     bool OnScreen = false;
+
     if(LevelMacro == 1) // SMB3 Exit
     {
         for(A = 1; A <= numPlayers; A++)

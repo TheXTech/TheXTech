@@ -869,7 +869,7 @@ int CheckLiving()
     int A = 0;
     for(A = 1; A <= numPlayers; A++)
     {
-        if(Player[A].Dead == false && Player[A].TimeToLive == 0)
+        if(!Player[A].Dead && Player[A].TimeToLive == 0)
             return A;
     }
     return 0;
@@ -881,7 +881,7 @@ bool LivingPlayers()
     int A = 0;
     for(A = 1; A <= numPlayers; A++)
     {
-        if(Player[A].Dead == false)
+        if(!Player[A].Dead)
             tempLivingPlayers = true;
     }
     return tempLivingPlayers;
@@ -890,7 +890,7 @@ bool LivingPlayers()
 void EveryonesDead()
 {
 //    int A = 0; // UNUSED
-    if(BattleMode == true)
+    if(BattleMode)
         return;
     LevelMacro = 0;
     FreezeNPCs = false;
