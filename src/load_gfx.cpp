@@ -43,6 +43,7 @@ static DirListCI s_dirEpisode;
 static DirListCI s_dirCustom;
 
 bool gfxLoaderTestMode = false;
+bool gfxLoaderThreadingMode = false;
 
 //// Private Sub cBlockGFX(A As Integer)
 //void cBlockGFX(int A);
@@ -635,7 +636,7 @@ void UnloadWorldCustomGFX()
     restoreWorldBackupTextures();
 }
 
-void UpdateLoad()
+void UpdateLoadREAL()
 {
     std::string state;
     bool draw = false;
@@ -645,12 +646,20 @@ void UpdateLoad()
         draw = true;
     }
 
+    static float alphaFader = 1.0f;
+
     if(LoadCoinsT <= SDL_GetTicks())
     {
         LoadCoinsT = SDL_GetTicks() + 100;
         LoadCoins += 1;
         if(LoadCoins > 3)
             LoadCoins = 0;
+        draw = true;
+    }
+
+    if(gfxLoaderThreadingMode && alphaFader >= 0.f)
+    {
+        alphaFader -= 0.04f;
         draw = true;
     }
 
@@ -669,10 +678,19 @@ void UpdateLoad()
         frmMain.renderTexture(632, 576, GFX.Loader);
         frmMain.renderTexture(760, 560, GFX.LoadCoin.w, GFX.LoadCoin.h / 4, GFX.LoadCoin, 0, 32 * LoadCoins);
 
+        if(gfxLoaderThreadingMode && alphaFader >= 0.f)
+            frmMain.renderRect(0, 0, ScreenW, ScreenH, 0.f, 0.f, 0.f, alphaFader);
+
         frmMain.repaint();
         DoEvents();
 #ifdef __EMSCRIPTEN__
         emscripten_sleep(1); // To repaint screenn, it's required to send a sleep signal
 #endif
     }
+}
+
+void UpdateLoad()
+{
+    if(!gfxLoaderThreadingMode)
+        UpdateLoadREAL();
 }

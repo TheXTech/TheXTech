@@ -24,10 +24,12 @@
  */
 
 #include <SDL2/SDL_messagebox.h>
+#include <SDL2/SDL_timer.h>
 #include <SDL2/SDL_mixer_ext.h>
 
 #include "globals.h"
 #include "load_gfx.h"
+#include "pge_delay.h"
 
 #include "sound.h"
 
@@ -475,6 +477,11 @@ void PlayInitSound()
         {
             g_curMusic = Mix_LoadMUS((SfxRoot + p).c_str());
             Mix_PlayMusic(g_curMusic, 0);
+            do // Synchroniously play the loading sound to don't distort it during the SFX loading
+            {
+                PGE_Delay(15);
+                UpdateLoadREAL();
+            } while(Mix_PlayingMusicStream(g_curMusic));
         }
     }
 }

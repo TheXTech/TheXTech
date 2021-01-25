@@ -29,6 +29,7 @@
 #include <string>
 
 extern bool gfxLoaderTestMode;
+extern bool gfxLoaderThreadingMode;
 
 // Public Sub LoadGFX()
 void LoadGFX();
@@ -54,6 +55,7 @@ void UnloadWorldCustomGFX();
 // Private Sub cPathGFX(A As Integer)
 
 // Public Sub UpdateLoad()
+void UpdateLoadREAL();
 void UpdateLoad();
 
 

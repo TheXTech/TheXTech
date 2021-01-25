@@ -62,6 +62,30 @@ void SizableBlocks();
 
 // game_main_setupphysics.cpp
 
+static int loadingThread(void *waiter_ptr)
+{
+#ifndef PGE_NO_THREADING
+    SDL_atomic_t *waiter = (SDL_atomic_t *)waiter_ptr;
+#else
+    UNUSED(waiter_ptr);
+#endif
+    InitSound(); // Setup sound effects
+    SetupPhysics(); // Setup Physics
+    SetupGraphics(); // setup graphics
+//    Load GFX 'load the graphics form
+//    GFX.load(); // load the graphics form // Moved to before sound load
+    SizableBlocks();
+    LoadGFX(); // load the graphics from file
+    SetupVars(); //Setup Variables
+
+#ifndef PGE_NO_THREADING
+    if(waiter)
+        SDL_AtomicSet(waiter, 0);
+#endif
+
+    return 0;
+}
+
 int GameMain(const CmdLineSetup_t &setup)
 {
     Player_t blankPlayer;
@@ -129,24 +153,53 @@ int GameMain(const CmdLineSetup_t &setup)
 #endif
 
     if(!noSound)
-    {
         InitMixerX();
+
+#ifndef PGE_NO_THREADING
+    gfxLoaderThreadingMode = true;
+#endif
+    frmMain.show(); // Don't show window until playing an initial sound
+
+    if(!noSound)
+    {
         if(!setup.testLevelMode)
             PlayInitSound();
     }
 
-    frmMain.show(); // Don't show window until playing an initial sound
+#ifndef PGE_NO_THREADING
+    {
+        SDL_Thread*     loadThread;
+        int             threadReturnValue;
+        SDL_atomic_t    loadWaiter;
+        int             loadWaiterState = 1;
 
-    InitSound(); // Setup sound effects
+        SDL_AtomicSet(&loadWaiter, loadWaiterState);
+        loadThread = SDL_CreateThread(loadingThread, "Loader", &loadWaiter);
+
+        if(!loadThread)
+        {
+            gfxLoaderThreadingMode = false;
+            pLogCritical("Failed to create the loading thread! Do running the load directly");
+            loadingThread(NULL);
+        }
+        else
+        {
+            do
+            {
+                UpdateLoadREAL();
+                PGE_Delay(15);
+                loadWaiterState = SDL_AtomicGet(&loadWaiter);
+            } while(loadWaiterState);
+
+            SDL_WaitThread(loadThread, &threadReturnValue);
+            pLogDebug("Loading thread was exited with %d code.", threadReturnValue);
+        }
+    }
+#else
+    loadingThread(NULL);
+#endif
+
     LevelSelect = true; // world map is to be shown
-    DoEvents();
-    SetupPhysics(); // Setup Physics
-    SetupGraphics(); // setup graphics
-//    Load GFX 'load the graphics form
-//    GFX.load(); // load the graphics form // Moved to before sound load
-    SizableBlocks();
-    LoadGFX(); // load the graphics from file
-    SetupVars(); //Setup Variables
 
     if(setup.interprocess)
         IntProc::init();
