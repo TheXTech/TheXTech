@@ -28,34 +28,65 @@
 #include "touchscreen.h"
 #include "../globals.h"
 
-//#ifdef __ANDROID__
-//#   include <jni.h>
-//#   if 1
-//#       undef JNIEXPORT
-//#       undef JNICALL
-//#       define JNIEXPORT extern "C"
-//#       define JNICALL
-//#   endif
-//#endif
+#ifdef __ANDROID__
+#   include <jni.h>
+#   if 1
+#       undef JNIEXPORT
+#       undef JNICALL
+#       define JNIEXPORT extern "C"
+#       define JNICALL
+#   endif
+
+enum
+{
+    KEYBOARD_NOKEYS = 0x00000001,
+    KEYBOARD_QWERTY = 0x00000002,
+    KEYBOARD_12KEY = 0x00000003
+};
+
+//! Is hardware keyboard presented?
+static int s_keyboardPresence = KEYBOARD_NOKEYS;
+
+#endif
+
+bool TouchScreenController::touchSupported()
+{
+    if(m_touchDevicesCount <= 0)
+        return false;
+#ifdef __ANDROID__
+    if(s_keyboardPresence > KEYBOARD_NOKEYS)
+        return false;
+#endif
+    return true;
+}
 
 TouchScreenController::FingerState::FingerState()
 {
-    SDL_memset(&heldKey, 0, sizeof(heldKey));
-    SDL_memset(&heldKeyPrev, 0, sizeof(heldKeyPrev));
+    for(int i = key_BEGIN; i < key_END; i++)
+    {
+        heldKey[i] = false;
+        heldKeyPrev[i] = false;
+    }
 }
 
 TouchScreenController::FingerState::FingerState(const FingerState &fs)
 {
     alive = fs.alive;
-    SDL_memcpy(&heldKey, &fs.heldKey, sizeof(heldKey));
-    SDL_memcpy(&heldKeyPrev, &fs.heldKeyPrev, sizeof(heldKeyPrev));
+    for(int i = key_BEGIN; i < key_END; i++)
+    {
+        heldKey[i] = fs.heldKey[i];
+        heldKeyPrev[i] = fs.heldKeyPrev[i];
+    }
 }
 
 TouchScreenController::FingerState &TouchScreenController::FingerState::operator=(const FingerState &fs)
 {
     alive = fs.alive;
-    SDL_memcpy(&heldKey, &fs.heldKey, sizeof(heldKey));
-    SDL_memcpy(&heldKeyPrev, &fs.heldKeyPrev, sizeof(heldKeyPrev));
+    for(int i = key_BEGIN; i < key_END; i++)
+    {
+        heldKey[i] = fs.heldKey[i];
+        heldKeyPrev[i] = fs.heldKeyPrev[i];
+    }
     return *this;
 }
 
@@ -93,13 +124,19 @@ static struct TouchKeyMap
 
         {542.0f, 537.0f, 693.0f,  587.0f, TouchScreenController::key_drop},
 
+        {807.0f, 150.0f, 914.0f,  180.0f, TouchScreenController::key_holdRun},
         {10.0f, 10.0f, 70.0f,  70.0f, TouchScreenController::key_toggleKeysView},
     };
 
     TouchKeyMap()
     {
+        SDL_assert(sizeof(touchKeysMap) == TouchScreenController::key_END * sizeof(KeyPos));
         for(int it = TouchScreenController::key_BEGIN; it < TouchScreenController::key_END; it++)
-            touchKeysMap[it].cmd = static_cast<TouchScreenController::commands>(it);
+        {
+            auto &p = touchKeysMap[it];
+            p.cmd = static_cast<TouchScreenController::commands>(it);
+            SDL_assert(p.cmd >= TouchScreenController::key_BEGIN && p.cmd < TouchScreenController::key_END);
+        }
     }
 
     /**
@@ -151,6 +188,7 @@ static struct TouchKeyMap
 
         for(const auto &p : touchKeysMap)
         {
+            SDL_assert(p.cmd >= TouchScreenController::key_BEGIN && p.cmd < TouchScreenController::key_END);
             fs.heldKey[p.cmd] = false;
             if(x >= p.x1 && x <= p.x2 && y >= p.y1 && y <= p.y2)
             {
@@ -165,35 +203,21 @@ static struct TouchKeyMap
 } g_touchKeyMap;
 
 
-//#ifdef __ANDROID__
+#ifdef __ANDROID__
 
-//JNIEXPORT void JNICALL
-//Java_ru_wohlsoft_moondust_moondustActivity_setKeyPos(JNIEnv *env, jclass type,
-//        jint cmd, jfloat left, jfloat top, jfloat right, jfloat bottom)
-//{
-//    (void)env;
-//    (void)type;
-//    g_touchKeyMap.setKeyPos(static_cast<Controller::commands>(cmd), left, top, right, bottom);
-//}
-
-//JNIEXPORT void JNICALL
-//Java_ru_wohlsoft_moondust_moondustActivity_setCanvasSize(JNIEnv *env, jclass type,
-//        jfloat width, jfloat height)
-//{
-
-//    (void)env;
-//    (void)type;
-//    g_touchKeyMap.setCanvasSize(width, height);
-//}
-
-//#endif
+JNIEXPORT void JNICALL
+Java_ru_wohlsoft_thextech_thextechActivity_setHardwareKeyboardPresence(JNIEnv *env, jclass type,
+        jint keyboard)
+{
+    (void)env;
+    (void)type;
+    s_keyboardPresence = keyboard;
+}
+#endif
 
 
-TouchScreenController::TouchScreenController()
-{}
-
-TouchScreenController::~TouchScreenController()
-{}
+TouchScreenController::TouchScreenController() = default;
+TouchScreenController::~TouchScreenController() = default;
 
 void TouchScreenController::init()
 {
@@ -217,7 +241,7 @@ static void updateKeyValue(bool &key, bool state)
 }
 
 static void updateFingerKeyState(TouchScreenController::FingerState &st,
-        Controls_t &keys, int keyCommand, bool setState, TouchScreenController &kkk)
+        Controls_t &keys, int keyCommand, bool setState, TouchScreenController::ExtraKeys &extraSt)
 {
     st.alive = (setState != 0);
     if(keyCommand >= static_cast<int>(TouchScreenController::key_BEGIN) && keyCommand < static_cast<int>(TouchScreenController::key_END))
@@ -243,9 +267,11 @@ static void updateFingerKeyState(TouchScreenController::FingerState &st,
                 updateKeyValue(keys.AltJump, setState);
                 break;
             case TouchScreenController::key_run:
+                extraSt.keyRunOnce = (setState & !keys.Run);
                 updateKeyValue(keys.Run, setState);
                 break;
             case TouchScreenController::key_altrun:
+                extraSt.keyAltRunOnce = (setState & !keys.AltRun);
                 updateKeyValue(keys.AltRun, setState);
                 break;
             case TouchScreenController::key_drop:
@@ -255,8 +281,12 @@ static void updateFingerKeyState(TouchScreenController::FingerState &st,
                 updateKeyValue(keys.Start, setState);
                 break;
             case TouchScreenController::key_toggleKeysView:
-                kkk.m_key_toggleViewOnce = (setState & !kkk.m_key_toggleView);
-                kkk.m_key_toggleView = setState;
+                extraSt.keyToggleViewOnce = (setState & !extraSt.keyToggleView);
+                extraSt.keyToggleView = setState;
+                break;
+            case TouchScreenController::key_holdRun:
+                extraSt.keyHoldRunOnce = (setState & !extraSt.keyHoldRun);
+                extraSt.keyHoldRun = setState;
                 break;
             default:
                 break;
@@ -300,12 +330,12 @@ void TouchScreenController::processTouchDevice(int dev_i)
                     key = key_toggleKeysView;
                 if(fs.heldKeyPrev[key] && !fs.heldKey[key]) // set key off
                 {
-                    updateFingerKeyState(found->second, m_current_keys, key, false, *this);
+                    updateFingerKeyState(fs, m_current_keys, key, false, m_current_extra_keys);
                     fs.heldKeyPrev[key] = fs.heldKey[key];
                 }
                 else if(fs.heldKey[key]) // set key on and keep alive
                 {
-                    updateFingerKeyState(found->second, m_current_keys, key, true, *this);
+                    updateFingerKeyState(fs, m_current_keys, key, true, m_current_extra_keys);
                     fs.heldKeyPrev[key] = fs.heldKey[key];
                 }
             }
@@ -322,7 +352,7 @@ void TouchScreenController::processTouchDevice(int dev_i)
                     key = key_toggleKeysView;
                 if(st.heldKey[key]) // set key on
                 {
-                    updateFingerKeyState(found->second, m_current_keys, key, true, *this);
+                    updateFingerKeyState(st, m_current_keys, key, true, m_current_extra_keys);
                     st.heldKeyPrev[key] = st.heldKey[key];
                     // Also: when more than one touch devices found, choose one which is actual
                     // Otherwise, the spam of on/off events will happen
@@ -344,21 +374,24 @@ void TouchScreenController::processTouchDevice(int dev_i)
         if(!it->second.alive)
         {
             for(int key = key_BEGIN; key < key_END; key++)
-                updateFingerKeyState(it->second, m_current_keys, key, false, *this);
+                updateFingerKeyState(it->second, m_current_keys, key, false, m_current_extra_keys);
             it = m_fingers.erase(it);
             continue;
         }
         it++;
     }
 
-    if(m_key_toggleViewOnce)
+    if(m_current_extra_keys.keyToggleViewOnce)
         m_touchHidden = !m_touchHidden;
+
+    if(m_current_extra_keys.keyHoldRunOnce)
+        m_runHeld = !m_runHeld;
 }
 
 void TouchScreenController::update()
 {
-    if(m_touchDevicesCount == 0)
-        return; // Nothing to do
+    if(!touchSupported())
+        return;
 
     // If actually used in the game touch was found, use it
     if(m_actualDevice >= 0)
@@ -377,6 +410,9 @@ void TouchScreenController::update()
 
 void TouchScreenController::render()
 {
+    if(!touchSupported())
+        return;
+
     for(int key = key_BEGIN; key < key_END; key++)
     {
         if(m_touchHidden && key != TouchScreenController::key_toggleKeysView)
@@ -388,6 +424,15 @@ void TouchScreenController::render()
         int y2 = std::round((k.y2 / g_touchKeyMap.touchCanvasHeight) * m_screenHeight);
         int w = x2 - x1;
         int h = y2 - y1;
-        frmMain.renderRect(x1, y1, w, h, 1.0f, 0.f, 0.f, 0.3f);
+        float r = 1.0f;
+        float g = 0.0f;
+
+        if(key == key_holdRun && m_runHeld)
+        {
+            r = 0.f;
+            g = 1.f;
+        }
+
+        frmMain.renderRect(x1, y1, w, h, r, g, 0.f, 0.3f);
     }
 }

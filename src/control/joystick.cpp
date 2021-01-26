@@ -311,17 +311,35 @@ void UpdateControls()
             if(A == 1)
             {
                 s_touch.update();
-                Controls_t &t = s_touch.m_current_keys;
-                c.Down |= t.Down;
-                c.Drop |= t.Drop;
-                c.Jump |= t.Jump;
-                c.Left |= t.Left;
-                c.Right |= t.Right;
-                c.Run |= t.Run;
-                c.Start |= t.Start;
-                c.Up |= t.Up;
-                c.AltJump |= t.AltJump;
-                c.AltRun |= t.AltRun;
+                if(!s_touch.m_touchHidden)
+                {
+                    auto &t = s_touch.m_current_keys;
+                    auto &te = s_touch.m_current_extra_keys;
+                    c.Down |= t.Down;
+                    c.Drop |= t.Drop;
+                    c.Jump |= t.Jump;
+                    c.Left |= t.Left;
+                    c.Right |= t.Right;
+                    c.Run |= t.Run;
+                    c.Start |= t.Start;
+                    c.Up |= t.Up;
+                    c.AltJump |= t.AltJump;
+                    c.AltRun |= t.AltRun;
+
+                    if(!GamePaused && !GameMenu && !GameOutro && !LevelSelect)
+                    {
+                        if(s_touch.m_runHeld && c.AltRun)
+                        {
+                            if(te.keyAltRunOnce)
+                                c.AltRun = false;
+                            c.Run = false;
+                        }
+                        else if(s_touch.m_runHeld && !te.keyRunOnce)
+                            c.Run |= true;
+                        else if(te.keyRunOnce && c.Run)
+                            c.Run = false;
+                    }
+                } // s_touch.m_touchHidden
             }
 #endif
 

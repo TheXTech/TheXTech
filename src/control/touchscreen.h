@@ -44,6 +44,11 @@ class TouchScreenController
     //! Actual touch device to use
     int m_actualDevice = -1;
 
+    /*!
+     * \brief Is touch-screen supported?
+     */
+    bool touchSupported();
+
 public:
 
     enum commands
@@ -59,20 +64,35 @@ public:
         key_altrun,
         key_altjump,
         key_drop,
+        key_holdRun,
         key_toggleKeysView,
         key_END
     };
 
+    //! In-game controls pressed
     Controls_t m_current_keys;
-    bool       m_key_toggleView = false;
-    bool       m_key_toggleViewOnce = false;
-    bool       m_touchHidden = false;
+
+    struct ExtraKeys
+    {
+        bool keyToggleView = false;
+        bool keyToggleViewOnce = false;
+
+        bool keyHoldRun = false;
+        bool keyHoldRunOnce = false;
+
+        bool keyRunOnce = false;
+        bool keyAltRunOnce = false;
+    } m_current_extra_keys;
+
+    //! Touch hidden by default, re-enablable by left-top corder
+    bool       m_touchHidden = true;
+    bool       m_runHeld = false;
 
     struct FingerState
     {
         bool alive = false;
-        bool heldKey[commands::key_END] = {};
-        bool heldKeyPrev[commands::key_END] = {};
+        bool heldKey[key_END] = {};
+        bool heldKeyPrev[key_END] = {};
 
         FingerState();
         FingerState(const FingerState &fs);

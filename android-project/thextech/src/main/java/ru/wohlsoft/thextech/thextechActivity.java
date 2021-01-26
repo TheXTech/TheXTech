@@ -73,6 +73,13 @@ public class thextechActivity extends SDLActivity
     }
 
     @Override
+    protected void onStart()
+    {
+        super.onStart();
+        setHardwareKeyboardPresence(getResources().getConfiguration().keyboard);
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
@@ -92,7 +99,5 @@ public class thextechActivity extends SDLActivity
         System.exit(0);
     }
 
-    public static native void setKeyPos(int cmd, float left, float top, float right, float bottom);
-    public static native void setCanvasSize(float width, float height);
-
+    public static native void setHardwareKeyboardPresence(int keyboard);
 }
