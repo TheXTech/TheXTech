@@ -29,9 +29,16 @@
 #include "joystick.h"
 #include "../pseudo_vb.h"
 
+#ifdef USE_TOUCHSCREEN_CONTROLLER
+#include "touchscreen.h"
+#endif
+
 // this module handles the players controls, both keyboard and joystick
 
-static std::vector<SDL_Joystick*> g_joysticks;
+static std::vector<SDL_Joystick*> s_joysticks;
+#ifdef USE_TOUCHSCREEN_CONTROLLER
+static TouchScreenController      s_touch;
+#endif
 
 static void updateJoyKey(SDL_Joystick *j, bool &key, const KM_Key &mkey)
 {
@@ -213,7 +220,8 @@ void UpdateControls()
 
         // With Player(A).Controls
         {
-            Controls_t &c = Player[A].Controls;
+            auto &p = Player[A];
+            Controls_t &c = p.Controls;
             c.Down = false;
             c.Drop = false;
             c.Jump = false;
@@ -229,10 +237,10 @@ void UpdateControls()
             {
                 int jNum = useJoystick[A] - 1;
 
-                if(jNum < 0 || jNum >= int(g_joysticks.size()))
+                if(jNum < 0 || jNum >= int(s_joysticks.size()))
                     continue;
 
-                auto *j = g_joysticks[size_t(jNum)];
+                auto *j = s_joysticks[size_t(jNum)];
 
                 updateJoyKey(j, c.Up, conJoystick[A].Up);
                 updateJoyKey(j, c.Down, conJoystick[A].Down);
@@ -298,9 +306,27 @@ void UpdateControls()
                 c.Right = False;
 //            End If
             }*/
+#ifdef USE_TOUCHSCREEN_CONTROLLER
+            // Mix controls of a touch screen with a player 1
+            if(A == 1)
+            {
+                s_touch.update();
+                Controls_t &t = s_touch.m_current_keys;
+                c.Down |= t.Down;
+                c.Drop |= t.Drop;
+                c.Jump |= t.Jump;
+                c.Left |= t.Left;
+                c.Right |= t.Right;
+                c.Run |= t.Run;
+                c.Start |= t.Start;
+                c.Up |= t.Up;
+                c.AltJump |= t.AltJump;
+                c.AltRun |= t.AltRun;
+            }
+#endif
 
-            if(!Player[A].Controls.Start && !Player[A].Controls.Jump) {
-                Player[A].UnStart = true;
+            if(!c.Start && !c.Jump) {
+                p.UnStart = true;
             }
 
             if(c.Up && c.Down)
@@ -315,11 +341,11 @@ void UpdateControls()
                 c.Right = false;
             }
 
-            if(!(Player[A].State == 5 && Player[A].Mount == 0) && c.AltRun)
+            if(!(p.State == 5 && p.Mount == 0) && c.AltRun)
                 c.Run = true;
-            if(ForcedControls && !GamePaused )
+            if(ForcedControls && !GamePaused)
             {
-                Player[A].Controls = ForcedControl;
+                c = ForcedControl;
             }
         } // End With
     }
@@ -375,6 +401,10 @@ void UpdateControls()
 
 int InitJoysticks()
 {
+#ifdef USE_TOUCHSCREEN_CONTROLLER
+    s_touch.init();
+#endif
+
     SDL_JoystickEventState(SDL_ENABLE);
     int num = SDL_NumJoysticks();
 
@@ -394,7 +424,7 @@ int InitJoysticks()
                 pLogDebug("Supported by the game controller interface!");
             pLogDebug("==========================");
 
-            g_joysticks.push_back(joy);
+            s_joysticks.push_back(joy);
         }
         else
         {
@@ -405,16 +435,16 @@ int InitJoysticks()
         }
     }
 
-    return int(g_joysticks.size());
+    return int(s_joysticks.size());
 }
 
 
 bool StartJoystick(int JoystickNumber)
 {
-    if(JoystickNumber < 0 || JoystickNumber >= int(g_joysticks.size()))
+    if(JoystickNumber < 0 || JoystickNumber >= int(s_joysticks.size()))
         return false;
 
-    SDL_Joystick *joy = g_joysticks[size_t(JoystickNumber)];
+    SDL_Joystick *joy = s_joysticks[size_t(JoystickNumber)];
     if(joy)
     {
         int balls = SDL_JoystickNumBalls(joy);
@@ -445,24 +475,36 @@ bool StartJoystick(int JoystickNumber)
 
 void CloseJoysticks()
 {
-    for(size_t i = 0; i < g_joysticks.size(); ++i) // scan hats first
-        SDL_JoystickClose(g_joysticks[i]);
-    g_joysticks.clear();
+    for(size_t i = 0; i < s_joysticks.size(); ++i) // scan hats first
+        SDL_JoystickClose(s_joysticks[i]);
+    s_joysticks.clear();
 }
 
 bool PollJoystick(int joystick, KM_Key &key)
 {
-    if(joystick < 0 || joystick >= int(g_joysticks.size()))
+    if(joystick < 0 || joystick >= int(s_joysticks.size()))
         return false;
-    return bindJoystickKey(g_joysticks[size_t(joystick)], key);
+    return bindJoystickKey(s_joysticks[size_t(joystick)], key);
 }
 
 bool JoyIsKeyDown(int JoystickNumber, const KM_Key &key)
 {
     bool val = false;
-    if(JoystickNumber < 0 || JoystickNumber >= int(g_joysticks.size()))
+    if(JoystickNumber < 0 || JoystickNumber >= int(s_joysticks.size()))
         return false;
 
-    updateJoyKey(g_joysticks[size_t(JoystickNumber)], val, key);
+    updateJoyKey(s_joysticks[size_t(JoystickNumber)], val, key);
     return val;
 }
+
+#ifdef USE_TOUCHSCREEN_CONTROLLER
+void RenderTouchControls()
+{
+    s_touch.render();
+}
+
+void UpdateTouchScreenSize()
+{
+    s_touch.updateScreenSize();
+}
+#endif

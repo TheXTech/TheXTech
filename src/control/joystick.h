@@ -33,6 +33,11 @@
 // Gets players controls
 void UpdateControls();
 
+#ifdef USE_TOUCHSCREEN_CONTROLLER
+void RenderTouchControls();
+void UpdateTouchScreenSize();
+#endif
+
 int InitJoysticks();
 
 bool JoyIsKeyDown(int JoystickNumber, const KM_Key &key);

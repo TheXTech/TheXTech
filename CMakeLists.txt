@@ -63,6 +63,7 @@ endif()
 if(ANDROID)
     include(cmake/ndk-stl-config.cmake)
     set(ANDROID_STL "c++_static")
+    set(USE_TOUCHSCREEN_CONTROLLER TRUE)
 endif()
 
 if(WIN32 AND NOT EMSCRIPTEN)
@@ -318,6 +319,10 @@ if(WIN32 AND NOT EMSCRIPTEN)
     list(APPEND THEXTECH_SRC resources/thextech.rc)
 endif()
 
+if(USE_TOUCHSCREEN_CONTROLLER)
+    list(APPEND THEXTECH_SRC src/control/touchscreen.cpp)
+endif()
+
 if(THEXTECH_ENABLE_LUA)
     add_subdirectory(script)
     target_link_libraries(A2XT_Int INTERFACE XTechLua ${libLuaBind_Lib} ${libLuaJit_Lib})
@@ -417,6 +422,10 @@ endif()
 
 if(ANDROID)
     target_link_libraries(A2XT_Int INTERFACE log)
+endif()
+
+if(USE_TOUCHSCREEN_CONTROLLER)
+    target_compile_definitions(thextech PRIVATE -DUSE_TOUCHSCREEN_CONTROLLER)
 endif()
 
 if(THEXTECH_FIXED_ASSETS_PATH AND NOT THEXTECH_FIXED_ASSETS_PATH STREQUAL "")

@@ -557,6 +557,9 @@ void FrmMain::eventResize()
 {
     updateViewport();
     SetupScreens();
+#ifdef USE_TOUCHSCREEN_CONTROLLER
+    UpdateTouchScreenSize();
+#endif
 }
 
 int FrmMain::setFullScreen(bool fs)
@@ -649,6 +652,10 @@ void FrmMain::repaint()
     SDL_SetTextureColorMod(m_tBuffer, 255, 255, 255);
     SDL_SetTextureAlphaMod(m_tBuffer, 255);
     SDL_RenderCopyEx(m_gRenderer, m_tBuffer, &sourceRect, &destRect, 0.0, nullptr, SDL_FLIP_NONE);
+
+#ifdef USE_TOUCHSCREEN_CONTROLLER
+    RenderTouchControls();
+#endif
 
     SDL_RenderPresent(m_gRenderer);
     SDL_SetRenderTarget(m_gRenderer, m_tBuffer);
