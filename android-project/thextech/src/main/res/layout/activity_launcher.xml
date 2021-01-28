@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#72A9D5"
+    android:orientation="horizontal"
+    tools:context=".Launcher">
+
+    <Button
+        android:id="@+id/startGame"
+        android:layout_width="127dp"
+        android:layout_height="77dp"
+        android:layout_below="@+id/imageView2"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginStart="77dp"
+        android:layout_marginLeft="77dp"
+        android:layout_marginTop="44dp"
+        android:text="Start game" />
+
+    <Button
+        android:id="@+id/gameSettings"
+        android:layout_width="127dp"
+        android:layout_height="77dp"
+        android:layout_below="@+id/imageView2"
+        android:layout_alignParentLeft="false"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginLeft="225dp"
+        android:layout_marginTop="44dp"
+        android:layout_marginEnd="77dp"
+        android:layout_marginRight="77dp"
+        android:text="Settings" />
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="300dp"
+        android:layout_height="75dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginStart="58dp"
+        android:layout_marginLeft="58dp"
+        android:layout_marginTop="31dp"
+        android:layout_marginEnd="58dp"
+        android:layout_marginRight="58dp"
+        app:srcCompat="@drawable/logo" />
+
+</RelativeLayout>
