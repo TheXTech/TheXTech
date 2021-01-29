@@ -24,7 +24,16 @@
             </intent-filter>
         </activity>
 
-        <meta-data android:name="SDL_ENV.SDL_ACCELEROMETER_AS_JOYSTICK" android:value="0"/>
+        <activity
+            android:name=".GameSettings"
+            android:theme="@style/Theme.AppCompat.DayNight"
+            android:label="@string/title_activity_game_settings"
+            android:screenOrientation="landscape"
+            android:parentActivityName=".Launcher">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".Launcher" />
+        </activity>
 
         <activity
             android:name="thextechActivity"
@@ -42,6 +51,8 @@
             </intent-filter>
             -->
         </activity>
+
+        <meta-data android:name="SDL_ENV.SDL_ACCELEROMETER_AS_JOYSTICK" android:value="0"/>
     </application>
 
     <!-- OpenGL ES 2.0 -->

@@ -1,0 +1,36 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <PreferenceCategory android:title="@string/setup_general_cat">
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="enable_frame_skip"
+            android:title="@string/settings_enable_frameskip" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="disable_sound"
+            android:title="@string/setup_disable_sound" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/setup_control_cat">
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="touchscreen_gamepad_enable"
+            android:title="@string/setup_touchscreen_controller_enable" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="touchscreen_gamepad_showalways"
+            android:title="@string/setup_touchscreen_alwaysshow" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/setup_display_cat">
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="show_fps"
+            android:title="@string/setup_show_framerate" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="enable_max_fps"
+            android:title="@string/setup_max_framerate_mode" />
+    </PreferenceCategory>
+</PreferenceScreen>

@@ -45,16 +45,19 @@ public class Launcher extends AppCompatActivity
         });
 
         Button gameSettings = (Button) findViewById(R.id.gameSettings);
-        gameSettings.setOnClickListener(new View.OnClickListener()
+        gameSettings.setOnClickListener(
+        new View.OnClickListener()
         {
             @Override
             public void onClick(View view)
             {
-                AlertDialog.Builder b = new AlertDialog.Builder(Launcher.this);
-                b.setTitle("WIP");
-                b.setMessage("Not implemented yet, sorry");
-                b.setNegativeButton(android.R.string.ok, null);
-                b.show();
+//                AlertDialog.Builder b = new AlertDialog.Builder(Launcher.this);
+//                b.setTitle("WIP");
+//                b.setMessage("Not implemented yet, sorry");
+//                b.setNegativeButton(android.R.string.ok, null);
+//                b.show();
+                Intent myIntent = new Intent(Launcher.this, GameSettings.class);
+                Launcher.this.startActivity(myIntent);
             }
         });
     }

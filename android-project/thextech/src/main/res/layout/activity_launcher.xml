@@ -18,7 +18,7 @@
         android:layout_marginStart="77dp"
         android:layout_marginLeft="77dp"
         android:layout_marginTop="44dp"
-        android:text="Start game" />
+        android:text="@string/start_game_button" />
 
     <Button
         android:id="@+id/gameSettings"
@@ -32,7 +32,9 @@
         android:layout_marginTop="44dp"
         android:layout_marginEnd="77dp"
         android:layout_marginRight="77dp"
-        android:text="Settings" />
+        android:text="@string/settings_button"
+        android:layout_alignParentStart="false"
+        android:layout_marginStart="225dp" />
 
     <ImageView
         android:id="@+id/imageView2"
@@ -48,6 +50,7 @@
         android:layout_marginTop="31dp"
         android:layout_marginEnd="58dp"
         android:layout_marginRight="58dp"
+        android:contentDescription="@string/game_logo_label"
         app:srcCompat="@drawable/logo" />
 
 </RelativeLayout>

@@ -1,5 +1,6 @@
 package ru.wohlsoft.thextech;
 
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import java.util.ArrayList;
@@ -7,6 +8,8 @@ import java.util.List;
 import java.util.Locale;
 
 import org.libsdl.app.SDLActivity;
+
+import androidx.preference.PreferenceManager;
 
 enum ControllerKeys
 {
@@ -59,12 +62,27 @@ public class thextechActivity extends SDLActivity
     protected String[] getArguments()
     {
         List<String> args = new ArrayList<>();
+        args.add("thextech"); // fake %0
 
         // Detect current language of the system
         String lang = detectLanguage();
         // TODO: NOT IMPLEMENTED YET
 //        if(lang.length() >= 1)
 //            args.add("--lang=" + lang);
+        SharedPreferences setup = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        if(setup.getBoolean("enable_frame_skip", false))
+            args.add("--frameskip");
+        if(setup.getBoolean("disable_sound", false))
+            args.add("--no-sound");
+        if(setup.getBoolean("show_fps", false))
+            args.add("--show-fps");
+        if(setup.getBoolean("enable_max_fps", false))
+            args.add("--max-fps");
+
+//        if(setup.getBoolean("touchscreen_gamepad_enable", true))
+//            args.add("WIP");
+//        if(setup.getBoolean("touchscreen_gamepad_showalways", false))
+//            args.add("WIP");
 
         String[] argsOut = new String[args.size()];
         args.toArray(argsOut);
