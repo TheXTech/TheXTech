@@ -1594,6 +1594,57 @@ void FrmMain::renderTextureI(int xDst, int yDst, int wDst, int hDst,
                      rotateAngle, center, static_cast<SDL_RendererFlip>(flip));
 }
 
+void FrmMain::renderTextureScaleI(int xDst, int yDst, int wDst, int hDst,
+                             StdPicture &tx,
+                             int xSrc, int ySrc,
+                             int wSrc, int hSrc,
+                             double rotateAngle, SDL_Point *center, unsigned int flip,
+                             float red, float green, float blue, float alpha)
+{
+    if(!tx.inited)
+        return;
+
+    if(!tx.texture && tx.lazyLoaded)
+        lazyLoad(tx);
+
+    if(!tx.texture)
+    {
+        D_pLogWarningNA("Attempt to render an empty texture!");
+        return;
+    }
+
+    SDL_assert_release(tx.texture);
+
+    // Don't go more than size of texture
+    if(xSrc + wSrc > tx.w)
+    {
+        wSrc = tx.w - xSrc;
+        if(wSrc < 0)
+            wSrc = 0;
+    }
+    if(ySrc + hSrc > tx.h)
+    {
+        hSrc = tx.h - ySrc;
+        if(hSrc < 0)
+            hSrc = 0;
+    }
+
+    SDL_Rect destRect = {xDst + viewport_offset_x, yDst + viewport_offset_y, wDst, hDst};
+    SDL_Rect sourceRect;
+    if(tx.w_orig == 0 && tx.h_orig == 0)
+        sourceRect = {xSrc, ySrc, wSrc, hSrc};
+    else
+        sourceRect = {int(tx.w_scale * xSrc), int(tx.h_scale * ySrc), int(tx.w_scale * wSrc), int(tx.h_scale * hSrc)};
+
+    SDL_SetTextureColorMod(tx.texture,
+                           static_cast<unsigned char>(255.f * red),
+                           static_cast<unsigned char>(255.f * green),
+                           static_cast<unsigned char>(255.f * blue));
+    SDL_SetTextureAlphaMod(tx.texture, static_cast<unsigned char>(255.f * alpha));
+    SDL_RenderCopyEx(m_gRenderer, tx.texture, &sourceRect, &destRect,
+                     rotateAngle, center, static_cast<SDL_RendererFlip>(flip));
+}
+
 void FrmMain::renderTexture(double xDst, double yDst, double wDst, double hDst,
                             StdPicture &tx,
                             int xSrc, int ySrc,
@@ -1609,6 +1660,24 @@ void FrmMain::renderTexture(double xDst, double yDst, double wDst, double hDst,
                    ySrc,
                    0.0, nullptr, flip,
                    red, green, blue, alpha);
+}
+
+void FrmMain::renderTextureScale(double xDst, double yDst, double wDst, double hDst,
+                            StdPicture &tx,
+                            int xSrc, int ySrc,
+                            int wSrc, int hSrc,
+                            float red, float green, float blue, float alpha)
+{
+    const unsigned int flip = SDL_FLIP_NONE;
+    renderTextureScaleI(Maths::iRound(xDst),
+                        Maths::iRound(yDst),
+                        Maths::iRound(wDst),
+                        Maths::iRound(hDst),
+                        tx,
+                        xSrc, ySrc,
+                        wSrc, hSrc,
+                        0.0, nullptr, flip,
+                        red, green, blue, alpha);
 }
 
 void FrmMain::renderTextureFL(double xDst, double yDst, double wDst, double hDst,
@@ -1645,6 +1714,38 @@ void FrmMain::renderTexture(int xDst, int yDst, StdPicture &tx, float red, float
     }
 
     SDL_Rect destRect = {xDst, yDst, tx.w, tx.h};
+    SDL_Rect sourceRect;
+    if(tx.w_orig == 0 && tx.h_orig == 0)
+        sourceRect = {0, 0, tx.w, tx.h};
+    else
+        sourceRect = {0, 0, tx.w_orig, tx.h_orig};
+
+    SDL_SetTextureColorMod(tx.texture,
+                           static_cast<unsigned char>(255.f * red),
+                           static_cast<unsigned char>(255.f * green),
+                           static_cast<unsigned char>(255.f * blue));
+    SDL_SetTextureAlphaMod(tx.texture, static_cast<unsigned char>(255.f * alpha));
+    SDL_RenderCopyEx(m_gRenderer, tx.texture, &sourceRect, &destRect,
+                     0.0, nullptr, static_cast<SDL_RendererFlip>(flip));
+}
+
+void FrmMain::renderTextureScale(int xDst, int yDst, int wDst, int hDst, StdPicture &tx, float red, float green, float blue, float alpha)
+{
+    const unsigned int flip = SDL_FLIP_NONE;
+
+    if(!tx.inited)
+        return;
+
+    if(!tx.texture && tx.lazyLoaded)
+        lazyLoad(tx);
+
+    if(!tx.texture)
+    {
+        D_pLogWarningNA("Attempt to render an empty texture!");
+        return;
+    }
+
+    SDL_Rect destRect = {xDst, yDst, wDst, hDst};
     SDL_Rect sourceRect;
     if(tx.w_orig == 0 && tx.h_orig == 0)
         sourceRect = {0, 0, tx.w, tx.h};
