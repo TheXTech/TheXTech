@@ -110,6 +110,10 @@ bool GFX_t::load()
     loadImage(touch[BUTTON_RIGHT], "buttons/Right.png");
     loadImage(touch[BUTTON_UP], "buttons/Up.png");
     loadImage(touch[BUTTON_DOWN], "buttons/Down.png");
+    loadImage(touch[BUTTON_UPLEFT], "buttons/UpLeft.png");
+    loadImage(touch[BUTTON_UPRIGHT], "buttons/UpRight.png");
+    loadImage(touch[BUTTON_DOWNLEFT], "buttons/DownLeft.png");
+    loadImage(touch[BUTTON_DOWNRIGHT], "buttons/DownRight.png");
     loadImage(touch[BUTTON_A], "buttons/A.png");
     loadImage(touch[BUTTON_B], "buttons/V.png");
     loadImage(touch[BUTTON_X], "buttons/X.png");
