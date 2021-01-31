@@ -473,7 +473,7 @@ void TouchScreenController::render()
 
     for(int key = key_BEGIN; key < key_END; key++)
     {
-        if(m_touchHidden && key != TouchScreenController::key_toggleKeysView || LoadingInProcess)
+        if((m_touchHidden && key != TouchScreenController::key_toggleKeysView) || LoadingInProcess)
             key = TouchScreenController::key_toggleKeysView;
         const auto &k = g_touchKeyMap.touchKeysMap[key];
         int x1 = std::round((k.x1 / g_touchKeyMap.touchCanvasWidth) * m_screenWidth);
