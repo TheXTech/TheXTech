@@ -50,7 +50,7 @@ public:
     /*!
      * \brief Constructor with pre-opened file
      */
-    FileMapper(std::string file);
+    FileMapper(const std::string& file);
 
     /*!
      * \brief Copy Constructor
@@ -67,7 +67,7 @@ public:
      * \param path to file
      * \return True if success. False if error occouped
      */
-    bool open_file(std::string path);
+    bool open_file(const std::string& path);
 
     /*!
      * \brief Closes opened file

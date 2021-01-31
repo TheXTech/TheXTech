@@ -21,8 +21,11 @@
  */
 
 #include "file_mapper.h"
-#if defined(__unix__) || defined(__APPLE__) || defined(__HAIKU__)
+#if defined(__unix__) || defined(__APPLE__) || defined(__HAIKU__) || defined(__ANDROID__)
 #   define FileMapper_POSIX
+#   if defined(__ANDROID__)
+#       define FileMapper_AndroidExtras
+#   endif
 #elif _WIN32
 #   define FileMapper_Windows
 #else
@@ -40,14 +43,22 @@
 #ifdef FileMapper_Windows
 #include <windows.h>
 #endif
+#ifdef FileMapper_AndroidExtras
+#include <SDL2/SDL_rwops.h>
+#include <SDL2/SDL_assert.h>
+#include <vector>
+#endif
 
 class FileMapper::FileMapper_private
 {
     friend class FileMapper;
-    #ifdef FileMapper_Windows
+#ifdef FileMapper_Windows
     void    *m_File;
     void    *m_Map;
-    #endif
+#endif
+#ifdef FileMapper_AndroidExtras
+    std::vector<uint8_t> m_dump;
+#endif
     void    *m_Address;
     off_t   m_size;
     //! Full path to opened file
@@ -60,10 +71,10 @@ class FileMapper::FileMapper_private
 
 public:
     FileMapper_private() :
-        #ifdef FileMapper_Windows
+#ifdef FileMapper_Windows
         m_File(NULL),
         m_Map(NULL),
-        #endif
+#endif
         m_Address(NULL),
         m_size(0)
     {}
@@ -73,7 +84,31 @@ public:
         if(m_Address)
             closeFile();
     }
+#ifdef FileMapper_AndroidExtras
+    bool dumpFile(const std::string &path);
+#endif
 };
+
+#ifdef FileMapper_AndroidExtras
+bool FileMapper::FileMapper_private::dumpFile(const std::string &path)
+{
+    size_t size;
+    SDL_RWops *op = SDL_RWFromFile(path.c_str(), "rb");
+
+    if(op)
+    {
+        SDL_RWseek(op, 0, RW_SEEK_END);
+        size = static_cast<size_t>(SDL_RWtell(op));
+        SDL_RWseek(op, 0, RW_SEEK_SET);
+        m_dump.resize(size);
+        SDL_RWread(op, m_dump.data(), 1, size);
+        SDL_RWclose(op);
+        return true;
+    }
+
+    return false;
+}
+#endif
 
 /*
  *   Implementation for POSIX-compatible operating system
@@ -87,7 +122,18 @@ bool FileMapper::FileMapper_private::openFile(const std::string &path)
     m_fd = open(path.c_str(), O_RDONLY);
 
     if(m_fd == -1)
+    {
+#ifdef FileMapper_AndroidExtras
+        if(dumpFile(path)) // Attempt to load the file from assets via SDL_RWops
+        {
+            m_Address = m_dump.data();
+            m_size = m_dump.size();
+            m_path = path;
+            return true;
+        }
+#endif
         return false;
+    }
 
     if(fstat(m_fd, &sb) == -1)
     {
@@ -128,10 +174,20 @@ bool FileMapper::FileMapper_private::openFile(const std::string &path)
 bool FileMapper::FileMapper_private::closeFile()
 {
     bool ret = true;
-    if(munmap(m_Address, m_size) == -1)
+    if(m_Address)
     {
-        m_error = "Fail to unmap";
-        ret = false;
+#ifdef FileMapper_AndroidExtras
+        if(!m_dump.empty())
+        {
+            m_dump.clear();
+        }
+        else
+#endif
+        if(munmap(m_Address, m_size) == -1)
+        {
+            m_error = "Fail to unmap";
+            ret = false;
+        }
     }
     m_path.clear();
     m_Address   = NULL;
@@ -231,7 +287,7 @@ FileMapper::FileMapper() :
     d(new FileMapper_private)
 {}
 
-FileMapper::FileMapper(std::string file) :
+FileMapper::FileMapper(const std::string& file) :
     d(new FileMapper_private)
 {
     if(!open_file(file))
@@ -250,7 +306,7 @@ FileMapper::~FileMapper()
     close_file();
 }
 
-bool FileMapper::open_file(std::string path)
+bool FileMapper::open_file(const std::string& path)
 {
     return d->openFile(path);
 }
