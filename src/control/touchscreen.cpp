@@ -27,6 +27,9 @@
 
 #include "touchscreen.h"
 #include "../globals.h"
+#ifdef __ANDROID__
+#include "../gfx.h"
+#endif
 
 #ifdef __ANDROID__
 #   include <jni.h>
@@ -177,10 +180,10 @@ static struct TouchKeyMap
         {1.0f,  328.0f, 261.0f,  418.0f, TouchScreenController::key_up},
         {1.0f,  498.0f, 261.0f,  588.0f, TouchScreenController::key_down},
 
-        {807.0f, 431.0f, 914.0f,  522.0f, TouchScreenController::key_run},
-        {898.0f, 396.0f, 1005.0f, 487.0f, TouchScreenController::key_jump},
-        {807.0f, 325.0f, 914.0f,  416.0f, TouchScreenController::key_altrun},
-        {898.0f, 290.0f, 1005.0f, 381.0f, TouchScreenController::key_altjump},
+        {788.0f, 396.0f, 895.0f,  487.0f, TouchScreenController::key_run},
+        {898.0f, 431.0f, 1005.0f, 522.0f, TouchScreenController::key_jump},
+        {788.0f, 290.0f, 895.0f,  381.0f, TouchScreenController::key_altrun},
+        {898.0f, 325.0f, 1005.0f, 416.0f, TouchScreenController::key_altjump},
 
         {542.0f, 537.0f, 693.0f,  587.0f, TouchScreenController::key_drop},
 
@@ -480,6 +483,57 @@ void TouchScreenController::render()
             g = 1.f;
         }
 
+#ifdef __ANDROID__
+        float a = 0.5f;
+
+        switch(key)
+        {
+        case TouchScreenController::key_toggleKeysView:
+            frmMain.renderTextureScale(x1, y1, w, h,
+                                       GFX.touch[m_touchHidden ? GFX_t::BUTTON_VIEW_TOGGLE_OFF : GFX_t::BUTTON_VIEW_TOGGLE_ON],
+                                       1.f, 1.f, 1.f, a);
+            break;
+        case TouchScreenController::key_start:
+            frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[GFX_t::BUTTON_START], 1.f, 1.f, 1.f, a);
+            break;
+        case TouchScreenController::key_drop:
+            frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[GFX_t::BUTTON_DROP], 1.f, 1.f, 1.f, a);
+            break;
+        case TouchScreenController::key_up:
+            frmMain.renderTextureScale(x1 + w / 3, y1, w / 3, h, GFX.touch[GFX_t::BUTTON_UP], 1.f, 1.f, 1.f, a);
+            break;
+        case TouchScreenController::key_left:
+            frmMain.renderTextureScale(x1, y1 + h / 2, w, h / 2, GFX.touch[GFX_t::BUTTON_LEFT], 1.f, 1.f, 1.f, a);
+            break;
+        case TouchScreenController::key_right:
+            frmMain.renderTextureScale(x1, y1 + h / 2, w, h / 2, GFX.touch[GFX_t::BUTTON_RIGHT], 1.f, 1.f, 1.f, a);
+            break;
+        case TouchScreenController::key_down:
+            frmMain.renderTextureScale(x1 + w / 3, y1, w / 3, h, GFX.touch[GFX_t::BUTTON_DOWN], 1.f, 1.f, 1.f, a);
+            break;
+        case TouchScreenController::key_holdRun:
+            frmMain.renderTextureScale(x1, y1, w, h,
+                                       GFX.touch[m_runHeld ? GFX_t::BUTTON_HOLD_RUN_ON : GFX_t::BUTTON_HOLD_RUN_OFF],
+                                       1.f, 1.f, 1.f, a);
+            break;
+        case TouchScreenController::key_jump:
+            frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[GFX_t::BUTTON_A], 1.f, 1.f, 1.f, a);
+            break;
+        case TouchScreenController::key_run:
+            frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[GFX_t::BUTTON_X], 1.f, 1.f, 1.f, a);
+            break;
+        case TouchScreenController::key_altjump:
+            frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[GFX_t::BUTTON_B], 1.f, 1.f, 1.f, a);
+            break;
+        case TouchScreenController::key_altrun:
+            frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[GFX_t::BUTTON_Y], 1.f, 1.f, 1.f, a);
+            break;
+        default:
+            frmMain.renderRect(x1, y1, w, h, r, g, 0.f, 0.3f);
+            break;
+        }
+#else
         frmMain.renderRect(x1, y1, w, h, r, g, 0.f, 0.3f);
+#endif
     }
 }
