@@ -71,6 +71,7 @@ public:
 
     //! In-game controls pressed
     Controls_t m_current_keys;
+    bool m_keysHeld[key_END] = {false};
 
     struct ExtraKeys
     {

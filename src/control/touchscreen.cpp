@@ -270,6 +270,8 @@ TouchScreenController::~TouchScreenController() = default;
 
 void TouchScreenController::init()
 {
+    for(int key = key_BEGIN; key < key_END; ++key)
+        m_keysHeld[key] = false;
     m_touchHidden = !s_showTouchscreenOnStart;
     D_pLogDebugNA("Initialization of touch-screen controller...");
     m_touchDevicesCount = SDL_GetNumTouchDevices();
@@ -381,11 +383,13 @@ void TouchScreenController::processTouchDevice(int dev_i)
                 if(fs.heldKeyPrev[key] && !fs.heldKey[key]) // set key off
                 {
                     updateFingerKeyState(fs, m_current_keys, key, false, m_current_extra_keys);
+                    m_keysHeld[key] = false;
                     fs.heldKeyPrev[key] = fs.heldKey[key];
                 }
                 else if(fs.heldKey[key]) // set key on and keep alive
                 {
                     updateFingerKeyState(fs, m_current_keys, key, true, m_current_extra_keys);
+                    m_keysHeld[key] = true;
                     fs.heldKeyPrev[key] = fs.heldKey[key];
                 }
             }
@@ -403,6 +407,7 @@ void TouchScreenController::processTouchDevice(int dev_i)
                 if(st.heldKey[key]) // set key on
                 {
                     updateFingerKeyState(st, m_current_keys, key, true, m_current_extra_keys);
+                    m_keysHeld[key] = true;
                     st.heldKeyPrev[key] = st.heldKey[key];
                     // Also: when more than one touch devices found, choose one which is actual
                     // Otherwise, the spam of on/off events will happen
@@ -424,7 +429,10 @@ void TouchScreenController::processTouchDevice(int dev_i)
         if(!it->second.alive)
         {
             for(int key = key_BEGIN; key < key_END; key++)
+            {
                 updateFingerKeyState(it->second, m_current_keys, key, false, m_current_extra_keys);
+                m_keysHeld[key] = false;
+            }
             it = m_fingers.erase(it);
             continue;
         }
@@ -484,7 +492,7 @@ void TouchScreenController::render()
         }
 
 #ifdef __ANDROID__
-        float a = 0.5f;
+        float a = m_keysHeld[key] ? 0.9f : 0.5f;
 
         switch(key)
         {
