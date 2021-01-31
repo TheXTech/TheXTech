@@ -187,19 +187,19 @@ static struct TouchKeyMap
     {
         /* Note that order of keys must match the Controller::commands enum!!! */
         {331.0f, 537.0f, 482.0f,  587.0f, TouchScreenController::key_start},
-
-        {1.0f,   328.0f, 91.0f,   498.0f, TouchScreenController::key_left},
-        {171.0f, 328.0f, 261.0f,  498.0f, TouchScreenController::key_right},
-        {1.0f,  328.0f, 261.0f,  418.0f, TouchScreenController::key_up},
-        {1.0f,  498.0f, 261.0f,  588.0f, TouchScreenController::key_down},
-
+        {1.0f, 410.0f, 83.0f,  492.0f, TouchScreenController::key_left},
+        {165.0f, 410.0f, 247.0f,  492.0f, TouchScreenController::key_right},
+        {83.0f, 328.0f, 165.0f,  410.0f, TouchScreenController::key_up},
+        {83.0f, 492.0f, 165.0f,  574.0f, TouchScreenController::key_down},
+        {1.0f, 328.0f, 83.0f,  410.0f, TouchScreenController::key_upleft},
+        {165.0f, 328.0f, 247.0f,  410.0f, TouchScreenController::key_upright},
+        {1.0f, 492.0f, 83.0f,  574.0f, TouchScreenController::key_downleft},
+        {165.0f, 492.0f, 247.0f,  574.0f, TouchScreenController::key_downright},
         {788.0f, 396.0f, 895.0f,  487.0f, TouchScreenController::key_run},
-        {898.0f, 431.0f, 1005.0f, 522.0f, TouchScreenController::key_jump},
+        {898.0f, 431.0f, 1005.0f,  522.0f, TouchScreenController::key_jump},
         {788.0f, 290.0f, 895.0f,  381.0f, TouchScreenController::key_altrun},
-        {898.0f, 325.0f, 1005.0f, 416.0f, TouchScreenController::key_altjump},
-
+        {898.0f, 325.0f, 1005.0f,  416.0f, TouchScreenController::key_altjump},
         {542.0f, 537.0f, 693.0f,  587.0f, TouchScreenController::key_drop},
-
         {807.0f, 150.0f, 914.0f,  180.0f, TouchScreenController::key_holdRun},
         {10.0f, 10.0f, 70.0f,  70.0f, TouchScreenController::key_toggleKeysView},
     };
@@ -324,6 +324,22 @@ static void updateFingerKeyState(TouchScreenController::FingerState &st,
                 break;
             case TouchScreenController::key_down:
                 updateKeyValue(keys.Down, setState);
+                break;
+            case TouchScreenController::key_upleft:
+                updateKeyValue(keys.Up, setState);
+                updateKeyValue(keys.Left, setState);
+                break;
+            case TouchScreenController::key_upright:
+                updateKeyValue(keys.Up, setState);
+                updateKeyValue(keys.Right, setState);
+                break;
+            case TouchScreenController::key_downleft:
+                updateKeyValue(keys.Down, setState);
+                updateKeyValue(keys.Left, setState);
+                break;
+            case TouchScreenController::key_downright:
+                updateKeyValue(keys.Down, setState);
+                updateKeyValue(keys.Right, setState);
                 break;
             case TouchScreenController::key_jump:
                 updateKeyValue(keys.Jump, setState);
@@ -521,17 +537,31 @@ void TouchScreenController::render()
             frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[GFX_t::BUTTON_DROP], 1.f, 1.f, 1.f, a);
             break;
         case TouchScreenController::key_up:
-            frmMain.renderTextureScale(x1 + w / 3, y1, w / 3, h, GFX.touch[GFX_t::BUTTON_UP], 1.f, 1.f, 1.f, a);
+            frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[GFX_t::BUTTON_UP], 1.f, 1.f, 1.f, a);
             break;
         case TouchScreenController::key_left:
-            frmMain.renderTextureScale(x1, y1 + h / 2, w, h / 2, GFX.touch[GFX_t::BUTTON_LEFT], 1.f, 1.f, 1.f, a);
+            frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[GFX_t::BUTTON_LEFT], 1.f, 1.f, 1.f, a);
             break;
         case TouchScreenController::key_right:
-            frmMain.renderTextureScale(x1, y1 + h / 2, w, h / 2, GFX.touch[GFX_t::BUTTON_RIGHT], 1.f, 1.f, 1.f, a);
+            frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[GFX_t::BUTTON_RIGHT], 1.f, 1.f, 1.f, a);
             break;
         case TouchScreenController::key_down:
-            frmMain.renderTextureScale(x1 + w / 3, y1, w / 3, h, GFX.touch[GFX_t::BUTTON_DOWN], 1.f, 1.f, 1.f, a);
+            frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[GFX_t::BUTTON_DOWN], 1.f, 1.f, 1.f, a);
             break;
+
+        case TouchScreenController::key_upleft:
+            frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[GFX_t::BUTTON_UPLEFT], 1.f, 1.f, 1.f, a);
+            break;
+        case TouchScreenController::key_upright:
+            frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[GFX_t::BUTTON_UPRIGHT], 1.f, 1.f, 1.f, a);
+            break;
+        case TouchScreenController::key_downleft:
+            frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[GFX_t::BUTTON_DOWNLEFT], 1.f, 1.f, 1.f, a);
+            break;
+        case TouchScreenController::key_downright:
+            frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[GFX_t::BUTTON_DOWNRIGHT], 1.f, 1.f, 1.f, a);
+            break;
+
         case TouchScreenController::key_holdRun:
             frmMain.renderTextureScale(x1, y1, w, h,
                                        GFX.touch[m_runHeld ? GFX_t::BUTTON_HOLD_RUN_ON : GFX_t::BUTTON_HOLD_RUN_OFF],
