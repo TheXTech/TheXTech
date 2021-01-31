@@ -103,6 +103,26 @@ bool GFX_t::load()
 
     loadImage(YoshiWings, uiPath + "YoshiWings.png");
 
+#ifdef __ANDROID__
+    // Loading a touch-screen buttons from assets
+    loadImage(touch[BUTTON_START], "buttons/Start.png");
+    loadImage(touch[BUTTON_LEFT], "buttons/Left.png");
+    loadImage(touch[BUTTON_RIGHT], "buttons/Right.png");
+    loadImage(touch[BUTTON_UP], "buttons/Up.png");
+    loadImage(touch[BUTTON_DOWN], "buttons/Down.png");
+    loadImage(touch[BUTTON_A], "buttons/A.png");
+    loadImage(touch[BUTTON_B], "buttons/V.png");
+    loadImage(touch[BUTTON_X], "buttons/X.png");
+    loadImage(touch[BUTTON_Y], "buttons/Y.png");
+    loadImage(touch[BUTTON_DROP], "buttons/Select.png");
+    loadImage(touch[BUTTON_HOLD_RUN_OFF], "buttons/RunOff.png");
+    loadImage(touch[BUTTON_HOLD_RUN_ON], "buttons/RunOn.png");
+    loadImage(touch[BUTTON_VIEW_TOGGLE_OFF], "buttons/KeysShowOff.png");
+    loadImage(touch[BUTTON_VIEW_TOGGLE_ON], "buttons/KeysShow.png");
+    loadImage(touch[BUTTON_ANALOG_BORDER], "buttons/SBorder.png");
+    loadImage(touch[BUTTON_ANALOG_STICK], "buttons/AStick.png");
+#endif
+
     if(m_loadErrors > 0)
     {
         std::string msg = fmt::format_ne("Failed to load an UI image assets. Look a log file to get more details:\n{0}", getLogFilePath());

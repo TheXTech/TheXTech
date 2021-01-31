@@ -63,6 +63,31 @@ public:
     RangeArr<StdPicture, 1, 2> Tongue;
     StdPicture Warp;
     StdPicture YoshiWings;
+
+#ifdef __ANDROID__
+    // Android specific pictures
+    enum
+    {
+        BUTTON_START = 0,
+        BUTTON_LEFT,
+        BUTTON_RIGHT,
+        BUTTON_UP,
+        BUTTON_DOWN,
+        BUTTON_A,
+        BUTTON_B,
+        BUTTON_X,
+        BUTTON_Y,
+        BUTTON_DROP,
+        BUTTON_HOLD_RUN_OFF,
+        BUTTON_HOLD_RUN_ON,
+        BUTTON_VIEW_TOGGLE_OFF,
+        BUTTON_VIEW_TOGGLE_ON,
+        BUTTON_ANALOG_BORDER,
+        BUTTON_ANALOG_STICK,
+        BUTTONS_END
+    };
+    StdPicture touch[BUTTONS_END];
+#endif
 };
 
 #endif // GFX_H
