@@ -8,10 +8,11 @@
     <string name="settings_enable_frameskip">Включить пропуск кадров</string>
     <string name="setup_disable_sound">Отключить звук</string>
     <string name="setup_general_cat">Общее</string>
-    <string name="setup_control_cat">Управление</string>
+    <string name="setup_control_cat">Сенсорный контроллер</string>
     <string name="setup_display_cat">Отображение</string>
     <string name="setup_touchscreen_controller_enable">Включить экранный джойстик</string>
-    <string name="setup_touchscreen_alwaysshow">Показывать экранный джойстик</string>
+    <string name="setup_touchscreen_alwaysshow">Показывать экранный джойстик при запуске</string>
     <string name="setup_show_framerate">Показать частоту кадров</string>
     <string name="setup_max_framerate_mode">Режим максимальной частоты кадров</string>
+    <string name="setup_touchscreen_mode">Режим контроллера</string>
 </resources>

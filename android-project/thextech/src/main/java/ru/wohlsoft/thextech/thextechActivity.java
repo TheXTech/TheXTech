@@ -79,10 +79,8 @@ public class thextechActivity extends SDLActivity
         if(setup.getBoolean("enable_max_fps", false))
             args.add("--max-fps");
 
-//        if(setup.getBoolean("touchscreen_gamepad_enable", true))
-//            args.add("WIP");
-//        if(setup.getBoolean("touchscreen_gamepad_showalways", false))
-//            args.add("WIP");
+        setTouchScreenMode(Integer.parseInt(setup.getString("setup_touchscreen_mode", "1")));
+        setTouchScreenShowOnStart(setup.getBoolean("touchscreen_gamepad_showalways", false));
 
         String[] argsOut = new String[args.size()];
         args.toArray(argsOut);
@@ -118,4 +116,6 @@ public class thextechActivity extends SDLActivity
     }
 
     public static native void setHardwareKeyboardPresence(int keyboard);
+    public static native void setTouchScreenMode(int mode);
+    public static native void setTouchScreenShowOnStart(boolean showOnStart);
 }

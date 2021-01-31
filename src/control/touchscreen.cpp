@@ -44,8 +44,17 @@ enum
     KEYBOARD_12KEY = 0x00000003
 };
 
+enum
+{
+    TOUCHSCREEN_DISABLE = 0,
+    TOUCHSCREEN_DISABLE_ON_KEYBOARD = 1,
+    TOUCHSCREEN_ENABLE = 2,
+};
+
 //! Is hardware keyboard presented?
 static int s_keyboardPresence = KEYBOARD_NOKEYS;
+static int s_touchscreenMode = TOUCHSCREEN_DISABLE_ON_KEYBOARD;
+static bool s_showTouchscreenOnStart = false;
 
 #endif
 
@@ -53,12 +62,63 @@ bool TouchScreenController::touchSupported()
 {
     if(m_touchDevicesCount <= 0)
         return false;
+
 #ifdef __ANDROID__
-    if(s_keyboardPresence > KEYBOARD_NOKEYS)
+    switch(s_touchscreenMode)
+    {
+    case TOUCHSCREEN_DISABLE:
         return false;
+    case TOUCHSCREEN_DISABLE_ON_KEYBOARD:
+        if(s_keyboardPresence > KEYBOARD_NOKEYS)
+            return false;
+        break;
+    case TOUCHSCREEN_ENABLE:
+        return true;
+    }
 #endif
+
     return true;
 }
+
+
+#ifdef __ANDROID__
+
+JNIEXPORT void JNICALL
+Java_ru_wohlsoft_thextech_thextechActivity_setHardwareKeyboardPresence(
+    JNIEnv *env,
+    jclass type,
+    jint keyboard
+)
+{
+    (void)env;
+    (void)type;
+    s_keyboardPresence = keyboard;
+}
+
+JNIEXPORT void JNICALL
+Java_ru_wohlsoft_thextech_thextechActivity_setTouchScreenMode(
+    JNIEnv *env,
+    jclass type,
+    jint mode
+)
+{
+    (void)env;
+    (void)type;
+    s_touchscreenMode = mode;
+}
+
+JNIEXPORT void JNICALL
+Java_ru_wohlsoft_thextech_thextechActivity_setTouchScreenShowOnStart(
+        JNIEnv *env,
+        jclass type,
+        jboolean showOnStart
+)
+{
+    (void)env;
+    (void)type;
+    s_showTouchscreenOnStart = showOnStart;
+}
+#endif
 
 TouchScreenController::FingerState::FingerState()
 {
@@ -202,25 +262,12 @@ static struct TouchKeyMap
 
 } g_touchKeyMap;
 
-
-#ifdef __ANDROID__
-
-JNIEXPORT void JNICALL
-Java_ru_wohlsoft_thextech_thextechActivity_setHardwareKeyboardPresence(JNIEnv *env, jclass type,
-        jint keyboard)
-{
-    (void)env;
-    (void)type;
-    s_keyboardPresence = keyboard;
-}
-#endif
-
-
 TouchScreenController::TouchScreenController() = default;
 TouchScreenController::~TouchScreenController() = default;
 
 void TouchScreenController::init()
 {
+    m_touchHidden = !s_showTouchscreenOnStart;
     D_pLogDebugNA("Initialization of touch-screen controller...");
     m_touchDevicesCount = SDL_GetNumTouchDevices();
     updateScreenSize();

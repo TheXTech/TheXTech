@@ -1,0 +1,7 @@
+<resources>
+    <string-array name="touchscreenControllerTypes">
+        <item>Всегда включать</item>
+        <item>Выключить при наличии аппаратной клавиатуры</item>
+        <item>Всегда выключать</item>
+    </string-array>
+</resources>

@@ -1,7 +1,6 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <PreferenceCategory android:title="@string/setup_general_cat">
-
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="enable_frame_skip"
@@ -12,18 +11,18 @@
             android:title="@string/setup_disable_sound" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/setup_control_cat">
-
-        <CheckBoxPreference
-            android:defaultValue="true"
-            android:key="touchscreen_gamepad_enable"
-            android:title="@string/setup_touchscreen_controller_enable" />
+        <ListPreference
+            android:defaultValue="1"
+            android:entries="@array/touchscreenControllerTypes"
+            android:entryValues="@array/touchscreenControllerTypesValues"
+            android:key="setup_touchscreen_mode"
+            android:title="@string/setup_touchscreen_mode" />
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="touchscreen_gamepad_showalways"
             android:title="@string/setup_touchscreen_alwaysshow" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/setup_display_cat">
-
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="show_fps"

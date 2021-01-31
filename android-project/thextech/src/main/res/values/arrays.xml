@@ -1,0 +1,12 @@
+<resources>
+    <string-array name="touchscreenControllerTypes">
+        <item>Always enable</item>
+        <item>Disable when hardware keyboard is plugged</item>
+        <item>Always disable</item>
+    </string-array>
+    <string-array name="touchscreenControllerTypesValues">
+        <item>2</item>
+        <item>1</item>
+        <item>0</item>
+    </string-array>
+</resources>
