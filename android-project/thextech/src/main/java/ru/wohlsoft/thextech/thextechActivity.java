@@ -2,7 +2,10 @@ package ru.wohlsoft.thextech;
 
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.graphics.Point;
 import android.os.Bundle;
+import android.view.WindowManager;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -99,12 +102,8 @@ public class thextechActivity extends SDLActivity
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        // Not needed yet
-//        LinearLayout ll = new LinearLayout(this);
-//        ll.setBackground(getResources().getDrawable(R.mipmap.buttons));
-//        addContentView(ll, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-//                LinearLayout.LayoutParams.MATCH_PARENT));
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        this.setScreenSize(SDLActivity.getDiagonal());
     }
 
     @Override
@@ -118,4 +117,5 @@ public class thextechActivity extends SDLActivity
     public static native void setHardwareKeyboardPresence(int keyboard);
     public static native void setTouchScreenMode(int mode);
     public static native void setTouchScreenShowOnStart(boolean showOnStart);
+    public static native void setScreenSize(double screenSize);
 }

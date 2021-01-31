@@ -58,6 +58,7 @@ enum
 static int s_keyboardPresence = KEYBOARD_NOKEYS;
 static int s_touchscreenMode = TOUCHSCREEN_DISABLE_ON_KEYBOARD;
 static bool s_showTouchscreenOnStart = false;
+static double s_screenSize = 0;
 
 #endif
 
@@ -120,6 +121,18 @@ Java_ru_wohlsoft_thextech_thextechActivity_setTouchScreenShowOnStart(
     (void)env;
     (void)type;
     s_showTouchscreenOnStart = showOnStart;
+}
+
+JNIEXPORT void JNICALL
+Java_ru_wohlsoft_thextech_thextechActivity_setScreenSize(
+        JNIEnv *env,
+        jclass type,
+        jdouble screenSize
+)
+{
+    (void)env;
+    (void)type;
+    s_screenSize = screenSize;
 }
 #endif
 
