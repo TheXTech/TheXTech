@@ -282,6 +282,8 @@ void SetupCredits()
     AddCredit("Aero");
     AddCredit("Kley");
     AddCredit("ShadowYoshi (Joey)");
+    AddCredit("ZeZeinzer"); // Android testing, touchscreen controller button pictures
+    AddCredit("LucyZocker"); // Android testing
 #endif
     AddCredit("");
     AddCredit("4matsy");
