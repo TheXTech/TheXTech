@@ -97,10 +97,9 @@ bool FileMapper::FileMapper_private::dumpFile(const std::string &path)
 
     if(op)
     {
-        SDL_RWseek(op, 0, RW_SEEK_END);
-        size = static_cast<size_t>(SDL_RWtell(op));
-        SDL_RWseek(op, 0, RW_SEEK_SET);
+        size = static_cast<size_t>(SDL_RWsize(op));
         m_dump.resize(size);
+        SDL_RWseek(op, 0, RW_SEEK_SET);
         SDL_RWread(op, m_dump.data(), 1, size);
         SDL_RWclose(op);
         return true;
