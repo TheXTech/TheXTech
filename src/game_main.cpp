@@ -800,7 +800,10 @@ int GameMain(const CmdLineSetup_t &setup)
                     StartWarp = 0;
                 }
                 else
+                {
+                    lastWarpEntered = 0;
                     ReturnWarp = 0;
+                }
             }
 //'--------------------------------------------
             ProcEvent("Level - Start", true);
