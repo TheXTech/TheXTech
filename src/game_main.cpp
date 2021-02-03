@@ -947,9 +947,14 @@ void EditorLoop()
 void KillIt()
 {
     GameIsActive = false;
+#ifndef __ANDROID__
     frmMain.hide();
     if(resChanged)
         SetOrigRes();
+#else
+    frmMain.clearBuffer();
+    frmMain.repaint();
+#endif
     QuitMixerX();
     UnloadGFX();
     showCursor(1);

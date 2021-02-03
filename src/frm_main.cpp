@@ -161,6 +161,7 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
 
 #if defined(__ANDROID__) // Use a full-screen on Android mode by default
     setFullScreen(true);
+    show();
 #endif
 
 
@@ -262,8 +263,7 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
     }
 
     // Clean-up from a possible start-up junk
-    SDL_SetRenderDrawColor(m_gRenderer, 0, 0, 0, 255);
-    SDL_RenderClear(m_gRenderer);
+    clearBuffer();
 
     SDL_SetRenderTarget(m_gRenderer, m_tBuffer);
 
@@ -272,6 +272,9 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
     m_keyboardState = SDL_GetKeyboardState(nullptr);
 
     updateViewport();
+
+    // Clean-up the texture buffer from the same start-up junk
+    clearBuffer();
 
     repaint();
     doEvents();

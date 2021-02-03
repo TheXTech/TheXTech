@@ -44,6 +44,8 @@ enum ControllerKeys
 
 public class thextechActivity extends SDLActivity
 {
+    static boolean gameRunning = false;
+
     protected String[] getLibraries()
     {
         return new String[] {
@@ -95,7 +97,16 @@ public class thextechActivity extends SDLActivity
     protected void onStart()
     {
         super.onStart();
+        gameRunning = true;
         setHardwareKeyboardPresence(getResources().getConfiguration().keyboard);
+    }
+
+
+    @Override
+    public void onStop()
+    {
+        super.onStop();
+        gameRunning = false;
     }
 
     @Override
