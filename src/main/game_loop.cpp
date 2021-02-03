@@ -205,8 +205,8 @@ void PauseGame(int plr)
     int A = 0;
     int B = 0;
     bool noButtons = false;
-    double fpsTime = 0;
-    int fpsCount = 0;
+//    double fpsTime = 0;
+//    int fpsCount = 0;
 
     for(A = numPlayers; A >= 1; A--)
         SavedChar[Player[A].Character] = Player[A];
@@ -236,44 +236,15 @@ void PauseGame(int plr)
 
     do
     {
-        tempTime = SDL_GetTicks();
-        if(tempTime >= gameTime + frameRate || tempTime < gameTime || MaxFPS)
+        if(canProceedFrame())
         {
-            if(fpsCount >= 32000) // Fixes Overflow bug
-                fpsCount = 0;
-            if(cycleCount >= 32000) // Fixes Overflow bug
-                cycleCount = 0;
-            overTime = overTime + (tempTime - (gameTime + frameRate));
-            if(gameTime == 0.0)
-                overTime = 0;
-            if(overTime <= 1)
-                overTime = 0;
-            else if(overTime > 1000)
-                overTime = 1000;
-            gameTime = tempTime - overTime;
-            overTime = (overTime - (tempTime - gameTime));
-            if(SDL_GetTicks() > fpsTime)
-            {
-                if(cycleCount >= 65)
-                {
-                    overTime = 0;
-                    gameTime = tempTime;
-                }
-                cycleCount = 0;
-                fpsTime = SDL_GetTicks() + 1000;
-                GoalTime = fpsTime;
-//                if(Debugger == true)
-//                    frmLevelDebugger.lblFPS = fpsCount;
-                if(ShowFPS)
-                    PrintFPS = fpsCount;
-                fpsCount = 0;
-            }
-
+            computeFrameTime1();
+            computeFrameTime2();
 
             DoEvents();
             CheckActive();
 
-            if(LevelSelect == true)
+            if(LevelSelect)
                 UpdateGraphics2();
             else
                 UpdateGraphics();

@@ -322,6 +322,17 @@ int GameMain(const CmdLineSetup_t &setup)
             // Update graphics before loop begin (to process an initial lazy-unpacking of used sprites)
             UpdateGraphics();
 
+            // Run the frame-loop
+            runFrameLoop(&OutroLoop,
+                         nullptr,
+                        []()->bool{ return GameOutro;}, nullptr,
+                        nullptr,
+                        []()->void
+                        {
+                            ScreenType = 0;
+                            SetupScreens();
+                        });
+#if 0
             do
             {
                 DoEvents();
@@ -378,6 +389,7 @@ int GameMain(const CmdLineSetup_t &setup)
                 PGE_Delay(1);
                 if(!GameIsActive) break;// Break on quit
             } while(GameOutro);
+#endif
         }
 
         // The Game Menu
@@ -498,6 +510,10 @@ int GameMain(const CmdLineSetup_t &setup)
             // Update graphics before loop begin (to process inital lazy-unpacking of used sprites)
             UpdateGraphics();
 
+            runFrameLoop(&MenuLoop, nullptr, []()->bool{ return GameMenu;});
+            if(!GameIsActive)
+                return 0;// Break on quit
+#if 0
             do
             {
                 DoEvents();
@@ -552,6 +568,7 @@ int GameMain(const CmdLineSetup_t &setup)
                 if(!GameIsActive) return 0;// Break on quit
 
             } while(GameMenu);
+#endif
         }
 
         // World Map
@@ -634,6 +651,13 @@ int GameMain(const CmdLineSetup_t &setup)
                 // Update graphics before loop begin (to process inital lazy-unpacking of used sprites)
                 UpdateGraphics2();
 
+                runFrameLoop(nullptr, &WorldLoop,
+                             []()->bool{return LevelSelect;},
+                             nullptr,
+                             []()->void{FreezeNPCs = false;});
+                if(!GameIsActive)
+                    return 0;// Break on quit
+#if 0
                 do // 'level select loop
                 {
                     FreezeNPCs = false;
@@ -687,6 +711,7 @@ int GameMain(const CmdLineSetup_t &setup)
                     if(!GameIsActive)
                         return 0;// Break on quit
                 } while(LevelSelect);
+#endif
             }
         }
 
@@ -819,6 +844,18 @@ int GameMain(const CmdLineSetup_t &setup)
             // Update graphics before loop begin (to process inital lazy-unpacking of used sprites)
             UpdateGraphics();
 
+            runFrameLoop(nullptr, &GameLoop,
+            []()->bool{return !LevelSelect && !GameMenu;},
+            []()->bool
+            {
+                if(!LivingPlayers())
+                {
+                    EveryonesDead();
+                    return true;
+                }
+                return false;
+            });
+#if 0
             do // MAIN GAME LOOP
             {
                 DoEvents();
@@ -874,6 +911,7 @@ int GameMain(const CmdLineSetup_t &setup)
                 if(!GameIsActive) return 0;// Break on quit
             }
             while(!LevelSelect && !GameMenu);
+#endif
 
             // TODO: Utilize this and any TestLevel/MagicHand related code to allow PGE Editor integration
             // (do any code without interaction of no more existnig Editor VB forms, keep IPS with PGE Editor instead)

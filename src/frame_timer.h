@@ -26,7 +26,22 @@
 #ifndef FRAME_TIMER_H
 #define FRAME_TIMER_H
 
+#include <functional>
+
 void resetFrameTimer();
 bool frameSkipNeeded();
+
+typedef void (*LoopCall_t)(void);
+
+bool canProceedFrame();
+void computeFrameTime1();
+void computeFrameTime2();
+
+void runFrameLoop(LoopCall_t doLoopCallbackPre,
+                  LoopCall_t doLoopCallbackPost,
+                  std::function<bool ()> condition,
+                  std::function<bool ()> subCondition = nullptr,
+                  std::function<void ()> preTimerExtraPre = nullptr,
+                  std::function<void ()> preTimerExtraPost = nullptr);
 
 #endif // FRAME_TIMER_H

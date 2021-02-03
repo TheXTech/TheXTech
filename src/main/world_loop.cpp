@@ -649,42 +649,15 @@ void PathWait()
     do
     {
         DoEvents();
-        tempTime = SDL_GetTicks();
-        if(tempTime >= gameTime + frameRate || tempTime < gameTime || MaxFPS)
+        if(canProceedFrame())
         {
             UpdateGraphics2();
             UpdateSound();
-            C = C + 1;
-            if(fpsCount >= 32000) // Fixes Overflow bug
-                fpsCount = 0;
-            if(cycleCount >= 32000) // Fixes Overflow bug
-                cycleCount = 0;
-            overTime = overTime + (tempTime - (gameTime + frameRate));
-            if(gameTime == 0.0)
-                overTime = 0;
-            if(overTime <= 1)
-                overTime = 0;
-            else if(overTime > 1000)
-                overTime = 1000;
-            gameTime = tempTime - overTime;
-            overTime = (overTime - (tempTime - gameTime));
+
+            C++;
+            computeFrameTime1();
             DoEvents();
-            if(SDL_GetTicks() > fpsTime)
-            {
-                if(cycleCount >= 65)
-                {
-                    overTime = 0;
-                    gameTime = tempTime;
-                }
-                cycleCount = 0;
-                fpsTime = SDL_GetTicks() + 1000;
-                GoalTime = fpsTime;
-//                if(Debugger)
-//                    frmLevelDebugger.lblFPS = fpsCount;
-                if(ShowFPS)
-                    PrintFPS = fpsCount;
-                fpsCount = 0;
-            }
+            computeFrameTime2();
         }
         PGE_Delay(1);
     } while(!(C >= 24));

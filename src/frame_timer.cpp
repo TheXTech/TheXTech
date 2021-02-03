@@ -26,9 +26,12 @@
 #include <SDL2/SDL_timer.h>
 
 #include <Logger/logger.h>
+#include "pge_delay.h"
 
 #include "frame_timer.h"
 #include "globals.h"
+#include "graphics.h"
+
 
 void resetFrameTimer()
 {
@@ -44,4 +47,113 @@ void resetFrameTimer()
 bool frameSkipNeeded()
 {
     return SDL_GetTicks() + SDL_floor(1000 * (1 - (cycleCount / 63.0))) > GoalTime;
+}
+
+
+extern void CheckActive(); // game_main.cpp
+
+static SDL_INLINE bool canProcessFrameCond()
+{
+    return tempTime >= gameTime + frameRate || tempTime < gameTime || MaxFPS;
+}
+
+bool canProceedFrame()
+{
+    tempTime = SDL_GetTicks();
+    return canProcessFrameCond();
+}
+
+static SDL_INLINE void computeFrameTime1Real()
+{
+    if(fpsCount >= 32000)
+        fpsCount = 0; // Fixes Overflow bug
+
+    if(cycleCount >= 32000)
+        cycleCount = 0; // Fixes Overflow bug
+
+    overTime = overTime + (tempTime - (gameTime + frameRate));
+
+    if(gameTime == 0.0)
+        overTime = 0;
+
+    if(overTime <= 1)
+        overTime = 0;
+    else if(overTime > 1000)
+        overTime = 1000;
+
+    gameTime = tempTime - overTime;
+    overTime = (overTime - (tempTime - gameTime));
+}
+
+static SDL_INLINE void computeFrameTime2Real()
+{
+    if(SDL_GetTicks() > fpsTime)
+    {
+        if(cycleCount >= 65)
+        {
+            overTime = 0;
+            gameTime = tempTime;
+        }
+        cycleCount = 0;
+        fpsTime = SDL_GetTicks() + 1000;
+        GoalTime = fpsTime;
+//      if(Debugger == true)
+//          frmLevelDebugger.lblFPS = fpsCount;
+        if(ShowFPS)
+            PrintFPS = fpsCount;
+        fpsCount = 0;
+    }
+}
+
+
+void computeFrameTime1()
+{
+    computeFrameTime1Real();
+}
+
+void computeFrameTime2()
+{
+    computeFrameTime2Real();
+}
+
+void runFrameLoop(LoopCall_t doLoopCallbackPre,
+                  LoopCall_t doLoopCallbackPost,
+                  std::function<bool(void)> condition,
+                  std::function<bool ()> subCondition,
+                  std::function<void ()> preTimerExtraPre,
+                  std::function<void ()> preTimerExtraPost)
+{
+    do
+    {
+        if(preTimerExtraPre)
+            preTimerExtraPre();
+
+        DoEvents();
+        tempTime = SDL_GetTicks();
+
+        if(preTimerExtraPost)
+            preTimerExtraPost();
+
+        if(canProcessFrameCond())
+        {
+            CheckActive();
+            if(doLoopCallbackPre)
+                doLoopCallbackPre();
+
+            computeFrameTime1Real();
+
+            if(doLoopCallbackPost)
+                doLoopCallbackPost(); // Run the loop callback
+            DoEvents();
+
+            computeFrameTime2Real();
+
+            if(subCondition && subCondition())
+                break;
+        }
+
+        PGE_Delay(1);
+        if(!GameIsActive)
+            break;// Break on quit
+    } while(condition());
 }
