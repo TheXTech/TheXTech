@@ -26,6 +26,9 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_thread.h>
 #include <SDL2/SDL_opengl.h>
+#ifdef __ANDROID__
+#include <SDL2/SDL_assert.h>
+#endif
 
 #include "globals.h"
 #include "frame_timer.h"
@@ -371,6 +374,19 @@ void FrmMain::processEvent()
     case SDL_MOUSEMOTION:
         eventMouseMove(m_event.motion);
         break;
+#ifdef __ANDROID__
+    case SDL_RENDER_DEVICE_RESET:
+        D_pLogDebug("Android: Render Device Reset");
+        break;
+    case SDL_APP_WILLENTERBACKGROUND:
+        m_blockRender = true;
+        D_pLogDebug("Android: Entering background");
+        break;
+    case SDL_APP_DIDENTERFOREGROUND:
+        m_blockRender = false;
+        D_pLogDebug("Android: Resumed foreground");
+        break;
+#endif
     }
 }
 
@@ -611,6 +627,11 @@ bool FrmMain::isSdlError()
 
 void FrmMain::repaint()
 {
+#ifdef __ANDROID__
+    if(m_blockRender)
+        return;
+#endif
+
     int w, h, off_x, off_y, wDst, hDst;
     float scale_x, scale_y;
 
@@ -1092,6 +1113,12 @@ void FrmMain::lazyLoadedBytesReset()
     m_lazyLoadedBytes = 0;
 }
 
+#ifdef __ANDROID__
+bool FrmMain::renderBlocked()
+{
+    return m_blockRender;
+}
+#endif
 
 #ifndef __EMSCRIPTEN__
 
@@ -1478,12 +1505,18 @@ void FrmMain::clearAllTextures()
 
 void FrmMain::clearBuffer()
 {
+#ifdef __ANDROID__
+    SDL_assert(!m_blockRender);
+#endif
     SDL_SetRenderDrawColor(m_gRenderer, 0, 0, 0, 255);
     SDL_RenderClear(m_gRenderer);
 }
 
 void FrmMain::renderRect(int x, int y, int w, int h, float red, float green, float blue, float alpha, bool filled)
 {
+#ifdef __ANDROID__
+    SDL_assert(!m_blockRender);
+#endif
     SDL_Rect aRect = {x + viewport_offset_x,
                       y + viewport_offset_y,
                       w, h};
@@ -1502,6 +1535,9 @@ void FrmMain::renderRect(int x, int y, int w, int h, float red, float green, flo
 
 void FrmMain::renderRectBR(int _left, int _top, int _right, int _bottom, float red, float green, float blue, float alpha)
 {
+#ifdef __ANDROID__
+    SDL_assert(!m_blockRender);
+#endif
     SDL_Rect aRect = {_left + viewport_offset_x,
                       _top + viewport_offset_y,
                       _right - _left, _bottom - _top};
@@ -1516,6 +1552,9 @@ void FrmMain::renderRectBR(int _left, int _top, int _right, int _bottom, float r
 
 void FrmMain::renderCircle(int cx, int cy, int radius, float red, float green, float blue, float alpha, bool filled)
 {
+#ifdef __ANDROID__
+    SDL_assert(!m_blockRender);
+#endif
     UNUSED(filled);
 
     SDL_SetRenderDrawColor(m_gRenderer,
@@ -1553,6 +1592,9 @@ void FrmMain::renderTextureI(int xDst, int yDst, int wDst, int hDst,
                              double rotateAngle, SDL_Point *center, unsigned int flip,
                              float red, float green, float blue, float alpha)
 {
+#ifdef __ANDROID__
+    SDL_assert(!m_blockRender);
+#endif
     if(!tx.inited)
         return;
 
@@ -1604,6 +1646,9 @@ void FrmMain::renderTextureScaleI(int xDst, int yDst, int wDst, int hDst,
                              double rotateAngle, SDL_Point *center, unsigned int flip,
                              float red, float green, float blue, float alpha)
 {
+#ifdef __ANDROID__
+    SDL_assert(!m_blockRender);
+#endif
     if(!tx.inited)
         return;
 
@@ -1702,6 +1747,9 @@ void FrmMain::renderTextureFL(double xDst, double yDst, double wDst, double hDst
 
 void FrmMain::renderTexture(int xDst, int yDst, StdPicture &tx, float red, float green, float blue, float alpha)
 {
+#ifdef __ANDROID__
+    SDL_assert(!m_blockRender);
+#endif
     const unsigned int flip = SDL_FLIP_NONE;
 
     if(!tx.inited)
@@ -1734,6 +1782,9 @@ void FrmMain::renderTexture(int xDst, int yDst, StdPicture &tx, float red, float
 
 void FrmMain::renderTextureScale(int xDst, int yDst, int wDst, int hDst, StdPicture &tx, float red, float green, float blue, float alpha)
 {
+#ifdef __ANDROID__
+    SDL_assert(!m_blockRender);
+#endif
     const unsigned int flip = SDL_FLIP_NONE;
 
     if(!tx.inited)

@@ -36,6 +36,11 @@ void UpdateGraphics2()
     if(!GameIsActive)
         return;
 
+#ifdef __ANDROID__
+    if(frmMain.renderBlocked())
+        return;
+#endif
+
     float c = ShadowMode ? 0.f : 1.f;
     cycleCount = cycleCount + 1;
 

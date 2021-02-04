@@ -663,6 +663,11 @@ void UpdateLoadREAL()
         draw = true;
     }
 
+#ifdef __ANDROID__
+    if(frmMain.renderBlocked())
+        return;
+#endif
+
     if(draw)
     {
         frmMain.clearBuffer();

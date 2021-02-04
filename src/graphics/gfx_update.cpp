@@ -51,6 +51,11 @@ void UpdateGraphics(bool skipRepaint)
     if(!GameIsActive)
         return;
 
+#ifdef __ANDROID__
+    if(frmMain.renderBlocked())
+        return;
+#endif
+
     // frame skip code
     cycleCount += 1;
 

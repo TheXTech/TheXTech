@@ -58,6 +58,9 @@ class FrmMain
     Uint32 m_lastMousePress = 0;
     SDL_Event m_event;
     SDL_RendererInfo m_ri;
+#ifdef __ANDROID__
+    bool m_blockRender = false;
+#endif
 
     size_t m_lazyLoadedBytes = 0;
 
@@ -155,6 +158,10 @@ public:
 
     size_t lazyLoadedBytes();
     void lazyLoadedBytesReset();
+
+#ifdef __ANDROID__
+    bool renderBlocked();
+#endif
 
 #ifndef __EMSCRIPTEN__
     void makeShot();
