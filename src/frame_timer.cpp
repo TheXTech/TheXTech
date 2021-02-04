@@ -32,17 +32,206 @@
 #include "globals.h"
 #include "graphics.h"
 
+#define USE_NEW_TIMER
+
+#ifdef USE_NEW_TIMER
+#define COMPUTE_FRAME_TIME_1_REAL computeFrameTime1Real_2
+#define COMPUTE_FRAME_TIME_2_REAL computeFrameTime2Real_2
+#else
+#define COMPUTE_FRAME_TIME_1_REAL computeFrameTime1Real
+#define COMPUTE_FRAME_TIME_2_REAL computeFrameTime2Real
+#endif
+
+
+#ifdef USE_NEW_TIMER
+
+#define ONE_MILLIARD 1000000000
+
+typedef int64_t nanotime_t;
+
+#ifdef _WIN32
+// https://stackoverflow.com/questions/5404277/porting-clock-gettime-to-windows
+
+static SDL_INLINE LARGE_INTEGER getFILETIMEoffset()
+{
+    SYSTEMTIME s;
+    FILETIME f;
+    LARGE_INTEGER t;
+
+    s.wYear = 1970;
+    s.wMonth = 1;
+    s.wDay = 1;
+    s.wHour = 0;
+    s.wMinute = 0;
+    s.wSecond = 0;
+    s.wMilliseconds = 0;
+    SystemTimeToFileTime(&s, &f);
+    t.QuadPart = f.dwHighDateTime;
+    t.QuadPart <<= 32;
+    t.QuadPart |= f.dwLowDateTime;
+    return (t);
+}
+
+static SDL_INLINE int clock_gettime(int X, struct timeval *tv)
+{
+    LARGE_INTEGER           t;
+    FILETIME                f;
+    double                  microseconds;
+    static LARGE_INTEGER    offset;
+    static double           frequencyToMicroseconds;
+    static int              initialized = 0;
+    static BOOL             usePerformanceCounter = 0;
+
+    if(!initialized)
+    {
+        LARGE_INTEGER performanceFrequency;
+        initialized = 1;
+        usePerformanceCounter = QueryPerformanceFrequency(&performanceFrequency);
+        if(usePerformanceCounter)
+        {
+            QueryPerformanceCounter(&offset);
+            frequencyToMicroseconds = (double)performanceFrequency.QuadPart / 1000000.;
+        }
+        else
+        {
+            offset = getFILETIMEoffset();
+            frequencyToMicroseconds = 10.;
+        }
+    }
+    if(usePerformanceCounter) QueryPerformanceCounter(&t);
+    else
+    {
+        GetSystemTimeAsFileTime(&f);
+        t.QuadPart = f.dwHighDateTime;
+        t.QuadPart <<= 32;
+        t.QuadPart |= f.dwLowDateTime;
+    }
+
+    t.QuadPart -= offset.QuadPart;
+    microseconds = (double)t.QuadPart / frequencyToMicroseconds;
+    t.QuadPart = microseconds;
+    tv->tv_sec = t.QuadPart / 1000000;
+    tv->tv_usec = t.QuadPart % 1000000;
+    return (0);
+}
+
+
+// https://gist.github.com/Youka/4153f12cf2e17a77314c
+
+/* Windows sleep in 100ns units */
+BOOLEAN SDL_INLINE win_nanosleep(LONGLONG ns)
+{
+    /* Declarations */
+    HANDLE timer;   /* Timer handle */
+    LARGE_INTEGER li;   /* Time defintion */
+
+    /* Create timer */
+    if(!(timer = CreateWaitableTimer(NULL, TRUE, NULL)))
+        return FALSE;
+
+    /* Set timer properties */
+    li.QuadPart = -ns;
+
+    if(!SetWaitableTimer(timer, &li, 0, NULL, NULL, FALSE))
+    {
+        CloseHandle(timer);
+        return FALSE;
+    }
+
+    /* Start & wait for timer */
+    WaitForSingleObject(timer, INFINITE);
+    /* Clean resources */
+    CloseHandle(timer);
+    /* Slept without problems */
+    return TRUE;
+}
+#endif
+
+static SDL_INLINE nanotime_t timespecToNanotime(const struct timespec *ts)
+{
+    return static_cast<nanotime_t>(ts->tv_sec) * static_cast<nanotime_t>(ONE_MILLIARD) + ts->tv_nsec;
+}
+
+static SDL_INLINE struct timespec nanotimeToTimespec(nanotime_t time)
+{
+    struct timespec ts;
+    ts.tv_nsec = time % ONE_MILLIARD;
+    ts.tv_sec = time / ONE_MILLIARD;
+
+    return ts;
+}
+
+
+static SDL_INLINE nanotime_t getNanoTime()
+{
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
+    return timespecToNanotime(&ts);
+}
+
+static SDL_INLINE nanotime_t getElapsedTime(nanotime_t oldTime)
+{
+    return getNanoTime() - oldTime;
+}
+
+static SDL_INLINE nanotime_t getSleepTime(nanotime_t oldTime, nanotime_t target)
+{
+    return target - getElapsedTime(oldTime);
+}
+
+static SDL_INLINE int xtech_nanosleep(nanotime_t sleepTime)
+{
+    if(sleepTime <= 0)
+        return 0;
+#ifdef _WIN32
+    return win_nanosleep(sleepTime / 100);
+#else
+    struct timespec ts = nanotimeToTimespec(sleepTime);
+    return nanosleep(&ts, NULL);
+#endif
+}
+
+
+struct TimeStore
+{
+    const size_t size = 4;
+    size_t       pos = 0;
+    nanotime_t   sum = 0;
+    nanotime_t   items[4] = {0};
+
+    void add(nanotime_t item)
+    {
+        sum -= items[pos];
+        sum += item;
+        items[pos] = item;
+        pos = (pos + 1) % size;
+    }
+
+    nanotime_t average()
+    {
+        return sum / size;
+    }
+};
+
+static TimeStore         s_overheadTimes;
+static const  nanotime_t c_frameRateNano = 1000000000.0 / 64.1025;
+static nanotime_t        s_oldTime = 0,
+                         s_overhead = 0;
+#endif
+// ----------------------------------------------------
+
 //Public Const frameRate As Double = 15 'for controlling game speed
 //const int frameRate = 15;
-const double c_frameRate = 15.0;
+static const  double c_frameRate = 15.0;
 
 static double s_overTime = 0;
 static double s_goalTime = 0;
 static double s_fpsCount = 0.0;
 static double s_fpsTime = 0.0;
-static int s_cycleCount = 0;
+static int    s_cycleCount = 0;
 static double s_gameTime = 0.0;
 static double s_currentTicks = 0.0;
+
 
 void resetFrameTimer()
 {
@@ -77,16 +266,6 @@ void cycleNextInc()
 
 extern void CheckActive(); // game_main.cpp
 
-typedef int64_t nanotime_t;
-
-typedef struct {
-    const size_t size;
-    size_t       pos;
-    nanotime_t   sum;
-    nanotime_t*  items;
-} TimeArray;
-
-
 static SDL_INLINE bool canProcessFrameCond()
 {
     return s_currentTicks >= s_gameTime + c_frameRate || s_currentTicks < s_gameTime || MaxFPS;
@@ -98,6 +277,7 @@ bool canProceedFrame()
     return canProcessFrameCond();
 }
 
+#ifndef USE_NEW_TIMER
 static SDL_INLINE void computeFrameTime1Real()
 {
     if(s_fpsCount >= 32000)
@@ -132,23 +312,73 @@ static SDL_INLINE void computeFrameTime2Real()
         s_cycleCount = 0;
         s_fpsTime = SDL_GetTicks() + 1000;
         s_goalTime = s_fpsTime;
-//      if(Debugger == true)
-//          frmLevelDebugger.lblFPS = fpsCount;
+        //      if(Debugger == true)
+        //          frmLevelDebugger.lblFPS = fpsCount;
         if(ShowFPS)
             PrintFPS = s_fpsCount;
         s_fpsCount = 0;
     }
 }
+#endif
+
+
+#ifdef USE_NEW_TIMER
+static SDL_INLINE void computeFrameTime1Real_2()
+{
+    if(s_fpsCount >= 32000)
+        s_fpsCount = 0; // Fixes Overflow bug
+
+    if(s_cycleCount >= 32000)
+        s_cycleCount = 0; // Fixes Overflow bug
+}
+
+static SDL_INLINE void computeFrameTime2Real_2()
+{
+    if(c_frameRateNano <= 0)
+        return;
+
+    if(SDL_GetTicks() > s_fpsTime)
+    {
+        if(s_cycleCount >= 65)
+        {
+            s_overTime = 0;
+            s_gameTime = s_currentTicks;
+        }
+        s_cycleCount = 0;
+        s_fpsTime = SDL_GetTicks() + 1000;
+        s_goalTime = s_fpsTime;
+
+        if(ShowFPS)
+            PrintFPS = s_fpsCount;
+        s_fpsCount = 0;
+    }
+
+    nanotime_t start = getNanoTime();
+    nanotime_t sleepTime = getSleepTime(s_oldTime, c_frameRateNano);
+    s_overhead = s_overheadTimes.average();
+
+    if(sleepTime > s_overhead)
+    {
+        nanotime_t adjustedSleepTime = sleepTime - s_overhead;
+        xtech_nanosleep(adjustedSleepTime);
+        nanotime_t overslept = getElapsedTime(start) - adjustedSleepTime;
+        if(overslept < c_frameRateNano)
+            s_overheadTimes.add(overslept);
+    }
+
+    s_oldTime = getNanoTime();
+}
+#endif
 
 
 void computeFrameTime1()
 {
-    computeFrameTime1Real();
+    COMPUTE_FRAME_TIME_1_REAL();
 }
 
 void computeFrameTime2()
 {
-    computeFrameTime2Real();
+    COMPUTE_FRAME_TIME_2_REAL();
 }
 
 void runFrameLoop(LoopCall_t doLoopCallbackPre,
@@ -175,13 +405,13 @@ void runFrameLoop(LoopCall_t doLoopCallbackPre,
             if(doLoopCallbackPre)
                 doLoopCallbackPre();
 
-            computeFrameTime1Real();
+            COMPUTE_FRAME_TIME_1_REAL();
 
             if(doLoopCallbackPost)
                 doLoopCallbackPost(); // Run the loop callback
             DoEvents();
 
-            computeFrameTime2Real();
+            COMPUTE_FRAME_TIME_2_REAL();
 
             if(subCondition && subCondition())
                 break;
@@ -190,5 +420,6 @@ void runFrameLoop(LoopCall_t doLoopCallbackPre,
         PGE_Delay(1);
         if(!GameIsActive)
             break;// Break on quit
-    } while(condition());
+    }
+    while(condition());
 }
