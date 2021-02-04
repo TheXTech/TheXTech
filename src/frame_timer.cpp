@@ -25,6 +25,10 @@
 
 #include <SDL2/SDL_timer.h>
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 #include <Logger/logger.h>
 #include "pge_delay.h"
 
@@ -32,7 +36,9 @@
 #include "globals.h"
 #include "graphics.h"
 
+#if !defined(__EMSCRIPTEN__)
 #define USE_NEW_TIMER
+#endif
 
 #ifdef USE_NEW_TIMER
 #define COMPUTE_FRAME_TIME_1_REAL computeFrameTime1Real_2
@@ -51,6 +57,8 @@ typedef int64_t nanotime_t;
 
 #ifdef _WIN32
 // https://stackoverflow.com/questions/5404277/porting-clock-gettime-to-windows
+
+#define CLOCK_MONOTONIC_RAW  4
 
 static SDL_INLINE LARGE_INTEGER getFILETIMEoffset()
 {
@@ -72,7 +80,7 @@ static SDL_INLINE LARGE_INTEGER getFILETIMEoffset()
     return (t);
 }
 
-static SDL_INLINE int clock_gettime(int X, struct timeval *tv)
+static SDL_INLINE int clock_gettime(int X, struct timespec *tv)
 {
     LARGE_INTEGER           t;
     FILETIME                f;
@@ -81,6 +89,7 @@ static SDL_INLINE int clock_gettime(int X, struct timeval *tv)
     static double           frequencyToMicroseconds;
     static int              initialized = 0;
     static BOOL             usePerformanceCounter = 0;
+    UNUSED(X);
 
     if(!initialized)
     {
@@ -109,9 +118,9 @@ static SDL_INLINE int clock_gettime(int X, struct timeval *tv)
 
     t.QuadPart -= offset.QuadPart;
     microseconds = (double)t.QuadPart / frequencyToMicroseconds;
-    t.QuadPart = microseconds;
-    tv->tv_sec = t.QuadPart / 1000000;
-    tv->tv_usec = t.QuadPart % 1000000;
+    t.QuadPart = microseconds * 1000;
+    tv->tv_sec = t.QuadPart / ONE_MILLIARD;
+    tv->tv_nsec = t.QuadPart % ONE_MILLIARD;
     return (0);
 }
 
