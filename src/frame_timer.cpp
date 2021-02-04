@@ -59,8 +59,6 @@ typedef int64_t nanotime_t;
 #ifdef _WIN32
 // https://stackoverflow.com/questions/5404277/porting-clock-gettime-to-windows
 
-#define CLOCK_MONOTONIC_RAW  4
-
 static SDL_INLINE LARGE_INTEGER getFILETIMEoffset()
 {
     SYSTEMTIME s;
@@ -81,7 +79,7 @@ static SDL_INLINE LARGE_INTEGER getFILETIMEoffset()
     return (t);
 }
 
-static SDL_INLINE int clock_gettime(int X, struct timespec *tv)
+static SDL_INLINE int win_clock_gettime(struct timespec *tv)
 {
     LARGE_INTEGER           t;
     FILETIME                f;
@@ -90,7 +88,6 @@ static SDL_INLINE int clock_gettime(int X, struct timespec *tv)
     static double           frequencyToMicroseconds;
     static int              initialized = 0;
     static BOOL             usePerformanceCounter = 0;
-    UNUSED(X);
 
     if(!initialized)
     {
@@ -129,7 +126,7 @@ static SDL_INLINE int clock_gettime(int X, struct timespec *tv)
 // https://gist.github.com/Youka/4153f12cf2e17a77314c
 
 /* Windows sleep in 100ns units */
-BOOLEAN SDL_INLINE win_nanosleep(LONGLONG ns)
+static BOOLEAN SDL_INLINE win_nanosleep(LONGLONG ns)
 {
     /* Declarations */
     HANDLE timer;   /* Timer handle */
@@ -175,7 +172,11 @@ static SDL_INLINE struct timespec nanotimeToTimespec(nanotime_t time)
 static SDL_INLINE nanotime_t getNanoTime()
 {
     struct timespec ts;
+#ifdef _WIN32
+    win_clock_gettime(&ts);
+#else
     clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
+#endif
     return timespecToNanotime(&ts);
 }
 
