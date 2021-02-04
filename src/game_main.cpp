@@ -332,64 +332,6 @@ int GameMain(const CmdLineSetup_t &setup)
                             ScreenType = 0;
                             SetupScreens();
                         });
-#if 0
-            do
-            {
-                DoEvents();
-                tempTime = SDL_GetTicks();
-                ScreenType = 0;
-                SetupScreens();
-
-                if(tempTime >= gameTime + frameRate || tempTime < gameTime)
-                {
-                    CheckActive();
-                    OutroLoop();
-
-                    if(fpsCount >= 32000)
-                        fpsCount = 0; // Fixes Overflow bug
-
-                    if(cycleCount >= 32000)
-                        cycleCount = 0; // Fixes Overflow bug
-
-                    overTime = overTime + (tempTime - (gameTime + frameRate));
-
-                    if(gameTime == 0.0)
-                        overTime = 0;
-
-                    if(overTime <= 1)
-                        overTime = 0;
-                    else if(overTime > 1000)
-                        overTime = 1000;
-
-                    gameTime = tempTime - overTime;
-                    overTime = (overTime - (tempTime - gameTime));
-                    DoEvents();
-
-                    if(SDL_GetTicks() > fpsTime)
-                    {
-                        if(cycleCount >= 65)
-                        {
-                            overTime = 0;
-                            gameTime = 0;
-                        }
-
-                        cycleCount = 0;
-                        fpsTime = SDL_GetTicks() + 1000;
-                        GoalTime = fpsTime;
-//                        If Debugger = True Then frmLevelDebugger.lblFPS = fpsCount
-
-                        if(ShowFPS)
-                        {
-                            PrintFPS = fpsCount;
-                        }
-                        fpsCount = 0;
-                    }
-                }
-
-                PGE_Delay(1);
-                if(!GameIsActive) break;// Break on quit
-            } while(GameOutro);
-#endif
         }
 
         // The Game Menu
@@ -510,65 +452,10 @@ int GameMain(const CmdLineSetup_t &setup)
             // Update graphics before loop begin (to process inital lazy-unpacking of used sprites)
             UpdateGraphics();
 
+            // Main menu loop
             runFrameLoop(&MenuLoop, nullptr, []()->bool{ return GameMenu;});
             if(!GameIsActive)
                 return 0;// Break on quit
-#if 0
-            do
-            {
-                DoEvents();
-                tempTime = SDL_GetTicks();
-                if(tempTime >= gameTime + frameRate || tempTime < gameTime)
-                {
-                    CheckActive();
-                    MenuLoop();   // Run the menu loop
-
-                    if(fpsCount >= 32000)
-                        fpsCount = 0; // Fixes Overflow bug
-
-                    if(cycleCount >= 32000)
-                        cycleCount = 0; // Fixes Overflow bug
-
-                    overTime = overTime + (tempTime - (gameTime + frameRate));
-                    if(gameTime == 0.0)
-                        overTime = 0;
-
-                    if(overTime <= 1)
-                        overTime = 0;
-                    else if(overTime > 1000)
-                        overTime = 1000;
-
-                    gameTime = tempTime - overTime;
-                    overTime = (overTime - (tempTime - gameTime));
-
-                    DoEvents();
-
-                    if(SDL_GetTicks() > fpsTime)
-                    {
-                        if(cycleCount >= 65)
-                        {
-                            overTime = 0;
-                            gameTime = 0;
-                        }
-
-                        cycleCount = 0;
-                        fpsTime = SDL_GetTicks() + 1000;
-                        GoalTime = fpsTime;
-//                        If Debugger = True Then frmLevelDebugger.lblFPS = fpsCount
-
-                        if(ShowFPS)
-                        {
-                            PrintFPS = fpsCount;
-                        }
-                        fpsCount = 0;
-                    }
-                }
-
-                PGE_Delay(1);
-                if(!GameIsActive) return 0;// Break on quit
-
-            } while(GameMenu);
-#endif
         }
 
         // World Map
@@ -651,67 +538,13 @@ int GameMain(const CmdLineSetup_t &setup)
                 // Update graphics before loop begin (to process inital lazy-unpacking of used sprites)
                 UpdateGraphics2();
 
+                // 'level select loop
                 runFrameLoop(nullptr, &WorldLoop,
                              []()->bool{return LevelSelect;},
                              nullptr,
                              []()->void{FreezeNPCs = false;});
                 if(!GameIsActive)
                     return 0;// Break on quit
-#if 0
-                do // 'level select loop
-                {
-                    FreezeNPCs = false;
-                    DoEvents();
-                    tempTime = SDL_GetTicks();
-                    if(tempTime >= gameTime + frameRate || tempTime < gameTime || MaxFPS)
-                    {
-                        if(fpsCount >= 32000)
-                            fpsCount = 0; // Fixes Overflow bug
-
-                        if(cycleCount >= 32000)
-                            cycleCount = 0; // Fixes Overflow bug
-
-                        overTime = overTime + (tempTime - (gameTime + frameRate));
-
-                        if(gameTime == 0.0)
-                            overTime = 0;
-
-                        if(overTime <= 1)
-                            overTime = 0;
-                        else if(overTime > 1000)
-                            overTime = 1000;
-
-                        gameTime = tempTime - overTime;
-                        overTime = (overTime - (tempTime - gameTime));
-
-                        CheckActive();
-                        WorldLoop();
-                        DoEvents();
-
-                        if(SDL_GetTicks() > fpsTime)
-                        {
-                            if(cycleCount >= 65)
-                            {
-                                overTime = 0;
-                                gameTime = 0;
-                            }
-                            cycleCount = 0;
-                            fpsTime = SDL_GetTicks() + 1000;
-                            GoalTime = fpsTime;
-//                            If Debugger = True Then frmLevelDebugger.lblFPS = fpsCount
-
-                            if(ShowFPS)
-                                PrintFPS = fpsCount;
-
-                            fpsCount = 0;
-                        }
-                    }
-
-                    PGE_Delay(1);
-                    if(!GameIsActive)
-                        return 0;// Break on quit
-                } while(LevelSelect);
-#endif
             }
         }
 
@@ -844,6 +677,7 @@ int GameMain(const CmdLineSetup_t &setup)
             // Update graphics before loop begin (to process inital lazy-unpacking of used sprites)
             UpdateGraphics();
 
+            // MAIN GAME LOOP
             runFrameLoop(nullptr, &GameLoop,
             []()->bool{return !LevelSelect && !GameMenu;},
             []()->bool
@@ -855,63 +689,8 @@ int GameMain(const CmdLineSetup_t &setup)
                 }
                 return false;
             });
-#if 0
-            do // MAIN GAME LOOP
-            {
-                DoEvents();
-                tempTime = SDL_GetTicks();
-
-                if(tempTime >= gameTime + frameRate || tempTime < gameTime || MaxFPS)
-                {
-                    CheckActive();
-                    if(fpsCount >= 32000) fpsCount = 0; // Fixes Overflow bug
-                    if(cycleCount >= 32000) cycleCount = 0; // Fixes Overflow bug
-                    overTime = overTime + (tempTime - (gameTime + frameRate));
-                    if(gameTime == 0.0)
-                        overTime = 0;
-                    if(overTime <= 1)
-                        overTime = 0;
-                    else if(overTime > 1000)
-                        overTime = 1000;
-
-                    gameTime = tempTime - overTime;
-                    overTime = (overTime - (tempTime - gameTime));
-
-                    GameLoop(); // Run the game loop
-                    DoEvents();
-
-                    if(SDL_GetTicks() > fpsTime)
-                    {
-                        if(cycleCount >= 65)
-                        {
-                            overTime = 0;
-                            gameTime = tempTime;
-                        }
-
-                        cycleCount = 0;
-                        fpsTime = SDL_GetTicks() + 1000;
-                        GoalTime = fpsTime;
-
-
-                        if(ShowFPS)
-                        {
-                            PrintFPS = fpsCount;
-                        }
-                        fpsCount = 0;
-                    }
-
-                    if(!LivingPlayers())
-                    {
-                        EveryonesDead();
-                        break;
-                    }
-                }
-
-                PGE_Delay(1);
-                if(!GameIsActive) return 0;// Break on quit
-            }
-            while(!LevelSelect && !GameMenu);
-#endif
+            if(!GameIsActive)
+                return 0;// Break on quit
 
             // TODO: Utilize this and any TestLevel/MagicHand related code to allow PGE Editor integration
             // (do any code without interaction of no more existnig Editor VB forms, keep IPS with PGE Editor instead)
