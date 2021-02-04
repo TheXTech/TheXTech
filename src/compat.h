@@ -28,6 +28,7 @@
 
 struct Compatibility_t
 {
+    bool enable_last_warp_hub_resume;
     bool fix_pokey_collapse;
     bool fix_platforms_acceleration;
     bool fix_player_filter_bounce;

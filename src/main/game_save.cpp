@@ -25,6 +25,7 @@
 
 #include "../globals.h"
 #include "../game_main.h"
+#include "../compat.h"
 
 #include <Utils/files.h>
 #include <DirManager/dirman.h>
@@ -162,9 +163,18 @@ void LoadGame()
     curWorldMusic = int(sav.musicID);
     curWorldMusicFile = sav.musicFile;
 
-    ReturnWarp = int(sav.last_hub_warp);
-    if(ReturnWarp > maxWarps)
-        ReturnWarp = 0; // Invalid value
+    if(g_compatibility.enable_last_warp_hub_resume)
+    {
+        ReturnWarp = int(sav.last_hub_warp);
+        if(ReturnWarp > maxWarps)
+            ReturnWarp = 0; // Invalid value
+    }
+    else
+    {
+        // Keep the vanilla behavior, and let players feel the pain!, MuhahahahA! >:-D
+        ReturnWarp = 0;
+    }
+
     ReturnWarpSaved = ReturnWarp;
 
     for(A = 1, i = 0; A <= 5; A++, i++)
