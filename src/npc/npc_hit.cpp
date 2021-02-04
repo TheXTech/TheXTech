@@ -1687,7 +1687,7 @@ void NPCHit(int A, int B, int C)
         {
             if((B == 1 || B == 10) && NPC[A].Special == 0.0)
             {
-                NPC[A].Damage = NPC[A].Damage + 3;
+                NPC[A].Damage += 3;
                 if(B == 1)
                     PlaySound(2);
                 else
@@ -1702,7 +1702,7 @@ void NPCHit(int A, int B, int C)
                 NPC[A].Immune = 20;
                 if(C > 0)
                     NPCHit(C, 3, A);
-                NPC[A].Damage = NPC[A].Damage + 1;
+                NPC[A].Damage++;
                 PlaySound(9);
             }
             else if(B == 6)
@@ -1712,9 +1712,11 @@ void NPCHit(int A, int B, int C)
             }
             else if(B == 10)
             {
+#if XTECH_ENABLE_WEIRD_GFX_UPDATES
                 UpdateGraphics(true);
+#endif
                 NPC[A].Immune = 10;
-                NPC[A].Damage = NPC[A].Damage + 1;
+                NPC[A].Damage++;
                 PlaySound(39);
             }
         }

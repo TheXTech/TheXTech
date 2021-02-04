@@ -2104,7 +2104,7 @@ void TailSwipe(int plr, bool boo, bool Stab, int StabDir)
         {
             if(!BlockIsSizable[Block[A].Type] && Block[A].Hidden == false && (Block[A].Type != 293 || Stab == true) && Block[A].Invis == false && BlockNoClipping[Block[A].Type] == false)
             {
-                if(CheckCollision(tailLoc, Block[A].Location) == true)
+                if(CheckCollision(tailLoc, Block[A].Location))
                 {
                     if(Block[A].ShakeY == 0 && Block[A].ShakeY2 == 0 && Block[A].ShakeY3 == 0)
                     {
@@ -2112,17 +2112,22 @@ void TailSwipe(int plr, bool boo, bool Stab, int StabDir)
                             PlaySound(3);
 //                        if(nPlay.Online == true && plr - 1 == nPlay.MySlot)
 //                            Netplay::sendData Netplay::PutPlayerLoc(nPlay.MySlot) + "1g" + std::to_string(plr) + "|" + Player[plr].TailCount - 1;
-                        UpdateGraphics(true);
-                        if(StabDir == 2)
-                        {
-                            BlockHit(A, true, plr);
-                        }
-                        else
-                        {
-                            BlockHit(A, false, plr);
-                        }
+#if XTECH_ENABLE_WEIRD_GFX_UPDATES
+                        UpdateGraphics(true); // FIXME: Why this extra graphics update is here? It causes the lag while whipping blocks by the tail
+#endif
+
+                        BlockHit(A, (StabDir == 2), plr);
+                        //if(StabDir == 2)
+                        //{
+                        //    BlockHit(A, true, plr);
+                        //}
+                        //else
+                        //{
+                        //    BlockHit(A, false, plr);
+                        //}
+
                         BlockHitHard(A);
-                        if(Stab == false)
+                        if(!Stab)
                         {
                             if(Block[A].ShakeY != 0)
                             {
