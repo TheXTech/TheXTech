@@ -62,7 +62,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
     }
 
     compat.beginGroup("compatibility");
-    compat.read("enable-last-warp-hub-resume", c.fix_platforms_acceleration, c.enable_last_warp_hub_resume);
+    compat.read("enable-last-warp-hub-resume", c.enable_last_warp_hub_resume, c.enable_last_warp_hub_resume);
     compat.read("fix-platform-acceleration", c.fix_platforms_acceleration, c.fix_platforms_acceleration);
     compat.read("fix-pokey-collapse", c.fix_pokey_collapse, c.fix_pokey_collapse);
     compat.read("fix-player-filter-bounce", c.fix_player_filter_bounce, c.fix_player_filter_bounce);
