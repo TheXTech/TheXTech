@@ -1448,7 +1448,7 @@ void CheckActive()
 
         resetFrameTimer();
 
-        tempTime = 0;
+        resetTimeBuffer();
         //keyDownEnter = false;
         //keyDownAlt = false;
 

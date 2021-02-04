@@ -34,6 +34,7 @@
 #include "graphics.h"
 #include "game_main.h"
 #include "compat.h"
+#include "frame_timer.h"
 
 
 int numLayers = 0;
@@ -410,12 +411,7 @@ void ProcEvent(std::string EventName, bool NoEffect)
                             qScreenY[1] = vScreenY[1];
                         }
 
-                        overTime = 0;
-                        GoalTime = SDL_GetTicks() + 1000;
-                        fpsCount = 0;
-                        cycleCount = 0;
-                        gameTime = 0;
-                        fpsTime = 0;
+                        resetFrameTimer();
                     }
                 }
             }

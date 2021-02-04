@@ -1586,17 +1586,17 @@ extern int BeltDirection;
 extern bool BeatTheGame;
 // 'for frameskip
 //Public cycleCount As Integer
-extern int cycleCount;
+//extern int cycleCount;
 //Public fpsTime As Double
-extern double fpsTime;
+//extern double fpsTime;
 //Public fpsCount As Double
-extern double fpsCount;
+//extern double fpsCount;
 //Public FrameSkip As Boolean
 extern bool FrameSkip;
 //Public GoalTime As Double
-extern double GoalTime;
+//extern double GoalTime;
 //Public overTime As Double
-extern double overTime;
+//extern double overTime;
 //'------------------
 //Public worldCurs As Integer
 extern int worldCurs;
@@ -2042,12 +2042,12 @@ extern int SyncCount;
 //Public noUpdate As Boolean
 extern bool noUpdate;
 //Public gameTime As Double
-extern double gameTime;
+//extern double gameTime;
 //Public noSound As Boolean
 extern bool noSound;
 extern bool neverPause;
 //Public tempTime As Double
-extern double tempTime;
+//extern double tempTime;
 //Dim ScrollDelay As Integer [in main.cpp]
 //'battlemode stuff
 //Public BattleMode As Boolean

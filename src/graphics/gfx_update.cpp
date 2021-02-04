@@ -57,7 +57,7 @@ void UpdateGraphics(bool skipRepaint)
 #endif
 
     // frame skip code
-    cycleCount += 1;
+    cycleNextInc();
 
     if(FrameSkip && !TakeScreen)
     {
@@ -136,7 +136,8 @@ void UpdateGraphics(bool skipRepaint)
             return;
         }
     }
-    fpsCount++;
+
+    frameNextInc();
 
     std::string SuperText;
     std::string tempText;

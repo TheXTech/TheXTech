@@ -101,8 +101,4 @@ const int ScreenW = 800;
 //Public Const ScreenH As Integer = 600  'Game Screen Height
 const int ScreenH = 600;
 
-//Public Const frameRate As Double = 15 'for controlling game speed
-//const int frameRate = 15;
-const double frameRate = 15.0;
-
 #endif // LIMITS_H

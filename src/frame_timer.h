@@ -29,6 +29,7 @@
 #include <functional>
 
 void resetFrameTimer();
+void resetTimeBuffer();
 bool frameSkipNeeded();
 
 typedef void (*LoopCall_t)(void);
@@ -36,6 +37,8 @@ typedef void (*LoopCall_t)(void);
 bool canProceedFrame();
 void computeFrameTime1();
 void computeFrameTime2();
+void frameNextInc();
+void cycleNextInc();
 
 void runFrameLoop(LoopCall_t doLoopCallbackPre,
                   LoopCall_t doLoopCallbackPost,

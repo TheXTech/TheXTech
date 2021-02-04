@@ -32,76 +32,111 @@
 #include "globals.h"
 #include "graphics.h"
 
+//Public Const frameRate As Double = 15 'for controlling game speed
+//const int frameRate = 15;
+const double c_frameRate = 15.0;
+
+static double s_overTime = 0;
+static double s_goalTime = 0;
+static double s_fpsCount = 0.0;
+static double s_fpsTime = 0.0;
+static int s_cycleCount = 0;
+static double s_gameTime = 0.0;
+static double s_currentTicks = 0.0;
 
 void resetFrameTimer()
 {
-    overTime = 0;
-    GoalTime = SDL_GetTicks() + 1000;
-    fpsCount = 0;
-    fpsTime = 0;
-    cycleCount = 0;
-    gameTime = 0;
+    s_overTime = 0;
+    s_goalTime = SDL_GetTicks() + 1000;
+    s_fpsCount = 0;
+    s_fpsTime = 0;
+    s_cycleCount = 0;
+    s_gameTime = 0;
     D_pLogDebugNA("Time counter reset was called");
+}
+
+void resetTimeBuffer()
+{
+    s_currentTicks = 0;
 }
 
 bool frameSkipNeeded()
 {
-    return SDL_GetTicks() + SDL_floor(1000 * (1 - (cycleCount / 63.0))) > GoalTime;
+    return SDL_GetTicks() + SDL_floor(1000 * (1 - (s_cycleCount / 63.0))) > s_goalTime;
 }
 
+void frameNextInc()
+{
+    s_fpsCount += 1;
+}
+
+void cycleNextInc()
+{
+    s_cycleCount++;
+}
 
 extern void CheckActive(); // game_main.cpp
 
+typedef int64_t nanotime_t;
+
+typedef struct {
+    const size_t size;
+    size_t       pos;
+    nanotime_t   sum;
+    nanotime_t*  items;
+} TimeArray;
+
+
 static SDL_INLINE bool canProcessFrameCond()
 {
-    return tempTime >= gameTime + frameRate || tempTime < gameTime || MaxFPS;
+    return s_currentTicks >= s_gameTime + c_frameRate || s_currentTicks < s_gameTime || MaxFPS;
 }
 
 bool canProceedFrame()
 {
-    tempTime = SDL_GetTicks();
+    s_currentTicks = SDL_GetTicks();
     return canProcessFrameCond();
 }
 
 static SDL_INLINE void computeFrameTime1Real()
 {
-    if(fpsCount >= 32000)
-        fpsCount = 0; // Fixes Overflow bug
+    if(s_fpsCount >= 32000)
+        s_fpsCount = 0; // Fixes Overflow bug
 
-    if(cycleCount >= 32000)
-        cycleCount = 0; // Fixes Overflow bug
+    if(s_cycleCount >= 32000)
+        s_cycleCount = 0; // Fixes Overflow bug
 
-    overTime = overTime + (tempTime - (gameTime + frameRate));
+    s_overTime += (s_currentTicks - (s_gameTime + c_frameRate));
 
-    if(gameTime == 0.0)
-        overTime = 0;
+    if(s_gameTime == 0.0)
+        s_overTime = 0;
 
-    if(overTime <= 1)
-        overTime = 0;
-    else if(overTime > 1000)
-        overTime = 1000;
+    if(s_overTime <= 1)
+        s_overTime = 0;
+    else if(s_overTime > 1000)
+        s_overTime = 1000;
 
-    gameTime = tempTime - overTime;
-    overTime = (overTime - (tempTime - gameTime));
+    s_gameTime = s_currentTicks - s_overTime;
+    s_overTime -= (s_currentTicks - s_gameTime);
 }
 
 static SDL_INLINE void computeFrameTime2Real()
 {
-    if(SDL_GetTicks() > fpsTime)
+    if(SDL_GetTicks() > s_fpsTime)
     {
-        if(cycleCount >= 65)
+        if(s_cycleCount >= 65)
         {
-            overTime = 0;
-            gameTime = tempTime;
+            s_overTime = 0;
+            s_gameTime = s_currentTicks;
         }
-        cycleCount = 0;
-        fpsTime = SDL_GetTicks() + 1000;
-        GoalTime = fpsTime;
+        s_cycleCount = 0;
+        s_fpsTime = SDL_GetTicks() + 1000;
+        s_goalTime = s_fpsTime;
 //      if(Debugger == true)
 //          frmLevelDebugger.lblFPS = fpsCount;
         if(ShowFPS)
-            PrintFPS = fpsCount;
-        fpsCount = 0;
+            PrintFPS = s_fpsCount;
+        s_fpsCount = 0;
     }
 }
 
@@ -129,7 +164,7 @@ void runFrameLoop(LoopCall_t doLoopCallbackPre,
             preTimerExtraPre();
 
         DoEvents();
-        tempTime = SDL_GetTicks();
+        s_currentTicks = SDL_GetTicks();
 
         if(preTimerExtraPost)
             preTimerExtraPost();

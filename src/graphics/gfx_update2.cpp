@@ -42,12 +42,13 @@ void UpdateGraphics2()
 #endif
 
     float c = ShadowMode ? 0.f : 1.f;
-    cycleCount = cycleCount + 1;
+    cycleNextInc();
 
     if(FrameSkip && frameSkipNeeded())
         return;
 
-    fpsCount = fpsCount + 1;
+    frameNextInc();
+
     int A = 0;
     int B = 0;
     int Z = 0;
