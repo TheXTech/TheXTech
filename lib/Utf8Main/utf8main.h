@@ -2,7 +2,7 @@
  * utf8main - a small wrapper over entry points
  * to provide the UTF8 encoded main function
  *
- * Copyright (c) 2017-2020 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2017-2021 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
  * software and associated documentation files (the "Software"), to deal in the Software

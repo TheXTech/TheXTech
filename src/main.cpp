@@ -2,7 +2,7 @@
  * TheXTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
- * Copyright (c) 2020-2020 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2020-2021 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the "Software"),
@@ -152,7 +152,7 @@ int main(int argc, char**argv)
     {
         // Define the command line object.
         TCLAP::CmdLine  cmd("TheXTech\n"
-                            "Copyright (c) 2020-2020 Vitaly Novichkov <admin@wohlnet.ru>\n"
+                            "Copyright (c) 2020-2021 Vitaly Novichkov <admin@wohlnet.ru>\n"
                             "This program is distributed under the MIT license\n", ' ', "1.3");
 
         TCLAP::ValueArg<std::string> customAssetsPath("c", "assets-root", "Specify the different assets root directory to play",
