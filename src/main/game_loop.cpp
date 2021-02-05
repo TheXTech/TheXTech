@@ -113,9 +113,9 @@ void GameLoop()
         UpdateBlocks();
         UpdateEffects();
         UpdatePlayer();
+        speedRun_tick();
         if(LivingPlayers() || BattleMode)
             UpdateGraphics();
-        speedRun_tick();
         UpdateSound();
         UpdateEvents();
 //        If MagicHand = True Then UpdateEditor
@@ -246,11 +246,11 @@ void PauseGame(int plr)
             DoEvents();
             CheckActive();
 
+            speedRun_tick();
             if(LevelSelect)
                 UpdateGraphics2();
             else
                 UpdateGraphics();
-            speedRun_tick();
             UpdateControls();
             UpdateSound();
             BlockFrames();

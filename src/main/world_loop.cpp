@@ -60,8 +60,8 @@ void WorldLoop()
             Player[B].Mount = 0;
     }
 
-    UpdateGraphics2();
     speedRun_tick();
+    UpdateGraphics2();
     UpdateControls();
     UpdateSound();
 
