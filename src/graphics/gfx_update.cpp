@@ -33,6 +33,7 @@
 #include "../npc.h"
 #include "../location.h"
 #include "../main/menu_main.h"
+#include "../main/speedrunner.h"
 
 #include <fmt_format_ne.h>
 #include <Utils/maths.h>
@@ -2139,10 +2140,13 @@ void UpdateGraphics(bool skipRepaint)
 
                 frmMain.renderTexture(int(MenuMouseX), int(MenuMouseY), GFX.ECursor[2]);
             }
+
             if(PrintFPS > 0) {
                 SuperPrint(fmt::format_ne("{0}", int(PrintFPS)), 1, 8, 8, 0.f, 1.f, 0.f);
             }
         }
+
+        speedRun_render();
 
 //        If LevelEditor = True Or MagicHand = True Then
         if((LevelEditor || MagicHand) && !GamePaused)
@@ -2395,8 +2399,6 @@ void UpdateGraphics(bool skipRepaint)
                 } while(!SuperText.empty());
                 frmMain.renderTexture(400 - GFX.TextBox.w / 2 + X, BoxY + Y + Y, GFX.TextBox.w, 10, GFX.TextBox, 0, GFX.TextBox.h - 10);
             }
-
-
 
             // Display the cursor
             {

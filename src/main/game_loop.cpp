@@ -40,6 +40,7 @@
 #include "../layers.h"
 #include "../player.h"
 #include "../editor.h"
+#include "speedrunner.h"
 
 #include "../pseudo_vb.h"
 
@@ -114,6 +115,7 @@ void GameLoop()
         UpdatePlayer();
         if(LivingPlayers() || BattleMode)
             UpdateGraphics();
+        speedRun_tick();
         UpdateSound();
         UpdateEvents();
 //        If MagicHand = True Then UpdateEditor
@@ -248,6 +250,7 @@ void PauseGame(int plr)
                 UpdateGraphics2();
             else
                 UpdateGraphics();
+            speedRun_tick();
             UpdateControls();
             UpdateSound();
             BlockFrames();
@@ -443,6 +446,8 @@ void PauseGame(int plr)
                         {
                             if(!Cheater && (LevelSelect || (/*StartLevel == FileName*/IsEpisodeIntro && NoMap)))
                                 SaveGame(); // "Save & Quit"
+                            else
+                                speedRun_saveStats();
                             stopPause = true;
                             GameMenu = true;
 

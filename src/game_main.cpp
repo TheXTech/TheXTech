@@ -53,6 +53,7 @@
 #include "editor.h"
 #include "custom.h"
 #include "main/level_file.h"
+#include "main/speedrunner.h"
 
 #include "pseudo_vb.h"
 
@@ -101,6 +102,9 @@ int GameMain(const CmdLineSetup_t &setup)
     FrameSkip = setup.frameSkip;
     noSound = setup.noSound;
     neverPause = setup.neverPause;
+
+    g_speedRunnerMode = setup.speedRunnerMode;
+    speedRun_setSemitransparentRender(setup.speedRunnerSemiTransparent);
 
     ResetCompat();
 
@@ -455,7 +459,10 @@ int GameMain(const CmdLineSetup_t &setup)
             // Main menu loop
             runFrameLoop(&MenuLoop, nullptr, []()->bool{ return GameMenu;});
             if(!GameIsActive)
+            {
+                speedRun_saveStats();
                 return 0;// Break on quit
+            }
         }
 
         // World Map
@@ -531,6 +538,7 @@ int GameMain(const CmdLineSetup_t &setup)
                     StartMusic(curWorldMusic);
 
                 resetFrameTimer();
+                speedRun_resetCurrent();
 
                 // On a world map, reset this into default state
                 GoToLevelNoGameThing = false;
@@ -544,7 +552,10 @@ int GameMain(const CmdLineSetup_t &setup)
                              nullptr,
                              []()->void{FreezeNPCs = false;});
                 if(!GameIsActive)
+                {
+                    speedRun_saveStats();
                     return 0;// Break on quit
+                }
             }
         }
 
@@ -673,6 +684,7 @@ int GameMain(const CmdLineSetup_t &setup)
             }
 
             resetFrameTimer();
+            speedRun_resetCurrent();
 
             // Update graphics before loop begin (to process inital lazy-unpacking of used sprites)
             UpdateGraphics();
@@ -690,7 +702,10 @@ int GameMain(const CmdLineSetup_t &setup)
                 return false;
             });
             if(!GameIsActive)
+            {
+                speedRun_saveStats();
                 return 0;// Break on quit
+            }
 
             // TODO: Utilize this and any TestLevel/MagicHand related code to allow PGE Editor integration
             // (do any code without interaction of no more existnig Editor VB forms, keep IPS with PGE Editor instead)
@@ -903,7 +918,7 @@ void UpdateMacro()
         float tempTime = 0;
         float gameTime = 0;
 
-        do
+        do // FIXME: Don't loop too fast here
         {
             // tempTime = Timer - Int(Timer)
             tempTime = (float(SDL_GetTicks()) / 1000.0f) - std::floor(float(SDL_GetTicks()) / 1000.0f);
@@ -914,13 +929,16 @@ void UpdateMacro()
                 UpdateGraphics();
                 UpdateSound();
                 BlockFrames();
-                LevelMacroCounter = LevelMacroCounter + 1;
+                LevelMacroCounter += 1;
                 if(LevelMacroCounter >= 300)
                     break;
             }
 
             if(!GameIsActive)
+            {
+                speedRun_saveStats();
                 return;
+            }
 
             PGE_Delay(1);
         } while(true);
@@ -1244,7 +1262,10 @@ void CheckActive()
         }
 
         if(!GameIsActive)
+        {
+            speedRun_saveStats();
             break;
+        }
     }
 
     if(focusLost)

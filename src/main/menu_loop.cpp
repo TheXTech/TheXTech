@@ -45,6 +45,7 @@
 #include "../collision.h"
 #include "level_file.h"
 #include "menu_main.h"
+#include "speedrunner.h"
 
 #include "../pseudo_vb.h"
 
@@ -902,6 +903,7 @@ void MenuLoop()
                             StartLevel.clear();
 //                        LoadGame
                         LoadGame();
+                        speedRun_loadStats();
 //                    End If
                     }
 

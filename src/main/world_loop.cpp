@@ -38,6 +38,7 @@
 #include "../graphics.h"
 #include "../collision.h"
 #include "level_file.h"
+#include "speedrunner.h"
 
 #include "../pseudo_vb.h"
 
@@ -60,6 +61,7 @@ void WorldLoop()
     }
 
     UpdateGraphics2();
+    speedRun_tick();
     UpdateControls();
     UpdateSound();
 

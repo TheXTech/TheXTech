@@ -35,6 +35,7 @@
 #include "game_main.h"
 #include "compat.h"
 #include "frame_timer.h"
+#include "main/speedrunner.h"
 
 
 int numLayers = 0;
@@ -546,6 +547,7 @@ void ProcEvent(std::string EventName, bool NoEffect)
                 for(B = 0; B <= numSections; B++)
                     bgMusic[B] = 0;
                 StopMusic();
+                speedRun_bossDeadEvent();
                 LevelMacroCounter = 0;
                 LevelMacro = 5;
             }

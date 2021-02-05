@@ -29,6 +29,7 @@
 #include "../effect.h"
 #include "../layers.h"
 #include "../game_main.h"
+#include "../main/speedrunner.h"
 
 
 void KillNPC(int A, int B)
@@ -683,7 +684,8 @@ void KillNPC(int A, int B)
                 NewEffect(50, NPC[A].Location, NPC[A].Direction);
             }
             PlaySound(44);
-            if(NPC[A].Legacy == true)
+
+            if(NPC[A].Legacy)
             {
                 tempBool = false;
                 for(B = 1; B <= numNPCs; B++)
@@ -691,8 +693,10 @@ void KillNPC(int A, int B)
                     if(B != A && NPC[B].Type == 86)
                         tempBool = true;
                 }
-                if(tempBool == false)
+
+                if(!tempBool)
                 {
+                    speedRun_bossDeadEvent();
                     LevelMacroCounter = 0;
                     LevelMacro = 5;
                 }

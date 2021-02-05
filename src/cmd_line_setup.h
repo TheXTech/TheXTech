@@ -43,6 +43,11 @@ struct CmdLineSetup_t
 
     //! Force log output into console
     bool verboseLogging = false;
+
+    //! Enable the speed-run mode
+    int  speedRunnerMode = 0;
+    //! Draw the speed-run timer semi-transparently
+    bool speedRunnerSemiTransparent = false;
 };
 
 #endif // CMD_LINE_SETUP_H

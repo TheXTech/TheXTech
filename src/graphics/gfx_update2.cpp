@@ -28,6 +28,7 @@
 #include "../graphics.h"
 #include "../collision.h"
 #include "../player.h"
+#include "../main/speedrunner.h"
 
 
 // draws GFX to screen when on the world map/world map editor
@@ -649,6 +650,8 @@ void UpdateGraphics2()
         {
             SuperPrint(std::to_string(int(PrintFPS)), 1, 8, 8, 0.f, 1.f, 0.f);
         }
+
+        speedRun_render();
 
         frmMain.repaint();
     }

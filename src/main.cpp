@@ -198,7 +198,19 @@ int main(int argc, char**argv)
         TCLAP::SwitchArg switchTestMagicHand("k", "magic-hand", "Enable magic hand functionality while level test running", false);
         TCLAP::SwitchArg switchTestInterprocess("i", "interprocessing", "Enable an interprocessing mode with Editor", false);
 
-        TCLAP::SwitchArg switchVerboseLog("e", "verbose", "Enable log output into the terminal", false);
+        TCLAP::ValueArg<unsigned int> speedRunMode(std::string(), "speed-run-mode",
+                                                   "Enable the speed-runer mode: the playthrough timer will be shown, "
+                                                   "and some gameplay limitations will be enabled.",
+                                                    false, 0u,
+                                                   "Number: 0 - disabled, "
+                                                   "1 - TheXTech native, "
+                                                   "2 - Disable time-winning updates, "
+                                                   "3 - Strict vanilla, enable all bugs.",
+                                                   cmd);
+        TCLAP::SwitchArg switchSpeedRunSemiTransparent(std::string(), "speed-run-semitransparent",
+                                                       "Make the speed-runner mode timer be drawn transparently", false);
+
+        TCLAP::SwitchArg switchVerboseLog(std::string(), "verbose", "Enable log output into the terminal", false);
 
         TCLAP::UnlabeledValueArg<std::string> inputFileNames("levelpath", "Path to level file to run the test", false, std::string(), "path to file");
 
@@ -214,6 +226,7 @@ int main(int argc, char**argv)
         cmd.add(&switchTestMagicHand);
         cmd.add(&switchTestInterprocess);
         cmd.add(&switchVerboseLog);
+        cmd.add(&switchSpeedRunSemiTransparent);
         cmd.add(&inputFileNames);
 
         cmd.parse(argc, argv);
@@ -273,6 +286,9 @@ int main(int argc, char**argv)
         setup.testShowFPS = switchTestShowFPS.getValue();
         setup.testMaxFPS = switchTestMaxFPS.getValue();
         setup.testMagicHand = switchTestMagicHand.getValue();
+
+        setup.speedRunnerMode = speedRunMode.getValue();
+        setup.speedRunnerSemiTransparent = switchSpeedRunSemiTransparent.getValue();
     }
     catch(TCLAP::ArgException &e)   // catch any exceptions
     {

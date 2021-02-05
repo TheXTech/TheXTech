@@ -29,6 +29,7 @@
 #include <Utils/dir_list_ci.h>
 #include "globals.h"
 #include "compat.h"
+#include "main/speedrunner.h"
 
 
 Compatibility_t g_compatibility;
@@ -48,6 +49,27 @@ static void compatInit(Compatibility_t &c)
     c.fix_player_clip_wall_at_npc = true;
     c.fix_skull_raft = true;
     c.fix_peach_escape_shell_surf = true;
+
+    if(g_speedRunnerMode >= SPEEDRUN_MODE_2) // Avoid the time-winning features
+    {
+        c.enable_last_warp_hub_resume = false;
+    }
+
+    if(g_speedRunnerMode >= SPEEDRUN_MODE_3) // Strict vanilla SMBX
+    {
+        c.fix_platforms_acceleration = false;
+        c.fix_pokey_collapse = false;
+        c.fix_player_filter_bounce = false;
+        c.fix_player_downward_clip = false;
+        c.fix_npc_downward_clip = false;
+        c.fix_npc55_kick_ice_blocks = false;
+        c.fix_climb_invisible_fences = false;
+        c.fix_climb_bgo_speed_adding = false;
+        c.enable_climb_bgo_layer_move = false;
+        c.fix_player_clip_wall_at_npc = false;
+        c.fix_skull_raft = false;
+        c.fix_peach_escape_shell_surf = false;
+    }
 }
 
 static void loadCompatIni(Compatibility_t &c, const std::string &fileName)

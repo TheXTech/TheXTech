@@ -271,9 +271,11 @@ set(THEXTECH_SRC
     src/main/world_file.cpp
     src/main/game_info.cpp
     src/main/game_loop.cpp
+    src/main/gameplay_timer.cpp
     src/main/player_frames.cpp
     src/main/setup_vars.cpp
     src/main/setup_physics.cpp
+    src/main/speedrunner.cpp
     src/main/game_save.cpp
     src/main/main_config.cpp
     src/main/level_file.cpp

@@ -26,6 +26,7 @@
 #include "../globals.h"
 #include "../game_main.h"
 #include "../compat.h"
+#include "speedrunner.h"
 
 #include <Utils/files.h>
 #include <DirManager/dirman.h>
@@ -110,6 +111,9 @@ void SaveGame()
     sav.totalStars = uint32_t(MaxWorldStars);
 
     FileFormats::WriteExtendedSaveFileF(savePath, sav);
+
+    // Also, save the speed-running states
+    speedRun_saveStats();
 
 #ifdef __EMSCRIPTEN__
     AppPathManager::syncFs();
