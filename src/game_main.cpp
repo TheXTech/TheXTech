@@ -915,22 +915,32 @@ void UpdateMacro()
     }
     else if(LevelMacro == 3)
     {
-        float tempTime = 0;
-        float gameTime = 0;
+//        float tempTime = 0;
+//        float gameTime = 0;
 
         do // FIXME: Don't loop too fast here
         {
             // tempTime = Timer - Int(Timer)
-            tempTime = (float(SDL_GetTicks()) / 1000.0f) - std::floor(float(SDL_GetTicks()) / 1000.0f);
-            if(tempTime > (float)(gameTime + 0.01f) || tempTime < gameTime)
+
+//            tempTime = (float(SDL_GetTicks()) / 1000.0f) - std::floor(float(SDL_GetTicks()) / 1000.0f);
+//            if(tempTime > (float)(gameTime + 0.01f) || tempTime < gameTime)
+            DoEvents();
+
+            if(canProceedFrame())
             {
-                gameTime = tempTime;
-                DoEvents();
+//                gameTime = tempTime;
+                computeFrameTime1();
+
+                speedRun_tick();
                 UpdateGraphics();
                 UpdateSound();
                 BlockFrames();
+                DoEvents();
+
+                computeFrameTime2();
+
                 LevelMacroCounter += 1;
-                if(LevelMacroCounter >= 300)
+                if(LevelMacroCounter >= 195) /*300*/
                     break;
             }
 
