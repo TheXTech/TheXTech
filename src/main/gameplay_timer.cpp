@@ -81,7 +81,7 @@ void GameplayTimer::reset()
 
 void GameplayTimer::resetCurrent()
 {
-    m_cyclesCurrent = 1;
+    m_cyclesCurrent = 0;
 }
 
 void GameplayTimer::load()
@@ -101,8 +101,8 @@ void GameplayTimer::load()
     o.beginGroup("timers");
     o.read("int", m_cyclesInt, false);
     o.read("fin", m_cyclesFin, false);
-    o.read("current", m_cyclesCurrent, 0);
     o.read("total", m_cyclesTotal, 0);
+    m_cyclesCurrent = 0; // Reset the counter
     o.endGroup();
 }
 
@@ -120,7 +120,6 @@ void GameplayTimer::save()
     o.beginGroup("timers");
     o.setValue("int", m_cyclesInt);
     o.setValue("fin", m_cyclesFin);
-    o.setValue("current", m_cyclesCurrent);
     o.setValue("total", m_cyclesTotal);
     o.endGroup();
 

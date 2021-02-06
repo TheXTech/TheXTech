@@ -674,6 +674,8 @@ int GameMain(const CmdLineSetup_t &setup)
                     ReturnWarp = 0;
                 }
             }
+
+            speedRun_resetCurrent();
 //'--------------------------------------------
             ProcEvent("Level - Start", true);
 
@@ -684,7 +686,6 @@ int GameMain(const CmdLineSetup_t &setup)
             }
 
             resetFrameTimer();
-            speedRun_resetCurrent();
 
             // Update graphics before loop begin (to process inital lazy-unpacking of used sprites)
             UpdateGraphics();
