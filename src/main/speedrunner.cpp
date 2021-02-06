@@ -136,6 +136,7 @@ void speedRun_render()
     SuperPrint("E", 3, 184, 584, 1.f, 1.f, 1.f, bool2alpha(c.Drop));
 #endif
 
+    SuperPrintRightAlign(fmt::format_ne("Mode {0}", g_speedRunnerMode), 3, ScreenW - 2, 2, 1.f, 0.3f, 0.3f, 0.5f);
 }
 
 #undef bool2alpha
