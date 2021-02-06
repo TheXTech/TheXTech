@@ -84,11 +84,11 @@ public class thextechActivity extends SDLActivity
         if(setup.getBoolean("enable_max_fps", false))
             args.add("--max-fps");
 
-        int speedRunMode = setup.getInt("setup_speedRunMode", 0);
+        int speedRunMode = Integer.parseInt(setup.getString("setup_speedRunMode", "0"));
         if(speedRunMode > 0)
         {
             args.add("--speed-run-mode");
-            args.add(Integer.toString(speedRunMode));
+            args.add(String.valueOf(speedRunMode));
 
             if(setup.getBoolean("setup_sr_showStopwatchTransparent", false))
                 args.add("--speed-run-semitransparent");
