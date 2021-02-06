@@ -96,16 +96,16 @@ void speedRun_render()
         SuperPrint(">", 3, 56, 584);
 
     if(c.AltJump)
-        SuperPrint("A", 3, 72, 584);
+        SuperPrint("P", 3, 72, 584);
 
     if(c.Jump)
-        SuperPrint("B", 3, 88, 584);
+        SuperPrint("J", 3, 88, 584);
 
     if(c.AltRun)
-        SuperPrint("X", 3, 104, 584);
+        SuperPrint("N", 3, 104, 584);
 
     if(c.Run)
-        SuperPrint("Y", 3, 120, 584);
+        SuperPrint("R", 3, 120, 584);
 
     if(c.Start)
     {
@@ -124,10 +124,10 @@ void speedRun_render()
     SuperPrint("v", 3, 24, 584, 1.f, 1.f, 1.f, bool2alpha(c.Down));
     SuperPrint("<", 3, 40, 584, 1.f, 1.f, 1.f, bool2alpha(c.Left));
     SuperPrint(">", 3, 56, 584, 1.f, 1.f, 1.f, bool2alpha(c.Right));
-    SuperPrint("A", 3, 72, 584, 1.f, 1.f, 1.f, bool2alpha(c.AltJump));
-    SuperPrint("B", 3, 88, 584, 1.f, 1.f, 1.f, bool2alpha(c.Jump));
-    SuperPrint("X", 3, 104, 584, 1.f, 1.f, 1.f, bool2alpha(c.AltRun));
-    SuperPrint("Y", 3, 120, 584, 1.f, 1.f, 1.f, bool2alpha(c.Run));
+    SuperPrint("P", 3, 72, 584, 1.f, 1.f, 1.f, bool2alpha(c.AltJump));
+    SuperPrint("J", 3, 88, 584, 1.f, 1.f, 1.f, bool2alpha(c.Jump));
+    SuperPrint("N", 3, 104, 584, 1.f, 1.f, 1.f, bool2alpha(c.AltRun));
+    SuperPrint("R", 3, 120, 584, 1.f, 1.f, 1.f, bool2alpha(c.Run));
 
     SuperPrint("S", 3, 136, 584, 1.f, 1.f, 1.f, bool2alpha(c.Start));
     SuperPrint("T", 3, 152, 584, 1.f, 1.f, 1.f, bool2alpha(c.Start));
