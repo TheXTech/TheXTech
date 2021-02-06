@@ -34,7 +34,7 @@
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/setup_speedrunner">
         <ListPreference
-            android:defaultValue="false"
+            android:defaultValue="0"
             android:entries="@array/speedRunModes"
             android:entryValues="@array/speedRunModesValues"
             android:key="setup_speedRunMode"
