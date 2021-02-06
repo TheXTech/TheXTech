@@ -23,6 +23,7 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#include <fmt_format_ne.h>
 #include "speedrunner.h"
 #include "globals.h"
 #include "graphics.h"
@@ -31,7 +32,7 @@
 
 
 static      GameplayTimer s_gamePlayTimer;
-int                       g_speedRunnerMode = SPEEDRUN_MODE_1;
+int                       g_speedRunnerMode = SPEEDRUN_MODE_OFF;
 
 void speedRun_loadStats()
 {

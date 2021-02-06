@@ -138,7 +138,7 @@ void GameplayTimer::tick()
     }
     else
     {
-        if(LevelSelect || (LevelBeatCode == 0))
+        if(LevelSelect || (!LevelSelect && LevelMacro == 0))
             m_cyclesCurrent += 1;
 
         if(!m_cyclesFin)
