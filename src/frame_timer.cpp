@@ -30,6 +30,10 @@
 #include <time.h>
 #endif
 
+#if defined(__EMSCRIPTEN__)
+#include <time.h>
+#endif
+
 #include <Logger/logger.h>
 #include "pge_delay.h"
 
@@ -37,9 +41,9 @@
 #include "globals.h"
 #include "graphics.h"
 
-#if !defined(__EMSCRIPTEN__)
+//#if !defined(__EMSCRIPTEN__)
 #define USE_NEW_TIMER
-#endif
+//#endif
 
 #ifdef USE_NEW_TIMER
 #define COMPUTE_FRAME_TIME_1_REAL computeFrameTime1Real_2
