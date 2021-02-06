@@ -2674,34 +2674,37 @@ void zTestLevel(bool magicHand, bool interProcess)
     if(numPlayers == 0)
         numPlayers = 1;
 
-    if(numPlayers > 2 /* ||nPlay.Online == true*/)
+    if(Checkpoint.empty()) // Don't reset players when resume at the checkpoint
     {
-        for(A = 1; A <= numPlayers; A++)
+        if(numPlayers > 2 /* ||nPlay.Online == true*/)
         {
-            Player[A].Hearts = 0;
-            Player[A].State = testPlayer[1].State;
-            Player[A].HeldBonus = 0;
-            Player[A].Dead = false;
-            Player[A].Mount = testPlayer[1].Mount;
-            Player[A].MountType = testPlayer[1].MountType;
-            Player[A].Character = testPlayer[1].Character;
-            if(Player[A].Character == 0)
-                Player[1].Character = 1;
+            for(A = 1; A <= numPlayers; A++)
+            {
+                Player[A].Hearts = 0;
+                Player[A].State = testPlayer[1].State;
+                Player[A].HeldBonus = 0;
+                Player[A].Dead = false;
+                Player[A].Mount = testPlayer[1].Mount;
+                Player[A].MountType = testPlayer[1].MountType;
+                Player[A].Character = testPlayer[1].Character;
+                if(Player[A].Character == 0)
+                    Player[1].Character = 1;
+            }
         }
-    }
-    else
-    {
-        for(A = 2; A >= 1; A--)
+        else
         {
-            Player[A].State = testPlayer[A].State;
-            Player[A].HeldBonus = 0;
-            Player[A].Dead = false;
-            Player[A].Mount = testPlayer[A].Mount;
-            Player[A].MountType = testPlayer[A].MountType;
-            Player[A].Character = testPlayer[A].Character;
-            if(Player[A].Character == 0)
-                Player[A].Character = A;
-            SavedChar[Player[A].Character] = Player[A];
+            for(A = 2; A >= 1; A--)
+            {
+                Player[A].State = testPlayer[A].State;
+                Player[A].HeldBonus = 0;
+                Player[A].Dead = false;
+                Player[A].Mount = testPlayer[A].Mount;
+                Player[A].MountType = testPlayer[A].MountType;
+                Player[A].Character = testPlayer[A].Character;
+                if(Player[A].Character == 0)
+                    Player[A].Character = A;
+                SavedChar[Player[A].Character] = Player[A];
+            }
         }
     }
 
