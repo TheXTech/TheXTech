@@ -35,6 +35,41 @@ namespace std
 }
 #endif
 
+void SuperPrintRightAlign(std::string SuperWords, int Font, float X, float Y, float r, float g, float b, float a)
+{
+    switch(Font)
+    {
+    default:
+    case 1:
+    case 4:
+        X -= SuperWords.length() * 18;
+        break;
+    case 2:
+        X -= SuperWords.length() * 16;
+        break;
+    case 3:
+    {
+        int B = 0;
+        for(auto c : SuperWords)
+        {
+            c = std::toupper(c);
+            if(c >= 33 && c <= 126)
+            {
+                B += 18;
+                if(c == 'M')
+                    B += 2;
+            } else {
+                B += 16;
+            }
+        }
+        X -= B;
+        break;
+    }
+    }
+
+    SuperPrint(SuperWords, Font, X, Y, r, g, b, a);
+}
+
 void SuperPrint(std::string SuperWords, int Font, float X, float Y,
                 float r, float g, float b, float a)
 {
