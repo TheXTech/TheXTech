@@ -14,4 +14,7 @@
     <string name="setup_show_framerate">Show frame-rate value</string>
     <string name="setup_max_framerate_mode">Max frame-rate mode</string>
     <string name="setup_touchscreen_mode">Controller mode</string>
+    <string name="setup_sr_speedrunMode">Speed-Run Mode</string>
+    <string name="setup_sr_stopwatchSemiTransparent">Make stopwatch being semi-transparent</string>
+    <string name="setup_speedrunner">Speed-runner</string>
 </resources>

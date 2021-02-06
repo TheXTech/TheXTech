@@ -32,4 +32,16 @@
             android:key="enable_max_fps"
             android:title="@string/setup_max_framerate_mode" />
     </PreferenceCategory>
+    <PreferenceCategory android:title="@string/setup_speedrunner">
+        <ListPreference
+            android:defaultValue="false"
+            android:entries="@array/speedRunModes"
+            android:entryValues="@array/speedRunModesValues"
+            android:key="setup_speedRunMode"
+            android:title="@string/setup_sr_speedrunMode" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="setup_sr_showStopwatchTransparent"
+            android:title="@string/setup_sr_stopwatchSemiTransparent" />
+    </PreferenceCategory>
 </PreferenceScreen>

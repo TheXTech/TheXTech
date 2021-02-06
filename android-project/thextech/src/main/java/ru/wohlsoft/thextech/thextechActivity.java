@@ -84,6 +84,16 @@ public class thextechActivity extends SDLActivity
         if(setup.getBoolean("enable_max_fps", false))
             args.add("--max-fps");
 
+        int speedRunMode = setup.getInt("setup_speedRunMode", 0);
+        if(speedRunMode > 0)
+        {
+            args.add("--speed-run-mode");
+            args.add(Integer.toString(speedRunMode));
+
+            if(setup.getBoolean("setup_sr_showStopwatchTransparent", false))
+                args.add("--speed-run-semitransparent");
+        }
+
         setTouchScreenMode(Integer.parseInt(setup.getString("setup_touchscreen_mode", "1")));
         setTouchScreenShowOnStart(setup.getBoolean("touchscreen_gamepad_showalways", false));
 

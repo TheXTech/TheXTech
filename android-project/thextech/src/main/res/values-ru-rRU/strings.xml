@@ -15,4 +15,7 @@
     <string name="setup_show_framerate">Показать частоту кадров</string>
     <string name="setup_max_framerate_mode">Режим максимальной частоты кадров</string>
     <string name="setup_touchscreen_mode">Режим контроллера</string>
+    <string name="setup_sr_speedrunMode">Режим спидраннера</string>
+    <string name="setup_speedrunner">Скоростное прохождение</string>
+    <string name="setup_sr_stopwatchSemiTransparent">Сделать секундомер прозрачным</string>
 </resources>
