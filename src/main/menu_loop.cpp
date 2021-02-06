@@ -2197,7 +2197,7 @@ void MenuLoop()
     }
 
 //    If LevelMacro > 0 Then UpdateMacro
-    if(LevelMacro > 0) UpdateMacro();
+    if(LevelMacro > LEVELMACRO_OFF) UpdateMacro();
 //    UpdateLayers
     UpdateLayers();
 //    UpdateNPCs

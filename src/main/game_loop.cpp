@@ -49,7 +49,7 @@ void CheckActive();//in game_main.cpp
 void GameLoop()
 {
     UpdateControls();
-    if(LevelMacro > 0)
+    if(LevelMacro > LEVELMACRO_OFF)
         UpdateMacro();
 
     if(BattleMode)
@@ -107,7 +107,7 @@ void GameLoop()
         UpdateLayers(); // layers before/after npcs
         UpdateNPCs();
 
-        if(LevelMacro == 3)
+        if(LevelMacro == LEVELMACRO_KEYHOLE_EXIT)
             return; // stop on key exit
 
         UpdateBlocks();
@@ -134,7 +134,7 @@ void GameLoop()
 
         if(pausePress)
         {
-            if(LevelMacro == 0 && CheckLiving() > 0)
+            if(LevelMacro == LEVELMACRO_OFF && CheckLiving() > 0)
             {
                 if(Player[1].UnStart)
                 {
@@ -178,7 +178,7 @@ void GameLoop()
         }
         else if(numPlayers == 2 && Player[2].Controls.Start)
         {
-            if(LevelMacro == 0 && CheckLiving() > 0)
+            if(LevelMacro == LEVELMACRO_OFF && CheckLiving() > 0)
             {
                 if(Player[2].UnStart)
                 {

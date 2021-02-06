@@ -432,7 +432,7 @@ void TouchBonus(int A, int B)
                 MoreScore(1, NPC[B].Location);
             NewEffect(78, NPC[B].Location);
         }
-        else if(NPCIsAnExit[NPC[B].Type] && LevelMacro == 0) // Level exit
+        else if(NPCIsAnExit[NPC[B].Type] && LevelMacro == LEVELMACRO_OFF) // Level exit
         {
             if(NPC[B].Type != 196)
             {
@@ -449,7 +449,7 @@ void TouchBonus(int A, int B)
                     MoreScore(6, Player[A].Location);
                 if(NPC[B].Frame == 2)
                     MoreScore(8, Player[A].Location);
-                LevelMacro = 1;
+                LevelMacro = LEVELMACRO_CARD_ROULETTE_EXIT;
                 for(C = 1; C <= numPlayers; C++)
                 {
                     if(A != C) // And DScreenType <> 5 Then
@@ -469,7 +469,7 @@ void TouchBonus(int A, int B)
             }
             else if(NPC[B].Type == 16)
             {
-                LevelMacro = 2;
+                LevelMacro = LEVELMACRO_QUESTION_SPHERE_EXIT;
                 for(C = 1; C <= numPlayers; C++)
                 {
                     if(A != C) // And DScreenType <> 5 Then
@@ -488,7 +488,7 @@ void TouchBonus(int A, int B)
             }
             else if(NPC[B].Type == 41)
             {
-                LevelMacro = 4;
+                LevelMacro = LEVELMACRO_CRYSTAL_BALL_EXIT;
                 for(C = 1; C <= numPlayers; C++)
                 {
                     if(A != C) // And DScreenType <> 5 Then
@@ -540,7 +540,7 @@ void TouchBonus(int A, int B)
 
                 if(NPC[B].Type == 97)
                 {
-                    LevelMacro = 6;
+                    LevelMacro = LEVELMACRO_STAR_EXIT;
                     for(C = 1; C <= numPlayers; C++)
                     {
                         if(A != C) // And DScreenType <> 5 Then

@@ -2525,7 +2525,7 @@ void NPCSpecial(int A)
                             TurnNPCsIntoCoins();
                             if(numPlayers > 2 /*&& nPlay.Online == false*/)
                                 Player[1] = Player[A];
-                            LevelMacro = 7;
+                            LevelMacro = LEVELMACRO_GOAL_TAPE_EXIT;
                             for(C = 1; C <= numPlayers; C++)
                             {
                                 if(!fEqual(B, C)) // And DScreenType <> 5 Then
@@ -3641,7 +3641,7 @@ void SpecialNPC(int A)
         if(NPC[A].Location.Y > level[NPC[A].Section].Height + 1)
             NPC[A].Location.Y = level[NPC[A].Section].Height;
     }
-    else if((NPC[A].Type == 46 || NPC[A].Type == 212) && LevelMacro == 0)
+    else if((NPC[A].Type == 46 || NPC[A].Type == 212) && LevelMacro == LEVELMACRO_OFF)
     {
         if(NPC[A].Special == 0)
         {

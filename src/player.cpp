@@ -467,7 +467,7 @@ void PlayerHurt(int A)
     if(NPC[Player[A].HoldingNPC].Type == 13)
         Player[A].HoldingNPC = 0;
 
-    if(LevelMacro == 0)
+    if(LevelMacro == LEVELMACRO_OFF)
     {
         if(Player[A].Immune == 0)
         {
@@ -892,7 +892,7 @@ void EveryonesDead()
 //    int A = 0; // UNUSED
     if(BattleMode)
         return;
-    LevelMacro = 0;
+    LevelMacro = LEVELMACRO_OFF;
     FreezeNPCs = false;
     StopMusic();
     frmMain.clearBuffer();
@@ -905,7 +905,7 @@ void EveryonesDead()
     Lives--;
     if(Lives >= 0.f)
     {
-        LevelMacro = 0;
+        LevelMacro = LEVELMACRO_OFF;
         LevelMacroCounter = 0;
 
         ClearLevel();
@@ -926,7 +926,7 @@ void EveryonesDead()
         Coins = 0;
         Score = 0;
         SaveGame();
-        LevelMacro = 0;
+        LevelMacro = LEVELMACRO_OFF;
         LevelMacroCounter = 0;
         ClearLevel();
         LevelSelect = true;
@@ -2865,7 +2865,7 @@ void YoshiEatCode(int A)
                         {
                             PlaySound(31);
                             StopMusic();
-                            LevelMacro = 3;
+                            LevelMacro = LEVELMACRO_KEYHOLE_EXIT;
                             break;
                         }
                     }
@@ -3136,7 +3136,7 @@ void StealBonus()
                     C = -40;
                 }
 
-                if(Lives > 0 && LevelMacro == 0)
+                if(Lives > 0 && LevelMacro == LEVELMACRO_OFF)
                 {
                     if(Player[A].Controls.Jump == true || Player[A].Controls.Run == true)
                     {
@@ -3180,7 +3180,7 @@ void ClownCar()
 
     for(A = 1; A <= numPlayers; A++) // Code for running the Koopa Clown Car
     {
-        if(numPlayers > 2 && GameMenu == false && LevelMacro == 0 /*&& nPlay.Online == false*/)
+        if(numPlayers > 2 && GameMenu == false && LevelMacro == LEVELMACRO_OFF /*&& nPlay.Online == false*/)
             Player[A].Controls = Player[1].Controls;
         if(Player[A].Mount == 2 && Player[A].Dead == false && Player[A].TimeToLive == 0)
         {

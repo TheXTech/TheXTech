@@ -1518,8 +1518,21 @@ extern RangeArrI<int, 1, numSounds, 0> SoundPause;
 extern bool ErrorQuit;
 //Public EndLevel As Boolean 'End the level and move to the next
 extern bool EndLevel;
+
+enum LevelMacro_t
+{
+    LEVELMACRO_OFF = 0,
+    LEVELMACRO_CARD_ROULETTE_EXIT = 1,
+    LEVELMACRO_QUESTION_SPHERE_EXIT = 2,
+    LEVELMACRO_KEYHOLE_EXIT = 3,
+    LEVELMACRO_CRYSTAL_BALL_EXIT = 4,
+    LEVELMACRO_GAME_COMPLETE_EXIT = 5,
+    LEVELMACRO_STAR_EXIT = 6,
+    LEVELMACRO_GOAL_TAPE_EXIT = 7,
+};
 //Public LevelMacro As Integer 'Shows a level outro when beat
 extern int LevelMacro;
+
 //Public LevelMacroCounter As Integer
 extern int LevelMacroCounter;
 //Public numJoysticks As Integer

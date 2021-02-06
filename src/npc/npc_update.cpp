@@ -108,7 +108,7 @@ void UpdateNPCs()
     NPC[0].Location.SpeedX = 0;
     NPC[0].Location.SpeedY = 0;
 
-    if(LevelMacro > 0)
+    if(LevelMacro > LEVELMACRO_OFF)
     {
         if(PSwitchTime > 0)
             PSwitchTime = 100;
@@ -4549,7 +4549,7 @@ void UpdateNPCs()
                                 {
                                     PlaySound(31);
                                     StopMusic();
-                                    LevelMacro = 3;
+                                    LevelMacro = LEVELMACRO_KEYHOLE_EXIT;
                                     break;
                                 }
                             }

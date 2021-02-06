@@ -801,7 +801,7 @@ void NextLevel()
     int A = 0;
     for(A = 1; A <= numPlayers; A++)
         Player[A].HoldingNPC = 0;
-    LevelMacro = 0;
+    LevelMacro = LEVELMACRO_OFF;
     LevelMacroCounter = 0;
     StopMusic();
     ClearLevel();
@@ -837,11 +837,11 @@ void UpdateMacro()
     int A = 0;
     bool OnScreen = false;
 
-    if(LevelMacro == 1) // SMB3 Exit
+    if(LevelMacro == LEVELMACRO_CARD_ROULETTE_EXIT) // SMB3 Exit
     {
         for(A = 1; A <= numPlayers; A++)
         {
-            if(Player[A].Location.X < level[Player[A].Section].Width && Player[A].Dead == false)
+            if(Player[A].Location.X < level[Player[A].Section].Width && !Player[A].Dead)
             {
                 OnScreen = true;
                 Player[A].Controls.Down = false;
@@ -854,7 +854,7 @@ void UpdateMacro()
                 Player[A].Controls.Start = false;
                 Player[A].Controls.AltJump = false;
                 Player[A].Controls.AltRun = false;
-                if(Player[A].Wet > 0 && Player[A].CanJump == true)
+                if(Player[A].Wet > 0 && Player[A].CanJump)
                 {
                     if(Player[A].Location.SpeedY > 1)
                         Player[A].Controls.Jump = true;
@@ -882,13 +882,13 @@ void UpdateMacro()
             if(LevelMacroCounter >= 100)
             {
                 LevelBeatCode = 1;
-                LevelMacro = 0;
+                LevelMacro = LEVELMACRO_OFF;
                 LevelMacroCounter = 0;
                 EndLevel = true;
             }
         }
     }
-    else if(LevelMacro == 2)
+    else if(LevelMacro == LEVELMACRO_QUESTION_SPHERE_EXIT)
     {
         for(A = 1; A <= numPlayers; A++)
         {
@@ -908,12 +908,12 @@ void UpdateMacro()
         {
             LevelBeatCode = 2;
             EndLevel = true;
-            LevelMacro = 0;
+            LevelMacro = LEVELMACRO_OFF;
             LevelMacroCounter = 0;
             frmMain.clearBuffer();
         }
     }
-    else if(LevelMacro == 3)
+    else if(LevelMacro == LEVELMACRO_KEYHOLE_EXIT)
     {
 //        float tempTime = 0;
 //        float gameTime = 0;
@@ -955,11 +955,11 @@ void UpdateMacro()
 
         LevelBeatCode = 4;
         EndLevel = true;
-        LevelMacro = 0;
+        LevelMacro = LEVELMACRO_OFF;
         LevelMacroCounter = 0;
         frmMain.clearBuffer();
     }
-    else if(LevelMacro == 4)
+    else if(LevelMacro == LEVELMACRO_CRYSTAL_BALL_EXIT)
     {
         for(A = 1; A <= numPlayers; A++)
         {
@@ -979,12 +979,12 @@ void UpdateMacro()
         {
             LevelBeatCode = 5;
             EndLevel = true;
-            LevelMacro = 0;
+            LevelMacro = LEVELMACRO_OFF;
             LevelMacroCounter = 0;
             frmMain.clearBuffer();
         }
     }
-    else if(LevelMacro == 5)
+    else if(LevelMacro == LEVELMACRO_GAME_COMPLETE_EXIT)
     {
         // numNPCs = 0
         for(A = 1; A <= numPlayers; A++)
@@ -1006,7 +1006,7 @@ void UpdateMacro()
         if(LevelMacroCounter >= 800)
         {
             EndLevel = true;
-            LevelMacro = 0;
+            LevelMacro = LEVELMACRO_OFF;
             LevelMacroCounter = 0;
             if(!TestLevel)
             {
@@ -1019,7 +1019,7 @@ void UpdateMacro()
             frmMain.clearBuffer();
         }
     }
-    else if(LevelMacro == 6) // Star Exit
+    else if(LevelMacro == LEVELMACRO_STAR_EXIT) // Star Exit
     {
         for(A = 1; A <= numPlayers; A++)
         {
@@ -1038,12 +1038,12 @@ void UpdateMacro()
         if(LevelMacroCounter >= 300)
         {
             LevelBeatCode = 7;
-            LevelMacro = 0;
+            LevelMacro = LEVELMACRO_OFF;
             LevelMacroCounter = 0;
             EndLevel = true;
         }
     }
-    else if(LevelMacro == 7) // SMW Exit
+    else if(LevelMacro == LEVELMACRO_GOAL_TAPE_EXIT) // SMW Exit
     {
         for(A = 1; A <= numPlayers; A++)
         {
@@ -1079,7 +1079,7 @@ void UpdateMacro()
         if(LevelMacroCounter >= 630)
         {
             LevelBeatCode = 8;
-            LevelMacro = 0;
+            LevelMacro = LEVELMACRO_OFF;
             LevelMacroCounter = 0;
             EndLevel = true;
         }

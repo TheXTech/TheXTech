@@ -2019,7 +2019,7 @@ void UpdatePlayer()
                                 {
                                     PlaySound(31);
                                     StopMusic();
-                                    LevelMacro = 3;
+                                    LevelMacro = LEVELMACRO_KEYHOLE_EXIT;
                                     break;
                                 }
                             }
@@ -2191,7 +2191,7 @@ void UpdatePlayer()
                         EndLevel = true;
                         for(B = 1; B <= numPlayers; B++)
                             Player[B].TailCount = 0;
-                        LevelMacro = 0;
+                        LevelMacro = LEVELMACRO_OFF;
                         LevelMacroCounter = 0;
                         frmMain.clearBuffer();
                         frmMain.repaint();
@@ -2200,7 +2200,7 @@ void UpdatePlayer()
                     {
                         LevelBeatCode = 3;
                         EndLevel = true;
-                        LevelMacro = 0;
+                        LevelMacro = LEVELMACRO_OFF;
                         LevelMacroCounter = 0;
                         frmMain.clearBuffer();
                         frmMain.repaint();
@@ -2208,7 +2208,7 @@ void UpdatePlayer()
                     hBoundsHandled = true;
                 }
 
-                if(!hBoundsHandled && LevelMacro != 1 && LevelMacro != 7 && !GameMenu)
+                if(!hBoundsHandled && LevelMacro != LEVELMACRO_CARD_ROULETTE_EXIT && LevelMacro != LEVELMACRO_GOAL_TAPE_EXIT && !GameMenu)
                 {
                     // Check edge of levels
                     if(Player[A].Location.X < level[Player[A].Section].X)
@@ -4479,7 +4479,7 @@ void UpdatePlayer()
                 }
 
                 // Check edge of screen
-                if(!LevelWrap[Player[A].Section] && LevelMacro == 0)
+                if(!LevelWrap[Player[A].Section] && LevelMacro == LEVELMACRO_OFF)
                 {
                     if(ScreenType == 3)
                     {

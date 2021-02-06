@@ -246,7 +246,7 @@ RangeArrI<int, 1, numSounds, 0> Sound;
 RangeArrI<int, 1, numSounds, 0> SoundPause;
 bool ErrorQuit = false;
 bool EndLevel = false;
-int LevelMacro = 0;
+int LevelMacro = LEVELMACRO_OFF;
 int LevelMacroCounter = 0;
 int numJoysticks = 0;
 std::string FileName;

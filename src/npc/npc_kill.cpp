@@ -698,7 +698,7 @@ void KillNPC(int A, int B)
                 {
                     speedRun_bossDeadEvent();
                     LevelMacroCounter = 0;
-                    LevelMacro = 5;
+                    LevelMacro = LEVELMACRO_GAME_COMPLETE_EXIT;
                 }
             }
         }

@@ -92,7 +92,7 @@ void UpdateEditor()
     {
 //        frmNPCs::chkMessage.Enabled = true;
         FreezeNPCs = false;
-        LevelMacro = 0;
+        LevelMacro = LEVELMACRO_OFF;
         LevelMacroCounter = 0;
     }
 

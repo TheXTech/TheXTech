@@ -463,7 +463,7 @@ void UpdateGraphics(bool skipRepaint)
 //                    With Player(A)
                     Player_t &p = Player[A];
 //                        If vScreenCollision(Z, .Location) = False And LevelMacro = 0 And .Location.Y < level(.Section).Height And .Location.Y + .Location.Height > level(.Section).Y And .TimeToLive = 0 And .Dead = False Then
-                    if(!vScreenCollision(Z, p.Location) && LevelMacro == 0 &&
+                    if(!vScreenCollision(Z, p.Location) && LevelMacro == LEVELMACRO_OFF &&
                         p.Location.Y < level[p.Section].Height &&
                         p.Location.Y + p.Location.Height > level[p.Section].Y &&
                         p.TimeToLive == 0 && !p.Dead)

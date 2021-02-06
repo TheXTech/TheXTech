@@ -549,7 +549,7 @@ void ProcEvent(std::string EventName, bool NoEffect)
                 StopMusic();
                 speedRun_bossDeadEvent();
                 LevelMacroCounter = 0;
-                LevelMacro = 5;
+                LevelMacro = LEVELMACRO_GAME_COMPLETE_EXIT;
             }
 
             ForcedControls = (Events[A].Controls.AltJump ||

@@ -738,7 +738,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 //    else
     {
         FindStars();
-        LevelMacro = 0;
+        LevelMacro = LEVELMACRO_OFF;
         for(A = 0; A <= numSections; A++) // Automatically correct 608 section height to 600
         {
 //            if(int(level[A].Height - level[A].Y) == 608)
