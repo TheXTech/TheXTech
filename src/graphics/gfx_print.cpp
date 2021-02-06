@@ -91,11 +91,10 @@ void SuperPrint(std::string SuperWords, int Font, float X, float Y,
     }
     else if (Font == 3)
     {
-        std::string Words = SuperWords;
-        std::transform(Words.begin(), Words.end(), Words.begin(), [](unsigned char c){ return std::toupper(c); });
 //        Do While Len(Words) > 0
-        for(auto c : Words)
+        for(auto c : SuperWords)
         {
+            c = std::toupper(c);
 //            If Asc(Left(Words, 1)) >= 33 And Asc(Left(Words, 1)) <= 126 Then
             if(c >= 33 && c <= 126)
             {
