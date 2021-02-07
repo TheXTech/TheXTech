@@ -26,6 +26,8 @@
 #ifndef SPEEDRUNNER_H
 #define SPEEDRUNNER_H
 
+#include "controls.h"
+
 enum
 {
     SPEEDRUN_MODE_OFF = 0,
@@ -39,6 +41,8 @@ extern int  g_speedRunnerMode;
 void speedRun_tick();
 
 void speedRun_setSemitransparentRender(bool r);
+
+void speedRun_syncControlKeys(Controls_t &keys);
 
 void speedRun_loadStats();
 void speedRun_saveStats();

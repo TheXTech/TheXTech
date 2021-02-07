@@ -70,6 +70,8 @@ void speedRun_resetTotal()
 
 #define bool2alpha(b) (b ? 1.f : 0.1f)
 
+static Controls_t s_displayControls = Controls_t();
+
 void speedRun_render()
 {
     if(g_speedRunnerMode == SPEEDRUN_MODE_OFF)
@@ -80,7 +82,7 @@ void speedRun_render()
 
     s_gamePlayTimer.render();
 
-    const auto &c = Player[1].Controls;
+    const auto &c = s_displayControls;
 
 #if 1
     if(c.Up)
@@ -166,4 +168,12 @@ void speedRun_setSemitransparentRender(bool r)
         return; // Do nothing
 
     s_gamePlayTimer.setSemitransparent(r);
+}
+
+void speedRun_syncControlKeys(Controls_t &keys)
+{
+    if(g_speedRunnerMode == SPEEDRUN_MODE_OFF)
+        return; // Do nothing
+
+    SDL_memcpy(&s_displayControls, &keys, sizeof(Controls_t));
 }

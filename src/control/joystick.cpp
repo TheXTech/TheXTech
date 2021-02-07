@@ -28,10 +28,12 @@
 #include "../globals.h"
 #include "joystick.h"
 #include "../pseudo_vb.h"
+#include "../main/speedrunner.h"
 
 #ifdef USE_TOUCHSCREEN_CONTROLLER
 #include "touchscreen.h"
 #endif
+
 
 // this module handles the players controls, both keyboard and joystick
 
@@ -342,6 +344,9 @@ void UpdateControls()
                 } // s_touch.m_touchHidden
             }
 #endif
+
+            if(B == 1) // Push the controls state into the speed-runner to properly display
+                speedRun_syncControlKeys(c);
 
             if(!c.Start && !c.Jump) {
                 p.UnStart = true;
