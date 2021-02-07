@@ -26,8 +26,10 @@
 #include <SDL2/SDL_timer.h>
 
 #ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <time.h>
+#include <chrono>
 #endif
 
 #if defined(__EMSCRIPTEN__)
@@ -61,71 +63,17 @@
 typedef int64_t nanotime_t;
 
 #ifdef _WIN32
-// https://stackoverflow.com/questions/5404277/porting-clock-gettime-to-windows
 
-static SDL_INLINE LARGE_INTEGER getFILETIMEoffset()
+static SDL_INLINE struct timespec nanotimeToTimespec(nanotime_t time);
+
+static SDL_INLINE int win_clock_gettime(struct timespec *ct)
 {
-    SYSTEMTIME s;
-    FILETIME f;
-    LARGE_INTEGER t;
-
-    s.wYear = 1970;
-    s.wMonth = 1;
-    s.wDay = 1;
-    s.wHour = 0;
-    s.wMinute = 0;
-    s.wSecond = 0;
-    s.wMilliseconds = 0;
-    SystemTimeToFileTime(&s, &f);
-    t.QuadPart = f.dwHighDateTime;
-    t.QuadPart <<= 32;
-    t.QuadPart |= f.dwLowDateTime;
-    return (t);
+    auto n = std::chrono::high_resolution_clock::now().time_since_epoch();
+    auto ctt = nanotimeToTimespec(n.count());
+    ct->tv_nsec = ctt.tv_nsec;
+    ct->tv_sec = ctt.tv_sec;
+    return 0;
 }
-
-static SDL_INLINE int win_clock_gettime(struct timespec *tv)
-{
-    LARGE_INTEGER           t;
-    FILETIME                f;
-    double                  microseconds;
-    static LARGE_INTEGER    offset;
-    static double           frequencyToMicroseconds;
-    static int              initialized = 0;
-    static BOOL             usePerformanceCounter = 0;
-
-    if(!initialized)
-    {
-        LARGE_INTEGER performanceFrequency;
-        initialized = 1;
-        usePerformanceCounter = QueryPerformanceFrequency(&performanceFrequency);
-        if(usePerformanceCounter)
-        {
-            QueryPerformanceCounter(&offset);
-            frequencyToMicroseconds = (double)performanceFrequency.QuadPart / 1000000.;
-        }
-        else
-        {
-            offset = getFILETIMEoffset();
-            frequencyToMicroseconds = 10.;
-        }
-    }
-    if(usePerformanceCounter) QueryPerformanceCounter(&t);
-    else
-    {
-        GetSystemTimeAsFileTime(&f);
-        t.QuadPart = f.dwHighDateTime;
-        t.QuadPart <<= 32;
-        t.QuadPart |= f.dwLowDateTime;
-    }
-
-    t.QuadPart -= offset.QuadPart;
-    microseconds = (double)t.QuadPart / frequencyToMicroseconds;
-    t.QuadPart = microseconds * 1000;
-    tv->tv_sec = t.QuadPart / ONE_MILLIARD;
-    tv->tv_nsec = t.QuadPart % ONE_MILLIARD;
-    return (0);
-}
-
 
 // https://gist.github.com/Youka/4153f12cf2e17a77314c
 
@@ -168,10 +116,8 @@ static SDL_INLINE struct timespec nanotimeToTimespec(nanotime_t time)
     struct timespec ts;
     ts.tv_nsec = time % ONE_MILLIARD;
     ts.tv_sec = time / ONE_MILLIARD;
-
     return ts;
 }
-
 
 static SDL_INLINE nanotime_t getNanoTime()
 {
@@ -199,7 +145,7 @@ static SDL_INLINE int xtech_nanosleep(nanotime_t sleepTime)
     if(sleepTime <= 0)
         return 0;
 #ifdef _WIN32
-    return win_nanosleep(sleepTime / 100);
+    return win_nanosleep((sleepTime / 100) + 1);
 #else
     struct timespec ts = nanotimeToTimespec(sleepTime);
     return nanosleep(&ts, NULL);
@@ -212,7 +158,7 @@ struct TimeStore
     const size_t size = 4;
     size_t       pos = 0;
     nanotime_t   sum = 0;
-    nanotime_t   items[4] = {0};
+    nanotime_t   items[4] = {0, 0, 0, 0};
 
     void add(nanotime_t item)
     {
@@ -378,8 +324,10 @@ static SDL_INLINE void computeFrameTime2Real_2()
         {
             nanotime_t adjustedSleepTime = sleepTime - s_overhead;
             xtech_nanosleep(adjustedSleepTime);
-            nanotime_t overslept = getElapsedTime(start) - adjustedSleepTime;
-            if(overslept < c_frameRateNano)
+            auto e = getElapsedTime(start);
+            nanotime_t overslept = e - adjustedSleepTime;
+            // SDL_assert(overslept >= 0);
+            if(overslept >= 0 && overslept < c_frameRateNano)
                 s_overheadTimes.add(overslept);
         }
     }
