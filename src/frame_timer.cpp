@@ -45,6 +45,7 @@
 
 //#if !defined(__EMSCRIPTEN__)
 #define USE_NEW_TIMER
+//#define USE_NEW_FRAMESKIP
 //#endif
 
 #ifdef USE_NEW_TIMER
@@ -178,6 +179,12 @@ static TimeStore         s_overheadTimes;
 static const  nanotime_t c_frameRateNano = 1000000000.0 / 64.1025;
 static nanotime_t        s_oldTime = 0,
                          s_overhead = 0;
+#ifdef USE_NEW_FRAMESKIP
+static nanotime_t        s_startProcessing = 0;
+static nanotime_t        s_stopProcessing = 0;
+static nanotime_t        s_doUpdate = 0;
+#endif
+
 #endif
 // ----------------------------------------------------
 
@@ -210,10 +217,21 @@ void resetTimeBuffer()
     s_currentTicks = 0;
 }
 
+#ifdef USE_NEW_FRAMESKIP
+
 bool frameSkipNeeded()
+{
+    return s_doUpdate > 0;
+}
+
+#else
+
+bool frameSkipNeeded() // Old and buggy Redigit's
 {
     return SDL_GetTicks() + SDL_floor(1000 * (1 - (s_cycleCount / 63.0))) > s_goalTime;
 }
+
+#endif
 
 void frameNextInc()
 {
@@ -367,6 +385,10 @@ void runFrameLoop(LoopCall_t doLoopCallbackPre,
 
         if(canProcessFrameCond())
         {
+#ifdef USE_NEW_FRAMESKIP
+            if(s_doUpdate <= 0)
+                s_startProcessing = getNanoTime();
+#endif
             CheckActive();
             if(doLoopCallbackPre)
                 doLoopCallbackPre();
@@ -376,6 +398,19 @@ void runFrameLoop(LoopCall_t doLoopCallbackPre,
             if(doLoopCallbackPost)
                 doLoopCallbackPost(); // Run the loop callback
             DoEvents();
+
+#ifdef USE_NEW_FRAMESKIP
+
+            if(s_doUpdate <= 0)
+            {
+                s_stopProcessing = getNanoTime();
+                s_doUpdate = FrameSkip ? (s_stopProcessing - s_startProcessing) : 0;
+            }
+
+            s_doUpdate -= c_frameRateNano;
+            s_startProcessing = 0;
+            s_stopProcessing = 0;
+#endif
 
             COMPUTE_FRAME_TIME_2_REAL();
 
