@@ -22,6 +22,7 @@ Changes for 1.3.4
 -Improved the framerate controller behavior, added the guarantee of the 65.1025 FPS on almost all supported platforms
 -Added the Speed-Runner mode which can be enabled via the --speed-run-mode <mode> command line argument
 -Fixed an wrong FPS while the key-hole exit is in process
+-Improved the frame-skip logic
 
 Changes for 1.3.3.1
 -Fixed a crash, caused by the incremental locked warps counter that leads BGO array exciting

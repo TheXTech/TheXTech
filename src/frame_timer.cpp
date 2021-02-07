@@ -45,7 +45,7 @@
 
 //#if !defined(__EMSCRIPTEN__)
 #define USE_NEW_TIMER
-//#define USE_NEW_FRAMESKIP
+#define USE_NEW_FRAMESKIP
 //#endif
 
 #ifdef USE_NEW_TIMER
@@ -247,7 +247,12 @@ extern void CheckActive(); // game_main.cpp
 
 static SDL_INLINE bool canProcessFrameCond()
 {
-    return s_currentTicks >= s_gameTime + c_frameRate || s_currentTicks < s_gameTime || MaxFPS;
+    bool ret = s_currentTicks >= s_gameTime + c_frameRate || s_currentTicks < s_gameTime || MaxFPS;
+#ifdef USE_NEW_FRAMESKIP
+    if(ret && s_doUpdate <= 0)
+        s_startProcessing = getNanoTime();
+#endif
+    return ret;
 }
 
 bool canProceedFrame()
@@ -313,8 +318,11 @@ static SDL_INLINE void computeFrameTime1Real_2()
 
 static SDL_INLINE void computeFrameTime2Real_2()
 {
-    if(c_frameRateNano <= 0)
-        return;
+#ifdef USE_NEW_FRAMESKIP
+    s_doUpdate -= c_frameRateNano;
+    s_startProcessing = 0;
+    s_stopProcessing = 0;
+#endif
 
     if(SDL_GetTicks() > s_fpsTime)
     {
@@ -385,10 +393,6 @@ void runFrameLoop(LoopCall_t doLoopCallbackPre,
 
         if(canProcessFrameCond())
         {
-#ifdef USE_NEW_FRAMESKIP
-            if(s_doUpdate <= 0)
-                s_startProcessing = getNanoTime();
-#endif
             CheckActive();
             if(doLoopCallbackPre)
                 doLoopCallbackPre();
@@ -398,19 +402,6 @@ void runFrameLoop(LoopCall_t doLoopCallbackPre,
             if(doLoopCallbackPost)
                 doLoopCallbackPost(); // Run the loop callback
             DoEvents();
-
-#ifdef USE_NEW_FRAMESKIP
-
-            if(s_doUpdate <= 0)
-            {
-                s_stopProcessing = getNanoTime();
-                s_doUpdate = FrameSkip ? (s_stopProcessing - s_startProcessing) : 0;
-            }
-
-            s_doUpdate -= c_frameRateNano;
-            s_startProcessing = 0;
-            s_stopProcessing = 0;
-#endif
 
             COMPUTE_FRAME_TIME_2_REAL();
 
@@ -423,4 +414,25 @@ void runFrameLoop(LoopCall_t doLoopCallbackPre,
             break;// Break on quit
     }
     while(condition());
+}
+
+void frameRenderStart()
+{
+#ifdef USE_NEW_FRAMESKIP
+    if(s_doUpdate <= 0)
+        s_startProcessing = getNanoTime();
+#endif
+}
+
+void frameRenderEnd()
+{
+#ifdef USE_NEW_FRAMESKIP
+    if(s_doUpdate <= 0)
+    {
+        s_stopProcessing = getNanoTime();
+        s_doUpdate = FrameSkip ? (s_stopProcessing - s_startProcessing) : 0;
+        if(s_doUpdate > c_frameRateNano * 15) // Limit 15 frames being skipped maximum
+            s_doUpdate = c_frameRateNano * 15;
+    }
+#endif
 }

@@ -139,6 +139,7 @@ void UpdateGraphics(bool skipRepaint)
     }
 
     frameNextInc();
+    frameRenderStart();
 
     std::string SuperText;
     std::string tempText;
@@ -2692,6 +2693,8 @@ void UpdateGraphics(bool skipRepaint)
 //        if(timeStr != "")
 //            Netplay::sendData timeStr + LB;
 //    }
+
+    frameRenderEnd();
 
     if(frmMain.lazyLoadedBytes() > 200000) // Reset timer while loading many pictures at the same time
         resetFrameTimer();

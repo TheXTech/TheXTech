@@ -49,6 +49,7 @@ void UpdateGraphics2()
         return;
 
     frameNextInc();
+    frameRenderStart();
 
     int A = 0;
     int B = 0;
@@ -658,6 +659,8 @@ void UpdateGraphics2()
 
     if(TakeScreen)
         ScreenShot();
+
+    frameRenderEnd();
 
     if(frmMain.lazyLoadedBytes() > 200000) // Reset timer while loading many pictures at the same time
         resetFrameTimer();

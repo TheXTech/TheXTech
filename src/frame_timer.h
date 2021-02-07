@@ -40,6 +40,9 @@ void computeFrameTime2();
 void frameNextInc();
 void cycleNextInc();
 
+void frameRenderStart();
+void frameRenderEnd();
+
 void runFrameLoop(LoopCall_t doLoopCallbackPre,
                   LoopCall_t doLoopCallbackPost,
                   std::function<bool ()> condition,
