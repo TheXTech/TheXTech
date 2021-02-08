@@ -405,19 +405,21 @@ void TouchScreenController::processTouchDevice(int dev_i)
         {
             FingerState &fs = found->second;
             int keysCount = g_touchKeyMap.findTouchKeys(finger_x, finger_y, fs);
-            for(int key = key_BEGIN; key < key_END; key++)
+            for(int key = key_BEGIN; key < key_END; ++key)
             {
                 if(m_touchHidden && key != key_toggleKeysView)
                     key = key_toggleKeysView;
                 if(fs.heldKeyPrev[key] && !fs.heldKey[key]) // set key off
                 {
                     updateFingerKeyState(fs, m_current_keys, key, false, m_current_extra_keys);
+                    D_pLogDebug("= Finger Key ID=%d released (move)", static_cast<int>(key));
                     m_keysHeld[key] = false;
                     fs.heldKeyPrev[key] = fs.heldKey[key];
                 }
                 else if(fs.heldKey[key]) // set key on and keep alive
                 {
                     updateFingerKeyState(fs, m_current_keys, key, true, m_current_extra_keys);
+                    D_pLogDebug("= Finger Key ID=%d pressed (move)", static_cast<int>(key));
                     m_keysHeld[key] = true;
                     fs.heldKeyPrev[key] = fs.heldKey[key];
                 }
@@ -436,6 +438,7 @@ void TouchScreenController::processTouchDevice(int dev_i)
                 if(st.heldKey[key]) // set key on
                 {
                     updateFingerKeyState(st, m_current_keys, key, true, m_current_extra_keys);
+                    D_pLogDebug("= Finger Key ID=%d pressed (put)", static_cast<int>(key));
                     m_keysHeld[key] = true;
                     st.heldKeyPrev[key] = st.heldKey[key];
                     // Also: when more than one touch devices found, choose one which is actual
@@ -444,9 +447,13 @@ void TouchScreenController::processTouchDevice(int dev_i)
                         m_actualDevice = dev_i;
                 }
             }
+
             st.alive = (keysCount > 0);
             if(st.alive)
+            {
+                D_pLogDebug("= Finger ID=%d came", static_cast<int>(finger_id));
                 m_fingers.insert({finger_id, st});
+            }
         }
 
         D_pLogDebug("= Finger press: ID=%d, X=%.04f, Y=%.04f, P=%.04f",
@@ -459,9 +466,15 @@ void TouchScreenController::processTouchDevice(int dev_i)
         {
             for(int key = key_BEGIN; key < key_END; key++)
             {
-                updateFingerKeyState(it->second, m_current_keys, key, false, m_current_extra_keys);
-                m_keysHeld[key] = false;
+                if(it->second.heldKey[key]) // Key was previously held
+                {
+                    updateFingerKeyState(it->second, m_current_keys, key, false, m_current_extra_keys);
+                    D_pLogDebug("= Finger Key ID=%d released (take)", static_cast<int>(key));
+                    m_keysHeld[key] = false;
+                }
             }
+            D_pLogDebug("= Finger ID=%d has gone", static_cast<int>(it->first));
+
             it = m_fingers.erase(it);
             continue;
         }
