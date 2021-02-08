@@ -1,0 +1,6 @@
+HEAD
+TL:"Speed-run unit-test";DC:11101;IT:"unit-test.lvlx";CPID:"SMBX1.3Compat";
+HEAD_END
+LEVELS
+ID:12;X:0;Y:0;LT:"Auto-runnable level";LF:"unit-test.lvlx";SP:1;
+LEVELS_END
