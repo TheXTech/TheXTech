@@ -50,25 +50,25 @@ static void compatInit(Compatibility_t &c)
     c.fix_skull_raft = true;
     c.fix_peach_escape_shell_surf = true;
 
-    if(g_speedRunnerMode >= SPEEDRUN_MODE_2) // Avoid the time-winning features
+    if(g_speedRunnerMode >= SPEEDRUN_MODE_2) // Make sure that bugs were same as on SMBX2 Beta 4 on this moment
     {
         c.enable_last_warp_hub_resume = false;
-    }
-
-    if(g_speedRunnerMode >= SPEEDRUN_MODE_3) // Strict vanilla SMBX
-    {
         c.fix_platforms_acceleration = false;
         c.fix_pokey_collapse = false;
-        c.fix_player_filter_bounce = false;
-        c.fix_player_downward_clip = false;
         c.fix_npc_downward_clip = false;
         c.fix_npc55_kick_ice_blocks = false;
         c.fix_climb_invisible_fences = false;
         c.fix_climb_bgo_speed_adding = false;
         c.enable_climb_bgo_layer_move = false;
-        c.fix_player_clip_wall_at_npc = false;
         c.fix_skull_raft = false;
         c.fix_peach_escape_shell_surf = false;
+    }
+
+    if(g_speedRunnerMode >= SPEEDRUN_MODE_3) // Strict vanilla SMBX
+    {
+        c.fix_player_filter_bounce = false;
+        c.fix_player_downward_clip = false;
+        c.fix_player_clip_wall_at_npc = false;
     }
 }
 
@@ -91,19 +91,21 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
 
     compat.beginGroup("compatibility");
     if(g_speedRunnerMode < SPEEDRUN_MODE_2)
+    {
         compat.read("enable-last-warp-hub-resume", c.enable_last_warp_hub_resume, c.enable_last_warp_hub_resume);
-    compat.read("fix-platform-acceleration", c.fix_platforms_acceleration, c.fix_platforms_acceleration);
-    compat.read("fix-pokey-collapse", c.fix_pokey_collapse, c.fix_pokey_collapse);
+        compat.read("fix-platform-acceleration", c.fix_platforms_acceleration, c.fix_platforms_acceleration);
+        compat.read("fix-pokey-collapse", c.fix_pokey_collapse, c.fix_pokey_collapse);
+        compat.read("fix-npc55-kick-ice-blocks", c.fix_npc55_kick_ice_blocks, c.fix_npc55_kick_ice_blocks);
+        compat.read("fix-climb-invisible-fences", c.fix_climb_invisible_fences, c.fix_climb_invisible_fences);
+        compat.read("fix-climb-bgo-speed-adding", c.fix_climb_bgo_speed_adding, c.fix_climb_bgo_speed_adding);
+        compat.read("enable-climb-bgo-layer-move", c.enable_climb_bgo_layer_move, c.enable_climb_bgo_layer_move);
+        compat.read("fix-player-clip-wall-at-npc", c.fix_player_clip_wall_at_npc, c.fix_player_clip_wall_at_npc);
+        compat.read("fix-skull-raft", c.fix_skull_raft, c.fix_skull_raft);
+        compat.read("fix-peach-escape-shell-surf", c.fix_peach_escape_shell_surf, c.fix_peach_escape_shell_surf);
+    }
     compat.read("fix-player-filter-bounce", c.fix_player_filter_bounce, c.fix_player_filter_bounce);
     compat.read("fix-player-downward-clip", c.fix_player_downward_clip, c.fix_player_downward_clip);
     compat.read("fix-npc-downward-clip", c.fix_npc_downward_clip, c.fix_npc_downward_clip);
-    compat.read("fix-npc55-kick-ice-blocks", c.fix_npc55_kick_ice_blocks, c.fix_npc55_kick_ice_blocks);
-    compat.read("fix-climb-invisible-fences", c.fix_climb_invisible_fences, c.fix_climb_invisible_fences);
-    compat.read("fix-climb-bgo-speed-adding", c.fix_climb_bgo_speed_adding, c.fix_climb_bgo_speed_adding);
-    compat.read("enable-climb-bgo-layer-move", c.enable_climb_bgo_layer_move, c.enable_climb_bgo_layer_move);
-    compat.read("fix-player-clip-wall-at-npc", c.fix_player_clip_wall_at_npc, c.fix_player_clip_wall_at_npc);
-    compat.read("fix-skull-raft", c.fix_skull_raft, c.fix_skull_raft);
-    compat.read("fix-peach-escape-shell-surf", c.fix_peach_escape_shell_surf, c.fix_peach_escape_shell_surf);
     compat.endGroup();
 }
 
