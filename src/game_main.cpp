@@ -1011,9 +1011,9 @@ void UpdateMacro()
             LevelMacroCounter = 0;
             if(!TestLevel)
             {
-                GameOutro = true;
                 BeatTheGame = true;
                 SaveGame();
+                GameOutro = true;
                 MenuMode = 0;
                 MenuCursor = 0;
             }
