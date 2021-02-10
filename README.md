@@ -7,43 +7,43 @@ SMBX engine, rewritten into C++ from VisualBasic 6.
 This paragraph contains a list of several questions you would to ask me, I'll give answers to most of them.
 
 ## What is this?
-It's a port of an old VB6 engine, purely written in C++. It reproduces an old engine completely (except an Editor), includes lots of its logical bugs (crashy bugs where they were found and then fixed).
+It's a port of an old VB6 engine, purely written in C++. It completely reproduces the old SMBX 1.3 engine (aside from it's Editor), includes many of its logical bugs (critical bugs that lead the game to crash or freeze got fixed).
 
 
 ## Why did you make it?
-Why? I have several purposes for why I made it:
-- It's a very convenient life model for research I want to use in PGE Engine development.
-- To provide a fully-compatible replica of the old engine for modern platforms to allow playing of old levels and episodes with the same feeling as they was played on original VB6-based SMBX game.
-- To make it work without it being necessary to use Wine on non-Windows platforms and allow it to run on any other than x86 platforms.
-- To be able to optimize it to make it use fewer hardware resources than the original VB6-based build of a game.
+I have several purposes for making it:
+- It's a very convenient research model I want to use in developent of the PGE Engine.
+- To provide a fully-compatible replica of the old engine for modern platforms, allowing to play old levels and episodes with the same feeling as if they were played on the original VB6-based SMBX game.
+- To make it work without the necessity to use Wine on non-Windows platforms and making it available on non-x86/x64 platforms.
+- Optimizing it to use fewer hardware resources than the original VB6-based game.
 
 
-## You have PGE Engine, why you have spent an over than one month to craft this thing?
-I need it for PGE Engine development directly, it's much easier to hack and inspect rather dealing with the old and inconvenient VB6 environment.
+## You have PGE Engine, why you have spent an over a month to craft this thing?
+I need it for PGE Engine development directly, it's much easier to hack and inspect than an old, inconvenient VB6 environment.
 
 
-## What's future of PGE Engine as TheXTech now exist?
-I'll continue development of PGE Engine as I still have to pass the second goal of PGE Project.
-Since foundation, PGE Project had two goals: 1) save SMBX; 2) give a flexible toolkit for new platform games. Opening of SMBX sources and introducing the TheXTech has solved the first goal: SMBX has been saved and now it's free and opensource cross-platform software. PGE Engine will be used to pass the second goal - giving a toolkit for new games. Unlike TheXTech, PGE Engine gives a full flexibility that allows anyone to build something new from scratch without inheriting of an old game base. However, TheXTech is needed for PGE Engine as a working research model to develop a new engine. It will be similar to GZDoom and Chocolate Doom ports of the Doom game: GZDoom is a powerful and functional engine, the best choice of modders; a Chocolate Doom is an accurate port of the original game to a modern platform with a purpose to represent an original game including even bugs. The PGE Engine intends to be like a GZDoom while TheXTech is an analog of Chocolate Doom to represent an original game on modern platforms.
+## What's future of PGE Engine now that TheXTech exists?
+I'll continue developing the PGE Engine as I have yet to reach the second goal of the project.
+Since it's foundation, the PGE Project had two goals: 1) save SMBX; 2) give a flexible toolkit for new platform games. The opening of SMBX's source-code and introducing TheXTech has solved the first goal: SMBX has been saved and now it's free/opensource cross-platform software. PGE Engine will be used for the second goal - giving a toolkit for new games. Unlike TheXTech, PGE Engine gives a high degree of flexibility that allows anyone to build something new from scratch without inheriting an old game base. However, TheXTech is needed for PGE Engine as a working research model to develop the new engine. It will be similar to GZDoom and Chocolate Doom ports of the Doom game: GZDoom is a powerful and functional engine, the best choice for modders; Chocolate Doom is an accurate port of the original game to a modern platform with the purpose to represent the original game including even bugs. The PGE Engine intends to be like GZDoom while TheXTech is an analog of Chocolate Doom to represent an original game on modern platforms.
 
 
 ## Can LunaLua work on this?
 No, LunaLua won't work: this project is binary-incompatible with LunaLua. This also means that SMBX2 content is incompatible.
 
 
-## Why code here is so bad?
-Originally, a most of code in "src" folder was writtein in VB6 by it's original author. I did the whole conversion of code with an effort on accurate reproduction. So, the rest of code is identical to the code that was written in VB6 originally. VB6 platform had a lot of challenges and limitations where are:
-- All variables are global and accessible from every module and form by default without any includes or imports. The reason why "globals.h" exist: it has a full list of globally available variables.
-- Limited and inconvenient support for classes, therefore a rest of code did abused a ton of global variables and arrays (also an initial lack of experience of original author was an another factor why this mess is exist here).
-- All functions in all modules are global and can be called from each module directly. Except calls where marked as "private". Therefore I had an additional work to provide inclusions into files where these calls requested.
-- Why so much `if-elseif-elseif-elseif-elseif-....?` Yes, here probably will be correct to use `switch()` (in VB6 the `Select Case` analogue) operator. One another factor that explains that original author had a low experience while coded this project.
-- Why so deep `if() { if {} if { .... } }` lasanha? Two cases: 1) low experinece of original author, 2) workaround to don't check all conditions of expression which may cause a crash. In C++ with multiple conditions splitted by `&&` operator, never executing when one of them gets a false result. In VB6, ALL conditions in expression getting be always executed. This difference caused the next situation: in VB6, an expression `if A < 5 And Array(A) = 1 Then` will cause a crash when A is more than 5. In C++ the same `if(A < 5 && Array[A] == 1)` expression will never crash because a second check gets be never executed if a first check gave a false result.
-- Why so long expressions like `if(id == 1 || id == 3 || id == 4 || ... id == N)`? Rather making a ton of conditions like this, it's would be better to use classes with a polymorphism and separate the logic of every object between different classes. Also should be solvable with having to use of function pointers (which aren't possible in VB6 without workaronds, but possible in C++). However again, a low experience of original author together with a bunch of VB6 limits did caused these constructions.
+## Why is the code here is so bad?
+Originally, most of the code in the "*src*" folder was written in VB6 by it's original author. I did a whole conversion of the code with an effort to accurate reproduction. So, a lot of the code is identical to what was written in VB6 originally. VB6 platform had a lot of challenges and limitations such as:
+- All variables are global and accessible from every module and form by default without any includes or imports. The reason why "globals.h" exists: it has a full list of globally available variables.
+- Limited and inconvenient support for classes, therefore the code tends to abuse a ton of global variables and arrays (also an initial lack of experience of the original author was an another factor that lead to this mess).
+- All functions in all modules are global and can be called from each module directly. Except calls marked as "private". Therefore I had an additional work to provide inclusions into files where these calls are requested.
+- Why so much `if-elseif-elseif-elseif-elseif-....?` Yes, here probably will be correct to use `switch()` (in VB6 the `Select Case` analogue) operator. Another factor that shows the original author had a low amount of experience when he coded this project.
+- Why the `if() { if {} if { .... } }` lasagna? Two reasons: 1) inexperience of original author, 2) workaround to not check all conditions of expression which may cause a crash. In C++ with multiple conditions splitted by `&&` operator, never executing when one of them gets a false result. In VB6, ALL conditions in expression getting be always executed. This difference caused the next situation: in VB6, an expression `if A < 5 And Array(A) = 1 Then` will cause a crash when A is more than 5. In C++ the same `if(A < 5 && Array[A] == 1)` expression will never crash because a second check gets be never executed if a first check gave a false result.
+- Why so long expressions like `if(id == 1 || id == 3 || id == 4 || ... id == N)`? Rather making a ton of conditions like this, it's would be better to use classes with a polymorphism and separate the logic of every object between different classes. Also should be solvable with having to use of function pointers (which aren't possible in VB6 without workaronds, but possible in C++). But, again, the original author's inexperience combined with a bunch of VB6 limits caused these constructions.
 
 
 ## How to use this?
 Here are many ways to play games with it:
-- there are some ready for use packages, just take and use as you did it with SMBX.
+- there are some ready-to-use packages, just take and play as you did it with SMBX.
 - [macOS users, skip this]: use by the same way as an original game: put an executable file into the game root folder with an "thextech.ini" that contains next text:
 ```
 [Main]
