@@ -653,6 +653,7 @@ void PathWait()
         DoEvents();
         if(canProceedFrame())
         {
+            speedRun_tick();
             UpdateGraphics2();
             UpdateSound();
 
