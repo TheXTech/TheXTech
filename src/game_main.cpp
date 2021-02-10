@@ -941,7 +941,7 @@ void UpdateMacro()
                 computeFrameTime2();
 
                 LevelMacroCounter += 1;
-                if(LevelMacroCounter >= 195) /*300*/
+                if(LevelMacroCounter >= 192) /*300*/
                     break;
             }
 
