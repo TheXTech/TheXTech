@@ -3,8 +3,7 @@
 SMBX engine, rewritten into C++ from VisualBasic 6.
 
 
-# Frequently Asking Questions
-This paragraph contains a list of several questions you would to ask me, I'll give answers to most of them.
+# Frequently Asked Questions
 
 ## What is this?
 It's a port of an old VB6 engine, purely written in C++. It completely reproduces the old SMBX 1.3 engine (aside from it's Editor), includes many of its logical bugs (critical bugs that lead the game to crash or freeze got fixed).
@@ -18,11 +17,11 @@ I have several purposes for making it:
 - Optimizing it to use fewer hardware resources than the original VB6-based game.
 
 
-## You have PGE Engine, why you have spent an over a month to craft this thing?
+## You have PGE Engine, why you have spent over a month to craft this thing?
 I need it for PGE Engine development directly, it's much easier to hack and inspect than an old, inconvenient VB6 environment.
 
 
-## What's future of PGE Engine now that TheXTech exists?
+## What's the future of PGE Engine now that TheXTech exists?
 I'll continue developing the PGE Engine as I have yet to reach the second goal of the project.
 Since it's foundation, the PGE Project had two goals: 1) save SMBX; 2) give a flexible toolkit for new platform games. The opening of SMBX's source-code and introducing TheXTech has solved the first goal: SMBX has been saved and now it's free/opensource cross-platform software. PGE Engine will be used for the second goal - giving a toolkit for new games. Unlike TheXTech, PGE Engine gives a high degree of flexibility that allows anyone to build something new from scratch without inheriting an old game base. However, TheXTech is needed for PGE Engine as a working research model to develop the new engine. It will be similar to GZDoom and Chocolate Doom ports of the Doom game: GZDoom is a powerful and functional engine, the best choice for modders; Chocolate Doom is an accurate port of the original game to a modern platform with the purpose to represent the original game including even bugs. The PGE Engine intends to be like GZDoom while TheXTech is an analog of Chocolate Doom to represent an original game on modern platforms.
 
@@ -31,8 +30,8 @@ Since it's foundation, the PGE Project had two goals: 1) save SMBX; 2) give a fl
 No, LunaLua won't work: this project is binary-incompatible with LunaLua. This also means that SMBX2 content is incompatible.
 
 
-## Why is the code here is so bad?
-Originally, most of the code in the "*src*" folder was written in VB6 by it's original author. I did a whole conversion of the code with an effort to accurate reproduction. So, a lot of the code is identical to what was written in VB6 originally. VB6 platform had a lot of challenges and limitations such as:
+## Why is the code here so bad?
+The original author wrote most of the code in the "*src*" folder in VB6. I did a whole conversion of the code with an effort to accurate reproduction. So, a lot of the code is identical to what was written in VB6 originally. The VB6 platform had a lot of challenges and limitations such as:
 - All variables are global and accessible from every module and form by default without any includes or imports. The reason why "globals.h" exists: it has a full list of globally available variables.
 - Limited and inconvenient support for classes, therefore the code tends to abuse a ton of global variables and arrays (also an initial lack of experience of the original author was an another factor that lead to this mess).
 - All functions in all modules are global and can be called from each module directly. Except calls marked as "private". Therefore I had an additional work to provide inclusions into files where these calls are requested.
@@ -89,12 +88,12 @@ If you want to replace default assets with your own, you can modify the content 
 
 
 ## How to build it?
-You can read a guide how to build this project from a source code which you can find here: https://github.com/Wohlstand/TheXTech/wiki/Building-the-game
+You can read a guide how to build this project from source here: https://github.com/Wohlstand/TheXTech/wiki/Building-the-game
 
-To build it, you need to have next things:
+To build it, you need to have the following things:
 - CMake
-- Ninja optionally (to speeds-up the build process)
-- Compatible C/C++ compiler (GCC, Clang, MinGW, MSVC haven't tested yet)
+- Ninja optionally (to speed-up the build process)
+- Compatible C/C++ compiler (GCC, Clang, MinGW, MSVC hasn't been tested yet)
 - Git (required to pull submodules and clone source of dependent libraries to build them in place)
 - Mercurial (required to clone an official SDL2 repository to build it in place here)
 - Optionally: system-wide installed dependencies: SDL2, libFreeImageLite (a modded implementation of the FreeImage), MixerX sound library, AudioCodecs collection of libraries. Having them be installed in a system gives a major build speed up. However, it's possible to build all these dependencies in place here with a cost of extra build time being added.
