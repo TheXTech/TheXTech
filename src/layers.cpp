@@ -287,6 +287,9 @@ void ProcEvent(std::string EventName, bool NoEffect)
     {
         if(equalCase(EventName, Events[A].Name))
         {
+            if(equalCase(EventName, "Boss Dead"))
+                speedRun_bossDeadEvent();
+
             for(B = 0; B <= numSections; B++)
             {
                 if(Events[A].Music[B] == -2)
