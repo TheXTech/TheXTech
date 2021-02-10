@@ -41,6 +41,7 @@ struct Compatibility_t
     bool fix_player_clip_wall_at_npc;
     bool fix_skull_raft;
     bool fix_peach_escape_shell_surf;
+    bool fix_keyhole_framerate;
 };
 
 extern Compatibility_t g_compatibility;

@@ -916,32 +916,44 @@ void UpdateMacro()
     }
     else if(LevelMacro == LEVELMACRO_KEYHOLE_EXIT)
     {
-//        float tempTime = 0;
-//        float gameTime = 0;
+        float tempTime = 0;
+        float gameTime = 0;
+        int keyholeMax = g_compatibility.fix_keyhole_framerate ? 192 : 300;
 
-        do // FIXME: Don't loop too fast here
+        do
         {
             // tempTime = Timer - Int(Timer)
 
-//            tempTime = (float(SDL_GetTicks()) / 1000.0f) - std::floor(float(SDL_GetTicks()) / 1000.0f);
+            tempTime = (float(SDL_GetTicks()) / 1000.0f) - std::floor(float(SDL_GetTicks()) / 1000.0f);
 //            if(tempTime > (float)(gameTime + 0.01f) || tempTime < gameTime)
-            DoEvents();
 
-            if(canProceedFrame())
+            if(g_compatibility.fix_keyhole_framerate)
+                DoEvents();
+
+            if(g_compatibility.fix_keyhole_framerate ?
+               canProceedFrame() :
+               (tempTime > (float)(gameTime + 0.01f) || tempTime < gameTime))
             {
-//                gameTime = tempTime;
-                computeFrameTime1();
+                gameTime = tempTime;
+
+                if(g_compatibility.fix_keyhole_framerate)
+                    computeFrameTime1();
+                else
+                    DoEvents();
 
                 speedRun_tick();
                 UpdateGraphics();
                 UpdateSound();
                 BlockFrames();
-                DoEvents();
 
-                computeFrameTime2();
+                if(g_compatibility.fix_keyhole_framerate)
+                {
+                    DoEvents();
+                    computeFrameTime2();
+                }
 
                 LevelMacroCounter += 1;
-                if(LevelMacroCounter >= 192) /*300*/
+                if(LevelMacroCounter >= keyholeMax) /*300*/
                     break;
             }
 
