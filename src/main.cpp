@@ -289,6 +289,12 @@ int main(int argc, char**argv)
 
         setup.speedRunnerMode = speedRunMode.getValue();
         setup.speedRunnerSemiTransparent = switchSpeedRunSemiTransparent.getValue();
+
+        if(setup.speedRunnerMode >= 1) // Always show FPS and don't pause the game work when focusing other windows
+        {
+            setup.testShowFPS = true;
+            setup.neverPause = true;
+        }
     }
     catch(TCLAP::ArgException &e)   // catch any exceptions
     {
