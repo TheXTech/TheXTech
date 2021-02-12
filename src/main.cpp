@@ -181,15 +181,25 @@ int main(int argc, char**argv)
 
         TCLAP::SwitchArg switchBattleMode("b", "battle", "Test level in battle mode", false);
 
-        TCLAP::ValueArg<std::string> playerCharacter1("1", "player1", "Setup of playable character for player 1",
-                                                        false, "",
-                                                       "c1;s2;m0;t0 : c - character, s - state, m - mount, t - mount type",
-                                                       cmd);
+        TCLAP::ValueArg<std::string> playerCharacter1("1",
+                                                      "player1",
+                                                      "Setup of playable character for player 1:"
+                                                      "   Semi-colon separated key-argument values:\n"
+                                                      "   c - character, s - state, m - mount, t - mount type. Example:"
+                                                      "   c1;s2;m3;t0 - Character as 1, State as 2, Mount as 3, Mount type as 0",
+                                                      false, "",
+                                                      "c1;s2;m0;t0",
+                                                      cmd);
 
-        TCLAP::ValueArg<std::string> playerCharacter2("2", "player2", "Setup of playable character for player 1",
-                                                        false, "",
-                                                       "c1;s2;m0;t0 : c - character, s - state, m - mount, t - mount type",
-                                                       cmd);
+        TCLAP::ValueArg<std::string> playerCharacter2("2",
+                                                      "player2",
+                                                      "Setup of playable character for player 2:"
+                                                      "   Semi-colon separated key-argument values:\n"
+                                                      "   c - character, s - state, m - mount, t - mount type. Example:"
+                                                      "   c1;s2;m3;t0 - Character as 1, State as 2, Mount as 3, Mount type as 0",
+                                                      false, "",
+                                                      "c1;s2;m0;t0",
+                                                      cmd);
 
         TCLAP::SwitchArg switchTestGodMode("g", "god-mode", "Enable god mode in level testing", false);
         TCLAP::SwitchArg switchTestGrabAll("a", "grab-all", "Enable ability to grab everything while level testing", false);
@@ -200,12 +210,13 @@ int main(int argc, char**argv)
 
         TCLAP::ValueArg<unsigned int> speedRunMode(std::string(), "speed-run-mode",
                                                    "Enable the speed-runer mode: the playthrough timer will be shown, "
-                                                   "and some gameplay limitations will be enabled.",
+                                                   "and some gameplay limitations will be enabled. Supported values:\n"
+                                                   "   0 - Disabled [Default]\n"
+                                                   "   1 - TheXTech native\n"
+                                                   "   2 - Disable time-winning updates\n"
+                                                   "   3 - Strict vanilla, enable all bugs\n",
                                                     false, 0u,
-                                                   "Number: 0 - disabled, "
-                                                   "1 - TheXTech native, "
-                                                   "2 - Disable time-winning updates, "
-                                                   "3 - Strict vanilla, enable all bugs.",
+                                                   "0, 1, 2, or 3",
                                                    cmd);
         TCLAP::SwitchArg switchSpeedRunSemiTransparent(std::string(), "speed-run-semitransparent",
                                                        "Make the speed-runner mode timer be drawn transparently", false);
