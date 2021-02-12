@@ -662,7 +662,7 @@ void UpdateGraphics2()
 
     frameRenderEnd();
 
-    if(frmMain.lazyLoadedBytes() > 200000) // Reset timer while loading many pictures at the same time
-        resetFrameTimer();
+//    if(frmMain.lazyLoadedBytes() > 200000) // Reset timer while loading many pictures at the same time
+//        resetFrameTimer();
     frmMain.lazyLoadedBytesReset();
 }
