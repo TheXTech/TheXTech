@@ -147,7 +147,6 @@ static bool bindJoystickKey(SDL_Joystick *joy, KM_Key &k)
 
     for(int i = 0; i < hats; i++)
     {
-        val = 0;
         val = SDL_JoystickGetHat(joy, i);
 
         if(val != 0)
@@ -161,7 +160,6 @@ static bool bindJoystickKey(SDL_Joystick *joy, KM_Key &k)
 
     for(int i = 0; i < buttons; i++)
     {
-        val = 0;
         val = SDL_JoystickGetButton(joy, i);
 
         if(val == 1)
@@ -175,7 +173,6 @@ static bool bindJoystickKey(SDL_Joystick *joy, KM_Key &k)
 
     for(int i = 0; i < axes; i++)
     {
-        val = 0;
         //Note: The SDL 2.0.6 and higher is requires to support this function
         if(SDL_JoystickGetAxisInitialState(joy, i, &val_initial) == SDL_FALSE)
             break;
