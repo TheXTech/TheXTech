@@ -1324,7 +1324,7 @@ void MenuLoop()
                 else if(getNewJoystick)
                 {
                     int JoyNum = useJoystick[MenuMode - 30] - 1;
-                    SDL_JoystickUpdate();
+                    //SDL_JoystickUpdate();
                     KM_Key joyKey;
                     bool gotNewKey = PollJoystick(JoyNum, joyKey);
 
@@ -1400,7 +1400,7 @@ void MenuLoop()
                         if(MenuCursor == 0)
                         {
                             PlaySound(29);
-                            useJoystick[MenuMode - 30] = useJoystick[MenuMode - 30] + 1;
+                            useJoystick[MenuMode - 30] += 1;
                             if(useJoystick[MenuMode - 30] > numJoysticks)
                                 useJoystick[MenuMode - 30] = 0;
                         }

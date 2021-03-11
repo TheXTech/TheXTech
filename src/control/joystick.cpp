@@ -60,11 +60,14 @@ static void updateJoyKey(SDL_Joystick *j, bool &key, const KM_Key &mkey)
         }
         val = SDL_JoystickGetAxis(j, mkey.id);
 
-        if(mkey.val > val_initial)
+        if(SDL_abs(val) <= 15000)
+            key_new = false;
+        else if(mkey.val > val_initial)
             key_new = (val > val_initial);
         else if(mkey.val < val_initial)
             key_new = (val < val_initial);
-        else key_new = false;
+        else
+            key_new = false;
 
         break;
 
@@ -114,7 +117,7 @@ static bool bindJoystickKey(SDL_Joystick *joy, KM_Key &k)
     Sint16 val_initial = 0;
     int dx = 0, dy = 0;
     //SDL_PumpEvents();
-    SDL_JoystickUpdate();
+    //SDL_JoystickUpdate();
     int balls = SDL_JoystickNumBalls(joy);
     int hats = SDL_JoystickNumHats(joy);
     int buttons = SDL_JoystickNumButtons(joy);
@@ -209,8 +212,8 @@ void UpdateControls()
 //        }
 //    }
 
-    if(numJoysticks > 0 && (useJoystick[1] || useJoystick[2]))
-        SDL_JoystickUpdate();
+//    if(numJoysticks > 0 && (useJoystick[1] || useJoystick[2]))
+//        SDL_JoystickUpdate();
 
     For(B, 1, numPlayers)
     {
