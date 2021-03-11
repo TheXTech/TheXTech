@@ -42,6 +42,22 @@ static std::vector<SDL_Joystick*> s_joysticks;
 static TouchScreenController      s_touch;
 #endif
 
+static std::string getJoyUuidStr(SDL_Joystick *j)
+{
+    SDL_JoystickGUID guid = SDL_JoystickGetGUID(j);
+    std::string guidStr;
+    guidStr.resize(32);
+    SDL_JoystickGetGUIDString(guid, &guidStr[0], 33);
+    return guidStr;
+}
+
+std::string joyGetUuidStr(int joystick)
+{
+    if(joystick < 0 || joystick >= int(s_joysticks.size()))
+        return std::string();
+    return getJoyUuidStr(s_joysticks[joystick]);
+}
+
 static void updateJoyKey(SDL_Joystick *j, bool &key, const KM_Key &mkey)
 {
     Sint32 val = 0, dx = 0, dy = 0;
@@ -474,10 +490,12 @@ bool StartJoystick(int JoystickNumber)
         int hats = SDL_JoystickNumHats(joy);
         int buttons = SDL_JoystickNumButtons(joy);
         int axes = SDL_JoystickNumAxes(joy);
+        std::string guidStr = getJoyUuidStr(joy);
 
         pLogDebug("==========================");
         pLogDebug("Josytick %s", SDL_JoystickName(joy));
         pLogDebug("--------------------------");
+        pLogDebug("GUID:    %s", guidStr.c_str());
         pLogDebug("Axes:    %d", axes);
         pLogDebug("Balls:   %d", balls);
         pLogDebug("Hats:    %d", hats);

@@ -40,6 +40,8 @@ void UpdateTouchScreenSize();
 
 int InitJoysticks();
 
+std::string joyGetUuidStr(int joystick);
+
 bool JoyIsKeyDown(int JoystickNumber, const KM_Key &key);
 
 void CloseJoysticks();
