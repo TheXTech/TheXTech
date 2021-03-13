@@ -103,6 +103,12 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
     SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight");
 #endif
 
+#if defined(__ANDROID__)
+    SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 5);
+    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 6);
+    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 5);
+#endif
+
     Uint32 sdlInitFlags = 0;
     // Prepare flags for SDL initialization
 #ifndef __EMSCRIPTEN__
