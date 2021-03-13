@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">The X-Tech 引擎</string>
+    <string name="title_activity_game_settings">游戏设置</string>
+    <string name="start_game_button">开始游戏</string>
+    <string name="settings_button">设置</string>
+    <string name="setup_speedrunner">计时模式</string>
+    <string name="setup_sr_stopwatchSemiTransparent">半透明计时器</string>
+    <string name="setup_sr_speedrunMode">计时模式</string>
+    <string name="setup_touchscreen_mode">按键模式</string>
+    <string name="setup_max_framerate_mode">最大帧率</string>
+    <string name="setup_show_framerate">显示帧数</string>
+    <string name="setup_touchscreen_alwaysshow">启动时显示虚拟按键</string>
+    <string name="setup_touchscreen_controller_enable">使用虚拟按键</string>
+    <string name="setup_display_cat">显示</string>
+    <string name="setup_control_cat">虚拟按键</string>
+    <string name="setup_general_cat">常规</string>
+    <string name="setup_disable_sound">禁用声音</string>
+    <string name="settings_enable_frameskip">启用跳帧</string>
+    <string name="game_logo_label">游戏logo</string>
+</resources>
