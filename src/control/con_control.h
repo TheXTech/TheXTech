@@ -23,38 +23,80 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef JOYSTICK_H
-#define JOYSTICK_H
+#ifndef CON_CONTROL_H
+#define CON_CONTROL_H
 
+#include <cstdint>
 #include <string>
-#include "../range_arr.hpp"
-#include "con_control.h"
 
-// Public Sub UpdateControls() 'Gets players controls
-// Gets players controls
-void UpdateControls();
+//Public Type conKeyboard  'Input settings for the keyboard
+struct ConKeyboard_t
+{
+//    Up As Integer
+    int Up = 0;
+//    Down As Integer
+    int Down = 0;
+//    Left As Integer
+    int Left = 0;
+//    Right As Integer
+    int Right = 0;
+//    Jump As Integer
+    int Jump = 0;
+//    AltJump As Integer
+    int AltJump = 0;
+//    Run As Integer
+    int Run = 0;
+//    AltRun As Integer
+    int AltRun = 0;
+//    Drop As Integer
+    int Drop = 0;
+//    Start As Integer
+    int Start = 0;
+//End Type
+};
 
-#ifdef USE_TOUCHSCREEN_CONTROLLER
-void RenderTouchControls();
-void UpdateTouchScreenSize();
-#endif
+struct KM_Key
+{
+    int val = -1;
+    int id = -1;
+    int type = -1;
+};
 
-extern int            InitJoysticks();
+//Public Type conJoystick   'Input settings for the joystick
+struct ConJoystick_t
+{
+// EXTRA
+    std::string hwGUID;
+    bool isGameController = false;
 
-extern int            joyCount();
-extern ConJoystick_t &joyGetByUuid(const std::string &uuid);
-extern ConJoystick_t &joyGetByIndex(int joyNum);
-extern void           joySetByUuid(const std::string &uuid, const ConJoystick_t &cj);
+    enum CtrlTypes
+    {
+        NoControl=-1,
+        JoyAxis=0,
+        JoyBallX,
+        JoyBallY,
+        JoyHat,
+        JoyButton
+    };
 
-extern std::string    joyGetUuidStr(int joystick);
+    KM_Key Up;
+    KM_Key Down;
+    KM_Key Left;
+    KM_Key Right;
 
-bool JoyIsKeyDown(int JoystickNumber, const KM_Key &key);
+//    Jump As Integer
+    KM_Key Jump;
+//    Run As Integer
+    KM_Key Run;
+//    Drop As Integer
+    KM_Key Drop;
+//    Start As Integer
+    KM_Key Start;
+//    AltJump As Integer
+    KM_Key AltJump;
+//    AltRun As Integer
+    KM_Key AltRun;
+//End Type
+};
 
-void CloseJoysticks();
-// Public Function StartJoystick(Optional ByVal JoystickNumber As Integer = 0) As Boolean
-bool StartJoystick(int JoystickNumber);
-// Public Sub PollJoystick()
-bool PollJoystick(int joystick, KM_Key &key);
-
-
-#endif // JOYSTICK_H
+#endif // CON_CONTROL_H

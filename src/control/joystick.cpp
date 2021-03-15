@@ -23,6 +23,7 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#include <unordered_map>
 #include <Logger/logger.h>
 
 #include "../globals.h"
@@ -38,6 +39,7 @@
 // this module handles the players controls, both keyboard and joystick
 
 static std::vector<SDL_Joystick*> s_joysticks;
+static std::unordered_map<std::string, ConJoystick_t> s_joystickControls;
 #ifdef USE_TOUCHSCREEN_CONTROLLER
 static TouchScreenController      s_touch;
 #endif
@@ -57,6 +59,33 @@ std::string joyGetUuidStr(int joystick)
         return std::string();
     return getJoyUuidStr(s_joysticks[joystick]);
 }
+
+int joyCount()
+{
+    return (int)s_joysticks.size();
+}
+
+ConJoystick_t &joyGetByUuid(const std::string &uuid)
+{
+    return s_joystickControls[uuid];
+}
+
+ConJoystick_t &joyGetByIndex(int joyNum)
+{
+    SDL_assert(joyNum >= 0 && (size_t)joyNum < s_joysticks.size());
+    std::string guidStr = getJoyUuidStr(s_joysticks[joyNum]);
+    auto &ret = s_joystickControls[guidStr];
+    if(ret.hwGUID.empty() && ret.hwGUID != guidStr)
+        ret.hwGUID = guidStr;
+    return ret;
+}
+
+void joySetByUuid(const std::string &uuid, const ConJoystick_t &cj)
+{
+    SDL_memcpy(&s_joystickControls[uuid], &cj, sizeof(ConJoystick_t));
+}
+
+
 
 static void updateJoyKey(SDL_Joystick *j, bool &key, const KM_Key &mkey)
 {
@@ -452,14 +481,19 @@ int InitJoysticks()
         SDL_Joystick *joy = SDL_JoystickOpen(i);
         if(joy)
         {
+            std::string guidStr = getJoyUuidStr(joy);
+            auto &j = s_joystickControls[guidStr];
+            j.hwGUID = guidStr;
+            j.isGameController = SDL_IsGameController(i);
             pLogDebug("==========================");
             pLogDebug("Josytick %s", SDL_JoystickName(joy));
             pLogDebug("--------------------------");
+            pLogDebug("GUID:    %s", guidStr.c_str());
             pLogDebug("Axes:    %d", SDL_JoystickNumAxes(joy));
             pLogDebug("Balls:   %d", SDL_JoystickNumBalls(joy));
             pLogDebug("Hats:    %d", SDL_JoystickNumHats(joy));
             pLogDebug("Buttons: %d", SDL_JoystickNumButtons(joy));
-            if(SDL_IsGameController(i))
+            if(j.isGameController)
                 pLogDebug("Supported by the game controller interface!");
             pLogDebug("==========================");
 

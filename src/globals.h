@@ -40,6 +40,7 @@
 #include "range_arr.hpp"
 #include "rand.h"
 #include "floats.h"
+#include "control/con_control.h"
 
 #include "global_constants.h"
 #include "controls.h"
@@ -235,72 +236,7 @@ struct EditorControls_t
 //End Type
 };
 
-
-//Public Type conKeyboard  'Input settings for the keyboard
-struct ConKeyboard_t
-{
-//    Up As Integer
-    int Up = 0;
-//    Down As Integer
-    int Down = 0;
-//    Left As Integer
-    int Left = 0;
-//    Right As Integer
-    int Right = 0;
-//    Jump As Integer
-    int Jump = 0;
-//    AltJump As Integer
-    int AltJump = 0;
-//    Run As Integer
-    int Run = 0;
-//    AltRun As Integer
-    int AltRun = 0;
-//    Drop As Integer
-    int Drop = 0;
-//    Start As Integer
-    int Start = 0;
-//End Type
-};
-
-struct KM_Key
-{
-    int val = -1;
-    int id = -1;
-    int type = -1;
-};
-
-//Public Type conJoystick   'Input settings for the joystick
-struct ConJoystick_t
-{
-// EXTRA
-    enum CtrlTypes
-    {
-        NoControl=-1,
-        JoyAxis=0,
-        JoyBallX,
-        JoyBallY,
-        JoyHat,
-        JoyButton
-    };
-    KM_Key Up;
-    KM_Key Down;
-    KM_Key Left;
-    KM_Key Right;
-
-//    Jump As Integer
-    KM_Key Jump;
-//    Run As Integer
-    KM_Key Run;
-//    Drop As Integer
-    KM_Key Drop;
-//    Start As Integer
-    KM_Key Start;
-//    AltJump As Integer
-    KM_Key AltJump;
-//    AltRun As Integer
-    KM_Key AltRun;
-//End Type
-};
+// Structures moved into con_control.h
 
 //Public conKeyboard(1 To 2) As conKeyboard  'player 1 and 2's controls
 extern RangeArr<ConKeyboard_t, 1, 2> conKeyboard;

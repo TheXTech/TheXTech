@@ -29,6 +29,7 @@
 #include "../game_main.h"
 #include "../graphics.h"
 #include "../sound.h"
+#include "../control/joystick.h"
 
 #include <Utils/files.h>
 #include <IniProcessor/ini_processing.h>
@@ -110,6 +111,23 @@ void OpenConfig()
         config.read("ground-pound-by-alt-run", GameplayPoundByAltRun, false);
         config.endGroup();
 
+        for(int i = 0; i < joyCount(); i++)
+        {
+            auto &j = joyGetByIndex(i);
+            config.beginGroup(fmt::format_ne("joystick-{0}", j.hwGUID));
+            readJoyKey(config, "Up", j.Up);
+            readJoyKey(config, "Down", j.Down);
+            readJoyKey(config, "Left", j.Left);
+            readJoyKey(config, "Right", j.Right);
+            readJoyKey(config, "Run", j.Run);
+            readJoyKey(config, "Jump", j.Jump);
+            readJoyKey(config, "Drop", j.Drop);
+            readJoyKey(config, "Start", j.Start);
+            readJoyKey(config, "AltJump", j.AltJump);
+            readJoyKey(config, "AltRun", j.AltRun);
+            config.endGroup();
+        }
+
         For(A, 1, 2)
         {
             config.beginGroup(fmt::format_ne("player-{0}-keyboard", A));
@@ -168,6 +186,23 @@ void SaveConfig()
     config.beginGroup("gameplay");
     config.setValue("ground-pound-by-alt-run", GameplayPoundByAltRun);
     config.endGroup();
+
+    for(int i = 0; i < joyCount(); i++)
+    {
+        auto &j = joyGetByIndex(i);
+        config.beginGroup(fmt::format_ne("joystick-{0}", j.hwGUID));
+        writeJoyKey(config, "Up", j.Up);
+        writeJoyKey(config, "Down", j.Down);
+        writeJoyKey(config, "Left", j.Left);
+        writeJoyKey(config, "Right", j.Right);
+        writeJoyKey(config, "Run", j.Run);
+        writeJoyKey(config, "Jump", j.Jump);
+        writeJoyKey(config, "Drop", j.Drop);
+        writeJoyKey(config, "Start", j.Start);
+        writeJoyKey(config, "AltJump", j.AltJump);
+        writeJoyKey(config, "AltRun", j.AltRun);
+        config.endGroup();
+    }
 
     For(A, 1, 2)
     {
