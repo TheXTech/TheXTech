@@ -32,7 +32,7 @@
 #include <chrono>
 #endif
 
-#if defined(__EMSCRIPTEN__)
+#if defined(__EMSCRIPTEN__) || defined(__APPLE__)
 #include <time.h>
 #endif
 
