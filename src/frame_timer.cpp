@@ -36,6 +36,14 @@
 #include <time.h>
 #endif
 
+#ifndef _WIN32
+#   if defined(__APPLE__)
+#       define XTECH_CLOCK_TYPE CLOCK_MONOTONIC
+#   else
+#       define XTECH_CLOCK_TYPE CLOCK_MONOTONIC_RAW
+#   endif
+#endif
+
 #include <Logger/logger.h>
 #include "pge_delay.h"
 
@@ -126,7 +134,7 @@ static SDL_INLINE nanotime_t getNanoTime()
 #ifdef _WIN32
     win_clock_gettime(&ts);
 #else
-    clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
+    clock_gettime(XTECH_CLOCK_TYPE, &ts);
 #endif
     return timespecToNanotime(&ts);
 }
