@@ -29,20 +29,21 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <time.h>
-#include <chrono>
 #endif
+
+#include <chrono>
 
 #if defined(__EMSCRIPTEN__) || defined(__APPLE__)
 #include <time.h>
 #endif
 
-#ifndef _WIN32
-#   if defined(__APPLE__)
-#       define XTECH_CLOCK_TYPE CLOCK_MONOTONIC
-#   else
-#       define XTECH_CLOCK_TYPE CLOCK_MONOTONIC_RAW
-#   endif
-#endif
+//#ifndef _WIN32
+//#   if defined(__APPLE__)
+//#       define XTECH_CLOCK_TYPE CLOCK_MONOTONIC
+//#   else
+//#       define XTECH_CLOCK_TYPE CLOCK_MONOTONIC_RAW
+//#   endif
+//#endif
 
 #include <Logger/logger.h>
 #include "pge_delay.h"
@@ -71,18 +72,18 @@
 
 typedef int64_t nanotime_t;
 
-#ifdef _WIN32
-
 static SDL_INLINE struct timespec nanotimeToTimespec(nanotime_t time);
 
-static SDL_INLINE int win_clock_gettime(struct timespec *ct)
-{
-    auto n = std::chrono::high_resolution_clock::now().time_since_epoch();
-    auto ctt = nanotimeToTimespec(n.count());
-    ct->tv_nsec = ctt.tv_nsec;
-    ct->tv_sec = ctt.tv_sec;
-    return 0;
-}
+//static SDL_INLINE int chrono_clock_gettime(struct timespec *ct)
+//{
+//    auto n = std::chrono::high_resolution_clock::now().time_since_epoch();
+//    auto ctt = nanotimeToTimespec(n.count());
+//    ct->tv_nsec = ctt.tv_nsec;
+//    ct->tv_sec = ctt.tv_sec;
+//    return 0;
+//}
+
+#ifdef _WIN32
 
 // https://gist.github.com/Youka/4153f12cf2e17a77314c
 
@@ -115,10 +116,10 @@ static BOOLEAN SDL_INLINE win_nanosleep(LONGLONG ns)
 }
 #endif
 
-static SDL_INLINE nanotime_t timespecToNanotime(const struct timespec *ts)
-{
-    return static_cast<nanotime_t>(ts->tv_sec) * static_cast<nanotime_t>(ONE_MILLIARD) + ts->tv_nsec;
-}
+//static SDL_INLINE nanotime_t timespecToNanotime(const struct timespec *ts)
+//{
+//    return static_cast<nanotime_t>(ts->tv_sec) * static_cast<nanotime_t>(ONE_MILLIARD) + ts->tv_nsec;
+//}
 
 static SDL_INLINE struct timespec nanotimeToTimespec(nanotime_t time)
 {
@@ -130,13 +131,15 @@ static SDL_INLINE struct timespec nanotimeToTimespec(nanotime_t time)
 
 static SDL_INLINE nanotime_t getNanoTime()
 {
-    struct timespec ts;
-#ifdef _WIN32
-    win_clock_gettime(&ts);
-#else
-    clock_gettime(XTECH_CLOCK_TYPE, &ts);
-#endif
-    return timespecToNanotime(&ts);
+//    struct timespec ts;
+//#ifdef _WIN32
+//    win_clock_gettime(&ts);
+//#else
+//    clock_gettime(XTECH_CLOCK_TYPE, &ts);
+//#endif
+//    chrono_clock_gettime(&ts);
+    auto n = std::chrono::high_resolution_clock::now().time_since_epoch();
+    return n.count();
 }
 
 static SDL_INLINE nanotime_t getElapsedTime(nanotime_t oldTime)
