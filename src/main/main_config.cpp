@@ -209,7 +209,7 @@ void SaveConfig()
         for(int i = 0; i < joyCount(); i++)
         {
             auto &j = joyGetByIndex(A, i);
-            config.beginGroup(fmt::format_ne("player-{0}-keyboard", A));
+            config.beginGroup(fmt::format_ne("joystick-{0}-{1}", A, i));
             writeJoyKey(config, "Up", j.Up);
             writeJoyKey(config, "Down", j.Down);
             writeJoyKey(config, "Left", j.Left);
