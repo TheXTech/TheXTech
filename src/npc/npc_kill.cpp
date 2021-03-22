@@ -30,6 +30,7 @@
 #include "../layers.h"
 #include "../game_main.h"
 #include "../main/speedrunner.h"
+#include "../control/joystick.h"
 
 
 void KillNPC(int A, int B)
@@ -998,6 +999,8 @@ void KillNPC(int A, int B)
         }
         else if(NPC[A].Type == 241)
         {
+            joyRumbleAllPlayers(200, 1.0);
+
             if(B == 6)
             {
                 PlaySound(16);

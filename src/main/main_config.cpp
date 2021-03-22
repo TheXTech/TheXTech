@@ -80,6 +80,9 @@ static void readJoyKey(IniProcessing &setup, const char *n, KM_Key &key)
     setup.read((joyKey + "-val").c_str(), key.val, key.val);
     setup.read((joyKey + "-id").c_str(), key.id, key.id);
     setup.read((joyKey + "-type").c_str(), key.type, key.type);
+    setup.read((joyKey + "-ctrl-val").c_str(), key.ctrl_val, key.ctrl_val);
+    setup.read((joyKey + "-ctrl-id").c_str(), key.ctrl_id, key.ctrl_id);
+    setup.read((joyKey + "-ctrl-type").c_str(), key.ctrl_type, key.ctrl_type);
 }
 
 static void writeJoyKey(IniProcessing &setup, const char *n, KM_Key &key)
@@ -88,6 +91,9 @@ static void writeJoyKey(IniProcessing &setup, const char *n, KM_Key &key)
     setup.setValue((joyKey + "-val").c_str(), key.val);
     setup.setValue((joyKey + "-id").c_str(), key.id);
     setup.setValue((joyKey + "-type").c_str(), key.type);
+    setup.setValue((joyKey + "-ctrl-val").c_str(), key.ctrl_val);
+    setup.setValue((joyKey + "-ctrl-id").c_str(), key.ctrl_id);
+    setup.setValue((joyKey + "-ctrl-type").c_str(), key.ctrl_type);
 }
 
 
@@ -111,25 +117,30 @@ void OpenConfig()
         config.read("ground-pound-by-alt-run", GameplayPoundByAltRun, false);
         config.endGroup();
 
-        for(int i = 0; i < joyCount(); i++)
-        {
-            auto &j = joyGetByIndex(i);
-            config.beginGroup(fmt::format_ne("joystick-{0}", j.hwGUID));
-            readJoyKey(config, "Up", j.Up);
-            readJoyKey(config, "Down", j.Down);
-            readJoyKey(config, "Left", j.Left);
-            readJoyKey(config, "Right", j.Right);
-            readJoyKey(config, "Run", j.Run);
-            readJoyKey(config, "Jump", j.Jump);
-            readJoyKey(config, "Drop", j.Drop);
-            readJoyKey(config, "Start", j.Start);
-            readJoyKey(config, "AltJump", j.AltJump);
-            readJoyKey(config, "AltRun", j.AltRun);
-            config.endGroup();
-        }
+        config.beginGroup("joystick");
+        config.read("enable-rumble", JoystickEnableRumble, true);
+        config.read("enable-battery-status", JoystickEnableBatteryStatus, true);
+        config.endGroup();
 
         For(A, 1, 2)
         {
+            for(int i = 0; i < joyCount(); i++)
+            {
+                auto &j = joyGetByIndex(A, i);
+                config.beginGroup(fmt::format_ne("joystick-{0}-{1}", A, i));
+                readJoyKey(config, "Up", j.Up);
+                readJoyKey(config, "Down", j.Down);
+                readJoyKey(config, "Left", j.Left);
+                readJoyKey(config, "Right", j.Right);
+                readJoyKey(config, "Run", j.Run);
+                readJoyKey(config, "Jump", j.Jump);
+                readJoyKey(config, "Drop", j.Drop);
+                readJoyKey(config, "Start", j.Start);
+                readJoyKey(config, "AltJump", j.AltJump);
+                readJoyKey(config, "AltRun", j.AltRun);
+                config.endGroup();
+            }
+
             config.beginGroup(fmt::format_ne("player-{0}-keyboard", A));
             config.read("device", useJoystick[A], useJoystick[A]);
             config.read("Up", conKeyboard[A].Up, conKeyboard[A].Up);
@@ -145,6 +156,7 @@ void OpenConfig()
             config.endGroup();
 
             config.beginGroup(fmt::format_ne("player-{0}-joystick", A));
+//            config.read("used-device", conJoystick[A].hwGUID, std::string());
             readJoyKey(config, "Up", conJoystick[A].Up);
             readJoyKey(config, "Down", conJoystick[A].Down);
             readJoyKey(config, "Left", conJoystick[A].Left);
@@ -187,25 +199,30 @@ void SaveConfig()
     config.setValue("ground-pound-by-alt-run", GameplayPoundByAltRun);
     config.endGroup();
 
-    for(int i = 0; i < joyCount(); i++)
-    {
-        auto &j = joyGetByIndex(i);
-        config.beginGroup(fmt::format_ne("joystick-{0}", j.hwGUID));
-        writeJoyKey(config, "Up", j.Up);
-        writeJoyKey(config, "Down", j.Down);
-        writeJoyKey(config, "Left", j.Left);
-        writeJoyKey(config, "Right", j.Right);
-        writeJoyKey(config, "Run", j.Run);
-        writeJoyKey(config, "Jump", j.Jump);
-        writeJoyKey(config, "Drop", j.Drop);
-        writeJoyKey(config, "Start", j.Start);
-        writeJoyKey(config, "AltJump", j.AltJump);
-        writeJoyKey(config, "AltRun", j.AltRun);
-        config.endGroup();
-    }
+    config.beginGroup("joystick");
+    config.setValue("enable-rumble", JoystickEnableRumble);
+    config.setValue("enable-battery-status", JoystickEnableBatteryStatus);
+    config.endGroup();
 
     For(A, 1, 2)
     {
+        for(int i = 0; i < joyCount(); i++)
+        {
+            auto &j = joyGetByIndex(A, i);
+            config.beginGroup(fmt::format_ne("player-{0}-keyboard", A));
+            writeJoyKey(config, "Up", j.Up);
+            writeJoyKey(config, "Down", j.Down);
+            writeJoyKey(config, "Left", j.Left);
+            writeJoyKey(config, "Right", j.Right);
+            writeJoyKey(config, "Run", j.Run);
+            writeJoyKey(config, "Jump", j.Jump);
+            writeJoyKey(config, "Drop", j.Drop);
+            writeJoyKey(config, "Start", j.Start);
+            writeJoyKey(config, "AltJump", j.AltJump);
+            writeJoyKey(config, "AltRun", j.AltRun);
+            config.endGroup();
+        }
+
         config.beginGroup(fmt::format_ne("player-{0}-keyboard", A));
         config.setValue("device", useJoystick[A]);
         config.setValue("Up", conKeyboard[A].Up);
@@ -221,6 +238,7 @@ void SaveConfig()
         config.endGroup();
 
         config.beginGroup(fmt::format_ne("player-{0}-joystick", A));
+//        config.setValue("used-device", conJoystick[A].hwGUID);
         writeJoyKey(config, "Up", conJoystick[A].Up);
         writeJoyKey(config, "Down", conJoystick[A].Down);
         writeJoyKey(config, "Left", conJoystick[A].Left);

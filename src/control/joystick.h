@@ -39,12 +39,21 @@ void RenderTouchControls();
 void UpdateTouchScreenSize();
 #endif
 
+extern void           joyFillDefaults(ConJoystick_t &j);
+
 extern int            InitJoysticks();
 
 extern int            joyCount();
-extern ConJoystick_t &joyGetByUuid(const std::string &uuid);
-extern ConJoystick_t &joyGetByIndex(int joyNum);
-extern void           joySetByUuid(const std::string &uuid, const ConJoystick_t &cj);
+extern ConJoystick_t &joyGetByUuid(int player, const std::string &uuid);
+extern void           joyGetByUuid(ConJoystick_t &dst, int player, const std::string &uuid);
+extern ConJoystick_t &joyGetByIndex(int player, int joyNum);
+extern void           joyGetByIndex(int player, int joyNum, ConJoystick_t &dst);
+extern void           joySetByUuid(int player, const std::string &uuid, const ConJoystick_t &cj);
+extern void           joySetByIndex(int player, int index, const ConJoystick_t &cj);
+
+extern int            joyGetPowerLevel(int joyNum);
+extern void           joyRumble(int joyNum, int ms, float strength);
+extern void           joyRumbleAllPlayers(int ms, float strength);
 
 extern std::string    joyGetUuidStr(int joystick);
 

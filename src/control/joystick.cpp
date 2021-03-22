@@ -23,6 +23,11 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#include <SDL2/SDL_version.h>
+#include <SDL2/SDL_joystick.h>
+#include <SDL2/SDL_gamecontroller.h>
+#include <SDL2/SDL_haptic.h>
+
 #include <unordered_map>
 #include <Logger/logger.h>
 
@@ -38,11 +43,92 @@
 
 // this module handles the players controls, both keyboard and joystick
 
-static std::vector<SDL_Joystick*> s_joysticks;
-static std::unordered_map<std::string, ConJoystick_t> s_joystickControls;
+struct Joystick_t
+{
+    SDL_Joystick        *joystick = nullptr;
+    SDL_GameController  *control = nullptr;
+    SDL_Haptic          *haptic = nullptr;
+};
+
+static std::vector<Joystick_t> s_joysticks;
+
+static std::unordered_map<std::string, ConJoystick_t> s_joystickControls[maxLocalPlayers];
 #ifdef USE_TOUCHSCREEN_CONTROLLER
 static TouchScreenController      s_touch;
 #endif
+
+void joyFillDefaults(ConJoystick_t &j)
+{
+    j.Up.val = SDL_HAT_UP;
+    j.Up.type = ConJoystick_t::JoyHat;
+    j.Up.id = 0;
+    j.Up.ctrl_val = 1;
+    j.Up.ctrl_type = ConJoystick_t::CtrlButton;
+    j.Up.ctrl_id = SDL_CONTROLLER_BUTTON_DPAD_UP;
+
+    j.Down.val = SDL_HAT_DOWN;
+    j.Down.type = ConJoystick_t::JoyHat;
+    j.Down.id = 0;
+    j.Down.ctrl_val = 1;
+    j.Down.ctrl_type = ConJoystick_t::CtrlButton;
+    j.Down.ctrl_id = SDL_CONTROLLER_BUTTON_DPAD_DOWN;
+
+    j.Left.val = SDL_HAT_LEFT;
+    j.Left.id = 0;
+    j.Left.type = ConJoystick_t::JoyHat;
+    j.Left.ctrl_val = 1;
+    j.Left.ctrl_type = ConJoystick_t::CtrlButton;
+    j.Left.ctrl_id = SDL_CONTROLLER_BUTTON_DPAD_LEFT;
+
+    j.Right.val = SDL_HAT_RIGHT;
+    j.Right.type = ConJoystick_t::JoyHat;
+    j.Right.id = 0;
+    j.Right.ctrl_val = 1;
+    j.Right.ctrl_type = ConJoystick_t::CtrlButton;
+    j.Right.ctrl_id = SDL_CONTROLLER_BUTTON_DPAD_RIGHT;
+
+    j.Run.id = 2;
+    j.Run.val = 1;
+    j.Run.type = ConJoystick_t::JoyButton;
+    j.Run.ctrl_val = 1;
+    j.Run.ctrl_type = ConJoystick_t::CtrlButton;
+    j.Run.ctrl_id = SDL_CONTROLLER_BUTTON_X;
+
+    j.AltRun.id = 3;
+    j.AltRun.val = 1;
+    j.AltRun.type = ConJoystick_t::JoyButton;
+    j.AltRun.ctrl_val = 1;
+    j.AltRun.ctrl_type = ConJoystick_t::CtrlButton;
+    j.AltRun.ctrl_id = SDL_CONTROLLER_BUTTON_Y;
+
+    j.Jump.id = 0;
+    j.Jump.val = 1;
+    j.Jump.type = ConJoystick_t::JoyButton;
+    j.Jump.ctrl_val = 1;
+    j.Jump.ctrl_type = ConJoystick_t::CtrlButton;
+    j.Jump.ctrl_id = SDL_CONTROLLER_BUTTON_A;
+
+    j.AltJump.id = 1;
+    j.AltJump.val = 1;
+    j.AltJump.type = ConJoystick_t::JoyButton;
+    j.AltJump.ctrl_val = 1;
+    j.AltJump.ctrl_type = ConJoystick_t::CtrlButton;
+    j.AltJump.ctrl_id = SDL_CONTROLLER_BUTTON_B;
+
+    j.Drop.id = 6;
+    j.Drop.val = 1;
+    j.Drop.type = ConJoystick_t::JoyButton;
+    j.Drop.ctrl_val = 1;
+    j.Drop.ctrl_type = ConJoystick_t::CtrlButton;
+    j.Drop.ctrl_id = SDL_CONTROLLER_BUTTON_BACK;
+
+    j.Start.id = 7;
+    j.Start.val = 1;
+    j.Start.type = ConJoystick_t::JoyButton;
+    j.Start.ctrl_val = 1;
+    j.Start.ctrl_type = ConJoystick_t::CtrlButton;
+    j.Start.ctrl_id = SDL_CONTROLLER_BUTTON_START;
+}
 
 static std::string getJoyUuidStr(SDL_Joystick *j)
 {
@@ -57,7 +143,7 @@ std::string joyGetUuidStr(int joystick)
 {
     if(joystick < 0 || joystick >= int(s_joysticks.size()))
         return std::string();
-    return getJoyUuidStr(s_joysticks[joystick]);
+    return getJoyUuidStr(s_joysticks[joystick].joystick);
 }
 
 int joyCount()
@@ -65,26 +151,106 @@ int joyCount()
     return (int)s_joysticks.size();
 }
 
-ConJoystick_t &joyGetByUuid(const std::string &uuid)
+ConJoystick_t &joyGetByUuid(int player, const std::string &uuid)
 {
-    return s_joystickControls[uuid];
+    SDL_assert(player >= 1 && player <= maxLocalPlayers);
+    return s_joystickControls[player - 1][uuid];
 }
 
-ConJoystick_t &joyGetByIndex(int joyNum)
+void joyGetByUuid(ConJoystick_t &dst, int player, const std::string &uuid)
+{
+    auto &j = joyGetByUuid(player, uuid);
+    SDL_memcpy(&dst, &j, sizeof(ConJoystick_t));
+}
+
+ConJoystick_t &joyGetByIndex(int player, int joyNum)
 {
     SDL_assert(joyNum >= 0 && (size_t)joyNum < s_joysticks.size());
-    std::string guidStr = getJoyUuidStr(s_joysticks[joyNum]);
-    auto &ret = s_joystickControls[guidStr];
-    if(ret.hwGUID.empty() && ret.hwGUID != guidStr)
-        ret.hwGUID = guidStr;
+    SDL_assert(player >= 1 && player <= maxLocalPlayers);
+
+    std::string guidStr = getJoyUuidStr(s_joysticks[joyNum].joystick);
+    auto &ret = s_joystickControls[player - 1][guidStr];
+//    if(ret.hwGUID.empty() && ret.hwGUID != guidStr)
+//        ret.hwGUID = guidStr;
     return ret;
 }
 
-void joySetByUuid(const std::string &uuid, const ConJoystick_t &cj)
+void joyGetByIndex(int player, int joyNum, ConJoystick_t &dst)
 {
-    SDL_memcpy(&s_joystickControls[uuid], &cj, sizeof(ConJoystick_t));
+    SDL_assert(joyNum >= 0 && (size_t)joyNum < s_joysticks.size());
+    SDL_assert(player >= 1 && player <= maxLocalPlayers);
+
+    std::string guidStr = getJoyUuidStr(s_joysticks[joyNum].joystick);
+    auto &ret = s_joystickControls[player - 1][guidStr];
+    SDL_memcpy(&dst, &ret, sizeof(ConJoystick_t));
 }
 
+
+void joySetByUuid(int player, const std::string &uuid, const ConJoystick_t &cj)
+{
+    SDL_assert(player >= 1 && player <= maxLocalPlayers);
+    SDL_memcpy(&s_joystickControls[player - 1][uuid], &cj, sizeof(ConJoystick_t));
+}
+
+void joySetByIndex(int player, int index, const ConJoystick_t &cj)
+{
+    auto u = joyGetUuidStr(index);
+    joySetByUuid(player, u, cj);
+}
+
+int joyGetPowerLevel(int joyNum)
+{
+    SDL_assert(joyNum >= 0 && (size_t)joyNum < s_joysticks.size());
+    auto *j = s_joysticks[joyNum].joystick;
+    if(j)
+        return SDL_JoystickCurrentPowerLevel(j);
+    return SDL_JOYSTICK_POWER_UNKNOWN;
+}
+
+void joyRumble(int joyNum, int ms, float strength)
+{
+    if(!JoystickEnableRumble)
+        return;
+
+    SDL_assert(joyNum >= 0 && (size_t)joyNum < s_joysticks.size());
+    auto &j = s_joysticks[joyNum];
+
+    if(j.haptic)
+    {
+        if(SDL_HapticRumblePlay(j.haptic, strength, ms) == 0)
+            return;
+    }
+
+    int intStrength = (int)(0xFFFF * strength + 0.5f);
+
+    if(intStrength > 0xFFFF)
+        intStrength = 0xFFFF;
+
+    if(intStrength < 0)
+        intStrength = 0;
+
+#if SDL_VERSION_ATLEAST(2, 0, 12)
+    if(j.control)
+    {
+        if(SDL_GameControllerRumble(j.control, intStrength, intStrength, ms) == 0)
+            return;
+    }
+    if(j.joystick)
+        SDL_JoystickRumble(j.joystick, intStrength, intStrength, ms);
+#endif
+}
+
+void joyRumbleAllPlayers(int ms, float strength)
+{
+    if(!JoystickEnableRumble)
+        return;
+
+    for(int plr = 1; plr <= numPlayers && plr <= maxLocalPlayers; ++plr)
+    {
+        if(useJoystick[plr] > 0)
+            joyRumble(useJoystick[plr] - 1, ms, strength);
+    }
+}
 
 
 static void updateJoyKey(SDL_Joystick *j, bool &key, const KM_Key &mkey)
@@ -155,6 +321,55 @@ static void updateJoyKey(SDL_Joystick *j, bool &key, const KM_Key &mkey)
 //    key_pressed = (key_new && !key);
     key = key_new;
 }
+
+static void updateCtrlKey(SDL_GameController *j, bool &key, const KM_Key &mkey)
+{
+    key = (0 != (Sint32)SDL_GameControllerGetButton(j, static_cast<SDL_GameControllerButton>(mkey.ctrl_id)));
+}
+
+
+static void updateCtrlAxisOr(SDL_GameController *j, bool &key, SDL_GameControllerAxis axis, Sint16 dst_val)
+{
+    bool key_new = false;
+    Sint16 val = SDL_GameControllerGetAxis(j, axis);
+
+    dst_val *= 25000;
+
+    if(SDL_abs(val) <= 15000)
+        key_new = false;
+    else if(dst_val > 0)
+        key_new = (val > 0);
+    else if(dst_val < 0)
+        key_new = (val < 0);
+    else
+        key_new = false;
+    key |= key_new;
+}
+
+
+static bool bindControllerKey(SDL_GameController *ctrl, KM_Key &k)
+{
+    Uint8 val;
+
+    for(int i = 0; i < SDL_CONTROLLER_BUTTON_MAX; i++)
+    {
+        val = SDL_GameControllerGetButton(ctrl, static_cast<SDL_GameControllerButton>(i));
+        if(val == 1)
+        {
+            k.ctrl_val = val;
+            k.ctrl_id = i;
+            k.ctrl_type = (int)ConJoystick_t::JoyButton;
+            return true;
+        }
+    }
+
+    k.ctrl_val = 0;
+    k.ctrl_id = -1;
+    k.ctrl_type = (int)ConJoystick_t::NoControl;
+    k.type = k.ctrl_type;
+    return false;
+}
+
 
 static bool bindJoystickKey(SDL_Joystick *joy, KM_Key &k)
 {
@@ -265,6 +480,9 @@ void UpdateControls()
             A = 1;
         }
 
+        auto &joyCon = conJoystick[A];
+        auto &keyCon = conKeyboard[A];
+
         // With Player(A).Controls
         {
             auto &p = Player[A];
@@ -287,59 +505,83 @@ void UpdateControls()
                 if(jNum < 0 || jNum >= int(s_joysticks.size()))
                     continue;
 
-                auto *j = s_joysticks[size_t(jNum)];
+                auto &jj = s_joysticks[size_t(jNum)];
 
-                updateJoyKey(j, c.Up, conJoystick[A].Up);
-                updateJoyKey(j, c.Down, conJoystick[A].Down);
-                updateJoyKey(j, c.Left, conJoystick[A].Left);
-                updateJoyKey(j, c.Right, conJoystick[A].Right);
-                updateJoyKey(j, c.Run, conJoystick[A].Run);
-                updateJoyKey(j, c.AltRun, conJoystick[A].AltRun);
-                updateJoyKey(j, c.Jump, conJoystick[A].Jump);
-                updateJoyKey(j, c.AltJump, conJoystick[A].AltJump);
-                updateJoyKey(j, c.Drop, conJoystick[A].Drop);
-                updateJoyKey(j, c.Start, conJoystick[A].Start);
+                auto *j = jj.joystick;
+                auto *k = jj.control;
+
+                if(joyCon.isGameController)
+                {
+                    updateCtrlKey(k, c.Up, joyCon.Up);
+                    updateCtrlKey(k, c.Down, joyCon.Down);
+                    updateCtrlKey(k, c.Left, joyCon.Left);
+                    updateCtrlKey(k, c.Right, joyCon.Right);
+                    updateCtrlKey(k, c.Run, joyCon.Run);
+                    updateCtrlKey(k, c.AltRun, joyCon.AltRun);
+                    updateCtrlKey(k, c.Jump, joyCon.Jump);
+                    updateCtrlKey(k, c.AltJump, joyCon.AltJump);
+                    updateCtrlKey(k, c.Drop, joyCon.Drop);
+                    updateCtrlKey(k, c.Start, joyCon.Start);
+                    // Use analog stick as an additional move controller
+                    updateCtrlAxisOr(k, c.Up, SDL_CONTROLLER_AXIS_LEFTY, -1);
+                    updateCtrlAxisOr(k, c.Down, SDL_CONTROLLER_AXIS_LEFTY, +1);
+                    updateCtrlAxisOr(k, c.Left, SDL_CONTROLLER_AXIS_LEFTX, -1);
+                    updateCtrlAxisOr(k, c.Right, SDL_CONTROLLER_AXIS_LEFTX, +1);
+                }
+                else
+                {
+                    updateJoyKey(j, c.Up, joyCon.Up);
+                    updateJoyKey(j, c.Down, joyCon.Down);
+                    updateJoyKey(j, c.Left, joyCon.Left);
+                    updateJoyKey(j, c.Right, joyCon.Right);
+                    updateJoyKey(j, c.Run, joyCon.Run);
+                    updateJoyKey(j, c.AltRun, joyCon.AltRun);
+                    updateJoyKey(j, c.Jump, joyCon.Jump);
+                    updateJoyKey(j, c.AltJump, joyCon.AltJump);
+                    updateJoyKey(j, c.Drop, joyCon.Drop);
+                    updateJoyKey(j, c.Start, joyCon.Start);
+                }
             }
 
             if(useJoystick[A] == 0) // Keyboard controls
             {
-                if(getKeyStateI(conKeyboard[A].Up)) {
+                if(getKeyStateI(keyCon.Up)) {
                     c.Up = true;
                 }
 
-                if(getKeyStateI(conKeyboard[A].Down)) {
+                if(getKeyStateI(keyCon.Down)) {
                     c.Down = true;
                 }
 
-                if(getKeyStateI(conKeyboard[A].Left)) {
+                if(getKeyStateI(keyCon.Left)) {
                     c.Left = true;
                 }
 
-                if(getKeyStateI(conKeyboard[A].Right)) {
+                if(getKeyStateI(keyCon.Right)) {
                     c.Right = true;
                 }
 
-                if(getKeyStateI(conKeyboard[A].Jump)) {
+                if(getKeyStateI(keyCon.Jump)) {
                     c.Jump = true;
                 }
 
-                if(getKeyStateI(conKeyboard[A].Run)) {
+                if(getKeyStateI(keyCon.Run)) {
                     c.Run = true;
                 }
 
-                if(getKeyStateI(conKeyboard[A].Drop)) {
+                if(getKeyStateI(keyCon.Drop)) {
                     c.Drop = true;
                 }
 
-                if(getKeyStateI(conKeyboard[A].Start)) {
+                if(getKeyStateI(keyCon.Start)) {
                     c.Start = true;
                 }
 
-                if(getKeyStateI(conKeyboard[A].AltJump)) {
+                if(getKeyStateI(keyCon.AltJump)) {
                     c.AltJump = true;
                 }
 
-                if(getKeyStateI(conKeyboard[A].AltRun)) {
+                if(getKeyStateI(keyCon.AltRun)) {
                     c.AltRun = true;
                 }
             }
@@ -478,25 +720,55 @@ int InitJoysticks()
 
     for(int i = 0; i < num; ++i)
     {
-        SDL_Joystick *joy = SDL_JoystickOpen(i);
-        if(joy)
+        Joystick_t joy;
+        joy.joystick = SDL_JoystickOpen(i);
+
+        if(joy.joystick)
         {
-            std::string guidStr = getJoyUuidStr(joy);
-            auto &j = s_joystickControls[guidStr];
-            j.hwGUID = guidStr;
+            std::string guidStr = getJoyUuidStr(joy.joystick);
+            auto &j = s_joystickControls[0][guidStr];
+
+//            j.hwGUID = guidStr;
+            j.isValid = true;
             j.isGameController = SDL_IsGameController(i);
+            j.isHaptic = SDL_JoystickIsHaptic(joy.joystick);
+            joyFillDefaults(j);
+
             pLogDebug("==========================");
-            pLogDebug("Josytick %s", SDL_JoystickName(joy));
+            pLogDebug("Josytick %s", SDL_JoystickName(joy.joystick));
             pLogDebug("--------------------------");
             pLogDebug("GUID:    %s", guidStr.c_str());
-            pLogDebug("Axes:    %d", SDL_JoystickNumAxes(joy));
-            pLogDebug("Balls:   %d", SDL_JoystickNumBalls(joy));
-            pLogDebug("Hats:    %d", SDL_JoystickNumHats(joy));
-            pLogDebug("Buttons: %d", SDL_JoystickNumButtons(joy));
+            pLogDebug("Axes:    %d", SDL_JoystickNumAxes(joy.joystick));
+            pLogDebug("Balls:   %d", SDL_JoystickNumBalls(joy.joystick));
+            pLogDebug("Hats:    %d", SDL_JoystickNumHats(joy.joystick));
+            pLogDebug("Buttons: %d", SDL_JoystickNumButtons(joy.joystick));
             if(j.isGameController)
                 pLogDebug("Supported by the game controller interface!");
+            if(j.isHaptic)
+                pLogDebug("Is the haptic device!");
             pLogDebug("==========================");
 
+            if(j.isGameController)
+            {
+                joy.control = SDL_GameControllerOpen(i);
+                if(!joy.control)
+                {
+                    pLogWarning("Couldn't open the game controller %d, using as a joystick!", i);
+                    j.isGameController = false;
+                }
+            }
+
+            if(j.isHaptic)
+            {
+                joy.haptic = SDL_HapticOpenFromJoystick(joy.joystick);
+                if(!joy.haptic)
+                {
+                    pLogWarning("Couldn't open the haptic device %d, disabling the haptic support!", i);
+                    j.isHaptic = false;
+                }
+            }
+
+            s_joystickControls[1][guidStr] = j;
             s_joysticks.push_back(joy);
         }
         else
@@ -517,25 +789,27 @@ bool StartJoystick(int JoystickNumber)
     if(JoystickNumber < 0 || JoystickNumber >= int(s_joysticks.size()))
         return false;
 
-    SDL_Joystick *joy = s_joysticks[size_t(JoystickNumber)];
-    if(joy)
+    auto &joy = s_joysticks[size_t(JoystickNumber)];
+    if(joy.joystick)
     {
-        int balls = SDL_JoystickNumBalls(joy);
-        int hats = SDL_JoystickNumHats(joy);
-        int buttons = SDL_JoystickNumButtons(joy);
-        int axes = SDL_JoystickNumAxes(joy);
-        std::string guidStr = getJoyUuidStr(joy);
+        int balls = SDL_JoystickNumBalls(joy.joystick);
+        int hats = SDL_JoystickNumHats(joy.joystick);
+        int buttons = SDL_JoystickNumButtons(joy.joystick);
+        int axes = SDL_JoystickNumAxes(joy.joystick);
+        std::string guidStr = getJoyUuidStr(joy.joystick);
 
         pLogDebug("==========================");
-        pLogDebug("Josytick %s", SDL_JoystickName(joy));
+        pLogDebug("Josytick %s", SDL_JoystickName(joy.joystick));
         pLogDebug("--------------------------");
         pLogDebug("GUID:    %s", guidStr.c_str());
         pLogDebug("Axes:    %d", axes);
         pLogDebug("Balls:   %d", balls);
         pLogDebug("Hats:    %d", hats);
         pLogDebug("Buttons: %d", buttons);
-        if(SDL_IsGameController(JoystickNumber))
+        if(joy.control)
             pLogDebug("Supported by the game controller interface!");
+        if(joy.haptic)
+            pLogDebug("Is the haptic device!");
         pLogDebug("==========================");
         return true;
     }
@@ -551,7 +825,15 @@ bool StartJoystick(int JoystickNumber)
 void CloseJoysticks()
 {
     for(size_t i = 0; i < s_joysticks.size(); ++i) // scan hats first
-        SDL_JoystickClose(s_joysticks[i]);
+    {
+        auto j = s_joysticks[i];
+        if(j.joystick)
+            SDL_JoystickClose(j.joystick);
+        if(j.control)
+            SDL_GameControllerClose(j.control);
+        if(j.haptic)
+             SDL_HapticClose(j.haptic);
+    }
     s_joysticks.clear();
 }
 
@@ -559,16 +841,27 @@ bool PollJoystick(int joystick, KM_Key &key)
 {
     if(joystick < 0 || joystick >= int(s_joysticks.size()))
         return false;
-    return bindJoystickKey(s_joysticks[size_t(joystick)], key);
+
+    auto &j = s_joysticks[size_t(joystick)];
+
+    if(j.control)
+        return bindControllerKey(j.control, key);
+
+    return bindJoystickKey(j.joystick, key);
 }
 
 bool JoyIsKeyDown(int JoystickNumber, const KM_Key &key)
 {
     bool val = false;
+
     if(JoystickNumber < 0 || JoystickNumber >= int(s_joysticks.size()))
         return false;
 
-    updateJoyKey(s_joysticks[size_t(JoystickNumber)], val, key);
+    auto &j = s_joysticks[size_t(JoystickNumber)];
+    if(j.control)
+        updateCtrlKey(j.control, val, key);
+    else
+        updateJoyKey(j.joystick, val, key);
     return val;
 }
 

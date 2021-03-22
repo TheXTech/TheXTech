@@ -1333,6 +1333,8 @@ void MenuLoop()
                         oldJumpJoy.type = -1;
                         if(gotNewKey)
                         {
+                            if(conJoystick[MenuMode - 30].isGameController)
+                                joyKey.type = lastJoyButton.type;
                             PlaySound(29);
                             if(MenuCursor == 1)
                                 conJoystick[MenuMode - 30].Up = joyKey;
@@ -1354,6 +1356,8 @@ void MenuLoop()
                                 conJoystick[MenuMode - 30].Drop = joyKey;
                             else if(MenuCursor == 10)
                                 conJoystick[MenuMode - 30].Start = joyKey;
+                            // Save the changed state into the common cache
+                            joySetByIndex(MenuMode - 30, JoyNum, conJoystick[MenuMode - 30]);
                             getNewJoystick = false;
                             MenuCursorCanMove = false;
                         }
@@ -1403,6 +1407,13 @@ void MenuLoop()
                             useJoystick[MenuMode - 30] += 1;
                             if(useJoystick[MenuMode - 30] > numJoysticks)
                                 useJoystick[MenuMode - 30] = 0;
+
+                            if(useJoystick[MenuMode - 30] > 0)
+                            {
+                                int joyNum = useJoystick[MenuMode - 30];
+                                // Load the saved state for given joystick
+                                joyGetByIndex(MenuMode - 30, joyNum, conJoystick[MenuMode - 30]);
+                            }
                         }
                         else
                         {

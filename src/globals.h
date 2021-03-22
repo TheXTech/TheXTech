@@ -107,7 +107,7 @@ const int KEY_PRESSED = 1;
 const char *getKeyName(int key);
 
 struct KM_Key;
-std::string getJoyKeyName(const KM_Key &key);
+std::string getJoyKeyName(bool isController, const KM_Key &key);
 
 /**
  * @brief Rounding function that works same as in VB6
@@ -1064,6 +1064,10 @@ extern bool ShowFPS;
 extern double PrintFPS;
 // Do ground-point by alt-run key instead of down
 extern bool GameplayPoundByAltRun;
+// Enable usage of the rumble control
+extern bool JoystickEnableRumble;
+// Show the battery status for wireless gamepads
+extern bool JoystickEnableBatteryStatus;
 //Public vScreen(0 To 2) As vScreen 'Sets up the players screens
 extern RangeArr<vScreen_t, 0, 2> vScreen;
 //Public ScreenType As Integer 'The screen/view type

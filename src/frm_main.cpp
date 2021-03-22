@@ -118,8 +118,7 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
     sdlInitFlags |= SDL_INIT_VIDEO;
     sdlInitFlags |= SDL_INIT_EVENTS;
     sdlInitFlags |= SDL_INIT_JOYSTICK;
-    //(Cool thing, but is not needed yet)
-    //sdlInitFlags |= SDL_INIT_HAPTIC;
+    sdlInitFlags |= SDL_INIT_HAPTIC;
     sdlInitFlags |= SDL_INIT_GAMECONTROLLER;
 
     // Initialize SDL

@@ -1147,47 +1147,7 @@ void InitControls()
 //    '
 
     For(A, 1, 2)
-    {
-        {
-            auto &j = conJoystick[A];
-            j.Up.val = SDL_HAT_UP;
-            j.Up.type = ConJoystick_t::JoyHat;
-            j.Up.id = 0;
-            j.Down.val = SDL_HAT_DOWN;
-            j.Down.type = ConJoystick_t::JoyHat;
-            j.Down.id = 0;
-            j.Left.val = SDL_HAT_LEFT;
-            j.Left.id = 0;
-            j.Left.type = ConJoystick_t::JoyHat;
-            j.Right.val = SDL_HAT_RIGHT;
-            j.Right.type = ConJoystick_t::JoyHat;
-            j.Right.id = 0;
-
-            j.Run.id = 2;
-            j.Run.val = 1;
-            j.Run.type = ConJoystick_t::JoyButton;
-
-            j.AltRun.id = 3;
-            j.AltRun.val = 1;
-            j.AltRun.type = ConJoystick_t::JoyButton;
-
-            j.Jump.id = 0;
-            j.Jump.val = 1;
-            j.Jump.type = ConJoystick_t::JoyButton;
-
-            j.AltJump.id = 1;
-            j.AltJump.val = 1;
-            j.AltJump.type = ConJoystick_t::JoyButton;
-
-            j.Drop.id = 6;
-            j.Drop.val = 1;
-            j.Drop.type = ConJoystick_t::JoyButton;
-
-            j.Start.id = 7;
-            j.Start.val = 1;
-            j.Start.type = ConJoystick_t::JoyButton;
-        }
-    }
+        joyFillDefaults(conJoystick[A]);
 
     conKeyboard[1].Down = vbKeyDown;
     conKeyboard[1].Left = vbKeyLeft;
@@ -1213,10 +1173,18 @@ void InitControls()
 
     OpenConfig();
 
-    if(useJoystick[1] > numJoysticks)
-        useJoystick[1] = 0;
-    if(useJoystick[2] > numJoysticks)
-        useJoystick[2] = 0;
+    for(int player = 1 ; player <= 2; ++player)
+    {
+        if(useJoystick[player] > numJoysticks)
+            useJoystick[player] = 0;
+        else
+        {
+            int jip = useJoystick[player];
+            int ji = jip - 1;
+            if(ji >= 0)
+                joyGetByIndex(player, ji, conJoystick[player]);
+        }
+    }
 }
 
 

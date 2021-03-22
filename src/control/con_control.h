@@ -57,17 +57,24 @@ struct ConKeyboard_t
 
 struct KM_Key
 {
+    // SDL_Joystick control
     int val = -1;
     int id = -1;
     int type = -1;
+
+    // SDL_GameController control
+    int ctrl_val = -1;
+    int ctrl_id = -1;
+    int ctrl_type = -1;
 };
 
 //Public Type conJoystick   'Input settings for the joystick
 struct ConJoystick_t
 {
 // EXTRA
-    std::string hwGUID;
+    bool isValid = false;
     bool isGameController = false;
+    bool isHaptic = false;
 
     enum CtrlTypes
     {
@@ -76,7 +83,9 @@ struct ConJoystick_t
         JoyBallX,
         JoyBallY,
         JoyHat,
-        JoyButton
+        JoyButton,
+        CtrlButton,
+        CtrlAxis
     };
 
     KM_Key Up;
