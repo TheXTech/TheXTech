@@ -209,7 +209,7 @@ int joyGetPowerLevel(int joyNum)
 
 void joyRumble(int joyNum, int ms, float strength)
 {
-    if(!JoystickEnableRumble)
+    if(!JoystickEnableRumble || GameMenu || GameOutro)
         return;
 
     SDL_assert(joyNum >= 0 && (size_t)joyNum < s_joysticks.size());
