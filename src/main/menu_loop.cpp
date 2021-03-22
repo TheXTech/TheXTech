@@ -1410,7 +1410,7 @@ void MenuLoop()
 
                             if(useJoystick[MenuMode - 30] > 0)
                             {
-                                int joyNum = useJoystick[MenuMode - 30];
+                                int joyNum = useJoystick[MenuMode - 30] - 1;
                                 // Load the saved state for given joystick
                                 joyGetByIndex(MenuMode - 30, joyNum, conJoystick[MenuMode - 30]);
                             }
