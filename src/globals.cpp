@@ -571,6 +571,18 @@ std::string getJoyKeyName(bool isController, const KM_Key &key)
             return "D-Pad LEFT";
         case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
             return "D-Pad RIGHT";
+        case SDL_CONTROLLER_BUTTON_MISC1:
+            return "Misc. 1";
+        case SDL_CONTROLLER_BUTTON_PADDLE1:
+            return "Paddle 1";
+        case SDL_CONTROLLER_BUTTON_PADDLE2:
+            return "Paddle 2";
+        case SDL_CONTROLLER_BUTTON_PADDLE3:
+            return "Paddle 3";
+        case SDL_CONTROLLER_BUTTON_PADDLE4:
+            return "Paddle 4";
+        case SDL_CONTROLLER_BUTTON_TOUCHPAD:
+            return "Touchpad";
         default:
             return "<invalid>";
         }
