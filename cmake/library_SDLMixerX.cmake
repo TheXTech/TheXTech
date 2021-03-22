@@ -14,6 +14,7 @@ else()
 endif()
 
 option(PGE_SHARED_SDLMIXER "Link MixerX as a shared library (dll/so/dylib)" ${PGE_SHARED_SDLMIXER_DEFAULT})
+option(PGE_USE_LOCAL_SDL2 "Do use the locally-built SDL2 library from the AudioCodecs set. Otherwise, download and build the development top main version." ON)
 
 if(WIN32)
     if(MSVC)
@@ -47,7 +48,7 @@ if(USE_SYSTEM_SDL2)
     set(USE_LOCAL_SDL2 OFF)
     find_package(SDL2 REQUIRED)
 else()
-    set(USE_LOCAL_SDL2 ON)
+    set(USE_LOCAL_SDL2 ${PGE_USE_LOCAL_SDL2})
     set(SDL2_INCLUDE_DIRS ${DEPENDENCIES_INSTALL_DIR}/include/SDL2)
 endif()
 
