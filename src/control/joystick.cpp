@@ -512,7 +512,8 @@ void UpdateControls()
 
                 if(joyCon.isGameController)
                 {
-#ifdef DEBUG_BUILD // Experimental share-button key hook, not working yet
+// Experimental share-button key hook, not working yet
+#if DEBUG_BUILD && SDL_VERSION_ATLEAST(2, 0, 14)
                     KM_Key share;
                     share.ctrl_type = ConJoystick_t::CtrlButton;
                     share.ctrl_id = SDL_CONTROLLER_BUTTON_MISC1;

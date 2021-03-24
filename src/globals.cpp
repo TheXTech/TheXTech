@@ -23,6 +23,8 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#include <SDL2/SDL_version.h>
+
 #include "globals.h"
 #include <fmt_format_ne.h>
 #include <cmath>
@@ -571,6 +573,7 @@ std::string getJoyKeyName(bool isController, const KM_Key &key)
             return "D-Pad LEFT";
         case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
             return "D-Pad RIGHT";
+#if SDL_VERSION_ATLEAST(2, 0, 14)
         case SDL_CONTROLLER_BUTTON_MISC1:
             return "Misc. 1";
         case SDL_CONTROLLER_BUTTON_PADDLE1:
@@ -583,6 +586,7 @@ std::string getJoyKeyName(bool isController, const KM_Key &key)
             return "Paddle 4";
         case SDL_CONTROLLER_BUTTON_TOUCHPAD:
             return "Touchpad";
+#endif
         default:
             return "<invalid>";
         }
