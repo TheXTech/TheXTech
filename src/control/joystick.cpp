@@ -354,7 +354,7 @@ static bool bindControllerKey(SDL_GameController *ctrl, KM_Key &k)
     for(int i = 0; i < SDL_CONTROLLER_BUTTON_MAX; i++)
     {
         val = SDL_GameControllerGetButton(ctrl, static_cast<SDL_GameControllerButton>(i));
-        if(val == 1)
+        if(val != 0)
         {
             k.ctrl_val = val;
             k.ctrl_id = i;
@@ -512,6 +512,19 @@ void UpdateControls()
 
                 if(joyCon.isGameController)
                 {
+#ifdef DEBUG_BUILD // Experimental share-button key hook, not working yet
+                    KM_Key share;
+                    share.ctrl_type = ConJoystick_t::CtrlButton;
+                    share.ctrl_id = SDL_CONTROLLER_BUTTON_MISC1;
+                    share.ctrl_val = 1;
+                    static bool take = false;
+                    bool takePrev = take;
+                    updateCtrlKey(k, take, share);
+
+                    if(take != takePrev && take)
+                        TakeScreen = true;
+#endif
+
                     updateCtrlKey(k, c.Up, joyCon.Up);
                     updateCtrlKey(k, c.Down, joyCon.Down);
                     updateCtrlKey(k, c.Left, joyCon.Left);
