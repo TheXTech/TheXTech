@@ -352,8 +352,8 @@ void frameRenderEnd()
     {
         s_stopProcessing = getNanoTime();
         s_doUpdate = FrameSkip ? (s_stopProcessing - s_startProcessing) : 0;
-        if(s_doUpdate > c_frameRateNano * 15) // Limit 15 frames being skipped maximum
-            s_doUpdate = c_frameRateNano * 15;
+        if(s_doUpdate > c_frameRateNano * 25) // Limit 25 frames being skipped maximum
+            s_doUpdate = c_frameRateNano * 25;
     }
 #endif
 }
