@@ -25,26 +25,6 @@
 
 #include <SDL2/SDL_timer.h>
 
-#ifdef _WIN32
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#include <time.h>
-#endif
-
-#include <chrono>
-
-#if defined(__EMSCRIPTEN__) || defined(__APPLE__)
-#include <time.h>
-#endif
-
-//#ifndef _WIN32
-//#   if defined(__APPLE__)
-//#       define XTECH_CLOCK_TYPE CLOCK_MONOTONIC
-//#   else
-//#       define XTECH_CLOCK_TYPE CLOCK_MONOTONIC_RAW
-//#   endif
-//#endif
-
 #include <Logger/logger.h>
 #include "pge_delay.h"
 
@@ -72,74 +52,9 @@
 
 typedef int64_t nanotime_t;
 
-static SDL_INLINE struct timespec nanotimeToTimespec(nanotime_t time);
-
-//static SDL_INLINE int chrono_clock_gettime(struct timespec *ct)
-//{
-//    auto n = std::chrono::high_resolution_clock::now().time_since_epoch();
-//    auto ctt = nanotimeToTimespec(n.count());
-//    ct->tv_nsec = ctt.tv_nsec;
-//    ct->tv_sec = ctt.tv_sec;
-//    return 0;
-//}
-
-#ifdef _WIN32
-
-// https://gist.github.com/Youka/4153f12cf2e17a77314c
-
-/* Windows sleep in 100ns units */
-static BOOLEAN SDL_INLINE win_nanosleep(LONGLONG ns)
-{
-    /* Declarations */
-    HANDLE timer;   /* Timer handle */
-    LARGE_INTEGER li;   /* Time defintion */
-
-    /* Create timer */
-    if(!(timer = CreateWaitableTimer(NULL, TRUE, NULL)))
-        return FALSE;
-
-    /* Set timer properties */
-    li.QuadPart = -ns;
-
-    if(!SetWaitableTimer(timer, &li, 0, NULL, NULL, FALSE))
-    {
-        CloseHandle(timer);
-        return FALSE;
-    }
-
-    /* Start & wait for timer */
-    WaitForSingleObject(timer, INFINITE);
-    /* Clean resources */
-    CloseHandle(timer);
-    /* Slept without problems */
-    return TRUE;
-}
-#endif
-
-//static SDL_INLINE nanotime_t timespecToNanotime(const struct timespec *ts)
-//{
-//    return static_cast<nanotime_t>(ts->tv_sec) * static_cast<nanotime_t>(ONE_MILLIARD) + ts->tv_nsec;
-//}
-
-static SDL_INLINE struct timespec nanotimeToTimespec(nanotime_t time)
-{
-    struct timespec ts;
-    ts.tv_nsec = time % ONE_MILLIARD;
-    ts.tv_sec = time / ONE_MILLIARD;
-    return ts;
-}
-
 static SDL_INLINE nanotime_t getNanoTime()
 {
-//    struct timespec ts;
-//#ifdef _WIN32
-//    win_clock_gettime(&ts);
-//#else
-//    clock_gettime(XTECH_CLOCK_TYPE, &ts);
-//#endif
-//    chrono_clock_gettime(&ts);
-    auto n = std::chrono::high_resolution_clock::now().time_since_epoch();
-    return n.count();
+    return static_cast<nanotime_t>(SDL_GetTicks()) * 1000000;
 }
 
 static SDL_INLINE nanotime_t getElapsedTime(nanotime_t oldTime)
@@ -152,16 +67,11 @@ static SDL_INLINE nanotime_t getSleepTime(nanotime_t oldTime, nanotime_t target)
     return target - getElapsedTime(oldTime);
 }
 
-static SDL_INLINE int xtech_nanosleep(nanotime_t sleepTime)
+static SDL_INLINE void xtech_nanosleep(nanotime_t sleepTime)
 {
     if(sleepTime <= 0)
-        return 0;
-#ifdef _WIN32
-    return win_nanosleep((sleepTime / 100) + 1);
-#else
-    struct timespec ts = nanotimeToTimespec(sleepTime);
-    return nanosleep(&ts, NULL);
-#endif
+        return;
+    PGE_Delay((Uint32)SDL_ceil(sleepTime / 1000000.0));
 }
 
 
