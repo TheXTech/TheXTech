@@ -4,6 +4,7 @@ Changes for 1.3.4.1
 -Fixed the gamepad control stuck because of axes returned value that doesn't equal the initial state on some devices
 -Fixed the invalid conversion of old sprites with a mask that is smaller than the front
 -Implemented usage of the SDL_GameController with some extras like using of the rumble and the battery status (Render of the status is not implemented yet)
+-Player now can quit the credits screen by pressing the Start button on the gamepad
 
 Changes for 1.3.4
 -Fixed the inability to use any custom sounds and custom music at level's custom data directory
