@@ -34,6 +34,7 @@
 #include "../location.h"
 #include "../main/menu_main.h"
 #include "../main/speedrunner.h"
+#include "../control/joystick.h"
 
 #include <fmt_format_ne.h>
 #include <Utils/maths.h>
@@ -2087,16 +2088,13 @@ void UpdateGraphics(bool skipRepaint)
                         SuperPrint(fmt::format_ne("ALT JUMP...{0}", getKeyName(conKeyboard[MenuMode - 30].AltJump)), 3, 300, 500 + menuFix);
                         SuperPrint(fmt::format_ne("DROP ITEM..{0}", getKeyName(conKeyboard[MenuMode - 30].Drop)), 3, 300, 530 + menuFix);
                         SuperPrint(fmt::format_ne("PAUSE......{0}", getKeyName(conKeyboard[MenuMode - 30].Start)), 3, 300, 560 + menuFix);
+                        SuperPrint("Reset to default", 3, 300, 590 + menuFix);
     //                    Else
                     }
                     else
                     {
                         auto &cj = conJoystick[MenuMode - 30];
-                        if(cj.isGameController)
-                            SuperPrint("INPUT......CONTROLLER " + std::to_string(useJoystick[MenuMode - 30]), 3, 300, 260 + menuFix);
-                        else
-                            SuperPrint("INPUT......JOYSTICK " + std::to_string(useJoystick[MenuMode - 30]), 3, 300, 260 + menuFix);
-
+                        SuperPrint("INPUT......" + joyGetName(useJoystick[MenuMode - 30] - 1), 3, 300, 260 + menuFix);
                         SuperPrint(fmt::format_ne("UP.........{0}", getJoyKeyName(cj.isGameController, cj.Up)), 3, 300, 290 + menuFix);
                         SuperPrint(fmt::format_ne("DOWN.......{0}", getJoyKeyName(cj.isGameController, cj.Down)), 3, 300, 320 + menuFix);
                         SuperPrint(fmt::format_ne("LEFT.......{0}", getJoyKeyName(cj.isGameController, cj.Left)), 3, 300, 350 + menuFix);
@@ -2107,6 +2105,7 @@ void UpdateGraphics(bool skipRepaint)
                         SuperPrint(fmt::format_ne("ALT JUMP...{0}", getJoyKeyName(cj.isGameController, cj.AltJump)), 3, 300, 500 + menuFix);
                         SuperPrint(fmt::format_ne("DROP ITEM..{0}", getJoyKeyName(cj.isGameController, cj.Drop)), 3, 300, 530 + menuFix);
                         SuperPrint(fmt::format_ne("PAUSE......{0}", getJoyKeyName(cj.isGameController, cj.Start)), 3, 300, 560 + menuFix);
+                        SuperPrint("Reset to default", 3, 300, 590 + menuFix);
 
 //                        if(cj.Run >= 0)
 //                            SuperPrint(fmt::format_ne("RUN........{0}", cj.Run), 3, 300, 290 + menuFix);

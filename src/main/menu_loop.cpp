@@ -1125,7 +1125,7 @@ void MenuLoop()
                 if(useJoystick[MenuMode - 30] == 0)
                 {
 //                    For A = 0 To 10
-                    For(A, 0, 10)
+                    For(A, 0, 11)
                     {
 //                        If MenuMouseY >= 260 - 44 + A * 30 And MenuMouseY <= 276 - 44 + A * 30 Then
                         if(MenuMouseY >= 260 - 44 + A * 30 && MenuMouseY <= 276 - 44 + A * 30)
@@ -1197,8 +1197,9 @@ void MenuLoop()
                                 menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
                                                         getKeyName(conKeyboard[MenuMode - 30].Start)).size());
                                 break;
-//                                menuLen = 18 * Len("UP........." & CheckKey(Chr(conKeyboard(MenuMode - 30).Start)))
-//                            End If
+                            case 11:
+                                menuLen = 18 * std::strlen("Reset tp default");
+                                break;
                             }
 //                            If MenuMouseX >= 300 And MenuMouseX <= 300 + menuLen Then
                             if(MenuMouseX >= 300 && MenuMouseX <= 300 + menuLen)
@@ -1226,21 +1227,20 @@ void MenuLoop()
                 else
                 {
 //                    For A = 0 To 6
-                    For(A, 0, 10)
+                    For(A, 0, 11)
                     {
 //                        If MenuMouseY >= 260 - 44 + A * 30 And MenuMouseY <= 276 + A * 30 - 44 Then
                         if(MenuMouseY >= 260 - 44 + A * 30 && MenuMouseY <= 276 + A * 30 - 44)
                         {
-//                            If A = 0 Then
-                            if(A == 0) {
-//                                menuLen = 18 * Len("INPUT......JOYSTICK 1") - 2
+                            if(A == 0)
+                            {
                                 menuLen = 18 * std::strlen("INPUT......JOYSTICK 1") - 2;
-//                            Else
-                            } else {
-//                                menuLen = 18 * Len("RUN........_")
-                                menuLen = 18 * std::strlen("RUN........_");
-//                            End If
                             }
+                            else
+                            {
+                                menuLen = 18 * std::strlen("RUN........_");
+                            }
+
 //                            If MenuMouseX >= 300 And MenuMouseX <= 300 + menuLen Then
                             if(MenuMouseX >= 300 && MenuMouseX <= 300 + menuLen)
                             {
@@ -1282,8 +1282,9 @@ void MenuLoop()
                         getNewKeyboard = false;
 //                        MenuCursorCanMove = False
                         MenuCursorCanMove = false;
-//                        PlaySound 29
+
                         PlaySound(29);
+
 //                        If MenuCursor = 1 Then
                         if(MenuCursor == 1) {
 //                            conKeyboard(MenuMode - 30).Up = inputKey
@@ -1326,11 +1327,12 @@ void MenuLoop()
                     int JoyNum = useJoystick[MenuMode - 30] - 1;
                     //SDL_JoystickUpdate();
                     KM_Key joyKey;
-                    bool gotNewKey = PollJoystick(JoyNum, joyKey);
+                    bool gotNewKey = joyPollJoystick(JoyNum, joyKey);
 
-                    if(!JoyIsKeyDown(JoyNum, oldJumpJoy))
+                    if(!joyIsKeyDown(JoyNum, oldJumpJoy))
                     {
                         oldJumpJoy.type = -1;
+                        oldJumpJoy.ctrl_type = -1;
                         if(gotNewKey)
                         {
                             if(conJoystick[MenuMode - 30].isGameController)
@@ -1416,6 +1418,24 @@ void MenuLoop()
                             }
                         }
                         else
+                        if(MenuCursor == 11) // Reset to default
+                        {
+                            PlaySound(27);
+                            if(useJoystick[MenuMode - 30] == 0)
+                            {
+                                joyFillDefaults(conKeyboard[MenuMode - 30]);
+                            }
+                            else
+                            {
+                                int JoyNum = useJoystick[MenuMode - 30] - 1;
+                                if(JoyNum >= 0)
+                                {
+                                    joyFillDefaults(conJoystick[MenuMode - 30]);
+                                    joySetByIndex(MenuMode - 30, JoyNum, conJoystick[MenuMode - 30]);
+                                }
+                            }
+                        }
+                        else
                         {
                             if(useJoystick[MenuMode - 30] == 0)
                             {
@@ -1463,52 +1483,62 @@ void MenuLoop()
                                 {
                                     lastJoyButton = conJoystick[MenuMode - 30].Up;
                                     conJoystick[MenuMode - 30].Up.type = -1;
+                                    conJoystick[MenuMode - 30].Up.ctrl_type = -1;
                                 }
                                 else if(MenuCursor == 2)
                                 {
                                     lastJoyButton = conJoystick[MenuMode - 30].Down;
                                     conJoystick[MenuMode - 30].Down.type = -1;
+                                    conJoystick[MenuMode - 30].Down.ctrl_type = -1;
                                 }
                                 else if(MenuCursor == 3)
                                 {
                                     lastJoyButton = conJoystick[MenuMode - 30].Left;
                                     conJoystick[MenuMode - 30].Left.type = -1;
+                                    conJoystick[MenuMode - 30].Left.ctrl_type = -1;
                                 }
                                 else if(MenuCursor == 4)
                                 {
                                     lastJoyButton = conJoystick[MenuMode - 30].Right;
                                     conJoystick[MenuMode - 30].Right.type = -1;
+                                    conJoystick[MenuMode - 30].Right.ctrl_type = -1;
                                 }
                                 else if(MenuCursor == 5)
                                 {
                                     lastJoyButton = conJoystick[MenuMode - 30].Run;
                                     conJoystick[MenuMode - 30].Run.type = -1;
+                                    conJoystick[MenuMode - 30].Run.ctrl_type = -1;
                                 }
                                 else if(MenuCursor == 6)
                                 {
                                     lastJoyButton = conJoystick[MenuMode - 30].AltRun;
                                     conJoystick[MenuMode - 30].AltRun.type = -1;
+                                    conJoystick[MenuMode - 30].AltRun.ctrl_type = -1;
                                 }
                                 else if(MenuCursor == 7)
                                 {
                                     lastJoyButton = conJoystick[MenuMode - 30].Jump;
                                     oldJumpJoy = conJoystick[MenuMode - 30].Jump;
                                     conJoystick[MenuMode - 30].Jump.type = -1;
+                                    conJoystick[MenuMode - 30].Jump.ctrl_type = -1;
                                 }
                                 else if(MenuCursor == 8)
                                 {
                                     lastJoyButton = conJoystick[MenuMode - 30].AltJump;
                                     conJoystick[MenuMode - 30].AltJump.type = -1;
+                                    conJoystick[MenuMode - 30].AltJump.ctrl_type = -1;
                                 }
                                 else if(MenuCursor == 9)
                                 {
                                     lastJoyButton = conJoystick[MenuMode - 30].Drop;
                                     conJoystick[MenuMode - 30].Drop.type = -1;
+                                    conJoystick[MenuMode - 30].Drop.ctrl_type = -1;
                                 }
                                 else if(MenuCursor == 10)
                                 {
                                     lastJoyButton = conJoystick[MenuMode - 30].Start;
                                     conJoystick[MenuMode - 30].Start.type = -1;
+                                    conJoystick[MenuMode - 30].Start.ctrl_type = -1;
                                 }
                                 getNewJoystick = true;
                                 MenuCursorCanMove = false;
@@ -1523,10 +1553,10 @@ void MenuLoop()
 //            If MenuMode <> 3 Then
             if(MenuMode != 3)
             {
-                if(MenuCursor > 10)
+                if(MenuCursor > 11)
                     MenuCursor = 0;
                 if(MenuCursor < 0)
-                    MenuCursor = 10;
+                    MenuCursor = 11;
 #if 0
 //                If useJoystick(MenuMode - 30) = 0 Then
                 if(useJoystick[MenuMode - 30] == 0) {

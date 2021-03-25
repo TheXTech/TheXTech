@@ -625,7 +625,7 @@ void PlaySound(int A, int loops)
     if(noSound)
         return;
 
-    if((!GameMenu || A == 26 || A == 29) && !GameOutro)
+    if((!GameMenu || A == 26 || A == 27 || A == 29) && !GameOutro)
     {
         if(numPlayers > 2)
             SoundPause[10] = 1;

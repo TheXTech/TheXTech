@@ -1109,11 +1109,11 @@ void InitControls()
 //    int B = 0;
     bool newJoystick = false;
 
-    int joysticksCount = InitJoysticks();
+    int joysticksCount = joyInitJoysticks();
 
     for(int i = 0; i < joysticksCount; ++i)
     {
-        newJoystick = StartJoystick(i);
+        newJoystick = joyStartJoystick(i);
         if(newJoystick) {
             A += 1;
         } else {
@@ -1145,39 +1145,18 @@ void InitControls()
     }
     */
 
-//    '
-    useJoystick[1] = 0;
-    useJoystick[2] = 0;
-//    '
+    For(A, 1, maxLocalPlayers)
+        useJoystick[A] = 0;
 
-    For(A, 1, 2)
+    For(A, 1, maxLocalPlayers)
+    {
+        joyFillDefaults(conKeyboard[A]);
         joyFillDefaults(conJoystick[A]);
-
-    conKeyboard[1].Down = vbKeyDown;
-    conKeyboard[1].Left = vbKeyLeft;
-    conKeyboard[1].Up = vbKeyUp;
-    conKeyboard[1].Right = vbKeyRight;
-    conKeyboard[1].Jump = vbKeyZ;
-    conKeyboard[1].Run = vbKeyX;
-    conKeyboard[1].Drop = vbKeyShift;
-    conKeyboard[1].Start = vbKeyEscape;
-    conKeyboard[1].AltJump = vbKeyA;
-    conKeyboard[1].AltRun = vbKeyS;
-
-    conKeyboard[2].Down = vbKeyDown;
-    conKeyboard[2].Left = vbKeyLeft;
-    conKeyboard[2].Up = vbKeyUp;
-    conKeyboard[2].Right = vbKeyRight;
-    conKeyboard[2].Jump = vbKeyZ;
-    conKeyboard[2].Run = vbKeyX;
-    conKeyboard[2].Drop = vbKeyShift;
-    conKeyboard[2].Start = vbKeyEscape;
-    conKeyboard[2].AltJump = vbKeyA;
-    conKeyboard[2].AltRun = vbKeyS;
+    }
 
     OpenConfig();
 
-    for(int player = 1 ; player <= 2; ++player)
+    for(int player = 1; player <= maxLocalPlayers; ++player)
     {
         if(useJoystick[player] > numJoysticks)
             useJoystick[player] = 0;

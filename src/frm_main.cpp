@@ -298,7 +298,7 @@ void FrmMain::freeSDL()
 {
     GFX.unLoad();
     clearAllTextures();
-    CloseJoysticks();
+    joyCloseJoysticks();
 
 #ifndef __EMSCRIPTEN__
     m_gif.quit();

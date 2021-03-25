@@ -28,6 +28,8 @@
 #include <SDL2/SDL_gamecontroller.h>
 #include <SDL2/SDL_haptic.h>
 
+#include <fmt_format_ne.h>
+
 #include <unordered_map>
 #include <Logger/logger.h>
 
@@ -56,6 +58,20 @@ static std::unordered_map<std::string, ConJoystick_t> s_joystickControls[maxLoca
 #ifdef USE_TOUCHSCREEN_CONTROLLER
 static TouchScreenController      s_touch;
 #endif
+
+void joyFillDefaults(ConKeyboard_t &k)
+{
+    k.Down = vbKeyDown;
+    k.Left = vbKeyLeft;
+    k.Up = vbKeyUp;
+    k.Right = vbKeyRight;
+    k.Jump = vbKeyZ;
+    k.Run = vbKeyX;
+    k.Drop = vbKeyShift;
+    k.Start = vbKeyEscape;
+    k.AltJump = vbKeyA;
+    k.AltRun = vbKeyS;
+}
 
 void joyFillDefaults(ConJoystick_t &j)
 {
@@ -146,9 +162,41 @@ std::string joyGetUuidStr(int joystick)
     return getJoyUuidStr(s_joysticks[joystick].joystick);
 }
 
+std::string joyGetName(int joystick)
+{
+    if(joystick < 0 || joystick >= int(s_joysticks.size()))
+        return fmt::format_ne("Joystick {0}", joystick);
+
+    const char *n;
+    auto &j = s_joysticks[joystick];
+
+//    if(j.control)
+//        n = SDL_GameControllerName(j.control);
+//    else
+    n = SDL_JoystickName(j.joystick);
+
+    if(!n)
+    {
+        if(j.control)
+            return fmt::format_ne("Controller {0}", joystick + 1);
+        else
+            return fmt::format_ne("Joystick {0}", joystick + 1);
+    }
+
+    return fmt::format("{0}: {1}", joystick + 1, n);
+}
+
 int joyCount()
 {
     return (int)s_joysticks.size();
+}
+
+void joyGetAllUUIDs(int player, std::vector<std::string> &out)
+{
+    SDL_assert(player >= 1 && player <= maxLocalPlayers);
+    out.clear();
+    for(auto &q : s_joystickControls[player - 1])
+        out.push_back(q.first);
 }
 
 ConJoystick_t &joyGetByUuid(int player, const std::string &uuid)
@@ -358,7 +406,8 @@ static bool bindControllerKey(SDL_GameController *ctrl, KM_Key &k)
         {
             k.ctrl_val = val;
             k.ctrl_id = i;
-            k.ctrl_type = (int)ConJoystick_t::JoyButton;
+            k.ctrl_type = (int)ConJoystick_t::CtrlButton;
+            k.type = k.ctrl_type;
             return true;
         }
     }
@@ -723,7 +772,7 @@ void UpdateControls()
 }
 
 
-int InitJoysticks()
+int joyInitJoysticks()
 {
 #ifdef USE_TOUCHSCREEN_CONTROLLER
     s_touch.init();
@@ -749,7 +798,7 @@ int InitJoysticks()
             joyFillDefaults(j);
 
             pLogDebug("==========================");
-            pLogDebug("Josytick %s", SDL_JoystickName(joy.joystick));
+            pLogDebug("Josytick available: %s", SDL_JoystickName(joy.joystick));
             pLogDebug("--------------------------");
             pLogDebug("GUID:    %s", guidStr.c_str());
             pLogDebug("Axes:    %d", SDL_JoystickNumAxes(joy.joystick));
@@ -760,7 +809,6 @@ int InitJoysticks()
                 pLogDebug("Supported by the game controller interface!");
             if(j.isHaptic)
                 pLogDebug("Is the haptic device!");
-            pLogDebug("==========================");
 
             if(j.isGameController)
             {
@@ -770,6 +818,8 @@ int InitJoysticks()
                     pLogWarning("Couldn't open the game controller %d, using as a joystick!", i);
                     j.isGameController = false;
                 }
+                else
+                    pLogDebug("Controller: %s", SDL_GameControllerName(joy.control));
             }
 
             if(j.isHaptic)
@@ -781,6 +831,8 @@ int InitJoysticks()
                     j.isHaptic = false;
                 }
             }
+
+            pLogDebug("==========================");
 
             s_joystickControls[1][guidStr] = j;
             s_joysticks.push_back(joy);
@@ -798,7 +850,7 @@ int InitJoysticks()
 }
 
 
-bool StartJoystick(int JoystickNumber)
+bool joyStartJoystick(int JoystickNumber)
 {
     if(JoystickNumber < 0 || JoystickNumber >= int(s_joysticks.size()))
         return false;
@@ -806,24 +858,8 @@ bool StartJoystick(int JoystickNumber)
     auto &joy = s_joysticks[size_t(JoystickNumber)];
     if(joy.joystick)
     {
-        int balls = SDL_JoystickNumBalls(joy.joystick);
-        int hats = SDL_JoystickNumHats(joy.joystick);
-        int buttons = SDL_JoystickNumButtons(joy.joystick);
-        int axes = SDL_JoystickNumAxes(joy.joystick);
-        std::string guidStr = getJoyUuidStr(joy.joystick);
-
         pLogDebug("==========================");
-        pLogDebug("Josytick %s", SDL_JoystickName(joy.joystick));
-        pLogDebug("--------------------------");
-        pLogDebug("GUID:    %s", guidStr.c_str());
-        pLogDebug("Axes:    %d", axes);
-        pLogDebug("Balls:   %d", balls);
-        pLogDebug("Hats:    %d", hats);
-        pLogDebug("Buttons: %d", buttons);
-        if(joy.control)
-            pLogDebug("Supported by the game controller interface!");
-        if(joy.haptic)
-            pLogDebug("Is the haptic device!");
+        pLogDebug("Josytick started: %s", SDL_JoystickName(joy.joystick));
         pLogDebug("==========================");
         return true;
     }
@@ -836,7 +872,7 @@ bool StartJoystick(int JoystickNumber)
     }
 }
 
-void CloseJoysticks()
+void joyCloseJoysticks()
 {
     for(size_t i = 0; i < s_joysticks.size(); ++i) // scan hats first
     {
@@ -851,7 +887,7 @@ void CloseJoysticks()
     s_joysticks.clear();
 }
 
-bool PollJoystick(int joystick, KM_Key &key)
+bool joyPollJoystick(int joystick, KM_Key &key)
 {
     if(joystick < 0 || joystick >= int(s_joysticks.size()))
         return false;
@@ -864,7 +900,7 @@ bool PollJoystick(int joystick, KM_Key &key)
     return bindJoystickKey(j.joystick, key);
 }
 
-bool JoyIsKeyDown(int JoystickNumber, const KM_Key &key)
+bool joyIsKeyDown(int JoystickNumber, const KM_Key &key)
 {
     bool val = false;
 

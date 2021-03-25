@@ -538,7 +538,7 @@ std::string getJoyKeyName(bool isController, const KM_Key &key)
 {
     if(isController)
     {
-        if(key.type < 0)
+        if(key.ctrl_type < 0)
             return "_";
 
         switch(key.ctrl_id)

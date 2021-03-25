@@ -27,6 +27,7 @@
 #define JOYSTICK_H
 
 #include <string>
+#include <vector>
 #include "../range_arr.hpp"
 #include "con_control.h"
 
@@ -40,8 +41,10 @@ void UpdateTouchScreenSize();
 #endif
 
 extern void           joyFillDefaults(ConJoystick_t &j);
+extern void           joyFillDefaults(ConKeyboard_t &k);
 
-extern int            InitJoysticks();
+extern int            joyInitJoysticks();
+extern void           joyGetAllUUIDs(int player, std::vector<std::string> &out);
 
 extern int            joyCount();
 extern ConJoystick_t &joyGetByUuid(int player, const std::string &uuid);
@@ -56,14 +59,15 @@ extern void           joyRumble(int joyNum, int ms, float strength);
 extern void           joyRumbleAllPlayers(int ms, float strength);
 
 extern std::string    joyGetUuidStr(int joystick);
+extern std::string    joyGetName(int joystick);
 
-bool JoyIsKeyDown(int JoystickNumber, const KM_Key &key);
+bool joyIsKeyDown(int JoystickNumber, const KM_Key &key);
 
-void CloseJoysticks();
+void joyCloseJoysticks();
 // Public Function StartJoystick(Optional ByVal JoystickNumber As Integer = 0) As Boolean
-bool StartJoystick(int JoystickNumber);
+bool joyStartJoystick(int JoystickNumber);
 // Public Sub PollJoystick()
-bool PollJoystick(int joystick, KM_Key &key);
+bool joyPollJoystick(int joystick, KM_Key &key);
 
 
 #endif // JOYSTICK_H

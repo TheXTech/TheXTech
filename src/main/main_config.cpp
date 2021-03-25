@@ -32,6 +32,7 @@
 #include "../control/joystick.h"
 
 #include <Utils/files.h>
+#include <Utils/strings.h>
 #include <IniProcessor/ini_processing.h>
 #include <fmt_format_ne.h>
 #include <AppPath/app_path.h>
@@ -124,21 +125,35 @@ void OpenConfig()
 
         For(A, 1, 2)
         {
-            for(int i = 0; i < joyCount(); i++)
+            auto keys = config.childGroups();
+            auto keyNeed = fmt::format_ne("joystick-uuid-{0}-", A);
+
+            for(auto &k : keys)
             {
-                auto &j = joyGetByIndex(A, i);
-                config.beginGroup(fmt::format_ne("joystick-{0}-{1}", A, i));
-                readJoyKey(config, "Up", j.Up);
-                readJoyKey(config, "Down", j.Down);
-                readJoyKey(config, "Left", j.Left);
-                readJoyKey(config, "Right", j.Right);
-                readJoyKey(config, "Run", j.Run);
-                readJoyKey(config, "Jump", j.Jump);
-                readJoyKey(config, "Drop", j.Drop);
-                readJoyKey(config, "Start", j.Start);
-                readJoyKey(config, "AltJump", j.AltJump);
-                readJoyKey(config, "AltRun", j.AltRun);
-                config.endGroup();
+                auto r = k.find(keyNeed);
+                if(r != std::string::npos && r == 0)
+                {
+                    std::string u;
+                    config.beginGroup(k);
+                    config.read("device-uuid", u, "");
+                    if(u.empty())
+                    {
+                        config.endGroup();
+                        continue;
+                    }
+                    auto &j = joyGetByUuid(A, u);
+                    readJoyKey(config, "Up", j.Up);
+                    readJoyKey(config, "Down", j.Down);
+                    readJoyKey(config, "Left", j.Left);
+                    readJoyKey(config, "Right", j.Right);
+                    readJoyKey(config, "Run", j.Run);
+                    readJoyKey(config, "Jump", j.Jump);
+                    readJoyKey(config, "Drop", j.Drop);
+                    readJoyKey(config, "Start", j.Start);
+                    readJoyKey(config, "AltJump", j.AltJump);
+                    readJoyKey(config, "AltRun", j.AltRun);
+                    config.endGroup();
+                }
             }
 
             config.beginGroup(fmt::format_ne("player-{0}-keyboard", A));
@@ -206,10 +221,14 @@ void SaveConfig()
 
     For(A, 1, 2)
     {
-        for(int i = 0; i < joyCount(); i++)
+        std::vector<std::string> joystickUuid;
+        joyGetAllUUIDs(A, joystickUuid);
+
+        for(auto &u : joystickUuid)
         {
-            auto &j = joyGetByIndex(A, i);
-            config.beginGroup(fmt::format_ne("joystick-{0}-{1}", A, i));
+            auto &j = joyGetByUuid(A, u);
+            config.beginGroup(fmt::format_ne("joystick-uuid-{0}-{1}", A, u));
+            config.setValue("device-uuid", u);
             writeJoyKey(config, "Up", j.Up);
             writeJoyKey(config, "Down", j.Down);
             writeJoyKey(config, "Left", j.Left);
