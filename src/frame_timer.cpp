@@ -130,6 +130,9 @@ void resetFrameTimer()
     s_fpsTime = 0;
     s_cycleCount = 0;
     s_gameTime = 0;
+#ifdef USE_NEW_FRAMESKIP
+    s_doUpdate = 0;
+#endif
     D_pLogDebugNA("Time counter reset was called");
 }
 
