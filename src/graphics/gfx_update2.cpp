@@ -32,7 +32,7 @@
 
 
 // draws GFX to screen when on the world map/world map editor
-void UpdateGraphics2()
+void UpdateGraphics2(bool skipRepaint)
 {
     if(!GameIsActive)
         return;
@@ -654,7 +654,8 @@ void UpdateGraphics2()
 
         speedRun_render();
 
-        frmMain.repaint();
+        if(!skipRepaint)
+            frmMain.repaint();
     }
 
     if(TakeScreen)

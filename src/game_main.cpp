@@ -324,7 +324,8 @@ int GameMain(const CmdLineSetup_t &setup)
             resetFrameTimer();
 
             // Update graphics before loop begin (to process an initial lazy-unpacking of used sprites)
-            UpdateGraphics();
+            UpdateGraphics(true);
+            resetFrameTimer();
 
             // Run the frame-loop
             runFrameLoop(&OutroLoop,
@@ -454,7 +455,8 @@ int GameMain(const CmdLineSetup_t &setup)
             resetFrameTimer();
 
             // Update graphics before loop begin (to process inital lazy-unpacking of used sprites)
-            UpdateGraphics();
+            UpdateGraphics(true);
+            resetFrameTimer();
 
             // Main menu loop
             runFrameLoop(&MenuLoop, nullptr, []()->bool{ return GameMenu;});
@@ -544,7 +546,8 @@ int GameMain(const CmdLineSetup_t &setup)
                 GoToLevelNoGameThing = false;
 
                 // Update graphics before loop begin (to process inital lazy-unpacking of used sprites)
-                UpdateGraphics2();
+                UpdateGraphics2(true);
+                resetFrameTimer();
 
                 // 'level select loop
                 runFrameLoop(nullptr, &WorldLoop,
@@ -688,7 +691,8 @@ int GameMain(const CmdLineSetup_t &setup)
             resetFrameTimer();
 
             // Update graphics before loop begin (to process inital lazy-unpacking of used sprites)
-            UpdateGraphics();
+            UpdateGraphics(true);
+            resetFrameTimer();
 
             // MAIN GAME LOOP
             runFrameLoop(nullptr, &GameLoop,
