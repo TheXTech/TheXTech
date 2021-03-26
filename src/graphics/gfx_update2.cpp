@@ -29,6 +29,7 @@
 #include "../collision.h"
 #include "../player.h"
 #include "../main/speedrunner.h"
+#include "../main/trees.h"
 
 
 // draws GFX to screen when on the world map/world map editor
@@ -36,6 +37,18 @@ void UpdateGraphics2(bool skipRepaint)
 {
     if(!GameIsActive)
         return;
+
+    // Keep them static to don't re-alloc them for every iteration
+    static TilePtrArr  tarr;
+    static ScenePtrArr sarr;
+    static WorldPathPtrArr parr;
+    static WorldLevelPtrArr larr;
+
+    // Reserve 400 elements per every array
+    tarr.reserve(400);
+    sarr.reserve(400);
+    parr.reserve(400);
+    larr.reserve(400);
 
 #ifdef __ANDROID__
     if(frmMain.renderBlocked())
@@ -226,74 +239,94 @@ void UpdateGraphics2(bool skipRepaint)
 //        Next A
 //    Else
     {
-        for(A = 1; A <= numTiles; A++)
+        double sLeft = -vScreenX[1];
+        double sTop = -vScreenY[1];
+        double sRight = -vScreenX[1] + vScreen[1].Width;
+        double sBottom = -vScreenY[1] + vScreen[1].Height;
+
+        treeWorldTileQuery(sLeft, sTop, sRight, sBottom, tarr, true);
+        //for(A = 1; A <= numTiles; A++)
+        for(auto *t : tarr)
         {
-            if(vScreenCollision2(1, Tile[A].Location) == true)
+            Tile_t &tile = *t;
+            if(vScreenCollision2(1, tile.Location))
             {
 //                frmMain.renderTexture(vScreenX[Z] + Tile[A].Location.X, vScreenY[Z] + Tile[A].Location.Y, Tile[A].Location.Width, Tile[A].Location.Height, GFXTile[Tile[A].Type], 0, TileHeight[Tile[A].Type] * TileFrame[Tile[A].Type]);
-                frmMain.renderTexture(vScreenX[Z] + Tile[A].Location.X,
-                                      vScreenY[Z] + Tile[A].Location.Y,
-                                      Tile[A].Location.Width,
-                                      Tile[A].Location.Height,
-                                      GFXTileBMP[Tile[A].Type], 0, TileHeight[Tile[A].Type] * TileFrame[Tile[A].Type]);
+                frmMain.renderTexture(vScreenX[Z] + tile.Location.X,
+                                      vScreenY[Z] + tile.Location.Y,
+                                      tile.Location.Width,
+                                      tile.Location.Height,
+                                      GFXTileBMP[tile.Type], 0, TileHeight[tile.Type] * TileFrame[tile.Type]);
             }
         }
-        for(A = 1; A <= numScenes; A++)
+
+        treeWorldSceneQuery(sLeft, sTop, sRight, sBottom, sarr, true);
+        //for(A = 1; A <= numScenes; A++)
+        for(auto *t : sarr)
         {
-            if(vScreenCollision2(1, Scene[A].Location) == true && Scene[A].Active == true)
+            Scene_t &scene = *t;
+            if(vScreenCollision2(1, scene.Location) && scene.Active)
             {
-//                frmMain.renderTexture(vScreenX[Z] + Scene[A].Location.X, vScreenY[Z] + Scene[A].Location.Y, Scene[A].Location.Width, Scene[A].Location.Height, GFXSceneMask[Scene[A].Type], 0, SceneHeight[Scene[A].Type] * SceneFrame[Scene[A].Type]);
-//                frmMain.renderTexture(vScreenX[Z] + Scene[A].Location.X, vScreenY[Z] + Scene[A].Location.Y, Scene[A].Location.Width, Scene[A].Location.Height, GFXScene[Scene[A].Type], 0, SceneHeight[Scene[A].Type] * SceneFrame[Scene[A].Type]);
-                frmMain.renderTexture(vScreenX[Z] + Scene[A].Location.X,
-                                      vScreenY[Z] + Scene[A].Location.Y,
-                                      Scene[A].Location.Width, Scene[A].Location.Height,
-                                      GFXSceneBMP[Scene[A].Type], 0, SceneHeight[Scene[A].Type] * SceneFrame[Scene[A].Type]);
+//                frmMain.renderTexture(vScreenX[Z] + scene.Location.X, vScreenY[Z] + scene.Location.Y, scene.Location.Width, scene.Location.Height, GFXSceneMask[scene.Type], 0, SceneHeight[scene.Type] * SceneFrame[scene.Type]);
+//                frmMain.renderTexture(vScreenX[Z] + scene.Location.X, vScreenY[Z] + scene.Location.Y, scene.Location.Width, scene.Location.Height, GFXScene[scene.Type], 0, SceneHeight[scene.Type] * SceneFrame[scene.Type]);
+                frmMain.renderTexture(vScreenX[Z] + scene.Location.X,
+                                      vScreenY[Z] + scene.Location.Y,
+                                      scene.Location.Width, scene.Location.Height,
+                                      GFXSceneBMP[scene.Type], 0, SceneHeight[scene.Type] * SceneFrame[scene.Type]);
             }
         }
-        for(A = 1; A <= numWorldPaths; A++)
+
+        treeWorldPathQuery(sLeft, sTop, sRight, sBottom, parr, true);
+        //for(A = 1; A <= numWorldPaths; A++)
+        for(auto *t : parr)
         {
-            if(vScreenCollision2(1, WorldPath[A].Location) == true && WorldPath[A].Active == true)
+            WorldPath_t &path = *t;
+            if(vScreenCollision2(1, path.Location) && path.Active)
             {
-//                frmMain.renderTexture(vScreenX[Z] + WorldPath[A].Location.X, vScreenY[Z] + WorldPath[A].Location.Y, WorldPath[A].Location.Width, WorldPath[A].Location.Height, GFXPathMask[WorldPath[A].Type], 0, 0);
-//                frmMain.renderTexture(vScreenX[Z] + WorldPath[A].Location.X, vScreenY[Z] + WorldPath[A].Location.Y, WorldPath[A].Location.Width, WorldPath[A].Location.Height, GFXPath[WorldPath[A].Type], 0, 0);
-                frmMain.renderTexture(vScreenX[Z] + WorldPath[A].Location.X,
-                                      vScreenY[Z] + WorldPath[A].Location.Y,
-                                      WorldPath[A].Location.Width, WorldPath[A].Location.Height,
-                                      GFXPathBMP[WorldPath[A].Type], 0, 0);
+//                frmMain.renderTexture(vScreenX[Z] + path.Location.X, vScreenY[Z] + path.Location.Y, path.Location.Width, path.Location.Height, GFXPathMask[path.Type], 0, 0);
+//                frmMain.renderTexture(vScreenX[Z] + path.Location.X, vScreenY[Z] + path.Location.Y, path.Location.Width, path.Location.Height, GFXPath[path.Type], 0, 0);
+                frmMain.renderTexture(vScreenX[Z] + path.Location.X,
+                                      vScreenY[Z] + path.Location.Y,
+                                      path.Location.Width, path.Location.Height,
+                                      GFXPathBMP[path.Type], 0, 0);
             }
         }
-        for(A = 1; A <= numWorldLevels; A++)
+
+        treeWorldLevelQuery(sLeft, sTop, sRight, sBottom, larr, true);
+        //for(A = 1; A <= numWorldLevels; A++)
+        for(auto *t : larr)
         {
-            if(vScreenCollision2(1, WorldLevel[A].Location) == true && WorldLevel[A].Active == true)
+            WorldLevel_t &level = *t;
+            if(vScreenCollision2(1, level.Location) && level.Active)
             {
-                if(WorldLevel[A].Path == true)
+                if(level.Path == true)
                 {
-                    frmMain.renderTexture(vScreenX[Z] + WorldLevel[A].Location.X,
-                                          vScreenY[Z] + WorldLevel[A].Location.Y,
-                                          WorldLevel[A].Location.Width,
-                                          WorldLevel[A].Location.Height,
+                    frmMain.renderTexture(vScreenX[Z] + level.Location.X,
+                                          vScreenY[Z] + level.Location.Y,
+                                          level.Location.Width,
+                                          level.Location.Height,
                                           GFXLevelBMP[0], 0, 0);
                 }
-                if(WorldLevel[A].Path2 == true)
+                if(level.Path2 == true)
                 {
-                    frmMain.renderTexture(vScreenX[Z] + WorldLevel[A].Location.X - 16,
-                                          vScreenY[Z] + 8 + WorldLevel[A].Location.Y,
+                    frmMain.renderTexture(vScreenX[Z] + level.Location.X - 16,
+                                          vScreenY[Z] + 8 + level.Location.Y,
                                           64, 32,
                                           GFXLevelBMP[29], 0, 0);
                 }
-                if(GFXLevelBig[WorldLevel[A].Type] == true)
+                if(GFXLevelBig[level.Type] == true)
                 {
-                    frmMain.renderTexture(vScreenX[Z] + WorldLevel[A].Location.X - (GFXLevelWidth[WorldLevel[A].Type] - 32) / 2.0,
-                                          vScreenY[Z] + WorldLevel[A].Location.Y - GFXLevelHeight[WorldLevel[A].Type] + 32,
-                                          GFXLevelWidth[WorldLevel[A].Type], GFXLevelHeight[WorldLevel[A].Type],
-                                          GFXLevelBMP[WorldLevel[A].Type], 0, 32 * LevelFrame[WorldLevel[A].Type]);
+                    frmMain.renderTexture(vScreenX[Z] + level.Location.X - (GFXLevelWidth[level.Type] - 32) / 2.0,
+                                          vScreenY[Z] + level.Location.Y - GFXLevelHeight[level.Type] + 32,
+                                          GFXLevelWidth[level.Type], GFXLevelHeight[level.Type],
+                                          GFXLevelBMP[level.Type], 0, 32 * LevelFrame[level.Type]);
                 }
                 else
                 {
-                    frmMain.renderTexture(vScreenX[Z] + WorldLevel[A].Location.X,
-                                          vScreenY[Z] + WorldLevel[A].Location.Y,
-                                          WorldLevel[A].Location.Width, WorldLevel[A].Location.Height,
-                                          GFXLevelBMP[WorldLevel[A].Type], 0, 32 * LevelFrame[WorldLevel[A].Type]);
+                    frmMain.renderTexture(vScreenX[Z] + level.Location.X,
+                                          vScreenY[Z] + level.Location.Y,
+                                          level.Location.Width, level.Location.Height,
+                                          GFXLevelBMP[level.Type], 0, 32 * LevelFrame[level.Type]);
                 }
             }
         }

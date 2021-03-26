@@ -55,9 +55,9 @@ void OpenWorld(std::string FilePath);
 //! Loop for world select
 void WorldLoop();
 
-void LevelPath(int Lvl, int Direction, bool Skp = false);
+void LevelPath(const WorldLevel_t &Lvl, int Direction, bool Skp = false);
 
-void PathPath(int Pth, bool Skp = false);
+void PathPath(WorldPath_t &Pth, bool Skp = false);
 
 void PathWait();
 

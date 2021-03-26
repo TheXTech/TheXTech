@@ -838,6 +838,8 @@ struct WorldLevel_t
 //    Visible As Boolean 'true if it should be shown on the map
     bool Visible = false;
 //End Type
+    long long Z = 0;
+    int index = 0;
 };
 
 //Public Type Warp 'warps such as pipes and doors
@@ -903,6 +905,8 @@ struct Tile_t
 //    Type As Integer
     int Type = 0;
 //End Type
+    long long Z = 0;
+    bool Active = true;
 };
 
 //Public Type Scene 'World Scenery
@@ -915,6 +919,7 @@ struct Scene_t
 //    Active As Boolean 'if false this won't be shown. used for paths that become available on a scene
     bool Active = false;
 //End Type
+    long long Z = 0;
 };
 
 //Public Type WorldPath 'World Paths
@@ -927,6 +932,8 @@ struct WorldPath_t
 //    Type As Integer
     int Type = 0;
 //End Type
+    long long Z = 0;
+    int index = 0;
 };
 
 //Public Type WorldMusic 'World Music
@@ -939,6 +946,8 @@ struct WorldMusic_t
 //    EXTRA: Custom Music
     std::string MusicFile;
 //End Type
+    long long Z = 0;
+    bool Active = true;
 };
 
 //Public Type EditorCursor 'The editor's cursor
