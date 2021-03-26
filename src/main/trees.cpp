@@ -67,8 +67,8 @@ void sortElements(std::vector<WorldItemT*> &list)
     end.reserve(list.size());
 
     WorldItemT *piv;
-    ssize_t i = 0;
-    ssize_t L, R, swapv;
+    int64_t i = 0;
+    int64_t L, R, swapv;
     beg.push_back(0);
     end.push_back(list.size());
 
