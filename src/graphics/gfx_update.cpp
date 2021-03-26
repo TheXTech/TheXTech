@@ -142,6 +142,8 @@ void UpdateGraphics(bool skipRepaint)
     frameNextInc();
     frameRenderStart();
 
+    g_stats.reset();
+
     std::string SuperText;
     std::string tempText;
     int BoxY = 0;
@@ -531,6 +533,7 @@ void UpdateGraphics(bool skipRepaint)
 //            For A = 1 To MidBackground - 1 'First backgrounds
             For(A, 1, MidBackground - 1)  // First backgrounds
             {
+                g_stats.checkedBGOs++;
 //                if(BackgroundHasNoMask[Background[A].Type] == false) // Useless code
 //                {
 //                    if(vScreenCollision(Z, Background[A].Location) && !Background[A].Hidden)
@@ -548,6 +551,7 @@ void UpdateGraphics(bool skipRepaint)
 //                {
                 if(vScreenCollision(Z, Background[A].Location) && !Background[A].Hidden)
                 {
+                    g_stats.renderedBGOs++;
                     frmMain.renderTexture(vScreenX[Z] + Background[A].Location.X,
                                           vScreenY[Z] + Background[A].Location.Y,
                                           GFXBackgroundWidth[Background[A].Type],
@@ -564,10 +568,12 @@ void UpdateGraphics(bool skipRepaint)
 
         For(A, 1, sBlockNum) // Display sizable blocks
         {
+            g_stats.checkedSzBlocks++;
             if(BlockIsSizable[Block[sBlockArray[A]].Type] && (!Block[sBlockArray[A]].Invis || LevelEditor))
             {
                 if(vScreenCollision(Z, Block[sBlockArray[A]].Location) && !Block[sBlockArray[A]].Hidden)
                 {
+                    g_stats.renderedSzBlocks++;
                     int bHeight = Block[sBlockArray[A]].Location.Height / 32.0;
                     for(B = 0; B < bHeight; B++)
                     {
@@ -637,8 +643,10 @@ void UpdateGraphics(bool skipRepaint)
         { // NOT AN EDITOR
             for(A = MidBackground; A <= LastBackground; A++) // Second backgrounds
             {
+                g_stats.checkedBGOs++;
                 if(vScreenCollision(Z, Background[A].Location) && !Background[A].Hidden)
                 {
+                    g_stats.renderedBGOs++;
                     frmMain.renderTexture(vScreenX[Z] + Background[A].Location.X,
                                           vScreenY[Z] + Background[A].Location.Y,
                                           BackgroundWidth[Background[A].Type],
@@ -651,9 +659,11 @@ void UpdateGraphics(bool skipRepaint)
 
         For(A, numBackground + 1, numBackground + numLocked) // Locked doors
         {
+            g_stats.checkedBGOs++;
             if(vScreenCollision(Z, Background[A].Location) &&
                 (Background[A].Type == 98 || Background[A].Type == 160) && !Background[A].Hidden)
             {
+                g_stats.renderedBGOs++;
                 frmMain.renderTexture(vScreenX[Z] + Background[A].Location.X,
                                       vScreenY[Z] + Background[A].Location.Y,
                                       BackgroundWidth[Background[A].Type], BackgroundHeight[Background[A].Type],
@@ -665,6 +675,7 @@ void UpdateGraphics(bool skipRepaint)
 //        For A = 1 To numNPCs 'Display NPCs that should be behind blocks
         For(A, 1, numNPCs) // Display NPCs that should be behind blocks
         {
+            g_stats.checkedNPCs++;
             float cn = NPC[A].Shadow ? 0.f : 1.f;
             if(((NPC[A].Effect == 208 || NPCIsAVine[NPC[A].Type] ||
                  NPC[A].Type == 209 || NPC[A].Type == 159 || NPC[A].Type == 245 ||
@@ -683,10 +694,12 @@ void UpdateGraphics(bool skipRepaint)
                         {
                             if(NPC[A].Type == 8 || NPC[A].Type == 74 || NPC[A].Type == 93 || NPC[A].Type == 245 || NPC[A].Type == 256 || NPC[A].Type == 270)
                             {
+                                g_stats.renderedNPCs++;
                                 frmMain.renderTexture(vScreenX[Z] + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type], vScreenY[Z] + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type], NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPCHeight[NPC[A].Type], cn, cn, cn);
                             }
                             else if(NPC[A].Type == 51 || NPC[A].Type == 257)
                             {
+                                g_stats.renderedNPCs++;
                                 frmMain.renderTexture(vScreenX[Z] + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type],
                                         vScreenY[Z] + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type],
                                         NPC[A].Location.Width, NPC[A].Location.Height,
@@ -696,6 +709,7 @@ void UpdateGraphics(bool skipRepaint)
                             }
                             else if(NPC[A].Type == 52)
                             {
+                                g_stats.renderedNPCs++;
                                 if(NPC[A].Direction == -1)
                                 {
                                     frmMain.renderTexture(vScreenX[Z] + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type], vScreenY[Z] + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type], NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPCHeight[NPC[A].Type]);
@@ -707,10 +721,12 @@ void UpdateGraphics(bool skipRepaint)
                             }
                             else if(NPCWidthGFX[NPC[A].Type] == 0 || NPC[A].Effect == 1)
                             {
+                                g_stats.renderedNPCs++;
                                 frmMain.renderTexture(vScreenX[Z] + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type], vScreenY[Z] + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type], NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPCHeight[NPC[A].Type], cn ,cn ,cn);
                             }
                             else
                             {
+                                g_stats.renderedNPCs++;
                                 frmMain.renderTexture(vScreenX[Z] + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type] - NPCWidthGFX[NPC[A].Type] / 2.0 + NPC[A].Location.Width / 2.0, vScreenY[Z] + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type] - NPCHeightGFX[NPC[A].Type] + NPC[A].Location.Height, NPCWidthGFX[NPC[A].Type], NPCHeightGFX[NPC[A].Type], GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPCHeightGFX[NPC[A].Type], cn, cn, cn);
                             }
                         }
@@ -1058,10 +1074,12 @@ void UpdateGraphics(bool skipRepaint)
 //        For A = fBlock To lBlock 'Non-Sizable Blocks
         For(A, fBlock, lBlock)
         {
+            g_stats.checkedBlocks++;
             if(!BlockIsSizable[Block[A].Type] && (!Block[A].Invis || (LevelEditor && BlockFlash <= 30)) && Block[A].Type != 0 && !BlockKills[Block[A].Type])
             {
                 if(vScreenCollision(Z, Block[A].Location) && !Block[A].Hidden)
                 {
+                    g_stats.renderedBlocks++;
                     // Don't show a visual difference of hit-resized block in a comparison to original state
                     double offX = Block[A].wasShrinkResized ? 0.05 : 0.0;
                     double offW = Block[A].wasShrinkResized ? 0.1 : 0.0;
@@ -1079,11 +1097,13 @@ void UpdateGraphics(bool skipRepaint)
 //'effects in back
         for(A = 1; A <= numEffects; A++)
         {
+            g_stats.checkedEffects++;
             if(Effect[A].Type == 112 || Effect[A].Type == 54 || Effect[A].Type == 55 ||
                Effect[A].Type == 59 || Effect[A].Type == 77 || Effect[A].Type == 81 ||
                Effect[A].Type == 82 || Effect[A].Type == 103 || Effect[A].Type == 104 ||
                Effect[A].Type == 114 || Effect[A].Type == 123 || Effect[A].Type == 124)
             {
+                g_stats.renderedEffects++;
                 if(vScreenCollision(Z, Effect[A].Location))
                 {
                     float cn = Effect[A].Shadow ? 0.f : 1.f;
@@ -1095,6 +1115,7 @@ void UpdateGraphics(bool skipRepaint)
 
         for(A = 1; A <= numNPCs; A++) // Display NPCs that should be behind other npcs
         {
+            g_stats.checkedNPCs++;
             float cn = NPC[A].Shadow ? 0.f : 1.f;
             if(NPC[A].Effect == 0)
             {
@@ -1105,6 +1126,7 @@ void UpdateGraphics(bool skipRepaint)
                     {
                         if(NPC[A].Active)
                         {
+                            g_stats.renderedNPCs++;
                             if(NPCWidthGFX[NPC[A].Type] == 0)
                             {
                                 frmMain.renderTexture(vScreenX[Z] + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type], vScreenY[Z] + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type], NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A].Location.Height, cn, cn, cn);
@@ -1151,10 +1173,12 @@ void UpdateGraphics(bool skipRepaint)
 
         for(A = 1; A <= numNPCs; A++) // ice
         {
+            g_stats.checkedNPCs++;
             if(NPC[A].Type == 263 && NPC[A].Effect == 0 && NPC[A].HoldingPlayer == 0)
             {
                 if((vScreenCollision(Z, NPC[A].Location) | vScreenCollision(Z, newLoc(NPC[A].Location.X - (NPCWidthGFX[NPC[A].Type] - NPC[A].Location.Width) / 2.0, NPC[A].Location.Y, static_cast<double>(NPCWidthGFX[NPC[A].Type]), static_cast<double>(NPCHeight[NPC[A].Type])))) != 0 && NPC[A].Hidden == false)
                 {
+                    g_stats.renderedNPCs++;
                     DrawFrozenNPC(Z, A);
                     if(NPC[A].Reset[Z] || NPC[A].Active)
                     {
@@ -1192,6 +1216,7 @@ void UpdateGraphics(bool skipRepaint)
 //        For A = 1 To numNPCs 'Display NPCs that should be in front of blocks
         For(A, 1, numNPCs) // Display NPCs that should be in front of blocks
         {
+            g_stats.checkedNPCs++;
             float cn = NPC[A].Shadow ? 0.f : 1.f;
             if(NPC[A].Effect == 0)
             {
@@ -1210,6 +1235,7 @@ void UpdateGraphics(bool skipRepaint)
                             {
                                 if(!NPCIsYoshi[NPC[A].Type])
                                 {
+                                    g_stats.renderedNPCs++;
                                     if(NPCWidthGFX[NPC[A].Type] == 0)
                                     {
                                         frmMain.renderTexture(vScreenX[Z] + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type], vScreenY[Z] + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type], NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A].Location.Height, cn, cn, cn);
@@ -1340,6 +1366,7 @@ void UpdateGraphics(bool skipRepaint)
                                     }
                                     // YoshiBX = YoshiBX + 4
                                     // YoshiTX = YoshiTX + 4
+                                    g_stats.renderedNPCs++;
                                     // Yoshi's Body
                                     frmMain.renderTexture(vScreenX[Z] + static_cast<int>(floor(static_cast<double>(NPC[A].Location.X))) + YoshiBX, vScreenY[Z] + NPC[A].Location.Y + YoshiBY, 32, 32, GFXYoshiB[B], 0, 32 * YoshiBFrame, cn, cn, cn);
 
@@ -1388,11 +1415,13 @@ void UpdateGraphics(bool skipRepaint)
         // npc chat bubble
         for(A = 1; A <= numNPCs; A++)
         {
+            g_stats.checkedNPCs++;
             if(NPC[A].Active && NPC[A].Chat)
             {
                 B = NPCHeightGFX[NPC[A].Type] - NPC[A].Location.Height;
                 if(B < 0)
                     B = 0;
+                g_stats.renderedNPCs++;
                 frmMain.renderTexture(vScreenX[Z] + NPC[A].Location.X + NPC[A].Location.Width / 2.0 - GFX.Chat.w / 2, vScreenY[Z] + NPC[A].Location.Y - 30 - B, GFX.Chat.w, GFX.Chat.h, GFX.Chat, 0, 0);
             }
         }
@@ -1451,6 +1480,7 @@ void UpdateGraphics(bool skipRepaint)
 
         for(A = 1; A <= numNPCs; A++) // Put held NPCs on top
         {
+            g_stats.checkedNPCs++;
             float cn = NPC[A].Shadow ? 0.f : 1.f;
             if(
                 (
@@ -1464,10 +1494,12 @@ void UpdateGraphics(bool skipRepaint)
             {
                 if(NPC[A].Type == 263)
                 {
+                    g_stats.renderedNPCs++;
                     DrawFrozenNPC(Z, A);
                 }
                 else if(!NPCIsYoshi[NPC[A].Type] && NPC[A].Type > 0)
                 {
+                    g_stats.renderedNPCs++;
                     if(NPCWidthGFX[NPC[A].Type] == 0)
                     {
                         frmMain.renderTexture(vScreenX[Z] + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type], vScreenY[Z] + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type], NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A].Location.Height, cn, cn, cn);
@@ -1516,8 +1548,10 @@ void UpdateGraphics(bool skipRepaint)
         { // NOT AN EDITOR
             for(A = LastBackground + 1; A <= numBackground; A++) // Foreground objects
             {
+                g_stats.checkedBGOs++;
                 if(vScreenCollision(Z, Background[A].Location) && !Background[A].Hidden)
                 {
+                    g_stats.renderedBGOs++;
                     frmMain.renderTexture(vScreenX[Z] + Background[A].Location.X, vScreenY[Z] + Background[A].Location.Y, GFXBackgroundWidth[Background[A].Type], BackgroundHeight[Background[A].Type], GFXBackground[Background[A].Type], 0, BackgroundHeight[Background[A].Type] * BackgroundFrame[Background[A].Type]);
                 }
             }
@@ -1526,6 +1560,7 @@ void UpdateGraphics(bool skipRepaint)
 
         for(A = 1; A <= numNPCs; A++) // foreground NPCs
         {
+            g_stats.checkedNPCs++;
             float cn = NPC[A].Shadow ? 0.f : 1.f;
             if(NPC[A].Effect == 0)
             {
@@ -1537,6 +1572,7 @@ void UpdateGraphics(bool skipRepaint)
                         {
                             if(NPC[A].Active)
                             {
+                                g_stats.renderedNPCs++;
                                 if(NPCWidthGFX[NPC[A].Type] == 0)
                                 {
                                     frmMain.renderTexture(vScreenX[Z] + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type], vScreenY[Z] + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type], NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A].Location.Height, cn, cn, cn);
@@ -1582,10 +1618,12 @@ void UpdateGraphics(bool skipRepaint)
 
         for(A = fBlock; A <= lBlock; A++) // Blocks in Front
         {
+            g_stats.checkedBlocks++;
             if(BlockKills[Block[A].Type])
             {
                 if(vScreenCollision(Z, Block[A].Location) && !Block[A].Hidden)
                 {
+                    g_stats.renderedBlocks++;
                     // Don't show a visual difference of hit-resized block in a comparison to original state
                     double offX = Block[A].wasShrinkResized ? 0.05 : 0.0;
                     double offW = Block[A].wasShrinkResized ? 0.1 : 0.0;
@@ -1603,6 +1641,7 @@ void UpdateGraphics(bool skipRepaint)
 // effects on top
         For(A, 1, numEffects)
         {
+            g_stats.checkedEffects++;
 //            With Effect(A)
             auto &e = Effect[A];
 //                If .Type <> 112 And .Type <> 54 And .Type <> 55 And .Type <> 59 And .Type <> 77 And .Type <> 81 And .Type <> 82 And .Type <> 103 And .Type <> 104 And .Type <> 114 And .Type <> 123 And .Type <> 124 Then
@@ -1613,6 +1652,7 @@ void UpdateGraphics(bool skipRepaint)
 //                    If vScreenCollision(Z, .Location) Then
                 if(vScreenCollision(Z, e.Location))
                 {
+                    g_stats.renderedEffects++;
 //                        BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, .Location.Width, .Location.Height, GFXEffectMask(.Type), 0, .Frame * EffectHeight(.Type), vbSrcAnd
 //                        If .Shadow = False Then BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, .Location.Width, .Location.Height, GFXEffect(.Type), 0, .Frame * EffectHeight(.Type), vbSrcPaint
                     float c = e.Shadow ? 0.f : 1.f;
@@ -1651,6 +1691,7 @@ void UpdateGraphics(bool skipRepaint)
         // NPC Generators
             for(A = 1; A <= numNPCs; A++)
             {
+                g_stats.checkedNPCs++;
                 if(NPC[A].Generator)
                 {
                     if(vScreenCollision(Z, NPC[A].Location) && !NPC[A].Hidden)
@@ -1720,6 +1761,7 @@ void UpdateGraphics(bool skipRepaint)
 
                 For(A, 1, numNPCs) // Display NPCs that got dropped from the container
                 {
+                    g_stats.checkedNPCs++;
                     if(NPC[A].Effect == 2)
                     {
                         if(std::fmod(NPC[A].Effect2, 3) != 0.0)
@@ -1728,6 +1770,7 @@ void UpdateGraphics(bool skipRepaint)
                             {
                                 if(NPC[A].Active)
                                 {
+                                    g_stats.renderedNPCs++;
                                     if(NPCWidthGFX[NPC[A].Type] == 0)
                                     {
                                         frmMain.renderTexture(vScreenX[Z] + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type], vScreenY[Z] + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type], NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A].Location.Height);
@@ -2145,9 +2188,9 @@ void UpdateGraphics(bool skipRepaint)
                 frmMain.renderTexture(int(MenuMouseX), int(MenuMouseY), GFX.ECursor[2]);
             }
 
-            if(PrintFPS > 0) {
+            if(PrintFPS > 0)
                 SuperPrint(fmt::format_ne("{0}", int(PrintFPS)), 1, 8, 8, 0.f, 1.f, 0.f);
-            }
+            g_stats.print();
         }
 
         speedRun_render();

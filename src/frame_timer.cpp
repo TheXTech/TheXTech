@@ -39,12 +39,16 @@ PerformanceStats_t g_stats;
 void PerformanceStats_t::reset()
 {
    renderedBlocks = 0;
+   renderedSzBlocks = 0;
    renderedBGOs = 0;
    renderedNPCs = 0;
+   renderedEffects = 0;
 
    checkedBlocks = 0;
+   checkedSzBlocks = 0;
    checkedBGOs = 0;
    checkedNPCs = 0;
+   checkedEffects = 0;
 
    renderedTiles = 0;
    renderedScenes = 0;
@@ -66,23 +70,36 @@ void PerformanceStats_t::print()
     if(!enabled)
         return;
 
-    if(LevelSelect)
+    if(LevelSelect && !GameMenu)
     {
-        SuperPrint(fmt::sprintf_ne("DRAW: T=%03d S=%03d P=%03d L=%03d",
-                                   renderedTiles, renderedScenes, renderedPaths, renderedLevels),
+        SuperPrint(fmt::sprintf_ne("DRAW: T=%03d S=%03d P=%03d L=%03d, SUM=%03d",
+                                   renderedTiles, renderedScenes, renderedPaths, renderedLevels,
+                                   (renderedTiles + renderedScenes + renderedPaths + renderedLevels)),
                    3, 45, 8);
-        SuperPrint(fmt::sprintf_ne("CHEK: T=%03d S=%03d P=%03d L=%03d",
-                                   checkedTiles, checkedScenes, checkedPaths, checkedLevels),
+        SuperPrint(fmt::sprintf_ne("CHEK: T=%03d S=%03d P=%03d L=%03d, SUM=%03d",
+                                   checkedTiles, checkedScenes, checkedPaths, checkedLevels,
+                                   (checkedTiles + checkedScenes + checkedPaths + checkedLevels)),
                    3, 45, 26);
     }
     else
     {
-        SuperPrint(fmt::sprintf_ne("DRAW: B=%03d G=%03d N=%03d",
-                                   renderedBlocks, renderedBGOs, renderedNPCs),
-                   3, 45, 8);
-        SuperPrint(fmt::sprintf_ne("CHEK: B=%03d G=%03d N=%03d",
-                                   checkedBlocks, checkedBGOs, checkedNPCs),
-                   3, 45, 26);
+        frmMain.renderRect(42, 6, 745, 72, 0.0f,0.0f, 0.0f, 0.3f, true);
+        SuperPrint(fmt::sprintf_ne("DRAW: B=%05d Z=%04d G=%04d N=%04d, E=%03d",
+                                   renderedBlocks, renderedSzBlocks, renderedBGOs, renderedNPCs, renderedEffects,
+                                   (renderedBlocks + renderedSzBlocks + renderedBGOs + renderedNPCs + renderedEffects)),
+                   3, 45, 8, 0.5f, 1.f, 1.f);
+        SuperPrint(fmt::sprintf_ne("DRAW: SUMM=%d", (renderedBlocks + renderedSzBlocks + renderedBGOs + renderedNPCs + renderedEffects)),
+                   3, 45, 26, 0.5f, 1.f, 1.f);
+        SuperPrint(fmt::sprintf_ne("CHEK: B=%05d Z=%04d G=%04d N=%04d, E=%03d",
+                                   checkedBlocks, checkedSzBlocks, checkedBGOs, checkedNPCs, checkedEffects),
+                   3, 45, 44, 0.5f, 1.f, 1.f);
+        SuperPrint(fmt::sprintf_ne("CHEK: SUMM=%d", (checkedBlocks + checkedSzBlocks+ checkedBGOs + checkedNPCs + checkedEffects)),
+                   3, 45, 62, 0.5f, 1.f, 1.f);
+        // WIP
+//        SuperPrint(fmt::sprintf_ne("PHYS: B%03d G%03d N%03d, S:%03d",
+//                                   physScannedBlocks, physScannedBGOs, physScannedNPCs,
+//                                   (physScannedBlocks + physScannedBGOs + physScannedNPCs)),
+//                   3, 45, 44);
     }
 }
 

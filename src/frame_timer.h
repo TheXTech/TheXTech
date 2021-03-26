@@ -32,13 +32,17 @@ struct PerformanceStats_t
 {
     // How many objects got drawn in one frame
     int renderedBlocks = 0;
+    int renderedSzBlocks = 0;
     int renderedBGOs = 0;
     int renderedNPCs = 0;
+    int renderedEffects = 0;
 
     // How many objects got scanned to find what to render
     int checkedBlocks = 0;
+    int checkedSzBlocks = 0;
     int checkedBGOs = 0;
     int checkedNPCs = 0;
+    int checkedEffects = 0;
 
     int renderedTiles = 0;
     int renderedScenes = 0;
