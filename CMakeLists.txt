@@ -112,6 +112,8 @@ option(ENABLE_LOGGING "Enable debug logging" ON)
 
 option(THEXTECH_ENABLE_LUA "Enable lua scripting support" OFF)
 
+option(ENABLE_ADDRESS_SANITIZER "Enable the Address Sanitizer GCC feature" OFF)
+
 # ============ Customization ==============
 set(LIB_SRC_EXTRA)
 set(THEXTECH_GAME_NAME_TITLE "" CACHE STRING "Custom game title, shown in the titlebar of window")
@@ -454,6 +456,11 @@ endif()
 
 if(THEXTECH_ENABLE_LUA)
     target_compile_definitions(thextech PRIVATE -DENABLE_XTECH_LUA)
+endif()
+
+if(ENABLE_ADDRESS_SANITIZER)
+    target_compile_options(thextech PRIVATE -fsanitize=address)
+    target_link_options(thextech PRIVATE -fsanitize=address)
 endif()
 
 target_include_directories(thextech PRIVATE ${A2XT_INCS})
