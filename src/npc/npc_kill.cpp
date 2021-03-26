@@ -1513,7 +1513,7 @@ void KillNPC(int A, int B)
         }
         NPC[A] = NPC[numNPCs];
         NPC[numNPCs] = blankNPC;
-        numNPCs = numNPCs - 1;
+        numNPCs--;
         if(NPC[A].HoldingPlayer > 0)
         {
             Player[NPC[A].HoldingPlayer].HoldingNPC = A;
