@@ -38,18 +38,6 @@ void UpdateGraphics2(bool skipRepaint)
     if(!GameIsActive)
         return;
 
-    // Keep them static to don't re-alloc them for every iteration
-    static TilePtrArr  tarr;
-    static ScenePtrArr sarr;
-    static WorldPathPtrArr parr;
-    static WorldLevelPtrArr larr;
-
-    // Reserve 400 elements per every array
-    tarr.reserve(400);
-    sarr.reserve(400);
-    parr.reserve(400);
-    larr.reserve(400);
-
 #ifdef __ANDROID__
     if(frmMain.renderBlocked())
         return;
@@ -63,6 +51,22 @@ void UpdateGraphics2(bool skipRepaint)
 
     frameNextInc();
     frameRenderStart();
+
+    // Keep them static to don't re-alloc them for every iteration
+    static TilePtrArr  tarr;
+    static ScenePtrArr sarr;
+    static WorldPathPtrArr parr;
+    static WorldLevelPtrArr larr;
+
+    // Reserve 400 elements per every array
+    if(tarr.capacity() < 400)
+        tarr.reserve(400);
+    if(sarr.capacity() < 400)
+        sarr.reserve(400);
+    if(parr.capacity() < 400)
+        parr.reserve(400);
+    if(larr.capacity() < 400)
+        larr.reserve(400);
 
     int A = 0;
     int B = 0;
@@ -299,7 +303,7 @@ void UpdateGraphics2(bool skipRepaint)
             WorldLevel_t &level = *t;
             if(vScreenCollision2(1, level.Location) && level.Active)
             {
-                if(level.Path == true)
+                if(level.Path)
                 {
                     frmMain.renderTexture(vScreenX[Z] + level.Location.X,
                                           vScreenY[Z] + level.Location.Y,
@@ -307,14 +311,14 @@ void UpdateGraphics2(bool skipRepaint)
                                           level.Location.Height,
                                           GFXLevelBMP[0], 0, 0);
                 }
-                if(level.Path2 == true)
+                if(level.Path2)
                 {
                     frmMain.renderTexture(vScreenX[Z] + level.Location.X - 16,
                                           vScreenY[Z] + 8 + level.Location.Y,
                                           64, 32,
                                           GFXLevelBMP[29], 0, 0);
                 }
-                if(GFXLevelBig[level.Type] == true)
+                if(GFXLevelBig[level.Type])
                 {
                     frmMain.renderTexture(vScreenX[Z] + level.Location.X - (GFXLevelWidth[level.Type] - 32) / 2.0,
                                           vScreenY[Z] + level.Location.Y - GFXLevelHeight[level.Type] + 32,
