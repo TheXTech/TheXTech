@@ -25,12 +25,66 @@
 
 #include <SDL2/SDL_timer.h>
 
+#include <fmt_format_ne.h>
 #include <Logger/logger.h>
 #include "pge_delay.h"
 
 #include "frame_timer.h"
 #include "globals.h"
 #include "graphics.h"
+
+
+PerformanceStats_t g_stats;
+
+void PerformanceStats_t::reset()
+{
+   renderedBlocks = 0;
+   renderedBGOs = 0;
+   renderedNPCs = 0;
+
+   checkedBlocks = 0;
+   checkedBGOs = 0;
+   checkedNPCs = 0;
+
+   renderedTiles = 0;
+   renderedScenes = 0;
+   renderedPaths = 0;
+   renderedLevels = 0;
+
+   checkedTiles = 0;
+   checkedScenes = 0;
+   checkedPaths = 0;
+   checkedLevels = 0;
+
+   physScannedBlocks = 0;
+   physScannedBGOs = 0;
+   physScannedNPCs = 0;
+}
+
+void PerformanceStats_t::print()
+{
+    if(!enabled)
+        return;
+
+    if(LevelSelect)
+    {
+        SuperPrint(fmt::sprintf_ne("DRAW: T=%03d S=%03d P=%03d L=%03d",
+                                   renderedTiles, renderedScenes, renderedPaths, renderedLevels),
+                   3, 45, 8);
+        SuperPrint(fmt::sprintf_ne("CHEK: T=%03d S=%03d P=%03d L=%03d",
+                                   checkedTiles, checkedScenes, checkedPaths, checkedLevels),
+                   3, 45, 26);
+    }
+    else
+    {
+        SuperPrint(fmt::sprintf_ne("DRAW: B=%03d G=%03d N=%03d",
+                                   renderedBlocks, renderedBGOs, renderedNPCs),
+                   3, 45, 8);
+        SuperPrint(fmt::sprintf_ne("CHEK: B=%03d G=%03d N=%03d",
+                                   checkedBlocks, checkedBGOs, checkedNPCs),
+                   3, 45, 26);
+    }
+}
 
 //#if !defined(__EMSCRIPTEN__)
 #define USE_NEW_TIMER
