@@ -125,13 +125,15 @@ static double s_currentTicks = 0.0;
 void resetFrameTimer()
 {
     s_overTime = 0;
-    s_goalTime = SDL_GetTicks() + 1000;
     s_fpsCount = 0;
     s_fpsTime = 0;
     s_cycleCount = 0;
     s_gameTime = 0;
 #ifdef USE_NEW_FRAMESKIP
     s_doUpdate = 0;
+    s_goalTime = 0;
+#else
+    s_goalTime = SDL_GetTicks() + 1000;
 #endif
     D_pLogDebugNA("Time counter reset was called");
 }
@@ -243,7 +245,8 @@ static SDL_INLINE void computeFrameTime1Real_2()
 static SDL_INLINE void computeFrameTime2Real_2()
 {
 #ifdef USE_NEW_FRAMESKIP
-    s_doUpdate -= c_frameRateNano;
+    if(s_doUpdate > 0)
+        s_doUpdate -= c_frameRateNano;
     s_startProcessing = 0;
     s_stopProcessing = 0;
 #endif
@@ -354,9 +357,15 @@ void frameRenderEnd()
     if(s_doUpdate <= 0)
     {
         s_stopProcessing = getNanoTime();
-        s_doUpdate = FrameSkip ? (s_stopProcessing - s_startProcessing) : 0;
-        if(s_doUpdate > c_frameRateNano * 25) // Limit 25 frames being skipped maximum
-            s_doUpdate = c_frameRateNano * 25;
+        nanotime_t newTime = FrameSkip ? (s_stopProcessing - s_startProcessing) : 0;
+        // D_pLogDebug("newTime/nano=%lld (%lld)", newTime/c_frameRateNano, newTime / 1000000);
+        if(newTime > c_frameRateNano * 25) // Limit 25 frames being skipped maximum
+        {
+            D_pLogDebug("Overloading detected: %lld frames to skip (%lld milliseconds delay)", newTime/c_frameRateNano, newTime / 1000000);
+            newTime = c_frameRateNano * 25;
+        }
+        s_doUpdate += newTime;
+        s_goalTime = SDL_GetTicks() + (newTime / 1000000);
     }
 #endif
 }
