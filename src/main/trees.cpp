@@ -61,8 +61,10 @@ void sortElements(std::vector<WorldItemT*> &list)
     if(list.size() <= 1)
         return; //Nothing to sort!
 
-    std::vector<size_t> beg;
-    std::vector<size_t> end;
+#define S(x) (static_cast<size_t>(x))
+
+    std::vector<int64_t> beg;
+    std::vector<int64_t> end;
     beg.reserve(list.size());
     end.reserve(list.size());
 
@@ -70,38 +72,38 @@ void sortElements(std::vector<WorldItemT*> &list)
     int64_t i = 0;
     int64_t L, R, swapv;
     beg.push_back(0);
-    end.push_back(list.size());
+    end.push_back(static_cast<int64_t>(list.size()));
 
     while(i >= 0)
     {
-        L = beg[static_cast<size_t>(i)];
-        R = end[static_cast<size_t>(i)] - 1;
+        L = beg[S(i)];
+        R = end[S(i)] - 1;
 
         if(L < R)
         {
-            piv = list[L];
+            piv = list[S(L)];
             while(L < R)
             {
-                while((list[R]->Z >= piv->Z) && (L < R)) R--;
-                if(L < R) list[L++] = std::move(list[R]);
+                while((list[S(R)]->Z >= piv->Z) && (L < R)) R--;
+                if(L < R) list[S(L++)] = std::move(list[S(R)]);
 
-                while((list[L]->Z <= piv->Z) && (L < R)) L++;
-                if(L < R) list[R--] = std::move(list[L]);
+                while((list[S(L)]->Z <= piv->Z) && (L < R)) L++;
+                if(L < R) list[S(R--)] = std::move(list[S(L)]);
             }
 
-            list[L] = piv;
+            list[S(L)] = piv;
             beg.push_back(L + 1);
-            end.push_back(end[i]);
-            end[i++] = (L);
+            end.push_back(end[S(i)]);
+            end[S(i++)] = (L);
 
-            if((end[i] - beg[i]) > (end[i - 1] - beg[i - 1]))
+            if((end[i] - beg[S(i)]) > (end[i - 1] - beg[S(i - 1)]))
             {
-                swapv = beg[i];
-                beg[i] = beg[i - 1];
-                beg[i - 1] = swapv;
-                swapv = end[i];
-                end[i] = end[i - 1];
-                end[i - 1] = swapv;
+                swapv = beg[S(i)];
+                beg[S(i)] = beg[S(i - 1)];
+                beg[S(i - 1)] = swapv;
+                swapv = end[S(i)];
+                end[S(i)] = end[S(i - 1)];
+                end[S(i - 1)] = swapv;
             }
         }
         else
@@ -111,6 +113,8 @@ void sortElements(std::vector<WorldItemT*> &list)
             end.pop_back();
         }
     }
+
+#undef S
 }
 
 template<class Q>
