@@ -52,6 +52,8 @@ void UpdateGraphics2(bool skipRepaint)
     frameNextInc();
     frameRenderStart();
 
+    g_stats.reset();
+
     // Keep them static to don't re-alloc them for every iteration
     static TilePtrArr  tarr;
     static ScenePtrArr sarr;
@@ -243,18 +245,20 @@ void UpdateGraphics2(bool skipRepaint)
 //        Next A
 //    Else
     {
-        double sLeft = -vScreenX[1];
-        double sTop = -vScreenY[1];
-        double sRight = -vScreenX[1] + vScreen[1].Width;
-        double sBottom = -vScreenY[1] + vScreen[1].Height;
+        double sLeft = -vScreenX[1] + 64;
+        double sTop = -vScreenY[1] + 96;
+        double sRight = -vScreenX[1] + vScreen[1].Width - 64;
+        double sBottom = -vScreenY[1] + vScreen[1].Height - 64;
 
         treeWorldTileQuery(sLeft, sTop, sRight, sBottom, tarr, true);
         //for(A = 1; A <= numTiles; A++)
         for(auto *t : tarr)
         {
             Tile_t &tile = *t;
+            g_stats.checkedTiles++;
             if(vScreenCollision2(1, tile.Location))
             {
+                g_stats.renderedTiles++;
 //                frmMain.renderTexture(vScreenX[Z] + Tile[A].Location.X, vScreenY[Z] + Tile[A].Location.Y, Tile[A].Location.Width, Tile[A].Location.Height, GFXTile[Tile[A].Type], 0, TileHeight[Tile[A].Type] * TileFrame[Tile[A].Type]);
                 frmMain.renderTexture(vScreenX[Z] + tile.Location.X,
                                       vScreenY[Z] + tile.Location.Y,
@@ -269,8 +273,10 @@ void UpdateGraphics2(bool skipRepaint)
         for(auto *t : sarr)
         {
             Scene_t &scene = *t;
+            g_stats.checkedScenes++;
             if(vScreenCollision2(1, scene.Location) && scene.Active)
             {
+                g_stats.renderedScenes++;
 //                frmMain.renderTexture(vScreenX[Z] + scene.Location.X, vScreenY[Z] + scene.Location.Y, scene.Location.Width, scene.Location.Height, GFXSceneMask[scene.Type], 0, SceneHeight[scene.Type] * SceneFrame[scene.Type]);
 //                frmMain.renderTexture(vScreenX[Z] + scene.Location.X, vScreenY[Z] + scene.Location.Y, scene.Location.Width, scene.Location.Height, GFXScene[scene.Type], 0, SceneHeight[scene.Type] * SceneFrame[scene.Type]);
                 frmMain.renderTexture(vScreenX[Z] + scene.Location.X,
@@ -285,8 +291,10 @@ void UpdateGraphics2(bool skipRepaint)
         for(auto *t : parr)
         {
             WorldPath_t &path = *t;
+            g_stats.checkedPaths++;
             if(vScreenCollision2(1, path.Location) && path.Active)
             {
+                g_stats.renderedPaths++;
 //                frmMain.renderTexture(vScreenX[Z] + path.Location.X, vScreenY[Z] + path.Location.Y, path.Location.Width, path.Location.Height, GFXPathMask[path.Type], 0, 0);
 //                frmMain.renderTexture(vScreenX[Z] + path.Location.X, vScreenY[Z] + path.Location.Y, path.Location.Width, path.Location.Height, GFXPath[path.Type], 0, 0);
                 frmMain.renderTexture(vScreenX[Z] + path.Location.X,
@@ -301,8 +309,10 @@ void UpdateGraphics2(bool skipRepaint)
         for(auto *t : larr)
         {
             WorldLevel_t &level = *t;
+            g_stats.checkedLevels++;
             if(vScreenCollision2(1, level.Location) && level.Active)
             {
+                g_stats.renderedLevels++;
                 if(level.Path)
                 {
                     frmMain.renderTexture(vScreenX[Z] + level.Location.X,
@@ -684,10 +694,11 @@ void UpdateGraphics2(bool skipRepaint)
                 frmMain.renderTexture(252 + 56, 275 + (MenuCursor * 35), 16, 16, GFX.MCursor[0], 0, 0);
             }
         }
+
         if(PrintFPS > 0)
-        {
             SuperPrint(std::to_string(int(PrintFPS)), 1, 8, 8, 0.f, 1.f, 0.f);
-        }
+
+        g_stats.print();
 
         speedRun_render();
 

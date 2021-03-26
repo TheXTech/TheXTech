@@ -47,7 +47,7 @@ struct WorldTree_private
     IndexTreeQ tree;
 };
 
-const double s_gridSize = 16;
+const double s_gridSize = 4;
 
 static std::unique_ptr<WorldTree_private<Tile_t>> s_worldTilesTree;
 static std::unique_ptr<WorldTree_private<Scene_t>> s_worldSceneTree;
