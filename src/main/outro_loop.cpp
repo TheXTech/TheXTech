@@ -111,6 +111,10 @@ void DoCredits()
 #ifdef __ANDROID__ // Quit credits on BACK key press
         quitKey |= (getKeyState(SDL_SCANCODE_AC_BACK) == KEY_PRESSED);
 #endif
+#ifdef USE_TOUCHSCREEN_CONTROLLER // Quit when pressed the "Start" on a touchscreen controller
+        quitKey |= CurrentTouchControls().Start;
+#endif
+
         if(quitKey)
         {
             CreditChop = static_cast<float>(screenH_half);

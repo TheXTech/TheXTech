@@ -38,6 +38,7 @@ void UpdateControls();
 #ifdef USE_TOUCHSCREEN_CONTROLLER
 void RenderTouchControls();
 void UpdateTouchScreenSize();
+const Controls_t &CurrentTouchControls();
 #endif
 
 extern void           joyFillDefaults(ConJoystick_t &j);

@@ -57,6 +57,10 @@ static std::vector<Joystick_t> s_joysticks;
 static std::unordered_map<std::string, ConJoystick_t> s_joystickControls[maxLocalPlayers];
 #ifdef USE_TOUCHSCREEN_CONTROLLER
 static TouchScreenController      s_touch;
+const Controls_t &CurrentTouchControls()
+{
+    return s_touch.m_current_keys;
+}
 #endif
 
 void joyFillDefaults(ConKeyboard_t &k)
