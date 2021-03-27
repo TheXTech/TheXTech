@@ -534,7 +534,7 @@ void TouchScreenController::render()
         }
 
 #ifdef __ANDROID__
-        float a = m_keysHeld[key] ? 0.9f : 0.5f;
+        float a = m_keysHeld[key] ? 0.9f : 0.3f;
 
         switch(key)
         {
