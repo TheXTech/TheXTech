@@ -166,6 +166,129 @@ TouchScreenController::FingerState &TouchScreenController::FingerState::operator
     return *this;
 }
 
+static int buttonLeft()
+{
+    if(LevelSelect && GamePaused)
+        return GFX_t::BUTTON_LEFT_CHAR;
+    else
+        return GFX_t::BUTTON_LEFT;
+}
+
+static int buttonRight()
+{
+    if(LevelSelect && GamePaused)
+        return GFX_t::BUTTON_RIGHT_CHAR;
+    else
+        return GFX_t::BUTTON_RIGHT;
+}
+
+static int buttonA()
+{
+    if(GamePaused || GameMenu)
+        return GFX_t::BUTTON_A_DO;
+    else if(GameOutro)
+        return GFX_t::BUTTON_A_BLANK;
+    else if(LevelSelect)
+        return GFX_t::BUTTON_A_ENTER;
+    else
+        return GFX_t::BUTTON_A_JUMP;
+}
+
+static int buttonX()
+{
+    if(GamePaused || GameMenu)
+        return GFX_t::BUTTON_X_BACK;
+    else if(LevelSelect || GameOutro)
+        return GFX_t::BUTTON_X_BLANK;
+    else
+    {
+        for(int i = 1; i <= numPlayers; ++i)
+        {
+            auto &p = Player[i];
+            if(p.Character == 5 || p.State == 4 || p.State == 5)
+                return GFX_t::BUTTON_X_SWORD;
+            else if(p.State < 3)
+                return GFX_t::BUTTON_X_RUN;
+            else if(p.State == 3 || p.State == 7)
+                return GFX_t::BUTTON_X_FIRE;
+            else if(p.State == 6)
+            {
+                switch(p.Character)
+                {
+                default:
+                case 1:
+                case 2:
+                    return GFX_t::BUTTON_X_HAMMER;
+                case 3:
+                    return GFX_t::BUTTON_X_BOMB;
+                case 4:
+                    return GFX_t::BUTTON_X_BUMERANG;
+                case 5:
+                    return GFX_t::BUTTON_X_SWORD;
+                }
+            }
+        }
+        return GFX_t::BUTTON_X_BLANK;
+    }
+}
+
+static int buttonB()
+{
+    if(LevelSelect || GamePaused || GameMenu || GameOutro)
+        return GFX_t::BUTTON_B_BLANK;
+    else
+    {
+        for(int i = 1; i <= numPlayers; ++i)
+        {
+            auto &p = Player[i];
+            if(p.Character <= 2 || p.Character == 4)
+                return GFX_t::BUTTON_B_SPINJUMP;
+            else
+                return GFX_t::BUTTON_B_JUMP;
+        }
+        return GFX_t::BUTTON_B_BLANK;
+    }
+}
+
+static int buttonY()
+{
+    if(LevelSelect || GamePaused || GameMenu || GameOutro)
+        return GFX_t::BUTTON_Y_BLANK;
+    else
+    {
+        for(int i = 1; i <= numPlayers; ++i)
+        {
+            auto &p = Player[i];
+            if(p.State == 5)
+                return GFX_t::BUTTON_Y_STATUE;
+            if(p.Character == 5 || p.State == 4)
+                return GFX_t::BUTTON_Y_SWORD;
+            else if(p.State < 3)
+                return GFX_t::BUTTON_Y_RUN;
+            else if(p.State == 3 || p.State == 7)
+                return GFX_t::BUTTON_Y_FIRE;
+            else if(p.State == 6)
+            {
+                switch(p.Character)
+                {
+                    default:
+                    case 1:
+                    case 2:
+                        return GFX_t::BUTTON_Y_HAMMER;
+                    case 3:
+                        return GFX_t::BUTTON_Y_BOMB;
+                    case 4:
+                        return GFX_t::BUTTON_Y_BUMERANG;
+                    case 5:
+                        return GFX_t::BUTTON_Y_SWORD;
+                }
+            }
+        }
+        return GFX_t::BUTTON_Y_BLANK;
+    }
+}
+
+
 static struct TouchKeyMap
 {
     struct KeyPos
@@ -553,10 +676,10 @@ void TouchScreenController::render()
             frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[GFX_t::BUTTON_UP], 1.f, 1.f, 1.f, a);
             break;
         case TouchScreenController::key_left:
-            frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[GFX_t::BUTTON_LEFT], 1.f, 1.f, 1.f, a);
+            frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[buttonLeft()], 1.f, 1.f, 1.f, a);
             break;
         case TouchScreenController::key_right:
-            frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[GFX_t::BUTTON_RIGHT], 1.f, 1.f, 1.f, a);
+            frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[buttonRight()], 1.f, 1.f, 1.f, a);
             break;
         case TouchScreenController::key_down:
             frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[GFX_t::BUTTON_DOWN], 1.f, 1.f, 1.f, a);
@@ -581,16 +704,16 @@ void TouchScreenController::render()
                                        1.f, 1.f, 1.f, a);
             break;
         case TouchScreenController::key_jump:
-            frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[GFX_t::BUTTON_A], 1.f, 1.f, 1.f, a);
+            frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[buttonA()], 1.f, 1.f, 1.f, a);
             break;
         case TouchScreenController::key_run:
-            frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[GFX_t::BUTTON_X], 1.f, 1.f, 1.f, a);
+            frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[buttonX()], 1.f, 1.f, 1.f, a);
             break;
         case TouchScreenController::key_altjump:
-            frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[GFX_t::BUTTON_B], 1.f, 1.f, 1.f, a);
+            frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[buttonB()], 1.f, 1.f, 1.f, a);
             break;
         case TouchScreenController::key_altrun:
-            frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[GFX_t::BUTTON_Y], 1.f, 1.f, 1.f, a);
+            frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[buttonY()], 1.f, 1.f, 1.f, a);
             break;
         default:
             frmMain.renderRect(x1, y1, w, h, r, g, 0.f, 0.3f);

@@ -127,6 +127,7 @@ bool GFX_t::load()
     loadImage(touch[BUTTON_B_SPINJUMP], "buttons/V_spinjump.png");
     loadImage(touch[BUTTON_X], "buttons/X.png");
     loadImage(touch[BUTTON_X_BACK], "buttons/X_back.png");
+    loadImage(touch[BUTTON_X_BLANK], "buttons/X_blank.png");
     loadImage(touch[BUTTON_X_BOMB], "buttons/X_bomb.png");
     loadImage(touch[BUTTON_X_BUMERANG], "buttons/X_bumerang.png");
     loadImage(touch[BUTTON_X_FIRE], "buttons/X_fire.png");
