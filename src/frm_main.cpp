@@ -1385,7 +1385,7 @@ int FrmMain::makeShot_action(void *_pixels)
     {
         delete []shoot->pixels;
         shoot->pixels = nullptr;
-        delete []shoot;
+        delete shoot;
         me->m_screenshot_thread = nullptr;
         return 0;
     }
@@ -1429,7 +1429,7 @@ int FrmMain::makeShot_action(void *_pixels)
     FreeImage_Unload(shotImg);
     delete []shoot->pixels;
     shoot->pixels = nullptr;
-    delete []shoot;
+    delete shoot;
 
     me->m_screenshot_thread = nullptr;
     return 0;
