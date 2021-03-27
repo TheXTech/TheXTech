@@ -327,6 +327,30 @@ static struct TouchKeyMap
         {10.0f, 10.0f, 70.0f,  70.0f, TouchScreenController::key_toggleKeysView},
     };
 
+    /*-----------------------Screen size depending layouts ----------------------------------*/
+    static constexpr KeyPos c_averagePhoneMap[TouchScreenController::key_END] =
+    {
+        /* Note that order of keys must match the TouchScreenController::commands enum!!! */
+        {542.0f, 537.0f, 693.0f,  587.0f, TouchScreenController::key_start},
+        {1.0f, 410.0f, 83.0f,  492.0f, TouchScreenController::key_left},
+        {165.0f, 410.0f, 247.0f,  492.0f, TouchScreenController::key_right},
+        {83.0f, 328.0f, 165.0f,  410.0f, TouchScreenController::key_up},
+        {83.0f, 492.0f, 165.0f,  574.0f, TouchScreenController::key_down},
+        {1.0f, 328.0f, 83.0f,  410.0f, TouchScreenController::key_upleft},
+        {165.0f, 328.0f, 247.0f,  410.0f, TouchScreenController::key_upright},
+        {1.0f, 492.0f, 83.0f,  574.0f, TouchScreenController::key_downleft},
+        {165.0f, 492.0f, 247.0f,  574.0f, TouchScreenController::key_downright},
+        {770.0f, 396.0f, 877.0f,  487.0f, TouchScreenController::key_run},
+        {888.0f, 431.0f, 995.0f,  522.0f, TouchScreenController::key_jump},
+        {780.0f, 290.0f, 887.0f,  381.0f, TouchScreenController::key_altrun},
+        {898.0f, 325.0f, 1005.0f,  416.0f, TouchScreenController::key_altjump},
+        {331.0f, 537.0f, 482.0f,  587.0f, TouchScreenController::key_drop},
+        {807.0f, 150.0f, 914.0f,  180.0f, TouchScreenController::key_holdRun},
+        {10.0f, 10.0f, 70.0f,  70.0f, TouchScreenController::key_toggleKeysView},
+    };
+    /*---------------------------------------------------------------------------------------*/
+
+
     TouchKeyMap()
     {
         SDL_assert(sizeof(touchKeysMap) == TouchScreenController::key_END * sizeof(KeyPos));
