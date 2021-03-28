@@ -293,6 +293,7 @@ void SetupCredits()
     AddCredit("ShadowYoshi (Joey)");
     AddCredit("ZeZeinzer"); // Android testing, touchscreen controller button pictures
     AddCredit("LucyZocker"); // Android testing
+    AddCredit("DavFar Gamers"); // Spanish translation of the readme
 #endif
     AddCredit("");
     AddCredit("4matsy");
