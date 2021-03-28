@@ -4,7 +4,8 @@ Motor SMBX, reescrito en C ++ a partir de VisualBasic 6.
 
 # Preguntas Frecuentes
 
-## ¿Qué es esto? Es un puerto de un antiguo motor VB6, escrito puramente en C ++. Reproduce enteramente el antiguo motor SMBX 1.3 (aparte de su Editor), incluye varios de sus errores lógicos (errores críticos que hacen que el juego se bloquee o se congele). 
+## ¿Qué es esto? 
+Es un puerto de un antiguo motor VB6, escrito puramente en C ++. Reproduce enteramente el antiguo motor SMBX 1.3 (aparte de su Editor), incluye varios de sus errores lógicos (errores críticos que hacen que el juego se bloquee o se congele). 
 
 ## ¿Por qué lo hiciste? Tengo diversos fines para realizarlo: 
 - Es un modelo de investigación bastante conveniente que deseo usar en el desarrollo del motor PGE. - Proveer una copia plenamente compatible del motor antiguo para plataformas modernas, lo cual posibilita jugar niveles y episodios viejos con la misma sensación que si se hubieran jugado en el juego SMBX original con base en VB6. 
