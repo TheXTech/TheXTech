@@ -36,6 +36,7 @@
 #include <Logger/logger.h>
 #include <IniProcessor/ini_processing.h>
 #include <Utils/files.h>
+#include <Utils/strings.h>
 #include <unordered_map>
 #include <fmt_format_ne.h>
 
@@ -311,6 +312,20 @@ void SoundResumeAll()
     Mix_ResumeMusic();
 }
 
+static void processPathArgs(std::string &path,
+                            const std::string &episodeRoot,
+                            const std::string &dataDirName)
+{
+    if(path.find('|') == std::string::npos)
+        return; // Nothing to do
+    Strings::List p;
+    Strings::split(p, path, '|');
+    Strings::replaceInAll(p[1], "{e}", episodeRoot);
+    Strings::replaceInAll(p[1], "{d}", episodeRoot + dataDirName);
+    Strings::replaceInAll(p[1], "{r}", MusicRoot);
+    path = p[0] + "|" + p[1];
+}
+
 void PlayMusic(std::string Alias, int fadeInMs)
 {
     if(noSound)
@@ -326,7 +341,9 @@ void PlayMusic(std::string Alias, int fadeInMs)
     if(mus != music.end())
     {
         auto &m = mus->second;
-        g_curMusic = Mix_LoadMUS(m.path.c_str());
+        std::string p = m.path;
+        processPathArgs(p, FileNamePath + "/", FileName + "/");
+        g_curMusic = Mix_LoadMUS(p.c_str());
         if(!g_curMusic)
         {
             pLogWarning("Music '%s' opening error: %s", m.path.c_str(), Mix_GetError());
@@ -377,7 +394,9 @@ void StartMusic(int A, int fadeInMs)
             pLogDebug("Starting custom music [%s]", curWorldMusicFile.c_str());
             if(g_curMusic)
                 Mix_FreeMusic(g_curMusic);
-            g_curMusic = Mix_LoadMUS((FileNamePath + "/" + curWorldMusicFile).c_str());
+            std::string p = FileNamePath + "/" + curWorldMusicFile;
+            processPathArgs(p, FileNamePath + "/", FileName + "/");
+            g_curMusic = Mix_LoadMUS(p.c_str());
             Mix_VolumeMusicStream(g_curMusic, 64);
             if(fadeInMs > 0)
                 Mix_FadeInMusic(g_curMusic, -1, fadeInMs);
@@ -415,7 +434,9 @@ void StartMusic(int A, int fadeInMs)
             pLogDebug("Starting custom music [%s]", CustomMusic[A].c_str());
             if(g_curMusic)
                 Mix_FreeMusic(g_curMusic);
-            g_curMusic = Mix_LoadMUS((FileNamePath + "/" + CustomMusic[A]).c_str());
+            std::string p = FileNamePath + "/" + CustomMusic[A];
+            processPathArgs(p, FileNamePath + "/", FileName + "/");
+            g_curMusic = Mix_LoadMUS(p.c_str());
             Mix_VolumeMusicStream(g_curMusic, 52);
             if(fadeInMs > 0)
                 Mix_FadeInMusic(g_curMusic, -1, fadeInMs);
