@@ -416,7 +416,11 @@ if(APPLE)
         target_compile_definitions(thextech PRIVATE -DUSERDATA_ROOT_NAME="${THEXTECH_CUSTOM_USERDATA_DIR_NAME}")
     endif()
 
-    target_link_libraries(A2XT_Int INTERFACE iconv)
+    check_library_exists(iconv iconv_open "" HAVE_LIBICONV)
+    if(HAVE_LIBICONV)
+        target_link_libraries(A2XT_Int INTERFACE iconv)
+    endif()
+
     if(PGE_USE_LUAJIT)
         # Required to link on 64-bit macOS
         # See: http://luajit.org/install.html
