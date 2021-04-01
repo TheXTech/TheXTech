@@ -4,6 +4,7 @@ project(TheXTech LANGUAGES C CXX)
 
 include(CheckCXXCompilerFlag)
 include(ExternalProject)
+include(CheckLibraryExists)
 include(GNUInstallDirs)
 
 include(cmake/git_info.cmake)
