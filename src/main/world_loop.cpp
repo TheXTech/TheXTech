@@ -727,10 +727,10 @@ void PathPath(WorldPath_t &Pth, bool Skp)
             D_pLogDebug("Found path activity: %d", (int)path.Active);
             if(!path.Active)
             {
-                D_pLogDebug("Collision with path...");
+                D_pLogDebugNA("Collision with path...");
                 if(CheckCollision(tempLocation, path.Location))
                 {
-                    D_pLogDebug("Collision with path FOUND...");
+                    D_pLogDebugNA("Collision with path FOUND...");
                     PathPath(path, Skp);
                 }
             }
@@ -744,10 +744,10 @@ void PathPath(WorldPath_t &Pth, bool Skp)
             D_pLogDebug("Found level activity: %d", (int)lev.Active);
             if(!lev.Active)
             {
-                D_pLogDebug("Collision with level...");
+                D_pLogDebugNA("Collision with level...");
                 if(CheckCollision(tempLocation, lev.Location))
                 {
-                    D_pLogDebug("Collision with level FOUND...");
+                    D_pLogDebugNA("Collision with level FOUND...");
                     lev.Active = true;
                     if(!Skp)
                     {
