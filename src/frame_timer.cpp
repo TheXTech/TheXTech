@@ -344,6 +344,7 @@ static SDL_INLINE void computeFrameTime2Real_2()
         nanotime_t sleepTime = getSleepTime(s_oldTime, c_frameRateNano);
         s_overhead = s_overheadTimes.average();
 
+        // D_pLogDebug("ST=%lld, OH=%lld", sleepTime, s_overhead);
         if(sleepTime > s_overhead)
         {
             nanotime_t adjustedSleepTime = sleepTime - s_overhead;
@@ -351,7 +352,9 @@ static SDL_INLINE void computeFrameTime2Real_2()
             auto e = getElapsedTime(start);
             nanotime_t overslept = e - adjustedSleepTime;
             // SDL_assert(overslept >= 0);
-            if(overslept >= 0 && overslept < c_frameRateNano)
+            if(overslept < 0)
+                s_overheadTimes.add(0);
+            else if(overslept < c_frameRateNano)
                 s_overheadTimes.add(overslept);
         }
     }
