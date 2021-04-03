@@ -96,6 +96,7 @@ public class thextechActivity extends SDLActivity
 
         setTouchScreenMode(Integer.parseInt(setup.getString("setup_touchscreen_mode", "1")));
         setTouchScreenShowOnStart(setup.getBoolean("touchscreen_gamepad_showalways", false));
+        setTouchPadStyle(Integer.parseInt(setup.getString("setup_touchscreen_style", "0")));
 
         String[] argsOut = new String[args.size()];
         args.toArray(argsOut);
@@ -139,4 +140,5 @@ public class thextechActivity extends SDLActivity
     public static native void setTouchScreenMode(int mode);
     public static native void setTouchScreenShowOnStart(boolean showOnStart);
     public static native void setScreenSize(double screenSize);
+    public static native void setTouchPadStyle(int style);
 }

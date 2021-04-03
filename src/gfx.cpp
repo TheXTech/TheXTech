@@ -117,15 +117,18 @@ bool GFX_t::load()
     loadImage(touch[BUTTON_DOWNLEFT], "buttons/DownLeft.png");
     loadImage(touch[BUTTON_DOWNRIGHT], "buttons/DownRight.png");
     loadImage(touch[BUTTON_A], "buttons/A.png");
+    loadImage(touch[BUTTON_A_PS], "buttons/A_ps.png");
     loadImage(touch[BUTTON_A_BLANK], "buttons/A_blank.png");
     loadImage(touch[BUTTON_A_DO], "buttons/A_do.png");
     loadImage(touch[BUTTON_A_ENTER], "buttons/A_enter.png");
     loadImage(touch[BUTTON_A_JUMP], "buttons/A_jump.png");
     loadImage(touch[BUTTON_B], "buttons/V.png");
+    loadImage(touch[BUTTON_B_PS], "buttons/V_ps.png");
     loadImage(touch[BUTTON_B_BLANK], "buttons/V_blank.png");
     loadImage(touch[BUTTON_B_JUMP], "buttons/V_jump.png");
     loadImage(touch[BUTTON_B_SPINJUMP], "buttons/V_spinjump.png");
     loadImage(touch[BUTTON_X], "buttons/X.png");
+    loadImage(touch[BUTTON_X_PS], "buttons/X_ps.png");
     loadImage(touch[BUTTON_X_BACK], "buttons/X_back.png");
     loadImage(touch[BUTTON_X_BLANK], "buttons/X_blank.png");
     loadImage(touch[BUTTON_X_BOMB], "buttons/X_bomb.png");
@@ -135,6 +138,7 @@ bool GFX_t::load()
     loadImage(touch[BUTTON_X_RUN], "buttons/X_run.png");
     loadImage(touch[BUTTON_X_SWORD], "buttons/X_sword.png");
     loadImage(touch[BUTTON_Y], "buttons/Y.png");
+    loadImage(touch[BUTTON_Y_PS], "buttons/Y_ps.png");
     loadImage(touch[BUTTON_Y_BLANK], "buttons/Y_blank.png");
     loadImage(touch[BUTTON_Y_BOMB], "buttons/Y_bomb.png");
     loadImage(touch[BUTTON_Y_BUMERANG], "buttons/Y_bumerang.png");

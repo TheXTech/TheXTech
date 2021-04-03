@@ -10,4 +10,9 @@
         <item>Режим 2 (Отключить функции, дающие преимущество во времени)</item>
         <item>Режим 3 (Строгое следование SMBX 1.3, все баги будут включены)</item>
     </string-array>
+    <string-array name="touchPadStyles">
+        <item>Внутри-игровые действия</item>
+        <item>Стиль Nintendo/Xbox (A/B/X/Y)</item>
+        <item>Стиль PlayStation (X/O/D/A)</item>
+    </string-array>
 </resources>

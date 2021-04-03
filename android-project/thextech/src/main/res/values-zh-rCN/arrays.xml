@@ -10,4 +10,9 @@
         <item>模式 2 (包含 SMBX 2.0的bug)</item>
         <item>模式 3 (不使用bug修复，包含所有bug)</item>
     </string-array>
+    <string-array name="touchPadStyles">
+        <item>显示游戏动作</item>
+        <item>字母形式 (A/B/X/Y)</item>
+        <item>图形形式 (X/O/D/A)</item>
+    </string-array>
 </resources>

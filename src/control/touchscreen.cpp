@@ -24,6 +24,7 @@
  */
 
 #include <Logger/logger.h>
+#include <Utils/maths.h>
 
 #include "touchscreen.h"
 #include "../globals.h"
@@ -54,10 +55,18 @@ enum
     TOUCHSCREEN_ENABLE = 2,
 };
 
+enum
+{
+    TOUCHPAD_STYLE_ACTIONS = 0,
+    TPUCHPAD_STYLE_ABXY = 1,
+    TPUCHPAD_STYLE_XODA = 2
+};
+
 //! Is hardware keyboard presented?
 static int s_keyboardPresence = KEYBOARD_NOKEYS;
 static int s_touchscreenMode = TOUCHSCREEN_DISABLE_ON_KEYBOARD;
 static bool s_showTouchscreenOnStart = false;
+static int  s_touchPadStyle = 0;
 static double s_screenSize = 0;
 
 #endif
@@ -134,6 +143,18 @@ Java_ru_wohlsoft_thextech_thextechActivity_setScreenSize(
     (void)type;
     s_screenSize = screenSize;
 }
+
+JNIEXPORT void JNICALL
+Java_ru_wohlsoft_thextech_thextechActivity_setTouchPadStyle(
+        JNIEnv *env,
+        jclass type,
+        jint style
+)
+{
+    (void)env;
+    (void)type;
+    s_touchPadStyle = style;
+}
 #endif
 
 TouchScreenController::FingerState::FingerState()
@@ -184,107 +205,143 @@ static int buttonRight()
 
 static int buttonA()
 {
-    if(GamePaused || GameMenu)
-        return GFX_t::BUTTON_A_DO;
-    else if(GameOutro)
-        return GFX_t::BUTTON_A_BLANK;
-    else if(LevelSelect)
-        return GFX_t::BUTTON_A_ENTER;
-    else
-        return GFX_t::BUTTON_A_JUMP;
+    switch(s_touchPadStyle)
+    {
+    case TPUCHPAD_STYLE_ABXY:
+        return GFX_t::BUTTON_A;
+    case TPUCHPAD_STYLE_XODA:
+        return GFX_t::BUTTON_A_PS;
+    default:
+    case TOUCHPAD_STYLE_ACTIONS:
+        if(GamePaused || GameMenu)
+            return GFX_t::BUTTON_A_DO;
+        else if(GameOutro)
+            return GFX_t::BUTTON_A_BLANK;
+        else if(LevelSelect)
+            return GFX_t::BUTTON_A_ENTER;
+        else
+            return GFX_t::BUTTON_A_JUMP;
+    }
 }
 
 static int buttonX()
 {
-    if(GamePaused || GameMenu)
-        return GFX_t::BUTTON_X_BACK;
-    else if(LevelSelect || GameOutro)
-        return GFX_t::BUTTON_X_BLANK;
-    else
+    switch(s_touchPadStyle)
     {
-        for(int i = 1; i <= numPlayers; ++i)
+    case TPUCHPAD_STYLE_ABXY:
+        return GFX_t::BUTTON_X;
+    case TPUCHPAD_STYLE_XODA:
+        return GFX_t::BUTTON_X_PS;
+    default:
+    case TOUCHPAD_STYLE_ACTIONS:
+        if(GamePaused || GameMenu)
+            return GFX_t::BUTTON_X_BACK;
+        else if(LevelSelect || GameOutro)
+            return GFX_t::BUTTON_X_BLANK;
+        else
         {
-            auto &p = Player[i];
-            if(p.Character == 5 || p.State == 4 || p.State == 5)
-                return GFX_t::BUTTON_X_SWORD;
-            else if(p.State < 3)
-                return GFX_t::BUTTON_X_RUN;
-            else if(p.State == 3 || p.State == 7)
-                return GFX_t::BUTTON_X_FIRE;
-            else if(p.State == 6)
+            if(numPlayers >= 1)
             {
-                switch(p.Character)
-                {
-                default:
-                case 1:
-                case 2:
-                    return GFX_t::BUTTON_X_HAMMER;
-                case 3:
-                    return GFX_t::BUTTON_X_BOMB;
-                case 4:
-                    return GFX_t::BUTTON_X_BUMERANG;
-                case 5:
+                auto &p = Player[1];
+                if(p.Character == 5 || p.State == 4 || p.State == 5)
                     return GFX_t::BUTTON_X_SWORD;
+                else if(p.State < 3)
+                    return GFX_t::BUTTON_X_RUN;
+                else if(p.State == 3 || p.State == 7)
+                    return GFX_t::BUTTON_X_FIRE;
+                else if(p.State == 6)
+                {
+                    switch(p.Character)
+                    {
+                    default:
+                    case 1:
+                    case 2:
+                        return GFX_t::BUTTON_X_HAMMER;
+                    case 3:
+                        return GFX_t::BUTTON_X_BOMB;
+                    case 4:
+                        return GFX_t::BUTTON_X_BUMERANG;
+                    case 5:
+                        return GFX_t::BUTTON_X_SWORD;
+                    }
                 }
             }
+            return GFX_t::BUTTON_X_BLANK;
         }
-        return GFX_t::BUTTON_X_BLANK;
     }
 }
 
 static int buttonB()
 {
-    if(LevelSelect || GamePaused || GameMenu || GameOutro)
-        return GFX_t::BUTTON_B_BLANK;
-    else
+    switch(s_touchPadStyle)
     {
-        for(int i = 1; i <= numPlayers; ++i)
+    case TPUCHPAD_STYLE_ABXY:
+        return GFX_t::BUTTON_B;
+    case TPUCHPAD_STYLE_XODA:
+        return GFX_t::BUTTON_B_PS;
+    default:
+    case TOUCHPAD_STYLE_ACTIONS:
+        if(LevelSelect || GamePaused || GameMenu || GameOutro)
+            return GFX_t::BUTTON_B_BLANK;
+        else
         {
-            auto &p = Player[i];
-            if(p.Character <= 2 || p.Character == 4)
-                return GFX_t::BUTTON_B_SPINJUMP;
-            else
-                return GFX_t::BUTTON_B_JUMP;
+            if(numPlayers >= 1)
+            {
+                auto &p = Player[1];
+                if(p.Character <= 2 || p.Character == 4)
+                    return GFX_t::BUTTON_B_SPINJUMP;
+                else
+                    return GFX_t::BUTTON_B_JUMP;
+            }
+            return GFX_t::BUTTON_B_BLANK;
         }
-        return GFX_t::BUTTON_B_BLANK;
     }
 }
 
 static int buttonY()
 {
-    if(LevelSelect || GamePaused || GameMenu || GameOutro)
-        return GFX_t::BUTTON_Y_BLANK;
-    else
+    switch(s_touchPadStyle)
     {
-        for(int i = 1; i <= numPlayers; ++i)
+    case TPUCHPAD_STYLE_ABXY:
+        return GFX_t::BUTTON_Y;
+    case TPUCHPAD_STYLE_XODA:
+        return GFX_t::BUTTON_Y_PS;
+    default:
+    case TOUCHPAD_STYLE_ACTIONS:
+        if(LevelSelect || GamePaused || GameMenu || GameOutro)
+            return GFX_t::BUTTON_Y_BLANK;
+        else
         {
-            auto &p = Player[i];
-            if(p.State == 5)
-                return GFX_t::BUTTON_Y_STATUE;
-            if(p.Character == 5 || p.State == 4)
-                return GFX_t::BUTTON_Y_SWORD;
-            else if(p.State < 3)
-                return GFX_t::BUTTON_Y_RUN;
-            else if(p.State == 3 || p.State == 7)
-                return GFX_t::BUTTON_Y_FIRE;
-            else if(p.State == 6)
+            if(numPlayers >= 1)
             {
-                switch(p.Character)
+                auto &p = Player[1];
+                if(p.State == 5)
+                    return GFX_t::BUTTON_Y_STATUE;
+                if(p.Character == 5 || p.State == 4)
+                    return GFX_t::BUTTON_Y_SWORD;
+                else if(p.State < 3)
+                    return GFX_t::BUTTON_Y_RUN;
+                else if(p.State == 3 || p.State == 7)
+                    return GFX_t::BUTTON_Y_FIRE;
+                else if(p.State == 6)
                 {
-                    default:
-                    case 1:
-                    case 2:
-                        return GFX_t::BUTTON_Y_HAMMER;
-                    case 3:
-                        return GFX_t::BUTTON_Y_BOMB;
-                    case 4:
-                        return GFX_t::BUTTON_Y_BUMERANG;
-                    case 5:
-                        return GFX_t::BUTTON_Y_SWORD;
+                    switch(p.Character)
+                    {
+                        default:
+                        case 1:
+                        case 2:
+                            return GFX_t::BUTTON_Y_HAMMER;
+                        case 3:
+                            return GFX_t::BUTTON_Y_BOMB;
+                        case 4:
+                            return GFX_t::BUTTON_Y_BUMERANG;
+                        case 5:
+                            return GFX_t::BUTTON_Y_SWORD;
+                    }
                 }
             }
+            return GFX_t::BUTTON_Y_BLANK;
         }
-        return GFX_t::BUTTON_Y_BLANK;
     }
 }
 
@@ -665,20 +722,20 @@ void TouchScreenController::render()
         if((m_touchHidden && key != TouchScreenController::key_toggleKeysView) || LoadingInProcess)
             key = TouchScreenController::key_toggleKeysView;
         const auto &k = g_touchKeyMap.touchKeysMap[key];
-        int x1 = std::round((k.x1 / g_touchKeyMap.touchCanvasWidth) * m_screenWidth);
-        int y1 = std::round((k.y1 / g_touchKeyMap.touchCanvasHeight) * m_screenHeight);
-        int x2 = std::round((k.x2 / g_touchKeyMap.touchCanvasWidth) * m_screenWidth);
-        int y2 = std::round((k.y2 / g_touchKeyMap.touchCanvasHeight) * m_screenHeight);
+        int x1 = Maths::iRound((k.x1 / g_touchKeyMap.touchCanvasWidth) * float(m_screenWidth));
+        int y1 = Maths::iRound((k.y1 / g_touchKeyMap.touchCanvasHeight) * float(m_screenHeight));
+        int x2 = Maths::iRound((k.x2 / g_touchKeyMap.touchCanvasWidth) * float(m_screenWidth));
+        int y2 = Maths::iRound((k.y2 / g_touchKeyMap.touchCanvasHeight) * float(m_screenHeight));
         int w = x2 - x1;
         int h = y2 - y1;
         float r = 1.0f;
         float g = 0.0f;
 
-        if(key == key_holdRun && m_runHeld)
-        {
-            r = 0.f;
-            g = 1.f;
-        }
+//        if(key == key_holdRun && m_runHeld)
+//        {
+//            r = 0.f;
+//            g = 1.f;
+//        }
 
 #ifdef __ANDROID__
         float a = m_keysHeld[key] ? 0.9f : 0.3f;
