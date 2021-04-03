@@ -49,9 +49,10 @@ bool ScrollRelease = false;
 bool TakeScreen = false;
 std::string LB;
 std::string EoT;
-RangeArr<ConKeyboard_t, 1, 2> conKeyboard;
-RangeArr<ConJoystick_t, 1, 2> conJoystick;
-RangeArrI<int, 1, 2, 0> useJoystick;
+RangeArr<ConKeyboard_t, 1, maxLocalPlayers> conKeyboard;
+RangeArr<ConJoystick_t, 1, maxLocalPlayers> conJoystick;
+RangeArrI<int, 1, maxLocalPlayers, 0> useJoystick;
+RangeArrI<bool, 1, maxLocalPlayers, false> wantedKeyboard;
 
 int ScreenShake = 0;
 std::string Checkpoint;
@@ -608,6 +609,7 @@ void initAll()
     conKeyboard.fill(ConKeyboard_t());
     conJoystick.fill(ConJoystick_t());
     useJoystick.fill(0);
+    wantedKeyboard.fill(false);
     vScreen.fill(vScreen_t());
     PlayerStart.fill(Location_t());
     blockCharacter.fill(false);

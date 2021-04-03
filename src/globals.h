@@ -239,13 +239,14 @@ struct EditorControls_t
 // Structures moved into con_control.h
 
 //Public conKeyboard(1 To 2) As conKeyboard  'player 1 and 2's controls
-extern RangeArr<ConKeyboard_t, 1, 2> conKeyboard;
+extern RangeArr<ConKeyboard_t, 1, maxLocalPlayers> conKeyboard;
 
 //Public conJoystick(1 To 2) As conJoystick
-extern RangeArr<ConJoystick_t, 1, 2> conJoystick;
+extern RangeArr<ConJoystick_t, 1, maxLocalPlayers> conJoystick;
 
 //Public useJoystick(1 To 2) As Integer
-extern RangeArrI<int, 1, 2, 0> useJoystick;
+extern RangeArrI<int, 1, maxLocalPlayers, 0> useJoystick;
+extern RangeArrI<bool, 1, maxLocalPlayers, false> wantedKeyboard;
 
 //Public Type NPC 'The NPC Type
 struct NPC_t

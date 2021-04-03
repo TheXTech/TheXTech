@@ -1156,6 +1156,13 @@ void InitControls()
 
     OpenConfig();
 
+    // Automatically set the joystick if keyboard chosen
+    for(int i = 1; i <= numJoysticks && i <= maxLocalPlayers; i++)
+    {
+        if(useJoystick[i] <= 0 && !wantedKeyboard[i])
+            useJoystick[i] = i;
+    }
+
     for(int player = 1; player <= maxLocalPlayers; ++player)
     {
         if(useJoystick[player] > numJoysticks)

@@ -1416,6 +1416,8 @@ void MenuLoop()
                                 // Load the saved state for given joystick
                                 joyGetByIndex(MenuMode - 30, joyNum, conJoystick[MenuMode - 30]);
                             }
+                            // Tell player is prefer to use the keyboard than controller
+                            wantedKeyboard[MenuMode - 30] = (useJoystick[MenuMode - 30] == 0);
                         }
                         else
                         if(MenuCursor == 11) // Reset to default

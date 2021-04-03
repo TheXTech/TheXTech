@@ -158,6 +158,7 @@ void OpenConfig()
 
             config.beginGroup(fmt::format_ne("player-{0}-keyboard", A));
             config.read("device", useJoystick[A], useJoystick[A]);
+            config.read("wanted-keyboard", wantedKeyboard[A], wantedKeyboard[A]);
             config.read("Up", conKeyboard[A].Up, conKeyboard[A].Up);
             config.read("Down", conKeyboard[A].Down, conKeyboard[A].Down);
             config.read("Left", conKeyboard[A].Left, conKeyboard[A].Left);
@@ -244,6 +245,7 @@ void SaveConfig()
 
         config.beginGroup(fmt::format_ne("player-{0}-keyboard", A));
         config.setValue("device", useJoystick[A]);
+        config.setValue("wanted-keyboard", wantedKeyboard[A]);
         config.setValue("Up", conKeyboard[A].Up);
         config.setValue("Down", conKeyboard[A].Down);
         config.setValue("Left", conKeyboard[A].Left);
