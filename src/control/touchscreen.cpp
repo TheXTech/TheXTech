@@ -496,6 +496,7 @@ void TouchScreenController::init()
     D_pLogDebug("Found %d touch devices, screen size: %d x %d",
                 m_touchDevicesCount,
                 m_screenWidth, m_screenHeight);
+    pLogDebug("The screen size: %g inches", s_screenSize);
 }
 
 void TouchScreenController::updateScreenSize()
