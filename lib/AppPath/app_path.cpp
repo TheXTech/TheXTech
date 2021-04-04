@@ -258,6 +258,11 @@ std::string AppPathManager::settingsFileSTD()
     return m_settingsPath + "thextech.ini";
 }
 
+std::string AppPathManager::settingsControlsFileSTD()
+{
+    return m_settingsPath + "controls.ini";
+}
+
 std::string AppPathManager::userAppDirSTD()
 {
     return m_userPath;

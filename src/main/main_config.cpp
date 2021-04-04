@@ -119,10 +119,15 @@ void OpenConfig()
     int FileRelease = 0;
     bool resBool = false;
     std::string configPath = AppPathManager::settingsFileSTD();
+    std::string controlsPath = AppPathManager::settingsControlsFileSTD();
 
     if(Files::fileExists(configPath))
     {
         IniProcessing config(configPath);
+        IniProcessing controls(controlsPath);
+         // Keep backward compatibility and restore old mappings from the "thextech.ini"
+        IniProcessing *ctl = Files::fileExists(controlsPath) ? &controls : &config;
+
         config.beginGroup("main");
         config.read("release", FileRelease, curRelease);
         config.read("full-screen", resBool, false);
@@ -141,7 +146,7 @@ void OpenConfig()
 
         For(A, 1, 2)
         {
-            auto keys = config.childGroups();
+            auto keys = ctl->childGroups();
             auto keyNeed = fmt::format_ne("joystick-uuid-{0}-", A);
 
             for(auto &k : keys)
@@ -150,56 +155,56 @@ void OpenConfig()
                 if(r != std::string::npos && r == 0)
                 {
                     std::string u;
-                    config.beginGroup(k);
-                    config.read("device-uuid", u, "");
+                    ctl->beginGroup(k);
+                    ctl->read("device-uuid", u, "");
                     if(u.empty())
                     {
-                        config.endGroup();
+                        ctl->endGroup();
                         continue;
                     }
                     auto &j = joyGetByUuid(A, u);
-                    readJoyKey(config, "Up", j.Up);
-                    readJoyKey(config, "Down", j.Down);
-                    readJoyKey(config, "Left", j.Left);
-                    readJoyKey(config, "Right", j.Right);
-                    readJoyKey(config, "Run", j.Run);
-                    readJoyKey(config, "Jump", j.Jump);
-                    readJoyKey(config, "Drop", j.Drop);
-                    readJoyKey(config, "Start", j.Start);
-                    readJoyKey(config, "AltJump", j.AltJump);
-                    readJoyKey(config, "AltRun", j.AltRun);
-                    config.endGroup();
+                    readJoyKey(*ctl, "Up", j.Up);
+                    readJoyKey(*ctl, "Down", j.Down);
+                    readJoyKey(*ctl, "Left", j.Left);
+                    readJoyKey(*ctl, "Right", j.Right);
+                    readJoyKey(*ctl, "Run", j.Run);
+                    readJoyKey(*ctl, "Jump", j.Jump);
+                    readJoyKey(*ctl, "Drop", j.Drop);
+                    readJoyKey(*ctl, "Start", j.Start);
+                    readJoyKey(*ctl, "AltJump", j.AltJump);
+                    readJoyKey(*ctl, "AltRun", j.AltRun);
+                    ctl->endGroup();
                 }
             }
 
-            config.beginGroup(fmt::format_ne("player-{0}-keyboard", A));
-            config.read("device", useJoystick[A], useJoystick[A]);
-            config.read("wanted-keyboard", wantedKeyboard[A], wantedKeyboard[A]);
-            config.read("Up", conKeyboard[A].Up, conKeyboard[A].Up);
-            config.read("Down", conKeyboard[A].Down, conKeyboard[A].Down);
-            config.read("Left", conKeyboard[A].Left, conKeyboard[A].Left);
-            config.read("Right", conKeyboard[A].Right, conKeyboard[A].Right);
-            config.read("Run", conKeyboard[A].Run, conKeyboard[A].Run);
-            config.read("Jump", conKeyboard[A].Jump, conKeyboard[A].Jump);
-            config.read("Drop", conKeyboard[A].Drop, conKeyboard[A].Drop);
-            config.read("Start", conKeyboard[A].Start, conKeyboard[A].Start);
-            config.read("AltJump", conKeyboard[A].AltJump, conKeyboard[A].AltJump);
-            config.read("AltRun", conKeyboard[A].AltRun, conKeyboard[A].AltRun);
-            config.endGroup();
+            ctl->beginGroup(fmt::format_ne("player-{0}-keyboard", A));
+            ctl->read("device", useJoystick[A], useJoystick[A]);
+            ctl->read("wanted-keyboard", wantedKeyboard[A], wantedKeyboard[A]);
+            ctl->read("Up", conKeyboard[A].Up, conKeyboard[A].Up);
+            ctl->read("Down", conKeyboard[A].Down, conKeyboard[A].Down);
+            ctl->read("Left", conKeyboard[A].Left, conKeyboard[A].Left);
+            ctl->read("Right", conKeyboard[A].Right, conKeyboard[A].Right);
+            ctl->read("Run", conKeyboard[A].Run, conKeyboard[A].Run);
+            ctl->read("Jump", conKeyboard[A].Jump, conKeyboard[A].Jump);
+            ctl->read("Drop", conKeyboard[A].Drop, conKeyboard[A].Drop);
+            ctl->read("Start", conKeyboard[A].Start, conKeyboard[A].Start);
+            ctl->read("AltJump", conKeyboard[A].AltJump, conKeyboard[A].AltJump);
+            ctl->read("AltRun", conKeyboard[A].AltRun, conKeyboard[A].AltRun);
+            ctl->endGroup();
 
-            config.beginGroup(fmt::format_ne("player-{0}-joystick", A));
+            ctl->beginGroup(fmt::format_ne("player-{0}-joystick", A));
 //            config.read("used-device", conJoystick[A].hwGUID, std::string());
-            readJoyKey(config, "Up", conJoystick[A].Up);
-            readJoyKey(config, "Down", conJoystick[A].Down);
-            readJoyKey(config, "Left", conJoystick[A].Left);
-            readJoyKey(config, "Right", conJoystick[A].Right);
-            readJoyKey(config, "Run", conJoystick[A].Run);
-            readJoyKey(config, "Jump", conJoystick[A].Jump);
-            readJoyKey(config, "Drop", conJoystick[A].Drop);
-            readJoyKey(config, "Start", conJoystick[A].Start);
-            readJoyKey(config, "AltJump", conJoystick[A].AltJump);
-            readJoyKey(config, "AltRun", conJoystick[A].AltRun);
-            config.endGroup();
+            readJoyKey(*ctl, "Up", conJoystick[A].Up);
+            readJoyKey(*ctl, "Down", conJoystick[A].Down);
+            readJoyKey(*ctl, "Left", conJoystick[A].Left);
+            readJoyKey(*ctl, "Right", conJoystick[A].Right);
+            readJoyKey(*ctl, "Run", conJoystick[A].Run);
+            readJoyKey(*ctl, "Jump", conJoystick[A].Jump);
+            readJoyKey(*ctl, "Drop", conJoystick[A].Drop);
+            readJoyKey(*ctl, "Start", conJoystick[A].Start);
+            readJoyKey(*ctl, "AltJump", conJoystick[A].AltJump);
+            readJoyKey(*ctl, "AltRun", conJoystick[A].AltRun);
+            ctl->endGroup();
         }
     }
 //    If resBool = True And resChanged = False And LevelEditor = False Then ChangeScreen
@@ -215,7 +220,10 @@ void SaveConfig()
 {
 //    Dim A As Integer
     std::string configPath = AppPathManager::settingsFileSTD();
+    std::string controlsPath = AppPathManager::settingsControlsFileSTD();
+
     IniProcessing config(configPath);
+    IniProcessing controls(controlsPath);
 
     config.beginGroup("main");
     config.setValue("release", curRelease);
@@ -263,55 +271,56 @@ void SaveConfig()
         for(auto &u : joystickUuid)
         {
             auto &j = joyGetByUuid(A, u);
-            config.beginGroup(fmt::format_ne("joystick-uuid-{0}-{1}", A, u));
-            config.setValue("device-uuid", u);
-            writeJoyKey(config, "Up", j.Up);
-            writeJoyKey(config, "Down", j.Down);
-            writeJoyKey(config, "Left", j.Left);
-            writeJoyKey(config, "Right", j.Right);
-            writeJoyKey(config, "Run", j.Run);
-            writeJoyKey(config, "Jump", j.Jump);
-            writeJoyKey(config, "Drop", j.Drop);
-            writeJoyKey(config, "Start", j.Start);
-            writeJoyKey(config, "AltJump", j.AltJump);
-            writeJoyKey(config, "AltRun", j.AltRun);
-            config.endGroup();
+            controls.beginGroup(fmt::format_ne("joystick-uuid-{0}-{1}", A, u));
+            controls.setValue("device-uuid", u);
+            writeJoyKey(controls, "Up", j.Up);
+            writeJoyKey(controls, "Down", j.Down);
+            writeJoyKey(controls, "Left", j.Left);
+            writeJoyKey(controls, "Right", j.Right);
+            writeJoyKey(controls, "Run", j.Run);
+            writeJoyKey(controls, "Jump", j.Jump);
+            writeJoyKey(controls, "Drop", j.Drop);
+            writeJoyKey(controls, "Start", j.Start);
+            writeJoyKey(controls, "AltJump", j.AltJump);
+            writeJoyKey(controls, "AltRun", j.AltRun);
+            controls.endGroup();
         }
 
-        config.beginGroup(fmt::format_ne("player-{0}-keyboard", A));
-        config.setValue("device", useJoystick[A]);
-        config.setValue("wanted-keyboard", wantedKeyboard[A]);
-        config.setValue("Up", conKeyboard[A].Up);
-        config.setValue("Down", conKeyboard[A].Down);
-        config.setValue("Left", conKeyboard[A].Left);
-        config.setValue("Right", conKeyboard[A].Right);
-        config.setValue("Run", conKeyboard[A].Run);
-        config.setValue("Jump", conKeyboard[A].Jump);
-        config.setValue("Drop", conKeyboard[A].Drop);
-        config.setValue("Start", conKeyboard[A].Start);
-        config.setValue("AltJump", conKeyboard[A].AltJump);
-        config.setValue("AltRun", conKeyboard[A].AltRun);
-        config.endGroup();
+        controls.beginGroup(fmt::format_ne("player-{0}-keyboard", A));
+        controls.setValue("device", useJoystick[A]);
+        controls.setValue("wanted-keyboard", wantedKeyboard[A]);
+        controls.setValue("Up", conKeyboard[A].Up);
+        controls.setValue("Down", conKeyboard[A].Down);
+        controls.setValue("Left", conKeyboard[A].Left);
+        controls.setValue("Right", conKeyboard[A].Right);
+        controls.setValue("Run", conKeyboard[A].Run);
+        controls.setValue("Jump", conKeyboard[A].Jump);
+        controls.setValue("Drop", conKeyboard[A].Drop);
+        controls.setValue("Start", conKeyboard[A].Start);
+        controls.setValue("AltJump", conKeyboard[A].AltJump);
+        controls.setValue("AltRun", conKeyboard[A].AltRun);
+        controls.endGroup();
 
-        config.beginGroup(fmt::format_ne("player-{0}-joystick", A));
+        controls.beginGroup(fmt::format_ne("player-{0}-joystick", A));
 //        config.setValue("used-device", conJoystick[A].hwGUID);
-        writeJoyKey(config, "Up", conJoystick[A].Up);
-        writeJoyKey(config, "Down", conJoystick[A].Down);
-        writeJoyKey(config, "Left", conJoystick[A].Left);
-        writeJoyKey(config, "Right", conJoystick[A].Right);
-        writeJoyKey(config, "Run", conJoystick[A].Run);
-        writeJoyKey(config, "Jump", conJoystick[A].Jump);
-        writeJoyKey(config, "Drop", conJoystick[A].Drop);
-        writeJoyKey(config, "Start", conJoystick[A].Start);
-        writeJoyKey(config, "AltJump", conJoystick[A].AltJump);
-        writeJoyKey(config, "AltRun", conJoystick[A].AltRun);
-        config.endGroup();
+        writeJoyKey(controls, "Up", conJoystick[A].Up);
+        writeJoyKey(controls, "Down", conJoystick[A].Down);
+        writeJoyKey(controls, "Left", conJoystick[A].Left);
+        writeJoyKey(controls, "Right", conJoystick[A].Right);
+        writeJoyKey(controls, "Run", conJoystick[A].Run);
+        writeJoyKey(controls, "Jump", conJoystick[A].Jump);
+        writeJoyKey(controls, "Drop", conJoystick[A].Drop);
+        writeJoyKey(controls, "Start", conJoystick[A].Start);
+        writeJoyKey(controls, "AltJump", conJoystick[A].AltJump);
+        writeJoyKey(controls, "AltRun", conJoystick[A].AltRun);
+        controls.endGroup();
     }
 
     config.writeIniFile();
+    controls.writeIniFile();
 #ifdef __EMSCRIPTEN__
     AppPathManager::syncFs();
 #endif
 
-    pLogDebug("Saved config: %s", configPath.c_str());
+    pLogDebug("Saved config: %s, control mappings: %s", configPath.c_str(), controlsPath.c_str());
 }

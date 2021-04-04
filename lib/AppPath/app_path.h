@@ -29,6 +29,7 @@ class AppPathManager
 public:
     static void initAppPath();
     static std::string settingsFileSTD();
+    static std::string settingsControlsFileSTD();
     static std::string userAppDirSTD();
     static std::string assetsRoot();
     static void setAssetsRoot(const std::string &root);
