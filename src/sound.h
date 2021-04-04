@@ -76,6 +76,7 @@ void InitSound();
 // Public Sub PlaySound(A As Integer) 'play a sound
 // play a sound
 void PlaySound(int A, int loops = 0);
+void PlaySoundMenu(int A, int loops = 0);
 // Public Sub BlockSound() 'stops all sound from being played for 10 cycles
 // stops all sound from being played for 10 cycles
 void BlockSound();

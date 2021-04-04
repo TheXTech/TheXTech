@@ -641,45 +641,75 @@ void InitSound()
     }
 }
 
+static const std::unordered_map<int, int> s_soundDelays =
+{
+    {2, 12}, {3, 12},  {4, 12},  {5, 30}, {8, 10},  {9, 4},
+    {10, 8}, {12, 10}, {17, 10}, {26, 8}, {31, 20}, {37, 10},
+    {42, 16},{50, 8},  {54, 8},  {71, 9}, {74, 8},  {81, 5},
+    {86, 8}
+};
+
+static void s_resetSoundDelay(int A)
+{
+    // set the delay before a sound can be played again
+    auto i = s_soundDelays.find(A);
+    if(i == s_soundDelays.end())
+        SoundPause[A] = 4;
+    else
+        SoundPause[A] = i->second;
+#if 0
+    switch(A)
+    {
+    case 2: SoundPause[A] = 12; break;
+    case 3: SoundPause[A] = 12; break;
+    case 4: SoundPause[A] = 12; break;
+    case 5: SoundPause[A] = 30; break;
+    case 8: SoundPause[A] = 10; break;
+    case 9: SoundPause[A] = 4; break;
+    case 10: SoundPause[A] = 8; break;
+    case 12: SoundPause[A] = 10; break;
+    case 17: SoundPause[A] = 10; break;
+    case 26: SoundPause[A] = 8; break;
+    case 31: SoundPause[A] = 20; break;
+    case 37: SoundPause[A] = 10; break;
+    case 42: SoundPause[A] = 16; break;
+    case 50: SoundPause[A] = 8; break;
+    case 54: SoundPause[A] = 8; break;
+    case 71: SoundPause[A] = 9; break;
+    case 74: SoundPause[A] = 8; break;
+    case 81: SoundPause[A] = 5; break;
+    case 86: SoundPause[A] = 8; break;
+    default: SoundPause[A] = 4; break;
+    }
+#endif
+}
+
 void PlaySound(int A, int loops)
 {
     if(noSound)
         return;
 
-    if((!GameMenu || A == 26 || A == 27 || A == 29) && !GameOutro)
+    if(GameMenu || GameOutro) // || A == 26 || A == 27 || A == 29)
+        return;
+
+    if(numPlayers > 2)
+        SoundPause[10] = 1;
+
+    if(SoundPause[A] == 0) // if the sound wasn't just played
     {
-        if(numPlayers > 2)
-            SoundPause[10] = 1;
+        std::string alias = fmt::format_ne("sound{0}", A);
+        PlaySfx(alias, loops);
+        s_resetSoundDelay(A);
+    }
+}
 
-        if(SoundPause[A] == 0) // if the sound wasn't just played
-        {
-            std::string alias = fmt::format_ne("sound{0}", A);
-            PlaySfx(alias, loops);
-
-            switch(A) // set the delay before a sound can be played again
-            {
-            case 2: SoundPause[A] = 12; break;
-            case 3: SoundPause[A] = 12; break;
-            case 4: SoundPause[A] = 12; break;
-            case 5: SoundPause[A] = 30; break;
-            case 8: SoundPause[A] = 10; break;
-            case 9: SoundPause[A] = 4; break;
-            case 10: SoundPause[A] = 8; break;
-            case 12: SoundPause[A] = 10; break;
-            case 17: SoundPause[A] = 10; break;
-            case 26: SoundPause[A] = 8; break;
-            case 31: SoundPause[A] = 20; break;
-            case 37: SoundPause[A] = 10; break;
-            case 42: SoundPause[A] = 16; break;
-            case 50: SoundPause[A] = 8; break;
-            case 54: SoundPause[A] = 8; break;
-            case 71: SoundPause[A] = 9; break;
-            case 74: SoundPause[A] = 8; break;
-            case 81: SoundPause[A] = 5; break;
-            case 86: SoundPause[A] = 8; break;
-            default: SoundPause[A] = 4; break;
-            }
-        }
+void PlaySoundMenu(int A, int loops)
+{
+    if(SoundPause[A] == 0) // if the sound wasn't just played
+    {
+        std::string alias = fmt::format_ne("sound{0}", A);
+        PlaySfx(alias, loops);
+        s_resetSoundDelay(A);
     }
 }
 
