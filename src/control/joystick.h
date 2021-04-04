@@ -31,6 +31,8 @@
 #include "../range_arr.hpp"
 #include "con_control.h"
 
+struct SDL_JoyDeviceEvent;
+
 // Public Sub UpdateControls() 'Gets players controls
 // Gets players controls
 void UpdateControls();
@@ -62,13 +64,16 @@ extern void           joyRumbleAllPlayers(int ms, float strength);
 extern std::string    joyGetUuidStr(int joystick);
 extern std::string    joyGetName(int joystick);
 
-bool joyIsKeyDown(int JoystickNumber, const KM_Key &key);
+extern void           joyDeviceAddEvent(const SDL_JoyDeviceEvent *e);
+extern void           joyDeviceRemoveEvent(const SDL_JoyDeviceEvent *e);
 
-void joyCloseJoysticks();
+extern bool joyIsKeyDown(int JoystickNumber, const KM_Key &key);
+
+extern void joyCloseJoysticks();
 // Public Function StartJoystick(Optional ByVal JoystickNumber As Integer = 0) As Boolean
-bool joyStartJoystick(int JoystickNumber);
+extern bool joyStartJoystick(int JoystickNumber);
 // Public Sub PollJoystick()
-bool joyPollJoystick(int joystick, KM_Key &key);
+extern bool joyPollJoystick(int joystick, KM_Key &key);
 
 
 #endif // JOYSTICK_H

@@ -350,6 +350,12 @@ void FrmMain::processEvent()
         showCursor(1);
         KillIt();
         break;
+    case SDL_JOYDEVICEADDED:
+        joyDeviceAddEvent(&m_event.jdevice);
+        break;
+    case SDL_JOYDEVICEREMOVED:
+        joyDeviceRemoveEvent(&m_event.jdevice);
+        break;
     case SDL_WINDOWEVENT:
         if((m_event.window.event == SDL_WINDOWEVENT_RESIZED) || (m_event.window.event == SDL_WINDOWEVENT_MOVED))
         {
