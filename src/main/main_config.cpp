@@ -60,14 +60,30 @@ void OpenConfig_preSetup()
             {"pcm_s8", AUDIO_S8},
             {"u8", AUDIO_U8},
             {"pcm_u8", AUDIO_U8},
-            {"s16", AUDIO_S16},
-            {"pcm_s16", AUDIO_S16},
-            {"u16", AUDIO_U16},
-            {"pcm_u16", AUDIO_U16},
-            {"s32", AUDIO_S32},
-            {"pcm_s32", AUDIO_S32},
-            {"float32", AUDIO_F32},
-            {"pcm_f32", AUDIO_F32}
+            {"s16", AUDIO_S16SYS},
+            {"pcm_s16", AUDIO_S16SYS},
+            {"s16le", AUDIO_S16LSB},
+            {"pcm_s16le", AUDIO_S16LSB},
+            {"s16be", AUDIO_S16MSB},
+            {"pcm_s16be", AUDIO_S16MSB},
+            {"u16", AUDIO_U16SYS},
+            {"pcm_u16", AUDIO_U16SYS},
+            {"u16le", AUDIO_U16LSB},
+            {"pcm_u16le", AUDIO_U16LSB},
+            {"u16be", AUDIO_U16MSB},
+            {"pcm_u16be", AUDIO_U16MSB},
+            {"s32", AUDIO_S32SYS},
+            {"pcm_s32", AUDIO_S32SYS},
+            {"s32le", AUDIO_S32LSB},
+            {"pcm_s32le", AUDIO_S32LSB},
+            {"s32be", AUDIO_S32MSB},
+            {"pcm_s32be", AUDIO_S32MSB},
+            {"float32", AUDIO_F32SYS},
+            {"pcm_f32", AUDIO_F32SYS},
+            {"float32le", AUDIO_F32LSB},
+            {"pcm_f32le", AUDIO_F32LSB},
+            {"float32be", AUDIO_F32MSB},
+            {"pcm_f32be", AUDIO_F32MSB}
         };
         config.readEnum("format", g_audioSetup.format, (uint16_t)AUDIO_F32, sampleFormats);
         config.read("buffer-size", g_audioSetup.bufferSize, 512);
@@ -209,6 +225,25 @@ void SaveConfig()
     // TODO: Make sure, saving of those settings will not been confused by line arguments
 //    config.setValue("frame-skip", FrameSkip);
 //    config.setValue("show-fps", ShowFPS);
+    config.endGroup();
+
+    config.beginGroup("sound");
+    config.setValue("sample-rate", g_audioSetup.sampleRate);
+    config.setValue("channels", g_audioSetup.channels);
+    config.setValue("buffer-size", g_audioSetup.bufferSize);
+    static const std::unordered_map<int, std::string> formats_back = {
+        {AUDIO_S8 , "s8"},
+        {AUDIO_U8 , "u8"},
+        {AUDIO_S16LSB, "s16le"},
+        {AUDIO_U16LSB, "u16le"},
+        {AUDIO_S32LSB, "s32le"},
+        {AUDIO_F32LSB, "float32le"},
+        {AUDIO_S16MSB, "s16be"},
+        {AUDIO_U16MSB, "u16be"},
+        {AUDIO_S32MSB, "s32be"},
+        {AUDIO_F32MSB, "float32be"}
+    };
+    config.setValue("format", formats_back.at(g_audioSetup.format));
     config.endGroup();
 
     config.beginGroup("gameplay");
