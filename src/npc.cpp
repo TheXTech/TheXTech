@@ -874,6 +874,7 @@ void NPCSpecial(int A)
                             NPC[A].Special2 = Player[B].Location.Y + 130;
                         }
 
+                        PlaySound(SFX_SwooperFlap);
                     }
                 }
             }
