@@ -3591,7 +3591,7 @@ void PowerUps(int A)
                             PlaySound(75);
                         }
                         else
-                            PlaySound(18);
+                            PlaySound(SFX_Fireball);
 
                         NPC[numNPCs].Projectile = true;
                         NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
@@ -3725,7 +3725,7 @@ void PowerUps(int A)
                             }
                             if(Player[A].StandingOnNPC != 0)
                                 NPC[numNPCs].Location.SpeedX = 5 * Player[A].Direction + (Player[A].Location.SpeedX / 3.5) + NPC[Player[A].StandingOnNPC].Location.SpeedX / 3.5;
-                            PlaySound(18);
+                            PlaySound(SFX_Iceball);
                             NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 0.8;
                         }
                         else
@@ -3750,7 +3750,7 @@ void PowerUps(int A)
 
                             if(Player[A].StandingOnNPC != 0)
                                 NPC[numNPCs].Location.SpeedX = 5 * Player[A].Direction + (Player[A].Location.SpeedX / 3.5) + NPC[Player[A].StandingOnNPC].Location.SpeedX / 3.5;
-                            PlaySound(18);
+                            PlaySound(SFX_Fireball);
                         }
                     }
                 }

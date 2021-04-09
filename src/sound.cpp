@@ -70,6 +70,8 @@ static unsigned int g_totalMusicLevel = 0;
 static unsigned int g_totalMusicWorld = 0;
 //! Total count of special music
 static unsigned int g_totalMusicSpecial = 0;
+//! Enable using the unique iceball SFX when available
+static bool s_useIceBallSfx = false;
 
 static int g_errorsSfx = 0;
 // static int g_errorsMusic = 0; // Unued yet
@@ -622,6 +624,7 @@ void InitSound()
     IniProcessing sounds(sfxIni);
     sounds.beginGroup("sound-main");
     sounds.read("total", g_totalSounds, 0);
+    sounds.read("use-iceball-sfx", s_useIceBallSfx, false);
     sounds.endGroup();
 
     UpdateLoad();
@@ -691,6 +694,9 @@ void PlaySound(int A, int loops)
 
     if(GameMenu || GameOutro) // || A == 26 || A == 27 || A == 29)
         return;
+
+    if(A == SFX_Iceball && (!s_useIceBallSfx || g_totalSounds < SFX_Iceball))
+        A = SFX_Fireball; // Fell back into fireball when iceball sound gets absent
 
     if(numPlayers > 2)
         SoundPause[10] = 1;
