@@ -83,7 +83,7 @@ static std::string return_current_time_and_date()
     auto now = std::chrono::system_clock::now();
     auto in_time_t = std::chrono::system_clock::to_time_t(now);
     char out[24];
-    memset(out, 0, sizeof(out));
+    SDL_memset(out, 0, sizeof(out));
     if(0 < strftime(out, sizeof(out), "%Y_%m_%d_%H_%M_%S", std::localtime(&in_time_t)))
         return std::string(out);
     else
