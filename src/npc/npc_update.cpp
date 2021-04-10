@@ -533,10 +533,10 @@ void UpdateNPCs()
                      NPC[A].Type == 52 || NPC[A].Type == 74 || NPC[A].Type == 256 ||
                      NPC[A].Type == 257 || NPC[A].Type == 93 || NPC[A].Type == 245))
                 {
-                    NPC[A].Location.X = NPC[A].Location.X + 0.015;
+                    NPC[A].Location.X += 0.015;
                 }
 
-                NPC[A].Location.Width = NPC[A].Location.Width - 0.03;
+                NPC[A].Location.Width -= 0.03;
             }
         }
         else if(fEqual(NPC[A].Location.Width, 256.0))
