@@ -3331,7 +3331,8 @@ void SpecialNPC(int A)
                 NPC[A].Location.Y -= 1.5;
                 if(NPC[A].Special >= NPCHeight[NPC[A].Type] * 0.65 + 1)
                 {
-                    NPC[A].Location.Y = std::round(NPC[A].Location.Y);
+                    NPC[A].Location.Y = vb6Round(NPC[A].Location.Y);
+                    NPC[A].Location.Height = NPCHeight[NPC[A].Type];
                     NPC[A].Special2 = 2;
                     NPC[A].Special = 0;
                 }
@@ -3405,7 +3406,7 @@ void SpecialNPC(int A)
         if(NPC[A].Location.X != NPC[A].DefaultLocation.X)
         {
             NPC[A].Killed = 2;
-            NPC[A].Location.Y = NPC[A].Location.Y - NPC[A].Location.SpeedY;
+            NPC[A].Location.Y -= NPC[A].Location.SpeedY;
         }
         else
         {
@@ -3423,7 +3424,7 @@ void SpecialNPC(int A)
                 NPC[A].Location.Height += 1.5;
                 if(NPC[A].Special >= NPCHeight[NPC[A].Type] * 0.65 + 1)
                 {
-                    NPC[A].Location.Height = std::floor(NPC[A].Location.Height);
+                    NPC[A].Location.Height = NPCHeight[NPC[A].Type];
                     NPC[A].Special2 = 2;
                     NPC[A].Special = 0;
                 }
@@ -3496,7 +3497,7 @@ void SpecialNPC(int A)
                     NPC[A].Location.Width += 1.5 * NPC[A].Direction;
                 if(NPC[A].Special >= NPCWidth[NPC[A].Type] * 0.65 + 1)
                 {
-                    NPC[A].Location.Width = std::floor(NPC[A].Location.Width);
+                    NPC[A].Location.Width = NPCWidth[NPC[A].Type];
                     NPC[A].Special2 = 2;
                     NPC[A].Special = 0;
                 }
