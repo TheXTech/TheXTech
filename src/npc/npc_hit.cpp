@@ -160,7 +160,7 @@ void NPCHit(int A, int B, int C)
                 Effect[numEffects].Frame = iRand() % 3;
             }
 
-            PlaySound(9);
+            PlaySound(SFX_Freeze);
             // NPCHit C, 3, C
             return;
         }

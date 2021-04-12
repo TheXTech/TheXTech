@@ -697,6 +697,8 @@ void PlaySound(int A, int loops)
 
     if(A == SFX_Iceball && (!s_useIceBallSfx || g_totalSounds < SFX_Iceball))
         A = SFX_Fireball; // Fell back into fireball when iceball sound gets absent
+    else if(A == SFX_Freeze && (g_totalSounds < SFX_Freeze))
+        A = SFX_ShellHit; // Fell back into shell-hit sound when the freeze sound gets absent
 
     if(numPlayers > 2)
         SoundPause[10] = 1;

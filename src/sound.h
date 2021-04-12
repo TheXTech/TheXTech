@@ -141,7 +141,8 @@ enum
     // non-SMBX64, Extra
     SFX_PSwitchTimeout,
     SFX_SwooperFlap,
-    SFX_Iceball
+    SFX_Iceball,
+    SFX_Freeze
 };
 
 int CustomWorldMusicId();
