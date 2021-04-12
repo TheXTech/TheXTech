@@ -1650,14 +1650,14 @@ void NPCHit(int A, int B, int C)
                 if(NPC[C].Type != 171)
                 {
                     if(B != 6)
-                        PlaySound(3);
+                        PlaySound(SFX_BlockHit);
                     NPC[A].Killed = B;
                 }
             }
             else
             {
                 if(B != 6)
-                    PlaySound(3);
+                    PlaySound(SFX_BlockHit);
                 NPC[A].Killed = B;
             }
         }
@@ -1667,7 +1667,7 @@ void NPCHit(int A, int B, int C)
     {
         if(B == 3 || B == 5)
         {
-            PlaySound(3);
+            PlaySound(SFX_BlockHit);
             NPC[A].Killed = B;
         }
         // Hammer Bros.
