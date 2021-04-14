@@ -2523,7 +2523,7 @@ void NPCSpecial(int A)
                             {
                                 MoreScore(static_cast<int>(floor(static_cast<double>((1 - (NPC[A].Location.Y - NPC[A].DefaultLocation.Y) / (NPC[A].Special2 - NPC[A].DefaultLocation.Y)) * 10))) + 1, NPC[A].Location);
                                 NPC[A].Killed = 9;
-                                PlaySound(37);
+                                PlaySound(SFX_Twomp);
                             }
                             FreezeNPCs = false;
                             TurnNPCsIntoCoins();
@@ -4358,7 +4358,7 @@ void SpecialNPC(int A)
             {
                 if(NPC[A].Special2 == 0)
                 {
-                    PlaySound(37);
+                    PlaySound(SFX_Twomp);
                     tempLocation.Width = 32;
                     tempLocation.Height = 32;
                     tempLocation.Y = NPC[A].Location.Y + NPC[A].Location.Height - 16;

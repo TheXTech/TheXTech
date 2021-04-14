@@ -2700,7 +2700,7 @@ void UpdatePlayer()
                                             {
                                                 if(Player[A].Location.SpeedY > 3)
                                                 {
-                                                    PlaySound(37);
+                                                    PlaySound(SFX_Twomp);
                                                     YoshiPound(A, B, true);
                                                 }
                                             }
@@ -4372,7 +4372,7 @@ void UpdatePlayer()
                     {
                         Player[A].StandingOnNPC = 0;
                         if(Player[A].Location.SpeedY > 4 + NPC[B].Location.SpeedY)
-                            PlaySound(37);
+                            PlaySound(SFX_Twomp);
                         Player[A].Location.SpeedY = NPC[B].Location.SpeedY;
                     }
 

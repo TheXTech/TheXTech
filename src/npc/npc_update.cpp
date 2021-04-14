@@ -2583,9 +2583,9 @@ void UpdateNPCs()
                                                                 NPC[A].Special = 2;
 
                                                             if((NPC[A].Type == 58 || NPC[A].Type == 21 || NPC[A].Type == 67 || NPC[A].Type == 68 || NPC[A].Type == 69 || NPC[A].Type == 70) && NPC[A].Location.SpeedY > Physics.NPCGravity * 20)
-                                                                PlaySound(37);
+                                                                PlaySound(SFX_Twomp);
                                                             if(NPC[A].Type == 78 && NPC[A].Location.SpeedY > Physics.NPCGravity * 10)
-                                                                PlaySound(37);
+                                                                PlaySound(SFX_Twomp);
 
                                                             if(WalkingCollision3(NPC[A].Location, Block[B].Location, oldBeltSpeed) == true || NPC[A].Location.Width > 32)
                                                             {
@@ -4143,7 +4143,7 @@ void UpdateNPCs()
                                 NPC[A].Location.SpeedY = 10;
                             else
                             {
-                                PlaySound(37);
+                                PlaySound(SFX_Twomp);
                                 NPC[A].Special3 = 30;
                                 NPC[A].Frame = 11;
                                 NPC[A].Projectile = false;

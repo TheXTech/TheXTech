@@ -2052,7 +2052,7 @@ void PowBlock()
     int numScreens = 0;
     int A = 0;
     int Z = 0;
-    PlaySound(37);
+    PlaySound(SFX_Twomp);
     numScreens = 1;
     if(LevelEditor == false)
     {

@@ -2574,7 +2574,7 @@ void YoshiPound(int A, int /*C*/, bool BreakBlocks)
         tempLocation.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - 16 + 16;
         NewEffect(10, tempLocation);
         Effect[numEffects].Location.SpeedX = 2;
-        PlaySound(37);
+        PlaySound(SFX_Twomp);
     }
 }
 
