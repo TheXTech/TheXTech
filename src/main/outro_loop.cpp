@@ -294,6 +294,9 @@ void SetupCredits()
     AddCredit("ZeZeinzer"); // Android testing, touchscreen controller button pictures
     AddCredit("LucyZocker"); // Android testing
     AddCredit("DavFar Gamers"); // Spanish translation of the readme
+    AddCredit("Elf of H & L"); // Idea for individual iceball shooting SFX
+    AddCredit("MrDoubleA"); // Contribution with the "NPC got frozen" SFX
+    AddCredit("Slash"); // Contribution with the better iceball shooting SFX
 #endif
     AddCredit("");
     AddCredit("4matsy");
