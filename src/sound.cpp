@@ -74,6 +74,8 @@ static unsigned int g_totalMusicWorld = 0;
 static unsigned int g_totalMusicSpecial = 0;
 //! Enable using the unique iceball SFX when available
 static bool s_useIceBallSfx = false;
+//! Enable using of the new ice SFX: NPC freeze and breaking of the frozen NPC
+static bool s_useNewIceSfx = false;
 
 static int g_errorsSfx = 0;
 // static int g_errorsMusic = 0; // Unued yet
@@ -644,6 +646,7 @@ void InitSound()
     sounds.beginGroup("sound-main");
     sounds.read("total", g_totalSounds, 0);
     sounds.read("use-iceball-sfx", s_useIceBallSfx, false);
+    sounds.read("use-new-ice-sfx", s_useNewIceSfx, false);
     bool playerUseNPCHammer;
     bool playerUseOwnHammer;
     sounds.read("player-use-npc-hammer-sfx", playerUseNPCHammer, false);
@@ -724,6 +727,14 @@ static const std::unordered_map<int, int> s_soundFallback =
     {SFX_Icebreak, SFX_ShellHit},
 };
 
+static int getFallbackSfx(int A)
+{
+    auto fb = s_soundFallback.find(A);
+    if(fb != s_soundFallback.end())
+        A = fb->second;
+    return A;
+}
+
 void PlaySound(int A, int loops)
 {
     if(noSound)
@@ -732,15 +743,12 @@ void PlaySound(int A, int loops)
     if(GameMenu || GameOutro) // || A == 26 || A == 27 || A == 29)
         return;
 
-    if(A == SFX_Iceball && !s_useIceBallSfx)
-        A = SFX_Fireball; // Fell back into fireball when iceball sound isn't preferred
-
     if(A > (int)g_totalSounds) // Play fallback sound for the missing SFX
-    {
-        auto fb = s_soundFallback.find(A);
-        if(fb != s_soundFallback.end())
-            A = fb->second;
-    }
+        A = getFallbackSfx(A);
+    else if(!s_useIceBallSfx && A == SFX_Iceball)
+        A = SFX_Fireball; // Fell back into fireball when iceball sound isn't preferred
+    else if(!s_useNewIceSfx && (A == SFX_Freeze || A == SFX_Icebreak))
+        A = SFX_ShellHit; // Restore the old behavior
 
     if(numPlayers > 2)
         SoundPause[10] = 1;
