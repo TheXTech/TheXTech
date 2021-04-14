@@ -49,6 +49,8 @@ int musicLoop = 0;
 // Public musicName As String
 std::string musicName;
 
+int playerHammerSFX = SFX_Fireball;
+
 AudioSetup_t g_audioSetup;
 
 static Mix_Music *g_curMusic = nullptr;
@@ -625,7 +627,18 @@ void InitSound()
     sounds.beginGroup("sound-main");
     sounds.read("total", g_totalSounds, 0);
     sounds.read("use-iceball-sfx", s_useIceBallSfx, false);
+    bool playerUseNPCHammer;
+    bool playerUseOwnHammer;
+    sounds.read("player-use-npc-hammer-sfx", playerUseNPCHammer, false);
+    sounds.read("player-use-own-hammer-sfx", playerUseOwnHammer, false);
     sounds.endGroup();
+
+    if(playerUseOwnHammer)
+        playerHammerSFX = SFX_PlayerHammer;
+    else if(playerUseNPCHammer)
+        playerHammerSFX = SFX_HammerToss;
+    else
+        playerHammerSFX = SFX_Fireball;
 
     UpdateLoad();
     for(unsigned int i = 1; i <= g_totalSounds; ++i)

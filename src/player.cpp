@@ -3574,10 +3574,10 @@ void PowerUps(int A)
                             {
                                 NPC[numNPCs].HoldingPlayer = A;
                                 Player[A].HoldingNPC = numNPCs;
-                                PlaySound(73);
+                                PlaySound(SFX_Grab2);
                             }
                             else
-                                PlaySound(75);
+                                PlaySound(SFX_Throw);
                         }
                         else if(Player[A].Character == 4)
                         {
@@ -3588,10 +3588,10 @@ void PowerUps(int A)
                             NPC[numNPCs].Type = 292;
                             NPC[numNPCs].Special5 = A;
                             NPC[numNPCs].Special6 = Player[A].Direction;
-                            PlaySound(75);
+                            PlaySound(SFX_Throw);
                         }
                         else
-                            PlaySound(SFX_Fireball);
+                            PlaySound(playerHammerSFX);
 
                         NPC[numNPCs].Projectile = true;
                         NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];

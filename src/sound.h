@@ -35,6 +35,8 @@ extern int musicLoop;
 // Public musicName As String
 extern std::string musicName;
 
+extern int playerHammerSFX;
+
 extern struct AudioSetup_t
 {
     int sampleRate = 44100;
@@ -143,7 +145,8 @@ enum
     SFX_SwooperFlap,
     SFX_Iceball,
     SFX_Freeze,
-    SFX_Icebreak
+    SFX_Icebreak,
+    SFX_PlayerHammer // Reserved
 };
 
 int CustomWorldMusicId();
