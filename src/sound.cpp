@@ -687,6 +687,12 @@ static void s_resetSoundDelay(int A)
 #endif
 }
 
+static const std::unordered_map<int, int> s_soundFallback =
+{
+    {SFX_Iceball, SFX_Fireball},
+    {SFX_Freeze, SFX_ShellHit},
+};
+
 void PlaySound(int A, int loops)
 {
     if(noSound)
@@ -699,6 +705,15 @@ void PlaySound(int A, int loops)
         A = SFX_Fireball; // Fell back into fireball when iceball sound gets absent
     else if(A == SFX_Freeze && (g_totalSounds < SFX_Freeze))
         A = SFX_ShellHit; // Fell back into shell-hit sound when the freeze sound gets absent
+    if(A == SFX_Iceball && !s_useIceBallSfx)
+        A = SFX_Fireball; // Fell back into fireball when iceball sound isn't preferred
+
+    if(A > (int)g_totalSounds) // Play fallback sound for the missing SFX
+    {
+        auto fb = s_soundFallback.find(A);
+        if(fb != s_soundFallback.end())
+            A = fb->second;
+    }
 
     if(numPlayers > 2)
         SoundPause[10] = 1;
