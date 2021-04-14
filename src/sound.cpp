@@ -649,7 +649,7 @@ static const std::unordered_map<int, int> s_soundDelays =
     {2, 12}, {3, 12},  {4, 12},  {5, 30}, {8, 10},  {9, 4},
     {10, 8}, {12, 10}, {17, 10}, {26, 8}, {31, 20}, {37, 10},
     {42, 16},{50, 8},  {54, 8},  {71, 9}, {74, 8},  {81, 5},
-    {86, 8}
+    {86, 8}, {SFX_Icebreak, 4}
 };
 
 static void s_resetSoundDelay(int A)
@@ -691,6 +691,7 @@ static const std::unordered_map<int, int> s_soundFallback =
 {
     {SFX_Iceball, SFX_Fireball},
     {SFX_Freeze, SFX_ShellHit},
+    {SFX_Icebreak, SFX_ShellHit},
 };
 
 void PlaySound(int A, int loops)
@@ -701,10 +702,6 @@ void PlaySound(int A, int loops)
     if(GameMenu || GameOutro) // || A == 26 || A == 27 || A == 29)
         return;
 
-    if(A == SFX_Iceball && (!s_useIceBallSfx || g_totalSounds < SFX_Iceball))
-        A = SFX_Fireball; // Fell back into fireball when iceball sound gets absent
-    else if(A == SFX_Freeze && (g_totalSounds < SFX_Freeze))
-        A = SFX_ShellHit; // Fell back into shell-hit sound when the freeze sound gets absent
     if(A == SFX_Iceball && !s_useIceBallSfx)
         A = SFX_Fireball; // Fell back into fireball when iceball sound isn't preferred
 

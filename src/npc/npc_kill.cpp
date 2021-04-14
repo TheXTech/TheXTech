@@ -68,7 +68,7 @@ void KillNPC(int A, int B)
             Effect[numEffects].Location.SpeedY = dRand() * 4 - 2 + NPC[A].Location.SpeedY * 0.2;
             Effect[numEffects].Frame = (iRand() % 3);
         }
-        PlaySound(9);
+        PlaySound(SFX_Icebreak);
         NPC[A].Type = NPC[A].Special;
         if(B != 10)
         {

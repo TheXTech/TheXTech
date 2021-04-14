@@ -142,7 +142,8 @@ enum
     SFX_PSwitchTimeout,
     SFX_SwooperFlap,
     SFX_Iceball,
-    SFX_Freeze
+    SFX_Freeze,
+    SFX_Icebreak
 };
 
 int CustomWorldMusicId();
