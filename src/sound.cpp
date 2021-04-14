@@ -97,6 +97,8 @@ struct SFX_t
     Mix_Chunk *chunk = nullptr;
     Mix_Chunk *chunkOrig = nullptr;
     bool isCustom = false;
+    bool isSilent = false;
+    bool isSilentOrig = false;
     int volume = 128;
     int channel = -1;
 };
@@ -210,10 +212,12 @@ static void RestoreSfx(SFX_t &u)
 {
     if(u.isCustom)
     {
-        if(u.chunk && u.chunkOrig)
+        if((u.chunk || u.isSilent) && (u.chunkOrig || u.isSilentOrig))
         {
-            Mix_FreeChunk(u.chunk);
+            if(u.chunk)
+                Mix_FreeChunk(u.chunk);
             u.chunk = u.chunkOrig;
+            u.isSilent = u.isSilentOrig;
             u.chunkOrig = nullptr;
         }
         u.isCustom = false;
@@ -227,9 +231,11 @@ static void AddSfx(const std::string &root,
                    bool isCustom = false)
 {
     std::string f;
+    bool isSilent;
     ini.beginGroup(group);
     ini.read("file", f, std::string());
-    if(!f.empty())
+    ini.read("silent", isSilent, false);
+    if(!f.empty() || isSilent)
     {
         if(isCustom)
         {
@@ -238,26 +244,33 @@ static void AddSfx(const std::string &root,
             {
                 auto &m = s->second;
                 std::string newPath = root + f;
-                if(m.isCustom && newPath == m.customPath)
+                if(!isSilent && m.isCustom && newPath == m.customPath)
                 {
                     ini.endGroup();
-                    return;  // Don't load same file twice!
+                    return;  // Don't load the same file twice!
                 }
 
                 Mix_Chunk *backup = m.chunk;
+                bool backup_isSilent = m.isSilent;
                 m.customPath = newPath;
-                m.chunk = Mix_LoadWAV((root + f).c_str());
-                if(m.chunk)
+                if(!isSilent)
+                    m.chunk = Mix_LoadWAV((root + f).c_str());
+                if(m.chunk || isSilent)
                 {
                     if(!m.isCustom && !m.chunkOrig)
+                    {
                         m.chunkOrig = backup;
-                    else
+                        m.isSilentOrig = backup_isSilent;
+                    }
+                    else if(backup)
                         Mix_FreeChunk(backup);
                     m.isCustom = true;
+                    m.isSilent = isSilent;
                 }
                 else
                 {
                     m.chunk = backup;
+                    m.isSilent = backup_isSilent;
                     pLogWarning("ERROR: SFX '%s' loading error: %s", m.path.c_str(), Mix_GetError());
                 }
             }
@@ -267,10 +280,12 @@ static void AddSfx(const std::string &root,
             SFX_t m;
             m.path = root + f;
             m.volume = 128;
-            pLogDebug("Adding SFX [%s] '%s'", alias.c_str(), m.path.c_str());
-            m.chunk = Mix_LoadWAV(m.path.c_str());
+            m.isSilent = isSilent;
+            pLogDebug("Adding SFX [%s] '%s'", alias.c_str(), isSilent ? "<silence>" : m.path.c_str());
+            if(!isSilent)
+                m.chunk = Mix_LoadWAV(m.path.c_str());
             m.channel = -1;
-            if(m.chunk)
+            if(m.chunk || isSilent)
             {
                 bool isSingleChannel = false;
                 ini.read("single-channel", isSingleChannel, false);
@@ -369,7 +384,8 @@ void PlaySfx(std::string Alias, int loops)
     if(sfx != sound.end())
     {
         auto &s = sfx->second;
-        Mix_PlayChannel(s.channel, s.chunk, loops);
+        if(!s.isSilent)
+            Mix_PlayChannel(s.channel, s.chunk, loops);
     }
 }
 
@@ -379,7 +395,8 @@ void StopSfx(std::string Alias)
     if(sfx != sound.end())
     {
         auto &s = sfx->second;
-        Mix_HaltChannel(s.channel);
+        if(!s.isSilent)
+            Mix_HaltChannel(s.channel);
     }
 }
 
