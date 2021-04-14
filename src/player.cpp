@@ -2575,7 +2575,8 @@ void YoshiPound(int A, int /*C*/, bool BreakBlocks)
         NewEffect(10, tempLocation);
         Effect[numEffects].Location.SpeedX = 2;
         PlaySound(SFX_Twomp);
-        doShakeScreen(0, 4, SHAKE_SEQUENTIAL, 4, 0.2);
+        if(GameplayShakeScreenPound)
+            doShakeScreen(0, 4, SHAKE_SEQUENTIAL, 4, 0.2);
     }
 }
 

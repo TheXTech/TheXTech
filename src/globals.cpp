@@ -72,6 +72,8 @@ std::vector<SelectWorld_t> SelectWorld;
 bool ShowFPS = false;
 double PrintFPS = 0.0;
 bool GameplayPoundByAltRun = false;
+bool GameplayShakeScreenThwomp = true;
+bool GameplayShakeScreenPound = true;
 bool JoystickEnableRumble = true;
 bool JoystickEnableBatteryStatus = true;
 RangeArr<vScreen_t, 0, 2> vScreen;

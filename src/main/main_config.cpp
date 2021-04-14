@@ -139,6 +139,11 @@ void OpenConfig()
         config.read("ground-pound-by-alt-run", GameplayPoundByAltRun, false);
         config.endGroup();
 
+        config.beginGroup("effects");
+        config.read("enable-thwomp-screen-shake", GameplayShakeScreenThwomp, true);
+        config.read("enable-yoshi-ground-pound-screen-shake", GameplayShakeScreenPound, true);
+        config.endGroup();
+
         config.beginGroup("joystick");
         config.read("enable-rumble", JoystickEnableRumble, true);
         config.read("enable-battery-status", JoystickEnableBatteryStatus, true);
@@ -256,6 +261,11 @@ void SaveConfig()
 
     config.beginGroup("gameplay");
     config.setValue("ground-pound-by-alt-run", GameplayPoundByAltRun);
+    config.endGroup();
+
+    config.beginGroup("effects");
+    config.setValue("enable-thwomp-screen-shake", GameplayShakeScreenThwomp);
+    config.setValue("enable-yoshi-ground-pound-screen-shake", GameplayShakeScreenPound);
     config.endGroup();
 
     config.beginGroup("joystick");

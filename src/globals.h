@@ -1074,6 +1074,10 @@ extern bool ShowFPS;
 extern double PrintFPS;
 // Do ground-point by alt-run key instead of down
 extern bool GameplayPoundByAltRun;
+// Shake screen on thwomp falling
+extern bool GameplayShakeScreenThwomp;
+// Shake screen on Yoshi ground pount
+extern bool GameplayShakeScreenPound;
 // Enable usage of the rumble control
 extern bool JoystickEnableRumble;
 // Show the battery status for wireless gamepads
