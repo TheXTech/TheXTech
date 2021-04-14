@@ -4359,6 +4359,7 @@ void SpecialNPC(int A)
                 if(NPC[A].Special2 == 0)
                 {
                     PlaySound(SFX_Twomp);
+                    doShakeScreen(0, 4, SHAKE_SEQUENTIAL, 5, 0.2);
                     tempLocation.Width = 32;
                     tempLocation.Height = 32;
                     tempLocation.Y = NPC[A].Location.Y + NPC[A].Location.Height - 16;
