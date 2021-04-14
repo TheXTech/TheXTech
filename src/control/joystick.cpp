@@ -218,13 +218,16 @@ static int s_joyDeviceAdd(int i)
     {
         joy.id = SDL_JoystickInstanceID(joy.joystick);
         std::string guidStr = getJoyUuidStr(joy.joystick);
+        bool exist1 = s_joystickControls[0].find(guidStr) != s_joystickControls[0].end();
+        bool exist2 = s_joystickControls[1].find(guidStr) != s_joystickControls[1].end();
         auto &j = s_joystickControls[0][guidStr];
 
 //            j.hwGUID = guidStr;
         j.isValid = true;
         j.isGameController = SDL_IsGameController(i);
         j.isHaptic = SDL_JoystickIsHaptic(joy.joystick);
-        joyFillDefaults(j);
+        if(!exist1)
+            joyFillDefaults(j);
 
         joy.name = SDL_JoystickName(joy.joystick);
 
@@ -265,7 +268,16 @@ static int s_joyDeviceAdd(int i)
 
         pLogDebug("==========================");
 
-        s_joystickControls[1][guidStr] = j;
+        if(exist2)
+        {
+            // Don't override controls when model entry is already loaded
+            auto &j2 = s_joystickControls[1][guidStr];
+            j2.isHaptic = j.isHaptic;
+            j2.isGameController = j.isGameController;
+            j2.isValid = j.isValid;
+        }
+        else
+            s_joystickControls[1][guidStr] = j;
 
         int objIdx = (int)s_joysticks.size();
         s_joysticks.push_back(joy);
