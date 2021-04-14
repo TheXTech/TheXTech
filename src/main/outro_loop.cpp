@@ -294,7 +294,7 @@ void SetupCredits()
     AddCredit("ZeZeinzer"); // Android testing, touchscreen controller button pictures
     AddCredit("LucyZocker"); // Android testing
     AddCredit("DavFar Gamers"); // Spanish translation of the readme
-    AddCredit("Yingchun Soul"); // Idea for individual iceball shooting SFX
+    AddCredit("Yingchun Soul"); // Idea for individual iceball shooting SFX and contribution with the "frozen NPC breaking" SFX
     AddCredit("MrDoubleA"); // Contribution with the "NPC got frozen" SFX
     AddCredit("Slash-18"); // Contribution with the better iceball shooting SFX
 #endif
