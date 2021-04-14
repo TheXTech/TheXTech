@@ -321,7 +321,7 @@ void joyDeviceAddEvent(const SDL_JoyDeviceEvent *e)
                 useJoystick[i] = (idx + 1);
                 if(useJoystick[i] >= 0)
                     joyGetByIndex(i, idx, conJoystick[i]);
-                PlaySoundMenu(88);
+                PlaySoundMenu(SFX_Yoshi);
                 break;
             }
         }
@@ -341,9 +341,10 @@ void joyDeviceRemoveEvent(const SDL_JoyDeviceEvent *e)
 
     pLogDebug("Disconnected game device: %s, index %d instance %d", s_joysticks[idx].name.c_str(), idx, e->which);
 
+    PlaySoundMenu(SFX_SMGlass);
+
     if(GameMenu && getNewJoystick) // Cancel the key binding if device got disconnected in the middle of the key awaiting
     {
-        PlaySoundMenu(4);
         // FIXME: Avoid this copypasting from the menu_loop.cpp at all
         if(MenuCursor == 1)
             conJoystick[MenuMode - 30].Up = lastJoyButton;
