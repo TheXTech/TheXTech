@@ -39,6 +39,21 @@
 #include <fmt_format_ne.h>
 #include <Utils/maths.h>
 
+static int s_shakeScreenX = 0;
+static int s_shakeScreenY = 0;
+
+void doShakeScreen(int force)
+{
+    s_shakeScreenX = force;
+    s_shakeScreenY = force;
+}
+
+void doShakeScreen(int forceX, int forceY)
+{
+    s_shakeScreenX = forceX;
+    s_shakeScreenY = forceY;
+}
+
 
 // This draws the graphic to the screen when in a level/game menu/outro/level editor
 void UpdateGraphics(bool skipRepaint)
@@ -2681,17 +2696,19 @@ void UpdateGraphics(bool skipRepaint)
 //            StretchBlt frmLevelWindow.vScreen(Z).hdc, 0, 0, frmLevelWindow.vScreen(Z).ScaleWidth, frmLevelWindow.vScreen(Z).ScaleHeight, myBackBuffer, 0, 0, 800, 600, vbSrcCopy
 //        Else
         { // NOT AN EDITOR!!!
-            if(ScreenShake > 0)
+            if(s_shakeScreenX > 0 || s_shakeScreenY > 0)
             {
-                ScreenShake--;
-                if(ScreenShake == 0)
-                {
+                if(s_shakeScreenX > 0)
+                    s_shakeScreenX--;
+                if(s_shakeScreenY > 0)
+                    s_shakeScreenY--;
+
+                if(s_shakeScreenX <= 0 && s_shakeScreenY <= 0)
                     frmMain.offsetViewport(0, 0);
-                }
                 else
                 {
-                    A = (iRand() % ScreenShake * 4) - ScreenShake * 2;
-                    B = (iRand() % ScreenShake * 4) - ScreenShake * 2;
+                    A = s_shakeScreenX > 0 ? (iRand() % s_shakeScreenX * 4) - s_shakeScreenX * 2 : 0;
+                    B = s_shakeScreenY > 0 ? (iRand() % s_shakeScreenY * 4) - s_shakeScreenY * 2 : 0;
                     frmMain.offsetViewport(A, B);
                 }
             }

@@ -54,7 +54,6 @@ RangeArr<ConJoystick_t, 1, maxLocalPlayers> conJoystick;
 RangeArrI<int, 1, maxLocalPlayers, 0> useJoystick;
 RangeArrI<bool, 1, maxLocalPlayers, false> wantedKeyboard;
 
-int ScreenShake = 0;
 std::string Checkpoint;
 std::vector<Checkpoint_t> CheckpointsList;
 bool MagicHand = false;

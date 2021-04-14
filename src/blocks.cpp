@@ -2096,7 +2096,7 @@ void PowBlock()
         }
     }
     if(GameMenu == false)
-        ScreenShake = 20;
+        doShakeScreen(20);
 }
 
 bool BlockCheckPlayerFilter(int blockIdx, int playerIdx)
