@@ -29,8 +29,14 @@
 #include <string>
 #include "location.h"
 
-void doShakeScreen(int force);
-void doShakeScreen(int forceX, int forceY);
+enum
+{
+    SHAKE_RANDOM = 0,
+    SHAKE_SEQUENTIAL
+};
+
+void doShakeScreen(int force, int type);
+void doShakeScreen(int forceX, int forceY, int type, int duration, double decay);
 
 // Public Sub UpdateGraphics2() 'draws GFX to screen when on the world map/world map editor
 // draws GFX to screen when on the world map/world map editor

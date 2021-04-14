@@ -2095,8 +2095,8 @@ void PowBlock()
             }
         }
     }
-    if(GameMenu == false)
-        doShakeScreen(20);
+
+    doShakeScreen(20, SHAKE_RANDOM);
 }
 
 bool BlockCheckPlayerFilter(int blockIdx, int playerIdx)

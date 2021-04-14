@@ -39,19 +39,99 @@
 #include <fmt_format_ne.h>
 #include <Utils/maths.h>
 
-static int s_shakeScreenX = 0;
-static int s_shakeScreenY = 0;
-
-void doShakeScreen(int force)
+struct ScreenShake_t
 {
-    s_shakeScreenX = force;
-    s_shakeScreenY = force;
+    double forceX = 0;
+    double forceY = 0;
+    double forceDecay = 1.0;
+    int    type = SHAKE_RANDOM;
+    double duration = 0;
+    double sign = +1.0;
+
+    bool   active = false;
+
+    void update()
+    {
+        if(!active || GameMenu)
+            return;
+
+        int offsetX, offsetY;
+
+        if(duration <= 0)
+        {
+            if(forceX > 0)
+                forceX -= forceDecay;
+            if(forceY > 0)
+                forceY -= forceDecay;
+        }
+        else
+            duration--;
+
+        if(forceX <= 0 && forceY <= 0)
+        {
+            frmMain.offsetViewport(0, 0);
+            forceX = 0.0;
+            forceY = 0.0;
+            active = false;
+        }
+        else
+        {
+            switch(type)
+            {
+            default:
+            case SHAKE_RANDOM:
+                offsetX = forceX > 0 ? (int)round((SDL_fmod(iRand(), forceX) * 4) - forceX * 2) : 0;
+                offsetY = forceY > 0 ? (int)round((SDL_fmod(iRand(), forceY) * 4) - forceY * 2) : 0;
+                break;
+            case SHAKE_SEQUENTIAL:
+                offsetX = forceX > 0 ? (int)round(sign * forceX) : 0;
+                offsetY = forceY > 0 ? (int)round(sign * forceY) : 0;
+                sign *= -1;
+                break;
+            }
+            frmMain.offsetViewport(offsetX, offsetY);
+        }
+    }
+
+    void setup(int i_forceX, int i_forceY, int i_type, int i_duration, double i_decay)
+    {
+        if(GameMenu)
+            return;
+
+        if((forceX <= 0 && forceY <= 0) || (forceDecay < i_decay))
+            forceDecay = i_decay;
+
+        // don't override random shake by sequential while random shake is active
+        if((forceX <= 0 && forceY <= 0) || (type != SHAKE_RANDOM))
+            type = i_type;
+
+        if(forceX < i_forceX)
+            forceX = i_forceX;
+        if(forceY < i_forceY)
+            forceY = i_forceY;
+        if(duration < i_duration)
+            duration = i_duration;
+
+        active = true;
+    }
+};
+
+static ScreenShake_t s_shakeScreen;
+
+//static double s_shakeScreenX = 0;
+//static double s_shakeScreenY = 0;
+//static int s_shakeScreenType = SHAKE_RANDOM;
+//static double s_shakeScreenDuration = 0;
+//static double s_shakeScreenSign = +1.0;
+
+void doShakeScreen(int force, int type)
+{
+    s_shakeScreen.setup(force, force, type, 0, 1.0);
 }
 
-void doShakeScreen(int forceX, int forceY)
+void doShakeScreen(int forceX, int forceY, int type, int duration, double decay)
 {
-    s_shakeScreenX = forceX;
-    s_shakeScreenY = forceY;
+    s_shakeScreen.setup(forceX, forceY, type, duration, decay);
 }
 
 
@@ -2696,22 +2776,7 @@ void UpdateGraphics(bool skipRepaint)
 //            StretchBlt frmLevelWindow.vScreen(Z).hdc, 0, 0, frmLevelWindow.vScreen(Z).ScaleWidth, frmLevelWindow.vScreen(Z).ScaleHeight, myBackBuffer, 0, 0, 800, 600, vbSrcCopy
 //        Else
         { // NOT AN EDITOR!!!
-            if(s_shakeScreenX > 0 || s_shakeScreenY > 0)
-            {
-                if(s_shakeScreenX > 0)
-                    s_shakeScreenX--;
-                if(s_shakeScreenY > 0)
-                    s_shakeScreenY--;
-
-                if(s_shakeScreenX <= 0 && s_shakeScreenY <= 0)
-                    frmMain.offsetViewport(0, 0);
-                else
-                {
-                    A = s_shakeScreenX > 0 ? (iRand() % s_shakeScreenX * 4) - s_shakeScreenX * 2 : 0;
-                    B = s_shakeScreenY > 0 ? (iRand() % s_shakeScreenY * 4) - s_shakeScreenY * 2 : 0;
-                    frmMain.offsetViewport(A, B);
-                }
-            }
+            s_shakeScreen.update();
         }
 //    Next Z
     }
