@@ -33,6 +33,7 @@
 #include "effect.h"
 #include "collision.h"
 #include "npc.h"
+#include "npc_id.h"
 #include "player.h"
 #include "sorting.h"
 #include "layers.h"
@@ -683,7 +684,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                 }
             }
 
-            if(HitDown == false)
+            if(!HitDown)
             {
                 NPC[numNPCs].Location.Y = b.Location.Y; // - 0.1
                 NPC[numNPCs].Location.Height = 0;
@@ -693,18 +694,17 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                     NPC[numNPCs].Location.Height = 32;
                     NPC[numNPCs].Location.Y = b.Location.Y - 32;
                 }
-                else if(NPC[numNPCs].Type == 34)
+                else if(NPC[numNPCs].Type == NPCID_LEAF)
                 {
                     NPC[numNPCs].Effect = 0;
                     NPC[numNPCs].Location.Y = b.Location.Y - 32;
                     NPC[numNPCs].Location.SpeedY = -6;
                     NPC[numNPCs].Location.Height = NPCHeight[C];
-                    // PlaySound(7); // Don't play mushroom sound on leaf, like in original SMB3
+                    // PlaySound(SFX_Mushroom); // Don't play mushroom sound on leaf, like in original SMB3
                 }
                 else
                 {
                     NPC[numNPCs].Effect = 1;
-                    PlaySound(7);
                 }
             }
             else
@@ -712,7 +712,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                 NPC[numNPCs].Location.Y = b.Location.Y + 4;
                 NPC[numNPCs].Location.Height = NPCHeight[C];
                 NPC[numNPCs].Effect = 3;
-                PlaySound(7);
+                PlaySound(SFX_Mushroom);
             }
 
             NPC[numNPCs].Effect2 = 0;
@@ -732,7 +732,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         }
         else // Spawn the player
         {
-            PlaySound(7);
+            PlaySound(SFX_Mushroom);
             Player[tempPlayer].State = 1;
             Player[tempPlayer].Location.Width = Physics.PlayerWidth[Player[tempPlayer].Character][Player[tempPlayer].State];
             Player[tempPlayer].Location.Height = Physics.PlayerHeight[Player[tempPlayer].Character][Player[tempPlayer].State];
@@ -775,7 +775,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         {
             tempPlayer = 0;
         }
-        PlaySound(7);
+        PlaySound(SFX_Mushroom);
         if(tempPlayer == 0)
         {
             numNPCs++;
@@ -852,7 +852,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         {
             tempPlayer = 0;
         }
-        PlaySound(7);
+        PlaySound(SFX_Mushroom);
         if(tempPlayer == 0)
         {
             numNPCs++;
@@ -943,7 +943,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         {
             tempPlayer = 0;
         }
-        PlaySound(7);
+        PlaySound(SFX_Mushroom);
         if(tempPlayer == 0)
         {
             numNPCs++;
@@ -1038,7 +1038,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         {
             BlockShakeDown(A);
         }
-        PlaySound(7);
+        PlaySound(SFX_Mushroom);
         numNPCs++;
         NPC[numNPCs] = NPC_t();
         NPC[numNPCs].Active = true;
@@ -1068,7 +1068,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
     else if(b.Special == 105) // Block contains a Green Yoshi
     {
         SoundPause[2] = 2;
-        PlaySound(7);
+        PlaySound(SFX_Mushroom);
 
         if(HitDown == false)
         {
@@ -1113,7 +1113,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         }
         else
         {
-            PlaySound(7);
+            PlaySound(SFX_Mushroom);
             NPC[numNPCs].Location.Y = b.Location.Y + 4;
             NPC[numNPCs].Location.Height = 32;
             NPC[numNPCs].Effect = 3;
@@ -1146,7 +1146,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         {
             BlockShakeDown(A);
         }
-        PlaySound(7);
+        PlaySound(SFX_Mushroom);
         numNPCs++;
         NPC[numNPCs] = NPC_t();
         NPC[numNPCs].Active = true;
@@ -1197,7 +1197,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         {
             BlockShakeDown(A);
         }
-        PlaySound(7);
+        PlaySound(SFX_Mushroom);
         numNPCs++;
         NPC[numNPCs] = NPC_t();
         NPC[numNPCs].Active = true;
