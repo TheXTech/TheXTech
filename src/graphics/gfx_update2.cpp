@@ -49,6 +49,8 @@ void UpdateGraphics2(bool skipRepaint)
     if(FrameSkip && frameSkipNeeded())
         return;
 
+    frmMain.setTargetTexture();
+
     frameNextInc();
     frameRenderStart();
 
@@ -704,6 +706,8 @@ void UpdateGraphics2(bool skipRepaint)
 
         if(!skipRepaint)
             frmMain.repaint();
+
+        frmMain.setTargetScreen();
     }
 
     if(TakeScreen)

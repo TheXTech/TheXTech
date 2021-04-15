@@ -527,7 +527,9 @@ int pfrY(int plrFrame)
 void ScreenShot()
 {
 #ifndef __EMSCRIPTEN__
+    frmMain.setTargetTexture();
     frmMain.makeShot();
+    frmMain.setTargetScreen();
     PlaySound(12);
 #endif
     TakeScreen = false;

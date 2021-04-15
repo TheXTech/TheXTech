@@ -52,6 +52,7 @@ class FrmMain
     SDL_Window *m_window = nullptr;
     SDL_Renderer *m_gRenderer = nullptr;
     SDL_Texture  *m_tBuffer = nullptr;
+    SDL_Texture  *m_recentTarget = nullptr;
     std::set<SDL_Texture *> m_textureBank;
     bool m_sdlLoaded = false;
     const Uint8 *m_keyboardState = nullptr;
@@ -103,6 +104,17 @@ public:
     void resetViewport();
     void setViewport(int x, int y, int w, int h);
     void offsetViewport(int x, int y); // for screen-shaking
+
+    /*!
+     * \brief Set render target into the virtual in-game screen (use to render in-game world)
+     */
+    void setTargetTexture();
+
+    /*!
+     * \brief Set render target into the real window or screen (use to render on-screen buttons and other meta-info)
+     */
+    void setTargetScreen();
+
 
     StdPicture LoadPicture(std::string path, std::string maskPath = std::string(), std::string maskFallbackPath = std::string());
     StdPicture lazyLoadPicture(std::string path, std::string maskPath = std::string(), std::string maskFallbackPath = std::string());

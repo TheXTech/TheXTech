@@ -331,6 +331,7 @@ void MenuLoop()
                     PlaySoundMenu(29);
 //                    BitBlt myBackBuffer, 0, 0, ScreenW, ScreenH, 0, 0, 0, vbWhiteness
 //                    BitBlt frmMain.hdc, 0, 0, frmMain.ScaleWidth, frmMain.ScaleHeight, 0, 0, 0, vbWhiteness
+                    frmMain.setTargetTexture();
                     frmMain.clearBuffer();
 //                    StopMusic
                     StopMusic();
@@ -883,6 +884,7 @@ void MenuLoop()
                     GameMenu = false;
 //                    BitBlt myBackBuffer, 0, 0, ScreenW, ScreenH, 0, 0, 0, vbWhiteness
 //                    BitBlt frmMain.hdc, 0, 0, frmMain.ScaleWidth, frmMain.ScaleHeight, 0, 0, 0, vbWhiteness
+                    frmMain.setTargetTexture();
                     frmMain.clearBuffer();
                     frmMain.repaint();
 //                    StopMusic

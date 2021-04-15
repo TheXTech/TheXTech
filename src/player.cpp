@@ -895,6 +895,7 @@ void EveryonesDead()
     LevelMacro = LEVELMACRO_OFF;
     FreezeNPCs = false;
     StopMusic();
+    frmMain.setTargetTexture();
     frmMain.clearBuffer();
     frmMain.repaint();
 //    if(MagicHand == true)

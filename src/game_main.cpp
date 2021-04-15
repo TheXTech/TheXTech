@@ -512,6 +512,7 @@ int GameMain(const CmdLineSetup_t &setup)
                     GameThing();
                 else
                 {
+                    frmMain.setTargetTexture();
                     frmMain.clearBuffer();
                     frmMain.repaint();
                 }
@@ -810,6 +811,7 @@ void NextLevel()
     LevelMacroCounter = 0;
     StopMusic();
     ClearLevel();
+    frmMain.setTargetTexture();
     frmMain.clearBuffer();
     frmMain.repaint();
     DoEvents();
@@ -1415,6 +1417,7 @@ void StartBattleMode()
     LevelSelect = false;
     GameMenu = false;
     BattleMode = true;
+    frmMain.setTargetTexture();
     frmMain.clearBuffer();
     frmMain.repaint();
     StopMusic();

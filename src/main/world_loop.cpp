@@ -445,6 +445,7 @@ void WorldLoop()
                     {
                         StopMusic();
                         PlaySound(28);
+                        frmMain.setTargetTexture();
                         frmMain.clearBuffer();
                         frmMain.repaint();
                         DoEvents();

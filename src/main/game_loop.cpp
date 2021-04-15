@@ -405,6 +405,7 @@ void PauseGame(int plr)
                                 stopPause = true;
                                 MenuMode = 0;
                                 MenuCursor = 0;
+                                frmMain.setTargetTexture();
                                 frmMain.clearBuffer();
                                 frmMain.repaint();
                                 EndLevel = true;
@@ -425,6 +426,7 @@ void PauseGame(int plr)
                                 stopPause = true;
                                 MenuMode = 0;
                                 MenuCursor = 0;
+                                frmMain.setTargetTexture();
                                 frmMain.clearBuffer();
                                 frmMain.repaint();
                                 EndLevel = true;
@@ -456,6 +458,7 @@ void PauseGame(int plr)
 
                             MenuMode = 0;
                             MenuCursor = 0;
+
                             if(!LevelSelect)
                             {
                                 LevelSelect = true;
@@ -463,6 +466,8 @@ void PauseGame(int plr)
                             }
                             else
                                 LevelSelect = false;
+
+                            frmMain.setTargetTexture();
                             frmMain.clearBuffer();
                             frmMain.repaint();
                             StopMusic();

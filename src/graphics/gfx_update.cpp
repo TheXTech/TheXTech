@@ -234,6 +234,8 @@ void UpdateGraphics(bool skipRepaint)
         }
     }
 
+    frmMain.setTargetTexture();
+
     frameNextInc();
     frameRenderStart();
 
@@ -2783,6 +2785,8 @@ void UpdateGraphics(bool skipRepaint)
 
     if(!skipRepaint)
         frmMain.repaint();
+
+    frmMain.setTargetScreen();
 
 //    If TakeScreen = True Then ScreenShot
     if(TakeScreen)

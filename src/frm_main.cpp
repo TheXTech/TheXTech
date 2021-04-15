@@ -273,7 +273,7 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
     // Clean-up from a possible start-up junk
     clearBuffer();
 
-    SDL_SetRenderTarget(m_gRenderer, m_tBuffer);
+    setTargetTexture();
 
     SDL_SetRenderDrawBlendMode(m_gRenderer, SDL_BLENDMODE_BLEND);
 
@@ -283,6 +283,8 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
 
     // Clean-up the texture buffer from the same start-up junk
     clearBuffer();
+
+    setTargetScreen();
 
     repaint();
     doEvents();
@@ -648,11 +650,11 @@ void FrmMain::repaint()
     int w, h, off_x, off_y, wDst, hDst;
     float scale_x, scale_y;
 
+    setTargetScreen();
+
 #ifndef __EMSCRIPTEN__
     processRecorder();
 #endif
-
-    SDL_SetRenderTarget(m_gRenderer, nullptr);
 
     // Get the size of surface where to draw the scene
     SDL_GetRendererOutputSize(m_gRenderer, &w, &h);
@@ -695,7 +697,6 @@ void FrmMain::repaint()
 #endif
 
     SDL_RenderPresent(m_gRenderer);
-    SDL_SetRenderTarget(m_gRenderer, m_tBuffer);
 }
 
 void FrmMain::updateViewport()
@@ -774,6 +775,22 @@ void FrmMain::offsetViewport(int x, int y)
         viewport_offset_x = x;
         viewport_offset_y = y;
     }
+}
+
+void FrmMain::setTargetTexture()
+{
+    if(m_recentTarget == m_tBuffer)
+        return;
+    SDL_SetRenderTarget(m_gRenderer, m_tBuffer);
+    m_recentTarget = m_tBuffer;
+}
+
+void FrmMain::setTargetScreen()
+{
+    if(m_recentTarget == nullptr)
+        return;
+    SDL_SetRenderTarget(m_gRenderer, nullptr);
+    m_recentTarget = nullptr;
 }
 
 StdPicture FrmMain::LoadPicture(std::string path, std::string maskPath, std::string maskFallbackPath)
@@ -1318,12 +1335,15 @@ void FrmMain::processRecorder()
     if(!m_gif.enabled)
         return;
 
+    setTargetTexture();
+
     m_gif.delayTimer += int(1000.0 / 65.0);
     if(m_gif.delayTimer >= m_gif.delay * 10)
         m_gif.delayTimer = 0.0;
     if(m_gif.doFinalize || (m_gif.delayTimer != 0.0))
     {
         m_gif.drawRecCircle();
+        setTargetScreen();
         return;
     }
 
@@ -1333,6 +1353,7 @@ void FrmMain::processRecorder()
     if(!pixels)
     {
         pLogCritical("Can't allocate memory for a next GIF frame: out of memory");
+        setTargetScreen();
         return; // Drop frame (out of memory)
     }
 
@@ -1348,6 +1369,7 @@ void FrmMain::processRecorder()
     m_gif.enqueue(shoot);
 
     m_gif.drawRecCircle();
+    setTargetScreen();
 }
 
 int FrmMain::processRecorder_action(void *_recorder)

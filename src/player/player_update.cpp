@@ -2193,6 +2193,7 @@ void UpdatePlayer()
                             Player[B].TailCount = 0;
                         LevelMacro = LEVELMACRO_OFF;
                         LevelMacroCounter = 0;
+                        frmMain.setTargetTexture();
                         frmMain.clearBuffer();
                         frmMain.repaint();
                     }
@@ -2202,6 +2203,7 @@ void UpdatePlayer()
                         EndLevel = true;
                         LevelMacro = LEVELMACRO_OFF;
                         LevelMacroCounter = 0;
+                        frmMain.setTargetTexture();
                         frmMain.clearBuffer();
                         frmMain.repaint();
                     }
