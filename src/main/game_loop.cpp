@@ -305,8 +305,11 @@ void PauseGame(int plr)
                         else
                         {
                             if(MenuCursor != 1)
-                                PlaySound(26);
-                            MenuCursor = 1;
+                                PlaySound(SFX_Slide);
+                            if(TestLevel)
+                                MenuCursor = 3;
+                            else
+                                MenuCursor = 1;
                         }
                         noButtons = false;
                     }
