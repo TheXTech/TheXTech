@@ -216,11 +216,11 @@ void PauseGame(int plr)
 //    if(TestLevel && MessageText.empty())
 //        return;
     if(MessageText.empty())
-        PlaySound(30);
+        PlaySound(SFX_Pause);
     else
     {
-        SoundPause[47] = 0;
-        PlaySound(47);
+        SoundPause[SFX_Message] = 0;
+        PlaySound(SFX_Message);
     }
 
     GamePaused = true;
@@ -230,7 +230,7 @@ void PauseGame(int plr)
     if(PSwitchTime > 0)
     {
         // If noSound = False Then mciSendString "pause smusic", 0, 0, 0
-        if(noSound == false)
+        if(!noSound)
             SoundPauseAll();
     }
 
@@ -299,7 +299,7 @@ void PauseGame(int plr)
                         if(LevelSelect && !Cheater)
                         {
                             if(MenuCursor != 2)
-                                PlaySound(26);
+                                PlaySound(SFX_Slide);
                             MenuCursor = 2;
                         }
                         else
@@ -315,13 +315,13 @@ void PauseGame(int plr)
 
                     if(upPressed)
                     {
-                        PlaySound(26);
+                        PlaySound(SFX_Slide);
                         MenuCursor = MenuCursor - 1;
                         noButtons = false;
                     }
                     else if(downPressed)
                     {
-                        PlaySound(26);
+                        PlaySound(SFX_Slide);
                         MenuCursor = MenuCursor + 1;
                         noButtons = false;
                     }
@@ -355,7 +355,7 @@ void PauseGame(int plr)
                                 }
                                 if(AllCharBlock == 0)
                                 {
-                                    PlaySound(26);
+                                    PlaySound(SFX_Slide);
                                     Player[A].RunRelease = false;
                                     if(A == 1)
                                         B = 2;
@@ -416,7 +416,7 @@ void PauseGame(int plr)
                                 numStars = 0;
                                 numSavedEvents = 0;
                                 BlockSwitch.fill(false);
-                                PlaySound(22);
+                                PlaySound(SFX_Bullet);
                                 break;
                             case 3: // Quit testing
                                 stopPause = true;
@@ -520,12 +520,14 @@ void PauseGame(int plr)
     GamePaused = false;
     Player[plr].UnStart = false;
     Player[plr].CanJump = false;
+
     if(!TestLevel && MessageText.empty())
-        PlaySound(30);
+        PlaySound(SFX_Pause);
+
     if(PSwitchTime > 0)
     {
         // If noSound = False Then mciSendString "resume smusic", 0, 0, 0
-        if(noSound == false)
+        if(!noSound)
             SoundResumeAll();
     }
     MessageText.clear();
