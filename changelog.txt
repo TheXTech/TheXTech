@@ -22,6 +22,7 @@ Changes for 1.3.4.1
 -Added an ability to put the silence instead of the actual sound file by specifying the "silent=true" field instead of the "file=..."
 -Thwomps will slightly shake the screen on their fall
 -Yoshi's ground pound will slightly shake the screen
+-Sprout vine from blocks got an individual sound
 
 Changes for 1.3.4
 -Fixed the inability to use any custom sounds and custom music at level's custom data directory

@@ -146,7 +146,8 @@ enum
     SFX_Iceball,
     SFX_Freeze,
     SFX_Icebreak,
-    SFX_PlayerHammer // Reserved
+    SFX_PlayerHammer, // Reserved
+    SFX_SproutVine
 };
 
 int CustomWorldMusicId();

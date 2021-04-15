@@ -705,6 +705,17 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                 else
                 {
                     NPC[numNPCs].Effect = 1;
+                    switch(C)
+                    {
+                    case NPCID_VINEHEAD_GREEN_SMB3:
+                    case NPCID_VINEHEAD_RED_SMB3:
+                    case NPCID_VINEHEAD_SMW:
+                        PlaySound(SFX_SproutVine);
+                        break;
+                    default:
+                        PlaySound(SFX_Mushroom);
+                        break;
+                    }
                 }
             }
             else
