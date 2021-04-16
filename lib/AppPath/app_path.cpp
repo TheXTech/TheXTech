@@ -124,7 +124,8 @@ bool AppPathManager::m_isPortable = false;
  */
 static std::string getPgeUserDirectory()
 {
-    std::string path = "";
+    std::string path;
+
 #if defined(__APPLE__)
     {
         char *base_path = getAppSupportDir();
@@ -134,6 +135,7 @@ static std::string getPgeUserDirectory()
             SDL_free(base_path);
         }
     }
+
 #elif defined(_WIN32)
     {
         wchar_t pathW[MAX_PATH];
@@ -146,19 +148,27 @@ static std::string getPgeUserDirectory()
                                        0, FALSE);
         path.resize(path_len);
     }
+
 #elif defined(__ANDROID__)
-    path = "/sdcard/";
+    path = "/storage/emulated/0";
+
+    DirMan homeDir(path);
+    if(!homeDir.exists())
+        path = "/sdcard";
+
 #elif defined(__HAIKU__)
     {
         const char *home = SDL_getenv("HOME");
         path.append(home);
     }
+
 #elif defined(__gnu_linux__)
     {
         passwd *pw = getpwuid(getuid());
         path.append(pw->pw_dir);
     }
 #endif
+
     return path.empty() ? std::string(".") : (path + UserDirName);
 }
 
@@ -189,10 +199,10 @@ void AppPathManager::initAppPath()
     char *path = SDL_GetBasePath();
     if(!path)
     {
-#ifndef DISABLE_LOGGING
-        std::fprintf(stderr, "== Failed to recogonize application path by using of SDL_GetBasePath! Using current working directory \"./\" instead.\n");
+#   ifndef DISABLE_LOGGING
+        std::fprintf(stderr, "== Failed to recognize application path by using of SDL_GetBasePath! Using current working directory \"./\" instead.\n");
         std::fflush(stderr);
-#endif
+#   endif
         path = SDL_strdup("./");
     }
     ApplicationPathSTD = std::string(path);
@@ -200,7 +210,7 @@ void AppPathManager::initAppPath()
     std::replace(ApplicationPathSTD.begin(), ApplicationPathSTD.end(), '\\', '/');
 #   endif
     SDL_free(path);
-#endif
+#endif //__APPLE__
 
 #ifdef __EMSCRIPTEN__
     loadCustomState();
@@ -213,7 +223,7 @@ void AppPathManager::initAppPath()
     if(!userDirPath.empty())
     {
         DirMan appDir(userDirPath);
-        if(!appDir.exists() && !appDir.mkpath(userDirPath))
+        if(!appDir.exists() && !appDir.mkpath())
             goto defaultSettingsPath;
 // #ifdef __APPLE__
 //         if(!DirMan::exists(ApplicationPathSTD + "/Data directory"))
@@ -224,9 +234,12 @@ void AppPathManager::initAppPath()
         std::string noMediaFile = userDirPath + "/.nomedia";
         if(!Files::fileExists(noMediaFile))
         {
-            SDL_RWops *noMediaRWops = SDL_RWFromFile(noMediaFile.c_str(), "wb");
+            SDL_RWops *noMediaRWops = SDL_RWFromFile(noMediaFile.c_str(), "w");
             if(noMediaRWops)
+            {
+                SDL_RWwrite(noMediaRWops, "\0", 1, 1);
                 SDL_RWclose(noMediaRWops);
+            }
         }
 #endif
         m_userPath = appDir.absolutePath();
