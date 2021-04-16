@@ -158,7 +158,10 @@ bool GFX_t::load()
 
     if(m_loadErrors > 0)
     {
-        std::string msg = fmt::format_ne("Failed to load an UI image assets. Look a log file to get more details:\n{0}", getLogFilePath());
+        std::string msg = fmt::format_ne("Failed to load an UI image assets. Look a log file to get more details:\n{0}"
+                                         "\n\n"
+                                         "It's possible that you didn't installed the game assets package, or you had installed it at the incorrect directory.",
+                                         getLogFilePath());
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "UI image assets loading error", msg.c_str(), nullptr);
         return false;
     }
