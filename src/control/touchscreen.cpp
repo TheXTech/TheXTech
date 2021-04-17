@@ -96,6 +96,8 @@ bool TouchScreenController::touchSupported()
 
 #ifdef __ANDROID__
 
+static void initTouchMap();
+
 JNIEXPORT void JNICALL
 Java_ru_wohlsoft_thextech_thextechActivity_setHardwareKeyboardPresence(
     JNIEnv *env,
@@ -142,6 +144,7 @@ Java_ru_wohlsoft_thextech_thextechActivity_setScreenSize(
     (void)env;
     (void)type;
     s_screenSize = screenSize;
+    initTouchMap();
 }
 
 JNIEXPORT void JNICALL
@@ -363,26 +366,7 @@ static struct TouchKeyMap
     float touchCanvasHeight = 600.0f;
 
     //! List of key hit boxes
-    KeyPos touchKeysMap[TouchScreenController::key_END] =
-    {
-        /* Note that order of keys must match the TouchScreenController::commands enum!!! */
-        {542.0f, 537.0f, 693.0f,  587.0f, TouchScreenController::key_start},
-        {1.0f, 410.0f, 83.0f,  492.0f, TouchScreenController::key_left},
-        {165.0f, 410.0f, 247.0f,  492.0f, TouchScreenController::key_right},
-        {83.0f, 328.0f, 165.0f,  410.0f, TouchScreenController::key_up},
-        {83.0f, 492.0f, 165.0f,  574.0f, TouchScreenController::key_down},
-        {1.0f, 328.0f, 83.0f,  410.0f, TouchScreenController::key_upleft},
-        {165.0f, 328.0f, 247.0f,  410.0f, TouchScreenController::key_upright},
-        {1.0f, 492.0f, 83.0f,  574.0f, TouchScreenController::key_downleft},
-        {165.0f, 492.0f, 247.0f,  574.0f, TouchScreenController::key_downright},
-        {770.0f, 396.0f, 877.0f,  487.0f, TouchScreenController::key_run},
-        {888.0f, 431.0f, 995.0f,  522.0f, TouchScreenController::key_jump},
-        {780.0f, 290.0f, 887.0f,  381.0f, TouchScreenController::key_altrun},
-        {898.0f, 325.0f, 1005.0f,  416.0f, TouchScreenController::key_altjump},
-        {331.0f, 537.0f, 482.0f,  587.0f, TouchScreenController::key_drop},
-        {807.0f, 150.0f, 914.0f,  180.0f, TouchScreenController::key_holdRun},
-        {10.0f, 10.0f, 70.0f,  70.0f, TouchScreenController::key_toggleKeysView},
-    };
+    KeyPos touchKeysMap[TouchScreenController::key_END];
 
     TouchKeyMap()
     {
@@ -459,6 +443,11 @@ static struct TouchKeyMap
 } g_touchKeyMap;
 
 /*-----------------------Screen size depending layouts ----------------------------------*/
+/************************************************
+ * Please use this tool to edit these layouts:  *
+ * https://github.com/Wohlstand/TouchpadTuner   *
+ ************************************************/
+
 static const TouchKeyMap::KeyPos c_4_tinyPhoneMap[TouchScreenController::key_END] =
 {
     /* Note that order of keys must match the TouchScreenController::commands enum!!! */
@@ -483,22 +472,43 @@ static const TouchKeyMap::KeyPos c_4_tinyPhoneMap[TouchScreenController::key_END
 static const TouchKeyMap::KeyPos c_averagePhoneMap[TouchScreenController::key_END] =
 {
     /* Note that order of keys must match the TouchScreenController::commands enum!!! */
-    {542.0f, 537.0f, 693.0f,  587.0f, TouchScreenController::key_start},
-    {1.0f, 410.0f, 83.0f,  492.0f, TouchScreenController::key_left},
-    {165.0f, 410.0f, 247.0f,  492.0f, TouchScreenController::key_right},
-    {83.0f, 328.0f, 165.0f,  410.0f, TouchScreenController::key_up},
-    {83.0f, 492.0f, 165.0f,  574.0f, TouchScreenController::key_down},
-    {1.0f, 328.0f, 83.0f,  410.0f, TouchScreenController::key_upleft},
-    {165.0f, 328.0f, 247.0f,  410.0f, TouchScreenController::key_upright},
-    {1.0f, 492.0f, 83.0f,  574.0f, TouchScreenController::key_downleft},
-    {165.0f, 492.0f, 247.0f,  574.0f, TouchScreenController::key_downright},
-    {770.0f, 396.0f, 877.0f,  487.0f, TouchScreenController::key_run},
-    {888.0f, 431.0f, 995.0f,  522.0f, TouchScreenController::key_jump},
-    {780.0f, 290.0f, 887.0f,  381.0f, TouchScreenController::key_altrun},
-    {898.0f, 325.0f, 1005.0f,  416.0f, TouchScreenController::key_altjump},
-    {331.0f, 537.0f, 482.0f,  587.0f, TouchScreenController::key_drop},
-    {807.0f, 150.0f, 914.0f,  180.0f, TouchScreenController::key_holdRun},
-    {10.0f, 10.0f, 70.0f,  70.0f, TouchScreenController::key_toggleKeysView},
+    {542.0f, 537.0f, 693.0f, 587.0f, TouchScreenController::key_start},
+    {1.0f, 410.0f, 83.0f, 492.0f, TouchScreenController::key_left},
+    {165.0f, 410.0f, 247.0f, 492.0f, TouchScreenController::key_right},
+    {83.0f, 328.0f, 165.0f, 410.0f, TouchScreenController::key_up},
+    {83.0f, 492.0f, 165.0f, 574.0f, TouchScreenController::key_down},
+    {1.0f, 328.0f, 83.0f, 410.0f, TouchScreenController::key_upleft},
+    {165.0f, 328.0f, 247.0f, 410.0f, TouchScreenController::key_upright},
+    {1.0f, 492.0f, 83.0f, 574.0f, TouchScreenController::key_downleft},
+    {165.0f, 492.0f, 247.0f, 574.0f, TouchScreenController::key_downright},
+    {764.0f, 403.0f, 868.0f, 507.0f, TouchScreenController::key_run},
+    {885.0f, 436.0f, 989.0f, 540.0f, TouchScreenController::key_jump},
+    {786.0f, 287.0f, 890.0f, 391.0f, TouchScreenController::key_altrun},
+    {904.0f, 317.0f, 1008.0f, 421.0f, TouchScreenController::key_altjump},
+    {331.0f, 537.0f, 482.0f, 587.0f, TouchScreenController::key_drop},
+    {827.0f, 129.0f, 943.0f, 169.0f, TouchScreenController::key_holdRun},
+    {10.0f, 10.0f, 70.0f, 70.0f, TouchScreenController::key_toggleKeysView},
+};
+
+static const TouchKeyMap::KeyPos c_7_tablet[TouchScreenController::key_END] =
+{
+    /* Note that order of keys must match the TouchScreenController::commands enum!!! */
+    {636.0f, 544.0f, 775.0f, 582.0f, TouchScreenController::key_start},
+    {3.0f, 430.0f, 76.0f, 503.0f, TouchScreenController::key_left},
+    {149.0f, 430.0f, 222.0f, 503.0f, TouchScreenController::key_right},
+    {76.0f, 357.0f, 149.0f, 430.0f, TouchScreenController::key_up},
+    {76.0f, 503.0f, 149.0f, 576.0f, TouchScreenController::key_down},
+    {3.0f, 357.0f, 76.0f, 430.0f, TouchScreenController::key_upleft},
+    {149.0f, 357.0f, 222.0f, 430.0f, TouchScreenController::key_upright},
+    {3.0f, 503.0f, 76.0f, 576.0f, TouchScreenController::key_downleft},
+    {149.0f, 503.0f, 222.0f, 576.0f, TouchScreenController::key_downright},
+    {797.0f, 439.0f, 887.0f, 529.0f, TouchScreenController::key_run},
+    {897.0f, 463.0f, 987.0f, 553.0f, TouchScreenController::key_jump},
+    {819.0f, 341.0f, 909.0f, 431.0f, TouchScreenController::key_altrun},
+    {919.0f, 363.0f, 1009.0f, 453.0f, TouchScreenController::key_altjump},
+    {257.0f, 544.0f, 396.0f, 582.0f, TouchScreenController::key_drop},
+    {873.0f, 226.0f, 968.0f, 258.0f, TouchScreenController::key_holdRun},
+    {10.0f, 10.0f, 58.0f, 58.0f, TouchScreenController::key_toggleKeysView},
 };
 
 static const TouchKeyMap::KeyPos c_10_6_tablet[TouchScreenController::key_END] =
@@ -517,22 +527,25 @@ static const TouchKeyMap::KeyPos c_10_6_tablet[TouchScreenController::key_END] =
     {1158.0f, 686.0f, 1248.0f, 776.0f, TouchScreenController::key_jump},
     {1056.0f, 554.0f, 1146.0f, 644.0f, TouchScreenController::key_altrun},
     {1177.0f, 571.0f, 1267.0f, 661.0f, TouchScreenController::key_altjump},
-    {704.0f, 753.0f, 837.0f, 785.0f, TouchScreenController::key_drop},
-    {1134.0f, 466.0f, 1241.0f, 496.0f, TouchScreenController::key_holdRun},
+    {256.0f, 753.0f, 389.0f, 785.0f, TouchScreenController::key_drop},
+    {1122.0f, 453.0f, 1216.0f, 492.0f, TouchScreenController::key_holdRun},
     {10.0f, 10.0f, 57.0f, 57.0f, TouchScreenController::key_toggleKeysView},
 };
 /*---------------------------------------------------------------------------------------*/
 
-TouchScreenController::TouchScreenController() = default;
-TouchScreenController::~TouchScreenController() = default;
-
-void TouchScreenController::init()
+static void initTouchMap()
 {
     if(s_screenSize >= 9.0)
     {
         g_touchKeyMap.touchCanvasWidth = 1300.0f;
         g_touchKeyMap.touchCanvasHeight = 812.0f;
         SDL_memcpy(g_touchKeyMap.touchKeysMap, c_10_6_tablet, sizeof(g_touchKeyMap.touchKeysMap));
+    }
+    else if(s_screenSize >= 7.0)
+    {
+        g_touchKeyMap.touchCanvasWidth = 1024.0f;
+        g_touchKeyMap.touchCanvasHeight = 600.0f;
+        SDL_memcpy(g_touchKeyMap.touchKeysMap, c_7_tablet, sizeof(g_touchKeyMap.touchKeysMap));
     }
     else if(s_screenSize < 4.0)
     {
@@ -546,6 +559,15 @@ void TouchScreenController::init()
         g_touchKeyMap.touchCanvasHeight = 600.0f;
         SDL_memcpy(g_touchKeyMap.touchKeysMap, c_averagePhoneMap, sizeof(g_touchKeyMap.touchKeysMap));
     }
+
+}
+
+TouchScreenController::TouchScreenController() = default;
+TouchScreenController::~TouchScreenController() = default;
+
+void TouchScreenController::init()
+{
+    initTouchMap();
 
     for(int key = key_BEGIN; key < key_END; ++key)
         m_keysHeld[key] = false;
