@@ -4366,11 +4366,13 @@ void SpecialNPC(int A)
                     tempLocation.Y = NPC[A].Location.Y + NPC[A].Location.Height - 16;
 
 
-                    tempLocation.X = NPC[A].Location.X;
+//                    tempLocation.X = NPC[A].Location.X;
+                    tempLocation.X = (NPC[A].Location.X + NPC[A].Location.Width / 8);
                     NewEffect(10, tempLocation);
                     Effect[numEffects].Location.SpeedX = -1.5;
 
-                    tempLocation.X = tempLocation.X + tempLocation.Width - EffectWidth[10];
+//                    tempLocation.X = tempLocation.X + tempLocation.Width - EffectWidth[10];
+                    tempLocation.X = (NPC[A].Location.X + NPC[A].Location.Width - EffectWidth[10]) - (NPC[A].Location.Width / 8);
                     NewEffect(10, tempLocation);
                     Effect[numEffects].Location.SpeedX = 1.5;
 
