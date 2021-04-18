@@ -656,7 +656,7 @@ void InitSound()
     if(playerUseOwnHammer)
         playerHammerSFX = SFX_PlayerHammer;
     else if(playerUseNPCHammer)
-        playerHammerSFX = SFX_HammerToss;
+        playerHammerSFX = SFX_Throw;
     else
         playerHammerSFX = SFX_Fireball;
 
