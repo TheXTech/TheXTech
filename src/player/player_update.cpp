@@ -4366,7 +4366,7 @@ void UpdatePlayer()
                        (Player[A].HoldingNPC == 0 || Player[A].Character == 5))
                     {
                         UnDuck(A);
-                        if(g_compatibility.fix_link_clowncar_fairy) // Avoid the mortal glitch
+                        if(g_compatibility.fix_link_clowncar_fairy && Player[A].Fairy) // Avoid the mortal glitch
                         {
                             Player[A].Fairy = false;
                             PlaySound(SFX_ZeldaFairy);
