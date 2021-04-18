@@ -4,6 +4,7 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.graphics.Point;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.WindowManager;
 
 import java.util.ArrayList;
@@ -126,6 +127,7 @@ public class thextechActivity extends SDLActivity
         super.onCreate(savedInstanceState);
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         this.setScreenSize(SDLActivity.getDiagonal());
+        this.setSdCardPath(Environment.getExternalStorageDirectory().getAbsolutePath());
     }
 
     @Override
@@ -141,4 +143,5 @@ public class thextechActivity extends SDLActivity
     public static native void setTouchScreenShowOnStart(boolean showOnStart);
     public static native void setScreenSize(double screenSize);
     public static native void setTouchPadStyle(int style);
+    public static native void setSdCardPath(String path);
 }

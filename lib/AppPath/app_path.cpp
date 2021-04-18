@@ -28,6 +28,16 @@
 #define FMT_NOEXCEPT
 #include <fmt/fmt_format.h>
 
+#ifdef __ANDROID__
+#   include <jni.h>
+#   if 1
+#       undef JNIEXPORT
+#       undef JNICALL
+#       define JNIEXPORT extern "C"
+#       define JNICALL
+#   endif
+#endif
+
 #ifdef __APPLE__
 #include <CoreFoundation/CoreFoundation.h>
 #include <CoreServices/CoreServices.h>
@@ -100,6 +110,24 @@ std::string AppPathManager::m_settingsPath;
 std::string AppPathManager::m_userPath;
 std::string AppPathManager::m_customAssetsRoot;
 
+#if defined(__ANDROID__)
+static std::string m_androidSdCardPath = "/storage/emulated/0";
+
+JNIEXPORT void JNICALL
+Java_ru_wohlsoft_thextech_thextechActivity_setSdCardPath(
+    JNIEnv *env,
+    jclass type,
+    jstring sdcardPath_j
+)
+{
+    const char *sdcardPath;
+    (void)type;
+    sdcardPath = env->GetStringUTFChars(sdcardPath_j, NULL);
+    m_androidSdCardPath = sdcardPath;
+    env->ReleaseStringUTFChars(sdcardPath_j, sdcardPath);
+}
+#endif
+
 #ifdef __APPLE__
 
 #   ifndef USERDATA_ROOT_NAME
@@ -150,7 +178,7 @@ static std::string getPgeUserDirectory()
     }
 
 #elif defined(__ANDROID__)
-    path = "/storage/emulated/0";
+    path = m_androidSdCardPath;
 
     DirMan homeDir(path);
     if(!homeDir.exists())
