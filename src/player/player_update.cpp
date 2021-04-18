@@ -2546,13 +2546,13 @@ void UpdatePlayer()
 
                                                         if(Player[A].GroundPound)
                                                         {
-                                                            YoshiPound(A, tempHit3, true);
+                                                            YoshiPound(A, Player[A].Mount, true);
                                                             Player[A].GroundPound = false;
                                                         }
                                                         else if(Player[A].YoshiYellow)
                                                         {
                                                             if(oldSlope == 0)
-                                                                YoshiPound(A, tempHit3);
+                                                                YoshiPound(A, Player[A].Mount);
                                                         }
 
                                                         Player[A].Location.Y = Block[B].Location.Y + (Block[B].Location.Height * Slope) - Player[A].Location.Height - 0.1;
@@ -2972,11 +2972,11 @@ void UpdatePlayer()
                             Player[A].Location.Y = tempLocation3.Y - Player[A].Location.Height;
                             if(Player[A].GroundPound)
                             {
-                                YoshiPound(A, tempHit3, true);
+                                YoshiPound(A, Player[A].Mount, true);
                                 Player[A].GroundPound = false;
                             }
                             else if(Player[A].YoshiYellow)
-                                YoshiPound(A, tempHit3);
+                                YoshiPound(A, Player[A].Mount);
 
                             Player[A].Location.SpeedY = 0;
                             if(tempLocation3.SpeedX != 0.0 || tempLocation3.SpeedY != 0.0)
@@ -3054,11 +3054,11 @@ void UpdatePlayer()
 
                         if(Player[A].GroundPound)
                         {
-                            YoshiPound(A, tempHit3, true);
+                            YoshiPound(A, Player[A].Mount, true);
                             Player[A].GroundPound = false;
                         }
                         else if(Player[A].YoshiYellow)
-                            YoshiPound(A, tempHit3);
+                            YoshiPound(A, Player[A].Mount);
 
                         if(Player[A].Slope == 0 || Player[A].Slide)
                             Player[A].Location.SpeedY = 0;
@@ -4327,7 +4327,7 @@ void UpdatePlayer()
                         {
                             numBlock = numBlock + 1;
                             Block[numBlock].Location.Y = NPC[B].Location.Y;
-                            YoshiPound(A, numBlock, true);
+                            YoshiPound(A, Player[A].Mount, true);
                             Block[numBlock].Location.Y = 0;
                             numBlock = numBlock - 1;
                             Player[A].GroundPound = false;
@@ -4336,7 +4336,7 @@ void UpdatePlayer()
                         {
                             numBlock = numBlock + 1;
                             Block[numBlock].Location.Y = NPC[B].Location.Y;
-                            YoshiPound(A, numBlock);
+                            YoshiPound(A, Player[A].Mount);
                             Block[numBlock].Location.Y = 0;
                             numBlock = numBlock - 1;
                         }
