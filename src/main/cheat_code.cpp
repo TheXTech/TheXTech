@@ -653,7 +653,7 @@ void CheatCode(char NewKey)
             CheatString.clear();
             cheated = true;
         }
-        else if(SDL_strstr(CheatString.c_str(), "ibakedacakeforyou") || SDL_strstr(CheatString.c_str(), "itsamepeach"))
+        else if(SDL_strstr(CheatString.c_str(), "ibakedacakeforyou") || SDL_strstr(CheatString.c_str(), "ibakedacakeforzou") || SDL_strstr(CheatString.c_str(), "itsamepeach"))
         {
             PlaySound(34);
             for(B = 1; B <= numPlayers; B++)
