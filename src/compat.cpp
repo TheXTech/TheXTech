@@ -50,6 +50,7 @@ static void compatInit(Compatibility_t &c)
     c.fix_skull_raft = true;
     c.fix_peach_escape_shell_surf = true;
     c.fix_keyhole_framerate = true;
+    c.fix_link_clowncar_fairy = true;
 
     if(g_speedRunnerMode >= SPEEDRUN_MODE_2) // Make sure that bugs were same as on SMBX2 Beta 4 on this moment
     {
@@ -64,6 +65,7 @@ static void compatInit(Compatibility_t &c)
         c.fix_skull_raft = false;
         c.fix_peach_escape_shell_surf = false;
         c.fix_keyhole_framerate = false;
+        c.fix_link_clowncar_fairy = false;
     }
 
     if(g_speedRunnerMode >= SPEEDRUN_MODE_3) // Strict vanilla SMBX
@@ -105,6 +107,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         compat.read("fix-skull-raft", c.fix_skull_raft, c.fix_skull_raft);
         compat.read("fix-peach-escape-shell-surf", c.fix_peach_escape_shell_surf, c.fix_peach_escape_shell_surf);
         compat.read("fix-keyhole-framerate", c.fix_keyhole_framerate, c.fix_keyhole_framerate);
+        compat.read("fix-link-clowncar-fairy", c.fix_link_clowncar_fairy, c.fix_link_clowncar_fairy);
     }
     compat.read("fix-player-filter-bounce", c.fix_player_filter_bounce, c.fix_player_filter_bounce);
     compat.read("fix-player-downward-clip", c.fix_player_downward_clip, c.fix_player_downward_clip);

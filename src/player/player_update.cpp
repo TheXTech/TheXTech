@@ -1951,11 +1951,15 @@ void UpdatePlayer()
                 {
                     if(Player[A].State == 4 || Player[A].State == 5)
                     {
+                        bool hasNoMonts = (g_compatibility.fix_link_clowncar_fairy && Player[A].Mount <= 0) ||
+                                           !g_compatibility.fix_link_clowncar_fairy;
 
-                        if(Player[A].FlyCount > 0 ||
-                           ((Player[A].Controls.AltJump || (Player[A].Controls.Jump && Player[A].FloatRelease)) &&
-                             Player[A].Location.SpeedY != Physics.PlayerGravity && Player[A].Slope == 0 &&
-                             Player[A].StandingOnNPC == 0))
+                        bool turnFairy = Player[A].FlyCount > 0 ||
+                                        ((Player[A].Controls.AltJump || (Player[A].Controls.Jump && Player[A].FloatRelease)) &&
+                                          Player[A].Location.SpeedY != Physics.PlayerGravity && Player[A].Slope == 0 &&
+                                          Player[A].StandingOnNPC == 0);
+
+                        if(turnFairy && hasNoMonts)
                         {
                             if(Player[A].FlyCount > 0)
                                 Player[A].FairyCD = 0;
@@ -3272,14 +3276,16 @@ void UpdatePlayer()
                             {
                                 if(Player[A].Character == 5)
                                 {
-                                    if(Player[A].Immune == 0 && Player[A].Controls.Up)
+                                    bool hasNoMonts = (g_compatibility.fix_link_clowncar_fairy && Player[A].Mount <= 0) ||
+                                                       !g_compatibility.fix_link_clowncar_fairy;
+                                    if(hasNoMonts && Player[A].Immune == 0 && Player[A].Controls.Up)
                                     {
                                         Player[A].FairyCD = 0;
                                         if(!Player[A].Fairy)
                                         {
                                             Player[A].Fairy = true;
                                             SizeCheck(A);
-                                            PlaySound(87);
+                                            PlaySound(SFX_ZeldaFairy);
                                             Player[A].Immune = 10;
                                             Player[A].Effect = 8;
                                             Player[A].Effect2 = 4;
@@ -3616,7 +3622,9 @@ void UpdatePlayer()
                                     {
                                         if(Player[A].Character == 5)
                                         {
-                                            if(Player[A].Immune == 0 && Player[A].Controls.Up)
+                                            bool hasNoMonts = (g_compatibility.fix_link_clowncar_fairy && Player[A].Mount <= 0) ||
+                                                               !g_compatibility.fix_link_clowncar_fairy;
+                                            if(hasNoMonts && Player[A].Immune == 0 && Player[A].Controls.Up)
                                             {
                                                 Player[A].FairyCD = 0;
                                                 if(!Player[A].Fairy)
@@ -4358,12 +4366,18 @@ void UpdatePlayer()
                        (Player[A].HoldingNPC == 0 || Player[A].Character == 5))
                     {
                         UnDuck(A);
+                        if(g_compatibility.fix_link_clowncar_fairy) // Avoid the mortal glitch
+                        {
+                            Player[A].Fairy = false;
+                            PlaySound(SFX_ZeldaFairy);
+                            NewEffect(63, Player[A].Location);
+                        }
                         Player[A].Location = NPC[B].Location;
                         Player[A].Mount = 2;
                         NPC[B].Killed = 9;
                         Player[A].HoldingNPC = 0;
                         Player[A].StandingOnNPC = 0;
-                        PlaySound(2);
+                        PlaySound(SFX_Stomp);
                         for(C = 1; C <= numPlayers; ++C)
                         {
                             if(Player[C].StandingOnNPC == B)
