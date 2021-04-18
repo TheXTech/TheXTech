@@ -4839,7 +4839,8 @@ void LinkFrame(int A)
         else
             Player[A].FrameCount = 0;
     }
-    if(Player[A].Stoned == true)
+
+    if(Player[A].Stoned)
     {
         Player[A].Frame = 12;
         if(Player[A].Location.SpeedX != 0.0)
@@ -4857,25 +4858,28 @@ void LinkFrame(int A)
         }
         return;
     }
-    if(LevelSelect == false && Player[A].Effect == 0 && Player[A].FireBallCD == 0)
+
+    if(!LevelSelect && Player[A].Effect == 0 && Player[A].FireBallCD == 0)
     {
-        if(Player[A].Controls.Left == true)
+        if(Player[A].Controls.Left)
             Player[A].Direction = -1;
-        if(Player[A].Controls.Right == true)
+        if(Player[A].Controls.Right)
             Player[A].Direction = 1;
     }
-    if(Player[A].Fairy == true)
+
+    if(Player[A].Fairy)
         return;
+
     if(Player[A].SwordPoke < 0) // Drawing back
     {
-        if(Player[A].Duck == false)
+        if(!Player[A].Duck)
             Player[A].Frame = 6;
         else
             Player[A].Frame = 8;
     }
     else if(Player[A].SwordPoke > 0) // Stabbing
     {
-        if(Player[A].Duck == false)
+        if(!Player[A].Duck)
             Player[A].Frame = 7;
         else
             Player[A].Frame = 8;
@@ -4887,15 +4891,17 @@ void LinkFrame(int A)
         if(Player[A].Direction == 1)
             Player[A].MountFrame = Player[A].MountFrame + 4;
     }
-    else if(Player[A].Duck == true) // Ducking
+    else if(Player[A].Duck) // Ducking
         Player[A].Frame = 5;
-    else if(Player[A].WetFrame == true && Player[A].Location.SpeedY != 0.0 && Player[A].Slope == 0 && Player[A].StandingOnNPC == 0 && Player[A].Duck == false && Player[A].Quicksand == 0) // Link is swimming
+    else if(Player[A].WetFrame && Player[A].Location.SpeedY != 0.0 && Player[A].Slope == 0 && Player[A].StandingOnNPC == 0 && Player[A].Duck == false && Player[A].Quicksand == 0) // Link is swimming
     {
         if(Player[A].Location.SpeedY < 0.5 || Player[A].Frame != 3)
         {
             if(Player[A].Frame != 1 && Player[A].Frame != 2 && Player[A].Frame != 3 && Player[A].Frame != 4)
                 Player[A].FrameCount = 6;
+
             Player[A].FrameCount = Player[A].FrameCount + 1;
+
             if(Player[A].FrameCount < 6)
                 Player[A].Frame = 3;
             else if(Player[A].FrameCount < 12)
@@ -4917,41 +4923,48 @@ void LinkFrame(int A)
     {
         if(Player[A].Location.SpeedY < 0)
         {
-            if(Player[A].Controls.Up == true)
+            if(Player[A].Controls.Up)
                 Player[A].Frame = 10;
             else
                 Player[A].Frame = 5;
         }
         else
         {
-            if(Player[A].Controls.Down == true)
+            if(Player[A].Controls.Down)
                 Player[A].Frame = 9;
             else
                 Player[A].Frame = 3;
         }
     }
-    else if(Player[A].Location.SpeedX == 0.0 || (Player[A].Slippy == true && Player[A].Controls.Left == false && Player[A].Controls.Right == false)) // Standing
+    else if(Player[A].Location.SpeedX == 0.0 || (Player[A].Slippy && !Player[A].Controls.Left && !Player[A].Controls.Right)) // Standing
         Player[A].Frame = 1;
     else // Running
     {
         Player[A].FrameCount = Player[A].FrameCount + 1;
+
         if(Player[A].Location.SpeedX > Physics.PlayerWalkSpeed - 1.5 || Player[A].Location.SpeedX < -Physics.PlayerWalkSpeed + 1.5)
             Player[A].FrameCount = Player[A].FrameCount + 1;
+
         if(Player[A].Location.SpeedX > Physics.PlayerWalkSpeed || Player[A].Location.SpeedX < -Physics.PlayerWalkSpeed)
             Player[A].FrameCount = Player[A].FrameCount + 1;
+
         if(Player[A].Location.SpeedX > Physics.PlayerWalkSpeed + 1 || Player[A].Location.SpeedX < -Physics.PlayerWalkSpeed - 1)
             Player[A].FrameCount = Player[A].FrameCount + 1;
+
         if(Player[A].Location.SpeedX > Physics.PlayerWalkSpeed + 2 || Player[A].Location.SpeedX < -Physics.PlayerWalkSpeed - 2)
             Player[A].FrameCount = Player[A].FrameCount + 1;
+
         if(Player[A].FrameCount >= 8)
         {
             Player[A].FrameCount = 0;
             Player[A].Frame = Player[A].Frame - 1;
         }
+
         if(Player[A].Frame <= 0)
             Player[A].Frame = 4;
         else if(Player[A].Frame >= 5)
             Player[A].Frame = 1;
+
         if(Player[A].Location.SpeedX >= Physics.PlayerRunSpeed * 0.9 || Player[A].Location.SpeedX <= -Physics.PlayerRunSpeed * 0.9)
         {
             if(Player[A].SlideCounter <= 0)
@@ -4959,10 +4972,12 @@ void LinkFrame(int A)
                 PlaySound(86);
                 Player[A].SlideCounter = 2 + dRand() * 2;
                 tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height - 4;
+
                 if(Player[A].Location.SpeedX < 0)
                     tempLocation.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - 6 - 4;
                 else
                     tempLocation.X = Player[A].Location.X + Player[A].Location.Width / 2.0 + 6 - 4;
+
                 NewEffect(74, tempLocation, 1, 0, ShadowMode);
             }
         }
