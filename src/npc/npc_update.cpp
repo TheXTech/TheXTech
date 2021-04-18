@@ -26,6 +26,7 @@
 #include "../globals.h"
 #include "../npc.h"
 #include "../sound.h"
+#include "../graphics.h"
 #include "../collision.h"
 #include "../effect.h"
 #include "../layers.h"
@@ -4143,6 +4144,7 @@ void UpdateNPCs()
                                 NPC[A].Location.SpeedY = 10;
                             else
                             {
+                                bool legacy = NPC[A].Legacy && fEqual(NPC[A].Special7, 1.0);
                                 PlaySound(SFX_Twomp);
                                 NPC[A].Special3 = 30;
                                 NPC[A].Frame = 11;
@@ -4161,7 +4163,10 @@ void UpdateNPCs()
                                         KillBlock(B);
                                 }
 
-                                if(NPC[A].Legacy && fEqual(NPC[A].Special7, 1.0)) // Classic SMBX 1.0's behavior when Bowser stomps a floor
+                                if(!legacy && GameplayShakeScreenBowserIIIrd)
+                                    doShakeScreen(0, 4, SHAKE_SEQUENTIAL, 7, 0.15);
+
+                                if(legacy) // Classic SMBX 1.0's behavior when Bowser stomps a floor
                                 {
                                     fBlock = FirstBlock[long(level[NPC[A].Section].X / 32) - 1];
                                     lBlock = LastBlock[long((level[NPC[A].Section].Width) / 32.0) + 2];

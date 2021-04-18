@@ -1076,6 +1076,8 @@ extern double PrintFPS;
 extern bool GameplayPoundByAltRun;
 // Shake screen on thwomp falling
 extern bool GameplayShakeScreenThwomp;
+// Shake screen on Bowser III'rd ground pound
+extern bool GameplayShakeScreenBowserIIIrd;
 // Shake screen on Yoshi ground pount
 extern bool GameplayShakeScreenPound;
 // Enable usage of the rumble control
