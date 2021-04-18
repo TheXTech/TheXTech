@@ -5,27 +5,33 @@ Motor SMBX, reescrito en C ++ a partir de VisualBasic 6.
 # Preguntas Frecuentes
 
 ## ¿Qué es esto? 
-Es un puerto de un antiguo motor VB6, escrito puramente en C ++. Reproduce enteramente el antiguo motor SMBX 1.3 (aparte de su Editor), incluye varios de sus errores lógicos (errores críticos que hacen que el juego se bloquee o se congele). 
+Es una transportación de un antiguo motor VB6, escrito puramente en C ++. Reproduce enteramente el antiguo motor SMBX 1.3 (aparte de su Editor), incluye varios de sus errores lógicos (errores críticos que hacen que el juego se bloquee o se congele). 
 
-## ¿Por qué lo hiciste? Tengo diversos fines para realizarlo: 
-- Es un modelo de investigación bastante conveniente que deseo usar en el desarrollo del motor PGE. - Proveer una copia plenamente compatible del motor antiguo para plataformas modernas, lo cual posibilita jugar niveles y episodios viejos con la misma sensación que si se hubieran jugado en el juego SMBX original con base en VB6. 
-- Para que funcione sin la necesidad de usar Wine en plataformas que no sean Windows y que se encuentre disponible en plataformas que no sean x86 / x64. - Optimizándolo para utilizar menos recursos de hardware que el juego original con base en VB6. 
+## ¿Por qué lo hiciste? 
+Tengo diversos fines para realizarlo: 
+- Es un modelo de investigación bastante conveniente que deseo usar en el desarrollo del motor PGE.
+- Proveer una copia plenamente compatible del motor antiguo para plataformas modernas, lo cual posibilita jugar niveles y episodios viejos con la misma sensación que si se hubieran jugado en el juego SMBX original basado en VB6. 
+- Para que funcione sin la necesidad de usar Wine en plataformas que no sean Windows y que se encuentre disponible en plataformas que no sean x86 / x64. 
+- Optimizarlo para utilizar menos recursos de hardware que el juego original con base en VB6. 
 
 ## Tienes PGE Engine, ¿por qué has pasado bastante más de un mes para producir esta cosa? 
-Lo necesito para el desarrollo de PGE Engine de manera directa, es muchísimo más simple de piratear y examinar que un ámbito VB6 antiguo e inconveniente. 
+Lo necesito para el desarrollo de PGE Engine de manera directa, es muchísimo más simple de hackear y examinar que un ambiente VB6 antiguo e inconveniente. 
 
-## ¿Cuál es el futuro de PGE Engine ahora que excite TheXTech? 
+## ¿Cuál es el futuro de PGE Engine ahora que existe TheXTech? 
 Continuaré desarrollando el motor PGE debido a que aún tengo que conseguir el segundo objetivo del proyecto. 
-A partir de su fundación, el Proyecto PGE poseía 2 fines: 1) rescatar SMBX; 2) dar un grupo de herramientas flexible para nuevos juegos de plataformas. La aperturadel código fuente de SMBX y la introducción de TheXTech ha resuelto el primer objetivo: SMBX se ha guardado y ahora es un software multiplataforma gratuito / de código abierto. PGE Engine se usará para el segundo objetivo: dar un grupo de herramientas para nuevos juegos. A diferencia de TheXTech, PGE Engine da un elevado nivel de flexibilidad que posibilita a cualquier persona edificar algo nuevo a partir de cero sin heredar una base de juego vieja. No obstante, TheXTech se necesita para PGE Engine como modelo de investigacion funcional para desarrollar el nuevo motor. Va a ser parecido a los puertos GZDoom y Chocolate Doom del juego Doom: GZDoom es un motor potente y servible, la mejor alternativa para los modders; Chocolate Doom es una adaptacion precisadel juego original a una plataforma modernadestinados a representar el juego original, integrados inclusive los errores. El motor PGE pretende ser como GZDoom, en lo que TheXTech es un semejante de Chocolate Doom para representar un juego original en plataformas modernas.
+A partir de su fundación, el Proyecto PGE poseía 2 fines: 
+1) Salvar SMBX
+2) Dar un grupo de herramientas flexible para nuevos juegos de plataformas.
+La apertura del código fuente de SMBX y la introducción de TheXTech ha resuelto el primer objetivo: SMBX ha sido salvado y ahora es un software multiplataforma gratuito de código abierto. PGE Engine se usará para el segundo objetivo: dar un grupo de herramientas para nuevos juegos. A diferencia de TheXTech, PGE Engine da un elevado nivel de flexibilidad que posibilita a cualquier persona edificar algo nuevo a partir de cero sin heredar una base de juego vieja. No obstante, TheXTech se necesita para PGE Engine como modelo de investigacion funcional para desarrollar el nuevo motor. Va a ser parecido a los puertos GZDoom y Chocolate Doom del juego Doom: GZDoom es un motor potente y servible, la mejor alternativa para los modders; Chocolate Doom es una adaptacion precisa del juego original a  plataformas modernas para representar el juego original, incluidos los errores. El motor PGE pretende ser como GZDoom, en lo que TheXTech es un semejante de Chocolate Doom para representar un juego original en plataformas modernas.
 
-## ¿Puede LunaLua trabajar en esto?
+## ¿Puede LunaLua funcionar en esto?
 No, LunaLua no funcionará: este proyecto es binario-incompatible con LunaLua. Esto también significa que el contenido SMBX2 es incompatible.
 
 
 ## ¿Por qué el código aquí es tan malo?
 El autor original escribió la mayor parte del código en la carpeta "* src *" en VB6. Hice una conversión completa del código con un esfuerzo por lograr una reproducción precisa. Por lo tanto, gran parte del código es idéntico a lo que se escribió originalmente en VB6. La plataforma VB6 tenía muchos desafíos y limitaciones como:
 - Todas las variables son globales y accesibles desde todos los módulos y se forman de forma predeterminada sin ninguna inclusión o importación. La razón por la que existe "globals.h": tiene una lista completa de variables disponibles globalmente.
-- Soporte limitado e inconveniente para las clases, por lo tanto, el código tiende a abusar de una tonelada de variables y matrices globales (también una falta inicial de experiencia del autor original fue otro factor que llevó a este lío).
+- Soporte limitado e inconveniente para las clases, por lo tanto, el código tiende a abusar de una tonelada de variables y matrices globales (también una falta inicial de experiencia del autor original fue otro factor que llevó a este problema).
 - Todas las funciones de todos los módulos son globales y se pueden llamar directamente desde cada módulo. Excepto las llamadas marcadas como "privadas". Por lo tanto, tuve un trabajo adicional para proporcionar inclusiones en archivos donde se solicitan estas llamadas.
 - ¿Por qué tanto `if-elseif-elseif-elseif-elseif -....?` Sí, aquí probablemente sea correcto usar `switch ()` (en VB6 el operador `Select Case` analógico). Otro factor que muestra que el autor original tenía poca experiencia cuando codificó este proyecto.
 - ¿Por qué la lasaña `if () {if {} if {....}}`? Dos razones: 1) inexperiencia del autor original, 2) solución para no verificar todas las condiciones de expresión que pueden causar un bloqueo. En C ++ con múltiples condiciones divididas por el operador `&&`, nunca se ejecuta cuando una de ellas obtiene un resultado falso. En VB6, TODAS las condiciones en la obtención de expresiones siempre se ejecutarán. Esta diferencia provocó la siguiente situación: en VB6, una expresión `if A <5 And Array (A) = 1 Then` provocará un bloqueo cuando A sea más de 5. En C ++ el mismo` if (A <5 && Array [ Una expresión] == 1) `nunca fallará porque una segunda verificación nunca se ejecutará si una primera verificación dio un resultado falso.
@@ -41,7 +47,7 @@ Aquí hay muchas formas de jugar con él:
 force-portable = true
 ```
 , music.ini, sounds.ini y una carpeta adicional "graphics/ui". Una nota importante: todos los gráficos predeterminados deben convertirse a PNG, use la herramienta GIFs2PNG de PGE Project en su carpeta "gráficos" con un interruptor "-d". No use el interruptor "-r" para mantener los GIF originales junto con los PNG recién creados si planea continuar usando SMBX original escrito en VB6.
-- utilícelo para el modo de depuración: en su directorio de inicio, cree la carpeta ".PGE_Project/thextech" (en macOS, la "`~/Library/Application Support/PGE Project/thextech`") donde debe colocar un juego completo recursos y cosas de mundos, esta carpeta funcionará como la raíz de un juego en el juego original. Este modo le permite ejecutar un archivo ejecutable desde cualquier ubicación de carpeta de su computadora y usar la misma ubicación de recursos para todas las compilaciones (excepto que estos están marcados como portátiles por un archivo INI).
+- utilícelo para el modo de depuración: en su directorio de inicio, cree la carpeta ".PGE_Project/thextech" (en macOS, la "`~/Library/Application Support/PGE Project/thextech`") donde debe colocar un juego completo recursos y cosas de mundos, esta carpeta funcionará como la raíz de un juego en el juego original. Este modo le permite ejecutar un archivo ejecutable desde cualquier ubicación de carpeta de su computadora y usar la misma ubicación de recursos para todas las compilaciones (excepto las que están marcadas como portátiles por el archivo INI).
 
 
 ## ¿Cómo agregar episodios personalizados para la versión de macOS?
