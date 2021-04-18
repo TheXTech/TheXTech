@@ -68,6 +68,8 @@ static int s_touchscreenMode = TOUCHSCREEN_DISABLE_ON_KEYBOARD;
 static bool s_showTouchscreenOnStart = false;
 static int  s_touchPadStyle = 0;
 static double s_screenSize = 0;
+static double s_screenWidth = 0;
+static double s_screenHeight = 0;
 
 #endif
 
@@ -138,12 +140,16 @@ JNIEXPORT void JNICALL
 Java_ru_wohlsoft_thextech_thextechActivity_setScreenSize(
         JNIEnv *env,
         jclass type,
-        jdouble screenSize
+        jdouble screenSize,
+        jdouble screenWidth,
+        jdouble screenHeight
 )
 {
     (void)env;
     (void)type;
     s_screenSize = screenSize;
+    s_screenWidth = screenWidth;
+    s_screenHeight = screenHeight;
     initTouchMap();
 }
 
@@ -578,7 +584,7 @@ void TouchScreenController::init()
     D_pLogDebug("Found %d touch devices, screen size: %d x %d",
                 m_touchDevicesCount,
                 m_screenWidth, m_screenHeight);
-    pLogDebug("The screen size: %g inches", s_screenSize);
+    pLogDebug("The screen size: %g inches (%g x %g)", s_screenSize, s_screenWidth, s_screenHeight);
 }
 
 void TouchScreenController::updateScreenSize()
