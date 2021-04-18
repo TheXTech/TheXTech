@@ -496,6 +496,27 @@ static const TouchKeyMap::KeyPos c_averagePhoneMap[TouchScreenController::key_EN
     {10.0f, 10.0f, 70.0f, 70.0f, TouchScreenController::key_toggleKeysView},
 };
 
+static const TouchKeyMap::KeyPos c_averagePhoneLongMap[TouchScreenController::key_END] =
+{
+    /* Note that order of keys must match the TouchScreenController::commands enum!!! */
+    {727.0f, 632.0f, 911.0f, 691.0f, TouchScreenController::key_start},
+    {5.0f, 444.0f, 106.0f, 545.0f, TouchScreenController::key_left},
+    {207.0f, 444.0f, 308.0f, 545.0f, TouchScreenController::key_right},
+    {106.0f, 343.0f, 207.0f, 444.0f, TouchScreenController::key_up},
+    {106.0f, 545.0f, 207.0f, 646.0f, TouchScreenController::key_down},
+    {5.0f, 343.0f, 106.0f, 444.0f, TouchScreenController::key_upleft},
+    {207.0f, 343.0f, 308.0f, 444.0f, TouchScreenController::key_upright},
+    {5.0f, 545.0f, 106.0f, 646.0f, TouchScreenController::key_downleft},
+    {207.0f, 545.0f, 308.0f, 646.0f, TouchScreenController::key_downright},
+    {1055.0f, 500.0f, 1183.0f, 628.0f, TouchScreenController::key_run},
+    {1218.0f, 537.0f, 1346.0f, 665.0f, TouchScreenController::key_jump},
+    {1085.0f, 351.0f, 1213.0f, 479.0f, TouchScreenController::key_altrun},
+    {1242.0f, 389.0f, 1370.0f, 517.0f, TouchScreenController::key_altjump},
+    {474.0f, 632.0f, 658.0f, 691.0f, TouchScreenController::key_drop},
+    {1178.0f, 214.0f, 1315.0f, 275.0f, TouchScreenController::key_holdRun},
+    {10.0f, 10.0f, 85.0f, 85.0f, TouchScreenController::key_toggleKeysView},
+};
+
 static const TouchKeyMap::KeyPos c_7_tablet[TouchScreenController::key_END] =
 {
     /* Note that order of keys must match the TouchScreenController::commands enum!!! */
@@ -541,31 +562,40 @@ static const TouchKeyMap::KeyPos c_10_6_tablet[TouchScreenController::key_END] =
 
 static void initTouchMap()
 {
-    if(s_screenSize >= 9.0)
+    if(s_screenSize >= 9.0) // Big tablets
     {
         g_touchKeyMap.touchCanvasWidth = 1300.0f;
         g_touchKeyMap.touchCanvasHeight = 812.0f;
         SDL_memcpy(g_touchKeyMap.touchKeysMap, c_10_6_tablet, sizeof(g_touchKeyMap.touchKeysMap));
     }
-    else if(s_screenSize >= 7.0)
+    else if(s_screenSize >= 7.0) // Middle tablets
     {
         g_touchKeyMap.touchCanvasWidth = 1024.0f;
         g_touchKeyMap.touchCanvasHeight = 600.0f;
         SDL_memcpy(g_touchKeyMap.touchKeysMap, c_7_tablet, sizeof(g_touchKeyMap.touchKeysMap));
     }
-    else if(s_screenSize < 4.0)
+    else if(s_screenSize < 4.0) // Very small phones
     {
         g_touchKeyMap.touchCanvasWidth = 640.0f;
         g_touchKeyMap.touchCanvasHeight = 480.0f;
         SDL_memcpy(g_touchKeyMap.touchKeysMap, c_4_tinyPhoneMap, sizeof(g_touchKeyMap.touchKeysMap));
     }
-    else
+    else // All other devices
     {
-        g_touchKeyMap.touchCanvasWidth = 1024.0f;
-        g_touchKeyMap.touchCanvasHeight = 600.0f;
-        SDL_memcpy(g_touchKeyMap.touchKeysMap, c_averagePhoneMap, sizeof(g_touchKeyMap.touchKeysMap));
+        // Longer screens (big ration between sides, more like a stick)
+        if((s_screenWidth / s_screenHeight) > 1.6f)
+        {
+            g_touchKeyMap.touchCanvasWidth = 1396.0f;
+            g_touchKeyMap.touchCanvasHeight = 720.0f;
+            SDL_memcpy(g_touchKeyMap.touchKeysMap, c_averagePhoneLongMap, sizeof(g_touchKeyMap.touchKeysMap));
+        }
+        else // Shorter screens (smaller ratio between sides, more like a square)
+        {
+            g_touchKeyMap.touchCanvasWidth = 1024.0f;
+            g_touchKeyMap.touchCanvasHeight = 600.0f;
+            SDL_memcpy(g_touchKeyMap.touchKeysMap, c_averagePhoneMap, sizeof(g_touchKeyMap.touchKeysMap));
+        }
     }
-
 }
 
 TouchScreenController::TouchScreenController() = default;
