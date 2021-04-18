@@ -2707,7 +2707,7 @@ void UpdatePlayer()
                                                 if(Player[A].Location.SpeedY > 3)
                                                 {
                                                     PlaySound(SFX_Twomp);
-                                                    YoshiPound(A, B, true);
+                                                    YoshiPound(A, Player[A].Mount, true);
                                                 }
                                             }
 

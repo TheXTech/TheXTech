@@ -2523,7 +2523,7 @@ void YoshiSpit(int A)
     Player[A].YoshiYellow = false;
 }
 
-void YoshiPound(int A, int /*C*/, bool BreakBlocks)
+void YoshiPound(int A, int mount, bool BreakBlocks)
 {
     int B = 0;
     Location_t tempLocation;
@@ -2556,16 +2556,22 @@ void YoshiPound(int A, int /*C*/, bool BreakBlocks)
         {
             for(B = 1; B <= numBlock; B++)
             {
-                if(Block[B].Hidden == false && Block[B].Invis == false && BlockNoClipping[Block[B].Type] == false && BlockIsSizable[Block[B].Type] == false)
-                {
-                    if(CheckCollision(Player[A].Location, Block[B].Location) == true)
-                    {
-                        BlockHit(B, true, A);
-                        BlockHitHard(B);
-                    }
-                }
+                auto &b = Block[B];
+                if(b.Hidden || b.Invis || BlockNoClipping[b.Type] || BlockIsSizable[b.Type])
+                    continue;
+
+                if(g_compatibility.fix_dont_switch_player_by_clowncar && mount == 2 &&
+                    ((b.Type >= 622 && b.Type <= 625) || b.Type == 631))
+                    continue; // Forbid playable character switch when riding a clown car
+
+                if(!CheckCollision(Player[A].Location, b.Location))
+                    continue;
+
+                BlockHit(B, true, A);
+                BlockHitHard(B);
             }
         }
+
         tempLocation.Width = 32;
         tempLocation.Height = 32;
         tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height - 16;

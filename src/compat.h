@@ -43,6 +43,7 @@ struct Compatibility_t
     bool fix_peach_escape_shell_surf;
     bool fix_keyhole_framerate;
     bool fix_link_clowncar_fairy;
+    bool fix_dont_switch_player_by_clowncar;
 };
 
 extern Compatibility_t g_compatibility;
