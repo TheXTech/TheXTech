@@ -122,18 +122,22 @@ static void setupCheckpoints()
             if(NPC[A].Type != 192)
                 continue;
 
-            if(cp.id != Maths::iRound(NPC[A].Special))
+            if(g_compatibility.enable_multipoints && cp.id != Maths::iRound(NPC[A].Special))
                 continue;
 
             NPC[A].Killed = 9;
 
             // found a last id, leave player here
-            if(cpId == int(CheckpointsList.size() - 1))
+            if(!g_compatibility.enable_multipoints || cpId == int(CheckpointsList.size() - 1))
             {
                 setupPlayerAtCheckpoints(NPC[A], cp);
-                break;// Stop to find NPCs
+                if(g_compatibility.enable_multipoints)
+                    break;// Stop to find NPCs
             }
         }// for NPCs
+
+        if(!g_compatibility.enable_multipoints)
+            break;
     } // for Check points
 }
 
