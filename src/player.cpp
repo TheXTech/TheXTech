@@ -4820,6 +4820,8 @@ void LinkFrame(int A)
 {
     Location_t tempLocation;
 
+    Player[A].MountOffsetY = 0;
+
     // Hurt frame
     if(Player[A].FrameCount == -10)
     {
