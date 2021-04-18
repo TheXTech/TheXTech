@@ -59,13 +59,91 @@ void PlayerCollide(int A);
 // Private Sub PlayerEffects(A As Integer)
 void PlayerEffects(int A);
 
-void SetupPlayers()
+
+static void setupPlayerAtCheckpoints(NPC_t &npc, Checkpoint_t &cp)
 {
     Location_t tempLocation;
+    int B;
+    int C;
+    tempLocation = npc.Location;
+    tempLocation.Height = 600;
+
+    C = 0;
+    for(B = 1; B <= numBlock; B++)
+    {
+        if(CheckCollision(tempLocation, Block[B].Location) == true)
+        {
+            if(C == 0)
+                C = B;
+            else
+            {
+                if(Block[B].Location.Y < Block[C].Location.Y)
+                    C = B;
+            }
+        }
+    }
+
+    for(B = 1; B <= numPlayers; B++)
+    {
+        Player[B].Location.Y = Block[C].Location.Y - Player[B].Location.Height;
+        Player[B].Location.X = npc.Location.X + npc.Location.Width / 2.0 - Player[B].Location.Width / 2.0;
+        CheckSection(B);
+        pLogDebug("Restore player %d at checkpoint ID=%d by X=%g, Y=%g",
+                  B, cp.id, Player[B].Location.X, Player[B].Location.Y);
+    }
+
+    if(numPlayers > 1)
+    {
+        Player[1].Location.X = Player[1].Location.X - 16;
+        Player[2].Location.X = Player[2].Location.X + 16;
+    }
+}
+
+static void setupCheckpoints()
+{
+    if(Checkpoint != FullFileName || Checkpoint.empty())
+    {
+        if(StartLevel != FileNameFull)
+        {
+            pLogDebug("Clear check-points at SetupPlayers()");
+            Checkpoint.clear();
+            CheckpointsList.clear();
+        }
+        return;
+    }
+
+    pLogDebug("Trying to restore %zu checkpoints...", CheckpointsList.size());
+    for(int cpId = 0; cpId < int(CheckpointsList.size()); cpId++)
+    {
+        auto &cp = CheckpointsList[size_t(cpId)];
+
+        for(int numNPCsMax = numNPCs, A = 1; A <= numNPCsMax; A++)
+        {
+            if(NPC[A].Type != 192)
+                continue;
+
+            if(cp.id != Maths::iRound(NPC[A].Special))
+                continue;
+
+            NPC[A].Killed = 9;
+
+            // found a last id, leave player here
+            if(cpId == int(CheckpointsList.size() - 1))
+            {
+                setupPlayerAtCheckpoints(NPC[A], cp);
+                break;// Stop to find NPCs
+            }
+        }// for NPCs
+    } // for Check points
+}
+
+void SetupPlayers()
+{
+//    Location_t tempLocation;
 //    Controls_t blankControls;
     int A = 0;
     int B = 0;
-    int C = 0;
+//    int C = 0;
     FreezeNPCs = false;
     qScreen = false;
     ForcedControls = false;
@@ -341,83 +419,17 @@ void SetupPlayers()
     //        StartMusic Player[nPlay.MySlot + 1].Section;
     //    }
     SetupScreens(); // setup the screen depending on how many players there are
-
-
-    if(Checkpoint == FullFileName && !Checkpoint.empty()) // if this level has a checkpoint the put the player in the correct position
-    {
-        pLogDebug("Trying to restore %zu checkpoints...", CheckpointsList.size());
-        for(int cpId = 0; cpId < int(CheckpointsList.size()); cpId++)
-        {
-            auto &cp = CheckpointsList[size_t(cpId)];
-
-            for(int numNPCsMax = numNPCs, A = 1; A <= numNPCsMax; A++)
-            {
-                if(NPC[A].Type != 192)
-                    continue;
-
-                if(cp.id != Maths::iRound(NPC[A].Special))
-                    continue;
-
-                NPC[A].Killed = 9;
-
-                // found a last id, leave player here
-                if(cpId == int(CheckpointsList.size() - 1))
-                {
-                    tempLocation = NPC[A].Location;
-                    tempLocation.Height = 600;
-
-
-                    C = 0;
-                    for(B = 1; B <= numBlock; B++)
-                    {
-                        if(CheckCollision(tempLocation, Block[B].Location) == true)
-                        {
-                            if(C == 0)
-                                C = B;
-                            else
-                            {
-                                if(Block[B].Location.Y < Block[C].Location.Y)
-                                    C = B;
-                            }
-                        }
-                    }
-
-                    for(B = 1; B <= numPlayers; B++)
-                    {
-                        Player[B].Location.Y = Block[C].Location.Y - Player[B].Location.Height;
-                        Player[B].Location.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0 - Player[B].Location.Width / 2.0;
-                        CheckSection(B);
-                        pLogDebug("Restore player %d at checkpoint ID=%d by X=%g, Y=%g",
-                                  B, cp.id, Player[B].Location.X, Player[B].Location.Y);
-                    }
-
-                    if(numPlayers > 1)
-                    {
-                        Player[1].Location.X = Player[1].Location.X - 16;
-                        Player[2].Location.X = Player[2].Location.X + 16;
-                    }
-                    break;// Stop to find NPCs
-                }
-            }// for NPCs
-        } // for Check points
-    }
-    // if not in the level for the checkpoint, blank the checkpoint
-    else if(StartLevel != FileNameFull)
-    {
-        pLogDebug("Clear check-points at SetupPlayers()");
-        Checkpoint.clear();
-        CheckpointsList.clear();
-    }
+    setupCheckpoints(); // setup the checkpoint and restpore the player at it if needed
 }
 
 void PlayerHurt(int A)
 {
-    if(GodMode == true || GameOutro == true || BattleOutro > 0)
+    if(GodMode || GameOutro || BattleOutro > 0)
             return;
     Location_t tempLocation;
     int B = 0;
 
-    if(Player[A].Dead == true || Player[A].TimeToLive > 0 || Player[A].Stoned == true || Player[A].Immune > 0 || Player[A].Effect > 0)
+    if(Player[A].Dead || Player[A].TimeToLive > 0 || Player[A].Stoned || Player[A].Immune > 0 || Player[A].Effect > 0)
         return;
 //    if(nPlay.Online == true) // netplay stuffs
 //    {
@@ -435,6 +447,7 @@ void PlayerHurt(int A)
     Player[A].CanFly2 = false;
     Player[A].FlyCount = 0;
     Player[A].RunCount = 0;
+
     if(Player[A].Fairy == true)
     {
         PlaySound(87);
@@ -456,7 +469,8 @@ void PlayerHurt(int A)
         }
         return;
     }
-    if(GameMenu == true)
+
+    if(GameMenu)
     {
         if(Player[A].State > 1)
             Player[A].Hearts = 2;
