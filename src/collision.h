@@ -30,6 +30,16 @@
 
 struct NPC_t;
 
+enum CollisionSpot
+{
+    COLLISION_NONE = 0,
+    COLLISION_TOP = 1,
+    COLLISION_RIGHT = 2,
+    COLLISION_BOTTOM = 3,
+    COLLISION_LEFT = 4,
+    COLLISION_CENTER = 5
+};
+
 // Public Function CheckCollision(Loc1 As Location, Loc2 As Location) As Boolean 'Normal collisions
 // Normal collisions
 bool CheckCollision(const Location_t &Loc1, const Location_t &Loc2);
