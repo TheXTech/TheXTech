@@ -768,17 +768,20 @@ void UpdateNPCs()
             {
                 if(NPC[A].Wet > 0)
                     NPC[A].Wet = NPC[A].Wet - 1;
+
                 if(NPC[A].Quicksand > 0)
                     NPC[A].Quicksand = NPC[A].Quicksand - 1;
-                if(UnderWater[NPC[A].Section] == true)
+
+                if(UnderWater[NPC[A].Section])
                     NPC[A].Wet = 2;
+
                 for(B = 1; B <= numWater; B++)
                 {
-                    if(Water[B].Hidden == false)
+                    if(!Water[B].Hidden)
                     {
-                        if(CheckCollision(NPC[A].Location, Water[B].Location) == true)
+                        if(CheckCollision(NPC[A].Location, Water[B].Location))
                         {
-                            if(NPC[A].Wet == 0 && NPCIsACoin[NPC[A].Type] == false)
+                            if(NPC[A].Wet == 0 && !NPCIsACoin[NPC[A].Type])
                             {
                                 if(NPC[A].Location.SpeedY >= 1)
                                 {
@@ -788,6 +791,7 @@ void UpdateNPCs()
                                     tempLocation.Y = NPC[A].Location.Y + NPC[A].Location.Height - tempLocation.Height;
                                     NewEffect(114, tempLocation);
                                 }
+
                                 if(!(NPCIsCheep[NPC[A].Type] && NPC[A].Special == 1) && NPC[A].Type != 34 && NPC[A].Type != 13)
                                 {
                                     if(NPC[A].Location.SpeedY > 0.5)
@@ -802,16 +806,20 @@ void UpdateNPCs()
                                     if(NPC[A].Location.SpeedY < -2)
                                         NPC[A].Location.SpeedY = -2;
                                 }
+
                                 if(NPC[A].Type == 104)
                                     NPC[A].Special = NPC[A].Location.SpeedY;
                             }
-                            if(Water[B].Quicksand == true)
+
+                            if(Water[B].Quicksand)
                                 NPC[A].Quicksand = 2;
+
                             NPC[A].Wet = 2;
                         }
                     }
                 }
             }
+
             if(NPC[A].Wet == 1 && NPC[A].Location.SpeedY < -1)
             {
                 tempLocation.Width = 32;
@@ -831,30 +839,37 @@ void UpdateNPCs()
                 }
                 else
                     Physics.NPCGravity = Physics.NPCGravityReal * 0.2;
+
                 if(NPC[A].Type == 195 && NPC[A].Special4 == 1)
                     NPC[A].Special5 = 0;
                 else if(!NPCIsCheep[NPC[A].Type] && NPC[A].Type != 190 && NPC[A].Type != 205 && NPC[A].Type != 206 && NPC[A].Type != 207)
                     speedVar = (float)(speedVar * 0.5);
                 else if(NPCIsCheep[NPC[A].Type] && NPC[A].Special == 2 && NPC[A].Location.SpeedY > 0)
                     speedVar = (float)(speedVar * 0.5);
+
                 if(NPC[A].Location.SpeedY >= 3) // Terminal Velocity in water
                     NPC[A].Location.SpeedY = 3;
+
                 if(NPC[A].Location.SpeedY < -3)
                     NPC[A].Location.SpeedY = -3;
             }
             else if(!(NPC[A].Type != 190 && NPCIsCheep[NPC[A].Type] == false))
             {
                 NPC[A].WallDeath = NPC[A].WallDeath + 2;
+
                 if(NPC[A].WallDeath >= 10)
                     NPC[A].WallDeath = 10;
             }
+
             if(NPC[A].Quicksand > 0 && NPCNoClipping[NPC[A].Type] == false)
             {
                 NPC[A].Location.SpeedY = NPC[A].Location.SpeedY + 1;
+
                 if(NPC[A].Location.SpeedY < -1)
                     NPC[A].Location.SpeedY = -1;
                 else if(NPC[A].Location.SpeedY > 0.5)
                     NPC[A].Location.SpeedY = 0.5;
+
                 speedVar = (float)(speedVar * 0.3);
             }
 
