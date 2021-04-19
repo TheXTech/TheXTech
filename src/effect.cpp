@@ -1063,6 +1063,8 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
                 if(b.Type == 82 || b.Type == 26 || b.Type == 65 || b.Type == 159 || b.Type == 166 || b.Type == 168)
                 {
                     auto t = b.Location;
+                    if(t.Height > 8)
+                        t.Height = 8; // Limit the height
                     if(CheckCollision(Effect[numEffects].Location, t))
                     {
                         if(b.Type == 82 || b.Type == 159)
