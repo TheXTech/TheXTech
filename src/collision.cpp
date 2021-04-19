@@ -42,6 +42,25 @@ bool CheckCollision(const Location_t &Loc1, const Location_t &Loc2)
     return false;
 }
 
+// Intersect collisions
+bool CheckCollisionIntersect(const Location_t &Loc1, const Location_t &Loc2)
+{
+    if(Loc1.Y < Loc2.Y)
+        return false;
+
+    if(Loc1.Y + Loc1.Height > Loc2.Y + Loc2.Height)
+        return false;
+
+    if(Loc1.X < Loc2.X)
+        return false;
+
+    if(Loc1.X + Loc1.Width > Loc2.X + Loc2.Width)
+        return false;
+
+    return true;
+}
+
+
 // Make the game easier for the people who whine about the detection being 'off'
 bool n00bCollision(const Location_t &Loc1, const Location_t &Loc2)
 {
