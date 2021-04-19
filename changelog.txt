@@ -24,11 +24,12 @@ Changes for 1.3.4.1
 -Yoshi's ground pound will slightly shake the screen
 -Sprout vine from blocks got an individual sound
 -Fixed an incorrect word wrapping at message boxes
--Fixed the thwomp's ground pound dirt effect being inproperly aligned
+-Fixed the vanilla GFX bug: the thwomp's ground pound dirt effect being improperly aligned
 -Bowser III'rd will shake the screen on his ground pount
 -Fixed the vanilla bug: Link may die when attempting to use the Clown Car being in a fairy form, and when flying up on the Clown Car while any vines behind him
 -Avoided the ability to switch the playable character by the Clown Car at the top of a player switch block
 -Added an ability to restore old checkpoints behavior of the SMBX 1.3 using the "compat.ini" file
+-Fixed the vanilla GFX bug: an incorrect Link's alignment at the Clown Car after being transformed from anybody who rides Yoshi
 
 Changes for 1.3.4
 -Fixed the inability to use any custom sounds and custom music at level's custom data directory
