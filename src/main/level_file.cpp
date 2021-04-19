@@ -33,6 +33,7 @@
 #include "../sorting.h"
 #include "../layers.h"
 #include "../compat.h"
+#include "../graphics.h"
 #include "level_file.h"
 
 #include <DirManager/dirman.h>
@@ -809,6 +810,7 @@ void ClearLevel()
     BlocksSorted = true;
     qScreen = false;
     UnloadCustomGFX();
+    doShakeScreenClear();
 
     numSections = 0;
 

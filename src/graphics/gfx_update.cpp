@@ -114,6 +114,14 @@ struct ScreenShake_t
 
         active = true;
     }
+
+    void clear()
+    {
+        forceX = 0.0;
+        forceY = 0.0;
+        duration = 0.0;
+        active = false;
+    }
 };
 
 static ScreenShake_t s_shakeScreen;
@@ -132,6 +140,11 @@ void doShakeScreen(int force, int type)
 void doShakeScreen(int forceX, int forceY, int type, int duration, double decay)
 {
     s_shakeScreen.setup(forceX, forceY, type, duration, decay);
+}
+
+void doShakeScreenClear()
+{
+    s_shakeScreen.clear();
 }
 
 
