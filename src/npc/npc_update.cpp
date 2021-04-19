@@ -2013,7 +2013,8 @@ void UpdateNPCs()
                                                             {
                                                                 auto bt = Block[B].Type;
                                                                 if(Block[B].IsNPC <= 0 && NPC[A].Special == 1 &&
-                                                                  ((HitSpot == COLLISION_LEFT && BlockSlope[bt] == SLOPE_FLOOR) || (HitSpot == COLLISION_RIGHT && BlockSlope[bt] == SLOPE_FLOOR)) &&
+                                                                  ((HitSpot == COLLISION_LEFT && BlockSlope[bt] == SLOPE_FLOOR && BlockSlope2[bt] == SLOPE_CEILING) ||
+                                                                   (HitSpot == COLLISION_RIGHT && BlockSlope[bt] == SLOPE_FLOOR && BlockSlope2[bt] == SLOPE_CEILING)) &&
                                                                    !BlockOnlyHitspot1[bt] && !BlockIsSizable[bt])
                                                                 {
                                                                     SkullRideDone(A, Block[B].Location);
