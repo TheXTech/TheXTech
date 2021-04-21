@@ -242,7 +242,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         block.TriggerHit = b.event_hit;
         block.TriggerLast = b.event_emptylayer;
 
-        if(block.Type > maxBlockType) // Drop ID to 1 for blocks of out of range IDs
+        if(IF_OUTRANGE(block.Type, 0, maxBlockType)) // Drop ID to 1 for blocks of out of range IDs
         {
             pLogWarning("Block-%d ID is out of range (max types %d), reset to Block-1", block.Type, maxBlockType);
             block.Type = 1;
@@ -296,7 +296,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             }
         }
 
-        if(bgo.Type > maxBackgroundType) // Drop ID to 1 for BGOs of out of range IDs
+        if(IF_OUTRANGE(bgo.Type, 1, maxBackgroundType)) // Drop ID to 1 for BGOs of out of range IDs
         {
             pLogWarning("BGO-%d ID is out of range (max types %d), reset to BGO-1", bgo.Type, maxBackgroundType);
             bgo.Type = 1;
@@ -324,7 +324,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         npc.Direction = n.direct;
         npc.Type = int(n.id);
 
-        if(npc.Type > maxNPCType) // Drop ID to 1 for NPCs of out of range IDs
+        if(IF_OUTRANGE(npc.Type, 0, maxNPCType)) // Drop ID to 1 for NPCs of out of range IDs
         {
             pLogWarning("NPC-%d ID is out of range (max types %d), reset to NPC-1", npc.Type, maxNPCType);
             npc.Type = 1;

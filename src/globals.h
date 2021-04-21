@@ -68,6 +68,9 @@
 
 #define UNUSED(x) (void)x
 
+#define IF_OUTRANGE(x, l, r)  ((x) < (l) || (x) > (r))
+#define IF_INRANGE(x, l, r)  ((x) >= (l) && (x) <= (r))
+
 //! Main window
 extern FrmMain frmMain;
 //! Container of "hardcoded" (no more) graphics

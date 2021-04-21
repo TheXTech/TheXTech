@@ -134,7 +134,7 @@ void OpenWorld(std::string FilePath)
         terra.Z = zCounter++;
         treeWorldTileAdd(&terra);
 
-        if(terra.Type > maxTileType) // Drop ID to 1 for Tiles of out of range IDs
+        if(IF_OUTRANGE(terra.Type, 1, maxTileType)) // Drop ID to 1 for Tiles of out of range IDs
         {
             pLogWarning("TILE-%d ID is out of range (max types %d), reset to TILE-1", terra.Type, maxTileType);
             terra.Type = 1;
@@ -164,7 +164,7 @@ void OpenWorld(std::string FilePath)
         scene.Z = zCounter++;
         treeWorldSceneAdd(&scene);
 
-        if(scene.Type > maxSceneType) // Drop ID to 1 for Scenery of out of range IDs
+        if(IF_OUTRANGE(scene.Type, 1, maxSceneType)) // Drop ID to 1 for Scenery of out of range IDs
         {
             pLogWarning("TILE-%d ID is out of range (max types %d), reset to TILE-1", scene.Type, maxSceneType);
             scene.Type = 1;
@@ -197,7 +197,7 @@ void OpenWorld(std::string FilePath)
 //        if(LevelEditor == true)
 //            pp.Active = true;
 
-        if(pp.Type > maxPathType) // Drop ID to 1 for Path of out of range IDs
+        if(IF_OUTRANGE(pp.Type, 1, maxPathType)) // Drop ID to 1 for Path of out of range IDs
         {
             pLogWarning("PATH-%d ID is out of range (max types %d), reset to PATH-1", pp.Type, maxPathType);
             pp.Type = 1;
@@ -241,7 +241,7 @@ void OpenWorld(std::string FilePath)
         ll.Z = zCounter++;
         treeWorldLevelAdd(&ll);
 
-        if(ll.Type > maxLevelType) // Drop ID to 1 for Levels of out of range IDs
+        if(IF_OUTRANGE(ll.Type, 0, maxLevelType)) // Drop ID to 1 for Levels of out of range IDs
         {
             pLogWarning("PATH-%d ID is out of range (max types %d), reset to PATH-1", ll.Type, maxLevelType);
             ll.Type = 1;

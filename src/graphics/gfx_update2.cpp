@@ -257,6 +257,8 @@ void UpdateGraphics2(bool skipRepaint)
         for(auto *t : tarr)
         {
             Tile_t &tile = *t;
+            SDL_assert(IF_INRANGE(tile.Type, 1, maxTileType));
+
             g_stats.checkedTiles++;
             if(vScreenCollision2(1, tile.Location))
             {
@@ -275,6 +277,8 @@ void UpdateGraphics2(bool skipRepaint)
         for(auto *t : sarr)
         {
             Scene_t &scene = *t;
+            SDL_assert(IF_INRANGE(scene.Type, 1, maxSceneType));
+
             g_stats.checkedScenes++;
             if(vScreenCollision2(1, scene.Location) && scene.Active)
             {
@@ -293,6 +297,8 @@ void UpdateGraphics2(bool skipRepaint)
         for(auto *t : parr)
         {
             WorldPath_t &path = *t;
+            SDL_assert(IF_INRANGE(path.Type, 1, maxPathType));
+
             g_stats.checkedPaths++;
             if(vScreenCollision2(1, path.Location) && path.Active)
             {
@@ -311,6 +317,8 @@ void UpdateGraphics2(bool skipRepaint)
         for(auto *t : larr)
         {
             WorldLevel_t &level = *t;
+            SDL_assert(IF_INRANGE(level.Type, 0, maxLevelType));
+
             g_stats.checkedLevels++;
             if(vScreenCollision2(1, level.Location) && level.Active)
             {
