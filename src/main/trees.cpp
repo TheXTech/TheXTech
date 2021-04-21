@@ -162,10 +162,10 @@ void treeRemove(Arr &p, Obj*obj)
 template<class Obj, class Arr>
 void treeWorldQuery(Arr &p, double Left, double Top, double Right, double Bottom, std::vector<Obj *> &list, bool z_sort)
 {
+    list.clear();
+
     if(!p.get())
         return;
-
-    list.clear();
 
     auto q = p->tree.QueryIntersectsRegion(loose_quadtree::BoundingBox<double>(Left - s_gridSize,
                                                                                Top - s_gridSize,
