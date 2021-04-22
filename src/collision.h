@@ -30,9 +30,21 @@
 
 struct NPC_t;
 
+enum CollisionSpot
+{
+    COLLISION_NONE = 0,
+    COLLISION_TOP = 1,
+    COLLISION_RIGHT = 2,
+    COLLISION_BOTTOM = 3,
+    COLLISION_LEFT = 4,
+    COLLISION_CENTER = 5
+};
+
 // Public Function CheckCollision(Loc1 As Location, Loc2 As Location) As Boolean 'Normal collisions
 // Normal collisions
 bool CheckCollision(const Location_t &Loc1, const Location_t &Loc2);
+// Intersect collision
+bool CheckCollisionIntersect(const Location_t &Loc1, const Location_t &Loc2);
 // Public Function n00bCollision(Loc1 As Location, Loc2 As Location) As Boolean 'Make the game easier for the people who whine about the detection being 'off'
 // Make the game easier for the people who whine about the detection being 'off'
 bool n00bCollision(const Location_t &Loc1, const Location_t &Loc2);

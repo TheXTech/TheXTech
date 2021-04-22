@@ -1666,7 +1666,7 @@ void UpdatePlayer()
 
                         // START ALT JUMP - this code does the player's spin jump
                         if(Player[A].Controls.AltJump && (Player[A].Character == 1 || Player[A].Character == 2 || Player[A].Character == 4 ||
-                                                          (g_compatibility.fix_peach_escape_shell_surf && Player[A].Character == 3)))
+                                                          (g_compatibility.fix_peach_escape_shell_surf && Player[A].Character == 3 && Player[A].ShellSurf)))
                         {
                             if(Player[A].Location.SpeedX > 0)
                                 tempSpeed = Player[A].Location.SpeedX * 0.2;
@@ -1951,11 +1951,15 @@ void UpdatePlayer()
                 {
                     if(Player[A].State == 4 || Player[A].State == 5)
                     {
+                        bool hasNoMonts = (g_compatibility.fix_link_clowncar_fairy && Player[A].Mount <= 0) ||
+                                           !g_compatibility.fix_link_clowncar_fairy;
 
-                        if(Player[A].FlyCount > 0 ||
-                           ((Player[A].Controls.AltJump || (Player[A].Controls.Jump && Player[A].FloatRelease)) &&
-                             Player[A].Location.SpeedY != Physics.PlayerGravity && Player[A].Slope == 0 &&
-                             Player[A].StandingOnNPC == 0))
+                        bool turnFairy = Player[A].FlyCount > 0 ||
+                                        ((Player[A].Controls.AltJump || (Player[A].Controls.Jump && Player[A].FloatRelease)) &&
+                                          Player[A].Location.SpeedY != Physics.PlayerGravity && Player[A].Slope == 0 &&
+                                          Player[A].StandingOnNPC == 0);
+
+                        if(turnFairy && hasNoMonts)
                         {
                             if(Player[A].FlyCount > 0)
                                 Player[A].FairyCD = 0;
@@ -2193,6 +2197,7 @@ void UpdatePlayer()
                             Player[B].TailCount = 0;
                         LevelMacro = LEVELMACRO_OFF;
                         LevelMacroCounter = 0;
+                        frmMain.setTargetTexture();
                         frmMain.clearBuffer();
                         frmMain.repaint();
                     }
@@ -2202,6 +2207,7 @@ void UpdatePlayer()
                         EndLevel = true;
                         LevelMacro = LEVELMACRO_OFF;
                         LevelMacroCounter = 0;
+                        frmMain.setTargetTexture();
                         frmMain.clearBuffer();
                         frmMain.repaint();
                     }
@@ -2540,13 +2546,13 @@ void UpdatePlayer()
 
                                                         if(Player[A].GroundPound)
                                                         {
-                                                            YoshiPound(A, tempHit3, true);
+                                                            YoshiPound(A, Player[A].Mount, true);
                                                             Player[A].GroundPound = false;
                                                         }
                                                         else if(Player[A].YoshiYellow)
                                                         {
                                                             if(oldSlope == 0)
-                                                                YoshiPound(A, tempHit3);
+                                                                YoshiPound(A, Player[A].Mount);
                                                         }
 
                                                         Player[A].Location.Y = Block[B].Location.Y + (Block[B].Location.Height * Slope) - Player[A].Location.Height - 0.1;
@@ -2700,8 +2706,8 @@ void UpdatePlayer()
                                             {
                                                 if(Player[A].Location.SpeedY > 3)
                                                 {
-                                                    PlaySound(37);
-                                                    YoshiPound(A, B, true);
+                                                    PlaySound(SFX_Twomp);
+                                                    YoshiPound(A, Player[A].Mount, true);
                                                 }
                                             }
 
@@ -2966,11 +2972,11 @@ void UpdatePlayer()
                             Player[A].Location.Y = tempLocation3.Y - Player[A].Location.Height;
                             if(Player[A].GroundPound)
                             {
-                                YoshiPound(A, tempHit3, true);
+                                YoshiPound(A, Player[A].Mount, true);
                                 Player[A].GroundPound = false;
                             }
                             else if(Player[A].YoshiYellow)
-                                YoshiPound(A, tempHit3);
+                                YoshiPound(A, Player[A].Mount);
 
                             Player[A].Location.SpeedY = 0;
                             if(tempLocation3.SpeedX != 0.0 || tempLocation3.SpeedY != 0.0)
@@ -3048,11 +3054,11 @@ void UpdatePlayer()
 
                         if(Player[A].GroundPound)
                         {
-                            YoshiPound(A, tempHit3, true);
+                            YoshiPound(A, Player[A].Mount, true);
                             Player[A].GroundPound = false;
                         }
                         else if(Player[A].YoshiYellow)
-                            YoshiPound(A, tempHit3);
+                            YoshiPound(A, Player[A].Mount);
 
                         if(Player[A].Slope == 0 || Player[A].Slide)
                             Player[A].Location.SpeedY = 0;
@@ -3270,14 +3276,16 @@ void UpdatePlayer()
                             {
                                 if(Player[A].Character == 5)
                                 {
-                                    if(Player[A].Immune == 0 && Player[A].Controls.Up)
+                                    bool hasNoMonts = (g_compatibility.fix_link_clowncar_fairy && Player[A].Mount <= 0) ||
+                                                       !g_compatibility.fix_link_clowncar_fairy;
+                                    if(hasNoMonts && Player[A].Immune == 0 && Player[A].Controls.Up)
                                     {
                                         Player[A].FairyCD = 0;
                                         if(!Player[A].Fairy)
                                         {
                                             Player[A].Fairy = true;
                                             SizeCheck(A);
-                                            PlaySound(87);
+                                            PlaySound(SFX_ZeldaFairy);
                                             Player[A].Immune = 10;
                                             Player[A].Effect = 8;
                                             Player[A].Effect2 = 4;
@@ -3614,7 +3622,9 @@ void UpdatePlayer()
                                     {
                                         if(Player[A].Character == 5)
                                         {
-                                            if(Player[A].Immune == 0 && Player[A].Controls.Up)
+                                            bool hasNoMonts = (g_compatibility.fix_link_clowncar_fairy && Player[A].Mount <= 0) ||
+                                                               !g_compatibility.fix_link_clowncar_fairy;
+                                            if(hasNoMonts && Player[A].Immune == 0 && Player[A].Controls.Up)
                                             {
                                                 Player[A].FairyCD = 0;
                                                 if(!Player[A].Fairy)
@@ -4317,7 +4327,7 @@ void UpdatePlayer()
                         {
                             numBlock = numBlock + 1;
                             Block[numBlock].Location.Y = NPC[B].Location.Y;
-                            YoshiPound(A, numBlock, true);
+                            YoshiPound(A, Player[A].Mount, true);
                             Block[numBlock].Location.Y = 0;
                             numBlock = numBlock - 1;
                             Player[A].GroundPound = false;
@@ -4326,7 +4336,7 @@ void UpdatePlayer()
                         {
                             numBlock = numBlock + 1;
                             Block[numBlock].Location.Y = NPC[B].Location.Y;
-                            YoshiPound(A, numBlock);
+                            YoshiPound(A, Player[A].Mount);
                             Block[numBlock].Location.Y = 0;
                             numBlock = numBlock - 1;
                         }
@@ -4356,12 +4366,18 @@ void UpdatePlayer()
                        (Player[A].HoldingNPC == 0 || Player[A].Character == 5))
                     {
                         UnDuck(A);
+                        if(g_compatibility.fix_link_clowncar_fairy && Player[A].Fairy) // Avoid the mortal glitch
+                        {
+                            Player[A].Fairy = false;
+                            PlaySound(SFX_ZeldaFairy);
+                            NewEffect(63, Player[A].Location);
+                        }
                         Player[A].Location = NPC[B].Location;
                         Player[A].Mount = 2;
                         NPC[B].Killed = 9;
                         Player[A].HoldingNPC = 0;
                         Player[A].StandingOnNPC = 0;
-                        PlaySound(2);
+                        PlaySound(SFX_Stomp);
                         for(C = 1; C <= numPlayers; ++C)
                         {
                             if(Player[C].StandingOnNPC == B)
@@ -4372,7 +4388,7 @@ void UpdatePlayer()
                     {
                         Player[A].StandingOnNPC = 0;
                         if(Player[A].Location.SpeedY > 4 + NPC[B].Location.SpeedY)
-                            PlaySound(37);
+                            PlaySound(SFX_Twomp);
                         Player[A].Location.SpeedY = NPC[B].Location.SpeedY;
                     }
 

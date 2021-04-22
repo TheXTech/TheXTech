@@ -59,15 +59,37 @@ static inline void rtrim(std::string &s) {
 
 std::string Strings::trim(std::string str)
 {
-    ltrim(str);
-    rtrim(str);
+    ::ltrim(str);
+    ::rtrim(str);
+    return str;
+}
+std::string Strings::ltrim(std::string str)
+{
+    ::rtrim(str);
+    return str;
+}
+
+std::string Strings::rtrim(std::string str)
+{
+    ::ltrim(str);
+    ::rtrim(str);
     return str;
 }
 
 void Strings::doTrim(std::string& str)
 {
-    ltrim(str);
-    rtrim(str);
+    ::ltrim(str);
+    ::rtrim(str);
+}
+
+void Strings::doLTrim(std::string &str)
+{
+    ::ltrim(str);
+}
+
+void Strings::doRTrim(std::string &str)
+{
+    ::rtrim(str);
 }
 
 
@@ -113,4 +135,37 @@ Strings::List Strings::split(const std::string& str, const std::string& delimite
     List res;
     split(res, str, delimiter);
     return res;
+}
+
+void Strings::replaceInAll(std::string &src, std::string from, std::string to)
+{
+    if(from.empty())
+        return;
+
+    size_t start_pos = 0;
+    while((start_pos = src.find(from, start_pos)) != std::string::npos)
+    {
+        src.replace(start_pos, from.length(), to);
+        start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with 'yx'
+    }
+}
+
+void Strings::removeInAll(std::string &src, std::string substr)
+{
+    std::string::size_type foundpos = src.find(substr);
+    if(foundpos != std::string::npos)
+        src.erase(src.begin() + std::string::difference_type(foundpos),
+                     src.begin() + std::string::difference_type(foundpos + substr.length()));
+}
+
+std::string Strings::removeAll(std::string src, std::string substr)
+{
+    removeInAll(src, substr);
+    return src;
+}
+
+std::string Strings::replaceAll(std::string src, std::string from, std::string to)
+{
+    replaceInAll(src, from, to);
+    return src;
 }

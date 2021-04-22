@@ -34,6 +34,7 @@
 #include "editor.h"
 #include "blocks.h"
 #include "compat.h"
+#include "control/joystick.h"
 
 #include <Utils/maths.h>
 
@@ -163,12 +164,14 @@ void Bomb(Location_t Location, int Game, int ImmunePlayer)
     }
     if(Game == 2)
     {
+        joyRumbleAllPlayers(150, 1.0);
         NewEffect(69, Location);
         PlaySound(43);
         Radius = 52;
     }
     if(Game == 3)
     {
+        joyRumbleAllPlayers(200, 1.0);
         NewEffect(70, Location);
         PlaySound(43);
         Radius = 64;
@@ -871,6 +874,7 @@ void NPCSpecial(int A)
                             NPC[A].Special2 = Player[B].Location.Y + 130;
                         }
 
+                        PlaySound(SFX_SwooperFlap);
                     }
                 }
             }
@@ -2519,7 +2523,7 @@ void NPCSpecial(int A)
                             {
                                 MoreScore(static_cast<int>(floor(static_cast<double>((1 - (NPC[A].Location.Y - NPC[A].DefaultLocation.Y) / (NPC[A].Special2 - NPC[A].DefaultLocation.Y)) * 10))) + 1, NPC[A].Location);
                                 NPC[A].Killed = 9;
-                                PlaySound(37);
+                                PlaySound(SFX_Twomp);
                             }
                             FreezeNPCs = false;
                             TurnNPCsIntoCoins();
@@ -3327,7 +3331,8 @@ void SpecialNPC(int A)
                 NPC[A].Location.Y -= 1.5;
                 if(NPC[A].Special >= NPCHeight[NPC[A].Type] * 0.65 + 1)
                 {
-                    NPC[A].Location.Y = std::round(NPC[A].Location.Y);
+                    NPC[A].Location.Y = vb6Round(NPC[A].Location.Y);
+                    NPC[A].Location.Height = NPCHeight[NPC[A].Type];
                     NPC[A].Special2 = 2;
                     NPC[A].Special = 0;
                 }
@@ -3401,7 +3406,7 @@ void SpecialNPC(int A)
         if(NPC[A].Location.X != NPC[A].DefaultLocation.X)
         {
             NPC[A].Killed = 2;
-            NPC[A].Location.Y = NPC[A].Location.Y - NPC[A].Location.SpeedY;
+            NPC[A].Location.Y -= NPC[A].Location.SpeedY;
         }
         else
         {
@@ -3419,7 +3424,7 @@ void SpecialNPC(int A)
                 NPC[A].Location.Height += 1.5;
                 if(NPC[A].Special >= NPCHeight[NPC[A].Type] * 0.65 + 1)
                 {
-                    NPC[A].Location.Height = std::floor(NPC[A].Location.Height);
+                    NPC[A].Location.Height = NPCHeight[NPC[A].Type];
                     NPC[A].Special2 = 2;
                     NPC[A].Special = 0;
                 }
@@ -3492,7 +3497,7 @@ void SpecialNPC(int A)
                     NPC[A].Location.Width += 1.5 * NPC[A].Direction;
                 if(NPC[A].Special >= NPCWidth[NPC[A].Type] * 0.65 + 1)
                 {
-                    NPC[A].Location.Width = std::floor(NPC[A].Location.Width);
+                    NPC[A].Location.Width = NPCWidth[NPC[A].Type];
                     NPC[A].Special2 = 2;
                     NPC[A].Special = 0;
                 }
@@ -4353,17 +4358,21 @@ void SpecialNPC(int A)
             {
                 if(NPC[A].Special2 == 0)
                 {
-                    PlaySound(37);
+                    PlaySound(SFX_Twomp);
+                    if(GameplayShakeScreenThwomp)
+                        doShakeScreen(0, 4, SHAKE_SEQUENTIAL, 5, 0.2);
                     tempLocation.Width = 32;
                     tempLocation.Height = 32;
                     tempLocation.Y = NPC[A].Location.Y + NPC[A].Location.Height - 16;
 
 
-                    tempLocation.X = NPC[A].Location.X;
+//                    tempLocation.X = NPC[A].Location.X;
+                    tempLocation.X = (NPC[A].Location.X + NPC[A].Location.Width / 8);
                     NewEffect(10, tempLocation);
                     Effect[numEffects].Location.SpeedX = -1.5;
 
-                    tempLocation.X = tempLocation.X + tempLocation.Width - EffectWidth[10];
+//                    tempLocation.X = tempLocation.X + tempLocation.Width - EffectWidth[10];
+                    tempLocation.X = (NPC[A].Location.X + NPC[A].Location.Width - EffectWidth[10]) - (NPC[A].Location.Width / 8);
                     NewEffect(10, tempLocation);
                     Effect[numEffects].Location.SpeedX = 1.5;
 

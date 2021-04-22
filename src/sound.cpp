@@ -36,6 +36,7 @@
 #include <Logger/logger.h>
 #include <IniProcessor/ini_processing.h>
 #include <Utils/files.h>
+#include <Utils/strings.h>
 #include <unordered_map>
 #include <fmt_format_ne.h>
 
@@ -47,6 +48,8 @@ bool musicPlaying = false;
 int musicLoop = 0;
 // Public musicName As String
 std::string musicName;
+
+int playerHammerSFX = SFX_Fireball;
 
 AudioSetup_t g_audioSetup;
 
@@ -69,6 +72,10 @@ static unsigned int g_totalMusicLevel = 0;
 static unsigned int g_totalMusicWorld = 0;
 //! Total count of special music
 static unsigned int g_totalMusicSpecial = 0;
+//! Enable using the unique iceball SFX when available
+static bool s_useIceBallSfx = false;
+//! Enable using of the new ice SFX: NPC freeze and breaking of the frozen NPC
+static bool s_useNewIceSfx = false;
 
 static int g_errorsSfx = 0;
 // static int g_errorsMusic = 0; // Unued yet
@@ -92,6 +99,8 @@ struct SFX_t
     Mix_Chunk *chunk = nullptr;
     Mix_Chunk *chunkOrig = nullptr;
     bool isCustom = false;
+    bool isSilent = false;
+    bool isSilentOrig = false;
     int volume = 128;
     int channel = -1;
 };
@@ -205,10 +214,12 @@ static void RestoreSfx(SFX_t &u)
 {
     if(u.isCustom)
     {
-        if(u.chunk && u.chunkOrig)
+        if((u.chunk || u.isSilent) && (u.chunkOrig || u.isSilentOrig))
         {
-            Mix_FreeChunk(u.chunk);
+            if(u.chunk)
+                Mix_FreeChunk(u.chunk);
             u.chunk = u.chunkOrig;
+            u.isSilent = u.isSilentOrig;
             u.chunkOrig = nullptr;
         }
         u.isCustom = false;
@@ -222,9 +233,11 @@ static void AddSfx(const std::string &root,
                    bool isCustom = false)
 {
     std::string f;
+    bool isSilent;
     ini.beginGroup(group);
     ini.read("file", f, std::string());
-    if(!f.empty())
+    ini.read("silent", isSilent, false);
+    if(!f.empty() || isSilent)
     {
         if(isCustom)
         {
@@ -233,26 +246,33 @@ static void AddSfx(const std::string &root,
             {
                 auto &m = s->second;
                 std::string newPath = root + f;
-                if(m.isCustom && newPath == m.customPath)
+                if(!isSilent && m.isCustom && newPath == m.customPath)
                 {
                     ini.endGroup();
-                    return;  // Don't load same file twice!
+                    return;  // Don't load the same file twice!
                 }
 
                 Mix_Chunk *backup = m.chunk;
+                bool backup_isSilent = m.isSilent;
                 m.customPath = newPath;
-                m.chunk = Mix_LoadWAV((root + f).c_str());
-                if(m.chunk)
+                if(!isSilent)
+                    m.chunk = Mix_LoadWAV((root + f).c_str());
+                if(m.chunk || isSilent)
                 {
                     if(!m.isCustom && !m.chunkOrig)
+                    {
                         m.chunkOrig = backup;
-                    else
+                        m.isSilentOrig = backup_isSilent;
+                    }
+                    else if(backup)
                         Mix_FreeChunk(backup);
                     m.isCustom = true;
+                    m.isSilent = isSilent;
                 }
                 else
                 {
                     m.chunk = backup;
+                    m.isSilent = backup_isSilent;
                     pLogWarning("ERROR: SFX '%s' loading error: %s", m.path.c_str(), Mix_GetError());
                 }
             }
@@ -262,10 +282,12 @@ static void AddSfx(const std::string &root,
             SFX_t m;
             m.path = root + f;
             m.volume = 128;
-            pLogDebug("Adding SFX [%s] '%s'", alias.c_str(), m.path.c_str());
-            m.chunk = Mix_LoadWAV(m.path.c_str());
+            m.isSilent = isSilent;
+            pLogDebug("Adding SFX [%s] '%s'", alias.c_str(), isSilent ? "<silence>" : m.path.c_str());
+            if(!isSilent)
+                m.chunk = Mix_LoadWAV(m.path.c_str());
             m.channel = -1;
-            if(m.chunk)
+            if(m.chunk || isSilent)
             {
                 bool isSingleChannel = false;
                 ini.read("single-channel", isSingleChannel, false);
@@ -311,6 +333,20 @@ void SoundResumeAll()
     Mix_ResumeMusic();
 }
 
+static void processPathArgs(std::string &path,
+                            const std::string &episodeRoot,
+                            const std::string &dataDirName)
+{
+    if(path.find('|') == std::string::npos)
+        return; // Nothing to do
+    Strings::List p;
+    Strings::split(p, path, '|');
+    Strings::replaceInAll(p[1], "{e}", episodeRoot);
+    Strings::replaceInAll(p[1], "{d}", episodeRoot + dataDirName);
+    Strings::replaceInAll(p[1], "{r}", MusicRoot);
+    path = p[0] + "|" + p[1];
+}
+
 void PlayMusic(std::string Alias, int fadeInMs)
 {
     if(noSound)
@@ -326,7 +362,9 @@ void PlayMusic(std::string Alias, int fadeInMs)
     if(mus != music.end())
     {
         auto &m = mus->second;
-        g_curMusic = Mix_LoadMUS(m.path.c_str());
+        std::string p = m.path;
+        processPathArgs(p, FileNamePath + "/", FileName + "/");
+        g_curMusic = Mix_LoadMUS(p.c_str());
         if(!g_curMusic)
         {
             pLogWarning("Music '%s' opening error: %s", m.path.c_str(), Mix_GetError());
@@ -348,7 +386,8 @@ void PlaySfx(std::string Alias, int loops)
     if(sfx != sound.end())
     {
         auto &s = sfx->second;
-        Mix_PlayChannel(s.channel, s.chunk, loops);
+        if(!s.isSilent)
+            Mix_PlayChannel(s.channel, s.chunk, loops);
     }
 }
 
@@ -358,7 +397,8 @@ void StopSfx(std::string Alias)
     if(sfx != sound.end())
     {
         auto &s = sfx->second;
-        Mix_HaltChannel(s.channel);
+        if(!s.isSilent)
+            Mix_HaltChannel(s.channel);
     }
 }
 
@@ -377,7 +417,9 @@ void StartMusic(int A, int fadeInMs)
             pLogDebug("Starting custom music [%s]", curWorldMusicFile.c_str());
             if(g_curMusic)
                 Mix_FreeMusic(g_curMusic);
-            g_curMusic = Mix_LoadMUS((FileNamePath + "/" + curWorldMusicFile).c_str());
+            std::string p = FileNamePath + "/" + curWorldMusicFile;
+            processPathArgs(p, FileNamePath + "/", FileName + "/");
+            g_curMusic = Mix_LoadMUS(p.c_str());
             Mix_VolumeMusicStream(g_curMusic, 64);
             if(fadeInMs > 0)
                 Mix_FadeInMusic(g_curMusic, -1, fadeInMs);
@@ -415,7 +457,9 @@ void StartMusic(int A, int fadeInMs)
             pLogDebug("Starting custom music [%s]", CustomMusic[A].c_str());
             if(g_curMusic)
                 Mix_FreeMusic(g_curMusic);
-            g_curMusic = Mix_LoadMUS((FileNamePath + "/" + CustomMusic[A]).c_str());
+            std::string p = FileNamePath + "/" + CustomMusic[A];
+            processPathArgs(p, FileNamePath + "/", FileName + "/");
+            g_curMusic = Mix_LoadMUS(p.c_str());
             Mix_VolumeMusicStream(g_curMusic, 52);
             if(fadeInMs > 0)
                 Mix_FadeInMusic(g_curMusic, -1, fadeInMs);
@@ -601,7 +645,20 @@ void InitSound()
     IniProcessing sounds(sfxIni);
     sounds.beginGroup("sound-main");
     sounds.read("total", g_totalSounds, 0);
+    sounds.read("use-iceball-sfx", s_useIceBallSfx, false);
+    sounds.read("use-new-ice-sfx", s_useNewIceSfx, false);
+    bool playerUseNPCHammer;
+    bool playerUseOwnHammer;
+    sounds.read("player-use-npc-hammer-sfx", playerUseNPCHammer, false);
+    sounds.read("player-use-own-hammer-sfx", playerUseOwnHammer, false);
     sounds.endGroup();
+
+    if(playerUseOwnHammer)
+        playerHammerSFX = SFX_PlayerHammer;
+    else if(playerUseNPCHammer)
+        playerHammerSFX = SFX_Throw;
+    else
+        playerHammerSFX = SFX_Fireball;
 
     UpdateLoad();
     for(unsigned int i = 1; i <= g_totalSounds; ++i)
@@ -620,45 +677,98 @@ void InitSound()
     }
 }
 
+static const std::unordered_map<int, int> s_soundDelays =
+{
+    {2, 12}, {3, 12},  {4, 12},  {5, 30}, {8, 10},  {9, 4},
+    {10, 8}, {12, 10}, {17, 10}, {26, 8}, {31, 20}, {37, 10},
+    {42, 16},{50, 8},  {54, 8},  {71, 9}, {74, 8},  {81, 5},
+    {86, 8}, {SFX_Icebreak, 4}
+};
+
+static void s_resetSoundDelay(int A)
+{
+    // set the delay before a sound can be played again
+    auto i = s_soundDelays.find(A);
+    if(i == s_soundDelays.end())
+        SoundPause[A] = 4;
+    else
+        SoundPause[A] = i->second;
+#if 0
+    switch(A)
+    {
+    case 2: SoundPause[A] = 12; break;
+    case 3: SoundPause[A] = 12; break;
+    case 4: SoundPause[A] = 12; break;
+    case 5: SoundPause[A] = 30; break;
+    case 8: SoundPause[A] = 10; break;
+    case 9: SoundPause[A] = 4; break;
+    case 10: SoundPause[A] = 8; break;
+    case 12: SoundPause[A] = 10; break;
+    case 17: SoundPause[A] = 10; break;
+    case 26: SoundPause[A] = 8; break;
+    case 31: SoundPause[A] = 20; break;
+    case 37: SoundPause[A] = 10; break;
+    case 42: SoundPause[A] = 16; break;
+    case 50: SoundPause[A] = 8; break;
+    case 54: SoundPause[A] = 8; break;
+    case 71: SoundPause[A] = 9; break;
+    case 74: SoundPause[A] = 8; break;
+    case 81: SoundPause[A] = 5; break;
+    case 86: SoundPause[A] = 8; break;
+    default: SoundPause[A] = 4; break;
+    }
+#endif
+}
+
+static const std::unordered_map<int, int> s_soundFallback =
+{
+    {SFX_Iceball, SFX_Fireball},
+    {SFX_Freeze, SFX_ShellHit},
+    {SFX_Icebreak, SFX_ShellHit},
+    {SFX_SproutVine, SFX_Mushroom},
+};
+
+static int getFallbackSfx(int A)
+{
+    auto fb = s_soundFallback.find(A);
+    if(fb != s_soundFallback.end())
+        A = fb->second;
+    return A;
+}
+
 void PlaySound(int A, int loops)
 {
     if(noSound)
         return;
 
-    if((!GameMenu || A == 26 || A == 29) && !GameOutro)
+    if(GameMenu || GameOutro) // || A == 26 || A == 27 || A == 29)
+        return;
+
+    if(A > (int)g_totalSounds) // Play fallback sound for the missing SFX
+        A = getFallbackSfx(A);
+    else if(!s_useIceBallSfx && A == SFX_Iceball)
+        A = SFX_Fireball; // Fell back into fireball when iceball sound isn't preferred
+    else if(!s_useNewIceSfx && (A == SFX_Freeze || A == SFX_Icebreak))
+        A = SFX_ShellHit; // Restore the old behavior
+
+    if(numPlayers > 2)
+        SoundPause[10] = 1;
+
+    if(SoundPause[A] == 0) // if the sound wasn't just played
     {
-        if(numPlayers > 2)
-            SoundPause[10] = 1;
+        std::string alias = fmt::format_ne("sound{0}", A);
+        PlaySfx(alias, loops);
+        s_resetSoundDelay(A);
+    }
+}
 
-        if(SoundPause[A] == 0) // if the sound wasn't just played
-        {
-            std::string alias = fmt::format_ne("sound{0}", A);
-            PlaySfx(alias, loops);
-
-            switch(A) // set the delay before a sound can be played again
-            {
-            case 2: SoundPause[A] = 12; break;
-            case 3: SoundPause[A] = 12; break;
-            case 4: SoundPause[A] = 12; break;
-            case 5: SoundPause[A] = 30; break;
-            case 8: SoundPause[A] = 10; break;
-            case 9: SoundPause[A] = 4; break;
-            case 10: SoundPause[A] = 8; break;
-            case 12: SoundPause[A] = 10; break;
-            case 17: SoundPause[A] = 10; break;
-            case 26: SoundPause[A] = 8; break;
-            case 31: SoundPause[A] = 20; break;
-            case 37: SoundPause[A] = 10; break;
-            case 42: SoundPause[A] = 16; break;
-            case 50: SoundPause[A] = 8; break;
-            case 54: SoundPause[A] = 8; break;
-            case 71: SoundPause[A] = 9; break;
-            case 74: SoundPause[A] = 8; break;
-            case 81: SoundPause[A] = 5; break;
-            case 86: SoundPause[A] = 8; break;
-            default: SoundPause[A] = 4; break;
-            }
-        }
+void PlaySoundMenu(int A, int loops)
+{
+    if(SoundPause[A] == 0) // if the sound wasn't just played
+    {
+        std::string alias = fmt::format_ne("sound{0}", A);
+        PlaySfx(alias, loops);
+        s_resetSoundDelay(A);
     }
 }
 

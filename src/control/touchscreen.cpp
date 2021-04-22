@@ -24,6 +24,7 @@
  */
 
 #include <Logger/logger.h>
+#include <Utils/maths.h>
 
 #include "touchscreen.h"
 #include "../globals.h"
@@ -54,11 +55,21 @@ enum
     TOUCHSCREEN_ENABLE = 2,
 };
 
+enum
+{
+    TOUCHPAD_STYLE_ACTIONS = 0,
+    TPUCHPAD_STYLE_ABXY = 1,
+    TPUCHPAD_STYLE_XODA = 2
+};
+
 //! Is hardware keyboard presented?
 static int s_keyboardPresence = KEYBOARD_NOKEYS;
 static int s_touchscreenMode = TOUCHSCREEN_DISABLE_ON_KEYBOARD;
 static bool s_showTouchscreenOnStart = false;
+static int  s_touchPadStyle = 0;
 static double s_screenSize = 0;
+static double s_screenWidth = 0;
+static double s_screenHeight = 0;
 
 #endif
 
@@ -86,6 +97,8 @@ bool TouchScreenController::touchSupported()
 
 
 #ifdef __ANDROID__
+
+static void initTouchMap();
 
 JNIEXPORT void JNICALL
 Java_ru_wohlsoft_thextech_thextechActivity_setHardwareKeyboardPresence(
@@ -127,12 +140,29 @@ JNIEXPORT void JNICALL
 Java_ru_wohlsoft_thextech_thextechActivity_setScreenSize(
         JNIEnv *env,
         jclass type,
-        jdouble screenSize
+        jdouble screenSize,
+        jdouble screenWidth,
+        jdouble screenHeight
 )
 {
     (void)env;
     (void)type;
     s_screenSize = screenSize;
+    s_screenWidth = screenWidth;
+    s_screenHeight = screenHeight;
+    initTouchMap();
+}
+
+JNIEXPORT void JNICALL
+Java_ru_wohlsoft_thextech_thextechActivity_setTouchPadStyle(
+        JNIEnv *env,
+        jclass type,
+        jint style
+)
+{
+    (void)env;
+    (void)type;
+    s_touchPadStyle = style;
 }
 #endif
 
@@ -166,6 +196,165 @@ TouchScreenController::FingerState &TouchScreenController::FingerState::operator
     return *this;
 }
 
+static int buttonLeft()
+{
+    if(LevelSelect && GamePaused)
+        return GFX_t::BUTTON_LEFT_CHAR;
+    else
+        return GFX_t::BUTTON_LEFT;
+}
+
+static int buttonRight()
+{
+    if(LevelSelect && GamePaused)
+        return GFX_t::BUTTON_RIGHT_CHAR;
+    else
+        return GFX_t::BUTTON_RIGHT;
+}
+
+static int buttonA()
+{
+    switch(s_touchPadStyle)
+    {
+    case TPUCHPAD_STYLE_ABXY:
+        return GFX_t::BUTTON_A;
+    case TPUCHPAD_STYLE_XODA:
+        return GFX_t::BUTTON_A_PS;
+    default:
+    case TOUCHPAD_STYLE_ACTIONS:
+        if(GamePaused || GameMenu)
+            return GFX_t::BUTTON_A_DO;
+        else if(GameOutro)
+            return GFX_t::BUTTON_A_BLANK;
+        else if(LevelSelect)
+            return GFX_t::BUTTON_A_ENTER;
+        else
+            return GFX_t::BUTTON_A_JUMP;
+    }
+}
+
+static int buttonX()
+{
+    switch(s_touchPadStyle)
+    {
+    case TPUCHPAD_STYLE_ABXY:
+        return GFX_t::BUTTON_X;
+    case TPUCHPAD_STYLE_XODA:
+        return GFX_t::BUTTON_X_PS;
+    default:
+    case TOUCHPAD_STYLE_ACTIONS:
+        if(GamePaused || GameMenu)
+            return GFX_t::BUTTON_X_BACK;
+        else if(LevelSelect || GameOutro)
+            return GFX_t::BUTTON_X_BLANK;
+        else
+        {
+            if(numPlayers >= 1)
+            {
+                auto &p = Player[1];
+                if(p.Character == 5 || p.State == 4 || p.State == 5)
+                    return GFX_t::BUTTON_X_SWORD;
+                else if(p.State < 3)
+                    return GFX_t::BUTTON_X_RUN;
+                else if(p.State == 3 || p.State == 7)
+                    return GFX_t::BUTTON_X_FIRE;
+                else if(p.State == 6)
+                {
+                    switch(p.Character)
+                    {
+                    default:
+                    case 1:
+                    case 2:
+                        return GFX_t::BUTTON_X_HAMMER;
+                    case 3:
+                        return GFX_t::BUTTON_X_BOMB;
+                    case 4:
+                        return GFX_t::BUTTON_X_BUMERANG;
+                    case 5:
+                        return GFX_t::BUTTON_X_SWORD;
+                    }
+                }
+            }
+            return GFX_t::BUTTON_X_BLANK;
+        }
+    }
+}
+
+static int buttonB()
+{
+    switch(s_touchPadStyle)
+    {
+    case TPUCHPAD_STYLE_ABXY:
+        return GFX_t::BUTTON_B;
+    case TPUCHPAD_STYLE_XODA:
+        return GFX_t::BUTTON_B_PS;
+    default:
+    case TOUCHPAD_STYLE_ACTIONS:
+        if(LevelSelect || GamePaused || GameMenu || GameOutro)
+            return GFX_t::BUTTON_B_BLANK;
+        else
+        {
+            if(numPlayers >= 1)
+            {
+                auto &p = Player[1];
+                if(p.Character <= 2 || p.Character == 4)
+                    return GFX_t::BUTTON_B_SPINJUMP;
+                else
+                    return GFX_t::BUTTON_B_JUMP;
+            }
+            return GFX_t::BUTTON_B_BLANK;
+        }
+    }
+}
+
+static int buttonY()
+{
+    switch(s_touchPadStyle)
+    {
+    case TPUCHPAD_STYLE_ABXY:
+        return GFX_t::BUTTON_Y;
+    case TPUCHPAD_STYLE_XODA:
+        return GFX_t::BUTTON_Y_PS;
+    default:
+    case TOUCHPAD_STYLE_ACTIONS:
+        if(LevelSelect || GamePaused || GameMenu || GameOutro)
+            return GFX_t::BUTTON_Y_BLANK;
+        else
+        {
+            if(numPlayers >= 1)
+            {
+                auto &p = Player[1];
+                if(p.State == 5)
+                    return GFX_t::BUTTON_Y_STATUE;
+                if(p.Character == 5 || p.State == 4)
+                    return GFX_t::BUTTON_Y_SWORD;
+                else if(p.State < 3)
+                    return GFX_t::BUTTON_Y_RUN;
+                else if(p.State == 3 || p.State == 7)
+                    return GFX_t::BUTTON_Y_FIRE;
+                else if(p.State == 6)
+                {
+                    switch(p.Character)
+                    {
+                        default:
+                        case 1:
+                        case 2:
+                            return GFX_t::BUTTON_Y_HAMMER;
+                        case 3:
+                            return GFX_t::BUTTON_Y_BOMB;
+                        case 4:
+                            return GFX_t::BUTTON_Y_BUMERANG;
+                        case 5:
+                            return GFX_t::BUTTON_Y_SWORD;
+                    }
+                }
+            }
+            return GFX_t::BUTTON_Y_BLANK;
+        }
+    }
+}
+
+
 static struct TouchKeyMap
 {
     struct KeyPos
@@ -183,26 +372,7 @@ static struct TouchKeyMap
     float touchCanvasHeight = 600.0f;
 
     //! List of key hit boxes
-    KeyPos touchKeysMap[TouchScreenController::key_END] =
-    {
-        /* Note that order of keys must match the TouchScreenController::commands enum!!! */
-        {331.0f, 537.0f, 482.0f,  587.0f, TouchScreenController::key_start},
-        {1.0f, 410.0f, 83.0f,  492.0f, TouchScreenController::key_left},
-        {165.0f, 410.0f, 247.0f,  492.0f, TouchScreenController::key_right},
-        {83.0f, 328.0f, 165.0f,  410.0f, TouchScreenController::key_up},
-        {83.0f, 492.0f, 165.0f,  574.0f, TouchScreenController::key_down},
-        {1.0f, 328.0f, 83.0f,  410.0f, TouchScreenController::key_upleft},
-        {165.0f, 328.0f, 247.0f,  410.0f, TouchScreenController::key_upright},
-        {1.0f, 492.0f, 83.0f,  574.0f, TouchScreenController::key_downleft},
-        {165.0f, 492.0f, 247.0f,  574.0f, TouchScreenController::key_downright},
-        {770.0f, 396.0f, 877.0f,  487.0f, TouchScreenController::key_run},
-        {888.0f, 431.0f, 995.0f,  522.0f, TouchScreenController::key_jump},
-        {780.0f, 290.0f, 887.0f,  381.0f, TouchScreenController::key_altrun},
-        {898.0f, 325.0f, 1005.0f,  416.0f, TouchScreenController::key_altjump},
-        {542.0f, 537.0f, 693.0f,  587.0f, TouchScreenController::key_drop},
-        {807.0f, 150.0f, 914.0f,  180.0f, TouchScreenController::key_holdRun},
-        {10.0f, 10.0f, 70.0f,  70.0f, TouchScreenController::key_toggleKeysView},
-    };
+    KeyPos touchKeysMap[TouchScreenController::key_END];
 
     TouchKeyMap()
     {
@@ -278,11 +448,163 @@ static struct TouchKeyMap
 
 } g_touchKeyMap;
 
+/*-----------------------Screen size depending layouts ----------------------------------*/
+/************************************************
+ * Please use this tool to edit these layouts:  *
+ * https://github.com/Wohlstand/TouchpadTuner   *
+ ************************************************/
+
+static const TouchKeyMap::KeyPos c_4_tinyPhoneMap[TouchScreenController::key_END] =
+{
+    /* Note that order of keys must match the TouchScreenController::commands enum!!! */
+    {335.0f, 12.0f, 451.0f, 52.0f, TouchScreenController::key_start},
+    {11.0f, 262.0f, 91.0f, 342.0f, TouchScreenController::key_left},
+    {171.0f, 262.0f, 251.0f, 342.0f, TouchScreenController::key_right},
+    {91.0f, 182.0f, 171.0f, 262.0f, TouchScreenController::key_up},
+    {91.0f, 342.0f, 171.0f, 422.0f, TouchScreenController::key_down},
+    {11.0f, 182.0f, 91.0f, 262.0f, TouchScreenController::key_upleft},
+    {171.0f, 182.0f, 251.0f, 262.0f, TouchScreenController::key_upright},
+    {11.0f, 342.0f, 91.0f, 422.0f, TouchScreenController::key_downleft},
+    {171.0f, 342.0f, 251.0f, 422.0f, TouchScreenController::key_downright},
+    {396.0f, 276.0f, 493.0f, 373.0f, TouchScreenController::key_run},
+    {512.0f, 307.0f, 609.0f, 404.0f, TouchScreenController::key_jump},
+    {416.0f, 163.0f, 513.0f, 260.0f, TouchScreenController::key_altrun},
+    {531.0f, 191.0f, 628.0f, 288.0f, TouchScreenController::key_altjump},
+    {196.0f, 12.0f, 312.0f, 52.0f, TouchScreenController::key_drop},
+    {494.0f, 50.0f, 618.0f, 97.0f, TouchScreenController::key_holdRun},
+    {10.0f, 10.0f, 64.0f, 64.0f, TouchScreenController::key_toggleKeysView},
+};
+
+static const TouchKeyMap::KeyPos c_averagePhoneMap[TouchScreenController::key_END] =
+{
+    /* Note that order of keys must match the TouchScreenController::commands enum!!! */
+    {542.0f, 537.0f, 693.0f, 587.0f, TouchScreenController::key_start},
+    {1.0f, 410.0f, 83.0f, 492.0f, TouchScreenController::key_left},
+    {165.0f, 410.0f, 247.0f, 492.0f, TouchScreenController::key_right},
+    {83.0f, 328.0f, 165.0f, 410.0f, TouchScreenController::key_up},
+    {83.0f, 492.0f, 165.0f, 574.0f, TouchScreenController::key_down},
+    {1.0f, 328.0f, 83.0f, 410.0f, TouchScreenController::key_upleft},
+    {165.0f, 328.0f, 247.0f, 410.0f, TouchScreenController::key_upright},
+    {1.0f, 492.0f, 83.0f, 574.0f, TouchScreenController::key_downleft},
+    {165.0f, 492.0f, 247.0f, 574.0f, TouchScreenController::key_downright},
+    {764.0f, 403.0f, 868.0f, 507.0f, TouchScreenController::key_run},
+    {885.0f, 436.0f, 989.0f, 540.0f, TouchScreenController::key_jump},
+    {786.0f, 287.0f, 890.0f, 391.0f, TouchScreenController::key_altrun},
+    {904.0f, 317.0f, 1008.0f, 421.0f, TouchScreenController::key_altjump},
+    {331.0f, 537.0f, 482.0f, 587.0f, TouchScreenController::key_drop},
+    {827.0f, 129.0f, 943.0f, 169.0f, TouchScreenController::key_holdRun},
+    {10.0f, 10.0f, 70.0f, 70.0f, TouchScreenController::key_toggleKeysView},
+};
+
+static const TouchKeyMap::KeyPos c_averagePhoneLongMap[TouchScreenController::key_END] =
+{
+    /* Note that order of keys must match the TouchScreenController::commands enum!!! */
+    {727.0f, 632.0f, 911.0f, 691.0f, TouchScreenController::key_start},
+    {5.0f, 444.0f, 106.0f, 545.0f, TouchScreenController::key_left},
+    {207.0f, 444.0f, 308.0f, 545.0f, TouchScreenController::key_right},
+    {106.0f, 343.0f, 207.0f, 444.0f, TouchScreenController::key_up},
+    {106.0f, 545.0f, 207.0f, 646.0f, TouchScreenController::key_down},
+    {5.0f, 343.0f, 106.0f, 444.0f, TouchScreenController::key_upleft},
+    {207.0f, 343.0f, 308.0f, 444.0f, TouchScreenController::key_upright},
+    {5.0f, 545.0f, 106.0f, 646.0f, TouchScreenController::key_downleft},
+    {207.0f, 545.0f, 308.0f, 646.0f, TouchScreenController::key_downright},
+    {1055.0f, 500.0f, 1183.0f, 628.0f, TouchScreenController::key_run},
+    {1218.0f, 537.0f, 1346.0f, 665.0f, TouchScreenController::key_jump},
+    {1085.0f, 351.0f, 1213.0f, 479.0f, TouchScreenController::key_altrun},
+    {1242.0f, 389.0f, 1370.0f, 517.0f, TouchScreenController::key_altjump},
+    {474.0f, 632.0f, 658.0f, 691.0f, TouchScreenController::key_drop},
+    {1178.0f, 214.0f, 1315.0f, 275.0f, TouchScreenController::key_holdRun},
+    {10.0f, 10.0f, 85.0f, 85.0f, TouchScreenController::key_toggleKeysView},
+};
+
+static const TouchKeyMap::KeyPos c_7_tablet[TouchScreenController::key_END] =
+{
+    /* Note that order of keys must match the TouchScreenController::commands enum!!! */
+    {636.0f, 544.0f, 775.0f, 582.0f, TouchScreenController::key_start},
+    {3.0f, 430.0f, 76.0f, 503.0f, TouchScreenController::key_left},
+    {149.0f, 430.0f, 222.0f, 503.0f, TouchScreenController::key_right},
+    {76.0f, 357.0f, 149.0f, 430.0f, TouchScreenController::key_up},
+    {76.0f, 503.0f, 149.0f, 576.0f, TouchScreenController::key_down},
+    {3.0f, 357.0f, 76.0f, 430.0f, TouchScreenController::key_upleft},
+    {149.0f, 357.0f, 222.0f, 430.0f, TouchScreenController::key_upright},
+    {3.0f, 503.0f, 76.0f, 576.0f, TouchScreenController::key_downleft},
+    {149.0f, 503.0f, 222.0f, 576.0f, TouchScreenController::key_downright},
+    {797.0f, 439.0f, 887.0f, 529.0f, TouchScreenController::key_run},
+    {897.0f, 463.0f, 987.0f, 553.0f, TouchScreenController::key_jump},
+    {819.0f, 341.0f, 909.0f, 431.0f, TouchScreenController::key_altrun},
+    {919.0f, 363.0f, 1009.0f, 453.0f, TouchScreenController::key_altjump},
+    {257.0f, 544.0f, 396.0f, 582.0f, TouchScreenController::key_drop},
+    {873.0f, 226.0f, 968.0f, 258.0f, TouchScreenController::key_holdRun},
+    {10.0f, 10.0f, 58.0f, 58.0f, TouchScreenController::key_toggleKeysView},
+};
+
+static const TouchKeyMap::KeyPos c_10_6_tablet[TouchScreenController::key_END] =
+{
+    /* Note that order of keys must match the TouchScreenController::commands enum!!! */
+    {869.0f, 753.0f, 1002.0f, 785.0f, TouchScreenController::key_start},
+    {19.0f, 591.0f, 89.0f, 661.0f, TouchScreenController::key_left},
+    {159.0f, 591.0f, 229.0f, 661.0f, TouchScreenController::key_right},
+    {89.0f, 521.0f, 159.0f, 591.0f, TouchScreenController::key_up},
+    {89.0f, 661.0f, 159.0f, 731.0f, TouchScreenController::key_down},
+    {19.0f, 521.0f, 89.0f, 591.0f, TouchScreenController::key_upleft},
+    {159.0f, 521.0f, 229.0f, 591.0f, TouchScreenController::key_upright},
+    {19.0f, 661.0f, 89.0f, 731.0f, TouchScreenController::key_downleft},
+    {159.0f, 661.0f, 229.0f, 731.0f, TouchScreenController::key_downright},
+    {1047.0f, 588.0f, 1137.0f, 678.0f, TouchScreenController::key_run},
+    {1159.0f, 624.0f, 1249.0f, 714.0f, TouchScreenController::key_jump},
+    {1067.0f, 477.0f, 1157.0f, 567.0f, TouchScreenController::key_altrun},
+    {1179.0f, 505.0f, 1269.0f, 595.0f, TouchScreenController::key_altjump},
+    {256.0f, 753.0f, 389.0f, 785.0f, TouchScreenController::key_drop},
+    {1131.0f, 387.0f, 1225.0f, 426.0f, TouchScreenController::key_holdRun},
+    {10.0f, 10.0f, 57.0f, 57.0f, TouchScreenController::key_toggleKeysView},
+};
+/*---------------------------------------------------------------------------------------*/
+
+static void initTouchMap()
+{
+    if(s_screenSize >= 9.0) // Big tablets
+    {
+        g_touchKeyMap.touchCanvasWidth = 1300.0f;
+        g_touchKeyMap.touchCanvasHeight = 812.0f;
+        SDL_memcpy(g_touchKeyMap.touchKeysMap, c_10_6_tablet, sizeof(g_touchKeyMap.touchKeysMap));
+    }
+    else if(s_screenSize >= 7.0) // Middle tablets
+    {
+        g_touchKeyMap.touchCanvasWidth = 1024.0f;
+        g_touchKeyMap.touchCanvasHeight = 600.0f;
+        SDL_memcpy(g_touchKeyMap.touchKeysMap, c_7_tablet, sizeof(g_touchKeyMap.touchKeysMap));
+    }
+    else if(s_screenSize < 4.0) // Very small phones
+    {
+        g_touchKeyMap.touchCanvasWidth = 640.0f;
+        g_touchKeyMap.touchCanvasHeight = 480.0f;
+        SDL_memcpy(g_touchKeyMap.touchKeysMap, c_4_tinyPhoneMap, sizeof(g_touchKeyMap.touchKeysMap));
+    }
+    else // All other devices
+    {
+        // Longer screens (big ration between sides, more like a stick)
+        if((s_screenWidth / s_screenHeight) > 1.6f)
+        {
+            g_touchKeyMap.touchCanvasWidth = 1396.0f;
+            g_touchKeyMap.touchCanvasHeight = 720.0f;
+            SDL_memcpy(g_touchKeyMap.touchKeysMap, c_averagePhoneLongMap, sizeof(g_touchKeyMap.touchKeysMap));
+        }
+        else // Shorter screens (smaller ratio between sides, more like a square)
+        {
+            g_touchKeyMap.touchCanvasWidth = 1024.0f;
+            g_touchKeyMap.touchCanvasHeight = 600.0f;
+            SDL_memcpy(g_touchKeyMap.touchKeysMap, c_averagePhoneMap, sizeof(g_touchKeyMap.touchKeysMap));
+        }
+    }
+}
+
 TouchScreenController::TouchScreenController() = default;
 TouchScreenController::~TouchScreenController() = default;
 
 void TouchScreenController::init()
 {
+    initTouchMap();
+
     for(int key = key_BEGIN; key < key_END; ++key)
         m_keysHeld[key] = false;
     m_touchHidden = !s_showTouchscreenOnStart;
@@ -292,6 +614,7 @@ void TouchScreenController::init()
     D_pLogDebug("Found %d touch devices, screen size: %d x %d",
                 m_touchDevicesCount,
                 m_screenWidth, m_screenHeight);
+    pLogDebug("The screen size: %g inches (%g x %g)", s_screenSize, s_screenWidth, s_screenHeight);
 }
 
 void TouchScreenController::updateScreenSize()
@@ -518,23 +841,23 @@ void TouchScreenController::render()
         if((m_touchHidden && key != TouchScreenController::key_toggleKeysView) || LoadingInProcess)
             key = TouchScreenController::key_toggleKeysView;
         const auto &k = g_touchKeyMap.touchKeysMap[key];
-        int x1 = std::round((k.x1 / g_touchKeyMap.touchCanvasWidth) * m_screenWidth);
-        int y1 = std::round((k.y1 / g_touchKeyMap.touchCanvasHeight) * m_screenHeight);
-        int x2 = std::round((k.x2 / g_touchKeyMap.touchCanvasWidth) * m_screenWidth);
-        int y2 = std::round((k.y2 / g_touchKeyMap.touchCanvasHeight) * m_screenHeight);
+        int x1 = Maths::iRound((k.x1 / g_touchKeyMap.touchCanvasWidth) * float(m_screenWidth));
+        int y1 = Maths::iRound((k.y1 / g_touchKeyMap.touchCanvasHeight) * float(m_screenHeight));
+        int x2 = Maths::iRound((k.x2 / g_touchKeyMap.touchCanvasWidth) * float(m_screenWidth));
+        int y2 = Maths::iRound((k.y2 / g_touchKeyMap.touchCanvasHeight) * float(m_screenHeight));
         int w = x2 - x1;
         int h = y2 - y1;
         float r = 1.0f;
         float g = 0.0f;
 
-        if(key == key_holdRun && m_runHeld)
-        {
-            r = 0.f;
-            g = 1.f;
-        }
+//        if(key == key_holdRun && m_runHeld)
+//        {
+//            r = 0.f;
+//            g = 1.f;
+//        }
 
 #ifdef __ANDROID__
-        float a = m_keysHeld[key] ? 0.9f : 0.5f;
+        float a = m_keysHeld[key] ? 0.9f : 0.3f;
 
         switch(key)
         {
@@ -553,10 +876,10 @@ void TouchScreenController::render()
             frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[GFX_t::BUTTON_UP], 1.f, 1.f, 1.f, a);
             break;
         case TouchScreenController::key_left:
-            frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[GFX_t::BUTTON_LEFT], 1.f, 1.f, 1.f, a);
+            frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[buttonLeft()], 1.f, 1.f, 1.f, a);
             break;
         case TouchScreenController::key_right:
-            frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[GFX_t::BUTTON_RIGHT], 1.f, 1.f, 1.f, a);
+            frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[buttonRight()], 1.f, 1.f, 1.f, a);
             break;
         case TouchScreenController::key_down:
             frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[GFX_t::BUTTON_DOWN], 1.f, 1.f, 1.f, a);
@@ -581,16 +904,16 @@ void TouchScreenController::render()
                                        1.f, 1.f, 1.f, a);
             break;
         case TouchScreenController::key_jump:
-            frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[GFX_t::BUTTON_A], 1.f, 1.f, 1.f, a);
+            frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[buttonA()], 1.f, 1.f, 1.f, a);
             break;
         case TouchScreenController::key_run:
-            frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[GFX_t::BUTTON_X], 1.f, 1.f, 1.f, a);
+            frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[buttonX()], 1.f, 1.f, 1.f, a);
             break;
         case TouchScreenController::key_altjump:
-            frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[GFX_t::BUTTON_B], 1.f, 1.f, 1.f, a);
+            frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[buttonB()], 1.f, 1.f, 1.f, a);
             break;
         case TouchScreenController::key_altrun:
-            frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[GFX_t::BUTTON_Y], 1.f, 1.f, 1.f, a);
+            frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[buttonY()], 1.f, 1.f, 1.f, a);
             break;
         default:
             frmMain.renderRect(x1, y1, w, h, r, g, 0.f, 0.3f);

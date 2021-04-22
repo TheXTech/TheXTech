@@ -1054,36 +1054,43 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
         Effect[numEffects].Location.SpeedX = 0;
         Effect[numEffects].Shadow = Shadow;
         tempBool = false;
+
         if(A == 114) // Change height for the background
         {
             for(B = 1; B <= numBackground; B++)
             {
-                if(Background[B].Type == 82 || Background[B].Type == 26 || Background[B].Type == 65 || Background[B].Type == 159 || Background[B].Type == 166 || Background[B].Type == 168)
+                auto &b = Background[B];
+                if(b.Type == 82 || b.Type == 26 || b.Type == 65 || b.Type == 159 || b.Type == 166 || b.Type == 168)
                 {
-                    if(CheckCollision(Effect[numEffects].Location, Background[B].Location) == true)
+                    auto t = b.Location;
+                    if(t.Height > 8)
+                        t.Height = 8; // Limit the height
+                    if(CheckCollision(Effect[numEffects].Location, t))
                     {
-                        if(Background[B].Type == 82 || Background[B].Type == 159)
-                            Effect[numEffects].Location.Y = Background[B].Location.Y - Effect[numEffects].Location.Height + 12;
-                        if(Background[B].Type == 26)
-                            Effect[numEffects].Location.Y = Background[B].Location.Y - Effect[numEffects].Location.Height + 6;
-                        if(Background[B].Type == 168)
-                            Effect[numEffects].Location.Y = Background[B].Location.Y - Effect[numEffects].Location.Height + 8;
-                        if(Background[B].Type == 166)
-                            Effect[numEffects].Location.Y = Background[B].Location.Y - Effect[numEffects].Location.Height + 10;
-                        if(Background[B].Type == 65)
-                            Effect[numEffects].Location.Y = Background[B].Location.Y - Effect[numEffects].Location.Height + 16;
+                        if(b.Type == 82 || b.Type == 159)
+                            Effect[numEffects].Location.Y = b.Location.Y - Effect[numEffects].Location.Height + 12;
+                        if(b.Type == 26)
+                            Effect[numEffects].Location.Y = b.Location.Y - Effect[numEffects].Location.Height + 6;
+                        if(b.Type == 168)
+                            Effect[numEffects].Location.Y = b.Location.Y - Effect[numEffects].Location.Height + 8;
+                        if(b.Type == 166)
+                            Effect[numEffects].Location.Y = b.Location.Y - Effect[numEffects].Location.Height + 10;
+                        if(b.Type == 65)
+                            Effect[numEffects].Location.Y = b.Location.Y - Effect[numEffects].Location.Height + 16;
                         tempBool = true;
                         break;
                     }
                 }
             }
         }
+
         Effect[numEffects].Frame = 0;
         Effect[numEffects].Life = 300;
         Effect[numEffects].NewNpc = NewNpc;
         Effect[numEffects].Type = A;
-        if(tempBool == false && A == 114)
-            numEffects = numEffects - 1;
+
+        if(!tempBool && A == 114)
+            numEffects -= 1;
     }
     else if(A == 109) // Spike Top
     {

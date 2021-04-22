@@ -41,6 +41,8 @@ const int maxYoshiGfx = 10;
 
 const int maxStarsNum = 1000;
 
+const int maxLocalPlayers = 2;
+
 //Public Const vScreenYOffset As Integer = 0     'Players Y on the screen
 const int vScreenYOffset = 0;
 //Public Const maxBlocks As Integer = 20000  'Max # of blocks

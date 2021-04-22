@@ -42,6 +42,9 @@ struct Compatibility_t
     bool fix_skull_raft;
     bool fix_peach_escape_shell_surf;
     bool fix_keyhole_framerate;
+    bool fix_link_clowncar_fairy;
+    bool fix_dont_switch_player_by_clowncar;
+    bool enable_multipoints;
 };
 
 extern Compatibility_t g_compatibility;

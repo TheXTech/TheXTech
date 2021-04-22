@@ -103,6 +103,12 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
     SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight");
 #endif
 
+#if defined(__ANDROID__)
+    SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 5);
+    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 6);
+    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 5);
+#endif
+
     Uint32 sdlInitFlags = 0;
     // Prepare flags for SDL initialization
 #ifndef __EMSCRIPTEN__
@@ -112,8 +118,7 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
     sdlInitFlags |= SDL_INIT_VIDEO;
     sdlInitFlags |= SDL_INIT_EVENTS;
     sdlInitFlags |= SDL_INIT_JOYSTICK;
-    //(Cool thing, but is not needed yet)
-    //sdlInitFlags |= SDL_INIT_HAPTIC;
+    sdlInitFlags |= SDL_INIT_HAPTIC;
     sdlInitFlags |= SDL_INIT_GAMECONTROLLER;
 
     // Initialize SDL
@@ -268,7 +273,7 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
     // Clean-up from a possible start-up junk
     clearBuffer();
 
-    SDL_SetRenderTarget(m_gRenderer, m_tBuffer);
+    setTargetTexture();
 
     SDL_SetRenderDrawBlendMode(m_gRenderer, SDL_BLENDMODE_BLEND);
 
@@ -278,6 +283,8 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
 
     // Clean-up the texture buffer from the same start-up junk
     clearBuffer();
+
+    setTargetScreen();
 
     repaint();
     doEvents();
@@ -293,7 +300,7 @@ void FrmMain::freeSDL()
 {
     GFX.unLoad();
     clearAllTextures();
-    CloseJoysticks();
+    joyCloseJoysticks();
 
 #ifndef __EMSCRIPTEN__
     m_gif.quit();
@@ -344,6 +351,12 @@ void FrmMain::processEvent()
     case SDL_QUIT:
         showCursor(1);
         KillIt();
+        break;
+    case SDL_JOYDEVICEADDED:
+        joyDeviceAddEvent(&m_event.jdevice);
+        break;
+    case SDL_JOYDEVICEREMOVED:
+        joyDeviceRemoveEvent(&m_event.jdevice);
         break;
     case SDL_WINDOWEVENT:
         if((m_event.window.event == SDL_WINDOWEVENT_RESIZED) || (m_event.window.event == SDL_WINDOWEVENT_MOVED))
@@ -448,6 +461,8 @@ void FrmMain::eventKeyDown(SDL_KeyboardEvent &evt)
 #ifndef __EMSCRIPTEN__
     if(KeyCode == SDL_SCANCODE_F12)
         TakeScreen = true;
+    else if(KeyCode == SDL_SCANCODE_F3)
+        g_stats.enabled = !g_stats.enabled;
 #   ifdef __APPLE__
     else if(KeyCode == SDL_SCANCODE_F10) // Reserved by macOS as "show desktop"
 #   else
@@ -635,11 +650,11 @@ void FrmMain::repaint()
     int w, h, off_x, off_y, wDst, hDst;
     float scale_x, scale_y;
 
+    setTargetScreen();
+
 #ifndef __EMSCRIPTEN__
     processRecorder();
 #endif
-
-    SDL_SetRenderTarget(m_gRenderer, nullptr);
 
     // Get the size of surface where to draw the scene
     SDL_GetRendererOutputSize(m_gRenderer, &w, &h);
@@ -682,7 +697,6 @@ void FrmMain::repaint()
 #endif
 
     SDL_RenderPresent(m_gRenderer);
-    SDL_SetRenderTarget(m_gRenderer, m_tBuffer);
 }
 
 void FrmMain::updateViewport()
@@ -761,6 +775,22 @@ void FrmMain::offsetViewport(int x, int y)
         viewport_offset_x = x;
         viewport_offset_y = y;
     }
+}
+
+void FrmMain::setTargetTexture()
+{
+    if(m_recentTarget == m_tBuffer)
+        return;
+    SDL_SetRenderTarget(m_gRenderer, m_tBuffer);
+    m_recentTarget = m_tBuffer;
+}
+
+void FrmMain::setTargetScreen()
+{
+    if(m_recentTarget == nullptr)
+        return;
+    SDL_SetRenderTarget(m_gRenderer, nullptr);
+    m_recentTarget = nullptr;
 }
 
 StdPicture FrmMain::LoadPicture(std::string path, std::string maskPath, std::string maskFallbackPath)
@@ -1305,12 +1335,15 @@ void FrmMain::processRecorder()
     if(!m_gif.enabled)
         return;
 
+    setTargetTexture();
+
     m_gif.delayTimer += int(1000.0 / 65.0);
     if(m_gif.delayTimer >= m_gif.delay * 10)
         m_gif.delayTimer = 0.0;
     if(m_gif.doFinalize || (m_gif.delayTimer != 0.0))
     {
         m_gif.drawRecCircle();
+        setTargetScreen();
         return;
     }
 
@@ -1320,6 +1353,7 @@ void FrmMain::processRecorder()
     if(!pixels)
     {
         pLogCritical("Can't allocate memory for a next GIF frame: out of memory");
+        setTargetScreen();
         return; // Drop frame (out of memory)
     }
 
@@ -1335,6 +1369,7 @@ void FrmMain::processRecorder()
     m_gif.enqueue(shoot);
 
     m_gif.drawRecCircle();
+    setTargetScreen();
 }
 
 int FrmMain::processRecorder_action(void *_recorder)
@@ -1378,7 +1413,7 @@ int FrmMain::makeShot_action(void *_pixels)
     {
         delete []shoot->pixels;
         shoot->pixels = nullptr;
-        delete []shoot;
+        delete shoot;
         me->m_screenshot_thread = nullptr;
         return 0;
     }
@@ -1422,7 +1457,7 @@ int FrmMain::makeShot_action(void *_pixels)
     FreeImage_Unload(shotImg);
     delete []shoot->pixels;
     shoot->pixels = nullptr;
-    delete []shoot;
+    delete shoot;
 
     me->m_screenshot_thread = nullptr;
     return 0;

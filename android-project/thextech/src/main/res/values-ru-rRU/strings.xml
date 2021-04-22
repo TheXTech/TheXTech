@@ -18,4 +18,5 @@
     <string name="setup_sr_speedrunMode">Режим спидраннера</string>
     <string name="setup_speedrunner">Скоростное прохождение</string>
     <string name="setup_sr_stopwatchSemiTransparent">Сделать секундомер прозрачным</string>
+    <string name="setup_touchpad_style">Стиль контроллера</string>
 </resources>

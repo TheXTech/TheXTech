@@ -32,6 +32,7 @@
 #include "../sound.h"
 #include "../custom.h"
 #include "../compat.h"
+#include "../main/trees.h"
 #include "level_file.h"
 
 #include <Utils/strings.h>
@@ -47,6 +48,7 @@ void OpenWorld(std::string FilePath)
     int FileRelease = 64;
     int A = 0;
     int B = 0;
+    long long zCounter = 0;
     WorldData wld;
     DirListCI dirEpisode;
 
@@ -110,6 +112,7 @@ void OpenWorld(std::string FilePath)
         }
     }
 
+    zCounter = 0;
     for(auto &t : wld.tiles)
     {
         numTiles++;
@@ -128,14 +131,17 @@ void OpenWorld(std::string FilePath)
         terra.Type = int(t.id);
         terra.Location.Width = TileWidth[terra.Type];
         terra.Location.Height = TileHeight[terra.Type];
+        terra.Z = zCounter++;
+        treeWorldTileAdd(&terra);
 
-        if(terra.Type > maxTileType) // Drop ID to 1 for Tiles of out of range IDs
+        if(IF_OUTRANGE(terra.Type, 1, maxTileType)) // Drop ID to 1 for Tiles of out of range IDs
         {
             pLogWarning("TILE-%d ID is out of range (max types %d), reset to TILE-1", terra.Type, maxTileType);
             terra.Type = 1;
         }
     }
 
+    zCounter = 0;
     for(auto &s : wld.scenery)
     {
         numScenes++;
@@ -155,14 +161,17 @@ void OpenWorld(std::string FilePath)
         scene.Location.Width = SceneWidth[scene.Type];
         scene.Location.Height = SceneHeight[scene.Type];
         scene.Active = true;
+        scene.Z = zCounter++;
+        treeWorldSceneAdd(&scene);
 
-        if(scene.Type > maxSceneType) // Drop ID to 1 for Scenery of out of range IDs
+        if(IF_OUTRANGE(scene.Type, 1, maxSceneType)) // Drop ID to 1 for Scenery of out of range IDs
         {
             pLogWarning("TILE-%d ID is out of range (max types %d), reset to TILE-1", scene.Type, maxSceneType);
             scene.Type = 1;
         }
     }
 
+    zCounter = 0;
     for(auto &p : wld.paths)
     {
         numWorldPaths++;
@@ -176,22 +185,26 @@ void OpenWorld(std::string FilePath)
 
         pp = WorldPath_t();
 
+        pp.index = numWorldPaths;
         pp.Location.X = p.x;
         pp.Location.Y = p.y;
         pp.Type = int(p.id);
         pp.Location.Width = 32;
         pp.Location.Height = 32;
         pp.Active = false;
+        pp.Z = zCounter++;
+        treeWorldPathAdd(&pp);
 //        if(LevelEditor == true)
 //            pp.Active = true;
 
-        if(pp.Type > maxPathType) // Drop ID to 1 for Path of out of range IDs
+        if(IF_OUTRANGE(pp.Type, 1, maxPathType)) // Drop ID to 1 for Path of out of range IDs
         {
             pLogWarning("PATH-%d ID is out of range (max types %d), reset to PATH-1", pp.Type, maxPathType);
             pp.Type = 1;
         }
     }
 
+    zCounter = 0;
     for(auto &l : wld.levels)
     {
         numWorldLevels++;
@@ -205,6 +218,7 @@ void OpenWorld(std::string FilePath)
 
         ll = WorldLevel_t();
 
+        ll.index = numWorldLevels;
         ll.Location.X = l.x;
         ll.Location.Y = l.y;
         ll.Type = int(l.id);
@@ -224,14 +238,17 @@ void OpenWorld(std::string FilePath)
         ll.WarpX = l.gotox;
         ll.WarpY = l.gotoy;
         ll.Path2 = l.bigpathbg;
+        ll.Z = zCounter++;
+        treeWorldLevelAdd(&ll);
 
-        if(ll.Type > maxLevelType) // Drop ID to 1 for Levels of out of range IDs
+        if(IF_OUTRANGE(ll.Type, 0, maxLevelType)) // Drop ID to 1 for Levels of out of range IDs
         {
             pLogWarning("PATH-%d ID is out of range (max types %d), reset to PATH-1", ll.Type, maxLevelType);
             ll.Type = 1;
         }
     }
 
+    zCounter = 0;
     for(auto &m : wld.music)
     {
         numWorldMusic++;
@@ -255,6 +272,8 @@ void OpenWorld(std::string FilePath)
         box.Location.Height = 30;
         box.Location.Y = box.Location.Y + 1;
         box.Location.X = box.Location.X + 1;
+        box.Z = zCounter++;
+        treeWorldMusicAdd(&box);
     }
 
     LoadCustomGFX();
@@ -279,7 +298,7 @@ void OpenWorld(std::string FilePath)
             if((FileRelease <= 20 && ll.Type == 1) || (FileRelease > 20 && ll.Start))
             {
                 ll.Active = true;
-                LevelPath(A, 5, true);
+                LevelPath(WorldLevel[A], 5, true);
             }
         }
     }
@@ -319,6 +338,8 @@ void ClearWorld()
 //        if(LevelEditor == true)
 //            frmWorld::chkChar(A).Value = 0;
     }
+
+    treeWorldCleanAll();
 
     for(A = 1; A <= numTiles; A++)
         Tile[A] = Tile_t();

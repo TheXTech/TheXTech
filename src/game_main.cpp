@@ -324,7 +324,8 @@ int GameMain(const CmdLineSetup_t &setup)
             resetFrameTimer();
 
             // Update graphics before loop begin (to process an initial lazy-unpacking of used sprites)
-            UpdateGraphics();
+            UpdateGraphics(true);
+            resetFrameTimer();
 
             // Run the frame-loop
             runFrameLoop(&OutroLoop,
@@ -454,7 +455,8 @@ int GameMain(const CmdLineSetup_t &setup)
             resetFrameTimer();
 
             // Update graphics before loop begin (to process inital lazy-unpacking of used sprites)
-            UpdateGraphics();
+            UpdateGraphics(true);
+            resetFrameTimer();
 
             // Main menu loop
             runFrameLoop(&MenuLoop, nullptr, []()->bool{ return GameMenu;});
@@ -510,6 +512,7 @@ int GameMain(const CmdLineSetup_t &setup)
                     GameThing();
                 else
                 {
+                    frmMain.setTargetTexture();
                     frmMain.clearBuffer();
                     frmMain.repaint();
                 }
@@ -544,7 +547,8 @@ int GameMain(const CmdLineSetup_t &setup)
                 GoToLevelNoGameThing = false;
 
                 // Update graphics before loop begin (to process inital lazy-unpacking of used sprites)
-                UpdateGraphics2();
+                UpdateGraphics2(true);
+                resetFrameTimer();
 
                 // 'level select loop
                 runFrameLoop(nullptr, &WorldLoop,
@@ -688,7 +692,8 @@ int GameMain(const CmdLineSetup_t &setup)
             resetFrameTimer();
 
             // Update graphics before loop begin (to process inital lazy-unpacking of used sprites)
-            UpdateGraphics();
+            UpdateGraphics(true);
+            resetFrameTimer();
 
             // MAIN GAME LOOP
             runFrameLoop(nullptr, &GameLoop,
@@ -806,6 +811,7 @@ void NextLevel()
     LevelMacroCounter = 0;
     StopMusic();
     ClearLevel();
+    frmMain.setTargetTexture();
     frmMain.clearBuffer();
     frmMain.repaint();
     DoEvents();
@@ -1105,11 +1111,11 @@ void InitControls()
 //    int B = 0;
     bool newJoystick = false;
 
-    int joysticksCount = InitJoysticks();
+    int joysticksCount = joyInitJoysticks();
 
     for(int i = 0; i < joysticksCount; ++i)
     {
-        newJoystick = StartJoystick(i);
+        newJoystick = joyStartJoystick(i);
         if(newJoystick) {
             A += 1;
         } else {
@@ -1141,82 +1147,36 @@ void InitControls()
     }
     */
 
-//    '
-    useJoystick[1] = 0;
-    useJoystick[2] = 0;
-//    '
+    For(A, 1, maxLocalPlayers)
+        useJoystick[A] = 0;
 
-    For(A, 1, 2)
+    For(A, 1, maxLocalPlayers)
     {
-        {
-            auto &j = conJoystick[A];
-            j.Up.val = SDL_HAT_UP;
-            j.Up.type = ConJoystick_t::JoyHat;
-            j.Up.id = 0;
-            j.Down.val = SDL_HAT_DOWN;
-            j.Down.type = ConJoystick_t::JoyHat;
-            j.Down.id = 0;
-            j.Left.val = SDL_HAT_LEFT;
-            j.Left.id = 0;
-            j.Left.type = ConJoystick_t::JoyHat;
-            j.Right.val = SDL_HAT_RIGHT;
-            j.Right.type = ConJoystick_t::JoyHat;
-            j.Right.id = 0;
-
-            j.Run.id = 2;
-            j.Run.val = 1;
-            j.Run.type = ConJoystick_t::JoyButton;
-
-            j.AltRun.id = 3;
-            j.AltRun.val = 1;
-            j.AltRun.type = ConJoystick_t::JoyButton;
-
-            j.Jump.id = 0;
-            j.Jump.val = 1;
-            j.Jump.type = ConJoystick_t::JoyButton;
-
-            j.AltJump.id = 1;
-            j.AltJump.val = 1;
-            j.AltJump.type = ConJoystick_t::JoyButton;
-
-            j.Drop.id = 6;
-            j.Drop.val = 1;
-            j.Drop.type = ConJoystick_t::JoyButton;
-
-            j.Start.id = 7;
-            j.Start.val = 1;
-            j.Start.type = ConJoystick_t::JoyButton;
-        }
+        joyFillDefaults(conKeyboard[A]);
+        joyFillDefaults(conJoystick[A]);
     }
-
-    conKeyboard[1].Down = vbKeyDown;
-    conKeyboard[1].Left = vbKeyLeft;
-    conKeyboard[1].Up = vbKeyUp;
-    conKeyboard[1].Right = vbKeyRight;
-    conKeyboard[1].Jump = vbKeyZ;
-    conKeyboard[1].Run = vbKeyX;
-    conKeyboard[1].Drop = vbKeyShift;
-    conKeyboard[1].Start = vbKeyEscape;
-    conKeyboard[1].AltJump = vbKeyA;
-    conKeyboard[1].AltRun = vbKeyS;
-
-    conKeyboard[2].Down = vbKeyDown;
-    conKeyboard[2].Left = vbKeyLeft;
-    conKeyboard[2].Up = vbKeyUp;
-    conKeyboard[2].Right = vbKeyRight;
-    conKeyboard[2].Jump = vbKeyZ;
-    conKeyboard[2].Run = vbKeyX;
-    conKeyboard[2].Drop = vbKeyShift;
-    conKeyboard[2].Start = vbKeyEscape;
-    conKeyboard[2].AltJump = vbKeyA;
-    conKeyboard[2].AltRun = vbKeyS;
 
     OpenConfig();
 
-    if(useJoystick[1] > numJoysticks)
-        useJoystick[1] = 0;
-    if(useJoystick[2] > numJoysticks)
-        useJoystick[2] = 0;
+    // Automatically set the joystick if keyboard chosen
+    for(int i = 1; i <= numJoysticks && i <= maxLocalPlayers; i++)
+    {
+        if(useJoystick[i] <= 0 && !wantedKeyboard[i])
+            useJoystick[i] = i;
+    }
+
+    for(int player = 1; player <= maxLocalPlayers; ++player)
+    {
+        if(useJoystick[player] > numJoysticks)
+            useJoystick[player] = 0;
+        else
+        {
+            int jip = useJoystick[player];
+            int ji = jip - 1;
+            if(ji >= 0)
+                joyGetByIndex(player, ji, conJoystick[player]);
+        }
+    }
 }
 
 
@@ -1457,6 +1417,7 @@ void StartBattleMode()
     LevelSelect = false;
     GameMenu = false;
     BattleMode = true;
+    frmMain.setTargetTexture();
     frmMain.clearBuffer();
     frmMain.repaint();
     StopMusic();

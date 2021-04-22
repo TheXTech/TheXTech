@@ -103,9 +103,18 @@ void DoCredits()
         quitKey |= (getKeyState(vbKeyEscape) == KEY_PRESSED);
         quitKey |= (getKeyState(vbKeySpace) == KEY_PRESSED);
         quitKey |= (getKeyState(vbKeyReturn) == KEY_PRESSED);
+        for(int p = 1; p <= maxLocalPlayers; ++p)
+        {
+            if(useJoystick[p] > 0)
+                quitKey |= joyIsKeyDown(useJoystick[p] - 1, conJoystick[p].Start);
+        }
 #ifdef __ANDROID__ // Quit credits on BACK key press
         quitKey |= (getKeyState(SDL_SCANCODE_AC_BACK) == KEY_PRESSED);
 #endif
+#ifdef USE_TOUCHSCREEN_CONTROLLER // Quit when pressed the "Start" on a touchscreen controller
+        quitKey |= CurrentTouchControls().Start;
+#endif
+
         if(quitKey)
         {
             CreditChop = static_cast<float>(screenH_half);
@@ -284,6 +293,10 @@ void SetupCredits()
     AddCredit("ShadowYoshi (Joey)");
     AddCredit("ZeZeinzer"); // Android testing, touchscreen controller button pictures
     AddCredit("LucyZocker"); // Android testing
+    AddCredit("DavFar Gamers"); // Spanish translation of the readme
+    AddCredit("Yingchun Soul"); // Idea for individual iceball shooting SFX and contribution with the "frozen NPC breaking" SFX
+    AddCredit("MrDoubleA"); // Contribution with the "NPC got frozen" SFX
+    AddCredit("Slash-18"); // Contribution with the better iceball shooting SFX
 #endif
     AddCredit("");
     AddCredit("4matsy");

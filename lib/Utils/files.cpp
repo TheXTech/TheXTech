@@ -48,9 +48,9 @@ static std::wstring Str2WStr(const std::string &path)
 #endif
 
 #if defined(__CYGWIN__) || defined(__DJGPP__) || defined(__MINGW32__)
-#define IS_PATH_SEPARATOR(c) (((c) == '/') || ((c) == '\\'))
+#   define IS_PATH_SEPARATOR(c) (((c) == '/') || ((c) == '\\'))
 #else
-#define IS_PATH_SEPARATOR(c) ((c) == '/')
+#   define IS_PATH_SEPARATOR(c) ((c) == '/')
 #endif
 
 static char fi_path_dot[] = ".";
@@ -106,9 +106,9 @@ static char *fi_dirname(char *path)
 
 FILE *Files::utf8_fopen(const char *filePath, const char *modes)
 {
-    #ifndef _WIN32
+#ifndef _WIN32
     return ::fopen(filePath, modes);
-    #else
+#else
     wchar_t wfile[MAX_PATH + 1];
     wchar_t wmode[21];
     int wfile_len = (int)strlen(filePath);
@@ -118,15 +118,15 @@ FILE *Files::utf8_fopen(const char *filePath, const char *modes)
     wfile[wfile_len] = L'\0';
     wmode[wmode_len] = L'\0';
     return ::_wfopen(wfile, wmode);
-    #endif
+#endif
 }
 
 bool Files::fileExists(const std::string &path)
 {
-    #ifdef _WIN32
+#ifdef _WIN32
     std::wstring wpath = Str2WStr(path);
     return PathFileExistsW(wpath.c_str()) == TRUE;
-    #else
+#else
     FILE *ops = fopen(path.c_str(), "rb");
     if(ops)
     {
@@ -134,17 +134,17 @@ bool Files::fileExists(const std::string &path)
         return true;
     }
     return false;
-    #endif
+#endif
 }
 
 bool Files::deleteFile(const std::string &path)
 {
-    #ifdef _WIN32
+#ifdef _WIN32
     std::wstring wpath = Str2WStr(path);
     return (DeleteFileW(wpath.c_str()) == TRUE);
-    #else
+#else
     return ::unlink(path.c_str()) == 0;
-    #endif
+#endif
 }
 
 bool Files::copyFile(const std::string &to, const std::string &from, bool override)
@@ -154,13 +154,13 @@ bool Files::copyFile(const std::string &to, const std::string &from, bool overri
 
     bool ret = true;
 
-    #ifdef _WIN32
+#ifdef _WIN32
 
     std::wstring wfrom  = Str2WStr(from);
     std::wstring wto    = Str2WStr(to);
     ret = (bool)CopyFileW(wfrom.c_str(), wto.c_str(), !override);
 
-    #else
+#else
 
     char    buf[BUFSIZ];
     ssize_t size;
@@ -189,7 +189,7 @@ bool Files::copyFile(const std::string &to, const std::string &from, bool overri
 
     close(source);
     close(dest);
-    #endif
+#endif
 
     return ret;
 }
@@ -260,16 +260,16 @@ bool Files::hasSuffix(const std::string &path, const std::string &suffix)
 bool Files::isAbsolute(const std::string& path)
 {
     bool firstCharIsSlash = (path.size() > 0) ? path[0] == '/' : false;
-    #ifdef _WIN32
+#ifdef _WIN32
     bool containsWinChars = (path.size() > 2) ? (path[1] == ':') && ((path[2] == '\\') || (path[2] == '/')) : false;
     if(firstCharIsSlash || containsWinChars)
     {
         return true;
     }
     return false;
-    #else
+#else
     return firstCharIsSlash;
-    #endif
+#endif
 }
 
 void Files::getGifMask(std::string& mask, const std::string& front)

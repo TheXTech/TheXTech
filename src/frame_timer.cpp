@@ -25,23 +25,83 @@
 
 #include <SDL2/SDL_timer.h>
 
-#ifdef _WIN32
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#include <time.h>
-#include <chrono>
-#endif
-
-#if defined(__EMSCRIPTEN__)
-#include <time.h>
-#endif
-
+#include <fmt_format_ne.h>
 #include <Logger/logger.h>
 #include "pge_delay.h"
 
 #include "frame_timer.h"
 #include "globals.h"
 #include "graphics.h"
+
+
+PerformanceStats_t g_stats;
+
+void PerformanceStats_t::reset()
+{
+   renderedBlocks = 0;
+   renderedSzBlocks = 0;
+   renderedBGOs = 0;
+   renderedNPCs = 0;
+   renderedEffects = 0;
+
+   checkedBlocks = 0;
+   checkedSzBlocks = 0;
+   checkedBGOs = 0;
+   checkedNPCs = 0;
+   checkedEffects = 0;
+
+   renderedTiles = 0;
+   renderedScenes = 0;
+   renderedPaths = 0;
+   renderedLevels = 0;
+
+   checkedTiles = 0;
+   checkedScenes = 0;
+   checkedPaths = 0;
+   checkedLevels = 0;
+
+   physScannedBlocks = 0;
+   physScannedBGOs = 0;
+   physScannedNPCs = 0;
+}
+
+void PerformanceStats_t::print()
+{
+    if(!enabled)
+        return;
+
+    if(LevelSelect && !GameMenu)
+    {
+        SuperPrint(fmt::sprintf_ne("DRAW: T=%03d S=%03d P=%03d L=%03d, SUM=%03d",
+                                   renderedTiles, renderedScenes, renderedPaths, renderedLevels,
+                                   (renderedTiles + renderedScenes + renderedPaths + renderedLevels)),
+                   3, 45, 8);
+        SuperPrint(fmt::sprintf_ne("CHEK: T=%03d S=%03d P=%03d L=%03d, SUM=%03d",
+                                   checkedTiles, checkedScenes, checkedPaths, checkedLevels,
+                                   (checkedTiles + checkedScenes + checkedPaths + checkedLevels)),
+                   3, 45, 26);
+    }
+    else
+    {
+        frmMain.renderRect(42, 6, 745, 72, 0.0f,0.0f, 0.0f, 0.3f, true);
+        SuperPrint(fmt::sprintf_ne("DRAW: B=%05d Z=%04d G=%04d N=%04d, E=%03d",
+                                   renderedBlocks, renderedSzBlocks, renderedBGOs, renderedNPCs, renderedEffects,
+                                   (renderedBlocks + renderedSzBlocks + renderedBGOs + renderedNPCs + renderedEffects)),
+                   3, 45, 8, 0.5f, 1.f, 1.f);
+        SuperPrint(fmt::sprintf_ne("DRAW: SUMM=%d", (renderedBlocks + renderedSzBlocks + renderedBGOs + renderedNPCs + renderedEffects)),
+                   3, 45, 26, 0.5f, 1.f, 1.f);
+        SuperPrint(fmt::sprintf_ne("CHEK: B=%05d Z=%04d G=%04d N=%04d, E=%03d",
+                                   checkedBlocks, checkedSzBlocks, checkedBGOs, checkedNPCs, checkedEffects),
+                   3, 45, 44, 0.5f, 1.f, 1.f);
+        SuperPrint(fmt::sprintf_ne("CHEK: SUMM=%d", (checkedBlocks + checkedSzBlocks+ checkedBGOs + checkedNPCs + checkedEffects)),
+                   3, 45, 62, 0.5f, 1.f, 1.f);
+        // WIP
+//        SuperPrint(fmt::sprintf_ne("PHYS: B%03d G%03d N%03d, S:%03d",
+//                                   physScannedBlocks, physScannedBGOs, physScannedNPCs,
+//                                   (physScannedBlocks + physScannedBGOs + physScannedNPCs)),
+//                   3, 45, 44);
+    }
+}
 
 //#if !defined(__EMSCRIPTEN__)
 #define USE_NEW_TIMER
@@ -63,72 +123,9 @@
 
 typedef int64_t nanotime_t;
 
-#ifdef _WIN32
-
-static SDL_INLINE struct timespec nanotimeToTimespec(nanotime_t time);
-
-static SDL_INLINE int win_clock_gettime(struct timespec *ct)
-{
-    auto n = std::chrono::high_resolution_clock::now().time_since_epoch();
-    auto ctt = nanotimeToTimespec(n.count());
-    ct->tv_nsec = ctt.tv_nsec;
-    ct->tv_sec = ctt.tv_sec;
-    return 0;
-}
-
-// https://gist.github.com/Youka/4153f12cf2e17a77314c
-
-/* Windows sleep in 100ns units */
-static BOOLEAN SDL_INLINE win_nanosleep(LONGLONG ns)
-{
-    /* Declarations */
-    HANDLE timer;   /* Timer handle */
-    LARGE_INTEGER li;   /* Time defintion */
-
-    /* Create timer */
-    if(!(timer = CreateWaitableTimer(NULL, TRUE, NULL)))
-        return FALSE;
-
-    /* Set timer properties */
-    li.QuadPart = -ns;
-
-    if(!SetWaitableTimer(timer, &li, 0, NULL, NULL, FALSE))
-    {
-        CloseHandle(timer);
-        return FALSE;
-    }
-
-    /* Start & wait for timer */
-    WaitForSingleObject(timer, INFINITE);
-    /* Clean resources */
-    CloseHandle(timer);
-    /* Slept without problems */
-    return TRUE;
-}
-#endif
-
-static SDL_INLINE nanotime_t timespecToNanotime(const struct timespec *ts)
-{
-    return static_cast<nanotime_t>(ts->tv_sec) * static_cast<nanotime_t>(ONE_MILLIARD) + ts->tv_nsec;
-}
-
-static SDL_INLINE struct timespec nanotimeToTimespec(nanotime_t time)
-{
-    struct timespec ts;
-    ts.tv_nsec = time % ONE_MILLIARD;
-    ts.tv_sec = time / ONE_MILLIARD;
-    return ts;
-}
-
 static SDL_INLINE nanotime_t getNanoTime()
 {
-    struct timespec ts;
-#ifdef _WIN32
-    win_clock_gettime(&ts);
-#else
-    clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
-#endif
-    return timespecToNanotime(&ts);
+    return static_cast<nanotime_t>(SDL_GetTicks()) * 1000000;
 }
 
 static SDL_INLINE nanotime_t getElapsedTime(nanotime_t oldTime)
@@ -141,16 +138,11 @@ static SDL_INLINE nanotime_t getSleepTime(nanotime_t oldTime, nanotime_t target)
     return target - getElapsedTime(oldTime);
 }
 
-static SDL_INLINE int xtech_nanosleep(nanotime_t sleepTime)
+static SDL_INLINE void xtech_nanosleep(nanotime_t sleepTime)
 {
     if(sleepTime <= 0)
-        return 0;
-#ifdef _WIN32
-    return win_nanosleep((sleepTime / 100) + 1);
-#else
-    struct timespec ts = nanotimeToTimespec(sleepTime);
-    return nanosleep(&ts, NULL);
-#endif
+        return;
+    PGE_Delay((Uint32)SDL_ceil(sleepTime / 1000000.0));
 }
 
 
@@ -204,11 +196,16 @@ static double s_currentTicks = 0.0;
 void resetFrameTimer()
 {
     s_overTime = 0;
-    s_goalTime = SDL_GetTicks() + 1000;
     s_fpsCount = 0;
     s_fpsTime = 0;
     s_cycleCount = 0;
     s_gameTime = 0;
+#ifdef USE_NEW_FRAMESKIP
+    s_doUpdate = 0;
+    s_goalTime = 0;
+#else
+    s_goalTime = SDL_GetTicks() + 1000;
+#endif
     D_pLogDebugNA("Time counter reset was called");
 }
 
@@ -319,7 +316,8 @@ static SDL_INLINE void computeFrameTime1Real_2()
 static SDL_INLINE void computeFrameTime2Real_2()
 {
 #ifdef USE_NEW_FRAMESKIP
-    s_doUpdate -= c_frameRateNano;
+    if(s_doUpdate > 0)
+        s_doUpdate -= c_frameRateNano;
     s_startProcessing = 0;
     s_stopProcessing = 0;
 #endif
@@ -346,6 +344,7 @@ static SDL_INLINE void computeFrameTime2Real_2()
         nanotime_t sleepTime = getSleepTime(s_oldTime, c_frameRateNano);
         s_overhead = s_overheadTimes.average();
 
+        // D_pLogDebug("ST=%lld, OH=%lld", sleepTime, s_overhead);
         if(sleepTime > s_overhead)
         {
             nanotime_t adjustedSleepTime = sleepTime - s_overhead;
@@ -353,7 +352,9 @@ static SDL_INLINE void computeFrameTime2Real_2()
             auto e = getElapsedTime(start);
             nanotime_t overslept = e - adjustedSleepTime;
             // SDL_assert(overslept >= 0);
-            if(overslept >= 0 && overslept < c_frameRateNano)
+            if(overslept < 0)
+                s_overheadTimes.add(0);
+            else if(overslept < c_frameRateNano)
                 s_overheadTimes.add(overslept);
         }
     }
@@ -430,9 +431,15 @@ void frameRenderEnd()
     if(s_doUpdate <= 0)
     {
         s_stopProcessing = getNanoTime();
-        s_doUpdate = FrameSkip ? (s_stopProcessing - s_startProcessing) : 0;
-        if(s_doUpdate > c_frameRateNano * 15) // Limit 15 frames being skipped maximum
-            s_doUpdate = c_frameRateNano * 15;
+        nanotime_t newTime = FrameSkip ? (s_stopProcessing - s_startProcessing) : 0;
+        // D_pLogDebug("newTime/nano=%lld (%lld)", newTime/c_frameRateNano, newTime / 1000000);
+        if(newTime > c_frameRateNano * 25) // Limit 25 frames being skipped maximum
+        {
+            D_pLogDebug("Overloading detected: %lld frames to skip (%lld milliseconds delay)", newTime/c_frameRateNano, newTime / 1000000);
+            newTime = c_frameRateNano * 25;
+        }
+        s_doUpdate += newTime;
+        s_goalTime = SDL_GetTicks() + (newTime / 1000000);
     }
 #endif
 }

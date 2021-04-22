@@ -40,6 +40,7 @@
 #include "range_arr.hpp"
 #include "rand.h"
 #include "floats.h"
+#include "control/con_control.h"
 
 #include "global_constants.h"
 #include "controls.h"
@@ -66,6 +67,9 @@
 //Public OnlineDisc As Boolean
 
 #define UNUSED(x) (void)x
+
+#define IF_OUTRANGE(x, l, r)  ((x) < (l) || (x) > (r))
+#define IF_INRANGE(x, l, r)  ((x) >= (l) && (x) <= (r))
 
 //! Main window
 extern FrmMain frmMain;
@@ -106,7 +110,7 @@ const int KEY_PRESSED = 1;
 const char *getKeyName(int key);
 
 struct KM_Key;
-std::string getJoyKeyName(const KM_Key &key);
+std::string getJoyKeyName(bool isController, const KM_Key &key);
 
 /**
  * @brief Rounding function that works same as in VB6
@@ -235,81 +239,17 @@ struct EditorControls_t
 //End Type
 };
 
-
-//Public Type conKeyboard  'Input settings for the keyboard
-struct ConKeyboard_t
-{
-//    Up As Integer
-    int Up = 0;
-//    Down As Integer
-    int Down = 0;
-//    Left As Integer
-    int Left = 0;
-//    Right As Integer
-    int Right = 0;
-//    Jump As Integer
-    int Jump = 0;
-//    AltJump As Integer
-    int AltJump = 0;
-//    Run As Integer
-    int Run = 0;
-//    AltRun As Integer
-    int AltRun = 0;
-//    Drop As Integer
-    int Drop = 0;
-//    Start As Integer
-    int Start = 0;
-//End Type
-};
-
-struct KM_Key
-{
-    int val = -1;
-    int id = -1;
-    int type = -1;
-};
-
-//Public Type conJoystick   'Input settings for the joystick
-struct ConJoystick_t
-{
-// EXTRA
-    enum CtrlTypes
-    {
-        NoControl=-1,
-        JoyAxis=0,
-        JoyBallX,
-        JoyBallY,
-        JoyHat,
-        JoyButton
-    };
-    KM_Key Up;
-    KM_Key Down;
-    KM_Key Left;
-    KM_Key Right;
-
-//    Jump As Integer
-    KM_Key Jump;
-//    Run As Integer
-    KM_Key Run;
-//    Drop As Integer
-    KM_Key Drop;
-//    Start As Integer
-    KM_Key Start;
-//    AltJump As Integer
-    KM_Key AltJump;
-//    AltRun As Integer
-    KM_Key AltRun;
-//End Type
-};
+// Structures moved into con_control.h
 
 //Public conKeyboard(1 To 2) As conKeyboard  'player 1 and 2's controls
-extern RangeArr<ConKeyboard_t, 1, 2> conKeyboard;
+extern RangeArr<ConKeyboard_t, 1, maxLocalPlayers> conKeyboard;
 
 //Public conJoystick(1 To 2) As conJoystick
-extern RangeArr<ConJoystick_t, 1, 2> conJoystick;
+extern RangeArr<ConJoystick_t, 1, maxLocalPlayers> conJoystick;
 
 //Public useJoystick(1 To 2) As Integer
-extern RangeArrI<int, 1, 2, 0> useJoystick;
+extern RangeArrI<int, 1, maxLocalPlayers, 0> useJoystick;
+extern RangeArrI<bool, 1, maxLocalPlayers, false> wantedKeyboard;
 
 //Public Type NPC 'The NPC Type
 struct NPC_t
@@ -902,6 +842,8 @@ struct WorldLevel_t
 //    Visible As Boolean 'true if it should be shown on the map
     bool Visible = false;
 //End Type
+    int64_t Z = 0;
+    int index = 0;
 };
 
 //Public Type Warp 'warps such as pipes and doors
@@ -967,6 +909,8 @@ struct Tile_t
 //    Type As Integer
     int Type = 0;
 //End Type
+    int64_t Z = 0;
+    bool Active = true;
 };
 
 //Public Type Scene 'World Scenery
@@ -979,6 +923,7 @@ struct Scene_t
 //    Active As Boolean 'if false this won't be shown. used for paths that become available on a scene
     bool Active = false;
 //End Type
+    int64_t Z = 0;
 };
 
 //Public Type WorldPath 'World Paths
@@ -991,6 +936,8 @@ struct WorldPath_t
 //    Type As Integer
     int Type = 0;
 //End Type
+    int64_t Z = 0;
+    int index = 0;
 };
 
 //Public Type WorldMusic 'World Music
@@ -1003,6 +950,8 @@ struct WorldMusic_t
 //    EXTRA: Custom Music
     std::string MusicFile;
 //End Type
+    int64_t Z = 0;
+    bool Active = true;
 };
 
 //Public Type EditorCursor 'The editor's cursor
@@ -1081,7 +1030,7 @@ struct CreditLine_t
 };
 
 //Public ScreenShake As Integer
-extern int ScreenShake;
+//extern int ScreenShake; // REPLACED with static variables at the update_gfx.cpp
 // TODO: Make it have multiple checkpoints and assign each one with different NPCs,
 // last one should resume player at given position
 //Public Checkpoint As String 'the filename of the level the player has a checkpoint in
@@ -1128,6 +1077,16 @@ extern bool ShowFPS;
 extern double PrintFPS;
 // Do ground-point by alt-run key instead of down
 extern bool GameplayPoundByAltRun;
+// Shake screen on thwomp falling
+extern bool GameplayShakeScreenThwomp;
+// Shake screen on Bowser III'rd ground pound
+extern bool GameplayShakeScreenBowserIIIrd;
+// Shake screen on Yoshi ground pount
+extern bool GameplayShakeScreenPound;
+// Enable usage of the rumble control
+extern bool JoystickEnableRumble;
+// Show the battery status for wireless gamepads
+extern bool JoystickEnableBatteryStatus;
 //Public vScreen(0 To 2) As vScreen 'Sets up the players screens
 extern RangeArr<vScreen_t, 0, 2> vScreen;
 //Public ScreenType As Integer 'The screen/view type
@@ -1398,6 +1357,16 @@ extern RangeArrI<int, 0, maxNPCType, 0> NPCFrameStyle;
 
 //Public BlockIsSizable(0 To maxBlockType) As Boolean 'Flags block if it is sizable
 extern RangeArrI<bool, 0, maxBlockType, false> BlockIsSizable;
+
+enum
+{
+    SLOPE_FLOOR = 0,
+    SLOPE_FLOOR_LEFT = -1,
+    SLOPE_FLOOR_RIGHT = +1,
+    SLOPE_CEILING = 0,
+    SLOPE_CEILING_LEFT = -1,
+    SLOPE_CEILING_RIGHT = +1,
+};
 //Public BlockSlope(0 To maxBlockType) As Integer 'block is sloped on top. -1 of block has an upward slope, 1 for downward
 extern RangeArrI<int, 0, maxBlockType, 0> BlockSlope;
 //Public BlockSlope2(0 To maxBlockType) As Integer 'block is sloped on the bottom.

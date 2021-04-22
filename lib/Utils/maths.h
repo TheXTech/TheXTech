@@ -57,11 +57,11 @@ namespace Maths
 
     inline double roundToUp(double numToRound, double multiple)
     {
-        if (multiple == 0)
+        if (multiple == 0.0)
             return numToRound;
 
         double remainder = std::fmod(std::fabs(numToRound), multiple);
-        if (remainder == 0)
+        if (remainder == 0.0)
             return numToRound;
 
         if (numToRound < 0)

@@ -48,21 +48,25 @@
 static int isDebuggerPresent()
 {
 #ifdef __gnu_linux__
-    char buf[1024];
+    const size_t buf_size = 2048;
+    char buf[buf_size];
     int debugger_present = 0;
 
     int status_fd = open("/proc/self/status", O_RDONLY);
     if(status_fd == -1)
         return 0;
 
-    ssize_t num_read = read(status_fd, buf, sizeof(buf));
+    ssize_t num_read = read(status_fd, buf, buf_size);
 
     if(num_read > 0)
     {
         static const char TracerPid[] = "TracerPid:";
         char *tracer_pid;
 
-        buf[num_read] = 0;
+        if(num_read < (ssize_t)buf_size)
+            buf[num_read] = 0;
+        else
+            buf[buf_size - 1] = 0;
         tracer_pid    = strstr(buf, TracerPid);
         if(tracer_pid)
             debugger_present = static_cast<bool>(SDL_atoi(tracer_pid + sizeof(TracerPid) - 1));

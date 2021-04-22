@@ -4,6 +4,7 @@ project(TheXTech LANGUAGES C CXX)
 
 include(CheckCXXCompilerFlag)
 include(ExternalProject)
+include(CheckLibraryExists)
 include(GNUInstallDirs)
 
 include(cmake/git_info.cmake)
@@ -111,6 +112,8 @@ option(ENABLE_OLD_CREDITS "Use original Redigit's credits without changes" OFF)
 option(ENABLE_LOGGING "Enable debug logging" ON)
 
 option(THEXTECH_ENABLE_LUA "Enable lua scripting support" OFF)
+
+option(ENABLE_ADDRESS_SANITIZER "Enable the Address Sanitizer GCC feature" OFF)
 
 # ============ Customization ==============
 set(LIB_SRC_EXTRA)
@@ -283,6 +286,8 @@ set(THEXTECH_SRC
     src/main/menu_main.cpp
     src/main/cheat_code.cpp
     src/main/outro_loop.cpp
+    src/main/trees.cpp
+    src/main/QuadTree/LooseQuadtree-impl.cpp
     src/graphics/gfx_update2.cpp
     src/graphics/gfx_update.cpp
     src/graphics/gfx_background.cpp
@@ -412,7 +417,11 @@ if(APPLE)
         target_compile_definitions(thextech PRIVATE -DUSERDATA_ROOT_NAME="${THEXTECH_CUSTOM_USERDATA_DIR_NAME}")
     endif()
 
-    target_link_libraries(A2XT_Int INTERFACE iconv)
+    check_library_exists(iconv iconv_open "" HAVE_LIBICONV)
+    if(HAVE_LIBICONV)
+        target_link_libraries(A2XT_Int INTERFACE iconv)
+    endif()
+
     if(PGE_USE_LUAJIT)
         # Required to link on 64-bit macOS
         # See: http://luajit.org/install.html
@@ -452,6 +461,11 @@ endif()
 
 if(THEXTECH_ENABLE_LUA)
     target_compile_definitions(thextech PRIVATE -DENABLE_XTECH_LUA)
+endif()
+
+if(ENABLE_ADDRESS_SANITIZER)
+    target_compile_options(thextech PRIVATE -fsanitize=address)
+    target_link_options(thextech PRIVATE -fsanitize=address)
 endif()
 
 target_include_directories(thextech PRIVATE ${A2XT_INCS})

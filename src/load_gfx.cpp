@@ -670,6 +670,7 @@ void UpdateLoadREAL()
 
     if(draw)
     {
+        frmMain.setTargetTexture();
         frmMain.clearBuffer();
         if(!gfxLoaderTestMode)
             frmMain.renderTexture(0, 0, GFX.MenuGFX[4]);
@@ -687,6 +688,7 @@ void UpdateLoadREAL()
             frmMain.renderRect(0, 0, ScreenW, ScreenH, 0.f, 0.f, 0.f, alphaFader);
 
         frmMain.repaint();
+        frmMain.setTargetScreen();
         DoEvents();
 #ifdef __EMSCRIPTEN__
         emscripten_sleep(1); // To repaint screenn, it's required to send a sleep signal

@@ -28,6 +28,45 @@
 
 #include <functional>
 
+struct PerformanceStats_t
+{
+    // How many objects got drawn in one frame
+    int renderedBlocks = 0;
+    int renderedSzBlocks = 0;
+    int renderedBGOs = 0;
+    int renderedNPCs = 0;
+    int renderedEffects = 0;
+
+    // How many objects got scanned to find what to render
+    int checkedBlocks = 0;
+    int checkedSzBlocks = 0;
+    int checkedBGOs = 0;
+    int checkedNPCs = 0;
+    int checkedEffects = 0;
+
+    int renderedTiles = 0;
+    int renderedScenes = 0;
+    int renderedPaths = 0;
+    int renderedLevels = 0;
+
+    int checkedTiles = 0;
+    int checkedScenes = 0;
+    int checkedPaths = 0;
+    int checkedLevels = 0;
+
+    // How many objects got checked during the physics processing
+    int physScannedBlocks = 0;
+    int physScannedBGOs = 0;
+    int physScannedNPCs = 0;
+
+    bool enabled = false;
+
+    void reset();
+    void print();
+};
+
+extern PerformanceStats_t g_stats;
+
 void resetFrameTimer();
 void resetTimeBuffer();
 bool frameSkipNeeded();

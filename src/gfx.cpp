@@ -107,7 +107,9 @@ bool GFX_t::load()
     // Loading a touch-screen buttons from assets
     loadImage(touch[BUTTON_START], "buttons/Start.png");
     loadImage(touch[BUTTON_LEFT], "buttons/Left.png");
+    loadImage(touch[BUTTON_LEFT_CHAR], "buttons/Left_char.png");
     loadImage(touch[BUTTON_RIGHT], "buttons/Right.png");
+    loadImage(touch[BUTTON_RIGHT_CHAR], "buttons/Right_char.png");
     loadImage(touch[BUTTON_UP], "buttons/Up.png");
     loadImage(touch[BUTTON_DOWN], "buttons/Down.png");
     loadImage(touch[BUTTON_UPLEFT], "buttons/UpLeft.png");
@@ -115,9 +117,36 @@ bool GFX_t::load()
     loadImage(touch[BUTTON_DOWNLEFT], "buttons/DownLeft.png");
     loadImage(touch[BUTTON_DOWNRIGHT], "buttons/DownRight.png");
     loadImage(touch[BUTTON_A], "buttons/A.png");
+    loadImage(touch[BUTTON_A_PS], "buttons/A_ps.png");
+    loadImage(touch[BUTTON_A_BLANK], "buttons/A_blank.png");
+    loadImage(touch[BUTTON_A_DO], "buttons/A_do.png");
+    loadImage(touch[BUTTON_A_ENTER], "buttons/A_enter.png");
+    loadImage(touch[BUTTON_A_JUMP], "buttons/A_jump.png");
     loadImage(touch[BUTTON_B], "buttons/V.png");
+    loadImage(touch[BUTTON_B_PS], "buttons/V_ps.png");
+    loadImage(touch[BUTTON_B_BLANK], "buttons/V_blank.png");
+    loadImage(touch[BUTTON_B_JUMP], "buttons/V_jump.png");
+    loadImage(touch[BUTTON_B_SPINJUMP], "buttons/V_spinjump.png");
     loadImage(touch[BUTTON_X], "buttons/X.png");
+    loadImage(touch[BUTTON_X_PS], "buttons/X_ps.png");
+    loadImage(touch[BUTTON_X_BACK], "buttons/X_back.png");
+    loadImage(touch[BUTTON_X_BLANK], "buttons/X_blank.png");
+    loadImage(touch[BUTTON_X_BOMB], "buttons/X_bomb.png");
+    loadImage(touch[BUTTON_X_BUMERANG], "buttons/X_bumerang.png");
+    loadImage(touch[BUTTON_X_FIRE], "buttons/X_fire.png");
+    loadImage(touch[BUTTON_X_HAMMER], "buttons/X_hammer.png");
+    loadImage(touch[BUTTON_X_RUN], "buttons/X_run.png");
+    loadImage(touch[BUTTON_X_SWORD], "buttons/X_sword.png");
     loadImage(touch[BUTTON_Y], "buttons/Y.png");
+    loadImage(touch[BUTTON_Y_PS], "buttons/Y_ps.png");
+    loadImage(touch[BUTTON_Y_BLANK], "buttons/Y_blank.png");
+    loadImage(touch[BUTTON_Y_BOMB], "buttons/Y_bomb.png");
+    loadImage(touch[BUTTON_Y_BUMERANG], "buttons/Y_bumerang.png");
+    loadImage(touch[BUTTON_Y_FIRE], "buttons/Y_fire.png");
+    loadImage(touch[BUTTON_Y_HAMMER], "buttons/Y_hammer.png");
+    loadImage(touch[BUTTON_Y_RUN], "buttons/Y_run.png");
+    loadImage(touch[BUTTON_Y_STATUE], "buttons/Y_statue.png");
+    loadImage(touch[BUTTON_Y_SWORD], "buttons/Y_sword.png");
     loadImage(touch[BUTTON_DROP], "buttons/Select.png");
     loadImage(touch[BUTTON_HOLD_RUN_OFF], "buttons/RunOff.png");
     loadImage(touch[BUTTON_HOLD_RUN_ON], "buttons/RunOn.png");
@@ -129,7 +158,10 @@ bool GFX_t::load()
 
     if(m_loadErrors > 0)
     {
-        std::string msg = fmt::format_ne("Failed to load an UI image assets. Look a log file to get more details:\n{0}", getLogFilePath());
+        std::string msg = fmt::format_ne("Failed to load an UI image assets. Look a log file to get more details:\n{0}"
+                                         "\n\n"
+                                         "It's possible that you didn't installed the game assets package, or you had installed it at the incorrect directory.",
+                                         getLogFilePath());
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "UI image assets loading error", msg.c_str(), nullptr);
         return false;
     }

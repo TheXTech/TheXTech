@@ -23,6 +23,8 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#include <SDL2/SDL_version.h>
+
 #include "globals.h"
 #include <fmt_format_ne.h>
 #include <cmath>
@@ -47,11 +49,11 @@ bool ScrollRelease = false;
 bool TakeScreen = false;
 std::string LB;
 std::string EoT;
-RangeArr<ConKeyboard_t, 1, 2> conKeyboard;
-RangeArr<ConJoystick_t, 1, 2> conJoystick;
-RangeArrI<int, 1, 2, 0> useJoystick;
+RangeArr<ConKeyboard_t, 1, maxLocalPlayers> conKeyboard;
+RangeArr<ConJoystick_t, 1, maxLocalPlayers> conJoystick;
+RangeArrI<int, 1, maxLocalPlayers, 0> useJoystick;
+RangeArrI<bool, 1, maxLocalPlayers, false> wantedKeyboard;
 
-int ScreenShake = 0;
 std::string Checkpoint;
 std::vector<Checkpoint_t> CheckpointsList;
 bool MagicHand = false;
@@ -70,6 +72,11 @@ std::vector<SelectWorld_t> SelectWorld;
 bool ShowFPS = false;
 double PrintFPS = 0.0;
 bool GameplayPoundByAltRun = false;
+bool GameplayShakeScreenThwomp = true;
+bool GameplayShakeScreenBowserIIIrd = true;
+bool GameplayShakeScreenPound = true;
+bool JoystickEnableRumble = true;
+bool JoystickEnableBatteryStatus = true;
 RangeArr<vScreen_t, 0, 2> vScreen;
 int ScreenType = 0;
 int DScreenType = 0;
@@ -530,11 +537,69 @@ const char *getKeyName(int key)
     return SDL_GetScancodeName(k);
 }
 
-std::string getJoyKeyName(const KM_Key &key)
+std::string getJoyKeyName(bool isController, const KM_Key &key)
 {
-    if(key.type < 0)
-        return "_";
-    return fmt::format_ne("K={0} ID={1} T={2}", key.val, key.id, key.type);
+    if(isController)
+    {
+        if(key.ctrl_type < 0)
+            return "_";
+
+        switch(key.ctrl_id)
+        {
+        case SDL_CONTROLLER_BUTTON_A:
+            return "Button A";
+        case SDL_CONTROLLER_BUTTON_B:
+            return "Button B";
+        case SDL_CONTROLLER_BUTTON_X:
+            return "Button X";
+        case SDL_CONTROLLER_BUTTON_Y:
+            return "Button Y";
+        case SDL_CONTROLLER_BUTTON_BACK:
+            return "Button BACK";
+        case SDL_CONTROLLER_BUTTON_GUIDE:
+            return "Button GUIDE";
+        case SDL_CONTROLLER_BUTTON_START:
+            return "Button START";
+        case SDL_CONTROLLER_BUTTON_LEFTSTICK:
+            return "Button L-Stick";
+        case SDL_CONTROLLER_BUTTON_RIGHTSTICK:
+            return "Button R-Stick";
+        case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:
+            return "Button L-Shoulder";
+        case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
+            return "Button R-Shoulder";
+        case SDL_CONTROLLER_BUTTON_DPAD_UP:
+            return "D-Pad UP";
+        case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
+            return "D-Pad DOWN";
+        case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
+            return "D-Pad LEFT";
+        case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
+            return "D-Pad RIGHT";
+#if SDL_VERSION_ATLEAST(2, 0, 14)
+        case SDL_CONTROLLER_BUTTON_MISC1:
+            return "Misc. 1";
+        case SDL_CONTROLLER_BUTTON_PADDLE1:
+            return "Paddle 1";
+        case SDL_CONTROLLER_BUTTON_PADDLE2:
+            return "Paddle 2";
+        case SDL_CONTROLLER_BUTTON_PADDLE3:
+            return "Paddle 3";
+        case SDL_CONTROLLER_BUTTON_PADDLE4:
+            return "Paddle 4";
+        case SDL_CONTROLLER_BUTTON_TOUCHPAD:
+            return "Touchpad";
+#endif
+        default:
+            return "<invalid>";
+        }
+    }
+    else
+    {
+        if(key.type < 0)
+            return "_";
+        return fmt::format_ne("K={0} ID={1} T={2}", key.val, key.id, key.type);
+    }
 }
 
 
@@ -546,6 +611,7 @@ void initAll()
     conKeyboard.fill(ConKeyboard_t());
     conJoystick.fill(ConJoystick_t());
     useJoystick.fill(0);
+    wantedKeyboard.fill(false);
     vScreen.fill(vScreen_t());
     PlayerStart.fill(Location_t());
     blockCharacter.fill(false);

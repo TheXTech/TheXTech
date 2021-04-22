@@ -17,6 +17,12 @@
             android:entryValues="@array/touchscreenControllerTypesValues"
             android:key="setup_touchscreen_mode"
             android:title="@string/setup_touchscreen_mode" />
+        <ListPreference
+            android:defaultValue="0"
+            android:entries="@array/touchPadStyles"
+            android:entryValues="@array/touchPadStylesValues"
+            android:key="setup_touchscreen_style"
+            android:title="@string/setup_touchpad_style" />
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="touchscreen_gamepad_showalways"

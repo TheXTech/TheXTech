@@ -33,6 +33,9 @@ void GameThing()
     int A = 0;
 //    int B = 0;
     Player_t tempPlayer[3];
+
+    frmMain.setTargetTexture();
+
     tempPlayer[1] = Player[1];
     tempPlayer[2] = Player[2];
 

@@ -150,7 +150,7 @@ void MenuLoop()
 //                    End If
                     }
 //                    PlaySound 26
-                    PlaySound(26);
+                    PlaySoundMenu(26);
 //                End If
                 }
 //                MenuCursorCanMove = False
@@ -184,7 +184,7 @@ void MenuLoop()
 //                    End If
                     }
 //                    PlaySound 26
-                    PlaySound(26);
+                    PlaySoundMenu(26);
 //                End If
                 }
 //                MenuCursorCanMove = False
@@ -238,7 +238,7 @@ void MenuLoop()
                             if(MenuCursor != A)
                             {
 //                                PlaySound 26
-                                PlaySound(26);
+                                PlaySoundMenu(26);
 //                                MenuCursor = A
                                 MenuCursor = A;
 //                            End If
@@ -261,7 +261,7 @@ void MenuLoop()
 //                    MenuCursor = 4
                     MenuCursor = 4;
 //                    PlaySound 26
-                    PlaySound(26);
+                    PlaySoundMenu(26);
 //                End If
                 }
 //            ElseIf ((.Jump = True Or _
@@ -282,7 +282,7 @@ void MenuLoop()
                 if(MenuCursor == 0)
                 {
 //                    PlaySound 29
-                    PlaySound(29);
+                    PlaySoundMenu(29);
 //                    MenuMode = 1
                     MenuMode = 1;
 //                    FindWorlds
@@ -294,7 +294,7 @@ void MenuLoop()
                 else if(MenuCursor == 1)
                 {
 //                    PlaySound 29
-                    PlaySound(29);
+                    PlaySoundMenu(29);
 //                    MenuMode = 2
                     MenuMode = 2;
 //                    FindWorlds
@@ -306,7 +306,7 @@ void MenuLoop()
                 else if(MenuCursor == 2)
                 {
 //                    PlaySound 29
-                    PlaySound(29);
+                    PlaySoundMenu(29);
 //                    MenuMode = 4
                     MenuMode = 4;
 //                    FindLevels
@@ -318,7 +318,7 @@ void MenuLoop()
                 else if(MenuCursor == 3)
                 {
 //                    PlaySound 29
-                    PlaySound(29);
+                    PlaySoundMenu(29);
 //                    MenuMode = 3
                     MenuMode = 3;
 //                    MenuCursor = 0
@@ -328,9 +328,10 @@ void MenuLoop()
                 else if(MenuCursor == 4)
                 {
 //                    PlaySound 29
-                    PlaySound(29);
+                    PlaySoundMenu(29);
 //                    BitBlt myBackBuffer, 0, 0, ScreenW, ScreenH, 0, 0, 0, vbWhiteness
 //                    BitBlt frmMain.hdc, 0, 0, frmMain.ScaleWidth, frmMain.ScaleHeight, 0, 0, 0, vbWhiteness
+                    frmMain.setTargetTexture();
                     frmMain.clearBuffer();
 //                    StopMusic
                     StopMusic();
@@ -408,7 +409,7 @@ void MenuLoop()
 //                                    Else
                                     } else {
 //                                        PlaySound 26
-                                        PlaySound(26);
+                                        PlaySoundMenu(26);
 //                                        MenuCursor = A
                                         MenuCursor = A;
 //                                    End If
@@ -456,7 +457,7 @@ void MenuLoop()
 //                    MenuCursorCanMove = False
                     MenuCursorCanMove = false;
 //                    PlaySound 26
-                    PlaySound(26);
+                    PlaySoundMenu(26);
 //                ElseIf .Jump = True Or .Start = True Or _
 //                        (GetKeyState(vbKeySpace) And KEY_PRESSED) Or _
 //                        (GetKeyState(vbKeyReturn) And KEY_PRESSED) Or _
@@ -465,7 +466,7 @@ void MenuLoop()
                 else if(menuDoPress || MenuMouseClick)
                 {
 //                    PlaySound 29
-                    PlaySound(29);
+                    PlaySoundMenu(29);
 //                    If MenuMode = 100 Then
                     if(MenuMode == 100)
                     {
@@ -639,7 +640,7 @@ void MenuLoop()
 //                                ScrollDelay = 10
                                 ScrollDelay = 10;
 //                                PlaySound 26
-                                PlaySound(26);
+                                PlaySoundMenu(26);
 //                                MenuCursor = A
                                 MenuCursor = A;
 //                            End If
@@ -671,7 +672,7 @@ void MenuLoop()
 //'world select back
 
 //                    PlaySound 26
-                    PlaySound(26);
+                    PlaySoundMenu(26);
 //                    MenuCursorCanMove = False
                     MenuCursorCanMove = false;
 //                ElseIf .Jump = True Or .Start = True Or _
@@ -681,7 +682,7 @@ void MenuLoop()
                 else if(menuDoPress || MenuMouseClick)
                 {
 //                    PlaySound 29
-                    PlaySound(29);
+                    PlaySoundMenu(29);
 //                    selWorld = MenuCursor + 1
                     selWorld = MenuCursor + 1;
 //                    FindSaves
@@ -758,7 +759,7 @@ void MenuLoop()
                             if(MenuCursor != A)
                             {
 //                                PlaySound 26
-                                PlaySound(26);
+                                PlaySoundMenu(26);
 //                                MenuCursor = A
                                 MenuCursor = A;
 //                            End If
@@ -805,7 +806,7 @@ void MenuLoop()
 //                    MenuCursorCanMove = False
                     MenuCursorCanMove = false;
 //                    PlaySound 29
-                    PlaySound(29);
+                    PlaySoundMenu(29);
 //                ElseIf .Jump = True Or .Start = True Or _
 //                       (GetKeyState(vbKeySpace) And KEY_PRESSED) Or _
 //                       (GetKeyState(vbKeyReturn) And KEY_PRESSED) Or _
@@ -814,7 +815,7 @@ void MenuLoop()
                 else if(menuDoPress || MenuMouseClick)
                 {
 //                    PlaySound 29
-                    PlaySound(29);
+                    PlaySoundMenu(29);
 //                    numPlayers = MenuMode / 10
                     numPlayers = MenuMode / 10;
 //                    For A = 1 To numCharacters
@@ -883,6 +884,7 @@ void MenuLoop()
                     GameMenu = false;
 //                    BitBlt myBackBuffer, 0, 0, ScreenW, ScreenH, 0, 0, 0, vbWhiteness
 //                    BitBlt frmMain.hdc, 0, 0, frmMain.ScaleWidth, frmMain.ScaleHeight, 0, 0, 0, vbWhiteness
+                    frmMain.setTargetTexture();
                     frmMain.clearBuffer();
                     frmMain.repaint();
 //                    StopMusic
@@ -937,7 +939,7 @@ void MenuLoop()
 
                     if(!StartLevel.empty())
                     {
-                        PlaySound(28);
+                        PlaySoundMenu(28);
                         SoundPause[26] = 200;
                         LevelSelect = false;
 
@@ -1022,7 +1024,7 @@ void MenuLoop()
 //                            If MenuCursor <> A Then
                             if(MenuCursor != A) {
 //                                PlaySound 26
-                                PlaySound(26);
+                                PlaySoundMenu(26);
 //                                MenuCursor = A
                                 MenuCursor = A;
 //                            End If
@@ -1048,7 +1050,7 @@ void MenuLoop()
 //                    MenuCursorCanMove = False
                     MenuCursorCanMove = false;
 //                    PlaySound 26
-                    PlaySound(26);
+                    PlaySoundMenu(26);
 //                ElseIf .Jump = True Or .Start = True Or (GetKeyState(vbKeySpace) And KEY_PRESSED) Or (GetKeyState(vbKeyReturn) And KEY_PRESSED) Or MenuMouseClick = True Then
                 }
                 else if(menuDoPress || MenuMouseClick)
@@ -1062,7 +1064,7 @@ void MenuLoop()
 //                        MenuMode = 31
                         MenuMode = 31;
 //                        PlaySound 26
-                        PlaySound(26);
+                        PlaySoundMenu(26);
 //                    ElseIf MenuCursor = 1 Then
                     } else if(MenuCursor == 1) {
 //                        MenuCursor = 0
@@ -1070,12 +1072,12 @@ void MenuLoop()
 //                        MenuMode = 32
                         MenuMode = 32;
 //                        PlaySound 26
-                        PlaySound(26);
+                        PlaySoundMenu(26);
 //                    ElseIf MenuCursor = 2 Then
 #ifndef __ANDROID__ // on Android run the always full-screen
                     } else if(MenuCursor == 2) {
 //                        PlaySound 29
-                        PlaySound(29);
+                        PlaySoundMenu(29);
 //                        ChangeScreen
                         ChangeScreen();
                     } else if(MenuCursor == 3) {
@@ -1084,7 +1086,7 @@ void MenuLoop()
 #endif
 //                    ElseIf MenuCursor = 3 Then
 //                        PlaySound 29
-                        PlaySound(29);
+                        PlaySoundMenu(29);
 //                        GameMenu = False
                         GameMenu = false;
 //                        GameOutro = True
@@ -1125,7 +1127,7 @@ void MenuLoop()
                 if(useJoystick[MenuMode - 30] == 0)
                 {
 //                    For A = 0 To 10
-                    For(A, 0, 10)
+                    For(A, 0, 11)
                     {
 //                        If MenuMouseY >= 260 - 44 + A * 30 And MenuMouseY <= 276 - 44 + A * 30 Then
                         if(MenuMouseY >= 260 - 44 + A * 30 && MenuMouseY <= 276 - 44 + A * 30)
@@ -1197,8 +1199,9 @@ void MenuLoop()
                                 menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
                                                         getKeyName(conKeyboard[MenuMode - 30].Start)).size());
                                 break;
-//                                menuLen = 18 * Len("UP........." & CheckKey(Chr(conKeyboard(MenuMode - 30).Start)))
-//                            End If
+                            case 11:
+                                menuLen = 18 * std::strlen("Reset tp default");
+                                break;
                             }
 //                            If MenuMouseX >= 300 And MenuMouseX <= 300 + menuLen Then
                             if(MenuMouseX >= 300 && MenuMouseX <= 300 + menuLen)
@@ -1210,7 +1213,7 @@ void MenuLoop()
                                 if(MenuCursor != A)
                                 {
 //                                    PlaySound 26
-                                    PlaySound(26);
+                                    PlaySoundMenu(26);
 //                                    MenuCursor = A
                                     MenuCursor = A;
 //                                End If
@@ -1226,21 +1229,20 @@ void MenuLoop()
                 else
                 {
 //                    For A = 0 To 6
-                    For(A, 0, 10)
+                    For(A, 0, 11)
                     {
 //                        If MenuMouseY >= 260 - 44 + A * 30 And MenuMouseY <= 276 + A * 30 - 44 Then
                         if(MenuMouseY >= 260 - 44 + A * 30 && MenuMouseY <= 276 + A * 30 - 44)
                         {
-//                            If A = 0 Then
-                            if(A == 0) {
-//                                menuLen = 18 * Len("INPUT......JOYSTICK 1") - 2
+                            if(A == 0)
+                            {
                                 menuLen = 18 * std::strlen("INPUT......JOYSTICK 1") - 2;
-//                            Else
-                            } else {
-//                                menuLen = 18 * Len("RUN........_")
-                                menuLen = 18 * std::strlen("RUN........_");
-//                            End If
                             }
+                            else
+                            {
+                                menuLen = 18 * std::strlen("RUN........_");
+                            }
+
 //                            If MenuMouseX >= 300 And MenuMouseX <= 300 + menuLen Then
                             if(MenuMouseX >= 300 && MenuMouseX <= 300 + menuLen)
                             {
@@ -1251,7 +1253,7 @@ void MenuLoop()
                                 if(MenuCursor != A)
                                 {
 //                                    PlaySound 26
-                                    PlaySound(26);
+                                    PlaySoundMenu(26);
 //                                    MenuCursor = A
                                     MenuCursor = A;
 //                                End If
@@ -1282,8 +1284,9 @@ void MenuLoop()
                         getNewKeyboard = false;
 //                        MenuCursorCanMove = False
                         MenuCursorCanMove = false;
-//                        PlaySound 29
-                        PlaySound(29);
+
+                        PlaySoundMenu(29);
+
 //                        If MenuCursor = 1 Then
                         if(MenuCursor == 1) {
 //                            conKeyboard(MenuMode - 30).Up = inputKey
@@ -1324,16 +1327,19 @@ void MenuLoop()
                 else if(getNewJoystick)
                 {
                     int JoyNum = useJoystick[MenuMode - 30] - 1;
-                    SDL_JoystickUpdate();
+                    //SDL_JoystickUpdate();
                     KM_Key joyKey;
-                    bool gotNewKey = PollJoystick(JoyNum, joyKey);
+                    bool gotNewKey = joyPollJoystick(JoyNum, joyKey);
 
-                    if(!JoyIsKeyDown(JoyNum, oldJumpJoy))
+                    if(!joyIsKeyDown(JoyNum, oldJumpJoy))
                     {
                         oldJumpJoy.type = -1;
+                        oldJumpJoy.ctrl_type = -1;
                         if(gotNewKey)
                         {
-                            PlaySound(29);
+                            if(conJoystick[MenuMode - 30].isGameController)
+                                joyKey.type = lastJoyButton.type;
+                            PlaySoundMenu(29);
                             if(MenuCursor == 1)
                                 conJoystick[MenuMode - 30].Up = joyKey;
                             else if(MenuCursor == 2)
@@ -1354,12 +1360,15 @@ void MenuLoop()
                                 conJoystick[MenuMode - 30].Drop = joyKey;
                             else if(MenuCursor == 10)
                                 conJoystick[MenuMode - 30].Start = joyKey;
+                            // Save the changed state into the common cache
+                            joySetByIndex(MenuMode - 30, JoyNum, conJoystick[MenuMode - 30]);
                             getNewJoystick = false;
                             MenuCursorCanMove = false;
                         }
 //                        else if(getKeyState(vbKeyEscape) == KEY_PRESSED)
                         else if(escPressed)
                         {
+                            PlaySoundMenu(3);
                             if(MenuCursor == 1)
                                 conJoystick[MenuMode - 30].Up = lastJoyButton;
                             else if(MenuCursor == 2)
@@ -1393,16 +1402,43 @@ void MenuLoop()
                         MenuCursor = MenuMode - 31;
                         MenuMode = 3;
                         MenuCursorCanMove = false;
-                        PlaySound(26);
+                        PlaySoundMenu(26);
                     }
                     else if(menuDoPress || MenuMouseClick)
                     {
                         if(MenuCursor == 0)
                         {
-                            PlaySound(29);
-                            useJoystick[MenuMode - 30] = useJoystick[MenuMode - 30] + 1;
+                            PlaySoundMenu(29);
+                            useJoystick[MenuMode - 30] += 1;
                             if(useJoystick[MenuMode - 30] > numJoysticks)
                                 useJoystick[MenuMode - 30] = 0;
+
+                            if(useJoystick[MenuMode - 30] > 0)
+                            {
+                                int joyNum = useJoystick[MenuMode - 30] - 1;
+                                // Load the saved state for given joystick
+                                joyGetByIndex(MenuMode - 30, joyNum, conJoystick[MenuMode - 30]);
+                            }
+                            // Tell player is prefer to use the keyboard than controller
+                            wantedKeyboard[MenuMode - 30] = (useJoystick[MenuMode - 30] == 0);
+                        }
+                        else
+                        if(MenuCursor == 11) // Reset to default
+                        {
+                            PlaySoundMenu(27);
+                            if(useJoystick[MenuMode - 30] == 0)
+                            {
+                                joyFillDefaults(conKeyboard[MenuMode - 30]);
+                            }
+                            else
+                            {
+                                int JoyNum = useJoystick[MenuMode - 30] - 1;
+                                if(JoyNum >= 0)
+                                {
+                                    joyFillDefaults(conJoystick[MenuMode - 30]);
+                                    joySetByIndex(MenuMode - 30, JoyNum, conJoystick[MenuMode - 30]);
+                                }
+                            }
                         }
                         else
                         {
@@ -1452,52 +1488,62 @@ void MenuLoop()
                                 {
                                     lastJoyButton = conJoystick[MenuMode - 30].Up;
                                     conJoystick[MenuMode - 30].Up.type = -1;
+                                    conJoystick[MenuMode - 30].Up.ctrl_type = -1;
                                 }
                                 else if(MenuCursor == 2)
                                 {
                                     lastJoyButton = conJoystick[MenuMode - 30].Down;
                                     conJoystick[MenuMode - 30].Down.type = -1;
+                                    conJoystick[MenuMode - 30].Down.ctrl_type = -1;
                                 }
                                 else if(MenuCursor == 3)
                                 {
                                     lastJoyButton = conJoystick[MenuMode - 30].Left;
                                     conJoystick[MenuMode - 30].Left.type = -1;
+                                    conJoystick[MenuMode - 30].Left.ctrl_type = -1;
                                 }
                                 else if(MenuCursor == 4)
                                 {
                                     lastJoyButton = conJoystick[MenuMode - 30].Right;
                                     conJoystick[MenuMode - 30].Right.type = -1;
+                                    conJoystick[MenuMode - 30].Right.ctrl_type = -1;
                                 }
                                 else if(MenuCursor == 5)
                                 {
                                     lastJoyButton = conJoystick[MenuMode - 30].Run;
                                     conJoystick[MenuMode - 30].Run.type = -1;
+                                    conJoystick[MenuMode - 30].Run.ctrl_type = -1;
                                 }
                                 else if(MenuCursor == 6)
                                 {
                                     lastJoyButton = conJoystick[MenuMode - 30].AltRun;
                                     conJoystick[MenuMode - 30].AltRun.type = -1;
+                                    conJoystick[MenuMode - 30].AltRun.ctrl_type = -1;
                                 }
                                 else if(MenuCursor == 7)
                                 {
                                     lastJoyButton = conJoystick[MenuMode - 30].Jump;
                                     oldJumpJoy = conJoystick[MenuMode - 30].Jump;
                                     conJoystick[MenuMode - 30].Jump.type = -1;
+                                    conJoystick[MenuMode - 30].Jump.ctrl_type = -1;
                                 }
                                 else if(MenuCursor == 8)
                                 {
                                     lastJoyButton = conJoystick[MenuMode - 30].AltJump;
                                     conJoystick[MenuMode - 30].AltJump.type = -1;
+                                    conJoystick[MenuMode - 30].AltJump.ctrl_type = -1;
                                 }
                                 else if(MenuCursor == 9)
                                 {
                                     lastJoyButton = conJoystick[MenuMode - 30].Drop;
                                     conJoystick[MenuMode - 30].Drop.type = -1;
+                                    conJoystick[MenuMode - 30].Drop.ctrl_type = -1;
                                 }
                                 else if(MenuCursor == 10)
                                 {
                                     lastJoyButton = conJoystick[MenuMode - 30].Start;
                                     conJoystick[MenuMode - 30].Start.type = -1;
+                                    conJoystick[MenuMode - 30].Start.ctrl_type = -1;
                                 }
                                 getNewJoystick = true;
                                 MenuCursorCanMove = false;
@@ -1512,10 +1558,10 @@ void MenuLoop()
 //            If MenuMode <> 3 Then
             if(MenuMode != 3)
             {
-                if(MenuCursor > 10)
+                if(MenuCursor > 11)
                     MenuCursor = 0;
                 if(MenuCursor < 0)
-                    MenuCursor = 10;
+                    MenuCursor = 11;
 #if 0
 //                If useJoystick(MenuMode - 30) = 0 Then
                 if(useJoystick[MenuMode - 30] == 0) {

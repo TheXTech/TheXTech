@@ -26,6 +26,7 @@
 #include "../globals.h"
 #include "../npc.h"
 #include "../sound.h"
+#include "../graphics.h"
 #include "../collision.h"
 #include "../effect.h"
 #include "../layers.h"
@@ -533,10 +534,10 @@ void UpdateNPCs()
                      NPC[A].Type == 52 || NPC[A].Type == 74 || NPC[A].Type == 256 ||
                      NPC[A].Type == 257 || NPC[A].Type == 93 || NPC[A].Type == 245))
                 {
-                    NPC[A].Location.X = NPC[A].Location.X + 0.015;
+                    NPC[A].Location.X += 0.015;
                 }
 
-                NPC[A].Location.Width = NPC[A].Location.Width - 0.03;
+                NPC[A].Location.Width -= 0.03;
             }
         }
         else if(fEqual(NPC[A].Location.Width, 256.0))
@@ -767,19 +768,22 @@ void UpdateNPCs()
             {
                 if(NPC[A].Wet > 0)
                     NPC[A].Wet = NPC[A].Wet - 1;
+
                 if(NPC[A].Quicksand > 0)
                     NPC[A].Quicksand = NPC[A].Quicksand - 1;
-                if(UnderWater[NPC[A].Section] == true)
+
+                if(UnderWater[NPC[A].Section])
                     NPC[A].Wet = 2;
+
                 for(B = 1; B <= numWater; B++)
                 {
-                    if(Water[B].Hidden == false)
+                    if(!Water[B].Hidden)
                     {
-                        if(CheckCollision(NPC[A].Location, Water[B].Location) == true)
+                        if(CheckCollision(NPC[A].Location, Water[B].Location))
                         {
-                            if(NPC[A].Wet == 0 && NPCIsACoin[NPC[A].Type] == false)
+                            if(NPC[A].Wet == 0 && !NPCIsACoin[NPC[A].Type])
                             {
-                                if(NPC[A].Location.SpeedY >= 1)
+                                if(NPC[A].Location.SpeedY >= 1 && !CheckCollisionIntersect(NPC[A].Location, Water[B].Location))
                                 {
                                     tempLocation.Width = 32;
                                     tempLocation.Height = 32;
@@ -787,6 +791,7 @@ void UpdateNPCs()
                                     tempLocation.Y = NPC[A].Location.Y + NPC[A].Location.Height - tempLocation.Height;
                                     NewEffect(114, tempLocation);
                                 }
+
                                 if(!(NPCIsCheep[NPC[A].Type] && NPC[A].Special == 1) && NPC[A].Type != 34 && NPC[A].Type != 13)
                                 {
                                     if(NPC[A].Location.SpeedY > 0.5)
@@ -801,16 +806,20 @@ void UpdateNPCs()
                                     if(NPC[A].Location.SpeedY < -2)
                                         NPC[A].Location.SpeedY = -2;
                                 }
+
                                 if(NPC[A].Type == 104)
                                     NPC[A].Special = NPC[A].Location.SpeedY;
                             }
-                            if(Water[B].Quicksand == true)
+
+                            if(Water[B].Quicksand)
                                 NPC[A].Quicksand = 2;
+
                             NPC[A].Wet = 2;
                         }
                     }
                 }
             }
+
             if(NPC[A].Wet == 1 && NPC[A].Location.SpeedY < -1)
             {
                 tempLocation.Width = 32;
@@ -830,30 +839,37 @@ void UpdateNPCs()
                 }
                 else
                     Physics.NPCGravity = Physics.NPCGravityReal * 0.2;
+
                 if(NPC[A].Type == 195 && NPC[A].Special4 == 1)
                     NPC[A].Special5 = 0;
                 else if(!NPCIsCheep[NPC[A].Type] && NPC[A].Type != 190 && NPC[A].Type != 205 && NPC[A].Type != 206 && NPC[A].Type != 207)
                     speedVar = (float)(speedVar * 0.5);
                 else if(NPCIsCheep[NPC[A].Type] && NPC[A].Special == 2 && NPC[A].Location.SpeedY > 0)
                     speedVar = (float)(speedVar * 0.5);
+
                 if(NPC[A].Location.SpeedY >= 3) // Terminal Velocity in water
                     NPC[A].Location.SpeedY = 3;
+
                 if(NPC[A].Location.SpeedY < -3)
                     NPC[A].Location.SpeedY = -3;
             }
             else if(!(NPC[A].Type != 190 && NPCIsCheep[NPC[A].Type] == false))
             {
                 NPC[A].WallDeath = NPC[A].WallDeath + 2;
+
                 if(NPC[A].WallDeath >= 10)
                     NPC[A].WallDeath = 10;
             }
+
             if(NPC[A].Quicksand > 0 && NPCNoClipping[NPC[A].Type] == false)
             {
                 NPC[A].Location.SpeedY = NPC[A].Location.SpeedY + 1;
+
                 if(NPC[A].Location.SpeedY < -1)
                     NPC[A].Location.SpeedY = -1;
                 else if(NPC[A].Location.SpeedY > 0.5)
                     NPC[A].Location.SpeedY = 0.5;
+
                 speedVar = (float)(speedVar * 0.3);
             }
 
@@ -2012,7 +2028,8 @@ void UpdateNPCs()
                                                             {
                                                                 auto bt = Block[B].Type;
                                                                 if(Block[B].IsNPC <= 0 && NPC[A].Special == 1 &&
-                                                                  ((HitSpot == 4 && BlockSlope[bt] == 0) || (HitSpot == 2 && BlockSlope[bt] == 0)) &&
+                                                                  ((HitSpot == COLLISION_LEFT && BlockSlope[bt] == SLOPE_FLOOR && BlockSlope2[bt] == SLOPE_CEILING) ||
+                                                                   (HitSpot == COLLISION_RIGHT && BlockSlope[bt] == SLOPE_FLOOR && BlockSlope2[bt] == SLOPE_CEILING)) &&
                                                                    !BlockOnlyHitspot1[bt] && !BlockIsSizable[bt])
                                                                 {
                                                                     SkullRideDone(A, Block[B].Location);
@@ -2583,9 +2600,9 @@ void UpdateNPCs()
                                                                 NPC[A].Special = 2;
 
                                                             if((NPC[A].Type == 58 || NPC[A].Type == 21 || NPC[A].Type == 67 || NPC[A].Type == 68 || NPC[A].Type == 69 || NPC[A].Type == 70) && NPC[A].Location.SpeedY > Physics.NPCGravity * 20)
-                                                                PlaySound(37);
+                                                                PlaySound(SFX_Twomp);
                                                             if(NPC[A].Type == 78 && NPC[A].Location.SpeedY > Physics.NPCGravity * 10)
-                                                                PlaySound(37);
+                                                                PlaySound(SFX_Twomp);
 
                                                             if(WalkingCollision3(NPC[A].Location, Block[B].Location, oldBeltSpeed) == true || NPC[A].Location.Width > 32)
                                                             {
@@ -4143,7 +4160,8 @@ void UpdateNPCs()
                                 NPC[A].Location.SpeedY = 10;
                             else
                             {
-                                PlaySound(37);
+                                bool legacy = NPC[A].Legacy && fEqual(NPC[A].Special7, 1.0);
+                                PlaySound(SFX_Twomp);
                                 NPC[A].Special3 = 30;
                                 NPC[A].Frame = 11;
                                 NPC[A].Projectile = false;
@@ -4161,7 +4179,10 @@ void UpdateNPCs()
                                         KillBlock(B);
                                 }
 
-                                if(NPC[A].Legacy && fEqual(NPC[A].Special7, 1.0)) // Classic SMBX 1.0's behavior when Bowser stomps a floor
+                                if(!legacy && GameplayShakeScreenBowserIIIrd)
+                                    doShakeScreen(0, 4, SHAKE_SEQUENTIAL, 7, 0.15);
+
+                                if(legacy) // Classic SMBX 1.0's behavior when Bowser stomps a floor
                                 {
                                     fBlock = FirstBlock[long(level[NPC[A].Section].X / 32) - 1];
                                     lBlock = LastBlock[long((level[NPC[A].Section].Width) / 32.0) + 2];

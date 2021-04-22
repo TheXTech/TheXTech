@@ -1,4 +1,4 @@
-/*
+﻿/*
  * TheXTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
@@ -37,6 +37,7 @@
 #include "../effect.h"
 #include "../graphics.h"
 #include "../collision.h"
+#include "../main/trees.h"
 #include "level_file.h"
 #include "speedrunner.h"
 
@@ -45,6 +46,17 @@
 
 void WorldLoop()
 {
+    // Keep them static to don't re-alloc them for every iteration
+    static WorldPathPtrArr parr;
+    static WorldLevelPtrArr larr;
+    static WorldLevelPtrArr larr2;
+    static WorldMusicPtrArr marr;
+    // Reserve 20 elements per every array
+    parr.reserve(20);
+    larr.reserve(20);
+    larr2.reserve(20);
+    marr.reserve(20);
+
     Location_t tempLocation;
     int A = 0;
     int B = 0;
@@ -69,58 +81,67 @@ void WorldLoop()
     {
         if(LevelBeatCode > 0)
         {
-            for(A = 1; A <= numWorldMusic; A++)
+            treeWorldMusicQuery(WorldPlayer[1].Location, marr, false);
+            //for(A = 1; A <= numWorldMusic; A++)
+            for(auto *t : marr)
             {
-                if(CheckCollision(WorldPlayer[1].Location, WorldMusic[A].Location))
+                WorldMusic_t &mus = *t;
+                if(CheckCollision(WorldPlayer[1].Location, mus.Location))
                 {
-                    if(curWorldMusic != WorldMusic[A].Type)
-                    {
-                        StartMusic(WorldMusic[A].Type);
-                    }
+                    if(curWorldMusic != mus.Type)
+                        StartMusic(mus.Type);
                 }
             }
+
             for(A = 1; A <= 4; A++)
             {
                 if(WorldLevel[curWorldLevel].LevelExit[A] == LevelBeatCode || WorldLevel[curWorldLevel].LevelExit[A] == -1)
                 {
                     WorldPlayer[1].LevelName = WorldLevel[curWorldLevel].LevelName;
-                    LevelPath(curWorldLevel, A);
+                    LevelPath(WorldLevel[curWorldLevel], A);
                 }
             }
+
             SaveGame();
             LevelBeatCode = 0;
         }
         else if(LevelBeatCode == -1)
         {
-            for(A = 1; A <= numWorldMusic; A++)
+            treeWorldMusicQuery(WorldPlayer[1].Location, marr, false);
+            //for(A = 1; A <= numWorldMusic; A++)
+            for(auto *t : marr)
             {
-                if(CheckCollision(WorldPlayer[1].Location, WorldMusic[A].Location))
+                WorldMusic_t &mus = *t;
+                if(CheckCollision(WorldPlayer[1].Location, mus.Location))
                 {
-                    if(curWorldMusic != WorldMusic[A].Type)
-                    {
-                        StartMusic(WorldMusic[A].Type);
-                    }
+                    if(curWorldMusic != mus.Type)
+                        StartMusic(mus.Type);
                 }
             }
-            for(A = 1; A <= numWorldLevels; A++)
+
+            treeWorldLevelQuery(WorldPlayer[1].Location, larr, false);
+            //for(A = 1; A <= numWorldLevels; A++)
+            for(auto *t : larr)
             {
-                if(CheckCollision(WorldPlayer[1].Location, WorldLevel[A].Location))
+                WorldLevel_t &level = *t;
+                if(CheckCollision(WorldPlayer[1].Location, level.Location))
                 {
-                    curWorldLevel = A;
-                    WorldPlayer[1].LevelName = WorldLevel[A].LevelName;
+                    curWorldLevel = level.index;
+                    WorldPlayer[1].LevelName = level.LevelName;
                     break;
                 }
             }
+
             if(curWorldLevel > 0)
-            {
-                LevelPath(curWorldLevel, 5);
-            }
+                LevelPath(WorldLevel[curWorldLevel], 5);
+
             SaveGame();
             LevelBeatCode = 0;
         }
     }
     else
         LevelBeatCode = 0;
+
     for(A = 1; A <= numPlayers; A++)
     {
         Player[A].Bumped = false;
@@ -180,7 +201,7 @@ void WorldLoop()
         tempLocation.Height = tempLocation.Height - 8;
         tempLocation.X = tempLocation.X + 4;
         tempLocation.Y = tempLocation.Y + 4;
-        WorldPlayer[1].LevelName = "";
+        WorldPlayer[1].LevelName.clear();
 
         bool altPressed = getKeyState(SDL_SCANCODE_LALT) == KEY_PRESSED ||
                           getKeyState(SDL_SCANCODE_RALT) == KEY_PRESSED;
@@ -192,11 +213,14 @@ void WorldLoop()
 
         bool pausePress = (Player[1].Controls.Start || escPressed) && !altPressed;
 
-        for(A = 1; A <= numWorldLevels; A++)
+        treeWorldLevelQuery(tempLocation, larr, true);
+        //for(A = 1; A <= numWorldLevels; A++)
+        for(auto *t : larr)
         {
-            if(CheckCollision(tempLocation, WorldLevel[A].Location))
+            WorldLevel_t &level = *t;
+            if(CheckCollision(tempLocation, level.Location))
             {
-                WorldPlayer[1].LevelName = WorldLevel[A].LevelName;
+                WorldPlayer[1].LevelName = level.LevelName;
                 break;
             }
         }
@@ -210,19 +234,26 @@ void WorldLoop()
         if(Player[1].Controls.Up)
         {
             tempLocation.Y = tempLocation.Y - 32;
-            for(A = 1; A <= numWorldPaths; A++)
+            treeWorldPathQuery(tempLocation, parr, true);
+            //for(A = 1; A <= numWorldPaths; A++)
+            for(auto *t : parr)
             {
-                if(CheckCollision(tempLocation, WorldPath[A].Location) && WorldPath[A].Active)
+                WorldPath_t &path = *t;
+                if(CheckCollision(tempLocation, path.Location) && path.Active)
                 {
                     WorldPlayer[1].Move = 1;
                     break;
                 }
             }
-            for(A = 1; A <= numWorldLevels; A++)
+
+            treeWorldLevelQuery(tempLocation, larr, true);
+            //for(A = 1; A <= numWorldLevels; A++)
+            for(auto *t : larr)
             {
+                WorldLevel_t &level = *t;
                 if(WorldPlayer[1].Move == 0)
                 {
-                    if(CheckCollision(tempLocation, WorldLevel[A].Location) && WorldLevel[A].Active)
+                    if(CheckCollision(tempLocation, level.Location) && level.Active)
                     {
                         WorldPlayer[1].Move = 1;
                         break;
@@ -241,25 +272,33 @@ void WorldLoop()
         else if(Player[1].Controls.Left)
         {
             tempLocation.X = tempLocation.X - 32;
-            for(A = 1; A <= numWorldPaths; A++)
+            treeWorldPathQuery(tempLocation, parr, true);
+            //for(A = 1; A <= numWorldPaths; A++)
+            for(auto *t : parr)
             {
-                if(CheckCollision(tempLocation, WorldPath[A].Location) && WorldPath[A].Active)
+                WorldPath_t &path = *t;
+                if(CheckCollision(tempLocation, path.Location) && path.Active)
                 {
                     WorldPlayer[1].Move = 2;
                     break;
                 }
             }
-            for(A = 1; A <= numWorldLevels; A++)
+
+            treeWorldLevelQuery(tempLocation, larr, true);
+            //for(A = 1; A <= numWorldLevels; A++)
+            for(auto *t : larr)
             {
+                WorldLevel_t &level = *t;
                 if(WorldPlayer[1].Move == 0)
                 {
-                    if(CheckCollision(tempLocation, WorldLevel[A].Location) && WorldLevel[A].Active)
+                    if(CheckCollision(tempLocation, level.Location) && level.Active)
                     {
                         WorldPlayer[1].Move = 2;
                         break;
                     }
                 }
             }
+
             if(WalkAnywhere)
                 WorldPlayer[1].Move = 2;
             if(WorldPlayer[1].Move == 0)
@@ -272,25 +311,33 @@ void WorldLoop()
         else if(Player[1].Controls.Down)
         {
             tempLocation.Y = tempLocation.Y + 32;
-            for(A = 1; A <= numWorldPaths; A++)
+            treeWorldPathQuery(tempLocation, parr, true);
+            //for(A = 1; A <= numWorldPaths; A++)
+            for(auto *t : parr)
             {
-                if(CheckCollision(tempLocation, WorldPath[A].Location) && WorldPath[A].Active)
+                WorldPath_t &path = *t;
+                if(CheckCollision(tempLocation, path.Location) && path.Active)
                 {
                     WorldPlayer[1].Move = 3;
                     break;
                 }
             }
-            for(A = 1; A <= numWorldLevels; A++)
+
+            treeWorldLevelQuery(tempLocation, larr, true);
+            //for(A = 1; A <= numWorldLevels; A++)
+            for(auto *t : larr)
             {
+                WorldLevel_t &level = *t;
                 if(WorldPlayer[1].Move == 0)
                 {
-                    if(CheckCollision(tempLocation, WorldLevel[A].Location) && WorldLevel[A].Active)
+                    if(CheckCollision(tempLocation, level.Location) && level.Active)
                     {
                         WorldPlayer[1].Move = 3;
                         break;
                     }
                 }
             }
+
             if(WalkAnywhere)
                 WorldPlayer[1].Move = 3;
             if(WorldPlayer[1].Move == 0)
@@ -303,25 +350,33 @@ void WorldLoop()
         else if(Player[1].Controls.Right)
         {
             tempLocation.X = tempLocation.X + 32;
-            for(A = 1; A <= numWorldPaths; A++)
+            treeWorldPathQuery(tempLocation, parr, true);
+            //for(A = 1; A <= numWorldPaths; A++)
+            for(auto *t : parr)
             {
-                if(CheckCollision(tempLocation, WorldPath[A].Location) && WorldPath[A].Active)
+                WorldPath_t &path = *t;
+                if(CheckCollision(tempLocation, path.Location) && path.Active)
                 {
                     WorldPlayer[1].Move = 4;
                     break;
                 }
             }
-            for(A = 1; A <= numWorldLevels; A++)
+
+            treeWorldLevelQuery(tempLocation, larr, true);
+            //for(A = 1; A <= numWorldLevels; A++)
+            for(auto *t : larr)
             {
+                WorldLevel_t &level = *t;
                 if(WorldPlayer[1].Move == 0)
                 {
-                    if(CheckCollision(tempLocation, WorldLevel[A].Location) && WorldLevel[A].Active)
+                    if(CheckCollision(tempLocation, level.Location) && level.Active)
                     {
                         WorldPlayer[1].Move = 4;
                         break;
                     }
                 }
             }
+
             if(WalkAnywhere)
                 WorldPlayer[1].Move = 4;
             if(WorldPlayer[1].Move == 0)
@@ -333,55 +388,64 @@ void WorldLoop()
         }
         else if(Player[1].Controls.Jump && Player[1].UnStart)
         {
-            for(A = 1; A <= numWorldLevels; A++)
+            treeWorldLevelQuery(tempLocation, larr, true);
+            //for(A = 1; A <= numWorldLevels; A++)
+            for(auto *t : larr)
             {
-                if(CheckCollision(tempLocation, WorldLevel[A].Location))
+                WorldLevel_t &level = *t;
+                if(CheckCollision(tempLocation, level.Location))
                 {
-                    if(int(WorldLevel[A].WarpX) != -1)
-                        WorldPlayer[1].Location.X = WorldLevel[A].WarpX;
-                    if(int(WorldLevel[A].WarpY) != -1)
-                        WorldPlayer[1].Location.Y = WorldLevel[A].WarpY;
-                    if(int(WorldLevel[A].WarpY) != -1 || int(WorldLevel[A].WarpX) != -1)
+                    if(int(level.WarpX) != -1)
+                        WorldPlayer[1].Location.X = level.WarpX;
+
+                    if(int(level.WarpY) != -1)
+                        WorldPlayer[1].Location.Y = level.WarpY;
+
+                    if(int(level.WarpY) != -1 || int(level.WarpX) != -1)
                     {
                         LevelBeatCode = 6;
-                        for(B = 1; B <= numWorldLevels; B++)
+                        treeWorldLevelQuery(WorldPlayer[1].Location, larr2, true);
+                        //for(B = 1; B <= numWorldLevels; B++)
+                        for(auto *t2 : larr2)
                         {
-                            if(CheckCollision(WorldPlayer[1].Location, WorldLevel[B].Location))
+                            WorldLevel_t &level2 = *t2;
+                            if(CheckCollision(WorldPlayer[1].Location, level2.Location))
                             {
-                                WorldLevel[B].Active = true;
-                                curWorldLevel = B;
+                                level2.Active = true;
+                                curWorldLevel = level2.index;
                             }
                         }
                     }
 
-                    if(!WorldLevel[A].FileName.empty() && WorldLevel[A].FileName != ".lvl" && WorldLevel[A].FileName != ".lvlx")
+                    if(!level.FileName.empty() && level.FileName != ".lvl" && level.FileName != ".lvlx")
                     {
-                        addMissingLvlSuffix(WorldLevel[A].FileName);
-                        if(Files::fileExists(SelectWorld[selWorld].WorldPath + WorldLevel[A].FileName))
+                        addMissingLvlSuffix(level.FileName);
+                        if(Files::fileExists(SelectWorld[selWorld].WorldPath + level.FileName))
                         {
-                            StartWarp = WorldLevel[A].StartWarp;
+                            StartWarp = level.StartWarp;
                             StopMusic();
                             PlaySound(28);
                             SoundPause[26] = 200;
-                            curWorldLevel = A;
+                            curWorldLevel = level.index;
                             LevelSelect = false;
                             GameThing();
                             ClearLevel();
                             PGE_Delay(1000);
-                            std::string levelPath = SelectWorld[selWorld].WorldPath + WorldLevel[A].FileName;
+                            std::string levelPath = SelectWorld[selWorld].WorldPath + level.FileName;
                             if(!OpenLevel(levelPath))
                             {
-                                MessageText = fmt::format_ne("ERROR: Can't open \"{0}\": file doesn't exist or corrupted.", WorldLevel[A].FileName);
+                                MessageText = fmt::format_ne("ERROR: Can't open \"{0}\": file doesn't exist or corrupted.", level.FileName);
                                 PauseGame(1);
                                 ErrorQuit = true;
                             }
                             break;
                         }
                     }
-                    else if(int(WorldLevel[A].WarpX) != -1 || int(WorldLevel[A].WarpY) != -1)
+                    else if(int(level.WarpX) != -1 || int(level.WarpY) != -1)
                     {
                         StopMusic();
                         PlaySound(28);
+                        frmMain.setTargetTexture();
                         frmMain.clearBuffer();
                         frmMain.repaint();
                         DoEvents();
@@ -403,15 +467,19 @@ void WorldLoop()
             WorldPlayer[1].Move3 = false;
             PlaySound(26);
         }
-        for(A = 1; A <= numWorldMusic; A++)
+
+        treeWorldMusicQuery(tempLocation, marr, true);
+        //for(A = 1; A <= numWorldMusic; A++)
+        for(auto *t : marr)
         {
-            if(CheckCollision(WorldPlayer[1].Location, WorldMusic[A].Location))
+            WorldMusic_t &mus = *t;
+            if(CheckCollision(WorldPlayer[1].Location, mus.Location))
             {
-                if((curWorldMusic != WorldMusic[A].Type) ||
-                   (WorldMusic[A].Type == CustomWorldMusicId() && curWorldMusicFile != WorldMusic[A].MusicFile))
+                if((curWorldMusic != mus.Type) ||
+                   (mus.Type == CustomWorldMusicId() && curWorldMusicFile != mus.MusicFile))
                 {
-                    curWorldMusicFile = WorldMusic[A].MusicFile;
-                    StartMusic(WorldMusic[A].Type);
+                    curWorldMusicFile = mus.MusicFile;
+                    StartMusic(mus.Type);
                 }
             }
         }
@@ -483,156 +551,209 @@ void WorldLoop()
 
 }
 
-void LevelPath(int Lvl, int Direction, bool Skp)
+void LevelPath(const WorldLevel_t &Lvl, int Direction, bool Skp)
 {
+    WorldPathPtrArr parr;
+    parr.reserve(20);
     Location_t tempLocation;
-    int A = 0;
+//    int A = 0;
 
+    // Up
     if(Direction == 1 || Direction == 5)
     {
-        tempLocation = WorldLevel[Lvl].Location;
+        tempLocation = Lvl.Location;
         tempLocation.X = tempLocation.X + 4;
         tempLocation.Y = tempLocation.Y + 4;
         tempLocation.Width = tempLocation.Width - 8;
         tempLocation.Height = tempLocation.Height - 8;
         tempLocation.Y = tempLocation.Y - 32;
-        for(A = 1; A <= numWorldPaths; A++)
+
+        treeWorldPathQuery(tempLocation, parr, false);
+        //for(A = 1; A <= numWorldPaths; A++)
+        for(auto *t : parr)
         {
-            if(WorldPath[A].Active == false)
+            WorldPath_t &path = *t;
+            if(!path.Active)
             {
-                if(CheckCollision(tempLocation, WorldPath[A].Location))
+                if(CheckCollision(tempLocation, path.Location))
                 {
-                    PathPath(A, Skp);
+                    PathPath(path, Skp);
                 }
             }
         }
     }
+
+    // Left
     if(Direction == 2 || Direction == 5)
     {
-        tempLocation = WorldLevel[Lvl].Location;
+        tempLocation = Lvl.Location;
         tempLocation.X = tempLocation.X + 4;
         tempLocation.Y = tempLocation.Y + 4;
         tempLocation.Width = tempLocation.Width - 8;
         tempLocation.Height = tempLocation.Height - 8;
         tempLocation.X = tempLocation.X - 32;
-        for(A = 1; A <= numWorldPaths; A++)
+
+        treeWorldPathQuery(tempLocation, parr, false);
+        //for(A = 1; A <= numWorldPaths; A++)
+        for(auto *t : parr)
         {
-            if(WorldPath[A].Active == false)
+            WorldPath_t &path = *t;
+            if(!path.Active)
             {
-                if(CheckCollision(tempLocation, WorldPath[A].Location))
+                if(CheckCollision(tempLocation, path.Location))
                 {
-                    PathPath(A, Skp);
+                    PathPath(path, Skp);
                 }
             }
         }
     }
+
+    // Down
     if(Direction == 3 || Direction == 5)
     {
-        tempLocation = WorldLevel[Lvl].Location;
+        tempLocation = Lvl.Location;
         tempLocation.X = tempLocation.X + 4;
         tempLocation.Y = tempLocation.Y + 4;
         tempLocation.Width = tempLocation.Width - 8;
         tempLocation.Height = tempLocation.Height - 8;
         tempLocation.Y = tempLocation.Y + 32;
-        for(A = 1; A <= numWorldPaths; A++)
+
+        treeWorldPathQuery(tempLocation, parr, false);
+        //for(A = 1; A <= numWorldPaths; A++)
+        for(auto *t : parr)
         {
-            if(WorldPath[A].Active == false)
+            WorldPath_t &path = *t;
+            if(!path.Active)
             {
-                if(CheckCollision(tempLocation, WorldPath[A].Location))
+                if(CheckCollision(tempLocation, path.Location))
                 {
-                    PathPath(A, Skp);
+                    PathPath(path, Skp);
                 }
             }
         }
     }
+
+    // Right
     if(Direction == 4 || Direction == 5)
     {
-        tempLocation = WorldLevel[Lvl].Location;
+        tempLocation = Lvl.Location;
         tempLocation.X = tempLocation.X + 4;
         tempLocation.Y = tempLocation.Y + 4;
         tempLocation.Width = tempLocation.Width - 8;
         tempLocation.Height = tempLocation.Height - 8;
         tempLocation.X = tempLocation.X + 32;
-        for(A = 1; A <= numWorldPaths; A++)
+
+        treeWorldPathQuery(tempLocation, parr, false);
+        //for(A = 1; A <= numWorldPaths; A++)
+        for(auto *t : parr)
         {
-            if(WorldPath[A].Active == false)
+            WorldPath_t &path = *t;
+            if(!path.Active)
             {
-                if(CheckCollision(tempLocation, WorldPath[A].Location))
+                if(CheckCollision(tempLocation, path.Location))
                 {
-                    PathPath(A, Skp);
+                    PathPath(path, Skp);
                 }
             }
         }
     }
 }
 
-void PathPath(int Pth, bool Skp)
+void PathPath(WorldPath_t &Pth, bool Skp)
 {
-    int A = 0;
+    WorldPathPtrArr parr;
+    WorldLevelPtrArr larr;
+    ScenePtrArr sarr;
+    parr.reserve(20);
+    larr.reserve(20);
+    sarr.reserve(20);
+    //int A = 0;
     int B = 0;
+
     Location_t tempLocation;
-    tempLocation = WorldPath[Pth].Location;
+    tempLocation = Pth.Location;
     tempLocation.X = tempLocation.X + 4;
     tempLocation.Y = tempLocation.Y + 4;
     tempLocation.Width = tempLocation.Width - 8;
     tempLocation.Height = tempLocation.Height - 8;
-    for(A = 1; A <= numScenes; A++)
+
+    treeWorldSceneQuery(tempLocation, sarr, true);
+    //for(A = 1; A <= numScenes; A++)
+    for(auto *t : sarr)
     {
-        if(Scene[A].Active)
+        Scene_t &scene = *t;
+        if(scene.Active)
         {
-            if(CheckCollision(tempLocation, Scene[A].Location))
-                Scene[A].Active = false;
+            if(CheckCollision(tempLocation, scene.Location))
+                scene.Active = false;
         }
     }
-    if(WorldPath[Pth].Active == false && Skp == false)
+
+    if(!Pth.Active && !Skp)
     {
-        WorldPath[Pth].Active = true;
-        vScreenX[1] = -(WorldPath[Pth].Location.X + WorldPath[Pth].Location.Width / 2.0) + vScreen[1].Width / 2.0;
-        vScreenY[1] = -(WorldPath[Pth].Location.Y + WorldPath[Pth].Location.Height / 2.0) + vScreen[1].Height / 2.0;
+        Pth.Active = true;
+        vScreenX[1] = -(Pth.Location.X + Pth.Location.Width / 2.0) + vScreen[1].Width / 2.0;
+        vScreenY[1] = -(Pth.Location.Y + Pth.Location.Height / 2.0) + vScreen[1].Height / 2.0;
         PlaySound(27);
         PathWait();
     }
-    WorldPath[Pth].Active = true;
+
+    Pth.Active = true;
+
     for(B = 1; B <= 4; B++)
     {
         if(B == 1)
-            tempLocation.Y = tempLocation.Y - 32;
+            tempLocation.Y -= 32; // Up
         else if(B == 2)
         {
-            tempLocation.Y = tempLocation.Y + 32;
-            tempLocation.X = tempLocation.X - 32;
+            tempLocation.Y += 32; // Down
+            tempLocation.X -= 32; // Left
         }
         else if(B == 3)
         {
-            tempLocation.X = tempLocation.X + 32;
-            tempLocation.Y = tempLocation.Y + 32;
+            tempLocation.X += 32; // Right
+            tempLocation.Y += 32; // Down
         }
         else if(B == 4)
         {
-            tempLocation.Y = tempLocation.Y - 32;
-            tempLocation.X = tempLocation.X + 32;
+            tempLocation.Y -= 32; // Up
+            tempLocation.X += 32; // Right
         }
-        for(A = 1; A <= numWorldPaths; A++)
+
+        treeWorldPathQuery(tempLocation, parr, true);
+        //for(A = 1; A <= numWorldPaths; A++)
+        for(auto *t : parr)
         {
-            if(WorldPath[A].Active == false)
+            WorldPath_t &path = *t;
+            D_pLogDebug("Found path activity: %d", (int)path.Active);
+            if(!path.Active)
             {
-                if(CheckCollision(tempLocation, WorldPath[A].Location))
+                D_pLogDebugNA("Collision with path...");
+                if(CheckCollision(tempLocation, path.Location))
                 {
-                    PathPath(A, Skp);
+                    D_pLogDebugNA("Collision with path FOUND...");
+                    PathPath(path, Skp);
                 }
             }
         }
-        for(A = 1; A <= numWorldLevels; A++)
+
+        treeWorldLevelQuery(tempLocation, larr, true);
+        //for(A = 1; A <= numWorldLevels; A++)
+        for(auto *t : larr)
         {
-            if(WorldLevel[A].Active == false)
+            WorldLevel_t &lev = *t;
+            D_pLogDebug("Found level activity: %d", (int)lev.Active);
+            if(!lev.Active)
             {
-                if(CheckCollision(tempLocation, WorldLevel[A].Location))
+                D_pLogDebugNA("Collision with level...");
+                if(CheckCollision(tempLocation, lev.Location))
                 {
-                    WorldLevel[A].Active = true;
-                    if(Skp == false)
+                    D_pLogDebugNA("Collision with level FOUND...");
+                    lev.Active = true;
+                    if(!Skp)
                     {
-                        vScreenX[1] = -(WorldLevel[A].Location.X + WorldLevel[A].Location.Width / 2.0) + vScreen[1].Width / 2.0;
-                        vScreenY[1] = -(WorldLevel[A].Location.Y + WorldLevel[A].Location.Height / 2.0) + vScreen[1].Height / 2.0;
+                        vScreenX[1] = -(lev.Location.X + lev.Location.Width / 2.0) + vScreen[1].Width / 2.0;
+                        vScreenY[1] = -(lev.Location.Y + lev.Location.Height / 2.0) + vScreen[1].Height / 2.0;
                         PlaySound(27);
                         PathWait();
                     }

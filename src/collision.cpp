@@ -29,28 +29,44 @@
 // 'Normal collisions
 bool CheckCollision(const Location_t &Loc1, const Location_t &Loc2)
 {
-    bool tempCheckCollision = false;
-    if(Loc1.Y + Loc1.Height >= Loc2.Y)
+    if(
+        (Loc1.Y + Loc1.Height >= Loc2.Y) &&
+        (Loc1.Y <= Loc2.Y + Loc2.Height) &&
+        (Loc1.X <= Loc2.X + Loc2.Width) &&
+        (Loc1.X + Loc1.Width >= Loc2.X)
+    )
     {
-        if(Loc1.Y <= Loc2.Y + Loc2.Height)
-        {
-            if(Loc1.X <= Loc2.X + Loc2.Width)
-            {
-                if(Loc1.X + Loc1.Width >= Loc2.X)
-                {
-                    tempCheckCollision = true;
-                }
-            }
-        }
+        return true;
     }
-    return tempCheckCollision;
+
+    return false;
 }
+
+// Intersect collisions
+bool CheckCollisionIntersect(const Location_t &Loc1, const Location_t &Loc2)
+{
+    if(Loc1.Y < Loc2.Y)
+        return false;
+
+    if(Loc1.Y + Loc1.Height > Loc2.Y + Loc2.Height)
+        return false;
+
+    if(Loc1.X < Loc2.X)
+        return false;
+
+    if(Loc1.X + Loc1.Width > Loc2.X + Loc2.Width)
+        return false;
+
+    return true;
+}
+
 
 // Make the game easier for the people who whine about the detection being 'off'
 bool n00bCollision(const Location_t &Loc1, const Location_t &Loc2)
 {
     bool tempn00bCollision = false;
     float EZ = 2.f;
+
     if(float(Loc2.Width) >= 32 - EZ * 2 && float(Loc2.Height) >= 32 - EZ * 2)
     {
         if(float(Loc1.Y) + float(Loc1.Height) - EZ >= float(Loc2.Y))
@@ -83,6 +99,7 @@ bool n00bCollision(const Location_t &Loc1, const Location_t &Loc2)
             }
         }
     }
+
     return tempn00bCollision;
 }
 
@@ -148,207 +165,218 @@ bool WarpCollision(const Location_t &Loc1, int A)
             }
         }
     }
+
     return tempWarpCollision;
 }
 
 // Whats side the collision happened
 int FindCollision(const Location_t &Loc1, const Location_t &Loc2)
 {
-    int tempFindCollision = 0;
+    int tempFindCollision = COLLISION_NONE;
+
     if(Loc1.Y + Loc1.Height - Loc1.SpeedY <= Loc2.Y - Loc2.SpeedY)
     {
-        tempFindCollision = 1;
+        tempFindCollision = COLLISION_TOP;
     }
     else if(Loc1.X - Loc1.SpeedX >= Loc2.X + Loc2.Width - Loc2.SpeedX)
     {
-        tempFindCollision = 2;
+        tempFindCollision = COLLISION_RIGHT;
     }
     else if(Loc1.X + Loc1.Width - Loc1.SpeedX <= Loc2.X - Loc2.SpeedX)
     {
-        tempFindCollision = 4;
+        tempFindCollision = COLLISION_LEFT;
     }
     else if(Loc1.Y - Loc1.SpeedY > Loc2.Y + Loc2.Height - Loc2.SpeedY - 0.1)
     {
-        tempFindCollision = 3;
+        tempFindCollision = COLLISION_BOTTOM;
     }
     else
     {
-        tempFindCollision = 5;
+        tempFindCollision = COLLISION_CENTER;
     }
+
     return tempFindCollision;
 }
 
 // Whats side the collision happened for belts
 int FindCollisionBelt(const Location_t &Loc1, const Location_t &Loc2, float BeltSpeed)
 {
-    int tempFindCollisionBelt = 0;
+    int tempFindCollisionBelt = COLLISION_NONE;
+
     if(Loc1.Y + Loc1.Height - Loc1.SpeedY <= Loc2.Y - Loc2.SpeedY)
     {
-        tempFindCollisionBelt = 1;
+        tempFindCollisionBelt = COLLISION_TOP;
     }
     else if(Loc1.X - Loc1.SpeedX - BeltSpeed >= Loc2.X + Loc2.Width - Loc2.SpeedX)
     {
-        tempFindCollisionBelt = 2;
+        tempFindCollisionBelt = COLLISION_RIGHT;
     }
     else if(Loc1.X + Loc1.Width - Loc1.SpeedX <= Loc2.X - Loc2.SpeedX)
     {
-        tempFindCollisionBelt = 4;
+        tempFindCollisionBelt = COLLISION_LEFT;
     }
     else if(Loc1.Y - Loc1.SpeedY - BeltSpeed > Loc2.Y + Loc2.Height - Loc2.SpeedY - 0.1)
     {
-        tempFindCollisionBelt = 3;
+        tempFindCollisionBelt = COLLISION_BOTTOM;
     }
     else
     {
-        tempFindCollisionBelt = 5;
+        tempFindCollisionBelt = COLLISION_CENTER;
     }
+
     return tempFindCollisionBelt;
 }
 
 // Whats side the collision happened for NPCs
 int NPCFindCollision(const Location_t &Loc1, const Location_t &Loc2)
 {
-    int tempNPCFindCollision = 0;
+    int tempNPCFindCollision = COLLISION_NONE;
+
     if(Loc1.Y + Loc1.Height - Loc1.SpeedY <= Loc2.Y - Loc2.SpeedY + 4)
     {
-        tempNPCFindCollision = 1;
+        tempNPCFindCollision = COLLISION_TOP;
     }
     else if(Loc1.X - Loc1.SpeedX >= Loc2.X + Loc2.Width - Loc2.SpeedX)
     {
-        tempNPCFindCollision = 2;
+        tempNPCFindCollision = COLLISION_RIGHT;
     }
     else if(Loc1.X + Loc1.Width - Loc1.SpeedX <= Loc2.X - Loc2.SpeedX)
     {
-        tempNPCFindCollision = 4;
+        tempNPCFindCollision = COLLISION_LEFT;
     }
     else if(Loc1.Y - Loc1.SpeedY > Loc2.Y + Loc2.Height - Loc2.SpeedY - 0.1)
     {
-        tempNPCFindCollision = 3;
+        tempNPCFindCollision = COLLISION_BOTTOM;
     }
     else
     {
-        tempNPCFindCollision = 5;
+        tempNPCFindCollision = COLLISION_CENTER;
     }
+
     return tempNPCFindCollision;
 }
 
 // Easy mode collision for jumping on NPCs
 int EasyModeCollision(const Location_t &Loc1, const Location_t &Loc2, bool StandOn)
 {
-    int tempEasyModeCollision = 0;
+    int tempEasyModeCollision = COLLISION_NONE;
+
     if(!FreezeNPCs)
     {
         if(Loc1.Y + Loc1.Height - Loc1.SpeedY <= Loc2.Y - Loc2.SpeedY + 10)
         {
             if(Loc1.SpeedY > Loc2.SpeedY || StandOn)
             {
-                tempEasyModeCollision = 1;
+                tempEasyModeCollision = COLLISION_TOP;
             }
             else
             {
-                tempEasyModeCollision = 0;
+                tempEasyModeCollision = COLLISION_NONE;
             }
         }
         else if(Loc1.X - Loc1.SpeedX >= Loc2.X + Loc2.Width - Loc2.SpeedX)
         {
-            tempEasyModeCollision = 2;
+            tempEasyModeCollision = COLLISION_RIGHT;
         }
         else if(Loc1.X + Loc1.Width - Loc1.SpeedX <= Loc2.X - Loc2.SpeedX)
         {
-            tempEasyModeCollision = 4;
+            tempEasyModeCollision = COLLISION_LEFT;
         }
         else if(Loc1.Y - Loc1.SpeedY >= Loc2.Y + Loc2.Height - Loc2.SpeedY)
         {
-            tempEasyModeCollision = 3;
+            tempEasyModeCollision = COLLISION_BOTTOM;
         }
         else
         {
-            tempEasyModeCollision = 5;
+            tempEasyModeCollision = COLLISION_CENTER;
         }
     }
     else
     {
         if(Loc1.Y + Loc1.Height - Loc1.SpeedY <= Loc2.Y + 10)
         {
-            tempEasyModeCollision = 1;
+            tempEasyModeCollision = COLLISION_TOP;
         }
         else if(Loc1.X - Loc1.SpeedX >= Loc2.X + Loc2.Width)
         {
-            tempEasyModeCollision = 2;
+            tempEasyModeCollision = COLLISION_RIGHT;
         }
         else if(Loc1.X + Loc1.Width - Loc1.SpeedX <= Loc2.X)
         {
-            tempEasyModeCollision = 4;
+            tempEasyModeCollision = COLLISION_LEFT;
         }
         else if(Loc1.Y - Loc1.SpeedY >= Loc2.Y + Loc2.Height)
         {
-            tempEasyModeCollision = 3;
+            tempEasyModeCollision = COLLISION_BOTTOM;
         }
         else
         {
-            tempEasyModeCollision = 5;
+            tempEasyModeCollision = COLLISION_CENTER;
         }
     }
+
     return tempEasyModeCollision;
 }
 
 // Easy mode collision for jumping on NPCs while on yoshi/boot
 int BootCollision(const Location_t &Loc1, const Location_t &Loc2, bool StandOn)
 {
-    int tempBootCollision = 0;
-    if(FreezeNPCs == false)
+    int tempBootCollision = COLLISION_NONE;
+
+    if(!FreezeNPCs)
     {
         if(Loc1.Y + Loc1.Height - Loc1.SpeedY <= Loc2.Y - Loc2.SpeedY + 16)
         {
             if(Loc1.SpeedY > Loc2.SpeedY || StandOn == true)
             {
-                tempBootCollision = 1;
+                tempBootCollision = COLLISION_TOP;
             }
             else
             {
-                tempBootCollision = 0;
+                tempBootCollision = COLLISION_NONE;
             }
         }
         else if(Loc1.X - Loc1.SpeedX >= Loc2.X + Loc2.Width - Loc2.SpeedX)
         {
-            tempBootCollision = 2;
+            tempBootCollision = COLLISION_RIGHT;
         }
         else if(Loc1.X + Loc1.Width - Loc1.SpeedX <= Loc2.X - Loc2.SpeedX)
         {
-            tempBootCollision = 4;
+            tempBootCollision = COLLISION_LEFT;
         }
         else if(Loc1.Y - Loc1.SpeedY >= Loc2.Y + Loc2.Height - Loc2.SpeedY)
         {
-            tempBootCollision = 3;
+            tempBootCollision = COLLISION_BOTTOM;
         }
         else
         {
-            tempBootCollision = 5;
+            tempBootCollision = COLLISION_CENTER;
         }
     }
     else
     {
         if(Loc1.Y + Loc1.Height - Loc1.SpeedY <= Loc2.Y + 16)
         {
-            tempBootCollision = 1;
+            tempBootCollision = COLLISION_TOP;
         }
         else if(Loc1.X - Loc1.SpeedX >= Loc2.X + Loc2.Width)
         {
-            tempBootCollision = 2;
+            tempBootCollision = COLLISION_RIGHT;
         }
         else if(Loc1.X + Loc1.Width - Loc1.SpeedX <= Loc2.X)
         {
-            tempBootCollision = 4;
+            tempBootCollision = COLLISION_LEFT;
         }
         else if(Loc1.Y - Loc1.SpeedY >= Loc2.Y + Loc2.Height)
         {
-            tempBootCollision = 3;
+            tempBootCollision = COLLISION_BOTTOM;
         }
         else
         {
-            tempBootCollision = 5;
+            tempBootCollision = COLLISION_CENTER;
         }
     }
+
     return tempBootCollision;
 
 }
@@ -357,6 +385,7 @@ int BootCollision(const Location_t &Loc1, const Location_t &Loc2, bool StandOn)
 bool CursorCollision(const Location_t &Loc1, const Location_t &Loc2)
 {
     bool tempCursorCollision = false;
+
     if(Loc1.X <= Loc2.X + Loc2.Width - 1)
     {
         if(Loc1.X + Loc1.Width >= Loc2.X + 1)
@@ -370,6 +399,7 @@ bool CursorCollision(const Location_t &Loc1, const Location_t &Loc2)
             }
         }
     }
+
     return tempCursorCollision;
 }
 
@@ -377,6 +407,7 @@ bool CursorCollision(const Location_t &Loc1, const Location_t &Loc2)
 bool ShakeCollision(const Location_t &Loc1, const Location_t &Loc2, int ShakeY3)
 {
     bool tempShakeCollision = false;
+
     if(Loc1.X + 1 <= Loc2.X + Loc2.Width)
     {
         if(Loc1.X + Loc1.Width - 1 >= Loc2.X)
@@ -390,6 +421,7 @@ bool ShakeCollision(const Location_t &Loc1, const Location_t &Loc2, int ShakeY3)
             }
         }
     }
+
     return tempShakeCollision;
 }
 
@@ -397,6 +429,7 @@ bool ShakeCollision(const Location_t &Loc1, const Location_t &Loc2, int ShakeY3)
 bool vScreenCollision(int A, const Location_t &Loc2)
 {
     bool tempvScreenCollision = false;
+
     if(A == 0)
     {
         return true;
@@ -414,6 +447,7 @@ bool vScreenCollision(int A, const Location_t &Loc2)
             }
         }
     }
+
     return tempvScreenCollision;
 
 }
@@ -422,6 +456,7 @@ bool vScreenCollision(int A, const Location_t &Loc2)
 bool vScreenCollision2(int A, const Location_t &Loc2)
 {
     bool tempvScreenCollision2 = false;
+
     if(-vScreenX[A] + 64 <= Loc2.X + Loc2.Width)
     {
         if(-vScreenX[A] + vScreen[A].Width - 64 >= Loc2.X)
@@ -435,6 +470,7 @@ bool vScreenCollision2(int A, const Location_t &Loc2)
             }
         }
     }
+
     return tempvScreenCollision2;
 }
 
@@ -442,6 +478,7 @@ bool vScreenCollision2(int A, const Location_t &Loc2)
 bool WalkingCollision(const Location_t &Loc1, const Location_t &Loc2)
 {
     bool tempWalkingCollision = false;
+
     if(Loc1.X <= Loc2.X + Loc2.Width + Loc1.SpeedX)
     {
         if(Loc1.X + Loc1.Width >= Loc2.X + Loc1.SpeedX)
@@ -449,6 +486,7 @@ bool WalkingCollision(const Location_t &Loc1, const Location_t &Loc2)
             tempWalkingCollision = true;
         }
     }
+
     return tempWalkingCollision;
 }
 
@@ -456,6 +494,7 @@ bool WalkingCollision(const Location_t &Loc1, const Location_t &Loc2)
 bool WalkingCollision2(const Location_t &Loc1, const Location_t &Loc2)
 {
     bool tempWalkingCollision2 = false;
+
     if(Loc1.X <= Loc2.X + Loc2.Width - Loc1.SpeedX - 1)
     {
         if(Loc1.X + Loc1.Width >= Loc2.X - Loc1.SpeedX + 1)
@@ -463,6 +502,7 @@ bool WalkingCollision2(const Location_t &Loc1, const Location_t &Loc2)
             tempWalkingCollision2 = true;
         }
     }
+
     return tempWalkingCollision2;
 }
 
@@ -470,6 +510,7 @@ bool WalkingCollision2(const Location_t &Loc1, const Location_t &Loc2)
 bool WalkingCollision3(const Location_t &Loc1, const Location_t &Loc2, float BeltSpeed)
 {
     bool tempWalkingCollision3 = false;
+
     if(Loc1.X <= Loc2.X + Loc2.Width - (Loc1.SpeedX + BeltSpeed) - 1)
     {
         if(Loc1.X + Loc1.Width >= Loc2.X - (Loc1.SpeedX + BeltSpeed) + 1)
@@ -477,33 +518,36 @@ bool WalkingCollision3(const Location_t &Loc1, const Location_t &Loc2, float Bel
             tempWalkingCollision3 = true;
         }
     }
+
     return tempWalkingCollision3;
 }
 
 // Helps the player to walk over 1 unit cracks
 int FindRunningCollision(const Location_t &Loc1, const Location_t &Loc2)
 {
-    int tempFindRunningCollision = 0;
+    int tempFindRunningCollision = COLLISION_NONE;
+
     if(Loc1.Y + Loc1.Height - Loc1.SpeedY - 2.5 <= Loc2.Y - Loc2.SpeedY)
     {
-        tempFindRunningCollision = 1;
+        tempFindRunningCollision = COLLISION_TOP;
     }
     else if(Loc1.X - Loc1.SpeedX >= Loc2.X + Loc2.Width - Loc2.SpeedX)
     {
-        tempFindRunningCollision = 2;
+        tempFindRunningCollision = COLLISION_RIGHT;
     }
     else if(Loc1.X + Loc1.Width - Loc1.SpeedX <= Loc2.X - Loc2.SpeedX)
     {
-        tempFindRunningCollision = 4;
+        tempFindRunningCollision = COLLISION_LEFT;
     }
     else if(Loc1.Y - Loc1.SpeedY >= Loc2.Y + Loc2.Height - Loc2.SpeedY)
     {
-        tempFindRunningCollision = 3;
+        tempFindRunningCollision = COLLISION_BOTTOM;
     }
     else
     {
-        tempFindRunningCollision = 5;
+        tempFindRunningCollision = COLLISION_CENTER;
     }
+
     return tempFindRunningCollision;
 }
 
@@ -512,6 +556,7 @@ bool ShouldTurnAround(const Location_t &Loc1, const Location_t &Loc2, float Dire
 {
     bool tempShouldTurnAround = false;
     tempShouldTurnAround = true;
+
     if(Loc1.Y + Loc1.Height + 8 <= Loc2.Y + Loc2.Height)
     {
         if(Loc1.Y + Loc1.Height + 8 >= Loc2.Y)
@@ -528,6 +573,7 @@ bool ShouldTurnAround(const Location_t &Loc1, const Location_t &Loc2, float Dire
             }
         }
     }
+
     return tempShouldTurnAround;
 }
 
@@ -536,6 +582,7 @@ bool CanComeOut(const Location_t &Loc1, const Location_t &Loc2)
 {
     bool tempCanComeOut = false;
     tempCanComeOut = true;
+
     if(Loc1.X <= Loc2.X + Loc2.Width + 32)
     {
         if(Loc1.X + Loc1.Width >= Loc2.X - 32)
@@ -549,6 +596,7 @@ bool CanComeOut(const Location_t &Loc1, const Location_t &Loc2)
             }
         }
     }
+
     return tempCanComeOut;
 }
 
@@ -556,10 +604,12 @@ bool CanComeOut(const Location_t &Loc1, const Location_t &Loc2)
 bool CheckHitSpot1(const Location_t &Loc1, const Location_t &Loc2)
 {
     bool tempCheckHitSpot1 = false;
+
     if(Loc1.Y + Loc1.Height - Loc1.SpeedY - Physics.NPCGravity <= Loc2.Y - Loc2.SpeedY)
     {
         tempCheckHitSpot1 = true;
     }
+
     return tempCheckHitSpot1;
 }
 

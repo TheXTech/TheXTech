@@ -27,7 +27,11 @@
 #define JOYSTICK_H
 
 #include <string>
+#include <vector>
 #include "../range_arr.hpp"
+#include "con_control.h"
+
+struct SDL_JoyDeviceEvent;
 
 // Public Sub UpdateControls() 'Gets players controls
 // Gets players controls
@@ -36,17 +40,40 @@ void UpdateControls();
 #ifdef USE_TOUCHSCREEN_CONTROLLER
 void RenderTouchControls();
 void UpdateTouchScreenSize();
+const Controls_t &CurrentTouchControls();
 #endif
 
-int InitJoysticks();
+extern void           joyFillDefaults(ConJoystick_t &j);
+extern void           joyFillDefaults(ConKeyboard_t &k);
 
-bool JoyIsKeyDown(int JoystickNumber, const KM_Key &key);
+extern int            joyInitJoysticks();
+extern void           joyGetAllUUIDs(int player, std::vector<std::string> &out);
 
-void CloseJoysticks();
+extern int            joyCount();
+extern ConJoystick_t &joyGetByUuid(int player, const std::string &uuid);
+extern void           joyGetByUuid(ConJoystick_t &dst, int player, const std::string &uuid);
+extern ConJoystick_t &joyGetByIndex(int player, int joyNum);
+extern void           joyGetByIndex(int player, int joyNum, ConJoystick_t &dst);
+extern void           joySetByUuid(int player, const std::string &uuid, const ConJoystick_t &cj);
+extern void           joySetByIndex(int player, int index, const ConJoystick_t &cj);
+
+extern int            joyGetPowerLevel(int joyNum);
+extern void           joyRumble(int joyNum, int ms, float strength);
+extern void           joyRumbleAllPlayers(int ms, float strength);
+
+extern std::string    joyGetUuidStr(int joystick);
+extern std::string    joyGetName(int joystick);
+
+extern void           joyDeviceAddEvent(const SDL_JoyDeviceEvent *e);
+extern void           joyDeviceRemoveEvent(const SDL_JoyDeviceEvent *e);
+
+extern bool joyIsKeyDown(int JoystickNumber, const KM_Key &key);
+
+extern void joyCloseJoysticks();
 // Public Function StartJoystick(Optional ByVal JoystickNumber As Integer = 0) As Boolean
-bool StartJoystick(int JoystickNumber);
+extern bool joyStartJoystick(int JoystickNumber);
 // Public Sub PollJoystick()
-bool PollJoystick(int joystick, KM_Key &key);
+extern bool joyPollJoystick(int joystick, KM_Key &key);
 
 
 #endif // JOYSTICK_H

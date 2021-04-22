@@ -33,10 +33,18 @@ namespace Strings
     bool endsWith(const std::string &str, char what);
     bool endsWith(const std::string &str, const std::string &what);
     std::string trim(std::string str);
+    std::string ltrim(std::string str);
+    std::string rtrim(std::string str);
     void doTrim(std::string &str);
+    void doLTrim(std::string &str);
+    void doRTrim(std::string &str);
     void split(List &out, const std::string &str, char delimiter);
     void split(List &out, const std::string &str, const std::string &delimiter);
     List split(const std::string &str, char delimiter);
     List split(const std::string &str, const std::string &delimiter);
+    void replaceInAll(std::string &src, std::string from, std::string to);
+    void removeInAll(std::string &src, std::string substr);
+    std::string replaceAll(std::string src, std::string from, std::string to);
+    std::string removeAll(std::string src, std::string substr);
 }
 #endif // STRINGS_H
