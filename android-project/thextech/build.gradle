@@ -42,7 +42,7 @@ android {
 
     signingConfigs {
         releaseci {
-            storeFile file("release-key.jks")
+            storeFile file("../release-key.jks")
             storePassword = release_store_password
             keyAlias = release_key_alias
             keyPassword = release_key_password
