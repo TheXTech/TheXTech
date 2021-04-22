@@ -373,8 +373,7 @@ jobs:
         name: ${{ matrix.config.name }} ${{ matrix.config.build_type }}
 
     - name: Deploy to builds.wohlsoft.ru
-      if: always()
-#      if: runner.os == 'macOS' || runner.os == 'Linux'
+      if: github.event_name != 'pull_request'
       shell: bash
       run: |
         if [[ ! -z "${{ matrix.config.extra_path }}" ]]; then
