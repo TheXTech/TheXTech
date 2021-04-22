@@ -285,40 +285,44 @@ void ProcEvent(std::string EventName, bool NoEffect)
 
     for(A = 0; A <= numEvents; A++)
     {
-        if(equalCase(EventName, Events[A].Name))
+        auto &evt = Events[A];
+        if(equalCase(EventName, evt.Name))
         {
             if(equalCase(EventName, "Boss Dead"))
                 speedRun_bossDeadEvent();
 
             for(B = 0; B <= numSections; B++)
             {
-                if(Events[A].Music[B] == -2)
+                /* Music change */
+                bool musicChanged = false;
+                auto &m = evt.Music[B];
+                if(m == -2)
                 {
                     bgMusic[B] = bgMusicREAL[B];
-                    if(B == Player[1].Section || (numPlayers == 2 && B == Player[2].Section))
-                    {
-                        StartMusic(B);
-                    }
+                    musicChanged = true;
                 }
-                else if(Events[A].Music[B] != -1)
+                else if(evt.Music[B] != -1)
                 {
-                    bgMusic[B] = Events[A].Music[B];
-                    if(B == Player[1].Section || (numPlayers == 2 && B == Player[2].Section))
-                    {
-                        StartMusic(B);
-                    }
+                    bgMusic[B] = m;
+                    musicChanged = true;
                 }
-                if(Events[A].Background[B] == -2)
+                if(musicChanged && (B == Player[1].Section || (numPlayers == 2 && B == Player[2].Section)))
+                    StartMusic(B);
+
+                /* Background change */
+                if(evt.Background[B] == -2)
                     Background2[B] = Background2REAL[B];
-                else if(Events[A].Background[B] != -1)
-                    Background2[B] = Events[A].Background[B];
-                if(int(Events[A].level[B].X) == -2)
+                else if(evt.Background[B] != -1)
+                    Background2[B] = evt.Background[B];
+
+                /* Resize the section noundaries */
+                if(int(evt.level[B].X) == -2)
                     level[B] = LevelREAL[B];
-                else if(int(Events[A].level[B].X) != -1)
+                else if(int(evt.level[B].X) != -1)
                 {
                     tempLevel = level[B];
-                    level[B] = Events[A].level[B];
-                    if(!Events[A].AutoStart && !equalCase(Events[A].Name, "Level - Start"))
+                    level[B] = evt.level[B];
+                    if(!evt.AutoStart && !equalCase(evt.Name, "Level - Start"))
                     {
                         for(C = 1; C <= numPlayers; C++)
                         {
@@ -369,7 +373,7 @@ void ProcEvent(std::string EventName, bool NoEffect)
                         }
                     }
 
-                    if(!equalCase(Events[A].Name, "Level - Start"))
+                    if(!equalCase(evt.Name, "Level - Start"))
                     {
                         C = plr;
                         if(numPlayers == 2 && DScreenType != 5)
@@ -406,7 +410,7 @@ void ProcEvent(std::string EventName, bool NoEffect)
                                 qScreenY[1] = -level[Player[C].Section].Y;
                             if(-qScreenY[1] + frmMain.ScaleHeight > level[Player[C].Section].Height)
                                 qScreenY[1] = -(level[Player[C].Section].Height - ScreenH);
-                            level[B] = Events[A].level[B];
+                            level[B] = evt.level[B];
                         }
                         else
                         {
@@ -420,17 +424,17 @@ void ProcEvent(std::string EventName, bool NoEffect)
                 }
             }
 
-            for(auto &l : Events[A].HideLayer)
+            for(auto &l : evt.HideLayer)
             {
-                HideLayer(l, NoEffect ? true : Events[A].LayerSmoke);
+                HideLayer(l, NoEffect ? true : evt.LayerSmoke);
             }
 
-            for(auto &l : Events[A].ShowLayer)
+            for(auto &l : evt.ShowLayer)
             {
-                ShowLayer(l, NoEffect ? true : Events[A].LayerSmoke);
+                ShowLayer(l, NoEffect ? true : evt.LayerSmoke);
             }
 
-            for(auto &l : Events[A].ToggleLayer)
+            for(auto &l : evt.ToggleLayer)
             {
                 if(l.empty())
                     continue;
@@ -440,9 +444,9 @@ void ProcEvent(std::string EventName, bool NoEffect)
                     if(Layer[C].Name == l)
                     {
                         if(Layer[C].Hidden)
-                            ShowLayer(Layer[C].Name, Events[A].LayerSmoke);
+                            ShowLayer(Layer[C].Name, evt.LayerSmoke);
                         else
-                            HideLayer(Layer[C].Name, Events[A].LayerSmoke);
+                            HideLayer(Layer[C].Name, evt.LayerSmoke);
                     }
                 }
             }
@@ -452,28 +456,28 @@ void ProcEvent(std::string EventName, bool NoEffect)
             {
                 if(NoEffect == true)
                 {
-                    HideLayer(Events[A].HideLayer[B], NoEffect);
-                    ShowLayer(Events[A].ShowLayer[B], NoEffect);
+                    HideLayer(evt.HideLayer[B], NoEffect);
+                    ShowLayer(evt.ShowLayer[B], NoEffect);
                 }
                 else
                 {
-                    HideLayer(Events[A].HideLayer[B], Events[A].LayerSmoke);
-                    ShowLayer(Events[A].ShowLayer[B], Events[A].LayerSmoke);
+                    HideLayer(evt.HideLayer[B], evt.LayerSmoke);
+                    ShowLayer(evt.ShowLayer[B], evt.LayerSmoke);
                 }
 
-                if(!(Events[A].ToggleLayer[B] == ""))
+                if(!(evt.ToggleLayer[B] == ""))
                 {
                     for(C = 0; C <= maxLayers; C++)
                     {
-                        if(Layer[C].Name == Events[A].ToggleLayer[B])
+                        if(Layer[C].Name == evt.ToggleLayer[B])
                         {
                             if(Layer[C].Hidden)
                             {
-                                ShowLayer(Layer[C].Name, Events[A].LayerSmoke);
+                                ShowLayer(Layer[C].Name, evt.LayerSmoke);
                             }
                             else
                             {
-                                HideLayer(Layer[C].Name, Events[A].LayerSmoke);
+                                HideLayer(Layer[C].Name, evt.LayerSmoke);
                             }
                         }
                     }
@@ -481,15 +485,15 @@ void ProcEvent(std::string EventName, bool NoEffect)
             }
 #endif
 
-            if(!Events[A].MoveLayer.empty())
+            if(!evt.MoveLayer.empty())
             {
                 for(B = 0; B <= maxLayers; B++)
                 {
-                    if(Layer[B].Name == Events[A].MoveLayer)
+                    if(Layer[B].Name == evt.MoveLayer)
                     {
                         Layer[B].EffectStop = true;
-                        Layer[B].SpeedX = Events[A].SpeedX;
-                        Layer[B].SpeedY = Events[A].SpeedY;
+                        Layer[B].SpeedX = evt.SpeedX;
+                        Layer[B].SpeedY = evt.SpeedY;
                         if(Layer[B].SpeedX == 0.f && Layer[B].SpeedY == 0.f)
                         {
                             // stop layer
@@ -529,23 +533,23 @@ void ProcEvent(std::string EventName, bool NoEffect)
                     }
                 }
             }
-            AutoX[Events[A].AutoSection] = Events[Events[A].AutoSection].AutoX;
-            AutoY[Events[A].AutoSection] = Events[Events[A].AutoSection].AutoY;
 
             if(!Events[A].Text.empty())
+                AutoX[evt.AutoSection] = Events[evt.AutoSection].AutoX;
+                AutoY[evt.AutoSection] = Events[evt.AutoSection].AutoY;
             {
-                MessageText = Events[A].Text;
+                MessageText = evt.Text;
                 PauseGame(1);
                 MessageText = "";
             }
 
-            if(Events[A].Sound > 0)
+            if(evt.Sound > 0)
             {
-                SoundPause[Events[A].Sound] = 0;
-                PlaySound(Events[A].Sound);
+                SoundPause[evt.Sound] = 0;
+                PlaySound(evt.Sound);
             }
 
-            if(Events[A].EndGame == 1)
+            if(evt.EndGame == 1)
             {
                 for(B = 0; B <= numSections; B++)
                     bgMusic[B] = 0;
@@ -555,42 +559,42 @@ void ProcEvent(std::string EventName, bool NoEffect)
                 LevelMacro = LEVELMACRO_GAME_COMPLETE_EXIT;
             }
 
-            ForcedControls = (Events[A].Controls.AltJump ||
-                              Events[A].Controls.AltRun ||
-                              Events[A].Controls.Down ||
-                              Events[A].Controls.Drop ||
-                              Events[A].Controls.Jump ||
-                              Events[A].Controls.Left ||
-                              Events[A].Controls.Right ||
-                              Events[A].Controls.Run ||
-                              Events[A].Controls.Start ||
-                              Events[A].Controls.Up);
+            ForcedControls = (evt.Controls.AltJump ||
+                              evt.Controls.AltRun ||
+                              evt.Controls.Down ||
+                              evt.Controls.Drop ||
+                              evt.Controls.Jump ||
+                              evt.Controls.Left ||
+                              evt.Controls.Right ||
+                              evt.Controls.Run ||
+                              evt.Controls.Start ||
+                              evt.Controls.Up);
 
-            ForcedControl = Events[A].Controls;
+            ForcedControl = evt.Controls;
 
             tempBool = false;
-            if(!Events[A].TriggerEvent.empty())
+            if(!evt.TriggerEvent.empty())
             {
-                if(std::round(Events[A].TriggerDelay) == 0.0)
+                if(std::round(evt.TriggerDelay) == 0.0)
                 {
                     for(B = 0; B <= maxEvents; B++)
                     {
-                        if(Events[B].Name == Events[A].TriggerEvent)
+                        if(Events[B].Name == evt.TriggerEvent)
                         {
-                            if(Events[B].TriggerEvent == Events[A].Name)
+                            if(Events[B].TriggerEvent == evt.Name)
                                 tempBool = true;
                             break;
                         }
                     }
 
                     if(!tempBool)
-                        ProcEvent(Events[A].TriggerEvent);
+                        ProcEvent(evt.TriggerEvent);
                 }
                 else
                 {
                     newEventNum++;
-                    NewEvent[newEventNum] = Events[A].TriggerEvent;
-                    newEventDelay[newEventNum] = vb6Round(Events[A].TriggerDelay * 6.5);
+                    NewEvent[newEventNum] = evt.TriggerEvent;
+                    newEventDelay[newEventNum] = vb6Round(evt.TriggerDelay * 6.5);
                 }
             }
         }
