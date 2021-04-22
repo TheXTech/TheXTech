@@ -16,9 +16,10 @@ sips -Z 96 $TYPE".iconset/icon_48x48.png" --out $TYPE".iconset/icon_48x48@2x.png
 cp $TYPE"_128.png" $TYPE".iconset/icon_128x128.png"
 cp $TYPE"_256.png" $TYPE".iconset/icon_256x256.png"
 cp $TYPE"_256.png" $TYPE".iconset/icon_128x128@2x.png"
-sips -Z 512 $TYPE".iconset/icon_256x256.png" --out $TYPE".iconset/icon_256x256@2x.png"
+cp $TYPE"_512.png" $TYPE".iconset/icon_256x256@2x.png"
+#sips -Z 512 $TYPE".iconset/icon_256x256.png" --out $TYPE".iconset/icon_256x256@2x.png"
 #sips -Z 512 $TYPE".iconset/icon_256x256.png" --out $TYPE".iconset/icon_512x512.png"
-sips -Z 128 $TYPE".iconset/icon_256x256.png" --out $TYPE".iconset/icon_128x128.png"
+#sips -Z 128 $TYPE".iconset/icon_256x256.png" --out $TYPE".iconset/icon_128x128.png"
 
 echo "makeIcon..."
 
