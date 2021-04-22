@@ -280,6 +280,8 @@ void ProcEvent(std::string EventName, bool NoEffect)
     vScreen_t screenLoc;
     double tX = 0;
     double tY = 0;
+    // Ignore vanilla autoscroll if newer way has been used
+    bool autoScrollerChanged = false;
 
     if(EventName.empty() || LevelEditor)
         return;
@@ -315,6 +317,15 @@ void ProcEvent(std::string EventName, bool NoEffect)
                     Background2[B] = Background2REAL[B];
                 else if(evt.Background[B] != -1)
                     Background2[B] = evt.Background[B];
+
+                /* Per-Section autoscroll setup */
+                auto &s = evt.section[B];
+                if(s.autoscroll)
+                {
+                    autoScrollerChanged = true;
+                    AutoX[B] = s.autoscroll_x;
+                    AutoY[B] = s.autoscroll_y;
+                }
 
                 /* Resize the section noundaries */
                 if(int(evt.level[B].X) == -2)
@@ -537,12 +548,15 @@ void ProcEvent(std::string EventName, bool NoEffect)
 
             if(g_compatibility.fix_autoscroll_speed)
             {
+                if(!autoScrollerChanged)
+                {
                     // Do set the autoscrool when non-zero values only, don't zero by other autoruns
                     if(evt.AutoX != 0.0 || evt.AutoY != 0.0)
                     {
                         AutoX[evt.AutoSection] = evt.AutoX;
                         AutoY[evt.AutoSection] = evt.AutoY;
                     }
+                }
             }
             else // Buggy behavior, see https://github.com/Wohlstand/TheXTech/issues/44
             {

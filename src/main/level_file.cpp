@@ -629,10 +629,21 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             auto &s = e.sets[size_t(B)];
             event.Music[B] = int(s.music_id);
             event.Background[B] = int(s.background_id);
-            event.level[B].X = s.position_left;
-            event.level[B].Y = s.position_top;
-            event.level[B].Height = s.position_bottom;
-            event.level[B].Width = s.position_right;
+
+            auto &l = event.level[B];
+            l.X = s.position_left;
+            l.Y = s.position_top;
+            l.Height = s.position_bottom;
+            l.Width = s.position_right;
+
+            auto &ss = event.section[B];
+            ss.autoscroll = s.autoscrol;
+            // Simple style is only supported yet
+            if(s.autoscroll_style == LevelEvent_Sets::AUTOSCROLL_SIMPLE)
+            {
+                ss.autoscroll_x = s.autoscrol_x;
+                ss.autoscroll_y = s.autoscrol_y;
+            }
         }
 
         event.TriggerEvent = e.trigger;

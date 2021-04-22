@@ -49,6 +49,17 @@ struct Layer_t
 //End Type
 };
 
+struct EventSection_t
+{
+    //! Do override current autoscroll
+    bool  autoscroll = false;
+    //! X speed of autoscrool
+    float autoscroll_x = 0.0;
+    //! Y speed of autoscrool
+    float autoscroll_y = 0.0;
+};
+
+
 //Public Type Events
 struct Events_t
 {
@@ -76,6 +87,8 @@ struct Events_t
     RangeArrI<int, 0, maxSections, 0> Background;
 //    level(0 To maxSections) As Location
     RangeArr<Location_t, 0, maxSections> level;
+// EXTRA: Override per-section settings
+    RangeArr<EventSection_t, 0, maxSections> section;
 //    EndGame As Integer
     int EndGame = 0;
 //    TriggerEvent As String
