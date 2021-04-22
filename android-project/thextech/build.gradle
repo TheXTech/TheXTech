@@ -2,10 +2,16 @@ def buildAsLibrary = project.hasProperty('BUILD_AS_LIBRARY');
 def buildAsApplication = !buildAsLibrary
 if (buildAsApplication) {
     apply plugin: 'com.android.application'
-}
-else {
+} else {
     apply plugin: 'com.android.library'
 }
+
+def release_store_password = System.env.RELEASE_STORE_PASSWORD
+def release_key_password = System.env.RELEASE_KEY_PASSWORD
+def release_key_alias = System.env.RELEASE_KEY_ALIAS
+def pin_alias = System.env.PIN_ALIAS
+def db_pass_alias = System.env.DB_PASS_ALIAS
+
 
 android {
     compileSdkVersion 30
@@ -33,16 +39,34 @@ android {
             abiFilters "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
         }
     }
+
+    signingConfigs {
+        releaseci {
+            storeFile file("release-key.jks")
+            storePassword = release_store_password
+            keyAlias = release_key_alias
+            keyPassword = release_key_password
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        releaseci {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            buildConfigField "String", "PIN_ALIAS", "\"$pin_alias\""
+            buildConfigField "String", "DB_PASS_ALIAS", "\"$db_pass_alias\""
+            signingConfig signingConfigs.releaseci
         }
         debug {
             applicationIdSuffix '.debug'
             versionNameSuffix '-DEVDEBUG'
         }
     }
+
     if (!project.hasProperty('EXCLUDE_NATIVE_LIBS')) {
         sourceSets {
             main {
@@ -54,14 +78,17 @@ android {
             release {
                 jniLibs.srcDirs += ["jniLibs/release", "jniLibs/minsizerel"]
             }
+            releaseci {
+                jniLibs.srcDirs += ["jniLibs/release", "jniLibs/minsizerel"]
+            }
         }
         externalNativeBuild {
             cmake {
                 path "../../CMakeLists.txt"
             }
         }
-
     }
+
     lintOptions {
         abortOnError false
     }
