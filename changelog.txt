@@ -33,6 +33,8 @@ Changes for 1.3.5
 -Fixed the skull raft getting stuck at the ceiling slope blocks
 -Fixed the vanilla GFX bug: the unexpected water splash effect appearance at BGOs
 -Fixed the inability to setup the jump button on gamepads in some conditions
+-Fixed the vanilla bug: inability to set the autoscrolling for any non-zero section
+-Added the support for the simple-style per-section autoscrolling setup from the SMBX-38A specification
 
 Changes for 1.3.4
 -Fixed the inability to use any custom sounds and custom music at level's custom data directory
