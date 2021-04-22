@@ -36,6 +36,7 @@
 #include "compat.h"
 #include "frame_timer.h"
 #include "main/speedrunner.h"
+#include "compat.h"
 
 
 int numLayers = 0;
@@ -534,9 +535,22 @@ void ProcEvent(std::string EventName, bool NoEffect)
                 }
             }
 
-            if(!Events[A].Text.empty())
+            if(g_compatibility.fix_autoscroll_speed)
+            {
+                    // Do set the autoscrool when non-zero values only, don't zero by other autoruns
+                    if(evt.AutoX != 0.0 || evt.AutoY != 0.0)
+                    {
+                        AutoX[evt.AutoSection] = evt.AutoX;
+                        AutoY[evt.AutoSection] = evt.AutoY;
+                    }
+            }
+            else // Buggy behavior, see https://github.com/Wohlstand/TheXTech/issues/44
+            {
                 AutoX[evt.AutoSection] = Events[evt.AutoSection].AutoX;
                 AutoY[evt.AutoSection] = Events[evt.AutoSection].AutoY;
+            }
+
+            if(!evt.Text.empty())
             {
                 MessageText = evt.Text;
                 PauseGame(1);
