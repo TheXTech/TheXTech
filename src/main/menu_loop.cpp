@@ -1331,7 +1331,7 @@ void MenuLoop()
                     KM_Key joyKey;
                     bool gotNewKey = joyPollJoystick(JoyNum, joyKey);
 
-                    if(!joyIsKeyDown(JoyNum, oldJumpJoy))
+                    //if(!joyIsKeyDown(JoyNum, oldJumpJoy))
                     {
                         oldJumpJoy.type = -1;
                         oldJumpJoy.ctrl_type = -1;
@@ -1382,9 +1382,9 @@ void MenuLoop()
                             else if(MenuCursor == 6)
                                 conJoystick[MenuMode - 30].AltRun = lastJoyButton;
                             else if(MenuCursor == 7)
-                                conJoystick[MenuMode - 30].AltJump = lastJoyButton;
-                            else if(MenuCursor == 8)
                                 conJoystick[MenuMode - 30].Jump = lastJoyButton;
+                            else if(MenuCursor == 8)
+                                conJoystick[MenuMode - 30].AltJump = lastJoyButton;
                             else if(MenuCursor == 9)
                                 conJoystick[MenuMode - 30].Drop = lastJoyButton;
                             else if(MenuCursor == 10)
