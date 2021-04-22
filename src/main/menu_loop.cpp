@@ -150,7 +150,7 @@ void MenuLoop()
 //                    End If
                     }
 //                    PlaySound 26
-                    PlaySoundMenu(26);
+                    PlaySoundMenu(SFX_Slide);
 //                End If
                 }
 //                MenuCursorCanMove = False
@@ -184,7 +184,7 @@ void MenuLoop()
 //                    End If
                     }
 //                    PlaySound 26
-                    PlaySoundMenu(26);
+                    PlaySoundMenu(SFX_Slide);
 //                End If
                 }
 //                MenuCursorCanMove = False
@@ -238,7 +238,7 @@ void MenuLoop()
                             if(MenuCursor != A)
                             {
 //                                PlaySound 26
-                                PlaySoundMenu(26);
+                                PlaySoundMenu(SFX_Slide);
 //                                MenuCursor = A
                                 MenuCursor = A;
 //                            End If
@@ -261,7 +261,7 @@ void MenuLoop()
 //                    MenuCursor = 4
                     MenuCursor = 4;
 //                    PlaySound 26
-                    PlaySoundMenu(26);
+                    PlaySoundMenu(SFX_Slide);
 //                End If
                 }
 //            ElseIf ((.Jump = True Or _
@@ -282,7 +282,7 @@ void MenuLoop()
                 if(MenuCursor == 0)
                 {
 //                    PlaySound 29
-                    PlaySoundMenu(29);
+                    PlaySoundMenu(SFX_Do);
 //                    MenuMode = 1
                     MenuMode = 1;
 //                    FindWorlds
@@ -294,7 +294,7 @@ void MenuLoop()
                 else if(MenuCursor == 1)
                 {
 //                    PlaySound 29
-                    PlaySoundMenu(29);
+                    PlaySoundMenu(SFX_Do);
 //                    MenuMode = 2
                     MenuMode = 2;
 //                    FindWorlds
@@ -306,7 +306,7 @@ void MenuLoop()
                 else if(MenuCursor == 2)
                 {
 //                    PlaySound 29
-                    PlaySoundMenu(29);
+                    PlaySoundMenu(SFX_Do);
 //                    MenuMode = 4
                     MenuMode = 4;
 //                    FindLevels
@@ -318,7 +318,7 @@ void MenuLoop()
                 else if(MenuCursor == 3)
                 {
 //                    PlaySound 29
-                    PlaySoundMenu(29);
+                    PlaySoundMenu(SFX_Do);
 //                    MenuMode = 3
                     MenuMode = 3;
 //                    MenuCursor = 0
@@ -328,7 +328,7 @@ void MenuLoop()
                 else if(MenuCursor == 4)
                 {
 //                    PlaySound 29
-                    PlaySoundMenu(29);
+                    PlaySoundMenu(SFX_Do);
 //                    BitBlt myBackBuffer, 0, 0, ScreenW, ScreenH, 0, 0, 0, vbWhiteness
 //                    BitBlt frmMain.hdc, 0, 0, frmMain.ScaleWidth, frmMain.ScaleHeight, 0, 0, 0, vbWhiteness
                     frmMain.setTargetTexture();
@@ -409,7 +409,7 @@ void MenuLoop()
 //                                    Else
                                     } else {
 //                                        PlaySound 26
-                                        PlaySoundMenu(26);
+                                        PlaySoundMenu(SFX_Slide);
 //                                        MenuCursor = A
                                         MenuCursor = A;
 //                                    End If
@@ -457,7 +457,7 @@ void MenuLoop()
 //                    MenuCursorCanMove = False
                     MenuCursorCanMove = false;
 //                    PlaySound 26
-                    PlaySoundMenu(26);
+                    PlaySoundMenu(SFX_Slide);
 //                ElseIf .Jump = True Or .Start = True Or _
 //                        (GetKeyState(vbKeySpace) And KEY_PRESSED) Or _
 //                        (GetKeyState(vbKeyReturn) And KEY_PRESSED) Or _
@@ -466,7 +466,7 @@ void MenuLoop()
                 else if(menuDoPress || MenuMouseClick)
                 {
 //                    PlaySound 29
-                    PlaySoundMenu(29);
+                    PlaySoundMenu(SFX_Do);
 //                    If MenuMode = 100 Then
                     if(MenuMode == 100)
                     {
@@ -640,7 +640,7 @@ void MenuLoop()
 //                                ScrollDelay = 10
                                 ScrollDelay = 10;
 //                                PlaySound 26
-                                PlaySoundMenu(26);
+                                PlaySoundMenu(SFX_Slide);
 //                                MenuCursor = A
                                 MenuCursor = A;
 //                            End If
@@ -672,7 +672,7 @@ void MenuLoop()
 //'world select back
 
 //                    PlaySound 26
-                    PlaySoundMenu(26);
+                    PlaySoundMenu(SFX_Slide);
 //                    MenuCursorCanMove = False
                     MenuCursorCanMove = false;
 //                ElseIf .Jump = True Or .Start = True Or _
@@ -682,7 +682,7 @@ void MenuLoop()
                 else if(menuDoPress || MenuMouseClick)
                 {
 //                    PlaySound 29
-                    PlaySoundMenu(29);
+                    PlaySoundMenu(SFX_Do);
 //                    selWorld = MenuCursor + 1
                     selWorld = MenuCursor + 1;
 //                    FindSaves
@@ -759,7 +759,7 @@ void MenuLoop()
                             if(MenuCursor != A)
                             {
 //                                PlaySound 26
-                                PlaySoundMenu(26);
+                                PlaySoundMenu(SFX_Slide);
 //                                MenuCursor = A
                                 MenuCursor = A;
 //                            End If
@@ -806,7 +806,7 @@ void MenuLoop()
 //                    MenuCursorCanMove = False
                     MenuCursorCanMove = false;
 //                    PlaySound 29
-                    PlaySoundMenu(29);
+                    PlaySoundMenu(SFX_Do);
 //                ElseIf .Jump = True Or .Start = True Or _
 //                       (GetKeyState(vbKeySpace) And KEY_PRESSED) Or _
 //                       (GetKeyState(vbKeyReturn) And KEY_PRESSED) Or _
@@ -815,7 +815,7 @@ void MenuLoop()
                 else if(menuDoPress || MenuMouseClick)
                 {
 //                    PlaySound 29
-                    PlaySoundMenu(29);
+                    PlaySoundMenu(SFX_Do);
 //                    numPlayers = MenuMode / 10
                     numPlayers = MenuMode / 10;
 //                    For A = 1 To numCharacters
@@ -939,7 +939,7 @@ void MenuLoop()
 
                     if(!StartLevel.empty())
                     {
-                        PlaySoundMenu(28);
+                        PlaySoundMenu(SFX_LevelSelect);
                         SoundPause[26] = 200;
                         LevelSelect = false;
 
@@ -1024,7 +1024,7 @@ void MenuLoop()
 //                            If MenuCursor <> A Then
                             if(MenuCursor != A) {
 //                                PlaySound 26
-                                PlaySoundMenu(26);
+                                PlaySoundMenu(SFX_Slide);
 //                                MenuCursor = A
                                 MenuCursor = A;
 //                            End If
@@ -1050,7 +1050,7 @@ void MenuLoop()
 //                    MenuCursorCanMove = False
                     MenuCursorCanMove = false;
 //                    PlaySound 26
-                    PlaySoundMenu(26);
+                    PlaySoundMenu(SFX_Slide);
 //                ElseIf .Jump = True Or .Start = True Or (GetKeyState(vbKeySpace) And KEY_PRESSED) Or (GetKeyState(vbKeyReturn) And KEY_PRESSED) Or MenuMouseClick = True Then
                 }
                 else if(menuDoPress || MenuMouseClick)
@@ -1064,7 +1064,7 @@ void MenuLoop()
 //                        MenuMode = 31
                         MenuMode = 31;
 //                        PlaySound 26
-                        PlaySoundMenu(26);
+                        PlaySoundMenu(SFX_Slide);
 //                    ElseIf MenuCursor = 1 Then
                     } else if(MenuCursor == 1) {
 //                        MenuCursor = 0
@@ -1072,12 +1072,12 @@ void MenuLoop()
 //                        MenuMode = 32
                         MenuMode = 32;
 //                        PlaySound 26
-                        PlaySoundMenu(26);
+                        PlaySoundMenu(SFX_Slide);
 //                    ElseIf MenuCursor = 2 Then
 #ifndef __ANDROID__ // on Android run the always full-screen
                     } else if(MenuCursor == 2) {
 //                        PlaySound 29
-                        PlaySoundMenu(29);
+                        PlaySoundMenu(SFX_Do);
 //                        ChangeScreen
                         ChangeScreen();
                     } else if(MenuCursor == 3) {
@@ -1086,7 +1086,7 @@ void MenuLoop()
 #endif
 //                    ElseIf MenuCursor = 3 Then
 //                        PlaySound 29
-                        PlaySoundMenu(29);
+                        PlaySoundMenu(SFX_Do);
 //                        GameMenu = False
                         GameMenu = false;
 //                        GameOutro = True
@@ -1213,7 +1213,7 @@ void MenuLoop()
                                 if(MenuCursor != A)
                                 {
 //                                    PlaySound 26
-                                    PlaySoundMenu(26);
+                                    PlaySoundMenu(SFX_Slide);
 //                                    MenuCursor = A
                                     MenuCursor = A;
 //                                End If
@@ -1253,7 +1253,7 @@ void MenuLoop()
                                 if(MenuCursor != A)
                                 {
 //                                    PlaySound 26
-                                    PlaySoundMenu(26);
+                                    PlaySoundMenu(SFX_Slide);
 //                                    MenuCursor = A
                                     MenuCursor = A;
 //                                End If
@@ -1285,7 +1285,7 @@ void MenuLoop()
 //                        MenuCursorCanMove = False
                         MenuCursorCanMove = false;
 
-                        PlaySoundMenu(29);
+                        PlaySoundMenu(SFX_Do);
 
 //                        If MenuCursor = 1 Then
                         if(MenuCursor == 1) {
@@ -1339,7 +1339,7 @@ void MenuLoop()
                         {
                             if(conJoystick[MenuMode - 30].isGameController)
                                 joyKey.type = lastJoyButton.type;
-                            PlaySoundMenu(29);
+                            PlaySoundMenu(SFX_Do);
                             if(MenuCursor == 1)
                                 conJoystick[MenuMode - 30].Up = joyKey;
                             else if(MenuCursor == 2)
@@ -1368,7 +1368,7 @@ void MenuLoop()
 //                        else if(getKeyState(vbKeyEscape) == KEY_PRESSED)
                         else if(escPressed)
                         {
-                            PlaySoundMenu(3);
+                            PlaySoundMenu(SFX_BlockHit);
                             if(MenuCursor == 1)
                                 conJoystick[MenuMode - 30].Up = lastJoyButton;
                             else if(MenuCursor == 2)
@@ -1402,13 +1402,13 @@ void MenuLoop()
                         MenuCursor = MenuMode - 31;
                         MenuMode = 3;
                         MenuCursorCanMove = false;
-                        PlaySoundMenu(26);
+                        PlaySoundMenu(SFX_Slide);
                     }
                     else if(menuDoPress || MenuMouseClick)
                     {
                         if(MenuCursor == 0)
                         {
-                            PlaySoundMenu(29);
+                            PlaySoundMenu(SFX_Do);
                             useJoystick[MenuMode - 30] += 1;
                             if(useJoystick[MenuMode - 30] > numJoysticks)
                                 useJoystick[MenuMode - 30] = 0;
@@ -1425,7 +1425,7 @@ void MenuLoop()
                         else
                         if(MenuCursor == 11) // Reset to default
                         {
-                            PlaySoundMenu(27);
+                            PlaySoundMenu(SFX_NewPath);
                             if(useJoystick[MenuMode - 30] == 0)
                             {
                                 joyFillDefaults(conKeyboard[MenuMode - 30]);
