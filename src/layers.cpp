@@ -297,29 +297,30 @@ void ProcEvent(std::string EventName, bool NoEffect)
             for(B = 0; B <= numSections; B++)
             {
                 /* Music change */
+                auto &s = evt.section[B];
+
                 bool musicChanged = false;
-                auto &m = evt.Music[B];
-                if(m == -2)
+                if(s.music_id == EventSection_t::LESet_ResetDefault)
                 {
                     bgMusic[B] = bgMusicREAL[B];
                     musicChanged = true;
                 }
-                else if(evt.Music[B] != -1)
+                else if(s.music_id != EventSection_t::LESet_Nothing)
                 {
-                    bgMusic[B] = m;
+                    bgMusic[B] = s.music_id;
                     musicChanged = true;
                 }
+
                 if(musicChanged && (B == Player[1].Section || (numPlayers == 2 && B == Player[2].Section)))
                     StartMusic(B);
 
                 /* Background change */
-                if(evt.Background[B] == -2)
+                if(s.background_id == EventSection_t::LESet_ResetDefault)
                     Background2[B] = Background2REAL[B];
-                else if(evt.Background[B] != -1)
-                    Background2[B] = evt.Background[B];
+                else if(s.background_id != EventSection_t::LESet_Nothing)
+                    Background2[B] = s.background_id;
 
                 /* Per-Section autoscroll setup */
-                auto &s = evt.section[B];
                 if(s.autoscroll)
                 {
                     autoScrollerChanged = true;
@@ -328,12 +329,13 @@ void ProcEvent(std::string EventName, bool NoEffect)
                 }
 
                 /* Resize the section noundaries */
-                if(int(evt.level[B].X) == -2)
+                if(int(s.position.X) == EventSection_t::LESet_ResetDefault)
                     level[B] = LevelREAL[B];
-                else if(int(evt.level[B].X) != -1)
+                else if(int(s.position.X) != EventSection_t::LESet_Nothing)
                 {
                     tempLevel = level[B];
-                    level[B] = evt.level[B];
+                    level[B] = s.position;
+
                     if(!evt.AutoStart && !equalCase(evt.Name, "Level - Start"))
                     {
                         for(C = 1; C <= numPlayers; C++)
@@ -422,7 +424,7 @@ void ProcEvent(std::string EventName, bool NoEffect)
                                 qScreenY[1] = -level[Player[C].Section].Y;
                             if(-qScreenY[1] + frmMain.ScaleHeight > level[Player[C].Section].Height)
                                 qScreenY[1] = -(level[Player[C].Section].Height - ScreenH);
-                            level[B] = evt.level[B];
+                            level[B] = s.position;
                         }
                         else
                         {

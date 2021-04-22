@@ -51,6 +51,23 @@ struct Layer_t
 
 struct EventSection_t
 {
+    enum SetActions
+    {
+        LESet_Nothing = -1,
+        LESet_ResetDefault = -2,
+    };
+
+    //! Set new Music ID in this section (-1 - do nothing, -2 - reset to defaint, >=0 - set music ID)
+    int music_id = LESet_Nothing;
+    //! Set new Custom Music File path
+    std::string music_file;
+
+    //! Set new Background ID in this section (-1 - do nothing, -2 - reset to defaint, >=0 - set background ID)
+    int background_id = LESet_Nothing;
+
+    //! Change section borders if not (-1 - do nothing, -2 set default, any other values - set X position of left section boundary)
+    Location_t position;
+
     //! Do override current autoscroll
     bool  autoscroll = false;
     //! X speed of autoscrool
@@ -82,11 +99,11 @@ struct Events_t
 //    ToggleLayer(0 To 20) As String
     std::vector<std::string> ToggleLayer;
 //    Music(0 To maxSections) As Integer
-    RangeArrI<int, 0, maxSections, 0> Music;
+//    RangeArrI<int, 0, maxSections, 0> Music;
 //    Background(0 To maxSections) As Integer
-    RangeArrI<int, 0, maxSections, 0> Background;
+//    RangeArrI<int, 0, maxSections, 0> Background;
 //    level(0 To maxSections) As Location
-    RangeArr<Location_t, 0, maxSections> level;
+//    RangeArr<Location_t, 0, maxSections> level;
 // EXTRA: Override per-section settings
     RangeArr<EventSection_t, 0, maxSections> section;
 //    EndGame As Integer

@@ -616,27 +616,30 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 
         for(B = 0; B <= numSections; B++)
         {
-            event.Music[B] = LevelEvent_Sets::LESet_Nothing;
-            event.Background[B] = LevelEvent_Sets::LESet_Nothing;
-            event.level[B].X = LevelEvent_Sets::LESet_Nothing;
-            event.level[B].Y = 0;
-            event.level[B].Height = 0;
-            event.level[B].Width = 0;
+            auto &s = event.section[B];
+            s.music_id = LevelEvent_Sets::LESet_Nothing;
+            s.background_id = LevelEvent_Sets::LESet_Nothing;
+            s.music_file.clear();
+            s.position.X = LevelEvent_Sets::LESet_Nothing;
+            s.position.Y = 0;
+            s.position.Height = 0;
+            s.position.Width = 0;
         }
 
         for(B = 0; B < maxSets; B++)
         {
+            auto &ss = event.section[B];
             auto &s = e.sets[size_t(B)];
-            event.Music[B] = int(s.music_id);
-            event.Background[B] = int(s.background_id);
+            ss.music_id = int(s.music_id);
+            ss.background_id = int(s.background_id);
+            ss.music_file = s.music_file;
 
-            auto &l = event.level[B];
+            auto &l = ss.position;
             l.X = s.position_left;
             l.Y = s.position_top;
             l.Height = s.position_bottom;
             l.Width = s.position_right;
 
-            auto &ss = event.section[B];
             ss.autoscroll = s.autoscrol;
             // Simple style is only supported yet
             if(s.autoscroll_style == LevelEvent_Sets::AUTOSCROLL_SIMPLE)
@@ -844,9 +847,11 @@ void ClearLevel()
         Events[A] = blankEvent;
         for(B = 0; B <= maxSections; B++)
         {
-            Events[A].Background[B] = -1;
-            Events[A].Music[B] = -1;
-            Events[A].level[B].X = -1;
+            auto &ss = Events[A].section[B];
+            ss.background_id = EventSection_t::LESet_Nothing;
+            ss.music_id = EventSection_t::LESet_Nothing;
+            ss.music_file.clear();
+            ss.position.X = EventSection_t::LESet_Nothing;
         }
     }
 
