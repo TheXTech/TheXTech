@@ -759,7 +759,7 @@ void NPCSpecial(int A)
         }
 
     }
-    else if(npc.Type == 275) // fire plant thing
+    else if(npc.Type == NPCID_VOLCANO_LOTUS) // fire plant thing
     {
         if(npc.Special == 0.0)
         {
@@ -787,7 +787,7 @@ void NPCSpecial(int A)
                 {
                     numNPCs++;
                     NPC[numNPCs] = NPC_t();
-                    NPC[numNPCs].Type = 276;
+                    NPC[numNPCs].Type = NPCID_VOLCANO_LOTUS_FIREBALL;
                     NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
                     NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
                     NPC[numNPCs].Section = npc.Section;
@@ -824,7 +824,7 @@ void NPCSpecial(int A)
             }
         }
     }
-    else if(npc.Type == 276) // plant fireballs
+    else if(npc.Type == NPCID_VOLCANO_LOTUS_FIREBALL) // plant fireballs
     {
         if(npc.Special == 0)
         {
@@ -860,7 +860,7 @@ void NPCSpecial(int A)
 
         }
     }
-    else if(npc.Type == 271) // bat thing
+    else if(npc.Type == NPCID_SWOOPER) // bat thing
     {
         if(npc.Special == 0)
         {
@@ -911,7 +911,7 @@ void NPCSpecial(int A)
             }
         }
     }
-    else if(npc.Type == 269) // larry magic
+    else if(npc.Type == NPCID_LARRY_MAGIC_RING) // larry magic
     {
         if(npc.Special < 2)
         {
@@ -939,7 +939,7 @@ void NPCSpecial(int A)
             }
         }
     }
-    else if(npc.Type == 268 || npc.Type == 281) // larry/ludwig shell
+    else if(npc.Type == NPCID_LARRYSHELL || npc.Type == NPCID_LUDWIG_SHELL) // larry/ludwig shell
     {
         if(npc.Special5 == 0) // Target a Random Player
         {
@@ -1060,7 +1060,7 @@ void NPCSpecial(int A)
             npc.Special = 0;
 
     }
-    else if(npc.Type == 267) // larry koopa
+    else if(npc.Type == NPCID_LARRY) // larry koopa
     {
         // special is phase
         // special5 is targetted player
@@ -1207,7 +1207,7 @@ void NPCSpecial(int A)
 
         // ludwig koopa
     }
-    else if(npc.Type == 280)
+    else if(npc.Type == NPCID_LUDWIG)
     {
         // special is phase
         // special5 is targetted player
@@ -1304,7 +1304,7 @@ void NPCSpecial(int A)
                 npc.Special6 = 0;
                 npc.Location.X += npc.Location.Width / 2.0;
                 npc.Location.Y += npc.Location.Height;
-                npc.Type = 281;
+                npc.Type = NPCID_LUDWIG_SHELL;
                 npc.Location.Width = NPCWidth[npc.Type];
                 npc.Location.Height = NPCHeight[npc.Type];
                 npc.Location.X -= npc.Location.Width / 2.0;
@@ -1338,7 +1338,7 @@ void NPCSpecial(int A)
                 NPC[numNPCs].TimeLeft = 100;
                 NPC[numNPCs].Direction = npc.Direction;
                 NPC[numNPCs].Section = npc.Section;
-                NPC[numNPCs].Type = 282;
+                NPC[numNPCs].Type = NPCID_LUDWIG_FIRE;
                 NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
                 NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
                 NPC[numNPCs].Frame = 0;
@@ -1375,7 +1375,7 @@ void NPCSpecial(int A)
 
 
     }
-    else if(npc.Type == 266) // link sword beam
+    else if(npc.Type == NPCID_SWORDBEAM) // link sword beam
     {
         npc.Special += 1;
         if(npc.Special == 40)
@@ -1412,7 +1412,7 @@ void NPCSpecial(int A)
 
 
     }
-    else if(npc.Type == 262) // mouser
+    else if(npc.Type == NPCID_MOUSER) // mouser
     {
         if(npc.Immune == 0)
         {
