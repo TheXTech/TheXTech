@@ -48,8 +48,8 @@ void UpdatePlayer()
     float D = 0;
 //    Controls_t blankControls;
     float speedVar = 0; // adjusts the players speed by percentages
-    long long fBlock = 0; // for collision detection optimizations
-    long long lBlock = 0;
+    int64_t fBlock = 0; // for collision detection optimizations
+    int64_t lBlock = 0;
     double tempSpeed = 0;
     int HitSpot = 0;
     // the hitspot is used for collision detection to find out where to put the player after it collides with a block
@@ -4062,6 +4062,7 @@ void UpdatePlayer()
                                                            !BlockOnlyHitspot1[Block[C].Type])
                                                             Player[A].Location = tempLocation;
                                                     }
+
                                                     PlaySound(3);
                                                     Player[A].Jump = 0;
                                                     if(Player[A].Mount == 2)

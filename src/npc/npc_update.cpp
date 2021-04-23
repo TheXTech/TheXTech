@@ -86,10 +86,10 @@ void UpdateNPCs()
     int oldDirection = 0;
 
     // used for collision detection
-    long long fBlock = 0;
-    long long lBlock = 0;
-    long long fBlock2 = 0;
-    long long lBlock2 = 0;
+    int64_t fBlock = 0;
+    int64_t lBlock = 0;
+    int64_t fBlock2 = 0;
+    int64_t lBlock2 = 0;
     int bCheck2 = 0;
     int bCheck = 0;
     float addBelt = 0;
@@ -1944,6 +1944,7 @@ void UpdateNPCs()
                                     fBlock = numBlock + 1 - numTempBlock;
                                     lBlock = numBlock;
                                 }
+
                                 for(B = (int)fBlock; B <= lBlock; B++)
                                 {
                                     // If Not .Block = B And Not .tempBlock = B And Not (.Projectile = True And Block(B).noProjClipping = True) And BlockNoClipping(Block(B).Type) = False And Block(B).Hidden = False And Block(B).Hidden = False Then

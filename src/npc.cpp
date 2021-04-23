@@ -418,13 +418,13 @@ void SkullRideDone(int A, const Location_t &alignAt)
 
 void NPCSpecial(int A)
 {
-    double B = 0;
+    int64_t B = 0;
     double C = 0;
     double D = 0;
     double E = 0;
     double F = 0;
-    double fBlock = 0;
-    double lBlock = 0;
+    int64_t fBlock = 0;
+    int64_t lBlock = 0;
     bool straightLine = false; // SET BUT NOT USED
     bool tempBool = false;
     bool tempBool2 = false;
@@ -461,15 +461,16 @@ void NPCSpecial(int A)
                 }
             }
         }
-        if(tempBool == false)
+
+        if(!tempBool)
         {
             fBlock = FirstBlock[static_cast<int>(floor(static_cast<double>(tempLocation.X / 32))) - 1];
             lBlock = LastBlock[floor((tempLocation.X + tempLocation.Width) / 32.0) + 1];
             for(B = fBlock; B <= lBlock; B++)
             {
-                if(Block[B].Hidden == false && BlockNoClipping[Block[B].Type] == false && BlockIsSizable[Block[B].Type] == false && BlockOnlyHitspot1[Block[B].Type] == false)
+                if(!Block[B].Hidden && !BlockNoClipping[Block[B].Type] && !BlockIsSizable[Block[B].Type] && !BlockOnlyHitspot1[Block[B].Type])
                 {
-                    if(CheckCollision(tempLocation, Block[B].Location) == true && BlockSlope[Block[B].Type] == 0)
+                    if(CheckCollision(tempLocation, Block[B].Location) && BlockSlope[Block[B].Type] == 0)
                     {
                         // tempBool = True
                     }
@@ -477,7 +478,7 @@ void NPCSpecial(int A)
             }
         }
 
-        if(tempBool == false || NPC[A].Special == 1.0)
+        if(!tempBool || NPC[A].Special == 1.0)
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
@@ -579,7 +580,7 @@ void NPCSpecial(int A)
     }
     else if(NPC[A].Type == 272)
     {
-        if(NPC[A].Projectile == false)
+        if(!NPC[A].Projectile)
         {
             NPC[A].Location.SpeedX = 0;
             if(NPC[A].Location.SpeedY < 0)
@@ -610,7 +611,8 @@ void NPCSpecial(int A)
                     }
                 }
             }
-            if(tempBool == false)
+
+            if(!tempBool)
             {
                 for(B = 1; B <= numBackground; B++)
                 {
@@ -627,7 +629,8 @@ void NPCSpecial(int A)
                     }
                 }
             }
-            if(tempBool == true)
+
+            if(tempBool)
             {
                 if(NPC[A].Special == 1)
                     NPC[A].Location.SpeedY = 2;
@@ -1815,9 +1818,9 @@ void NPCSpecial(int A)
             lBlock = LastBlock[floor((tempLocation.X + tempLocation.Width) / 32.0) + 1];
             for(B = fBlock; B <= lBlock; B++)
             {
-                if(Block[B].Hidden == false && BlockNoClipping[Block[B].Type] == false && BlockIsSizable[Block[B].Type] == false && BlockOnlyHitspot1[Block[B].Type] == false)
+                if(!Block[B].Hidden && !BlockNoClipping[Block[B].Type] && !BlockIsSizable[Block[B].Type] && !BlockOnlyHitspot1[Block[B].Type])
                 {
-                    if(CheckCollision(tempLocation, Block[B].Location) == true && BlockSlope[Block[B].Type] == 0)
+                    if(CheckCollision(tempLocation, Block[B].Location) && BlockSlope[Block[B].Type] == 0)
                     {
                         if(NPC[A].Special2 == 1)
                         {
@@ -1836,7 +1839,8 @@ void NPCSpecial(int A)
                     }
                 }
             }
-            if(tempBool == false)
+
+            if(!tempBool)
             {
                 tempLocation.Width = NPC[A].Location.Width + 2;
                 tempLocation.Height = 8;
@@ -1846,7 +1850,7 @@ void NPCSpecial(int A)
                 lBlock = LastBlock[floor((tempLocation.X + tempLocation.Width) / 32.0) + 1];
                 for(B = fBlock; B <= lBlock; B++)
                 {
-                    if(Block[B].Hidden == false && BlockNoClipping[Block[B].Type] == false && BlockIsSizable[Block[B].Type] == false && BlockOnlyHitspot1[Block[B].Type] == false)
+                    if(!Block[B].Hidden && !BlockNoClipping[Block[B].Type] && !BlockIsSizable[Block[B].Type] && !BlockOnlyHitspot1[Block[B].Type])
                     {
                         if(CheckCollision(tempLocation, Block[B].Location) == true)
                         {
@@ -1856,7 +1860,8 @@ void NPCSpecial(int A)
                         }
                     }
                 }
-                if(tempBool2 == false)
+
+                if(!tempBool2)
                 {
                     if(NPC[A].Special2 == 1)
                     {
@@ -1889,9 +1894,9 @@ void NPCSpecial(int A)
             lBlock = LastBlock[floor((tempLocation.X + tempLocation.Width) / 32.0) + 1];
             for(B = fBlock; B <= lBlock; B++)
             {
-                if(Block[B].Hidden == false && BlockNoClipping[Block[B].Type] == false && BlockIsSizable[Block[B].Type] == false && BlockOnlyHitspot1[Block[B].Type] == false)
+                if(!Block[B].Hidden && !BlockNoClipping[Block[B].Type] && !BlockIsSizable[Block[B].Type] && !BlockOnlyHitspot1[Block[B].Type])
                 {
-                    if(CheckCollision(tempLocation, Block[B].Location) == true)
+                    if(CheckCollision(tempLocation, Block[B].Location))
                     {
                         if(NPC[A].Special2 == 1)
                         {
@@ -1908,7 +1913,8 @@ void NPCSpecial(int A)
                     }
                 }
             }
-            if(tempBool == false)
+
+            if(!tempBool)
             {
                 tempLocation.Width = 8;
                 tempLocation.Height = NPC[A].Location.Height;
@@ -1918,16 +1924,17 @@ void NPCSpecial(int A)
                 lBlock = LastBlock[floor((tempLocation.X + tempLocation.Width) / 32.0) + 1];
                 for(B = fBlock; B <= lBlock; B++)
                 {
-                    if(Block[B].Hidden == false && BlockNoClipping[Block[B].Type] == false && BlockIsSizable[Block[B].Type] == false && BlockOnlyHitspot1[Block[B].Type] == false)
+                    if(!Block[B].Hidden && !BlockNoClipping[Block[B].Type] && !BlockIsSizable[Block[B].Type] && !BlockOnlyHitspot1[Block[B].Type])
                     {
-                        if(CheckCollision(tempLocation, Block[B].Location) == true)
+                        if(CheckCollision(tempLocation, Block[B].Location))
                         {
                             tempBool2 = true;
                             break;
                         }
                     }
                 }
-                if(tempBool2 == false)
+
+                if(!tempBool2)
                 {
                     if(NPC[A].Special2 == 1)
                     {
@@ -1955,9 +1962,9 @@ void NPCSpecial(int A)
             lBlock = LastBlock[floor((tempLocation.X + tempLocation.Width) / 32.0) + 1];
             for(B = fBlock; B <= lBlock; B++)
             {
-                if(Block[B].Hidden == false && BlockNoClipping[Block[B].Type] == false && BlockIsSizable[Block[B].Type] == false && BlockOnlyHitspot1[Block[B].Type] == false)
+                if(!Block[B].Hidden && !BlockNoClipping[Block[B].Type] && !BlockIsSizable[Block[B].Type] && !BlockOnlyHitspot1[Block[B].Type])
                 {
-                    if(CheckCollision(tempLocation, Block[B].Location) == true && BlockSlope2[Block[B].Type] == 0)
+                    if(CheckCollision(tempLocation, Block[B].Location) && BlockSlope2[Block[B].Type] == 0)
                     {
                         if(NPC[A].Special2 == 1)
                         {
@@ -1974,7 +1981,8 @@ void NPCSpecial(int A)
                     }
                 }
             }
-            if(tempBool == false)
+
+            if(!tempBool)
             {
                 tempLocation.Width = NPC[A].Location.Width;
                 tempLocation.Height = 8;
@@ -1984,9 +1992,9 @@ void NPCSpecial(int A)
                 lBlock = LastBlock[floor((tempLocation.X + tempLocation.Width) / 32.0) + 1];
                 for(B = fBlock; B <= lBlock; B++)
                 {
-                    if(Block[B].Hidden == false && BlockNoClipping[Block[B].Type] == false && BlockIsSizable[Block[B].Type] == false && BlockOnlyHitspot1[Block[B].Type] == false)
+                    if(!Block[B].Hidden && !BlockNoClipping[Block[B].Type] && !BlockIsSizable[Block[B].Type] && !BlockOnlyHitspot1[Block[B].Type])
                     {
-                        if(CheckCollision(tempLocation, Block[B].Location) == true)
+                        if(CheckCollision(tempLocation, Block[B].Location))
                         {
                             tempBool2 = true;
                             if(BlockSlope2[Block[B].Type] != 0)
@@ -1994,7 +2002,8 @@ void NPCSpecial(int A)
                         }
                     }
                 }
-                if(tempBool2 == false)
+
+                if(!tempBool2)
                 {
                     if(NPC[A].Special2 == 1)
                     {
@@ -2022,9 +2031,9 @@ void NPCSpecial(int A)
             lBlock = LastBlock[floor((tempLocation.X + tempLocation.Width) / 32.0) + 1];
             for(B = fBlock; B <= lBlock; B++)
             {
-                if(Block[B].Hidden == false && BlockNoClipping[Block[B].Type] == false && BlockIsSizable[Block[B].Type] == false && BlockOnlyHitspot1[Block[B].Type] == false)
+                if(!Block[B].Hidden && !BlockNoClipping[Block[B].Type] && !BlockIsSizable[Block[B].Type] && !BlockOnlyHitspot1[Block[B].Type])
                 {
-                    if(CheckCollision(tempLocation, Block[B].Location) == true && BlockSlope2[Block[B].Type] == 0)
+                    if(CheckCollision(tempLocation, Block[B].Location) && BlockSlope2[Block[B].Type] == 0)
                     {
                         if(NPC[A].Special2 == 1)
                         {
@@ -2041,7 +2050,8 @@ void NPCSpecial(int A)
                     }
                 }
             }
-            if(tempBool == false)
+
+            if(!tempBool)
             {
                 tempLocation.Width = 8;
                 tempLocation.Height = NPC[A].Location.Height;
@@ -2051,16 +2061,17 @@ void NPCSpecial(int A)
                 lBlock = LastBlock[floor((tempLocation.X + tempLocation.Width) / 32.0) + 1];
                 for(B = fBlock; B <= lBlock; B++)
                 {
-                    if(Block[B].Hidden == false && BlockNoClipping[Block[B].Type] == false && BlockIsSizable[Block[B].Type] == false && BlockOnlyHitspot1[Block[B].Type] == false)
+                    if(!Block[B].Hidden && !BlockNoClipping[Block[B].Type] && !BlockIsSizable[Block[B].Type] && !BlockOnlyHitspot1[Block[B].Type])
                     {
-                        if(CheckCollision(tempLocation, Block[B].Location) == true)
+                        if(CheckCollision(tempLocation, Block[B].Location))
                         {
                             tempBool2 = true;
                             break;
                         }
                     }
                 }
-                if(tempBool2 == false)
+
+                if(!tempBool2)
                 {
                     if(NPC[A].Special2 == 1)
                     {

@@ -135,8 +135,8 @@ void OutroLoop()
     int B = 0;
     Location_t tempLocation;
     bool jumpBool = false;
-    long long fBlock = 0;
-    long long lBlock = 0;
+    int64_t fBlock = 0;
+    int64_t lBlock = 0;
     UpdateControls();
 
     for(A = 1; A <= numPlayers; A++)

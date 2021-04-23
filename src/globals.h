@@ -1159,7 +1159,7 @@ extern bool RestartLevel;
 extern float LevelChop[maxSections + 1];
 //'collision detection optimization. creates a table of contents for blocks
 //Public Const FLBlocks As Long = 8000
-const long FLBlocks = 10000;
+const int64_t FLBlocks = 10000;
 //Public FirstBlock(-FLBlocks To FLBlocks) As Integer
 extern RangeArr<int, -FLBlocks, FLBlocks> FirstBlock;
 //Public LastBlock(-FLBlocks To FLBlocks) As Integer

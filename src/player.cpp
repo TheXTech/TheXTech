@@ -2052,8 +2052,8 @@ void TailSwipe(int plr, bool boo, bool Stab, int StabDir)
     int A = 0;
     long long B = 0;
     int C = 0;
-    int fBlock = 0;
-    int lBlock = 0;
+    int64_t fBlock = 0;
+    int64_t lBlock = 0;
     if(Stab == true)
     {
         if(Player[plr].Duck == false)
@@ -2113,15 +2113,18 @@ void TailSwipe(int plr, bool boo, bool Stab, int StabDir)
         else
             tailLoc.X = Player[plr].Location.X - tailLoc.Width;
     }
+
     if(Player[plr].Character == 4) // move tail down for toad
         tailLoc.Y = tailLoc.Y + 4;
-    if(boo == true) // the bool flag means hit a block
+
+    if(boo) // the bool flag means hit a block
     {
         fBlock = FirstBlock[(tailLoc.X / 32) - 1];
         lBlock = LastBlock[((tailLoc.X + tailLoc.Width) / 32.0) + 1];
         for(A = fBlock; A <= lBlock; A++)
+        for(A = (int)fBlock; A <= lBlock; A++)
         {
-            if(!BlockIsSizable[Block[A].Type] && Block[A].Hidden == false && (Block[A].Type != 293 || Stab == true) && Block[A].Invis == false && BlockNoClipping[Block[A].Type] == false)
+            if(!BlockIsSizable[Block[A].Type] && !Block[A].Hidden && (Block[A].Type != 293 || Stab) && !Block[A].Invis && !BlockNoClipping[Block[A].Type])
             {
                 if(CheckCollision(tailLoc, Block[A].Location))
                 {
@@ -2636,8 +2639,8 @@ void SwapCoop()
 void PlayerPush(int A, int HitSpot)
 {
     Location_t tempLocation;
-    double fBlock = 0;
-    double lBlock = 0;
+    int64_t fBlock = 0;
+    int64_t lBlock = 0;
 
     if(ShadowMode)
         return;

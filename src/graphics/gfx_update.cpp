@@ -267,8 +267,8 @@ void UpdateGraphics(bool skipRepaint)
 //    int e2 = 0;
     int X = 0;
     int Y = 0;
-    int fBlock = 0;
-    int lBlock = 0;
+    int64_t fBlock = 0;
+    int64_t lBlock = 0;
     Location_t tempLocation;
     int S = 0; // Level section to display
 
