@@ -75,3 +75,7 @@ extern void treeWorldMusicQuery(double Left, double Top, double Right, double Bo
                                WorldMusicPtrArr &list,
                                bool z_sort);
 extern void treeWorldMusicQuery(const Location_t &loc, WorldMusicPtrArr &list, bool z_sort);
+
+
+extern void blockTileGet(const Location_t &loc, int64_t &fBlock, int64_t &lBlock);
+extern void blockTileGet(double x, double w, int64_t &fBlock, int64_t &lBlock);

@@ -34,6 +34,7 @@
 #include "../blocks.h"
 #include "../sorting.h"
 #include "../compat.h"
+#include "../main/trees.h"
 
 #include <Utils/maths.h>
 
@@ -1811,8 +1812,9 @@ void UpdateNPCs()
                             loc.X += 1 * NPC[A].Direction;
                             loc.SpeedX += 2 * NPC[A].Direction;
 
-                            int fBlock = FirstBlock[static_cast<int>(floor(static_cast<double>(loc.X / 32))) - 1];
-                            int lBlock = LastBlock[floor((loc.X + loc.Width) / 32.0) + 1];
+                            int64_t fBlock;// = FirstBlock[static_cast<int>(floor(static_cast<double>(loc.X / 32))) - 1];
+                            int64_t lBlock;// = LastBlock[floor((loc.X + loc.Width) / 32.0) + 1];
+                            blockTileGet(loc, fBlock, lBlock);
                             bool stillCollide = false;
 
                             for(int B = (int)fBlock; B <= lBlock; B++)
@@ -1936,8 +1938,9 @@ void UpdateNPCs()
                             {
                                 if(bCheck == 1)
                                 {
-                                    fBlock = FirstBlock[static_cast<int>(floor(static_cast<double>(NPC[A].Location.X / 32))) - 1];
-                                    lBlock = LastBlock[floor((NPC[A].Location.X + NPC[A].Location.Width) / 32.0) + 1];
+                                    // fBlock = FirstBlock[(int)SDL_floor(NPC[A].Location.X / 32) - 1];
+                                    // lBlock = LastBlock[(int)SDL_floor((NPC[A].Location.X + NPC[A].Location.Width) / 32.0) + 1];
+                                    blockTileGet(NPC[A].Location, fBlock, lBlock);
                                 }
                                 else
                                 {
@@ -3227,8 +3230,9 @@ void UpdateNPCs()
                                                                                     {
                                                                                         if(bCheck2 == 1)
                                                                                         {
-                                                                                            fBlock2 = FirstBlock[(NPC[B].Location.X / 32) - 1];
-                                                                                            lBlock2 = LastBlock[((NPC[B].Location.X + NPC[B].Location.Width) / 32.0) + 1];
+                                                                                            // fBlock2 = FirstBlock[(NPC[B].Location.X / 32) - 1];
+                                                                                            // lBlock2 = LastBlock[((NPC[B].Location.X + NPC[B].Location.Width) / 32.0) + 1];
+                                                                                            blockTileGet(NPC[B].Location, fBlock2, lBlock2);
                                                                                         }
                                                                                         else
                                                                                         {
@@ -3526,8 +3530,9 @@ void UpdateNPCs()
                                 {
                                     if(bCheck2 == 1)
                                     {
-                                        fBlock2 = FirstBlock[(tempLocation.X / 32) - 1];
-                                        lBlock2 = LastBlock[((tempLocation.X + tempLocation.Width) / 32.0) + 1];
+                                        // fBlock2 = FirstBlock[(tempLocation.X / 32) - 1];
+                                        // lBlock2 = LastBlock[((tempLocation.X + tempLocation.Width) / 32.0) + 1];
+                                        blockTileGet(tempLocation, fBlock2, lBlock2);
                                     }
                                     else
                                     {
@@ -3604,8 +3609,9 @@ void UpdateNPCs()
                                 {
                                     if(bCheck2 == 1)
                                     {
-                                        fBlock2 = FirstBlock[(tempLocation.X / 32) - 1];
-                                        lBlock2 = LastBlock[((tempLocation.X + tempLocation.Width) / 32.0) + 1];
+                                        // fBlock2 = FirstBlock[(tempLocation.X / 32) - 1];
+                                        // lBlock2 = LastBlock[((tempLocation.X + tempLocation.Width) / 32.0) + 1];
+                                        blockTileGet(tempLocation, fBlock2, lBlock2);
                                     }
                                     else
                                     {
@@ -3638,8 +3644,9 @@ void UpdateNPCs()
                                 {
                                     if(bCheck2 == 1)
                                     {
-                                        fBlock2 = FirstBlock[(tempLocation.X / 32) - 1];
-                                        lBlock2 = LastBlock[((tempLocation.X + tempLocation.Width) / 32.0) + 1];
+                                        // fBlock2 = FirstBlock[(tempLocation.X / 32) - 1];
+                                        // lBlock2 = LastBlock[((tempLocation.X + tempLocation.Width) / 32.0) + 1];
+                                        blockTileGet(tempLocation, fBlock2, lBlock2);
                                     }
                                     else
                                     {
@@ -4171,8 +4178,9 @@ void UpdateNPCs()
                                 tempLocation.Width = tempLocation.Width; // - 32
                                 tempLocation.Y = tempLocation.Y + tempLocation.Height - 8;
                                 tempLocation.Height = 16;
-                                fBlock = FirstBlock[long(NPC[A].Location.X / 32) - 1];
-                                lBlock = LastBlock[long((NPC[A].Location.X + NPC[A].Location.Width) / 32.0) + 1];
+                                // fBlock = FirstBlock[long(NPC[A].Location.X / 32) - 1];
+                                // lBlock = LastBlock[long((NPC[A].Location.X + NPC[A].Location.Width) / 32.0) + 1];
+                                blockTileGet(NPC[A].Location, fBlock, lBlock);
 
                                 for(B = (int)fBlock; B <= lBlock; B++)
                                 {
@@ -4185,8 +4193,9 @@ void UpdateNPCs()
 
                                 if(legacy) // Classic SMBX 1.0's behavior when Bowser stomps a floor
                                 {
-                                    fBlock = FirstBlock[long(level[NPC[A].Section].X / 32) - 1];
-                                    lBlock = LastBlock[long((level[NPC[A].Section].Width) / 32.0) + 2];
+                                    // fBlock = FirstBlock[long(level[NPC[A].Section].X / 32) - 1];
+                                    // lBlock = LastBlock[long((level[NPC[A].Section].Width) / 32.0) + 2];
+                                    blockTileGet(level[NPC[A].Section], fBlock, lBlock);
 
                                     // Shake all blocks up
                                     for(int B = (int)fBlock; B <= lBlock; B++)
@@ -4779,8 +4788,9 @@ void UpdateNPCs()
                     {
                         if(bCheck == 1)
                         {
-                            fBlock = FirstBlock[(NPC[A].Location.X / 32) - 1];
-                            lBlock = LastBlock[((NPC[A].Location.X + NPC[A].Location.Width) / 32.0) + 1];
+                            // fBlock = FirstBlock[(NPC[A].Location.X / 32) - 1];
+                            // lBlock = LastBlock[((NPC[A].Location.X + NPC[A].Location.Width) / 32.0) + 1];
+                            blockTileGet(NPC[A].Location, fBlock, lBlock);
                         }
                         else
                         {

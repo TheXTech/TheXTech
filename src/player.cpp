@@ -43,6 +43,7 @@
 #include "editor.h"
 #include "layers.h"
 #include "main/level_file.h"
+#include "main/trees.h"
 #include "compat.h"
 
 
@@ -2119,9 +2120,10 @@ void TailSwipe(int plr, bool boo, bool Stab, int StabDir)
 
     if(boo) // the bool flag means hit a block
     {
-        fBlock = FirstBlock[(tailLoc.X / 32) - 1];
-        lBlock = LastBlock[((tailLoc.X + tailLoc.Width) / 32.0) + 1];
-        for(A = fBlock; A <= lBlock; A++)
+        // fBlock = FirstBlock[(tailLoc.X / 32) - 1];
+        // lBlock = LastBlock[((tailLoc.X + tailLoc.Width) / 32.0) + 1];
+        blockTileGet(tailLoc, fBlock, lBlock);
+
         for(A = (int)fBlock; A <= lBlock; A++)
         {
             if(!BlockIsSizable[Block[A].Type] && !Block[A].Hidden && (Block[A].Type != 293 || Stab) && !Block[A].Invis && !BlockNoClipping[Block[A].Type])
@@ -2647,8 +2649,9 @@ void PlayerPush(int A, int HitSpot)
 
     auto &p = Player[A];
 
-    fBlock = FirstBlock[(p.Location.X / 32) - 1];
-    lBlock = LastBlock[((p.Location.X + p.Location.Width) / 32.0) + 1];
+    // fBlock = FirstBlock[(p.Location.X / 32) - 1];
+    // lBlock = LastBlock[((p.Location.X + p.Location.Width) / 32.0) + 1];
+    blockTileGet(p.Location, fBlock, lBlock);
 
     for(int B = int(fBlock); B <= lBlock; B++)
     {

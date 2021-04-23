@@ -35,6 +35,7 @@
 #include "../main/menu_main.h"
 #include "../main/speedrunner.h"
 #include "../control/joystick.h"
+#include "../main/trees.h"
 
 #include <fmt_format_ne.h>
 #include <Utils/maths.h>
@@ -1173,10 +1174,9 @@ void UpdateGraphics(bool skipRepaint)
 //            lBlock = numBlock
 //        Else
         { // NOT AN EDITOR!!!
-//            fBlock = FirstBlock((-vScreenX(Z) / 32) - 1)
-            fBlock = FirstBlock[int(-vScreenX[Z] / 32) - 1];
-//            lBlock = LastBlock(((-vScreenX(Z) + vScreen(Z).Width) / 32) + 1)
-            lBlock = LastBlock[int((-vScreenX[Z] + vScreen[Z].Width) / 32) + 1];
+            //fBlock = FirstBlock[int(-vScreenX[Z] / 32) - 1];
+            //lBlock = LastBlock[int((-vScreenX[Z] + vScreen[Z].Width) / 32) + 1];
+            blockTileGet(-vScreenX[Z], vScreen[Z].Width, fBlock, lBlock);
 //        End If
         }
 

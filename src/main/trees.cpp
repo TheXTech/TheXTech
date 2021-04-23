@@ -321,3 +321,22 @@ void treeWorldMusicQuery(const Location_t &loc, WorldMusicPtrArr &list, bool z_s
 {
     treeWorldQuery(s_worldMusicTree, loc.X, loc.Y, loc.X + loc.Width, loc.Y + loc.Height, list, z_sort);
 }
+
+
+
+/* ================= Tile block search ================= */
+void blockTileGet(const Location_t &loc, int64_t &fBlock, int64_t &lBlock)
+{
+    int f = (int)SDL_floor(loc.X / 32) - 1;
+    int l = (int)SDL_floor((loc.X + loc.Width) / 32.0) + 1;
+    fBlock = FirstBlock[f < -FLBlocks ? -FLBlocks : f];
+    lBlock = LastBlock[l > FLBlocks ? FLBlocks : l];
+}
+
+void blockTileGet(double x, double w, int64_t &fBlock, int64_t &lBlock)
+{
+    int f = (int)SDL_floor(x / 32) - 1;
+    int l = (int)SDL_floor((x + w) / 32.0) + 1;
+    fBlock = FirstBlock[f < -FLBlocks ? -FLBlocks : f];
+    lBlock = LastBlock[l > FLBlocks ? FLBlocks : l];
+}

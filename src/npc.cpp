@@ -35,6 +35,7 @@
 #include "blocks.h"
 #include "compat.h"
 #include "control/joystick.h"
+#include "main/trees.h"
 
 #include <Utils/maths.h>
 
@@ -464,8 +465,10 @@ void NPCSpecial(int A)
 
         if(!tempBool)
         {
-            fBlock = FirstBlock[static_cast<int>(floor(static_cast<double>(tempLocation.X / 32))) - 1];
-            lBlock = LastBlock[floor((tempLocation.X + tempLocation.Width) / 32.0) + 1];
+            // fBlock = FirstBlock[static_cast<int>(floor(static_cast<double>(tempLocation.X / 32))) - 1];
+            // lBlock = LastBlock[floor((tempLocation.X + tempLocation.Width) / 32.0) + 1];
+            blockTileGet(tempLocation, fBlock, lBlock);
+
             for(B = fBlock; B <= lBlock; B++)
             {
                 if(!Block[B].Hidden && !BlockNoClipping[Block[B].Type] && !BlockIsSizable[Block[B].Type] && !BlockOnlyHitspot1[Block[B].Type])
@@ -1816,8 +1819,10 @@ void NPCSpecial(int A)
             tempLocation.Height = 2;
             tempLocation.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0 - 1 + 18 * NPC[A].Special2;
             tempLocation.Y = NPC[A].Location.Y + NPC[A].Location.Height / 2.0 - 1;
-            fBlock = FirstBlock[static_cast<int>(floor(static_cast<double>(tempLocation.X / 32))) - 1];
-            lBlock = LastBlock[floor((tempLocation.X + tempLocation.Width) / 32.0) + 1];
+            // fBlock = FirstBlock[static_cast<int>(floor(static_cast<double>(tempLocation.X / 32))) - 1];
+            // lBlock = LastBlock[floor((tempLocation.X + tempLocation.Width) / 32.0) + 1];
+            blockTileGet(tempLocation, fBlock, lBlock);
+
             for(B = fBlock; B <= lBlock; B++)
             {
                 if(!Block[B].Hidden && !BlockNoClipping[Block[B].Type] && !BlockIsSizable[Block[B].Type] && !BlockOnlyHitspot1[Block[B].Type])
@@ -1848,8 +1853,11 @@ void NPCSpecial(int A)
                 tempLocation.Height = 8;
                 tempLocation.X = NPC[A].Location.X;
                 tempLocation.Y = NPC[A].Location.Y + NPC[A].Location.Height;
-                fBlock = FirstBlock[static_cast<int>(floor(static_cast<double>(tempLocation.X / 32))) - 1];
-                lBlock = LastBlock[floor((tempLocation.X + tempLocation.Width) / 32.0) + 1];
+
+                // fBlock = FirstBlock[static_cast<int>(floor(static_cast<double>(tempLocation.X / 32))) - 1];
+                // lBlock = LastBlock[floor((tempLocation.X + tempLocation.Width) / 32.0) + 1];
+                blockTileGet(tempLocation, fBlock, lBlock);
+
                 for(B = fBlock; B <= lBlock; B++)
                 {
                     if(!Block[B].Hidden && !BlockNoClipping[Block[B].Type] && !BlockIsSizable[Block[B].Type] && !BlockOnlyHitspot1[Block[B].Type])
@@ -1892,8 +1900,11 @@ void NPCSpecial(int A)
             tempLocation.Height = 2;
             tempLocation.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0 - 1;
             tempLocation.Y = NPC[A].Location.Y + NPC[A].Location.Height / 2.0 - 1 + 18 * NPC[A].Special2;
-            fBlock = FirstBlock[static_cast<int>(floor(static_cast<double>(tempLocation.X / 32))) - 1];
-            lBlock = LastBlock[floor((tempLocation.X + tempLocation.Width) / 32.0) + 1];
+
+            // fBlock = FirstBlock[static_cast<int>(floor(static_cast<double>(tempLocation.X / 32))) - 1];
+            // lBlock = LastBlock[floor((tempLocation.X + tempLocation.Width) / 32.0) + 1];
+            blockTileGet(tempLocation, fBlock, lBlock);
+
             for(B = fBlock; B <= lBlock; B++)
             {
                 if(!Block[B].Hidden && !BlockNoClipping[Block[B].Type] && !BlockIsSizable[Block[B].Type] && !BlockOnlyHitspot1[Block[B].Type])
@@ -1922,8 +1933,10 @@ void NPCSpecial(int A)
                 tempLocation.Height = NPC[A].Location.Height;
                 tempLocation.Y = NPC[A].Location.Y;
                 tempLocation.X = NPC[A].Location.X + NPC[A].Location.Width;
-                fBlock = FirstBlock[static_cast<int>(floor(static_cast<double>(tempLocation.X / 32))) - 1];
-                lBlock = LastBlock[floor((tempLocation.X + tempLocation.Width) / 32.0) + 1];
+                // fBlock = FirstBlock[static_cast<int>(floor(static_cast<double>(tempLocation.X / 32))) - 1];
+                // lBlock = LastBlock[floor((tempLocation.X + tempLocation.Width) / 32.0) + 1];
+                blockTileGet(tempLocation, fBlock, lBlock);
+
                 for(B = fBlock; B <= lBlock; B++)
                 {
                     if(!Block[B].Hidden && !BlockNoClipping[Block[B].Type] && !BlockIsSizable[Block[B].Type] && !BlockOnlyHitspot1[Block[B].Type])
@@ -1960,8 +1973,10 @@ void NPCSpecial(int A)
             tempLocation.Height = 2;
             tempLocation.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0 - 1 + 18 * NPC[A].Special2;
             tempLocation.Y = NPC[A].Location.Y + NPC[A].Location.Height / 2.0 - 1;
-            fBlock = FirstBlock[static_cast<int>(floor(static_cast<double>(tempLocation.X / 32))) - 1];
-            lBlock = LastBlock[floor((tempLocation.X + tempLocation.Width) / 32.0) + 1];
+            // fBlock = FirstBlock[static_cast<int>(floor(static_cast<double>(tempLocation.X / 32))) - 1];
+            // lBlock = LastBlock[floor((tempLocation.X + tempLocation.Width) / 32.0) + 1];
+            blockTileGet(tempLocation, fBlock, lBlock);
+
             for(B = fBlock; B <= lBlock; B++)
             {
                 if(!Block[B].Hidden && !BlockNoClipping[Block[B].Type] && !BlockIsSizable[Block[B].Type] && !BlockOnlyHitspot1[Block[B].Type])
@@ -1990,8 +2005,10 @@ void NPCSpecial(int A)
                 tempLocation.Height = 8;
                 tempLocation.X = NPC[A].Location.X;
                 tempLocation.Y = NPC[A].Location.Y - 8;
-                fBlock = FirstBlock[static_cast<int>(floor(static_cast<double>(tempLocation.X / 32))) - 1];
-                lBlock = LastBlock[floor((tempLocation.X + tempLocation.Width) / 32.0) + 1];
+                // fBlock = FirstBlock[static_cast<int>(floor(static_cast<double>(tempLocation.X / 32))) - 1];
+                // lBlock = LastBlock[floor((tempLocation.X + tempLocation.Width) / 32.0) + 1];
+                blockTileGet(tempLocation, fBlock, lBlock);
+
                 for(B = fBlock; B <= lBlock; B++)
                 {
                     if(!Block[B].Hidden && !BlockNoClipping[Block[B].Type] && !BlockIsSizable[Block[B].Type] && !BlockOnlyHitspot1[Block[B].Type])
@@ -2029,8 +2046,10 @@ void NPCSpecial(int A)
             tempLocation.Height = 2;
             tempLocation.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0 - 1;
             tempLocation.Y = NPC[A].Location.Y + NPC[A].Location.Height / 2.0 - 1 + 18 * NPC[A].Special2;
-            fBlock = FirstBlock[static_cast<int>(floor(static_cast<double>(tempLocation.X / 32))) - 1];
-            lBlock = LastBlock[floor((tempLocation.X + tempLocation.Width) / 32.0) + 1];
+            // fBlock = FirstBlock[static_cast<int>(floor(static_cast<double>(tempLocation.X / 32))) - 1];
+            // lBlock = LastBlock[floor((tempLocation.X + tempLocation.Width) / 32.0) + 1];
+            blockTileGet(tempLocation, fBlock, lBlock);
+
             for(B = fBlock; B <= lBlock; B++)
             {
                 if(!Block[B].Hidden && !BlockNoClipping[Block[B].Type] && !BlockIsSizable[Block[B].Type] && !BlockOnlyHitspot1[Block[B].Type])
@@ -2059,8 +2078,10 @@ void NPCSpecial(int A)
                 tempLocation.Height = NPC[A].Location.Height;
                 tempLocation.Y = NPC[A].Location.Y;
                 tempLocation.X = NPC[A].Location.X - 8;
-                fBlock = FirstBlock[static_cast<int>(floor(static_cast<double>(tempLocation.X / 32))) - 1];
-                lBlock = LastBlock[floor((tempLocation.X + tempLocation.Width) / 32.0) + 1];
+                // fBlock = FirstBlock[static_cast<int>(floor(static_cast<double>(tempLocation.X / 32))) - 1];
+                // lBlock = LastBlock[floor((tempLocation.X + tempLocation.Width) / 32.0) + 1];
+                blockTileGet(tempLocation, fBlock, lBlock);
+
                 for(B = fBlock; B <= lBlock; B++)
                 {
                     if(!Block[B].Hidden && !BlockNoClipping[Block[B].Type] && !BlockIsSizable[Block[B].Type] && !BlockOnlyHitspot1[Block[B].Type])

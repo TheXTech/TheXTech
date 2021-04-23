@@ -36,6 +36,7 @@
 #include "../graphics.h"
 #include "../sound.h"
 #include "../pseudo_vb.h"
+#include "../main/trees.h"
 #include "game_info.h"
 
 
@@ -156,8 +157,9 @@ void OutroLoop()
             tempLocation.X = Player[A].Location.X + Player[A].Location.Width + 20;
         else
             tempLocation.X = Player[A].Location.X - tempLocation.Width - 20;
-        fBlock = FirstBlock[long(tempLocation.X / 32) - 1];
-        lBlock = LastBlock[long((tempLocation.X + tempLocation.Width) / 32.0) + 1];
+        // fBlock = FirstBlock[long(tempLocation.X / 32) - 1];
+        // lBlock = LastBlock[long((tempLocation.X + tempLocation.Width) / 32.0) + 1];
+        blockTileGet(tempLocation, fBlock, lBlock);
 
         for(B = (int)fBlock; B <= lBlock; B++)
         {

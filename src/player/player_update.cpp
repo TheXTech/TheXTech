@@ -38,6 +38,7 @@
 #include "../editor.h"
 #include "../game_main.h"
 #include "../compat.h"
+#include "../main/trees.h"
 
 
 void UpdatePlayer()
@@ -478,8 +479,9 @@ void UpdatePlayer()
                         tempLocation.Y = tempLocation.Y - Physics.PlayerHeight[Player[A].Character][Player[A].State];
                         tempLocation.Width = Physics.PlayerWidth[Player[A].Character][Player[A].State];
                         tempLocation.X = tempLocation.X + 64 - tempLocation.Width / 2.0;
-                        fBlock = FirstBlock[(tempLocation.X / 32) - 1];
-                        lBlock = LastBlock[((tempLocation.X + tempLocation.Width) / 32.0) + 1];
+                        // fBlock = FirstBlock[(tempLocation.X / 32) - 1];
+                        // lBlock = LastBlock[((tempLocation.X + tempLocation.Width) / 32.0) + 1];
+                        blockTileGet(tempLocation, fBlock, lBlock);
 
                         for(B = (int)fBlock; B <= lBlock; B++)
                         {
@@ -2314,8 +2316,9 @@ void UpdatePlayer()
 
 
                 // block collision optimization
-                fBlock = FirstBlock[(Player[A].Location.X / 32) - 1];
-                lBlock = LastBlock[((Player[A].Location.X + Player[A].Location.Width) / 32.0) + 1];
+                // fBlock = FirstBlock[(Player[A].Location.X / 32) - 1];
+                // lBlock = LastBlock[((Player[A].Location.X + Player[A].Location.Width) / 32.0) + 1];
+                blockTileGet(Player[A].Location, fBlock, lBlock);
 
                 for(B = (int)fBlock; B <= lBlock; B++)
                 {
@@ -2842,8 +2845,10 @@ void UpdatePlayer()
                                                 tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height;
                                                 tempLocation.Height = 0.1;
                                                 tempBool = false;
-                                                fBlock = FirstBlock[(tempLocation.X / 32) - 1];
-                                                lBlock = LastBlock[((tempLocation.X + tempLocation.Width) / 32.0) + 1];
+                                                // fBlock = FirstBlock[(tempLocation.X / 32) - 1];
+                                                // lBlock = LastBlock[((tempLocation.X + tempLocation.Width) / 32.0) + 1];
+                                                blockTileGet(tempLocation, fBlock, lBlock);
+
                                                 for(auto C = fBlock; C <= lBlock; C++)
                                                 {
                                                     if(CheckCollision(tempLocation, Block[C].Location) && !Block[C].Hidden)
@@ -4053,8 +4058,11 @@ void UpdatePlayer()
                                                     tempLocation = Player[A].Location;
                                                     Player[A].Location.SpeedY = 0.1 + NPC[B].Location.SpeedY;
                                                     Player[A].Location.Y = NPC[B].Location.Y + NPC[B].Location.Height + 0.1;
-                                                    fBlock = FirstBlock[(Player[A].Location.X / 32) - 1];
-                                                    lBlock = LastBlock[((Player[A].Location.X + Player[A].Location.Width) / 32.0) + 1];
+
+                                                    // fBlock = FirstBlock[(Player[A].Location.X / 32) - 1];
+                                                    // lBlock = LastBlock[((Player[A].Location.X + Player[A].Location.Width) / 32.0) + 1];
+                                                    blockTileGet(Player[A].Location, fBlock, lBlock);
+
                                                     for(C = fBlock; C <= lBlock; C++)
                                                     {
                                                         if(CheckCollision(Player[A].Location, Block[C].Location) &&
