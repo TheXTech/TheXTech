@@ -1514,8 +1514,9 @@ void NPCSpecial(int A)
     }
     else if(NPC[A].Type == 260) // Firebar
     {
-        C = 0.03 * NPC[A].DefaultSpecial;
-        B = 0.98 * NPC[A].DefaultSpecial;
+        double C = 0.03 * NPC[A].DefaultSpecial;
+        double B = 0.98 * NPC[A].DefaultSpecial;
+
         if(NPC[A].Special2 == 0)
         {
             NPC[A].Location.SpeedX = NPC[A].Location.SpeedX + C;
@@ -1588,8 +1589,9 @@ void NPCSpecial(int A)
     }
     else if(NPC[A].Type == 259) // Roto-Disk
     {
-        C = 0.2; // * .DefaultDirection
-        B = 6.05; // * .DefaultDirection
+        double C = 0.2; // * .DefaultDirection
+        double B = 6.05; // * .DefaultDirection
+
         NPC[A].Special4 = NPC[A].Special4 + 1;
         if(NPC[A].Special4 == 4)
         {
@@ -1696,10 +1698,10 @@ void NPCSpecial(int A)
     {
         if(NPC[A].Special >= 1)
         {
-            B = 1 - (NPC[A].Special / 45);
-            C = B * 0.5;
-            B = B * 15;
-            C = C * 15;
+            double B = 1 - (NPC[A].Special / 45);
+            double C = B * 0.5;
+            B *= 15;
+            C *= 15;
             NPC[A].Location.X = NPC[A].DefaultLocation.X + dRand() * B - dRand() * C;
             NPC[A].Location.Y = NPC[A].DefaultLocation.Y + dRand() * B - dRand() * C;
             NPC[A].Special = NPC[A].Special + 1;
