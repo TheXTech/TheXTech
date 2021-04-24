@@ -27,6 +27,7 @@
 
 #include <Logger/logger.h>
 #include <Utils/files.h>
+#include <AppPath/app_path.h>
 #include <InterProcess/intproc.h>
 #include <pge_delay.h>
 #include <fmt_format_ne.h>
@@ -1482,4 +1483,8 @@ void CopySave(int world, int src, int dst)
                                                w.WorldFile,
                                                fmt::format_ne("save{0}.savx", dst));
     Files::copyFile(savePathSrc, savePathDst, true);
+
+#ifdef __EMSCRIPTEN__
+    AppPathManager::syncFs();
+#endif
 }
