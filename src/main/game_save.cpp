@@ -310,21 +310,5 @@ void ClearGame(bool punnish)
     numStars = 0;
 
     if(punnish) // Remove gamesave of user who was used a trap cheat
-    {
-        std::string savePath = makeGameSavePath(SelectWorld[selWorld].WorldPath,
-                                                SelectWorld[selWorld].WorldFile,
-                                                fmt::format_ne("save{0}.savx", selSave));
-        std::string savePathOld = SelectWorld[selWorld].WorldPath + fmt::format_ne("save{0}.savx", selSave);
-        std::string savePathAncient = SelectWorld[selWorld].WorldPath + fmt::format_ne("save{0}.sav", selSave);
-        if(Files::fileExists(savePath))
-            Files::deleteFile(savePath);
-        if(Files::fileExists(savePathOld))
-            Files::deleteFile(savePathOld);
-        if(Files::fileExists(savePathAncient))
-            Files::deleteFile(savePathAncient);
-
-#ifdef __EMSCRIPTEN__
-        AppPathManager::syncFs();
-#endif
-    }
+        DeleteSave(selWorld, selSave);
 }

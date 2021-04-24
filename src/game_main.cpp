@@ -1450,3 +1450,36 @@ void StartBattleMode()
     BattleWinner = 0;
     BattleOutro = 0;
 }
+
+void DeleteSave(int world, int save)
+{
+    auto &w = SelectWorld[world];
+    std::string savePath = makeGameSavePath(w.WorldPath,
+                                            w.WorldFile,
+                                            fmt::format_ne("save{0}.savx", save));
+    std::string savePathOld = w.WorldPath + fmt::format_ne("save{0}.savx", save);
+    std::string savePathAncient = w.WorldPath + fmt::format_ne("save{0}.sav", save);
+
+    if(Files::fileExists(savePath))
+        Files::deleteFile(savePath);
+    if(Files::fileExists(savePathOld))
+        Files::deleteFile(savePathOld);
+    if(Files::fileExists(savePathAncient))
+        Files::deleteFile(savePathAncient);
+
+#ifdef __EMSCRIPTEN__
+    AppPathManager::syncFs();
+#endif
+}
+
+void CopySave(int world, int src, int dst)
+{
+    auto &w = SelectWorld[world];
+    std::string savePathSrc = makeGameSavePath(w.WorldPath,
+                                               w.WorldFile,
+                                               fmt::format_ne("save{0}.savx", src));
+    std::string savePathDst = makeGameSavePath(w.WorldPath,
+                                               w.WorldFile,
+                                               fmt::format_ne("save{0}.savx", dst));
+    Files::copyFile(savePathSrc, savePathDst, true);
+}

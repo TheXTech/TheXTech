@@ -76,6 +76,8 @@ void SaveGame();
 void LoadGame();
 //! Removes gamesave file and restores initial state of all level objects
 void ClearGame(bool punnish = false);
+void DeleteSave(int world, int save);
+void CopySave(int world, int src, int dst);
 
 void PauseGame(int plr);
 
