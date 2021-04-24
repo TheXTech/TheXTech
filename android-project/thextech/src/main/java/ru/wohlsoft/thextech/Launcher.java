@@ -1,15 +1,20 @@
 package ru.wohlsoft.thextech;
 
 import android.Manifest;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -60,7 +65,7 @@ public class Launcher extends AppCompatActivity
     public void OnStartGameClick(View view)
     {
         // Here, thisActivity is the current activity
-        if(checkFilePermissions(READWRITE_PERMISSION_FOR_GAME))
+        if(checkFilePermissions(READWRITE_PERMISSION_FOR_GAME) || !hasManageAppFS())
             return;
         startGame();
     }
@@ -69,7 +74,7 @@ public class Launcher extends AppCompatActivity
     {
         final int grant = PackageManager.PERMISSION_GRANTED;
 
-        if (Build.VERSION.SDK_INT >= 23)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
         {
             final String exStorage = Manifest.permission.WRITE_EXTERNAL_STORAGE;
             if (ContextCompat.checkSelfPermission(this, exStorage) == grant) {
@@ -114,17 +119,49 @@ public class Launcher extends AppCompatActivity
         return false;
     }
 
+    public boolean hasManageAppFS()
+    {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !Environment.isExternalStorageManager())
+        {
+            AlertDialog.Builder b = new AlertDialog.Builder(this);
+            b.setTitle(R.string.managePermExplainTitle);
+            b.setMessage(R.string.managePermExplainText);
+            b.setNegativeButton(android.R.string.ok, new DialogInterface.OnClickListener()
+            {
+                public void onClick(DialogInterface dialog, int whichButton)
+                {
+                    Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+                    String pName = getPackageName();
+                    Uri uri = Uri.fromParts("package", pName, null);
+                    intent.setData(uri);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                }
+            });
+            b.show();
+
+            return false;
+        }
+
+        return true;
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
     {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if(grantResults.length > 0 && permissions[0].equals(Manifest.permission.WRITE_EXTERNAL_STORAGE) && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-        {
-            if(requestCode == READWRITE_PERMISSION_FOR_GAME)
-            {
-                startGame();
-            }
-        }
+
+        if(grantResults.length <= 0)
+            return;
+        if(!permissions[0].equals(Manifest.permission.WRITE_EXTERNAL_STORAGE))
+            return;
+        if(grantResults[0] != PackageManager.PERMISSION_GRANTED)
+            return;
+        if(!hasManageAppFS())
+            return;
+
+        if(requestCode == READWRITE_PERMISSION_FOR_GAME)
+            startGame();
     }
 
     public void startGame()
