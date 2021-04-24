@@ -70,6 +70,12 @@ void SuperPrintRightAlign(std::string SuperWords, int Font, float X, float Y, fl
     SuperPrint(SuperWords, Font, X, Y, r, g, b, a);
 }
 
+void SuperPrintScreenCenter(std::string SuperWords, int Font, float Y, float r, float g, float b, float a)
+{
+    float X = (ScreenW / 2) - ((SuperWords.size() * 18) / 2);
+    SuperPrint(SuperWords, Font, X, Y, r, g, b, a);
+}
+
 void SuperPrint(std::string SuperWords, int Font, float X, float Y,
                 float r, float g, float b, float a)
 {

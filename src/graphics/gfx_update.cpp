@@ -2086,6 +2086,8 @@ void UpdateGraphics(bool skipRepaint)
                     B = 0;
                     C = 0;
 
+                    SuperPrint(SelectWorld[selWorld].WorldName, 3, 300, 310, 0.6f, 1.f, 1.f);
+
                     // TODO: Make a custom playable character names print here
                     if(!blockCharacter[1])
                         SuperPrint(g_mainMenu.selectPlayer[1], 3, 300, 350);
@@ -2208,6 +2210,7 @@ void UpdateGraphics(bool skipRepaint)
 
                 else if(MenuMode == 10 || MenuMode == 20) // Save Select
                 {
+                    SuperPrint(SelectWorld[selWorld].WorldName, 3, 300, 310, 0.6f, 1.f, 1.f);
                     for(auto A = 1; A <= maxSaveSlots; A++)
                     {
                         if(SaveSlot[A] >= 0)
