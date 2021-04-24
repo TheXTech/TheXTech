@@ -2,11 +2,9 @@ package ru.wohlsoft.thextech;
 
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
-import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.DisplayMetrics;
-import android.view.WindowManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -127,11 +125,11 @@ public class thextechActivity extends SDLActivity
     {
         super.onCreate(savedInstanceState);
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        this.setSdCardPath(Environment.getExternalStorageDirectory().getAbsolutePath());
+        setSdCardPath(Environment.getExternalStorageDirectory().getAbsolutePath());
 
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        this.setScreenSize(SDLActivity.getDiagonal(), displayMetrics.widthPixels, displayMetrics.heightPixels);
+        setScreenSize(SDLActivity.getDiagonal(), displayMetrics.widthPixels, displayMetrics.heightPixels);
     }
 
     @Override
