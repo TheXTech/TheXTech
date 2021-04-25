@@ -147,7 +147,7 @@ endif()
 
 option(PGEFL_QT_SUPPORT "Build PGE-FL with Qt support [Unneeded]" OFF)
 set(Moondust_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}) # Don't install PGE-FL libraries
-add_subdirectory(lib/PGE_File_Formats)
+add_subdirectory(3rdparty/PGE_File_Formats)
 mark_as_advanced(WITH_UNIT_TESTS PGEFL_QT_SUPPORT)
 
 if(USE_STATIC_LIBC)
@@ -192,7 +192,7 @@ if(EMSCRIPTEN)
 endif()
 
 set(A2XT_LIBS pgefl ${UTILS_LIBS})
-set(A2XT_INCS src lib)
+set(A2XT_INCS src lib 3rdparty)
 set(A2XT_DEPS)
 
 add_library(A2XT_Int INTERFACE)

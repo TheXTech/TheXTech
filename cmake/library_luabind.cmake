@@ -14,7 +14,7 @@ endif()
 set(libLuaBind_Lib "${DEPENDENCIES_INSTALL_DIR}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}luabind${PGE_LIBS_DEBUG_SUFFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}")
 
 if(NOT LUABIND_SOURCE_DIR)
-    set(LUABIND_SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/../lib/luabind")
+    set(LUABIND_SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/../3rdparty/luabind")
 endif()
 
 # LuaBind is a powerful lua binding library for C++

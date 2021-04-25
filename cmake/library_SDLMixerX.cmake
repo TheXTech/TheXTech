@@ -151,8 +151,10 @@ set(AudioCodecs_Deps)
 ExternalProject_Add(
     AudioCodecs_Local
     PREFIX ${CMAKE_BINARY_DIR}/external/AudioCodecs
-    GIT_REPOSITORY https://github.com/WohlSoft/AudioCodecs.git
-    UPDATE_COMMAND ""
+#    GIT_REPOSITORY https://github.com/WohlSoft/AudioCodecs.git
+#   UPDATE_COMMAND ""
+    DOWNLOAD_COMMAND ""
+    SOURCE_DIR ${CMAKE_SOURCE_DIR}/3rdparty/AudioCodecs
     CMAKE_ARGS
         "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}"
         "-DCMAKE_INSTALL_PREFIX=${DEPENDENCIES_INSTALL_DIR}"
@@ -180,8 +182,10 @@ list(APPEND MixerX_Deps AudioCodecs_Local)
 ExternalProject_Add(
     SDLMixerX_Local
     PREFIX ${CMAKE_BINARY_DIR}/external/SDLMixerX
-    GIT_REPOSITORY https://github.com/WohlSoft/SDL-Mixer-X.git
-    UPDATE_COMMAND ""
+#    GIT_REPOSITORY https://github.com/WohlSoft/SDL-Mixer-X.git
+#    UPDATE_COMMAND ""
+    DOWNLOAD_COMMAND ""
+    SOURCE_DIR ${CMAKE_SOURCE_DIR}/3rdparty/SDL-Mixer-X
     CMAKE_ARGS
         "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}"
         "-DCMAKE_INSTALL_PREFIX=${DEPENDENCIES_INSTALL_DIR}"

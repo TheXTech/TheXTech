@@ -1,9 +1,18 @@
-[submodule "lib/PGE_File_Formats"]
-	path = lib/PGE_File_Formats
+[submodule "3rdparty/PGE_File_Formats"]
+	path = 3rdparty/PGE_File_Formats
 	url = https://github.com/WohlSoft/PGE-File-Library-STL.git
-[submodule "lib/LuaJIT"]
-	path = lib/LuaJIT
+[submodule "3rdparty/LuaJIT"]
+	path = 3rdparty/LuaJIT
 	url = https://github.com/WohlSoft/LuaJIT.git
-[submodule "lib/luabind"]
-	path = lib/luabind
+[submodule "3rdparty/luabind"]
+	path = 3rdparty/luabind
 	url = https://github.com/WohlSoft/luabind-deboostified.git
+[submodule "3rdparty/AudioCodecs"]
+	path = 3rdparty/AudioCodecs
+	url = https://github.com/WohlSoft/AudioCodecs.git
+[submodule "3rdparty/SDL-Mixer-X"]
+	path = 3rdparty/SDL-Mixer-X
+	url = https://github.com/WohlSoft/SDL-Mixer-X.git
+[submodule "3rdparty/FreeImageLite"]
+	path = 3rdparty/FreeImageLite
+	url = https://github.com/WohlSoft/libFreeImage.git
