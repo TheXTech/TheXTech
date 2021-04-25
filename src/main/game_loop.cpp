@@ -41,6 +41,7 @@
 #include "../player.h"
 #include "../editor.h"
 #include "speedrunner.h"
+#include "menu_main.h"
 
 #include "../pseudo_vb.h"
 
@@ -403,7 +404,7 @@ void PauseGame(int plr)
                                 break;
                             case 1: // Restart level
                                 stopPause = true;
-                                MenuMode = 0;
+                                MenuMode = MENU_MAIN;
                                 MenuCursor = 0;
                                 frmMain.setTargetTexture();
                                 frmMain.clearBuffer();
@@ -424,7 +425,7 @@ void PauseGame(int plr)
                                 break;
                             case 3: // Quit testing
                                 stopPause = true;
-                                MenuMode = 0;
+                                MenuMode = MENU_MAIN;
                                 MenuCursor = 0;
                                 frmMain.setTargetTexture();
                                 frmMain.clearBuffer();
@@ -456,7 +457,7 @@ void PauseGame(int plr)
                             stopPause = true;
                             GameMenu = true;
 
-                            MenuMode = 0;
+                            MenuMode = MENU_MAIN;
                             MenuCursor = 0;
 
                             if(!LevelSelect)

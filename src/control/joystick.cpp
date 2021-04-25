@@ -38,6 +38,7 @@
 #include "joystick.h"
 #include "../pseudo_vb.h"
 #include "../main/speedrunner.h"
+#include "../main/menu_main.h"
 
 #ifdef USE_TOUCHSCREEN_CONTROLLER
 #include "touchscreen.h"
@@ -345,27 +346,8 @@ void joyDeviceRemoveEvent(const SDL_JoyDeviceEvent *e)
 
     if(GameMenu && getNewJoystick) // Cancel the key binding if device got disconnected in the middle of the key awaiting
     {
-        // FIXME: Avoid this copypasting from the menu_loop.cpp at all
-        if(MenuCursor == 1)
-            conJoystick[MenuMode - 30].Up = lastJoyButton;
-        else if(MenuCursor == 2)
-            conJoystick[MenuMode - 30].Down = lastJoyButton;
-        else if(MenuCursor == 3)
-            conJoystick[MenuMode - 30].Left = lastJoyButton;
-        else if(MenuCursor == 4)
-            conJoystick[MenuMode - 30].Right = lastJoyButton;
-        else if(MenuCursor == 5)
-            conJoystick[MenuMode - 30].Run = lastJoyButton;
-        else if(MenuCursor == 6)
-            conJoystick[MenuMode - 30].AltRun = lastJoyButton;
-        else if(MenuCursor == 7)
-            conJoystick[MenuMode - 30].AltJump = lastJoyButton;
-        else if(MenuCursor == 8)
-            conJoystick[MenuMode - 30].Jump = lastJoyButton;
-        else if(MenuCursor == 9)
-            conJoystick[MenuMode - 30].Drop = lastJoyButton;
-        else if(MenuCursor == 10)
-            conJoystick[MenuMode - 30].Start = lastJoyButton;
+        auto &cj = conJoystick[MenuMode - MENU_INPUT_SETTINGS_BASE];
+        setKey(cj, MenuCursor, lastJoyButton);
         getNewJoystick = false;
         MenuCursorCanMove = false;
     }
@@ -1066,3 +1048,115 @@ void UpdateTouchScreenSize()
     s_touch.updateScreenSize();
 }
 #endif
+
+void setKey(ConKeyboard_t &ck, int id, int val)
+{
+    switch(id)
+    {
+    case 1:
+        ck.Up = val;
+        break;
+    case 2:
+        ck.Down = val;
+        break;
+    case 3:
+        ck.Left = val;
+        break;
+    case 4:
+        ck.Right = val;
+        break;
+    case 5:
+        ck.Run = val;
+        break;
+    case 6:
+        ck.AltRun = val;
+        break;
+    case 7:
+        ck.Jump = val;
+        break;
+    case 8:
+        ck.AltJump = val;
+        break;
+    case 9:
+        ck.Drop = val;
+        break;
+    case 10:
+        ck.Start = val;
+        break;
+    }
+}
+
+void setKey(ConJoystick_t &cj, int id, const KM_Key &val)
+{
+    switch(id)
+    {
+    case 1:
+        cj.Up = val;
+        break;
+    case 2:
+        cj.Down = val;
+        break;
+    case 3:
+        cj.Left = val;
+        break;
+    case 4:
+        cj.Right = val;
+        break;
+    case 5:
+        cj.Run = val;
+        break;
+    case 6:
+        cj.AltRun = val;
+        break;
+    case 7:
+        cj.Jump = val;
+        break;
+    case 8:
+        cj.AltJump = val;
+        break;
+    case 9:
+        cj.Drop = val;
+        break;
+    case 10:
+        cj.Start = val;
+        break;
+    }
+}
+
+KM_Key &getKey(ConJoystick_t &cj, int id)
+{
+    switch(id)
+    {
+    case 1:
+    default:
+        return cj.Up;
+        break;
+    case 2:
+        return cj.Down;
+        break;
+    case 3:
+        return cj.Left;
+        break;
+    case 4:
+        return cj.Right;
+        break;
+    case 5:
+        return cj.Run;
+        break;
+    case 6:
+        return cj.AltRun;
+        break;
+    case 7:
+        return cj.Jump;
+        break;
+    case 8:
+        return cj.AltJump;
+        break;
+    case 9:
+        return cj.Drop;
+        break;
+    case 10:
+        return cj.Start;
+        break;
+    }
+}

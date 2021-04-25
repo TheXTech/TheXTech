@@ -75,5 +75,8 @@ extern bool joyStartJoystick(int JoystickNumber);
 // Public Sub PollJoystick()
 extern bool joyPollJoystick(int joystick, KM_Key &key);
 
+extern void setKey(ConKeyboard_t &ck, int id, int val);
+extern void setKey(ConJoystick_t &cj, int id, const KM_Key &val);
+extern KM_Key &getKey(ConJoystick_t &cj, int id);
 
 #endif // JOYSTICK_H

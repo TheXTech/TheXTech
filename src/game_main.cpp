@@ -55,6 +55,7 @@
 #include "custom.h"
 #include "main/level_file.h"
 #include "main/speedrunner.h"
+#include "main/menu_main.h"
 
 #include "pseudo_vb.h"
 
@@ -363,7 +364,7 @@ int GameMain(const CmdLineSetup_t &setup)
             MenuMouseBack = false;
             BattleMode = false;
 
-            if(MenuMode != 4)
+            if(MenuMode != MENU_BATTLE_MODE)
             {
                 PlayerCharacter = 0;
                 PlayerCharacter2 = 0;
@@ -806,8 +807,10 @@ void KillIt()
 void NextLevel()
 {
     int A = 0;
+
     for(A = 1; A <= numPlayers; A++)
         Player[A].HoldingNPC = 0;
+
     LevelMacro = LEVELMACRO_OFF;
     LevelMacroCounter = 0;
     StopMusic();
@@ -816,13 +819,15 @@ void NextLevel()
     frmMain.clearBuffer();
     frmMain.repaint();
     DoEvents();
+
     if(!TestLevel && GoToLevel.empty() && !NoMap)
         PGE_Delay(500);
+
     if(BattleMode && !LevelEditor && !TestLevel)
     {
         EndLevel = false;
         GameMenu = true;
-        MenuMode = 4;
+        MenuMode = MENU_BATTLE_MODE;
         MenuCursor = selWorld - 1;
         PlayerCharacter = Player[1].Character;
         PlayerCharacter2 = Player[2].Character;
@@ -1033,7 +1038,7 @@ void UpdateMacro()
                 BeatTheGame = true;
                 SaveGame();
                 GameOutro = true;
-                MenuMode = 0;
+                MenuMode = MENU_MAIN;
                 MenuCursor = 0;
             }
             frmMain.clearBuffer();

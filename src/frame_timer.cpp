@@ -101,6 +101,12 @@ void PerformanceStats_t::print()
 //                                   (physScannedBlocks + physScannedBGOs + physScannedNPCs)),
 //                   3, 45, 44);
     }
+
+    if(GameMenu)
+    {
+        SuperPrint(fmt::sprintf_ne("MENU-MODE: %d", MenuMode),
+                   3, 45, 70, 0.5f, 1.f, 1.f);
+    }
 }
 
 //#if !defined(__EMSCRIPTEN__)

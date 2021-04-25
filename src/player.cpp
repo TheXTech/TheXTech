@@ -44,6 +44,7 @@
 #include "layers.h"
 #include "main/level_file.h"
 #include "main/trees.h"
+#include "main/menu_main.h"
 #include "compat.h"
 
 
@@ -951,7 +952,7 @@ void EveryonesDead()
         ClearLevel();
         LevelSelect = true;
         GameMenu = true;
-        MenuMode = 0;
+        MenuMode = MENU_MAIN;
         MenuCursor = 0;
     }
     DoEvents();

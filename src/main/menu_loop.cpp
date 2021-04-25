@@ -112,10 +112,10 @@ void MenuLoop()
                 {
                     MenuCursor -= 1;
 
-                    if(MenuMode >= 100)
+                    if(MenuMode >= MENU_CHARACTER_SELECT_BASE)
                     {
                         while((MenuCursor == (PlayerCharacter - 1) &&
-                              (MenuMode == 300 || MenuMode == 500)) ||
+                              (MenuMode == MENU_CHARACTER_SELECT_2P_S2 || MenuMode == MENU_CHARACTER_SELECT_BM_S2)) ||
                                blockCharacter[MenuCursor + 1])
                         {
                             MenuCursor -= 1;
@@ -134,10 +134,10 @@ void MenuLoop()
                 {
                     MenuCursor += 1;
 
-                    if(MenuMode >= 100)
+                    if(MenuMode >= MENU_CHARACTER_SELECT_BASE)
                     {
                         while((MenuCursor == (PlayerCharacter - 1) &&
-                              (MenuMode == 300 || MenuMode == 500)) ||
+                              (MenuMode == MENU_CHARACTER_SELECT_2P_S2 || MenuMode == MENU_CHARACTER_SELECT_BM_S2)) ||
                                blockCharacter[MenuCursor + 1])
                         {
                             MenuCursor += 1;
@@ -153,7 +153,7 @@ void MenuLoop()
         }
 
         // Main Menu
-        if(MenuMode == 0)
+        if(MenuMode == MENU_MAIN)
         {
             if(MenuMouseMove)
             {
@@ -204,28 +204,28 @@ void MenuLoop()
                 if(MenuCursor == 0)
                 {
                     PlaySoundMenu(SFX_Do);
-                    MenuMode = 1;
+                    MenuMode = MENU_1PLAYER_GAME;
                     FindWorlds();
                     MenuCursor = 0;
                 }
                 else if(MenuCursor == 1)
                 {
                     PlaySoundMenu(SFX_Do);
-                    MenuMode = 2;
+                    MenuMode = MENU_2PLAYER_GAME;
                     FindWorlds();
                     MenuCursor = 0;
                 }
                 else if(MenuCursor == 2)
                 {
                     PlaySoundMenu(SFX_Do);
-                    MenuMode = 4;
+                    MenuMode = MENU_BATTLE_MODE;
                     FindLevels();
                     MenuCursor = 0;
                 }
                 else if(MenuCursor == 3)
                 {
                     PlaySoundMenu(SFX_Do);
-                    MenuMode = 3;
+                    MenuMode = MENU_OPTIONS;
                     MenuCursor = 0;
                 }
                 else if(MenuCursor == 4)
@@ -249,7 +249,11 @@ void MenuLoop()
         }
 
         // Character Select
-        else if(MenuMode == 100 || MenuMode == 200 || MenuMode == 300 || MenuMode == 400 || MenuMode == 500)
+        else if(MenuMode == MENU_CHARACTER_SELECT_1P ||
+                MenuMode == MENU_CHARACTER_SELECT_2P_S1 ||
+                MenuMode == MENU_CHARACTER_SELECT_2P_S2 ||
+                MenuMode == MENU_CHARACTER_SELECT_BM_S1 ||
+                MenuMode == MENU_CHARACTER_SELECT_BM_S2)
         {
             if(MenuMouseMove)
             {
@@ -282,7 +286,7 @@ void MenuLoop()
                                 if(MenuCursor != A)
                                 {
                                     if(
-                                        ((MenuMode == 300 || MenuMode == 500) && PlayerCharacter - 1 == A) ||
+                                        ((MenuMode == MENU_CHARACTER_SELECT_2P_S2 || MenuMode == MENU_CHARACTER_SELECT_BM_S2) && PlayerCharacter - 1 == A) ||
                                         ((blockCharacter[A + 1]) && MenuMouseClick)
                                     )
                                     {
@@ -304,20 +308,20 @@ void MenuLoop()
             {
                 if(menuBackPress || MenuMouseBack)
                 {
-                    if(MenuMode == 300)
+                    if(MenuMode == MENU_CHARACTER_SELECT_2P_S2)
                     {
-                        MenuMode = 200;
+                        MenuMode = MENU_CHARACTER_SELECT_2P_S1;
                         MenuCursor = PlayerCharacter - 1;
                     }
-                    else if(MenuMode == 500)
+                    else if(MenuMode == MENU_CHARACTER_SELECT_BM_S2)
                     {
-                        MenuMode = 400;
+                        MenuMode = MENU_CHARACTER_SELECT_BM_S1;
                         MenuCursor = PlayerCharacter - 1;
                     }
                     else
                     {
                         MenuCursor = selWorld - 1;
-                        MenuMode = MenuMode / 100;
+                        MenuMode /= MENU_CHARACTER_SELECT_BASE;
                     }
 
                     MenuCursorCanMove = false;
@@ -327,33 +331,33 @@ void MenuLoop()
                 {
                     PlaySoundMenu(SFX_Do);
 
-                    if(MenuMode == 100)
+                    if(MenuMode == MENU_CHARACTER_SELECT_1P)
                     {
                         PlayerCharacter = MenuCursor + 1;
-                        MenuMode = 10;
+                        MenuMode = MENU_SELECT_SLOT_1P;
                         MenuCursor = 0;
                     }
-                    else if(MenuMode == 200)
+                    else if(MenuMode == MENU_CHARACTER_SELECT_2P_S1)
                     {
                         PlayerCharacter = MenuCursor + 1;
-                        MenuMode = 300;
+                        MenuMode = MENU_CHARACTER_SELECT_2P_S2;
                         MenuCursor = PlayerCharacter2;
                     }
-                    else if(MenuMode == 300)
+                    else if(MenuMode == MENU_CHARACTER_SELECT_2P_S2)
                     {
                         PlayerCharacter2 = MenuCursor + 1;
-                        MenuMode = 20;
+                        MenuMode = MENU_SELECT_SLOT_2P;
                         MenuCursor = 0;
                     }
-                    else if(MenuMode == 400)
+                    else if(MenuMode == MENU_CHARACTER_SELECT_BM_S1)
                     {
                         PlayerCharacter = MenuCursor + 1;
-                        MenuMode = 500;
+                        MenuMode = MENU_CHARACTER_SELECT_BM_S2;
                         MenuCursor = PlayerCharacter2 - 1;
                         if(MenuCursor < 0)
                             MenuCursor = 0;
                     }
-                    else if(MenuMode == 500)
+                    else if(MenuMode == MENU_CHARACTER_SELECT_BM_S2)
                     {
                         PlayerCharacter2 = MenuCursor + 1;
                         MenuCursor = 0;
@@ -365,16 +369,16 @@ void MenuLoop()
                 }
             }
 
-            if(MenuMode > 0)
+            if(MenuMode > MENU_MAIN)
             {
                 if(MenuCursor > numCharacters - 1)
                 {
                     MenuCursor = 0;
 
-                    while((MenuCursor == PlayerCharacter - 1 && (MenuMode == 300 || MenuMode == 500)) ||
+                    while((MenuCursor == PlayerCharacter - 1 && (MenuMode == MENU_CHARACTER_SELECT_2P_S2 || MenuMode == MENU_CHARACTER_SELECT_BM_S2)) ||
                           blockCharacter[MenuCursor + 1])
                     {
-                        MenuCursor = MenuCursor + 1;
+                        MenuCursor += 1;
                     }
 
                 }
@@ -383,21 +387,21 @@ void MenuLoop()
                 {
                     MenuCursor = numCharacters - 1;
 
-                    while((MenuCursor == PlayerCharacter - 1 && (MenuMode == 300 || MenuMode == 500)) ||
+                    while((MenuCursor == PlayerCharacter - 1 && (MenuMode == MENU_CHARACTER_SELECT_2P_S2 || MenuMode == MENU_CHARACTER_SELECT_BM_S2)) ||
                           blockCharacter[MenuCursor + 1])
                     {
-                        MenuCursor = MenuCursor - 1;
+                        MenuCursor -= 1;
                     }
                 }
             }
 
-            while(((MenuMode == 300 || MenuMode == 500) && MenuCursor == PlayerCharacter - 1) ||
+            while(((MenuMode == MENU_CHARACTER_SELECT_2P_S2 || MenuMode == MENU_CHARACTER_SELECT_BM_S2) && MenuCursor == PlayerCharacter - 1) ||
                    blockCharacter[MenuCursor + 1])
             {
-                MenuCursor = MenuCursor + 1;
+                MenuCursor += 1;
             }
 
-            if(MenuMode >= 100)
+            if(MenuMode >= MENU_CHARACTER_SELECT_BASE)
             {
                 if(MenuCursor >= numCharacters)
                 {
@@ -421,7 +425,7 @@ void MenuLoop()
         }
 
         // World Select
-        else if(MenuMode == 1 || MenuMode == 2 || MenuMode == 4)
+        else if(MenuMode == MENU_1PLAYER_GAME || MenuMode == MENU_2PLAYER_GAME || MenuMode == MENU_BATTLE_MODE)
         {
             if(ScrollDelay > 0)
             {
@@ -465,8 +469,8 @@ void MenuLoop()
 
                     if(MenuMode == MENU_BATTLE_MODE)
                         MenuCursor = 2;
-                    MenuMode = 0;
 
+                    MenuMode = MENU_MAIN;
 //'world select back
 
                     PlaySoundMenu(SFX_Slide);
@@ -480,16 +484,16 @@ void MenuLoop()
 
                     For(A, 1, numCharacters)
                     {
-                        if(MenuMode == 4)
+                        if(MenuMode == MENU_BATTLE_MODE)
                             blockCharacter[A] = false;
                         else
                             blockCharacter[A] = SelectWorld[selWorld].blockChar[A];
                     }
 
-                    MenuMode = MenuMode * 100;
+                    MenuMode *= MENU_CHARACTER_SELECT_BASE;
                     MenuCursor = 0;
 
-                    if(MenuMode == 400 && PlayerCharacter != 0)
+                    if(MenuMode == MENU_CHARACTER_SELECT_BM_S1 && PlayerCharacter != 0)
                         MenuCursor = PlayerCharacter - 1;
 
                     MenuCursorCanMove = false;
@@ -497,7 +501,7 @@ void MenuLoop()
 
             }
 
-            if(MenuMode < 100)
+            if(MenuMode < MENU_CHARACTER_SELECT_BASE)
             {
                 if(MenuCursor >= NumSelectWorld)
                     MenuCursor = 0;
@@ -507,7 +511,7 @@ void MenuLoop()
         }
 
         // Save Select
-        else if(MenuMode == 10 || MenuMode == 20)
+        else if(MenuMode == MENU_SELECT_SLOT_1P || MenuMode == MENU_SELECT_SLOT_2P)
         {
             if(MenuMouseMove)
             {
@@ -544,20 +548,20 @@ void MenuLoop()
 //'save select back
                     if(AllCharBlock > 0)
                     {
-                        MenuMode = MenuMode / 10;
+                        MenuMode /= MENU_SELECT_SLOT_BASE;
                         MenuCursor = selWorld - 1;
                     }
                     else
                     {
-                        if(MenuMode == 10)
+                        if(MenuMode == MENU_SELECT_SLOT_1P)
                         {
                             MenuCursor = PlayerCharacter - 1;
-                            MenuMode = 100;
+                            MenuMode = MENU_CHARACTER_SELECT_1P;
                         }
                         else
                         {
-                            MenuMode = 300;
                             MenuCursor = PlayerCharacter2 - 1;
+                            MenuMode = MENU_CHARACTER_SELECT_2P_S2;
                         }
                     }
 
@@ -567,7 +571,7 @@ void MenuLoop()
                 else if(menuDoPress || MenuMouseClick)
                 {
                     PlaySoundMenu(SFX_Do);
-                    numPlayers = MenuMode / 10;
+                    numPlayers = MenuMode / MENU_SELECT_SLOT_BASE;
 
                     For(A, 1, numCharacters)
                     {
@@ -686,7 +690,7 @@ void MenuLoop()
                 }
             }
 
-            if(MenuMode < 100)
+            if(MenuMode < MENU_CHARACTER_SELECT_BASE)
             {
                 if(MenuCursor > 2) MenuCursor = 0;
                 if(MenuCursor < 0) MenuCursor = 2;
@@ -694,7 +698,7 @@ void MenuLoop()
         }
 
         // Options
-        else if(MenuMode == 3)
+        else if(MenuMode == MENU_OPTIONS)
         {
 #ifndef __ANDROID__
             const int optionsMenuLength = 3;
@@ -743,7 +747,7 @@ void MenuLoop()
             {
                 if(menuBackPress || MenuMouseBack)
                 {
-                    MenuMode = 0;
+                    MenuMode = MENU_MAIN;
                     MenuCursor = 3;
                     MenuCursorCanMove = false;
                     PlaySoundMenu(SFX_Slide);
@@ -754,13 +758,13 @@ void MenuLoop()
                     if(MenuCursor == 0)
                     {
                         MenuCursor = 0;
-                        MenuMode = 31;
+                        MenuMode = MENU_INPUT_SETTINGS_P1;
                         PlaySoundMenu(SFX_Slide);
                     }
                     else if(MenuCursor == 1)
                     {
                         MenuCursor = 0;
-                        MenuMode = 32;
+                        MenuMode = MENU_INPUT_SETTINGS_P2;
                         PlaySoundMenu(SFX_Slide);
 #ifndef __ANDROID__ // on Android run the always full-screen
                     }
@@ -788,7 +792,7 @@ void MenuLoop()
 
             }
 
-            if(MenuMode == 3)
+            if(MenuMode == MENU_OPTIONS)
             {
                 if(MenuCursor > optionsMenuLength)
                     MenuCursor = 0;
@@ -798,16 +802,17 @@ void MenuLoop()
         }
 
         // Input Settings
-        else if(MenuMode == 31 || MenuMode == 32)
+        else if(MenuMode == MENU_INPUT_SETTINGS_P1 || MenuMode == MENU_INPUT_SETTINGS_P2)
         {
             if(MenuMouseMove && !getNewJoystick && !getNewKeyboard)
             {
-                if(useJoystick[MenuMode - 30] == 0)
+                if(useJoystick[MenuMode - MENU_INPUT_SETTINGS_BASE] == 0)
                 {
                     For(A, 0, 11)
                     {
                         if(MenuMouseY >= 260 - 44 + A * 30 && MenuMouseY <= 276 - 44 + A * 30)
                         {
+                            auto &ck = conKeyboard[MenuMode - MENU_INPUT_SETTINGS_BASE];
                             switch(A)
                             {
                             default:
@@ -816,43 +821,43 @@ void MenuLoop()
                                 break;
                             case 1:
                                 menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
-                                                        getKeyName(conKeyboard[MenuMode - 30].Up)).size());
+                                                        getKeyName(ck.Up)).size());
                                 break;
                             case 2:
                                 menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
-                                                        getKeyName(conKeyboard[MenuMode - 30].Down)).size());
+                                                        getKeyName(ck.Down)).size());
                                 break;
                             case 3:
                                 menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
-                                                        getKeyName(conKeyboard[MenuMode - 30].Left)).size());
+                                                        getKeyName(ck.Left)).size());
                                 break;
                             case 4:
                                 menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
-                                                        getKeyName(conKeyboard[MenuMode - 30].Right)).size());
+                                                        getKeyName(ck.Right)).size());
                                 break;
                             case 5:
                                 menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
-                                                        getKeyName(conKeyboard[MenuMode - 30].Run)).size());
+                                                        getKeyName(ck.Run)).size());
                                 break;
                             case 6:
                                 menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
-                                                        getKeyName(conKeyboard[MenuMode - 30].AltRun)).size());
+                                                        getKeyName(ck.AltRun)).size());
                                 break;
                             case 7:
                                 menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
-                                                        getKeyName(conKeyboard[MenuMode - 30].Jump)).size());
+                                                        getKeyName(ck.Jump)).size());
                                 break;
                             case 8:
                                 menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
-                                                        getKeyName(conKeyboard[MenuMode - 30].AltJump)).size());
+                                                        getKeyName(ck.AltJump)).size());
                                 break;
                             case 9:
                                 menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
-                                                        getKeyName(conKeyboard[MenuMode - 30].Drop)).size());
+                                                        getKeyName(ck.Drop)).size());
                                 break;
                             case 10:
                                 menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
-                                                        getKeyName(conKeyboard[MenuMode - 30].Start)).size());
+                                                        getKeyName(ck.Start)).size());
                                 break;
                             case 11:
                                 menuLen = 18 * std::strlen("Reset tp default");
@@ -912,35 +917,13 @@ void MenuLoop()
                         getNewKeyboard = false;
                         MenuCursorCanMove = false;
                         PlaySoundMenu(SFX_Do);
-
-                        if(MenuCursor == 1) {
-                            conKeyboard[MenuMode - 30].Up = inputKey;
-                        } else if(MenuCursor == 2) {
-                            conKeyboard[MenuMode - 30].Down = inputKey;
-                        } else if(MenuCursor == 3) {
-                            conKeyboard[MenuMode - 30].Left = inputKey;
-                        } else if(MenuCursor == 4) {
-                            conKeyboard[MenuMode - 30].Right = inputKey;
-                        } else if(MenuCursor == 5) {
-                            conKeyboard[MenuMode - 30].Run = inputKey;
-                        } else if(MenuCursor == 6) {
-                            conKeyboard[MenuMode - 30].AltRun = inputKey;
-                        } else if(MenuCursor == 7) {
-                            conKeyboard[MenuMode - 30].Jump = inputKey;
-                        } else if(MenuCursor == 8) {
-                            conKeyboard[MenuMode - 30].AltJump = inputKey;
-                        } else if(MenuCursor == 9) {
-                            conKeyboard[MenuMode - 30].Drop = inputKey;
-                        } else if(MenuCursor == 10) {
-                            conKeyboard[MenuMode - 30].Start = inputKey;
-                        }
-
+                        setKey(conKeyboard[MenuMode - MENU_INPUT_SETTINGS_BASE], MenuCursor, inputKey);
                     }
 
                 }
                 else if(getNewJoystick)
                 {
-                    int JoyNum = useJoystick[MenuMode - 30] - 1;
+                    int JoyNum = useJoystick[MenuMode - MENU_INPUT_SETTINGS_BASE] - 1;
                     //SDL_JoystickUpdate();
                     KM_Key joyKey;
                     bool gotNewKey = joyPollJoystick(JoyNum, joyKey);
@@ -949,60 +932,23 @@ void MenuLoop()
                     {
                         oldJumpJoy.type = -1;
                         oldJumpJoy.ctrl_type = -1;
+                        auto &cj = conJoystick[MenuMode - MENU_INPUT_SETTINGS_BASE];
+
                         if(gotNewKey)
                         {
-                            if(conJoystick[MenuMode - 30].isGameController)
+                            if(cj.isGameController)
                                 joyKey.type = lastJoyButton.type;
                             PlaySoundMenu(SFX_Do);
-                            if(MenuCursor == 1)
-                                conJoystick[MenuMode - 30].Up = joyKey;
-                            else if(MenuCursor == 2)
-                                conJoystick[MenuMode - 30].Down = joyKey;
-                            else if(MenuCursor == 3)
-                                conJoystick[MenuMode - 30].Left = joyKey;
-                            else if(MenuCursor == 4)
-                                conJoystick[MenuMode - 30].Right = joyKey;
-                            else if(MenuCursor == 5)
-                                conJoystick[MenuMode - 30].Run = joyKey;
-                            else if(MenuCursor == 6)
-                                conJoystick[MenuMode - 30].AltRun = joyKey;
-                            else if(MenuCursor == 7)
-                                conJoystick[MenuMode - 30].Jump = joyKey;
-                            else if(MenuCursor == 8)
-                                conJoystick[MenuMode - 30].AltJump = joyKey;
-                            else if(MenuCursor == 9)
-                                conJoystick[MenuMode - 30].Drop = joyKey;
-                            else if(MenuCursor == 10)
-                                conJoystick[MenuMode - 30].Start = joyKey;
+                            setKey(cj, MenuCursor, joyKey);
                             // Save the changed state into the common cache
-                            joySetByIndex(MenuMode - 30, JoyNum, conJoystick[MenuMode - 30]);
+                            joySetByIndex(MenuMode - MENU_INPUT_SETTINGS_BASE, JoyNum, cj);
                             getNewJoystick = false;
                             MenuCursorCanMove = false;
                         }
-
                         else if(escPressed)
                         {
                             PlaySoundMenu(SFX_BlockHit);
-                            if(MenuCursor == 1)
-                                conJoystick[MenuMode - 30].Up = lastJoyButton;
-                            else if(MenuCursor == 2)
-                                conJoystick[MenuMode - 30].Down = lastJoyButton;
-                            else if(MenuCursor == 3)
-                                conJoystick[MenuMode - 30].Left = lastJoyButton;
-                            else if(MenuCursor == 4)
-                                conJoystick[MenuMode - 30].Right = lastJoyButton;
-                            else if(MenuCursor == 5)
-                                conJoystick[MenuMode - 30].Run = lastJoyButton;
-                            else if(MenuCursor == 6)
-                                conJoystick[MenuMode - 30].AltRun = lastJoyButton;
-                            else if(MenuCursor == 7)
-                                conJoystick[MenuMode - 30].Jump = lastJoyButton;
-                            else if(MenuCursor == 8)
-                                conJoystick[MenuMode - 30].AltJump = lastJoyButton;
-                            else if(MenuCursor == 9)
-                                conJoystick[MenuMode - 30].Drop = lastJoyButton;
-                            else if(MenuCursor == 10)
-                                conJoystick[MenuMode - 30].Start = lastJoyButton;
+                            setKey(cj, MenuCursor, lastJoyButton);
                             getNewJoystick = false;
                             MenuCursorCanMove = false;
                         }
@@ -1013,152 +959,67 @@ void MenuLoop()
                     if(menuBackPress || MenuMouseBack)
                     {
                         SaveConfig();
-                        MenuCursor = MenuMode - 31;
-                        MenuMode = 3;
+                        MenuCursor = MenuMode - (MENU_INPUT_SETTINGS_BASE + 1);
+                        MenuMode = MENU_OPTIONS;
                         MenuCursorCanMove = false;
                         PlaySoundMenu(SFX_Slide);
                     }
                     else if(menuDoPress || MenuMouseClick)
                     {
+                        auto &uj = useJoystick[MenuMode - MENU_INPUT_SETTINGS_BASE];
+                        auto &ck = conKeyboard[MenuMode - MENU_INPUT_SETTINGS_BASE];
+                        auto &cj = conJoystick[MenuMode - MENU_INPUT_SETTINGS_BASE];
+
                         if(MenuCursor == 0)
                         {
                             PlaySoundMenu(SFX_Do);
-                            useJoystick[MenuMode - 30] += 1;
-                            if(useJoystick[MenuMode - 30] > numJoysticks)
-                                useJoystick[MenuMode - 30] = 0;
+                            uj += 1;
+                            if(uj > numJoysticks)
+                                uj = 0;
 
-                            if(useJoystick[MenuMode - 30] > 0)
+                            if(uj > 0)
                             {
-                                int joyNum = useJoystick[MenuMode - 30] - 1;
+                                int joyNum = uj - 1;
                                 // Load the saved state for given joystick
-                                joyGetByIndex(MenuMode - 30, joyNum, conJoystick[MenuMode - 30]);
+                                joyGetByIndex(MenuMode - MENU_INPUT_SETTINGS_BASE, joyNum, cj);
                             }
                             // Tell player is prefer to use the keyboard than controller
-                            wantedKeyboard[MenuMode - 30] = (useJoystick[MenuMode - 30] == 0);
+                            wantedKeyboard[MenuMode - MENU_INPUT_SETTINGS_BASE] = (uj == 0);
                         }
                         else
                         if(MenuCursor == 11) // Reset to default
                         {
                             PlaySoundMenu(SFX_NewPath);
-                            if(useJoystick[MenuMode - 30] == 0)
+                            if(uj == 0)
                             {
-                                joyFillDefaults(conKeyboard[MenuMode - 30]);
+                                joyFillDefaults(ck);
                             }
                             else
                             {
-                                int JoyNum = useJoystick[MenuMode - 30] - 1;
+                                int JoyNum = uj - 1;
                                 if(JoyNum >= 0)
                                 {
-                                    joyFillDefaults(conJoystick[MenuMode - 30]);
-                                    joySetByIndex(MenuMode - 30, JoyNum, conJoystick[MenuMode - 30]);
+                                    joyFillDefaults(cj);
+                                    joySetByIndex(MenuMode - MENU_INPUT_SETTINGS_BASE, JoyNum, cj);
                                 }
                             }
                         }
                         else
                         {
-                            if(useJoystick[MenuMode - 30] == 0)
+                            if(uj == 0)
                             {
                                 getNewKeyboard = true;
-                                switch(MenuCursor)
-                                {
-                                case 1:
-                                    conKeyboard[MenuMode - 30].Up = -1;
-                                    break;
-                                case 2:
-                                    conKeyboard[MenuMode - 30].Down = -1;
-                                    break;
-                                case 3:
-                                    conKeyboard[MenuMode - 30].Left = -1;
-                                    break;
-                                case 4:
-                                    conKeyboard[MenuMode - 30].Right = -1;
-                                    break;
-                                case 5:
-                                    conKeyboard[MenuMode - 30].Run = -1;
-                                    break;
-                                case 6:
-                                    conKeyboard[MenuMode - 30].AltRun = -1;
-                                    break;
-                                case 7:
-                                    conKeyboard[MenuMode - 30].Jump = -1;
-                                    break;
-                                case 8:
-                                    conKeyboard[MenuMode - 30].AltJump = -1;
-                                    break;
-                                case 9:
-                                    conKeyboard[MenuMode - 30].Drop = -1;
-                                    break;
-                                case 10:
-                                    conKeyboard[MenuMode - 30].Start = -1;
-                                    break;
-                                default:
-                                    break;
-                                }
+                                setKey(ck, MenuCursor, -1);
                                 inputKey = 0;
                             }
                             else
                             {
-                                if(MenuCursor == 1)
-                                {
-                                    lastJoyButton = conJoystick[MenuMode - 30].Up;
-                                    conJoystick[MenuMode - 30].Up.type = -1;
-                                    conJoystick[MenuMode - 30].Up.ctrl_type = -1;
-                                }
-                                else if(MenuCursor == 2)
-                                {
-                                    lastJoyButton = conJoystick[MenuMode - 30].Down;
-                                    conJoystick[MenuMode - 30].Down.type = -1;
-                                    conJoystick[MenuMode - 30].Down.ctrl_type = -1;
-                                }
-                                else if(MenuCursor == 3)
-                                {
-                                    lastJoyButton = conJoystick[MenuMode - 30].Left;
-                                    conJoystick[MenuMode - 30].Left.type = -1;
-                                    conJoystick[MenuMode - 30].Left.ctrl_type = -1;
-                                }
-                                else if(MenuCursor == 4)
-                                {
-                                    lastJoyButton = conJoystick[MenuMode - 30].Right;
-                                    conJoystick[MenuMode - 30].Right.type = -1;
-                                    conJoystick[MenuMode - 30].Right.ctrl_type = -1;
-                                }
-                                else if(MenuCursor == 5)
-                                {
-                                    lastJoyButton = conJoystick[MenuMode - 30].Run;
-                                    conJoystick[MenuMode - 30].Run.type = -1;
-                                    conJoystick[MenuMode - 30].Run.ctrl_type = -1;
-                                }
-                                else if(MenuCursor == 6)
-                                {
-                                    lastJoyButton = conJoystick[MenuMode - 30].AltRun;
-                                    conJoystick[MenuMode - 30].AltRun.type = -1;
-                                    conJoystick[MenuMode - 30].AltRun.ctrl_type = -1;
-                                }
-                                else if(MenuCursor == 7)
-                                {
-                                    lastJoyButton = conJoystick[MenuMode - 30].Jump;
-                                    oldJumpJoy = conJoystick[MenuMode - 30].Jump;
-                                    conJoystick[MenuMode - 30].Jump.type = -1;
-                                    conJoystick[MenuMode - 30].Jump.ctrl_type = -1;
-                                }
-                                else if(MenuCursor == 8)
-                                {
-                                    lastJoyButton = conJoystick[MenuMode - 30].AltJump;
-                                    conJoystick[MenuMode - 30].AltJump.type = -1;
-                                    conJoystick[MenuMode - 30].AltJump.ctrl_type = -1;
-                                }
-                                else if(MenuCursor == 9)
-                                {
-                                    lastJoyButton = conJoystick[MenuMode - 30].Drop;
-                                    conJoystick[MenuMode - 30].Drop.type = -1;
-                                    conJoystick[MenuMode - 30].Drop.ctrl_type = -1;
-                                }
-                                else if(MenuCursor == 10)
-                                {
-                                    lastJoyButton = conJoystick[MenuMode - 30].Start;
-                                    conJoystick[MenuMode - 30].Start.type = -1;
-                                    conJoystick[MenuMode - 30].Start.ctrl_type = -1;
-                                }
+                                auto &key = getKey(cj, MenuCursor);
+                                lastJoyButton = key;
+                                key.type = -1;
+                                key.ctrl_type = -1;
+                                if(MenuCursor == 7)
+                                    oldJumpJoy = key;
                                 getNewJoystick = true;
                                 MenuCursorCanMove = false;
                             }
@@ -1167,19 +1028,23 @@ void MenuLoop()
                     }
                 }
             }
-            if(MenuMode != 3)
+
+            if(MenuMode != MENU_OPTIONS)
             {
                 if(MenuCursor > 11)
                     MenuCursor = 0;
                 if(MenuCursor < 0)
                     MenuCursor = 11;
 #if 0
-                if(useJoystick[MenuMode - 30] == 0) {
+                if(useJoystick[MenuMode - 30] == 0)
+                {
                     if(MenuCursor > 10)
                         MenuCursor = 0;
                     if(MenuCursor < 0)
                         MenuCursor = 10;
-                } else {
+                }
+                else
+                {
                     if(MenuCursor > 10)
                         MenuCursor = 0;
                     if(MenuCursor < 0)
@@ -1191,9 +1056,10 @@ void MenuLoop()
     }
 
 //'check for all characters blocked
-    if(MenuMode == 100 || MenuMode == 200 || MenuMode == 300)
+    if(MenuMode == MENU_CHARACTER_SELECT_1P || MenuMode == MENU_CHARACTER_SELECT_2P_S1 || MenuMode == MENU_CHARACTER_SELECT_2P_S2)
     {
         AllCharBlock = 0;
+
         For(A, 1, numCharacters)
         {
             if(!blockCharacter[A])
@@ -1215,24 +1081,23 @@ void MenuLoop()
             PlayerCharacter = AllCharBlock;
             PlayerCharacter2 = AllCharBlock;
 
-            if(MenuMode == 100)
+            if(MenuMode == MENU_CHARACTER_SELECT_1P)
             {
-                MenuMode = 10;
+                MenuMode = MENU_SELECT_SLOT_1P;
                 MenuCursor = 0;
             }
-            else if(MenuMode == 200)
+            else if(MenuMode == MENU_CHARACTER_SELECT_2P_S1)
             {
-                MenuMode = 300;
+                MenuMode = MENU_CHARACTER_SELECT_2P_S2;
                 MenuCursor = PlayerCharacter2;
             }
             else
             {
-                MenuMode = 20;
+                MenuMode = MENU_SELECT_SLOT_2P;
                 MenuCursor = 0;
             }
         }
     }
-
 
     if(CheckLiving() == 0)
     {
@@ -1718,7 +1583,7 @@ void FindWorlds()
     SelectWorld.clear();
     SelectWorld.push_back(SelectWorld_t()); // Dummy entry
 
-    for(auto worldsRoot : worldRoots)
+    for(const auto &worldsRoot : worldRoots)
     {
         DirMan episodes(worldsRoot);
 
@@ -1774,7 +1639,7 @@ void FindLevels()
     SelectWorld[1].WorldName = "Random Level";
     LevelData head;
 
-    for(auto battleRoot : battleRoots)
+    for(const auto &battleRoot : battleRoots)
     {
         std::vector<std::string> files;
         DirMan battleLvls(battleRoot);

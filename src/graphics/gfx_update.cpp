@@ -2058,7 +2058,7 @@ void UpdateGraphics(bool skipRepaint)
 
             else if(!GameOutro)
             {
-                if(MenuMode != 1 && MenuMode != 2 && MenuMode != 4)
+                if(MenuMode != MENU_1PLAYER_GAME && MenuMode != MENU_2PLAYER_GAME && MenuMode != MENU_OPTIONS)
                     worldCurs = 0;
 
                 int menuFix = -44; // for Input Settings
@@ -2070,7 +2070,7 @@ void UpdateGraphics(bool skipRepaint)
                 frmMain.renderTexture(ScreenW / 2 - GFX.MenuGFX[3].w / 2, 576,
                         GFX.MenuGFX[3].w, GFX.MenuGFX[3].h, GFX.MenuGFX[3], 0, 0);
 
-                if(MenuMode == 0)
+                if(MenuMode == MENU_MAIN)
                 {
                     SuperPrint(g_mainMenu.main1PlayerGame, 3, 300, 350);
                     SuperPrint(g_mainMenu.main2PlayerGame, 3, 300, 380);
@@ -2080,7 +2080,11 @@ void UpdateGraphics(bool skipRepaint)
                     frmMain.renderTexture(300 - 20, 350 + (MenuCursor * 30), 16, 16, GFX.MCursor[0], 0, 0);
                 }
                 // Character select
-                else if(MenuMode == 100 || MenuMode == 200 || MenuMode == 300 || MenuMode == 400 || MenuMode == 500)
+                else if(MenuMode == MENU_CHARACTER_SELECT_1P ||
+                        MenuMode == MENU_CHARACTER_SELECT_2P_S1 ||
+                        MenuMode == MENU_CHARACTER_SELECT_2P_S2 ||
+                        MenuMode == MENU_CHARACTER_SELECT_BM_S1 ||
+                        MenuMode == MENU_CHARACTER_SELECT_BM_S2)
                 {
                     A = 0;
                     B = 0;
@@ -2126,7 +2130,7 @@ void UpdateGraphics(bool skipRepaint)
                         SuperPrint(g_mainMenu.selectPlayer[4], 3, 300, 440 + A);
                     else
                     {
-                        A = A - 30;
+                        A -= 30;
                         if(MenuCursor + 1 >= 4)
                             B = B - 30;
                         if(PlayerCharacter >= 4)
@@ -2137,14 +2141,14 @@ void UpdateGraphics(bool skipRepaint)
                         SuperPrint(g_mainMenu.selectPlayer[5], 3, 300, 470 + A);
                     else
                     {
-                        A = A - 30;
+                        A -= 30;
                         if(MenuCursor + 1 >= 5)
                             B = B - 30;
                         if(PlayerCharacter >= 5)
                             C = C - 30;
                     }
 
-                    if(MenuMode == 300 || MenuMode == 500)
+                    if(MenuMode == MENU_CHARACTER_SELECT_2P_S2 || MenuMode == MENU_CHARACTER_SELECT_BM_S2)
                     {
                         frmMain.renderTexture(300 - 20, B + 350 + (MenuCursor * 30), GFX.MCursor[3]);
                         frmMain.renderTexture(300 - 20, B + 350 + ((PlayerCharacter - 1) * 30), GFX.MCursor[0]);
@@ -2155,7 +2159,7 @@ void UpdateGraphics(bool skipRepaint)
                     }
 
                 }
-                else if(MenuMode == 1 || MenuMode == 2 || MenuMode == 4)
+                else if(MenuMode == MENU_1PLAYER_GAME || MenuMode == MENU_2PLAYER_GAME || MenuMode == MENU_BATTLE_MODE)
                 {
                     std::string tempStr = "";
                     minShow = 1;
@@ -2208,7 +2212,7 @@ void UpdateGraphics(bool skipRepaint)
                     }
                 }
 
-                else if(MenuMode == 10 || MenuMode == 20) // Save Select
+                else if(MenuMode == MENU_SELECT_SLOT_1P || MenuMode == MENU_SELECT_SLOT_2P) // Save Select
                 {
                     SuperPrint(SelectWorld[selWorld].WorldName, 3, 300, 310, 0.6f, 1.f, 1.f);
                     for(auto A = 1; A <= maxSaveSlots; A++)
@@ -2236,7 +2240,7 @@ void UpdateGraphics(bool skipRepaint)
                 }
 
                 // Options Menu
-                else if(MenuMode == 3)
+                else if(MenuMode == MENU_OPTIONS)
                 {
     //                    SuperPrint "PLAYER 1 CONTROLS", 3, 300, 350
                     SuperPrint("PLAYER 1 CONTROLS", 3, 300, 350);
@@ -2264,30 +2268,31 @@ void UpdateGraphics(bool skipRepaint)
                                           GFX.MCursor[0].w, GFX.MCursor[0].h, GFX.MCursor[0], 0, 0);
     //                ElseIf MenuMode = 31 Or MenuMode = 32 Then
                 }
-                else if(MenuMode == 31 || MenuMode == 32)
+                else if(MenuMode == MENU_INPUT_SETTINGS_P1 || MenuMode == MENU_INPUT_SETTINGS_P2)
                 {
     //                    If useJoystick(MenuMode - 30) = 0 Then
-                    if(useJoystick[MenuMode - 30] == 0)
+                    if(useJoystick[MenuMode - MENU_INPUT_SETTINGS_BASE] == 0)
                     {
+                        auto &ck = conKeyboard[MenuMode - MENU_INPUT_SETTINGS_BASE];
     //                        SuperPrint "INPUT......KEYBOARD", 3, 300, 260 + menuFix
                         SuperPrint("INPUT......KEYBOARD", 3, 300, 260 + menuFix);
-                        SuperPrint(fmt::format_ne("UP.........{0}", getKeyName(conKeyboard[MenuMode - 30].Up)), 3, 300, 290 + menuFix);
-                        SuperPrint(fmt::format_ne("DOWN.......{0}", getKeyName(conKeyboard[MenuMode - 30].Down)), 3, 300, 320 + menuFix);
-                        SuperPrint(fmt::format_ne("LEFT.......{0}", getKeyName(conKeyboard[MenuMode - 30].Left)), 3, 300, 350 + menuFix);
-                        SuperPrint(fmt::format_ne("RIGHT......{0}", getKeyName(conKeyboard[MenuMode - 30].Right)), 3, 300, 380 + menuFix);
-                        SuperPrint(fmt::format_ne("RUN........{0}", getKeyName(conKeyboard[MenuMode - 30].Run)), 3, 300, 410 + menuFix);
-                        SuperPrint(fmt::format_ne("ALT RUN....{0}", getKeyName(conKeyboard[MenuMode - 30].AltRun)), 3, 300, 440 + menuFix);
-                        SuperPrint(fmt::format_ne("JUMP.......{0}", getKeyName(conKeyboard[MenuMode - 30].Jump)), 3, 300, 470 + menuFix);
-                        SuperPrint(fmt::format_ne("ALT JUMP...{0}", getKeyName(conKeyboard[MenuMode - 30].AltJump)), 3, 300, 500 + menuFix);
-                        SuperPrint(fmt::format_ne("DROP ITEM..{0}", getKeyName(conKeyboard[MenuMode - 30].Drop)), 3, 300, 530 + menuFix);
-                        SuperPrint(fmt::format_ne("PAUSE......{0}", getKeyName(conKeyboard[MenuMode - 30].Start)), 3, 300, 560 + menuFix);
+                        SuperPrint(fmt::format_ne("UP.........{0}", getKeyName(ck.Up)), 3, 300, 290 + menuFix);
+                        SuperPrint(fmt::format_ne("DOWN.......{0}", getKeyName(ck.Down)), 3, 300, 320 + menuFix);
+                        SuperPrint(fmt::format_ne("LEFT.......{0}", getKeyName(ck.Left)), 3, 300, 350 + menuFix);
+                        SuperPrint(fmt::format_ne("RIGHT......{0}", getKeyName(ck.Right)), 3, 300, 380 + menuFix);
+                        SuperPrint(fmt::format_ne("RUN........{0}", getKeyName(ck.Run)), 3, 300, 410 + menuFix);
+                        SuperPrint(fmt::format_ne("ALT RUN....{0}", getKeyName(ck.AltRun)), 3, 300, 440 + menuFix);
+                        SuperPrint(fmt::format_ne("JUMP.......{0}", getKeyName(ck.Jump)), 3, 300, 470 + menuFix);
+                        SuperPrint(fmt::format_ne("ALT JUMP...{0}", getKeyName(ck.AltJump)), 3, 300, 500 + menuFix);
+                        SuperPrint(fmt::format_ne("DROP ITEM..{0}", getKeyName(ck.Drop)), 3, 300, 530 + menuFix);
+                        SuperPrint(fmt::format_ne("PAUSE......{0}", getKeyName(ck.Start)), 3, 300, 560 + menuFix);
                         SuperPrint("Reset to default", 3, 300, 590 + menuFix);
     //                    Else
                     }
                     else
                     {
-                        auto &cj = conJoystick[MenuMode - 30];
-                        SuperPrint("INPUT......" + joyGetName(useJoystick[MenuMode - 30] - 1), 3, 300, 260 + menuFix);
+                        auto &cj = conJoystick[MenuMode - MENU_INPUT_SETTINGS_BASE];
+                        SuperPrint("INPUT......" + joyGetName(useJoystick[MenuMode - MENU_INPUT_SETTINGS_BASE] - 1), 3, 300, 260 + menuFix);
                         SuperPrint(fmt::format_ne("UP.........{0}", getJoyKeyName(cj.isGameController, cj.Up)), 3, 300, 290 + menuFix);
                         SuperPrint(fmt::format_ne("DOWN.......{0}", getJoyKeyName(cj.isGameController, cj.Down)), 3, 300, 320 + menuFix);
                         SuperPrint(fmt::format_ne("LEFT.......{0}", getJoyKeyName(cj.isGameController, cj.Left)), 3, 300, 350 + menuFix);
