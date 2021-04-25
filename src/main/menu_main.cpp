@@ -1105,7 +1105,7 @@ void mainMenuDraw()
     int B = 0;
     int C = 0;
 
-    if(MenuMode != MENU_1PLAYER_GAME && MenuMode != MENU_2PLAYER_GAME && MenuMode != MENU_OPTIONS)
+    if(MenuMode != MENU_1PLAYER_GAME && MenuMode != MENU_2PLAYER_GAME && MenuMode != MENU_BATTLE_MODE)
         worldCurs = 0;
 
     int menuFix = -44; // for Input Settings
