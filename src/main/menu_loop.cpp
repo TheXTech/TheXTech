@@ -56,7 +56,8 @@ void MenuLoop()
 
     UpdateControls();
 
-    mainMenuUpdate();
+    if(mainMenuUpdate())
+        return;
 
     SingleCoop = 0;
 

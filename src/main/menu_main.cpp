@@ -59,7 +59,7 @@ static int ScrollDelay = 0;
 static int menuPlayersNum = 0;
 static int menuBattleMode = false;
 
-void mainMenuUpdate()
+bool mainMenuUpdate()
 {
     int B;
     Location_t tempLocation;
@@ -245,6 +245,7 @@ void mainMenuUpdate()
                     DoEvents();
                     PGE_Delay(500);
                     KillIt();
+                    return true;
                 }
 
             }
@@ -369,7 +370,7 @@ void mainMenuUpdate()
                         PlayerCharacter2 = MenuCursor + 1;
                         MenuCursor = 0;
                         StartBattleMode();
-                        return;
+                        return true;
                     }
 
                     MenuCursorCanMove = false;
@@ -693,7 +694,7 @@ void mainMenuUpdate()
                             ErrorQuit = true;
                         }
                     }
-                    return;
+                    return true;
                 }
             }
 
@@ -1105,6 +1106,8 @@ void mainMenuUpdate()
             }
         }
     }
+
+    return false;
 }
 
 static void s_drawGameTypeTitle(int x, int y)
