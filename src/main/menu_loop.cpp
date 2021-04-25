@@ -1607,6 +1607,8 @@ void FindWorlds()
                     head.charactersToS64();
                     w.WorldPath = epDir;
                     w.WorldFile = fName;
+                    if(w.WorldName.empty())
+                        w.WorldName = fName;
                     w.blockChar[1] = head.nocharacter1;
                     w.blockChar[2] = head.nocharacter2;
                     w.blockChar[3] = head.nocharacter3;
@@ -1652,6 +1654,8 @@ void FindLevels()
                 w.WorldPath = battleRoot;
                 w.WorldFile = fName;
                 w.WorldName = head.LevelName;
+                if(w.WorldName.empty())
+                    w.WorldName = fName;
                 SelectWorld.push_back(w);
             }
         }
