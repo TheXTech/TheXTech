@@ -1055,7 +1055,7 @@ void FrmMain::lazyLoad(StdPicture &target)
 
     if((w == 0) || (h == 0))
     {
-        FreeImage_Unload(sourceImage);
+        GraphicsHelps::closeImage(sourceImage);
         pLogWarning("Error lazy-decompressing of image file:\n"
                     "Reason: %s."
                     "Zero image size!");
@@ -1107,7 +1107,7 @@ void FrmMain::lazyLoad(StdPicture &target)
         FIBITMAP *d = FreeImage_Rescale(sourceImage, int(w), int(h));
         if(d)
         {
-            FreeImage_Unload(sourceImage);
+            GraphicsHelps::closeImage(sourceImage);
             sourceImage = d;
         }
         target.w_scale = float(w) / float(target.w_orig);

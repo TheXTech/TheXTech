@@ -94,7 +94,7 @@ FIBITMAP *GraphicsHelps::loadImage(std::string file, bool convertTo32bit)
     long long imgConvertElapsed = 0;
 #endif
 
-    if(convertTo32bit)
+    if(convertTo32bit && (FreeImage_GetBPP(img) != 32))
     {
 #ifdef DEBUG_BUILD
         imgConvTime.start();
@@ -136,7 +136,7 @@ FIBITMAP *GraphicsHelps::loadImage(std::vector<char> &raw, bool convertTo32bit)
     if(!img)
         return nullptr;
 
-    if(convertTo32bit)
+    if(convertTo32bit && (FreeImage_GetBPP(img) != 32))
     {
         FIBITMAP *temp;
         temp = FreeImage_ConvertTo32Bits(img);
