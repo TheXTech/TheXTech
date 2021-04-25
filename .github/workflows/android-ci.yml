@@ -48,7 +48,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: notification_tracker
-          path: thextech/build/outputs/apk/releaseci/thextech-releaseci.apk
+          path: android-project/thextech/build/outputs/apk/releaseci/thextech-releaseci.apk
 
       - name: Deploy to builds.wohlsoft.ru
         if: github.event_name != 'pull_request'
