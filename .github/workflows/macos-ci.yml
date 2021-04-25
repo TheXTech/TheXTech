@@ -1,0 +1,150 @@
+name: macOS CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    name: ${{ matrix.config.name }} | ${{ matrix.config.build_type }}
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+        # ======================================= Adventures of Demo =======================================
+        # The side game about Demo and siblings from the A2XT universe by raocow and his fan community.
+        - {
+            name: "Adventures of Demo - macOS Intel",
+            os: macos-latest,
+            extra_options: "-DTHEXTECH_PRELOAD_ENVIRONMENT=\"`pwd`/assets/\" -DTHEXTECH_CUSTOM_ICON_PATH=\"`pwd`/assets/graphics/ui/icon/advdemo.icns\" -DTHEXTECH_ICON_NAME=advdemo.icns -DTHEXTECH_BUNDLE_NAME=\"Adventures of Demo\" -DTHEXTECH_EXECUTABLE_NAME=\"advdemo\"",
+            deps_cmdline: "brew install ninja wget p7zip lftp",
+            generator: "Ninja",
+            build_type: "MinSizeRel",
+            assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-adventure-of-demo-assets-full.7z",
+            package_filename: "thextech-adventures-of-demo-intel-dev.dmg",
+            upload_directory: "www/macosx/"
+          }
+        - {
+            name: "Adventures of Demo - macOS ARM",
+            os: macos-latest,
+            extra_options: "-DCMAKE_OSX_ARCHITECTURES=\"arm64\" -DTHEXTECH_PRELOAD_ENVIRONMENT=\"`pwd`/assets/\" -DTHEXTECH_CUSTOM_ICON_PATH=\"`pwd`/assets/graphics/ui/icon/advdemo.icns\" -DTHEXTECH_ICON_NAME=advdemo.icns -DTHEXTECH_BUNDLE_NAME=\"Adventures of Demo\" -DTHEXTECH_EXECUTABLE_NAME=\"advdemo\"",
+            deps_cmdline: "brew install ninja wget p7zip lftp",
+            generator: "Ninja",
+            build_type: "MinSizeRel",
+            assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-adventure-of-demo-assets-full.7z",
+            package_filename: "thextech-adventures-of-demo-arm-dev.dmg",
+            upload_directory: "www/macosx/"
+          }
+
+        # ======================================= Super Mario Bros. X - a fan-game =======================================
+        # Was made in 2009 by Andrew Spinks "Redigit", and supported up to 2011 by it's original author.
+        - {
+            name: "Super Mario Bros. X - macOS Intel",
+            os: macos-latest,
+            extra_options: "-DTHEXTECH_PRELOAD_ENVIRONMENT=\"`pwd`/assets/\" -DTHEXTECH_CUSTOM_ICON_PATH=\"`pwd`/assets/graphics/ui/icon/smbx.icns\" -DTHEXTECH_ICON_NAME=smbx.icns -DTHEXTECH_BUNDLE_NAME=\"Super Mario Bros. X\" -DTHEXTECH_EXECUTABLE_NAME=\"thextech\"",
+            deps_cmdline: "brew install ninja wget p7zip lftp",
+            generator: "Ninja",
+            build_type: "MinSizeRel",
+            assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-smbx13-assets-full.7z",
+            package_filename: "thextech-super-mario-bros-x-intel-dev.dmg",
+            upload_directory: "www/macosx/"
+          }
+        - {
+            name: "Super Mario Bros. X - macOS ARM",
+            os: macos-latest,
+            extra_options: "-DCMAKE_OSX_ARCHITECTURES=\"arm64\" -DTHEXTECH_PRELOAD_ENVIRONMENT=\"`pwd`/assets/\" -DTHEXTECH_CUSTOM_ICON_PATH=\"`pwd`/assets/graphics/ui/icon/smbx.icns\" -DTHEXTECH_ICON_NAME=smbx.icns -DTHEXTECH_BUNDLE_NAME=\"Super Mario Bros. X\" -DTHEXTECH_EXECUTABLE_NAME=\"thextech\"",
+            deps_cmdline: "brew install ninja wget p7zip lftp",
+            generator: "Ninja",
+            build_type: "MinSizeRel",
+            assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-smbx13-assets-full.7z",
+            package_filename: "thextech-super-mario-bros-x-arm-dev.dmg",
+            upload_directory: "www/macosx/"
+          }
+
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Install Dependencies
+      shell: bash
+      run: |
+        if [[ ! -z "${{ matrix.config.deps_cmdline }}" ]]; then
+          eval ${{ matrix.config.deps_cmdline }}
+        fi
+        # Pull submodules
+        git submodule init
+        git submodule update
+
+    - name: Download assets
+      uses: carlosperate/download-file-action@v1.0.3
+      with:
+        file-url: "${{ matrix.config.assets_url }}"
+        file-name: assets.7z
+
+    - name: Unpack assets
+      shell: bash
+      run: |
+        mkdir -p assets
+        cd assets
+        7z x ../assets.7z
+        cd ..
+        rm assets.7z
+
+    - name: Configure
+      shell: bash
+      run: |
+        if [[ ! -z "${{ matrix.config.extra_path }}" ]]; then
+          export PATH=${{ matrix.config.extra_path }}:${PATH}
+          echo "PATH environment: ${PATH}"
+        fi
+        cmake -B build -G "${{ matrix.config.generator }}" -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} ${{ matrix.config.extra_options }} .
+
+    - name: Build
+      shell: bash
+      run: |
+        if [[ ! -z "${{ matrix.config.extra_path }}" ]]; then
+          export PATH=${{ matrix.config.extra_path }}:${PATH}
+        fi
+        export MAKEFLAGS=--keep-going
+        cmake --build build --config ${{ matrix.config.build_type }} --parallel 3
+
+    - name: Create Package
+      if: always()
+      shell: bash
+      run: |
+        cd build
+        mkdir package
+        cpack
+        mv *.dmg package/${{ matrix.config.package_filename }}
+        cd ..
+
+    - name: Upload artifact
+      if: always()
+      uses: actions/upload-artifact@v2
+      with:
+        path: build/package/${{ matrix.config.package_filename }}
+        name: ${{ matrix.config.name }} ${{ matrix.config.build_type }}
+
+    - name: Deploy to builds.wohlsoft.ru
+      if: github.event_name != 'pull_request'
+      shell: bash
+      run: |
+        if [[ ! -z "${{ matrix.config.extra_path }}" ]]; then
+          export PATH=${{ matrix.config.extra_path }}:${PATH}
+        fi
+        UPLOAD_LIST="set ssl:verify-certificate no;"
+        UPLOAD_LIST="${UPLOAD_LIST} put -O ${{ matrix.config.upload_directory }} ./build/package/${{ matrix.config.package_filename }};"
+        lftp -e "${UPLOAD_LIST} exit" -u ${{ secrets.builds_login }},${{ secrets.builds_password }} ${{ secrets.builds_host }}
+
+    - name: List Build Directory
+      if: always()
+      shell: bash
+      run: |
+        git status
+        ls -lR build
+
