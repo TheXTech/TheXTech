@@ -56,6 +56,8 @@ void initMainMenu()
 
 
 static int ScrollDelay = 0;
+static int menuPlayersNum = 0;
+static int menuBattleMode = false;
 
 void mainMenuUpdate()
 {
@@ -204,6 +206,8 @@ void mainMenuUpdate()
                 {
                     PlaySoundMenu(SFX_Do);
                     MenuMode = MENU_1PLAYER_GAME;
+                    menuPlayersNum = 1;
+                    menuBattleMode = false;
                     FindWorlds();
                     MenuCursor = 0;
                 }
@@ -211,6 +215,8 @@ void mainMenuUpdate()
                 {
                     PlaySoundMenu(SFX_Do);
                     MenuMode = MENU_2PLAYER_GAME;
+                    menuPlayersNum = 2;
+                    menuBattleMode = false;
                     FindWorlds();
                     MenuCursor = 0;
                 }
@@ -218,6 +224,8 @@ void mainMenuUpdate()
                 {
                     PlaySoundMenu(SFX_Do);
                     MenuMode = MENU_BATTLE_MODE;
+                    menuPlayersNum = 2;
+                    menuBattleMode = true;
                     FindLevels();
                     MenuCursor = 0;
                 }
@@ -1099,6 +1107,18 @@ void mainMenuUpdate()
     }
 }
 
+static void s_drawGameTypeTitle(int x, int y)
+{
+    if(menuBattleMode)
+        SuperPrint("Battle game", 3, x, y, 0.3f, 0.3f, 1.0f);
+    else
+    {
+        float r = menuPlayersNum == 1 ? 1.f : 0.3f;
+        float g = menuPlayersNum == 2 ? 1.f : 0.3f;
+        SuperPrint(fmt::format_ne("{0} Player game", menuPlayersNum), 3, x, y, r, g, 0.3f);
+    }
+}
+
 void mainMenuDraw()
 {
     int A = 0;
@@ -1117,6 +1137,7 @@ void mainMenuDraw()
     frmMain.renderTexture(ScreenW / 2 - GFX.MenuGFX[3].w / 2, 576,
             GFX.MenuGFX[3].w, GFX.MenuGFX[3].h, GFX.MenuGFX[3], 0, 0);
 
+    // Main menu
     if(MenuMode == MENU_MAIN)
     {
         SuperPrint(g_mainMenu.main1PlayerGame, 3, 300, 350);
@@ -1138,6 +1159,7 @@ void mainMenuDraw()
         B = 0;
         C = 0;
 
+        s_drawGameTypeTitle(300, 280);
         SuperPrint(SelectWorld[selWorld].WorldName, 3, 300, 310, 0.6f, 1.f, 1.f);
 
         // TODO: Make a custom playable character names print here
@@ -1205,10 +1227,12 @@ void mainMenuDraw()
         {
             frmMain.renderTexture(300 - 20, B + 350 + (MenuCursor * 30), GFX.MCursor[0]);
         }
-
     }
+
+    // Episode / Level selection
     else if(MenuMode == MENU_1PLAYER_GAME || MenuMode == MENU_2PLAYER_GAME || MenuMode == MENU_BATTLE_MODE)
     {
+        s_drawGameTypeTitle(300, 280);
         std::string tempStr;
 
         minShow = 1;
@@ -1220,12 +1244,14 @@ void mainMenuDraw()
             maxShow = minShow + 4;
 
             if(MenuCursor <= minShow - 1)
-                worldCurs = worldCurs - 1;
+                worldCurs -= 1;
+
             if(MenuCursor >= maxShow - 1)
-                worldCurs = worldCurs + 1;
+                worldCurs += 1;
 
             if(worldCurs < 1)
                 worldCurs = 1;
+
             if(worldCurs > NumSelectWorld - 4)
                 worldCurs = NumSelectWorld - 4;
 
@@ -1261,7 +1287,9 @@ void mainMenuDraw()
 
     else if(MenuMode == MENU_SELECT_SLOT_1P || MenuMode == MENU_SELECT_SLOT_2P) // Save Select
     {
+        s_drawGameTypeTitle(300, 280);
         SuperPrint(SelectWorld[selWorld].WorldName, 3, 300, 310, 0.6f, 1.f, 1.f);
+
         for(auto A = 1; A <= maxSaveSlots; A++)
         {
             if(SaveSlot[A] >= 0)
@@ -1305,6 +1333,7 @@ void mainMenuDraw()
                               GFX.MCursor[0].w, GFX.MCursor[0].h, GFX.MCursor[0], 0, 0);
     }
 
+    // Player controls setup
     else if(MenuMode == MENU_INPUT_SETTINGS_P1 || MenuMode == MENU_INPUT_SETTINGS_P2)
     {
         if(useJoystick[MenuMode - MENU_INPUT_SETTINGS_BASE] == 0)
@@ -1344,6 +1373,6 @@ void mainMenuDraw()
                               GFX.MCursor[0].w, GFX.MCursor[0].h, GFX.MCursor[0], 0, 0);
     }
 
+    // Mouse cursor
     frmMain.renderTexture(int(MenuMouseX), int(MenuMouseY), GFX.ECursor[2]);
 }
-
