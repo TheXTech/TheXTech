@@ -63,7 +63,6 @@ void MenuLoop()
 
     SingleCoop = 0;
 
-    initMainMenu();
 
     bool altPressed = getKeyState(SDL_SCANCODE_LALT) == KEY_PRESSED ||
                       getKeyState(SDL_SCANCODE_RALT) == KEY_PRESSED;

@@ -117,6 +117,7 @@ int GameMain(const CmdLineSetup_t &setup)
     //        DoEvents
     //    Loop While StartMenu = False 'wait until the player clicks a button
 
+    initMainMenu();
     StartMenu = true;
 
     initAll();
