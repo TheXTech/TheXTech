@@ -85,4 +85,7 @@ extern MainMenuContent g_mainMenu;
 
 extern void initMainMenu();
 
+extern void mainMenuUpdate();
+extern void mainMenuDraw();
+
 #endif // MENU_MAIN_H
