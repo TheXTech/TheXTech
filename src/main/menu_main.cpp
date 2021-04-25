@@ -59,6 +59,33 @@ static int ScrollDelay = 0;
 static int menuPlayersNum = 0;
 static int menuBattleMode = false;
 
+static int menuCopySaveSrc = 0;
+static int menuCopySaveDst = 0;
+
+
+static void s_handleMouseMove(int items, int x, int y, int maxWidth, int itemHeight)
+{
+    For(A, 0, items)
+    {
+        if(MenuMouseY >= y + A * itemHeight && MenuMouseY <= y + 16 + A * itemHeight)
+        {
+            if(MenuMouseX >= x && MenuMouseX <= x + maxWidth)
+            {
+                if(MenuMouseRelease && MenuMouseDown)
+                    MenuMouseClick = true;
+                if(MenuCursor != A)
+                {
+                    PlaySoundMenu(SFX_Slide);
+                    MenuCursor = A;
+                    break;
+                }
+            }
+        }
+    }
+}
+
+
+
 bool mainMenuUpdate()
 {
     int B;
@@ -518,32 +545,7 @@ bool mainMenuUpdate()
         else if(MenuMode == MENU_SELECT_SLOT_1P || MenuMode == MENU_SELECT_SLOT_2P)
         {
             if(MenuMouseMove)
-            {
-                For(A, 0, 2)
-                {
-                    if(MenuMouseY >= 350 + A * 30 && MenuMouseY <= 366 + A * 30)
-                    {
-                        menuLen = 18 * std::strlen("slot 1 empty") - 2;
-
-                        if(SaveSlot[A + 1] >= 0)
-                            menuLen = 18 * std::strlen("slot ... 100") - 2;
-
-                        if(SaveStars[A + 1] > 0)
-                            menuLen = 288 + 2/*sizeof(short) == 2 in VB6*/ * 18;
-
-                        if(MenuMouseX >= 300 && MenuMouseX <= 300 + menuLen)
-                        {
-                            if(MenuMouseRelease && MenuMouseDown)
-                                MenuMouseClick = true;
-                            if(MenuCursor != A)
-                            {
-                                PlaySoundMenu(SFX_Slide);
-                                MenuCursor = A;
-                            }
-                        }
-                    }
-                }
-            }
+                s_handleMouseMove(4, 300, 350, 300, 30);
 
             if(MenuCursorCanMove || MenuMouseClick || MenuMouseBack)
             {
@@ -575,131 +577,241 @@ bool mainMenuUpdate()
                 else if(menuDoPress || MenuMouseClick)
                 {
                     PlaySoundMenu(SFX_Do);
-                    numPlayers = MenuMode / MENU_SELECT_SLOT_BASE;
 
-                    For(A, 1, numCharacters)
+                    if(MenuCursor >= 0 && MenuCursor <= 2) // Select the save slot
                     {
-                        SavedChar[A] = blankPlayer;
-                        SavedChar[A].Character = A;
-                        SavedChar[A].State = 1;
-                    }
+                        numPlayers = MenuMode / MENU_SELECT_SLOT_BASE;
 
-                    Player[1].State = 1;
-                    Player[1].Mount = 0;
-                    Player[1].Character = 1;
-                    Player[1].HeldBonus = 0;
-                    Player[1].CanFly = false;
-                    Player[1].CanFly2 = false;
-                    Player[1].TailCount = 0;
-                    Player[1].YoshiBlue = false;
-                    Player[1].YoshiRed = false;
-                    Player[1].YoshiYellow = false;
-                    Player[1].Hearts = 0;
-                    Player[2].State = 1;
-                    Player[2].Mount = 0;
-                    Player[2].Character = 2;
-                    Player[2].HeldBonus = 0;
-                    Player[2].CanFly = false;
-                    Player[2].CanFly2 = false;
-                    Player[2].TailCount = 0;
-                    Player[2].YoshiBlue = false;
-                    Player[2].YoshiRed = false;
-                    Player[2].YoshiYellow = false;
-                    Player[2].Hearts = 0;
-
-                    if(numPlayers <= 2 && PlayerCharacter > 0)
-                    {
-                        Player[1].Character = PlayerCharacter;
-                        PlayerCharacter = 0;
-                    }
-
-                    if(numPlayers == 2 && PlayerCharacter2 > 0)
-                    {
-                        Player[2].Character = PlayerCharacter2;
-                        PlayerCharacter2 = 0;
-                    }
-
-                    selSave = MenuCursor + 1;
-                    numStars = 0;
-                    Coins = 0;
-                    Score = 0;
-                    Lives = 3;
-                    LevelSelect = true;
-                    GameMenu = false;
-                    frmMain.setTargetTexture();
-                    frmMain.clearBuffer();
-                    frmMain.repaint();
-                    StopMusic();
-                    DoEvents();
-                    PGE_Delay(500);
-                    ClearGame();
-
-                    OpenWorld(SelectWorld[selWorld].WorldPath + SelectWorld[selWorld].WorldFile);
-
-                    if(SaveSlot[selSave] >= 0)
-                    {
-                        if(!NoMap)
-                            StartLevel.clear();
-                        LoadGame();
-                        speedRun_loadStats();
-                    }
-
-                    if(WorldUnlock)
-                    {
-                        For(A, 1, numWorldPaths)
+                        For(A, 1, numCharacters)
                         {
-                            tempLocation = WorldPath[A].Location;
-                            {
-                                Location_t &l =tempLocation;
-                                l.X = l.X + 4;
-                                l.Y = l.Y + 4;
-                                l.Width = l.Width - 8;
-                                l.Height = l.Height - 8;
-                            }
-
-                            WorldPath[A].Active = true;
-
-                            For(B, 1, numScenes)
-                            {
-                                if(CheckCollision(tempLocation, Scene[B].Location))
-                                    Scene[B].Active = false;
-                            }
+                            SavedChar[A] = blankPlayer;
+                            SavedChar[A].Character = A;
+                            SavedChar[A].State = 1;
                         }
 
-                        For(A, 1, numWorldLevels)
-                            WorldLevel[A].Active = true;
-                    }
+                        Player[1].State = 1;
+                        Player[1].Mount = 0;
+                        Player[1].Character = 1;
+                        Player[1].HeldBonus = 0;
+                        Player[1].CanFly = false;
+                        Player[1].CanFly2 = false;
+                        Player[1].TailCount = 0;
+                        Player[1].YoshiBlue = false;
+                        Player[1].YoshiRed = false;
+                        Player[1].YoshiYellow = false;
+                        Player[1].Hearts = 0;
+                        Player[2].State = 1;
+                        Player[2].Mount = 0;
+                        Player[2].Character = 2;
+                        Player[2].HeldBonus = 0;
+                        Player[2].CanFly = false;
+                        Player[2].CanFly2 = false;
+                        Player[2].TailCount = 0;
+                        Player[2].YoshiBlue = false;
+                        Player[2].YoshiRed = false;
+                        Player[2].YoshiYellow = false;
+                        Player[2].Hearts = 0;
 
-                    SetupPlayers();
-
-                    if(!StartLevel.empty())
-                    {
-                        PlaySoundMenu(SFX_LevelSelect);
-                        SoundPause[26] = 200;
-                        LevelSelect = false;
-
-                        GameThing();
-                        ClearLevel();
-
-                        PGE_Delay(1000);
-                        std::string levelPath = SelectWorld[selWorld].WorldPath + StartLevel;
-                        if(!OpenLevel(levelPath))
+                        if(numPlayers <= 2 && PlayerCharacter > 0)
                         {
-                            MessageText = fmt::format_ne("ERROR: Can't open \"{0}\": file doesn't exist or corrupted.", StartLevel);
-                            PauseGame(1);
-                            ErrorQuit = true;
+                            Player[1].Character = PlayerCharacter;
+                            PlayerCharacter = 0;
                         }
+
+                        if(numPlayers == 2 && PlayerCharacter2 > 0)
+                        {
+                            Player[2].Character = PlayerCharacter2;
+                            PlayerCharacter2 = 0;
+                        }
+
+                        selSave = MenuCursor + 1;
+                        numStars = 0;
+                        Coins = 0;
+                        Score = 0;
+                        Lives = 3;
+                        LevelSelect = true;
+                        GameMenu = false;
+                        frmMain.setTargetTexture();
+                        frmMain.clearBuffer();
+                        frmMain.repaint();
+                        StopMusic();
+                        DoEvents();
+                        PGE_Delay(500);
+                        ClearGame();
+
+                        OpenWorld(SelectWorld[selWorld].WorldPath + SelectWorld[selWorld].WorldFile);
+
+                        if(SaveSlot[selSave] >= 0)
+                        {
+                            if(!NoMap)
+                                StartLevel.clear();
+                            LoadGame();
+                            speedRun_loadStats();
+                        }
+
+                        if(WorldUnlock)
+                        {
+                            For(A, 1, numWorldPaths)
+                            {
+                                tempLocation = WorldPath[A].Location;
+                                {
+                                    Location_t &l =tempLocation;
+                                    l.X = l.X + 4;
+                                    l.Y = l.Y + 4;
+                                    l.Width = l.Width - 8;
+                                    l.Height = l.Height - 8;
+                                }
+
+                                WorldPath[A].Active = true;
+
+                                For(B, 1, numScenes)
+                                {
+                                    if(CheckCollision(tempLocation, Scene[B].Location))
+                                        Scene[B].Active = false;
+                                }
+                            }
+
+                            For(A, 1, numWorldLevels)
+                                WorldLevel[A].Active = true;
+                        }
+
+                        SetupPlayers();
+
+                        if(!StartLevel.empty())
+                        {
+                            PlaySoundMenu(SFX_LevelSelect);
+                            SoundPause[26] = 200;
+                            LevelSelect = false;
+
+                            GameThing();
+                            ClearLevel();
+
+                            PGE_Delay(1000);
+                            std::string levelPath = SelectWorld[selWorld].WorldPath + StartLevel;
+                            if(!OpenLevel(levelPath))
+                            {
+                                MessageText = fmt::format_ne("ERROR: Can't open \"{0}\": file doesn't exist or corrupted.", StartLevel);
+                                PauseGame(1);
+                                ErrorQuit = true;
+                            }
+                        }
+                        return true;
                     }
-                    return true;
+                    else if(MenuCursor == 3) // Copy the gamesave
+                    {
+                        MenuCursor = 0;
+                        MenuMode += MENU_SELECT_SLOT_COPY_S1_ADD;
+                        MenuCursorCanMove = false;
+                    }
+                    else if(MenuCursor == 4) // Delete the gamesave
+                    {
+                        MenuCursor = 0;
+                        MenuMode += MENU_SELECT_SLOT_DELETE_ADD;
+                        MenuCursorCanMove = false;
+                    }
                 }
             }
 
-            if(MenuMode < MENU_CHARACTER_SELECT_BASE)
+            if(MenuMode == MENU_SELECT_SLOT_1P || MenuMode == MENU_SELECT_SLOT_2P)
+            {
+                if(MenuCursor > 4) MenuCursor = 0;
+                if(MenuCursor < 0) MenuCursor = 4;
+            }
+        } // Save Slot Select
+
+        // Save Select
+        else if(MenuMode == MENU_SELECT_SLOT_1P_COPY_S1 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S1 ||
+                MenuMode == MENU_SELECT_SLOT_1P_COPY_S2 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S2)
+        {
+            if(MenuMouseMove)
+                s_handleMouseMove(4, 300, 350, 300, 30);
+
+            if(MenuCursorCanMove || MenuMouseClick || MenuMouseBack)
+            {
+                if(menuBackPress || MenuMouseBack)
+                {
+//'save select back
+                    if(MenuMode == MENU_SELECT_SLOT_1P_COPY_S2 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S2)
+                    {
+                        MenuMode -= MENU_SELECT_SLOT_COPY_S1_ADD;
+                    }
+                    else
+                    {
+                        MenuMode -= MENU_SELECT_SLOT_COPY_S1_ADD;
+                        MenuCursor = 3;
+                    }
+
+                    MenuCursorCanMove = false;
+                    PlaySoundMenu(SFX_Do);
+                }
+                else if(menuDoPress || MenuMouseClick)
+                {
+                    if(MenuMode == MENU_SELECT_SLOT_1P_COPY_S1 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S1)
+                    {
+                        PlaySoundMenu(SFX_Do);
+                        menuCopySaveSrc = (MenuCursor + 1);
+                        MenuMode += MENU_SELECT_SLOT_COPY_S1_ADD;
+                        MenuCursorCanMove = false;
+                    }
+                    else if(menuCopySaveSrc == (MenuCursor + 1))
+                    {
+                        PlaySoundMenu(SFX_BlockHit);
+                        MenuCursorCanMove = false;
+                    }
+                    else
+                    {
+                        PlaySoundMenu(SFX_Raccoon);
+                        menuCopySaveDst = (MenuCursor + 1);
+                        CopySave(selWorld, menuCopySaveSrc, menuCopySaveDst);
+                        FindSaves();
+                        MenuMode -= MENU_SELECT_SLOT_COPY_S2_ADD;
+                        MenuCursor = 3;
+                        MenuCursorCanMove = false;
+                    }
+                }
+            }
+
+            if(MenuMode == MENU_SELECT_SLOT_1P_COPY_S1 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S1 ||
+               MenuMode == MENU_SELECT_SLOT_1P_COPY_S2 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S2)
             {
                 if(MenuCursor > 2) MenuCursor = 0;
                 if(MenuCursor < 0) MenuCursor = 2;
             }
-        } // Save Slot Select
+        }
+
+        // Delete gamesave
+        else if(MenuMode == MENU_SELECT_SLOT_1P_DELETE || MenuMode == MENU_SELECT_SLOT_1P_DELETE)
+        {
+            if(MenuMouseMove)
+                s_handleMouseMove(4, 300, 350, 300, 30);
+
+            if(MenuCursorCanMove || MenuMouseClick || MenuMouseBack)
+            {
+                if(menuBackPress || MenuMouseBack)
+                {
+//'save select back
+                    MenuMode -= MENU_SELECT_SLOT_DELETE_ADD;
+                    MenuCursor = 4;
+                    PlaySoundMenu(SFX_Do);
+                    MenuCursorCanMove = false;
+                }
+                else if(menuDoPress || MenuMouseClick)
+                {
+                    MenuMode -= MENU_SELECT_SLOT_DELETE_ADD;
+                    DeleteSave(selWorld, (MenuCursor + 1));
+                    FindSaves();
+                    MenuCursor = 4;
+                    PlaySoundMenu(SFX_Blaarg);
+                    MenuCursorCanMove = false;
+                }
+            }
+
+            if(MenuMode == MENU_SELECT_SLOT_1P_DELETE || MenuMode == MENU_SELECT_SLOT_1P_DELETE)
+            {
+                if(MenuCursor > 2) MenuCursor = 0;
+                if(MenuCursor < 0) MenuCursor = 2;
+            }
+        }
 
         // Options
         else if(MenuMode == MENU_OPTIONS)
@@ -1118,6 +1230,40 @@ static void s_drawGameTypeTitle(int x, int y)
     }
 }
 
+static void s_drawGameSaves()
+{
+    int A;
+
+    for(A = 1; A <= maxSaveSlots; A++)
+    {
+        if(SaveSlot[A] >= 0)
+        {
+            SuperPrint(fmt::format_ne("SLOT {0} ... {1}%", A, SaveSlot[A]), 3, 300, 320 + (A * 30));
+            if(SaveStars[A] > 0)
+            {
+                frmMain.renderTexture(560, 320 + (A * 30) + 1,
+                                      GFX.Interface[5].w, GFX.Interface[5].h,
+                                      GFX.Interface[5], 0, 0);
+                frmMain.renderTexture(560 + 24, 320 + (A * 30) + 2,
+                                      GFX.Interface[1].w, GFX.Interface[1].h,
+                                      GFX.Interface[1], 0, 0);
+                SuperPrint(fmt::format_ne(" {0}", SaveStars[A]), 3, 588, 320 + (A * 30));
+            }
+        }
+        else
+        {
+            SuperPrint(fmt::format_ne("SLOT {0} ... NEW GAME", A), 3, 300, 320 + (A * 30));
+        }
+    }
+
+    if(MenuMode == MENU_SELECT_SLOT_1P || MenuMode == MENU_SELECT_SLOT_2P)
+    {
+        SuperPrint("COPY SAVE", 3, 300, 320 + (A * 30));
+        A++;
+        SuperPrint("ERASE SAVE", 3, 300, 320 + (A * 30));
+    }
+}
+
 void mainMenuDraw()
 {
     int A = 0;
@@ -1288,28 +1434,39 @@ void mainMenuDraw()
     {
         s_drawGameTypeTitle(300, 280);
         SuperPrint(SelectWorld[selWorld].WorldName, 3, 300, 310, 0.6f, 1.f, 1.f);
+        s_drawGameSaves();
+        frmMain.renderTexture(300 - 20, 350 + (MenuCursor * 30), GFX.MCursor[0]);
+    }
 
-        for(auto A = 1; A <= maxSaveSlots; A++)
+    else if(MenuMode == MENU_SELECT_SLOT_1P_COPY_S1 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S1 ||
+            MenuMode == MENU_SELECT_SLOT_1P_COPY_S2 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S2) // Copy save
+    {
+        s_drawGameTypeTitle(300, 280);
+        SuperPrint(SelectWorld[selWorld].WorldName, 3, 300, 310, 0.6f, 1.f, 1.f);
+        s_drawGameSaves();
+
+        if(MenuMode == MENU_SELECT_SLOT_1P_COPY_S1 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S1)
+            SuperPrint("Select the source slot", 3, 300, 320 + (5 * 30), 0.7f, 0.7f, 1.0f);
+        else if(MenuMode == MENU_SELECT_SLOT_1P_COPY_S2 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S2)
+            SuperPrint("Now select the target", 3, 300, 320 + (5 * 30), 0.7f, 1.0f, 0.7f);
+
+        if(MenuMode == MENU_SELECT_SLOT_1P_COPY_S2 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S2)
         {
-            if(SaveSlot[A] >= 0)
-            {
-                SuperPrint(fmt::format_ne("SLOT {0} ... {1}", A, SaveSlot[A]), 3, 300, 320 + (A * 30));
-                if(SaveStars[A] > 0)
-                {
-                    frmMain.renderTexture(560, 320 + (A * 30) + 1,
-                                          GFX.Interface[5].w, GFX.Interface[5].h,
-                                          GFX.Interface[5], 0, 0);
-                    frmMain.renderTexture(560 + 24, 320 + (A * 30) + 2,
-                                          GFX.Interface[1].w, GFX.Interface[1].h,
-                                          GFX.Interface[1], 0, 0);
-                    SuperPrint(fmt::format_ne(" {0}", SaveStars[A]), 3, 588, 320 + (A * 30));
-                }
-            }
-            else
-            {
-                SuperPrint(fmt::format_ne("SLOT {0} ... EMPTY", A), 3, 300, 320 + (A * 30));
-            }
+            frmMain.renderTexture(300 - 20, 350 + ((menuCopySaveSrc - 1) * 30), GFX.MCursor[0]);
+            frmMain.renderTexture(300 - 20, 350 + (MenuCursor * 30), GFX.MCursor[3]);
         }
+        else
+            frmMain.renderTexture(300 - 20, 350 + (MenuCursor * 30), GFX.MCursor[0]);
+    }
+
+    else if(MenuMode == MENU_SELECT_SLOT_1P_DELETE || MenuMode == MENU_SELECT_SLOT_2P_DELETE) // Copy save
+    {
+        s_drawGameTypeTitle(300, 280);
+        SuperPrint(SelectWorld[selWorld].WorldName, 3, 300, 310, 0.6f, 1.f, 1.f);
+        s_drawGameSaves();
+
+        SuperPrint("Select the slot to erase", 3, 300, 320 + (5 * 30), 1.0f, 0.7f, 0.7f);
+
         frmMain.renderTexture(300 - 20, 350 + (MenuCursor * 30), GFX.MCursor[0]);
     }
 

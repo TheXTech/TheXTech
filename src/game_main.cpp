@@ -1474,6 +1474,12 @@ void DeleteSave(int world, int save)
     if(Files::fileExists(savePathAncient))
         Files::deleteFile(savePathAncient);
 
+    std::string timersPath = makeGameSavePath(w.WorldPath,
+                                              w.WorldFile,
+                                              fmt::format_ne("timers{0}.ini", save));
+    if(Files::fileExists(timersPath))
+        Files::deleteFile(timersPath);
+
 #ifdef __EMSCRIPTEN__
     AppPathManager::syncFs();
 #endif
@@ -1488,7 +1494,15 @@ void CopySave(int world, int src, int dst)
     std::string savePathDst = makeGameSavePath(w.WorldPath,
                                                w.WorldFile,
                                                fmt::format_ne("save{0}.savx", dst));
-    Files::copyFile(savePathSrc, savePathDst, true);
+    Files::copyFile(savePathDst, savePathSrc, true);
+
+    std::string timersPathSrc = makeGameSavePath(w.WorldPath,
+                                                 w.WorldFile,
+                                                 fmt::format_ne("timers{0}.ini", src));
+    std::string timersPathDst = makeGameSavePath(w.WorldPath,
+                                                 w.WorldFile,
+                                                 fmt::format_ne("timers{0}.ini", dst));
+    Files::copyFile(timersPathDst, timersPathSrc, true);
 
 #ifdef __EMSCRIPTEN__
     AppPathManager::syncFs();
