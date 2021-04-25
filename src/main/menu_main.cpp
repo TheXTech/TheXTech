@@ -107,24 +107,14 @@ bool mainMenuUpdate()
 
         if(!getNewKeyboard && !getNewJoystick)
         {
+            int cursorDelta = 0;
+
             if(c.Up || upPressed)
             {
                 if(MenuCursorCanMove)
                 {
                     MenuCursor -= 1;
-
-                    if(MenuMode >= MENU_CHARACTER_SELECT_BASE)
-                    {
-                        while((MenuCursor == (PlayerCharacter - 1) &&
-                              (MenuMode == MENU_CHARACTER_SELECT_2P_S2 || MenuMode == MENU_CHARACTER_SELECT_BM_S2)) ||
-                               blockCharacter[MenuCursor + 1])
-                        {
-                            MenuCursor -= 1;
-                            if(MenuCursor < 0)
-                                MenuCursor = numCharacters - 1;
-                        }
-                    }
-                    PlaySoundMenu(SFX_Slide);
+                    cursorDelta = -1;
                 }
 
                 MenuCursorCanMove = false;
@@ -134,24 +124,30 @@ bool mainMenuUpdate()
                 if(MenuCursorCanMove)
                 {
                     MenuCursor += 1;
-
-                    if(MenuMode >= MENU_CHARACTER_SELECT_BASE)
-                    {
-                        while((MenuCursor == (PlayerCharacter - 1) &&
-                              (MenuMode == MENU_CHARACTER_SELECT_2P_S2 || MenuMode == MENU_CHARACTER_SELECT_BM_S2)) ||
-                               blockCharacter[MenuCursor + 1])
-                        {
-                            MenuCursor += 1;
-                            if(MenuCursor >= numCharacters)
-                                MenuCursor = 0;
-                        }
-                    }
-                    PlaySoundMenu(SFX_Slide);
+                    cursorDelta = +1;
                 }
-
                 MenuCursorCanMove = false;
             }
-        }
+
+            if(cursorDelta != 0)
+            {
+                if(MenuMode >= MENU_CHARACTER_SELECT_BASE && MenuMode <= MENU_CHARACTER_SELECT_BASE_END)
+                {
+                    while((MenuCursor == (PlayerCharacter - 1) &&
+                          (MenuMode == MENU_CHARACTER_SELECT_2P_S2 || MenuMode == MENU_CHARACTER_SELECT_BM_S2)) ||
+                           blockCharacter[MenuCursor + 1])
+                    {
+                        MenuCursor += cursorDelta;
+                        if(MenuCursor < 0)
+                            MenuCursor = numCharacters - 1;
+                        else if(MenuCursor >= numCharacters)
+                            MenuCursor = 0;
+                    }
+                }
+                PlaySoundMenu(SFX_Slide);
+            }
+
+        } // No keyboard/Joystick grabbing active
 
         // Main Menu
         if(MenuMode == MENU_MAIN)
@@ -254,7 +250,7 @@ bool mainMenuUpdate()
                 MenuCursor = 0;
             if(MenuCursor < 0)
                 MenuCursor = 4;
-        }
+        } // Main Menu
 
         // Character Select
         else if(MenuMode == MENU_CHARACTER_SELECT_1P ||
@@ -409,7 +405,7 @@ bool mainMenuUpdate()
                 MenuCursor += 1;
             }
 
-            if(MenuMode >= MENU_CHARACTER_SELECT_BASE)
+            if(MenuMode >= MENU_CHARACTER_SELECT_BASE && MenuMode <= MENU_CHARACTER_SELECT_BASE_END)
             {
                 if(MenuCursor >= numCharacters)
                 {
@@ -430,7 +426,7 @@ bool mainMenuUpdate()
                     }
                 }
             }
-        }
+        } // Character Select
 
         // World Select
         else if(MenuMode == MENU_1PLAYER_GAME || MenuMode == MENU_2PLAYER_GAME || MenuMode == MENU_BATTLE_MODE)
@@ -516,7 +512,7 @@ bool mainMenuUpdate()
                 if(MenuCursor < 0)
                     MenuCursor = NumSelectWorld - 1;
             }
-        }
+        } // World select
 
         // Save Select
         else if(MenuMode == MENU_SELECT_SLOT_1P || MenuMode == MENU_SELECT_SLOT_2P)
@@ -703,7 +699,7 @@ bool mainMenuUpdate()
                 if(MenuCursor > 2) MenuCursor = 0;
                 if(MenuCursor < 0) MenuCursor = 2;
             }
-        }
+        } // Save Slot Select
 
         // Options
         else if(MenuMode == MENU_OPTIONS)
