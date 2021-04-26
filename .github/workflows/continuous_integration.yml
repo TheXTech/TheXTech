@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - versus-ci
   pull_request:
     branches:
       - master

@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - versus-ci-emscripten
   pull_request:
     branches:
       - master
