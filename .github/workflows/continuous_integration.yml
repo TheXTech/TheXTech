@@ -16,181 +16,86 @@ jobs:
       fail-fast: false
       matrix:
         config:
-        # ======================================= Adventures of Demo =======================================
-        # The side game about Demo and siblings from the A2XT universe by raocow and his fan community.
         - {
-            name: "Adventures of Demo - Ubuntu 16.04",
+            name: "Ubuntu 16.04 x86_64",
             os: ubuntu-16.04,
-            extra_options: "-DTHEXTECH_EXECUTABLE_NAME=advdemo -DUSE_STATIC_LIBC=ON -DUSE_SYSTEM_LIBS=OFF -DUSE_SYSTEM_SDL2=OFF -DUSE_SHARED_FREEIMAGE=OFF -DPGE_SHARED_SDLMIXER=OFF",
+            extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech -DUSE_STATIC_LIBC=ON -DUSE_SYSTEM_LIBS=OFF -DUSE_SYSTEM_SDL2=OFF -DUSE_SHARED_FREEIMAGE=OFF -DPGE_SHARED_SDLMIXER=OFF",
             deps_cmdline: "sudo apt-get update -qq && sudo apt-get install -qq cmake ninja-build cmake ninja-build lftp \"^libxcb.*\" libx11-dev libx11-xcb-dev libgtk-3-dev libgegl-dev libxcursor-dev libxrender-dev libxrandr-dev libxext-dev libxi-dev libxss-dev libxt-dev libxv-dev libxxf86vm-dev libxinerama-dev libxkbcommon-dev libfontconfig1-dev libasound2-dev libpulse-dev libdbus-1-dev udev mtdev-tools webp libudev-dev libglm-dev libwayland-dev libegl1-mesa-dev mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev libgles2-mesa libgles2-mesa-dev libmirclient-dev libproxy-dev",
             generator: "Ninja",
             build_type: "MinSizeRel",
-            executable_name: "advdemo",
-            assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-adventure-of-demo-assets-full.7z",
             subdir_name: "thextech-adventures-of-demo",
-            package_filename: "thextech-adventures-of-demo-ubuntu-16-04-amd64-dev.tar.gz",
+            executable_name_suffix: "",
+            package_filename_suffix: "ubuntu-16-04-amd64-dev",
             upload_directory: "www/ubuntu-16-04/"
           }
         - {
-            name: "Adventures of Demo - Ubuntu 18.04",
+            name: "Ubuntu 18.04 x86_64",
             os: ubuntu-18.04,
-            extra_options: "-DTHEXTECH_EXECUTABLE_NAME=advdemo -DUSE_STATIC_LIBC=ON -DUSE_SYSTEM_LIBS=OFF -DUSE_SYSTEM_SDL2=OFF -DUSE_SHARED_FREEIMAGE=OFF -DPGE_SHARED_SDLMIXER=OFF",
+            extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech -DUSE_STATIC_LIBC=ON -DUSE_SYSTEM_LIBS=OFF -DUSE_SYSTEM_SDL2=OFF -DUSE_SHARED_FREEIMAGE=OFF -DPGE_SHARED_SDLMIXER=OFF",
             deps_cmdline: "sudo apt-get update -qq && sudo apt-get install -qq cmake ninja-build cmake ninja-build lftp \"^libxcb.*\" libx11-dev libx11-xcb-dev libgtk-3-dev libgegl-dev libxcursor-dev libxrender-dev libxrandr-dev libxext-dev libxi-dev libxss-dev libxt-dev libxv-dev libxxf86vm-dev libxinerama-dev libxkbcommon-dev libfontconfig1-dev libasound2-dev libpulse-dev libdbus-1-dev udev mtdev-tools webp libudev-dev libglm-dev libwayland-dev libegl1-mesa-dev mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev libgles2-mesa libgles2-mesa-dev libmirclient-dev libproxy-dev",
             generator: "Ninja",
             build_type: "MinSizeRel",
-            executable_name: "advdemo",
-            assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-adventure-of-demo-assets-full.7z",
             subdir_name: "thextech-adventures-of-demo",
-            package_filename: "thextech-adventures-of-demo-ubuntu-18-04-amd64-dev.tar.gz",
+            executable_name_suffix: "",
+            package_filename_suffix: "ubuntu-18-04-amd64-dev",
             upload_directory: "www/ubuntu-18-04/"
           }
         - {
-            name: "Adventures of Demo - Ubuntu 20.04",
+            name: "Ubuntu 20.04 x86_64",
             os: ubuntu-20.04,
-            extra_options: "-DTHEXTECH_EXECUTABLE_NAME=advdemo -DUSE_STATIC_LIBC=ON -DUSE_SYSTEM_LIBS=OFF -DUSE_SYSTEM_SDL2=OFF -DUSE_SHARED_FREEIMAGE=OFF -DPGE_SHARED_SDLMIXER=OFF",
+            extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech -DUSE_STATIC_LIBC=ON -DUSE_SYSTEM_LIBS=OFF -DUSE_SYSTEM_SDL2=OFF -DUSE_SHARED_FREEIMAGE=OFF -DPGE_SHARED_SDLMIXER=OFF",
             deps_cmdline: "sudo apt-get update -qq && sudo apt-get install -qq cmake ninja-build cmake ninja-build lftp \"^libxcb.*\" libx11-dev libx11-xcb-dev libgtk-3-dev libgegl-dev libxcursor-dev libxrender-dev libxrandr-dev libxext-dev libxi-dev libxss-dev libxt-dev libxv-dev libxxf86vm-dev libxinerama-dev libxkbcommon-dev libfontconfig1-dev libasound2-dev libpulse-dev libdbus-1-dev udev mtdev-tools webp libudev-dev libglm-dev libwayland-dev libegl1-mesa-dev mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev libgles2-mesa libgles2-mesa-dev libmirclient-dev libproxy-dev",
             generator: "Ninja",
             build_type: "MinSizeRel",
-            executable_name: "advdemo",
-            assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-adventure-of-demo-assets-full.7z",
             subdir_name: "thextech-adventures-of-demo",
-            package_filename: "thextech-adventures-of-demo-ubuntu-20-04-amd64-dev.tar.gz",
+            executable_name_suffix: "",
+            package_filename_suffix: "ubuntu-20-04-amd64-dev",
             upload_directory: "www/ubuntu-20-04/"
           }
         - {
-            name: "Adventures of Demo - Windows - 64-bit",
+            name: "Windows - 64-bit",
             os: windows-latest,
-            extra_options: "-DCMAKE_PREFIX_PATH=C:/WohlMinGWw64/mingw64 -DTHEXTECH_EXECUTABLE_NAME=advdemo -DCMAKE_TOOLCHAIN_FILE=`pwd`/cmake/ci_windows_mingw_toolchain_x64.cmake",
+            extra_options: "-DCMAKE_PREFIX_PATH=C:/WohlMinGWw64/mingw64 -DTHEXTECH_EXECUTABLE_NAME=thextech -DCMAKE_TOOLCHAIN_FILE=`pwd`/cmake/ci_windows_mingw_toolchain_x64.cmake",
             generator: "Ninja",
             build_type: "MinSizeRel",
-            assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-adventure-of-demo-assets-full.7z",
             subdir_name: "thextech-adventures-of-demo",
             extra_path: "/c/WohlMinGWw64/mingw64/bin",
-            executable_name: "advdemo.exe",
-            package_filename: "thextech-adventures-of-demo-win64-dev.7z",
+            executable_name_suffix: "-win64",
+            package_filename_suffix: "win64-dev",
             upload_directory: "www/win32/",
             mingw_download: "https://wohlsoft.ru/docs/Software/MinGW/x86_64-8.1.0-release-posix-seh-rt_v6-rev0.7z", mingw_install_dir: "C:/WohlMinGWw64/",
             ninja_download: "https://wohlsoft.ru/docs/Software/Ninja-Build/ninja-win.zip", ninja_install_dir: "C:/WohlMinGWw64/mingw64/bin",
             lftp_download: "https://wohlsoft.ru/docs/Software/lftp-4.4.15.win64-openssl-1.0.1g.7z", lftp_install_dir: "C:/WohlMinGWw64/mingw64/"
           }
         - {
-            name: "Adventures of Demo - Windows - 32-bit",
+            name: "Windows - 32-bit",
             os: windows-latest,
-            extra_options: "-DCMAKE_PREFIX_PATH=C:/WohlMinGWw64/mingw32 -DTHEXTECH_EXECUTABLE_NAME=advdemo -DCMAKE_TOOLCHAIN_FILE=`pwd`/cmake/ci_windows_mingw_toolchain_x32.cmake",
+            extra_options: "-DCMAKE_PREFIX_PATH=C:/WohlMinGWw64/mingw32 -DTHEXTECH_EXECUTABLE_NAME=thextech -DCMAKE_TOOLCHAIN_FILE=`pwd`/cmake/ci_windows_mingw_toolchain_x32.cmake",
             generator: "Ninja",
             build_type: "MinSizeRel",
-            assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-adventure-of-demo-assets-full.7z",
             subdir_name: "thextech-adventures-of-demo",
             extra_path: "/c/WohlMinGWw64/mingw32/bin",
-            executable_name: "advdemo.exe",
-            package_filename: "thextech-adventures-of-demo-win32-dev.7z",
+            executable_name_suffix: "",
+            package_filename_suffix: "win32-dev",
             upload_directory: "www/win32/",
             mingw_download: "https://wohlsoft.ru/docs/Software/MinGW/i686-8.1.0-release-posix-dwarf-rt_v6-rev0.7z", mingw_install_dir: "C:/WohlMinGWw64/",
             ninja_download: "https://wohlsoft.ru/docs/Software/Ninja-Build/ninja-win.zip", ninja_install_dir: "C:/WohlMinGWw64/mingw32/bin",
             lftp_download: "https://wohlsoft.ru/docs/Software/lftp-4.4.15.win64-openssl-1.0.1g.7z", lftp_install_dir: "C:/WohlMinGWw64/mingw32/"
           }
         - {
-            name: "Adventures of Demo - Windows - ARM64",
+            name: "Windows - ARM64",
             os: windows-latest,
-            extra_options: "-A ARM64 -DTHEXTECH_EXECUTABLE_NAME=advdemo-arm64",
+            extra_options: "-A ARM64 -DTHEXTECH_EXECUTABLE_NAME=thextech",
             generator: "Visual Studio 16 2019",
             build_type: "MinSizeRel",
-            assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-adventure-of-demo-assets-full.7z",
             subdir_name: "thextech-adventures-of-demo",
             extra_path: "/c/WohlLFTP/bin",
-            executable_name: "advdemo-arm64.exe",
-            package_filename: "thextech-adventures-of-demo-arm64-dev.7z",
+            executable_name_suffix: "-arm64",
+            package_filename_suffix: "arm32-dev",
             upload_directory: "www/win-arm/",
             lftp_download: "https://wohlsoft.ru/docs/Software/lftp-4.4.15.win64-openssl-1.0.1g.7z", lftp_install_dir: "C:/WohlLFTP/"
           }
 
-        # ======================================= Super Mario Bros. X - a fan-game =======================================
-        # Was made in 2009 by Andrew Spinks "Redigit", and supported up to 2011 by it's original author.
-        - {
-            name: "Super Mario Bros. X - Ubuntu 16.04",
-            os: ubuntu-16.04,
-            extra_options: "-DTHEXTECH_EXECUTABLE_NAME=smbx -DUSE_STATIC_LIBC=ON -DUSE_SYSTEM_LIBS=OFF -DUSE_SYSTEM_SDL2=OFF -DUSE_SHARED_FREEIMAGE=OFF -DPGE_SHARED_SDLMIXER=OFF",
-            deps_cmdline: "sudo apt-get update -qq && sudo apt-get install -qq cmake ninja-build cmake ninja-build lftp \"^libxcb.*\" libx11-dev libx11-xcb-dev libgtk-3-dev libgegl-dev libxcursor-dev libxrender-dev libxrandr-dev libxext-dev libxi-dev libxss-dev libxt-dev libxv-dev libxxf86vm-dev libxinerama-dev libxkbcommon-dev libfontconfig1-dev libasound2-dev libpulse-dev libdbus-1-dev udev mtdev-tools webp libudev-dev libglm-dev libwayland-dev libegl1-mesa-dev mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev libgles2-mesa libgles2-mesa-dev libmirclient-dev libproxy-dev",
-            generator: "Ninja",
-            build_type: "MinSizeRel",
-            executable_name: "smbx",
-            assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-smbx13-assets-full.7z",
-            subdir_name: "thextech-super-mario-bros-x",
-            package_filename: "thextech-super-mario-bros-x-ubuntu-16-04-amd64-dev.tar.gz",
-            upload_directory: "www/ubuntu-16-04/"
-          }
-        - {
-            name: "Super Mario Bros. X - Ubuntu 18.04",
-            os: ubuntu-18.04,
-            extra_options: "-DTHEXTECH_EXECUTABLE_NAME=smbx -DUSE_STATIC_LIBC=ON -DUSE_SYSTEM_LIBS=OFF -DUSE_SYSTEM_SDL2=OFF -DUSE_SHARED_FREEIMAGE=OFF -DPGE_SHARED_SDLMIXER=OFF",
-            deps_cmdline: "sudo apt-get update -qq && sudo apt-get install -qq cmake ninja-build cmake ninja-build lftp \"^libxcb.*\" libx11-dev libx11-xcb-dev libgtk-3-dev libgegl-dev libxcursor-dev libxrender-dev libxrandr-dev libxext-dev libxi-dev libxss-dev libxt-dev libxv-dev libxxf86vm-dev libxinerama-dev libxkbcommon-dev libfontconfig1-dev libasound2-dev libpulse-dev libdbus-1-dev udev mtdev-tools webp libudev-dev libglm-dev libwayland-dev libegl1-mesa-dev mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev libgles2-mesa libgles2-mesa-dev libmirclient-dev libproxy-dev",
-            generator: "Ninja",
-            build_type: "MinSizeRel",
-            executable_name: "smbx",
-            assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-smbx13-assets-full.7z",
-            subdir_name: "thextech-super-mario-bros-x",
-            package_filename: "thextech-super-mario-bros-x-ubuntu-18-04-amd64-dev.tar.gz",
-            upload_directory: "www/ubuntu-18-04/"
-          }
-        - {
-            name: "Super Mario Bros. X - Ubuntu 20.04",
-            os: ubuntu-20.04,
-            extra_options: "-DTHEXTECH_EXECUTABLE_NAME=smbx -DUSE_STATIC_LIBC=ON -DUSE_SYSTEM_LIBS=OFF -DUSE_SYSTEM_SDL2=OFF -DUSE_SHARED_FREEIMAGE=OFF -DPGE_SHARED_SDLMIXER=OFF",
-            deps_cmdline: "sudo apt-get update -qq && sudo apt-get install -qq cmake ninja-build cmake ninja-build lftp \"^libxcb.*\" libx11-dev libx11-xcb-dev libgtk-3-dev libgegl-dev libxcursor-dev libxrender-dev libxrandr-dev libxext-dev libxi-dev libxss-dev libxt-dev libxv-dev libxxf86vm-dev libxinerama-dev libxkbcommon-dev libfontconfig1-dev libasound2-dev libpulse-dev libdbus-1-dev udev mtdev-tools webp libudev-dev libglm-dev libwayland-dev libegl1-mesa-dev mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev libgles2-mesa libgles2-mesa-dev libmirclient-dev libproxy-dev",
-            generator: "Ninja",
-            build_type: "MinSizeRel",
-            executable_name: "smbx",
-            assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-smbx13-assets-full.7z",
-            subdir_name: "thextech-super-mario-bros-x",
-            package_filename: "thextech-super-mario-bros-x-ubuntu-20-04-amd64-dev.tar.gz",
-            upload_directory: "www/ubuntu-20-04/"
-          }
-        - {
-            name: "Super Mario Bros. X - Windows - 64-bit",
-            os: windows-latest,
-            extra_options: "-DCMAKE_PREFIX_PATH=C:/WohlMinGWw64/mingw64 -DTHEXTECH_EXECUTABLE_NAME=smbx-win64 -DCMAKE_TOOLCHAIN_FILE=`pwd`/cmake/ci_windows_mingw_toolchain_x64.cmake",
-            generator: "Ninja",
-            build_type: "MinSizeRel",
-            assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-smbx13-assets-full.7z",
-            subdir_name: "thextech-super-mario-bros-x",
-            extra_path: "/c/WohlMinGWw64/mingw64/bin",
-            executable_name: "smbx-win64.exe",
-            package_filename: "thextech-super-mario-bros-x-win64-dev.7z",
-            upload_directory: "www/win32/",
-            mingw_download: "https://wohlsoft.ru/docs/Software/MinGW/x86_64-8.1.0-release-posix-seh-rt_v6-rev0.7z", mingw_install_dir: "C:/WohlMinGWw64/",
-            ninja_download: "https://wohlsoft.ru/docs/Software/Ninja-Build/ninja-win.zip", ninja_install_dir: "C:/WohlMinGWw64/mingw64/bin",
-            lftp_download: "https://wohlsoft.ru/docs/Software/lftp-4.4.15.win64-openssl-1.0.1g.7z", lftp_install_dir: "C:/WohlMinGWw64/mingw64/"
-          }
-        - {
-            name: "Super Mario Bros. X - Windows - 32-bit",
-            os: windows-latest,
-            extra_options: "-DCMAKE_PREFIX_PATH=C:/WohlMinGWw64/mingw32 -DTHEXTECH_EXECUTABLE_NAME=smbx -DCMAKE_TOOLCHAIN_FILE=`pwd`/cmake/ci_windows_mingw_toolchain_x32.cmake",
-            generator: "Ninja",
-            build_type: "MinSizeRel",
-            assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-smbx13-assets-full.7z",
-            subdir_name: "thextech-super-mario-bros-x",
-            extra_path: "/c/WohlMinGWw64/mingw32/bin",
-            executable_name: "smbx.exe",
-            package_filename: "thextech-super-mario-bros-x-win32-dev.7z",
-            upload_directory: "www/win32/",
-            mingw_download: "https://wohlsoft.ru/docs/Software/MinGW/i686-8.1.0-release-posix-dwarf-rt_v6-rev0.7z", mingw_install_dir: "C:/WohlMinGWw64/",
-            ninja_download: "https://wohlsoft.ru/docs/Software/Ninja-Build/ninja-win.zip", ninja_install_dir: "C:/WohlMinGWw64/mingw32/bin",
-            lftp_download: "https://wohlsoft.ru/docs/Software/lftp-4.4.15.win64-openssl-1.0.1g.7z", lftp_install_dir: "C:/WohlMinGWw64/mingw32/"
-          }
-        - {
-            name: "Super Mario Bros. X - Windows - ARM64",
-            os: windows-latest,
-            extra_options: "-A ARM64 -DTHEXTECH_EXECUTABLE_NAME=smbx-arm64",
-            generator: "Visual Studio 16 2019",
-            build_type: "MinSizeRel",
-            assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-smbx13-assets-full.7z",
-            subdir_name: "thextech-super-mario-bros-x",
-            extra_path: "/c/WohlLFTP/bin",
-            executable_name: "smbx-arm64.exe",
-            package_filename: "thextech-super-mario-bros-x-arm64-dev.7z",
-            upload_directory: "www/win-arm/",
-            lftp_download: "https://wohlsoft.ru/docs/Software/lftp-4.4.15.win64-openssl-1.0.1g.7z", lftp_install_dir: "C:/WohlLFTP/"
-          }
 
     steps:
     - uses: actions/checkout@v1
@@ -244,20 +149,31 @@ jobs:
       run: |
         7z x lftp.7z bin etc -o"${{ matrix.config.lftp_install_dir }}"
 
-    - name: Download assets
+    - name: Download SMBX assets
       uses: carlosperate/download-file-action@v1.0.3
       with:
-        file-url: "${{ matrix.config.assets_url }}"
-        file-name: assets.7z
+        file-url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-smbx13-assets-full.7z"
+        file-name: smbx13.7z
 
-    - name: Unpack assets
+    - name: Download AoD assets
+      uses: carlosperate/download-file-action@v1.0.3
+      with:
+        file-url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-smbx13-assets-full.7"
+        file-name: aod.7z
+
+    - name: Unpack all assets
       shell: bash
       run: |
-        mkdir -p assets
-        cd assets
-        7z x ../assets.7z
+        mkdir -p smbx13
+        cd smbx13
+        7z x ../smbx13.7z
         cd ..
-        rm assets.7z
+        rm smbx13.7z
+        mkdir -p aod
+        cd aod
+        7z x ../aod.7z
+        cd ..
+        rm aod.7z
 
     - name: Configure
       shell: bash
@@ -281,50 +197,51 @@ jobs:
       if: runner.os == 'Linux'
       shell: bash
       run: |
-        file build/output/bin/${{ matrix.config.executable_name }}
-        ldd build/output/bin/${{ matrix.config.executable_name }}
+        file build/output/bin/thextech
+        ldd build/output/bin/thextech
+
 
     - name: Create Package
       if: always()
       shell: bash
+      # ======================================= Adventures of Demo =======================================
+      # The side game about Demo and siblings from the A2XT universe by raocow and his fan community.
+      # ======================================= Super Mario Bros. X - a fan-game =======================================
+      # Was made in 2009 by Andrew Spinks "Redigit", and supported up to 2011 by it's original author.
       run: |
-        cd build
-        mkdir package
-        if [[ "${{ runner.os }}" == 'Windows' ]]; then
-          mkdir "package/${{ matrix.config.subdir_name }}"
-          cp ../changelog.txt "package/${{ matrix.config.subdir_name }}/"
-          cp ../LICENSE "package/${{ matrix.config.subdir_name }}/License.TheXTech.txt"
-          cp ../README.md "package/${{ matrix.config.subdir_name }}/ReadMe.txt"
-          cp ../README.RUS.md "package/${{ matrix.config.subdir_name }}/ReadMe.RUS.txt"
-          cp ../README.ESP.md "package/${{ matrix.config.subdir_name }}/ReadMe.ESP.txt"
-          cp output/bin/${{ matrix.config.executable_name }} "package/${{ matrix.config.subdir_name }}/${{ matrix.config.executable_name }}"
-          cp output/bin/*.dll "package/${{ matrix.config.subdir_name }}/"
-          cp -r ../assets/* "package/${{ matrix.config.subdir_name }}/"
-          cd package
-          7z a "${{ matrix.config.package_filename }}" "${{ matrix.config.subdir_name }}"
-          rm -Rf "${{ matrix.config.subdir_name }}"
-          cd ..
-        elif [[ "${{ runner.os }}" == 'Linux' ]]; then
-          mkdir "package/${{ matrix.config.subdir_name }}"
-          cp ../changelog.txt "package/${{ matrix.config.subdir_name }}/"
-          cp ../LICENSE "package/${{ matrix.config.subdir_name }}/License.TheXTech.txt"
-          cp ../README.md "package/${{ matrix.config.subdir_name }}/"
-          cp ../README.RUS.md "package/${{ matrix.config.subdir_name }}/"
-          cp ../README.ESP.md "package/${{ matrix.config.subdir_name }}/"
-          cp output/bin/${{ matrix.config.executable_name }} "package/${{ matrix.config.subdir_name }}/${{ matrix.config.executable_name }}"
-          cp -r ../assets/* "package/${{ matrix.config.subdir_name }}/"
-          cd package
-          tar -cvzf "${{ matrix.config.package_filename }}" "${{ matrix.config.subdir_name }}"
-          rm -Rf "${{ matrix.config.subdir_name }}"
-          cd ..
-        fi
-        cd ..
+        bash .github/ci-helper/pack-game.sh \
+            "${{ runner.os }}" \
+            "thextech-adventures-of-demo" \
+            "advdemo${{ matrix.config.executable_name_suffix }}" \
+            "thextech-adventures-of-demo-${{ matrix.config.package_filename_suffix }}" \
+            "aod"
+
+        bash .github/ci-helper/pack-game.sh \
+            "${{ runner.os }}" \
+            "thextech-super-mario-bros-x" \
+            "smbx${{ matrix.config.executable_name_suffix }}" \
+            "thextech-super-mario-bros-x-${{ matrix.config.package_filename_suffix }}" \
+            "smbx13"
+
+        bash .github/ci-helper/pack-game.sh \
+            "${{ runner.os }}" \
+            "thextech-bin" \
+            "thextech${{ matrix.config.executable_name_suffix }}" \
+            "thextech-bin-${{ matrix.config.package_filename_suffix }}" \
+            "none"
 
     - name: Upload artifact
-      if: always()
+      if: runner.os == 'Linux'
       uses: actions/upload-artifact@v2
       with:
-        path: build/package/${{ matrix.config.package_filename }}
+        path: build/package/*.tar.gz
+        name: TheXTech ${{ matrix.config.name }} ${{ matrix.config.build_type }}
+
+    - name: Upload artifact
+      if: runner.os == 'Windows'
+      uses: actions/upload-artifact@v2
+      with:
+        path: build/package/*.7z
         name: ${{ matrix.config.name }} ${{ matrix.config.build_type }}
 
     - name: Deploy to builds.wohlsoft.ru
@@ -335,7 +252,11 @@ jobs:
           export PATH=${{ matrix.config.extra_path }}:${PATH}
         fi
         UPLOAD_LIST="set ssl:verify-certificate no;"
-        UPLOAD_LIST="${UPLOAD_LIST} put -O ${{ matrix.config.upload_directory }} ./build/package/${{ matrix.config.package_filename }};"
+        if [[ "${{ runner.os }}" == 'Windows' ]]; then
+            UPLOAD_LIST="${UPLOAD_LIST} put -O ${{ matrix.config.upload_directory }} ./build/package/*.7z;"
+        elif [[ "${{ runner.os }}" == 'Linux' ]]; then
+            UPLOAD_LIST="${UPLOAD_LIST} put -O ${{ matrix.config.upload_directory }} ./build/package/*.tar.gz;"
+        fi
         lftp -e "${UPLOAD_LIST} exit" -u ${{ secrets.builds_login }},${{ secrets.builds_password }} ${{ secrets.builds_host }}
 
     - name: List Build Directory
