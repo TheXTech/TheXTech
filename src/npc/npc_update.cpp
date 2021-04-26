@@ -3148,22 +3148,22 @@ void UpdateNPCs()
 
                                                                     if(NPC[A].Type == 266)
                                                                     {
-                                                                        if(NPCIsABonus[NPC[B].Type] == false)
+                                                                        if(!NPCIsABonus[NPC[B].Type])
                                                                             NPCHit(B, 10, NPC[A].CantHurtPlayer);
                                                                         HitSpot = 0;
                                                                     }
 
                                                                     // toad code
-                                                                    if(NPCIsToad[NPC[A].Type] == true)
+                                                                    if(NPCIsToad[NPC[A].Type])
                                                                     {
-                                                                        if(!(NPCWontHurt[NPC[B].Type] && NPC[B].Projectile == false) && !NPCIsABonus[NPC[B].Type] && !(NPC[B].Type == 13) && !(NPC[B].Type == 265) && !(NPC[B].Type == 17 && NPC[B].CantHurt > 0) && !(NPC[B].Type == 50) && !(NPC[B].Type == 171) && !(NPC[B].Type == 292) && !(NPC[B].Type == 195))
+                                                                        if(!(NPCWontHurt[NPC[B].Type] && !NPC[B].Projectile) && !NPCIsABonus[NPC[B].Type] && !(NPC[B].Type == 13) && !(NPC[B].Type == 265) && !(NPC[B].Type == 17 && NPC[B].CantHurt > 0) && !(NPC[B].Type == 50) && !(NPC[B].Type == 171) && !(NPC[B].Type == 292) && !(NPC[B].Type == 195))
                                                                         {
                                                                             NPCHit(A, 3, B);
                                                                             HitSpot = 0;
                                                                         }
                                                                     }
                                                                     // Koopa Code
-                                                                    if((NPC[A].Type == 117 || NPC[A].Type == 118 || NPC[A].Type == 120) && NPC[A].Projectile == false && (NPC[B].Projectile == false && NPC[B].Type >= 113 && NPC[B].Type <= 116))
+                                                                    if((NPC[A].Type == 117 || NPC[A].Type == 118 || NPC[A].Type == 120) && !NPC[A].Projectile && (NPC[B].Projectile == false && NPC[B].Type >= 113 && NPC[B].Type <= 116))
                                                                     {
                                                                         tempLocation = NPC[A].Location;
                                                                         tempLocation2 = NPC[B].Location;
@@ -3242,9 +3242,9 @@ void UpdateNPCs()
 
                                                                                         for(auto C = fBlock2; C <= lBlock2; C++)
                                                                                         {
-                                                                                            if(!BlockIsSizable[Block[C].Type] && !BlockOnlyHitspot1[Block[C].Type] && Block[C].Hidden == false && BlockSlope[Block[C].Type] == 0)
+                                                                                            if(!BlockIsSizable[Block[C].Type] && !BlockOnlyHitspot1[Block[C].Type] && !Block[C].Hidden && BlockSlope[Block[C].Type] == 0)
                                                                                             {
-                                                                                                if(CheckCollision(tempLocation, Block[C].Location) == true)
+                                                                                                if(CheckCollision(tempLocation, Block[C].Location))
                                                                                                 {
                                                                                                     if(int(NPC[A].Direction) == -1)
                                                                                                     {
@@ -3272,7 +3272,8 @@ void UpdateNPCs()
                                                                                         else
                                                                                         {
                                                                                             tempBool = false; // This whole cluster stops friendly projectiles form killing riddin shells
-                                                                                            if(NPCIsAShell[NPC[A].Type] == true)
+
+                                                                                            if(NPCIsAShell[NPC[A].Type])
                                                                                             {
                                                                                                 for(auto C = 1; C <= numPlayers; C++)
                                                                                                 {
@@ -3283,7 +3284,8 @@ void UpdateNPCs()
                                                                                                     }
                                                                                                 }
                                                                                             }
-                                                                                            if(NPCIsAShell[NPC[B].Type] == true)
+
+                                                                                            if(NPCIsAShell[NPC[B].Type])
                                                                                             {
                                                                                                 for(auto C = 1; C <= numPlayers; C++)
                                                                                                 {
@@ -3294,21 +3296,24 @@ void UpdateNPCs()
                                                                                                     }
                                                                                                 }
                                                                                             }
-                                                                                            if(!(NPC[A].Type == 17 && NPC[A].Projectile == true))
+
+                                                                                            if(!(NPC[A].Type == 17 && NPC[A].Projectile))
                                                                                             {
-                                                                                                if(NPCIsAShell[NPC[B].Type] && NPC[B].Projectile == true)
+                                                                                                if(NPCIsAShell[NPC[B].Type] && NPC[B].Projectile)
                                                                                                 {
-                                                                                                    if(tempBool == false)
+                                                                                                    if(!tempBool)
                                                                                                         NPCHit(A, 3, B);
                                                                                                 }
                                                                                                 else
                                                                                                 {
-                                                                                                    if(tempBool == false)
+                                                                                                    if(!tempBool)
                                                                                                         NPCHit(A, 4, B);
                                                                                                 }
                                                                                             }
-                                                                                            if(tempBool == false) // end cluster
+
+                                                                                            if(!tempBool) // end cluster
                                                                                                 NPCHit(B, 3, A);
+
                                                                                             if(NPC[A].Type == 17)
                                                                                             {
                                                                                                 if(NPC[B].Type == 15)
@@ -3329,7 +3334,7 @@ void UpdateNPCs()
                                                                             }
                                                                         }
                                                                     }
-                                                                    else if(!(NPC[B].Type == 40 && NPC[B].Projectile == false))
+                                                                    else if(!(NPC[B].Type == 40 && !NPC[B].Projectile))
                                                                     {
                                                                         HitSpot = FindCollision(NPC[A].Location, NPC[B].Location);
                                                                         if(NPCIsToad[NPC[A].Type] && NPC[A].Killed > 0)
@@ -3411,7 +3416,7 @@ void UpdateNPCs()
 
                         if(NPC[A].WallDeath > 0)
                         {
-                            if(NPCIsCheep[NPC[A].Type] == true)
+                            if(NPCIsCheep[NPC[A].Type])
                                 NPC[A].WallDeath = NPC[A].WallDeath - 1;
                             else
                                 NPC[A].WallDeath = 0;
@@ -3556,7 +3561,7 @@ void UpdateNPCs()
                                                 {
                                                     if(tempLocation.Y <= Block[B].Location.Y + Block[B].Location.Height)
                                                     {
-                                                        if(BlockNoClipping[Block[B].Type] == false && Block[B].Invis == false && Block[B].Hidden == false && !(BlockIsSizable[Block[B].Type] && Block[B].Location.Y < NPC[A].Location.Y + NPC[A].Location.Height - 3))
+                                                        if(!BlockNoClipping[Block[B].Type] && !Block[B].Invis && !Block[B].Hidden && !(BlockIsSizable[Block[B].Type] && Block[B].Location.Y < NPC[A].Location.Y + NPC[A].Location.Height - 3))
                                                         {
                                                             // If CheckCollision(tempLocation, Block(B).Location) = True Then
                                                             tempTurn = false;
@@ -3578,8 +3583,10 @@ void UpdateNPCs()
                                         // End If
                                     }
                                 }
-                                if(tempTurn == true)
+
+                                if(tempTurn)
                                     NPC[A].TurnAround = true;
+
                                 NPC[A].Location.SpeedY = 0;
                                 if(NPC[A].Slope > 0)
                                 {
@@ -3618,11 +3625,12 @@ void UpdateNPCs()
                                         fBlock2 = numBlock - numTempBlock;
                                         lBlock2 = numBlock;
                                     }
+
                                     for(B = (int)fBlock2; B <= lBlock2; B++)
                                     {
-                                        if(BlockNoClipping[Block[B].Type] == false && Block[B].Invis == false && Block[B].Hidden == false && !(BlockIsSizable[Block[B].Type] && Block[B].Location.Y < NPC[A].Location.Y + NPC[A].Location.Height - 3))
+                                        if(!BlockNoClipping[Block[B].Type] && !Block[B].Invis && !Block[B].Hidden && !(BlockIsSizable[Block[B].Type] && Block[B].Location.Y < NPC[A].Location.Y + NPC[A].Location.Height - 3))
                                         {
-                                            if(CheckCollision(tempLocation, Block[B].Location) == true)
+                                            if(CheckCollision(tempLocation, Block[B].Location))
                                             {
                                                 tempTurn = false;
                                                 break;
@@ -3919,8 +3927,8 @@ void UpdateNPCs()
                         else
                         {
                             do
-                                B = static_cast<int>(floor(static_cast<double>(dRand() * numPlayers))) + 1;
-                            while(Player[B].Dead == true || Player[B].TimeToLive > 0);
+                                B = (iRand() % numPlayers) + 1;
+                            while(Player[B].Dead || Player[B].TimeToLive > 0);
                             NPC[A].Special5 = B;
                         }
                     }

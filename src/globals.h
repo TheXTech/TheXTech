@@ -399,7 +399,7 @@ struct NPC_t
 //    WallDeath As Integer
     int WallDeath = 0;
 //    Projectile As Boolean 'If the NPC is a projectile
-    int Projectile = 0;
+    bool Projectile = false;
 //    Effect As Integer 'For starting / stopping effects
     int Effect = 0;
 //    Effect2 As Double

@@ -40,7 +40,7 @@ void NPCFrames(int A)
     if(NPCFrame[NPC[A].Type] > 0) // custom frames
     {
         NPC[A].FrameCount = NPC[A].FrameCount + 1;
-        if(NPCFrameStyle[NPC[A].Type] == 2 && (NPC[A].Projectile != 0 || NPC[A].HoldingPlayer > 0))
+        if(NPCFrameStyle[NPC[A].Type] == 2 && (NPC[A].Projectile || NPC[A].HoldingPlayer > 0))
             NPC[A].FrameCount = NPC[A].FrameCount + 1;
         if(NPC[A].FrameCount >= NPCFrameSpeed[NPC[A].Type])
         {
@@ -76,7 +76,7 @@ void NPCFrames(int A)
         }
         else if(NPCFrameStyle[NPC[A].Type] == 2)
         {
-            if(NPC[A].HoldingPlayer == 0 && NPC[A].Projectile == 0)
+            if(NPC[A].HoldingPlayer == 0 && !NPC[A].Projectile)
             {
                 if(NPC[A].Direction == -1)
                 {
@@ -238,7 +238,7 @@ void NPCFrames(int A)
     }
     else if(NPC[A].Type == 272) // spider
     {
-        if(NPC[A].Projectile != 0 || NPC[A].Location.SpeedY >= 0 || NPC[A].HoldingPlayer > 0)
+        if(NPC[A].Projectile || NPC[A].Location.SpeedY >= 0 || NPC[A].HoldingPlayer > 0)
             NPC[A].Frame = 0;
         else
             NPC[A].Frame = 2;
@@ -562,7 +562,7 @@ void NPCFrames(int A)
         // Special less than zero - body, zero - head
         if(NPC[A].Special < 0 && NPC[A].Location.SpeedY == 0)
             NPC[A].Special += 1;
-        if(NPC[A].Projectile != 0 || NPC[A].HoldingPlayer > 0)
+        if(NPC[A].Projectile || NPC[A].HoldingPlayer > 0)
             NPC[A].Frame = 4;
         else
         {
@@ -576,7 +576,7 @@ void NPCFrames(int A)
             NPC[A].FrameCount = 0;
         else if(NPC[A].FrameCount > 8)
         {
-            if(NPC[A].Projectile != 0 || NPC[A].HoldingPlayer > 0)
+            if(NPC[A].Projectile || NPC[A].HoldingPlayer > 0)
                 NPC[A].Frame += 1;
             else
                 NPC[A].Frame += 2;
@@ -1199,7 +1199,7 @@ void NPCFrames(int A)
         if(NPC[A].Direction == 1)
             NPC[A].Frame = NPC[A].Frame + 3;
 
-        if(NPC[A].Projectile != 0 || NPC[A].Special2 != 0)
+        if(NPC[A].Projectile || NPC[A].Special2 != 0)
         {
             NPC[A].Frame = NPC[A].Frame + 2;
             NPC[A].FrameCount = 0;
@@ -1252,7 +1252,7 @@ void NPCFrames(int A)
     }
     else if(NPC[A].Type >= 117 && NPC[A].Type <= 120) // beach koopa
     {
-        if(NPC[A].Projectile != 0)
+        if(NPC[A].Projectile)
         {
             if(NPC[A].Location.SpeedX < -0.5 || NPC[A].Location.SpeedX > 0.5)
                 NPC[A].Frame = 3;
@@ -1574,7 +1574,7 @@ void NPCFrames(int A)
     }
     else if(NPC[A].Type == 49) // killer pipe
     {
-        if(NPC[A].HoldingPlayer == 0 && !Player[NPC[A].standingOnPlayer].Controls.Run && NPC[A].Projectile == 0)
+        if(NPC[A].HoldingPlayer == 0 && !Player[NPC[A].standingOnPlayer].Controls.Run && !NPC[A].Projectile)
         {
             NPC[A].FrameCount = NPC[A].FrameCount + 1;
             if(NPC[A].FrameCount >= 4)
@@ -1854,14 +1854,14 @@ void NPCFrames(int A)
             NPC[A].Frame = 10;
             NPC[A].FrameCount = 0;
         }
-        if(NPC[A].HoldingPlayer > 0 || NPC[A].Projectile != 0)
+        if(NPC[A].HoldingPlayer > 0 || NPC[A].Projectile)
             NPC[A].Frame = NPC[A].Frame + 6;
         if(NPC[A].Direction == 1)
             NPC[A].Frame = NPC[A].Frame + 3;
     }
     else if(NPC[A].Type == 19 || NPC[A].Type == 20 || NPC[A].Type == 28 || (NPC[A].Type >= 129 && NPC[A].Type <= 132) || NPC[A].Type == 135 || NPC[A].Type == 158) // Shy guys / Jumping Fish
     {
-        if(NPC[A].HoldingPlayer == 0 && NPC[A].Projectile == 0)
+        if(NPC[A].HoldingPlayer == 0 && !NPC[A].Projectile)
         {
             NPC[A].FrameCount = NPC[A].FrameCount + 1;
             if(NPC[A].Direction == -1 && NPC[A].Frame >= 2)
@@ -1914,7 +1914,7 @@ void NPCFrames(int A)
     }
     else if(NPC[A].Type == 25) // Bouncy Star things
     {
-        if(NPC[A].HoldingPlayer == 0 && NPC[A].Projectile == 0)
+        if(NPC[A].HoldingPlayer == 0 && !NPC[A].Projectile)
         {
             if(NPC[A].Location.SpeedY == 0 || NPC[A].Slope > 0)
             {

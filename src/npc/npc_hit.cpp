@@ -269,7 +269,7 @@ void NPCHit(int A, int B, int C)
 
         // Things that link can move with his sword
     }
-    else if(B == 10 && NPC[A].Type == 134 && NPC[A].CantHurt == 0 && NPC[A].Projectile == false) // link picks up bombs
+    else if(B == 10 && NPC[A].Type == 134 && NPC[A].CantHurt == 0 && !NPC[A].Projectile) // link picks up bombs
     {
         if(Player[C].Bombs < 9)
             Player[C].Bombs = Player[C].Bombs + 1;
@@ -867,7 +867,7 @@ void NPCHit(int A, int B, int C)
             if(NPC[A].Type == 167)
             {
                 NPC[A].Type = 165;
-                if(NPC[A].Projectile == false)
+                if(!NPC[A].Projectile)
                 {
                     PlaySound(9);
                     NPC[A].Projectile = true;
@@ -1196,7 +1196,7 @@ void NPCHit(int A, int B, int C)
     }
     else if(NPC[A].Type == 45)
     {
-        if(B == 1 || (B == 10 && NPC[A].Projectile == false))
+        if(B == 1 || (B == 10 && !NPC[A].Projectile))
         {
             NPC[A].Special = 1;
             PlaySound(9);
@@ -1204,7 +1204,7 @@ void NPCHit(int A, int B, int C)
             NPC[A].CantHurt = Physics.NPCCanHurtWait;
             NPC[A].CantHurtPlayer = C;
         }
-        else if(B == 6 || B == 2 || B == 5 || B == 4 || (B == 3 && NPC[A].Special == 1) || B == 9 || (B == 10 && NPC[A].Projectile == true))
+        else if(B == 6 || B == 2 || B == 5 || B == 4 || (B == 3 && NPC[A].Special == 1) || B == 9 || (B == 10 && NPC[A].Projectile))
         {
             if(B == 10)
                 B = 3;
@@ -1543,7 +1543,7 @@ void NPCHit(int A, int B, int C)
         }
         else if(B == 4)
         {
-            if(NPC[C].Projectile == true && !(NPC[C].Type >= 117 && NPC[C].Type <= 120))
+            if(NPC[C].Projectile && !(NPC[C].Type >= 117 && NPC[C].Type <= 120))
             {
                 if(!(NPC[A].Type == 24 && NPC[C].Type == 13))
                     NPC[A].Killed = B;
@@ -1633,7 +1633,7 @@ void NPCHit(int A, int B, int C)
         }
         else if(B == 4 && C > 0)
         {
-            if(NPC[C].Projectile == true)
+            if(NPC[C].Projectile)
             {
                 PlaySound(9);
                 NPC[A].Killed = 3;
@@ -1730,13 +1730,13 @@ void NPCHit(int A, int B, int C)
         {
             if(!((B == 3 || B == 4) && (NPC[C].Type == 13 || NPC[C].Type == 12)))
             {
-                if(!(B == 7 && NPC[A].Projectile == true))
+                if(!(B == 7 && NPC[A].Projectile))
                 {
                     if(!(B == 3 && NPC[A].CantHurt > 0) && !(B == 3 && NPC[C].Type == 108))
                     {
                         if(!(NPC[A].Type == 18 && B == 4))
                         {
-                            if(!(B == 10 && NPC[A].Projectile == true)) // Link can't stab friendly bullets
+                            if(!(B == 10 && NPC[A].Projectile)) // Link can't stab friendly bullets
                             {
                                 NPC[A].Killed = B;
                                 if(A != C && B != 8 && B != 10)
