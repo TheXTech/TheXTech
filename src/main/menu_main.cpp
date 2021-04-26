@@ -746,14 +746,22 @@ bool mainMenuUpdate()
                 }
                 else if(menuDoPress || MenuMouseClick)
                 {
+                    SDL_assert_release(IF_INRANGE(MenuCursor, 0, maxSaveSlots - 1));
+                    int slot = MenuCursor + 1;
+
                     if(MenuMode == MENU_SELECT_SLOT_1P_COPY_S1 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S1)
                     {
-                        PlaySoundMenu(SFX_Do);
-                        menuCopySaveSrc = (MenuCursor + 1);
-                        MenuMode += MENU_SELECT_SLOT_COPY_S1_ADD;
+                        if(SaveSlot[slot] < 0)
+                            PlaySoundMenu(SFX_BlockHit);
+                        else
+                        {
+                            PlaySoundMenu(SFX_Do);
+                            menuCopySaveSrc = slot;
+                            MenuMode += MENU_SELECT_SLOT_COPY_S1_ADD;
+                        }
                         MenuCursorCanMove = false;
                     }
-                    else if(menuCopySaveSrc == (MenuCursor + 1))
+                    else if(menuCopySaveSrc == slot)
                     {
                         PlaySoundMenu(SFX_BlockHit);
                         MenuCursorCanMove = false;
@@ -761,7 +769,7 @@ bool mainMenuUpdate()
                     else
                     {
                         PlaySoundMenu(SFX_Raccoon);
-                        menuCopySaveDst = (MenuCursor + 1);
+                        menuCopySaveDst = slot;
                         CopySave(selWorld, menuCopySaveSrc, menuCopySaveDst);
                         FindSaves();
                         MenuMode -= MENU_SELECT_SLOT_COPY_S2_ADD;
