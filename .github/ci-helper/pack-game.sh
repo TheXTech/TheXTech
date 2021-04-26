@@ -9,7 +9,7 @@ ASSETS_NAME=$5
 
 cd build
 
-mkdir "package/${SUBDIR_NAME}"
+mkdir -p "package/${SUBDIR_NAME}"
 
 cp ../changelog.txt "package/${SUBDIR_NAME}/"
 

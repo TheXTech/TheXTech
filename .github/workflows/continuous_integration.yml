@@ -253,9 +253,13 @@ jobs:
         fi
         UPLOAD_LIST="set ssl:verify-certificate no;"
         if [[ "${{ runner.os }}" == 'Windows' ]]; then
-            UPLOAD_LIST="${UPLOAD_LIST} put -O ${{ matrix.config.upload_directory }} ./build/package/*.7z;"
+            for q in ./build/package/*.7z; do
+                UPLOAD_LIST="${UPLOAD_LIST} put -O ${{ matrix.config.upload_directory }} $q;"
+            done
         elif [[ "${{ runner.os }}" == 'Linux' ]]; then
-            UPLOAD_LIST="${UPLOAD_LIST} put -O ${{ matrix.config.upload_directory }} ./build/package/*.tar.gz;"
+            for q in ./build/package/*.tar.gz; do
+                UPLOAD_LIST="${UPLOAD_LIST} put -O ${{ matrix.config.upload_directory }} $q;"
+            done
         fi
         lftp -e "${UPLOAD_LIST} exit" -u ${{ secrets.builds_login }},${{ secrets.builds_password }} ${{ secrets.builds_host }}
 
