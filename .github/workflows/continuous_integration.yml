@@ -23,22 +23,19 @@ jobs:
             deps_cmdline: "sudo apt-get update -qq && sudo apt-get install -qq cmake ninja-build lftp \"^libxcb.*\" libx11-dev libx11-xcb-dev libgtk-3-dev libgegl-dev libxcursor-dev libxrender-dev libxrandr-dev libxext-dev libxi-dev libxss-dev libxt-dev libxv-dev libxxf86vm-dev libxinerama-dev libxkbcommon-dev libfontconfig1-dev libasound2-dev libpulse-dev libdbus-1-dev udev mtdev-tools webp libudev-dev libglm-dev libwayland-dev libegl1-mesa-dev mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev libgles2-mesa libgles2-mesa-dev libmirclient-dev libproxy-dev",
             generator: "Ninja",
             build_type: "MinSizeRel",
-            subdir_name: "thextech-adventures-of-demo",
             executable_name_suffix: "",
             package_filename_suffix: "ubuntu-16-04-amd64-dev",
             upload_directory: "www/ubuntu-16-04/"
           }
         - {
-            name: "Ubuntu 16.04 x86 32bit",
+            name: "Ubuntu 16.04 32bit",
             os: ubuntu-16.04,
-            extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech -DUSE_STATIC_LIBC=ON -DUSE_SYSTEM_LIBS=OFF -DUSE_SYSTEM_SDL2=OFF -DUSE_SHARED_FREEIMAGE=OFF -DPGE_SHARED_SDLMIXER=OFF",
+            extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech -DUSE_STATIC_LIBC=ON -DUSE_SYSTEM_LIBS=OFF -DUSE_SYSTEM_SDL2=OFF -DUSE_SHARED_FREEIMAGE=OFF -DPGE_SHARED_SDLMIXER=OFF -DCMAKE_TOOLCHAIN_FILE=`pwd`/cmake/ci_linux_gcc_toolchain_x32.cmake",
             deps_cmdline: "sudo dpkg --add-architecture i386 && sudo apt-get update -qq && sudo apt-get install -qq cmake ninja-build lftp gcc-multilib g++-multilib \"^libxcb.*:i386\" libx11-dev:i386 libx11-xcb-dev:i386 libgtk-3-dev:i386 libxcursor-dev:i386 libxrender-dev:i386 libxrandr-dev:i386 libxext-dev:i386 libxi-dev:i386 libxss-dev:i386 libxt-dev:i386 libxv-dev:i386 libxxf86vm-dev:i386 libxinerama-dev:i386 libxkbcommon-dev:i386 libfontconfig1-dev:i386 libasound2-dev:i386 libpulse-dev:i386 libdbus-1-dev:i386 udev mtdev-tools webp libudev-dev:i386 libwayland-dev:i386 libegl1-mesa-dev:i386 mesa-common-dev:i386 libgl1-mesa-dev:i386 libglu1-mesa-dev:i386 libgles2-mesa:i386 libgles2-mesa-dev:i386 libproxy-dev:i386",
             generator: "Ninja",
             build_type: "MinSizeRel",
-            extra_configure_vars: "CFLAGS=-m32 CXXFLAGS=-m32",
-            subdir_name: "thextech-adventures-of-demo",
             executable_name_suffix: "",
-            package_filename_suffix: "ubuntu-16-04-amd64-dev",
+            package_filename_suffix: "ubuntu-16-04-i386-dev",
             upload_directory: "www/ubuntu-16-04/"
           }
         - {
@@ -48,7 +45,6 @@ jobs:
             deps_cmdline: "sudo apt-get update -qq && sudo apt-get install -qq cmake ninja-build lftp \"^libxcb.*\" libx11-dev libx11-xcb-dev libgtk-3-dev libgegl-dev libxcursor-dev libxrender-dev libxrandr-dev libxext-dev libxi-dev libxss-dev libxt-dev libxv-dev libxxf86vm-dev libxinerama-dev libxkbcommon-dev libfontconfig1-dev libasound2-dev libpulse-dev libdbus-1-dev udev mtdev-tools webp libudev-dev libglm-dev libwayland-dev libegl1-mesa-dev mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev libgles2-mesa libgles2-mesa-dev libmirclient-dev libproxy-dev",
             generator: "Ninja",
             build_type: "MinSizeRel",
-            subdir_name: "thextech-adventures-of-demo",
             executable_name_suffix: "",
             package_filename_suffix: "ubuntu-18-04-amd64-dev",
             upload_directory: "www/ubuntu-18-04/"
@@ -60,7 +56,6 @@ jobs:
             deps_cmdline: "sudo apt-get update -qq && sudo apt-get install -qq cmake ninja-build lftp \"^libxcb.*\" libx11-dev libx11-xcb-dev libgtk-3-dev libgegl-dev libxcursor-dev libxrender-dev libxrandr-dev libxext-dev libxi-dev libxss-dev libxt-dev libxv-dev libxxf86vm-dev libxinerama-dev libxkbcommon-dev libfontconfig1-dev libasound2-dev libpulse-dev libdbus-1-dev udev mtdev-tools webp libudev-dev libglm-dev libwayland-dev libegl1-mesa-dev mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev libgles2-mesa libgles2-mesa-dev libmirclient-dev libproxy-dev",
             generator: "Ninja",
             build_type: "MinSizeRel",
-            subdir_name: "thextech-adventures-of-demo",
             executable_name_suffix: "",
             package_filename_suffix: "ubuntu-20-04-amd64-dev",
             upload_directory: "www/ubuntu-20-04/"
@@ -71,7 +66,6 @@ jobs:
             extra_options: "-DCMAKE_PREFIX_PATH=C:/WohlMinGWw64/mingw64 -DTHEXTECH_EXECUTABLE_NAME=thextech -DCMAKE_TOOLCHAIN_FILE=`pwd`/cmake/ci_windows_mingw_toolchain_x64.cmake",
             generator: "Ninja",
             build_type: "MinSizeRel",
-            subdir_name: "thextech-adventures-of-demo",
             extra_path: "/c/WohlMinGWw64/mingw64/bin",
             executable_name_suffix: "-win64",
             package_filename_suffix: "win64-dev",
@@ -86,7 +80,6 @@ jobs:
             extra_options: "-DCMAKE_PREFIX_PATH=C:/WohlMinGWw64/mingw32 -DTHEXTECH_EXECUTABLE_NAME=thextech -DCMAKE_TOOLCHAIN_FILE=`pwd`/cmake/ci_windows_mingw_toolchain_x32.cmake",
             generator: "Ninja",
             build_type: "MinSizeRel",
-            subdir_name: "thextech-adventures-of-demo",
             extra_path: "/c/WohlMinGWw64/mingw32/bin",
             executable_name_suffix: "",
             package_filename_suffix: "win32-dev",
@@ -101,7 +94,6 @@ jobs:
             extra_options: "-A ARM64 -DTHEXTECH_EXECUTABLE_NAME=thextech",
             generator: "Visual Studio 16 2019",
             build_type: "MinSizeRel",
-            subdir_name: "thextech-adventures-of-demo",
             extra_path: "/c/WohlLFTP/bin",
             executable_name_suffix: "-arm64",
             package_filename_suffix: "arm32-dev",
@@ -195,7 +187,7 @@ jobs:
           export PATH=${{ matrix.config.extra_path }}:${PATH}
           echo "PATH environment: ${PATH}"
         fi
-        ${{ matrix.config.extra_configure_vars }} cmake -B build -G "${{ matrix.config.generator }}" -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} ${{ matrix.config.extra_options }} .
+        cmake -B build -G "${{ matrix.config.generator }}" -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} ${{ matrix.config.extra_options }} .
 
     - name: Build
       shell: bash
