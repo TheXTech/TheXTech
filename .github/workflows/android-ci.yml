@@ -47,7 +47,7 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v2
         with:
-          name: notification_tracker
+          name: thextech-releaseci
           path: android-project/thextech/build/outputs/apk/releaseci/thextech-releaseci.apk
 
       - name: Deploy to builds.wohlsoft.ru
@@ -63,4 +63,3 @@ jobs:
         run: |
           git status
           ls -lR build
-
