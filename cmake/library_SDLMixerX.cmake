@@ -88,10 +88,6 @@ if(NOT WIN32 AND NOT EMSCRIPTEN AND NOT APPLE AND NOT ANDROID)
     if(_lib_dl)
         list(APPEND MixerX_SysLibs ${_lib_dl})
     endif()
-
-    if(LINUX_X64_TO_X32)
-        list(APPEND MixerX_SysLibs GL pthread dl)
-    endif()
 endif()
 
 if(ANDROID)
