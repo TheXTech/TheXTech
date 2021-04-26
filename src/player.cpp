@@ -5305,7 +5305,7 @@ void PlayerEffects(int A)
         }
         else if(fEqual(Player[A].Effect2, 1))
         {
-            if(Warp[Player[A].Warp].NoYoshi == true)
+            if(Warp[Player[A].Warp].NoYoshi)
             {
                 if(OwedMount[A] == 0 && Player[A].Mount > 0 && Player[A].Mount != 2)
                 {

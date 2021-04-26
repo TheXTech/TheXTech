@@ -845,7 +845,7 @@ void UpdateLayers()
                                 if(NPC[B].Type == 8 || NPC[B].Type == 74 || NPC[B].Type == 93 ||
                                    NPC[B].Type == 256 || NPC[B].Type == 245)
                                     NPC[B].Location.Y += NPC[B].DefaultLocation.Height;
-                                else if(NPC[B].Type == 52 && fEqual(NPC[B].Direction, -1))
+                                else if(NPC[B].Type == 52 && fiEqual(NPC[B].Direction, -1))
                                     NPC[B].Location.X += NPC[B].DefaultLocation.Width;
                             }
                             else

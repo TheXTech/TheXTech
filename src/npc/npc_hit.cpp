@@ -414,7 +414,7 @@ void NPCHit(int A, int B, int C)
             NPC[A].Killed = B;
         if(NPC[A].Damage >= 15)
             NPC[A].Killed = B;
-        else if(fEqual(NPC[A].Special, 5) && !(NPC[A].Type == 268 || NPC[A].Type == 281))
+        else if(fiEqual(NPC[A].Special, 5) && !(NPC[A].Type == 268 || NPC[A].Type == 281))
         {
             NPC[A].Special = 0;
             NPC[A].Special2 = 0;

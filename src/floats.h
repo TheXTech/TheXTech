@@ -55,16 +55,16 @@ SDL_INLINE bool fEqual(float a, float b)
     return ai == bi;
 }
 
-SDL_INLINE bool fEqual(double a, int b)
+SDL_INLINE bool fiEqual(double a, int b)
 {
-    int ai = Sint64(a);
+    int ai = Sint64(Maths::iRound(a));
     int bi = b;
     return ai == bi;
 }
 
-SDL_INLINE bool fEqual(float a, int b)
+SDL_INLINE bool fiEqual(float a, int b)
 {
-    int ai = Sint64(a);
+    int ai = Sint64(Maths::iRound(a));
     int bi = b;
     return ai == bi;
 }
