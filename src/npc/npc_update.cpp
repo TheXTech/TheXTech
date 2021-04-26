@@ -3015,10 +3015,12 @@ void UpdateNPCs()
                                 }
                             }
                         }
+
                         if(NPC[A].Type == 78 && NPC[A].Location.SpeedX != 0)
                             NPC[A].Location.SpeedX = 1 * NPC[A].DefaultDirection;
+
                         // beltspeed code
-                        if(resetBeltSpeed == false)
+                        if(!resetBeltSpeed)
                         {
                             if(NPC[A].Type == 86 && NPC[A].Special == 1)
                                 NPC[A].Special = 0;
@@ -3949,8 +3951,9 @@ void UpdateNPCs()
                         }
                     }
 
-                    NPC[A].Special2 = NPC[A].Special2 + dRand();
-                    if(NPC[A].Special4 == 0.0 && tempBool == true)
+                    NPC[A].Special2 += dRand();
+
+                    if(fEqual(NPC[A].Special4, 0) && tempBool)
                     {
                         if(NPC[A].Special2 >= 200 + dRand() * 400 - dRand() * 200) // hop on player
                         {
@@ -3968,7 +3971,7 @@ void UpdateNPCs()
                             NPC[A].Special4 = 0;
                     }
 
-                    if(NPC[A].Special4 == 0.0) // when not doing anything turn to player
+                    if(fEqual(NPC[A].Special4, 0)) // when not doing anything turn to player
                     {
                         if(!tempBool)
                         {

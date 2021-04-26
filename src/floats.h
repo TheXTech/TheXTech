@@ -55,4 +55,18 @@ SDL_INLINE bool fEqual(float a, float b)
     return ai == bi;
 }
 
+SDL_INLINE bool fEqual(double a, int b)
+{
+    int ai = Sint64(a);
+    int bi = b;
+    return ai == bi;
+}
+
+SDL_INLINE bool fEqual(float a, int b)
+{
+    int ai = Sint64(a);
+    int bi = b;
+    return ai == bi;
+}
+
 #endif // FLOATS_H
