@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - versus-ci-android
 
 defaults:
   run:

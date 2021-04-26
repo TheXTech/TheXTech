@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - versus-ci-macos
   pull_request:
     branches:
       - master
@@ -147,4 +148,3 @@ jobs:
       run: |
         git status
         ls -lR build
-

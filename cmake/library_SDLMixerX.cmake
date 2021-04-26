@@ -223,6 +223,8 @@ else()
     target_link_libraries(PGE_SDLMixerX INTERFACE "${SDL2_SO_Lib}")
 endif()
 
+message("--- Detected system libraries list: ${MixerX_SysLibs} ---")
+
 target_link_libraries(PGE_SDLMixerX_static INTERFACE
     "${SDL_MixerX_A_Lib}"
     ${MixerX_CodecLibs}
