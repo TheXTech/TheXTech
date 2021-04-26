@@ -20,7 +20,7 @@ cp ../README.RUS.md "package/${SUBDIR_NAME}/ReadMe.RUS.txt"
 cp ../README.ESP.md "package/${SUBDIR_NAME}/ReadMe.ESP.txt"
 
 if [[ "${RUNNER_OS}" == "Windows" ]]; then
-    cp output/bin/thextech.exe "package/${SUBDIR_NAME}/${EXECUTABLE_NAME}"
+    cp output/bin/thextech.exe "package/${SUBDIR_NAME}/${EXECUTABLE_NAME}.exe"
     cp output/bin/*.dll "package/${SUBDIR_NAME}/"
 elif [[ "${RUNNER_OS}" == "Linux" ]]; then
     cp output/bin/thextech "package/${SUBDIR_NAME}/${EXECUTABLE_NAME}"
