@@ -78,7 +78,7 @@ static void loadCustomState()
         // run the 'test' function
         FS.syncfs(true, function (err) {
             assert(!err);
-            ccall('unlockLoadingCustomState', 'v');
+            ccall('unlockLoadingCustomState', 'v', null, null, {async: true});
         });
     );
 
