@@ -440,7 +440,7 @@ void CheatCode(char NewKey)
             CheatString.clear();
             cheated = true;
         }
-        else if(SDL_strstr(CheatString.c_str(), "needahammersuit"))
+        else if(SDL_strstr(CheatString.c_str(), "needahammersuit") || SDL_strstr(CheatString.c_str(), "hammertime"))
         {
             PlaySound(12);
             for(B = 1; B <= numPlayers; B++)
