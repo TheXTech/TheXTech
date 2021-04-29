@@ -111,7 +111,10 @@ std::string AppPathManager::m_userPath;
 std::string AppPathManager::m_customAssetsRoot;
 
 #if defined(__ANDROID__)
+//! Default path to the internal sotrage directory
 static std::string m_androidSdCardPath = "/storage/emulated/0";
+//! Customized absolute path to the game assets directory
+static std::string m_androidGameAssetsPath;
 
 JNIEXPORT void JNICALL
 Java_ru_wohlsoft_thextech_thextechActivity_setSdCardPath(
@@ -122,9 +125,23 @@ Java_ru_wohlsoft_thextech_thextechActivity_setSdCardPath(
 {
     const char *sdcardPath;
     (void)type;
-    sdcardPath = env->GetStringUTFChars(sdcardPath_j, NULL);
+    sdcardPath = env->GetStringUTFChars(sdcardPath_j, nullptr);
     m_androidSdCardPath = sdcardPath;
     env->ReleaseStringUTFChars(sdcardPath_j, sdcardPath);
+}
+
+JNIEXPORT void JNICALL
+Java_ru_wohlsoft_thextech_thextechActivity_setGameAssetsPath(
+    JNIEnv *env,
+    jclass type,
+    jstring gameAssetsPath_j
+)
+{
+    const char *gameAssetsPath;
+    (void)type;
+    gameAssetsPath = env->GetStringUTFChars(gameAssetsPath_j, nullptr);
+    m_androidGameAssetsPath = gameAssetsPath;
+    env->ReleaseStringUTFChars(gameAssetsPath_j, gameAssetsPath);
 }
 #endif
 
@@ -178,6 +195,9 @@ static std::string getPgeUserDirectory()
     }
 
 #elif defined(__ANDROID__)
+    if(!m_androidGameAssetsPath.empty())
+        return m_androidGameAssetsPath; // Don't search the path, simply re-use the defined path
+
     path = m_androidSdCardPath;
 
     DirMan homeDir(path);
@@ -272,7 +292,14 @@ void AppPathManager::initAppPath()
 #endif
         m_userPath = appDir.absolutePath();
 #if !defined(__EMSCRIPTEN__) && !defined(USER_DIR_NAME)
+#   if defined(__ANDROID__)
+        if(m_androidGameAssetsPath.empty())
+            m_userPath.append("/thextech/");
+        else
+            m_userPath.append("/");
+#   else
         m_userPath.append("/thextech/");
+#   endif
 #else
         m_userPath.append("/");
 #endif

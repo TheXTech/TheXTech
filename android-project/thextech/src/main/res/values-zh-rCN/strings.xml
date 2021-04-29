@@ -21,4 +21,5 @@
     <string name="setup_touchpad_style">控制器风格</string>
     <string name="managePermExplainTitle">【需要翻译】All files access permission is required</string>
     <string name="managePermExplainText">【需要翻译】This game uses resources (such as levels, episodes, graphics, music, sounds, configs, etc.) that was placed by user on the local storage directly. This allows users to modify and extend the content for their own purposes like that was done at the desktop version of this game. Unfortunately, Android 11+ doesn\'t gives the way to grant an individual permission for the specific directory instead of a single file. To run this game you should grand the access to all files to the game because of explained reason.</string>
+    <string name="setup_assets_path_label">【需要翻译】Change the resources absolute path</string>
 </resources>

@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.util.DisplayMetrics;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -98,6 +99,15 @@ public class thextechActivity extends SDLActivity
         setTouchScreenShowOnStart(setup.getBoolean("touchscreen_gamepad_showalways", false));
         setTouchPadStyle(Integer.parseInt(setup.getString("setup_touchscreen_style", "0")));
 
+        String gameAssetsPath = setup.getString("setup_assets_path", "");
+        if(!gameAssetsPath.isEmpty())
+        {
+            File f = new File(gameAssetsPath);
+            if (f.exists() && f.isDirectory()) {
+                setGameAssetsPath(gameAssetsPath);
+            }
+        }
+
         String[] argsOut = new String[args.size()];
         args.toArray(argsOut);
 
@@ -146,4 +156,5 @@ public class thextechActivity extends SDLActivity
     public static native void setScreenSize(double screenSize, double width, double height);
     public static native void setTouchPadStyle(int style);
     public static native void setSdCardPath(String path);
+    public static native void setGameAssetsPath(String path);
 }
