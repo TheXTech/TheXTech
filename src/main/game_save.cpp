@@ -154,6 +154,7 @@ void LoadGame()
     Lives = float(sav.lives);
     Coins = int(sav.coins);
     Score = int(sav.points);
+    BeatTheGame = sav.gameCompleted;
     WorldPlayer[1].Location.X = double(sav.worldPosX);
     WorldPlayer[1].Location.Y = double(sav.worldPosY);
 

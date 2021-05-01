@@ -629,10 +629,10 @@ void FindLevels()
 
 void FindSaves()
 {
-    std::string newInput = "";
-
+    std::string newInput;
     std::string episode = SelectWorld[selWorld].WorldPath;
     GamesaveData f;
+
     for(auto A = 1; A <= maxSaveSlots; A++)
     {
         SaveSlot[A] = -1;
