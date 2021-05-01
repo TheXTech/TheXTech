@@ -125,7 +125,7 @@ void UpdateNPCs()
         {
             StopMusic();
             StartMusic(-1);
-            PlaySound(32);
+            PlaySound(SFX_PSwitch);
         }
         if(PSwitchTime > 2)
             PSwitchTime = 2;
@@ -184,14 +184,14 @@ void UpdateNPCs()
             CoinMode = false;
         else
         {
-            PlaySound(14);
+            PlaySound(SFX_Coin);
             Coins = Coins + 1;
             if(Coins >= 100)
             {
                 if(Lives < 99)
                 {
                     Lives = Lives + 1;
-                    PlaySound(15);
+                    PlaySound(SFX_1up);
                     Coins = Coins - 100;
                 }
                 else
@@ -329,7 +329,7 @@ void UpdateNPCs()
                             else if(NPC[A].GeneratorEffect == 2) // projectile
                             {
                                 NPC[numNPCs].Layer = "Spawned NPCs";
-                                PlaySound(22);
+                                PlaySound(SFX_Bullet);
                                 NPC[numNPCs].Projectile = true;
                                 if(NPC[numNPCs].Type == 17) // Normal Bullet Bills
                                     NPC[numNPCs].Projectile = false;
@@ -701,7 +701,7 @@ void UpdateNPCs()
                         NPC[A].Special5 = 1;
                     }
                     else if(!(NPC[A].Type == 42))
-                        PlaySound(22);
+                        PlaySound(SFX_Bullet);
                 }
                 else if(NPC[A].Type == 21)
                     NPC[A].Special = 100;
@@ -1094,7 +1094,7 @@ void UpdateNPCs()
                         }
                         if(NPC[A].Type == 17)
                         {
-                            PlaySound(22);
+                            PlaySound(SFX_Bullet);
                             NPC[A].Location.SpeedX = 5 * NPC[A].Direction;
                             NPC[A].Projectile = true;
                             NPC[A].CantHurt = 1000;
@@ -1203,7 +1203,7 @@ void UpdateNPCs()
                     }
 
                     if(NPC[A].Type == 179) // play saw sound
-                        PlaySound(74);
+                        PlaySound(SFX_Saw);
                     // NPC Movement Code
 
 
@@ -2920,7 +2920,7 @@ void UpdateNPCs()
                                                             if(HitSpot == 2 || HitSpot == 4 || HitSpot == 5)
                                                             {
                                                                 BlockHit(B);
-                                                                PlaySound(3);
+                                                                PlaySound(SFX_BlockHit);
                                                                 if(NPC[A].Type == 17) // Bullet Bills
                                                                 {
                                                                     NPC[A].Location.SpeedX = -NPC[A].Location.SpeedX;
@@ -2986,7 +2986,7 @@ void UpdateNPCs()
                                     if(NPC[A].Location.SpeedY < -0.05)
                                     {
                                         BlockHit(winningBlock);
-                                        PlaySound(3);
+                                        PlaySound(SFX_BlockHit);
                                         if(NPCIsAShell[NPC[A].Type] || NPC[A].Type == 263)
                                             BlockHitHard(winningBlock);
                                     }
@@ -3327,7 +3327,7 @@ void UpdateNPCs()
                                                                                                 else if(NPC[B].Type == 21)
                                                                                                 {
                                                                                                     NPC[A].Location.SpeedX = -NPC[A].Location.SpeedX;
-                                                                                                    PlaySound(3);
+                                                                                                    PlaySound(SFX_BlockHit);
                                                                                                     NPCHit(A, 4, A);
                                                                                                 }
                                                                                             }
@@ -4342,7 +4342,7 @@ void UpdateNPCs()
                         NPC[A].Special3 = NPC[A].Special3 + 1;
                     if(NPC[A].Special3 >= 20)
                     {
-                        PlaySound(25);
+                        PlaySound(SFX_HammerToss);
                         NPC[A].Special3 = 0; // -15
                         numNPCs++;
                         NPC[numNPCs] = NPC_t();
@@ -4487,7 +4487,7 @@ void UpdateNPCs()
                                     tempLocation.Y = NPC[numNPCs].Location.Y + NPC[numNPCs].Location.Height / 2.0 - EffectHeight[10] / 2.0;
                                     NewEffect(10, tempLocation);
 
-                                    PlaySound(22);
+                                    PlaySound(SFX_Bullet);
                                 }
                             }
                         }
@@ -4590,7 +4590,7 @@ void UpdateNPCs()
                                 tempLocation.Y = tempLocation.Y + 2;
                                 if(CheckCollision(NPC[A].Location, tempLocation) == true)
                                 {
-                                    PlaySound(31);
+                                    PlaySound(SFX_Key);
                                     StopMusic();
                                     LevelMacro = LEVELMACRO_KEYHOLE_EXIT;
                                     break;

@@ -233,7 +233,7 @@ void UpdateEditor()
                     {
                         if(CursorCollision(EditorCursor.Location, PlayerStart[A]))
                         {
-                            PlaySound(23);
+                            PlaySound(SFX_Grab);
                             EditorCursor.Location = PlayerStart[A];
                             PlayerStart[A].X = 0;
                             PlayerStart[A].Y = 0;
@@ -260,7 +260,7 @@ void UpdateEditor()
 
                         if(CursorCollision(EditorCursor.Location, tempLocation) && !NPC[A].Hidden)
                         {
-                            PlaySound(23);
+                            PlaySound(SFX_Grab);
                             B = 0;
 //                            frmLevelEditor::optCursor(4).Value = true;
                             optCursor.current = 4;
@@ -425,7 +425,7 @@ void UpdateEditor()
                         {
                             if(CursorCollision(EditorCursor.Location, Block[A].Location) && !Block[A].Hidden)
                             {
-                                PlaySound(23);
+                                PlaySound(SFX_Grab);
 //                                frmLevelEditor::optCursor(1).Value = true;
                                 optCursor.current = 1;
                                 OptCursorSync();
@@ -532,7 +532,7 @@ void UpdateEditor()
                     {
                         if(CursorCollision(EditorCursor.Location, Warp[A].Entrance) && Warp[A].Hidden == false)
                         {
-                            PlaySound(23);
+                            PlaySound(SFX_Grab);
 //                            Warp[A].PlacedEnt = false;
 //                            if(Warp[A].NoYoshi == true)
 //                                frmWarp.cmdYoshi.Caption = "Yes";
@@ -582,7 +582,7 @@ void UpdateEditor()
                         }
                         else if(CursorCollision(EditorCursor.Location, Warp[A].Exit))
                         {
-                            PlaySound(23);
+                            PlaySound(SFX_Grab);
                             Warp[A].PlacedExit = false;
 //                            if(Warp[A].NoYoshi == true)
 //                                frmWarp.cmdYoshi.Caption = "Yes";
@@ -640,7 +640,7 @@ void UpdateEditor()
                     {
                         if(CursorCollision(EditorCursor.Location, Background[A].Location) == true && Background[A].Hidden == false)
                         {
-                            PlaySound(23);
+                            PlaySound(SFX_Grab);
 //                            frmLevelEditor::optCursor(3).Value = true;
                             optCursor.current = 3;
                             OptCursorSync();
@@ -687,7 +687,7 @@ void UpdateEditor()
                         {
                             if(CursorCollision(EditorCursor.Location, Block[A].Location) && !Block[A].Hidden)
                             {
-                                PlaySound(23);
+                                PlaySound(SFX_Grab);
 //                                frmLevelEditor::optCursor(1).Value = true;
                                 optCursor.current = 1;
                                 OptCursorSync();
@@ -796,7 +796,7 @@ void UpdateEditor()
                     {
                         if(CursorCollision(EditorCursor.Location, Water[A].Location) == true)
                         {
-                            PlaySound(23);
+                            PlaySound(SFX_Grab);
 //                            frmLevelEditor::optCursor(15).Value = true;
                             optCursor.current = 15;
                             OptCursorSync();
@@ -825,7 +825,7 @@ void UpdateEditor()
                     {
                         if(CursorCollision(EditorCursor.Location, WorldMusic[A].Location) == true)
                         {
-                            PlaySound(23);
+                            PlaySound(SFX_Grab);
 //                            frmLevelEditor::optCursor(11).Value = true;
                             optCursor.current = 11;
                             OptCursorSync();
@@ -848,7 +848,7 @@ void UpdateEditor()
                     {
                         if(CursorCollision(EditorCursor.Location, WorldPath[A].Location) == true)
                         {
-                            PlaySound(23);
+                            PlaySound(SFX_Grab);
 //                            frmLevelEditor::optCursor(10).Value = true;
                             optCursor.current = 10;
                             OptCursorSync();
@@ -871,7 +871,7 @@ void UpdateEditor()
                     {
                         if(CursorCollision(EditorCursor.Location, Scene[A].Location) == true)
                         {
-                            PlaySound(23);
+                            PlaySound(SFX_Grab);
 //                            frmLevelEditor::optCursor(8).Value = true;
                             optCursor.current = 8;
                             OptCursorSync();
@@ -896,7 +896,7 @@ void UpdateEditor()
                     {
                         if(CursorCollision(EditorCursor.Location, WorldLevel[A].Location) == true)
                         {
-                            PlaySound(23);
+                            PlaySound(SFX_Grab);
 //                            frmLevelEditor::optCursor(9).Value = true;
                             optCursor.current = 9;
                             OptCursorSync();
@@ -949,7 +949,7 @@ void UpdateEditor()
                     {
                         if(CursorCollision(EditorCursor.Location, Tile[A].Location) == true)
                         {
-                            PlaySound(23);
+                            PlaySound(SFX_Grab);
 //                            frmLevelEditor::optCursor(7).Value = true;
                             optCursor.current = 7;
                             OptCursorSync();
@@ -1086,7 +1086,7 @@ void UpdateEditor()
                             b.Location.X = b.Location.X + b.Location.Width / 2.0 - EffectWidth[10] / 2;
                             b.Location.Y = b.Location.Y + b.Location.Height / 2.0 - EffectHeight[10] / 2;
                             NewEffect(10, b.Location);
-                            PlaySound(36);
+                            PlaySound(SFX_Smash);
                             Background[A] = Background[numBackground];
                             numBackground -= 1;
                             MouseRelease = false;
@@ -1125,7 +1125,7 @@ void UpdateEditor()
                         tempLocation = Water[A].Location;
                         if(CursorCollision(EditorCursor.Location, tempLocation) == true && Water[A].Hidden == false)
                         {
-                            PlaySound(36);
+                            PlaySound(SFX_Smash);
 //                            if(nPlay.Online == true)
 //                                Netplay::sendData "y" + std::to_string(A) + LB + "p36" + LB;
                             Water[A] = Water[numWater];
@@ -1146,7 +1146,7 @@ void UpdateEditor()
                             tempLocation.X = tempLocation.X + tempLocation.Width / 2.0 - EffectWidth[10] / 2;
                             tempLocation.Y = tempLocation.Y + tempLocation.Height / 2.0 - EffectHeight[10] / 2;
                             NewEffect(10, tempLocation);
-                            PlaySound(9);
+                            PlaySound(SFX_ShellHit);
                             WorldMusic[A] = WorldMusic[numWorldMusic];
                             numWorldMusic = numWorldMusic - 1;
                             MouseRelease = false;
@@ -1165,7 +1165,7 @@ void UpdateEditor()
                             tempLocation.X = tempLocation.X + tempLocation.Width / 2.0 - EffectWidth[10] / 2;
                             tempLocation.Y = tempLocation.Y + tempLocation.Height / 2.0 - EffectHeight[10] / 2;
                             NewEffect(10, tempLocation);
-                            PlaySound(9);
+                            PlaySound(SFX_ShellHit);
                             WorldPath[A] = WorldPath[numWorldPaths];
                             numWorldPaths -= 1;
                             MouseRelease = false;
@@ -1184,7 +1184,7 @@ void UpdateEditor()
                             tempLocation.X = tempLocation.X + tempLocation.Width / 2.0 - EffectWidth[10] / 2;
                             tempLocation.Y = tempLocation.Y + tempLocation.Height / 2.0 - EffectHeight[10] / 2;
                             NewEffect(10, tempLocation);
-                            PlaySound(9);
+                            PlaySound(SFX_ShellHit);
                             for(B = A; B < numScenes; B++)
                                 Scene[B] = Scene[B + 1];
                             numScenes = numScenes - 1;
@@ -1204,7 +1204,7 @@ void UpdateEditor()
                             tempLocation.X = tempLocation.X + tempLocation.Width / 2.0 - EffectWidth[10] / 2;
                             tempLocation.Y = tempLocation.Y + tempLocation.Height / 2.0 - EffectHeight[10] / 2;
                             NewEffect(10, tempLocation);
-                            PlaySound(9);
+                            PlaySound(SFX_ShellHit);
                             WorldLevel[A] = WorldLevel[numWorldLevels];
                             numWorldLevels = numWorldLevels - 1;
                             MouseRelease = false;
@@ -1223,7 +1223,7 @@ void UpdateEditor()
                             tempLocation.X = tempLocation.X + tempLocation.Width / 2.0 - EffectWidth[10] / 2;
                             tempLocation.Y = tempLocation.Y + tempLocation.Height / 2.0 - EffectHeight[10] / 2;
                             NewEffect(10, tempLocation);
-                            PlaySound(9);
+                            PlaySound(SFX_ShellHit);
                             Tile[A] = Tile[numTiles];
                             numTiles = numTiles - 1;
                             MouseRelease = false;
@@ -1707,7 +1707,7 @@ void UpdateInterprocess()
 
                 if(EditorCursor.Mode != OptCursor_t::LVL_BLOCKS ||
                    EditorCursor.Block.Type != int(b.id))
-                    PlaySound(23);
+                    PlaySound(SFX_Grab);
 
                 EditorCursor.Layer = b.layer;
 
@@ -1750,7 +1750,7 @@ void UpdateInterprocess()
 
                 if(EditorCursor.Mode != OptCursor_t::LVL_BGOS ||
                    EditorCursor.Background.Type != int(b.id))
-                    PlaySound(23);
+                    PlaySound(SFX_Grab);
 
                 EditorCursor.Layer = b.layer;
 
@@ -1803,7 +1803,7 @@ void UpdateInterprocess()
 
                 if(EditorCursor.Mode != OptCursor_t::LVL_NPCS ||
                    EditorCursor.NPC.Type != int(n.id))
-                    PlaySound(23);
+                    PlaySound(SFX_Grab);
 
                 EditorCursor.Layer = n.layer;
 
@@ -1883,7 +1883,7 @@ void UpdateInterprocess()
                 SetCursor();
             }
             else
-                PlaySound(43);
+                PlaySound(SFX_Fireworks);
 
             break;
         }

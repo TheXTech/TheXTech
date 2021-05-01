@@ -101,7 +101,7 @@ void GameLoop()
         }
         BattleIntro--;
         if(BattleIntro == 1)
-            PlaySound(58);
+            PlaySound(SFX_Checkpoint);
     }
     else
     {
@@ -167,7 +167,7 @@ void GameLoop()
                                         SoundPauseAll();
                                 }
                             }
-                            PlaySound(30);
+                            PlaySound(SFX_Pause);
                         }
                     }
                     else
@@ -194,7 +194,7 @@ void GameLoop()
                         {
                             FreezeNPCs = true;
                         }
-                        PlaySound(30);
+                        PlaySound(SFX_Pause);
                     }
                 }
             }

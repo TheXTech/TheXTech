@@ -161,21 +161,21 @@ void Bomb(Location_t Location, int Game, int ImmunePlayer)
     if(Game == 0)
     {
         NewEffect(148, Location);
-        PlaySound(22);
+        PlaySound(SFX_Bullet);
         Radius = 32;
     }
     if(Game == 2)
     {
         joyRumbleAllPlayers(150, 1.0);
         NewEffect(69, Location);
-        PlaySound(43);
+        PlaySound(SFX_Fireworks);
         Radius = 52;
     }
     if(Game == 3)
     {
         joyRumbleAllPlayers(200, 1.0);
         NewEffect(70, Location);
-        PlaySound(43);
+        PlaySound(SFX_Fireworks);
         Radius = 64;
     }
 
@@ -256,7 +256,7 @@ void DropNPC(int A, int NPCType)
     int B = 0;
     if(A == 1 || numPlayers == 2)
     {
-        PlaySound(11);
+        PlaySound(SFX_DropItem);
         numNPCs++;
         NPC[numNPCs] = NPC_t();
         NPC[numNPCs].Type = NPCType;
@@ -309,14 +309,14 @@ void TurnNPCsIntoCoins()
                 {
                     NPC[A].Location.Y = NPC[A].Location.Y + 32;
                     NewEffect(11, NPC[A].Location);
-                    PlaySound(14);
+                    PlaySound(SFX_Coin);
                     Coins = Coins + 1;
                     if(Coins >= 100)
                     {
                         if(Lives < 99)
                         {
                             Lives = Lives + 1;
-                            PlaySound(15);
+                            PlaySound(SFX_1up);
                             Coins = Coins - 100;
                         }
                         else
@@ -735,7 +735,7 @@ void NPCSpecial(int A)
         if(npc.Special3 > 0)
         {
             NewEffect(144, npc.Location);
-            PlaySound(91);
+            PlaySound(SFX_Bubble);
             npc.Type = npc.Special;
             npc.Special3 = 0;
             npc.Special2 = 0;
@@ -1049,7 +1049,7 @@ void NPCSpecial(int A)
             if(npc.Type == 281)
             {
                 npc.Special2 = 20;
-                PlaySound(24);
+                PlaySound(SFX_Spring);
             }
 
             if(npc.Special2 == 20)
@@ -1177,7 +1177,7 @@ void NPCSpecial(int A)
                 }
 
                 if(npc.Special3 == 0)
-                    PlaySound(34);
+                    PlaySound(SFX_Raccoon);
 
                 numNPCs++;
                 NPC[numNPCs] = NPC_t();
@@ -1301,7 +1301,7 @@ void NPCSpecial(int A)
             {
                 npc.Special6 = 0;
                 npc.Special = 3;
-                PlaySound(24);
+                PlaySound(SFX_Spring);
                 npc.Location.SpeedY = -7 - dRand() * 2;
             }
         }
@@ -1344,7 +1344,7 @@ void NPCSpecial(int A)
 
             if(npc.Special3 == 20) // shoot
             {
-                PlaySound(42);
+                PlaySound(SFX_BigFireball);
                 numNPCs++;
                 NPC[numNPCs] = NPC_t();
                 NPC[numNPCs].Active = true;
@@ -2195,7 +2195,7 @@ void NPCSpecial(int A)
         if(npc.Damage >= 30)
         {
             if(npc.Special != 3)
-                PlaySound(63);
+                PlaySound(SFX_WartKilled);
             npc.Special = 3;
         }
 
@@ -2228,7 +2228,7 @@ void NPCSpecial(int A)
         {
             npc.Location.SpeedX = 0;
             if(npc.Special3 == 0)
-                PlaySound(62);
+                PlaySound(SFX_WartBubbles);
 
             npc.Special3 = npc.Special3 + 1;
             if((int(npc.Special3) % 10) == 0)
@@ -2509,7 +2509,7 @@ void NPCSpecial(int A)
         {
             if((dRand() * 100 > 40) && int(npc.Special4) % 16 == 0)
             {
-                PlaySound(25);
+                PlaySound(SFX_HammerToss);
                 numNPCs++;
                 NPC[numNPCs] = NPC_t();
                 NPC[numNPCs].Inert = npc.Inert;
@@ -2566,7 +2566,7 @@ void NPCSpecial(int A)
                         NPC[numNPCs].Location.SpeedY = 1;
                     else if(NPC[numNPCs].Location.SpeedY < -1)
                         NPC[numNPCs].Location.SpeedY = -1;
-                    PlaySound(42);
+                    PlaySound(SFX_BigFireball);
                 }
                 npc.Special = 2;
             }
@@ -2672,7 +2672,7 @@ void NPCSpecial(int A)
 
                             StopMusic();
                             DoEvents();
-                            PlaySound(60);
+                            PlaySound(SFX_TapeExit);
                             break;
                         }
                     }
@@ -2877,7 +2877,7 @@ void SpecialNPC(int A)
 #if XTECH_ENABLE_WEIRD_GFX_UPDATES
                     UpdateGraphics(true);
 #endif
-                    PlaySound(85);
+                    PlaySound(SFX_ZeldaShield);
                     if(NPC[A].Type == 133)
                         NPC[A].Killed = 3;
                     else
@@ -3003,7 +3003,7 @@ void SpecialNPC(int A)
             {
                 NPC[A].Killed = 9;
                 Player[NPC[A].Special5].FrameCount = 115;
-                PlaySound(73);
+                PlaySound(SFX_Grab2);
                 for(B = 1; B <= numNPCs; B++)
                 {
                     if(NPC[B].Active)
@@ -3222,7 +3222,7 @@ void SpecialNPC(int A)
             NPC[A].Projectile = false;
             NPC[A].Type = 289;
             NPC[A].Effect2 = 16;
-            PlaySound(41);
+            PlaySound(SFX_BirdoBeat);
         }
     // firespitting plant
     }
@@ -3761,7 +3761,7 @@ void SpecialNPC(int A)
             NPC[A].Location.Y = NPC[A].DefaultLocation.Y + NPC[A].Location.Height + 1.5;
             NPC[A].Special2 = 1;
             NPC[A].Special = 0;
-            PlaySound(16);
+            PlaySound(SFX_Lava);
             tempLocation = NPC[A].Location;
             tempLocation.Y -= 32;
             NewEffect(13, tempLocation);
@@ -3793,7 +3793,7 @@ void SpecialNPC(int A)
                 tempLocation = NPC[A].Location;
                 tempLocation.Y = tempLocation.Y + 2;
                 NewEffect(13, tempLocation);
-                PlaySound(16);
+                PlaySound(SFX_Lava);
             }
 
             if(NPC[A].Special >= 150)
@@ -4145,7 +4145,7 @@ void SpecialNPC(int A)
             if(NPC[numNPCs].Direction == 1)
                 NPC[numNPCs].Frame = 4;
             NPC[numNPCs].FrameCount = (float)(iRand() % 8);
-            PlaySound(42);
+            PlaySound(SFX_BigFireball);
         }
     // Hammer Bro
     }
@@ -4198,7 +4198,7 @@ void SpecialNPC(int A)
                 NPC[A].Location.SpeedY = -3;
                 NPC[A].Location.Y = NPC[A].Location.Y - 1;
             }
-            PlaySound(25);
+            PlaySound(SFX_HammerToss);
             NPC[A].Special3 = -15;
             numNPCs++;
             NPC[numNPCs] = NPC_t();
@@ -4498,7 +4498,7 @@ void SpecialNPC(int A)
                 tempNPC = NPC[A];
                 NPC[A] = NPC[numNPCs];
                 NPC[numNPCs] = tempNPC;
-                PlaySound(25);
+                PlaySound(SFX_HammerToss);
             }
         }
     }
@@ -4803,7 +4803,7 @@ void SpecialNPC(int A)
                     NPC[numNPCs].TimeLeft = 100;
                     NPC[numNPCs].Section = NPC[A].Section;
                     NPC[numNPCs].Location.SpeedX = 4 * NPC[numNPCs].Direction;
-                    PlaySound(38);
+                    PlaySound(SFX_BirdoSpit);
                 }
                 NPC[A].Special = 1;
                 if(NPC[A].Special2 > 280)

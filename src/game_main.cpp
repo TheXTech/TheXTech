@@ -506,7 +506,7 @@ int GameMain(const CmdLineSetup_t &setup)
                 Player[2].Vine = 0;
 
                 if(!GoToLevelNoGameThing)
-                    PlaySound(28);
+                    PlaySound(SFX_LevelSelect);
                 SoundPause[26] = 2000;
 
                 LevelSelect = false;
@@ -1028,7 +1028,7 @@ void UpdateMacro()
         }
         LevelMacroCounter = LevelMacroCounter + 1;
         if(LevelMacroCounter == 250)
-            PlaySound(45);
+            PlaySound(SFX_GameBeat);
         if(LevelMacroCounter >= 800)
         {
             EndLevel = true;
@@ -1336,7 +1336,7 @@ void MoreScore(int addScore, Location_t Loc, int &Multiplier)
     if(Points[A] <= 5)
     {
         Lives += Points[A];
-        PlaySound(15, Points[A] - 1);
+        PlaySound(SFX_1up, Points[A] - 1);
     }
     else
         Score += Points[A];

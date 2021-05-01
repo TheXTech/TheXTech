@@ -68,7 +68,7 @@ void UpdateEffects()
                     NPC[numNPCs].TimeLeft = 100;
                     NPC[numNPCs].Frame = 0;
                     CheckSectionNPC(numNPCs);
-                    PlaySound(20);
+                    PlaySound(SFX_BossBeat);
                 }
             }
         }
@@ -163,7 +163,7 @@ void UpdateEffects()
             if(e.Life == 100)
             {
                 e.Location.SpeedY = -8;
-                PlaySound(63);
+                PlaySound(SFX_WartKilled);
             }
 
         }
@@ -894,12 +894,12 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
         if(A == 56)
         {
             if(Effect[numEffects].NewNpc != 0 && Effect[numEffects].NewNpc != 96)
-                PlaySound(51);
+                PlaySound(SFX_YoshiEgg);
             else
-                PlaySound(36);
+                PlaySound(SFX_Smash);
         }
         else if(A == 58)
-            PlaySound(48);
+            PlaySound(SFX_Yoshi);
     }
     else if(A == 136) // Roto Disk
     {
@@ -1006,7 +1006,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
     }
     else if(A == 2 || A == 6 || A == 23 || A == 35 || A == 37 || A == 39 || A == 41 || A == 43 || A == 45 || A == 52 || A == 62 || A == 84 || A == 126) // Goomba smash effect
     {
-        PlaySound(2); // Stomp sound
+        PlaySound(SFX_Stomp); // Stomp sound
         numEffects++;
         Effect[numEffects].Shadow = Shadow;
         Effect[numEffects].Location.X = Location.X;
@@ -1786,7 +1786,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
         Effect[numEffects].Location.SpeedX = 3 * -Direction;
         Effect[numEffects].Life = 200;
         Effect[numEffects].Type = A;
-        PlaySound(63);
+        PlaySound(SFX_WartKilled);
     }
 }
 

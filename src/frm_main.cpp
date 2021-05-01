@@ -1311,7 +1311,7 @@ void FrmMain::toggleGifRecorder()
         {
             m_gif.enabled = true;
             m_gif.doFinalize = false;
-            PlaySound(6);
+            PlaySound(SFX_PlayerGrow);
         }
 
         m_gif.worker = SDL_CreateThread(processRecorder_action, "gif_recorder", reinterpret_cast<void *>(&m_gif));
@@ -1321,11 +1321,11 @@ void FrmMain::toggleGifRecorder()
         if(!m_gif.doFinalize)
         {
             m_gif.doFinalize = true;
-            PlaySound(5);
+            PlaySound(SFX_PlayerShrink);
         }
         else
         {
-            PlaySound(3);
+            PlaySound(SFX_BlockHit);
         }
     }
 }

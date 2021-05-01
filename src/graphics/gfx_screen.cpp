@@ -145,7 +145,7 @@ void DynamicScreen()
                 vScreen[1].Top = 0;
                 GetvScreenAverage2();
                 if(DScreenType != 1)
-                    PlaySound(13);
+                    PlaySound(SFX_Camera);
                 for(A = 1; A <= 2; A++)
                 {
                     vScreen[A].TempDelay = 200;
@@ -167,7 +167,7 @@ void DynamicScreen()
                 vScreen[2].Top = 0;
                 GetvScreenAverage2();
                 if(DScreenType != 2)
-                    PlaySound(13);
+                    PlaySound(SFX_Camera);
                 for(A = 1; A <= 2; A++)
                 {
                     vScreen[A].TempDelay = 200;
@@ -189,7 +189,7 @@ void DynamicScreen()
                 vScreen[2].Top = 0;
                 GetvScreenAverage2();
                 if(DScreenType != 3)
-                    PlaySound(13);
+                    PlaySound(SFX_Camera);
                 for(A = 1; A <= 2; A++)
                 {
                     vScreen[A].TempDelay = 200;
@@ -211,7 +211,7 @@ void DynamicScreen()
                 vScreen[2].Top = ScreenH / 2.0;
                 GetvScreenAverage2();
                 if(DScreenType != 4)
-                    PlaySound(13);
+                    PlaySound(SFX_Camera);
                 for(A = 1; A <= 2; A++)
                 {
                     vScreen[A].TempDelay = 200;
@@ -226,7 +226,7 @@ void DynamicScreen()
                 if(vScreen[2].Visible == true)
                 {
                     if(DScreenType != 5)
-                        PlaySound(13);
+                        PlaySound(SFX_Camera);
                     vScreen[2].Visible = false;
                     vScreen[1].Height = ScreenH;
                     vScreen[1].Width = ScreenW;
@@ -267,7 +267,7 @@ void DynamicScreen()
             vScreen[2].TempY = 0;
             GetvScreenAverage2();
             if(DScreenType != 6)
-                PlaySound(13);
+                PlaySound(SFX_Camera);
             DScreenType = 6;
             vScreen[2].Visible = true;
         }

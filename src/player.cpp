@@ -456,7 +456,7 @@ void PlayerHurt(int A)
 
     if(Player[A].Fairy == true)
     {
-        PlaySound(87);
+        PlaySound(SFX_ZeldaFairy);
         Player[A].Immune = 30;
         Player[A].Effect = 8;
         Player[A].Effect2 = 4;
@@ -471,7 +471,7 @@ void PlayerHurt(int A)
             Player[A].Location.SpeedY = -7.01;
             Player[A].StandingOnNPC = 0;
             Player[A].FireBallCD = 20;
-            PlaySound(78);
+            PlaySound(SFX_ZeldaHurt);
         }
         return;
     }
@@ -494,7 +494,7 @@ void PlayerHurt(int A)
             if(Player[A].Mount == 1)
             {
                 Player[A].Mount = 0;
-                PlaySound(35);
+                PlaySound(SFX_Boot);
                 UnDuck(A);
                 tempLocation = Player[A].Location;
                 tempLocation.SpeedX = 5 * -Player[A].Direction;
@@ -513,7 +513,7 @@ void PlayerHurt(int A)
             else if(Player[A].Mount == 3)
             {
                 UnDuck(A);
-                PlaySound(49);
+                PlaySound(SFX_YoshiHurt);
                 Player[A].Immune = 100;
                 Player[A].Immune2 = true;
                 Player[A].CanJump = false;
@@ -575,7 +575,7 @@ void PlayerHurt(int A)
                         Player[A].Immune = 150;
                         Player[A].Immune2 = true;
                         Player[A].Hearts = Player[A].Hearts - 1;
-                        PlaySound(76);
+                        PlaySound(SFX_PlayerHit);
                         return;
                     }
                     else
@@ -587,14 +587,14 @@ void PlayerHurt(int A)
                         {
                             Player[A].Effect = 227;
                             Player[A].Effect2 = 0;
-                            PlaySound(5);
+                            PlaySound(SFX_PlayerShrink);
                             return;
                         }
                         else if(Player[A].State == 7 && Player[A].Hearts == 2)
                         {
                             Player[A].Effect = 228;
                             Player[A].Effect2 = 0;
-                            PlaySound(5);
+                            PlaySound(SFX_PlayerShrink);
                             return;
                         }
                         else
@@ -622,13 +622,13 @@ void PlayerHurt(int A)
                         }
                         Player[A].Immune = 150;
                         Player[A].Immune2 = true;
-                        PlaySound(78);
+                        PlaySound(SFX_ZeldaHurt);
                         return;
                     }
                 }
                 if(Player[A].State > 1)
                 {
-                    PlaySound(5);
+                    PlaySound(SFX_PlayerShrink);
                     Player[A].StateNPC = 0;
                     Player[A].Effect = 2;
                 }
@@ -702,11 +702,11 @@ void PlayerDead(int A)
 //    }
 
     if(Player[A].Character == 5)
-        PlaySound(80);
+        PlaySound(SFX_ZeldaDied);
     else
     {
         if(BattleMode == true)
-            PlaySound(54);
+            PlaySound(SFX_PlayerDied2);
         else if(numPlayers > 2)
         {
             for(B = 1; B <= numPlayers; B++)
@@ -715,12 +715,12 @@ void PlayerDead(int A)
                     tempBool = true;
             }
             if(tempBool == true)
-                PlaySound(54);
+                PlaySound(SFX_PlayerDied2);
             else
-                PlaySound(8);
+                PlaySound(SFX_PlayerDied);
         }
         else
-            PlaySound(8);
+            PlaySound(SFX_PlayerDied);
     }
     if(Player[A].YoshiNPC > 0 || Player[A].YoshiPlayer > 0)
     {
@@ -823,7 +823,7 @@ void KillPlayer(int A)
             if(BattleOutro == 0)
             {
                 BattleOutro = 1;
-                PlaySound(52);
+                PlaySound(SFX_GotStar);
                 StopMusic();
             }
             if(BattleWinner == 0)
@@ -838,7 +838,7 @@ void KillPlayer(int A)
         {
             if(BattleLives[A] > 0)
                 BattleLives[A] = BattleLives[A] - 1;
-            PlaySound(34);
+            PlaySound(SFX_Raccoon);
             Player[A].Frame = 1;
             Player[A].Location.SpeedX = 0;
             Player[A].Location.SpeedY = 0;
@@ -1226,7 +1226,7 @@ void PlayerFrame(int A)
                 Player[A].Frame += 1;
                 Player[A].FrameCount = 0;
             }
-            PlaySound(71);
+            PlaySound(SFX_Climbing);
         }
 
         if(Player[A].Frame < 25)
@@ -1364,7 +1364,7 @@ void PlayerFrame(int A)
                             {
                                 if(!(Player[A].Mount == 2) && Player[A].WetFrame == false && Player[A].Duck == false)
                                 {
-                                    PlaySound(10);
+                                    PlaySound(SFX_Skid);
                                     if(Player[A].SlideCounter <= 0)
                                     {
                                         Player[A].SlideCounter = 2 + dRand() * 2;
@@ -1382,7 +1382,7 @@ void PlayerFrame(int A)
                             {
                                 if(!(Player[A].Mount == 2) && Player[A].WetFrame == false && Player[A].Duck == false)
                                 {
-                                    PlaySound(10);
+                                    PlaySound(SFX_Skid);
                                     if(Player[A].SlideCounter <= 0)
                                     {
                                         Player[A].SlideCounter = 2 + iRand() % 2;
@@ -1433,7 +1433,7 @@ void PlayerFrame(int A)
                 {
                     if(Player[A].Mount != 2 && ((Player[A].Controls.Left == true && Player[A].Location.SpeedX > 0) || (Player[A].Controls.Right == true && Player[A].Location.SpeedX < 0)) && Player[A].Effect == 0 && Player[A].Duck == false)
                     {
-                        PlaySound(10);
+                        PlaySound(SFX_Skid);
                         if(Player[A].SlideCounter <= 0)
                         {
                             Player[A].SlideCounter = 2 + iRand() % 2;
@@ -1578,7 +1578,7 @@ void PlayerFrame(int A)
                             {
                                 if(!(Player[A].Mount == 2) && Player[A].Wet == 0)
                                 {
-                                    PlaySound(10);
+                                    PlaySound(SFX_Skid);
                                     if(Player[A].SlideCounter <= 0)
                                     {
                                         Player[A].SlideCounter = 2 + iRand() % 2;
@@ -1596,7 +1596,7 @@ void PlayerFrame(int A)
                             {
                                 if(!(Player[A].Mount == 2) && Player[A].Wet == 0)
                                 {
-                                    PlaySound(10);
+                                    PlaySound(SFX_Skid);
                                     if(Player[A].SlideCounter <= 0)
                                     {
                                         Player[A].SlideCounter = 2 + iRand() % 2;
@@ -1719,7 +1719,7 @@ void PlayerFrame(int A)
                 {
                     if(Player[A].Mount != 2 && ((Player[A].Controls.Left == true && Player[A].Location.SpeedX > 0) || (Player[A].Controls.Right == true && Player[A].Location.SpeedX < 0)) && Player[A].Effect == 0 && Player[A].Duck == false)
                     {
-                        PlaySound(10);
+                        PlaySound(SFX_Skid);
                         if(Player[A].SlideCounter <= 0)
                         {
                             Player[A].SlideCounter = 2 + iRand() % 2;
@@ -2134,7 +2134,7 @@ void TailSwipe(int plr, bool boo, bool Stab, int StabDir)
                     if(Block[A].ShakeY == 0 && Block[A].ShakeY2 == 0 && Block[A].ShakeY3 == 0)
                     {
                         if(Block[A].Special > 0 || Block[A].Type == 55 || Block[A].Type == 159 || Block[A].Type == 90)
-                            PlaySound(3);
+                            PlaySound(SFX_BlockHit);
 //                        if(nPlay.Online == true && plr - 1 == nPlay.MySlot)
 //                            Netplay::sendData Netplay::PutPlayerLoc(nPlay.MySlot) + "1g" + std::to_string(plr) + "|" + Player[plr].TailCount - 1;
 #if XTECH_ENABLE_WEIRD_GFX_UPDATES
@@ -2169,7 +2169,7 @@ void TailSwipe(int plr, bool boo, bool Stab, int StabDir)
                                 if(Block[A].Type == 293 || Block[A].Type == 370 || Block[A].ShakeY != 0 || Block[A].ShakeY2 != 0 || Block[A].ShakeY3 != 0 || Block[A].Hidden == true || BlockHurts[Block[A].Type])
                                 {
                                     if(BlockHurts[Block[A].Type])
-                                        PlaySound(24);
+                                        PlaySound(SFX_Spring);
                                     Player[plr].Location.Y = Player[plr].Location.Y - 0.1;
                                     Player[plr].Location.SpeedY = Physics.PlayerJumpVelocity;
                                     Player[plr].StandingOnNPC = 0;
@@ -2179,7 +2179,7 @@ void TailSwipe(int plr, bool boo, bool Stab, int StabDir)
                             }
                             if(Block[A].Type == 370)
                             {
-                                PlaySound(88);
+                                PlaySound(SFX_ZeldaGrass);
                                 Block[A].Hidden = true;
                                 Block[A].Layer = "Destroyed Blocks";
                                 NewEffect(10, Block[A].Location);
@@ -2284,13 +2284,13 @@ void TailSwipe(int plr, bool boo, bool Stab, int StabDir)
                                 Player[plr].Jump = 10;
                         }
                         PlayerHurt(A);
-                        PlaySound(89);
+                        PlaySound(SFX_ZeldaHit);
                     }
                     else
                     {
                         Player[A].Location.SpeedX = 6 * Player[plr].Direction;
                         Player[A].Location.SpeedY = -5;
-                        PlaySound(2);
+                        PlaySound(SFX_Stomp);
                     }
                 }
             }
@@ -2350,7 +2350,7 @@ void YoshiEat(int A)
                 {
                     if(NPCNoYoshi[NPC[B].Special] == false)
                     {
-                        PlaySound(23);
+                        PlaySound(SFX_Grab);
                         NPC[B].Generator = false;
                         NPC[B].Frame = 0;
                         NPC[B].Type = NPC[B].Special;
@@ -2441,7 +2441,7 @@ void YoshiSpit(int A)
             PlayerPush(Player[A].YoshiPlayer, 4);
         }
         Player[A].YoshiPlayer = 0;
-        PlaySound(38);
+        PlaySound(SFX_BirdoSpit);
     }
     else
     {
@@ -2451,7 +2451,7 @@ void YoshiSpit(int A)
         if((NPCIsAShell[NPC[Player[A].YoshiNPC].Type] || NPCIsABot[NPC[Player[A].YoshiNPC].Type] || NPC[Player[A].YoshiNPC].Type == 194) && !(NPC[Player[A].YoshiNPC].Type == 24) && Player[A].YoshiRed == true)
         {
             NPC[Player[A].YoshiNPC].Killed = 9;
-            PlaySound(42);
+            PlaySound(SFX_BigFireball);
             for(B = 1; B <= 3; B++)
             {
                 numNPCs++;
@@ -2508,7 +2508,7 @@ void YoshiSpit(int A)
 
             if(NPC[Player[A].YoshiNPC].Type == 45)
                 NPC[Player[A].YoshiNPC].Special = 1;
-            PlaySound(38);
+            PlaySound(SFX_BirdoSpit);
             if(Player[A].Controls.Down == false || (Player[A].Location.SpeedY != 0 && Player[A].StandingOnNPC == 0 && Player[A].Slope == 0))
             {
                 if(NPCIsAShell[NPC[Player[A].YoshiNPC].Type])
@@ -2629,7 +2629,7 @@ void SwapCoop()
     Player[1].Controls.Drop = true;
     Player[2].DropRelease = false;
     Player[2].Controls.Drop = true;
-    PlaySound(13);
+    PlaySound(SFX_Camera);
 
     Player[SingleCoop].Immune = 50;
     if(curMusic >= 0 && curMusic != bgMusic[Player[SingleCoop].Section])
@@ -2897,7 +2897,7 @@ void YoshiEatCode(int A)
                         tempLocation.Y = tempLocation.Y + 2;
                         if(CheckCollision(Player[A].Location, tempLocation) == true)
                         {
-                            PlaySound(31);
+                            PlaySound(SFX_Key);
                             StopMusic();
                             LevelMacro = LEVELMACRO_KEYHOLE_EXIT;
                             break;
@@ -2920,7 +2920,7 @@ void YoshiEatCode(int A)
                             Player[A].MountSpecial = 1;
                             Player[A].YoshiTongueLength = 0;
                             Player[A].YoshiTonugeBool = false;
-                            PlaySound(50);
+                            PlaySound(SFX_YoshiTongue);
                         }
                     }
                     else
@@ -3118,13 +3118,13 @@ void YoshiEatCode(int A)
                         if(Lives < 99)
                         {
                             Lives = Lives + 1;
-                            PlaySound(15);
+                            PlaySound(SFX_1up);
                             Coins = Coins - 100;
                         }
                         else
                             Coins = 99;
                     }
-                    PlaySound(55);
+                    PlaySound(SFX_YoshiSwallow);
                 }
             }
         }
@@ -3194,7 +3194,7 @@ void StealBonus()
                             Player[A].Effect2 = Player[B].Location.Y - Player[A].Location.Height;
                         Player[A].Location.Y = -vScreenY[1] - Player[A].Location.Height;
                         Player[A].Location.X = Player[B].Location.X + Player[B].Location.Width / 2.0 - Player[A].Location.Width / 2.0;
-                        PlaySound(11);
+                        PlaySound(SFX_DropItem);
                     }
                 }
             }
@@ -3801,7 +3801,7 @@ void PowerUps(int A)
                     {
                         Player[A].TailCount = 1;
                         if(Player[A].SpinJump == false)
-                            PlaySound(33);
+                            PlaySound(SFX_Tail);
                     }
                 }
              }
@@ -3847,7 +3847,7 @@ void PowerUps(int A)
                 NPC[numNPCs].Location.Y = Player[A].Location.Y + Player[A].Location.Height - NPC[numNPCs].Location.Height;
                 NPC[numNPCs].Location.SpeedX = 0;
                 NPC[numNPCs].Location.SpeedY = 0;
-                PlaySound(23);
+                PlaySound(SFX_Grab);
             }
             else
             {
@@ -3858,7 +3858,7 @@ void PowerUps(int A)
                 NPC[numNPCs].Projectile = true;
                 if(Player[A].Location.SpeedY == 0 || Player[A].Slope > 0 || Player[A].StandingOnNPC != 0)
                     Player[A].SwordPoke = -10;
-                PlaySound(75);
+                PlaySound(SFX_Throw);
             }
 
 
@@ -4112,7 +4112,7 @@ void SuperWarp(int A)
                     }
                     else if(warp.Effect == 1)
                     {
-                        PlaySound(17);
+                        PlaySound(SFX_Warp);
                         plr.Effect = 3;
                         plr.Warp = B;
 //                        if(nPlay.Online == true && A == nPlay.MySlot + 1)
@@ -4120,7 +4120,7 @@ void SuperWarp(int A)
                     }
                     else if(warp.Effect == 2)
                     {
-                        PlaySound(46);
+                        PlaySound(SFX_Door);
                         plr.Effect = 7;
                         plr.Warp = B;
 //                        if(nPlay.Online == true && A == nPlay.MySlot + 1)
@@ -4211,7 +4211,7 @@ void PlayerCollide(int A)
                 if(HitSpot == 2 || HitSpot == 4)
                 {
                     if(numPlayers < 3 /*|| nPlay.Online == true*/)
-                        PlaySound(10);
+                        PlaySound(SFX_Skid);
                     tempLocation = Player[A].Location;
                     Player[A].Location.SpeedX = Player[B].Location.SpeedX;
                     Player[B].Location.SpeedX = tempLocation.SpeedX;
@@ -4221,7 +4221,7 @@ void PlayerCollide(int A)
                 else if(HitSpot == 1)
                 {
                     if(numPlayers < 3 /*|| nPlay.Online == true*/)
-                        PlaySound(2);
+                        PlaySound(SFX_Stomp);
                     Player[A].Location.Y = Player[B].Location.Y - Player[A].Location.Height - 0.1;
                     PlayerPush(A, 3);
                     Player[A].Location.SpeedY = Physics.PlayerJumpVelocity;
@@ -4239,7 +4239,7 @@ void PlayerCollide(int A)
                 else if(HitSpot == 3)
                 {
                     if(numPlayers < 3/* || nPlay.Online == true*/)
-                        PlaySound(2);
+                        PlaySound(SFX_Stomp);
                     Player[B].Location.Y = Player[A].Location.Y - Player[B].Location.Height - 0.1;
                     PlayerPush(B, 3);
                     Player[B].Location.SpeedY = Physics.PlayerJumpVelocity;
@@ -4386,9 +4386,9 @@ void PlayerGrabCode(int A, bool DontResetGrabTime)
                     if(Player[A].GrabTime == 0)
                     {
                         if(NPC[Player[A].StandingOnNPC].Type == 91 || NPCIsVeggie[NPC[Player[A].StandingOnNPC].Type] == true)
-                            PlaySound(73);
+                            PlaySound(SFX_Grab2);
                         else
-                            PlaySound(23);
+                            PlaySound(SFX_Grab);
                         Player[A].FrameCount = 0;
                         Player[A].GrabSpeed = Player[A].Location.SpeedX;
                     }
@@ -4451,7 +4451,7 @@ void PlayerGrabCode(int A, bool DontResetGrabTime)
                         NPC[Player[A].HoldingNPC].Special2 = 0;
                     }
 
-                        PlaySound(82);
+                        PlaySound(SFX_ZeldaFire);
 
                     // For B = 1 To 3
                         numNPCs++;
@@ -4635,9 +4635,9 @@ void PlayerGrabCode(int A, bool DontResetGrabTime)
                     }
                 }
                 if(NPCIsVeggie[NPC[Player[A].HoldingNPC].Type] == true || NPC[Player[A].HoldingNPC].Type == 19 || NPC[Player[A].HoldingNPC].Type == 20 || NPC[Player[A].HoldingNPC].Type == 25 || NPC[Player[A].HoldingNPC].Type == 129 || NPC[Player[A].HoldingNPC].Type == 130 || NPC[Player[A].HoldingNPC].Type == 131 || NPC[Player[A].HoldingNPC].Type == 132 || NPC[Player[A].HoldingNPC].Type == 134 || NPC[Player[A].HoldingNPC].Type == 135 || NPC[Player[A].HoldingNPC].Type == 154 || NPC[Player[A].HoldingNPC].Type == 155 || NPC[Player[A].HoldingNPC].Type == 156 || NPC[Player[A].HoldingNPC].Type == 157 || NPC[Player[A].HoldingNPC].Type == 40 || NPC[Player[A].HoldingNPC].Type == 240 || NPC[Player[A].HoldingNPC].Type == 13 || NPC[Player[A].HoldingNPC].Type == 265 || NPC[Player[A].HoldingNPC].Type == 288 || NPC[Player[A].HoldingNPC].Type == 291)
-                    PlaySound(75);
+                    PlaySound(SFX_Throw);
                 else
-                    PlaySound(9);
+                    PlaySound(SFX_ShellHit);
                 NPC[Player[A].HoldingNPC].Projectile = true;
             }
             else if(Player[A].Controls.Down == true && NPC[Player[A].HoldingNPC].Type != 17) // Drop
@@ -4653,7 +4653,7 @@ void PlayerGrabCode(int A, bool DontResetGrabTime)
                     NPC[Player[A].HoldingNPC].CantHurt = 0;
                     NPC[Player[A].HoldingNPC].CantHurtPlayer = 0;
                     NPC[Player[A].HoldingNPC].HoldingPlayer = 0;
-                    PlaySound(9);
+                    PlaySound(SFX_ShellHit);
                     NewEffect(73, newLoc(NPC[Player[A].HoldingNPC].Location.X, NPC[Player[A].HoldingNPC].Location.Y + NPC[Player[A].HoldingNPC].Location.Height - 16));
                     NPC[Player[A].HoldingNPC].Location.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - NPC[Player[A].HoldingNPC].Location.Width / 2.0;
                     NPC[Player[A].HoldingNPC].Location.Y = Player[A].Location.Y + Player[A].Location.Height - NPC[Player[A].HoldingNPC].Location.Height;
@@ -4684,7 +4684,7 @@ void PlayerGrabCode(int A, bool DontResetGrabTime)
                         NPC[Player[A].HoldingNPC].Location.Y = Player[A].Location.Y - NPC[Player[A].HoldingNPC].Location.Height;
                     else
                         NPC[Player[A].HoldingNPC].Location.Y = Player[A].Location.Y - NPC[Player[A].HoldingNPC].Location.Height + 6;
-                    PlaySound(75);
+                    PlaySound(SFX_Throw);
                     NPC[Player[A].HoldingNPC].Location.SpeedX = 0;
                     NPC[Player[A].HoldingNPC].Location.SpeedY = 20;
                 }
@@ -4730,11 +4730,11 @@ void PlayerGrabCode(int A, bool DontResetGrabTime)
                 }
                 NPC[Player[A].HoldingNPC].Projectile = true;
                 if(NPCIsVeggie[NPC[Player[A].HoldingNPC].Type] == true || NPC[Player[A].HoldingNPC].Type == 19 || NPC[Player[A].HoldingNPC].Type == 20 || NPC[Player[A].HoldingNPC].Type == 25 || NPC[Player[A].HoldingNPC].Type == 129 || NPC[Player[A].HoldingNPC].Type == 130 || NPC[Player[A].HoldingNPC].Type == 131 || NPC[Player[A].HoldingNPC].Type == 132 || NPC[Player[A].HoldingNPC].Type == 134 || NPC[Player[A].HoldingNPC].Type == 135 || NPC[Player[A].HoldingNPC].Type == 154 || NPC[Player[A].HoldingNPC].Type == 155 || NPC[Player[A].HoldingNPC].Type == 156 || NPC[Player[A].HoldingNPC].Type == 157 || NPC[Player[A].HoldingNPC].Type == 40 || NPC[Player[A].HoldingNPC].Type == 240 || NPC[Player[A].HoldingNPC].Type == 13 || NPC[Player[A].HoldingNPC].Type == 265 || NPC[Player[A].HoldingNPC].Type == 288 || NPC[Player[A].HoldingNPC].Type == 291)
-                    PlaySound(75);
+                    PlaySound(SFX_Throw);
                 else if(NPC[Player[A].HoldingNPC].Type == 17)
-                    PlaySound(22);
+                    PlaySound(SFX_Bullet);
                 else
-                    PlaySound(9);
+                    PlaySound(SFX_ShellHit);
             }
             else if(NPCIsAShell[NPC[Player[A].HoldingNPC].Type] == true)
             {
@@ -4753,7 +4753,7 @@ void PlayerGrabCode(int A, bool DontResetGrabTime)
             }
             else if(NPC[Player[A].HoldingNPC].Type == 263)
             {
-                 PlaySound(9);
+                 PlaySound(SFX_ShellHit);
                 NPC[Player[A].HoldingNPC].Location.SpeedX = Physics.NPCShellSpeed * Player[A].Direction;
                 NPC[Player[A].HoldingNPC].CantHurt = Physics.NPCCanHurtWait;
                 NPC[Player[A].HoldingNPC].CantHurtPlayer = A;
@@ -4996,7 +4996,7 @@ void LinkFrame(int A)
         {
             if(Player[A].SlideCounter <= 0)
             {
-                PlaySound(86);
+                PlaySound(SFX_ZeldaDash);
                 Player[A].SlideCounter = 2 + dRand() * 2;
                 tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height - 4;
 
@@ -5457,7 +5457,7 @@ void PlayerEffects(int A)
             if(Player[A].Effect2 >= 110)
             {
                 Player[A].Effect2 = 2;
-                PlaySound(17);
+                PlaySound(SFX_Warp);
             }
         }
         else if(fEqual(Player[A].Effect2, 2))
@@ -5739,7 +5739,7 @@ void PlayerEffects(int A)
                     }
                 }
                 SoundPause[46] = 0;
-                PlaySound(46);
+                PlaySound(SFX_Door);
             }
         }
         else if(Player[A].Effect2 <= 130)
@@ -5792,7 +5792,7 @@ void PlayerEffects(int A)
                     }
                 }
                 SoundPause[46] = 0;
-                PlaySound(46);
+                PlaySound(SFX_Door);
                 Player[A].Effect = 8;
                 Player[A].Effect2 = 30;
                 if(A == 2)
@@ -6053,7 +6053,7 @@ void PlayerEffects(int A)
         if(Player[A].Effect2 == 0.0)
         {
             UnDuck(A);
-            PlaySound(34);
+            PlaySound(SFX_Raccoon);
             tempLocation.Width = 32;
             tempLocation.Height = 32;
             tempLocation.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - tempLocation.Width / 2.0;

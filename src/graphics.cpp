@@ -530,7 +530,7 @@ void ScreenShot()
     frmMain.setTargetTexture();
     frmMain.makeShot();
     frmMain.setTargetScreen();
-    PlaySound(12);
+    PlaySound(SFX_GotItem);
 #endif
     TakeScreen = false;
 }

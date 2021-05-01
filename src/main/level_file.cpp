@@ -739,7 +739,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 //            Netplay::sendData "j" + LB + "d" + LocalNick + " has loaded " + FileName + "." + LB + "w1" + LB + EoT;
 //            frmChat.txtChat = frmChat::txtChat + LocalNick + " has loaded " + FileName + "." + LB;
 //            frmChat::txtChat.SelStart = frmChat::txtChat.Text.Length;
-//            PlaySound(47);
+//            PlaySound(SFX_Message);
 //            SoundPause[47] = 2;
 //            for(A = 1; A <= 15; A++)
 //            {

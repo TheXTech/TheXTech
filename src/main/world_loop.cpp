@@ -265,7 +265,7 @@ void WorldLoop()
             if(WorldPlayer[1].Move == 0)
             {
                 WorldPlayer[1].Move3 = false;
-                PlaySound(3);
+                PlaySound(SFX_BlockHit);
                 SoundPause[3] = 2;
             }
         }
@@ -304,7 +304,7 @@ void WorldLoop()
             if(WorldPlayer[1].Move == 0)
             {
                 WorldPlayer[1].Move3 = false;
-                PlaySound(3);
+                PlaySound(SFX_BlockHit);
                 SoundPause[3] = 2;
             }
         }
@@ -343,7 +343,7 @@ void WorldLoop()
             if(WorldPlayer[1].Move == 0)
             {
                 WorldPlayer[1].Move3 = false;
-                PlaySound(3);
+                PlaySound(SFX_BlockHit);
                 SoundPause[3] = 2;
             }
         }
@@ -382,7 +382,7 @@ void WorldLoop()
             if(WorldPlayer[1].Move == 0)
             {
                 WorldPlayer[1].Move3 = false;
-                PlaySound(3);
+                PlaySound(SFX_BlockHit);
                 SoundPause[3] = 2;
             }
         }
@@ -424,7 +424,7 @@ void WorldLoop()
                         {
                             StartWarp = level.StartWarp;
                             StopMusic();
-                            PlaySound(28);
+                            PlaySound(SFX_LevelSelect);
                             SoundPause[26] = 200;
                             curWorldLevel = level.index;
                             LevelSelect = false;
@@ -444,7 +444,7 @@ void WorldLoop()
                     else if(int(level.WarpX) != -1 || int(level.WarpY) != -1)
                     {
                         StopMusic();
-                        PlaySound(28);
+                        PlaySound(SFX_LevelSelect);
                         frmMain.setTargetTexture();
                         frmMain.clearBuffer();
                         frmMain.repaint();
@@ -465,7 +465,7 @@ void WorldLoop()
         if(WorldPlayer[1].Move3 && WorldPlayer[1].Move == 0)
         {
             WorldPlayer[1].Move3 = false;
-            PlaySound(26);
+            PlaySound(SFX_Slide);
         }
 
         treeWorldMusicQuery(tempLocation, marr, true);
@@ -694,7 +694,7 @@ void PathPath(WorldPath_t &Pth, bool Skp)
         Pth.Active = true;
         vScreenX[1] = -(Pth.Location.X + Pth.Location.Width / 2.0) + vScreen[1].Width / 2.0;
         vScreenY[1] = -(Pth.Location.Y + Pth.Location.Height / 2.0) + vScreen[1].Height / 2.0;
-        PlaySound(27);
+        PlaySound(SFX_NewPath);
         PathWait();
     }
 
@@ -754,7 +754,7 @@ void PathPath(WorldPath_t &Pth, bool Skp)
                     {
                         vScreenX[1] = -(lev.Location.X + lev.Location.Width / 2.0) + vScreen[1].Width / 2.0;
                         vScreenY[1] = -(lev.Location.Y + lev.Location.Height / 2.0) + vScreen[1].Height / 2.0;
-                        PlaySound(27);
+                        PlaySound(SFX_NewPath);
                         PathWait();
                     }
                 }

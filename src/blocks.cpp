@@ -206,14 +206,14 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
     if(Block[A].Type == 169)
     {
-        PlaySound(32);
+        PlaySound(SFX_PSwitch);
         BeltDirection = -BeltDirection; // for the blet direction changing block
     }
 
 
     if(b.Type == 170) // smw switch blocks
     {
-        PlaySound(32);
+        PlaySound(SFX_PSwitch);
         for(auto B = 1; B <= numBlock; B++)
         {
             if(Block[B].Type == 171)
@@ -236,7 +236,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
     if(b.Type == 173) // smw switch blocks
     {
-        PlaySound(32);
+        PlaySound(SFX_PSwitch);
         for(auto B = 1; B <= numBlock; B++)
         {
             if(Block[B].Type == 174)
@@ -259,7 +259,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
     if(b.Type == 176) // smw switch blocks
     {
-        PlaySound(32);
+        PlaySound(SFX_PSwitch);
         for(auto B = 1; B <= numBlock; B++)
         {
             if(Block[B].Type == 177)
@@ -282,7 +282,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
     if(b.Type == 179) // smw switch blocks
     {
-        PlaySound(32);
+        PlaySound(SFX_PSwitch);
         for(auto B = 1; B <= numBlock; B++)
         {
             if(Block[B].Type == 180)
@@ -391,11 +391,11 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                             NPC[numNPCs].Type = 252;
                         if(dRand() * 60 <= 3.0)
                             NPC[numNPCs].Type = 253;
-                        PlaySound(81);
+                        PlaySound(SFX_ZeldaRupee);
                     }
                     else
                     {
-                        PlaySound(14);
+                        PlaySound(SFX_Coin);
                     }
 
                     NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
@@ -427,7 +427,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                     if(Lives < 99)
                     {
                         Lives = Lives + 1;
-                        PlaySound(15);
+                        PlaySound(SFX_1up);
                         Coins = Coins - 100;
                     }
                     else
@@ -435,7 +435,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                         Coins = 99;
                     }
                 }
-                PlaySound(14);
+                PlaySound(SFX_Coin);
                 NewEffect(11, b.Location);
                 b.Special = b.Special - 1;
             }
@@ -495,7 +495,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                     if(Lives < 99)
                     {
                         Lives = Lives + 1;
-                        PlaySound(15);
+                        PlaySound(SFX_1up);
                         Coins = Coins - 100;
                     }
                     else
@@ -1433,11 +1433,11 @@ void KillBlock(int A, bool Splode)
     if(Splode)
     {
         if(Block[A].Type == 526)
-            PlaySound(64);
+            PlaySound(SFX_SMBlockHit);
         else if(Block[A].Type == 186)
-            PlaySound(43);
+            PlaySound(SFX_Fireworks);
         else
-            PlaySound(4); // Block smashed
+            PlaySound(SFX_BlockSmashed); // Block smashed
         // Create the break effect
         if(Block[A].Type == 60)
             NewEffect(21, Block[A].Location);
@@ -1942,7 +1942,7 @@ void UpdateBlocks()
                             {
                                 Player[B].Location.SpeedY = double(Physics.PlayerJumpVelocity);
                                 Player[B].StandUp = true;
-                                PlaySound(2);
+                                PlaySound(SFX_Stomp);
                             }
                             else
                             {
@@ -1950,7 +1950,7 @@ void UpdateBlocks()
                                 {
                                     Player[B].Location.SpeedY = double(Physics.PlayerJumpVelocity);
                                     Player[B].StandUp = true;
-                                    PlaySound(2);
+                                    PlaySound(SFX_Stomp);
                                 }
                             }
                         }
@@ -1995,14 +1995,14 @@ void UpdateBlocks()
         {
             StopMusic();
             StartMusic(-1);
-            PlaySound(32);
+            PlaySound(SFX_PSwitch);
             PSwitch(true);
         }
 
         PSwitchTime--;
 
         if(PSwitchTime == 195)
-            PlaySound(92);
+            PlaySound(SFX_PSwitchTimeout);
 
         if(PSwitchTime <= 1)
         {
