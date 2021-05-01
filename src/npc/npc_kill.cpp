@@ -258,7 +258,10 @@ void KillNPC(int A, int B)
             }
             else
             {
-                PlaySound(SFX_ShellHit); // Shell hit sound
+                if(NPC[A].Type == 237) // Yoshi's ice break
+                    PlaySound(SFX_Icebreak);
+                else
+                    PlaySound(SFX_ShellHit); // Shell hit sound
                 if(NPC[A].Type == 1 || NPC[A].Type == 244)
                     NewEffect(4, NPC[A].Location);
                 else if(NPC[A].Type == 242 || NPC[A].Type == 243)
