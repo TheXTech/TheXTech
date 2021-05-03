@@ -22,5 +22,5 @@
     <string name="managePermExplainTitle">需要文件访问权限</string>
     <string name="setup_assets_path_label">更改数据目录</string>
     <string name="managePermExplainText">此游戏使用的是用户在直接在本地存储的数据（例如关卡、素材、音乐、声音、设置等），即允许用户修改或扩展内容。不幸的是安卓 11 以上的版本不支持设置目录权限。因此当游戏运行时，请您将所有文件的访问权限开启。</string>
-    <string name="launcher_no_resources_question">【需要翻译】Whoops, the game can\'t start because the game resources directory is not selected. This game requires you to manually download and unpack the archive with game assets, and then select the directory that contains them. If you downloaded and unpacked them already, please select the directory that contains the game assets. Do you want to select the assets directory for now?</string>
+    <string name="launcher_no_resources_question">很抱歉，由于您尚未选择游戏数据目录，因此无法启动游戏。此游戏需要您下载并解压数据文件，之后选择对应目录。如果您之前已经下载过，请直接选择游戏数据目录。您现在要选择游戏数据目录吗？</string>
 </resources>
