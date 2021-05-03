@@ -3,6 +3,7 @@ package ru.wohlsoft.thextech;
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
@@ -11,6 +12,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.PreferenceManager;
 
 import android.os.Bundle;
 import android.os.Environment;
@@ -67,6 +69,36 @@ public class Launcher extends AppCompatActivity
         // Here, thisActivity is the current activity
         if(checkFilePermissions(READWRITE_PERMISSION_FOR_GAME) || !hasManageAppFS())
             return;
+
+        SharedPreferences setup = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        String gameAssetsPath = setup.getString("setup_assets_path", "");
+
+        if(!GameSettings.verifyAssetsPath(gameAssetsPath))
+        {
+            DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener()
+            {
+                @Override
+                public void onClick(DialogInterface dialog, int which)
+                {
+                    switch (which){
+                        case DialogInterface.BUTTON_POSITIVE:
+                            GameSettings.selectAssetsPath(Launcher.this);
+                            break;
+                        case DialogInterface.BUTTON_NEGATIVE:
+                            //No button clicked
+                            break;
+                    }
+                }
+            };
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+            builder.setMessage(R.string.launcher_no_resources_question)
+                .setPositiveButton(android.R.string.yes, dialogClickListener)
+                .setNegativeButton(android.R.string.no, dialogClickListener)
+            .show();
+            return;
+        }
+
         startGame();
     }
 
