@@ -151,9 +151,11 @@ int GameMain(const CmdLineSetup_t &setup)
 
     while(!MenuMouseDown)
     {
+        frmMain.setTargetTexture();
         frmMain.clearBuffer();
         SuperPrint("Click to start a game", 3, 230, 280);
         frmMain.repaint();
+        frmMain.setTargetScreen();
         DoEvents();
         PGE_Delay(10);
     }
