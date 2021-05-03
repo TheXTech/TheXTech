@@ -126,6 +126,7 @@ set(THEXTECH_EXECUTABLE_NAME "thextech" CACHE STRING "Name of executable file")
 
 if(APPLE)
     set(THEXTECH_PRELOAD_ENVIRONMENT "" CACHE STRING "Path to resources root to pack")
+    option(THEXTECH_PRELOAD_ENVIRONMENT_MANUALLY "Make application look for assets inside the bundle, but don't actually put any assets. The 'Template' app will be produced for manual addition of assets." OFF)
     set(THEXTECH_BUNDLE_NAME "TheXTech" CACHE STRING "Name of bundle folder")
     set(THEXTECH_ICON_NAME "thextech.icns" CACHE STRING "Name of bundle icon file")
     set(THEXTECH_CUSTOM_ICON_PATH "" CACHE STRING "Name of icon file to pack into the bundle")
@@ -412,6 +413,10 @@ if(APPLE)
             COMMAND ${CMAKE_COMMAND} -E copy_directory "${THEXTECH_PRELOAD_ENVIRONMENT}" "$<TARGET_FILE_DIR:thextech>/../Resources/assets"
             COMMENT "Copying assets into bundle..."
         )
+        target_compile_definitions(thextech PRIVATE -DUSE_BUNDLED_ASSETS)
+    endif()
+
+    if(THEXTECH_PRELOAD_ENVIRONMENT_MANUALLY)
         target_compile_definitions(thextech PRIVATE -DUSE_BUNDLED_ASSETS)
     endif()
 
