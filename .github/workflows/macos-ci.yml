@@ -119,7 +119,7 @@ jobs:
       shell: bash
       run: |
         file TheXTech.app/Contents/MacOS/TheXTech
-        ldd TheXTech.app/Contents/MacOS/TheXTech
+        otool -L TheXTech.app/Contents/MacOS/TheXTech
 
     - name: Create Package
       if: always()
