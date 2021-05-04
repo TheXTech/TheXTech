@@ -171,9 +171,18 @@ jobs:
         fi
         lftp -e "${UPLOAD_LIST} exit" -u ${{ secrets.builds_login }},${{ secrets.builds_password }} ${{ secrets.builds_host }}
 
+    - name: Clean-up
+      if: always()
+      shell: bash
+      run: |
+        rm -Rf TheXTech.app
+        rm -Rf aod
+        rm -Rf smbx13
+
     - name: List Build Directory
       if: always()
       shell: bash
       run: |
         git status
-        ls -lR build
+        ls -lR build-x64
+        ls -lR build-arm
