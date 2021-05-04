@@ -75,7 +75,7 @@ jobs:
           export PATH=${{ matrix.config.extra_path }}:${PATH}
           echo "PATH environment: ${PATH}"
         fi
-        cmake -B build-x64 -G "${{ matrix.config.generator }}" -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} ${{ matrix.config.extra_options }} .
+        cmake -B build-x64 -G "${{ matrix.config.generator }}" -DCMAKE_OSX_ARCHITECTURES="x86_64" -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} ${{ matrix.config.extra_options }} .
 
     - name: Build (x86_64)
       shell: bash
@@ -93,7 +93,7 @@ jobs:
           export PATH=${{ matrix.config.extra_path }}:${PATH}
           echo "PATH environment: ${PATH}"
         fi
-        cmake -B build-arm -G "${{ matrix.config.generator }}" -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} ${{ matrix.config.extra_options }} .
+        cmake -B build-arm -G "${{ matrix.config.generator }}" -DCMAKE_OSX_ARCHITECTURES="arm64" -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} ${{ matrix.config.extra_options }} .
 
     - name: Build (arm64)
       shell: bash
