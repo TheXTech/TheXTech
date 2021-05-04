@@ -3,20 +3,20 @@ TheXTech Changelog.
 Changes for 1.3.5
 -Fixed the gamepad control stuck because of axes returned value that doesn't equal the initial state on some devices
 -Fixed the invalid conversion of old sprites with a mask that is smaller than the front
--Implemented usage of the SDL_GameController with some extras like using of the rumble and the battery status (Render of the status is not implemented yet)
+-Implemented usage of the SDL_GameController with some extras like using the rumble and the battery status (Render of the status is not implemented yet)
 -Player now can quit the credits screen by pressing the Start button on the gamepad
 -Fixed the glitched rendering of the first frame at the main menu and at the world map when frame-skip is enabled
--Every gamepad model will keep it's individual settings per player
+-Every gamepad model will keep its individual settings per player
 -Added the "Reset to default" menu item to reset controls
 -Resolved the slow work of the world map on weak devices
 -Added the performance debug printing that you can activate by the F3 key
--Automatically select the gamepad on startup if user didn't manually set up the keyboard usage
+-Automatically select the gamepad on startup if the user didn't manually set up the keyboard usage
 -Added the ability of the hot connection and disconnection of game controllers
 -Control mappings have been moved into the "controls.ini" to keep the "thextech.ini" file being human-friendly
 -Swooper can play the flap sound if presented at the assets pack
 -Iceball may have the individual shoot sound of sounds.ini enables that
 -Fixed an unexpected ability of Peach to spin-jump from off vines and on pressing of the ALT-JUMP while the JUMP key is held
--Fixed the GFX shaking of the upside down piranha plants when they got customized in some cases
+-Fixed the GFX shaking of the upside-down piranha plants when they got customized in some cases
 -NPC freezing sound got an individual sound instead of the shell hit
 -Frozen NPC breaking got an individual sound
 -Added an ability to put the silence instead of the actual sound file by specifying the "silent=true" field instead of the "file=..."
@@ -25,14 +25,14 @@ Changes for 1.3.5
 -Sprout vine from blocks got an individual sound
 -Fixed an incorrect word wrapping at message boxes
 -Fixed the vanilla GFX bug: the thwomp's ground pound dirt effect being improperly aligned
--Bowser III'rd will shake the screen on his ground pount
+-Bowser III'rd will shake the screen on his ground pound
 -Fixed the vanilla bug: Link may die when attempting to use the Clown Car being in a fairy form, and when flying up on the Clown Car while any vines behind him
 -Avoided the ability to switch the playable character by the Clown Car at the top of a player switch block
 -Added an ability to restore old checkpoints behavior of the SMBX 1.3 using the "compat.ini" file
 -Fixed the vanilla GFX bug: an incorrect Link's alignment at the Clown Car after being transformed from anybody who rides Yoshi
 -Fixed the skull raft getting stuck at the ceiling slope blocks
 -Fixed the vanilla GFX bug: the unexpected water splash effect appearance at BGOs
--Fixed the inability to setup the jump button on gamepads in some conditions
+-Fixed the inability to set up the jump button on gamepads in some conditions
 -Fixed the vanilla bug: inability to set the autoscrolling for any non-zero section
 -Added the support for the simple-style per-section autoscrolling setup from the SMBX-38A specification
 -Fixed the vanilla crash when NPC being located far off the screen, tries to find blocks
