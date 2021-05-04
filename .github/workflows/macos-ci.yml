@@ -141,14 +141,14 @@ jobs:
       if: always()
       uses: actions/upload-artifact@v2
       with:
-        path: *.dmg
+        path: ./*.dmg
         name: ${{ matrix.config.name }} ${{ matrix.config.build_type }} DMG
 
     - name: Upload ZIP artifact
       if: always()
       uses: actions/upload-artifact@v2
       with:
-        path: *.zip
+        path: ./*.zip
         name: ${{ matrix.config.name }} ${{ matrix.config.build_type }} ZIP
 
     - name: Deploy to builds.wohlsoft.ru
