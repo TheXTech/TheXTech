@@ -20,53 +20,14 @@ jobs:
         # ======================================= Adventures of Demo =======================================
         # The side game about Demo and siblings from the A2XT universe by raocow and his fan community.
         - {
-            name: "Adventures of Demo - macOS Intel",
+            name: "macOS Universal",
             os: macos-latest,
-            extra_options: "-DTHEXTECH_PRELOAD_ENVIRONMENT=\"`pwd`/assets/\" -DTHEXTECH_CUSTOM_ICON_PATH=\"`pwd`/assets/graphics/ui/icon/advdemo.icns\" -DTHEXTECH_ICON_NAME=advdemo.icns -DTHEXTECH_BUNDLE_NAME=\"Adventures of Demo\" -DTHEXTECH_EXECUTABLE_NAME=\"advdemo\"",
+            extra_options: "-DTHEXTECH_PRELOAD_ENVIRONMENT_MANUALLY=ON -DTHEXTECH_EXECUTABLE_NAME=\"thextech\"",
             deps_cmdline: "brew install ninja wget p7zip lftp",
             generator: "Ninja",
             build_type: "MinSizeRel",
-            assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-adventure-of-demo-assets-full.7z",
-            package_filename: "thextech-adventures-of-demo-intel-dev.dmg",
             upload_directory: "www/macosx/"
           }
-        - {
-            name: "Adventures of Demo - macOS ARM",
-            os: macos-latest,
-            extra_options: "-DCMAKE_OSX_ARCHITECTURES=\"arm64\" -DTHEXTECH_PRELOAD_ENVIRONMENT=\"`pwd`/assets/\" -DTHEXTECH_CUSTOM_ICON_PATH=\"`pwd`/assets/graphics/ui/icon/advdemo.icns\" -DTHEXTECH_ICON_NAME=advdemo.icns -DTHEXTECH_BUNDLE_NAME=\"Adventures of Demo\" -DTHEXTECH_EXECUTABLE_NAME=\"advdemo\"",
-            deps_cmdline: "brew install ninja wget p7zip lftp",
-            generator: "Ninja",
-            build_type: "MinSizeRel",
-            assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-adventure-of-demo-assets-full.7z",
-            package_filename: "thextech-adventures-of-demo-arm-dev.dmg",
-            upload_directory: "www/macosx/"
-          }
-
-        # ======================================= Super Mario Bros. X - a fan-game =======================================
-        # Was made in 2009 by Andrew Spinks "Redigit", and supported up to 2011 by it's original author.
-        - {
-            name: "Super Mario Bros. X - macOS Intel",
-            os: macos-latest,
-            extra_options: "-DTHEXTECH_PRELOAD_ENVIRONMENT=\"`pwd`/assets/\" -DTHEXTECH_CUSTOM_ICON_PATH=\"`pwd`/assets/graphics/ui/icon/smbx.icns\" -DTHEXTECH_ICON_NAME=smbx.icns -DTHEXTECH_BUNDLE_NAME=\"Super Mario Bros. X\" -DTHEXTECH_EXECUTABLE_NAME=\"thextech\"",
-            deps_cmdline: "brew install ninja wget p7zip lftp",
-            generator: "Ninja",
-            build_type: "MinSizeRel",
-            assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-smbx13-assets-full.7z",
-            package_filename: "thextech-super-mario-bros-x-intel-dev.dmg",
-            upload_directory: "www/macosx/"
-          }
-        - {
-            name: "Super Mario Bros. X - macOS ARM",
-            os: macos-latest,
-            extra_options: "-DCMAKE_OSX_ARCHITECTURES=\"arm64\" -DTHEXTECH_PRELOAD_ENVIRONMENT=\"`pwd`/assets/\" -DTHEXTECH_CUSTOM_ICON_PATH=\"`pwd`/assets/graphics/ui/icon/smbx.icns\" -DTHEXTECH_ICON_NAME=smbx.icns -DTHEXTECH_BUNDLE_NAME=\"Super Mario Bros. X\" -DTHEXTECH_EXECUTABLE_NAME=\"thextech\"",
-            deps_cmdline: "brew install ninja wget p7zip lftp",
-            generator: "Ninja",
-            build_type: "MinSizeRel",
-            assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-smbx13-assets-full.7z",
-            package_filename: "thextech-super-mario-bros-x-arm-dev.dmg",
-            upload_directory: "www/macosx/"
-          }
-
 
     steps:
     - uses: actions/checkout@v1
@@ -81,55 +42,114 @@ jobs:
         git submodule init
         git submodule update
 
-    - name: Download assets
+    - name: Download SMBX assets
       uses: carlosperate/download-file-action@v1.0.3
       with:
-        file-url: "${{ matrix.config.assets_url }}"
-        file-name: assets.7z
+        file-url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-smbx13-assets-full.7z"
+        file-name: smbx13.7z
 
-    - name: Unpack assets
+    - name: Download AoD assets
+      uses: carlosperate/download-file-action@v1.0.3
+      with:
+        file-url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-adventure-of-demo-assets-full.7z"
+        file-name: aod.7z
+
+    - name: Unpack all assets
       shell: bash
       run: |
-        mkdir -p assets
-        cd assets
-        7z x ../assets.7z
+        mkdir -p smbx13
+        cd smbx13
+        7z x ../smbx13.7z
         cd ..
-        rm assets.7z
+        rm smbx13.7z
+        mkdir -p aod
+        cd aod
+        7z x ../aod.7z
+        cd ..
+        rm aod.7z
 
-    - name: Configure
+    - name: Configure (x86_64)
       shell: bash
       run: |
         if [[ ! -z "${{ matrix.config.extra_path }}" ]]; then
           export PATH=${{ matrix.config.extra_path }}:${PATH}
           echo "PATH environment: ${PATH}"
         fi
-        cmake -B build -G "${{ matrix.config.generator }}" -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} ${{ matrix.config.extra_options }} .
+        cmake -B build-x64 -G "${{ matrix.config.generator }}" -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} ${{ matrix.config.extra_options }} .
 
-    - name: Build
+    - name: Build (x86_64)
       shell: bash
       run: |
         if [[ ! -z "${{ matrix.config.extra_path }}" ]]; then
           export PATH=${{ matrix.config.extra_path }}:${PATH}
         fi
         export MAKEFLAGS=--keep-going
-        cmake --build build --config ${{ matrix.config.build_type }} --parallel 3
+        cmake --build build-x64 --config ${{ matrix.config.build_type }} --parallel 3
+
+    - name: Configure (arm64)
+      shell: bash
+      run: |
+        if [[ ! -z "${{ matrix.config.extra_path }}" ]]; then
+          export PATH=${{ matrix.config.extra_path }}:${PATH}
+          echo "PATH environment: ${PATH}"
+        fi
+        cmake -B build-arm -G "${{ matrix.config.generator }}" -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} ${{ matrix.config.extra_options }} .
+
+    - name: Build (arm64)
+      shell: bash
+      run: |
+        if [[ ! -z "${{ matrix.config.extra_path }}" ]]; then
+          export PATH=${{ matrix.config.extra_path }}:${PATH}
+        fi
+        export MAKEFLAGS=--keep-going
+        cmake --build build-arm --config ${{ matrix.config.build_type }} --parallel 3
+
+    - name: Merging executible
+      shell: bash
+      run: |
+        if [[ ! -z "${{ matrix.config.extra_path }}" ]]; then
+          export PATH=${{ matrix.config.extra_path }}:${PATH}
+        fi
+        cp -R build-arm/output/bin/TheXTech.app TheXTech.app
+        rm TheXTech.app/Contents/MacOS/TheXTech
+        lipo -create -output TheXTech.app/Contents/MacOS/TheXTech build-x64/output/bin/TheXTech.app/Contents/MacOS/TheXTech build-arm/output/bin/TheXTech.app/Contents/MacOS/TheXTech
+        mkdir TheXTech.app/Contents/Resources/assets
 
     - name: Create Package
       if: always()
       shell: bash
       run: |
-        cd build
-        mkdir package
-        cpack
-        mv *.dmg package/${{ matrix.config.package_filename }}
-        cd ..
+        bash .github/ci-helper/pack-game-macos.sh \
+            aod \
+            "assets/graphics/ui/icon/advdemo.icns" \
+            "Adventures of Demo" \
+            "thextech-adventures-of-demo-macos-universal.dmg"
 
-    - name: Upload artifact
+        bash .github/ci-helper/pack-game-macos.sh \
+            smbx \
+            "assets/graphics/ui/icon/smbx.icns" \
+            "Super Mario Bros. X" \
+            "thextech-super-mario-bros-x-macos-uni-dev.dmg"
+
+        bash .github/ci-helper/pack-game-macos.sh \
+            none \
+            "thextech.icns" \
+            "TheXTech.app" \
+            "thextech-macos-uni-dev.zip"
+
+    - name: Upload DMG artifact
       if: always()
       uses: actions/upload-artifact@v2
       with:
-        path: build/package/${{ matrix.config.package_filename }}
-        name: ${{ matrix.config.name }} ${{ matrix.config.build_type }}
+        path: *.dmg
+        name: ${{ matrix.config.name }} ${{ matrix.config.build_type }} DMG
+
+    - name: Upload ZIP artifact
+      if: always()
+      uses: actions/upload-artifact@v2
+      with:
+        path: *.zip
+        name: ${{ matrix.config.name }} ${{ matrix.config.build_type }} ZIP
 
     - name: Deploy to builds.wohlsoft.ru
       if: github.event_name != 'pull_request'
@@ -139,7 +159,16 @@ jobs:
           export PATH=${{ matrix.config.extra_path }}:${PATH}
         fi
         UPLOAD_LIST="set ssl:verify-certificate no;"
-        UPLOAD_LIST="${UPLOAD_LIST} put -O ${{ matrix.config.upload_directory }} ./build/package/${{ matrix.config.package_filename }};"
+        if ls *.dmg 1> /dev/null 2>&1; then
+            for q in *.dmg; do
+                UPLOAD_LIST="${UPLOAD_LIST} put -O ${{ matrix.config.upload_directory }} $q;"
+            done
+        fi
+        if ls *.zip 1> /dev/null 2>&1; then
+            for q in *.zip; do
+                UPLOAD_LIST="${UPLOAD_LIST} put -O ${{ matrix.config.upload_directory }} $q;"
+            done
+        fi
         lftp -e "${UPLOAD_LIST} exit" -u ${{ secrets.builds_login }},${{ secrets.builds_password }} ${{ secrets.builds_host }}
 
     - name: List Build Directory
