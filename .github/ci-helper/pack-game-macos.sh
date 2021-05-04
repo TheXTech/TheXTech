@@ -8,6 +8,7 @@ BUNDLE_NAME=$3
 ARCHIVE_NAME=$4
 
 if [[ "${ASSETS_NAME}" != "none" ]]; then
+    echo "Preparing the application..."
     cp -R TheXTech.app "tmpapp"
     cp -R $ASSETS_NAME/* "tmpapp/Contents/Resources/assets/"
     find tmpapp -name ".DS_Store" -delete
@@ -24,20 +25,25 @@ cp README.md "dmg-root/ReadMe.txt"
 cp README.RUS.md "dmg-root/ReadMe.RUS.txt"
 cp README.ESP.md "dmg-root/ReadMe.ESP.txt"
 
-cp -R "$BUNDLE_NAME.app" dmg-root
+echo "== mv \"$BUNDLE_NAME.app\" dmg-root/"
+mv "$BUNDLE_NAME.app" dmg-root/
 
 if [[ "${ASSETS_NAME}" == "none" ]]; then
+    echo "Creating ZIP..."
     cd dmg-root
-    zip -9 ../${ARCHIVE_NAME} *
+    zip -9 -r ../${ARCHIVE_NAME} *
     cd ..
 else
+    echo "Creating DMG..."
     ./.github/ci-helper/create-dmg.sh \
         --volname "$BUNDLE_NAME" \
         --window-size 800 600 \
         --app-drop-link 450 320 \
-        --subfolder \
+        --no-internet-enable \
         "$ARCHIVE_NAME" \
         "dmg-root/"
 fi
 
+echo "Cleaning up..."
 rm -Rf dmg-root
+printf "\n----------------------------------------------------------------\n\n"
