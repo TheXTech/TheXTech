@@ -32,11 +32,11 @@ if [[ "${ASSETS_NAME}" == "none" ]]; then
     cd ..
 else
     ./.github/ci-helper/create-dmg.sh \
-        --volname "$BUNDLE_NAME"
-        --window-size 800 600
-        --app-drop-link 450 320
-        --subfolder
-        "$ARCHIVE_NAME"
+        --volname "$BUNDLE_NAME" \
+        --window-size 800 600 \
+        --app-drop-link 450 320 \
+        --subfolder \
+        "$ARCHIVE_NAME" \
         "dmg-root/"
 fi
 

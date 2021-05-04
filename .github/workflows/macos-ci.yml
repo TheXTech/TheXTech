@@ -134,7 +134,7 @@ jobs:
         bash .github/ci-helper/pack-game-macos.sh \
             none \
             "thextech.icns" \
-            "TheXTech.app" \
+            "TheXTech" \
             "thextech-macos-uni-dev.zip"
 
     - name: Upload DMG artifact
