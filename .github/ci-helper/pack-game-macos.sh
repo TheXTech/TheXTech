@@ -9,8 +9,7 @@ ARCHIVE_NAME=$4
 
 if [[ "${ASSETS_NAME}" != "none" ]]; then
     cp -R TheXTech.app "tmpapp"
-        cp -R $ASSETS_NAME/* "tmpapp/Contents/Resources/assets/"
-    fi
+    cp -R $ASSETS_NAME/* "tmpapp/Contents/Resources/assets/"
     find tmpapp -name ".DS_Store" -delete
     plutil -replace CFBundleName -string "$BUNDLE_NAME" "tmpapp/Contents/Info.plist"
     plutil -replace CFBundleIconFile -string "$ICON_FILE" "tmpapp/Contents/Info.plist"
