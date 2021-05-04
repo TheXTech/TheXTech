@@ -126,7 +126,7 @@ jobs:
             "thextech-adventures-of-demo-macos-universal.dmg"
 
         bash .github/ci-helper/pack-game-macos.sh \
-            smbx \
+            smbx13 \
             "assets/graphics/ui/icon/smbx.icns" \
             "Super Mario Bros. X" \
             "thextech-super-mario-bros-x-macos-uni-dev.dmg"
