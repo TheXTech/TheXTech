@@ -108,6 +108,7 @@ jobs:
         cp ../LICENSE "package/${{ matrix.config.subdir_name }}/License.TheXTech.txt"
         cp ../README.md "package/${{ matrix.config.subdir_name }}/"
         cp ../README.RUS.md "package/${{ matrix.config.subdir_name }}/"
+        cp ../README.ESP.md "package/${{ matrix.config.subdir_name }}/"
         cp output/bin/${{ matrix.config.executable_name }}* "package/${{ matrix.config.subdir_name }}/"
         cd package
         tar -cvzf "${{ matrix.config.package_filename }}" "${{ matrix.config.subdir_name }}"
