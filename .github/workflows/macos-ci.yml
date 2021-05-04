@@ -115,6 +115,12 @@ jobs:
         lipo -create -output TheXTech.app/Contents/MacOS/TheXTech build-x64/output/bin/TheXTech.app/Contents/MacOS/TheXTech build-arm/output/bin/TheXTech.app/Contents/MacOS/TheXTech
         mkdir TheXTech.app/Contents/Resources/assets
 
+    - name: Executable info
+      shell: bash
+      run: |
+        file TheXTech.app/Contents/MacOS/TheXTech
+        ldd TheXTech.app/Contents/MacOS/TheXTech
+
     - name: Create Package
       if: always()
       shell: bash
