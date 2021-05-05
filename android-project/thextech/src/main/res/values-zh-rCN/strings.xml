@@ -8,7 +8,7 @@
     <string name="setup_sr_stopwatchSemiTransparent">半透明计时器</string>
     <string name="setup_sr_speedrunMode">计时模式</string>
     <string name="setup_touchscreen_mode">按键模式</string>
-    <string name="setup_max_framerate_mode">最大帧率</string>
+    <string name="setup_max_framerate_mode">禁用锁帧</string>
     <string name="setup_show_framerate">显示帧数</string>
     <string name="setup_touchscreen_alwaysshow">启动时显示虚拟按键</string>
     <string name="setup_touchscreen_controller_enable">使用虚拟按键</string>
