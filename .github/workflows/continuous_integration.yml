@@ -97,7 +97,7 @@ jobs:
             build_type: "MinSizeRel",
             extra_path: "/c/WohlLFTP/bin",
             executable_name_suffix: "-arm64",
-            package_filename_suffix: "arm32-dev",
+            package_filename_suffix: "arm64-dev",
             upload_directory: "www/win-arm/",
             lftp_download: "https://wohlsoft.ru/docs/Software/lftp-4.4.15.win64-openssl-1.0.1g.7z", lftp_install_dir: "C:/WohlLFTP/"
           }
