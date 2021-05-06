@@ -1,0 +1,18 @@
+<resources>
+    <string-array name="touchscreenControllerTypes">
+        <item>Activar siempre</item>
+        <item>Desactivar si se ha conectado un teclado fisico</item>
+        <item>Desactivar siempre</item>
+    </string-array>
+    <string-array name="speedRunModes">
+        <item>Off</item>
+        <item>Modo 1 (Motor X-Tech nativo)</item>
+        <item>Modo 2 (Desactivar funciones que dan ventaja)</item>
+        <item>Mode 3 (Simular SMBX 1.3 original, bugs incluidos)</item>
+    </string-array>
+    <string-array name="touchPadStyles">
+        <item>Acciones del juego</item>
+        <item>Estilo Nintendo/Xbox (A/B/X/Y)</item>
+        <item>Estilo PlayStation (X/O/D/A)</item>
+    </string-array>
+</resources>
