@@ -90,6 +90,8 @@ struct MainMenuContent
     std::string mainOptions;
     std::string mainExit;
 
+    std::string loading;
+
     RangeArr<std::string, 1, numCharacters> selectPlayer;
 
 };

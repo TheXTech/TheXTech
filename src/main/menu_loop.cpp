@@ -25,7 +25,6 @@
 
 #include <SDL2/SDL_timer.h>
 
-#include <DirManager/dirman.h>
 #include <AppPath/app_path.h>
 #include <Utils/files.h>
 #include <PGE_File_Formats/file_formats.h>
@@ -530,101 +529,6 @@ void MenuLoop()
         MenuMouseRelease = true;
 
     MenuMouseBack = false;
-}
-
-void FindWorlds()
-{
-    NumSelectWorld = 0;
-
-    std::vector<std::string> worldRoots;
-    worldRoots.push_back(AppPath + "worlds/");
-#if (defined(__APPLE__) && defined(USE_BUNDLED_ASSETS)) || defined(FIXED_ASSETS_PATH)
-    worldRoots.push_back(AppPathManager::userWorldsRootDir() + "/");
-#endif
-
-    SelectWorld.clear();
-    SelectWorld.push_back(SelectWorld_t()); // Dummy entry
-
-    for(const auto &worldsRoot : worldRoots)
-    {
-        DirMan episodes(worldsRoot);
-
-        std::vector<std::string> dirs;
-        std::vector<std::string> files;
-        episodes.getListOfFolders(dirs);
-        WorldData head;
-
-        for(auto &dir : dirs)
-        {
-            std::string epDir = worldsRoot + dir + "/";
-            DirMan episode(epDir);
-            episode.getListOfFiles(files, {".wld", ".wldx"});
-
-            for(std::string &fName : files)
-            {
-                std::string wPath = epDir + fName;
-                if(FileFormats::OpenWorldFileHeader(wPath, head))
-                {
-                    SelectWorld_t w;
-                    w.WorldName = head.EpisodeTitle;
-                    head.charactersToS64();
-                    w.WorldPath = epDir;
-                    w.WorldFile = fName;
-                    if(w.WorldName.empty())
-                        w.WorldName = fName;
-                    w.blockChar[1] = head.nocharacter1;
-                    w.blockChar[2] = head.nocharacter2;
-                    w.blockChar[3] = head.nocharacter3;
-                    w.blockChar[4] = head.nocharacter4;
-                    w.blockChar[5] = head.nocharacter5;
-
-                    SelectWorld.push_back(w);
-                }
-            }
-        }
-    }
-
-    NumSelectWorld = (SelectWorld.size() - 1);
-}
-
-void FindLevels()
-{
-    std::vector<std::string> battleRoots;
-    battleRoots.push_back(AppPath + "battle/");
-#if (defined(__APPLE__) && defined(USE_BUNDLED_ASSETS)) || defined(FIXED_ASSETS_PATH)
-    battleRoots.push_back(AppPathManager::userBattleRootDir() + "/");
-#endif
-
-    SelectWorld.clear();
-    SelectWorld.push_back(SelectWorld_t()); // Dummy entry
-
-    NumSelectWorld = 1;
-    SelectWorld.push_back(SelectWorld_t()); // "random level" entry
-    SelectWorld[1].WorldName = "Random Level";
-    LevelData head;
-
-    for(const auto &battleRoot : battleRoots)
-    {
-        std::vector<std::string> files;
-        DirMan battleLvls(battleRoot);
-        battleLvls.getListOfFiles(files, {".lvl", ".lvlx"});
-        for(std::string &fName : files)
-        {
-            std::string wPath = battleRoot + fName;
-            if(FileFormats::OpenLevelFileHeader(wPath, head))
-            {
-                SelectWorld_t w;
-                w.WorldPath = battleRoot;
-                w.WorldFile = fName;
-                w.WorldName = head.LevelName;
-                if(w.WorldName.empty())
-                    w.WorldName = fName;
-                SelectWorld.push_back(w);
-            }
-        }
-    }
-
-    NumSelectWorld = (SelectWorld.size() - 1);
 }
 
 void FindSaves()

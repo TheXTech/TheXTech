@@ -24,7 +24,14 @@
  */
 
 #include <SDL2/SDL_timer.h>
+#include <SDL2/SDL_thread.h>
 #include <fmt_format_ne.h>
+#include <atomic>
+
+#include <AppPath/app_path.h>
+#include <DirManager/dirman.h>
+#include <Utils/files.h>
+#include <PGE_File_Formats/file_formats.h>
 
 #include "menu_main.h"
 #include "game_info.h"
@@ -42,13 +49,26 @@
 
 MainMenuContent g_mainMenu;
 
+static SDL_atomic_t         loading;
+static SDL_atomic_t         loadingProgrss;
+static SDL_atomic_t         loadingProgrssMax;
+
+static SDL_Thread*          loadingThread = nullptr;
+
+
 void initMainMenu()
 {
+    SDL_AtomicSet(&loading, 0);
+    SDL_AtomicSet(&loadingProgrss, 0);
+    SDL_AtomicSet(&loadingProgrssMax, 0);
+
     g_mainMenu.main1PlayerGame = "1 Player Game";
     g_mainMenu.main2PlayerGame = "2 Player Game";
     g_mainMenu.mainBattleGame = "Battle Game";
     g_mainMenu.mainOptions = "Options";
     g_mainMenu.mainExit = "Exit";
+
+    g_mainMenu.loading = "Loading...";
 
     for(int i = 1; i <= numCharacters; ++i)
         g_mainMenu.selectPlayer[i] = fmt::format_ne("{0} game", g_gameInfo.characterName[i]);
@@ -61,6 +81,141 @@ static int menuBattleMode = false;
 
 static int menuCopySaveSrc = 0;
 static int menuCopySaveDst = 0;
+
+static int FindWorldsThread(void *)
+{
+    FindWorlds();
+    return 0;
+}
+
+void FindWorlds()
+{
+    NumSelectWorld = 0;
+
+    std::vector<std::string> worldRoots;
+    worldRoots.push_back(AppPath + "worlds/");
+#if (defined(__APPLE__) && defined(USE_BUNDLED_ASSETS)) || defined(FIXED_ASSETS_PATH)
+    worldRoots.push_back(AppPathManager::userWorldsRootDir() + "/");
+#endif
+
+    SelectWorld.clear();
+    SelectWorld.push_back(SelectWorld_t()); // Dummy entry
+
+    SDL_AtomicSet(&loadingProgrss, 0);
+    SDL_AtomicSet(&loadingProgrssMax, 0);
+
+    for(const auto &worldsRoot : worldRoots)
+    {
+        std::vector<std::string> dirs;
+        DirMan episodes(worldsRoot);
+        episodes.getListOfFolders(dirs);
+        SDL_AtomicAdd(&loadingProgrssMax, dirs.size());
+    }
+
+    for(const auto &worldsRoot : worldRoots)
+    {
+        DirMan episodes(worldsRoot);
+
+        std::vector<std::string> dirs;
+        std::vector<std::string> files;
+        episodes.getListOfFolders(dirs);
+        WorldData head;
+
+        for(auto &dir : dirs)
+        {
+            std::string epDir = worldsRoot + dir + "/";
+            DirMan episode(epDir);
+            episode.getListOfFiles(files, {".wld", ".wldx"});
+
+            for(std::string &fName : files)
+            {
+                std::string wPath = epDir + fName;
+                if(FileFormats::OpenWorldFileHeader(wPath, head))
+                {
+                    SelectWorld_t w;
+                    w.WorldName = head.EpisodeTitle;
+                    head.charactersToS64();
+                    w.WorldPath = epDir;
+                    w.WorldFile = fName;
+                    if(w.WorldName.empty())
+                        w.WorldName = fName;
+                    w.blockChar[1] = head.nocharacter1;
+                    w.blockChar[2] = head.nocharacter2;
+                    w.blockChar[3] = head.nocharacter3;
+                    w.blockChar[4] = head.nocharacter4;
+                    w.blockChar[5] = head.nocharacter5;
+
+                    SelectWorld.push_back(w);
+                }
+            }
+
+            SDL_AtomicAdd(&loadingProgrss, 1);
+        }
+    }
+
+    NumSelectWorld = (SelectWorld.size() - 1);
+
+    SDL_AtomicSet(&loading, 0);
+}
+
+static int FindLevelsThread(void *)
+{
+    FindLevels();
+    return 0;
+}
+
+void FindLevels()
+{
+    std::vector<std::string> battleRoots;
+    battleRoots.push_back(AppPath + "battle/");
+#if (defined(__APPLE__) && defined(USE_BUNDLED_ASSETS)) || defined(FIXED_ASSETS_PATH)
+    battleRoots.push_back(AppPathManager::userBattleRootDir() + "/");
+#endif
+
+    SelectWorld.clear();
+    SelectWorld.push_back(SelectWorld_t()); // Dummy entry
+
+    NumSelectWorld = 1;
+    SelectWorld.push_back(SelectWorld_t()); // "random level" entry
+    SelectWorld[1].WorldName = "Random Level";
+    LevelData head;
+
+    SDL_AtomicSet(&loadingProgrss, 0);
+    SDL_AtomicSet(&loadingProgrssMax, 0);
+
+    for(const auto &battleRoot : battleRoots)
+    {
+        std::vector<std::string> files;
+        DirMan battleLvls(battleRoot);
+        battleLvls.getListOfFiles(files, {".lvl", ".lvlx"});
+        SDL_AtomicAdd(&loadingProgrssMax, files.size());
+    }
+
+    for(const auto &battleRoot : battleRoots)
+    {
+        std::vector<std::string> files;
+        DirMan battleLvls(battleRoot);
+        battleLvls.getListOfFiles(files, {".lvl", ".lvlx"});
+        for(std::string &fName : files)
+        {
+            std::string wPath = battleRoot + fName;
+            if(FileFormats::OpenLevelFileHeader(wPath, head))
+            {
+                SelectWorld_t w;
+                w.WorldPath = battleRoot;
+                w.WorldFile = fName;
+                w.WorldName = head.LevelName;
+                if(w.WorldName.empty())
+                    w.WorldName = fName;
+                SelectWorld.push_back(w);
+            }
+            SDL_AtomicAdd(&loadingProgrss, 1);
+        }
+    }
+
+    NumSelectWorld = (SelectWorld.size() - 1);
+    SDL_AtomicSet(&loading, 0);
+}
 
 
 static void s_handleMouseMove(int items, int x, int y, int maxWidth, int itemHeight)
@@ -176,8 +331,13 @@ bool mainMenuUpdate()
 
         } // No keyboard/Joystick grabbing active
 
+        if(SDL_AtomicGet(&loading))
+        {
+            if((menuDoPress && MenuCursorCanMove) || MenuMouseClick)
+                PlaySoundMenu(SFX_BlockHit);
+        }
         // Main Menu
-        if(MenuMode == MENU_MAIN)
+        else if(MenuMode == MENU_MAIN)
         {
             if(MenuMouseMove)
             {
@@ -231,7 +391,12 @@ bool mainMenuUpdate()
                     MenuMode = MENU_1PLAYER_GAME;
                     menuPlayersNum = 1;
                     menuBattleMode = false;
+#ifdef __EMSCRIPTEN__
                     FindWorlds();
+#else
+                    SDL_AtomicSet(&loading, 1);
+                    loadingThread = SDL_CreateThread(FindWorldsThread, "FindWorlds", NULL);
+#endif
                     MenuCursor = 0;
                 }
                 else if(MenuCursor == 1)
@@ -240,7 +405,12 @@ bool mainMenuUpdate()
                     MenuMode = MENU_2PLAYER_GAME;
                     menuPlayersNum = 2;
                     menuBattleMode = false;
+#ifdef __EMSCRIPTEN__
                     FindWorlds();
+#else
+                    SDL_AtomicSet(&loading, 1);
+                    loadingThread = SDL_CreateThread(FindWorldsThread, "FindWorlds", NULL);
+#endif
                     MenuCursor = 0;
                 }
                 else if(MenuCursor == 2)
@@ -249,7 +419,12 @@ bool mainMenuUpdate()
                     MenuMode = MENU_BATTLE_MODE;
                     menuPlayersNum = 2;
                     menuBattleMode = true;
+#ifdef __EMSCRIPTEN__
                     FindLevels();
+#else
+                    SDL_AtomicSet(&loading, 1);
+                    loadingThread = SDL_CreateThread(FindLevelsThread, "FindLevels", NULL);
+#endif
                     MenuCursor = 0;
                 }
                 else if(MenuCursor == 3)
@@ -1290,8 +1465,19 @@ void mainMenuDraw()
     frmMain.renderTexture(ScreenW / 2 - GFX.MenuGFX[3].w / 2, 576,
             GFX.MenuGFX[3].w, GFX.MenuGFX[3].h, GFX.MenuGFX[3], 0, 0);
 
+    if(SDL_AtomicGet(&loading))
+    {
+        if(SDL_AtomicGet(&loadingProgrssMax) <= 0)
+            SuperPrint(g_mainMenu.loading, 3, 300, 350);
+        else
+        {
+            int progress = (SDL_AtomicGet(&loadingProgrss) * 100) / SDL_AtomicGet(&loadingProgrssMax);
+            SuperPrint(fmt::format_ne("{0} {1}%", g_mainMenu.loading, progress), 3, 300, 350);
+        }
+    }
+
     // Main menu
-    if(MenuMode == MENU_MAIN)
+    else if(MenuMode == MENU_MAIN)
     {
         SuperPrint(g_mainMenu.main1PlayerGame, 3, 300, 350);
         SuperPrint(g_mainMenu.main2PlayerGame, 3, 300, 380);
