@@ -335,6 +335,8 @@ bool mainMenuUpdate()
         {
             if((menuDoPress && MenuCursorCanMove) || MenuMouseClick)
                 PlaySoundMenu(SFX_BlockHit);
+            if(MenuCursor != 0)
+                MenuCursor = 0;
         }
         // Main Menu
         else if(MenuMode == MENU_MAIN)
