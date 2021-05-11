@@ -34,8 +34,8 @@ extern void treeWorldTileUpdate(Tile_t *obj);
 extern void treeWorldTileRemove(Tile_t *obj);
 extern void treeWorldTileQuery(double Left, double Top, double Right, double Bottom,
                                TilePtrArr &list,
-                               bool z_sort);
-extern void treeWorldTileQuery(const Location_t &loc, TilePtrArr &list, bool z_sort);
+                               bool z_sort, double margin = 0.0);
+extern void treeWorldTileQuery(const Location_t &loc, TilePtrArr &list, bool z_sort, double margin = 0.0);
 
 
 typedef std::vector<Scene_t*> ScenePtrArr;
@@ -44,8 +44,8 @@ extern void treeWorldSceneUpdate(Scene_t *obj);
 extern void treeWorldSceneRemove(Scene_t *obj);
 extern void treeWorldSceneQuery(double Left, double Top, double Right, double Bottom,
                                ScenePtrArr &list,
-                               bool z_sort);
-extern void treeWorldSceneQuery(const Location_t &loc, ScenePtrArr &list, bool z_sort);
+                               bool z_sort, double margin = 16.0);
+extern void treeWorldSceneQuery(const Location_t &loc, ScenePtrArr &list, bool z_sort, double margin = 16.0);
 
 
 typedef std::vector<WorldPath_t*> WorldPathPtrArr;
@@ -54,8 +54,8 @@ extern void treeWorldPathUpdate(WorldPath_t *obj);
 extern void treeWorldPathRemove(WorldPath_t *obj);
 extern void treeWorldPathQuery(double Left, double Top, double Right, double Bottom,
                                WorldPathPtrArr &list,
-                               bool z_sort);
-extern void treeWorldPathQuery(const Location_t &loc, WorldPathPtrArr &list, bool z_sort);
+                               bool z_sort, double margin = 16.0);
+extern void treeWorldPathQuery(const Location_t &loc, WorldPathPtrArr &list, bool z_sort, double margin = 16.0);
 
 
 typedef std::vector<WorldLevel_t*> WorldLevelPtrArr;
@@ -64,8 +64,9 @@ extern void treeWorldLevelUpdate(WorldLevel_t *obj);
 extern void treeWorldLevelRemove(WorldLevel_t *obj);
 extern void treeWorldLevelQuery(double Left, double Top, double Right, double Bottom,
                                WorldLevelPtrArr &list,
-                               bool z_sort);
-extern void treeWorldLevelQuery(const Location_t &loc, WorldLevelPtrArr &list, bool z_sort);
+                               bool z_sort,
+                               double margin = 16.0);
+extern void treeWorldLevelQuery(const Location_t &loc, WorldLevelPtrArr &list, bool z_sort, double margin = 16.0);
 
 typedef std::vector<WorldMusic_t*> WorldMusicPtrArr;
 extern void treeWorldMusicAdd(WorldMusic_t *obj);
@@ -73,8 +74,8 @@ extern void treeWorldMusicUpdate(WorldMusic_t *obj);
 extern void treeWorldMusicRemove(WorldMusic_t *obj);
 extern void treeWorldMusicQuery(double Left, double Top, double Right, double Bottom,
                                WorldMusicPtrArr &list,
-                               bool z_sort);
-extern void treeWorldMusicQuery(const Location_t &loc, WorldMusicPtrArr &list, bool z_sort);
+                               bool z_sort, double margin = 16.0);
+extern void treeWorldMusicQuery(const Location_t &loc, WorldMusicPtrArr &list, bool z_sort, double margin = 16.0);
 
 
 extern void blockTileGet(const Location_t &loc, int64_t &fBlock, int64_t &lBlock);

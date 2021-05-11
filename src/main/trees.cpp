@@ -201,14 +201,24 @@ void treeWorldTileRemove(Tile_t *obj)
     treeRemove(s_worldTilesTree, obj);
 }
 
-void treeWorldTileQuery(double Left, double Top, double Right, double Bottom, TilePtrArr &list, bool z_sort)
+void treeWorldTileQuery(double Left, double Top, double Right, double Bottom, TilePtrArr &list, bool z_sort, double margin)
 {
-    treeWorldQuery(s_worldTilesTree, Left, Top, Right, Bottom, list, z_sort);
+    treeWorldQuery(s_worldTilesTree,
+                   Left - margin,
+                   Top - margin,
+                   Right + margin,
+                   Bottom + margin,
+                   list, z_sort);
 }
 
-void treeWorldTileQuery(const Location_t &loc, TilePtrArr &list, bool z_sort)
+void treeWorldTileQuery(const Location_t &loc, TilePtrArr &list, bool z_sort, double margin)
 {
-    treeWorldQuery(s_worldTilesTree, loc.X, loc.Y, loc.X + loc.Width, loc.Y + loc.Height, list, z_sort);
+    treeWorldQuery(s_worldTilesTree,
+                   loc.X - margin,
+                   loc.Y - margin,
+                   loc.X + loc.Width + margin,
+                   loc.Y + loc.Height + margin,
+                   list, z_sort);
 }
 
 
@@ -229,14 +239,24 @@ void treeWorldSceneRemove(Scene_t *obj)
     treeRemove(s_worldSceneTree, obj);
 }
 
-void treeWorldSceneQuery(double Left, double Top, double Right, double Bottom, ScenePtrArr &list, bool z_sort)
+void treeWorldSceneQuery(double Left, double Top, double Right, double Bottom, ScenePtrArr &list, bool z_sort, double margin)
 {
-    treeWorldQuery(s_worldSceneTree, Left, Top, Right, Bottom, list, z_sort);
+    treeWorldQuery(s_worldSceneTree,
+                   Left - margin,
+                   Top - margin,
+                   Right + margin,
+                   Bottom + margin,
+                   list, z_sort);
 }
 
-void treeWorldSceneQuery(const Location_t &loc, ScenePtrArr &list, bool z_sort)
+void treeWorldSceneQuery(const Location_t &loc, ScenePtrArr &list, bool z_sort, double margin)
 {
-    treeWorldQuery(s_worldSceneTree, loc.X, loc.Y, loc.X + loc.Width, loc.Y + loc.Height, list, z_sort);
+    treeWorldQuery(s_worldSceneTree,
+                   loc.X - margin,
+                   loc.Y - margin,
+                   loc.X + loc.Width + margin,
+                   loc.Y + loc.Height + margin,
+                   list, z_sort);
 }
 
 
@@ -257,14 +277,26 @@ void treeWorldPathRemove(WorldPath_t *obj)
     treeRemove(s_worldPathTree, obj);
 }
 
-void treeWorldPathQuery(double Left, double Top, double Right, double Bottom, WorldPathPtrArr &list, bool z_sort)
+void treeWorldPathQuery(double Left, double Top, double Right, double Bottom,
+                        WorldPathPtrArr &list,
+                        bool z_sort, double margin)
 {
-    treeWorldQuery(s_worldPathTree, Left, Top, Right, Bottom, list, z_sort);
+    treeWorldQuery(s_worldPathTree,
+                   Left - margin,
+                   Top - margin,
+                   Right + margin,
+                   Bottom + margin,
+                   list, z_sort);
 }
 
-void treeWorldPathQuery(const Location_t &loc, WorldPathPtrArr &list, bool z_sort)
+void treeWorldPathQuery(const Location_t &loc, WorldPathPtrArr &list, bool z_sort, double margin)
 {
-    treeWorldQuery(s_worldPathTree, loc.X, loc.Y, loc.X + loc.Width, loc.Y + loc.Height, list, z_sort);
+    treeWorldQuery(s_worldPathTree,
+                   loc.X - margin,
+                   loc.Y - margin,
+                   loc.X + loc.Width + margin,
+                   loc.Y + loc.Height + margin,
+                   list, z_sort);
 }
 
 /* ================= Levels ================= */
@@ -284,14 +316,26 @@ void treeWorldLevelRemove(WorldLevel_t *obj)
     treeRemove(s_worldLevelTree, obj);
 }
 
-void treeWorldLevelQuery(double Left, double Top, double Right, double Bottom, WorldLevelPtrArr &list, bool z_sort)
+void treeWorldLevelQuery(double Left, double Top, double Right, double Bottom,
+                         WorldLevelPtrArr &list,
+                         bool z_sort, double margin)
 {
-    treeWorldQuery(s_worldLevelTree, Left, Top, Right, Bottom, list, z_sort);
+    treeWorldQuery(s_worldLevelTree,
+                   Left - margin,
+                   Top - margin,
+                   Right + margin,
+                   Bottom + margin,
+                   list, z_sort);
 }
 
-void treeWorldLevelQuery(const Location_t &loc, WorldLevelPtrArr &list, bool z_sort)
+void treeWorldLevelQuery(const Location_t &loc, WorldLevelPtrArr &list, bool z_sort, double margin)
 {
-    treeWorldQuery(s_worldLevelTree, loc.X, loc.Y, loc.X + loc.Width, loc.Y + loc.Height, list, z_sort);
+    treeWorldQuery(s_worldLevelTree,
+                   loc.X - margin,
+                   loc.Y - margin,
+                   loc.X + loc.Width + margin,
+                   loc.Y + loc.Height + margin,
+                   list, z_sort);
 }
 
 
@@ -312,14 +356,29 @@ void treeWorldMusicRemove(WorldMusic_t *obj)
     treeRemove(s_worldMusicTree, obj);
 }
 
-void treeWorldMusicQuery(double Left, double Top, double Right, double Bottom, WorldMusicPtrArr &list, bool z_sort)
+void treeWorldMusicQuery(double Left, double Top, double Right, double Bottom,
+                         WorldMusicPtrArr &list,
+                         bool z_sort,
+                         double margin)
 {
-    treeWorldQuery(s_worldMusicTree, Left, Top, Right, Bottom, list, z_sort);
+    treeWorldQuery(s_worldMusicTree,
+                   Left - margin,
+                   Top - margin,
+                   Right + margin,
+                   Bottom + margin,
+                   list, z_sort);
 }
 
-void treeWorldMusicQuery(const Location_t &loc, WorldMusicPtrArr &list, bool z_sort)
+void treeWorldMusicQuery(const Location_t &loc,
+                         WorldMusicPtrArr &list,
+                         bool z_sort,
+                         double margin)
 {
-    treeWorldQuery(s_worldMusicTree, loc.X, loc.Y, loc.X + loc.Width, loc.Y + loc.Height, list, z_sort);
+    treeWorldQuery(s_worldMusicTree,
+                   loc.X - margin,
+                   loc.Y - margin,
+                   loc.X + loc.Width + margin,
+                   loc.Y + loc.Height + margin, list, z_sort);
 }
 
 
