@@ -56,6 +56,7 @@
 #include "main/level_file.h"
 #include "main/speedrunner.h"
 #include "main/menu_main.h"
+#include "main/game_info.h"
 
 #include "pseudo_vb.h"
 
@@ -408,7 +409,9 @@ int GameMain(const CmdLineSetup_t &setup)
                 Player[A] = blankPlayer;
             }
 
-            numPlayers = 6;
+            numPlayers = g_gameInfo.introMaxPlayersCount;
+            if(!g_gameInfo.introEnableActivity || g_gameInfo.introMaxPlayersCount < 1)
+                numPlayers = 1;// one deadman should be
 
             auto introPath = AppPath + "intro.lvlx";
             if(!Files::fileExists(introPath))

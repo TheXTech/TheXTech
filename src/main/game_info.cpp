@@ -67,6 +67,9 @@ void initGameInfo()
 #   endif
 #endif
 
+    g_gameInfo.introEnableActivity = true;
+    g_gameInfo.introMaxPlayersCount = 6;
+
     std::string gameInfoPath = AppPathManager::assetsRoot() + "gameinfo.ini";
     if(Files::fileExists(gameInfoPath))
     {
@@ -89,6 +92,13 @@ void initGameInfo()
                             g_gameInfo.characterName[i],
                             g_gameInfo.characterName[i]);
             }
+        }
+        config.endGroup();
+
+        config.beginGroup("intro");
+        {
+            config.read("enable-activity", g_gameInfo.introEnableActivity, true);
+            config.read("max-players-count", g_gameInfo.introMaxPlayersCount, 6);
         }
         config.endGroup();
 

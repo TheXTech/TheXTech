@@ -44,19 +44,15 @@
 #include "../collision.h"
 #include "level_file.h"
 #include "menu_main.h"
+#include "game_info.h"
 #include "speedrunner.h"
 
 #include "../pseudo_vb.h"
 
-void MenuLoop()
+static void updateIntroLevelActivity()
 {
     Location_t tempLocation;
     bool tempBool;
-
-    UpdateControls();
-
-    if(mainMenuUpdate())
-        return;
 
     SingleCoop = 0;
 
@@ -218,7 +214,7 @@ void MenuLoop()
         if(p.Location.X > -vScreenX[1] + 600 && -vScreenX[1] + 850 < level[0].Width)
             p.Controls.Run = false;
 
-        if(-vScreenX[1] <= level[0].X && (p.Dead || p.TimeToLive > 0))
+        if(-vScreenX[1] <= level[0].X && (p.Dead || p.TimeToLive > 0) && g_gameInfo.introMaxPlayersCount > 0)
         {
             p.ForceHold = 65;
             p.State = (iRand() % 6) + 2;
@@ -475,6 +471,28 @@ void MenuLoop()
     UpdateGraphics();
     UpdateSound();
     UpdateEvents();
+}
+
+void MenuLoop()
+{
+    UpdateControls();
+
+    if(mainMenuUpdate())
+        return;
+
+    if(g_gameInfo.introEnableActivity)
+        updateIntroLevelActivity();
+    else
+    {
+        UpdateLayers();
+        UpdateNPCs();
+        UpdateBlocks();
+        UpdateEffects();
+        //UpdatePlayer();
+        UpdateGraphics();
+        UpdateSound();
+        UpdateEvents();
+    }
 
     if(MenuMouseDown)
     {
