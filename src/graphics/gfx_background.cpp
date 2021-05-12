@@ -39,6 +39,10 @@ void DrawBackground(int S, int Z)
         LevelREAL[S] = level[S];
     level[S] = LevelREAL[S];
 
+    if(Background2[S] == 0)
+    {
+        frmMain.renderRect(0, 0, vScreen[Z].Width, vScreen[Z].Height, 0.f, 0.f, 0.f, 1.f, true);
+    }
     A = 1; // Blocks
     if(Background2[S] == 1)
     {
@@ -63,7 +67,8 @@ void DrawBackground(int S, int Z)
         for(B = 0; B <= tempVar2; B++)
         {
             tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.75);
-            tempLocation.Y = level[S].Height - GFXBackground2Height[A] - ScreenH + 100;
+            // the lower graphics is 500px tall, so we really need exactly this offset
+            tempLocation.Y = level[S].Height - GFXBackground2Height[A] - 600 + 100;
             tempLocation.Height = GFXBackground2Height[A];
             tempLocation.Width = GFXBackground2Width[A];
             if(vScreenCollision(Z, tempLocation))
@@ -73,7 +78,7 @@ void DrawBackground(int S, int Z)
         }
     }
 
-    if(Background2[S] == 13)
+    if(Background2[S] == 13) // clouds
     {
 
         int tempVar3 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.75))) + 1;
@@ -83,13 +88,28 @@ void DrawBackground(int S, int Z)
             if(level[S].Height - level[S].Y > GFXBackground2Height[A])
             {
                 // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
-                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
+                if (GFXBackground2Height[A] - ScreenH > 0)
+                    tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
+                else
+                    tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - 600) * (GFXBackground2Height[A] - 600) + vScreen[Z].Top;
                 tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
             }
             else
                 tempLocation.Y = level[S].Height - GFXBackground2Height[A];
             tempLocation.Height = GFXBackground2Height[A];
             tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            }
+            // at 720p, sometimes gets pegged to the top or bottom of the screen
+            // so repeat.
+            tempLocation.Y -= GFXBackground2Height[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            }
+            tempLocation.Y += GFXBackground2Height[A] * 2;
             if(vScreenCollision(Z, tempLocation))
             {
                 frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
@@ -144,7 +164,7 @@ void DrawBackground(int S, int Z)
     if(Background2[S] == 4)
     {
 
-        int tempVar6 = static_cast<int>(floor(static_cast<double>((level[S].Height - level[S].Y) / GFXBackground2Height[A] * 0.5))) + 1;
+        int tempVar6 = static_cast<int>(floor(static_cast<double>((level[S].Height - level[S].Y) / GFXBackground2Height[A] * 0.5))) + 2;
         for(B = 0; B <= tempVar6; B++)
         {
             tempLocation.Y = level[S].Y + ((B * GFXBackground2Height[A] - B) - (vScreenY[Z] + vScreen[Z].Top + level[S].Y) * 0.5) - 32;
@@ -157,6 +177,12 @@ void DrawBackground(int S, int Z)
                 tempLocation.X = level[S].Width - GFXBackground2Width[A];
             tempLocation.Height = GFXBackground2Height[A];
             tempLocation.Width = GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            }
+            // some issues can arise at 720p
+            tempLocation.X += GFXBackground2Width[A];
             if(vScreenCollision(Z, tempLocation))
             {
                 frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
@@ -193,7 +219,7 @@ void DrawBackground(int S, int Z)
     if(Background2[S] == 6)
     {
 
-        int tempVar8 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
+        int tempVar8 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 2;
         for(B = 0; B <= tempVar8; B++)
         {
             tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
@@ -428,17 +454,31 @@ void DrawBackground(int S, int Z)
     A = 17; // smb3 ship
     if(Background2[S] == 17)
     {
-
         int tempVar18 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
+
+        // in tall levels, must repeat the texture.
+        // the upper part of the texture is 254px in the original assets
+        int verticalReps = static_cast<int>(floor(static_cast<double>((level[S].Height - level[S].Y - 254 + 32) / (GFXBackground2Height[A] - 254)))) + 1;
         for(B = 0; B <= tempVar18; B++)
         {
             tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
             tempLocation.Y = level[S].Y - 32;
-            tempLocation.Height = GFXBackground2Height[A];
+            tempLocation.Height = 254;
             tempLocation.Width = GFXBackground2Width[A];
             if(vScreenCollision(Z, tempLocation))
             {
-                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], 254, GFXBackground2[A], 0, 0);
+            }
+
+            tempLocation.Y += 254;
+            tempLocation.Height = GFXBackground2Height[A] - 254;
+            for(int C = 0; C <= verticalReps; C++)
+            {
+                if(vScreenCollision(Z, tempLocation))
+                {
+                    frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A] - 254, GFXBackground2[A], 0, 254);
+                }
+                tempLocation.Y += GFXBackground2Height[A] - 254;
             }
         }
     }
@@ -523,7 +563,7 @@ void DrawBackground(int S, int Z)
     if(Background2[S] == 21)
     {
 
-        int tempVar22 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
+        int tempVar22 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 2;
         for(B = 0; B <= tempVar22; B++)
         {
             tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
@@ -566,7 +606,7 @@ void DrawBackground(int S, int Z)
     if(Background2[S] == 23)
     {
 
-        int tempVar24 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
+        int tempVar24 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 2;
         for(B = 0; B <= tempVar24; B++)
         {
             tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
@@ -628,6 +668,12 @@ void DrawBackground(int S, int Z)
             {
                 frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
             }
+            // some issues can arise at 720p
+            tempLocation.X += GFXBackground2Width[A];
+            if(vScreenCollision(Z, tempLocation))
+            {
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            }
         }
     }
 
@@ -657,7 +703,7 @@ void DrawBackground(int S, int Z)
     if(Background2[S] == 27)
     {
 
-        int tempVar28 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
+        int tempVar28 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 2;
         for(B = 0; B <= tempVar28; B++)
         {
             tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
@@ -884,7 +930,8 @@ void DrawBackground(int S, int Z)
         for(B = 0; B <= tempVar37; B++)
         {
             tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.75);
-            tempLocation.Y = level[S].Height - GFXBackground2Height[A] - ScreenH + 100;
+            // the other background is 500px, so this really needs to be 600...
+            tempLocation.Y = level[S].Height - GFXBackground2Height[A] - 600 + 100;
             tempLocation.Height = GFXBackground2Height[A];
             tempLocation.Width = GFXBackground2Width[A];
             if(vScreenCollision(Z, tempLocation))
@@ -904,7 +951,10 @@ void DrawBackground(int S, int Z)
             if(level[S].Height - level[S].Y > GFXBackground2Height[A])
             {
                 // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
-                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
+                if (GFXBackground2Height[A] - ScreenH > 0)
+                    tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
+                else
+                    tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - 600) * (GFXBackground2Height[A] - 600) + vScreen[Z].Top;
                 tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
             }
             else
@@ -915,6 +965,13 @@ void DrawBackground(int S, int Z)
             {
                 frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
             }
+            // leaves top / bottom of screen undrawn at 720p
+            tempLocation.Y -= GFXBackground2Height[A];
+            if(vScreenCollision(Z, tempLocation))
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+            tempLocation.Y += GFXBackground2Height[A] * 2;
+            if(vScreenCollision(Z, tempLocation))
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
         }
     }
 
@@ -1246,7 +1303,7 @@ void DrawBackground(int S, int Z)
             tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
             if(level[S].Height - level[S].Y > GFXBackground2Height[A])
             {
-                tempLocation.Y = (-vScreenY[Z] - level[S].Y) / (level[S].Height - level[S].Y - 600) * (GFXBackground2Height[A] - 600);
+                tempLocation.Y = (-vScreenY[Z] - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH);
                 tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
             }
             else
@@ -1504,13 +1561,16 @@ void DrawBackground(int S, int Z)
         }
     }
 
-    A = 51; // SMB1 Desert
+    A = 51; // SMB1 Desert //TODO
     if(Background2[S] == 51)
     {
         if(level[S].Height - level[S].Y > GFXBackground2Height[A])
         {
             // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
-            tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
+            if (GFXBackground2Height[A] - ScreenH > 0)
+                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
+            else
+                tempLocation.Y = (GFXBackground2Height[A] - vScreen[Z].Height) + vScreen[Z].Top;
             tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
         }
         else
@@ -1518,6 +1578,8 @@ void DrawBackground(int S, int Z)
         tempLocation.Height = GFXBackground2Height[A];
         tempLocation.Width = GFXBackground2Width[A];
 
+        // off-white backdrop for safety at 720p
+        frmMain.renderRect(0, 0, vScreen[Z].Width, vScreen[Z].Height, .973f, .973f, .973f, 1.f, true);
         int tempVar78 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.75))) + 1;
         for(B = 0; B <= tempVar78; B++)
         {
@@ -1538,13 +1600,16 @@ void DrawBackground(int S, int Z)
             }
         }
     }
-    A = 52; // SMB2 Desert Night
+    A = 52; // SMB2 Desert Night //TODO
     if(Background2[S] == 52)
     {
         if(level[S].Height - level[S].Y > GFXBackground2Height[A])
         {
             // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
-            tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
+            if (GFXBackground2Height[A] - ScreenH > 0)
+                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
+            else
+                tempLocation.Y = (GFXBackground2Height[A] - vScreen[Z].Height) + vScreen[Z].Top;
             tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
         }
         else
@@ -1552,6 +1617,8 @@ void DrawBackground(int S, int Z)
         tempLocation.Height = GFXBackground2Height[A];
         tempLocation.Width = GFXBackground2Width[A];
 
+        // indigo backdrop for safety at 720p
+        frmMain.renderRect(0, 0, vScreen[Z].Width, vScreen[Z].Height, .220f, .220f, .408f, 1.f, true);
         int tempVar80 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
         for(B = 0; B <= tempVar80; B++)
         {
@@ -1716,13 +1783,16 @@ void DrawBackground(int S, int Z)
         }
     }
 
-    A = 56; // SMB3 Water
+    A = 56; // SMB3 Water // TODO
     if(Background2[S] == 56)
     {
         if(level[S].Height - level[S].Y > GFXBackground2Height[A])
         {
             // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
-            tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
+            if (GFXBackground2Height[A] - ScreenH > 0)
+                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
+            else
+                tempLocation.Y = (GFXBackground2Height[A] - vScreen[Z].Height) + vScreen[Z].Top;
             tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
         }
         else
@@ -1731,6 +1801,9 @@ void DrawBackground(int S, int Z)
         tempLocation.Width = GFXBackground2Width[A];
 
 
+
+        // blue backdrop for safety at 720p
+        frmMain.renderRect(0, 0, vScreen[Z].Width, vScreen[Z].Height, .0f, .314f, .753f, 1.f, true);
 
         int tempVar92 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.65))) + 1;
         for(B = 0; B <= tempVar92; B++)
