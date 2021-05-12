@@ -539,6 +539,10 @@ void UpdateGraphics(bool skipRepaint)
 
     if (Do_FrameSkip) return;
 
+#ifdef __3DS__
+    frmMain.initDraw(0);
+#endif
+
     if(ClearBuffer)
     {
         ClearBuffer = false;
@@ -1636,18 +1640,18 @@ void UpdateGraphics(bool skipRepaint)
         if (vScreen[Z].Width + level[S].X > level[S].Width)
         {
             B = (vScreen[Z].Width + level[S].X - level[S].Width) / 2;
-            frmMain.renderRect(vScreen[Z].Left, vScreen[Z].Top, B, vScreen[Z].Height,
+            frmMain.renderRect(0, 0, B, vScreen[Z].Height,
                 0.f, 0.f, 0.f, 1.f, true);
-            frmMain.renderRect(vScreen[Z].Left + vScreen[Z].Width - B, vScreen[Z].Top,
+            frmMain.renderRect(vScreen[Z].Width - B, 0,
                 B, vScreen[Z].Height, 0.f, 0.f, 0.f, 1.f, true);
         }
         // menu and credits always have same height as screen
         if (!GameMenu && !GameOutro && vScreen[Z].Height + level[S].Y > level[S].Height)
         {
             B = (vScreen[Z].Height + level[S].Y - level[S].Height) / 2;
-            frmMain.renderRect(vScreen[Z].Left, vScreen[Z].Top, vScreen[Z].Width, B,
+            frmMain.renderRect(0, 0, vScreen[Z].Width, B,
                 0.f, 0.f, 0.f, 1.f, true);
-            frmMain.renderRect(vScreen[Z].Left, vScreen[Z].Top + vScreen[Z].Height - B,
+            frmMain.renderRect(0, vScreen[Z].Height - B,
                 vScreen[Z].Width, B, 0.f, 0.f, 0.f, 1.f, true);
         }
 
