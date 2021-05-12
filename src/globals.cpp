@@ -507,6 +507,16 @@ int BattleIntro = 0;
 int BattleOutro = 0;
 std::string LevelName;
 
+#if !defined(__ORIGINAL_RES__) && !defined(__3DS__)
+int ScreenW = 800;
+int ScreenH = 600;
+void Set_Resolution(int sw, int sh)
+{
+	ScreenW = sw;
+	ScreenH = sh;
+}
+#endif
+
 void DoEvents()
 {
     frmMain.doEvents();

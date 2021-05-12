@@ -971,6 +971,7 @@ struct EditorCursor_t
     std::string Layer;
 //    Mode As Integer
     int Mode = 0;
+    int SubMode = 0;
 //    Block As Block
     Block_t Block;
 //    Water As Water
@@ -2044,6 +2045,14 @@ extern int BattleIntro;
 extern int BattleOutro;
 //Public LevelName As String
 extern std::string LevelName;
+
+#if !defined(__ORIGINAL_RES__) && !defined(__3DS__)
+extern int ScreenW;
+extern int ScreenH;
+void Set_Resolution(int sw, int sh);
+#endif
+
+
 //Public Const curRelease As Integer = 64
 const int curRelease = 64;
 

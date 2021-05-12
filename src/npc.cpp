@@ -269,12 +269,18 @@ void DropNPC(int A, int NPCType)
             if(A == 2)
                 B = 40;
             NPC[numNPCs].Location.X = -vScreenX[1] + vScreen[1].Width / 2.0 - NPC[numNPCs].Location.Width / 2.0 + B;
-            NPC[numNPCs].Location.Y = -vScreenY[1] + 16 + 12;
+            double ScreenTop = -vScreenY[1];
+            if (vScreen[1].Height > 600)
+                ScreenTop += vScreen[1].Height / 2 - 300;
+            NPC[numNPCs].Location.Y = ScreenTop + 16 + 12;
         }
         else
         {
             NPC[numNPCs].Location.X = -vScreenX[A] + vScreen[A].Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
-            NPC[numNPCs].Location.Y = -vScreenY[A] + 16 + 12;
+            double ScreenTop = -vScreenY[A];
+            if (vScreen[A].Height > 600)
+                ScreenTop += vScreen[A].Height / 2 - 300;
+            NPC[numNPCs].Location.Y = ScreenTop + 16 + 12;
         }
         NPC[numNPCs].Location.SpeedX = 0;
         NPC[numNPCs].Location.SpeedY = 0;

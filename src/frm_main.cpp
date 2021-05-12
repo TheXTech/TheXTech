@@ -704,7 +704,7 @@ void FrmMain::updateViewport()
     float w, w1, h, h1;
     int   wi, hi;
 
-#ifndef __EMSCRIPTEN__
+#if !defined(__EMSCRIPTEN__) && !defined(__ORIGINAL_RES__)
     SDL_GetWindowSize(m_window, &wi, &hi);
 #else
     if(IsFullScreen(m_window))
@@ -717,6 +717,19 @@ void FrmMain::updateViewport()
         hi = ScreenH;
     }
 #endif
+
+    #if !defined(__ORIGINAL_RES__)
+    ScaleWidth = wi;
+    ScaleHeight = hi;
+    if (ScaleWidth < 512) ScaleWidth = 512;
+    if (ScaleHeight < 384) ScaleHeight = 384;
+    if (ScaleWidth > 1280) ScaleWidth = 1280;
+    if (ScaleHeight > 720) ScaleHeight = 720;
+    Set_Resolution(ScaleWidth, ScaleHeight);
+    SDL_DestroyTexture(m_tBuffer);
+    m_tBuffer = SDL_CreateTexture(m_gRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, ScreenW, ScreenH);
+    SDL_SetRenderTarget(m_gRenderer, m_tBuffer);
+    #endif
 
     w = wi;
     h = hi;

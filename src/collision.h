@@ -78,6 +78,8 @@ bool ShakeCollision(const Location_t &Loc1, const Location_t &Loc2, int ShakeY3)
 // Public Function vScreenCollision(A As Integer, Loc2 As Location) As Boolean  'vScreen collisions
 // vScreen collisions
 bool vScreenCollision(int A, const Location_t &Loc2);
+// vScreen collisions assuming 800x600
+bool vScreenCollisionCanonical(int left, int top, const Location_t &Loc2);
 // Public Function vScreenCollision2(A As Integer, Loc2 As Location) As Boolean  'vScreen collisions 2
 // vScreen collisions 2
 bool vScreenCollision2(int A, const Location_t &Loc2);

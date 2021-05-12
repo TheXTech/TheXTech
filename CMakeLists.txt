@@ -295,6 +295,8 @@ set(THEXTECH_SRC
     src/graphics/gfx_update.cpp
     src/graphics/gfx_background.cpp
     src/graphics/gfx_print.cpp
+    src/graphics/gfx_message.cpp
+    src/graphics/gfx_editor.cpp
     src/graphics/gfx_credits.cpp
     src/graphics/gfx_hud.cpp
     src/graphics/gfx_enter_screen.cpp

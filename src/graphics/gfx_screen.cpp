@@ -94,11 +94,11 @@ void SetupScreens()
         vScreen[2].Left = 0;
         vScreen[2].Top = 0;
         break;
-    case 7:
+    case 7: // Credits
+        vScreen[1].Height = ScreenH;
+        vScreen[1].Width = ScreenW;
         vScreen[1].Left = 0;
-        vScreen[1].Width = 800;
         vScreen[1].Top = 0;
-        vScreen[1].Height = 600;
         vScreen[2].Visible = false;
         break;
     case 8: // netplay

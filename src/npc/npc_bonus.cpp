@@ -63,8 +63,13 @@ void DropBonus(int A)
                 if(A == 2)
                     B = 40;
                 GetvScreenAverage();
+
+                double ScreenTop = -vScreenY[1];
+                if (vScreen[1].Height > 600)
+                    ScreenTop += vScreen[1].Height / 2 - 300;
+
                 NPC[numNPCs].Location.X = -vScreenX[1] + vScreen[1].Width / 2.0 - NPC[numNPCs].Location.Width / 2.0 + B;
-                NPC[numNPCs].Location.Y = -vScreenY[1] + 16 + 12;
+                NPC[numNPCs].Location.Y = ScreenTop + 16 + 12;
             }
                 //            else if(nPlay.Online == true)
                 //            {
@@ -75,8 +80,13 @@ void DropBonus(int A)
             else
             {
                 GetvScreen(A);
+
+                double ScreenTop = -vScreenY[1];
+                if (vScreen[1].Height > 600)
+                    ScreenTop += vScreen[1].Height / 2 - 300;
+
                 NPC[numNPCs].Location.X = -vScreenX[A] + vScreen[A].Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
-                NPC[numNPCs].Location.Y = -vScreenY[A] + 16 + 12;
+                NPC[numNPCs].Location.Y = ScreenTop + 16 + 12;
             }
             NPC[numNPCs].Location.SpeedX = 0;
             NPC[numNPCs].Location.SpeedY = 0;

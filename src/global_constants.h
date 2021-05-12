@@ -98,9 +98,16 @@ const int maxTiles = 20000;
 //Public Const maxScenes As Integer = 5000
 const int maxScenes = 5000;
 
+#ifdef __ORIGINAL_RES__
 //Public Const ScreenW As Integer = 800  'Game Screen Width
 const int ScreenW = 800;
 //Public Const ScreenH As Integer = 600  'Game Screen Height
 const int ScreenH = 600;
+#endif
+
+#ifdef __3DS__
+const int ScreenW = 800;
+const int ScreenH = 480;
+#endif
 
 #endif // LIMITS_H

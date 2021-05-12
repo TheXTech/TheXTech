@@ -1415,7 +1415,7 @@ static void s_drawGameTypeTitle(int x, int y)
     }
 }
 
-static void s_drawGameSaves()
+static void s_drawGameSaves(int MenuX, int MenuY)
 {
     int A;
 
@@ -1423,29 +1423,29 @@ static void s_drawGameSaves()
     {
         if(SaveSlot[A] >= 0)
         {
-            SuperPrint(fmt::format_ne("SLOT {0} ... {1}%", A, SaveSlot[A]), 3, 300, 320 + (A * 30));
+            SuperPrint(fmt::format_ne("SLOT {0} ... {1}%", A, SaveSlot[A]), 3, MenuX, MenuY - 30 + (A * 30));
             if(SaveStars[A] > 0)
             {
-                frmMain.renderTexture(560, 320 + (A * 30) + 1,
+                frmMain.renderTexture(MenuX + 260, MenuY - 30 + (A * 30) + 1,
                                       GFX.Interface[5].w, GFX.Interface[5].h,
                                       GFX.Interface[5], 0, 0);
-                frmMain.renderTexture(560 + 24, 320 + (A * 30) + 2,
+                frmMain.renderTexture(MenuX + 260 + 24, MenuY - 30 + (A * 30) + 2,
                                       GFX.Interface[1].w, GFX.Interface[1].h,
                                       GFX.Interface[1], 0, 0);
-                SuperPrint(fmt::format_ne(" {0}", SaveStars[A]), 3, 588, 320 + (A * 30));
+                SuperPrint(fmt::format_ne(" {0}", SaveStars[A]), 3, MenuX + 288, MenuY - 30 + (A * 30));
             }
         }
         else
         {
-            SuperPrint(fmt::format_ne("SLOT {0} ... NEW GAME", A), 3, 300, 320 + (A * 30));
+            SuperPrint(fmt::format_ne("SLOT {0} ... NEW GAME", A), 3, MenuX, MenuY - 30 + (A * 30));
         }
     }
 
     if(MenuMode == MENU_SELECT_SLOT_1P || MenuMode == MENU_SELECT_SLOT_2P)
     {
-        SuperPrint("COPY SAVE", 3, 300, 320 + (A * 30));
+        SuperPrint("COPY SAVE", 3, MenuX, MenuY - 30 + (A * 30));
         A++;
-        SuperPrint("ERASE SAVE", 3, 300, 320 + (A * 30));
+        SuperPrint("ERASE SAVE", 3, MenuX, MenuY - 30 + (A * 30));
     }
 }
 
@@ -1460,12 +1460,21 @@ void mainMenuDraw()
 
     int menuFix = -44; // for Input Settings
 
-    frmMain.renderTexture(0, 0, GFX.MenuGFX[1].w, GFX.MenuGFX[1].h, GFX.MenuGFX[1], 0, 0);
+    #ifdef __3DS__
+    frmMain.setLayer(2);
+    #endif
+    frmMain.renderTexture(ScreenW / 2 - GFX.MenuGFX[1].w / 2, 0, GFX.MenuGFX[1].w, GFX.MenuGFX[1].h, GFX.MenuGFX[1], 0, 0);
+    frmMain.renderTexture(ScreenW / 2 - GFX.MenuGFX[3].w / 2, ScreenH - 24,
+            GFX.MenuGFX[3].w, GFX.MenuGFX[3].h, GFX.MenuGFX[3], 0, 0);
+
+    #ifdef __3DS__
+    frmMain.setLayer(3);
+    #endif
     frmMain.renderTexture(ScreenW / 2 - GFX.MenuGFX[2].w / 2, 70,
             GFX.MenuGFX[2].w, GFX.MenuGFX[2].h, GFX.MenuGFX[2], 0, 0);
 
-    frmMain.renderTexture(ScreenW / 2 - GFX.MenuGFX[3].w / 2, 576,
-            GFX.MenuGFX[3].w, GFX.MenuGFX[3].h, GFX.MenuGFX[3], 0, 0);
+    int MenuX = ScreenW / 2 - 100;
+    int MenuY = ScreenH - 250;
 
     if(SDL_AtomicGet(&loading))
     {
@@ -1481,12 +1490,12 @@ void mainMenuDraw()
     // Main menu
     else if(MenuMode == MENU_MAIN)
     {
-        SuperPrint(g_mainMenu.main1PlayerGame, 3, 300, 350);
-        SuperPrint(g_mainMenu.main2PlayerGame, 3, 300, 380);
-        SuperPrint(g_mainMenu.mainBattleGame, 3, 300, 410);
-        SuperPrint(g_mainMenu.mainOptions, 3, 300, 440);
-        SuperPrint(g_mainMenu.mainExit, 3, 300, 470);
-        frmMain.renderTexture(300 - 20, 350 + (MenuCursor * 30), 16, 16, GFX.MCursor[0], 0, 0);
+        SuperPrint(g_mainMenu.main1PlayerGame, 3, MenuX, MenuY);
+        SuperPrint(g_mainMenu.main2PlayerGame, 3, MenuX, MenuY + 30);
+        SuperPrint(g_mainMenu.mainBattleGame, 3, MenuX, MenuY + 60);
+        SuperPrint(g_mainMenu.mainOptions, 3, MenuX, MenuY + 90);
+        SuperPrint(g_mainMenu.mainExit, 3, MenuX, MenuY + 120);
+        frmMain.renderTexture(MenuX - 20, MenuY + (MenuCursor * 30), 16, 16, GFX.MCursor[0], 0, 0);
     }
 
     // Character select
@@ -1500,12 +1509,12 @@ void mainMenuDraw()
         B = 0;
         C = 0;
 
-        s_drawGameTypeTitle(300, 280);
-        SuperPrint(SelectWorld[selWorld].WorldName, 3, 300, 310, 0.6f, 1.f, 1.f);
+        s_drawGameTypeTitle(MenuX, MenuY - 70);
+        SuperPrint(SelectWorld[selWorld].WorldName, 3, MenuX, MenuY - 40, 0.6f, 1.f, 1.f);
 
         // TODO: Make a custom playable character names print here
         if(!blockCharacter[1])
-            SuperPrint(g_mainMenu.selectPlayer[1], 3, 300, 350);
+            SuperPrint(g_mainMenu.selectPlayer[1], 3, MenuX, MenuY);
         else
         {
             A -= 30;
@@ -1516,7 +1525,7 @@ void mainMenuDraw()
         }
 
         if(!blockCharacter[2])
-            SuperPrint(g_mainMenu.selectPlayer[2], 3, 300, 380 + A);
+            SuperPrint(g_mainMenu.selectPlayer[2], 3, MenuX, MenuY + 30 + A);
         else
         {
             A = A - 30;
@@ -1527,7 +1536,7 @@ void mainMenuDraw()
         }
 
         if(!blockCharacter[3])
-            SuperPrint(g_mainMenu.selectPlayer[3], 3, 300, 410 + A);
+            SuperPrint(g_mainMenu.selectPlayer[3], 3, MenuX, MenuY + 60 + A);
         else
         {
             A -= 30;
@@ -1538,7 +1547,7 @@ void mainMenuDraw()
         }
 
         if(!blockCharacter[4])
-            SuperPrint(g_mainMenu.selectPlayer[4], 3, 300, 440 + A);
+            SuperPrint(g_mainMenu.selectPlayer[4], 3, MenuX, MenuY + 90 + A);
         else
         {
             A -= 30;
@@ -1549,7 +1558,7 @@ void mainMenuDraw()
         }
 
         if(!blockCharacter[5])
-            SuperPrint(g_mainMenu.selectPlayer[5], 3, 300, 470 + A);
+            SuperPrint(g_mainMenu.selectPlayer[5], 3, MenuX, MenuY + 120 + A);
         else
         {
             A -= 30;
@@ -1561,26 +1570,29 @@ void mainMenuDraw()
 
         if(MenuMode == MENU_CHARACTER_SELECT_2P_S2 || MenuMode == MENU_CHARACTER_SELECT_BM_S2)
         {
-            frmMain.renderTexture(300 - 20, B + 350 + (MenuCursor * 30), GFX.MCursor[3]);
-            frmMain.renderTexture(300 - 20, B + 350 + ((PlayerCharacter - 1) * 30), GFX.MCursor[0]);
+            frmMain.renderTexture(MenuX - 20, B + MenuY + (MenuCursor * 30), GFX.MCursor[3]);
+            frmMain.renderTexture(MenuX - 20, C + MenuY + ((PlayerCharacter - 1) * 30), GFX.MCursor[0]);
         }
         else
         {
-            frmMain.renderTexture(300 - 20, B + 350 + (MenuCursor * 30), GFX.MCursor[0]);
+            frmMain.renderTexture(MenuX - 20, B + MenuY + (MenuCursor * 30), GFX.MCursor[0]);
         }
     }
 
     // Episode / Level selection
     else if(MenuMode == MENU_1PLAYER_GAME || MenuMode == MENU_2PLAYER_GAME || MenuMode == MENU_BATTLE_MODE)
     {
-        s_drawGameTypeTitle(300, 280);
+        s_drawGameTypeTitle(MenuX, MenuY - 70);
         std::string tempStr;
 
         minShow = 1;
+        // maxShow = (MenuMode == 4) ? NumSelectBattle : ((MenuMode == 9) ? NumSelectWorldEditable : NumSelectWorld);
         maxShow = NumSelectWorld;
 
-        if(NumSelectWorld > 5)
+        if(maxShow > 5)
         {
+            int original_maxShow = maxShow;
+
             minShow = worldCurs;
             maxShow = minShow + 4;
 
@@ -1593,13 +1605,13 @@ void mainMenuDraw()
             if(worldCurs < 1)
                 worldCurs = 1;
 
-            if(worldCurs > NumSelectWorld - 4)
-                worldCurs = NumSelectWorld - 4;
+            if(worldCurs > original_maxShow - 4)
+                worldCurs = original_maxShow - 4;
 
-            if(maxShow >= NumSelectWorld)
+            if(maxShow >= original_maxShow)
             {
-                maxShow = NumSelectWorld;
-                minShow = NumSelectWorld - 4;
+                maxShow = original_maxShow;
+                minShow = original_maxShow - 4;
             }
 
             minShow = worldCurs;
@@ -1609,79 +1621,95 @@ void mainMenuDraw()
         for(auto A = minShow; A <= maxShow; A++)
         {
             B = A - minShow + 1;
+//            tempStr = (MenuMode != 4) ? SelectWorld[A].WorldName : SelectBattle[A].WorldName;
             tempStr = SelectWorld[A].WorldName;
-            SuperPrint(tempStr, 3, 300, 320 + (B * 30));
+            SuperPrint(tempStr, 3, MenuX, MenuY - 30 + (B * 30));
         }
 
         if(minShow > 1)
-            frmMain.renderTexture(400 - 8, 350 - 20, GFX.MCursor[1]);
-
+            frmMain.renderTexture(ScreenW/2 - 8, MenuY - 20, GFX.MCursor[1]);
 
         if(maxShow < NumSelectWorld)
-            frmMain.renderTexture(400 - 8, 490, GFX.MCursor[2]);
+            frmMain.renderTexture(ScreenW/2 - 8, MenuY + 140, GFX.MCursor[2]);
 
         B = MenuCursor - minShow + 1;
 
         if(B >= 0 && B < 5)
-            frmMain.renderTexture(300 - 20, 350 + (B * 30), GFX.MCursor[0].w, GFX.MCursor[0].h, GFX.MCursor[0], 0, 0);
+            frmMain.renderTexture(MenuX - 20, MenuY + (B * 30), GFX.MCursor[0].w, GFX.MCursor[0].h, GFX.MCursor[0], 0, 0);
     }
 
     else if(MenuMode == MENU_SELECT_SLOT_1P || MenuMode == MENU_SELECT_SLOT_2P) // Save Select
     {
-        s_drawGameTypeTitle(300, 280);
-        SuperPrint(SelectWorld[selWorld].WorldName, 3, 300, 310, 0.6f, 1.f, 1.f);
-        s_drawGameSaves();
-        frmMain.renderTexture(300 - 20, 350 + (MenuCursor * 30), GFX.MCursor[0]);
+        s_drawGameTypeTitle(MenuX, MenuY - 70);
+        SuperPrint(SelectWorld[selWorld].WorldName, 3, MenuX, MenuY - 40, 0.6f, 1.f, 1.f);
+        s_drawGameSaves(MenuX, MenuY);
+        frmMain.renderTexture(MenuX - 20, MenuY + (MenuCursor * 30), GFX.MCursor[0]);
     }
 
     else if(MenuMode == MENU_SELECT_SLOT_1P_COPY_S1 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S1 ||
             MenuMode == MENU_SELECT_SLOT_1P_COPY_S2 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S2) // Copy save
     {
-        s_drawGameTypeTitle(300, 280);
-        SuperPrint(SelectWorld[selWorld].WorldName, 3, 300, 310, 0.6f, 1.f, 1.f);
-        s_drawGameSaves();
+        s_drawGameTypeTitle(MenuX, MenuY - 70);
+        SuperPrint(SelectWorld[selWorld].WorldName, 3, MenuX, MenuY - 40, 0.6f, 1.f, 1.f);
+        s_drawGameSaves(MenuX, MenuY);
 
         if(MenuMode == MENU_SELECT_SLOT_1P_COPY_S1 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S1)
-            SuperPrint("Select the source slot", 3, 300, 320 + (5 * 30), 0.7f, 0.7f, 1.0f);
+            SuperPrint("Select the source slot", 3, MenuX, MenuY - 30 + (5 * 30), 0.7f, 0.7f, 1.0f);
         else if(MenuMode == MENU_SELECT_SLOT_1P_COPY_S2 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S2)
-            SuperPrint("Now select the target", 3, 300, 320 + (5 * 30), 0.7f, 1.0f, 0.7f);
+            SuperPrint("Now select the target", 3, MenuX, MenuY - 30 + (5 * 30), 0.7f, 1.0f, 0.7f);
 
         if(MenuMode == MENU_SELECT_SLOT_1P_COPY_S2 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S2)
         {
-            frmMain.renderTexture(300 - 20, 350 + ((menuCopySaveSrc - 1) * 30), GFX.MCursor[0]);
-            frmMain.renderTexture(300 - 20, 350 + (MenuCursor * 30), GFX.MCursor[3]);
+            frmMain.renderTexture(MenuX - 20, MenuY + ((menuCopySaveSrc - 1) * 30), GFX.MCursor[0]);
+            frmMain.renderTexture(MenuX - 20, MenuY + (MenuCursor * 30), GFX.MCursor[3]);
         }
         else
-            frmMain.renderTexture(300 - 20, 350 + (MenuCursor * 30), GFX.MCursor[0]);
+            frmMain.renderTexture(MenuX - 20, MenuY + (MenuCursor * 30), GFX.MCursor[0]);
     }
 
     else if(MenuMode == MENU_SELECT_SLOT_1P_DELETE || MenuMode == MENU_SELECT_SLOT_2P_DELETE) // Copy save
     {
-        s_drawGameTypeTitle(300, 280);
-        SuperPrint(SelectWorld[selWorld].WorldName, 3, 300, 310, 0.6f, 1.f, 1.f);
-        s_drawGameSaves();
+        s_drawGameTypeTitle(MenuX, MenuY - 70);
+        SuperPrint(SelectWorld[selWorld].WorldName, 3, MenuX, MenuY - 40, 0.6f, 1.f, 1.f);
+        s_drawGameSaves(MenuX, MenuY);
 
-        SuperPrint("Select the slot to erase", 3, 300, 320 + (5 * 30), 1.0f, 0.7f, 0.7f);
+        SuperPrint("Select the slot to erase", 3, MenuX, MenuY - 30 + (5 * 30), 1.0f, 0.7f, 0.7f);
 
-        frmMain.renderTexture(300 - 20, 350 + (MenuCursor * 30), GFX.MCursor[0]);
+        frmMain.renderTexture(MenuX - 20, MenuY + (MenuCursor * 30), GFX.MCursor[0]);
     }
 
     // Options Menu
     else if(MenuMode == MENU_OPTIONS)
     {
-        SuperPrint("PLAYER 1 CONTROLS", 3, 300, 350);
-        SuperPrint("PLAYER 2 CONTROLS", 3, 300, 380);
-#ifdef __ANDROID__
-        SuperPrint("VIEW CREDITS", 3, 300, 410);
-#else
+        SuperPrint("PLAYER 1 CONTROLS", 3, MenuX, MenuY);
+        SuperPrint("PLAYER 2 CONTROLS", 3, MenuX, MenuY + 30);
+        A = 2;
+#if !defined(__ANDROID__) && !defined(__3DS__)
         if(resChanged)
-            SuperPrint("WINDOWED MODE", 3, 300, 410);
+            SuperPrint("WINDOWED MODE", 3, MenuX, MenuY + 30*A);
         else
-            SuperPrint("FULLSCREEN MODE", 3, 300, 410);
-
-        SuperPrint("VIEW CREDITS", 3, 300, 440);
+            SuperPrint("FULLSCREEN MODE", 3, MenuX, MenuY + 30*A);
+        A ++;
 #endif
-        frmMain.renderTexture(300 - 20, 350 + (MenuCursor * 30),
+#ifdef __3DS__
+        SuperPrint("EDITOR CONTROLS", 3, MenuX, MenuY + 30*A);
+        A++;
+        if (n3ds_clocked != -1)
+        {
+            if (n3ds_clocked)
+                SuperPrint("USE O3DS CLOCK SPEED", 3, MenuX, MenuY + 30*A);
+            else
+                SuperPrint("USE N3DS CLOCK SPEED", 3, MenuX, MenuY + 30*A);
+            A++;
+        }
+        if (debugMode)
+            SuperPrint("HIDE DEBUG SCREEN", 3, MenuX, MenuY + 30*A);
+        else
+            SuperPrint("SHOW DEBUG SCREEN", 3, MenuX, MenuY + 30*A);
+        A++;
+#endif
+        SuperPrint("VIEW CREDITS", 3, MenuX, MenuY + 30*A);
+        frmMain.renderTexture(MenuX - 20, MenuY + (MenuCursor * 30),
                               GFX.MCursor[0].w, GFX.MCursor[0].h, GFX.MCursor[0], 0, 0);
     }
 
@@ -1691,37 +1719,37 @@ void mainMenuDraw()
         if(useJoystick[MenuMode - MENU_INPUT_SETTINGS_BASE] == 0)
         {
             auto &ck = conKeyboard[MenuMode - MENU_INPUT_SETTINGS_BASE];
-            SuperPrint("INPUT......KEYBOARD", 3, 300, 260 + menuFix);
-            SuperPrint(fmt::format_ne("UP.........{0}", getKeyName(ck.Up)), 3, 300, 290 + menuFix);
-            SuperPrint(fmt::format_ne("DOWN.......{0}", getKeyName(ck.Down)), 3, 300, 320 + menuFix);
-            SuperPrint(fmt::format_ne("LEFT.......{0}", getKeyName(ck.Left)), 3, 300, 350 + menuFix);
-            SuperPrint(fmt::format_ne("RIGHT......{0}", getKeyName(ck.Right)), 3, 300, 380 + menuFix);
-            SuperPrint(fmt::format_ne("RUN........{0}", getKeyName(ck.Run)), 3, 300, 410 + menuFix);
-            SuperPrint(fmt::format_ne("ALT RUN....{0}", getKeyName(ck.AltRun)), 3, 300, 440 + menuFix);
-            SuperPrint(fmt::format_ne("JUMP.......{0}", getKeyName(ck.Jump)), 3, 300, 470 + menuFix);
-            SuperPrint(fmt::format_ne("ALT JUMP...{0}", getKeyName(ck.AltJump)), 3, 300, 500 + menuFix);
-            SuperPrint(fmt::format_ne("DROP ITEM..{0}", getKeyName(ck.Drop)), 3, 300, 530 + menuFix);
-            SuperPrint(fmt::format_ne("PAUSE......{0}", getKeyName(ck.Start)), 3, 300, 560 + menuFix);
-            SuperPrint("Reset to default", 3, 300, 590 + menuFix);
+            SuperPrint("INPUT......KEYBOARD", 3, MenuX, MenuY - 90 + menuFix);
+            SuperPrint(fmt::format_ne("UP.........{0}", getKeyName(ck.Up)), 3, MenuX, MenuY - 60 + menuFix);
+            SuperPrint(fmt::format_ne("DOWN.......{0}", getKeyName(ck.Down)), 3, MenuX, MenuY - 30 + menuFix);
+            SuperPrint(fmt::format_ne("LEFT.......{0}", getKeyName(ck.Left)), 3, MenuX, MenuY + menuFix);
+            SuperPrint(fmt::format_ne("RIGHT......{0}", getKeyName(ck.Right)), 3, MenuX, MenuY + 30 + menuFix);
+            SuperPrint(fmt::format_ne("RUN........{0}", getKeyName(ck.Run)), 3, MenuX, MenuY + 60 + menuFix);
+            SuperPrint(fmt::format_ne("ALT RUN....{0}", getKeyName(ck.AltRun)), 3, MenuX, MenuY + 90 + menuFix);
+            SuperPrint(fmt::format_ne("JUMP.......{0}", getKeyName(ck.Jump)), 3, MenuX, MenuY + 120 + menuFix);
+            SuperPrint(fmt::format_ne("ALT JUMP...{0}", getKeyName(ck.AltJump)), 3, MenuX, MenuY + 150 + menuFix);
+            SuperPrint(fmt::format_ne("DROP ITEM..{0}", getKeyName(ck.Drop)), 3, MenuX, MenuY + 180 + menuFix);
+            SuperPrint(fmt::format_ne("PAUSE......{0}", getKeyName(ck.Start)), 3, MenuX, MenuY + 210 + menuFix);
+            SuperPrint("Reset to default", 3, MenuX, MenuY + 240 + menuFix);
         }
         else
         {
             auto &cj = conJoystick[MenuMode - MENU_INPUT_SETTINGS_BASE];
-            SuperPrint("INPUT......" + joyGetName(useJoystick[MenuMode - MENU_INPUT_SETTINGS_BASE] - 1), 3, 300, 260 + menuFix);
-            SuperPrint(fmt::format_ne("UP.........{0}", getJoyKeyName(cj.isGameController, cj.Up)), 3, 300, 290 + menuFix);
-            SuperPrint(fmt::format_ne("DOWN.......{0}", getJoyKeyName(cj.isGameController, cj.Down)), 3, 300, 320 + menuFix);
-            SuperPrint(fmt::format_ne("LEFT.......{0}", getJoyKeyName(cj.isGameController, cj.Left)), 3, 300, 350 + menuFix);
-            SuperPrint(fmt::format_ne("RIGHT......{0}", getJoyKeyName(cj.isGameController, cj.Right)), 3, 300, 380 + menuFix);
-            SuperPrint(fmt::format_ne("RUN........{0}", getJoyKeyName(cj.isGameController, cj.Run)), 3, 300, 410 + menuFix);
-            SuperPrint(fmt::format_ne("ALT RUN....{0}", getJoyKeyName(cj.isGameController, cj.AltRun)), 3, 300, 440 + menuFix);
-            SuperPrint(fmt::format_ne("JUMP.......{0}", getJoyKeyName(cj.isGameController, cj.Jump)), 3, 300, 470 + menuFix);
-            SuperPrint(fmt::format_ne("ALT JUMP...{0}", getJoyKeyName(cj.isGameController, cj.AltJump)), 3, 300, 500 + menuFix);
-            SuperPrint(fmt::format_ne("DROP ITEM..{0}", getJoyKeyName(cj.isGameController, cj.Drop)), 3, 300, 530 + menuFix);
-            SuperPrint(fmt::format_ne("PAUSE......{0}", getJoyKeyName(cj.isGameController, cj.Start)), 3, 300, 560 + menuFix);
-            SuperPrint("Reset to default", 3, 300, 590 + menuFix);
+            SuperPrint("INPUT......" + joyGetName(useJoystick[MenuMode - MENU_INPUT_SETTINGS_BASE] - 1), 3, MenuX, MenuY - 90 + menuFix);
+            SuperPrint(fmt::format_ne("UP.........{0}", getJoyKeyName(cj.isGameController, cj.Up)), 3, MenuX, MenuY - 60 + menuFix);
+            SuperPrint(fmt::format_ne("DOWN.......{0}", getJoyKeyName(cj.isGameController, cj.Down)), 3, MenuX, MenuY - 30 + menuFix);
+            SuperPrint(fmt::format_ne("LEFT.......{0}", getJoyKeyName(cj.isGameController, cj.Left)), 3, MenuX, MenuY + menuFix);
+            SuperPrint(fmt::format_ne("RIGHT......{0}", getJoyKeyName(cj.isGameController, cj.Right)), 3, MenuX, MenuY + 30 + menuFix);
+            SuperPrint(fmt::format_ne("RUN........{0}", getJoyKeyName(cj.isGameController, cj.Run)), 3, MenuX, MenuY + 60 + menuFix);
+            SuperPrint(fmt::format_ne("ALT RUN....{0}", getJoyKeyName(cj.isGameController, cj.AltRun)), 3, MenuX, MenuY + 90 + menuFix);
+            SuperPrint(fmt::format_ne("JUMP.......{0}", getJoyKeyName(cj.isGameController, cj.Jump)), 3, MenuX, MenuY + 120 + menuFix);
+            SuperPrint(fmt::format_ne("ALT JUMP...{0}", getJoyKeyName(cj.isGameController, cj.AltJump)), 3, MenuX, MenuY + 150 + menuFix);
+            SuperPrint(fmt::format_ne("DROP ITEM..{0}", getJoyKeyName(cj.isGameController, cj.Drop)), 3, MenuX, MenuY + 180 + menuFix);
+            SuperPrint(fmt::format_ne("PAUSE......{0}", getJoyKeyName(cj.isGameController, cj.Start)), 3, MenuX, MenuY + 210 + menuFix);
+            SuperPrint("Reset to default", 3, MenuX, MenuY + 240 + menuFix);
         }
 
-        frmMain.renderTexture(300 - 20, 260 + (MenuCursor * 30) + menuFix,
+        frmMain.renderTexture(MenuX - 20, MenuY - 90 + (MenuCursor * 30) + menuFix,
                               GFX.MCursor[0].w, GFX.MCursor[0].h, GFX.MCursor[0], 0, 0);
     }
 

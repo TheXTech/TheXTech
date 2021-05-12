@@ -52,7 +52,12 @@ struct OptCursor_t
         LVL_NPCS = 4,
         LVL_SETTINGS = 2,
         LVL_WARPS = 5,
-        LVL_WATER = 15
+        LVL_WATER = 15,
+        WLD_PATHS = 10,
+        WLD_MUSIC = 11,
+        WLD_SCENES = 8,
+        WLD_LEVELS = 9,
+        WLD_TILES = 7,
     };
     int current = LVL_SELECT;
 };

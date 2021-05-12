@@ -48,9 +48,13 @@ void UpdateGraphics(bool skipRepaint = false);
 // Public Sub GetvScreen(A As Integer) ' Get the screen position
 //  Get the screen position
 void GetvScreen(int A);
+//  Get the screen position assuming the game is 800x600
+void GetvScreenCanonical(int A, int* X, int* Y);
 // Public Sub GetvScreenAverage() ' Get the average screen position for all players
 //  Get the average screen position for all players
 void GetvScreenAverage();
+//  Get the average screen position assuming the game is 800x600
+void GetvScreenAverageCanonical(int* X, int* Y);
 // Public Sub GetvScreenAverage2() ' Get the average screen position for all players with no level edge detection
 //  Get the average screen position for all players with no level edge detection
 void GetvScreenAverage2();
@@ -98,6 +102,12 @@ void DrawCredits();
 // Public Sub DrawInterface(Z As Integer, numScreens) 'draws the games interface
 // draws the games interface
 void DrawInterface(int Z, int numScreens);
+// draws the currently-shown MessageText on the primary screen
+void DrawMessage();
+// draws the level editor interface on vScreen Z
+void DrawEditorLevel(int Z);
+// draws the world editor interface
+void DrawEditorWorld();
 // Public Function pfrX(plrFrame As Integer) As Integer
 int pfrX(int plrFrame);
 // Public Function pfrY(plrFrame As Integer) As Integer
