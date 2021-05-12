@@ -17,6 +17,8 @@
  * or see <http://www.gnu.org/licenses/>.
  */
 
+#include <exception>
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_messagebox.h>
 #include <SDL2/SDL_version.h>
