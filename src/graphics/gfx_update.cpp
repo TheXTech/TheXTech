@@ -570,6 +570,8 @@ void UpdateGraphics(bool skipRepaint)
 #endif
 
         DrawBackground(S, Z);
+
+        // don't show background outside of the current section!
         if(LevelEditor)
         {
             if (vScreenX[Z] + level[S].X > 0) {
@@ -1716,7 +1718,7 @@ void UpdateGraphics(bool skipRepaint)
         }
 
         if(numScreens > 1) // for multiple screens
-            frmMain.resetViewport();
+            frmMain.setViewport(0, 0, ScreenW, ScreenH);
     }
     // splitscreen divider
     if(vScreen[2].Visible)
