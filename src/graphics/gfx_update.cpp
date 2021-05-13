@@ -566,7 +566,7 @@ void UpdateGraphics(bool skipRepaint)
         else
             S = Player[Z].Section;
 
-        frmMain.setViewport(vScreen[Z].Left, vScreen[Z].Top, vScreen[Z].Width, vScreen[Z].Height);
+        frmMain.setViewport(vScreen[Z].ScreenLeft, vScreen[Z].ScreenTop, vScreen[Z].Width, vScreen[Z].Height);
 
 #ifdef __3DS__
         frmMain.setLayer(0);
