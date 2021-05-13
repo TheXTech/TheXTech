@@ -296,6 +296,31 @@ void DynamicScreen()
     }
 }
 
+void CenterScreens()
+{
+    // restrict the vScreen to the level if the level is smaller than the screen
+    if (level[Player[1].Section].Width - level[Player[1].Section].X < vScreen[1].Width)
+    {
+        vScreen[1].Left += (vScreen[1].Width - (level[Player[1].Section].Width - level[Player[1].Section].X)) / 2;
+        vScreen[1].Width = level[Player[1].Section].Width - level[Player[1].Section].X;
+    }
+    if (level[Player[2].Section].Width - level[Player[2].Section].X < vScreen[2].Width)
+    {
+        vScreen[2].Left += (vScreen[2].Width - (level[Player[2].Section].Width - level[Player[2].Section].X)) / 2;
+        vScreen[2].Width = level[Player[2].Section].Width - level[Player[2].Section].X;
+    }
+    if (level[Player[1].Section].Height - level[Player[1].Section].Y < vScreen[1].Height)
+    {
+        vScreen[1].Top += (vScreen[1].Height - (level[Player[1].Section].Height - level[Player[1].Section].Y)) / 2;
+        vScreen[1].Height = level[Player[1].Section].Height - level[Player[1].Section].Y;
+    }
+    if (level[Player[2].Section].Height - level[Player[2].Section].Y < vScreen[2].Height)
+    {
+        vScreen[2].Top += (vScreen[2].Height - (level[Player[2].Section].Height - level[Player[2].Section].Y)) / 2;
+        vScreen[2].Height = level[Player[2].Section].Height - level[Player[2].Section].Y;
+    }
+}
+
 void SetRes()
 {
 //    GetCurrentRes(); // Dummy, useless

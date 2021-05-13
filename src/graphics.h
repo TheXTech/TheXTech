@@ -69,6 +69,8 @@ void SetupScreens();
 // Public Sub DynamicScreen() 'for the split screen stuff
 // for the split screen stuff
 void DynamicScreen();
+// limit vScreens to playable section area and center them on the real screen
+void CenterScreens();
 // Public Sub SuperPrint(SuperWords As String, Font As Integer, X As Single, Y As Single) 'prints text to the screen
 // prints text to the screen
 void SuperPrint(std::string SuperWords, int Font, float X, float Y, float r = 1.f, float g = 1.f, float b = 1.f, float a = 1.f);

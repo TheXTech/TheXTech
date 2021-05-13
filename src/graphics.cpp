@@ -183,14 +183,14 @@ void GetvScreenAverage()
         vScreenX[A] = -level[Player[1].Section].X/2 + -(level[Player[1].Section].Width - vScreen[A].Width)/2;
     else if(-vScreenX[A] < level[Player[1].Section].X)
         vScreenX[A] = -level[Player[1].Section].X;
-    else if(-vScreenX[A] + ScreenW > level[Player[1].Section].Width)
-        vScreenX[A] = -(level[Player[1].Section].Width - ScreenW);
+    else if(-vScreenX[A] + vScreen[A].Width > level[Player[1].Section].Width)
+        vScreenX[A] = -(level[Player[1].Section].Width - vScreen[A].Width);
     if(vScreen[A].Height + level[Player[1].Section].Y > level[Player[1].Section].Height)
         vScreenY[A] = -level[Player[1].Section].Y/2 + -(level[Player[1].Section].Height - vScreen[A].Height)/2;
     else if(-vScreenY[A] < level[Player[1].Section].Y)
         vScreenY[A] = -level[Player[1].Section].Y;
-    else if(-vScreenY[A] + ScreenH > level[Player[1].Section].Height)
-        vScreenY[A] = -(level[Player[1].Section].Height - ScreenH);
+    else if(-vScreenY[A] + vScreen[A].Height > level[Player[1].Section].Height)
+        vScreenY[A] = -(level[Player[1].Section].Height - vScreen[A].Height);
 
     if(GameMenu)
     {

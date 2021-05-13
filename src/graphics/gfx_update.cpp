@@ -345,6 +345,7 @@ void UpdateGraphics(bool skipRepaint)
 
 
     // Any and all screen-based logic... Things we don't want to need to do twice.
+    SetupScreens();
     if(ScreenType == 1)
         numScreens = 2;
     if(ScreenType == 4)
@@ -361,6 +362,8 @@ void UpdateGraphics(bool skipRepaint)
         numScreens = 1;
     if(SingleCoop == 2)
         numScreens = 2;
+    if (!GameMenu && !GameOutro && !LevelEditor && !WorldEditor)
+        CenterScreens();
 
     For(Z, 1, numScreens)
     {
@@ -385,17 +388,14 @@ void UpdateGraphics(bool skipRepaint)
             else
                 GetvScreen(Z);
 
-            if(ForcedControls || qScreen)
-            {
-                if(ScreenType == 2 || ScreenType == 3)
-                    GetvScreenAverageCanonical(&X, &Y);
-                else if(ScreenType == 5 && !vScreen[2].Visible)
-                    GetvScreenAverageCanonical(&X, &Y);
-                else if(ScreenType == 7)
-                    GetvScreenAverageCanonical(&X, &Y);
-                else
-                    GetvScreenCanonical(Z, &X, &Y);
-            }
+            if(ScreenType == 2 || ScreenType == 3)
+                GetvScreenAverageCanonical(&X, &Y);
+            else if(ScreenType == 5 && !vScreen[2].Visible)
+                GetvScreenAverageCanonical(&X, &Y);
+            else if(ScreenType == 7)
+                GetvScreenAverageCanonical(&X, &Y);
+            else
+                GetvScreenCanonical(Z, &X, &Y);
         }
 
         if(!Do_FrameSkip && qScreen)
@@ -494,6 +494,12 @@ void UpdateGraphics(bool skipRepaint)
                 bool onscreen;
                 if(ForcedControls || qScreen)
                     onscreen = vScreenCollisionCanonical(X, Y, NPC[A].Location);
+                // else if(vScreen[Z].Width > 800 && vScreen[Z].Height > 600)
+                //     onscreen = vScreenCollisionCanonical(X, Y, NPC[A].Location);
+                // else if(vScreen[Z].Width > 800)
+                //     onscreen = vScreenCollisionCanonicalX(Z, X, Y, NPC[A].Location);
+                // else if(vScreen[Z].Height > 600)
+                //     onscreen = vScreenCollisionCanonicalY(Z, X, Y, NPC[A].Location);
                 else
                     onscreen = vScreenCollision(Z, NPC[A].Location);
                 if(onscreen && !NPC[A].Hidden)
@@ -543,15 +549,13 @@ void UpdateGraphics(bool skipRepaint)
     frmMain.initDraw(0);
 #endif
 
-    if(ClearBuffer)
-    {
-        ClearBuffer = false;
-        frmMain.clearBuffer();
-    }
+    // buffer now cleared every frame because of cases where vScreens change positions
+    frmMain.clearBuffer();
 
     if(SingleCoop == 2)
         numScreens = 2;
 
+    // draw code now separated from logic.
     For(Z, 1, numScreens)
     {
         if(SingleCoop == 2)
@@ -562,8 +566,7 @@ void UpdateGraphics(bool skipRepaint)
         else
             S = Player[Z].Section;
 
-        if(numScreens > 1) // To separate drawing of screens
-            frmMain.setViewport(vScreen[Z].Left, vScreen[Z].Top, vScreen[Z].Width, vScreen[Z].Height);
+        frmMain.setViewport(vScreen[Z].Left, vScreen[Z].Top, vScreen[Z].Width, vScreen[Z].Height);
 
 #ifdef __3DS__
         frmMain.setLayer(0);
@@ -1638,25 +1641,6 @@ void UpdateGraphics(bool skipRepaint)
             }
         }
 
-        // clip any off-level draws (for cases where screen size > level size)
-        if (vScreen[Z].Width + level[S].X > level[S].Width)
-        {
-            B = (vScreen[Z].Width + level[S].X - level[S].Width) / 2;
-            frmMain.renderRect(0, 0, B, vScreen[Z].Height,
-                0.f, 0.f, 0.f, 1.f, true);
-            frmMain.renderRect(vScreen[Z].Width - B, 0,
-                B, vScreen[Z].Height, 0.f, 0.f, 0.f, 1.f, true);
-        }
-        // menu and credits always have same height as screen
-        if (!GameMenu && !GameOutro && vScreen[Z].Height + level[S].Y > level[S].Height)
-        {
-            B = (vScreen[Z].Height + level[S].Y - level[S].Height) / 2;
-            frmMain.renderRect(0, 0, vScreen[Z].Width, B,
-                0.f, 0.f, 0.f, 1.f, true);
-            frmMain.renderRect(0, vScreen[Z].Height - B,
-                vScreen[Z].Width, B, 0.f, 0.f, 0.f, 1.f, true);
-        }
-
 #ifdef __3DS
         frmMain.setLayer(3);
 #endif
@@ -1717,13 +1701,12 @@ void UpdateGraphics(bool skipRepaint)
             DrawEditorLevel(Z);
         }
 
-        if(numScreens > 1) // for multiple screens
-            frmMain.setViewport(0, 0, ScreenW, ScreenH);
     }
+    frmMain.setViewport(0, 0, ScreenW, ScreenH);
     // splitscreen divider
     if(vScreen[2].Visible)
     {
-        if(int(vScreen[2].Width) == ScreenW)
+        if(DScreenType == 3 || DScreenType == 4 || DScreenType == 6)
             frmMain.renderRect(0, ScreenH/2-2, vScreen[2].Width, 4, 0, 0, 0);
         else
             frmMain.renderRect(ScreenW/2-2, 0, 4, vScreen[2].Height, 0, 0, 0);
