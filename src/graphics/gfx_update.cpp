@@ -362,8 +362,7 @@ void UpdateGraphics(bool skipRepaint)
         numScreens = 1;
     if(SingleCoop == 2)
         numScreens = 2;
-    if (!GameMenu && !GameOutro && !LevelEditor && !WorldEditor)
-        CenterScreens();
+    CenterScreens();
 
     For(Z, 1, numScreens)
     {
