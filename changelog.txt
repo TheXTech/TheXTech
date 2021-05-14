@@ -4,6 +4,7 @@ Changes for 1.3.5.1
 -Episodes and battle levels lists now loading in the separated thread with a progress showing
 -Fixed the regression caused world map music not being switched properly
 -Added an ability to control the intro scene activity on the level by `gameinfo.ini`: set maximum number of running players, and enable/disable the activity at all
+-Fixed an inability to copy the game save based on old files at episode directory
 
 Changes for 1.3.5
 -Fixed the gamepad control stuck because of axes returned value that doesn't equal the initial state on some devices
