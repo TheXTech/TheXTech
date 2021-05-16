@@ -491,14 +491,8 @@ void UpdateGraphics(bool skipRepaint)
             for(A = 1; A <= numNPCs; A++)
             {
                 bool onscreen;
-                if(ForcedControls || qScreen)
+                if(ForcedControls || qScreen || (!NPC[A].Active && !NPC[A].TriggerActivate.empty()))
                     onscreen = vScreenCollisionCanonical(X, Y, NPC[A].Location);
-                // else if(vScreen[Z].Width > 800 && vScreen[Z].Height > 600)
-                //     onscreen = vScreenCollisionCanonical(X, Y, NPC[A].Location);
-                // else if(vScreen[Z].Width > 800)
-                //     onscreen = vScreenCollisionCanonicalX(Z, X, Y, NPC[A].Location);
-                // else if(vScreen[Z].Height > 600)
-                //     onscreen = vScreenCollisionCanonicalY(Z, X, Y, NPC[A].Location);
                 else
                     onscreen = vScreenCollision(Z, NPC[A].Location);
                 if(onscreen && !NPC[A].Hidden)
