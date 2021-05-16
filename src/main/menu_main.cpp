@@ -376,9 +376,10 @@ bool mainMenuUpdate()
             if(MenuCursor != 0)
                 MenuCursor = 0;
         }
+        else
 #endif
         // Main Menu
-        else if(MenuMode == MENU_MAIN)
+        if(MenuMode == MENU_MAIN)
         {
             if(MenuMouseMove)
             {
@@ -1532,11 +1533,10 @@ void mainMenuDraw()
             SuperPrint(fmt::format_ne("{0} {1}%", g_mainMenu.loading, progress), 3, MenuX, MenuY);
         }
     }
-#else
-    if(false) {}
+    else
 #endif
     // Main menu
-    else if(MenuMode == MENU_MAIN)
+    if(MenuMode == MENU_MAIN)
     {
         SuperPrint(g_mainMenu.main1PlayerGame, 3, MenuX, MenuY);
         SuperPrint(g_mainMenu.main2PlayerGame, 3, MenuX, MenuY + 30);
