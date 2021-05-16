@@ -54,6 +54,7 @@ static void compatInit(Compatibility_t &c)
     c.fix_dont_switch_player_by_clowncar = true;
     c.enable_multipoints = true;
     c.fix_autoscroll_speed = true;
+    c.fix_blooper_stomp_effect = true;
 
     if(g_speedRunnerMode >= SPEEDRUN_MODE_2) // Make sure that bugs were same as on SMBX2 Beta 4 on this moment
     {
@@ -72,6 +73,7 @@ static void compatInit(Compatibility_t &c)
         c.fix_dont_switch_player_by_clowncar = false;
         c.enable_multipoints = false;
         c.fix_autoscroll_speed = false;
+        c.fix_blooper_stomp_effect = false;
     }
 
     if(g_speedRunnerMode >= SPEEDRUN_MODE_3) // Strict vanilla SMBX
@@ -117,6 +119,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         compat.read("fix-dont-switch-player-by-clowncar", c.fix_dont_switch_player_by_clowncar, c.fix_dont_switch_player_by_clowncar);
         compat.read("enable-multipoints", c.enable_multipoints, c.enable_multipoints);
         compat.read("fix-autoscroll-speed", c.fix_autoscroll_speed, c.fix_autoscroll_speed);
+        compat.read("fix-blooper-stomp-effect", c.fix_blooper_stomp_effect, c.fix_blooper_stomp_effect);
     }
     compat.read("fix-player-filter-bounce", c.fix_player_filter_bounce, c.fix_player_filter_bounce);
     compat.read("fix-player-downward-clip", c.fix_player_downward_clip, c.fix_player_downward_clip);
