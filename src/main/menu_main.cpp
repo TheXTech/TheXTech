@@ -23,10 +23,13 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#ifndef __3DS__
 #include <SDL2/SDL_timer.h>
 #include <SDL2/SDL_thread.h>
-#include <fmt_format_ne.h>
 #include <atomic>
+#endif
+
+#include <fmt_format_ne.h>
 
 #include <AppPath/app_path.h>
 #include <DirManager/dirman.h>
@@ -49,18 +52,21 @@
 
 MainMenuContent g_mainMenu;
 
+#ifndef __3DS__
 static SDL_atomic_t         loading;
 static SDL_atomic_t         loadingProgrss;
 static SDL_atomic_t         loadingProgrssMax;
 
 static SDL_Thread*          loadingThread = nullptr;
-
+#endif
 
 void initMainMenu()
 {
+#ifndef __3DS__
     SDL_AtomicSet(&loading, 0);
     SDL_AtomicSet(&loadingProgrss, 0);
     SDL_AtomicSet(&loadingProgrssMax, 0);
+#endif
 
     g_mainMenu.main1PlayerGame = "1 Player Game";
     g_mainMenu.main2PlayerGame = "2 Player Game";
@@ -82,6 +88,8 @@ static int menuBattleMode = false;
 static int menuCopySaveSrc = 0;
 static int menuCopySaveDst = 0;
 
+const int menuFix = -44; // for Input Settings
+
 static int FindWorldsThread(void *)
 {
     FindWorlds();
@@ -101,15 +109,19 @@ void FindWorlds()
     SelectWorld.clear();
     SelectWorld.push_back(SelectWorld_t()); // Dummy entry
 
+#ifndef __3DS__
     SDL_AtomicSet(&loadingProgrss, 0);
     SDL_AtomicSet(&loadingProgrssMax, 0);
+#endif
 
     for(const auto &worldsRoot : worldRoots)
     {
         std::vector<std::string> dirs;
         DirMan episodes(worldsRoot);
         episodes.getListOfFolders(dirs);
+#ifndef __3DS__
         SDL_AtomicAdd(&loadingProgrssMax, dirs.size());
+#endif
     }
 
     for(const auto &worldsRoot : worldRoots)
@@ -149,13 +161,17 @@ void FindWorlds()
                 }
             }
 
+#ifndef __3DS__
             SDL_AtomicAdd(&loadingProgrss, 1);
+#endif
         }
     }
 
     NumSelectWorld = (SelectWorld.size() - 1);
 
+#ifndef __3DS__
     SDL_AtomicSet(&loading, 0);
+#endif
 }
 
 static int FindLevelsThread(void *)
@@ -180,15 +196,19 @@ void FindLevels()
     SelectWorld[1].WorldName = "Random Level";
     LevelData head;
 
+#ifndef __3DS__
     SDL_AtomicSet(&loadingProgrss, 0);
     SDL_AtomicSet(&loadingProgrssMax, 0);
+#endif
 
     for(const auto &battleRoot : battleRoots)
     {
         std::vector<std::string> files;
         DirMan battleLvls(battleRoot);
         battleLvls.getListOfFiles(files, {".lvl", ".lvlx"});
+#ifndef __3DS__
         SDL_AtomicAdd(&loadingProgrssMax, files.size());
+#endif
     }
 
     for(const auto &battleRoot : battleRoots)
@@ -209,12 +229,16 @@ void FindLevels()
                     w.WorldName = fName;
                 SelectWorld.push_back(w);
             }
+#ifndef __3DS__
             SDL_AtomicAdd(&loadingProgrss, 1);
+#endif
         }
     }
 
     NumSelectWorld = (SelectWorld.size() - 1);
+#ifndef __3DS__
     SDL_AtomicSet(&loading, 0);
+#endif
 }
 
 
@@ -243,21 +267,34 @@ static void s_handleMouseMove(int items, int x, int y, int maxWidth, int itemHei
 
 bool mainMenuUpdate()
 {
+    int MenuX = ScreenW / 2 - 100;
+    int MenuY = ScreenH - 250;
+
     int B;
     Location_t tempLocation;
     int menuLen;
     Player_t blankPlayer;
 
+#ifndef __3DS__
     bool altPressed = getKeyState(SDL_SCANCODE_LALT) == KEY_PRESSED ||
                       getKeyState(SDL_SCANCODE_RALT) == KEY_PRESSED;
     bool escPressed = getKeyState(SDL_SCANCODE_ESCAPE) == KEY_PRESSED;
-#ifdef __ANDROID__
-    escPressed |= getKeyState(SDL_SCANCODE_AC_BACK) == KEY_PRESSED;
-#endif
     bool spacePressed = getKeyState(SDL_SCANCODE_SPACE) == KEY_PRESSED;
     bool returnPressed = getKeyState(SDL_SCANCODE_RETURN) == KEY_PRESSED;
     bool upPressed = getKeyState(SDL_SCANCODE_UP) == KEY_PRESSED;
     bool downPressed = getKeyState(SDL_SCANCODE_DOWN) == KEY_PRESSED;
+#else // #ifndef __3DS__
+    bool altPressed = false;
+    bool returnPressed = false;
+    bool spacePressed = false;
+    bool escPressed = false;
+    bool upPressed = false;
+    bool downPressed = false;
+#endif // #ifndef __3DS__ ... #else
+
+#ifdef __ANDROID__
+    escPressed |= getKeyState(SDL_SCANCODE_AC_BACK) == KEY_PRESSED;
+#endif // #ifdef __ANDROID__
 
     bool menuDoPress = (returnPressed && !altPressed) || spacePressed;
     bool menuBackPress = (escPressed && !altPressed);
@@ -331,6 +368,7 @@ bool mainMenuUpdate()
 
         } // No keyboard/Joystick grabbing active
 
+#ifndef __3DS__
         if(SDL_AtomicGet(&loading))
         {
             if((menuDoPress && MenuCursorCanMove) || MenuMouseClick)
@@ -338,6 +376,7 @@ bool mainMenuUpdate()
             if(MenuCursor != 0)
                 MenuCursor = 0;
         }
+#endif
         // Main Menu
         else if(MenuMode == MENU_MAIN)
         {
@@ -345,7 +384,7 @@ bool mainMenuUpdate()
             {
                 For(A, 0, 4)
                 {
-                    if(MenuMouseY >= 350 + A * 30 && MenuMouseY <= 366 + A * 30)
+                    if(MenuMouseY >= MenuY + A * 30 && MenuMouseY <= MenuY + A * 30 + 16)
                     {
                         if(A == 0)
                             menuLen = 18 * g_mainMenu.main1PlayerGame.size() - 2;
@@ -358,7 +397,7 @@ bool mainMenuUpdate()
                         else
                             menuLen = 18 * g_mainMenu.mainExit.size();
 
-                        if(MenuMouseX >= 300 && MenuMouseX <= 300 + menuLen)
+                        if(MenuMouseX >= MenuX && MenuMouseX <= MenuX + menuLen)
                         {
                             if(MenuMouseRelease && MenuMouseDown)
                                 MenuMouseClick = true;
@@ -393,7 +432,7 @@ bool mainMenuUpdate()
                     MenuMode = MENU_1PLAYER_GAME;
                     menuPlayersNum = 1;
                     menuBattleMode = false;
-#ifdef __EMSCRIPTEN__
+#if defined(__EMSCRIPTEN__) || defined(__3DS__)
                     FindWorlds();
 #else
                     SDL_AtomicSet(&loading, 1);
@@ -407,7 +446,7 @@ bool mainMenuUpdate()
                     MenuMode = MENU_2PLAYER_GAME;
                     menuPlayersNum = 2;
                     menuBattleMode = false;
-#ifdef __EMSCRIPTEN__
+#if defined(__EMSCRIPTEN__) || defined(__3DS__)
                     FindWorlds();
 #else
                     SDL_AtomicSet(&loading, 1);
@@ -421,7 +460,7 @@ bool mainMenuUpdate()
                     MenuMode = MENU_BATTLE_MODE;
                     menuPlayersNum = 2;
                     menuBattleMode = true;
-#ifdef __EMSCRIPTEN__
+#if defined(__EMSCRIPTEN__) || defined(__3DS__)
                     FindLevels();
 #else
                     SDL_AtomicSet(&loading, 1);
@@ -474,7 +513,7 @@ bool mainMenuUpdate()
                     }
                     else
                     {
-                        if(MenuMouseY >= 350 + A * 30 + B && MenuMouseY <= 366 + A * 30 + B)
+                        if(MenuMouseY >= MenuY + A * 30 + B && MenuMouseY <= MenuY + A * 30 + B + 16)
                         {
                             if(A >= 0 && A < numCharacters)
                             {
@@ -487,7 +526,7 @@ bool mainMenuUpdate()
                                 menuLen = 180;
                             }
 
-                            if(MenuMouseX >= 300 && MenuMouseX <= 300 + menuLen)
+                            if(MenuMouseX >= MenuX && MenuMouseX <= MenuX + menuLen)
                             {
                                 if(MenuMouseRelease && MenuMouseDown)
                                     MenuMouseClick = true;
@@ -647,11 +686,11 @@ bool mainMenuUpdate()
 
                 For(A, minShow - 1, maxShow - 1)
                 {
-                    if(MenuMouseY >= 350 + B * 30 && MenuMouseY <= 366 + B * 30)
+                    if(MenuMouseY >= MenuY + B * 30 && MenuMouseY <= MenuY + B * 30 + 16)
                     {
                         menuLen = 19 * static_cast<int>(SelectWorld[A + 1].WorldName.size());
 
-                        if(MenuMouseX >= 300 && MenuMouseX <= 300 + menuLen)
+                        if(MenuMouseX >= MenuX && MenuMouseX <= MenuX + menuLen)
                         {
                             if(MenuMouseRelease && MenuMouseDown)
                                 MenuMouseClick = true;
@@ -722,7 +761,7 @@ bool mainMenuUpdate()
         else if(MenuMode == MENU_SELECT_SLOT_1P || MenuMode == MENU_SELECT_SLOT_2P)
         {
             if(MenuMouseMove)
-                s_handleMouseMove(4, 300, 350, 300, 30);
+                s_handleMouseMove(4, MenuX, MenuY, 300, 30);
 
             if(MenuCursorCanMove || MenuMouseClick || MenuMouseBack)
             {
@@ -901,7 +940,7 @@ bool mainMenuUpdate()
                 MenuMode == MENU_SELECT_SLOT_1P_COPY_S2 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S2)
         {
             if(MenuMouseMove)
-                s_handleMouseMove(4, 300, 350, 300, 30);
+                s_handleMouseMove(4, MenuX, MenuY, 300, 30);
 
             if(MenuCursorCanMove || MenuMouseClick || MenuMouseBack)
             {
@@ -968,7 +1007,7 @@ bool mainMenuUpdate()
         else if(MenuMode == MENU_SELECT_SLOT_1P_DELETE || MenuMode == MENU_SELECT_SLOT_1P_DELETE)
         {
             if(MenuMouseMove)
-                s_handleMouseMove(4, 300, 350, 300, 30);
+                s_handleMouseMove(4, MenuX, MenuY, 300, 30);
 
             if(MenuCursorCanMove || MenuMouseClick || MenuMouseBack)
             {
@@ -1011,7 +1050,7 @@ bool mainMenuUpdate()
             {
                 For(A, 0, optionsMenuLength)
                 {
-                    if(MenuMouseY >= 350 + A * 30 && MenuMouseY <= 366 + A * 30)
+                    if(MenuMouseY >= MenuY + A * 30 && MenuMouseY <= MenuY + A * 30 + 16)
                     {
                         if(A == 0)
                             menuLen = 18 * std::strlen("player 1 controls") - 4;
@@ -1029,7 +1068,7 @@ bool mainMenuUpdate()
                         else
                             menuLen = 18 * std::strlen("view credits") - 2;
 
-                        if(MenuMouseX >= 300 && MenuMouseX <= 300 + menuLen)
+                        if(MenuMouseX >= MenuX && MenuMouseX <= MenuX + menuLen)
                         {
                             if(MenuMouseRelease && MenuMouseDown)
                                 MenuMouseClick = true;
@@ -1111,7 +1150,7 @@ bool mainMenuUpdate()
                 {
                     For(A, 0, 11)
                     {
-                        if(MenuMouseY >= 260 - 44 + A * 30 && MenuMouseY <= 276 - 44 + A * 30)
+                        if(MenuMouseY >= MenuY - 90 + menuFix + A * 30 && MenuMouseY <= MenuY - 90 + menuFix + A * 30 + 16)
                         {
                             auto &ck = conKeyboard[MenuMode - MENU_INPUT_SETTINGS_BASE];
                             switch(A)
@@ -1165,7 +1204,7 @@ bool mainMenuUpdate()
                                 break;
                             }
 
-                            if(MenuMouseX >= 300 && MenuMouseX <= 300 + menuLen)
+                            if(MenuMouseX >= MenuX && MenuMouseX <= MenuX + menuLen)
                             {
                                 if(MenuMouseRelease && MenuMouseDown)
                                     MenuMouseClick = true;
@@ -1183,7 +1222,7 @@ bool mainMenuUpdate()
                 {
                     For(A, 0, 11)
                     {
-                        if(MenuMouseY >= 260 - 44 + A * 30 && MenuMouseY <= 276 + A * 30 - 44)
+                        if(MenuMouseY >= MenuY - 90 + menuFix + A * 30 && MenuMouseY <= MenuY - 90 + menuFix + A * 30 + 16)
                         {
                             if(A == 0)
                             {
@@ -1193,7 +1232,7 @@ bool mainMenuUpdate()
                             {
                                 menuLen = 18 * std::strlen("RUN........_");
                             }
-                            if(MenuMouseX >= 300 && MenuMouseX <= 300 + menuLen)
+                            if(MenuMouseX >= MenuX && MenuMouseX <= MenuX + menuLen)
                             {
                                 if(MenuMouseRelease && MenuMouseDown)
                                     MenuMouseClick = true;
@@ -1458,12 +1497,18 @@ void mainMenuDraw()
     if(MenuMode != MENU_1PLAYER_GAME && MenuMode != MENU_2PLAYER_GAME && MenuMode != MENU_BATTLE_MODE)
         worldCurs = 0;
 
-    int menuFix = -44; // for Input Settings
-
     #ifdef __3DS__
     frmMain.setLayer(2);
     #endif
-    frmMain.renderTexture(ScreenW / 2 - GFX.MenuGFX[1].w / 2, 0, GFX.MenuGFX[1].w, GFX.MenuGFX[1].h, GFX.MenuGFX[1], 0, 0);
+
+    // correction to loop the original asset properly
+    A = GFX.MenuGFX[1].w;
+    if (A == 800)
+        A = 768;
+    // horizReps
+    B = ScreenW / A + 1;
+    for (C = 0; C < B; C++)
+        frmMain.renderTexture(A * C, 0, A, GFX.MenuGFX[1].h, GFX.MenuGFX[1], 0, 0);
     frmMain.renderTexture(ScreenW / 2 - GFX.MenuGFX[3].w / 2, ScreenH - 24,
             GFX.MenuGFX[3].w, GFX.MenuGFX[3].h, GFX.MenuGFX[3], 0, 0);
 
@@ -1476,17 +1521,20 @@ void mainMenuDraw()
     int MenuX = ScreenW / 2 - 100;
     int MenuY = ScreenH - 250;
 
+#ifndef __3DS__
     if(SDL_AtomicGet(&loading))
     {
         if(SDL_AtomicGet(&loadingProgrssMax) <= 0)
-            SuperPrint(g_mainMenu.loading, 3, 300, 350);
+            SuperPrint(g_mainMenu.loading, 3, MenuX, MenuY);
         else
         {
             int progress = (SDL_AtomicGet(&loadingProgrss) * 100) / SDL_AtomicGet(&loadingProgrssMax);
-            SuperPrint(fmt::format_ne("{0} {1}%", g_mainMenu.loading, progress), 3, 300, 350);
+            SuperPrint(fmt::format_ne("{0} {1}%", g_mainMenu.loading, progress), 3, MenuX, MenuY);
         }
     }
-
+#else
+    if(false) {}
+#endif
     // Main menu
     else if(MenuMode == MENU_MAIN)
     {

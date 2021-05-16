@@ -101,14 +101,16 @@ void DoCredits()
 //        for(A = 1; A <= 2; A++) // Useless loop
 //        {
         bool quitKey = false;
-        quitKey |= (getKeyState(vbKeyEscape) == KEY_PRESSED);
-        quitKey |= (getKeyState(vbKeySpace) == KEY_PRESSED);
-        quitKey |= (getKeyState(vbKeyReturn) == KEY_PRESSED);
         for(int p = 1; p <= maxLocalPlayers; ++p)
         {
             if(useJoystick[p] > 0)
                 quitKey |= joyIsKeyDown(useJoystick[p] - 1, conJoystick[p].Start);
         }
+#ifndef __3DS__
+        quitKey |= (getKeyState(vbKeyEscape) == KEY_PRESSED);
+        quitKey |= (getKeyState(vbKeySpace) == KEY_PRESSED);
+        quitKey |= (getKeyState(vbKeyReturn) == KEY_PRESSED);
+#endif
 #ifdef __ANDROID__ // Quit credits on BACK key press
         quitKey |= (getKeyState(SDL_SCANCODE_AC_BACK) == KEY_PRESSED);
 #endif
@@ -252,6 +254,13 @@ void SetupCredits()
     AddCredit("");
     AddCredit("Vitaly Novichkov");
     AddCredit("'Wohlstand'");
+    AddCredit("");
+    AddCredit("");
+#endif
+#ifdef __3DS__
+    AddCredit("3DS port By:");
+    AddCredit("");
+    AddCredit("'ds-sloth'");
     AddCredit("");
     AddCredit("");
 #endif

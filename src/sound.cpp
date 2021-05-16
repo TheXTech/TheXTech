@@ -23,6 +23,10 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#ifdef __3DS__
+#error "Primary `sound.cpp` only for SDL clients. Build `3ds/sound.cpp` instead."
+#endif
+
 #include <SDL2/SDL_messagebox.h>
 #include <SDL2/SDL_timer.h>
 #include <SDL2/SDL_mixer_ext.h>

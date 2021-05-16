@@ -23,7 +23,9 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#ifndef __3DS__
 #include <SDL2/SDL_audio.h>
+#endif
 
 #include "../globals.h"
 #include "../game_main.h"
@@ -51,6 +53,7 @@ void OpenConfig_preSetup()
             RenderMode = 2;
         config.endGroup();
 
+#ifndef __3DS__
         config.beginGroup("sound");
         config.read("sample-rate", g_audioSetup.sampleRate, 44100);
         config.read("channels", g_audioSetup.channels, 2);
@@ -88,6 +91,7 @@ void OpenConfig_preSetup()
         config.readEnum("format", g_audioSetup.format, (uint16_t)AUDIO_F32, sampleFormats);
         config.read("buffer-size", g_audioSetup.bufferSize, 512);
         config.endGroup();
+#endif // #ifndef __3DS__
     }
 }
 
@@ -241,6 +245,7 @@ void SaveConfig()
 //    config.setValue("show-fps", ShowFPS);
     config.endGroup();
 
+#ifndef __3DS__
     config.beginGroup("sound");
     config.setValue("sample-rate", g_audioSetup.sampleRate);
     config.setValue("channels", g_audioSetup.channels);
@@ -259,6 +264,7 @@ void SaveConfig()
     };
     config.setValue("format", formats_back.at(g_audioSetup.format));
     config.endGroup();
+#endif
 
     config.beginGroup("gameplay");
     config.setValue("ground-pound-by-alt-run", GameplayPoundByAltRun);

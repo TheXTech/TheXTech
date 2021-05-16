@@ -23,8 +23,6 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#include <SDL2/SDL_timer.h>
-
 #include "../globals.h"
 #include "../frame_timer.h"
 #include "../game_main.h"

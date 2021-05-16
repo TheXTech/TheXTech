@@ -23,7 +23,11 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#ifndef __3DS__
 #include <SDL2/SDL_version.h>
+#else
+#include "3ds/SDL_supplement.h"
+#endif
 
 #include "globals.h"
 #include <fmt_format_ne.h>
@@ -522,6 +526,7 @@ void DoEvents()
     frmMain.doEvents();
 }
 
+#ifndef __3DS__
 int showCursor(int show)
 {
     return SDL_ShowCursor(show);
@@ -611,6 +616,19 @@ std::string getJoyKeyName(bool isController, const KM_Key &key)
         return fmt::format_ne("K={0} ID={1} T={2}", key.val, key.id, key.type);
     }
 }
+#endif
+// #ifndef __3DS__
+
+#ifdef __3DS__
+int showCursor(int show) {return 0;}
+const char *getKeyName(int key) {return " ... ";}
+std::string getJoyKeyName(const KM_Key &key)
+{
+    if(key.type < 0)
+        return "_";
+    return KEYNAMES[key.val];
+}
+#endif
 
 
 void initAll()

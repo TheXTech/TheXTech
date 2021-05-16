@@ -23,6 +23,10 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#ifdef __3DS__
+#error "Primary `control/touchscreen.cpp` only for SDL clients. Build `3ds/touchscreen.cpp` instead."
+#endif
+
 #include <Logger/logger.h>
 #include <Utils/maths.h>
 

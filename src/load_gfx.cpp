@@ -23,7 +23,10 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#ifndef __3DS__
 #include <SDL2/SDL_timer.h>
+#include <InterProcess/intproc.h>
+#endif
 
 #include "globals.h"
 #include "load_gfx.h"
@@ -31,7 +34,6 @@
 #include <Utils/files.h>
 #include <Utils/dir_list_ci.h>
 #include <DirManager/dirman.h>
-#include <InterProcess/intproc.h>
 #include <fmt_format_ne.h>
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
@@ -640,11 +642,13 @@ void UpdateLoadREAL()
 {
     std::string state;
     bool draw = false;
+#ifndef __3DS__
     if(IntProc::isEnabled())
     {
         state = IntProc::getState();
         draw = true;
     }
+#endif
 
     static float alphaFader = 1.0f;
 
@@ -670,6 +674,9 @@ void UpdateLoadREAL()
 
     if(draw)
     {
+#ifdef __3DS__
+        frmMain.initDraw();
+#endif
         frmMain.setTargetTexture();
         frmMain.clearBuffer();
         if(!gfxLoaderTestMode)

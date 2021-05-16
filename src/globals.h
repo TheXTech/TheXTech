@@ -26,7 +26,9 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
+#ifndef __3DS__
 #include <SDL2/SDL_scancode.h>
+#endif
 
 #include <string>
 #include <vector>
@@ -96,7 +98,10 @@ extern void DoEvents();
  */
 extern int showCursor(int show);
 
+#ifndef __3DS__
 extern Uint8 getKeyState(SDL_Scancode key);
+#endif
+
 extern Uint8 getKeyStateI(int key);
 
 //Public Const KEY_PRESSED As Integer = &H1000    'For control information
@@ -226,17 +231,18 @@ extern std::string EoT;
 //Public Type EditorControls      'Controls for the editor
 struct EditorControls_t
 {
-//    Up As Boolean
     bool Up = false;
-//    Down As Boolean
     bool Down = false;
-//    Left As Boolean
     bool Left = false;
-//    Right As Boolean
     bool Right = false;
-//    Mouse1 As Boolean
     bool Mouse1 = false;
-//End Type
+    bool NextSection = false;
+    bool PrevSection = false;
+    bool SwitchScreens = false;
+    bool TestPlay = false;
+    bool Select = false;
+    bool Erase = false;
+    bool FastScroll = false;
 };
 
 // Structures moved into con_control.h

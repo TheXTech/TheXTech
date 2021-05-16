@@ -23,8 +23,6 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#include <SDL2/SDL_timer.h>
-
 #include <cmath>
 #include <ctime>
 #include <Utils/maths.h>

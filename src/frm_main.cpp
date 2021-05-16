@@ -23,6 +23,10 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#ifdef __3DS__
+#error "Primary `frm_main.cpp` only for SDL clients. Build `3ds/frm_main.cpp` instead."
+#endif
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_thread.h>
 #include <SDL2/SDL_opengl.h>

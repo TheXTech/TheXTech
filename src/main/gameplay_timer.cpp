@@ -24,7 +24,12 @@
  */
 
 
+#ifndef __3DS__
 #include <SDL2/SDL_stdinc.h>
+#else
+#include "3ds/SDL_supplement.h"
+#endif
+
 #include <fmt_format_ne.h>
 #include <IniProcessor/ini_processing.h>
 

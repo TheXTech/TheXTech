@@ -23,6 +23,10 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#ifdef __3DS__
+#error "Primary `main/cheat_code.cpp` only for SDL clients. Build `3ds/cheat_code.cpp` instead."
+#endif
+
 #include <SDL2/SDL_stdinc.h>
 #include <SDL2/SDL_messagebox.h>
 

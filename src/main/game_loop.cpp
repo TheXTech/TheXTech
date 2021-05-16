@@ -23,7 +23,9 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#ifndef __3DS__
 #include <SDL2/SDL_timer.h>
+#endif
 
 #include <Logger/logger.h>
 #include <pge_delay.h>
@@ -123,13 +125,18 @@ void GameLoop()
         if(MagicHand)
             UpdateEditor();
 
+#ifndef __3DS__
         bool altPressed = getKeyState(SDL_SCANCODE_LALT) == KEY_PRESSED ||
                           getKeyState(SDL_SCANCODE_RALT) == KEY_PRESSED;
 
         bool escPressed = getKeyState(SDL_SCANCODE_ESCAPE) == KEY_PRESSED;
 #ifdef __ANDROID__
         escPressed |= getKeyState(SDL_SCANCODE_AC_BACK) == KEY_PRESSED;
-#endif
+#endif // #ifdef __ANDROID__
+#else // #ifndef __3DS__
+        bool altPressed = false;
+        bool escPressed = false;
+#endif // #ifndef __3DS__
 
         bool pausePress = (Player[1].Controls.Start || escPressed) && !altPressed;
 
@@ -257,6 +264,16 @@ void PauseGame(int plr)
             BlockFrames();
             UpdateEffects();
 
+
+            if(SingleCoop > 0 || numPlayers > 2)
+            {
+                for(A = 1; A <= numPlayers; A++)
+                    Player[A].Controls = Player[1].Controls;
+            }
+
+            auto &c = Player[plr].Controls;
+
+#ifndef __3DS__
             bool altPressed = getKeyState(SDL_SCANCODE_LALT) == KEY_PRESSED ||
                               getKeyState(SDL_SCANCODE_RALT) == KEY_PRESSED;
             bool escPressed = getKeyState(SDL_SCANCODE_ESCAPE) == KEY_PRESSED;
@@ -268,19 +285,17 @@ void PauseGame(int plr)
             bool menuDoPress = (returnPressed && !altPressed) || spacePressed;
             bool menuBackPress = (escPressed && !altPressed);
 
-            if(SingleCoop > 0 || numPlayers > 2)
-            {
-                for(A = 1; A <= numPlayers; A++)
-                    Player[A].Controls = Player[1].Controls;
-            }
-
-            auto &c = Player[plr].Controls;
-
             menuDoPress |= (c.Start || c.Jump) && !altPressed;
             menuBackPress |= c.Run && !altPressed;
 
             upPressed |= (c.Up && !altPressed);
             downPressed |= (c.Down && !altPressed);
+#else // #ifndef __3DS__
+            menuDoPress |= (c.Start || c.Jump);
+            menuBackPress |= c.Run;
+            upPressed |= c.Up;
+            downPressed |= c.Down;
+#endif
 
             if(MessageText.empty())
             {

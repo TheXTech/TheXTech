@@ -23,15 +23,20 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#ifndef __3DS__
 #include <SDL2/SDL.h>
+#include <tclap/CmdLine.h>
+#include <CrashHandler/crash_handler.h>
+#else
+#include "3ds/SDL_supplement.h"
+#include <3ds.h>
+#endif
 
 #include "game_main.h"
 #include "main/game_info.h"
 #include <AppPath/app_path.h>
-#include <tclap/CmdLine.h>
 #include <Utils/strings.h>
 #include <Utils/files.h>
-#include <CrashHandler/crash_handler.h>
 
 #ifdef ENABLE_XTECH_LUA
 #include "xtech_lua_main.h"
@@ -135,9 +140,15 @@ static void strToPlayerSetup(int player, const std::string &setupString)
 extern "C"
 int main(int argc, char**argv)
 {
+#ifdef __3DS__
+    romfsInit();
+#endif
+
     CmdLineSetup_t setup;
 
+#ifndef __3DS__
     CrashHandler::initSigs();
+#endif
 
     AppPathManager::initAppPath();
     AppPath = AppPathManager::assetsRoot();
@@ -148,6 +159,7 @@ int main(int argc, char**argv)
 
     testPlayer.fill(Player_t());
 
+#ifndef __3DS__
     try
     {
         // Define the command line object.
@@ -313,6 +325,7 @@ int main(int argc, char**argv)
         std::cerr.flush();
         return 2;
     }
+#endif // #ifndef __3DS__
 
     initGameInfo();
 
@@ -352,6 +365,10 @@ int main(int argc, char**argv)
 #endif
 
     frmMain.freeSDL();
+
+#ifdef __3DS__
+    romfsExit();
+#endif
 
     return ret;
 }

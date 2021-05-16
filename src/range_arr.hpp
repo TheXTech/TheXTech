@@ -28,7 +28,12 @@
 
 #include <cstddef>
 #include <cstring>
+
+#ifndef __3DS__
 #include <SDL2/SDL_assert.h>
+#else
+#include "3ds/SDL_supplement.h"
+#endif
 
 #define For(A, From, To) for(int A = From; A <= To; ++A)
 

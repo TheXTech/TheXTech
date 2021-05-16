@@ -23,9 +23,11 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#ifndef __3DS__
 #include <SDL2/SDL_timer.h>
-
 #include <InterProcess/intproc.h>
+#endif
+
 #include <Logger/logger.h>
 #include <Utils/elapsed_timer.h>
 #include <pge_delay.h>
@@ -104,7 +106,7 @@ void UpdateEditor()
 
     if(!MagicHand)
     {
-        if((getKeyState(vbKeyPageUp) == KEY_PRESSED) != 0)
+        if(EditorControls.PrevSection && !WorldEditor)
         {
             if(ScrollRelease == true)
             {
@@ -117,7 +119,7 @@ void UpdateEditor()
 //                    frmLevelSettings::optSection(curSection).Value = true;
             }
         }
-        else if((getKeyState(vbKeyPageDown) == KEY_PRESSED) != 0)
+        else if(EditorControls.NextSection && !WorldEditor)
         {
             if(ScrollRelease == true)
             {
@@ -172,7 +174,7 @@ void UpdateEditor()
     if(LevelEditor || MagicHand)
     {
         GetEditorControls();
-        if((getKeyState(vbKeyShift) == KEY_PRESSED) != 0)
+        if(EditorControls.FastScroll)
             ScrollDelay = 0;
 
         if(MagicHand)
@@ -218,8 +220,10 @@ void UpdateEditor()
 
         // this is where objects are placed/grabbed/deleted
 
+#ifndef __3DS__
         if(IntProc::isEnabled())
             UpdateInterprocess();
+#endif
 
         if(EditorControls.Mouse1)
         {
@@ -2056,22 +2060,23 @@ void GetEditorControls()
 {
     if(HasCursor)
     {
-        if((getKeyState(vbKeyUp) == KEY_PRESSED))
-            EditorControls.Up = true;
-        else
-            EditorControls.Up = false;
-        if((getKeyState(vbKeyDown) == KEY_PRESSED))
-            EditorControls.Down = true;
-        else
-            EditorControls.Down = false;
-        if((getKeyState(vbKeyLeft) == KEY_PRESSED))
-            EditorControls.Left = true;
-        else
-            EditorControls.Left = false;
-        if((getKeyState(vbKeyRight) == KEY_PRESSED))
-            EditorControls.Right = true;
-        else
-            EditorControls.Right = false;
+        // TODO: move elsewhere
+        // if((getKeyState(vbKeyUp) == KEY_PRESSED))
+        //     EditorControls.Up = true;
+        // else
+        //     EditorControls.Up = false;
+        // if((getKeyState(vbKeyDown) == KEY_PRESSED))
+        //     EditorControls.Down = true;
+        // else
+        //     EditorControls.Down = false;
+        // if((getKeyState(vbKeyLeft) == KEY_PRESSED))
+        //     EditorControls.Left = true;
+        // else
+        //     EditorControls.Left = false;
+        // if((getKeyState(vbKeyRight) == KEY_PRESSED))
+        //     EditorControls.Right = true;
+        // else
+        //     EditorControls.Right = false;
     }
 }
 
@@ -2721,6 +2726,7 @@ void zTestLevel(bool magicHand, bool interProcess)
         MagicHand = false;
     }
 
+#ifndef __3DS__
     if(interProcess)
     {
         LevelData data;
@@ -2779,6 +2785,7 @@ void zTestLevel(bool magicHand, bool interProcess)
         IntProc::setState("Done. Starting game...");
     }
     else
+#endif
     {
         if(!OpenLevel(FullFileName))
         {

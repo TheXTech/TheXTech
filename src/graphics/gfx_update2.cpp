@@ -423,16 +423,30 @@ void UpdateGraphics2(bool skipRepaint)
 #ifdef __3DS__
         frmMain.setLayer(2);
 #endif
-        // render background, in careful segments...
+        // render background, in MANY careful segments...
 
-        // top...
-        frmMain.renderTexture(0, 0, ScreenW-66, 130, GFX.Interface[4], 0, 0);
+        // top-left
+        frmMain.renderTexture(0, 0, 66, 130, GFX.Interface[4], 0, 0);
+        // top
+        A = GFX.Interface[4].w-66-66;
+        for (B = 0; B < (ScreenW-66-66)/A+1; B++)
+            frmMain.renderTexture(66+B*A, 0, A, 130, GFX.Interface[4], 66, 0);
+        // top-right
+        frmMain.renderTexture(ScreenW-66, 0, 66, 150, GFX.Interface[4], GFX.Interface[4].w-66, 0);
         // left
-        frmMain.renderTexture(0, 130, 66, ScreenH-130-66, GFX.Interface[4], 0, 130);
+        A = GFX.Interface[4].h-130-66;
+        for (B = 0; B < (ScreenH-130-66)/A+1; B++)
+            frmMain.renderTexture(0, 130+B*A, 66, A, GFX.Interface[4], 0, 130);
         // right
-        frmMain.renderTexture(ScreenW-66, 0, 66, ScreenH-66, GFX.Interface[4], GFX.Interface[4].w-66, 0);
+        A = GFX.Interface[4].h-150-66;
+        for (B = 0; B < (ScreenH-150-66)/A+1; B++)
+            frmMain.renderTexture(ScreenW-66, 150+B*A, 66, A, GFX.Interface[4], GFX.Interface[4].w-66, 150);
+        // bottom-left
+        frmMain.renderTexture(0, ScreenH-66, 100, 66, GFX.Interface[4], 0, GFX.Interface[4].h-66);
         // bottom
-        frmMain.renderTexture(0, ScreenH-66, ScreenW-66, 66, GFX.Interface[4], 0, GFX.Interface[4].h-66);
+        A = GFX.Interface[4].w-100-66;
+        for (B = 0; B < (ScreenW-100-66)/A+1; B++)
+            frmMain.renderTexture(100+B*A, ScreenH-66, A, 66, GFX.Interface[4], 100, GFX.Interface[4].h-66);
         // bottom-right
         frmMain.renderTexture(ScreenW-66, ScreenH-66, 66, 66, GFX.Interface[4], GFX.Interface[4].w-66, GFX.Interface[4].h-66);
 

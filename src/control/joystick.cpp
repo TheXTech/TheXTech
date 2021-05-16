@@ -23,6 +23,10 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#ifdef __3DS__
+#error "Primary `control/joystick.cpp` only for SDL clients. Build `3ds/joystick.cpp` instead."
+#endif
+
 #include <SDL2/SDL_version.h>
 #include <SDL2/SDL_joystick.h>
 #include <SDL2/SDL_gamecontroller.h>

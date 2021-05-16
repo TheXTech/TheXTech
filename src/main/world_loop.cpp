@@ -23,8 +23,6 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#include <SDL2/SDL_timer.h>
-
 #include <Utils/files.h>
 #include <pge_delay.h>
 #include <fmt_format_ne.h>
@@ -203,10 +201,16 @@ void WorldLoop()
         tempLocation.Y = tempLocation.Y + 4;
         WorldPlayer[1].LevelName.clear();
 
+#ifndef __3DS__
         bool altPressed = getKeyState(SDL_SCANCODE_LALT) == KEY_PRESSED ||
                           getKeyState(SDL_SCANCODE_RALT) == KEY_PRESSED;
 
         bool escPressed = getKeyState(SDL_SCANCODE_ESCAPE) == KEY_PRESSED;
+#else
+        bool altPressed = false;
+        bool escPressed = false;
+#endif
+
 #ifdef __ANDROID__
         escPressed |= getKeyState(SDL_SCANCODE_AC_BACK) == KEY_PRESSED;
 #endif

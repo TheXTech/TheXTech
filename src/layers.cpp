@@ -23,7 +23,11 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#ifndef __3DS__
 #include <SDL2/SDL_timer.h>
+#else
+#include "3ds/SDL_supplement.h"
+#endif
 
 #include "globals.h"
 #include "layers.h"

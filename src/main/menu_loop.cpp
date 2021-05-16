@@ -23,8 +23,6 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#include <SDL2/SDL_timer.h>
-
 #include <AppPath/app_path.h>
 #include <Utils/files.h>
 #include <PGE_File_Formats/file_formats.h>
