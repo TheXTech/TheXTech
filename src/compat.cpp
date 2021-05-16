@@ -53,7 +53,7 @@ static void compatInit(Compatibility_t &c)
     c.fix_link_clowncar_fairy = true;
     c.fix_dont_switch_player_by_clowncar = true;
     c.enable_multipoints = true;
-    c.fix_autoscroll_speed = true;
+    c.fix_autoscroll_speed = false;
     c.fix_blooper_stomp_effect = true;
 
     if(g_speedRunnerMode >= SPEEDRUN_MODE_2) // Make sure that bugs were same as on SMBX2 Beta 4 on this moment

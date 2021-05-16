@@ -6,6 +6,7 @@ Changes for 1.3.5.1
 -Added an ability to control the intro scene activity on the level by `gameinfo.ini`: set maximum number of running players, and enable/disable the activity at all
 -Fixed an inability to copy the game save based on old files at episode directory
 -Fixed the vanilla bug: incorrect blooper effect when stomped (needed an npc-*.txt with the "jumphurt=0" flag being set)
+-Changed the default compat.ini value "fix-autoscroll-speed" into "false" to prevent possible glitches from invalid setup given by several old levels
 
 Changes for 1.3.5
 -Fixed the gamepad control stuck because of axes returned value that doesn't equal the initial state on some devices
