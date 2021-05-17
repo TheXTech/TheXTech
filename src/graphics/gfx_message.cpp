@@ -3,77 +3,122 @@
 
 void DrawMessage()
 {
+#ifdef __3DS__
+    const int TextBoxW = 500;
+#else
+    const int TextBoxW = GFX.TextBox.w;
+#endif
+
+    const int charWidth = 18;
+    const int lineHeight = 16;
     // based on Wohlstand's improved algorithm, but screen-size aware
     static std::string SuperText;
     static std::string tempText;
     SuperText = MessageText;
     int BoxY = 0;
     const int BoxY_Start = ScreenH/2 - 150;
-    const int TextBoxW = 500;
     // Draw background all at once:
     // how many lines are there?
-    // A is the proposed start of the next line
-    int A;
-    int B = 0; // start of current line
-    int C = 0; // planned start of next line
-    int D = 1; // n lines
-    bool tempBool;
+    int lineStart = 0; // start of current line
+    int lastWord = 0; // planned start of next line
+    int numLines = 0; // n lines
+    int maxChars = (TextBoxW-24)/charWidth+1; // 27 by default
 
-    for(A = 1; A <= int(SuperText.size()); A++)
+    // PASS ONE
+    // Wohlstand's updated algorithm, no substrings, reasonably fast
+    while(lineStart < int(SuperText.size()))
     {
-        if(SuperText[size_t(A) - 1] == ' ' || A == int(SuperText.size()))
+        lastWord = lineStart;
+        for(int i = lineStart + 1; i <= lineStart+maxChars; i++)
         {
-            if(A-B < 28)
-                C = A;
-            else {
-                B = C;
-                D ++;
+            auto c = SuperText[size_t(i) - 1];
+
+            if((lastWord == 0 && i == lineStart+maxChars) || i == int(SuperText.size()) || c == '\n')
+            {
+                lastWord = i;
+                break;
+            }
+            else if(c == ' ')
+            {
+                lastWord = i;
             }
         }
+
+        numLines ++;
+        lineStart = lastWord;
     }
+
+    // Draw the background now we know how many lines there are.
+#ifdef __3DS__
     frmMain.renderRect(ScreenW/2 - TextBoxW / 2 ,
                           BoxY_Start,
-                          TextBoxW, D*16 + 20, 0.f, 0.f, 0.f, 1.f);
+                          TextBoxW, numLines*lineHeight + 20, 0.f, 0.f, 0.f, 1.f);
     frmMain.renderRect(ScreenW/2 - TextBoxW / 2 + 2,
                           BoxY_Start + 2,
-                          TextBoxW - 4, D*16 + 20 - 4, 1.f, 1.f, 1.f, 1.f);
+                          TextBoxW - 4, numLines*lineHeight + 20 - 4, 1.f, 1.f, 1.f, 1.f);
     frmMain.renderRect(ScreenW/2 - TextBoxW / 2 + 4,
                           BoxY_Start + 4,
-                          TextBoxW - 8, D*16 + 20 - 8, 8.f/255.f, 96.f/255.f, 168.f/255.f, 1.f);
-    tempBool = false; // multi-line
+                          TextBoxW - 8, numLines*lineHeight + 20 - 8, 8.f/255.f, 96.f/255.f, 168.f/255.f, 1.f);
+#else
+    // carefully render the background image...
+    frmMain.renderTexture(ScreenW / 2 - TextBoxW / 2,
+                          BoxY_Start,
+                          TextBoxW, 20, GFX.TextBox, 0, 0);
+    int rndMidH = numLines*lineHeight + 20 - 20 - 20;
+    int gfxMidH = GFX.TextBox.h - 20 - 20;
+    int vertReps = rndMidH / gfxMidH + 1;
+    for (int i = 0; i < vertReps; i++)
+    {
+        if ((i+1) * gfxMidH <= rndMidH)
+            frmMain.renderTexture(ScreenW / 2 - TextBoxW / 2,
+                                  BoxY_Start + 20 + i*gfxMidH,
+                                  TextBoxW, gfxMidH, GFX.TextBox, 0, 20);
+        else
+            frmMain.renderTexture(ScreenW / 2 - TextBoxW / 2,
+                                  BoxY_Start + 20 + i*gfxMidH,
+                                  TextBoxW, rndMidH - i*gfxMidH, GFX.TextBox, 0, 20);
+    }
+    frmMain.renderTexture(ScreenW / 2 - TextBoxW / 2,
+                          BoxY_Start + 20 + rndMidH,
+                          TextBoxW, 20, GFX.TextBox, 0, GFX.TextBox.h - 20);
+#endif
+    // PASS TWO
+    // Wohlstand's updated algorithm
+    bool firstLine = true;
     BoxY = BoxY_Start + 10;
     do
     {
         // find last word break
-        B = 0;
-        for(A = 1; A <= int(SuperText.size()); A++)
+        lastWord = 0;
+        for(int i = 1; i <= maxChars; i++)
         {
-            if(SuperText[size_t(A) - 1] == ' ' || A == int(SuperText.size()))
+            auto c = SuperText[size_t(i) - 1];
+
+            if((lastWord == 0 && i == maxChars) || i == int(SuperText.size()) || c == '\n')
             {
-                if(A < 28)
-                    B = A;
-                else
-                    break;
+                lastWord = i;
+                break;
+            }
+            else if(c == ' ')
+            {
+                lastWord = i;
             }
         }
 
-        if(B == 0)
-            B = A;
-
-        tempText = SuperText.substr(0, size_t(B));
-        SuperText = SuperText.substr(size_t(B), SuperText.length());
-        if(SuperText.length() == 0 && !tempBool)
+        tempText = SuperText.substr(0, size_t(lastWord));
+        SuperText.erase(0, size_t(lastWord));
+        if(SuperText.length() == 0 && firstLine)
         {
             SuperPrint(tempText,
                        4,
-                       ScreenW/2 - TextBoxW / 2 + 12 + (27 * 9) - (tempText.length() * 9),
+                       ScreenW/2 - (tempText.length() * charWidth)/2,
                        BoxY);
         }
         else
         {
             SuperPrint(tempText, 4, ScreenW/2 - TextBoxW / 2 + 12, BoxY);
         }
-        BoxY += 16;
-        tempBool = true;
+        BoxY += lineHeight;
+        firstLine = false;
     } while(!SuperText.empty());
 }
