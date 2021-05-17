@@ -1700,9 +1700,9 @@ void UpdateGraphics(bool skipRepaint)
     if(vScreen[2].Visible)
     {
         if(DScreenType == 3 || DScreenType == 4 || DScreenType == 6)
-            frmMain.renderRect(0, ScreenH/2-2, vScreen[2].Width, 4, 0, 0, 0);
+            frmMain.renderRect(0, ScreenH/2-2, ScreenW, 4, 0, 0, 0);
         else
-            frmMain.renderRect(ScreenW/2-2, 0, 4, vScreen[2].Height, 0, 0, 0);
+            frmMain.renderRect(ScreenW/2-2, 0, 4, ScreenH, 0, 0, 0);
     }
 
     // pause menu and message interface
