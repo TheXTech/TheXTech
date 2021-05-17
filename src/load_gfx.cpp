@@ -679,17 +679,25 @@ void UpdateLoadREAL()
 #endif
         frmMain.setTargetTexture();
         frmMain.clearBuffer();
+        int Left = ScreenW/2 - GFX.MenuGFX[4].w/2;
+        if (Left < 0) Left = 0;
+        int Top = ScreenH/2 - GFX.MenuGFX[4].h/2;
+        if (Top < 0) Top = 0;
+        int Right = ScreenW/2 + GFX.MenuGFX[4].w/2;
+        if (Right > ScreenW) Right = ScreenW;
+        int Bottom = ScreenH/2 + GFX.MenuGFX[4].h/2;
+        if (Bottom > ScreenH) Bottom = ScreenH;
         if(!gfxLoaderTestMode)
-            frmMain.renderTexture(0, 0, GFX.MenuGFX[4]);
+            frmMain.renderTexture(ScreenW/2 - GFX.MenuGFX[4].w/2, ScreenH/2 - GFX.MenuGFX[4].h/2, GFX.MenuGFX[4]);
         else
         {
             if(!state.empty())
-                SuperPrint(state, 3, 10, 10);
+                SuperPrint(state, 3, Left + 10, Top + 10);
             else
-                SuperPrint("Loading data...", 3, 10, 10);
+                SuperPrint("Loading data...", 3, Left + 10, Top + 10);
         }
-        frmMain.renderTexture(632, 576, GFX.Loader);
-        frmMain.renderTexture(760, 560, GFX.LoadCoin.w, GFX.LoadCoin.h / 4, GFX.LoadCoin, 0, 32 * LoadCoins);
+        frmMain.renderTexture(Right - 168, Bottom - 24, GFX.Loader);
+        frmMain.renderTexture(Right - 40, Bottom - 40, GFX.LoadCoin.w, GFX.LoadCoin.h / 4, GFX.LoadCoin, 0, 32 * LoadCoins);
 
         if(gfxLoaderThreadingMode && alphaFader >= 0.f)
             frmMain.renderRect(0, 0, ScreenW, ScreenH, 0.f, 0.f, 0.f, alphaFader);
