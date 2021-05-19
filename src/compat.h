@@ -46,6 +46,7 @@ struct Compatibility_t
     bool fix_dont_switch_player_by_clowncar;
     bool enable_multipoints;
     bool fix_autoscroll_speed;
+    bool dynamic_resolution;
 };
 
 extern Compatibility_t g_compatibility;

@@ -703,8 +703,13 @@ void FrmMain::repaint()
     SDL_RenderPresent(m_gRenderer);
 }
 
+//int internalW, int internalH, int scaleMode
 void FrmMain::updateViewport()
 {
+    // invalidates GIF recorder handle
+    if(m_gif.enabled)
+        toggleGifRecorder();
+
     float w, w1, h, h1;
     int   wi, hi;
 
@@ -722,7 +727,9 @@ void FrmMain::updateViewport()
     }
 #endif
 
-    #if !defined(__ORIGINAL_RES__)
+    // TODO: if dynamic resolution
+    // TODO: make this general
+    // TODO: enable scaling modes
     ScaleWidth = wi;
     ScaleHeight = hi;
     if (ScaleWidth < 512) ScaleWidth = 512;
@@ -733,7 +740,6 @@ void FrmMain::updateViewport()
     SDL_DestroyTexture(m_tBuffer);
     m_tBuffer = SDL_CreateTexture(m_gRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, ScreenW, ScreenH);
     SDL_SetRenderTarget(m_gRenderer, m_tBuffer);
-    #endif
 
     w = wi;
     h = hi;

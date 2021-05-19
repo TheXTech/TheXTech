@@ -397,22 +397,9 @@ void UpdateGraphics(bool skipRepaint)
                 GetvScreenCanonical(Z, &X, &Y);
         }
 
+        // moved to `graphics/gfx_screen.cpp`
         if(!Do_FrameSkip && qScreen)
-        {
-            if(vScreenX[1] < qScreenX[1] - 2)
-                qScreenX[1] = qScreenX[1] - 2;
-            else if(vScreenX[1] > qScreenX[1] + 2)
-                qScreenX[1] = qScreenX[1] + 2;
-            if(vScreenY[1] < qScreenY[1] - 2)
-                qScreenY[1] = qScreenY[1] - 2;
-            else if(vScreenY[1] > qScreenY[1] + 2)
-                qScreenY[1] = qScreenY[1] + 2;
-            if(qScreenX[1] < vScreenX[1] + 5 && qScreenX[1] > vScreenX[1] - 5 &&
-               qScreenY[1] < vScreenY[1] + 5 && qScreenY[1] > vScreenY[1] - 5)
-                qScreen = false;
-            vScreenX[1] = qScreenX[1];
-            vScreenY[1] = qScreenY[1];
-        }
+            Update_qScreen();
 
         // noturningback
         if(!LevelEditor && NoTurnBack[Player[Z].Section])

@@ -206,9 +206,10 @@ RangeArrI<int, 0, maxBlockType, 0> BlockSlope2;
 RangeArr<double, 0, maxPlayers> vScreenX;
 RangeArr<double, 0, maxPlayers> vScreenY;
 
+bool qScreen = false;
 RangeArr<double, 0, maxPlayers> qScreenX;
 RangeArr<double, 0, maxPlayers> qScreenY;
-bool qScreen = false;
+RangeArr<vScreen_t, 0, 2> qScreenLoc;
 
 RangeArrI<int, 0, maxBlockType, 0> BlockWidth;
 RangeArrI<int, 0, maxBlockType, 0> BlockHeight;

@@ -611,7 +611,7 @@ int pfrY(int plrFrame)
 
 void ScreenShot()
 {
-#ifndef __EMSCRIPTEN__
+#if !defined(__EMSCRIPTEN__) && !defined(__3DS__)
     frmMain.setTargetTexture();
     frmMain.makeShot();
     frmMain.setTargetScreen();

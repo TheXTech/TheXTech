@@ -1392,6 +1392,9 @@ extern RangeArr<double, 0, maxPlayers> qScreenX;
 extern RangeArr<double, 0, maxPlayers> qScreenY;
 //Public qScreen As Boolean 'Weather or not the screen needs adjusting
 extern bool qScreen;
+// allows screen position to change during qScreen
+extern RangeArr<vScreen_t, 0, 2> qScreenLoc;
+
 
 //Public BlockWidth(0 To maxBlockType) As Integer 'Block type width
 extern RangeArrI<int, 0, maxBlockType, 0> BlockWidth;

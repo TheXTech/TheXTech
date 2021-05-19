@@ -435,6 +435,7 @@ void ProcEvent(std::string EventName, bool NoEffect)
                             qScreen = true;
                             qScreenX[1] = vScreenX[1];
                             qScreenY[1] = vScreenY[1];
+                            qScreenLoc[1] = vScreen[1];
                         }
 
                         resetFrameTimer();

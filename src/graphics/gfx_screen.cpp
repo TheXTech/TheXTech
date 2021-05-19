@@ -29,7 +29,7 @@
 #include "../sound.h"
 #include "../change_res.h"
 #include "../load_gfx.h"
-
+#include "../compat.h"
 
 // Sets up the split lines
 void SetupScreens()
@@ -307,33 +307,108 @@ void CenterScreens()
         return;
 
     // restrict the vScreen to the level if the level is smaller than the screen
-    double EffectiveSectionWidth;
+    double EffectiveSectionWidth, EffectiveSectionHeight;
+
     EffectiveSectionWidth = level[Player[1].Section].Width - level[Player[1].Section].X;
-    if (NoTurnBack[Player[1].Section])
+    if (NoTurnBack[Player[1].Section] || !g_compatibility.dynamic_resolution)
         EffectiveSectionWidth = 800;
     if (EffectiveSectionWidth < vScreen[1].Width)
     {
         vScreen[1].ScreenLeft += (vScreen[1].Width - EffectiveSectionWidth) / 2;
         vScreen[1].Width = EffectiveSectionWidth;
     }
+
     EffectiveSectionWidth = level[Player[2].Section].Width - level[Player[2].Section].X;
-    if (NoTurnBack[Player[2].Section])
+    if (NoTurnBack[Player[2].Section] || !g_compatibility.dynamic_resolution)
         EffectiveSectionWidth = 800;
     if (EffectiveSectionWidth < vScreen[2].Width)
     {
         vScreen[2].ScreenLeft += (vScreen[2].Width - EffectiveSectionWidth) / 2;
         vScreen[2].Width = EffectiveSectionWidth;
     }
-    if (level[Player[1].Section].Height - level[Player[1].Section].Y < vScreen[1].Height)
+
+    EffectiveSectionHeight = level[Player[1].Section].Height - level[Player[1].Section].Y;
+    if (!g_compatibility.dynamic_resolution)
+        EffectiveSectionHeight = 600;
+    if (EffectiveSectionHeight < vScreen[1].Height)
     {
-        vScreen[1].ScreenTop += (vScreen[1].Height - (level[Player[1].Section].Height - level[Player[1].Section].Y)) / 2;
-        vScreen[1].Height = level[Player[1].Section].Height - level[Player[1].Section].Y;
+        vScreen[1].ScreenTop += (vScreen[1].Height - EffectiveSectionHeight) / 2;
+        vScreen[1].Height = EffectiveSectionHeight;
     }
-    if (level[Player[2].Section].Height - level[Player[2].Section].Y < vScreen[2].Height)
+
+    EffectiveSectionHeight = level[Player[2].Section].Height - level[Player[2].Section].Y;
+    if (!g_compatibility.dynamic_resolution)
+        EffectiveSectionHeight = 600;
+    if (EffectiveSectionHeight < vScreen[2].Height)
     {
-        vScreen[2].ScreenTop += (vScreen[2].Height - (level[Player[2].Section].Height - level[Player[2].Section].Y)) / 2;
-        vScreen[2].Height = level[Player[2].Section].Height - level[Player[2].Section].Y;
+        vScreen[2].ScreenTop += (vScreen[2].Height - EffectiveSectionHeight) / 2;
+        vScreen[2].Height = EffectiveSectionHeight;
     }
+}
+
+void Update_qScreen()
+{
+    // take the slower option of 2px per second camera (vanilla)
+    //   or 2px per second resize, then scale the speed of the faster one to match
+    double camRateX = 2;
+    double camRateY = 2;
+
+    double resizeRateX = 2;
+    double resizeRateY = 2;
+
+    double camFramesX = std::abs(vScreenX[1] - qScreenX[1])/camRateX;
+    double camFramesY = std::abs(vScreenY[1] - qScreenY[1])/camRateY;
+    double resizeFramesX = std::abs(vScreen[1].ScreenLeft - qScreenLoc[1].ScreenLeft)/resizeRateX;
+    double resizeFramesY = std::abs(vScreen[1].ScreenTop - qScreenLoc[1].ScreenTop)/resizeRateY;
+    double qFramesX = (camFramesX > resizeFramesX ? camFramesX : resizeFramesX);
+    double qFramesY = (camFramesY > resizeFramesY ? camFramesY : resizeFramesY);
+
+    // don't continue after this frame if it would arrive next frame
+    // (this is equivalent to the <5 condition in the vanilla game)
+    if (qFramesX < 2.5 && qFramesY < 2.5)
+        qScreen = false;
+
+    if (qFramesX < 1) qFramesX = 1;
+    if (qFramesY < 1) qFramesY = 1;
+
+    camRateX = std::abs(vScreenX[1] - qScreenX[1])/qFramesX;
+    camRateY = std::abs(vScreenY[1] - qScreenY[1])/qFramesY;
+
+    resizeRateX = std::abs(vScreen[1].ScreenLeft - qScreenLoc[1].ScreenLeft)/qFramesX;
+    resizeRateY = std::abs(vScreen[1].ScreenTop - qScreenLoc[1].ScreenTop)/qFramesY;
+
+    if(vScreenX[1] < qScreenX[1] - camRateX)
+        qScreenX[1] = qScreenX[1] - camRateX;
+    else if(vScreenX[1] > qScreenX[1] + camRateX)
+        qScreenX[1] = qScreenX[1] + camRateX;
+    else
+        qScreenX[1] = vScreenX[1];
+    if(vScreenY[1] < qScreenY[1] - camRateY)
+        qScreenY[1] = qScreenY[1] - camRateY;
+    else if(vScreenY[1] > qScreenY[1] + camRateY)
+        qScreenY[1] = qScreenY[1] + camRateY;
+    else
+        qScreenY[1] = vScreenY[1];
+
+    if(vScreen[1].ScreenLeft < qScreenLoc[1].ScreenLeft - resizeRateX)
+        qScreenLoc[1].ScreenLeft -= resizeRateX;
+    else if(vScreen[1].ScreenLeft > qScreenLoc[1].ScreenLeft + resizeRateX)
+        qScreenLoc[1].ScreenLeft += resizeRateX;
+    else
+        qScreenLoc[1].ScreenLeft = vScreen[1].ScreenLeft;
+    if(vScreen[1].ScreenTop < qScreenLoc[1].ScreenTop - resizeRateY)
+        qScreenLoc[1].ScreenTop -= resizeRateY;
+    else if(vScreen[1].ScreenTop > qScreenLoc[1].ScreenTop + resizeRateY)
+        qScreenLoc[1].ScreenTop += resizeRateY;
+    else
+        qScreenLoc[1].ScreenTop = vScreen[1].ScreenTop;
+
+    vScreenX[1] = qScreenX[1];
+    vScreenY[1] = qScreenY[1];
+    vScreen[1].Width -= 2*(std::floor(qScreenLoc[1].ScreenLeft) - vScreen[1].ScreenLeft);
+    vScreen[1].Height -= 2*(std::floor(qScreenLoc[1].ScreenTop) - vScreen[1].ScreenTop);
+    vScreen[1].ScreenLeft = std::floor(qScreenLoc[1].ScreenLeft);
+    vScreen[1].ScreenTop = std::floor(qScreenLoc[1].ScreenTop);
 }
 
 void SetRes()
