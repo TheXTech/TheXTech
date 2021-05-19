@@ -848,7 +848,6 @@ void FrmMain::updateViewport()
 
 void FrmMain::resetViewport()
 {
-    updateViewport();
     SDL_RenderSetViewport(m_gRenderer, nullptr);
 }
 

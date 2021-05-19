@@ -307,42 +307,54 @@ void CenterScreens()
         return;
 
     // restrict the vScreen to the level if the level is smaller than the screen
-    double EffectiveSectionWidth, EffectiveSectionHeight;
+    double MaxWidth1, MaxWidth2, MaxHeight1, MaxHeight2;
 
-    EffectiveSectionWidth = level[Player[1].Section].Width - level[Player[1].Section].X;
-    if (NoTurnBack[Player[1].Section] || !g_compatibility.dynamic_resolution)
-        EffectiveSectionWidth = 800;
-    if (EffectiveSectionWidth < vScreen[1].Width)
+    MaxWidth1 = MaxWidth2 = ScreenW;
+    MaxHeight1 = MaxHeight2 = ScreenH;
+    if (LevelSelect && !g_compatibility.free_world_res)
     {
-        vScreen[1].ScreenLeft += (vScreen[1].Width - EffectiveSectionWidth) / 2;
-        vScreen[1].Width = EffectiveSectionWidth;
+        MaxWidth1 = MaxWidth2 = 800;
+        MaxHeight1 = MaxHeight2 = 600;
+    }
+    if (!LevelSelect && !g_compatibility.free_level_res)
+    {
+        MaxWidth1 = MaxWidth2 = 800;
+        MaxHeight1 = MaxHeight2 = 600;
+    }
+    else if (!LevelSelect)
+    {
+        MaxWidth1 = level[Player[1].Section].Width - level[Player[1].Section].X;
+        MaxWidth2 = level[Player[2].Section].Width - level[Player[2].Section].X;
+        MaxHeight1 = level[Player[1].Section].Height - level[Player[1].Section].Y;
+        MaxHeight2 = level[Player[2].Section].Height - level[Player[2].Section].Y;
+        if (NoTurnBack[Player[1].Section])
+            MaxWidth1 = 800;
+        if (NoTurnBack[Player[2].Section])
+            MaxWidth2 = 800;
     }
 
-    EffectiveSectionWidth = level[Player[2].Section].Width - level[Player[2].Section].X;
-    if (NoTurnBack[Player[2].Section] || !g_compatibility.dynamic_resolution)
-        EffectiveSectionWidth = 800;
-    if (EffectiveSectionWidth < vScreen[2].Width)
+    if (MaxWidth1 < vScreen[1].Width)
     {
-        vScreen[2].ScreenLeft += (vScreen[2].Width - EffectiveSectionWidth) / 2;
-        vScreen[2].Width = EffectiveSectionWidth;
+        vScreen[1].ScreenLeft += (vScreen[1].Width - MaxWidth1) / 2;
+        vScreen[1].Width = MaxWidth1;
     }
 
-    EffectiveSectionHeight = level[Player[1].Section].Height - level[Player[1].Section].Y;
-    if (!g_compatibility.dynamic_resolution)
-        EffectiveSectionHeight = 600;
-    if (EffectiveSectionHeight < vScreen[1].Height)
+    if (MaxWidth2 < vScreen[2].Width)
     {
-        vScreen[1].ScreenTop += (vScreen[1].Height - EffectiveSectionHeight) / 2;
-        vScreen[1].Height = EffectiveSectionHeight;
+        vScreen[2].ScreenLeft += (vScreen[2].Width - MaxWidth2) / 2;
+        vScreen[2].Width = MaxWidth2;
     }
 
-    EffectiveSectionHeight = level[Player[2].Section].Height - level[Player[2].Section].Y;
-    if (!g_compatibility.dynamic_resolution)
-        EffectiveSectionHeight = 600;
-    if (EffectiveSectionHeight < vScreen[2].Height)
+    if (MaxHeight1 < vScreen[1].Height)
     {
-        vScreen[2].ScreenTop += (vScreen[2].Height - EffectiveSectionHeight) / 2;
-        vScreen[2].Height = EffectiveSectionHeight;
+        vScreen[1].ScreenTop += (vScreen[1].Height - MaxHeight1) / 2;
+        vScreen[1].Height = MaxHeight1;
+    }
+
+    if (MaxHeight2 < vScreen[2].Height)
+    {
+        vScreen[2].ScreenTop += (vScreen[2].Height - MaxHeight2) / 2;
+        vScreen[2].Height = MaxHeight2;
     }
 }
 
