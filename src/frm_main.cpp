@@ -61,6 +61,7 @@
 #include "frm_main.h"
 #include "main/game_info.h"
 
+#include "config.h"
 
 static SDL_bool IsFullScreen(SDL_Window *win)
 {
@@ -139,6 +140,12 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
 
     SDL_GL_ResetAttributes();
 
+    if (config_InternalW != 0 && config_InternalH != 0)
+    {
+        ScaleWidth = config_InternalW;
+        ScaleHeight = config_InternalH;
+    }
+
     m_window = SDL_CreateWindow(m_windowTitle.c_str(),
                               SDL_WINDOWPOS_CENTERED,
                               SDL_WINDOWPOS_CENTERED,
@@ -169,7 +176,10 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
     SDL_SetWindowMinimumSize(m_window, ScaleWidth, ScaleHeight);
 #endif //__EMSCRIPTEN__
 
-    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
+    if (config_ScaleMode == ScaleMode_t::DYNAMIC_LINEAR)
+        SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
+    else
+        SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
 
 #if defined(__ANDROID__) // Use a full-screen on Android mode by default
     setFullScreen(true);
@@ -652,7 +662,6 @@ void FrmMain::repaint()
 #endif
 
     int w, h, off_x, off_y, wDst, hDst;
-    float scale_x, scale_y;
 
     setTargetScreen();
 
@@ -664,23 +673,9 @@ void FrmMain::repaint()
     SDL_GetRendererOutputSize(m_gRenderer, &w, &h);
 
     // Calculate the size difference factor
-    scale_x = float(w) / ScaleWidth;
-    scale_y = float(h) / ScaleHeight;
 
-    wDst = w;
-    hDst = h;
-
-    // Keep aspect ratio
-    if(scale_x > scale_y) // Width more than height
-    {
-        wDst = int(scale_y * ScaleWidth);
-        hDst = int(scale_y * ScaleHeight);
-    }
-    else if(scale_x < scale_y) // Height more than width
-    {
-        hDst = int(scale_x * ScaleHeight);
-        wDst = int(scale_x * ScaleWidth);
-    }
+    wDst = int(scale * ScaleWidth);
+    hDst = int(scale * ScaleHeight);
 
     // Align the rendering scene to the center of screen
     off_x = (w - wDst) / 2;
@@ -703,7 +698,6 @@ void FrmMain::repaint()
     SDL_RenderPresent(m_gRenderer);
 }
 
-//int internalW, int internalH, int scaleMode
 void FrmMain::updateViewport()
 {
     // invalidates GIF recorder handle
@@ -727,43 +721,62 @@ void FrmMain::updateViewport()
     }
 #endif
 
-    // TODO: if dynamic resolution
-    // TODO: make this general
-    // TODO: enable scaling modes
-    ScaleWidth = wi;
-    ScaleHeight = hi;
-    if (ScaleWidth < 512) ScaleWidth = 512;
-    if (ScaleHeight < 384) ScaleHeight = 384;
-    if (ScaleWidth > 1280) ScaleWidth = 1280;
-    if (ScaleHeight > 720) ScaleHeight = 720;
+    if (config_ScaleMode == ScaleMode_t::DYNAMIC_LINEAR)
+        SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
+    else
+        SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
+
+#ifndef __ORIGINAL_RES__
+    if (config_InternalW == 0 || config_InternalH == 0)
+    {
+        ScaleWidth = wi;
+        ScaleHeight = hi;
+        if(config_ScaleMode == ScaleMode_t::FIXED_2X)
+        {
+            ScaleWidth /= 2;
+            ScaleHeight /= 2;
+        }
+        if (ScaleWidth < 480) ScaleWidth = 480;
+        if (ScaleHeight < 320) ScaleHeight = 320;
+        if (ScaleWidth > 1280) ScaleWidth = 1280;
+        if (ScaleHeight > 720) ScaleHeight = 720;
+    }
+    else
+    {
+        ScaleWidth = config_InternalW;
+        ScaleHeight = config_InternalH;   
+    }
     Set_Resolution(ScaleWidth, ScaleHeight);
     SDL_DestroyTexture(m_tBuffer);
     m_tBuffer = SDL_CreateTexture(m_gRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, ScreenW, ScreenH);
     SDL_SetRenderTarget(m_gRenderer, m_tBuffer);
+#endif
 
     w = wi;
     h = hi;
     w1 = w;
     h1 = h;
 
-    scale_x = w / ScaleWidth;
-    scale_y = h / ScaleHeight;
-    viewport_scale_x = scale_x;
-    viewport_scale_y = scale_y;
+    scale = w / ScaleWidth;
+
+    if(scale > h / ScaleHeight)
+        scale = h / ScaleHeight;
+
+    if(config_ScaleMode == ScaleMode_t::DYNAMIC_INTEGER && scale > 1.f)
+        scale = std::floor(scale);
+    if(config_ScaleMode == ScaleMode_t::FIXED_1X && scale > 1.f)
+        scale = 1.f;
+    if(config_ScaleMode == ScaleMode_t::FIXED_2X && scale > 2.f)
+        scale = 2.f;
+
+    w1 = scale * ScaleWidth;
+    h1 = scale * ScaleHeight;
+
+    viewport_scale_x = scale;
+    viewport_scale_y = scale;
 
     viewport_offset_x = 0;
     viewport_offset_y = 0;
-
-    if(scale_x > scale_y)
-    {
-        w1 = scale_y * ScaleWidth;
-        viewport_scale_x = w1 / ScaleWidth;
-    }
-    else if(scale_x < scale_y)
-    {
-        h1 = scale_x * ScaleHeight;
-        viewport_scale_y = h1 / ScaleHeight;
-    }
 
     offset_x = (w - w1) / 2;
     offset_y = (h - h1) / 2;

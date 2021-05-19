@@ -268,6 +268,7 @@ endif()
 
 set(THEXTECH_SRC
     src/compat.cpp
+    src/config.cpp
     src/game_main.cpp
     src/globals.cpp
     src/npc.cpp

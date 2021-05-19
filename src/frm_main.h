@@ -281,8 +281,7 @@ private:
 #endif
 
     //Scale of virtual and window resolutuins
-    float scale_x = 1.f;
-    float scale_y = 1.f;
+    float scale = 1.f;
     //Side offsets to keep ratio
     float offset_x = 0.f;
     float offset_y = 0.f;

@@ -48,7 +48,7 @@
 #include "../control/joystick.h"
 #include "level_file.h"
 #include "pge_delay.h"
-
+#include "../config.h"
 
 MainMenuContent g_mainMenu;
 
@@ -1041,10 +1041,20 @@ bool mainMenuUpdate()
         // Options
         else if(MenuMode == MENU_OPTIONS)
         {
-#ifndef __ANDROID__
-            const int optionsMenuLength = 3;
-#else
-            const int optionsMenuLength = 2;
+            int optionsMenuLength = 2; // P1, P2, Credits
+#if !defined(__ANDROID__) && !defined(__3DS__)
+            optionsMenuLength ++; // Fullscreen
+#endif
+#ifndef __3DS__
+            optionsMenuLength ++; // ScaleMode
+#endif
+#ifndef __ORIGINAL_RES__
+            optionsMenuLength ++; // resolution
+#endif
+#ifdef __3DS__
+            optionsMenuLength += 2; // EditorControls, debugMode
+            if (n3ds_clocked != -1)
+                optionsMenuLength ++; // clock speed
 #endif
 
             if(MenuMouseMove)
@@ -1053,18 +1063,35 @@ bool mainMenuUpdate()
                 {
                     if(MenuMouseY >= MenuY + A * 30 && MenuMouseY <= MenuY + A * 30 + 16)
                     {
-                        if(A == 0)
+                        int i = 0;
+                        if(A == i++)
                             menuLen = 18 * std::strlen("player 1 controls") - 4;
-                        else if(A == 1)
+                        else if(A == i++)
                             menuLen = 18 * std::strlen("player 2 controls") - 4;
-#ifndef __ANDROID__
-                        else if(A == 2)
+#if !defined(__ANDROID__) && !defined(__3DS__)
+                        else if(A == i++)
                         {
                             if(resChanged)
                                 menuLen = 18 * std::strlen("windowed mode");
                             else
                                 menuLen = 18 * std::strlen("fullscreen mode");
                         }
+#endif
+#if !defined(__3DS__)
+                        else if(A == i++)
+                            menuLen = 18 * (7+ScaleMode_strings.at(config_ScaleMode).length());
+#endif
+#if !defined(__ORIGINAL_RES__)
+                        else if(A == i++)
+                            menuLen = 18 * std::strlen("res: WWWxHHH (word)");
+#endif
+#ifdef __3DS__
+                        else if(A == i++)
+                            menuLen = 18 * std::strlen("editor controls") - 2;
+                        else if(n3ds_clocked != -1 && A == i++)
+                            menuLen = 18 * std::strlen("use n3ds clock speed") - 6;
+                        else if(A == i++)
+                            menuLen = 18 * std::strlen("show debug screen") - 4;
 #endif
                         else
                             menuLen = 18 * std::strlen("view credits") - 2;
@@ -1096,31 +1123,72 @@ bool mainMenuUpdate()
                 else if(menuDoPress || MenuMouseClick)
                 {
                     MenuCursorCanMove = false;
-                    if(MenuCursor == 0)
+                    int i = 0;
+                    if(MenuCursor == i++)
                     {
                         MenuCursor = 0;
                         MenuMode = MENU_INPUT_SETTINGS_P1;
                         PlaySoundMenu(SFX_Slide);
                     }
-                    else if(MenuCursor == 1)
+                    else if(MenuCursor == i++)
                     {
                         MenuCursor = 0;
                         MenuMode = MENU_INPUT_SETTINGS_P2;
                         PlaySoundMenu(SFX_Slide);
-#ifndef __ANDROID__ // on Android run the always full-screen
                     }
-                    else if(MenuCursor == 2)
+#if !defined(__ANDROID__) && !defined(__3DS__) // on Android run the always full-screen
+                    else if(MenuCursor == i++)
                     {
                         PlaySoundMenu(SFX_Do);
                         ChangeScreen();
                     }
-                    else if(MenuCursor == 3)
-                    {
-#else
-                    }
-                    else if(MenuCursor == 2)
-                    {
 #endif
+#if !defined(__3DS__)
+                    else if(MenuCursor == i++)
+                    {
+                        PlaySoundMenu(SFX_Do);
+                        config_ScaleMode = (ScaleMode_t)((int)config_ScaleMode + 1);
+                        if(config_ScaleMode > ScaleMode_t::FIXED_2X)
+                            config_ScaleMode = ScaleMode_t::DYNAMIC_INTEGER;
+                        frmMain.updateViewport();
+                    }
+#endif
+#if !defined(__ORIGINAL_RES__)
+                    else if(MenuCursor == i++)
+                    {
+                        PlaySoundMenu(SFX_Do);
+                        if (config_InternalW == 0 || config_InternalH == 0)
+                            { config_InternalW = 480; config_InternalH = 320; }
+                        else if (config_InternalW == 480 && config_InternalH == 320)
+                            { config_InternalW = 512; config_InternalH = 384; }
+                        else if (config_InternalW == 512 && config_InternalH == 384)
+                            { config_InternalW = 512; config_InternalH = 448; }
+                        else if (config_InternalW == 512 && config_InternalH == 448)
+                            { config_InternalW = 640; config_InternalH = 480; }
+                        else if (config_InternalW == 640 && config_InternalH == 480)
+                            { config_InternalW = 800; config_InternalH = 480; }
+                        else if (config_InternalW == 800 && config_InternalH == 480)
+                            { config_InternalW = 800; config_InternalH = 600; }
+                        else if (config_InternalW == 800 && config_InternalH == 600)
+                            { config_InternalW = 960; config_InternalH = 600; }
+                        else if (config_InternalW == 960 && config_InternalH == 600)
+                            { config_InternalW = 1066; config_InternalH = 600; }
+                        else if (config_InternalW == 1066 && config_InternalH == 600)
+                            { config_InternalW = 1200; config_InternalH = 600; }
+                        else if (config_InternalW == 1200 && config_InternalH == 600)
+                            { config_InternalW = 1280; config_InternalH = 720; }
+                        else if (config_InternalW == 1280 && config_InternalH == 720)
+                            { config_InternalW = 0; config_InternalH = 0; }
+                        else
+                            { config_InternalW = 0; config_InternalH = 0; }
+                        frmMain.updateViewport();
+                    }
+#endif
+#ifdef __3DS__
+                    //TODO: implement 3DS options
+#endif
+                    else if(MenuCursor == i++)
+                    {
                         PlaySoundMenu(SFX_Do);
                         GameMenu = false;
                         GameOutro = true;
@@ -1737,6 +1805,37 @@ void mainMenuDraw()
             SuperPrint("WINDOWED MODE", 3, MenuX, MenuY + 30*A);
         else
             SuperPrint("FULLSCREEN MODE", 3, MenuX, MenuY + 30*A);
+        A ++;
+#endif
+#ifndef __3DS__
+        SuperPrint("SCALE: "+ScaleMode_strings.at(config_ScaleMode), 3, MenuX, MenuY + 30*A);
+        A ++;
+#endif
+#ifndef __ORIGINAL_RES__
+        std::string resString = fmt::format_ne("RES: {0}x{1}", config_InternalW, config_InternalH);
+        if (config_InternalW == 480 && config_InternalH == 320)
+            resString += " (GBA)";
+        else if (config_InternalW == 512 && config_InternalH == 384)
+            resString += " (NDS)";
+        else if (config_InternalW == 512 && config_InternalH == 448)
+            resString += " (SNES)";
+        else if (config_InternalW == 640 && config_InternalH == 480)
+            resString += " (VGA)";
+        else if (config_InternalW == 800 && config_InternalH == 480)
+            resString += " (3DS)";
+        else if (config_InternalW == 800 && config_InternalH == 600)
+            resString += " (SMBX)";
+        else if (config_InternalW == 960 && config_InternalH == 600)
+            resString += " (16:10)";
+        else if (config_InternalW == 1066 && config_InternalH == 600)
+            resString += " (16:9)";
+        else if (config_InternalW == 1200 && config_InternalH == 600)
+            resString += " (18:9)";
+        else if (config_InternalW == 1280 && config_InternalH == 720)
+            resString += " (HD)";
+        else if (config_InternalW == 0 || config_InternalH == 0)
+            resString = "RES: DYNAMIC";
+        SuperPrint(resString, 3, MenuX, MenuY + 30*A);
         A ++;
 #endif
 #ifdef __3DS__
