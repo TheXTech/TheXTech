@@ -1115,6 +1115,7 @@ bool mainMenuUpdate()
             {
                 if(menuBackPress || MenuMouseBack)
                 {
+                    SaveConfig();
                     MenuMode = MENU_MAIN;
                     MenuCursor = 3;
                     MenuCursorCanMove = false;

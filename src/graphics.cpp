@@ -147,7 +147,6 @@ void GetvScreenAverage()
 
     OldX = vScreenX[1];
     OldY = vScreenY[1];
-    UNUSED(OldY);
 
     vScreenX[1] = 0;
     vScreenY[1] = 0;
@@ -174,10 +173,14 @@ void GetvScreenAverage()
             B = 1;
         }
         else
+        {
+            vScreenX[1] = OldX;
+            vScreenY[1] = OldY;
             return;
+        }
     }
-    vScreenX[1] = (vScreenX[1] / B) + (ScreenW * 0.5);
-    vScreenY[1] = (vScreenY[1] / B) + (ScreenH * 0.5) - vScreenYOffset;
+    vScreenX[1] = (vScreenX[1] / B) + (vScreen[1].Width * 0.5);
+    vScreenY[1] = (vScreenY[1] / B) + (vScreen[1].Height * 0.5) - vScreenYOffset;
 
     if(vScreen[A].Width + level[Player[1].Section].X > level[Player[1].Section].Width)
         vScreenX[A] = -level[Player[1].Section].X/2 + -(level[Player[1].Section].Width - vScreen[A].Width)/2;

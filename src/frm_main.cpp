@@ -140,7 +140,7 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
 
     SDL_GL_ResetAttributes();
 
-    if (config_InternalW != 0 && config_InternalH != 0)
+    if(config_InternalW != 0 && config_InternalH != 0)
     {
         ScaleWidth = config_InternalW;
         ScaleHeight = config_InternalH;
@@ -173,10 +173,10 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
 #elif defined(__ANDROID__) // Set as small as possible
     SDL_SetWindowMinimumSize(m_window, 200, 150);
 #else
-    SDL_SetWindowMinimumSize(m_window, ScaleWidth, ScaleHeight);
+    SDL_SetWindowMinimumSize(m_window, 480, 320);
 #endif //__EMSCRIPTEN__
 
-    if (config_ScaleMode == ScaleMode_t::DYNAMIC_LINEAR)
+    if(config_ScaleMode == ScaleMode_t::DYNAMIC_LINEAR)
         SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
     else
         SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
@@ -707,6 +707,35 @@ void FrmMain::updateViewport()
     float w, w1, h, h1;
     int   wi, hi;
 
+    SDL_SetWindowResizable(m_window, SDL_TRUE);
+#if defined(__ORIGINAL_RES__)
+    if(config_ScaleMode == ScaleMode_t::FIXED_1X)
+    {
+        SDL_SetWindowSize(m_window, ScreenW, ScreenH);
+        SDL_SetWindowResizable(m_window, SDL_FALSE);
+    }
+    else if(config_ScaleMode == ScaleMode_t::FIXED_2X)
+    {
+        SDL_SetWindowSize(m_window, 2*ScreenW, 2*ScreenH);
+        SDL_SetWindowResizable(m_window, SDL_FALSE);
+    }
+#else
+    if(config_InternalW != 0 && config_InternalH != 0)
+    {
+        if(config_ScaleMode == ScaleMode_t::FIXED_1X)
+        {
+            SDL_SetWindowSize(m_window, config_InternalW, config_InternalH);
+            SDL_SetWindowResizable(m_window, SDL_FALSE);
+        }
+        else if(config_ScaleMode == ScaleMode_t::FIXED_2X)
+        {
+            SDL_SetWindowSize(m_window, 2*config_InternalW, 2*config_InternalH);
+            SDL_SetWindowResizable(m_window, SDL_FALSE);
+        }
+    }
+#endif
+
+
 #if !defined(__EMSCRIPTEN__) && !defined(__ORIGINAL_RES__)
     SDL_GetWindowSize(m_window, &wi, &hi);
 #else
@@ -721,13 +750,13 @@ void FrmMain::updateViewport()
     }
 #endif
 
-    if (config_ScaleMode == ScaleMode_t::DYNAMIC_LINEAR)
+    if(config_ScaleMode == ScaleMode_t::DYNAMIC_LINEAR)
         SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
     else
         SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
 
 #ifndef __ORIGINAL_RES__
-    if (config_InternalW == 0 || config_InternalH == 0)
+    if(config_InternalW == 0 || config_InternalH == 0)
     {
         ScaleWidth = wi;
         ScaleHeight = hi;
@@ -736,10 +765,34 @@ void FrmMain::updateViewport()
             ScaleWidth /= 2;
             ScaleHeight /= 2;
         }
-        if (ScaleWidth < 480) ScaleWidth = 480;
-        if (ScaleHeight < 320) ScaleHeight = 320;
-        if (ScaleWidth > 1280) ScaleWidth = 1280;
-        if (ScaleHeight > 720) ScaleHeight = 720;
+        if(config_ScaleMode == ScaleMode_t::DYNAMIC_INTEGER)
+        {
+            int i = 1;
+            while(ScaleWidth/(i+1) > 800 && ScaleHeight/(i+1) > 600)
+                i++;
+            ScaleWidth /= i;
+            ScaleHeight /= i;
+        }
+        if(ScaleWidth < 480) ScaleWidth = 480;
+        if(ScaleHeight < 320) ScaleHeight = 320;
+        if(ScaleHeight > 720)
+        {
+            if((config_ScaleMode == ScaleMode_t::DYNAMIC_NEAREST
+                || config_ScaleMode == ScaleMode_t::DYNAMIC_LINEAR)
+                && ScaleWidth * 720 / ScaleHeight > 800)
+            {
+                ScaleWidth = ScaleWidth * 720 / ScaleHeight;
+            }
+            if(config_ScaleMode == ScaleMode_t::DYNAMIC_INTEGER
+                && ScaleWidth / std::floor(ScaleHeight / 720) > 800)
+            {
+                ScaleWidth = ScaleWidth / std::floor(ScaleHeight / 720);
+            }
+            ScaleHeight = 720;
+        }
+        // maximum 2.4 (cinematic) aspect ratio
+        if(ScaleWidth > 1728)
+            ScaleWidth = 1728;
     }
     else
     {
@@ -785,6 +838,15 @@ void FrmMain::updateViewport()
     viewport_y = 0;
     viewport_w = static_cast<int>(w1);
     viewport_h = static_cast<int>(h1);
+
+    if(GameMenu)
+    {
+        SetupScreens();
+        CenterScreens();
+        GameMenu = false;
+        GetvScreenAverage();
+        GameMenu = true;
+    }
 }
 
 void FrmMain::resetViewport()
