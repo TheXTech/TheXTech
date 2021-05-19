@@ -5,8 +5,15 @@ void DrawMessage()
 {
 #ifdef __3DS__
     const int TextBoxW = 500;
+    const bool UseGFX = false;
 #else
-    const int TextBoxW = GFX.TextBox.w;
+    int TextBoxW = GFX.TextBox.w;
+    bool UseGFX = true;
+    if(ScreenW < GFX.TextBox.w)
+    {
+        TextBoxW = ScreenW - 50;
+        UseGFX = false;
+    }
 #endif
 
     const int charWidth = 18;
@@ -16,7 +23,9 @@ void DrawMessage()
     static std::string tempText;
     SuperText = MessageText;
     int BoxY = 0;
-    const int BoxY_Start = ScreenH/2 - 150;
+    int BoxY_Start = ScreenH/2 - 150;
+    if(BoxY_Start < 60)
+        BoxY_Start = 60;
     // Draw background all at once:
     // how many lines are there?
     int lineStart = 0; // start of current line
@@ -49,38 +58,43 @@ void DrawMessage()
     }
 
     // Draw the background now we know how many lines there are.
-#ifdef __3DS__
-    frmMain.renderRect(ScreenW/2 - TextBoxW / 2 ,
-                          BoxY_Start,
-                          TextBoxW, numLines*lineHeight + 20, 0.f, 0.f, 0.f, 1.f);
-    frmMain.renderRect(ScreenW/2 - TextBoxW / 2 + 2,
-                          BoxY_Start + 2,
-                          TextBoxW - 4, numLines*lineHeight + 20 - 4, 1.f, 1.f, 1.f, 1.f);
-    frmMain.renderRect(ScreenW/2 - TextBoxW / 2 + 4,
-                          BoxY_Start + 4,
-                          TextBoxW - 8, numLines*lineHeight + 20 - 8, 8.f/255.f, 96.f/255.f, 168.f/255.f, 1.f);
-#else
-    // carefully render the background image...
-    frmMain.renderTexture(ScreenW / 2 - TextBoxW / 2,
-                          BoxY_Start,
-                          TextBoxW, 20, GFX.TextBox, 0, 0);
-    int rndMidH = numLines*lineHeight + 20 - 20 - 20;
-    int gfxMidH = GFX.TextBox.h - 20 - 20;
-    int vertReps = rndMidH / gfxMidH + 1;
-    for (int i = 0; i < vertReps; i++)
+    if(!UseGFX)
     {
-        if ((i+1) * gfxMidH <= rndMidH)
-            frmMain.renderTexture(ScreenW / 2 - TextBoxW / 2,
-                                  BoxY_Start + 20 + i*gfxMidH,
-                                  TextBoxW, gfxMidH, GFX.TextBox, 0, 20);
-        else
-            frmMain.renderTexture(ScreenW / 2 - TextBoxW / 2,
-                                  BoxY_Start + 20 + i*gfxMidH,
-                                  TextBoxW, rndMidH - i*gfxMidH, GFX.TextBox, 0, 20);
+        frmMain.renderRect(ScreenW/2 - TextBoxW / 2 ,
+                              BoxY_Start,
+                              TextBoxW, numLines*lineHeight + 20, 0.f, 0.f, 0.f, 1.f);
+        frmMain.renderRect(ScreenW/2 - TextBoxW / 2 + 2,
+                              BoxY_Start + 2,
+                              TextBoxW - 4, numLines*lineHeight + 20 - 4, 1.f, 1.f, 1.f, 1.f);
+        frmMain.renderRect(ScreenW/2 - TextBoxW / 2 + 4,
+                              BoxY_Start + 4,
+                              TextBoxW - 8, numLines*lineHeight + 20 - 8, 8.f/255.f, 96.f/255.f, 168.f/255.f, 1.f);
     }
-    frmMain.renderTexture(ScreenW / 2 - TextBoxW / 2,
-                          BoxY_Start + 20 + rndMidH,
-                          TextBoxW, 20, GFX.TextBox, 0, GFX.TextBox.h - 20);
+#ifndef __3DS__
+    else
+    {
+        // carefully render the background image...
+        frmMain.renderTexture(ScreenW / 2 - TextBoxW / 2,
+                              BoxY_Start,
+                              TextBoxW, 20, GFX.TextBox, 0, 0);
+        int rndMidH = numLines*lineHeight + 20 - 20 - 20;
+        int gfxMidH = GFX.TextBox.h - 20 - 20;
+        int vertReps = rndMidH / gfxMidH + 1;
+        for (int i = 0; i < vertReps; i++)
+        {
+            if ((i+1) * gfxMidH <= rndMidH)
+                frmMain.renderTexture(ScreenW / 2 - TextBoxW / 2,
+                                      BoxY_Start + 20 + i*gfxMidH,
+                                      TextBoxW, gfxMidH, GFX.TextBox, 0, 20);
+            else
+                frmMain.renderTexture(ScreenW / 2 - TextBoxW / 2,
+                                      BoxY_Start + 20 + i*gfxMidH,
+                                      TextBoxW, rndMidH - i*gfxMidH, GFX.TextBox, 0, 20);
+        }
+        frmMain.renderTexture(ScreenW / 2 - TextBoxW / 2,
+                              BoxY_Start + 20 + rndMidH,
+                              TextBoxW, 20, GFX.TextBox, 0, GFX.TextBox.h - 20);
+    }
 #endif
     // PASS TWO
     // Wohlstand's updated algorithm

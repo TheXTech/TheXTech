@@ -30,6 +30,7 @@
 #endif
 
 #include "globals.h"
+#include "main/menu_main.h"
 #include <fmt_format_ne.h>
 #include <cmath>
 #include <cfenv>
@@ -306,7 +307,7 @@ int ReturnWarpSaved = 0;
 int StartWarp = 0;
 Physics_t Physics;
 int MenuCursor = 0;
-int MenuMode = 0;
+int MenuMode = MENU_INTRO;
 bool MenuCursorCanMove = false;
 bool MenuCursorCanMove2 = false;
 bool NextFrame = false;

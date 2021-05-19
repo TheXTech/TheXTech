@@ -68,6 +68,8 @@ void initMainMenu()
     SDL_AtomicSet(&loadingProgrssMax, 0);
 #endif
 
+    g_mainMenu.introPressStart = "Press Start";
+
     g_mainMenu.main1PlayerGame = "1 Player Game";
     g_mainMenu.main2PlayerGame = "2 Player Game";
     g_mainMenu.mainBattleGame = "Battle Game";
@@ -89,6 +91,35 @@ static int menuCopySaveSrc = 0;
 static int menuCopySaveDst = 0;
 
 const int menuFix = -44; // for Input Settings
+
+const int TinyScreenH = 400;
+const int SmallScreenH = 500;
+const int TinyScreenW = 600;
+
+void GetMenuPos(int& MenuX, int& MenuY)
+{
+    MenuX = ScreenW / 2 - 100;
+    MenuY = ScreenH - 250;
+    if(ScreenW < TinyScreenW)
+    {
+        MenuX = ScreenW / 2 - 240;
+        if(MenuX < 24)
+            MenuX = 24;
+    }
+    if(ScreenH < TinyScreenH)
+        MenuY = 100;
+    else if(ScreenH < SmallScreenH)
+        MenuY = ScreenH - 180;
+    if(MenuMode == MENU_INPUT_SETTINGS_P1 || MenuMode == MENU_INPUT_SETTINGS_P2)
+    {
+        if(ScreenH < TinyScreenH)
+            MenuY += 16;
+        else if(ScreenH < SmallScreenH)
+            MenuY -= 70 - menuFix;
+        else
+            MenuY += menuFix;
+    }
+}
 
 static int FindWorldsThread(void *)
 {
@@ -267,8 +298,8 @@ static void s_handleMouseMove(int items, int x, int y, int maxWidth, int itemHei
 
 bool mainMenuUpdate()
 {
-    int MenuX = ScreenW / 2 - 100;
-    int MenuY = ScreenH - 250;
+    int MenuX, MenuY;
+    GetMenuPos(MenuX, MenuY);
 
     int B;
     Location_t tempLocation;
@@ -368,6 +399,9 @@ bool mainMenuUpdate()
 
         } // No keyboard/Joystick grabbing active
 
+        if(MenuMode == MENU_INTRO && ScreenH >= TinyScreenH)
+            MenuMode = MENU_MAIN;
+
 #ifndef __3DS__
         if(SDL_AtomicGet(&loading))
         {
@@ -378,8 +412,26 @@ bool mainMenuUpdate()
         }
         else
 #endif
+        // Menu Intro
+        if(MenuMode == MENU_INTRO)
+        {
+            if(MenuMouseRelease && MenuMouseDown)
+                MenuMouseClick = true;
+            if(escPressed && MenuCursorCanMove)
+            {
+                MenuMode = MENU_MAIN;
+                MenuCursor = 4;
+                PlaySoundMenu(SFX_Slide);
+            }
+            if((menuDoPress && MenuCursorCanMove) || MenuMouseClick)
+            {
+                MenuCursorCanMove = false;
+                MenuMode = MENU_MAIN;
+                PlaySoundMenu(SFX_Do);
+            }
+        }
         // Main Menu
-        if(MenuMode == MENU_MAIN)
+        else if(MenuMode == MENU_MAIN)
         {
             if(MenuMouseMove)
             {
@@ -415,11 +467,23 @@ bool mainMenuUpdate()
 
             if(escPressed && MenuCursorCanMove)
             {
-                if(MenuCursor != 4)
+                if(ScreenH < TinyScreenH)
+                {
+                    MenuCursorCanMove = false;
+                    MenuMode = MENU_INTRO;
+                    PlaySoundMenu(SFX_Slide);
+                }
+                else if(MenuCursor != 4)
                 {
                     MenuCursor = 4;
                     PlaySoundMenu(SFX_Slide);
                 }
+            }
+            else if(menuBackPress && MenuCursorCanMove && ScreenH < TinyScreenH)
+            {
+                MenuCursorCanMove = false;
+                MenuMode = MENU_INTRO;
+                PlaySoundMenu(SFX_Slide);
             }
             else if((menuDoPress && MenuCursorCanMove) || MenuMouseClick)
             {
@@ -749,7 +813,7 @@ bool mainMenuUpdate()
 
             }
 
-            if(MenuMode < MENU_CHARACTER_SELECT_BASE)
+            if(MenuMode != MENU_MAIN && MenuMode < MENU_CHARACTER_SELECT_BASE)
             {
                 if(MenuCursor >= NumSelectWorld)
                     MenuCursor = 0;
@@ -1220,7 +1284,7 @@ bool mainMenuUpdate()
                 {
                     For(A, 0, 11)
                     {
-                        if(MenuMouseY >= MenuY - 90 + menuFix + A * 30 && MenuMouseY <= MenuY - 90 + menuFix + A * 30 + 16)
+                        if(MenuMouseY >= MenuY - 90 + A * 30 && MenuMouseY <= MenuY - 90 + A * 30 + 16)
                         {
                             auto &ck = conKeyboard[MenuMode - MENU_INPUT_SETTINGS_BASE];
                             switch(A)
@@ -1292,7 +1356,7 @@ bool mainMenuUpdate()
                 {
                     For(A, 0, 11)
                     {
-                        if(MenuMouseY >= MenuY - 90 + menuFix + A * 30 && MenuMouseY <= MenuY - 90 + menuFix + A * 30 + 16)
+                        if(MenuMouseY >= MenuY - 90 + A * 30 && MenuMouseY <= MenuY - 90 + A * 30 + 16)
                         {
                             if(A == 0)
                             {
@@ -1560,6 +1624,9 @@ static void s_drawGameSaves(int MenuX, int MenuY)
 
 void mainMenuDraw()
 {
+    int MenuX, MenuY;
+    GetMenuPos(MenuX, MenuY);
+
     int A = 0;
     int B = 0;
     int C = 0;
@@ -1579,17 +1646,41 @@ void mainMenuDraw()
     B = ScreenW / A + 1;
     for (C = 0; C < B; C++)
         frmMain.renderTexture(A * C, 0, A, GFX.MenuGFX[1].h, GFX.MenuGFX[1], 0, 0);
-    frmMain.renderTexture(ScreenW / 2 - GFX.MenuGFX[3].w / 2, ScreenH - 24,
-            GFX.MenuGFX[3].w, GFX.MenuGFX[3].h, GFX.MenuGFX[3], 0, 0);
+    // URL
+    if(ScreenH >= SmallScreenH)
+        frmMain.renderTexture(ScreenW / 2 - GFX.MenuGFX[3].w / 2, ScreenH - 24,
+                GFX.MenuGFX[3].w, GFX.MenuGFX[3].h, GFX.MenuGFX[3], 0, 0);
 
-    #ifdef __3DS__
-    frmMain.setLayer(3);
-    #endif
-    frmMain.renderTexture(ScreenW / 2 - GFX.MenuGFX[2].w / 2, 70,
-            GFX.MenuGFX[2].w, GFX.MenuGFX[2].h, GFX.MenuGFX[2], 0, 0);
+    // game logo
+    int LogoMode = 0;
+    if (ScreenH < SmallScreenH &&
+        (MenuMode == MENU_INPUT_SETTINGS_P1 || MenuMode == MENU_INPUT_SETTINGS_P2))
+    {
+        LogoMode = 2;
+    }
+    else if (ScreenH >= TinyScreenH || MenuMode == MENU_INTRO)
+    {
+        LogoMode = 1;
+    }
+    else if (MenuMode == MENU_MAIN || MenuMode == MENU_OPTIONS)
+        LogoMode = 2;
 
-    int MenuX = ScreenW / 2 - 100;
-    int MenuY = ScreenH - 250;
+    if(LogoMode == 1)
+    {
+#ifdef __3DS__
+        frmMain.setLayer(3);
+#endif
+        if(ScreenH < SmallScreenH)
+            frmMain.renderTexture(ScreenW / 2 - GFX.MenuGFX[2].w / 2, 30,
+                    GFX.MenuGFX[2].w, GFX.MenuGFX[2].h, GFX.MenuGFX[2], 0, 0);
+        else
+            frmMain.renderTexture(ScreenW / 2 - GFX.MenuGFX[2].w / 2, 70,
+                    GFX.MenuGFX[2].w, GFX.MenuGFX[2].h, GFX.MenuGFX[2], 0, 0);
+    }
+    else if (LogoMode == 2)
+    {
+        SuperPrint(g_gameInfo.title, 3, ScreenW/2 - g_gameInfo.title.length()*9, 30);
+    }
 
 #ifndef __3DS__
     if(SDL_AtomicGet(&loading))
@@ -1604,8 +1695,20 @@ void mainMenuDraw()
     }
     else
 #endif
+
+    // Menu Intro
+    if(MenuMode == MENU_INTRO)
+    {
+        BlockFlash += 1;
+
+        if(BlockFlash >= 90)
+            BlockFlash = 0;
+
+        if(BlockFlash < 45)
+            SuperPrint(g_mainMenu.introPressStart, 3, ScreenW/2 - g_mainMenu.introPressStart.length()*9, ScreenH - 40);
+    }
     // Main menu
-    if(MenuMode == MENU_MAIN)
+    else if(MenuMode == MENU_MAIN)
     {
         SuperPrint(g_mainMenu.main1PlayerGame, 3, MenuX, MenuY);
         SuperPrint(g_mainMenu.main2PlayerGame, 3, MenuX, MenuY + 30);
@@ -1867,37 +1970,37 @@ void mainMenuDraw()
         if(useJoystick[MenuMode - MENU_INPUT_SETTINGS_BASE] == 0)
         {
             auto &ck = conKeyboard[MenuMode - MENU_INPUT_SETTINGS_BASE];
-            SuperPrint("INPUT......KEYBOARD", 3, MenuX, MenuY - 90 + menuFix);
-            SuperPrint(fmt::format_ne("UP.........{0}", getKeyName(ck.Up)), 3, MenuX, MenuY - 60 + menuFix);
-            SuperPrint(fmt::format_ne("DOWN.......{0}", getKeyName(ck.Down)), 3, MenuX, MenuY - 30 + menuFix);
-            SuperPrint(fmt::format_ne("LEFT.......{0}", getKeyName(ck.Left)), 3, MenuX, MenuY + menuFix);
-            SuperPrint(fmt::format_ne("RIGHT......{0}", getKeyName(ck.Right)), 3, MenuX, MenuY + 30 + menuFix);
-            SuperPrint(fmt::format_ne("RUN........{0}", getKeyName(ck.Run)), 3, MenuX, MenuY + 60 + menuFix);
-            SuperPrint(fmt::format_ne("ALT RUN....{0}", getKeyName(ck.AltRun)), 3, MenuX, MenuY + 90 + menuFix);
-            SuperPrint(fmt::format_ne("JUMP.......{0}", getKeyName(ck.Jump)), 3, MenuX, MenuY + 120 + menuFix);
-            SuperPrint(fmt::format_ne("ALT JUMP...{0}", getKeyName(ck.AltJump)), 3, MenuX, MenuY + 150 + menuFix);
-            SuperPrint(fmt::format_ne("DROP ITEM..{0}", getKeyName(ck.Drop)), 3, MenuX, MenuY + 180 + menuFix);
-            SuperPrint(fmt::format_ne("PAUSE......{0}", getKeyName(ck.Start)), 3, MenuX, MenuY + 210 + menuFix);
-            SuperPrint("Reset to default", 3, MenuX, MenuY + 240 + menuFix);
+            SuperPrint("INPUT......KEYBOARD", 3, MenuX, MenuY - 90);
+            SuperPrint(fmt::format_ne("UP.........{0}", getKeyName(ck.Up)), 3, MenuX, MenuY - 60);
+            SuperPrint(fmt::format_ne("DOWN.......{0}", getKeyName(ck.Down)), 3, MenuX, MenuY - 30);
+            SuperPrint(fmt::format_ne("LEFT.......{0}", getKeyName(ck.Left)), 3, MenuX, MenuY);
+            SuperPrint(fmt::format_ne("RIGHT......{0}", getKeyName(ck.Right)), 3, MenuX, MenuY + 30);
+            SuperPrint(fmt::format_ne("RUN........{0}", getKeyName(ck.Run)), 3, MenuX, MenuY + 60);
+            SuperPrint(fmt::format_ne("ALT RUN....{0}", getKeyName(ck.AltRun)), 3, MenuX, MenuY + 90);
+            SuperPrint(fmt::format_ne("JUMP.......{0}", getKeyName(ck.Jump)), 3, MenuX, MenuY + 120);
+            SuperPrint(fmt::format_ne("ALT JUMP...{0}", getKeyName(ck.AltJump)), 3, MenuX, MenuY + 150);
+            SuperPrint(fmt::format_ne("DROP ITEM..{0}", getKeyName(ck.Drop)), 3, MenuX, MenuY + 180);
+            SuperPrint(fmt::format_ne("PAUSE......{0}", getKeyName(ck.Start)), 3, MenuX, MenuY + 210);
+            SuperPrint("Reset to default", 3, MenuX, MenuY + 240);
         }
         else
         {
             auto &cj = conJoystick[MenuMode - MENU_INPUT_SETTINGS_BASE];
-            SuperPrint("INPUT......" + joyGetName(useJoystick[MenuMode - MENU_INPUT_SETTINGS_BASE] - 1), 3, MenuX, MenuY - 90 + menuFix);
-            SuperPrint(fmt::format_ne("UP.........{0}", getJoyKeyName(cj.isGameController, cj.Up)), 3, MenuX, MenuY - 60 + menuFix);
-            SuperPrint(fmt::format_ne("DOWN.......{0}", getJoyKeyName(cj.isGameController, cj.Down)), 3, MenuX, MenuY - 30 + menuFix);
-            SuperPrint(fmt::format_ne("LEFT.......{0}", getJoyKeyName(cj.isGameController, cj.Left)), 3, MenuX, MenuY + menuFix);
-            SuperPrint(fmt::format_ne("RIGHT......{0}", getJoyKeyName(cj.isGameController, cj.Right)), 3, MenuX, MenuY + 30 + menuFix);
-            SuperPrint(fmt::format_ne("RUN........{0}", getJoyKeyName(cj.isGameController, cj.Run)), 3, MenuX, MenuY + 60 + menuFix);
-            SuperPrint(fmt::format_ne("ALT RUN....{0}", getJoyKeyName(cj.isGameController, cj.AltRun)), 3, MenuX, MenuY + 90 + menuFix);
-            SuperPrint(fmt::format_ne("JUMP.......{0}", getJoyKeyName(cj.isGameController, cj.Jump)), 3, MenuX, MenuY + 120 + menuFix);
-            SuperPrint(fmt::format_ne("ALT JUMP...{0}", getJoyKeyName(cj.isGameController, cj.AltJump)), 3, MenuX, MenuY + 150 + menuFix);
-            SuperPrint(fmt::format_ne("DROP ITEM..{0}", getJoyKeyName(cj.isGameController, cj.Drop)), 3, MenuX, MenuY + 180 + menuFix);
-            SuperPrint(fmt::format_ne("PAUSE......{0}", getJoyKeyName(cj.isGameController, cj.Start)), 3, MenuX, MenuY + 210 + menuFix);
-            SuperPrint("Reset to default", 3, MenuX, MenuY + 240 + menuFix);
+            SuperPrint("INPUT......" + joyGetName(useJoystick[MenuMode - MENU_INPUT_SETTINGS_BASE] - 1), 3, MenuX, MenuY - 90);
+            SuperPrint(fmt::format_ne("UP.........{0}", getJoyKeyName(cj.isGameController, cj.Up)), 3, MenuX, MenuY - 60);
+            SuperPrint(fmt::format_ne("DOWN.......{0}", getJoyKeyName(cj.isGameController, cj.Down)), 3, MenuX, MenuY - 30);
+            SuperPrint(fmt::format_ne("LEFT.......{0}", getJoyKeyName(cj.isGameController, cj.Left)), 3, MenuX, MenuY);
+            SuperPrint(fmt::format_ne("RIGHT......{0}", getJoyKeyName(cj.isGameController, cj.Right)), 3, MenuX, MenuY + 30);
+            SuperPrint(fmt::format_ne("RUN........{0}", getJoyKeyName(cj.isGameController, cj.Run)), 3, MenuX, MenuY + 60);
+            SuperPrint(fmt::format_ne("ALT RUN....{0}", getJoyKeyName(cj.isGameController, cj.AltRun)), 3, MenuX, MenuY + 90);
+            SuperPrint(fmt::format_ne("JUMP.......{0}", getJoyKeyName(cj.isGameController, cj.Jump)), 3, MenuX, MenuY + 120);
+            SuperPrint(fmt::format_ne("ALT JUMP...{0}", getJoyKeyName(cj.isGameController, cj.AltJump)), 3, MenuX, MenuY + 150);
+            SuperPrint(fmt::format_ne("DROP ITEM..{0}", getJoyKeyName(cj.isGameController, cj.Drop)), 3, MenuX, MenuY + 180);
+            SuperPrint(fmt::format_ne("PAUSE......{0}", getJoyKeyName(cj.isGameController, cj.Start)), 3, MenuX, MenuY + 210);
+            SuperPrint("Reset to default", 3, MenuX, MenuY + 240);
         }
 
-        frmMain.renderTexture(MenuX - 20, MenuY - 90 + (MenuCursor * 30) + menuFix,
+        frmMain.renderTexture(MenuX - 20, MenuY - 90 + (MenuCursor * 30),
                               GFX.MCursor[0].w, GFX.MCursor[0].h, GFX.MCursor[0], 0, 0);
     }
 

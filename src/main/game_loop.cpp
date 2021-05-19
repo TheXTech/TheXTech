@@ -419,7 +419,7 @@ void PauseGame(int plr)
                                 break;
                             case 1: // Restart level
                                 stopPause = true;
-                                MenuMode = MENU_MAIN;
+                                MenuMode = MENU_INTRO;
                                 MenuCursor = 0;
                                 frmMain.setTargetTexture();
                                 frmMain.clearBuffer();
@@ -440,7 +440,7 @@ void PauseGame(int plr)
                                 break;
                             case 3: // Quit testing
                                 stopPause = true;
-                                MenuMode = MENU_MAIN;
+                                MenuMode = MENU_INTRO;
                                 MenuCursor = 0;
                                 frmMain.setTargetTexture();
                                 frmMain.clearBuffer();
@@ -472,7 +472,7 @@ void PauseGame(int plr)
                             stopPause = true;
                             GameMenu = true;
 
-                            MenuMode = MENU_MAIN;
+                            MenuMode = MENU_INTRO;
                             MenuCursor = 0;
 
                             if(!LevelSelect)

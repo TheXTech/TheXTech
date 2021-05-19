@@ -33,6 +33,8 @@
 // Menu modes
 enum
 {
+    // Main intro
+    MENU_INTRO = -1,
     // Main menu
     MENU_MAIN = 0,
     // One player game episode select
@@ -43,6 +45,8 @@ enum
     MENU_BATTLE_MODE = 4,
     // Options menu
     MENU_OPTIONS = 3,
+    // Editor menu
+    MENU_EDITOR = 9,
 
     // Character select for single player game
     MENU_CHARACTER_SELECT_1P    = 100,
@@ -84,6 +88,8 @@ enum
 
 struct MainMenuContent
 {
+    std::string introPressStart;
+
     std::string main1PlayerGame;
     std::string main2PlayerGame;
     std::string mainBattleGame;
