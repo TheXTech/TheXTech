@@ -314,6 +314,8 @@ bool mainMenuUpdate()
     bool returnPressed = getKeyState(SDL_SCANCODE_RETURN) == KEY_PRESSED;
     bool upPressed = getKeyState(SDL_SCANCODE_UP) == KEY_PRESSED;
     bool downPressed = getKeyState(SDL_SCANCODE_DOWN) == KEY_PRESSED;
+    bool leftPressed = getKeyState(SDL_SCANCODE_LEFT) == KEY_PRESSED;
+    bool rightPressed = getKeyState(SDL_SCANCODE_RIGHT) == KEY_PRESSED;
 #else // #ifndef __3DS__
     bool altPressed = false;
     bool returnPressed = false;
@@ -321,6 +323,8 @@ bool mainMenuUpdate()
     bool escPressed = false;
     bool upPressed = false;
     bool downPressed = false;
+    bool leftPressed = false;
+    bool rightPressed = false;
 #endif // #ifndef __3DS__ ... #else
 
 #ifdef __ANDROID__
@@ -329,12 +333,16 @@ bool mainMenuUpdate()
 
     bool menuDoPress = (returnPressed && !altPressed) || spacePressed;
     bool menuBackPress = (escPressed && !altPressed);
+    bool menuLeftPress = leftPressed;
+    bool menuRightPress = rightPressed;
 
     {
         Controls_t &c = Player[1].Controls;
 
         menuDoPress |= (c.Start || c.Jump) && !altPressed;
         menuBackPress |= c.Run && !altPressed;
+        menuLeftPress |= c.Left;
+        menuRightPress |= c.Right;
 
         if(frmMain.MousePointer != 99)
         {
@@ -342,12 +350,14 @@ bool mainMenuUpdate()
             showCursor(0);
         }
 
-        if(!c.Up && !c.Down && !c.Jump && !c.Run && !c.Start)
+        if(!c.Up && !c.Down && !c.Jump && !c.Run && !c.Start && !c.Left && !c.Right)
         {
             bool k = false;
             k |= menuDoPress;
             k |= upPressed;
             k |= downPressed;
+            k |= leftPressed;
+            k |= rightPressed;
             k |= escPressed;
 
             if(!k)
@@ -1175,7 +1185,7 @@ bool mainMenuUpdate()
                 }
             }
 
-            if(MenuCursorCanMove || MenuMouseClick || MenuMouseBack)
+            if(MenuCursorCanMove || MenuMouseClick || MenuMouseBack || (menuLeftPress || menuRightPress) && MenuCursorCanMove)
             {
                 if(menuBackPress || MenuMouseBack)
                 {
@@ -1185,7 +1195,7 @@ bool mainMenuUpdate()
                     MenuCursorCanMove = false;
                     PlaySoundMenu(SFX_Slide);
                 }
-                else if(menuDoPress || MenuMouseClick)
+                else if(menuDoPress || MenuMouseClick || menuLeftPress || menuRightPress)
                 {
                     MenuCursorCanMove = false;
                     int i = 0;
@@ -1212,9 +1222,14 @@ bool mainMenuUpdate()
                     else if(MenuCursor == i++)
                     {
                         PlaySoundMenu(SFX_Do);
-                        config_ScaleMode = (ScaleMode_t)((int)config_ScaleMode + 1);
+                        if(!menuLeftPress)
+                            config_ScaleMode = (ScaleMode_t)((int)config_ScaleMode + 1);
+                        else
+                            config_ScaleMode = (ScaleMode_t)((int)config_ScaleMode - 1);
                         if(config_ScaleMode > ScaleMode_t::FIXED_2X)
                             config_ScaleMode = ScaleMode_t::DYNAMIC_INTEGER;
+                        if(config_ScaleMode < ScaleMode_t::DYNAMIC_INTEGER)
+                            config_ScaleMode = ScaleMode_t::FIXED_2X;
                         frmMain.updateViewport();
                     }
 #endif
@@ -1222,30 +1237,60 @@ bool mainMenuUpdate()
                     else if(MenuCursor == i++)
                     {
                         PlaySoundMenu(SFX_Do);
-                        if (config_InternalW == 0 || config_InternalH == 0)
-                            { config_InternalW = 480; config_InternalH = 320; }
-                        else if (config_InternalW == 480 && config_InternalH == 320)
-                            { config_InternalW = 512; config_InternalH = 384; }
-                        else if (config_InternalW == 512 && config_InternalH == 384)
-                            { config_InternalW = 512; config_InternalH = 448; }
-                        else if (config_InternalW == 512 && config_InternalH == 448)
-                            { config_InternalW = 640; config_InternalH = 480; }
-                        else if (config_InternalW == 640 && config_InternalH == 480)
-                            { config_InternalW = 800; config_InternalH = 480; }
-                        else if (config_InternalW == 800 && config_InternalH == 480)
-                            { config_InternalW = 800; config_InternalH = 600; }
-                        else if (config_InternalW == 800 && config_InternalH == 600)
-                            { config_InternalW = 960; config_InternalH = 600; }
-                        else if (config_InternalW == 960 && config_InternalH == 600)
-                            { config_InternalW = 1066; config_InternalH = 600; }
-                        else if (config_InternalW == 1066 && config_InternalH == 600)
-                            { config_InternalW = 1200; config_InternalH = 600; }
-                        else if (config_InternalW == 1200 && config_InternalH == 600)
-                            { config_InternalW = 1280; config_InternalH = 720; }
-                        else if (config_InternalW == 1280 && config_InternalH == 720)
-                            { config_InternalW = 0; config_InternalH = 0; }
+                        if(!menuLeftPress)
+                        {
+                            if (config_InternalW == 0 || config_InternalH == 0)
+                                { config_InternalW = 480; config_InternalH = 320; }
+                            else if (config_InternalW == 480 && config_InternalH == 320)
+                                { config_InternalW = 512; config_InternalH = 384; }
+                            else if (config_InternalW == 512 && config_InternalH == 384)
+                                { config_InternalW = 512; config_InternalH = 448; }
+                            else if (config_InternalW == 512 && config_InternalH == 448)
+                                { config_InternalW = 640; config_InternalH = 480; }
+                            else if (config_InternalW == 640 && config_InternalH == 480)
+                                { config_InternalW = 800; config_InternalH = 480; }
+                            else if (config_InternalW == 800 && config_InternalH == 480)
+                                { config_InternalW = 800; config_InternalH = 600; }
+                            else if (config_InternalW == 800 && config_InternalH == 600)
+                                { config_InternalW = 960; config_InternalH = 600; }
+                            else if (config_InternalW == 960 && config_InternalH == 600)
+                                { config_InternalW = 1066; config_InternalH = 600; }
+                            else if (config_InternalW == 1066 && config_InternalH == 600)
+                                { config_InternalW = 1200; config_InternalH = 600; }
+                            else if (config_InternalW == 1200 && config_InternalH == 600)
+                                { config_InternalW = 1280; config_InternalH = 720; }
+                            else if (config_InternalW == 1280 && config_InternalH == 720)
+                                { config_InternalW = 0; config_InternalH = 0; }
+                            else
+                                { config_InternalW = 0; config_InternalH = 0; }
+                        }
                         else
-                            { config_InternalW = 0; config_InternalH = 0; }
+                        {
+                            if (config_InternalW == 0 || config_InternalH == 0)
+                                { config_InternalW = 1280; config_InternalH = 720; }
+                            else if (config_InternalW == 480 && config_InternalH == 320)
+                                { config_InternalW = 0; config_InternalH = 0; }
+                            else if (config_InternalW == 512 && config_InternalH == 384)
+                                { config_InternalW = 480; config_InternalH = 320; }
+                            else if (config_InternalW == 512 && config_InternalH == 448)
+                                { config_InternalW = 512; config_InternalH = 384; }
+                            else if (config_InternalW == 640 && config_InternalH == 480)
+                                { config_InternalW = 512; config_InternalH = 448; }
+                            else if (config_InternalW == 800 && config_InternalH == 480)
+                                { config_InternalW = 640; config_InternalH = 480; }
+                            else if (config_InternalW == 800 && config_InternalH == 600)
+                                { config_InternalW = 800; config_InternalH = 480; }
+                            else if (config_InternalW == 960 && config_InternalH == 600)
+                                { config_InternalW = 800; config_InternalH = 600; }
+                            else if (config_InternalW == 1066 && config_InternalH == 600)
+                                { config_InternalW = 960; config_InternalH = 600; }
+                            else if (config_InternalW == 1200 && config_InternalH == 600)
+                                { config_InternalW = 1066; config_InternalH = 600; }
+                            else if (config_InternalW == 1280 && config_InternalH == 720)
+                                { config_InternalW = 1200; config_InternalH = 600; }
+                            else
+                                { config_InternalW = 0; config_InternalH = 0; }
+                        }
                         frmMain.updateViewport();
                     }
 #endif
@@ -1939,6 +1984,8 @@ void mainMenuDraw()
             resString += " (HD)";
         else if (config_InternalW == 0 || config_InternalH == 0)
             resString = "RES: DYNAMIC";
+        else
+            resString += " (CUSTOM)";
         SuperPrint(resString, 3, MenuX, MenuY + 30*A);
         A ++;
 #endif

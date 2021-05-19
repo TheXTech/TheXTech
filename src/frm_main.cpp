@@ -440,6 +440,32 @@ bool FrmMain::hasWindowMouseFocus()
     return (flags & SDL_WINDOW_MOUSE_FOCUS) != 0;
 }
 
+void SizeWindow(SDL_Window* window)
+{
+    #if defined(__ORIGINAL_RES__)
+        if(config_ScaleMode == ScaleMode_t::FIXED_1X)
+        {
+            SDL_SetWindowSize(window, ScreenW, ScreenH);
+        }
+        else if(config_ScaleMode == ScaleMode_t::FIXED_2X)
+        {
+            SDL_SetWindowSize(window, 2*ScreenW, 2*ScreenH);
+        }
+    #else
+        if(config_InternalW != 0 && config_InternalH != 0)
+        {
+            if(config_ScaleMode == ScaleMode_t::FIXED_1X)
+            {
+                SDL_SetWindowSize(window, config_InternalW, config_InternalH);
+            }
+            else if(config_ScaleMode == ScaleMode_t::FIXED_2X)
+            {
+                SDL_SetWindowSize(window, 2*config_InternalW, 2*config_InternalH);
+            }
+        }
+    #endif
+}
+
 void FrmMain::eventDoubleClick()
 {
     if(MagicHand)
@@ -450,7 +476,7 @@ void FrmMain::eventDoubleClick()
         frmMain.setFullScreen(false);
         resChanged = false;
         SDL_RestoreWindow(m_window);
-        SDL_SetWindowSize(m_window, ScreenW, ScreenH);
+        SizeWindow(m_window);
         if(!GameMenu && !MagicHand)
             showCursor(1);
     }
@@ -706,35 +732,6 @@ void FrmMain::updateViewport()
 
     float w, w1, h, h1;
     int   wi, hi;
-
-    SDL_SetWindowResizable(m_window, SDL_TRUE);
-#if defined(__ORIGINAL_RES__)
-    if(config_ScaleMode == ScaleMode_t::FIXED_1X)
-    {
-        SDL_SetWindowSize(m_window, ScreenW, ScreenH);
-        SDL_SetWindowResizable(m_window, SDL_FALSE);
-    }
-    else if(config_ScaleMode == ScaleMode_t::FIXED_2X)
-    {
-        SDL_SetWindowSize(m_window, 2*ScreenW, 2*ScreenH);
-        SDL_SetWindowResizable(m_window, SDL_FALSE);
-    }
-#else
-    if(config_InternalW != 0 && config_InternalH != 0)
-    {
-        if(config_ScaleMode == ScaleMode_t::FIXED_1X)
-        {
-            SDL_SetWindowSize(m_window, config_InternalW, config_InternalH);
-            SDL_SetWindowResizable(m_window, SDL_FALSE);
-        }
-        else if(config_ScaleMode == ScaleMode_t::FIXED_2X)
-        {
-            SDL_SetWindowSize(m_window, 2*config_InternalW, 2*config_InternalH);
-            SDL_SetWindowResizable(m_window, SDL_FALSE);
-        }
-    }
-#endif
-
 
 #if !defined(__EMSCRIPTEN__) && !defined(__ORIGINAL_RES__)
     SDL_GetWindowSize(m_window, &wi, &hi);
