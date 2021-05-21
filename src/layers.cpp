@@ -391,7 +391,7 @@ void ProcEvent(std::string EventName, bool NoEffect)
                         }
                     }
 
-                    if(!equalCase(evt.Name, "Level - Start"))
+                    if(!evt.AutoStart && !equalCase(evt.Name, "Level - Start"))
                     {
                         C = plr;
                         if(numPlayers == 2 && DScreenType != 5)
