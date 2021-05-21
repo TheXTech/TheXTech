@@ -388,7 +388,7 @@ struct NPC_t
     bool TurnAround = false;
 //    Killed As Integer 'Flags the NPC to die a specific way.
     int Killed = 0;
-//    Active As Boolean 'If on screen
+//    Active As Boolean 'If on screen and active
     bool Active = false;
 //    Reset(1 To 2) As Boolean 'If it can display the NPC
     RangeArrI<bool, 1, 2, false> Reset;

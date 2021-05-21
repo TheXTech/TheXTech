@@ -35,6 +35,7 @@
 #include "../sorting.h"
 #include "../compat.h"
 #include "../main/trees.h"
+#include "../npc_id.h"
 
 #include <Utils/maths.h>
 
@@ -677,7 +678,8 @@ void UpdateNPCs()
 
 
 
-                else if(NPC[A].Type == 17 || NPC[A].Type == 18 || (NPCIsCheep[NPC[A].Type] && NPC[A].Special == 2) || NPC[A].Type == 42) // Special Start for Jumping Fish and Bullet Bills
+                else if(NPC[A].Type == NPCID_BULLET_SMB3 || NPC[A].Type == NPCID_BULLET_SMW || NPC[A].Type == NPCID_EERIE
+                    || (NPCIsCheep[NPC[A].Type] && Maths::iRound(NPC[A].Special) == 2)) // Special Start for Jumping Fish and Bullet Bills
                 {
                     if(NPC[A].TimeLeft <= 1)
                     {
