@@ -24,10 +24,10 @@
  */
 
 
-#ifndef __3DS__
+#ifndef NO_SDL
 #include <SDL2/SDL_stdinc.h>
 #else
-#include "3ds/SDL_supplement.h"
+#include "SDL_supplement.h"
 #endif
 
 #include <fmt_format_ne.h>

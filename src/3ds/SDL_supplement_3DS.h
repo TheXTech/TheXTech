@@ -1,17 +1,3 @@
-#ifndef SDL_SUPPLEMENT_H
-#define SDL_SUPPLEMENT_H
-
-typedef struct _SDL_Point {
-    int x;
-    int y;
-} SDL_Point;
-
-extern uint SDL_GetTicks(void);
-
-const uint SDL_FLIP_NONE = 0;
-const uint SDL_FLIP_HORIZONTAL = 1;
-const uint SDL_FLIP_VERTICAL = 2; // bitwise combos
-
 const char KEYNAMES[32][32] = {
  "A", "B", "SELECT", "START",
  "D-PAD RIGHT", "D-PAD LEFT", "D-PAD UP", "D-PAD DOWN",
@@ -76,21 +62,3 @@ enum KEYID {
  KEYID_PAD_UP=30,
  KEYID_PAD_DOWN=31
 };
-
-#define SDL_INLINE inline
-
-#define Sint64 sint64_t
-#define Uint8 uint8_t
-#define SDL_bool bool
-
-#define SDL_memset memset
-#define SDL_fabs fabs
-#define SDL_strcasecmp strcasecmp
-#define SDL_strtol strtol
-#define SDL_fmod fmod
-#define SDL_floor floor
-
-inline void SDL_assert_release(bool arg) {};
-inline void SDL_assert(bool arg) {};
-
-#endif // SDL_SUPPLEMENT_H

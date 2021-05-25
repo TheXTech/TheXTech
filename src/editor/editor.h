@@ -26,7 +26,9 @@
 #ifndef EDITOR_H
 #define EDITOR_H
 
-#include "location.h"
+#include "../location.h"
+
+extern std::string Backup_FullFileName;
 
 struct Point_t
 {
@@ -63,6 +65,10 @@ struct OptCursor_t
 };
 
 extern OptCursor_t optCursor;
+
+void ResetSectionScrolls();
+
+void SetSection(int i);
 
 // this sub handles the level editor
 // it is still called when the player is testing a level in the editor in windowed mode

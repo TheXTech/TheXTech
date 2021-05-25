@@ -26,7 +26,7 @@
 #ifndef SPEEDRUNNER_H
 #define SPEEDRUNNER_H
 
-#include "controls.h"
+#include "../controls.h"
 
 enum
 {

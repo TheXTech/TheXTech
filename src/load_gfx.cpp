@@ -23,8 +23,10 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef __3DS__
+#ifndef NO_SDL
 #include <SDL2/SDL_timer.h>
+#endif
+#ifndef NO_INTPROC
 #include <InterProcess/intproc.h>
 #endif
 
@@ -149,7 +151,12 @@ static void loadCGFX(const std::set<std::string> &files,
 #ifdef DEBUG_BUILD
         pLogDebug("Trying to load custom GFX: %s with mask %s", imgToUse.c_str(), maskToUse.c_str());
 #endif
+#ifdef __3DS__
+        // 3DS never uses masks
+        newTexture = frmMain.lazyLoadPicture(imgToUse);
+#else
         newTexture = frmMain.lazyLoadPicture(imgToUse, maskToUse, origPath);
+#endif
         success = newTexture.inited;
         loadedPath = imgToUse;
     }
@@ -642,7 +649,7 @@ void UpdateLoadREAL()
 {
     std::string state;
     bool draw = false;
-#ifndef __3DS__
+#ifndef NO_INTPROC
     if(IntProc::isEnabled())
     {
         state = IntProc::getState();
@@ -674,11 +681,11 @@ void UpdateLoadREAL()
 
     if(draw)
     {
-#ifdef __3DS__
-        frmMain.initDraw();
-#endif
         frmMain.setTargetTexture();
-        frmMain.clearBuffer();
+#ifdef __3DS__
+        frmMain.initDraw(0);
+#endif
+        // frmMain.clearBuffer();
         int Left = ScreenW/2 - GFX.MenuGFX[4].w/2;
         if (Left < 0) Left = 0;
         int Top = ScreenH/2 - GFX.MenuGFX[4].h/2;

@@ -26,11 +26,13 @@
 #ifndef FRMMAIN_H
 #define FRMMAIN_H
 
-#ifndef __3DS__
+#ifndef NO_SDL
 #include <SDL2/SDL_stdinc.h>
 #include <SDL2/SDL_scancode.h>
 #include <SDL2/SDL_events.h>
 #include <SDL2/SDL_render.h>
+#else
+#include "SDL_supplement.h"
 #endif
 
 #ifdef __3DS__
@@ -44,7 +46,7 @@
 #include "std_picture.h"
 #include "cmd_line_setup.h"
 
-#if !defined(__EMSCRIPTEN__) && !defined(__3DS__)
+#ifndef NO_SCREENSHOT
 #include <deque>
 #include <gif_writer.h>
 typedef struct SDL_Thread SDL_Thread;
@@ -54,7 +56,7 @@ typedef struct SDL_mutex SDL_mutex;
 class FrmMain
 {
     std::string m_windowTitle;
-#ifndef __3DS__
+#ifndef NO_SDL
     SDL_Window *m_window = nullptr;
     SDL_Renderer *m_gRenderer = nullptr;
     SDL_Texture  *m_tBuffer = nullptr;
@@ -69,13 +71,22 @@ class FrmMain
 #ifdef __3DS__
     std::set<C2D_SpriteSheet> m_textureBank; // SDL_Texture
     std::set<StdPicture*> m_bigPictures;
+    bool inFrame = false;
     uint32_t currentFrame = 0;
     touchPosition m_lastMousePosition = {0, 0};
-    float depthSlider = 1.;
+    float depthSlider = 0.;
 
     uint32_t keys_held = 0;
     uint32_t keys_pressed = 0;
     uint32_t keys_released = 0;
+
+    C3D_RenderTarget* top;
+    C3D_RenderTarget* right;
+    C3D_RenderTarget* bottom;
+    Tex3DS_SubTexture layer_subtexs[4];
+    C3D_Tex layer_texs[4];
+    C2D_Image layer_ims[4];
+    C3D_RenderTarget* layer_targets[4];
 #endif
 #ifdef __ANDROID__
     bool m_blockRender = false;
@@ -91,11 +102,22 @@ public:
 
     FrmMain();
 
-#ifndef __3DS__
+#ifndef NO_SDL
     SDL_Window *getWindow();
     Uint8 getKeyState(SDL_Scancode key);
 #else
-    uint8_t getKeyState(int key);
+    inline bool getKeyHeld(int id)
+    {
+        return id & keys_held;
+    }
+    inline bool getKeyPressed(int id)
+    {
+        return id & keys_pressed;
+    }
+    inline bool getKeyReleased(int id)
+    {
+        return id & keys_released;
+    }
 #endif
 
     bool initSDL(const CmdLineSetup_t &setup);
@@ -109,7 +131,7 @@ public:
     bool isWindowActive();
     bool hasWindowMouseFocus();
 
-#ifndef __3DS__
+#ifndef NO_SDL
     void eventDoubleClick();
     void eventKeyPress(SDL_Scancode KeyASCII);
     void eventKeyDown(SDL_KeyboardEvent &evt);
@@ -126,6 +148,7 @@ public:
 #ifdef __3DS__
     void initDraw(int screen = 0);
     void setLayer(int layer);
+    void toggleDebug();
 #endif
 
     void repaint();
@@ -161,9 +184,22 @@ public:
     void renderRect(int x, int y, int w, int h, float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f, bool filled = true);
     void renderRectBR(int _left, int _top, int _right, int _bottom, float red, float green, float blue, float alpha);
 
+    // this is extremely difficult to implement on some platforms, including 3DS, where circle mode is distinct from polygon mode.
+#ifndef __3DS__
     void renderCircle(int cx, int cy, int radius, float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f, bool filled = true);
+#endif
 
+    // these operate in render coordinates on 3DS and should not be called by external units
+private:
     // Similar to BitBlt, but without masks, just draw a texture or it's fragment!
+#ifdef __3DS__
+    void renderTexturePrivate(float xDst, float yDst, float wDst, float hDst,
+                             StdPicture &tx,
+                             float xSrc, float ySrc, float wSrc, float hSrc,
+                             float rotateAngle = 0.f, SDL_Point *center = nullptr, unsigned int flip = SDL_FLIP_NONE,
+                             float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f);
+#endif
+    // 3DS only handles rotation and flipping correctly for non-huge images
     void renderTextureI(int xDst, int yDst, int wDst, int hDst,
                         StdPicture &tx,
                         int xSrc, int ySrc,
@@ -175,6 +211,7 @@ public:
                              int wSrc, int hSrc,
                              double rotateAngle = 0.0, SDL_Point *center = nullptr, unsigned int flip = SDL_FLIP_NONE,
                              float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f);
+public:
     void renderTextureScale(double xDst, double yDst, double wDst, double hDst,
                             StdPicture &tx,
                             int xSrc, int ySrc,
@@ -197,7 +234,7 @@ public:
                             StdPicture &tx,
                             float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f);
 
-#ifndef __3DS__
+#ifndef NO_SCREENSHOT
     void getScreenPixels(int x, int y, int w, int h, unsigned char *pixels);
     void getScreenPixelsRGBA(int x, int y, int w, int h, unsigned char *pixels);
     int  getPixelDataSize(const StdPicture &tx);
@@ -213,12 +250,12 @@ public:
     bool renderBlocked();
 #endif
 
-#if !defined(__EMSCRIPTEN__) && !defined(__3DS__)
+#ifndef NO_SCREENSHOT
     void makeShot();
 #endif
 
 private:
-#if !defined(__EMSCRIPTEN__) && !defined(__3DS__)
+#ifndef NO_SCREENSHOT
 
     struct PGE_GL_shoot
     {
@@ -272,7 +309,7 @@ private:
     void lazyLoad(StdPicture &target);
     void lazyUnLoad(StdPicture &target);
 
-#if !defined(__EMSCRIPTEN__) && !defined(__3DS__)
+#ifndef NO_SCREENSHOT
     std::string m_screenshotPath;
     std::string m_gifRecordPath;
 
@@ -286,8 +323,8 @@ private:
     float offset_x = 0.f;
     float offset_y = 0.f;
     //Offset to shake screen
-    int viewport_offset_x = 0.f;
-    int viewport_offset_y = 0.f;
+    int viewport_offset_x = 0;
+    int viewport_offset_y = 0;
     //Need to calculate relative viewport position when screen was scaled
     float viewport_scale_x = 1.0f;
     float viewport_scale_y = 1.0f;
@@ -296,17 +333,6 @@ private:
     int viewport_y = 0;
     int viewport_w = 0;
     int viewport_h = 0;
-
-#ifdef __3DS__
-    C3D_RenderTarget* top;
-    C3D_RenderTarget* right;
-    C3D_RenderTarget* bottom;
-    int currentLayer = 0;
-    Tex3DS_SubTexture layer_subtexs[4];
-    C3D_Tex layer_texs[4];
-    C2D_Image layer_ims[4];
-    C3D_RenderTarget* layer_targets[4];
-#endif
 
     SDL_Point MapToScr(int x, int y);
 };

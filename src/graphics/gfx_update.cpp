@@ -23,13 +23,11 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#include <SDL2/SDL_timer.h>
-
 #include "../globals.h"
 #include "../frame_timer.h"
 #include "../graphics.h"
 #include "../collision.h"
-#include "../editor.h"
+#include "../editor/editor.h"
 #include "../npc.h"
 #include "../location.h"
 #include "../main/menu_main.h"
@@ -40,9 +38,10 @@
 #include "../compat.h"
 
 #ifdef __3DS__
-#include "../3ds/n3ds-clock.h"
 #include "../3ds/second_screen.h"
-#include "../3ds/editor_screen.h"
+#endif
+#ifdef NEW_EDITOR
+#include "../editor/new_editor.h"
 #endif
 
 #include <fmt_format_ne.h>
@@ -504,6 +503,25 @@ void UpdateGraphics(bool skipRepaint)
                 GetvScreenAverageCanonical(&X, &Y);
             else
                 GetvScreenCanonical(Z, &X, &Y);
+#ifdef __3DS__
+            if(!GameMenu && !GameOutro)
+            {
+                // make sure that the left or right boundary of the section is never seen only by one eye
+                double sectionStartX_OnScreen = level[S].X + vScreenX[Z];
+                double sectionEndX_OnScreen = level[S].Width + vScreenX[Z];
+                if(sectionStartX_OnScreen > 0)
+                {
+                    vScreen[Z].Width -= sectionStartX_OnScreen;
+                    vScreen[Z].Left += sectionStartX_OnScreen;
+                    vScreen[Z].ScreenLeft += sectionStartX_OnScreen;
+                    vScreenX[Z] = -level[S].X;
+                }
+                if(sectionEndX_OnScreen < vScreen[Z].Width)
+                {
+                    vScreen[Z].Width = sectionEndX_OnScreen;
+                }
+            }
+#endif
         }
 
         // moved to `graphics/gfx_screen.cpp`
@@ -720,10 +738,10 @@ void UpdateGraphics(bool skipRepaint)
 
 #ifdef __3DS__
     frmMain.initDraw(0);
-#endif
-
+#else
     // buffer now cleared every frame because of cases where vScreens change positions
     frmMain.clearBuffer();
+#endif
 
     if(SingleCoop == 2)
         numScreens = 2;
@@ -1883,6 +1901,11 @@ void UpdateGraphics(bool skipRepaint)
 
     if(!skipRepaint)
         frmMain.repaint();
+    else
+    {
+        frmMain.clearBuffer();
+        frmMain.repaint();
+    }
 
     frmMain.setTargetScreen();
 

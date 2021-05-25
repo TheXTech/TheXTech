@@ -23,12 +23,16 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef __3DS__
+#ifndef NO_SDL
 #include <SDL2/SDL.h>
+#else
+#include "SDL_supplement.h"
+#endif
+
+#ifndef __3DS__
 #include <tclap/CmdLine.h>
 #include <CrashHandler/crash_handler.h>
 #else
-#include "3ds/SDL_supplement.h"
 #include <3ds.h>
 #endif
 

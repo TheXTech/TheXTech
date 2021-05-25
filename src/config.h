@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include <string>
 
-#ifndef __ORIGINAL_RES__
+#ifndef FIXED_RES
 extern int config_InternalW;
 extern int config_InternalH;
 #endif

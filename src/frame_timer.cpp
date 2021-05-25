@@ -23,10 +23,10 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef __3DS__
+#ifndef NO_SDL
 #include <SDL2/SDL_timer.h>
 #else
-#include "3ds/SDL_supplement.h"
+#include "SDL_supplement.h"
 #endif
 
 #include <fmt_format_ne.h>
@@ -133,10 +133,17 @@ void PerformanceStats_t::print()
 
 typedef int64_t nanotime_t;
 
+#ifndef NO_SDL
 static SDL_INLINE nanotime_t getNanoTime()
 {
     return static_cast<nanotime_t>(SDL_GetTicks()) * 1000000;
 }
+#else
+static SDL_INLINE nanotime_t getNanoTime()
+{
+    return static_cast<nanotime_t>(SDL_GetMicroTicks()) * 1000;
+}
+#endif
 
 static SDL_INLINE nanotime_t getElapsedTime(nanotime_t oldTime)
 {
@@ -148,13 +155,21 @@ static SDL_INLINE nanotime_t getSleepTime(nanotime_t oldTime, nanotime_t target)
     return target - getElapsedTime(oldTime);
 }
 
+#ifdef __3DS__
+static SDL_INLINE void xtech_nanosleep(nanotime_t sleepTime)
+{
+    if(sleepTime <= 0)
+        return;
+    PGE_Nano_Delay(sleepTime);
+}
+#else
 static SDL_INLINE void xtech_nanosleep(nanotime_t sleepTime)
 {
     if(sleepTime <= 0)
         return;
     PGE_Delay((Uint32)SDL_ceil(sleepTime / 1000000.0));
 }
-
+#endif
 
 struct TimeStore
 {

@@ -201,7 +201,7 @@ void WorldLoop()
         tempLocation.Y = tempLocation.Y + 4;
         WorldPlayer[1].LevelName.clear();
 
-#ifndef __3DS__
+#ifndef NO_SDL
         bool altPressed = getKeyState(SDL_SCANCODE_LALT) == KEY_PRESSED ||
                           getKeyState(SDL_SCANCODE_RALT) == KEY_PRESSED;
 

@@ -26,10 +26,10 @@
 #ifndef FLOATS_H
 #define FLOATS_H
 
-#ifndef __3DS__
+#ifndef NO_SDL
 #include <SDL2/SDL_types.h>
 #else
-#include "3ds/SDL_supplement.h"
+#include "SDL_supplement.h"
 #endif
 
 #include <Utils/maths.h>

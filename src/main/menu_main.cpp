@@ -23,10 +23,20 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef __3DS__
+#ifndef NO_SDL
 #include <SDL2/SDL_timer.h>
+#else
+#include "SDL_supplement.h"
+#endif
+
+#ifndef PGE_NO_THREADING
 #include <SDL2/SDL_thread.h>
 #include <atomic>
+#endif
+
+#ifdef __3DS__
+#include "../3ds/second_screen.h"
+#include "../3ds/n3ds-clock.h"
 #endif
 
 #include <fmt_format_ne.h>
@@ -50,9 +60,18 @@
 #include "pge_delay.h"
 #include "../config.h"
 
+#ifdef NEW_EDITOR
+#include "../editor/new_editor.h"
+const int MainMenuQuitIndex = 5;
+const int MainMenuOptionsIndex = 4;
+#else
+const int MainMenuQuitIndex = 4;
+const int MainMenuOptionsIndex = 3;
+#endif
+
 MainMenuContent g_mainMenu;
 
-#ifndef __3DS__
+#ifndef PGE_NO_THREADING
 static SDL_atomic_t         loading;
 static SDL_atomic_t         loadingProgrss;
 static SDL_atomic_t         loadingProgrssMax;
@@ -62,7 +81,7 @@ static SDL_Thread*          loadingThread = nullptr;
 
 void initMainMenu()
 {
-#ifndef __3DS__
+#ifndef PGE_NO_THREADING
     SDL_AtomicSet(&loading, 0);
     SDL_AtomicSet(&loadingProgrss, 0);
     SDL_AtomicSet(&loadingProgrssMax, 0);
@@ -73,6 +92,7 @@ void initMainMenu()
     g_mainMenu.main1PlayerGame = "1 Player Game";
     g_mainMenu.main2PlayerGame = "2 Player Game";
     g_mainMenu.mainBattleGame = "Battle Game";
+    g_mainMenu.mainEditor = "Editor";
     g_mainMenu.mainOptions = "Options";
     g_mainMenu.mainExit = "Exit";
 
@@ -130,17 +150,26 @@ static int FindWorldsThread(void *)
 void FindWorlds()
 {
     NumSelectWorld = 0;
+    NumSelectWorldEditable = 0;
+    bool stillEditable = true;
 
+#ifndef __3DS__
     std::vector<std::string> worldRoots;
     worldRoots.push_back(AppPath + "worlds/");
-#if (defined(__APPLE__) && defined(USE_BUNDLED_ASSETS)) || defined(FIXED_ASSETS_PATH)
+    const bool canOnlyEditFirstRoot = false;
+#else
+    const std::vector<std::string>& worldRoots = AppPathManager::worldRootDirs();
+    const bool canOnlyEditFirstRoot = true;
+#endif
+
+#if !defined(__3DS__) && ((defined(__APPLE__) && defined(USE_BUNDLED_ASSETS)) || defined(FIXED_ASSETS_PATH))
     worldRoots.push_back(AppPathManager::userWorldsRootDir() + "/");
 #endif
 
     SelectWorld.clear();
     SelectWorld.push_back(SelectWorld_t()); // Dummy entry
 
-#ifndef __3DS__
+#ifndef PGE_NO_THREADING
     SDL_AtomicSet(&loadingProgrss, 0);
     SDL_AtomicSet(&loadingProgrssMax, 0);
 #endif
@@ -150,7 +179,7 @@ void FindWorlds()
         std::vector<std::string> dirs;
         DirMan episodes(worldsRoot);
         episodes.getListOfFolders(dirs);
-#ifndef __3DS__
+#ifndef PGE_NO_THREADING
         SDL_AtomicAdd(&loadingProgrssMax, dirs.size());
 #endif
     }
@@ -189,18 +218,40 @@ void FindWorlds()
                     w.blockChar[5] = head.nocharacter5;
 
                     SelectWorld.push_back(w);
+                    if(stillEditable)
+                        SelectWorldEditable.push_back(w);
                 }
             }
 
-#ifndef __3DS__
+        // On 3DS, this is after the first and only non-romfs root has been processed.
+        if (canOnlyEditFirstRoot)
+            stillEditable = false;
+
+#ifndef PGE_NO_THREADING
             SDL_AtomicAdd(&loadingProgrss, 1);
 #endif
         }
     }
 
+    std::sort(SelectWorld.begin(), SelectWorld.end(), 
+        [](const SelectWorld_t& a, const SelectWorld_t& b) {
+            return a.WorldName < b.WorldName;
+        });
+    std::sort(SelectWorldEditable.begin(), SelectWorldEditable.end(), 
+        [](const SelectWorld_t& a, const SelectWorld_t& b) {
+            return a.WorldName < b.WorldName;
+        });
+
     NumSelectWorld = (SelectWorld.size() - 1);
 
-#ifndef __3DS__
+    SelectWorld_t createWorld = SelectWorld_t();
+    createWorld.WorldName = "Create New";
+    SelectWorldEditable.push_back(createWorld);
+    NumSelectWorldEditable = (SelectWorldEditable.size() - 1);
+
+    LevelData head;
+
+#ifndef PGE_NO_THREADING
     SDL_AtomicSet(&loading, 0);
 #endif
 }
@@ -219,15 +270,15 @@ void FindLevels()
     battleRoots.push_back(AppPathManager::userBattleRootDir() + "/");
 #endif
 
-    SelectWorld.clear();
-    SelectWorld.push_back(SelectWorld_t()); // Dummy entry
+    SelectBattle.clear();
+    SelectBattle.push_back(SelectWorld_t()); // Dummy entry
 
-    NumSelectWorld = 1;
-    SelectWorld.push_back(SelectWorld_t()); // "random level" entry
-    SelectWorld[1].WorldName = "Random Level";
+    NumSelectBattle = 1;
+    SelectBattle.push_back(SelectWorld_t()); // "random level" entry
+    SelectBattle[1].WorldName = "Random Level";
     LevelData head;
 
-#ifndef __3DS__
+#ifndef PGE_NO_THREADING
     SDL_AtomicSet(&loadingProgrss, 0);
     SDL_AtomicSet(&loadingProgrssMax, 0);
 #endif
@@ -237,7 +288,7 @@ void FindLevels()
         std::vector<std::string> files;
         DirMan battleLvls(battleRoot);
         battleLvls.getListOfFiles(files, {".lvl", ".lvlx"});
-#ifndef __3DS__
+#ifndef PGE_NO_THREADING
         SDL_AtomicAdd(&loadingProgrssMax, files.size());
 #endif
     }
@@ -260,14 +311,14 @@ void FindLevels()
                     w.WorldName = fName;
                 SelectWorld.push_back(w);
             }
-#ifndef __3DS__
+#ifndef PGE_NO_THREADING
             SDL_AtomicAdd(&loadingProgrss, 1);
 #endif
         }
     }
 
-    NumSelectWorld = (SelectWorld.size() - 1);
-#ifndef __3DS__
+    NumSelectBattle = (SelectBattle.size() - 1);
+#ifndef PGE_NO_THREADING
     SDL_AtomicSet(&loading, 0);
 #endif
 }
@@ -306,7 +357,7 @@ bool mainMenuUpdate()
     int menuLen;
     Player_t blankPlayer;
 
-#ifndef __3DS__
+#ifndef NO_SDL
     bool altPressed = getKeyState(SDL_SCANCODE_LALT) == KEY_PRESSED ||
                       getKeyState(SDL_SCANCODE_RALT) == KEY_PRESSED;
     bool escPressed = getKeyState(SDL_SCANCODE_ESCAPE) == KEY_PRESSED;
@@ -316,7 +367,7 @@ bool mainMenuUpdate()
     bool downPressed = getKeyState(SDL_SCANCODE_DOWN) == KEY_PRESSED;
     bool leftPressed = getKeyState(SDL_SCANCODE_LEFT) == KEY_PRESSED;
     bool rightPressed = getKeyState(SDL_SCANCODE_RIGHT) == KEY_PRESSED;
-#else // #ifndef __3DS__
+#else // #ifndef NO_SDL
     bool altPressed = false;
     bool returnPressed = false;
     bool spacePressed = false;
@@ -325,7 +376,7 @@ bool mainMenuUpdate()
     bool downPressed = false;
     bool leftPressed = false;
     bool rightPressed = false;
-#endif // #ifndef __3DS__ ... #else
+#endif // #ifndef NO_SDL ... #else
 
 #ifdef __ANDROID__
     escPressed |= getKeyState(SDL_SCANCODE_AC_BACK) == KEY_PRESSED;
@@ -412,7 +463,7 @@ bool mainMenuUpdate()
         if(MenuMode == MENU_INTRO && ScreenH >= TinyScreenH)
             MenuMode = MENU_MAIN;
 
-#ifndef __3DS__
+#ifndef PGE_NO_THREADING
         if(SDL_AtomicGet(&loading))
         {
             if((menuDoPress && MenuCursorCanMove) || MenuMouseClick)
@@ -430,7 +481,7 @@ bool mainMenuUpdate()
             if(escPressed && MenuCursorCanMove)
             {
                 MenuMode = MENU_MAIN;
-                MenuCursor = 4;
+                MenuCursor = MainMenuQuitIndex;
                 PlaySoundMenu(SFX_Slide);
             }
             if((menuDoPress && MenuCursorCanMove) || MenuMouseClick)
@@ -445,7 +496,7 @@ bool mainMenuUpdate()
         {
             if(MenuMouseMove)
             {
-                For(A, 0, 4)
+                For(A, 0, MainMenuQuitIndex)
                 {
                     if(MenuMouseY >= MenuY + A * 30 && MenuMouseY <= MenuY + A * 30 + 16)
                     {
@@ -455,7 +506,11 @@ bool mainMenuUpdate()
                             menuLen = 18 * g_mainMenu.main2PlayerGame.size() - 2;
                         else if(A == 2)
                             menuLen = 18 * g_mainMenu.mainBattleGame.size();
+#ifdef NEW_EDITOR
                         else if(A == 3)
+                            menuLen = 18 * g_mainMenu.mainEditor.size();
+#endif
+                        else if(A == MainMenuOptionsIndex)
                             menuLen = 18 * g_mainMenu.mainOptions.size();
                         else
                             menuLen = 18 * g_mainMenu.mainExit.size();
@@ -483,9 +538,9 @@ bool mainMenuUpdate()
                     MenuMode = MENU_INTRO;
                     PlaySoundMenu(SFX_Slide);
                 }
-                else if(MenuCursor != 4)
+                else if(MenuCursor != MainMenuQuitIndex)
                 {
-                    MenuCursor = 4;
+                    MenuCursor = MainMenuQuitIndex;
                     PlaySoundMenu(SFX_Slide);
                 }
             }
@@ -507,9 +562,9 @@ bool mainMenuUpdate()
                     MenuMode = MENU_1PLAYER_GAME;
                     menuPlayersNum = 1;
                     menuBattleMode = false;
-#if defined(__EMSCRIPTEN__) || defined(__3DS__)
+#if !defined(PRELOAD_LEVELS) && defined(PGE_NO_THREADING)
                     FindWorlds();
-#else
+#elif !defined(PRELOAD_LEVELS)
                     SDL_AtomicSet(&loading, 1);
                     loadingThread = SDL_CreateThread(FindWorldsThread, "FindWorlds", NULL);
 #endif
@@ -521,9 +576,9 @@ bool mainMenuUpdate()
                     MenuMode = MENU_2PLAYER_GAME;
                     menuPlayersNum = 2;
                     menuBattleMode = false;
-#if defined(__EMSCRIPTEN__) || defined(__3DS__)
+#if !defined(PRELOAD_LEVELS) && defined(PGE_NO_THREADING)
                     FindWorlds();
-#else
+#elif !defined(PRELOAD_LEVELS)
                     SDL_AtomicSet(&loading, 1);
                     loadingThread = SDL_CreateThread(FindWorldsThread, "FindWorlds", NULL);
 #endif
@@ -535,21 +590,35 @@ bool mainMenuUpdate()
                     MenuMode = MENU_BATTLE_MODE;
                     menuPlayersNum = 2;
                     menuBattleMode = true;
-#if defined(__EMSCRIPTEN__) || defined(__3DS__)
+#if !defined(PRELOAD_LEVELS) && defined(PGE_NO_THREADING)
                     FindLevels();
-#else
+#elif !defined(PRELOAD_LEVELS)
                     SDL_AtomicSet(&loading, 1);
                     loadingThread = SDL_CreateThread(FindLevelsThread, "FindLevels", NULL);
 #endif
                     MenuCursor = 0;
                 }
+#ifdef NEW_EDITOR
                 else if(MenuCursor == 3)
+                {
+                    PlaySoundMenu(SFX_Do);
+                    MenuMode = MENU_EDITOR;
+#if     !defined(PRELOAD_LEVELS) && defined(PGE_NO_THREADING)
+                    FindWorlds();
+#elif   !defined(PRELOAD_LEVELS)
+                    SDL_AtomicSet(&loading, 1);
+                    loadingThread = SDL_CreateThread(FindWorldsThread, "FindWorlds", NULL);
+#endif // PRELOAD_LEVELS
+                    MenuCursor = 0;
+                }
+#endif
+                else if(MenuCursor == MainMenuOptionsIndex)
                 {
                     PlaySoundMenu(SFX_Do);
                     MenuMode = MENU_OPTIONS;
                     MenuCursor = 0;
                 }
-                else if(MenuCursor == 4)
+                else
                 {
                     PlaySoundMenu(SFX_Do);
                     frmMain.setTargetTexture();
@@ -564,10 +633,10 @@ bool mainMenuUpdate()
 
             }
 
-            if(MenuCursor > 4)
+            if(MenuCursor > MainMenuQuitIndex)
                 MenuCursor = 0;
             if(MenuCursor < 0)
-                MenuCursor = 4;
+                MenuCursor = MainMenuQuitIndex;
         } // Main Menu
 
         // Character Select
@@ -747,8 +816,14 @@ bool mainMenuUpdate()
         } // Character Select
 
         // World Select
-        else if(MenuMode == MENU_1PLAYER_GAME || MenuMode == MENU_2PLAYER_GAME || MenuMode == MENU_BATTLE_MODE)
+        else if(MenuMode == MENU_1PLAYER_GAME || MenuMode == MENU_2PLAYER_GAME
+            || MenuMode == MENU_BATTLE_MODE || MenuMode == MENU_EDITOR)
         {
+            const std::vector<SelectWorld_t>& SelectorList
+                = (MenuMode == MENU_BATTLE_MODE) ? SelectBattle :
+                    ((MenuMode == MENU_EDITOR) ? SelectWorldEditable :
+                        SelectWorld);
+
             if(ScrollDelay > 0)
             {
                 MenuMouseMove = true;
@@ -763,7 +838,7 @@ bool mainMenuUpdate()
                 {
                     if(MenuMouseY >= MenuY + B * 30 && MenuMouseY <= MenuY + B * 30 + 16)
                     {
-                        menuLen = 19 * static_cast<int>(SelectWorld[A + 1].WorldName.size());
+                        menuLen = 19 * static_cast<int>(SelectorList[A + 1].WorldName.size());
 
                         if(MenuMouseX >= MenuX && MenuMouseX <= MenuX + menuLen)
                         {
@@ -791,6 +866,8 @@ bool mainMenuUpdate()
 
                     if(MenuMode == MENU_BATTLE_MODE)
                         MenuCursor = 2;
+                    else if(MenuMode == MENU_EDITOR)
+                        MenuCursor = 3;
 
                     MenuMode = MENU_MAIN;
 //'world select back
@@ -802,21 +879,47 @@ bool mainMenuUpdate()
                 {
                     PlaySoundMenu(SFX_Do);
                     selWorld = MenuCursor + 1;
-                    FindSaves();
-
-                    For(A, 1, numCharacters)
+                    // level editor
+                    if (MenuMode == MENU_EDITOR)
                     {
-                        if(MenuMode == MENU_BATTLE_MODE)
-                            blockCharacter[A] = false;
-                        else
-                            blockCharacter[A] = SelectWorld[selWorld].blockChar[A];
+                        GameMenu = false;
+                        LevelSelect = false;
+                        BattleMode = false;
+                        LevelEditor = true;
+                        WorldEditor = true;
+                        ClearLevel();
+                        ClearGame();
+                        if(selWorld == NumSelectWorldEditable)
+                        {
+                            ClearWorld();
+                            // do something here...
+                            printf("BAD TIMES\n");
+                        }
+                        OpenWorld(SelectWorldEditable[selWorld].WorldPath
+                            + SelectWorldEditable[selWorld].WorldFile);
+#ifdef NEW_EDITOR
+                        editorScreen.ResetCursor();
+#endif
+                        return true;
                     }
+                    else
+                    {
+                        FindSaves();
 
-                    MenuMode *= MENU_CHARACTER_SELECT_BASE;
-                    MenuCursor = 0;
+                        For(A, 1, numCharacters)
+                        {
+                            if(MenuMode == MENU_BATTLE_MODE)
+                                blockCharacter[A] = false;
+                            else
+                                blockCharacter[A] = SelectWorld[selWorld].blockChar[A];
+                        }
 
-                    if(MenuMode == MENU_CHARACTER_SELECT_BM_S1 && PlayerCharacter != 0)
-                        MenuCursor = PlayerCharacter - 1;
+                        MenuMode *= MENU_CHARACTER_SELECT_BASE;
+                        MenuCursor = 0;
+
+                        if(MenuMode == MENU_CHARACTER_SELECT_BM_S1 && PlayerCharacter != 0)
+                            MenuCursor = PlayerCharacter - 1;
+                    }
 
                     MenuCursorCanMove = false;
                 }
@@ -825,10 +928,13 @@ bool mainMenuUpdate()
 
             if(MenuMode != MENU_MAIN && MenuMode < MENU_CHARACTER_SELECT_BASE)
             {
-                if(MenuCursor >= NumSelectWorld)
+                maxShow = (MenuMode == MENU_BATTLE_MODE) ? NumSelectBattle :
+                    ((MenuMode == MENU_EDITOR) ? NumSelectWorldEditable :
+                        NumSelectWorld);
+                if(MenuCursor >= maxShow)
                     MenuCursor = 0;
                 if(MenuCursor < 0)
-                    MenuCursor = NumSelectWorld - 1;
+                    MenuCursor = maxShow - 1;
             }
         } // World select
 
@@ -1122,11 +1228,14 @@ bool mainMenuUpdate()
 #ifndef __3DS__
             optionsMenuLength ++; // ScaleMode
 #endif
-#ifndef __ORIGINAL_RES__
+#ifndef FIXED_RES
             optionsMenuLength ++; // resolution
 #endif
+#ifdef NEW_EDITOR
+            optionsMenuLength += 1; // EditorControls
+#endif
 #ifdef __3DS__
-            optionsMenuLength += 2; // EditorControls, debugMode
+            optionsMenuLength += 1; // debugMode
             if (n3ds_clocked != -1)
                 optionsMenuLength ++; // clock speed
 #endif
@@ -1155,13 +1264,15 @@ bool mainMenuUpdate()
                         else if(A == i++)
                             menuLen = 18 * (7+ScaleMode_strings.at(config_ScaleMode).length());
 #endif
-#if !defined(__ORIGINAL_RES__)
+#if !defined(FIXED_RES)
                         else if(A == i++)
                             menuLen = 18 * std::strlen("res: WWWxHHH (word)");
 #endif
-#ifdef __3DS__
+#ifdef NEW_EDITOR
                         else if(A == i++)
                             menuLen = 18 * std::strlen("editor controls") - 2;
+#endif
+#ifdef __3DS__
                         else if(n3ds_clocked != -1 && A == i++)
                             menuLen = 18 * std::strlen("use n3ds clock speed") - 6;
                         else if(A == i++)
@@ -1191,7 +1302,7 @@ bool mainMenuUpdate()
                 {
                     SaveConfig();
                     MenuMode = MENU_MAIN;
-                    MenuCursor = 3;
+                    MenuCursor = MainMenuOptionsIndex;
                     MenuCursorCanMove = false;
                     PlaySoundMenu(SFX_Slide);
                 }
@@ -1233,7 +1344,7 @@ bool mainMenuUpdate()
                         frmMain.updateViewport();
                     }
 #endif
-#if !defined(__ORIGINAL_RES__)
+#if !defined(FIXED_RES)
                     else if(MenuCursor == i++)
                     {
                         PlaySoundMenu(SFX_Do);
@@ -1623,13 +1734,18 @@ bool mainMenuUpdate()
 
 static void s_drawGameTypeTitle(int x, int y)
 {
+    if(MenuMode == MENU_EDITOR)
+        SuperPrint(g_mainMenu.mainEditor, 3, x, y);
     if(menuBattleMode)
-        SuperPrint("Battle game", 3, x, y, 0.3f, 0.3f, 1.0f);
+        SuperPrint(g_mainMenu.mainBattleGame, 3, x, y, 0.3f, 0.3f, 1.0f);
     else
     {
         float r = menuPlayersNum == 1 ? 1.f : 0.3f;
         float g = menuPlayersNum == 2 ? 1.f : 0.3f;
-        SuperPrint(fmt::format_ne("{0} Player game", menuPlayersNum), 3, x, y, r, g, 0.3f);
+        if (menuPlayersNum == 1)
+            SuperPrint(g_mainMenu.main1PlayerGame, 3, x, y, r, g, 0.3f);
+        else if (menuPlayersNum == 2)
+            SuperPrint(g_mainMenu.main2PlayerGame, 3, x, y, r, g, 0.3f);
     }
 }
 
@@ -1679,9 +1795,9 @@ void mainMenuDraw()
     if(MenuMode != MENU_1PLAYER_GAME && MenuMode != MENU_2PLAYER_GAME && MenuMode != MENU_BATTLE_MODE)
         worldCurs = 0;
 
-    #ifdef __3DS__
+#ifdef __3DS__
     frmMain.setLayer(2);
-    #endif
+#endif
 
     // correction to loop the original asset properly
     A = GFX.MenuGFX[1].w;
@@ -1727,7 +1843,7 @@ void mainMenuDraw()
         SuperPrint(g_gameInfo.title, 3, ScreenW/2 - g_gameInfo.title.length()*9, 30);
     }
 
-#ifndef __3DS__
+#ifndef PGE_NO_THREADING
     if(SDL_AtomicGet(&loading))
     {
         if(SDL_AtomicGet(&loadingProgrssMax) <= 0)
@@ -1755,11 +1871,15 @@ void mainMenuDraw()
     // Main menu
     else if(MenuMode == MENU_MAIN)
     {
-        SuperPrint(g_mainMenu.main1PlayerGame, 3, MenuX, MenuY);
-        SuperPrint(g_mainMenu.main2PlayerGame, 3, MenuX, MenuY + 30);
-        SuperPrint(g_mainMenu.mainBattleGame, 3, MenuX, MenuY + 60);
-        SuperPrint(g_mainMenu.mainOptions, 3, MenuX, MenuY + 90);
-        SuperPrint(g_mainMenu.mainExit, 3, MenuX, MenuY + 120);
+        A = 0;
+        SuperPrint(g_mainMenu.main1PlayerGame, 3, MenuX, MenuY + 30 * (A++));
+        SuperPrint(g_mainMenu.main2PlayerGame, 3, MenuX, MenuY + 30 * (A++));
+        SuperPrint(g_mainMenu.mainBattleGame, 3, MenuX, MenuY + 30 * (A++));
+#ifdef NEW_EDITOR
+        SuperPrint(g_mainMenu.mainEditor, 3, MenuX, MenuY + 30 * (A++));
+#endif
+        SuperPrint(g_mainMenu.mainOptions, 3, MenuX, MenuY + 30 * (A++));
+        SuperPrint(g_mainMenu.mainExit, 3, MenuX, MenuY + 30 * (A++));
         frmMain.renderTexture(MenuX - 20, MenuY + (MenuCursor * 30), 16, 16, GFX.MCursor[0], 0, 0);
     }
 
@@ -1770,12 +1890,16 @@ void mainMenuDraw()
             MenuMode == MENU_CHARACTER_SELECT_BM_S1 ||
             MenuMode == MENU_CHARACTER_SELECT_BM_S2)
     {
+        const std::vector<SelectWorld_t>& SelectorList
+            = (MenuMode == MENU_CHARACTER_SELECT_BM_S1 || MenuMode == MENU_CHARACTER_SELECT_BM_S2)
+                ? SelectBattle : SelectWorld;
+
         A = 0;
         B = 0;
         C = 0;
 
         s_drawGameTypeTitle(MenuX, MenuY - 70);
-        SuperPrint(SelectWorld[selWorld].WorldName, 3, MenuX, MenuY - 40, 0.6f, 1.f, 1.f);
+        SuperPrint(SelectorList[selWorld].WorldName, 3, MenuX, MenuY - 40, 0.6f, 1.f, 1.f);
 
         // TODO: Make a custom playable character names print here
         if(!blockCharacter[1])
@@ -1845,19 +1969,24 @@ void mainMenuDraw()
     }
 
     // Episode / Level selection
-    else if(MenuMode == MENU_1PLAYER_GAME || MenuMode == MENU_2PLAYER_GAME || MenuMode == MENU_BATTLE_MODE)
+    else if(MenuMode == MENU_1PLAYER_GAME || MenuMode == MENU_2PLAYER_GAME
+        || MenuMode == MENU_BATTLE_MODE || MenuMode == MENU_EDITOR)
     {
         s_drawGameTypeTitle(MenuX, MenuY - 70);
         std::string tempStr;
 
         minShow = 1;
-        // maxShow = (MenuMode == 4) ? NumSelectBattle : ((MenuMode == 9) ? NumSelectWorldEditable : NumSelectWorld);
-        maxShow = NumSelectWorld;
+        maxShow = (MenuMode == MENU_BATTLE_MODE) ? NumSelectBattle :
+            ((MenuMode == MENU_EDITOR) ? NumSelectWorldEditable :
+                NumSelectWorld);
+        const std::vector<SelectWorld_t>& SelectorList
+            = (MenuMode == MENU_BATTLE_MODE) ? SelectBattle :
+                ((MenuMode == MENU_EDITOR) ? SelectWorldEditable :
+                    SelectWorld);
+        int original_maxShow = maxShow;
 
         if(maxShow > 5)
         {
-            int original_maxShow = maxShow;
-
             minShow = worldCurs;
             maxShow = minShow + 4;
 
@@ -1886,15 +2015,14 @@ void mainMenuDraw()
         for(auto A = minShow; A <= maxShow; A++)
         {
             B = A - minShow + 1;
-//            tempStr = (MenuMode != 4) ? SelectWorld[A].WorldName : SelectBattle[A].WorldName;
-            tempStr = SelectWorld[A].WorldName;
+            tempStr = SelectorList[A].WorldName;
             SuperPrint(tempStr, 3, MenuX, MenuY - 30 + (B * 30));
         }
 
         if(minShow > 1)
             frmMain.renderTexture(ScreenW/2 - 8, MenuY - 20, GFX.MCursor[1]);
 
-        if(maxShow < NumSelectWorld)
+        if(maxShow < original_maxShow)
             frmMain.renderTexture(ScreenW/2 - 8, MenuY + 140, GFX.MCursor[2]);
 
         B = MenuCursor - minShow + 1;
@@ -1960,7 +2088,7 @@ void mainMenuDraw()
         SuperPrint("SCALE: "+ScaleMode_strings.at(config_ScaleMode), 3, MenuX, MenuY + 30*A);
         A ++;
 #endif
-#ifndef __ORIGINAL_RES__
+#ifndef FIXED_RES
         std::string resString = fmt::format_ne("RES: {0}x{1}", config_InternalW, config_InternalH);
         if (config_InternalW == 480 && config_InternalH == 320)
             resString += " (GBA)";

@@ -47,6 +47,11 @@ struct Layer_t
 //    SpeedY As Single
     float SpeedY = 0.0f;
 //End Type
+    std::set<int> blocks;
+    std::set<int> BGOs;
+    std::set<int> NPCs;
+    std::set<int> warps;
+    std::set<int> waters;
 };
 
 struct EventSection_t
@@ -159,6 +164,16 @@ void HideLayer(std::string LayerName, bool NoEffect = false);
 // Public Sub SetLayer(LayerName As String)
 void SetLayer(std::string LayerName);
 
+bool RenameLayer(const std::string OldName, const std::string NewName);
+
+bool DeleteLayer(const std::string LayerName, bool killall);
+
+void InitializeEvent(Events_t& event);
+
+bool RenameEvent(const std::string OldName, const std::string NewName);
+
+bool DeleteEvent(const std::string EventName);
+
 // Public Sub ProcEvent(EventName As String, Optional NoEffect As Boolean = False)
 void ProcEvent(std::string EventName, bool NoEffect = false);
 
@@ -167,5 +182,19 @@ void UpdateEvents();
 
 // Public Sub UpdateLayers()
 void UpdateLayers();
+
+void syncLayers_AllBlocks();
+void syncLayers_Block(int block);
+void syncLayers_Block_SetHidden(int block); // set block hidden based on layer
+
+void syncLayers_AllNPCs();
+void syncLayers_NPC(int npc);
+
+void syncLayers_AllBGOs();
+void syncLayers_BGO(int bgo);
+
+void syncLayers_Warp(int warp);
+
+void syncLayers_Water(int water);
 
 #endif // LAYERS_H

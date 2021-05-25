@@ -26,8 +26,12 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
-#ifndef __3DS__
+#ifndef NO_SDL
 #include <SDL2/SDL_scancode.h>
+#else
+#include <cstdint>
+typedef uint8_t Uint8;
+typedef uint32_t Uint32;
 #endif
 
 #include <string>
@@ -98,7 +102,7 @@ extern void DoEvents();
  */
 extern int showCursor(int show);
 
-#ifndef __3DS__
+#ifndef NO_SDL
 extern Uint8 getKeyState(SDL_Scancode key);
 #endif
 
@@ -228,30 +232,15 @@ extern std::string EoT;
 //    SpeedY As Double
 //End Type
 
-//Public Type EditorControls      'Controls for the editor
-struct EditorControls_t
-{
-    bool Up = false;
-    bool Down = false;
-    bool Left = false;
-    bool Right = false;
-    bool Mouse1 = false;
-    bool NextSection = false;
-    bool PrevSection = false;
-    bool SwitchScreens = false;
-    bool TestPlay = false;
-    bool Select = false;
-    bool Erase = false;
-    bool FastScroll = false;
-};
-
 // Structures moved into con_control.h
 
 //Public conKeyboard(1 To 2) As conKeyboard  'player 1 and 2's controls
 extern RangeArr<ConKeyboard_t, 1, maxLocalPlayers> conKeyboard;
+extern EditorConKeyboard_t editorConKeyboard;
 
 //Public conJoystick(1 To 2) As conJoystick
 extern RangeArr<ConJoystick_t, 1, maxLocalPlayers> conJoystick;
+extern EditorConJoystick_t editorConJoystick;
 
 //Public useJoystick(1 To 2) As Integer
 extern RangeArrI<int, 1, maxLocalPlayers, 0> useJoystick;
@@ -1077,10 +1066,14 @@ extern bool GamePaused;
 extern std::string MessageText;
 //Public NumSelectWorld As Integer
 extern int NumSelectWorld;
+extern int NumSelectWorldEditable;
+extern int NumSelectBattle;
 //Public SelectWorld(1 To 100) As SelectWorld
 struct SelectWorld_t;
 //extern RangeArr<SelectWorld_t, 1, maxSelectWorlds> SelectWorld;
 extern std::vector<SelectWorld_t> SelectWorld;
+extern std::vector<SelectWorld_t> SelectBattle;
+extern std::vector<SelectWorld_t> SelectWorldEditable;
 //Public ShowFPS As Boolean
 extern bool ShowFPS;
 //Public PrintFPS As Double
@@ -2058,7 +2051,7 @@ extern int BattleOutro;
 //Public LevelName As String
 extern std::string LevelName;
 
-#if !defined(__ORIGINAL_RES__) && !defined(__3DS__)
+#ifndef FIXED_RES
 extern int ScreenW;
 extern int ScreenH;
 void Set_Resolution(int sw, int sh);

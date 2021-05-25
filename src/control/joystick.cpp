@@ -23,8 +23,8 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#ifdef __3DS__
-#error "Primary `control/joystick.cpp` only for SDL clients. Build `3ds/joystick.cpp` instead."
+#ifdef NO_SDL
+#error "Primary `control/joystick.cpp` only for SDL targets. Build target-specific `joystick.cpp` instead."
 #endif
 
 #include <SDL2/SDL_version.h>
@@ -804,56 +804,18 @@ void UpdateControls()
 
             if(useJoystick[A] == 0) // Keyboard controls
             {
-                if(getKeyStateI(keyCon.Up)) {
-                    c.Up = true;
-                }
-
-                if(getKeyStateI(keyCon.Down)) {
-                    c.Down = true;
-                }
-
-                if(getKeyStateI(keyCon.Left)) {
-                    c.Left = true;
-                }
-
-                if(getKeyStateI(keyCon.Right)) {
-                    c.Right = true;
-                }
-
-                if(getKeyStateI(keyCon.Jump)) {
-                    c.Jump = true;
-                }
-
-                if(getKeyStateI(keyCon.Run)) {
-                    c.Run = true;
-                }
-
-                if(getKeyStateI(keyCon.Drop)) {
-                    c.Drop = true;
-                }
-
-                if(getKeyStateI(keyCon.Start)) {
-                    c.Start = true;
-                }
-
-                if(getKeyStateI(keyCon.AltJump)) {
-                    c.AltJump = true;
-                }
-
-                if(getKeyStateI(keyCon.AltRun)) {
-                    c.AltRun = true;
-                }
+                if(getKeyStateI(keyCon.Up)) c.Up = true;
+                if(getKeyStateI(keyCon.Down)) c.Down = true;
+                if(getKeyStateI(keyCon.Left)) c.Left = true;
+                if(getKeyStateI(keyCon.Right)) c.Right = true;
+                if(getKeyStateI(keyCon.Jump)) c.Jump = true;
+                if(getKeyStateI(keyCon.Run)) c.Run = true;
+                if(getKeyStateI(keyCon.Drop)) c.Drop = true;
+                if(getKeyStateI(keyCon.Start)) c.Start = true;
+                if(getKeyStateI(keyCon.AltJump)) c.AltJump = true;
+                if(getKeyStateI(keyCon.AltRun)) c.AltRun = true;
             }
 
-            /* // DEAD CODE
-//            If .Left = True And .Right = True Then
-            if(c.Left And c.Right) {
-//                .Left = False
-                c.Left = False;
-//                .Right = False
-                c.Right = False;
-//            End If
-            }*/
 #ifdef USE_TOUCHSCREEN_CONTROLLER
             // Mix controls of a touch screen with a player 1
             if(A == 1)

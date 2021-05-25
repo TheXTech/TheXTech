@@ -23,11 +23,14 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef __3DS__
+#ifndef NO_SDL
 #include <SDL2/SDL_timer.h>
-#include <InterProcess/intproc.h>
 #else
-#include "3ds/SDL_supplement.h"
+#include "SDL_supplement.h"
+#endif
+
+#ifndef NO_INTPROC
+#include <InterProcess/intproc.h>
 #endif
 
 #include <Logger/logger.h>
@@ -55,7 +58,7 @@
 #include "load_gfx.h"
 #include "player.h"
 #include "sound.h"
-#include "editor.h"
+#include "editor/editor.h"
 #include "custom.h"
 #include "main/level_file.h"
 #include "main/speedrunner.h"
@@ -71,7 +74,7 @@ void SizableBlocks();
 
 static int loadingThread(void *waiter_ptr)
 {
-#if !defined(PGE_NO_THREADING) && !defined(__3DS__)
+#if !defined(PGE_NO_THREADING)
     SDL_atomic_t *waiter = (SDL_atomic_t *)waiter_ptr;
 #else
     UNUSED(waiter_ptr);
@@ -84,8 +87,12 @@ static int loadingThread(void *waiter_ptr)
     SizableBlocks();
     LoadGFX(); // load the graphics from file
     SetupVars(); //Setup Variables
+#ifdef PRELOAD_LEVELS
+    FindWorlds();
+    FindLevels();
+#endif
 
-#if !defined(PGE_NO_THREADING) && !defined(__3DS__)
+#if !defined(PGE_NO_THREADING)
     if(waiter)
         SDL_AtomicSet(waiter, 0);
 #endif
@@ -168,7 +175,7 @@ int GameMain(const CmdLineSetup_t &setup)
     if(!noSound)
         InitMixerX();
 
-#if !defined(PGE_NO_THREADING) && !defined(__3DS__)
+#if !defined(PGE_NO_THREADING)
     gfxLoaderThreadingMode = true;
 #endif
     frmMain.show(); // Don't show window until playing an initial sound
@@ -179,7 +186,7 @@ int GameMain(const CmdLineSetup_t &setup)
             PlayInitSound();
     }
 
-#if !defined(PGE_NO_THREADING) && !defined(__3DS__)
+#if !defined(PGE_NO_THREADING)
     {
         SDL_Thread*     loadThread;
         int             threadReturnValue;
@@ -214,7 +221,7 @@ int GameMain(const CmdLineSetup_t &setup)
 
     LevelSelect = true; // world map is to be shown
 
-#ifndef __3DS__
+#ifndef NO_INTPROC
     if(setup.interprocess)
         IntProc::init();
 #endif
@@ -1170,6 +1177,8 @@ void InitControls()
         joyFillDefaults(conKeyboard[A]);
         joyFillDefaults(conJoystick[A]);
     }
+
+    // editorJoyFillDefaults(editorConJoystick);
 
     OpenConfig();
 

@@ -23,7 +23,7 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef __3DS__
+#ifndef NO_SDL
 #include <SDL2/SDL_timer.h>
 #endif
 
@@ -41,7 +41,7 @@
 #include "../npc.h"
 #include "../layers.h"
 #include "../player.h"
-#include "../editor.h"
+#include "../editor/editor.h"
 #include "speedrunner.h"
 #include "menu_main.h"
 
@@ -125,7 +125,7 @@ void GameLoop()
         if(MagicHand)
             UpdateEditor();
 
-#ifndef __3DS__
+#ifndef NO_SDL
         bool altPressed = getKeyState(SDL_SCANCODE_LALT) == KEY_PRESSED ||
                           getKeyState(SDL_SCANCODE_RALT) == KEY_PRESSED;
 
@@ -136,7 +136,7 @@ void GameLoop()
 #else // #ifndef __3DS__
         bool altPressed = false;
         bool escPressed = false;
-#endif // #ifndef __3DS__
+#endif // #ifndef NO_SDL
 
         bool pausePress = (Player[1].Controls.Start || escPressed) && !altPressed;
 
@@ -273,7 +273,7 @@ void PauseGame(int plr)
 
             auto &c = Player[plr].Controls;
 
-#ifndef __3DS__
+#ifndef NO_SDL
             bool altPressed = getKeyState(SDL_SCANCODE_LALT) == KEY_PRESSED ||
                               getKeyState(SDL_SCANCODE_RALT) == KEY_PRESSED;
             bool escPressed = getKeyState(SDL_SCANCODE_ESCAPE) == KEY_PRESSED;
@@ -290,11 +290,11 @@ void PauseGame(int plr)
 
             upPressed |= (c.Up && !altPressed);
             downPressed |= (c.Down && !altPressed);
-#else // #ifndef __3DS__
-            menuDoPress |= (c.Start || c.Jump);
-            menuBackPress |= c.Run;
-            upPressed |= c.Up;
-            downPressed |= c.Down;
+#else // #ifndef NO_SDL
+            bool menuDoPress = (c.Start || c.Jump);
+            bool menuBackPress = c.Run;
+            bool upPressed = c.Up;
+            bool downPressed = c.Down;
 #endif
 
             if(MessageText.empty())

@@ -63,6 +63,9 @@ public:
     RangeArr<StdPicture, 1, 2> Tongue;
     StdPicture Warp;
     StdPicture YoshiWings;
+#ifdef __3DS__
+    StdPicture NPC_modes;
+#endif
 
 #ifdef __ANDROID__
     // Android specific pictures

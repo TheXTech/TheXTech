@@ -26,7 +26,9 @@
 #ifndef TOUCHSCREEN_H
 #define TOUCHSCREEN_H
 
+#ifndef NO_SDL
 #include <SDL2/SDL_touch.h>
+#endif
 #include <map>
 #include "../controls.h"
 
@@ -106,7 +108,9 @@ public:
 
 private:
     //! Held finger states
+#ifndef NO_SDL
     std::map<SDL_FingerID, FingerState> m_fingers;
+#endif
 
 public:
     /*!

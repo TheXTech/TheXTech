@@ -52,4 +52,26 @@ struct Controls_t
 //End Type
 };
 
+// Controls for the editor
+struct EditorControls_t
+{
+    double Game_MouseX;
+    double Game_MouseY;
+    bool MouseClick = false;
+
+    bool FastScroll = false;
+    bool ScrollUp = false;
+    bool ScrollDown = false;
+    bool ScrollLeft = false;
+    bool ScrollRight = false;
+
+    bool NextSection = false;
+    bool PrevSection = false;
+ 
+    bool SwitchScreens = false;
+    bool TestPlay = false;
+    bool Select = false;
+    bool Erase = false;
+};
+
 #endif // CONTROLS_H

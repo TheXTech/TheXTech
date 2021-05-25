@@ -29,7 +29,9 @@
 #include <AppPath/app_path.h>
 #include <fmt_format_ne.h>
 #include <Logger/logger.h>
+#ifndef NO_SDL
 #include <SDL2/SDL_messagebox.h>
+#endif
 
 void GFX_t::loadImage(StdPicture &img, std::string path)
 {
@@ -103,6 +105,10 @@ bool GFX_t::load()
 
     loadImage(YoshiWings, uiPath + "YoshiWings.png");
 
+#ifdef NEW_EDITOR
+    loadImage(NPC_modes, uiPath + "NPC_modes.png");
+#endif
+
 #ifdef __ANDROID__
     // Loading a touch-screen buttons from assets
     loadImage(touch[BUTTON_START], "buttons/Start.png");
@@ -162,7 +168,9 @@ bool GFX_t::load()
                                          "\n\n"
                                          "It's possible that you didn't installed the game assets package, or you had installed it at the incorrect directory.",
                                          getLogFilePath());
+#ifndef NO_SDL
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "UI image assets loading error", msg.c_str(), nullptr);
+#endif
         return false;
     }
 

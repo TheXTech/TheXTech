@@ -106,13 +106,16 @@ void DoCredits()
             if(useJoystick[p] > 0)
                 quitKey |= joyIsKeyDown(useJoystick[p] - 1, conJoystick[p].Start);
         }
-#ifndef __3DS__
+#ifndef NO_SDL
         quitKey |= (getKeyState(vbKeyEscape) == KEY_PRESSED);
         quitKey |= (getKeyState(vbKeySpace) == KEY_PRESSED);
         quitKey |= (getKeyState(vbKeyReturn) == KEY_PRESSED);
 #endif
 #ifdef __ANDROID__ // Quit credits on BACK key press
         quitKey |= (getKeyState(SDL_SCANCODE_AC_BACK) == KEY_PRESSED);
+#endif
+#ifdef __3DS__
+        quitKey |= frmMain.getKeyHeld(KEYCODE_START);
 #endif
 #ifdef USE_TOUCHSCREEN_CONTROLLER // Quit when pressed the "Start" on a touchscreen controller
         quitKey |= CurrentTouchControls().Start;

@@ -28,7 +28,7 @@
 #include "../sound.h"
 #include "../collision.h"
 #include "../effect.h"
-#include "../editor.h"
+#include "../editor/editor.h"
 #include "../game_main.h"
 #include "../blocks.h"
 #include "../graphics.h"

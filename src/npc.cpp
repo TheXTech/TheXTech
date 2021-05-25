@@ -31,7 +31,7 @@
 #include "game_main.h"
 #include "player.h"
 #include "collision.h"
-#include "editor.h"
+#include "editor/editor.h"
 #include "blocks.h"
 #include "compat.h"
 #include "control/joystick.h"

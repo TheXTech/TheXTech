@@ -312,7 +312,7 @@ set(THEXTECH_SRC
     src/layers.cpp
     src/custom.cpp
     src/graphics.cpp
-    src/editor.cpp
+    src/editor/editor.cpp
     src/main.cpp
     src/blocks.cpp
     src/gfx.cpp

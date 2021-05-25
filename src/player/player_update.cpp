@@ -35,7 +35,7 @@
 #include "../npc.h"
 #include "../effect.h"
 #include "../layers.h"
-#include "../editor.h"
+#include "../editor/editor.h"
 #include "../game_main.h"
 #include "../compat.h"
 #include "../main/trees.h"

@@ -1,6 +1,6 @@
 #include "config.h"
 
-#ifndef __ORIGINAL_RES__
+#ifndef FIXED_RES
 int config_InternalW;
 int config_InternalH;
 #endif

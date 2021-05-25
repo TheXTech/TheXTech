@@ -23,10 +23,10 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef __3DS__
+#ifndef NO_SDL
 #include <SDL2/SDL_timer.h>
 #else
-#include "3ds/SDL_supplement.h"
+#include "SDL_supplement.h"
 #endif
 
 #include "globals.h"

@@ -55,6 +55,23 @@ struct ConKeyboard_t
 //End Type
 };
 
+struct EditorConKeyboard_t
+{
+    int FastScroll = 0;
+    int ScrollUp = 0;
+    int ScrollDown = 0;
+    int ScrollLeft = 0;
+    int ScrollRight = 0;
+
+    int PrevSection = 0;
+    int NextSection = 0;
+
+    int SwitchScreens = 0;
+    int TestPlay = 0;
+    int Select = 0;
+    int Erase = 0;
+};
+
 struct KM_Key
 {
     // SDL_Joystick control
@@ -106,6 +123,38 @@ struct ConJoystick_t
 //    AltRun As Integer
     KM_Key AltRun;
 //End Type
+};
+
+struct EditorConJoystick_t
+{
+    enum CtrlTypes
+    {
+        NoControl=-1,
+        JoyAxis=0,
+        JoyBallX,
+        JoyBallY,
+        JoyHat,
+        JoyButton
+    };
+    KM_Key MouseLeft;
+    KM_Key MouseRight;
+    KM_Key MouseUp;
+    KM_Key MouseDown;
+    KM_Key MouseClick;
+
+    KM_Key FastScroll;
+    KM_Key ScrollUp;
+    KM_Key ScrollDown;
+    KM_Key ScrollLeft;
+    KM_Key ScrollRight;
+
+    KM_Key PrevSection;
+    KM_Key NextSection;
+
+    KM_Key SwitchScreens;
+    KM_Key TestPlay;
+    KM_Key Select;
+    KM_Key Erase;
 };
 
 #endif // CON_CONTROL_H

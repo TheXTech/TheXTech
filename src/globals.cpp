@@ -23,10 +23,10 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef __3DS__
+#ifndef NO_SDL
 #include <SDL2/SDL_version.h>
 #else
-#include "3ds/SDL_supplement.h"
+#include "SDL_supplement.h"
 #endif
 
 #include "globals.h"
@@ -55,7 +55,9 @@ bool TakeScreen = false;
 std::string LB;
 std::string EoT;
 RangeArr<ConKeyboard_t, 1, maxLocalPlayers> conKeyboard;
+EditorConKeyboard_t editorConKeyboard;
 RangeArr<ConJoystick_t, 1, maxLocalPlayers> conJoystick;
+EditorConJoystick_t editorConJoystick;
 RangeArrI<int, 1, maxLocalPlayers, 0> useJoystick;
 RangeArrI<bool, 1, maxLocalPlayers, false> wantedKeyboard;
 
@@ -73,7 +75,11 @@ KM_Key lastJoyButton;
 bool GamePaused = false;
 std::string MessageText;
 int NumSelectWorld  = 0;
+int NumSelectWorldEditable  = 0;
+int NumSelectBattle  = 0;
 std::vector<SelectWorld_t> SelectWorld;
+std::vector<SelectWorld_t> SelectWorldEditable;
+std::vector<SelectWorld_t> SelectBattle;
 bool ShowFPS = false;
 double PrintFPS = 0.0;
 bool GameplayPoundByAltRun = false;
@@ -513,7 +519,7 @@ int BattleIntro = 0;
 int BattleOutro = 0;
 std::string LevelName;
 
-#if !defined(__ORIGINAL_RES__) && !defined(__3DS__)
+#ifndef FIXED_RES
 int ScreenW = 800;
 int ScreenH = 600;
 void Set_Resolution(int sw, int sh)
@@ -528,7 +534,7 @@ void DoEvents()
     frmMain.doEvents();
 }
 
-#ifndef __3DS__
+#ifndef NO_SDL
 int showCursor(int show)
 {
     return SDL_ShowCursor(show);
@@ -619,17 +625,20 @@ std::string getJoyKeyName(bool isController, const KM_Key &key)
     }
 }
 #endif
-// #ifndef __3DS__
+// #ifndef NO_SDL
 
-#ifdef __3DS__
+#ifdef NO_SDL
 int showCursor(int show) {return 0;}
 const char *getKeyName(int key) {return " ... ";}
-std::string getJoyKeyName(const KM_Key &key)
+// implementation dependent
+#ifdef __3DS__
+std::string getJoyKeyName(bool isController, const KM_Key &key)
 {
     if(key.type < 0)
         return "_";
     return KEYNAMES[key.val];
 }
+#endif
 #endif
 
 

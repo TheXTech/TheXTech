@@ -23,8 +23,8 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#ifdef __3DS__
-#error "Primary `frm_main.cpp` only for SDL clients. Build `3ds/frm_main.cpp` instead."
+#ifdef NO_SDL
+#error "Primary `frm_main.cpp` only for SDL clients. Build target-specific `frm_main.cpp` instead."
 #endif
 
 #include <SDL2/SDL.h>
@@ -40,7 +40,7 @@
 #include "graphics.h"
 #include "control/joystick.h"
 #include "sound.h"
-#include "editor.h"
+#include "editor/editor.h"
 
 #include <AppPath/app_path.h>
 #include <Logger/logger.h>
@@ -442,7 +442,7 @@ bool FrmMain::hasWindowMouseFocus()
 
 void SizeWindow(SDL_Window* window)
 {
-    #if defined(__ORIGINAL_RES__)
+    #if defined(FIXED_RES)
         if(config_ScaleMode == ScaleMode_t::FIXED_1X)
         {
             SDL_SetWindowSize(window, ScreenW, ScreenH);
@@ -568,7 +568,7 @@ void FrmMain::eventMouseDown(SDL_MouseButtonEvent &event)
         MenuMouseDown = true;
         MenuMouseMove = true;
         if(LevelEditor || MagicHand || TestLevel)
-            EditorControls.Mouse1 = true;
+            EditorControls.MouseClick = true;
     }
     else if(event.button == SDL_BUTTON_RIGHT)
     {
@@ -612,7 +612,7 @@ void FrmMain::eventMouseUp(SDL_MouseButtonEvent &event)
     MenuMouseDown = false;
     MenuMouseRelease = true;
     if(LevelEditor || MagicHand || TestLevel)
-        EditorControls.Mouse1 = false;
+        EditorControls.MouseClick = false;
 
     if(event.button == SDL_BUTTON_LEFT)
     {
@@ -733,7 +733,7 @@ void FrmMain::updateViewport()
     float w, w1, h, h1;
     int   wi, hi;
 
-#if !defined(__EMSCRIPTEN__) && !defined(__ORIGINAL_RES__)
+#if !defined(__EMSCRIPTEN__) && !defined(FIXED_RES)
     SDL_GetWindowSize(m_window, &wi, &hi);
 #else
     if(IsFullScreen(m_window))
@@ -752,7 +752,7 @@ void FrmMain::updateViewport()
     else
         SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
 
-#ifndef __ORIGINAL_RES__
+#ifndef FIXED_RES
     if(config_InternalW == 0 || config_InternalH == 0)
     {
         ScaleWidth = wi;

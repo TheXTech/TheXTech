@@ -37,7 +37,7 @@
 #define CBool(x) static_cast<bool>(x)
 #define CInt(x) static_cast<int>(x)
 
-#ifndef __3DS__
+#ifndef NO_SDL
 #include <SDL2/SDL_scancode.h>
 const SDL_Scancode vbKeyEscape = SDL_SCANCODE_ESCAPE;
 const SDL_Scancode vbKeySpace = SDL_SCANCODE_SPACE;
@@ -53,6 +53,6 @@ const SDL_Scancode vbKeyA = SDL_SCANCODE_A;
 const SDL_Scancode vbKeyS = SDL_SCANCODE_S;
 const SDL_Scancode vbKeyPageUp = SDL_SCANCODE_PAGEUP;
 const SDL_Scancode vbKeyPageDown = SDL_SCANCODE_PAGEDOWN;
-#endif // #ifndef __3DS__
+#endif // #ifndef NO_SDL
 
 #endif // PSEUDO_VB_H

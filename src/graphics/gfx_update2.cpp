@@ -184,7 +184,11 @@ void UpdateGraphics2(bool skipRepaint)
         TileFrame[241] = TileFrame[14];
     }
 
+#ifdef __3DS__
+    frmMain.initDraw();
+#else
     frmMain.clearBuffer();
+#endif
 
     frmMain.setViewport(vScreen[Z].ScreenLeft, vScreen[Z].ScreenTop,
         vScreen[Z].Width, vScreen[Z].Height);
@@ -759,6 +763,11 @@ void UpdateGraphics2(bool skipRepaint)
 
         if(!skipRepaint)
             frmMain.repaint();
+        else
+        {
+            frmMain.clearBuffer();
+            frmMain.repaint();
+        }
 
         frmMain.setTargetScreen();
     }

@@ -3,7 +3,10 @@
 #include "../layers.h"
 #include "../npc.h"
 #include "../collision.h"
-#include "../editor.h"
+#include "../editor/editor.h"
+#ifdef NEW_EDITOR
+#include "../editor/new_editor.h"
+#endif
 
 void DrawEditorLevel(int Z)
 {

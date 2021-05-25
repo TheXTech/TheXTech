@@ -177,7 +177,10 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         Background2REAL[B] = Background2[B];
         NoTurnBack[B] = s.lock_left_scroll;
         UnderWater[B] = s.underwater;
-        CustomMusic[B] = dirEpisode.resolveFileCase(s.music_file);
+        if(s.music_file.empty())
+            CustomMusic[B] = "";
+        else
+            CustomMusic[B] = dirEpisode.resolveFileCase(s.music_file);
         B++;
         if(B > maxSections)
             break;
@@ -819,13 +822,13 @@ void ClearLevel()
 {
     int A = 0;
     int B = 0;
-    NPC_t blankNPC = NPC_t();
-    Water_t blankwater = Water_t();
-    Warp_t blankWarp = Warp_t();
-    Block_t blankBlock = Block_t();
-    Background_t BlankBackground = Background_t();
-    Location_t BlankLocation = Location_t();
-    Events_t blankEvent = Events_t();
+    const NPC_t blankNPC = NPC_t();
+    const Water_t blankwater = Water_t();
+    const Warp_t blankWarp = Warp_t();
+    const Block_t blankBlock = Block_t();
+    const Background_t BlankBackground = Background_t();
+    const Location_t BlankLocation = Location_t();
+    const Events_t blankEvent = Events_t();
     NPCScore[274] = 6;
     LevelName.clear();
     ResetCompat();

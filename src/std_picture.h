@@ -82,7 +82,6 @@ struct StdPicture
 #ifdef __3DS__
     std::string path = "";
     uint32_t lastDrawFrame = 0;
-    bool lazyLoaded = false;
     C2D_SpriteSheet texture = nullptr;
     C2D_Image image;
     C2D_SpriteSheet texture2 = nullptr;

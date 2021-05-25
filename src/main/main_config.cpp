@@ -23,7 +23,7 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef __3DS__
+#ifndef NO_SDL
 #include <SDL2/SDL_audio.h>
 #endif
 
@@ -54,7 +54,7 @@ void OpenConfig_preSetup()
             RenderMode = 2;
         config.endGroup();
 
-#ifndef __3DS__
+#ifndef NO_SDL
         config.beginGroup("sound");
         config.read("sample-rate", g_audioSetup.sampleRate, 44100);
         config.read("channels", g_audioSetup.channels, 2);
@@ -92,10 +92,10 @@ void OpenConfig_preSetup()
         config.readEnum("format", g_audioSetup.format, (uint16_t)AUDIO_F32, sampleFormats);
         config.read("buffer-size", g_audioSetup.bufferSize, 512);
         config.endGroup();
-#endif // #ifndef __3DS__
+#endif // #ifndef NO_SDL
 
         config.beginGroup("video");
-#ifndef __ORIGINAL_RES__
+#ifndef FIXED_RES
         config.read("internal-width", config_InternalW, 800);
         config.read("internal-height", config_InternalH, 600);
 #endif
@@ -268,7 +268,7 @@ void SaveConfig()
 #if !defined(__EMSCRIPTEN__) && !defined(__ANDROID__) // Don't remember fullscreen state for Emscripten!
     config.setValue("full-screen", resChanged);
 #endif
-#ifndef __ORIGINAL_RES__
+#ifndef FIXED_RES
     config.setValue("internal-width", config_InternalW);
     config.setValue("internal-height", config_InternalH);
 #endif
@@ -276,7 +276,7 @@ void SaveConfig()
     config.endGroup();
 #endif
 
-#ifndef __3DS__
+#ifndef NO_SDL
     config.beginGroup("sound");
     config.setValue("sample-rate", g_audioSetup.sampleRate);
     config.setValue("channels", g_audioSetup.channels);

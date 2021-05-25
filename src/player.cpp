@@ -38,7 +38,7 @@
 #include "game_main.h"
 #include "effect.h"
 #include "blocks.h"
-#include "editor.h"
+#include "editor/editor.h"
 #include "layers.h"
 #include "main/level_file.h"
 #include "main/trees.h"

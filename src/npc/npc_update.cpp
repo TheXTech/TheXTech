@@ -30,7 +30,7 @@
 #include "../collision.h"
 #include "../effect.h"
 #include "../layers.h"
-#include "../editor.h"
+#include "../editor/editor.h"
 #include "../blocks.h"
 #include "../sorting.h"
 #include "../compat.h"
