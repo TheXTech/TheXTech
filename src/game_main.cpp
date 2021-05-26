@@ -64,6 +64,10 @@
 #include "main/speedrunner.h"
 #include "main/menu_main.h"
 
+#ifdef NEW_EDITOR
+#include "editor/new_editor.h"
+#endif
+
 #include "pseudo_vb.h"
 
 void CheckActive();
@@ -266,8 +270,37 @@ int GameMain(const CmdLineSetup_t &setup)
 //        If LevelEditor = True Then 'Load the level editor
 //            [USELESS!]
 
+        if(LevelEditor) // Load the level editor
+        {
+            if(resChanged)
+                ChangeScreen();
+            BattleMode = false;
+            SingleCoop = 0;
+            numPlayers = 0;
+            ScreenType = 0;
+            DoEvents();
+            SetupEditorGraphics(); //Set up the editor graphics
+            SetupScreens();
+            MagicHand = false;
+
+            // Run the frame-loop
+            runFrameLoop(&EditorLoop,
+                         nullptr,
+                        []()->bool{ return LevelEditor || WorldEditor;}, nullptr,
+                        nullptr,
+                        nullptr);
+
+            LevelEditor = false;
+            WorldEditor = false;
+            frmMain.clearBuffer();
+            frmMain.repaint();
+#ifdef PRELOAD_LEVELS
+            FindWorlds();
+#endif
+        }
+
         // TheXTech Credits
-        if(GameOutro)
+        else if(GameOutro)
         {
             ShadowMode = false;
             GodMode = false;
@@ -737,22 +770,35 @@ int GameMain(const CmdLineSetup_t &setup)
 //            If TestLevel = True Then
             if(TestLevel)
             {
-//                TestLevel = False
-//                TestLevel = false;
-//                LevelEditor = True
-//                LevelEditor = true;
-//                LevelEditor = true; //FIXME: Restart level testing or quit a game instead of THIS
+                // if called from the new editor, return to editor
+                if(!Backup_FullFileName.empty())
+                {
+                    TestLevel = false;
+                    LevelSelect = false;
+                    LevelEditor = true;
 
-                if(LevelBeatCode != 0)
-                    GameIsActive = false;
+                    OpenLevel(FullFileName);
+                    if (!Backup_FullFileName.empty())
+                    {
+                        Files::deleteFile(FullFileName);
+                        FullFileName = Backup_FullFileName;
+                        Backup_FullFileName = "";
+                    }
+                    LevelSelect = false;
+                }
                 else
                 {
-                    GameThing();
-                    PGE_Delay(500);
-                    zTestLevel(setup.testMagicHand, setup.interprocess); // Restart level
-                }
+                    if(LevelBeatCode != 0)
+                        GameIsActive = false;
+                    else
+                    {
+                        GameThing();
+                        PGE_Delay(500);
+                        zTestLevel(setup.testMagicHand, setup.interprocess); // Restart level
+                    }
 
-                LevelBeatCode = 0;
+                    LevelBeatCode = 0;
+                }
 
 //                If nPlay.Online = False Then
 //                    OpenLevel FullFileName
@@ -800,7 +846,25 @@ int GameMain(const CmdLineSetup_t &setup)
 
 void EditorLoop()
 {
-    // DUMMY
+    UpdateEditorControls();
+    UpdateEditor();
+    UpdateBlocks();
+    UpdateEffects();
+    if (WorldEditor == true)
+        UpdateGraphics2(true);
+    else
+        UpdateGraphics(true);
+#if defined(NEW_EDITOR) && defined(__3DS__)
+    editorScreen.UpdateSelectorBar(true);
+    editorScreen.UpdateEditorScreen();
+#elif defined(NEW_EDITOR)
+    if(editorScreen.active)
+        editorScreen.UpdateEditorScreen();
+    else
+        editorScreen.UpdateSelectorBar(true);
+#endif
+    frmMain.repaint();
+    UpdateSound();
 }
 
 void KillIt()
@@ -1178,7 +1242,8 @@ void InitControls()
         joyFillDefaults(conJoystick[A]);
     }
 
-    // editorJoyFillDefaults(editorConJoystick);
+    editorJoyFillDefaults(editorConKeyboard);
+    editorJoyFillDefaults(editorConJoystick);
 
     OpenConfig();
 

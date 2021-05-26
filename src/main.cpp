@@ -162,6 +162,8 @@ int main(int argc, char**argv)
     setup.renderType = CmdLineSetup_t::RenderType(RenderMode);
 
     testPlayer.fill(Player_t());
+    testPlayer[1].Character = 1;
+    testPlayer[2].Character = 2;
 
 #ifndef __3DS__
     try

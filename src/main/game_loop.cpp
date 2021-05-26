@@ -448,7 +448,8 @@ void PauseGame(int plr)
                                 EndLevel = true;
                                 StopMusic();
                                 DoEvents();
-                                KillIt(); // Quit the game entirely
+                                if(Backup_FullFileName.empty())
+                                    KillIt(); // Quit the game entirely
                                 break;
                             default:
                                 break;

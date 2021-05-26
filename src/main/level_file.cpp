@@ -34,6 +34,7 @@
 #include "../layers.h"
 #include "../compat.h"
 #include "../graphics.h"
+#include "../editor/editor.h"
 #include "level_file.h"
 
 #include <DirManager/dirman.h>
@@ -46,7 +47,7 @@
 
 void addMissingLvlSuffix(std::string &fileName)
 {
-    if(!fileName.empty() && !Files::hasSuffix(fileName, ".lvl") && !Files::hasSuffix(fileName, ".lvlx"))
+    if(!fileName.empty() && !Files::hasSuffix(fileName, ".lvl") && !Files::hasSuffix(fileName, ".lvlx") && !Files::hasSuffix(fileName, "tst"))
     {
         bool isAbsolute = Files::isAbsolute(fileName);
         bool lvlxExists;
@@ -627,7 +628,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         if(maxSets > numSections)
             maxSets = numSections;
 
-        for(B = 0; B <= numSections; B++)
+        for(B = 0; B <= maxSections; B++)
         {
             auto &s = event.section[B];
             s.music_id = LevelEvent_Sets::LESet_Nothing;
@@ -716,68 +717,12 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
     }
 
 
-//    if(LevelEditor == true || MagicHand == true)
-//    {
-//        frmEvents::lstEvent.ListIndex = 0;
-//        frmLayers::lstLayer.ListIndex = 0;
-//        frmEvents::RefreshEvents;
-//    }
-
-//    if(LevelEditor == true)
-//    {
-//        ResetNPC EditorCursor.NPC.Type;
-//        curSection = 0;
-//        vScreenY[1] = -(level[curSection].Height - 600);
-//        vScreenX[1] = -level[curSection].X;
-//        numWarps = numWarps + 1;
-//        for(A = 0; A < frmLevelSettings::optBackground.Count; A++)
-//        {
-//            if(Background2[0] == A)
-//                frmLevelSettings::optBackground(A).Value = true;
-//            else
-//                frmLevelSettings::optBackground(A).Value = false;
-//        }
-//        for(A = 1; A <= frmLevelSettings::optBackgroundColor.Count; A++)
-//        {
-//            if(bgColor[0] == frmLevelSettings::optBackgroundColor(A).BackColor)
-//            {
-//                frmLevelSettings::optBackgroundColor(A).Value = true;
-//                break;
-//            }
-//        }
-//        frmLevelSettings::optMusic(bgMusic[0]).Value = true;
-//        if(LevelWrap[0] == true)
-//            frmLevelSettings::cmdWrap.Caption = "On";
-//        else
-//            frmLevelSettings::cmdWrap.Caption = "Off";
-//        if(UnderWater[0] == true)
-//            frmLevelSettings::cmdWater.Caption = "On";
-//        else
-//            frmLevelSettings::cmdWater.Caption = "Off";
-//        if(OffScreenExit[0] == true)
-//            frmLevelSettings::cmdExit.Caption = "On";
-//        else
-//            frmLevelSettings::cmdExit.Caption = "Off";
-//        frmLevelSettings::txtMusic.Enabled = false;
-//        frmLevelSettings::txtMusic.Text = CustomMusic[0];
-//        frmLevelSettings::txtMusic.Enabled = true;
-//        if(nPlay.Online == true && nPlay.Mode == 1) // sync to server
-//        {
-//            Netplay::sendData "j" + LB + "d" + LocalNick + " has loaded " + FileName + "." + LB + "w1" + LB + EoT;
-//            frmChat.txtChat = frmChat::txtChat + LocalNick + " has loaded " + FileName + "." + LB;
-//            frmChat::txtChat.SelStart = frmChat::txtChat.Text.Length;
-//            PlaySound(SFX_Message);
-//            SoundPause[47] = 2;
-//            for(A = 1; A <= 15; A++)
-//            {
-//                if(nPlay.ClientCon(A) == true)
-//                {
-//                    Netplay::InitSync A;
-//                }
-//            }
-//        }
-//    }
-//    else
+    if (LevelEditor)
+    {
+        ResetSectionScrolls();
+        SetSection(0);
+    }
+    else
     {
         FindStars();
         LevelMacro = LEVELMACRO_OFF;

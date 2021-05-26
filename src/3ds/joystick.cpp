@@ -227,7 +227,7 @@ void UpdateControls()
 void UpdateEditorControls()
 {
     EditorControls_t &c = EditorControls;
-    EditorConJoystick_t &j = editorConJoystick;
+    const EditorConJoystick_t &j = editorConJoystick;
     c.FastScroll = frmMain.getKeyHeld(j.FastScroll.id);
     c.ScrollUp = frmMain.getKeyHeld(j.ScrollUp.id);
     c.ScrollDown = frmMain.getKeyHeld(j.ScrollDown.id);

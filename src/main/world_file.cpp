@@ -64,6 +64,7 @@ void OpenWorld(std::string FilePath)
     FileNameFull = Files::basename(FilePath);
     FileName = dirEpisode.resolveDirCase(wld.meta.filename); //FilePath.substr(FilePath.length() - (FilePath.length() - A));
     FileNamePath = wld.meta.path + "/"; //FilePath.substr(0, (A));
+    FullFileName = FilePath;
 
     if(wld.meta.RecentFormat == LevelData::SMBX64)
         FileRelease = int(wld.meta.RecentFormatVersion);
@@ -277,7 +278,7 @@ void OpenWorld(std::string FilePath)
     LoadCustomGFX();
     LoadCustomSound();
 
-//    if(LevelEditor == false)
+    if(!LevelEditor)
     {
         for(A = 1; A <= numWorldLevels; A++)
         {
@@ -299,6 +300,11 @@ void OpenWorld(std::string FilePath)
                 LevelPath(WorldLevel[A], 5, true);
             }
         }
+    }
+    else
+    {
+        vScreenX[1] = 0;
+        vScreenY[1] = 0;
     }
 //    else
 //    {
@@ -368,6 +374,11 @@ void ClearWorld()
     UnloadWorldCustomGFX();
     UnloadCustomSound();
     LoadPlayerDefaults();
+    if(LevelEditor)
+    {
+        vScreenX[1] = 0;
+        vScreenY[1] = 0;
+    }
 //    if(LevelEditor == true)
 //    {
 //        frmLevelEditor::optCursor(14).Value = true;

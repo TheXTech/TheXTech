@@ -45,6 +45,7 @@
 #include "../editor/write_world.h"
 #include "../editor/new_editor.h"
 #include "../control/joystick.h"
+#include "../main/trees.h"
 
 #include "../pseudo_vb.h"
 
@@ -120,7 +121,8 @@ void UpdateEditor()
 //        frmLevelDebugger::UpdateDisplay;
     GameMenu = false;
 
-    if(!EditorControls.MouseClick)
+    GetEditorControls();
+    if(!EditorControls.MouseClick && !EditorControls.SwitchScreens)
         MouseRelease = true;
 
     if(LevelEditor == true)
@@ -165,7 +167,7 @@ void UpdateEditor()
             {
                 ScrollRelease = false;
 //                frmLevelSettings::optSection(curSection).Value = false;
-                if(curSection != 20)
+                if(curSection != maxSections)
                     SetSection(curSection + 1);
 //                if(EditorCursor.Mode == 2)
 //                    frmLevelSettings::optSection(curSection).Value = true;
@@ -182,38 +184,12 @@ void UpdateEditor()
     else
     {
         curSection = Player[1].Section;
-//        frmLevelSettings::optSection(Player(1).Section).Value = true;
     }
-
-//    if(WorldEditor == true)
-//    {
-//        frmLevelEditor::mnuWorldEditor.Enabled = false;
-//        frmLevelEditor::mnuLevelEditor.Enabled = true;
-//        frmLevelEditor::menuView.Visible = false;
-//        frmLevelEditor::MenuTest.Visible = false;
-//        frmLevelEditor::picLevel.Visible = false;
-//        frmLevelEditor::picWorld.Visible = true;
-//    }
-//    else
-//    {
-//        frmLevelEditor::mnuWorldEditor.Enabled = true;
-//        frmLevelEditor::mnuLevelEditor.Enabled = false;
-//        frmLevelEditor::menuView.Visible = true;
-//        frmLevelEditor::MenuTest.Visible = true;
-//        frmLevelEditor::picWorld.Visible = false;
-//        frmLevelEditor::picLevel.Visible = true;
-//    }
-//    GetCursorPos(CursorPos);
-    // CursorPos.X = MenuMouseX;
-    // CursorPos.Y = MenuMouseY;
-
-    // if(!frmMain.hasWindowMouseFocus() || CursorPos.X < 0 || CursorPos.Y > ScreenW || CursorPos.Y < 0 || CursorPos.Y > ScreenH)
-    //     HideCursor();
 
     if(LevelEditor || MagicHand)
     {
-        // if(frmMain.getKeyHeld(KEYCODE_DUP))
-        //     ScrollDelay = 0;
+        if(EditorControls.FastScroll)
+            ScrollDelay = 0;
 
         if(MagicHand)
             ScrollDelay = 10;
@@ -506,6 +482,8 @@ void UpdateEditor()
 //                            frmMusic::optMusic(WorldMusic[A].Type).Value = true;
                             EditorCursor.WorldMusic = WorldMusic[A];
                             WorldMusic[A] = WorldMusic[numWorldMusic];
+                            treeWorldMusicRemove(&WorldMusic[numWorldMusic]);
+                            treeWorldMusicUpdate(&WorldMusic[A]);
                             numWorldMusic = numWorldMusic - 1;
                             MouseRelease = false;
                             EditorControls.MouseClick = false; /* Simulate "Focus out" inside of SMBX Editor */
@@ -530,6 +508,8 @@ void UpdateEditor()
                             EditorCursor.Location = WorldPath[A].Location;
                             SetCursor();
                             std::swap(WorldPath[A], WorldPath[numWorldPaths]);
+                            treeWorldPathRemove(&WorldPath[numWorldPaths]);
+                            treeWorldPathUpdate(&WorldPath[A]);
                             numWorldPaths = numWorldPaths - 1;
                             MouseRelease = false;
                             EditorControls.MouseClick = false; /* Simulate "Focus out" inside of SMBX Editor */
@@ -554,8 +534,14 @@ void UpdateEditor()
                             EditorCursor.Location = Scene[A].Location;
                             SetCursor();
                             MouseMove(EditorCursor.X, EditorCursor.Y);
+                            // this maintains the order of the scenes
+                            // but makes for a hellish quadtree update
                             for(B = A; B < numScenes; B++)
+                            {
                                 std::swap(Scene[B], Scene[B + 1]);
+                                treeWorldSceneUpdate(&Scene[B]);
+                            }
+                            treeWorldSceneRemove(&Scene[numScenes]);
                             numScenes = numScenes - 1;
                             MouseRelease = false;
                             EditorControls.MouseClick = false; /* Simulate "Focus out" inside of SMBX Editor */
@@ -571,45 +557,15 @@ void UpdateEditor()
                         if(CursorCollision(EditorCursor.Location, WorldLevel[A].Location) == true)
                         {
                             PlaySound(23);
-//                            frmLevelEditor::optCursor(9).Value = true;
                             optCursor.current = OptCursor_t::WLD_LEVELS;
                             OptCursorSync();
-//                            frmLevels::WorldLevel(WorldLevel[A].Type).Value = true;
-//                            auto &wl = WorldLevel[A];
-//                            frmLevels.txtLevelName = wl.LevelName;
-//                            frmLevels.txtFilename = wl.FileName;
-//                            frmLevels::scrWarp.Value = wl.StartWarp;
-//                            if(wl.WarpX == -1)
-//                                frmLevels.txtX = "";
-//                            else
-//                                frmLevels.txtX = wl.WarpX;
-//                            if(wl.WarpY == -1)
-//                                frmLevels.txtY = "";
-//                            else
-//                                frmLevels.txtY = wl.WarpY;
-//                            if(wl.Path == true)
-//                                frmLevels::chkPath.Value = 1;
-//                            else
-//                                frmLevels::chkPath.Value = 0;
-//                            if(wl.Path2 == true)
-//                                frmLevels::chkPath2.Value = 1;
-//                            else
-//                                frmLevels::chkPath2.Value = 0;
-//                            if(wl.Start == true)
-//                                frmLevels::chkStart.Value = 1;
-//                            else
-//                                frmLevels::chkStart.Value = 0;
-//                            if(wl.Visible == true)
-//                                frmLevels::chkVisible.Value = 1;
-//                            else
-//                                frmLevels::chkVisible.Value = 0;
-//                            for(B = 1; B <= 4; B++)
-//                                frmLevels::cmbExit(B).ListIndex = wl.LevelExit[B] + 1;
                             EditorCursor.Mode = OptCursor_t::WLD_LEVELS;
                             EditorCursor.WorldLevel = WorldLevel[A];
                             EditorCursor.Location = WorldLevel[A].Location;
                             SetCursor();
                             std::swap(WorldLevel[A], WorldLevel[numWorldLevels]);
+                            treeWorldLevelRemove(&WorldLevel[numWorldLevels]);
+                            treeWorldLevelUpdate(&WorldLevel[A]);
                             numWorldLevels = numWorldLevels - 1;
                             MouseRelease = false;
                             EditorControls.MouseClick = false; /* Simulate "Focus out" inside of SMBX Editor */
@@ -625,24 +581,15 @@ void UpdateEditor()
                         if(CursorCollision(EditorCursor.Location, Tile[A].Location) == true)
                         {
                             PlaySound(23);
-//                            frmLevelEditor::optCursor(7).Value = true;
                             optCursor.current = OptCursor_t::WLD_TILES;
                             OptCursorSync();
-//                            frmTiles::Tile(Tile[A].Type).Value = true;
-//                            if(frmTiles::Tile(Tile[A].Type).Visible == false)
-//                            {
-//                                for(B = 0; B < frmTiles::Game.Count; B++)
-//                                {
-//                                    frmTiles::optGame(B).Value = true;
-//                                    if(frmTiles::Tile(Tile[A].Type).Visible == true)
-//                                        break;
-//                                }
-//                            }
                             EditorCursor.Mode = OptCursor_t::WLD_TILES;
                             EditorCursor.Tile = Tile[A];
                             EditorCursor.Location = Tile[A].Location;
                             SetCursor();
                             std::swap(Tile[A], Tile[numTiles]);
+                            treeWorldTileRemove(&Tile[numTiles]);
+                            treeWorldTileUpdate(&Tile[A]);
                             numTiles = numTiles - 1;
                             editorScreen.FocusTile();
                             MouseRelease = false;
@@ -839,6 +786,8 @@ void UpdateEditor()
                             NewEffect(10, tempLocation);
                             PlaySound(9);
                             WorldMusic[A] = WorldMusic[numWorldMusic];
+                            treeWorldMusicRemove(&WorldMusic[numWorldMusic]);
+                            treeWorldMusicUpdate(&WorldMusic[A]);
                             numWorldMusic = numWorldMusic - 1;
                             MouseRelease = false;
                             break;
@@ -858,6 +807,8 @@ void UpdateEditor()
                             NewEffect(10, tempLocation);
                             PlaySound(9);
                             WorldPath[A] = WorldPath[numWorldPaths];
+                            treeWorldPathRemove(&WorldPath[numWorldPaths]);
+                            treeWorldPathUpdate(&WorldPath[A]);
                             numWorldPaths -= 1;
                             MouseRelease = false;
                             break;
@@ -877,7 +828,11 @@ void UpdateEditor()
                             NewEffect(10, tempLocation);
                             PlaySound(9);
                             for(B = A; B < numScenes; B++)
+                            {
                                 Scene[B] = Scene[B + 1];
+                                treeWorldSceneUpdate(&Scene[B]);
+                            }
+                            treeWorldSceneRemove(&Scene[numScenes]);
                             numScenes = numScenes - 1;
                             MouseRelease = false;
                             break;
@@ -897,6 +852,8 @@ void UpdateEditor()
                             NewEffect(10, tempLocation);
                             PlaySound(9);
                             WorldLevel[A] = WorldLevel[numWorldLevels];
+                            treeWorldLevelRemove(&WorldLevel[numWorldLevels]);
+                            treeWorldLevelUpdate(&WorldLevel[A]);
                             numWorldLevels = numWorldLevels - 1;
                             MouseRelease = false;
                             break;
@@ -916,6 +873,8 @@ void UpdateEditor()
                             NewEffect(10, tempLocation);
                             PlaySound(9);
                             Tile[A] = Tile[numTiles];
+                            treeWorldTileRemove(&Tile[numTiles]);
+                            treeWorldTileUpdate(&Tile[A]);
                             numTiles = numTiles - 1;
                             MouseRelease = false;
                             break;
@@ -1204,6 +1163,7 @@ void UpdateEditor()
                     {
                         numTiles++;
                         Tile[numTiles] = EditorCursor.Tile;
+                        treeWorldTileAdd(&Tile[numTiles]);
                     }
                 }
             }
@@ -1234,6 +1194,7 @@ void UpdateEditor()
                     {
                         numScenes++;
                         Scene[numScenes] = EditorCursor.Scene;
+                        treeWorldSceneAdd(&Scene[numScenes]);
                     }
                 }
             }
@@ -1267,6 +1228,7 @@ void UpdateEditor()
                     {
                         numWorldLevels++;
                         WorldLevel[numWorldLevels] = EditorCursor.WorldLevel;
+                        treeWorldLevelAdd(&WorldLevel[numWorldLevels]);
                     }
                 }
             }
@@ -1290,6 +1252,7 @@ void UpdateEditor()
                     {
                         numWorldPaths++;
                         WorldPath[numWorldPaths] = EditorCursor.WorldPath;
+                        treeWorldPathAdd(&WorldPath[numWorldPaths]);
                     }
                 }
             }
@@ -1306,6 +1269,7 @@ void UpdateEditor()
                     EditorCursor.WorldMusic.Location = EditorCursor.Location;
                     numWorldMusic++;
                     WorldMusic[numWorldMusic] = EditorCursor.WorldMusic;
+                    treeWorldMusicAdd(&WorldMusic[numWorldMusic]);
                 }
             }
         }
@@ -1482,26 +1446,25 @@ int EditorNPCFrame(int A, float C, int N)
 
 void GetEditorControls()
 {
-    if(frmMain.getKeyPressed(editorConJoystick.Select.id))
+    if(EditorControls.Select)
     {
         optCursor.current = 13;
         SetCursor();
     }
-    if(frmMain.getKeyPressed(editorConJoystick.Erase.id))
+    if(EditorControls.Erase)
     {
         optCursor.current = 0;
         SetCursor();
     }
-    if(!WorldEditor && frmMain.getKeyPressed(editorConJoystick.TestPlay.id))
+    if(!WorldEditor && EditorControls.TestPlay)
     {
         Backup_FullFileName = FullFileName;
-        // how does this interact with cross-level warps?
         FullFileName = FullFileName + "tst";
         SaveLevel(FullFileName);
         HasCursor = false;
         zTestLevel();
     }
-    if(frmMain.getKeyPressed(editorConJoystick.SwitchScreens.id))
+    if(EditorControls.SwitchScreens && MouseRelease)
     {
         editorScreen.active = !editorScreen.active;
         HasCursor = false;
@@ -1512,16 +1475,6 @@ void GetEditorControls()
 
 void SetCursor()
 {
-//    int A = 0;
-//    for(A = 0; A < frmLevelEditor::optCursor.Count; A++)
-//    {
-//        if(frmLevelEditor::optCursor(A).Value)
-//        {
-//            EditorCursor.Mode = optCursor.current;
-//            break;
-//        }
-//    }
-
     EditorCursor.Mode = optCursor.current;
 
     if(EditorCursor.Mode == 6 && WorldEditor)

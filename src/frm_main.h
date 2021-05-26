@@ -71,7 +71,6 @@ class FrmMain
 #ifdef __3DS__
     std::set<C2D_SpriteSheet> m_textureBank; // SDL_Texture
     std::set<StdPicture*> m_bigPictures;
-    bool inFrame = false;
     uint32_t currentFrame = 0;
     touchPosition m_lastMousePosition = {0, 0};
     float depthSlider = 0.;
@@ -146,6 +145,7 @@ public:
     bool isSdlError();
 
 #ifdef __3DS__
+    bool inFrame = false;
     void initDraw(int screen = 0);
     void setLayer(int layer);
     void toggleDebug();

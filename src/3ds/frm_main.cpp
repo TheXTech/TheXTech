@@ -174,7 +174,7 @@ void FrmMain::doEvents()
     }
     else
     {
-        MenuMouseRelease = keys_released & KEY_TOUCH;
+        MenuMouseRelease |= keys_released & KEY_TOUCH;
         MenuMouseDown = keys_held & KEY_TOUCH;
         if (MenuMouseDown)
         {
@@ -261,10 +261,14 @@ void FrmMain::clearBuffer()
 {
     if(!inFrame)
     {
+        resetViewport();
         C3D_FrameBegin(0);
-        C2D_TargetClear(top, C2D_Color32f(0.0f, 0.0f, 0.0f, 1.0f));
-        C2D_TargetClear(right, C2D_Color32f(0.0f, 0.0f, 0.0f, 1.0f));
-        C2D_TargetClear(bottom, C2D_Color32f(0.0f, 0.0f, 0.0f, 1.0f));
+        C2D_SceneBegin(top);
+        renderRect(0,0,ScreenW,ScreenH,0.f,0.f,0.f,1.f,true);
+        C2D_SceneBegin(right);
+        renderRect(0,0,ScreenW,ScreenH,0.f,0.f,0.f,1.f,true);
+        C2D_SceneBegin(bottom);
+        renderRect(0,0,ScreenW,ScreenH,0.f,0.f,0.f,1.f,true);
         C3D_FrameEnd(0);
     }
 }
@@ -900,7 +904,7 @@ void FrmMain::renderTextureScale(double xDst, double yDst, double wDst, double h
     renderTexturePrivate(
         ROUNDDIV2(xDst), ROUNDDIV2(yDst), ROUNDDIV2(wDst), ROUNDDIV2(hDst),
         tx,
-        xSrc/2, ySrc/2, wSrc/2, wDst/2,
+        xSrc/2, ySrc/2, wSrc/2, hSrc/2,
         0.f, nullptr, SDL_FLIP_NONE,
         red, green, blue, alpha);
 }

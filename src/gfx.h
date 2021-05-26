@@ -63,7 +63,7 @@ public:
     RangeArr<StdPicture, 1, 2> Tongue;
     StdPicture Warp;
     StdPicture YoshiWings;
-#ifdef __3DS__
+#ifdef NEW_EDITOR
     StdPicture NPC_modes;
 #endif
 

@@ -127,6 +127,10 @@ struct ConJoystick_t
 
 struct EditorConJoystick_t
 {
+    bool isValid = false;
+    bool isGameController = false;
+    bool isHaptic = false;
+
     enum CtrlTypes
     {
         NoControl=-1,

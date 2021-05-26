@@ -62,6 +62,8 @@
 
 #ifdef NEW_EDITOR
 #include "../editor/new_editor.h"
+#include "../editor/write_world.h"
+#include "../editor/text_input.h"
 const int MainMenuQuitIndex = 5;
 const int MainMenuOptionsIndex = 4;
 #else
@@ -151,7 +153,6 @@ void FindWorlds()
 {
     NumSelectWorld = 0;
     NumSelectWorldEditable = 0;
-    bool stillEditable = true;
 
 #ifndef __3DS__
     std::vector<std::string> worldRoots;
@@ -168,22 +169,23 @@ void FindWorlds()
 
     SelectWorld.clear();
     SelectWorld.push_back(SelectWorld_t()); // Dummy entry
+    SelectWorldEditable.clear();
+    SelectWorldEditable.push_back(SelectWorld_t()); // Dummy entry
 
 #ifndef PGE_NO_THREADING
     SDL_AtomicSet(&loadingProgrss, 0);
     SDL_AtomicSet(&loadingProgrssMax, 0);
-#endif
 
     for(const auto &worldsRoot : worldRoots)
     {
         std::vector<std::string> dirs;
         DirMan episodes(worldsRoot);
         episodes.getListOfFolders(dirs);
-#ifndef PGE_NO_THREADING
         SDL_AtomicAdd(&loadingProgrssMax, dirs.size());
-#endif
     }
+#endif
 
+    bool stillEditable = true;
     for(const auto &worldsRoot : worldRoots)
     {
         DirMan episodes(worldsRoot);
@@ -223,14 +225,14 @@ void FindWorlds()
                 }
             }
 
-        // On 3DS, this is after the first and only non-romfs root has been processed.
-        if (canOnlyEditFirstRoot)
-            stillEditable = false;
-
 #ifndef PGE_NO_THREADING
             SDL_AtomicAdd(&loadingProgrss, 1);
 #endif
         }
+        // On 3DS, this is after the first and
+        // only editable root has been processed.
+        if (canOnlyEditFirstRoot)
+            stillEditable = false;
     }
 
     std::sort(SelectWorld.begin(), SelectWorld.end(), 
@@ -880,29 +882,55 @@ bool mainMenuUpdate()
                     PlaySoundMenu(SFX_Do);
                     selWorld = MenuCursor + 1;
                     // level editor
+#ifdef NEW_EDITOR
                     if (MenuMode == MENU_EDITOR)
                     {
-                        GameMenu = false;
-                        LevelSelect = false;
-                        BattleMode = false;
-                        LevelEditor = true;
-                        WorldEditor = true;
-                        ClearLevel();
-                        ClearGame();
                         if(selWorld == NumSelectWorldEditable)
                         {
                             ClearWorld();
-                            // do something here...
-                            printf("BAD TIMES\n");
-                        }
-                        OpenWorld(SelectWorldEditable[selWorld].WorldPath
-                            + SelectWorldEditable[selWorld].WorldFile);
-#ifdef NEW_EDITOR
-                        editorScreen.ResetCursor();
+                            WorldName = GetTextInput("New world name");
+                            if(!WorldName.empty())
+                            {
+                                std::string fn = WorldName;
+                                std::replace(fn.begin(), fn.end(), '/', '_');
+                                std::replace(fn.begin(), fn.end(), '\\', '_');
+                                std::replace(fn.begin(), fn.end(), '.', '_');
+                                std::replace(fn.begin(), fn.end(), ':', '_');
+                                std::replace(fn.begin(), fn.end(), '<', '_');
+                                std::replace(fn.begin(), fn.end(), '>', '_');
+                                std::replace(fn.begin(), fn.end(), '"', '_');
+                                std::replace(fn.begin(), fn.end(), '|', '_');
+                                std::replace(fn.begin(), fn.end(), '?', '_');
+                                std::replace(fn.begin(), fn.end(), '*', '_');
+                                while(DirMan::exists(AppPathManager::userWorldsRootDir()+"/"+fn))
+                                    fn = fn + "2";
+                                DirMan::mkAbsPath(AppPathManager::userWorldsRootDir()+"/"+fn);
+                                SaveWorld(AppPathManager::userWorldsRootDir()+"/"+fn+"/world.wld");
+#ifdef PGE_NO_THREADING
+                                FindWorlds();
+#else
+                                SDL_AtomicSet(&loading, 1);
+                                loadingThread = SDL_CreateThread(FindWorldsThread, "FindWorlds", NULL);
 #endif
-                        return true;
+                            }
+                        }
+                        else
+                        {
+                            GameMenu = false;
+                            LevelSelect = false;
+                            BattleMode = false;
+                            LevelEditor = true;
+                            WorldEditor = true;
+                            ClearLevel();
+                            ClearGame();
+                            OpenWorld(SelectWorldEditable[selWorld].WorldPath
+                                + SelectWorldEditable[selWorld].WorldFile);
+                            editorScreen.ResetCursor();
+                            return true;
+                        }
                     }
                     else
+#endif // #ifdef NEW_EDITOR
                     {
                         FindSaves();
 

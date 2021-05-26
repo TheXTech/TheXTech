@@ -312,6 +312,8 @@ void AppPathManager::initAppPath()
             m_userPath.append("/");
 #   elif !defined(__3DS__)
         m_userPath.append("/thextech/");
+#else
+        m_userPath.append("/");
 #   endif
 #else
         m_userPath.append("/");

@@ -110,6 +110,7 @@ option(RANGE_ARR_USE_HEAP "Store data of RangeArr<> template in a heap" OFF)
 option(ENABLE_ANTICHEAT_TRAP "Enable anti-cheating trap for the \"redigitiscool\" cheat code" OFF)
 option(ENABLE_OLD_CREDITS "Use original Redigit's credits without changes" OFF)
 option(ENABLE_LOGGING "Enable debug logging" ON)
+option(NEW_EDITOR "Enable new classic editor" OFF)
 
 option(THEXTECH_ENABLE_LUA "Enable lua scripting support" OFF)
 
@@ -253,6 +254,7 @@ set(LIB_SRC
     lib/InterProcess/intproc.cpp
     ${INIPROCESSOR_SRCS}
     lib/Logger/logger_sets.cpp
+    3rdparty/tinyfiledialogs/tinyfiledialogs.c
     ${UTILS_SRCS}
     ${LIB_SRC_EXTRA}
 )
@@ -314,6 +316,11 @@ set(THEXTECH_SRC
     src/custom.cpp
     src/graphics.cpp
     src/editor/editor.cpp
+    src/editor/new_editor.cpp
+    src/editor/text_input.cpp
+    src/editor/write_common.cpp
+    src/editor/write_level.cpp
+    src/editor/write_world.cpp
     src/main.cpp
     src/blocks.cpp
     src/gfx.cpp
@@ -495,12 +502,29 @@ if(ENABLE_OLD_CREDITS)
     set_target_properties(thextech PROPERTIES OUTPUT_NAME "smbx")
 endif()
 
+if(NEW_EDITOR)
+    target_compile_definitions(thextech PRIVATE -DNEW_EDITOR)
+endif()
+
 if(NOT ENABLE_LOGGING)
     target_compile_definitions(thextech PRIVATE -DDISABLE_LOGGING)
 endif()
 
 if(EMSCRIPTEN)
     target_compile_definitions(thextech PRIVATE -DPGE_NO_THREADING)
+    target_compile_definitions(thextech PRIVATE -DNO_SCREENSHOT)
+    target_compile_definitions(thextech PRIVATE -DNO_INTPROC)
+endif()
+
+if(3DS)
+    target_compile_definitions(thextech PRIVATE -DPGE_NO_THREADING)
+    target_compile_definitions(thextech PRIVATE -DNO_SCREENSHOT)
+    target_compile_definitions(thextech PRIVATE -DNO_INTPROC)
+    target_compile_definitions(thextech PRIVATE -DNO_SDL)
+    target_compile_definitions(thextech PRIVATE -DNEW_EDITOR)
+    target_compile_definitions(thextech PRIVATE -DLOW_MEM)
+    target_compile_definitions(thextech PRIVATE -DFIXED_RES)
+    target_compile_definitions(thextech PRIVATE -DPRELOAD_LEVELS)
 endif()
 
 if(NOT USE_SYSTEM_LIBS)
