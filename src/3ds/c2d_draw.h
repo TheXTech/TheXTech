@@ -34,7 +34,8 @@ inline bool C2D_DrawImage_Custom(C2D_Image img,
         scale_y = 1.f;
 
     bool result;
-    if (r != 1.f || g != 1.f || b != 1.f || a != 1.f)
+    // sadly tints don't work the same on 3DS as SDL...
+    if (r == 0.f || g == 0.f || b == 0.f)
     {
         uint32_t color = C2D_Color32f(r, g, b, a);
         const C2D_ImageTint tint = {color, 1., color, 1., color, 1., color, 1.};
@@ -89,7 +90,8 @@ inline bool C2D_DrawImage_Custom_Rotated(C2D_Image img,
 
     const C2D_DrawParams params = {{x, y, w*scale_x, h*scale_y}, {cx, cy}, 0.f, angle};
     bool result;
-    if (r != 1.f || g != 1.f || b != 1.f || a != 1.f)
+    // sadly tints don't work the same on 3DS as SDL...
+    if (r == 0.f || g == 0.f || b == 0.f)
     {
         uint32_t color = C2D_Color32f(r, g, b, a);
         const C2D_ImageTint tint = {color, 1., color, 1., color, 1., color, 1.};
