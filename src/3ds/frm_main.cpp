@@ -727,17 +727,29 @@ void FrmMain::renderTexturePrivate(float xDst, float yDst, float wDst, float hDs
     if(xDst > viewport_w || yDst > viewport_h)
         return;
 
+    // automatic flipping based on SMBX style!
+    unsigned int mode = 0;
+    while(ySrc >= tx.h/2 && mode < 3)
+    {
+        ySrc -= tx.h/2;
+        mode += 1;
+    }
+    flip ^= mode;
+
     // texture boundaries
     // this never happens unless there was an invalid input
     // if((xSrc < 0.f) || (ySrc < 0.f)) return;
 
-    // TODO: think about flips for these...
+    // TODO: graphics tests for how offscreen draws interact with flips
     //       handling rotations properly is probably impossible
     if(xDst < 0.f)
     {
-        xSrc -= xDst * wSrc/wDst;
+        if(!(flip & SDL_FLIP_HORIZONTAL))
+            xSrc -= xDst * wSrc/wDst;
         if (wDst+xDst > viewport_w)
         {
+            if(flip & SDL_FLIP_HORIZONTAL)
+                xSrc += (wDst+xDst-viewport_w) * wSrc/wDst;
             wSrc = viewport_w * wSrc/wDst;
             wDst = viewport_w;
         }
@@ -750,14 +762,19 @@ void FrmMain::renderTexturePrivate(float xDst, float yDst, float wDst, float hDs
     }
     else if(xDst + wDst > viewport_w)
     {
+        if(flip & SDL_FLIP_HORIZONTAL)
+            xSrc += (wDst+xDst-viewport_w) * wSrc/wDst;
         wSrc = (viewport_w - xDst) * wSrc/wDst;
         wDst = (viewport_w - xDst);
     }
     if(yDst < 0.f)
     {
-        ySrc -= yDst * hSrc/hDst;
+        if(!(flip & SDL_FLIP_VERTICAL))
+            ySrc -= yDst * hSrc/hDst;
         if (hDst+yDst > viewport_h)
         {
+            if(flip & SDL_FLIP_VERTICAL)
+                ySrc += (hDst+yDst-viewport_h) * hSrc/hDst;
             hSrc = viewport_h * hSrc/hDst;
             hDst = viewport_h;
         }
@@ -770,6 +787,8 @@ void FrmMain::renderTexturePrivate(float xDst, float yDst, float wDst, float hDs
     }
     else if(yDst + hDst > viewport_h)
     {
+        if(flip & SDL_FLIP_VERTICAL)
+            ySrc += (hDst+yDst-viewport_h) * hSrc/hDst;
         hSrc = (viewport_h - yDst) * hSrc/hDst;
         hDst = (viewport_h - yDst);
     }

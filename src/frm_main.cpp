@@ -1738,6 +1738,15 @@ void FrmMain::renderTextureI(int xDst, int yDst, int wDst, int hDst,
 
     SDL_assert_release(tx.texture);
 
+    // automatic flipping based on SMBX style!
+    unsigned int mode = 0;
+    while(ySrc >= tx.h && mode < 3)
+    {
+        ySrc -= tx.h;
+        mode += 1;
+    }
+    flip ^= mode;
+
     // Don't go more than size of texture
     if(xSrc + wDst > tx.w)
     {
@@ -1791,6 +1800,15 @@ void FrmMain::renderTextureScaleI(int xDst, int yDst, int wDst, int hDst,
     }
 
     SDL_assert_release(tx.texture);
+
+    // automatic flipping based on SMBX style!
+    unsigned int mode = 0;
+    while(ySrc >= tx.h && mode < 3)
+    {
+        ySrc -= tx.h;
+        mode += 1;
+    }
+    flip ^= mode;
 
     // Don't go more than size of texture
     if(xSrc + wSrc > tx.w)
