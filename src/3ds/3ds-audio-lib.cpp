@@ -256,7 +256,7 @@ int loadWaveFileData(FILE* f, uint16_t* nChannels, uint32_t* sampleRate)
     return 0;
 }
 
-uint32_t playSound(const char* path, int loops) {
+uint32_t playSoundWAV(const char* path, int loops) {
     // printf("Playin sound %s\n", path);
     for (size_t ci = 0; ci < NUM_CHANNELS; ci++)
     {
@@ -464,12 +464,13 @@ uint32_t playSoundAuto(const char* path, int loops)
     if (!strcasecmp(ext, "mp3"))
         return playSoundOGG(path, loops);
     if (!strcasecmp(ext, "wav"))
-        return playSound(path, loops);
+        return playSoundWAV(path, loops);
     else
         return playSoundGME(path, loops);
 }
 
-bool audioInit() {
+bool audioInit()
+{
     LightEvent_Init(&sound_event, RESET_ONESHOT);
     ndspInit();
 

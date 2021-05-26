@@ -50,7 +50,9 @@ void audioExit();
 void audioPause();
 void audioResume();
 
-uint32_t playSound(const char* path, int loops=0);
+const char* get_filename_ext(const char* filename);
+
+uint32_t playSoundWAV(const char* path, int loops=0);
 
 uint32_t playSoundMem(const WaveObject* wave, int loops=0);
 
