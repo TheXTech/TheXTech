@@ -200,7 +200,7 @@ jobs:
         cmake --build build --config ${{ matrix.config.build_type }} --parallel 3
 
     - name: List dependent libraries
-      if: runner.os == 'Linux'
+      if: success() && runner.os == 'Linux'
       shell: bash
       run: |
         file build/output/bin/thextech
@@ -208,7 +208,7 @@ jobs:
 
 
     - name: Create Package
-      if: always()
+      if: success()
       shell: bash
       # ======================================= Adventures of Demo =======================================
       # The side game about Demo and siblings from the A2XT universe by raocow and his fan community.
@@ -237,21 +237,21 @@ jobs:
             "none"
 
     - name: Upload artifact
-      if: runner.os == 'Linux'
+      if: success() && runner.os == 'Linux'
       uses: actions/upload-artifact@v2
       with:
         path: build/package/*.tar.gz
         name: TheXTech ${{ matrix.config.name }} ${{ matrix.config.build_type }}
 
     - name: Upload artifact
-      if: runner.os == 'Windows'
+      if: success() && runner.os == 'Windows'
       uses: actions/upload-artifact@v2
       with:
         path: build/package/*.7z
         name: ${{ matrix.config.name }} ${{ matrix.config.build_type }}
 
     - name: Deploy to builds.wohlsoft.ru
-      if: github.event_name != 'pull_request'
+      if: success() && github.event_name != 'pull_request'
       shell: bash
       run: |
         if [[ ! -z "${{ matrix.config.extra_path }}" ]]; then

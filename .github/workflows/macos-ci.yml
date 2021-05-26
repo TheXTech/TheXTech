@@ -122,7 +122,7 @@ jobs:
         otool -L TheXTech.app/Contents/MacOS/TheXTech
 
     - name: Create Package
-      if: always()
+      if: success()
       shell: bash
       run: |
         bash .github/ci-helper/pack-game-macos.sh \
@@ -144,21 +144,21 @@ jobs:
             "thextech-macos-uni-dev.zip"
 
     - name: Upload DMG artifact
-      if: always()
+      if: success()
       uses: actions/upload-artifact@v2
       with:
         path: ./*.dmg
         name: ${{ matrix.config.name }} ${{ matrix.config.build_type }} DMG
 
     - name: Upload ZIP artifact
-      if: always()
+      if: success()
       uses: actions/upload-artifact@v2
       with:
         path: ./*.zip
         name: ${{ matrix.config.name }} ${{ matrix.config.build_type }} ZIP
 
     - name: Deploy to builds.wohlsoft.ru
-      if: github.event_name != 'pull_request'
+      if: success() && github.event_name != 'pull_request'
       shell: bash
       run: |
         if [[ ! -z "${{ matrix.config.extra_path }}" ]]; then
