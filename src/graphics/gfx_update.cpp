@@ -657,6 +657,13 @@ void UpdateGraphics(bool skipRepaint)
                     onscreen = false;
                 }
 
+                // don't show a Cheep that hasn't jumped yet
+                if(NPCIsCheep[NPC[A].Type] && Maths::iRound(NPC[A].Special) == 2)
+                {
+                    if(!NPC[A].Active && !can_activate)
+                        onscreen = false;
+                }
+
                 if(can_activate)
                 {
                     if(NPC[A].Generator)
@@ -674,7 +681,6 @@ void UpdateGraphics(bool skipRepaint)
                     }
                 }
 
-                // TODO: think through the logical conflict between `cannot_reset` and `can_activate`
                 if(cannot_reset)
                 {
                     if(NPC[A].Type != 0
