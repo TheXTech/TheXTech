@@ -1736,7 +1736,7 @@ static void s_drawGameTypeTitle(int x, int y)
 {
     if(MenuMode == MENU_EDITOR)
         SuperPrint(g_mainMenu.mainEditor, 3, x, y);
-    if(menuBattleMode)
+    else if(menuBattleMode)
         SuperPrint(g_mainMenu.mainBattleGame, 3, x, y, 0.3f, 0.3f, 1.0f);
     else
     {

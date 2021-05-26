@@ -381,6 +381,7 @@ void UpdateNPCs()
                                 ProcEvent(NPC[numNPCs].TriggerActivate);
                             if(NPC[numNPCs].Type == 287)
                                 NPC[numNPCs].Type = RandomBonus();
+                            syncLayers_NPC(numNPCs);
                         }
                     }
                 }
@@ -2091,6 +2092,7 @@ void UpdateNPCs()
                                                                 {
                                                                     Block[B].Layer = "Destroyed Blocks";
                                                                     Block[B].Hidden = true;
+                                                                    syncLayers_Block(B);
                                                                     numNPCs++;
                                                                     NPC[numNPCs] = NPC_t();
                                                                     NPC[numNPCs].Location.Width = 28;
@@ -2102,6 +2104,7 @@ void UpdateNPCs()
                                                                     NPC[numNPCs].DefaultType = NPC[numNPCs].Type;
                                                                     NPC[numNPCs].DefaultLocation = NPC[numNPCs].Location;
                                                                     NPC[numNPCs].TimeLeft = 100;
+                                                                    syncLayers_NPC(numNPCs);
                                                                     CheckSectionNPC(numNPCs);
                                                                 }
                                                             }
@@ -4323,6 +4326,7 @@ void UpdateNPCs()
                                     NPC[numNPCs].Location.SpeedY = 1;
                                 else if(NPC[numNPCs].Location.SpeedY < -1)
                                     NPC[numNPCs].Location.SpeedY = -1;
+                                syncLayers_NPC(numNPCs);
                                 PlaySound(SFX_BigFireball);
                             }
                         }
@@ -4362,6 +4366,7 @@ void UpdateNPCs()
                         NPC[numNPCs].TimeLeft = 50;
                         NPC[numNPCs].Location.SpeedY = -8;
                         NPC[numNPCs].Location.SpeedX = 3 * Player[NPC[A].HoldingPlayer].Direction + Player[NPC[A].HoldingPlayer].Location.SpeedX * 0.8;
+                        syncLayers_NPC(numNPCs);
                     }
                 }
                 else if(NPC[A].Type == 21 || NPC[A].Type == 22) // Bullet Bill Shooter
@@ -4483,6 +4488,7 @@ void UpdateNPCs()
                                     else
                                         NPC[numNPCs].Frame = 0;
                                     NPC[numNPCs].Location.Y = NPC[A].Location.Y + NPC[A].Location.Height / 2.0 - NPC[numNPCs].Location.Height / 2.0;
+                                    syncLayers_NPC(numNPCs);
 
                                     tempLocation = NPC[numNPCs].Location;
                                     tempLocation.X = NPC[numNPCs].Location.X + (NPC[numNPCs].Location.Width / 2.0) * NPC[numNPCs].Direction;
@@ -4563,6 +4569,7 @@ void UpdateNPCs()
                         else
                             NPC[numNPCs].Location.X = NPC[A].Location.X - NPC[numNPCs].Location.Width;
                         NPC[numNPCs].Location.Y = NPC[A].Location.Y;
+                        syncLayers_NPC(numNPCs);
                     }
                     if(NPC[NPC[A].Special2].Type == 50 && fEqual(NPC[NPC[A].Special2].Special2, A))
                     {
@@ -4886,7 +4893,7 @@ void UpdateNPCs()
 
                 if(NPC[A].Effect == 0 && NPC[A].Type != 91)
                     NPC[A].Layer = "Spawned NPCs";
-
+                syncLayers_NPC(A);
             }
             else if(NPC[A].Effect == 5) // Grabbed by Yoshi
             {
@@ -4943,25 +4950,31 @@ void UpdateNPCs()
                                 Layer[B].SpeedX = 0;
                                 Layer[B].SpeedY = 0;
 
-                                for(int C = 1; C <= numBlock; C++)
+                                for(int C : Layer[B].blocks)
                                 {
-                                    if(Block[C].Layer == Layer[B].Name)
-                                    {
                                         Block[C].Location.SpeedX = double(Layer[B].SpeedX);
                                         Block[C].Location.SpeedY = double(Layer[B].SpeedY);
+                                }
+
+                                if(g_compatibility.enable_climb_bgo_layer_move)
+                                {
+                                    for(int C : Layer[B].BGOs)
+                                    {
+                                        if(BackgroundFence[Background[C].Type])
+                                        {
+                                            Background[C].Location.SpeedX = 0;
+                                            Background[C].Location.SpeedY = 0;
+                                        }
                                     }
                                 }
 
-                                for(int C = 1; C <= numNPCs; C++)
+                                for(int C : Layer[B].NPCs)
                                 {
-                                    if(NPC[C].Layer == Layer[B].Name)
-                                    {
                                         if(NPCIsAVine[NPC[C].Type] || NPC[C].Type == 91)
                                         {
                                             NPC[C].Location.SpeedX = 0;
                                             NPC[C].Location.SpeedY = 0;
                                         }
-                                    }
                                 }
                             }
                         }

@@ -208,6 +208,25 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             break;
     }
 
+    A = 0;
+    for(auto &l : lvl.layers)
+    {
+        auto &layer = Layer[A];
+
+        layer = Layer_t();
+        // does this clear all of those lists???
+
+        layer.Name = l.name;
+        layer.Hidden = l.hidden;
+        // hide layers after everything is done
+        A++;
+        numLayers++;
+        if(numLayers > maxLayers)
+        {
+            numLayers = maxLayers;
+            break;
+        }
+    }
 
     for(auto &b : lvl.blocks)
     {
@@ -417,6 +436,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             npc.Reset[2] = true;
         }
 
+        syncLayers_NPC(numNPCs);
         CheckSectionNPC(numNPCs);
 
         if(npc.Type == 192) // Is a checkpoint
@@ -509,6 +529,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         warp.Entrance.Width = 32;
         warp.Exit.Height = 32;
         warp.Exit.Width = 32;
+        syncLayers_Warp(numWarps);
         if(w.two_way)
             twoWayWarps.push_back(numWarps);
     }
@@ -532,6 +553,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             warp.Entrance = w.Exit;
             warp.Direction2 = w.Direction;
             warp.Direction = w.Direction2;
+            syncLayers_Warp(numWarps);
         }
     }
 
@@ -555,33 +577,10 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         water.Buoy = w.buoy;
         water.Quicksand = w.env_type;
         water.Layer = w.layer;
+        syncLayers_Water(numWater);
     }
 
-    A = 0;
-    for(auto &l : lvl.layers)
-    {
-        auto &layer = Layer[A];
-
-        layer = Layer_t();
-
-        layer.Name = l.name;
-        layer.Hidden = l.hidden;
-        if(layer.Hidden)
-        {
-            HideLayer(layer.Name, true);
-        }
-//        if(LevelEditor == true || MagicHand == true)
-//        {
-//            // Add into listbox
-//        }
-        A++;
-        numLayers++;
-        if(numLayers > maxLayers)
-        {
-            numLayers = maxLayers;
-            break;
-        }
-    }
+    // layers added earlier, will be hidden later
 
     A = 0;
     for(auto &e : lvl.events)
@@ -701,6 +700,20 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
     qSortBackgrounds(1, numBackground);
     UpdateBackgrounds();
     FindSBlocks();
+    syncLayers_AllBlocks();
+    syncLayers_AllBGOs();
+
+    // Do this before adding locks,
+    // which should reproduce an obscure vanilla bug
+    // that may not have been discovered yet.
+    for (A = 0; A < numLayers; A++)
+    {
+        auto &layer = Layer[A];
+        if(layer.Hidden)
+        {
+            HideLayer(layer.Name, true);
+        }
+    }
 
 
 //    if(LevelEditor == true || MagicHand == true)
@@ -793,6 +806,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
                 bgo.Location.Y = Warp[A].Entrance.Y - bgo.Location.Height;
                 bgo.Location.X = Warp[A].Entrance.X + Warp[A].Entrance.Width / 2.0 - bgo.Location.Width / 2.0;
                 bgo.Type = 160;
+                syncLayers_BGO(B);
             }
             else if(Warp[A].Effect == 2 && Warp[A].Locked) // For locks
             {
@@ -805,6 +819,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
                 bgo.Location = Warp[A].Entrance;
                 bgo.Type = 98;
                 bgo.Location.Width = 16;
+                syncLayers_BGO(B);
             }
         }
     }

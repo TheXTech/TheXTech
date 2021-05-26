@@ -31,6 +31,7 @@
 #include "../graphics.h"
 #include "../player.h"
 #include "../game_main.h"
+#include "../layers.h"
 
 #include <Utils/maths.h>
 #include <Logger/logger.h>
@@ -94,6 +95,7 @@ void DropBonus(int A)
             NPC[numNPCs].Effect2 = 1;
             NPC[numNPCs].Active = true;
             NPC[numNPCs].TimeLeft = 200;
+            syncLayers_NPC(numNPCs);
             CheckSectionNPC(numNPCs);
             Player[A].HeldBonus = 0;
             //            if(nPlay.Online == true)

@@ -37,6 +37,7 @@
 #include "control/joystick.h"
 #include "main/trees.h"
 #include "npc_id.h"
+#include "layers.h"
 
 #include <Utils/maths.h>
 
@@ -287,6 +288,7 @@ void DropNPC(int A, int NPCType)
         NPC[numNPCs].Effect = 2;
         NPC[numNPCs].Active = true;
         NPC[numNPCs].TimeLeft = 200;
+        syncLayers_NPC(numNPCs);
     }
 }
 
@@ -522,6 +524,7 @@ void NPCSpecial(int A)
             NPC[numNPCs].DefaultType = NPC[numNPCs].Type;
             NPC[numNPCs].Layer = npc.Layer;
             NPC[numNPCs].Shadow = npc.Shadow;
+            syncLayers_NPC(numNPCs);
         }
 
         if(npc.Special == 1.0)
@@ -832,6 +835,7 @@ void NPCSpecial(int A)
 
                     NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 1.6;
                     NPC[numNPCs].Location.SpeedY = NPC[numNPCs].Location.SpeedY * 1.6;
+                    syncLayers_NPC(numNPCs);
                 }
             }
 
@@ -1212,6 +1216,7 @@ void NPCSpecial(int A)
                     NPC[numNPCs].Location.SpeedY = 3;
                 else if(NPC[numNPCs].Location.SpeedY < -3)
                     NPC[numNPCs].Location.SpeedY = -3;
+                syncLayers_NPC(numNPCs);
             }
 
             npc.Special3 += 1;
@@ -1374,6 +1379,7 @@ void NPCSpecial(int A)
                     NPC[numNPCs].Location.SpeedY = 2;
                 else if(NPC[numNPCs].Location.SpeedY < -2)
                     NPC[numNPCs].Location.SpeedY = -2;
+                syncLayers_NPC(numNPCs);
             }
 
             npc.Special3 += 1;
@@ -1513,6 +1519,7 @@ void NPCSpecial(int A)
                 NPC[numNPCs].Section = npc.Section;
                 NPC[numNPCs].Location.SpeedX = (5 + dRand() * 3) * NPC[numNPCs].Direction;
                 NPC[numNPCs].Location.SpeedY = -5 - (dRand() * 3);
+                syncLayers_NPC(numNPCs);
             }
 
             npc.Location.SpeedX = 0;
@@ -1838,6 +1845,7 @@ void NPCSpecial(int A)
             NPC[numNPCs].Type = 210;
             NPC[numNPCs].Active = true;
             NPC[numNPCs].TimeLeft = 50;
+            syncLayers_NPC(numNPCs);
         }
     }
     else if(npc.Type == NPCID_SPARK || npc.Type == NPCID_METROID_ZOOMER || npc.Type == NPCID_SPIKE_TOP) // sparky
@@ -2254,6 +2262,7 @@ void NPCSpecial(int A)
                 NPC[numNPCs].Location.SpeedX = 7 * NPC[numNPCs].Direction;
                 NPC[numNPCs].Location.SpeedY = NPC[numNPCs].Location.SpeedY + dRand() * 6 - 3;
                 NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * (1 - (npc.Special3 / 140));
+                syncLayers_NPC(numNPCs);
             }
 
             if(npc.Special3 >= 120 + dRand() * 40)
@@ -2530,6 +2539,7 @@ void NPCSpecial(int A)
                 NPC[numNPCs].Layer = "Spawned NPCs";
                 NPC[numNPCs].Location.SpeedY = -8;
                 NPC[numNPCs].Location.SpeedX = 3 * NPC[numNPCs].Direction;
+                syncLayers_NPC(numNPCs);
             }
         }
         else if(npc.Special4 > 300 + dRand() * 50)
@@ -2572,6 +2582,7 @@ void NPCSpecial(int A)
                         NPC[numNPCs].Location.SpeedY = 1;
                     else if(NPC[numNPCs].Location.SpeedY < -1)
                         NPC[numNPCs].Location.SpeedY = -1;
+                    syncLayers_NPC(numNPCs);
                     PlaySound(SFX_BigFireball);
                 }
                 npc.Special = 2;
@@ -2839,6 +2850,7 @@ void NPCSpecial(int A)
             NPC[numNPCs].Location.Height = 16;
             NPC[numNPCs].Location.X = npc.Location.X + 8 + 16 * NPC[numNPCs].Direction;
             NPC[numNPCs].Location.Y = npc.Location.Y + 13;
+            syncLayers_NPC(numNPCs);
         }
     }
 
@@ -3323,6 +3335,7 @@ void SpecialNPC(int A)
 
                     NPC[numNPCs].Location.X = NPC[numNPCs].Location.X + NPC[numNPCs].Location.SpeedX * 4;
                     NPC[numNPCs].Location.Y = NPC[numNPCs].Location.Y + NPC[numNPCs].Location.SpeedY * 4;
+                    syncLayers_NPC(numNPCs);
                 }
             }
             else if(fiEqual(NPC[A].Special2, 3))
@@ -4151,6 +4164,7 @@ void SpecialNPC(int A)
             if(NPC[numNPCs].Direction == 1)
                 NPC[numNPCs].Frame = 4;
             NPC[numNPCs].FrameCount = (float)(iRand() % 8);
+            syncLayers_NPC(numNPCs);
             PlaySound(SFX_BigFireball);
         }
     // Hammer Bro
@@ -4220,6 +4234,7 @@ void SpecialNPC(int A)
             NPC[numNPCs].TimeLeft = 50;
             NPC[numNPCs].Location.SpeedY = -8;
             NPC[numNPCs].Location.SpeedX = 3 * NPC[numNPCs].Direction;
+            syncLayers_NPC(numNPCs);
         }
     // leaf
     }
@@ -4504,6 +4519,8 @@ void SpecialNPC(int A)
                 tempNPC = NPC[A];
                 NPC[A] = NPC[numNPCs];
                 NPC[numNPCs] = tempNPC;
+                syncLayers_NPC(numNPCs);
+                syncLayers_NPC(A);
                 PlaySound(SFX_HammerToss);
             }
         }
@@ -4809,6 +4826,7 @@ void SpecialNPC(int A)
                     NPC[numNPCs].TimeLeft = 100;
                     NPC[numNPCs].Section = NPC[A].Section;
                     NPC[numNPCs].Location.SpeedX = 4 * NPC[numNPCs].Direction;
+                    syncLayers_NPC(numNPCs);
                     PlaySound(SFX_BirdoSpit);
                 }
                 NPC[A].Special = 1;
@@ -5049,6 +5067,7 @@ void SpecialNPC(int A)
                     NPC[numNPCs].Special = 1;
                     NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 0.5;
                 }
+                syncLayers_NPC(numNPCs);
 
                 // tempNPC = NPC(A)
                 // NPC(A) = NPC(numNPCs)

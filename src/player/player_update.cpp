@@ -1203,6 +1203,7 @@ void UpdatePlayer()
                             NPC[numNPCs].Location.SpeedX = (Player[A].Location.SpeedX - NPC[Player[A].StandingOnNPC].Location.SpeedX) * 0.8;
                             NPC[numNPCs].CantHurt = 10;
                             NPC[numNPCs].CantHurtPlayer = A;
+                            syncLayers_NPC(numNPCs);
                             Player[A].Location.Y = Player[A].Location.Y + Player[A].Location.Height;
                             Player[A].Location.Height = Physics.PlayerHeight[Player[A].Character][Player[A].State];
                             Player[A].Location.Y = Player[A].Location.Y - Player[A].Location.Height;
@@ -1247,6 +1248,7 @@ void UpdatePlayer()
                             NPC[numNPCs].Location.SpeedX = 0;
                             NPC[numNPCs].CantHurt = 10;
                             NPC[numNPCs].CantHurtPlayer = A;
+                            syncLayers_NPC(numNPCs);
                             // If ShadowMode = True Then .Shadow = True
                             Player[A].Location.Height = Physics.PlayerHeight[Player[A].Character][Player[A].State];
                         }
@@ -1435,6 +1437,7 @@ void UpdatePlayer()
                                 NPC[numNPCs].Location.SpeedX = (Player[A].Location.SpeedX - NPC[Player[A].StandingOnNPC].Location.SpeedX) * 0.8;
                                 NPC[numNPCs].CantHurt = 10;
                                 NPC[numNPCs].CantHurtPlayer = A;
+                                syncLayers_NPC(numNPCs);
                                 Player[A].Location.Y = Player[A].Location.Y + Player[A].Location.Height;
                                 Player[A].Location.Height = Physics.PlayerHeight[Player[A].Character][Player[A].State];
                                 Player[A].Location.Y = Player[A].Location.Y - Player[A].Location.Height;
@@ -1486,6 +1489,7 @@ void UpdatePlayer()
                                 NPC[numNPCs].Location.SpeedX = 0;
                                 NPC[numNPCs].CantHurt = 10;
                                 NPC[numNPCs].CantHurtPlayer = A;
+                                syncLayers_NPC(numNPCs);
                                 Player[A].Location.Height = Physics.PlayerHeight[Player[A].Character][Player[A].State];
                             }
                         }
@@ -2102,6 +2106,7 @@ void UpdatePlayer()
                                     NPC[numNPCs].Location.SpeedX = 9 * Player[A].Direction + (Player[A].Location.SpeedX / 3);
                                 if(Player[A].StandingOnNPC != 0)
                                     NPC[numNPCs].Location.Y = NPC[numNPCs].Location.Y - Player[A].Location.SpeedY;
+                                syncLayers_NPC(numNPCs);
                                 CheckSectionNPC(numNPCs);
                             }
                         }
@@ -2940,6 +2945,7 @@ void UpdatePlayer()
                                 Player[A].GrabSpeed = 0;
                                 Block[B].Hidden = true;
                                 Block[B].Layer = "Destroyed Blocks";
+                                syncLayers_Block(B);
                                 NewEffect(10, Block[B].Location);
                                 Effect[numEffects].Location.SpeedY = -2;
                                 Player[A].GrabTime = 0;
@@ -3538,6 +3544,7 @@ void UpdatePlayer()
                                                     NPC[numNPCs].Location.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
                                                     NPC[numNPCs].Location.SpeedX = 4;
                                                     NPC[numNPCs].Location.SpeedY = 10;
+                                                    syncLayers_NPC(numNPCs);
                                                     numNPCs++;
                                                     NPC[numNPCs] = NPC_t();
                                                     NPC[numNPCs].Active = true;
@@ -3551,6 +3558,7 @@ void UpdatePlayer()
                                                     NPC[numNPCs].Location.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
                                                     NPC[numNPCs].Location.SpeedX = -4;
                                                     NPC[numNPCs].Location.SpeedY = 10;
+                                                    syncLayers_NPC(numNPCs);
                                                 }
                                                 if(NPC[B].Killed == 0 && Player[A].SpinJump == 0)
                                                     PlaySound(SFX_Stomp);

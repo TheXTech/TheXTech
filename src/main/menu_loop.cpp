@@ -362,6 +362,7 @@ void MenuLoop()
                     n.Location.X = Player[A].Location.X; // level[n.Section].X + 1000
                     n.TimeLeft = 100;
                     n.Section = Player[A].Section;
+                    syncLayers_NPC(numNPCs);
                 }
             }
 
