@@ -16,3 +16,6 @@
 [submodule "3rdparty/FreeImageLite"]
 	path = 3rdparty/FreeImageLite
 	url = https://github.com/WohlSoft/libFreeImage.git
+[submodule "3rdparty/tinyfiledialogs"]
+	path = 3rdparty/tinyfiledialogs
+	url = https://git.code.sf.net/p/tinyfiledialogs/code
