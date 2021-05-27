@@ -70,6 +70,9 @@ void ResetSectionScrolls();
 
 void SetSection(int i);
 
+void EditorBackup();
+void EditorRestore();
+
 // this sub handles the level editor
 // it is still called when the player is testing a level in the editor in windowed mode
 extern void UpdateEditor();

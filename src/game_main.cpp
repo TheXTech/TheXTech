@@ -279,6 +279,14 @@ int GameMain(const CmdLineSetup_t &setup)
             SetupEditorGraphics(); //Set up the editor graphics
             SetupScreens();
             MagicHand = false;
+            MouseRelease = false;
+            ScrollRelease = false;
+
+            // coming back from a level test
+            if(!WorldEditor)
+            {
+                EditorRestore();
+            }
 
             // Run the frame-loop
             runFrameLoop(&EditorLoop,

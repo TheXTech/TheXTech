@@ -3,6 +3,41 @@
 #include <vector>
 #include <DirManager/dirman.h>
 
+namespace Icon
+{
+    enum Icons : int
+    {
+        unk = 0,
+        left,
+        right,
+        up,
+        down,
+        bottom,
+        top,
+        check,
+        x,
+        lr,
+        ud,
+        hop,
+        target,
+        wave,
+        leap,
+        _10,
+        _1x,
+        pencil,
+        show,
+        hide,
+        toggle,
+        play,
+        save,
+        open,
+        newf,
+        page,
+        music,
+        move
+    };
+}
+
 class EditorScreen
 {
 private:

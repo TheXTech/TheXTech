@@ -10,8 +10,11 @@ const std::string GetTextInput(const std::string& prompt, const std::string& ini
         get = tinyfd_inputBox(prompt.c_str(), nullptr, " ");
     else
         get = tinyfd_inputBox(prompt.c_str(), nullptr, init.c_str());
+    SoundResumeAll();
     if (get == nullptr)
         return "";
-    SoundResumeAll();
+    // in case the extra space tripped someone up
+    if (get[0] == ' ')
+        return get+1;
     return get;
 }

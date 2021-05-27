@@ -78,6 +78,11 @@ bool enableAutoAlign = true;
 int last_vScreenX[maxSections+1];
 int last_vScreenY[maxSections+1];
 
+int last_vScreenX_b[maxSections+1];
+int last_vScreenY_b[maxSections+1];
+
+int curSection_b;
+
 void ResetSectionScrolls()
 {
     for (int i = 0; i <= maxSections; i++)
@@ -85,9 +90,9 @@ void ResetSectionScrolls()
         // initialize the section
         if (level[i].Height == level[i].Y)
         {
-            level[i].Height = ((20000 * (i - maxSections / 2)) / 32) * 32;
+            level[i].Height = (((20000 * 20)/maxSections * (i - maxSections / 2)) / 32) * 32;
             level[i].Y = level[i].Height - 600;
-            level[i].X = ((20000 * (i - maxSections / 2)) / 32) * 32;
+            level[i].X = (((20000 * 20)/maxSections * (i - maxSections / 2)) / 32) * 32;
             level[i].Width = level[i].X + 800;
         }
 
@@ -115,6 +120,31 @@ void SetSection(int i)
     curSection = i;
     vScreenY[1] = last_vScreenY[curSection];
     vScreenX[1] = last_vScreenX[curSection];
+}
+
+void EditorBackup()
+{
+    for(int i = 0; i <= maxSections; i++)
+    {
+        last_vScreenX_b[i] = last_vScreenX[i];
+        last_vScreenY_b[i] = last_vScreenY[i];
+    }
+    curSection_b = curSection;
+}
+
+void EditorRestore()
+{
+    for(int i = 0; i <= maxSections; i++)
+    {
+        last_vScreenX[i] = last_vScreenX_b[i];
+        last_vScreenY[i] = last_vScreenY_b[i];
+    }
+    curSection = curSection_b;
+    vScreenX[1] = last_vScreenX_b[curSection];
+    vScreenY[1] = last_vScreenY_b[curSection];
+    SetSection(curSection);
+    vScreenX[1] = last_vScreenX_b[curSection];
+    vScreenY[1] = last_vScreenY_b[curSection];
 }
 
 // this sub handles the level editor
@@ -1754,6 +1784,7 @@ void GetEditorControls()
 #ifdef NEW_EDITOR
     if(!WorldEditor && EditorControls.TestPlay)
     {
+        EditorBackup();
         Backup_FullFileName = FullFileName;
         FullFileName = FullFileName + "tst";
         SaveLevel(FullFileName);
@@ -2030,7 +2061,7 @@ void SetCursor()
         EditorCursor.Location.Height = 32;
         EditorCursor.WorldPath.Location = EditorCursor.Location;
     }
-    else if(EditorCursor.Mode == 11) // World Music
+    else if(EditorCursor.Mode == OptCursor_t::WLD_MUSIC) // World Music
     {
         EditorCursor.Location.Height = 32;
         EditorCursor.Location.Width = 32;
