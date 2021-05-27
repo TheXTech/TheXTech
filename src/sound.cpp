@@ -222,7 +222,7 @@ static void AddSfx(const std::string &root,
                 SI_Chunk* backup = m.chunk;
                 bool backup_isSilent = m.isSilent;
                 m.customPath = newPath;
-                bool no_preload = !SI_NoPreload((root + f).c_str());
+                bool no_preload = SI_NoPreload((root + f).c_str());
                 if(!no_preload && !isSilent)
                     m.chunk = SI_LoadWAV((root + f).c_str());
                 if(no_preload || m.chunk || isSilent)
@@ -251,7 +251,7 @@ static void AddSfx(const std::string &root,
             m.volume = 128;
             m.isSilent = isSilent;
             pLogDebug("Adding SFX [%s] '%s'", alias.c_str(), isSilent ? "<silence>" : m.path.c_str());
-            bool no_preload = !SI_NoPreload(m.path.c_str());
+            bool no_preload = SI_NoPreload(m.path.c_str());
             if(!isSilent && !no_preload)
                 m.chunk = SI_LoadWAV(m.path.c_str());
             m.channel = -1;
@@ -367,7 +367,7 @@ void StartMusic(int A, int fadeInMs)
 
     SI_KillMusic();
 
-    if(LevelSelect && !GameMenu && !GameOutro) // music on the world map
+    if((LevelSelect || WorldEditor) && !GameMenu && !GameOutro) // music on the world map
     {
         curWorldMusic = A;
         std::string mus = fmt::format_ne("wmusic{0}", A);
