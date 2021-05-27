@@ -762,8 +762,14 @@ bool mainMenuUpdate()
                 }
             }
 
-            if(MenuMode > MENU_MAIN)
+            if(MenuMode >= MENU_CHARACTER_SELECT_BASE && MenuMode <= MENU_CHARACTER_SELECT_BASE_END)
             {
+                while(((MenuMode == MENU_CHARACTER_SELECT_2P_S2 || MenuMode == MENU_CHARACTER_SELECT_BM_S2) && MenuCursor == PlayerCharacter - 1) ||
+                       blockCharacter[MenuCursor + 1])
+                {
+                    MenuCursor += 1;
+                }
+
                 if(MenuCursor > numCharacters - 1)
                 {
                     MenuCursor = 0;
@@ -786,16 +792,7 @@ bool mainMenuUpdate()
                         MenuCursor -= 1;
                     }
                 }
-            }
 
-            while(((MenuMode == MENU_CHARACTER_SELECT_2P_S2 || MenuMode == MENU_CHARACTER_SELECT_BM_S2) && MenuCursor == PlayerCharacter - 1) ||
-                   blockCharacter[MenuCursor + 1])
-            {
-                MenuCursor += 1;
-            }
-
-            if(MenuMode >= MENU_CHARACTER_SELECT_BASE && MenuMode <= MENU_CHARACTER_SELECT_BASE_END)
-            {
                 if(MenuCursor >= numCharacters)
                 {
                     MenuCursor = 0;
@@ -926,6 +923,11 @@ bool mainMenuUpdate()
                             OpenWorld(SelectWorldEditable[selWorld].WorldPath
                                 + SelectWorldEditable[selWorld].WorldFile);
                             editorScreen.ResetCursor();
+#ifdef __3DS__
+                            editorScreen.active = true;
+#else
+                            editorScreen.active = false;
+#endif
                             return true;
                         }
                     }
@@ -1820,7 +1822,7 @@ void mainMenuDraw()
     int B = 0;
     int C = 0;
 
-    if(MenuMode != MENU_1PLAYER_GAME && MenuMode != MENU_2PLAYER_GAME && MenuMode != MENU_BATTLE_MODE)
+    if(MenuMode != MENU_1PLAYER_GAME && MenuMode != MENU_2PLAYER_GAME && MenuMode != MENU_BATTLE_MODE && MenuMode != MENU_EDITOR)
         worldCurs = 0;
 
 #ifdef __3DS__
@@ -2029,12 +2031,6 @@ void mainMenuDraw()
 
             if(worldCurs > original_maxShow - 4)
                 worldCurs = original_maxShow - 4;
-
-            if(maxShow >= original_maxShow)
-            {
-                maxShow = original_maxShow;
-                minShow = original_maxShow - 4;
-            }
 
             minShow = worldCurs;
             maxShow = minShow + 4;

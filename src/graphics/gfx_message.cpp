@@ -42,7 +42,7 @@ void DrawMessage()
         {
             auto c = SuperText[size_t(i) - 1];
 
-            if((lastWord == 0 && i == lineStart+maxChars) || i == int(SuperText.size()) || c == '\n')
+            if((lastWord == lineStart && i == lineStart+maxChars) || i == int(SuperText.size()) || c == '\n')
             {
                 lastWord = i;
                 break;

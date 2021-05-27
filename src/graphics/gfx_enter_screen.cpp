@@ -63,6 +63,9 @@ void GameThing()
     PlayerFrame(2);
 
     frmMain.clearBuffer();
+#ifdef __3DS__
+    frmMain.initDraw(0);
+#endif
 
     for(A = 1; A <= numPlayers; A++)
     {

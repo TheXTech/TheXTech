@@ -449,7 +449,13 @@ void PauseGame(int plr)
                                 StopMusic();
                                 DoEvents();
                                 if(Backup_FullFileName.empty())
+                                {
                                     KillIt(); // Quit the game entirely
+                                }
+                                else
+                                {
+                                    LevelBeatCode = -1; // Return to editor
+                                }
                                 break;
                             default:
                                 break;

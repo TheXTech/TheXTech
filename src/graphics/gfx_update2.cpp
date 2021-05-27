@@ -753,24 +753,19 @@ void UpdateGraphics2(bool skipRepaint)
                 frmMain.renderTexture(ScreenW/2 - 190 + 42, ScreenH/2 - 100 + 75 + (MenuCursor * 35), 16, 16, GFX.MCursor[0], 0, 0);
             }
         }
-
-        if(PrintFPS > 0)
-            SuperPrint(std::to_string(int(PrintFPS)), 1, 8, 8, 0.f, 1.f, 0.f);
-
-        g_stats.print();
-
-        speedRun_render();
-
-        if(!skipRepaint)
-            frmMain.repaint();
-        else
-        {
-            frmMain.clearBuffer();
-            frmMain.repaint();
-        }
-
-        frmMain.setTargetScreen();
     }
+
+    if(PrintFPS > 0)
+        SuperPrint(std::to_string(int(PrintFPS)), 1, 8, 8, 0.f, 1.f, 0.f);
+
+    g_stats.print();
+
+    speedRun_render();
+
+    if(!skipRepaint)
+        frmMain.repaint();
+
+    frmMain.setTargetScreen();
 
     if(TakeScreen)
         ScreenShot();

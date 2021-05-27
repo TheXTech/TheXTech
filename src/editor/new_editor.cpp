@@ -1,3 +1,5 @@
+#ifdef NEW_EDITOR
+
 #include <algorithm>
 
 #include "../globals.h"
@@ -3404,35 +3406,35 @@ void EditorScreen::UpdateFileScreen()
         }
         if (confirmed)
         {
-            if (m_special_subpage == 1)
+            if (m_special_subpage == 1) // new level
             {
                 StartFileBrowser(&FullFileName, "", FileNamePath, {".lvl"}, BROWSER_MODE_SAVE_NEW, BROWSER_CALLBACK_NEW_LEVEL);
             }
-            else if (m_special_subpage == 2)
+            else if (m_special_subpage == 2) // open level
             {
                 StartFileBrowser(&FullFileName, "", FileNamePath, {".lvl"}, BROWSER_MODE_OPEN, BROWSER_CALLBACK_OPEN_LEVEL);
             }
-            else if (m_special_subpage == 3)
+            else if (m_special_subpage == 3) // revert level
             {
                 OpenLevel(FullFileName);
                 m_special_page = SPECIAL_PAGE_FILE;
                 m_special_subpage = 0;
             }
-            else if (m_special_subpage == 11)
+            else if (m_special_subpage == 11) // new world
             {
                 StartFileBrowser(&FullFileName, "", FileNamePath, {".wld"}, BROWSER_MODE_SAVE_NEW, BROWSER_CALLBACK_NEW_WORLD);
             }
-            else if (m_special_subpage == 12)
+            else if (m_special_subpage == 12) // open world
             {
                 StartFileBrowser(&FullFileName, "", FileNamePath, {".wld"}, BROWSER_MODE_OPEN, BROWSER_CALLBACK_OPEN_WORLD);
             }
-            else if (m_special_subpage == 13)
+            else if (m_special_subpage == 13) // revert world
             {
                 OpenWorld(FullFileName);
                 m_special_page = SPECIAL_PAGE_FILE;
                 m_special_subpage = 0;
             }
-            else if (m_special_subpage == 4)
+            else if (m_special_subpage == 4) // exit
             {
                 ClearLevel();
                 ClearWorld();
@@ -3843,7 +3845,13 @@ void EditorScreen::UpdateSelectorBar(bool level_screen)
     int sx;
     if (level_screen)
     {
-        sx = 100;
+#ifndef __3DS__
+        MenuMouseX = EditorCursor.X;
+        MenuMouseY = EditorCursor.Y;
+        if(WorldEditor)
+            MenuMouseY += 8;
+#endif
+        sx = (ScreenW - e_ScreenW)/2;
     }
     else
         sx = 0;
@@ -4060,6 +4068,10 @@ void EditorScreen::UpdateSelectorBar(bool level_screen)
         optCursor.current = EditorCursor.Mode;
         m_last_mode = EditorCursor.Mode;
     }
+#ifndef __3DS__
+    if(MenuMouseY < 40 && MenuMouseX >= sx && MenuMouseX < sx+e_ScreenW)
+        frmMain.renderTexture(MenuMouseX, MenuMouseY, GFX.ECursor[2]);
+#endif
 }
 
 void EditorScreen::UpdateEditorScreen()
@@ -4068,6 +4080,11 @@ void EditorScreen::UpdateEditorScreen()
 #ifdef __3DS__
     frmMain.initDraw(1);
 #else
+    MenuMouseX = EditorCursor.X;
+    MenuMouseY = EditorCursor.Y;
+    if(WorldEditor)
+        MenuMouseY += 8;
+    MenuMouseX -= ScreenW/2-e_ScreenW/2;
     frmMain.setViewport(ScreenW/2-e_ScreenW/2, 0, e_ScreenW, e_ScreenH);
 #endif
     frmMain.renderRect(0, 0, e_ScreenW, e_ScreenH, 0.4f, 0.4f, 0.8f, 1.0f, true);
@@ -4121,8 +4138,12 @@ void EditorScreen::UpdateEditorScreen()
         SuperPrint("Y: "+std::to_string(32*(int)std::floor(EditorCursor.Location.Y/32)), 3, 10, 100);
         SuperPrint("IN WORLD COORDINATES.", 3, 40, 140);
     }
-    // frmMain.renderTexture(MenuMouseX, MenuMouseY, GFX.ECursor[2]);
+#ifndef __3DS__
+    frmMain.renderTexture(MenuMouseX, MenuMouseY, GFX.ECursor[2]);
+#endif
     MenuMouseRelease = false;
 }
 
 EditorScreen editorScreen;
+
+#endif // #ifdef NEW_EDITOR

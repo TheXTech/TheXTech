@@ -16,7 +16,7 @@ void DrawEditorLevel(int Z)
     int D;
     int E;
     Location_t tempLocation;
-    int S = 0; // Level section to display
+    int S = curSection; // Level section to display
 
 #ifdef __3DS__
     frmMain.setLayer(2);
@@ -191,11 +191,14 @@ void DrawEditorLevel(int Z)
 #ifdef __3DS__
     frmMain.setLayer(3);
 #endif
-    // if (editorScreen.active && !MessageText.empty())
-    if(!MessageText.empty()) // In-Editor message box preview
+
+#ifdef NEW_EDITOR
+    // In-Editor message box preview
+    if (editorScreen.active && !MessageText.empty())
     {
         DrawMessage();
     }
+#endif
 
     // Display the cursor
     {

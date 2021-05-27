@@ -267,9 +267,6 @@ int GameMain(const CmdLineSetup_t &setup)
             showCursor(1);
         }
 
-//        If LevelEditor = True Then 'Load the level editor
-//            [USELESS!]
-
         if(LevelEditor) // Load the level editor
         {
             if(resChanged)
@@ -290,6 +287,7 @@ int GameMain(const CmdLineSetup_t &setup)
                         nullptr,
                         nullptr);
 
+            MenuMode = MENU_INTRO;
             LevelEditor = false;
             WorldEditor = false;
             frmMain.clearBuffer();
@@ -770,11 +768,17 @@ int GameMain(const CmdLineSetup_t &setup)
 //            If TestLevel = True Then
             if(TestLevel)
             {
+                if(LevelBeatCode == 0)
+                {
+                    // restart level if lost
+                    GameThing();
+                    PGE_Delay(500);
+                    zTestLevel(setup.testMagicHand, setup.interprocess); // Restart level
+                }
                 // if called from the new editor, return to editor
-                if(!Backup_FullFileName.empty())
+                else if(!Backup_FullFileName.empty())
                 {
                     TestLevel = false;
-                    LevelSelect = false;
                     LevelEditor = true;
 
                     OpenLevel(FullFileName);
@@ -784,45 +788,13 @@ int GameMain(const CmdLineSetup_t &setup)
                         FullFileName = Backup_FullFileName;
                         Backup_FullFileName = "";
                     }
-                    LevelSelect = false;
                 }
                 else
                 {
-                    if(LevelBeatCode != 0)
-                        GameIsActive = false;
-                    else
-                    {
-                        GameThing();
-                        PGE_Delay(500);
-                        zTestLevel(setup.testMagicHand, setup.interprocess); // Restart level
-                    }
-
-                    LevelBeatCode = 0;
+                    GameIsActive = false;
                 }
 
-//                If nPlay.Online = False Then
-//                    OpenLevel FullFileName
-//                OpenLevel(FullFileName);
-//                Else
-//                    If nPlay.Mode = 1 Then
-//                        Netplay.sendData "H0" & LB
-//                        If Len(FullFileName) > 4 Then
-//                            If LCase(Right(FullFileName, 4)) = ".lvl" Then
-//                                OpenLevel FullFileName
-//                            Else
-//                                For A = 1 To 15
-//                                    If nPlay.ClientCon(A) = True Then Netplay.InitSync A
-//                                Next A
-//                            End If
-//                        Else
-//                            For A = 1 To 15
-//                                If nPlay.ClientCon(A) = True Then Netplay.InitSync A
-//                            Next A
-//                        End If
-//                    End If
-//                End If
-
-//                LevelSelect = False
+                LevelBeatCode = 0;
                 LevelSelect = false;
             }
 //            Else
@@ -854,6 +826,7 @@ void EditorLoop()
         UpdateGraphics2(true);
     else
         UpdateGraphics(true);
+    frmMain.setTargetTexture();
 #if defined(NEW_EDITOR) && defined(__3DS__)
     editorScreen.UpdateSelectorBar(true);
     editorScreen.UpdateEditorScreen();
@@ -863,6 +836,7 @@ void EditorLoop()
     else
         editorScreen.UpdateSelectorBar(true);
 #endif
+    frmMain.setTargetScreen();
     frmMain.repaint();
     UpdateSound();
 }

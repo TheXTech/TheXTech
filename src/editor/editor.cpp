@@ -2,7 +2,6 @@
  * TheXTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
- * Copyright (c) 2020-2021 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the "Software"),
@@ -41,6 +40,7 @@
 #include "../graphics.h"
 #include "../sound.h"
 #include "../collision.h"
+#include "../layers.h"
 #include "../npc.h"
 #include "../blocks.h"
 #include "../sorting.h"
@@ -49,8 +49,16 @@
 #include "../game_main.h"
 #include "../main/level_file.h"
 #include "../load_gfx.h"
+#include "../control/joystick.h"
+#include "../main/trees.h"
 
-#include "pseudo_vb.h"
+#include "../pseudo_vb.h"
+
+#ifdef NEW_EDITOR
+#include "write_level.h"
+#include "write_world.h"
+#include "new_editor.h"
+#endif
 
 static int ScrollDelay = 0; // slows down the camera movement when scrolling through a level
 //Public Declare Function GetCursorPos Lib "user32" (lpPoint As POINTAPI) As long long;
@@ -67,12 +75,12 @@ OptCursor_t optCursor;
 
 bool enableAutoAlign = true;
 
-int last_vScreenX[21];
-int last_vScreenY[21];
+int last_vScreenX[maxSections+1];
+int last_vScreenY[maxSections+1];
 
 void ResetSectionScrolls()
 {
-    for (int i = 0; i < 21; i++)
+    for (int i = 0; i <= maxSections; i++)
     {
         // initialize the section
         if (level[i].Height == level[i].Y)
@@ -109,7 +117,6 @@ void SetSection(int i)
     vScreenX[1] = last_vScreenX[curSection];
 }
 
-
 // this sub handles the level editor
 // it is still called when the player is testing a level in the editor in windowed mode
 void UpdateEditor()
@@ -126,7 +133,8 @@ void UpdateEditor()
 //        frmLevelDebugger::UpdateDisplay;
     GameMenu = false;
 
-    if(!EditorControls.MouseClick)
+    GetEditorControls();
+    if(!EditorControls.MouseClick && !EditorControls.SwitchScreens)
         MouseRelease = true;
 
     if(LevelEditor == true)
@@ -159,9 +167,8 @@ void UpdateEditor()
             {
                 ScrollRelease = false;
 //                frmLevelSettings::optSection(curSection).Value = false;
-                curSection--;
-                if(curSection < 0)
-                    curSection = 0;
+                if(curSection != 0)
+                    SetSection(curSection - 1);
 //                if(EditorCursor.Mode == 2)
 //                    frmLevelSettings::optSection(curSection).Value = true;
             }
@@ -172,9 +179,8 @@ void UpdateEditor()
             {
                 ScrollRelease = false;
 //                frmLevelSettings::optSection(curSection).Value = false;
-                curSection++;
-                if(curSection > 20)
-                    curSection = 20;
+                if(curSection != maxSections)
+                    SetSection(curSection + 1);
 //                if(EditorCursor.Mode == 2)
 //                    frmLevelSettings::optSection(curSection).Value = true;
             }
@@ -190,37 +196,10 @@ void UpdateEditor()
     else
     {
         curSection = Player[1].Section;
-//        frmLevelSettings::optSection(Player(1).Section).Value = true;
     }
-
-//    if(WorldEditor == true)
-//    {
-//        frmLevelEditor::mnuWorldEditor.Enabled = false;
-//        frmLevelEditor::mnuLevelEditor.Enabled = true;
-//        frmLevelEditor::menuView.Visible = false;
-//        frmLevelEditor::MenuTest.Visible = false;
-//        frmLevelEditor::picLevel.Visible = false;
-//        frmLevelEditor::picWorld.Visible = true;
-//    }
-//    else
-//    {
-//        frmLevelEditor::mnuWorldEditor.Enabled = true;
-//        frmLevelEditor::mnuLevelEditor.Enabled = false;
-//        frmLevelEditor::menuView.Visible = true;
-//        frmLevelEditor::MenuTest.Visible = true;
-//        frmLevelEditor::picWorld.Visible = false;
-//        frmLevelEditor::picLevel.Visible = true;
-//    }
-//    GetCursorPos(CursorPos);
-    CursorPos.X = MenuMouseX;
-    CursorPos.Y = MenuMouseY;
-
-    if(!frmMain.hasWindowMouseFocus() || CursorPos.X < 0 || CursorPos.Y > ScreenW || CursorPos.Y < 0 || CursorPos.Y > ScreenH)
-        HideCursor();
 
     if(LevelEditor || MagicHand)
     {
-        GetEditorControls();
         if(EditorControls.FastScroll)
             ScrollDelay = 0;
 
@@ -272,12 +251,15 @@ void UpdateEditor()
             UpdateInterprocess();
 #endif
 
+#ifdef NEW_EDITOR
+        if(EditorControls.MouseClick && !editorScreen.active && EditorCursor.Y > 40)
+#else
         if(EditorControls.MouseClick)
+#endif
         {
             CanPlace = true;
             if(EditorCursor.Mode == OptCursor_t::LVL_SELECT || EditorCursor.Mode == 14)
             {
-#if 0 // Forbidden while level testing
                 if(MouseRelease && !MagicHand) // Player start points
                 {
                     for(A = 1; A <= 2; A++)
@@ -289,8 +271,8 @@ void UpdateEditor()
                             PlayerStart[A].X = 0;
                             PlayerStart[A].Y = 0;
                             optCursor.current = 2;
-//                            frmLevelSettings::optLevel(3 + A).Value = true;
                             EditorCursor.Mode = 2;
+                            EditorCursor.SubMode = 3 + A;
                             MouseMove(EditorCursor.X, EditorCursor.Y);
                             MouseRelease = false;
                             EditorControls.MouseClick = false; /* Simulate "Focus out" inside of SMBX Editor */
@@ -298,7 +280,6 @@ void UpdateEditor()
                         }
                     }
                 }
-#endif
 
                 if(MouseRelease) // NPCs
                 {
@@ -314,141 +295,10 @@ void UpdateEditor()
                             PlaySound(SFX_Grab);
                             B = 0;
 //                            frmLevelEditor::optCursor(4).Value = true;
-                            optCursor.current = 4;
+                            optCursor.current = OptCursor_t::LVL_NPCS;
                             OptCursorSync();
 
-//                            if(NPC[A].Type == 91 || NPC[A].Type == 284 || NPC[A].Type == 283 ||
-//                               (NPC[A].Type == 96 && NPC[A].Special != 0.0 && !fEqual(NPC[A].Special, 96)))
-//                            {
-//                                if(NPC[A].Special > 0)
-//                                {
-////                                    while(frmNPCs::NPC(NPC[A].Special).Visible == false)
-////                                    {
-////                                        frmNPCs::optGame(B).Value = true;
-////                                        B = B + 1;
-////                                        if(B > frmNPCs::optGame.Count - 1)
-////                                            break;
-////                                    }
-//                                }
-//                            }
-//                            else
-//                            {
-////                                while(frmNPCs::NPC(NPC[A].Type).Visible == false)
-////                                {
-////                                    frmNPCs::optGame(B).Value = true;
-////                                    B = B + 1;
-////                                    if(B > frmNPCs::optGame.Count - 1)
-////                                        break;
-////                                }
-//                            }
-
-//                            frmNPCs::NPC(NPC[A].Type).Value = true;
-//                            frmNPCs.NPCText = NPC[A].Text;
-//                            if(NPC[A].Inert == true)
-//                                frmNPCs::Friendly.Caption = "Yes";
-//                            else
-//                                frmNPCs::Friendly.Caption = "No";
-//                            if(NPC[A].Stuck == true)
-//                                frmNPCs::DontMove.Caption = "Yes";
-//                            else
-//                                frmNPCs::DontMove.Caption = "No";
-//                            if(NPC[A].Legacy == true)
-//                            {
-//                                frmNPCAdvanced::Legacy.Caption = "Yes";
-//                                frmNPCAdvanced::Show;
-//                            }
-//                            else
-//                                frmNPCAdvanced::Legacy.Caption = "No";
-
-//                            if(NPC[A].Type == 288 || NPC[A].Type == 289 || (NPC[A].Type == 91 && NPC[A].Special == 288))
-//                            {
-//                                frmNPCAdvanced::Show;
-//                                frmNPCAdvanced::WarpSection.ListIndex = NPC[A].Special2;
-//                                frmNPCAdvanced::WarpSection.Text = frmNPCAdvanced::WarpSection::List(frmNPCAdvanced::WarpSection::ListIndex);
-//                            }
-//                            frmAdvanced.AttLayer = NPC[A].AttLayer;
-//                            if(frmAdvanced::AttLayer != "")
-//                                frmAdvanced::Show;
-//                            frmAdvanced.TriggerActivate = NPC[A].TriggerActivate;
-//                            frmAdvanced.TriggerDeath = NPC[A].TriggerDeath;
-//                            frmAdvanced.TriggerTalk = NPC[A].TriggerTalk;
-//                            frmAdvanced.TriggerLast = NPC[A].TriggerLast;
-//                            if(frmAdvanced::TriggerActivate != "" || frmAdvanced::TriggerDeath != "" || frmAdvanced::TriggerTalk != "" || frmAdvanced::TriggerLast != "")
-//                                frmAdvanced::Show;
-//                            if(NPC[A].Generator == true)
-//                            {
-//                                frmGenerator::Show;
-//                                frmGenerator::Spawn.Caption = "Yes";
-//                                frmGenerator::scrDelay.Value = NPC[A].GeneratorTimeMax;
-//                                frmGenerator::optEffect(NPC[A].GeneratorEffect).Value = true;
-//                                frmGenerator::optSpawnDirection(NPC[A].GeneratorDirection).Value = true;
-//                                frmGenerator::CheckSpawn;
-//                            }
-//                            else
-//                                frmGenerator::Spawn.Caption = "No";
-//                            if(NPC[A].Type == 91)
-//                            {
-//                                frmNPCs::Buried.Caption = "Yes";
-//                                if(NPC[A].Special > 0)
-//                                    frmNPCs::NPC(NPC[A].Special).Value = true;
-//                            }
-//                            else
-//                                frmNPCs::Buried.Caption = "No";
-
-//                            if(NPC[A].Type == 283)
-//                            {
-//                                frmNPCs::Bubble.Caption = "Yes";
-//                                if(NPC[A].Special > 0)
-//                                    frmNPCs::NPC(NPC[A].Special).Value = true;
-//                            }
-//                            else
-//                                frmNPCs::Bubble.Caption = "No";
-
-//                            if(NPC[A].Type == 284)
-//                            {
-//                                frmNPCs::Lakitu.Caption = "Yes";
-//                                if(NPC[A].Special > 0)
-//                                    frmNPCs::NPC(NPC[A].Special).Value = true;
-//                            }
-//                            else
-//                                frmNPCs::Lakitu.Caption = "No";
-
-//                            if(NPC[A].Type == 96)
-//                            {
-//                                if(NPC[A].Special != 0 && NPC[A].Special != 96)
-//                                {
-//                                    frmNPCs::Egg.Caption = "Yes";
-//                                    if(NPC[A].Special > 0)
-//                                        frmNPCs::NPC(NPC[A].Special).Value = true;
-//                                }
-//                            }
-//                            else
-//                                frmNPCs::Egg.Caption = "No";
-//                            if(NPCIsAParaTroopa(NPC[A].Type) == true)
-//                            {
-//                                frmNPCAdvanced::cmbPara.ListIndex = NPC[A].Special;
-//                                frmNPCAdvanced::Show;
-//                            }
-//                            if(NPCIsCheep(NPC[A].Type) == true)
-//                            {
-//                                frmNPCAdvanced::cmbCheep.ListIndex = NPC[A].Special;
-//                                frmNPCAdvanced::Show;
-//                            }
-//                            if(NPC[A].Type == 260)
-//                            {
-//                                frmNPCAdvanced::scrFire.Value = NPC[A].Special;
-//                                frmNPCAdvanced::Show;
-//                            }
-//                            for(B = 0; B < frmLayers::lstLayer::ListCount; B++)
-//                            {
-//                                if(NPC[A].Layer.ToLower() == frmLayers::lstLayer::List(B).ToLower())
-//                                {
-//                                    frmLayers::lstLayer.ListIndex = B;
-//                                    break;
-//                                }
-//                            }
-//                            frmNPCs::optNPCDirection(NPC[A].Direction + 1).Value = true;
-                            EditorCursor.Mode = 4;
+                            EditorCursor.Mode = OptCursor_t::LVL_NPCS;
                             ResetNPC(A);
                             EditorCursor.NPC = NPC[A];
                             EditorCursor.NPC.Hidden = false;
@@ -459,6 +309,9 @@ void UpdateEditor()
                             SetCursor();
 //                            Netplay::sendData Netplay::EraseNPC(A, 1) + "p23" + LB;
                             KillNPC(A, 9);
+#ifdef NEW_EDITOR
+                            editorScreen.FocusNPC();
+#endif
                             MouseRelease = false;
                             EditorControls.MouseClick = false; /* Simulate "Focus out" inside of SMBX Editor */
                             tempBool = true;
@@ -478,86 +331,10 @@ void UpdateEditor()
                             {
                                 PlaySound(SFX_Grab);
 //                                frmLevelEditor::optCursor(1).Value = true;
-                                optCursor.current = 1;
+                                optCursor.current = OptCursor_t::LVL_BLOCKS;
                                 OptCursorSync();
-//                                B = 0;
-//                                while(frmBlocks::Block(Block[A].Type).Visible == false)
-//                                {
-//                                    if(B > frmBlocks::optGame.Count - 1)
-//                                        break;
-//                                    frmBlocks::optGame(B).Value = true;
-//                                    if(B == 0)
-//                                    {
-//                                        for(C = 0; C < frmBlocks::SMB3.Count; C++)
-//                                        {
-//                                            frmBlocks::optSMB3(C).Value = true;
-//                                            if(frmBlocks::Block(Block[A].Type).Visible == true)
-//                                                break;
-//                                        }
-//                                    }
-//                                    if(B == 1)
-//                                    {
-//                                        for(C = 0; C < frmBlocks::SMB2.Count; C++)
-//                                        {
-//                                            frmBlocks::optSMB2(C).Value = true;
-//                                            if(frmBlocks::Block(Block[A].Type).Visible == true)
-//                                                break;
-//                                        }
-//                                    }
-//                                    if(B == 2)
-//                                    {
-//                                        for(C = 0; C < frmBlocks::SMB1.Count; C++)
-//                                        {
-//                                            frmBlocks::optSMB1(C).Value = true;
-//                                            if(frmBlocks::Block(Block[A].Type).Visible == true)
-//                                                break;
-//                                        }
-//                                    }
-//                                    if(B == 3)
-//                                    {
-//                                        for(C = 0; C < frmBlocks::SMW.Count; C++)
-//                                        {
-//                                            frmBlocks::optSMW(C).Value = true;
-//                                            if(frmBlocks::Block(Block[A].Type).Visible == true)
-//                                                break;
-//                                        }
-//                                    }
-//                                    if(B == 4)
-//                                    {
-//                                        for(C = 0; C < frmBlocks::Misc.Count; C++)
-//                                        {
-//                                            frmBlocks::optMisc(C).Value = true;
-//                                            if(frmBlocks::Block(Block[A].Type).Visible == true)
-//                                                break;
-//                                        }
-//                                    }
-//                                    B = B + 1;
-//                                }
-//                                frmBlocks::Block(Block[A].Type).Value = true;
-//                                frmAdvancedBlock::TriggerHit.Text = Block[A].TriggerHit;
-//                                frmAdvancedBlock::TriggerDeath.Text = Block[A].TriggerDeath;
-//                                frmAdvancedBlock.TriggerLast = Block[A].TriggerLast;
-//                                if(Block[A].Special >= 1 && Block[A].Special <= 99)
-//                                    frmBlocks::optBlockS.Value = -Block[A].Special;
-//                                else if(Block[A].Special > 1000)
-//                                    frmBlocks::optBlockS.Value = Block[A].Special - 1000;
-//                                if(Block[A].Invis == true)
-//                                    frmBlocks::cmdInvis.Caption = "Yes";
-//                                else
-//                                    frmBlocks::cmdInvis.Caption = "No";
-//                                if(Block[A].Slippy == true)
-//                                    frmBlocks::cmdSlip.Caption = "Yes";
-//                                else
-//                                    frmBlocks::cmdSlip.Caption = "No";
-//                                for(B = 0; B < frmLayers::lstLayer::ListCount; B++)
-//                                {
-//                                    if(Block[A].Layer.ToLower() == frmLayers::lstLayer::List(B).ToLower())
-//                                    {
-//                                        frmLayers::lstLayer.ListIndex = B;
-//                                        break;
-//                                    }
-//                                }
-                                EditorCursor.Mode = 1;
+
+                                EditorCursor.Mode = OptCursor_t::LVL_BLOCKS;
                                 EditorCursor.Block = Block[A];
                                 EditorCursor.Layer = Block[A].Layer;
                                 EditorCursor.Location.X = Block[A].Location.X;
@@ -565,18 +342,21 @@ void UpdateEditor()
                                 EditorCursor.Location.Width = Block[A].Location.Width;
                                 EditorCursor.Location.Height = Block[A].Location.Height;
                                 SetCursor();
-//                                Netplay::sendData Netplay::EraseBlock(A, 1);
                                 KillBlock(A, false);
+#ifdef NEW_EDITOR
+                                editorScreen.FocusBlock();
+#endif
                                 MouseRelease = false;
                                 EditorControls.MouseClick = false; /* Simulate "Focus out" inside of SMBX Editor */
                                 FindSBlocks();
+                                // ugh
+                                syncLayers_AllBlocks();
                                 break;
                             }
                         }
                     }
                 }
 
-#if 0 // Forbidded in level testing
                 if(MouseRelease && !MagicHand) // Warps
                 {
                     for(A = 1; A <= numWarps; A++)
@@ -584,106 +364,40 @@ void UpdateEditor()
                         if(CursorCollision(EditorCursor.Location, Warp[A].Entrance) && Warp[A].Hidden == false)
                         {
                             PlaySound(SFX_Grab);
-//                            Warp[A].PlacedEnt = false;
-//                            if(Warp[A].NoYoshi == true)
-//                                frmWarp.cmdYoshi.Caption = "Yes";
-//                            else
-//                                frmWarp.cmdYoshi.Caption = "No";
-//                            if(Warp[A].WarpNPC == true)
-//                                frmWarp.cmdNPC.Caption = "Yes";
-//                            else
-//                                frmWarp.cmdNPC.Caption = "No";
-//                            if(Warp[A].Locked == true)
-//                                frmWarp.cmdLocked.Caption = "Yes";
-//                            else
-//                                frmWarp.cmdLocked.Caption = "No";
-//                            frmLevelEditor::optCursor(5).Value = true;
-                            optCursor.current = 5;
+                            Warp[A].PlacedEnt = false;
+                            optCursor.current = OptCursor_t::LVL_WARPS;
                             OptCursorSync();
-//                            if(Warp[A].MapWarp == true)
-//                                frmWarp.chkMapWarp.Value = 1;
-//                            else
-//                                frmWarp.chkMapWarp.Value = 0;
-//                            frmWarp.optE(1).Value = true;
-//                            frmWarp.optDirection(Warp[A].Direction).Value = true;
-//                            frmWarp.optDirection2(Warp[A].Direction2).Value = true;
-//                            frmWarp.optEffect(Warp[A].Effect).Value = true;
-//                            frmWarp.txtLevel = Warp[A].level;
-//                            frmWarp.scrWarp.Value = Warp[A].LevelWarp;
-//                            frmWarp.chkEntrance.Value = Microsoft::VisualBasic::Conversion::Val(Warp[A].LevelEnt);
-//                            frmWarp.txtStars = Warp[A].Stars;
-//                            if(frmWarp.txtStars == 0)
-//                                frmWarp.txtStars = "";
-//                            frmWarp.txtX = Warp[A].MapX;
-//                            frmWarp.txtY = Warp[A].MapY;
-//                            if(frmWarp.txtX == -1)
-//                                frmWarp.txtX = "";
-//                            if(frmWarp.txtY == -1)
-//                                frmWarp.txtY = "";
                             MouseRelease = false;
+                            EditorCursor.Mode = OptCursor_t::LVL_WARPS;
+                            EditorCursor.SubMode = 1;
                             EditorControls.MouseClick = false; /* Simulate "Focus out" inside of SMBX Editor */
-                            if(Warp[A].LevelEnt)
-                            {
-//                                frmWarp.chkEntrance = 1;
+                            if(Warp[A].LevelEnt || EditorCursor.Warp.MapWarp || EditorCursor.Warp.level != "")
                                 Warp[A].PlacedExit = false;
-                            }
-//                            if(nPlay.Online == true)
-//                                Netplay::sendData Netplay::AddWarp[A];
+                            EditorCursor.Warp = Warp[A];
+                            if (!Warp[A].PlacedEnt && !Warp[A].PlacedExit)
+                                KillWarp(A);
                             break;
                         }
                         else if(CursorCollision(EditorCursor.Location, Warp[A].Exit))
                         {
                             PlaySound(SFX_Grab);
                             Warp[A].PlacedExit = false;
-//                            if(Warp[A].NoYoshi == true)
-//                                frmWarp.cmdYoshi.Caption = "Yes";
-//                            else
-//                                frmWarp.cmdYoshi.Caption = "No";
-//                            if(Warp[A].WarpNPC == true)
-//                                frmWarp.cmdNPC.Caption = "Yes";
-//                            else
-//                                frmWarp.cmdNPC.Caption = "No";
-//                            if(Warp[A].Locked == true)
-//                                frmWarp.cmdLocked.Caption = "Yes";
-//                            else
-//                                frmWarp.cmdLocked.Caption = "No";
-//                            frmLevelEditor::optCursor(5).Value = true;
-                            optCursor.current = 5;
+                            optCursor.current = OptCursor_t::LVL_WARPS;
                             OptCursorSync();
-//                            if(Warp[A].MapWarp == true)
-//                                frmWarp.chkMapWarp.Value = 1;
-//                            else
-//                                frmWarp.chkMapWarp.Value = 0;
-//                            frmWarp.optE(2).Value = true;
-//                            frmWarp.optDirection(Warp[A].Direction).Value = true;
-//                            frmWarp.optDirection2(Warp[A].Direction2).Value = true;
-//                            frmWarp.optEffect(Warp[A].Effect).Value = true;
-//                            frmWarp.txtLevel = Warp[A].level;
-//                            frmWarp.scrWarp.Value = Warp[A].LevelWarp;
-//                            frmWarp.chkEntrance.Value = Warp[A].LevelEnt;
-//                            frmWarp.txtStars = Warp[A].Stars;
-//                            if(frmWarp.txtStars == 0)
-//                                frmWarp.txtStars = "";
-//                            frmWarp.txtX = Warp[A].MapX;
-//                            frmWarp.txtY = Warp[A].MapY;
-//                            if(frmWarp.txtX == -1)
-//                                frmWarp.txtX = "";
-//                            if(frmWarp.txtY == -1)
-//                                frmWarp.txtY = "";
                             MouseRelease = false;
+                            EditorCursor.Mode = OptCursor_t::LVL_WARPS;
+                            EditorCursor.SubMode = 2;
                             EditorControls.MouseClick = false; /* Simulate "Focus out" inside of SMBX Editor */
-                            if(Warp[A].LevelEnt == true)
-                            {
-//                                frmWarp.chkEntrance = 1;
+                            // TODO: additional testing of these situations
+                            if(Warp[A].LevelEnt || EditorCursor.Warp.MapWarp || EditorCursor.Warp.level != "")
                                 Warp[A].PlacedEnt = false;
-                            }
-//                            if(nPlay.Online == true)
-//                                Netplay::sendData Netplay::AddWarp[A];
+                            EditorCursor.Warp = Warp[A];
+                            if (!Warp[A].PlacedEnt && !Warp[A].PlacedExit)
+                                KillWarp(A);
                             break;
                         }
                     }
                 }
-#endif
 
                 if(MouseRelease) // BGOs
                 {
@@ -692,36 +406,28 @@ void UpdateEditor()
                         if(CursorCollision(EditorCursor.Location, Background[A].Location) == true && Background[A].Hidden == false)
                         {
                             PlaySound(SFX_Grab);
-//                            frmLevelEditor::optCursor(3).Value = true;
                             optCursor.current = 3;
                             OptCursorSync();
-//                            B = 0;
-//                            while(frmBackgrounds::Background(Background[A].Type).Visible == false)
-//                            {
-//                                frmBackgrounds::optGame(B).Value = true;
-//                                B = B + 1;
-//                            }
-//                            for(B = 0; B < frmLayers::lstLayer::ListCount; B++)
-//                            {
-//                                if(Background[A].Layer.ToLower() == frmLayers::lstLayer::List(B).ToLower())
-//                                {
-//                                    frmLayers::lstLayer.ListIndex = B;
-//                                    break;
-//                                }
-//                            }
-//                            frmBackgrounds::Background(Background[A].Type).Value = true;
                             EditorCursor.Background = Background[A];
                             EditorCursor.Layer = Background[A].Layer;
                             EditorCursor.Location.X = Background[A].Location.X;
                             EditorCursor.Location.Y = Background[A].Location.Y;
                             SetCursor();
-//                            Netplay::sendData Netplay::EraseBackground(A, 1) + "p23" + LB;
                             Background[A] = Background[numBackground];
                             numBackground = numBackground - 1;
+#ifdef NEW_EDITOR
+                            editorScreen.FocusBGO();
+#endif
                             if(MagicHand)
                             {
                                 qSortBackgrounds(1, numBackground);
                                 UpdateBackgrounds();
+                                syncLayers_AllBGOs();
+                            }
+                            else
+                            {
+                                syncLayers_BGO(A);
+                                syncLayers_BGO(numBackground+1);
                             }
                             MouseRelease = false;
                             EditorControls.MouseClick = false; /* Simulate "Focus out" inside of SMBX Editor */
@@ -742,86 +448,8 @@ void UpdateEditor()
 //                                frmLevelEditor::optCursor(1).Value = true;
                                 optCursor.current = 1;
                                 OptCursorSync();
-//                                B = 0;
-//                                while(frmBlocks::Block(Block[A].Type).Visible == false)
-//                                {
-//                                    if(B > frmBlocks::optGame.Count - 1)
-//                                        break;
-//                                    frmBlocks::optGame(B).Value = true;
-//                                    if(B == 0)
-//                                    {
-//                                        for(C = 0; C < frmBlocks::SMB3.Count; C++)
-//                                        {
-//                                            frmBlocks::optSMB3(C).Value = true;
-//                                            if(frmBlocks::Block(Block[A].Type).Visible == true)
-//                                                break;
-//                                        }
-//                                    }
-//                                    if(B == 1)
-//                                    {
-//                                        for(C = 0; C < frmBlocks::SMB2.Count; C++)
-//                                        {
-//                                            frmBlocks::optSMB2(C).Value = true;
-//                                            if(frmBlocks::Block(Block[A].Type).Visible == true)
-//                                                break;
-//                                        }
-//                                    }
-//                                    if(B == 2)
-//                                    {
-//                                        for(C = 0; C < frmBlocks::SMB1.Count; C++)
-//                                        {
-//                                            frmBlocks::optSMB1(C).Value = true;
-//                                            if(frmBlocks::Block(Block[A].Type).Visible == true)
-//                                                break;
-//                                        }
-//                                    }
-//                                    if(B == 3)
-//                                    {
-//                                        for(C = 0; C < frmBlocks::SMW.Count; C++)
-//                                        {
-//                                            frmBlocks::optSMW(C).Value = true;
-//                                            if(frmBlocks::Block(Block[A].Type).Visible == true)
-//                                                break;
-//                                        }
-//                                    }
-//                                    if(B == 4)
-//                                    {
-//                                        for(C = 0; C < frmBlocks::Misc.Count; C++)
-//                                        {
-//                                            frmBlocks::optMisc(C).Value = true;
-//                                            if(frmBlocks::Block(Block[A].Type).Visible == true)
-//                                                break;
-//                                        }
-//                                    }
-//                                    B = B + 1;
-//                                }
-//                                frmBlocks::Block(Block[A].Type).Value = true;
-//                                if(Block[A].Special >= 1 && Block[A].Special <= 99)
-//                                    frmBlocks::optBlockS.Value = -Block[A].Special;
-//                                else if(Block[A].Special > 1000)
-//                                    frmBlocks::optBlockS.Value = Block[A].Special - 1000;
-//                                if(Block[A].Invis == true)
-//                                    frmBlocks::cmdInvis.Caption = "Yes";
-//                                else
-//                                    frmBlocks::cmdInvis.Caption = "No";
-//                                if(Block[A].Slippy == true)
-//                                    frmBlocks::cmdSlip.Caption = "Yes";
-//                                else
-//                                    frmBlocks::cmdSlip.Caption = "No";
-//                                for(B = 0; B < frmLayers::lstLayer::ListCount; B++)
-//                                {
-//                                    if(Block[A].Layer.ToLower() == frmLayers::lstLayer::List(B).ToLower())
-//                                    {
-//                                        frmLayers::lstLayer.ListIndex = B;
-//                                        break;
-//                                    }
-//                                }
-//                                frmAdvancedBlock.TriggerHit = Block[A].TriggerHit;
-//                                frmAdvancedBlock.TriggerDeath = Block[A].TriggerDeath;
-//                                frmAdvancedBlock.TriggerLast = Block[A].TriggerLast;
-//                                frmBlocks::BlockW.Value = Block[A].Location.Width / 32.0;
-//                                frmBlocks::BlockH.Value = Block[A].Location.Height / 32.0;
-                                EditorCursor.Mode = 1;
+
+                                EditorCursor.Mode = OptCursor_t::LVL_BLOCKS;
                                 EditorCursor.Block = Block[A];
                                 EditorCursor.Layer = Block[A].Layer;
                                 EditorCursor.Location.X = Block[A].Location.X;
@@ -831,17 +459,20 @@ void UpdateEditor()
                                 SetCursor();
 //                                Netplay::sendData Netplay::EraseBlock(A, 1);
                                 KillBlock(A, false);
+#ifdef NEW_EDITOR
+                                editorScreen.FocusBlock();
+#endif
                                 MouseRelease = false;
                                 EditorControls.MouseClick = false; /* Simulate "Focus out" inside of SMBX Editor */
                                 FindSBlocks();
+                                syncLayers_AllBlocks();
                                 break;
                             }
                         }
                     }
                 }
 
-#if 0 // Unsupported
-                if(MouseRelease) // Water boxes
+                if(MouseRelease && !MagicHand) // Water boxes
                 {
                     for(int numWaterMax = numWater, A = 1; A <= numWaterMax; A++)
                     {
@@ -849,27 +480,22 @@ void UpdateEditor()
                         {
                             PlaySound(SFX_Grab);
 //                            frmLevelEditor::optCursor(15).Value = true;
-                            optCursor.current = 15;
+                            optCursor.current = OptCursor_t::LVL_WATER;
                             OptCursorSync();
-//                            frmWater.WaterW = Water[A].Location.Width / 32.0;
-//                            frmWater.WaterH = Water[A].Location.Height / 32.0;
-//                            if(EditorCursor.Water.Quicksand == true)
-//                                frmWater::Quicksand.Caption = "Yes";
-//                            else
-//                                frmWater::Quicksand.Caption = "No";
-//                            if(nPlay.Online == true)
-//                                Netplay::sendData "y" + std::to_string(A) + LB + "p23" + LB;
-                            Water[A] = Water_t();
+                            EditorCursor.Water = Water[A];
+                            EditorCursor.Location = Water[A].Location;
+                            EditorCursor.Layer = Water[A].Layer;
+                            std::swap(Water[A], Water[numWater]);
                             numWater--;
+                            syncLayers_Water(A);
+                            syncLayers_Water(numWater+1);
                             MouseRelease = false;
                             EditorControls.MouseClick = false; /* Simulate "Focus out" inside of SMBX Editor */
                             break;
                         }
                     }
                 }
-#endif
 
-#if 0 // Unused
                 if(MouseRelease && !MagicHand) // World map music
                 {
                     for(int numWorldMusicMax = numWorldMusic, A = 1; A <= numWorldMusicMax; A++)
@@ -877,14 +503,16 @@ void UpdateEditor()
                         if(CursorCollision(EditorCursor.Location, WorldMusic[A].Location) == true)
                         {
                             PlaySound(SFX_Grab);
-//                            frmLevelEditor::optCursor(11).Value = true;
                             optCursor.current = 11;
                             OptCursorSync();
                             EditorCursor.Mode = 11;
                             EditorCursor.Location = WorldMusic[A].Location;
                             SetCursor();
 //                            frmMusic::optMusic(WorldMusic[A].Type).Value = true;
+                            EditorCursor.WorldMusic = WorldMusic[A];
                             WorldMusic[A] = WorldMusic[numWorldMusic];
+                            treeWorldMusicRemove(&WorldMusic[numWorldMusic]);
+                            treeWorldMusicUpdate(&WorldMusic[A]);
                             numWorldMusic = numWorldMusic - 1;
                             MouseRelease = false;
                             EditorControls.MouseClick = false; /* Simulate "Focus out" inside of SMBX Editor */
@@ -904,10 +532,13 @@ void UpdateEditor()
                             optCursor.current = 10;
                             OptCursorSync();
 //                            frmPaths::WorldPath(WorldPath[A].Type).Value = true;
-                            EditorCursor.Mode = 10;
+                            EditorCursor.Mode = OptCursor_t::WLD_PATHS;
+                            EditorCursor.WorldPath = WorldPath[A];
                             EditorCursor.Location = WorldPath[A].Location;
                             SetCursor();
-//                            WorldPath[A] = WorldPath(numWorldPaths);
+                            std::swap(WorldPath[A], WorldPath[numWorldPaths]);
+                            treeWorldPathRemove(&WorldPath[numWorldPaths]);
+                            treeWorldPathUpdate(&WorldPath[A]);
                             numWorldPaths = numWorldPaths - 1;
                             MouseRelease = false;
                             EditorControls.MouseClick = false; /* Simulate "Focus out" inside of SMBX Editor */
@@ -927,12 +558,19 @@ void UpdateEditor()
                             optCursor.current = 8;
                             OptCursorSync();
 //                            frmScene::Scene(Scene[A].Type).Value = true;
-                            EditorCursor.Mode = 8;
+                            EditorCursor.Mode = OptCursor_t::WLD_SCENES;
+                            EditorCursor.Scene = Scene[A];
                             EditorCursor.Location = Scene[A].Location;
                             SetCursor();
                             MouseMove(EditorCursor.X, EditorCursor.Y);
+                            // this maintains the order of the scenes
+                            // but makes for a hellish quadtree update
                             for(B = A; B < numScenes; B++)
-                                Scene[B] = Scene[B + 1];
+                            {
+                                std::swap(Scene[B], Scene[B + 1]);
+                                treeWorldSceneUpdate(&Scene[B]);
+                            }
+                            treeWorldSceneRemove(&Scene[numScenes]);
                             numScenes = numScenes - 1;
                             MouseRelease = false;
                             EditorControls.MouseClick = false; /* Simulate "Focus out" inside of SMBX Editor */
@@ -948,44 +586,15 @@ void UpdateEditor()
                         if(CursorCollision(EditorCursor.Location, WorldLevel[A].Location) == true)
                         {
                             PlaySound(SFX_Grab);
-//                            frmLevelEditor::optCursor(9).Value = true;
-                            optCursor.current = 9;
+                            optCursor.current = OptCursor_t::WLD_LEVELS;
                             OptCursorSync();
-//                            frmLevels::WorldLevel(WorldLevel[A].Type).Value = true;
-//                            auto &wl = WorldLevel[A];
-//                            frmLevels.txtLevelName = wl.LevelName;
-//                            frmLevels.txtFilename = wl.FileName;
-//                            frmLevels::scrWarp.Value = wl.StartWarp;
-//                            if(wl.WarpX == -1)
-//                                frmLevels.txtX = "";
-//                            else
-//                                frmLevels.txtX = wl.WarpX;
-//                            if(wl.WarpY == -1)
-//                                frmLevels.txtY = "";
-//                            else
-//                                frmLevels.txtY = wl.WarpY;
-//                            if(wl.Path == true)
-//                                frmLevels::chkPath.Value = 1;
-//                            else
-//                                frmLevels::chkPath.Value = 0;
-//                            if(wl.Path2 == true)
-//                                frmLevels::chkPath2.Value = 1;
-//                            else
-//                                frmLevels::chkPath2.Value = 0;
-//                            if(wl.Start == true)
-//                                frmLevels::chkStart.Value = 1;
-//                            else
-//                                frmLevels::chkStart.Value = 0;
-//                            if(wl.Visible == true)
-//                                frmLevels::chkVisible.Value = 1;
-//                            else
-//                                frmLevels::chkVisible.Value = 0;
-//                            for(B = 1; B <= 4; B++)
-//                                frmLevels::cmbExit(B).ListIndex = wl.LevelExit[B] + 1;
-                            EditorCursor.Mode = 9;
+                            EditorCursor.Mode = OptCursor_t::WLD_LEVELS;
+                            EditorCursor.WorldLevel = WorldLevel[A];
                             EditorCursor.Location = WorldLevel[A].Location;
                             SetCursor();
-                            WorldLevel[A] = WorldLevel[numWorldLevels];
+                            std::swap(WorldLevel[A], WorldLevel[numWorldLevels]);
+                            treeWorldLevelRemove(&WorldLevel[numWorldLevels]);
+                            treeWorldLevelUpdate(&WorldLevel[A]);
                             numWorldLevels = numWorldLevels - 1;
                             MouseRelease = false;
                             EditorControls.MouseClick = false; /* Simulate "Focus out" inside of SMBX Editor */
@@ -1001,31 +610,25 @@ void UpdateEditor()
                         if(CursorCollision(EditorCursor.Location, Tile[A].Location) == true)
                         {
                             PlaySound(SFX_Grab);
-//                            frmLevelEditor::optCursor(7).Value = true;
-                            optCursor.current = 7;
+                            optCursor.current = OptCursor_t::WLD_TILES;
                             OptCursorSync();
-//                            frmTiles::Tile(Tile[A].Type).Value = true;
-//                            if(frmTiles::Tile(Tile[A].Type).Visible == false)
-//                            {
-//                                for(B = 0; B < frmTiles::Game.Count; B++)
-//                                {
-//                                    frmTiles::optGame(B).Value = true;
-//                                    if(frmTiles::Tile(Tile[A].Type).Visible == true)
-//                                        break;
-//                                }
-//                            }
-                            EditorCursor.Mode = 7;
+                            EditorCursor.Mode = OptCursor_t::WLD_TILES;
+                            EditorCursor.Tile = Tile[A];
                             EditorCursor.Location = Tile[A].Location;
                             SetCursor();
-                            Tile[A] = Tile[numTiles];
+                            std::swap(Tile[A], Tile[numTiles]);
+                            treeWorldTileRemove(&Tile[numTiles]);
+                            treeWorldTileUpdate(&Tile[A]);
                             numTiles = numTiles - 1;
+#ifdef NEW_EDITOR
+                            editorScreen.FocusTile();
+#endif
                             MouseRelease = false;
                             EditorControls.MouseClick = false; /* Simulate "Focus out" inside of SMBX Editor */
                             break;
                         }
                     }
                 }
-#endif
             }
             else if(EditorCursor.Mode == OptCursor_t::LVL_WATER) // Water
             {
@@ -1049,6 +652,7 @@ void UpdateEditor()
                     {
                         numWater++;
                         Water[numWater] = EditorCursor.Water;
+                        syncLayers_Water(numWater);
 //                        if(nPlay.Online == true)
 //                            Netplay::sendData Netplay::AddWater(numWater);
                     }
@@ -1091,6 +695,8 @@ void UpdateEditor()
 //                                Netplay::sendData Netplay::EraseBlock[A];
                                 KillBlock(A); // Erase the block
                                 FindSBlocks();
+                                // ugh
+                                syncLayers_AllBlocks();
                                 MouseRelease = false;
                                 break;
                             }
@@ -1138,13 +744,20 @@ void UpdateEditor()
                             b.Location.Y = b.Location.Y + b.Location.Height / 2.0 - EffectHeight[10] / 2;
                             NewEffect(10, b.Location);
                             PlaySound(SFX_Smash);
-                            Background[A] = Background[numBackground];
+                            std::swap(Background[A], Background[numBackground]);
                             numBackground -= 1;
                             MouseRelease = false;
                             if(MagicHand)
                             {
                                 qSortBackgrounds(1, numBackground);
                                 UpdateBackgrounds();
+                                syncLayers_AllBGOs();
+                                syncLayers_BGO(numBackground + 1);
+                            }
+                            else
+                            {
+                                syncLayers_BGO(A);
+                                syncLayers_BGO(numBackground + 1);
                             }
                             break;
                         }
@@ -1162,6 +775,8 @@ void UpdateEditor()
 //                                Netplay::sendData Netplay::EraseBlock[A];
                                 KillBlock(A); // Erase the block
                                 FindSBlocks();
+                                // ugh
+                                syncLayers_AllBlocks();
                                 MouseRelease = false;
                                 break;
                             }
@@ -1180,7 +795,10 @@ void UpdateEditor()
 //                            if(nPlay.Online == true)
 //                                Netplay::sendData "y" + std::to_string(A) + LB + "p36" + LB;
                             Water[A] = Water[numWater];
+                            std::swap(Water[A], Water[numWater]);
                             numWater = numWater - 1;
+                            syncLayers_Water(A);
+                            syncLayers_Water(numWater + 1);
                             MouseRelease = false;
                             break;
                         }
@@ -1199,6 +817,8 @@ void UpdateEditor()
                             NewEffect(10, tempLocation);
                             PlaySound(SFX_ShellHit);
                             WorldMusic[A] = WorldMusic[numWorldMusic];
+                            treeWorldMusicRemove(&WorldMusic[numWorldMusic]);
+                            treeWorldMusicUpdate(&WorldMusic[A]);
                             numWorldMusic = numWorldMusic - 1;
                             MouseRelease = false;
                             break;
@@ -1218,6 +838,8 @@ void UpdateEditor()
                             NewEffect(10, tempLocation);
                             PlaySound(SFX_ShellHit);
                             WorldPath[A] = WorldPath[numWorldPaths];
+                            treeWorldPathRemove(&WorldPath[numWorldPaths]);
+                            treeWorldPathUpdate(&WorldPath[A]);
                             numWorldPaths -= 1;
                             MouseRelease = false;
                             break;
@@ -1237,7 +859,11 @@ void UpdateEditor()
                             NewEffect(10, tempLocation);
                             PlaySound(SFX_ShellHit);
                             for(B = A; B < numScenes; B++)
+                            {
                                 Scene[B] = Scene[B + 1];
+                                treeWorldSceneUpdate(&Scene[B]);
+                            }
+                            treeWorldSceneRemove(&Scene[numScenes]);
                             numScenes = numScenes - 1;
                             MouseRelease = false;
                             break;
@@ -1257,6 +883,8 @@ void UpdateEditor()
                             NewEffect(10, tempLocation);
                             PlaySound(SFX_ShellHit);
                             WorldLevel[A] = WorldLevel[numWorldLevels];
+                            treeWorldLevelRemove(&WorldLevel[numWorldLevels]);
+                            treeWorldLevelUpdate(&WorldLevel[A]);
                             numWorldLevels = numWorldLevels - 1;
                             MouseRelease = false;
                             break;
@@ -1276,6 +904,8 @@ void UpdateEditor()
                             NewEffect(10, tempLocation);
                             PlaySound(SFX_ShellHit);
                             Tile[A] = Tile[numTiles];
+                            treeWorldTileRemove(&Tile[numTiles]);
+                            treeWorldTileUpdate(&Tile[A]);
                             numTiles = numTiles - 1;
                             MouseRelease = false;
                             break;
@@ -1344,6 +974,7 @@ void UpdateEditor()
                             Block[numBlock] = EditorCursor.Block;
                             Block[numBlock].DefaultType = Block[numBlock].Type;
                             Block[numBlock].DefaultSpecial = Block[numBlock].Special;
+                            syncLayers_Block(numBlock);
                             if(MagicHand == true)
                             {
                                 for(A = -FLBlocks; A <= FLBlocks; A++)
@@ -1355,73 +986,70 @@ void UpdateEditor()
                             }
                         }
                         FindSBlocks();
+                        // ack!
+                        syncLayers_AllBlocks();
 //                        if(nPlay.Online == true)
 //                            Netplay::sendData Netplay::AddBlock(numBlock);
                     }
 
                 }
             }
-#if 0
-            else if(EditorCursor.Mode == 2 && !MagicHand) // Level
+            else if(EditorCursor.Mode == OptCursor_t::LVL_SETTINGS && !MagicHand) // Level
             {
-//                if(frmLevelSettings::optLevel(0).Value == true) // Top
-//                {
-//                    level(curSection).Y = static_cast<int>(floor(static_cast<double>(EditorCursor.Location.Y / 32))) * 32;
-//                    if(level(curSection).Height - level(curSection).Y < 600)
-//                        level(curSection).Y = level(curSection).Height - 600;
-//                }
-//                else if(frmLevelSettings::optLevel(1).Value == true) // Left
-//                {
-//                    level(curSection).X = static_cast<int>(floor(static_cast<double>(EditorCursor.Location.X / 32))) * 32;
-//                    if(level(curSection).Width - level(curSection).X < 800)
-//                        level(curSection).X = level(curSection).Width - 800;
-//                }
-//                else if(frmLevelSettings::optLevel(2).Value == true) // Right
-//                {
-//                    level(curSection).Width = static_cast<int>(floor(static_cast<double>(EditorCursor.Location.X / 32))) * 32;
-//                    if(level(curSection).Width - level(curSection).X < 800)
-//                        level(curSection).Width = level(curSection).X + 800;
-//                }
-//                else if(frmLevelSettings::optLevel(3).Value == true) // Bottom
-//                {
-//                    level(curSection).Height = static_cast<int>(floor(static_cast<double>(EditorCursor.Location.Y / 32))) * 32;
-//                    if(level(curSection).Height - level(curSection).Y < 600)
-//                        level(curSection).Height = level(curSection).Y + 600;
-//                }
-//                else if(frmLevelSettings::optLevel(4).Value == true || frmLevelSettings::optLevel(5).Value == true)
-//                {
-//                    if(frmLevelSettings::optLevel(4).Value == true)
-//                        B = 1;
-//                    else
-//                        B = 2;
-//                    for(A = 1; A <= 2; A++)
-//                    {
-//                        if(CursorCollision(EditorCursor.Location, PlayerStart[A]) == true && A != B)
-//                            CanPlace = false;
-//                    }
-//                    for(A = 1; A <= numBlock; A++)
-//                    {
-//                        if(CursorCollision(EditorCursor.Location, Block[A].Location) == true && Block[A].Hidden == false && Block[A].Invis == false && BlockIsSizable(Block[A].Type) == false && BlockNoClipping(Block[A].Type) == false && BlockOnlyHitspot1(Block[A].Type) == false && BlockSlope(Block[A].Type) == 0 && BlockSlope2(Block[A].Type) == 0)
-//                            CanPlace = false;
-//                    }
-//                    if(CanPlace == true)
-//                    {
-//                        if(frmLevelSettings::optLevel(4).Value == true)
-//                        {
-//                            PlayerStart(1) = EditorCursor.Location;
-//                            Netplay::sendData "v" + std::to_string(1) + "|" + PlayerStart(1).X + "|" + PlayerStart(1).Y + "|" + std::to_string(PlayerStart(1).Width) + "|" + std::to_string(PlayerStart(1).Height) + LB;
-//                        }
-//                        else
-//                        {
-//                            PlayerStart(2) = EditorCursor.Location;
-//                            Netplay::sendData "v" + std::to_string(2) + "|" + PlayerStart(2).X + "|" + PlayerStart(2).Y + "|" + std::to_string(PlayerStart(2).Width) + "|" + std::to_string(PlayerStart(2).Height) + LB;
-//                        }
-//                    }
-//                }
-//                if(frmLevelSettings::optLevel(0).Value == true || frmLevelSettings::optLevel(1).Value == true || frmLevelSettings::optLevel(2).Value == true || frmLevelSettings::optLevel(3).Value == true)
-//                    Netplay::sendData "g" + curSection + "|" + level(curSection).X + "|" + level(curSection).Y + "|" + std::to_string(level(curSection).Width) + "|" + std::to_string(level(curSection).Height);
+                if(EditorCursor.SubMode == 0) // Top
+                {
+                    level[curSection].Y = static_cast<int>(floor(static_cast<double>(EditorCursor.Location.Y / 32))) * 32;
+                    if(level[curSection].Height - level[curSection].Y < 600)
+                        level[curSection].Y = level[curSection].Height - 600;
+                }
+                else if(EditorCursor.SubMode == 1) // Left
+                {
+                    level[curSection].X = static_cast<int>(floor(static_cast<double>(EditorCursor.Location.X / 32))) * 32;
+                    if(level[curSection].Width - level[curSection].X < 800)
+                        level[curSection].X = level[curSection].Width - 800;
+                }
+                else if(EditorCursor.SubMode == 2) // Right
+                {
+                    level[curSection].Width = static_cast<int>(floor(static_cast<double>(EditorCursor.Location.X / 32))) * 32;
+                    if(level[curSection].Width - level[curSection].X < 800)
+                        level[curSection].Width = level[curSection].X + 800;
+                }
+                else if(EditorCursor.SubMode == 3) // Bottom
+                {
+                    level[curSection].Height = static_cast<int>(floor(static_cast<double>(EditorCursor.Location.Y / 32))) * 32;
+                    if(level[curSection].Height - level[curSection].Y < 600)
+                        level[curSection].Height = level[curSection].Y + 600;
+                }
+                else if(EditorCursor.SubMode == 4 || EditorCursor.SubMode == 5)
+                {
+                    // printf("Trying to place player at %f, %f...\n", EditorCursor.Location.X, EditorCursor.Location.Y);
+                    if(EditorCursor.SubMode == 4)
+                        B = 1;
+                    else
+                        B = 2;
+                    for(A = 1; A <= 2; A++)
+                    {
+                        if(CursorCollision(EditorCursor.Location, PlayerStart[A]) == true && A != B)
+                            CanPlace = false;
+                    }
+                    for(A = 1; A <= numBlock; A++)
+                    {
+                        if(CursorCollision(EditorCursor.Location, Block[A].Location) == true && Block[A].Hidden == false && Block[A].Invis == false && BlockIsSizable[Block[A].Type] == false && BlockNoClipping[Block[A].Type] == false && BlockOnlyHitspot1[Block[A].Type] == false && BlockSlope[Block[A].Type] == 0 && BlockSlope2[Block[A].Type] == 0)
+                            CanPlace = false;
+                    }
+                    if(CanPlace == true)
+                    {
+                        if(EditorCursor.SubMode == 4)
+                        {
+                            PlayerStart[1] = EditorCursor.Location;
+                        }
+                        else
+                        {
+                            PlayerStart[2] = EditorCursor.Location;
+                        }
+                    }
+                }
             }
-#endif
             else if(EditorCursor.Mode == OptCursor_t::LVL_BGOS) // Backgrounds
             {
                 for(A = 1; A <= numBackground; A++)
@@ -1439,10 +1067,13 @@ void UpdateEditor()
                     {
                         numBackground++;
                         Background[numBackground] = EditorCursor.Background;
+                        syncLayers_BGO(numBackground);
                         if(MagicHand)
                         {
                             qSortBackgrounds(1, numBackground);
                             UpdateBackgrounds();
+                            // ugh
+                            syncLayers_AllBGOs();
                         }
 //                        Netplay::sendData Netplay::AddBackground(numBackground);
                     }
@@ -1500,9 +1131,14 @@ void UpdateEditor()
 //                        }
 
                         NPC[numNPCs] = EditorCursor.NPC;
+                        syncLayers_NPC(numNPCs);
 //                        Netplay::sendData Netplay::AddNPC(numNPCs);
                         if(!MagicHand)
+                        {
+                            // ugh
                             NPCSort();
+                            syncLayers_AllNPCs();
+                        }
 
                         if(MagicHand)
                         {
@@ -1520,7 +1156,8 @@ void UpdateEditor()
             }
             else if(EditorCursor.Mode == OptCursor_t::LVL_WARPS) // Warps
             {
-                for(int numWarpsMax = numWarps + 1, A = 1; A <= numWarpsMax; A++)
+                int numWarpsMax = numWarps + 1;
+                for(A = 1; A <= numWarpsMax; A++)
                 {
                     if(Warp[A].PlacedEnt == false || Warp[A].PlacedExit == false)
                         break;
@@ -1529,46 +1166,36 @@ void UpdateEditor()
                 if(A > numWarps)
                     numWarps = A;
 
+                // TODO: implement optE for framewarp and for level settings
+                if(EditorCursor.SubMode == 1 || EditorCursor.Warp.level != "" || EditorCursor.Warp.LevelEnt == true || EditorCursor.Warp.MapWarp == true)
+                {
+                    EditorCursor.Warp.Entrance = EditorCursor.Location;
+                    EditorControls.MouseClick = false;
+                    EditorCursor.Warp.PlacedEnt = true;
+                }
+                if(EditorCursor.SubMode == 2 || EditorCursor.Warp.level != "" || EditorCursor.Warp.LevelEnt == true || EditorCursor.Warp.MapWarp == true)
+                {
+                    EditorCursor.Warp.Exit = EditorCursor.Location;
+                    EditorControls.MouseClick = false;
+                    EditorCursor.Warp.PlacedExit = true;
+                }
+                Warp[A] = EditorCursor.Warp;
                 Warp[A].Layer = EditorCursor.Layer;
-                Warp[A].Effect = EditorCursor.Warp.Effect;
-                Warp[A].Direction2 = EditorCursor.Warp.Direction2;
-                Warp[A].Direction = EditorCursor.Warp.Direction;
-                Warp[A].level = EditorCursor.Warp.level;
-                Warp[A].LevelEnt = EditorCursor.Warp.LevelEnt;
-                Warp[A].LevelWarp = EditorCursor.Warp.LevelWarp;
-                Warp[A].Stars = EditorCursor.Warp.Stars;
-                Warp[A].NoYoshi = EditorCursor.Warp.NoYoshi;
-                Warp[A].WarpNPC = EditorCursor.Warp.WarpNPC;
-                Warp[A].Locked = EditorCursor.Warp.Locked;
-//                if(frmWarp.chkMapWarp.Value == 0)
-//                    Warp[A].MapWarp = false;
-//                else
-//                    Warp[A].MapWarp = true;
-//                Warp[A].MapX = SDL_atoi(frmWarp.txtX.Text);
-//                Warp[A].MapY = SDL_atoi(frmWarp.txtY.Text);
-//                if(frmWarp.txtX.Text == "" && frmWarp.txtY.Text == "")
-//                {
-//                    Warp[A].MapX = -1;
-//                    Warp[A].MapY = -1;
-//                }
-//                if(frmWarp.optE(1).Value == true || Warp[A].level != "" || Warp[A].LevelEnt == true || Warp[A].MapWarp == true)
-//                {
-//                    EditorCursor.Warp.Entrance = EditorCursor.Location;
-//                    Warp[A].Entrance = EditorCursor.Warp.Entrance;
-//                    EditorControls.MouseClick = false;
-//                    Warp[A].PlacedEnt = true;
-//                }
-//                if(frmWarp.optE(2).Value == true || Warp[A].level != "" || Warp[A].LevelEnt == true || Warp[A].MapWarp == true)
-//                {
-//                    EditorCursor.Warp.Exit = EditorCursor.Location;
-//                    Warp[A].Exit = EditorCursor.Warp.Exit;
-//                    EditorControls.MouseClick = false;
-//                    Warp[A].PlacedExit = true;
-//                }
+                if (Warp[A].PlacedEnt && Warp[A].PlacedExit)
+                {
+                    EditorCursor.Warp.PlacedEnt = false;
+                    EditorCursor.Warp.PlacedExit = false;
+                    EditorCursor.SubMode = 1;
+                }
+                else if (Warp[A].PlacedEnt)
+                    EditorCursor.SubMode = 2;
+                else
+                    EditorCursor.SubMode = 1;
+                syncLayers_Warp(A);
 //                if(nPlay.Online == true)
 //                    Netplay::sendData Netplay::AddWarp[A];
             }
-            else if(EditorCursor.Mode == 7) // Tiles
+            else if(EditorCursor.Mode == OptCursor_t::WLD_TILES) // Tiles
             {
                 for(A = 1; A <= numTiles; A++)
                 {
@@ -1582,10 +1209,11 @@ void UpdateEditor()
                     {
                         numTiles++;
                         Tile[numTiles] = EditorCursor.Tile;
+                        treeWorldTileAdd(&Tile[numTiles]);
                     }
                 }
             }
-            else if(EditorCursor.Mode == 8) // Scenery
+            else if(EditorCursor.Mode == OptCursor_t::WLD_SCENES) // Scenery
             {
                 for(A = 1; A <= numScenes; A++)
                 {
@@ -1612,10 +1240,11 @@ void UpdateEditor()
                     {
                         numScenes++;
                         Scene[numScenes] = EditorCursor.Scene;
+                        treeWorldSceneAdd(&Scene[numScenes]);
                     }
                 }
             }
-            else if(EditorCursor.Mode == 9) // Level
+            else if(EditorCursor.Mode == OptCursor_t::WLD_LEVELS) // Level
             {
                 for(A = 1; A <= numWorldPaths; A++)
                 {
@@ -1645,10 +1274,11 @@ void UpdateEditor()
                     {
                         numWorldLevels++;
                         WorldLevel[numWorldLevels] = EditorCursor.WorldLevel;
+                        treeWorldLevelAdd(&WorldLevel[numWorldLevels]);
                     }
                 }
             }
-            else if(EditorCursor.Mode == 10) // Paths
+            else if(EditorCursor.Mode == OptCursor_t::WLD_PATHS) // Paths
             {
                 for(A = 1; A <= numWorldPaths; A++)
                 {
@@ -1668,10 +1298,11 @@ void UpdateEditor()
                     {
                         numWorldPaths++;
                         WorldPath[numWorldPaths] = EditorCursor.WorldPath;
+                        treeWorldPathAdd(&WorldPath[numWorldPaths]);
                     }
                 }
             }
-            else if(EditorCursor.Mode == 11) // Music
+            else if(EditorCursor.Mode == OptCursor_t::WLD_MUSIC) // Music
             {
                 for(A = 1; A <= numWorldMusic; A++)
                 {
@@ -1684,6 +1315,7 @@ void UpdateEditor()
                     EditorCursor.WorldMusic.Location = EditorCursor.Location;
                     numWorldMusic++;
                     WorldMusic[numWorldMusic] = EditorCursor.WorldMusic;
+                    treeWorldMusicAdd(&WorldMusic[numWorldMusic]);
                 }
             }
         }
@@ -1699,6 +1331,7 @@ void UpdateEditor()
     }
 }
 
+#ifndef NO_INTPROC
 void UpdateInterprocess()
 {
     IntProc::cmdLock();
@@ -1943,6 +1576,7 @@ void UpdateInterprocess()
 
     IntProc::cmdUnLock();
 }
+#endif // #ifndef NO_INTPROC
 
 int EditorNPCFrame(int A, float C, int N)
 {
@@ -2105,40 +1739,39 @@ int EditorNPCFrame(int A, float C, int N)
 
 void GetEditorControls()
 {
-    if(HasCursor)
+    if(MagicHand)
+        return;
+    if(EditorControls.Select)
     {
-        // TODO: move elsewhere
-        // if((getKeyState(vbKeyUp) == KEY_PRESSED))
-        //     EditorControls.ScrollUp = true;
-        // else
-        //     EditorControls.ScrollUp = false;
-        // if((getKeyState(vbKeyDown) == KEY_PRESSED))
-        //     EditorControls.ScrollDown = true;
-        // else
-        //     EditorControls.ScrollDown = false;
-        // if((getKeyState(vbKeyLeft) == KEY_PRESSED))
-        //     EditorControls.ScrollLeft = true;
-        // else
-        //     EditorControls.ScrollLeft = false;
-        // if((getKeyState(vbKeyRight) == KEY_PRESSED))
-        //     EditorControls.ScrollRight = true;
-        // else
-        //     EditorControls.ScrollRight = false;
+        optCursor.current = 13;
+        SetCursor();
     }
+    if(EditorControls.Erase)
+    {
+        optCursor.current = 0;
+        SetCursor();
+    }
+#ifdef NEW_EDITOR
+    if(!WorldEditor && EditorControls.TestPlay)
+    {
+        Backup_FullFileName = FullFileName;
+        FullFileName = FullFileName + "tst";
+        SaveLevel(FullFileName);
+        HasCursor = false;
+        zTestLevel();
+    }
+    if(EditorControls.SwitchScreens && MouseRelease)
+    {
+        editorScreen.active = !editorScreen.active;
+        HasCursor = false;
+        MouseRelease = false;
+        MenuMouseRelease = false;
+    }
+#endif
 }
 
 void SetCursor()
 {
-//    int A = 0;
-//    for(A = 0; A < frmLevelEditor::optCursor.Count; A++)
-//    {
-//        if(frmLevelEditor::optCursor(A).Value)
-//        {
-//            EditorCursor.Mode = optCursor.current;
-//            break;
-//        }
-//    }
-
     EditorCursor.Mode = optCursor.current;
 
     if(EditorCursor.Mode == 6 && WorldEditor)
@@ -2157,13 +1790,17 @@ void SetCursor()
     }
     else if(EditorCursor.Mode == 15) // Water
     {
+        // some of these seem sort of unbelievable........
 //        EditorCursor.Location.Height = frmWater::WaterH * 32;
 //        EditorCursor.Location.Width = frmWater::WaterW * 32;
-        EditorCursor.Water.Location = EditorCursor.Location;
+        EditorCursor.Location.Height = EditorCursor.Water.Location.Height;
+        EditorCursor.Location.Width = EditorCursor.Water.Location.Width;
+        EditorCursor.Water.Location.X = EditorCursor.Location.X;
+        EditorCursor.Water.Location.Y = EditorCursor.Location.Y;
         EditorCursor.Water.Buoy = 0; // frmWater.scrBuoy / 100
         EditorCursor.Water.Layer = EditorCursor.Layer;
 //        if(frmWater::Quicksand.Caption == "Yes")
-            EditorCursor.Water.Quicksand = false;
+            // EditorCursor.Water.Quicksand = false;
 //        else
 //            EditorCursor.Water.Quicksand = false;
     }
@@ -2209,60 +1846,23 @@ void SetCursor()
 
         EditorCursor.Location.Width = EditorCursor.Block.Location.Width;
         EditorCursor.Location.Height = EditorCursor.Block.Location.Height;
-
-// old code
-//            If frmBlocks.optBlockSpecial(0).Value = True Then
-//                .Block.Special = 0 'Nothing in the block
-//            ElseIf frmBlocks.optBlockSpecial(1).Value = True Then
-//                .Block.Special = 100 'Block contains a mushroom
-//            ElseIf frmBlocks.optBlockSpecial(2).Value = True Then
-//                .Block.Special = 1 'Block contains 1 coin
-//            ElseIf frmBlocks.optBlockSpecial(3).Value = True Then
-//                .Block.Special = 10 'Block contains 10 coins
-//            ElseIf frmBlocks.optBlockSpecial(4).Value = True Then
-//                .Block.Special = 101 'Block contains a goomba
-//            ElseIf frmBlocks.optBlockSpecial(5).Value = True Then
-//                .Block.Special = 102 'Block contains a Fire Flower
-//            ElseIf frmBlocks.optBlockSpecial(6).Value = True Then
-//                .Block.Special = 103 'Block contains a Leaf
-//            ElseIf frmBlocks.optBlockSpecial(7).Value = True Then
-//                .Block.Special = 104 'Block contains a Shoe
-//            ElseIf frmBlocks.optBlockSpecial(8).Value = True Then
-//                .Block.Special = 201 'Block contains a 1 up
-//            ElseIf frmBlocks.optBlockSpecial(9).Value = True Then
-//                .Block.Special = 105 'Block contains a Green Yoshi
-//            End If
-//        if(frmBlocks::optBlockS.Value < 0)
-//            EditorCursor.Block.Special = -frmBlocks::optBlockS.Value;
-//        else if(frmBlocks::optBlockS.Value > 0)
-//            EditorCursor.Block.Special = 1000 + frmBlocks::optBlockS.Value;
-//        else
-//            EditorCursor.Block.Special = 0;
-//        if(frmBlocks::cmdInvis.Caption == "Yes")
-//            EditorCursor.Block.Invis = true;
-//        else
-//            EditorCursor.Block.Invis = false;
-//        if(frmBlocks::cmdSlip.Caption == "Yes")
-//            EditorCursor.Block.Slippy = true;
-//        else
-//            EditorCursor.Block.Slippy = false;
     }
     else if(EditorCursor.Mode == 2) // Level
     {
-//        if(frmLevelSettings::optLevel(4).Value == true)
-//        {
-//            EditorCursor.Location.Width = Physics_t::PlayerWidth(1, 2); // Mario
-//            EditorCursor.Location.Height = Physics_t::PlayerHeight(1, 2);
-//        }
-//        else if(frmLevelSettings::optLevel(5).Value == true)
-//        {
-//            EditorCursor.Location.Width = Physics_t::PlayerWidth(2, 2); // Luigi
-//            EditorCursor.Location.Height = Physics_t::PlayerHeight(2, 2);
-//        }
-//        else
+        if(EditorCursor.SubMode == 4)
         {
-            EditorCursor.Location.Width = 4; // 32
-            EditorCursor.Location.Height = 4; // 32
+            EditorCursor.Location.Width = Physics.PlayerWidth[1][2]; // Mario
+            EditorCursor.Location.Height = Physics.PlayerHeight[1][2];
+        }
+        else if(EditorCursor.SubMode == 5)
+        {
+            EditorCursor.Location.Width = Physics.PlayerWidth[2][2]; // Luigi
+            EditorCursor.Location.Height = Physics.PlayerHeight[2][2];
+        }
+        else
+        {
+            EditorCursor.Location.Width = 32;
+            EditorCursor.Location.Height = 32;
         }
     }
     else if(EditorCursor.Mode == 3) // Background
@@ -2274,14 +1874,6 @@ void SetCursor()
 
         EditorCursor.Background.Layer = EditorCursor.Layer;
         EditorCursor.Background.Location = EditorCursor.Location;
-//        for(A = 1; A <= frmBackgrounds::Background.Count; A++)
-//        {
-//            if(frmBackgrounds::Background(A).Value == true && frmBackgrounds::Background(A).Visible == true)
-//            {
-//                EditorCursor.Background.Type = A;
-//                break;
-//            }
-//        }
         EditorCursor.Background.Location.Width = BackgroundWidth[EditorCursor.Background.Type];
         EditorCursor.Background.Location.Height = BackgroundHeight[EditorCursor.Background.Type];
         EditorCursor.Location.Width = EditorCursor.Background.Location.Width;
@@ -2290,81 +1882,20 @@ void SetCursor()
     else if(EditorCursor.Mode == 4) // NPCs
     {
         int t = EditorCursor.NPC.Type;
-        if(t != 91 && t != 96 && t != 283 && t != 284)
-            EditorCursor.NPC.Special = 0;
-        if(t != 288 && t != 289 && t != 91 && t != 260)
-            EditorCursor.NPC.Special2 = 0.0;
+        // handled elsewhere in new editor
+        if(MagicHand)
+        {
+            if(t != 91 && t != 96 && t != 283 && t != 284)
+                EditorCursor.NPC.Special = 0;
+            if(t != 288 && t != 289 && t != 91 && t != 260)
+                EditorCursor.NPC.Special2 = 0.0;
+        }
         EditorCursor.NPC.Special3 = 0.0;
         EditorCursor.NPC.Special4 = 0.0;
         EditorCursor.NPC.Special5 = 0.0;
         EditorCursor.NPC.Special6 = 0.0;
         EditorCursor.NPC.Layer = EditorCursor.Layer;
         EditorCursor.NPC.Location = EditorCursor.Location;
-//        for(A = 1; A <= frmNPCs::NPC.Count; A++)
-//        {
-//            if(frmNPCs::NPC(A).Value == true && frmNPCs::NPC(A).Visible == true)
-//            {
-//                EditorCursor.NPC.Type = A;
-//                break;
-//            }
-//        }
-//        if(frmNPCs::Buried.Caption == "Yes")
-//        {
-//            EditorCursor.NPC.Special = EditorCursor.NPC::Type;
-//            EditorCursor.NPC.Type = 91;
-//        }
-//        else if(frmNPCs::Egg.Caption == "Yes")
-//        {
-//            EditorCursor.NPC.Special = EditorCursor.NPC::Type;
-//            EditorCursor.NPC.Type = 96;
-//        }
-//        else if(frmNPCs::Bubble.Caption == "Yes")
-//        {
-//            EditorCursor.NPC.Special = EditorCursor.NPC::Type;
-//            EditorCursor.NPC.Type = 283;
-//        }
-//        else if(frmNPCs::Lakitu.Caption == "Yes")
-//        {
-//            EditorCursor.NPC.Special = EditorCursor.NPC::Type;
-//            EditorCursor.NPC.Type = 284;
-//        }
-
-//        if(EditorCursor.NPC.Type == 288 || EditorCursor.NPC.Type == 289 || (EditorCursor.NPC.Type == 91 && EditorCursor.NPC.Special == 288)) // Door potion
-//            EditorCursor.NPC.Special2 = frmNPCAdvanced::WarpSection::ListIndex;
-
-//        if(NPCIsAParaTroopa(EditorCursor.NPC::Type))
-//            EditorCursor.NPC.Special = frmNPCAdvanced::cmbPara::ListIndex;
-//        if(NPCIsCheep(EditorCursor.NPC::Type))
-//            EditorCursor.NPC.Special = frmNPCAdvanced::cmbCheep::ListIndex;
-//        if(EditorCursor.NPC.Type == 260)
-//            EditorCursor.NPC.Special = frmNPCAdvanced::scrFire.Value;
-//        EditorCursor.NPC.Text = "";
-
-//        for(int tempVar = frmNPCs::NPCText.Text.Length, A = 1; A <= tempVar; A++)
-//        {
-//            if(frmNPCs::NPCText.Text.substr(A - 1, 1) == StringHelper::toString(static_cast<char>(34)))
-//                EditorCursor.NPC.Text = EditorCursor.NPC.Text + "'";
-//            else
-//                EditorCursor.NPC.Text = EditorCursor.NPC.Text + frmNPCs::NPCText.Text.substr(A - 1, 1);
-//        }
-
-//        if(frmGenerator::Spawn.Caption == "Yes")
-//        {
-//            EditorCursor.NPC.Generator = true;
-//            EditorCursor.NPC.GeneratorTimeMax = frmGenerator::scrDelay.Value;
-//            for(A = 1; A <= 4; A++)
-//            {
-//                if(frmGenerator::optSpawnDirection(A).Value == true)
-//                    EditorCursor.NPC.GeneratorDirection = A;
-//            }
-//            for(A = 1; A <= 2; A++)
-//            {
-//                if(frmGenerator::optEffect(A).Value == true)
-//                    EditorCursor.NPC.GeneratorEffect = A;
-//            }
-//        }
-//        else
-//            EditorCursor.NPC.Generator = false;
 
         if(NPCWidth[EditorCursor.NPC.Type] > 0)
             EditorCursor.NPC.Location.Width = NPCWidth[EditorCursor.NPC.Type];
@@ -2380,31 +1911,6 @@ void SetCursor()
         EditorCursor.Location.SpeedX = 0.0;
         EditorCursor.Location.SpeedY = 0.0;
 
-//        if(frmNPCs::optNPCDirection(2).Value == true)
-//            EditorCursor.NPC.Direction = 1;
-//        else if(frmNPCs::optNPCDirection(0).Value == true)
-//            EditorCursor.NPC.Direction = -1;
-//        else
-//            EditorCursor.NPC.Direction = 0;
-//        if(frmNPCs::DontMove.Caption == "Yes")
-//            EditorCursor.NPC.Stuck = true;
-//        else
-//            EditorCursor.NPC.Stuck = false;
-//        if(frmNPCs::Friendly.Caption == "Yes")
-//            EditorCursor.NPC.Inert = true;
-//        else
-//            EditorCursor.NPC.Inert = false;
-//        if(frmNPCAdvanced::Legacy.Caption == "Yes")
-//            EditorCursor.NPC.Legacy = true;
-//        else
-//            EditorCursor.NPC.Legacy = false;
-
-//        EditorCursor.NPC.TriggerActivate = frmAdvanced::TriggerActivate.Text;
-//        EditorCursor.NPC.TriggerDeath = frmAdvanced::TriggerDeath.Text;
-//        EditorCursor.NPC.TriggerTalk = frmAdvanced::TriggerTalk.Text;
-//        EditorCursor.NPC.TriggerLast = frmAdvanced::TriggerLast.Text;
-//        EditorCursor.NPC.AttLayer = frmAdvanced::AttLayer.Text;
-//        EditorCursor.NPC.Frame = EditorNPCFrame(EditorCursor.NPC::Type, EditorCursor.NPC::Direction);
         EditorCursor.NPC.Frame = EditorNPCFrame(EditorCursor.NPC.Type, EditorCursor.NPC.Direction);
         EditorCursor.NPC.Active = true;
     }
@@ -2413,48 +1919,9 @@ void SetCursor()
         EditorCursor.Warp.Layer = EditorCursor.Layer;
         EditorCursor.Location.Width = 32;
         EditorCursor.Location.Height = 32;
-        EditorCursor.Warp.Entrance = EditorCursor.Location;
-        EditorCursor.Warp.Exit = EditorCursor.Location;
-//        EditorCursor.Warp.level = frmWarp::txtLevel.Text;
-//        EditorCursor.Warp.LevelWarp = frmWarp::scrWarp.Value;
-//        EditorCursor.Warp.LevelEnt = frmWarp::chkEntrance.Value;
-//        EditorCursor.Warp.Stars = Microsoft::VisualBasic::Conversion::Val(frmWarp::txtStars);
-//        if(frmWarp::cmdYoshi.Caption == "Yes")
-//            EditorCursor.Warp.NoYoshi = true;
-//        else
-//            EditorCursor.Warp.NoYoshi = false;
-//        if(frmWarp::cmdNPC.Caption == "Yes")
-//            EditorCursor.Warp.WarpNPC = true;
-//        else
-//            EditorCursor.Warp.WarpNPC = false;
-//        if(frmWarp::cmdLocked.Caption == "Yes")
-//            EditorCursor.Warp.Locked = true;
-//        else
-//            EditorCursor.Warp.Locked = false;
-//        for(A = 0; A < frmWarp::optEffect.Count; A++)
-//        {
-//            if(frmWarp::optEffect(A).Value == true)
-//            {
-//                EditorCursor.Warp.Effect = A;
-//                break;
-//            }
-//        }
-//        for(A = 1; A <= frmWarp::optDirection.Count; A++)
-//        {
-//            if(frmWarp::optDirection(A).Value == true)
-//            {
-//                EditorCursor.Warp.Direction = A;
-//                break;
-//            }
-//        }
-//        for(A = 1; A <= frmWarp::optDirection2.Count; A++)
-//        {
-//            if(frmWarp::optDirection2(A).Value == true)
-//            {
-//                EditorCursor.Warp.Direction2 = A;
-//                break;
-//            }
-//        }
+        // EditorCursor.Warp is now the canonical Warp object.
+        // EditorCursor.Warp.Entrance = EditorCursor.Location;
+        // EditorCursor.Warp.Exit = EditorCursor.Location;
     }
     else if(EditorCursor.Mode == 6) // Eraser
     {
@@ -2471,6 +1938,8 @@ void SetCursor()
 //                break;
 //            }
 //        }
+        if (EditorCursor.Tile.Type == 0)
+            EditorCursor.Tile.Type = 1;
         EditorCursor.Location.Width = TileWidth[EditorCursor.Tile.Type];
         EditorCursor.Location.Height = TileHeight[EditorCursor.Tile.Type];
         EditorCursor.Tile.Location = EditorCursor.Location;
@@ -2488,6 +1957,10 @@ void SetCursor()
 //        }
 //        EditorCursor.Location.Width = SceneWidth(EditorCursor.Scene::Type);
 //        EditorCursor.Location.Height = SceneHeight(EditorCursor.Scene::Type);
+        if (EditorCursor.Scene.Type == 0)
+            EditorCursor.Scene.Type = 1;
+        EditorCursor.Location.Width = SceneWidth[EditorCursor.Scene.Type];
+        EditorCursor.Location.Height = SceneHeight[EditorCursor.Scene.Type];
         EditorCursor.Scene.Location = EditorCursor.Location;
     }
     else if(EditorCursor.Mode == 9) // Levels
@@ -2501,6 +1974,8 @@ void SetCursor()
 //                break;
 //            }
 //        }
+        if (EditorCursor.WorldLevel.Type == 0)
+            EditorCursor.WorldLevel.Type = 1;
         EditorCursor.Location.Width = 32;
         EditorCursor.Location.Height = 32;
         EditorCursor.WorldLevel.Location = EditorCursor.Location;
@@ -2509,10 +1984,11 @@ void SetCursor()
 //            EditorCursor.WorldLevel.FileName = EditorCursor.WorldLevel::FileName + ".lvl";
 //        EditorCursor.WorldLevel.StartWarp = SDL_atoi(frmLevels::scrWarp.Value);
 //        EditorCursor.WorldLevel.LevelName = frmLevels::txtLevelName.Text;
-        EditorCursor.WorldLevel.Visible = false;
-        EditorCursor.WorldLevel.Start = false;
-        EditorCursor.WorldLevel.Path = false;
-        EditorCursor.WorldLevel.Path2 = false;
+        // set in the full editor.
+        // EditorCursor.WorldLevel.Visible = false;
+        // EditorCursor.WorldLevel.Start = false;
+        // EditorCursor.WorldLevel.Path = false;
+        // EditorCursor.WorldLevel.Path2 = false;
 //        if(frmLevels::chkVisible.Value > 0)
 //            EditorCursor.WorldLevel.Visible = true;
 //        if(frmLevels::chkStart.Value > 0)
@@ -2548,6 +2024,8 @@ void SetCursor()
 //                break;
 //            }
 //        }
+        if (EditorCursor.WorldPath.Type == 0)
+            EditorCursor.WorldPath.Type = 1;
         EditorCursor.Location.Width = 32;
         EditorCursor.Location.Height = 32;
         EditorCursor.WorldPath.Location = EditorCursor.Location;
@@ -2557,6 +2035,11 @@ void SetCursor()
         EditorCursor.Location.Height = 32;
         EditorCursor.Location.Width = 32;
         EditorCursor.WorldMusic.Location = EditorCursor.Location;
+        // make it play the music
+        if(curWorldMusic != EditorCursor.WorldMusic.Type)
+        {
+            StartMusic(EditorCursor.WorldMusic.Type);
+        }
 //        for(A = 0; A < frmMusic::optMusic.Count; A++)
 //        {
 //            if(frmMusic::optMusic(A).Value == true)
@@ -2580,7 +2063,7 @@ void PositionCursor()
     }
 
     if(EditorCursor.Mode == OptCursor_t::LVL_SELECT || EditorCursor.Mode == 14 ||
-      (EditorCursor.Mode == 2 /*&& frmLevelSettings::optLevel(4).Value == false && frmLevelSettings::optLevel(5).Value == false*/))
+      (EditorCursor.Mode == OptCursor_t::LVL_SETTINGS && EditorCursor.SubMode < 4))
         return;
 
     if(!enableAutoAlign)
@@ -2590,7 +2073,7 @@ void PositionCursor()
         return;
     }
 
-    if(EditorCursor.Mode == OptCursor_t::LVL_SETTINGS /*&& (frmLevelSettings::optLevel(4).Value == true || frmLevelSettings::optLevel(5).Value == true)*/)
+    if(EditorCursor.Mode == OptCursor_t::LVL_SETTINGS && EditorCursor.SubMode >= 4)
         EditorCursor.Location.X = EditorCursor.Location.X - 14;
 
     if(EditorCursor.Mode == OptCursor_t::LVL_SETTINGS || EditorCursor.Mode == OptCursor_t::LVL_NPCS)
@@ -2657,7 +2140,7 @@ void PositionCursor()
             EditorCursor.Location.Y = EditorCursor.Location.Y - 8;
     }
 
-    if(EditorCursor.Mode == 4)
+    if(EditorCursor.Mode == OptCursor_t::LVL_NPCS)
     {
         if(NPCHeight[EditorCursor.NPC.Type] < 32)
             EditorCursor.Location.Y = EditorCursor.Location.Y + 32;
@@ -2672,9 +2155,9 @@ void HideCursor()
     EditorCursor.Y = float(vScreenY[1] - 600);
     HasCursor = false;
     EditorControls.ScrollDown = false;
-    EditorControls.ScrollLeft = false;
-    EditorControls.MouseClick = false;
     EditorControls.ScrollRight = false;
+    EditorControls.MouseClick = false;
+    EditorControls.ScrollLeft = false;
     EditorControls.ScrollUp = false;
 }
 
@@ -2684,6 +2167,8 @@ void KillWarp(int A)
     Warp[A] = Warp[numWarps];
     Warp[numWarps] = blankWarp;
     numWarps--;
+    syncLayers_Warp(A);
+    syncLayers_Warp(numWarps+1);
 }
 
 void zTestLevel(bool magicHand, bool interProcess)
@@ -2938,18 +2423,18 @@ void MouseMove(float X, float Y, bool /*nCur*/)
         }
         else if(EditorCursor.Mode == OptCursor_t::LVL_SETTINGS)
         {
-//            if(frmLevelSettings::optLevel(4).Value == false && frmLevelSettings::optLevel(5).Value == false)
-//            {
-//                EditorCursor.Location.X = X - vScreenX[A];
-//                EditorCursor.Location.Y = Y - vScreenY[A];
-//            }
-//            else if(!(EditorCursor.Location.X == static_cast<float>(floor(X / 8)) * 8 - vScreenX[A] && EditorCursor.Location.Y + 8 == static_cast<float>(floor(Y / 8)) * 8 - vScreenY[A]))
-//            {
-//                EditorCursor.Location.X = static_cast<float>(floor(X / 8)) * 8 - vScreenX[A];
-//                EditorCursor.Location.Y = static_cast<float>(floor(Y / 8)) * 8 - vScreenY[A];
-//                EditorCursor.Location.Y = EditorCursor.Location.Y - 8;
-//                PositionCursor();
-//            }
+            if(EditorCursor.SubMode < 4)
+            {
+                EditorCursor.Location.X = X - vScreenX[A];
+                EditorCursor.Location.Y = Y - vScreenY[A];
+            }
+            else if(!(EditorCursor.Location.X == static_cast<float>(floor(X / 8)) * 8 - vScreenX[A] && EditorCursor.Location.Y + 8 == static_cast<float>(floor(Y / 8)) * 8 - vScreenY[A]))
+            {
+                EditorCursor.Location.X = static_cast<float>(floor(X / 8)) * 8 - vScreenX[A];
+                EditorCursor.Location.Y = static_cast<float>(floor(Y / 8)) * 8 - vScreenY[A];
+                EditorCursor.Location.Y = EditorCursor.Location.Y - 8;
+                PositionCursor();
+            }
         }
         else if(EditorCursor.Mode == 8)
         {

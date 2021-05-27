@@ -1907,11 +1907,6 @@ void UpdateGraphics(bool skipRepaint)
 
     if(!skipRepaint)
         frmMain.repaint();
-    else
-    {
-        frmMain.clearBuffer();
-        frmMain.repaint();
-    }
 
     frmMain.setTargetScreen();
 
