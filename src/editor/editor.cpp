@@ -438,12 +438,12 @@ void UpdateEditor()
                             PlaySound(SFX_Grab);
                             optCursor.current = 3;
                             OptCursorSync();
-                            EditorCursor.Background = Background[A];
                             EditorCursor.Layer = Background[A].Layer;
                             EditorCursor.Location.X = Background[A].Location.X;
                             EditorCursor.Location.Y = Background[A].Location.Y;
+                            EditorCursor.Background = std::move(Background[A]);
                             SetCursor();
-                            Background[A] = Background[numBackground];
+                            Background[A] = std::move(Background[numBackground]);
                             numBackground = numBackground - 1;
 #ifdef NEW_EDITOR
                             editorScreen.FocusBGO();
@@ -480,12 +480,12 @@ void UpdateEditor()
                                 OptCursorSync();
 
                                 EditorCursor.Mode = OptCursor_t::LVL_BLOCKS;
-                                EditorCursor.Block = Block[A];
                                 EditorCursor.Layer = Block[A].Layer;
                                 EditorCursor.Location.X = Block[A].Location.X;
                                 EditorCursor.Location.Y = Block[A].Location.Y;
                                 EditorCursor.Location.Width = Block[A].Location.Width;
                                 EditorCursor.Location.Height = Block[A].Location.Height;
+                                EditorCursor.Block = std::move(Block[A]);
                                 SetCursor();
 //                                Netplay::sendData Netplay::EraseBlock(A, 1);
                                 KillBlock(A, false);
@@ -512,10 +512,10 @@ void UpdateEditor()
 //                            frmLevelEditor::optCursor(15).Value = true;
                             optCursor.current = OptCursor_t::LVL_WATER;
                             OptCursorSync();
-                            EditorCursor.Water = Water[A];
                             EditorCursor.Location = Water[A].Location;
                             EditorCursor.Layer = Water[A].Layer;
-                            std::swap(Water[A], Water[numWater]);
+                            EditorCursor.Water = std::move(Water[A]);
+                            Water[A] = std::move(Water[numWater]);
                             numWater--;
                             syncLayers_Water(A);
                             syncLayers_Water(numWater+1);
@@ -528,8 +528,9 @@ void UpdateEditor()
 
                 if(MouseRelease && !MagicHand) // World map music
                 {
-                    for(int numWorldMusicMax = numWorldMusic, A = 1; A <= numWorldMusicMax; A++)
+                    for(auto *t : treeWorldMusicQuery(EditorCursor.Location, false))
                     {
+                        A = (t - &WorldMusic[1]) + 1;
                         if(CursorCollision(EditorCursor.Location, WorldMusic[A].Location) == true)
                         {
                             PlaySound(SFX_Grab);
@@ -539,10 +540,13 @@ void UpdateEditor()
                             EditorCursor.Location = WorldMusic[A].Location;
                             SetCursor();
 //                            frmMusic::optMusic(WorldMusic[A].Type).Value = true;
-                            EditorCursor.WorldMusic = WorldMusic[A];
-                            WorldMusic[A] = WorldMusic[numWorldMusic];
+                            EditorCursor.WorldMusic = std::move(WorldMusic[A]);
+                            if(A != numWorldMusic)
+                            {
+                                WorldMusic[A] = std::move(WorldMusic[numWorldMusic]);
+                                treeWorldMusicUpdate(&WorldMusic[A]);
+                            }
                             treeWorldMusicRemove(&WorldMusic[numWorldMusic]);
-                            treeWorldMusicUpdate(&WorldMusic[A]);
                             numWorldMusic = numWorldMusic - 1;
                             MouseRelease = false;
                             EditorControls.MouseClick = false; /* Simulate "Focus out" inside of SMBX Editor */
@@ -553,8 +557,9 @@ void UpdateEditor()
 
                 if(MouseRelease && !MagicHand) // World paths
                 {
-                    for(int numWorldPathsMax = numWorldPaths, A = 1; A <= numWorldPathsMax; A++)
+                    for(auto *t : treeWorldPathQuery(EditorCursor.Location, false))
                     {
+                        A = (t - &WorldPath[1]) + 1;
                         if(CursorCollision(EditorCursor.Location, WorldPath[A].Location) == true)
                         {
                             PlaySound(SFX_Grab);
@@ -563,12 +568,15 @@ void UpdateEditor()
                             OptCursorSync();
 //                            frmPaths::WorldPath(WorldPath[A].Type).Value = true;
                             EditorCursor.Mode = OptCursor_t::WLD_PATHS;
-                            EditorCursor.WorldPath = WorldPath[A];
                             EditorCursor.Location = WorldPath[A].Location;
+                            EditorCursor.WorldPath = std::move(WorldPath[A]);
                             SetCursor();
-                            std::swap(WorldPath[A], WorldPath[numWorldPaths]);
+                            if(A != numWorldPaths)
+                            {
+                                WorldPath[A] = std::move(WorldPath[numWorldPaths]);
+                                treeWorldPathUpdate(&WorldPath[A]);
+                            }
                             treeWorldPathRemove(&WorldPath[numWorldPaths]);
-                            treeWorldPathUpdate(&WorldPath[A]);
                             numWorldPaths = numWorldPaths - 1;
                             MouseRelease = false;
                             EditorControls.MouseClick = false; /* Simulate "Focus out" inside of SMBX Editor */
@@ -579,8 +587,12 @@ void UpdateEditor()
 
                 if(MouseRelease && !MagicHand) // World sceneries
                 {
-                    for(A = numScenes; A >= 1; A--)
+                    auto sentinel = treeWorldSceneQuery(EditorCursor.Location, true);
+                    auto i = sentinel.end();
+                    --i;
+                    for(; i >= sentinel.begin(); i--)
                     {
+                        A = (*i - &Scene[1]) + 1;
                         if(CursorCollision(EditorCursor.Location, Scene[A].Location) == true)
                         {
                             PlaySound(SFX_Grab);
@@ -589,15 +601,15 @@ void UpdateEditor()
                             OptCursorSync();
 //                            frmScene::Scene(Scene[A].Type).Value = true;
                             EditorCursor.Mode = OptCursor_t::WLD_SCENES;
-                            EditorCursor.Scene = Scene[A];
                             EditorCursor.Location = Scene[A].Location;
+                            EditorCursor.Scene = std::move(Scene[A]);
                             SetCursor();
                             MouseMove(EditorCursor.X, EditorCursor.Y);
                             // this maintains the order of the scenes
                             // but makes for a hellish quadtree update
                             for(B = A; B < numScenes; B++)
                             {
-                                std::swap(Scene[B], Scene[B + 1]);
+                                Scene[B] = std::move(Scene[B + 1]);
                                 treeWorldSceneUpdate(&Scene[B]);
                             }
                             treeWorldSceneRemove(&Scene[numScenes]);
@@ -611,20 +623,24 @@ void UpdateEditor()
 
                 if(MouseRelease && !MagicHand) // World map level points
                 {
-                    for(int numWorldLevelsMax = numWorldLevels, A = 1; A <= numWorldLevelsMax; A++)
+                    for(auto *t : treeWorldLevelQuery(EditorCursor.Location, false))
                     {
+                        A = (t - &WorldLevel[1]) + 1;
                         if(CursorCollision(EditorCursor.Location, WorldLevel[A].Location) == true)
                         {
                             PlaySound(SFX_Grab);
                             optCursor.current = OptCursor_t::WLD_LEVELS;
                             OptCursorSync();
                             EditorCursor.Mode = OptCursor_t::WLD_LEVELS;
-                            EditorCursor.WorldLevel = WorldLevel[A];
                             EditorCursor.Location = WorldLevel[A].Location;
+                            EditorCursor.WorldLevel = std::move(WorldLevel[A]);
                             SetCursor();
-                            std::swap(WorldLevel[A], WorldLevel[numWorldLevels]);
+                            if(A != numWorldLevels)
+                            {
+                                WorldLevel[A] = std::move(WorldLevel[numWorldLevels]);
+                                treeWorldLevelUpdate(&WorldLevel[A]);
+                            }
                             treeWorldLevelRemove(&WorldLevel[numWorldLevels]);
-                            treeWorldLevelUpdate(&WorldLevel[A]);
                             numWorldLevels = numWorldLevels - 1;
                             MouseRelease = false;
                             EditorControls.MouseClick = false; /* Simulate "Focus out" inside of SMBX Editor */
@@ -635,20 +651,24 @@ void UpdateEditor()
 
                 if(MouseRelease && !MagicHand) // Terrain tiles
                 {
-                    for(int numTilesMax = numTiles, A = 1; A <= numTilesMax; A++)
+                    for(auto *t : treeWorldTileQuery(EditorCursor.Location, false))
                     {
+                        A = (t - &Tile[1]) + 1;
                         if(CursorCollision(EditorCursor.Location, Tile[A].Location) == true)
                         {
                             PlaySound(SFX_Grab);
                             optCursor.current = OptCursor_t::WLD_TILES;
                             OptCursorSync();
                             EditorCursor.Mode = OptCursor_t::WLD_TILES;
-                            EditorCursor.Tile = Tile[A];
                             EditorCursor.Location = Tile[A].Location;
+                            EditorCursor.Tile = std::move(Tile[A]);
                             SetCursor();
-                            std::swap(Tile[A], Tile[numTiles]);
+                            if(A != numTiles)
+                            {
+                                Tile[A] = std::move(Tile[numTiles]);
+                                treeWorldTileUpdate(&Tile[A]);
+                            }
                             treeWorldTileRemove(&Tile[numTiles]);
-                            treeWorldTileUpdate(&Tile[A]);
                             numTiles = numTiles - 1;
 #ifdef NEW_EDITOR
                             editorScreen.FocusTile();
@@ -774,7 +794,7 @@ void UpdateEditor()
                             b.Location.Y = b.Location.Y + b.Location.Height / 2.0 - EffectHeight[10] / 2;
                             NewEffect(10, b.Location);
                             PlaySound(SFX_Smash);
-                            std::swap(Background[A], Background[numBackground]);
+                            Background[A] = std::move(Background[numBackground]);
                             numBackground -= 1;
                             MouseRelease = false;
                             if(MagicHand)
@@ -824,8 +844,7 @@ void UpdateEditor()
                             PlaySound(SFX_Smash);
 //                            if(nPlay.Online == true)
 //                                Netplay::sendData "y" + std::to_string(A) + LB + "p36" + LB;
-                            Water[A] = Water[numWater];
-                            std::swap(Water[A], Water[numWater]);
+                            Water[A] = std::move(Water[numWater]);
                             numWater = numWater - 1;
                             syncLayers_Water(A);
                             syncLayers_Water(numWater + 1);
@@ -837,8 +856,10 @@ void UpdateEditor()
 
                 if(MouseRelease)
                 {
-                    for(int numWorldMusicMax = numWorldMusic, A = 1; A <= numWorldMusicMax; A++)
+                    // for(int numWorldMusicMax = numWorldMusic, A = 1; A <= numWorldMusicMax; A++)
+                    for(auto *t : treeWorldMusicQuery(EditorCursor.Location, false))
                     {
+                        A = (t - &WorldMusic[1]) + 1;
                         if(CursorCollision(EditorCursor.Location, WorldMusic[A].Location) == true)
                         {
                             tempLocation = WorldMusic[A].Location;
@@ -846,9 +867,12 @@ void UpdateEditor()
                             tempLocation.Y = tempLocation.Y + tempLocation.Height / 2.0 - EffectHeight[10] / 2;
                             NewEffect(10, tempLocation);
                             PlaySound(SFX_ShellHit);
-                            WorldMusic[A] = WorldMusic[numWorldMusic];
+                            if(A != numWorldMusic)
+                            {
+                                WorldMusic[A] = std::move(WorldMusic[numWorldMusic]);
+                                treeWorldMusicUpdate(&WorldMusic[A]);
+                            }
                             treeWorldMusicRemove(&WorldMusic[numWorldMusic]);
-                            treeWorldMusicUpdate(&WorldMusic[A]);
                             numWorldMusic = numWorldMusic - 1;
                             MouseRelease = false;
                             break;
@@ -858,8 +882,10 @@ void UpdateEditor()
 
                 if(MouseRelease)
                 {
-                    for(int numWorldPathsMax = numWorldPaths, A = 1; A <= numWorldPathsMax; A++)
+                    for(auto *t : treeWorldPathQuery(EditorCursor.Location, false))
                     {
+                        A = (t - &WorldPath[1]) + 1;
+
                         if(CursorCollision(EditorCursor.Location, WorldPath[A].Location) == true)
                         {
                             tempLocation = WorldPath[A].Location;
@@ -867,9 +893,12 @@ void UpdateEditor()
                             tempLocation.Y = tempLocation.Y + tempLocation.Height / 2.0 - EffectHeight[10] / 2;
                             NewEffect(10, tempLocation);
                             PlaySound(SFX_ShellHit);
-                            WorldPath[A] = WorldPath[numWorldPaths];
+                            if(A != numWorldPaths)
+                            {
+                                WorldPath[A] = std::move(WorldPath[numWorldPaths]);
+                                treeWorldPathUpdate(&WorldPath[A]);
+                            }
                             treeWorldPathRemove(&WorldPath[numWorldPaths]);
-                            treeWorldPathUpdate(&WorldPath[A]);
                             numWorldPaths -= 1;
                             MouseRelease = false;
                             break;
@@ -879,8 +908,12 @@ void UpdateEditor()
 
                 if(MouseRelease)
                 {
-                    for(A = numScenes; A >= 1; A--)
+                    auto sentinel = treeWorldSceneQuery(EditorCursor.Location, true);
+                    auto i = sentinel.end();
+                    --i;
+                    for(; i >= sentinel.begin(); i--)
                     {
+                        A = (*i - &Scene[1]) + 1;
                         if(CursorCollision(EditorCursor.Location, Scene[A].Location) == true)
                         {
                             tempLocation = Scene[A].Location;
@@ -890,7 +923,7 @@ void UpdateEditor()
                             PlaySound(SFX_ShellHit);
                             for(B = A; B < numScenes; B++)
                             {
-                                Scene[B] = Scene[B + 1];
+                                Scene[B] = std::move(Scene[B + 1]);
                                 treeWorldSceneUpdate(&Scene[B]);
                             }
                             treeWorldSceneRemove(&Scene[numScenes]);
@@ -903,8 +936,9 @@ void UpdateEditor()
 
                 if(MouseRelease)
                 {
-                    for(int numWorldLevelsMax = numWorldLevels, A = 1; A <= numWorldLevelsMax; A++)
+                    for(auto *t : treeWorldLevelQuery(EditorCursor.Location, false))
                     {
+                        A = (t - &WorldLevel[1]) + 1;
                         if(CursorCollision(EditorCursor.Location, WorldLevel[A].Location) == true)
                         {
                             tempLocation = WorldLevel[A].Location;
@@ -912,9 +946,12 @@ void UpdateEditor()
                             tempLocation.Y = tempLocation.Y + tempLocation.Height / 2.0 - EffectHeight[10] / 2;
                             NewEffect(10, tempLocation);
                             PlaySound(SFX_ShellHit);
-                            WorldLevel[A] = WorldLevel[numWorldLevels];
+                            if(A != numWorldLevels)
+                            {
+                                WorldLevel[A] = std::move(WorldLevel[numWorldLevels]);
+                                treeWorldLevelUpdate(&WorldLevel[A]);
+                            }
                             treeWorldLevelRemove(&WorldLevel[numWorldLevels]);
-                            treeWorldLevelUpdate(&WorldLevel[A]);
                             numWorldLevels = numWorldLevels - 1;
                             MouseRelease = false;
                             break;
@@ -924,8 +961,9 @@ void UpdateEditor()
 
                 if(MouseRelease)
                 {
-                    for(int numTilesMax = numTiles, A = 1; A <= numTilesMax; A++)
+                    for(auto *t : treeWorldTileQuery(EditorCursor.Location, false))
                     {
+                        A = (t - &Tile[1]) + 1;
                         if(CursorCollision(EditorCursor.Location, Tile[A].Location) == true)
                         {
                             tempLocation = Tile[A].Location;
@@ -933,9 +971,12 @@ void UpdateEditor()
                             tempLocation.Y = tempLocation.Y + tempLocation.Height / 2.0 - EffectHeight[10] / 2;
                             NewEffect(10, tempLocation);
                             PlaySound(SFX_ShellHit);
-                            Tile[A] = Tile[numTiles];
+                            if(A != numTiles)
+                            {
+                                Tile[A] = std::move(Tile[numTiles]);
+                                treeWorldTileUpdate(&Tile[A]);
+                            }
                             treeWorldTileRemove(&Tile[numTiles]);
-                            treeWorldTileUpdate(&Tile[A]);
                             numTiles = numTiles - 1;
                             MouseRelease = false;
                             break;

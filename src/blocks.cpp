@@ -1472,8 +1472,7 @@ void KillBlock(int A, bool Splode)
     {
         if(numBlock > 0)
         {
-            Block[A] = Block[numBlock];
-            Block[numBlock] = blankBlock;
+            Block[A] = std::move(Block[numBlock]);
             syncLayers_Block(A);
             numBlock = numBlock - 1;
             syncLayers_Block(numBlock + 1);

@@ -468,7 +468,7 @@ void SizeWindow(SDL_Window* window)
 
 void FrmMain::eventDoubleClick()
 {
-    if(MagicHand)
+    if(MagicHand || LevelEditor || WorldEditor)
         return; // Don't toggle fullscreen/window when magic hand is active
 #if !defined(__EMSCRIPTEN__) && !defined(__ANDROID__)
     if(resChanged)
@@ -477,7 +477,7 @@ void FrmMain::eventDoubleClick()
         resChanged = false;
         SDL_RestoreWindow(m_window);
         SizeWindow(m_window);
-        if(!GameMenu && !MagicHand)
+        if(!GameMenu && !MagicHand && !LevelEditor && !WorldEditor)
             showCursor(1);
     }
     else

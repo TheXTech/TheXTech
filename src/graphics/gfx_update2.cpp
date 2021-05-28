@@ -56,22 +56,6 @@ void UpdateGraphics2(bool skipRepaint)
 
     g_stats.reset();
 
-    // Keep them static to don't re-alloc them for every iteration
-    static TilePtrArr  tarr;
-    static ScenePtrArr sarr;
-    static WorldPathPtrArr parr;
-    static WorldLevelPtrArr larr;
-
-    // Reserve 400 elements per every array
-    if(tarr.capacity() < 400)
-        tarr.reserve(400);
-    if(sarr.capacity() < 400)
-        sarr.reserve(400);
-    if(parr.capacity() < 400)
-        parr.reserve(400);
-    if(larr.capacity() < 400)
-        larr.reserve(400);
-
     int A = 0;
     int B = 0;
     int Z = 0;
@@ -294,9 +278,7 @@ void UpdateGraphics2(bool skipRepaint)
         sView.Width = sRight - sLeft;
         sView.Height = sBottom - sTop;
 
-        treeWorldTileQuery(sLeft, sTop, sRight, sBottom, tarr, true);
-        //for(A = 1; A <= numTiles; A++)
-        for(auto *t : tarr)
+        for(Tile_t* t : treeWorldTileQuery(sLeft, sTop, sRight, sBottom, true))
         {
             Tile_t &tile = *t;
             SDL_assert(IF_INRANGE(tile.Type, 1, maxTileType));
@@ -314,9 +296,7 @@ void UpdateGraphics2(bool skipRepaint)
             }
         }
 
-        treeWorldSceneQuery(sLeft, sTop, sRight, sBottom, sarr, true);
-        //for(A = 1; A <= numScenes; A++)
-        for(auto *t : sarr)
+        for(Scene_t* t : treeWorldSceneQuery(sLeft, sTop, sRight, sBottom, true))
         {
             Scene_t &scene = *t;
             SDL_assert(IF_INRANGE(scene.Type, 1, maxSceneType));
@@ -334,9 +314,7 @@ void UpdateGraphics2(bool skipRepaint)
             }
         }
 
-        treeWorldPathQuery(sLeft, sTop, sRight, sBottom, parr, true);
-        //for(A = 1; A <= numWorldPaths; A++)
-        for(auto *t : parr)
+        for(WorldPath_t* t : treeWorldPathQuery(sLeft, sTop, sRight, sBottom, true))
         {
             WorldPath_t &path = *t;
             SDL_assert(IF_INRANGE(path.Type, 1, maxPathType));
@@ -354,9 +332,7 @@ void UpdateGraphics2(bool skipRepaint)
             }
         }
 
-        treeWorldLevelQuery(sLeft, sTop, sRight, sBottom, larr, true);
-        //for(A = 1; A <= numWorldLevels; A++)
-        for(auto *t : larr)
+        for(WorldLevel_t* t : treeWorldLevelQuery(sLeft, sTop, sRight, sBottom, true))
         {
             WorldLevel_t &level = *t;
             SDL_assert(IF_INRANGE(level.Type, 0, maxLevelType));
@@ -409,13 +385,15 @@ void UpdateGraphics2(bool skipRepaint)
                     GFXEffect[Effect[A].Type], 0, Effect[A].Frame * EffectHeight[Effect[A].Type]);
             }
         }
-        for (A = 1; A <= numWorldMusic; A++)
+        //for(A = 1; A <= numWorldLevels; A++)
+        for(WorldMusic_t* t : treeWorldMusicQuery(sLeft, sTop, sRight, sBottom, true))
         {
-            if (vScreenCollision(Z, WorldMusic[A].Location))
+            WorldMusic_t &music = *t;
+            if (vScreenCollision(Z, music.Location))
             {
-                frmMain.renderRect(vScreenX[Z] + WorldMusic[A].Location.X, vScreenY[Z] + WorldMusic[A].Location.Y, 32, 32,
+                frmMain.renderRect(vScreenX[Z] + music.Location.X, vScreenY[Z] + music.Location.Y, 32, 32,
                     1.f, 0.f, 1.f, 1.f, false);
-                SuperPrint(std::to_string(WorldMusic[A].Type), 1, vScreenX[Z] + WorldMusic[A].Location.X + 2, vScreenY[Z] + WorldMusic[A].Location.Y + 2);
+                SuperPrint(std::to_string(music.Type), 1, vScreenX[Z] + music.Location.X + 2, vScreenY[Z] + music.Location.Y + 2);
             }
         }
 #ifdef __3DS__

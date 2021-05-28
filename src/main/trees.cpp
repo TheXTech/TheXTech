@@ -24,8 +24,12 @@
  */
 
 #include <memory>
+#include <algorithm>
 #include "trees.h"
 #include "QuadTree/LooseQuadtree.h"
+
+std::vector<void*> treeresult_vec[4] = {std::vector<void*>(400), std::vector<void*>(400), std::vector<void*>(50), std::vector<void*>(50)};
+ptrdiff_t cur_treeresult_vec = 0;
 
 template<class WorldItemT>
 class WorldTree_Extractor
@@ -54,68 +58,6 @@ static std::unique_ptr<WorldTree_private<Scene_t>> s_worldSceneTree;
 static std::unique_ptr<WorldTree_private<WorldPath_t>> s_worldPathTree;
 static std::unique_ptr<WorldTree_private<WorldLevel_t>> s_worldLevelTree;
 static std::unique_ptr<WorldTree_private<WorldMusic_t>> s_worldMusicTree;
-
-template<class WorldItemT>
-void sortElements(std::vector<WorldItemT*> &list)
-{
-    if(list.size() <= 1)
-        return; //Nothing to sort!
-
-#define S(x) (static_cast<size_t>(x))
-
-    std::vector<int64_t> beg;
-    std::vector<int64_t> end;
-    beg.reserve(list.size());
-    end.reserve(list.size());
-
-    WorldItemT *piv;
-    int64_t i = 0;
-    int64_t L, R, swapv;
-    beg.push_back(0);
-    end.push_back(static_cast<int64_t>(list.size()));
-
-    while(i >= 0)
-    {
-        L = beg[S(i)];
-        R = end[S(i)] - 1;
-
-        if(L < R)
-        {
-            piv = list[S(L)];
-            while(L < R)
-            {
-                while((list[S(R)]->Z >= piv->Z) && (L < R)) R--;
-                if(L < R) list[S(L++)] = std::move(list[S(R)]);
-
-                while((list[S(L)]->Z <= piv->Z) && (L < R)) L++;
-                if(L < R) list[S(R--)] = std::move(list[S(L)]);
-            }
-
-            list[S(L)] = piv;
-            beg.push_back(L + 1);
-            end.push_back(end[S(i)]);
-            end[S(i++)] = (L);
-
-            if((end[i] - beg[S(i)]) > (end[i - 1] - beg[S(i - 1)]))
-            {
-                swapv = beg[S(i)];
-                beg[S(i)] = beg[S(i - 1)];
-                beg[S(i - 1)] = swapv;
-                swapv = end[S(i)];
-                end[S(i)] = end[S(i - 1)];
-                end[S(i - 1)] = swapv;
-            }
-        }
-        else
-        {
-            i--;
-            beg.pop_back();
-            end.pop_back();
-        }
-    }
-
-#undef S
-}
 
 template<class Q>
 void clearTree(Q &tree)
@@ -159,28 +101,37 @@ void treeRemove(Arr &p, Obj*obj)
         p->tree.Remove(obj);
 }
 
-template<class Obj, class Arr>
-void treeWorldQuery(Arr &p, double Left, double Top, double Right, double Bottom, std::vector<Obj *> &list, bool z_sort)
+template<class Obj>
+TreeResult_Sentinel<Obj> treeWorldQuery(std::unique_ptr<WorldTree_private<Obj>> &p,
+    double Left, double Top, double Right, double Bottom, bool z_sort)
 {
-    list.clear();
+    TreeResult_Sentinel<Obj> result;
 
     if(!p.get())
-        return;
+        return result;
 
     auto q = p->tree.QueryIntersectsRegion(loose_quadtree::BoundingBox<double>(Left - s_gridSize,
                                                                                Top - s_gridSize,
                                                                                (Right - Left) + s_gridSize * 2,
                                                                                (Bottom - Top) + s_gridSize * 2));
+
     while(!q.EndOfQuery())
     {
         auto *item = q.GetCurrent();
         if(item)
-            list.push_back(q.GetCurrent());
+            result.i_vec->push_back(q.GetCurrent());
         q.Next();
     }
 
     if(z_sort)
-        sortElements(list);
+    {
+        std::sort(result.i_vec->begin(), result.i_vec->end(),
+            [](void* a, void* b) {
+                return a < b;
+            });
+    }
+
+    return result;
 }
 
 
@@ -201,24 +152,24 @@ void treeWorldTileRemove(Tile_t *obj)
     treeRemove(s_worldTilesTree, obj);
 }
 
-void treeWorldTileQuery(double Left, double Top, double Right, double Bottom, TilePtrArr &list, bool z_sort, double margin)
+TreeResult_Sentinel<Tile_t> treeWorldTileQuery(double Left, double Top, double Right, double Bottom, bool z_sort, double margin)
 {
-    treeWorldQuery(s_worldTilesTree,
+    return treeWorldQuery(s_worldTilesTree,
                    Left - margin,
                    Top - margin,
                    Right + margin,
                    Bottom + margin,
-                   list, z_sort);
+                   z_sort);
 }
 
-void treeWorldTileQuery(const Location_t &loc, TilePtrArr &list, bool z_sort, double margin)
+TreeResult_Sentinel<Tile_t> treeWorldTileQuery(const Location_t &loc, bool z_sort, double margin)
 {
-    treeWorldQuery(s_worldTilesTree,
+    return treeWorldQuery(s_worldTilesTree,
                    loc.X - margin,
                    loc.Y - margin,
                    loc.X + loc.Width + margin,
                    loc.Y + loc.Height + margin,
-                   list, z_sort);
+                   z_sort);
 }
 
 
@@ -239,24 +190,24 @@ void treeWorldSceneRemove(Scene_t *obj)
     treeRemove(s_worldSceneTree, obj);
 }
 
-void treeWorldSceneQuery(double Left, double Top, double Right, double Bottom, ScenePtrArr &list, bool z_sort, double margin)
+TreeResult_Sentinel<Scene_t> treeWorldSceneQuery(double Left, double Top, double Right, double Bottom, bool z_sort, double margin)
 {
-    treeWorldQuery(s_worldSceneTree,
+    return treeWorldQuery(s_worldSceneTree,
                    Left - margin,
                    Top - margin,
                    Right + margin,
                    Bottom + margin,
-                   list, z_sort);
+                   z_sort);
 }
 
-void treeWorldSceneQuery(const Location_t &loc, ScenePtrArr &list, bool z_sort, double margin)
+TreeResult_Sentinel<Scene_t> treeWorldSceneQuery(const Location_t &loc, bool z_sort, double margin)
 {
-    treeWorldQuery(s_worldSceneTree,
+    return treeWorldQuery(s_worldSceneTree,
                    loc.X - margin,
                    loc.Y - margin,
                    loc.X + loc.Width + margin,
                    loc.Y + loc.Height + margin,
-                   list, z_sort);
+                   z_sort);
 }
 
 
@@ -277,26 +228,25 @@ void treeWorldPathRemove(WorldPath_t *obj)
     treeRemove(s_worldPathTree, obj);
 }
 
-void treeWorldPathQuery(double Left, double Top, double Right, double Bottom,
-                        WorldPathPtrArr &list,
+TreeResult_Sentinel<WorldPath_t> treeWorldPathQuery(double Left, double Top, double Right, double Bottom,
                         bool z_sort, double margin)
 {
-    treeWorldQuery(s_worldPathTree,
+    return treeWorldQuery(s_worldPathTree,
                    Left - margin,
                    Top - margin,
                    Right + margin,
                    Bottom + margin,
-                   list, z_sort);
+                   z_sort);
 }
 
-void treeWorldPathQuery(const Location_t &loc, WorldPathPtrArr &list, bool z_sort, double margin)
+TreeResult_Sentinel<WorldPath_t> treeWorldPathQuery(const Location_t &loc, bool z_sort, double margin)
 {
-    treeWorldQuery(s_worldPathTree,
+    return treeWorldQuery(s_worldPathTree,
                    loc.X - margin,
                    loc.Y - margin,
                    loc.X + loc.Width + margin,
                    loc.Y + loc.Height + margin,
-                   list, z_sort);
+                   z_sort);
 }
 
 /* ================= Levels ================= */
@@ -316,26 +266,25 @@ void treeWorldLevelRemove(WorldLevel_t *obj)
     treeRemove(s_worldLevelTree, obj);
 }
 
-void treeWorldLevelQuery(double Left, double Top, double Right, double Bottom,
-                         WorldLevelPtrArr &list,
+TreeResult_Sentinel<WorldLevel_t> treeWorldLevelQuery(double Left, double Top, double Right, double Bottom,
                          bool z_sort, double margin)
 {
-    treeWorldQuery(s_worldLevelTree,
+    return treeWorldQuery(s_worldLevelTree,
                    Left - margin,
                    Top - margin,
                    Right + margin,
                    Bottom + margin,
-                   list, z_sort);
+                   z_sort);
 }
 
-void treeWorldLevelQuery(const Location_t &loc, WorldLevelPtrArr &list, bool z_sort, double margin)
+TreeResult_Sentinel<WorldLevel_t> treeWorldLevelQuery(const Location_t &loc, bool z_sort, double margin)
 {
-    treeWorldQuery(s_worldLevelTree,
+    return treeWorldQuery(s_worldLevelTree,
                    loc.X - margin,
                    loc.Y - margin,
                    loc.X + loc.Width + margin,
                    loc.Y + loc.Height + margin,
-                   list, z_sort);
+                   z_sort);
 }
 
 
@@ -356,29 +305,27 @@ void treeWorldMusicRemove(WorldMusic_t *obj)
     treeRemove(s_worldMusicTree, obj);
 }
 
-void treeWorldMusicQuery(double Left, double Top, double Right, double Bottom,
-                         WorldMusicPtrArr &list,
+TreeResult_Sentinel<WorldMusic_t> treeWorldMusicQuery(double Left, double Top, double Right, double Bottom,
                          bool z_sort,
                          double margin)
 {
-    treeWorldQuery(s_worldMusicTree,
+    return treeWorldQuery(s_worldMusicTree,
                    Left - margin,
                    Top - margin,
                    Right + margin,
                    Bottom + margin,
-                   list, z_sort);
+                   z_sort);
 }
 
-void treeWorldMusicQuery(const Location_t &loc,
-                         WorldMusicPtrArr &list,
+TreeResult_Sentinel<WorldMusic_t> treeWorldMusicQuery(const Location_t &loc,
                          bool z_sort,
                          double margin)
 {
-    treeWorldQuery(s_worldMusicTree,
+    return treeWorldQuery(s_worldMusicTree,
                    loc.X - margin,
                    loc.Y - margin,
                    loc.X + loc.Width + margin,
-                   loc.Y + loc.Height + margin, list, z_sort);
+                   loc.Y + loc.Height + margin, z_sort);
 }
 
 

@@ -44,7 +44,7 @@ void SetOrigRes()
 #endif
     if(LoadingInProcess)
         UpdateLoad();
-    if(!GameMenu && !MagicHand)
+    if(!GameMenu && !MagicHand && !LevelEditor && !WorldEditor)
         showCursor(1);
 }
 
