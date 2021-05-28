@@ -484,6 +484,12 @@ void UpdateGraphics(bool skipRepaint)
 
         if(GameOutro) ScreenType = 7;
 
+        // Make sure we are in range.
+        // If we later add more than two screens,
+        // need to change how many NPC draw queues we have.
+        SDL_assert_release(Z-1 >= 0 && Z-1 < 2);
+        NPC_Draw_Queue_t& NPC_Draw_Queue_p = NPC_Draw_Queue[Z-1];
+
         if(!LevelEditor)
         {
             if(ScreenType == 2 || ScreenType == 3)
@@ -601,7 +607,7 @@ void UpdateGraphics(bool skipRepaint)
             }
         }
         if(!Do_FrameSkip)
-            NPC_Draw_Queue[Z].reset();
+            NPC_Draw_Queue_p.reset();
         if(!LevelEditor)
         {
             for(A = 1; A <= numNPCs; A++)
@@ -717,7 +723,7 @@ void UpdateGraphics(bool skipRepaint)
                 if(!Do_FrameSkip && onscreen && ((NPC[A].Reset[1] && NPC[A].Reset[2]) || NPC[A].Active || NPC[A].Type == NPCID_CONVEYER))
                 {
                     g_stats.renderedNPCs++;
-                    NPC_Draw_Queue[Z].add(A);
+                    NPC_Draw_Queue_p.add(A);
 
                     if(!NPC[A].Active)
                         NPCFrames(A);
@@ -734,7 +740,7 @@ void UpdateGraphics(bool skipRepaint)
                     && (vScreenCollision(Z, NPC[A].Location) || vScreenCollision(Z, loc2)))
                 {
                     g_stats.renderedNPCs++;
-                    NPC_Draw_Queue[Z].add(A);
+                    NPC_Draw_Queue_p.add(A);
                 }
             }
         }
@@ -762,6 +768,12 @@ void UpdateGraphics(bool skipRepaint)
             S = curSection;
         else
             S = Player[Z].Section;
+
+        // Make sure we are in range.
+        // If we later add more than two screens,
+        // need to change how many NPC draw queues we have.
+        SDL_assert_release(Z-1 >= 0 && Z-1 < 2);
+        NPC_Draw_Queue_t& NPC_Draw_Queue_p = NPC_Draw_Queue[Z-1];
 
         frmMain.setViewport(vScreen[Z].ScreenLeft, vScreen[Z].ScreenTop, vScreen[Z].Width, vScreen[Z].Height);
 
@@ -951,9 +963,9 @@ void UpdateGraphics(bool skipRepaint)
         frmMain.setLayer(2);
 #endif
 //        For A = 1 To numNPCs 'Display NPCs that should be behind blocks
-        for(size_t i = 0; i < NPC_Draw_Queue[Z].BG_n; i++)
+        for(size_t i = 0; i < NPC_Draw_Queue_p.BG_n; i++)
         {
-            A = NPC_Draw_Queue[Z].BG[i];
+            A = NPC_Draw_Queue_p.BG[i];
             float cn = NPC[A].Shadow ? 0.f : 1.f;
             {
                 {
@@ -1347,9 +1359,9 @@ void UpdateGraphics(bool skipRepaint)
         }
 
         // draw NPCs that should be behind other NPCs
-        for(size_t i = 0; i < NPC_Draw_Queue[Z].Low_n; i++)
+        for(size_t i = 0; i < NPC_Draw_Queue_p.Low_n; i++)
         {
-            A = NPC_Draw_Queue[Z].Low[i];
+            A = NPC_Draw_Queue_p.Low[i];
             float cn = NPC[A].Shadow ? 0.f : 1.f;
             {
                 {
@@ -1372,9 +1384,9 @@ void UpdateGraphics(bool skipRepaint)
 
 
         // ice
-        for(size_t i = 0; i < NPC_Draw_Queue[Z].Iced_n; i++)
+        for(size_t i = 0; i < NPC_Draw_Queue_p.Iced_n; i++)
         {
-            A = NPC_Draw_Queue[Z].Iced[i];
+            A = NPC_Draw_Queue_p.Iced[i];
             {
                 {
                     DrawFrozenNPC(Z, A);
@@ -1384,9 +1396,9 @@ void UpdateGraphics(bool skipRepaint)
 
 
 //        For A = 1 To numNPCs 'Display NPCs that should be in front of blocks
-        for(size_t i = 0; i < NPC_Draw_Queue[Z].Normal_n; i++)
+        for(size_t i = 0; i < NPC_Draw_Queue_p.Normal_n; i++)
         {
-            A = NPC_Draw_Queue[Z].Normal[i];
+            A = NPC_Draw_Queue_p.Normal[i];
             float cn = NPC[A].Shadow ? 0.f : 1.f;
             {
                 {
@@ -1540,9 +1552,9 @@ void UpdateGraphics(bool skipRepaint)
         }
 
         // npc chat bubble
-        for(size_t i = 0; i < NPC_Draw_Queue[Z].Chat_n; i++)
+        for(size_t i = 0; i < NPC_Draw_Queue_p.Chat_n; i++)
         {
-            A = NPC_Draw_Queue[Z].Chat[i];
+            A = NPC_Draw_Queue_p.Chat[i];
             {
                 B = NPCHeightGFX[NPC[A].Type] - NPC[A].Location.Height;
                 if(B < 0)
@@ -1635,9 +1647,9 @@ void UpdateGraphics(bool skipRepaint)
 
 
         // Put held NPCs on top
-        for(size_t i = 0; i < NPC_Draw_Queue[Z].Held_n; i++)
+        for(size_t i = 0; i < NPC_Draw_Queue_p.Held_n; i++)
         {
-            A = NPC_Draw_Queue[Z].Held[i];
+            A = NPC_Draw_Queue_p.Held[i];
             float cn = NPC[A].Shadow ? 0.f : 1.f;
             {
                 if(NPC[A].Type == 263)
@@ -1704,9 +1716,9 @@ void UpdateGraphics(bool skipRepaint)
         }
 
         // foreground NPCs
-        for(size_t i = 0; i < NPC_Draw_Queue[Z].FG_n; i++)
+        for(size_t i = 0; i < NPC_Draw_Queue_p.FG_n; i++)
         {
-            A = NPC_Draw_Queue[Z].FG[i];
+            A = NPC_Draw_Queue_p.FG[i];
             float cn = NPC[A].Shadow ? 0.f : 1.f;
             {
                 {
@@ -1818,9 +1830,9 @@ void UpdateGraphics(bool skipRepaint)
             DrawInterface(Z, numScreens);
 
             // Display NPCs that got dropped from the container
-            for(size_t i = 0; i < NPC_Draw_Queue[Z].Dropped_n; i++)
+            for(size_t i = 0; i < NPC_Draw_Queue_p.Dropped_n; i++)
             {
-                A = NPC_Draw_Queue[Z].Dropped[i];
+                A = NPC_Draw_Queue_p.Dropped[i];
                 {
                     {
                         {
