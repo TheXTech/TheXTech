@@ -41,7 +41,7 @@ El autor original escribió la mayor parte del código en la carpeta "* src *" e
 ## ¿Como usar esto?
 Aquí hay muchas formas de jugar con él:
 - hay algunos paquetes listos para usar, simplemente tómelos y juegue como lo hizo con SMBX.
-- [usuarios de macOS, omita esto]: use la misma manera que el juego original: coloque un archivo ejecutable en la carpeta raíz del juego con un "thextech.ini" que contenga el siguiente texto:
+- [usuarios de macOS, omitan esto]: use la misma manera que el juego original: coloque un archivo ejecutable en la carpeta raíz del juego con un "thextech.ini" que contenga el siguiente texto:
 ```
 [Main]
 force-portable = true
