@@ -19,9 +19,7 @@ void DrawMessage()
     const int charWidth = 18;
     const int lineHeight = 16;
     // based on Wohlstand's improved algorithm, but screen-size aware
-    static std::string SuperText;
-    static std::string tempText;
-    SuperText = MessageText;
+    const std::string& SuperText = MessageText;
     int BoxY = 0;
     int BoxY_Start = ScreenH/2 - 150;
     if(BoxY_Start < 60)
@@ -98,17 +96,18 @@ void DrawMessage()
 #endif
     // PASS TWO
     // Wohlstand's updated algorithm
+    // modified to not allocate/copy a bunch of strings
     bool firstLine = true;
     BoxY = BoxY_Start + 10;
-    do
+    lineStart = 0; // start of current line
+    while(lineStart < int(SuperText.size()))
     {
-        // find last word break
-        lastWord = 0;
-        for(int i = 1; i <= maxChars; i++)
+        lastWord = lineStart;
+        for(int i = lineStart + 1; i <= lineStart+maxChars; i++)
         {
             auto c = SuperText[size_t(i) - 1];
 
-            if((lastWord == 0 && i == maxChars) || i == int(SuperText.size()) || c == '\n')
+            if((lastWord == lineStart && i == lineStart+maxChars) || i == int(SuperText.size()) || c == '\n')
             {
                 lastWord = i;
                 break;
@@ -119,20 +118,22 @@ void DrawMessage()
             }
         }
 
-        tempText = SuperText.substr(0, size_t(lastWord));
-        SuperText.erase(0, size_t(lastWord));
-        if(SuperText.length() == 0 && firstLine)
+        if(lastWord == SuperText.length() && firstLine)
         {
-            SuperPrint(tempText,
-                       4,
-                       ScreenW/2 - (tempText.length() * charWidth)/2,
-                       BoxY);
+            SuperPrint(SuperText.c_str() + size_t(lineStart), size_t(lastWord) - size_t(lineStart),
+                4,
+                ScreenW/2 - ((lastWord - lineStart) * charWidth)/2,
+                BoxY);
         }
         else
         {
-            SuperPrint(tempText, 4, ScreenW/2 - TextBoxW / 2 + 12, BoxY);
+            SuperPrint(SuperText.c_str() + size_t(lineStart), size_t(lastWord) - size_t(lineStart),
+                4,
+                ScreenW/2 - TextBoxW / 2 + 12,
+                BoxY);
         }
+        lineStart = lastWord;
         BoxY += lineHeight;
         firstLine = false;
-    } while(!SuperText.empty());
+    }
 }

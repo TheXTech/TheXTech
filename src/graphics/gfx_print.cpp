@@ -35,23 +35,24 @@ namespace std
 }
 #endif
 
-void SuperPrintRightAlign(std::string SuperWords, int Font, float X, float Y, float r, float g, float b, float a)
+void SuperPrintRightAlign(const char* SuperChars, int SuperN, int Font, float X, float Y, float r, float g, float b, float a)
 {
     switch(Font)
     {
     default:
     case 1:
     case 4:
-        X -= SuperWords.length() * 18;
+        X -= SuperN * 18;
         break;
     case 2:
-        X -= SuperWords.length() * 16;
+        X -= SuperN * 16;
         break;
     case 3:
     {
         int B = 0;
-        for(auto c : SuperWords)
+        for(int i = 0; i < SuperN; i++)
         {
+            char c = SuperChars[i];
             c = std::toupper(c);
             if(c >= 33 && c <= 126)
             {
@@ -67,16 +68,16 @@ void SuperPrintRightAlign(std::string SuperWords, int Font, float X, float Y, fl
     }
     }
 
-    SuperPrint(SuperWords, Font, X, Y, r, g, b, a);
+    SuperPrint(SuperChars, SuperN, Font, X, Y, r, g, b, a);
 }
 
-void SuperPrintScreenCenter(std::string SuperWords, int Font, float Y, float r, float g, float b, float a)
+void SuperPrintScreenCenter(const char* SuperChars, int SuperN, int Font, float Y, float r, float g, float b, float a)
 {
-    float X = (ScreenW / 2) - ((SuperWords.size() * 18) / 2);
-    SuperPrint(SuperWords, Font, X, Y, r, g, b, a);
+    float X = (ScreenW / 2) - ((SuperN * 18) / 2);
+    SuperPrint(SuperChars, SuperN, Font, X, Y, r, g, b, a);
 }
 
-void SuperPrint(std::string SuperWords, int Font, float X, float Y,
+void SuperPrint(const char* SuperChars, int SuperN, int Font, float X, float Y,
                 float r, float g, float b, float a)
 {
 //    int A = 0;
@@ -85,8 +86,9 @@ void SuperPrint(std::string SuperWords, int Font, float X, float Y,
 
     if(Font == 1)
     {
-        for(auto c : SuperWords)
+        for(int i = 0; i < SuperN; i++)
         {
+            char c = SuperChars[i];
             if(c >= '0' && c <= '9')
                 frmMain.renderTexture(int(X + B), int(Y), 16, 14, GFX.Font1[c - '0'], 0, 0, r, g, b, a);
             B += 18;
@@ -94,8 +96,9 @@ void SuperPrint(std::string SuperWords, int Font, float X, float Y,
     }
     else if(Font == 2)
     {
-        for(auto c : SuperWords)
+        for(int i = 0; i < SuperN; i++)
         {
+            char c = SuperChars[i];
             if(c >= 48 && c <= 57) {
                 C = (c - 48) * 16;
                 frmMain.renderTexture(int(X + B), int(Y), 15, 17, GFX.Font2[1], C, 0, r, g, b, a);
@@ -133,8 +136,9 @@ void SuperPrint(std::string SuperWords, int Font, float X, float Y,
     else if (Font == 3)
     {
 //        Do While Len(Words) > 0
-        for(auto c : SuperWords)
+        for(int i = 0; i < SuperN; i++)
         {
+            char c = SuperChars[i];
             c = std::toupper(c);
 //            If Asc(Left(Words, 1)) >= 33 And Asc(Left(Words, 1)) <= 126 Then
             if(c >= 33 && c <= 126)
@@ -163,8 +167,9 @@ void SuperPrint(std::string SuperWords, int Font, float X, float Y,
     else if(Font == 4)
     {
 //        Do While Len(Words) > 0
-        for(auto c : SuperWords)
+        for(int i = 0; i < SuperN; i++)
         {
+            char c = SuperChars[i];
 //            If Asc(Left(Words, 1)) >= 33 And Asc(Left(Words, 1)) <= 126 Then
             if(c >= 33 && c <= 126)
             {
@@ -185,4 +190,19 @@ void SuperPrint(std::string SuperWords, int Font, float X, float Y,
         }
 //    End If
     }
+}
+
+void SuperPrintRightAlign(std::string SuperWords, int Font, float X, float Y, float r, float g, float b, float a)
+{
+    SuperPrintRightAlign(SuperWords.c_str(), SuperWords.size(), Font, X, Y, r, g, b, a);
+}
+
+void SuperPrintScreenCenter(std::string SuperWords, int Font, float Y, float r, float g, float b, float a)
+{
+    SuperPrintScreenCenter(SuperWords.c_str(), SuperWords.size(), Font, Y, r, g, b, a);
+}
+
+void SuperPrint(std::string SuperWords, int Font, float X, float Y, float r, float g, float b, float a)
+{
+    SuperPrint(SuperWords.c_str(), SuperWords.size(), Font, X, Y, r, g, b, a);
 }
