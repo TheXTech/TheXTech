@@ -172,11 +172,15 @@ void HideLayer(std::string LayerName, bool NoEffect = false);
 // Public Sub SetLayer(LayerName As String)
 void SetLayer(std::string LayerName);
 
+bool ExistsLayer(const std::string LayerName);
+
 bool RenameLayer(const std::string OldName, const std::string NewName);
 
 bool DeleteLayer(const std::string LayerName, bool killall);
 
 void InitializeEvent(Events_t& event);
+
+bool ExistsEvent(const std::string EventName);
 
 bool RenameEvent(const std::string OldName, const std::string NewName);
 

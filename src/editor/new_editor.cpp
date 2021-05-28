@@ -971,7 +971,7 @@ void EditorScreen::UpdateEventsScreen()
             if (UpdateButton(400 + 4, 80 + 40*i + 4, GFX.NPC_modes, false, 0, 32*Icon::pencil, 32, 32))
             {
                 std::string new_name = GetTextInput("New event name", "");
-                if (!new_name.empty())
+                if (!new_name.empty() && !ExistsEvent(new_name))
                 {
                     InitializeEvent(Events[e]);
                     Events[e].Name = new_name;
@@ -2247,7 +2247,7 @@ void EditorScreen::UpdateLayersScreen()
             if (UpdateButton(400 + 4, 80 + 40*i + 4, GFX.NPC_modes, false, 0, 32*Icon::pencil, 32, 32))
             {
                 std::string new_name = GetTextInput("New layer name", "");
-                if (!new_name.empty())
+                if (!new_name.empty() && !ExistsLayer(new_name))
                 {
                     Layer[l] = Layer_t();
                     Layer[l].Name = new_name;

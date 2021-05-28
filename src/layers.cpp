@@ -173,6 +173,23 @@ void ShowLayer(std::string LayerName, bool NoEffect)
     }
 }
 
+bool ExistsLayer(const std::string LayerName)
+{
+    if(LayerName.empty())
+        return false;
+
+    if(equalCase(LayerName, "Default"))
+        return true;
+
+    for(int A = 0; A <= maxLayers; A++)
+    {
+        if(equalCase(Layer[A].Name, LayerName))
+            return true;
+    }
+
+    return false;
+}
+
 void HideLayer(std::string LayerName, bool NoEffect)
 {
     int A = 0;
@@ -447,6 +464,20 @@ void InitializeEvent(Events_t& event)
         event.section[i].background_id = EventSection_t::LESet_Nothing;
         event.section[i].position.X = EventSection_t::LESet_Nothing;
     }
+}
+
+bool ExistsEvent(const std::string EventName)
+{
+    if(EventName.empty())
+        return false;
+
+    for(int A = 0; A <= maxEvents; A++)
+    {
+        if(equalCase(Events[A].Name, EventName))
+            return true;
+    }
+
+    return false;
 }
 
 bool RenameEvent(const std::string OldName, const std::string NewName)

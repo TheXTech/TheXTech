@@ -90,9 +90,9 @@ void ResetSectionScrolls()
         // initialize the section
         if (level[i].Height == level[i].Y)
         {
-            level[i].Height = (((20000 * 20)/maxSections * (i - maxSections / 2)) / 32) * 32;
+            level[i].Height = (-200000 + 20000 * i);
             level[i].Y = level[i].Height - 600;
-            level[i].X = (((20000 * 20)/maxSections * (i - maxSections / 2)) / 32) * 32;
+            level[i].X = (-200000 + 20000 * i);
             level[i].Width = level[i].X + 800;
         }
 
@@ -124,6 +124,8 @@ void SetSection(int i)
 
 void EditorBackup()
 {
+    last_vScreenY[curSection] = vScreenY[1];
+    last_vScreenX[curSection] = vScreenX[1];
     for(int i = 0; i <= maxSections; i++)
     {
         last_vScreenX_b[i] = last_vScreenX[i];

@@ -666,7 +666,7 @@ void UpdateGraphics(bool skipRepaint)
                 // don't show a Cheep that hasn't jumped yet
                 if(NPCIsCheep[NPC[A].Type] && Maths::iRound(NPC[A].Special) == 2)
                 {
-                    if(!NPC[A].Active && !can_activate)
+                    if(!NPC[A].Active)
                         onscreen = false;
                 }
 
