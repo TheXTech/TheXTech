@@ -4997,7 +4997,7 @@ void SpecialNPC(int A)
             {
                 for(int Ei = 1; Ei <= numBlock; Ei++)
                 {
-                    if(CheckCollision(tempLocation, Block[Ei].Location) && !BlockNoClipping[Block[E].Type])
+                    if(CheckCollision(tempLocation, Block[Ei].Location) && !BlockNoClipping[Block[Ei].Type])
                         D = 1;
                 }
             }
