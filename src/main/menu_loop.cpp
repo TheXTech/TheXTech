@@ -43,6 +43,7 @@
 #include "level_file.h"
 #include "menu_main.h"
 #include "speedrunner.h"
+#include "trees.h"
 
 #include "../pseudo_vb.h"
 
@@ -274,12 +275,14 @@ void MenuLoop()
             do
             {
                 tempBool = true;
-                For(B, 1, numBlock)
+                for(Block_t* block : treeBlockQuery(p.Location, false))
                 {
-                    if(CheckCollision(p.Location, Block[B].Location))
+                    Block_t& b = *block;
+                    if(CheckCollision(p.Location, b.Location))
                     {
-                        p.Location.Y = Block[B].Location.Y - p.Location.Height - 0.1;
+                        p.Location.Y = b.Location.Y - p.Location.Height - 0.1;
                         tempBool = false;
+                        break;
                     }
                 }
             } while(!tempBool);
@@ -416,11 +419,12 @@ void MenuLoop()
             tempLocation = Player[A].Location;
             tempLocation.Width = 95;
             tempLocation.Height = tempLocation.Height - 1;
-            for(auto B = 1; B <= numBlock; B++)
+            for(Block_t* block : treeBlockQuery(tempLocation, false))
             {
-                if(BlockSlope[Block[B].Type] == 0 && BlockIsSizable[Block[B].Type] == false && BlockOnlyHitspot1[Block[B].Type] == false && Block[B].Hidden == false)
+                Block_t& b = *block;
+                if(BlockSlope[b.Type] == 0 && !BlockIsSizable[b.Type] && !BlockOnlyHitspot1[b.Type] && !b.Hidden)
                 {
-                    if(CheckCollision(Block[B].Location, tempLocation) == true)
+                    if(CheckCollision(b.Location, tempLocation) == true)
                     {
                         Player[A].CanJump = true;
                         Player[A].SpinJump = false;
@@ -438,11 +442,12 @@ void MenuLoop()
             tempLocation.Height = 16;
             tempLocation.X = Player[A].Location.X + Player[A].Location.Width;
             tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height;
-            for(auto B = 1; B <= numBlock; B++)
+            for(Block_t* block : treeBlockQuery(tempLocation, false))
             {
-                if((BlockIsSizable[Block[B].Type] == false || Block[B].Location.Y > Player[A].Location.Y + Player[A].Location.Height - 1) && BlockOnlyHitspot1[Block[B].Type] == false && Block[B].Hidden == false)
+                Block_t& b = *block;
+                if((!BlockIsSizable[b.Type] || b.Location.Y > Player[A].Location.Y + Player[A].Location.Height - 1) && !BlockOnlyHitspot1[b.Type] && !b.Hidden)
                 {
-                    if(CheckCollision(Block[B].Location, tempLocation) == true)
+                    if(CheckCollision(b.Location, tempLocation) == true)
                     {
                         tempBool = true;
                         break;
@@ -506,11 +511,13 @@ void MenuLoop()
             }
         }
 
-        For(A, 1, numBlock)
+        tempLocation = newLoc(MenuMouseX - vScreenX[1], MenuMouseY - vScreenY[1]);
+        for(Block_t* block : treeBlockQuery(tempLocation, false))
         {
+            int A = block - &Block[1] + 1;
             if(!Block[A].Hidden)
             {
-                if(CheckCollision(newLoc(MenuMouseX - vScreenX[1], MenuMouseY - vScreenY[1]), Block[A].Location))
+                if(CheckCollision(tempLocation, Block[A].Location))
                 {
                     BlockHit(A);
                     BlockHitHard(A);

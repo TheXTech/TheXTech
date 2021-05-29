@@ -41,6 +41,7 @@
 #include "player.h"
 #include "sorting.h"
 #include "layers.h"
+#include "main/trees.h"
 
 void BlockHit(int A, bool HitDown, int whatPlayer)
 {
@@ -174,9 +175,10 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
     if(HitDown == true && b.Special > 0)
     {
         tempBool = false;
-        auto tmpNumBlocks = numBlock;
-        for(auto B = 1; B <= tmpNumBlocks; B++)
+        // auto tmpNumBlocks = numBlock;
+        for(Block_t* ptr : treeBlockQuery(b.Location, false, 32))
         {
+            int B = ptr - &Block[1] + 1;
             if(B != A)
             {
                 if(CheckCollision(b.Location, newLoc(Block[B].Location.X + 4, Block[B].Location.Y - 16, Block[B].Location.Width - 8, Block[B].Location.Height)))
@@ -217,6 +219,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
     if(b.Type == 170) // smw switch blocks
     {
+        // think through possible cheaper way to do these
         PlaySound(SFX_PSwitch);
         for(auto B = 1; B <= numBlock; B++)
         {
@@ -354,8 +357,9 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         {
             tempBool = false;
 
-            for(auto B = 1; B <= numBlock; B++)
+            for(Block_t* ptr : treeBlockQuery(b.Location, false, 64))
             {
+                int B = ptr - &Block[1] + 1;
                 if(B != A && Block[B].Hidden == false && (BlockOnlyHitspot1[Block[B].Type] & !BlockIsSizable[Block[B].Type]) == 0)
                 {
                     if(CheckCollision(Block[B].Location, newLoc(b.Location.X + 1, b.Location.Y - 31, 30, 30)))
@@ -449,8 +453,9 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         {
             tempBool = false;
 
-            for(auto B = 1; B <= numBlock; B++)
+            for(Block_t* ptr : treeBlockQuery(b.Location, false, 64))
             {
+                int B = ptr - &Block[1] + 1;
                 if(B != A && Block[B].Hidden == false && (BlockOnlyHitspot1[Block[B].Type] & !BlockIsSizable[Block[B].Type]) == 0)
                 {
                     if(CheckCollision(Block[B].Location, newLoc(b.Location.X + 1, b.Location.Y - 31, 30, 30)))
@@ -678,6 +683,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             NPC[numNPCs].Location.Width = NPCWidth[C];
 
             // Make block a bit smaller to allow player take a bonus easier (Redigit's idea)
+            // this is not enough to merit a resync of the block's position
             if(fEqual(b.Location.Width, 32) && !b.wasShrinkResized)
             {
                 b.Location.Width = b.Location.Width - 0.1;
@@ -2081,7 +2087,8 @@ void PSwitch(bool enabled)
                     Block[numBlock].Special = 0;
                     Block[numBlock].Kill = false;
                     Block[numBlock].NPC = NPC[A].Type;
-                    // block layers will be synchronized later (after sorting)
+                    syncLayers_Block(numBlock);
+                    // block layers are synchronized now because sorting is gone
                 }
                 NPC[A].Killed = 9;
             }
@@ -2127,7 +2134,9 @@ void PSwitch(bool enabled)
                     Block[A] = Block[numBlock];
                     Block[numBlock] = blankBlock;
                     numBlock = numBlock - 1;
-                    // block layers will be synchronized later (after sorting)
+                    syncLayers_Block(A);
+                    syncLayers_Block(numBlock + 1);
+                    // block layers are synchronized now because sorting is gone
                 }
             }
         }
@@ -2156,7 +2165,8 @@ void PSwitch(bool enabled)
                     Block[numBlock].Location.X = Block[numBlock].Location.X + (NPC[A].Location.Width - Block[numBlock].Location.Width) / 2.0;
                     Block[numBlock].Special = 0;
                     Block[numBlock].Kill = false;
-                    // block layers will be synchronized later (after sorting)
+                    syncLayers_Block(numBlock);
+                    // block layers are synchronized now because sorting is gone
                 }
                 NPC[A].Killed = 9;
             }
@@ -2192,7 +2202,9 @@ void PSwitch(bool enabled)
                     NPC[numNPCs].Killed = 0;
                     KillBlock(A, false);
                     Block[A].Layer = "Used P Switch";
-                    // block layers will be synchronized later (after sorting)
+                    syncLayers_Block(A);
+                    // this is as close to a permanent death as blocks get in the game,
+                    // because this layer usually doesn't exist
                 }
             }
         }
@@ -2200,22 +2212,24 @@ void PSwitch(bool enabled)
         ProcEvent("P Switch - End", true);
     }
 
-    qSortBlocksX(1, numBlock);
-    B = 1;
+    // so glad we can eliminate this now!
 
-    for(A = 2; A <= numBlock; A++)
-    {
-        if(Block[A].Location.X > Block[B].Location.X)
-        {
-            qSortBlocksY(B, A - 1);
-            B = A;
-        }
-    }
+    // qSortBlocksX(1, numBlock);
+    // B = 1;
 
-    qSortBlocksY(B, A - 1);
-    FindSBlocks();
-    FindBlocks();
-    syncLayers_AllBlocks();
+    // for(A = 2; A <= numBlock; A++)
+    // {
+    //     if(Block[A].Location.X > Block[B].Location.X)
+    //     {
+    //         qSortBlocksY(B, A - 1);
+    //         B = A;
+    //     }
+    // }
+
+    // qSortBlocksY(B, A - 1);
+    // FindSBlocks();
+    // FindBlocks();
+    // syncLayers_AllBlocks();
 
     iBlocks = numBlock;
     for(A = 1; A <= numBlock; A++)

@@ -36,7 +36,15 @@ enum
     SPEEDRUN_MODE_3
 };
 
+enum
+{
+    SPEEDRUN_DEBUG_OFF = 0,
+    SPEEDRUN_DEBUG_REC,
+    SPEEDRUN_DEBUG_PLAY,
+};
+
 extern int  g_speedRunnerMode;
+extern int  g_speedRunnerDebug;
 
 void speedRun_tick();
 

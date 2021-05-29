@@ -23,8 +23,11 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#ifndef TREES_H
+#define TREES_H
 
-#include "globals.h"
+#include "../globals.h"
+#include "../layers.h"
 
 extern std::vector<void*> treeresult_vec[4];
 extern ptrdiff_t cur_treeresult_vec;
@@ -114,6 +117,8 @@ public:
 };
 
 extern void treeWorldCleanAll();
+extern void treeLevelCleanBlockLayers();
+extern void treeLevelCleanAll();
 
 extern void treeWorldTileAdd(Tile_t *obj);
 extern void treeWorldTileUpdate(Tile_t *obj);
@@ -155,5 +160,15 @@ extern TreeResult_Sentinel<WorldMusic_t> treeWorldMusicQuery(double Left, double
 extern TreeResult_Sentinel<WorldMusic_t> treeWorldMusicQuery(const Location_t &loc, bool z_sort, double margin = 16.0);
 
 
+extern void treeBlockAddLayer(int layer, Block_t *obj);
+extern void treeBlockRemoveLayer(int layer, Block_t *obj);
+extern void treeBlockUpdateLayer(int layer, Block_t *obj);
+extern TreeResult_Sentinel<Block_t> treeBlockQuery(double Left, double Top, double Right, double Bottom,
+                               bool z_sort, double margin = 16.0);
+extern TreeResult_Sentinel<Block_t> treeBlockQuery(const Location_t &loc, bool z_sort, double margin = 16.0);
+
+
 extern void blockTileGet(const Location_t &loc, int64_t &fBlock, int64_t &lBlock);
 extern void blockTileGet(double x, double w, int64_t &fBlock, int64_t &lBlock);
+
+#endif // #ifndef TREES_H

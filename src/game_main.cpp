@@ -63,6 +63,7 @@
 #include "main/level_file.h"
 #include "main/speedrunner.h"
 #include "main/menu_main.h"
+#include "main/trees.h"
 
 #ifdef NEW_EDITOR
 #include "editor/new_editor.h"
@@ -490,12 +491,14 @@ int GameMain(const CmdLineSetup_t &setup)
                 do
                 {
                     tempBool = true;
-                    for(int B = 1; B <= numBlock; ++B)
+                    // for(int B = 1; B <= numBlock; ++B)
+                    for(Block_t* block : treeBlockQuery(p.Location, false, 64))
                     {
-                        if(CheckCollision(p.Location, Block[B].Location))
+                        if(CheckCollision(p.Location, block->Location))
                         {
-                            p.Location.Y = Block[B].Location.Y - p.Location.Height - 0.1;
+                            p.Location.Y = block->Location.Y - p.Location.Height - 0.1;
                             tempBool = false;
+                            break;
                         }
                     }
                 } while(!tempBool);

@@ -36,6 +36,7 @@
 #include "../graphics.h"
 #include "../editor/editor.h"
 #include "level_file.h"
+#include "trees.h"
 
 #include <DirManager/dirman.h>
 #include <Utils/files.h>
@@ -799,6 +800,8 @@ void ClearLevel()
     qScreen = false;
     UnloadCustomGFX();
     doShakeScreenClear();
+
+    treeLevelCleanAll();
 
     numSections = 0;
 

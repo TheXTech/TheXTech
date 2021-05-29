@@ -92,6 +92,7 @@ void KillNPC(int A, int B)
             tempBool = true;
         if(tempBool == false)
         {
+            // cache this somehow?
             if(NPC[A].Type == 59 || NPC[A].DefaultType == 59)
             {
                 PlaySound(SFX_PSwitch);

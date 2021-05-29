@@ -729,6 +729,8 @@ struct Block_t
     std::string TriggerLast;
 //    Layer As String
     std::string Layer;
+    int LayerIndex;
+    Location_t LocationInLayer;
 //    Hidden As Boolean
     bool Hidden = false;
 //    Type As Integer 'the block's type

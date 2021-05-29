@@ -58,6 +58,7 @@ static std::unique_ptr<WorldTree_private<Scene_t>> s_worldSceneTree;
 static std::unique_ptr<WorldTree_private<WorldPath_t>> s_worldPathTree;
 static std::unique_ptr<WorldTree_private<WorldLevel_t>> s_worldLevelTree;
 static std::unique_ptr<WorldTree_private<WorldMusic_t>> s_worldMusicTree;
+static std::unique_ptr<WorldTree_private<Block_t>> s_levelBlockTrees[maxLayers+2];
 
 template<class Q>
 void clearTree(Q &tree)
@@ -78,6 +79,16 @@ void treeWorldCleanAll()
     clearTree(s_worldMusicTree);
 }
 
+void treeLevelCleanBlockLayers()
+{
+    for(int i = 0; i < maxLayers+2; i++)
+        clearTree(s_levelBlockTrees[i]);
+}
+
+void treeLevelCleanAll()
+{
+    treeLevelCleanBlockLayers();
+}
 
 template<class Obj, class Arr>
 void treeInsert(Arr &p, Obj*obj)
@@ -119,7 +130,7 @@ TreeResult_Sentinel<Obj> treeWorldQuery(std::unique_ptr<WorldTree_private<Obj>> 
     {
         auto *item = q.GetCurrent();
         if(item)
-            result.i_vec->push_back(q.GetCurrent());
+            result.i_vec->push_back(item);
         q.Next();
     }
 
@@ -328,6 +339,83 @@ TreeResult_Sentinel<WorldMusic_t> treeWorldMusicQuery(const Location_t &loc,
                    loc.Y + loc.Height + margin, z_sort);
 }
 
+
+/* ================= Level blocks ================= */
+
+void treeBlockAddLayer(int layer, Block_t *obj)
+{
+    if(layer < 0)
+        layer = maxLayers + 1;
+    treeInsert(s_levelBlockTrees[layer], obj);
+}
+
+void treeBlockUpdateLayer(int layer, Block_t *obj)
+{
+    if(layer < 0)
+        layer = maxLayers + 1;
+    treeUpdate(s_levelBlockTrees[layer], obj);
+}
+
+void treeBlockRemoveLayer(int layer, Block_t *obj)
+{
+    if(layer < 0)
+        layer = maxLayers + 1;
+    treeRemove(s_levelBlockTrees[layer], obj);
+}
+
+TreeResult_Sentinel<Block_t> treeBlockQuery(double Left, double Top, double Right, double Bottom,
+                         bool z_sort,
+                         double margin)
+{
+    TreeResult_Sentinel<Block_t> result;
+
+    for(int layer = 0; layer < maxLayers+2; layer++)
+    {
+        double OffsetX, OffsetY;
+        if (layer == maxLayers+1)
+            OffsetX = OffsetY = 0.0;
+        else
+        {
+            OffsetX = Layer[layer].OffsetX;
+            OffsetY = Layer[layer].OffsetY;
+        }
+        std::unique_ptr<WorldTree_private<Block_t>>& p = s_levelBlockTrees[layer];
+        if(!p.get())
+            continue;
+
+        auto q = p->tree.QueryIntersectsRegion(loose_quadtree::BoundingBox<double>(Left - OffsetX - margin - s_gridSize,
+                                                                                   Top - OffsetY - margin - s_gridSize,
+                                                                                   (Right - Left) + (margin + s_gridSize) * 2,
+                                                                                   (Bottom - Top) + (margin + s_gridSize) * 2));
+        while(!q.EndOfQuery())
+        {
+            auto *item = q.GetCurrent();
+            if(item)
+                result.i_vec->push_back(item);
+            q.Next();
+        }
+    }
+
+    if(z_sort)
+    {
+        std::sort(result.i_vec->begin(), result.i_vec->end(),
+            [](void* a, void* b) {
+                return a < b;
+            });
+    }
+
+    return result;
+}
+
+TreeResult_Sentinel<Block_t> treeBlockQuery(const Location_t &loc,
+                         bool z_sort,
+                         double margin)
+{
+    return treeBlockQuery(loc.X,
+                   loc.Y,
+                   loc.X + loc.Width,
+                   loc.Y + loc.Height, z_sort, margin);
+}
 
 
 /* ================= Tile block search ================= */

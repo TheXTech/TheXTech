@@ -42,6 +42,8 @@ struct Layer_t
     std::string Name;
 //    Hidden As Boolean
     bool Hidden = false;
+    double OffsetX = 0.0;
+    double OffsetY = 0.0;
 //    SpeedX As Single
     float SpeedX = 0.0f;
 //    SpeedY As Single

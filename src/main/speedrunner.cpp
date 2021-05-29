@@ -33,6 +33,10 @@
 
 static      GameplayTimer s_gamePlayTimer;
 int                       g_speedRunnerMode = SPEEDRUN_MODE_OFF;
+int                       g_speedRunnerDebug = SPEEDRUN_DEBUG_OFF;
+
+int64_t frame_no = 0;
+std::vector<Controls_t> control_history;
 
 void speedRun_loadStats()
 {
@@ -175,5 +179,15 @@ void speedRun_syncControlKeys(Controls_t &keys)
     if(g_speedRunnerMode == SPEEDRUN_MODE_OFF)
         return; // Do nothing
 
+    if(g_speedRunnerDebug == SPEEDRUN_DEBUG_PLAY)
+    {
+        if(frame_no < control_history.size())
+            keys = control_history[frame_no];
+    }
+    else if(g_speedRunnerDebug == SPEEDRUN_DEBUG_REC)
+        control_history.push_back(keys);
+
     SDL_memcpy(&s_displayControls, &keys, sizeof(Controls_t));
+
+    frame_no++;
 }

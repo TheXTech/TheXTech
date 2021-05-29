@@ -380,9 +380,9 @@ void UpdateEditor()
 #endif
                                 MouseRelease = false;
                                 EditorControls.MouseClick = false; /* Simulate "Focus out" inside of SMBX Editor */
-                                FindSBlocks();
+                                // FindSBlocks();
                                 // ugh
-                                syncLayers_AllBlocks();
+                                // syncLayers_AllBlocks();
                                 break;
                             }
                         }
@@ -496,8 +496,8 @@ void UpdateEditor()
 #endif
                                 MouseRelease = false;
                                 EditorControls.MouseClick = false; /* Simulate "Focus out" inside of SMBX Editor */
-                                FindSBlocks();
-                                syncLayers_AllBlocks();
+                                // FindSBlocks();
+                                // syncLayers_AllBlocks();
                                 break;
                             }
                         }
@@ -746,9 +746,9 @@ void UpdateEditor()
                             {
 //                                Netplay::sendData Netplay::EraseBlock[A];
                                 KillBlock(A); // Erase the block
-                                FindSBlocks();
+                                // FindSBlocks();
                                 // ugh
-                                syncLayers_AllBlocks();
+                                // syncLayers_AllBlocks();
                                 MouseRelease = false;
                                 break;
                             }
@@ -826,9 +826,9 @@ void UpdateEditor()
                             {
 //                                Netplay::sendData Netplay::EraseBlock[A];
                                 KillBlock(A); // Erase the block
-                                FindSBlocks();
+                                // FindSBlocks();
                                 // ugh
-                                syncLayers_AllBlocks();
+                                // syncLayers_AllBlocks();
                                 MouseRelease = false;
                                 break;
                             }
@@ -1048,19 +1048,19 @@ void UpdateEditor()
                             Block[numBlock].DefaultType = Block[numBlock].Type;
                             Block[numBlock].DefaultSpecial = Block[numBlock].Special;
                             syncLayers_Block(numBlock);
-                            if(MagicHand == true)
-                            {
-                                for(A = -FLBlocks; A <= FLBlocks; A++)
-                                {
-                                    FirstBlock[A] = 1;
-                                    LastBlock[A] = numBlock;
-                                }
-                                BlocksSorted = false;
-                            }
+                            // if(MagicHand == true)
+                            // {
+                            //     for(A = -FLBlocks; A <= FLBlocks; A++)
+                            //     {
+                            //         FirstBlock[A] = 1;
+                            //         LastBlock[A] = numBlock;
+                            //     }
+                            //     BlocksSorted = false;
+                            // }
                         }
-                        FindSBlocks();
+                        // FindSBlocks();
                         // ack!
-                        syncLayers_AllBlocks();
+                        // syncLayers_AllBlocks();
 //                        if(nPlay.Online == true)
 //                            Netplay::sendData Netplay::AddBlock(numBlock);
                     }

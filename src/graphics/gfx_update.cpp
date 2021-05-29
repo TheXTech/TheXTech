@@ -1304,22 +1304,27 @@ void UpdateGraphics(bool skipRepaint)
         }
 
 
-        if (LevelEditor)
-        {
-            fBlock = 1;
-            lBlock = numBlock;
-        }
-        else
-        {
-            //fBlock = FirstBlock[int(-vScreenX[Z] / 32) - 1];
-            //lBlock = LastBlock[int((-vScreenX[Z] + vScreen[Z].Width) / 32) + 1];
-            blockTileGet(-vScreenX[Z], vScreen[Z].Width, fBlock, lBlock);
-        }
+        // if (LevelEditor)
+        // {
+        //     fBlock = 1;
+        //     lBlock = numBlock;
+        // }
+        // else
+        // {
+        //     //fBlock = FirstBlock[int(-vScreenX[Z] / 32) - 1];
+        //     //lBlock = LastBlock[int((-vScreenX[Z] + vScreen[Z].Width) / 32) + 1];
+        //     blockTileGet(-vScreenX[Z], vScreen[Z].Width, fBlock, lBlock);
+        // }
 
 
 //        For A = fBlock To lBlock 'Non-Sizable Blocks
-        For(A, fBlock, lBlock)
+        TreeResult_Sentinel<Block_t> screenBlocks = treeBlockQuery(
+            -vScreenX[Z], -vScreenY[Z],
+            -vScreenX[Z] + vScreen[Z].Width, -vScreenY[Z] + vScreen[Z].Height,
+            true);
+        for(Block_t* block : screenBlocks)
         {
+            A = block - &Block[1] + 1;
             g_stats.checkedBlocks++;
             if(!BlockIsSizable[Block[A].Type] && (!Block[A].Invis || (LevelEditor && BlockFlash <= 30)) && Block[A].Type != 0 && !BlockKills[Block[A].Type])
             {
@@ -1740,8 +1745,9 @@ void UpdateGraphics(bool skipRepaint)
             }
         }
 
-        for(A = fBlock; A <= lBlock; A++) // Blocks in Front
+        for(Block_t* block : screenBlocks) // Blocks in Front
         {
+            A = block - &Block[1] + 1;
             g_stats.checkedBlocks++;
             if(BlockKills[Block[A].Type])
             {

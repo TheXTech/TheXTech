@@ -481,10 +481,11 @@ void UpdatePlayer()
                         tempLocation.X = tempLocation.X + 64 - tempLocation.Width / 2.0;
                         // fBlock = FirstBlock[(tempLocation.X / 32) - 1];
                         // lBlock = LastBlock[((tempLocation.X + tempLocation.Width) / 32.0) + 1];
-                        blockTileGet(tempLocation, fBlock, lBlock);
+                        // blockTileGet(tempLocation, fBlock, lBlock);
 
-                        for(B = (int)fBlock; B <= lBlock; B++)
+                        for(Block_t* block : treeBlockQuery(tempLocation, false))
                         {
+                            B = block - &Block[1] + 1;
                             if(!Block[B].Invis && !BlockIsSizable[Block[B].Type] && !BlockOnlyHitspot1[Block[B].Type] &&
                                !BlockNoClipping[Block[B].Type] && !Block[B].Hidden)
                             {
@@ -2323,10 +2324,11 @@ void UpdatePlayer()
                 // block collision optimization
                 // fBlock = FirstBlock[(Player[A].Location.X / 32) - 1];
                 // lBlock = LastBlock[((Player[A].Location.X + Player[A].Location.Width) / 32.0) + 1];
-                blockTileGet(Player[A].Location, fBlock, lBlock);
+                // blockTileGet(Player[A].Location, fBlock, lBlock);
 
-                for(B = (int)fBlock; B <= lBlock; B++)
+                for(Block_t* block : treeBlockQuery(Player[A].Location, false))
                 {
+                    B = block - &Block[1] + 1;
 
                     // checks to see if a collision happened
                     if(Player[A].Location.X + Player[A].Location.Width >= Block[B].Location.X)
@@ -2852,10 +2854,11 @@ void UpdatePlayer()
                                                 tempBool = false;
                                                 // fBlock = FirstBlock[(tempLocation.X / 32) - 1];
                                                 // lBlock = LastBlock[((tempLocation.X + tempLocation.Width) / 32.0) + 1];
-                                                blockTileGet(tempLocation, fBlock, lBlock);
+                                                // blockTileGet(tempLocation, fBlock, lBlock);
 
-                                                for(auto C = fBlock; C <= lBlock; C++)
+                                                for(Block_t* block : treeBlockQuery(tempLocation, false))
                                                 {
+                                                    C = block - &Block[1] + 1;
                                                     if(CheckCollision(tempLocation, Block[C].Location) && !Block[C].Hidden)
                                                     {
                                                         if(BlockSlope[Block[C].Type] == 0)
@@ -4069,10 +4072,11 @@ void UpdatePlayer()
 
                                                     // fBlock = FirstBlock[(Player[A].Location.X / 32) - 1];
                                                     // lBlock = LastBlock[((Player[A].Location.X + Player[A].Location.Width) / 32.0) + 1];
-                                                    blockTileGet(Player[A].Location, fBlock, lBlock);
+                                                    // blockTileGet(Player[A].Location, fBlock, lBlock);
 
-                                                    for(C = fBlock; C <= lBlock; C++)
+                                                    for(Block_t* block : treeBlockQuery(Player[A].Location, false))
                                                     {
+                                                        C = block - &Block[1] + 1;
                                                         if(CheckCollision(Player[A].Location, Block[C].Location) &&
                                                            !Block[C].Hidden && !BlockIsSizable[Block[C].Type] &&
                                                            !BlockOnlyHitspot1[Block[C].Type])
@@ -4344,18 +4348,24 @@ void UpdatePlayer()
                         {
                             numBlock = numBlock + 1;
                             Block[numBlock].Location.Y = NPC[B].Location.Y;
+                            // this block does not seem useful but I will sync it
+                            syncLayers_Block(numBlock);
                             YoshiPound(A, Player[A].Mount, true);
                             Block[numBlock].Location.Y = 0;
                             numBlock = numBlock - 1;
+                            syncLayers_Block(numBlock + 1);
                             Player[A].GroundPound = false;
                         }
                         else if(Player[A].YoshiYellow)
                         {
                             numBlock = numBlock + 1;
                             Block[numBlock].Location.Y = NPC[B].Location.Y;
+                            // this block does not seem useful but I will sync it
+                            syncLayers_Block(numBlock);
                             YoshiPound(A, Player[A].Mount);
                             Block[numBlock].Location.Y = 0;
                             numBlock = numBlock - 1;
+                            syncLayers_Block(numBlock + 1);
                         }
                     }
                     if(NPC[B].playerTemp == 0)

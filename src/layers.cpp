@@ -43,6 +43,7 @@
 #include "compat.h"
 #include "editor/editor.h"
 #include "blocks.h"
+#include "main/trees.h"
 
 int numLayers = 0;
 RangeArr<Layer_t, 0, maxLayers> Layer;
@@ -1053,18 +1054,21 @@ void UpdateLayers()
         else
         {
             // move the sort invalidation out of the loop over blocks
-            if(!Layer[A].blocks.empty() && Layer[A].SpeedX != 0.f)
-            {
-                if(BlocksSorted == true)
-                {
-                    for(C = (int)(-FLBlocks); C <= FLBlocks; C++)
-                    {
-                        FirstBlock[C] = 1;
-                        LastBlock[C] = numBlock;
-                    }
-                    BlocksSorted = false;
-                }
-            }
+            // if(!Layer[A].blocks.empty() && Layer[A].SpeedX != 0.f)
+            // {
+            //     if(BlocksSorted == true)
+            //     {
+            //         for(C = (int)(-FLBlocks); C <= FLBlocks; C++)
+            //         {
+            //             FirstBlock[C] = 1;
+            //             LastBlock[C] = numBlock;
+            //         }
+            //         BlocksSorted = false;
+            //     }
+            // }
+
+            Layer[A].OffsetX += double(Layer[A].SpeedX);
+            Layer[A].OffsetY += double(Layer[A].SpeedY);
 
             for(int B : Layer[A].blocks)
             {
@@ -1170,6 +1174,7 @@ void UpdateLayers()
 
 void syncLayers_AllBlocks()
 {
+    treeLevelCleanBlockLayers();
     for (int block = 1; block <= numBlock; block++)
     {
         syncLayers_Block(block);
@@ -1178,27 +1183,47 @@ void syncLayers_AllBlocks()
 
 void syncLayers_Block(int block)
 {
+    int foundLayer = false;
     for (int layer = 0; layer <= numLayers; layer++)
     {
         if (block <= numBlock && Block[block].Layer == Layer[layer].Name)
+        {
+            if(!foundLayer)
+            {
+                Block[block].LayerIndex = layer;
+                Block[block].LocationInLayer = Block[block].Location;
+                Block[block].LocationInLayer.X = Block[block].Location.X - Layer[layer].OffsetX;
+                Block[block].LocationInLayer.Y = Block[block].Location.Y - Layer[layer].OffsetY;
+                treeBlockAddLayer(layer, &Block[block]);
+                foundLayer = true;
+            }
+            else
+                treeBlockRemoveLayer(layer, &Block[block]);
             Layer[layer].blocks.insert(block);
+        }
         else
+        {
             Layer[layer].blocks.erase(block);
+            treeBlockRemoveLayer(layer, &Block[block]);
+        }
+    }
+    if(!foundLayer && block <= numBlock)
+    {
+        Block[block].LayerIndex = -1;
+        Block[block].LocationInLayer = Block[block].Location;
+        treeBlockAddLayer(-1, &Block[block]);
+    }
+    else
+    {
+        treeBlockRemoveLayer(-1, &Block[block]);
     }
 }
 
 void syncLayers_Block_SetHidden(int block) // set block hidden based on layer
 {
-    for (int layer = 0; layer <= numLayers; layer++)
-    {
-        if (block <= numBlock && Block[block].Layer == Layer[layer].Name)
-        {
-            Layer[layer].blocks.insert(block);
-            Block[block].Hidden = Layer[layer].Hidden;
-        }
-        else
-            Layer[layer].blocks.erase(block);
-    }
+    syncLayers_Block(block);
+    if(Block[block].LayerIndex != -1)
+        Block[block].Hidden = Layer[Block[block].LayerIndex].Hidden;
 }
 
 void syncLayers_AllNPCs()

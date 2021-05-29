@@ -38,6 +38,7 @@
 #include "../pseudo_vb.h"
 #include "../main/trees.h"
 #include "game_info.h"
+#include "trees.h"
 
 
 void DoCredits()
@@ -164,28 +165,24 @@ void OutroLoop()
             tempLocation.X = Player[A].Location.X - tempLocation.Width - 20;
         // fBlock = FirstBlock[long(tempLocation.X / 32) - 1];
         // lBlock = LastBlock[long((tempLocation.X + tempLocation.Width) / 32.0) + 1];
-        blockTileGet(tempLocation, fBlock, lBlock);
+        // blockTileGet(tempLocation, fBlock, lBlock);
 
-        for(B = (int)fBlock; B <= lBlock; B++)
+        for(Block_t* block : treeBlockQuery(tempLocation, false))
         {
-            if(tempLocation.X + tempLocation.Width >= Block[B].Location.X)
+            Block_t& b = *block;
+            if(tempLocation.X + tempLocation.Width >= b.Location.X)
             {
-                if(tempLocation.X <= Block[B].Location.X + Block[B].Location.Width)
+                if(tempLocation.X <= b.Location.X + b.Location.Width)
                 {
-                    if(tempLocation.Y + tempLocation.Height >= Block[B].Location.Y)
+                    if(tempLocation.Y + tempLocation.Height >= b.Location.Y)
                     {
-                        if(tempLocation.Y <= Block[B].Location.Y + Block[B].Location.Height)
+                        if(tempLocation.Y <= b.Location.Y + b.Location.Height)
                         {
-                            if(!BlockNoClipping[Block[B].Type] && !Block[B].Invis && !Block[B].Hidden && !(BlockIsSizable[Block[B].Type] && Block[B].Location.Y < Player[A].Location.Y + Player[A].Location.Height - 3))
+                            if(!BlockNoClipping[b.Type] && !b.Invis && !b.Hidden && !(BlockIsSizable[b.Type] && b.Location.Y < Player[A].Location.Y + Player[A].Location.Height - 3))
                                 jumpBool = false;
                         }
                     }
                 }
-            }
-            else
-            {
-                if(BlocksSorted)
-                    break;
             }
         }
 

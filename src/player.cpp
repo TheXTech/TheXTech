@@ -69,8 +69,9 @@ static void setupPlayerAtCheckpoints(NPC_t &npc, Checkpoint_t &cp)
     tempLocation.Height = 600;
 
     C = 0;
-    for(B = 1; B <= numBlock; B++)
+    for(Block_t* block : treeBlockQuery(tempLocation, false))
     {
+        B = block - &Block[1] + 1;
         if(CheckCollision(tempLocation, Block[B].Location) == true)
         {
             if(C == 0)
@@ -2124,10 +2125,9 @@ void TailSwipe(int plr, bool boo, bool Stab, int StabDir)
     {
         // fBlock = FirstBlock[(tailLoc.X / 32) - 1];
         // lBlock = LastBlock[((tailLoc.X + tailLoc.Width) / 32.0) + 1];
-        blockTileGet(tailLoc, fBlock, lBlock);
-
-        for(A = (int)fBlock; A <= lBlock; A++)
+        for(Block_t* block : treeBlockQuery(tailLoc, false))
         {
+            A = block - &Block[1] + 1;
             if(!BlockIsSizable[Block[A].Type] && !Block[A].Hidden && (Block[A].Type != 293 || Stab) && !Block[A].Invis && !BlockNoClipping[Block[A].Type])
             {
                 if(CheckCollision(tailLoc, Block[A].Location))
@@ -2581,9 +2581,11 @@ void YoshiPound(int A, int mount, bool BreakBlocks)
 
         if(BreakBlocks)
         {
-            for(B = 1; B <= numBlock; B++)
+            for(Block_t* block : treeBlockQuery(Player[A].Location, false))
             {
-                auto &b = Block[B];
+                B = block - &Block[1] + 1;
+                Block_t& b = *block;
+
                 if(b.Hidden || b.Invis || BlockNoClipping[b.Type] || BlockIsSizable[b.Type])
                     continue;
 
@@ -2655,11 +2657,12 @@ void PlayerPush(int A, int HitSpot)
 
     // fBlock = FirstBlock[(p.Location.X / 32) - 1];
     // lBlock = LastBlock[((p.Location.X + p.Location.Width) / 32.0) + 1];
-    blockTileGet(p.Location, fBlock, lBlock);
+    // blockTileGet(p.Location, fBlock, lBlock);
 
-    for(int B = int(fBlock); B <= lBlock; B++)
+    for(Block_t* block : treeBlockQuery(p.Location, false))
     {
-        auto &b = Block[B];
+        int B = block - &Block[1] + 1;
+        Block_t& b = *block;
 
         if(b.Hidden || BlockIsSizable[b.Type])
             continue;
