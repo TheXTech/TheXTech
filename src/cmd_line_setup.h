@@ -44,6 +44,13 @@ struct CmdLineSetup_t
     //! Force log output into console
     bool verboseLogging = false;
 
+    //! save a log of limited gameplay data
+    std::string gameplayLog;
+    //! save a controls recording to
+    std::string recordControls;
+    //! replay a controls recording from
+    std::string replayControls;
+
     //! Enable the speed-run mode
     int  speedRunnerMode = 0;
     //! Draw the speed-run timer semi-transparently

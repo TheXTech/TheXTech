@@ -239,6 +239,21 @@ int main(int argc, char**argv)
         TCLAP::SwitchArg switchSpeedRunSemiTransparent(std::string(), "speed-run-semitransparent",
                                                        "Make the speed-runner mode timer be drawn transparently", false);
 
+        TCLAP::ValueArg<std::string> recordControls(std::string(), "record-controls", "Path to save a controls recording to.",
+                                                false, "",
+                                                "record path",
+                                                cmd);
+
+        TCLAP::ValueArg<std::string> replayControls(std::string(), "replay-controls", "Path to replay a controls recording from.",
+                                                false, "",
+                                                "replay path",
+                                                cmd);
+
+        TCLAP::ValueArg<std::string> gameplayLog(std::string(), "gameplay-log", "Path to save a log of limited gameplay data.",
+                                                false, "",
+                                                "log path",
+                                                cmd);
+
         TCLAP::SwitchArg switchVerboseLog(std::string(), "verbose", "Enable log output into the terminal", false);
 
         TCLAP::UnlabeledValueArg<std::string> inputFileNames("levelpath", "Path to level file to run the test", false, std::string(), "path to file");
@@ -319,10 +334,20 @@ int main(int argc, char**argv)
         setup.speedRunnerMode = speedRunMode.getValue();
         setup.speedRunnerSemiTransparent = switchSpeedRunSemiTransparent.getValue();
 
+        setup.replayControls = replayControls.getValue();
+        setup.recordControls = recordControls.getValue();
+        setup.gameplayLog = gameplayLog.getValue();
+
         if(setup.speedRunnerMode >= 1) // Always show FPS and don't pause the game work when focusing other windows
         {
             setup.testShowFPS = true;
             setup.neverPause = true;
+        }
+
+        if(!setup.replayControls.empty() && !setup.gameplayLog.empty())
+        {
+            setup.testShowFPS = true;
+            setup.testMaxFPS = true;
         }
     }
     catch(TCLAP::ArgException &e)   // catch any exceptions

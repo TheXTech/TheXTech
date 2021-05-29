@@ -64,6 +64,7 @@
 #include "main/speedrunner.h"
 #include "main/menu_main.h"
 #include "main/trees.h"
+#include "rand.h"
 
 #ifdef NEW_EDITOR
 #include "editor/new_editor.h"
@@ -123,6 +124,23 @@ int GameMain(const CmdLineSetup_t &setup)
 
     g_speedRunnerMode = setup.speedRunnerMode;
     speedRun_setSemitransparentRender(setup.speedRunnerSemiTransparent);
+    if(!setup.gameplayLog.empty())
+    {
+        seedRandom(42);
+        g_speedRunnerGameplayLog = fopen(setup.gameplayLog.c_str(), "w");
+    }
+    if(!setup.replayControls.empty())
+    {
+        seedRandom(42);
+        g_speedRunnerControlFile = fopen(setup.replayControls.c_str(), "r");
+        g_speedRunnerDebug = SPEEDRUN_DEBUG_PLAY;
+    }
+    else if(!setup.recordControls.empty())
+    {
+        seedRandom(42);
+        g_speedRunnerControlFile = fopen(setup.recordControls.c_str(), "w");
+        g_speedRunnerDebug = SPEEDRUN_DEBUG_REC;
+    }
 
     ResetCompat();
 
@@ -142,7 +160,13 @@ int GameMain(const CmdLineSetup_t &setup)
     gfxLoaderTestMode = setup.testLevelMode;
 
     if(!GFX.load()) // Load UI graphics
+    {
+        if(g_speedRunnerGameplayLog)
+            fclose(g_speedRunnerGameplayLog);
+        if(g_speedRunnerControlFile)
+            fclose(g_speedRunnerControlFile);
         return 1;
+    }
 
 //    If LevelEditor = False Then
 //        frmMain.Show // Show window a bit later
@@ -523,7 +547,7 @@ int GameMain(const CmdLineSetup_t &setup)
             if(!GameIsActive)
             {
                 speedRun_saveStats();
-                return 0;// Break on quit
+                break;// Break on quit
             }
         }
 
@@ -618,7 +642,7 @@ int GameMain(const CmdLineSetup_t &setup)
                 if(!GameIsActive)
                 {
                     speedRun_saveStats();
-                    return 0;// Break on quit
+                    break;// Break on quit
                 }
             }
         }
@@ -770,7 +794,7 @@ int GameMain(const CmdLineSetup_t &setup)
             if(!GameIsActive)
             {
                 speedRun_saveStats();
-                return 0;// Break on quit
+                break;// Break on quit
             }
 
             // TODO: Utilize this and any TestLevel/MagicHand related code to allow PGE Editor integration
@@ -817,6 +841,11 @@ int GameMain(const CmdLineSetup_t &setup)
         }
 
     } while(GameIsActive);
+
+    if(g_speedRunnerGameplayLog)
+        fclose(g_speedRunnerGameplayLog);
+    if(g_speedRunnerControlFile)
+        fclose(g_speedRunnerControlFile);
 
     return 0;
 }

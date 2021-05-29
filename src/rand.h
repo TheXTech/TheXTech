@@ -27,6 +27,11 @@
 #define RAND_H
 
 /**
+ * @brief Seed all future random numbers with integer argument seed
+ */
+extern void seedRandom(int seed);
+
+/**
  * @brief Random number generator in float format, between 0.0f to 1.0f
  * @return random float value
  */
