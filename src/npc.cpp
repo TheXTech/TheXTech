@@ -2484,18 +2484,14 @@ void NPCSpecial(int A)
         if(npc.Location.SpeedY < 0)
             Block[npc.tempBlock].Location.Y += npc.Location.SpeedY;
 
-        // TODO: see if this is needed
+        // necessary for tree update
         Block[npc.tempBlock].LocationInLayer = Block[npc.tempBlock].Location;
         if(Block[npc.tempBlock].LayerIndex != -1)
         {
             Block[npc.tempBlock].LocationInLayer.X -= Layer[Block[npc.tempBlock].LayerIndex].OffsetX;
             Block[npc.tempBlock].LocationInLayer.Y -= Layer[Block[npc.tempBlock].LayerIndex].OffsetY;
-            treeBlockUpdateLayer(Block[npc.tempBlock].LayerIndex, &Block[npc.tempBlock]);
         }
-        else
-        {
-            treeBlockUpdateLayer(Block[npc.tempBlock].LayerIndex, &Block[npc.tempBlock]);
-        }
+        treeBlockUpdateLayer(Block[npc.tempBlock].LayerIndex, &Block[npc.tempBlock]);
 
         if(npc.Type == 179)
         {

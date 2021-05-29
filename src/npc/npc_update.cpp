@@ -3801,12 +3801,20 @@ void UpdateNPCs()
                     if((NPC[A].Type < 78 || NPC[A].Type > 83) && NPC[A].Type != 26)
                     {
                         Block[NPC[A].tempBlock].Location = NPC[A].Location;
-                        treeBlockUpdateLayer(Block[NPC[A].tempBlock].LayerIndex, &Block[NPC[A].tempBlock]);
                         if(NPC[A].Type == 26)
                         {
                             Block[NPC[A].tempBlock].Location.Y = Block[NPC[A].tempBlock].Location.Y - 16;
                             Block[NPC[A].tempBlock].Location.Height = Block[NPC[A].tempBlock].Location.Height + 16;
                         }
+                        // necessary for tree update
+                        Block[NPC[A].tempBlock].LocationInLayer = Block[NPC[A].tempBlock].Location;
+                        if(Block[NPC[A].tempBlock].LayerIndex != -1)
+                        {
+                            Block[NPC[A].tempBlock].LocationInLayer.X -= Layer[Block[NPC[A].tempBlock].LayerIndex].OffsetX;
+                            Block[NPC[A].tempBlock].LocationInLayer.Y -= Layer[Block[NPC[A].tempBlock].LayerIndex].OffsetY;
+                        }
+                        treeBlockUpdateLayer(Block[NPC[A].tempBlock].LayerIndex, &Block[NPC[A].tempBlock]);
+
                         // no longer needed; maintaining the sort
                         // while(Block[NPC[A].tempBlock].Location.X < Block[NPC[A].tempBlock - 1].Location.X && NPC[A].tempBlock > numBlock + 1 - numTempBlock)
                         // {
