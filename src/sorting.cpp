@@ -26,6 +26,7 @@
 #include "globals.h"
 #include "sorting.h"
 
+// these are now used only when saving levels
 void qSortBlocksY(int min, int max)
 {
     Block_t medBlock;
@@ -168,6 +169,8 @@ void qSortBackgrounds(int min, int max)
     qSortBackgrounds(lo + 1, max);
 }
 
+// this code found the block column indices -- replaced by tree
+#if 0
 void FindBlocks()
 {
     double A = 0;
@@ -205,7 +208,10 @@ void FindBlocks()
     }
     BlocksSorted = true;
 }
+#endif
 
+// these were old block sorts that were abandoned back in the SMBX days
+#if 0
 void BlockSort()
 {
     int A = 0;
@@ -286,6 +292,7 @@ void BlockSort2()
         }
     } while(sortAgain == true);
 }
+#endif
 
 void BackgroundSort()
 {
@@ -389,6 +396,8 @@ void NPCSort()
     }
 }
 
+// this is still used for now and doesn't depend on any of the rest of the block code
+// it also does not modify the order of the Block array, but rather the order of the sBlockArray.
 void FindSBlocks()
 {
     int A = 0;
@@ -523,6 +532,8 @@ void UpdateBackgrounds()
 //        Netplay::sendData "s" + std::to_string(numBackground) + LB;
 }
 
+// this code is no longer needed due to trees
+#if 0
 void qSortTempBlocksX(int min, int max)
 {
     Block_t medBlock;
@@ -572,3 +583,4 @@ void qSortTempBlocksX(int min, int max)
     qSortBlocksX(min, lo - 1);
     qSortBlocksX(lo + 1, max);
 }
+#endif

@@ -1163,12 +1163,13 @@ extern bool RestartLevel;
 //Public LevelChop(0 To maxSections) As Single 'for drawing backgrounds when the level has been shrunk
 extern float LevelChop[maxSections + 1];
 //'collision detection optimization. creates a table of contents for blocks
+// replaced by trees
 //Public Const FLBlocks As Long = 8000
-const int64_t FLBlocks = 10000;
+const int64_t OLD_FLBlocks = 8000;
 //Public FirstBlock(-FLBlocks To FLBlocks) As Integer
-extern RangeArr<int, -FLBlocks, FLBlocks> FirstBlock;
+// extern RangeArr<int, -FLBlocks, FLBlocks> FirstBlock;
 //Public LastBlock(-FLBlocks To FLBlocks) As Integer
-extern RangeArr<int, -FLBlocks, FLBlocks> LastBlock;
+// extern RangeArr<int, -FLBlocks, FLBlocks> LastBlock;
 //Public MidBackground As Integer 'for drawing backgrounds
 extern int MidBackground;
 //Public LastBackground As Integer 'last backgrounds to be drawn

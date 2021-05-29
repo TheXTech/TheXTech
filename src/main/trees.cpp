@@ -31,11 +31,11 @@
 std::vector<void*> treeresult_vec[4] = {std::vector<void*>(400), std::vector<void*>(400), std::vector<void*>(50), std::vector<void*>(50)};
 ptrdiff_t cur_treeresult_vec = 0;
 
-template<class WorldItemT>
-class WorldTree_Extractor
+template<class ItemT>
+class Tree_Extractor
 {
 public:
-    static void ExtractBoundingBox(const WorldItemT *object, loose_quadtree::BoundingBox<double> *bbox)
+    static void ExtractBoundingBox(const ItemT *object, loose_quadtree::BoundingBox<double> *bbox)
     {
         bbox->left      = object->Location.X;
         bbox->top       = object->Location.Y;
@@ -44,21 +44,35 @@ public:
     }
 };
 
-template<class WorldItemT>
-struct WorldTree_private
+
+template<>
+class Tree_Extractor<Block_t>
 {
-    typedef loose_quadtree::LooseQuadtree<double, WorldItemT, WorldTree_Extractor<WorldItemT>> IndexTreeQ;
+public:
+    static void ExtractBoundingBox(const Block_t *object, loose_quadtree::BoundingBox<double> *bbox)
+    {
+        bbox->left      = object->LocationInLayer.X;
+        bbox->top       = object->LocationInLayer.Y;
+        bbox->width     = object->LocationInLayer.Width;
+        bbox->height    = object->LocationInLayer.Height;
+    }
+};
+
+template<class ItemT>
+struct Tree_private
+{
+    typedef loose_quadtree::LooseQuadtree<double, ItemT, Tree_Extractor<ItemT>> IndexTreeQ;
     IndexTreeQ tree;
 };
 
 const double s_gridSize = 4;
 
-static std::unique_ptr<WorldTree_private<Tile_t>> s_worldTilesTree;
-static std::unique_ptr<WorldTree_private<Scene_t>> s_worldSceneTree;
-static std::unique_ptr<WorldTree_private<WorldPath_t>> s_worldPathTree;
-static std::unique_ptr<WorldTree_private<WorldLevel_t>> s_worldLevelTree;
-static std::unique_ptr<WorldTree_private<WorldMusic_t>> s_worldMusicTree;
-static std::unique_ptr<WorldTree_private<Block_t>> s_levelBlockTrees[maxLayers+2];
+static std::unique_ptr<Tree_private<Tile_t>> s_worldTilesTree;
+static std::unique_ptr<Tree_private<Scene_t>> s_worldSceneTree;
+static std::unique_ptr<Tree_private<WorldPath_t>> s_worldPathTree;
+static std::unique_ptr<Tree_private<WorldLevel_t>> s_worldLevelTree;
+static std::unique_ptr<Tree_private<WorldMusic_t>> s_worldMusicTree;
+static std::unique_ptr<Tree_private<Block_t>> s_levelBlockTrees[maxLayers+2];
 
 template<class Q>
 void clearTree(Q &tree)
@@ -94,7 +108,7 @@ template<class Obj, class Arr>
 void treeInsert(Arr &p, Obj*obj)
 {
     if(!p.get())
-        p.reset(new WorldTree_private<Obj>());
+        p.reset(new Tree_private<Obj>());
     p->tree.Insert(obj);
 }
 
@@ -113,7 +127,7 @@ void treeRemove(Arr &p, Obj*obj)
 }
 
 template<class Obj>
-TreeResult_Sentinel<Obj> treeWorldQuery(std::unique_ptr<WorldTree_private<Obj>> &p,
+TreeResult_Sentinel<Obj> treeWorldQuery(std::unique_ptr<Tree_private<Obj>> &p,
     double Left, double Top, double Right, double Bottom, bool z_sort)
 {
     TreeResult_Sentinel<Obj> result;
@@ -379,7 +393,7 @@ TreeResult_Sentinel<Block_t> treeBlockQuery(double Left, double Top, double Righ
             OffsetX = Layer[layer].OffsetX;
             OffsetY = Layer[layer].OffsetY;
         }
-        std::unique_ptr<WorldTree_private<Block_t>>& p = s_levelBlockTrees[layer];
+        std::unique_ptr<Tree_private<Block_t>>& p = s_levelBlockTrees[layer];
         if(!p.get())
             continue;
 
@@ -415,22 +429,4 @@ TreeResult_Sentinel<Block_t> treeBlockQuery(const Location_t &loc,
                    loc.Y,
                    loc.X + loc.Width,
                    loc.Y + loc.Height, z_sort, margin);
-}
-
-
-/* ================= Tile block search ================= */
-void blockTileGet(const Location_t &loc, int64_t &fBlock, int64_t &lBlock)
-{
-    int f = vb6Round(loc.X / 32) - 1;
-    int l = vb6Round((loc.X + loc.Width) / 32.0) + 1;
-    fBlock = FirstBlock[f < -FLBlocks ? -FLBlocks : f];
-    lBlock = LastBlock[l > FLBlocks ? FLBlocks : l];
-}
-
-void blockTileGet(double x, double w, int64_t &fBlock, int64_t &lBlock)
-{
-    int f = vb6Round(x / 32) - 1;
-    int l = vb6Round((x + w) / 32.0) + 1;
-    fBlock = FirstBlock[f < -FLBlocks ? -FLBlocks : f];
-    lBlock = LastBlock[l > FLBlocks ? FLBlocks : l];
 }

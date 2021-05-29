@@ -698,11 +698,12 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         }
     }
 
-    FindBlocks();
+    // no longer needed
+    // FindBlocks();
     qSortBackgrounds(1, numBackground);
     UpdateBackgrounds();
     FindSBlocks();
-    syncLayers_AllBlocks();
+    syncLayersTrees_AllBlocks();
     syncLayers_AllBGOs();
 
     // Do this before adding locks,

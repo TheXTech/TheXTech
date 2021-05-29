@@ -88,13 +88,13 @@ void UpdateNPCs()
 //    float beltFixX = 0;
     int oldDirection = 0;
 
-    // used for collision detection
-    int64_t fBlock = 0;
-    int64_t lBlock = 0;
-    int64_t fBlock2 = 0;
-    int64_t lBlock2 = 0;
-    int bCheck2 = 0;
-    int bCheck = 0;
+    // no longer needed since trees // used for collision detection
+    // int64_t fBlock = 0;
+    // int64_t lBlock = 0;
+    // int64_t fBlock2 = 0;
+    // int64_t lBlock2 = 0;
+    // int bCheck2 = 0;
+    // int bCheck = 0;
     float addBelt = 0;
     int numAct = 0;
     bool beltClear = false; // stops belt movement when on a wall
@@ -635,7 +635,7 @@ void UpdateNPCs()
     // think about these all...
     for(A = numBlock + 1 - numTempBlock; A <= numBlock; A++)
     {
-        syncLayers_Block(A);
+        syncLayersTrees_Block(A);
     }
     // if(numTempBlock > 1)
     //     qSortBlocksX(numBlock + 1 - numTempBlock, numBlock);
@@ -1947,10 +1947,11 @@ void UpdateNPCs()
                     oldSlope = NPC[A].Slope;
                     SlopeTurn = false;
                     NPC[A].Slope = 0;
-                    if(NPC[A].Location.X < -(FLBlocks - 1) * 32)
-                        NPC[A].Location.X = -(FLBlocks - 1) * 32;
-                    if(NPC[A].Location.X + NPC[A].Location.Width > (FLBlocks + 1) * 32)
-                        NPC[A].Location.X = (FLBlocks + 1) * 32 - NPC[A].Location.Width;
+                    // extreme level bounds no longer needed, but kept for compatibility
+                    if(NPC[A].Location.X < -(OLD_FLBlocks - 1) * 32)
+                        NPC[A].Location.X = -(OLD_FLBlocks - 1) * 32;
+                    if(NPC[A].Location.X + NPC[A].Location.Width > (OLD_FLBlocks + 1) * 32)
+                        NPC[A].Location.X = (OLD_FLBlocks + 1) * 32 - NPC[A].Location.Width;
 
                     if(!(NPCIsACoin[NPC[A].Type] && NPC[A].Special == 0) && !(NPC[A].Type == 45 && NPC[A].Special == 0) && !(NPC[A].Type == 57) && !(NPC[A].Type == 85) && !(NPC[A].Type == 91) && !(NPC[A].Type == 97) && !(NPC[A].Type == 196) && !(NPC[A].Type >= 104 && NPC[A].Type <= 106) && !(NPCIsAnExit[NPC[A].Type] && ((NPC[A].DefaultLocation.X == NPC[A].Location.X && NPC[A].DefaultLocation.Y == NPC[A].Location.Y) || NPC[A].Inert == true)) && !(NPC[A].Type == 159) && !(NPC[A].Type == 192) && !(NPC[A].Type == 202) && !(NPC[A].Type == 246 || NPC[A].Type == 255 || NPC[A].Type == 259 || NPC[A].Type == 260))
                     {
@@ -1974,6 +1975,8 @@ void UpdateNPCs()
                                 //     lBlock = numBlock;
                                 // }
 
+                                // for(B = 1; B <= numBlock; B++)
+                                // {
                                 for(Block_t* block : treeBlockQuery(NPC[A].Location, false))
                                 {
                                     B = block - &Block[1] + 1;
@@ -2116,7 +2119,7 @@ void UpdateNPCs()
                                                                 {
                                                                     Block[B].Layer = "Destroyed Blocks";
                                                                     Block[B].Hidden = true;
-                                                                    syncLayers_Block(B);
+                                                                    syncLayersTrees_Block(B);
                                                                     numNPCs++;
                                                                     NPC[numNPCs] = NPC_t();
                                                                     NPC[numNPCs].Location.Width = 28;
@@ -3798,41 +3801,43 @@ void UpdateNPCs()
                     if((NPC[A].Type < 78 || NPC[A].Type > 83) && NPC[A].Type != 26)
                     {
                         Block[NPC[A].tempBlock].Location = NPC[A].Location;
+                        treeBlockUpdateLayer(Block[NPC[A].tempBlock].LayerIndex, &Block[NPC[A].tempBlock]);
                         if(NPC[A].Type == 26)
                         {
                             Block[NPC[A].tempBlock].Location.Y = Block[NPC[A].tempBlock].Location.Y - 16;
                             Block[NPC[A].tempBlock].Location.Height = Block[NPC[A].tempBlock].Location.Height + 16;
                         }
-                        while(Block[NPC[A].tempBlock].Location.X < Block[NPC[A].tempBlock - 1].Location.X && NPC[A].tempBlock > numBlock + 1 - numTempBlock)
-                        {
+                        // no longer needed; maintaining the sort
+                        // while(Block[NPC[A].tempBlock].Location.X < Block[NPC[A].tempBlock - 1].Location.X && NPC[A].tempBlock > numBlock + 1 - numTempBlock)
+                        // {
 
-                            tmpBlock = Block[NPC[A].tempBlock - 1];
-                            Block[NPC[A].tempBlock - 1] = Block[NPC[A].tempBlock];
-                            Block[NPC[A].tempBlock] = tmpBlock;
+                        //     tmpBlock = Block[NPC[A].tempBlock - 1];
+                        //     Block[NPC[A].tempBlock - 1] = Block[NPC[A].tempBlock];
+                        //     Block[NPC[A].tempBlock] = tmpBlock;
 
-                            NPC[Block[NPC[A].tempBlock].IsReally].tempBlock = NPC[A].tempBlock;
-                            NPC[A].tempBlock = NPC[A].tempBlock - 1;
+                        //     NPC[Block[NPC[A].tempBlock].IsReally].tempBlock = NPC[A].tempBlock;
+                        //     NPC[A].tempBlock = NPC[A].tempBlock - 1;
 
-                        }
-                        while(Block[NPC[A].tempBlock].Location.X > Block[NPC[A].tempBlock + 1].Location.X && NPC[A].tempBlock < numBlock)
-                        {
-
-
-                            tmpBlock = Block[NPC[A].tempBlock + 1];
-                            Block[NPC[A].tempBlock + 1] = Block[NPC[A].tempBlock];
-                            Block[NPC[A].tempBlock] = tmpBlock;
-
-                            NPC[Block[NPC[A].tempBlock].IsReally].tempBlock = NPC[A].tempBlock;
-                            NPC[A].tempBlock = NPC[A].tempBlock + 1;
+                        // }
+                        // while(Block[NPC[A].tempBlock].Location.X > Block[NPC[A].tempBlock + 1].Location.X && NPC[A].tempBlock < numBlock)
+                        // {
 
 
+                        //     tmpBlock = Block[NPC[A].tempBlock + 1];
+                        //     Block[NPC[A].tempBlock + 1] = Block[NPC[A].tempBlock];
+                        //     Block[NPC[A].tempBlock] = tmpBlock;
+
+                        //     NPC[Block[NPC[A].tempBlock].IsReally].tempBlock = NPC[A].tempBlock;
+                        //     NPC[A].tempBlock = NPC[A].tempBlock + 1;
 
 
-                            // NPC(Block(.tempBlock).IsReally).tempBlock = .tempBlock
-                            // NPC(Block(.tempBlock + 1).IsReally).tempBlock = .tempBlock + 1
 
 
-                        }
+                        //     // NPC(Block(.tempBlock).IsReally).tempBlock = .tempBlock
+                        //     // NPC(Block(.tempBlock + 1).IsReally).tempBlock = .tempBlock + 1
+
+
+                        // }
                     }
                     Block[NPC[A].tempBlock].Location.SpeedX = NPC[A].Location.SpeedX + NPC[A].BeltSpeed;
                 }
@@ -5032,7 +5037,7 @@ void UpdateNPCs()
     numBlock = numBlock - numTempBlock; // clean up the temp npc blocks
     for(int i = numBlock + 1; i <= numBlock + numTempBlock; i++)
     {
-        syncLayers_Block(i);
+        syncLayersTrees_Block(i);
     }
     for(A = numNPCs; A >= 1; A--) // KILL THE NPCS <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><
     {

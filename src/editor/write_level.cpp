@@ -50,7 +50,7 @@ void SaveLevel(std::string FilePath)   // saves the level
     qSortBackgrounds(1, numBackground);
     FindSBlocks();
 
-    syncLayers_AllBlocks();
+    syncLayersTrees_AllBlocks();
     syncLayers_AllBGOs();
     syncLayers_AllNPCs();
 

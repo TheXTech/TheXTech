@@ -2056,8 +2056,9 @@ void TailSwipe(int plr, bool boo, bool Stab, int StabDir)
     int A = 0;
     long long B = 0;
     int C = 0;
-    int64_t fBlock = 0;
-    int64_t lBlock = 0;
+    // no longer needed since trees
+    // int64_t fBlock = 0;
+    // int64_t lBlock = 0;
     if(Stab == true)
     {
         if(Player[plr].Duck == false)
@@ -2183,7 +2184,7 @@ void TailSwipe(int plr, bool boo, bool Stab, int StabDir)
                                 PlaySound(SFX_ZeldaGrass);
                                 Block[A].Hidden = true;
                                 Block[A].Layer = "Destroyed Blocks";
-                                syncLayers_Block(A);
+                                syncLayersTrees_Block(A);
                                 NewEffect(10, Block[A].Location);
                                 Effect[numEffects].Location.SpeedY = -2;
                             }
@@ -2647,8 +2648,9 @@ void SwapCoop()
 void PlayerPush(int A, int HitSpot)
 {
     Location_t tempLocation;
-    int64_t fBlock = 0;
-    int64_t lBlock = 0;
+    // no longer needed since trees
+    // int64_t fBlock = 0;
+    // int64_t lBlock = 0;
 
     if(ShadowMode)
         return;

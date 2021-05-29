@@ -197,9 +197,9 @@ void UpdateEvents();
 // Public Sub UpdateLayers()
 void UpdateLayers();
 
-void syncLayers_AllBlocks();
-void syncLayers_Block(int block);
-void syncLayers_Block_SetHidden(int block); // set block hidden based on layer
+void syncLayersTrees_AllBlocks();
+void syncLayersTrees_Block(int block);
+void syncLayersTrees_Block_SetHidden(int block); // set block hidden based on layer
 
 void syncLayers_AllNPCs();
 void syncLayers_NPC(int npc);

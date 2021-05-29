@@ -338,6 +338,7 @@ void UpdateEditor()
                             EditorCursor.Location = NPC[A].Location;
                             EditorCursor.Location.X = NPC[A].Location.X;
                             EditorCursor.Location.Y = NPC[A].Location.Y;
+                            printf("Got %d\n", EditorCursor.NPC.Type);
                             SetCursor();
 //                            Netplay::sendData Netplay::EraseNPC(A, 1) + "p23" + LB;
                             KillNPC(A, 9);
@@ -380,9 +381,7 @@ void UpdateEditor()
 #endif
                                 MouseRelease = false;
                                 EditorControls.MouseClick = false; /* Simulate "Focus out" inside of SMBX Editor */
-                                // FindSBlocks();
-                                // ugh
-                                // syncLayers_AllBlocks();
+                                FindSBlocks();
                                 break;
                             }
                         }
@@ -496,8 +495,7 @@ void UpdateEditor()
 #endif
                                 MouseRelease = false;
                                 EditorControls.MouseClick = false; /* Simulate "Focus out" inside of SMBX Editor */
-                                // FindSBlocks();
-                                // syncLayers_AllBlocks();
+                                FindSBlocks();
                                 break;
                             }
                         }
@@ -746,9 +744,7 @@ void UpdateEditor()
                             {
 //                                Netplay::sendData Netplay::EraseBlock[A];
                                 KillBlock(A); // Erase the block
-                                // FindSBlocks();
-                                // ugh
-                                // syncLayers_AllBlocks();
+                                FindSBlocks();
                                 MouseRelease = false;
                                 break;
                             }
@@ -826,9 +822,7 @@ void UpdateEditor()
                             {
 //                                Netplay::sendData Netplay::EraseBlock[A];
                                 KillBlock(A); // Erase the block
-                                // FindSBlocks();
-                                // ugh
-                                // syncLayers_AllBlocks();
+                                FindSBlocks();
                                 MouseRelease = false;
                                 break;
                             }
@@ -1047,7 +1041,7 @@ void UpdateEditor()
                             Block[numBlock] = EditorCursor.Block;
                             Block[numBlock].DefaultType = Block[numBlock].Type;
                             Block[numBlock].DefaultSpecial = Block[numBlock].Special;
-                            syncLayers_Block(numBlock);
+                            syncLayersTrees_Block(numBlock);
                             // if(MagicHand == true)
                             // {
                             //     for(A = -FLBlocks; A <= FLBlocks; A++)
@@ -1058,9 +1052,7 @@ void UpdateEditor()
                             //     BlocksSorted = false;
                             // }
                         }
-                        // FindSBlocks();
-                        // ack!
-                        // syncLayers_AllBlocks();
+                        FindSBlocks();
 //                        if(nPlay.Online == true)
 //                            Netplay::sendData Netplay::AddBlock(numBlock);
                     }

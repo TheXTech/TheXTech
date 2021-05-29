@@ -1479,9 +1479,9 @@ void KillBlock(int A, bool Splode)
         if(numBlock > 0)
         {
             Block[A] = std::move(Block[numBlock]);
-            syncLayers_Block(A);
+            syncLayersTrees_Block(A);
             numBlock = numBlock - 1;
-            syncLayers_Block(numBlock + 1);
+            syncLayersTrees_Block(numBlock + 1);
         }
     }
     else
@@ -1529,7 +1529,7 @@ void KillBlock(int A, bool Splode)
         Block[A].Hidden = true;
         Block[A].Layer = "Destroyed Blocks";
         Block[A].Kill = false;
-        syncLayers_Block(A);
+        syncLayersTrees_Block(A);
     }
 
 }
@@ -1817,13 +1817,13 @@ void UpdateBlocks()
 
                             if(Block[A].Hidden)
                             {
-                                syncLayers_Block_SetHidden(A);
+                                syncLayersTrees_Block_SetHidden(A);
                                 if(!Block[A].Hidden)
                                     NewEffect(10, newLoc(Block[A].Location.X + Block[A].Location.Width / 2.0 - EffectWidth[10] / 2, Block[A].Location.Y + Block[A].Location.Height / 2.0 - EffectHeight[10] / 2));
                             }
                             else
                             {
-                                syncLayers_Block(A);
+                                syncLayersTrees_Block(A);
                             }
 
                             if(Block[A].Type != Block[A].DefaultType || Block[A].Special != Block[A].DefaultSpecial)
@@ -2087,7 +2087,7 @@ void PSwitch(bool enabled)
                     Block[numBlock].Special = 0;
                     Block[numBlock].Kill = false;
                     Block[numBlock].NPC = NPC[A].Type;
-                    syncLayers_Block(numBlock);
+                    syncLayersTrees_Block(numBlock);
                     // block layers are synchronized now because sorting is gone
                 }
                 NPC[A].Killed = 9;
@@ -2134,8 +2134,8 @@ void PSwitch(bool enabled)
                     Block[A] = Block[numBlock];
                     Block[numBlock] = blankBlock;
                     numBlock = numBlock - 1;
-                    syncLayers_Block(A);
-                    syncLayers_Block(numBlock + 1);
+                    syncLayersTrees_Block(A);
+                    syncLayersTrees_Block(numBlock + 1);
                     // block layers are synchronized now because sorting is gone
                 }
             }
@@ -2165,7 +2165,7 @@ void PSwitch(bool enabled)
                     Block[numBlock].Location.X = Block[numBlock].Location.X + (NPC[A].Location.Width - Block[numBlock].Location.Width) / 2.0;
                     Block[numBlock].Special = 0;
                     Block[numBlock].Kill = false;
-                    syncLayers_Block(numBlock);
+                    syncLayersTrees_Block(numBlock);
                     // block layers are synchronized now because sorting is gone
                 }
                 NPC[A].Killed = 9;
@@ -2202,7 +2202,7 @@ void PSwitch(bool enabled)
                     NPC[numNPCs].Killed = 0;
                     KillBlock(A, false);
                     Block[A].Layer = "Used P Switch";
-                    syncLayers_Block(A);
+                    syncLayersTrees_Block(A);
                     // this is as close to a permanent death as blocks get in the game,
                     // because this layer usually doesn't exist
                 }
@@ -2229,7 +2229,7 @@ void PSwitch(bool enabled)
     // qSortBlocksY(B, A - 1);
     // FindSBlocks();
     // FindBlocks();
-    // syncLayers_AllBlocks();
+    // syncLayersTrees_AllBlocks();
 
     iBlocks = numBlock;
     for(A = 1; A <= numBlock; A++)

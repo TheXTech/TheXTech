@@ -167,8 +167,4 @@ extern TreeResult_Sentinel<Block_t> treeBlockQuery(double Left, double Top, doub
                                bool z_sort, double margin = 16.0);
 extern TreeResult_Sentinel<Block_t> treeBlockQuery(const Location_t &loc, bool z_sort, double margin = 16.0);
 
-
-extern void blockTileGet(const Location_t &loc, int64_t &fBlock, int64_t &lBlock);
-extern void blockTileGet(double x, double w, int64_t &fBlock, int64_t &lBlock);
-
 #endif // #ifndef TREES_H

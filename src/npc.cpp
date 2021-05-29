@@ -2492,6 +2492,10 @@ void NPCSpecial(int A)
             Block[npc.tempBlock].LocationInLayer.Y -= Layer[Block[npc.tempBlock].LayerIndex].OffsetY;
             treeBlockUpdateLayer(Block[npc.tempBlock].LayerIndex, &Block[npc.tempBlock]);
         }
+        else
+        {
+            treeBlockUpdateLayer(Block[npc.tempBlock].LayerIndex, &Block[npc.tempBlock]);
+        }
 
         if(npc.Type == 179)
         {

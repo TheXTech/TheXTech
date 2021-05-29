@@ -168,7 +168,7 @@ void ShowLayer(std::string LayerName, bool NoEffect)
                     Block[A].Layer = "Default";
                 Block[A].Special = Block[A].DefaultSpecial;
                 Block[A].Type = Block[A].DefaultType;
-                syncLayers_Block(A);
+                syncLayersTrees_Block(A);
             }
         }
     }
@@ -1172,16 +1172,16 @@ void UpdateLayers()
     }
 }
 
-void syncLayers_AllBlocks()
+void syncLayersTrees_AllBlocks()
 {
     treeLevelCleanBlockLayers();
     for (int block = 1; block <= numBlock; block++)
     {
-        syncLayers_Block(block);
+        syncLayersTrees_Block(block);
     }
 }
 
-void syncLayers_Block(int block)
+void syncLayersTrees_Block(int block)
 {
     int foundLayer = false;
     for (int layer = 0; layer <= numLayers; layer++)
@@ -1219,9 +1219,9 @@ void syncLayers_Block(int block)
     }
 }
 
-void syncLayers_Block_SetHidden(int block) // set block hidden based on layer
+void syncLayersTrees_Block_SetHidden(int block) // set block hidden based on layer
 {
-    syncLayers_Block(block);
+    syncLayersTrees_Block(block);
     if(Block[block].LayerIndex != -1)
         Block[block].Hidden = Layer[Block[block].LayerIndex].Hidden;
 }

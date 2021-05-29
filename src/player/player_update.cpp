@@ -49,8 +49,8 @@ void UpdatePlayer()
     float D = 0;
 //    Controls_t blankControls;
     float speedVar = 0; // adjusts the players speed by percentages
-    int64_t fBlock = 0; // for collision detection optimizations
-    int64_t lBlock = 0;
+    // int64_t fBlock = 0; // for collision detection optimizations
+    // int64_t lBlock = 0;
     double tempSpeed = 0;
     int HitSpot = 0;
     // the hitspot is used for collision detection to find out where to put the player after it collides with a block
@@ -2948,7 +2948,7 @@ void UpdatePlayer()
                                 Player[A].GrabSpeed = 0;
                                 Block[B].Hidden = true;
                                 Block[B].Layer = "Destroyed Blocks";
-                                syncLayers_Block(B);
+                                syncLayersTrees_Block(B);
                                 NewEffect(10, Block[B].Location);
                                 Effect[numEffects].Location.SpeedY = -2;
                                 Player[A].GrabTime = 0;
@@ -4349,11 +4349,11 @@ void UpdatePlayer()
                             numBlock = numBlock + 1;
                             Block[numBlock].Location.Y = NPC[B].Location.Y;
                             // this block does not seem useful but I will sync it
-                            syncLayers_Block(numBlock);
+                            syncLayersTrees_Block(numBlock);
                             YoshiPound(A, Player[A].Mount, true);
                             Block[numBlock].Location.Y = 0;
                             numBlock = numBlock - 1;
-                            syncLayers_Block(numBlock + 1);
+                            syncLayersTrees_Block(numBlock + 1);
                             Player[A].GroundPound = false;
                         }
                         else if(Player[A].YoshiYellow)
@@ -4361,11 +4361,11 @@ void UpdatePlayer()
                             numBlock = numBlock + 1;
                             Block[numBlock].Location.Y = NPC[B].Location.Y;
                             // this block does not seem useful but I will sync it
-                            syncLayers_Block(numBlock);
+                            syncLayersTrees_Block(numBlock);
                             YoshiPound(A, Player[A].Mount);
                             Block[numBlock].Location.Y = 0;
                             numBlock = numBlock - 1;
-                            syncLayers_Block(numBlock + 1);
+                            syncLayersTrees_Block(numBlock + 1);
                         }
                     }
                     if(NPC[B].playerTemp == 0)
