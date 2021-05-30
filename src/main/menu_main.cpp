@@ -1364,13 +1364,13 @@ bool mainMenuUpdate()
                     {
                         PlaySoundMenu(SFX_Do);
                         if(!menuLeftPress)
-                            config_ScaleMode = (ScaleMode_t)((int)config_ScaleMode + 1);
+                            config_ScaleMode = config_ScaleMode + 1;
                         else
-                            config_ScaleMode = (ScaleMode_t)((int)config_ScaleMode - 1);
-                        if(config_ScaleMode > ScaleMode_t::FIXED_2X)
-                            config_ScaleMode = ScaleMode_t::DYNAMIC_INTEGER;
-                        if(config_ScaleMode < ScaleMode_t::DYNAMIC_INTEGER)
-                            config_ScaleMode = ScaleMode_t::FIXED_2X;
+                            config_ScaleMode = config_ScaleMode - 1;
+                        if(config_ScaleMode > SCALE_FIXED_2X)
+                            config_ScaleMode = SCALE_DYNAMIC_INTEGER;
+                        if(config_ScaleMode < SCALE_DYNAMIC_INTEGER)
+                            config_ScaleMode = SCALE_FIXED_2X;
                         frmMain.updateViewport();
                     }
 #endif

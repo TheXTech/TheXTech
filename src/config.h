@@ -9,23 +9,23 @@ extern int config_InternalW;
 extern int config_InternalH;
 #endif
 
-enum class ScaleMode_t : int
+enum ScaleModes
 {
-    DYNAMIC_INTEGER = -2,
-    DYNAMIC_NEAREST = -1,
-    DYNAMIC_LINEAR = 0,
-    FIXED_1X = 1,
-    FIXED_2X = 2,
+    SCALE_DYNAMIC_INTEGER = -2,
+    SCALE_DYNAMIC_NEAREST = -1,
+    SCALE_DYNAMIC_LINEAR = 0,
+    SCALE_FIXED_1X = 1,
+    SCALE_FIXED_2X = 2,
 };
 
-static const std::unordered_map<ScaleMode_t, std::string> ScaleMode_strings = {
-	{ScaleMode_t::DYNAMIC_INTEGER, "integer"},
-    {ScaleMode_t::DYNAMIC_NEAREST, "nearest"},
-    {ScaleMode_t::DYNAMIC_LINEAR, "linear"},
-    {ScaleMode_t::FIXED_1X, "1x"},
-    {ScaleMode_t::FIXED_2X, "2x"},
+static const std::unordered_map<int, std::string> ScaleMode_strings = {
+	{SCALE_DYNAMIC_INTEGER, "integer"},
+    {SCALE_DYNAMIC_NEAREST, "nearest"},
+    {SCALE_DYNAMIC_LINEAR, "linear"},
+    {SCALE_FIXED_1X, "1x"},
+    {SCALE_FIXED_2X, "2x"},
 };
 
-extern ScaleMode_t config_ScaleMode;
+extern int config_ScaleMode;
 
 #endif // #ifndef CONFIG_H

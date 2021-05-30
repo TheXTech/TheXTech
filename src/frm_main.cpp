@@ -176,7 +176,7 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
     SDL_SetWindowMinimumSize(m_window, 480, 320);
 #endif //__EMSCRIPTEN__
 
-    if(config_ScaleMode == ScaleMode_t::DYNAMIC_LINEAR)
+    if(config_ScaleMode == SCALE_DYNAMIC_LINEAR)
         SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
     else
         SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
@@ -443,22 +443,22 @@ bool FrmMain::hasWindowMouseFocus()
 void SizeWindow(SDL_Window* window)
 {
     #if defined(FIXED_RES)
-        if(config_ScaleMode == ScaleMode_t::FIXED_1X)
+        if(config_ScaleMode == SCALE_FIXED_1X)
         {
             SDL_SetWindowSize(window, ScreenW, ScreenH);
         }
-        else if(config_ScaleMode == ScaleMode_t::FIXED_2X)
+        else if(config_ScaleMode == SCALE_FIXED_2X)
         {
             SDL_SetWindowSize(window, 2*ScreenW, 2*ScreenH);
         }
     #else
         if(config_InternalW != 0 && config_InternalH != 0)
         {
-            if(config_ScaleMode == ScaleMode_t::FIXED_1X)
+            if(config_ScaleMode == SCALE_FIXED_1X)
             {
                 SDL_SetWindowSize(window, config_InternalW, config_InternalH);
             }
-            else if(config_ScaleMode == ScaleMode_t::FIXED_2X)
+            else if(config_ScaleMode == SCALE_FIXED_2X)
             {
                 SDL_SetWindowSize(window, 2*config_InternalW, 2*config_InternalH);
             }
@@ -745,7 +745,7 @@ void FrmMain::updateViewport()
     }
 #endif
 
-    if(config_ScaleMode == ScaleMode_t::DYNAMIC_LINEAR)
+    if(config_ScaleMode == SCALE_DYNAMIC_LINEAR)
         SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
     else
         SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
@@ -755,12 +755,12 @@ void FrmMain::updateViewport()
     {
         ScaleWidth = wi;
         ScaleHeight = hi;
-        if(config_ScaleMode == ScaleMode_t::FIXED_2X)
+        if(config_ScaleMode == SCALE_FIXED_2X)
         {
             ScaleWidth /= 2;
             ScaleHeight /= 2;
         }
-        if(config_ScaleMode == ScaleMode_t::DYNAMIC_INTEGER)
+        if(config_ScaleMode == SCALE_DYNAMIC_INTEGER)
         {
             int i = 1;
             while(ScaleWidth/(i+1) > 800 && ScaleHeight/(i+1) > 600)
@@ -772,13 +772,13 @@ void FrmMain::updateViewport()
         if(ScaleHeight < 320) ScaleHeight = 320;
         if(ScaleHeight > 720)
         {
-            if((config_ScaleMode == ScaleMode_t::DYNAMIC_NEAREST
-                || config_ScaleMode == ScaleMode_t::DYNAMIC_LINEAR)
+            if((config_ScaleMode == SCALE_DYNAMIC_NEAREST
+                || config_ScaleMode == SCALE_DYNAMIC_LINEAR)
                 && ScaleWidth * 720 / ScaleHeight > 800)
             {
                 ScaleWidth = ScaleWidth * 720 / ScaleHeight;
             }
-            if(config_ScaleMode == ScaleMode_t::DYNAMIC_INTEGER
+            if(config_ScaleMode == SCALE_DYNAMIC_INTEGER
                 && ScaleWidth / std::floor(ScaleHeight / 720) > 800)
             {
                 ScaleWidth = ScaleWidth / std::floor(ScaleHeight / 720);
@@ -810,11 +810,11 @@ void FrmMain::updateViewport()
     if(scale > h / ScaleHeight)
         scale = h / ScaleHeight;
 
-    if(config_ScaleMode == ScaleMode_t::DYNAMIC_INTEGER && scale > 1.f)
+    if(config_ScaleMode == SCALE_DYNAMIC_INTEGER && scale > 1.f)
         scale = std::floor(scale);
-    if(config_ScaleMode == ScaleMode_t::FIXED_1X && scale > 1.f)
+    if(config_ScaleMode == SCALE_FIXED_1X && scale > 1.f)
         scale = 1.f;
-    if(config_ScaleMode == ScaleMode_t::FIXED_2X && scale > 2.f)
+    if(config_ScaleMode == SCALE_FIXED_2X && scale > 2.f)
         scale = 2.f;
 
     w1 = scale * ScaleWidth;

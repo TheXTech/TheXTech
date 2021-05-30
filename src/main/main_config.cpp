@@ -101,13 +101,13 @@ void OpenConfig_preSetup()
 #endif
         IniProcessing::StrEnumMap scaleModes =
         {
-            {"linear", (int)ScaleMode_t::DYNAMIC_LINEAR},
-            {"integer", (int)ScaleMode_t::DYNAMIC_INTEGER},
-            {"nearest", (int)ScaleMode_t::DYNAMIC_NEAREST},
-            {"1x", (int)ScaleMode_t::FIXED_1X},
-            {"2x", (int)ScaleMode_t::FIXED_2X},
+            {"linear", SCALE_DYNAMIC_LINEAR},
+            {"integer", SCALE_DYNAMIC_INTEGER},
+            {"nearest", SCALE_DYNAMIC_NEAREST},
+            {"1x", SCALE_FIXED_1X},
+            {"2x", SCALE_FIXED_2X},
         };
-        config.readEnum("scale-mode", config_ScaleMode, ScaleMode_t::DYNAMIC_NEAREST, scaleModes);
+        config.readEnum("scale-mode", config_ScaleMode, (int)SCALE_DYNAMIC_NEAREST, scaleModes);
         config.endGroup();
     }
 }

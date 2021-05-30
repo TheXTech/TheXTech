@@ -5,4 +5,4 @@ int config_InternalW;
 int config_InternalH;
 #endif
 
-ScaleMode_t config_ScaleMode;
+int config_ScaleMode;
