@@ -529,7 +529,7 @@ void MenuLoop()
             }
         }
 
-        tempLocation = newLoc(MenuMouseX - vScreenX[1], MenuMouseY - vScreenY[1]);
+        Location_t tempLocation = newLoc(MenuMouseX - vScreenX[1], MenuMouseY - vScreenY[1]);
         for(Block_t* block : treeBlockQuery(tempLocation, false))
         {
             int A = block - &Block[1] + 1;
