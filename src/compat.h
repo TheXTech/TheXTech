@@ -26,6 +26,13 @@
 #ifndef COMPAT_H
 #define COMPAT_H
 
+enum class NPC_activate_modes : int
+{
+    onscreen,
+    smart,
+    orig,
+};
+
 struct Compatibility_t
 {
     bool enable_last_warp_hub_resume;
@@ -47,6 +54,9 @@ struct Compatibility_t
     bool enable_multipoints;
     bool fix_autoscroll_speed;
     bool fix_blooper_stomp_effect;
+    bool free_level_res;
+    bool free_world_res;
+    NPC_activate_modes NPC_activate_mode;
 };
 
 extern Compatibility_t g_compatibility;

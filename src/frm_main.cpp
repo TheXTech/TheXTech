@@ -23,6 +23,10 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#ifdef NO_SDL
+#error "Primary `frm_main.cpp` only for SDL clients. Build target-specific `frm_main.cpp` instead."
+#endif
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_thread.h>
 #include <SDL2/SDL_opengl.h>
@@ -36,7 +40,7 @@
 #include "graphics.h"
 #include "control/joystick.h"
 #include "sound.h"
-#include "editor.h"
+#include "editor/editor.h"
 
 #include <AppPath/app_path.h>
 #include <Logger/logger.h>
@@ -57,6 +61,7 @@
 #include "frm_main.h"
 #include "main/game_info.h"
 
+#include "config.h"
 
 static SDL_bool IsFullScreen(SDL_Window *win)
 {
@@ -135,6 +140,12 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
 
     SDL_GL_ResetAttributes();
 
+    if(config_InternalW != 0 && config_InternalH != 0)
+    {
+        ScaleWidth = config_InternalW;
+        ScaleHeight = config_InternalH;
+    }
+
     m_window = SDL_CreateWindow(m_windowTitle.c_str(),
                               SDL_WINDOWPOS_CENTERED,
                               SDL_WINDOWPOS_CENTERED,
@@ -162,10 +173,13 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
 #elif defined(__ANDROID__) // Set as small as possible
     SDL_SetWindowMinimumSize(m_window, 200, 150);
 #else
-    SDL_SetWindowMinimumSize(m_window, ScaleWidth, ScaleHeight);
+    SDL_SetWindowMinimumSize(m_window, 480, 320);
 #endif //__EMSCRIPTEN__
 
-    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
+    if(config_ScaleMode == ScaleMode_t::DYNAMIC_LINEAR)
+        SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
+    else
+        SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
 
 #if defined(__ANDROID__) // Use a full-screen on Android mode by default
     setFullScreen(true);
@@ -426,9 +440,35 @@ bool FrmMain::hasWindowMouseFocus()
     return (flags & SDL_WINDOW_MOUSE_FOCUS) != 0;
 }
 
+void SizeWindow(SDL_Window* window)
+{
+    #if defined(FIXED_RES)
+        if(config_ScaleMode == ScaleMode_t::FIXED_1X)
+        {
+            SDL_SetWindowSize(window, ScreenW, ScreenH);
+        }
+        else if(config_ScaleMode == ScaleMode_t::FIXED_2X)
+        {
+            SDL_SetWindowSize(window, 2*ScreenW, 2*ScreenH);
+        }
+    #else
+        if(config_InternalW != 0 && config_InternalH != 0)
+        {
+            if(config_ScaleMode == ScaleMode_t::FIXED_1X)
+            {
+                SDL_SetWindowSize(window, config_InternalW, config_InternalH);
+            }
+            else if(config_ScaleMode == ScaleMode_t::FIXED_2X)
+            {
+                SDL_SetWindowSize(window, 2*config_InternalW, 2*config_InternalH);
+            }
+        }
+    #endif
+}
+
 void FrmMain::eventDoubleClick()
 {
-    if(MagicHand)
+    if(MagicHand || LevelEditor || WorldEditor)
         return; // Don't toggle fullscreen/window when magic hand is active
 #if !defined(__EMSCRIPTEN__) && !defined(__ANDROID__)
     if(resChanged)
@@ -436,8 +476,8 @@ void FrmMain::eventDoubleClick()
         frmMain.setFullScreen(false);
         resChanged = false;
         SDL_RestoreWindow(m_window);
-        SDL_SetWindowSize(m_window, ScreenW, ScreenH);
-        if(!GameMenu && !MagicHand)
+        SizeWindow(m_window);
+        if(!GameMenu && !MagicHand && !LevelEditor && !WorldEditor)
             showCursor(1);
     }
     else
@@ -528,7 +568,7 @@ void FrmMain::eventMouseDown(SDL_MouseButtonEvent &event)
         MenuMouseDown = true;
         MenuMouseMove = true;
         if(LevelEditor || MagicHand || TestLevel)
-            EditorControls.Mouse1 = true;
+            EditorControls.MouseClick = true;
     }
     else if(event.button == SDL_BUTTON_RIGHT)
     {
@@ -536,7 +576,6 @@ void FrmMain::eventMouseDown(SDL_MouseButtonEvent &event)
         if(LevelEditor || MagicHand || TestLevel)
         {
             optCursor.current = 13;
-            MouseMove(float(MenuMouseX), float(MenuMouseY));
             SetCursor();
         }
     }
@@ -545,7 +584,6 @@ void FrmMain::eventMouseDown(SDL_MouseButtonEvent &event)
         if(LevelEditor || MagicHand || TestLevel)
         {
             optCursor.current = 6;
-            MouseMove(float(MenuMouseX), float(MenuMouseY));
             SetCursor();
         }
     }
@@ -559,8 +597,8 @@ void FrmMain::eventMouseMove(SDL_MouseMotionEvent &event)
     MenuMouseMove = true;
     if(LevelEditor || MagicHand || TestLevel)
     {
-        EditorCursor.X = CursorPos.X;
-        EditorCursor.Y = CursorPos.Y;
+        EditorCursor.X = p.x;
+        EditorCursor.Y = p.y;
         MouseMove(EditorCursor.X, EditorCursor.Y, true);
         MouseRelease = true;
     }
@@ -572,7 +610,7 @@ void FrmMain::eventMouseUp(SDL_MouseButtonEvent &event)
     MenuMouseDown = false;
     MenuMouseRelease = true;
     if(LevelEditor || MagicHand || TestLevel)
-        EditorControls.Mouse1 = false;
+        EditorControls.MouseClick = false;
 
     if(event.button == SDL_BUTTON_LEFT)
     {
@@ -648,7 +686,6 @@ void FrmMain::repaint()
 #endif
 
     int w, h, off_x, off_y, wDst, hDst;
-    float scale_x, scale_y;
 
     setTargetScreen();
 
@@ -660,23 +697,9 @@ void FrmMain::repaint()
     SDL_GetRendererOutputSize(m_gRenderer, &w, &h);
 
     // Calculate the size difference factor
-    scale_x = float(w) / ScaleWidth;
-    scale_y = float(h) / ScaleHeight;
 
-    wDst = w;
-    hDst = h;
-
-    // Keep aspect ratio
-    if(scale_x > scale_y) // Width more than height
-    {
-        wDst = int(scale_y * ScaleWidth);
-        hDst = int(scale_y * ScaleHeight);
-    }
-    else if(scale_x < scale_y) // Height more than width
-    {
-        hDst = int(scale_x * ScaleHeight);
-        wDst = int(scale_x * ScaleWidth);
-    }
+    wDst = int(scale * ScaleWidth);
+    hDst = int(scale * ScaleHeight);
 
     // Align the rendering scene to the center of screen
     off_x = (w - wDst) / 2;
@@ -701,10 +724,14 @@ void FrmMain::repaint()
 
 void FrmMain::updateViewport()
 {
+    // invalidates GIF recorder handle
+    if(m_gif.enabled)
+        toggleGifRecorder();
+
     float w, w1, h, h1;
     int   wi, hi;
 
-#ifndef __EMSCRIPTEN__
+#if !defined(__EMSCRIPTEN__) && !defined(FIXED_RES)
     SDL_GetWindowSize(m_window, &wi, &hi);
 #else
     if(IsFullScreen(m_window))
@@ -718,29 +745,86 @@ void FrmMain::updateViewport()
     }
 #endif
 
+    if(config_ScaleMode == ScaleMode_t::DYNAMIC_LINEAR)
+        SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
+    else
+        SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
+
+#ifndef FIXED_RES
+    if(config_InternalW == 0 || config_InternalH == 0)
+    {
+        ScaleWidth = wi;
+        ScaleHeight = hi;
+        if(config_ScaleMode == ScaleMode_t::FIXED_2X)
+        {
+            ScaleWidth /= 2;
+            ScaleHeight /= 2;
+        }
+        if(config_ScaleMode == ScaleMode_t::DYNAMIC_INTEGER)
+        {
+            int i = 1;
+            while(ScaleWidth/(i+1) > 800 && ScaleHeight/(i+1) > 600)
+                i++;
+            ScaleWidth /= i;
+            ScaleHeight /= i;
+        }
+        if(ScaleWidth < 480) ScaleWidth = 480;
+        if(ScaleHeight < 320) ScaleHeight = 320;
+        if(ScaleHeight > 720)
+        {
+            if((config_ScaleMode == ScaleMode_t::DYNAMIC_NEAREST
+                || config_ScaleMode == ScaleMode_t::DYNAMIC_LINEAR)
+                && ScaleWidth * 720 / ScaleHeight > 800)
+            {
+                ScaleWidth = ScaleWidth * 720 / ScaleHeight;
+            }
+            if(config_ScaleMode == ScaleMode_t::DYNAMIC_INTEGER
+                && ScaleWidth / std::floor(ScaleHeight / 720) > 800)
+            {
+                ScaleWidth = ScaleWidth / std::floor(ScaleHeight / 720);
+            }
+            ScaleHeight = 720;
+        }
+        // maximum 2.4 (cinematic) aspect ratio
+        if(ScaleWidth > 1728)
+            ScaleWidth = 1728;
+    }
+    else
+    {
+        ScaleWidth = config_InternalW;
+        ScaleHeight = config_InternalH;   
+    }
+    Set_Resolution(ScaleWidth, ScaleHeight);
+    SDL_DestroyTexture(m_tBuffer);
+    m_tBuffer = SDL_CreateTexture(m_gRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, ScreenW, ScreenH);
+    SDL_SetRenderTarget(m_gRenderer, m_tBuffer);
+#endif
+
     w = wi;
     h = hi;
     w1 = w;
     h1 = h;
 
-    scale_x = w / ScaleWidth;
-    scale_y = h / ScaleHeight;
-    viewport_scale_x = scale_x;
-    viewport_scale_y = scale_y;
+    scale = w / ScaleWidth;
+
+    if(scale > h / ScaleHeight)
+        scale = h / ScaleHeight;
+
+    if(config_ScaleMode == ScaleMode_t::DYNAMIC_INTEGER && scale > 1.f)
+        scale = std::floor(scale);
+    if(config_ScaleMode == ScaleMode_t::FIXED_1X && scale > 1.f)
+        scale = 1.f;
+    if(config_ScaleMode == ScaleMode_t::FIXED_2X && scale > 2.f)
+        scale = 2.f;
+
+    w1 = scale * ScaleWidth;
+    h1 = scale * ScaleHeight;
+
+    viewport_scale_x = scale;
+    viewport_scale_y = scale;
 
     viewport_offset_x = 0;
     viewport_offset_y = 0;
-
-    if(scale_x > scale_y)
-    {
-        w1 = scale_y * ScaleWidth;
-        viewport_scale_x = w1 / ScaleWidth;
-    }
-    else if(scale_x < scale_y)
-    {
-        h1 = scale_x * ScaleHeight;
-        viewport_scale_y = h1 / ScaleHeight;
-    }
 
     offset_x = (w - w1) / 2;
     offset_y = (h - h1) / 2;
@@ -749,11 +833,19 @@ void FrmMain::updateViewport()
     viewport_y = 0;
     viewport_w = static_cast<int>(w1);
     viewport_h = static_cast<int>(h1);
+
+    if(GameMenu)
+    {
+        SetupScreens();
+        CenterScreens();
+        GameMenu = false;
+        GetvScreenAverage();
+        GameMenu = true;
+    }
 }
 
 void FrmMain::resetViewport()
 {
-    updateViewport();
     SDL_RenderSetViewport(m_gRenderer, nullptr);
 }
 
@@ -1644,6 +1736,15 @@ void FrmMain::renderTextureI(int xDst, int yDst, int wDst, int hDst,
 
     SDL_assert_release(tx.texture);
 
+    // automatic flipping based on SMBX style!
+    unsigned int mode = 0;
+    while(ySrc >= tx.h && mode < 3)
+    {
+        ySrc -= tx.h;
+        mode += 1;
+    }
+    flip ^= mode;
+
     // Don't go more than size of texture
     if(xSrc + wDst > tx.w)
     {
@@ -1697,6 +1798,15 @@ void FrmMain::renderTextureScaleI(int xDst, int yDst, int wDst, int hDst,
     }
 
     SDL_assert_release(tx.texture);
+
+    // automatic flipping based on SMBX style!
+    unsigned int mode = 0;
+    while(ySrc >= tx.h && mode < 3)
+    {
+        ySrc -= tx.h;
+        mode += 1;
+    }
+    flip ^= mode;
 
     // Don't go more than size of texture
     if(xSrc + wSrc > tx.w)

@@ -23,6 +23,10 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#ifdef NO_SDL
+#error "Primary `control/touchscreen.cpp` only for SDL targets. Build target-specific `touchscreen.cpp` instead."
+#endif
+
 #include <Logger/logger.h>
 #include <Utils/maths.h>
 

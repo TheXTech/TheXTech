@@ -42,11 +42,18 @@ struct Layer_t
     std::string Name;
 //    Hidden As Boolean
     bool Hidden = false;
+    double OffsetX = 0.0;
+    double OffsetY = 0.0;
 //    SpeedX As Single
     float SpeedX = 0.0f;
 //    SpeedY As Single
     float SpeedY = 0.0f;
 //End Type
+    std::set<int> blocks;
+    std::set<int> BGOs;
+    std::set<int> NPCs;
+    std::set<int> warps;
+    std::set<int> waters;
 };
 
 struct EventSection_t
@@ -132,12 +139,20 @@ struct Events_t
 };
 
 //Public Layer(0 To 100) As Layer
+#ifdef LOW_MEM
+const int maxLayers = 100; // 100
+#else
 const int maxLayers = 255; // 100
+#endif
 extern int numLayers;
 extern RangeArr<Layer_t, 0, maxLayers> Layer;
 
 //Public Events(0 To 100) As Events
+#ifdef LOW_MEM
+const int maxEvents = 100; // 100
+#else
 const int maxEvents = 255; // 100
+#endif
 extern int numEvents;
 extern RangeArr<Events_t, 0, maxEvents> Events;
 
@@ -159,6 +174,20 @@ void HideLayer(std::string LayerName, bool NoEffect = false);
 // Public Sub SetLayer(LayerName As String)
 void SetLayer(std::string LayerName);
 
+bool ExistsLayer(const std::string LayerName);
+
+bool RenameLayer(const std::string OldName, const std::string NewName);
+
+bool DeleteLayer(const std::string LayerName, bool killall);
+
+void InitializeEvent(Events_t& event);
+
+bool ExistsEvent(const std::string EventName);
+
+bool RenameEvent(const std::string OldName, const std::string NewName);
+
+bool DeleteEvent(const std::string EventName);
+
 // Public Sub ProcEvent(EventName As String, Optional NoEffect As Boolean = False)
 void ProcEvent(std::string EventName, bool NoEffect = false);
 
@@ -167,5 +196,19 @@ void UpdateEvents();
 
 // Public Sub UpdateLayers()
 void UpdateLayers();
+
+void syncLayersTrees_AllBlocks();
+void syncLayersTrees_Block(int block);
+void syncLayersTrees_Block_SetHidden(int block); // set block hidden based on layer
+
+void syncLayers_AllNPCs();
+void syncLayers_NPC(int npc);
+
+void syncLayers_AllBGOs();
+void syncLayers_BGO(int bgo);
+
+void syncLayers_Warp(int warp);
+
+void syncLayers_Water(int water);
 
 #endif // LAYERS_H

@@ -29,10 +29,11 @@
 #include "graphics.h"
 
 #include "gameplay_timer.h"
-
+#include "game_main.h"
 
 static      GameplayTimer s_gamePlayTimer;
 int                       g_speedRunnerMode = SPEEDRUN_MODE_OFF;
+int                       g_speedRunnerDebug = SPEEDRUN_DEBUG_OFF;
 
 void speedRun_loadStats()
 {
@@ -170,10 +171,125 @@ void speedRun_setSemitransparentRender(bool r)
     s_gamePlayTimer.setSemitransparent(r);
 }
 
+int64_t frame_no = 0;
+FILE* g_speedRunnerControlFile;
+FILE* g_speedRunnerGameplayLog;
+Controls_t last_controls = Controls_t();
+int64_t next_delta_frame = -1;
+
 void speedRun_syncControlKeys(Controls_t &keys)
 {
-    if(g_speedRunnerMode == SPEEDRUN_MODE_OFF)
+    if(g_speedRunnerMode == SPEEDRUN_MODE_OFF && g_speedRunnerDebug == SPEEDRUN_DEBUG_OFF && !g_speedRunnerGameplayLog)
         return; // Do nothing
 
-    SDL_memcpy(&s_displayControls, &keys, sizeof(Controls_t));
+    if(g_speedRunnerDebug == SPEEDRUN_DEBUG_PLAY)
+    {
+        if(next_delta_frame == -1 && g_speedRunnerControlFile)
+        {
+            if(!fscanf(g_speedRunnerControlFile, "%ld ", &next_delta_frame))
+            {
+                fclose(g_speedRunnerControlFile);
+                g_speedRunnerControlFile = nullptr;
+            }
+        }
+        while(next_delta_frame == frame_no && g_speedRunnerControlFile)
+        {
+            char mode, key;
+            if(fscanf(g_speedRunnerControlFile, "%c%c\n", &mode, &key) != 2)
+            {
+                fclose(g_speedRunnerControlFile);
+                g_speedRunnerControlFile = nullptr;
+                break;
+            }
+            bool set;
+            if(mode == '-')
+                set = false;
+            else
+                set = true;
+            if(key == 'U')
+                last_controls.Up = set;
+            else if(key == 'D')
+                last_controls.Down = set;
+            else if(key == 'L')
+                last_controls.Left = set;
+            else if(key == 'R')
+                last_controls.Right = set;
+            else if(key == 'S')
+                last_controls.Start = set;
+            else if(key == 'I')
+                last_controls.Drop = set;
+            else if(key == 'A')
+                last_controls.Jump = set;
+            else if(key == 'B')
+                last_controls.Run = set;
+            else if(key == 'X')
+                last_controls.AltJump = set;
+            else if(key == 'Y')
+                last_controls.AltRun = set;
+            if(!fscanf(g_speedRunnerControlFile, "%ld ", &next_delta_frame))
+            {
+                fclose(g_speedRunnerControlFile);
+                g_speedRunnerControlFile = nullptr;
+            }
+        }
+        keys = last_controls;
+    }
+    else if(g_speedRunnerDebug == SPEEDRUN_DEBUG_REC && g_speedRunnerControlFile)
+    {
+        if(!last_controls.Up && keys.Up)
+            fprintf(g_speedRunnerControlFile, "%ld +U\n", frame_no);
+        else if(last_controls.Up && !keys.Up)
+            fprintf(g_speedRunnerControlFile, "%ld -U\n", frame_no);
+        else if(!last_controls.Down && keys.Down)
+            fprintf(g_speedRunnerControlFile, "%ld +D\n", frame_no);
+        else if(last_controls.Down && !keys.Down)
+            fprintf(g_speedRunnerControlFile, "%ld -D\n", frame_no);
+        else if(!last_controls.Left && keys.Left)
+            fprintf(g_speedRunnerControlFile, "%ld +L\n", frame_no);
+        else if(last_controls.Left && !keys.Left)
+            fprintf(g_speedRunnerControlFile, "%ld -L\n", frame_no);
+        else if(!last_controls.Right && keys.Right)
+            fprintf(g_speedRunnerControlFile, "%ld +R\n", frame_no);
+        else if(last_controls.Right && !keys.Right)
+            fprintf(g_speedRunnerControlFile, "%ld -R\n", frame_no);
+        else if(!last_controls.Start && keys.Start)
+            fprintf(g_speedRunnerControlFile, "%ld +S\n", frame_no);
+        else if(last_controls.Start && !keys.Start)
+            fprintf(g_speedRunnerControlFile, "%ld -S\n", frame_no);
+        else if(!last_controls.Drop && keys.Drop)
+            fprintf(g_speedRunnerControlFile, "%ld +I\n", frame_no);
+        else if(last_controls.Drop && !keys.Drop)
+            fprintf(g_speedRunnerControlFile, "%ld -I\n", frame_no);
+        else if(!last_controls.Jump && keys.Jump)
+            fprintf(g_speedRunnerControlFile, "%ld +A\n", frame_no);
+        else if(last_controls.Jump && !keys.Jump)
+            fprintf(g_speedRunnerControlFile, "%ld -A\n", frame_no);
+        else if(!last_controls.Run && keys.Run)
+            fprintf(g_speedRunnerControlFile, "%ld +B\n", frame_no);
+        else if(last_controls.Run && !keys.Run)
+            fprintf(g_speedRunnerControlFile, "%ld -B\n", frame_no);
+        else if(!last_controls.AltJump && keys.AltJump)
+            fprintf(g_speedRunnerControlFile, "%ld +X\n", frame_no);
+        else if(last_controls.AltJump && !keys.AltJump)
+            fprintf(g_speedRunnerControlFile, "%ld -X\n", frame_no);
+        else if(!last_controls.AltRun && keys.AltRun)
+            fprintf(g_speedRunnerControlFile, "%ld +Y\n", frame_no);
+        else if(last_controls.AltRun && !keys.AltRun)
+            fprintf(g_speedRunnerControlFile, "%ld -Y\n", frame_no);
+        last_controls = keys;
+    }
+
+    if(g_speedRunnerGameplayLog && !(frame_no % 60))
+    {
+        fprintf(g_speedRunnerGameplayLog, "%ld %f %f %d\n",
+            frame_no, Player[1].Location.X, Player[1].Location.Y, Score);
+    }
+
+    if(g_speedRunnerGameplayLog && g_speedRunnerDebug == SPEEDRUN_DEBUG_PLAY && !g_speedRunnerControlFile)
+        KillIt();
+
+    if(g_speedRunnerMode != SPEEDRUN_MODE_OFF)
+        SDL_memcpy(&s_displayControls, &keys, sizeof(Controls_t));
+
+    frame_no++;
 }

@@ -24,7 +24,12 @@
 #include <algorithm>
 #include <cstdlib>
 
+#ifndef __3DS__
 #include <SDL2/SDL_stdinc.h>
+#else
+#include <cstring>
+#define SDL_strlen strlen;
+#endif
 
 #ifdef _WIN32
 #include <windows.h>

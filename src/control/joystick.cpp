@@ -23,6 +23,10 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#ifdef NO_SDL
+#error "Primary `control/joystick.cpp` only for SDL targets. Build target-specific `joystick.cpp` instead."
+#endif
+
 #include <SDL2/SDL_version.h>
 #include <SDL2/SDL_joystick.h>
 #include <SDL2/SDL_gamecontroller.h>
@@ -154,6 +158,96 @@ void joyFillDefaults(ConJoystick_t &j)
     j.Start.ctrl_val = 1;
     j.Start.ctrl_type = ConJoystick_t::CtrlButton;
     j.Start.ctrl_id = SDL_CONTROLLER_BUTTON_START;
+}
+
+void editorJoyFillDefaults(EditorConKeyboard_t &k)
+{
+    k.FastScroll = SDL_SCANCODE_LSHIFT;
+    k.ScrollDown = vbKeyDown;
+    k.ScrollLeft = vbKeyLeft;
+    k.ScrollUp = vbKeyUp;
+    k.ScrollRight = vbKeyRight;
+
+    k.PrevSection = vbKeyZ;
+    k.NextSection = vbKeyX;
+
+    k.SwitchScreens = vbKeyEscape;
+    k.TestPlay = SDL_SCANCODE_RETURN;
+    k.Select = vbKeyA;
+    k.Erase = vbKeyS;
+}
+
+void editorJoyFillDefaults(EditorConJoystick_t &j)
+{
+    j.ScrollUp.val = SDL_HAT_UP;
+    j.ScrollUp.type = ConJoystick_t::JoyHat;
+    j.ScrollUp.id = 0;
+    j.ScrollUp.ctrl_val = 1;
+    j.ScrollUp.ctrl_type = ConJoystick_t::CtrlButton;
+    j.ScrollUp.ctrl_id = SDL_CONTROLLER_BUTTON_DPAD_UP;
+
+    j.ScrollDown.val = SDL_HAT_DOWN;
+    j.ScrollDown.type = ConJoystick_t::JoyHat;
+    j.ScrollDown.id = 0;
+    j.ScrollDown.ctrl_val = 1;
+    j.ScrollDown.ctrl_type = ConJoystick_t::CtrlButton;
+    j.ScrollDown.ctrl_id = SDL_CONTROLLER_BUTTON_DPAD_DOWN;
+
+    j.ScrollLeft.val = SDL_HAT_LEFT;
+    j.ScrollLeft.id = 0;
+    j.ScrollLeft.type = ConJoystick_t::JoyHat;
+    j.ScrollLeft.ctrl_val = 1;
+    j.ScrollLeft.ctrl_type = ConJoystick_t::CtrlButton;
+    j.ScrollLeft.ctrl_id = SDL_CONTROLLER_BUTTON_DPAD_LEFT;
+
+    j.ScrollRight.val = SDL_HAT_RIGHT;
+    j.ScrollRight.type = ConJoystick_t::JoyHat;
+    j.ScrollRight.id = 0;
+    j.ScrollRight.ctrl_val = 1;
+    j.ScrollRight.ctrl_type = ConJoystick_t::CtrlButton;
+    j.ScrollRight.ctrl_id = SDL_CONTROLLER_BUTTON_DPAD_RIGHT;
+
+    j.PrevSection.id = 2;
+    j.PrevSection.val = 1;
+    j.PrevSection.type = ConJoystick_t::JoyButton;
+    j.PrevSection.ctrl_val = 1;
+    j.PrevSection.ctrl_type = ConJoystick_t::CtrlButton;
+    j.PrevSection.ctrl_id = SDL_CONTROLLER_BUTTON_X;
+
+    j.NextSection.id = 3;
+    j.NextSection.val = 1;
+    j.NextSection.type = ConJoystick_t::JoyButton;
+    j.NextSection.ctrl_val = 1;
+    j.NextSection.ctrl_type = ConJoystick_t::CtrlButton;
+    j.NextSection.ctrl_id = SDL_CONTROLLER_BUTTON_Y;
+
+    j.Select.id = 0;
+    j.Select.val = 1;
+    j.Select.type = ConJoystick_t::JoyButton;
+    j.Select.ctrl_val = 1;
+    j.Select.ctrl_type = ConJoystick_t::CtrlButton;
+    j.Select.ctrl_id = SDL_CONTROLLER_BUTTON_A;
+
+    j.Erase.id = 1;
+    j.Erase.val = 1;
+    j.Erase.type = ConJoystick_t::JoyButton;
+    j.Erase.ctrl_val = 1;
+    j.Erase.ctrl_type = ConJoystick_t::CtrlButton;
+    j.Erase.ctrl_id = SDL_CONTROLLER_BUTTON_B;
+
+    j.SwitchScreens.id = 6;
+    j.SwitchScreens.val = 1;
+    j.SwitchScreens.type = ConJoystick_t::JoyButton;
+    j.SwitchScreens.ctrl_val = 1;
+    j.SwitchScreens.ctrl_type = ConJoystick_t::CtrlButton;
+    j.SwitchScreens.ctrl_id = SDL_CONTROLLER_BUTTON_BACK;
+
+    j.TestPlay.id = 7;
+    j.TestPlay.val = 1;
+    j.TestPlay.type = ConJoystick_t::JoyButton;
+    j.TestPlay.ctrl_val = 1;
+    j.TestPlay.ctrl_type = ConJoystick_t::CtrlButton;
+    j.TestPlay.ctrl_id = SDL_CONTROLLER_BUTTON_START;
 }
 
 static std::string getJoyUuidStr(SDL_Joystick *j)
@@ -800,56 +894,18 @@ void UpdateControls()
 
             if(useJoystick[A] == 0) // Keyboard controls
             {
-                if(getKeyStateI(keyCon.Up)) {
-                    c.Up = true;
-                }
-
-                if(getKeyStateI(keyCon.Down)) {
-                    c.Down = true;
-                }
-
-                if(getKeyStateI(keyCon.Left)) {
-                    c.Left = true;
-                }
-
-                if(getKeyStateI(keyCon.Right)) {
-                    c.Right = true;
-                }
-
-                if(getKeyStateI(keyCon.Jump)) {
-                    c.Jump = true;
-                }
-
-                if(getKeyStateI(keyCon.Run)) {
-                    c.Run = true;
-                }
-
-                if(getKeyStateI(keyCon.Drop)) {
-                    c.Drop = true;
-                }
-
-                if(getKeyStateI(keyCon.Start)) {
-                    c.Start = true;
-                }
-
-                if(getKeyStateI(keyCon.AltJump)) {
-                    c.AltJump = true;
-                }
-
-                if(getKeyStateI(keyCon.AltRun)) {
-                    c.AltRun = true;
-                }
+                if(getKeyStateI(keyCon.Up)) c.Up = true;
+                if(getKeyStateI(keyCon.Down)) c.Down = true;
+                if(getKeyStateI(keyCon.Left)) c.Left = true;
+                if(getKeyStateI(keyCon.Right)) c.Right = true;
+                if(getKeyStateI(keyCon.Jump)) c.Jump = true;
+                if(getKeyStateI(keyCon.Run)) c.Run = true;
+                if(getKeyStateI(keyCon.Drop)) c.Drop = true;
+                if(getKeyStateI(keyCon.Start)) c.Start = true;
+                if(getKeyStateI(keyCon.AltJump)) c.AltJump = true;
+                if(getKeyStateI(keyCon.AltRun)) c.AltRun = true;
             }
 
-            /* // DEAD CODE
-//            If .Left = True And .Right = True Then
-            if(c.Left And c.Right) {
-//                .Left = False
-                c.Left = False;
-//                .Right = False
-                c.Right = False;
-//            End If
-            }*/
 #ifdef USE_TOUCHSCREEN_CONTROLLER
             // Mix controls of a touch screen with a player 1
             if(A == 1)
@@ -963,6 +1019,91 @@ void UpdateControls()
     }
 }
 
+void UpdateEditorControls()
+{
+    const auto &joyCon = editorConJoystick;
+    const auto &keyCon = editorConKeyboard;
+    EditorControls_t &c = EditorControls;
+
+    c.FastScroll = false;
+    c.ScrollDown = false;
+    c.ScrollUp = false;
+    c.ScrollLeft = false;
+    c.ScrollRight = false;
+
+    c.PrevSection = false;
+    c.NextSection = false;
+
+    c.SwitchScreens = false;
+    c.TestPlay = false;
+    c.Select = false;
+    c.Erase = false;
+
+    if(useJoystick[1] > 0 && useJoystick[1] <= int(s_joysticks.size())) // There is a joystick
+    {
+        int jNum = useJoystick[1] - 1;
+
+        auto &jj = s_joysticks[size_t(jNum)];
+
+        auto *j = jj.joystick;
+        auto *k = jj.control;
+
+        if(joyCon.isGameController)
+        {
+            updateCtrlKey(k, c.FastScroll, joyCon.FastScroll);
+            updateCtrlKey(k, c.ScrollUp, joyCon.ScrollUp);
+            updateCtrlKey(k, c.ScrollDown, joyCon.ScrollDown);
+            updateCtrlKey(k, c.ScrollLeft, joyCon.ScrollLeft);
+            updateCtrlKey(k, c.ScrollRight, joyCon.ScrollRight);
+
+            updateCtrlKey(k, c.PrevSection, joyCon.PrevSection);
+            updateCtrlKey(k, c.NextSection, joyCon.NextSection);
+
+            updateCtrlKey(k, c.SwitchScreens, joyCon.SwitchScreens);
+            updateCtrlKey(k, c.TestPlay, joyCon.TestPlay);
+            updateCtrlKey(k, c.Select, joyCon.Select);
+            updateCtrlKey(k, c.Erase, joyCon.Erase);
+
+            // Use analog stick as an additional move controller
+            updateCtrlAxisOr(k, c.ScrollUp, SDL_CONTROLLER_AXIS_LEFTY, -1);
+            updateCtrlAxisOr(k, c.ScrollDown, SDL_CONTROLLER_AXIS_LEFTY, +1);
+            updateCtrlAxisOr(k, c.ScrollLeft, SDL_CONTROLLER_AXIS_LEFTX, -1);
+            updateCtrlAxisOr(k, c.ScrollRight, SDL_CONTROLLER_AXIS_LEFTX, +1);
+        }
+        else
+        {
+            updateJoyKey(j, c.FastScroll, joyCon.FastScroll);
+            updateJoyKey(j, c.ScrollUp, joyCon.ScrollUp);
+            updateJoyKey(j, c.ScrollDown, joyCon.ScrollDown);
+            updateJoyKey(j, c.ScrollLeft, joyCon.ScrollLeft);
+            updateJoyKey(j, c.ScrollRight, joyCon.ScrollRight);
+
+            updateJoyKey(j, c.PrevSection, joyCon.PrevSection);
+            updateJoyKey(j, c.NextSection, joyCon.NextSection);
+
+            updateJoyKey(j, c.SwitchScreens, joyCon.SwitchScreens);
+            updateJoyKey(j, c.TestPlay, joyCon.TestPlay);
+            updateJoyKey(j, c.Select, joyCon.Select);
+            updateJoyKey(j, c.Erase, joyCon.Erase);
+        }
+    }
+    else // Keyboard controls
+    {
+        if(getKeyStateI(keyCon.FastScroll)) c.FastScroll = true;
+        if(getKeyStateI(keyCon.ScrollUp)) c.ScrollUp = true;
+        if(getKeyStateI(keyCon.ScrollDown)) c.ScrollDown = true;
+        if(getKeyStateI(keyCon.ScrollLeft)) c.ScrollLeft = true;
+        if(getKeyStateI(keyCon.ScrollRight)) c.ScrollRight = true;
+
+        if(getKeyStateI(keyCon.PrevSection)) c.PrevSection = true;
+        if(getKeyStateI(keyCon.NextSection)) c.NextSection = true;
+
+        if(getKeyStateI(keyCon.SwitchScreens)) c.SwitchScreens = true;
+        if(getKeyStateI(keyCon.TestPlay)) c.TestPlay = true;
+        if(getKeyStateI(keyCon.Select)) c.Select = true;
+        if(getKeyStateI(keyCon.Erase)) c.Erase = true;
+    }
+}
 
 int joyInitJoysticks()
 {

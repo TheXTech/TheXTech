@@ -79,13 +79,30 @@ void GetvScreen(int A)
         vScreenY[A] = -Player[A].Location.Y + (vScreen[A].Height * 0.5) - vScreenYOffset - Player[A].Location.Height;
         vScreenX[A] = vScreenX[A] - vScreen[A].tempX;
         vScreenY[A] = vScreenY[A] - vScreen[A].TempY;
-        if(-vScreenX[A] < level[Player[A].Section].X)
+
+#ifdef __3DS__
+        double screenMargin = Max3DOffset + vScreen[A].Left - vScreen[A].ScreenLeft;
+        if (screenMargin < 0.) screenMargin = 0.;
+#endif
+
+        if (vScreen[A].Width + level[Player[A].Section].X > level[Player[A].Section].Width)
+            vScreenX[A] = -level[Player[A].Section].X/2 + -(level[Player[A].Section].Width - vScreen[A].Width)/2;
+#ifdef __3DS__
+        else if(-vScreenX[A] + screenMargin < level[Player[A].Section].X)
+            vScreenX[A] = -level[Player[A].Section].X + screenMargin;
+        else if(-vScreenX[A] + vScreen[A].Width - screenMargin > level[Player[A].Section].Width)
+            vScreenX[A] = -(level[Player[A].Section].Width - vScreen[A].Width + screenMargin);
+#else
+        else if(-vScreenX[A] < level[Player[A].Section].X)
             vScreenX[A] = -level[Player[A].Section].X;
-        if(-vScreenX[A] + vScreen[A].Width > level[Player[A].Section].Width)
+        else if(-vScreenX[A] + vScreen[A].Width > level[Player[A].Section].Width)
             vScreenX[A] = -(level[Player[A].Section].Width - vScreen[A].Width);
-        if(-vScreenY[A] < level[Player[A].Section].Y)
+#endif
+        if (vScreen[A].Height + level[Player[A].Section].Y > level[Player[A].Section].Height)
+            vScreenY[A] = -level[Player[A].Section].Y/2 + -(level[Player[A].Section].Height - vScreen[A].Height)/2;
+        else if(-vScreenY[A] < level[Player[A].Section].Y)
             vScreenY[A] = -level[Player[A].Section].Y;
-        if(-vScreenY[A] + vScreen[A].Height > level[Player[A].Section].Height)
+        else if(-vScreenY[A] + vScreen[A].Height > level[Player[A].Section].Height)
             vScreenY[A] = -(level[Player[A].Section].Height - vScreen[A].Height);
         if(vScreen[A].TempDelay > 0)
             vScreen[A].TempDelay = vScreen[A].TempDelay - 1;
@@ -100,9 +117,35 @@ void GetvScreen(int A)
             if(vScreen[A].TempY < 0)
                 vScreen[A].TempY = vScreen[A].TempY + 1;
         }
+#ifdef __3DS__
+        vScreenX[A] -= std::fmod(vScreenX[A], 2.);
+        vScreenY[A] -= std::fmod(vScreenY[A], 2.);
+#endif
         if(Player[A].Mount == 2)
             Player[A].Location.Height = 128;
+
     }
+}
+
+//  Get the screen position if it were 800x600
+void GetvScreenCanonical(int A, int* left, int* top)
+{
+    if(Player[A].Mount == 2)
+        Player[A].Location.Height = 0;
+    *left = -Player[A].Location.X + (800 * 0.5) - Player[A].Location.Width / 2.0;
+    *top = -Player[A].Location.Y + (600 * 0.5) - vScreenYOffset - Player[A].Location.Height;
+    *left -= vScreen[A].tempX;
+    *top -= vScreen[A].TempY;
+    if(-(*left) < level[Player[A].Section].X)
+        *left = -level[Player[A].Section].X;
+    else if(-(*left) + 800 > level[Player[A].Section].Width)
+        *left = -(level[Player[A].Section].Width - 800);
+    if(-(*top) < level[Player[A].Section].Y)
+        *top = -level[Player[A].Section].Y;
+    else if(-(*top) + 600 > level[Player[A].Section].Height)
+        *top = -(level[Player[A].Section].Height - 600);
+    if(Player[A].Mount == 2)
+        Player[A].Location.Height = 128;
 }
 
 // Get the average screen position for all players
@@ -115,7 +158,6 @@ void GetvScreenAverage()
 
     OldX = vScreenX[1];
     OldY = vScreenY[1];
-    UNUSED(OldY);
 
     vScreenX[1] = 0;
     vScreenY[1] = 0;
@@ -142,19 +184,39 @@ void GetvScreenAverage()
             B = 1;
         }
         else
+        {
+            vScreenX[1] = OldX;
+            vScreenY[1] = OldY;
             return;
+        }
     }
-    vScreenX[1] = (vScreenX[1] / B) + (ScreenW * 0.5);
-    vScreenY[1] = (vScreenY[1] / B) + (ScreenH * 0.5) - vScreenYOffset;
+    vScreenX[1] = (vScreenX[1] / B) + (vScreen[1].Width * 0.5);
+    vScreenY[1] = (vScreenY[1] / B) + (vScreen[1].Height * 0.5) - vScreenYOffset;
 
-    if(-vScreenX[A] < level[Player[1].Section].X)
+#ifdef __3DS__
+    double screenMargin = Max3DOffset + vScreen[A].Left - vScreen[A].ScreenLeft;
+    if (screenMargin < 0.) screenMargin = 0.;
+#endif
+
+    if(vScreen[A].Width + level[Player[1].Section].X > level[Player[1].Section].Width)
+        vScreenX[A] = -level[Player[1].Section].X/2 + -(level[Player[1].Section].Width - vScreen[A].Width)/2;
+#ifdef __3DS__
+    else if(-vScreenX[A] + screenMargin < level[Player[1].Section].X)
+        vScreenX[A] = -level[Player[1].Section].X + screenMargin;
+    else if(-vScreenX[A] + vScreen[A].Width - screenMargin > level[Player[1].Section].Width)
+        vScreenX[A] = -(level[Player[1].Section].Width - vScreen[A].Width + screenMargin);
+#else
+    else if(-vScreenX[A] < level[Player[1].Section].X)
         vScreenX[A] = -level[Player[1].Section].X;
-    if(-vScreenX[A] + ScreenW > level[Player[1].Section].Width)
-        vScreenX[A] = -(level[Player[1].Section].Width - ScreenW);
-    if(-vScreenY[A] < level[Player[1].Section].Y)
+    else if(-vScreenX[A] + vScreen[A].Width > level[Player[1].Section].Width)
+        vScreenX[A] = -(level[Player[1].Section].Width - vScreen[A].Width);
+#endif
+    if(vScreen[A].Height + level[Player[1].Section].Y > level[Player[1].Section].Height)
+        vScreenY[A] = -level[Player[1].Section].Y/2 + -(level[Player[1].Section].Height - vScreen[A].Height)/2;
+    else if(-vScreenY[A] < level[Player[1].Section].Y)
         vScreenY[A] = -level[Player[1].Section].Y;
-    if(-vScreenY[A] + ScreenH > level[Player[1].Section].Height)
-        vScreenY[A] = -(level[Player[1].Section].Height - ScreenH);
+    else if(-vScreenY[A] + vScreen[A].Height > level[Player[1].Section].Height)
+        vScreenY[A] = -(level[Player[1].Section].Height - vScreen[A].Height);
 
     if(GameMenu)
     {
@@ -167,7 +229,61 @@ void GetvScreenAverage()
         }
         else if(vScreenX[1] < OldX - 10)
             vScreenX[1] = OldX - 10;
+
+        // on menu, bottom of screen always tracks bottom of level
+        vScreenY[A] = -(level[Player[1].Section].Height - ScreenH);
     }
+
+#ifdef __3DS__
+        vScreenX[A] -= std::fmod(vScreenX[A], 2.);
+        vScreenY[A] -= std::fmod(vScreenY[A], 2.);
+#endif
+}
+
+// Get the average screen position for all players as if the screen were 800x600
+void GetvScreenAverageCanonical(int* left, int* top)
+{
+    int A = 0;
+    int B = 0;
+
+    *left = 0;
+    *top = 0;
+
+    for(A = 1; A <= numPlayers; A++)
+    {
+        if(!Player[A].Dead && Player[A].Effect != 6)
+        {
+            *left -= Player[A].Location.X + Player[A].Location.Width / 2.0;
+            if(Player[A].Mount == 2)
+                *top -= Player[A].Location.Y;
+            else
+                *top -= Player[A].Location.Y + Player[A].Location.Height;
+            B += 1;
+        }
+    }
+
+    A = 1;
+    if(B == 0)
+    {
+        if(GameMenu)
+        {
+            *left = -level[0].X;
+            B = 1;
+        }
+        else
+            return;
+    }
+    *left = (*left / B) + (800 / 2);
+    *top = (*top / B) + (600 / 2) - vScreenYOffset;
+
+    if(-(*left) < level[Player[1].Section].X)
+        *left = -level[Player[1].Section].X;
+    else if(-(*left) + 800 > level[Player[1].Section].Width)
+        *left = -(level[Player[1].Section].Width - 800);
+    if(-(*top) < level[Player[1].Section].Y)
+        *top = -level[Player[1].Section].Y;
+    else if(-(*top) + 600 > level[Player[1].Section].Height)
+        *top = -(level[Player[1].Section].Height - 600);
 }
 
 // Get the average screen position for all players with no level edge detection
@@ -194,6 +310,11 @@ void GetvScreenAverage2()
         return;
     vScreenX[1] = (vScreenX[1] / B) + (ScreenW * 0.5);
     vScreenY[1] = (vScreenY[1] / B) + (ScreenH * 0.5) - vScreenYOffset;
+
+#ifdef __3DS__
+        vScreenX[A] -= std::fmod(vScreenX[A], 2.);
+        vScreenY[A] -= std::fmod(vScreenY[A], 2.);
+#endif
 }
 
 void SetupGraphics()
@@ -526,7 +647,7 @@ int pfrY(int plrFrame)
 
 void ScreenShot()
 {
-#ifndef __EMSCRIPTEN__
+#ifndef NO_SCREENSHOT
     frmMain.setTargetTexture();
     frmMain.makeShot();
     frmMain.setTargetScreen();

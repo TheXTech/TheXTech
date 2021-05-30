@@ -94,6 +94,7 @@ void KillNPC(int A, int B)
             tempBool = true;
         if(tempBool == false)
         {
+            // cache this somehow?
             if(NPC[A].Type == 59 || NPC[A].DefaultType == 59)
             {
                 PlaySound(SFX_PSwitch);
@@ -167,18 +168,24 @@ void KillNPC(int A, int B)
     if(NPC[A].TriggerLast != "")
     {
         tempBool = false;
-        for(C = 1; C <= numNPCs; C++)
+        for(C = 0; C <= numLayers; C++)
         {
-            if(C != A)
+            if(Layer[C].Name != NPC[A].Layer) continue;
+            for (int other_npc : Layer[C].NPCs)
             {
-                if(NPC[C].Layer == NPC[A].Layer && NPC[C].Generator == false)
+                if(other_npc != A && NPC[other_npc].Generator == false)
+                {
                     tempBool = true;
+                    break;
+                }
             }
-        }
-        for(C = 1; C <= numBlock; C++)
-        {
-            if(NPC[A].Layer == Block[C].Layer)
+            if (tempBool) break;
+            for (int block : Layer[C].blocks)
+            {
                 tempBool = true;
+                break;
+            }
+            if (tempBool) break;
         }
         if(tempBool == false)
         {
@@ -222,6 +229,7 @@ void KillNPC(int A, int B)
                 NPC[numNPCs].Special = 1;
                 NPC[numNPCs].Location.SpeedY = -5;
                 NPC[numNPCs].Location.SpeedX = (1 + std::fmod(dRand(), 0.5)) * NPC[A].Direction;
+                syncLayers_NPC(numNPCs);
             }
         }
     }
@@ -1079,6 +1087,7 @@ void KillNPC(int A, int B)
                     NPC[numNPCs].Active = true;
                     NPC[numNPCs].TimeLeft = 100;
                     NPC[numNPCs].Frame = 0;
+                    syncLayers_NPC(numNPCs);
                     CheckSectionNPC(numNPCs);
                     PlaySound(SFX_BirdoBeat);
                 }
@@ -1531,6 +1540,8 @@ void KillNPC(int A, int B)
         NPC[A] = NPC[numNPCs];
         NPC[numNPCs] = blankNPC;
         numNPCs--;
+        syncLayers_NPC(A);
+        syncLayers_NPC(numNPCs+1);
         if(NPC[A].HoldingPlayer > 0)
         {
             Player[NPC[A].HoldingPlayer].HoldingNPC = A;

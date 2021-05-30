@@ -27,12 +27,14 @@
 #define MENU_MAIN_H
 
 #include <string>
-#include "global_constants.h"
-#include "range_arr.hpp"
+#include "../global_constants.h"
+#include "../range_arr.hpp"
 
 // Menu modes
 enum
 {
+    // Main intro
+    MENU_INTRO = -1,
     // Main menu
     MENU_MAIN = 0,
     // One player game episode select
@@ -43,6 +45,8 @@ enum
     MENU_BATTLE_MODE = 4,
     // Options menu
     MENU_OPTIONS = 3,
+    // Editor menu
+    MENU_EDITOR = 9,
 
     // Character select for single player game
     MENU_CHARACTER_SELECT_1P    = 100,
@@ -63,6 +67,8 @@ enum
     MENU_INPUT_SETTINGS_P1 = 31,
     // Set up controls for player 2
     MENU_INPUT_SETTINGS_P2 = 32,
+    // Set up controls for editor
+    MENU_INPUT_SETTINGS_EDITOR = 33,
 
     MENU_SELECT_SLOT_BASE = 10,
     // Select game slot for single-player game
@@ -84,9 +90,12 @@ enum
 
 struct MainMenuContent
 {
+    std::string introPressStart;
+
     std::string main1PlayerGame;
     std::string main2PlayerGame;
     std::string mainBattleGame;
+    std::string mainEditor;
     std::string mainOptions;
     std::string mainExit;
 

@@ -26,7 +26,13 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
+#ifndef NO_SDL
 #include <SDL2/SDL_scancode.h>
+#else
+#include <cstdint>
+typedef uint8_t Uint8;
+typedef uint32_t Uint32;
+#endif
 
 #include <string>
 #include <vector>
@@ -96,7 +102,10 @@ extern void DoEvents();
  */
 extern int showCursor(int show);
 
+#ifndef NO_SDL
 extern Uint8 getKeyState(SDL_Scancode key);
+#endif
+
 extern Uint8 getKeyStateI(int key);
 
 //Public Const KEY_PRESSED As Integer = &H1000    'For control information
@@ -223,29 +232,15 @@ extern std::string EoT;
 //    SpeedY As Double
 //End Type
 
-//Public Type EditorControls      'Controls for the editor
-struct EditorControls_t
-{
-//    Up As Boolean
-    bool Up = false;
-//    Down As Boolean
-    bool Down = false;
-//    Left As Boolean
-    bool Left = false;
-//    Right As Boolean
-    bool Right = false;
-//    Mouse1 As Boolean
-    bool Mouse1 = false;
-//End Type
-};
-
 // Structures moved into con_control.h
 
 //Public conKeyboard(1 To 2) As conKeyboard  'player 1 and 2's controls
 extern RangeArr<ConKeyboard_t, 1, maxLocalPlayers> conKeyboard;
+extern EditorConKeyboard_t editorConKeyboard;
 
 //Public conJoystick(1 To 2) As conJoystick
 extern RangeArr<ConJoystick_t, 1, maxLocalPlayers> conJoystick;
+extern EditorConJoystick_t editorConJoystick;
 
 //Public useJoystick(1 To 2) As Integer
 extern RangeArrI<int, 1, maxLocalPlayers, 0> useJoystick;
@@ -382,7 +377,7 @@ struct NPC_t
     bool TurnAround = false;
 //    Killed As Integer 'Flags the NPC to die a specific way.
     int Killed = 0;
-//    Active As Boolean 'If on screen
+//    Active As Boolean 'If on screen and active
     bool Active = false;
 //    Reset(1 To 2) As Boolean 'If it can display the NPC
     RangeArrI<bool, 1, 2, false> Reset;
@@ -734,6 +729,8 @@ struct Block_t
     std::string TriggerLast;
 //    Layer As String
     std::string Layer;
+    int LayerIndex;
+    Location_t LocationInLayer;
 //    Hidden As Boolean
     bool Hidden = false;
 //    Type As Integer 'the block's type
@@ -797,6 +794,9 @@ struct vScreen_t
     double Left = 0.0;
 //    Top As Double
     double Top = 0.0;
+// location on screen when vScreens are smaller due to level size
+    double ScreenTop = 0.0;
+    double ScreenLeft = 0.0;
 //    Width As Double
     double Width = 0.0;
 //    Height As Double
@@ -971,6 +971,7 @@ struct EditorCursor_t
     std::string Layer;
 //    Mode As Integer
     int Mode = 0;
+    int SubMode = 0;
 //    Block As Block
     Block_t Block;
 //    Water As Water
@@ -1067,10 +1068,14 @@ extern bool GamePaused;
 extern std::string MessageText;
 //Public NumSelectWorld As Integer
 extern int NumSelectWorld;
+extern int NumSelectWorldEditable;
+extern int NumSelectBattle;
 //Public SelectWorld(1 To 100) As SelectWorld
 struct SelectWorld_t;
 //extern RangeArr<SelectWorld_t, 1, maxSelectWorlds> SelectWorld;
 extern std::vector<SelectWorld_t> SelectWorld;
+extern std::vector<SelectWorld_t> SelectBattle;
+extern std::vector<SelectWorld_t> SelectWorldEditable;
 //Public ShowFPS As Boolean
 extern bool ShowFPS;
 //Public PrintFPS As Double
@@ -1158,12 +1163,13 @@ extern bool RestartLevel;
 //Public LevelChop(0 To maxSections) As Single 'for drawing backgrounds when the level has been shrunk
 extern float LevelChop[maxSections + 1];
 //'collision detection optimization. creates a table of contents for blocks
+// replaced by trees
 //Public Const FLBlocks As Long = 8000
-const int64_t FLBlocks = 10000;
+const int64_t OLD_FLBlocks = 8000;
 //Public FirstBlock(-FLBlocks To FLBlocks) As Integer
-extern RangeArr<int, -FLBlocks, FLBlocks> FirstBlock;
+// extern RangeArr<int, -FLBlocks, FLBlocks> FirstBlock;
 //Public LastBlock(-FLBlocks To FLBlocks) As Integer
-extern RangeArr<int, -FLBlocks, FLBlocks> LastBlock;
+// extern RangeArr<int, -FLBlocks, FLBlocks> LastBlock;
 //Public MidBackground As Integer 'for drawing backgrounds
 extern int MidBackground;
 //Public LastBackground As Integer 'last backgrounds to be drawn
@@ -1382,6 +1388,9 @@ extern RangeArr<double, 0, maxPlayers> qScreenX;
 extern RangeArr<double, 0, maxPlayers> qScreenY;
 //Public qScreen As Boolean 'Weather or not the screen needs adjusting
 extern bool qScreen;
+// allows screen position to change during qScreen
+extern RangeArr<vScreen_t, 0, 2> qScreenLoc;
+
 
 //Public BlockWidth(0 To maxBlockType) As Integer 'Block type width
 extern RangeArrI<int, 0, maxBlockType, 0> BlockWidth;
@@ -2044,6 +2053,14 @@ extern int BattleIntro;
 extern int BattleOutro;
 //Public LevelName As String
 extern std::string LevelName;
+
+#ifndef FIXED_RES
+extern int ScreenW;
+extern int ScreenH;
+void Set_Resolution(int sw, int sh);
+#endif
+
+
 //Public Const curRelease As Integer = 64
 const int curRelease = 64;
 

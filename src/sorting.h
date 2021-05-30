@@ -37,13 +37,13 @@ void qSortBlocksX(int min, int max);
 void qSortBackgrounds(int min, int max);
 // Public Sub FindBlocks() 'create a table of contents for blocks for an optimization
 // create a table of contents for blocks for an optimization
-void FindBlocks();
+// void FindBlocks();
 // Public Sub BlockSort() 'sizable block sorting
 // sizable block sorting
-void BlockSort();
+// void BlockSort();
 // Public Sub BlockSort2() 'Super Block sorting / slow and only used when saving
 // Super Block sorting / slow and only used when saving
-void BlockSort2();
+// void BlockSort2();
 // Public Sub BackgroundSort()
 void BackgroundSort();
 // Public Function BackGroundPri(A As Integer) As Double 'finds where the backgrounds should be put to set drawing priority
@@ -52,7 +52,7 @@ double BackGroundPri(int A);
 // Public Sub NPCSort()
 void NPCSort();
 // Public Sub FindSBlocks() 'sorts sizable blocks
-// sorts sizable blocks
+// sorts sizable blocks -- DOES NOT modify Block array
 void FindSBlocks();
 // Public Sub qSortSBlocks(min As Integer, max As Integer)
 void qSortSBlocks(int min, int max);
@@ -61,7 +61,7 @@ void qSortNPCsY(int min, int max);
 // Public Sub UpdateBackgrounds()
 void UpdateBackgrounds();
 // Public Sub qSortTempBlocksX(min As Integer, max As Integer)
-void qSortTempBlocksX(int min, int max);
+// void qSortTempBlocksX(int min, int max);
 
 
 #endif // SORTING_H

@@ -452,6 +452,67 @@ bool vScreenCollision(int A, const Location_t &Loc2)
 
 }
 
+// vScreen collisions assuming the game is 800 x H
+bool vScreenCollisionCanonicalX(int A, int left, int top, const Location_t &Loc2)
+{
+    bool tempvScreenCollision = false;
+    if(-left <= Loc2.X + Loc2.Width)
+    {
+        if(-left + 800 >= Loc2.X)
+        {
+            if(-vScreenY[A] <= Loc2.Y + Loc2.Height)
+            {
+                if(-vScreenY[A] + vScreen[A].Height >= Loc2.Y)
+                {
+                    tempvScreenCollision = true;
+                }
+            }
+        }
+    }
+    return tempvScreenCollision;
+}
+
+// vScreen collisions assuming the game is W x 600
+bool vScreenCollisionCanonicalY(int A, int left, int top, const Location_t &Loc2)
+{
+    bool tempvScreenCollision = false;
+    if(-vScreenX[A] <= Loc2.X + Loc2.Width)
+    {
+        if(-vScreenX[A] + vScreen[A].Width >= Loc2.X)
+        {
+            if(-top <= Loc2.Y + Loc2.Height)
+            {
+                if(-top + 600 >= Loc2.Y)
+                {
+                    tempvScreenCollision = true;
+                }
+            }
+        }
+    }
+    return tempvScreenCollision;
+}
+
+// vScreen collisions assuming the game is 800 x 600
+bool vScreenCollisionCanonical(int left, int top, const Location_t &Loc2)
+{
+    bool tempvScreenCollision = false;
+    if(-left <= Loc2.X + Loc2.Width)
+    {
+        if(-left + 800 >= Loc2.X)
+        {
+            if(-top <= Loc2.Y + Loc2.Height)
+            {
+                if(-top + 600 >= Loc2.Y)
+                {
+                    tempvScreenCollision = true;
+                }
+            }
+        }
+    }
+    return tempvScreenCollision;
+
+}
+
 // vScreen collisions 2
 bool vScreenCollision2(int A, const Location_t &Loc2)
 {

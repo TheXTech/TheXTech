@@ -34,7 +34,9 @@
 #include "../layers.h"
 #include "../compat.h"
 #include "../graphics.h"
+#include "../editor/editor.h"
 #include "level_file.h"
+#include "trees.h"
 
 #include <DirManager/dirman.h>
 #include <Utils/files.h>
@@ -46,7 +48,7 @@
 
 void addMissingLvlSuffix(std::string &fileName)
 {
-    if(!fileName.empty() && !Files::hasSuffix(fileName, ".lvl") && !Files::hasSuffix(fileName, ".lvlx"))
+    if(!fileName.empty() && !Files::hasSuffix(fileName, ".lvl") && !Files::hasSuffix(fileName, ".lvlx") && !Files::hasSuffix(fileName, "tst"))
     {
         bool isAbsolute = Files::isAbsolute(fileName);
         bool lvlxExists;
@@ -177,7 +179,10 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         Background2REAL[B] = Background2[B];
         NoTurnBack[B] = s.lock_left_scroll;
         UnderWater[B] = s.underwater;
-        CustomMusic[B] = dirEpisode.resolveFileCase(s.music_file);
+        if(s.music_file.empty())
+            CustomMusic[B] = "";
+        else
+            CustomMusic[B] = dirEpisode.resolveFileCase(s.music_file);
         B++;
         if(B > maxSections)
             break;
@@ -205,6 +210,25 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             break;
     }
 
+    A = 0;
+    for(auto &l : lvl.layers)
+    {
+        auto &layer = Layer[A];
+
+        layer = Layer_t();
+        // does this clear all of those lists???
+
+        layer.Name = l.name;
+        layer.Hidden = l.hidden;
+        // hide layers after everything is done
+        A++;
+        numLayers++;
+        if(numLayers > maxLayers)
+        {
+            numLayers = maxLayers;
+            break;
+        }
+    }
 
     for(auto &b : lvl.blocks)
     {
@@ -399,10 +423,22 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         npc.Location.Height = NPCHeight[npc.Type];
         npc.DefaultLocation = npc.Location;
         npc.DefaultDirection = npc.Direction;
-        npc.TimeLeft = 1;
-        npc.Active = true;
-        npc.JustActivated = 1;
+        if(g_compatibility.NPC_activate_mode == NPC_activate_modes::onscreen)
+        {
+            npc.TimeLeft = 1;
+            npc.Active = true;
+            npc.JustActivated = 1;
+        }
+        else
+        {
+            npc.TimeLeft = 0;
+            npc.Active = false;
+            npc.JustActivated = 0;
+            npc.Reset[1] = true;
+            npc.Reset[2] = true;
+        }
 
+        syncLayers_NPC(numNPCs);
         CheckSectionNPC(numNPCs);
 
         if(npc.Type == 192) // Is a checkpoint
@@ -495,6 +531,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         warp.Entrance.Width = 32;
         warp.Exit.Height = 32;
         warp.Exit.Width = 32;
+        syncLayers_Warp(numWarps);
         if(w.two_way)
             twoWayWarps.push_back(numWarps);
     }
@@ -518,6 +555,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             warp.Entrance = w.Exit;
             warp.Direction2 = w.Direction;
             warp.Direction = w.Direction2;
+            syncLayers_Warp(numWarps);
         }
     }
 
@@ -541,33 +579,10 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         water.Buoy = w.buoy;
         water.Quicksand = w.env_type;
         water.Layer = w.layer;
+        syncLayers_Water(numWater);
     }
 
-    A = 0;
-    for(auto &l : lvl.layers)
-    {
-        auto &layer = Layer[A];
-
-        layer = Layer_t();
-
-        layer.Name = l.name;
-        layer.Hidden = l.hidden;
-        if(layer.Hidden)
-        {
-            HideLayer(layer.Name, true);
-        }
-//        if(LevelEditor == true || MagicHand == true)
-//        {
-//            // Add into listbox
-//        }
-        A++;
-        numLayers++;
-        if(numLayers > maxLayers)
-        {
-            numLayers = maxLayers;
-            break;
-        }
-    }
+    // layers added earlier, will be hidden later
 
     A = 0;
     for(auto &e : lvl.events)
@@ -614,7 +629,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         if(maxSets > numSections)
             maxSets = numSections;
 
-        for(B = 0; B <= numSections; B++)
+        for(B = 0; B <= maxSections; B++)
         {
             auto &s = event.section[B];
             s.music_id = LevelEvent_Sets::LESet_Nothing;
@@ -683,74 +698,33 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         }
     }
 
-    FindBlocks();
+    // no longer needed
+    // FindBlocks();
     qSortBackgrounds(1, numBackground);
     UpdateBackgrounds();
     FindSBlocks();
+    syncLayersTrees_AllBlocks();
+    syncLayers_AllBGOs();
+
+    // Do this before adding locks,
+    // which should reproduce an obscure vanilla bug
+    // that may not have been discovered yet.
+    for (A = 0; A < numLayers; A++)
+    {
+        auto &layer = Layer[A];
+        if(layer.Hidden)
+        {
+            HideLayer(layer.Name, true);
+        }
+    }
 
 
-//    if(LevelEditor == true || MagicHand == true)
-//    {
-//        frmEvents::lstEvent.ListIndex = 0;
-//        frmLayers::lstLayer.ListIndex = 0;
-//        frmEvents::RefreshEvents;
-//    }
-
-//    if(LevelEditor == true)
-//    {
-//        ResetNPC EditorCursor.NPC.Type;
-//        curSection = 0;
-//        vScreenY[1] = -(level[curSection].Height - 600);
-//        vScreenX[1] = -level[curSection].X;
-//        numWarps = numWarps + 1;
-//        for(A = 0; A < frmLevelSettings::optBackground.Count; A++)
-//        {
-//            if(Background2[0] == A)
-//                frmLevelSettings::optBackground(A).Value = true;
-//            else
-//                frmLevelSettings::optBackground(A).Value = false;
-//        }
-//        for(A = 1; A <= frmLevelSettings::optBackgroundColor.Count; A++)
-//        {
-//            if(bgColor[0] == frmLevelSettings::optBackgroundColor(A).BackColor)
-//            {
-//                frmLevelSettings::optBackgroundColor(A).Value = true;
-//                break;
-//            }
-//        }
-//        frmLevelSettings::optMusic(bgMusic[0]).Value = true;
-//        if(LevelWrap[0] == true)
-//            frmLevelSettings::cmdWrap.Caption = "On";
-//        else
-//            frmLevelSettings::cmdWrap.Caption = "Off";
-//        if(UnderWater[0] == true)
-//            frmLevelSettings::cmdWater.Caption = "On";
-//        else
-//            frmLevelSettings::cmdWater.Caption = "Off";
-//        if(OffScreenExit[0] == true)
-//            frmLevelSettings::cmdExit.Caption = "On";
-//        else
-//            frmLevelSettings::cmdExit.Caption = "Off";
-//        frmLevelSettings::txtMusic.Enabled = false;
-//        frmLevelSettings::txtMusic.Text = CustomMusic[0];
-//        frmLevelSettings::txtMusic.Enabled = true;
-//        if(nPlay.Online == true && nPlay.Mode == 1) // sync to server
-//        {
-//            Netplay::sendData "j" + LB + "d" + LocalNick + " has loaded " + FileName + "." + LB + "w1" + LB + EoT;
-//            frmChat.txtChat = frmChat::txtChat + LocalNick + " has loaded " + FileName + "." + LB;
-//            frmChat::txtChat.SelStart = frmChat::txtChat.Text.Length;
-//            PlaySound(SFX_Message);
-//            SoundPause[47] = 2;
-//            for(A = 1; A <= 15; A++)
-//            {
-//                if(nPlay.ClientCon(A) == true)
-//                {
-//                    Netplay::InitSync A;
-//                }
-//            }
-//        }
-//    }
-//    else
+    if (LevelEditor)
+    {
+        ResetSectionScrolls();
+        SetSection(0);
+    }
+    else
     {
         FindStars();
         LevelMacro = LEVELMACRO_OFF;
@@ -779,6 +753,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
                 bgo.Location.Y = Warp[A].Entrance.Y - bgo.Location.Height;
                 bgo.Location.X = Warp[A].Entrance.X + Warp[A].Entrance.Width / 2.0 - bgo.Location.Width / 2.0;
                 bgo.Type = 160;
+                syncLayers_BGO(B);
             }
             else if(Warp[A].Effect == 2 && Warp[A].Locked) // For locks
             {
@@ -791,6 +766,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
                 bgo.Location = Warp[A].Entrance;
                 bgo.Type = 98;
                 bgo.Location.Width = 16;
+                syncLayers_BGO(B);
             }
         }
     }
@@ -808,13 +784,13 @@ void ClearLevel()
 {
     int A = 0;
     int B = 0;
-    NPC_t blankNPC = NPC_t();
-    Water_t blankwater = Water_t();
-    Warp_t blankWarp = Warp_t();
-    Block_t blankBlock = Block_t();
-    Background_t BlankBackground = Background_t();
-    Location_t BlankLocation = Location_t();
-    Events_t blankEvent = Events_t();
+    const NPC_t blankNPC = NPC_t();
+    const Water_t blankwater = Water_t();
+    const Warp_t blankWarp = Warp_t();
+    const Block_t blankBlock = Block_t();
+    const Background_t BlankBackground = Background_t();
+    const Location_t BlankLocation = Location_t();
+    const Events_t blankEvent = Events_t();
     NPCScore[274] = 6;
     LevelName.clear();
     ResetCompat();
@@ -825,6 +801,8 @@ void ClearLevel()
     qScreen = false;
     UnloadCustomGFX();
     doShakeScreenClear();
+
+    treeLevelCleanAll();
 
     numSections = 0;
 

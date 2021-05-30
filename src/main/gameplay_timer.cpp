@@ -24,7 +24,12 @@
  */
 
 
+#ifndef NO_SDL
 #include <SDL2/SDL_stdinc.h>
+#else
+#include "SDL_supplement.h"
+#endif
+
 #include <fmt_format_ne.h>
 #include <IniProcessor/ini_processing.h>
 

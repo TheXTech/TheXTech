@@ -37,6 +37,9 @@ struct SDL_JoyDeviceEvent;
 // Gets players controls
 void UpdateControls();
 
+// Gets editor controls
+void UpdateEditorControls();
+
 #ifdef USE_TOUCHSCREEN_CONTROLLER
 void RenderTouchControls();
 void UpdateTouchScreenSize();
@@ -45,6 +48,8 @@ const Controls_t &CurrentTouchControls();
 
 extern void           joyFillDefaults(ConJoystick_t &j);
 extern void           joyFillDefaults(ConKeyboard_t &k);
+extern void           editorJoyFillDefaults(EditorConJoystick_t &j);
+extern void           editorJoyFillDefaults(EditorConKeyboard_t &j);
 
 extern int            joyInitJoysticks();
 extern void           joyGetAllUUIDs(int player, std::vector<std::string> &out);

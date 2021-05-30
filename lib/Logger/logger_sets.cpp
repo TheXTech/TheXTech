@@ -19,6 +19,10 @@
 
 #include "logger_sets.h"
 
+#ifdef __3DS__
+#define DISABLE_LOGGING
+#endif
+
 #ifndef DISABLE_LOGGING
 
 #include <SDL2/SDL_rwops.h>

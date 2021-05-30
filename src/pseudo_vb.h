@@ -26,8 +26,6 @@
 #ifndef PSEUDO_VB_H
 #define PSEUDO_VB_H
 
-#include <SDL2/SDL_scancode.h>
-
 #define False false
 #define True true
 #define If if(
@@ -39,6 +37,8 @@
 #define CBool(x) static_cast<bool>(x)
 #define CInt(x) static_cast<int>(x)
 
+#ifndef NO_SDL
+#include <SDL2/SDL_scancode.h>
 const SDL_Scancode vbKeyEscape = SDL_SCANCODE_ESCAPE;
 const SDL_Scancode vbKeySpace = SDL_SCANCODE_SPACE;
 const SDL_Scancode vbKeyReturn = SDL_SCANCODE_RETURN;
@@ -53,5 +53,6 @@ const SDL_Scancode vbKeyA = SDL_SCANCODE_A;
 const SDL_Scancode vbKeyS = SDL_SCANCODE_S;
 const SDL_Scancode vbKeyPageUp = SDL_SCANCODE_PAGEUP;
 const SDL_Scancode vbKeyPageDown = SDL_SCANCODE_PAGEDOWN;
+#endif // #ifndef NO_SDL
 
 #endif // PSEUDO_VB_H

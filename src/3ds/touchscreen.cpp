@@ -23,68 +23,54 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef EDITOR_H
-#define EDITOR_H
+#include "../control/touchscreen.h"
 
-#include "location.h"
-
-struct Point_t
+bool TouchScreenController::touchSupported()
 {
-    int X = 0;
-    int Y = 0;
-};
+    return false;
+}
 
-extern Point_t CursorPos;
-extern bool HasCursor;
-extern bool NoReallyKillIt;
-extern int curSection;
-
-extern bool enableAutoAlign;
-
-struct OptCursor_t
+TouchScreenController::FingerState::FingerState()
 {
-    enum Level {
-        LVL_SELECT = 13,
-        LVL_ERASER0 = 0,
-        LVL_ERASER = 6,
-        LVL_BLOCKS = 1,
-        LVL_BGOS = 3,
-        LVL_NPCS = 4,
-        LVL_SETTINGS = 2,
-        LVL_WARPS = 5,
-        LVL_WATER = 15
-    };
-    int current = LVL_SELECT;
-};
+}
 
-extern OptCursor_t optCursor;
+TouchScreenController::FingerState::FingerState(const FingerState &fs)
+{
+}
 
-// this sub handles the level editor
-// it is still called when the player is testing a level in the editor in windowed mode
-extern void UpdateEditor();
+TouchScreenController::FingerState &TouchScreenController::FingerState::operator=(const FingerState &fs)
+{
+    return *this;
+}
 
-extern void UpdateInterprocess();
+TouchScreenController::TouchScreenController() = default;
+TouchScreenController::~TouchScreenController() = default;
 
-extern int EditorNPCFrame(int A, float C, int N = 0);
+void TouchScreenController::init()
+{
+}
 
-extern void GetEditorControls();
+void TouchScreenController::updateScreenSize()
+{
+}
 
-extern void OptCursorSync();
+static void updateKeyValue(bool &key, bool state)
+{
+}
 
-extern void SetCursor();
+static void updateFingerKeyState(TouchScreenController::FingerState &st,
+        Controls_t &keys, int keyCommand, bool setState, TouchScreenController::ExtraKeys &extraSt)
+{
+}
 
-extern void PositionCursor();
+void TouchScreenController::processTouchDevice(int dev_i)
+{
+}
 
-extern void HideCursor();
+void TouchScreenController::update()
+{
+}
 
-extern void KillWarp(int A);
-
-extern void zTestLevel(bool magicHand = false, bool interProcess = false);
-
-extern void MouseMove(float X, float Y, bool nCur = false);
-
-extern void ResetNPC(int A);
-
-extern void BlockFill(Location_t Loc);
-
-#endif // EDITOR_H
+void TouchScreenController::render()
+{
+}

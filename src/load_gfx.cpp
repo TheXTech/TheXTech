@@ -23,7 +23,12 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#ifndef NO_SDL
 #include <SDL2/SDL_timer.h>
+#endif
+#ifndef NO_INTPROC
+#include <InterProcess/intproc.h>
+#endif
 
 #include "globals.h"
 #include "load_gfx.h"
@@ -31,7 +36,6 @@
 #include <Utils/files.h>
 #include <Utils/dir_list_ci.h>
 #include <DirManager/dirman.h>
-#include <InterProcess/intproc.h>
 #include <fmt_format_ne.h>
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
@@ -147,7 +151,12 @@ static void loadCGFX(const std::set<std::string> &files,
 #ifdef DEBUG_BUILD
         pLogDebug("Trying to load custom GFX: %s with mask %s", imgToUse.c_str(), maskToUse.c_str());
 #endif
+#ifdef __3DS__
+        // 3DS never uses masks
+        newTexture = frmMain.lazyLoadPicture(imgToUse);
+#else
         newTexture = frmMain.lazyLoadPicture(imgToUse, maskToUse, origPath);
+#endif
         success = newTexture.inited;
         loadedPath = imgToUse;
     }
@@ -640,11 +649,13 @@ void UpdateLoadREAL()
 {
     std::string state;
     bool draw = false;
+#ifndef NO_INTPROC
     if(IntProc::isEnabled())
     {
         state = IntProc::getState();
         draw = true;
     }
+#endif
 
     static float alphaFader = 1.0f;
 
@@ -671,18 +682,29 @@ void UpdateLoadREAL()
     if(draw)
     {
         frmMain.setTargetTexture();
-        frmMain.clearBuffer();
+#ifdef __3DS__
+        frmMain.initDraw(0);
+#endif
+        // frmMain.clearBuffer();
+        int Left = ScreenW/2 - GFX.MenuGFX[4].w/2;
+        if (Left < 0) Left = 0;
+        int Top = ScreenH/2 - GFX.MenuGFX[4].h/2;
+        if (Top < 0) Top = 0;
+        int Right = ScreenW/2 + GFX.MenuGFX[4].w/2;
+        if (Right > ScreenW) Right = ScreenW;
+        int Bottom = ScreenH/2 + GFX.MenuGFX[4].h/2;
+        if (Bottom > ScreenH) Bottom = ScreenH;
         if(!gfxLoaderTestMode)
-            frmMain.renderTexture(0, 0, GFX.MenuGFX[4]);
+            frmMain.renderTexture(ScreenW/2 - GFX.MenuGFX[4].w/2, ScreenH/2 - GFX.MenuGFX[4].h/2, GFX.MenuGFX[4]);
         else
         {
             if(!state.empty())
-                SuperPrint(state, 3, 10, 10);
+                SuperPrint(state, 3, Left + 10, Top + 10);
             else
-                SuperPrint("Loading data...", 3, 10, 10);
+                SuperPrint("Loading data...", 3, Left + 10, Top + 10);
         }
-        frmMain.renderTexture(632, 576, GFX.Loader);
-        frmMain.renderTexture(760, 560, GFX.LoadCoin.w, GFX.LoadCoin.h / 4, GFX.LoadCoin, 0, 32 * LoadCoins);
+        frmMain.renderTexture(Right - 168, Bottom - 24, GFX.Loader);
+        frmMain.renderTexture(Right - 40, Bottom - 40, GFX.LoadCoin.w, GFX.LoadCoin.h / 4, GFX.LoadCoin, 0, 32 * LoadCoins);
 
         if(gfxLoaderThreadingMode && alphaFader >= 0.f)
             frmMain.renderRect(0, 0, ScreenW, ScreenH, 0.f, 0.f, 0.f, alphaFader);

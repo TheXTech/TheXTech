@@ -27,6 +27,13 @@
 #include "change_res.h"
 #include "load_gfx.h"
 
+#ifdef __3DS__
+void SetOrigRes() {}
+
+void ChangeRes(int, int, int, int) {}
+
+#else
+
 void SetOrigRes()
 {
     frmMain.setFullScreen(false);
@@ -37,7 +44,7 @@ void SetOrigRes()
 #endif
     if(LoadingInProcess)
         UpdateLoad();
-    if(!GameMenu && !MagicHand)
+    if(!GameMenu && !MagicHand && !LevelEditor && !WorldEditor)
         showCursor(1);
 }
 
@@ -47,6 +54,8 @@ void ChangeRes(int, int, int, int)
     if(LoadingInProcess)
         UpdateLoad();
 }
+
+#endif
 
 //void SaveIt(int ScX, int ScY, int ScC, int ScF, std::string ScreenChanged)
 //{

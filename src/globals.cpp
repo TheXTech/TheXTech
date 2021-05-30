@@ -23,9 +23,14 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#ifndef NO_SDL
 #include <SDL2/SDL_version.h>
+#else
+#include "SDL_supplement.h"
+#endif
 
 #include "globals.h"
+#include "main/menu_main.h"
 #include <fmt_format_ne.h>
 #include <cmath>
 #include <cfenv>
@@ -50,7 +55,9 @@ bool TakeScreen = false;
 std::string LB;
 std::string EoT;
 RangeArr<ConKeyboard_t, 1, maxLocalPlayers> conKeyboard;
+EditorConKeyboard_t editorConKeyboard;
 RangeArr<ConJoystick_t, 1, maxLocalPlayers> conJoystick;
+EditorConJoystick_t editorConJoystick;
 RangeArrI<int, 1, maxLocalPlayers, 0> useJoystick;
 RangeArrI<bool, 1, maxLocalPlayers, false> wantedKeyboard;
 
@@ -68,7 +75,11 @@ KM_Key lastJoyButton;
 bool GamePaused = false;
 std::string MessageText;
 int NumSelectWorld  = 0;
+int NumSelectWorldEditable  = 0;
+int NumSelectBattle  = 0;
 std::vector<SelectWorld_t> SelectWorld;
+std::vector<SelectWorld_t> SelectWorldEditable;
+std::vector<SelectWorld_t> SelectBattle;
 bool ShowFPS = false;
 double PrintFPS = 0.0;
 bool GameplayPoundByAltRun = false;
@@ -98,8 +109,8 @@ std::string StartLevel;
 bool NoMap = false;
 bool RestartLevel = false;
 float LevelChop[maxSections + 1];
-RangeArr<int, -FLBlocks, FLBlocks> FirstBlock;
-RangeArr<int, -FLBlocks, FLBlocks> LastBlock;
+// RangeArr<int, -FLBlocks, FLBlocks> FirstBlock;
+// RangeArr<int, -FLBlocks, FLBlocks> LastBlock;
 int MidBackground = 1;
 int LastBackground = 1;
 int iBlocks = 0;
@@ -202,9 +213,10 @@ RangeArrI<int, 0, maxBlockType, 0> BlockSlope2;
 RangeArr<double, 0, maxPlayers> vScreenX;
 RangeArr<double, 0, maxPlayers> vScreenY;
 
+bool qScreen = false;
 RangeArr<double, 0, maxPlayers> qScreenX;
 RangeArr<double, 0, maxPlayers> qScreenY;
-bool qScreen = false;
+RangeArr<vScreen_t, 0, 2> qScreenLoc;
 
 RangeArrI<int, 0, maxBlockType, 0> BlockWidth;
 RangeArrI<int, 0, maxBlockType, 0> BlockHeight;
@@ -301,7 +313,7 @@ int ReturnWarpSaved = 0;
 int StartWarp = 0;
 Physics_t Physics;
 int MenuCursor = 0;
-int MenuMode = 0;
+int MenuMode = MENU_INTRO;
 bool MenuCursorCanMove = false;
 bool MenuCursorCanMove2 = false;
 bool NextFrame = false;
@@ -507,11 +519,22 @@ int BattleIntro = 0;
 int BattleOutro = 0;
 std::string LevelName;
 
+#ifndef FIXED_RES
+int ScreenW = 800;
+int ScreenH = 600;
+void Set_Resolution(int sw, int sh)
+{
+	ScreenW = sw;
+	ScreenH = sh;
+}
+#endif
+
 void DoEvents()
 {
     frmMain.doEvents();
 }
 
+#ifndef NO_SDL
 int showCursor(int show)
 {
     return SDL_ShowCursor(show);
@@ -601,6 +624,22 @@ std::string getJoyKeyName(bool isController, const KM_Key &key)
         return fmt::format_ne("K={0} ID={1} T={2}", key.val, key.id, key.type);
     }
 }
+#endif
+// #ifndef NO_SDL
+
+#ifdef NO_SDL
+int showCursor(int show) {return 0;}
+const char *getKeyName(int key) {return " ... ";}
+// implementation dependent
+#ifdef __3DS__
+std::string getJoyKeyName(bool isController, const KM_Key &key)
+{
+    if(key.type < 0)
+        return "_";
+    return KEYNAMES[key.val];
+}
+#endif
+#endif
 
 
 void initAll()
@@ -621,8 +660,8 @@ void initAll()
     AutoY.fill(0.f);
     Water.fill(Water_t());
     Star.fill(Star_t());
-    FirstBlock.fill(0);
-    LastBlock.fill(0);
+    // FirstBlock.fill(0);
+    // LastBlock.fill(0);
     iBlock.fill(0);
     CustomMusic.fill(std::string());
     level.fill(Location_t());

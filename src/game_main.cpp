@@ -23,12 +23,19 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#ifndef NO_SDL
 #include <SDL2/SDL_timer.h>
+#else
+#include "SDL_supplement.h"
+#endif
+
+#ifndef NO_INTPROC
+#include <InterProcess/intproc.h>
+#endif
 
 #include <Logger/logger.h>
 #include <Utils/files.h>
 #include <AppPath/app_path.h>
-#include <InterProcess/intproc.h>
 #include <pge_delay.h>
 #include <fmt_format_ne.h>
 
@@ -51,12 +58,18 @@
 #include "load_gfx.h"
 #include "player.h"
 #include "sound.h"
-#include "editor.h"
+#include "editor/editor.h"
 #include "custom.h"
 #include "main/level_file.h"
 #include "main/speedrunner.h"
 #include "main/menu_main.h"
 #include "main/game_info.h"
+#include "main/trees.h"
+#include "rand.h"
+
+#ifdef NEW_EDITOR
+#include "editor/new_editor.h"
+#endif
 
 #include "pseudo_vb.h"
 
@@ -68,7 +81,7 @@ void SizableBlocks();
 
 static int loadingThread(void *waiter_ptr)
 {
-#ifndef PGE_NO_THREADING
+#if !defined(PGE_NO_THREADING)
     SDL_atomic_t *waiter = (SDL_atomic_t *)waiter_ptr;
 #else
     UNUSED(waiter_ptr);
@@ -81,8 +94,12 @@ static int loadingThread(void *waiter_ptr)
     SizableBlocks();
     LoadGFX(); // load the graphics from file
     SetupVars(); //Setup Variables
+#ifdef PRELOAD_LEVELS
+    FindWorlds();
+    FindLevels();
+#endif
 
-#ifndef PGE_NO_THREADING
+#if !defined(PGE_NO_THREADING)
     if(waiter)
         SDL_AtomicSet(waiter, 0);
 #endif
@@ -108,6 +125,23 @@ int GameMain(const CmdLineSetup_t &setup)
 
     g_speedRunnerMode = setup.speedRunnerMode;
     speedRun_setSemitransparentRender(setup.speedRunnerSemiTransparent);
+    if(!setup.gameplayLog.empty())
+    {
+        seedRandom(42);
+        g_speedRunnerGameplayLog = fopen(setup.gameplayLog.c_str(), "w");
+    }
+    if(!setup.replayControls.empty())
+    {
+        seedRandom(42);
+        g_speedRunnerControlFile = fopen(setup.replayControls.c_str(), "r");
+        g_speedRunnerDebug = SPEEDRUN_DEBUG_PLAY;
+    }
+    else if(!setup.recordControls.empty())
+    {
+        seedRandom(42);
+        g_speedRunnerControlFile = fopen(setup.recordControls.c_str(), "w");
+        g_speedRunnerDebug = SPEEDRUN_DEBUG_REC;
+    }
 
     ResetCompat();
 
@@ -127,7 +161,13 @@ int GameMain(const CmdLineSetup_t &setup)
     gfxLoaderTestMode = setup.testLevelMode;
 
     if(!GFX.load()) // Load UI graphics
+    {
+        if(g_speedRunnerGameplayLog)
+            fclose(g_speedRunnerGameplayLog);
+        if(g_speedRunnerControlFile)
+            fclose(g_speedRunnerControlFile);
         return 1;
+    }
 
 //    If LevelEditor = False Then
 //        frmMain.Show // Show window a bit later
@@ -165,7 +205,7 @@ int GameMain(const CmdLineSetup_t &setup)
     if(!noSound)
         InitMixerX();
 
-#ifndef PGE_NO_THREADING
+#if !defined(PGE_NO_THREADING)
     gfxLoaderThreadingMode = true;
 #endif
     frmMain.show(); // Don't show window until playing an initial sound
@@ -176,7 +216,7 @@ int GameMain(const CmdLineSetup_t &setup)
             PlayInitSound();
     }
 
-#ifndef PGE_NO_THREADING
+#if !defined(PGE_NO_THREADING)
     {
         SDL_Thread*     loadThread;
         int             threadReturnValue;
@@ -211,8 +251,10 @@ int GameMain(const CmdLineSetup_t &setup)
 
     LevelSelect = true; // world map is to be shown
 
+#ifndef NO_INTPROC
     if(setup.interprocess)
         IntProc::init();
+#endif
 
     LoadingInProcess = false;
 
@@ -251,11 +293,46 @@ int GameMain(const CmdLineSetup_t &setup)
             showCursor(1);
         }
 
-//        If LevelEditor = True Then 'Load the level editor
-//            [USELESS!]
+        if(LevelEditor) // Load the level editor
+        {
+            if(resChanged)
+                ChangeScreen();
+            BattleMode = false;
+            SingleCoop = 0;
+            numPlayers = 0;
+            ScreenType = 0;
+            DoEvents();
+            SetupEditorGraphics(); //Set up the editor graphics
+            SetupScreens();
+            MagicHand = false;
+            MouseRelease = false;
+            ScrollRelease = false;
+
+            // coming back from a level test
+            if(!WorldEditor)
+            {
+                EditorRestore();
+            }
+
+            // Run the frame-loop
+            runFrameLoop(&EditorLoop,
+                         nullptr,
+                        []()->bool{ return LevelEditor || WorldEditor;}, nullptr,
+                        nullptr,
+                        nullptr);
+
+            MenuMode = MENU_INTRO;
+            LevelEditor = false;
+            WorldEditor = false;
+            frmMain.clearBuffer();
+            frmMain.repaint();
+#ifdef PRELOAD_LEVELS
+            FindWorlds();
+#endif
+        }
 
         // TheXTech Credits
-        if(GameOutro)
+        else if(GameOutro)
         {
             ShadowMode = false;
             GodMode = false;
@@ -441,12 +518,14 @@ int GameMain(const CmdLineSetup_t &setup)
                 do
                 {
                     tempBool = true;
-                    for(int B = 1; B <= numBlock; ++B)
+                    // for(int B = 1; B <= numBlock; ++B)
+                    for(Block_t* block : treeBlockQuery(p.Location, false, 64))
                     {
-                        if(CheckCollision(p.Location, Block[B].Location))
+                        if(CheckCollision(p.Location, block->Location))
                         {
-                            p.Location.Y = Block[B].Location.Y - p.Location.Height - 0.1;
+                            p.Location.Y = block->Location.Y - p.Location.Height - 0.1;
                             tempBool = false;
+                            break;
                         }
                     }
                 } while(!tempBool);
@@ -471,7 +550,7 @@ int GameMain(const CmdLineSetup_t &setup)
             if(!GameIsActive)
             {
                 speedRun_saveStats();
-                return 0;// Break on quit
+                break;// Break on quit
             }
         }
 
@@ -566,7 +645,7 @@ int GameMain(const CmdLineSetup_t &setup)
                 if(!GameIsActive)
                 {
                     speedRun_saveStats();
-                    return 0;// Break on quit
+                    break;// Break on quit
                 }
             }
         }
@@ -718,7 +797,7 @@ int GameMain(const CmdLineSetup_t &setup)
             if(!GameIsActive)
             {
                 speedRun_saveStats();
-                return 0;// Break on quit
+                break;// Break on quit
             }
 
             // TODO: Utilize this and any TestLevel/MagicHand related code to allow PGE Editor integration
@@ -727,46 +806,33 @@ int GameMain(const CmdLineSetup_t &setup)
 //            If TestLevel = True Then
             if(TestLevel)
             {
-//                TestLevel = False
-//                TestLevel = false;
-//                LevelEditor = True
-//                LevelEditor = true;
-//                LevelEditor = true; //FIXME: Restart level testing or quit a game instead of THIS
-
-                if(LevelBeatCode != 0)
-                    GameIsActive = false;
-                else
+                if(LevelBeatCode == 0)
                 {
+                    // restart level if lost
                     GameThing();
                     PGE_Delay(500);
                     zTestLevel(setup.testMagicHand, setup.interprocess); // Restart level
                 }
+                // if called from the new editor, return to editor
+                else if(!Backup_FullFileName.empty())
+                {
+                    TestLevel = false;
+                    LevelEditor = true;
+
+                    OpenLevel(FullFileName);
+                    if (!Backup_FullFileName.empty())
+                    {
+                        Files::deleteFile(FullFileName);
+                        FullFileName = Backup_FullFileName;
+                        Backup_FullFileName = "";
+                    }
+                }
+                else
+                {
+                    GameIsActive = false;
+                }
 
                 LevelBeatCode = 0;
-
-//                If nPlay.Online = False Then
-//                    OpenLevel FullFileName
-//                OpenLevel(FullFileName);
-//                Else
-//                    If nPlay.Mode = 1 Then
-//                        Netplay.sendData "H0" & LB
-//                        If Len(FullFileName) > 4 Then
-//                            If LCase(Right(FullFileName, 4)) = ".lvl" Then
-//                                OpenLevel FullFileName
-//                            Else
-//                                For A = 1 To 15
-//                                    If nPlay.ClientCon(A) = True Then Netplay.InitSync A
-//                                Next A
-//                            End If
-//                        Else
-//                            For A = 1 To 15
-//                                If nPlay.ClientCon(A) = True Then Netplay.InitSync A
-//                            Next A
-//                        End If
-//                    End If
-//                End If
-
-//                LevelSelect = False
                 LevelSelect = false;
             }
 //            Else
@@ -779,6 +845,11 @@ int GameMain(const CmdLineSetup_t &setup)
 
     } while(GameIsActive);
 
+    if(g_speedRunnerGameplayLog)
+        fclose(g_speedRunnerGameplayLog);
+    if(g_speedRunnerControlFile)
+        fclose(g_speedRunnerControlFile);
+
     return 0;
 }
 
@@ -790,7 +861,27 @@ int GameMain(const CmdLineSetup_t &setup)
 
 void EditorLoop()
 {
-    // DUMMY
+    UpdateEditorControls();
+    UpdateEditor();
+    UpdateBlocks();
+    UpdateEffects();
+    if (WorldEditor == true)
+        UpdateGraphics2(true);
+    else
+        UpdateGraphics(true);
+    frmMain.setTargetTexture();
+#if defined(NEW_EDITOR) && defined(__3DS__)
+    editorScreen.UpdateSelectorBar(true);
+    editorScreen.UpdateEditorScreen();
+#elif defined(NEW_EDITOR)
+    if(editorScreen.active)
+        editorScreen.UpdateEditorScreen();
+    else
+        editorScreen.UpdateSelectorBar(true);
+#endif
+    frmMain.setTargetScreen();
+    frmMain.repaint();
+    UpdateSound();
 }
 
 void KillIt()
@@ -1044,7 +1135,7 @@ void UpdateMacro()
                 BeatTheGame = true;
                 SaveGame();
                 GameOutro = true;
-                MenuMode = MENU_MAIN;
+                MenuMode = MENU_INTRO;
                 MenuCursor = 0;
             }
             frmMain.clearBuffer();
@@ -1167,6 +1258,9 @@ void InitControls()
         joyFillDefaults(conKeyboard[A]);
         joyFillDefaults(conJoystick[A]);
     }
+
+    editorJoyFillDefaults(editorConKeyboard);
+    editorJoyFillDefaults(editorConJoystick);
 
     OpenConfig();
 

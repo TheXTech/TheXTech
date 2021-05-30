@@ -38,6 +38,7 @@
 #include "../pseudo_vb.h"
 #include "../main/trees.h"
 #include "game_info.h"
+#include "trees.h"
 
 
 void DoCredits()
@@ -101,16 +102,21 @@ void DoCredits()
 //        for(A = 1; A <= 2; A++) // Useless loop
 //        {
         bool quitKey = false;
-        quitKey |= (getKeyState(vbKeyEscape) == KEY_PRESSED);
-        quitKey |= (getKeyState(vbKeySpace) == KEY_PRESSED);
-        quitKey |= (getKeyState(vbKeyReturn) == KEY_PRESSED);
         for(int p = 1; p <= maxLocalPlayers; ++p)
         {
             if(useJoystick[p] > 0)
                 quitKey |= joyIsKeyDown(useJoystick[p] - 1, conJoystick[p].Start);
         }
+#ifndef NO_SDL
+        quitKey |= (getKeyState(vbKeyEscape) == KEY_PRESSED);
+        quitKey |= (getKeyState(vbKeySpace) == KEY_PRESSED);
+        quitKey |= (getKeyState(vbKeyReturn) == KEY_PRESSED);
+#endif
 #ifdef __ANDROID__ // Quit credits on BACK key press
         quitKey |= (getKeyState(SDL_SCANCODE_AC_BACK) == KEY_PRESSED);
+#endif
+#ifdef __3DS__
+        quitKey |= frmMain.getKeyHeld(KEYCODE_START);
 #endif
 #ifdef USE_TOUCHSCREEN_CONTROLLER // Quit when pressed the "Start" on a touchscreen controller
         quitKey |= CurrentTouchControls().Start;
@@ -159,28 +165,24 @@ void OutroLoop()
             tempLocation.X = Player[A].Location.X - tempLocation.Width - 20;
         // fBlock = FirstBlock[long(tempLocation.X / 32) - 1];
         // lBlock = LastBlock[long((tempLocation.X + tempLocation.Width) / 32.0) + 1];
-        blockTileGet(tempLocation, fBlock, lBlock);
+        // blockTileGet(tempLocation, fBlock, lBlock);
 
-        for(B = (int)fBlock; B <= lBlock; B++)
+        for(Block_t* block : treeBlockQuery(tempLocation, false))
         {
-            if(tempLocation.X + tempLocation.Width >= Block[B].Location.X)
+            Block_t& b = *block;
+            if(tempLocation.X + tempLocation.Width >= b.Location.X)
             {
-                if(tempLocation.X <= Block[B].Location.X + Block[B].Location.Width)
+                if(tempLocation.X <= b.Location.X + b.Location.Width)
                 {
-                    if(tempLocation.Y + tempLocation.Height >= Block[B].Location.Y)
+                    if(tempLocation.Y + tempLocation.Height >= b.Location.Y)
                     {
-                        if(tempLocation.Y <= Block[B].Location.Y + Block[B].Location.Height)
+                        if(tempLocation.Y <= b.Location.Y + b.Location.Height)
                         {
-                            if(!BlockNoClipping[Block[B].Type] && !Block[B].Invis && !Block[B].Hidden && !(BlockIsSizable[Block[B].Type] && Block[B].Location.Y < Player[A].Location.Y + Player[A].Location.Height - 3))
+                            if(!BlockNoClipping[b.Type] && !b.Invis && !b.Hidden && !(BlockIsSizable[b.Type] && b.Location.Y < Player[A].Location.Y + Player[A].Location.Height - 3))
                                 jumpBool = false;
                         }
                     }
                 }
-            }
-            else
-            {
-                if(BlocksSorted)
-                    break;
             }
         }
 
@@ -252,6 +254,13 @@ void SetupCredits()
     AddCredit("");
     AddCredit("Vitaly Novichkov");
     AddCredit("'Wohlstand'");
+    AddCredit("");
+    AddCredit("");
+#endif
+#ifdef __3DS__
+    AddCredit("3DS port By:");
+    AddCredit("");
+    AddCredit("'ds-sloth'");
     AddCredit("");
     AddCredit("");
 #endif

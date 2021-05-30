@@ -23,6 +23,10 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#ifdef NO_SDL
+#error "Primary `main/cheat_code.cpp` only for SDL targets. Build target-specific `cheat_code.cpp` instead."
+#endif
+
 #include <SDL2/SDL_stdinc.h>
 #include <SDL2/SDL_messagebox.h>
 

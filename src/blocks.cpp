@@ -23,7 +23,11 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#ifndef NO_SDL
 #include <SDL2/SDL_timer.h>
+#else
+#include "SDL_supplement.h"
+#endif
 
 #include "globals.h"
 #include "frame_timer.h"
@@ -37,6 +41,7 @@
 #include "player.h"
 #include "sorting.h"
 #include "layers.h"
+#include "main/trees.h"
 
 void BlockHit(int A, bool HitDown, int whatPlayer)
 {
@@ -170,9 +175,10 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
     if(HitDown == true && b.Special > 0)
     {
         tempBool = false;
-        auto tmpNumBlocks = numBlock;
-        for(auto B = 1; B <= tmpNumBlocks; B++)
+        // auto tmpNumBlocks = numBlock;
+        for(Block_t* ptr : treeBlockQuery(b.Location, false, 32))
         {
+            int B = ptr - &Block[1] + 1;
             if(B != A)
             {
                 if(CheckCollision(b.Location, newLoc(Block[B].Location.X + 4, Block[B].Location.Y - 16, Block[B].Location.Width - 8, Block[B].Location.Height)))
@@ -213,6 +219,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
     if(b.Type == 170) // smw switch blocks
     {
+        // think through possible cheaper way to do these
         PlaySound(SFX_PSwitch);
         for(auto B = 1; B <= numBlock; B++)
         {
@@ -350,8 +357,9 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         {
             tempBool = false;
 
-            for(auto B = 1; B <= numBlock; B++)
+            for(Block_t* ptr : treeBlockQuery(b.Location, false, 64))
             {
+                int B = ptr - &Block[1] + 1;
                 if(B != A && Block[B].Hidden == false && (BlockOnlyHitspot1[Block[B].Type] & !BlockIsSizable[Block[B].Type]) == 0)
                 {
                     if(CheckCollision(Block[B].Location, newLoc(b.Location.X + 1, b.Location.Y - 31, 30, 30)))
@@ -411,6 +419,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                     }
                     NPC[numNPCs].Special = 1;
                     NPC[numNPCs].Immune = 20;
+                    syncLayers_NPC(numNPCs);
                     CheckSectionNPC(numNPCs);
                     if(B > 20 || (Player[whatPlayer].Character == 5 && B > 5))
                     {
@@ -444,8 +453,9 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         {
             tempBool = false;
 
-            for(auto B = 1; B <= numBlock; B++)
+            for(Block_t* ptr : treeBlockQuery(b.Location, false, 64))
             {
+                int B = ptr - &Block[1] + 1;
                 if(B != A && Block[B].Hidden == false && (BlockOnlyHitspot1[Block[B].Type] & !BlockIsSizable[Block[B].Type]) == 0)
                 {
                     if(CheckCollision(Block[B].Location, newLoc(b.Location.X + 1, b.Location.Y - 31, 30, 30)))
@@ -484,6 +494,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                 NPC[numNPCs].Special = 1;
                 NPC[numNPCs].Immune = 20;
                 PlaySound(SFX_Coin);
+                syncLayers_NPC(numNPCs);
                 CheckSectionNPC(numNPCs);
                 b.Special = b.Special - 1;
             }
@@ -672,6 +683,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             NPC[numNPCs].Location.Width = NPCWidth[C];
 
             // Make block a bit smaller to allow player take a bonus easier (Redigit's idea)
+            // this is not enough to merit a resync of the block's position
             if(fEqual(b.Location.Width, 32) && !b.wasShrinkResized)
             {
                 b.Location.Width = b.Location.Width - 0.1;
@@ -755,6 +767,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             }
 
             NPC[numNPCs].Effect2 = 0;
+            syncLayers_NPC(numNPCs);
             CheckSectionNPC(numNPCs);
             if(NPCIsYoshi[NPC[numNPCs].Type] ||
                NPCIsBoot[NPC[numNPCs].Type] || NPC[numNPCs].Type == 9 ||
@@ -846,6 +859,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             }
 
             NPC[numNPCs].Effect2 = 0;
+            syncLayers_NPC(numNPCs);
             CheckSectionNPC(numNPCs);
         }
         else
@@ -951,6 +965,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             }
 
             NPC[numNPCs].Effect2 = 0;
+            syncLayers_NPC(numNPCs);
             CheckSectionNPC(numNPCs);
         }
         else // Rez player
@@ -1063,6 +1078,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             }
 
             NPC[numNPCs].Effect2 = 0;
+            syncLayers_NPC(numNPCs);
             CheckSectionNPC(numNPCs);
         }
         else // Rez player
@@ -1144,6 +1160,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         }
 
         NPC[numNPCs].Effect2 = 0;
+        syncLayers_NPC(numNPCs);
         CheckSectionNPC(numNPCs);
     }
     else if(b.Special == 105) // Block contains a Green Yoshi
@@ -1207,6 +1224,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         }
 
         NPC[numNPCs].Effect2 = 0;
+        syncLayers_NPC(numNPCs);
         CheckSectionNPC(numNPCs);
     }
     else if(b.Special == 101) // Block contains a Goomba
@@ -1266,6 +1284,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         }
 
         NPC[numNPCs].Effect2 = 0;
+        syncLayers_NPC(numNPCs);
         CheckSectionNPC(numNPCs);
     }
     else if(b.Special == 201) // Block contains a 1-up
@@ -1324,6 +1343,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         }
 
         NPC[numNPCs].Effect2 = 0;
+        syncLayers_NPC(numNPCs);
         CheckSectionNPC(numNPCs);
     }
 
@@ -1342,6 +1362,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         NPC[numNPCs].Location.Y = NPC[numNPCs].Location.Y - 0.01;
         NPC[numNPCs].DefaultLocation = NPC[numNPCs].Location;
         NPC[numNPCs].DefaultType = NPC[numNPCs].Type;
+        syncLayers_NPC(numNPCs);
         CheckSectionNPC(numNPCs);
         b = blankBlock;
     }
@@ -1457,9 +1478,10 @@ void KillBlock(int A, bool Splode)
     {
         if(numBlock > 0)
         {
-            Block[A] = Block[numBlock];
-            Block[numBlock] = blankBlock;
+            Block[A] = std::move(Block[numBlock]);
+            syncLayersTrees_Block(A);
             numBlock = numBlock - 1;
+            syncLayersTrees_Block(numBlock + 1);
         }
     }
     else
@@ -1475,21 +1497,29 @@ void KillBlock(int A, bool Splode)
         {
             tempBool = false;
 
-            for(C = 1; C <= numNPCs; C++)
+            for(C = 0; C <= numLayers; C++)
             {
-                if(NPC[C].Layer == Block[A].Layer && !NPC[C].Generator)
-                    tempBool = true;
-            }
-
-            for(C = 1; C <= numBlock; C++)
-            {
-                if(C != A)
+                if(Layer[C].Name != Block[A].Layer) continue;
+                for(int npc : Layer[C].NPCs)
                 {
-                    if(Block[A].Layer == Block[C].Layer)
+                    if(NPC[npc].Generator == false)
+                    {
                         tempBool = true;
+                        break;
+                    }
                 }
+                if(tempBool)
+                    break;
+                for (int other_block : Layer[C].blocks)
+                {
+                    if(other_block != A)
+                    {
+                        tempBool = true;
+                        break;
+                    }
+                }
+                if (tempBool) break;
             }
-
             if(!tempBool)
             {
                 ProcEvent(Block[A].TriggerLast);
@@ -1499,6 +1529,7 @@ void KillBlock(int A, bool Splode)
         Block[A].Hidden = true;
         Block[A].Layer = "Destroyed Blocks";
         Block[A].Kill = false;
+        syncLayersTrees_Block(A);
     }
 
 }
@@ -1786,14 +1817,13 @@ void UpdateBlocks()
 
                             if(Block[A].Hidden)
                             {
-                                for(B = 0; B <= maxLayers; B++)
-                                {
-                                    if(Layer[B].Name == Block[A].Layer)
-                                        Block[A].Hidden = Layer[B].Hidden;
-                                }
-
+                                syncLayersTrees_Block_SetHidden(A);
                                 if(!Block[A].Hidden)
                                     NewEffect(10, newLoc(Block[A].Location.X + Block[A].Location.Width / 2.0 - EffectWidth[10] / 2, Block[A].Location.Y + Block[A].Location.Height / 2.0 - EffectHeight[10] / 2));
+                            }
+                            else
+                            {
+                                syncLayersTrees_Block(A);
                             }
 
                             if(Block[A].Type != Block[A].DefaultType || Block[A].Special != Block[A].DefaultSpecial)
@@ -2057,6 +2087,8 @@ void PSwitch(bool enabled)
                     Block[numBlock].Special = 0;
                     Block[numBlock].Kill = false;
                     Block[numBlock].NPC = NPC[A].Type;
+                    syncLayersTrees_Block(numBlock);
+                    // block layers are synchronized now because sorting is gone
                 }
                 NPC[A].Killed = 9;
             }
@@ -2097,10 +2129,14 @@ void PSwitch(bool enabled)
                     NPC[numNPCs].Location.X = NPC[numNPCs].Location.X + (Block[A].Location.Width - NPC[numNPCs].Location.Width) / 2.0;
                     NPC[numNPCs].DefaultLocation = NPC[numNPCs].Location;
                     NPC[numNPCs].DefaultType = NPC[numNPCs].Type;
+                    syncLayers_NPC(numNPCs);
                     CheckSectionNPC(numNPCs);
                     Block[A] = Block[numBlock];
                     Block[numBlock] = blankBlock;
                     numBlock = numBlock - 1;
+                    syncLayersTrees_Block(A);
+                    syncLayersTrees_Block(numBlock + 1);
+                    // block layers are synchronized now because sorting is gone
                 }
             }
         }
@@ -2129,6 +2165,8 @@ void PSwitch(bool enabled)
                     Block[numBlock].Location.X = Block[numBlock].Location.X + (NPC[A].Location.Width - Block[numBlock].Location.Width) / 2.0;
                     Block[numBlock].Special = 0;
                     Block[numBlock].Kill = false;
+                    syncLayersTrees_Block(numBlock);
+                    // block layers are synchronized now because sorting is gone
                 }
                 NPC[A].Killed = 9;
             }
@@ -2159,10 +2197,14 @@ void PSwitch(bool enabled)
                     NPC[numNPCs].Location.X = NPC[numNPCs].Location.X + (Block[A].Location.Width - NPC[numNPCs].Location.Width) / 2.0;
                     NPC[numNPCs].DefaultLocation = NPC[numNPCs].Location;
                     NPC[numNPCs].DefaultType = NPC[numNPCs].Type;
+                    syncLayers_NPC(numNPCs);
                     CheckSectionNPC(numNPCs);
                     NPC[numNPCs].Killed = 0;
                     KillBlock(A, false);
                     Block[A].Layer = "Used P Switch";
+                    syncLayersTrees_Block(A);
+                    // this is as close to a permanent death as blocks get in the game,
+                    // because this layer usually doesn't exist
                 }
             }
         }
@@ -2170,21 +2212,24 @@ void PSwitch(bool enabled)
         ProcEvent("P Switch - End", true);
     }
 
-    qSortBlocksX(1, numBlock);
-    B = 1;
+    // so glad we can eliminate this now!
 
-    for(A = 2; A <= numBlock; A++)
-    {
-        if(Block[A].Location.X > Block[B].Location.X)
-        {
-            qSortBlocksY(B, A - 1);
-            B = A;
-        }
-    }
+    // qSortBlocksX(1, numBlock);
+    // B = 1;
 
-    qSortBlocksY(B, A - 1);
-    FindSBlocks();
-    FindBlocks();
+    // for(A = 2; A <= numBlock; A++)
+    // {
+    //     if(Block[A].Location.X > Block[B].Location.X)
+    //     {
+    //         qSortBlocksY(B, A - 1);
+    //         B = A;
+    //     }
+    // }
+
+    // qSortBlocksY(B, A - 1);
+    // FindSBlocks();
+    // FindBlocks();
+    // syncLayersTrees_AllBlocks();
 
     iBlocks = numBlock;
     for(A = 1; A <= numBlock; A++)

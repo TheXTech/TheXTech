@@ -31,6 +31,11 @@
 #include <string>
 #endif
 
+#ifdef __3DS__
+#include <citro2d.h>
+#include <string>
+#endif
+
 typedef unsigned int    GLenum;
 typedef int             GLint;
 typedef unsigned int    GLuint;
@@ -63,6 +68,8 @@ struct StdPicture
     float h_scale = 1.0f;
 
     bool lazyLoaded = false;
+
+#ifndef __3DS__
     std::vector<char> raw;
     std::vector<char> rawMask;
     bool isMaskPng = false;
@@ -71,6 +78,17 @@ struct StdPicture
     GLint  nOfColors = 0;
     PGEColor ColorUpper;
     PGEColor ColorLower;
+#endif
+#ifdef __3DS__
+    std::string path = "";
+    uint32_t lastDrawFrame = 0;
+    C2D_SpriteSheet texture = nullptr;
+    C2D_Image image;
+    C2D_SpriteSheet texture2 = nullptr;
+    C2D_Image image2;
+    C2D_SpriteSheet texture3 = nullptr;
+    C2D_Image image3;
+#endif
 };
 
 #endif // STD_PICTURE_H

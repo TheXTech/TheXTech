@@ -23,8 +23,6 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#include <SDL2/SDL_timer.h>
-
 #include <cmath>
 #include <ctime>
 #include <Utils/maths.h>
@@ -40,7 +38,7 @@
 #include "game_main.h"
 #include "effect.h"
 #include "blocks.h"
-#include "editor.h"
+#include "editor/editor.h"
 #include "layers.h"
 #include "main/level_file.h"
 #include "main/trees.h"
@@ -71,8 +69,9 @@ static void setupPlayerAtCheckpoints(NPC_t &npc, Checkpoint_t &cp)
     tempLocation.Height = 600;
 
     C = 0;
-    for(B = 1; B <= numBlock; B++)
+    for(Block_t* block : treeBlockQuery(tempLocation, false))
     {
+        B = block - &Block[1] + 1;
         if(CheckCollision(tempLocation, Block[B].Location) == true)
         {
             if(C == 0)
@@ -563,6 +562,7 @@ void PlayerHurt(int A)
                 NPC[numNPCs].Location.SpeedX = 0;
                 NPC[numNPCs].CantHurt = 10;
                 NPC[numNPCs].CantHurtPlayer = A;
+                syncLayers_NPC(numNPCs);
                 Player[A].Location.Height = Physics.PlayerHeight[Player[A].Character][Player[A].State];
             }
             else
@@ -655,6 +655,7 @@ void PlayerHurt(int A)
                         NPC[numNPCs].Location.SpeedY = 0;
                         NPC[numNPCs].Location.SpeedX = 0;
                         NPC[numNPCs].CantHurt = 10;
+                        syncLayers_NPC(numNPCs);
                         NPC[numNPCs].CantHurtPlayer = A;
                         Player[A].Location.Height = Physics.PlayerHeight[Player[A].Character][Player[A].State];
                         Player[A].Location.Width = Physics.PlayerWidth[Player[A].Character][Player[A].State];
@@ -754,6 +755,7 @@ void PlayerDead(int A)
         NPC[numNPCs].Location.SpeedX = 0;
         NPC[numNPCs].CantHurt = 10;
         NPC[numNPCs].CantHurtPlayer = A;
+        syncLayers_NPC(numNPCs);
         Player[A].Mount = 0;
         Player[A].Location.Y = Player[A].Location.Y - 32;
         Player[A].Location.Height = 32;
@@ -952,7 +954,7 @@ void EveryonesDead()
         ClearLevel();
         LevelSelect = true;
         GameMenu = true;
-        MenuMode = MENU_MAIN;
+        MenuMode = MENU_INTRO;
         MenuCursor = 0;
     }
     DoEvents();
@@ -2054,8 +2056,9 @@ void TailSwipe(int plr, bool boo, bool Stab, int StabDir)
     int A = 0;
     long long B = 0;
     int C = 0;
-    int64_t fBlock = 0;
-    int64_t lBlock = 0;
+    // no longer needed since trees
+    // int64_t fBlock = 0;
+    // int64_t lBlock = 0;
     if(Stab == true)
     {
         if(Player[plr].Duck == false)
@@ -2123,10 +2126,9 @@ void TailSwipe(int plr, bool boo, bool Stab, int StabDir)
     {
         // fBlock = FirstBlock[(tailLoc.X / 32) - 1];
         // lBlock = LastBlock[((tailLoc.X + tailLoc.Width) / 32.0) + 1];
-        blockTileGet(tailLoc, fBlock, lBlock);
-
-        for(A = (int)fBlock; A <= lBlock; A++)
+        for(Block_t* block : treeBlockQuery(tailLoc, false))
         {
+            A = block - &Block[1] + 1;
             if(!BlockIsSizable[Block[A].Type] && !Block[A].Hidden && (Block[A].Type != 293 || Stab) && !Block[A].Invis && !BlockNoClipping[Block[A].Type])
             {
                 if(CheckCollision(tailLoc, Block[A].Location))
@@ -2182,6 +2184,7 @@ void TailSwipe(int plr, bool boo, bool Stab, int StabDir)
                                 PlaySound(SFX_ZeldaGrass);
                                 Block[A].Hidden = true;
                                 Block[A].Layer = "Destroyed Blocks";
+                                syncLayersTrees_Block(A);
                                 NewEffect(10, Block[A].Location);
                                 Effect[numEffects].Location.SpeedY = -2;
                             }
@@ -2482,6 +2485,7 @@ void YoshiSpit(int A)
                     NPC[numNPCs].Location.SpeedY = 0.8;
                     NPC[numNPCs].Location.SpeedX = 5 * Player[A].Direction;
                 }
+                syncLayers_NPC(numNPCs);
             }
         }
         else
@@ -2578,9 +2582,11 @@ void YoshiPound(int A, int mount, bool BreakBlocks)
 
         if(BreakBlocks)
         {
-            for(B = 1; B <= numBlock; B++)
+            for(Block_t* block : treeBlockQuery(Player[A].Location, false))
             {
-                auto &b = Block[B];
+                B = block - &Block[1] + 1;
+                Block_t& b = *block;
+
                 if(b.Hidden || b.Invis || BlockNoClipping[b.Type] || BlockIsSizable[b.Type])
                     continue;
 
@@ -2642,8 +2648,9 @@ void SwapCoop()
 void PlayerPush(int A, int HitSpot)
 {
     Location_t tempLocation;
-    int64_t fBlock = 0;
-    int64_t lBlock = 0;
+    // no longer needed since trees
+    // int64_t fBlock = 0;
+    // int64_t lBlock = 0;
 
     if(ShadowMode)
         return;
@@ -2652,11 +2659,12 @@ void PlayerPush(int A, int HitSpot)
 
     // fBlock = FirstBlock[(p.Location.X / 32) - 1];
     // lBlock = LastBlock[((p.Location.X + p.Location.Width) / 32.0) + 1];
-    blockTileGet(p.Location, fBlock, lBlock);
+    // blockTileGet(p.Location, fBlock, lBlock);
 
-    for(int B = int(fBlock); B <= lBlock; B++)
+    for(Block_t* block : treeBlockQuery(p.Location, false))
     {
-        auto &b = Block[B];
+        int B = block - &Block[1] + 1;
+        Block_t& b = *block;
 
         if(b.Hidden || BlockIsSizable[b.Type])
             continue;
@@ -3287,6 +3295,7 @@ void ClownCar()
             NPC[numNPCs].Location.Y = NPC[numNPCs].Location.Y + NPC[numNPCs].Location.SpeedY;
             NPC[numNPCs].Location.X = NPC[numNPCs].Location.X + NPC[numNPCs].Location.SpeedX;
             NPC[numNPCs].Section = Player[A].Section;
+            syncLayers_NPC(numNPCs);
             for(B = 1; B <= numPlayers; B++)
             {
                 if(Player[B].StandingOnTempNPC == 56)
@@ -3334,6 +3343,7 @@ void ClownCar()
                                 NPC[numNPCs].Direction = NPC[B].Direction;
                                 if(Maths::iRound(NPC[numNPCs].Direction) == 1)
                                     NPC[numNPCs].Frame = 2;
+                                syncLayers_NPC(numNPCs);
                             }
                             for(int numNPCsMax9 = numNPCs, C = 1; C <= numNPCsMax9; C++)
                             {
@@ -3675,6 +3685,7 @@ void PowerUps(int A)
                         }
                         if(Player[A].Character == 4)
                             NPC[numNPCs].Location.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
+                        syncLayers_NPC(numNPCs);
                         CheckSectionNPC(numNPCs);
                     }
                 }
@@ -3730,6 +3741,7 @@ void PowerUps(int A)
                             NPC[numNPCs].Frame = 8;
                         if(Maths::iRound(NPC[numNPCs].Special) == 4)
                             NPC[numNPCs].Frame = 12;
+                        syncLayers_NPC(numNPCs);
                         CheckSectionNPC(numNPCs);
                         Player[A].FireBallCD = 30;
                         if(Player[A].Character == 2)
@@ -3860,7 +3872,7 @@ void PowerUps(int A)
                     Player[A].SwordPoke = -10;
                 PlaySound(SFX_Throw);
             }
-
+            syncLayers_NPC(numNPCs);
 
         }
         else if(Player[A].FireBallCD == 0 && Player[A].Controls.Run == true && Player[A].RunRelease == true)
@@ -4487,6 +4499,7 @@ void PlayerGrabCode(int A, bool DontResetGrabTime)
 
                         NPC[numNPCs].Projectile = true;
                         NPC[numNPCs].Frame = EditorNPCFrame(NPC[numNPCs].Type, NPC[numNPCs].Direction);
+                        syncLayers_NPC(numNPCs);
                     // Next B
                 }
             }
@@ -4554,6 +4567,7 @@ void PlayerGrabCode(int A, bool DontResetGrabTime)
                     NPC[numNPCs].Location.Height = 32;
                     NPC[numNPCs].Location.Width = 48;
                     NPC[numNPCs].Special = A;
+                    syncLayers_NPC(numNPCs);
                     if(Player[A].Direction > 0)
                         NPC[numNPCs].Frame = 2;
                 }
@@ -4806,24 +4820,29 @@ void PlayerGrabCode(int A, bool DontResetGrabTime)
                             Layer[B].EffectStop = true;
                             Layer[B].SpeedX = 0;
                             Layer[B].SpeedY = 0;
-                            for(C = 1; C <= numBlock; C++)
+                            for(int C : Layer[B].blocks)
                             {
-                                if(Block[C].Layer == Layer[B].Name)
-                                {
                                     Block[C].Location.SpeedX = Layer[B].SpeedX;
                                     Block[C].Location.SpeedY = Layer[B].SpeedY;
+                            }
+                            if(g_compatibility.enable_climb_bgo_layer_move)
+                            {
+                                for(int C : Layer[B].BGOs)
+                                {
+                                    if(BackgroundFence[Background[C].Type])
+                                    {
+                                        Background[C].Location.SpeedX = 0;
+                                        Background[C].Location.SpeedY = 0;
+                                    }
                                 }
                             }
-                            for(C = 1; C <= numNPCs; C++)
+                            for(int C : Layer[B].NPCs)
                             {
-                                if(NPC[C].Layer == Layer[B].Name)
-                                {
                                     if(NPCIsAVine[NPC[C].Type] || NPC[C].Type == 91)
                                     {
                                         NPC[C].Location.SpeedX = 0;
                                         NPC[C].Location.SpeedY = 0;
                                     }
-                                }
                             }
                         }
                     }

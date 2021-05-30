@@ -23,7 +23,9 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#ifndef NO_SDL
 #include <SDL2/SDL_timer.h>
+#endif
 
 #include <Logger/logger.h>
 #include <pge_delay.h>
@@ -39,7 +41,7 @@
 #include "../npc.h"
 #include "../layers.h"
 #include "../player.h"
-#include "../editor.h"
+#include "../editor/editor.h"
 #include "speedrunner.h"
 #include "menu_main.h"
 
@@ -123,13 +125,18 @@ void GameLoop()
         if(MagicHand)
             UpdateEditor();
 
+#ifndef NO_SDL
         bool altPressed = getKeyState(SDL_SCANCODE_LALT) == KEY_PRESSED ||
                           getKeyState(SDL_SCANCODE_RALT) == KEY_PRESSED;
 
         bool escPressed = getKeyState(SDL_SCANCODE_ESCAPE) == KEY_PRESSED;
 #ifdef __ANDROID__
         escPressed |= getKeyState(SDL_SCANCODE_AC_BACK) == KEY_PRESSED;
-#endif
+#endif // #ifdef __ANDROID__
+#else // #ifndef __3DS__
+        bool altPressed = false;
+        bool escPressed = false;
+#endif // #ifndef NO_SDL
 
         bool pausePress = (Player[1].Controls.Start || escPressed) && !altPressed;
 
@@ -257,6 +264,16 @@ void PauseGame(int plr)
             BlockFrames();
             UpdateEffects();
 
+
+            if(SingleCoop > 0 || numPlayers > 2)
+            {
+                for(A = 1; A <= numPlayers; A++)
+                    Player[A].Controls = Player[1].Controls;
+            }
+
+            auto &c = Player[plr].Controls;
+
+#ifndef NO_SDL
             bool altPressed = getKeyState(SDL_SCANCODE_LALT) == KEY_PRESSED ||
                               getKeyState(SDL_SCANCODE_RALT) == KEY_PRESSED;
             bool escPressed = getKeyState(SDL_SCANCODE_ESCAPE) == KEY_PRESSED;
@@ -268,19 +285,17 @@ void PauseGame(int plr)
             bool menuDoPress = (returnPressed && !altPressed) || spacePressed;
             bool menuBackPress = (escPressed && !altPressed);
 
-            if(SingleCoop > 0 || numPlayers > 2)
-            {
-                for(A = 1; A <= numPlayers; A++)
-                    Player[A].Controls = Player[1].Controls;
-            }
-
-            auto &c = Player[plr].Controls;
-
             menuDoPress |= (c.Start || c.Jump) && !altPressed;
             menuBackPress |= c.Run && !altPressed;
 
             upPressed |= (c.Up && !altPressed);
             downPressed |= (c.Down && !altPressed);
+#else // #ifndef NO_SDL
+            bool menuDoPress = (c.Start || c.Jump);
+            bool menuBackPress = c.Run;
+            bool upPressed = c.Up;
+            bool downPressed = c.Down;
+#endif
 
             if(MessageText.empty())
             {
@@ -404,7 +419,7 @@ void PauseGame(int plr)
                                 break;
                             case 1: // Restart level
                                 stopPause = true;
-                                MenuMode = MENU_MAIN;
+                                MenuMode = MENU_INTRO;
                                 MenuCursor = 0;
                                 frmMain.setTargetTexture();
                                 frmMain.clearBuffer();
@@ -425,7 +440,7 @@ void PauseGame(int plr)
                                 break;
                             case 3: // Quit testing
                                 stopPause = true;
-                                MenuMode = MENU_MAIN;
+                                MenuMode = MENU_INTRO;
                                 MenuCursor = 0;
                                 frmMain.setTargetTexture();
                                 frmMain.clearBuffer();
@@ -433,7 +448,14 @@ void PauseGame(int plr)
                                 EndLevel = true;
                                 StopMusic();
                                 DoEvents();
-                                KillIt(); // Quit the game entirely
+                                if(Backup_FullFileName.empty())
+                                {
+                                    KillIt(); // Quit the game entirely
+                                }
+                                else
+                                {
+                                    LevelBeatCode = -1; // Return to editor
+                                }
                                 break;
                             default:
                                 break;
@@ -459,7 +481,7 @@ void PauseGame(int plr)
                             stopPause = true;
                             GameMenu = true;
 
-                            MenuMode = MENU_MAIN;
+                            MenuMode = MENU_INTRO;
                             MenuCursor = 0;
 
                             if(!LevelSelect)

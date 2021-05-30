@@ -23,15 +23,24 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#ifndef NO_SDL
 #include <SDL2/SDL.h>
+#else
+#include "SDL_supplement.h"
+#endif
+
+#ifndef __3DS__
+#include <tclap/CmdLine.h>
+#include <CrashHandler/crash_handler.h>
+#else
+#include <3ds.h>
+#endif
 
 #include "game_main.h"
 #include "main/game_info.h"
 #include <AppPath/app_path.h>
-#include <tclap/CmdLine.h>
 #include <Utils/strings.h>
 #include <Utils/files.h>
-#include <CrashHandler/crash_handler.h>
 
 #ifdef ENABLE_XTECH_LUA
 #include "xtech_lua_main.h"
@@ -135,9 +144,15 @@ static void strToPlayerSetup(int player, const std::string &setupString)
 extern "C"
 int main(int argc, char**argv)
 {
+#ifdef __3DS__
+    romfsInit();
+#endif
+
     CmdLineSetup_t setup;
 
+#ifndef __3DS__
     CrashHandler::initSigs();
+#endif
 
     AppPathManager::initAppPath();
     AppPath = AppPathManager::assetsRoot();
@@ -147,7 +162,10 @@ int main(int argc, char**argv)
     setup.renderType = CmdLineSetup_t::RenderType(RenderMode);
 
     testPlayer.fill(Player_t());
+    testPlayer[1].Character = 1;
+    testPlayer[2].Character = 2;
 
+#ifndef __3DS__
     try
     {
         // Define the command line object.
@@ -220,6 +238,21 @@ int main(int argc, char**argv)
                                                    cmd);
         TCLAP::SwitchArg switchSpeedRunSemiTransparent(std::string(), "speed-run-semitransparent",
                                                        "Make the speed-runner mode timer be drawn transparently", false);
+
+        TCLAP::ValueArg<std::string> recordControls(std::string(), "record-controls", "Path to save a controls recording to.",
+                                                false, "",
+                                                "record path",
+                                                cmd);
+
+        TCLAP::ValueArg<std::string> replayControls(std::string(), "replay-controls", "Path to replay a controls recording from.",
+                                                false, "",
+                                                "replay path",
+                                                cmd);
+
+        TCLAP::ValueArg<std::string> gameplayLog(std::string(), "gameplay-log", "Path to save a log of limited gameplay data.",
+                                                false, "",
+                                                "log path",
+                                                cmd);
 
         TCLAP::SwitchArg switchVerboseLog(std::string(), "verbose", "Enable log output into the terminal", false);
 
@@ -301,10 +334,20 @@ int main(int argc, char**argv)
         setup.speedRunnerMode = speedRunMode.getValue();
         setup.speedRunnerSemiTransparent = switchSpeedRunSemiTransparent.getValue();
 
+        setup.replayControls = replayControls.getValue();
+        setup.recordControls = recordControls.getValue();
+        setup.gameplayLog = gameplayLog.getValue();
+
         if(setup.speedRunnerMode >= 1) // Always show FPS and don't pause the game work when focusing other windows
         {
             setup.testShowFPS = true;
             setup.neverPause = true;
+        }
+
+        if(!setup.replayControls.empty() && !setup.gameplayLog.empty())
+        {
+            setup.testShowFPS = true;
+            setup.testMaxFPS = true;
         }
     }
     catch(TCLAP::ArgException &e)   // catch any exceptions
@@ -313,6 +356,7 @@ int main(int argc, char**argv)
         std::cerr.flush();
         return 2;
     }
+#endif // #ifndef __3DS__
 
     initGameInfo();
 
@@ -352,6 +396,10 @@ int main(int argc, char**argv)
 #endif
 
     frmMain.freeSDL();
+
+#ifdef __3DS__
+    romfsExit();
+#endif
 
     return ret;
 }

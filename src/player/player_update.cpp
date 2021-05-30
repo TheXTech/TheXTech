@@ -35,7 +35,7 @@
 #include "../npc.h"
 #include "../effect.h"
 #include "../layers.h"
-#include "../editor.h"
+#include "../editor/editor.h"
 #include "../game_main.h"
 #include "../compat.h"
 #include "../main/trees.h"
@@ -49,8 +49,8 @@ void UpdatePlayer()
     float D = 0;
 //    Controls_t blankControls;
     float speedVar = 0; // adjusts the players speed by percentages
-    int64_t fBlock = 0; // for collision detection optimizations
-    int64_t lBlock = 0;
+    // int64_t fBlock = 0; // for collision detection optimizations
+    // int64_t lBlock = 0;
     double tempSpeed = 0;
     int HitSpot = 0;
     // the hitspot is used for collision detection to find out where to put the player after it collides with a block
@@ -481,10 +481,11 @@ void UpdatePlayer()
                         tempLocation.X = tempLocation.X + 64 - tempLocation.Width / 2.0;
                         // fBlock = FirstBlock[(tempLocation.X / 32) - 1];
                         // lBlock = LastBlock[((tempLocation.X + tempLocation.Width) / 32.0) + 1];
-                        blockTileGet(tempLocation, fBlock, lBlock);
+                        // blockTileGet(tempLocation, fBlock, lBlock);
 
-                        for(B = (int)fBlock; B <= lBlock; B++)
+                        for(Block_t* block : treeBlockQuery(tempLocation, false))
                         {
+                            B = block - &Block[1] + 1;
                             if(!Block[B].Invis && !BlockIsSizable[Block[B].Type] && !BlockOnlyHitspot1[Block[B].Type] &&
                                !BlockNoClipping[Block[B].Type] && !Block[B].Hidden)
                             {
@@ -1203,6 +1204,7 @@ void UpdatePlayer()
                             NPC[numNPCs].Location.SpeedX = (Player[A].Location.SpeedX - NPC[Player[A].StandingOnNPC].Location.SpeedX) * 0.8;
                             NPC[numNPCs].CantHurt = 10;
                             NPC[numNPCs].CantHurtPlayer = A;
+                            syncLayers_NPC(numNPCs);
                             Player[A].Location.Y = Player[A].Location.Y + Player[A].Location.Height;
                             Player[A].Location.Height = Physics.PlayerHeight[Player[A].Character][Player[A].State];
                             Player[A].Location.Y = Player[A].Location.Y - Player[A].Location.Height;
@@ -1247,6 +1249,7 @@ void UpdatePlayer()
                             NPC[numNPCs].Location.SpeedX = 0;
                             NPC[numNPCs].CantHurt = 10;
                             NPC[numNPCs].CantHurtPlayer = A;
+                            syncLayers_NPC(numNPCs);
                             // If ShadowMode = True Then .Shadow = True
                             Player[A].Location.Height = Physics.PlayerHeight[Player[A].Character][Player[A].State];
                         }
@@ -1435,6 +1438,7 @@ void UpdatePlayer()
                                 NPC[numNPCs].Location.SpeedX = (Player[A].Location.SpeedX - NPC[Player[A].StandingOnNPC].Location.SpeedX) * 0.8;
                                 NPC[numNPCs].CantHurt = 10;
                                 NPC[numNPCs].CantHurtPlayer = A;
+                                syncLayers_NPC(numNPCs);
                                 Player[A].Location.Y = Player[A].Location.Y + Player[A].Location.Height;
                                 Player[A].Location.Height = Physics.PlayerHeight[Player[A].Character][Player[A].State];
                                 Player[A].Location.Y = Player[A].Location.Y - Player[A].Location.Height;
@@ -1486,6 +1490,7 @@ void UpdatePlayer()
                                 NPC[numNPCs].Location.SpeedX = 0;
                                 NPC[numNPCs].CantHurt = 10;
                                 NPC[numNPCs].CantHurtPlayer = A;
+                                syncLayers_NPC(numNPCs);
                                 Player[A].Location.Height = Physics.PlayerHeight[Player[A].Character][Player[A].State];
                             }
                         }
@@ -2102,6 +2107,7 @@ void UpdatePlayer()
                                     NPC[numNPCs].Location.SpeedX = 9 * Player[A].Direction + (Player[A].Location.SpeedX / 3);
                                 if(Player[A].StandingOnNPC != 0)
                                     NPC[numNPCs].Location.Y = NPC[numNPCs].Location.Y - Player[A].Location.SpeedY;
+                                syncLayers_NPC(numNPCs);
                                 CheckSectionNPC(numNPCs);
                             }
                         }
@@ -2318,10 +2324,11 @@ void UpdatePlayer()
                 // block collision optimization
                 // fBlock = FirstBlock[(Player[A].Location.X / 32) - 1];
                 // lBlock = LastBlock[((Player[A].Location.X + Player[A].Location.Width) / 32.0) + 1];
-                blockTileGet(Player[A].Location, fBlock, lBlock);
+                // blockTileGet(Player[A].Location, fBlock, lBlock);
 
-                for(B = (int)fBlock; B <= lBlock; B++)
+                for(Block_t* block : treeBlockQuery(Player[A].Location, false))
                 {
+                    B = block - &Block[1] + 1;
 
                     // checks to see if a collision happened
                     if(Player[A].Location.X + Player[A].Location.Width >= Block[B].Location.X)
@@ -2847,10 +2854,11 @@ void UpdatePlayer()
                                                 tempBool = false;
                                                 // fBlock = FirstBlock[(tempLocation.X / 32) - 1];
                                                 // lBlock = LastBlock[((tempLocation.X + tempLocation.Width) / 32.0) + 1];
-                                                blockTileGet(tempLocation, fBlock, lBlock);
+                                                // blockTileGet(tempLocation, fBlock, lBlock);
 
-                                                for(auto C = fBlock; C <= lBlock; C++)
+                                                for(Block_t* block : treeBlockQuery(tempLocation, false))
                                                 {
+                                                    C = block - &Block[1] + 1;
                                                     if(CheckCollision(tempLocation, Block[C].Location) && !Block[C].Hidden)
                                                     {
                                                         if(BlockSlope[Block[C].Type] == 0)
@@ -2940,6 +2948,7 @@ void UpdatePlayer()
                                 Player[A].GrabSpeed = 0;
                                 Block[B].Hidden = true;
                                 Block[B].Layer = "Destroyed Blocks";
+                                syncLayersTrees_Block(B);
                                 NewEffect(10, Block[B].Location);
                                 Effect[numEffects].Location.SpeedY = -2;
                                 Player[A].GrabTime = 0;
@@ -3538,6 +3547,7 @@ void UpdatePlayer()
                                                     NPC[numNPCs].Location.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
                                                     NPC[numNPCs].Location.SpeedX = 4;
                                                     NPC[numNPCs].Location.SpeedY = 10;
+                                                    syncLayers_NPC(numNPCs);
                                                     numNPCs++;
                                                     NPC[numNPCs] = NPC_t();
                                                     NPC[numNPCs].Active = true;
@@ -3551,6 +3561,7 @@ void UpdatePlayer()
                                                     NPC[numNPCs].Location.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
                                                     NPC[numNPCs].Location.SpeedX = -4;
                                                     NPC[numNPCs].Location.SpeedY = 10;
+                                                    syncLayers_NPC(numNPCs);
                                                 }
                                                 if(NPC[B].Killed == 0 && Player[A].SpinJump == 0)
                                                     PlaySound(SFX_Stomp);
@@ -4061,10 +4072,11 @@ void UpdatePlayer()
 
                                                     // fBlock = FirstBlock[(Player[A].Location.X / 32) - 1];
                                                     // lBlock = LastBlock[((Player[A].Location.X + Player[A].Location.Width) / 32.0) + 1];
-                                                    blockTileGet(Player[A].Location, fBlock, lBlock);
+                                                    // blockTileGet(Player[A].Location, fBlock, lBlock);
 
-                                                    for(C = fBlock; C <= lBlock; C++)
+                                                    for(Block_t* block : treeBlockQuery(Player[A].Location, false))
                                                     {
+                                                        C = block - &Block[1] + 1;
                                                         if(CheckCollision(Player[A].Location, Block[C].Location) &&
                                                            !Block[C].Hidden && !BlockIsSizable[Block[C].Type] &&
                                                            !BlockOnlyHitspot1[Block[C].Type])
@@ -4336,18 +4348,24 @@ void UpdatePlayer()
                         {
                             numBlock = numBlock + 1;
                             Block[numBlock].Location.Y = NPC[B].Location.Y;
+                            // this block does not seem useful but I will sync it
+                            syncLayersTrees_Block(numBlock);
                             YoshiPound(A, Player[A].Mount, true);
                             Block[numBlock].Location.Y = 0;
                             numBlock = numBlock - 1;
+                            syncLayersTrees_Block(numBlock + 1);
                             Player[A].GroundPound = false;
                         }
                         else if(Player[A].YoshiYellow)
                         {
                             numBlock = numBlock + 1;
                             Block[numBlock].Location.Y = NPC[B].Location.Y;
+                            // this block does not seem useful but I will sync it
+                            syncLayersTrees_Block(numBlock);
                             YoshiPound(A, Player[A].Mount);
                             Block[numBlock].Location.Y = 0;
                             numBlock = numBlock - 1;
+                            syncLayersTrees_Block(numBlock + 1);
                         }
                     }
                     if(NPC[B].playerTemp == 0)

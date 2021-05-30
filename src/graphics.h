@@ -48,9 +48,13 @@ void UpdateGraphics(bool skipRepaint = false);
 // Public Sub GetvScreen(A As Integer) ' Get the screen position
 //  Get the screen position
 void GetvScreen(int A);
+//  Get the screen position assuming the game is 800x600
+void GetvScreenCanonical(int A, int* X, int* Y);
 // Public Sub GetvScreenAverage() ' Get the average screen position for all players
 //  Get the average screen position for all players
 void GetvScreenAverage();
+//  Get the average screen position assuming the game is 800x600
+void GetvScreenAverageCanonical(int* X, int* Y);
 // Public Sub GetvScreenAverage2() ' Get the average screen position for all players with no level edge detection
 //  Get the average screen position for all players with no level edge detection
 void GetvScreenAverage2();
@@ -65,11 +69,20 @@ void SetupScreens();
 // Public Sub DynamicScreen() 'for the split screen stuff
 // for the split screen stuff
 void DynamicScreen();
+// limit vScreens to playable section area and center them on the real screen
+void CenterScreens();
+// moves qScreen towards vScreen, now including the screen size
+void Update_qScreen();
 // Public Sub SuperPrint(SuperWords As String, Font As Integer, X As Single, Y As Single) 'prints text to the screen
 // prints text to the screen
 void SuperPrint(std::string SuperWords, int Font, float X, float Y, float r = 1.f, float g = 1.f, float b = 1.f, float a = 1.f);
 void SuperPrintRightAlign(std::string SuperWords, int Font, float X, float Y, float r = 1.f, float g = 1.f, float b = 1.f, float a = 1.f);
 void SuperPrintScreenCenter(std::string SuperWords, int Font, float Y, float r = 1.f, float g = 1.f, float b = 1.f, float a = 1.f);
+
+void SuperPrint(const char* SuperChars, int SuperN, int Font, float X, float Y, float r = 1.f, float g = 1.f, float b = 1.f, float a = 1.f);
+void SuperPrintRightAlign(const char* SuperChars, int SuperN, int Font, float X, float Y, float r = 1.f, float g = 1.f, float b = 1.f, float a = 1.f);
+void SuperPrintScreenCenter(const char* SuperChars, int SuperN, int Font, float Y, float r = 1.f, float g = 1.f, float b = 1.f, float a = 1.f);
+
 // Public Sub SetRes()
 void SetRes();
 // Public Function CheckKey(newStrizzle As String) As String
@@ -98,6 +111,12 @@ void DrawCredits();
 // Public Sub DrawInterface(Z As Integer, numScreens) 'draws the games interface
 // draws the games interface
 void DrawInterface(int Z, int numScreens);
+// draws the currently-shown MessageText on the primary screen
+void DrawMessage();
+// draws the level editor interface on vScreen Z
+void DrawEditorLevel(int Z);
+// draws the world editor interface
+void DrawEditorWorld();
 // Public Function pfrX(plrFrame As Integer) As Integer
 int pfrX(int plrFrame);
 // Public Function pfrY(plrFrame As Integer) As Integer

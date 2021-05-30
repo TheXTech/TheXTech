@@ -23,13 +23,16 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#ifndef NO_SDL
 #include <SDL2/SDL_audio.h>
+#endif
 
 #include "../globals.h"
 #include "../game_main.h"
 #include "../graphics.h"
 #include "../sound.h"
 #include "../control/joystick.h"
+#include "../config.h"
 
 #include <Utils/files.h>
 #include <Utils/strings.h>
@@ -51,6 +54,7 @@ void OpenConfig_preSetup()
             RenderMode = 2;
         config.endGroup();
 
+#ifndef NO_SDL
         config.beginGroup("sound");
         config.read("sample-rate", g_audioSetup.sampleRate, 44100);
         config.read("channels", g_audioSetup.channels, 2);
@@ -87,6 +91,23 @@ void OpenConfig_preSetup()
         };
         config.readEnum("format", g_audioSetup.format, (uint16_t)AUDIO_F32, sampleFormats);
         config.read("buffer-size", g_audioSetup.bufferSize, 512);
+        config.endGroup();
+#endif // #ifndef NO_SDL
+
+        config.beginGroup("video");
+#ifndef FIXED_RES
+        config.read("internal-width", config_InternalW, 800);
+        config.read("internal-height", config_InternalH, 600);
+#endif
+        IniProcessing::StrEnumMap scaleModes =
+        {
+            {"linear", (int)ScaleMode_t::DYNAMIC_LINEAR},
+            {"integer", (int)ScaleMode_t::DYNAMIC_INTEGER},
+            {"nearest", (int)ScaleMode_t::DYNAMIC_NEAREST},
+            {"1x", (int)ScaleMode_t::FIXED_1X},
+            {"2x", (int)ScaleMode_t::FIXED_2X},
+        };
+        config.readEnum("scale-mode", config_ScaleMode, ScaleMode_t::DYNAMIC_NEAREST, scaleModes);
         config.endGroup();
     }
 }
@@ -133,6 +154,10 @@ void OpenConfig()
         config.read("full-screen", resBool, false);
         config.read("frame-skip", FrameSkip, FrameSkip);
         config.read("show-fps", ShowFPS, ShowFPS);
+        config.endGroup();
+
+        config.beginGroup("video");
+        config.read("full-screen", resBool, resBool);
         config.endGroup();
 
         config.beginGroup("gameplay");
@@ -233,14 +258,25 @@ void SaveConfig()
 
     config.beginGroup("main");
     config.setValue("release", curRelease);
-#if !defined(__EMSCRIPTEN__) && !defined(__ANDROID__) // Don't remember fullscreen state for Emscripten!
-    config.setValue("full-screen", resChanged);
-#endif
     // TODO: Make sure, saving of those settings will not been confused by line arguments
 //    config.setValue("frame-skip", FrameSkip);
 //    config.setValue("show-fps", ShowFPS);
     config.endGroup();
 
+#ifndef __3DS__
+    config.beginGroup("video");
+#if !defined(__EMSCRIPTEN__) && !defined(__ANDROID__) // Don't remember fullscreen state for Emscripten!
+    config.setValue("full-screen", resChanged);
+#endif
+#ifndef FIXED_RES
+    config.setValue("internal-width", config_InternalW);
+    config.setValue("internal-height", config_InternalH);
+#endif
+    config.setValue("scale-mode", ScaleMode_strings.at(config_ScaleMode));
+    config.endGroup();
+#endif
+
+#ifndef NO_SDL
     config.beginGroup("sound");
     config.setValue("sample-rate", g_audioSetup.sampleRate);
     config.setValue("channels", g_audioSetup.channels);
@@ -259,6 +295,7 @@ void SaveConfig()
     };
     config.setValue("format", formats_back.at(g_audioSetup.format));
     config.endGroup();
+#endif
 
     config.beginGroup("gameplay");
     config.setValue("ground-pound-by-alt-run", GameplayPoundByAltRun);

@@ -26,7 +26,12 @@
 #ifndef FLOATS_H
 #define FLOATS_H
 
+#ifndef NO_SDL
 #include <SDL2/SDL_types.h>
+#else
+#include "SDL_supplement.h"
+#endif
+
 #include <Utils/maths.h>
 
 /**

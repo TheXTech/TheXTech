@@ -35,6 +35,11 @@ static std::uniform_real_distribution<float> distF(0.0f, 1.0f);
 static std::uniform_int_distribution<int> distI(0, RAND_MAX);
 
 
+void seedRandom(int seed)
+{
+    mt.seed(seed);
+}
+
 float fRand()
 {
     return distF(mt);
