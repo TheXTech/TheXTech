@@ -8,6 +8,7 @@ assignees: ''
 ---
 
 **Describe the issue**
+
 A clear and concise description of what the bug is.
 
 **Example Case**
@@ -18,7 +19,7 @@ Even better: If you make a dedicated test level and link to that or attach it to
 
 **Recording**
 
-Add a link to a Recording here. If it's an in-game issue, you can use TheXTech's built-in GIF Recorder (Press F11 or F10 on macOS). If it's a crash, use a Screen Capture program such as OBS or vokoscreen.
+Embed or add a link to a Recording here. If it's an in-game issue, you can use TheXTech's built-in GIF Recorder (Press F11 or F10 on macOS). If it's a crash, use a Screen Capture program such as OBS or vokoscreen.
 
 **Vanilla Recording**
 
