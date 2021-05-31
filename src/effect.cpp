@@ -1358,7 +1358,12 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
         Effect[numEffects].Location.Height = EffectHeight[A];
         Effect[numEffects].Location.X = Location.X + Location.Width / 2.0 - Effect[numEffects].Location.Width / 2.0;
         Effect[numEffects].Location.Y = Location.Y + Location.Height - Effect[numEffects].Location.Height;
-        if(Location.SpeedY != -5.1)
+        if(fEqual(Location.SpeedY, 0.123))
+        {
+            Effect[numEffects].Location.SpeedY = 1;
+            Effect[numEffects].Location.SpeedX = 0;
+        }
+        else if(Location.SpeedY != -5.1)
         {
             Effect[numEffects].Location.SpeedY = -11;
             Effect[numEffects].Location.SpeedX = Location.SpeedX;

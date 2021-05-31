@@ -42,6 +42,9 @@ struct GameInfo
     int creditsFont;
     std::string creditsHomePage;
     std::vector<std::string> creditsGame;
+
+    bool introEnableActivity = true;
+    int  introMaxPlayersCount = 6;
 };
 
 extern GameInfo g_gameInfo;

@@ -46,13 +46,14 @@ jobs:
           PIN_ALIAS: ${{ secrets.PIN_ALIAS }}
           DB_PASS_ALIAS: ${{ secrets.DB_PASS_ALIAS }}
       - name: Upload APK
+        if: success()
         uses: actions/upload-artifact@v2
         with:
           name: thextech-releaseci
           path: android-project/thextech/build/outputs/apk/releaseci/thextech-releaseci.apk
 
       - name: Deploy to builds.wohlsoft.ru
-        if: github.event_name != 'pull_request'
+        if: success() && github.event_name != 'pull_request'
         shell: bash
         run: |
           UPLOAD_LIST="set ssl:verify-certificate no;"

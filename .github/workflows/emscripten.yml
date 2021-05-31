@@ -98,7 +98,7 @@ jobs:
         emmake cmake --build build --target all
 
     - name: Create Package
-      if: always()
+      if: success()
       shell: bash
       run: |
         cd build
@@ -116,14 +116,14 @@ jobs:
         cd ../..
 
     - name: Upload artifact
-      if: always()
+      if: success()
       uses: actions/upload-artifact@v2
       with:
         path: build/package/${{ matrix.config.package_filename }}
         name: ${{ matrix.config.name }} ${{ matrix.config.build_type }}
 
     - name: Deploy to builds.wohlsoft.ru
-      if: github.event_name != 'pull_request'
+      if: success() && github.event_name != 'pull_request'
       shell: bash
       run: |
         if [[ ! -z "${{ matrix.config.extra_path }}" ]]; then

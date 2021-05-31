@@ -865,15 +865,16 @@ void ProcEvent(std::string EventName, bool NoEffect)
                 if(!autoScrollerChanged)
                 {
                     // Do set the autoscrool when non-zero values only, don't zero by other autoruns
-                    if(evt.AutoX != 0.0 || evt.AutoY != 0.0)
+                    if((evt.AutoX != 0.0 || evt.AutoY != 0.0) && IF_INRANGE(evt.AutoSection, 0, maxSections))
                     {
                         AutoX[evt.AutoSection] = evt.AutoX;
                         AutoY[evt.AutoSection] = evt.AutoY;
                     }
                 }
             }
-            else // Buggy behavior, see https://github.com/Wohlstand/TheXTech/issues/44
+            else if(IF_INRANGE(evt.AutoSection, 0, maxSections) && IF_INRANGE(evt.AutoSection, 0, maxEvents))
             {
+                // Buggy behavior, see https://github.com/Wohlstand/TheXTech/issues/44
                 AutoX[evt.AutoSection] = Events[evt.AutoSection].AutoX;
                 AutoY[evt.AutoSection] = Events[evt.AutoSection].AutoY;
             }

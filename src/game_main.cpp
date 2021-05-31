@@ -63,6 +63,7 @@
 #include "main/level_file.h"
 #include "main/speedrunner.h"
 #include "main/menu_main.h"
+#include "main/game_info.h"
 #include "main/trees.h"
 #include "rand.h"
 
@@ -485,7 +486,9 @@ int GameMain(const CmdLineSetup_t &setup)
                 Player[A] = blankPlayer;
             }
 
-            numPlayers = 6;
+            numPlayers = g_gameInfo.introMaxPlayersCount;
+            if(!g_gameInfo.introEnableActivity || g_gameInfo.introMaxPlayersCount < 1)
+                numPlayers = 1;// one deadman should be
 
             auto introPath = AppPath + "intro.lvlx";
             if(!Files::fileExists(introPath))
@@ -1584,12 +1587,30 @@ void DeleteSave(int world, int save)
 void CopySave(int world, int src, int dst)
 {
     auto &w = SelectWorld[world];
+    std::string savePathOld = SelectWorld[world].WorldPath + fmt::format_ne("save{0}.savx", src);
+    std::string savePathAncient = SelectWorld[world].WorldPath + fmt::format_ne("save{0}.sav", src);
+
     std::string savePathSrc = makeGameSavePath(w.WorldPath,
                                                w.WorldFile,
                                                fmt::format_ne("save{0}.savx", src));
     std::string savePathDst = makeGameSavePath(w.WorldPath,
                                                w.WorldFile,
                                                fmt::format_ne("save{0}.savx", dst));
+
+    if(!Files::fileExists(savePathSrc)) // Attempt to convert an old game-save from the episode directory
+    {
+        GamesaveData sav;
+        bool succ = false;
+
+        if(Files::fileExists(savePathOld))
+            succ = FileFormats::ReadExtendedSaveFileF(savePathOld, sav);
+        else if(Files::fileExists(savePathAncient))
+            succ = FileFormats::ReadSMBX64SavFileF(savePathAncient, sav);
+
+        if(succ)
+            FileFormats::WriteExtendedSaveFileF(savePathSrc, sav);
+    }
+
     Files::copyFile(savePathDst, savePathSrc, true);
 
     std::string timersPathSrc = makeGameSavePath(w.WorldPath,

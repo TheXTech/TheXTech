@@ -42,20 +42,16 @@
 #include "../collision.h"
 #include "level_file.h"
 #include "menu_main.h"
+#include "game_info.h"
 #include "speedrunner.h"
 #include "trees.h"
 
 #include "../pseudo_vb.h"
 
-void MenuLoop()
+static void updateIntroLevelActivity()
 {
     Location_t tempLocation;
     bool tempBool;
-
-    UpdateControls();
-
-    if(mainMenuUpdate())
-        return;
 
     SingleCoop = 0;
 
@@ -217,7 +213,7 @@ void MenuLoop()
         if(p.Location.X > -vScreenX[1] + vScreen[1].Width * 0.75 && -vScreenX[1] + vScreen[1].Width + 50 < level[0].Width)
             p.Controls.Run = false;
 
-        if(-vScreenX[1] <= level[0].X && (p.Dead || p.TimeToLive > 0))
+        if(-vScreenX[1] <= level[0].X && (p.Dead || p.TimeToLive > 0) && g_gameInfo.introMaxPlayersCount > 0)
         {
             p.ForceHold = 65;
             p.State = (iRand() % 6) + 2;
@@ -479,6 +475,28 @@ void MenuLoop()
     UpdateGraphics();
     UpdateSound();
     UpdateEvents();
+}
+
+void MenuLoop()
+{
+    UpdateControls();
+
+    if(mainMenuUpdate())
+        return;
+
+    if(g_gameInfo.introEnableActivity)
+        updateIntroLevelActivity();
+    else
+    {
+        UpdateLayers();
+        UpdateNPCs();
+        UpdateBlocks();
+        UpdateEffects();
+        //UpdatePlayer();
+        UpdateGraphics();
+        UpdateSound();
+        UpdateEvents();
+    }
 
     if(MenuMouseDown)
     {
@@ -511,7 +529,7 @@ void MenuLoop()
             }
         }
 
-        tempLocation = newLoc(MenuMouseX - vScreenX[1], MenuMouseY - vScreenY[1]);
+        Location_t tempLocation = newLoc(MenuMouseX - vScreenX[1], MenuMouseY - vScreenY[1]);
         for(Block_t* block : treeBlockQuery(tempLocation, false))
         {
             int A = block - &Block[1] + 1;

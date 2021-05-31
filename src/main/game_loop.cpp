@@ -214,7 +214,7 @@ void PauseGame(int plr)
     bool stopPause = false;
     int A = 0;
     int B = 0;
-    bool noButtons = false;
+    bool noButtons = false, quitNoSound = false;
 //    double fpsTime = 0;
 //    int fpsCount = 0;
 
@@ -468,6 +468,8 @@ void PauseGame(int plr)
                         else if(MenuCursor == 1 && (LevelSelect || (/*StartLevel == FileName*/IsEpisodeIntro && NoMap)) && !Cheater) // "Save and continue"
                         {
                             SaveGame();
+                            PlaySound(SFX_Checkpoint);
+                            quitNoSound = true;
                             stopPause = true;
                         }
                         else // "Quit" or "Save & Quit"
@@ -552,7 +554,7 @@ void PauseGame(int plr)
     Player[plr].UnStart = false;
     Player[plr].CanJump = false;
 
-    if(!TestLevel && MessageText.empty())
+    if(!TestLevel && MessageText.empty() && !quitNoSound)
         PlaySound(SFX_Pause);
 
     if(PSwitchTime > 0)
