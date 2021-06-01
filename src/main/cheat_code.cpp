@@ -793,7 +793,7 @@ void CheatCode(char NewKey)
                         Player[C].Location.SpeedY = dRand() * 24 - 12;
                     }
                 }
-                Bomb(Player[B].Location, (iRand() % 2) + 2);
+                Bomb(Player[B].Location, iRand(2) + 2);
             }
             CheatString.clear();
             cheated = true;
@@ -817,7 +817,7 @@ void CheatCode(char NewKey)
                         Player[C].Location.SpeedY = dRand() * 24 - 12;
                     }
                 }
-                Bomb(Player[B].Location, (iRand() % 2) + 2);
+                Bomb(Player[B].Location, iRand(2) + 2);
             }
             CheatString.clear();
             cheated = true;
@@ -841,7 +841,7 @@ void CheatCode(char NewKey)
                         Player[C].Location.SpeedY = dRand() * 24 - 12;
                     }
                 }
-                Bomb(Player[B].Location, (iRand() % 2) + 2);
+                Bomb(Player[B].Location, iRand(2) + 2);
             }
             CheatString.clear();
             cheated = true;
@@ -865,7 +865,7 @@ void CheatCode(char NewKey)
                         Player[C].Location.SpeedY = dRand() * 24 - 12;
                     }
                 }
-                Bomb(Player[B].Location, (iRand() % 2) + 2);
+                Bomb(Player[B].Location, iRand(2) + 2);
             }
             CheatString.clear();
             cheated = true;
@@ -889,7 +889,7 @@ void CheatCode(char NewKey)
                         Player[C].Location.SpeedY = dRand() * 24 - 12;
                     }
                 }
-                Bomb(Player[B].Location, (iRand() % 2) + 2);
+                Bomb(Player[B].Location, iRand(2) + 2);
             }
             CheatString.clear();
             cheated = true;
@@ -913,7 +913,7 @@ void CheatCode(char NewKey)
                         Player[C].Location.SpeedY = dRand() * 24 - 12;
                     }
                 }
-                Bomb(Player[B].Location, (iRand() % 2) + 2);
+                Bomb(Player[B].Location, iRand(2) + 2);
             }
             CheatString.clear();
             cheated = true;
@@ -964,7 +964,7 @@ void CheatCode(char NewKey)
                         }
                     }
                 }
-                Bomb(Player[B].Location, (iRand() % 2) + 2);
+                Bomb(Player[B].Location, iRand(2) + 2);
             }
             CheatString.clear();
             cheated = true;
@@ -980,7 +980,7 @@ void CheatCode(char NewKey)
                 {
                     if(C != B)
                     {
-                        Bomb(Player[C].Location, (iRand() % 2) + 2);
+                        Bomb(Player[C].Location, iRand(2) + 2);
                     }
                 }
                 numPlayers = 1;
@@ -1054,7 +1054,7 @@ void CheatCode(char NewKey)
                         }
                     }
                 }
-                Bomb(Player[B].Location, (iRand() % 2) + 2);
+                Bomb(Player[B].Location, iRand(2) + 2);
             }
             CheatString.clear();
             cheated = true;

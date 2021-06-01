@@ -217,13 +217,13 @@ static void updateIntroLevelActivity()
         if(-vScreenX[1] <= level[0].X && (p.Dead || p.TimeToLive > 0) && g_gameInfo.introMaxPlayersCount > 0)
         {
             p.ForceHold = 65;
-            p.State = (iRand() % 6) + 2;
+            p.State = iRand(6) + 2;
             p.CanFly = false;
             p.CanFly2 = false;
             p.TailCount = 0;
             p.Dead = false;
             p.TimeToLive = 0;
-            p.Character = (iRand() % 5) + 1;
+            p.Character = iRand(5) + 1;
 
             if(A >= 1 && A <= 5)
                 p.Character = A;
@@ -284,10 +284,10 @@ static void updateIntroLevelActivity()
 
             if(!UnderWater[p.Section])
             {
-                if((iRand() % 25) + 1 == 25)
+                if(iRand(25) + 1 == 25)
                 {
                     p.Mount = 1;
-                    p.MountType = (iRand() % 3) + 1;
+                    p.MountType = iRand(3) + 1;
                     if(p.State == 1)
                     {
                         p.Location.Height = Physics.PlayerHeight[1][2];
@@ -298,10 +298,10 @@ static void updateIntroLevelActivity()
 
             if(p.Mount == 0 && p.Character <= 2)
             {
-                if((iRand() % 15) + 1 == 15)
+                if(iRand(15) + 1 == 15)
                 {
                     p.Mount = 3;
-                    p.MountType = (iRand() % 7) + 1;
+                    p.MountType = iRand(7) + 1;
                     p.Location.Y = p.Location.Y + p.Location.Height;
                     p.Location.Height = Physics.PlayerHeight[2][2];
                     p.Location.Y = p.Location.Y - p.Location.Height - 0.01;
@@ -324,7 +324,7 @@ static void updateIntroLevelActivity()
                     {
                         do
                         {
-                            n.Type = (iRand() % 286) + 1;
+                            n.Type = iRand(286) + 1;
                         } while(n.Type == 11 || n.Type == 16 || n.Type == 18 || n.Type == 15 ||
                                 n.Type == 21 || n.Type == 12 || n.Type == 13 || n.Type == 30 ||
                                 n.Type == 17 || n.Type == 31 || n.Type == 32 ||
@@ -402,9 +402,9 @@ static void updateIntroLevelActivity()
         if(NPC[Player[A].HoldingNPC].Type == 13 && (dRand() * 100) > 95.0)
         {
             Player[A].Controls.Run = false;
-            if(iRand() % 2 == 1)
+            if(iRand(2) == 1)
                 Player[A].Controls.Up = true;
-            if(iRand() % 2 == 1)
+            if(iRand(2) == 1)
                 Player[A].Controls.Right = false;
         }
 

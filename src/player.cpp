@@ -1385,7 +1385,7 @@ void PlayerFrame(int A)
                                     PlaySound(SFX_Skid);
                                     if(Player[A].SlideCounter <= 0)
                                     {
-                                        Player[A].SlideCounter = 2 + iRand() % 2;
+                                        Player[A].SlideCounter = 2 + iRand(2);
                                         tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height - 5;
                                         tempLocation.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - 4 + 8 * -Player[A].Direction;
                                         NewEffect(74, tempLocation, 1, 0, ShadowMode);
@@ -1436,7 +1436,7 @@ void PlayerFrame(int A)
                         PlaySound(SFX_Skid);
                         if(Player[A].SlideCounter <= 0)
                         {
-                            Player[A].SlideCounter = 2 + iRand() % 2;
+                            Player[A].SlideCounter = 2 + iRand(2);
                             tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height - 5;
                             tempLocation.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - 4 + 10 * -Player[A].Direction;
                             NewEffect(74, tempLocation, 1, 0, ShadowMode);
@@ -1581,7 +1581,7 @@ void PlayerFrame(int A)
                                     PlaySound(SFX_Skid);
                                     if(Player[A].SlideCounter <= 0)
                                     {
-                                        Player[A].SlideCounter = 2 + iRand() % 2;
+                                        Player[A].SlideCounter = 2 + iRand(2);
                                         tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height - 5;
                                         tempLocation.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - 4 + 6 * -Player[A].Direction;
                                         NewEffect(74, tempLocation, 1, 0, ShadowMode);
@@ -1599,7 +1599,7 @@ void PlayerFrame(int A)
                                     PlaySound(SFX_Skid);
                                     if(Player[A].SlideCounter <= 0)
                                     {
-                                        Player[A].SlideCounter = 2 + iRand() % 2;
+                                        Player[A].SlideCounter = 2 + iRand(2);
                                         tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height - 5;
                                         tempLocation.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - 4 + 10 * -Player[A].Direction;
                                         NewEffect(74, tempLocation, 1, 0, ShadowMode);
@@ -1722,7 +1722,7 @@ void PlayerFrame(int A)
                         PlaySound(SFX_Skid);
                         if(Player[A].SlideCounter <= 0)
                         {
-                            Player[A].SlideCounter = 2 + iRand() % 2;
+                            Player[A].SlideCounter = 2 + iRand(2);
                             tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height - 5;
                             tempLocation.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - 4 + 10 * -Player[A].Direction;
                             NewEffect(74, tempLocation, 1, 0, ShadowMode);
@@ -2382,7 +2382,7 @@ void YoshiEat(int A)
                 }
                 if(NPC[B].Type == 147)
                 {
-                    NPC[B].Type = 139 + (iRand() % 9);
+                    NPC[B].Type = 139 + iRand(9);
                     if(NPC[B].Type == 147)
                         NPC[B].Type = 92;
                     NPC[B].Location.X = NPC[B].Location.X + NPC[B].Location.Width / 2.0;
@@ -3072,7 +3072,7 @@ void YoshiEatCode(int A)
             }
             else if(Player[A].MountType == 7 && NPCIsABonus[NPC[Player[A].YoshiNPC].Type] == false)
             {
-                B = (iRand() % 9);
+                B = iRand(9);
                 NPC[Player[A].YoshiNPC].Type = 139 + B;
                 if(NPC[Player[A].YoshiNPC].Type == 147)
                     NPC[Player[A].YoshiNPC].Type = 92;
@@ -4266,7 +4266,7 @@ void PlayerCollide(int A)
                         Player[A].Bumped2 = -1;
                         Player[B].Bumped2 = 1;
                     }
-                    else if(iRand() % 2 == 1)
+                    else if(iRand(2) == 1)
                     {
                         Player[A].Bumped2 = -1;
                         Player[B].Bumped2 = 1;
@@ -4366,7 +4366,7 @@ void PlayerGrabCode(int A, bool DontResetGrabTime)
                         NPC[Player[A].StandingOnNPC].Location.Width = NPCWidth[NPC[Player[A].StandingOnNPC].Type];
                         if(NPC[Player[A].StandingOnNPC].Type == 147)
                         {
-                            B = (iRand() % 9);
+                            B = iRand(9);
                             NPC[Player[A].StandingOnNPC].Type = 139 + B;
                             if(NPC[Player[A].StandingOnNPC].Type == 147)
                                 NPC[Player[A].StandingOnNPC].Type = 92;

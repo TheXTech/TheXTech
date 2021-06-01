@@ -707,7 +707,7 @@ void UpdateNPCs()
                     NPC[A].Special = 100;
             }
             if(NPC[A].Type == 84 || NPC[A].Type == 181)
-                NPC[A].Special = iRand() % 200;
+                NPC[A].Special = iRand(200);
             NPC[A].JustActivated = 0;
             NPC[A].CantHurt = 0;
             NPC[A].CantHurtPlayer = 0;
@@ -879,7 +879,7 @@ void UpdateNPCs()
 
             if(NPC[A].Type == 147)
             {
-                B = iRand() % 9;
+                B = iRand(9);
                 NPC[A].Type = 139 + B;
                 if(NPC[A].Type == 147)
                     NPC[A].Type = 92;
@@ -1000,7 +1000,7 @@ void UpdateNPCs()
                             NPC[A].Location.Width = NPCWidth[NPC[A].Type];
                             if(NPC[A].Type == 147)
                             {
-                                B = iRand() % 9;
+                                B = iRand(9);
                                 NPC[A].Type = 139 + B;
                                 if(NPC[A].Type == 147)
                                     NPC[A].Type = 92;
@@ -1213,7 +1213,7 @@ void UpdateNPCs()
                     {
                         if(NPC[A].Direction == 0)
                         {
-                            if(iRand() % 2 == 0)
+                            if(iRand(2) == 0)
                                 NPC[A].Direction = -1;
                             else
                                 NPC[A].Direction = 1;
@@ -3930,7 +3930,7 @@ void UpdateNPCs()
                         else
                         {
                             do
-                                B = (iRand() % numPlayers) + 1;
+                                B = iRand(numPlayers) + 1;
                             while(Player[B].Dead || Player[B].TimeToLive > 0);
                             NPC[A].Special5 = B;
                         }
@@ -4634,7 +4634,7 @@ void UpdateNPCs()
                         {
                             NPC[A].Location.SpeedX = 0;
                             if(fiEqual(NPC[A].Special, 0))
-                                NPC[A].Special = (iRand() % 3) + 1;
+                                NPC[A].Special = iRand(3) + 1;
                             if(fiEqual(NPC[A].Special, 1))
                             {
                                 NPC[A].FrameCount = NPC[A].FrameCount + 1;

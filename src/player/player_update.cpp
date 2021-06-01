@@ -1653,7 +1653,7 @@ void UpdatePlayer()
                                     tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height - 2 + dRand() * (NPC[Player[A].StandingOnNPC].Location.Height - 8) + 4;
                                     tempLocation.X = Player[A].Location.X - 4 + dRand() * (Player[A].Location.Width - 8) + 4 - 8 * Player[A].Direction;
                                     NewEffect(80, tempLocation, 1, 0, ShadowMode);
-                                    Effect[numEffects].Frame = iRand() % 3;
+                                    Effect[numEffects].Frame = iRand(3);
                                     Effect[numEffects].Location.SpeedY = (Player[A].Location.Y + Player[A].Location.Height + NPC[Player[A].StandingOnNPC].Location.Height / 32.0 - tempLocation.Y + 12) * 0.05;
                                 }
                             }
@@ -3612,9 +3612,9 @@ void UpdatePlayer()
                                                 Effect[numEffects].Location.SpeedX = dRand() * 3 - 1.5 + NPC[B].Location.SpeedX * 0.1;
                                                 Effect[numEffects].Location.SpeedY = dRand() * 3 - 1.5 - NPC[B].Location.SpeedY * 0.1;
                                                 if(Effect[numEffects].Frame == 0)
-                                                    Effect[numEffects].Frame = -(iRand() % 3);
+                                                    Effect[numEffects].Frame = -iRand(3);
                                                 else
-                                                    Effect[numEffects].Frame = 5 + (iRand() % 3);
+                                                    Effect[numEffects].Frame = 5 + iRand(3);
                                             }
                                             NPC[B].Location.X = NPC[B].Location.X + NPC[B].Location.Width / 2.0 - EffectWidth[10] / 2.0;
                                             NPC[B].Location.Y = NPC[B].Location.Y + NPC[B].Location.Height / 2.0 - EffectHeight[10] / 2.0;

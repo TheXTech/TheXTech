@@ -160,7 +160,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
     {
         if(b.RapidHit > 0 && Player[whatPlayer].Character == 4 && whatPlayer > 0)
         {
-            b.RapidHit = (iRand() % 3) + 1;
+            b.RapidHit = (iRand(3)) + 1;
         }
         return;
     }
@@ -333,7 +333,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
     {
         if(whatPlayer > 0 && Player[whatPlayer].Character == 4)
         {
-            b.RapidHit = (iRand() % 3) + 1;
+            b.RapidHit = (iRand(3)) + 1;
         }
 
         if(!HitDown)

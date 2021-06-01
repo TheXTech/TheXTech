@@ -68,7 +68,7 @@ void KillNPC(int A, int B)
             NewEffect(80, tempLocation);
             Effect[numEffects].Location.SpeedX = dRand() * 4 - 2 - NPC[A].Location.SpeedX * 0.2;
             Effect[numEffects].Location.SpeedY = dRand() * 4 - 2 + NPC[A].Location.SpeedY * 0.2;
-            Effect[numEffects].Frame = (iRand() % 3);
+            Effect[numEffects].Frame = iRand(3);
         }
         PlaySound(SFX_Icebreak);
         NPC[A].Type = NPC[A].Special;
@@ -346,7 +346,7 @@ void KillNPC(int A, int B)
                         NewEffect(80, tempLocation);
                         Effect[numEffects].Location.SpeedX = dRand() * 2 - 1 - NPC[A].Location.SpeedX * 0.3;
                         Effect[numEffects].Location.SpeedY = dRand() * 2 - 1 + NPC[A].Location.SpeedY * 0.3;
-                        Effect[numEffects].Frame = iRand() % 3;
+                        Effect[numEffects].Frame = iRand(3);
                     }
                 }
                 else

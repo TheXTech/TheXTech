@@ -1282,7 +1282,7 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
                 Effect[numEffects].Location.X = Effect[numEffects].Location.X + Effect[numEffects].Location.SpeedX * 3;
                 Effect[numEffects].Location.Y = Effect[numEffects].Location.Y + Effect[numEffects].Location.SpeedY * 3;
 
-                Effect[numEffects].Frame = iRand() % 4;
+                Effect[numEffects].Frame = iRand(4);
                 Effect[numEffects].Type = A;
             }
         }
@@ -1502,9 +1502,9 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
         Effect[numEffects].Location.SpeedY = -2 - dRand() * 10;
         Effect[numEffects].Location.SpeedX = dRand() * 8 - 4;
         Effect[numEffects].Frame = 0;
-        if((iRand() % 2) == 1)
+        if((iRand(2)) == 1)
             Effect[numEffects].Frame = 7;
-        Effect[numEffects].Frame += iRand() % 7;
+        Effect[numEffects].Frame += iRand(7);
         Effect[numEffects].Life = 300;
         Effect[numEffects].Type = A;
     }
