@@ -57,6 +57,7 @@
 #include "main/speedrunner.h"
 #include "main/menu_main.h"
 #include "main/game_info.h"
+#include "main/record.h"
 
 #include "pseudo_vb.h"
 
@@ -108,6 +109,11 @@ int GameMain(const CmdLineSetup_t &setup)
 
     g_speedRunnerMode = setup.speedRunnerMode;
     speedRun_setSemitransparentRender(setup.speedRunnerSemiTransparent);
+
+    g_recordControlReplay = setup.recordReplay;
+    g_recordControlRecord = setup.recordRecord;
+    g_recordGameplay = setup.recordReplay | setup.recordRecord;
+    g_recordReplayId = setup.recordReplayId;
 
     ResetCompat();
 
@@ -577,6 +583,8 @@ int GameMain(const CmdLineSetup_t &setup)
             CheatString.clear();
             EndLevel = false;
 
+            record_init(); // initializes level data recording
+
             if(numPlayers == 1)
                 ScreenType = 0; // Follow 1 player
             else if(numPlayers == 2)
@@ -715,6 +723,7 @@ int GameMain(const CmdLineSetup_t &setup)
                 }
                 return false;
             });
+            record_finish();
             if(!GameIsActive)
             {
                 speedRun_saveStats();

@@ -29,23 +29,32 @@
 #include "rand.h"
 
 static std::random_device rd;
-static std::mt19937 mt(rd());
-static std::uniform_real_distribution<double> distD(0.0, 1.0);
-static std::uniform_real_distribution<float> distF(0.0f, 1.0f);
-static std::uniform_int_distribution<int> distI(0, RAND_MAX);
+static std::mt19937 engine(rd());
 
+void seedRandom(int seed)
+{
+    engine.seed(seed);
+}
 
 float fRand()
 {
-    return distF(mt);
+    return (float)((double)(engine()) / (double)0x100000000);
 }
 
+// seems crazy to drop to float precision and back,
+// but the VB6 random code lives in single precision
 double dRand()
 {
-    return distD(mt);
+    return (double)fRand();
 }
 
 int iRand()
 {
-    return distI(mt);
+    return engine() & 0x7fffffff;
+}
+
+// this is how the original VB6 code does it
+int iRand(int max)
+{
+    return (int)(fRand() * max);
 }

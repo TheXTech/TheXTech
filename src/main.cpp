@@ -225,6 +225,16 @@ int main(int argc, char**argv)
 
         TCLAP::UnlabeledValueArg<std::string> inputFileNames("levelpath", "Path to level file to run the test", false, std::string(), "path to file");
 
+        TCLAP::ValueArg<int> recordReplayId(std::string(), "replay-id",
+                                                   "Index of recording data to replay.\n",
+                                                    false, -1,
+                                                   "index found in recording filename",
+                                                   cmd);
+        TCLAP::SwitchArg recordReplay(std::string(), "replay",
+                                        "Replay previous game data.", false);
+        TCLAP::SwitchArg recordRecord(std::string(), "record",
+                                        "Record your gameplay data.", false);
+
         cmd.add(&switchFrameSkip);
         cmd.add(&switchNoSound);
         cmd.add(&switchNoPause);
@@ -239,6 +249,9 @@ int main(int argc, char**argv)
         cmd.add(&switchVerboseLog);
         cmd.add(&switchSpeedRunSemiTransparent);
         cmd.add(&inputFileNames);
+
+        cmd.add(&recordReplay);
+        cmd.add(&recordRecord);
 
         cmd.parse(argc, argv);
 
@@ -300,6 +313,23 @@ int main(int argc, char**argv)
 
         setup.speedRunnerMode = speedRunMode.getValue();
         setup.speedRunnerSemiTransparent = switchSpeedRunSemiTransparent.getValue();
+
+        setup.recordReplay = recordReplay.getValue();
+        setup.recordRecord = recordRecord.getValue();
+        setup.recordReplayId = recordReplayId.getValue();
+
+        if(setup.recordReplayId != -1)
+            setup.recordReplay = true;
+
+        if(setup.recordReplay || setup.recordRecord)
+            setup.frameSkip = false;
+
+        if(setup.testLevelMode && setup.recordReplay)
+        {
+            setup.testShowFPS = true;
+            setup.testMaxFPS = true;
+            setup.neverPause = true;
+        }
 
         if(setup.speedRunnerMode >= 1) // Always show FPS and don't pause the game work when focusing other windows
         {
