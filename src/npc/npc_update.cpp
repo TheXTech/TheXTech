@@ -43,6 +43,8 @@
 static RangeArr<int, 0, maxNPCs> newAct;
 // Why this array is here? to don't reallocate it every call of UpdateNPCs()
 
+extern int64_t frame_no;
+
 void UpdateNPCs()
 {
     // this is 1 of the 2 clusterfuck subs in the code, be weary
@@ -58,13 +60,26 @@ void UpdateNPCs()
 //    std::string tempStr;
     int oldSlope = 0; // previous sloped block the npc was on
 //    NPC_t tempNPC;
-    int HitSpot = 0; // used for collision detection
+    int HitSpot = COLLISION_NONE; // used for collision detection
     double tempHit = 0;
-    double tempHitOld = 0;
     Block_t tmpBlock;
     int tempHitBlock = 0;
-    int tempHitOldBlock = 0;
     int tempHitIsSlope = 0;
+    int tempHitCode = 0;
+    // Temp hit codes for how tempHitBlock interacts with other possible blocks:
+    // 0 is normal (sort with smart code if compat allows)
+    // 1 is invalidate (invalidates all tempHit values before it in an (x, y) sort,
+    //                  including itself, and competes normally to fill the slot)
+    // 2 is erase (invalidates all blocks before it, and fills the slot with a 0)
+    // 3 is slope (invalidates all blocks before it, but only
+    //             according to the slope condition, and fills the slot with a 0)
+
+    int tempHit_n;
+    int tempHitBlock_stack[16];
+    int tempHitCode_stack[16];
+    bool tempHitValid_stack[16];
+    float tempHit_stack[16];
+
     float tempSpeedA = 0;
 //    float tempSpeedB = 0;
     bool tempTurn = false; // used for turning the npc around
@@ -1131,6 +1146,8 @@ void UpdateNPCs()
                         NPC[A].CantHurtPlayer = 0;
                     tempHit = 0;
                     tempHitBlock = 0;
+                    tempHitCode = 0;
+                    tempHit_n = 0;
                     tempBlockHit[1] = 0;
                     tempBlockHit[2] = 0;
                     winningBlock = 0;
@@ -1960,9 +1977,6 @@ void UpdateNPCs()
                         {
                             // for(bCheck = 1; bCheck <= 2; bCheck++)
                             {
-                                // is there some benefit to doing this two-pass structure?
-                                // (first real blocks, then temp blocks?)
-
                                 // if(bCheck == 1)
                                 // {
                                 //     // fBlock = FirstBlock[(int)SDL_floor(NPC[A].Location.X / 32) - 1];
@@ -1977,6 +1991,16 @@ void UpdateNPCs()
 
                                 // for(B = 1; B <= numBlock; B++)
                                 // {
+
+                                //     The goal of this code block is:
+                                // (1) push NPCs out of the way of blocks, and
+                                // (2) figure out which block the NPC is walking on.
+
+                                // Now that blocks are not sorted, the first one is okay but the second is tricky.
+                                // A tempHit can be *invalidated* when an NPC is pushed out of its range by a
+                                // collision that would have occurred previously if the NPCs had been sorted.
+                                // It can also be invalidated by certain code that deals with slopes.
+                                // Therefore, we can't just keep the single best tempHit in memory at one time.
                                 for(Block_t* block : treeBlockQuery(NPC[A].Location, false))
                                 {
                                     B = block - &Block[1] + 1;
@@ -2013,7 +2037,7 @@ void UpdateNPCs()
                                                             if(NPC[A].Wet == 0)
                                                             {
                                                                 if(NPC[A].WallDeath >= 9)
-                                                                    HitSpot = 0;
+                                                                    HitSpot = COLLISION_NONE;
                                                             }
                                                         }
 
@@ -2021,42 +2045,42 @@ void UpdateNPCs()
                                                         {
                                                             if(Block[B].Type == 457)
                                                                 KillBlock(B);
-                                                            HitSpot = 0;
+                                                            HitSpot = COLLISION_NONE;
                                                         }
 
                                                         if(NPC[A].Type == 266)
-                                                            HitSpot = 0;
+                                                            HitSpot = COLLISION_NONE;
                                                         if(Block[B].IsPlayer > 0 && ((NPCStandsOnPlayer[NPC[A].Type] == false && NPC[A].Type != 13) || NPC[A].Inert == true))
-                                                            HitSpot = 0;
-                                                        if((NPCIsCheep[NPC[A].Type] && NPC[A].Special == 2) && HitSpot != 3)
-                                                            HitSpot = 0;
+                                                            HitSpot = COLLISION_NONE;
+                                                        if((NPCIsCheep[NPC[A].Type] && NPC[A].Special == 2) && HitSpot != COLLISION_BOTTOM)
+                                                            HitSpot = COLLISION_NONE;
                                                         if(Block[B].Invis == true)
                                                         {
-                                                            if(HitSpot != 3)
-                                                                HitSpot = 0;
+                                                            if(HitSpot != COLLISION_BOTTOM)
+                                                                HitSpot = COLLISION_NONE;
                                                         }
-                                                        if(HitSpot == 5)
+                                                        if(HitSpot == COLLISION_CENTER)
                                                         {
                                                             if(CheckHitSpot1(NPC[A].Location, Block[B].Location) == true)
-                                                                HitSpot = 1;
+                                                                HitSpot = COLLISION_TOP;
                                                         }
                                                         if(NPC[A].Type == 58 || NPC[A].Type == 21 || NPC[A].Type == 67 || NPC[A].Type == 68 || NPC[A].Type == 69 || NPC[A].Type == 70)
                                                         {
                                                             if(Block[B].IsPlayer > 0 || Block[B].IsNPC == 56)
                                                             {
-                                                                HitSpot = 0;
+                                                                HitSpot = COLLISION_NONE;
                                                                 NPC[A].Location.SpeedX = -NPC[A].Location.SpeedX;
                                                             }
                                                         }
-                                                        if(NPC[A].Type >= 78 && NPC[A].Type <= 83 && HitSpot != 1)
-                                                            HitSpot = 0;
+                                                        if(NPC[A].Type >= 78 && NPC[A].Type <= 83 && HitSpot != COLLISION_TOP)
+                                                            HitSpot = COLLISION_NONE;
                                                         if(NPC[A].Type == 48 && (Block[B].IsNPC == 22 || Block[B].IsNPC == 49)) // spiney eggs don't walk on special items
-                                                            HitSpot = 0;
+                                                            HitSpot = COLLISION_NONE;
 
                                                         if(NPC[A].Type == 190) // Skull raft
                                                         {
                                                             if(Block[B].IsNPC > 0)
-                                                                HitSpot = 0;
+                                                                HitSpot = COLLISION_NONE;
 
                                                             if(g_compatibility.fix_skull_raft) // reached a solid wall
                                                             {
@@ -2074,17 +2098,17 @@ void UpdateNPCs()
 
                                                         if(NPC[A].Type == 86)
                                                         {
-                                                            if(HitSpot != 1 && NPC[A].Special > 0)
+                                                            if(HitSpot != COLLISION_TOP && NPC[A].Special > 0)
                                                             {
                                                                 if(Block[B].Location.X < level[NPC[A].Section].X + 48 || Block[B].Location.X > level[NPC[A].Section].Width - 80)
                                                                     NPC[A].Special = 0;
                                                                 else
                                                                 {
-                                                                    HitSpot = 0;
+                                                                    HitSpot = COLLISION_NONE;
                                                                     resetBeltSpeed = true;
                                                                 }
                                                             }
-                                                            else if(HitSpot == 3)
+                                                            else if(HitSpot == COLLISION_BOTTOM)
                                                             {
                                                                 if(fiEqual(NPC[A].Special4, 3))
                                                                 {
@@ -2099,13 +2123,13 @@ void UpdateNPCs()
                                                         if(NPC[A].Type == 13 || NPC[A].Type == 265)
                                                         {
                                                             if(Block[B].Type == 626 && fiEqual(NPC[A].Special, 1))
-                                                                HitSpot = 0;
+                                                                HitSpot = COLLISION_NONE;
                                                             if(Block[B].Type == 627 && fiEqual(NPC[A].Special, 2))
-                                                                HitSpot = 0;
+                                                                HitSpot = COLLISION_NONE;
                                                             if(Block[B].Type == 628 && fiEqual(NPC[A].Special, 3))
-                                                                HitSpot = 0;
+                                                                HitSpot = COLLISION_NONE;
                                                             if(Block[B].Type == 629 && fiEqual(NPC[A].Special, 4))
-                                                                HitSpot = 0;
+                                                                HitSpot = COLLISION_NONE;
                                                         }
 
                                                         if(NPC[A].Type == 13 || NPC[A].Type == 108)
@@ -2137,51 +2161,51 @@ void UpdateNPCs()
                                                             }
                                                         }
 
-                                                        if((NPC[A].Type == 37 || NPC[A].Type == 180) && HitSpot != 1)
-                                                            HitSpot = 0;
-                                                        if(Block[B].IsNPC == 57 && HitSpot == 5)
+                                                        if((NPC[A].Type == 37 || NPC[A].Type == 180) && HitSpot != COLLISION_TOP)
+                                                            HitSpot = COLLISION_NONE;
+                                                        if(Block[B].IsNPC == 57 && HitSpot == COLLISION_CENTER)
                                                         {
                                                             if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 < Block[B].Location.X + Block[B].Location.Width / 2.0)
-                                                                HitSpot = 4;
+                                                                HitSpot = COLLISION_LEFT;
                                                             else
-                                                                HitSpot = 2;
+                                                                HitSpot = COLLISION_RIGHT;
                                                         }
                                                         if(NPC[A].Type == 13 || NPC[A].Type == 265)
                                                         {
                                                             if(NPCIsABonus[Block[B].IsNPC])
-                                                                HitSpot = 0;
+                                                                HitSpot = COLLISION_NONE;
                                                         }
-                                                        if(NPC[A].Type == 15 && HitSpot == 5)
+                                                        if(NPC[A].Type == 15 && HitSpot == COLLISION_CENTER)
                                                         {
                                                             if(NPC[A].WallDeath >= 5)
                                                                 NPC[A].Killed = 3;
                                                             else
-                                                                HitSpot = 3;
+                                                                HitSpot = COLLISION_BOTTOM;
                                                         }
-                                                        if(BlockIsSizable[Block[B].Type] && HitSpot != 1)
-                                                            HitSpot = 0;
+                                                        if(BlockIsSizable[Block[B].Type] && HitSpot != COLLISION_TOP)
+                                                            HitSpot = COLLISION_NONE;
                                                         if(BlockIsSizable[Block[B].Type] || BlockOnlyHitspot1[Block[B].Type] == true)
                                                         {
-                                                            if(HitSpot != 1 || (NPCIsAParaTroopa[NPC[A].Type] && NPC[A].Special != 1))
-                                                                HitSpot = 0;
+                                                            if(HitSpot != COLLISION_TOP || (NPCIsAParaTroopa[NPC[A].Type] && NPC[A].Special != 1))
+                                                                HitSpot = COLLISION_NONE;
                                                         }
-                                                        if(NPC[A].Type == 133 && HitSpot > 0)
+                                                        if(NPC[A].Type == 133 && HitSpot > COLLISION_NONE)
                                                             NPC[A].Killed = 4;
-                                                        if(NPC[A].Type == 134 && NPC[A].Projectile == true && HitSpot != 0)
+                                                        if(NPC[A].Type == 134 && NPC[A].Projectile == true && HitSpot != COLLISION_NONE)
                                                             NPC[A].Special = 1000;
-                                                        if(NPC[A].Shadow == true && HitSpot != 1 && !(Block[B].Special > 0 && NPC[A].Projectile == true))
-                                                            HitSpot = 0;
+                                                        if(NPC[A].Shadow == true && HitSpot != COLLISION_TOP && !(Block[B].Special > 0 && NPC[A].Projectile == true))
+                                                            HitSpot = COLLISION_NONE;
 
 
                                                         // vine makers
                                                         if(NPC[A].Type == 225 || NPC[A].Type == 226 || NPC[A].Type == 227)
                                                         {
-                                                            if(HitSpot == 3)
+                                                            if(HitSpot == COLLISION_BOTTOM)
                                                                 NPC[A].Special = 1;
                                                         }
 
                                                         if(NPC[A].Type == 197 && Block[B].IsNPC > 0)
-                                                            HitSpot = 0;
+                                                            HitSpot = COLLISION_NONE;
 
 
 
@@ -2189,16 +2213,16 @@ void UpdateNPCs()
                                                         if(NPC[A].Type == 205 || NPC[A].Type == 206 || NPC[A].Type == 207)
                                                         {
                                                             NPC[A].Special5 = 0;
-                                                            if(HitSpot == 1)
+                                                            if(HitSpot == COLLISION_TOP)
                                                             {
                                                                 if(NPC[A].Special == 4 && NPC[A].Location.X + 0.99 == Block[B].Location.X + Block[B].Location.Width)
-                                                                    HitSpot = 0;
+                                                                    HitSpot = COLLISION_NONE;
                                                                 if(NPC[A].Special == 2 && NPC[A].Location.X + NPC[A].Location.Width - 0.99 == Block[B].Location.X)
-                                                                    HitSpot = 0;
+                                                                    HitSpot = COLLISION_NONE;
                                                             }
                                                             if(BlockIsSizable[Block[B].Type] == true || BlockOnlyHitspot1[Block[B].Type] == true)
-                                                                HitSpot = 0;
-                                                            if(BlockSlope2[Block[B].Type] != 0 && HitSpot == 3)
+                                                                HitSpot = COLLISION_NONE;
+                                                            if(BlockSlope2[Block[B].Type] != 0 && HitSpot == COLLISION_BOTTOM)
                                                             {
                                                                 if(NPC[A].Special == 4 && NPC[A].Special2 == -1)
                                                                 {
@@ -2210,31 +2234,31 @@ void UpdateNPCs()
                                                                     }
                                                                 }
                                                             }
-                                                            if(BlockSlope2[Block[B].Type] != 0 && HitSpot == 1)
+                                                            if(BlockSlope2[Block[B].Type] != 0 && HitSpot == COLLISION_TOP)
                                                             {
                                                                 if(NPC[A].Special == 4)
-                                                                    HitSpot = 2;
+                                                                    HitSpot = COLLISION_RIGHT;
                                                                 if(NPC[A].Special == 2)
-                                                                    HitSpot = 4;
+                                                                    HitSpot = COLLISION_LEFT;
                                                             }
                                                             if(NPC[A].Special == 3)
                                                             {
                                                                 if(BlockSlope2[Block[B].Type] != 0)
                                                                 {
-                                                                    if(HitSpot == 2 || HitSpot == 4)
-                                                                        HitSpot = 0;
+                                                                    if(HitSpot == COLLISION_RIGHT || HitSpot == COLLISION_LEFT)
+                                                                        HitSpot = COLLISION_NONE;
                                                                 }
-                                                                else if(HitSpot == 2 || HitSpot == 4)
-                                                                    HitSpot = 0;
+                                                                else if(HitSpot == COLLISION_RIGHT || HitSpot == COLLISION_LEFT)
+                                                                    HitSpot = COLLISION_NONE;
                                                             }
                                                         }
 
 
 
-                                                        if(BlockSlope2[Block[B].Type] != 0 && HitSpot > 0 && ((NPC[A].Location.Y > Block[B].Location.Y) || ((NPC[A].Type == 205 || NPC[A].Type == 206 || NPC[A].Type == 207) && NPC[A].Special == 3)))
+                                                        if(BlockSlope2[Block[B].Type] != 0 && HitSpot > COLLISION_NONE && ((NPC[A].Location.Y > Block[B].Location.Y) || ((NPC[A].Type == 205 || NPC[A].Type == 206 || NPC[A].Type == 207) && NPC[A].Special == 3)))
                                                         {
 
-                                                            if(HitSpot == 5)
+                                                            if(HitSpot == COLLISION_CENTER)
                                                             {
                                                                 if(NPC[A].Special == 2 && NPC[A].Special2 == 1)
                                                                 {
@@ -2248,7 +2272,7 @@ void UpdateNPCs()
                                                                 }
                                                             }
 
-                                                            HitSpot = 0;
+                                                            HitSpot = COLLISION_NONE;
                                                             if(BlockSlope2[Block[B].Type] == 1)
                                                                 PlrMid = NPC[A].Location.X + NPC[A].Location.Width;
                                                             else
@@ -2295,18 +2319,22 @@ void UpdateNPCs()
                                                                         Slope = 0;
                                                                     if(Slope > 1)
                                                                         Slope = 1;
+                                                                    // WATCH: this may modify collisions with other blocks.
+                                                                    // sufficient margin is key here.
                                                                     if(BlockSlope2[Block[B].Type] < 0)
                                                                         NPC[A].Location.X = Block[B].Location.X + Block[B].Location.Width - (Block[B].Location.Width * Slope);
                                                                     else
                                                                         NPC[A].Location.X = Block[B].Location.X + (Block[B].Location.Width * Slope) - NPC[A].Location.Width;
                                                                     SlopeTurn = true;
                                                                     if(NPC[A].Location.SpeedX < 0)
-                                                                        HitSpot = 2;
+                                                                        HitSpot = COLLISION_RIGHT;
                                                                     else
-                                                                        HitSpot = 4;
+                                                                        HitSpot = COLLISION_LEFT;
                                                                 }
                                                                 else
                                                                 {
+                                                                    // WATCH: this may modify collisions with other blocks.
+                                                                    // sufficient margin is key here.
                                                                     NPC[A].Location.Y = Block[B].Location.Y + Block[B].Location.Height - (Block[B].Location.Height * Slope);
                                                                     if(NPC[A].Type == 205 || NPC[A].Type == 206 || NPC[A].Type == 207)
                                                                     {
@@ -2326,9 +2354,9 @@ void UpdateNPCs()
 
 
 
-                                                        if(BlockSlope[Block[B].Type] != 0 && HitSpot > 0)
+                                                        if(BlockSlope[Block[B].Type] != 0 && HitSpot > COLLISION_NONE)
                                                         {
-                                                            HitSpot = 0;
+                                                            HitSpot = COLLISION_NONE;
                                                             if(NPC[A].Location.Y + NPC[A].Location.Height <= Block[B].Location.Y + Block[B].Location.Height + NPC[A].Location.SpeedY + 4)
                                                             {
                                                                 if(NPC[A].Location.X < Block[B].Location.X + Block[B].Location.Width && NPC[A].Location.X + NPC[A].Location.Width > Block[B].Location.X)
@@ -2348,17 +2376,10 @@ void UpdateNPCs()
                                                                     if(Slope > 100)
                                                                         Slope = 100;
 
-                                                                    if(tempHitBlock > 0) // VERIFY ME
-                                                                    {
-                                                                        if(!BlockIsSizable[Block[tempHitBlock].Type])
-                                                                        {
-                                                                            if(Block[tempHitBlock].Location.Y != Block[B].Location.Y)
-                                                                            {
-                                                                                tempHitBlock = 0;
-                                                                                tempHit = 0;
-                                                                            }
-                                                                        }
-                                                                    }
+                                                                    // this will remove any previous tempHitBlocks
+                                                                    // in a way compatible with vanilla behavior for slopes
+                                                                    tempHitBlock = B;
+                                                                    tempHitCode = 3; // slope
 
                                                                     if(NPC[A].Location.Y >= Block[B].Location.Y + (Block[B].Location.Height * Slope) - NPC[A].Location.Height - 0.1)
                                                                     {
@@ -2374,28 +2395,28 @@ void UpdateNPCs()
                                                                         {
                                                                             NPC[A].Slope = 1;
                                                                             if(NPC[A].Location.SpeedX < 0)
-                                                                                HitSpot = 2;
+                                                                                HitSpot = COLLISION_RIGHT;
                                                                             else
-                                                                                HitSpot = 4;
+                                                                                HitSpot = COLLISION_LEFT;
                                                                         }
                                                                         else
                                                                         {
-
-
+                                                                            // WATCH: this may modify collisions with other blocks.
+                                                                            // sufficient margin is key here.
                                                                             NPC[A].Location.Y = Block[B].Location.Y + (Block[B].Location.Height * Slope) - NPC[A].Location.Height - 0.1;
                                                                             if(NPCIsCheep[NPC[A].Type])
                                                                                 NPC[A].TurnAround = true;
                                                                             NPC[A].Slope = B;
-                                                                            HitSpot = 1;
+                                                                            HitSpot = COLLISION_TOP;
                                                                             // Fireballs dont go up steep slopes
                                                                             if(Block[B].Location.Height / static_cast<double>(Block[B].Location.Width) >= 1 && ((BlockSlope[Block[B].Type] == -1 && NPC[A].Location.SpeedX > 0) || (BlockSlope[Block[B].Type] == 1 && NPC[A].Location.SpeedX < 0)))
                                                                             {
                                                                                 if((NPC[A].Type == 13 && NPC[A].Special != 2 && NPC[A].Special != 3) || (NPC[A].Type == 265 && NPC[A].Special == 5))
                                                                                 {
                                                                                     if(NPC[A].Location.SpeedX < 0)
-                                                                                        HitSpot = 2;
+                                                                                        HitSpot = COLLISION_RIGHT;
                                                                                     else
-                                                                                        HitSpot = 4;
+                                                                                        HitSpot = COLLISION_LEFT;
                                                                                 }
                                                                             }
                                                                             if(NPCIsAShell[NPC[A].Type] || (NPC[A].Type == 45 && NPC[A].Special == 1) || NPC[A].Type == 263)
@@ -2403,7 +2424,7 @@ void UpdateNPCs()
                                                                                 if(NPC[A].Location.SpeedY > NPC[A].Location.SpeedX * (Block[B].Location.Height / static_cast<double>(Block[B].Location.Width)) * BlockSlope[Block[B].Type])
                                                                                 {
                                                                                     NPC[A].Location.SpeedY = NPC[A].Location.SpeedX * (Block[B].Location.Height / static_cast<double>(Block[B].Location.Width)) * BlockSlope[Block[B].Type];
-                                                                                    HitSpot = 0;
+                                                                                    HitSpot = COLLISION_NONE;
                                                                                     if(NPC[A].Location.SpeedY > 0)
                                                                                         NPC[A].Location.SpeedY = 0;
                                                                                 }
@@ -2418,38 +2439,38 @@ void UpdateNPCs()
 
                                                         if(NPC[A].Type == 206 || NPC[A].Type == 205 || NPC[A].Type == 207)
                                                         {
-                                                            if(NPC[A].Special == 3 && (HitSpot == 2 || HitSpot == 4))
+                                                            if(NPC[A].Special == 3 && (HitSpot == COLLISION_RIGHT || HitSpot == COLLISION_LEFT))
                                                             {
                                                                 if(Block[B].Location.Y + Block[B].Location.Height <= NPC[A].Location.Y + 1)
-                                                                    HitSpot = 3;
+                                                                    HitSpot = COLLISION_BOTTOM;
                                                             }
                                                             if(Block[B].IsNPC > 0)
-                                                                HitSpot = 0;
+                                                                HitSpot = COLLISION_NONE;
                                                         }
 
-                                                        if(BlockKills[Block[B].Type] && (HitSpot > 0 || NPC[A].Slope == B))
+                                                        if(BlockKills[Block[B].Type] && (HitSpot > COLLISION_NONE || NPC[A].Slope == B))
                                                             NPCHit(A, 6, B);
 
                                                         if(NPC[A].Type == 13 && Block[B].IsNPC == 263)
-                                                            HitSpot = 0;
+                                                            HitSpot = COLLISION_NONE;
 
-                                                        if(NPC[A].Type == 96 && HitSpot == 1)
+                                                        if(NPC[A].Type == 96 && HitSpot == COLLISION_TOP)
                                                         {
-                                                            if((NPC[A].Location.SpeedY > 2 && HitSpot == 1) || (NPC[A].Location.SpeedY < -2 && HitSpot == 3) || (NPC[A].Location.SpeedX > 2 && HitSpot == 4) || (NPC[A].Location.SpeedX < -2 && HitSpot == 2))
+                                                            if((NPC[A].Location.SpeedY > 2 && HitSpot == COLLISION_TOP) || (NPC[A].Location.SpeedY < -2 && HitSpot == COLLISION_BOTTOM) || (NPC[A].Location.SpeedX > 2 && HitSpot == COLLISION_LEFT) || (NPC[A].Location.SpeedX < -2 && HitSpot == COLLISION_RIGHT))
                                                                 NPC[A].Special2 = 1;
                                                         }
-                                                        if(HitSpot == 5)
+                                                        if(HitSpot == COLLISION_CENTER)
                                                         {
                                                             if(NPC[A].Slope > 0 && Block[B].Location.Y + Block[B].Location.Height < NPC[A].Location.Y + 4)
                                                             {
                                                                 if(Block[B].Location.X + Block[B].Location.Width < NPC[A].Location.X + 4 || Block[B].Location.X > NPC[A].Location.X + NPC[A].Location.Width - 4)
-                                                                    HitSpot = 0;
+                                                                    HitSpot = COLLISION_NONE;
                                                             }
                                                         }
                                                         // beech koopa kicking an ice block
                                                         if(((g_compatibility.fix_npc55_kick_ice_blocks && NPC[A].Type == 55) || NPC[A].Type == 119) && Block[B].IsNPC == 45)
                                                         {
-                                                            if(HitSpot == 2 || HitSpot == 4)
+                                                            if(HitSpot == COLLISION_RIGHT || HitSpot == COLLISION_LEFT)
                                                             {
                                                                 if(NPC[A].Location.SpeedY == Physics.NPCGravity ||
                                                                    NPC[A].Location.SpeedY == 0.0 || NPC[A].Slope > 0 ||
@@ -2458,14 +2479,16 @@ void UpdateNPCs()
                                                                     NPC[Block[B].IsReally].Special = 1;
                                                                     NPC[A].Special = 10;
                                                                     Player[numPlayers + 1].Direction = NPC[A].Direction;
+                                                                    // WATCH: this may modify collisions with other blocks.
+                                                                    // sufficient margin is key here.
                                                                     NPC[A].Location.X = NPC[A].Location.X - NPC[A].Direction;
                                                                     NPCHit(Block[B].IsReally, 1, numPlayers + 1);
-                                                                    HitSpot = 0;
+                                                                    HitSpot = COLLISION_NONE;
                                                                 }
                                                             }
                                                         }
                                                         if(NPC[A].Type == 179 && Block[B].IsNPC > 0)
-                                                            HitSpot = 0;
+                                                            HitSpot = COLLISION_NONE;
                                                         if(Block[B].IsNPC == 208 || Block[B].IsNPC == 209)
                                                         {
                                                             if(NPC[A].Projectile == true)
@@ -2477,7 +2500,7 @@ void UpdateNPCs()
 
 
 
-                                                        if((NPC[A].Type == 237 || NPC[A].Type == 263) && (HitSpot == 2 || HitSpot == 4 || HitSpot == 5))
+                                                        if((NPC[A].Type == 237 || NPC[A].Type == 263) && (HitSpot == COLLISION_RIGHT || HitSpot == COLLISION_LEFT || HitSpot == COLLISION_CENTER))
                                                         {
                                                             if(Block[B].IsNPC == 263)
                                                             {
@@ -2488,7 +2511,7 @@ void UpdateNPCs()
                                                             NPCHit(A, 3, A);
                                                         }
 
-                                                        if(NPC[A].Type == 263 && (HitSpot == 1 || HitSpot == 3 || HitSpot == 5))
+                                                        if(NPC[A].Type == 263 && (HitSpot == COLLISION_TOP || HitSpot == COLLISION_BOTTOM || HitSpot == COLLISION_CENTER))
                                                         {
                                                             if(NPC[A].Location.SpeedX > -Physics.NPCShellSpeed * 0.8 && NPC[A].Location.SpeedX < Physics.NPCShellSpeed * 0.8)
                                                             {
@@ -2497,25 +2520,25 @@ void UpdateNPCs()
                                                             }
                                                         }
 
-                                                        if(NPCIsACoin[NPC[A].Type] && NPC[A].Special == 0 && HitSpot > 0)
+                                                        if(NPCIsACoin[NPC[A].Type] && NPC[A].Special == 0 && HitSpot > COLLISION_NONE)
                                                             NPCHit(A, 3, A);
 
-                                                        if(Block[B].Location.SpeedX != 0 && (HitSpot == 2 || HitSpot == 4))
+                                                        if(Block[B].Location.SpeedX != 0 && (HitSpot == COLLISION_RIGHT || HitSpot == COLLISION_LEFT))
                                                             NPC[A].MovingPinched = 2;
-                                                        if(Block[B].Location.SpeedY != 0 && (HitSpot == 1 || HitSpot == 3))
+                                                        if(Block[B].Location.SpeedY != 0 && (HitSpot == COLLISION_TOP || HitSpot == COLLISION_BOTTOM))
                                                             NPC[A].MovingPinched = 2;
 
                                                         if(NPC[A].TimeLeft > 1)
                                                         {
-                                                            if(HitSpot == 1)
+                                                            if(HitSpot == COLLISION_TOP)
                                                                 NPC[A].Pinched1 = 2;
-                                                            else if(HitSpot == 2)
+                                                            else if(HitSpot == COLLISION_RIGHT)
                                                                 NPC[A].Pinched2 = 2;
-                                                            else if(HitSpot == 3)
+                                                            else if(HitSpot == COLLISION_BOTTOM)
                                                                 NPC[A].Pinched3 = 2;
-                                                            else if(HitSpot == 4)
+                                                            else if(HitSpot == COLLISION_LEFT)
                                                                 NPC[A].Pinched4 = 2;
-                                                            else if(HitSpot == 5)
+                                                            else if(HitSpot == COLLISION_CENTER)
                                                             {
                                                                 double C = 0;
                                                                 int D = 0;
@@ -2567,8 +2590,8 @@ void UpdateNPCs()
                                                             {
                                                                 if((NPC[A].Pinched1 > 0 && NPC[A].Pinched3 > 0) || (NPC[A].Pinched2 > 0 && NPC[A].Pinched4 > 0))
                                                                 {
-                                                                    if(HitSpot > 1)
-                                                                        HitSpot = 0;
+                                                                    if(HitSpot > COLLISION_TOP)
+                                                                        HitSpot = COLLISION_NONE;
                                                                     NPC[A].Damage = NPC[A].Damage + 10000;
                                                                     NPC[A].Immune = 0;
                                                                     NPC[0].Multiplier = 0;
@@ -2577,40 +2600,41 @@ void UpdateNPCs()
                                                             }
                                                         }
 
-                                                        if(HitSpot == 1 && NPC[A].Type == 241 && NPC[A].Location.SpeedY > 2)
+                                                        if(HitSpot == COLLISION_TOP && NPC[A].Type == 241 && NPC[A].Location.SpeedY > 2)
                                                             NPCHit(A, 4, A);
 
                                                         // If a Pokey head stands on a top of another Pokey segment
-                                                        if(HitSpot == 1 && NPC[A].Type == 247 && Block[B].IsNPC == 247)
+                                                        if(HitSpot == COLLISION_TOP && NPC[A].Type == 247 && Block[B].IsNPC == 247)
                                                         {
                                                             NPC[Block[B].IsReally].Special = -3;
                                                             NPC[A].Special2 = 0;
                                                         }
 
-                                                        if((NPC[A].Type == 13 || NPC[A].Type == 265) && NPC[A].Special == 5 && HitSpot > 0)
+                                                        if((NPC[A].Type == 13 || NPC[A].Type == 265) && NPC[A].Special == 5 && HitSpot > COLLISION_NONE)
                                                             NPCHit(A, 3, A);
-                                                        if(NPC[A].Type == 265 && HitSpot > 1)
+                                                        if(NPC[A].Type == 265 && HitSpot > COLLISION_TOP)
                                                             NPCHit(A, 3, A);
                                                         if(NPC[A].Type == 283 && BlockIsSizable[Block[B].Type] == false)
                                                             NPCHit(A, 3, A);
-                                                        if(NPC[A].Type == 286 && HitSpot == 1)
+                                                        if(NPC[A].Type == 286 && HitSpot == COLLISION_TOP)
                                                             NPC[A].Special = 1;
-                                                        if(NPC[A].Type == 288 && HitSpot == 1)
+                                                        if(NPC[A].Type == 288 && HitSpot == COLLISION_TOP)
                                                         {
                                                             NPC[A].Special3 = 1;
                                                             NPC[A].Projectile = false;
                                                         }
-                                                        if(NPC[A].Type == 291 && HitSpot > 0)
+                                                        if(NPC[A].Type == 291 && HitSpot > COLLISION_NONE)
                                                             NPCHit(A, 3, A);
 
-                                                        if(g_compatibility.fix_npc_downward_clip)
-                                                        {
-                                                            tempHitOld = tempHit;
-                                                            tempHitOldBlock = tempHitBlock;
-                                                        }
+                                                        // no longer needed because we are maintaining a full stack of them
+                                                        // if(g_compatibility.fix_npc_downward_clip)
+                                                        // {
+                                                        //     tempHitOld = tempHit;
+                                                        //     tempHitOldBlock = tempHitBlock;
+                                                        // }
 
                                                         // hitspot 1
-                                                        if(HitSpot == 1) // Hitspot 1
+                                                        if(HitSpot == COLLISION_TOP) // Hitspot 1
                                                         {
                                                             if((NPC[A].Type == 13 || NPC[A].Type == 265) && NPC[A].Location.SpeedX == 0)
                                                                 NPCHit(A, 4, A);
@@ -2640,7 +2664,7 @@ void UpdateNPCs()
                                                             if(NPC[A].Type == 78 && NPC[A].Location.SpeedY > Physics.NPCGravity * 10)
                                                                 PlaySound(SFX_Twomp);
 
-                                                            if(WalkingCollision3(NPC[A].Location, Block[B].Location, oldBeltSpeed) == true || NPC[A].Location.Width > 32)
+                                                            if(NPC[A].Location.Width > 32 || WalkingCollision3(NPC[A].Location, Block[B].Location, oldBeltSpeed))
                                                             {
                                                                 resetBeltSpeed = true;
 
@@ -2651,11 +2675,13 @@ void UpdateNPCs()
                                                                     else
                                                                         tempHit = Block[B].Location.Y - NPC[A].Location.Height - 0.01;
                                                                     tempHitBlock = B;
+                                                                    tempHitCode = 0;
                                                                 }
                                                                 else
                                                                 {
                                                                     tempHitBlock = B;
                                                                     tempHit = Block[B].Location.Y - NPC[A].Location.Height - 0.01;
+                                                                    tempHitCode = 0;
                                                                 }
                                                                 if(Block[B].IsNPC >= 60 && Block[B].IsNPC <= 66)
                                                                 {
@@ -2692,10 +2718,13 @@ void UpdateNPCs()
                                                                     if(NPC[A].Location.SpeedY > 2)
                                                                     {
                                                                         NPC[A].Location.SpeedY = -NPC[A].Location.SpeedY * 0.7 + Block[B].Location.SpeedY;
+                                                                        // WATCH: this may modify collisions with other blocks.
+                                                                        // sufficient margin is key here.
                                                                         if(NPC[A].Slope == 0)
                                                                             NPC[A].Location.Y = Block[B].Location.Y - NPC[A].Location.Height - 0.01;
                                                                         tempHit = 0;
-                                                                        tempHitBlock = 0;
+                                                                        // tempHitBlock = 0
+                                                                        tempHitCode = 2;
                                                                     }
                                                                 }
 
@@ -2721,18 +2750,24 @@ void UpdateNPCs()
                                                                             NPC[A].Location.SpeedY = -3 + Block[B].Location.SpeedY;
                                                                         else
                                                                             NPC[A].Location.SpeedY = -5 + Block[B].Location.SpeedY;
+                                                                        // WATCH: this may modify collisions with other blocks.
+                                                                        // sufficient margin is key here.
                                                                         if(NPC[A].Slope == 0)
                                                                             NPC[A].Location.Y = Block[B].Location.Y - NPC[A].Location.Height - 0.01;
                                                                         tempHit = 0;
-                                                                        tempHitOld = 0;
+                                                                        // tempHitOld = 0
+                                                                        tempHitCode = 1;
                                                                     }
                                                                     else if(NPC[A].Type == 265)
                                                                     {
                                                                         NPC[A].Location.SpeedY = -7 + Block[B].Location.SpeedY;
+                                                                        // WATCH: this may modify collisions with other blocks.
+                                                                        // sufficient margin is key here.
                                                                         if(NPC[A].Slope == 0)
                                                                             NPC[A].Location.Y = Block[B].Location.Y - NPC[A].Location.Height - 0.01;
                                                                         tempHit = 0;
-                                                                        tempHitOld = 0;
+                                                                        // tempHitOld = 0
+                                                                        tempHitCode = 1;
                                                                         if(Block[B].Slippy == false)
                                                                             NPC[A].Special5 = NPC[A].Special5 + 1;
                                                                         if(NPC[A].Special5 >= 3)
@@ -2770,10 +2805,13 @@ void UpdateNPCs()
                                                                         }
                                                                         else
                                                                             NPC[A].Location.SpeedY = -NPC[A].Location.SpeedY * 0.6;
+                                                                        // WATCH: this may modify collisions with other blocks.
+                                                                        // sufficient margin is key here.
                                                                         if(NPC[A].Slope == 0)
                                                                             NPC[A].Location.Y = Block[B].Location.Y - NPC[A].Location.Height - 0.01;
                                                                         tempHit = 0;
-                                                                        tempHitOld = 0;
+                                                                        // tempHitOld = 0
+                                                                        tempHitCode = 1;
                                                                     }
                                                                     else if(NPC[A].Type != 78 && NPC[A].Type != 17 && NPC[A].Type != 13)
                                                                     {
@@ -2807,7 +2845,7 @@ void UpdateNPCs()
                                                                 }
                                                             }
                                                         }
-                                                        else if(HitSpot == 2) // Hitspot 2
+                                                        else if(HitSpot == COLLISION_RIGHT) // Hitspot 2
                                                         {
                                                             if(BlockSlope[Block[oldSlope].Type] == 1 && Block[oldSlope].Location.Y == Block[B].Location.Y)
                                                             {
@@ -2833,6 +2871,8 @@ void UpdateNPCs()
                                                                     NPCHit(A, 4, A);
                                                                 if(NPC[A].Type == 45 && NPC[A].Special == 1)
                                                                     NPCHit(A, 4, A);
+                                                                // WATCH: this may modify collisions with other blocks.
+                                                                // sufficient margin is key here.
                                                                 if(NPC[A].Slope == 0 && SlopeTurn == false)
                                                                     NPC[A].Location.X = Block[B].Location.X + Block[B].Location.Width + 0.01;
                                                                 if(!(NPC[A].Type == 13 || NPC[A].Type == 78 || NPC[A].Type == 17))
@@ -2844,7 +2884,7 @@ void UpdateNPCs()
                                                                 addBelt = NPC[A].Location.X - addBelt;
                                                             }
                                                         }
-                                                        else if(HitSpot == 4) // Hitspot 4
+                                                        else if(HitSpot == COLLISION_LEFT) // Hitspot 4
                                                         {
                                                             beltClear = true;
                                                             if(NPC[A].Type == 86)
@@ -2865,6 +2905,8 @@ void UpdateNPCs()
                                                                 NPCHit(A, 4, A);
                                                             if(NPC[A].Type == 45 && NPC[A].Special == 1)
                                                                 NPCHit(A, 4, A);
+                                                            // WATCH: this may modify collisions with other blocks.
+                                                            // sufficient margin is key here.
                                                             if(NPC[A].Slope == 0 && SlopeTurn == false)
                                                                 NPC[A].Location.X = Block[B].Location.X - NPC[A].Location.Width - 0.01;
                                                             if(!(NPC[A].Type == 13 || NPC[A].Type == 78 || NPC[A].Type == 17))
@@ -2875,7 +2917,7 @@ void UpdateNPCs()
                                                                 NPC[A].Location.SpeedX = -NPC[A].Location.SpeedX;
                                                             addBelt = NPC[A].Location.X - addBelt;
                                                         }
-                                                        else if(HitSpot == 3) // Hitspot 3
+                                                        else if(HitSpot == COLLISION_BOTTOM) // Hitspot 3
                                                         {
                                                             if(NPC[A].Type == 45 && NPC[A].Special == 1)
                                                                 NPCHit(A, 4, A);
@@ -2888,10 +2930,12 @@ void UpdateNPCs()
                                                             if(NPCIsAParaTroopa[NPC[A].Type])
                                                             {
                                                                 NPC[A].Location.SpeedY = 2 + Block[B].Location.SpeedY;
+                                                                // WATCH: this may modify collisions with other blocks.
+                                                                // sufficient margin is key here.
                                                                 NPC[A].Location.Y = Block[B].Location.Y + Block[B].Location.Height + 0.1;
                                                             }
                                                         }
-                                                        else if(HitSpot == 5) // Hitspot 5
+                                                        else if(HitSpot == COLLISION_CENTER) // Hitspot 5
                                                         {
                                                             if(NPC[A].Type == 13 || NPC[A].Type == 40)
                                                                 NPCHit(A, 4, A);
@@ -2917,6 +2961,8 @@ void UpdateNPCs()
                                                             else if(NPC[A].Type != 48 && !(NPCIsABlock[NPC[A].Type] && Block[B].IsNPC > 0) && Block[B].IsNPC != 57)
                                                             {
                                                                 addBelt = NPC[A].Location.X;
+                                                                // WATCH: this may modify collisions with other blocks.
+                                                                // sufficient margin is key here.
                                                                 if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 < Block[B].Location.X + Block[B].Location.Width * 0.5)
                                                                     NPC[A].Location.X = Block[B].Location.X - NPC[A].Location.Width - 0.01;
                                                                 else
@@ -2925,12 +2971,16 @@ void UpdateNPCs()
                                                                 if(NPC[A].Type == 15)
                                                                 {
                                                                     NPC[A].Location.SpeedY = 0;
+                                                                    // WATCH: this may modify collisions with other blocks.
+                                                                    // sufficient margin is key here.
                                                                     NPC[A].Location.Y = Block[B].Location.Y - NPC[A].Location.Height - 0.01;
                                                                 }
                                                                 if(NPC[A].Type != 13 && NPC[A].Type != 78 && NPC[A].Type != 265)
                                                                     NPC[A].TurnAround = true;
                                                                 if(NPCIsAShell[NPC[A].Type])
                                                                 {
+                                                                    // WATCH: this may modify collisions with other blocks.
+                                                                    // sufficient margin is key here.
                                                                     if(NPC[A].Location.X < Block[B].Location.X && NPC[A].Location.SpeedX > 0)
                                                                         NPC[A].Location.SpeedX = -NPC[A].Location.SpeedX;
                                                                     else if(NPC[A].Location.X + NPC[A].Location.Width > Block[B].Location.X + Block[B].Location.Width && NPC[A].Location.SpeedX < 0)
@@ -2939,17 +2989,19 @@ void UpdateNPCs()
                                                             }
                                                         }
 
-                                                        // Find best block here
-                                                        if(g_compatibility.fix_npc_downward_clip && (tempHitBlock != tempHitOldBlock))
+
+                                                        if(tempHitBlock == B)
                                                         {
-                                                            CompareNpcWalkBlock(tempHitBlock, tempHitOldBlock,
-                                                                                tempHit, tempHitOld,
-                                                                                tempHitIsSlope, &NPC[A]);
+                                                            tempHitBlock_stack[tempHit_n] = tempHitBlock;
+                                                            tempHit_stack[tempHit_n] = tempHit;
+                                                            tempHitCode_stack[tempHit_n] = tempHitCode;
+                                                            tempHit_n ++;
+                                                            SDL_assert(tempHit_n < 16);
                                                         }
 
                                                         if((NPC[A].Projectile && NPC[A].Type != 13) != 0 && NPC[A].Type != 265 && NPC[A].Type != 58 && !(NPC[A].Type == 21 || NPC[A].Type == 67 || NPC[A].Type == 68 || NPC[A].Type == 69 || NPC[A].Type == 70)) // Hit the block if the NPC is a projectile
                                                         {
-                                                            if(HitSpot == 2 || HitSpot == 4 || HitSpot == 5)
+                                                            if(HitSpot == COLLISION_RIGHT || HitSpot == COLLISION_LEFT || HitSpot == COLLISION_CENTER)
                                                             {
                                                                 BlockHit(B);
                                                                 PlaySound(SFX_BlockHit);
@@ -2958,6 +3010,8 @@ void UpdateNPCs()
                                                                     NPC[A].Location.SpeedX = -NPC[A].Location.SpeedX;
                                                                     NPCHit(A, 4, A);
                                                                     BlockHitHard(B);
+                                                                    // WATCH: Now that blocks are not sorted,
+                                                                    // this might violate frame-level compatibility.
                                                                     break;
                                                                 }
                                                                 if(NPCIsAShell[NPC[A].Type] || (NPC[A].Type == 45 && NPC[A].Special == 1) || NPC[A].Type == 263)
@@ -2987,6 +3041,123 @@ void UpdateNPCs()
                                 //     break;
                             }
                         }
+
+                        // invalidate the correct tempBlocks and then do the sort according to g_compatibility.fix_npc_downward_clip
+
+                        // invalidate ones that have been pushed out of the way
+                        for(int i = 0; i < tempHit_n; i++)
+                        {
+                            if(NPC[A].Location.X + NPC[A].Location.Width < Block[tempHitBlock_stack[i]].Location.X
+                                || NPC[A].Location.X > Block[tempHitBlock_stack[i]].Location.X + Block[tempHitBlock_stack[i]].Location.Width)
+                            {
+                                // the collision "never happened"
+                                tempHitCode_stack[i] = -1;
+                                tempHitValid_stack[i] = false;
+                            }
+                            else
+                            {
+                                tempHitValid_stack[i] = true;
+                            }
+                        }
+
+                        // invalidate ones that have been invalidated by later blocks
+                        for(int i = 0; i < tempHit_n; i++)
+                        {
+                            if(tempHitCode_stack[i] == 3)
+                            {
+                                for(int j = 0; j < tempHit_n; j++)
+                                {
+                                    if(i == j) continue;
+                                    // does block i sort (strictly) before block j?
+                                    // avoid circular invalidations
+                                    if(Block[tempHitBlock_stack[i]].Location.X < Block[tempHitBlock_stack[j]].Location.X
+                                        || (Block[tempHitBlock_stack[i]].Location.X == Block[tempHitBlock_stack[j]].Location.X
+                                            && Block[tempHitBlock_stack[i]].Location.Y < Block[tempHitBlock_stack[j]].Location.Y))
+                                    {
+                                        if(!BlockIsSizable[Block[tempHitBlock_stack[j]].Type])
+                                        {
+                                            if(Block[tempHitBlock_stack[j]].Location.Y != Block[tempHitBlock_stack[i]].Location.Y)
+                                            {
+                                                tempHitValid_stack[j] = false;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            else if(tempHitCode_stack[i] > 0)
+                            {
+                                for(int j = 0; j < tempHit_n; j++)
+                                {
+                                    if(i == j) continue;
+                                    // does block i sort (strictly) before block j?
+                                    // avoid circular invalidations
+                                    if(Block[tempHitBlock_stack[i]].Location.X < Block[tempHitBlock_stack[j]].Location.X
+                                        || (Block[tempHitBlock_stack[i]].Location.X == Block[tempHitBlock_stack[j]].Location.X
+                                            && Block[tempHitBlock_stack[i]].Location.Y < Block[tempHitBlock_stack[j]].Location.Y))
+                                    {
+                                        tempHitValid_stack[j] = false;
+                                    }
+                                }
+                            }
+                        }
+
+                        // Find best block here
+                        tempHitBlock = 0;
+                        tempHit = 0;
+                        int real_block = 0;
+                        for(int i = 0; i < tempHit_n; i++)
+                        {
+                            printf("Candidate %d Block %d valid %d code %d\n",
+                                i, tempHitBlock_stack[i], tempHitValid_stack[i], tempHitCode_stack[i]);
+                            if(!tempHitValid_stack[i])
+                                continue;
+                            if(!g_compatibility.fix_npc_downward_clip)
+                            {
+                                if(real_block == 0 || (Block[real_block].Location.X < Block[tempHitBlock_stack[i]].Location.X)
+                                    || (Block[real_block].Location.X == Block[tempHitBlock_stack[i]].Location.X
+                                        && Block[real_block].Location.Y < Block[tempHitBlock_stack[i]].Location.Y))
+                                {
+                                    real_block = tempHitBlock_stack[i];
+                                }
+                            }
+                            else
+                            {
+                                if(tempHitBlock == 0 || CompareWalkBlock(tempHitBlock, tempHitBlock_stack[i], NPC[A].Location))
+                                {
+                                    real_block = tempHitBlock_stack[i];
+                                }
+                            }
+                            if(real_block == tempHitBlock_stack[i])
+                            {
+                                printf("YES!\n");
+                                if(tempHitCode_stack[i] == 0)
+                                {
+                                    tempHitBlock = real_block;
+                                    tempHit = tempHit_stack[i];
+                                }
+                                else if(tempHitCode_stack[i] == 1)
+                                {
+                                    tempHitBlock = real_block;
+                                    tempHit = 0;
+                                }
+                                else if(tempHitCode_stack[i] == 2)
+                                {
+                                    tempHitBlock = 0;
+                                    tempHit = 0;
+                                }
+                                else if(tempHitCode_stack[i] == 3)
+                                {
+                                    tempHitBlock = 0;
+                                    tempHit = 0;
+                                    if(NPC[A].Type == 17 || NPC[A].Type == 40) // Bullet bills crash on slopes
+                                        NPC[A].Slope = 1;
+                                    else
+                                        NPC[A].Slope = real_block;
+                                }
+                            }
+                        }
+
+                        printf("On frame %ld, NPC %d is on block %d.\n", frame_no, A, tempHitBlock);
 
                         if(tempBlockHit[1] > 0) // find out which block was hit from below
                         {
@@ -3170,12 +3341,12 @@ void UpdateNPCs()
                                                                 {
 
                                                                     if(NPC[A].Type == 269 || NPC[B].Type == 269 || NPC[A].Type == 282 || NPC[B].Type == 282)
-                                                                        HitSpot = 0;
+                                                                        HitSpot = COLLISION_NONE;
 
                                                                     if(NPC[A].Type == 283)
                                                                     {
                                                                         NPCHit(A, 3, B);
-                                                                        HitSpot = 0;
+                                                                        HitSpot = COLLISION_NONE;
                                                                     }
                                                                     else if(NPC[B].Type == 283)
                                                                         NPCHit(B, 3, A);
@@ -3185,7 +3356,7 @@ void UpdateNPCs()
                                                                     {
                                                                         if(!NPCIsABonus[NPC[B].Type])
                                                                             NPCHit(B, 10, NPC[A].CantHurtPlayer);
-                                                                        HitSpot = 0;
+                                                                        HitSpot = COLLISION_NONE;
                                                                     }
 
                                                                     // toad code
@@ -3194,7 +3365,7 @@ void UpdateNPCs()
                                                                         if(!(NPCWontHurt[NPC[B].Type] && !NPC[B].Projectile) && !NPCIsABonus[NPC[B].Type] && !(NPC[B].Type == 13) && !(NPC[B].Type == 265) && !(NPC[B].Type == 17 && NPC[B].CantHurt > 0) && !(NPC[B].Type == 50) && !(NPC[B].Type == 171) && !(NPC[B].Type == 292) && !(NPC[B].Type == 195))
                                                                         {
                                                                             NPCHit(A, 3, B);
-                                                                            HitSpot = 0;
+                                                                            HitSpot = COLLISION_NONE;
                                                                         }
                                                                     }
                                                                     // Koopa Code
@@ -3375,7 +3546,7 @@ void UpdateNPCs()
                                                                     {
                                                                         HitSpot = FindCollision(NPC[A].Location, NPC[B].Location);
                                                                         if(NPCIsToad[NPC[A].Type] && NPC[A].Killed > 0)
-                                                                            HitSpot = 0;
+                                                                            HitSpot = COLLISION_NONE;
                                                                         if(NPCIsAParaTroopa[NPC[A].Type] && NPCIsAParaTroopa[NPC[B].Type])
                                                                         {
                                                                             if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > NPC[B].Location.X + NPC[B].Location.Width / 2.0)
@@ -3386,7 +3557,7 @@ void UpdateNPCs()
                                                                                 NPC[A].Location.SpeedY = NPC[A].Location.SpeedY + 0.05;
                                                                             else
                                                                                 NPC[A].Location.SpeedY = NPC[A].Location.SpeedY - 0.05;
-                                                                            HitSpot = 0;
+                                                                            HitSpot = COLLISION_NONE;
                                                                         }
 
                                                                         if(NPC[B].Projectile == false && NPCNoClipping[NPC[A].Type] == false && NPCNoClipping[NPC[B].Type] == false)
@@ -3412,7 +3583,7 @@ void UpdateNPCs()
                                                                                     }
                                                                                 }
                                                                             }
-                                                                            else if((HitSpot == 2 || HitSpot == 4) && NPC[A].Type != 179 && NPC[B].Type != 179)
+                                                                            else if((HitSpot == COLLISION_RIGHT || HitSpot == COLLISION_LEFT) && NPC[A].Type != 179 && NPC[B].Type != 179)
                                                                             {
                                                                                 NPC[A].onWall = true;
                                                                                 if(NPC[A].Direction == NPC[B].Direction)
