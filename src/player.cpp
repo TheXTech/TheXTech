@@ -2128,7 +2128,7 @@ void TailSwipe(int plr, bool boo, bool Stab, int StabDir)
     {
         // fBlock = FirstBlock[(tailLoc.X / 32) - 1];
         // lBlock = LastBlock[((tailLoc.X + tailLoc.Width) / 32.0) + 1];
-        for(Block_t* block : treeBlockQuery(tailLoc, false))
+        for(Block_t* block : treeBlockQuery(tailLoc, SORTMODE_LOC))
         {
             A = block - &Block[1] + 1;
             if(!BlockIsSizable[Block[A].Type] && !Block[A].Hidden && (Block[A].Type != 293 || Stab) && !Block[A].Invis && !BlockNoClipping[Block[A].Type])
@@ -2663,7 +2663,7 @@ void PlayerPush(int A, int HitSpot)
     // lBlock = LastBlock[((p.Location.X + p.Location.Width) / 32.0) + 1];
     // blockTileGet(p.Location, fBlock, lBlock);
 
-    for(Block_t* block : treeBlockQuery(p.Location, false))
+    for(Block_t* block : treeBlockQuery(p.Location, SORTMODE_LOC))
     {
         int B = block - &Block[1] + 1;
         Block_t& b = *block;

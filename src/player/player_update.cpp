@@ -2326,7 +2326,7 @@ void UpdatePlayer()
                 // lBlock = LastBlock[((Player[A].Location.X + Player[A].Location.Width) / 32.0) + 1];
                 // blockTileGet(Player[A].Location, fBlock, lBlock);
 
-                for(Block_t* block : treeBlockQuery(Player[A].Location, false))
+                for(Block_t* block : treeBlockQuery(Player[A].Location, SORTMODE_LOC))
                 {
                     B = block - &Block[1] + 1;
 
@@ -2856,7 +2856,7 @@ void UpdatePlayer()
                                                 // lBlock = LastBlock[((tempLocation.X + tempLocation.Width) / 32.0) + 1];
                                                 // blockTileGet(tempLocation, fBlock, lBlock);
 
-                                                for(Block_t* block : treeBlockQuery(tempLocation, false))
+                                                for(Block_t* block : treeBlockQuery(tempLocation, SORTMODE_LOC))
                                                 {
                                                     C = block - &Block[1] + 1;
                                                     if(CheckCollision(tempLocation, Block[C].Location) && !Block[C].Hidden)
@@ -4080,7 +4080,10 @@ void UpdatePlayer()
                                                         if(CheckCollision(Player[A].Location, Block[C].Location) &&
                                                            !Block[C].Hidden && !BlockIsSizable[Block[C].Type] &&
                                                            !BlockOnlyHitspot1[Block[C].Type])
+                                                        {
                                                             Player[A].Location = tempLocation;
+                                                            break;
+                                                        }
                                                     }
 
                                                     PlaySound(SFX_BlockHit);
