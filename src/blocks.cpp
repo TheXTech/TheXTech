@@ -37,6 +37,7 @@
 #include "player.h"
 #include "sorting.h"
 #include "layers.h"
+#include "compat.h"
 
 void BlockHit(int A, bool HitDown, int whatPlayer)
 {
@@ -2023,7 +2024,12 @@ void PSwitch(bool enabled)
     {
         for(A = 1; A <= numNPCs; A++)
         {
-            if(NPCIsACoin[NPC[A].Type] == true && NPC[A].Block == 0 && NPC[A].Hidden == false && NPC[A].Special == 0.0)
+            bool transform = NPCIsACoin[NPC[A].Type] && NPC[A].Block == 0 && !NPC[A].Hidden && NPC[A].Special == 0.0;
+
+            if(NPC[A].Type == NPCID_DRAGONCOIN && g_compatibility.fix_pswitch_dragon_coin)
+                transform = false;
+
+            if(transform)
             {
                 if(numBlock < maxBlocks)
                 {
@@ -2064,7 +2070,7 @@ void PSwitch(bool enabled)
 
         for(A = numBlock; A >= 1; A--)
         {
-            if(BlockPSwitch[Block[A].Type] == true && Block[A].Special == 0 && Block[A].NPC == 0 && !Block[A].Hidden)
+            if(BlockPSwitch[Block[A].Type] && Block[A].Special == 0 && Block[A].NPC == 0 && !Block[A].Hidden)
             {
                 if(numNPCs < maxNPCs)
                 {
@@ -2100,10 +2106,11 @@ void PSwitch(bool enabled)
                     CheckSectionNPC(numNPCs);
                     Block[A] = Block[numBlock];
                     Block[numBlock] = blankBlock;
-                    numBlock = numBlock - 1;
+                    numBlock--;
                 }
             }
         }
+
         ProcEvent("P Switch - Start", true);
     }
     else
@@ -2114,7 +2121,7 @@ void PSwitch(bool enabled)
             {
                 if(numBlock < maxBlocks)
                 {
-                    numBlock = numBlock + 1;
+                    numBlock++;
                     Block[numBlock].Layer = NPC[A].Layer;
                     Block[numBlock].TriggerDeath = NPC[A].TriggerDeath;
                     Block[numBlock].TriggerLast = NPC[A].TriggerLast;

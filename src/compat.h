@@ -48,6 +48,7 @@ struct Compatibility_t
     bool fix_autoscroll_speed;
     bool fix_blooper_stomp_effect;
     bool keep_bullet_bill_dir;
+    bool fix_pswitch_dragon_coin;
 };
 
 extern Compatibility_t g_compatibility;
