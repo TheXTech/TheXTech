@@ -34,7 +34,7 @@ void record_writestate()
     fprintf(s_recordGameplayFile, "Init\r\n");
     fprintf(s_recordGameplayFile, "%s\r\n", LONG_VERSION); // game version / commit
     fprintf(s_recordGameplayFile, " %d \r\n", g_speedRunnerMode); // compatibility mode
-    fprintf(s_recordGameplayFile, "%s\r\n", FileName.c_str()); // level that was played
+    fprintf(s_recordGameplayFile, "%s\r\n", FileNameFull.c_str()); // level that was played
     if(Checkpoint == FullFileName)
         fprintf(s_recordGameplayFile, " %d \r\n", 1);
     else
@@ -73,7 +73,7 @@ void record_readstate(char* buffer)
     fgets(buffer, 1024, s_recordOldGameplayFile); // level that was played
     for(int i = 0; i < 1024; i++)
         if(buffer[i] == '\r') buffer[i] = '\0'; // clip the newline :(
-    if(strcasecmp(buffer, FileName.c_str()))
+    if(strcasecmp(buffer, FileNameFull.c_str()))
         printf("Warning: FileName does not match.\n");
     fscanf(s_recordOldGameplayFile, "%d\r\n", &n); // is there a checkpoint?
     if(n)
@@ -171,7 +171,7 @@ void record_init()
         n_chars = snprintf(buffer, 1024, "%s.%d.c.txt", FullFileName.c_str(), cur_run);
         if(!s_recordControlFile)
             s_recordControlFile = fopen(buffer, "rb");
-        if(!s_recordGameplayFile)
+        if(!s_recordOldGameplayFile)
         {
             buffer[n_chars-5] = 'g';
             s_recordOldGameplayFile = fopen(buffer, "rb");
@@ -193,6 +193,64 @@ void record_init()
     for(int i = 0; i < numPlayers; i++)
     {
         last_controls[i] = Controls_t();
+    }
+}
+
+// need to preload level info from the replay to load with proper compat
+void record_preload()
+{
+    if(!g_recordControlReplay && !g_recordControlRecord && !g_recordGameplay)
+        return;
+
+    if(LevelEditor || GameMenu || GameOutro)
+        return;
+
+    int cur_run = 0;
+    char buffer[1024];
+    int n_chars;
+    FILE* e = nullptr;
+    // existence checks, figure out correct run for filenames
+    if(g_recordReplayId != -1)
+    {
+        cur_run = g_recordReplayId + 1;
+        n_chars = snprintf(buffer, 1024, "%s.%d.c.txt", FullFileName.c_str(), cur_run);
+    }
+    else while(true)
+    {
+        n_chars = snprintf(buffer, 1024, "%s.%d.c.txt", FullFileName.c_str(), cur_run);
+        if(n_chars >= 1024)
+        {
+            // everything has failed
+            return;
+        }
+        if(e = fopen(buffer, "rb"))
+            fclose(e);
+        else
+        {
+            buffer[n_chars-5] = 'g';
+            if(e = fopen(buffer, "rb"))
+                fclose(e);
+            else
+                break;
+        }
+        cur_run ++;
+    }
+
+    if(!g_recordControlRecord && g_recordControlReplay)
+    {
+        cur_run --;
+        n_chars = snprintf(buffer, 1024, "%s.%d.c.txt", FullFileName.c_str(), cur_run);
+        if(!s_recordOldGameplayFile)
+        {
+            buffer[n_chars-5] = 'g';
+            s_recordOldGameplayFile = fopen(buffer, "rb");
+            if(s_recordOldGameplayFile)
+            {
+                record_readstate(buffer);
+                fclose(s_recordOldGameplayFile);
+                s_recordOldGameplayFile = nullptr;
+            }
+        }
     }
 }
 

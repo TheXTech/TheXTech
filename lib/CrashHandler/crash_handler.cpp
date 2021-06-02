@@ -22,6 +22,7 @@
 #include <SDL2/SDL_version.h>
 #include <SDL2/SDL_mixer_ext.h>
 
+#include <exception>
 #include <cstdlib>
 #include <signal.h>
 
