@@ -37,6 +37,7 @@
 #include "../editor/editor.h"
 #include "level_file.h"
 #include "trees.h"
+#include "record.h"
 
 #include <DirManager/dirman.h>
 #include <Utils/files.h>
@@ -129,6 +130,9 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         FileNameFull = FileName + ".lvlx";
         FullFileName = FileNamePath + FileName + ".lvlx";
     }
+
+    // load compatibility settings from previous recording
+    record_preload();
 
     IsEpisodeIntro = (StartLevel == FileNameFull);
 
