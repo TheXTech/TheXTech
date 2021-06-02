@@ -412,6 +412,43 @@ void UpdateEditor()
                             EditorControls.Mouse1 = false; /* Simulate "Focus out" inside of SMBX Editor */
                             tempBool = true;
                             UNUSED(tempBool);
+
+                            if(IntProc::isEnabled()) // Report the taken block into the Editor
+                            {
+                                LevelNPC n;
+                                n.id = EditorCursor.NPC.DefaultType;
+                                n.direct = EditorCursor.NPC.Direction;
+
+                                n.generator = EditorCursor.NPC.Generator;
+                                if(n.generator)
+                                {
+                                    n.generator_direct = EditorCursor.NPC.GeneratorDirection;
+                                    n.generator_type = EditorCursor.NPC.GeneratorEffect;
+                                    n.generator_period = EditorCursor.NPC.GeneratorTimeMax;
+                                }
+
+                                if(n.id == 91 || n.id == 96 || n.id == 283 || n.id == 284)
+                                    n.contents = EditorCursor.NPC.DefaultSpecial;
+
+                                if(n.id == 288 || n.id == 289 || (n.id == 91 && int(EditorCursor.NPC.Special) == 288))
+                                    n.special_data = EditorCursor.NPC.DefaultSpecial2;
+
+                                if(NPCIsAParaTroopa[n.id] || NPCIsCheep[n.id] || n.id == 260)
+                                    n.special_data = EditorCursor.NPC.DefaultSpecial;
+
+                                n.msg = EditorCursor.NPC.Text;
+                                n.nomove = EditorCursor.NPC.DefaultStuck;
+                                n.is_boss = EditorCursor.NPC.Legacy;
+
+                                n.layer = EditorCursor.NPC.Layer;
+                                n.event_activate = EditorCursor.NPC.TriggerActivate;
+                                n.event_die = EditorCursor.NPC.TriggerDeath;
+                                n.event_emptylayer = EditorCursor.NPC.TriggerLast;
+                                n.event_talk = EditorCursor.NPC.TriggerTalk;
+                                n.attach_layer = EditorCursor.NPC.AttLayer;
+                                IntProc::sendTakenNPC(n);
+                            }
+
                             break;
                         }
                     }
@@ -519,6 +556,28 @@ void UpdateEditor()
                                 MouseRelease = false;
                                 EditorControls.Mouse1 = false; /* Simulate "Focus out" inside of SMBX Editor */
                                 FindSBlocks();
+
+                                if(IntProc::isEnabled()) // Report the taken block into the Editor
+                                {
+                                    LevelBlock block;
+                                    block.id = EditorCursor.Block.Type;
+                                    block.w = EditorCursor.Location.Width;
+                                    block.h = EditorCursor.Location.Height;
+                                    block.invisible = EditorCursor.Block.Invis;
+                                    block.slippery = EditorCursor.Block.Slippy;
+                                    block.layer = EditorCursor.Block.Layer;
+                                    if(EditorCursor.Block.Special >= 1000)
+                                        block.npc_id = EditorCursor.Block.Special - 1000;
+                                    else if(EditorCursor.Block.Special <= 0)
+                                        block.npc_id = 0;
+                                    else if(EditorCursor.Block.Special < 1000)
+                                        block.npc_id = -EditorCursor.Block.Special;
+                                    block.event_hit = EditorCursor.Block.TriggerHit;
+                                    block.event_emptylayer = EditorCursor.Block.TriggerLast;
+                                    block.event_destroy = EditorCursor.Block.TriggerDeath;
+                                    IntProc::sendTakenBlock(block);
+                                }
+
                                 break;
                             }
                         }
@@ -674,6 +733,15 @@ void UpdateEditor()
                             }
                             MouseRelease = false;
                             EditorControls.Mouse1 = false; /* Simulate "Focus out" inside of SMBX Editor */
+
+                            if(IntProc::isEnabled()) // Report the taken block into the Editor
+                            {
+                                LevelBGO bgo;
+                                bgo.id = EditorCursor.Background.Type;
+                                bgo.layer = EditorCursor.Background.Layer;
+                                IntProc::sendTakenBGO(bgo);
+                            }
+
                             break;
                         }
                     }
@@ -783,6 +851,28 @@ void UpdateEditor()
                                 MouseRelease = false;
                                 EditorControls.Mouse1 = false; /* Simulate "Focus out" inside of SMBX Editor */
                                 FindSBlocks();
+
+                                if(IntProc::isEnabled()) // Report the taken block into the Editor
+                                {
+                                    LevelBlock block;
+                                    block.id = EditorCursor.Block.Type;
+                                    block.w = EditorCursor.Location.Width;
+                                    block.h = EditorCursor.Location.Height;
+                                    block.invisible = EditorCursor.Block.Invis;
+                                    block.slippery = EditorCursor.Block.Slippy;
+                                    block.layer = EditorCursor.Block.Layer;
+                                    if(EditorCursor.Block.Special >= 1000)
+                                        block.npc_id = EditorCursor.Block.Special - 1000;
+                                    else if(EditorCursor.Block.Special <= 0)
+                                        block.npc_id = 0;
+                                    else if(EditorCursor.Block.Special < 1000)
+                                        block.npc_id = -EditorCursor.Block.Special;
+                                    block.event_hit = EditorCursor.Block.TriggerHit;
+                                    block.event_emptylayer = EditorCursor.Block.TriggerLast;
+                                    block.event_destroy = EditorCursor.Block.TriggerDeath;
+                                    IntProc::sendTakenBlock(block);
+                                }
+
                                 break;
                             }
                         }
@@ -1678,6 +1768,13 @@ void UpdateInterprocess()
             EditorCursor.Block.Layer = EditorCursor.Layer;
             EditorCursor.Background.Layer = EditorCursor.Layer;
             EditorCursor.NPC.Layer = EditorCursor.Layer;
+            break;
+        }
+
+        case IntProc::SetNumStars:
+        {
+            auto s = IntProc::getCMD();
+            numStars = SDL_atoi(s.c_str());
             break;
         }
 

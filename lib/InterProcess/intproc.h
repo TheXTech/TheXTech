@@ -32,6 +32,12 @@ namespace IntProc
     bool isEnabled();
     bool isWorking();
 
+    void sendStarsNumber(int numStars);
+    void sendTakenBlock(const LevelBlock &block);
+    void sendTakenBGO(const LevelBGO &bgo);
+    void sendTakenNPC(const LevelNPC &npc);
+    void sendPlayerSettings(int playerId, int character, int state, int vehicleID, int vehicleState);
+
     std::string getState();
     void        setState(const std::string &instate);
 
@@ -44,7 +50,9 @@ namespace IntProc
         //! Place item (magic-hand only)
         PlaceItem = 2,
         //! Toggle a name of current
-        SetLayer = 3
+        SetLayer = 3,
+        //! Set number of taken stars
+        SetNumStars = 4
     };
 
     struct cmdEntry

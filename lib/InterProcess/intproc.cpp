@@ -188,3 +188,38 @@ bool IntProc::levelReceivingInProcess()
         return false;
     return editor->levelReceivingInProcess();
 }
+
+void IntProc::sendStarsNumber(int numStars)
+{
+    if(!editor)
+        return;
+    editor->sendStarsNumber(numStars);
+}
+
+void IntProc::sendTakenBlock(const LevelBlock &block)
+{
+    if(!editor)
+        return;
+    editor->sendTakenBlock(block);
+}
+
+void IntProc::sendTakenBGO(const LevelBGO &bgo)
+{
+    if(!editor)
+        return;
+    editor->sendTakenBGO(bgo);
+}
+
+void IntProc::sendTakenNPC(const LevelNPC &npc)
+{
+    if(!editor)
+        return;
+    editor->sendTakenNPC(npc);
+}
+
+void IntProc::sendPlayerSettings(int playerId, int character, int state, int vehicleID, int vehicleState)
+{
+    if(!editor)
+        return;
+    editor->sendPlayerSettings(playerId, character, state, vehicleID, vehicleState);
+}

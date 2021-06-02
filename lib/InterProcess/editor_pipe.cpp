@@ -99,6 +99,52 @@ EditorPipe::~EditorPipe()
     stop();
 }
 
+void EditorPipe::sendStarsNumber(int numStars)
+{
+    sendMessage(fmt::format_ne("CMD:NUM_STARS {0}", numStars));
+}
+
+void EditorPipe::sendTakenBlock(const LevelBlock &block)
+{
+    std::string encoded;
+    LevelData buffer;
+    FileFormats::CreateLevelData(buffer);
+    buffer.blocks.push_back(block);
+    buffer.layers.clear();
+    buffer.events.clear();
+    if(FileFormats::WriteExtendedLvlFileRaw(buffer, encoded))
+        sendMessage(fmt::format_ne("CMD:TAKEN_BLOCK\nTAKEN_BLOCK_END\n{0}", encoded));
+}
+
+void EditorPipe::sendTakenBGO(const LevelBGO &bgo)
+{
+    std::string encoded;
+    LevelData buffer;
+    FileFormats::CreateLevelData(buffer);
+    buffer.bgo.push_back(bgo);
+    buffer.layers.clear();
+    buffer.events.clear();
+    if(FileFormats::WriteExtendedLvlFileRaw(buffer, encoded))
+        sendMessage(fmt::format_ne("CMD:TAKEN_BGO\nTAKEN_BGO_END\n{0}", encoded));
+}
+
+void EditorPipe::sendTakenNPC(const LevelNPC &npc)
+{
+    std::string encoded;
+    LevelData buffer;
+    FileFormats::CreateLevelData(buffer);
+    buffer.npc.push_back(npc);
+    buffer.layers.clear();
+    buffer.events.clear();
+    if(FileFormats::WriteExtendedLvlFileRaw(buffer, encoded))
+        sendMessage(fmt::format_ne("CMD:TAKEN_NPC\nTAKEN_NPC_END\n{0}", encoded));
+}
+
+void EditorPipe::sendPlayerSettings(int playerId, int character, int state, int vehicleID, int vehicleState)
+{
+    sendMessage(fmt::format_ne("CMD:PLAYER_SETUP_UPDATE {0} {1} {2} {3} {4}", playerId, character, state, vehicleID, vehicleState));
+}
+
 void EditorPipe::shut()
 {
     sendMessage("CMD:ENGINE_CLOSED");
@@ -179,6 +225,11 @@ void EditorPipe::icomingData(const std::string &in)
     {
         D_pLogDebugNA("Accepted layer change!");
         IntProc::storeCommand(in.c_str() + 11, in.size() - 11, IntProc::SetLayer);
+    }
+    else if(in.compare(0, 14, "SET_NUMSTARS: ") == 0)
+    {
+        D_pLogDebugNA("Accepted stars number change!");
+        IntProc::storeCommand(in.c_str() + 14, in.size() - 14, IntProc::SetNumStars);
     }
     else if(in.compare(0, 8, "MSGBOX: ") == 0)
     {

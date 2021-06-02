@@ -15,7 +15,13 @@ class EditorPipe
 public:
     EditorPipe();
     ~EditorPipe();
+    void sendStarsNumber(int numStars);
+    void sendTakenBlock(const LevelBlock &block);
+    void sendTakenBGO(const LevelBGO &bgo);
+    void sendTakenNPC(const LevelNPC &npc);
+    void sendPlayerSettings(int playerId, int character, int state, int vehicleID, int vehicleState);
     void shut();
+
     bool        m_isWorking;
 
     static int run(void *self);
