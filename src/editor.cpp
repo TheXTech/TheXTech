@@ -416,7 +416,7 @@ void UpdateEditor()
                             if(IntProc::isEnabled()) // Report the taken block into the Editor
                             {
                                 LevelNPC n;
-                                n.id = EditorCursor.NPC.DefaultType;
+                                n.id = EditorCursor.NPC.Type;
                                 n.direct = EditorCursor.NPC.Direction;
 
                                 n.generator = EditorCursor.NPC.Generator;
@@ -428,16 +428,16 @@ void UpdateEditor()
                                 }
 
                                 if(n.id == 91 || n.id == 96 || n.id == 283 || n.id == 284)
-                                    n.contents = EditorCursor.NPC.DefaultSpecial;
+                                    n.contents = EditorCursor.NPC.Special;
 
                                 if(n.id == 288 || n.id == 289 || (n.id == 91 && int(EditorCursor.NPC.Special) == 288))
-                                    n.special_data = EditorCursor.NPC.DefaultSpecial2;
+                                    n.special_data = EditorCursor.NPC.Special2;
 
                                 if(NPCIsAParaTroopa[n.id] || NPCIsCheep[n.id] || n.id == 260)
-                                    n.special_data = EditorCursor.NPC.DefaultSpecial;
+                                    n.special_data = EditorCursor.NPC.Special;
 
                                 n.msg = EditorCursor.NPC.Text;
-                                n.nomove = EditorCursor.NPC.DefaultStuck;
+                                n.nomove = EditorCursor.NPC.Stuck;
                                 n.is_boss = EditorCursor.NPC.Legacy;
 
                                 n.layer = EditorCursor.NPC.Layer;
@@ -736,10 +736,14 @@ void UpdateEditor()
 
                             if(IntProc::isEnabled()) // Report the taken block into the Editor
                             {
-                                LevelBGO bgo;
-                                bgo.id = EditorCursor.Background.Type;
-                                bgo.layer = EditorCursor.Background.Layer;
-                                IntProc::sendTakenBGO(bgo);
+                                LevelBGO b;
+                                b.id = EditorCursor.Background.Type;
+                                b.layer = EditorCursor.Background.Layer;
+                                b.z_mode = EditorCursor.Background.zMode;
+                                b.z_offset = EditorCursor.Background.zOffset;
+                                if(EditorCursor.Background.zMode == LevelBGO::ZDefault)
+                                    b.smbx64_sp = EditorCursor.Background.SortPriority;
+                                IntProc::sendTakenBGO(b);
                             }
 
                             break;
@@ -1477,6 +1481,7 @@ void UpdateEditor()
                     if(numBackground < maxBackgrounds) // Not out of backgrounds
                     {
                         numBackground++;
+                        EditorCursor.Background.uid = numBackground;
                         Background[numBackground] = EditorCursor.Background;
                         if(MagicHand)
                         {
@@ -1857,31 +1862,12 @@ void UpdateInterprocess()
                 EditorCursor.Location.X = b.x;
                 EditorCursor.Location.Y = b.y;
                 EditorCursor.Background.Layer = b.layer;
-                EditorCursor.Background.SortPriority = int(b.smbx64_sp);
+                EditorCursor.Background.SortPriority = -1;
                 EditorCursor.Background.uid = (numBackground + 1);
+                EditorCursor.Background.zMode = b.z_mode;
+                EditorCursor.Background.zOffset = b.z_offset;
 
-                if(b.z_mode == LevelBGO::ZDefault)
-                    EditorCursor.Background.SortPriority = int(b.smbx64_sp);
-                else
-                {
-                    switch(b.z_mode)
-                    {
-                    case LevelBGO::Background2:
-                        EditorCursor.Background.SortPriority = 10;
-                        break;
-                    case LevelBGO::Background1:
-                        EditorCursor.Background.SortPriority = 30;
-                        break;
-                    case LevelBGO::Foreground1:
-                        EditorCursor.Background.SortPriority = 125;
-                        break;
-                    case LevelBGO::Foreground2:
-                        EditorCursor.Background.SortPriority = 200;
-                        break;
-                    default:
-                        break;
-                    }
-                }
+                bgoApplyZMode(&EditorCursor.Background, int(b.smbx64_sp));
 
                 if(EditorCursor.Background.Type > maxBackgroundType) // Avoid out of range crash
                     EditorCursor.Background.Type = 1;

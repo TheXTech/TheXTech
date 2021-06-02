@@ -30,6 +30,10 @@
 #include <string>
 #include <PGE_File_Formats/lvl_filedata.h>
 
+struct Background_t;
+
+extern void bgoApplyZMode(Background_t *bgo, int smbx64sp);
+
 extern void addMissingLvlSuffix(std::string &fileName);
 
 //! loads the level
