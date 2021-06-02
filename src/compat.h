@@ -47,6 +47,7 @@ struct Compatibility_t
     bool enable_multipoints;
     bool fix_autoscroll_speed;
     bool fix_blooper_stomp_effect;
+    bool keep_bullet_bill_dir;
 };
 
 extern Compatibility_t g_compatibility;
