@@ -184,20 +184,23 @@ public:
     {
         if(NPC[A].Chat)
         {
-            if (Chat_n == sizeof(Chat)/sizeof(uint16_t))
-                return;
-            Chat[Chat_n] = A;
-            Chat_n += 1;
+            if(Chat_n != sizeof(Chat)/sizeof(uint16_t))
+            {
+                Chat[Chat_n] = A;
+                Chat_n += 1;
+                g_stats.renderedNPCs += 1;
+            }
         }
 
         if(NPC[A].Effect == 2)
         {
             if(std::fmod(NPC[A].Effect2, 3) == 0.0)
                 return;
-            if (Dropped_n == sizeof(Dropped)/sizeof(uint16_t))
+            if(Dropped_n == sizeof(Dropped)/sizeof(uint16_t))
                 return;
             Dropped[Dropped_n] = A;
             Dropped_n += 1;
+            g_stats.renderedNPCs += 1;
         }
         else if(
                 (
@@ -209,34 +212,38 @@ public:
                 ) && NPC[A].Type != 91 && !Player[NPC[A].HoldingPlayer].Dead
             )
         {
-            if (Held_n == sizeof(Held)/sizeof(uint16_t))
+            if(Held_n == sizeof(Held)/sizeof(uint16_t))
                 return;
             Held[Held_n] = A;
             Held_n += 1;
+            g_stats.renderedNPCs += 1;
         }
         else if(NPC[A].Effect == 0 && NPCForeground[NPC[A].Type] && NPC[A].HoldingPlayer == 0 && !NPCIsACoin[NPC[A].Type])
         {
-            if (FG_n == sizeof(FG)/sizeof(uint16_t))
+            if(FG_n == sizeof(FG)/sizeof(uint16_t))
                 return;
             FG[FG_n] = A;
             FG_n += 1;
+            g_stats.renderedNPCs += 1;
         }
         else if(NPC[A].Type == 263 && NPC[A].Effect == 0 && NPC[A].HoldingPlayer == 0)
         {
-            if (Iced_n == sizeof(Iced)/sizeof(uint16_t))
+            if(Iced_n == sizeof(Iced)/sizeof(uint16_t))
                 return;
             Iced[Iced_n] = A;
             Iced_n += 1;
+            g_stats.renderedNPCs += 1;
         }
         else if(NPC[A].Effect == 0 && NPC[A].HoldingPlayer == 0 &&
             (NPC[A].standingOnPlayer > 0 || NPC[A].Type == 56 || NPC[A].Type == 22 ||
                 NPC[A].Type == 49 || NPC[A].Type == 91 || NPC[A].Type == 160 ||
                 NPC[A].Type == 282 || NPCIsACoin[NPC[A].Type]))
         {
-            if (Low_n == sizeof(Low)/sizeof(uint16_t))
+            if(Low_n == sizeof(Low)/sizeof(uint16_t))
                 return;
             Low[Low_n] = A;
             Low_n += 1;
+            g_stats.renderedNPCs += 1;
         }
         else if(NPC[A].Type == 179 || NPC[A].Type == 270 ||
             ((NPC[A].Effect == 208 || NPCIsAVine[NPC[A].Type] ||
@@ -247,17 +254,19 @@ public:
                     NPC[A].Effect == 4 || (NPC[A].Type == 45 && NPC[A].Special == 0.0))
                 && NPC[A].standingOnPlayer == 0))
         {
-            if (BG_n == sizeof(BG)/sizeof(uint16_t))
+            if(BG_n == sizeof(BG)/sizeof(uint16_t))
                 return;
             BG[BG_n] = A;
             BG_n += 1;
+            g_stats.renderedNPCs += 1;
         }
         else if(NPC[A].Effect == 0 && NPC[A].HoldingPlayer == 0)
         {
-            if (Normal_n == sizeof(Normal)/sizeof(uint16_t))
+            if(Normal_n == sizeof(Normal)/sizeof(uint16_t))
                 return;
             Normal[Normal_n] = A;
             Normal_n += 1;
+            g_stats.renderedNPCs += 1;
         }
     }
 };
@@ -629,11 +638,11 @@ void UpdateGraphics(bool skipRepaint)
                 {
                     onscreen = cannot_reset = can_activate = false;
                 }
-                else if (g_compatibility.NPC_activate_mode == NPC_activate_modes::onscreen)
+                else if(g_compatibility.NPC_activate_mode == NPC_activate_modes::onscreen)
                 {
                     onscreen = cannot_reset = can_activate = vScreenCollision(Z, NPC[A].Location) || (loc2_exists && vScreenCollision(Z, loc2));
                 }
-                else if (g_compatibility.NPC_activate_mode == NPC_activate_modes::smart)
+                else if(g_compatibility.NPC_activate_mode == NPC_activate_modes::smart)
                 {
                     onscreen = vScreenCollision(Z, NPC[A].Location) || (loc2_exists && vScreenCollision(Z, loc2));
                     bool onscreen_orig = vScreenCollisionCanonical(X, Y, NPC[A].Location) || (loc2_exists && vScreenCollisionCanonical(X, Y, loc2));
@@ -651,7 +660,7 @@ void UpdateGraphics(bool skipRepaint)
                     else
                         can_activate = onscreen;
                 }
-                else if (g_compatibility.NPC_activate_mode == NPC_activate_modes::orig)
+                else if(g_compatibility.NPC_activate_mode == NPC_activate_modes::orig)
                 {
                     onscreen = vScreenCollision(Z, NPC[A].Location) || (loc2_exists && vScreenCollision(Z, loc2));
                     bool onscreen_orig = vScreenCollisionCanonical(X, Y, NPC[A].Location) || (loc2_exists && vScreenCollisionCanonical(X, Y, loc2));
@@ -664,7 +673,8 @@ void UpdateGraphics(bool skipRepaint)
                 }
 
                 // don't show a Cheep that hasn't jumped yet
-                if(NPCIsCheep[NPC[A].Type] && Maths::iRound(NPC[A].Special) == 2)
+                if(g_compatibility.NPC_activate_mode != NPC_activate_modes::onscreen
+                    && NPCIsCheep[NPC[A].Type] && Maths::iRound(NPC[A].Special) == 2)
                 {
                     if(!NPC[A].Active)
                         onscreen = false;
@@ -672,9 +682,7 @@ void UpdateGraphics(bool skipRepaint)
 
                 if(can_activate)
                 {
-                    if(NPC[A].Generator)
-                        NPC[A].GeneratorActive = true;
-                    else if(NPC[A].Type == 0) // what is this?
+                    if(NPC[A].Type == 0) // what is this?
                     {
                         NPC[A].Killed = 9;
                         KillNPC(A, 9);
@@ -685,6 +693,8 @@ void UpdateGraphics(bool skipRepaint)
                         NPC[A].Active = true;
                         NPC[A].JustActivated = Z;
                     }
+                    if(NPC[A].Generator)
+                        NPC[A].GeneratorActive = true;
                 }
 
                 if(cannot_reset)
@@ -703,7 +713,8 @@ void UpdateGraphics(bool skipRepaint)
                             NPC[A].TimeLeft = Physics.NPCTimeOffScreen;
                     }
 
-                    if(NPC[A].Active)
+                    if(g_compatibility.NPC_activate_mode == NPC_activate_modes::onscreen
+                        || NPC[A].Active)
                     {
                         NPC[A].Reset[1] = false;
                         NPC[A].Reset[2] = false;
@@ -722,11 +733,13 @@ void UpdateGraphics(bool skipRepaint)
 
                 if(!Do_FrameSkip && onscreen && ((NPC[A].Reset[1] && NPC[A].Reset[2]) || NPC[A].Active || NPC[A].Type == NPCID_CONVEYER))
                 {
-                    g_stats.renderedNPCs++;
                     NPC_Draw_Queue_p.add(A);
 
-                    if(!NPC[A].Active)
+                    if(g_compatibility.NPC_activate_mode != NPC_activate_modes::onscreen
+                        && !NPC[A].Active)
+                    {
                         NPCFrames(A);
+                    }
                 }
             }
         }
