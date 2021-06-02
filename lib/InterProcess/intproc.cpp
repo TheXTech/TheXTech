@@ -18,10 +18,12 @@
  */
 
 #include "intproc.h"
+#include <SDL2/SDL_atomic.h>
 #include "../Logger/logger.h"
 
 EditorPipe              *IntProc::editor = nullptr;
 static bool             ipc_enabled = false;
+static SDL_atomic_t     has_command;
 
 static std::string      state;
 static std::mutex       state_lock;
@@ -33,6 +35,7 @@ static std::mutex                       cmd_mutex;
 
 void IntProc::init()
 {
+    SDL_AtomicSet(&has_command, 0);
     pLogDebug("IntProc constructing...");
     editor = new EditorPipe();
     editor->m_isWorking = true;
@@ -107,6 +110,7 @@ void IntProc::storeCommand(const char *cmd, size_t length, IntProc::ExternalComm
 
     cmd_queue.push_back({in, type});
     cmd_recentType = type;
+    SDL_AtomicSet(&has_command, 1);
     cmd_mutex.unlock();
 }
 
@@ -122,7 +126,7 @@ void IntProc::cmdUnLock()
 
 bool IntProc::hasCommand()
 {
-    return !cmd_queue.empty();
+    return SDL_AtomicGet(&has_command);
 }
 
 IntProc::ExternalCommands IntProc::commandType()
@@ -136,6 +140,8 @@ std::string IntProc::getCMD()
     cmd_queue.pop_front();
     if(!cmd_queue.empty())
         cmd_recentType = cmd_queue.front().type;
+    else
+        SDL_AtomicSet(&has_command, 0);
     return tmp.cmd;
 }
 

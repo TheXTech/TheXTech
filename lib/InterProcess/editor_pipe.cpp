@@ -36,10 +36,10 @@ int EditorPipe::run(void *self)
 void EditorPipe::start()
 {
     std::cin.sync_with_stdio(false);
-    #ifndef PGE_NO_THREADING
+#ifndef PGE_NO_THREADING
     m_thread_isAlive = true;
     m_thread = SDL_CreateThread(&run, "EditorPipe_std", this);
-    #endif
+#endif
 }
 
 void EditorPipe::stop()

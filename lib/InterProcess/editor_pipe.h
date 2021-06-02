@@ -10,8 +10,8 @@
 class EditorPipe
 {
     friend class EditorPipe_std;
-    SDL_Thread *m_thread;
-    bool        m_thread_isAlive;
+    SDL_Thread *m_thread = nullptr;
+    bool        m_thread_isAlive = false;
 public:
     EditorPipe();
     ~EditorPipe();
@@ -26,6 +26,7 @@ public:
     bool        m_isWorking;
 
     static int run(void *self);
+    static int sendMessageAsync(void *outString);
     void start();
     void stop();
 
