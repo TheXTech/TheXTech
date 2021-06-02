@@ -1304,10 +1304,10 @@ void KillNPC(int A, int B)
             }
             else
                 NewEffect(14 , NPC[A].Location);
-         }
-         else if(NPC[A].Type == 17 || NPC[A].Type == 18) // Bullet Bills
-         {
-             NPC[A].Location.SpeedX = NPC[A].Location.SpeedX / 2;
+        }
+        else if(NPC[A].Type == 17 || NPC[A].Type == 18) // Bullet Bills
+        {
+            NPC[A].Location.SpeedX = NPC[A].Location.SpeedX / 2;
             if(B == 1)
                  NPC[A].Location.SpeedX = 0.0001 * NPC[A].Direction;
             else if(B == 5)

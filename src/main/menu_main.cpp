@@ -901,7 +901,7 @@ bool mainMenuUpdate()
                 MenuMode == MENU_SELECT_SLOT_1P_COPY_S2 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S2)
         {
             if(MenuMouseMove)
-                s_handleMouseMove(4, 300, 350, 300, 30);
+                s_handleMouseMove(2, 300, 350, 300, 30);
 
             if(MenuCursorCanMove || MenuMouseClick || MenuMouseBack)
             {
@@ -968,7 +968,7 @@ bool mainMenuUpdate()
         else if(MenuMode == MENU_SELECT_SLOT_1P_DELETE || MenuMode == MENU_SELECT_SLOT_1P_DELETE)
         {
             if(MenuMouseMove)
-                s_handleMouseMove(4, 300, 350, 300, 30);
+                s_handleMouseMove(2, 300, 350, 300, 30);
 
             if(MenuCursorCanMove || MenuMouseClick || MenuMouseBack)
             {
