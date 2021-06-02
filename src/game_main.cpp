@@ -64,6 +64,7 @@
 #include "main/speedrunner.h"
 #include "main/menu_main.h"
 #include "main/game_info.h"
+#include "main/record.h"
 #include "main/trees.h"
 #include "rand.h"
 
@@ -125,23 +126,11 @@ int GameMain(const CmdLineSetup_t &setup)
 
     g_speedRunnerMode = setup.speedRunnerMode;
     speedRun_setSemitransparentRender(setup.speedRunnerSemiTransparent);
-    if(!setup.gameplayLog.empty())
-    {
-        seedRandom(42);
-        g_speedRunnerGameplayLog = fopen(setup.gameplayLog.c_str(), "w");
-    }
-    if(!setup.replayControls.empty())
-    {
-        seedRandom(42);
-        g_speedRunnerControlFile = fopen(setup.replayControls.c_str(), "r");
-        g_speedRunnerDebug = SPEEDRUN_DEBUG_PLAY;
-    }
-    else if(!setup.recordControls.empty())
-    {
-        seedRandom(42);
-        g_speedRunnerControlFile = fopen(setup.recordControls.c_str(), "w");
-        g_speedRunnerDebug = SPEEDRUN_DEBUG_REC;
-    }
+
+    g_recordControlReplay = setup.recordReplay;
+    g_recordControlRecord = setup.recordRecord;
+    g_recordGameplay = setup.recordReplay | setup.recordRecord;
+    g_recordReplayId = setup.recordReplayId;
 
     ResetCompat();
 
@@ -161,13 +150,7 @@ int GameMain(const CmdLineSetup_t &setup)
     gfxLoaderTestMode = setup.testLevelMode;
 
     if(!GFX.load()) // Load UI graphics
-    {
-        if(g_speedRunnerGameplayLog)
-            fclose(g_speedRunnerGameplayLog);
-        if(g_speedRunnerControlFile)
-            fclose(g_speedRunnerControlFile);
         return 1;
-    }
 
 //    If LevelEditor = False Then
 //        frmMain.Show // Show window a bit later
@@ -382,14 +365,14 @@ int GameMain(const CmdLineSetup_t &setup)
                 if(A == 4)
                 {
                     p.Mount = 1;
-                    p.MountType = int(iRand() % 3) + 1;
+                    p.MountType = int(iRand(3)) + 1;
                 }
 
                 p.Character = A;
                 if(A == 2)
                 {
                     p.Mount = 3;
-                    p.MountType = int(iRand() % 8) + 1;
+                    p.MountType = int(iRand(8)) + 1;
                 }
 
                 p.HeldBonus = 0;
@@ -502,8 +485,8 @@ int GameMain(const CmdLineSetup_t &setup)
             For(A, 1, numPlayers)
             {
                 Player_t &p = Player[A];
-                p.State = (iRand() % 6) + 2;
-                p.Character = (iRand() % 5) + 1;
+                p.State = (iRand(6)) + 2;
+                p.Character = (iRand(5)) + 1;
 
                 if(A >= 1 && A <= 5)
                     p.Character = A;
@@ -550,7 +533,7 @@ int GameMain(const CmdLineSetup_t &setup)
             if(!GameIsActive)
             {
                 speedRun_saveStats();
-                break;// Break on quit
+                return 0;// Break on quit
             }
         }
 
@@ -645,7 +628,7 @@ int GameMain(const CmdLineSetup_t &setup)
                 if(!GameIsActive)
                 {
                     speedRun_saveStats();
-                    break;// Break on quit
+                    return 0;// Break on quit
                 }
             }
         }
@@ -655,6 +638,8 @@ int GameMain(const CmdLineSetup_t &setup)
         {
             CheatString.clear();
             EndLevel = false;
+
+            record_init(); // initializes level data recording
 
             if(numPlayers == 1)
                 ScreenType = 0; // Follow 1 player
@@ -794,10 +779,11 @@ int GameMain(const CmdLineSetup_t &setup)
                 }
                 return false;
             });
+            record_finish();
             if(!GameIsActive)
             {
                 speedRun_saveStats();
-                break;// Break on quit
+                return 0;// Break on quit
             }
 
             // TODO: Utilize this and any TestLevel/MagicHand related code to allow PGE Editor integration
@@ -844,11 +830,6 @@ int GameMain(const CmdLineSetup_t &setup)
         }
 
     } while(GameIsActive);
-
-    if(g_speedRunnerGameplayLog)
-        fclose(g_speedRunnerGameplayLog);
-    if(g_speedRunnerControlFile)
-        fclose(g_speedRunnerControlFile);
 
     return 0;
 }
@@ -1540,7 +1521,7 @@ void StartBattleMode()
     else
     {
         if(selWorld == 1)
-            selWorld = (iRand() % (NumSelectWorld - 1)) + 2;
+            selWorld = (iRand(NumSelectWorld - 1)) + 2;
     }
 
     std::string levelPath = SelectWorld[selWorld].WorldPath + SelectWorld[selWorld].WorldFile;

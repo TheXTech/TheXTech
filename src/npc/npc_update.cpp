@@ -729,7 +729,7 @@ void UpdateNPCs()
                     NPC[A].Special = 100;
             }
             if(NPC[A].Type == 84 || NPC[A].Type == 181)
-                NPC[A].Special = iRand() % 200;
+                NPC[A].Special = iRand(200);
             NPC[A].JustActivated = 0;
             NPC[A].CantHurt = 0;
             NPC[A].CantHurtPlayer = 0;
@@ -901,7 +901,7 @@ void UpdateNPCs()
 
             if(NPC[A].Type == 147)
             {
-                B = iRand() % 9;
+                B = iRand(9);
                 NPC[A].Type = 139 + B;
                 if(NPC[A].Type == 147)
                     NPC[A].Type = 92;
@@ -1022,7 +1022,7 @@ void UpdateNPCs()
                             NPC[A].Location.Width = NPCWidth[NPC[A].Type];
                             if(NPC[A].Type == 147)
                             {
-                                B = iRand() % 9;
+                                B = iRand(9);
                                 NPC[A].Type = 139 + B;
                                 if(NPC[A].Type == 147)
                                     NPC[A].Type = 92;
@@ -1235,7 +1235,7 @@ void UpdateNPCs()
                     {
                         if(NPC[A].Direction == 0)
                         {
-                            if(iRand() % 2 == 0)
+                            if(iRand(2) == 0)
                                 NPC[A].Direction = -1;
                             else
                                 NPC[A].Direction = 1;
@@ -3978,7 +3978,7 @@ void UpdateNPCs()
                         else
                         {
                             do
-                                B = (iRand() % numPlayers) + 1;
+                                B = iRand(numPlayers) + 1;
                             while(Player[B].Dead || Player[B].TimeToLive > 0);
                             NPC[A].Special5 = B;
                         }
@@ -4421,18 +4421,18 @@ void UpdateNPCs()
                 {
                     if(NPC[A].Type == 21)
                     {
-                        NPC[A].Special = NPC[A].Special + 1;
+                        NPC[A].Special += 1;
                         if(NPC[A].HoldingPlayer > 0)
                         {
                             if(Player[NPC[A].HoldingPlayer].Effect == 0)
-                                NPC[A].Special = NPC[A].Special + 6;
+                                NPC[A].Special += 6;
                         }
                     }
                     else
                     {
                         if(NPC[A].HoldingPlayer > 0)
                         {
-                            if(Player[NPC[A].HoldingPlayer].SpinJump == true)
+                            if(Player[NPC[A].HoldingPlayer].SpinJump)
                             {
                                 if(NPC[A].Direction != Player[NPC[A].HoldingPlayer].SpinFireDir)
                                 {
@@ -4448,7 +4448,7 @@ void UpdateNPCs()
                         }
                         else if(NPC[A].standingOnPlayer > 0)
                             NPC[A].Special = NPC[A].Special + 5;
-                        else if(NPC[A].Projectile == true)
+                        else if(NPC[A].Projectile)
                         {
                             // .Special = .Special + 10
                         }
@@ -4460,7 +4460,7 @@ void UpdateNPCs()
 
                         if(NPC[A].HoldingPlayer > 0)
                         {
-                            if(Player[NPC[A].HoldingPlayer].SpinJump == true)
+                            if(Player[NPC[A].HoldingPlayer].SpinJump)
                                 Player[NPC[A].HoldingPlayer].SpinFireDir = int(NPC[A].Direction);
                         }
 
@@ -4478,7 +4478,7 @@ void UpdateNPCs()
                                             NPC[A].Direction = -1;
                                         else
                                             NPC[A].Direction = 1;
-                                        if(CanComeOut(NPC[A].Location, Player[B].Location) == false)
+                                        if(!CanComeOut(NPC[A].Location, Player[B].Location))
                                             C = -1;
                                     }
                                 }
@@ -4515,9 +4515,9 @@ void UpdateNPCs()
                                 else if(NPC[A].Type == 22)
                                 {
                                     tempBool = true;
-                                    numNPCs = numNPCs - 1;
+                                    numNPCs -= 1;
                                 }
-                                if(tempBool == false)
+                                if(!tempBool)
                                 {
                                     NPC[numNPCs].Shadow = NPC[A].Shadow;
                                     NPC[numNPCs].Active = true;
@@ -4693,7 +4693,7 @@ void UpdateNPCs()
                         {
                             NPC[A].Location.SpeedX = 0;
                             if(fiEqual(NPC[A].Special, 0))
-                                NPC[A].Special = (iRand() % 3) + 1;
+                                NPC[A].Special = iRand(3) + 1;
                             if(fiEqual(NPC[A].Special, 1))
                             {
                                 NPC[A].FrameCount = NPC[A].FrameCount + 1;

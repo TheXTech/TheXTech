@@ -27,18 +27,18 @@
 #define RAND_H
 
 /**
- * @brief Seed all future random numbers with integer argument seed
+ * @brief Seeds the random number generator with argument seed for reproducible results
  */
 extern void seedRandom(int seed);
 
 /**
- * @brief Random number generator in float format, between 0.0f to 1.0f
+ * @brief Random number generator in float format, between 0.0f to 1.0f (exclusive)
  * @return random float value
  */
 extern float fRand();
 
 /**
- * @brief Random number generator in double format, between 0.0 to 1.0
+ * @brief Random number generator in double format, between 0.0 to 1.0 (exclusive)
  * @return random double value
  */
 extern double dRand();
@@ -48,6 +48,12 @@ extern double dRand();
  * @return random integer value
  */
 extern int iRand();
+
+/**
+ * @brief Random number generator in integer format, between 0 to argument max (exclusive)
+ * @return random integer value
+ */
+extern int iRand(int max);
 
 
 #endif // RAND_H

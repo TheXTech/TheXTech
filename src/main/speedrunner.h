@@ -26,8 +26,6 @@
 #ifndef SPEEDRUNNER_H
 #define SPEEDRUNNER_H
 
-#include <cstdio>
-
 #include "../controls.h"
 
 enum
@@ -38,17 +36,7 @@ enum
     SPEEDRUN_MODE_3
 };
 
-enum
-{
-    SPEEDRUN_DEBUG_OFF = 0,
-    SPEEDRUN_DEBUG_REC,
-    SPEEDRUN_DEBUG_PLAY,
-};
-
 extern int  g_speedRunnerMode;
-extern int  g_speedRunnerDebug;
-extern FILE* g_speedRunnerControlFile;
-extern FILE* g_speedRunnerGameplayLog;
 
 void speedRun_tick();
 

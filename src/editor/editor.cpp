@@ -1643,6 +1643,12 @@ void UpdateInterprocess()
 }
 #endif // #ifndef NO_INTPROC
 
+int EditorNPCFrame(int A, int C, int N)
+{
+    float C_ = C;
+    return EditorNPCFrame(A, C_, N);
+}
+
 int EditorNPCFrame(int A, float& C, int N)
 {
     int ret = 0;
@@ -1655,7 +1661,7 @@ int EditorNPCFrame(int A, float& C, int N)
     int E = 0;
     B = C;
     while(int(B) == 0)
-        B = (iRand() % 3) - 1;
+        B = (iRand(3)) - 1;
 
     if(LevelEditor == false)
         C = B;

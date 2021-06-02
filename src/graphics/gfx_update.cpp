@@ -88,8 +88,8 @@ struct ScreenShake_t
             {
             default:
             case SHAKE_RANDOM:
-                offsetX = forceX > 0 ? (int)round((SDL_fmod(iRand(), forceX) * 4) - forceX * 2) : 0;
-                offsetY = forceY > 0 ? (int)round((SDL_fmod(iRand(), forceY) * 4) - forceY * 2) : 0;
+                offsetX = forceX > 0 ? (int)round((dRand()*forceX * 4) - forceX * 2) : 0;
+                offsetY = forceY > 0 ? (int)round((dRand()*forceY * 4) - forceY * 2) : 0;
                 break;
             case SHAKE_SEQUENTIAL:
                 offsetX = forceX > 0 ? (int)round(sign * forceX) : 0;

@@ -239,24 +239,19 @@ int main(int argc, char**argv)
         TCLAP::SwitchArg switchSpeedRunSemiTransparent(std::string(), "speed-run-semitransparent",
                                                        "Make the speed-runner mode timer be drawn transparently", false);
 
-        TCLAP::ValueArg<std::string> recordControls(std::string(), "record-controls", "Path to save a controls recording to.",
-                                                false, "",
-                                                "record path",
-                                                cmd);
-
-        TCLAP::ValueArg<std::string> replayControls(std::string(), "replay-controls", "Path to replay a controls recording from.",
-                                                false, "",
-                                                "replay path",
-                                                cmd);
-
-        TCLAP::ValueArg<std::string> gameplayLog(std::string(), "gameplay-log", "Path to save a log of limited gameplay data.",
-                                                false, "",
-                                                "log path",
-                                                cmd);
-
         TCLAP::SwitchArg switchVerboseLog(std::string(), "verbose", "Enable log output into the terminal", false);
 
         TCLAP::UnlabeledValueArg<std::string> inputFileNames("levelpath", "Path to level file to run the test", false, std::string(), "path to file");
+
+        TCLAP::ValueArg<int> recordReplayId(std::string(), "replay-id",
+                                                   "Index of recording data to replay.\n",
+                                                    false, -1,
+                                                   "index found in recording filename",
+                                                   cmd);
+        TCLAP::SwitchArg recordReplay(std::string(), "replay",
+                                        "Replay previous game data.", false);
+        TCLAP::SwitchArg recordRecord(std::string(), "record",
+                                        "Record your gameplay data.", false);
 
         cmd.add(&switchFrameSkip);
         cmd.add(&switchNoSound);
@@ -272,6 +267,9 @@ int main(int argc, char**argv)
         cmd.add(&switchVerboseLog);
         cmd.add(&switchSpeedRunSemiTransparent);
         cmd.add(&inputFileNames);
+
+        cmd.add(&recordReplay);
+        cmd.add(&recordRecord);
 
         cmd.parse(argc, argv);
 
@@ -334,20 +332,27 @@ int main(int argc, char**argv)
         setup.speedRunnerMode = speedRunMode.getValue();
         setup.speedRunnerSemiTransparent = switchSpeedRunSemiTransparent.getValue();
 
-        setup.replayControls = replayControls.getValue();
-        setup.recordControls = recordControls.getValue();
-        setup.gameplayLog = gameplayLog.getValue();
+        setup.recordReplay = recordReplay.getValue();
+        setup.recordRecord = recordRecord.getValue();
+        setup.recordReplayId = recordReplayId.getValue();
+
+        if(setup.recordReplayId != -1)
+            setup.recordReplay = true;
+
+        if(setup.recordReplay || setup.recordRecord)
+            setup.frameSkip = false;
+
+        if(setup.testLevelMode && setup.recordReplay)
+        {
+            setup.testShowFPS = true;
+            setup.testMaxFPS = true;
+            setup.neverPause = true;
+        }
 
         if(setup.speedRunnerMode >= 1) // Always show FPS and don't pause the game work when focusing other windows
         {
             setup.testShowFPS = true;
             setup.neverPause = true;
-        }
-
-        if(!setup.replayControls.empty() && !setup.gameplayLog.empty())
-        {
-            setup.testShowFPS = true;
-            setup.testMaxFPS = true;
         }
     }
     catch(TCLAP::ArgException &e)   // catch any exceptions

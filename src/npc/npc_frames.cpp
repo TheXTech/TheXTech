@@ -906,7 +906,7 @@ void NPCFrames(int A)
                 NPC[A].Frame = 3;
         }
 
-        if(iRand() % 4 == 0)
+        if(iRand(4) == 0)
         {
             NewEffect(80, newLoc(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - 4, NPC[A].Location.Y + NPC[A].Location.Height / 2.0 - 4), 1, 0, NPC[A].Shadow);
             Effect[numEffects].Location.SpeedX = dRand() * 1 - 0.5;
@@ -1065,11 +1065,11 @@ void NPCFrames(int A)
             NPC[A].Frame = NPC[A].Frame + 6;
         else // If .Special3 >= 16 Then
             NPC[A].Special3 = 0;
-        if(fRand() * 10 > 9.2)
+        if(dRand() * 10 > 9.2)
         {
             NewEffect(80, newLoc(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - 4, NPC[A].Location.Y + NPC[A].Location.Height / 2.0 - 6), 1, 0, NPC[A].Shadow);
-            Effect[numEffects].Location.SpeedX = std::fmod(fRand(), 1.0) - 0.5;
-            Effect[numEffects].Location.SpeedY = std::fmod(fRand(), 1.0) - 0.5;
+            Effect[numEffects].Location.SpeedX = dRand() * 1.0 - 0.5;
+            Effect[numEffects].Location.SpeedY = dRand() * 1.0 - 0.5;
         }
     }
     else if(NPC[A].Type == 91)
@@ -1663,7 +1663,7 @@ void NPCFrames(int A)
                                 NewEffect(80, tempLocation);
                                 Effect[numEffects].Location.SpeedX = NPC[A].Location.SpeedX * 0.5;
                                 Effect[numEffects].Location.SpeedY = NPC[A].Location.SpeedY * 0.5;
-                                Effect[numEffects].Frame = iRand() % 3;
+                                Effect[numEffects].Frame = iRand(3);
                             }
                         }
                         else if(dRand() * 10 > 6)
@@ -1677,7 +1677,7 @@ void NPCFrames(int A)
                             NewEffect(80, tempLocation, 1, 0, NPC[A].Shadow);
                             Effect[numEffects].Location.SpeedX = NPC[A].Location.SpeedX * 0.25;
                             Effect[numEffects].Location.SpeedY = NPC[A].Location.SpeedY * 0.25;
-                            Effect[numEffects].Frame = iRand() % 3;
+                            Effect[numEffects].Frame = iRand(3);
                         }
                     }
                     else
@@ -1702,7 +1702,7 @@ void NPCFrames(int A)
                             NewEffect(80, tempLocation);
                             Effect[numEffects].Location.SpeedX = NPC[A].Location.SpeedX * 0.5;
                             Effect[numEffects].Location.SpeedY = NPC[A].Location.SpeedY * 0.5;
-                            Effect[numEffects].Frame = iRand() % 3;
+                            Effect[numEffects].Frame = iRand(3);
                         }
                     }
                     else if(dRand() * 10 > 6)
@@ -1716,7 +1716,7 @@ void NPCFrames(int A)
                         NewEffect(80, tempLocation, 1, 0, NPC[A].Shadow);
                         Effect[numEffects].Location.SpeedX = NPC[A].Location.SpeedX * 0.25;
                         Effect[numEffects].Location.SpeedY = NPC[A].Location.SpeedY * 0.25;
-                        Effect[numEffects].Frame = iRand() % 3;
+                        Effect[numEffects].Frame = iRand(3);
                     }
                 }
                 else

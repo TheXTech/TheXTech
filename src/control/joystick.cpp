@@ -43,6 +43,7 @@
 #include "../pseudo_vb.h"
 #include "../main/speedrunner.h"
 #include "../main/menu_main.h"
+#include "../main/record.h"
 
 #ifdef USE_TOUCHSCREEN_CONTROLLER
 #include "touchscreen.h"
@@ -942,9 +943,23 @@ void UpdateControls()
                 } // s_touch.m_touchHidden
             }
 #endif
+        }
+    }
+    // Push the controls state into the speed-runner to properly display
+    record_sync();
+    speedRun_syncControlKeys(Player[1].Controls);
+    For(B, 1, numPlayers)
+    {
+        if(B == 2 && numPlayers == 2) {
+            A = 2;
+        } else {
+            A = 1;
+        }
 
-            if(B == 1) // Push the controls state into the speed-runner to properly display
-                speedRun_syncControlKeys(c);
+        // With Player(A).Controls
+        {
+            auto &p = Player[A];
+            Controls_t &c = p.Controls;
 
             if(!c.Start && !c.Jump) {
                 p.UnStart = true;
