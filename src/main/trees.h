@@ -32,6 +32,13 @@
 extern std::vector<void*> treeresult_vec[4];
 extern ptrdiff_t cur_treeresult_vec;
 
+enum SortMode
+{
+    SORTMODE_NONE = 0,
+    SORTMODE_ID = 1,
+    SORTMODE_LOC = 2,
+};
+
 template<class ItemT>
 class TreeResult_Sentinel
 {
@@ -164,7 +171,7 @@ extern void treeBlockAddLayer(int layer, Block_t *obj);
 extern void treeBlockRemoveLayer(int layer, Block_t *obj);
 extern void treeBlockUpdateLayer(int layer, Block_t *obj);
 extern TreeResult_Sentinel<Block_t> treeBlockQuery(double Left, double Top, double Right, double Bottom,
-                               bool z_sort, double margin = 16.0);
-extern TreeResult_Sentinel<Block_t> treeBlockQuery(const Location_t &loc, bool z_sort, double margin = 16.0);
+                               int sort_mode, double margin = 16.0);
+extern TreeResult_Sentinel<Block_t> treeBlockQuery(const Location_t &loc, int sort_mode, double margin = 16.0);
 
 #endif // #ifndef TREES_H

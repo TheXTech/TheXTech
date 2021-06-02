@@ -1334,7 +1334,7 @@ void UpdateGraphics(bool skipRepaint)
         TreeResult_Sentinel<Block_t> screenBlocks = treeBlockQuery(
             -vScreenX[Z], -vScreenY[Z],
             -vScreenX[Z] + vScreen[Z].Width, -vScreenY[Z] + vScreen[Z].Height,
-            true);
+            SORTMODE_ID);
         for(Block_t* block : screenBlocks)
         {
             A = block - &Block[1] + 1;

@@ -1977,7 +1977,7 @@ void UpdateNPCs()
 
                                 // for(B = 1; B <= numBlock; B++)
                                 // {
-                                for(Block_t* block : treeBlockQuery(NPC[A].Location, false))
+                                for(Block_t* block : treeBlockQuery(NPC[A].Location, SORTMODE_LOC))
                                 {
                                     B = block - &Block[1] + 1;
                                     // If Not .Block = B And Not .tempBlock = B And Not (.Projectile = True And Block(B).noProjClipping = True) And BlockNoClipping(Block(B).Type) = False And Block(B).Hidden = False And Block(B).Hidden = False Then

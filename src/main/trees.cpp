@@ -378,7 +378,7 @@ void treeBlockRemoveLayer(int layer, Block_t *obj)
 }
 
 TreeResult_Sentinel<Block_t> treeBlockQuery(double Left, double Top, double Right, double Bottom,
-                         bool z_sort,
+                         int sort_mode,
                          double margin)
 {
     TreeResult_Sentinel<Block_t> result;
@@ -410,7 +410,16 @@ TreeResult_Sentinel<Block_t> treeBlockQuery(double Left, double Top, double Righ
         }
     }
 
-    if(z_sort)
+    if(sort_mode == SORTMODE_LOC)
+    {
+        std::sort(result.i_vec->begin(), result.i_vec->end(),
+            [](void* a, void* b) {
+                return (((Block_t*)a)->Location.X < ((Block_t*)b)->Location.X
+                    || (((Block_t*)a)->Location.X == ((Block_t*)b)->Location.X
+                        && ((Block_t*)a)->Location.Y < ((Block_t*)b)->Location.Y));
+            });
+    }
+    else if(sort_mode == SORTMODE_ID)
     {
         std::sort(result.i_vec->begin(), result.i_vec->end(),
             [](void* a, void* b) {
@@ -422,11 +431,11 @@ TreeResult_Sentinel<Block_t> treeBlockQuery(double Left, double Top, double Righ
 }
 
 TreeResult_Sentinel<Block_t> treeBlockQuery(const Location_t &loc,
-                         bool z_sort,
+                         int sort_mode,
                          double margin)
 {
     return treeBlockQuery(loc.X,
                    loc.Y,
                    loc.X + loc.Width,
-                   loc.Y + loc.Height, z_sort, margin);
+                   loc.Y + loc.Height, sort_mode, margin);
 }
