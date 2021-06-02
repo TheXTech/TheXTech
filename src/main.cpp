@@ -181,6 +181,7 @@ int main(int argc, char**argv)
 
         TCLAP::SwitchArg switchFrameSkip("f", "frameskip", "Enable frame skipping mode", false);
         TCLAP::SwitchArg switchNoSound("s", "no-sound", "Disable sound", false);
+        TCLAP::SwitchArg switchNoVideo("", "no-video", "Disable video", false);
         TCLAP::SwitchArg switchNoPause("p", "never-pause", "Never pause game when window losts a focus", false);
         TCLAP::ValueArg<std::string> renderType("r", "render", "Render mode: sw (software), hw (hardware), vsync (hardware with vsync)",
                                                 false, "",
@@ -255,6 +256,7 @@ int main(int argc, char**argv)
 
         cmd.add(&switchFrameSkip);
         cmd.add(&switchNoSound);
+        cmd.add(&switchNoVideo);
         cmd.add(&switchNoPause);
         cmd.add(&switchBattleMode);
 
@@ -283,6 +285,7 @@ int main(int argc, char**argv)
 
         setup.frameSkip = switchFrameSkip.getValue();
         setup.noSound   = switchNoSound.getValue();
+        setup.noVideo   = switchNoVideo.getValue();
         setup.neverPause = switchNoPause.getValue();
 
         std::string rt = renderType.getValue();
@@ -335,6 +338,13 @@ int main(int argc, char**argv)
         setup.recordReplay = recordReplay.getValue();
         setup.recordRecord = recordRecord.getValue();
         setup.recordReplayId = recordReplayId.getValue();
+
+        if(setup.noVideo)
+        {
+            setup.testMaxFPS = true;
+            setup.neverPause = true;
+            setup.noSound = true;
+        }
 
         if(setup.recordReplayId != -1)
             setup.recordReplay = true;

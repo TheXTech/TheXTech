@@ -90,6 +90,8 @@ Uint8 FrmMain::getKeyState(SDL_Scancode key)
 bool FrmMain::initSDL(const CmdLineSetup_t &setup)
 {
     bool res = false;
+    if(setup.noVideo)
+        m_headless = true;
 
     m_windowTitle = g_gameInfo.titleWindow;
 
@@ -682,6 +684,8 @@ bool FrmMain::isSdlError()
 
 void FrmMain::repaint()
 {
+    if(m_headless)
+        return;
 #ifdef __ANDROID__
     if(m_blockRender)
         return;
@@ -1634,6 +1638,8 @@ void FrmMain::clearAllTextures()
 
 void FrmMain::clearBuffer()
 {
+    if(m_headless)
+        return;
 #ifdef __ANDROID__
     SDL_assert(!m_blockRender);
 #endif
@@ -1643,6 +1649,8 @@ void FrmMain::clearBuffer()
 
 void FrmMain::renderRect(int x, int y, int w, int h, float red, float green, float blue, float alpha, bool filled)
 {
+    if(m_headless)
+        return;
 #ifdef __ANDROID__
     SDL_assert(!m_blockRender);
 #endif
@@ -1664,6 +1672,8 @@ void FrmMain::renderRect(int x, int y, int w, int h, float red, float green, flo
 
 void FrmMain::renderRectBR(int _left, int _top, int _right, int _bottom, float red, float green, float blue, float alpha)
 {
+    if(m_headless)
+        return;
 #ifdef __ANDROID__
     SDL_assert(!m_blockRender);
 #endif
@@ -1681,6 +1691,8 @@ void FrmMain::renderRectBR(int _left, int _top, int _right, int _bottom, float r
 
 void FrmMain::renderCircle(int cx, int cy, int radius, float red, float green, float blue, float alpha, bool filled)
 {
+    if(m_headless)
+        return;
 #ifdef __ANDROID__
     SDL_assert(!m_blockRender);
 #endif
@@ -1721,6 +1733,8 @@ void FrmMain::renderTextureI(int xDst, int yDst, int wDst, int hDst,
                              double rotateAngle, SDL_Point *center, unsigned int flip,
                              float red, float green, float blue, float alpha)
 {
+    if(m_headless)
+        return;
 #ifdef __ANDROID__
     SDL_assert(!m_blockRender);
 #endif
@@ -1784,6 +1798,8 @@ void FrmMain::renderTextureScaleI(int xDst, int yDst, int wDst, int hDst,
                              double rotateAngle, SDL_Point *center, unsigned int flip,
                              float red, float green, float blue, float alpha)
 {
+    if(m_headless)
+        return;
 #ifdef __ANDROID__
     SDL_assert(!m_blockRender);
 #endif
@@ -1894,6 +1910,8 @@ void FrmMain::renderTextureFL(double xDst, double yDst, double wDst, double hDst
 
 void FrmMain::renderTexture(int xDst, int yDst, StdPicture &tx, float red, float green, float blue, float alpha)
 {
+    if(m_headless)
+        return;
 #ifdef __ANDROID__
     SDL_assert(!m_blockRender);
 #endif
@@ -1929,6 +1947,8 @@ void FrmMain::renderTexture(int xDst, int yDst, StdPicture &tx, float red, float
 
 void FrmMain::renderTextureScale(int xDst, int yDst, int wDst, int hDst, StdPicture &tx, float red, float green, float blue, float alpha)
 {
+    if(m_headless)
+        return;
 #ifdef __ANDROID__
     SDL_assert(!m_blockRender);
 #endif

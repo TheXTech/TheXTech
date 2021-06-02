@@ -55,6 +55,7 @@ typedef struct SDL_mutex SDL_mutex;
 
 class FrmMain
 {
+    bool m_headless = false;
     std::string m_windowTitle;
 #ifndef NO_SDL
     SDL_Window *m_window = nullptr;

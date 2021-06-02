@@ -5,6 +5,8 @@
 
 struct CmdLineSetup_t
 {
+    //! Disable game video
+    bool noVideo = false;
     //! Disable game sound
     bool noSound = false;
     //! Skip frames when laggy rendering is
