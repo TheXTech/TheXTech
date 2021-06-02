@@ -1893,7 +1893,7 @@ void UpdateInterprocess()
     IntProc::cmdUnLock();
 }
 
-int EditorNPCFrame(int A, float C, int N)
+int EditorNPCFrame(int A, float& C, int N)
 {
     int ret = 0;
 // find the default left/right frames for NPCs

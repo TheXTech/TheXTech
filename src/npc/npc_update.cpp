@@ -4442,6 +4442,8 @@ void UpdateNPCs()
                                 NPC[numNPCs].Inert = NPC[A].Inert;
                                 tempBool = false;
                                 NPC[numNPCs].Direction = NPC[A].Direction;
+                                if(g_compatibility.keep_bullet_bill_dir)
+                                    NPC[numNPCs].DefaultDirection = NPC[A].Direction;
                                 if(NPC[A].HoldingPlayer > 0 || NPC[A].standingOnPlayer > 0 || (NPC[A].Type == 22 && NPC[A].Projectile))
                                 {
                                     NPC[numNPCs].Projectile = true;
