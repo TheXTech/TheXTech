@@ -36,18 +36,17 @@ void seedRandom(int seed)
     engine.seed(seed);
 }
 
-float fRand()
-{
-    return (float)((double)(engine()) / (double)0x100000000);
-}
-
-// seems crazy to drop to float precision and back,
-// but the VB6 random code lives in single precision
 double dRand()
 {
-    return (double)fRand();
+    return (double)(engine()) / (double)0x100000000;
 }
 
+float fRand()
+{
+    return (float)dRand();
+}
+
+// NEVER USED IN SMBX
 int iRand()
 {
     return engine() & 0x7fffffff;
@@ -56,5 +55,11 @@ int iRand()
 // this is how the original VB6 code does it
 int iRand(int max)
 {
-    return (int)(fRand() * max);
+    return (int)(dRand() * max);
 }
+
+// Also note that many VB6 calls use dRand * x
+// and then assign the result to an Integer.
+// The result is NOT iRand(x) but rather vb6RRound(dRand()*x),
+// which has a different probability distribution
+// (prob 1/(2x) of being 0 or x and 1/x of being each number in between)

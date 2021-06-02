@@ -1171,7 +1171,7 @@ void PlayerFrame(int A)
             {
                 if(Player[A].SlideCounter <= 0)
                 {
-                    Player[A].SlideCounter = 2 + dRand() * 2;
+                    Player[A].SlideCounter = vb6Round(2 + dRand() * 2);
                     tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height - 5;
                     tempLocation.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - 4;
                     NewEffect(74, tempLocation, 1, 0, ShadowMode);
@@ -1190,7 +1190,7 @@ void PlayerFrame(int A)
             {
                 if(Player[A].SlideCounter <= 0 && Player[A].SlideKill == true)
                 {
-                    Player[A].SlideCounter = 2 + dRand() * 2;
+                    Player[A].SlideCounter = vb6Round(2 + dRand() * 2);
                     tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height - 4;
                     if(Player[A].Location.SpeedX < 0)
                         tempLocation.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - 4 + 6;
@@ -1369,7 +1369,7 @@ void PlayerFrame(int A)
                                     PlaySound(SFX_Skid);
                                     if(Player[A].SlideCounter <= 0)
                                     {
-                                        Player[A].SlideCounter = 2 + dRand() * 2;
+                                        Player[A].SlideCounter = vb6Round(2 + dRand() * 2);
                                         tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height - 5;
                                         tempLocation.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - 4 + 8 * -Player[A].Direction;
                                         NewEffect(74, tempLocation, 1, 0, ShadowMode);
@@ -1387,7 +1387,7 @@ void PlayerFrame(int A)
                                     PlaySound(SFX_Skid);
                                     if(Player[A].SlideCounter <= 0)
                                     {
-                                        Player[A].SlideCounter = 2 + iRand(2);
+                                        Player[A].SlideCounter = vb6Round(2 + dRand() * 2);
                                         tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height - 5;
                                         tempLocation.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - 4 + 8 * -Player[A].Direction;
                                         NewEffect(74, tempLocation, 1, 0, ShadowMode);
@@ -1438,7 +1438,7 @@ void PlayerFrame(int A)
                         PlaySound(SFX_Skid);
                         if(Player[A].SlideCounter <= 0)
                         {
-                            Player[A].SlideCounter = 2 + iRand(2);
+                            Player[A].SlideCounter = vb6Round(2 + dRand() * 2);
                             tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height - 5;
                             tempLocation.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - 4 + 10 * -Player[A].Direction;
                             NewEffect(74, tempLocation, 1, 0, ShadowMode);
@@ -1583,7 +1583,7 @@ void PlayerFrame(int A)
                                     PlaySound(SFX_Skid);
                                     if(Player[A].SlideCounter <= 0)
                                     {
-                                        Player[A].SlideCounter = 2 + iRand(2);
+                                        Player[A].SlideCounter = vb6Round(2 + dRand() * 2);
                                         tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height - 5;
                                         tempLocation.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - 4 + 6 * -Player[A].Direction;
                                         NewEffect(74, tempLocation, 1, 0, ShadowMode);
@@ -1601,7 +1601,7 @@ void PlayerFrame(int A)
                                     PlaySound(SFX_Skid);
                                     if(Player[A].SlideCounter <= 0)
                                     {
-                                        Player[A].SlideCounter = 2 + iRand(2);
+                                        Player[A].SlideCounter = vb6Round(2 + dRand() * 2);
                                         tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height - 5;
                                         tempLocation.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - 4 + 10 * -Player[A].Direction;
                                         NewEffect(74, tempLocation, 1, 0, ShadowMode);
@@ -1724,7 +1724,7 @@ void PlayerFrame(int A)
                         PlaySound(SFX_Skid);
                         if(Player[A].SlideCounter <= 0)
                         {
-                            Player[A].SlideCounter = 2 + iRand(2);
+                            Player[A].SlideCounter = vb6Round(2 + dRand() * 2);
                             tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height - 5;
                             tempLocation.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - 4 + 10 * -Player[A].Direction;
                             NewEffect(74, tempLocation, 1, 0, ShadowMode);
@@ -4878,7 +4878,7 @@ void LinkFrame(int A)
             {
                 if(Player[A].SlideCounter <= 0)
                 {
-                    Player[A].SlideCounter = 2 + dRand() * 2;
+                    Player[A].SlideCounter = vb6Round(2 + dRand() * 2);
                     tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height - 5;
                     tempLocation.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - 4;
                     NewEffect(74, tempLocation, 1, 0, ShadowMode);
@@ -4999,7 +4999,7 @@ void LinkFrame(int A)
             if(Player[A].SlideCounter <= 0)
             {
                 PlaySound(SFX_ZeldaDash);
-                Player[A].SlideCounter = 2 + dRand() * 2;
+                Player[A].SlideCounter = vb6Round(2 + dRand() * 2);
                 tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height - 4;
 
                 if(Player[A].Location.SpeedX < 0)

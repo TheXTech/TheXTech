@@ -221,7 +221,7 @@ void KillNPC(int A, int B)
                 NPC[numNPCs].TailCD = 10;
                 NPC[numNPCs].Special = 1;
                 NPC[numNPCs].Location.SpeedY = -5;
-                NPC[numNPCs].Location.SpeedX = (1 + std::fmod(dRand(), 0.5)) * NPC[A].Direction;
+                NPC[numNPCs].Location.SpeedX = (1 + dRand() * 0.5) * NPC[A].Direction;
             }
         }
     }

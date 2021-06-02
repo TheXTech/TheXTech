@@ -999,8 +999,8 @@ void UpdatePlayer()
                         NewEffect(80,
                                   newLoc(Player[A].Location.X - 8 + dRand() * (Player[A].Location.Width + 16) - 4,
                                          Player[A].Location.Y - 8 + dRand() * (Player[A].Location.Height + 16)), 1, 0, ShadowMode);
-                        Effect[numEffects].Location.SpeedX = std::fmod(dRand(), 0.5) - 0.25;
-                        Effect[numEffects].Location.SpeedY = std::fmod(dRand(), 0.5) - 0.25;
+                        Effect[numEffects].Location.SpeedX = dRand() * 0.5 - 0.25;
+                        Effect[numEffects].Location.SpeedY = dRand() * 0.5 - 0.25;
                         Effect[numEffects].Frame = 1;
                     }
                     if(Player[A].FairyTime > 0)

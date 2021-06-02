@@ -1065,11 +1065,11 @@ void NPCFrames(int A)
             NPC[A].Frame = NPC[A].Frame + 6;
         else // If .Special3 >= 16 Then
             NPC[A].Special3 = 0;
-        if(fRand() * 10 > 9.2)
+        if(dRand() * 10 > 9.2)
         {
             NewEffect(80, newLoc(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - 4, NPC[A].Location.Y + NPC[A].Location.Height / 2.0 - 6), 1, 0, NPC[A].Shadow);
-            Effect[numEffects].Location.SpeedX = std::fmod(fRand(), 1.0) - 0.5;
-            Effect[numEffects].Location.SpeedY = std::fmod(fRand(), 1.0) - 0.5;
+            Effect[numEffects].Location.SpeedX = dRand() * 1.0 - 0.5;
+            Effect[numEffects].Location.SpeedY = dRand() * 1.0 - 0.5;
         }
     }
     else if(NPC[A].Type == 91)
