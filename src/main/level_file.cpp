@@ -815,6 +815,7 @@ void ClearLevel()
     Background_t BlankBackground = Background_t();
     Location_t BlankLocation = Location_t();
     Events_t blankEvent = Events_t();
+    Effect_t blankEffect = Effect_t();
     NPCScore[274] = 6;
     LevelName.clear();
     ResetCompat();
@@ -945,6 +946,8 @@ void ClearLevel()
     for(A = 1; A <= numWarps; A++)
         Warp[A] = blankWarp;
 
+    for(A = 1; A <= numEffects; A++)
+        Effect[A] = blankEffect;
     numEffects = 0;
     numBackground = 0;
     numLocked = 0;
