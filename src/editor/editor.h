@@ -79,7 +79,7 @@ extern void UpdateEditor();
 
 extern void UpdateInterprocess();
 
-extern int EditorNPCFrame(int A, float C, int N = 0);
+extern int EditorNPCFrame(int A, float& C, int N = 0);
 
 extern void GetEditorControls();
 

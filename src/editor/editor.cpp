@@ -1643,7 +1643,7 @@ void UpdateInterprocess()
 }
 #endif // #ifndef NO_INTPROC
 
-int EditorNPCFrame(int A, float C, int N)
+int EditorNPCFrame(int A, float& C, int N)
 {
     int ret = 0;
 // find the default left/right frames for NPCs

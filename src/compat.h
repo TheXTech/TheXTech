@@ -54,6 +54,7 @@ struct Compatibility_t
     bool enable_multipoints;
     bool fix_autoscroll_speed;
     bool fix_blooper_stomp_effect;
+    bool keep_bullet_bill_dir;
     bool free_level_res;
     bool free_world_res;
     NPC_activate_modes NPC_activate_mode;
