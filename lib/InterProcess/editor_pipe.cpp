@@ -140,6 +140,11 @@ void EditorPipe::sendTakenNPC(const LevelNPC &npc)
         sendMessage(fmt::format_ne("CMD:TAKEN_NPC\nTAKEN_NPC_END\n{0}", encoded));
 }
 
+void EditorPipe::sendCloseProperties()
+{
+    sendMessage("CMD:CLOSE_PROPERTIES");
+}
+
 void EditorPipe::sendPlayerSettings(int playerId, int character, int state, int vehicleID, int vehicleState)
 {
     sendMessage(fmt::format_ne("CMD:PLAYER_SETUP_UPDATE {0} {1} {2} {3} {4}", playerId, character, state, vehicleID, vehicleState));

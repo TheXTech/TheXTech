@@ -2184,23 +2184,47 @@ void SetCursor()
 //        }
 //    }
 
+    if(IntProc::isWorking() && EditorCursor.Mode != optCursor.current)
+    {
+        switch(optCursor.current) // Tell the IPC Editor to close the properties dialog
+        {
+        case OptCursor_t::LVL_ERASER:
+        case OptCursor_t::LVL_SELECT:
+            switch(EditorCursor.Mode)
+            {
+            case OptCursor_t::LVL_BLOCKS:
+            case OptCursor_t::LVL_BGOS:
+            case OptCursor_t::LVL_NPCS:
+            case OptCursor_t::LVL_WARPS:
+            case OptCursor_t::LVL_WATER:
+                IntProc::sendCloseProperties();
+                break;
+            default:
+                break;
+            }
+            break;
+        default:
+            break;
+        }
+    }
+
     EditorCursor.Mode = optCursor.current;
 
-    if(EditorCursor.Mode == 6 && WorldEditor)
-        EditorCursor.Mode = 13;
+    if(EditorCursor.Mode == OptCursor_t::LVL_ERASER && WorldEditor)
+        EditorCursor.Mode = OptCursor_t::LVL_SELECT;
 
 //    EditorCursor.Layer = frmLayers::lstLayer::List(frmLayers::lstLayer::ListIndex);
-    if(EditorCursor.Mode == 0 || EditorCursor.Mode == 6) // Eraser
+    if(EditorCursor.Mode == OptCursor_t::LVL_ERASER0 || EditorCursor.Mode == OptCursor_t::LVL_ERASER) // Eraser
     {
         EditorCursor.Location.Width = 18;
         EditorCursor.Location.Height = 8;
     }
-    else if(EditorCursor.Mode == 13 || EditorCursor.Mode == 14) // Selection
+    else if(EditorCursor.Mode == OptCursor_t::LVL_SELECT || EditorCursor.Mode == 14) // Selection
     {
         EditorCursor.Location.Width = 4;
         EditorCursor.Location.Height = 4;
     }
-    else if(EditorCursor.Mode == 15) // Water
+    else if(EditorCursor.Mode == OptCursor_t::LVL_WATER) // Water
     {
 //        EditorCursor.Location.Height = frmWater::WaterH * 32;
 //        EditorCursor.Location.Width = frmWater::WaterW * 32;
@@ -2212,7 +2236,7 @@ void SetCursor()
 //        else
 //            EditorCursor.Water.Quicksand = false;
     }
-    else if(EditorCursor.Mode == 1) // Blocks
+    else if(EditorCursor.Mode == OptCursor_t::LVL_BLOCKS) // Blocks
     {
         if(EditorCursor.Block.Type <= 0)
             EditorCursor.Block.Type = 1;
@@ -2292,7 +2316,7 @@ void SetCursor()
 //        else
 //            EditorCursor.Block.Slippy = false;
     }
-    else if(EditorCursor.Mode == 2) // Level
+    else if(EditorCursor.Mode == OptCursor_t::LVL_SETTINGS) // Level
     {
 //        if(frmLevelSettings::optLevel(4).Value == true)
 //        {
@@ -2310,7 +2334,7 @@ void SetCursor()
             EditorCursor.Location.Height = 4; // 32
         }
     }
-    else if(EditorCursor.Mode == 3) // Background
+    else if(EditorCursor.Mode == OptCursor_t::LVL_BGOS) // Background
     {
         if(EditorCursor.Background.Type <= 0)
             EditorCursor.Background.Type = 1;
@@ -2332,7 +2356,7 @@ void SetCursor()
         EditorCursor.Location.Width = EditorCursor.Background.Location.Width;
         EditorCursor.Location.Height = EditorCursor.Background.Location.Height;
     }
-    else if(EditorCursor.Mode == 4) // NPCs
+    else if(EditorCursor.Mode == OptCursor_t::LVL_NPCS) // NPCs
     {
         int t = EditorCursor.NPC.Type;
         if(t != 91 && t != 96 && t != 283 && t != 284)
@@ -2453,7 +2477,7 @@ void SetCursor()
         EditorCursor.NPC.Frame = EditorNPCFrame(EditorCursor.NPC.Type, EditorCursor.NPC.Direction);
         EditorCursor.NPC.Active = true;
     }
-    else if(EditorCursor.Mode == 5) // Warps
+    else if(EditorCursor.Mode == OptCursor_t::LVL_WARPS) // Warps
     {
         EditorCursor.Warp.Layer = EditorCursor.Layer;
         EditorCursor.Location.Width = 32;
@@ -2501,7 +2525,7 @@ void SetCursor()
 //            }
 //        }
     }
-    else if(EditorCursor.Mode == 6) // Eraser
+    else if(EditorCursor.Mode == OptCursor_t::LVL_ERASER) // Eraser
     {
         EditorCursor.Location.Width = 32;
         EditorCursor.Location.Height = 32;

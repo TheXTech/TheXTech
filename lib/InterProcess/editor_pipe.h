@@ -19,6 +19,7 @@ public:
     void sendTakenBlock(const LevelBlock &block);
     void sendTakenBGO(const LevelBGO &bgo);
     void sendTakenNPC(const LevelNPC &npc);
+    void sendCloseProperties();
     void sendPlayerSettings(int playerId, int character, int state, int vehicleID, int vehicleState);
     void shut();
 

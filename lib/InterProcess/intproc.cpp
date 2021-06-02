@@ -223,3 +223,10 @@ void IntProc::sendPlayerSettings(int playerId, int character, int state, int veh
         return;
     editor->sendPlayerSettings(playerId, character, state, vehicleID, vehicleState);
 }
+
+void IntProc::sendCloseProperties()
+{
+    if(!editor)
+        return;
+    editor->sendCloseProperties();
+}

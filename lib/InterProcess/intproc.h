@@ -37,6 +37,7 @@ namespace IntProc
     void sendTakenBGO(const LevelBGO &bgo);
     void sendTakenNPC(const LevelNPC &npc);
     void sendPlayerSettings(int playerId, int character, int state, int vehicleID, int vehicleState);
+    void sendCloseProperties();
 
     std::string getState();
     void        setState(const std::string &instate);
