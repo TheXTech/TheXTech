@@ -47,6 +47,32 @@
 #include <PGE_File_Formats/file_formats.h>
 
 
+void bgoApplyZMode(Background_t *bgo, int smbx64sp)
+{
+    if(bgo->zMode == LevelBGO::ZDefault)
+        bgo->SortPriority = smbx64sp;
+    else
+    {
+        switch(bgo->zMode)
+        {
+        case LevelBGO::Background2:
+            bgo->SortPriority = 10;
+            break;
+        case LevelBGO::Background1:
+            bgo->SortPriority = 30;
+            break;
+        case LevelBGO::Foreground1:
+            bgo->SortPriority = 125;
+            break;
+        case LevelBGO::Foreground2:
+            bgo->SortPriority = 200;
+            break;
+        default:
+            break;
+        }
+    }
+}
+
 void addMissingLvlSuffix(std::string &fileName)
 {
     if(!fileName.empty() && !Files::hasSuffix(fileName, ".lvl") && !Files::hasSuffix(fileName, ".lvlx") && !Files::hasSuffix(fileName, "tst"))
@@ -299,30 +325,10 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 
         bgo.uid = int(b.meta.array_id);
 
+        bgo.zMode = b.z_mode;
         bgo.zOffset = b.z_offset;
 
-        if(b.z_mode == LevelBGO::ZDefault)
-            bgo.SortPriority = int(b.smbx64_sp);
-        else
-        {
-            switch(b.z_mode)
-            {
-            case LevelBGO::Background2:
-                bgo.SortPriority = 10;
-                break;
-            case LevelBGO::Background1:
-                bgo.SortPriority = 30;
-                break;
-            case LevelBGO::Foreground1:
-                bgo.SortPriority = 125;
-                break;
-            case LevelBGO::Foreground2:
-                bgo.SortPriority = 200;
-                break;
-            default:
-                break;
-            }
-        }
+        bgoApplyZMode(&bgo, int(b.smbx64_sp));
 
         if(IF_OUTRANGE(bgo.Type, 1, maxBackgroundType)) // Drop ID to 1 for BGOs of out of range IDs
         {

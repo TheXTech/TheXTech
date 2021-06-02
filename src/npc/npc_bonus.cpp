@@ -35,6 +35,7 @@
 
 #include <Utils/maths.h>
 #include <Logger/logger.h>
+#include <InterProcess/intproc.h>
 
 
 void DropBonus(int A)
@@ -527,9 +528,11 @@ void TouchBonus(int A, int B)
 
                 if(!tempBool)
                 {
-                    numStars = numStars + 1;
+                    numStars += 1;
                     Star[numStars].level = FileNameFull;
                     Star[numStars].Section = NPC[B].Section;
+                    IntProc::sendStarsNumber(numStars);
+
                     for(C = 1; C <= numWarps; C++)
                     {
                         if(Warp[C].Stars == numStars)

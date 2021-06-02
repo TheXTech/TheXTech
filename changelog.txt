@@ -9,6 +9,9 @@ Changes for 1.3.5.1
 -Changed the default compat.ini value "fix-autoscroll-speed" into "false" to prevent possible glitches from invalid setup given by several old levels
 -The "Checkpoint" sound will be played when selecting the "Save and Continue" menu item at the pause menu
 -Fixed a minor glitch at the game save copy and erase menu while moving the mouse under menu block
+-Fixed the bullet bill getting stuck after it got unfrozen (Thanks to the @ds-sloth for the contribution!)
+-Updated an inter-process protocol with adding new commands
+-Fixed the vanilla bug: The dragon coin has avoided being turned into the block by the P-Switch activation
 
 Changes for 1.3.5
 -Fixed the gamepad control stuck because of axes returned value that doesn't equal the initial state on some devices

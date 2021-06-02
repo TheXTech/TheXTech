@@ -575,7 +575,8 @@ void FrmMain::eventMouseDown(SDL_MouseButtonEvent &event)
         MenuMouseBack = true;
         if(LevelEditor || MagicHand || TestLevel)
         {
-            optCursor.current = 13;
+            optCursor.current = OptCursor_t::LVL_SELECT;
+            MouseMove(float(MenuMouseX), float(MenuMouseY));
             SetCursor();
         }
     }
@@ -583,7 +584,8 @@ void FrmMain::eventMouseDown(SDL_MouseButtonEvent &event)
     {
         if(LevelEditor || MagicHand || TestLevel)
         {
-            optCursor.current = 6;
+            optCursor.current = OptCursor_t::LVL_ERASER;
+            MouseMove(float(MenuMouseX), float(MenuMouseY));
             SetCursor();
         }
     }

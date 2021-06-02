@@ -29,6 +29,9 @@
 
 #include <Logger/logger.h>
 #include <pge_delay.h>
+#ifndef NO_INTPROC
+#include <InterProcess/intproc.h>
+#endif
 
 #include "../globals.h"
 #include "../frame_timer.h"
@@ -434,6 +437,9 @@ void PauseGame(int plr)
                                 Checkpoint.clear();
                                 CheckpointsList.clear();
                                 numStars = 0;
+#ifndef NO_INTPROC
+                                IntProc::sendStarsNumber(numStars);
+#endif
                                 numSavedEvents = 0;
                                 BlockSwitch.fill(false);
                                 PlaySound(SFX_Bullet);

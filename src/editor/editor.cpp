@@ -349,6 +349,43 @@ void UpdateEditor()
                             EditorControls.MouseClick = false; /* Simulate "Focus out" inside of SMBX Editor */
                             tempBool = true;
                             UNUSED(tempBool);
+#ifndef NO_INTPROC
+                            if(IntProc::isEnabled()) // Report the taken block into the Editor
+                            {
+                                LevelNPC n;
+                                n.id = EditorCursor.NPC.Type;
+                                n.direct = EditorCursor.NPC.Direction;
+
+                                n.generator = EditorCursor.NPC.Generator;
+                                if(n.generator)
+                                {
+                                    n.generator_direct = EditorCursor.NPC.GeneratorDirection;
+                                    n.generator_type = EditorCursor.NPC.GeneratorEffect;
+                                    n.generator_period = EditorCursor.NPC.GeneratorTimeMax;
+                                }
+
+                                if(n.id == 91 || n.id == 96 || n.id == 283 || n.id == 284)
+                                    n.contents = EditorCursor.NPC.Special;
+
+                                if(n.id == 288 || n.id == 289 || (n.id == 91 && int(EditorCursor.NPC.Special) == 288))
+                                    n.special_data = EditorCursor.NPC.Special2;
+
+                                if(NPCIsAParaTroopa[n.id] || NPCIsCheep[n.id] || n.id == 260)
+                                    n.special_data = EditorCursor.NPC.Special;
+
+                                n.msg = EditorCursor.NPC.Text;
+                                n.nomove = EditorCursor.NPC.Stuck;
+                                n.is_boss = EditorCursor.NPC.Legacy;
+
+                                n.layer = EditorCursor.NPC.Layer;
+                                n.event_activate = EditorCursor.NPC.TriggerActivate;
+                                n.event_die = EditorCursor.NPC.TriggerDeath;
+                                n.event_emptylayer = EditorCursor.NPC.TriggerLast;
+                                n.event_talk = EditorCursor.NPC.TriggerTalk;
+                                n.attach_layer = EditorCursor.NPC.AttLayer;
+                                IntProc::sendTakenNPC(n);
+                            }
+#endif
                             break;
                         }
                     }
@@ -382,6 +419,28 @@ void UpdateEditor()
                                 MouseRelease = false;
                                 EditorControls.MouseClick = false; /* Simulate "Focus out" inside of SMBX Editor */
                                 FindSBlocks();
+#ifndef NO_INTPROC
+                                if(IntProc::isEnabled()) // Report the taken block into the Editor
+                                {
+                                    LevelBlock block;
+                                    block.id = EditorCursor.Block.Type;
+                                    block.w = EditorCursor.Location.Width;
+                                    block.h = EditorCursor.Location.Height;
+                                    block.invisible = EditorCursor.Block.Invis;
+                                    block.slippery = EditorCursor.Block.Slippy;
+                                    block.layer = EditorCursor.Block.Layer;
+                                    if(EditorCursor.Block.Special >= 1000)
+                                        block.npc_id = EditorCursor.Block.Special - 1000;
+                                    else if(EditorCursor.Block.Special <= 0)
+                                        block.npc_id = 0;
+                                    else if(EditorCursor.Block.Special < 1000)
+                                        block.npc_id = -EditorCursor.Block.Special;
+                                    block.event_hit = EditorCursor.Block.TriggerHit;
+                                    block.event_emptylayer = EditorCursor.Block.TriggerLast;
+                                    block.event_destroy = EditorCursor.Block.TriggerDeath;
+                                    IntProc::sendTakenBlock(block);
+                                }
+#endif
                                 break;
                             }
                         }
@@ -462,6 +521,19 @@ void UpdateEditor()
                             }
                             MouseRelease = false;
                             EditorControls.MouseClick = false; /* Simulate "Focus out" inside of SMBX Editor */
+#ifndef NO_INTPROC
+                            if(IntProc::isEnabled()) // Report the taken block into the Editor
+                            {
+                                LevelBGO b;
+                                b.id = EditorCursor.Background.Type;
+                                b.layer = EditorCursor.Background.Layer;
+                                b.z_mode = EditorCursor.Background.zMode;
+                                b.z_offset = EditorCursor.Background.zOffset;
+                                if(EditorCursor.Background.zMode == LevelBGO::ZDefault)
+                                    b.smbx64_sp = EditorCursor.Background.SortPriority;
+                                IntProc::sendTakenBGO(b);
+                            }
+#endif
                             break;
                         }
                     }
@@ -496,6 +568,28 @@ void UpdateEditor()
                                 MouseRelease = false;
                                 EditorControls.MouseClick = false; /* Simulate "Focus out" inside of SMBX Editor */
                                 FindSBlocks();
+#ifndef NO_INTPROC
+                                if(IntProc::isEnabled()) // Report the taken block into the Editor
+                                {
+                                    LevelBlock block;
+                                    block.id = EditorCursor.Block.Type;
+                                    block.w = EditorCursor.Location.Width;
+                                    block.h = EditorCursor.Location.Height;
+                                    block.invisible = EditorCursor.Block.Invis;
+                                    block.slippery = EditorCursor.Block.Slippy;
+                                    block.layer = EditorCursor.Block.Layer;
+                                    if(EditorCursor.Block.Special >= 1000)
+                                        block.npc_id = EditorCursor.Block.Special - 1000;
+                                    else if(EditorCursor.Block.Special <= 0)
+                                        block.npc_id = 0;
+                                    else if(EditorCursor.Block.Special < 1000)
+                                        block.npc_id = -EditorCursor.Block.Special;
+                                    block.event_hit = EditorCursor.Block.TriggerHit;
+                                    block.event_emptylayer = EditorCursor.Block.TriggerLast;
+                                    block.event_destroy = EditorCursor.Block.TriggerDeath;
+                                    IntProc::sendTakenBlock(block);
+                                }
+#endif
                                 break;
                             }
                         }
@@ -1131,6 +1225,7 @@ void UpdateEditor()
                     if(numBackground < maxBackgrounds) // Not out of backgrounds
                     {
                         numBackground++;
+                        EditorCursor.Background.uid = numBackground;
                         Background[numBackground] = EditorCursor.Background;
                         syncLayers_BGO(numBackground);
                         if(MagicHand)
@@ -1231,7 +1326,6 @@ void UpdateEditor()
                 if(A > numWarps)
                     numWarps = A;
 
-                // TODO: implement optE for framewarp and for level settings
                 if(EditorCursor.SubMode == 1 || EditorCursor.Warp.level != "" || EditorCursor.Warp.LevelEnt == true || EditorCursor.Warp.MapWarp == true)
                 {
                     EditorCursor.Warp.Entrance = EditorCursor.Location;
@@ -1399,244 +1493,232 @@ void UpdateEditor()
 #ifndef NO_INTPROC
 void UpdateInterprocess()
 {
+    if(!IntProc::hasCommand())
+        return;
+
     IntProc::cmdLock();
 
     //Recive external commands!
-    if(IntProc::hasCommand())
+    switch(IntProc::commandType())
     {
-        switch(IntProc::commandType())
+    case IntProc::MsgBox:
+    {
+        MessageText = IntProc::getCMD();
+        PauseGame(1);
+        break;
+    }
+
+    case IntProc::Cheat:
+    {
+        CheatString = IntProc::getCMD();
+        CheatCode(CheatString[0]);
+        break;
+    }
+
+    case IntProc::SetLayer:
+    {
+        EditorCursor.Layer = IntProc::getCMD();
+
+        EditorCursor.Block.Layer = EditorCursor.Layer;
+        EditorCursor.Background.Layer = EditorCursor.Layer;
+        EditorCursor.NPC.Layer = EditorCursor.Layer;
+        break;
+    }
+
+    case IntProc::SetNumStars:
+    {
+        auto s = IntProc::getCMD();
+        numStars = SDL_atoi(s.c_str());
+        break;
+    }
+
+    case IntProc::PlaceItem:
+    {
+        std::string raw = IntProc::getCMD();
+        pLogDebug(raw.c_str());
+        LevelData got;
+        PGE_FileFormats_misc::RawTextInput raw_file(&raw);
+        FileFormats::ReadExtendedLvlFile(raw_file, got);
+
+        if(!got.meta.ReadFileValid)
         {
-        case IntProc::MsgBox:
-        {
-            MessageText = IntProc::getCMD();
-            PauseGame(1);
+            pLogDebug(got.meta.ERROR_info.c_str());
             break;
         }
 
-        case IntProc::Cheat:
+        if(raw.compare(0, 11, "BLOCK_PLACE") == 0)
         {
-            CheatString = IntProc::getCMD();
-            CheatCode(CheatString[0]);
-            break;
-        }
-
-        case IntProc::SetLayer:
-        {
-            EditorCursor.Layer = IntProc::getCMD();
-
-            EditorCursor.Block.Layer = EditorCursor.Layer;
-            EditorCursor.Background.Layer = EditorCursor.Layer;
-            EditorCursor.NPC.Layer = EditorCursor.Layer;
-            break;
-        }
-
-        case IntProc::PlaceItem:
-        {
-            std::string raw = IntProc::getCMD();
-            pLogDebug(raw.c_str());
-            LevelData got;
-            PGE_FileFormats_misc::RawTextInput raw_file(&raw);
-            FileFormats::ReadExtendedLvlFile(raw_file, got);
-
-            if(!got.meta.ReadFileValid)
-            {
-                pLogDebug(got.meta.ERROR_info.c_str());
+            if(got.blocks.empty())
                 break;
-            }
 
-            if(raw.compare(0, 11, "BLOCK_PLACE") == 0)
+            optCursor.current = 1;
+            OptCursorSync();
+
+            const LevelBlock &b = got.blocks[0];
+
+            if(EditorCursor.Mode != OptCursor_t::LVL_BLOCKS ||
+               EditorCursor.Block.Type != int(b.id))
+                PlaySound(SFX_Grab);
+
+            EditorCursor.Layer = b.layer;
+
+            EditorCursor.Mode = OptCursor_t::LVL_BLOCKS;
+            EditorCursor.Block = Block_t();
+            EditorCursor.Block.Type = int(b.id);
+            EditorCursor.Location.X = b.x;
+            EditorCursor.Location.Y = b.y;
+            EditorCursor.Location.Width = b.w;
+            EditorCursor.Location.Height = b.h;
+            if(EditorCursor.Block.Type <= maxBlockType && BlockIsSizable[EditorCursor.Block.Type])
             {
-                if(got.blocks.empty())
-                    break;
-
-                optCursor.current = 1;
-                OptCursorSync();
-
-                const LevelBlock &b = got.blocks[0];
-
-                if(EditorCursor.Mode != OptCursor_t::LVL_BLOCKS ||
-                   EditorCursor.Block.Type != int(b.id))
-                    PlaySound(SFX_Grab);
-
-                EditorCursor.Layer = b.layer;
-
-                EditorCursor.Mode = OptCursor_t::LVL_BLOCKS;
-                EditorCursor.Block = Block_t();
-                EditorCursor.Block.Type = int(b.id);
-                EditorCursor.Location.X = b.x;
-                EditorCursor.Location.Y = b.y;
-                EditorCursor.Location.Width = b.w;
-                EditorCursor.Location.Height = b.h;
-                if(EditorCursor.Block.Type <= maxBlockType && BlockIsSizable[EditorCursor.Block.Type])
-                {
-                    EditorCursor.Block.Location.Width = 128;
-                    EditorCursor.Block.Location.Height = 128;
-                    EditorCursor.Location.Width = 128;
-                    EditorCursor.Location.Height = 128;
-                }
-                EditorCursor.Block.Invis = b.invisible;
-                EditorCursor.Block.Slippy = b.slippery;
-                EditorCursor.Block.Special = b.npc_id > 0 ? int(b.npc_id + 1000) : int(-b.npc_id);
-                EditorCursor.Block.Layer = b.layer;
-                EditorCursor.Block.TriggerHit = b.event_hit;
-                EditorCursor.Block.TriggerLast = b.event_emptylayer;
-                EditorCursor.Block.TriggerDeath = b.event_destroy;
-
-                if(EditorCursor.Block.Type > maxBlockType) // Avoid out of range crash
-                    EditorCursor.Block.Type = 1;
-
-                SetCursor();
+                EditorCursor.Block.Location.Width = 128;
+                EditorCursor.Block.Location.Height = 128;
+                EditorCursor.Location.Width = 128;
+                EditorCursor.Location.Height = 128;
             }
-            else if(raw.compare(0, 9, "BGO_PLACE") == 0)
-            {
-                if(got.bgo.empty())
-                    break;
+            EditorCursor.Block.Invis = b.invisible;
+            EditorCursor.Block.Slippy = b.slippery;
+            EditorCursor.Block.Special = b.npc_id > 0 ? int(b.npc_id + 1000) : int(-b.npc_id);
+            EditorCursor.Block.Layer = b.layer;
+            EditorCursor.Block.TriggerHit = b.event_hit;
+            EditorCursor.Block.TriggerLast = b.event_emptylayer;
+            EditorCursor.Block.TriggerDeath = b.event_destroy;
 
-                optCursor.current = 3;
-                OptCursorSync();
+            if(EditorCursor.Block.Type > maxBlockType) // Avoid out of range crash
+                EditorCursor.Block.Type = 1;
 
-                const LevelBGO &b = got.bgo[0];
-
-                if(EditorCursor.Mode != OptCursor_t::LVL_BGOS ||
-                   EditorCursor.Background.Type != int(b.id))
-                    PlaySound(SFX_Grab);
-
-                EditorCursor.Layer = b.layer;
-
-                EditorCursor.Mode = OptCursor_t::LVL_BGOS;
-                EditorCursor.Background = Background_t();
-                EditorCursor.Background.Type = int(b.id);
-                EditorCursor.Location.X = b.x;
-                EditorCursor.Location.Y = b.y;
-                EditorCursor.Background.Layer = b.layer;
-                EditorCursor.Background.SortPriority = int(b.smbx64_sp);
-                EditorCursor.Background.uid = (numBackground + 1);
-
-                if(b.z_mode == LevelBGO::ZDefault)
-                    EditorCursor.Background.SortPriority = int(b.smbx64_sp);
-                else
-                {
-                    switch(b.z_mode)
-                    {
-                    case LevelBGO::Background2:
-                        EditorCursor.Background.SortPriority = 10;
-                        break;
-                    case LevelBGO::Background1:
-                        EditorCursor.Background.SortPriority = 30;
-                        break;
-                    case LevelBGO::Foreground1:
-                        EditorCursor.Background.SortPriority = 125;
-                        break;
-                    case LevelBGO::Foreground2:
-                        EditorCursor.Background.SortPriority = 200;
-                        break;
-                    default:
-                        break;
-                    }
-                }
-
-                if(EditorCursor.Background.Type > maxBackgroundType) // Avoid out of range crash
-                    EditorCursor.Background.Type = 1;
-
-                SetCursor();
-            }
-            else if(raw.compare(0, 9, "NPC_PLACE") == 0)
-            {
-                if(got.npc.empty())
-                    break;
-
-                optCursor.current = 4;
-                OptCursorSync();
-
-                const LevelNPC &n = got.npc[0];
-
-                if(EditorCursor.Mode != OptCursor_t::LVL_NPCS ||
-                   EditorCursor.NPC.Type != int(n.id))
-                    PlaySound(SFX_Grab);
-
-                EditorCursor.Layer = n.layer;
-
-                EditorCursor.Mode = OptCursor_t::LVL_NPCS;
-                EditorCursor.NPC = NPC_t();
-                EditorCursor.NPC.Type = int(n.id);
-                EditorCursor.NPC.Hidden = false;
-                EditorCursor.Location.X = n.x;
-                EditorCursor.Location.Y = n.y;
-                EditorCursor.NPC.Direction = n.direct;
-
-                if(EditorCursor.NPC.Type > maxNPCType) // Avoid out of range crash
-                    EditorCursor.NPC.Type = 1;
-
-                if(EditorCursor.NPC.Type == 91 || EditorCursor.NPC.Type == 96 || EditorCursor.NPC.Type == 283 || EditorCursor.NPC.Type == 284)
-                {
-                    EditorCursor.NPC.Special = n.contents;
-                    EditorCursor.NPC.DefaultSpecial = int(EditorCursor.NPC.Special);
-                }
-                if(EditorCursor.NPC.Type == 288 || EditorCursor.NPC.Type == 289 || (EditorCursor.NPC.Type == 91 && int(EditorCursor.NPC.Special) == 288))
-                {
-                    EditorCursor.NPC.Special2 = n.special_data;
-                    EditorCursor.NPC.DefaultSpecial2 = int(EditorCursor.NPC.Special2);
-                }
-
-                if(NPCIsAParaTroopa[EditorCursor.NPC.Type])
-                {
-                    EditorCursor.NPC.Special = n.special_data;
-                    EditorCursor.NPC.DefaultSpecial = int(EditorCursor.NPC.Special);
-                }
-
-                if(NPCIsCheep[EditorCursor.NPC.Type])
-                {
-                    EditorCursor.NPC.Special = n.special_data;
-                    EditorCursor.NPC.DefaultSpecial = int(EditorCursor.NPC.Special);
-                }
-
-                if(EditorCursor.NPC.Type == 260)
-                {
-                    EditorCursor.NPC.Special = n.special_data;
-                    EditorCursor.NPC.DefaultSpecial = int(EditorCursor.NPC.Special);
-                }
-
-                EditorCursor.NPC.Generator = n.generator;
-                if(EditorCursor.NPC.Generator)
-                {
-                    EditorCursor.NPC.GeneratorDirection = n.generator_direct;
-                    EditorCursor.NPC.GeneratorEffect = n.generator_type;
-                    EditorCursor.NPC.GeneratorTimeMax = n.generator_period;
-                }
-
-                EditorCursor.NPC.Text = n.msg;
-
-                EditorCursor.NPC.Inert = n.friendly;
-                if(EditorCursor.NPC.Type == 151)
-                    EditorCursor.NPC.Inert = true;
-                EditorCursor.NPC.Stuck = n.nomove;
-                EditorCursor.NPC.DefaultStuck = EditorCursor.NPC.Stuck;
-
-                EditorCursor.NPC.Legacy = n.is_boss;
-
-                EditorCursor.NPC.Layer = n.layer;
-                EditorCursor.NPC.TriggerActivate = n.event_activate;
-                EditorCursor.NPC.TriggerDeath = n.event_die;
-                EditorCursor.NPC.TriggerTalk = n.event_talk;
-                EditorCursor.NPC.TriggerLast = n.event_emptylayer;
-                EditorCursor.NPC.AttLayer = n.attach_layer;
-
-                EditorCursor.NPC.DefaultType = EditorCursor.NPC.Type;
-                EditorCursor.NPC.Location.Width = NPCWidth[EditorCursor.NPC.Type];
-                EditorCursor.NPC.Location.Height = NPCHeight[EditorCursor.NPC.Type];
-                EditorCursor.NPC.DefaultLocation = EditorCursor.NPC.Location;
-                EditorCursor.NPC.DefaultDirection = EditorCursor.NPC.Direction;
-                EditorCursor.NPC.TimeLeft = 1;
-                EditorCursor.NPC.Active = true;
-                EditorCursor.NPC.JustActivated = 1;
-                SetCursor();
-            }
-            else
-                PlaySound(SFX_Fireworks);
-
-            break;
+            SetCursor();
         }
+        else if(raw.compare(0, 9, "BGO_PLACE") == 0)
+        {
+            if(got.bgo.empty())
+                break;
+
+            optCursor.current = 3;
+            OptCursorSync();
+
+            const LevelBGO &b = got.bgo[0];
+
+            if(EditorCursor.Mode != OptCursor_t::LVL_BGOS ||
+               EditorCursor.Background.Type != int(b.id))
+                PlaySound(SFX_Grab);
+
+            EditorCursor.Layer = b.layer;
+
+            EditorCursor.Mode = OptCursor_t::LVL_BGOS;
+            EditorCursor.Background = Background_t();
+            EditorCursor.Background.Type = int(b.id);
+            EditorCursor.Location.X = b.x;
+            EditorCursor.Location.Y = b.y;
+            EditorCursor.Background.Layer = b.layer;
+            EditorCursor.Background.SortPriority = -1;
+            EditorCursor.Background.uid = (numBackground + 1);
+            EditorCursor.Background.zMode = b.z_mode;
+            EditorCursor.Background.zOffset = b.z_offset;
+
+            bgoApplyZMode(&EditorCursor.Background, int(b.smbx64_sp));
+
+            if(EditorCursor.Background.Type > maxBackgroundType) // Avoid out of range crash
+                EditorCursor.Background.Type = 1;
+
+            SetCursor();
         }
+        else if(raw.compare(0, 9, "NPC_PLACE") == 0)
+        {
+            if(got.npc.empty())
+                break;
+
+            optCursor.current = 4;
+            OptCursorSync();
+
+            const LevelNPC &n = got.npc[0];
+
+            if(EditorCursor.Mode != OptCursor_t::LVL_NPCS ||
+               EditorCursor.NPC.Type != int(n.id))
+                PlaySound(SFX_Grab);
+
+            EditorCursor.Layer = n.layer;
+
+            EditorCursor.Mode = OptCursor_t::LVL_NPCS;
+            EditorCursor.NPC = NPC_t();
+            EditorCursor.NPC.Type = int(n.id);
+            EditorCursor.NPC.Hidden = false;
+            EditorCursor.Location.X = n.x;
+            EditorCursor.Location.Y = n.y;
+            EditorCursor.NPC.Direction = n.direct;
+
+            if(EditorCursor.NPC.Type > maxNPCType) // Avoid out of range crash
+                EditorCursor.NPC.Type = 1;
+
+            if(EditorCursor.NPC.Type == 91 || EditorCursor.NPC.Type == 96 || EditorCursor.NPC.Type == 283 || EditorCursor.NPC.Type == 284)
+            {
+                EditorCursor.NPC.Special = n.contents;
+                EditorCursor.NPC.DefaultSpecial = int(EditorCursor.NPC.Special);
+            }
+            if(EditorCursor.NPC.Type == 288 || EditorCursor.NPC.Type == 289 || (EditorCursor.NPC.Type == 91 && int(EditorCursor.NPC.Special) == 288))
+            {
+                EditorCursor.NPC.Special2 = n.special_data;
+                EditorCursor.NPC.DefaultSpecial2 = int(EditorCursor.NPC.Special2);
+            }
+
+            if(NPCIsAParaTroopa[EditorCursor.NPC.Type])
+            {
+                EditorCursor.NPC.Special = n.special_data;
+                EditorCursor.NPC.DefaultSpecial = int(EditorCursor.NPC.Special);
+            }
+
+            if(NPCIsCheep[EditorCursor.NPC.Type])
+            {
+                EditorCursor.NPC.Special = n.special_data;
+                EditorCursor.NPC.DefaultSpecial = int(EditorCursor.NPC.Special);
+            }
+
+            if(EditorCursor.NPC.Type == 260)
+            {
+                EditorCursor.NPC.Special = n.special_data;
+                EditorCursor.NPC.DefaultSpecial = int(EditorCursor.NPC.Special);
+            }
+
+            EditorCursor.NPC.Generator = n.generator;
+            if(EditorCursor.NPC.Generator)
+            {
+                EditorCursor.NPC.GeneratorDirection = n.generator_direct;
+                EditorCursor.NPC.GeneratorEffect = n.generator_type;
+                EditorCursor.NPC.GeneratorTimeMax = n.generator_period;
+            }
+
+            EditorCursor.NPC.Text = n.msg;
+
+            EditorCursor.NPC.Inert = n.friendly;
+            if(EditorCursor.NPC.Type == 151)
+                EditorCursor.NPC.Inert = true;
+            EditorCursor.NPC.Stuck = n.nomove;
+            EditorCursor.NPC.DefaultStuck = EditorCursor.NPC.Stuck;
+
+            EditorCursor.NPC.Legacy = n.is_boss;
+
+            EditorCursor.NPC.Layer = n.layer;
+            EditorCursor.NPC.TriggerActivate = n.event_activate;
+            EditorCursor.NPC.TriggerDeath = n.event_die;
+            EditorCursor.NPC.TriggerTalk = n.event_talk;
+            EditorCursor.NPC.TriggerLast = n.event_emptylayer;
+            EditorCursor.NPC.AttLayer = n.attach_layer;
+
+            EditorCursor.NPC.DefaultType = EditorCursor.NPC.Type;
+            EditorCursor.NPC.Location.Width = NPCWidth[EditorCursor.NPC.Type];
+            EditorCursor.NPC.Location.Height = NPCHeight[EditorCursor.NPC.Type];
+            EditorCursor.NPC.DefaultLocation = EditorCursor.NPC.Location;
+            EditorCursor.NPC.DefaultDirection = EditorCursor.NPC.Direction;
+            EditorCursor.NPC.TimeLeft = 1;
+            EditorCursor.NPC.Active = true;
+            EditorCursor.NPC.JustActivated = 1;
+            SetCursor();
+        }
+        else
+            PlaySound(SFX_Fireworks);
+
+        break;
+    }
     }
 
     IntProc::cmdUnLock();
@@ -1844,23 +1926,48 @@ void GetEditorControls()
 
 void SetCursor()
 {
+#ifndef NO_INTPROC
+    if(IntProc::isWorking() && EditorCursor.Mode != optCursor.current)
+    {
+        switch(optCursor.current) // Tell the IPC Editor to close the properties dialog
+        {
+        case OptCursor_t::LVL_ERASER:
+        case OptCursor_t::LVL_SELECT:
+            switch(EditorCursor.Mode)
+            {
+            case OptCursor_t::LVL_BLOCKS:
+            case OptCursor_t::LVL_BGOS:
+            case OptCursor_t::LVL_NPCS:
+            case OptCursor_t::LVL_WARPS:
+            case OptCursor_t::LVL_WATER:
+                IntProc::sendCloseProperties();
+                break;
+            default:
+                break;
+            }
+            break;
+        default:
+            break;
+        }
+    }
+#endif
     EditorCursor.Mode = optCursor.current;
 
-    if(EditorCursor.Mode == 6 && WorldEditor)
-        EditorCursor.Mode = 13;
+    if(EditorCursor.Mode == OptCursor_t::LVL_ERASER && WorldEditor)
+        EditorCursor.Mode = OptCursor_t::LVL_SELECT;
 
 //    EditorCursor.Layer = frmLayers::lstLayer::List(frmLayers::lstLayer::ListIndex);
-    if(EditorCursor.Mode == 0 || EditorCursor.Mode == 6) // Eraser
+    if(EditorCursor.Mode == OptCursor_t::LVL_ERASER0 || EditorCursor.Mode == OptCursor_t::LVL_ERASER) // Eraser
     {
         EditorCursor.Location.Width = 18;
         EditorCursor.Location.Height = 8;
     }
-    else if(EditorCursor.Mode == 13 || EditorCursor.Mode == 14) // Selection
+    else if(EditorCursor.Mode == OptCursor_t::LVL_SELECT || EditorCursor.Mode == 14) // Selection
     {
         EditorCursor.Location.Width = 4;
         EditorCursor.Location.Height = 4;
     }
-    else if(EditorCursor.Mode == 15) // Water
+    else if(EditorCursor.Mode == OptCursor_t::LVL_WATER) // Water
     {
         // some of these seem sort of unbelievable........
 //        EditorCursor.Location.Height = frmWater::WaterH * 32;
@@ -1876,7 +1983,7 @@ void SetCursor()
 //        else
 //            EditorCursor.Water.Quicksand = false;
     }
-    else if(EditorCursor.Mode == 1) // Blocks
+    else if(EditorCursor.Mode == OptCursor_t::LVL_BLOCKS) // Blocks
     {
         if(EditorCursor.Block.Type <= 0)
             EditorCursor.Block.Type = 1;
@@ -1919,7 +2026,7 @@ void SetCursor()
         EditorCursor.Location.Width = EditorCursor.Block.Location.Width;
         EditorCursor.Location.Height = EditorCursor.Block.Location.Height;
     }
-    else if(EditorCursor.Mode == 2) // Level
+    else if(EditorCursor.Mode == OptCursor_t::LVL_SETTINGS) // Level
     {
         if(EditorCursor.SubMode == 4)
         {
@@ -1937,7 +2044,7 @@ void SetCursor()
             EditorCursor.Location.Height = 32;
         }
     }
-    else if(EditorCursor.Mode == 3) // Background
+    else if(EditorCursor.Mode == OptCursor_t::LVL_BGOS) // Background
     {
         if(EditorCursor.Background.Type <= 0)
             EditorCursor.Background.Type = 1;
@@ -1951,7 +2058,7 @@ void SetCursor()
         EditorCursor.Location.Width = EditorCursor.Background.Location.Width;
         EditorCursor.Location.Height = EditorCursor.Background.Location.Height;
     }
-    else if(EditorCursor.Mode == 4) // NPCs
+    else if(EditorCursor.Mode == OptCursor_t::LVL_NPCS) // NPCs
     {
         int t = EditorCursor.NPC.Type;
         // handled elsewhere in new editor
@@ -1986,16 +2093,18 @@ void SetCursor()
         EditorCursor.NPC.Frame = EditorNPCFrame(EditorCursor.NPC.Type, EditorCursor.NPC.Direction);
         EditorCursor.NPC.Active = true;
     }
-    else if(EditorCursor.Mode == 5) // Warps
+    else if(EditorCursor.Mode == OptCursor_t::LVL_WARPS) // Warps
     {
         EditorCursor.Warp.Layer = EditorCursor.Layer;
         EditorCursor.Location.Width = 32;
         EditorCursor.Location.Height = 32;
         // EditorCursor.Warp is now the canonical Warp object.
+        // It stores the warp's entrance and exit until the warp is placed,
+        // instead of finding and modifying an existing warp.
         // EditorCursor.Warp.Entrance = EditorCursor.Location;
         // EditorCursor.Warp.Exit = EditorCursor.Location;
     }
-    else if(EditorCursor.Mode == 6) // Eraser
+    else if(EditorCursor.Mode == OptCursor_t::LVL_ERASER) // Eraser
     {
         EditorCursor.Location.Width = 32;
         EditorCursor.Location.Height = 32;
@@ -2056,7 +2165,7 @@ void SetCursor()
 //            EditorCursor.WorldLevel.FileName = EditorCursor.WorldLevel::FileName + ".lvl";
 //        EditorCursor.WorldLevel.StartWarp = SDL_atoi(frmLevels::scrWarp.Value);
 //        EditorCursor.WorldLevel.LevelName = frmLevels::txtLevelName.Text;
-        // set in the full editor.
+        // these are set in the new editor screen.
         // EditorCursor.WorldLevel.Visible = false;
         // EditorCursor.WorldLevel.Start = false;
         // EditorCursor.WorldLevel.Path = false;
@@ -2085,7 +2194,7 @@ void SetCursor()
 //            EditorCursor.WorldLevel::LevelExit(A) = frmLevels::cmbExit(A).ListIndex - 1;
 //        }
     }
-    else if(EditorCursor.Mode == 10) // Paths
+    else if(EditorCursor.Mode == OptCursor_t::WLD_PATHS) // Paths
     {
 //        for(A = 1; A <= frmPaths::WorldPath.Count; A++)
 //        {

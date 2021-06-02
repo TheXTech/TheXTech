@@ -684,6 +684,8 @@ struct Background_t
     Location_t Location;
 //EXTRA: make a custom sorting priority
     int SortPriority = -1;
+//EXTRA: Preserved Z-Mode value
+    int zMode = 0;
 //EXTRA: sub-priority
     double zOffset = 0.0;
 //EXTRA: UID

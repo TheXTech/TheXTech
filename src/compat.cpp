@@ -56,6 +56,7 @@ static void compatInit(Compatibility_t &c)
     c.fix_autoscroll_speed = false;
     c.fix_blooper_stomp_effect = true;
     c.keep_bullet_bill_dir = true;
+    c.fix_pswitch_dragon_coin = true;
     c.free_level_res = true;
     c.free_world_res = true;
     c.NPC_activate_mode = NPC_activate_modes::smart;
@@ -79,6 +80,7 @@ static void compatInit(Compatibility_t &c)
         c.fix_autoscroll_speed = false;
         c.fix_blooper_stomp_effect = false;
         c.keep_bullet_bill_dir = false;
+        c.fix_pswitch_dragon_coin = false;
         c.free_level_res = false;
         c.free_world_res = false;
         c.NPC_activate_mode = NPC_activate_modes::onscreen;
@@ -129,6 +131,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         compat.read("fix-autoscroll-speed", c.fix_autoscroll_speed, c.fix_autoscroll_speed);
         compat.read("fix-blooper-stomp-effect", c.fix_blooper_stomp_effect, c.fix_blooper_stomp_effect);
         compat.read("keep-bullet-bill-direction", c.keep_bullet_bill_dir, c.keep_bullet_bill_dir);
+        compat.read("fix-pswitch-dragon-coin", c.fix_pswitch_dragon_coin, c.fix_pswitch_dragon_coin);
         compat.read("free-level-res", c.free_level_res, c.free_level_res);
         compat.read("free-world-res", c.free_world_res, c.free_world_res);
         IniProcessing::StrEnumMap activModes =
