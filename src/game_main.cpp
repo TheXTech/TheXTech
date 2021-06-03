@@ -68,6 +68,8 @@
 #include "main/trees.h"
 #include "rand.h"
 
+#include <PGE_File_Formats/file_formats.h>
+
 #ifdef NEW_EDITOR
 #include "editor/new_editor.h"
 #endif
@@ -928,6 +930,7 @@ void UpdateMacro()
     int A = 0;
     bool OnScreen = false;
 
+#ifndef NO_INTPROC
     if(LevelMacro != LEVELMACRO_OFF && LevelMacroCounter == 0 && IntProc::isEnabled())
     {
         for(int i = 0; i < numPlayers; ++i)
@@ -936,6 +939,7 @@ void UpdateMacro()
             IntProc::sendPlayerSettings(i, p.Character, p.State, p.Mount, p.MountType);
         }
     }
+#endif
 
     if(LevelMacro == LEVELMACRO_CARD_ROULETTE_EXIT) // SMB3 Exit
     {

@@ -35,8 +35,10 @@
 
 #include <Utils/maths.h>
 #include <Logger/logger.h>
-#include <InterProcess/intproc.h>
 
+#ifndef NO_INTPROC
+#include <InterProcess/intproc.h>
+#endif
 
 void DropBonus(int A)
 {
@@ -531,7 +533,9 @@ void TouchBonus(int A, int B)
                     numStars += 1;
                     Star[numStars].level = FileNameFull;
                     Star[numStars].Section = NPC[B].Section;
+#ifndef NO_INTPROC
                     IntProc::sendStarsNumber(numStars);
+#endif
 
                     for(C = 1; C <= numWarps; C++)
                     {

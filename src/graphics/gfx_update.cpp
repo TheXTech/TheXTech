@@ -280,7 +280,7 @@ void UpdateGraphics(bool skipRepaint)
     float c = ShadowMode ? 0.f : 1.f;
     int A = 0;
     std::string timeStr;
-    int Z = 0;
+    int Z;
     int numScreens = 0;
 
     if(!GameIsActive)
@@ -311,8 +311,6 @@ void UpdateGraphics(bool skipRepaint)
 //    int e2 = 0;
     int X = 0;
     int Y = 0;
-    int64_t fBlock = 0;
-    int64_t lBlock = 0;
     Location_t tempLocation;
     int S = 0; // Level section to display
 
@@ -481,7 +479,7 @@ void UpdateGraphics(bool skipRepaint)
         numScreens = 2;
     CenterScreens();
 
-    For(Z, 1, numScreens)
+    for(Z = 1; Z <= numScreens; Z++)
     {
         if(SingleCoop == 2)
             Z = 2;
@@ -772,7 +770,7 @@ void UpdateGraphics(bool skipRepaint)
         numScreens = 2;
 
     // draw code now separated from logic.
-    For(Z, 1, numScreens)
+    for(Z = 1; Z <= numScreens; Z++)
     {
         if(SingleCoop == 2)
             Z = 2;

@@ -691,7 +691,7 @@ void UpdateGraphics2(bool skipRepaint)
         // Print the level's name
         if(WorldPlayer[1].LevelName != "")
         {
-            size_t availChars = (size_t)((sW - margin - (pX + 116))/16);
+            size_t availChars = (size_t)((sW - margin - (pX + 116))/16) + 1;
             if(WorldPlayer[1].LevelName.length() > availChars*2)
             {
                 SuperPrint(WorldPlayer[1].LevelName.substr(0, availChars), 2,

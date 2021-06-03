@@ -139,12 +139,12 @@ void record_init()
             // everything has failed
             return;
         }
-        if(e = fopen(buffer, "rb"))
+        if((e = fopen(buffer, "rb")))
             fclose(e);
         else
         {
             buffer[n_chars-5] = 'g';
-            if(e = fopen(buffer, "rb"))
+            if((e = fopen(buffer, "rb")))
                 fclose(e);
             else
                 break;
@@ -223,12 +223,12 @@ void record_preload()
             // everything has failed
             return;
         }
-        if(e = fopen(buffer, "rb"))
+        if((e = fopen(buffer, "rb")))
             fclose(e);
         else
         {
             buffer[n_chars-5] = 'g';
-            if(e = fopen(buffer, "rb"))
+            if((e = fopen(buffer, "rb")))
                 fclose(e);
             else
                 break;
@@ -288,7 +288,7 @@ void record_finish()
         }
         if(!diverged)
         {
-            printf("CONGRATULATIONS! Your program's run did not diverge from the old run.\n");
+            printf("CONGRATULATIONS! Your build's run did not diverge from the old run.\n");
             if(s_recordGameplayFile)
                 fprintf(s_recordGameplayFile, "DID NOT diverge from old run.\n");
         }
@@ -297,7 +297,7 @@ void record_finish()
     }
     if(diverged)
     {
-        printf("I'm sorry, but your program's run DIVERGED from the old run.\n");
+        printf("I'm sorry, but your build's run DIVERGED from the old run.\n");
         if(s_recordGameplayFile)
             fprintf(s_recordGameplayFile, "DIVERGED from old run.\n");
     }
