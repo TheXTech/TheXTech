@@ -39,6 +39,8 @@
 #include "level_file.h"
 #include "speedrunner.h"
 
+#include "../config.h"
+
 #include "../pseudo_vb.h"
 
 
@@ -434,18 +436,26 @@ void WorldLoop()
                 }
             }
         }
-        else
+        if(WorldPlayer[1].Move3 && WorldPlayer[1].Move == 0)
+        {
+            if(config_FastMove)
+                PlayerPath(1);
+            if(WorldPlayer[1].Move == 0)
+            {
+                WorldPlayer[1].Move3 = false;
+                PlaySound(SFX_Slide);
+            }
+        }
+
+        if(WorldPlayer[1].Move == 0)
         {
             if(WorldPlayer[1].Frame == 5)
                 WorldPlayer[1].Frame = 4;
             if(WorldPlayer[1].Frame == 3)
                 WorldPlayer[1].Frame = 2;
         }
-        if(WorldPlayer[1].Move3 && WorldPlayer[1].Move == 0)
-        {
-            WorldPlayer[1].Move3 = false;
-            PlaySound(SFX_Slide);
-        }
+
+        WorldPlayer[1].LastMove = 0;
 
         //for(A = 1; A <= numWorldMusic; A++)
         for(auto *t : treeWorldMusicQuery(tempLocation, true))
@@ -466,13 +476,14 @@ void WorldLoop()
     {
         WorldPlayer[1].Move2 = WorldPlayer[1].Move2 + 2;
         WorldPlayer[1].Location.Y = WorldPlayer[1].Location.Y - 2;
-        if(WalkAnywhere)
+        if(WalkAnywhere || config_FastMove)
         {
             WorldPlayer[1].Move2 = WorldPlayer[1].Move2 + 2;
             WorldPlayer[1].Location.Y = WorldPlayer[1].Location.Y - 2;
         }
         if(WorldPlayer[1].Move2 >= 32)
         {
+            WorldPlayer[1].LastMove = WorldPlayer[1].Move;
             WorldPlayer[1].Move2 = 0;
             WorldPlayer[1].Move = 0;
             WorldPlayer[1].Move3 = true;
@@ -482,13 +493,14 @@ void WorldLoop()
     {
         WorldPlayer[1].Move2 = WorldPlayer[1].Move2 + 2;
         WorldPlayer[1].Location.X = WorldPlayer[1].Location.X - 2;
-        if(WalkAnywhere)
+        if(WalkAnywhere || config_FastMove)
         {
             WorldPlayer[1].Move2 = WorldPlayer[1].Move2 + 2;
             WorldPlayer[1].Location.X = WorldPlayer[1].Location.X - 2;
         }
         if(WorldPlayer[1].Move2 >= 32)
         {
+            WorldPlayer[1].LastMove = WorldPlayer[1].Move;
             WorldPlayer[1].Move2 = 0;
             WorldPlayer[1].Move = 0;
             WorldPlayer[1].Move3 = true;
@@ -498,13 +510,14 @@ void WorldLoop()
     {
         WorldPlayer[1].Move2 = WorldPlayer[1].Move2 + 2;
         WorldPlayer[1].Location.Y = WorldPlayer[1].Location.Y + 2;
-        if(WalkAnywhere)
+        if(WalkAnywhere || config_FastMove)
         {
             WorldPlayer[1].Move2 = WorldPlayer[1].Move2 + 2;
             WorldPlayer[1].Location.Y = WorldPlayer[1].Location.Y + 2;
         }
         if(WorldPlayer[1].Move2 >= 32)
         {
+            WorldPlayer[1].LastMove = WorldPlayer[1].Move;
             WorldPlayer[1].Move2 = 0;
             WorldPlayer[1].Move = 0;
             WorldPlayer[1].Move3 = true;
@@ -514,13 +527,14 @@ void WorldLoop()
     {
         WorldPlayer[1].Move2 = WorldPlayer[1].Move2 + 2;
         WorldPlayer[1].Location.X = WorldPlayer[1].Location.X + 2;
-        if(WalkAnywhere)
+        if(WalkAnywhere || config_FastMove)
         {
             WorldPlayer[1].Move2 = WorldPlayer[1].Move2 + 2;
             WorldPlayer[1].Location.X = WorldPlayer[1].Location.X + 2;
         }
         if(WorldPlayer[1].Move2 >= 32)
         {
+            WorldPlayer[1].LastMove = WorldPlayer[1].Move;
             WorldPlayer[1].Move2 = 0;
             WorldPlayer[1].Move = 0;
             WorldPlayer[1].Move3 = true;
@@ -629,6 +643,67 @@ void LevelPath(const WorldLevel_t &Lvl, int Direction, bool Skp)
             }
         }
     }
+}
+
+void PlayerPath(int A)
+{
+    if(!WorldPlayer[A].LevelName.empty())
+        return;
+
+    Location_t tempLocation = WorldPlayer[A].Location;
+
+    tempLocation.X += 4;
+    tempLocation.Y += 4;
+    tempLocation.Width -= 8;
+    tempLocation.Height -= 8;
+
+    int n_moves = 0;
+    for(int B = 1; B <= 4; B++)
+    {
+        if(B == 1)
+            tempLocation.Y -= 32; // Up
+        else if(B == 2)
+        {
+            tempLocation.Y += 32; // Down
+            tempLocation.X -= 32; // Left
+        }
+        else if(B == 3)
+        {
+            tempLocation.X += 32; // Right
+            tempLocation.Y += 32; // Down
+        }
+        else if(B == 4)
+        {
+            tempLocation.Y -= 32; // Up
+            tempLocation.X += 32; // Right
+        }
+        if(B != WorldPlayer[A].LastMove && B % 2 == WorldPlayer[A].LastMove % 2)
+            continue;
+        for(auto *t : treeWorldPathQuery(tempLocation, false))
+        {
+            WorldPath_t& path = *t;
+            if(CheckCollision(tempLocation, path.Location) && path.Active)
+            {
+                WorldPlayer[A].Move = B;
+                n_moves ++;
+                break;
+            }
+        }
+        if(WorldPlayer[A].Move == B)
+            continue;
+        for(auto *t : treeWorldLevelQuery(tempLocation, false))
+        {
+            WorldLevel_t& level = *t;
+            if(CheckCollision(tempLocation, level.Location) && level.Active)
+            {
+                WorldPlayer[A].Move = B;
+                n_moves ++;
+                break;
+            }
+        }
+    }
+    if(n_moves > 1)
+        WorldPlayer[A].Move = 0;
 }
 
 void PathPath(WorldPath_t &Pth, bool Skp)

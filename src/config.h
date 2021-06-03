@@ -28,4 +28,6 @@ static const std::unordered_map<int, std::string> ScaleMode_strings = {
 
 extern int config_ScaleMode;
 
+extern bool config_FastMove;
+
 #endif // #ifndef CONFIG_H

@@ -162,6 +162,7 @@ void OpenConfig()
 
         config.beginGroup("gameplay");
         config.read("ground-pound-by-alt-run", GameplayPoundByAltRun, false);
+        config.read("world-map-fast-move", config_FastMove, false);
         config.endGroup();
 
         config.beginGroup("effects");
@@ -299,6 +300,7 @@ void SaveConfig()
 
     config.beginGroup("gameplay");
     config.setValue("ground-pound-by-alt-run", GameplayPoundByAltRun);
+    config.setValue("world-map-fast-move", config_FastMove);
     config.endGroup();
 
     config.beginGroup("effects");

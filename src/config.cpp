@@ -6,3 +6,5 @@ int config_InternalH;
 #endif
 
 int config_ScaleMode;
+
+bool config_FastMove;

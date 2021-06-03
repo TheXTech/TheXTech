@@ -57,6 +57,8 @@ void WorldLoop();
 
 void LevelPath(const WorldLevel_t &Lvl, int Direction, bool Skp = false);
 
+void PlayerPath(int A);
+
 void PathPath(WorldPath_t &Pth, bool Skp = false);
 
 void PathWait();
