@@ -99,8 +99,10 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
     //Write into log the application start event
     pLogDebug("<Application started>");
 
+#ifndef NO_SCREENSHOT
     m_screenshotPath = AppPathManager::screenshotsDir();
     m_gifRecordPath = AppPathManager::gifRecordsDir();
+#endif
 
     //Initialize FreeImage
     GraphicsHelps::initFreeImage();
@@ -730,9 +732,11 @@ void FrmMain::repaint()
 
 void FrmMain::updateViewport()
 {
+#ifndef NO_SCREENSHOT
     // invalidates GIF recorder handle
     if(m_gif.enabled)
         toggleGifRecorder();
+#endif
 
     float w, w1, h, h1;
     int   wi, hi;

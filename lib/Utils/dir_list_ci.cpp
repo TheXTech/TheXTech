@@ -95,7 +95,7 @@ std::string DirListCI::resolveFileCaseExists(const std::string &in_name)
 std::string DirListCI::resolveFileCase(const std::string &in_name)
 {
 #ifdef _WIN32
-    return name; // no need on Windows
+    return in_name; // no need on Windows
 #else
     if(in_name.empty())
         return in_name;

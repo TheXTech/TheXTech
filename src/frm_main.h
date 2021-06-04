@@ -235,12 +235,10 @@ public:
                             StdPicture &tx,
                             float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f);
 
-#ifndef NO_SCREENSHOT
     void getScreenPixels(int x, int y, int w, int h, unsigned char *pixels);
     void getScreenPixelsRGBA(int x, int y, int w, int h, unsigned char *pixels);
     int  getPixelDataSize(const StdPicture &tx);
     void getPixelData(const StdPicture &tx, unsigned char *pixelData);
-#endif
 
     void lazyPreLoad(StdPicture &target);
 
