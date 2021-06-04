@@ -1,5 +1,8 @@
 TheXTech Changelog.
 
+Changes for 1.3.6
+<wip>
+
 Changes for 1.3.5.1
 -Episodes and battle levels lists now loading in the separated thread with a progress showing
 -Fixed the regression caused world map music not being switched properly
