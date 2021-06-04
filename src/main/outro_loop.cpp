@@ -299,6 +299,7 @@ void SetupCredits()
     AddCredit("Yingchun Soul"); // Idea for individual iceball shooting SFX and contribution with the "frozen NPC breaking" SFX
     AddCredit("MrDoubleA"); // Contribution with the "NPC got frozen" SFX
     AddCredit("Slash-18"); // Contribution with the better iceball shooting SFX
+    AddCredit("ds-sloth"); // For the major contribution to the code and becoming a co-developer
 #endif
     AddCredit("");
     AddCredit("4matsy");
