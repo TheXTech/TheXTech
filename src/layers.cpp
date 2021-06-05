@@ -296,7 +296,7 @@ void ProcEvent(std::string EventName, bool NoEffect)
         auto &evt = Events[A];
         if(equalCase(EventName, evt.Name))
         {
-            if(g_compatibility.speedrun_stop_timer_by_event && equalCase(EventName, g_compatibility.speedrun_stop_timer_event_name))
+            if(g_compatibility.speedrun_stop_timer_by == Compatibility_t::SPEEDRUN_STOP_EVENT && equalCase(EventName.c_str(), g_compatibility.speedrun_stop_timer_at))
                 speedRun_bossDeadEvent();
 
             for(B = 0; B <= numSections; B++)
