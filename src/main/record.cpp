@@ -66,10 +66,7 @@ void record_writestate()
     fprintf(s_recordGameplayFile, "%s\r\n", LONG_VERSION); // game version / commit
     fprintf(s_recordGameplayFile, " %d \r\n", g_speedRunnerMode); // compatibility mode
     fprintf(s_recordGameplayFile, "%s\r\n", FileNameFull.c_str()); // level that was played
-    if(Checkpoint == FullFileName)
-        fprintf(s_recordGameplayFile, " %d \r\n", 1);
-    else
-        fprintf(s_recordGameplayFile, " %d \r\n", 0);
+    fprintf(s_recordGameplayFile, " %d \r\n", (Checkpoint == FullFileName) ? 1 : 0);
     fprintf(s_recordGameplayFile, " %d \r\n", StartWarp);
     fprintf(s_recordGameplayFile, " %d \r\n", ReturnWarp);
     fprintf(s_recordGameplayFile, " %d \r\n", (int)Lives);
