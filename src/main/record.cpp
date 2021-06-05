@@ -13,6 +13,7 @@
 #include "speedrunner.h"
 #include "game_main.h"
 
+#include <SDL2/SDL_stdinc.h>
 #include <Utils/files.h>
 #include <DirManager/dirman.h>
 #include <AppPath/app_path.h>
@@ -112,7 +113,7 @@ void record_readstate()
     for(int i = 0; i < 1024; i++)
         if(buffer[i] == '\r') buffer[i] = '\0'; // clip the newline :(
 
-    if(strcasecmp(buffer, FileNameFull.c_str()))
+    if(SDL_strcasecmp(buffer, FileNameFull.c_str()))
         pLogWarning("FileName does not match.");
 
     fscanf(s_recordOldGameplayFile, "%d\r\n", &n); // is there a checkpoint?
@@ -596,7 +597,7 @@ void record_sync()
                     }
 
                     // quite non-strict because in a true divergence situation, it will get continually worse
-                    if(fabs(px - Player[i].Location.X) > 0.01 || fabs(py - Player[i].Location.Y) > 0.01)
+                    if(SDL_fabs(px - Player[i].Location.X) > 0.01 || SDL_fabs(py - Player[i].Location.Y) > 0.01)
                     {
                         pLogWarning("player %d position diverged (old: %f %f, new: %f %f) at frame %ld.", i, px, py, Player[i].Location.X, Player[i].Location.Y, s_frame_no);
                         s_diverged = true;
