@@ -20,6 +20,20 @@
 #include <AppPath/app_path.h>
 #include <Logger/logger.h>
 
+#ifndef PRId64 /*Workaround*/
+#   ifndef __PRI64_PREFIX
+#       if __WORDSIZE == 64
+#           define __PRI64_PREFIX	"l"
+#           define __PRIPTR_PREFIX	"l"
+#       else
+#           define __PRI64_PREFIX	"ll"
+#           define __PRIPTR_PREFIX
+#       endif
+#   endif
+#   define PRId64		__PRI64_PREFIX "d"
+#endif
+
+
 std::string makeRecordPrefix(int index)
 {
     // want to figure out path of filename relative to game engine, then save in the recording root.
