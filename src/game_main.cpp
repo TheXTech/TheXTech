@@ -466,6 +466,9 @@ int GameMain(const CmdLineSetup_t &setup)
             UpdateGraphics(true);
             resetFrameTimer();
 
+            if(g_compatibility.speedrun_stop_timer_by == Compatibility_t::SPEEDRUN_STOP_ENTER_LEVEL && (SDL_strcasecmp(FileName.c_str(), g_compatibility.speedrun_stop_timer_at) == 0))
+                speedRun_bossDeadEvent();
+
             // Main menu loop
             runFrameLoop(&MenuLoop, nullptr, []()->bool{ return GameMenu;});
             if(!GameIsActive)
@@ -473,6 +476,9 @@ int GameMain(const CmdLineSetup_t &setup)
                 speedRun_saveStats();
                 return 0;// Break on quit
             }
+
+            if(g_compatibility.speedrun_stop_timer_by == Compatibility_t::SPEEDRUN_STOP_LEAVE_LEVEL && (SDL_strcasecmp(FileName.c_str(), g_compatibility.speedrun_stop_timer_at) == 0))
+                speedRun_bossDeadEvent();
         }
 
         // World Map
