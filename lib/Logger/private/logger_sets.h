@@ -19,11 +19,13 @@
 
 #ifndef LOGGER_SETS_H
 #define LOGGER_SETS_H
+#pragma once
 
 #include <string>
 #include <memory>
+#include <stdarg.h>
 
-#include "logger.h"
+#include "../logger.h"
 
 typedef struct SDL_RWops SDL_RWops;
 
@@ -32,21 +34,22 @@ class LogWriter
 public:
     static std::string  m_logDirPath;
     static std::string  m_logFilePath;
-    static PGE_LogLevel m_logLevel;
+    static PGE_LogLevel::Level m_logLevel;
     static int          m_maxFilesCount;
     //! Is logging system is enabled
-    static bool  m_enabled;
+    static bool       m_enabled;
     //! Is logging system allowed to output into `stdout`
-    static bool  m_enabledStdOut;
+    static bool       m_enabledStdOut;
     //! Verbose logs to stdOut if possible
-    static bool  m_enabledVerboseLogs;
-    //! Is log file is opened
-    static bool  m_logIsOpened;
-    //! Output file
-    static SDL_RWops *m_logout;
+    static bool       m_enabledVerboseLogs;
 
-    static void WriteToLog(PGE_LogLevel type, const std::string &msg);
-    static void LoadLogSettings(bool disableStdOut = false, bool verboseLogs = false);
+    static void OpenLogFile();
+    static void CloseLog();
 };
+
+extern void LoggerPrivate_pLogConsole(int level, const char *label, const char *format, va_list arg);
+#ifndef NO_FILE_LOGGING
+extern void LoggerPrivate_pLogFile(int level, const char *label, const char *format, va_list arg);
+#endif
 
 #endif // LOGGER_SETS_H

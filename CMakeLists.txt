@@ -109,7 +109,7 @@ option(RANGE_ARR_USE_HEAP "Store data of RangeArr<> template in a heap" OFF)
 
 option(ENABLE_ANTICHEAT_TRAP "Enable anti-cheating trap for the \"redigitiscool\" cheat code" OFF)
 option(ENABLE_OLD_CREDITS "Use original Redigit's credits without changes" OFF)
-option(ENABLE_LOGGING "Enable debug logging" ON)
+option(ENABLE_LOGGING "Enable debug logging written into a file (may not work on some platfors)" ON)
 
 option(THEXTECH_ENABLE_LUA "Enable lua scripting support" OFF)
 
@@ -160,6 +160,7 @@ include(lib/FileMapper/FileMapper.cmake)
 include(lib/fmt/fmt.cmake)
 include(lib/IniProcessor/IniProcessor.cmake)
 include(lib/Utils/Utils.cmake)
+include(lib/Logger/logger.cmake)
 if(WIN32)
     include(lib/CrashHandler/StackWalker/StackWalker.cmake)
 endif()
@@ -252,7 +253,7 @@ set(LIB_SRC
     lib/InterProcess/editor_pipe.cpp
     lib/InterProcess/intproc.cpp
     ${INIPROCESSOR_SRCS}
-    lib/Logger/logger_sets.cpp
+    ${LOGGER_SRCS}
     ${UTILS_SRCS}
     ${LIB_SRC_EXTRA}
 )
@@ -493,11 +494,11 @@ if(ENABLE_OLD_CREDITS)
 endif()
 
 if(NOT ENABLE_LOGGING)
-    target_compile_definitions(thextech PRIVATE -DDISABLE_LOGGING)
+    target_compile_definitions(thextech PRIVATE -DDISABLE_LOGGING -DNO_FILE_LOGGING)
 endif()
 
 if(EMSCRIPTEN)
-    target_compile_definitions(thextech PRIVATE -DPGE_NO_THREADING)
+    target_compile_definitions(thextech PRIVATE -DPGE_NO_THREADING -DNO_FILE_LOGGING)
 endif()
 
 if(NOT USE_SYSTEM_LIBS)

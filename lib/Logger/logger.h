@@ -24,14 +24,17 @@
 #ifdef __cplusplus
 #include <string>
 
-enum class PGE_LogLevel
+struct PGE_LogLevel
 {
-    Debug    = 5,
-    Warning  = 4,
-    Critical = 3,
-    Info     = 2,
-    Fatal    = 1,
-    NoLog    = 0,
+    enum Level : int
+    {
+        Debug    = 5,
+        Warning  = 4,
+        Critical = 3,
+        Info     = 2,
+        Fatal    = 1,
+        NoLog    = 0,
+    };
 };
 
 extern void LoadLogSettings(bool disableStdOut = false, bool verboseLogs = false);
@@ -52,7 +55,6 @@ extern void pLogFatal(const char *format, ...);
 #endif
 
 #ifdef __cplusplus
-extern void WriteToLog(PGE_LogLevel type, const std::string &msg);
 extern std::string getLogFilePath();
 #endif
 

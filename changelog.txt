@@ -5,6 +5,11 @@ Changes for 1.3.6
 -Gameplay can be recorded and played back for speedruns and verification
 <wip>
 
+Changes for 1.3.5.2
+-Fixed the ARM64 building
+-Updated the log writer
+-Disabled the "Boss Dead" event hook to stop the episode speed-run timer by default, added the compat.ini options to enable and configure it
+
 Changes for 1.3.5.1
 -Episodes and battle levels lists now loading in the separated thread with a progress showing
 -Fixed the regression caused world map music not being switched properly

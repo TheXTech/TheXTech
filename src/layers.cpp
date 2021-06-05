@@ -54,6 +54,11 @@ static SDL_INLINE bool equalCase(const std::string &x, const std::string &y)
     return (SDL_strcasecmp(x.c_str(), y.c_str()) == 0);
 }
 
+static SDL_INLINE bool equalCase(const char *x, const char *y)
+{
+    return (SDL_strcasecmp(x, y) == 0);
+}
+
 void ShowLayer(std::string LayerName, bool NoEffect)
 {
     int A = 0;
@@ -291,7 +296,7 @@ void ProcEvent(std::string EventName, bool NoEffect)
         auto &evt = Events[A];
         if(equalCase(EventName, evt.Name))
         {
-            if(equalCase(EventName, "Boss Dead"))
+            if(g_compatibility.speedrun_stop_timer_by_event && equalCase(EventName, g_compatibility.speedrun_stop_timer_event_name))
                 speedRun_bossDeadEvent();
 
             for(B = 0; B <= numSections; B++)
