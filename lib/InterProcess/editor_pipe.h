@@ -10,15 +10,23 @@
 class EditorPipe
 {
     friend class EditorPipe_std;
-    SDL_Thread *m_thread;
-    bool        m_thread_isAlive;
+    SDL_Thread *m_thread = nullptr;
+    bool        m_thread_isAlive = false;
 public:
     EditorPipe();
     ~EditorPipe();
+    void sendStarsNumber(int numStars);
+    void sendTakenBlock(const LevelBlock &block);
+    void sendTakenBGO(const LevelBGO &bgo);
+    void sendTakenNPC(const LevelNPC &npc);
+    void sendCloseProperties();
+    void sendPlayerSettings(int playerId, int character, int state, int vehicleID, int vehicleState);
     void shut();
+
     bool        m_isWorking;
 
     static int run(void *self);
+    static int sendMessageAsync(void *outString);
     void start();
     void stop();
 

@@ -27,6 +27,7 @@
 
 #include <Logger/logger.h>
 #include <pge_delay.h>
+#include <InterProcess/intproc.h>
 
 #include "../globals.h"
 #include "../frame_timer.h"
@@ -419,6 +420,7 @@ void PauseGame(int plr)
                                 Checkpoint.clear();
                                 CheckpointsList.clear();
                                 numStars = 0;
+                                IntProc::sendStarsNumber(numStars);
                                 numSavedEvents = 0;
                                 BlockSwitch.fill(false);
                                 PlaySound(SFX_Bullet);

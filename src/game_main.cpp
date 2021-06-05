@@ -865,6 +865,15 @@ void UpdateMacro()
     int A = 0;
     bool OnScreen = false;
 
+    if(LevelMacro != LEVELMACRO_OFF && LevelMacroCounter == 0 && IntProc::isEnabled())
+    {
+        for(int i = 0; i < numPlayers; ++i)
+        {
+            auto &p = Player[i + 1];
+            IntProc::sendPlayerSettings(i, p.Character, p.State, p.Mount, p.MountType);
+        }
+    }
+
     if(LevelMacro == LEVELMACRO_CARD_ROULETTE_EXIT) // SMB3 Exit
     {
         for(A = 1; A <= numPlayers; A++)
@@ -906,7 +915,7 @@ void UpdateMacro()
 
         if(!OnScreen)
         {
-            LevelMacroCounter = LevelMacroCounter + 1;
+            LevelMacroCounter += 1;
             if(LevelMacroCounter >= 100)
             {
                 LevelBeatCode = 1;
@@ -931,7 +940,8 @@ void UpdateMacro()
             Player[A].Controls.AltJump = false;
             Player[A].Controls.AltRun = false;
         }
-        LevelMacroCounter = LevelMacroCounter + 1;
+
+        LevelMacroCounter += 1;
         if(LevelMacroCounter >= 460)
         {
             LevelBeatCode = 2;
@@ -1014,7 +1024,8 @@ void UpdateMacro()
             Player[A].Controls.AltJump = false;
             Player[A].Controls.AltRun = false;
         }
-        LevelMacroCounter = LevelMacroCounter + 1;
+
+        LevelMacroCounter += 1;
         if(LevelMacroCounter >= 300)
         {
             LevelBeatCode = 5;
@@ -1040,7 +1051,8 @@ void UpdateMacro()
             Player[A].Controls.AltJump = false;
             Player[A].Controls.AltRun = false;
         }
-        LevelMacroCounter = LevelMacroCounter + 1;
+
+        LevelMacroCounter += 1;
         if(LevelMacroCounter == 250)
             PlaySound(SFX_GameBeat);
         if(LevelMacroCounter >= 800)
@@ -1074,7 +1086,8 @@ void UpdateMacro()
             Player[A].Controls.AltJump = false;
             Player[A].Controls.AltRun = false;
         }
-        LevelMacroCounter = LevelMacroCounter + 1;
+
+        LevelMacroCounter += 1;
         if(LevelMacroCounter >= 300)
         {
             LevelBeatCode = 7;
@@ -1115,7 +1128,8 @@ void UpdateMacro()
                 Player[A].Controls.AltRun = false;
             }
         }
-        LevelMacroCounter = LevelMacroCounter + 1;
+
+        LevelMacroCounter += 1;
         if(LevelMacroCounter >= 630)
         {
             LevelBeatCode = 8;
