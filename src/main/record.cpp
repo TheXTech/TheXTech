@@ -299,14 +299,14 @@ void record_finish()
     }
 
     if(s_recordGameplayFile)
-        fprintf(s_recordGameplayFile, "End\r\n %ld \r\n %d \r\n", s_frame_no, LevelBeatCode);
+        fprintf(s_recordGameplayFile, "End\r\n %lld \r\n %d \r\n", s_frame_no, LevelBeatCode);
 
     if(s_recordOldGameplayFile)
     {
         int64_t f;
         int b;
 
-        if(fscanf(s_recordOldGameplayFile, "End\r\n%ld\r\n%d\r\n", &f, &b) != 2)
+        if(fscanf(s_recordOldGameplayFile, "End\r\n%lld\r\n%d\r\n", &f, &b) != 2)
         {
             pLogWarning("old gameplay file diverged (invalid end header).");
             s_diverged = true;
@@ -314,7 +314,7 @@ void record_finish()
 
         if(f != s_frame_no)
         {
-            pLogWarning("final frame_no diverged (old: %ld, new: %ld).", f, s_frame_no);
+            pLogWarning("final frame_no diverged (old: %lld, new: %lld).", f, s_frame_no);
             s_diverged = true;
         }
 
@@ -371,7 +371,7 @@ void record_sync()
     {
         if(s_next_delta_frame == -1 && s_recordControlFile)
         {
-            if(!fscanf(s_recordControlFile, "%ld\r\n", &s_next_delta_frame))
+            if(!fscanf(s_recordControlFile, "%lld\r\n", &s_next_delta_frame))
             {
                 fclose(s_recordControlFile);
                 s_recordControlFile = nullptr;
@@ -413,7 +413,7 @@ void record_sync()
             else if(key == 'Y')
                 s_last_controls[p-1].AltRun = set;
 
-            if(!fscanf(s_recordControlFile, "%ld\r\n", &s_next_delta_frame))
+            if(!fscanf(s_recordControlFile, "%lld\r\n", &s_next_delta_frame))
             {
                 fclose(s_recordControlFile);
                 s_recordControlFile = nullptr;
@@ -432,54 +432,54 @@ void record_sync()
             const Controls_t& keys = Player[i+1].Controls;
 
             if(!s_last_controls[i].Up && keys.Up)
-                fprintf(s_recordControlFile, "%ld\r\n+%dU\r\n", s_frame_no, i+1);
+                fprintf(s_recordControlFile, "%lld\r\n+%dU\r\n", s_frame_no, i+1);
             else if(s_last_controls[i].Up && !keys.Up)
-                fprintf(s_recordControlFile, "%ld\r\n-%dU\r\n", s_frame_no, i+1);
+                fprintf(s_recordControlFile, "%lld\r\n-%dU\r\n", s_frame_no, i+1);
 
             if(!s_last_controls[i].Down && keys.Down)
-                fprintf(s_recordControlFile, "%ld\r\n+%dD\r\n", s_frame_no, i+1);
+                fprintf(s_recordControlFile, "%lld\r\n+%dD\r\n", s_frame_no, i+1);
             else if(s_last_controls[i].Down && !keys.Down)
-                fprintf(s_recordControlFile, "%ld\r\n-%dD\r\n", s_frame_no, i+1);
+                fprintf(s_recordControlFile, "%lld\r\n-%dD\r\n", s_frame_no, i+1);
 
             if(!s_last_controls[i].Left && keys.Left)
-                fprintf(s_recordControlFile, "%ld\r\n+%dL\r\n", s_frame_no, i+1);
+                fprintf(s_recordControlFile, "%lld\r\n+%dL\r\n", s_frame_no, i+1);
             else if(s_last_controls[i].Left && !keys.Left)
-                fprintf(s_recordControlFile, "%ld\r\n-%dL\r\n", s_frame_no, i+1);
+                fprintf(s_recordControlFile, "%lld\r\n-%dL\r\n", s_frame_no, i+1);
 
             if(!s_last_controls[i].Right && keys.Right)
-                fprintf(s_recordControlFile, "%ld\r\n+%dR\r\n", s_frame_no, i+1);
+                fprintf(s_recordControlFile, "%lld\r\n+%dR\r\n", s_frame_no, i+1);
             else if(s_last_controls[i].Right && !keys.Right)
-                fprintf(s_recordControlFile, "%ld\r\n-%dR\r\n", s_frame_no, i+1);
+                fprintf(s_recordControlFile, "%lld\r\n-%dR\r\n", s_frame_no, i+1);
 
             if(!s_last_controls[i].Start && keys.Start)
-                fprintf(s_recordControlFile, "%ld\r\n+%dS\r\n", s_frame_no, i+1);
+                fprintf(s_recordControlFile, "%lld\r\n+%dS\r\n", s_frame_no, i+1);
             else if(s_last_controls[i].Start && !keys.Start)
-                fprintf(s_recordControlFile, "%ld\r\n-%dS\r\n", s_frame_no, i+1);
+                fprintf(s_recordControlFile, "%lld\r\n-%dS\r\n", s_frame_no, i+1);
 
             if(!s_last_controls[i].Drop && keys.Drop)
-                fprintf(s_recordControlFile, "%ld\r\n+%dI\r\n", s_frame_no, i+1);
+                fprintf(s_recordControlFile, "%lld\r\n+%dI\r\n", s_frame_no, i+1);
             else if(s_last_controls[i].Drop && !keys.Drop)
-                fprintf(s_recordControlFile, "%ld\r\n-%dI\r\n", s_frame_no, i+1);
+                fprintf(s_recordControlFile, "%lld\r\n-%dI\r\n", s_frame_no, i+1);
 
             if(!s_last_controls[i].Jump && keys.Jump)
-                fprintf(s_recordControlFile, "%ld\r\n+%dA\r\n", s_frame_no, i+1);
+                fprintf(s_recordControlFile, "%lld\r\n+%dA\r\n", s_frame_no, i+1);
             else if(s_last_controls[i].Jump && !keys.Jump)
-                fprintf(s_recordControlFile, "%ld\r\n-%dA\r\n", s_frame_no, i+1);
+                fprintf(s_recordControlFile, "%lld\r\n-%dA\r\n", s_frame_no, i+1);
 
             if(!s_last_controls[i].Run && keys.Run)
-                fprintf(s_recordControlFile, "%ld\r\n+%dB\r\n", s_frame_no, i+1);
+                fprintf(s_recordControlFile, "%lld\r\n+%dB\r\n", s_frame_no, i+1);
             else if(s_last_controls[i].Run && !keys.Run)
-                fprintf(s_recordControlFile, "%ld\r\n-%dB\r\n", s_frame_no, i+1);
+                fprintf(s_recordControlFile, "%lld\r\n-%dB\r\n", s_frame_no, i+1);
 
             if(!s_last_controls[i].AltJump && keys.AltJump)
-                fprintf(s_recordControlFile, "%ld\r\n+%dX\r\n", s_frame_no, i+1);
+                fprintf(s_recordControlFile, "%lld\r\n+%dX\r\n", s_frame_no, i+1);
             else if(s_last_controls[i].AltJump && !keys.AltJump)
-                fprintf(s_recordControlFile, "%ld\r\n-%dX\r\n", s_frame_no, i+1);
+                fprintf(s_recordControlFile, "%lld\r\n-%dX\r\n", s_frame_no, i+1);
 
             if(!s_last_controls[i].AltRun && keys.AltRun)
-                fprintf(s_recordControlFile, "%ld\r\n+%dY\r\n", s_frame_no, i+1);
+                fprintf(s_recordControlFile, "%lld\r\n+%dY\r\n", s_frame_no, i+1);
             else if(s_last_controls[i].AltRun && !keys.AltRun)
-                fprintf(s_recordControlFile, "%ld\r\n-%dY\r\n", s_frame_no, i+1);
+                fprintf(s_recordControlFile, "%lld\r\n-%dY\r\n", s_frame_no, i+1);
 
             fflush(s_recordControlFile);
 
@@ -497,7 +497,7 @@ void record_sync()
             g_stats.renderedBGOs = 0;
         }
 
-        fprintf(s_recordGameplayFile, "Frame\r\n %ld \r\n",
+        fprintf(s_recordGameplayFile, "Frame\r\n %lld \r\n",
             s_frame_no);
         fprintf(s_recordGameplayFile, " %d \r\n", Score);
         fprintf(s_recordGameplayFile, " %d \r\n", numNPCs);
@@ -529,9 +529,9 @@ void record_sync()
             int64_t f;
             int o_Score, o_numNPCs, o_numActiveNPCs, o_renderedNPCs, o_renderedBlocks, o_renderedBGOs;
 
-            if(!fscanf(s_recordOldGameplayFile, "Frame\r\n%ld\r\n", &f) || f != s_frame_no)
+            if(!fscanf(s_recordOldGameplayFile, "Frame\r\n%lld\r\n", &f) || f != s_frame_no)
             {
-                pLogWarning("old gameplay file diverged (invalid frame header) at frame %ld.", s_frame_no);
+                pLogWarning("old gameplay file diverged (invalid frame header) at frame %lld.", s_frame_no);
                 s_diverged = true;
                 fclose(s_recordOldGameplayFile);
                 s_recordOldGameplayFile = nullptr;
@@ -540,7 +540,7 @@ void record_sync()
             else if(fscanf(s_recordOldGameplayFile, "%d\r\n%d\r\n%d\r\n%d\r\n%d\r\n%d\r\n",
                 &o_Score, &o_numNPCs, &o_numActiveNPCs, &o_renderedNPCs, &o_renderedBlocks, &o_renderedBGOs) != 6)
             {
-                pLogWarning("old gameplay file diverged (invalid frame info) at frame %ld.", s_frame_no);
+                pLogWarning("old gameplay file diverged (invalid frame info) at frame %lld.", s_frame_no);
                 s_diverged = true;
                 fclose(s_recordOldGameplayFile);
                 s_recordOldGameplayFile = nullptr;
@@ -549,37 +549,37 @@ void record_sync()
             {
                 if(o_Score != Score)
                 {
-                    pLogWarning("score diverged (old: %d, new: %d) at frame %ld.", o_Score, Score, s_frame_no);
+                    pLogWarning("score diverged (old: %d, new: %d) at frame %lld.", o_Score, Score, s_frame_no);
                     s_diverged = true;
                 }
 
                 if(o_numNPCs != numNPCs)
                 {
-                    pLogWarning("numNPCs diverged (old: %d, new: %d) at frame %ld.", o_numNPCs, numNPCs, s_frame_no);
+                    pLogWarning("numNPCs diverged (old: %d, new: %d) at frame %lld.", o_numNPCs, numNPCs, s_frame_no);
                     s_diverged = true;
                 }
 
                 if(o_numActiveNPCs != numActiveNPCs)
                 {
-                    pLogWarning("numActiveNPCs diverged (old: %d, new: %d) at frame %ld.", o_numActiveNPCs, numActiveNPCs, s_frame_no);
+                    pLogWarning("numActiveNPCs diverged (old: %d, new: %d) at frame %lld.", o_numActiveNPCs, numActiveNPCs, s_frame_no);
                     s_diverged = true;
                 }
 
                 if(o_renderedNPCs != g_stats.renderedNPCs)
                 {
-                    pLogWarning("renderedNPCs diverged (old: %d, new: %d) at frame %ld.", o_renderedNPCs, g_stats.renderedNPCs, s_frame_no);
+                    pLogWarning("renderedNPCs diverged (old: %d, new: %d) at frame %lld.", o_renderedNPCs, g_stats.renderedNPCs, s_frame_no);
                     s_diverged = true;
                 }
 
                 if(o_renderedBlocks != g_stats.renderedBlocks + g_stats.renderedSzBlocks)
                 {
-                    pLogWarning("renderedBlocks diverged (old: %d, new: %d) at frame %ld.", o_renderedNPCs, g_stats.renderedNPCs + g_stats.renderedSzBlocks, s_frame_no);
+                    pLogWarning("renderedBlocks diverged (old: %d, new: %d) at frame %lld.", o_renderedNPCs, g_stats.renderedNPCs + g_stats.renderedSzBlocks, s_frame_no);
                     s_diverged = true;
                 }
 
                 if(o_renderedBGOs != g_stats.renderedBGOs)
                 {
-                    pLogWarning("renderedBGOs diverged (old: %d, new: %d) at frame %ld.", o_renderedBGOs, g_stats.renderedBGOs, s_frame_no);
+                    pLogWarning("renderedBGOs diverged (old: %d, new: %d) at frame %lld.", o_renderedBGOs, g_stats.renderedBGOs, s_frame_no);
                     s_diverged = true;
                 }
 
@@ -589,7 +589,7 @@ void record_sync()
 
                     if(fscanf(s_recordOldGameplayFile, "%lf\r\n%lf\r\n", &px, &py) != 2)
                     {
-                        pLogWarning("old gameplay file diverged (invalid player %d info) at frame %ld.", i, s_frame_no);
+                        pLogWarning("old gameplay file diverged (invalid player %d info) at frame %lld.", i, s_frame_no);
                         s_diverged = true;
                         fclose(s_recordOldGameplayFile);
                         s_recordOldGameplayFile = nullptr;
@@ -599,7 +599,7 @@ void record_sync()
                     // quite non-strict because in a true divergence situation, it will get continually worse
                     if(SDL_fabs(px - Player[i].Location.X) > 0.01 || SDL_fabs(py - Player[i].Location.Y) > 0.01)
                     {
-                        pLogWarning("player %d position diverged (old: %f %f, new: %f %f) at frame %ld.", i, px, py, Player[i].Location.X, Player[i].Location.Y, s_frame_no);
+                        pLogWarning("player %d position diverged (old: %f %f, new: %f %f) at frame %lld.", i, px, py, Player[i].Location.X, Player[i].Location.Y, s_frame_no);
                         s_diverged = true;
                     }
                 }
