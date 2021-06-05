@@ -49,15 +49,15 @@ bool g_recordControlRecord = false;
 int g_recordReplayId = -1;
 
 // private
-FILE* s_recordControlFile;
-FILE* s_recordGameplayFile;
-FILE* s_recordOldGameplayFile;
+static FILE* s_recordControlFile = nullptr;
+static FILE* s_recordGameplayFile = nullptr;
+static FILE* s_recordOldGameplayFile = nullptr;
 
-bool in_level = false;
-bool diverged = false;
-int64_t frame_no;
-int64_t next_delta_frame;
-Controls_t last_controls[maxPlayers];
+static bool in_level = false;
+static bool diverged = false;
+static int64_t frame_no = 0;
+static int64_t next_delta_frame = 0;
+static Controls_t last_controls[maxPlayers];
 
 void record_writestate()
 {
