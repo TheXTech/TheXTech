@@ -356,11 +356,13 @@ void record_sync()
                 s_recordControlFile = nullptr;
                 break;
             }
-            bool set;
-            if(mode == '-')
+
+            bool set = (mode != '-');
+            /*if(mode == '-')
                 set = false;
             else
-                set = true;
+                set = true;*/
+
             if(key == 'U')
                 last_controls[p-1].Up = set;
             else if(key == 'D')
