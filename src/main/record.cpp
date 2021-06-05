@@ -35,7 +35,7 @@ std::string findRecordPrefix(int index)
         + "/" + Files::basename(Files::dirname(FullFileName))
         + "/" + FileNameFull + "." + std::to_string(index);
     FILE* e;
-    if((e = fopen((recordPath + ".c.txt").c_str(), "rb")))
+    if((e = Files::utf8_fopen((recordPath + ".c.txt").c_str(), "rb")))
     {
         fclose(e);
         return recordPath;
@@ -173,12 +173,12 @@ void record_init()
         std::string filename = makeRecordPrefix(next_run)+".c.txt";
         if(!s_recordControlFile)
         {
-            s_recordControlFile = fopen(filename.c_str(), "wb");
+            s_recordControlFile = Files::utf8_fopen(filename.c_str(), "wb");
         }
         if(!s_recordGameplayFile)
         {
             filename.end()[-5] = 'g';
-            s_recordGameplayFile = fopen(filename.c_str(), "wb");
+            s_recordGameplayFile = Files::utf8_fopen(filename.c_str(), "wb");
         }
     }
     else if(g_recordControlReplay)
@@ -191,11 +191,11 @@ void record_init()
         }
         filename += ".c.txt";
         if(!s_recordControlFile)
-            s_recordControlFile = fopen(filename.c_str(), "rb");
+            s_recordControlFile = Files::utf8_fopen(filename.c_str(), "rb");
         if(!s_recordOldGameplayFile)
         {
             filename.end()[-5] = 'g';
-            s_recordOldGameplayFile = fopen(filename.c_str(), "rb");
+            s_recordOldGameplayFile = Files::utf8_fopen(filename.c_str(), "rb");
             if(s_recordOldGameplayFile)
             {
                 record_readstate();
@@ -204,7 +204,7 @@ void record_init()
         if(s_recordControlFile && !s_recordGameplayFile)
         {
             filename.replace(filename.end()-5, filename.end(), "r." SHORT_VERSION ".txt");
-            s_recordGameplayFile = fopen(filename.c_str(), "wb");
+            s_recordGameplayFile = Files::utf8_fopen(filename.c_str(), "wb");
         }
     }
 
@@ -252,7 +252,7 @@ void record_preload()
         if(!s_recordOldGameplayFile)
         {
             filename += ".g.txt";
-            s_recordOldGameplayFile = fopen(filename.c_str(), "rb");
+            s_recordOldGameplayFile = Files::utf8_fopen(filename.c_str(), "rb");
             if(s_recordOldGameplayFile)
             {
                 record_readstate();
