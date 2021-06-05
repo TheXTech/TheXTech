@@ -86,22 +86,33 @@ static void compatInit(Compatibility_t &c)
         c.fix_player_downward_clip = false;
         c.fix_player_clip_wall_at_npc = false;
     }
+
+    c.speedrun_stop_timer_by_event = false;
+    SDL_memset(c.speedrun_stop_timer_event_name, 0, sizeof(c.speedrun_stop_timer_event_name));
+    SDL_strlcpy(c.speedrun_stop_timer_event_name, "Boss Dead", sizeof(c.speedrun_stop_timer_event_name));
 }
 
 static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
 {
+    std::string buffer;
     pLogDebug("Loading %s...", fileName.c_str());
-
-    if(g_speedRunnerMode >= SPEEDRUN_MODE_3)
-    {
-        pLogDebug("Speed-Run Mode 3 detected, the compat.ini completely disabled, all old bugs enforced.", fileName.c_str());
-        return;
-    }
 
     IniProcessing compat(fileName);
     if(!compat.isOpened())
     {
         pLogWarning("Can't open the compat.ini file: %s", fileName.c_str());
+        return;
+    }
+
+    compat.beginGroup("speedrun");
+    compat.read("stop-timer-by-event", c.speedrun_stop_timer_by_event, c.speedrun_stop_timer_by_event);
+    compat.read("stop-timer-event-name", buffer, std::string(c.speedrun_stop_timer_event_name));
+    SDL_strlcpy(c.speedrun_stop_timer_event_name, buffer.c_str(), sizeof(c.speedrun_stop_timer_event_name));
+    compat.endGroup();
+
+    if(g_speedRunnerMode >= SPEEDRUN_MODE_3)
+    {
+        pLogDebug("Speed-Run Mode 3 detected, the [compatibility] section for the compat.ini completely skipped, all old bugs enforced.", fileName.c_str());
         return;
     }
 

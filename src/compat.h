@@ -49,6 +49,10 @@ struct Compatibility_t
     bool fix_blooper_stomp_effect;
     bool keep_bullet_bill_dir;
     bool fix_pswitch_dragon_coin;
+
+    // SpeedRun section
+    bool speedrun_stop_timer_by_event;
+    char speedrun_stop_timer_event_name[250];
 };
 
 extern Compatibility_t g_compatibility;
