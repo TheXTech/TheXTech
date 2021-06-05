@@ -168,20 +168,7 @@ void record_init()
         }
     }
 
-    if(g_recordControlRecord)
-    {
-        std::string filename = makeRecordPrefix(next_run)+".c.txt";
-        if(!s_recordControlFile)
-        {
-            s_recordControlFile = fopen(filename.c_str(), "wb");
-        }
-        if(!s_recordGameplayFile)
-        {
-            filename.end()[-5] = 'g';
-            s_recordGameplayFile = fopen(filename.c_str(), "wb");
-        }
-    }
-    else if(g_recordControlReplay)
+    if(g_recordControlReplay)
     {
         std::string filename = findRecordPrefix(next_run-1);
         if(filename.empty())
@@ -204,6 +191,19 @@ void record_init()
         if(s_recordControlFile && !s_recordGameplayFile)
         {
             filename.replace(filename.end()-5, filename.end(), "r." SHORT_VERSION ".txt");
+            s_recordGameplayFile = fopen(filename.c_str(), "wb");
+        }
+    }
+    else if(g_recordControlRecord)
+    {
+        std::string filename = makeRecordPrefix(next_run)+".c.txt";
+        if(!s_recordControlFile)
+        {
+            s_recordControlFile = fopen(filename.c_str(), "wb");
+        }
+        if(!s_recordGameplayFile)
+        {
+            filename.end()[-5] = 'g';
             s_recordGameplayFile = fopen(filename.c_str(), "wb");
         }
     }
@@ -240,7 +240,7 @@ void record_preload()
             next_run ++;
     }
 
-    if(!g_recordControlRecord && g_recordControlReplay)
+    if(g_recordControlReplay)
     {
         std::string filename = findRecordPrefix(next_run-1);
         if(filename.empty())
@@ -437,6 +437,7 @@ void record_sync()
                 fprintf(s_recordControlFile, "%ld\r\n+%dY\r\n", frame_no, i+1);
             else if(last_controls[i].AltRun && !keys.AltRun)
                 fprintf(s_recordControlFile, "%ld\r\n-%dY\r\n", frame_no, i+1);
+            fflush(s_recordControlFile);
             last_controls[i] = keys;
         }
     }
@@ -471,6 +472,7 @@ void record_sync()
             fprintf(s_recordGameplayFile, "%lf\r\n%lf\r\n",
                 Player[i].Location.X, Player[i].Location.Y);
         }
+        fflush(s_recordGameplayFile);
         if(s_recordOldGameplayFile)
         {
             int64_t f;
