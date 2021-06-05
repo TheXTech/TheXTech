@@ -374,6 +374,11 @@ void AppPathManager::setAssetsRoot(const std::string &root)
         m_customAssetsRoot.push_back('/');
 }
 
+std::string AppPathManager::logsDir()
+{
+    return ApplicationPathSTD + "logs";
+}
+
 std::string AppPathManager::languagesDir()
 {
 #if defined(__APPLE__)
