@@ -26,11 +26,9 @@
 #define LOG_CHANNEL "Application"
 #endif
 
-#ifndef NO_FILE_LOGGING
 static std::mutex g_lockLocker;
 #define OUT_BUFFER_SIZE 10240
 static char       g_outputBuffer[OUT_BUFFER_SIZE];
-#endif
 
 void LogWriter::OpenLogFile()
 {}
