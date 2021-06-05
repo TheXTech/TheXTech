@@ -31,6 +31,8 @@
 #include "../sound.h"
 #include "../control/joystick.h"
 
+#include "record.h"
+
 #include <Utils/files.h>
 #include <Utils/strings.h>
 #include <IniProcessor/ini_processing.h>
@@ -133,6 +135,7 @@ void OpenConfig()
         config.read("full-screen", resBool, false);
         config.read("frame-skip", FrameSkip, FrameSkip);
         config.read("show-fps", ShowFPS, ShowFPS);
+        config.read("record-gameplay", g_recordControlRecord, g_recordControlRecord);
         config.endGroup();
 
         config.beginGroup("gameplay");
@@ -237,8 +240,10 @@ void SaveConfig()
     config.setValue("full-screen", resChanged);
 #endif
     // TODO: Make sure, saving of those settings will not been confused by line arguments
+    // by separating config settings from global active settings
 //    config.setValue("frame-skip", FrameSkip);
 //    config.setValue("show-fps", ShowFPS);
+//    config.setValue("record-gameplay", g_recordControlRecord);
     config.endGroup();
 
     config.beginGroup("sound");
