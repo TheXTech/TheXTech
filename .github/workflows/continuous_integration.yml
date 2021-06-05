@@ -5,6 +5,7 @@ on:
     branches:
       - master
       - versus-ci
+      - stable-1.3.5.x
   pull_request:
     branches:
       - master
@@ -25,20 +26,20 @@ jobs:
             generator: "Ninja",
             build_type: "MinSizeRel",
             executable_name_suffix: "",
-            package_filename_suffix: "ubuntu-16-04-amd64-dev",
+            package_filename_suffix: "ubuntu-16-04-amd64",
             upload_directory: "www/ubuntu-16-04/"
           }
-        - {
-            name: "Ubuntu 16.04 32bit",
-            os: ubuntu-16.04,
-            extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech -DUSE_STATIC_LIBC=ON -DUSE_SYSTEM_LIBS=OFF -DUSE_SYSTEM_SDL2=OFF -DUSE_SHARED_FREEIMAGE=OFF -DPGE_SHARED_SDLMIXER=OFF -DCMAKE_TOOLCHAIN_FILE=`pwd`/cmake/ci_linux_gcc_toolchain_x32.cmake",
-            deps_cmdline: "sudo dpkg --add-architecture i386 && sudo apt-get update -qq && sudo apt-get install -qq cmake ninja-build lftp gcc-multilib g++-multilib libc6-dev:i386 \"^libxcb.*:i386\" libx11-dev:i386 libx11-xcb-dev:i386 libgtk-3-dev:i386 libxcursor-dev:i386 libxrender-dev:i386 libxrandr-dev:i386 libxext-dev:i386 libxi-dev:i386 libxss-dev:i386 libxt-dev:i386 libxv-dev:i386 libxxf86vm-dev:i386 libxinerama-dev:i386 libxkbcommon-dev:i386 libfontconfig1-dev:i386 libasound2-dev:i386 libpulse-dev:i386 libdbus-1-dev:i386 udev mtdev-tools webp libudev-dev:i386 libwayland-dev:i386 libegl1-mesa-dev:i386 mesa-common-dev:i386 libgl1-mesa-dev:i386 libglu1-mesa-dev:i386 libgles2-mesa:i386 libgles2-mesa-dev:i386 libproxy-dev:i386",
-            generator: "Ninja",
-            build_type: "MinSizeRel",
-            executable_name_suffix: "",
-            package_filename_suffix: "ubuntu-16-04-i386-dev",
-            upload_directory: "www/ubuntu-16-04/"
-          }
+#        - {
+#            name: "Ubuntu 16.04 32bit",
+#            os: ubuntu-16.04,
+#            extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech -DUSE_STATIC_LIBC=ON -DUSE_SYSTEM_LIBS=OFF -DUSE_SYSTEM_SDL2=OFF -DUSE_SHARED_FREEIMAGE=OFF -DPGE_SHARED_SDLMIXER=OFF -DCMAKE_TOOLCHAIN_FILE=`pwd`/cmake/ci_linux_gcc_toolchain_x32.cmake",
+#            deps_cmdline: "sudo dpkg --add-architecture i386 && sudo apt-get update -qq && sudo apt-get install -y cmake ninja-build lftp gcc-multilib g++-multilib libc6-dev:i386 \"^libxcb.*:i386\" libx11-dev:i386 libx11-xcb-dev:i386 libgtk-3-dev:i386 libxcursor-dev:i386 libxrender-dev:i386 libxrandr-dev:i386 libxext-dev:i386 libxi-dev:i386 libxss-dev:i386 libxt-dev:i386 libxv-dev:i386 libxxf86vm-dev:i386 libxinerama-dev:i386 libxkbcommon-dev:i386 libfontconfig1-dev:i386 libasound2-dev:i386 libpulse-dev:i386 libdbus-1-dev:i386 udev mtdev-tools webp libudev-dev:i386 libwayland-dev:i386 libegl1-mesa-dev:i386 mesa-common-dev:i386 libgl1-mesa-dev:i386 libglu1-mesa-dev:i386 libgles2-mesa:i386 libgles2-mesa-dev:i386 libproxy-dev:i386",
+#            generator: "Ninja",
+#            build_type: "MinSizeRel",
+#            executable_name_suffix: "",
+#            package_filename_suffix: "ubuntu-16-04-i386",
+#            upload_directory: "www/ubuntu-16-04/"
+#          }
         - {
             name: "Ubuntu 18.04 x86_64",
             os: ubuntu-18.04,
@@ -47,7 +48,7 @@ jobs:
             generator: "Ninja",
             build_type: "MinSizeRel",
             executable_name_suffix: "",
-            package_filename_suffix: "ubuntu-18-04-amd64-dev",
+            package_filename_suffix: "ubuntu-18-04-amd64",
             upload_directory: "www/ubuntu-18-04/"
           }
         - {
@@ -58,7 +59,7 @@ jobs:
             generator: "Ninja",
             build_type: "MinSizeRel",
             executable_name_suffix: "",
-            package_filename_suffix: "ubuntu-20-04-amd64-dev",
+            package_filename_suffix: "ubuntu-20-04-amd64",
             upload_directory: "www/ubuntu-20-04/"
           }
         - {
@@ -69,7 +70,7 @@ jobs:
             build_type: "MinSizeRel",
             extra_path: "/c/WohlMinGWw64/mingw64/bin",
             executable_name_suffix: "-win64",
-            package_filename_suffix: "win64-dev",
+            package_filename_suffix: "win64",
             upload_directory: "www/win32/",
             mingw_download: "https://wohlsoft.ru/docs/Software/MinGW/x86_64-8.1.0-release-posix-seh-rt_v6-rev0.7z", mingw_install_dir: "C:/WohlMinGWw64/",
             ninja_download: "https://wohlsoft.ru/docs/Software/Ninja-Build/ninja-win.zip", ninja_install_dir: "C:/WohlMinGWw64/mingw64/bin",
@@ -83,7 +84,7 @@ jobs:
             build_type: "MinSizeRel",
             extra_path: "/c/WohlMinGWw64/mingw32/bin",
             executable_name_suffix: "",
-            package_filename_suffix: "win32-dev",
+            package_filename_suffix: "win32",
             upload_directory: "www/win32/",
             mingw_download: "https://wohlsoft.ru/docs/Software/MinGW/i686-8.1.0-release-posix-dwarf-rt_v6-rev0.7z", mingw_install_dir: "C:/WohlMinGWw64/",
             ninja_download: "https://wohlsoft.ru/docs/Software/Ninja-Build/ninja-win.zip", ninja_install_dir: "C:/WohlMinGWw64/mingw32/bin",
@@ -97,7 +98,7 @@ jobs:
             build_type: "MinSizeRel",
             extra_path: "/c/WohlLFTP/bin",
             executable_name_suffix: "-arm64",
-            package_filename_suffix: "arm64-dev",
+            package_filename_suffix: "arm64",
             upload_directory: "www/win-arm/",
             lftp_download: "https://wohlsoft.ru/docs/Software/lftp-4.4.15.win64-openssl-1.0.1g.7z", lftp_install_dir: "C:/WohlLFTP/"
           }
@@ -105,6 +106,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
+
+    - uses: nelonoel/branch-name@v1.0.1
 
     - name: Install Dependencies
       shell: bash
@@ -219,21 +222,21 @@ jobs:
             "${{ runner.os }}" \
             "thextech-adventures-of-demo" \
             "advdemo${{ matrix.config.executable_name_suffix }}" \
-            "thextech-adventures-of-demo-${{ matrix.config.package_filename_suffix }}" \
+            "thextech-adventures-of-demo-${{ matrix.config.package_filename_suffix }}-${BRANCH_NAME}" \
             "aod"
 
         bash .github/ci-helper/pack-game.sh \
             "${{ runner.os }}" \
             "thextech-super-mario-bros-x" \
             "smbx${{ matrix.config.executable_name_suffix }}" \
-            "thextech-super-mario-bros-x-${{ matrix.config.package_filename_suffix }}" \
+            "thextech-super-mario-bros-x-${{ matrix.config.package_filename_suffix }}-${BRANCH_NAME}" \
             "smbx13"
 
         bash .github/ci-helper/pack-game.sh \
             "${{ runner.os }}" \
             "thextech-bin" \
             "thextech${{ matrix.config.executable_name_suffix }}" \
-            "thextech-bin-${{ matrix.config.package_filename_suffix }}" \
+            "thextech-bin-${{ matrix.config.package_filename_suffix }}-${BRANCH_NAME}" \
             "none"
 
     - name: Upload artifact

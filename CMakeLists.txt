@@ -109,7 +109,7 @@ option(RANGE_ARR_USE_HEAP "Store data of RangeArr<> template in a heap" OFF)
 
 option(ENABLE_ANTICHEAT_TRAP "Enable anti-cheating trap for the \"redigitiscool\" cheat code" OFF)
 option(ENABLE_OLD_CREDITS "Use original Redigit's credits without changes" OFF)
-option(ENABLE_LOGGING "Enable debug logging" ON)
+option(ENABLE_LOGGING "Enable debug logging written into a file (may not work on some platfors)" ON)
 option(NEW_EDITOR "Enable new classic editor" OFF)
 option(NO_INTPROC "Disable Interprocess" OFF)
 
@@ -151,6 +151,7 @@ if(3DS)
     set(NEW_EDITOR ON CACHE BOOL "Enable new editor.")
     set(USE_STATIC_LIBC ON CACHE BOOL "Must use static linkage on 3DS." FORCE)
     set(USE_SYSTEM_LIBS OFF CACHE BOOL "Cannot use system libs on 3DS." FORCE)
+    set(ENABLE_LOGGING OFF CACHE BOOL "Cannot currently use logging on 3DS." FORCE)
 endif()
 
 # ============ Customization ==end=========
@@ -169,6 +170,7 @@ include(lib/FileMapper/FileMapper.cmake)
 include(lib/fmt/fmt.cmake)
 include(lib/IniProcessor/IniProcessor.cmake)
 include(lib/Utils/Utils.cmake)
+include(lib/Logger/logger.cmake)
 if(WIN32)
     include(lib/CrashHandler/StackWalker/StackWalker.cmake)
 endif()
@@ -261,7 +263,7 @@ set(LIB_SRC
     ${DIRMANAGER_SRCS}
     ${FMT_SRCS}
     ${INIPROCESSOR_SRCS}
-    lib/Logger/logger_sets.cpp
+    ${LOGGER_SRCS}
     ${UTILS_SRCS}
     ${LIB_SRC_EXTRA}
     ${PGE_FILE_LIBRARY_SRCS}
@@ -561,11 +563,12 @@ if(NEW_EDITOR)
 endif()
 
 if(NOT ENABLE_LOGGING)
-    target_compile_definitions(thextech PRIVATE -DDISABLE_LOGGING)
+    target_compile_definitions(thextech PRIVATE -DDISABLE_LOGGING -DNO_FILE_LOGGING)
 endif()
 
 if(EMSCRIPTEN)
     target_compile_definitions(thextech PRIVATE -DPGE_NO_THREADING)
+    target_compile_definitions(thextech PRIVATE -DNO_FILE_LOGGING)
     target_compile_definitions(thextech PRIVATE -DNO_SCREENSHOT)
 endif()
 
@@ -583,7 +586,7 @@ if(3DS)
     target_compile_definitions(thextech PRIVATE -D__3DS__)
 endif()
 
-if(USE_SYSTEM_LIBS)
+if(NOT USE_SYSTEM_LIBS)
     add_dependencies(thextech ${A2XT_DEPS})
 endif()
 

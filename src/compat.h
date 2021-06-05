@@ -59,6 +59,10 @@ struct Compatibility_t
     bool free_level_res;
     bool free_world_res;
     NPC_activate_modes NPC_activate_mode;
+
+    // SpeedRun section
+    bool speedrun_stop_timer_by_event;
+    char speedrun_stop_timer_event_name[250];
 };
 
 extern Compatibility_t g_compatibility;
