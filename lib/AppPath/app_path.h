@@ -37,6 +37,7 @@ public:
     static std::string screenshotsDir();
     static std::string gifRecordsDir();
     static std::string gameSaveRootDir();
+    static std::string gameplayRecordsRootDir();
     static std::string userWorldsRootDir();
     static std::string userBattleRootDir();
     static void install();
