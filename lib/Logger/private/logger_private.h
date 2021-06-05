@@ -45,8 +45,6 @@
 #define OS_NEWLINE_LEN 1
 #endif
 
-
-#ifndef NO_FILE_LOGGING
 class MutexLocker
 {
         std::mutex *m_mutex;
@@ -61,12 +59,7 @@ class MutexLocker
             m_mutex->unlock();
         }
 };
-#endif
 
-#ifndef NO_FILE_LOGGING
-#   define MUTEXLOCK(mn) \
+#define MUTEXLOCK(mn) \
     MutexLocker mn(&g_lockLocker); \
     (void)mn
-#else
-#   define MUTEXLOCK(mn)
-#endif
