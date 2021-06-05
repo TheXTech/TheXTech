@@ -499,6 +499,11 @@ std::string AppPathManager::gameSaveRootDir()
     return m_settingsPath + "gamesaves";
 }
 
+std::string AppPathManager::gameplayRecordsRootDir()
+{
+    return m_userPath + "gameplay-records";
+}
+
 std::string AppPathManager::userWorldsRootDir()
 {
 #ifdef __APPLE__

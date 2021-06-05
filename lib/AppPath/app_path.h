@@ -39,6 +39,7 @@ public:
     static std::string screenshotsDir();
     static std::string gifRecordsDir();
     static std::string gameSaveRootDir();
+    static std::string gameplayRecordsRootDir();
     static std::string userWorldsRootDir();
 #ifdef __3DS__
     static const std::vector<std::string>& worldRootDirs();

@@ -9,12 +9,43 @@
 #include "../globals.h"
 #include "../rand.h"
 #include "../frame_timer.h"
+#include "record.h"
 #include "speedrunner.h"
 #include "game_main.h"
 
+#include <Utils/files.h>
+#include <DirManager/dirman.h>
+#include <AppPath/app_path.h>
+#include <Logger/logger.h>
+
+std::string makeRecordPrefix(int index)
+{
+    // want to figure out path of filename relative to game engine, then save in the recording root.
+    std::string recordDir = AppPathManager::gameplayRecordsRootDir() + "/"
+        + Files::basename(Files::dirname(FullFileName));
+    if(!DirMan::exists(recordDir))
+        DirMan::mkAbsPath(recordDir);
+
+    return recordDir + "/" + FileNameFull + "." + std::to_string(index);
+}
+
+std::string findRecordPrefix(int index)
+{
+    std::string recordPath = AppPathManager::gameplayRecordsRootDir()
+        + "/" + Files::basename(Files::dirname(FullFileName))
+        + "/" + FileNameFull + "." + std::to_string(index);
+    FILE* e;
+    if((e = fopen((recordPath + ".c.txt").c_str(), "rb")))
+    {
+        fclose(e);
+        return recordPath;
+    }
+
+    return "";
+}
+
 bool g_recordControlReplay = false;
 bool g_recordControlRecord = false;
-bool g_recordGameplay = false;
 int g_recordReplayId = -1;
 
 // private
@@ -57,9 +88,10 @@ void record_writestate()
             Player[A].Character, Player[A].State, Player[A].MountType, Player[A].HeldBonus);
 }
 
-void record_readstate(char* buffer)
+void record_readstate()
 {
     // buffer is a 1024-character buffer used for reading strings, shared with the record_init() function.
+    char buffer[1024];
 
     // n is an integer for some implicit conversions
     int n;
@@ -69,12 +101,12 @@ void record_readstate(char* buffer)
     fgets(buffer, 1024, s_recordOldGameplayFile); // game version / commit
     fscanf(s_recordOldGameplayFile, "%d\r\n", &g_speedRunnerMode); // compatibility mode
     if(g_speedRunnerMode < 2)
-        printf("Warning: compatibility mode is not a long-term support version. Do not expect identical results.\n");
+        pLogWarning("compatibility mode is not a long-term support version. Do not expect identical results.\n");
     fgets(buffer, 1024, s_recordOldGameplayFile); // level that was played
     for(int i = 0; i < 1024; i++)
         if(buffer[i] == '\r') buffer[i] = '\0'; // clip the newline :(
     if(strcasecmp(buffer, FileNameFull.c_str()))
-        printf("Warning: FileName does not match.\n");
+        pLogWarning("FileName does not match.\n");
     fscanf(s_recordOldGameplayFile, "%d\r\n", &n); // is there a checkpoint?
     if(n)
         Checkpoint = FullFileName;
@@ -108,7 +140,7 @@ void record_readstate(char* buffer)
 
 void record_init()
 {
-    if(!g_recordControlReplay && !g_recordControlRecord && !g_recordGameplay)
+    if(!g_recordControlReplay && !g_recordControlRecord)
         return;
 
     in_level = true;
@@ -121,68 +153,58 @@ void record_init()
 
     seedRandom(310);
 
-    int cur_run = 0;
-    char buffer[1024];
-    int n_chars;
-    FILE* e = nullptr;
-    // existence checks, figure out correct run for filenames
+    // figure out how many runs have already happened
+    int next_run;
     if(g_recordReplayId != -1)
     {
-        cur_run = g_recordReplayId + 1;
-        n_chars = snprintf(buffer, 1024, "%s.%d.c.txt", FullFileName.c_str(), cur_run);
+        next_run = g_recordReplayId + 1;
     }
-    else while(true)
+    else
     {
-        n_chars = snprintf(buffer, 1024, "%s.%d.c.txt", FullFileName.c_str(), cur_run);
-        if(n_chars >= 1024)
+        next_run = 0;
+        while(!findRecordPrefix(next_run).empty())
         {
-            // everything has failed
-            return;
+            next_run ++;
         }
-        if((e = fopen(buffer, "rb")))
-            fclose(e);
-        else
-        {
-            buffer[n_chars-5] = 'g';
-            if((e = fopen(buffer, "rb")))
-                fclose(e);
-            else
-                break;
-        }
-        cur_run ++;
     }
 
     if(g_recordControlRecord)
     {
+        std::string filename = makeRecordPrefix(next_run)+".c.txt";
         if(!s_recordControlFile)
         {
-            buffer[n_chars-5] = 'c';
-            s_recordControlFile = fopen(buffer, "wb");
+            s_recordControlFile = fopen(filename.c_str(), "wb");
         }
-        if(g_recordGameplay && !s_recordGameplayFile)
+        if(!s_recordGameplayFile)
         {
-            buffer[n_chars-5] = 'g';
-            s_recordGameplayFile = fopen(buffer, "wb");
+            filename.end()[-5] = 'g';
+            s_recordGameplayFile = fopen(filename.c_str(), "wb");
         }
     }
     else if(g_recordControlReplay)
     {
-        cur_run --;
-        n_chars = snprintf(buffer, 1024, "%s.%d.c.txt", FullFileName.c_str(), cur_run);
+        std::string filename = findRecordPrefix(next_run-1);
+        if(filename.empty())
+        {
+            // nothing to reproduce
+            return;
+        }
+        filename += ".c.txt";
         if(!s_recordControlFile)
-            s_recordControlFile = fopen(buffer, "rb");
+            s_recordControlFile = fopen(filename.c_str(), "rb");
         if(!s_recordOldGameplayFile)
         {
-            buffer[n_chars-5] = 'g';
-            s_recordOldGameplayFile = fopen(buffer, "rb");
+            filename.end()[-5] = 'g';
+            s_recordOldGameplayFile = fopen(filename.c_str(), "rb");
             if(s_recordOldGameplayFile)
-                record_readstate(buffer);
+            {
+                record_readstate();
+            }
         }
-        if(s_recordControlFile && g_recordGameplay && !s_recordGameplayFile)
+        if(s_recordControlFile && !s_recordGameplayFile)
         {
-            n_chars = snprintf(buffer, 1024, "%s.%d.r." SHORT_VERSION ".txt", FullFileName.c_str(), cur_run);
-            if(n_chars < 1024)
-                s_recordGameplayFile = fopen(buffer, "wb");
+            filename.replace(filename.end()-5, filename.end(), "r." SHORT_VERSION ".txt");
+            s_recordGameplayFile = fopen(filename.c_str(), "wb");
         }
     }
 
@@ -199,54 +221,41 @@ void record_init()
 // need to preload level info from the replay to load with proper compat
 void record_preload()
 {
-    if(!g_recordControlReplay && !g_recordControlRecord && !g_recordGameplay)
+    if(!g_recordControlReplay && !g_recordControlRecord)
         return;
 
     if(LevelEditor || GameMenu || GameOutro)
         return;
 
-    int cur_run = 0;
-    char buffer[1024];
-    int n_chars;
-    FILE* e = nullptr;
-    // existence checks, figure out correct run for filenames
+    // figure out how many runs have already happened
+    int next_run;
     if(g_recordReplayId != -1)
     {
-        cur_run = g_recordReplayId + 1;
-        n_chars = snprintf(buffer, 1024, "%s.%d.c.txt", FullFileName.c_str(), cur_run);
+        next_run = g_recordReplayId + 1;
     }
-    else while(true)
+    else
     {
-        n_chars = snprintf(buffer, 1024, "%s.%d.c.txt", FullFileName.c_str(), cur_run);
-        if(n_chars >= 1024)
-        {
-            // everything has failed
-            return;
-        }
-        if((e = fopen(buffer, "rb")))
-            fclose(e);
-        else
-        {
-            buffer[n_chars-5] = 'g';
-            if((e = fopen(buffer, "rb")))
-                fclose(e);
-            else
-                break;
-        }
-        cur_run ++;
+        next_run = 0;
+        while(!findRecordPrefix(next_run).empty())
+            next_run ++;
     }
 
     if(!g_recordControlRecord && g_recordControlReplay)
     {
-        cur_run --;
-        n_chars = snprintf(buffer, 1024, "%s.%d.c.txt", FullFileName.c_str(), cur_run);
+        std::string filename = findRecordPrefix(next_run-1);
+        if(filename.empty())
+        {
+            // nothing to reproduce
+            return;
+        }
+
         if(!s_recordOldGameplayFile)
         {
-            buffer[n_chars-5] = 'g';
-            s_recordOldGameplayFile = fopen(buffer, "rb");
+            filename += ".g.txt";
+            s_recordOldGameplayFile = fopen(filename.c_str(), "rb");
             if(s_recordOldGameplayFile)
             {
-                record_readstate(buffer);
+                record_readstate();
                 fclose(s_recordOldGameplayFile);
                 s_recordOldGameplayFile = nullptr;
             }
@@ -273,21 +282,22 @@ void record_finish()
         int b;
         if(fscanf(s_recordOldGameplayFile, "End\r\n%ld\r\n%d\r\n", &f, &b) != 2)
         {
-            printf("WARNING: old gameplay file diverged (invalid end header).\n");
+            pLogWarning("old gameplay file diverged (invalid end header).\n");
             diverged = true;
         }
         if(f != frame_no)
         {
-            printf("Warning: final frame_no diverged (old: %ld, new: %ld).\n", f, frame_no);
+            pLogWarning("final frame_no diverged (old: %ld, new: %ld).\n", f, frame_no);
             diverged = true;
         }
         if(b != LevelBeatCode)
         {
-            printf("Warning: LevelBeatCode diverged (old: %d, new: %d).\n", b, LevelBeatCode);
+            pLogWarning("LevelBeatCode diverged (old: %d, new: %d).\n", b, LevelBeatCode);
             diverged = true;
         }
         if(!diverged)
         {
+            pLogDebug("CONGRATULATIONS! Your build's run did not diverge from the old run.\n");
             printf("CONGRATULATIONS! Your build's run did not diverge from the old run.\n");
             if(s_recordGameplayFile)
                 fprintf(s_recordGameplayFile, "DID NOT diverge from old run.\n");
@@ -297,6 +307,7 @@ void record_finish()
     }
     if(diverged)
     {
+        pLogWarning("I'm sorry, but your build's run DIVERGED from the old run.\n");
         printf("I'm sorry, but your build's run DIVERGED from the old run.\n");
         if(s_recordGameplayFile)
             fprintf(s_recordGameplayFile, "DIVERGED from old run.\n");
@@ -310,7 +321,7 @@ void record_finish()
 
     in_level = false;
 
-    if(g_recordControlReplay && TestLevel)
+    if(TestLevel)
     {
         GameIsActive = false;
     }
@@ -320,7 +331,7 @@ void record_sync()
 {
     if(!in_level)
         return;
-    if(!g_recordControlReplay && !g_recordControlRecord && !g_recordGameplay)
+    if(!g_recordControlReplay && !g_recordControlRecord)
         return;
     if(!s_recordControlFile && !s_recordGameplayFile)
         return; // Do nothing
@@ -466,15 +477,16 @@ void record_sync()
             int o_Score, o_numNPCs, o_numActiveNPCs, o_renderedNPCs, o_renderedBlocks, o_renderedBGOs;
             if(!fscanf(s_recordOldGameplayFile, "Frame\r\n%ld\r\n", &f) || f != frame_no)
             {
-                printf("WARNING: old gameplay file diverged (invalid frame header) at frame %ld.\n", frame_no);
+                pLogWarning("old gameplay file diverged (invalid frame header) at frame %ld.\n", frame_no);
                 diverged = true;
                 fclose(s_recordOldGameplayFile);
                 s_recordOldGameplayFile = nullptr;
+                KillIt();
             }
             else if(fscanf(s_recordOldGameplayFile, "%d\r\n%d\r\n%d\r\n%d\r\n%d\r\n%d\r\n",
                 &o_Score, &o_numNPCs, &o_numActiveNPCs, &o_renderedNPCs, &o_renderedBlocks, &o_renderedBGOs) != 6)
             {
-                printf("WARNING: old gameplay file diverged (invalid frame info) at frame %ld.\n", frame_no);
+                pLogWarning("old gameplay file diverged (invalid frame info) at frame %ld.\n", frame_no);
                 diverged = true;
                 fclose(s_recordOldGameplayFile);
                 s_recordOldGameplayFile = nullptr;
@@ -483,32 +495,32 @@ void record_sync()
             {
                 if(o_Score != Score)
                 {
-                    printf("Warning: score diverged (old: %d, new: %d) at frame %ld.\n", o_Score, Score, frame_no);
+                    pLogWarning("score diverged (old: %d, new: %d) at frame %ld.\n", o_Score, Score, frame_no);
                     diverged = true;
                 }
                 if(o_numNPCs != numNPCs)
                 {
-                    printf("Warning: numNPCs diverged (old: %d, new: %d) at frame %ld.\n", o_numNPCs, numNPCs, frame_no);
+                    pLogWarning("numNPCs diverged (old: %d, new: %d) at frame %ld.\n", o_numNPCs, numNPCs, frame_no);
                     diverged = true;
                 }
                 if(o_numActiveNPCs != numActiveNPCs)
                 {
-                    printf("Warning: numActiveNPCs diverged (old: %d, new: %d) at frame %ld.\n", o_numActiveNPCs, numActiveNPCs, frame_no);
+                    pLogWarning("numActiveNPCs diverged (old: %d, new: %d) at frame %ld.\n", o_numActiveNPCs, numActiveNPCs, frame_no);
                     diverged = true;
                 }
                 if(o_renderedNPCs != g_stats.renderedNPCs)
                 {
-                    printf("Warning: renderedNPCs diverged (old: %d, new: %d) at frame %ld.\n", o_renderedNPCs, g_stats.renderedNPCs, frame_no);
+                    pLogWarning("renderedNPCs diverged (old: %d, new: %d) at frame %ld.\n", o_renderedNPCs, g_stats.renderedNPCs, frame_no);
                     diverged = true;
                 }
                 if(o_renderedBlocks != g_stats.renderedBlocks + g_stats.renderedSzBlocks)
                 {
-                    printf("Warning: renderedBlocks diverged (old: %d, new: %d) at frame %ld.\n", o_renderedNPCs, g_stats.renderedNPCs + g_stats.renderedSzBlocks, frame_no);
+                    pLogWarning("renderedBlocks diverged (old: %d, new: %d) at frame %ld.\n", o_renderedNPCs, g_stats.renderedNPCs + g_stats.renderedSzBlocks, frame_no);
                     diverged = true;
                 }
                 if(o_renderedBGOs != g_stats.renderedBGOs)
                 {
-                    printf("Warning: renderedBGOs diverged (old: %d, new: %d) at frame %ld.\n", o_renderedBGOs, g_stats.renderedBGOs, frame_no);
+                    pLogWarning("renderedBGOs diverged (old: %d, new: %d) at frame %ld.\n", o_renderedBGOs, g_stats.renderedBGOs, frame_no);
                     diverged = true;
                 }
                 for(int i = 1; i <= numPlayers; i++)
@@ -516,7 +528,7 @@ void record_sync()
                     double px, py;
                     if(fscanf(s_recordOldGameplayFile, "%lf\r\n%lf\r\n", &px, &py) != 2)
                     {
-                        printf("WARNING: old gameplay file diverged (invalid player %d info) at frame %ld.\n", i, frame_no);
+                        pLogWarning("old gameplay file diverged (invalid player %d info) at frame %ld.\n", i, frame_no);
                         diverged = true;
                         fclose(s_recordOldGameplayFile);
                         s_recordOldGameplayFile = nullptr;
@@ -525,7 +537,7 @@ void record_sync()
                     // quite non-strict because in a true divergence situation, it will get continually worse
                     if(fabs(px - Player[i].Location.X) > 0.01 || fabs(py - Player[i].Location.Y) > 0.01)
                     {
-                        printf("Warning: player %d position diverged (old: %f %f, new: %f %f) at frame %ld.\n", i, px, py, Player[i].Location.X, Player[i].Location.Y, frame_no);
+                        pLogWarning("player %d position diverged (old: %f %f, new: %f %f) at frame %ld.\n", i, px, py, Player[i].Location.X, Player[i].Location.Y, frame_no);
                         diverged = true;
                     }
                 }

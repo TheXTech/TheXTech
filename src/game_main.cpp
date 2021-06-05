@@ -131,7 +131,6 @@ int GameMain(const CmdLineSetup_t &setup)
 
     g_recordControlReplay = setup.recordReplay;
     g_recordControlRecord = setup.recordRecord;
-    g_recordGameplay = setup.recordReplay | setup.recordRecord;
     g_recordReplayId = setup.recordReplayId;
 
     ResetCompat();
