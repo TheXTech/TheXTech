@@ -1,3 +1,6 @@
+#ifndef NEW_EDITOR_H
+#define NEW_EDITOR_H
+
 #include "std_picture.h"
 #include <string>
 #include <vector>
@@ -193,3 +196,5 @@ public:
 };
 
 extern EditorScreen editorScreen;
+
+#endif // #ifndef NEW_EDITOR_H

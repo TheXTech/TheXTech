@@ -111,6 +111,7 @@ option(ENABLE_ANTICHEAT_TRAP "Enable anti-cheating trap for the \"redigitiscool\
 option(ENABLE_OLD_CREDITS "Use original Redigit's credits without changes" OFF)
 option(ENABLE_LOGGING "Enable debug logging" ON)
 option(NEW_EDITOR "Enable new classic editor" OFF)
+option(NO_INTPROC "Disable Interprocess" OFF)
 
 option(THEXTECH_ENABLE_LUA "Enable lua scripting support" OFF)
 
@@ -145,6 +146,13 @@ if(NOT APPLE AND NOT ANDROID AND NOT EMSCRIPTEN)
     set(THEXTECH_USER_DIR_NAME "" CACHE STRING "The name of the user directory at user's home to store settings/episodes/etc. The 'PGE_Project/thextech' will be used by default.")
 endif()
 
+if(3DS)
+    set(NO_INTPROC ON CACHE BOOL "Disable interprocess." FORCE)
+    set(NEW_EDITOR ON CACHE BOOL "Enable new editor.")
+    set(USE_STATIC_LIBC ON CACHE BOOL "Must use static linkage on 3DS." FORCE)
+    set(USE_SYSTEM_LIBS OFF CACHE BOOL "Cannot use system libs on 3DS." FORCE)
+endif()
+
 # ============ Customization ==end=========
 
 option(PGEFL_QT_SUPPORT "Build PGE-FL with Qt support [Unneeded]" OFF)
@@ -163,6 +171,15 @@ include(lib/IniProcessor/IniProcessor.cmake)
 include(lib/Utils/Utils.cmake)
 if(WIN32)
     include(lib/CrashHandler/StackWalker/StackWalker.cmake)
+endif()
+
+if(3DS)
+    set(GME_YM2612_EMU "GENS" CACHE STRING "" FORCE)
+    set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+    set(ENABLE_UBSAN OFF CACHE BOOL "" FORCE)
+    set(BUILD_GME_STATIC ON CACHE BOOL "" FORCE)
+    set(GME_ENABLE_ZLIB OFF CACHE BOOL "" FORCE)
+    add_subdirectory(3rdparty/AudioCodecs/libgme)
 endif()
 
 if(THEXTECH_ENABLE_LUA)
@@ -222,7 +239,7 @@ if(USE_SYSTEM_LIBS)
     list(APPEND A2XT_LIBS ${FREEIMAGELITE_LIB} ${MIXERX_LIB} "${SDL2_LIBRARIES}")
     list(APPEND A2XT_INCS ${SDL2_INCLUDE_DIRS} ${MIXERX_HEAD_DIR} ${FREEIMAGELITE_HEAD_DIR})
     target_link_libraries(A2XT_Int INTERFACE ${A2XT_LIBS})
-else()
+elseif(NOT 3DS)
     include(cmake/library_FreeImage.cmake)
     include(cmake/library_SDLMixerX.cmake)
     list(APPEND A2XT_LIBS PGE_FreeImage)
@@ -242,22 +259,33 @@ set(LIB_SRC
     lib/util.cpp
     lib/AppPath/app_path.cpp
     ${DIRMANAGER_SRCS}
-    ${FILEMAPPER_SRCS}
     ${FMT_SRCS}
-    ${STACK_WALKER_SRCS}
-    lib/CrashHandler/crash_handler.cpp
-    lib/Graphics/graphics_funcs.cpp
-    lib/Graphics/image_size.cpp
-    lib/Graphics/size.cpp
-    lib/Graphics/sizef.cpp
-    lib/InterProcess/editor_pipe.cpp
-    lib/InterProcess/intproc.cpp
     ${INIPROCESSOR_SRCS}
     lib/Logger/logger_sets.cpp
-    3rdparty/tinyfiledialogs/tinyfiledialogs.c
     ${UTILS_SRCS}
     ${LIB_SRC_EXTRA}
+    ${PGE_FILE_LIBRARY_SRCS}
 )
+
+if(NOT 3DS)
+    list(APPEND LIB_SRC
+        ${FILEMAPPER_SRCS}
+        ${STACK_WALKER_SRCS}
+        3rdparty/tinyfiledialogs/tinyfiledialogs.c
+        lib/CrashHandler/crash_handler.cpp
+        lib/Graphics/graphics_funcs.cpp
+        lib/Graphics/image_size.cpp
+        lib/Graphics/size.cpp
+        lib/Graphics/sizef.cpp
+    )
+endif()
+
+if(NOT NO_INTPROC)
+    list(APPEND LIB_SRC
+        lib/InterProcess/editor_pipe.cpp
+        lib/InterProcess/intproc.cpp
+    )
+endif()
 
 if(APPLE)
     file(GLOB PGE_FILE_ICONS "${CMAKE_CURRENT_SOURCE_DIR}/resources/file_icons/*.icns")
@@ -275,7 +303,6 @@ set(THEXTECH_SRC
     src/globals.cpp
     src/npc.cpp
     src/sound.cpp
-    src/sound_internal.cpp
     src/frame_timer.cpp
     src/main/world_loop.cpp
     src/main/world_file.cpp
@@ -292,7 +319,6 @@ set(THEXTECH_SRC
     src/main/level_file.cpp
     src/main/menu_loop.cpp
     src/main/menu_main.cpp
-    src/main/cheat_code.cpp
     src/main/outro_loop.cpp
     src/main/trees.cpp
     src/main/QuadTree/LooseQuadtree-impl.cpp
@@ -308,7 +334,6 @@ set(THEXTECH_SRC
     src/graphics/gfx_draw_player.cpp
     src/graphics/gfx_special_frames.cpp
     src/graphics/gfx_screen.cpp
-    src/control/joystick.cpp
     src/change_res.cpp
     src/effect.cpp
     src/collision.cpp
@@ -318,14 +343,12 @@ set(THEXTECH_SRC
     src/graphics.cpp
     src/editor/editor.cpp
     src/editor/new_editor.cpp
-    src/editor/text_input.cpp
     src/editor/write_common.cpp
     src/editor/write_level.cpp
     src/editor/write_world.cpp
     src/main.cpp
     src/blocks.cpp
     src/gfx.cpp
-    src/frm_main.cpp
     src/player.cpp
     src/rand.cpp
     src/sorting.cpp
@@ -336,6 +359,28 @@ set(THEXTECH_SRC
     src/npc/npc_bonus.cpp
     src/player/player_update.cpp
 )
+
+if(3DS)
+    list(APPEND THEXTECH_SRC
+        src/3ds/3ds-audio-lib.cpp
+        src/3ds/cheat_code.cpp
+        src/3ds/frm_main.cpp
+        src/3ds/joystick.cpp
+        src/3ds/n3ds-clock.cpp
+        src/3ds/SDL_supplement.cpp
+        src/3ds/second_screen.cpp
+        src/3ds/sound_internal.cpp
+        src/3ds/text_input.cpp
+    )
+else()
+    list(APPEND THEXTECH_SRC
+        src/sound_internal.cpp
+        src/control/joystick.cpp
+        src/frm_main.cpp
+        src/main/cheat_code.cpp
+        src/editor/text_input.cpp
+    )
+endif()
 
 if(WIN32 AND NOT EMSCRIPTEN)
     list(APPEND THEXTECH_SRC resources/thextech.rc)
@@ -390,6 +435,14 @@ if(ANDROID)
         DEPENDS SDL_ApkPackLibs_makeDir "${DEPENDENCIES_INSTALL_DIR}/lib/libhidapi.so" AudioCodecs_Local
     )
     add_dependencies(thextech SDL_ApkPackLibs_hidapi)
+elseif(3DS)
+    add_executable(thextech ${THEXTECH_SRC} ${LIB_SRC})
+    target_include_directories(thextech PRIVATE "3rdparty/AudioCodecs/libgme/include/")
+    target_link_libraries(thextech PRIVATE gme_static)
+    target_link_libraries(thextech PRIVATE pgefl)
+    target_link_libraries(thextech PRIVATE citro2d citro3d ctru)
+    target_link_libraries(thextech PRIVATE vorbisidec ogg)
+    set_target_properties(thextech PROPERTIES SUFFIX ".elf")
 else()
     add_executable(thextech ${THEXTECH_SRC} ${LIB_SRC})
     pge_set_nopie(thextech)
@@ -514,21 +567,23 @@ endif()
 if(EMSCRIPTEN)
     target_compile_definitions(thextech PRIVATE -DPGE_NO_THREADING)
     target_compile_definitions(thextech PRIVATE -DNO_SCREENSHOT)
+endif()
+
+if(NO_INTPROC)
     target_compile_definitions(thextech PRIVATE -DNO_INTPROC)
 endif()
 
 if(3DS)
     target_compile_definitions(thextech PRIVATE -DPGE_NO_THREADING)
     target_compile_definitions(thextech PRIVATE -DNO_SCREENSHOT)
-    target_compile_definitions(thextech PRIVATE -DNO_INTPROC)
     target_compile_definitions(thextech PRIVATE -DNO_SDL)
-    target_compile_definitions(thextech PRIVATE -DNEW_EDITOR)
     target_compile_definitions(thextech PRIVATE -DLOW_MEM)
     target_compile_definitions(thextech PRIVATE -DFIXED_RES)
     target_compile_definitions(thextech PRIVATE -DPRELOAD_LEVELS)
+    target_compile_definitions(thextech PRIVATE -D__3DS__)
 endif()
 
-if(NOT USE_SYSTEM_LIBS)
+if(USE_SYSTEM_LIBS)
     add_dependencies(thextech ${A2XT_DEPS})
 endif()
 

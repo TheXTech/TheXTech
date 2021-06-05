@@ -4,7 +4,7 @@
 #include <tremor/ivorbisfile.h>
 #include <3ds.h>
 #include <cstdlib>
-#include "gme/gme.h"
+#include "gme.h"
 #include "second_screen.h"
 #include "n3ds-clock.h"
 
