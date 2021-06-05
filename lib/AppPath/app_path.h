@@ -33,6 +33,7 @@ public:
     static std::string userAppDirSTD();
     static std::string assetsRoot();
     static void setAssetsRoot(const std::string &root);
+    static std::string logsDir();
     static std::string languagesDir();
     static std::string screenshotsDir();
     static std::string gifRecordsDir();
