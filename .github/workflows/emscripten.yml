@@ -30,7 +30,7 @@ jobs:
             executable_name: "advdemo",
             assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-adventure-of-demo-assets-full.7z",
             subdir_name: "thextech-adventures-of-demo",
-            package_filename: "thextech-adventures-of-demo-webassembly-dev.tar.gz",
+            package_filename_game: "adventures-of-demo",
             upload_directory: "www/webassembly/"
           }
 
@@ -46,12 +46,16 @@ jobs:
             executable_name: "smbx",
             assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-smbx13-assets-full.7z",
             subdir_name: "thextech-super-mario-bros-x",
-            package_filename: "thextech-super-mario-bros-x-webassembly-dev.tar.gz",
+            package_filename_game: "super-mario-bros-x",
             upload_directory: "www/webassembly/"
           }
 
     steps:
     - uses: actions/checkout@v1
+
+    - name: Set output
+      id: vars
+      run: echo ::set-output name=short_ref::${GITHUB_REF#refs/*/}
 
     - name: Install Dependencies
       shell: bash
@@ -112,7 +116,8 @@ jobs:
         cp ../README.ESP.md "package/${{ matrix.config.subdir_name }}/"
         cp output/bin/${{ matrix.config.executable_name }}* "package/${{ matrix.config.subdir_name }}/"
         cd package
-        tar -cvzf "${{ matrix.config.package_filename }}" "${{ matrix.config.subdir_name }}"
+        thextech-super-mario-bros-x-webassembly-dev.tar.gz
+        tar -cvzf "thextech-${{ matrix.config.package_filename_game }}-webassembly-${{ steps.vars.outputs.short_ref }}.tar.gz" "${{ matrix.config.subdir_name }}"
         rm -Rf "${{ matrix.config.subdir_name }}"
         cd ../..
 
@@ -120,7 +125,7 @@ jobs:
       if: success()
       uses: actions/upload-artifact@v2
       with:
-        path: build/package/${{ matrix.config.package_filename }}
+        path: build/package/thextech-${{ matrix.config.package_filename_game }}-webassembly-${{ steps.vars.outputs.short_ref }}.tar.gz
         name: ${{ matrix.config.name }} ${{ matrix.config.build_type }}
 
     - name: Deploy to builds.wohlsoft.ru
@@ -131,7 +136,7 @@ jobs:
           export PATH=${{ matrix.config.extra_path }}:${PATH}
         fi
         UPLOAD_LIST="set ssl:verify-certificate no;"
-        UPLOAD_LIST="${UPLOAD_LIST} put -O ${{ matrix.config.upload_directory }} ./build/package/${{ matrix.config.package_filename }};"
+        UPLOAD_LIST="${UPLOAD_LIST} put -O ${{ matrix.config.upload_directory }} ./build/package/thextech-${{ matrix.config.package_filename_game }}-webassembly-${{ steps.vars.outputs.short_ref }}.tar.gz;"
         lftp -e "${UPLOAD_LIST} exit" -u ${{ secrets.builds_login }},${{ secrets.builds_password }} ${{ secrets.builds_host }}
 
     - name: List Build Directory

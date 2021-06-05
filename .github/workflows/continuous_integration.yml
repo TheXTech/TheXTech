@@ -26,7 +26,7 @@ jobs:
             generator: "Ninja",
             build_type: "MinSizeRel",
             executable_name_suffix: "",
-            package_filename_suffix: "ubuntu-16-04-amd64-dev",
+            package_filename_suffix: "ubuntu-16-04-amd64",
             upload_directory: "www/ubuntu-16-04/"
           }
         - {
@@ -37,7 +37,7 @@ jobs:
             generator: "Ninja",
             build_type: "MinSizeRel",
             executable_name_suffix: "",
-            package_filename_suffix: "ubuntu-16-04-i386-dev",
+            package_filename_suffix: "ubuntu-16-04-i386",
             upload_directory: "www/ubuntu-16-04/"
           }
         - {
@@ -48,7 +48,7 @@ jobs:
             generator: "Ninja",
             build_type: "MinSizeRel",
             executable_name_suffix: "",
-            package_filename_suffix: "ubuntu-18-04-amd64-dev",
+            package_filename_suffix: "ubuntu-18-04-amd64",
             upload_directory: "www/ubuntu-18-04/"
           }
         - {
@@ -59,7 +59,7 @@ jobs:
             generator: "Ninja",
             build_type: "MinSizeRel",
             executable_name_suffix: "",
-            package_filename_suffix: "ubuntu-20-04-amd64-dev",
+            package_filename_suffix: "ubuntu-20-04-amd64",
             upload_directory: "www/ubuntu-20-04/"
           }
         - {
@@ -70,7 +70,7 @@ jobs:
             build_type: "MinSizeRel",
             extra_path: "/c/WohlMinGWw64/mingw64/bin",
             executable_name_suffix: "-win64",
-            package_filename_suffix: "win64-dev",
+            package_filename_suffix: "win64",
             upload_directory: "www/win32/",
             mingw_download: "https://wohlsoft.ru/docs/Software/MinGW/x86_64-8.1.0-release-posix-seh-rt_v6-rev0.7z", mingw_install_dir: "C:/WohlMinGWw64/",
             ninja_download: "https://wohlsoft.ru/docs/Software/Ninja-Build/ninja-win.zip", ninja_install_dir: "C:/WohlMinGWw64/mingw64/bin",
@@ -84,7 +84,7 @@ jobs:
             build_type: "MinSizeRel",
             extra_path: "/c/WohlMinGWw64/mingw32/bin",
             executable_name_suffix: "",
-            package_filename_suffix: "win32-dev",
+            package_filename_suffix: "win32",
             upload_directory: "www/win32/",
             mingw_download: "https://wohlsoft.ru/docs/Software/MinGW/i686-8.1.0-release-posix-dwarf-rt_v6-rev0.7z", mingw_install_dir: "C:/WohlMinGWw64/",
             ninja_download: "https://wohlsoft.ru/docs/Software/Ninja-Build/ninja-win.zip", ninja_install_dir: "C:/WohlMinGWw64/mingw32/bin",
@@ -98,7 +98,7 @@ jobs:
             build_type: "MinSizeRel",
             extra_path: "/c/WohlLFTP/bin",
             executable_name_suffix: "-arm64",
-            package_filename_suffix: "arm64-dev",
+            package_filename_suffix: "arm64",
             upload_directory: "www/win-arm/",
             lftp_download: "https://wohlsoft.ru/docs/Software/lftp-4.4.15.win64-openssl-1.0.1g.7z", lftp_install_dir: "C:/WohlLFTP/"
           }
@@ -106,6 +106,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
+
+    - name: Set output
+      id: vars
+      run: echo ::set-output name=short_ref::${GITHUB_REF#refs/*/}
 
     - name: Install Dependencies
       shell: bash
@@ -220,21 +224,21 @@ jobs:
             "${{ runner.os }}" \
             "thextech-adventures-of-demo" \
             "advdemo${{ matrix.config.executable_name_suffix }}" \
-            "thextech-adventures-of-demo-${{ matrix.config.package_filename_suffix }}" \
+            "thextech-adventures-of-demo-${{ matrix.config.package_filename_suffix }}-${{ steps.vars.outputs.short_ref }}" \
             "aod"
 
         bash .github/ci-helper/pack-game.sh \
             "${{ runner.os }}" \
             "thextech-super-mario-bros-x" \
             "smbx${{ matrix.config.executable_name_suffix }}" \
-            "thextech-super-mario-bros-x-${{ matrix.config.package_filename_suffix }}" \
+            "thextech-super-mario-bros-x-${{ matrix.config.package_filename_suffix }}-${{ steps.vars.outputs.short_ref }}" \
             "smbx13"
 
         bash .github/ci-helper/pack-game.sh \
             "${{ runner.os }}" \
             "thextech-bin" \
             "thextech${{ matrix.config.executable_name_suffix }}" \
-            "thextech-bin-${{ matrix.config.package_filename_suffix }}" \
+            "thextech-bin-${{ matrix.config.package_filename_suffix }}-${{ steps.vars.outputs.short_ref }}" \
             "none"
 
     - name: Upload artifact

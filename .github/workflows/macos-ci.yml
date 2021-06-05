@@ -33,6 +33,10 @@ jobs:
     steps:
     - uses: actions/checkout@v1
 
+    - name: Set output
+      id: vars
+      run: echo ::set-output name=short_ref::${GITHUB_REF#refs/*/}
+
     - name: Install Dependencies
       shell: bash
       run: |
@@ -130,19 +134,19 @@ jobs:
             aod \
             "assets/graphics/ui/icon/advdemo.icns" \
             "Adventures of Demo" \
-            "thextech-adventures-of-demo-macos-uni-dev.dmg"
+            "thextech-adventures-of-demo-macos-uni-${{ steps.vars.outputs.short_ref }}.dmg"
 
         bash .github/ci-helper/pack-game-macos.sh \
             smbx13 \
             "assets/graphics/ui/icon/smbx.icns" \
             "Super Mario Bros. X" \
-            "thextech-super-mario-bros-x-macos-uni-dev.dmg"
+            "thextech-super-mario-bros-x-macos-uni-${{ steps.vars.outputs.short_ref }}.dmg"
 
         bash .github/ci-helper/pack-game-macos.sh \
             none \
             "thextech.icns" \
             "TheXTech" \
-            "thextech-macos-uni-dev.zip"
+            "thextech-macos-uni-${{ steps.vars.outputs.short_ref }}.zip"
 
     - name: Upload DMG artifact
       if: success()
