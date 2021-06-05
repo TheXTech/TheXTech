@@ -116,7 +116,6 @@ jobs:
         cp ../README.ESP.md "package/${{ matrix.config.subdir_name }}/"
         cp output/bin/${{ matrix.config.executable_name }}* "package/${{ matrix.config.subdir_name }}/"
         cd package
-        thextech-super-mario-bros-x-webassembly-dev.tar.gz
         tar -cvzf "thextech-${{ matrix.config.package_filename_game }}-webassembly-${{ steps.vars.outputs.short_ref }}.tar.gz" "${{ matrix.config.subdir_name }}"
         rm -Rf "${{ matrix.config.subdir_name }}"
         cd ../..
