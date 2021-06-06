@@ -24,11 +24,12 @@
 #ifdef __EMSCRIPTEN__
 #include <emscripten/trace.h>
 #define LOG_CHANNEL "Application"
-#endif
+#endif // __EMSCRIPTEN__
 
 static std::mutex g_lockLocker;
 #define OUT_BUFFER_SIZE 10240
 static char       g_outputBuffer[OUT_BUFFER_SIZE];
+
 
 void LogWriter::OpenLogFile()
 {}
@@ -44,8 +45,11 @@ void LoggerPrivate_pLogConsole(int level, const char *label, const char *format,
 
     va_copy(arg_in, arg);
     int len = std::vsnprintf(g_outputBuffer, OUT_BUFFER_SIZE, format, arg_in);
-    std::fprintf(stderr, "%s: %s\n", label, g_outputBuffer);
-    std::fflush(stderr);
+    if(len > 0)
+    {
+        std::fprintf(stderr, "%s: %s\n", label, g_outputBuffer);
+        std::fflush(stderr);
+    }
     va_end(arg_in);
     (void)len;
 }
@@ -53,4 +57,4 @@ void LoggerPrivate_pLogConsole(int level, const char *label, const char *format,
 #ifndef NO_FILE_LOGGING
 void LoggerPrivate_pLogFile(int, const char *, const char *, va_list)
 {}
-#endif
+#endif // NO_FILE_LOGGING

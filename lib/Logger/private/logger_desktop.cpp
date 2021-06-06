@@ -23,15 +23,12 @@
 
 #ifndef NO_FILE_LOGGING
 static std::mutex g_lockLocker;
-#define OUT_BUFFER_SIZE 10240
+#   define OUT_BUFFER_SIZE 10240
 static char       g_outputBuffer[OUT_BUFFER_SIZE];
-#define OUT_BUFFER_STRING_SIZE 10239
-#endif
-
-#ifndef NO_FILE_LOGGING
+#   define OUT_BUFFER_STRING_SIZE 10239
 //! Output file
-static SDL_RWops *s_logout;
-#endif
+static SDL_RWops *s_logout = nullptr;
+#endif // NO_FILE_LOGGING
 
 
 void LogWriter::OpenLogFile()
@@ -63,7 +60,7 @@ void LogWriter::OpenLogFile()
             std::fflush(stderr);
         }
     }
-#endif
+#endif // NO_FILE_LOGGING
 }
 
 void LogWriter::CloseLog()
@@ -73,7 +70,7 @@ void LogWriter::CloseLog()
     if(s_logout)
         SDL_RWclose(s_logout);
     s_logout = nullptr;
-#endif
+#endif // NO_FILE_LOGGING
 }
 
 void LoggerPrivate_pLogConsole(int level, const char *label, const char *format, va_list arg)
@@ -113,4 +110,4 @@ void LoggerPrivate_pLogFile(int level, const char *label, const char *format, va
     SDL_RWwrite(s_logout, reinterpret_cast<const void *>(OS_NEWLINE), 1, OS_NEWLINE_LEN);
     va_end(arg_in);
 }
-#endif
+#endif // NO_FILE_LOGGING
