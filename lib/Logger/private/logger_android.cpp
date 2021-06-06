@@ -27,6 +27,7 @@
 static std::mutex g_lockLocker;
 #define OUT_BUFFER_SIZE 10240
 static char       g_outputBuffer[OUT_BUFFER_SIZE];
+#define OUT_BUFFER_STRING_SIZE 10239
 #endif
 
 #ifndef NO_FILE_LOGGING
@@ -102,10 +103,15 @@ void LoggerPrivate_pLogFile(int level, const char *label, const char *format, va
     MUTEXLOCK(mutex);
 
     va_copy(arg_in, arg);
+
     int len = SDL_snprintf(g_outputBuffer, OUT_BUFFER_SIZE, "%s: ", label);
-    SDL_RWwrite(s_logout, g_outputBuffer, 1, (size_t)len);
+    if(len > 0)
+        SDL_RWwrite(s_logout, g_outputBuffer, 1, (size_t)(len < OUT_BUFFER_STRING_SIZE ? len : OUT_BUFFER_STRING_SIZE));
+
     len = SDL_vsnprintf(g_outputBuffer, OUT_BUFFER_SIZE, format, arg_in);
-    SDL_RWwrite(s_logout, g_outputBuffer, 1, (size_t)len);
+    if(len > 0)
+        SDL_RWwrite(s_logout, g_outputBuffer, 1, (size_t)(len < OUT_BUFFER_STRING_SIZE ? len : OUT_BUFFER_STRING_SIZE));
+
     SDL_RWwrite(s_logout, reinterpret_cast<const void *>(OS_NEWLINE), 1, OS_NEWLINE_LEN);
     va_end(arg_in);
 }
