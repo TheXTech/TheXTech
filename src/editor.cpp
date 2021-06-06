@@ -1780,7 +1780,12 @@ void UpdateInterprocess()
     case IntProc::SetNumStars:
     {
         auto s = IntProc::getCMD();
-        numStars = SDL_atoi(s.c_str());
+        int starsNew = SDL_atoi(s.c_str());
+        if(numStars < starsNew) // Can't decrease stars number
+        {
+            numStars = starsNew;
+            CheckAfterStarTake(true);
+        }
         break;
     }
 

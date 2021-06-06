@@ -33,6 +33,10 @@ void UpdateNPCs();
 // Public Sub DropBonus(A As Integer) 'Drops a bonus item that was held by the player
 // Drops a bonus item that was held by the player
 void DropBonus(int A);
+
+// EXTRA: After adding one new star, hide all over-star BGOs
+void CheckAfterStarTake(bool many = false);
+
 // Public Sub TouchBonus(A As Integer, B As Integer) 'Code for dealing with bonus and player
 // Code for dealing with bonus and player
 void TouchBonus(int A, int B);
