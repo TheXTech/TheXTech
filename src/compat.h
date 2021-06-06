@@ -61,8 +61,15 @@ struct Compatibility_t
     NPC_activate_modes NPC_activate_mode;
 
     // SpeedRun section
-    bool speedrun_stop_timer_by_event;
-    char speedrun_stop_timer_event_name[250];
+    enum
+    {
+        SPEEDRUN_STOP_NONE = 0,
+        SPEEDRUN_STOP_EVENT,
+        SPEEDRUN_STOP_LEAVE_LEVEL,
+        SPEEDRUN_STOP_ENTER_LEVEL
+    };
+    int speedrun_stop_timer_by;
+    char speedrun_stop_timer_at[250];
 };
 
 extern Compatibility_t g_compatibility;

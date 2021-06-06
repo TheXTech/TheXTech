@@ -99,14 +99,13 @@ static void compatInit(Compatibility_t &c)
         c.fix_player_clip_wall_at_npc = false;
     }
 
-    c.speedrun_stop_timer_by_event = false;
-    SDL_memset(c.speedrun_stop_timer_event_name, 0, sizeof(c.speedrun_stop_timer_event_name));
-    SDL_strlcpy(c.speedrun_stop_timer_event_name, "Boss Dead", sizeof(c.speedrun_stop_timer_event_name));
+    c.speedrun_stop_timer_by = Compatibility_t::SPEEDRUN_STOP_NONE;
+    SDL_memset(c.speedrun_stop_timer_at, 0, sizeof(c.speedrun_stop_timer_at));
+    SDL_strlcpy(c.speedrun_stop_timer_at, "Boss Dead", sizeof(c.speedrun_stop_timer_at));
 }
 
 static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
 {
-    std::string buffer;
     pLogDebug("Loading %s...", fileName.c_str());
 
     IniProcessing compat(fileName);
@@ -117,9 +116,19 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
     }
 
     compat.beginGroup("speedrun");
-    compat.read("stop-timer-by-event", c.speedrun_stop_timer_by_event, c.speedrun_stop_timer_by_event);
-    compat.read("stop-timer-event-name", buffer, std::string(c.speedrun_stop_timer_event_name));
-    SDL_strlcpy(c.speedrun_stop_timer_event_name, buffer.c_str(), sizeof(c.speedrun_stop_timer_event_name));
+    {
+        std::string buffer;
+        IniProcessing::StrEnumMap stopBy
+        {
+            {"none", Compatibility_t::SPEEDRUN_STOP_NONE},
+            {"event", Compatibility_t::SPEEDRUN_STOP_EVENT},
+            {"leave", Compatibility_t::SPEEDRUN_STOP_LEAVE_LEVEL},
+            {"enter", Compatibility_t::SPEEDRUN_STOP_ENTER_LEVEL}
+        };
+        compat.read("stop-timer-by", c.speedrun_stop_timer_by, c.speedrun_stop_timer_by);
+        compat.read("stop-timer-at", buffer, std::string(c.speedrun_stop_timer_at));
+        SDL_strlcpy(c.speedrun_stop_timer_at, buffer.c_str(), sizeof(c.speedrun_stop_timer_at));
+    }
     compat.endGroup();
 
     if(g_speedRunnerMode >= SPEEDRUN_MODE_3)
