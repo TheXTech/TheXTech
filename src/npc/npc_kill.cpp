@@ -180,11 +180,8 @@ void KillNPC(int A, int B)
                 }
             }
             if (tempBool) break;
-            for (int block : Layer[C].blocks)
-            {
+            if(!Layer[C].blocks.empty())
                 tempBool = true;
-                break;
-            }
             if (tempBool) break;
         }
         if(tempBool == false)

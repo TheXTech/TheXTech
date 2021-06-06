@@ -198,7 +198,6 @@ bool ExistsLayer(const std::string LayerName)
 
 void HideLayer(std::string LayerName, bool NoEffect)
 {
-    int A = 0;
     Location_t tempLocation;
     if(LayerName.empty())
         return;

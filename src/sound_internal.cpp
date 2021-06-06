@@ -88,6 +88,7 @@ void SI_Quit()
 
 bool SI_NoPreload(const char* path)
 {
+	(void)path;
 	return false;
 }
 
@@ -152,12 +153,15 @@ void SI_PlayMusic(const char* path, int volume, int fadeInMs)
 
 void SI_KillSound(int channel, uint32_t playingSoundId)
 {
+	(void)playingSoundId;
 	Mix_HaltChannel(channel);
 }
 
 uint32_t SI_PlaySound(SI_Chunk* chunk, const char* backup_path, int loops,
 	int channel, uint32_t playingSoundId)
 {
+	(void)backup_path;
+	(void)playingSoundId;
 	if(chunk)
 		Mix_PlayChannel(channel, (Mix_Chunk*)chunk, loops);
 	return 0;

@@ -636,10 +636,6 @@ void UpdateGraphics(bool skipRepaint)
                 {
                     onscreen = cannot_reset = can_activate = false;
                 }
-                else if(g_compatibility.NPC_activate_mode == NPC_activate_modes::onscreen)
-                {
-                    onscreen = cannot_reset = can_activate = vScreenCollision(Z, NPC[A].Location) || (loc2_exists && vScreenCollision(Z, loc2));
-                }
                 else if(g_compatibility.NPC_activate_mode == NPC_activate_modes::smart)
                 {
                     onscreen = vScreenCollision(Z, NPC[A].Location) || (loc2_exists && vScreenCollision(Z, loc2));
@@ -664,6 +660,10 @@ void UpdateGraphics(bool skipRepaint)
                     bool onscreen_orig = vScreenCollisionCanonical(X, Y, NPC[A].Location) || (loc2_exists && vScreenCollisionCanonical(X, Y, loc2));
                     cannot_reset = (onscreen || onscreen_orig);
                     can_activate = onscreen_orig;
+                }
+                else // if(g_compatibility.NPC_activate_mode == NPC_activate_modes::onscreen)
+                {
+                    onscreen = cannot_reset = can_activate = vScreenCollision(Z, NPC[A].Location) || (loc2_exists && vScreenCollision(Z, loc2));
                 }
                 if(NPC[A].Type == 0 || NPC[A].Generator)
                 {

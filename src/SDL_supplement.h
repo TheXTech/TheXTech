@@ -41,7 +41,7 @@ typedef bool SDL_bool;
 #define SDL_floor floor
 #define SDL_ceil ceil
 
-inline void SDL_assert_release(bool arg) {};
-inline void SDL_assert(bool arg) {};
+inline void SDL_assert_release(bool arg) { (void)arg; };
+inline void SDL_assert(bool arg) { (void)arg; };
 
 #endif // SDL_SUPPLEMENT_H

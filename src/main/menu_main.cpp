@@ -1326,7 +1326,7 @@ bool mainMenuUpdate()
                 }
             }
 
-            if(MenuCursorCanMove || MenuMouseClick || MenuMouseBack || (menuLeftPress || menuRightPress) && MenuCursorCanMove)
+            if(MenuCursorCanMove || MenuMouseClick || MenuMouseBack || ((menuLeftPress || menuRightPress) && MenuCursorCanMove))
             {
                 if(menuBackPress || MenuMouseBack)
                 {

@@ -2047,7 +2047,6 @@ void UpdateBlocks()
 void PSwitch(bool enabled)
 {
     int A = 0;
-    int B = 0;
     Block_t blankBlock;
 
     if(enabled)

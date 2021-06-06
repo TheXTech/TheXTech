@@ -4318,7 +4318,6 @@ void PlayerGrabCode(int A, bool DontResetGrabTime)
     Location_t tempLocation;
     int LayerNPC = 0;
     int B = 0;
-    int C = 0;
     bool tempBool = false;
     double lyrX = 0;
     double lyrY = 0;

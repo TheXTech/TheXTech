@@ -455,6 +455,7 @@ bool vScreenCollision(int A, const Location_t &Loc2)
 // vScreen collisions assuming the game is 800 x H
 bool vScreenCollisionCanonicalX(int A, int left, int top, const Location_t &Loc2)
 {
+    (void)top;
     bool tempvScreenCollision = false;
     if(-left <= Loc2.X + Loc2.Width)
     {
@@ -475,6 +476,7 @@ bool vScreenCollisionCanonicalX(int A, int left, int top, const Location_t &Loc2
 // vScreen collisions assuming the game is W x 600
 bool vScreenCollisionCanonicalY(int A, int left, int top, const Location_t &Loc2)
 {
+    (void)left;
     bool tempvScreenCollision = false;
     if(-vScreenX[A] <= Loc2.X + Loc2.Width)
     {
