@@ -428,15 +428,19 @@ void UpdateEditor()
                                 }
 
                                 if(n.id == 91 || n.id == 96 || n.id == 283 || n.id == 284)
-                                    n.contents = EditorCursor.NPC.Special;
+                                    n.contents = (long)EditorCursor.NPC.Special;
 
                                 if(n.id == 288 || n.id == 289 || (n.id == 91 && int(EditorCursor.NPC.Special) == 288))
-                                    n.special_data = EditorCursor.NPC.Special2;
+                                    n.special_data = (long)EditorCursor.NPC.Special2;
 
                                 if(NPCIsAParaTroopa[n.id] || NPCIsCheep[n.id] || n.id == 260)
-                                    n.special_data = EditorCursor.NPC.Special;
+                                    n.special_data = (long)EditorCursor.NPC.Special;
+
+                                if(n.id == 86)
+                                    n.special_data = (long)EditorCursor.NPC.Special7;
 
                                 n.msg = EditorCursor.NPC.Text;
+                                n.friendly = EditorCursor.NPC.Inert;
                                 n.nomove = EditorCursor.NPC.Stuck;
                                 n.is_boss = EditorCursor.NPC.Legacy;
 
@@ -1935,6 +1939,9 @@ void UpdateInterprocess()
                 EditorCursor.NPC.Special = n.special_data;
                 EditorCursor.NPC.DefaultSpecial = int(EditorCursor.NPC.Special);
             }
+
+            if(EditorCursor.NPC.Type == 86)
+                EditorCursor.NPC.Special7 = n.special_data;
 
             EditorCursor.NPC.Generator = n.generator;
             if(EditorCursor.NPC.Generator)
