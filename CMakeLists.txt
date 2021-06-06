@@ -586,7 +586,7 @@ if(3DS)
     target_compile_definitions(thextech PRIVATE -D__3DS__)
 endif()
 
-if(NOT USE_SYSTEM_LIBS)
+if(NOT USE_SYSTEM_LIBS AND A2XT_DEPS)
     add_dependencies(thextech ${A2XT_DEPS})
 endif()
 

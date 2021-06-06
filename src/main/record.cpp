@@ -13,7 +13,12 @@
 #include "speedrunner.h"
 #include "game_main.h"
 
+#ifndef NO_SDL
 #include <SDL2/SDL_stdinc.h>
+#else
+#include "../SDL_supplement.h"
+#endif
+
 #include <Utils/files.h>
 #include <DirManager/dirman.h>
 #include <AppPath/app_path.h>

@@ -31,6 +31,12 @@
 #include "compat.h"
 #include "main/speedrunner.h"
 
+#ifndef NO_SDL
+#include <SDL2/SDL_stdinc.h>
+#else
+#include "SDL_supplement.h"
+#endif
+
 
 Compatibility_t g_compatibility;
 

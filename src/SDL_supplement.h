@@ -33,6 +33,8 @@ typedef bool SDL_bool;
 #define SDL_memset memset
 #define SDL_memcpy memcpy
 #define SDL_fabs fabs
+#define SDL_strcpy strcpy
+#define SDL_strlcpy strlcpy
 #define SDL_strcasecmp strcasecmp
 #define SDL_strtol strtol
 #define SDL_fmod fmod

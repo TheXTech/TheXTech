@@ -26,7 +26,12 @@
 #define LOG_CHANNEL "Application"
 #endif
 
+#ifndef PGE_NO_THREADING
 static std::mutex g_lockLocker;
+#else
+static bool g_lockLocker;
+#endif
+
 #define OUT_BUFFER_SIZE 10240
 static char       g_outputBuffer[OUT_BUFFER_SIZE];
 

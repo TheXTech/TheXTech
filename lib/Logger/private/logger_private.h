@@ -33,9 +33,12 @@
 #include <fmt/fmt_printf.h>
 #include <stdarg.h>
 #include <cstdio>
-#include <mutex>
 #include <sstream>
 #include <algorithm>
+
+#ifndef PGE_NO_THREADING
+#include <mutex>
+#endif
 
 #ifdef _WIN32
 #define OS_NEWLINE "\r\n"
@@ -45,6 +48,7 @@
 #define OS_NEWLINE_LEN 1
 #endif
 
+#ifndef PGE_NO_THREADING
 class MutexLocker
 {
         std::mutex *m_mutex;
@@ -63,3 +67,9 @@ class MutexLocker
 #define MUTEXLOCK(mn) \
     MutexLocker mn(&g_lockLocker); \
     (void)mn
+
+#else // #ifndef PGE_NO_THREADING
+
+#define MUTEXLOCK(mn) (void)mn
+
+#endif
