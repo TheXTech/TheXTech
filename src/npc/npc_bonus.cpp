@@ -95,10 +95,31 @@ void DropBonus(int A)
         Player[A].HeldBonus = 0;
 }
 
+void CheckAfterStarTake(bool many)
+{
+    int allBGOs = numBackground + numLocked;
+    for(int c = 1; c <= numWarps; c++)
+    {
+        auto &w = Warp[c];
+        if((!many && (w.Stars == numStars)) || (many && (w.Stars <= numStars)))
+        {
+            for(int d = numBackground; d <= allBGOs; d++)
+            {
+                auto &b = Background[d];
+                if(b.Type == 160 && CheckCollision(w.Entrance, b.Location))
+                {
+                    b.Layer.clear();
+                    b.Hidden = true;
+                }
+            }
+        }
+    }
+}
+
 void TouchBonus(int A, int B)
 {
     int C = 0;
-    int D = 0;
+    // int D = 0;
     int toadBool = 0;
     bool tempBool = false;
     Location_t tempLocation;
@@ -520,25 +541,7 @@ void TouchBonus(int A, int B)
                     Star[numStars].level = FileNameFull;
                     Star[numStars].Section = NPC[B].Section;
                     IntProc::sendStarsNumber(numStars);
-
-                    for(C = 1; C <= numWarps; C++)
-                    {
-                        if(Warp[C].Stars == numStars)
-                        {
-                            int allBGOs = numBackground + numLocked;
-                            for(D = numBackground; D <= allBGOs; D++)
-                            {
-                                if(Background[D].Type == 160)
-                                {
-                                    if(CheckCollision(Warp[C].Entrance, Background[D].Location))
-                                    {
-                                        Background[D].Layer.clear();
-                                        Background[D].Hidden = true;
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    CheckAfterStarTake(false);
                 }
 
                 if(NPC[B].Type == 97)
