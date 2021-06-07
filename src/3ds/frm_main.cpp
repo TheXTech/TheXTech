@@ -234,6 +234,10 @@ void FrmMain::initDraw(int screen)
     // enter the draw context!
     if (screen == 0)
     {
+        if(inFrame)
+            cancelFrame();
+        if(!inFrame)
+            C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
         resetViewport();
         for (int layer = 0; layer < 4; layer++)
         {
