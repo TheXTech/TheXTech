@@ -728,7 +728,9 @@ int GameMain(const CmdLineSetup_t &setup)
                 }
                 return false;
             });
+
             record_finish();
+
             if(!GameIsActive)
             {
                 speedRun_saveStats();

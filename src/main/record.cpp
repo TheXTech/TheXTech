@@ -305,6 +305,9 @@ void record_preload()
 
 void record_finish()
 {
+    if(!g_recordControlReplay && !g_recordControlRecord)
+        return;
+
     s_in_level = false;
 
     if(s_recordControlFile)
@@ -368,9 +371,7 @@ void record_finish()
     s_in_level = false;
 
     if(TestLevel)
-    {
         GameIsActive = false;
-    }
 }
 
 void record_sync()
