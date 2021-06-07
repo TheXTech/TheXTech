@@ -174,9 +174,9 @@ void CloseLog()
 std::string getLogFilePath()
 {
 #ifdef NO_FILE_LOGGING
-    return LogWriter::m_logFilePath;
-#else
     return "<No log file: Logging was been disabled in this build>";
+#else
+    return LogWriter::m_logFilePath;
 #endif
 }
 
