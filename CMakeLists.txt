@@ -151,7 +151,6 @@ if(3DS)
     set(NEW_EDITOR ON CACHE BOOL "Enable new editor.")
     set(USE_STATIC_LIBC ON CACHE BOOL "Must use static linkage on 3DS." FORCE)
     set(USE_SYSTEM_LIBS OFF CACHE BOOL "Cannot use system libs on 3DS." FORCE)
-    set(ENABLE_LOGGING OFF CACHE BOOL "Cannot currently use logging on 3DS." FORCE)
 endif()
 
 # ============ Customization ==end=========

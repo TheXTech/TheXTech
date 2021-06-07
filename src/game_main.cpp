@@ -533,7 +533,9 @@ int GameMain(const CmdLineSetup_t &setup)
                 speedRun_bossDeadEvent();
 
             // Main menu loop
+            pLogDebug("Entering GameMenu loop.");
             runFrameLoop(&MenuLoop, nullptr, []()->bool{ return GameMenu;});
+            pLogDebug("Exiting GameMenu loop.");
             if(!GameIsActive)
             {
                 speedRun_saveStats();

@@ -444,7 +444,7 @@ void AppPathManager::setAssetsRoot(const std::string &root)
 
 std::string AppPathManager::logsDir()
 {
-    return ApplicationPathSTD + "logs";
+    return m_userPath + "logs";
 }
 
 std::string AppPathManager::languagesDir()

@@ -25,7 +25,7 @@
 #include "logger_sets.h"
 #endif
 
-#ifndef NO_FILE_LOGGING
+#if !defined(NO_FILE_LOGGING) && !defined(NO_SDL)
 #include <SDL2/SDL_rwops.h>
 #endif
 

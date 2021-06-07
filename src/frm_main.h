@@ -150,6 +150,7 @@ public:
     void initDraw(int screen = 0);
     void setLayer(int layer);
     void toggleDebug();
+    void cancelFrame();
 #endif
 
     void repaint();

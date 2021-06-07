@@ -21,7 +21,14 @@
 #include "../logger.h"
 #include "logger_sets.h"
 #ifndef NO_FILE_LOGGING
+
+#ifndef NO_SDL
 #include <SDL2/SDL_rwops.h>
+#else
+#define SDL_strncasecmp strncasecmp
+#define SDL_memset memset
+#endif
+
 #include <chrono>  // chrono::system_clock
 #include <ctime>   // localtime
 #include <DirManager/dirman.h>

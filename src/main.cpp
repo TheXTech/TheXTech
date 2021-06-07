@@ -33,6 +33,7 @@
 #include <tclap/CmdLine.h>
 #include <CrashHandler/crash_handler.h>
 #else
+uint32_t __stacksize__ = 0x00020000;
 #include <3ds.h>
 #endif
 

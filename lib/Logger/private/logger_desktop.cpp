@@ -27,11 +27,12 @@
 static std::mutex g_lockLocker;
 #else
 static bool g_lockLocker;
-#endif
+#endif // #ifndef PGE_NO_THREADING
 
 #define OUT_BUFFER_SIZE 10240
 static char       g_outputBuffer[OUT_BUFFER_SIZE];
-#endif
+
+#endif // #ifndef NO_FILE_LOGGING
 
 #ifndef NO_FILE_LOGGING
 //! Output file

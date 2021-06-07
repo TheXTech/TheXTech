@@ -31,7 +31,7 @@
 #include "../editor/editor.h"
 
 #include <AppPath/app_path.h>
-// #include <Logger/logger.h>
+#include <Logger/logger.h>
 #include <Utils/files.h>
 #include <Utils/elapsed_timer.h>
 #include <DirManager/dirman.h>
@@ -63,6 +63,8 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
     C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
     C2D_Init(C2D_DEFAULT_MAX_OBJECTS);
     C2D_Prepare();
+
+    LoadLogSettings(false, false);
     // consoleInit(GFX_BOTTOM, NULL);
 
     top = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
@@ -340,6 +342,21 @@ void FrmMain::repaint()
         C2D_DrawImageAt(layer_ims[2], -shift, 0, 0);
         C2D_DrawImageAt(layer_ims[3], -shift - (int)(mid_shift * depthSlider), 0, 0);
     }
+    currentFrame ++;
+    inFrame = false;
+    C3D_FrameEnd(0);
+}
+
+void FrmMain::cancelFrame()
+{
+    if(!inFrame)
+        return;
+    C2D_SceneBegin(top);
+    renderRect(0,0,ScreenW,ScreenH,0.f,0.f,0.f,1.f,true);
+    C2D_SceneBegin(right);
+    renderRect(0,0,ScreenW,ScreenH,0.f,0.f,0.f,1.f,true);
+    C2D_SceneBegin(bottom);
+    renderRect(0,0,ScreenW,ScreenH,0.f,0.f,0.f,1.f,true);
     currentFrame ++;
     inFrame = false;
     C3D_FrameEnd(0);

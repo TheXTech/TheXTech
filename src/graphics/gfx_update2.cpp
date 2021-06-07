@@ -742,6 +742,10 @@ void UpdateGraphics2(bool skipRepaint)
 
     if(!skipRepaint)
         frmMain.repaint();
+#ifdef __3DS__
+    else
+        frmMain.cancelFrame();
+#endif
 
     frmMain.setTargetScreen();
 
