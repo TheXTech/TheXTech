@@ -908,7 +908,8 @@ void NPCSpecial(int A)
                             npc.Special2 = p.Location.Y + 130;
                         }
 
-                        PlaySound(SFX_SwooperFlap);
+                        if(npc.Active)
+                            PlaySound(SFX_SwooperFlap);
                     }
                 }
             }
