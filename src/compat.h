@@ -49,6 +49,7 @@ struct Compatibility_t
     bool fix_blooper_stomp_effect;
     bool keep_bullet_bill_dir;
     bool fix_pswitch_dragon_coin;
+    bool fix_swooper_start_while_inactive;
 
     // SpeedRun section
     enum
