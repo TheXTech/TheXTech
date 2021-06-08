@@ -9,6 +9,7 @@
 #include "../globals.h"
 #include "../rand.h"
 #include "../frame_timer.h"
+#include "../compat.h"
 #include "record.h"
 #include "speedrunner.h"
 #include "game_main.h"
@@ -86,7 +87,7 @@ void record_writestate()
     // write all necessary state variables!
     fprintf(s_recordGameplayFile, "Init\r\n");
     fprintf(s_recordGameplayFile, "%s\r\n", LONG_VERSION); // game version / commit
-    fprintf(s_recordGameplayFile, " %d \r\n", g_speedRunnerMode); // compatibility mode
+    fprintf(s_recordGameplayFile, " %d \r\n", CompatGetLevel()); // compatibility mode
     fprintf(s_recordGameplayFile, "%s\r\n", FileNameFull.c_str()); // level that was played
     fprintf(s_recordGameplayFile, " %d \r\n", (Checkpoint == FullFileName) ? 1 : 0);
     fprintf(s_recordGameplayFile, " %d \r\n", StartWarp);
@@ -123,9 +124,11 @@ void record_readstate()
     // read all necessary state variables!
     fgets(buffer, 1024, s_recordOldGameplayFile); // "Init"
     fgets(buffer, 1024, s_recordOldGameplayFile); // game version / commit
-    fscanf(s_recordOldGameplayFile, "%d\r\n", &g_speedRunnerMode); // compatibility mode
+    fscanf(s_recordOldGameplayFile, "%d\r\n", &n); // compatibility mode
 
-    if(g_speedRunnerMode < 2)
+    CompatSetEnforcedLevel(n);
+
+    if(CompatGetLevel() < COMPAT_SMBX2)
         pLogWarning("compatibility mode is not a long-term support version. Do not expect identical results.");
 
     fgets(buffer, 1024, s_recordOldGameplayFile); // level that was played
