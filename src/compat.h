@@ -56,6 +56,7 @@ struct Compatibility_t
     bool fix_blooper_stomp_effect;
     bool keep_bullet_bill_dir;
     bool fix_pswitch_dragon_coin;
+    bool fix_swooper_start_while_inactive;
     bool free_level_res;
     bool free_world_res;
     NPC_activate_modes NPC_activate_mode;
