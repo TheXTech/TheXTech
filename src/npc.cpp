@@ -877,39 +877,42 @@ void NPCSpecial(int A)
     {
         if(npc.Special == 0)
         {
-            for(int i = 1; i <= numPlayers; i++)
+            if(!g_compatibility.fix_swooper_start_while_inactive || npc.Active)
             {
-                auto &p = Player[i];
-                if(p.Section == npc.Section && !p.Dead && p.TimeToLive == 0)
+                for(int i = 1; i <= numPlayers; i++)
                 {
-                    tempLocation = npc.Location;
-                    tempLocation.Width = 400;
-                    tempLocation.Height = 800;
-                    tempLocation.X -= tempLocation.Width / 2.0;
-                    tempLocation.Y -= tempLocation.Height / 2.0;
-
-                    if(CheckCollision(tempLocation, p.Location))
+                    auto &p = Player[i];
+                    if(p.Section == npc.Section && !p.Dead && p.TimeToLive == 0)
                     {
-                        npc.Special = 1;
-                        if(p.Location.X < npc.Location.X)
-                            npc.Direction = -1;
-                        else
-                            npc.Direction = 1;
-                        npc.Location.SpeedX = 0.01 * npc.Direction;
+                        tempLocation = npc.Location;
+                        tempLocation.Width = 400;
+                        tempLocation.Height = 800;
+                        tempLocation.X -= tempLocation.Width / 2.0;
+                        tempLocation.Y -= tempLocation.Height / 2.0;
 
-                        if(p.Location.Y > npc.Location.Y)
+                        if(CheckCollision(tempLocation, p.Location))
                         {
-                            npc.Location.SpeedY = 2.5;
-                            npc.Special2 = p.Location.Y - 130;
-                        }
-                        else
-                        {
-                            npc.Location.SpeedY = -2.5;
-                            npc.Special2 = p.Location.Y + 130;
-                        }
+                            npc.Special = 1;
+                            if(p.Location.X < npc.Location.X)
+                                npc.Direction = -1;
+                            else
+                                npc.Direction = 1;
+                            npc.Location.SpeedX = 0.01 * npc.Direction;
 
-                        if(npc.Active)
-                            PlaySound(SFX_SwooperFlap);
+                            if(p.Location.Y > npc.Location.Y)
+                            {
+                                npc.Location.SpeedY = 2.5;
+                                npc.Special2 = p.Location.Y - 130;
+                            }
+                            else
+                            {
+                                npc.Location.SpeedY = -2.5;
+                                npc.Special2 = p.Location.Y + 130;
+                            }
+
+                            if(npc.Active)
+                                PlaySound(SFX_SwooperFlap);
+                        }
                     }
                 }
             }
