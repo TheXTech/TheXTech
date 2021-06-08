@@ -11,6 +11,7 @@ Changes for 1.3.5.2
 -Disabled the "Boss Dead" event hook to stop the episode speed-run timer by default, added the compat.ini options to enable and configure it
 -Fixed the unexpected Swooper flap sound played after the Swooper has gone far away
 -Fixed the vanilla bug: The Swooper has avoided being started to fly when inactive
+-Added the compatibility level command line option separated from the speed-run modes (However, the speed-run mode will still override the compativility level)
 
 Changes for 1.3.5.1
 -Episodes and battle levels lists now loading in the separated thread with a progress showing

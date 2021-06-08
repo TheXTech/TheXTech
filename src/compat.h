@@ -78,4 +78,20 @@ extern Compatibility_t g_compatibility;
 void LoadCustomCompat();
 void ResetCompat();
 
+/**
+ * @brief The level of the enforced compatibility
+ */
+enum CompatibilityLevel
+{
+    //! No specific compatibiltiy will be enforced, all modern features will be enabled and tuned individually by compat.ini or settings menu
+    COMPAT_MODERN = 0,
+    //! Enables all bugs except these was been fixed at the SMBX2 project
+    COMPAT_SMBX2,
+    //! Enforces the full compatibility to the SMBX 1.3 engine and disables almost all new features and bugfixes that leads the gameplay difference
+    COMPAT_SMBX13
+};
+
+void CompatSetEnforcedLevel(int level);
+int  CompatGetLevel();
+
 #endif // COMPAT_H

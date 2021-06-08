@@ -39,6 +39,7 @@ uint32_t __stacksize__ = 0x00020000;
 
 #include "game_main.h"
 #include "main/game_info.h"
+#include "compat.h"
 #include <AppPath/app_path.h>
 #include <Utils/strings.h>
 #include <Utils/files.h>
@@ -231,6 +232,15 @@ int main(int argc, char**argv)
         TCLAP::SwitchArg switchTestMagicHand("k", "magic-hand", "Enable magic hand functionality while level test running", false);
         TCLAP::SwitchArg switchTestInterprocess("i", "interprocessing", "Enable an interprocessing mode with Editor", false);
 
+        TCLAP::ValueArg<std::string> compatLevel(std::string(), "compat-level",
+                                                   "Enforce the specific gameplay compatibiltiy level. Supported values:\n"
+                                                   "       modern - TheXTech native, all features and bugfixes enabled [Default]\n"
+                                                   "       smbx2  - Disables all features and bugfixes except fixed at SMBX2\n"
+                                                   "       smbx13 - Enforces the full compatibility with the SMBX 1.3 behaviour\n"
+                                                   "       Note: If speed-run mode is set, the compatibility level will be overriden by the speed-run mode",
+                                                    false, "modern",
+                                                   "modern, smbx2, smbx3",
+                                                   cmd);
         TCLAP::ValueArg<unsigned int> speedRunMode(std::string(), "speed-run-mode",
                                                    "Enable the speed-runer mode: the playthrough timer will be shown, "
                                                    "and some gameplay limitations will be enabled. Supported values:\n"
@@ -335,6 +345,20 @@ int main(int argc, char**argv)
         setup.testShowFPS = switchTestShowFPS.getValue();
         setup.testMaxFPS = switchTestMaxFPS.getValue();
         setup.testMagicHand = switchTestMagicHand.getValue();
+
+        std::string compatModeVal = compatLevel.getValue();
+        if(compatModeVal == "smbx2")
+            setup.compatibilityLevel = COMPAT_SMBX2;
+        else if(compatModeVal == "smbx13")
+            setup.compatibilityLevel = COMPAT_SMBX13;
+        else if(compatModeVal == "modern")
+            setup.compatibilityLevel = COMPAT_MODERN;
+        else
+        {
+            std::cerr << "Error: Invalid value for the --compat-level argument: " << compatModeVal << std::endl;
+            std::cerr.flush();
+            return 2;
+        }
 
         setup.speedRunnerMode = speedRunMode.getValue();
         setup.speedRunnerSemiTransparent = switchSpeedRunSemiTransparent.getValue();

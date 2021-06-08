@@ -46,6 +46,9 @@ struct CmdLineSetup_t
     //! Force log output into console
     bool verboseLogging = false;
 
+    //! Enforce spefic compatibiltiy level (If Speed-Run mode is enabled, this will be overwritten)
+    int  compatibilityLevel = 0;
+
     //! Enable the speed-run mode
     int  speedRunnerMode = 0;
     //! Draw the speed-run timer semi-transparently
