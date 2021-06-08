@@ -32,10 +32,28 @@
 #include "main/speedrunner.h"
 
 
+static int s_compatLevel = COMPAT_MODERN;
+
 Compatibility_t g_compatibility;
 
 static void compatInit(Compatibility_t &c)
 {
+    if(g_speedRunnerMode != SPEEDRUN_MODE_OFF)
+    {
+        switch(g_speedRunnerMode)
+        {
+        case SPEEDRUN_MODE_1:
+            CompatSetEnforcedLevel(COMPAT_MODERN);
+            break;
+        case SPEEDRUN_MODE_2:
+            CompatSetEnforcedLevel(COMPAT_SMBX2);
+            break;
+        case SPEEDRUN_MODE_3:
+            CompatSetEnforcedLevel(COMPAT_SMBX13);
+            break;
+        }
+    }
+
     c.enable_last_warp_hub_resume = true;
     c.fix_platforms_acceleration = true;
     c.fix_pokey_collapse = true;
@@ -59,7 +77,7 @@ static void compatInit(Compatibility_t &c)
     c.fix_pswitch_dragon_coin = true;
     c.fix_swooper_start_while_inactive = true;
 
-    if(g_speedRunnerMode >= SPEEDRUN_MODE_2) // Make sure that bugs were same as on SMBX2 Beta 4 on this moment
+    if(s_compatLevel >= COMPAT_SMBX2) // Make sure that bugs were same as on SMBX2 Beta 4 on this moment
     {
         c.enable_last_warp_hub_resume = false;
         c.fix_platforms_acceleration = false;
@@ -82,7 +100,7 @@ static void compatInit(Compatibility_t &c)
         c.fix_swooper_start_while_inactive = false;
     }
 
-    if(g_speedRunnerMode >= SPEEDRUN_MODE_3) // Strict vanilla SMBX
+    if(s_compatLevel >= COMPAT_SMBX13) // Strict vanilla SMBX
     {
         c.fix_player_filter_bounce = false;
         c.fix_player_downward_clip = false;
@@ -121,14 +139,15 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
     }
     compat.endGroup();
 
-    if(g_speedRunnerMode >= SPEEDRUN_MODE_3)
+    if(s_compatLevel >= COMPAT_SMBX13)
     {
-        pLogDebug("Speed-Run Mode 3 detected, the [compatibility] section for the compat.ini completely skipped, all old bugs enforced.", fileName.c_str());
+        if(g_speedRunnerMode >= SPEEDRUN_MODE_3)
+            pLogDebug("Speed-Run Mode 3 detected, the [compatibility] section for the compat.ini completely skipped, all old bugs enforced.", fileName.c_str());
         return;
     }
 
     compat.beginGroup("compatibility");
-    if(g_speedRunnerMode < SPEEDRUN_MODE_2)
+    if(s_compatLevel < COMPAT_SMBX2) // Ignore options are still not been fixed at the SMBX2
     {
         compat.read("enable-last-warp-hub-resume", c.enable_last_warp_hub_resume, c.enable_last_warp_hub_resume);
         compat.read("fix-platform-acceleration", c.fix_platforms_acceleration, c.fix_platforms_acceleration);
@@ -181,4 +200,31 @@ void LoadCustomCompat()
 void ResetCompat()
 {
     compatInit(g_compatibility);
+}
+
+void CompatSetEnforcedLevel(int level)
+{
+    if(s_compatLevel == level)
+        return;
+
+    s_compatLevel = level;
+
+    switch(s_compatLevel)
+    {
+    default:
+    case COMPAT_MODERN:
+        pLogDebug("The compatibility level was changed: Modern");
+        break;
+    case COMPAT_SMBX2:
+        pLogDebug("The compatibility level was changed: Enforced SMBX2");
+        break;
+    case COMPAT_SMBX13:
+        pLogDebug("The compatibility level was changed: Enforced SMBX 1.3");
+        break;
+    }
+}
+
+int CompatGetLevel()
+{
+    return s_compatLevel;
 }
