@@ -107,6 +107,8 @@ int GameMain(const CmdLineSetup_t &setup)
     noSound = setup.noSound;
     neverPause = setup.neverPause;
 
+    CompatSetEnforcedLevel(setup.compatibilityLevel);
+
     g_speedRunnerMode = setup.speedRunnerMode;
     speedRun_setSemitransparentRender(setup.speedRunnerSemiTransparent);
 
