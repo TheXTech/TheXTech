@@ -164,7 +164,10 @@ int main(int argc, char**argv)
         TCLAP::SwitchArg switchFrameSkip("f", "frameskip", "Enable frame skipping mode", false);
         TCLAP::SwitchArg switchNoSound("s", "no-sound", "Disable sound", false);
         TCLAP::SwitchArg switchNoPause("p", "never-pause", "Never pause game when window losts a focus", false);
-        TCLAP::ValueArg<std::string> renderType("r", "render", "Render mode: sw (software), hw (hardware), vsync (hardware with vsync)",
+        TCLAP::ValueArg<std::string> renderType("r", "render", "Sets the graphics mode:\n"
+                                                "       sw - software render (fallback)\n"
+                                                "       hw - hardware accelerated render [Default]\n"
+                                                "       vsync - hardware accelerated with the v-sync enabled",
                                                 false, "",
                                                 "render type",
                                                 cmd);
@@ -183,20 +186,20 @@ int main(int argc, char**argv)
 
         TCLAP::ValueArg<std::string> playerCharacter1("1",
                                                       "player1",
-                                                      "Setup of playable character for player 1:"
-                                                      "   Semi-colon separated key-argument values:\n"
-                                                      "   c - character, s - state, m - mount, t - mount type. Example:"
-                                                      "   c1;s2;m3;t0 - Character as 1, State as 2, Mount as 3, Mount type as 0",
+                                                      "Setup of playable character for player 1:\n"
+                                                      "       Semicolon separated key-argument values:\n"
+                                                      "       c - character, s - state, m - mount, t - mount type. Example:\n"
+                                                      "       c1;s2;m3;t0 - Character as 1, State as 2, Mount as 3, Mount type as 0",
                                                       false, "",
                                                       "c1;s2;m0;t0",
                                                       cmd);
 
         TCLAP::ValueArg<std::string> playerCharacter2("2",
                                                       "player2",
-                                                      "Setup of playable character for player 2:"
-                                                      "   Semi-colon separated key-argument values:\n"
-                                                      "   c - character, s - state, m - mount, t - mount type. Example:"
-                                                      "   c1;s2;m3;t0 - Character as 1, State as 2, Mount as 3, Mount type as 0",
+                                                      "Setup of playable character for player 2:\n"
+                                                      "       Semicolon separated key-argument values:\n"
+                                                      "       c - character, s - state, m - mount, t - mount type. Example:\n"
+                                                      "       c1;s2;m3;t0 - Character as 1, State as 2, Mount as 3, Mount type as 0",
                                                       false, "",
                                                       "c1;s2;m0;t0",
                                                       cmd);
@@ -211,10 +214,10 @@ int main(int argc, char**argv)
         TCLAP::ValueArg<unsigned int> speedRunMode(std::string(), "speed-run-mode",
                                                    "Enable the speed-runer mode: the playthrough timer will be shown, "
                                                    "and some gameplay limitations will be enabled. Supported values:\n"
-                                                   "   0 - Disabled [Default]\n"
-                                                   "   1 - TheXTech native\n"
-                                                   "   2 - Disable time-winning updates\n"
-                                                   "   3 - Strict vanilla, enable all bugs\n",
+                                                   "       0 - Disabled [Default]\n"
+                                                   "       1 - TheXTech native\n"
+                                                   "       2 - Disable time-winning updates (SMBX2 mode)\n"
+                                                   "       3 - Strict vanilla SMBX 1.3, enable all bugs",
                                                     false, 0u,
                                                    "0, 1, 2, or 3",
                                                    cmd);
