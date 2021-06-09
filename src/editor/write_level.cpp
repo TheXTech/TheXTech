@@ -14,6 +14,7 @@ void SaveLevel(std::string FilePath)   // saves the level
     int B = 0;
     int C = 0;
     int starCount = 0;
+
     // put NPC types 60, 62, 64, 66, and 78-83 first. (why?)
     for(A = 1; A <= numNPCs; A++)
     {
@@ -34,9 +35,11 @@ void SaveLevel(std::string FilePath)   // saves the level
         }
         // C ++ was here but that is a logical flaw.
     }
+
     qSortNPCsY(1, C);
     qSortNPCsY(C + 1, numNPCs);
     qSortBlocksX(1, numBlock);
+
     B = 1;
     for(A = 2; A <= numBlock; A++)
     {
@@ -46,6 +49,7 @@ void SaveLevel(std::string FilePath)   // saves the level
             B = A;
         }
     }
+
     qSortBlocksY(B, A - 1);
     qSortBackgrounds(1, numBackground);
     FindSBlocks();
@@ -74,6 +78,7 @@ void SaveLevel(std::string FilePath)   // saves the level
     fwritenum(f, curRelease);
     fwritenum(f, starCount);
     fwritestr(f, LevelName);
+
     for(B = 0; B <= 20; B++)
     {
         fwritenum(f, level[B].X);
@@ -89,6 +94,7 @@ void SaveLevel(std::string FilePath)   // saves the level
         fwritebool(f, UnderWater[B]);
         fwritestr(f, CustomMusic[B]);
     }
+
     for(A = 1; A <= 2; A++)
     {
         fwritenum(f, PlayerStart[A].X);
@@ -96,6 +102,7 @@ void SaveLevel(std::string FilePath)   // saves the level
         fwritenum(f, PlayerStart[A].Width);
         fwritenum(f, PlayerStart[A].Height);
     }
+
     for(A = 1; A <= numBlock; A++)
     {
         fwritenum(f, Block[A].Location.X);
@@ -114,7 +121,9 @@ void SaveLevel(std::string FilePath)   // saves the level
         fwritestr(f, Block[A].TriggerHit);
         fwritestr(f, Block[A].TriggerLast);
     }
+
     fprintf(f, "next\r\n");
+
     for(A = 1; A <= numBackground; A++)
     {
         fwritenum(f, Background[A].Location.X);
@@ -125,31 +134,39 @@ void SaveLevel(std::string FilePath)   // saves the level
             Background[A].Layer = "Default";
         fwritestr(f, Background[A].Layer);
     }
+
     fprintf(f, "next\r\n");
+
     for(A = 1; A <= numNPCs; A++)
     {
         fwritenum(f, NPC[A].Location.X);
         fwritenum(f, NPC[A].Location.Y);
         fwritenum(f, NPC[A].Direction);
         fwritenum(f, NPC[A].Type);
+
         if (NPC[A].Type == 91 || NPC[A].Type == 96 || NPCIsAParaTroopa[NPC[A].Type] || NPC[A].Type == 283 || NPC[A].Type == 284 || NPCIsCheep[NPC[A].Type] || NPC[A].Type == 260)
             fwritenum(f, NPC[A].Special);
         // "potion"
         if (NPC[A].Type == 288 || NPC[A].Type == 289 || (NPC[A].Type == 91 && NPC[A].Special == 288))
             fwritenum(f, NPC[A].Special2);
+
         fwritebool(f, NPC[A].Generator);
+
         if (NPC[A].Generator)
         {
             fwritenum(f, NPC[A].GeneratorDirection);
             fwritenum(f, NPC[A].GeneratorEffect);
             fwritenum(f, NPC[A].GeneratorTimeMax);
         }
+
         fwritestr_multiline(f, NPC[A].Text);
         fwritebool(f, NPC[A].Inert);
         fwritebool(f, NPC[A].Stuck);
         fwritebool(f, NPC[A].Legacy);
-        if (NPC[A].Layer == "")
+
+        if (NPC[A].Layer.empty())
             NPC[A].Layer = "Default";
+
         fwritestr(f, NPC[A].Layer);
         fwritestr(f, NPC[A].TriggerActivate);
         fwritestr(f, NPC[A].TriggerDeath);
@@ -157,7 +174,9 @@ void SaveLevel(std::string FilePath)   // saves the level
         fwritestr(f, NPC[A].TriggerLast);
         fwritestr(f, NPC[A].AttLayer);
     }
+
     fprintf(f, "next\r\n");
+
     for(A = 1; A <= numWarps + 1; A++)
     {
         if (!Warp[A].PlacedEnt || !Warp[A].PlacedExit) continue;
@@ -188,7 +207,9 @@ void SaveLevel(std::string FilePath)   // saves the level
         fwritebool(f, Warp[A].WarpNPC);
         fwritebool(f, Warp[A].Locked);
     }
+
     fprintf(f, "next\r\n");
+
     for(A = 1; A <= numWater; A++)
     {
         fwritenum(f, Water[A].Location.X);
@@ -199,7 +220,9 @@ void SaveLevel(std::string FilePath)   // saves the level
         fwritebool(f, Water[A].Quicksand);
         fwritestr(f, Water[A].Layer);
     }
+
     fprintf(f, "next\r\n");
+
     // (removed code that made sure Name and Hidden were synced with the UI)
     for(A = 0; A <= 100; A++)
     {
@@ -207,29 +230,35 @@ void SaveLevel(std::string FilePath)   // saves the level
         fwritestr(f, Layer[A].Name);
         fwritebool(f, Layer[A].Hidden);
     }
+
     fprintf(f, "next\r\n");
+
     for(A = 0; A <= 100; A++)
     {
-        if(Events[A].Name == "") break;
+        if(Events[A].Name.empty())
+            break;
+
         fwritestr(f, Events[A].Name);
         fwritestr_multiline(f, Events[A].Text);
         fwritenum(f, Events[A].Sound);
         fwritenum(f, Events[A].EndGame);
+
         for(B = 0; B <= 20; B++)
         {
-            if(B < Events[A].HideLayer.size())
+            if(B < (int)Events[A].HideLayer.size())
                 fwritestr(f, Events[A].HideLayer[B]);
             else
                 fwritestr(f, "");
-            if(B < Events[A].ShowLayer.size())
+            if(B < (int)Events[A].ShowLayer.size())
                 fwritestr(f, Events[A].ShowLayer[B]);
             else
                 fwritestr(f, "");
-            if(B < Events[A].ToggleLayer.size())
+            if(B < (int)Events[A].ToggleLayer.size())
                 fwritestr(f, Events[A].ToggleLayer[B]);
             else
                 fwritestr(f, "");
         }
+
         for(B = 0; B <= 20; B++)
         {
             fwritenum(f, Events[A].section[B].music_id);
@@ -239,6 +268,7 @@ void SaveLevel(std::string FilePath)   // saves the level
             fwritenum(f, Events[A].section[B].position.Height);
             fwritenum(f, Events[A].section[B].position.Width);
         }
+
         fwritestr(f, Events[A].TriggerEvent);
         fwritenum(f, Events[A].TriggerDelay);
         fwritebool(f, Events[A].LayerSmoke);
@@ -263,6 +293,7 @@ void SaveLevel(std::string FilePath)   // saves the level
         fwritefloat(f, Events[A].AutoY);
         fwritenum(f, Events[A].AutoSection);
     }
+
     fclose(f);
 
     // the rest of this stuff is all meant to be appropriately loading data

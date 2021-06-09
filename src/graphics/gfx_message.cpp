@@ -9,6 +9,7 @@ void DrawMessage()
 #else
     int TextBoxW = GFX.TextBox.w;
     bool UseGFX = true;
+
     if(ScreenW < GFX.TextBox.w)
     {
         TextBoxW = ScreenW - 50;
@@ -20,10 +21,13 @@ void DrawMessage()
     const int lineHeight = 16;
     // based on Wohlstand's improved algorithm, but screen-size aware
     const std::string& SuperText = MessageText;
+
     int BoxY = 0;
     int BoxY_Start = ScreenH/2 - 150;
+
     if(BoxY_Start < 60)
         BoxY_Start = 60;
+
     // Draw background all at once:
     // how many lines are there?
     int lineStart = 0; // start of current line
@@ -36,6 +40,7 @@ void DrawMessage()
     while(lineStart < int(SuperText.size()))
     {
         lastWord = lineStart;
+
         for(int i = lineStart + 1; i <= lineStart+maxChars; i++)
         {
             auto c = SuperText[size_t(i) - 1];
@@ -78,6 +83,7 @@ void DrawMessage()
         int rndMidH = numLines*lineHeight + 20 - 20 - 20;
         int gfxMidH = GFX.TextBox.h - 20 - 20;
         int vertReps = rndMidH / gfxMidH + 1;
+
         for (int i = 0; i < vertReps; i++)
         {
             if ((i+1) * gfxMidH <= rndMidH)
@@ -89,6 +95,7 @@ void DrawMessage()
                                       BoxY_Start + 20 + i*gfxMidH,
                                       TextBoxW, rndMidH - i*gfxMidH, GFX.TextBox, 0, 20);
         }
+
         frmMain.renderTexture(ScreenW / 2 - TextBoxW / 2,
                               BoxY_Start + 20 + rndMidH,
                               TextBoxW, 20, GFX.TextBox, 0, GFX.TextBox.h - 20);
@@ -100,6 +107,7 @@ void DrawMessage()
     bool firstLine = true;
     BoxY = BoxY_Start + 10;
     lineStart = 0; // start of current line
+
     while(lineStart < int(SuperText.size()))
     {
         lastWord = lineStart;
@@ -118,7 +126,7 @@ void DrawMessage()
             }
         }
 
-        if(lastWord == SuperText.length() && firstLine)
+        if(lastWord == int(SuperText.size()) && firstLine)
         {
             SuperPrint(SuperText.c_str() + size_t(lineStart), size_t(lastWord) - size_t(lineStart),
                 4,
@@ -132,6 +140,7 @@ void DrawMessage()
                 ScreenW/2 - TextBoxW / 2 + 12,
                 BoxY);
         }
+
         lineStart = lastWord;
         BoxY += lineHeight;
         firstLine = false;
