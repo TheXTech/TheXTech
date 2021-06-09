@@ -5,7 +5,8 @@
  *  file:  ArgTraits.h
  *
  *  Copyright (c) 2007, Daniel Aarno, Michael E. Smoot .
- *  All rights reverved.
+ *  Copyright (c) 2017 Google LLC
+ *  All rights reserved.
  *
  *  See the file COPYING in the top directory of this distribution for
  *  more information.
@@ -23,8 +24,8 @@
 // This is an internal tclap file, you should probably not have to
 // include this directly
 
-#ifndef TCLAP_ARGTRAITS_H
-#define TCLAP_ARGTRAITS_H
+#ifndef TCLAP_ARG_TRAITS_H
+#define TCLAP_ARG_TRAITS_H
 
 namespace TCLAP {
 
@@ -37,16 +38,16 @@ namespace TCLAP {
  */
 struct ValueLike {
     typedef ValueLike ValueCategory;
-	virtual ~ValueLike() {}
+    virtual ~ValueLike() {}
 };
 
 /**
  * A string like argument value type is a value that can be set using
- * operator=(string). Usefull if the value type contains spaces which
+ * operator=(string). Useful if the value type contains spaces which
  * will be broken up into individual tokens by operator>>.
  */
 struct StringLike {
-	virtual ~StringLike() {}
+    virtual ~StringLike() {}
 };
 
 /**
@@ -56,7 +57,7 @@ struct StringLike {
  */
 struct StringLikeTrait {
     typedef StringLike ValueCategory;
-	virtual ~StringLikeTrait() {}
+    virtual ~StringLikeTrait() {}
 };
 
 /**
@@ -66,22 +67,57 @@ struct StringLikeTrait {
  */
 struct ValueLikeTrait {
     typedef ValueLike ValueCategory;
-	virtual ~ValueLikeTrait() {}
+    virtual ~ValueLikeTrait() {}
 };
 
 /**
  * Arg traits are used to get compile type specialization when parsing
  * argument values. Using an ArgTraits you can specify the way that
  * values gets assigned to any particular type during parsing. The two
- * supported types are StringLike and ValueLike.
+ * supported types are StringLike and ValueLike. ValueLike is the
+ * default and means that operator>> will be used to assign values to
+ * the type.
  */
-template<typename T>
-struct ArgTraits {
-    typedef typename T::ValueCategory ValueCategory;
-	virtual ~ArgTraits() {}
-    //typedef ValueLike ValueCategory;
+template <typename T>
+class ArgTraits {
+    // This is a bit silly, but what we want to do is:
+    // 1) If there exists a specialization of ArgTraits for type X,
+    // use it.
+    //
+    // 2) If no specialization exists but X has the typename
+    // X::ValueCategory, use the specialization for X::ValueCategory.
+    //
+    // 3) If neither (1) nor (2) defines the trait, use the default
+    // which is ValueLike.
+
+    // This is the "how":
+    //
+    // test<T>(0) (where 0 is the NULL ptr) will match
+    // test(typename C::ValueCategory*) iff type T has the
+    // corresponding typedef. If it does not test(...) will be
+    // matched. This allows us to determine if T::ValueCategory
+    // exists by checking the sizeof for the test function (return
+    // value must have different sizeof).
+    template <typename C>
+    static short test(typename C::ValueCategory *);  // NOLINT
+    template <typename C>
+    static long test(...);                                             // NOLINT
+    static const bool hasTrait = sizeof(test<T>(0)) == sizeof(short);  // NOLINT
+
+    template <typename C, bool>
+    struct DefaultArgTrait {
+        typedef ValueLike ValueCategory;
+    };
+
+    template <typename C>
+    struct DefaultArgTrait<C, true> {
+        typedef typename C::ValueCategory ValueCategory;
+    };
+
+public:
+    typedef typename DefaultArgTrait<T, hasTrait>::ValueCategory ValueCategory;
 };
 
-#endif
+}  // namespace TCLAP
 
-} // namespace
+#endif  // TCLAP_ARG_TRAITS_H

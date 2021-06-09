@@ -152,9 +152,9 @@ int main(int argc, char**argv)
     try
     {
         // Define the command line object.
-        TCLAP::CmdLine  cmd("TheXTech\n"
-                            "Copyright (c) 2020-2021 Vitaly Novichkov <admin@wohlnet.ru>\n"
-                            "This program is distributed under the MIT license\n", ' ', "1.3");
+        TCLAP::CmdLine  cmd("TheXTech Engine\n"
+                            "Copyright (c) 2020-2021 Vitaly Novichkov <admin@wohlnet.ru>\n\n"
+                            "This program is distributed under the MIT license\n\n", ' ', "1.3");
 
         TCLAP::ValueArg<std::string> customAssetsPath("c", "assets-root", "Specify the different assets root directory to play",
                                                       false, "",
@@ -168,14 +168,15 @@ int main(int argc, char**argv)
         TCLAP::SwitchArg switchNoPause("p", "never-pause", "Never pause game when window losts a focus", false);
         TCLAP::SwitchArg switchBgInput(std::string(), "bg-input", "Allow background input for joysticks", false);
         TCLAP::ValueArg<std::string> renderType("r", "render", "Sets the graphics mode:\n"
-                                                "       sw - software render (fallback)\n"
-                                                "       hw - hardware accelerated render [Default]\n"
-                                                "       vsync - hardware accelerated with the v-sync enabled",
+                                                "  sw - software render (fallback)\n"
+                                                "  hw - hardware accelerated render [Default]\n"
+                                                "  vsync - hardware accelerated with the v-sync enabled",
                                                 false, "",
                                                 "render type",
                                                 cmd);
 
-        TCLAP::ValueArg<std::string> testLevel("l", "leveltest", "Start a level test of a given level file. OBSOLETE OPTION: now you able to specify the file path without -l or --leveltest argument.",
+        TCLAP::ValueArg<std::string> testLevel("l", "leveltest", "Start a level test of a given level file.\n"
+                                                "[OBSOLETE OPTION]: now you able to specify the file path without -l or --leveltest argument.",
                                                 false, "",
                                                 "file path",
                                                 cmd);
@@ -190,9 +191,10 @@ int main(int argc, char**argv)
         TCLAP::ValueArg<std::string> playerCharacter1("1",
                                                       "player1",
                                                       "Setup of playable character for player 1:\n"
-                                                      "       Semicolon separated key-argument values:\n"
-                                                      "       c - character, s - state, m - mount, t - mount type. Example:\n"
-                                                      "       c1;s2;m3;t0 - Character as 1, State as 2, Mount as 3, Mount type as 0",
+                                                      "  Semicolon separated key-argument values:\n"
+                                                      "  c - character, s - state, m - mount, t - mount type.\n\n"
+                                                      "Example:\n"
+                                                      "  c1;s2;m3;t0 - Character as 1, State as 2, Mount as 3, M.Type as 0",
                                                       false, "",
                                                       "c1;s2;m0;t0",
                                                       cmd);
@@ -200,9 +202,10 @@ int main(int argc, char**argv)
         TCLAP::ValueArg<std::string> playerCharacter2("2",
                                                       "player2",
                                                       "Setup of playable character for player 2:\n"
-                                                      "       Semicolon separated key-argument values:\n"
-                                                      "       c - character, s - state, m - mount, t - mount type. Example:\n"
-                                                      "       c1;s2;m3;t0 - Character as 1, State as 2, Mount as 3, Mount type as 0",
+                                                      "  Semicolon separated key-argument values:\n"
+                                                      "  c - character, s - state, m - mount, t - mount type.\n\n"
+                                                      "Example:\n"
+                                                      "  c1;s2;m3;t0 - Character as 1, State as 2, Mount as 3, M.Type as 0",
                                                       false, "",
                                                       "c1;s2;m0;t0",
                                                       cmd);
@@ -216,20 +219,21 @@ int main(int argc, char**argv)
 
         TCLAP::ValueArg<std::string> compatLevel(std::string(), "compat-level",
                                                    "Enforce the specific gameplay compatibiltiy level. Supported values:\n"
-                                                   "       modern - TheXTech native, all features and bugfixes enabled [Default]\n"
-                                                   "       smbx2  - Disables all features and bugfixes except fixed at SMBX2\n"
-                                                   "       smbx13 - Enforces the full compatibility with the SMBX 1.3 behaviour\n"
-                                                   "       Note: If speed-run mode is set, the compatibility level will be overriden by the speed-run mode",
+                                                   "  modern - TheXTech native, all features and fixes enabled [Default]\n"
+                                                   "  smbx2  - Disables all features and bugfixes except fixed at SMBX2\n"
+                                                   "  smbx13 - Enforces the full compatibility with the SMBX 1.3 behaviour\n"
+                                                   "\n"
+                                                   "  Note: If speed-run mode is set, the compatibility level will be overriden by the speed-run mode",
                                                     false, "modern",
                                                    "modern, smbx2, smbx3",
                                                    cmd);
         TCLAP::ValueArg<unsigned int> speedRunMode(std::string(), "speed-run-mode",
                                                    "Enable the speed-runer mode: the playthrough timer will be shown, "
                                                    "and some gameplay limitations will be enabled. Supported values:\n"
-                                                   "       0 - Disabled [Default]\n"
-                                                   "       1 - TheXTech native\n"
-                                                   "       2 - Disable time-winning updates (SMBX2 mode)\n"
-                                                   "       3 - Strict vanilla SMBX 1.3, enable all bugs",
+                                                   "  0 - Disabled [Default]\n"
+                                                   "  1 - TheXTech native\n"
+                                                   "  2 - Disable time-winning updates (SMBX2 mode)\n"
+                                                   "  3 - Strict vanilla SMBX 1.3, enable all bugs",
                                                     false, 0u,
                                                    "0, 1, 2, or 3",
                                                    cmd);
