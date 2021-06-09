@@ -185,6 +185,7 @@ int main(int argc, char**argv)
         TCLAP::SwitchArg switchNoSound("s", "no-sound", "Disable sound", false);
         TCLAP::SwitchArg switchNoVideo("", "no-video", "Disable video", false);
         TCLAP::SwitchArg switchNoPause("p", "never-pause", "Never pause game when window losts a focus", false);
+        TCLAP::SwitchArg switchBgInput(std::string(), "bg-input", "Allow background input for joysticks", false);
         TCLAP::ValueArg<std::string> renderType("r", "render", "Sets the graphics mode:\n"
                                                 "       sw - software render (fallback)\n"
                                                 "       hw - hardware accelerated render [Default]\n"
@@ -272,6 +273,7 @@ int main(int argc, char**argv)
         cmd.add(&switchNoSound);
         cmd.add(&switchNoVideo);
         cmd.add(&switchNoPause);
+        cmd.add(&switchBgInput);
         cmd.add(&switchBattleMode);
 
         cmd.add(&switchTestGodMode);
@@ -301,6 +303,9 @@ int main(int argc, char**argv)
         setup.noSound   = switchNoSound.getValue();
         setup.noVideo   = switchNoVideo.getValue();
         setup.neverPause = switchNoPause.getValue();
+        setup.allowBgInput = switchBgInput.getValue();
+        if(setup.allowBgInput) // The BG-input depends on the never-pause option
+            setup.neverPause = setup.allowBgInput;
 
         std::string rt = renderType.getValue();
         if(rt == "sw")
