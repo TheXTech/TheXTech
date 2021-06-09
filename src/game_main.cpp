@@ -687,42 +687,45 @@ int GameMain(const CmdLineSetup_t &setup)
                     else
                         p.Warp = ReturnWarp;
 
-                    if(Warp[p.Warp].Effect == 1)
+                    p.WarpBackward = false;
+                    auto &warp = Warp[p.Warp];
+
+                    if(warp.Effect == 1)
                     {
-                        if(Warp[p.Warp].Direction2 == 1) // DOWN
+                        if(warp.Direction2 == 1) // DOWN
                         {
 //                                .Location.X = Warp(.Warp).Exit.X + Warp(.Warp).Exit.Width / 2 - .Location.Width / 2
-                            p.Location.X = Warp[p.Warp].Exit.X + (Warp[p.Warp].Exit.Width / 2) - (p.Location.Width / 2);
+                            p.Location.X = warp.Exit.X + (warp.Exit.Width / 2) - (p.Location.Width / 2);
 //                                .Location.Y = Warp(.Warp).Exit.Y - .Location.Height - 8
-                            p.Location.Y = Warp[p.Warp].Exit.Y - p.Location.Height - 8;
+                            p.Location.Y = warp.Exit.Y - p.Location.Height - 8;
                         }
 //                            ElseIf Warp(.Warp).Direction2 = 3 Then
-                        if(Warp[p.Warp].Direction2 == 3) // UP
+                        if(warp.Direction2 == 3) // UP
                         {
 //                                .Location.X = Warp(.Warp).Exit.X + Warp(.Warp).Exit.Width / 2 - .Location.Width / 2
-                            p.Location.X = Warp[p.Warp].Exit.X + (Warp[p.Warp].Exit.Width / 2) - (p.Location.Width / 2);
+                            p.Location.X = warp.Exit.X + (warp.Exit.Width / 2) - (p.Location.Width / 2);
 //                                .Location.Y = Warp(.Warp).Exit.Y + Warp(.Warp).Exit.Height + 8
-                            p.Location.Y = Warp[p.Warp].Exit.Y + Warp[p.Warp].Exit.Height + 8;
+                            p.Location.Y = warp.Exit.Y + warp.Exit.Height + 8;
                         }
 //                            ElseIf Warp(.Warp).Direction2 = 2 Then
-                        if(Warp[p.Warp].Direction2 == 2) // RIGHT
+                        if(warp.Direction2 == 2) // RIGHT
                         {
 //                                If .Mount = 3 Then .Duck = True
                             if(p.Mount == 3) p.Duck = true;
 //                                .Location.X = Warp(.Warp).Exit.X - .Location.Width - 8
-                            p.Location.X = Warp[p.Warp].Exit.X - p.Location.Width - 8;
+                            p.Location.X = warp.Exit.X - p.Location.Width - 8;
 //                                .Location.Y = Warp(.Warp).Exit.Y + Warp(.Warp).Exit.Height - .Location.Height - 2
-                            p.Location.Y = Warp[p.Warp].Exit.Y + Warp[p.Warp].Exit.Height - p.Location.Height - 2;
+                            p.Location.Y = warp.Exit.Y + warp.Exit.Height - p.Location.Height - 2;
                         }
 //                            ElseIf Warp(.Warp).Direction2 = 4 Then
-                        if(Warp[p.Warp].Direction2 == 4) // LEFT
+                        if(warp.Direction2 == 4) // LEFT
                         {
 //                                If .Mount = 3 Then .Duck = True
                             if(p.Mount == 3) p.Duck = true;
 //                                .Location.X = Warp(.Warp).Exit.X + Warp(.Warp).Exit.Width + 8
-                            p.Location.X = Warp[p.Warp].Exit.X + Warp[p.Warp].Exit.Width + 8;
+                            p.Location.X = warp.Exit.X + warp.Exit.Width + 8;
 //                                .Location.Y = Warp(.Warp).Exit.Y + Warp(.Warp).Exit.Height - .Location.Height - 2
-                            p.Location.Y = Warp[p.Warp].Exit.Y + Warp[p.Warp].Exit.Height - p.Location.Height - 2;
+                            p.Location.Y = warp.Exit.Y + warp.Exit.Height - p.Location.Height - 2;
 //                            End If
                         }
 
@@ -732,12 +735,12 @@ int GameMain(const CmdLineSetup_t &setup)
                         p.Effect = 8;
                         p.Effect2 = 950;
                     }
-                    else if(Warp[p.Warp].Effect == 2)
+                    else if(warp.Effect == 2)
                     {
 //                            .Location.X = Warp(.Warp).Exit.X + Warp(.Warp).Exit.Width / 2 - .Location.Width / 2
-                        p.Location.X = Warp[p.Warp].Exit.X + Warp[p.Warp].Exit.Width / 2 - p.Location.Width / 2;
+                        p.Location.X = warp.Exit.X + warp.Exit.Width / 2 - p.Location.Width / 2;
 //                            .Location.Y = Warp(.Warp).Exit.Y + Warp(.Warp).Exit.Height - .Location.Height
-                        p.Location.Y = Warp[p.Warp].Exit.Y + Warp[p.Warp].Exit.Height - p.Location.Height;
+                        p.Location.Y = warp.Exit.Y + warp.Exit.Height - p.Location.Height;
 
                         CheckSection(A);
                         p.Effect = 8;

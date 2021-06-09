@@ -53,7 +53,7 @@ bool n00bCollision(const Location_t &Loc1, const Location_t &Loc2);
 bool NPCStartCollision(const Location_t &Loc1, const Location_t &Loc2);
 // Public Function WarpCollision(Loc1 As Location, A As Integer) As Boolean  'Warp point collisions
 // Warp point collisions
-bool WarpCollision(const Location_t &Loc1, int A);
+bool WarpCollision(const Location_t &Loc1, const Location_t &entrance, int direction);
 // Public Function FindCollision(Loc1 As Location, Loc2 As Location) As Integer 'Whats side the collision happened
 // Whats side the collision happened
 int FindCollision(const Location_t &Loc1, const Location_t &Loc2);

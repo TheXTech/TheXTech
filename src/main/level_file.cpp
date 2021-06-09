@@ -167,7 +167,6 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
     numLocked = 0;
     numNPCs = 0;
     numWarps = 0;
-    numWarpsReal = 0;
 
     numLayers = 0;
     numEvents = 0;
@@ -477,11 +476,10 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         }
     }
 
-    std::vector<int> twoWayWarps;
+
     for(auto &w : lvl.doors)
     {
         numWarps++;
-        numWarpsReal++;
         if(numWarps > maxWarps)
         {
             numWarps = maxWarps;
@@ -544,33 +542,10 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         warp.Entrance.Width = 32;
         warp.Exit.Height = 32;
         warp.Exit.Width = 32;
+
         syncLayers_Warp(numWarps);
-        if(warp.twoWay)
-            twoWayWarps.push_back(numWarps);
     }
 
-    if(!twoWayWarps.empty())
-    {
-        for(auto &tww : twoWayWarps)
-        {
-            numWarps++;
-            if(numWarps > maxWarps)
-            {
-                numWarps = maxWarps;
-                break;
-            }
-
-            auto &w = Warp[tww];
-            auto &warp = Warp[numWarps];
-
-            warp = w;
-            warp.Exit = w.Entrance;
-            warp.Entrance = w.Exit;
-            warp.Direction2 = w.Direction;
-            warp.Direction = w.Direction2;
-            syncLayers_Warp(numWarps);
-        }
-    }
 
     for(auto &w : lvl.physez)
     {
@@ -937,7 +912,6 @@ void ClearLevel()
     for(A = 1; A <= numWarps; A++)
         Warp[A] = blankWarp;
     numWarps = 0;
-    numWarpsReal = 0;
 
     for(A = 1; A <= numEffects; A++)
         Effect[A] = blankEffect;
