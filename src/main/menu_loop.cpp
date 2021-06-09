@@ -248,6 +248,7 @@ static void updateIntroLevelActivity()
             p.FireBallCD = 0;
             p.ForceHold = 0;
             p.Warp = 0;
+            p.WarpBackward = false;
             p.WarpCD = 0;
             p.GroundPound = false;
             p.Immune = 0;
