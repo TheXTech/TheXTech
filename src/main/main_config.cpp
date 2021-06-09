@@ -29,6 +29,7 @@
 #include "../game_main.h"
 #include "../graphics.h"
 #include "../sound.h"
+#include "../video.h"
 #include "../control/joystick.h"
 
 #include "record.h"
@@ -43,50 +44,70 @@
 
 void OpenConfig_preSetup()
 {
+    const IniProcessing::StrEnumMap renderMode =
+    {
+        {"sw", RENDER_SOFTWARE},
+        {"hw", RENDER_ACCELERATED},
+        {"vsync", RENDER_ACCELERATED_VSYNC},
+        {"0", RENDER_SOFTWARE},
+        {"1", RENDER_ACCELERATED},
+        {"2", RENDER_ACCELERATED_VSYNC}
+    };
+
+    const IniProcessing::StrEnumMap sampleFormats =
+    {
+        {"s8", AUDIO_S8},
+        {"pcm_s8", AUDIO_S8},
+        {"u8", AUDIO_U8},
+        {"pcm_u8", AUDIO_U8},
+        {"s16", AUDIO_S16SYS},
+        {"pcm_s16", AUDIO_S16SYS},
+        {"s16le", AUDIO_S16LSB},
+        {"pcm_s16le", AUDIO_S16LSB},
+        {"s16be", AUDIO_S16MSB},
+        {"pcm_s16be", AUDIO_S16MSB},
+        {"u16", AUDIO_U16SYS},
+        {"pcm_u16", AUDIO_U16SYS},
+        {"u16le", AUDIO_U16LSB},
+        {"pcm_u16le", AUDIO_U16LSB},
+        {"u16be", AUDIO_U16MSB},
+        {"pcm_u16be", AUDIO_U16MSB},
+        {"s32", AUDIO_S32SYS},
+        {"pcm_s32", AUDIO_S32SYS},
+        {"s32le", AUDIO_S32LSB},
+        {"pcm_s32le", AUDIO_S32LSB},
+        {"s32be", AUDIO_S32MSB},
+        {"pcm_s32be", AUDIO_S32MSB},
+        {"float32", AUDIO_F32SYS},
+        {"pcm_f32", AUDIO_F32SYS},
+        {"float32le", AUDIO_F32LSB},
+        {"pcm_f32le", AUDIO_F32LSB},
+        {"float32be", AUDIO_F32MSB},
+        {"pcm_f32be", AUDIO_F32MSB}
+    };
+
     std::string configPath = AppPathManager::settingsFileSTD();
+
     if(Files::fileExists(configPath))
     {
         IniProcessing config(configPath);
+
+        config.beginGroup("video");
+        config.readEnum("render", g_videoSettings.renderMode, (int)RENDER_ACCELERATED, renderMode);
+        config.read("background-work", g_videoSettings.allowBgWork, false);
+        config.read("background-controller-input", g_videoSettings.allowBgControllerInput, false);
+        config.read("frame-skip", g_videoSettings.enableFrameSkip, true);
+        config.read("show-fps", g_videoSettings.showFrameRate, false);
+        config.endGroup();
+
         config.beginGroup("main");
-        config.read("render", RenderMode, 1);
-        if(RenderMode > 2) // Allowed values: 0, 1 and 2
-            RenderMode = 2;
+        config.readEnum("render", g_videoSettings.renderMode, g_videoSettings.renderMode, renderMode);
         config.endGroup();
 
         config.beginGroup("sound");
+        config.read("disable-sound", g_audioSetup.disableSound, false);
         config.read("sample-rate", g_audioSetup.sampleRate, 44100);
         config.read("channels", g_audioSetup.channels, 2);
-        IniProcessing::StrEnumMap sampleFormats =
-        {
-            {"s8", AUDIO_S8},
-            {"pcm_s8", AUDIO_S8},
-            {"u8", AUDIO_U8},
-            {"pcm_u8", AUDIO_U8},
-            {"s16", AUDIO_S16SYS},
-            {"pcm_s16", AUDIO_S16SYS},
-            {"s16le", AUDIO_S16LSB},
-            {"pcm_s16le", AUDIO_S16LSB},
-            {"s16be", AUDIO_S16MSB},
-            {"pcm_s16be", AUDIO_S16MSB},
-            {"u16", AUDIO_U16SYS},
-            {"pcm_u16", AUDIO_U16SYS},
-            {"u16le", AUDIO_U16LSB},
-            {"pcm_u16le", AUDIO_U16LSB},
-            {"u16be", AUDIO_U16MSB},
-            {"pcm_u16be", AUDIO_U16MSB},
-            {"s32", AUDIO_S32SYS},
-            {"pcm_s32", AUDIO_S32SYS},
-            {"s32le", AUDIO_S32LSB},
-            {"pcm_s32le", AUDIO_S32LSB},
-            {"s32be", AUDIO_S32MSB},
-            {"pcm_s32be", AUDIO_S32MSB},
-            {"float32", AUDIO_F32SYS},
-            {"pcm_f32", AUDIO_F32SYS},
-            {"float32le", AUDIO_F32LSB},
-            {"pcm_f32le", AUDIO_F32LSB},
-            {"float32be", AUDIO_F32MSB},
-            {"pcm_f32be", AUDIO_F32MSB}
-        };
         config.readEnum("format", g_audioSetup.format, (uint16_t)AUDIO_F32, sampleFormats);
         config.read("buffer-size", g_audioSetup.bufferSize, 512);
         config.endGroup();
@@ -246,7 +267,25 @@ void SaveConfig()
 //    config.setValue("record-gameplay", g_recordControlRecord);
     config.endGroup();
 
+    config.beginGroup("video");
+    {
+        std::unordered_map<int, std::string> renderMode =
+        {
+            {RENDER_SOFTWARE, "sw"},
+            {RENDER_ACCELERATED, "hw"},
+            {RENDER_ACCELERATED_VSYNC, "vsync"},
+        };
+
+        config.setValue("render", renderMode[g_videoSettings.renderMode]);
+        config.setValue("background-work", g_videoSettings.allowBgWork);
+        config.setValue("background-controller-input", g_videoSettings.allowBgControllerInput);
+        config.setValue("frame-skip", g_videoSettings.enableFrameSkip);
+        config.setValue("show-fps", g_videoSettings.showFrameRate);
+    }
+    config.endGroup();
+
     config.beginGroup("sound");
+    config.setValue("disable-sound", g_audioSetup.disableSound);
     config.setValue("sample-rate", g_audioSetup.sampleRate);
     config.setValue("channels", g_audioSetup.channels);
     config.setValue("buffer-size", g_audioSetup.bufferSize);
