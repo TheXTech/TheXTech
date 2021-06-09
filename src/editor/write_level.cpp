@@ -324,7 +324,7 @@ void SaveLevel(std::string FilePath, int format, int version)   // saves the lev
 
 //    fprintf(f, "next\r\n");
 
-    for(int i = 1; i < numWarpsReal; ++i)
+    for(int i = 1; i < numWarps; ++i)
     {
         auto &w = Warp[i];
 
