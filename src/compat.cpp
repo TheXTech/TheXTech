@@ -133,7 +133,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
             {"leave", Compatibility_t::SPEEDRUN_STOP_LEAVE_LEVEL},
             {"enter", Compatibility_t::SPEEDRUN_STOP_ENTER_LEVEL}
         };
-        compat.read("stop-timer-by", c.speedrun_stop_timer_by, c.speedrun_stop_timer_by);
+        compat.readEnum("stop-timer-by", c.speedrun_stop_timer_by, c.speedrun_stop_timer_by, stopBy);
         compat.read("stop-timer-at", buffer, std::string(c.speedrun_stop_timer_at));
         SDL_strlcpy(c.speedrun_stop_timer_at, buffer.c_str(), sizeof(c.speedrun_stop_timer_at));
     }
