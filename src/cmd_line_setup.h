@@ -11,6 +11,8 @@ struct CmdLineSetup_t
     bool frameSkip = false;
     //! Don't pause game while window is not active
     bool neverPause = false;
+    //! Allow background input for joysticks
+    bool allowBgInput = false;
     //! TYpe of a render
     enum RenderType
     {
