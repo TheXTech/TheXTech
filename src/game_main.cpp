@@ -679,6 +679,13 @@ int GameMain(const CmdLineSetup_t &setup)
                         p.Effect = 8;
                         p.Effect2 = 2000;
                     }
+                    else if(warp.Effect == 3) // Portal warp
+                    {
+                        p.Location.X = warp.Exit.X + warp.Exit.Width / 2 - p.Location.Width / 2;
+                        p.Location.Y = warp.Exit.Y + warp.Exit.Height - p.Location.Height;
+                        CheckSection(A);
+                        p.WarpCD = 50;
+                    }
                 }
 
                 if(StartWarp > 0)
