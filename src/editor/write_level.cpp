@@ -4,7 +4,7 @@
 #include "write_common.h"
 #include "sound.h"
 
-void SaveLevel(std::string FilePath)   // saves the level
+void SaveLevel(std::string FilePath, int format, int version)   // saves the level
 {
     FILE* f = fopen(FilePath.c_str(), "wb");
     if (!f)

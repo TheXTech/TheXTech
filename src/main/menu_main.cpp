@@ -899,10 +899,10 @@ bool mainMenuUpdate()
                                 std::replace(fn.begin(), fn.end(), '|', '_');
                                 std::replace(fn.begin(), fn.end(), '?', '_');
                                 std::replace(fn.begin(), fn.end(), '*', '_');
-                                while(DirMan::exists(AppPathManager::userWorldsRootDir()+"/"+fn))
-                                    fn = fn + "2";
-                                DirMan::mkAbsPath(AppPathManager::userWorldsRootDir()+"/"+fn);
-                                SaveWorld(AppPathManager::userWorldsRootDir()+"/"+fn+"/world.wld");
+                                while(DirMan::exists(AppPathManager::userWorldsRootDir() + "/" + fn))
+                                    fn += "2";
+                                DirMan::mkAbsPath(AppPathManager::userWorldsRootDir() + "/" + fn);
+                                SaveWorld(AppPathManager::userWorldsRootDir() + "/" + fn + "/world.wldx", FileFormats::WLD_PGEX);
 #ifdef PGE_NO_THREADING
                                 FindWorlds();
 #else

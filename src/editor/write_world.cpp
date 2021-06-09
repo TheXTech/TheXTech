@@ -2,7 +2,7 @@
 #include "sound.h"
 #include "write_common.h"
 
-void SaveWorld(std::string FilePath)   // Saves the world!
+void SaveWorld(std::string FilePath, int format, int version)   // Saves the world!
 {
     int A = 0;
     int B = 0;
