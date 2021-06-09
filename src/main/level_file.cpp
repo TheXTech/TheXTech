@@ -167,6 +167,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
     numLocked = 0;
     numNPCs = 0;
     numWarps = 0;
+    numWarpsReal = 0;
 
     numLayers = 0;
     numEvents = 0;
@@ -480,6 +481,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
     for(auto &w : lvl.doors)
     {
         numWarps++;
+        numWarpsReal++;
         if(numWarps > maxWarps)
         {
             numWarps = maxWarps;
@@ -499,6 +501,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         warp.Direction = w.idirect;
         warp.Direction2 = w.odirect;
         warp.Effect = w.type;
+        warp.twoWay = w.two_way;
 
         // Work around filenames with no extension suffix and case missmatch
         if(!Strings::endsWith(w.lname, ".lvl") && !Strings::endsWith(w.lname, ".lvlx"))
@@ -542,7 +545,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         warp.Exit.Height = 32;
         warp.Exit.Width = 32;
         syncLayers_Warp(numWarps);
-        if(w.two_way)
+        if(warp.twoWay)
             twoWayWarps.push_back(numWarps);
     }
 
@@ -933,6 +936,8 @@ void ClearLevel()
 
     for(A = 1; A <= numWarps; A++)
         Warp[A] = blankWarp;
+    numWarps = 0;
+    numWarpsReal = 0;
 
     for(A = 1; A <= numEffects; A++)
         Effect[A] = blankEffect;

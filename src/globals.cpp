@@ -133,6 +133,7 @@ RangeArrI<int, 0, maxSections, 0> Background2;
 RangeArr<WorldPath_t, 1, maxWorldPaths> WorldPath;
 int numWorldPaths = 0;
 int numWarps = 0;
+int numWarpsReal = 0;
 RangeArr<Warp_t, 1, maxWarps> Warp;
 RangeArr<Tile_t, 1, maxTiles> Tile;
 RangeArr<Scene_t, 1, maxScenes> Scene;

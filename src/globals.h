@@ -894,6 +894,7 @@ struct Warp_t
 //    maxStars As Integer
     int maxStars = 0;
 //EXTRA:
+    bool twoWay = false;
     bool noPrintStars = false;
     bool noEntranceScene = false;
     bool cannonExit = false;
@@ -1217,6 +1218,8 @@ extern RangeArr<WorldPath_t, 1, maxWorldPaths> WorldPath;
 extern int numWorldPaths;
 //Public numWarps As Integer 'number of warps in a level
 extern int numWarps;
+//! EXTRA: REAL number of warps (exclude the two-way warps)
+extern int numWarpsReal;
 //Public Warp(1 To maxWarps) As Warp 'define the warps
 extern RangeArr<Warp_t, 1, maxWarps> Warp;
 //Public Tile(1 To maxTiles) As Tile
