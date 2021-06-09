@@ -1,10 +1,12 @@
+// -*- Mode: c++; c-basic-offset: 4; tab-width: 4; -*-
 
 /******************************************************************************
  *
  *  file:  Constraint.h
  *
  *  Copyright (c) 2005, Michael E. Smoot
- *  All rights reverved.
+ *  Copyright (c) 2017, Google LLC
+ *  All rights reserved.
  *
  *  See the file COPYING in the top directory of this distribution for
  *  more information.
@@ -22,47 +24,54 @@
 #ifndef TCLAP_CONSTRAINT_H
 #define TCLAP_CONSTRAINT_H
 
+#include <algorithm>
+#include <iomanip>
+#include <iostream>
+#include <list>
+#include <stdexcept>
 #include <string>
 #include <vector>
-#include <list>
-#include <iostream>
-#include <iomanip>
-#include <algorithm>
 
 namespace TCLAP {
 
 /**
  * The interface that defines the interaction between the Arg and Constraint.
  */
-template<class T>
-class Constraint
-{
+template <class T>
+class Constraint {
+public:
+    /**
+     * Returns a description of the Constraint.
+     */
+    virtual std::string description() const = 0;
 
-	public:
-		/**
-		 * Returns a description of the Constraint.
-		 */
-		virtual std::string description() const =0;
+    /**
+     * Returns the short ID for the Constraint.
+     */
+    virtual std::string shortID() const = 0;
 
-		/**
-		 * Returns the short ID for the Constraint.
-		 */
-		virtual std::string shortID() const =0;
+    /**
+     * The method used to verify that the value parsed from the command
+     * line meets the constraint.
+     * \param value - The value that will be checked.
+     */
+    virtual bool check(const T &value) const = 0;
 
-		/**
-		 * The method used to verify that the value parsed from the command
-		 * line meets the constraint.
-		 * \param value - The value that will be checked.
-		 */
-		virtual bool check(const T& value) const =0;
+    /**
+     * Destructor.
+     * Silences warnings about Constraint being a base class with virtual
+     * functions but without a virtual destructor.
+     */
+    virtual ~Constraint() { ; }
 
-		/**
-		 * Destructor.
-		 * Silences warnings about Constraint being a base class with virtual
-		 * functions but without a virtual destructor.
-		 */
-		virtual ~Constraint() { ; }
+    static std::string shortID(Constraint<T> *constraint) {
+        if (!constraint)
+            throw std::logic_error(
+                "Cannot create a ValueArg with a NULL constraint");
+        return constraint->shortID();
+    }
 };
 
-} //namespace TCLAP
-#endif
+}  // namespace TCLAP
+
+#endif  // TCLAP_CONSTRAINT_H

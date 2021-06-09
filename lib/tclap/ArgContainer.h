@@ -2,10 +2,9 @@
 
 /******************************************************************************
  *
- *  file:  Visitor.h
+ *  file:  ArgContainer.h
  *
- *  Copyright (c) 2003, Michael E. Smoot .
- *  Copyright (c) 2017, Google LLC
+ *  Copyright (c) 2018 Google LLC
  *  All rights reserved.
  *
  *  See the file COPYING in the top directory of this distribution for
@@ -21,32 +20,39 @@
  *
  *****************************************************************************/
 
-#ifndef TCLAP_VISITOR_H
-#define TCLAP_VISITOR_H
+#ifndef TCLAP_ARG_CONTAINER_H
+#define TCLAP_ARG_CONTAINER_H
 
 namespace TCLAP {
 
+class Arg;
+
 /**
- * A base class that defines the interface for visitors.
+ * Interface that allows adding an Arg to a "container".
+ *
+ * A container does not have to be a container in the C++ standard
+ * library sense, just something that wants to hold on to references
+ * to Arg's. The container does not own the added Arg's and it is the
+ * user's responsibility to ensure the life time (scope) of the Arg's
+ * outlives any operations on the container.
  */
-class Visitor {
+class ArgContainer {
 public:
-    /**
-     * Constructor. Does nothing.
-     */
-    Visitor() {}
+    virtual ~ArgContainer() {}
 
     /**
-     * Destructor. Does nothing.
+     * Adds an argument. Ownership is not transfered.
+     * \param a - Argument to be added.
      */
-    virtual ~Visitor() {}
+    virtual ArgContainer &add(Arg &a) = 0;
 
     /**
-     * This method (to implemented by children) will be
-     * called when the visitor is visited.
+     * Adds an argument. Ownership is not transfered.
+     * \param a - Argument to be added.
      */
-    virtual void visit() = 0;
+    virtual ArgContainer &add(Arg *a) = 0;
 };
+
 }  // namespace TCLAP
 
-#endif  // TCLAP_VISITOR_H
+#endif  // TCLAP_ARG_CONTAINER_H

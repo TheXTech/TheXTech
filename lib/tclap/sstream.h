@@ -2,10 +2,11 @@
 
 /******************************************************************************
  *
- *  file:  IgnoreRestVisitor.h
+ *  file:  sstream.h
  *
  *  Copyright (c) 2003, Michael E. Smoot .
- *  Copyright (c) 2020, Google LLC
+ *  Copyright (c) 2004, Michael E. Smoot, Daniel Aarno .
+ *  Copyright (c) 2017 Google Inc.
  *  All rights reserved.
  *
  *  See the file COPYING in the top directory of this distribution for
@@ -21,27 +22,29 @@
  *
  *****************************************************************************/
 
-#ifndef TCLAP_IGNORE_REST_VISITOR_H
-#define TCLAP_IGNORE_REST_VISITOR_H
+#ifndef TCLAP_SSTREAM_H
+#define TCLAP_SSTREAM_H
 
-#include <tclap/CmdLineInterface.h>
-#include <tclap/Visitor.h>
+#if !defined(TCLAP_HAVE_STRSTREAM)
+// Assume sstream is available if strstream is not specified
+// (https://sourceforge.net/p/tclap/bugs/23/)
+#define TCLAP_HAVE_SSTREAM
+#endif
 
+#if defined(TCLAP_HAVE_SSTREAM)
+#include <sstream>
 namespace TCLAP {
-
-/**
- * A Visitor that tells the CmdLine to begin ignoring arguments after
- * this one is parsed.
- */
-class IgnoreRestVisitor : public Visitor {
-public:
-    IgnoreRestVisitor(CmdLineInterface &cmdLine)
-        : Visitor(), cmdLine_(cmdLine) {}
-    void visit() { cmdLine_.beginIgnoring(); }
-
-private:
-    CmdLineInterface &cmdLine_;
-};
+typedef std::istringstream istringstream;
+typedef std::ostringstream ostringstream;
 }  // namespace TCLAP
+#elif defined(TCLAP_HAVE_STRSTREAM)
+#include <strstream>
+namespace TCLAP {
+typedef std::istrstream istringstream;
+typedef std::ostrstream ostringstream;
+}  // namespace TCLAP
+#else
+#error "Need a stringstream (sstream or strstream) to compile!"
+#endif
 
-#endif  // TCLAP_IGNORE_REST_VISITOR_H
+#endif  // TCLAP_SSTREAM_H
