@@ -3922,10 +3922,245 @@ void PowerUps(int A)
     }
 }
 
-void SuperWarp(int A)
+
+static SDL_INLINE bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool backward)
 {
     bool canWarp = false;
 
+    auto &entrance      = backward ? warp.Exit        : warp.Entrance;
+    auto &exit          = backward ? warp.Entrance    : warp.Exit;
+    auto &direction     = backward ? warp.Direction2  : warp.Direction;
+
+    if(!CheckCollision(plr.Location, entrance))
+        return false; // continue
+
+    plr.ShowWarp = B;
+
+    if(warp.Effect == 3) // Portal
+        canWarp = true;
+    else if(direction == 1 && plr.Controls.Up) // Pipe
+    {
+        if(WarpCollision(plr.Location, entrance, direction))
+            canWarp = true;
+    }
+    else if(direction == 2 && plr.Controls.Left)
+    {
+        if(WarpCollision(plr.Location, entrance, direction))
+            canWarp = true;
+    }
+    else if(direction == 3 && plr.Controls.Down)
+    {
+        if(WarpCollision(plr.Location, entrance, direction))
+            canWarp = true;
+    }
+    else if(direction == 4 && plr.Controls.Right)
+    {
+        if(WarpCollision(plr.Location, entrance, direction))
+            canWarp = true;
+    }
+    // NOTE: Would be correct to move this up, but leave this here for a compatibility to keep the same behavior
+    else if(warp.Effect == 0) // Instant
+        canWarp = true;
+
+    if(warp.LevelEnt)
+        canWarp = false;
+
+    if(warp.Stars > numStars && canWarp)
+    {
+        if(warp.StarsMsg.empty())
+        {
+            if(warp.Stars == 1)
+                MessageText = "You need 1 star to enter.";
+            else
+                MessageText = fmt::format_ne("You need {0} stars to enter.", warp.Stars);
+        } else {
+            MessageText = warp.StarsMsg;
+        }
+        PauseGame(A);
+        MessageText.clear();
+        canWarp = false;
+    }
+
+    if(canWarp)
+    {
+        plr.Slide = false;
+
+        if(warp.Effect != 3)
+            plr.Stoned = false;
+
+        if(warp.Locked)
+        {
+            if(plr.HoldingNPC > 0 && NPC[plr.HoldingNPC].Type == 31)
+            {
+                NPC[plr.HoldingNPC].Killed = 9;
+                NewEffect(10, NPC[plr.HoldingNPC].Location);
+                warp.Locked = false;
+                int allBGOs = numBackground + numLocked;
+                for(int C = numBackground; C <= allBGOs; C++)
+                {
+                    if(Background[C].Type == 98)
+                    {
+                        if(CheckCollision(entrance, Background[C].Location))
+                        {
+                            Background[C].Layer.clear();
+                            Background[C].Hidden = true;
+                        }
+                    }
+                }
+            }
+            else if(plr.Mount == 3 && plr.YoshiNPC > 0 && NPC[plr.YoshiNPC].Type == 31)
+            {
+                NPC[plr.YoshiNPC].Killed = 9;
+                plr.YoshiNPC = 0;
+
+                warp.Locked = false;
+
+                int allBGOs = numBackground + numLocked;
+
+                for(int C = numBackground; C <= allBGOs; C++)
+                {
+                    if(Background[C].Type == 98)
+                    {
+                        if(CheckCollision(entrance, Background[C].Location))
+                        {
+                            Background[C].Layer.clear();
+                            Background[C].Hidden = true;
+                        }
+                    }
+                }
+            }
+            else if(plr.HasKey)
+            {
+                plr.HasKey = false;
+                warp.Locked = false;
+                int allBGOs = numBackground + numLocked;
+                for(int C = numBackground; C <= allBGOs; C++)
+                {
+                    if(Background[C].Type == 98)
+                    {
+                        if(CheckCollision(entrance, Background[C].Location))
+                        {
+                            Background[C].Layer.clear();
+                            Background[C].Hidden = true;
+                        }
+                    }
+                }
+            }
+            else
+                canWarp = false;
+        }
+    }
+
+    if(canWarp)
+    {
+        UnDuck(A);
+        plr.YoshiTongueLength = 0;
+        plr.MountSpecial = 0;
+        plr.FrameCount = 0;
+        plr.TailCount = 0;
+        plr.CanFly = false;
+        plr.CanFly2 = false;
+        plr.RunCount = 0;
+
+        if(warp.NoYoshi && plr.YoshiPlayer > 0)
+        {
+            YoshiSpit(A);
+        }
+
+        if(!warp.WarpNPC || (plr.Mount == 3 && (plr.YoshiNPC != 0 || plr.YoshiPlayer != 0) && warp.NoYoshi))
+        {
+            if(plr.HoldingNPC > 0)
+            {
+                if(NPC[plr.HoldingNPC].Type == 29)
+                {
+                    NPCHit(plr.HoldingNPC, 3, plr.HoldingNPC);
+                }
+            }
+            if(plr.Character == 3 ||
+              (plr.Character == 4 && warp.Effect == 1 && direction == 1))
+                NPC[plr.HoldingNPC].Location.Y = entrance.Y;
+            plr.HoldingNPC = 0;
+            if(plr.YoshiNPC > 0)
+            {
+                YoshiSpit(A);
+            }
+        }
+
+        if(plr.HoldingNPC > 0)
+        {
+            if(NPC[plr.HoldingNPC].Type == 263) // can't bring ice through warps
+            {
+                NPC[plr.HoldingNPC].HoldingPlayer = 0;
+                plr.HoldingNPC = 0;
+            }
+        }
+
+        plr.StandingOnNPC = 0;
+        if(warp.Effect != 3) // Don't zero speed when passing a portal warp
+        {
+            plr.Location.SpeedX = 0;
+            plr.Location.SpeedY = 0;
+        }
+
+        if(!warp.eventEnter.empty())
+            ProcEvent(warp.eventEnter);
+
+        if(warp.Effect == 0 || warp.Effect == 3) // Instant / Portal
+        {
+            plr.Location.X = exit.X + exit.Width / 2.0 - plr.Location.Width / 2.0;
+            plr.Location.Y = exit.Y + exit.Height - plr.Location.Height - 0.1;
+            CheckSection(A);
+            plr.WarpCD = (warp.Effect == 3) ? 10 : 50;
+            return true; // break
+        }
+        else if(warp.Effect == 1) // Pipe
+        {
+            PlaySound(SFX_Warp);
+            plr.Effect = 3;
+            plr.Warp = B;
+            plr.WarpBackward = backward;
+//                        if(nPlay.Online == true && A == nPlay.MySlot + 1)
+//                            Netplay::sendData Netplay::PutPlayerLoc(nPlay.MySlot) + "1j" + std::to_string(A) + "|" + plr.Warp + LB;
+        }
+        else if(warp.Effect == 2) // Door
+        {
+            PlaySound(SFX_Door);
+            plr.Effect = 7;
+            plr.Warp = B;
+            plr.WarpBackward = backward;
+//                        if(nPlay.Online == true && A == nPlay.MySlot + 1)
+//                            Netplay::sendData Netplay::PutPlayerLoc(nPlay.MySlot) + "1j" + std::to_string(A) + "|" + plr.Warp + LB;
+            plr.Location.X = entrance.X + entrance.Width / 2.0 - plr.Location.Width / 2.0;
+            plr.Location.Y = entrance.Y + entrance.Height - plr.Location.Height;
+
+            for(int C = 1; C <= numBackground; C++)
+            {
+                if((CheckCollision(entrance, Background[C].Location) | CheckCollision(exit, Background[C].Location)) != 0)
+                {
+                    if(Background[C].Type == 88)
+                        NewEffect(54, Background[C].Location);
+                    else if(Background[C].Type == 87)
+                        NewEffect(55, Background[C].Location);
+                    else if(Background[C].Type == 107)
+                        NewEffect(59, Background[C].Location);
+                    else if(Background[C].Type == 141)
+                    {
+                        Location_t bLoc = Background[C].Location;
+                        bLoc.X = bLoc.X + bLoc.Width / 2.0;
+                        bLoc.Width = 104;
+                        bLoc.X = bLoc.X - bLoc.Width / 2.0;
+                        NewEffect(103, bLoc);
+                    }
+                }
+            }
+        }
+    }
+
+    return false; // continue
+}
+
+void SuperWarp(int A)
+{
     auto &plr = Player[A];
 
     if(plr.WarpCD <= 0 && plr.Mount != 2 && !plr.GroundPound && !plr.GroundPound2)
@@ -3933,224 +4168,17 @@ void SuperWarp(int A)
         for(int B = 1; B <= numWarps; B++)
         {
             auto &warp = Warp[B];
-            if(CheckCollision(plr.Location, warp.Entrance) && !warp.Hidden)
+
+            if(warp.Hidden)
+                continue;
+
+            if(checkWarp(warp, B, plr, A, false))
+                break;
+
+            if(warp.twoWay) // Check the same warp again if two-way
             {
-                plr.ShowWarp = B;
-                canWarp = false;
-
-                if(warp.Effect == 3) // Portal
-                    canWarp = true;
-                else if(warp.Direction == 1 && plr.Controls.Up) // Pipe
-                {
-                    if(WarpCollision(plr.Location, B))
-                        canWarp = true;
-                }
-                else if(warp.Direction == 2 && plr.Controls.Left)
-                {
-                    if(WarpCollision(plr.Location, B))
-                        canWarp = true;
-                }
-                else if(warp.Direction == 3 && plr.Controls.Down)
-                {
-                    if(WarpCollision(plr.Location, B))
-                        canWarp = true;
-                }
-                else if(warp.Direction == 4 && plr.Controls.Right)
-                {
-                    if(WarpCollision(plr.Location, B))
-                        canWarp = true;
-                }
-                // NOTE: Would be correct to move this up, but leave this here for a compatibility to keep the same behavior
-                else if(warp.Effect == 0) // Instant
-                    canWarp = true;
-
-                if(warp.LevelEnt)
-                    canWarp = false;
-
-                if(warp.Stars > numStars && canWarp)
-                {
-                    if(warp.StarsMsg.empty())
-                    {
-                        if(warp.Stars == 1)
-                            MessageText = "You need 1 star to enter.";
-                        else
-                            MessageText = fmt::format_ne("You need {0} stars to enter.", warp.Stars);
-                    } else {
-                        MessageText = warp.StarsMsg;
-                    }
-                    PauseGame(A);
-                    MessageText = "";
-                    canWarp = false;
-                }
-
-                if(canWarp)
-                {
-                    plr.Slide = false;
-
-                    if(warp.Effect != 3)
-                        plr.Stoned = false;
-
-                    if(warp.Locked)
-                    {
-                        if(plr.HoldingNPC > 0 && NPC[plr.HoldingNPC].Type == 31)
-                        {
-                            NPC[plr.HoldingNPC].Killed = 9;
-                            NewEffect(10, NPC[plr.HoldingNPC].Location);
-                            warp.Locked = false;
-                            int allBGOs = numBackground + numLocked;
-                            for(int C = numBackground; C <= allBGOs; C++)
-                            {
-                                if(Background[C].Type == 98)
-                                {
-                                    if(CheckCollision(warp.Entrance, Background[C].Location))
-                                    {
-                                        Background[C].Layer.clear();
-                                        Background[C].Hidden = true;
-                                    }
-                                }
-                            }
-                        }
-                        else if(plr.Mount == 3 && plr.YoshiNPC > 0 && NPC[plr.YoshiNPC].Type == 31)
-                        {
-                            NPC[plr.YoshiNPC].Killed = 9;
-                            plr.YoshiNPC = 0;
-                            warp.Locked = false;
-                            int allBGOs = numBackground + numLocked;
-                            for(int C = numBackground; C <= allBGOs; C++)
-                            {
-                                if(Background[C].Type == 98)
-                                {
-                                    if(CheckCollision(warp.Entrance, Background[C].Location))
-                                    {
-                                        Background[C].Layer.clear();
-                                        Background[C].Hidden = true;
-                                    }
-                                }
-                            }
-                        }
-                        else if(plr.HasKey)
-                        {
-                            plr.HasKey = false;
-                            warp.Locked = false;
-                            int allBGOs = numBackground + numLocked;
-                            for(int C = numBackground; C <= allBGOs; C++)
-                            {
-                                if(Background[C].Type == 98)
-                                {
-                                    if(CheckCollision(warp.Entrance, Background[C].Location))
-                                    {
-                                        Background[C].Layer.clear();
-                                        Background[C].Hidden = true;
-                                    }
-                                }
-                            }
-                        }
-                        else
-                            canWarp = false;
-                    }
-                }
-
-                if(canWarp)
-                {
-                    UnDuck(A);
-                    plr.YoshiTongueLength = 0;
-                    plr.MountSpecial = 0;
-                    plr.FrameCount = 0;
-                    plr.TailCount = 0;
-                    plr.CanFly = false;
-                    plr.CanFly2 = false;
-                    plr.RunCount = 0;
-
-                    if(warp.NoYoshi && plr.YoshiPlayer > 0)
-                    {
-                        YoshiSpit(A);
-                    }
-
-                    if(!warp.WarpNPC || (plr.Mount == 3 && (plr.YoshiNPC != 0 || plr.YoshiPlayer != 0) && warp.NoYoshi))
-                    {
-                        if(plr.HoldingNPC > 0)
-                        {
-                            if(NPC[plr.HoldingNPC].Type == 29)
-                            {
-                                NPCHit(plr.HoldingNPC, 3, plr.HoldingNPC);
-                            }
-                        }
-                        if(plr.Character == 3 ||
-                          (plr.Character == 4 && warp.Effect == 1 && warp.Direction == 1))
-                            NPC[plr.HoldingNPC].Location.Y = warp.Entrance.Y;
-                        plr.HoldingNPC = 0;
-                        if(plr.YoshiNPC > 0)
-                        {
-                            YoshiSpit(A);
-                        }
-                    }
-
-                    if(plr.HoldingNPC > 0)
-                    {
-                        if(NPC[plr.HoldingNPC].Type == 263) // can't bring ice through warps
-                        {
-                            NPC[plr.HoldingNPC].HoldingPlayer = 0;
-                            plr.HoldingNPC = 0;
-                        }
-                    }
-
-                    plr.StandingOnNPC = 0;
-                    if(warp.Effect != 3) // Don't zero speed when passing a portal warp
-                    {
-                        plr.Location.SpeedX = 0;
-                        plr.Location.SpeedY = 0;
-                    }
-
-                    if(!warp.eventEnter.empty())
-                        ProcEvent(warp.eventEnter);
-
-                    if(warp.Effect == 0 || warp.Effect == 3)
-                    {
-                        plr.Location.X = warp.Exit.X + warp.Exit.Width / 2.0 - plr.Location.Width / 2.0;
-                        plr.Location.Y = warp.Exit.Y + warp.Exit.Height - plr.Location.Height - 0.1;
-                        CheckSection(A);
-                        plr.WarpCD = (warp.Effect == 3) ? 10 : 50;
-                        break;
-                    }
-                    else if(warp.Effect == 1)
-                    {
-                        PlaySound(SFX_Warp);
-                        plr.Effect = 3;
-                        plr.Warp = B;
-//                        if(nPlay.Online == true && A == nPlay.MySlot + 1)
-//                            Netplay::sendData Netplay::PutPlayerLoc(nPlay.MySlot) + "1j" + std::to_string(A) + "|" + plr.Warp + LB;
-                    }
-                    else if(warp.Effect == 2)
-                    {
-                        PlaySound(SFX_Door);
-                        plr.Effect = 7;
-                        plr.Warp = B;
-//                        if(nPlay.Online == true && A == nPlay.MySlot + 1)
-//                            Netplay::sendData Netplay::PutPlayerLoc(nPlay.MySlot) + "1j" + std::to_string(A) + "|" + plr.Warp + LB;
-                        plr.Location.X = Warp[plr.Warp].Entrance.X + Warp[plr.Warp].Entrance.Width / 2.0 - plr.Location.Width / 2.0;
-                        plr.Location.Y = Warp[plr.Warp].Entrance.Y + Warp[plr.Warp].Entrance.Height - plr.Location.Height;
-                        for(int C = 1; C <= numBackground; C++)
-                        {
-                            if((CheckCollision(warp.Entrance, Background[C].Location) | CheckCollision(warp.Exit, Background[C].Location)) != 0)
-                            {
-                                if(Background[C].Type == 88)
-                                    NewEffect(54, Background[C].Location);
-                                else if(Background[C].Type == 87)
-                                    NewEffect(55, Background[C].Location);
-                                else if(Background[C].Type == 107)
-                                    NewEffect(59, Background[C].Location);
-                                else if(Background[C].Type == 141)
-                                {
-                                    Location_t bLoc = Background[C].Location;
-                                    bLoc.X = bLoc.X + bLoc.Width / 2.0;
-                                    bLoc.Width = 104;
-                                    bLoc.X = bLoc.X - bLoc.Width / 2.0;
-                                    NewEffect(103, bLoc);
-                                }
-                            }
-                        }
-                    }
-                }
+                if(checkWarp(warp, B, plr, A, true))
+                    break;
             }
         }
     }
@@ -5226,13 +5254,21 @@ void PlayerEffects(int A)
         Player[A].SpinJump = false;
         Player[A].TailCount = 0;
         Player[A].Location.SpeedY = 0;
-        if(Player[A].Effect2 == 0.0)
+
+        bool backward = Player[A].WarpBackward;
+        auto &warp = Warp[Player[A].Warp];
+        auto &warp_enter = backward ? warp.Exit : warp.Entrance;
+        auto &warp_exit = backward ? warp.Entrance : warp.Exit;
+        auto &warp_dir_enter = backward ? warp.Direction2 : warp.Direction;
+        auto &warp_dir_exit = backward ? warp.Direction : warp.Direction2;
+
+        if(Player[A].Effect2 == 0.0) // Entering pipe
         {
-            if(Warp[Player[A].Warp].Direction == 3)
+            if(warp_dir_enter == 3)
             {
                 Player[A].Location.Y = Player[A].Location.Y + 1;
-                Player[A].Location.X = Warp[Player[A].Warp].Entrance.X + Warp[Player[A].Warp].Entrance.Width / 2.0 - Player[A].Location.Width / 2.0;
-                if(Player[A].Location.Y > Warp[Player[A].Warp].Entrance.Y + Warp[Player[A].Warp].Entrance.Height + 8)
+                Player[A].Location.X = warp_enter.X + warp_enter.Width / 2.0 - Player[A].Location.Width / 2.0;
+                if(Player[A].Location.Y > warp_enter.Y + warp_enter.Height + 8)
                     Player[A].Effect2 = 1;
                 if(Player[A].Mount == 0)
                     Player[A].Frame = 15;
@@ -5242,11 +5278,11 @@ void PlayerEffects(int A)
                     NPC[Player[A].HoldingNPC].Location.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - NPC[Player[A].HoldingNPC].Location.Width / 2.0;
                 }
             }
-            else if(Warp[Player[A].Warp].Direction == 1)
+            else if(warp_dir_enter == 1)
             {
                 Player[A].Location.Y = Player[A].Location.Y - 1;
-                Player[A].Location.X = Warp[Player[A].Warp].Entrance.X + Warp[Player[A].Warp].Entrance.Width / 2.0 - Player[A].Location.Width / 2.0;
-                if(Player[A].Location.Y + Player[A].Location.Height + 8 < Warp[Player[A].Warp].Entrance.Y)
+                Player[A].Location.X = warp_enter.X + warp_enter.Width / 2.0 - Player[A].Location.Width / 2.0;
+                if(Player[A].Location.Y + Player[A].Location.Height + 8 < warp_enter.Y)
                     Player[A].Effect2 = 1;
                 if(Player[A].HoldingNPC > 0)
                 {
@@ -5256,7 +5292,7 @@ void PlayerEffects(int A)
                 if(Player[A].Mount == 0)
                     Player[A].Frame = 15;
             }
-            else if(Warp[Player[A].Warp].Direction == 2)
+            else if(warp_dir_enter == 2)
             {
                 if(Player[A].Mount == 3)
                 {
@@ -5264,9 +5300,9 @@ void PlayerEffects(int A)
                     Player[A].Location.Height = 30;
                 }
                 Player[A].Direction = -1;
-                Player[A].Location.Y = Warp[Player[A].Warp].Entrance.Y + Warp[Player[A].Warp].Entrance.Height - Player[A].Location.Height - 2;
+                Player[A].Location.Y = warp_enter.Y + warp_enter.Height - Player[A].Location.Height - 2;
                 Player[A].Location.X = Player[A].Location.X - 0.5;
-                if(Player[A].Location.X + Player[A].Location.Width + 8 < Warp[Player[A].Warp].Entrance.X)
+                if(Player[A].Location.X + Player[A].Location.Width + 8 < warp_enter.X)
                     Player[A].Effect2 = 1;
                 if(Player[A].HoldingNPC > 0)
                 {
@@ -5280,7 +5316,7 @@ void PlayerEffects(int A)
                 PlayerFrame(A);
                 Player[A].Location.SpeedX = 0;
             }
-            else if(Warp[Player[A].Warp].Direction == 4)
+            else if(warp_dir_enter == 4)
             {
                 if(Player[A].Mount == 3)
                 {
@@ -5288,9 +5324,9 @@ void PlayerEffects(int A)
                     Player[A].Location.Height = 30;
                 }
                 Player[A].Direction = 1;
-                Player[A].Location.Y = Warp[Player[A].Warp].Entrance.Y + Warp[Player[A].Warp].Entrance.Height - Player[A].Location.Height - 2;
+                Player[A].Location.Y = warp_enter.Y + warp_enter.Height - Player[A].Location.Height - 2;
                 Player[A].Location.X = Player[A].Location.X + 0.5;
-                if(Player[A].Location.X > Warp[Player[A].Warp].Entrance.X + Warp[Player[A].Warp].Entrance.Width + 8)
+                if(Player[A].Location.X > warp_enter.X + warp_enter.Width + 8)
                     Player[A].Effect2 = 1;
                 if(Player[A].HoldingNPC > 0)
                 {
@@ -5305,9 +5341,9 @@ void PlayerEffects(int A)
                 Player[A].Location.SpeedX = 0;
             }
         }
-        else if(fEqual(Player[A].Effect2, 1))
+        else if(fEqual(Player[A].Effect2, 1))  // Exiting pipe
         {
-            if(Warp[Player[A].Warp].NoYoshi)
+            if(warp.NoYoshi)
             {
                 if(OwedMount[A] == 0 && Player[A].Mount > 0 && Player[A].Mount != 2)
                 {
@@ -5321,10 +5357,10 @@ void PlayerEffects(int A)
                 SizeCheck(A);
             }
 
-            if(Warp[Player[A].Warp].Direction2 == 1)
+            if(warp_dir_exit == 1)
             {
-                Player[A].Location.X = Warp[Player[A].Warp].Exit.X + Warp[Player[A].Warp].Exit.Width / 2.0 - Player[A].Location.Width / 2.0;
-                Player[A].Location.Y = Warp[Player[A].Warp].Exit.Y - Player[A].Location.Height - 8;
+                Player[A].Location.X = warp_exit.X + warp_exit.Width / 2.0 - Player[A].Location.Width / 2.0;
+                Player[A].Location.Y = warp_exit.Y - Player[A].Location.Height - 8;
                 if(Player[A].Mount == 0)
                     Player[A].Frame = 15;
                 if(Player[A].HoldingNPC > 0)
@@ -5333,10 +5369,10 @@ void PlayerEffects(int A)
                     NPC[Player[A].HoldingNPC].Location.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - NPC[Player[A].HoldingNPC].Location.Width / 2.0;
                 }
             }
-            else if(Warp[Player[A].Warp].Direction2 == 3)
+            else if(warp_dir_exit == 3)
             {
-                Player[A].Location.X = Warp[Player[A].Warp].Exit.X + Warp[Player[A].Warp].Exit.Width / 2.0 - Player[A].Location.Width / 2.0;
-                Player[A].Location.Y = Warp[Player[A].Warp].Exit.Y + Warp[Player[A].Warp].Exit.Height + 8;
+                Player[A].Location.X = warp_exit.X + warp_exit.Width / 2.0 - Player[A].Location.Width / 2.0;
+                Player[A].Location.Y = warp_exit.Y + warp_exit.Height + 8;
                 if(Player[A].Mount == 0)
                     Player[A].Frame = 15;
                 if(Player[A].HoldingNPC > 0)
@@ -5345,15 +5381,15 @@ void PlayerEffects(int A)
                     NPC[Player[A].HoldingNPC].Location.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - NPC[Player[A].HoldingNPC].Location.Width / 2.0;
                 }
             }
-            else if(Warp[Player[A].Warp].Direction2 == 2)
+            else if(warp_dir_exit == 2)
             {
                 if(Player[A].Mount == 3)
                 {
                     Player[A].Duck = true;
                     Player[A].Location.Height = 30;
                 }
-                Player[A].Location.X = Warp[Player[A].Warp].Exit.X - Player[A].Location.Width - 8;
-                Player[A].Location.Y = Warp[Player[A].Warp].Exit.Y + Warp[Player[A].Warp].Exit.Height - Player[A].Location.Height - 2;
+                Player[A].Location.X = warp_exit.X - Player[A].Location.Width - 8;
+                Player[A].Location.Y = warp_exit.Y + warp_exit.Height - Player[A].Location.Height - 2;
                 if(Player[A].Mount == 0)
                     Player[A].Frame = 1;
                 Player[A].Direction = 1;
@@ -5371,15 +5407,15 @@ void PlayerEffects(int A)
                         NPC[Player[A].HoldingNPC].Location.X = Player[A].Location.X + Player[A].Location.Width - Physics.PlayerGrabSpotX[Player[A].Character][Player[A].State] - NPC[Player[A].HoldingNPC].Location.Width;
                 }
             }
-            else if(Warp[Player[A].Warp].Direction2 == 4)
+            else if(warp_dir_exit == 4)
             {
                 if(Player[A].Mount == 3)
                 {
                     Player[A].Duck = true;
                     Player[A].Location.Height = 30;
                 }
-                Player[A].Location.X = Warp[Player[A].Warp].Exit.X + Warp[Player[A].Warp].Exit.Width + 8;
-                Player[A].Location.Y = Warp[Player[A].Warp].Exit.Y + Warp[Player[A].Warp].Exit.Height - Player[A].Location.Height - 2;
+                Player[A].Location.X = warp_exit.X + warp_exit.Width + 8;
+                Player[A].Location.Y = warp_exit.Y + warp_exit.Height - Player[A].Location.Height - 2;
                 if(Player[A].Mount == 0)
                     Player[A].Frame = 1;
                 Player[A].Direction = -1;
@@ -5401,7 +5437,7 @@ void PlayerEffects(int A)
             Player[A].Effect2 = 100;
             if(Player[A].Duck)
             {
-                if(Warp[Player[A].Warp].Direction2 == 1 || Warp[Player[A].Warp].Direction2 == 3)
+                if(warp_dir_exit == 1 || warp_dir_exit == 3)
                 {
                     UnDuck(A);
                 }
@@ -5419,7 +5455,7 @@ void PlayerEffects(int A)
                 {
                     if(B != A)
                     {
-                        if(Warp[Player[A].Warp].Direction2 != 3)
+                        if(warp_dir_exit != 3)
                             Player[B].Location.Y = Player[A].Location.Y + Player[A].Location.Height - Player[B].Location.Height;
                         else
                             Player[B].Location.Y = Player[A].Location.Y;
@@ -5436,18 +5472,18 @@ void PlayerEffects(int A)
                 }
             }
 
-            if(!Warp[Player[A].Warp].level.empty())
+            if(!warp.level.empty())
             {
-                GoToLevel = Warp[Player[A].Warp].level;
-                GoToLevelNoGameThing = Warp[Player[A].Warp].noEntranceScene;
+                GoToLevel = warp.level;
+                GoToLevelNoGameThing = warp.noEntranceScene;
                 Player[A].Effect = 8;
                 Player[A].Effect2 = 2970;
                 ReturnWarp = Player[A].Warp;
                 if(IsEpisodeIntro && NoMap)
                     ReturnWarpSaved = ReturnWarp;
-                StartWarp = Warp[Player[A].Warp].LevelWarp;
+                StartWarp = warp.LevelWarp;
             }
-            else if(Warp[Player[A].Warp].MapWarp == true)
+            else if(warp.MapWarp)
             {
                 Player[A].Effect = 8;
                 Player[A].Effect2 = 2970;
@@ -5455,7 +5491,8 @@ void PlayerEffects(int A)
         }
         else if(Player[A].Effect2 >= 100)
         {
-            Player[A].Effect2 = Player[A].Effect2 + 1;
+            Player[A].Effect2 += 1;
+
             if(Player[A].Effect2 >= 110)
             {
                 Player[A].Effect2 = 2;
@@ -5464,38 +5501,46 @@ void PlayerEffects(int A)
         }
         else if(fEqual(Player[A].Effect2, 2))
         {
-            if(Warp[Player[A].Warp].Direction2 == 1)
+            if(warp_dir_exit == 1)
             {
                 Player[A].Location.Y = Player[A].Location.Y + 1;
-                if(Player[A].Location.Y >= Warp[Player[A].Warp].Exit.Y)
+
+                if(Player[A].Location.Y >= warp_exit.Y)
                     Player[A].Effect2 = 3;
+
                 if(Player[A].HoldingNPC > 0)
                 {
                     NPC[Player[A].HoldingNPC].Location.Y = Player[A].Location.Y + Physics.PlayerGrabSpotY[Player[A].Character][Player[A].State] + 32 - NPC[Player[A].HoldingNPC].Location.Height;
                     NPC[Player[A].HoldingNPC].Location.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - NPC[Player[A].HoldingNPC].Location.Width / 2.0;
                 }
+
                 if(Player[A].Mount == 0)
                     Player[A].Frame = 15;
             }
-            else if(Warp[Player[A].Warp].Direction2 == 3)
+            else if(warp_dir_exit == 3)
             {
                 Player[A].Location.Y = Player[A].Location.Y - 1;
-                if(Player[A].Location.Y + Player[A].Location.Height <= Warp[Player[A].Warp].Exit.Y + Warp[Player[A].Warp].Exit.Height)
+
+                if(Player[A].Location.Y + Player[A].Location.Height <= warp_exit.Y + warp_exit.Height)
                     Player[A].Effect2 = 3;
+
                 if(Player[A].HoldingNPC > 0)
                 {
                     NPC[Player[A].HoldingNPC].Location.Y = Player[A].Location.Y + Physics.PlayerGrabSpotY[Player[A].Character][Player[A].State] + 32 - NPC[Player[A].HoldingNPC].Location.Height;
                     NPC[Player[A].HoldingNPC].Location.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - NPC[Player[A].HoldingNPC].Location.Width / 2.0;
                 }
+
                 if(Player[A].Mount == 0)
                     Player[A].Frame = 15;
             }
-            else if(Warp[Player[A].Warp].Direction2 == 4)
+            else if(warp_dir_exit == 4)
             {
                 Player[A].Location.X = Player[A].Location.X - 0.5;
                 Player[A].Direction = -1;
-                if(Player[A].Location.X + Player[A].Location.Width <= Warp[Player[A].Warp].Exit.X + Warp[Player[A].Warp].Exit.Width)
+
+                if(Player[A].Location.X + Player[A].Location.Width <= warp_exit.X + warp_exit.Width)
                     Player[A].Effect2 = 3;
+
                 if(Player[A].HoldingNPC > 0)
                 {
                     if(Player[A].Character >= 3) // peach/toad leaving a pipe
@@ -5503,6 +5548,7 @@ void PlayerEffects(int A)
                         Player[A].Location.SpeedX = 1;
                         PlayerFrame(A);
                         NPC[Player[A].HoldingNPC].Location.Y = Player[A].Location.Y + Physics.PlayerGrabSpotY[Player[A].Character][Player[A].State] + 32 - NPC[Player[A].HoldingNPC].Location.Height;
+
                         if(Player[A].Direction < 0)
                             NPC[Player[A].HoldingNPC].Location.X = Player[A].Location.X + Physics.PlayerGrabSpotX[Player[A].Character][Player[A].State];
                         else
@@ -5511,11 +5557,14 @@ void PlayerEffects(int A)
                     else
                     {
                         Player[A].Direction = 1;
+
                         if(Player[A].State == 1)
                             Player[A].Frame = 5;
                         else
                             Player[A].Frame = 8;
+
                         NPC[Player[A].HoldingNPC].Location.Y = Player[A].Location.Y + Physics.PlayerGrabSpotY[Player[A].Character][Player[A].State] + 32 - NPC[Player[A].HoldingNPC].Location.Height;
+
                         if(Player[A].Direction > 0)
                             NPC[Player[A].HoldingNPC].Location.X = Player[A].Location.X + Physics.PlayerGrabSpotX[Player[A].Character][Player[A].State];
                         else
@@ -5529,12 +5578,14 @@ void PlayerEffects(int A)
                     Player[A].Location.SpeedX = 0;
                 }
             }
-            else if(Warp[Player[A].Warp].Direction2 == 2)
+            else if(warp_dir_exit == 2)
             {
                 Player[A].Location.X = Player[A].Location.X + 0.5;
                 Player[A].Direction = 1;
-                if(Player[A].Location.X >= Warp[Player[A].Warp].Exit.X)
+
+                if(Player[A].Location.X >= warp_exit.X)
                     Player[A].Effect2 = 3;
+
                 if(Player[A].HoldingNPC > 0)
                 {
                     if(Player[A].Character >= 3) // peach/toad leaving a pipe
@@ -5542,6 +5593,7 @@ void PlayerEffects(int A)
                         Player[A].Location.SpeedX = 1;
                         PlayerFrame(A);
                         NPC[Player[A].HoldingNPC].Location.Y = Player[A].Location.Y + Physics.PlayerGrabSpotY[Player[A].Character][Player[A].State] + 32 - NPC[Player[A].HoldingNPC].Location.Height;
+
                         if(Player[A].Direction < 0)
                             NPC[Player[A].HoldingNPC].Location.X = Player[A].Location.X + Physics.PlayerGrabSpotX[Player[A].Character][Player[A].State];
                         else
@@ -5550,11 +5602,14 @@ void PlayerEffects(int A)
                     else
                     {
                         Player[A].Direction = -1;
+
                         if(Player[A].State == 1)
                             Player[A].Frame = 5;
                         else
                             Player[A].Frame = 8;
+
                         NPC[Player[A].HoldingNPC].Location.Y = Player[A].Location.Y + Physics.PlayerGrabSpotY[Player[A].Character][Player[A].State] + 32 - NPC[Player[A].HoldingNPC].Location.Height;
+
                         if(Player[A].Direction > 0)
                             NPC[Player[A].HoldingNPC].Location.X = Player[A].Location.X + Physics.PlayerGrabSpotX[Player[A].Character][Player[A].State];
                         else
@@ -5573,21 +5628,25 @@ void PlayerEffects(int A)
         {
             if(Player[A].HoldingNPC > 0)
             {
-                if(Warp[Player[A].Warp].Direction2 == 2 || Warp[Player[A].Warp].Direction2 == 4)
+                if(warp_dir_exit == 2 || warp_dir_exit == 4)
                 {
-                    if(Warp[Player[A].Warp].Direction2 == 2)
+                    if(warp_dir_exit == 2)
                         Player[A].Direction = 1;
-                    else if(Warp[Player[A].Warp].Direction2 == 4)
+                    else if(warp_dir_exit == 4)
                         Player[A].Direction = -1;
+
                     if(Player[A].State == 1)
                         Player[A].Frame = 5;
                     else
                         Player[A].Frame = 8;
-                    if(Player[A].Controls.Run == false)
+
+                    if(!Player[A].Controls.Run)
                         Player[A].Controls.Run = true;
+
                     PlayerGrabCode(A);
                 }
             }
+
             Player[A].Effect = 0;
             Player[A].Effect2 = 0;
             Player[A].WarpCD = 20;
@@ -5596,18 +5655,21 @@ void PlayerEffects(int A)
             Player[A].CanAltJump = false;
             Player[A].Location.SpeedX = 0;
             Player[A].Bumped2 = 0;
+
             if(Player[A].HoldingNPC > 0)
                 NPC[Player[A].HoldingNPC].Effect = 0;
+
             if(numPlayers > 2 /*&& nPlay.Online == false*/)
             {
                 for(B = 1; B <= numPlayers; B++)
                 {
                     if(B != A)
                     {
-                        if(Warp[Player[A].Warp].Direction2 != 1)
+                        if(warp_dir_exit != 1)
                             Player[B].Location.Y = Player[A].Location.Y + Player[A].Location.Height - Player[B].Location.Height;
                         else
                             Player[B].Location.Y = Player[A].Location.Y;
+
                         Player[B].Location.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - Player[B].Location.Width / 2.0;
                         Player[B].Location.SpeedY = dRand() * 24 - 12;
                         Player[B].Effect = 0;
@@ -5620,56 +5682,72 @@ void PlayerEffects(int A)
     }
     else if(Player[A].Effect == 7) // Door effect
     {
+        bool backward = Player[A].WarpBackward;
+        auto &warp = Warp[Player[A].Warp];
+        auto &warp_exit = backward ? warp.Entrance : warp.Exit;
+
         if(Player[A].HoldingNPC > 0)
         {
             NPC[Player[A].HoldingNPC].Location.Y = Player[A].Location.Y + Physics.PlayerGrabSpotY[Player[A].Character][Player[A].State] + 32 - NPC[Player[A].HoldingNPC].Location.Height;
             NPC[Player[A].HoldingNPC].Location.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - NPC[Player[A].HoldingNPC].Location.Width / 2.0;
         }
+
         Player[A].Effect2 = Player[A].Effect2 + 1;
+
         if(Player[A].Mount == 0 && Player[A].Character != 5)
             Player[A].Frame = 13;
+
         if(Player[A].Character == 5)
             Player[A].Frame = 1;
+
         if(Player[A].Effect2 >= 30)
         {
-            if(Warp[Player[A].Warp].NoYoshi == true)
+            if(warp.NoYoshi)
             {
                 if(OwedMount[A] == 0 && Player[A].Mount > 0 && Player[A].Mount != 2)
                 {
                     OwedMount[A] = Player[A].Mount;
                     OwedMountType[A] = Player[A].MountType;
                 }
+
                 Player[A].Mount = 0;
                 Player[A].MountType = 0;
                 SizeCheck(A);
                 Player[A].MountOffsetY = 0;
                 Player[A].Frame = 1;
             }
-            Player[A].Location.X = Warp[Player[A].Warp].Exit.X + Warp[Player[A].Warp].Exit.Width / 2.0 - Player[A].Location.Width / 2.0;
-            Player[A].Location.Y = Warp[Player[A].Warp].Exit.Y + Warp[Player[A].Warp].Exit.Height - Player[A].Location.Height;
+
+            Player[A].Location.X = warp_exit.X + warp_exit.Width / 2.0 - Player[A].Location.Width / 2.0;
+            Player[A].Location.Y = warp_exit.Y + warp_exit.Height - Player[A].Location.Height;
+
             CheckSection(A);
+
             if(Player[A].HoldingNPC > 0)
             {
-                if(Player[A].Controls.Run == false)
+                if(!Player[A].Controls.Run)
                     Player[A].Controls.Run = true;
+
                 PlayerGrabCode(A);
             }
+
             Player[A].Effect = 0;
             Player[A].Effect2 = 0;
             Player[A].WarpCD = 40;
 
-            if(!Warp[Player[A].Warp].level.empty())
+            if(!warp.level.empty())
             {
-                GoToLevel = Warp[Player[A].Warp].level;
-                GoToLevelNoGameThing = Warp[Player[A].Warp].noEntranceScene;
+                GoToLevel = warp.level;
+                GoToLevelNoGameThing = warp.noEntranceScene;
                 Player[A].Effect = 8;
                 Player[A].Effect2 = 3000;
                 ReturnWarp = Player[A].Warp;
+
                 if(IsEpisodeIntro && NoMap)
                     ReturnWarpSaved = ReturnWarp;
-                StartWarp = Warp[Player[A].Warp].LevelWarp;
+
+                StartWarp = warp.LevelWarp;
             }
-            else if(Warp[Player[A].Warp].MapWarp == true)
+            else if(warp.MapWarp)
             {
                 Player[A].Effect = 8;
                 Player[A].Effect2 = 2970;
@@ -5685,12 +5763,14 @@ void PlayerEffects(int A)
                         Player[B].Location.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - Player[B].Location.Width / 2.0;
                         Player[B].Location.SpeedY = dRand() * 24 - 12;
                         CheckSection(B);
+
                         if(Player[B].HoldingNPC > 0)
                         {
                             if(Player[B].Direction > 0)
                                 NPC[Player[B].HoldingNPC].Location.X = Player[B].Location.X + Physics.PlayerGrabSpotX[Player[B].Character][Player[B].State];
                             else
                                 NPC[Player[B].HoldingNPC].Location.X = Player[B].Location.X + Player[B].Location.Width - Physics.PlayerGrabSpotX[Player[B].Character][Player[B].State] - NPC[Player[A].HoldingNPC].Location.Width;
+
                             NPC[Player[A].HoldingNPC].Location.Y = Player[A].Location.Y + Physics.PlayerGrabSpotY[Player[A].Character][Player[A].State] + 32 - NPC[Player[A].HoldingNPC].Location.Height;
                             NPC[Player[B].HoldingNPC].Section = Player[B].Section;
                         }
@@ -5725,9 +5805,11 @@ void PlayerEffects(int A)
                 if(B != A && CheckCollision(Player[A].Location, Player[B].Location))
                     tempBool = true;
             }
-            if(tempBool == false)
+
+            if(!tempBool)
             {
                 Player[A].Effect2 = 130;
+
                 for(C = 1; C <= numBackground; C++)
                 {
                     if(CheckCollision(Warp[Player[A].Warp].Exit, Background[C].Location))
@@ -5740,6 +5822,7 @@ void PlayerEffects(int A)
                             NewEffect(59, Background[C].Location);
                     }
                 }
+
                 SoundPause[46] = 0;
                 PlaySound(SFX_Door);
             }
@@ -5778,7 +5861,8 @@ void PlayerEffects(int A)
         }
         else if(Player[A].Effect2 <= 2000) // Start Wait
         {
-            Player[A].Effect2 = Player[A].Effect2 - 1;
+            Player[A].Effect2 -= 1;
+
             if(fEqual(Player[A].Effect2, 1900))
             {
                 for(C = 1; C <= numBackground; C++)
@@ -5793,10 +5877,12 @@ void PlayerEffects(int A)
                             NewEffect(59, Background[C].Location);
                     }
                 }
+
                 SoundPause[46] = 0;
                 PlaySound(SFX_Door);
                 Player[A].Effect = 8;
                 Player[A].Effect2 = 30;
+
                 if(A == 2)
                 {
                     Player[A].Effect = 8;
@@ -5806,16 +5892,19 @@ void PlayerEffects(int A)
         }
         else if(Player[A].Effect2 <= 3000) // warp wait
         {
-            Player[A].Effect2 = Player[A].Effect2 - 1;
+            Player[A].Effect2 -= 1;
+
             if(fEqual(Player[A].Effect2, 2920))
             {
-                if(Warp[Player[A].Warp].MapWarp == true)
+                if(Warp[Player[A].Warp].MapWarp)
                 {
                     LevelBeatCode = 6;
+
                     if(!(Warp[Player[A].Warp].MapX == -1 && Warp[Player[A].Warp].MapY == -1))
                     {
                         WorldPlayer[1].Location.X = Warp[Player[A].Warp].MapX;
                         WorldPlayer[1].Location.Y = Warp[Player[A].Warp].MapY;
+
                         for(B = 1; B <= numWorldLevels; B++)
                         {
                             if(CheckCollision(WorldPlayer[1].Location, WorldLevel[B].Location) == true)

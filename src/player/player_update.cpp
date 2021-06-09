@@ -3693,6 +3693,7 @@ void UpdatePlayer()
                                             PlaySound(SFX_Door);
                                             Player[A].Effect = 7;
                                             Player[A].Warp = numWarps + 1;
+                                            Player[A].WarpBackward = false;
                                             Warp[numWarps + 1].Entrance = NPC[B].Location;
                                             tempLocation = NPC[B].Location;
                                             tempLocation.X = NPC[B].Location.X - level[Player[A].Section].X + level[NPC[B].Special2].X;

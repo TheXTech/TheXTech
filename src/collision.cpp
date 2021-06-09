@@ -124,49 +124,49 @@ bool NPCStartCollision(const Location_t &Loc1, const Location_t &Loc2)
 }
 
 // Warp point collisions
-bool WarpCollision(const Location_t &Loc1, int A)
+bool WarpCollision(const Location_t &Loc1, const Location_t &entrance, int direction)
 {
-    bool tempWarpCollision = false;
+    bool hasCollision = false;
+
     float X2 = 0;
     float Y2 = 0;
 
-    auto &tempVar = Warp[A];
-    if(tempVar.Direction == 3)
+    if(direction == 3)
     {
         X2 = 0;
         Y2 = 32;
     }
-    else if(tempVar.Direction == 1)
+    else if(direction == 1)
     {
         X2 = 0;
         Y2 = -30;
     }
-    else if(tempVar.Direction == 2)
+    else if(direction == 2)
     {
         X2 = -31;
         Y2 = 32;
     }
-    else if(tempVar.Direction == 4)
+    else if(direction == 4)
     {
         X2 = 31;
         Y2 = 32;
     }
 
-    if(float(Loc1.X) <= float(tempVar.Entrance.X) + float(tempVar.Entrance.Width) + X2)
+    if(float(Loc1.X) <= float(entrance.X) + float(entrance.Width) + X2)
     {
-        if(float(Loc1.X) + float(Loc1.Width) >= float(tempVar.Entrance.X) + X2)
+        if(float(Loc1.X) + float(Loc1.Width) >= float(entrance.X) + X2)
         {
-            if(float(Loc1.Y) <= float(tempVar.Entrance.Y) + float(tempVar.Entrance.Height) + Y2)
+            if(float(Loc1.Y) <= float(entrance.Y) + float(entrance.Height) + Y2)
             {
-                if(float(Loc1.Y) + float(Loc1.Height) >= float(tempVar.Entrance.Y) + Y2)
+                if(float(Loc1.Y) + float(Loc1.Height) >= float(entrance.Y) + Y2)
                 {
-                    tempWarpCollision = true;
+                    hasCollision = true;
                 }
             }
         }
     }
 
-    return tempWarpCollision;
+    return hasCollision;
 }
 
 // Whats side the collision happened
