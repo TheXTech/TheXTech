@@ -5803,7 +5803,7 @@ void PlayerEffects(int A)
         {
             Player[A].Location.X = Player[-Player[A].Effect2].Location.X;
             Player[A].Location.Y = Player[-Player[A].Effect2].Location.Y;
-            if(Player[-Player[A].Effect2].Dead == true)
+            if(Player[-Player[A].Effect2].Dead)
                 Player[A].Dead = true;
         }
         else if(Player[A].Effect2 <= 30)
