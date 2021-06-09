@@ -58,6 +58,7 @@
 #include "load_gfx.h"
 #include "player.h"
 #include "sound.h"
+#include "video.h"
 #include "editor/editor.h"
 #include "custom.h"
 #include "main/level_file.h"
@@ -168,7 +169,7 @@ int GameMain(const CmdLineSetup_t &setup)
     LoadingInProcess = true;
 
     ShowFPS = setup.testShowFPS;
-    MaxFPS = setup.testMaxFPS;
+    MaxFPS = setup.testMaxFPS; // || (g_videoSettings.renderModeObtained == RENDER_ACCELERATED_VSYNC);
 
     InitControls(); // init player's controls
     DoEvents();

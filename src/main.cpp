@@ -38,6 +38,8 @@ uint32_t __stacksize__ = 0x00020000;
 #endif
 
 #include "game_main.h"
+#include "sound.h"
+#include "video.h"
 #include "main/game_info.h"
 #include "compat.h"
 #include <AppPath/app_path.h>
@@ -161,8 +163,6 @@ int main(int argc, char**argv)
 
     OpenConfig_preSetup();
 
-    setup.renderType = CmdLineSetup_t::RenderType(RenderMode);
-
     testPlayer.fill(Player_t());
     testPlayer[1].Character = 1;
     testPlayer[2].Character = 2;
@@ -182,6 +182,7 @@ int main(int argc, char**argv)
 
 
         TCLAP::SwitchArg switchFrameSkip("f", "frameskip", "Enable frame skipping mode", false);
+        TCLAP::SwitchArg switchDisableFrameSkip(std::string(), "no-frameskip", "Disable frame skipping mode", false);
         TCLAP::SwitchArg switchNoSound("s", "no-sound", "Disable sound", false);
         TCLAP::SwitchArg switchNoVideo("", "no-video", "Disable video", false);
         TCLAP::SwitchArg switchNoPause("p", "never-pause", "Never pause game when window losts a focus", false);
@@ -270,6 +271,7 @@ int main(int argc, char**argv)
                                         "Record your gameplay data.", false);
 
         cmd.add(&switchFrameSkip);
+        cmd.add(&switchDisableFrameSkip);
         cmd.add(&switchNoSound);
         cmd.add(&switchNoVideo);
         cmd.add(&switchNoPause);
@@ -299,21 +301,24 @@ int main(int argc, char**argv)
             AppPath = AppPathManager::assetsRoot();
         }
 
-        setup.frameSkip = switchFrameSkip.getValue();
-        setup.noSound   = switchNoSound.getValue();
+        setup.frameSkip = !switchDisableFrameSkip.getValue() && (switchFrameSkip.getValue() || g_videoSettings.enableFrameSkip);
+        setup.noSound   = switchNoSound.getValue() || g_audioSetup.disableSound;
         setup.noVideo   = switchNoVideo.getValue();
-        setup.neverPause = switchNoPause.getValue();
-        setup.allowBgInput = switchBgInput.getValue();
+        setup.neverPause = switchNoPause.getValue() || g_videoSettings.allowBgWork;
+        setup.allowBgInput = switchBgInput.getValue() || g_videoSettings.allowBgControllerInput;
         if(setup.allowBgInput) // The BG-input depends on the never-pause option
             setup.neverPause = setup.allowBgInput;
 
         std::string rt = renderType.getValue();
         if(rt == "sw")
-            setup.renderType = CmdLineSetup_t::RENDER_SW;
+            setup.renderType = SDL_RENDERER_SOFTWARE;
         else if(rt == "vsync")
-            setup.renderType = CmdLineSetup_t::RENDER_VSYNC;
+            setup.renderType = RENDER_ACCELERATED_VSYNC;
         else if(rt == "hw")
-            setup.renderType = CmdLineSetup_t::RENDER_HW;
+            setup.renderType = RENDER_ACCELERATED;
+
+        if(setup.renderType > RENDER_AUTO)
+            g_videoSettings.renderMode = setup.renderType;
 
         setup.testLevel = testLevel.getValue();
 

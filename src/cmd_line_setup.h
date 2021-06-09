@@ -16,12 +16,7 @@ struct CmdLineSetup_t
     //! Allow background input for joysticks
     bool allowBgInput = false;
     //! TYpe of a render
-    enum RenderType
-    {
-        RENDER_SW = 0,
-        RENDER_HW = 1,
-        RENDER_VSYNC = 2
-    } renderType;
+    int renderType = -1;
     //! Is a level testing mode
     bool testLevelMode = false;
     //! Level file to test

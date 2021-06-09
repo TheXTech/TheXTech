@@ -58,10 +58,14 @@
 
 #include "../version.h"
 
+#include "video.h"
 #include "frm_main.h"
 #include "main/game_info.h"
 
 #include "config.h"
+
+VideoSettings_t g_videoSettings;
+
 
 static SDL_bool IsFullScreen(SDL_Window *win)
 {
@@ -240,37 +244,40 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
     pLogDebug("Init renderer settings...");
 
     Uint32 renderFlags = 0;
-    if(setup.renderType == CmdLineSetup_t::RENDER_SW)
+    if(g_videoSettings.renderMode == RENDER_SOFTWARE)
     {
         renderFlags = SDL_RENDERER_SOFTWARE;
+        g_videoSettings.renderModeObtained = RENDER_SOFTWARE;
         pLogDebug("Using software rendering");
     }
-    else if(setup.renderType == CmdLineSetup_t::RENDER_HW)
+    else if(g_videoSettings.renderMode == RENDER_ACCELERATED)
     {
         renderFlags = SDL_RENDERER_ACCELERATED;
+        g_videoSettings.renderModeObtained = RENDER_ACCELERATED;
         pLogDebug("Using accelerated rendering");
     }
-    else if(setup.renderType == CmdLineSetup_t::RENDER_VSYNC)
+    else if(g_videoSettings.renderMode == RENDER_ACCELERATED_VSYNC)
     {
         renderFlags = SDL_RENDERER_ACCELERATED|SDL_RENDERER_PRESENTVSYNC;
-        MaxFPS = true;
+        g_videoSettings.renderModeObtained = RENDER_ACCELERATED_VSYNC;
         pLogDebug("Using accelerated rendering with a vertical synchronization");
     }
 
     m_gRenderer = SDL_CreateRenderer(m_window, -1, renderFlags | SDL_RENDERER_TARGETTEXTURE); // Try to make renderer
 
-    if(!m_gRenderer && setup.renderType == CmdLineSetup_t::RENDER_VSYNC) // If was a V-Sync renderer, use non-V-Synced
+    if(!m_gRenderer && g_videoSettings.renderMode != RENDER_ACCELERATED_VSYNC) // If was a V-Sync renderer, use non-V-Synced
     {
         pLogWarning("Failed to initialize V-Synced renderer, trying to create accelerated renderer...");
         renderFlags = SDL_RENDERER_ACCELERATED;
-        MaxFPS = false;
+        g_videoSettings.renderModeObtained = RENDER_ACCELERATED;
         m_gRenderer = SDL_CreateRenderer(m_window, -1, renderFlags | SDL_RENDERER_TARGETTEXTURE);
     }
 
-    if(!m_gRenderer && setup.renderType != CmdLineSetup_t::RENDER_SW) // Fall back to software
+    if(!m_gRenderer && g_videoSettings.renderMode != RENDER_SOFTWARE) // Fall back to software
     {
         pLogWarning("Failed to initialize accelerated renderer, trying to create a software renderer...");
         renderFlags = SDL_RENDERER_SOFTWARE;
+        g_videoSettings.renderModeObtained = RENDER_SOFTWARE;
         m_gRenderer = SDL_CreateRenderer(m_window, -1, renderFlags | SDL_RENDERER_TARGETTEXTURE);
     }
 
