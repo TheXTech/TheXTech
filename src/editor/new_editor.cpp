@@ -12,6 +12,7 @@
 #include "../game_main.h"
 #include "write_level.h"
 #include "write_world.h"
+#include <PGE_File_Formats/file_formats.h>
 
 #include "text_input.h"
 
@@ -1717,7 +1718,7 @@ void EditorScreen::UpdateSelectListScreen()
             j = *current_page*20 + i;
         else
             j = i;
-        if (j >= source->size())
+        if (j >= (int)source->size())
             break;
 
         int index;
@@ -2140,7 +2141,7 @@ void EditorScreen::UpdateLayersScreen()
                 *layer_to_set = "";
         }
         // default is a special case on OBJ page 1
-        else if (l == 0 && (m_special_page == SPECIAL_PAGE_OBJ_LAYER && m_special_subpage == 0 || m_special_page == SPECIAL_PAGE_LAYERS))
+        else if (l == 0 && ((m_special_page == SPECIAL_PAGE_OBJ_LAYER && m_special_subpage == 0) || m_special_page == SPECIAL_PAGE_LAYERS))
         {
             SuperPrint("DEFAULT", 3, 54, 80 + 40*i + 12);
             if (UpdateButton(10 + 4, 80 + 40*i + 4, GFX.ECursor[2], layer_to_set->empty() || (*layer_to_set) == Layer[l].Name, 0, 0, 32, 32))
@@ -3381,9 +3382,9 @@ void EditorScreen::UpdateFileScreen()
             if (UpdateButton(20 + 4, 100 + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
             {
                 if (!WorldEditor)
-                    SaveLevel(FullFileName);
+                    SaveLevel(FullFileName, FileFormats::LVL_PGEX);
                 else
-                    SaveWorld(FullFileName);
+                    SaveWorld(FullFileName, FileFormats::WLD_PGEX);
                 confirmed = true;
             }
         }
@@ -3408,11 +3409,11 @@ void EditorScreen::UpdateFileScreen()
         {
             if (m_special_subpage == 1) // new level
             {
-                StartFileBrowser(&FullFileName, "", FileNamePath, {".lvl"}, BROWSER_MODE_SAVE_NEW, BROWSER_CALLBACK_NEW_LEVEL);
+                StartFileBrowser(&FullFileName, "", FileNamePath, {".lvlx"}, BROWSER_MODE_SAVE_NEW, BROWSER_CALLBACK_NEW_LEVEL);
             }
             else if (m_special_subpage == 2) // open level
             {
-                StartFileBrowser(&FullFileName, "", FileNamePath, {".lvl"}, BROWSER_MODE_OPEN, BROWSER_CALLBACK_OPEN_LEVEL);
+                StartFileBrowser(&FullFileName, "", FileNamePath, {".lvlx", ".lvl"}, BROWSER_MODE_OPEN, BROWSER_CALLBACK_OPEN_LEVEL);
             }
             else if (m_special_subpage == 3) // revert level
             {
@@ -3422,11 +3423,11 @@ void EditorScreen::UpdateFileScreen()
             }
             else if (m_special_subpage == 11) // new world
             {
-                StartFileBrowser(&FullFileName, "", FileNamePath, {".wld"}, BROWSER_MODE_SAVE_NEW, BROWSER_CALLBACK_NEW_WORLD);
+                StartFileBrowser(&FullFileName, "", FileNamePath, {".wldx"}, BROWSER_MODE_SAVE_NEW, BROWSER_CALLBACK_NEW_WORLD);
             }
             else if (m_special_subpage == 12) // open world
             {
-                StartFileBrowser(&FullFileName, "", FileNamePath, {".wld"}, BROWSER_MODE_OPEN, BROWSER_CALLBACK_OPEN_WORLD);
+                StartFileBrowser(&FullFileName, "", FileNamePath, {".wldx", ".wld"}, BROWSER_MODE_OPEN, BROWSER_CALLBACK_OPEN_WORLD);
             }
             else if (m_special_subpage == 13) // revert world
             {
@@ -3471,12 +3472,12 @@ void EditorScreen::UpdateFileScreen()
         SuperPrint("SAVE", 3, 54, 190);
         if (UpdateButton(10 + 4, 180 + 4, GFX.NPC_modes, false, 0, 32*Icon::save, 32, 32))
         {
-            SaveLevel(FullFileName);
+            SaveLevel(FullFileName, FileFormats::LVL_PGEX);
         }
         SuperPrint("SAVE AS...", 3, 54, 230);
         if (UpdateButton(10 + 4, 220 + 4, GFX.NPC_modes, false, 0, 32*Icon::save, 32, 32))
         {
-            StartFileBrowser(&FullFileName, "", FileNamePath, {".lvl"}, BROWSER_MODE_SAVE, BROWSER_CALLBACK_SAVE_LEVEL);
+            StartFileBrowser(&FullFileName, "", FileNamePath, {".lvlx"}, BROWSER_MODE_SAVE, BROWSER_CALLBACK_SAVE_LEVEL);
         }
         SuperPrint("REVERT", 3, 54, 270);
         if (UpdateButton(10 + 4, 260 + 4, GFX.NPC_modes, false, 0, 32*Icon::hop, 32, 32))
@@ -3505,12 +3506,12 @@ void EditorScreen::UpdateFileScreen()
         SuperPrint("SAVE", 3, e_ScreenW/2 + 54, 190);
         if (UpdateButton(e_ScreenW/2 + 10 + 4, 180 + 4, GFX.NPC_modes, false, 0, 32*Icon::save, 32, 32))
         {
-            SaveWorld(FullFileName);
+            SaveWorld(FullFileName, FileFormats::WLD_PGEX);
         }
         SuperPrint("SAVE AS...", 3, e_ScreenW/2 + 54, 230);
         if (UpdateButton(e_ScreenW/2 + 10 + 4, 220 + 4, GFX.NPC_modes, false, 0, 32*Icon::save, 32, 32))
         {
-            StartFileBrowser(&FullFileName, "", FileNamePath, {".wld"}, BROWSER_MODE_SAVE, BROWSER_CALLBACK_SAVE_WORLD);
+            StartFileBrowser(&FullFileName, "", FileNamePath, {".wldx"}, BROWSER_MODE_SAVE, BROWSER_CALLBACK_SAVE_WORLD);
         }
         SuperPrint("REVERT", 3, e_ScreenW/2 + 54, 270);
         if (UpdateButton(e_ScreenW/2 + 10 + 4, 260 + 4, GFX.NPC_modes, false, 0, 32*Icon::hop, 32, 32))
@@ -3553,7 +3554,7 @@ void EditorScreen::FileBrowserSuccess()
     }
     else if (m_browser_callback == BROWSER_CALLBACK_SAVE_LEVEL)
     {
-        SaveLevel(FullFileName);
+        SaveLevel(FullFileName, FileFormats::LVL_PGEX);
         // this will resync custom assets
         OpenLevel(FullFileName);
     }
@@ -3561,7 +3562,7 @@ void EditorScreen::FileBrowserSuccess()
     {
         EnsureLevel();
         ClearLevel();
-        SaveLevel(FullFileName);
+        SaveLevel(FullFileName, FileFormats::LVL_PGEX);
         // this will resync custom assets
         OpenLevel(FullFileName);
         ResetCursor();
@@ -3574,7 +3575,7 @@ void EditorScreen::FileBrowserSuccess()
     }
     else if (m_browser_callback == BROWSER_CALLBACK_SAVE_WORLD)
     {
-        SaveWorld(FullFileName);
+        SaveWorld(FullFileName, FileFormats::WLD_PGEX);
         // resync custom assets
         OpenWorld(FullFileName);
     }
@@ -3582,7 +3583,7 @@ void EditorScreen::FileBrowserSuccess()
     {
         EnsureWorld();
         ClearWorld();
-        SaveWorld(FullFileName);
+        SaveWorld(FullFileName, FileFormats::WLD_PGEX);
         // resync custom assets
         OpenWorld(FullFileName);
         ResetCursor();
@@ -4043,7 +4044,7 @@ void EditorScreen::UpdateSelectorBar(bool level_screen)
         Backup_FullFileName = FullFileName;
         // how does this interact with cross-level warps?
         FullFileName = FullFileName + "tst";
-        SaveLevel(FullFileName);
+        SaveLevel(FullFileName, FileFormats::LVL_PGEX);
         HasCursor = false;
         EditorBackup();
         zTestLevel();

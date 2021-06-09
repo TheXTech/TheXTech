@@ -1922,7 +1922,7 @@ void GetEditorControls()
         EditorBackup();
         Backup_FullFileName = FullFileName;
         FullFileName = FullFileName + "tst";
-        SaveLevel(FullFileName);
+        SaveLevel(FullFileName, FileFormats::LVL_PGEX);
         HasCursor = false;
         zTestLevel();
     }
