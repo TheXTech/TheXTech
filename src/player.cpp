@@ -4107,6 +4107,32 @@ static SDL_INLINE bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool
 
         if(warp.Effect == 0 || warp.Effect == 3) // Instant / Portal
         {
+            if(warp.Effect == 3)
+            {
+                if(!warp.level.empty())
+                {
+                    GoToLevel = warp.level;
+                    GoToLevelNoGameThing = warp.noEntranceScene;
+                    plr.Effect = 8;
+                    plr.Effect2 = 2921;
+                    plr.Warp = B;
+                    plr.WarpBackward = backward;
+                    ReturnWarp = B;
+                    if(IsEpisodeIntro && NoMap)
+                        ReturnWarpSaved = ReturnWarp;
+                    StartWarp = warp.LevelWarp;
+                    return true;
+                }
+                else if(warp.MapWarp)
+                {
+                    plr.Effect = 8;
+                    plr.Effect2 = 2921;
+                    plr.Warp = B;
+                    plr.WarpBackward = backward;
+                    return true;
+                }
+            }
+
             plr.Location.X = exit.X + exit.Width / 2.0 - plr.Location.Width / 2.0;
             plr.Location.Y = exit.Y + exit.Height - plr.Location.Height - 0.1;
             CheckSection(A);
