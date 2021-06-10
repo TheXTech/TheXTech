@@ -969,7 +969,7 @@ void CheatCode(char NewKey)
             CheatString.clear();
             cheated = true;
         }
-        else if(SDL_strstr(CheatString.c_str(), "1player"))
+        else if(SDL_strstr(CheatString.c_str(), "1player") || SDL_strstr(CheatString.c_str(), "1plazer"))
         {
             B = CheckLiving();
             if(B > 0)
@@ -1008,7 +1008,7 @@ void CheatCode(char NewKey)
             cheated = true;
         }
 
-        else if(SDL_strstr(CheatString.c_str(), "2player"))
+        else if(SDL_strstr(CheatString.c_str(), "2player") || SDL_strstr(CheatString.c_str(), "2plazer"))
         {
             B = CheckLiving();
             if(B > 0)
