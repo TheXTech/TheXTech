@@ -647,6 +647,9 @@ struct Player_t
     int Warp = 0;
 // EXTRA: Is the backward warp mode
     int WarpBackward = false;
+// EXTRA: True if shooted from the cannon
+    int WarpShooted = false;
+    float WarpShootedCount = 0.0f;
 //    FireBallCD As Integer 'How long the player has to wait before he can shoot again
     int FireBallCD = 0;
 //    FireBallCD2 As Integer 'How long the player has to wait before he can shoot again

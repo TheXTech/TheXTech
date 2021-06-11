@@ -5520,14 +5520,38 @@ void PlayerEffects(int A)
             if(Player[A].Effect2 >= 110)
             {
                 Player[A].Effect2 = 2;
-                PlaySound(SFX_Warp);
+                if(backward || !warp.cannonExit)
+                    PlaySound(SFX_Warp);
             }
         }
         else if(fEqual(Player[A].Effect2, 2))
         {
-            if(warp_dir_exit == 1)
+            if(!backward && warp.cannonExit)
             {
-                Player[A].Location.Y = Player[A].Location.Y + 1;
+                switch(warp_dir_exit)
+                {
+                case LevelDoor::EXIT_DOWN:
+                    Player[A].Location.Y = warp_exit.Y;
+                    break;
+                case LevelDoor::EXIT_UP:
+                    Player[A].Location.Y = (warp_exit.Y + warp_exit.Height) - Player[A].Location.Height;
+                    break;
+                case LevelDoor::EXIT_LEFT:
+                    Player[A].Location.X = (warp_exit.X + warp_exit.Width) - Player[A].Location.Width;
+                    Player[A].Direction = -1;
+                    break;
+                case LevelDoor::EXIT_RIGHT:
+                    Player[A].Location.X = warp_exit.X;
+                    Player[A].Direction = +1;
+                    break;
+                }
+                Player[A].Effect2 = 3;
+                if(Player[A].HoldingNPC > 0)
+                    PlayerGrabCode(A);
+            }
+            else if(warp_dir_exit == LevelDoor::EXIT_DOWN)
+            {
+                Player[A].Location.Y += 1;
 
                 if(Player[A].Location.Y >= warp_exit.Y)
                     Player[A].Effect2 = 3;
@@ -5541,9 +5565,9 @@ void PlayerEffects(int A)
                 if(Player[A].Mount == 0)
                     Player[A].Frame = 15;
             }
-            else if(warp_dir_exit == 3)
+            else if(warp_dir_exit == LevelDoor::EXIT_UP)
             {
-                Player[A].Location.Y = Player[A].Location.Y - 1;
+                Player[A].Location.Y -= 1;
 
                 if(Player[A].Location.Y + Player[A].Location.Height <= warp_exit.Y + warp_exit.Height)
                     Player[A].Effect2 = 3;
@@ -5557,9 +5581,9 @@ void PlayerEffects(int A)
                 if(Player[A].Mount == 0)
                     Player[A].Frame = 15;
             }
-            else if(warp_dir_exit == 4)
+            else if(warp_dir_exit == LevelDoor::EXIT_LEFT)
             {
-                Player[A].Location.X = Player[A].Location.X - 0.5;
+                Player[A].Location.X -= 0.5;
                 Player[A].Direction = -1;
 
                 if(Player[A].Location.X + Player[A].Location.Width <= warp_exit.X + warp_exit.Width)
@@ -5602,9 +5626,9 @@ void PlayerEffects(int A)
                     Player[A].Location.SpeedX = 0;
                 }
             }
-            else if(warp_dir_exit == 2)
+            else if(warp_dir_exit == LevelDoor::EXIT_RIGHT)
             {
-                Player[A].Location.X = Player[A].Location.X + 0.5;
+                Player[A].Location.X += 0.5;
                 Player[A].Direction = 1;
 
                 if(Player[A].Location.X >= warp_exit.X)
@@ -5650,9 +5674,18 @@ void PlayerEffects(int A)
         }
         else if(fEqual(Player[A].Effect2, 3))
         {
+            if(!backward && warp.cannonExit)
+            {
+                PlaySound(SFX_Bullet);
+                auto loc = warp_exit;
+                if(warp_dir_exit == LevelDoor::EXIT_LEFT || warp_dir_exit == LevelDoor::EXIT_RIGHT)
+                    loc.Y += loc.Height - (Player[A].Location.Height / 2) - (loc.Height / 2);
+                NewEffect(132, loc, Player[A].Direction); // Cannon pipe shoot effect
+            }
+
             if(Player[A].HoldingNPC > 0)
             {
-                if(warp_dir_exit == 2 || warp_dir_exit == 4)
+                if(warp_dir_exit == LevelDoor::EXIT_LEFT || warp_dir_exit == LevelDoor::EXIT_RIGHT)
                 {
                     if(warp_dir_exit == 2)
                         Player[A].Direction = 1;
@@ -5674,11 +5707,40 @@ void PlayerEffects(int A)
             Player[A].Effect = 0;
             Player[A].Effect2 = 0;
             Player[A].WarpCD = 20;
-            Player[A].Location.SpeedY = 0;
             Player[A].CanJump = false;
             Player[A].CanAltJump = false;
-            Player[A].Location.SpeedX = 0;
             Player[A].Bumped2 = 0;
+            if(!backward && warp.cannonExit)
+            {
+                switch(warp_dir_exit)
+                {
+                case LevelDoor::EXIT_DOWN:
+                    Player[A].Location.SpeedY = warp.cannonExitSpeed;
+                    break;
+                case LevelDoor::EXIT_UP:
+                    Player[A].Location.SpeedY = -warp.cannonExitSpeed;
+                    break;
+                case LevelDoor::EXIT_LEFT:
+                    Player[A].Location.SpeedX = -warp.cannonExitSpeed;
+                    Player[A].Direction = -1;
+                    break;
+                case LevelDoor::EXIT_RIGHT:
+                    Player[A].Location.SpeedX = warp.cannonExitSpeed;
+                    Player[A].Direction = +1;
+                    break;
+                }
+
+                if(warp_dir_exit == LevelDoor::EXIT_LEFT || warp_dir_exit == LevelDoor::EXIT_RIGHT)
+                {
+                    Player[A].WarpShooted = true;
+                    Player[A].WarpShootedCount = warp.cannonExitSpeed * Player[A].Direction;
+                }
+            }
+            else
+            {
+                Player[A].Location.SpeedY = 0;
+                Player[A].Location.SpeedX = 0;
+            }
 
             if(Player[A].HoldingNPC > 0)
                 NPC[Player[A].HoldingNPC].Effect = 0;
