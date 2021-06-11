@@ -40,8 +40,6 @@
 
 static int s_compatLevel = COMPAT_MODERN;
 
-static int s_compatLevel = COMPAT_MODERN;
-
 Compatibility_t g_compatibility;
 
 static void compatInit(Compatibility_t &c)

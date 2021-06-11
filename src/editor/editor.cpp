@@ -2359,8 +2359,6 @@ void KillWarp(int A)
     Warp_t blankWarp;
     Warp[A] = Warp[numWarps];
     Warp[numWarps] = blankWarp;
-    if(numWarps < numWarpsReal)
-        numWarpsReal--; // FIXME: Make two-way warps to NOT use extra entries!
     numWarps--;
     syncLayers_Warp(A);
     syncLayers_Warp(numWarps+1);

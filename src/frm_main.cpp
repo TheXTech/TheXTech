@@ -67,9 +67,6 @@
 VideoSettings_t g_videoSettings;
 
 
-VideoSettings_t g_videoSettings;
-
-
 static SDL_bool IsFullScreen(SDL_Window *win)
 {
     Uint32 flags = SDL_GetWindowFlags(win);
