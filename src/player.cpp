@@ -330,6 +330,8 @@ void SetupPlayers()
         Player[A].TimeToLive = 0;
         Player[A].Warp = 0;
         Player[A].WarpCD = 0;
+        Player[A].WarpBackward = false;
+        Player[A].WarpShooted = false;
         Player[A].CanPound = false;
         Player[A].GroundPound = false;
         Player[A].GroundPound2 = false;
@@ -5741,10 +5743,7 @@ void PlayerEffects(int A)
                 }
 
                 if(warp_dir_exit == LevelDoor::EXIT_LEFT || warp_dir_exit == LevelDoor::EXIT_RIGHT)
-                {
                     Player[A].WarpShooted = true;
-                    Player[A].WarpShootedCount = warp.cannonExitSpeed * Player[A].Direction;
-                }
             }
             else
             {
