@@ -2077,8 +2077,6 @@ void UpdateGraphics(bool skipRepaint)
             g_stats.print();
         }
 
-        speedRun_render();
-
 //        If LevelEditor = True Or MagicHand = True Then
         if((LevelEditor || MagicHand) && !GamePaused)
         {
@@ -2570,6 +2568,8 @@ void UpdateGraphics(bool skipRepaint)
         }
 //    Next Z
     }
+
+    speedRun_render();
 
     if(!skipRepaint)
         frmMain.repaint();

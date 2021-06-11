@@ -887,8 +887,8 @@ void UpdateControls()
             }
 #endif
 
-            if(B == 1) // Push the controls state into the speed-runner to properly display
-                speedRun_syncControlKeys(c);
+            if(B == 1 || B == 2) // Push the controls state into the speed-runner to properly display
+                speedRun_syncControlKeys(B - 1, c);
 
             if(!c.Start && !c.Jump) {
                 p.UnStart = true;
