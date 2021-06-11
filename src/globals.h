@@ -645,6 +645,10 @@ struct Player_t
     int WarpCD = 0;
 //    Warp As Integer 'the warp the player is using
     int Warp = 0;
+// EXTRA: Is the backward warp mode
+    int WarpBackward = false;
+// EXTRA: True if shooted from the cannon
+    int WarpShooted = false;
 //    FireBallCD As Integer 'How long the player has to wait before he can shoot again
     int FireBallCD = 0;
 //    FireBallCD2 As Integer 'How long the player has to wait before he can shoot again
@@ -1211,8 +1215,6 @@ extern RangeArr<WorldPath_t, 1, maxWorldPaths> WorldPath;
 extern int numWorldPaths;
 //Public numWarps As Integer 'number of warps in a level
 extern int numWarps;
-//! EXTRA: REAL number of warps (exclude the two-way warps)
-extern int numWarpsReal;
 //Public Warp(1 To maxWarps) As Warp 'define the warps
 extern RangeArr<Warp_t, 1, maxWarps> Warp;
 //Public Tile(1 To maxTiles) As Tile

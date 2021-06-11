@@ -239,68 +239,76 @@ void SetupEditorGraphics()
 
 void PlayerWarpGFX(int A, Location_t &tempLocation, float &X2, float &Y2)
 {
+    auto &player = Player[A];
+    bool backward = player.WarpBackward;
+    auto &warp = Warp[player.Warp];
+    auto &warp_enter = backward ? warp.Exit : warp.Entrance;
+    auto &warp_exit = backward ? warp.Entrance : warp.Exit;
+    auto &warp_dir_enter = backward ? warp.Direction2 : warp.Direction;
+    auto &warp_dir_exit = backward ? warp.Direction : warp.Direction2;
+
     // .Effect = 3      -- Warp Pipe
     // .Effect2 = 0     -- Entering
     // .Effect2 = 1     -- Move to next spot
     // .Effect2 => 100  -- Delay at next spot
     // .Effect2 = 2     -- Exiting
     // .Effect2 = 3     -- Done
-    if(Player[A].Effect2 == 0.0)
+    if(player.Effect2 == 0.0)
     {
-        if(Warp[Player[A].Warp].Direction == 3) // Moving down
+        if(warp_dir_enter == 3) // Moving down
         {
-            if(tempLocation.Height > (Warp[Player[A].Warp].Entrance.Y + Warp[Player[A].Warp].Entrance.Height) - (tempLocation.Y))
-                tempLocation.Height = (Warp[Player[A].Warp].Entrance.Y + Warp[Player[A].Warp].Entrance.Height) - (tempLocation.Y);
+            if(tempLocation.Height > (warp_enter.Y + warp_enter.Height) - (tempLocation.Y))
+                tempLocation.Height = (warp_enter.Y + warp_enter.Height) - (tempLocation.Y);
         }
-        else if(Warp[Player[A].Warp].Direction == 1) // Moving up
+        else if(warp_dir_enter == 1) // Moving up
         {
-            if(Warp[Player[A].Warp].Entrance.Y > tempLocation.Y)
+            if(warp_enter.Y > tempLocation.Y)
             {
-                Y2 = float(Warp[Player[A].Warp].Entrance.Y - tempLocation.Y);
-                tempLocation.Y = Warp[Player[A].Warp].Entrance.Y;
+                Y2 = float(warp_enter.Y - tempLocation.Y);
+                tempLocation.Y = warp_enter.Y;
                 tempLocation.Height = tempLocation.Height - Y2;
             }
         }
-        else if(Warp[Player[A].Warp].Direction == 4) // Moving right
-            tempLocation.Width = (Warp[Player[A].Warp].Entrance.X + Warp[Player[A].Warp].Entrance.Width) - (tempLocation.X);
-        else if(Warp[Player[A].Warp].Direction == 2) // Moving left
+        else if(warp_dir_enter == 4) // Moving right
+            tempLocation.Width = (warp_enter.X + warp_enter.Width) - (tempLocation.X);
+        else if(warp_dir_enter == 2) // Moving left
         {
-            X2 = float(Warp[Player[A].Warp].Entrance.X - tempLocation.X);
+            X2 = float(warp_enter.X - tempLocation.X);
             if(X2 < 0)
                 X2 = 0;
             else
-                tempLocation.X = Warp[Player[A].Warp].Entrance.X;
+                tempLocation.X = warp_enter.X;
         }
     }
-    else if(Maths::iRound(Player[A].Effect2) == 2)
+    else if(Maths::iRound(player.Effect2) == 2)
     {
-        if(Warp[Player[A].Warp].Direction2 == 3) // Moving up
+        if(warp_dir_exit == 3) // Moving up
         {
-            if(tempLocation.Height > (Warp[Player[A].Warp].Exit.Y + Warp[Player[A].Warp].Exit.Height) - (tempLocation.Y))
-                tempLocation.Height = (Warp[Player[A].Warp].Exit.Y + Warp[Player[A].Warp].Exit.Height) - (tempLocation.Y);
+            if(tempLocation.Height > (warp_exit.Y + warp_exit.Height) - (tempLocation.Y))
+                tempLocation.Height = (warp_exit.Y + warp_exit.Height) - (tempLocation.Y);
         }
-        else if(Warp[Player[A].Warp].Direction2 == 1) // Moving down
+        else if(warp_dir_exit == 1) // Moving down
         {
-            if(Warp[Player[A].Warp].Exit.Y > tempLocation.Y)
+            if(warp_exit.Y > tempLocation.Y)
             {
-                Y2 = float(Warp[Player[A].Warp].Exit.Y - tempLocation.Y);
-                tempLocation.Y = Warp[Player[A].Warp].Exit.Y;
+                Y2 = float(warp_exit.Y - tempLocation.Y);
+                tempLocation.Y = warp_exit.Y;
                 tempLocation.Height = tempLocation.Height - double(Y2);
             }
         }
-        else if(Warp[Player[A].Warp].Direction2 == 4) // Moving left
-            tempLocation.Width = (Warp[Player[A].Warp].Exit.X + Warp[Player[A].Warp].Exit.Width) - (tempLocation.X);
-        else if(Warp[Player[A].Warp].Direction2 == 2) // Moving right
+        else if(warp_dir_exit == 4) // Moving left
+            tempLocation.Width = (warp_exit.X + warp_exit.Width) - (tempLocation.X);
+        else if(warp_dir_exit == 2) // Moving right
         {
-            X2 = float(Warp[Player[A].Warp].Exit.X - tempLocation.X);
+            X2 = float(warp_exit.X - tempLocation.X);
             if(X2 < 0)
                 X2 = 0;
             else
-                tempLocation.X = Warp[Player[A].Warp].Exit.X;
+                tempLocation.X = warp_exit.X;
         }
     }
 
-    if(Maths::iRound(Player[A].Effect2) == 1 || Player[A].Effect2 >= 100)
+    if(Maths::iRound(player.Effect2) == 1 || player.Effect2 >= 100)
         tempLocation.Height = 0;
 
     if(tempLocation.Height < 0)
@@ -314,68 +322,76 @@ void PlayerWarpGFX(int A, Location_t &tempLocation, float &X2, float &Y2)
 
 void NPCWarpGFX(int A, Location_t &tempLocation, float &X2, float &Y2)
 {
+    auto &player = Player[A];
+    bool backward = player.WarpBackward;
+    auto &warp = Warp[player.Warp];
+    auto &warp_enter = backward ? warp.Exit : warp.Entrance;
+    auto &warp_exit = backward ? warp.Entrance : warp.Exit;
+    auto &warp_dir_enter = backward ? warp.Direction2 : warp.Direction;
+    auto &warp_dir_exit = backward ? warp.Direction : warp.Direction2;
+
     // player(a).effect = 3      -- Warp Pipe
     // player(a).effect2 = 0     -- Entering
     // player(a).effect2 = 1     -- Move to next spot
     // player(a).effect2 => 100  -- Delay at next spot
     // player(a).effect2 = 2     -- Exiting
     // player(a).effect2 = 3     -- Done
-    if(Player[A].Effect2 == 0.0)
+    if(player.Effect2 == 0.0)
     {
-        if(Warp[Player[A].Warp].Direction == 3) // Moving down
+        if(warp_dir_enter == 3) // Moving down
         {
-            if(tempLocation.Height > (Warp[Player[A].Warp].Entrance.Y + Warp[Player[A].Warp].Entrance.Height) - (tempLocation.Y))
-                tempLocation.Height = (Warp[Player[A].Warp].Entrance.Y + Warp[Player[A].Warp].Entrance.Height) - (tempLocation.Y);
+            if(tempLocation.Height > (warp_enter.Y + warp_enter.Height) - (tempLocation.Y))
+                tempLocation.Height = (warp_enter.Y + warp_enter.Height) - (tempLocation.Y);
         }
-        else if(Warp[Player[A].Warp].Direction == 1) // Moving up
+        else if(warp_dir_enter == 1) // Moving up
         {
-            if(Warp[Player[A].Warp].Entrance.Y > tempLocation.Y)
+            if(warp_enter.Y > tempLocation.Y)
             {
-                Y2 = float(Warp[Player[A].Warp].Entrance.Y - tempLocation.Y);
-                tempLocation.Y = Warp[Player[A].Warp].Entrance.Y;
+                Y2 = float(warp_enter.Y - tempLocation.Y);
+                tempLocation.Y = warp_enter.Y;
                 tempLocation.Height = tempLocation.Height - double(Y2);
             }
         }
-        else if(Warp[Player[A].Warp].Direction == 4) // Moving right
-            tempLocation.Width = (Warp[Player[A].Warp].Entrance.X + Warp[Player[A].Warp].Entrance.Width) - (tempLocation.X);
-        else if(Warp[Player[A].Warp].Direction == 2) // Moving left
+        else if(warp_dir_enter == 4) // Moving right
+            tempLocation.Width = (warp_enter.X + warp_enter.Width) - (tempLocation.X);
+        else if(warp_dir_enter == 2) // Moving left
         {
-            X2 = float(Warp[Player[A].Warp].Entrance.X - tempLocation.X);
+            X2 = float(warp_enter.X - tempLocation.X);
             if(X2 < 0)
                 X2 = 0;
             else
-                tempLocation.X = Warp[Player[A].Warp].Entrance.X;
+                tempLocation.X = warp_enter.X;
         }
     }
-    else if(Maths::iRound(Player[A].Effect2) == 2)
+    else if(Maths::iRound(player.Effect2) == 2)
     {
-        if(Warp[Player[A].Warp].Direction2 == 3) // Moving up
+        if(warp_dir_exit == 3) // Moving up
         {
-            if(tempLocation.Height > (Warp[Player[A].Warp].Exit.Y + Warp[Player[A].Warp].Exit.Height) - (tempLocation.Y))
-                tempLocation.Height = (Warp[Player[A].Warp].Exit.Y + Warp[Player[A].Warp].Exit.Height) - (tempLocation.Y);
+            if(tempLocation.Height > (warp_exit.Y + warp_exit.Height) - (tempLocation.Y))
+                tempLocation.Height = (warp_exit.Y + warp_exit.Height) - (tempLocation.Y);
         }
-        else if(Warp[Player[A].Warp].Direction2 == 1) // Moving down
+        else if(warp_dir_exit == 1) // Moving down
         {
-            if(Warp[Player[A].Warp].Exit.Y > tempLocation.Y)
+            if(warp_exit.Y > tempLocation.Y)
             {
-                Y2 = float(Warp[Player[A].Warp].Exit.Y - tempLocation.Y);
-                tempLocation.Y = Warp[Player[A].Warp].Exit.Y;
+                Y2 = float(warp_exit.Y - tempLocation.Y);
+                tempLocation.Y = warp_exit.Y;
                 tempLocation.Height = tempLocation.Height - double(Y2);
             }
         }
-        else if(Warp[Player[A].Warp].Direction2 == 4) // Moving left
-            tempLocation.Width = (Warp[Player[A].Warp].Exit.X + Warp[Player[A].Warp].Exit.Width) - (tempLocation.X);
-        else if(Warp[Player[A].Warp].Direction2 == 2) // Moving right
+        else if(warp_dir_exit == 4) // Moving left
+            tempLocation.Width = (warp_exit.X + warp_exit.Width) - (tempLocation.X);
+        else if(warp_dir_exit == 2) // Moving right
         {
-            X2 = float(Warp[Player[A].Warp].Exit.X - tempLocation.X);
+            X2 = float(warp_exit.X - tempLocation.X);
             if(X2 < 0)
                 X2 = 0;
             else
-                tempLocation.X = Warp[Player[A].Warp].Exit.X;
+                tempLocation.X = warp_exit.X;
         }
     }
 
-    if(Maths::iRound(Player[A].Effect2) == 1 || Player[A].Effect2 >= 100)
+    if(Maths::iRound(player.Effect2) == 1 || player.Effect2 >= 100)
         tempLocation.Height = 0;
 
     if(tempLocation.Height < 0)
