@@ -1296,22 +1296,28 @@ void DrawBackground(int S, int Z)
         for(B = 0; B <= tempVar59; B++)
         {
             tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
-            if(level[S].Height - level[S].Y > GFXBackground2Height[A] / 4.0)
-            {
+            double frameH = vb6Round(GFXBackground2Height[A] / 4.0);
 
+            if(level[S].Height - level[S].Y > frameH)
+            {
                 // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - (600 - vScreen(Z).Top)) * (GFXBackground2Height(A) / 4 - (600 - vScreen(Z).Top))
                 // .Y = -vScreenY(Z) - .Y
-
-                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] / 4.0 - ScreenH) + vScreen[Z].Top;
+                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (frameH - ScreenH) + vScreen[Z].Top;
                 tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
             }
             else
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A] / 4.0;
+                tempLocation.Y = level[S].Height - frameH;
+
+            // HACK: align non-rounded pictures (there was Redigit's original with the 3455 pixels height,
+            // but it must be 3466. There are lot of custom resources that using the 3455 height by mistake)
+            if(SpecialFrame[3] == 3 && (GFXBackground2Height[A] % 4 != 0))
+                tempLocation.Y += 4 - (GFXBackground2Height[A] % 4); // So, align them by the same way
+
             tempLocation.Height = GFXBackground2Height[A] / 4;
             tempLocation.Width = GFXBackground2Width[A];
             if(vScreenCollision(Z, tempLocation))
             {
-                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A] / 4.0, GFXBackground2[A], 0, (GFXBackground2Height[A] / 4.0) * SpecialFrame[3]);
+                frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], frameH, GFXBackground2[A], 0, (frameH) * SpecialFrame[3]);
             }
         }
     }
