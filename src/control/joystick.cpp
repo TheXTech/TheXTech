@@ -889,9 +889,14 @@ void UpdateControls()
 #endif
         }
     }
+
     // Push the controls state into the speed-runner to properly display
     record_sync();
-    speedRun_syncControlKeys(Player[1].Controls);
+
+    speedRun_syncControlKeys(0, Player[1].Controls);
+    if(numPlayers == 2)
+        speedRun_syncControlKeys(1, Player[2].Controls);
+
     For(B, 1, numPlayers)
     {
         if(B == 2 && numPlayers == 2) {
