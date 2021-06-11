@@ -42,7 +42,7 @@ void speedRun_tick();
 
 void speedRun_setSemitransparentRender(bool r);
 
-void speedRun_syncControlKeys(Controls_t &keys);
+void speedRun_syncControlKeys(int plr, Controls_t &keys);
 
 void speedRun_loadStats();
 void speedRun_saveStats();
