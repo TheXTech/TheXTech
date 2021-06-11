@@ -685,17 +685,34 @@ void UpdateLoadREAL()
 #ifdef __3DS__
         frmMain.initDraw(0);
 #endif
-        int Left = ScreenW/2 - GFX.MenuGFX[4].w/2;
-        if (Left < 0) Left = 0;
-        int Top = ScreenH/2 - GFX.MenuGFX[4].h/2;
-        if (Top < 0) Top = 0;
-        int Right = ScreenW/2 + GFX.MenuGFX[4].w/2;
-        if (Right > ScreenW) Right = ScreenW;
-        int Bottom = ScreenH/2 + GFX.MenuGFX[4].h/2;
-        if (Bottom > ScreenH) Bottom = ScreenH;
         frmMain.clearBuffer();
+
+        int sh_w = ScreenW / 2;
+        int gh_w = GFX.MenuGFX[4].w / 2;
+        int sh_h = ScreenH / 2;
+        int gh_h = GFX.MenuGFX[4].h / 2;
+
+        int Left    = sh_w - gh_w;
+        int Top     = sh_h - gh_h;
+        int Right   = sh_w + gh_w;
+        int Bottom  = sh_h + gh_h;
+
+        if(Left < 0)
+            Left = 0;
+
+        if(Top < 0)
+            Top = 0;
+
+        if(Right > ScreenW)
+            Right = ScreenW;
+
+        if(Bottom > ScreenH)
+            Bottom = ScreenH;
+
         if(!gfxLoaderTestMode)
-            frmMain.renderTexture(ScreenW/2 - GFX.MenuGFX[4].w/2, ScreenH/2 - GFX.MenuGFX[4].h/2, GFX.MenuGFX[4]);
+        {
+            frmMain.renderTexture(sh_w - gh_w, sh_h - gh_h, GFX.MenuGFX[4]);
+        }
         else
         {
             if(!state.empty())
@@ -703,6 +720,7 @@ void UpdateLoadREAL()
             else
                 SuperPrint("Loading data...", 3, Left + 10, Top + 10);
         }
+
         frmMain.renderTexture(Right - 168, Bottom - 24, GFX.Loader);
         frmMain.renderTexture(Right - 40, Bottom - 40, GFX.LoadCoin.w, GFX.LoadCoin.h / 4, GFX.LoadCoin, 0, 32 * LoadCoins);
 
