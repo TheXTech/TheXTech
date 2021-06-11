@@ -685,7 +685,6 @@ void UpdateLoadREAL()
 #ifdef __3DS__
         frmMain.initDraw(0);
 #endif
-        // frmMain.clearBuffer();
         int Left = ScreenW/2 - GFX.MenuGFX[4].w/2;
         if (Left < 0) Left = 0;
         int Top = ScreenH/2 - GFX.MenuGFX[4].h/2;
@@ -694,6 +693,7 @@ void UpdateLoadREAL()
         if (Right > ScreenW) Right = ScreenW;
         int Bottom = ScreenH/2 + GFX.MenuGFX[4].h/2;
         if (Bottom > ScreenH) Bottom = ScreenH;
+        frmMain.clearBuffer();
         if(!gfxLoaderTestMode)
             frmMain.renderTexture(ScreenW/2 - GFX.MenuGFX[4].w/2, ScreenH/2 - GFX.MenuGFX[4].h/2, GFX.MenuGFX[4]);
         else
