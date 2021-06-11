@@ -70,6 +70,15 @@ void speedRun_resetTotal()
 
 #define bool2alpha(b) (b ? 1.f : 0.1f)
 
+#define bool2color(b) (b ? 1.f : 0.0f)
+#define bool2colorLt(b) (b ? 0.9f : 0.0f)
+
+#define bool2green(b) 0.f,              (b ? 1.f : 0.0f),   0.f
+#define bool2blue(b)  0.f,              0.f,                (b ? 1.f : 0.0f)
+#define bool2red(b)  (b ? 1.f : 0.0f),  0.f,                0.f
+#define bool2yellow(b) (b ? 1.f : 0.0f), (b ? 1.f : 0.0f),  0.f
+#define bool2gray(b) (b ? 0.9f : 0.0f), (b ? 0.9f : 0.0f),  (b ? 0.9f : 0.0f)
+
 static Controls_t s_displayControls[2] = {Controls_t()};
 
 void speedRun_render()
@@ -83,14 +92,39 @@ void speedRun_render()
     s_gamePlayTimer.render();
 
     int plrs = numPlayers > 2 ? 1 : numPlayers;
-    int plrs_x[] = {8, ScreenW - 200};
+    int plrs_x[] = {8, ScreenW - 80};
+
+    int w = 76;
+    int h = 30;
+    float alhpa = 0.7f;
+    float alhpaB = 0.8f;
 
     for(int i = 0; i < plrs; ++i)
     {
         const auto &c = s_displayControls[i];
         int x = plrs_x[i];
-        int y = ScreenH - 16;
+        int y = ScreenH - 32;
+
+        frmMain.renderRect(x, y, w, h, 0.4f, 0.4f, 0.4f, alhpa, true);//Box
+        frmMain.renderRect(x, y, w, h, 0.f, 0.f, 0.f, alhpa, false);//Edge
+
 #if 1
+        frmMain.renderRect(x + 10, y + 12, 6, 6, 0.f, 0.f, 0.f, alhpaB, true);//Cender of D-Pad
+        frmMain.renderRect(x + 10, y + 6, 6, 6, bool2gray(c.Up), alhpaB, true);
+        frmMain.renderRect(x + 10, y + 18, 6, 6, bool2gray(c.Down), alhpaB, true);
+        frmMain.renderRect(x + 4, y + 12, 6, 6, bool2gray(c.Left), alhpaB, true);
+        frmMain.renderRect(x + 16, y + 12, 6, 6, bool2gray(c.Right), alhpaB, true);
+
+        frmMain.renderRect(x + 64, y + 18, 6, 6, bool2green(c.Jump), alhpaB, true);
+        frmMain.renderRect(x + 66, y + 8, 6, 6, bool2red(c.AltJump), alhpaB, true);
+        frmMain.renderRect(x + 54, y + 16, 6, 6, bool2blue(c.Run), alhpaB, true);
+        frmMain.renderRect(x + 56, y + 6, 6, 6, bool2yellow(c.AltRun), alhpaB, true);
+
+        frmMain.renderRect(x + 26, y + 22, 10, 4, bool2gray(c.Drop), alhpaB, true);
+        frmMain.renderRect(x + 40, y + 22, 10, 4, bool2gray(c.Start), alhpaB, true);
+
+#elif 1
+        frmMain.renderRect(x + 10, y + 6, 6, 6, bool2color(c.Up), bool2color(c.Up), 0.f, alhpaB, false);
         if(c.Up)
             SuperPrint("]", 3, x, ScreenH - 24);
 
