@@ -12,6 +12,7 @@ Changes for 1.3.5.2
 -Added the cannon pipes that can shoot the player with a given speed
 -Added the workaround for custom background2-42 that has non-multiple 4 height (there are several custom sprites with the 3455 invalid height, they must be 3466)
 -Fixed an incorrect speed-run timer render at multiplayer mode
+-The controller state print has been replaced with a controller drawing to indicate the pressure state of buttons
 
 Changes for 1.3.5.1
 -Episodes and battle levels lists now loading in the separated thread with a progress showing
