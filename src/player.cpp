@@ -5561,7 +5561,11 @@ void PlayerEffects(int A)
                 }
                 Player[A].Effect2 = 3;
                 if(Player[A].HoldingNPC > 0)
+                {
+                    if(Player[A].ForceHold < 5) // Prevent NPC being stuck in the wall/ceiling
+                        Player[A].ForceHold = 5;
                     PlayerGrabCode(A);
+                }
             }
             else if(warp_dir_exit == LevelDoor::EXIT_DOWN)
             {
