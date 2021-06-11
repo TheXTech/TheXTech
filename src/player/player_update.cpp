@@ -849,17 +849,27 @@ void UpdatePlayer()
                             if(SuperSpeed)
                                 Player[A].Location.SpeedX = Player[A].Location.SpeedX * 0.95;
                         }
+
                         if(Player[A].Location.SpeedX > -0.18 && Player[A].Location.SpeedX < 0.18)
                         {
                             Player[A].Bumped = false;
                             Player[A].Location.SpeedX = 0;
                         }
                     }
+
                     if(Player[A].Location.SpeedX < -16)
                         Player[A].Location.SpeedX = -16;
                     else if(Player[A].Location.SpeedX > 16)
                         Player[A].Location.SpeedX = 16;
-                    if(Player[A].Controls.Run || Player[A].Character == 5)
+
+                    if(Player[A].WarpShooted &&
+                       Player[A].Location.SpeedX < Physics.PlayerRunSpeed * speedVar &&
+                       Player[A].Location.SpeedX > -Physics.PlayerRunSpeed * speedVar)
+                    {
+                        Player[A].WarpShooted = false;
+                    }
+
+                    if(!Player[A].WarpShooted && (Player[A].Controls.Run || Player[A].Character == 5))
                     {
                         if(Player[A].Location.SpeedX >= Physics.PlayerRunSpeed * speedVar)
                         {
@@ -871,9 +881,9 @@ void UpdatePlayer()
                             if(!SuperSpeed)
                                 Player[A].Location.SpeedX = -Physics.PlayerRunSpeed * speedVar;
                         }
-                        else
-                        {
-                        }
+//                        else  // REDURANT GARBAGE
+//                        {
+//                        }
                     }
                     else
                     {
