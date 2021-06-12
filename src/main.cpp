@@ -239,6 +239,7 @@ int main(int argc, char**argv)
                                                    cmd);
         TCLAP::SwitchArg switchSpeedRunSemiTransparent(std::string(), "speed-run-semitransparent",
                                                        "Make the speed-runner mode timer be drawn transparently", false);
+        TCLAP::SwitchArg switchDisplayControls(std::string(), "show-controls", "Display current controller state while the game process", false);
 
         TCLAP::SwitchArg switchVerboseLog(std::string(), "verbose", "Enable log output into the terminal", false);
 
@@ -269,6 +270,7 @@ int main(int argc, char**argv)
         cmd.add(&switchTestInterprocess);
         cmd.add(&switchVerboseLog);
         cmd.add(&switchSpeedRunSemiTransparent);
+        cmd.add(&switchDisplayControls);
         cmd.add(&inputFileNames);
 
         cmd.add(&recordReplay);
@@ -354,6 +356,7 @@ int main(int argc, char**argv)
 
         setup.speedRunnerMode = speedRunMode.getValue();
         setup.speedRunnerSemiTransparent = switchSpeedRunSemiTransparent.getValue();
+        setup.showControllerState = switchDisplayControls.getValue();
 
         setup.recordReplay = recordReplay.getValue();
         setup.recordRecord = recordRecord.getValue();

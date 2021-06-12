@@ -37,6 +37,7 @@ enum
 };
 
 extern int  g_speedRunnerMode;
+extern bool g_drawController;
 
 void speedRun_tick();
 
@@ -52,6 +53,7 @@ void speedRun_resetTotal();
 
 void speedRun_bossDeadEvent();
 
-void speedRun_render();
+void speedRun_renderControls(int player, int screenZ = -1);
+void speedRun_renderTimer();
 
 #endif // SPEEDRUNNER_H
