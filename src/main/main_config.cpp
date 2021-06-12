@@ -31,6 +31,7 @@
 #include "../sound.h"
 #include "../video.h"
 #include "../control/joystick.h"
+#include "speedrunner.h"
 
 #include <Utils/files.h>
 #include <Utils/strings.h>
@@ -96,6 +97,7 @@ void OpenConfig_preSetup()
         config.read("background-controller-input", g_videoSettings.allowBgControllerInput, false);
         config.read("frame-skip", g_videoSettings.enableFrameSkip, true);
         config.read("show-fps", g_videoSettings.showFrameRate, false);
+        config.read("display-controllers", g_drawController, false);
         config.endGroup();
 
         config.beginGroup("main");
@@ -276,6 +278,7 @@ void SaveConfig()
         config.setValue("background-controller-input", g_videoSettings.allowBgControllerInput);
         config.setValue("frame-skip", g_videoSettings.enableFrameSkip);
         config.setValue("show-fps", g_videoSettings.showFrameRate);
+        config.setValue("display-controllers", g_drawController);
     }
     config.endGroup();
 

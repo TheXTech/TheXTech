@@ -2553,7 +2553,6 @@ void UpdateGraphics(bool skipRepaint)
 //        End If
         }
 
-
         if(numScreens > 1) // for multiple screens
             frmMain.resetViewport();
 
@@ -2566,10 +2565,22 @@ void UpdateGraphics(bool skipRepaint)
         { // NOT AN EDITOR!!!
             s_shakeScreen.update();
         }
-//    Next Z
-    }
 
-    speedRun_render();
+        // TODO: VERIFY THIS
+        if(ScreenType == 5 && numScreens == 1)
+        {
+            speedRun_renderControls(1, -1);
+            speedRun_renderControls(2, -1);
+        }
+        else
+        {
+            speedRun_renderControls(Z, Z);
+        }
+
+//    Next Z
+    } // For(Z, 2, numScreens)
+
+    speedRun_renderTimer();
 
     if(!skipRepaint)
         frmMain.repaint();
