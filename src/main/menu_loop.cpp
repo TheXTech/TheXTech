@@ -42,6 +42,7 @@
 #include "../layers.h"
 #include "../player.h"
 #include "../collision.h"
+#include "../controls.h"
 #include "level_file.h"
 #include "menu_main.h"
 #include "game_info.h"
@@ -476,7 +477,8 @@ static void updateIntroLevelActivity()
 
 void MenuLoop()
 {
-    UpdateControls();
+    Controls::PollInputMethod();
+    Controls::Update();
 
     if(mainMenuUpdate())
         return;

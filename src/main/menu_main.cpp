@@ -35,6 +35,7 @@
 
 #include "menu_main.h"
 #include "game_info.h"
+#include "menu_playerselect.h"
 
 #include "speedrunner.h"
 #include "../game_main.h"
@@ -43,6 +44,7 @@
 #include "../collision.h"
 #include "../graphics.h"
 #include "../control/joystick.h"
+#include "../config.h"
 #include "level_file.h"
 #include "pge_delay.h"
 
@@ -62,6 +64,7 @@ void initMainMenu()
     SDL_AtomicSet(&loadingProgrss, 0);
     SDL_AtomicSet(&loadingProgrssMax, 0);
 
+    g_mainMenu.mainGame = "Main Game";
     g_mainMenu.main1PlayerGame = "1 Player Game";
     g_mainMenu.main2PlayerGame = "2 Player Game";
     g_mainMenu.mainBattleGame = "Battle Game";
@@ -72,6 +75,12 @@ void initMainMenu()
 
     for(int i = 1; i <= numCharacters; ++i)
         g_mainMenu.selectPlayer[i] = fmt::format_ne("{0} game", g_gameInfo.characterName[i]);
+
+    g_mainMenu.playerSelTitle = "Character Select";
+    g_mainMenu.wordPlayer = "Player";
+    g_mainMenu.wordProfile = "Profile";
+    g_mainMenu.playerSelStartGame = "Start Game";
+    g_mainMenu.playerSelAttachController = "Press A Button";
 }
 
 
@@ -248,50 +257,54 @@ bool mainMenuUpdate()
     int menuLen;
     Player_t blankPlayer;
 
-    bool altPressed = getKeyState(SDL_SCANCODE_LALT) == KEY_PRESSED ||
-                      getKeyState(SDL_SCANCODE_RALT) == KEY_PRESSED;
-    bool escPressed = getKeyState(SDL_SCANCODE_ESCAPE) == KEY_PRESSED;
-#ifdef __ANDROID__
-    escPressed |= getKeyState(SDL_SCANCODE_AC_BACK) == KEY_PRESSED;
-#endif
-    bool spacePressed = getKeyState(SDL_SCANCODE_SPACE) == KEY_PRESSED;
-    bool returnPressed = getKeyState(SDL_SCANCODE_RETURN) == KEY_PRESSED;
-    bool upPressed = getKeyState(SDL_SCANCODE_UP) == KEY_PRESSED;
-    bool downPressed = getKeyState(SDL_SCANCODE_DOWN) == KEY_PRESSED;
+    bool upPressed = SharedControls.MenuUp;
+    bool downPressed = SharedControls.MenuDown;
+    bool leftPressed = SharedControls.MenuLeft;
+    bool rightPressed = SharedControls.MenuRight;
 
-    bool menuDoPress = (returnPressed && !altPressed) || spacePressed;
-    bool menuBackPress = (escPressed && !altPressed);
+    bool menuDoPress = SharedControls.MenuDo;
+    bool menuBackPress = SharedControls.MenuBack;
+
+    for(int i = 0; i < maxLocalPlayers; i++)
+    {
+        Controls_t &c = Player[i+1].Controls;
+
+        menuDoPress |= c.Start || c.Jump;
+        menuBackPress |= c.Run;
+
+        upPressed |= c.Up;
+        downPressed |= c.Down;
+        leftPressed |= c.Left;
+        rightPressed |= c.Right;
+    }
 
     {
-        Controls_t &c = Player[1].Controls;
-
-        menuDoPress |= (c.Start || c.Jump) && !altPressed;
-        menuBackPress |= c.Run && !altPressed;
-
         if(frmMain.MousePointer != 99)
         {
             frmMain.MousePointer = 99;
             showCursor(0);
         }
 
-        if(!c.Up && !c.Down && !c.Jump && !c.Run && !c.Start)
         {
             bool k = false;
+            k |= menuBackPress;
             k |= menuDoPress;
             k |= upPressed;
             k |= downPressed;
-            k |= escPressed;
+            k |= leftPressed;
+            k |= rightPressed;
 
             if(!k)
                 MenuCursorCanMove = true;
 
         }
 
-        if(!getNewKeyboard && !getNewJoystick)
+        if(!getNewKeyboard && !getNewJoystick
+            && (MenuMode != MENU_CHARACTER_SELECT_NEW && MenuMode != MENU_CHARACTER_SELECT_NEW_BM))
         {
             int cursorDelta = 0;
 
-            if(c.Up || upPressed)
+            if(upPressed)
             {
                 if(MenuCursorCanMove)
                 {
@@ -301,7 +314,7 @@ bool mainMenuUpdate()
 
                 MenuCursorCanMove = false;
             }
-            else if(c.Down || downPressed)
+            else if(downPressed)
             {
                 if(MenuCursorCanMove)
                 {
@@ -343,20 +356,25 @@ bool mainMenuUpdate()
         {
             if(MenuMouseMove)
             {
-                For(A, 0, 4)
+                For(A, 0, 10)
                 {
                     if(MenuMouseY >= 350 + A * 30 && MenuMouseY <= 366 + A * 30)
                     {
-                        if(A == 0)
+                        int i = 0;
+                        if(g_config.LegacyPlayerSelect && A == i++)
                             menuLen = 18 * g_mainMenu.main1PlayerGame.size() - 2;
-                        else if(A == 1)
+                        else if(g_config.LegacyPlayerSelect && A == i++)
                             menuLen = 18 * g_mainMenu.main2PlayerGame.size() - 2;
-                        else if(A == 2)
+                        else if(!g_config.LegacyPlayerSelect && A == i++)
+                            menuLen = 18 * g_mainMenu.mainGame.size() - 2;
+                        else if(A == i++)
                             menuLen = 18 * g_mainMenu.mainBattleGame.size();
-                        else if(A == 3)
+                        else if(A == i++)
                             menuLen = 18 * g_mainMenu.mainOptions.size();
-                        else
+                        else if(A == i++)
                             menuLen = 18 * g_mainMenu.mainExit.size();
+                        else
+                            break;
 
                         if(MenuMouseX >= 300 && MenuMouseX <= 300 + menuLen)
                         {
@@ -373,11 +391,17 @@ bool mainMenuUpdate()
                 }
             }
 
-            if(escPressed && MenuCursorCanMove)
+            if(menuBackPress && MenuCursorCanMove)
             {
-                if(MenuCursor != 4)
+                int quitKeyPos;
+                if(g_config.LegacyPlayerSelect)
+                    quitKeyPos = 4;
+                else
+                    quitKeyPos = 3;
+
+                if(MenuCursor != quitKeyPos)
                 {
-                    MenuCursor = 4;
+                    MenuCursor = quitKeyPos;
                     PlaySoundMenu(SFX_Slide);
                 }
             }
@@ -387,7 +411,8 @@ bool mainMenuUpdate()
                 PlayerCharacter = 0;
                 PlayerCharacter2 = 0;
 
-                if(MenuCursor == 0)
+                int i = 0;
+                if(MenuCursor == i++)
                 {
                     PlaySoundMenu(SFX_Do);
                     MenuMode = MENU_1PLAYER_GAME;
@@ -401,7 +426,7 @@ bool mainMenuUpdate()
 #endif
                     MenuCursor = 0;
                 }
-                else if(MenuCursor == 1)
+                else if(g_config.LegacyPlayerSelect && MenuCursor == i++)
                 {
                     PlaySoundMenu(SFX_Do);
                     MenuMode = MENU_2PLAYER_GAME;
@@ -415,7 +440,7 @@ bool mainMenuUpdate()
 #endif
                     MenuCursor = 0;
                 }
-                else if(MenuCursor == 2)
+                else if(MenuCursor == i++)
                 {
                     PlaySoundMenu(SFX_Do);
                     MenuMode = MENU_BATTLE_MODE;
@@ -429,13 +454,13 @@ bool mainMenuUpdate()
 #endif
                     MenuCursor = 0;
                 }
-                else if(MenuCursor == 3)
+                else if(MenuCursor == i++)
                 {
                     PlaySoundMenu(SFX_Do);
                     MenuMode = MENU_OPTIONS;
                     MenuCursor = 0;
                 }
-                else if(MenuCursor == 4)
+                else if(MenuCursor == i++)
                 {
                     PlaySoundMenu(SFX_Do);
                     frmMain.setTargetTexture();
@@ -450,12 +475,53 @@ bool mainMenuUpdate()
 
             }
 
-            if(MenuCursor > 4)
+
+            int quitKeyPos;
+            if(g_config.LegacyPlayerSelect)
+                quitKeyPos = 4;
+            else
+                quitKeyPos = 3;
+            if(MenuCursor > quitKeyPos)
                 MenuCursor = 0;
             if(MenuCursor < 0)
-                MenuCursor = 4;
+                MenuCursor = quitKeyPos;
         } // Main Menu
 
+        // Character Select
+        else if(MenuMode == MENU_CHARACTER_SELECT_NEW ||
+                MenuMode == MENU_CHARACTER_SELECT_NEW_BM)
+        {
+            int ret = menuPlayerSelect_Logic(menuPlayersNum);
+            if(ret == -1)
+            {
+                if(MenuMode == MENU_CHARACTER_SELECT_NEW_BM)
+                {
+                    MenuCursor = selWorld - 1;
+                    MenuMode = MENU_BATTLE_MODE;
+                }
+                else
+                {
+                    MenuCursor = selSave - 1;
+                    MenuMode = MENU_SELECT_SLOT_1P;
+                }
+                MenuCursorCanMove = false;
+            }
+            else if(ret == 1)
+            {
+                if(MenuMode == MENU_CHARACTER_SELECT_NEW)
+                {
+                    MenuCursor = 0;
+                    StartEpisode();
+                    return true;
+                }
+                else if(MenuMode == MENU_CHARACTER_SELECT_NEW_BM)
+                {
+                    MenuCursor = 0;
+                    StartBattleMode();
+                    return true;
+                }
+            }
+        }
         // Character Select
         else if(MenuMode == MENU_CHARACTER_SELECT_1P ||
                 MenuMode == MENU_CHARACTER_SELECT_2P_S1 ||
@@ -676,7 +742,14 @@ bool mainMenuUpdate()
                     MenuCursor = MenuMode - 1;
 
                     if(MenuMode == MENU_BATTLE_MODE)
-                        MenuCursor = 2;
+                    {
+                        int battleIndex;
+                        if(g_config.LegacyPlayerSelect)
+                            battleIndex = 2;
+                        else
+                            battleIndex = 1;
+                        MenuCursor = battleIndex;
+                    }
 
                     MenuMode = MENU_MAIN;
 //'world select back
@@ -698,18 +771,34 @@ bool mainMenuUpdate()
                             blockCharacter[A] = SelectWorld[selWorld].blockChar[A];
                     }
 
-                    MenuMode *= MENU_CHARACTER_SELECT_BASE;
-                    MenuCursor = 0;
+                    if(g_config.LegacyPlayerSelect)
+                    {
+                        MenuMode *= MENU_CHARACTER_SELECT_BASE;
+                        MenuCursor = 0;
 
-                    if(MenuMode == MENU_CHARACTER_SELECT_BM_S1 && PlayerCharacter != 0)
-                        MenuCursor = PlayerCharacter - 1;
+                        if(MenuMode == MENU_CHARACTER_SELECT_BM_S1 && PlayerCharacter != 0)
+                            MenuCursor = PlayerCharacter - 1;
+                    }
+                    else
+                    {
+                        if(MenuMode == MENU_BATTLE_MODE)
+                        {
+                            MenuMode = MENU_CHARACTER_SELECT_NEW_BM;
+                            menuPlayerSelect_Start();
+                        }
+                        else
+                        {
+                            MenuMode *= MENU_SELECT_SLOT_BASE;
+                            MenuCursor = 0;
+                        }
+                    }
 
                     MenuCursorCanMove = false;
                 }
 
             }
 
-            if(MenuMode < MENU_CHARACTER_SELECT_BASE)
+            if(MenuMode == MENU_1PLAYER_GAME || MenuMode == MENU_2PLAYER_GAME || MenuMode == MENU_BATTLE_MODE)
             {
                 if(MenuCursor >= NumSelectWorld)
                     MenuCursor = 0;
@@ -729,150 +818,55 @@ bool mainMenuUpdate()
                 if(menuBackPress || MenuMouseBack)
                 {
 //'save select back
-                    if(AllCharBlock > 0)
+                    if(g_config.LegacyPlayerSelect)
+                    {
+                        if(AllCharBlock > 0)
+                        {
+                            MenuMode /= MENU_SELECT_SLOT_BASE;
+                            MenuCursor = selWorld - 1;
+                        }
+                        else
+                        {
+                            if(MenuMode == MENU_SELECT_SLOT_1P)
+                            {
+                                MenuCursor = PlayerCharacter - 1;
+                                MenuMode = MENU_CHARACTER_SELECT_1P;
+                            }
+                            else
+                            {
+                                MenuCursor = PlayerCharacter2 - 1;
+                                MenuMode = MENU_CHARACTER_SELECT_2P_S2;
+                            }
+                        }
+                    }
+                    else
                     {
                         MenuMode /= MENU_SELECT_SLOT_BASE;
                         MenuCursor = selWorld - 1;
                     }
-                    else
-                    {
-                        if(MenuMode == MENU_SELECT_SLOT_1P)
-                        {
-                            MenuCursor = PlayerCharacter - 1;
-                            MenuMode = MENU_CHARACTER_SELECT_1P;
-                        }
-                        else
-                        {
-                            MenuCursor = PlayerCharacter2 - 1;
-                            MenuMode = MENU_CHARACTER_SELECT_2P_S2;
-                        }
-                    }
 
                     MenuCursorCanMove = false;
-                    PlaySoundMenu(SFX_Do);
+                    PlaySoundMenu(SFX_Slide);
                 }
                 else if(menuDoPress || MenuMouseClick)
                 {
                     PlaySoundMenu(SFX_Do);
 
-                    if(MenuCursor >= 0 && MenuCursor <= 2) // Select the save slot
+                    if(MenuCursor >= 0 && MenuCursor <= 2 && g_config.LegacyPlayerSelect) // Select the save slot
                     {
+                        selSave = MenuCursor + 1;
                         numPlayers = MenuMode / MENU_SELECT_SLOT_BASE;
 
-                        For(A, 1, numCharacters)
-                        {
-                            SavedChar[A] = blankPlayer;
-                            SavedChar[A].Character = A;
-                            SavedChar[A].State = 1;
-                        }
+                        StartEpisode();
 
-                        Player[1].State = 1;
-                        Player[1].Mount = 0;
-                        Player[1].Character = 1;
-                        Player[1].HeldBonus = 0;
-                        Player[1].CanFly = false;
-                        Player[1].CanFly2 = false;
-                        Player[1].TailCount = 0;
-                        Player[1].YoshiBlue = false;
-                        Player[1].YoshiRed = false;
-                        Player[1].YoshiYellow = false;
-                        Player[1].Hearts = 0;
-                        Player[2].State = 1;
-                        Player[2].Mount = 0;
-                        Player[2].Character = 2;
-                        Player[2].HeldBonus = 0;
-                        Player[2].CanFly = false;
-                        Player[2].CanFly2 = false;
-                        Player[2].TailCount = 0;
-                        Player[2].YoshiBlue = false;
-                        Player[2].YoshiRed = false;
-                        Player[2].YoshiYellow = false;
-                        Player[2].Hearts = 0;
-
-                        if(numPlayers <= 2 && PlayerCharacter > 0)
-                        {
-                            Player[1].Character = PlayerCharacter;
-                            PlayerCharacter = 0;
-                        }
-
-                        if(numPlayers == 2 && PlayerCharacter2 > 0)
-                        {
-                            Player[2].Character = PlayerCharacter2;
-                            PlayerCharacter2 = 0;
-                        }
-
-                        selSave = MenuCursor + 1;
-                        numStars = 0;
-                        Coins = 0;
-                        Score = 0;
-                        Lives = 3;
-                        LevelSelect = true;
-                        GameMenu = false;
-                        frmMain.setTargetTexture();
-                        frmMain.clearBuffer();
-                        frmMain.repaint();
-                        StopMusic();
-                        DoEvents();
-                        PGE_Delay(500);
-                        ClearGame();
-
-                        OpenWorld(SelectWorld[selWorld].WorldPath + SelectWorld[selWorld].WorldFile);
-
-                        if(SaveSlot[selSave] >= 0)
-                        {
-                            if(!NoMap)
-                                StartLevel.clear();
-                            LoadGame();
-                            speedRun_loadStats();
-                        }
-
-                        if(WorldUnlock)
-                        {
-                            For(A, 1, numWorldPaths)
-                            {
-                                tempLocation = WorldPath[A].Location;
-                                {
-                                    Location_t &l =tempLocation;
-                                    l.X = l.X + 4;
-                                    l.Y = l.Y + 4;
-                                    l.Width = l.Width - 8;
-                                    l.Height = l.Height - 8;
-                                }
-
-                                WorldPath[A].Active = true;
-
-                                For(B, 1, numScenes)
-                                {
-                                    if(CheckCollision(tempLocation, Scene[B].Location))
-                                        Scene[B].Active = false;
-                                }
-                            }
-
-                            For(A, 1, numWorldLevels)
-                                WorldLevel[A].Active = true;
-                        }
-
-                        SetupPlayers();
-
-                        if(!StartLevel.empty())
-                        {
-                            PlaySoundMenu(SFX_LevelSelect);
-                            SoundPause[26] = 200;
-                            LevelSelect = false;
-
-                            GameThing();
-                            ClearLevel();
-
-                            PGE_Delay(1000);
-                            std::string levelPath = SelectWorld[selWorld].WorldPath + StartLevel;
-                            if(!OpenLevel(levelPath))
-                            {
-                                MessageText = fmt::format_ne("ERROR: Can't open \"{0}\": file doesn't exist or corrupted.", StartLevel);
-                                PauseGame(1);
-                                ErrorQuit = true;
-                            }
-                        }
                         return true;
+                    }
+                    else if(MenuCursor >= 0 && MenuCursor <= 2) // Select the save slot, but still need to select players
+                    {
+                        selSave = MenuCursor + 1;
+                        MenuMode = MENU_CHARACTER_SELECT_NEW;
+                        menuPlayerSelect_Start();
+                        MenuCursorCanMove = false;
                     }
                     else if(MenuCursor == 3) // Copy the gamesave
                     {
@@ -1048,8 +1042,13 @@ bool mainMenuUpdate()
             {
                 if(menuBackPress || MenuMouseBack)
                 {
+                    int optionsIndex;
+                    if(g_config.LegacyPlayerSelect)
+                        optionsIndex = 3;
+                    else
+                        optionsIndex = 2;
                     MenuMode = MENU_MAIN;
-                    MenuCursor = 3;
+                    MenuCursor = optionsIndex;
                     MenuCursorCanMove = false;
                     PlaySoundMenu(SFX_Slide);
                 }
@@ -1246,7 +1245,7 @@ bool mainMenuUpdate()
                             getNewJoystick = false;
                             MenuCursorCanMove = false;
                         }
-                        else if(escPressed)
+                        else if(SharedControls.MenuBack)
                         {
                             PlaySoundMenu(SFX_BlockHit);
                             setKey(cj, MenuCursor, lastJoyButton);
@@ -1406,12 +1405,19 @@ bool mainMenuUpdate()
 static void s_drawGameTypeTitle(int x, int y)
 {
     if(menuBattleMode)
-        SuperPrint("Battle game", 3, x, y, 0.3f, 0.3f, 1.0f);
+        SuperPrint(g_mainMenu.mainBattleGame, 3, x, y, 0.3f, 0.3f, 1.0f);
+    else if(!g_config.LegacyPlayerSelect)
+    {
+        SuperPrint(g_mainMenu.mainGame, 3, x, y);
+    }
     else
     {
         float r = menuPlayersNum == 1 ? 1.f : 0.3f;
         float g = menuPlayersNum == 2 ? 1.f : 0.3f;
-        SuperPrint(fmt::format_ne("{0} Player game", menuPlayersNum), 3, x, y, r, g, 0.3f);
+        if(menuPlayersNum == 1)
+            SuperPrint(g_mainMenu.main1PlayerGame, 3, x, y, r, g, 0.3f);
+        else
+            SuperPrint(g_mainMenu.main2PlayerGame, 3, x, y, r, g, 0.3f);
     }
 }
 
@@ -1481,15 +1487,25 @@ void mainMenuDraw()
     // Main menu
     else if(MenuMode == MENU_MAIN)
     {
-        SuperPrint(g_mainMenu.main1PlayerGame, 3, 300, 350);
-        SuperPrint(g_mainMenu.main2PlayerGame, 3, 300, 380);
-        SuperPrint(g_mainMenu.mainBattleGame, 3, 300, 410);
-        SuperPrint(g_mainMenu.mainOptions, 3, 300, 440);
-        SuperPrint(g_mainMenu.mainExit, 3, 300, 470);
+        int i = 0;
+        if(g_config.LegacyPlayerSelect)
+            SuperPrint(g_mainMenu.main1PlayerGame, 3, 300, 350+30*(i++));
+        else
+            SuperPrint(g_mainMenu.mainGame, 3, 300, 350+30*(i++));
+        if(g_config.LegacyPlayerSelect)
+            SuperPrint(g_mainMenu.main2PlayerGame, 3, 300, 350+30*(i++));
+        SuperPrint(g_mainMenu.mainBattleGame, 3, 300, 350+30*(i++));
+        SuperPrint(g_mainMenu.mainOptions, 3, 300, 350+30*(i++));
+        SuperPrint(g_mainMenu.mainExit, 3, 300, 350+30*(i++));
         frmMain.renderTexture(300 - 20, 350 + (MenuCursor * 30), 16, 16, GFX.MCursor[0], 0, 0);
     }
 
     // Character select
+    else if(MenuMode == MENU_CHARACTER_SELECT_NEW ||
+            MenuMode == MENU_CHARACTER_SELECT_NEW_BM)
+    {
+        menuPlayerSelect_Render(menuPlayersNum);
+    }
     else if(MenuMode == MENU_CHARACTER_SELECT_1P ||
             MenuMode == MENU_CHARACTER_SELECT_2P_S1 ||
             MenuMode == MENU_CHARACTER_SELECT_2P_S2 ||

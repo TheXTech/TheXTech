@@ -105,5 +105,6 @@ void LinkFrame(int A);
 // Private Sub PlayerEffects(A As Integer)
 void PlayerEffects(int A);
 
+void DeletePlayer(int A);
 
 #endif // PLAYER_H

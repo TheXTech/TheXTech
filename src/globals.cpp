@@ -248,6 +248,7 @@ RangeArrI<int, 1, 10, 0> CoinFrame;
 RangeArrI<int, 1, 10, 0> CoinFrame2;
 EditorCursor_t EditorCursor;
 EditorControls_t EditorControls;
+SharedControls_t SharedControls;
 
 RangeArrI<int, 1, numSounds, 0> Sound;
 RangeArrI<int, 1, numSounds, 0> SoundPause;

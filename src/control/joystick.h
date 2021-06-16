@@ -35,7 +35,8 @@ struct SDL_JoyDeviceEvent;
 
 // Public Sub UpdateControls() 'Gets players controls
 // Gets players controls
-void UpdateControls();
+// void UpdateControls();
+// replaced by Controls::Update()
 
 #ifdef USE_TOUCHSCREEN_CONTROLLER
 void RenderTouchControls();

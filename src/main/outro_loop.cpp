@@ -28,7 +28,7 @@
 
 #include "../globals.h"
 #include "../game_main.h"
-#include "../control/joystick.h"
+#include "../controls.h"
 #include "../npc.h"
 #include "../blocks.h"
 #include "../effect.h"
@@ -40,7 +40,7 @@
 #include "game_info.h"
 
 
-void DoCredits()
+void DoCredits(bool quit)
 {
     if(GameMenu)
         return;
@@ -100,23 +100,7 @@ void DoCredits()
     {
 //        for(A = 1; A <= 2; A++) // Useless loop
 //        {
-        bool quitKey = false;
-        quitKey |= (getKeyState(vbKeyEscape) == KEY_PRESSED);
-        quitKey |= (getKeyState(vbKeySpace) == KEY_PRESSED);
-        quitKey |= (getKeyState(vbKeyReturn) == KEY_PRESSED);
-        for(int p = 1; p <= maxLocalPlayers; ++p)
-        {
-            if(useJoystick[p] > 0)
-                quitKey |= joyIsKeyDown(useJoystick[p] - 1, conJoystick[p].Start);
-        }
-#ifdef __ANDROID__ // Quit credits on BACK key press
-        quitKey |= (getKeyState(SDL_SCANCODE_AC_BACK) == KEY_PRESSED);
-#endif
-#ifdef USE_TOUCHSCREEN_CONTROLLER // Quit when pressed the "Start" on a touchscreen controller
-        quitKey |= CurrentTouchControls().Start;
-#endif
-
-        if(quitKey)
+        if(quit)
         {
             CreditChop = static_cast<float>(screenH_half);
             EndCredits = 0;
@@ -138,7 +122,12 @@ void OutroLoop()
     bool jumpBool = false;
     int64_t fBlock = 0;
     int64_t lBlock = 0;
-    UpdateControls();
+    Controls::Update();
+    bool quit = SharedControls.QuitCredits;
+    for(int i = 0; i < maxLocalPlayers; i++)
+    {
+        quit |= Player[i+1].Controls.Start;
+    }
 
     for(A = 1; A <= numPlayers; A++)
     {
@@ -192,7 +181,7 @@ void OutroLoop()
     UpdateBlocks();
     UpdateEffects();
     UpdatePlayer();
-    DoCredits();
+    DoCredits(quit);
     UpdateGraphics();
     UpdateSound();
     if(GameOutroDoQuit) // Don't unset the GameOutro before GFX update, otherwise a glitch will happen

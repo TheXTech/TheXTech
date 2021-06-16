@@ -6438,3 +6438,15 @@ void PlayerEffects(int A)
 //            Netplay::sendData Netplay::PutPlayerControls(nPlay.MySlot) + "1c" + std::to_string(A) + "|" + Player[A].Effect + "|" + Player[A].Effect2 + LB + "1h" + std::to_string(A) + "|" + Player[A].State + LB;
 //    }
 }
+
+void DeletePlayer(int A)
+{
+    if(A < 1 || A > numPlayers)
+        return;
+    SavedChar[Player[A].Character] = Player[A];
+    for(int B = A; B < numPlayers; B++)
+    {
+        Player[B] = std::move(Player[B+1]);
+    }
+    numPlayers --;
+}

@@ -290,6 +290,7 @@ set(THEXTECH_SRC
     src/main/level_file.cpp
     src/main/menu_loop.cpp
     src/main/menu_main.cpp
+    src/main/menu_playerselect.cpp
     src/main/cheat_code.cpp
     src/main/outro_loop.cpp
     src/main/trees.cpp
@@ -305,6 +306,8 @@ set(THEXTECH_SRC
     src/graphics/gfx_special_frames.cpp
     src/graphics/gfx_screen.cpp
     src/control/joystick.cpp
+    src/control/keyboard.cpp
+    src/control/controls.cpp
     src/change_res.cpp
     src/effect.cpp
     src/collision.cpp

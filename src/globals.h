@@ -43,7 +43,6 @@
 #include "control/con_control.h"
 
 #include "global_constants.h"
-#include "controls.h"
 
 //Option Explicit
 //Public Declare Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As Long)
@@ -175,8 +174,9 @@ extern std::string LB;
 //Public EoT As String  ' End of Transmission for WINSOCK
 extern std::string EoT;
 
-//Public Type Controls 'Controls for the player
-//moved into "controls.h"
+// Moved back into "control_types.h"
+//     since "controls.h" is changing more rapidly
+#include "control_types.h"
 
 //Public Type nPlayer  'online player type
 //    Controls As Controls  'online players controls
@@ -1485,6 +1485,8 @@ extern RangeArrI<int, 1, 10, 0> CoinFrame2;
 extern EditorCursor_t EditorCursor;
 //Public EditorControls As EditorControls
 extern EditorControls_t EditorControls;
+
+extern SharedControls_t SharedControls;
 
 //Public Sound(1 To numSounds) As Integer
 extern RangeArrI<int, 1, numSounds, 0> Sound;

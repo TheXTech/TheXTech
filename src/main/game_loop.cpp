@@ -33,7 +33,7 @@
 #include "../frame_timer.h"
 #include "../game_main.h"
 #include "../sound.h"
-#include "../control/joystick.h"
+#include "../controls.h"
 #include "../effect.h"
 #include "../graphics.h"
 #include "../blocks.h"
@@ -50,7 +50,7 @@ void CheckActive();//in game_main.cpp
 
 void GameLoop()
 {
-    UpdateControls();
+    Controls::Update();
     if(LevelMacro > LEVELMACRO_OFF)
         UpdateMacro();
 
@@ -84,7 +84,7 @@ void GameLoop()
             }
         }
         NextLevel();
-        UpdateControls();
+        Controls::Update();
     }
     else if(qScreen)
     {
@@ -124,15 +124,7 @@ void GameLoop()
         if(MagicHand)
             UpdateEditor();
 
-        bool altPressed = getKeyState(SDL_SCANCODE_LALT) == KEY_PRESSED ||
-                          getKeyState(SDL_SCANCODE_RALT) == KEY_PRESSED;
-
-        bool escPressed = getKeyState(SDL_SCANCODE_ESCAPE) == KEY_PRESSED;
-#ifdef __ANDROID__
-        escPressed |= getKeyState(SDL_SCANCODE_AC_BACK) == KEY_PRESSED;
-#endif
-
-        bool pausePress = (Player[1].Controls.Start || escPressed) && !altPressed;
+        bool pausePress = Player[1].Controls.Start || SharedControls.Pause;
 
         if(pausePress)
         {
@@ -142,7 +134,8 @@ void GameLoop()
                 {
                     if((CaptainN || FreezeNPCs) && PSwitchStop == 0)
                     {
-                        if(escPressed)
+                        // not sure I understand why this distinction is here
+                        if(SharedControls.Pause) // if(escPressed)
                         {
                             FreezeNPCs = false;
                             PauseGame(1);
@@ -184,6 +177,7 @@ void GameLoop()
             {
                 if(Player[2].UnStart)
                 {
+                    // not sure I understand why the PSwitchStop is missing here
                     if(CaptainN || FreezeNPCs)
                     {
                         Player[2].UnStart = false;
@@ -253,21 +247,16 @@ void PauseGame(int plr)
                 UpdateGraphics2();
             else
                 UpdateGraphics();
-            UpdateControls();
+            Controls::Update();
             UpdateSound();
             BlockFrames();
             UpdateEffects();
 
-            bool altPressed = getKeyState(SDL_SCANCODE_LALT) == KEY_PRESSED ||
-                              getKeyState(SDL_SCANCODE_RALT) == KEY_PRESSED;
-            bool escPressed = getKeyState(SDL_SCANCODE_ESCAPE) == KEY_PRESSED;
-            bool spacePressed = getKeyState(SDL_SCANCODE_SPACE) == KEY_PRESSED;
-            bool returnPressed = getKeyState(SDL_SCANCODE_RETURN) == KEY_PRESSED;
-            bool upPressed = getKeyState(SDL_SCANCODE_UP) == KEY_PRESSED;
-            bool downPressed = getKeyState(SDL_SCANCODE_DOWN) == KEY_PRESSED;
+            bool upPressed = SharedControls.MenuUp;
+            bool downPressed = SharedControls.MenuDown;
 
-            bool menuDoPress = (returnPressed && !altPressed) || spacePressed;
-            bool menuBackPress = (escPressed && !altPressed);
+            bool menuDoPress = SharedControls.MenuDo;
+            bool menuBackPress = SharedControls.MenuBack;
 
             if(SingleCoop > 0 || numPlayers > 2)
             {
@@ -277,11 +266,11 @@ void PauseGame(int plr)
 
             auto &c = Player[plr].Controls;
 
-            menuDoPress |= (c.Start || c.Jump) && !altPressed;
-            menuBackPress |= c.Run && !altPressed;
+            menuDoPress |= (c.Start || c.Jump);
+            menuBackPress |= c.Run;
 
-            upPressed |= (c.Up && !altPressed);
-            downPressed |= (c.Down && !altPressed);
+            upPressed |= c.Up;
+            downPressed |= c.Down;
 
             if(MessageText.empty())
             {

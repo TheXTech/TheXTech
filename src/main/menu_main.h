@@ -54,6 +54,9 @@ enum
     MENU_CHARACTER_SELECT_BM_S1 = 400,
     // Character select for battle game, step 2
     MENU_CHARACTER_SELECT_BM_S2 = 500,
+    // New character select for main game
+    MENU_CHARACTER_SELECT_NEW    = 1000,
+    MENU_CHARACTER_SELECT_NEW_BM = 1001,
 
     MENU_CHARACTER_SELECT_BASE  = MENU_CHARACTER_SELECT_1P,
     MENU_CHARACTER_SELECT_BASE_END = MENU_CHARACTER_SELECT_BM_S2,
@@ -84,6 +87,7 @@ enum
 
 struct MainMenuContent
 {
+    std::string mainGame;
     std::string main1PlayerGame;
     std::string main2PlayerGame;
     std::string mainBattleGame;
@@ -94,6 +98,11 @@ struct MainMenuContent
 
     RangeArr<std::string, 1, numCharacters> selectPlayer;
 
+    std::string playerSelTitle;
+    std::string wordPlayer;
+    std::string wordProfile;
+    std::string playerSelStartGame;
+    std::string playerSelAttachController;
 };
 
 extern MainMenuContent g_mainMenu;

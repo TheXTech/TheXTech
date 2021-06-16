@@ -107,6 +107,7 @@ void MoreScore(int addScore, Location_t Loc, int &Multiplier);
 // sets up player frame offsets so they are displayed correctly on the screen
 void SetupPlayerFrames();
 
+void StartEpisode();
 void StartBattleMode();
 
 // std::string FixComma(std::string newStr); // USELESS

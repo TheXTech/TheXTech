@@ -69,6 +69,7 @@ void DynamicScreen();
 // prints text to the screen
 void SuperPrint(std::string SuperWords, int Font, float X, float Y, float r = 1.f, float g = 1.f, float b = 1.f, float a = 1.f);
 void SuperPrintRightAlign(std::string SuperWords, int Font, float X, float Y, float r = 1.f, float g = 1.f, float b = 1.f, float a = 1.f);
+void SuperPrintCenter(std::string SuperWords, int Font, float X, float Y, float r = 1.f, float g = 1.f, float b = 1.f, float a = 1.f);
 void SuperPrintScreenCenter(std::string SuperWords, int Font, float Y, float r = 1.f, float g = 1.f, float b = 1.f, float a = 1.f);
 // Public Sub SetRes()
 void SetRes();

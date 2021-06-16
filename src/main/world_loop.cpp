@@ -33,7 +33,7 @@
 #include "../frame_timer.h"
 #include "../game_main.h"
 #include "../sound.h"
-#include "../control/joystick.h"
+#include "../controls.h"
 #include "../effect.h"
 #include "../graphics.h"
 #include "../collision.h"
@@ -74,7 +74,7 @@ void WorldLoop()
 
     speedRun_tick();
     UpdateGraphics2();
-    UpdateControls();
+    Controls::Update();
     UpdateSound();
 
     if(curWorldLevel > 0)
@@ -203,15 +203,7 @@ void WorldLoop()
         tempLocation.Y = tempLocation.Y + 4;
         WorldPlayer[1].LevelName.clear();
 
-        bool altPressed = getKeyState(SDL_SCANCODE_LALT) == KEY_PRESSED ||
-                          getKeyState(SDL_SCANCODE_RALT) == KEY_PRESSED;
-
-        bool escPressed = getKeyState(SDL_SCANCODE_ESCAPE) == KEY_PRESSED;
-#ifdef __ANDROID__
-        escPressed |= getKeyState(SDL_SCANCODE_AC_BACK) == KEY_PRESSED;
-#endif
-
-        bool pausePress = (Player[1].Controls.Start || escPressed) && !altPressed;
+        bool pausePress = Player[1].Controls.Start || SharedControls.Pause;
 
         treeWorldLevelQuery(tempLocation, larr, true);
         //for(A = 1; A <= numWorldLevels; A++)

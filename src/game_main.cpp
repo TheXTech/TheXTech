@@ -62,6 +62,11 @@
 
 #include "pseudo_vb.h"
 
+#include "controls.h"
+
+#include "config.h"
+#include "main/menu_playerselect.h"
+
 void CheckActive();
 // set up sizable blocks
 void SizableBlocks();
@@ -1211,6 +1216,8 @@ void InitControls()
         joyFillDefaults(conJoystick[A]);
     }
 
+    Controls::Init();
+
     OpenConfig();
 
     // Automatically set the joystick if keyboard chosen
@@ -1428,41 +1435,169 @@ void SizableBlocks()
     BlockIsSizable[445] = true;
 }
 
+void StartEpisode()
+{
+    For(A, 1, numCharacters)
+    {
+        SavedChar[A] = Player_t();
+        SavedChar[A].Character = A;
+        SavedChar[A].State = 1;
+    }
+
+    for(int i = 1; i <= maxLocalPlayers; i++)
+    {
+        Player[i].State = 1;
+        Player[i].Mount = 0;
+        Player[i].Character = (i - 1) % 5 + 1;
+        Player[i].HeldBonus = 0;
+        Player[i].CanFly = false;
+        Player[i].CanFly2 = false;
+        Player[i].TailCount = 0;
+        Player[i].YoshiBlue = false;
+        Player[i].YoshiRed = false;
+        Player[i].YoshiYellow = false;
+        Player[i].Hearts = 0;
+    }
+
+    if(g_config.LegacyPlayerSelect)
+    {
+        if(numPlayers <= 2 && PlayerCharacter > 0)
+        {
+            Player[1].Character = PlayerCharacter;
+            PlayerCharacter = 0;
+        }
+
+        if(numPlayers == 2 && PlayerCharacter2 > 0)
+        {
+            Player[2].Character = PlayerCharacter2;
+            PlayerCharacter2 = 0;
+        }
+    }
+    else
+    {
+        numPlayers = Controls::g_InputMethods.size();
+        if(numPlayers > maxLocalPlayers)
+            numPlayers = maxLocalPlayers;
+        for(int i = 0; i < numPlayers; i++)
+        {
+            if(g_charSelect[i] != 0)
+                Player[i+1].Character = g_charSelect[i];
+        }
+    }
+
+    numStars = 0;
+    Coins = 0;
+    Score = 0;
+    Lives = 3;
+    LevelSelect = true;
+    GameMenu = false;
+    frmMain.setTargetTexture();
+    frmMain.clearBuffer();
+    frmMain.repaint();
+    StopMusic();
+    DoEvents();
+    PGE_Delay(500);
+    ClearGame();
+
+    OpenWorld(SelectWorld[selWorld].WorldPath + SelectWorld[selWorld].WorldFile);
+
+    if(SaveSlot[selSave] >= 0)
+    {
+        if(!NoMap)
+            StartLevel.clear();
+        LoadGame();
+        speedRun_loadStats();
+    }
+
+    if(WorldUnlock)
+    {
+        For(A, 1, numWorldPaths)
+        {
+            Location_t tempLocation = WorldPath[A].Location;
+            {
+                Location_t &l =tempLocation;
+                l.X = l.X + 4;
+                l.Y = l.Y + 4;
+                l.Width = l.Width - 8;
+                l.Height = l.Height - 8;
+            }
+
+            WorldPath[A].Active = true;
+
+            For(B, 1, numScenes)
+            {
+                if(CheckCollision(tempLocation, Scene[B].Location))
+                    Scene[B].Active = false;
+            }
+        }
+
+        For(A, 1, numWorldLevels)
+            WorldLevel[A].Active = true;
+    }
+
+    SetupPlayers();
+
+    if(!StartLevel.empty())
+    {
+        PlaySoundMenu(SFX_LevelSelect);
+        SoundPause[26] = 200;
+        LevelSelect = false;
+
+        GameThing();
+        ClearLevel();
+
+        PGE_Delay(1000);
+        std::string levelPath = SelectWorld[selWorld].WorldPath + StartLevel;
+        if(!OpenLevel(levelPath))
+        {
+            MessageText = fmt::format_ne("ERROR: Can't open \"{0}\": file doesn't exist or corrupted.", StartLevel);
+            PauseGame(1);
+            ErrorQuit = true;
+        }
+    }
+}
+
 void StartBattleMode()
 {
     int A = 0;
     Player_t blankPlayer;
-    numPlayers = 2;
     for(A = 1; A <= numCharacters; A++)
     {
         SavedChar[A] = blankPlayer;
         SavedChar[A].Character = A;
         SavedChar[A].State = 1;
     }
-    Player[1].State = 2;
-    Player[1].Mount = 0;
-    Player[1].Character = 1;
-    Player[1].HeldBonus = 0;
-    Player[1].CanFly = false;
-    Player[1].CanFly2 = false;
-    Player[1].TailCount = 0;
-    Player[1].YoshiBlue = false;
-    Player[1].YoshiRed = false;
-    Player[1].YoshiYellow = false;
-    Player[1].Hearts = 2;
-    Player[2].State = 2;
-    Player[2].Mount = 0;
-    Player[2].Character = 2;
-    Player[2].HeldBonus = 0;
-    Player[2].CanFly = false;
-    Player[2].CanFly2 = false;
-    Player[2].TailCount = 0;
-    Player[2].YoshiBlue = false;
-    Player[2].YoshiRed = false;
-    Player[2].YoshiYellow = false;
-    Player[2].Hearts = 2;
-    Player[1].Character = PlayerCharacter;
-    Player[2].Character = PlayerCharacter2;
+    for(int i = 1; i <= maxLocalPlayers; i++)
+    {
+        Player[i].State = 2;
+        Player[i].Mount = 0;
+        Player[i].Character = (i - 1) % 5 + 1;
+        Player[i].HeldBonus = 0;
+        Player[i].CanFly = false;
+        Player[i].CanFly2 = false;
+        Player[i].TailCount = 0;
+        Player[i].YoshiBlue = false;
+        Player[i].YoshiRed = false;
+        Player[i].YoshiYellow = false;
+        Player[i].Hearts = 2;
+    }
+    if(g_config.LegacyPlayerSelect)
+    {
+        numPlayers = 2;
+        Player[1].Character = PlayerCharacter;
+        Player[2].Character = PlayerCharacter2;
+    }
+    else
+    {
+        numPlayers = Controls::g_InputMethods.size();
+        if(numPlayers > maxLocalPlayers)
+            numPlayers = maxLocalPlayers;
+        for(int i = 0; i < numPlayers; i++)
+        {
+            if(g_charSelect[i] != 0)
+                Player[i+1].Character = g_charSelect[i];
+        }
+    }
     numStars = 0;
     Coins = 0;
     Score = 0;

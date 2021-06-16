@@ -31,6 +31,9 @@
 #include "../sound.h"
 #include "../video.h"
 #include "../control/joystick.h"
+#include "../controls.h"
+
+#include "../config.h"
 
 #include "record.h"
 
@@ -41,6 +44,7 @@
 #include <AppPath/app_path.h>
 #include <Logger/logger.h>
 
+Config_t g_config;
 
 void OpenConfig_preSetup()
 {
@@ -160,6 +164,7 @@ void OpenConfig()
         config.endGroup();
 
         config.beginGroup("gameplay");
+        config.read("legacy-player-select", g_config.LegacyPlayerSelect, false);
         config.read("ground-pound-by-alt-run", GameplayPoundByAltRun, false);
         config.endGroup();
 
@@ -174,6 +179,7 @@ void OpenConfig()
         config.read("enable-battery-status", JoystickEnableBatteryStatus, true);
         config.endGroup();
 
+        Controls::LoadConfig(ctl);
         For(A, 1, 2)
         {
             auto keys = ctl->childGroups();
@@ -306,6 +312,7 @@ void SaveConfig()
 
     config.beginGroup("gameplay");
     config.setValue("ground-pound-by-alt-run", GameplayPoundByAltRun);
+    config.setValue("legacy-player-select", g_config.LegacyPlayerSelect);
     config.endGroup();
 
     config.beginGroup("effects");
@@ -319,6 +326,7 @@ void SaveConfig()
     config.setValue("enable-battery-status", JoystickEnableBatteryStatus);
     config.endGroup();
 
+    Controls::SaveConfig(&controls);
     For(A, 1, 2)
     {
         std::vector<std::string> joystickUuid;

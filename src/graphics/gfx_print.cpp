@@ -70,10 +70,44 @@ void SuperPrintRightAlign(std::string SuperWords, int Font, float X, float Y, fl
     SuperPrint(SuperWords, Font, X, Y, r, g, b, a);
 }
 
+void SuperPrintCenter(std::string SuperWords, int Font, float X, float Y, float r, float g, float b, float a)
+{
+    switch(Font)
+    {
+    default:
+    case 1:
+    case 4:
+        X -= SuperWords.length() * 9;
+        break;
+    case 2:
+        X -= SuperWords.length() * 6;
+        break;
+    case 3:
+    {
+        int B = 0;
+        for(auto c : SuperWords)
+        {
+            c = std::toupper(c);
+            if(c >= 33 && c <= 126)
+            {
+                B += 9;
+                if(c == 'M')
+                    B += 1;
+            } else {
+                B += 8;
+            }
+        }
+        X -= B;
+        break;
+    }
+    }
+
+    SuperPrint(SuperWords, Font, X, Y, r, g, b, a);
+}
+
 void SuperPrintScreenCenter(std::string SuperWords, int Font, float Y, float r, float g, float b, float a)
 {
-    float X = (ScreenW / 2) - ((SuperWords.size() * 18) / 2);
-    SuperPrint(SuperWords, Font, X, Y, r, g, b, a);
+    SuperPrintCenter(SuperWords, Font, ScreenW / 2, Y, r, g, b, a);
 }
 
 void SuperPrint(std::string SuperWords, int Font, float X, float Y,
