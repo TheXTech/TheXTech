@@ -30,6 +30,7 @@
 #include "video.h"
 #include "main/game_info.h"
 #include "compat.h"
+#include "controls.h"
 #include <AppPath/app_path.h>
 #include <tclap/CmdLine.h>
 #include <Utils/strings.h>
@@ -415,12 +416,16 @@ int main(int argc, char**argv)
         return 1;
 #endif
 
+    Controls::Init();
+
     int ret = GameMain(setup);
 
 #ifdef ENABLE_XTECH_LUA
     if(!xtech_lua_quit())
         return 1;
 #endif
+
+    Controls::Quit();
 
     frmMain.freeSDL();
 

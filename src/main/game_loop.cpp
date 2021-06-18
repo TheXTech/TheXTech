@@ -537,3 +537,8 @@ void PauseGame(int plr)
     resetFrameTimer();
 }
 
+void RecoverControls()
+{
+    // breaks the main game loop to allow the players to fix their controls
+}
+

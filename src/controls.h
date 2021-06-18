@@ -239,7 +239,7 @@ public:
 };
 
 // represents a class of input devices, such as keyboard, SDL gamepad,
-//   or 3DS input. one of each class is instantiated in InitControls()
+//   or 3DS input. one of each class is instantiated in Controls::Init()
 class InputMethodType
 {
 protected:
@@ -298,6 +298,9 @@ public:
     /*-----------------------*\
     || OPTIONAL METHODS      ||
     \*-----------------------*/
+    // option function allowing developer to associate device information with profile
+    virtual bool SetDefaultProfile(InputMethod* method, InputMethodProfile* profile);
+
     // How many per-type special options are there?
     virtual size_t GetSpecialOptionCount();
 

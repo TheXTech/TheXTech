@@ -157,7 +157,8 @@ int GameMain(const CmdLineSetup_t &setup)
     ShowFPS = setup.testShowFPS;
     MaxFPS = setup.testMaxFPS; // || (g_videoSettings.renderModeObtained == RENDER_ACCELERATED_VSYNC);
 
-    InitControls(); // init player's controls
+    OpenConfig();
+
     DoEvents();
 
 #ifdef __EMSCRIPTEN__ // Workaround for a recent Chrome's policy to avoid sudden sound without user's interaction
@@ -1165,83 +1166,6 @@ void UpdateMacro()
     }
 }
 
-void InitControls()
-{
-    int A = 0;
-//    int B = 0;
-    bool newJoystick = false;
-
-    int joysticksCount = joyInitJoysticks();
-
-    for(int i = 0; i < joysticksCount; ++i)
-    {
-        newJoystick = joyStartJoystick(i);
-        if(newJoystick) {
-            A += 1;
-        } else {
-            break;
-        }
-    }
-    numJoysticks = A;
-
-    /* // Crazy Redigit's solution, useless
-//    If numJoysticks = 0 Then
-    if(numJoysticks == 0) {
-//        useJoystick(1) = 0
-        useJoystick[1] = 0;
-//        useJoystick(2) = 0
-        useJoystick[2] = 0;
-//    ElseIf numJoysticks = 1 Then
-    } else if(numJoysticks == 1) {
-//        useJoystick(1) = 1
-        useJoystick[1] = 1;
-//        useJoystick(2) = 0
-        useJoystick[2] = 0;
-//    Else
-    } else {
-//        useJoystick(1) = 1
-        useJoystick[1] = 1;
-//        useJoystick(2) = 2
-        useJoystick[2] = 2;
-//    End If
-    }
-    */
-
-    For(A, 1, maxLocalPlayers)
-        useJoystick[A] = 0;
-
-    For(A, 1, maxLocalPlayers)
-    {
-        joyFillDefaults(conKeyboard[A]);
-        joyFillDefaults(conJoystick[A]);
-    }
-
-    Controls::Init();
-
-    OpenConfig();
-
-    // Automatically set the joystick if keyboard chosen
-    for(int i = 1; i <= numJoysticks && i <= maxLocalPlayers; i++)
-    {
-        if(useJoystick[i] <= 0 && !wantedKeyboard[i])
-            useJoystick[i] = i;
-    }
-
-    for(int player = 1; player <= maxLocalPlayers; ++player)
-    {
-        if(useJoystick[player] > numJoysticks)
-            useJoystick[player] = 0;
-        else
-        {
-            int jip = useJoystick[player];
-            int ji = jip - 1;
-            if(ji >= 0)
-                joyGetByIndex(player, ji, conJoystick[player]);
-        }
-    }
-}
-
-
 // main_config.cpp
 
 
@@ -1485,6 +1409,11 @@ void StartEpisode()
         }
     }
 
+    for(int i = Controls::g_InputMethods.size() - 1; i >= numPlayers; i--)
+    {
+        Controls::DeleteInputMethodSlot(i);
+    }
+
     numStars = 0;
     Coins = 0;
     Score = 0;
@@ -1598,6 +1527,12 @@ void StartBattleMode()
                 Player[i+1].Character = g_charSelect[i];
         }
     }
+
+    for(int i = Controls::g_InputMethods.size() - 1; i >= numPlayers; i--)
+    {
+        Controls::DeleteInputMethodSlot(i);
+    }
+
     numStars = 0;
     Coins = 0;
     Score = 0;

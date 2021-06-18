@@ -103,6 +103,11 @@ struct MainMenuContent
     std::string wordProfile;
     std::string playerSelStartGame;
     std::string playerSelAttachController;
+    std::string rotateProfileMessage;
+
+    std::string controlsTitle;
+    std::string controlsConnected;
+    std::string controlsDeleteKey;
 };
 
 extern MainMenuContent g_mainMenu;

@@ -36,6 +36,7 @@
 #include "menu_main.h"
 #include "game_info.h"
 #include "menu_playerselect.h"
+#include "menu_controls.h"
 
 #include "speedrunner.h"
 #include "../game_main.h"
@@ -81,6 +82,7 @@ void initMainMenu()
     g_mainMenu.wordProfile = "Profile";
     g_mainMenu.playerSelStartGame = "Start Game";
     g_mainMenu.playerSelAttachController = "Press A Button";
+    g_mainMenu.rotateProfileMessage = "(L/R Rotate)";
 }
 
 
@@ -299,8 +301,7 @@ bool mainMenuUpdate()
 
         }
 
-        if(!getNewKeyboard && !getNewJoystick
-            && (MenuMode != MENU_CHARACTER_SELECT_NEW && MenuMode != MENU_CHARACTER_SELECT_NEW_BM))
+        if(!g_pollingInput && (MenuMode != MENU_CHARACTER_SELECT_NEW && MenuMode != MENU_CHARACTER_SELECT_NEW_BM))
         {
             int cursorDelta = 0;
 
