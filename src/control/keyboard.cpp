@@ -67,6 +67,10 @@ InputMethodProfile_Keyboard::InputMethodProfile_Keyboard()
     this->m_keys[PlayerControls::Buttons::AltRun] = SDL_SCANCODE_S;
     this->m_keys[PlayerControls::Buttons::Drop] = SDL_SCANCODE_LSHIFT;
     this->m_keys[PlayerControls::Buttons::Start] = SDL_SCANCODE_ESCAPE;
+    for(size_t i = 0; i < PlayerControls::n_buttons; i++)
+    {
+        this->m_keys2[i] = null_key;
+    }
 }
 
 bool InputMethodProfile_Keyboard::PollPrimaryButton(size_t i)
@@ -163,8 +167,11 @@ bool InputMethodProfile_Keyboard::PollSecondaryButton(size_t i)
     // if another button's secondary key is the new key, delete it.
     // if another button's primary key is the new key,
     //     and it has a secondary key, overwrite it with the secondary key.
-    //     otherwise, replace it with the button the player is replacing.
+    //     otherwise, if this button's secondary key is defined, overwrite the other's with this.
+    //     if all else fails, overwrite the other button's with this button's PRIMARY key and assign
+    //         this button's PRIMARY key instead
 
+    bool can_do_secondary = true;
     for(size_t j = 0; j < PlayerControls::n_buttons; j++)
     {
         if(i != j && this->m_keys2[j] == key)
@@ -178,13 +185,21 @@ bool InputMethodProfile_Keyboard::PollSecondaryButton(size_t i)
                 this->m_keys[j] = this->m_keys2[j];
                 this->m_keys2[j] = null_key;
             }
-            else
+            else if(this->m_keys2[i] != null_key)
             {
                 this->m_keys[j] = this->m_keys2[i];
             }
+            else
+            {
+                this->m_keys[j] = this->m_keys[i];
+                can_do_secondary = false;
+            }
         }
     }
-    this->m_keys[i] = key;
+    if(can_do_secondary)
+        this->m_keys2[i] = key;
+    else
+        this->m_keys[i] = key;
     return true;
 }
 
@@ -286,7 +301,11 @@ InputMethod* InputMethodType_Keyboard::Poll(const std::vector<InputMethod*>& act
     }
 
     if (n_keyboards >= m_maxKeyboards)
+    {
+        // reset in case things change
+        this->m_canPoll = false;
         return nullptr;
+    }
 
     int key;
     for(key = 0; key < this->m_keyboardStateSize; key++)

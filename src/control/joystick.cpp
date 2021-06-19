@@ -347,10 +347,11 @@ void joyDeviceRemoveEvent(const SDL_JoyDeviceEvent *e)
 
     if(GameMenu && getNewJoystick) // Cancel the key binding if device got disconnected in the middle of the key awaiting
     {
-        auto &cj = conJoystick[MenuMode - MENU_INPUT_SETTINGS_BASE];
-        setKey(cj, MenuCursor, lastJoyButton);
-        getNewJoystick = false;
-        MenuCursorCanMove = false;
+        // this is not real anymore
+        // auto &cj = conJoystick[MenuMode - MENU_INPUT_SETTINGS_BASE];
+        // setKey(cj, MenuCursor, lastJoyButton);
+        // getNewJoystick = false;
+        // MenuCursorCanMove = false;
     }
 
     for(int p = 1; p <= maxLocalPlayers; ++p)

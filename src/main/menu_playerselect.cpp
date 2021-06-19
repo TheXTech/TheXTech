@@ -82,6 +82,9 @@ bool menuPlayerSelect_CheckDone(int minPlayers)
 
 int menuPlayerSelect_Mouse_Render(bool mouse, bool render, int minPlayers)
 {
+    if(mouse && !MenuMouseMove && !render && !MenuMouseDown)
+        return 0;
+
     int n = Controls::g_InputMethods.size();
     if(n < minPlayers)
         n = minPlayers;
@@ -224,8 +227,6 @@ int menuPlayerSelect_Mouse_Render(bool mouse, bool render, int minPlayers)
                         PlaySoundMenu(SFX_Do);
                         s_charSelectDone[p] = true;
                         MenuMouseRelease = false;
-                        if(menuPlayerSelect_CheckDone(minPlayers))
-                            return 1;
                     }
                 }
             }
@@ -394,8 +395,11 @@ int menuPlayerSelect_Logic(int minPlayers)
                 s_charSelectDone[p] = true;
                 PlaySoundMenu(SFX_Do);
             }
-            if(menuPlayerSelect_CheckDone(minPlayers))
-                return 1;
+            else
+            {
+                if(menuPlayerSelect_CheckDone(minPlayers))
+                    return 1;
+            }
             s_inputReady[p] = false;
         }
         // next options only apply if character is still being selected

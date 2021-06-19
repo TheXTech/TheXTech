@@ -83,6 +83,21 @@ void initMainMenu()
     g_mainMenu.playerSelStartGame = "Start Game";
     g_mainMenu.playerSelAttachController = "Press A Button";
     g_mainMenu.rotateProfileMessage = "(L/R Rotate)";
+
+    g_mainMenu.controlsTitle = "Controls";
+    g_mainMenu.controlsConnected = "Connected:";
+    g_mainMenu.controlsDeleteKey = "(Alt Jump to Delete)";
+    g_mainMenu.controlsDeviceTypes = "Device Types";
+    g_mainMenu.controlsInUse = "(In Use)";
+    g_mainMenu.controlsNotInUse = "(Not In Use)";
+    g_mainMenu.wordProfiles = "Profiles";
+    g_mainMenu.wordButtons = "Buttons";
+
+    g_mainMenu.controlsReallyDeleteProfile = "Really delete profile?";
+    g_mainMenu.controlsNewProfile = "<New Profile>";
+
+    g_mainMenu.wordNo = "No";
+    g_mainMenu.wordYes = "Yes";
 }
 
 
@@ -997,9 +1012,9 @@ bool mainMenuUpdate()
         else if(MenuMode == MENU_OPTIONS)
         {
 #ifndef __ANDROID__
-            const int optionsMenuLength = 3;
-#else
             const int optionsMenuLength = 2;
+#else
+            const int optionsMenuLength = 1;
 #endif
 
             if(MenuMouseMove)
@@ -1008,12 +1023,11 @@ bool mainMenuUpdate()
                 {
                     if(MenuMouseY >= 350 + A * 30 && MenuMouseY <= 366 + A * 30)
                     {
-                        if(A == 0)
-                            menuLen = 18 * std::strlen("player 1 controls") - 4;
-                        else if(A == 1)
-                            menuLen = 18 * std::strlen("player 2 controls") - 4;
+                        int i = 0;
+                        if(A == i++)
+                            menuLen = 18 * g_mainMenu.controlsTitle.size();
 #ifndef __ANDROID__
-                        else if(A == 2)
+                        else if(A == i++)
                         {
                             if(resChanged)
                                 menuLen = 18 * std::strlen("windowed mode");
@@ -1056,31 +1070,22 @@ bool mainMenuUpdate()
                 else if(menuDoPress || MenuMouseClick)
                 {
                     MenuCursorCanMove = false;
-                    if(MenuCursor == 0)
+                    int i = 0;
+                    if(MenuCursor == i++)
                     {
                         MenuCursor = 0;
-                        MenuMode = MENU_INPUT_SETTINGS_P1;
+                        MenuMode = MENU_INPUT_SETTINGS;
                         PlaySoundMenu(SFX_Slide);
                     }
-                    else if(MenuCursor == 1)
-                    {
-                        MenuCursor = 0;
-                        MenuMode = MENU_INPUT_SETTINGS_P2;
-                        PlaySoundMenu(SFX_Slide);
 #ifndef __ANDROID__ // on Android run the always full-screen
-                    }
-                    else if(MenuCursor == 2)
+                    else if(MenuCursor == i++)
                     {
                         PlaySoundMenu(SFX_Do);
                         ChangeScreen();
                     }
-                    else if(MenuCursor == 3)
-                    {
-#else
-                    }
-                    else if(MenuCursor == 2)
-                    {
 #endif
+                    else if(MenuCursor == i++)
+                    {
                         PlaySoundMenu(SFX_Do);
                         GameMenu = false;
                         GameOutro = true;
@@ -1103,255 +1108,14 @@ bool mainMenuUpdate()
         }
 
         // Input Settings
-        else if(MenuMode == MENU_INPUT_SETTINGS_P1 || MenuMode == MENU_INPUT_SETTINGS_P2)
+        else if(MenuMode == MENU_INPUT_SETTINGS)
         {
-            if(MenuMouseMove && !getNewJoystick && !getNewKeyboard)
+            int ret = menuControls_Logic();
+            if(ret == -1)
             {
-                if(useJoystick[MenuMode - MENU_INPUT_SETTINGS_BASE] == 0)
-                {
-                    For(A, 0, 11)
-                    {
-                        if(MenuMouseY >= 260 - 44 + A * 30 && MenuMouseY <= 276 - 44 + A * 30)
-                        {
-                            auto &ck = conKeyboard[MenuMode - MENU_INPUT_SETTINGS_BASE];
-                            switch(A)
-                            {
-                            default:
-                            case 0:
-                                menuLen = 18 * std::strlen("INPUT......KEYBOARD");
-                                break;
-                            case 1:
-                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
-                                                        getKeyName(ck.Up)).size());
-                                break;
-                            case 2:
-                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
-                                                        getKeyName(ck.Down)).size());
-                                break;
-                            case 3:
-                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
-                                                        getKeyName(ck.Left)).size());
-                                break;
-                            case 4:
-                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
-                                                        getKeyName(ck.Right)).size());
-                                break;
-                            case 5:
-                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
-                                                        getKeyName(ck.Run)).size());
-                                break;
-                            case 6:
-                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
-                                                        getKeyName(ck.AltRun)).size());
-                                break;
-                            case 7:
-                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
-                                                        getKeyName(ck.Jump)).size());
-                                break;
-                            case 8:
-                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
-                                                        getKeyName(ck.AltJump)).size());
-                                break;
-                            case 9:
-                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
-                                                        getKeyName(ck.Drop)).size());
-                                break;
-                            case 10:
-                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
-                                                        getKeyName(ck.Start)).size());
-                                break;
-                            case 11:
-                                menuLen = 18 * std::strlen("Reset tp default");
-                                break;
-                            }
-
-                            if(MenuMouseX >= 300 && MenuMouseX <= 300 + menuLen)
-                            {
-                                if(MenuMouseRelease && MenuMouseDown)
-                                    MenuMouseClick = true;
-
-                                if(MenuCursor != A)
-                                {
-                                    PlaySoundMenu(SFX_Slide);
-                                    MenuCursor = A;
-                                }
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    For(A, 0, 11)
-                    {
-                        if(MenuMouseY >= 260 - 44 + A * 30 && MenuMouseY <= 276 + A * 30 - 44)
-                        {
-                            if(A == 0)
-                            {
-                                menuLen = 18 * std::strlen("INPUT......JOYSTICK 1") - 2;
-                            }
-                            else
-                            {
-                                menuLen = 18 * std::strlen("RUN........_");
-                            }
-                            if(MenuMouseX >= 300 && MenuMouseX <= 300 + menuLen)
-                            {
-                                if(MenuMouseRelease && MenuMouseDown)
-                                    MenuMouseClick = true;
-
-                                if(MenuCursor != A)
-                                {
-                                    PlaySoundMenu(SFX_Slide);
-                                    MenuCursor = A;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            if(MenuCursorCanMove || ((!getNewKeyboard && !getNewJoystick) && (MenuMouseClick || MenuMouseBack)))
-            {
-                if(getNewKeyboard)
-                {
-                    if(inputKey != 0)
-                    {
-                        getNewKeyboard = false;
-                        MenuCursorCanMove = false;
-                        PlaySoundMenu(SFX_Do);
-                        setKey(conKeyboard[MenuMode - MENU_INPUT_SETTINGS_BASE], MenuCursor, inputKey);
-                    }
-
-                }
-                else if(getNewJoystick)
-                {
-                    int JoyNum = useJoystick[MenuMode - MENU_INPUT_SETTINGS_BASE] - 1;
-                    //SDL_JoystickUpdate();
-                    KM_Key joyKey;
-                    bool gotNewKey = joyPollJoystick(JoyNum, joyKey);
-
-                    //if(!joyIsKeyDown(JoyNum, oldJumpJoy))
-                    {
-                        oldJumpJoy.type = -1;
-                        oldJumpJoy.ctrl_type = -1;
-                        auto &cj = conJoystick[MenuMode - MENU_INPUT_SETTINGS_BASE];
-
-                        if(gotNewKey)
-                        {
-                            if(cj.isGameController)
-                                joyKey.type = lastJoyButton.type;
-                            PlaySoundMenu(SFX_Do);
-                            setKey(cj, MenuCursor, joyKey);
-                            // Save the changed state into the common cache
-                            joySetByIndex(MenuMode - MENU_INPUT_SETTINGS_BASE, JoyNum, cj);
-                            getNewJoystick = false;
-                            MenuCursorCanMove = false;
-                        }
-                        else if(SharedControls.MenuBack)
-                        {
-                            PlaySoundMenu(SFX_BlockHit);
-                            setKey(cj, MenuCursor, lastJoyButton);
-                            getNewJoystick = false;
-                            MenuCursorCanMove = false;
-                        }
-                    }
-                }
-                else
-                {
-                    if(menuBackPress || MenuMouseBack)
-                    {
-                        SaveConfig();
-                        MenuCursor = MenuMode - (MENU_INPUT_SETTINGS_BASE + 1);
-                        MenuMode = MENU_OPTIONS;
-                        MenuCursorCanMove = false;
-                        PlaySoundMenu(SFX_Slide);
-                    }
-                    else if(menuDoPress || MenuMouseClick)
-                    {
-                        auto &uj = useJoystick[MenuMode - MENU_INPUT_SETTINGS_BASE];
-                        auto &ck = conKeyboard[MenuMode - MENU_INPUT_SETTINGS_BASE];
-                        auto &cj = conJoystick[MenuMode - MENU_INPUT_SETTINGS_BASE];
-
-                        if(MenuCursor == 0)
-                        {
-                            PlaySoundMenu(SFX_Do);
-                            uj += 1;
-                            if(uj > numJoysticks)
-                                uj = 0;
-
-                            if(uj > 0)
-                            {
-                                int joyNum = uj - 1;
-                                // Load the saved state for given joystick
-                                joyGetByIndex(MenuMode - MENU_INPUT_SETTINGS_BASE, joyNum, cj);
-                            }
-                            // Tell player is prefer to use the keyboard than controller
-                            wantedKeyboard[MenuMode - MENU_INPUT_SETTINGS_BASE] = (uj == 0);
-                        }
-                        else
-                        if(MenuCursor == 11) // Reset to default
-                        {
-                            PlaySoundMenu(SFX_NewPath);
-                            if(uj == 0)
-                            {
-                                joyFillDefaults(ck);
-                            }
-                            else
-                            {
-                                int JoyNum = uj - 1;
-                                if(JoyNum >= 0)
-                                {
-                                    joyFillDefaults(cj);
-                                    joySetByIndex(MenuMode - MENU_INPUT_SETTINGS_BASE, JoyNum, cj);
-                                }
-                            }
-                        }
-                        else
-                        {
-                            if(uj == 0)
-                            {
-                                getNewKeyboard = true;
-                                setKey(ck, MenuCursor, -1);
-                                inputKey = 0;
-                            }
-                            else
-                            {
-                                auto &key = getKey(cj, MenuCursor);
-                                lastJoyButton = key;
-                                key.type = -1;
-                                key.ctrl_type = -1;
-                                if(MenuCursor == 7)
-                                    oldJumpJoy = key;
-                                getNewJoystick = true;
-                                MenuCursorCanMove = false;
-                            }
-                        }
-                        MenuCursorCanMove = false;
-                    }
-                }
-            }
-
-            if(MenuMode != MENU_OPTIONS)
-            {
-                if(MenuCursor > 11)
-                    MenuCursor = 0;
-                if(MenuCursor < 0)
-                    MenuCursor = 11;
-#if 0
-                if(useJoystick[MenuMode - 30] == 0)
-                {
-                    if(MenuCursor > 10)
-                        MenuCursor = 0;
-                    if(MenuCursor < 0)
-                        MenuCursor = 10;
-                }
-                else
-                {
-                    if(MenuCursor > 10)
-                        MenuCursor = 0;
-                    if(MenuCursor < 0)
-                        MenuCursor = 10;
-                }
-#endif
+                MenuCursor = 0;
+                MenuMode = MENU_OPTIONS;
+                MenuCursorCanMove = false;
             }
         }
     }
@@ -1686,60 +1450,23 @@ void mainMenuDraw()
     // Options Menu
     else if(MenuMode == MENU_OPTIONS)
     {
-        SuperPrint("PLAYER 1 CONTROLS", 3, 300, 350);
-        SuperPrint("PLAYER 2 CONTROLS", 3, 300, 380);
-#ifdef __ANDROID__
-        SuperPrint("VIEW CREDITS", 3, 300, 410);
-#else
+        int i = 0;
+        SuperPrint(g_mainMenu.controlsTitle, 3, 300, 350 + 30*i++);
+#ifndef __ANDROID__
         if(resChanged)
-            SuperPrint("WINDOWED MODE", 3, 300, 410);
+            SuperPrint("WINDOWED MODE", 3, 300, 350 + 30*i++);
         else
-            SuperPrint("FULLSCREEN MODE", 3, 300, 410);
-
-        SuperPrint("VIEW CREDITS", 3, 300, 440);
+            SuperPrint("FULLSCREEN MODE", 3, 300, 350 + 30*i++);
 #endif
+        SuperPrint("VIEW CREDITS", 3, 300, 350 + 30*i++);
         frmMain.renderTexture(300 - 20, 350 + (MenuCursor * 30),
                               GFX.MCursor[0].w, GFX.MCursor[0].h, GFX.MCursor[0], 0, 0);
     }
 
     // Player controls setup
-    else if(MenuMode == MENU_INPUT_SETTINGS_P1 || MenuMode == MENU_INPUT_SETTINGS_P2)
+    else if(MenuMode == MENU_INPUT_SETTINGS)
     {
-        if(useJoystick[MenuMode - MENU_INPUT_SETTINGS_BASE] == 0)
-        {
-            auto &ck = conKeyboard[MenuMode - MENU_INPUT_SETTINGS_BASE];
-            SuperPrint("INPUT......KEYBOARD", 3, 300, 260 + menuFix);
-            SuperPrint(fmt::format_ne("UP.........{0}", getKeyName(ck.Up)), 3, 300, 290 + menuFix);
-            SuperPrint(fmt::format_ne("DOWN.......{0}", getKeyName(ck.Down)), 3, 300, 320 + menuFix);
-            SuperPrint(fmt::format_ne("LEFT.......{0}", getKeyName(ck.Left)), 3, 300, 350 + menuFix);
-            SuperPrint(fmt::format_ne("RIGHT......{0}", getKeyName(ck.Right)), 3, 300, 380 + menuFix);
-            SuperPrint(fmt::format_ne("RUN........{0}", getKeyName(ck.Run)), 3, 300, 410 + menuFix);
-            SuperPrint(fmt::format_ne("ALT RUN....{0}", getKeyName(ck.AltRun)), 3, 300, 440 + menuFix);
-            SuperPrint(fmt::format_ne("JUMP.......{0}", getKeyName(ck.Jump)), 3, 300, 470 + menuFix);
-            SuperPrint(fmt::format_ne("ALT JUMP...{0}", getKeyName(ck.AltJump)), 3, 300, 500 + menuFix);
-            SuperPrint(fmt::format_ne("DROP ITEM..{0}", getKeyName(ck.Drop)), 3, 300, 530 + menuFix);
-            SuperPrint(fmt::format_ne("PAUSE......{0}", getKeyName(ck.Start)), 3, 300, 560 + menuFix);
-            SuperPrint("Reset to default", 3, 300, 590 + menuFix);
-        }
-        else
-        {
-            auto &cj = conJoystick[MenuMode - MENU_INPUT_SETTINGS_BASE];
-            SuperPrint("INPUT......" + joyGetName(useJoystick[MenuMode - MENU_INPUT_SETTINGS_BASE] - 1), 3, 300, 260 + menuFix);
-            SuperPrint(fmt::format_ne("UP.........{0}", getJoyKeyName(cj.isGameController, cj.Up)), 3, 300, 290 + menuFix);
-            SuperPrint(fmt::format_ne("DOWN.......{0}", getJoyKeyName(cj.isGameController, cj.Down)), 3, 300, 320 + menuFix);
-            SuperPrint(fmt::format_ne("LEFT.......{0}", getJoyKeyName(cj.isGameController, cj.Left)), 3, 300, 350 + menuFix);
-            SuperPrint(fmt::format_ne("RIGHT......{0}", getJoyKeyName(cj.isGameController, cj.Right)), 3, 300, 380 + menuFix);
-            SuperPrint(fmt::format_ne("RUN........{0}", getJoyKeyName(cj.isGameController, cj.Run)), 3, 300, 410 + menuFix);
-            SuperPrint(fmt::format_ne("ALT RUN....{0}", getJoyKeyName(cj.isGameController, cj.AltRun)), 3, 300, 440 + menuFix);
-            SuperPrint(fmt::format_ne("JUMP.......{0}", getJoyKeyName(cj.isGameController, cj.Jump)), 3, 300, 470 + menuFix);
-            SuperPrint(fmt::format_ne("ALT JUMP...{0}", getJoyKeyName(cj.isGameController, cj.AltJump)), 3, 300, 500 + menuFix);
-            SuperPrint(fmt::format_ne("DROP ITEM..{0}", getJoyKeyName(cj.isGameController, cj.Drop)), 3, 300, 530 + menuFix);
-            SuperPrint(fmt::format_ne("PAUSE......{0}", getJoyKeyName(cj.isGameController, cj.Start)), 3, 300, 560 + menuFix);
-            SuperPrint("Reset to default", 3, 300, 590 + menuFix);
-        }
-
-        frmMain.renderTexture(300 - 20, 260 + (MenuCursor * 30) + menuFix,
-                              GFX.MCursor[0].w, GFX.MCursor[0].h, GFX.MCursor[0], 0, 0);
+        menuControls_Render();
     }
 
     // Mouse cursor

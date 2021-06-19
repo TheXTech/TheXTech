@@ -61,11 +61,7 @@ enum
     MENU_CHARACTER_SELECT_BASE  = MENU_CHARACTER_SELECT_1P,
     MENU_CHARACTER_SELECT_BASE_END = MENU_CHARACTER_SELECT_BM_S2,
 
-    MENU_INPUT_SETTINGS_BASE = 30,
-    // Set up controls for player 1
-    MENU_INPUT_SETTINGS_P1 = 31,
-    // Set up controls for player 2
-    MENU_INPUT_SETTINGS_P2 = 32,
+    MENU_INPUT_SETTINGS = 30,
 
     MENU_SELECT_SLOT_BASE = 10,
     // Select game slot for single-player game
@@ -108,6 +104,16 @@ struct MainMenuContent
     std::string controlsTitle;
     std::string controlsConnected;
     std::string controlsDeleteKey;
+    std::string controlsDeviceTypes;
+    std::string controlsInUse;
+    std::string controlsNotInUse;
+    std::string wordProfiles;
+    std::string wordButtons;
+    std::string controlsReallyDeleteProfile;
+    std::string controlsNewProfile;
+
+    std::string wordYes;
+    std::string wordNo;
 };
 
 extern MainMenuContent g_mainMenu;

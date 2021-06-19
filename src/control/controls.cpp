@@ -95,7 +95,7 @@ InputMethodProfile* InputMethodType::AddProfile()
         return nullptr;
     profile->Type = this;
     this->m_profiles.push_back((InputMethodProfile*) profile);
-    profile->Name = this->Name + std::to_string(this->m_profiles.size());
+    profile->Name = this->Name + " " + std::to_string(this->m_profiles.size());
     return profile;
 }
 
@@ -478,6 +478,7 @@ InputMethod* PollInputMethod() noexcept
     }
     if(!new_method->Profile)
     {
+        // fallback 1: last profile used by this player index
         InputMethodProfile* default_profile = new_method->Type->GetDefaultProfile(player_idx);
         if(default_profile)
         {
@@ -488,8 +489,29 @@ InputMethod* PollInputMethod() noexcept
             std::vector<InputMethodProfile*> profiles = new_method->Type->GetProfiles();
             if(!profiles.empty())
             {
-                new_method->Profile = profiles[0];
+                // fallback 2: find first unused profile
+                size_t i;
+                for(i = 0; i < profiles.size(); i++)
+                {
+                    bool unused = true;
+                    for(InputMethod* other_method : g_InputMethods)
+                    {
+                        if(other_method && other_method->Profile == profiles[i])
+                        {
+                            unused = false;
+                            break;
+                        }
+                    }
+                    if(unused)
+                        break;
+                }
+                if(i != profiles.size())
+                    new_method->Profile = profiles[i];
+                // fallback 3: first profile
+                else
+                    new_method->Profile = profiles[0];
             }
+            // fallback 4: new default profile
             else
             {
                 new_method->Profile = new_method->Type->AddProfile();
