@@ -717,8 +717,7 @@ int GameMain(const CmdLineSetup_t &setup)
             UpdateGraphics(true);
             resetFrameTimer();
 
-            if(g_compatibility.speedrun_stop_timer_by == Compatibility_t::SPEEDRUN_STOP_ENTER_LEVEL && (SDL_strcasecmp(FileName.c_str(), g_compatibility.speedrun_stop_timer_at) == 0))
-                speedRun_bossDeadEvent();
+            speedRun_triggerEnter();
 
             // MAIN GAME LOOP
             runFrameLoop(nullptr, &GameLoop,
@@ -727,6 +726,7 @@ int GameMain(const CmdLineSetup_t &setup)
             {
                 if(!LivingPlayers())
                 {
+                    speedRun_triggerLeave();
                     EveryonesDead();
                     return true;
                 }
@@ -738,9 +738,6 @@ int GameMain(const CmdLineSetup_t &setup)
                 speedRun_saveStats();
                 return 0;// Break on quit
             }
-
-            if(g_compatibility.speedrun_stop_timer_by == Compatibility_t::SPEEDRUN_STOP_LEAVE_LEVEL && (SDL_strcasecmp(FileName.c_str(), g_compatibility.speedrun_stop_timer_at) == 0))
-                speedRun_bossDeadEvent();
 
             // TODO: Utilize this and any TestLevel/MagicHand related code to allow PGE Editor integration
             // (do any code without interaction of no more existnig Editor VB forms, keep IPS with PGE Editor instead)

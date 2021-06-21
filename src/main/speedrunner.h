@@ -51,6 +51,9 @@ void speedRun_saveStats();
 void speedRun_resetCurrent();
 void speedRun_resetTotal();
 
+void speedRun_triggerEnter();
+void speedRun_triggerLeave();
+
 void speedRun_bossDeadEvent();
 
 void speedRun_renderControls(int player, int screenZ = -1);
