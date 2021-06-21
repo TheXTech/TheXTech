@@ -474,6 +474,8 @@ int GameMain(const CmdLineSetup_t &setup)
             // Update graphics before loop begin (to process inital lazy-unpacking of used sprites)
             UpdateGraphics(true);
             resetFrameTimer();
+            // Clear the speed-runner timer
+            speedRun_resetTotal();
 
             // Main menu loop
             runFrameLoop(&MenuLoop, nullptr, []()->bool{ return GameMenu;});
