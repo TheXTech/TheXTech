@@ -1926,8 +1926,6 @@ void UpdateGraphics(bool skipRepaint)
         SuperPrint(fmt::format_ne("{0}", int(PrintFPS)), 1, 8, 8, 0.f, 1.f, 0.f);
     g_stats.print();
 
-    speedRun_renderTimer();
-
     if(GameOutro)
         DrawCredits();
 
@@ -1941,6 +1939,8 @@ void UpdateGraphics(bool skipRepaint)
     {
         speedRun_renderControls(Z, Z);
     }
+
+    speedRun_renderTimer();
 
     s_shakeScreen.update();
 
