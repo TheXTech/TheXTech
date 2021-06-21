@@ -265,7 +265,7 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
 
     m_gRenderer = SDL_CreateRenderer(m_window, -1, renderFlags | SDL_RENDERER_TARGETTEXTURE); // Try to make renderer
 
-    if(!m_gRenderer && g_videoSettings.renderMode != RENDER_ACCELERATED_VSYNC) // If was a V-Sync renderer, use non-V-Synced
+    if(!m_gRenderer && g_videoSettings.renderModeObtained == RENDER_ACCELERATED_VSYNC) // If was a V-Sync renderer, use non-V-Synced
     {
         pLogWarning("Failed to initialize V-Synced renderer, trying to create accelerated renderer...");
         renderFlags = SDL_RENDERER_ACCELERATED;
@@ -273,7 +273,7 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
         m_gRenderer = SDL_CreateRenderer(m_window, -1, renderFlags | SDL_RENDERER_TARGETTEXTURE);
     }
 
-    if(!m_gRenderer && g_videoSettings.renderMode != RENDER_SOFTWARE) // Fall back to software
+    if(!m_gRenderer && g_videoSettings.renderModeObtained == RENDER_ACCELERATED) // Fall back to software
     {
         pLogWarning("Failed to initialize accelerated renderer, trying to create a software renderer...");
         renderFlags = SDL_RENDERER_SOFTWARE;

@@ -1922,15 +1922,25 @@ void UpdateGraphics(bool skipRepaint)
     if(GameMenu && !GameOutro)
         mainMenuDraw();
 
-
     if(PrintFPS > 0)
         SuperPrint(fmt::format_ne("{0}", int(PrintFPS)), 1, 8, 8, 0.f, 1.f, 0.f);
     g_stats.print();
 
-    speedRun_render();
+    speedRun_renderTimer();
 
     if(GameOutro)
         DrawCredits();
+
+    // TODO: VERIFY THIS
+    if(ScreenType == 5 && numScreens == 1)
+    {
+        speedRun_renderControls(1, -1);
+        speedRun_renderControls(2, -1);
+    }
+    else
+    {
+        speedRun_renderControls(Z, Z);
+    }
 
     s_shakeScreen.update();
 

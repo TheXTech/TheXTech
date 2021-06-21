@@ -101,10 +101,7 @@ void OpenConfig_preSetup()
         config.read("background-controller-input", g_videoSettings.allowBgControllerInput, false);
         config.read("frame-skip", g_videoSettings.enableFrameSkip, true);
         config.read("show-fps", g_videoSettings.showFrameRate, false);
-        config.endGroup();
-
-        config.beginGroup("main");
-        config.readEnum("render", g_videoSettings.renderMode, g_videoSettings.renderMode, renderMode);
+        config.read("display-controllers", g_drawController, false);
         config.endGroup();
 
 #ifndef NO_SDL
@@ -175,8 +172,6 @@ void OpenConfig()
         config.beginGroup("main");
         config.read("release", FileRelease, curRelease);
         config.read("full-screen", resBool, false);
-        config.read("frame-skip", FrameSkip, FrameSkip);
-        config.read("show-fps", ShowFPS, ShowFPS);
         config.read("record-gameplay", g_recordControlRecord, g_recordControlRecord);
         config.endGroup();
 
@@ -315,6 +310,7 @@ void SaveConfig()
         config.setValue("background-controller-input", g_videoSettings.allowBgControllerInput);
         config.setValue("frame-skip", g_videoSettings.enableFrameSkip);
         config.setValue("show-fps", g_videoSettings.showFrameRate);
+        config.setValue("display-controllers", g_drawController);
     }
     config.endGroup();
 #   endif // !defined(__3DS__)

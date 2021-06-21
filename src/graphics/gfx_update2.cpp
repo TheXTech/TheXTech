@@ -240,7 +240,7 @@ void UpdateGraphics2(bool skipRepaint)
 
         sW = vScreen[Z].Width;
         sH = vScreen[Z].Height;
-        
+
         margin = 66;
         marginTop = 130;
 
@@ -738,7 +738,8 @@ void UpdateGraphics2(bool skipRepaint)
 
     g_stats.print();
 
-    speedRun_render();
+    speedRun_renderControls(1, -1);
+    speedRun_renderTimer();
 
     if(!skipRepaint)
         frmMain.repaint();

@@ -87,6 +87,8 @@ void GameLoop()
                 CheckpointsList.clear();
             }
         }
+
+        speedRun_triggerLeave();
         NextLevel();
         UpdateControls();
     }

@@ -158,8 +158,8 @@ void GameplayTimer::onBossDead()
 void GameplayTimer::render()
 {
     float a = m_semiTransparent ? 0.5f : 1.f;
-    int x = (ScreenW / 2) - (144 / 2);
+    // int x = (ScreenW / 2) - (144 / 2);
     int y = ScreenH;
-    SuperPrint(formatTime(m_cyclesCurrent), 3, x, y - 32, 1.f, 1.f, 1.f, a);
-    SuperPrint(formatTime(m_cyclesTotal),   3, x, y - 16, 1.f, 1.f, 1.f, a);
+    SuperPrintScreenCenter(formatTime(m_cyclesCurrent), 3, y - 34, 1.f, 1.f, 1.f, a);
+    SuperPrintScreenCenter(formatTime(m_cyclesTotal),   3, y - 18, 1.f, 1.f, 1.f, a);
 }
