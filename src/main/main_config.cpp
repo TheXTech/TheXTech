@@ -100,10 +100,6 @@ void OpenConfig_preSetup()
         config.read("display-controllers", g_drawController, false);
         config.endGroup();
 
-        config.beginGroup("main");
-        config.readEnum("render", g_videoSettings.renderMode, g_videoSettings.renderMode, renderMode);
-        config.endGroup();
-
         config.beginGroup("sound");
         config.read("disable-sound", g_audioSetup.disableSound, false);
         config.read("sample-rate", g_audioSetup.sampleRate, 44100);
@@ -154,8 +150,6 @@ void OpenConfig()
         config.beginGroup("main");
         config.read("release", FileRelease, curRelease);
         config.read("full-screen", resBool, false);
-        config.read("frame-skip", FrameSkip, FrameSkip);
-        config.read("show-fps", ShowFPS, ShowFPS);
         config.endGroup();
 
         config.beginGroup("gameplay");

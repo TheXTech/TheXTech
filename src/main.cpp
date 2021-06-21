@@ -323,7 +323,7 @@ int main(int argc, char**argv)
 
         setup.testGodMode = switchTestGodMode.getValue();
         setup.testGrabAll = switchTestGrabAll.getValue();
-        setup.testShowFPS = switchTestShowFPS.getValue();
+        setup.testShowFPS = switchTestShowFPS.getValue() || g_videoSettings.showFrameRate;
         setup.testMaxFPS = switchTestMaxFPS.getValue();
         setup.testMagicHand = switchTestMagicHand.getValue();
 
