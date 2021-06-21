@@ -507,6 +507,10 @@ int GameMain(const CmdLineSetup_t &setup)
                 OwedMountType[A] = 0;
             }
 
+            // Restore the previously preserved world map paths
+            FileNameFull = FileNameFullWorld;
+            FileName = FileNameWorld;
+
             LoadCustomCompat();
             FindCustomPlayers();
             LoadCustomGFX();

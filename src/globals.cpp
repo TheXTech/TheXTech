@@ -258,6 +258,8 @@ int LevelMacroCounter = 0;
 int numJoysticks = 0;
 std::string FileName;
 std::string FileNameFull;
+std::string FileNameWorld;
+std::string FileNameFullWorld;
 bool IsEpisodeIntro = false;
 int Coins = 0;
 float Lives = 0.0f;
