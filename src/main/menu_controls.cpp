@@ -62,7 +62,10 @@ int menuControls_Mouse_Render(bool mouse, bool render)
     // rendering of profile deletion screen
     if(s_deleteProfileSel)
     {
-        SuperPrintScreenCenter(g_mainMenu.controlsReallyDeleteProfile, 3, sY);
+        if(render)
+        {
+            SuperPrintScreenCenter(g_mainMenu.controlsReallyDeleteProfile, 3, sY);
+        }
 
         if(s_curType < 0 || s_curType >= n_types)
         {
@@ -78,15 +81,69 @@ int menuControls_Mouse_Render(bool mouse, bool render)
 
         Controls::InputMethodProfile* profile = type->GetProfiles()[s_curProfile];
 
-        if(profile)
+        if(profile && render)
             SuperPrintScreenCenter(profile->Name, 3, sY+line);
 
-        SuperPrint(g_mainMenu.wordNo, 3, sX+width/4, sY+line*3);
-        if(MenuCursor == 0)
-            frmMain.renderTexture(sX+width/4-24, sY+line*3, GFX.MCursor[0]);
-        SuperPrint(g_mainMenu.wordYes, 3, sX+width/4, sY+line*4);
-        if(MenuCursor == 1)
-            frmMain.renderTexture(sX+width/4-24, sY+line*4, GFX.MCursor[0]);
+        if(render)
+        {
+            SuperPrint(g_mainMenu.wordNo, 3, sX+width/4, sY+line*3);
+            if(MenuCursor == 0)
+                frmMain.renderTexture(sX+width/4-24, sY+line*3, GFX.MCursor[0]);
+            SuperPrint(g_mainMenu.wordYes, 3, sX+width/4, sY+line*4);
+            if(MenuCursor == 1)
+                frmMain.renderTexture(sX+width/4-24, sY+line*4, GFX.MCursor[0]);
+        }
+
+        if(mouse)
+        {
+            // collision and click handling for "NO"
+            int menuLen = g_mainMenu.wordNo.size() * 18;
+            if(MenuMouseX >= sX+width/4 && MenuMouseX <= sX+width/4 + menuLen
+                && MenuMouseY >= sY+line*3 && MenuMouseY <= sY+line*3 + 16)
+            {
+                if(MenuCursor != 0)
+                {
+                    PlaySoundMenu(SFX_Slide);
+                    MenuCursor = 0;
+                }
+
+                if(MenuMouseRelease && MenuMouseDown)
+                {
+                    PlaySoundMenu(SFX_Slide);
+                    s_deleteProfileSel = false;
+                    MenuCursor = s_curProfile;
+                    s_curProfile = -1;
+                    MenuMouseRelease = false;
+                }
+            }
+            // collision and click handling for "YES"
+            menuLen = g_mainMenu.wordYes.size() * 18;
+            if(MenuMouseX >= sX+width/4 && MenuMouseX <= sX+width/4 + menuLen
+                && MenuMouseY >= sY+line*4 && MenuMouseY <= sY+line*4 + 16)
+            {
+                if(MenuCursor != 1)
+                {
+                    PlaySoundMenu(SFX_Slide);
+                    MenuCursor = 1;
+                }
+
+                if(MenuMouseRelease && MenuMouseDown)
+                {
+                    if(profile && type->DeleteProfile(profile, Controls::g_InputMethods))
+                    {
+                        PlaySoundMenu(SFX_BowserKilled);
+                        s_deleteProfileSel = false;
+                        MenuCursor = s_curProfile;
+                        s_curProfile = -1;
+                    }
+                    else
+                    {
+                        PlaySoundMenu(SFX_BlockHit);
+                    }
+                    MenuMouseRelease = false;
+                }
+            }
+        }
 
         return 0;
     }
@@ -105,15 +162,59 @@ int menuControls_Mouse_Render(bool mouse, bool render)
             SuperPrint(g_mainMenu.controlsDeviceTypes, 3, sX+16, sY+2*line);
         }
 
-        // TODO: scrolling (shouldn't be needed except on crazy systems w/ little screen and lots of controllers)
-        for(int i = 0; i < n_types; i++)
+        int scroll_start = 0;
+        int scroll_end = n_types;
+
+        if(max_line - 9 < n_types)
+        {
+            int scroll_n = max_line - 9;
+            scroll_start = MenuCursor - scroll_n/2;
+            scroll_end = scroll_start + scroll_n;
+            if(scroll_start < 0)
+            {
+                scroll_start = 0;
+                scroll_end = scroll_start + scroll_n;
+            }
+            if(scroll_end > n_types)
+            {
+                scroll_end = n_types;
+                scroll_start = scroll_end - scroll_n;
+            }
+        }
+        for(int i = 0; i < scroll_end - scroll_start; i++)
         {
             if(render)
             {
-                SuperPrint(Controls::g_InputMethodTypes[i]->Name, 3, sX+48, sY+(3+i)*line);
-                if(MenuCursor == i)
+                SuperPrint(Controls::g_InputMethodTypes[scroll_start + i]->Name, 3, sX+48, sY+(3+i)*line);
+                if(MenuCursor == scroll_start + i)
                     frmMain.renderTexture(sX + 24, sY+(3+i)*line, GFX.MCursor[0]);
             }
+            int item_width = Controls::g_InputMethodTypes[scroll_start + i]->Name.size()*18;
+            if(mouse && MenuMouseX >= sX+48 && MenuMouseX <= sX+48 + item_width
+                && MenuMouseY >= sY+(3+i)*line && MenuMouseY <= sY+(3+i)*line + 16)
+            {
+                if(MenuCursor != scroll_start + i)
+                {
+                    PlaySoundMenu(SFX_Slide);
+                    MenuCursor = scroll_start + i;
+                }
+
+                if(MenuMouseRelease && MenuMouseDown)
+                {
+                    PlaySoundMenu(SFX_Do);
+                    s_curType = MenuCursor;
+                    MenuCursor = 0;
+                    MenuMouseRelease = false;
+                }
+            }
+        }
+        if(render)
+        {
+            if(scroll_start > 0)
+                frmMain.renderTexture(sX + width / 2 - GFX.MCursor[1].w / 2, sY+3*line - GFX.MCursor[1].h, GFX.MCursor[1]);
+
+            if(scroll_end < n_types)
+                frmMain.renderTexture(sX + width / 2 - GFX.MCursor[2].w / 2, sY+(3+scroll_end-scroll_start)*line, GFX.MCursor[2]);
         }
 
 
@@ -121,7 +222,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
         // render the players
         if(render)
         {
-            SuperPrintScreenCenter(g_mainMenu.controlsConnected, 3, sY+(max_line-5)*line);
+            SuperPrint(g_mainMenu.controlsConnected, 3, sX+16, sY+(max_line-5)*line);
             for(size_t p = 0; p < Controls::g_InputMethods.size(); p++)
             {
                 if(!Controls::g_InputMethods[p])
@@ -168,7 +269,10 @@ int menuControls_Mouse_Render(bool mouse, bool render)
                 if(!method)
                     continue;
                 if(method->Type == type)
+                {
                     in_use = true;
+                    break;
+                }
             }
 
             if(in_use)
@@ -178,35 +282,109 @@ int menuControls_Mouse_Render(bool mouse, bool render)
         }
 
         // first come the profiles, and then the type options.
+        // work out scrolling here
 
-        // overall title, possibly "OPTIONS" and the options, and "PROFILES" come before the profiles
-        int pY = sY + (2+1)*line;
+        int avail_lines = max_line - 2;
 
-        if(render)
+        int total_lines;
+        if(double_line)
+            total_lines = 1 + (n_profiles+1) + 2 + n_options*2;
+        else
+            total_lines = 1 + (n_profiles+1) + 2 + n_options;
+
+        int cur_line;
+        if(MenuCursor <= n_profiles)
+            cur_line = 1 + MenuCursor;
+        else if(double_line)
+            cur_line = 1 + (n_profiles+1) + 2 + (MenuCursor-(n_profiles+1))*2;
+        else
+            cur_line = 1 + (n_profiles+1) + 2 + (MenuCursor-(n_profiles+1));
+
+        // handle scrolling
+        int scroll_start = 0;
+        int scroll_end = total_lines;
+
+        if(avail_lines < total_lines)
         {
-            SuperPrint(g_mainMenu.wordProfiles, 3, sX+16, pY-line);
-            SuperPrintRightAlign(g_mainMenu.controlsDeleteKey, 3, sX+width-16, pY-line);
+            int scroll_n = avail_lines;
+            scroll_start = cur_line - scroll_n/2;
+            scroll_end = scroll_start + scroll_n;
+            if(scroll_start < 0)
+            {
+                scroll_start = 0;
+                scroll_end = scroll_start + scroll_n;
+            }
+            if(scroll_end > total_lines)
+            {
+                scroll_end = total_lines;
+                scroll_start = scroll_end - scroll_n;
+            }
+        }
+
+        // overall title and "PROFILES" come before the profiles
+        int start_y = sY + 2*line;
+
+        if(render && 0 >= scroll_start && 0 < scroll_end)
+        {
+            SuperPrint(g_mainMenu.wordProfiles, 3, sX+16, start_y + (0-scroll_start)*line);
+            SuperPrintRightAlign(g_mainMenu.controlsDeleteKey, 3, sX+width-16, start_y + (0-scroll_start)*line);
         }
 
         for(int i = 0; i <= n_profiles; i++)
         {
-            if(render)
+            if(i+1 >= scroll_start && i+1 < scroll_end)
             {
-                if(i == n_profiles)
-                    SuperPrint(g_mainMenu.controlsNewProfile, 3, sX+48, pY+i*line);
-                else
-                    SuperPrint(profiles[i]->Name, 3, sX+48, pY+i*line);
-                if(MenuCursor == i)
-                    frmMain.renderTexture(sX + 24, pY+i*line, GFX.MCursor[0]);
+                if(render)
+                {
+                    if(i == n_profiles)
+                        SuperPrint(g_mainMenu.controlsNewProfile, 3, sX+48, start_y + (i+1-scroll_start)*line);
+                    else
+                        SuperPrint(profiles[i]->Name, 3, sX+48, start_y + (i+1-scroll_start)*line);
+                    if(MenuCursor == i)
+                        frmMain.renderTexture(sX + 24, start_y + (i+1-scroll_start)*line, GFX.MCursor[0]);
+                }
+                if(mouse)
+                {
+                    int item_width;
+                    if(i == n_profiles)
+                        item_width = g_mainMenu.controlsNewProfile.size()*18;
+                    else
+                        item_width = profiles[i]->Name.size()*18;
+                    if(MenuMouseX >= sX+48 && MenuMouseX <= sX+48 + item_width
+                        && MenuMouseY >= start_y + (i+1-scroll_start)*line && MenuMouseY <= start_y + (i+1-scroll_start)*line + 16)
+                    {
+                        if(MenuCursor != i)
+                        {
+                            PlaySoundMenu(SFX_Slide);
+                            MenuCursor = i;
+                        }
+
+                        if(MenuMouseRelease && MenuMouseDown)
+                        {
+                            if(MenuCursor != n_profiles)
+                            {
+                                PlaySoundMenu(SFX_Do);
+                                s_curProfile = MenuCursor;
+                                MenuCursor = 0;
+                            }
+                            else
+                            {
+                                PlaySoundMenu(SFX_DropItem);
+                                type->AddProfile();
+                            }
+                            MenuMouseRelease = false;
+                        }
+                    }
+                }
             }
         }
 
-        // overall title, the profiles, "NEW PROFILE", and "OPTIONS" come before the options
-        int oY = sY+(2+1+n_profiles+1+2)*line;
+        // "PROFILE", the profiles, "NEW PROFILE", a blank line, and "OPTIONS" come before the options
+        int o_base = (1+n_profiles+1+2);
 
-        if(n_options && render)
+        if(n_options && render && o_base - 1 >= scroll_start && o_base - 1 < scroll_end)
         {
-            SuperPrint(g_mainMenu.mainOptions, 3, sX+16, oY-line);
+            SuperPrint(g_mainMenu.mainOptions, 3, sX+16, start_y + (o_base - 1 - scroll_start)*line);
         }
 
         for(int i = 0; i < n_options; i++)
@@ -215,20 +393,65 @@ int menuControls_Mouse_Render(bool mouse, bool render)
             {
                 if(render)
                 {
-                    SuperPrint(type->GetOptionName(i), 3, sX+24, oY+(2*i)*line);
-                    SuperPrint(type->GetOptionValue(i), 3, sX+48, oY+(2*i+1)*line);
-                    if(MenuCursor - n_profiles - 1 == i)
-                        frmMain.renderTexture(sX + 24, oY+(2*i+1)*line, GFX.MCursor[0]);
+                    if(o_base + 2*i >= scroll_start && o_base + 2*i + 1 < scroll_end)
+                    {
+                        SuperPrint(type->GetOptionName(i), 3, sX+24, start_y + (o_base + 2*i - scroll_start)*line);
+                        SuperPrint(type->GetOptionValue(i), 3, sX+48, start_y + (o_base + 2*i + 1 - scroll_start)*line);
+                        if(MenuCursor - n_profiles - 1 == i)
+                            frmMain.renderTexture(sX + 24, start_y + (o_base + 2*i + 1 - scroll_start)*line, GFX.MCursor[0]);
+                    }
+                }
+                if(mouse)
+                {
+                    int item_width = strlen(type->GetOptionValue(i))*18;
+                    if(MenuMouseX >= sX+48 && MenuMouseX <= sX+48 + item_width
+                        && MenuMouseY >= start_y + (o_base + 2*i + 1 - scroll_start)*line && MenuMouseY <= start_y + (o_base + 2*i + 1 - scroll_start)*line + 16)
+                    {
+                        if(MenuCursor != i + n_profiles + 1)
+                        {
+                            PlaySoundMenu(SFX_Slide);
+                            MenuCursor = i + n_profiles + 1;
+                        }
+
+                        if(MenuMouseRelease && MenuMouseDown)
+                        {
+                            PlaySoundMenu(SFX_Do);
+                            type->OptionChange(i);
+                            MenuMouseRelease = false;
+                        }
+                    }
                 }
             }
             else
             {
                 if(render)
                 {
-                    SuperPrint(type->GetOptionName(i), 3, sX+48, oY+i*line);
-                    SuperPrintRightAlign(type->GetOptionValue(i), 3, sX+width-32, oY+i*line);
-                    if(MenuCursor - n_profiles - 1 == i)
-                        frmMain.renderTexture(sX + 24, oY+i*line, GFX.MCursor[0]);
+                    if(o_base + i >= scroll_start && o_base + i < scroll_end)
+                    {
+                        SuperPrint(type->GetOptionName(i), 3, sX+48, start_y + (o_base + i - scroll_start)*line);
+                        SuperPrintRightAlign(type->GetOptionValue(i), 3, sX+width-32, start_y + (o_base + i - scroll_start)*line);
+                        if(MenuCursor - n_profiles - 1 == i)
+                            frmMain.renderTexture(sX + 24, start_y + (o_base + i - scroll_start)*line, GFX.MCursor[0]);
+                    }
+                }
+                if(mouse)
+                {
+                    if(MenuMouseX >= sX+48 && MenuMouseX <= sX+width-32
+                        && MenuMouseY >= start_y + (o_base + i - scroll_start)*line && MenuMouseY <= start_y + (o_base + i - scroll_start)*line + 16)
+                    {
+                        if(MenuCursor != i + n_profiles + 1)
+                        {
+                            PlaySoundMenu(SFX_Slide);
+                            MenuCursor = i + n_profiles + 1;
+                        }
+
+                        if(MenuMouseRelease && MenuMouseDown)
+                        {
+                            PlaySoundMenu(SFX_Do);
+                            type->OptionChange(i);
+                            MenuMouseRelease = false;
+                        }
+                    }
                 }
             }
         }
@@ -242,7 +465,10 @@ int menuControls_Mouse_Render(bool mouse, bool render)
         {
             double_line = true;
             if(line > 20)
+            {
+                max_line = max_line * line / 20;
                 line = 20;
+            }
         }
         // should never happen
         if(s_curType < 0 || s_curType >= n_types)
@@ -283,79 +509,171 @@ int menuControls_Mouse_Render(bool mouse, bool render)
         }
 
         // first come the player buttons, then the profile options.
+        // work out scrolling here
+
+        int avail_lines = max_line - 3;
+
+        int total_lines;
+        if(double_line)
+            total_lines = 1 + n_playerButtons*2 + n_options*2;
+        else
+            total_lines = 1 + n_playerButtons + n_options;
+        if(n_options)
+            total_lines += 2;
+
+        int cur_line;
+        if(double_line)
+            cur_line = MenuCursor*2;
+        else
+            cur_line = MenuCursor;
+        if(MenuCursor >= n_playerButtons)
+            cur_line += 2;
+
+        // handle scrolling
+        int scroll_start = 0;
+        int scroll_end = total_lines;
+
+        if(avail_lines < total_lines)
+        {
+            scroll_start = cur_line - avail_lines/2;
+            scroll_end = scroll_start + avail_lines;
+            if(scroll_start < 0)
+            {
+                scroll_start = 0;
+                scroll_end = scroll_start + avail_lines;
+            }
+            if(scroll_end > total_lines)
+            {
+                scroll_end = total_lines;
+                scroll_start = scroll_end - avail_lines;
+            }
+        }
 
         // overall title and "BUTTONS" come before the buttons
-        int bY = sY+(2+1)*line;
+        int start_y = sY + 3*line;
+        int b_base = 0;
 
         if(render)
         {
-            SuperPrint(g_mainMenu.wordButtons, 3, sX+16, bY-line);
-            SuperPrintRightAlign(g_mainMenu.controlsDeleteKey, 3, sX+width-16, bY-line);
+            SuperPrint(g_mainMenu.wordButtons, 3, sX+16, sY + 2*line);
+            SuperPrintRightAlign(g_mainMenu.controlsDeleteKey, 3, sX+width-16, sY + 2*line);
         }
 
         for(int i = 0; i < n_playerButtons; i++)
         {
             if(double_line)
             {
-                if(render)
+                printf("b %d l %d s %d f %d\n", i, b_base+2*i, scroll_start, scroll_end);
+                if(render && b_base+2*i >= scroll_start && b_base+2*i+1 < scroll_end)
                 {
-                    SuperPrint(Controls::PlayerControls::GetButtonName_UI(i), 3, sX+32+(width-32)/4, bY+(2*i)*line);
+                    SuperPrint(Controls::PlayerControls::GetButtonName_UI(i), 3, sX+32+(width-32)/4, start_y+(b_base+2*i - scroll_start)*line);
+
                     if(MenuCursor == i && !s_secondaryInput && g_pollingInput)
-                        SuperPrint("...", 3, sX+32, bY+(2*i+1)*line);
+                        SuperPrint("...", 3, sX+32, start_y+(b_base+2*i+1 - scroll_start)*line);
                     else
-                        SuperPrint(profile->NamePrimaryButton(i), 3, sX+32, bY+(2*i+1)*line);
+                        SuperPrint(profile->NamePrimaryButton(i), 3, sX+32, start_y+(b_base+2*i+1 - scroll_start)*line);
                     if(MenuCursor == i && s_secondaryInput && g_pollingInput)
-                        SuperPrint("...", 3, sX+32+(width-32)/2, bY+(2*i+1)*line);
+                        SuperPrint("...", 3, sX+32+(width-32)/2, start_y+(b_base+2*i+1 - scroll_start)*line);
                     else
-                        SuperPrint(profile->NameSecondaryButton(i), 3, sX+32+(width-32)/2, bY+(2*i+1)*line);
+                        SuperPrint(profile->NameSecondaryButton(i), 3, sX+32+(width-32)/2, start_y+(b_base+2*i+1 - scroll_start)*line);
                     if(MenuCursor == i)
                     {
                         if(!s_secondaryInput)
-                            frmMain.renderTexture(sX+8, bY+(2*i+1)*line, GFX.MCursor[0]);
+                            frmMain.renderTexture(sX+8, start_y+(b_base+2*i+1 - scroll_start)*line, GFX.MCursor[0]);
                         else
-                            frmMain.renderTexture(sX+8+(width-32)/2, bY+(2*i+1)*line, GFX.MCursor[0]);
+                            frmMain.renderTexture(sX+8+(width-32)/2, start_y+(b_base+2*i+1 - scroll_start)*line, GFX.MCursor[0]);
                     }
                 }
             }
             else
             {
-                if(render)
+                if(render && b_base+i >= scroll_start && b_base+i < scroll_end)
                 {
-                    SuperPrint(Controls::PlayerControls::GetButtonName_UI(i), 3, sX+48, bY+i*line);
+                    SuperPrint(Controls::PlayerControls::GetButtonName_UI(i), 3, sX+48, start_y+(b_base+i - scroll_start)*line);
                     if(MenuCursor == i && !s_secondaryInput && g_pollingInput)
-                        SuperPrint("...", 3, sX+width-420, bY+i*line);
+                        SuperPrint("...", 3, sX+width-420, start_y+(b_base+i - scroll_start)*line);
                     else
-                        SuperPrint(profile->NamePrimaryButton(i), 3, sX+width-420, bY+i*line);
+                        SuperPrint(profile->NamePrimaryButton(i), 3, sX+width-420, start_y+(b_base+i - scroll_start)*line);
                     if(MenuCursor == i && s_secondaryInput && g_pollingInput)
-                        SuperPrint("...", 3, sX+width-210, bY+i*line);
+                        SuperPrint("...", 3, sX+width-210, start_y+(b_base+i - scroll_start)*line);
                     else
-                        SuperPrint(profile->NameSecondaryButton(i), 3, sX+width-210, bY+i*line);
+                        SuperPrint(profile->NameSecondaryButton(i), 3, sX+width-210, start_y+(b_base+i - scroll_start)*line);
                     if(MenuCursor == i)
                     {
                         if(!s_secondaryInput)
-                            frmMain.renderTexture(sX+width-420-24, bY+i*line, GFX.MCursor[0]);
+                            frmMain.renderTexture(sX+width-420-24, start_y+(b_base+i - scroll_start)*line, GFX.MCursor[0]);
                         else
-                            frmMain.renderTexture(sX+width-210-24, bY+i*line, GFX.MCursor[0]);
+                            frmMain.renderTexture(sX+width-210-24, start_y+(b_base+i - scroll_start)*line, GFX.MCursor[0]);
+                    }
+                }
+            }
+            if(mouse && !g_pollingInput)
+            {
+                int primary_width = strlen(profile->NamePrimaryButton(i))*18;
+                if(primary_width < 72)
+                    primary_width = 72;
+                if((double_line && MenuMouseX >= sX+32 && MenuMouseX <= sX+32+primary_width
+                    && MenuMouseY >= start_y + (b_base + 2*i+1 - scroll_start)*line && MenuMouseY <= start_y + (b_base + 2*i+1 - scroll_start)*line + 16)
+                    || (!double_line && MenuMouseX >= sX+width-420 && MenuMouseX <= sX+width-420+primary_width
+                    && MenuMouseY >= start_y + (b_base + i - scroll_start)*line && MenuMouseY <= start_y + (b_base + i - scroll_start)*line + 16))
+                {
+                    if(MenuCursor != i || s_secondaryInput)
+                    {
+                        PlaySoundMenu(SFX_Slide);
+                        MenuCursor = i;
+                        s_secondaryInput = false;
+                    }
+
+                    if(MenuMouseRelease && MenuMouseDown)
+                    {
+                        PlaySoundMenu(SFX_PSwitch);
+                        g_pollingInput = true;
+                        MenuCursorCanMove = false;
+                        MenuMouseRelease = false;
+                        return 0;
+                    }
+                }
+                int secondary_width = strlen(profile->NameSecondaryButton(i))*18;
+                if(secondary_width < 72)
+                    secondary_width = 72;
+                if((double_line && MenuMouseX >= sX+32+(width-32)/2 && MenuMouseX <= sX+32+(width-32)/2+secondary_width
+                    && MenuMouseY >= start_y + (b_base + 2*i+1 - scroll_start)*line && MenuMouseY <= start_y + (b_base + 2*i+1 - scroll_start)*line + 16)
+                    || (!double_line && MenuMouseX >= sX+width-210 && MenuMouseX <= sX+width-210+secondary_width
+                    && MenuMouseY >= start_y + (b_base + i - scroll_start)*line && MenuMouseY <= start_y + (b_base + i - scroll_start)*line + 16))
+                {
+                    if(MenuCursor != i || !s_secondaryInput)
+                    {
+                        PlaySoundMenu(SFX_Slide);
+                        MenuCursor = i;
+                        s_secondaryInput = true;
+                    }
+
+                    if(MenuMouseRelease && MenuMouseDown)
+                    {
+                        PlaySoundMenu(SFX_PSwitch);
+                        g_pollingInput = true;
+                        MenuCursorCanMove = false;
+                        MenuMouseRelease = false;
+                        return 0;
                     }
                 }
             }
         }
 
-        if(n_options && render)
-        {
-            SuperPrint(g_mainMenu.mainOptions, 3, sX+16, sY+2*line);
-        }
-
-
         // overall title, player buttons, and "OPTIONS" come before the options
-        int oY;
+        int o_base;
         if(double_line)
         {
-            oY = sY+(2+1+2*n_playerButtons+2)*line;
+            o_base = (2+1+n_playerButtons*2+2);
         }
-        else if(n_options)
+        else
         {
-            oY = sY+(2+1+n_playerButtons+2)*line;
+            o_base = (2+1+n_playerButtons+2);
+        }
+
+        if(n_options && render && o_base - 1 >= scroll_start && o_base - 1 < scroll_end)
+        {
+            SuperPrint(g_mainMenu.mainOptions, 3, sX+16, start_y + (o_base - 1 - scroll_start)*line);
         }
 
         for(int i = 0; i < n_options; i++)
@@ -364,26 +682,77 @@ int menuControls_Mouse_Render(bool mouse, bool render)
             {
                 if(render)
                 {
-                    SuperPrint(profile->GetOptionName(i), 3, sX+24, oY+(2*i)*line);
-                    SuperPrint(profile->GetOptionValue(i), 3, sX+48, oY+(2*i+1)*line);
-                    if(MenuCursor - n_playerButtons == i)
-                        frmMain.renderTexture(sX + 24, oY+(2*i+1)*line, GFX.MCursor[0]);
+                    if(o_base + 2*i >= scroll_start && o_base + 2*i < scroll_end)
+                        SuperPrint(profile->GetOptionName(i), 3, sX+24, start_y + (o_base + 2*i - scroll_start)*line);
+                    if(o_base + 2*i + 1 >= scroll_start && o_base + 2*i + 1 < scroll_end)
+                    {
+                        SuperPrint(profile->GetOptionValue(i), 3, sX+48, start_y + (o_base + 2*i + 1 - scroll_start)*line);
+                        if(MenuCursor - n_playerButtons == i)
+                            frmMain.renderTexture(sX + 24, start_y + (o_base + 2*i + 1 - scroll_start)*line, GFX.MCursor[0]);
+                    }
+                }
+                if(mouse)
+                {
+                    int item_width = strlen(type->GetOptionValue(i))*18;
+                    if(MenuMouseX >= sX+48 && MenuMouseX <= sX+48 + item_width
+                        && MenuMouseY >= start_y + (o_base + 2*i + 1 - scroll_start)*line && MenuMouseY <= start_y + (o_base + 2*i + 1 - scroll_start)*line + 16)
+                    {
+                        if(MenuCursor != i + n_playerButtons)
+                        {
+                            PlaySoundMenu(SFX_Slide);
+                            MenuCursor = i + n_playerButtons;
+                        }
+
+                        if(MenuMouseRelease && MenuMouseDown)
+                        {
+                            PlaySoundMenu(SFX_Do);
+                            type->OptionChange(i);
+                            MenuMouseRelease = false;
+                        }
+                    }
                 }
             }
             else
             {
                 if(render)
                 {
-                    SuperPrint(profile->GetOptionName(i), 3, sX+48, oY+i*line);
-                    SuperPrintRightAlign(profile->GetOptionValue(i), 3, sX+width-32, oY+i*line);
-                    if(MenuCursor - n_playerButtons == i)
-                        frmMain.renderTexture(sX + 24, oY+i*line, GFX.MCursor[0]);
+                    if(o_base + i >= scroll_start && o_base + i < scroll_end)
+                    {
+                        SuperPrint(profile->GetOptionName(i), 3, sX+48, start_y + (o_base + i - scroll_start)*line);
+                        SuperPrintRightAlign(profile->GetOptionValue(i), 3, sX+width-32, start_y + (o_base + i - scroll_start)*line);
+                        if(MenuCursor - n_playerButtons == i)
+                            frmMain.renderTexture(sX + 24, start_y + (o_base + i - scroll_start)*line, GFX.MCursor[0]);
+                    }
+                }
+                if(mouse)
+                {
+                    if(MenuMouseX >= sX+48 && MenuMouseX <= sX+width-32
+                        && MenuMouseY >= start_y + (o_base + i - scroll_start)*line && MenuMouseY <= start_y + (o_base + i - scroll_start)*line + 16)
+                    {
+                        if(MenuCursor != i + n_playerButtons)
+                        {
+                            PlaySoundMenu(SFX_Slide);
+                            MenuCursor = i + n_playerButtons;
+                        }
+
+                        if(MenuMouseRelease && MenuMouseDown)
+                        {
+                            PlaySoundMenu(SFX_Do);
+                            type->OptionChange(i);
+                            MenuMouseRelease = false;
+                        }
+                    }
                 }
             }
         }
     }
 
     return 0;
+}
+
+int menuControls_MouseLogic()
+{
+    return menuControls_Mouse_Render(true, false);
 }
 
 int menuControls_Logic()
@@ -448,7 +817,8 @@ int menuControls_Logic()
     bool rightPressed = SharedControls.MenuRight;
 
     bool menuDoPress = SharedControls.MenuDo;
-    bool menuBackPress = SharedControls.MenuBack;
+    // todo: integrate MenuMouseBack soon!
+    bool menuBackPress = SharedControls.MenuBack || MenuMouseBack;
 
     bool delPressed = false;
 
@@ -801,7 +1171,8 @@ int menuControls_Logic()
             }
         }
     }
-    return 0;
+
+    return menuControls_MouseLogic();
 }
 
 void menuControls_Render()
