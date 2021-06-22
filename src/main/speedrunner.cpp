@@ -112,6 +112,7 @@ void speedRun_renderControls(int player, int screenZ)
     int y = ScreenH - 34;
     int w = 76;
     int h = 30;
+    bool drawLabel = false;
 
     if(screenZ >= 0)
     {
@@ -136,18 +137,38 @@ void speedRun_renderControls(int player, int screenZ)
 
     if(ScreenType == 5)  // TODO: VERIFY THIS
     {
-        if(player == 1)
+        auto &p = Player[player];
+
+        switch(p.Character) // TODO: Add changing of these colors by gameinfo.ini
         {
+        case 1:
             r = 0.5f;
             g = 0.3f;
             b = 0.3f;
-        }
-        else if(player == 2)
-        {
+            break;
+        case 2:
             r = 0.3f;
-            g = 0.5f;
+            g = 0.7f;
             b = 0.3f;
+            break;
+        case 3:
+            r = 1.0f;
+            g = 0.6f;
+            b = 0.7f;
+            break;
+        case 4:
+            r = 0.3f;
+            g = 0.3f;
+            b = 0.5f;
+            break;
+        case 5:
+            r = 0.2f;
+            g = 0.4f;
+            b = 0.2f;
+            break;
         }
+
+        drawLabel = true;
     }
 
     const auto &c = s_displayControls[player - 1];
@@ -168,6 +189,9 @@ void speedRun_renderControls(int player, int screenZ)
 
     frmMain.renderRect(x + 26, y + 22, 10, 4, bool2gray(c.Drop), alhpaB, true);
     frmMain.renderRect(x + 40, y + 22, 10, 4, bool2gray(c.Start), alhpaB, true);
+
+    if(drawLabel)
+        SuperPrint(fmt::format_ne("P{0}", player), 3, x + 22, y + 2, 1.f, 1.f, 1.f, 0.5f);
 }
 
 #undef bool2alpha
