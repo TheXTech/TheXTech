@@ -739,6 +739,7 @@ int GameMain(const CmdLineSetup_t &setup)
             {
                 if(!LivingPlayers())
                 {
+                    speedRun_triggerLeave();
                     EveryonesDead();
                     return true;
                 }
@@ -896,9 +897,6 @@ void UpdateMacro()
             IntProc::sendPlayerSettings(i, p.Character, p.State, p.Mount, p.MountType);
         }
     }
-
-    if(LevelMacro != LEVELMACRO_OFF && LevelMacroCounter == 0)
-        speedRun_triggerLeave();
 
     if(LevelMacro == LEVELMACRO_CARD_ROULETTE_EXIT) // SMB3 Exit
     {
