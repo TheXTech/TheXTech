@@ -122,13 +122,30 @@ void speedRun_renderControls(int player, int screenZ)
     }
     else
     {
+#if 0
         bool firstLefter =   Player[1].Location.X + (Player[1].Location.Width / 2)
                            < Player[2].Location.X + (Player[2].Location.Width / 2);
 
-        if(player == 1)
+        switch(player)
+        {
+        case 1:
             x = firstLefter ? 4 : (ScreenW - (w + 4));
-        else if(player == 2)
+            break;
+        case 2:
             x = firstLefter ? (ScreenW - (w + 4)) : 4;
+            break;
+        }
+#else
+        switch(player)
+        {
+        case 1:
+            x = 4;
+            break;
+        case 2:
+            x = (ScreenW - (w + 4));
+            break;
+        }
+#endif
     }
 
     float alhpa = 0.7f;
