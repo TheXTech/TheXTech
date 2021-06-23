@@ -174,9 +174,9 @@ void speedRun_renderControls(int player, int screenZ)
             b = 0.7f;
             break;
         case 4:
-            r = 0.3f;
-            g = 0.3f;
-            b = 0.5f;
+            r = 0.04f;
+            g = 0.43f;
+            b = 1.0f;
             break;
         case 5:
             r = 0.752941176f;
