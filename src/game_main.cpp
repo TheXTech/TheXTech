@@ -739,7 +739,6 @@ int GameMain(const CmdLineSetup_t &setup)
             {
                 if(!LivingPlayers())
                 {
-                    speedRun_triggerLeave();
                     EveryonesDead();
                     return true;
                 }
