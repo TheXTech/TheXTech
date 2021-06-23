@@ -142,7 +142,7 @@ void speedRun_renderControls(int player, int screenZ)
         switch(p.Character) // TODO: Add changing of these colors by gameinfo.ini
         {
         case 1:
-            r = 0.5f;
+            r = 0.7f;
             g = 0.3f;
             b = 0.3f;
             break;
@@ -162,9 +162,9 @@ void speedRun_renderControls(int player, int screenZ)
             b = 0.5f;
             break;
         case 5:
-            r = 0.2f;
-            g = 0.4f;
-            b = 0.2f;
+            r = 0.752941176f;
+            g = 0.658823529f;
+            b = 0.282352941f;
             break;
         }
 
