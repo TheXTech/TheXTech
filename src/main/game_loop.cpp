@@ -88,6 +88,7 @@ void GameLoop()
             }
         }
 
+        speedRun_triggerLeave();
         NextLevel();
         UpdateControls();
     }

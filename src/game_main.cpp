@@ -966,9 +966,6 @@ void UpdateMacro()
     }
 #endif
 
-    if(LevelMacro != LEVELMACRO_OFF && LevelMacroCounter == 0)
-        speedRun_triggerLeave();
-
     if(LevelMacro == LEVELMACRO_CARD_ROULETTE_EXIT) // SMB3 Exit
     {
         for(A = 1; A <= numPlayers; A++)
