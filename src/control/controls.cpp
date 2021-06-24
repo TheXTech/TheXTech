@@ -197,20 +197,26 @@ InputMethodProfile* InputMethodType::GetDefaultProfile(int player_no)
 void InputMethodType::SaveConfig(IniProcessing* ctl)
 {
     ctl->beginGroup(this->Name);
-    this->SaveConfig_Options(ctl);
-    //ctl->write("n-profiles", ); // TODO
+    this->SaveConfig_Custom(ctl);
+    ctl->setValue("n-profiles", this->m_profiles.size());
     for(int i = 0; i < maxLocalPlayers; i++)
     {
         InputMethodProfile* default_profile = this->m_defaultProfiles[i];
+        std::string default_profile_key = "default-profile-" + std::to_string(i);
+        if(default_profile == nullptr)
+        {
+            ctl->setValue(default_profile_key.c_str(), -1);
+            continue;
+        }
         std::vector<InputMethodProfile*>::iterator loc = std::find(this->m_profiles.begin(), this->m_profiles.end(), default_profile);
         size_t index = loc - this->m_profiles.begin();
-        (void)index;
-        //ctl->write("default-profile-" + std::to_string(i), ); // TODO
+        ctl->setValue(default_profile_key.c_str(), index);
     }
     ctl->endGroup();
     for(size_t i = 0; i < this->m_profiles.size(); i++)
     {
-        ctl->beginGroup(this->Name + std::to_string(i));
+        ctl->beginGroup(this->Name + "-" + std::to_string(i));
+        ctl->setValue("name", this->m_profiles[i]->Name);
         this->m_profiles[i]->SaveConfig(ctl);
         ctl->endGroup();
     }
@@ -218,20 +224,41 @@ void InputMethodType::SaveConfig(IniProcessing* ctl)
 
 void InputMethodType::LoadConfig(IniProcessing* ctl)
 {
+    int n_profiles;
+    int n_existing = this->m_profiles.size(); // should usually be zero
+
     ctl->beginGroup(this->Name);
-    this->SaveConfig_Options(ctl);
-    //ctl->write("n-profiles", ); // to-do
+    ctl->read("n-profiles", n_profiles, 0); // TODO
+    this->LoadConfig_Custom(ctl);
     ctl->endGroup();
-    for(size_t i = 0; i < this->m_profiles.size(); i++)
+
+    for(int i = 0; i < n_profiles; i++)
     {
-        ctl->beginGroup(this->Name + std::to_string(i));
+        ctl->beginGroup(this->Name + "-" + std::to_string(i));
         InputMethodProfile* new_profile = this->AddProfile();
         if(new_profile)
         {
+            ctl->read("name", new_profile->Name, this->Name + " " + std::to_string(i+n_existing+1));
             new_profile->LoadConfig(ctl);
         }
         ctl->endGroup();
     }
+
+    ctl->beginGroup(this->Name);
+    for(int i = 0; i < maxLocalPlayers; i++)
+    {
+        std::string default_profile_key = "default-profile-" + std::to_string(i);
+        int index;
+        ctl->read(default_profile_key.c_str(), index, -1);
+        if(index == -1)
+            this->m_defaultProfiles[i] = nullptr;
+        else
+        {
+            index += n_existing;
+            this->m_defaultProfiles[i] = this->m_profiles[index];
+        }
+    }
+    ctl->endGroup();
 }
 
 // optionally overriden methods
@@ -283,14 +310,16 @@ bool InputMethodType::OptionRotateRight(size_t i)
     return false;
 }
 
-void InputMethodType::SaveConfig_Options(IniProcessing* ctl)
+void InputMethodType::SaveConfig_Custom(IniProcessing* ctl)
 {
     (void)ctl;
+    // must be implemented if user has created special options
     SDL_assert_release(this->GetSpecialOptionCount() == 0);
 }
-void InputMethodType::LoadConfig_Options(IniProcessing* ctl)
+void InputMethodType::LoadConfig_Custom(IniProcessing* ctl)
 {
     (void)ctl;
+    // must be implemented if user has created special options
     SDL_assert_release(this->GetSpecialOptionCount() == 0);
 }
 
@@ -314,11 +343,11 @@ void Quit()
     g_InputMethodTypes.clear();
 }
 
-// 1. Calls the UpdateControlsPre hooks of currently active InputMethodTypes
+// 1. Calls the UpdateControlsPre hooks of loaded InputMethodTypes
 //    a. Syncs hardware state as needed
 // 2. Updates Player and Editor controls by calling currently bound InputMethods
 //    a. May call or set changeScreen, frmMain.toggleGifRecorder, TakeScreen, g_stats.enabled, etc
-// 3. Calls the UpdateControlsPost hooks of currently active InputMethodTypes
+// 3. Calls the UpdateControlsPost hooks of loaded InputMethodTypes
 //    a. May call or set changeScreen, frmMain.toggleGifRecorder, TakeScreen, g_stats.enabled, etc
 //    b. If GameMenu or GameOutro is set, may update controls or Menu variables using hardcoded keys
 // 4. Updates speedrun and recording modules
@@ -452,7 +481,6 @@ void SaveConfig(IniProcessing* ctl)
 
 void LoadConfig(IniProcessing* ctl)
 {
-    // TODO
     for(InputMethodType* type : g_InputMethodTypes)
     {
         type->ClearProfiles(g_InputMethods);

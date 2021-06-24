@@ -320,8 +320,8 @@ public:
     // called when right is pressed
     virtual bool OptionRotateRight(size_t i);
 
-    virtual void SaveConfig_Options(IniProcessing* ctl);
-    virtual void LoadConfig_Options(IniProcessing* ctl);
+    virtual void SaveConfig_Custom(IniProcessing* ctl);
+    virtual void LoadConfig_Custom(IniProcessing* ctl);
 };
 
 // allocate InputMethodTypes according to system configuration
