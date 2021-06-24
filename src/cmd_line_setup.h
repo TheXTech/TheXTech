@@ -49,6 +49,7 @@ struct CmdLineSetup_t
     //! Draw the speed-run timer semi-transparently
     bool speedRunnerSemiTransparent = false;
 
+    bool showControllerState = false;
     //! Index to replay
     int  recordReplayId = -1;
     //! Record gameplay data

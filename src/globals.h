@@ -1519,6 +1519,10 @@ extern int numJoysticks;
 extern std::string FileName;
 //! EXTRA: A full filename (the "FileName" is now has the "base name" sense)
 extern std::string FileNameFull;
+//! EXTRA: World map preserved filename
+extern std::string FileNameWorld;
+//! EXTRA: World map preserved full path
+extern std::string FileNameFullWorld;
 //! EXTRA: Identify that episode is an intro level
 extern bool IsEpisodeIntro;
 //Public Coins As Integer 'number of coins

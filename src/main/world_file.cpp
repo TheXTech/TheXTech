@@ -67,6 +67,10 @@ void OpenWorld(std::string FilePath)
     FileName = dirEpisode.resolveDirCase(wld.meta.filename); //FilePath.substr(FilePath.length() - (FilePath.length() - A));
     FileNamePath = wld.meta.path + "/"; //FilePath.substr(0, (A));
 
+    // Preserve these values for quick restoring when going to the world map
+    FileNameFullWorld = FileNameFull;
+    FileNameWorld = FileName;
+
     if(wld.meta.RecentFormat == LevelData::SMBX64)
         FileRelease = int(wld.meta.RecentFormatVersion);
 
