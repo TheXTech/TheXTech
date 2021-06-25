@@ -209,21 +209,6 @@ void OpenConfig()
                 }
             }
 
-            ctl->beginGroup(fmt::format_ne("player-{0}-keyboard", A));
-            ctl->read("device", useJoystick[A], useJoystick[A]);
-            ctl->read("wanted-keyboard", wantedKeyboard[A], wantedKeyboard[A]);
-            ctl->read("Up", conKeyboard[A].Up, conKeyboard[A].Up);
-            ctl->read("Down", conKeyboard[A].Down, conKeyboard[A].Down);
-            ctl->read("Left", conKeyboard[A].Left, conKeyboard[A].Left);
-            ctl->read("Right", conKeyboard[A].Right, conKeyboard[A].Right);
-            ctl->read("Run", conKeyboard[A].Run, conKeyboard[A].Run);
-            ctl->read("Jump", conKeyboard[A].Jump, conKeyboard[A].Jump);
-            ctl->read("Drop", conKeyboard[A].Drop, conKeyboard[A].Drop);
-            ctl->read("Start", conKeyboard[A].Start, conKeyboard[A].Start);
-            ctl->read("AltJump", conKeyboard[A].AltJump, conKeyboard[A].AltJump);
-            ctl->read("AltRun", conKeyboard[A].AltRun, conKeyboard[A].AltRun);
-            ctl->endGroup();
-
             ctl->beginGroup(fmt::format_ne("player-{0}-joystick", A));
 //            config.read("used-device", conJoystick[A].hwGUID, std::string());
             readJoyKey(*ctl, "Up", conJoystick[A].Up);
@@ -346,21 +331,6 @@ void SaveConfig()
             writeJoyKey(controls, "AltRun", j.AltRun);
             controls.endGroup();
         }
-
-        controls.beginGroup(fmt::format_ne("player-{0}-keyboard", A));
-        controls.setValue("device", useJoystick[A]);
-        controls.setValue("wanted-keyboard", wantedKeyboard[A]);
-        controls.setValue("Up", conKeyboard[A].Up);
-        controls.setValue("Down", conKeyboard[A].Down);
-        controls.setValue("Left", conKeyboard[A].Left);
-        controls.setValue("Right", conKeyboard[A].Right);
-        controls.setValue("Run", conKeyboard[A].Run);
-        controls.setValue("Jump", conKeyboard[A].Jump);
-        controls.setValue("Drop", conKeyboard[A].Drop);
-        controls.setValue("Start", conKeyboard[A].Start);
-        controls.setValue("AltJump", conKeyboard[A].AltJump);
-        controls.setValue("AltRun", conKeyboard[A].AltRun);
-        controls.endGroup();
 
         controls.beginGroup(fmt::format_ne("player-{0}-joystick", A));
 //        config.setValue("used-device", conJoystick[A].hwGUID);

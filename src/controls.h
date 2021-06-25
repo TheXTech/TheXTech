@@ -62,25 +62,25 @@ namespace PlayerControls
         switch(i)
         {
             case Buttons::Up:
-                return "Up";
+                return "up";
             case Buttons::Down:
-                return "Down";
+                return "down";
             case Buttons::Left:
-                return "Left";
+                return "left";
             case Buttons::Right:
-                return "Right";
+                return "right";
             case Buttons::Jump:
-                return "Jump";
+                return "jump";
             case Buttons::AltJump:
-                return "AltJump";
+                return "altjump";
             case Buttons::Run:
-                return "Run";
+                return "run";
             case Buttons::AltRun:
-                return "AltRun";
+                return "altrun";
             case Buttons::Drop:
-                return "Drop";
+                return "drop";
             case Buttons::Start:
-                return "Start";
+                return "start";
             default:
                 return "NULL";
         }
@@ -258,6 +258,8 @@ protected:
 public:
     // absolutely required to be unique, because it is used to identify configuration
     std::string Name;
+    // not required to be defined, refers to original "player-X-keyboard", etc, configurations.
+    std::string LegacyName;
 
     // InputMethodType frees its InputMethodProfiles in its destructor
     virtual ~InputMethodType();
@@ -272,8 +274,11 @@ public:
     // otherwise, leaves one profile allocated.
     bool ClearProfiles(const std::vector<InputMethod*>& active_methods);
 
-    bool SetDefaultProfile(int player_no, InputMethodProfile* profile);
+protected:
+    void SetDefaultProfile(int player_no, InputMethodProfile* profile);
+public:
     InputMethodProfile* GetDefaultProfile(int player_no);
+    bool SetProfile(InputMethod* method, int player_no, InputMethodProfile* profile);
 
     void SaveConfig(IniProcessing* ctl);
     void LoadConfig(IniProcessing* ctl);
@@ -298,9 +303,11 @@ public:
     /*-----------------------*\
     || OPTIONAL METHODS      ||
     \*-----------------------*/
-    // option function allowing developer to associate device information with profile
-    virtual bool SetDefaultProfile(InputMethod* method, InputMethodProfile* profile);
+protected:
+    // optional function allowing developer to associate device information with profile, etc
+    virtual bool SetProfile_Custom(InputMethod* method, int player_no, InputMethodProfile* profile);
 
+public:
     // How many per-type special options are there?
     virtual size_t GetSpecialOptionCount();
 
@@ -320,6 +327,7 @@ public:
     // called when right is pressed
     virtual bool OptionRotateRight(size_t i);
 
+protected:
     virtual void SaveConfig_Custom(IniProcessing* ctl);
     virtual void LoadConfig_Custom(IniProcessing* ctl);
 };
@@ -350,6 +358,8 @@ void LoadConfig(IniProcessing* ctl);
 InputMethod* PollInputMethod() noexcept;
 void DeleteInputMethod(InputMethod* method);
 void DeleteInputMethodSlot(int slot);
+bool SetInputMethodProfile(int slot, InputMethodProfile* profile);
+bool SetInputMethodProfile(InputMethod* method, InputMethodProfile* profile);
 void ClearInputMethods();
 
 } // namespace Controls

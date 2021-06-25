@@ -1113,6 +1113,7 @@ bool mainMenuUpdate()
             int ret = menuControls_Logic();
             if(ret == -1)
             {
+                SaveConfig();
                 MenuCursor = 0;
                 MenuMode = MENU_OPTIONS;
                 MenuCursorCanMove = false;

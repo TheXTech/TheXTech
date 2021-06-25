@@ -563,7 +563,6 @@ int menuControls_Mouse_Render(bool mouse, bool render)
         {
             if(double_line)
             {
-                printf("b %d l %d s %d f %d\n", i, b_base+2*i, scroll_start, scroll_end);
                 if(render && b_base+2*i >= scroll_start && b_base+2*i+1 < scroll_end)
                 {
                     SuperPrint(Controls::PlayerControls::GetButtonName_UI(i), 3, sX+32+(width-32)/4, start_y+(b_base+2*i - scroll_start)*line);
@@ -933,6 +932,12 @@ int menuControls_Logic()
         {
             Controls_t &c = Player[p+1].Controls;
 
+            if(p >= (int)Controls::g_InputMethods.size() || !Controls::g_InputMethods[p])
+            {
+                s_canRotate[p] = false;
+                continue;
+            }
+
             if(!s_canRotate[p])
             {
                 if(!c.Left && !c.Right)
@@ -940,7 +945,7 @@ int menuControls_Logic()
                 continue;
             }
 
-            if(c.Left && Controls::g_InputMethods[p])
+            if(c.Left)
             {
                 // rotate controls profile left
                 std::vector<Controls::InputMethodProfile*> profiles = Controls::g_InputMethods[p]->Type->GetProfiles();
@@ -952,7 +957,7 @@ int menuControls_Logic()
                         p_profile = profiles.end() - 1;
                     else
                         p_profile --;
-                    Controls::g_InputMethods[p]->Profile = *p_profile;
+                    Controls::SetInputMethodProfile(p, *p_profile);
                     PlaySoundMenu(SFX_Slide);
                 }
                 else
@@ -961,7 +966,7 @@ int menuControls_Logic()
                 }
                 s_canRotate[p] = false;
             }
-            else if(c.Right && Controls::g_InputMethods[p])
+            else if(c.Right)
             {
                 // rotate controls profile right
                 std::vector<Controls::InputMethodProfile*> profiles = Controls::g_InputMethods[p]->Type->GetProfiles();
@@ -972,7 +977,7 @@ int menuControls_Logic()
                     p_profile ++;
                     if(p_profile == profiles.end())
                         p_profile = profiles.begin();
-                    Controls::g_InputMethods[p]->Profile = *p_profile;
+                    Controls::SetInputMethodProfile(p, *p_profile);
                     PlaySoundMenu(SFX_Slide);
                 }
                 else

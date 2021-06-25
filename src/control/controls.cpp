@@ -176,14 +176,29 @@ bool InputMethodType::ClearProfiles(const std::vector<InputMethod*>& active_meth
     return (i == 0);
 }
 
-bool InputMethodType::SetDefaultProfile(int player_no, InputMethodProfile* profile)
+bool InputMethodType::SetProfile(InputMethod* method, int player_no, InputMethodProfile* profile)
 {
     if(player_no < 0 || player_no >= maxLocalPlayers || !profile)
     {
         return false;
     }
-    this->m_defaultProfiles[player_no] = profile;
+
+    if(!this->SetProfile_Custom(method, player_no, profile))
+    {
+        return false;
+    }
+
+    this->SetDefaultProfile(player_no, profile);
+    method->Profile = profile;
+
     return true;
+}
+
+void InputMethodType::SetDefaultProfile(int player_no, InputMethodProfile* profile)
+{
+    if(player_no < 0 || player_no >= maxLocalPlayers || !profile)
+        return;
+    this->m_defaultProfiles[player_no] = profile;
 }
 
 InputMethodProfile* InputMethodType::GetDefaultProfile(int player_no)
@@ -202,7 +217,7 @@ void InputMethodType::SaveConfig(IniProcessing* ctl)
     for(int i = 0; i < maxLocalPlayers; i++)
     {
         InputMethodProfile* default_profile = this->m_defaultProfiles[i];
-        std::string default_profile_key = "default-profile-" + std::to_string(i);
+        std::string default_profile_key = "default-profile-" + std::to_string(i+1);
         if(default_profile == nullptr)
         {
             ctl->setValue(default_profile_key.c_str(), -1);
@@ -210,12 +225,15 @@ void InputMethodType::SaveConfig(IniProcessing* ctl)
         }
         std::vector<InputMethodProfile*>::iterator loc = std::find(this->m_profiles.begin(), this->m_profiles.end(), default_profile);
         size_t index = loc - this->m_profiles.begin();
-        ctl->setValue(default_profile_key.c_str(), index);
+        if(index == this->m_profiles.size())
+            ctl->setValue(default_profile_key.c_str(), -1);
+        else
+            ctl->setValue(default_profile_key.c_str(), index);
     }
     ctl->endGroup();
     for(size_t i = 0; i < this->m_profiles.size(); i++)
     {
-        ctl->beginGroup(this->Name + "-" + std::to_string(i));
+        ctl->beginGroup(this->Name + "-" + std::to_string(i+1));
         ctl->setValue("name", this->m_profiles[i]->Name);
         this->m_profiles[i]->SaveConfig(ctl);
         ctl->endGroup();
@@ -228,26 +246,34 @@ void InputMethodType::LoadConfig(IniProcessing* ctl)
     int n_existing = this->m_profiles.size(); // should usually be zero
 
     ctl->beginGroup(this->Name);
-    ctl->read("n-profiles", n_profiles, 0); // TODO
+    ctl->read("n-profiles", n_profiles, 2);
     this->LoadConfig_Custom(ctl);
     ctl->endGroup();
 
     for(int i = 0; i < n_profiles; i++)
     {
-        ctl->beginGroup(this->Name + "-" + std::to_string(i));
         InputMethodProfile* new_profile = this->AddProfile();
         if(new_profile)
         {
-            ctl->read("name", new_profile->Name, this->Name + " " + std::to_string(i+n_existing+1));
+            // load legacy profile
+            if(!this->LegacyName.empty())
+            {
+                ctl->beginGroup("player-" + std::to_string(i+1) + "-" + this->LegacyName);
+                new_profile->LoadConfig(ctl);
+                ctl->endGroup();
+            }
+            // load modern profile
+            ctl->beginGroup(this->Name + "-" + std::to_string(i+1));
             new_profile->LoadConfig(ctl);
+            ctl->read("name", new_profile->Name, this->Name + " " + std::to_string(i+n_existing+1));
+            ctl->endGroup();
         }
-        ctl->endGroup();
     }
 
     ctl->beginGroup(this->Name);
     for(int i = 0; i < maxLocalPlayers; i++)
     {
-        std::string default_profile_key = "default-profile-" + std::to_string(i);
+        std::string default_profile_key = "default-profile-" + std::to_string(i+1);
         int index;
         ctl->read(default_profile_key.c_str(), index, -1);
         if(index == -1)
@@ -263,9 +289,9 @@ void InputMethodType::LoadConfig(IniProcessing* ctl)
 
 // optionally overriden methods
 
-bool InputMethodType::SetDefaultProfile(InputMethod* method, InputMethodProfile* profile)
+bool InputMethodType::SetProfile_Custom(InputMethod* method, int player_no, InputMethodProfile* profile)
 {
-    if(!method || !profile)
+    if(!method || !profile || player_no < 0 || player_no >= maxLocalPlayers)
     {
         return false;
     }
@@ -499,15 +525,15 @@ InputMethod* PollInputMethod() noexcept
     }
     if(!new_method)
         return nullptr;
-    size_t player_idx = 0;
-    while(player_idx < g_InputMethods.size() && g_InputMethods[player_idx] != nullptr)
+    size_t player_no = 0;
+    while(player_no < g_InputMethods.size() && g_InputMethods[player_no] != nullptr)
     {
-        player_idx ++;
+        player_no ++;
     }
     if(!new_method->Profile)
     {
         // fallback 1: last profile used by this player index
-        InputMethodProfile* default_profile = new_method->Type->GetDefaultProfile(player_idx);
+        InputMethodProfile* default_profile = new_method->Type->GetDefaultProfile(player_no);
         if(default_profile)
         {
             new_method->Profile = default_profile;
@@ -552,14 +578,15 @@ InputMethod* PollInputMethod() noexcept
         delete new_method;
         return nullptr;
     }
-    if(player_idx < g_InputMethods.size())
+    if(player_no < g_InputMethods.size())
     {
-        g_InputMethods[player_idx] = new_method;
+        g_InputMethods[player_no] = new_method;
     }
     else
     {
         g_InputMethods.push_back(new_method);
     }
+    SetInputMethodProfile(player_no, new_method->Profile);
     pLogDebug("Just connected new %s '%s' with profile '%s'.",
         new_method->Type->Name.c_str(),  new_method->Name.c_str(), new_method->Profile->Name.c_str());
     return new_method;
@@ -586,6 +613,29 @@ void DeleteInputMethodSlot(int slot)
         DeleteInputMethod(g_InputMethods[slot]);
     }
     g_InputMethods.erase(g_InputMethods.begin() + slot);
+}
+
+bool SetInputMethodProfile(int player_no, InputMethodProfile* profile)
+{
+    if(player_no >= (int)g_InputMethods.size() || !g_InputMethods[player_no] || !profile)
+        return false;
+    InputMethod* method = g_InputMethods[player_no];
+    if(!method->Type)
+        return false;
+    return method->Type->SetProfile(method, player_no, profile);
+}
+
+bool SetInputMethodProfile(InputMethod* method, InputMethodProfile* profile)
+{
+    if(!method || !profile || !method->Type)
+        return false;
+
+    std::vector<InputMethod*>::iterator loc = std::find(g_InputMethods.begin(), g_InputMethods.end(), method);
+    size_t player_no = loc - g_InputMethods.begin();
+    if(player_no == g_InputMethods.size())
+        return false;
+
+    return method->Type->SetProfile(method, player_no, profile);
 }
 
 void ClearInputMethods()

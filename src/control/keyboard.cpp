@@ -229,11 +229,44 @@ const char* InputMethodProfile_Keyboard::NameSecondaryButton(size_t i)
 
 void InputMethodProfile_Keyboard::SaveConfig(IniProcessing* ctl)
 {
-    // TODO
+    char name2[20];
+    for(size_t i = 0; i < PlayerControls::n_buttons; i++)
+    {
+        const char* name = PlayerControls::GetButtonName_INI(i);
+        ctl->setValue(name, this->m_keys[i]);
+        for(size_t c = 0; c < 20; c++)
+        {
+            if(c+2 == 20 || name[c] == '\0')
+            {
+                name2[c] = '2';
+                name2[c+1] = '\0';
+                break;
+            }
+            name2[c] = name[c];
+        }
+        ctl->setValue(name2, this->m_keys2[i]);
+    }
 }
+
 void InputMethodProfile_Keyboard::LoadConfig(IniProcessing* ctl)
 {
-    // TODO
+    char name2[20];
+    for(size_t i = 0; i < PlayerControls::n_buttons; i++)
+    {
+        const char* name = PlayerControls::GetButtonName_INI(i);
+        ctl->read(name, this->m_keys[i], this->m_keys[i]);
+        for(size_t c = 0; c < 20; c++)
+        {
+            if(c+2 == 20 || name[c] == '\0')
+            {
+                name2[c] = '2';
+                name2[c+1] = '\0';
+                break;
+            }
+            name2[c] = name[c];
+        }
+        ctl->read(name2, this->m_keys2[i], this->m_keys2[i]);
+    }
 }
 
 /*====================================================*\
@@ -249,6 +282,7 @@ InputMethodType_Keyboard::InputMethodType_Keyboard()
 {
     this->m_keyboardState = SDL_GetKeyboardState(&this->m_keyboardStateSize);
     this->Name = "Keyboard";
+    this->LegacyName = "keyboard";
 }
 
 void InputMethodType_Keyboard::UpdateControlsPre() {}
@@ -300,23 +334,39 @@ InputMethod* InputMethodType_Keyboard::Poll(const std::vector<InputMethod*>& act
         }
     }
 
-    if (n_keyboards >= m_maxKeyboards)
+    if(n_keyboards != m_lastNumKeyboards)
+    {
+        // this ensures that keys that were held when a keyboard method was removed cannot be polled to add that method back
+        if(n_keyboards < this->m_lastNumKeyboards)
+        {
+            this->m_canPoll = false;
+        }
+        this->m_lastNumKeyboards = n_keyboards;
+    }
+
+    if(n_keyboards >= m_maxKeyboards)
     {
         // reset in case things change
         this->m_canPoll = false;
         return nullptr;
     }
 
+
     int key;
     for(key = 0; key < this->m_keyboardStateSize; key++)
     {
         bool allowed = true;
+        if(key == SDL_SCANCODE_LALT || key == SDL_SCANCODE_RALT || key == SDL_SCANCODE_LCTRL || key == SDL_SCANCODE_RCTRL)
+            allowed = false;
         for(InputMethod* method : active_methods)
         {
+            if(!allowed)
+                break;
             if(!method)
                 continue;
             InputMethodProfile_Keyboard* p = dynamic_cast<InputMethodProfile_Keyboard*>(method->Profile);
-            if(!p) continue;
+            if(!p)
+                continue;
             for(size_t i = 0; i < PlayerControls::n_buttons; i++)
             {
                 if(p->m_keys[i] == key || p->m_keys2[i] == key)
@@ -325,10 +375,8 @@ InputMethod* InputMethodType_Keyboard::Poll(const std::vector<InputMethod*>& act
                     break;
                 }
             }
-            if(!allowed)
-                break;
         }
-        if(allowed && this->m_keyboardState[key] != 0)
+        if(allowed && this->m_keyboardState[key])
             break;
     }
     // if didn't find any key, allow poll in future but return false
@@ -373,6 +421,20 @@ InputMethod* InputMethodType_Keyboard::Poll(const std::vector<InputMethod*>& act
     return (InputMethod*)method;
 }
 
+/*-----------------------*\
+|| OPTIONAL METHODS      ||
+\*-----------------------*/
+
+// optional function allowing developer to associate device information with profile, etc
+bool InputMethodType_Keyboard::SetProfile_Custom(InputMethod* method, int player_no, InputMethodProfile* profile)
+{
+    if(!method || !profile || player_no < 0 || player_no >= maxLocalPlayers)
+    {
+        return false;
+    }
+    m_canPoll = false;
+    return true;
+}
 
 // How many per-type special options are there?
 size_t InputMethodType_Keyboard::GetSpecialOptionCount()
@@ -380,9 +442,6 @@ size_t InputMethodType_Keyboard::GetSpecialOptionCount()
     return 1;
 }
 
-/*-----------------------*\
-|| OPTIONAL METHODS      ||
-\*-----------------------*/
 // Methods to manage per-profile options
 // It is guaranteed that none of these will be called if
 // GetOptionCount() returns 0.
@@ -441,6 +500,16 @@ bool InputMethodType_Keyboard::OptionRotateRight(size_t i)
         return true;
     }
     return false;
+}
+
+void InputMethodType_Keyboard::SaveConfig_Custom(IniProcessing* ctl)
+{
+    ctl->setValue("max-keyboards", this->m_maxKeyboards);
+}
+
+void InputMethodType_Keyboard::LoadConfig_Custom(IniProcessing* ctl)
+{
+    ctl->read("max-keyboards", this->m_maxKeyboards, 2);
 }
 
 } // namespace Controls

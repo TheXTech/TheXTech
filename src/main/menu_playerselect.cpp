@@ -23,8 +23,6 @@ void menuPlayerSelect_Start()
         s_charSelectDone[i] = false;
         s_inputReady[i] = false;
     }
-    // allow the first controller to immediately act upon connection
-    s_inputReady[0] = true;
     s_lastNumInputs = Controls::g_InputMethods.size();
 }
 
@@ -313,16 +311,28 @@ int menuPlayerSelect_Logic(int minPlayers)
         }
 
         if(p >= (int)Controls::g_InputMethods.size())
+        {
+            s_charSelectDone[p] = false;
+            g_charSelect[p] = 0;
+            // because P1's UI is always shown,
+            // allow the first controller to immediately act upon connection
+            if(p == 0)
+                s_inputReady[p] = true;
+            else
+                s_inputReady[p] = false;
             continue;
+        }
 
         // make sure controller not lost
         if(!Controls::g_InputMethods[p])
         {
             Controls::DeleteInputMethodSlot(p);
+            s_lastNumInputs -= 1;
             for(int p2 = p; p2+1 < maxLocalPlayers; p2++)
             {
                 g_charSelect[p2] = g_charSelect[p2+1];
                 s_charSelectDone[p2] = s_charSelectDone[p2+1];
+                s_inputReady[p2] = s_inputReady[p2+1];
             }
             // if nobody's left, exit!
             if(Controls::g_InputMethods.empty())
@@ -368,6 +378,7 @@ int menuPlayerSelect_Logic(int minPlayers)
             else
             {
                 Controls::DeleteInputMethodSlot(p);
+                s_lastNumInputs -= 1;
                 for(int p2 = p; p2+1 < maxLocalPlayers; p2++)
                 {
                     g_charSelect[p2] = g_charSelect[p2+1];
@@ -445,7 +456,7 @@ int menuPlayerSelect_Logic(int minPlayers)
                     cur_profile = profiles.end() - 1;
                 else
                     cur_profile --;
-                Controls::g_InputMethods[p]->Profile = *cur_profile;
+                Controls::SetInputMethodProfile(p, *cur_profile);
                 PlaySoundMenu(SFX_Slide);
             }
             else
@@ -465,7 +476,7 @@ int menuPlayerSelect_Logic(int minPlayers)
                 cur_profile ++;
                 if(cur_profile == profiles.end())
                     cur_profile = profiles.begin();
-                Controls::g_InputMethods[p]->Profile = *cur_profile;
+                Controls::SetInputMethodProfile(p, *cur_profile);
                 PlaySoundMenu(SFX_Slide);
             }
             else

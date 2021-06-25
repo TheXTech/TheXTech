@@ -58,7 +58,8 @@ class InputMethodType_Keyboard : public InputMethodType
 {
 private:
     bool m_canPoll = false;
-    int m_maxKeyboards = 1;
+    int m_maxKeyboards = 2;
+    int m_lastNumKeyboards = 0;
 
     InputMethodProfile* AllocateProfile() noexcept;
 
@@ -78,12 +79,16 @@ public:
     // allocates the new InputMethod on the heap
     InputMethod* Poll(const std::vector<InputMethod*>& active_methods) noexcept;
 
-    // How many per-type special options are there?
-    size_t GetSpecialOptionCount();
-
     /*-----------------------*\
     || OPTIONAL METHODS      ||
     \*-----------------------*/
+protected:
+    // optional function allowing developer to associate device information with profile, etc
+    bool SetProfile_Custom(InputMethod* method, int player_no, InputMethodProfile* profile);
+
+public:
+    // How many per-type special options are there?
+    size_t GetSpecialOptionCount();
     // Methods to manage per-profile options
     // It is guaranteed that none of these will be called if
     // GetOptionCount() returns 0.
@@ -99,6 +104,10 @@ public:
     bool OptionRotateLeft(size_t i);
     // called when right is pressed
     bool OptionRotateRight(size_t i);
+
+protected:
+    void SaveConfig_Custom(IniProcessing* ctl);
+    void LoadConfig_Custom(IniProcessing* ctl);
 };
 
 } // namespace Controls
