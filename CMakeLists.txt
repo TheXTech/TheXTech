@@ -308,6 +308,7 @@ set(THEXTECH_SRC
     src/graphics/gfx_screen.cpp
     src/control/joystick.cpp
     src/control/keyboard.cpp
+    src/control/touchscreen.cpp
     src/control/controls.cpp
     src/change_res.cpp
     src/effect.cpp
@@ -334,10 +335,6 @@ set(THEXTECH_SRC
 
 if(WIN32 AND NOT EMSCRIPTEN)
     list(APPEND THEXTECH_SRC resources/thextech.rc)
-endif()
-
-if(USE_TOUCHSCREEN_CONTROLLER)
-    list(APPEND THEXTECH_SRC src/control/touchscreen.cpp)
 endif()
 
 if(THEXTECH_ENABLE_LUA)

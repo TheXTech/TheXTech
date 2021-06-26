@@ -40,6 +40,14 @@
 #       define JNIEXPORT extern "C"
 #       define JNICALL
 #   endif
+#endif
+
+namespace Controls
+{
+
+/*-----------------*\
+|| definitions     ||
+\*-----------------*/
 
 enum
 {
@@ -51,52 +59,33 @@ enum
 enum
 {
     TOUCHSCREEN_DISABLE = 0,
-    TOUCHSCREEN_DISABLE_ON_KEYBOARD = 1,
+    TOUCHSCREEN_DISABLE_ON_TouchScreen = 1,
     TOUCHSCREEN_ENABLE = 2,
 };
 
 enum
 {
     TOUCHPAD_STYLE_ACTIONS = 0,
-    TPUCHPAD_STYLE_ABXY = 1,
-    TPUCHPAD_STYLE_XODA = 2
+    TOUCHPAD_STYLE_ABXY = 1,
+    TOUCHPAD_STYLE_XODA = 2
 };
 
 //! Is hardware keyboard presented?
-static int s_keyboardPresence = KEYBOARD_NOKEYS;
-static int s_touchscreenMode = TOUCHSCREEN_DISABLE_ON_KEYBOARD;
 static bool s_showTouchscreenOnStart = false;
 static int  s_touchPadStyle = 0;
 static double s_screenSize = 0;
 static double s_screenWidth = 0;
 static double s_screenHeight = 0;
 
-#endif
 
-bool TouchScreenController::touchSupported()
-{
-    if(m_touchDevicesCount <= 0)
-        return false;
+/*-----------------*\
+|| Java interface  ||
+\*-----------------*/
 
 #ifdef __ANDROID__
-    switch(s_touchscreenMode)
-    {
-    case TOUCHSCREEN_DISABLE:
-        return false;
-    case TOUCHSCREEN_DISABLE_ON_KEYBOARD:
-        if(s_keyboardPresence > KEYBOARD_NOKEYS)
-            return false;
-        break;
-    case TOUCHSCREEN_ENABLE:
-        return true;
-    }
-#endif
 
-    return true;
-}
-
-
-#ifdef __ANDROID__
+static int s_TouchScreenPresence = KEYBOARD_NOKEYS;
+static int s_touchscreenMode = TOUCHSCREEN_DISABLE_ON_TouchScreen;
 
 static void initTouchMap();
 
@@ -109,7 +98,7 @@ Java_ru_wohlsoft_thextech_thextechActivity_setHardwareKeyboardPresence(
 {
     (void)env;
     (void)type;
-    s_keyboardPresence = keyboard;
+    s_TouchScreenPresence = keyboard;
 }
 
 JNIEXPORT void JNICALL
@@ -166,6 +155,121 @@ Java_ru_wohlsoft_thextech_thextechActivity_setTouchPadStyle(
 }
 #endif
 
+/*------------------------------------------*\
+|| implementation for TouchScreenGFX_t      ||
+\*------------------------------------------*/
+
+void TouchScreenGFX_t::loadImage(StdPicture &img, std::string path)
+{
+    pLogDebug("Loading texture %s...", path.c_str());
+    img = frmMain.LoadPicture(path);
+    if(!img.texture)
+    {
+        pLogWarning("Failed to load texture: %s...", path.c_str());
+        m_loadErrors++;
+    }
+    m_loadedImages.push_back(&img);
+}
+
+TouchScreenGFX_t::TouchScreenGFX_t()
+{
+    std::string uiPath = AppPath + "graphics/touchscreen/";
+
+    // Loading a touch-screen buttons from assets
+    loadImage(touch[BUTTON_START], uiPath + "Start.png");
+    loadImage(touch[BUTTON_LEFT], uiPath + "Left.png");
+    loadImage(touch[BUTTON_LEFT_CHAR], uiPath + "Left_char.png");
+    loadImage(touch[BUTTON_RIGHT], uiPath + "Right.png");
+    loadImage(touch[BUTTON_RIGHT_CHAR], uiPath + "Right_char.png");
+    loadImage(touch[BUTTON_UP], uiPath + "Up.png");
+    loadImage(touch[BUTTON_DOWN], uiPath + "Down.png");
+    loadImage(touch[BUTTON_UPLEFT], uiPath + "UpLeft.png");
+    loadImage(touch[BUTTON_UPRIGHT], uiPath + "UpRight.png");
+    loadImage(touch[BUTTON_DOWNLEFT], uiPath + "DownLeft.png");
+    loadImage(touch[BUTTON_DOWNRIGHT], uiPath + "DownRight.png");
+    loadImage(touch[BUTTON_A], uiPath + "A.png");
+    loadImage(touch[BUTTON_A_PS], uiPath + "A_ps.png");
+    loadImage(touch[BUTTON_A_BLANK], uiPath + "A_blank.png");
+    loadImage(touch[BUTTON_A_DO], uiPath + "A_do.png");
+    loadImage(touch[BUTTON_A_ENTER], uiPath + "A_enter.png");
+    loadImage(touch[BUTTON_A_JUMP], uiPath + "A_jump.png");
+    loadImage(touch[BUTTON_B], uiPath + "V.png");
+    loadImage(touch[BUTTON_B_PS], uiPath + "V_ps.png");
+    loadImage(touch[BUTTON_B_BLANK], uiPath + "V_blank.png");
+    loadImage(touch[BUTTON_B_JUMP], uiPath + "V_jump.png");
+    loadImage(touch[BUTTON_B_SPINJUMP], uiPath + "V_spinjump.png");
+    loadImage(touch[BUTTON_X], uiPath + "X.png");
+    loadImage(touch[BUTTON_X_PS], uiPath + "X_ps.png");
+    loadImage(touch[BUTTON_X_BACK], uiPath + "X_back.png");
+    loadImage(touch[BUTTON_X_BLANK], uiPath + "X_blank.png");
+    loadImage(touch[BUTTON_X_BOMB], uiPath + "X_bomb.png");
+    loadImage(touch[BUTTON_X_BUMERANG], uiPath + "X_bumerang.png");
+    loadImage(touch[BUTTON_X_FIRE], uiPath + "X_fire.png");
+    loadImage(touch[BUTTON_X_HAMMER], uiPath + "X_hammer.png");
+    loadImage(touch[BUTTON_X_RUN], uiPath + "X_run.png");
+    loadImage(touch[BUTTON_X_SWORD], uiPath + "X_sword.png");
+    loadImage(touch[BUTTON_Y], uiPath + "Y.png");
+    loadImage(touch[BUTTON_Y_PS], uiPath + "Y_ps.png");
+    loadImage(touch[BUTTON_Y_BLANK], uiPath + "Y_blank.png");
+    loadImage(touch[BUTTON_Y_BOMB], uiPath + "Y_bomb.png");
+    loadImage(touch[BUTTON_Y_BUMERANG], uiPath + "Y_bumerang.png");
+    loadImage(touch[BUTTON_Y_FIRE], uiPath + "Y_fire.png");
+    loadImage(touch[BUTTON_Y_HAMMER], uiPath + "Y_hammer.png");
+    loadImage(touch[BUTTON_Y_RUN], uiPath + "Y_run.png");
+    loadImage(touch[BUTTON_Y_STATUE], uiPath + "Y_statue.png");
+    loadImage(touch[BUTTON_Y_SWORD], uiPath + "Y_sword.png");
+    loadImage(touch[BUTTON_DROP], uiPath + "Select.png");
+    loadImage(touch[BUTTON_HOLD_RUN_OFF], uiPath + "RunOff.png");
+    loadImage(touch[BUTTON_HOLD_RUN_ON], uiPath + "RunOn.png");
+    loadImage(touch[BUTTON_VIEW_TOGGLE_OFF], uiPath + "KeysShowOff.png");
+    loadImage(touch[BUTTON_VIEW_TOGGLE_ON], uiPath + "KeysShow.png");
+    loadImage(touch[BUTTON_ANALOG_BORDER], uiPath + "SBorder.png");
+    loadImage(touch[BUTTON_ANALOG_STICK], uiPath + "AStick.png");
+
+    if(m_loadErrors > 0)
+    {
+        m_success = false;
+        return;
+    }
+
+    m_success = true;
+}
+
+TouchScreenGFX_t::~TouchScreenGFX_t()
+{
+    for(StdPicture *p : m_loadedImages)
+        frmMain.deleteTexture(*p);
+    m_loadedImages.clear();
+}
+
+/*------------------------------------------*\
+|| implementation for TouchScreenController ||
+\*------------------------------------------*/
+
+bool TouchScreenController::touchSupported()
+{
+    if(m_touchDevicesCount <= 0)
+        return false;
+
+    if(!m_GFX.m_success)
+        return false;
+
+    return true;
+}
+
+bool TouchScreenController::touchOn()
+{
+    for(int dev_i = 0; dev_i < m_touchDevicesCount; dev_i++)
+    {
+        const SDL_TouchID dev = SDL_GetTouchDevice(dev_i);
+        int fingers = SDL_GetNumTouchFingers(dev);
+        if(fingers > 0)
+            return true;
+    }
+
+    return false;
+}
+
 TouchScreenController::FingerState::FingerState()
 {
     for(int i = key_BEGIN; i < key_END; i++)
@@ -196,68 +300,71 @@ TouchScreenController::FingerState &TouchScreenController::FingerState::operator
     return *this;
 }
 
-static int buttonLeft()
+static int buttonLeft(int player_no)
 {
+    (void)player_no;
     if(LevelSelect && GamePaused)
-        return GFX_t::BUTTON_LEFT_CHAR;
+        return TouchScreenGFX_t::BUTTON_LEFT_CHAR;
     else
-        return GFX_t::BUTTON_LEFT;
+        return TouchScreenGFX_t::BUTTON_LEFT;
 }
 
-static int buttonRight()
+static int buttonRight(int player_no)
 {
+    (void)player_no;
     if(LevelSelect && GamePaused)
-        return GFX_t::BUTTON_RIGHT_CHAR;
+        return TouchScreenGFX_t::BUTTON_RIGHT_CHAR;
     else
-        return GFX_t::BUTTON_RIGHT;
+        return TouchScreenGFX_t::BUTTON_RIGHT;
 }
 
-static int buttonA()
+static int buttonA(int player_no)
 {
+    (void)player_no;
     switch(s_touchPadStyle)
     {
-    case TPUCHPAD_STYLE_ABXY:
-        return GFX_t::BUTTON_A;
-    case TPUCHPAD_STYLE_XODA:
-        return GFX_t::BUTTON_A_PS;
+    case TOUCHPAD_STYLE_ABXY:
+        return TouchScreenGFX_t::BUTTON_A;
+    case TOUCHPAD_STYLE_XODA:
+        return TouchScreenGFX_t::BUTTON_A_PS;
     default:
     case TOUCHPAD_STYLE_ACTIONS:
         if(GamePaused || GameMenu)
-            return GFX_t::BUTTON_A_DO;
+            return TouchScreenGFX_t::BUTTON_A_DO;
         else if(GameOutro)
-            return GFX_t::BUTTON_A_BLANK;
+            return TouchScreenGFX_t::BUTTON_A_BLANK;
         else if(LevelSelect)
-            return GFX_t::BUTTON_A_ENTER;
+            return TouchScreenGFX_t::BUTTON_A_ENTER;
         else
-            return GFX_t::BUTTON_A_JUMP;
+            return TouchScreenGFX_t::BUTTON_A_JUMP;
     }
 }
 
-static int buttonX()
+static int buttonX(int player_no)
 {
     switch(s_touchPadStyle)
     {
-    case TPUCHPAD_STYLE_ABXY:
-        return GFX_t::BUTTON_X;
-    case TPUCHPAD_STYLE_XODA:
-        return GFX_t::BUTTON_X_PS;
+    case TOUCHPAD_STYLE_ABXY:
+        return TouchScreenGFX_t::BUTTON_X;
+    case TOUCHPAD_STYLE_XODA:
+        return TouchScreenGFX_t::BUTTON_X_PS;
     default:
     case TOUCHPAD_STYLE_ACTIONS:
         if(GamePaused || GameMenu)
-            return GFX_t::BUTTON_X_BACK;
+            return TouchScreenGFX_t::BUTTON_X_BACK;
         else if(LevelSelect || GameOutro)
-            return GFX_t::BUTTON_X_BLANK;
+            return TouchScreenGFX_t::BUTTON_X_BLANK;
         else
         {
-            if(numPlayers >= 1)
+            if(numPlayers >= player_no)
             {
-                auto &p = Player[1];
+                auto &p = Player[player_no];
                 if(p.Character == 5 || p.State == 4 || p.State == 5)
-                    return GFX_t::BUTTON_X_SWORD;
+                    return TouchScreenGFX_t::BUTTON_X_SWORD;
                 else if(p.State < 3)
-                    return GFX_t::BUTTON_X_RUN;
+                    return TouchScreenGFX_t::BUTTON_X_RUN;
                 else if(p.State == 3 || p.State == 7)
-                    return GFX_t::BUTTON_X_FIRE;
+                    return TouchScreenGFX_t::BUTTON_X_FIRE;
                 else if(p.State == 6)
                 {
                     switch(p.Character)
@@ -265,73 +372,73 @@ static int buttonX()
                     default:
                     case 1:
                     case 2:
-                        return GFX_t::BUTTON_X_HAMMER;
+                        return TouchScreenGFX_t::BUTTON_X_HAMMER;
                     case 3:
-                        return GFX_t::BUTTON_X_BOMB;
+                        return TouchScreenGFX_t::BUTTON_X_BOMB;
                     case 4:
-                        return GFX_t::BUTTON_X_BUMERANG;
+                        return TouchScreenGFX_t::BUTTON_X_BUMERANG;
                     case 5:
-                        return GFX_t::BUTTON_X_SWORD;
+                        return TouchScreenGFX_t::BUTTON_X_SWORD;
                     }
                 }
             }
-            return GFX_t::BUTTON_X_BLANK;
+            return TouchScreenGFX_t::BUTTON_X_BLANK;
         }
     }
 }
 
-static int buttonB()
+static int buttonB(int player_no)
 {
     switch(s_touchPadStyle)
     {
-    case TPUCHPAD_STYLE_ABXY:
-        return GFX_t::BUTTON_B;
-    case TPUCHPAD_STYLE_XODA:
-        return GFX_t::BUTTON_B_PS;
+    case TOUCHPAD_STYLE_ABXY:
+        return TouchScreenGFX_t::BUTTON_B;
+    case TOUCHPAD_STYLE_XODA:
+        return TouchScreenGFX_t::BUTTON_B_PS;
     default:
     case TOUCHPAD_STYLE_ACTIONS:
         if(LevelSelect || GamePaused || GameMenu || GameOutro)
-            return GFX_t::BUTTON_B_BLANK;
+            return TouchScreenGFX_t::BUTTON_B_BLANK;
         else
         {
-            if(numPlayers >= 1)
+            if(numPlayers >= player_no)
             {
-                auto &p = Player[1];
+                auto &p = Player[player_no];
                 if(p.Character <= 2 || p.Character == 4)
-                    return GFX_t::BUTTON_B_SPINJUMP;
+                    return TouchScreenGFX_t::BUTTON_B_SPINJUMP;
                 else
-                    return GFX_t::BUTTON_B_JUMP;
+                    return TouchScreenGFX_t::BUTTON_B_JUMP;
             }
-            return GFX_t::BUTTON_B_BLANK;
+            return TouchScreenGFX_t::BUTTON_B_BLANK;
         }
     }
 }
 
-static int buttonY()
+static int buttonY(int player_no)
 {
     switch(s_touchPadStyle)
     {
-    case TPUCHPAD_STYLE_ABXY:
-        return GFX_t::BUTTON_Y;
-    case TPUCHPAD_STYLE_XODA:
-        return GFX_t::BUTTON_Y_PS;
+    case TOUCHPAD_STYLE_ABXY:
+        return TouchScreenGFX_t::BUTTON_Y;
+    case TOUCHPAD_STYLE_XODA:
+        return TouchScreenGFX_t::BUTTON_Y_PS;
     default:
     case TOUCHPAD_STYLE_ACTIONS:
         if(LevelSelect || GamePaused || GameMenu || GameOutro)
-            return GFX_t::BUTTON_Y_BLANK;
+            return TouchScreenGFX_t::BUTTON_Y_BLANK;
         else
         {
-            if(numPlayers >= 1)
+            if(numPlayers >= player_no)
             {
-                auto &p = Player[1];
+                auto &p = Player[player_no];
                 if(p.State == 5)
-                    return GFX_t::BUTTON_Y_STATUE;
+                    return TouchScreenGFX_t::BUTTON_Y_STATUE;
                 if(p.Character == 5 || p.State == 4)
-                    return GFX_t::BUTTON_Y_SWORD;
+                    return TouchScreenGFX_t::BUTTON_Y_SWORD;
                 else if(p.State < 3)
-                    return GFX_t::BUTTON_Y_RUN;
+                    return TouchScreenGFX_t::BUTTON_Y_RUN;
                 else if(p.State == 3 || p.State == 7)
-                    return GFX_t::BUTTON_Y_FIRE;
+                    return TouchScreenGFX_t::BUTTON_Y_FIRE;
                 else if(p.State == 6)
                 {
                     switch(p.Character)
@@ -339,17 +446,17 @@ static int buttonY()
                         default:
                         case 1:
                         case 2:
-                            return GFX_t::BUTTON_Y_HAMMER;
+                            return TouchScreenGFX_t::BUTTON_Y_HAMMER;
                         case 3:
-                            return GFX_t::BUTTON_Y_BOMB;
+                            return TouchScreenGFX_t::BUTTON_Y_BOMB;
                         case 4:
-                            return GFX_t::BUTTON_Y_BUMERANG;
+                            return TouchScreenGFX_t::BUTTON_Y_BUMERANG;
                         case 5:
-                            return GFX_t::BUTTON_Y_SWORD;
+                            return TouchScreenGFX_t::BUTTON_Y_SWORD;
                     }
                 }
             }
-            return GFX_t::BUTTON_Y_BLANK;
+            return TouchScreenGFX_t::BUTTON_Y_BLANK;
         }
     }
 }
@@ -582,7 +689,7 @@ static void initTouchMap()
     }
     else // All other devices
     {
-        // Longer screens (big ration between sides, more like a stick)
+        // Longer screens (big ratio between sides, more like a stick)
         if((s_screenWidth / s_screenHeight) > 1.6f)
         {
             g_touchKeyMap.touchCanvasWidth = 1396.0f;
@@ -598,20 +705,19 @@ static void initTouchMap()
     }
 }
 
-TouchScreenController::TouchScreenController() = default;
 TouchScreenController::~TouchScreenController() = default;
 
-void TouchScreenController::init()
+TouchScreenController::TouchScreenController()
 {
     initTouchMap();
 
     for(int key = key_BEGIN; key < key_END; ++key)
         m_keysHeld[key] = false;
     m_touchHidden = !s_showTouchscreenOnStart;
-    D_pLogDebugNA("Initialization of touch-screen controller...");
+    pLogDebug("Initialization of touch-screen controller...");
     m_touchDevicesCount = SDL_GetNumTouchDevices();
     updateScreenSize();
-    D_pLogDebug("Found %d touch devices, screen size: %d x %d",
+    pLogDebug("Found %d touch devices, screen size: %d x %d",
                 m_touchDevicesCount,
                 m_screenWidth, m_screenHeight);
     pLogDebug("The screen size: %g inches (%g x %g)", s_screenSize, s_screenWidth, s_screenHeight);
@@ -625,11 +731,11 @@ void TouchScreenController::updateScreenSize()
 static void updateKeyValue(bool &key, bool state)
 {
     key = state;
-    D_pLogDebug("= Touch key: State=%d", (int)key);
+    pLogDebug("= Touch key: State=%d", (int)key);
 }
 
 static void updateFingerKeyState(TouchScreenController::FingerState &st,
-        Controls_t &keys, int keyCommand, bool setState, TouchScreenController::ExtraKeys &extraSt)
+        Controls_t &keys, int keyCommand, bool setState, TouchScreenController::ExtraKeys_t &extraSt)
 {
     st.alive = (setState != 0);
     if(keyCommand >= static_cast<int>(TouchScreenController::key_BEGIN) && keyCommand < static_cast<int>(TouchScreenController::key_END))
@@ -722,6 +828,7 @@ void TouchScreenController::processTouchDevice(int dev_i)
 
         SDL_FingerID finger_id = f->id;
         float finger_x = f->x, finger_y = f->y, finger_pressure = f->pressure;
+        (void)finger_pressure;
 
         auto found = m_fingers.find(finger_id);
         if(found != m_fingers.end())
@@ -730,19 +837,21 @@ void TouchScreenController::processTouchDevice(int dev_i)
             int keysCount = g_touchKeyMap.findTouchKeys(finger_x, finger_y, fs);
             for(int key = key_BEGIN; key < key_END; ++key)
             {
+                if(fs.ignore)
+                    break;
                 if(m_touchHidden && key != key_toggleKeysView)
                     key = key_toggleKeysView;
                 if(fs.heldKeyPrev[key] && !fs.heldKey[key]) // set key off
                 {
                     updateFingerKeyState(fs, m_current_keys, key, false, m_current_extra_keys);
-                    D_pLogDebug("= Finger Key ID=%d released (move)", static_cast<int>(key));
+                    pLogDebug("= Finger Key ID=%d released (move)", static_cast<int>(key));
                     m_keysHeld[key] = false;
                     fs.heldKeyPrev[key] = fs.heldKey[key];
                 }
                 else if(fs.heldKey[key]) // set key on and keep alive
                 {
                     updateFingerKeyState(fs, m_current_keys, key, true, m_current_extra_keys);
-                    D_pLogDebug("= Finger Key ID=%d pressed (move)", static_cast<int>(key));
+                    pLogDebug("= Finger Key ID=%d pressed (move)", static_cast<int>(key));
                     m_keysHeld[key] = true;
                     fs.heldKeyPrev[key] = fs.heldKey[key];
                 }
@@ -761,7 +870,7 @@ void TouchScreenController::processTouchDevice(int dev_i)
                 if(st.heldKey[key]) // set key on
                 {
                     updateFingerKeyState(st, m_current_keys, key, true, m_current_extra_keys);
-                    D_pLogDebug("= Finger Key ID=%d pressed (put)", static_cast<int>(key));
+                    pLogDebug("= Finger Key ID=%d pressed (put)", static_cast<int>(key));
                     m_keysHeld[key] = true;
                     st.heldKeyPrev[key] = st.heldKey[key];
                     // Also: when more than one touch devices found, choose one which is actual
@@ -774,12 +883,12 @@ void TouchScreenController::processTouchDevice(int dev_i)
             st.alive = (keysCount > 0);
             if(st.alive)
             {
-                D_pLogDebug("= Finger ID=%d came", static_cast<int>(finger_id));
+                pLogDebug("= Finger ID=%d came", static_cast<int>(finger_id));
                 m_fingers.insert({finger_id, st});
             }
         }
 
-        D_pLogDebug("= Finger press: ID=%d, X=%.04f, Y=%.04f, P=%.04f",
+        pLogDebug("= Finger press: ID=%d, X=%.04f, Y=%.04f, P=%.04f",
                     static_cast<int>(finger_id), finger_x, finger_y, finger_pressure);
     }
 
@@ -792,11 +901,11 @@ void TouchScreenController::processTouchDevice(int dev_i)
                 if(it->second.heldKey[key]) // Key was previously held
                 {
                     updateFingerKeyState(it->second, m_current_keys, key, false, m_current_extra_keys);
-                    D_pLogDebug("= Finger Key ID=%d released (take)", static_cast<int>(key));
+                    pLogDebug("= Finger Key ID=%d released (take)", static_cast<int>(key));
                     m_keysHeld[key] = false;
                 }
             }
-            D_pLogDebug("= Finger ID=%d has gone", static_cast<int>(it->first));
+            pLogDebug("= Finger ID=%d has gone", static_cast<int>(it->first));
 
             it = m_fingers.erase(it);
             continue;
@@ -831,7 +940,7 @@ void TouchScreenController::update()
     }
 }
 
-void TouchScreenController::render()
+void TouchScreenController::render(int player_no)
 {
     if(!touchSupported())
         return;
@@ -856,71 +965,255 @@ void TouchScreenController::render()
 //            g = 1.f;
 //        }
 
-#ifdef __ANDROID__
         float a = m_keysHeld[key] ? 0.9f : 0.3f;
 
         switch(key)
         {
         case TouchScreenController::key_toggleKeysView:
             frmMain.renderTextureScale(x1, y1, w, h,
-                                       GFX.touch[m_touchHidden ? GFX_t::BUTTON_VIEW_TOGGLE_OFF : GFX_t::BUTTON_VIEW_TOGGLE_ON],
+                                       m_GFX.touch[m_touchHidden ? TouchScreenGFX_t::BUTTON_VIEW_TOGGLE_OFF : TouchScreenGFX_t::BUTTON_VIEW_TOGGLE_ON],
                                        1.f, 1.f, 1.f, a);
             break;
         case TouchScreenController::key_start:
-            frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[GFX_t::BUTTON_START], 1.f, 1.f, 1.f, a);
+            frmMain.renderTextureScale(x1, y1, w, h, m_GFX.touch[TouchScreenGFX_t::BUTTON_START], 1.f, 1.f, 1.f, a);
             break;
         case TouchScreenController::key_drop:
-            frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[GFX_t::BUTTON_DROP], 1.f, 1.f, 1.f, a);
+            frmMain.renderTextureScale(x1, y1, w, h, m_GFX.touch[TouchScreenGFX_t::BUTTON_DROP], 1.f, 1.f, 1.f, a);
             break;
         case TouchScreenController::key_up:
-            frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[GFX_t::BUTTON_UP], 1.f, 1.f, 1.f, a);
+            frmMain.renderTextureScale(x1, y1, w, h, m_GFX.touch[TouchScreenGFX_t::BUTTON_UP], 1.f, 1.f, 1.f, a);
             break;
         case TouchScreenController::key_left:
-            frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[buttonLeft()], 1.f, 1.f, 1.f, a);
+            frmMain.renderTextureScale(x1, y1, w, h, m_GFX.touch[buttonLeft(player_no)], 1.f, 1.f, 1.f, a);
             break;
         case TouchScreenController::key_right:
-            frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[buttonRight()], 1.f, 1.f, 1.f, a);
+            frmMain.renderTextureScale(x1, y1, w, h, m_GFX.touch[buttonRight(player_no)], 1.f, 1.f, 1.f, a);
             break;
         case TouchScreenController::key_down:
-            frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[GFX_t::BUTTON_DOWN], 1.f, 1.f, 1.f, a);
+            frmMain.renderTextureScale(x1, y1, w, h, m_GFX.touch[TouchScreenGFX_t::BUTTON_DOWN], 1.f, 1.f, 1.f, a);
             break;
 
         case TouchScreenController::key_upleft:
-            frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[GFX_t::BUTTON_UPLEFT], 1.f, 1.f, 1.f, a);
+            frmMain.renderTextureScale(x1, y1, w, h, m_GFX.touch[TouchScreenGFX_t::BUTTON_UPLEFT], 1.f, 1.f, 1.f, a);
             break;
         case TouchScreenController::key_upright:
-            frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[GFX_t::BUTTON_UPRIGHT], 1.f, 1.f, 1.f, a);
+            frmMain.renderTextureScale(x1, y1, w, h, m_GFX.touch[TouchScreenGFX_t::BUTTON_UPRIGHT], 1.f, 1.f, 1.f, a);
             break;
         case TouchScreenController::key_downleft:
-            frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[GFX_t::BUTTON_DOWNLEFT], 1.f, 1.f, 1.f, a);
+            frmMain.renderTextureScale(x1, y1, w, h, m_GFX.touch[TouchScreenGFX_t::BUTTON_DOWNLEFT], 1.f, 1.f, 1.f, a);
             break;
         case TouchScreenController::key_downright:
-            frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[GFX_t::BUTTON_DOWNRIGHT], 1.f, 1.f, 1.f, a);
+            frmMain.renderTextureScale(x1, y1, w, h, m_GFX.touch[TouchScreenGFX_t::BUTTON_DOWNRIGHT], 1.f, 1.f, 1.f, a);
             break;
 
         case TouchScreenController::key_holdRun:
             frmMain.renderTextureScale(x1, y1, w, h,
-                                       GFX.touch[m_runHeld ? GFX_t::BUTTON_HOLD_RUN_ON : GFX_t::BUTTON_HOLD_RUN_OFF],
+                                       m_GFX.touch[m_runHeld ? TouchScreenGFX_t::BUTTON_HOLD_RUN_ON : TouchScreenGFX_t::BUTTON_HOLD_RUN_OFF],
                                        1.f, 1.f, 1.f, a);
             break;
         case TouchScreenController::key_jump:
-            frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[buttonA()], 1.f, 1.f, 1.f, a);
+            frmMain.renderTextureScale(x1, y1, w, h, m_GFX.touch[buttonA(player_no)], 1.f, 1.f, 1.f, a);
             break;
         case TouchScreenController::key_run:
-            frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[buttonX()], 1.f, 1.f, 1.f, a);
+            frmMain.renderTextureScale(x1, y1, w, h, m_GFX.touch[buttonX(player_no)], 1.f, 1.f, 1.f, a);
             break;
         case TouchScreenController::key_altjump:
-            frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[buttonB()], 1.f, 1.f, 1.f, a);
+            frmMain.renderTextureScale(x1, y1, w, h, m_GFX.touch[buttonB(player_no)], 1.f, 1.f, 1.f, a);
             break;
         case TouchScreenController::key_altrun:
-            frmMain.renderTextureScale(x1, y1, w, h, GFX.touch[buttonY()], 1.f, 1.f, 1.f, a);
+            frmMain.renderTextureScale(x1, y1, w, h, m_GFX.touch[buttonY(player_no)], 1.f, 1.f, 1.f, a);
             break;
         default:
             frmMain.renderRect(x1, y1, w, h, r, g, 0.f, 0.3f);
             break;
         }
-#else
-        frmMain.renderRect(x1, y1, w, h, r, g, 0.f, 0.3f);
-#endif
     }
 }
+
+void TouchScreenController::resetState()
+{
+    this->update();
+    for(std::pair<const long int, Controls::TouchScreenController::FingerState>& state : m_fingers)
+    {
+        state.second.ignore = true;
+    }
+    m_current_keys = Controls_t();
+    m_current_extra_keys = ExtraKeys_t();
+    for(int i = 0; i < key_END; i++)
+    {
+        m_keysHeld[i] = false;
+    }
+}
+
+/*====================================================*\
+|| implementation for InputMethod_TouchScreen         ||
+\*====================================================*/
+
+// Update functions that set player controls (and editor controls)
+// based on current device input. Return false if device lost.
+bool InputMethod_TouchScreen::Update(Controls_t& c)
+{
+    InputMethodType_TouchScreen* t = dynamic_cast<InputMethodType_TouchScreen*>(this->Type);
+    if(!t)
+        return false;
+
+    if(!t->m_controller.touchSupported())
+        return false;
+
+    c = t->m_controller.m_current_keys;
+
+    TouchScreenController::ExtraKeys_t& te = t->m_controller.m_current_extra_keys;
+    // think through this logic more thoroughly...
+    // would generally want the "run once" to serve as a sort of "run lock"...
+    if(!GamePaused && !GameMenu && !GameOutro && !LevelSelect)
+    {
+        if(t->m_controller.m_runHeld && c.AltRun)
+        {
+            if(te.keyAltRunOnce)
+                c.AltRun = false;
+            c.Run = false;
+        }
+        else if(t->m_controller.m_runHeld && !te.keyRunOnce)
+            c.Run = true;
+        else if(te.keyRunOnce && c.Run)
+            c.Run = false;
+    }
+
+    return true;
+}
+
+void InputMethod_TouchScreen::Rumble(int ms, float strength)
+{
+    (void)ms;
+    (void)strength;
+    // TODO: shake the phone!!
+}
+
+/*====================================================*\
+|| implementation for InputMethodProfile_TouchScreen  ||
+\*====================================================*/
+
+// the job of this function is to initialize the class in a consistent state
+InputMethodProfile_TouchScreen::InputMethodProfile_TouchScreen()
+{
+}
+
+bool InputMethodProfile_TouchScreen::PollPrimaryButton(size_t i)
+{
+    (void)i;
+    return true;
+}
+
+bool InputMethodProfile_TouchScreen::PollSecondaryButton(size_t i)
+{
+    (void)i;
+    return true;
+}
+
+bool InputMethodProfile_TouchScreen::DeleteSecondaryButton(size_t i)
+{
+    (void)i;
+    return true;
+}
+
+const char* InputMethodProfile_TouchScreen::NamePrimaryButton(size_t i)
+{
+    (void)i;
+    return "(TOUCH)";
+}
+
+const char* InputMethodProfile_TouchScreen::NameSecondaryButton(size_t i)
+{
+    (void)i;
+    return "";
+}
+
+void InputMethodProfile_TouchScreen::SaveConfig(IniProcessing* ctl)
+{
+    (void)ctl;
+}
+
+void InputMethodProfile_TouchScreen::LoadConfig(IniProcessing* ctl)
+{
+    (void)ctl;
+}
+
+/*====================================================*\
+|| implementation for InputMethodType_TouchScreen     ||
+\*====================================================*/
+
+InputMethodProfile* InputMethodType_TouchScreen::AllocateProfile() noexcept
+{
+    return (InputMethodProfile*) new(std::nothrow) InputMethodProfile_TouchScreen;
+}
+
+InputMethodType_TouchScreen::InputMethodType_TouchScreen()
+{
+    this->Name = "Touchscreen";
+}
+
+void InputMethodType_TouchScreen::UpdateControlsPre()
+{
+    this->m_controller.update();
+}
+
+void InputMethodType_TouchScreen::UpdateControlsPost()
+{
+}
+
+InputMethod* InputMethodType_TouchScreen::Poll(const std::vector<InputMethod*>& active_methods) noexcept
+{
+    int n_touchscreens = 0;
+    for(InputMethod* method : active_methods)
+    {
+        if(!method)
+            continue;
+        InputMethod_TouchScreen* m = dynamic_cast<InputMethod_TouchScreen*>(method);
+        if(m)
+        {
+            n_touchscreens ++;
+        }
+    }
+
+    if(n_touchscreens > 0)
+    {
+        this->m_canPoll = false;
+        return nullptr;
+    }
+
+    if(!this->m_controller.touchSupported())
+    {
+        this->m_canPoll = false;
+        return nullptr;
+    }
+
+    // if didn't find any touch, allow poll in future but return nullptr
+    if(!this->m_controller.touchOn())
+    {
+        this->m_canPoll = true;
+        return nullptr;
+    }
+
+    // if poll not allowed, return false
+    if(!this->m_canPoll)
+        return nullptr;
+
+    // we're going to create a touchscreen method!
+    // reset canPoll for next time
+    this->m_canPoll = false;
+
+    InputMethod_TouchScreen* method = new(std::nothrow) InputMethod_TouchScreen;
+
+    if(!method)
+        return nullptr;
+
+    if(!g_renderTouchscreen)
+        this->m_controller.resetState();
+
+    method->Name = "Touchscreen";
+    method->Type = this;
+
+    return (InputMethod*)method;
+}
+
+} // namespace Controls

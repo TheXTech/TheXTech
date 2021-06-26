@@ -3,6 +3,10 @@
 #include "../main/speedrunner.h"
 #include "keyboard.h"
 
+#ifndef NO_SDL
+#include "touchscreen.h"
+#endif
+
 #include <Logger/logger.h>
 
 namespace Controls
@@ -10,6 +14,7 @@ namespace Controls
 
 std::vector<InputMethod*> g_InputMethods;
 std::vector<InputMethodType*> g_InputMethodTypes;
+bool g_renderTouchscreen = false;
 
 /*====================================================*\
 || implementation for InputMethod                     ||
@@ -353,10 +358,18 @@ void InputMethodType::LoadConfig_Custom(IniProcessing* ctl)
 || implementation for global functions                ||
 \*====================================================*/
 
+/*====================================================*\
+||                                                    ||
+||         ADD EVERY NEW INPUT METHOD HERE,           ||
+||           IF SUPPORTED AT COMPILE TIME             ||
+||                                                    ||
+\*====================================================*/
+
 // allocate InputMethodTypes according to system configuration
 void Init()
 {
     g_InputMethodTypes.push_back(new InputMethodType_Keyboard);
+    g_InputMethodTypes.push_back(new InputMethodType_TouchScreen);
 }
 
 void Quit()
@@ -645,6 +658,81 @@ void ClearInputMethods()
         DeleteInputMethod(g_InputMethods[i]);
     }
     g_InputMethods.clear();
+}
+
+void RenderTouchControls()
+{
+#ifndef NO_SDL
+    // only want to render when the touchscreen is in use
+    InputMethod_TouchScreen* active_touchscreen = nullptr;
+    int player_no = 1;
+    for(size_t i = 0; i < g_InputMethods.size(); i++)
+    {
+        InputMethod* method = g_InputMethods[i];
+        if(!method)
+            continue;
+        InputMethod_TouchScreen* m = dynamic_cast<InputMethod_TouchScreen*>(method);
+        if(m)
+        {
+            active_touchscreen = m;
+            player_no = i + 1;
+            break;
+        }
+    }
+
+    if(g_InputMethods.size() > 0 && !active_touchscreen)
+        g_renderTouchscreen = false;
+    else if(active_touchscreen)
+        g_renderTouchscreen = true;
+
+    if(!g_renderTouchscreen)
+        return;
+
+    InputMethodType_TouchScreen* touchscreen = nullptr;
+    if(active_touchscreen)
+        touchscreen = dynamic_cast<InputMethodType_TouchScreen*>(active_touchscreen->Type);
+    else
+    {
+        for(InputMethodType* type : g_InputMethodTypes)
+        {
+            if(!type)
+                continue;
+            InputMethodType_TouchScreen* t = dynamic_cast<InputMethodType_TouchScreen*>(type);
+            if(t)
+            {
+                touchscreen = t;
+                break;
+            }
+        }
+    }
+    if(!touchscreen)
+        return;
+
+    touchscreen->m_controller.render(player_no);
+#endif
+}
+
+void UpdateTouchScreenSize()
+{
+#ifndef NO_SDL
+    InputMethodType_TouchScreen* touchscreen = nullptr;
+    for(InputMethodType* type : g_InputMethodTypes)
+    {
+        if(!type)
+            continue;
+        InputMethodType_TouchScreen* t = dynamic_cast<InputMethodType_TouchScreen*>(type);
+        if(t)
+        {
+            touchscreen = t;
+            break;
+        }
+    }
+
+    if(!touchscreen)
+        return;
+
+    touchscreen->m_controller.updateScreenSize();
+#endif
 }
 
 } // namespace Controls

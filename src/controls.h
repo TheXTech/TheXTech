@@ -41,6 +41,7 @@ class InputMethodType;
 // a nulled pointer in here signifies a player whose controller has disconnected
 extern std::vector<InputMethod*> g_InputMethods;
 extern std::vector<InputMethodType*> g_InputMethodTypes;
+extern bool g_renderTouchscreen;
 
 // utility functions to access information from the Controls_t struct
 namespace PlayerControls
@@ -361,6 +362,9 @@ void DeleteInputMethodSlot(int slot);
 bool SetInputMethodProfile(int slot, InputMethodProfile* profile);
 bool SetInputMethodProfile(InputMethod* method, InputMethodProfile* profile);
 void ClearInputMethods();
+
+void RenderTouchControls();
+void UpdateTouchScreenSize();
 
 } // namespace Controls
 

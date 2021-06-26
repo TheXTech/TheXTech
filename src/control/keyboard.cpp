@@ -299,7 +299,7 @@ void InputMethodType_Keyboard::UpdateControlsPost()
     bool rightPressed = this->m_keyboardState[SDL_SCANCODE_RIGHT] == KEY_PRESSED;
 
 #ifdef __ANDROID__ // Quit credits on BACK key press
-    bool backPressed = getKeyState(SDL_SCANCODE_AC_BACK) == KEY_PRESSED;
+    bool backPressed = this->m_keyboardState[SDL_SCANCODE_AC_BACK] == KEY_PRESSED;
 #else
     bool backPressed = false;
 #endif

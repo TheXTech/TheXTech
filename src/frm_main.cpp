@@ -35,6 +35,7 @@
 #include "game_main.h"
 #include "graphics.h"
 #include "control/joystick.h"
+#include "controls.h"
 #include "sound.h"
 #include "editor.h"
 
@@ -438,6 +439,7 @@ bool FrmMain::hasWindowMouseFocus()
 
 void FrmMain::eventDoubleClick()
 {
+    return; // touchscreen makes this too hard for now
     if(MagicHand)
         return; // Don't toggle fullscreen/window when magic hand is active
 #if !defined(__EMSCRIPTEN__) && !defined(__ANDROID__)
@@ -601,9 +603,7 @@ void FrmMain::eventResize()
 {
     updateViewport();
     SetupScreens();
-#ifdef USE_TOUCHSCREEN_CONTROLLER
-    UpdateTouchScreenSize();
-#endif
+    Controls::UpdateTouchScreenSize();
 }
 
 int FrmMain::setFullScreen(bool fs)
@@ -702,9 +702,7 @@ void FrmMain::repaint()
     SDL_SetTextureAlphaMod(m_tBuffer, 255);
     SDL_RenderCopyEx(m_gRenderer, m_tBuffer, &sourceRect, &destRect, 0.0, nullptr, SDL_FLIP_NONE);
 
-#ifdef USE_TOUCHSCREEN_CONTROLLER
-    RenderTouchControls();
-#endif
+    Controls::RenderTouchControls();
 
     SDL_RenderPresent(m_gRenderer);
 }

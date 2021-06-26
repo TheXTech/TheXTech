@@ -26,9 +26,89 @@
 #ifndef TOUCHSCREEN_H
 #define TOUCHSCREEN_H
 
-#include <SDL2/SDL_touch.h>
 #include <map>
+#include <string>
+#include <vector>
+
+#include <SDL2/SDL_touch.h>
+
 #include "../controls.h"
+#include "../std_picture.h"
+
+namespace Controls
+{
+
+
+/*!
+ * \brief A basic class including graphics for touchscreen controller
+ */
+
+class TouchScreenGFX_t
+{
+    std::vector<StdPicture*> m_loadedImages;
+    void loadImage(StdPicture &img, std::string path);
+    int m_loadErrors = 0;
+public:
+    bool m_success = false;
+
+    TouchScreenGFX_t();
+    ~TouchScreenGFX_t();
+
+    enum
+    {
+        BUTTON_START = 0,
+        BUTTON_LEFT,
+        BUTTON_LEFT_CHAR,
+        BUTTON_RIGHT,
+        BUTTON_RIGHT_CHAR,
+        BUTTON_UP,
+        BUTTON_DOWN,
+        BUTTON_UPLEFT,
+        BUTTON_UPRIGHT,
+        BUTTON_DOWNLEFT,
+        BUTTON_DOWNRIGHT,
+        BUTTON_A,
+        BUTTON_A_PS,
+        BUTTON_A_BLANK,
+        BUTTON_A_DO,
+        BUTTON_A_ENTER,
+        BUTTON_A_JUMP,
+        BUTTON_B,
+        BUTTON_B_PS,
+        BUTTON_B_BLANK,
+        BUTTON_B_JUMP,
+        BUTTON_B_SPINJUMP,
+        BUTTON_X,
+        BUTTON_X_PS,
+        BUTTON_X_BACK,
+        BUTTON_X_BLANK,
+        BUTTON_X_BOMB,
+        BUTTON_X_BUMERANG,
+        BUTTON_X_FIRE,
+        BUTTON_X_HAMMER,
+        BUTTON_X_RUN,
+        BUTTON_X_SWORD,
+        BUTTON_Y,
+        BUTTON_Y_PS,
+        BUTTON_Y_BLANK,
+        BUTTON_Y_BOMB,
+        BUTTON_Y_BUMERANG,
+        BUTTON_Y_FIRE,
+        BUTTON_Y_HAMMER,
+        BUTTON_Y_RUN,
+        BUTTON_Y_STATUE,
+        BUTTON_Y_SWORD,
+        BUTTON_DROP,
+        BUTTON_HOLD_RUN_OFF,
+        BUTTON_HOLD_RUN_ON,
+        BUTTON_VIEW_TOGGLE_OFF,
+        BUTTON_VIEW_TOGGLE_ON,
+        BUTTON_ANALOG_BORDER,
+        BUTTON_ANALOG_STICK,
+        BUTTONS_END
+    };
+    StdPicture touch[BUTTONS_END];
+};
 
 /*!
  * \brief A mobile touch-screen controller which reads state of the keyboard device
@@ -43,13 +123,20 @@ class TouchScreenController
     int m_screenHeight = 0;
     //! Actual touch device to use
     int m_actualDevice = -1;
+    //! Graphics for controller
+    TouchScreenGFX_t m_GFX;
+
+public:
 
     /*!
      * \brief Is touch-screen supported?
      */
     bool touchSupported();
 
-public:
+    /*!
+     * \brief Is touch-screen being touched?
+     */
+    bool touchOn();
 
     enum commands
     {
@@ -77,7 +164,7 @@ public:
     Controls_t m_current_keys;
     bool m_keysHeld[key_END] = {false};
 
-    struct ExtraKeys
+    struct ExtraKeys_t
     {
         bool keyToggleView = false;
         bool keyToggleViewOnce = false;
@@ -96,6 +183,7 @@ public:
     struct FingerState
     {
         bool alive = false;
+        bool ignore = false;
         bool heldKey[key_END] = {};
         bool heldKeyPrev[key_END] = {};
 
@@ -119,18 +207,83 @@ public:
      */
     ~TouchScreenController();
 
-    void init();
-
     void updateScreenSize();
 
     /*!
      * \brief Read current state of keyboard controller
      */
+    void processTouchDevice(int dev_i);
+
     void update();
 
-    void render();
+    void render(int player_no);
 
-    void processTouchDevice(int dev_i);
+    void resetState();
 };
+
+class InputMethod_TouchScreen : public InputMethod
+{
+public:
+    using InputMethod::Type;
+    using InputMethod::Profile;
+
+    // Update functions that set player controls (and editor controls)
+    // based on current device input. Return false if device lost.
+    bool Update(Controls_t& c);
+    // bool Update(EditorControls_t& c);
+
+    void Rumble(int ms, float strength);
+};
+
+class InputMethodProfile_TouchScreen : public InputMethodProfile
+{
+public:
+    using InputMethodProfile::Name;
+    using InputMethodProfile::Type;
+
+    InputMethodProfile_TouchScreen();
+
+    // Polls a new (secondary) device button for the i'th player button
+    // Returns true on success and false if no button pressed
+    // Never allows two player buttons to bind to the same device button
+    bool PollPrimaryButton(size_t i);
+    bool PollSecondaryButton(size_t i);
+
+    // Deletes a secondary device button for the i'th player button
+    bool DeleteSecondaryButton(size_t i);
+
+    // Gets strings for the device buttons currently used for the i'th player button
+    const char* NamePrimaryButton(size_t i);
+    const char* NameSecondaryButton(size_t i);
+
+    // one can assume that the IniProcessing* is already in the correct group
+    void SaveConfig(IniProcessing* ctl);
+    void LoadConfig(IniProcessing* ctl);
+};
+
+class InputMethodType_TouchScreen : public InputMethodType
+{
+private:
+    bool m_canPoll = false;
+
+    InputMethodProfile* AllocateProfile() noexcept;
+
+public:
+    using InputMethodType::Name;
+    using InputMethodType::m_profiles;
+
+    TouchScreenController m_controller;
+
+    InputMethodType_TouchScreen();
+
+    void UpdateControlsPre();
+    void UpdateControlsPost();
+
+    // null if no input method is ready
+    // allocates the new InputMethod on the heap
+    InputMethod* Poll(const std::vector<InputMethod*>& active_methods) noexcept;
+};
+
+} // namespace Controls
 
 #endif // TOUCHSCREEN_H
