@@ -71,7 +71,7 @@ enum
 };
 
 //! Is hardware keyboard presented?
-static bool s_showTouchscreenOnStart = false;
+static bool s_showTouchscreenOnStart = true;
 static int  s_touchPadStyle = 0;
 static double s_screenSize = 0;
 static double s_screenWidth = 0;
@@ -543,6 +543,7 @@ static struct TouchKeyMap
         {
             SDL_assert(p.cmd >= TouchScreenController::key_BEGIN && p.cmd < TouchScreenController::key_END);
             fs.heldKey[p.cmd] = false;
+            printf("%f,%f %f,%f,%f,%f\n", x, y, p.x1, p.y1, p.x2, p.y2);
             if(x >= p.x1 && x <= p.x2 && y >= p.y1 && y <= p.y2)
             {
                 fs.heldKey[p.cmd] = true;
@@ -665,9 +666,76 @@ static const TouchKeyMap::KeyPos c_10_6_tablet[TouchScreenController::key_END] =
     {1131.0f, 387.0f, 1225.0f, 426.0f, TouchScreenController::key_holdRun},
     {10.0f, 10.0f, 57.0f, 57.0f, TouchScreenController::key_toggleKeysView},
 };
+
+// based on c_10_6_tablet
+static const TouchKeyMap::KeyPos c_smallAutoMap[TouchScreenController::key_END] =
+{
+    /* Note that order of keys must match the TouchScreenController::commands enum!!! */
+    {-0.5307881773399015, -0.07266009852216748, -0.3669950738916256, -0.0332512315270936, TouchScreenController::key_start},
+    {0.023399014778325122, -0.27216748768472904, 0.10960591133004927, -0.18596059113300492, TouchScreenController::key_left},
+    {0.1958128078817734, -0.27216748768472904, 0.28201970443349755, -0.18596059113300492, TouchScreenController::key_right},
+    {0.10960591133004927, -0.3583743842364532, 0.1958128078817734, -0.27216748768472904, TouchScreenController::key_up},
+    {0.10960591133004927, -0.18596059113300492, 0.1958128078817734, -0.09975369458128079, TouchScreenController::key_down},
+    {0.023399014778325122, -0.3583743842364532, 0.10960591133004927, -0.27216748768472904, TouchScreenController::key_upleft},
+    {0.1958128078817734, -0.3583743842364532, 0.28201970443349755, -0.27216748768472904, TouchScreenController::key_upright},
+    {0.023399014778325122, -0.18596059113300492, 0.10960591133004927, -0.09975369458128079, TouchScreenController::key_downleft},
+    {0.1958128078817734, -0.18596059113300492, 0.28201970443349755, -0.09975369458128079, TouchScreenController::key_downright},
+    {-0.31157635467980294, -0.27586206896551724, -0.20073891625615764, -0.16502463054187191, TouchScreenController::key_run},
+    {-0.17364532019704434, -0.2315270935960591, -0.06280788177339902, -0.1206896551724138, TouchScreenController::key_jump},
+    {-0.2869458128078818, -0.4125615763546798, -0.17610837438423646, -0.3017241379310345, TouchScreenController::key_altrun},
+    {-0.14901477832512317, -0.37807881773399016, -0.038177339901477834, -0.2672413793103448, TouchScreenController::key_altjump},
+    {0.31527093596059114, -0.07266009852216748, 0.479064039408867, -0.0332512315270936, TouchScreenController::key_drop},
+    {-0.20812807881773399, -0.5233990147783252, -0.09236453201970443, -0.4753694581280788, TouchScreenController::key_holdRun},
+    {0.012315270935960592, 0.012315270935960592, 0.07019704433497537, 0.07019704433497537, TouchScreenController::key_toggleKeysView},
+};
+
+// based on c_averagePhoneMap
+static const TouchKeyMap::KeyPos c_mediumAutoMap[TouchScreenController::key_END] =
+{
+    /* Note that order of keys must match the TouchScreenController::commands enum!!! */
+    {0.75, -0.105, 1.0, -0.021666666666666667, TouchScreenController::key_start},
+    {0.0016666666666666668, -0.31666666666666665, 0.13833333333333334, -0.18, TouchScreenController::key_left},
+    {0.275, -0.31666666666666665, 0.4116666666666667, -0.18, TouchScreenController::key_right},
+    {0.13833333333333334, -0.4533333333333333, 0.275, -0.31666666666666665, TouchScreenController::key_up},
+    {0.13833333333333334, -0.18, 0.275, -0.043333333333333335, TouchScreenController::key_down},
+    {0.0016666666666666668, -0.4533333333333333, 0.13833333333333334, -0.31666666666666665, TouchScreenController::key_upleft},
+    {0.275, -0.4533333333333333, 0.4116666666666667, -0.31666666666666665, TouchScreenController::key_upright},
+    {0.0016666666666666668, -0.18, 0.13833333333333334, -0.043333333333333335, TouchScreenController::key_downleft},
+    {0.275, -0.18, 0.4116666666666667, -0.043333333333333335, TouchScreenController::key_downright},
+    {-0.43333333333333335, -0.3283333333333333, -0.26, -0.155, TouchScreenController::key_run},
+    {-0.23166666666666666, -0.2733333333333333, -0.058333333333333334, -0.1, TouchScreenController::key_jump},
+    {-0.39666666666666667, -0.5216666666666666, -0.22333333333333333, -0.34833333333333333, TouchScreenController::key_altrun},
+    {-0.2, -0.4716666666666667, -0.02666666666666667, -0.29833333333333334, TouchScreenController::key_altjump},
+    {0.45, -0.105, 0.7, -0.021666666666666667, TouchScreenController::key_drop},
+    {-0.3283333333333333, -0.785, -0.135, -0.7183333333333333, TouchScreenController::key_holdRun},
+    {0.016666666666666666, 0.016666666666666666, 0.11666666666666667, 0.11666666666666667, TouchScreenController::key_toggleKeysView},
+};
+
+// based on c_4_tinyPhoneMap
+static const TouchKeyMap::KeyPos c_largeAutoMap[TouchScreenController::key_END] =
+{
+    /* Note that order of keys must match the TouchScreenController::commands enum!!! */
+    {-0.5, 0.025, -0.25, 0.10, TouchScreenController::key_start},
+    {0.022916666666666665, -0.45416666666666666, 0.18958333333333333, -0.2875, TouchScreenController::key_left},
+    {0.35625, -0.45416666666666666, 0.5229166666666667, -0.2875, TouchScreenController::key_right},
+    {0.18958333333333333, -0.6208333333333333, 0.35625, -0.45416666666666666, TouchScreenController::key_up},
+    {0.18958333333333333, -0.2875, 0.35625, -0.12083333333333333, TouchScreenController::key_down},
+    {0.022916666666666665, -0.6208333333333333, 0.18958333333333333, -0.45416666666666666, TouchScreenController::key_upleft},
+    {0.35625, -0.6208333333333333, 0.5229166666666667, -0.45416666666666666, TouchScreenController::key_upright},
+    {0.022916666666666665, -0.2875, 0.18958333333333333, -0.12083333333333333, TouchScreenController::key_downleft},
+    {0.35625, -0.2875, 0.5229166666666667, -0.12083333333333333, TouchScreenController::key_downright},
+    {-0.5083333333333333, -0.425, -0.30625, -0.22291666666666668, TouchScreenController::key_run},
+    {-0.26666666666666666, -0.36041666666666666, -0.06458333333333334, -0.15833333333333333, TouchScreenController::key_jump},
+    {-0.4666666666666667, -0.6604166666666667, -0.26458333333333334, -0.4583333333333333, TouchScreenController::key_altrun},
+    {-0.22708333333333333, -0.6020833333333333, -0.025, -0.4, TouchScreenController::key_altjump},
+    {0.25, 0.025, 0.5, 0.10, TouchScreenController::key_drop},
+    {-0.20, 0.125, -0.02608695652173914, 0.20, TouchScreenController::key_holdRun},
+    {0.020833333333333332, 0.020833333333333332, 0.13333333333333333, 0.13333333333333333, TouchScreenController::key_toggleKeysView},
+};
 /*---------------------------------------------------------------------------------------*/
 
-static void initTouchMap()
+#if 0
+static void oldTouchMap()
 {
     if(s_screenSize >= 9.0) // Big tablets
     {
@@ -704,34 +772,76 @@ static void initTouchMap()
         }
     }
 }
+#endif
+
+static void updateTouchMap(int preferredSize, float screenWidth, float screenHeight)
+{
+    if(screenWidth > screenHeight)
+    {
+        g_touchKeyMap.touchCanvasWidth = screenWidth / screenHeight;
+        g_touchKeyMap.touchCanvasHeight = 1.f;
+    }
+    else
+    {
+        g_touchKeyMap.touchCanvasWidth = 1.f;
+        g_touchKeyMap.touchCanvasHeight = screenHeight / screenWidth;
+    }
+    if(preferredSize == TouchScreenController::size_small)
+        SDL_memcpy(g_touchKeyMap.touchKeysMap, c_smallAutoMap, sizeof(g_touchKeyMap.touchKeysMap));
+    else if(preferredSize == TouchScreenController::size_medium)
+        SDL_memcpy(g_touchKeyMap.touchKeysMap, c_mediumAutoMap, sizeof(g_touchKeyMap.touchKeysMap));
+    else
+        SDL_memcpy(g_touchKeyMap.touchKeysMap, c_largeAutoMap, sizeof(g_touchKeyMap.touchKeysMap));
+    for(int i = 0; i < TouchScreenController::key_END; i++)
+    {
+        if(g_touchKeyMap.touchKeysMap[i].x1 < 0)
+        {
+            g_touchKeyMap.touchKeysMap[i].x1 += g_touchKeyMap.touchCanvasWidth;
+        }
+        if(g_touchKeyMap.touchKeysMap[i].x2 < 0)
+        {
+            g_touchKeyMap.touchKeysMap[i].x2 += g_touchKeyMap.touchCanvasWidth;
+        }
+        if(g_touchKeyMap.touchKeysMap[i].y1 < 0)
+        {
+            g_touchKeyMap.touchKeysMap[i].y1 += g_touchKeyMap.touchCanvasHeight;
+        }
+        if(g_touchKeyMap.touchKeysMap[i].y2 < 0)
+        {
+            g_touchKeyMap.touchKeysMap[i].y2 += g_touchKeyMap.touchCanvasHeight;
+        }
+    }
+}
 
 TouchScreenController::~TouchScreenController() = default;
 
 TouchScreenController::TouchScreenController()
 {
-    initTouchMap();
+    updateScreenSize();
 
     for(int key = key_BEGIN; key < key_END; ++key)
         m_keysHeld[key] = false;
     m_touchHidden = !s_showTouchscreenOnStart;
     pLogDebug("Initialization of touch-screen controller...");
     m_touchDevicesCount = SDL_GetNumTouchDevices();
-    updateScreenSize();
     pLogDebug("Found %d touch devices, screen size: %d x %d",
                 m_touchDevicesCount,
                 m_screenWidth, m_screenHeight);
-    pLogDebug("The screen size: %g inches (%g x %g)", s_screenSize, s_screenWidth, s_screenHeight);
+#ifdef __ANDROID__
+    pLogDebug("The Android reported screen size: %g inches (%g x %g)", s_screenSize, s_screenWidth, s_screenHeight);
+#endif
 }
 
 void TouchScreenController::updateScreenSize()
 {
     SDL_GetWindowSize(frmMain.getWindow(), &m_screenWidth, &m_screenHeight);
+    updateTouchMap(m_preferredSize, m_screenWidth, m_screenHeight);
 }
 
 static void updateKeyValue(bool &key, bool state)
 {
     key = state;
-    pLogDebug("= Touch key: State=%d", (int)key);
+    D_pLogDebug("= Touch key: State=%d", (int)key);
 }
 
 static void updateFingerKeyState(TouchScreenController::FingerState &st,
@@ -844,14 +954,14 @@ void TouchScreenController::processTouchDevice(int dev_i)
                 if(fs.heldKeyPrev[key] && !fs.heldKey[key]) // set key off
                 {
                     updateFingerKeyState(fs, m_current_keys, key, false, m_current_extra_keys);
-                    pLogDebug("= Finger Key ID=%d released (move)", static_cast<int>(key));
+                    D_pLogDebug("= Finger Key ID=%d released (move)", static_cast<int>(key));
                     m_keysHeld[key] = false;
                     fs.heldKeyPrev[key] = fs.heldKey[key];
                 }
                 else if(fs.heldKey[key]) // set key on and keep alive
                 {
                     updateFingerKeyState(fs, m_current_keys, key, true, m_current_extra_keys);
-                    pLogDebug("= Finger Key ID=%d pressed (move)", static_cast<int>(key));
+                    D_pLogDebug("= Finger Key ID=%d pressed (move)", static_cast<int>(key));
                     m_keysHeld[key] = true;
                     fs.heldKeyPrev[key] = fs.heldKey[key];
                 }
@@ -870,7 +980,7 @@ void TouchScreenController::processTouchDevice(int dev_i)
                 if(st.heldKey[key]) // set key on
                 {
                     updateFingerKeyState(st, m_current_keys, key, true, m_current_extra_keys);
-                    pLogDebug("= Finger Key ID=%d pressed (put)", static_cast<int>(key));
+                    D_pLogDebug("= Finger Key ID=%d pressed (put)", static_cast<int>(key));
                     m_keysHeld[key] = true;
                     st.heldKeyPrev[key] = st.heldKey[key];
                     // Also: when more than one touch devices found, choose one which is actual
@@ -883,12 +993,12 @@ void TouchScreenController::processTouchDevice(int dev_i)
             st.alive = (keysCount > 0);
             if(st.alive)
             {
-                pLogDebug("= Finger ID=%d came", static_cast<int>(finger_id));
+                D_pLogDebug("= Finger ID=%d came", static_cast<int>(finger_id));
                 m_fingers.insert({finger_id, st});
             }
         }
 
-        pLogDebug("= Finger press: ID=%d, X=%.04f, Y=%.04f, P=%.04f",
+        D_pLogDebug("= Finger press: ID=%d, X=%.04f, Y=%.04f, P=%.04f",
                     static_cast<int>(finger_id), finger_x, finger_y, finger_pressure);
     }
 
@@ -901,11 +1011,11 @@ void TouchScreenController::processTouchDevice(int dev_i)
                 if(it->second.heldKey[key]) // Key was previously held
                 {
                     updateFingerKeyState(it->second, m_current_keys, key, false, m_current_extra_keys);
-                    pLogDebug("= Finger Key ID=%d released (take)", static_cast<int>(key));
+                    D_pLogDebug("= Finger Key ID=%d released (take)", static_cast<int>(key));
                     m_keysHeld[key] = false;
                 }
             }
-            pLogDebug("= Finger ID=%d has gone", static_cast<int>(it->first));
+            D_pLogDebug("= Finger ID=%d has gone", static_cast<int>(it->first));
 
             it = m_fingers.erase(it);
             continue;
@@ -1063,20 +1173,22 @@ bool InputMethod_TouchScreen::Update(Controls_t& c)
     c = t->m_controller.m_current_keys;
 
     TouchScreenController::ExtraKeys_t& te = t->m_controller.m_current_extra_keys;
-    // think through this logic more thoroughly...
-    // would generally want the "run once" to serve as a sort of "run lock"...
+    // This run lock logic has been modified to work as run invert code instead.
+    // The original code always delayed running by one frame,
+    //   even when run lock was not enabled.
     if(!GamePaused && !GameMenu && !GameOutro && !LevelSelect)
     {
+        // Alt Run functions as normal
         if(t->m_controller.m_runHeld && c.AltRun)
         {
+            // make sure Alt Run activates properly
             if(te.keyAltRunOnce)
                 c.AltRun = false;
             c.Run = false;
         }
-        else if(t->m_controller.m_runHeld && !te.keyRunOnce)
-            c.Run = true;
-        else if(te.keyRunOnce && c.Run)
-            c.Run = false;
+        // Run is inverted
+        else if(t->m_controller.m_runHeld)
+            c.Run = !c.Run;
     }
 
     return true;
@@ -1214,6 +1326,92 @@ InputMethod* InputMethodType_TouchScreen::Poll(const std::vector<InputMethod*>& 
     method->Type = this;
 
     return (InputMethod*)method;
+}
+
+/*-----------------------*\
+|| OPTIONAL METHODS      ||
+\*-----------------------*/
+
+// How many per-type special options are there?
+size_t InputMethodType_TouchScreen::GetSpecialOptionCount()
+{
+    return 1;
+}
+
+// Methods to manage per-profile options
+// It is guaranteed that none of these will be called if
+// GetOptionCount() returns 0.
+// get a char* describing the option
+const char* InputMethodType_TouchScreen::GetOptionName(size_t i)
+{
+    if(i == 0)
+    {
+        return "INTERFACE SIZE";
+    }
+    return nullptr;
+}
+// get a char* describing the current option value
+// must be allocated in static or instance memory
+// WILL NOT be freed
+const char* InputMethodType_TouchScreen::GetOptionValue(size_t i)
+{
+    if(i == 0)
+    {
+        if(this->m_controller.m_preferredSize == TouchScreenController::size_small)
+            return "SMALL";
+        else if(this->m_controller.m_preferredSize == TouchScreenController::size_medium)
+            return "MEDIUM";
+        else
+            return "LARGE";
+    }
+    return nullptr;
+}
+// called when A is pressed; allowed to interrupt main game loop
+bool InputMethodType_TouchScreen::OptionChange(size_t i)
+{
+    if(i == 0)
+    {
+        this->OptionRotateRight(i);
+    }
+    return false;
+}
+// called when left is pressed
+bool InputMethodType_TouchScreen::OptionRotateLeft(size_t i)
+{
+    if(i == 0)
+    {
+        if(this->m_controller.m_preferredSize > 0)
+            this->m_controller.m_preferredSize --;
+        else
+            this->m_controller.m_preferredSize = TouchScreenController::size_END - 1;
+        this->m_controller.updateScreenSize();
+        return true;
+    }
+    return false;
+}
+// called when right is pressed
+bool InputMethodType_TouchScreen::OptionRotateRight(size_t i)
+{
+    if(i == 0)
+    {
+        this->m_controller.m_preferredSize ++;
+        if(this->m_controller.m_preferredSize >= TouchScreenController::size_END)
+            this->m_controller.m_preferredSize = 0;
+        this->m_controller.updateScreenSize();
+        return true;
+    }
+    return false;
+}
+
+void InputMethodType_TouchScreen::SaveConfig_Custom(IniProcessing* ctl)
+{
+    ctl->setValue("ui-size", this->m_controller.m_preferredSize);
+}
+
+void InputMethodType_TouchScreen::LoadConfig_Custom(IniProcessing* ctl)
+{
+    ctl->read("ui-size", this->m_controller.m_preferredSize, TouchScreenController::size_medium);
+    this->m_controller.updateScreenSize();
 }
 
 } // namespace Controls

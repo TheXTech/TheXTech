@@ -236,15 +236,15 @@ int menuPlayerSelect_Mouse_Render(bool mouse, bool render, int minPlayers)
             }
         }
 
-        // only happens when first player is connecting
-        if(p >= (int)Controls::g_InputMethods.size() || Controls::g_InputMethods[p] == nullptr)
-        {
-            SuperPrintCenter(g_mainMenu.playerSelAttachController, 3, cX, sY+11*line);
-            continue;
-        }
-
         if(render)
         {
+            // only happens when first player is connecting
+            if(p >= (int)Controls::g_InputMethods.size() || Controls::g_InputMethods[p] == nullptr)
+            {
+                SuperPrintCenter(g_mainMenu.playerSelAttachController, 3, cX, sY+11*line);
+                continue;
+            }
+
             SuperPrintCenter(Controls::g_InputMethods[p]->Name, 3, cX, sY+10*line);
             SuperPrintCenter(g_mainMenu.wordProfile + ":", 3, cX, sY+11*line);
             // should never be null
@@ -262,6 +262,7 @@ int menuPlayerSelect_Mouse_Render(bool mouse, bool render, int minPlayers)
         if(mouse && MenuMouseRelease && MenuMouseDown)
         {
             PlaySoundMenu(SFX_Do);
+            MenuMouseRelease = false;
             return 1;
         }
     }

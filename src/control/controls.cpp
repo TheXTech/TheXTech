@@ -251,7 +251,7 @@ void InputMethodType::LoadConfig(IniProcessing* ctl)
     int n_existing = this->m_profiles.size(); // should usually be zero
 
     ctl->beginGroup(this->Name);
-    ctl->read("n-profiles", n_profiles, 2);
+    ctl->read("n-profiles", n_profiles, 0);
     this->LoadConfig_Custom(ctl);
     ctl->endGroup();
 

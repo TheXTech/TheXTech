@@ -160,6 +160,15 @@ public:
         key_END
     };
 
+    enum sizes
+    {
+        size_small = 0,
+        size_medium,
+        size_large,
+        size_END
+    };
+    int m_preferredSize = size_medium;
+
     //! In-game controls pressed
     Controls_t m_current_keys;
     bool m_keysHeld[key_END] = {false};
@@ -282,6 +291,32 @@ public:
     // null if no input method is ready
     // allocates the new InputMethod on the heap
     InputMethod* Poll(const std::vector<InputMethod*>& active_methods) noexcept;
+
+    /*-----------------------*\
+    || OPTIONAL METHODS      ||
+    \*-----------------------*/
+public:
+    // How many per-type special options are there?
+    size_t GetSpecialOptionCount();
+    // Methods to manage per-profile options
+    // It is guaranteed that none of these will be called if
+    // GetOptionCount() returns 0.
+    // get a char* describing the option
+    const char* GetOptionName(size_t i);
+    // get a char* describing the current option value
+    // must be allocated in static or instance memory
+    // WILL NOT be freed
+    const char* GetOptionValue(size_t i);
+    // called when A is pressed; allowed to interrupt main game loop
+    bool OptionChange(size_t i);
+    // called when left is pressed
+    bool OptionRotateLeft(size_t i);
+    // called when right is pressed
+    bool OptionRotateRight(size_t i);
+
+protected:
+    void SaveConfig_Custom(IniProcessing* ctl);
+    void LoadConfig_Custom(IniProcessing* ctl);
 };
 
 } // namespace Controls

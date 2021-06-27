@@ -535,6 +535,8 @@ void FrmMain::eventKeyUp(SDL_KeyboardEvent &evt)
 
 void FrmMain::eventMouseDown(SDL_MouseButtonEvent &event)
 {
+    if(Controls::g_renderTouchscreen && event.which == SDL_TOUCH_MOUSEID)
+        return;
     if(event.button == SDL_BUTTON_LEFT)
     {
         MenuMouseDown = true;
@@ -565,6 +567,12 @@ void FrmMain::eventMouseDown(SDL_MouseButtonEvent &event)
 
 void FrmMain::eventMouseMove(SDL_MouseMotionEvent &event)
 {
+    if(Controls::g_renderTouchscreen && event.which == SDL_TOUCH_MOUSEID)
+    {
+        MenuMouseX = -100;
+        MenuMouseY = -100;
+        return;
+    }
     SDL_Point p = MapToScr(event.x, event.y);
     MenuMouseX = p.x;// int(event.x * ScreenW / ScaleWidth);
     MenuMouseY = p.y;//int(event.y * ScreenH / ScaleHeight);
@@ -580,6 +588,8 @@ void FrmMain::eventMouseMove(SDL_MouseMotionEvent &event)
 
 void FrmMain::eventMouseUp(SDL_MouseButtonEvent &event)
 {
+    if(Controls::g_renderTouchscreen && event.which == SDL_TOUCH_MOUSEID)
+        return;
     bool doubleClick = false;
     MenuMouseDown = false;
     MenuMouseRelease = true;
