@@ -46,6 +46,7 @@
 #include <Logger/logger.h>
 
 Config_t g_config;
+VideoSettings_t g_videoSettings;
 
 void OpenConfig_preSetup()
 {

@@ -1,8 +1,6 @@
 #ifndef VIDEO_H
 #define VIDEO_H
 
-#include <SDL2/SDL_stdinc.h>
-
 enum RenderMode_t
 {
     RENDER_AUTO = -1,
@@ -25,6 +23,6 @@ extern struct VideoSettings_t
     bool   enableFrameSkip = true;
     //! Show FPS counter
     bool   showFrameRate = false;
-} g_videoSettings; // frm_main.cpp
+} g_videoSettings; // config.cpp
 
 #endif // VIDEO_H

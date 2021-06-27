@@ -60,8 +60,6 @@
 #include "main/game_info.h"
 
 
-VideoSettings_t g_videoSettings;
-
 
 static SDL_bool IsFullScreen(SDL_Window *win)
 {
