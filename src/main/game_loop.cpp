@@ -91,6 +91,7 @@ void GameLoop()
     else if(qScreen)
     {
         UpdateEffects();
+        speedRun_tick();
         UpdateGraphics();
     }
     else if(BattleIntro > 0)
