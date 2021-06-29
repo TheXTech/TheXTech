@@ -352,12 +352,17 @@ InputMethod* InputMethodType_Keyboard::Poll(const std::vector<InputMethod*>& act
     }
 
 
+    // ban attachment from active profile, must find new profile
     int key;
+    InputMethodProfile* target_profile = nullptr;
     for(key = 0; key < this->m_keyboardStateSize; key++)
     {
+        if(!this->m_keyboardState[key])
+            continue;
         bool allowed = true;
         if(key == SDL_SCANCODE_LALT || key == SDL_SCANCODE_RALT || key == SDL_SCANCODE_LCTRL || key == SDL_SCANCODE_RCTRL)
             allowed = false;
+        // ban attachment from active profile
         for(InputMethod* method : active_methods)
         {
             if(!allowed)
@@ -376,11 +381,31 @@ InputMethod* InputMethodType_Keyboard::Poll(const std::vector<InputMethod*>& act
                 }
             }
         }
-        if(allowed && this->m_keyboardState[key])
+        if(!allowed)
+            continue;
+        // must find new profile
+        for(InputMethodProfile* profile : this->m_profiles)
+        {
+            InputMethodProfile_Keyboard* p = dynamic_cast<InputMethodProfile_Keyboard*>(profile);
+            if(!p)
+                continue;
+            for(size_t i = 0; i < PlayerControls::n_buttons; i++)
+            {
+                if(p->m_keys[i] == key || p->m_keys2[i] == key)
+                {
+                    target_profile = profile;
+                    break;
+                }
+            }
+            if(target_profile)
+                break;
+        }
+        if(target_profile)
             break;
     }
+
     // if didn't find any key, allow poll in future but return false
-    if(key == this->m_keyboardStateSize)
+    if(key == this->m_keyboardStateSize || target_profile == nullptr)
     {
         this->m_canPoll = true;
         return nullptr;
@@ -400,23 +425,7 @@ InputMethod* InputMethodType_Keyboard::Poll(const std::vector<InputMethod*>& act
 
     method->Name = "Keyboard";
     method->Type = this;
-
-    // set the new method's profile if possible
-    for(InputMethodProfile* profile : this->m_profiles)
-    {
-        InputMethodProfile_Keyboard* profile_k = dynamic_cast<InputMethodProfile_Keyboard*>(profile);
-        if(!profile_k) continue;
-        for(size_t i = 0; i < PlayerControls::n_buttons; i++)
-        {
-            if(profile_k->m_keys[i] == key || profile_k->m_keys2[i] == key)
-            {
-                method->Profile = profile;
-                break;
-            }
-        }
-        if(method->Profile)
-            break;
-    }
+    method->Profile = target_profile;
 
     return (InputMethod*)method;
 }
@@ -426,11 +435,19 @@ InputMethod* InputMethodType_Keyboard::Poll(const std::vector<InputMethod*>& act
 \*-----------------------*/
 
 // optional function allowing developer to associate device information with profile, etc
-bool InputMethodType_Keyboard::SetProfile_Custom(InputMethod* method, int player_no, InputMethodProfile* profile)
+bool InputMethodType_Keyboard::SetProfile_Custom(InputMethod* method, int player_no, InputMethodProfile* profile,
+    const std::vector<InputMethod*>& active_methods)
 {
     if(!method || !profile || player_no < 0 || player_no >= maxLocalPlayers)
     {
         return false;
+    }
+    for(InputMethod* o_method : active_methods)
+    {
+        if(!o_method)
+            continue;
+        if(o_method != method && o_method->Profile == profile)
+            return false;
     }
     m_canPoll = false;
     return true;

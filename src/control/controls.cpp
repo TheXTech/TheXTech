@@ -181,14 +181,14 @@ bool InputMethodType::ClearProfiles(const std::vector<InputMethod*>& active_meth
     return (i == 0);
 }
 
-bool InputMethodType::SetProfile(InputMethod* method, int player_no, InputMethodProfile* profile)
+bool InputMethodType::SetProfile(InputMethod* method, int player_no, InputMethodProfile* profile, const std::vector<InputMethod*>& active_methods)
 {
     if(player_no < 0 || player_no >= maxLocalPlayers || !profile)
     {
         return false;
     }
 
-    if(!this->SetProfile_Custom(method, player_no, profile))
+    if(!this->SetProfile_Custom(method, player_no, profile, active_methods))
     {
         return false;
     }
@@ -294,8 +294,9 @@ void InputMethodType::LoadConfig(IniProcessing* ctl)
 
 // optionally overriden methods
 
-bool InputMethodType::SetProfile_Custom(InputMethod* method, int player_no, InputMethodProfile* profile)
+bool InputMethodType::SetProfile_Custom(InputMethod* method, int player_no, InputMethodProfile* profile, const std::vector<InputMethod*>& active_methods)
 {
+    (void)active_methods;
     if(!method || !profile || player_no < 0 || player_no >= maxLocalPlayers)
     {
         return false;
@@ -538,6 +539,10 @@ InputMethod* PollInputMethod() noexcept
     }
     if(!new_method)
         return nullptr;
+    SDL_assert_release(new_method->Type != nullptr); // InputMethodType did not assign itself as Type
+    if(!new_method->Type)
+        return nullptr;
+
     size_t player_no = 0;
     while(player_no < g_InputMethods.size() && g_InputMethods[player_no] != nullptr)
     {
@@ -588,6 +593,7 @@ InputMethod* PollInputMethod() noexcept
     // should only be null if something is very wrong (alloc failed, etc)
     if(!new_method->Profile)
     {
+        pLogWarning("Failed to find/alloc profile for new %s.", new_method->Type->Name.c_str());
         delete new_method;
         return nullptr;
     }
@@ -599,7 +605,9 @@ InputMethod* PollInputMethod() noexcept
     {
         g_InputMethods.push_back(new_method);
     }
-    SetInputMethodProfile(player_no, new_method->Profile);
+    if(SetInputMethodProfile(player_no, new_method->Profile))
+        pLogWarning("Failed to set profile '%s' for new %s.",
+            new_method->Profile->Name.c_str(), new_method->Type->Name.c_str());
     pLogDebug("Just connected new %s '%s' with profile '%s'.",
         new_method->Type->Name.c_str(),  new_method->Name.c_str(), new_method->Profile->Name.c_str());
     return new_method;
@@ -635,7 +643,7 @@ bool SetInputMethodProfile(int player_no, InputMethodProfile* profile)
     InputMethod* method = g_InputMethods[player_no];
     if(!method->Type)
         return false;
-    return method->Type->SetProfile(method, player_no, profile);
+    return method->Type->SetProfile(method, player_no, profile, g_InputMethods);
 }
 
 bool SetInputMethodProfile(InputMethod* method, InputMethodProfile* profile)
@@ -648,7 +656,7 @@ bool SetInputMethodProfile(InputMethod* method, InputMethodProfile* profile)
     if(player_no == g_InputMethods.size())
         return false;
 
-    return method->Type->SetProfile(method, player_no, profile);
+    return method->Type->SetProfile(method, player_no, profile, g_InputMethods);
 }
 
 void ClearInputMethods()

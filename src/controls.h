@@ -279,7 +279,7 @@ protected:
     void SetDefaultProfile(int player_no, InputMethodProfile* profile);
 public:
     InputMethodProfile* GetDefaultProfile(int player_no);
-    bool SetProfile(InputMethod* method, int player_no, InputMethodProfile* profile);
+    bool SetProfile(InputMethod* method, int player_no, InputMethodProfile* profile, const std::vector<InputMethod*>& active_methods);
 
     void SaveConfig(IniProcessing* ctl);
     void LoadConfig(IniProcessing* ctl);
@@ -306,7 +306,8 @@ public:
     \*-----------------------*/
 protected:
     // optional function allowing developer to associate device information with profile, etc
-    virtual bool SetProfile_Custom(InputMethod* method, int player_no, InputMethodProfile* profile);
+    // if developer wants to forbid assignment, return false
+    virtual bool SetProfile_Custom(InputMethod* method, int player_no, InputMethodProfile* profile, const std::vector<InputMethod*>& active_methods);
 
 public:
     // How many per-type special options are there?

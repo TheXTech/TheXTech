@@ -953,11 +953,16 @@ int menuControls_Logic()
                     = std::find(profiles.begin(), profiles.end(), Controls::g_InputMethods[p]->Profile);
                 if(profiles.size() > 1 && p_profile != profiles.end())
                 {
-                    if(p_profile == profiles.begin())
-                        p_profile = profiles.end() - 1;
-                    else
-                        p_profile --;
-                    Controls::SetInputMethodProfile(p, *p_profile);
+                    // try for a full rotation
+                    for(size_t i = 0; i < profiles.size(); i++)
+                    {
+                        if(p_profile == profiles.begin())
+                            p_profile = profiles.end() - 1;
+                        else
+                            p_profile --;
+                        if(Controls::SetInputMethodProfile(p, *p_profile))
+                            break;
+                    }
                     PlaySoundMenu(SFX_Slide);
                 }
                 else
@@ -974,10 +979,15 @@ int menuControls_Logic()
                     = std::find(profiles.begin(), profiles.end(), Controls::g_InputMethods[p]->Profile);
                 if(profiles.size() > 1 && p_profile != profiles.end())
                 {
-                    p_profile ++;
-                    if(p_profile == profiles.end())
-                        p_profile = profiles.begin();
-                    Controls::SetInputMethodProfile(p, *p_profile);
+                    // try for a full rotation
+                    for(size_t i = 0; i < profiles.size(); i++)
+                    {
+                        p_profile ++;
+                        if(p_profile == profiles.end())
+                            p_profile = profiles.begin();
+                        if(Controls::SetInputMethodProfile(p, *p_profile))
+                            break;
+                    }
                     PlaySoundMenu(SFX_Slide);
                 }
                 else

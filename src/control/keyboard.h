@@ -84,7 +84,8 @@ public:
     \*-----------------------*/
 protected:
     // optional function allowing developer to associate device information with profile, etc
-    bool SetProfile_Custom(InputMethod* method, int player_no, InputMethodProfile* profile);
+    // if developer wants to forbid assignment, return false
+    bool SetProfile_Custom(InputMethod* method, int player_no, InputMethodProfile* profile, const std::vector<InputMethod*>& active_methods);
 
 public:
     // How many per-type special options are there?

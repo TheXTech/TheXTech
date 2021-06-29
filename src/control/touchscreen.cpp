@@ -543,7 +543,6 @@ static struct TouchKeyMap
         {
             SDL_assert(p.cmd >= TouchScreenController::key_BEGIN && p.cmd < TouchScreenController::key_END);
             fs.heldKey[p.cmd] = false;
-            printf("%f,%f %f,%f,%f,%f\n", x, y, p.x1, p.y1, p.x2, p.y2);
             if(x >= p.x1 && x <= p.x2 && y >= p.y1 && y <= p.y2)
             {
                 fs.heldKey[p.cmd] = true;
