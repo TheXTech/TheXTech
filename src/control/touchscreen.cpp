@@ -32,6 +32,10 @@
 #include "../gfx.h"
 #endif
 
+#ifdef HAS_VIBRATOR
+#include <SDL2/SDL_haptic.h>
+#endif
+
 #ifdef __ANDROID__
 #   include <jni.h>
 #   if 1
@@ -70,6 +74,10 @@ static int  s_touchPadStyle = 0;
 static double s_screenSize = 0;
 static double s_screenWidth = 0;
 static double s_screenHeight = 0;
+
+static bool     s_vibrationEnable = false;
+static float    s_vibrationStrength = 1.0;
+static int      s_vibrationLength = 12;
 
 #endif
 
@@ -163,6 +171,42 @@ Java_ru_wohlsoft_thextech_thextechActivity_setTouchPadStyle(
     (void)env;
     (void)type;
     s_touchPadStyle = style;
+}
+
+JNIEXPORT void JNICALL
+Java_ru_wohlsoft_thextech_thextechActivity_setVibrationEnabled(
+    JNIEnv *env,
+    jclass type,
+    jboolean enableVibration
+)
+{
+    (void)env;
+    (void)type;
+    s_vibrationEnable = enableVibration;
+}
+
+JNIEXPORT void JNICALL
+Java_ru_wohlsoft_thextech_thextechActivity_setVibrationStrength(
+    JNIEnv *env,
+    jclass type,
+    jfloat strength
+)
+{
+    (void)env;
+    (void)type;
+    s_vibrationStrength = strength;
+}
+
+JNIEXPORT void JNICALL
+Java_ru_wohlsoft_thextech_thextechActivity_setVibrationLength(
+    JNIEnv *env,
+    jclass type,
+    jint length
+)
+{
+    (void)env;
+    (void)type;
+    s_vibrationLength = length;
 }
 #endif
 
@@ -598,6 +642,18 @@ static void initTouchMap()
     }
 }
 
+
+void TouchScreenController::doVibration()
+{
+#ifdef HAS_VIBRATOR
+    if(!s_vibrationEnable || !m_vibrator)
+        return;
+
+    int ret = SDL_HapticRumblePlay(m_vibrator, s_vibrationStrength, s_vibrationLength);
+    D_pLogDebug("TouchScreen: Vibration %g, %d ms, ret %d", s_vibrationStrength, s_vibrationLength, ret);
+#endif
+}
+
 TouchScreenController::TouchScreenController() = default;
 TouchScreenController::~TouchScreenController() = default;
 
@@ -615,6 +671,36 @@ void TouchScreenController::init()
                 m_touchDevicesCount,
                 m_screenWidth, m_screenHeight);
     pLogDebug("The screen size: %g inches (%g x %g)", s_screenSize, s_screenWidth, s_screenHeight);
+
+#ifdef HAS_VIBRATOR
+    m_vibrator = nullptr;
+    int numHaptics = SDL_NumHaptics();
+
+    for(int i = 0; i < numHaptics; ++i)
+    {
+        if(SDL_strcmp(SDL_HapticName(i), "VIBRATOR_SERVICE") == 0)
+        {
+            m_vibrator = SDL_HapticOpen(i);
+            if(m_vibrator)
+            {
+                pLogDebug("TouchScreen: Opened the vibrator service");
+                SDL_HapticRumbleInit(m_vibrator);
+            }
+            else
+                pLogWarning("TouchScreen: Can't open the vibrator service");
+            break;
+        }
+    }
+#endif
+}
+
+void TouchScreenController::quit()
+{
+#ifdef HAS_VIBRATOR
+    if(m_vibrator)
+        SDL_HapticClose(m_vibrator);
+    m_vibrator = nullptr;
+#endif
 }
 
 void TouchScreenController::updateScreenSize()
@@ -741,6 +827,8 @@ void TouchScreenController::processTouchDevice(int dev_i)
                 }
                 else if(fs.heldKey[key]) // set key on and keep alive
                 {
+                    if(!fs.heldKeyPrev[key] && fs.heldKey[key])
+                        doVibration(); // Vibrate when key gets on
                     updateFingerKeyState(fs, m_current_keys, key, true, m_current_extra_keys);
                     D_pLogDebug("= Finger Key ID=%d pressed (move)", static_cast<int>(key));
                     m_keysHeld[key] = true;
@@ -762,6 +850,7 @@ void TouchScreenController::processTouchDevice(int dev_i)
                 {
                     updateFingerKeyState(st, m_current_keys, key, true, m_current_extra_keys);
                     D_pLogDebug("= Finger Key ID=%d pressed (put)", static_cast<int>(key));
+                    doVibration();
                     m_keysHeld[key] = true;
                     st.heldKeyPrev[key] = st.heldKey[key];
                     // Also: when more than one touch devices found, choose one which is actual

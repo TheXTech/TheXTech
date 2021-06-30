@@ -157,4 +157,8 @@ public class thextechActivity extends SDLActivity
     public static native void setTouchPadStyle(int style);
     public static native void setSdCardPath(String path);
     public static native void setGameAssetsPath(String path);
+    // Touch-screen controller feeback
+    public static native void setVibrationEnabled(boolean enabled);
+    public static native void setVibrationStrength(float strength);
+    public static native void setVibrationLength(int length);
 }
