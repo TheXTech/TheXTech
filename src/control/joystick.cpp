@@ -1013,8 +1013,13 @@ bool joyStartJoystick(int JoystickNumber)
 
 void joyCloseJoysticks()
 {
+#ifdef USE_TOUCHSCREEN_CONTROLLER
+    s_touch.quit();
+#endif
+
     for(size_t i = 0; i < s_joysticks.size(); ++i) // scan hats first
         s_joyDeviceClose(i);
+
     s_joysticks.clear();
 }
 

@@ -30,6 +30,11 @@
 #include <map>
 #include "../controls.h"
 
+#ifdef __ANDROID__
+#define HAS_VIBRATOR
+typedef struct _SDL_Haptic SDL_Haptic;
+#endif
+
 /*!
  * \brief A mobile touch-screen controller which reads state of the keyboard device
  */
@@ -43,6 +48,10 @@ class TouchScreenController
     int m_screenHeight = 0;
     //! Actual touch device to use
     int m_actualDevice = -1;
+
+#ifdef HAS_VIBRATOR
+    SDL_Haptic *m_vibrator = nullptr;
+#endif
 
     /*!
      * \brief Is touch-screen supported?
@@ -108,6 +117,8 @@ private:
     //! Held finger states
     std::map<SDL_FingerID, FingerState> m_fingers;
 
+    void doVibration();
+
 public:
     /*!
      * \brief Constructor
@@ -120,6 +131,7 @@ public:
     ~TouchScreenController();
 
     void init();
+    void quit();
 
     void updateScreenSize();
 
