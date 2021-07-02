@@ -355,7 +355,16 @@ static int s_joyDeviceAdd(int i)
         if(j.isHaptic)
         {
             joy.haptic = SDL_HapticOpenFromJoystick(joy.joystick);
-            if(!joy.haptic)
+            if(joy.haptic)
+            {
+                if(SDL_HapticRumbleSupported(joy.haptic) && SDL_HapticRumbleInit(joy.haptic) != 0)
+                {
+                    pLogWarning("Couldn't open the rumble at the haptic device %d, disabling the haptic support!", i);
+                    SDL_HapticClose(joy.haptic);
+                    j.isHaptic = false;
+                }
+            }
+            else
             {
                 pLogWarning("Couldn't open the haptic device %d, disabling the haptic support!", i);
                 j.isHaptic = false;
@@ -1165,8 +1174,13 @@ bool joyStartJoystick(int JoystickNumber)
 
 void joyCloseJoysticks()
 {
+#ifdef USE_TOUCHSCREEN_CONTROLLER
+    s_touch.quit();
+#endif
+
     for(size_t i = 0; i < s_joysticks.size(); ++i) // scan hats first
         s_joyDeviceClose(i);
+
     s_joysticks.clear();
 }
 
