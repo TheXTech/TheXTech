@@ -34,6 +34,7 @@
 #include "../video.h"
 #include "../control/joystick.h"
 #include "../config.h"
+#include "speedrunner.h"
 
 #include "record.h"
 
