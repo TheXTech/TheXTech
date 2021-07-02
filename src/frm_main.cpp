@@ -1114,7 +1114,7 @@ void FrmMain::lazyLoad(StdPicture &target)
                     m_ri.max_texture_width, m_ri.max_texture_height,
                     w, h);
 
-        FIBITMAP *d = FreeImage_Rescale(sourceImage, int(w), int(h));
+        FIBITMAP *d = FreeImage_Rescale(sourceImage, int(w), int(h), FILTER_BOX);
         if(d)
         {
             GraphicsHelps::closeImage(sourceImage);
