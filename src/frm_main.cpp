@@ -1095,13 +1095,24 @@ void FrmMain::lazyLoad(StdPicture &target)
     target.frame_w = static_cast<int>(w);
     target.frame_h = static_cast<int>(h);
 
-    bool wLimitExcited = m_ri.max_texture_width > 0 && w > Uint32(m_ri.max_texture_width);
-    bool hLimitExcited = m_ri.max_texture_height > 0 && h > Uint32(m_ri.max_texture_height);
-
-    if(wLimitExcited || hLimitExcited)
+    if(g_videoSettings.scaleDownAllTextures)
     {
         target.w_orig = int(w);
         target.h_orig = int(h);
+        w /= 2;
+        h /= 2;
+    }
+
+    bool wLimitExcited = m_ri.max_texture_width > 0 && w > Uint32(m_ri.max_texture_width);
+    bool hLimitExcited = m_ri.max_texture_height > 0 && h > Uint32(m_ri.max_texture_height);
+
+    if(wLimitExcited || hLimitExcited || g_videoSettings.scaleDownAllTextures)
+    {
+        if(!g_videoSettings.scaleDownAllTextures)
+        {
+            target.w_orig = int(w);
+            target.h_orig = int(h);
+        }
 
         // WORKAROUND: down-scale too big textures
         if(w > Uint32(m_ri.max_texture_width))
@@ -1109,10 +1120,13 @@ void FrmMain::lazyLoad(StdPicture &target)
         if(h > Uint32(m_ri.max_texture_height))
             h = Uint32(m_ri.max_texture_height);
 
-        pLogWarning("Texture is too big for a given hardware limit (%dx%d). "
-                    "Shrinking texture to %dx%d, quality may be distorted!",
-                    m_ri.max_texture_width, m_ri.max_texture_height,
-                    w, h);
+        if(wLimitExcited || hLimitExcited)
+        {
+            pLogWarning("Texture is too big for a given hardware limit (%dx%d). "
+                        "Shrinking texture to %dx%d, quality may be distorted!",
+                        m_ri.max_texture_width, m_ri.max_texture_height,
+                        w, h);
+        }
 
         FIBITMAP *d = FreeImage_Rescale(sourceImage, int(w), int(h), FILTER_BOX);
         if(d)

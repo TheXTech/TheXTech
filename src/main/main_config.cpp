@@ -97,6 +97,7 @@ void OpenConfig_preSetup()
         config.read("background-controller-input", g_videoSettings.allowBgControllerInput, false);
         config.read("frame-skip", g_videoSettings.enableFrameSkip, true);
         config.read("show-fps", g_videoSettings.showFrameRate, false);
+        config.read("scale-down-all-textures", g_videoSettings.scaleDownAllTextures, false);
         config.read("display-controllers", g_drawController, false);
         config.endGroup();
 
@@ -272,6 +273,7 @@ void SaveConfig()
         config.setValue("background-controller-input", g_videoSettings.allowBgControllerInput);
         config.setValue("frame-skip", g_videoSettings.enableFrameSkip);
         config.setValue("show-fps", g_videoSettings.showFrameRate);
+        config.setValue("scale-down-all-textures", g_videoSettings.scaleDownAllTextures);
         config.setValue("display-controllers", g_drawController);
     }
     config.endGroup();
