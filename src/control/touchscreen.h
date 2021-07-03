@@ -110,6 +110,8 @@ public:
     StdPicture touch[BUTTONS_END];
 };
 
+typedef struct _SDL_Haptic SDL_Haptic;
+
 /*!
  * \brief A mobile touch-screen controller which reads state of the keyboard device
  */
@@ -127,6 +129,8 @@ class TouchScreenController
     TouchScreenGFX_t m_GFX;
 
 public:
+
+    SDL_Haptic *m_vibrator = nullptr;
 
     /*!
      * \brief Is touch-screen supported?
@@ -204,6 +208,8 @@ public:
 private:
     //! Held finger states
     std::map<SDL_FingerID, FingerState> m_fingers;
+
+    void doVibration();
 
 public:
     /*!

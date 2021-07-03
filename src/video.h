@@ -23,6 +23,8 @@ extern struct VideoSettings_t
     bool   enableFrameSkip = true;
     //! Show FPS counter
     bool   showFrameRate = false;
+    //! 2x scale down all textures to reduce the memory usage
+    bool   scaleDownAllTextures = false;
 } g_videoSettings; // config.cpp
 
 #endif // VIDEO_H
