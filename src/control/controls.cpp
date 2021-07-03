@@ -668,6 +668,28 @@ void ClearInputMethods()
     g_InputMethods.clear();
 }
 
+
+// player is 1-indexed :(
+void Rumble(int player, int ms, float strength)
+{
+    if(player < 1 || player > (int)g_InputMethods.size())
+        return;
+    if(!g_InputMethods[player-1])
+        return;
+    g_InputMethods[player-1]->Rumble(ms, strength);
+}
+
+void RumbleAllPlayers(int ms, float strength)
+{
+    for(InputMethod* method : g_InputMethods)
+    {
+        if(!method)
+            continue;
+        method->Rumble(ms, strength);
+    }
+}
+
+
 void RenderTouchControls()
 {
 #ifndef NO_SDL

@@ -364,6 +364,10 @@ bool SetInputMethodProfile(int slot, InputMethodProfile* profile);
 bool SetInputMethodProfile(InputMethod* method, InputMethodProfile* profile);
 void ClearInputMethods();
 
+// player is 1-indexed here :(
+void Rumble(int player, int ms, float strength);
+void RumbleAllPlayers(int ms, float strength);
+
 void RenderTouchControls();
 void UpdateTouchScreenSize();
 
