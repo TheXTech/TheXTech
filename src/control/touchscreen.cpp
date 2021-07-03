@@ -28,9 +28,6 @@
 
 #include "touchscreen.h"
 #include "../globals.h"
-#ifdef __ANDROID__
-#include "../gfx.h"
-#endif
 
 #ifdef __ANDROID__
 #   include <jni.h>

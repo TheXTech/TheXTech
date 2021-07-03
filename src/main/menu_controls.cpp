@@ -389,21 +389,25 @@ int menuControls_Mouse_Render(bool mouse, bool render)
 
         for(int i = 0; i < n_options; i++)
         {
+            const char* name = type->GetOptionName(i);
+            const char* value = type->GetOptionValue(i);
             if(double_line)
             {
                 if(render)
                 {
                     if(o_base + 2*i >= scroll_start && o_base + 2*i + 1 < scroll_end)
                     {
-                        SuperPrint(type->GetOptionName(i), 3, sX+24, start_y + (o_base + 2*i - scroll_start)*line);
-                        SuperPrint(type->GetOptionValue(i), 3, sX+48, start_y + (o_base + 2*i + 1 - scroll_start)*line);
+                        if(name)
+                            SuperPrint(name, 3, sX+24, start_y + (o_base + 2*i - scroll_start)*line);
+                        if(value)
+                            SuperPrint(value, 3, sX+48, start_y + (o_base + 2*i + 1 - scroll_start)*line);
                         if(MenuCursor - n_profiles - 1 == i)
                             frmMain.renderTexture(sX + 24, start_y + (o_base + 2*i + 1 - scroll_start)*line, GFX.MCursor[0]);
                     }
                 }
-                if(mouse)
+                if(mouse && value)
                 {
-                    int item_width = strlen(type->GetOptionValue(i))*18;
+                    int item_width = strlen(value)*18;
                     if(MenuMouseX >= sX+48 && MenuMouseX <= sX+48 + item_width
                         && MenuMouseY >= start_y + (o_base + 2*i + 1 - scroll_start)*line && MenuMouseY <= start_y + (o_base + 2*i + 1 - scroll_start)*line + 16)
                     {
@@ -428,8 +432,10 @@ int menuControls_Mouse_Render(bool mouse, bool render)
                 {
                     if(o_base + i >= scroll_start && o_base + i < scroll_end)
                     {
-                        SuperPrint(type->GetOptionName(i), 3, sX+48, start_y + (o_base + i - scroll_start)*line);
-                        SuperPrintRightAlign(type->GetOptionValue(i), 3, sX+width-32, start_y + (o_base + i - scroll_start)*line);
+                        if(name)
+                            SuperPrint(name, 3, sX+48, start_y + (o_base + i - scroll_start)*line);
+                        if(value)
+                            SuperPrintRightAlign(value, 3, sX+width-32, start_y + (o_base + i - scroll_start)*line);
                         if(MenuCursor - n_profiles - 1 == i)
                             frmMain.renderTexture(sX + 24, start_y + (o_base + i - scroll_start)*line, GFX.MCursor[0]);
                     }
@@ -677,22 +683,25 @@ int menuControls_Mouse_Render(bool mouse, bool render)
 
         for(int i = 0; i < n_options; i++)
         {
+            const char* name = profile->GetOptionName(i);
+            const char* value = profile->GetOptionValue(i);
             if(double_line)
             {
                 if(render)
                 {
-                    if(o_base + 2*i >= scroll_start && o_base + 2*i < scroll_end)
-                        SuperPrint(profile->GetOptionName(i), 3, sX+24, start_y + (o_base + 2*i - scroll_start)*line);
+                    if(o_base + 2*i >= scroll_start && o_base + 2*i < scroll_end && name)
+                        SuperPrint(name, 3, sX+24, start_y + (o_base + 2*i - scroll_start)*line);
                     if(o_base + 2*i + 1 >= scroll_start && o_base + 2*i + 1 < scroll_end)
                     {
-                        SuperPrint(profile->GetOptionValue(i), 3, sX+48, start_y + (o_base + 2*i + 1 - scroll_start)*line);
+                        if(value)
+                            SuperPrint(value, 3, sX+48, start_y + (o_base + 2*i + 1 - scroll_start)*line);
                         if(MenuCursor - n_playerButtons == i)
                             frmMain.renderTexture(sX + 24, start_y + (o_base + 2*i + 1 - scroll_start)*line, GFX.MCursor[0]);
                     }
                 }
-                if(mouse)
+                if(mouse && value)
                 {
-                    int item_width = strlen(type->GetOptionValue(i))*18;
+                    int item_width = strlen(value)*18;
                     if(MenuMouseX >= sX+48 && MenuMouseX <= sX+48 + item_width
                         && MenuMouseY >= start_y + (o_base + 2*i + 1 - scroll_start)*line && MenuMouseY <= start_y + (o_base + 2*i + 1 - scroll_start)*line + 16)
                     {
@@ -717,8 +726,10 @@ int menuControls_Mouse_Render(bool mouse, bool render)
                 {
                     if(o_base + i >= scroll_start && o_base + i < scroll_end)
                     {
-                        SuperPrint(profile->GetOptionName(i), 3, sX+48, start_y + (o_base + i - scroll_start)*line);
-                        SuperPrintRightAlign(profile->GetOptionValue(i), 3, sX+width-32, start_y + (o_base + i - scroll_start)*line);
+                        if(name)
+                            SuperPrint(name, 3, sX+48, start_y + (o_base + i - scroll_start)*line);
+                        if(value)
+                            SuperPrintRightAlign(value, 3, sX+width-32, start_y + (o_base + i - scroll_start)*line);
                         if(MenuCursor - n_playerButtons == i)
                             frmMain.renderTexture(sX + 24, start_y + (o_base + i - scroll_start)*line, GFX.MCursor[0]);
                     }
