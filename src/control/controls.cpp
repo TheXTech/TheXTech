@@ -7,6 +7,8 @@
 #include "touchscreen.h"
 #endif
 
+#include "duplicate.h"
+
 #include <Logger/logger.h>
 
 namespace Controls
@@ -370,7 +372,11 @@ void InputMethodType::LoadConfig_Custom(IniProcessing* ctl)
 void Init()
 {
     g_InputMethodTypes.push_back(new InputMethodType_Keyboard);
+#ifdef TOUCHSCREEN_H
     g_InputMethodTypes.push_back(new InputMethodType_TouchScreen);
+#endif
+    // not yet ready for prime time
+    // g_InputMethodTypes.push_back(new InputMethodType_Duplicate);
 }
 
 void Quit()

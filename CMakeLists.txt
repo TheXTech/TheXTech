@@ -309,6 +309,7 @@ set(THEXTECH_SRC
     src/control/joystick.cpp
     src/control/keyboard.cpp
     src/control/touchscreen.cpp
+    src/control/duplicate.cpp
     src/control/controls.cpp
     src/change_res.cpp
     src/effect.cpp
