@@ -810,6 +810,8 @@ void ClearLevel()
     UnloadCustomGFX();
     doShakeScreenClear();
 
+    AutoUseModern = false;
+
     numSections = 0;
 
     for(A = 1; A <= newEventNum; A++)

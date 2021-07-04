@@ -86,6 +86,7 @@ RangeArr<Location_t, 1, 2> PlayerStart;
 RangeArrI<bool, 0, 20, false> blockCharacter;
 RangeArrI<int, 0, maxPlayers, 0> OwedMount;
 RangeArrI<int, 0, maxPlayers, 0> OwedMountType;
+bool AutoUseModern = false;
 RangeArr<float, 0, maxSections> AutoX;
 RangeArr<float, 0, maxSections> AutoY;
 int numStars = 0;

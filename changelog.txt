@@ -14,6 +14,7 @@ Changes for 1.3.5.2
 -Fixed an incorrect speed-run timer render at multiplayer mode
 -The controller state print has been replaced with a controller drawing to indicate the pressure state of buttons
 -Added the opt-in 2x scale down optimization for all textures to reduce the memory usage
+-Fixed the confusion when using the modern section auto-scroll settings when an auto-scroll fix was disabled
 
 Changes for 1.3.5.1
 -Episodes and battle levels lists now loading in the separated thread with a progress showing
