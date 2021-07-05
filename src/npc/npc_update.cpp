@@ -4207,7 +4207,13 @@ void UpdateNPCs()
                                 {
                                     // fBlock = FirstBlock[long(level[NPC[A].Section].X / 32) - 1];
                                     // lBlock = LastBlock[long((level[NPC[A].Section].Width) / 32.0) + 2];
-                                    blockTileGet(level[NPC[A].Section], fBlock, lBlock);
+                                    {
+                                        auto &sec = level[NPC[A].Section];
+                                        Location_t toShake;
+                                        toShake.X = sec.X;
+                                        toShake.Width = (sec.Width - sec.X);
+                                        blockTileGet(toShake, fBlock, lBlock);
+                                    }
 
                                     // Shake all blocks up
                                     for(int B = (int)fBlock; B <= lBlock; B++)
