@@ -1134,6 +1134,8 @@ struct SelectWorld_t
 extern RangeArrI<int, 0, maxPlayers, 0> OwedMount;
 //Public OwedMountType(0 To maxPlayers) As Integer
 extern RangeArrI<int, 0, maxPlayers, 0> OwedMountType;
+//EXTRA: set this flag once modern autoscroll used, otherwise, legacy will be used
+extern bool AutoUseModern;
 //Public AutoX(0 To maxSections) As Single 'for autoscroll
 extern RangeArr<float, 0, maxSections> AutoX;
 //Public AutoY(0 To maxSections) As Single 'for autoscroll

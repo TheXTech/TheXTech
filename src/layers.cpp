@@ -645,6 +645,8 @@ void ProcEvent(std::string EventName, bool NoEffect)
                 /* Per-Section autoscroll setup */
                 if(s.autoscroll)
                 {
+                    if(!AutoUseModern) // First attemt to use modern autoscrolling will block futher use of the legacy autoscrolling
+                        AutoUseModern = true;
                     autoScrollerChanged = true;
                     AutoX[B] = s.autoscroll_x;
                     AutoY[B] = s.autoscroll_y;
@@ -864,23 +866,26 @@ void ProcEvent(std::string EventName, bool NoEffect)
                 }
             }
 
-            if(g_compatibility.fix_autoscroll_speed)
+            if(!AutoUseModern) // Use legacy auto-scrolling when modern autoscrolling was never used here
             {
-                if(!autoScrollerChanged)
+                if(g_compatibility.fix_autoscroll_speed)
                 {
-                    // Do set the autoscrool when non-zero values only, don't zero by other autoruns
-                    if((evt.AutoX != 0.0 || evt.AutoY != 0.0) && IF_INRANGE(evt.AutoSection, 0, maxSections))
+                    if(!autoScrollerChanged)
                     {
-                        AutoX[evt.AutoSection] = evt.AutoX;
-                        AutoY[evt.AutoSection] = evt.AutoY;
+                        // Do set the autoscrool when non-zero values only, don't zero by other autoruns
+                        if((evt.AutoX != 0.0 || evt.AutoY != 0.0) && IF_INRANGE(evt.AutoSection, 0, maxSections))
+                        {
+                            AutoX[evt.AutoSection] = evt.AutoX;
+                            AutoY[evt.AutoSection] = evt.AutoY;
+                        }
                     }
                 }
-            }
-            else if(IF_INRANGE(evt.AutoSection, 0, maxSections) && IF_INRANGE(evt.AutoSection, 0, maxEvents))
-            {
-                // Buggy behavior, see https://github.com/Wohlstand/TheXTech/issues/44
-                AutoX[evt.AutoSection] = Events[evt.AutoSection].AutoX;
-                AutoY[evt.AutoSection] = Events[evt.AutoSection].AutoY;
+                else if(IF_INRANGE(evt.AutoSection, 0, maxSections) && IF_INRANGE(evt.AutoSection, 0, maxEvents))
+                {
+                    // Buggy behavior, see https://github.com/Wohlstand/TheXTech/issues/44
+                    AutoX[evt.AutoSection] = Events[evt.AutoSection].AutoX;
+                    AutoY[evt.AutoSection] = Events[evt.AutoSection].AutoY;
+                }
             }
 
             if(!evt.Text.empty())

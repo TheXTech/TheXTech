@@ -788,9 +788,10 @@ void ClearLevel()
     noUpdate = true;
     BlocksSorted = true;
     qScreen = false;
+    AutoUseModern = false;
+
     UnloadCustomGFX();
     doShakeScreenClear();
-
     treeLevelCleanAll();
 
     numSections = 0;
