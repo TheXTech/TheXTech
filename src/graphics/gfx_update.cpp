@@ -40,9 +40,6 @@
 #ifdef __3DS__
 #include "../3ds/second_screen.h"
 #endif
-#ifdef NEW_EDITOR
-#include "../editor/new_editor.h"
-#endif
 
 #include <fmt_format_ne.h>
 #include <Utils/maths.h>

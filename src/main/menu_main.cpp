@@ -59,17 +59,20 @@
 #include "level_file.h"
 #include "pge_delay.h"
 #include "../config.h"
+#include "../video.h"
 
-#ifdef NEW_EDITOR
 #include "../editor/new_editor.h"
 #include "../editor/write_world.h"
 #include "../editor/text_input.h"
-const int MainMenuQuitIndex = 5;
-const int MainMenuOptionsIndex = 4;
-#else
-const int MainMenuQuitIndex = 4;
-const int MainMenuOptionsIndex = 3;
-#endif
+
+static inline int quit_index()
+{
+    return (g_config.UseNewEditor ? 5 : 4);
+}
+static inline int options_index()
+{
+    return (g_config.UseNewEditor ? 4 : 3);
+}
 
 MainMenuContent g_mainMenu;
 
@@ -483,7 +486,7 @@ bool mainMenuUpdate()
             if(escPressed && MenuCursorCanMove)
             {
                 MenuMode = MENU_MAIN;
-                MenuCursor = MainMenuQuitIndex;
+                MenuCursor = quit_index();
                 PlaySoundMenu(SFX_Slide);
             }
             if((menuDoPress && MenuCursorCanMove) || MenuMouseClick)
@@ -498,21 +501,20 @@ bool mainMenuUpdate()
         {
             if(MenuMouseMove)
             {
-                For(A, 0, MainMenuQuitIndex)
+                For(A, 0, quit_index())
                 {
                     if(MenuMouseY >= MenuY + A * 30 && MenuMouseY <= MenuY + A * 30 + 16)
                     {
-                        if(A == 0)
+                        int i = 0;
+                        if(A == i++)
                             menuLen = 18 * g_mainMenu.main1PlayerGame.size() - 2;
-                        else if(A == 1)
+                        else if(A == i++)
                             menuLen = 18 * g_mainMenu.main2PlayerGame.size() - 2;
-                        else if(A == 2)
+                        else if(A == i++)
                             menuLen = 18 * g_mainMenu.mainBattleGame.size();
-#ifdef NEW_EDITOR
-                        else if(A == 3)
+                        else if(g_config.UseNewEditor && A == i++)
                             menuLen = 18 * g_mainMenu.mainEditor.size();
-#endif
-                        else if(A == MainMenuOptionsIndex)
+                        else if(A == i++)
                             menuLen = 18 * g_mainMenu.mainOptions.size();
                         else
                             menuLen = 18 * g_mainMenu.mainExit.size();
@@ -540,9 +542,9 @@ bool mainMenuUpdate()
                     MenuMode = MENU_INTRO;
                     PlaySoundMenu(SFX_Slide);
                 }
-                else if(MenuCursor != MainMenuQuitIndex)
+                else if(MenuCursor != quit_index())
                 {
-                    MenuCursor = MainMenuQuitIndex;
+                    MenuCursor = quit_index();
                     PlaySoundMenu(SFX_Slide);
                 }
             }
@@ -558,7 +560,9 @@ bool mainMenuUpdate()
                 PlayerCharacter = 0;
                 PlayerCharacter2 = 0;
 
-                if(MenuCursor == 0)
+                int i = 0;
+
+                if(MenuCursor == i++)
                 {
                     PlaySoundMenu(SFX_Do);
                     MenuMode = MENU_1PLAYER_GAME;
@@ -572,7 +576,7 @@ bool mainMenuUpdate()
 #endif
                     MenuCursor = 0;
                 }
-                else if(MenuCursor == 1)
+                else if(MenuCursor == i++)
                 {
                     PlaySoundMenu(SFX_Do);
                     MenuMode = MENU_2PLAYER_GAME;
@@ -586,7 +590,7 @@ bool mainMenuUpdate()
 #endif
                     MenuCursor = 0;
                 }
-                else if(MenuCursor == 2)
+                else if(MenuCursor == i++)
                 {
                     PlaySoundMenu(SFX_Do);
                     MenuMode = MENU_BATTLE_MODE;
@@ -600,8 +604,7 @@ bool mainMenuUpdate()
 #endif
                     MenuCursor = 0;
                 }
-#ifdef NEW_EDITOR
-                else if(MenuCursor == 3)
+                else if(g_config.UseNewEditor && MenuCursor == i++)
                 {
                     PlaySoundMenu(SFX_Do);
                     MenuMode = MENU_EDITOR;
@@ -613,8 +616,7 @@ bool mainMenuUpdate()
 #endif // PRELOAD_LEVELS
                     MenuCursor = 0;
                 }
-#endif
-                else if(MenuCursor == MainMenuOptionsIndex)
+                else if(MenuCursor == i++)
                 {
                     PlaySoundMenu(SFX_Do);
                     MenuMode = MENU_OPTIONS;
@@ -635,10 +637,10 @@ bool mainMenuUpdate()
 
             }
 
-            if(MenuCursor > MainMenuQuitIndex)
+            if(MenuCursor > quit_index())
                 MenuCursor = 0;
             if(MenuCursor < 0)
-                MenuCursor = MainMenuQuitIndex;
+                MenuCursor = quit_index();
         } // Main Menu
 
         // Character Select
@@ -879,7 +881,6 @@ bool mainMenuUpdate()
                     PlaySoundMenu(SFX_Do);
                     selWorld = MenuCursor + 1;
                     // level editor
-#ifdef NEW_EDITOR
                     if (MenuMode == MENU_EDITOR)
                     {
                         if(selWorld == NumSelectWorldEditable)
@@ -932,7 +933,6 @@ bool mainMenuUpdate()
                         }
                     }
                     else
-#endif // #ifdef NEW_EDITOR
                     {
                         FindSaves();
 
@@ -1261,9 +1261,6 @@ bool mainMenuUpdate()
 #ifndef FIXED_RES
             optionsMenuLength ++; // resolution
 #endif
-#ifdef NEW_EDITOR
-            optionsMenuLength += 1; // EditorControls
-#endif
 #ifdef __3DS__
             optionsMenuLength += 1; // debugMode
             if (n3ds_clocked != -1)
@@ -1292,15 +1289,11 @@ bool mainMenuUpdate()
 #endif
 #if !defined(__3DS__)
                         else if(A == i++)
-                            menuLen = 18 * (7+ScaleMode_strings.at(config_ScaleMode).length());
+                            menuLen = 18 * (7+ScaleMode_strings.at(g_videoSettings.ScaleMode).length());
 #endif
 #if !defined(FIXED_RES)
                         else if(A == i++)
                             menuLen = 18 * std::strlen("res: WWWxHHH (word)");
-#endif
-#ifdef NEW_EDITOR
-                        else if(A == i++)
-                            menuLen = 18 * std::strlen("editor controls") - 2;
 #endif
 #ifdef __3DS__
                         else if(n3ds_clocked != -1 && A == i++)
@@ -1332,7 +1325,7 @@ bool mainMenuUpdate()
                 {
                     SaveConfig();
                     MenuMode = MENU_MAIN;
-                    MenuCursor = MainMenuOptionsIndex;
+                    MenuCursor = options_index();
                     MenuCursorCanMove = false;
                     PlaySoundMenu(SFX_Slide);
                 }
@@ -1364,13 +1357,13 @@ bool mainMenuUpdate()
                     {
                         PlaySoundMenu(SFX_Do);
                         if(!menuLeftPress)
-                            config_ScaleMode = config_ScaleMode + 1;
+                            g_videoSettings.ScaleMode = g_videoSettings.ScaleMode + 1;
                         else
-                            config_ScaleMode = config_ScaleMode - 1;
-                        if(config_ScaleMode > SCALE_FIXED_2X)
-                            config_ScaleMode = SCALE_DYNAMIC_INTEGER;
-                        if(config_ScaleMode < SCALE_DYNAMIC_INTEGER)
-                            config_ScaleMode = SCALE_FIXED_2X;
+                            g_videoSettings.ScaleMode = g_videoSettings.ScaleMode - 1;
+                        if(g_videoSettings.ScaleMode > SCALE_FIXED_2X)
+                            g_videoSettings.ScaleMode = SCALE_DYNAMIC_INTEGER;
+                        if(g_videoSettings.ScaleMode < SCALE_DYNAMIC_INTEGER)
+                            g_videoSettings.ScaleMode = SCALE_FIXED_2X;
                         frmMain.updateViewport();
                     }
 #endif
@@ -1380,57 +1373,57 @@ bool mainMenuUpdate()
                         PlaySoundMenu(SFX_Do);
                         if(!menuLeftPress)
                         {
-                            if (config_InternalW == 0 || config_InternalH == 0)
-                                { config_InternalW = 480; config_InternalH = 320; }
-                            else if (config_InternalW == 480 && config_InternalH == 320)
-                                { config_InternalW = 512; config_InternalH = 384; }
-                            else if (config_InternalW == 512 && config_InternalH == 384)
-                                { config_InternalW = 512; config_InternalH = 448; }
-                            else if (config_InternalW == 512 && config_InternalH == 448)
-                                { config_InternalW = 640; config_InternalH = 480; }
-                            else if (config_InternalW == 640 && config_InternalH == 480)
-                                { config_InternalW = 800; config_InternalH = 480; }
-                            else if (config_InternalW == 800 && config_InternalH == 480)
-                                { config_InternalW = 800; config_InternalH = 600; }
-                            else if (config_InternalW == 800 && config_InternalH == 600)
-                                { config_InternalW = 960; config_InternalH = 600; }
-                            else if (config_InternalW == 960 && config_InternalH == 600)
-                                { config_InternalW = 1066; config_InternalH = 600; }
-                            else if (config_InternalW == 1066 && config_InternalH == 600)
-                                { config_InternalW = 1200; config_InternalH = 600; }
-                            else if (config_InternalW == 1200 && config_InternalH == 600)
-                                { config_InternalW = 1280; config_InternalH = 720; }
-                            else if (config_InternalW == 1280 && config_InternalH == 720)
-                                { config_InternalW = 0; config_InternalH = 0; }
+                            if (g_config.InternalW == 0 || g_config.InternalH == 0)
+                                { g_config.InternalW = 480; g_config.InternalH = 320; }
+                            else if (g_config.InternalW == 480 && g_config.InternalH == 320)
+                                { g_config.InternalW = 512; g_config.InternalH = 384; }
+                            else if (g_config.InternalW == 512 && g_config.InternalH == 384)
+                                { g_config.InternalW = 512; g_config.InternalH = 448; }
+                            else if (g_config.InternalW == 512 && g_config.InternalH == 448)
+                                { g_config.InternalW = 640; g_config.InternalH = 480; }
+                            else if (g_config.InternalW == 640 && g_config.InternalH == 480)
+                                { g_config.InternalW = 800; g_config.InternalH = 480; }
+                            else if (g_config.InternalW == 800 && g_config.InternalH == 480)
+                                { g_config.InternalW = 800; g_config.InternalH = 600; }
+                            else if (g_config.InternalW == 800 && g_config.InternalH == 600)
+                                { g_config.InternalW = 960; g_config.InternalH = 600; }
+                            else if (g_config.InternalW == 960 && g_config.InternalH == 600)
+                                { g_config.InternalW = 1066; g_config.InternalH = 600; }
+                            else if (g_config.InternalW == 1066 && g_config.InternalH == 600)
+                                { g_config.InternalW = 1200; g_config.InternalH = 600; }
+                            else if (g_config.InternalW == 1200 && g_config.InternalH == 600)
+                                { g_config.InternalW = 1280; g_config.InternalH = 720; }
+                            else if (g_config.InternalW == 1280 && g_config.InternalH == 720)
+                                { g_config.InternalW = 0; g_config.InternalH = 0; }
                             else
-                                { config_InternalW = 0; config_InternalH = 0; }
+                                { g_config.InternalW = 0; g_config.InternalH = 0; }
                         }
                         else
                         {
-                            if (config_InternalW == 0 || config_InternalH == 0)
-                                { config_InternalW = 1280; config_InternalH = 720; }
-                            else if (config_InternalW == 480 && config_InternalH == 320)
-                                { config_InternalW = 0; config_InternalH = 0; }
-                            else if (config_InternalW == 512 && config_InternalH == 384)
-                                { config_InternalW = 480; config_InternalH = 320; }
-                            else if (config_InternalW == 512 && config_InternalH == 448)
-                                { config_InternalW = 512; config_InternalH = 384; }
-                            else if (config_InternalW == 640 && config_InternalH == 480)
-                                { config_InternalW = 512; config_InternalH = 448; }
-                            else if (config_InternalW == 800 && config_InternalH == 480)
-                                { config_InternalW = 640; config_InternalH = 480; }
-                            else if (config_InternalW == 800 && config_InternalH == 600)
-                                { config_InternalW = 800; config_InternalH = 480; }
-                            else if (config_InternalW == 960 && config_InternalH == 600)
-                                { config_InternalW = 800; config_InternalH = 600; }
-                            else if (config_InternalW == 1066 && config_InternalH == 600)
-                                { config_InternalW = 960; config_InternalH = 600; }
-                            else if (config_InternalW == 1200 && config_InternalH == 600)
-                                { config_InternalW = 1066; config_InternalH = 600; }
-                            else if (config_InternalW == 1280 && config_InternalH == 720)
-                                { config_InternalW = 1200; config_InternalH = 600; }
+                            if (g_config.InternalW == 0 || g_config.InternalH == 0)
+                                { g_config.InternalW = 1280; g_config.InternalH = 720; }
+                            else if (g_config.InternalW == 480 && g_config.InternalH == 320)
+                                { g_config.InternalW = 0; g_config.InternalH = 0; }
+                            else if (g_config.InternalW == 512 && g_config.InternalH == 384)
+                                { g_config.InternalW = 480; g_config.InternalH = 320; }
+                            else if (g_config.InternalW == 512 && g_config.InternalH == 448)
+                                { g_config.InternalW = 512; g_config.InternalH = 384; }
+                            else if (g_config.InternalW == 640 && g_config.InternalH == 480)
+                                { g_config.InternalW = 512; g_config.InternalH = 448; }
+                            else if (g_config.InternalW == 800 && g_config.InternalH == 480)
+                                { g_config.InternalW = 640; g_config.InternalH = 480; }
+                            else if (g_config.InternalW == 800 && g_config.InternalH == 600)
+                                { g_config.InternalW = 800; g_config.InternalH = 480; }
+                            else if (g_config.InternalW == 960 && g_config.InternalH == 600)
+                                { g_config.InternalW = 800; g_config.InternalH = 600; }
+                            else if (g_config.InternalW == 1066 && g_config.InternalH == 600)
+                                { g_config.InternalW = 960; g_config.InternalH = 600; }
+                            else if (g_config.InternalW == 1200 && g_config.InternalH == 600)
+                                { g_config.InternalW = 1066; g_config.InternalH = 600; }
+                            else if (g_config.InternalW == 1280 && g_config.InternalH == 720)
+                                { g_config.InternalW = 1200; g_config.InternalH = 600; }
                             else
-                                { config_InternalW = 0; config_InternalH = 0; }
+                                { g_config.InternalW = 0; g_config.InternalH = 0; }
                         }
                         frmMain.updateViewport();
                     }
@@ -1905,9 +1898,8 @@ void mainMenuDraw()
         SuperPrint(g_mainMenu.main1PlayerGame, 3, MenuX, MenuY + 30 * (A++));
         SuperPrint(g_mainMenu.main2PlayerGame, 3, MenuX, MenuY + 30 * (A++));
         SuperPrint(g_mainMenu.mainBattleGame, 3, MenuX, MenuY + 30 * (A++));
-#ifdef NEW_EDITOR
-        SuperPrint(g_mainMenu.mainEditor, 3, MenuX, MenuY + 30 * (A++));
-#endif
+        if(g_config.UseNewEditor)
+            SuperPrint(g_mainMenu.mainEditor, 3, MenuX, MenuY + 30 * (A++));
         SuperPrint(g_mainMenu.mainOptions, 3, MenuX, MenuY + 30 * (A++));
         SuperPrint(g_mainMenu.mainExit, 3, MenuX, MenuY + 30 * (A++));
         frmMain.renderTexture(MenuX - 20, MenuY + (MenuCursor * 30), 16, 16, GFX.MCursor[0], 0, 0);
@@ -2109,32 +2101,32 @@ void mainMenuDraw()
         A ++;
 #endif
 #ifndef __3DS__
-        SuperPrint("SCALE: "+ScaleMode_strings.at(config_ScaleMode), 3, MenuX, MenuY + 30*A);
+        SuperPrint("SCALE: "+ScaleMode_strings.at(g_videoSettings.ScaleMode), 3, MenuX, MenuY + 30*A);
         A ++;
 #endif
 #ifndef FIXED_RES
-        std::string resString = fmt::format_ne("RES: {0}x{1}", config_InternalW, config_InternalH);
-        if (config_InternalW == 480 && config_InternalH == 320)
+        std::string resString = fmt::format_ne("RES: {0}x{1}", g_config.InternalW, g_config.InternalH);
+        if (g_config.InternalW == 480 && g_config.InternalH == 320)
             resString += " (GBA)";
-        else if (config_InternalW == 512 && config_InternalH == 384)
+        else if (g_config.InternalW == 512 && g_config.InternalH == 384)
             resString += " (NDS)";
-        else if (config_InternalW == 512 && config_InternalH == 448)
+        else if (g_config.InternalW == 512 && g_config.InternalH == 448)
             resString += " (SNES)";
-        else if (config_InternalW == 640 && config_InternalH == 480)
+        else if (g_config.InternalW == 640 && g_config.InternalH == 480)
             resString += " (VGA)";
-        else if (config_InternalW == 800 && config_InternalH == 480)
+        else if (g_config.InternalW == 800 && g_config.InternalH == 480)
             resString += " (3DS)";
-        else if (config_InternalW == 800 && config_InternalH == 600)
+        else if (g_config.InternalW == 800 && g_config.InternalH == 600)
             resString += " (SMBX)";
-        else if (config_InternalW == 960 && config_InternalH == 600)
+        else if (g_config.InternalW == 960 && g_config.InternalH == 600)
             resString += " (16:10)";
-        else if (config_InternalW == 1066 && config_InternalH == 600)
+        else if (g_config.InternalW == 1066 && g_config.InternalH == 600)
             resString += " (16:9)";
-        else if (config_InternalW == 1200 && config_InternalH == 600)
+        else if (g_config.InternalW == 1200 && g_config.InternalH == 600)
             resString += " (18:9)";
-        else if (config_InternalW == 1280 && config_InternalH == 720)
+        else if (g_config.InternalW == 1280 && g_config.InternalH == 720)
             resString += " (HD)";
-        else if (config_InternalW == 0 || config_InternalH == 0)
+        else if (g_config.InternalW == 0 || g_config.InternalH == 0)
             resString = "RES: DYNAMIC";
         else
             resString += " (CUSTOM)";
@@ -2142,8 +2134,6 @@ void mainMenuDraw()
         A ++;
 #endif
 #ifdef __3DS__
-        SuperPrint("EDITOR CONTROLS", 3, MenuX, MenuY + 30*A);
-        A++;
         if (n3ds_clocked != -1)
         {
             if (n3ds_clocked)

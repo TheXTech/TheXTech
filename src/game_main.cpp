@@ -71,9 +71,7 @@
 
 #include <PGE_File_Formats/file_formats.h>
 
-#ifdef NEW_EDITOR
 #include "editor/new_editor.h"
-#endif
 
 #include "pseudo_vb.h"
 
@@ -878,10 +876,10 @@ void EditorLoop()
     else
         UpdateGraphics(true);
     frmMain.setTargetTexture();
-#if defined(NEW_EDITOR) && defined(__3DS__)
+#if defined(__3DS__)
     editorScreen.UpdateSelectorBar(true);
     editorScreen.UpdateEditorScreen();
-#elif defined(NEW_EDITOR)
+#else
     if(editorScreen.active)
         editorScreen.UpdateEditorScreen();
     else

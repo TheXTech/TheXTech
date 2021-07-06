@@ -34,8 +34,8 @@
 #include "../video.h"
 #include "../control/joystick.h"
 #include "../config.h"
-#include "speedrunner.h"
 
+#include "speedrunner.h"
 #include "record.h"
 
 #include <Utils/files.h>
@@ -45,6 +45,8 @@
 #include <AppPath/app_path.h>
 #include <Logger/logger.h>
 
+Config_t g_config;
+VideoSettings_t g_videoSettings;
 
 void OpenConfig_preSetup()
 {
@@ -58,6 +60,7 @@ void OpenConfig_preSetup()
         {"2", RENDER_ACCELERATED_VSYNC}
     };
 
+#ifndef NO_SDL
     const IniProcessing::StrEnumMap sampleFormats =
     {
         {"s8", AUDIO_S8},
@@ -89,6 +92,7 @@ void OpenConfig_preSetup()
         {"float32be", AUDIO_F32MSB},
         {"pcm_f32be", AUDIO_F32MSB}
     };
+#endif
 
     std::string configPath = AppPathManager::settingsFileSTD();
 
@@ -118,8 +122,8 @@ void OpenConfig_preSetup()
 
         config.beginGroup("video");
 #ifndef FIXED_RES
-        config.read("internal-width", config_InternalW, 800);
-        config.read("internal-height", config_InternalH, 600);
+        config.read("internal-width", g_config.InternalW, 800);
+        config.read("internal-height", g_config.InternalH, 600);
 #endif
         IniProcessing::StrEnumMap scaleModes =
         {
@@ -129,7 +133,7 @@ void OpenConfig_preSetup()
             {"1x", SCALE_FIXED_1X},
             {"2x", SCALE_FIXED_2X},
         };
-        config.readEnum("scale-mode", config_ScaleMode, (int)SCALE_DYNAMIC_NEAREST, scaleModes);
+        config.readEnum("scale-mode", g_videoSettings.ScaleMode, (int)SCALE_DYNAMIC_NEAREST, scaleModes);
         config.endGroup();
     }
 }
@@ -175,6 +179,7 @@ void OpenConfig()
         config.read("release", FileRelease, curRelease);
         config.read("full-screen", resBool, false);
         config.read("record-gameplay", g_recordControlRecord, g_recordControlRecord);
+        config.read("new-editor", g_config.UseNewEditor, false);
         config.endGroup();
 
         config.beginGroup("video");
@@ -183,7 +188,7 @@ void OpenConfig()
 
         config.beginGroup("gameplay");
         config.read("ground-pound-by-alt-run", GameplayPoundByAltRun, false);
-        config.read("world-map-fast-move", config_FastMove, false);
+        config.read("world-map-fast-move", g_config.FastMove, false);
         config.endGroup();
 
         config.beginGroup("effects");
@@ -280,6 +285,7 @@ void SaveConfig()
 
     config.beginGroup("main");
     config.setValue("release", curRelease);
+    config.setValue("new-editor", g_config.UseNewEditor);
     // TODO: Make sure, saving of those settings will not been confused by line arguments
     // by separating config settings from global active settings
 //    config.setValue("frame-skip", FrameSkip);
@@ -295,10 +301,10 @@ void SaveConfig()
         config.setValue("full-screen", resChanged);
 #       endif
 #       ifndef FIXED_RES
-        config.setValue("internal-width", config_InternalW);
-        config.setValue("internal-height", config_InternalH);
+        config.setValue("internal-width", g_config.InternalW);
+        config.setValue("internal-height", g_config.InternalH);
 #       endif
-        config.setValue("scale-mode", ScaleMode_strings.at(config_ScaleMode));
+        config.setValue("scale-mode", ScaleMode_strings.at(g_videoSettings.ScaleMode));
 
         std::unordered_map<int, std::string> renderMode =
         {
@@ -341,7 +347,7 @@ void SaveConfig()
 
     config.beginGroup("gameplay");
     config.setValue("ground-pound-by-alt-run", GameplayPoundByAltRun);
-    config.setValue("world-map-fast-move", config_FastMove);
+    config.setValue("world-map-fast-move", g_config.FastMove);
     config.endGroup();
 
     config.beginGroup("effects");

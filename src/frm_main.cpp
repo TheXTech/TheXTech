@@ -64,8 +64,6 @@
 
 #include "config.h"
 
-VideoSettings_t g_videoSettings;
-
 
 static SDL_bool IsFullScreen(SDL_Window *win)
 {
@@ -151,10 +149,10 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
 
     SDL_GL_ResetAttributes();
 
-    if(config_InternalW != 0 && config_InternalH != 0)
+    if(g_config.InternalW != 0 && g_config.InternalH != 0)
     {
-        ScaleWidth = config_InternalW;
-        ScaleHeight = config_InternalH;
+        ScaleWidth = g_config.InternalW;
+        ScaleHeight = g_config.InternalH;
     }
 
     m_window = SDL_CreateWindow(m_windowTitle.c_str(),
@@ -162,8 +160,7 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
                               SDL_WINDOWPOS_CENTERED,
                               ScaleWidth, ScaleHeight,
                               SDL_WINDOW_RESIZABLE |
-                              SDL_WINDOW_HIDDEN |
-                              SDL_WINDOW_ALLOW_HIGHDPI);
+                              SDL_WINDOW_HIDDEN);
 
     if(m_window == nullptr)
     {
@@ -187,7 +184,7 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
     SDL_SetWindowMinimumSize(m_window, 480, 320);
 #endif //__EMSCRIPTEN__
 
-    if(config_ScaleMode == SCALE_DYNAMIC_LINEAR)
+    if(g_videoSettings.ScaleMode == SCALE_DYNAMIC_LINEAR)
         SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
     else
         SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
@@ -457,24 +454,24 @@ bool FrmMain::hasWindowMouseFocus()
 void SizeWindow(SDL_Window* window)
 {
     #if defined(FIXED_RES)
-        if(config_ScaleMode == SCALE_FIXED_1X)
+        if(g_videoSettings.ScaleMode == SCALE_FIXED_1X)
         {
             SDL_SetWindowSize(window, ScreenW, ScreenH);
         }
-        else if(config_ScaleMode == SCALE_FIXED_2X)
+        else if(g_videoSettings.ScaleMode == SCALE_FIXED_2X)
         {
             SDL_SetWindowSize(window, 2*ScreenW, 2*ScreenH);
         }
     #else
-        if(config_InternalW != 0 && config_InternalH != 0)
+        if(g_config.InternalW != 0 && g_config.InternalH != 0)
         {
-            if(config_ScaleMode == SCALE_FIXED_1X)
+            if(g_videoSettings.ScaleMode == SCALE_FIXED_1X)
             {
-                SDL_SetWindowSize(window, config_InternalW, config_InternalH);
+                SDL_SetWindowSize(window, g_config.InternalW, g_config.InternalH);
             }
-            else if(config_ScaleMode == SCALE_FIXED_2X)
+            else if(g_videoSettings.ScaleMode == SCALE_FIXED_2X)
             {
-                SDL_SetWindowSize(window, 2*config_InternalW, 2*config_InternalH);
+                SDL_SetWindowSize(window, 2*g_config.InternalW, 2*g_config.InternalH);
             }
         }
     #endif
@@ -765,22 +762,22 @@ void FrmMain::updateViewport()
     }
 #endif
 
-    if(config_ScaleMode == SCALE_DYNAMIC_LINEAR)
+    if(g_videoSettings.ScaleMode == SCALE_DYNAMIC_LINEAR)
         SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
     else
         SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
 
 #ifndef FIXED_RES
-    if(config_InternalW == 0 || config_InternalH == 0)
+    if(g_config.InternalW == 0 || g_config.InternalH == 0)
     {
         ScaleWidth = wi;
         ScaleHeight = hi;
-        if(config_ScaleMode == SCALE_FIXED_2X)
+        if(g_videoSettings.ScaleMode == SCALE_FIXED_2X)
         {
             ScaleWidth /= 2;
             ScaleHeight /= 2;
         }
-        if(config_ScaleMode == SCALE_DYNAMIC_INTEGER)
+        if(g_videoSettings.ScaleMode == SCALE_DYNAMIC_INTEGER)
         {
             int i = 1;
             while(ScaleWidth/(i+1) > 800 && ScaleHeight/(i+1) > 600)
@@ -792,13 +789,13 @@ void FrmMain::updateViewport()
         if(ScaleHeight < 320) ScaleHeight = 320;
         if(ScaleHeight > 720)
         {
-            if((config_ScaleMode == SCALE_DYNAMIC_NEAREST
-                || config_ScaleMode == SCALE_DYNAMIC_LINEAR)
+            if((g_videoSettings.ScaleMode == SCALE_DYNAMIC_NEAREST
+                || g_videoSettings.ScaleMode == SCALE_DYNAMIC_LINEAR)
                 && ScaleWidth * 720 / ScaleHeight > 800)
             {
                 ScaleWidth = ScaleWidth * 720 / ScaleHeight;
             }
-            if(config_ScaleMode == SCALE_DYNAMIC_INTEGER
+            if(g_videoSettings.ScaleMode == SCALE_DYNAMIC_INTEGER
                 && ScaleWidth / std::floor(ScaleHeight / 720) > 800)
             {
                 ScaleWidth = ScaleWidth / std::floor(ScaleHeight / 720);
@@ -811,8 +808,8 @@ void FrmMain::updateViewport()
     }
     else
     {
-        ScaleWidth = config_InternalW;
-        ScaleHeight = config_InternalH;   
+        ScaleWidth = g_config.InternalW;
+        ScaleHeight = g_config.InternalH;   
     }
     Set_Resolution(ScaleWidth, ScaleHeight);
     SDL_DestroyTexture(m_tBuffer);
@@ -830,11 +827,11 @@ void FrmMain::updateViewport()
     if(scale > h / ScaleHeight)
         scale = h / ScaleHeight;
 
-    if(config_ScaleMode == SCALE_DYNAMIC_INTEGER && scale > 1.f)
+    if(g_videoSettings.ScaleMode == SCALE_DYNAMIC_INTEGER && scale > 1.f)
         scale = std::floor(scale);
-    if(config_ScaleMode == SCALE_FIXED_1X && scale > 1.f)
+    if(g_videoSettings.ScaleMode == SCALE_FIXED_1X && scale > 1.f)
         scale = 1.f;
-    if(config_ScaleMode == SCALE_FIXED_2X && scale > 2.f)
+    if(g_videoSettings.ScaleMode == SCALE_FIXED_2X && scale > 2.f)
         scale = 2.f;
 
     w1 = scale * ScaleWidth;

@@ -34,7 +34,7 @@
 class GFX_t
 {
     std::vector<StdPicture*> m_loadedImages;
-    void loadImage(StdPicture &img, std::string path);
+    void loadImage(StdPicture &img, std::string path, bool fail_okay = false);
     int m_loadErrors = 0;
 public:
     GFX_t();
@@ -63,9 +63,7 @@ public:
     RangeArr<StdPicture, 1, 2> Tongue;
     StdPicture Warp;
     StdPicture YoshiWings;
-#ifdef NEW_EDITOR
-    StdPicture NPC_modes;
-#endif
+    StdPicture EIcons;
 
 #ifdef __ANDROID__
     // Android specific pictures

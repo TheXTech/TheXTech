@@ -33,14 +33,15 @@
 #include <SDL2/SDL_messagebox.h>
 #endif
 
-void GFX_t::loadImage(StdPicture &img, std::string path)
+void GFX_t::loadImage(StdPicture &img, std::string path, bool fail_okay)
 {
     pLogDebug("Loading texture %s...", path.c_str());
     img = frmMain.LoadPicture(path);
     if(!img.texture)
     {
         pLogWarning("Failed to load texture: %s...", path.c_str());
-        m_loadErrors++;
+        if(!fail_okay)
+            m_loadErrors++;
     }
     m_loadedImages.push_back(&img);
 }
@@ -105,9 +106,7 @@ bool GFX_t::load()
 
     loadImage(YoshiWings, uiPath + "YoshiWings.png");
 
-#ifdef NEW_EDITOR
-    loadImage(NPC_modes, uiPath + "NPC_modes.png");
-#endif
+    loadImage(EIcons, uiPath + "EditorIcons.png", true);
 
 #ifdef __ANDROID__
     // Loading a touch-screen buttons from assets

@@ -4,9 +4,7 @@
 #include "../npc.h"
 #include "../collision.h"
 #include "../editor/editor.h"
-#ifdef NEW_EDITOR
 #include "../editor/new_editor.h"
-#endif
 
 void DrawEditorLevel(int Z)
 {
@@ -192,13 +190,11 @@ void DrawEditorLevel(int Z)
     frmMain.setLayer(3);
 #endif
 
-#ifdef NEW_EDITOR
     // In-Editor message box preview
     if (editorScreen.active && !MessageText.empty())
     {
         DrawMessage();
     }
-#endif
 
     // Display the cursor
     {

@@ -137,7 +137,6 @@ void FrmMain::doEvents()
     touchPosition touch;
     hidTouchRead(&touch);
 
-#ifdef NEW_EDITOR
     if (!editorScreen.active)
     {
         if ((keys_pressed & KEY_TOUCH) && (touch.py > 20))
@@ -185,7 +184,6 @@ void FrmMain::doEvents()
             MenuMouseY = touch.py * 2;
         }
     }
-#endif
 }
 
 void FrmMain::processEvent()
@@ -245,14 +243,12 @@ void FrmMain::initDraw(int screen)
         }
         C2D_SceneBegin(layer_targets[2]); // screen plane target
     }
-#ifdef NEW_EDITOR
     else if (LevelEditor && !editorScreen.active)
     {
         setViewport(80, 0, 640, 480);
         C2D_TargetClear(top, C2D_Color32f(0.0f, 0.0f, 0.0f, 1.0f));
         C2D_SceneBegin(top);
     }
-#endif
     else
     {
         setViewport(0, 0, 640, 480);
@@ -308,7 +304,6 @@ void FrmMain::repaint()
     constexpr double bg_shift = shift;
     constexpr double mid_shift = shift * .4;
     // leave the draw context and wait for vblank...
-#ifdef NEW_EDITOR
     if (LevelEditor && !editorScreen.active)
     {
         C2D_TargetClear(bottom, C2D_Color32f(0.0f, 0.0f, 0.0f, 1.0f));
@@ -319,9 +314,7 @@ void FrmMain::repaint()
         C2D_DrawImageAt(layer_ims[2], -40 - shift, 0, 0);
         C2D_DrawImageAt(layer_ims[3], -40 - shift, 0, 0);
     }
-    else
-#endif
-    if (depthSlider <= 0.05)
+    else if (depthSlider <= 0.05)
     {
         C2D_TargetClear(top, C2D_Color32f(0.0f, 0.0f, 0.0f, 1.0f));
         C2D_SceneBegin(top);

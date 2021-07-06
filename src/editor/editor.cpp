@@ -54,11 +54,11 @@
 
 #include "../pseudo_vb.h"
 
-#ifdef NEW_EDITOR
 #include "write_level.h"
 #include "write_world.h"
 #include "new_editor.h"
-#endif
+
+#include <PGE_File_Formats/file_formats.h>
 
 static int ScrollDelay = 0; // slows down the camera movement when scrolling through a level
 //Public Declare Function GetCursorPos Lib "user32" (lpPoint As POINTAPI) As long long;
@@ -283,11 +283,7 @@ void UpdateEditor()
             UpdateInterprocess();
 #endif
 
-#ifdef NEW_EDITOR
         if(EditorControls.MouseClick && !editorScreen.active && EditorCursor.Y > 40)
-#else
-        if(EditorControls.MouseClick)
-#endif
         {
             CanPlace = true;
             if(EditorCursor.Mode == OptCursor_t::LVL_SELECT || EditorCursor.Mode == 14)
@@ -338,13 +334,10 @@ void UpdateEditor()
                             EditorCursor.Location = NPC[A].Location;
                             EditorCursor.Location.X = NPC[A].Location.X;
                             EditorCursor.Location.Y = NPC[A].Location.Y;
-                            printf("Got %d\n", EditorCursor.NPC.Type);
                             SetCursor();
 //                            Netplay::sendData Netplay::EraseNPC(A, 1) + "p23" + LB;
                             KillNPC(A, 9);
-#ifdef NEW_EDITOR
                             editorScreen.FocusNPC();
-#endif
                             MouseRelease = false;
                             EditorControls.MouseClick = false; /* Simulate "Focus out" inside of SMBX Editor */
                             tempBool = true;
@@ -417,9 +410,7 @@ void UpdateEditor()
                                 EditorCursor.Location.Height = Block[A].Location.Height;
                                 SetCursor();
                                 KillBlock(A, false);
-#ifdef NEW_EDITOR
                                 editorScreen.FocusBlock();
-#endif
                                 MouseRelease = false;
                                 EditorControls.MouseClick = false; /* Simulate "Focus out" inside of SMBX Editor */
                                 FindSBlocks();
@@ -509,9 +500,7 @@ void UpdateEditor()
                             SetCursor();
                             Background[A] = std::move(Background[numBackground]);
                             numBackground = numBackground - 1;
-#ifdef NEW_EDITOR
                             editorScreen.FocusBGO();
-#endif
                             if(MagicHand)
                             {
                                 qSortBackgrounds(1, numBackground);
@@ -566,9 +555,7 @@ void UpdateEditor()
                                 SetCursor();
 //                                Netplay::sendData Netplay::EraseBlock(A, 1);
                                 KillBlock(A, false);
-#ifdef NEW_EDITOR
                                 editorScreen.FocusBlock();
-#endif
                                 MouseRelease = false;
                                 EditorControls.MouseClick = false; /* Simulate "Focus out" inside of SMBX Editor */
                                 FindSBlocks();
@@ -768,9 +755,7 @@ void UpdateEditor()
                             }
                             treeWorldTileRemove(&Tile[numTiles]);
                             numTiles = numTiles - 1;
-#ifdef NEW_EDITOR
                             editorScreen.FocusTile();
-#endif
                             MouseRelease = false;
                             EditorControls.MouseClick = false; /* Simulate "Focus out" inside of SMBX Editor */
                             break;
@@ -1916,7 +1901,6 @@ void GetEditorControls()
         optCursor.current = 0;
         SetCursor();
     }
-#ifdef NEW_EDITOR
     if(!WorldEditor && EditorControls.TestPlay)
     {
         EditorBackup();
@@ -1933,7 +1917,6 @@ void GetEditorControls()
         MouseRelease = false;
         MenuMouseRelease = false;
     }
-#endif
 }
 
 void SetCursor()
@@ -2366,6 +2349,9 @@ void KillWarp(int A)
 
 void zTestLevel(bool magicHand, bool interProcess)
 {
+#ifdef NO_INTPROC
+    (void)interProcess;
+#endif
     int A = 0;
     Player_t blankPlayer;
     qScreen = false;

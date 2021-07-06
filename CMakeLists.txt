@@ -110,7 +110,6 @@ option(RANGE_ARR_USE_HEAP "Store data of RangeArr<> template in a heap" OFF)
 option(ENABLE_ANTICHEAT_TRAP "Enable anti-cheating trap for the \"redigitiscool\" cheat code" OFF)
 option(ENABLE_OLD_CREDITS "Use original Redigit's credits without changes" OFF)
 option(ENABLE_LOGGING "Enable debug logging written into a file (may not work on some platfors)" ON)
-option(NEW_EDITOR "Enable new classic editor" OFF)
 option(NO_INTPROC "Disable Interprocess" OFF)
 
 option(THEXTECH_ENABLE_LUA "Enable lua scripting support" OFF)
@@ -148,7 +147,6 @@ endif()
 
 if(3DS)
     set(NO_INTPROC ON CACHE BOOL "Disable interprocess." FORCE)
-    set(NEW_EDITOR ON CACHE BOOL "Enable new editor.")
     set(USE_STATIC_LIBC ON CACHE BOOL "Must use static linkage on 3DS." FORCE)
     set(USE_SYSTEM_LIBS OFF CACHE BOOL "Cannot use system libs on 3DS." FORCE)
 endif()
@@ -300,7 +298,6 @@ endif()
 
 set(THEXTECH_SRC
     src/compat.cpp
-    src/config.cpp
     src/game_main.cpp
     src/globals.cpp
     src/npc.cpp
@@ -556,10 +553,6 @@ endif()
 if(ENABLE_OLD_CREDITS)
     target_compile_definitions(thextech PRIVATE -DENABLE_OLD_CREDITS)
     set_target_properties(thextech PROPERTIES OUTPUT_NAME "smbx")
-endif()
-
-if(NEW_EDITOR)
-    target_compile_definitions(thextech PRIVATE -DNEW_EDITOR)
 endif()
 
 if(NOT ENABLE_LOGGING)

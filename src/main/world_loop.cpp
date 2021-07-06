@@ -438,7 +438,7 @@ void WorldLoop()
         }
         if(WorldPlayer[1].Move3 && WorldPlayer[1].Move == 0)
         {
-            if(config_FastMove)
+            if(g_config.FastMove)
                 PlayerPath(1);
             if(WorldPlayer[1].Move == 0)
             {
@@ -476,7 +476,7 @@ void WorldLoop()
     {
         WorldPlayer[1].Move2 = WorldPlayer[1].Move2 + 2;
         WorldPlayer[1].Location.Y = WorldPlayer[1].Location.Y - 2;
-        if(WalkAnywhere || config_FastMove)
+        if(WalkAnywhere || g_config.FastMove)
         {
             WorldPlayer[1].Move2 = WorldPlayer[1].Move2 + 2;
             WorldPlayer[1].Location.Y = WorldPlayer[1].Location.Y - 2;
@@ -493,7 +493,7 @@ void WorldLoop()
     {
         WorldPlayer[1].Move2 = WorldPlayer[1].Move2 + 2;
         WorldPlayer[1].Location.X = WorldPlayer[1].Location.X - 2;
-        if(WalkAnywhere || config_FastMove)
+        if(WalkAnywhere || g_config.FastMove)
         {
             WorldPlayer[1].Move2 = WorldPlayer[1].Move2 + 2;
             WorldPlayer[1].Location.X = WorldPlayer[1].Location.X - 2;
@@ -510,7 +510,7 @@ void WorldLoop()
     {
         WorldPlayer[1].Move2 = WorldPlayer[1].Move2 + 2;
         WorldPlayer[1].Location.Y = WorldPlayer[1].Location.Y + 2;
-        if(WalkAnywhere || config_FastMove)
+        if(WalkAnywhere || g_config.FastMove)
         {
             WorldPlayer[1].Move2 = WorldPlayer[1].Move2 + 2;
             WorldPlayer[1].Location.Y = WorldPlayer[1].Location.Y + 2;
@@ -527,7 +527,7 @@ void WorldLoop()
     {
         WorldPlayer[1].Move2 = WorldPlayer[1].Move2 + 2;
         WorldPlayer[1].Location.X = WorldPlayer[1].Location.X + 2;
-        if(WalkAnywhere || config_FastMove)
+        if(WalkAnywhere || g_config.FastMove)
         {
             WorldPlayer[1].Move2 = WorldPlayer[1].Move2 + 2;
             WorldPlayer[1].Location.X = WorldPlayer[1].Location.X + 2;
