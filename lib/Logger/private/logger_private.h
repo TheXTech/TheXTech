@@ -51,17 +51,19 @@
 #ifndef PGE_NO_THREADING
 class MutexLocker
 {
-        std::mutex *m_mutex;
-    public:
-        MutexLocker(std::mutex *mutex)
-        {
-            m_mutex = mutex;
-            m_mutex->lock();
-        }
-        ~MutexLocker()
-        {
-            m_mutex->unlock();
-        }
+    std::mutex *m_mutex;
+
+public:
+    MutexLocker(std::mutex *mutex)
+    {
+        m_mutex = mutex;
+        m_mutex->lock();
+    }
+
+    ~MutexLocker()
+    {
+        m_mutex->unlock();
+    }
 };
 
 #define MUTEXLOCK(mn) \
@@ -70,6 +72,6 @@ class MutexLocker
 
 #else // #ifndef PGE_NO_THREADING
 
-#define MUTEXLOCK(mn) (void)mn
+#define MUTEXLOCK(mn)
 
 #endif
