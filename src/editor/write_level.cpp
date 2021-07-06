@@ -109,7 +109,9 @@ void SaveLevel(std::string FilePath, int format, int version)   // saves the lev
         section.underwater = UnderWater[i];
         section.music_file = CustomMusic[i];
 
-        if(out.sections.size() >= size_t(i))
+        // swapped order of operands because
+        // previous code did not make sense
+        if(size_t(i) >= out.sections.size())
             out.sections.push_back(section);
         else
             out.sections[i] = section;
@@ -327,6 +329,10 @@ void SaveLevel(std::string FilePath, int format, int version)   // saves the lev
     for(int i = 1; i < numWarps; ++i)
     {
         auto &w = Warp[i];
+
+        // no case where user would want to save incomplete warp in classic editor
+        if(!w.PlacedEnt || !w.PlacedExit)
+            continue;
 
         warp.ix = w.Entrance.X;
         warp.iy = w.Entrance.Y;

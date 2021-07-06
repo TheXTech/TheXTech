@@ -1534,7 +1534,7 @@ void EditorScreen::UpdateWorldSettingsScreen()
 
     // auto start level
     if (UpdateButton(10 + 4, 100 + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
-        StartFileBrowser(&StartLevel, FileNamePath, "", {".lvl"}, BROWSER_MODE_OPEN);
+        StartFileBrowser(&StartLevel, FileNamePath, "", {".lvl", ".lvlx"}, BROWSER_MODE_OPEN);
     SuperPrint("AUTO START LEVEL:", 3, 54, 102);
     if (!StartLevel.empty())
         SuperPrint(StartLevel, 3, 54, 120);
@@ -2919,7 +2919,7 @@ void EditorScreen::UpdateWarpScreen()
     // special options for lvl warp entrance
     if (!EditorCursor.Warp.level.empty())
     {
-        if (EditorCursor.Warp.level.length() < 10)
+        if (EditorCursor.Warp.level.length() <= 10)
             SuperPrint("TARGET: " + EditorCursor.Warp.level, 3, 10, 430);
         else
         {
@@ -2927,7 +2927,7 @@ void EditorScreen::UpdateWarpScreen()
             SuperPrint(EditorCursor.Warp.level.substr(10), 3, 28, 440);
         }
         if (UpdateButton(330 + 4, 420 + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
-            StartFileBrowser(&EditorCursor.Warp.level, FileNamePath, "", {".lvl"}, BROWSER_MODE_OPEN);
+            StartFileBrowser(&EditorCursor.Warp.level, FileNamePath, "", {".lvl", ".lvlx"}, BROWSER_MODE_OPEN);
         if (EditorCursor.Warp.LevelWarp == 0)
             SuperPrint("LVL START", 3, 384, 430);
         else
@@ -3237,7 +3237,7 @@ void EditorScreen::UpdateLevelScreen()
     else
         SuperPrint("<NONE>", 3, 10 + 44, e_ScreenH - 180 + 20);
     if (UpdateButton(10 + 4, e_ScreenH - 180 + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
-        StartFileBrowser(&EditorCursor.WorldLevel.FileName, FileNamePath, "", {".lvl"}, BROWSER_MODE_OPEN);
+        StartFileBrowser(&EditorCursor.WorldLevel.FileName, FileNamePath, "", {".lvl", ".lvlx"}, BROWSER_MODE_OPEN);
 
     if (!EditorCursor.WorldLevel.FileName.empty())
     {
