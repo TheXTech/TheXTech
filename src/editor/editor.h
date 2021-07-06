@@ -27,6 +27,7 @@
 #define EDITOR_H
 
 #include "../location.h"
+#include <string>
 
 extern std::string Backup_FullFileName;
 

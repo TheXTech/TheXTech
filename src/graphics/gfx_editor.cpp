@@ -5,6 +5,9 @@
 #include "../collision.h"
 #include "../editor/editor.h"
 #include "../editor/new_editor.h"
+#ifdef NO_SDL
+#include "SDL_supplement.h"
+#endif
 
 void DrawEditorLevel(int Z)
 {
@@ -400,7 +403,7 @@ void DrawEditorLevel(int Z)
         {
 //                    If .Mode = 5 Then
             frmMain.renderTexture(curX, curY, GFX.ECursor[2]);
-            if(!e.Layer.empty() && strcasecmp(e.Layer.c_str(), "Default") != 0)
+            if(!e.Layer.empty() && SDL_strcasecmp(e.Layer.c_str(), "Default") != 0)
                 SuperPrint(EditorCursor.Layer, 3, curX + 28 , curY + 34);
         }
 
