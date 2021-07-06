@@ -1289,7 +1289,7 @@ bool mainMenuUpdate()
 #endif
 #if !defined(__3DS__)
                         else if(A == i++)
-                            menuLen = 18 * (7+ScaleMode_strings.at(g_videoSettings.ScaleMode).length());
+                            menuLen = 18 * (7 + ScaleMode_strings.at(g_videoSettings.scaleMode).length());
 #endif
 #if !defined(FIXED_RES)
                         else if(A == i++)
@@ -1357,13 +1357,13 @@ bool mainMenuUpdate()
                     {
                         PlaySoundMenu(SFX_Do);
                         if(!menuLeftPress)
-                            g_videoSettings.ScaleMode = g_videoSettings.ScaleMode + 1;
+                            g_videoSettings.scaleMode = g_videoSettings.scaleMode + 1;
                         else
-                            g_videoSettings.ScaleMode = g_videoSettings.ScaleMode - 1;
-                        if(g_videoSettings.ScaleMode > SCALE_FIXED_2X)
-                            g_videoSettings.ScaleMode = SCALE_DYNAMIC_INTEGER;
-                        if(g_videoSettings.ScaleMode < SCALE_DYNAMIC_INTEGER)
-                            g_videoSettings.ScaleMode = SCALE_FIXED_2X;
+                            g_videoSettings.scaleMode = g_videoSettings.scaleMode - 1;
+                        if(g_videoSettings.scaleMode > SCALE_FIXED_2X)
+                            g_videoSettings.scaleMode = SCALE_DYNAMIC_INTEGER;
+                        if(g_videoSettings.scaleMode < SCALE_DYNAMIC_INTEGER)
+                            g_videoSettings.scaleMode = SCALE_FIXED_2X;
                         frmMain.updateViewport();
                     }
 #endif
@@ -2101,7 +2101,7 @@ void mainMenuDraw()
         A ++;
 #endif
 #ifndef __3DS__
-        SuperPrint("SCALE: "+ScaleMode_strings.at(g_videoSettings.ScaleMode), 3, MenuX, MenuY + 30*A);
+        SuperPrint("SCALE: "+ScaleMode_strings.at(g_videoSettings.scaleMode), 3, MenuX, MenuY + 30*A);
         A ++;
 #endif
 #ifndef FIXED_RES

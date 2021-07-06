@@ -21,7 +21,8 @@ enum ScaleModes
     SCALE_FIXED_2X = 2,
 };
 
-static const std::unordered_map<int, std::string> ScaleMode_strings = {
+static const std::unordered_map<int, std::string> ScaleMode_strings =
+{
     {SCALE_DYNAMIC_INTEGER, "integer"},
     {SCALE_DYNAMIC_NEAREST, "nearest"},
     {SCALE_DYNAMIC_LINEAR, "linear"},
@@ -36,7 +37,7 @@ extern struct VideoSettings_t
     //! THe currently running render mode
     int    renderModeObtained = RENDER_AUTO;
     //! Render scaling mode
-    int     ScaleMode = SCALE_DYNAMIC_NEAREST;
+    int    scaleMode = SCALE_DYNAMIC_NEAREST;
     //! Allow game to work when window is not active
     bool   allowBgWork = false;
     //! Allow background input handling for game controllers

@@ -184,7 +184,7 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
     SDL_SetWindowMinimumSize(m_window, 480, 320);
 #endif //__EMSCRIPTEN__
 
-    if(g_videoSettings.ScaleMode == SCALE_DYNAMIC_LINEAR)
+    if(g_videoSettings.scaleMode == SCALE_DYNAMIC_LINEAR)
         SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
     else
         SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
@@ -453,28 +453,28 @@ bool FrmMain::hasWindowMouseFocus()
 
 void SizeWindow(SDL_Window* window)
 {
-    #if defined(FIXED_RES)
-        if(g_videoSettings.ScaleMode == SCALE_FIXED_1X)
+#if defined(FIXED_RES)
+    if(g_videoSettings.scaleMode == SCALE_FIXED_1X)
+    {
+        SDL_SetWindowSize(window, ScreenW, ScreenH);
+    }
+    else if(g_videoSettings.scaleMode == SCALE_FIXED_2X)
+    {
+        SDL_SetWindowSize(window, 2*ScreenW, 2*ScreenH);
+    }
+#else
+    if(g_config.InternalW != 0 && g_config.InternalH != 0)
+    {
+        if(g_videoSettings.scaleMode == SCALE_FIXED_1X)
         {
-            SDL_SetWindowSize(window, ScreenW, ScreenH);
+            SDL_SetWindowSize(window, g_config.InternalW, g_config.InternalH);
         }
-        else if(g_videoSettings.ScaleMode == SCALE_FIXED_2X)
+        else if(g_videoSettings.scaleMode == SCALE_FIXED_2X)
         {
-            SDL_SetWindowSize(window, 2*ScreenW, 2*ScreenH);
+            SDL_SetWindowSize(window, 2*g_config.InternalW, 2*g_config.InternalH);
         }
-    #else
-        if(g_config.InternalW != 0 && g_config.InternalH != 0)
-        {
-            if(g_videoSettings.ScaleMode == SCALE_FIXED_1X)
-            {
-                SDL_SetWindowSize(window, g_config.InternalW, g_config.InternalH);
-            }
-            else if(g_videoSettings.ScaleMode == SCALE_FIXED_2X)
-            {
-                SDL_SetWindowSize(window, 2*g_config.InternalW, 2*g_config.InternalH);
-            }
-        }
-    #endif
+    }
+#endif
 }
 
 void FrmMain::eventDoubleClick()
@@ -762,7 +762,7 @@ void FrmMain::updateViewport()
     }
 #endif
 
-    if(g_videoSettings.ScaleMode == SCALE_DYNAMIC_LINEAR)
+    if(g_videoSettings.scaleMode == SCALE_DYNAMIC_LINEAR)
         SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
     else
         SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
@@ -772,12 +772,12 @@ void FrmMain::updateViewport()
     {
         ScaleWidth = wi;
         ScaleHeight = hi;
-        if(g_videoSettings.ScaleMode == SCALE_FIXED_2X)
+        if(g_videoSettings.scaleMode == SCALE_FIXED_2X)
         {
             ScaleWidth /= 2;
             ScaleHeight /= 2;
         }
-        if(g_videoSettings.ScaleMode == SCALE_DYNAMIC_INTEGER)
+        if(g_videoSettings.scaleMode == SCALE_DYNAMIC_INTEGER)
         {
             int i = 1;
             while(ScaleWidth/(i+1) > 800 && ScaleHeight/(i+1) > 600)
@@ -789,13 +789,13 @@ void FrmMain::updateViewport()
         if(ScaleHeight < 320) ScaleHeight = 320;
         if(ScaleHeight > 720)
         {
-            if((g_videoSettings.ScaleMode == SCALE_DYNAMIC_NEAREST
-                || g_videoSettings.ScaleMode == SCALE_DYNAMIC_LINEAR)
+            if((g_videoSettings.scaleMode == SCALE_DYNAMIC_NEAREST
+                || g_videoSettings.scaleMode == SCALE_DYNAMIC_LINEAR)
                 && ScaleWidth * 720 / ScaleHeight > 800)
             {
                 ScaleWidth = ScaleWidth * 720 / ScaleHeight;
             }
-            if(g_videoSettings.ScaleMode == SCALE_DYNAMIC_INTEGER
+            if(g_videoSettings.scaleMode == SCALE_DYNAMIC_INTEGER
                 && ScaleWidth / std::floor(ScaleHeight / 720) > 800)
             {
                 ScaleWidth = ScaleWidth / std::floor(ScaleHeight / 720);
@@ -827,11 +827,11 @@ void FrmMain::updateViewport()
     if(scale > h / ScaleHeight)
         scale = h / ScaleHeight;
 
-    if(g_videoSettings.ScaleMode == SCALE_DYNAMIC_INTEGER && scale > 1.f)
+    if(g_videoSettings.scaleMode == SCALE_DYNAMIC_INTEGER && scale > 1.f)
         scale = std::floor(scale);
-    if(g_videoSettings.ScaleMode == SCALE_FIXED_1X && scale > 1.f)
+    if(g_videoSettings.scaleMode == SCALE_FIXED_1X && scale > 1.f)
         scale = 1.f;
-    if(g_videoSettings.ScaleMode == SCALE_FIXED_2X && scale > 2.f)
+    if(g_videoSettings.scaleMode == SCALE_FIXED_2X && scale > 2.f)
         scale = 2.f;
 
     w1 = scale * ScaleWidth;

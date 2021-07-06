@@ -133,7 +133,7 @@ void OpenConfig_preSetup()
             {"1x", SCALE_FIXED_1X},
             {"2x", SCALE_FIXED_2X},
         };
-        config.readEnum("scale-mode", g_videoSettings.ScaleMode, (int)SCALE_DYNAMIC_NEAREST, scaleModes);
+        config.readEnum("scale-mode", g_videoSettings.scaleMode, (int)SCALE_DYNAMIC_NEAREST, scaleModes);
         config.endGroup();
     }
 }
@@ -304,7 +304,7 @@ void SaveConfig()
         config.setValue("internal-width", g_config.InternalW);
         config.setValue("internal-height", g_config.InternalH);
 #       endif
-        config.setValue("scale-mode", ScaleMode_strings.at(g_videoSettings.ScaleMode));
+        config.setValue("scale-mode", ScaleMode_strings.at(g_videoSettings.scaleMode));
 
         std::unordered_map<int, std::string> renderMode =
         {
