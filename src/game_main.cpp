@@ -838,7 +838,8 @@ int GameMain(const CmdLineSetup_t &setup)
                         Backup_FullFileName = "";
                     }
                 }
-                else
+                // if from command line
+                else if(setup.testLevelMode && !setup.interprocess)
                 {
                     GameIsActive = false;
                 }

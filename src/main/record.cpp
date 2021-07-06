@@ -377,9 +377,6 @@ void record_finish()
     }
 
     s_in_level = false;
-
-    if(TestLevel)
-        GameIsActive = false;
 }
 
 void record_sync()
