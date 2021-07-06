@@ -1871,6 +1871,15 @@ void UpdateGraphics(bool skipRepaint)
             DrawEditorLevel(Z);
         }
 
+        if(ScreenType == 5 && numScreens == 1)
+        {
+            speedRun_renderControls(1, Z, SPEEDRUN_ALIGN_LEFT);
+            speedRun_renderControls(2, Z, SPEEDRUN_ALIGN_RIGHT);
+        }
+        else
+        {
+            speedRun_renderControls(Z, Z, SPEEDRUN_ALIGN_AUTO);
+        }
     }
     frmMain.setViewport(0, 0, ScreenW, ScreenH);
     // splitscreen divider
@@ -1925,17 +1934,6 @@ void UpdateGraphics(bool skipRepaint)
 
     if(GameOutro)
         DrawCredits();
-
-    // TODO: VERIFY THIS
-    if(ScreenType == 5 && numScreens == 1)
-    {
-        speedRun_renderControls(1, -1);
-        speedRun_renderControls(2, -1);
-    }
-    else
-    {
-        speedRun_renderControls(Z, Z);
-    }
 
     speedRun_renderTimer();
 

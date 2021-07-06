@@ -97,55 +97,39 @@ void speedRun_renderTimer()
     SuperPrintRightAlign(fmt::format_ne("Mode {0}", g_speedRunnerMode), 3, ScreenW - 2, 2, 1.f, 0.3f, 0.3f, 0.5f);
 }
 
-void speedRun_renderControls(int player, int screenZ)
+void speedRun_renderControls(int player, int screenZ, int align)
 {
     if(g_speedRunnerMode == SPEEDRUN_MODE_OFF && !g_drawController)
         return; // Do nothing
 
-    if(GameMenu || GameOutro || BattleMode)
+    if(GameMenu || GameOutro || BattleMode || LevelEditor)
         return; // Don't draw things at Menu and Outro
 
     if(player < 1 || player > 2)
         return;
 
+    if(screenZ < 0)
+        return;
+
+    auto &scr = vScreen[screenZ];
     int x = 4;
-    int y = ScreenH - 34;
+    int y = (int)scr.Height - 34;
     int w = 76;
     int h = 30;
     bool drawLabel = false;
 
-    if(screenZ >= 0)
+    if(align == SPEEDRUN_ALIGN_AUTO)
     {
-        auto &scr = vScreen[screenZ];
-        x = scr.Left > 0 ? (int)(scr.Left + scr.Width) - (w + 4) : (int)scr.Left + 4;
-        y = (int)(scr.Top + scr.Height) - 34;
+        align = scr.Left > 0 ? SPEEDRUN_ALIGN_RIGHT : SPEEDRUN_ALIGN_LEFT;
+    }
+
+    if(align == SPEEDRUN_ALIGN_LEFT)
+    {
+        x = 4;
     }
     else
     {
-#if 0
-        bool firstLefter =   Player[1].Location.X + (Player[1].Location.Width / 2)
-                           < Player[2].Location.X + (Player[2].Location.Width / 2);
-
-        switch(player)
-        {
-        case 1:
-            x = firstLefter ? 4 : (ScreenW - (w + 4));
-            break;
-        case 2:
-            x = firstLefter ? (ScreenW - (w + 4)) : 4;
-            break;
-        }
-#else
-        switch(player)
-        {
-        case 1:
-            x = 4;
-            break;
-        case 2:
-            x = (ScreenW - (w + 4));
-            break;
-        }
-#endif
+        x = (int)scr.Width - (w + 4);
     }
 
     float alhpa = 0.7f;

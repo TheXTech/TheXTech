@@ -56,7 +56,14 @@ void speedRun_triggerLeave();
 
 void speedRun_bossDeadEvent();
 
-void speedRun_renderControls(int player, int screenZ = -1);
+enum
+{
+    SPEEDRUN_ALIGN_LEFT = -1,
+    SPEEDRUN_ALIGN_AUTO,
+    SPEEDRUN_ALIGN_RIGHT,
+};
+
+void speedRun_renderControls(int player, int screenZ, int align = SPEEDRUN_ALIGN_AUTO);
 void speedRun_renderTimer();
 
 #endif // SPEEDRUNNER_H
