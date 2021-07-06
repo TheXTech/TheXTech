@@ -1,10 +1,10 @@
 #include "../globals.h"
 #include "../sound.h"
-#ifdef __EMSCRIPTEN__
-#include <emscripten.h>
-#include <Logger/logger.h>
-#else
+
+#if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
 #include <tinyfiledialogs/tinyfiledialogs.h>
+#else
+#include <Logger/logger.h>
 #endif
 
 const std::string GetTextInput(const std::string& prompt, const std::string& init = "")
@@ -12,15 +12,15 @@ const std::string GetTextInput(const std::string& prompt, const std::string& ini
     SoundPauseAll();
     const char* get;
 
-#ifndef __EMSCRIPTEN__
+#if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
     if (init.empty())
         get = tinyfd_inputBox(prompt.c_str(), nullptr, " ");
     else
         get = tinyfd_inputBox(prompt.c_str(), nullptr, init.c_str());
 #else
-    // FIXME: Implement the Emscripten-side support
+    // FIXME: Implement the Android and Emscripten-sides support
     get = nullptr;
-    pLogWarning("Calling GetTextInput() with the missing Emscripten implementation");
+    pLogWarning("Calling GetTextInput() with the missing Android/Emscripten implementation");
 #endif
 
     SoundResumeAll();
