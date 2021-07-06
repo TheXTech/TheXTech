@@ -47,17 +47,19 @@
 
 class MutexLocker
 {
-        std::mutex *m_mutex;
-    public:
-        MutexLocker(std::mutex *mutex)
-        {
-            m_mutex = mutex;
-            m_mutex->lock();
-        }
-        ~MutexLocker()
-        {
-            m_mutex->unlock();
-        }
+    std::mutex *m_mutex;
+
+public:
+    MutexLocker(std::mutex *mutex)
+    {
+        m_mutex = mutex;
+        m_mutex->lock();
+    }
+
+    ~MutexLocker()
+    {
+        m_mutex->unlock();
+    }
 };
 
 #define MUTEXLOCK(mn) \
