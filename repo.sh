@@ -47,6 +47,10 @@ do
         update-submodules)
             git submodule foreach git checkout master
             git submodule foreach git pull origin master
+            cd 3rdparty/LuaJIT
+            git checkout v2.1
+            git pull origin v2.1
+            cd ../..
             exit 0
             ;;
 
@@ -59,6 +63,10 @@ do
             echo ""
             git submodule foreach git checkout master
             git submodule foreach git pull origin master
+            cd 3rdparty/LuaJIT
+            git checkout v2.1
+            git pull origin v2.1
+            cd ../..
             echo ""
             echo "==== Fixed! ===="
             exit 0;
