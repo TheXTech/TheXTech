@@ -280,6 +280,12 @@ if(NOT 3DS)
     )
 endif()
 
+if(NOT 3DS AND NOT EMSCRIPTEN AND NOT ANDROID)
+    list(APPEND LIB_SRC
+        3rdparty/tinyfiledialogs/tinyfiledialogs.c
+    )
+endif()
+
 if(NOT NO_INTPROC)
     list(APPEND LIB_SRC
         lib/InterProcess/editor_pipe.cpp
