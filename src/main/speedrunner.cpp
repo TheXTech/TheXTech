@@ -108,28 +108,40 @@ void speedRun_renderControls(int player, int screenZ, int align)
     if(player < 1 || player > 2)
         return;
 
-    if(screenZ < 0)
-        return;
-
-    auto &scr = vScreen[screenZ];
-    int x = 4;
-    int y = (int)scr.Height - 34;
+    int x, y;
     int w = 76;
     int h = 30;
+
     bool drawLabel = false;
-
-    if(align == SPEEDRUN_ALIGN_AUTO)
+    if(screenZ >= 0)
     {
-        align = scr.Left > 0 ? SPEEDRUN_ALIGN_RIGHT : SPEEDRUN_ALIGN_LEFT;
-    }
+        auto &scr = vScreen[screenZ];
+        y = (int)scr.Height - 34;
 
-    if(align == SPEEDRUN_ALIGN_LEFT)
-    {
-        x = 4;
+        if(align == SPEEDRUN_ALIGN_AUTO)
+        {
+            align = scr.Left > 0 ? SPEEDRUN_ALIGN_RIGHT : SPEEDRUN_ALIGN_LEFT;
+        }
+
+        if(align == SPEEDRUN_ALIGN_LEFT)
+        {
+            if((int)scr.Width < 800)
+                x = 4;
+            else
+                x = (int)scr.Width / 2 - 800 / 2 + 4;
+        }
+        else
+        {
+            if((int)scr.Width < 800)
+                x = (int)scr.Width - (w + 4);
+            else
+                x = (int)scr.Width / 2 + 800 / 2 - (w + 4);
+        }
     }
     else
     {
-        x = (int)scr.Width - (w + 4);
+        x = 4;
+        y = ScreenH - 34;
     }
 
     float alhpa = 0.7f;

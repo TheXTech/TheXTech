@@ -712,9 +712,9 @@ void UpdateGraphics2(bool skipRepaint)
                 SuperPrint(WorldPlayer[1].LevelName, 2, pX + 116, marginTop - 21);
         }
 
-        speedRun_renderControls(1, 1, SPEEDRUN_ALIGN_AUTO);
-
         frmMain.setViewport(0, 0, ScreenW, ScreenH);
+
+        speedRun_renderControls(1, -1, SPEEDRUN_ALIGN_LEFT);
 
         if(GamePaused == true)
         {

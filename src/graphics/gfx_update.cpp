@@ -1876,7 +1876,7 @@ void UpdateGraphics(bool skipRepaint)
             speedRun_renderControls(1, Z, SPEEDRUN_ALIGN_LEFT);
             speedRun_renderControls(2, Z, SPEEDRUN_ALIGN_RIGHT);
         }
-        else
+        else if(numScreens == 2)
         {
             speedRun_renderControls(Z, Z, SPEEDRUN_ALIGN_AUTO);
         }
@@ -1889,6 +1889,11 @@ void UpdateGraphics(bool skipRepaint)
             frmMain.renderRect(0, ScreenH/2-2, ScreenW, 4, 0, 0, 0);
         else
             frmMain.renderRect(ScreenW/2-2, 0, 4, ScreenH, 0, 0, 0);
+    }
+
+    if(ScreenType != 5 && numScreens == 1)
+    {
+        speedRun_renderControls(1, -1, SPEEDRUN_ALIGN_LEFT);
     }
 
     // pause menu and message interface
