@@ -8,8 +8,10 @@ extern struct Config_t
     int     InternalH = 600;
     //! Display new editor in menu
     bool    UseNewEditor = false;
-    //! Display new editor in menu
+    //! SMB3 world map movement
     bool    FastMove = false;
+    //! Dragon coin
+    bool    ShowDragonCoins = false;
 } g_config; // main_config.cpp
 
 #endif // #ifndef CONFIG_H

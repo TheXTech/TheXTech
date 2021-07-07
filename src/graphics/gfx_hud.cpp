@@ -25,6 +25,8 @@
 
 #include "../globals.h"
 #include "../graphics.h"
+#include "../npc_id.h"
+#include "../config.h"
 
 void DrawInterface(int Z, int numScreens)
 {
@@ -141,6 +143,16 @@ void DrawInterface(int Z, int numScreens)
                            40 + 20 - (int(scoreStr.size()) * 18) +
                            (CenterX) - (GFX.Container[1].w / 2) + 80 + 12 + 4 + 18 + 32 + GFX.Interface[3].w,
                            ScreenTop + 16 + 31);
+
+                // Show dragon coins
+                if(g_config.ShowDragonCoins)
+                {
+                    for(int i = 0; i < NPCScore[NPCID_DRAGONCOIN] - 6; i++)
+                    {
+                        frmMain.renderTexture(40 + 20 + CenterX - GFX.Container[1].w / 2 + 96 + 16*i, ScreenTop + 16 + 51, GFX.Interface[2]);
+                    }
+                }
+
                 // Print lives on the screen
                 frmMain.renderTexture(-80 + CenterX - GFX.Container[1].w / 2 + C - 122 - 16, ScreenTop + 16 + 10, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0);
                 frmMain.renderTexture(-80 + CenterX - GFX.Container[1].w / 2 + C - 122 + 10 + GFX.Interface[1].w, ScreenTop + 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
@@ -248,6 +260,15 @@ void DrawInterface(int Z, int numScreens)
                            1,
                            float(20 - int(scoreStr.size()) * 18 + CenterX - GFX.Container[1].w / 2 + 80 + 12 + 4 + 18 + 32 + GFX.Interface[3].w),
                            ScreenTop + 16 + 31);
+                // Show dragon coins
+                if(g_config.ShowDragonCoins)
+                {
+                    for(int i = 0; i < NPCScore[NPCID_DRAGONCOIN] - 6; i++)
+                    {
+                        frmMain.renderTexture(20 + CenterX - GFX.Container[1].w / 2 + 96 + 16*i, ScreenTop + 16 + 51, GFX.Interface[2]);
+                    }
+                }
+
                 // Print lives on the screen
 
                 frmMain.renderTexture(CenterX - GFX.Container[1].w / 2 + C - 122 - 16, ScreenTop + 16 + 10, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0);
@@ -413,6 +434,14 @@ void DrawInterface(int Z, int numScreens)
                    20 - int(scoreStr.size()) * 18 +
                    CenterX - GFX.Container[1].w / 2 + 80 + 12 + 4 + 18 + 32 + GFX.Interface[3].w,
                    ScreenTop + 16 + 31);
+        // Show dragon coins
+        if(g_config.ShowDragonCoins)
+        {
+            for(int i = 0; i < NPCScore[NPCID_DRAGONCOIN] - 6; i++)
+            {
+                frmMain.renderTexture(20 + CenterX - GFX.Container[1].w / 2 + 96 + 16*i, ScreenTop + 16 + 51, GFX.Interface[2]);
+            }
+        }
         // Print lives on the screen
         frmMain.renderTexture(CenterX - GFX.Container[1].w / 2 + C - 122 - 16, ScreenTop + 16 + 10, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0);
         frmMain.renderTexture(CenterX - GFX.Container[1].w / 2 + C - 122 + 10 + GFX.Interface[1].w, ScreenTop + 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);

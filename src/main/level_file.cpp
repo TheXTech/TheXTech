@@ -38,6 +38,7 @@
 #include "level_file.h"
 #include "trees.h"
 #include "record.h"
+#include "../npc_id.h"
 
 #include <DirManager/dirman.h>
 #include <Utils/files.h>
@@ -780,7 +781,7 @@ void ClearLevel()
     const Location_t BlankLocation = Location_t();
     const Events_t blankEvent = Events_t();
     const Effect_t blankEffect = Effect_t();
-    NPCScore[274] = 6;
+    NPCScore[NPCID_DRAGONCOIN] = 6;
     LevelName.clear();
     ResetCompat();
     LoadNPCDefaults();

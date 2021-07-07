@@ -32,6 +32,7 @@
 #include "../player.h"
 #include "../game_main.h"
 #include "../layers.h"
+#include "../npc_id.h"
 
 #include <Utils/maths.h>
 #include <Logger/logger.h>
@@ -461,9 +462,9 @@ void TouchBonus(int A, int B)
             {
                 PlaySound(SFX_DraginCoin);
                 MoreScore(NPCScore[NPC[B].Type], NPC[B].Location);
-                NPCScore[274] = NPCScore[274] + 1;
-                if(NPCScore[274] > 14)
-                    NPCScore[274] = 14;
+                NPCScore[NPCID_DRAGONCOIN] = NPCScore[NPCID_DRAGONCOIN] + 1;
+                if(NPCScore[NPCID_DRAGONCOIN] > 14)
+                    NPCScore[NPCID_DRAGONCOIN] = 14;
             }
             else
                 MoreScore(1, NPC[B].Location);

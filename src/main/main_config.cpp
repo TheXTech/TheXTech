@@ -189,6 +189,7 @@ void OpenConfig()
         config.beginGroup("gameplay");
         config.read("ground-pound-by-alt-run", GameplayPoundByAltRun, false);
         config.read("world-map-fast-move", g_config.FastMove, false);
+        config.read("show-dragon-coins", g_config.ShowDragonCoins, false);
         config.endGroup();
 
         config.beginGroup("effects");
@@ -348,6 +349,7 @@ void SaveConfig()
     config.beginGroup("gameplay");
     config.setValue("ground-pound-by-alt-run", GameplayPoundByAltRun);
     config.setValue("world-map-fast-move", g_config.FastMove);
+    config.setValue("show-dragon-coins", g_config.ShowDragonCoins);
     config.endGroup();
 
     config.beginGroup("effects");

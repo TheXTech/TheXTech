@@ -7,11 +7,14 @@ Changes for 1.3.6
 -Classic level editor added
 -Option for SMB3-style world map movement
 -Improved performance on large levels using quadtree for blocks
+-SMBX-style flipped graphics (vertically stacked normal, hflip, vflip, vhflip) are now automatically generated when only the normal graphics are included in the PNG.
+-Option to show collected dragon coins in HUD
 
 Goals for 1.3.6:
 -Support for add/drop players on the fly
 -New controller backend and menus
 -Implement quadtree for BGOs, NPCs, waters
+
 <wip>
 
 Changes for 1.3.5.2
