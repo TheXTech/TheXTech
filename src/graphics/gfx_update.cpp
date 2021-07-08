@@ -1910,6 +1910,7 @@ void UpdateGraphics(bool skipRepaint)
     {
         if(MessageText.empty())
         {
+            // TODO: make the width dynamic (currently 380px)
             frmMain.renderRect(ScreenW/2 - 190, ScreenH/2 - 100, 380, 200, 0, 0, 0);
             if(TestLevel)
             {
@@ -1928,9 +1929,9 @@ void UpdateGraphics(bool skipRepaint)
             }
             else
             {
-                SuperPrint("CONTINUE", 3, ScreenW/2 - 190 + 62, ScreenH/2 - 100 + 75);
-                SuperPrint("QUIT", 3, ScreenW/2 - 190 + 62, ScreenH/2 - 100 + 110);
-                frmMain.renderTexture(ScreenW/2 - 190 + 42, ScreenH/2 - 100 + 75 + (MenuCursor * 35), 16, 16, GFX.MCursor[0], 0, 0);
+                SuperPrint("CONTINUE", 3, ScreenW/2 - 190 + 62 + 56, ScreenH/2 - 100 + 75);
+                SuperPrint("QUIT", 3, ScreenW/2 - 190 + 62 + 56, ScreenH/2 - 100 + 110);
+                frmMain.renderTexture(ScreenW/2 - 190 + 42 + 56, ScreenH/2 - 100 + 75 + (MenuCursor * 35), 16, 16, GFX.MCursor[0], 0, 0);
             }
         }
         else
