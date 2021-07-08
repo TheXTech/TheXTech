@@ -36,6 +36,7 @@
 #include "../main/trees.h"
 #include "../npc_id.h"
 #include "../compat.h"
+#include "gfx_flip.h"
 
 #ifdef __3DS__
 #include "../3ds/second_screen.h"
@@ -1362,11 +1363,15 @@ void UpdateGraphics(bool skipRepaint)
                Effect[A].Type == 82 || Effect[A].Type == 103 || Effect[A].Type == 104 ||
                Effect[A].Type == 114 || Effect[A].Type == 123 || Effect[A].Type == 124)
             {
-                g_stats.renderedEffects++;
                 if(vScreenCollision(Z, Effect[A].Location))
                 {
+                    g_stats.renderedEffects++;
                     float cn = Effect[A].Shadow ? 0.f : 1.f;
-                    frmMain.renderTexture(vScreenX[Z] + Effect[A].Location.X, vScreenY[Z] + Effect[A].Location.Y, Effect[A].Location.Width, Effect[A].Location.Height, GFXEffect[Effect[A].Type], 0, Effect[A].Frame * EffectHeight[Effect[A].Type], cn, cn, cn);
+                    if(CAN_FLIP_EFFECT_H(Effect[A].Type) || CAN_FLIP_EFFECT_HV(Effect[A].Type)
+                        || Effect[A].Frame * EffectHeight[Effect[A].Type] < GFXEffect[Effect[A].Type].h)
+                    {
+                        frmMain.renderTexture(vScreenX[Z] + Effect[A].Location.X, vScreenY[Z] + Effect[A].Location.Y, Effect[A].Location.Width, Effect[A].Location.Height, GFXEffect[Effect[A].Type], 0, Effect[A].Frame * EffectHeight[Effect[A].Type], cn, cn, cn);
+                    }
                 }
             }
         }
@@ -1789,9 +1794,13 @@ void UpdateGraphics(bool skipRepaint)
                 {
                     g_stats.renderedEffects++;
                     float c = e.Shadow ? 0.f : 1.f;
-                    frmMain.renderTexture(int(vScreenX[Z] + e.Location.X), int(vScreenY[Z] + e.Location.Y),
-                                          int(e.Location.Width), int(e.Location.Height),
-                                          GFXEffectBMP[e.Type], 0, e.Frame * EffectHeight[e.Type], c, c, c);
+                    if(CAN_FLIP_EFFECT_H(e.Type) || CAN_FLIP_EFFECT_HV(e.Type)
+                        || e.Frame * EffectHeight[e.Type] < GFXEffect[e.Type].h)
+                    {
+                        frmMain.renderTexture(int(vScreenX[Z] + e.Location.X), int(vScreenY[Z] + e.Location.Y),
+                                              int(e.Location.Width), int(e.Location.Height),
+                                              GFXEffectBMP[e.Type], 0, e.Frame * EffectHeight[e.Type], c, c, c);
+                    }
                 }
             }
         }
