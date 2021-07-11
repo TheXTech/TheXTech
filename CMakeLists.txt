@@ -1,5 +1,33 @@
 cmake_minimum_required(VERSION 3.5)
 
+if(DEFINED ENV{VITASDK})
+    message("VITASDK Defined!")
+    message("VITA BUILD!")
+    message("VITA BUILD!")
+    message("VITA BUILD!")
+    message("VITA BUILD!")
+    message("VITA BUILD!")
+    message("VITA BUILD!")
+    message("VITA BUILD!")
+    #set(CMAKE_TOOLCHAIN_FILE "$ENV{VITASDK}/share/vita.toolchain.cmake" CACHE PATH "toolchain file")
+    set(CMAKE_TOOLCHAIN_FILE "/usr/local/vitasdk/share/vita.toolchain.cmake" CACHE PATH "toolchain file")
+
+    #include("${VITASDK}/share/vita.cmake" REQUIRED)
+    include ("/usr/local/vitasdk/share/vita.cmake" REQUIRED)
+
+    set(VITA 1)
+    set(VITA_APP_NAME "TheXTech Vita Edition")
+    set(VITA_TITLEID  "THEXTECH00001")
+    set(VITA_VERSION  "01.00")
+
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -I../src -fcompare-debug-second") # -std=c++11
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I../src -fcompare-debug-second -std=gnu++11 -fno-optimize-sibling-calls -Wno-class-conversion") # 
+    set(LDFLAGS "${LDFLAGS},-Wl,-V")
+
+    cmake_policy(SET CMP0077 OLD)
+    add_compile_definitions(VITA=1)
+endif()
+
 project(TheXTech LANGUAGES C CXX)
 
 include(CheckCXXCompilerFlag)
@@ -94,10 +122,19 @@ include(cmake/git_version.cmake)
 #endif()
 set(USE_SYSTEM_LIBS_DEFAULT OFF)
 
-if(HAIKU)
+if(HAIKU OR VITA)
     set(USE_SYSTEM_SDL2_DEFAULT ON)  # Should be used on Haiku, own SDL2 Haiku build on CMake is broken
 else()
     set(USE_SYSTEM_SDL2_DEFAULT ${USE_SYSTEM_LIBS_DEFAULT})
+endif()
+
+if(VITA)
+    message("Vita build, USE_SYSTEM_LIBS_DEFAULT is ON.")
+    set(USE_STATIC_LIBC OFF)
+    set(USE_SYSTEM_LIBS_DEFAULT ON)
+    set(USE_SYSTEM_LIBS ON)
+    set(USE_SYSTEM_SDL2 ON)
+    set(NO_INTPROC ON CACHE BOOL "Disable interprocess." FORCE)
 endif()
 
 option(USE_SYSTEM_LIBS "Use dependent libraries like SDL2, FreeImageLite and MixerX, installed in the system" ${USE_SYSTEM_LIBS_DEFAULT})
@@ -163,7 +200,11 @@ if(USE_STATIC_LIBC)
 endif()
 
 include(lib/DirManager/dirman.cmake)
-include(lib/FileMapper/FileMapper.cmake)
+
+if(NOT VITA)
+    include(lib/FileMapper/FileMapper.cmake)
+endif()
+
 include(lib/fmt/fmt.cmake)
 include(lib/IniProcessor/IniProcessor.cmake)
 include(lib/Utils/Utils.cmake)
@@ -226,6 +267,11 @@ endif()
 if(USE_SYSTEM_LIBS)
     find_package(SDL2 REQUIRED)
 
+    if(NOT SDL2_LIBRARIES)
+        find_library(SDL2_LIBRARIES SDL2)
+        message("SDL2_LIBRARIES: ${SDL2_LIBRARIES}")
+    endif()
+
     find_library(MIXERX_LIB NAMES SDL2_mixer_ext)
     find_path(MIXERX_HEAD_DIR SDL_mixer_ext.h PATH_SUFFIXES SDL2)
 
@@ -267,7 +313,7 @@ set(LIB_SRC
     ${PGE_FILE_LIBRARY_SRCS}
 )
 
-if(NOT 3DS)
+if(NOT 3DS AND NOT VITA)
     list(APPEND LIB_SRC
         ${FILEMAPPER_SRCS}
         ${STACK_WALKER_SRCS}
@@ -280,7 +326,16 @@ if(NOT 3DS)
     )
 endif()
 
-if(NOT 3DS AND NOT EMSCRIPTEN AND NOT ANDROID)
+if(VITA)
+    list(APPEND LIB_SRC
+        lib/Graphics/graphics_funcs.cpp
+        lib/Graphics/image_size.cpp
+        lib/Graphics/size.cpp
+        lib/Graphics/sizef.cpp
+    )
+endif()
+
+if(NOT 3DS AND NOT EMSCRIPTEN AND NOT ANDROID AND NOT VITA)
     list(APPEND LIB_SRC
         3rdparty/tinyfiledialogs/tinyfiledialogs.c
     )
@@ -548,6 +603,55 @@ endif()
 target_include_directories(thextech PRIVATE ${A2XT_INCS})
 target_link_libraries(thextech PRIVATE A2XT_Int)
 
+if(VITA)
+    target_link_libraries(A2XT_Int INTERFACE
+        FLAC
+        modplug
+        mad
+        opusfile
+        opus
+        vorbisfile
+        vorbis
+        ogg
+        jpeg
+        vitaGL
+        debugnet
+        SceCtrl_stub
+        SceMotion_stub
+        SceHid_stub
+        SceRtc_stub
+        SceNetCtl_stub
+        SceNet_stub
+        SceLibKernel_stub
+        ScePvf_stub
+        SceAppMgr_stub
+        SceAppUtil_stub
+        ScePgf_stub
+        freetype
+        png
+        SceCommonDialog_stub
+        m
+        z
+        SceGxm_stub
+        SceDisplay_stub
+        SceSysmodule_stub
+        SceTouch_stub
+        SceAudio_stub
+        vitashark
+        SceSysmem_stub
+        SceIofilemgr_stub
+        SceKernelThreadMgr_stub
+    )
+
+    target_compile_definitions(thextech PRIVATE -DPGE_NO_THREADING)
+    # target_compile_definitions(thextech PRIVATE -DNO_SCREENSHOT)
+    # target_compile_definitions(thextech PRIVATE -DNO_SDL)
+    # target_compile_definitions(thextech PRIVATE -DLOW_MEM)
+    # target_compile_definitions(thextech PRIVATE -DFIXED_RES)
+    target_compile_definitions(thextech PRIVATE -DPRELOAD_LEVELS)
+    target_compile_definitions(thextech PRIVATE -DVITA)
+endif()
+
 if(RANGE_ARR_USE_HEAP)
     target_compile_definitions(thextech PRIVATE -DRANGE_ARR_USE_HEAP)
 endif()
@@ -654,6 +758,13 @@ elseif(WIN32)
     install(FILES changelog.txt DESTINATION .)
     install(FILES README.md DESTINATION . RENAME ReadMe.txt)
     install(FILES LICENSE DESTINATION . RENAME License.TheXTech.txt)
+elseif(VITA)
+    install(TARGETS thextech DESTINATION .)
+    vita_create_self(${THEXTECH_EXECUTABLE_NAME}.self output/bin/thextech UNSAFE)
+    vita_create_vpk(${THEXTECH_EXECUTABLE_NAME}.vpk ${VITA_TITLEID} output/bin/thextech
+        VERSION ${VITA_VERSION}
+        NAME ${VITA_APP_NAME}
+    )
 else()
     install(TARGETS thextech
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}

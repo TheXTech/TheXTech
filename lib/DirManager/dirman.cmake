@@ -7,9 +7,14 @@ list(APPEND DIRMANAGER_SRCS
     ${CMAKE_CURRENT_LIST_DIR}/dirman.cpp
 )
 
+
+
 if(WIN32)
     list(APPEND DIRMANAGER_SRCS ${CMAKE_CURRENT_LIST_DIR}/dirman_winapi.cpp)
 else()
-    list(APPEND DIRMANAGER_SRCS ${CMAKE_CURRENT_LIST_DIR}/dirman_posix.cpp)
+    list(APPEND DIRMANAGER_SRCS ${CMAKE_CURRENT_LIST_DIR}/dirman_posix.cpp)    
 endif()
 
+if(VITA)
+    list(APPEND DIRMANAGER_SRCS ${CMAKE_CURRENT_LIST_DIR}/dirman_vita.cpp)
+endif()

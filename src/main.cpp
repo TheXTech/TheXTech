@@ -29,12 +29,18 @@
 #include "SDL_supplement.h"
 #endif
 
-#ifndef __3DS__
+#if !defined(__3DS__) && !defined(VITA)
 #include <tclap/CmdLine.h>
 #include <CrashHandler/crash_handler.h>
 #else
+#if defined(__3DS__)
 uint32_t __stacksize__ = 0x00020000;
 #include <3ds.h>
+#endif
+#endif
+
+#if VITA
+#include <tclap/CmdLine.h>
 #endif
 
 #include "game_main.h"
@@ -154,7 +160,7 @@ int main(int argc, char**argv)
 
     CmdLineSetup_t setup;
 
-#ifndef __3DS__
+#if !defined(__3DS__) && !defined(VITA)
     CrashHandler::initSigs();
 #endif
 

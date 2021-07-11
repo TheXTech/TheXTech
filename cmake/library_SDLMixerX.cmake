@@ -7,14 +7,24 @@ add_library(PGE_SDLMixerX_static INTERFACE)
 set(SDL_BRANCH "release-2.0.12")
 set(SDL_GIT_BRANCH "origin/release-2.0.12")
 
-if(EMSCRIPTEN OR APPLE OR ANDROID)
+if(EMSCRIPTEN OR APPLE OR ANDROID OR VITA)
     set(PGE_SHARED_SDLMIXER_DEFAULT OFF)
 else()
     set(PGE_SHARED_SDLMIXER_DEFAULT ON)
 endif()
 
+if(VITA)
+    set(USE_SYSTEM_AUDIO_LIBRARIES_DEFAULT ON)
+else()
+    set(USE_SYSTEM_AUDIO_LIBRARIES_DEFAULT OFF)
+endif()
+
 option(PGE_SHARED_SDLMIXER "Link MixerX as a shared library (dll/so/dylib)" ${PGE_SHARED_SDLMIXER_DEFAULT})
 option(PGE_USE_LOCAL_SDL2 "Do use the locally-built SDL2 library from the AudioCodecs set. Otherwise, download and build the development top main version." ON)
+
+if(VITA)
+    set(PGE_USE_LOCAL_SDL2 OFF)
+endif()
 
 if(WIN32)
     if(MSVC)
@@ -45,8 +55,9 @@ endif()
 set(CODECS_LIBRARIES_DIR ${DEPENDENCIES_INSTALL_DIR}/lib)
 
 if(USE_SYSTEM_SDL2)
+    message("LIBRARY_SDLMIXERX.CMAKE using USE_SYSTEM_SDL2")
     set(USE_LOCAL_SDL2 OFF)
-    if(HAIKU)
+    if(HAIKU OR VITA)
         find_library(SDL2_LIBRARY SDL2)
         find_path(SDL2_INCLUDE_DIR "SDL.h" PATH_SUFFIXES SDL2)
         if(NOT SDL2_LIBRARY AND NOT SDL2_INCLUDE_DIR)
@@ -148,44 +159,47 @@ set(MixerX_CodecLibs
 set(MixerX_Deps)
 set(AudioCodecs_Deps)
 
-ExternalProject_Add(
-    AudioCodecs_Local
-    PREFIX ${CMAKE_BINARY_DIR}/external/AudioCodecs
-#    GIT_REPOSITORY https://github.com/WohlSoft/AudioCodecs.git
-#   UPDATE_COMMAND ""
-    DOWNLOAD_COMMAND ""
-    SOURCE_DIR ${CMAKE_SOURCE_DIR}/3rdparty/AudioCodecs
-    CMAKE_ARGS
-        "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}"
-        "-DCMAKE_INSTALL_PREFIX=${DEPENDENCIES_INSTALL_DIR}"
-        "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
-        "-DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}"
-        "-DUSE_LOCAL_SDL2=${USE_LOCAL_SDL2}"
-        "-DCMAKE_DEBUG_POSTFIX=${PGE_LIBS_DEBUG_SUFFIX}"
-        "-DBUILD_MIKMOD=OFF"
-        ${ANDROID_CMAKE_FLAGS}
-        $<$<BOOL:APPLE>:-DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}>
-        $<$<BOOL:APPLE>:-DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}>
-        $<$<BOOL:WIN32>:-DCMAKE_SHARED_LIBRARY_PREFIX="">
-    DEPENDS ${AudioCodecs_Deps}
-    BUILD_BYPRODUCTS
-        "${SDL2_SO_Lib}"
-        "${SDL2_A_Lib}"
-        "${SDL2_main_A_Lib}"
-        "${SDLHIDAPI_SO_Lib}"
-        ${MixerX_CodecLibs}
-)
+if(NOT VITA)
+    ExternalProject_Add(
+        AudioCodecs_Local
+        PREFIX ${CMAKE_BINARY_DIR}/external/AudioCodecs
+        GIT_REPOSITORY https://github.com/WohlSoft/AudioCodecs.git
+        UPDATE_COMMAND ""
+        CMAKE_ARGS
+            "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}"
+            "-DCMAKE_INSTALL_PREFIX=${DEPENDENCIES_INSTALL_DIR}"
+            "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
+            "-DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}"
+            "-DUSE_LOCAL_SDL2=${USE_LOCAL_SDL2}"
+            "-DCMAKE_DEBUG_POSTFIX=${PGE_LIBS_DEBUG_SUFFIX}"
+            "-DBUILD_MIKMOD=OFF"
+            ${ANDROID_CMAKE_FLAGS}
+            $<$<BOOL:APPLE>:-DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}>
+            $<$<BOOL:APPLE>:-DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}>
+            $<$<BOOL:WIN32>:-DCMAKE_SHARED_LIBRARY_PREFIX="">
+        DEPENDS ${AudioCodecs_Deps}
+        BUILD_BYPRODUCTS
+            "${SDL2_SO_Lib}"
+            "${SDL2_A_Lib}"
+            "${SDL2_main_A_Lib}"
+            "${SDLHIDAPI_SO_Lib}"
+            ${MixerX_CodecLibs}
+    )
+endif()
 
-list(APPEND MixerX_Deps AudioCodecs_Local)
+if(VITA)
+list(APPEND MixerX_Deps)
+else()
+    list(APPEND MixerX_Deps AudioCodecs_Local)
+endif()
+
 
 # SDL Mixer X - an audio library, fork of SDL Mixer
 ExternalProject_Add(
     SDLMixerX_Local
     PREFIX ${CMAKE_BINARY_DIR}/external/SDLMixerX
-#    GIT_REPOSITORY https://github.com/WohlSoft/SDL-Mixer-X.git
-#    UPDATE_COMMAND ""
-    DOWNLOAD_COMMAND ""
-    SOURCE_DIR ${CMAKE_SOURCE_DIR}/3rdparty/SDL-Mixer-X
+    GIT_REPOSITORY https://github.com/suicvne/SDL-Mixer-X.git
+    UPDATE_COMMAND ""
     CMAKE_ARGS
         "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}"
         "-DCMAKE_INSTALL_PREFIX=${DEPENDENCIES_INSTALL_DIR}"
@@ -199,6 +213,7 @@ ExternalProject_Add(
         "-DAUDIO_CODECS_SDL2_HG_BRANCH=${SDL_BRANCH}"
         "-DAUDIO_CODECS_SDL2_GIT_BRANCH=${SDL_GIT_BRANCH}"
         "-DWITH_SDL2_WASAPI=ON"
+        "-DUSE_SYSTEM_AUDIO_LIBRARIES=${USE_SYSTEM_AUDIO_LIBRARIES_DEFAULT}"
         ${ANDROID_CMAKE_FLAGS}
         $<$<BOOL:APPLE>:-DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}>
         $<$<BOOL:APPLE>:-DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}>
@@ -223,14 +238,21 @@ else()
     target_link_libraries(PGE_SDLMixerX INTERFACE "${SDL2_SO_Lib}")
 endif()
 
-message("--- Detected system libraries list: ${MixerX_SysLibs} ---")
-
+if(VITA)
+target_link_libraries(PGE_SDLMixerX_static INTERFACE
+    "${SDL_MixerX_A_Lib}"
+    "${SDL2_A_Lib}"
+    "${MixerX_SysLibs}"
+)
+else()
 target_link_libraries(PGE_SDLMixerX_static INTERFACE
     "${SDL_MixerX_A_Lib}"
     ${MixerX_CodecLibs}
     "${SDL2_A_Lib}"
     "${MixerX_SysLibs}"
 )
+endif()
+
 
 if(ANDROID)
     target_link_libraries(PGE_SDLMixerX_static INTERFACE "${SDLHIDAPI_SO_Lib}")
