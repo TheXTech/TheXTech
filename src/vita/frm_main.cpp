@@ -261,7 +261,7 @@ void FrmMain::deleteTexture(StdPicture &tx, bool lazyUnload)
 
     }
 
-    if(!lazyUnLoad)
+    if(!lazyUnload)
     {
         tx.inited = false;
         tx.lazyLoaded = false;

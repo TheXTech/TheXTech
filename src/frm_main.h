@@ -58,11 +58,17 @@ class FrmMain
     bool m_headless = false;
     std::string m_windowTitle;
 #ifndef NO_SDL
+#ifndef VITA
     SDL_Window *m_window = nullptr;
     SDL_Renderer *m_gRenderer = nullptr;
     SDL_Texture  *m_tBuffer = nullptr;
     SDL_Texture  *m_recentTarget = nullptr;
     std::set<SDL_Texture *> m_textureBank;
+#else
+    std::set<GLuint> m_textureBank;
+    uint32_t currentFrame = 0;
+    
+#endif
     bool m_sdlLoaded = false;
     const Uint8 *m_keyboardState = nullptr;
     Uint32 m_lastMousePress = 0;
