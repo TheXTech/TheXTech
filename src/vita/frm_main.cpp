@@ -23,6 +23,10 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#ifndef USE_STBI
+#define USE_STBI
+#endif
+
 #include "../globals.h"
 #include "../game_main.h"
 #include "../graphics.h"
@@ -37,6 +41,8 @@
 #include <DirManager/dirman.h>
 #include <chrono>
 #include <fmt_format_ne.h>
+#include <Graphics/graphics_funcs.h>
+#include <FreeImageLite.h>
 #include "../editor/new_editor.h"
 
 
@@ -50,9 +56,36 @@
 #include <SDL2/SDL.h>
 #endif
 
+#ifndef DISPLAY_WIDTH_DEF
+#define DISPLAY_WIDTH_DEF 960
+#endif
+#ifndef DISPLAY_HEIGHT_DEF
+#define DISPLAY_HEIGHT_DEF 544
+#endif
+
+#ifdef USE_STBI
+#ifndef STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_IMPLEMENTATION
+#define STBI_NO_HDR
+#define STBI_NO_PIC
+#define STBI_NO_PSD
+#define STBI_ONLY_BMP
+#define STBI_ONLY_GIF
+#define STBI_ONLY_JPEG
+#define STBI_ONLY_PNG
+#define STBI_ONLY_PNM
+#define STBI_ONLY_TGA
+#include "stb_image.h"
+#endif
+#endif
+
 static unsigned int num_textures_loaded = 0;
-static const unsigned int vgl_pool_size = 0x100000;
-static unsigned int ram_pool_count = vgl_pool_size;
+static const int vgl_pool_size = 0x100000;
+static const int vgl_cdram_threshold = 256 * 1024;
+static const int vgl_phycont_threshold = 1 * 1024 * 1024;
+static const int vgl_pool_ram_threshold = vgl_pool_size * 2;//0x1000000
+static const SceGxmMultisampleMode vgl_msaa = SCE_GXM_MULTISAMPLE_NONE;
+static int ram_pool_count = vgl_pool_size;
 
 // typedef struct SDL_Point
 // {
@@ -67,6 +100,8 @@ FrmMain::FrmMain()
 
 #include <psp2/kernel/sysmem.h>
 
+static const int MEMORY_DIVISOR = 1e+6;
+
 static inline void print_memory_info()
 {
     SceKernelFreeMemorySizeInfo info;
@@ -78,10 +113,10 @@ static inline void print_memory_info()
     }
 
     pLogDebug(
-        "PS VITA MEMORY STATS\nUSER_RW MEMORY FREE: %d\nUSER_CDRAM_RW: %d\nUSER_MAIN_PHYCONT_*_RW: %d\n\n",
-        info.size_user,
-        info.size_cdram,
-        info.size_phycont
+        "PS VITA MEMORY STATS\nUSER_RW MEMORY FREE: %.2fMB\nUSER_CDRAM_RW: %.2fMB\nUSER_MAIN_PHYCONT_*_RW: %.2fMB\n\n",
+        (info.size_user / (float)MEMORY_DIVISOR),
+        (info.size_cdram / (float)MEMORY_DIVISOR),
+        (info.size_phycont / (float)MEMORY_DIVISOR)
     );
 }
 
@@ -90,8 +125,24 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
     bool res = false;
     LoadLogSettings(setup.interprocess, setup.verboseLogging);
 
-    vglInit(vgl_pool_size);
-    _debugPrintf_("PS VITA: Init with pool size of %d\n", vgl_pool_size);
+    _debugPrintf_("--Before vglInit--");
+    print_memory_info();
+
+    //void vglInitWithCustomThreshold(int pool_size, int width, int height, int ram_threshold, int cdram_threshold, int phycont_threshold, SceGxmMultisampleMode msaa)
+    // vglInitWithCustomThreshold(
+    //     vgl_pool_size, 
+    //     DISPLAY_WIDTH_DEF, DISPLAY_HEIGHT_DEF, 
+    //     vgl_pool_ram_threshold, 
+    //     vgl_cdram_threshold, 
+    //     vgl_phycont_threshold, 
+    //     vgl_msaa);
+    // vglInit(vgl_pool_size);
+    vglInitExtended(0x1400000, DISPLAY_WIDTH_DEF, DISPLAY_HEIGHT_DEF, 0x1000000, SCE_GXM_MULTISAMPLE_NONE);
+    vglUseVram(GL_TRUE);
+
+    _debugPrintf_("--After vglInit--");
+    _debugPrintf_("PS VITA: Init with pool size of %.4fMB", (vgl_pool_size / (float)MEMORY_DIVISOR));
+    print_memory_info();
 
 
 
@@ -115,8 +166,12 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
     sdlInitFlags |= SDL_INIT_HAPTIC;
     sdlInitFlags |= SDL_INIT_GAMECONTROLLER;
 
+    
     res = (SDL_Init(sdlInitFlags) < 0);
     m_sdlLoaded = !res;
+
+    _debugPrintf_("--After SDL_Init--");
+    print_memory_info();
     
     const char* error = SDL_GetError();
     if(*error != '\0')
@@ -142,22 +197,67 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
 
     // m_gif.init();
 
-    _debugPrintf_("SDL has initialized?\n");
+    _debugPrintf_("SDL has initialized.\n");
 
     return res;
 }
 
+bool FrmMain::freeTextureMem() // make it take an amount of memory, someday.....
+{
+    printf("Freeing texture memory...\n");
+    StdPicture* oldest = nullptr;
+    uint32_t earliestDraw = 0;
+    StdPicture* second_oldest = nullptr;
+    uint32_t second_earliestDraw = 0;
+    for (StdPicture* poss : m_textureBank)
+    {
+        if (poss->texture && poss->lazyLoaded && (poss->lastDrawFrame+30 < currentFrame))
+        {
+            if ((oldest == nullptr) || (poss->lastDrawFrame < earliestDraw))
+            {
+                second_oldest = oldest;
+                second_earliestDraw = earliestDraw;
+                oldest = poss;
+                earliestDraw = poss->lastDrawFrame;
+            }
+            else if ((second_oldest == nullptr) || (poss->lastDrawFrame < second_earliestDraw))
+            {
+                second_oldest = poss;
+                second_earliestDraw = poss->lastDrawFrame;
+            }
+        }
+    }
+    if (oldest == nullptr) return false;
+    printf("Clearing %p, %p\n", oldest, second_oldest);
+    printf("Clearing %s, %s\n", oldest->path.c_str(), (second_oldest) ? second_oldest->path.c_str() : "");
+    lazyUnLoad(*oldest);
+    if (second_oldest) lazyUnLoad(*second_oldest);
+    return true;
+}
+
 void FrmMain::freeSDL()
 {
+    pLogDebug("<Application Closing>");
+
+    pLogDebug("GFX.unLoad");
     GFX.unLoad();
+
+    pLogDebug("clearAllTextures");
     clearAllTextures();
+
+    pLogDebug("joyCloseJoysticks");
     joyCloseJoysticks();
 
+    pLogDebug("SDL_DestroyWindow");
     if(m_window)
         SDL_DestroyWindow(m_window);
     m_window = nullptr;
 
+    pLogDebug("SDL_Quit");
     SDL_Quit();
+
+    pLogDebug("vglEnd");
+    vglEnd();
 
     // TODO: Fix "has not currently been declared"
     // GraphicsHelps::closeFreeImage();
@@ -267,28 +367,55 @@ void FrmMain::repaint()
     // paint from render target to screen.
 }
 
+
+
 /// INCOMPLETE
 StdPicture FrmMain::LoadPicture(std::string path)
 {
     StdPicture target;
-    if(!GameIsActive) return target;
+    // FIBITMAP *sourceImage;
+    stbi_uc *sourceImage;
 
+    if(!GameIsActive) return target;
     target.inited = false;
     target.path = path;
 
     if(target.path.empty()) return target;
 
+    int w = 0, h = 0, channels = 0;
+    sourceImage = stbi_load(path.c_str(), &w, &h, &channels, STBI_rgb_alpha);
+
+    if(!sourceImage)
+    {
+        pLogWarning("Error, loading of image file:\n%s", path.c_str());
+        return target;
+    }
+    else
+    {
+        pLogDebug("VITA: Successfully loaded %s. Size: %d x %d with %d channels.", path.c_str(), w, h, channels);
+    }
+
     target.inited = true;
     target.lazyLoaded = false;
 
-    // Get source raw image data.
-    // srcImage = LoadImageDataNatively();
-
     // Get width and height
-    int width = 0, height = 0;
-    loadTexture(target, width, height, 0);
+    // uint32_t w = static_cast<uint32_t>(FreeImage_GetWidth(sourceImage));
+    // uint32_t h = static_cast<uint32_t>(FreeImage_GetHeight(sourceImage));
+
+    if((w == 0) || (h == 0))
+    {
+        // FreeImage_Unload(sourceImage);
+        stbi_image_free(sourceImage);
+        pLogWarning("Error loading of image file:\n%s\nReason: Zero Image size.", path.c_str());
+        return target;
+    }
+
+    GLubyte* textura = reinterpret_cast<GLubyte*>(sourceImage);
+    loadTexture(target, w, h, textura);
 
     num_textures_loaded++;
+    // GraphicsHelps::closeImage(sourceImage);
+    stbi_image_free(sourceImage);
 
     if(!target.texture)
         printf("FAILED TO LOAD!!!! %s\n", path.c_str());
@@ -340,16 +467,41 @@ StdPicture FrmMain::lazyLoadPicture(std::string path)
 
 void FrmMain::loadTexture(StdPicture &target, uint32_t width, uint32_t height, uint8_t *RGBApixels)
 {
-    // TODO: Override StdPicture definition and change
-    //      .texture to type GLuint (OpenGL texture ID).
-    // TODO: Override m_textureBank type and change
-    //      SDL_Texture* to GLuint (OpenGL texture ID).
+    // Take our raw bytes and load them in as an OpenGL image.
+    GLuint _newTexture = 0;
+    glGenTextures(1, &_newTexture);
+    glBindTexture(GL_TEXTURE_2D, _newTexture);
 
-    // Interpret raw image data into a GL_TEXTURE_2D.
-    // Set the target.texture to the returned GLuint texture ID.
-    // Insert the texture into our bank.
+    // Nearest neighbor filtering.
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-    target.inited = false;
+    glTexImage2D(
+        GL_TEXTURE_2D,
+        0,
+        GL_RGBA,
+        width, height,
+        0,
+        GL_RGBA,
+        GL_UNSIGNED_BYTE,
+        RGBApixels
+    );
+
+    if(_newTexture != 0)
+    {
+        target.texture = _newTexture;
+        target.w = width;
+        target.h = height;
+        pLogDebug("VITA: loaded texture with GLuint %d and size %d x %d.", _newTexture, width, height);
+    }
+    else
+    {
+        pLogWarning("VITA: loadTexture: _newTexture was 0 after glGenTextures.");
+        return;
+    }
+
+    num_textures_loaded++;
+    m_textureBank.insert(_newTexture);
 }
 
 void FrmMain::lazyLoad(StdPicture &target)
@@ -359,19 +511,44 @@ void FrmMain::lazyLoad(StdPicture &target)
 
     // Try and load source image data from disk.
     // EG:
-    // sourcePixels = LoadNativeData(target.path.c_str());
-    int sourceImage = 0;
+    #if USE_STBI
+    stbi_uc* sourceImage;
+    int width = 0, height = 0, channels = 0;
+    sourceImage = stbi_load(target.path.c_str(), &width, &height, &channels, STBI_rgb_alpha);
+    #else
+    FIBITMAP* sourceImage;
+    sourceImage = GraphicsHelps::loadImage(target.path);
+    #endif
+    
 
-    int i;
-    if(!sourceImage) {
+    
+    if(!sourceImage)
+    {
         printf("[lazyLoad] Failed to load %s. Not implemented or no free memory.\n", target.path.c_str());
         target.inited = false;
         return;
     }
 
-    int width = 0, height = 0, sourcePixels = 0;
-    loadTexture(target, width, height, sourcePixels);
+#ifndef USE_STBI
+    uint32_t w = static_cast<uint32_t>(FreeImage_GetWidth(sourceImage));
+    uint32_t h = static_cast<uint32_t>(FreeImage_GetHeight(sourceImage));
+    GLubyte *textura = reinterpret_cast<GLubyte *>(FreeImage_GetBits(sourceImage));
+    loadTexture(target, w, h, textura);
+#else
+    loadTexture(target, width, height, sourceImage);
+#endif
 
+    
+
+    num_textures_loaded++;
+
+#if USE_STBI
+    stbi_image_free(uc);
+#endif
+
+    // TODO: Track free ram space? 
+    // TODO: free texture memory every so often?
+    // TODO: Why does VitaGL take up so much memory at start?
     // TODO: Do I need to track "big textures" and have them
     // split like the 3DS version?
 }
@@ -404,10 +581,10 @@ void FrmMain::deleteTexture(StdPicture &tx, bool lazyUnload)
             m_textureBank.erase(tx.texture);
 
         // Free sprite from memory.
+        glDeleteTextures(1, &tx.texture);
         
         // For good measure.
         tx.texture = 0;
-
     }
 
     if(!lazyUnload)
@@ -423,10 +600,24 @@ void FrmMain::deleteTexture(StdPicture &tx, bool lazyUnload)
 
 void FrmMain::clearAllTextures()
 {
-    // for(SDL_Texture tx : m_textureBank)
-    // {
-        // Loop and clear the textures from memory.f
-    // }
+#if DEBUG_BUILD
+    int texturesDeleted = 0;
+#endif
+    for(GLuint tx : m_textureBank)
+    {
+        if(tx != 0)
+        {
+            #if DEBUG_BUILD
+            texturesDeleted++;
+            #endif
+            
+            glDeleteTextures(1, &tx);
+        }
+    }
+
+    #if DEBUG_BUILD
+    pLogDebug("Cleared %d textures from vram.\n", texturesDeleted);
+    #endif
 
     m_textureBank.clear();
 }

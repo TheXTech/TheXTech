@@ -33,6 +33,7 @@
 #endif
 
 static char __string_buffer[128];
+static char __string_buffer2[128];
 static int __vita_debug_setup = 0;
 #endif
 
@@ -69,8 +70,8 @@ void LoggerPrivate_pLogConsole(int level, const char *label, const char *format,
 
     // va_start(arg, format);
     vsprintf(__string_buffer, format, arg);
-    sprintf(__string_buffer, "%s\n", __string_buffer);
-    debugNetPrintf(DEBUG, __string_buffer);
+    sprintf(__string_buffer2, "%s\n", __string_buffer);
+    debugNetPrintf(DEBUG, __string_buffer2);
     // debugNetPrintf(DEBUG, "\n");
     // va_end(arg);
 

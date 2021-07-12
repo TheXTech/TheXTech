@@ -63,10 +63,10 @@ bool SI_Init()
 	        pLogWarning("MixerX: Failed to initialize OGG Vorbis module");
 	    if((initFlags & MIX_INIT_OPUS) != MIX_INIT_OPUS)
 	        pLogWarning("MixerX: Failed to initialize Opus module");
-		#ifndef VITA
+#ifndef VITA
 	    if((initFlags & MIX_INIT_MP3) != MIX_INIT_MP3)
 	        pLogWarning("MixerX: Failed to initialize MP3 module");
-		#endif
+#endif
 	}
 
 	ret = Mix_OpenAudio(g_audioSetup.sampleRate,
@@ -78,7 +78,9 @@ bool SI_Init()
 	{
 	    std::string msg = fmt::format_ne("Can't open audio stream, continuing without audio: ({0})", Mix_GetError());
 	    pLogCritical(msg.c_str());
+#ifndef VITA
 	    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Sound opening error", msg.c_str(), nullptr);
+#endif
 	    return false;
 	}
 

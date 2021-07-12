@@ -190,7 +190,7 @@ public:
 #endif
     void deleteTexture(StdPicture &tx, bool lazyUnload = false);
     void clearAllTextures();
-#ifdef __3DS__
+#if defined(__3DS__) || defined(VITA)
     bool freeTextureMem();
 #endif
 
