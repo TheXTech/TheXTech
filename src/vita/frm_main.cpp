@@ -46,6 +46,10 @@
 
 #include "../frm_main.h"
 
+#ifndef NO_SDL
+#include <SDL2/SDL.h>
+#endif
+
 static unsigned int num_textures_loaded = 0;
 
 // typedef struct SDL_Point
@@ -61,24 +65,89 @@ FrmMain::FrmMain()
 
 bool FrmMain::initSDL(const CmdLineSetup_t &setup)
 {
+    bool res = false;
+    LoadLogSettings(setup.interprocess, setup.verboseLogging);
+
     if(_debugPrintf_ != 0)
     {
         _debugPrintf_("PS VITA: TODO, init vitaGL and init SDL BUT only init SDL for input and audio.");
     }
+    else
+    {
+        _debugPrintf_ = pLogWarning;
+        _debugPrintf_("PS VITA: _debugPrintf_ assigned to pLogWarning.");
+        _debugPrintf_("PS VITA: TODO, init vitaGL and init SDL BUT only init SDL for input and audio.");
+    }
 
-    return false;
+    Uint32 sdlInitFlags = 0;
+    sdlInitFlags |= SDL_INIT_TIMER;
+    sdlInitFlags |= SDL_INIT_AUDIO;
+    // sdlInitFlags |= SDL_INIT_VIDEO;
+    sdlInitFlags |= SDL_INIT_EVENTS;
+    sdlInitFlags |= SDL_INIT_JOYSTICK;
+    sdlInitFlags |= SDL_INIT_HAPTIC;
+    sdlInitFlags |= SDL_INIT_GAMECONTROLLER;
+
+    res = (SDL_Init(sdlInitFlags) < 0);
+    m_sdlLoaded = !res;
+    
+    const char* error = SDL_GetError();
+    if(*error != '\0')
+        pLogWarning("Error while SDL Init: %s", error);
+    SDL_ClearError();
+
+    // TODO: Will this fuck everything up?
+    m_window = SDL_CreateWindow("Vita", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 16, 16, SDL_WINDOW_HIDDEN);
+    if(m_window == nullptr)
+    {
+        pLogCritical("Unable to create an SDL Window!");
+        SDL_ClearError();
+        return false;
+    }
+
+    clearBuffer();
+    m_keyboardState = SDL_GetKeyboardState(nullptr);
+    updateViewport();
+    clearBuffer();
+    setTargetScreen();
+    repaint();
+    doEvents();
+
+    // m_gif.init();
+
+    _debugPrintf_("SDL has initialized?\n");
+
+    return res;
 }
 
 void FrmMain::freeSDL()
 {
     GFX.unLoad();
+    clearAllTextures();
+    joyCloseJoysticks();
+
+    if(m_window)
+        SDL_DestroyWindow(m_window);
+    m_window = nullptr;
+
+    SDL_Quit();
+
+    // TODO: Fix "has not currently been declared"
+    // GraphicsHelps::closeFreeImage();
+    pLogDebug("<Application Closed>");
+    CloseLog();
 }
 
 void FrmMain::show()
-{}
+{
+    SDL_ShowWindow(m_window);
+}
 
 void FrmMain::hide()
-{}
+{
+    SDL_HideWindow(m_window);
+    showCursor(1);
+}
 
 bool FrmMain::isWindowActive() 
 {return true;}
@@ -106,19 +175,64 @@ void FrmMain::setTargetTexture() {}
 void FrmMain::setTargetScreen() {}
 
 void FrmMain::processEvent()
-{return;}
+{
+    switch(m_event.type)
+    {
+    case SDL_QUIT:
+        showCursor(1);
+        KillIt();
+        break;
+    case SDL_JOYDEVICEADDED:
+        joyDeviceAddEvent(&m_event.jdevice);
+        break;
+    case SDL_JOYDEVICEREMOVED:
+        joyDeviceRemoveEvent(&m_event.jdevice);
+        break;
+    case SDL_WINDOWEVENT:
+        if((m_event.window.event == SDL_WINDOWEVENT_RESIZED) || (m_event.window.event == SDL_WINDOWEVENT_MOVED))
+        {
+            eventResize();
+        }
+//#ifndef __EMSCRIPTEN__
+//        else if(m_event.window.event == SDL_WINDOWEVENT_MAXIMIZED)
+//        {
+//            SDL_RestoreWindow(m_window);
+//            SetRes();
+//        }
+//#endif
+        break;
+    case SDL_KEYDOWN:
+        eventKeyDown(m_event.key);
+        eventKeyPress(m_event.key.keysym.scancode);
+        break;
+    case SDL_KEYUP:
+        eventKeyUp(m_event.key);
+        break;
+    case SDL_MOUSEBUTTONDOWN:
+        eventMouseDown(m_event.button);
+        break;
+    case SDL_MOUSEBUTTONUP:
+        eventMouseUp(m_event.button);
+        break;
+    case SDL_MOUSEMOTION:
+        eventMouseMove(m_event.motion);
+        break;
+    }
+    return;
+}
 void FrmMain::waitEvents()
-{doEvents();}
+{
+    if(SDL_WaitEventTimeout(&m_event, 1000))
+        processEvent();
+    doEvents();
+}
 
 void FrmMain::doEvents()
 {
-    // Get keys held, or just borrow code from SDL version?
-
-    // Only accept touch input for level editor.
-    if(!LevelEditor)
-        return;
-
-    // Check for touch input on vita for the level editor.
+    while(SDL_PollEvent(&m_event))
+    {
+        processEvent();
+    }
 }
 
 void FrmMain::repaint()
@@ -594,3 +708,135 @@ Uint8 FrmMain::getKeyState(SDL_Scancode key)
         return m_keyboardState[key];
     return 0;
 }
+
+
+/////// SDL REIMPLEMENTATION KEY EVENTS
+void FrmMain::eventKeyDown(SDL_KeyboardEvent &evt)
+{
+    int KeyCode = evt.keysym.scancode;
+    inputKey = KeyCode;
+
+    // bool ctrlF = ((evt.keysym.mod & KMOD_CTRL) != 0 && evt.keysym.scancode == SDL_SCANCODE_F);
+    // bool altEnter = ((evt.keysym.mod & KMOD_ALT) != 0 && (evt.keysym.scancode == SDL_SCANCODE_RETURN || evt.keysym.scancode == SDL_SCANCODE_KP_ENTER));
+}
+
+void FrmMain::eventDoubleClick()
+{
+    return;
+}
+
+void FrmMain::eventKeyPress(SDL_Scancode KeyASCII)
+{
+    switch(KeyASCII)
+    {
+    case SDL_SCANCODE_A: CheatCode('a'); break;
+    case SDL_SCANCODE_B: CheatCode('b'); break;
+    case SDL_SCANCODE_C: CheatCode('c'); break;
+    case SDL_SCANCODE_D: CheatCode('d'); break;
+    case SDL_SCANCODE_E: CheatCode('e'); break;
+    case SDL_SCANCODE_F: CheatCode('f'); break;
+    case SDL_SCANCODE_G: CheatCode('g'); break;
+    case SDL_SCANCODE_H: CheatCode('h'); break;
+    case SDL_SCANCODE_I: CheatCode('i'); break;
+    case SDL_SCANCODE_J: CheatCode('j'); break;
+    case SDL_SCANCODE_K: CheatCode('k'); break;
+    case SDL_SCANCODE_L: CheatCode('l'); break;
+    case SDL_SCANCODE_M: CheatCode('m'); break;
+    case SDL_SCANCODE_N: CheatCode('n'); break;
+    case SDL_SCANCODE_O: CheatCode('o'); break;
+    case SDL_SCANCODE_P: CheatCode('p'); break;
+    case SDL_SCANCODE_Q: CheatCode('q'); break;
+    case SDL_SCANCODE_R: CheatCode('r'); break;
+    case SDL_SCANCODE_S: CheatCode('s'); break;
+    case SDL_SCANCODE_T: CheatCode('t'); break;
+    case SDL_SCANCODE_U: CheatCode('u'); break;
+    case SDL_SCANCODE_V: CheatCode('v'); break;
+    case SDL_SCANCODE_W: CheatCode('w'); break;
+    case SDL_SCANCODE_X: CheatCode('x'); break;
+    case SDL_SCANCODE_Y: CheatCode('y'); break;
+    case SDL_SCANCODE_Z: CheatCode('z'); break;
+    case SDL_SCANCODE_1: CheatCode('1'); break;
+    case SDL_SCANCODE_2: CheatCode('2'); break;
+    case SDL_SCANCODE_3: CheatCode('3'); break;
+    case SDL_SCANCODE_4: CheatCode('4'); break;
+    case SDL_SCANCODE_5: CheatCode('5'); break;
+    case SDL_SCANCODE_6: CheatCode('6'); break;
+    case SDL_SCANCODE_7: CheatCode('7'); break;
+    case SDL_SCANCODE_8: CheatCode('8'); break;
+    case SDL_SCANCODE_9: CheatCode('9'); break;
+    case SDL_SCANCODE_0: CheatCode('0'); break;
+    default: CheatCode(' '); break;
+    }
+}
+
+void FrmMain::eventKeyUp(SDL_KeyboardEvent &evt)
+{
+    UNUSED(evt);
+}
+
+void FrmMain::eventMouseDown(SDL_MouseButtonEvent &event)
+{
+    if(event.button == SDL_BUTTON_LEFT)
+    {
+        MenuMouseDown = true;
+        MenuMouseMove = true;
+        if(LevelEditor || MagicHand || TestLevel)
+            EditorControls.MouseClick = true;
+    }
+    else if(event.button == SDL_BUTTON_RIGHT)
+    {
+        MenuMouseBack = true;
+        if(LevelEditor || MagicHand || TestLevel)
+        {
+            optCursor.current = OptCursor_t::LVL_SELECT;
+            MouseMove(float(MenuMouseX), float(MenuMouseY));
+            SetCursor();
+        }
+    }
+    else if(event.button == SDL_BUTTON_MIDDLE)
+    {
+        if(LevelEditor || MagicHand || TestLevel)
+        {
+            optCursor.current = OptCursor_t::LVL_ERASER;
+            MouseMove(float(MenuMouseX), float(MenuMouseY));
+            SetCursor();
+        }
+    }
+}
+
+void FrmMain::eventMouseMove(SDL_MouseMotionEvent &event)
+{
+    SDL_Point p = MapToScr(event.x, event.y);
+    MenuMouseX = p.x;// int(event.x * ScreenW / ScaleWidth);
+    MenuMouseY = p.y;//int(event.y * ScreenH / ScaleHeight);
+    MenuMouseMove = true;
+    if(LevelEditor || MagicHand || TestLevel)
+    {
+        EditorCursor.X = p.x;
+        EditorCursor.Y = p.y;
+        MouseMove(EditorCursor.X, EditorCursor.Y, true);
+        MouseRelease = true;
+    }
+}
+
+void FrmMain::eventMouseUp(SDL_MouseButtonEvent &event)
+{
+    bool doubleClick = false;
+    MenuMouseDown = false;
+    MenuMouseRelease = true;
+    if(LevelEditor || MagicHand || TestLevel)
+        EditorControls.MouseClick = false;
+
+    if(event.button == SDL_BUTTON_LEFT)
+    {
+        doubleClick = (m_lastMousePress + 300) >= SDL_GetTicks();
+        m_lastMousePress = SDL_GetTicks();
+    }
+
+    if(doubleClick)
+    {
+        eventDoubleClick();
+        m_lastMousePress = 0;
+    }
+}
+///////

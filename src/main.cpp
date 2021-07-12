@@ -175,11 +175,7 @@ int main(int argc, char**argv)
 
     OpenConfig_preSetup();
 
-#if VITA
-    g_videoSettings.scaleDownAllTextures = true;
-    pLogDebug("\n\n\n\n\n----FORCING  g_videoSettings.scaleDownAllTextures TO TRUE FOR PS VITA\n\n\n");
-    frmMain._debugPrintf_ = pLogDebug;
-#endif
+
 
     testPlayer.fill(Player_t());
     testPlayer[1].Character = 1;
@@ -439,6 +435,12 @@ int main(int argc, char**argv)
 #endif // #ifndef __3DS__
 
     initGameInfo();
+
+#if VITA
+    g_videoSettings.scaleDownAllTextures = true;
+    pLogDebug("\n\n\n\n\n----FORCING  g_videoSettings.scaleDownAllTextures TO TRUE FOR PS VITA\n\n\n");
+    frmMain._debugPrintf_ = pLogDebug;
+#endif
 
     // set this flag before SDL initialization to allow game be quit when closing a window before a loading process will be completed
     GameIsActive = true;
