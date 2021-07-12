@@ -169,7 +169,7 @@ public:
      */
     void setTargetScreen();
 
-#ifndef __3DS__
+#if !defined(__3DS__) && !defined(VITA)
     StdPicture LoadPicture(std::string path, std::string maskPath = std::string(), std::string maskFallbackPath = std::string());
     StdPicture lazyLoadPicture(std::string path, std::string maskPath = std::string(), std::string maskFallbackPath = std::string());
 #else
@@ -194,7 +194,7 @@ public:
     // these operate in render coordinates on 3DS and should not be called by external units
 private:
     // Similar to BitBlt, but without masks, just draw a texture or it's fragment!
-#ifdef __3DS__
+#if defined(__3DS__) || defined(VITA)
     void renderTexturePrivate(float xDst, float yDst, float wDst, float hDst,
                              StdPicture &tx,
                              float xSrc, float ySrc, float wSrc, float hSrc,
