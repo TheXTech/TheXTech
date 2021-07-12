@@ -21,7 +21,7 @@ if(DEFINED ENV{VITASDK})
     set(VITA_VERSION  "01.00")
 
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -I../src -fcompare-debug-second") # -std=c++11
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I../src -fcompare-debug-second -std=gnu++11 -fno-optimize-sibling-calls -Wno-class-conversion") # 
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I../src -fpermissive -fcompare-debug-second -std=gnu++11 -fno-optimize-sibling-calls -Wno-class-conversion") # 
     set(LDFLAGS "${LDFLAGS},-Wl,-V")
 
     cmake_policy(SET CMP0077 OLD)
@@ -652,7 +652,7 @@ if(VITA)
     )
 
     target_compile_definitions(thextech PRIVATE -DPGE_NO_THREADING)
-    # target_compile_definitions(thextech PRIVATE -DNO_SCREENSHOT)
+    target_compile_definitions(thextech PRIVATE -DNO_SCREENSHOT)
     # target_compile_definitions(thextech PRIVATE -DNO_SDL)
     # target_compile_definitions(thextech PRIVATE -DLOW_MEM)
     # target_compile_definitions(thextech PRIVATE -DFIXED_RES)
@@ -769,7 +769,7 @@ elseif(WIN32)
 elseif(VITA)
     install(TARGETS thextech DESTINATION .)
     vita_create_self(${THEXTECH_EXECUTABLE_NAME}.self output/bin/thextech UNSAFE)
-    vita_create_vpk(${THEXTECH_EXECUTABLE_NAME}.vpk ${VITA_TITLEID} output/bin/thextech
+    vita_create_vpk(${THEXTECH_EXECUTABLE_NAME}.vpk ${VITA_TITLEID} ${THEXTECH_EXECUTABLE_NAME}.self
         VERSION ${VITA_VERSION}
         NAME ${VITA_APP_NAME}
     )
