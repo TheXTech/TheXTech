@@ -65,7 +65,9 @@ class FrmMain
     SDL_Texture  *m_recentTarget = nullptr;
     std::set<SDL_Texture *> m_textureBank;
 #else
+    // VITA SPECIFIC
     std::set<GLuint> m_textureBank;
+    GLuint m_renderTarget;
     uint32_t currentFrame = 0;
     
 #endif

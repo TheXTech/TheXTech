@@ -51,6 +51,8 @@
 #endif
 
 static unsigned int num_textures_loaded = 0;
+static const unsigned int vgl_pool_size = 0x100000;
+static unsigned int ram_pool_count = vgl_pool_size;
 
 // typedef struct SDL_Point
 // {
@@ -63,10 +65,35 @@ FrmMain::FrmMain()
     ScaleHeight = 544;
 }
 
+#include <psp2/kernel/sysmem.h>
+
+static inline void print_memory_info()
+{
+    SceKernelFreeMemorySizeInfo info;
+    info.size = sizeof(SceKernelFreeMemorySizeInfo);
+    if(sceKernelGetFreeMemorySize(&info) < 0)
+    {
+        pLogCritical("sceKernelGetFreeMemorySize returned less than 0.");
+        return;
+    }
+
+    pLogDebug(
+        "PS VITA MEMORY STATS\nUSER_RW MEMORY FREE: %d\nUSER_CDRAM_RW: %d\nUSER_MAIN_PHYCONT_*_RW: %d\n\n",
+        info.size_user,
+        info.size_cdram,
+        info.size_phycont
+    );
+}
+
 bool FrmMain::initSDL(const CmdLineSetup_t &setup)
 {
     bool res = false;
     LoadLogSettings(setup.interprocess, setup.verboseLogging);
+
+    vglInit(vgl_pool_size);
+    _debugPrintf_("PS VITA: Init with pool size of %d\n", vgl_pool_size);
+
+
 
     if(_debugPrintf_ != 0)
     {
@@ -652,6 +679,10 @@ void FrmMain::renderTextureScale(int xDst, int yDst, int wDst, int hDst, StdPict
         0.f, nullptr, SDL_FLIP_NONE,
         red, green, blue, alpha);
 }
+
+///// MORE BORING, FAIRLY CROSS IMPLEMENTATION DEPENDENT STUFF HERE
+///// MORE BORING, FAIRLY CROSS IMPLEMENTATION DEPENDENT STUFF HERE
+///// MORE BORING, FAIRLY CROSS IMPLEMENTATION DEPENDENT STUFF HERE
 
 size_t FrmMain::lazyLoadedBytes()
 {

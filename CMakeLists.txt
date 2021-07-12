@@ -624,6 +624,7 @@ if(VITA)
         jpeg
         vitaGL
         debugnet
+        mathneon
         SceCtrl_stub
         SceMotion_stub
         SceHid_stub
@@ -646,6 +647,7 @@ if(VITA)
         SceTouch_stub
         SceAudio_stub
         vitashark
+        SceShaccCg_stub
         SceSysmem_stub
         SceIofilemgr_stub
         SceKernelThreadMgr_stub
