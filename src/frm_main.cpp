@@ -1196,6 +1196,7 @@ void FrmMain::lazyLoad(StdPicture &target)
 
     if(g_videoSettings.scaleDownAllTextures)
     {
+        pLogDebug("VITA CAUSE: Scaling down textures");
         target.w_orig = int(w);
         target.h_orig = int(h);
         w /= 2;

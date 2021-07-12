@@ -228,7 +228,6 @@ static void restoreWorldBackupTextures()
     g_defaultWorldGfxBackup.clear();
 }
 
-
 void LoadGFX()
 {
     std::string p;

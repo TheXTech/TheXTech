@@ -250,9 +250,22 @@ static int pgeToAndroidLL(PGE_LogLevel level)
 }
 #endif
 
+
+
 static void pLogGeneric(PGE_LogLevel level, const char *label, const char *format, va_list arg)
 {
     va_list arg_in;
+
+#if defined(VITA)
+    // TODO: Clean this shit up.
+    // debugNetInit
+    va_copy(arg_in, arg);
+    // va_start(arg, format);
+    vsprintf(__string_buffer, format, argptr);
+    debugNetPrintf(DEBUG, __string_buffer);
+    // va_end(argptr);
+    return;
+#endif
 
 #if !defined(__ANDROID__)
     if(LogWriter::m_enabledStdOut && LogWriter::m_enabledVerboseLogs)
