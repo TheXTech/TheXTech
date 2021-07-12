@@ -24,8 +24,14 @@
 
 #ifdef VITA
 #include <debugnet.h>
-#define ip_server "192.168.0.4"
-#define port_server 18194
+#ifndef NETDBG_IP_SERVER
+#define NETDBG_IP_SERVER "192.168.0.4"
+#endif
+
+#ifndef NETDBG_PORT_SERVER
+#define NETDBG_PORT_SERVER 18194
+#endif
+
 static char __string_buffer[128];
 static int __vita_debug_setup = 0;
 #endif
@@ -58,14 +64,14 @@ void LoggerPrivate_pLogConsole(int level, const char *label, const char *format,
 {
     if(__vita_debug_setup == 0)
     {
-        int ret = debugNetInit(ip_server, port_server, DEBUG);
-
+        int ret = debugNetInit(NETDBG_IP_SERVER, NETDBG_PORT_SERVER, DEBUG);
     }
 
     // va_start(arg, format);
     vsprintf(__string_buffer, format, arg);
+    sprintf(__string_buffer, "%s\n", __string_buffer);
     debugNetPrintf(DEBUG, __string_buffer);
-    debugNetPrintf(DEBUG, "\n");
+    // debugNetPrintf(DEBUG, "\n");
     // va_end(arg);
 
     (void)level;

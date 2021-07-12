@@ -46,6 +46,8 @@
 
 #include "../frm_main.h"
 
+static unsigned int num_textures_loaded = 0;
+
 // typedef struct SDL_Point
 // {
 //     float x, y;
@@ -59,6 +61,11 @@ FrmMain::FrmMain()
 
 bool FrmMain::initSDL(const CmdLineSetup_t &setup)
 {
+    if(_debugPrintf_ != 0)
+    {
+        _debugPrintf_("PS VITA: TODO, init vitaGL and init SDL BUT only init SDL for input and audio.");
+    }
+
     return false;
 }
 
@@ -137,7 +144,7 @@ StdPicture FrmMain::LoadPicture(std::string path)
     // srcImage = LoadImageDataNatively();
 
     // Get width and height
-    int width = 0, int height = 0;
+    int width = 0, height = 0;
     loadTexture(target, width, height, 0);
 
     num_textures_loaded++;
@@ -212,6 +219,7 @@ void FrmMain::lazyLoad(StdPicture &target)
     // Try and load source image data from disk.
     // EG:
     // sourcePixels = LoadNativeData(target.path.c_str());
+    int sourceImage = 0;
 
     int i;
     if(!sourceImage) {
@@ -235,11 +243,11 @@ void FrmMain::lazyUnLoad(StdPicture &target)
     deleteTexture(target, true);
 }
 
-SDL_Point MapToScr(int x, int y)
+SDL_Point FrmMain::MapToScr(int x, int y)
 {
-    return {
-        static_cast<int>((static_cast<float>(x) - offset_x) / viewport_scale_x),
-        static_cast<int>((static_cast<float>(y) - offset_y) / viewport_scale_y)
+    return SDL_Point {
+        static_cast<int>((static_cast<float>(x) - this->offset_x) / this->viewport_scale_x),
+        static_cast<int>((static_cast<float>(y) - this->offset_y) / this->viewport_scale_y)
     };
 }
 
@@ -257,7 +265,7 @@ void FrmMain::deleteTexture(StdPicture &tx, bool lazyUnload)
         // Free sprite from memory.
         
         // For good measure.
-        tx.texture = nullptr;
+        tx.texture = 0;
 
     }
 
@@ -316,8 +324,8 @@ void FrmMain::renderRectBR(int _left, int _top, int _right, int _bottom, float r
 void FrmMain::renderTexturePrivate(float xDst, float yDst, float wDst, float hDst,
                              StdPicture &tx,
                              float xSrc, float ySrc, float wSrc, float hSrc,
-                             float rotateAngle = 0.f, SDL_Point *center = nullptr, unsigned int flip = SDL_FLIP_NONE,
-                             float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f)
+                             float rotateAngle, SDL_Point *center, unsigned int flip,
+                             float red, float green, float blue, float alpha)
 {
     // This is mostly lifted from the 3DS version so thank you, ds-sloth <3
 
@@ -332,7 +340,7 @@ void FrmMain::renderTexturePrivate(float xDst, float yDst, float wDst, float hDs
 
     if(!tx.texture)
         return;
-    if(xDst > viewport_w || yDst > viewport_h)
+    if(xDst > this->viewport_w || yDst > this->viewport_h)
         return;
 
     unsigned int mode = 0;
@@ -497,7 +505,7 @@ void FrmMain::renderTextureScale(double xDst, double yDst, double wDst, double h
 void FrmMain::renderTexture(double xDst, double yDst, double wDst, double hDst,
                             StdPicture &tx,
                             int xSrc, int ySrc,
-                            float red, float green, float blue, float alpha)
+                            float red = 1.f, float green, float blue, float alpha)
 {
     float w = ROUNDDIV2(wDst);
     float h = ROUNDDIV2(hDst);
@@ -538,4 +546,51 @@ size_t FrmMain::lazyLoadedBytes()
 
 void FrmMain::lazyLoadedBytesReset()
 {
+}
+
+void FrmMain::clearBuffer()
+{
+    // Clear the render buffer texture
+    return;
+}
+
+void FrmMain::updateViewport()
+{
+    resetViewport();
+    offsetViewport(0, 0);
+}
+
+void FrmMain::resetViewport()
+{
+    setViewport(0, 0, ScreenW, ScreenH);
+}
+
+void FrmMain::setViewport(int x, int y, int w, int h)
+{
+    int offset_x = viewport_offset_x - viewport_x;
+    int offset_y = viewport_offset_y - viewport_y;
+    viewport_x = x/2;
+    viewport_y = y/2;
+    viewport_w = w/2;
+    viewport_h = h/2;
+    viewport_offset_x = viewport_x + offset_x;
+    viewport_offset_y = viewport_y + offset_y;
+}
+
+void FrmMain::offsetViewport(int x, int y)
+{
+    viewport_offset_x = viewport_x+x/2;
+    viewport_offset_y = viewport_y+y/2;
+}
+
+SDL_Window *FrmMain::getWindow()
+{
+    return m_window;
+}
+
+Uint8 FrmMain::getKeyState(SDL_Scancode key)
+{
+    if(m_keyboardState)
+        return m_keyboardState[key];
+    return 0;
 }

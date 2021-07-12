@@ -168,16 +168,18 @@ int main(int argc, char**argv)
 #if !defined(__3DS__) && !defined(VITA)
     CrashHandler::initSigs();
 #endif
-#if VITA
-    g_videoSettings.scaleDownAllTextures = true;
-    pLogDebug("\n\n\n\n\n----FORCING  g_videoSettings.scaleDownAllTextures TO TRUE FOR PS VITA\n\n\n");
-#endif
     
 
     AppPathManager::initAppPath();
     AppPath = AppPathManager::assetsRoot();
 
     OpenConfig_preSetup();
+
+#if VITA
+    g_videoSettings.scaleDownAllTextures = true;
+    pLogDebug("\n\n\n\n\n----FORCING  g_videoSettings.scaleDownAllTextures TO TRUE FOR PS VITA\n\n\n");
+    frmMain._debugPrintf_ = pLogDebug;
+#endif
 
     testPlayer.fill(Player_t());
     testPlayer[1].Character = 1;

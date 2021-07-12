@@ -58,8 +58,8 @@ class FrmMain
     bool m_headless = false;
     std::string m_windowTitle;
 #ifndef NO_SDL
-#ifndef VITA
     SDL_Window *m_window = nullptr;
+#ifndef VITA
     SDL_Renderer *m_gRenderer = nullptr;
     SDL_Texture  *m_tBuffer = nullptr;
     SDL_Texture  *m_recentTarget = nullptr;
@@ -101,6 +101,10 @@ class FrmMain
     size_t m_lazyLoadedBytes = 0;
 
 public:
+#ifdef VITA
+    // TODO: Make this private and put in proper getters/setters.
+    void (*_debugPrintf_)(const char*, ...);    
+#endif
     int ScaleWidth = 800;
     int ScaleHeight = 600;
 
