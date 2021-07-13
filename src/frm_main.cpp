@@ -73,8 +73,15 @@ static SDL_bool IsFullScreen(SDL_Window *win)
 
 FrmMain::FrmMain()
 {
+#ifdef VITA
+    ScaleWidth = 960;
+    ScaleHeight = 544;
+    viewport_w = 960;
+    viewport_h = 544;
+#else
     ScaleWidth = ScreenW;
     ScaleHeight = ScreenH;
+#endif
 }
 
 SDL_Window *FrmMain::getWindow()
