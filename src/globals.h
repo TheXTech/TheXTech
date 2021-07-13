@@ -50,7 +50,7 @@ typedef uint32_t Uint32;
 
 #include "global_constants.h"
 #include "controls.h"
-#if VITA
+#ifdef VITA
 #include "video.h"
 extern VideoSettings_t g_videoSettings;
 #endif

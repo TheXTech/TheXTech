@@ -69,7 +69,7 @@ struct StdPicture
 
     bool lazyLoaded = false;
 
-#if !defined(__3DS__) && !defined(VITA)
+#if !defined(__3DS__) && (!defined(VITA) || defined(USE_SDL_VID))
     std::vector<char> raw;
     std::vector<char> rawMask;
     bool isMaskPng = false;
@@ -89,7 +89,7 @@ struct StdPicture
     C2D_SpriteSheet texture3 = nullptr;
     C2D_Image image3;
 #endif
-#ifdef VITA
+#if defined(VITA) && !defined(USE_SDL_VID)
     std::string path = "";
     uint32_t lastDrawFrame = 0;
     GLuint texture = 0;

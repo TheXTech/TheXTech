@@ -1,4 +1,4 @@
-#if VITA
+#ifdef VITA
 #include "dirman_vita.h"
 int dirfd(DIR *dirp)
     {

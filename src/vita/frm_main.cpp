@@ -24,7 +24,7 @@
  */
 
 #ifndef USE_STBI
-// #define USE_STBI
+#define USE_STBI
 #endif
 
 #include "../globals.h"
@@ -77,6 +77,8 @@
 #define STBI_ONLY_PNM
 #define STBI_ONLY_TGA
 #include "stb_image.h"
+#define STB_IMAGE_RESIZE_IMPLEMENTATION
+#include "stb_image_resize.h"
 #endif
 #endif
 
@@ -127,6 +129,12 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
 {
     bool res = false;
     LoadLogSettings(setup.interprocess, setup.verboseLogging);
+
+#ifdef USE_STBI
+    _debugPrintf_("VITA: Using stb_image for graphics loading!");
+#else
+    _debugPrintf_("VITA: Using libFreeImageLite for graphics loading.");
+#endif
 
     _debugPrintf_("--Before vglInit--");
     print_memory_info();
@@ -386,7 +394,67 @@ void FrmMain::repaint()
     vglSwapBuffers(GL_FALSE);
 }
 
+#define align_mem(addr, align) (((addr) + ((align) - 1)) & ~((align) - 1))
 
+static SceUID _stb_resize_cache = 0;
+static size_t _stb_resize_cache_size = 0;
+static inline SceUID _allocate_resize_cache(size_t size, unsigned char** output_mem)
+{
+    int ret = 0;
+    uint32_t mem_type = SCE_KERNEL_MEMBLOCK_TYPE_USER_CDRAM_RW;
+    if (mem_type == SCE_KERNEL_MEMBLOCK_TYPE_USER_CDRAM_RW)
+		size = align_mem(size, 256 * 1024);
+	else
+		size = align_mem(size, 4 * 1024);
+
+    if(_stb_resize_cache == 0)
+    {
+        _stb_resize_cache = 
+            sceKernelAllocMemBlock("stb_resize_cache", 
+                mem_type, 
+                size, 
+                0);
+        if(_stb_resize_cache < 0)
+        {
+            pLogWarning("   Unable to alloc memblock of size %d of type SCE_KERNEL_MEMBLOCK_TYPE_USER_RX\n(returned %d)", size, _stb_resize_cache);
+            return -1;
+        }
+        else
+        {
+            pLogWarning("   Allocated %d successfully, thank you sceKernelAllocMemBlock.", size);
+            ret = sceKernelGetMemBlockBase(_stb_resize_cache, output_mem);
+            pLogWarning("   sceKernelGetMemBlockBase(%d, %p): 0x%d\noutput_mem addr: %p", _stb_resize_cache, output_mem, ret, *output_mem);
+            if(ret != 0) {
+                return -1;
+            }
+
+            _stb_resize_cache_size = size;
+        }
+        return _stb_resize_cache;
+    }
+    else
+    {
+        // TODO: Re-alloc
+        pLogDebug("     _stb_resize_cache already contains a memory block of size %d", _stb_resize_cache_size);
+        ret = sceKernelGetMemBlockBase(_stb_resize_cache, output_mem);
+        if(ret != 0) 
+        {
+            pLogWarning("   Unable to retrieve MEM BLOCK with SceUID %d", _stb_resize_cache);
+            return -1;
+        }
+        else
+        {
+            pLogWarning("   (EXISTING) sceKernelGetMemBlockBase(%d, %p): 0x%d\noutput_mem addr: %p", _stb_resize_cache, output_mem, ret, *output_mem);
+            return _stb_resize_cache;
+        }
+    }
+
+    return 0;
+}
+
+#ifndef USE_STBI_RESIZE
+#define USE_STBI_RESIZE
+#endif
 
 /// INCOMPLETE
 StdPicture FrmMain::LoadPicture(std::string path)
@@ -397,8 +465,6 @@ StdPicture FrmMain::LoadPicture(std::string path)
 #else
     FIBITMAP *sourceImage;
 #endif
-    
-    
 
     if(!GameIsActive) return target;
     target.inited = false;
@@ -419,6 +485,53 @@ StdPicture FrmMain::LoadPicture(std::string path)
         pLogWarning("Error loading of image file:\n%s\nReason: Zero Image size.", path.c_str());
         return target;
     }
+#ifdef USE_STBI_RESIZE
+    else
+    {
+        pLogDebug("VITA: Attempting stb_image resizing....");
+        size_t _cache_size = ((w / h) * channels) * ((h / 2) * channels) * channels;
+        
+        stbi_uc *output_pixels = nullptr;
+        SceUID cache = _allocate_resize_cache(_cache_size, &output_pixels);
+        
+        if(cache > 0)
+        {
+            pLogDebug("[LoadPicture] VITA: Cache: %ld starting addr %p", cache, output_pixels);
+        }
+        else
+        {
+            pLogDebug("VITA: malloc (for now) cache with sizeof %d", _cache_size);
+            *output_pixels = malloc(_cache_size);
+        }
+        
+        if(stbir_resize_uint8(sourceImage, w, h, 0,
+                               output_pixels, w / 2, h / 2, 0, channels) == 0)
+        {
+            pLogWarning("Error resizing stbi_uc: stbir_resize_uint8 returned 0.");
+            return target;
+        }
+
+        if(output_pixels == nullptr)
+        {
+            pLogWarning("Error resizing stbi_uc: output_pixels is nullptr.");
+            return target;   
+        }
+
+        stbi_image_free(sourceImage);
+        sourceImage = output_pixels;
+        
+        if(sourceImage == nullptr)
+        {
+            pLogWarning("Error: sourceImage is nullptr after setting to output_pixels ptr.");
+            return target;
+        }
+
+        w = w / 2;
+        h = h / 2;
+        // target.w = w / 2;
+        // target.h = h / 2;
+    }
+#endif
 #else
     sourceImage = GraphicsHelps::loadImage(path);
     if(sourceImage == nullptr)
@@ -444,6 +557,7 @@ StdPicture FrmMain::LoadPicture(std::string path)
 
     if(!sourceImage)
     {
+        pLogDebug("Error");
         pLogWarning("Error, loading of image file:\n%s", path.c_str());
         return target;
     }
@@ -461,7 +575,9 @@ StdPicture FrmMain::LoadPicture(std::string path)
     num_textures_loaded++;
 
     #ifdef USE_STBI
+    #ifndef USE_STBI_RESIZE
     stbi_image_free(sourceImage);
+    #endif
     #else
     GraphicsHelps::closeImage(sourceImage);
     #endif
@@ -967,10 +1083,7 @@ void FrmMain::updateViewport()
 
 void FrmMain::resetViewport()
 {
-
-
-
-#if VITA
+#ifdef VITA
     pLogDebug("VITA: Reset view port to [%d x %d]", ScreenW, ScreenH);
 #endif
     setViewport(0, 0, ScreenW, ScreenH);
@@ -1001,7 +1114,7 @@ void FrmMain::setViewport(int x, int y, int w, int h)
 
 // TODO: Take care of this proper. viewport_w and viewport_h are absurdly
 // large values on the Vita, which is no doubt why things don't look right?
-#if VITA
+#ifdef VITA
     pLogDebug("VITA: Update view port to [%d, %d %dx%d]\nFinal: %d, %.2f %d x %d", x, y, w, h, 0, (y - (h / (float)2)), viewport_w, viewport_h);
 #endif
 
@@ -1011,7 +1124,7 @@ void FrmMain::setViewport(int x, int y, int w, int h)
 
 void FrmMain::offsetViewport(int x, int y)
 {
-#if VITA
+#ifdef VITA
     pLogDebug("VITA: Offset viewport by [%d, %d]", x, y);
 #endif
     viewport_offset_x = viewport_x+x/2;

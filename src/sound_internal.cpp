@@ -40,7 +40,7 @@ static const int maxSfxChannels = 91;
 bool SI_Init()
 {
 	int ret;
-	#if VITA
+	#ifdef VITA
 	const int initFlags = MIX_INIT_MOD|MIX_INIT_FLAC|MIX_INIT_OGG|MIX_INIT_OPUS;
 	#else
 	const int initFlags = MIX_INIT_MID|MIX_INIT_MOD|MIX_INIT_FLAC|MIX_INIT_OGG|MIX_INIT_OPUS|MIX_INIT_MP3;

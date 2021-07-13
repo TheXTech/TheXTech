@@ -27,7 +27,7 @@ DEALINGS IN THE SOFTWARE.
 #include <limits.h>
 #include <sys/types.h>
 
-#if VITA
+#ifdef VITA
 #include <dirent.h>
 #include <sys/stat.h>
 #else
@@ -38,7 +38,7 @@ DEALINGS IN THE SOFTWARE.
 #include <unistd.h>
 #include <memory.h>
 
-#if VITA
+#ifdef VITA
 #include "dirman_vita.h"
 #endif
 

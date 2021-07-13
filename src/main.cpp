@@ -39,7 +39,7 @@ uint32_t __stacksize__ = 0x00020000;
 #endif
 #endif
 
-#if VITA
+#ifdef VITA
 #include <tclap/CmdLine.h>
 int _newlib_heap_size_user = 128 * 1024 * 1024;
 #endif
@@ -152,7 +152,7 @@ static void strToPlayerSetup(int player, const std::string &setupString)
     }
 }
 
-#if VITA
+#ifdef VITA
 #include <Logger/logger.h>
 #endif
 
@@ -436,7 +436,7 @@ int main(int argc, char**argv)
 
     initGameInfo();
 
-#if VITA
+#ifdef VITA
     g_videoSettings.scaleDownAllTextures = true;
     pLogDebug("\n\n\n\n\n----FORCING  g_videoSettings.scaleDownAllTextures TO TRUE FOR PS VITA\n\n\n");
     frmMain._debugPrintf_ = pLogDebug;

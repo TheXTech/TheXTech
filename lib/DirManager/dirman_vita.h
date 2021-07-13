@@ -1,7 +1,7 @@
 #ifndef __DIRMAN_VITA_H__
 #define __DIRMAN_VITA_H__
 
-#if VITA
+#ifdef VITA
 #include <psp2/io/devctl.h>
 #include <psp2/io/dirent.h>
 #include <psp2/io/fcntl.h>

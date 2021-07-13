@@ -59,7 +59,7 @@ class FrmMain
     std::string m_windowTitle;
 #ifndef NO_SDL
     SDL_Window *m_window = nullptr;
-#ifndef VITA
+#if !defined(VITA) || defined(USE_SDL_VID)
     SDL_Renderer *m_gRenderer = nullptr;
     SDL_Texture  *m_tBuffer = nullptr;
     SDL_Texture  *m_recentTarget = nullptr;
@@ -181,7 +181,7 @@ public:
      */
     void setTargetScreen();
 
-#if !defined(__3DS__) && !defined(VITA)
+#if !defined(__3DS__) || (!defined(VITA) || defined(USE_SDL_MEM))
     StdPicture LoadPicture(std::string path, std::string maskPath = std::string(), std::string maskFallbackPath = std::string());
     StdPicture lazyLoadPicture(std::string path, std::string maskPath = std::string(), std::string maskFallbackPath = std::string());
 #else
@@ -190,7 +190,7 @@ public:
 #endif
     void deleteTexture(StdPicture &tx, bool lazyUnload = false);
     void clearAllTextures();
-#if defined(__3DS__) || defined(VITA)
+#if defined(__3DS__) || (defined(VITA) && !defined(USE_SDL_MEM))
     bool freeTextureMem();
 #endif
 
@@ -206,7 +206,7 @@ public:
     // these operate in render coordinates on 3DS and should not be called by external units
 private:
     // Similar to BitBlt, but without masks, just draw a texture or it's fragment!
-#if defined(__3DS__) || defined(VITA)
+#if defined(__3DS__) || (defined(VITA) && !defined(USE_SDL_MEM))
     void renderTexturePrivate(float xDst, float yDst, float wDst, float hDst,
                              StdPicture &tx,
                              float xSrc, float ySrc, float wSrc, float hSrc,
