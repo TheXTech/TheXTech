@@ -47,37 +47,8 @@ static inline void Vita_DrawImage(
     float n_src_y = (src_y / h);
     float n_src_y2 = ((src_y + hDst) / h);
 
-
-    pLogDebug(
-        "\n\nDraw X From %.2f w: %.2f, Y from %.2f h:%.2f\nSrc X: %.2f Src Y: %.2f\nSrc W: %.2f Src H: %.2f",
-        x, wDst,
-        y, hDst,
-        src_x, src_y,
-        src_w, src_h
-    );
-    
-    pLogDebug(
-        "\n Texture Reference Size: %.2f x %.2f",
-        w,
-        h
-    );
-
-    pLogDebug("\nx1: %.2f x2: %.2f\n     y1: %.2f y2: %.2f", n_src_x, n_src_x2, n_src_y, n_src_y2);
-
     glBindTexture(GL_TEXTURE_2D, texture.texture);
     glBegin(GL_QUADS);
-
-    // glTexCoord2f(0.f, 0.f);
-    // glVertex3f(x, y, 0);
-
-    // glTexCoord2f(1.f, 0.f);
-    // glVertex3f(x + src_w, y, 0);
-
-    // glTexCoord2f(1.f, 1.0f);
-    // glVertex3f(x + src_w, y + src_h, 0);
-
-    // glTexCoord2f(0.f, 1.0f);
-    // glVertex3f(x, y + src_h, 0);
 
     glTexCoord2f(n_src_x, n_src_y);
     glColor4f(r, g, b, a);

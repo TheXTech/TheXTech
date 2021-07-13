@@ -97,6 +97,8 @@ FrmMain::FrmMain()
 {
     ScaleWidth = 960;
     ScaleHeight = 544;
+    ScreenW = 960;
+    ScreenH = 544;
 }
 
 #include <psp2/kernel/sysmem.h>
@@ -193,7 +195,7 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
     SDL_ClearError();
 
     // TODO: Will this fuck everything up?
-    m_window = SDL_CreateWindow("Vita", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 16, 16, SDL_WINDOW_HIDDEN);
+    m_window = SDL_CreateWindow("Vita", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, DISPLAY_WIDTH_DEF, DISPLAY_HEIGHT_DEF, SDL_WINDOW_HIDDEN | SDL_WINDOW_FULLSCREEN);
     if(m_window == nullptr)
     {
         pLogCritical("Unable to create an SDL Window!");
@@ -934,11 +936,18 @@ void FrmMain::updateViewport()
 
 void FrmMain::resetViewport()
 {
+#if VITA
+    pLogDebug("VITA: Reset view port to [%d x %d]", ScreenW, ScreenH);
+#endif
     setViewport(0, 0, ScreenW, ScreenH);
 }
 
 void FrmMain::setViewport(int x, int y, int w, int h)
 {
+#if VITA
+    pLogDebug("VITA: Update view port to [%d, %d %dx%d]", x, y, w, h);
+#endif
+
     int offset_x = viewport_offset_x - viewport_x;
     int offset_y = viewport_offset_y - viewport_y;
     viewport_x = x/2;
@@ -951,6 +960,9 @@ void FrmMain::setViewport(int x, int y, int w, int h)
 
 void FrmMain::offsetViewport(int x, int y)
 {
+#if VITA
+    pLogDebug("VITA: Offset viewport by [%d, %d]", x, y);
+#endif
     viewport_offset_x = viewport_x+x/2;
     viewport_offset_y = viewport_y+y/2;
 }
