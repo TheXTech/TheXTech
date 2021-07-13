@@ -1,31 +1,31 @@
 cmake_minimum_required(VERSION 3.5)
 
-if(DEFINED ENV{VITASDK})
-    message("VITASDK Defined!")
-    message("VITA BUILD!")
-    message("VITA BUILD!")
-    message("VITA BUILD!")
-    message("VITA BUILD!")
-    message("VITA BUILD!")
-    message("VITA BUILD!")
-    message("VITA BUILD!")
-    #set(CMAKE_TOOLCHAIN_FILE "$ENV{VITASDK}/share/vita.toolchain.cmake" CACHE PATH "toolchain file")
-    set(CMAKE_TOOLCHAIN_FILE "/usr/local/vitasdk/share/vita.toolchain.cmake" CACHE PATH "toolchain file")
+if(Vita)
+    if(DEFINED ENV{VITASDK})
+        message("VITASDK Defined!")
+        message("Using VITASDK toolchain at $ENV{VITASDK}/share/vita.toolchain.cmake")
+        set(CMAKE_TOOLCHAIN_FILE "$ENV{VITASDK}/share/vita.toolchain.cmake" CACHE PATH "toolchain file")
+        include("$ENV{VITASDK}/share/vita.cmake" REQUIRED)
 
-    #include("${VITASDK}/share/vita.cmake" REQUIRED)
-    include ("/usr/local/vitasdk/share/vita.cmake" REQUIRED)
+        set(VITA 1)
+        set(VITA_APP_NAME "TheXTech Vita Edition")
+        set(VITA_TITLEID  "THEXTECH00001")
+        set(VERSION  "01.00")
 
-    set(VITA 1)
-    set(VITA_APP_NAME "TheXTech Vita Edition")
-    set(VITA_TITLEID  "THEXTECH00001")
-    set(VITA_VERSION  "01.00")
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -I../src -g -fcompare-debug-second") # -std=c++11
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I../src -g -fpermissive -fcompare-debug-second -std=gnu++11 -fno-optimize-sibling-calls -Wno-class-conversion") # 
 
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -I../src -fcompare-debug-second") # -std=c++11
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I../src -fpermissive -fcompare-debug-second -std=gnu++11 -fno-optimize-sibling-calls -Wno-class-conversion") # 
-    set(LDFLAGS "${LDFLAGS},-Wl,-V")
+        cmake_policy(SET CMP0077 OLD)
 
-    cmake_policy(SET CMP0077 OLD)
-    add_compile_definitions(VITA=1)
+        add_compile_definitions(VITA=1)
+        if(USE_SDL_VID)
+            add_compile_definitions(USE_SDL_VID=1)
+        endif()
+
+        message(${CMAKE_CXX_FLAGS})
+    else()
+        message(FATAL_ERROR "Please install the VitaSDK and verify that the environment variable `VITASDK` has been defined.")
+    endif()
 endif()
 
 project(TheXTech LANGUAGES C CXX)
@@ -436,11 +436,22 @@ elseif(VITA)
     list(APPEND THEXTECH_SRC
         src/sound_internal.cpp # Vita may one day be supported by SDL_mixer_ext, but for now it just fails to initialize despite building.
         src/control/joystick.cpp # Vita is supported by SDL for joystick.
-        src/vita/frm_main.cpp # This is the only one the vita needs extra so far.
-        src/vita/vitaGL_graphics.cpp # I lied
+    )
+
+    if(USE_SDL_VID)
+        message("Using SDL video.")
+        list(APPEND THEXTECH_SRC src/frm_main.cpp)
+    else()
+        message("Using vitaGL video.")
+        list(APPEND THEXTECH_SRC src/vita/frm_main.cpp)
+    endif()
+
+    list(APPEND THEXTECH_SRC
+    src/vita/vitaGL_graphics.cpp # I lied
         src/main/cheat_code.cpp # This will change one day also.
         src/editor/text_input.cpp # This will change one day, as the Vita has its own keyboard overlay.
     )
+
 else()
     list(APPEND THEXTECH_SRC
         src/sound_internal.cpp
@@ -643,6 +654,7 @@ if(VITA)
         m
         zip
         z
+        pthread
         SceGxm_stub
         SceDisplay_stub
         SceSysmodule_stub
@@ -656,9 +668,11 @@ if(VITA)
     )
 
     target_compile_definitions(thextech PRIVATE -DPGE_NO_THREADING)
-    target_compile_definitions(thextech PRIVATE -DNO_SCREENSHOT)
+    if(NOT USE_SDL_VID)
+        target_compile_definitions(thextech PRIVATE -DNO_SCREENSHOT)
+    endif()
     # target_compile_definitions(thextech PRIVATE -DNO_SDL)
-    # target_compile_definitions(thextech PRIVATE -DLOW_MEM)
+    target_compile_definitions(thextech PRIVATE -DLOW_MEM)
     # target_compile_definitions(thextech PRIVATE -DFIXED_RES)
     target_compile_definitions(thextech PRIVATE -DPRELOAD_LEVELS)
     target_compile_definitions(thextech PRIVATE -DVITA)
