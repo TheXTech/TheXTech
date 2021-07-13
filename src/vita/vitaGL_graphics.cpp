@@ -40,11 +40,12 @@ static inline void Vita_DrawImage(
 {
     float w = texture.w / 2,
           h = texture.h / 2;
+          
 
     float n_src_x = (src_x / w);
-    float n_src_x2 = (src_x / w) + ((wDst) / w);
+    float n_src_x2 = ((src_x + wDst) / w);
     float n_src_y = (src_y / h);
-    float n_src_y2 = (src_y / h) + ((hDst) / h);
+    float n_src_y2 = ((src_y + hDst) / h);
 
 
     pLogDebug(
@@ -86,11 +87,11 @@ static inline void Vita_DrawImage(
     glColor4f(r, g, b, a);
     glVertex3f(x + src_w, y, 0);
 
-    glTexCoord2f(n_src_x2, n_src_h);
+    glTexCoord2f(n_src_x2, n_src_y2);
     glColor4f(r, g, b, a);
     glVertex3f(x + src_w, y + src_h, 0);
 
-    glTexCoord2f(n_src_x, n_src_h);
+    glTexCoord2f(n_src_x, n_src_y2);
     glColor4f(r, g, b, a);
     glVertex3f(x, y + src_h, 0);
 
