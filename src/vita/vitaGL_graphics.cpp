@@ -38,15 +38,13 @@ static inline void Vita_DrawImage(
     unsigned int flip,
     float r, float g, float b, float a)
 {
+    #ifdef USE_STBI_RESIZE
+    float w = texture.w * 2,
+          h = texture.h * 2
+    #else
     float w = texture.w / 2,
           h = texture.h / 2;
-    // src_x = src_x * 2;
-    // src_y = src_y * 2;
-    // src_w = src_w * 2;
-    // src_h = src_h * 2;
-    // hDst = hDst * 2;
-    // wDst = wDst * 2;
-          
+    #endif
 
     float n_src_x = (src_x / w);
     float n_src_x2 = ((src_x + wDst) / w);
