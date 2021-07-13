@@ -181,7 +181,7 @@ public:
      */
     void setTargetScreen();
 
-#if !defined(__3DS__) || (!defined(VITA) || defined(USE_SDL_MEM))
+#if !defined(__3DS__) && (!defined(VITA) || defined(USE_SDL_MEM))
     StdPicture LoadPicture(std::string path, std::string maskPath = std::string(), std::string maskFallbackPath = std::string());
     StdPicture lazyLoadPicture(std::string path, std::string maskPath = std::string(), std::string maskFallbackPath = std::string());
 #else
