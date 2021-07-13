@@ -499,7 +499,7 @@ static inline SceUID _allocate_resize_cache(size_t size, unsigned char** output_
         }
         else
         {
-            pLogWarning("   (EXISTING) sceKernelGetMemBlockBase(%d, %p): 0x%d\n\toutput_mem addr: %p", _stb_resize_cache, output_mem, ret, *output_mem);
+            pLogWarning("   (EXISTING) sceKernelGetMemBlockBase(%d, %p): 0x%d\n\t\toutput_mem addr: %p", _stb_resize_cache, output_mem, ret, *output_mem);
             return _stb_resize_cache;
         }
     }
@@ -541,11 +541,17 @@ StdPicture FrmMain::LoadPicture(std::string path)
 #ifdef USE_STBI_RESIZE
     else
     {
-        size_t _cache_size = ((w / 2) * channels) * ((h / 2) * channels) * channels;
-        pLogDebug("VITA: stb_image resizing, %d x %d (%d ch) = %d bytes", w, h, channels);
+        int h_w = w / 2;
+        int h_h = h / 2;
+
+        size_t _cache_size = (w * h * channels);
+        unsigned int stride = 0;
+
+        pLogDebug("VITA: stb_image resizing, %d x %d (%d ch) (%d x %d) (stride: %d) = %d bytes", w, h, channels, h_w, h_h, stride, _cache_size);
         
         stbi_uc *output_pixels = nullptr;
-        SceUID cache = _allocate_resize_cache(_cache_size, &output_pixels);
+        // SceUID cache = _allocate_resize_cache(_cache_size, &output_pixels);
+        SceUID cache = -2;
         
         if(cache > 0)
         {
@@ -554,11 +560,16 @@ StdPicture FrmMain::LoadPicture(std::string path)
         else
         {
             pLogDebug("VITA: malloc (for now) cache with sizeof %d", _cache_size);
-            *output_pixels = malloc(_cache_size);
+            output_pixels = (unsigned char*)malloc(_cache_size);
         }
         
-        if(stbir_resize_uint8(sourceImage, w, h, 0,
-                               output_pixels, w / 2, h / 2, 0, channels) == 0)
+        
+        
+        
+        // if(stbir_resize_uint8_srgb(sourceImage, w, h, 0,
+                            //    output_pixels, w / 2, h / 2, 0, (channels == 4 ? 3 : channels), (channels == 4 ? 1 : 0), 0) == 0)
+        if(stbir_resize_uint8(sourceImage, w, h, stride,
+                               output_pixels, w / 2, h / 2, stride, channels) == 0)
         {
             pLogWarning("Error resizing stbi_uc: stbir_resize_uint8 returned 0.");
             return target;
@@ -579,10 +590,16 @@ StdPicture FrmMain::LoadPicture(std::string path)
             return target;
         }
 
+        target.w_orig = w;
+        target.h_orig = h;
+        target.w = w / 2;
+        target.h = h / 2;
+        target.w_scale = float(target.w) / float(target.w_orig);
+        target.h_scale = float(target.h) / float(target.h_orig);
+
+
         w = w / 2;
         h = h / 2;
-        // target.w = w / 2;
-        // target.h = h / 2;
     }
 #endif
 #else
@@ -708,8 +725,7 @@ void FrmMain::loadTexture(StdPicture &target, uint32_t width, uint32_t height, u
     if(_newTexture != 0)
     {
         target.texture = _newTexture;
-        target.w = width;
-        target.h = height;
+        
         // pLogDebug("VITA: loaded texture with GLuint %d and size %d x %d.", _newTexture, width, height);
     }
     else
@@ -727,12 +743,17 @@ void FrmMain::lazyLoad(StdPicture &target)
     if(!target.inited || !target.lazyLoaded || target.texture)
         return;
 
+    // TODO: Half size properly.
     // Try and load source image data from disk.
     // EG:
 #ifdef USE_STBI
     stbi_uc* sourceImage;
     int width = 0, height = 0, channels = 0;
     sourceImage = stbi_load(target.path.c_str(), &width, &height, &channels, STBI_rgb_alpha);
+    target.w_orig = width;
+    target.h_orig = height;
+    target.w = width / 2;
+    target.h = height / 2;
 #else
     FIBITMAP* sourceImage;
     sourceImage = GraphicsHelps::loadImage(target.path);
@@ -1137,7 +1158,7 @@ void FrmMain::updateViewport()
 void FrmMain::resetViewport()
 {
 #ifdef VITA
-    pLogDebug("VITA: Reset view port to [%d x %d]", ScreenW, ScreenH);
+    // pLogDebug("VITA: Reset view port to [%d x %d]", ScreenW, ScreenH);
 #endif
     setViewport(0, 0, ScreenW, ScreenH);
 }
@@ -1161,14 +1182,19 @@ void FrmMain::setViewport(int x, int y, int w, int h)
         // offset_y + (h - (y + h)) * viewport_scale_y,
         0,
         y - (h / (float)1),
+    // #ifdef USE_STBI_RESIZE
+        // viewport_w / 2,
+        // viewport_h / 2
+    // #else
         viewport_w,
         viewport_h
+    // #endif
     );
 
 // TODO: Take care of this proper. viewport_w and viewport_h are absurdly
 // large values on the Vita, which is no doubt why things don't look right?
 #ifdef VITA
-    pLogDebug("VITA: Update view port to [%d, %d %dx%d]\nFinal: %d, %.2f %d x %d", x, y, w, h, 0, (y - (h / (float)2)), viewport_w, viewport_h);
+    // pLogDebug("VITA: Update view port to [%d, %d %dx%d]\nFinal: %d, %.2f %d x %d", x, y, w, h, 0, (y - (h / (float)2)), viewport_w, viewport_h);
 #endif
 
     // viewport_x = x;
