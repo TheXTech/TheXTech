@@ -23,8 +23,16 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+/// DEFINE THIS FLAG TO USE STBI IMAGE LOADER INSTEAD
+/// THEXTECH'S DEFAULT LIBFREEIMAGELOADER
 #ifndef USE_STBI
 #define USE_STBI
+#endif
+
+/// DEFINE THIS FLAG TO USE EXPERIMENTAL STBI
+/// IMAGE RESIZING (currently crashes, runs out of memory)
+#ifndef USE_STBI_RESIZE
+#define USE_STBI_RESIZE
 #endif
 
 #include "../globals.h"
@@ -64,6 +72,8 @@
 #define DISPLAY_HEIGHT_DEF 544
 #endif
 
+
+
 #ifdef USE_STBI
 #ifndef STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_IMPLEMENTATION
@@ -83,6 +93,7 @@
 #endif
 
 static unsigned int num_textures_loaded = 0;
+static const int vgl_ram_threshold = 0x2000000;//0x1000000;
 static const int vgl_pool_size = 0x100000;
 static const int vgl_cdram_threshold = 256 * 1024;
 static const int vgl_phycont_threshold = 1 * 1024 * 1024;
@@ -148,7 +159,7 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
     //     vgl_phycont_threshold, 
     //     vgl_msaa);
     // vglInit(vgl_pool_size);
-    vglInitExtended(0x1400000, DISPLAY_WIDTH_DEF, DISPLAY_HEIGHT_DEF, 0x1000000, SCE_GXM_MULTISAMPLE_NONE);
+    vglInitExtended(0x1400000, DISPLAY_WIDTH_DEF, DISPLAY_HEIGHT_DEF, vgl_ram_threshold, SCE_GXM_MULTISAMPLE_NONE);
     // vglUseVram(GL_TRUE);
 
     _debugPrintf_("--After vglInit--");
@@ -398,10 +409,42 @@ void FrmMain::repaint()
 
 static SceUID _stb_resize_cache = 0;
 static size_t _stb_resize_cache_size = 0;
+
+static inline int _realloc(SceUID* sceUID, size_t old_size, size_t new_size, uint32_t mem_type)
+{
+    size_t new_size_aligned = 0;
+
+    if(mem_type == SCE_KERNEL_MEMBLOCK_TYPE_USER_CDRAM_RW)
+        new_size_aligned = align_mem(new_size, 256 * 1024);
+    else
+        new_size_aligned = align_mem(new_size, 4 * 1024);
+
+    pLogDebug("\tRealloc UID %d from %d -> %d (%d aligned)", *sceUID, old_size, new_size, new_size_aligned);
+
+    int ret = sceKernelFreeMemBlock(*sceUID);
+    if(ret < 0)
+    {
+        pLogWarning("\tERROR: Failed to free mem block with UID %d", *sceUID);
+        return ret;
+    }
+
+    *sceUID = sceKernelAllocMemBlock("stb_resize_cache",
+                mem_type,
+                new_size,
+                0);
+    if(*sceUID < 0)
+    {
+        pLogWarning("\tUnable to alloc memblock of size %d of type %d ( returned %d )", new_size, mem_type, *sceUID);
+        return *sceUID;
+    }
+
+    return 0;
+}
+
 static inline SceUID _allocate_resize_cache(size_t size, unsigned char** output_mem)
 {
     int ret = 0;
-    uint32_t mem_type = SCE_KERNEL_MEMBLOCK_TYPE_USER_CDRAM_RW;
+    uint32_t mem_type = SCE_KERNEL_MEMBLOCK_TYPE_USER_RW;
     if (mem_type == SCE_KERNEL_MEMBLOCK_TYPE_USER_CDRAM_RW)
 		size = align_mem(size, 256 * 1024);
 	else
@@ -416,14 +459,14 @@ static inline SceUID _allocate_resize_cache(size_t size, unsigned char** output_
                 0);
         if(_stb_resize_cache < 0)
         {
-            pLogWarning("   Unable to alloc memblock of size %d of type SCE_KERNEL_MEMBLOCK_TYPE_USER_RX\n(returned %d)", size, _stb_resize_cache);
+            pLogWarning("   Unable to alloc memblock of size %d of type SCE_KERNEL_MEMBLOCK_TYPE_USER_RW\n(returned %d)", size, _stb_resize_cache);
             return -1;
         }
         else
         {
             pLogWarning("   Allocated %d successfully, thank you sceKernelAllocMemBlock.", size);
             ret = sceKernelGetMemBlockBase(_stb_resize_cache, output_mem);
-            pLogWarning("   sceKernelGetMemBlockBase(%d, %p): 0x%d\noutput_mem addr: %p", _stb_resize_cache, output_mem, ret, *output_mem);
+            pLogWarning("   sceKernelGetMemBlockBase(%d, %p): 0x%d\n\toutput_mem addr: %p", _stb_resize_cache, output_mem, ret, *output_mem);
             if(ret != 0) {
                 return -1;
             }
@@ -434,8 +477,20 @@ static inline SceUID _allocate_resize_cache(size_t size, unsigned char** output_
     }
     else
     {
-        // TODO: Re-alloc
-        pLogDebug("     _stb_resize_cache already contains a memory block of size %d", _stb_resize_cache_size);
+        pLogDebug("     _stb_resize_cache already contains a memory block of size %d (we want %d)", _stb_resize_cache_size, size);
+        if(size > _stb_resize_cache_size)
+        {
+            int realloc_ret = _realloc(&_stb_resize_cache, _stb_resize_cache_size, size, mem_type);
+            if(realloc_ret < 0)
+            {
+                pLogWarning("\tUnable to realloc stb resize cache from %d to %d. (Probably out of memory)", _stb_resize_cache_size, size);
+                return -1;
+            }
+
+            // Update size after successful re-alloc.
+            _stb_resize_cache_size = size;
+        }
+
         ret = sceKernelGetMemBlockBase(_stb_resize_cache, output_mem);
         if(ret != 0) 
         {
@@ -444,7 +499,7 @@ static inline SceUID _allocate_resize_cache(size_t size, unsigned char** output_
         }
         else
         {
-            pLogWarning("   (EXISTING) sceKernelGetMemBlockBase(%d, %p): 0x%d\noutput_mem addr: %p", _stb_resize_cache, output_mem, ret, *output_mem);
+            pLogWarning("   (EXISTING) sceKernelGetMemBlockBase(%d, %p): 0x%d\n\toutput_mem addr: %p", _stb_resize_cache, output_mem, ret, *output_mem);
             return _stb_resize_cache;
         }
     }
@@ -452,9 +507,7 @@ static inline SceUID _allocate_resize_cache(size_t size, unsigned char** output_
     return 0;
 }
 
-#ifndef USE_STBI_RESIZE
-#define USE_STBI_RESIZE
-#endif
+
 
 /// INCOMPLETE
 StdPicture FrmMain::LoadPicture(std::string path)
@@ -488,8 +541,8 @@ StdPicture FrmMain::LoadPicture(std::string path)
 #ifdef USE_STBI_RESIZE
     else
     {
-        pLogDebug("VITA: Attempting stb_image resizing....");
-        size_t _cache_size = ((w / h) * channels) * ((h / 2) * channels) * channels;
+        size_t _cache_size = ((w / 2) * channels) * ((h / 2) * channels) * channels;
+        pLogDebug("VITA: stb_image resizing, %d x %d (%d ch) = %d bytes", w, h, channels);
         
         stbi_uc *output_pixels = nullptr;
         SceUID cache = _allocate_resize_cache(_cache_size, &output_pixels);
