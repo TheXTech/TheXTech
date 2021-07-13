@@ -641,6 +641,7 @@ if(VITA)
         png
         SceCommonDialog_stub
         m
+        zip
         z
         SceGxm_stub
         SceDisplay_stub

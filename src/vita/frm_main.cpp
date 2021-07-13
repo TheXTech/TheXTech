@@ -24,7 +24,7 @@
  */
 
 #ifndef USE_STBI
-#define USE_STBI
+// #define USE_STBI
 #endif
 
 #include "../globals.h"
@@ -392,17 +392,55 @@ void FrmMain::repaint()
 StdPicture FrmMain::LoadPicture(std::string path)
 {
     StdPicture target;
-    // FIBITMAP *sourceImage;
+#ifdef USE_STBI
     stbi_uc *sourceImage;
+#else
+    FIBITMAP *sourceImage;
+#endif
+    
+    
 
     if(!GameIsActive) return target;
     target.inited = false;
     target.path = path;
 
     if(target.path.empty()) return target;
-
+#ifdef USE_STBI
     int w = 0, h = 0, channels = 0;
     sourceImage = stbi_load(path.c_str(), &w, &h, &channels, STBI_rgb_alpha);
+
+    target.inited = true;
+    target.lazyLoaded = false;
+
+    if((w == 0) || (h == 0))
+    {
+        // FreeImage_Unload(sourceImage);
+        stbi_image_free(sourceImage);
+        pLogWarning("Error loading of image file:\n%s\nReason: Zero Image size.", path.c_str());
+        return target;
+    }
+#else
+    sourceImage = GraphicsHelps::loadImage(path);
+    if(sourceImage == nullptr)
+    {
+        pLogWarning("Error loading of image file:\n%s\nReason: GraphicsHelps::loadImage returned nullptr.", path.c_str());
+        return target;
+    }
+
+    uint32_t w = static_cast<uint32_t>(FreeImage_GetWidth(sourceImage));
+    uint32_t h = static_cast<uint32_t>(FreeImage_GetHeight(sourceImage));
+    uint32_t channels = 4;
+
+    target.inited = true;
+    target.lazyLoaded = false;
+
+    if((w == 0) || (h == 0))
+    {
+        FreeImage_Unload(sourceImage);
+        pLogWarning("Error loading of image file:\n%s\nReason: Zero image size in either w or h!", path.c_str());
+        return target;
+    }
+#endif
 
     if(!sourceImage)
     {
@@ -414,27 +452,19 @@ StdPicture FrmMain::LoadPicture(std::string path)
         pLogDebug("VITA: Successfully loaded %s. Size: %d x %d with %d channels.", path.c_str(), w, h, channels);
     }
 
-    target.inited = true;
-    target.lazyLoaded = false;
-
-    // Get width and height
-    // uint32_t w = static_cast<uint32_t>(FreeImage_GetWidth(sourceImage));
-    // uint32_t h = static_cast<uint32_t>(FreeImage_GetHeight(sourceImage));
-
-    if((w == 0) || (h == 0))
-    {
-        // FreeImage_Unload(sourceImage);
-        stbi_image_free(sourceImage);
-        pLogWarning("Error loading of image file:\n%s\nReason: Zero Image size.", path.c_str());
-        return target;
-    }
+    
+    
 
     GLubyte* textura = reinterpret_cast<GLubyte*>(sourceImage);
     loadTexture(target, w, h, textura);
 
     num_textures_loaded++;
-    // GraphicsHelps::closeImage(sourceImage);
+
+    #ifdef USE_STBI
     stbi_image_free(sourceImage);
+    #else
+    GraphicsHelps::closeImage(sourceImage);
+    #endif
 
     if(!target.texture)
         printf("FAILED TO LOAD!!!! %s\n", path.c_str());
@@ -539,8 +569,6 @@ void FrmMain::lazyLoad(StdPicture &target)
     sourceImage = GraphicsHelps::loadImage(target.path);
 #endif
     
-
-    
     if(!sourceImage)
     {
         printf("[lazyLoad] Failed to load %s. Not implemented or no free memory.\n", target.path.c_str());
@@ -548,13 +576,14 @@ void FrmMain::lazyLoad(StdPicture &target)
         return;
     }
 
-#ifndef USE_STBI
+#ifdef USE_STBI
+    loadTexture(target, width, height, sourceImage);
+#else
+    
     uint32_t w = static_cast<uint32_t>(FreeImage_GetWidth(sourceImage));
     uint32_t h = static_cast<uint32_t>(FreeImage_GetHeight(sourceImage));
     GLubyte *textura = reinterpret_cast<GLubyte *>(FreeImage_GetBits(sourceImage));
     loadTexture(target, w, h, textura);
-#else
-    loadTexture(target, width, height, sourceImage);
 #endif
 
     
@@ -563,6 +592,8 @@ void FrmMain::lazyLoad(StdPicture &target)
 
 #ifdef USE_STBI
     stbi_image_free(sourceImage);
+#else
+    GraphicsHelps::closeImage(sourceImage);
 #endif
 
     // TODO: Track free ram space? 
@@ -791,7 +822,7 @@ void FrmMain::renderTexturePrivate(float xDst, float yDst, float wDst, float hDs
         // C2D_DrawImage_Custom_Rotated(*to_draw, xDst+viewport_offset_x, yDst+viewport_offset_y, wDst, hDst,
     // else
 
-    pLogDebug("Drawing %s", tx.path.c_str());
+    // pLogDebug("Drawing %s", tx.path.c_str());
     Vita_DrawImage(
         tx, 
         xDst+viewport_offset_x, // x1
@@ -936,6 +967,9 @@ void FrmMain::updateViewport()
 
 void FrmMain::resetViewport()
 {
+
+
+
 #if VITA
     pLogDebug("VITA: Reset view port to [%d x %d]", ScreenW, ScreenH);
 #endif
@@ -944,18 +978,35 @@ void FrmMain::resetViewport()
 
 void FrmMain::setViewport(int x, int y, int w, int h)
 {
-#if VITA
-    pLogDebug("VITA: Update view port to [%d, %d %dx%d]", x, y, w, h);
-#endif
+
 
     int offset_x = viewport_offset_x - viewport_x;
     int offset_y = viewport_offset_y - viewport_y;
     viewport_x = x/2;
     viewport_y = y/2;
-    viewport_w = w/2;
-    viewport_h = h/2;
+    viewport_w = w * 2;
+    viewport_h = h * 2;
     viewport_offset_x = viewport_x + offset_x;
     viewport_offset_y = viewport_y + offset_y;
+
+    
+    glViewport(
+        // offset_x + x * viewport_scale_x,
+        // offset_y + (h - (y + h)) * viewport_scale_y,
+        0,
+        y - (h / (float)1),
+        viewport_w,
+        viewport_h
+    );
+
+// TODO: Take care of this proper. viewport_w and viewport_h are absurdly
+// large values on the Vita, which is no doubt why things don't look right?
+#if VITA
+    pLogDebug("VITA: Update view port to [%d, %d %dx%d]\nFinal: %d, %.2f %d x %d", x, y, w, h, 0, (y - (h / (float)2)), viewport_w, viewport_h);
+#endif
+
+    // viewport_x = x;
+    // viewport_y = y;
 }
 
 void FrmMain::offsetViewport(int x, int y)
