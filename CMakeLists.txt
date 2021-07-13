@@ -9,7 +9,7 @@ if(Vita)
 
         set(VITA 1)
         set(VITA_APP_NAME "TheXTech Vita Edition")
-        set(VITA_TITLEID  "THEXTECH00001")
+        set(VITA_TITLEID  "THEXTECH0")
         set(VERSION  "01.00")
 
         set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -I../src -g -fcompare-debug-second") # -std=c++11
