@@ -48,6 +48,7 @@
 
 #include <vitasdk.h>
 #include <vitaGL.h>
+#include "vitaGL_graphics.h"
 
 
 #include "../frm_main.h"
@@ -138,12 +139,25 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
     //     vgl_msaa);
     // vglInit(vgl_pool_size);
     vglInitExtended(0x1400000, DISPLAY_WIDTH_DEF, DISPLAY_HEIGHT_DEF, 0x1000000, SCE_GXM_MULTISAMPLE_NONE);
-    vglUseVram(GL_TRUE);
+    // vglUseVram(GL_TRUE);
 
     _debugPrintf_("--After vglInit--");
     _debugPrintf_("PS VITA: Init with pool size of %.4fMB", (vgl_pool_size / (float)MEMORY_DIVISOR));
     print_memory_info();
 
+    glClearColor(0.5, 0.1, 0.1, 0);
+    glEnable(GL_TEXTURE_2D);
+    glEnable(GL_BLEND);
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glClearColor(0.50, 0, 0, 0);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(0, 960, 544, 0, -1, 1);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
+    glEnable(GL_TEXTURE_2D);
 
 
     if(_debugPrintf_ != 0)
@@ -365,6 +379,9 @@ void FrmMain::doEvents()
 void FrmMain::repaint()
 {
     // paint from render target to screen.
+
+
+    vglSwapBuffers(GL_FALSE);
 }
 
 
@@ -484,7 +501,7 @@ void FrmMain::loadTexture(StdPicture &target, uint32_t width, uint32_t height, u
         0,
         GL_RGBA,
         GL_UNSIGNED_BYTE,
-        RGBApixels
+        (const GLvoid*)RGBApixels
     );
 
     if(_newTexture != 0)
@@ -492,7 +509,7 @@ void FrmMain::loadTexture(StdPicture &target, uint32_t width, uint32_t height, u
         target.texture = _newTexture;
         target.w = width;
         target.h = height;
-        pLogDebug("VITA: loaded texture with GLuint %d and size %d x %d.", _newTexture, width, height);
+        // pLogDebug("VITA: loaded texture with GLuint %d and size %d x %d.", _newTexture, width, height);
     }
     else
     {
@@ -511,14 +528,14 @@ void FrmMain::lazyLoad(StdPicture &target)
 
     // Try and load source image data from disk.
     // EG:
-    #if USE_STBI
+#ifdef USE_STBI
     stbi_uc* sourceImage;
     int width = 0, height = 0, channels = 0;
     sourceImage = stbi_load(target.path.c_str(), &width, &height, &channels, STBI_rgb_alpha);
-    #else
+#else
     FIBITMAP* sourceImage;
     sourceImage = GraphicsHelps::loadImage(target.path);
-    #endif
+#endif
     
 
     
@@ -542,8 +559,8 @@ void FrmMain::lazyLoad(StdPicture &target)
 
     num_textures_loaded++;
 
-#if USE_STBI
-    stbi_image_free(uc);
+#ifdef USE_STBI
+    stbi_image_free(sourceImage);
 #endif
 
     // TODO: Track free ram space? 
@@ -625,6 +642,9 @@ void FrmMain::clearAllTextures()
 void FrmMain::renderRect(int x, int y, int w, int h, float red, float green, float blue, float alpha, bool filled)
 {
     // uint32_t clr = C2D_Color32f(red, green, blue, alpha);
+    
+    // TODO: Filled or not?
+    DrawRectSolid(x, y, w, h, red, green, blue, alpha);
 
     // Filled is always True in this game
     // if (filled)
@@ -765,6 +785,21 @@ void FrmMain::renderTexturePrivate(float xDst, float yDst, float wDst, float hDs
 
     // VitaGL_DrawImage_Custom code here.
     // Todo also in the future, rotation ?!? !
+    // if(rotateAngle != 0.0)
+        // C2D_DrawImage_Custom_Rotated(*to_draw, xDst+viewport_offset_x, yDst+viewport_offset_y, wDst, hDst,
+    // else
+
+    pLogDebug("Drawing %s", tx.path.c_str());
+    Vita_DrawImage(
+        tx, 
+        xDst+viewport_offset_x, // x1
+        yDst+viewport_offset_y, // y1
+        wDst, // x2
+        hDst, // y2
+        xSrc, ySrc, 
+        wSrc, hSrc, 
+        flip, 
+        red, green, blue, alpha);
 
 }
 
@@ -887,6 +922,7 @@ void FrmMain::lazyLoadedBytesReset()
 void FrmMain::clearBuffer()
 {
     // Clear the render buffer texture
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     return;
 }
 

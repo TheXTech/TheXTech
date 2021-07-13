@@ -267,7 +267,13 @@ void LoadGFX()
     for(int A = 1; A <= numBackground2; ++A)
     {
         p = GfxRoot + fmt::format_ne("background2/background2-{0}.png", A);
-        if(Files::fileExists(p))
+        bool vitaDebugSkip = false;
+
+        #ifdef VITA
+        vitaDebugSkip = true;
+        #endif
+
+        if(Files::fileExists(p) && !vitaDebugSkip)
         {
             GFXBackground2BMP[A] = frmMain.lazyLoadPicture(p);
             GFXBackground2Width[A] = GFXBackground2BMP[A].w;

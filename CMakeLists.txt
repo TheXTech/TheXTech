@@ -437,6 +437,7 @@ elseif(VITA)
         src/sound_internal.cpp # Vita may one day be supported by SDL_mixer_ext, but for now it just fails to initialize despite building.
         src/control/joystick.cpp # Vita is supported by SDL for joystick.
         src/vita/frm_main.cpp # This is the only one the vita needs extra so far.
+        src/vita/vitaGL_graphics.cpp # I lied
         src/main/cheat_code.cpp # This will change one day also.
         src/editor/text_input.cpp # This will change one day, as the Vita has its own keyboard overlay.
     )
