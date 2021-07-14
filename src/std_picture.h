@@ -36,6 +36,10 @@
 #include <string>
 #endif
 
+#ifdef VITA
+#include <string>
+#endif
+
 typedef unsigned int    GLenum;
 typedef int             GLint;
 typedef unsigned int    GLuint;
