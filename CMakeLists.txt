@@ -1,31 +1,26 @@
 cmake_minimum_required(VERSION 3.5)
 
 if(Vita)
-    if(DEFINED ENV{VITASDK})
-        message("VITASDK Defined!")
-        message("Using VITASDK toolchain at $ENV{VITASDK}/share/vita.toolchain.cmake")
-        set(CMAKE_TOOLCHAIN_FILE "$ENV{VITASDK}/share/vita.toolchain.cmake" CACHE PATH "toolchain file")
-        include("$ENV{VITASDK}/share/vita.cmake" REQUIRED)
+    # if(DEFINED ENV{VITASDK})
+        # message("VITASDK Defined!")
+        # message("Using VITASDK toolchain at $ENV{VITASDK}/share/vita.toolchain.cmake")
+        # set(CMAKE_TOOLCHAIN_FILE "$ENV{VITASDK}/share/vita.toolchain.cmake" CACHE PATH "toolchain file")
+        # include("$ENV{VITASDK}/share/vita.cmake" REQUIRED)
 
-        set(VITA 1)
-        set(VITA_APP_NAME "TheXTech Vita Edition")
-        set(VITA_TITLEID  "THEXTECH0")
-        set(VERSION  "01.00")
+        # set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -I../src -g -fcompare-debug-second") # -std=c++11
+        # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I../src -g -fpermissive -fcompare-debug-second -std=gnu++11 -fno-optimize-sibling-calls -Wno-class-conversion") # 
 
-        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -I../src -g -fcompare-debug-second") # -std=c++11
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I../src -g -fpermissive -fcompare-debug-second -std=gnu++11 -fno-optimize-sibling-calls -Wno-class-conversion") # 
+        # cmake_policy(SET CMP0077 OLD)
 
-        cmake_policy(SET CMP0077 OLD)
+        # add_compile_definitions(VITA=1)
+        # if(USE_SDL_VID)
+            # add_compile_definitions(USE_SDL_VID=1)
+        # endif()
 
-        add_compile_definitions(VITA=1)
-        if(USE_SDL_VID)
-            add_compile_definitions(USE_SDL_VID=1)
-        endif()
-
-        message(${CMAKE_CXX_FLAGS})
-    else()
-        message(FATAL_ERROR "Please install the VitaSDK and verify that the environment variable `VITASDK` has been defined.")
-    endif()
+        # message(${CMAKE_CXX_FLAGS})
+    # else()
+        # message(FATAL_ERROR "Please install the VitaSDK and verify that the environment variable `VITASDK` has been defined.")
+    # endif()
 endif()
 
 project(TheXTech LANGUAGES C CXX)
@@ -126,15 +121,6 @@ if(HAIKU OR VITA)
     set(USE_SYSTEM_SDL2_DEFAULT ON)  # Should be used on Haiku, own SDL2 Haiku build on CMake is broken
 else()
     set(USE_SYSTEM_SDL2_DEFAULT ${USE_SYSTEM_LIBS_DEFAULT})
-endif()
-
-if(VITA)
-    message("Vita build, USE_SYSTEM_LIBS_DEFAULT is ON.")
-    set(USE_STATIC_LIBC OFF)
-    set(USE_SYSTEM_LIBS_DEFAULT ON)
-    set(USE_SYSTEM_LIBS ON)
-    set(USE_SYSTEM_SDL2 ON)
-    set(NO_INTPROC ON CACHE BOOL "Disable interprocess." FORCE)
 endif()
 
 option(USE_SYSTEM_LIBS "Use dependent libraries like SDL2, FreeImageLite and MixerX, installed in the system" ${USE_SYSTEM_LIBS_DEFAULT})
@@ -624,47 +610,9 @@ target_include_directories(thextech PRIVATE ${A2XT_INCS})
 target_link_libraries(thextech PRIVATE A2XT_Int)
 
 if(VITA)
+
     target_link_libraries(A2XT_Int INTERFACE
-        FLAC
-        modplug
-        mad
-        opusfile
-        opus
-        vorbisfile
-        vorbis
-        ogg
-        jpeg
-        vitaGL
-        debugnet
-        mathneon
-        SceCtrl_stub
-        SceMotion_stub
-        SceHid_stub
-        SceRtc_stub
-        SceNetCtl_stub
-        SceNet_stub
-        SceLibKernel_stub
-        ScePvf_stub
-        SceAppMgr_stub
-        SceAppUtil_stub
-        ScePgf_stub
-        freetype
-        png
-        SceCommonDialog_stub
-        m
-        zip
-        z
-        pthread
-        SceGxm_stub
-        SceDisplay_stub
-        SceSysmodule_stub
-        SceTouch_stub
-        SceAudio_stub
-        vitashark
-        SceShaccCg_stub
-        SceSysmem_stub
-        SceIofilemgr_stub
-        SceKernelThreadMgr_stub
+        ${VITA_ADDTL_LIBS}
     )
 
     target_compile_definitions(thextech PRIVATE -DPGE_NO_THREADING)
