@@ -11,6 +11,7 @@ static inline void DrawRectSolid(int x,
                           float _b,
                           float _a)
 {
+    glBindTexture(GL_TEXTURE_2D, 0);
     glBegin(GL_QUADS);
 
     glColor4f(_r, _g, _b, _a);
@@ -38,13 +39,26 @@ static inline void Vita_DrawImage(
     unsigned int flip,
     float r, float g, float b, float a)
 {
-    float w = texture.w / 2,
-          h = texture.h / 2;
+    
+    
 
-    float n_src_x = (src_x / w);
-    float n_src_x2 = ((src_x + wDst) / w);
-    float n_src_y = (src_y / h);
-    float n_src_y2 = ((src_y + hDst) / h);
+#ifdef USE_STBI_RESIZE
+    float tex_w = texture.w,
+          tex_h = texture.h;
+          wDst *= 2;
+          hDst *= 2;
+#else
+    // src_w *= 2;
+    // src_h *= 2;
+    float tex_w = texture.w / 2,
+          tex_h = texture.h / 2;
+#endif
+    
+
+    float n_src_x = (src_x / tex_w);
+    float n_src_x2 = ((src_x + src_w) / tex_w);
+    float n_src_y = (src_y / tex_h);
+    float n_src_y2 = ((src_y + src_h) / tex_h);
 
     glBindTexture(GL_TEXTURE_2D, texture.texture);
     glBegin(GL_QUADS);
@@ -55,15 +69,15 @@ static inline void Vita_DrawImage(
 
     glTexCoord2f(n_src_x2, n_src_y);
     glColor4f(r, g, b, a);
-    glVertex3f((x + (src_w * 1)), y, 0);
+    glVertex3f((x + (wDst * 1)), y, 0);
 
     glTexCoord2f(n_src_x2, n_src_y2);
     glColor4f(r, g, b, a);
-    glVertex3f((x + (src_w * 1)), (y + (src_h * 1)), 0);
+    glVertex3f((x + (wDst * 1)), (y + (hDst * 1)), 0);
 
     glTexCoord2f(n_src_x, n_src_y2);
     glColor4f(r, g, b, a);
-    glVertex3f(x, (y + (src_h * 1)), 0);
+    glVertex3f(x, (y + (hDst * 1)), 0);
 
     glEnd();
 }
