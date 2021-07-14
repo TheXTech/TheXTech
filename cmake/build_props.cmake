@@ -171,7 +171,6 @@ if(VITA)
     # option(USE_SYSTEM_LIBS ON) Pass these in Vita_CMAKE_FLAGS instead
     # option(USE_SYSTEM_SDL2 ON)
     # option(NO_INTPTROC ON FORCE)
-
     # option(USE_GME OFF FORCE)
     # option(USE_MIDI OFF FORCE)
 
