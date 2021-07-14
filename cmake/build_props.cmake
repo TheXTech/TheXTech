@@ -85,6 +85,7 @@ endif()
 
 if(VITA)
     message("Set CMAKE Flags for Vita.")
+    include("$ENV{VITASDK}/share/vita.cmake" REQUIRED)
 
     cmake_policy(SET CMP0077 OLD)
 
@@ -156,10 +157,11 @@ if(VITA)
         "-DUSE_SYSTEM_AUDIO_LIBRARIES_DEFAULT=OFF"
         "-DPGE_SHARED_SDLMIXER_DEFAULT=OFF"
         "-DSDL_MIXER_X_SHARED=OFF"
-        "-DAUDIO_CODECS_REPO_PATH=''"
-        "-DAUDIO_CODECS_INSTALL_PATH=''"
+        "-DAUDIO_CODECS_REPO_PATH="
+        "-DAUDIO_CODECS_INSTALL_PATH="
         "-DUSE_GME=OFF"
         "-DUSE_MIDI=OFF"
+        "-DADLMIDI_LIBRARY="
     )
 
     # option(USE_SYSTEM_LIBS ON)
@@ -228,7 +230,7 @@ if(MSVC)
 endif()
 
 # -fPIC thing
-if(LIBRARY_PROJECT AND NOT WIN32)
+if(LIBRARY_PROJECT AND NOT WIN32 AND NOT VITA)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 endif()
