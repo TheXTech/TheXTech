@@ -724,6 +724,9 @@ int vb6Round(double x)
 
 static SDL_INLINE double toNearest(double x)
 {
+    #ifdef VITA
+    return round(x);
+    #else
     int round_old = std::fegetround();
     if(round_old == FE_TONEAREST)
         return std::nearbyint(x);
@@ -734,6 +737,7 @@ static SDL_INLINE double toNearest(double x)
         std::fesetround(round_old);
         return x;
     }
+    #endif
 }
 
 double vb6Round(double x, int decimals)

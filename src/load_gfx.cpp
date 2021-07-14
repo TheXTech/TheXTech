@@ -151,8 +151,8 @@ static void loadCGFX(const std::set<std::string> &files,
 #ifdef DEBUG_BUILD
         pLogDebug("Trying to load custom GFX: %s with mask %s", imgToUse.c_str(), maskToUse.c_str());
 #endif
-#ifdef __3DS__
-        // 3DS never uses masks
+#if defined(__3DS__) || defined(VITA)
+        // 3DS and Vita will never use masks
         newTexture = frmMain.lazyLoadPicture(imgToUse);
 #else
         newTexture = frmMain.lazyLoadPicture(imgToUse, maskToUse, origPath);
@@ -228,7 +228,6 @@ static void restoreWorldBackupTextures()
     g_defaultWorldGfxBackup.clear();
 }
 
-
 void LoadGFX()
 {
     std::string p;
@@ -268,7 +267,13 @@ void LoadGFX()
     for(int A = 1; A <= numBackground2; ++A)
     {
         p = GfxRoot + fmt::format_ne("background2/background2-{0}.png", A);
-        if(Files::fileExists(p))
+        bool vitaDebugSkip = false;
+
+        #ifdef VITA
+        vitaDebugSkip = true;
+        #endif
+
+        if(Files::fileExists(p) && !vitaDebugSkip)
         {
             GFXBackground2BMP[A] = frmMain.lazyLoadPicture(p);
             GFXBackground2Width[A] = GFXBackground2BMP[A].w;

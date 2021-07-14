@@ -194,7 +194,15 @@ int GameMain(const CmdLineSetup_t &setup)
 #if !defined(PGE_NO_THREADING)
     gfxLoaderThreadingMode = true;
 #endif
+
+#ifdef VITA
+    pLogDebug("frmMain.show();");
+#endif
     frmMain.show(); // Don't show window until playing an initial sound
+
+#ifdef VITA
+    pLogDebug("AFTER frmMain.show();");
+#endif
 
     if(!noSound)
     {
@@ -232,6 +240,9 @@ int GameMain(const CmdLineSetup_t &setup)
         }
     }
 #else
+#ifdef VITA
+    pLogDebug("Starting HUGE loading thread, please be patient....");
+#endif
     loadingThread(NULL);
 #endif
 

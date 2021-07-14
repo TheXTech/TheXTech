@@ -94,7 +94,7 @@ include(cmake/git_version.cmake)
 #endif()
 set(USE_SYSTEM_LIBS_DEFAULT OFF)
 
-if(HAIKU)
+if(HAIKU OR VITA)
     set(USE_SYSTEM_SDL2_DEFAULT ON)  # Should be used on Haiku, own SDL2 Haiku build on CMake is broken
 else()
     set(USE_SYSTEM_SDL2_DEFAULT ${USE_SYSTEM_LIBS_DEFAULT})
@@ -163,7 +163,11 @@ if(USE_STATIC_LIBC)
 endif()
 
 include(lib/DirManager/dirman.cmake)
-include(lib/FileMapper/FileMapper.cmake)
+
+if(NOT VITA)
+    include(lib/FileMapper/FileMapper.cmake)
+endif()
+
 include(lib/fmt/fmt.cmake)
 include(lib/IniProcessor/IniProcessor.cmake)
 include(lib/Utils/Utils.cmake)
@@ -226,6 +230,11 @@ endif()
 if(USE_SYSTEM_LIBS)
     find_package(SDL2 REQUIRED)
 
+    if(NOT SDL2_LIBRARIES)
+        find_library(SDL2_LIBRARIES SDL2)
+        message("SDL2_LIBRARIES: ${SDL2_LIBRARIES}")
+    endif()
+
     find_library(MIXERX_LIB NAMES SDL2_mixer_ext)
     find_path(MIXERX_HEAD_DIR SDL_mixer_ext.h PATH_SUFFIXES SDL2)
 
@@ -248,6 +257,7 @@ elseif(NOT 3DS)
     else()
         list(APPEND A2XT_LIBS PGE_SDLMixerX_static)
     endif()
+    message("SDL2 INCLUDE: ${SDL2_INCLUDE_DIR}")
     list(APPEND A2XT_INCS "${DEPENDENCIES_INSTALL_DIR}/include" ${SDL2_INCLUDE_DIRS})
     target_link_libraries(A2XT_Int INTERFACE ${A2XT_LIBS})
     list(APPEND A2XT_DEPS FreeImage_Local SDLMixerX_Local)
@@ -267,7 +277,7 @@ set(LIB_SRC
     ${PGE_FILE_LIBRARY_SRCS}
 )
 
-if(NOT 3DS)
+if(NOT 3DS AND NOT VITA)
     list(APPEND LIB_SRC
         ${FILEMAPPER_SRCS}
         ${STACK_WALKER_SRCS}
@@ -280,7 +290,16 @@ if(NOT 3DS)
     )
 endif()
 
-if(NOT 3DS AND NOT EMSCRIPTEN AND NOT ANDROID)
+if(VITA)
+    list(APPEND LIB_SRC
+        lib/Graphics/graphics_funcs.cpp
+        lib/Graphics/image_size.cpp
+        lib/Graphics/size.cpp
+        lib/Graphics/sizef.cpp
+    )
+endif()
+
+if(NOT 3DS AND NOT EMSCRIPTEN AND NOT ANDROID AND NOT VITA)
     list(APPEND LIB_SRC
         3rdparty/tinyfiledialogs/tinyfiledialogs.c
     )
@@ -377,6 +396,26 @@ if(3DS)
         src/3ds/sound_internal.cpp
         src/3ds/text_input.cpp
     )
+elseif(VITA)
+    list(APPEND THEXTECH_SRC
+        src/sound_internal.cpp # Vita may one day be supported by SDL_mixer_ext, but for now it just fails to initialize despite building.
+        src/control/joystick.cpp # Vita is supported by SDL for joystick.
+    )
+
+    if(USE_SDL_VID)
+        message("Using SDL video.")
+        list(APPEND THEXTECH_SRC src/frm_main.cpp)
+    else()
+        message("Using vitaGL video.")
+        list(APPEND THEXTECH_SRC src/vita/frm_main.cpp)
+    endif()
+
+    list(APPEND THEXTECH_SRC
+    src/vita/vitaGL_graphics.cpp # I lied
+        src/main/cheat_code.cpp # This will change one day also.
+        src/editor/text_input.cpp # This will change one day, as the Vita has its own keyboard overlay.
+    )
+
 else()
     list(APPEND THEXTECH_SRC
         src/sound_internal.cpp
@@ -548,6 +587,12 @@ endif()
 target_include_directories(thextech PRIVATE ${A2XT_INCS})
 target_link_libraries(thextech PRIVATE A2XT_Int)
 
+if(VITA)
+    target_link_libraries(A2XT_Int INTERFACE
+        ${VITA_ADDTL_LIBS}
+    )
+endif()
+
 if(RANGE_ARR_USE_HEAP)
     target_compile_definitions(thextech PRIVATE -DRANGE_ARR_USE_HEAP)
 endif()
@@ -654,6 +699,13 @@ elseif(WIN32)
     install(FILES changelog.txt DESTINATION .)
     install(FILES README.md DESTINATION . RENAME ReadMe.txt)
     install(FILES LICENSE DESTINATION . RENAME License.TheXTech.txt)
+elseif(VITA)
+    install(TARGETS thextech DESTINATION .)
+    vita_create_self(${THEXTECH_EXECUTABLE_NAME}.self output/bin/thextech UNSAFE)
+    vita_create_vpk(${THEXTECH_EXECUTABLE_NAME}.vpk ${VITA_TITLEID} ${THEXTECH_EXECUTABLE_NAME}.self
+        VERSION ${VITA_VERSION}
+        NAME ${VITA_APP_NAME}
+    )
 else()
     install(TARGETS thextech
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}

@@ -50,6 +50,10 @@ typedef uint32_t Uint32;
 
 #include "global_constants.h"
 #include "controls.h"
+#ifdef VITA
+#include "video.h"
+extern VideoSettings_t g_videoSettings;
+#endif
 
 //Option Explicit
 //Public Declare Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As Long)
