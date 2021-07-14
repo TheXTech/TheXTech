@@ -588,20 +588,9 @@ target_include_directories(thextech PRIVATE ${A2XT_INCS})
 target_link_libraries(thextech PRIVATE A2XT_Int)
 
 if(VITA)
-
     target_link_libraries(A2XT_Int INTERFACE
         ${VITA_ADDTL_LIBS}
     )
-
-    target_compile_definitions(thextech PRIVATE -DPGE_NO_THREADING)
-    if(NOT USE_SDL_VID)
-        target_compile_definitions(thextech PRIVATE -DNO_SCREENSHOT)
-    endif()
-    # target_compile_definitions(thextech PRIVATE -DNO_SDL)
-    target_compile_definitions(thextech PRIVATE -DLOW_MEM)
-    # target_compile_definitions(thextech PRIVATE -DFIXED_RES)
-    target_compile_definitions(thextech PRIVATE -DPRELOAD_LEVELS)
-    target_compile_definitions(thextech PRIVATE -DVITA)
 endif()
 
 if(RANGE_ARR_USE_HEAP)

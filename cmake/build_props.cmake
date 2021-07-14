@@ -147,6 +147,7 @@ if(VITA)
         "-DNO_INTPTROC=ON"
         "-DUSE_STATIC_LIBC=OFF"
 
+        "-DCMAKE_POSITION_INDEPENDENT_CODE=OFF"
         "-DFREEIMAGE_SHARED=OFF"
         "-DFREEIMAGE_USE_SYSTEM_LIBPNG=ON"
         "-DFREEIMAGE_USE_SYSTEM_LIBJPEG=ON"
@@ -154,7 +155,7 @@ if(VITA)
         "-DPGE_SHARED_SDLMIXER=OFF"
         "-DPGE_USE_LOCAL_SDL2=OFF"
         "-DUSE_SYSTEM_SDL2=ON"
-        "-DUSE_SYSTEM_AUDIO_LIBRARIES_DEFAULT=OFF"
+        "-DUSE_SYSTEM_AUDIO_LIBRARIES_DEFAULT=ON"
         "-DPGE_SHARED_SDLMIXER_DEFAULT=OFF"
         "-DSDL_MIXER_X_SHARED=OFF"
         "-DAUDIO_CODECS_REPO_PATH="
@@ -181,7 +182,7 @@ if(VITA)
     endif()
 
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -I../src -g -fcompare-debug-second")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I../src -g -O0 -fpermissive -fcompare-debug-second -fno-optimize-sibling-calls -Wno-class-conversion")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I../src -g -O0 -DVITA=1 -fpermissive -fcompare-debug-second -fno-optimize-sibling-calls -Wno-class-conversion")
 endif()
 
 string(TOLOWER "${CMAKE_BUILD_TYPE}" CMAKE_BUILD_TYPE_LOWER)
@@ -231,6 +232,7 @@ endif()
 
 # -fPIC thing
 if(LIBRARY_PROJECT AND NOT WIN32 AND NOT VITA)
+    message("cmake/buildprops CAUSES FPIC ON ")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 endif()

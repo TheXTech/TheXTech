@@ -183,8 +183,11 @@ ExternalProject_Add(
 
 # TODO: LET VITA HAVE SOME FUN!
 if(VITA)
+    set(MixerX_CodecLibs)
+    message("-------          MixerX_deps only")
     list(APPEND MixerX_Deps)
 else()
+    message("-------          AudioCodecs_Local")
     list(APPEND MixerX_Deps AudioCodecs_Local)
 endif()
 
