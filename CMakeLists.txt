@@ -1,28 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
 
-if(Vita)
-    # if(DEFINED ENV{VITASDK})
-        # message("VITASDK Defined!")
-        # message("Using VITASDK toolchain at $ENV{VITASDK}/share/vita.toolchain.cmake")
-        # set(CMAKE_TOOLCHAIN_FILE "$ENV{VITASDK}/share/vita.toolchain.cmake" CACHE PATH "toolchain file")
-        # include("$ENV{VITASDK}/share/vita.cmake" REQUIRED)
-
-        # set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -I../src -g -fcompare-debug-second") # -std=c++11
-        # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I../src -g -fpermissive -fcompare-debug-second -std=gnu++11 -fno-optimize-sibling-calls -Wno-class-conversion") # 
-
-        # cmake_policy(SET CMP0077 OLD)
-
-        # add_compile_definitions(VITA=1)
-        # if(USE_SDL_VID)
-            # add_compile_definitions(USE_SDL_VID=1)
-        # endif()
-
-        # message(${CMAKE_CXX_FLAGS})
-    # else()
-        # message(FATAL_ERROR "Please install the VitaSDK and verify that the environment variable `VITASDK` has been defined.")
-    # endif()
-endif()
-
 project(TheXTech LANGUAGES C CXX)
 
 include(CheckCXXCompilerFlag)
@@ -280,6 +257,7 @@ elseif(NOT 3DS)
     else()
         list(APPEND A2XT_LIBS PGE_SDLMixerX_static)
     endif()
+    message("SDL2 INCLUDE: ${SDL2_INCLUDE_DIR}")
     list(APPEND A2XT_INCS "${DEPENDENCIES_INSTALL_DIR}/include" ${SDL2_INCLUDE_DIRS})
     target_link_libraries(A2XT_Int INTERFACE ${A2XT_LIBS})
     list(APPEND A2XT_DEPS FreeImage_Local SDLMixerX_Local)
