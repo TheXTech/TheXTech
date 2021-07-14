@@ -562,10 +562,6 @@ StdPicture FrmMain::LoadPicture(std::string path)
             pLogDebug("VITA: malloc (for now) cache with sizeof %d", _cache_size);
             output_pixels = (unsigned char*)malloc(_cache_size);
         }
-        
-        
-        
-        
         // if(stbir_resize_uint8_srgb(sourceImage, w, h, 0,
                             //    output_pixels, w / 2, h / 2, 0, (channels == 4 ? 3 : channels), (channels == 4 ? 1 : 0), 0) == 0)
         if(stbir_resize_uint8(sourceImage, w, h, stride,
@@ -590,12 +586,14 @@ StdPicture FrmMain::LoadPicture(std::string path)
             return target;
         }
 
+#if 0 // TODO: Re-enable these once we have all images properly scaling, so that way vitaGL_graphics can scale them back up to our viewport.
         target.w_orig = w;
         target.h_orig = h;
         target.w = w / 2;
         target.h = h / 2;
         target.w_scale = float(target.w) / float(target.w_orig);
         target.h_scale = float(target.h) / float(target.h_orig);
+#endif
 
 
         w = w / 2;
@@ -750,10 +748,13 @@ void FrmMain::lazyLoad(StdPicture &target)
     stbi_uc* sourceImage;
     int width = 0, height = 0, channels = 0;
     sourceImage = stbi_load(target.path.c_str(), &width, &height, &channels, STBI_rgb_alpha);
+
+#if 0 // TODO: Re-enable these once we have all images properly scaling, so that way vitaGL_graphics can scale them back up to our viewport.
     target.w_orig = width;
     target.h_orig = height;
     target.w = width / 2;
     target.h = height / 2;
+#endif
 #else
     FIBITMAP* sourceImage;
     sourceImage = GraphicsHelps::loadImage(target.path);
@@ -1182,13 +1183,8 @@ void FrmMain::setViewport(int x, int y, int w, int h)
         // offset_y + (h - (y + h)) * viewport_scale_y,
         0,
         y - (h / (float)1),
-    // #ifdef USE_STBI_RESIZE
-        // viewport_w / 2,
-        // viewport_h / 2
-    // #else
         viewport_w,
         viewport_h
-    // #endif
     );
 
 // TODO: Take care of this proper. viewport_w and viewport_h are absurdly
