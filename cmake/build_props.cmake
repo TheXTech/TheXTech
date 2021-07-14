@@ -136,30 +136,50 @@ if(VITA)
     )
 
     set(VITA_CMAKE_FLAGS
-        "-I../src"
-        "-g -O0"
-        "-fcompare-debug-second"
-        "-fpermissive"
-        "-std=gnu++11 -fno-optimize-sibling-calls -Wno-class-conversion"
         "-DVITA=1"
         "-DENABLE_FPIC=0"
-        "-DPGE_NO_THREADING"
-        "-DLOW_MEM"
-        "-DPRELOAD_LEVELS"
-        # "-DFIXED_RES"
+        "-DPGE_NO_THREADING=1"
+        "-DLOW_MEM=1"
+        "-DPRELOAD_LEVELS=1"
+        "-DUSE_SYSTEM_LIBS_DEFAULT=ON"
+        "-DUSE_SYSTEM_LIBS=ON"
+        "-DNO_INTPTROC=ON"
+        "-DUSE_STATIC_LIBC=OFF"
+
+        "-DFREEIMAGE_SHARED=OFF"
+        "-DFREEIMAGE_USE_SYSTEM_LIBPNG=ON"
+        "-DFREEIMAGE_USE_SYSTEM_LIBJPEG=ON"
+
+        "-DPGE_SHARED_SDLMIXER=OFF"
+        "-DPGE_USE_LOCAL_SDL2=OFF"
+        "-DUSE_SYSTEM_SDL2=ON"
+        "-DUSE_SYSTEM_AUDIO_LIBRARIES_DEFAULT=OFF"
+        "-DPGE_SHARED_SDLMIXER_DEFAULT=OFF"
+        "-DSDL_MIXER_X_SHARED=OFF"
+        "-DAUDIO_CODECS_REPO_PATH=''"
+        "-DAUDIO_CODECS_INSTALL_PATH=''"
+        "-DUSE_GME=OFF"
+        "-DUSE_MIDI=OFF"
     )
 
-    option(USE_STATIC_LIBC OFF)
-    option(USE_SYSTEM_LIBS_DEFAULT ON)
-    option(USE_SYSTEM_LIBS ON)
-    option(USE_SYSTEM_SDL2 ON)
-    option(NO_INTPTROC ON FORCE)
+    # option(USE_SYSTEM_LIBS ON)
+    # option(USE_STATIC_LIBC OFF)
+    # option(USE_SYSTEM_LIBS_DEFAULT ON)
+    # option(USE_SYSTEM_LIBS ON) Pass these in Vita_CMAKE_FLAGS instead
+    # option(USE_SYSTEM_SDL2 ON)
+    # option(NO_INTPTROC ON FORCE)
+
+    # option(USE_GME OFF FORCE)
+    # option(USE_MIDI OFF FORCE)
 
     if(USE_SDL_VID)
         set(VITA_CMAKE_FLAGS "${VITA_CMAKE_FLAGS} -DUSE_SDL_VID=1")
     else()
         set(VITA_CMAKE_FLAGS "${VITA_CMAKE_FLAGS} -DNO_SCREENSHOT=1")
     endif()
+
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -I../src -g -fcompare-debug-second")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I../src -g -O0 -fpermissive -fcompare-debug-second -fno-optimize-sibling-calls -Wno-class-conversion")
 endif()
 
 string(TOLOWER "${CMAKE_BUILD_TYPE}" CMAKE_BUILD_TYPE_LOWER)
