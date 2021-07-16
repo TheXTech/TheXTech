@@ -283,11 +283,13 @@ void GraphicsHelps::mergeWithMask(FIBITMAP *image, FIBITMAP *mask)
 {
     unsigned int img_w = FreeImage_GetWidth(image);
     unsigned int img_h = FreeImage_GetHeight(image);
+    unsigned int img_pitch = FreeImage_GetPitch(image);
     unsigned int mask_w = FreeImage_GetWidth(mask);
     unsigned int mask_h = FreeImage_GetHeight(mask);
+    unsigned int mask_pitch = FreeImage_GetPitch(image);
     BYTE *img_bits  = FreeImage_GetBits(image);
     BYTE *mask_bits = FreeImage_GetBits(mask);
-    BYTE *FPixP = img_bits;
+    BYTE *FPixP = nullptr;
     BYTE *SPixP = mask_bits;
     RGBQUAD Npix = {0x00, 0x00, 0x00, 0xFF};   //Destination pixel color
     BYTE Bpix[] = {0x00, 0x00, 0x00, 0xFF};   //Dummy black pixel
@@ -299,9 +301,9 @@ void GraphicsHelps::mergeWithMask(FIBITMAP *image, FIBITMAP *mask)
 
     while(1)
     {
-        FPixP = img_bits + (img_w * y * 4);
+        FPixP = img_bits + (img_pitch * y);
         if(!endOfY)
-            SPixP = mask_bits + (mask_w * ym * 4);
+            SPixP = mask_bits + (mask_pitch * ym);
 
         for(unsigned int x = 0; (x < img_w); x++)
         {
