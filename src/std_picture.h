@@ -73,4 +73,13 @@ struct StdPicture
     PGEColor ColorLower;
 };
 
+// This macro allows to get the original texture path when debug build is on,
+// and safely return the blank string when the release build is
+#ifdef DEBUG_BUILD
+#   define StdPictureGetOrigPath(x) x.origPath
+#else
+#   define StdPictureGetOrigPath(x) std::string()
+#endif
+
+
 #endif // STD_PICTURE_H

@@ -405,6 +405,45 @@ void GraphicsHelps::getMaskedImageInfo(std::string rootDir, std::string in_imgNa
     }
 }
 
+bool GraphicsHelps::validateFor2xScaleDown(FIBITMAP *image, const std::string &origPath)
+{
+    if(!image)
+        return false;
+
+    uint32_t w = static_cast<uint32_t>(FreeImage_GetWidth(image));
+    uint32_t h = static_cast<uint32_t>(FreeImage_GetHeight(image));
+    uint32_t pitch = static_cast<uint32_t>(FreeImage_GetPitch(image));
+    BYTE *img_bits  = FreeImage_GetBits(image);
+
+    if(w % 2 || h % 2)
+    {
+        D_pLogWarning("Texture can't be shrank, non-multiple size: %u x %u (%s)", w, h, origPath.c_str());
+        return false; // Not multiple two!
+    }
+
+    BYTE *line1 = img_bits;
+    BYTE *line2 = (img_bits + pitch);
+
+    for(uint32_t y = 0; y < h; y += 2)
+    {
+        for(uint32_t x = 0; x < w; x += 2)
+        {
+            BYTE *p1 = line1 + (y * pitch) + (x * 4);
+            BYTE *p2 = line2 + (y * pitch) + (x * 4);
+            if(SDL_memcmp(p1, p1 + 4, 4) != 0 ||
+               SDL_memcmp(p1, p2, 4) != 0 ||
+               SDL_memcmp(p1, p2 + 4, 4) != 0)
+            {
+                D_pLogWarning("Texture can't be shrank: Pixel colors at the %u x %u sector (2x2 square) aren't equal (%s)", x, y, origPath.c_str());
+                return false;
+            }
+        }
+    }
+
+    D_pLogDebug("Texture CAN be shrank (%s)", origPath.c_str());
+    return true;
+}
+
 bool GraphicsHelps::setWindowIcon(SDL_Window *window, FIBITMAP *img, int iconSize)
 {
 #ifdef _WIN32
