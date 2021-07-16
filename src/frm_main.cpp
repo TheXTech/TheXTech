@@ -1143,7 +1143,6 @@ void FrmMain::loadTexture(StdPicture &target, uint32_t width, uint32_t height, u
     target.inited = true;
 }
 
-
 void FrmMain::lazyLoad(StdPicture &target)
 {
     if(!target.inited || !target.lazyLoaded || target.texture)
@@ -1194,20 +1193,23 @@ void FrmMain::lazyLoad(StdPicture &target)
     target.frame_w = static_cast<int>(w);
     target.frame_h = static_cast<int>(h);
 
-    if(g_videoSettings.scaleDownAllTextures)
+    bool shrink2x = false;
+
+    if(g_videoSettings.scaleDownAllTextures || GraphicsHelps::validateFor2xScaleDown(sourceImage, StdPictureGetOrigPath(target)))
     {
         target.w_orig = int(w);
         target.h_orig = int(h);
         w /= 2;
         h /= 2;
+        shrink2x = true;
     }
 
     bool wLimitExcited = m_ri.max_texture_width > 0 && w > Uint32(m_ri.max_texture_width);
     bool hLimitExcited = m_ri.max_texture_height > 0 && h > Uint32(m_ri.max_texture_height);
 
-    if(wLimitExcited || hLimitExcited || g_videoSettings.scaleDownAllTextures)
+    if(wLimitExcited || hLimitExcited || shrink2x)
     {
-        if(!g_videoSettings.scaleDownAllTextures)
+        if(!shrink2x)
         {
             target.w_orig = int(w);
             target.h_orig = int(h);
