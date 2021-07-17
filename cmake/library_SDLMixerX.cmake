@@ -39,6 +39,7 @@ if(WIN32)
     set(SDL2_A_Lib "${DEPENDENCIES_INSTALL_DIR}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}SDL2-static${PGE_LIBS_DEBUG_SUFFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}")
 elseif(VITA AND USE_SYSTEM_SDL2)
     message("VITA: SDL2_A_Lib is now -lSDL2")
+    set(SDL_MixerX_A_Lib "${DEPENDENCIES_INSTALL_DIR}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}SDL2_mixer_ext${PGE_LIBS_DEBUG_SUFFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}")
     set(SDL2_A_Lib SDL2)
 else()
     set(SDL_MixerX_A_Lib "${DEPENDENCIES_INSTALL_DIR}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}SDL2_mixer_ext${PGE_LIBS_DEBUG_SUFFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}")
@@ -58,6 +59,10 @@ if(USE_SYSTEM_SDL2)
         endif()
         set(SDL2_INCLUDE_DIRS ${SDL2_INCLUDE_DIR})
         set(SDL2_LIBRARIES ${SDL2_LIBRARY})
+
+        message("library_SDLMixerX: SDL2 INCLUDE DIR: ${SDL2_INCLUDE_DIR}")
+        message("library_SDLMixerX: SDL2 LIBRARY DIR: ${SDL2_LIBRARY}")
+        message("library_SDLMixerX: CMAKE_FIND_ROOT_PATH: ${CMAKE_FIND_ROOT_PATH}")
     else()
         find_package(SDL2 REQUIRED)
         if(TARGET SDL2::SDL2)
@@ -181,15 +186,7 @@ ExternalProject_Add(
         ${MixerX_CodecLibs}
 )
 
-# TODO: LET VITA HAVE SOME FUN!
-if(VITA)
-    set(MixerX_CodecLibs)
-    message("-------          MixerX_deps and AudioCodecs only")
-    list(APPEND MixerX_Deps AudioCodecs_Local)
-else()
-    message("-------          AudioCodecs_Local")
-    list(APPEND MixerX_Deps AudioCodecs_Local)
-endif()
+list(APPEND MixerX_Deps AudioCodecs_Local)
 
 # SDL Mixer X - an audio library, fork of SDL Mixer
 ExternalProject_Add(

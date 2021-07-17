@@ -94,15 +94,6 @@ if(VITA)
     set(VERSION "01.00")
 
     set(VITA_ADDTL_LIBS
-        FLAC
-        modplug
-        mad
-        opusfile
-        opus
-        vorbisfile
-        vorbis
-        ogg
-        jpeg
         vitaGL
         debugnet
         mathneon
@@ -137,33 +128,38 @@ if(VITA)
     )
 
     set(VITA_CMAKE_FLAGS
+        # General/TheXTech
         "-DVITA=1"
         "-DENABLE_FPIC=0"
         "-DPGE_NO_THREADING=1"
         "-DLOW_MEM=1"
         "-DPRELOAD_LEVELS=1"
-        "-DUSE_SYSTEM_LIBS_DEFAULT=ON"
-        "-DUSE_SYSTEM_LIBS=ON"
+        "-DUSE_SYSTEM_SDL2_DEFAULT=ON"
+        "-DUSE_SYSTEM_SDL2=ON"
         "-DNO_INTPTROC=ON"
         "-DUSE_STATIC_LIBC=OFF"
-        "-DNO_SCREENSHOT=ON"
+        "-DNO_SCREENSHOT=1"
 
+        # Free Image
         "-DCMAKE_POSITION_INDEPENDENT_CODE=OFF"
         "-DFREEIMAGE_SHARED=OFF"
         "-DFREEIMAGE_USE_SYSTEM_LIBPNG=ON"
         "-DFREEIMAGE_USE_SYSTEM_LIBJPEG=ON"
 
+        # Audio Mixer
         "-DPGE_SHARED_SDLMIXER=OFF"
         "-DPGE_USE_LOCAL_SDL2=OFF"
         "-DUSE_SYSTEM_SDL2=ON"
-        "-DUSE_SYSTEM_AUDIO_LIBRARIES_DEFAULT=ON"
-        "-DPGE_SHARED_SDLMIXER_DEFAULT=OFF"
-        "-DSDL_MIXER_X_SHARED=OFF"
-        "-DAUDIO_CODECS_REPO_PATH="
-        "-DAUDIO_CODECS_INSTALL_PATH="
+        
         "-DUSE_GME=ON"
         "-DUSE_MIDI=ON"
         "-DADLMIDI_LIBRARY="
+        "-DBUILD_OGG_VORBIS=1"
+        # VitaSDK has local Opus available through vdpm (usually installed as part of a default install)
+        # BUILDS LOCALLY NOW!
+        # "-DBUILD_OPUS=OFF"
+        # "-DLIBOPUSFILE_LIB=${vita_opusfile}"
+        # "-DLIBOPUS_LIB=${vita_opus}"
     )
 
     # option(USE_SYSTEM_LIBS ON)
