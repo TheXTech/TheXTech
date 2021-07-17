@@ -110,6 +110,9 @@ const int maxScenes = 5000;
 const int Max3DOffset = 20;
 const int ScreenW = 800 + 2 * Max3DOffset;
 const int ScreenH = 480;
+#elif VITA
+const int ScreenW = 960;
+const int ScreenH = 544;
 #elif defined(FIXED_RES)
 //Public Const ScreenW As Integer = 800  'Game Screen Width
 const int ScreenW = 800;

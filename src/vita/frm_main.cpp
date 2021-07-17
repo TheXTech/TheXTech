@@ -108,10 +108,8 @@ static int ram_pool_count = vgl_pool_size;
 
 FrmMain::FrmMain()
 {
-    ScaleWidth = 960;
-    ScaleHeight = 544;
-    ScreenW = 960;
-    ScreenH = 544;
+    ScaleWidth = ScreenW;
+    ScaleHeight = ScreenH;
 }
 
 #include <psp2/kernel/sysmem.h>

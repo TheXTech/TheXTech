@@ -48,6 +48,6 @@ extern struct VideoSettings_t
     bool   showFrameRate = false;
     //! 2x scale down all textures to reduce the memory usage
     bool   scaleDownAllTextures = false;
-} _g_videoSettings; // main_config.cpp
+} g_videoSettings; // main_config.cpp
 
 #endif // VIDEO_H
