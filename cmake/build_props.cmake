@@ -146,6 +146,7 @@ if(VITA)
         "-DUSE_SYSTEM_LIBS=ON"
         "-DNO_INTPTROC=ON"
         "-DUSE_STATIC_LIBC=OFF"
+        "-DNO_SCREENSHOT=ON"
 
         "-DCMAKE_POSITION_INDEPENDENT_CODE=OFF"
         "-DFREEIMAGE_SHARED=OFF"
@@ -160,8 +161,8 @@ if(VITA)
         "-DSDL_MIXER_X_SHARED=OFF"
         "-DAUDIO_CODECS_REPO_PATH="
         "-DAUDIO_CODECS_INSTALL_PATH="
-        "-DUSE_GME=OFF"
-        "-DUSE_MIDI=OFF"
+        "-DUSE_GME=ON"
+        "-DUSE_MIDI=ON"
         "-DADLMIDI_LIBRARY="
     )
 
