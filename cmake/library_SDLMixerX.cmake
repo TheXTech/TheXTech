@@ -36,13 +36,8 @@ set_shared_lib(SDLHIDAPI_SO_Lib "${DEPENDENCIES_INSTALL_DIR}/lib" hidapi)
 
 set_static_lib(SDL2_main_A_Lib "${DEPENDENCIES_INSTALL_DIR}/lib" SDL2main)
 
-if(WIN32)
-    set_static_lib(SDL_MixerX_A_Lib "${DEPENDENCIES_INSTALL_DIR}/lib" SDL2_mixer_ext-static)
-    set_static_lib(SDL2_A_Lib "${DEPENDENCIES_INSTALL_DIR}/lib" SDL2-static)
-else()
-    set_static_lib(SDL_MixerX_A_Lib "${DEPENDENCIES_INSTALL_DIR}/lib" SDL2_mixer_ext)
-    set_static_lib(SDL2_A_Lib "${DEPENDENCIES_INSTALL_DIR}/lib" SDL2)
-endif()
+set_static_lib(SDL_MixerX_A_Lib "${DEPENDENCIES_INSTALL_DIR}/lib" SDL2_mixer_ext${LIBRARY_STATIC_NAME_SUFFIX})
+set_static_lib(SDL2_A_Lib "${DEPENDENCIES_INSTALL_DIR}/lib" SDL2${LIBRARY_STATIC_NAME_SUFFIX})
 
 set(CODECS_LIBRARIES_DIR ${DEPENDENCIES_INSTALL_DIR}/lib)
 
