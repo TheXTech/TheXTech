@@ -412,6 +412,8 @@ bool GraphicsHelps::validateFor2xScaleDown(FIBITMAP *image, const std::string &o
     if(!image)
         return false;
 
+    (void)origPath; // supress warning when build the release build
+
     uint32_t w = static_cast<uint32_t>(FreeImage_GetWidth(image));
     uint32_t h = static_cast<uint32_t>(FreeImage_GetHeight(image));
     uint32_t pitch = static_cast<uint32_t>(FreeImage_GetPitch(image));
