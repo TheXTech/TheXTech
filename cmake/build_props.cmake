@@ -110,6 +110,7 @@ if(VITA)
         ScePgf_stub
         freetype
         png
+        jpeg
         SceCommonDialog_stub
         m
         zip
