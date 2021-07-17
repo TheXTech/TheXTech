@@ -100,17 +100,33 @@ else()
     set(USE_SYSTEM_SDL2_DEFAULT ${USE_SYSTEM_LIBS_DEFAULT})
 endif()
 
-option(USE_SYSTEM_LIBS "Use dependent libraries like SDL2, FreeImageLite and MixerX, installed in the system" ${USE_SYSTEM_LIBS_DEFAULT})
+if(NOT 3DS)
+    option(USE_SYSTEM_LIBS "Use dependent libraries like SDL2, FreeImageLite and MixerX, installed in the system" ${USE_SYSTEM_LIBS_DEFAULT})
+endif()
+
 option(USE_SYSTEM_SDL2 "Use SDL2 from a system even prefering system libraries" ${USE_SYSTEM_SDL2_DEFAULT})
 
-option(USE_STATIC_LIBC "Link libc and libstdc++ statically" OFF)
+if(NOT VITA)
+    option(USE_STATIC_LIBC "Link libc and libstdc++ statically" OFF)
+else()
+    if(3DS)
+        set(USE_STATIC_LIBC ON)
+    else()
+        set(USE_STATIC_LIBC OFF)
+    endif()
+endif()
 
 option(RANGE_ARR_USE_HEAP "Store data of RangeArr<> template in a heap" OFF)
 
 option(ENABLE_ANTICHEAT_TRAP "Enable anti-cheating trap for the \"redigitiscool\" cheat code" OFF)
 option(ENABLE_OLD_CREDITS "Use original Redigit's credits without changes" OFF)
 option(ENABLE_LOGGING "Enable debug logging written into a file (may not work on some platfors)" ON)
-option(NO_INTPROC "Disable Interprocess" OFF)
+
+if(NOT VITA AND NOT 3DS AND NOT ANDROID AND NOT EMSCRIPTEN)
+    option(NO_INTPROC "Disable Interprocess" OFF)
+else()
+    set(NO_INTPROC ON)
+endif()
 
 option(THEXTECH_ENABLE_LUA "Enable lua scripting support" OFF)
 
@@ -143,12 +159,6 @@ endif()
 if(NOT APPLE AND NOT ANDROID AND NOT EMSCRIPTEN)
     set(THEXTECH_FIXED_ASSETS_PATH "" CACHE STRING "Fixed assets path (The '/usr/share/games/<game-name>/' suggested). Unused by default.")
     set(THEXTECH_USER_DIR_NAME "" CACHE STRING "The name of the user directory at user's home to store settings/episodes/etc. The 'PGE_Project/thextech' will be used by default.")
-endif()
-
-if(3DS)
-    set(NO_INTPROC ON CACHE BOOL "Disable interprocess." FORCE)
-    set(USE_STATIC_LIBC ON CACHE BOOL "Must use static linkage on 3DS." FORCE)
-    set(USE_SYSTEM_LIBS OFF CACHE BOOL "Cannot use system libs on 3DS." FORCE)
 endif()
 
 # ============ Customization ==end=========
@@ -587,12 +597,6 @@ endif()
 target_include_directories(thextech PRIVATE ${A2XT_INCS})
 target_link_libraries(thextech PRIVATE A2XT_Int)
 
-if(VITA)
-    target_link_libraries(A2XT_Int INTERFACE
-        ${VITA_ADDTL_LIBS}
-    )
-endif()
-
 if(RANGE_ARR_USE_HEAP)
     target_compile_definitions(thextech PRIVATE -DRANGE_ARR_USE_HEAP)
 endif()
@@ -618,6 +622,16 @@ endif()
 
 if(NO_INTPROC)
     target_compile_definitions(thextech PRIVATE -DNO_INTPROC)
+endif()
+
+if(VITA)
+    target_compile_definitions(thextech PRIVATE -DVITA -DVITA=1)
+    target_compile_definitions(thextech PRIVATE -DNO_SCREENSHOT)
+    target_compile_definitions(thextech PRIVATE -DPGE_NO_THREADING)
+    target_compile_definitions(thextech PRIVATE -DPRELOAD_LEVELS)
+    target_compile_definitions(thextech PRIVATE -DFIXED_RES)
+    target_compile_definitions(thextech PRIVATE -DLOW_MEM)
+    target_link_libraries(A2XT_Int INTERFACE ${VITA_ADDTL_LIBS})
 endif()
 
 if(3DS)

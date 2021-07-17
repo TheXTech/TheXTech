@@ -14,7 +14,11 @@ else()
 endif()
 
 option(PGE_SHARED_SDLMIXER "Link MixerX as a shared library (dll/so/dylib)" ${PGE_SHARED_SDLMIXER_DEFAULT})
-option(PGE_USE_LOCAL_SDL2 "Do use the locally-built SDL2 library from the AudioCodecs set. Otherwise, download and build the development top main version." ON)
+if(NOT VITA AND NOT 3DS)
+    option(PGE_USE_LOCAL_SDL2 "Do use the locally-built SDL2 library from the AudioCodecs set. Otherwise, download and build the development top main version." ON)
+else()
+    set(PGE_USE_LOCAL_SDL2 OFF)
+endif()
 
 if(WIN32)
     if(MSVC)
@@ -39,6 +43,7 @@ if(WIN32)
     set(SDL2_A_Lib "${DEPENDENCIES_INSTALL_DIR}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}SDL2-static${PGE_LIBS_DEBUG_SUFFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}")
 elseif(VITA AND USE_SYSTEM_SDL2)
     message("VITA: SDL2_A_Lib is now -lSDL2")
+    set(SDL_MixerX_A_Lib "${DEPENDENCIES_INSTALL_DIR}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}SDL2_mixer_ext${PGE_LIBS_DEBUG_SUFFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}")
     set(SDL2_A_Lib SDL2)
 else()
     set(SDL_MixerX_A_Lib "${DEPENDENCIES_INSTALL_DIR}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}SDL2_mixer_ext${PGE_LIBS_DEBUG_SUFFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}")
@@ -131,23 +136,79 @@ if(APPLE)
     list(APPEND MixerX_SysLibs ${OPENGL_LIBRARY})
 endif()
 
+macro(setlib OUTPUT_VAR LIBNAME)
+    set(${OUTPUT_VAR} "${CODECS_LIBRARIES_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}${LIBNAME}${PGE_LIBS_DEBUG_SUFFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}")
+endmacro()
+
+setlib(AC_FLAC         FLAC)
+setlib(AC_FLUIDLITE    fluidlite)
+setlib(AC_VORBISFILE   vorbisfile)
+setlib(AC_VORBIS       vorbis)
+setlib(AC_OPUSFILE     opusfile)
+setlib(AC_OPUS         opus)
+setlib(AC_OGG          ogg)
+setlib(AC_MAD          mad)
+setlib(AC_ADLMIDI      ADLMIDI)
+setlib(AC_OPNMIDI      OPNMIDI)
+setlib(AC_TIMIDITYSDL  timidity_sdl2)
+setlib(AC_GME          gme)
+setlib(AC_LIBXMP       xmp)
+setlib(AC_MODPLUG      modplug)
+setlib(AC_ZLIB         zlib)
+
 set(MixerX_CodecLibs
-    "${CODECS_LIBRARIES_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}FLAC${PGE_LIBS_DEBUG_SUFFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}"
-    "${CODECS_LIBRARIES_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}fluidlite${PGE_LIBS_DEBUG_SUFFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}"
-    "${CODECS_LIBRARIES_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}vorbisfile${PGE_LIBS_DEBUG_SUFFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}"
-    "${CODECS_LIBRARIES_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}vorbis${PGE_LIBS_DEBUG_SUFFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}"
-    "${CODECS_LIBRARIES_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}opusfile${PGE_LIBS_DEBUG_SUFFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}"
-    "${CODECS_LIBRARIES_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}opus${PGE_LIBS_DEBUG_SUFFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}"
-    "${CODECS_LIBRARIES_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}ogg${PGE_LIBS_DEBUG_SUFFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}"
-    "${CODECS_LIBRARIES_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}mad${PGE_LIBS_DEBUG_SUFFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}"
-    "${CODECS_LIBRARIES_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}ADLMIDI${PGE_LIBS_DEBUG_SUFFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}"
-    "${CODECS_LIBRARIES_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}OPNMIDI${PGE_LIBS_DEBUG_SUFFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}"
-    "${CODECS_LIBRARIES_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}timidity_sdl2${PGE_LIBS_DEBUG_SUFFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}"
-    "${CODECS_LIBRARIES_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}gme${PGE_LIBS_DEBUG_SUFFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}"
-    "${CODECS_LIBRARIES_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}xmp${PGE_LIBS_DEBUG_SUFFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}"
-    "${CODECS_LIBRARIES_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}modplug${PGE_LIBS_DEBUG_SUFFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}"
-    "${CODECS_LIBRARIES_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}zlib${PGE_LIBS_DEBUG_SUFFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}"
+    "${AC_FLAC}"
+    "${AC_FLUIDLITE}"
+    "${AC_VORBISFILE}"
+    "${AC_VORBIS}"
+    "${AC_OPUSFILE}"
+    "${AC_OPUS}"
+    "${AC_OGG}"
+    "${AC_MAD}"
+    "${AC_ADLMIDI}"
+    "${AC_OPNMIDI}"
+    "${AC_TIMIDITYSDL}"
+    "${AC_GME}"
+    "${AC_LIBXMP}"
+    "${AC_MODPLUG}"
+    "${AC_ZLIB}"
 )
+
+if(VITA)
+    # Don't build libraries which already at the system
+    set(VITA_AUDIOCODECS_CMAKE_FLAGS
+        -DBUILD_OGG_VORBIS=OFF
+        -DBUILD_FLAC=OFF
+        -DBUILD_OPUS=OFF
+        -DBUILD_MP3_MAD=OFF
+        -DBUILD_MIKMOD=OFF # this library is not used here
+    )
+
+    set(VITA_MIXERX_CMAKE_FLAGS
+        "-DUSE_OGG_VORBIS_TREMOR=ON"
+        "-DUSE_SYSTEM_SDL2=ON"
+        "-DUSE_SYSTEM_AUDIO_LIBRARIES_DEFAULT=ON"
+        "-DSDL_MIXER_X_SHARED=OFF"
+        "-DFLAC_LIBRARIES=FLAC"
+        "-DOGG_LIBRARIES=ogg"
+        "-DLIBOPUSFILE_LIB=opusfile"
+        "-DLIBOPUS_LIB=opus"
+        "-DCMAKE_C_FLAGS=-I$ENV{VITASDK}/arm-vita-eabi/include/opus"
+        "-DLIBVORBISIDEC_LIB=vorbisidec"
+        "-DMAD_LIBRARIES=mad"
+    )
+
+    set(MixerX_CodecLibs # Minimal list of libraries to link
+        "${AC_FLUIDLITE}"
+        "${AC_ADLMIDI}"
+        "${AC_OPNMIDI}"
+        "${AC_TIMIDITYSDL}"
+        "${AC_GME}"
+        "${AC_LIBXMP}"
+        "${AC_MODPLUG}"
+        "${AC_ZLIB}"
+    )
+endif()
 
 set(MixerX_Deps)
 set(AudioCodecs_Deps)
@@ -169,6 +230,7 @@ ExternalProject_Add(
         "-DBUILD_MIKMOD=OFF"
         ${ANDROID_CMAKE_FLAGS}
         ${VITA_CMAKE_FLAGS}
+        ${VITA_AUDIOCODECS_CMAKE_FLAGS}
         $<$<BOOL:APPLE>:-DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}>
         $<$<BOOL:APPLE>:-DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}>
         $<$<BOOL:WIN32>:-DCMAKE_SHARED_LIBRARY_PREFIX="">
@@ -181,15 +243,7 @@ ExternalProject_Add(
         ${MixerX_CodecLibs}
 )
 
-# TODO: LET VITA HAVE SOME FUN!
-if(VITA)
-    set(MixerX_CodecLibs)
-    message("-------          MixerX_deps only")
-    list(APPEND MixerX_Deps)
-else()
-    message("-------          AudioCodecs_Local")
-    list(APPEND MixerX_Deps AudioCodecs_Local)
-endif()
+list(APPEND MixerX_Deps AudioCodecs_Local)
 
 # SDL Mixer X - an audio library, fork of SDL Mixer
 ExternalProject_Add(
@@ -214,6 +268,7 @@ ExternalProject_Add(
         "-DWITH_SDL2_WASAPI=ON"
         ${ANDROID_CMAKE_FLAGS}
         ${VITA_CMAKE_FLAGS}
+        ${VITA_MIXERX_CMAKE_FLAGS}
         $<$<BOOL:APPLE>:-DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}>
         $<$<BOOL:APPLE>:-DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}>
         $<$<BOOL:WIN32>:-DCMAKE_SHARED_LIBRARY_PREFIX="">
