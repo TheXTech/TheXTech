@@ -109,6 +109,26 @@ public:
     static bool getImageMetrics(std::string imageFile, PGE_Size *imgSize);
     static void getMaskedImageInfo(std::string rootDir, std::string in_imgName, std::string &out_maskName, std::string &out_errStr, PGE_Size *imgSize = nullptr);
 
+    /*!
+     * \brief Checks the possibility to shrink down the image with 2x factor without losses
+     * This call checks the ability to scale-down an image without getting distortions after process.
+     * There are next conditions required:
+     * - Image should have metrics being multiple 2
+     * - Every 2x2 sector at the image should contain the same color.
+     * This means, this image was been scaled up with 2x factor in the past to get this image
+     * \param image Image to check
+     * \param origPath The optional original path to the texture, needed for log printing
+     * \return true - image will be shrank without damages
+     */
+    static bool validateFor2xScaleDown(FIBITMAP *image, const std::string &origPath = std::string());
+
+    /*!
+     * \brief Set the icon for the SDL Window
+     * \param window Target window instance
+     * \param img Icon image to set
+     * \param iconSize The desired size for the icon
+     * \return true if success
+     */
     static bool setWindowIcon(SDL_Window *window, FIBITMAP *img, int iconSize);
 };
 
