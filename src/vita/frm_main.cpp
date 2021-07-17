@@ -1307,6 +1307,11 @@ void FrmMain::eventMouseMove(SDL_MouseMotionEvent &event)
     }
 }
 
+void FrmMain::makeShot()
+{
+    return;
+}
+
 void FrmMain::eventMouseUp(SDL_MouseButtonEvent &event)
 {
     bool doubleClick = false;
