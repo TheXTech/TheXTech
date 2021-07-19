@@ -556,13 +556,13 @@ int menuControls_Mouse_Render(bool mouse, bool render)
         }
 
         // overall title and "BUTTONS" come before the buttons
-        int start_y = sY + 3*line;
-        int b_base = 0;
+        int start_y = sY + 2*line;
+        int b_base = 1;
 
-        if(render)
+        if(render && scroll_start == 0)
         {
-            SuperPrint(g_mainMenu.wordButtons, 3, sX+16, sY + 2*line);
-            SuperPrintRightAlign(g_mainMenu.controlsDeleteKey, 3, sX+width-16, sY + 2*line);
+            SuperPrint(g_mainMenu.wordButtons, 3, sX+16, start_y);
+            SuperPrintRightAlign(g_mainMenu.controlsDeleteKey, 3, sX+width-16, start_y);
         }
 
         for(int i = 0; i < n_playerButtons; i++)
@@ -669,11 +669,11 @@ int menuControls_Mouse_Render(bool mouse, bool render)
         int o_base;
         if(double_line)
         {
-            o_base = (2+1+n_playerButtons*2+2);
+            o_base = (1+n_playerButtons*2+2);
         }
         else
         {
-            o_base = (2+1+n_playerButtons+2);
+            o_base = (1+n_playerButtons+2);
         }
 
         if(n_options && render && o_base - 1 >= scroll_start && o_base - 1 < scroll_end)
