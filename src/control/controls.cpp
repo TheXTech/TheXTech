@@ -2,6 +2,7 @@
 #include "../main/record.h"
 #include "../main/speedrunner.h"
 #include "keyboard.h"
+#include "joystick.h"
 
 #ifndef NO_SDL
 #include "touchscreen.h"
@@ -32,6 +33,18 @@ const char* InputMethod::StatusInfo()
 {
     return nullptr;
 }
+
+// Optional function allowing developer to consume an SDL event (on SDL clients)
+//     usually used for hotkeys or for connect/disconnect events.
+// Called (1) in order of InputMethodTypes, then (2) in order of InputMethods
+// Returns true if event is consumed, false if other InputMethodTypes and InputMethods
+//     should receive it.
+bool InputMethod::ConsumeEvent(const SDL_Event* ev)
+{
+    (void)ev;
+    return false;
+}
+
 
 /*====================================================*\
 || implementation for InputMethodProfile              ||
@@ -254,7 +267,6 @@ void InputMethodType::LoadConfig(IniProcessing* ctl)
 
     ctl->beginGroup(this->Name);
     ctl->read("n-profiles", n_profiles, 0);
-    this->LoadConfig_Custom(ctl);
     ctl->endGroup();
 
     for(int i = 0; i < n_profiles; i++)
@@ -291,10 +303,17 @@ void InputMethodType::LoadConfig(IniProcessing* ctl)
             this->m_defaultProfiles[i] = this->m_profiles[index];
         }
     }
+    this->LoadConfig_Custom(ctl);
     ctl->endGroup();
 }
 
 // optionally overriden methods
+
+bool InputMethodType::ConsumeEvent(const SDL_Event* ev)
+{
+    (void)ev;
+    return false;
+}
 
 bool InputMethodType::SetProfile_Custom(InputMethod* method, int player_no, InputMethodProfile* profile, const std::vector<InputMethod*>& active_methods)
 {
@@ -372,6 +391,7 @@ void InputMethodType::LoadConfig_Custom(IniProcessing* ctl)
 void Init()
 {
     g_InputMethodTypes.push_back(new InputMethodType_Keyboard);
+    g_InputMethodTypes.push_back(new InputMethodType_Joystick);
 #ifdef TOUCHSCREEN_H
     g_InputMethodTypes.push_back(new InputMethodType_TouchScreen);
 #endif
@@ -389,6 +409,23 @@ void Quit()
     g_InputMethodTypes.clear();
 }
 
+// (for SDL clients) process SDL_Event using active InputMethodTypes
+// return true if successfully processed, false if unrecognized
+bool ProcessEvent(const SDL_Event* ev)
+{
+    for(InputMethodType* type : g_InputMethodTypes)
+    {
+        if(type && type->ConsumeEvent(ev))
+            return true;
+    }
+    for(InputMethod* method : g_InputMethods)
+    {
+        if(method && method->ConsumeEvent(ev))
+            return true;
+    }
+    return false;
+}
+
 // 1. Calls the UpdateControlsPre hooks of loaded InputMethodTypes
 //    a. Syncs hardware state as needed
 // 2. Updates Player and Editor controls by calling currently bound InputMethods
@@ -398,7 +435,7 @@ void Quit()
 //    b. If GameMenu or GameOutro is set, may update controls or Menu variables using hardcoded keys
 // 4. Updates speedrun and recording modules
 // 5. Resolves inconsistent control states (Left+Right, etc)
-[[nodiscard]] bool Update()
+bool Update()
 {
     bool okay = true;
     for(InputMethodType* type : g_InputMethodTypes)
@@ -611,10 +648,10 @@ InputMethod* PollInputMethod() noexcept
     {
         g_InputMethods.push_back(new_method);
     }
-    if(SetInputMethodProfile(player_no, new_method->Profile))
+    if(!SetInputMethodProfile(player_no, new_method->Profile))
         pLogWarning("Failed to set profile '%s' for new %s.",
             new_method->Profile->Name.c_str(), new_method->Type->Name.c_str());
-    pLogDebug("Just connected new %s '%s' with profile '%s'.",
+    pLogDebug("Just activated new %s '%s' with profile '%s'.",
         new_method->Type->Name.c_str(),  new_method->Name.c_str(), new_method->Profile->Name.c_str());
     return new_method;
 }
@@ -628,6 +665,8 @@ void DeleteInputMethod(InputMethod* method)
         *loc = nullptr;
         loc = std::find(g_InputMethods.begin(), g_InputMethods.end(), method);
     }
+    pLogDebug("Just deleted %s '%s' with profile '%s'.",
+        method->Type->Name.c_str(),  method->Name.c_str(), method->Profile->Name.c_str());
     delete method;
 }
 
@@ -678,6 +717,9 @@ void ClearInputMethods()
 // player is 1-indexed :(
 void Rumble(int player, int ms, float strength)
 {
+    if(!JoystickEnableRumble || GameMenu || GameOutro)
+        return;
+
     if(player < 1 || player > (int)g_InputMethods.size())
         return;
     if(!g_InputMethods[player-1])
@@ -687,6 +729,9 @@ void Rumble(int player, int ms, float strength)
 
 void RumbleAllPlayers(int ms, float strength)
 {
+    if(!JoystickEnableRumble || GameMenu || GameOutro)
+        return;
+
     for(InputMethod* method : g_InputMethods)
     {
         if(!method)

@@ -799,6 +799,7 @@ int menuControls_Logic()
         {
             g_pollingInput = false;
             MenuCursorCanMove = false;
+            s_canDelete = false;
             PlaySoundMenu(SFX_PSwitch);
             return 0;
         }
@@ -814,6 +815,7 @@ int menuControls_Logic()
         {
             g_pollingInput = false;
             MenuCursorCanMove = false;
+            s_canDelete = false;
             PlaySoundMenu(SFX_Slide);
             return 0;
         }

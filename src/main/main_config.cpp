@@ -118,28 +118,6 @@ void OpenConfig_preSetup()
     }
 }
 
-static void readJoyKey(IniProcessing &setup, const char *n, KM_Key &key)
-{
-    std::string joyKey(n);
-    setup.read((joyKey + "-val").c_str(), key.val, key.val);
-    setup.read((joyKey + "-id").c_str(), key.id, key.id);
-    setup.read((joyKey + "-type").c_str(), key.type, key.type);
-    setup.read((joyKey + "-ctrl-val").c_str(), key.ctrl_val, key.ctrl_val);
-    setup.read((joyKey + "-ctrl-id").c_str(), key.ctrl_id, key.ctrl_id);
-    setup.read((joyKey + "-ctrl-type").c_str(), key.ctrl_type, key.ctrl_type);
-}
-
-static void writeJoyKey(IniProcessing &setup, const char *n, KM_Key &key)
-{
-    std::string joyKey(n);
-    setup.setValue((joyKey + "-val").c_str(), key.val);
-    setup.setValue((joyKey + "-id").c_str(), key.id);
-    setup.setValue((joyKey + "-type").c_str(), key.type);
-    setup.setValue((joyKey + "-ctrl-val").c_str(), key.ctrl_val);
-    setup.setValue((joyKey + "-ctrl-id").c_str(), key.ctrl_id);
-    setup.setValue((joyKey + "-ctrl-type").c_str(), key.ctrl_type);
-}
-
 
 void OpenConfig()
 {
@@ -172,59 +150,7 @@ void OpenConfig()
         config.read("enable-bowser-iiird-screen-shake", GameplayShakeScreenBowserIIIrd, true);
         config.endGroup();
 
-        config.beginGroup("joystick");
-        config.read("enable-rumble", JoystickEnableRumble, true);
-        config.read("enable-battery-status", JoystickEnableBatteryStatus, true);
-        config.endGroup();
-
         Controls::LoadConfig(ctl);
-        For(A, 1, 2)
-        {
-            auto keys = ctl->childGroups();
-            auto keyNeed = fmt::format_ne("joystick-uuid-{0}-", A);
-
-            for(auto &k : keys)
-            {
-                auto r = k.find(keyNeed);
-                if(r != std::string::npos && r == 0)
-                {
-                    std::string u;
-                    ctl->beginGroup(k);
-                    ctl->read("device-uuid", u, "");
-                    if(u.empty())
-                    {
-                        ctl->endGroup();
-                        continue;
-                    }
-                    auto &j = joyGetByUuid(A, u);
-                    readJoyKey(*ctl, "Up", j.Up);
-                    readJoyKey(*ctl, "Down", j.Down);
-                    readJoyKey(*ctl, "Left", j.Left);
-                    readJoyKey(*ctl, "Right", j.Right);
-                    readJoyKey(*ctl, "Run", j.Run);
-                    readJoyKey(*ctl, "Jump", j.Jump);
-                    readJoyKey(*ctl, "Drop", j.Drop);
-                    readJoyKey(*ctl, "Start", j.Start);
-                    readJoyKey(*ctl, "AltJump", j.AltJump);
-                    readJoyKey(*ctl, "AltRun", j.AltRun);
-                    ctl->endGroup();
-                }
-            }
-
-            ctl->beginGroup(fmt::format_ne("player-{0}-joystick", A));
-//            config.read("used-device", conJoystick[A].hwGUID, std::string());
-            readJoyKey(*ctl, "Up", conJoystick[A].Up);
-            readJoyKey(*ctl, "Down", conJoystick[A].Down);
-            readJoyKey(*ctl, "Left", conJoystick[A].Left);
-            readJoyKey(*ctl, "Right", conJoystick[A].Right);
-            readJoyKey(*ctl, "Run", conJoystick[A].Run);
-            readJoyKey(*ctl, "Jump", conJoystick[A].Jump);
-            readJoyKey(*ctl, "Drop", conJoystick[A].Drop);
-            readJoyKey(*ctl, "Start", conJoystick[A].Start);
-            readJoyKey(*ctl, "AltJump", conJoystick[A].AltJump);
-            readJoyKey(*ctl, "AltRun", conJoystick[A].AltRun);
-            ctl->endGroup();
-        }
     }
 //    If resBool = True And resChanged = False And LevelEditor = False Then ChangeScreen
 #ifndef __ANDROID__
@@ -306,49 +232,7 @@ void SaveConfig()
     config.setValue("enable-bowser-iiird-screen-shake", GameplayShakeScreenBowserIIIrd);
     config.endGroup();
 
-    config.beginGroup("joystick");
-    config.setValue("enable-rumble", JoystickEnableRumble);
-    config.setValue("enable-battery-status", JoystickEnableBatteryStatus);
-    config.endGroup();
-
     Controls::SaveConfig(&controls);
-    For(A, 1, 2)
-    {
-        std::vector<std::string> joystickUuid;
-        joyGetAllUUIDs(A, joystickUuid);
-
-        for(auto &u : joystickUuid)
-        {
-            auto &j = joyGetByUuid(A, u);
-            controls.beginGroup(fmt::format_ne("joystick-uuid-{0}-{1}", A, u));
-            controls.setValue("device-uuid", u);
-            writeJoyKey(controls, "Up", j.Up);
-            writeJoyKey(controls, "Down", j.Down);
-            writeJoyKey(controls, "Left", j.Left);
-            writeJoyKey(controls, "Right", j.Right);
-            writeJoyKey(controls, "Run", j.Run);
-            writeJoyKey(controls, "Jump", j.Jump);
-            writeJoyKey(controls, "Drop", j.Drop);
-            writeJoyKey(controls, "Start", j.Start);
-            writeJoyKey(controls, "AltJump", j.AltJump);
-            writeJoyKey(controls, "AltRun", j.AltRun);
-            controls.endGroup();
-        }
-
-        controls.beginGroup(fmt::format_ne("player-{0}-joystick", A));
-//        config.setValue("used-device", conJoystick[A].hwGUID);
-        writeJoyKey(controls, "Up", conJoystick[A].Up);
-        writeJoyKey(controls, "Down", conJoystick[A].Down);
-        writeJoyKey(controls, "Left", conJoystick[A].Left);
-        writeJoyKey(controls, "Right", conJoystick[A].Right);
-        writeJoyKey(controls, "Run", conJoystick[A].Run);
-        writeJoyKey(controls, "Jump", conJoystick[A].Jump);
-        writeJoyKey(controls, "Drop", conJoystick[A].Drop);
-        writeJoyKey(controls, "Start", conJoystick[A].Start);
-        writeJoyKey(controls, "AltJump", conJoystick[A].AltJump);
-        writeJoyKey(controls, "AltRun", conJoystick[A].AltRun);
-        controls.endGroup();
-    }
 
     config.writeIniFile();
     controls.writeIniFile();

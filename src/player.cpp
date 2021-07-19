@@ -47,6 +47,7 @@
 #include "main/menu_main.h"
 #include "compat.h"
 
+#include "controls.h"
 
 
 void WaterCheck(int A);
@@ -435,12 +436,14 @@ void SetupPlayers()
 void PlayerHurt(int A)
 {
     if(GodMode || GameOutro || BattleOutro > 0)
-            return;
+        return;
     Location_t tempLocation;
     int B = 0;
 
     if(Player[A].Dead || Player[A].TimeToLive > 0 || Player[A].Stoned || Player[A].Immune > 0 || Player[A].Effect > 0)
         return;
+
+    Controls::Rumble(A, 250, 0.5);
 //    if(nPlay.Online) // netplay stuffs
 //    {
 //        if(nPlay.Allow == false && A != nPlay.MySlot + 1)
@@ -694,6 +697,8 @@ void PlayerHurt(int A)
 
 void PlayerDead(int A)
 {
+    Controls::Rumble(A, 400, 0.8);
+
     bool tempBool = false;
     int B = 0;
 

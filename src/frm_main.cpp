@@ -34,7 +34,6 @@
 #include "frame_timer.h"
 #include "game_main.h"
 #include "graphics.h"
-#include "control/joystick.h"
 #include "controls.h"
 #include "sound.h"
 #include "editor.h"
@@ -309,7 +308,6 @@ void FrmMain::freeSDL()
 {
     GFX.unLoad();
     clearAllTextures();
-    joyCloseJoysticks();
 
 #ifndef __EMSCRIPTEN__
     m_gif.quit();
@@ -355,17 +353,13 @@ void FrmMain::doEvents()
 
 void FrmMain::processEvent()
 {
+    if(Controls::ProcessEvent(&m_event))
+        return;
     switch(m_event.type)
     {
     case SDL_QUIT:
         showCursor(1);
         KillIt();
-        break;
-    case SDL_JOYDEVICEADDED:
-        joyDeviceAddEvent(&m_event.jdevice);
-        break;
-    case SDL_JOYDEVICEREMOVED:
-        joyDeviceRemoveEvent(&m_event.jdevice);
         break;
     case SDL_WINDOWEVENT:
         if((m_event.window.event == SDL_WINDOWEVENT_RESIZED) || (m_event.window.event == SDL_WINDOWEVENT_MOVED))
@@ -458,7 +452,6 @@ void FrmMain::eventDoubleClick()
 void FrmMain::eventKeyDown(SDL_KeyboardEvent &evt)
 {
     int KeyCode = evt.keysym.scancode;
-    inputKey = KeyCode;
 
     bool ctrlF = ((evt.keysym.mod & KMOD_CTRL) != 0 && evt.keysym.scancode == SDL_SCANCODE_F);
     bool altEnter = ((evt.keysym.mod & KMOD_ALT) != 0 && (evt.keysym.scancode == SDL_SCANCODE_RETURN || evt.keysym.scancode == SDL_SCANCODE_KP_ENTER));

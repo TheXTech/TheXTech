@@ -4,6 +4,9 @@
 namespace Controls
 {
 
+// helper functions
+
+
 /*====================================================*\
 || implementation for InputMethod_Keyboard            ||
 \*====================================================*/
@@ -22,8 +25,8 @@ bool InputMethod_Keyboard::Update(Controls_t& c)
                 || k->m_keyboardState[SDL_SCANCODE_RCTRL] == KEY_PRESSED);
     for(size_t i = 0; i < PlayerControls::n_buttons; i++)
     {
-        int key = (size_t)p->m_keys[i];
-        int key2 = (size_t)p->m_keys2[i];
+        int key = p->m_keys[i];
+        int key2 = p->m_keys2[i];
         bool& b = PlayerControls::GetButton(c, i);
 
         bool inhibit = altPressed && (key == SDL_SCANCODE_RETURN || key == SDL_SCANCODE_F);

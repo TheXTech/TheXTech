@@ -34,7 +34,6 @@
 #include "../location.h"
 #include "../main/menu_main.h"
 #include "../main/speedrunner.h"
-#include "../control/joystick.h"
 #include "../main/trees.h"
 
 #include <fmt_format_ne.h>

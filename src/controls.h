@@ -26,6 +26,9 @@
 #ifndef CONTROLS_H
 #define CONTROLS_H
 
+// forward declaration since some clients do not have SDL
+typedef union SDL_Event SDL_Event;
+
 #include <vector>
 
 #include <IniProcessor/ini_processing.h>
@@ -173,11 +176,22 @@ public:
 
     virtual void Rumble(int ms, float strength) = 0;
 
+    /*-----------------------*\
+    || OPTIONAL METHODS      ||
+    \*-----------------------*/
+
     // Used for battery, latency, etc
     // If this is dynamically generated, you MUST use an instance-owned buffer
     // This will NOT be freed
     // returning a null pointer is allowed
     virtual const char* StatusInfo();
+
+    // Optional function allowing developer to consume an SDL event (on SDL clients)
+    //     usually used for hotkeys or for connect/disconnect events.
+    // Called (1) in order of InputMethodTypes, then (2) in order of InputMethods
+    // Returns true if event is consumed, false if other InputMethodTypes and InputMethods
+    //     should receive it.
+    virtual bool ConsumeEvent(const SDL_Event* ev);
 };
 
 // represents an input method profile for a particular input class
@@ -304,6 +318,14 @@ public:
     /*-----------------------*\
     || OPTIONAL METHODS      ||
     \*-----------------------*/
+public:
+    // Optional function allowing developer to consume an SDL event (on SDL clients)
+    //     usually used for hotkeys or for connect/disconnect events.
+    // Called (1) in order of InputMethodTypes, then (2) in order of InputMethods
+    // Returns true if event is consumed, false if other InputMethodTypes and InputMethods
+    //     should receive it.
+    virtual bool ConsumeEvent(const SDL_Event* ev);
+
 protected:
     // optional function allowing developer to associate device information with profile, etc
     // if developer wants to forbid assignment, return false
@@ -339,6 +361,10 @@ void Init();
 
 // free all InputMethodTypes, InputMethodProfiles (implicitly), and InputMethods
 void Quit();
+
+// (for SDL clients) process SDL_Event using active InputMethodTypes
+// return true if successfully processed, false if unrecognized
+bool ProcessEvent(const SDL_Event* ev);
 
 // 1. Calls the UpdateControlsPre hooks of currently active InputMethodTypes
 //    a. Syncs hardware state as needed

@@ -35,6 +35,8 @@
 #include "../controls.h"
 #include "../std_picture.h"
 
+typedef struct _SDL_Haptic SDL_Haptic;
+
 namespace Controls
 {
 
@@ -109,8 +111,6 @@ public:
     };
     StdPicture touch[BUTTONS_END];
 };
-
-typedef struct _SDL_Haptic SDL_Haptic;
 
 /*!
  * \brief A mobile touch-screen controller which reads state of the keyboard device
