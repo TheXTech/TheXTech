@@ -330,6 +330,9 @@ protected:
     // optional function allowing developer to associate device information with profile, etc
     // if developer wants to forbid assignment, return false
     virtual bool SetProfile_Custom(InputMethod* method, int player_no, InputMethodProfile* profile, const std::vector<InputMethod*>& active_methods);
+    // unregisters any references to the profile before final deallocation
+    // returns false to prevent deletion if this is impossible
+    virtual bool DeleteProfile_Custom(InputMethodProfile* profile, const std::vector<InputMethod*>& active_methods);
 
 public:
     // How many per-type special options are there?

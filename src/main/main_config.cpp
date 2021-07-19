@@ -30,7 +30,6 @@
 #include "../graphics.h"
 #include "../sound.h"
 #include "../video.h"
-#include "../control/joystick.h"
 #include "speedrunner.h"
 #include "../controls.h"
 

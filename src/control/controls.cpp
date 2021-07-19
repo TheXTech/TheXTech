@@ -130,37 +130,26 @@ bool InputMethodType::DeleteProfile(InputMethodProfile* profile, const std::vect
     if(loc == this->m_profiles.end())
         return false;
 
-    // figure out a backup profile to assign to all relevant methods
-    InputMethodProfile* backup;
-    if(loc != this->m_profiles.begin())
-    {
-        backup = this->m_profiles[0];
-    }
-    else if(this->m_profiles.size() > 1)
-    {
-        backup = this->m_profiles[1];
-    }
-    else
-    {
-        backup = nullptr;
-    }
-
+    int player_no = 0;
     for(InputMethod* method : active_methods)
     {
         if(!method)
             continue;
         if(method->Profile == profile)
         {
-            if(backup)
+            // try to assign an acceptable backup profile to all relevant methods
+            for(InputMethodProfile* backup : this->m_profiles)
             {
-                method->Profile = backup;
+                if(backup != profile && this->SetProfile(method, player_no, backup, active_methods))
+                    break;
             }
-            // deleting the profile would leave the game inconsistent
-            else
+            // if we couldn't find one, deleting the profile would leave the game inconsistent
+            if(method->Profile == profile)
             {
                 return false;
             }
         }
+        player_no ++;
     }
 
     for(int i = 0; i < maxLocalPlayers; i++)
@@ -168,9 +157,12 @@ bool InputMethodType::DeleteProfile(InputMethodProfile* profile, const std::vect
         if(this->m_defaultProfiles[i] == profile)
         {
             // m_defaultProfiles is nullable, so this is okay
-            this->m_defaultProfiles[i] = backup;
+            this->m_defaultProfiles[i] = nullptr;
         }
     }
+
+    if(!this->DeleteProfile_Custom(profile, active_methods))
+        return false;
 
     this->m_profiles.erase(loc);
 
@@ -322,6 +314,13 @@ bool InputMethodType::SetProfile_Custom(InputMethod* method, int player_no, Inpu
     {
         return false;
     }
+    return true;
+}
+
+bool InputMethodType::DeleteProfile_Custom(InputMethodProfile* profile, const std::vector<InputMethod*>& active_methods)
+{
+    (void)profile;
+    (void)active_methods;
     return true;
 }
 

@@ -755,17 +755,52 @@ InputMethod* InputMethodType_Joystick::Poll(const std::vector<InputMethod*>& act
     if(!method)
         return nullptr;
 
-    // do special things for controllers...!
-
-    // cleverly do the profile using UUID, soon! :)
-
-    // make sure that the profile is appropriate to the controller-ness of the controller
-
+    method->Type = this;
+    method->Name = SDL_JoystickName(active_joystick->joy);
     method->m_devices = active_joystick;
 
-    method->Name = SDL_JoystickName(active_joystick->joy);
-    method->Type = this;
-    // method->Profile = target_profile;
+    // I've found that truncation to 10 characters is
+    // needed for this to display well with multiplayer
+    if(method->Name.size() > 10)
+        method->Name.resize(10);
+
+    // find controller profile...!
+
+    // 1. cleverly look for profile by GUID
+    std::unordered_map<std::string, InputMethodProfile*>::iterator found
+        = this->m_lastProfileByGUID.find(active_joystick->guid);
+
+    if(found != this->m_lastProfileByGUID.end())
+    {
+        method->Profile = found->second;
+    }
+
+    // 2. find first profile appropriate to the controller-ness of the controller
+    if(!method->Profile)
+    {
+        for(InputMethodProfile* p_ : this->m_profiles)
+        {
+            InputMethodProfile_Joystick* p = dynamic_cast<InputMethodProfile_Joystick*>(p_);
+            if(!p)
+                continue;
+            if((active_joystick->ctrl && p->m_controllerProfile)
+                || (!active_joystick->ctrl && !p->m_controllerProfile))
+            {
+                method->Profile = p_;
+                break;
+            }
+        }
+
+        // 3. make appropriate new profile (note that allocs could fail, that will be cleaned up later)
+        if(!method->Profile && active_joystick->ctrl)
+        {
+            method->Profile = this->AddControllerProfile();
+        }
+        else if(!method->Profile)
+        {
+            method->Profile = this->AddProfile();
+        }
+    }
 
     return (InputMethod*)method;
 }
@@ -883,7 +918,7 @@ bool InputMethodType_Joystick::OpenJoystick(int joystick_index)
         pLogDebug("  does not support haptic.");
     }
     int id = SDL_JoystickInstanceID(joy);
-    pLogDebug("  received ID %d. saving!", id);
+    pLogDebug("  received ID %d. adding to poll list!", id);
 
     this->m_availableJoysticks.emplace(id, devices);
 
@@ -934,7 +969,7 @@ InputMethodProfile* InputMethodType_Joystick::AddControllerProfile()
     if(!p)
         return nullptr;
     p->InitAsController();
-    p->Name = "CONTROLLER " + std::to_string(this->m_profiles.size());
+    p->Name = "Ctrl " + std::to_string(this->m_profiles.size());
 
     return p_;
 }
@@ -963,6 +998,31 @@ bool InputMethodType_Joystick::SetProfile_Custom(InputMethod* method, int player
         return false;
 
     // set in map!
+    this->m_lastProfileByGUID[m->m_devices->guid] = profile;
+
+    pLogDebug("Setting default controller for GUID '%s' to %s.", m->m_devices->guid.c_str(), profile->Name.c_str());
+
+    return true;
+}
+
+// unregisters any references to the profile before final deallocation
+// returns false to prevent deletion if this is impossible
+bool InputMethodType_Joystick::DeleteProfile_Custom(InputMethodProfile* profile, const std::vector<InputMethod*>& active_methods)
+{
+    (void)active_methods;
+
+    for(auto it = m_lastProfileByGUID.begin(); it != m_lastProfileByGUID.end(); )
+    {
+        if(it->second == profile)
+        {
+            pLogDebug("Unsetting default controller for GUID '%s'.", it->first.c_str());
+            it = m_lastProfileByGUID.erase(it);
+        }
+        else
+        {
+            ++it;
+        }
+    }
 
     return true;
 }

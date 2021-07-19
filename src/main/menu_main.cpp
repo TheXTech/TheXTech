@@ -44,7 +44,7 @@
 #include "../player.h"
 #include "../collision.h"
 #include "../graphics.h"
-#include "../control/joystick.h"
+#include "../controls.h"
 #include "../config.h"
 #include "level_file.h"
 #include "pge_delay.h"
