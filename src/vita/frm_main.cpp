@@ -166,10 +166,13 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
     bool res = false;
     LoadLogSettings(setup.interprocess, setup.verboseLogging);
 
+
+
 #ifdef USE_STBI
     _debugPrintf_("VITA: Using stb_image for graphics loading!");
 #else
     _debugPrintf_("VITA: Using libFreeImageLite for graphics loading.");
+    GraphicsHelps::initFreeImage();
 #endif
 
     _debugPrintf_("--Before vglInit--");
@@ -298,6 +301,9 @@ bool FrmMain::freeTextureMem() // make it take an amount of memory, someday.....
 void FrmMain::freeSDL()
 {
     pLogDebug("<Application Closing>");
+
+    pLogDebug("GraphicsHelps::closeFreeImage");
+    GraphicsHelps::closeFreeImage();
 
     pLogDebug("GFX.unLoad");
     GFX.unLoad();
@@ -547,6 +553,7 @@ StdPicture FrmMain::LoadPicture(std::string path)
     if(!GameIsActive) return target;
     target.inited = false;
     target.path = path;
+    target.origPath = path;
 
     if(target.path.empty()) return target;
 #ifdef USE_STBI
@@ -626,6 +633,7 @@ StdPicture FrmMain::LoadPicture(std::string path)
     target.inited = true;
     target.lazyLoaded = false;
 
+
     if((w == 0) || (h == 0))
     {
         FreeImage_Unload(sourceImage);
@@ -653,13 +661,13 @@ StdPicture FrmMain::LoadPicture(std::string path)
 
     num_textures_loaded++;
 
-    #ifdef USE_STBI
-    #ifndef USE_STBI_RESIZE
+#ifdef USE_STBI
+#ifndef USE_STBI_RESIZE
     stbi_image_free(sourceImage);
-    #endif
-    #else
+#endif
+#else
     GraphicsHelps::closeImage(sourceImage);
-    #endif
+#endif
 
     if(!target.texture)
         printf("FAILED TO LOAD!!!! %s\n", path.c_str());
