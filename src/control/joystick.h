@@ -105,15 +105,20 @@ public:
     using InputMethodProfile::Type;
 
     bool m_controllerProfile = false;
+    bool m_legacyProfile = false;
     bool m_rumbleEnabled = true;
 
+    // primary keys (also controller keys in legacy mode)
     KM_Key m_keys[PlayerControls::n_buttons];
+    // secondary keys (also joystick keys in legacy mode)
     KM_Key m_keys2[PlayerControls::n_buttons];
 
     InputMethodProfile_Joystick();
 
     void InitAsJoystick();
     void InitAsController();
+    void ExpandAsJoystick();
+    void ExpandAsController();
 
     // Polls a new (secondary) device button for the i'th player button
     // Returns true on success and false if no button pressed
@@ -189,7 +194,7 @@ public:
     \*-----------------------*/
     KM_Key PollJoystickKeyAll();
     KM_Key PollControllerKeyAll();
-    InputMethodProfile* AddControllerProfile();
+    InputMethodProfile* AddOldJoystickProfile();
 
     /*-----------------------*\
     || OPTIONAL METHODS      ||

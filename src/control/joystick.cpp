@@ -309,7 +309,7 @@ void InputMethod_Joystick::Rumble(int ms, float strength)
 // the job of this function is to initialize the class in a consistent state
 InputMethodProfile_Joystick::InputMethodProfile_Joystick()
 {
-    this->InitAsJoystick();
+    this->InitAsController();
 }
 
 void InputMethodProfile_Joystick::InitAsJoystick()
@@ -357,6 +357,52 @@ void InputMethodProfile_Joystick::InitAsController()
     {
         this->m_keys2[i].assign(KM_Key::NoControl, -1, -1);
     }
+    this->m_keys2[PlayerControls::Buttons::Up].assign(KM_Key::CtrlAxis, SDL_CONTROLLER_AXIS_LEFTY, -1);
+    this->m_keys2[PlayerControls::Buttons::Down].assign(KM_Key::CtrlAxis, SDL_CONTROLLER_AXIS_LEFTY, 1);
+    this->m_keys2[PlayerControls::Buttons::Left].assign(KM_Key::CtrlAxis, SDL_CONTROLLER_AXIS_LEFTX, -1);
+    this->m_keys2[PlayerControls::Buttons::Right].assign(KM_Key::CtrlAxis, SDL_CONTROLLER_AXIS_LEFTX, 1);
+}
+
+void InputMethodProfile_Joystick::ExpandAsJoystick()
+{
+    this->m_legacyProfile = false;
+    this->m_controllerProfile = false;
+
+    // controller keys are stored in m_keys, joystick in m_keys2
+    // copy joystick keys from m_keys2 to m_keys
+    this->m_keys[PlayerControls::Buttons::Up] = this->m_keys2[PlayerControls::Buttons::Up];
+    this->m_keys[PlayerControls::Buttons::Down] = this->m_keys2[PlayerControls::Buttons::Down];
+    this->m_keys[PlayerControls::Buttons::Left] = this->m_keys2[PlayerControls::Buttons::Left];
+    this->m_keys[PlayerControls::Buttons::Right] = this->m_keys2[PlayerControls::Buttons::Right];
+    this->m_keys[PlayerControls::Buttons::Jump] = this->m_keys2[PlayerControls::Buttons::Jump];
+    this->m_keys[PlayerControls::Buttons::AltJump] = this->m_keys2[PlayerControls::Buttons::AltJump];
+    this->m_keys[PlayerControls::Buttons::Run] = this->m_keys2[PlayerControls::Buttons::Run];
+    this->m_keys[PlayerControls::Buttons::AltRun] = this->m_keys2[PlayerControls::Buttons::AltRun];
+    this->m_keys[PlayerControls::Buttons::Drop] = this->m_keys2[PlayerControls::Buttons::Drop];
+    this->m_keys[PlayerControls::Buttons::Start] = this->m_keys2[PlayerControls::Buttons::Start];
+
+    // clear all of the old joystick keys that have been copied over
+    for(size_t i = 0; i < PlayerControls::n_buttons; i++)
+    {
+        this->m_keys2[i].assign(KM_Key::NoControl, -1, -1);
+    }
+}
+
+void InputMethodProfile_Joystick::ExpandAsController()
+{
+    this->m_legacyProfile = false;
+    this->m_controllerProfile = true;
+
+    // controller keys are stored in m_keys, joystick in m_keys2
+    // no action needed for m_keys
+
+    // clear all of the old joystick keys, then fill in some of them
+    for(size_t i = 0; i < PlayerControls::n_buttons; i++)
+    {
+        this->m_keys2[i].assign(KM_Key::NoControl, -1, -1);
+    }
+
+    // this is needed because using the LStick was not configurable before
     this->m_keys2[PlayerControls::Buttons::Up].assign(KM_Key::CtrlAxis, SDL_CONTROLLER_AXIS_LEFTY, -1);
     this->m_keys2[PlayerControls::Buttons::Down].assign(KM_Key::CtrlAxis, SDL_CONTROLLER_AXIS_LEFTY, 1);
     this->m_keys2[PlayerControls::Buttons::Left].assign(KM_Key::CtrlAxis, SDL_CONTROLLER_AXIS_LEFTX, -1);
@@ -576,25 +622,23 @@ const char* InputMethodProfile_Joystick::NameSecondaryButton(size_t i)
 
 void InputMethodProfile_Joystick::SaveConfig(IniProcessing* ctl)
 {
-/*
-    char name2[20];
+    std::string name;
     for(size_t i = 0; i < PlayerControls::n_buttons; i++)
     {
-        const char* name = PlayerControls::GetButtonName_INI(i);
-        ctl->setValue(name, this->m_keys[i]);
-        for(size_t c = 0; c < 20; c++)
-        {
-            if(c+2 == 20 || name[c] == '\0')
-            {
-                name2[c] = '2';
-                name2[c+1] = '\0';
-                break;
-            }
-            name2[c] = name[c];
-        }
-        ctl->setValue(name2, this->m_keys2[i]);
+        name = PlayerControls::GetButtonName_INI(i);
+        // ctl->setValue(name, this->m_keys[i]);
+        // for(size_t c = 0; c < 20; c++)
+        // {
+        //     if(c+2 == 20 || name[c] == '\0')
+        //     {
+        //         name2[c] = '2';
+        //         name2[c+1] = '\0';
+        //         break;
+        //     }
+        //     name2[c] = name[c];
+        // }
+        // ctl->setValue(name2, this->m_keys2[i]);
     }
-*/
 }
 
 void InputMethodProfile_Joystick::LoadConfig(IniProcessing* ctl)
@@ -766,13 +810,45 @@ InputMethod* InputMethodType_Joystick::Poll(const std::vector<InputMethod*>& act
 
     // find controller profile...!
 
-    // 1. cleverly look for profile by GUID
+    int my_index = 0;
+    for(const InputMethod* method : active_methods)
+    {
+        if(!method)
+        {
+            break;
+        }
+        my_index ++;
+    }
+
+    // 1. cleverly look for profile by GUID and player...
     std::unordered_map<std::string, InputMethodProfile*>::iterator found
-        = this->m_lastProfileByGUID.find(active_joystick->guid);
+        = this->m_lastProfileByGUID.find(active_joystick->guid+"-p"+std::to_string(my_index));
+
+    // ...then by just GUID.
+    if(found == this->m_lastProfileByGUID.end())
+    {
+        found = this->m_lastProfileByGUID.find(active_joystick->guid);
+    }
 
     if(found != this->m_lastProfileByGUID.end())
     {
         method->Profile = found->second;
+        InputMethodProfile_Joystick* profile = dynamic_cast<InputMethodProfile_Joystick*>(found->second);
+
+        if(profile->m_legacyProfile)
+        {
+            // expanding a legacy profile based on information from controller
+            profile->Name = method->Name + " P" + std::to_string(my_index);
+            if(active_joystick->ctrl)
+            {
+                profile->ExpandAsController();
+            }
+            else
+            {
+                profile->ExpandAsJoystick();
+            }
+            this->m_profiles.push_back(method->Profile);
+        }
     }
 
     // 2. find first profile appropriate to the controller-ness of the controller
@@ -794,11 +870,11 @@ InputMethod* InputMethodType_Joystick::Poll(const std::vector<InputMethod*>& act
         // 3. make appropriate new profile (note that allocs could fail, that will be cleaned up later)
         if(!method->Profile && active_joystick->ctrl)
         {
-            method->Profile = this->AddControllerProfile();
+            method->Profile = this->AddProfile();
         }
         else if(!method->Profile)
         {
-            method->Profile = this->AddProfile();
+            method->Profile = this->AddOldJoystickProfile();
         }
     }
 
@@ -962,14 +1038,14 @@ bool InputMethodType_Joystick::CloseJoystick(int instance_id)
     return true;
 }
 
-InputMethodProfile* InputMethodType_Joystick::AddControllerProfile()
+InputMethodProfile* InputMethodType_Joystick::AddOldJoystickProfile()
 {
     InputMethodProfile* p_ = this->AddProfile();
     InputMethodProfile_Joystick* p = dynamic_cast<InputMethodProfile_Joystick*>(p_);
     if(!p)
         return nullptr;
-    p->InitAsController();
-    p->Name = "Ctrl " + std::to_string(this->m_profiles.size());
+    p->InitAsJoystick();
+    p->Name = "Old Joy " + std::to_string(this->m_profiles.size());
 
     return p_;
 }
@@ -982,7 +1058,6 @@ InputMethodProfile* InputMethodType_Joystick::AddControllerProfile()
 // if developer wants to forbid assignment, return false
 bool InputMethodType_Joystick::SetProfile_Custom(InputMethod* method, int player_no, InputMethodProfile* profile, const std::vector<InputMethod*>& active_methods)
 {
-    (void)player_no;
     (void)active_methods;
 
     InputMethod_Joystick* m = dynamic_cast<InputMethod_Joystick*>(method);
@@ -998,9 +1073,11 @@ bool InputMethodType_Joystick::SetProfile_Custom(InputMethod* method, int player
         return false;
 
     // set in map!
+    this->m_lastProfileByGUID[m->m_devices->guid+"-p"+std::to_string(player_no)] = profile;
     this->m_lastProfileByGUID[m->m_devices->guid] = profile;
 
-    pLogDebug("Setting default controller for GUID '%s' to %s.", m->m_devices->guid.c_str(), profile->Name.c_str());
+    pLogDebug("Setting default controller for GUID '%s' and player %d to %s.",
+        m->m_devices->guid.c_str(), player_no, profile->Name.c_str());
 
     return true;
 }
@@ -1059,7 +1136,7 @@ size_t InputMethodType_Joystick::GetSpecialOptionCount()
 const char* InputMethodType_Joystick::GetOptionName(size_t i)
 {
     if(i == 0)
-        return "NEW CONTROLLER PROFILE";
+        return "NEW PROFILE FOR OLD JOYSTICK";
     else
         return nullptr;
 }
@@ -1074,7 +1151,7 @@ const char* InputMethodType_Joystick::GetOptionValue(size_t i)
 // called when A is pressed; allowed to interrupt main game loop
 bool InputMethodType_Joystick::OptionChange(size_t i)
 {
-    if(i == 0 && this->AddControllerProfile())
+    if(i == 0 && this->AddOldJoystickProfile())
         return true;
 
     return false;
