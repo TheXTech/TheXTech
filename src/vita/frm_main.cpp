@@ -792,32 +792,6 @@ StdPicture FrmMain::lazyLoadPicture(std::string path)
 
 void FrmMain::loadTexture(StdPicture &target, uint32_t width, uint32_t height, uint8_t *RGBApixels)
 {
-    // Convert
-    FIBITMAP *tempImage = NULL;
-    {
-        uint32_t p2_w = pow2roundup(width);
-        uint32_t p2_h = pow2roundup(height);
-
-        if((width != p2_w) || (height != p2_h))
-        {
-            tempImage = FreeImage_ConvertFromRawBits(RGBApixels,
-                        static_cast<int>(width),
-                        static_cast<int>(height),
-                        static_cast<int>(width * 4),
-                        32,
-                        FI_RGBA_RED_MASK,
-                        FI_RGBA_GREEN_MASK,
-                        FI_RGBA_BLUE_MASK,
-                        0);
-            toPowofTwo(&tempImage);
-            width = p2_w;
-            height = p2_h;
-            RGBApixels = FreeImage_GetBits(tempImage);
-        }
-    }
-    // End Convert
-
-
     // Take our raw bytes and load them in as an OpenGL image.
     GLuint _newTexture = 0;
     glGenTextures(1, &(target.texture));
@@ -855,9 +829,6 @@ void FrmMain::loadTexture(StdPicture &target, uint32_t width, uint32_t height, u
 
     num_textures_loaded++;
     m_textureBank.insert(_newTexture);
-
-    if(tempImage)
-        FreeImage_Unload(tempImage);
 }
 
 void FrmMain::lazyLoad(StdPicture &target)

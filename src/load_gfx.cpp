@@ -270,7 +270,7 @@ void LoadGFX()
         bool vitaDebugSkip = false;
 
         #ifdef VITA
-        vitaDebugSkip = true;
+        vitaDebugSkip = false;
         #endif
 
         if(Files::fileExists(p) && !vitaDebugSkip)
