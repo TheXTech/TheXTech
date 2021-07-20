@@ -39,8 +39,8 @@ static inline void Vita_DrawImage(
     unsigned int flip,
     float r, float g, float b, float a)
 {
-    
-    
+
+
 
 #ifdef USE_STBI_RESIZE
     float tex_w = texture.w,
@@ -53,12 +53,15 @@ static inline void Vita_DrawImage(
     float tex_w = texture.w / 2,
           tex_h = texture.h / 2;
 #endif
-    
+
 
     float n_src_x = (src_x / tex_w);
     float n_src_x2 = ((src_x + src_w) / tex_w);
-    float n_src_y = (src_y / tex_h);
-    float n_src_y2 = ((src_y + src_h) / tex_h);
+    // float n_src_y = (src_y / tex_h);
+    // float n_src_y2 = ((src_y + src_h) / tex_h);
+
+    float n_src_y = ((src_y + src_h) / tex_h);
+    float n_src_y2 = (src_y / tex_h);
 
     glBindTexture(GL_TEXTURE_2D, texture.texture);
     glBegin(GL_QUADS);

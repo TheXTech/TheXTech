@@ -103,6 +103,34 @@ static const int vgl_pool_ram_threshold = vgl_pool_size * 2;//0x1000000
 static const SceGxmMultisampleMode vgl_msaa = SCE_GXM_MULTISAMPLE_NONE;
 static int ram_pool_count = vgl_pool_size;
 
+inline uint32_t pow2roundup(uint32_t x)
+{
+    if(x == 0)
+        return 0;
+
+    --x;
+    x |= x >> 1;
+    x |= x >> 2;
+    x |= x >> 4;
+    x |= x >> 8;
+    x |= x >> 16;
+    return x + 1;
+}
+
+inline int32_t pow2roundup(int32_t x)
+{
+    if(x < 0)
+        return 0;
+
+    --x;
+    x |= x >> 1;
+    x |= x >> 2;
+    x |= x >> 4;
+    x |= x >> 8;
+    x |= x >> 16;
+    return x + 1;
+}
+
 static void dumpFullFile(std::vector<char> &dst, const std::string &path)
 {
     // Clear the destination buffer.
@@ -131,6 +159,17 @@ static void dumpFullFile(std::vector<char> &dst, const std::string &path)
     }
 
     SDL_RWclose(f);
+}
+
+static void toPowofTwo(FIBITMAP **image)
+{
+    unsigned int width = FreeImage_GetWidth(*image);
+    unsigned int height = FreeImage_GetHeight(*image);
+    width = pow2roundup(width);
+    height = pow2roundup(height);
+    FIBITMAP *newImage = FreeImage_Rescale(*image, static_cast<int>(width), static_cast<int>(height), FILTER_BOX);
+    FreeImage_Unload(*image);
+    *image = newImage;
 }
 
 FrmMain::FrmMain()
@@ -753,29 +792,57 @@ StdPicture FrmMain::lazyLoadPicture(std::string path)
 
 void FrmMain::loadTexture(StdPicture &target, uint32_t width, uint32_t height, uint8_t *RGBApixels)
 {
+    // Convert
+    FIBITMAP *tempImage = NULL;
+    {
+        uint32_t p2_w = pow2roundup(width);
+        uint32_t p2_h = pow2roundup(height);
+
+        if((width != p2_w) || (height != p2_h))
+        {
+            tempImage = FreeImage_ConvertFromRawBits(RGBApixels,
+                        static_cast<int>(width),
+                        static_cast<int>(height),
+                        static_cast<int>(width * 4),
+                        32,
+                        FI_RGBA_RED_MASK,
+                        FI_RGBA_GREEN_MASK,
+                        FI_RGBA_BLUE_MASK,
+                        0);
+            toPowofTwo(&tempImage);
+            width = p2_w;
+            height = p2_h;
+            RGBApixels = FreeImage_GetBits(tempImage);
+        }
+    }
+    // End Convert
+
+
     // Take our raw bytes and load them in as an OpenGL image.
     GLuint _newTexture = 0;
-    glGenTextures(1, &_newTexture);
-    glBindTexture(GL_TEXTURE_2D, _newTexture);
+    glGenTextures(1, &(target.texture));
+    glBindTexture(GL_TEXTURE_2D, (target.texture));
 
     // Nearest neighbor filtering.
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
+    // TODO: Do the responsible thing and update this
+    // To support taking the format from the texture.
+    // Also using its number of colors properly.
     glTexImage2D(
         GL_TEXTURE_2D,
         0,
         GL_RGBA,
         width, height,
         0,
-        GL_RGBA,
+        GL_BGRA,
         GL_UNSIGNED_BYTE,
         (const GLvoid*)RGBApixels
     );
 
     if(_newTexture != 0)
     {
-        target.texture = _newTexture;
         target.w = width;
         target.h = height;
         // pLogDebug("VITA: loaded texture with GLuint %d and size %d x %d.", _newTexture, width, height);
@@ -788,6 +855,9 @@ void FrmMain::loadTexture(StdPicture &target, uint32_t width, uint32_t height, u
 
     num_textures_loaded++;
     m_textureBank.insert(_newTexture);
+
+    if(tempImage)
+        FreeImage_Unload(tempImage);
 }
 
 void FrmMain::lazyLoad(StdPicture &target)
@@ -1235,9 +1305,6 @@ void FrmMain::updateViewport()
 
 void FrmMain::resetViewport()
 {
-#ifdef VITA
-    pLogDebug("VITA: Reset view port to [%d x %d]", ScreenW, ScreenH);
-#endif
     setViewport(0, 0, ScreenW, ScreenH);
 }
 
@@ -1263,15 +1330,6 @@ void FrmMain::setViewport(int x, int y, int w, int h)
         viewport_w,
         viewport_h
     );
-
-// TODO: Take care of this proper. viewport_w and viewport_h are absurdly
-// large values on the Vita, which is no doubt why things don't look right?
-#ifdef VITA
-    pLogDebug("VITA: Update view port to [%d, %d %dx%d]\nFinal: %d, %.2f %d x %d", x, y, w, h, 0, (y - (h / (float)2)), viewport_w, viewport_h);
-#endif
-
-    // viewport_x = x;
-    // viewport_y = y;
 }
 
 void FrmMain::offsetViewport(int x, int y)
