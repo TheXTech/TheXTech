@@ -96,6 +96,7 @@ struct StdPicture
 #if defined(VITA) && !defined(USE_SDL_VID)
     std::string path = "";
     uint32_t lastDrawFrame = 0;
+    std::vector<char> raw;
     GLuint texture = 0;
 #endif
 };
