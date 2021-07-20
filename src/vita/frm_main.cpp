@@ -32,7 +32,7 @@
 /// DEFINE THIS FLAG TO USE EXPERIMENTAL STBI
 /// IMAGE RESIZING (currently crashes, runs out of memory)
 #ifndef USE_STBI_RESIZE
-#define USE_STBI_RESIZE
+// #define USE_STBI_RESIZE
 #endif
 
 #include "../globals.h"
@@ -60,6 +60,8 @@
 
 
 #include "../frm_main.h"
+
+int _newlib_heap_size_user = 256 * 1024 * 1024;
 
 #ifndef NO_SDL
 #include <SDL2/SDL.h>
@@ -100,11 +102,6 @@ static const int vgl_phycont_threshold = 1 * 1024 * 1024;
 static const int vgl_pool_ram_threshold = vgl_pool_size * 2;//0x1000000
 static const SceGxmMultisampleMode vgl_msaa = SCE_GXM_MULTISAMPLE_NONE;
 static int ram_pool_count = vgl_pool_size;
-
-// typedef struct SDL_Point
-// {
-//     float x, y;
-// } SDL_Point;
 
 FrmMain::FrmMain()
 {
@@ -150,11 +147,11 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
 
     //void vglInitWithCustomThreshold(int pool_size, int width, int height, int ram_threshold, int cdram_threshold, int phycont_threshold, SceGxmMultisampleMode msaa)
     // vglInitWithCustomThreshold(
-    //     vgl_pool_size, 
-    //     DISPLAY_WIDTH_DEF, DISPLAY_HEIGHT_DEF, 
-    //     vgl_pool_ram_threshold, 
-    //     vgl_cdram_threshold, 
-    //     vgl_phycont_threshold, 
+    //     vgl_pool_size,
+    //     DISPLAY_WIDTH_DEF, DISPLAY_HEIGHT_DEF,
+    //     vgl_pool_ram_threshold,
+    //     vgl_cdram_threshold,
+    //     vgl_phycont_threshold,
     //     vgl_msaa);
     // vglInit(vgl_pool_size);
     vglInitExtended(0x1400000, DISPLAY_WIDTH_DEF, DISPLAY_HEIGHT_DEF, vgl_ram_threshold, SCE_GXM_MULTISAMPLE_NONE);
@@ -199,13 +196,13 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
     sdlInitFlags |= SDL_INIT_HAPTIC;
     sdlInitFlags |= SDL_INIT_GAMECONTROLLER;
 
-    
+
     res = (SDL_Init(sdlInitFlags) < 0);
     m_sdlLoaded = !res;
 
     _debugPrintf_("--After SDL_Init--");
     print_memory_info();
-    
+
     const char* error = SDL_GetError();
     if(*error != '\0')
         pLogWarning("Error while SDL Init: %s", error);
@@ -309,7 +306,7 @@ void FrmMain::hide()
     showCursor(1);
 }
 
-bool FrmMain::isWindowActive() 
+bool FrmMain::isWindowActive()
 {return true;}
 
 bool FrmMain::hasWindowMouseFocus()
@@ -450,10 +447,10 @@ static inline SceUID _allocate_resize_cache(size_t size, unsigned char** output_
 
     if(_stb_resize_cache == 0)
     {
-        _stb_resize_cache = 
-            sceKernelAllocMemBlock("stb_resize_cache", 
-                mem_type, 
-                size, 
+        _stb_resize_cache =
+            sceKernelAllocMemBlock("stb_resize_cache",
+                mem_type,
+                size,
                 0);
         if(_stb_resize_cache < 0)
         {
@@ -490,7 +487,7 @@ static inline SceUID _allocate_resize_cache(size_t size, unsigned char** output_
         }
 
         ret = sceKernelGetMemBlockBase(_stb_resize_cache, output_mem);
-        if(ret != 0) 
+        if(ret != 0)
         {
             pLogWarning("   Unable to retrieve MEM BLOCK with SceUID %d", _stb_resize_cache);
             return -1;
@@ -541,11 +538,11 @@ StdPicture FrmMain::LoadPicture(std::string path)
     {
         size_t _cache_size = (((w / 2)) * ((h / 2))) * channels;
         pLogDebug("VITA: stb_image resizing, %d x %d (%d ch) = %d bytes", w, h, channels);
-        
+
         stbi_uc *output_pixels = nullptr;
         // SceUID cache = _allocate_resize_cache(_cache_size, &output_pixels);
         SceUID cache = -1;
-        
+
         if(cache > 0)
         {
             pLogDebug("[LoadPicture] VITA: Cache: %ld starting addr %p", cache, output_pixels);
@@ -555,7 +552,7 @@ StdPicture FrmMain::LoadPicture(std::string path)
             pLogDebug("VITA: malloc (for now) cache with sizeof %d", _cache_size);
             output_pixels = (unsigned char*)malloc(_cache_size);
         }
-        
+
         if(stbir_resize_uint8(sourceImage, w, h, 0,
                                output_pixels, w / 2, h / 2, 0, channels) == 0)
         {
@@ -566,12 +563,12 @@ StdPicture FrmMain::LoadPicture(std::string path)
         if(output_pixels == nullptr)
         {
             pLogWarning("Error resizing stbi_uc: output_pixels is nullptr.");
-            return target;   
+            return target;
         }
 
         stbi_image_free(sourceImage);
         sourceImage = output_pixels;
-        
+
         if(sourceImage == nullptr)
         {
             pLogWarning("Error: sourceImage is nullptr after setting to output_pixels ptr.");
@@ -618,8 +615,8 @@ StdPicture FrmMain::LoadPicture(std::string path)
         pLogDebug("VITA: Successfully loaded %s. Size: %d x %d with %d channels.", path.c_str(), w, h, channels);
     }
 
-    
-    
+
+
 
     GLubyte* textura = reinterpret_cast<GLubyte*>(sourceImage);
     loadTexture(target, w, h, textura);
@@ -653,7 +650,7 @@ StdPicture FrmMain::lazyLoadPicture(std::string path)
     target.inited = true;
     target.lazyLoaded = true;
 
-    // Check for existing .size file 
+    // Check for existing .size file
     std::string sizePath = path + ".size";
     FILE *fs;
     fs = fopen(sizePath.c_str(), "r");
@@ -672,7 +669,7 @@ StdPicture FrmMain::lazyLoadPicture(std::string path)
 
         if(fclose(fs)) printf("lazyLoadPicture: Couldn't close file.\n");
     }
-    else 
+    else
     {
         lazyLoad(target);
         lazyUnLoad(target);
@@ -736,7 +733,7 @@ void FrmMain::lazyLoad(StdPicture &target)
     FIBITMAP* sourceImage;
     sourceImage = GraphicsHelps::loadImage(target.path);
 #endif
-    
+
     if(!sourceImage)
     {
         printf("[lazyLoad] Failed to load %s. Not implemented or no free memory.\n", target.path.c_str());
@@ -747,14 +744,14 @@ void FrmMain::lazyLoad(StdPicture &target)
 #ifdef USE_STBI
     loadTexture(target, width, height, sourceImage);
 #else
-    
+
     uint32_t w = static_cast<uint32_t>(FreeImage_GetWidth(sourceImage));
     uint32_t h = static_cast<uint32_t>(FreeImage_GetHeight(sourceImage));
     GLubyte *textura = reinterpret_cast<GLubyte *>(FreeImage_GetBits(sourceImage));
     loadTexture(target, w, h, textura);
 #endif
 
-    
+
 
     num_textures_loaded++;
 
@@ -764,7 +761,7 @@ void FrmMain::lazyLoad(StdPicture &target)
     GraphicsHelps::closeImage(sourceImage);
 #endif
 
-    // TODO: Track free ram space? 
+    // TODO: Track free ram space?
     // TODO: free texture memory every so often?
     // TODO: Why does VitaGL take up so much memory at start?
     // TODO: Do I need to track "big textures" and have them
@@ -800,7 +797,7 @@ void FrmMain::deleteTexture(StdPicture &tx, bool lazyUnload)
 
         // Free sprite from memory.
         glDeleteTextures(1, &tx.texture);
-        
+
         // For good measure.
         tx.texture = 0;
     }
@@ -828,7 +825,7 @@ void FrmMain::clearAllTextures()
             #if DEBUG_BUILD
             texturesDeleted++;
             #endif
-            
+
             glDeleteTextures(1, &tx);
         }
     }
@@ -843,7 +840,7 @@ void FrmMain::clearAllTextures()
 void FrmMain::renderRect(int x, int y, int w, int h, float red, float green, float blue, float alpha, bool filled)
 {
     // uint32_t clr = C2D_Color32f(red, green, blue, alpha);
-    
+
     // TODO: Filled or not?
     DrawRectSolid(x, y, w, h, red, green, blue, alpha);
 
@@ -992,14 +989,14 @@ void FrmMain::renderTexturePrivate(float xDst, float yDst, float wDst, float hDs
 
     // pLogDebug("Drawing %s", tx.path.c_str());
     Vita_DrawImage(
-        tx, 
+        tx,
         xDst+viewport_offset_x, // x1
         yDst+viewport_offset_y, // y1
         wDst, // x2
         hDst, // y2
-        xSrc, ySrc, 
-        wSrc, hSrc, 
-        flip, 
+        xSrc, ySrc,
+        wSrc, hSrc,
+        flip,
         red, green, blue, alpha);
 
 }
@@ -1154,7 +1151,7 @@ void FrmMain::setViewport(int x, int y, int w, int h)
     viewport_offset_x = viewport_x + offset_x;
     viewport_offset_y = viewport_y + offset_y;
 
-    
+
     glViewport(
         // offset_x + x * viewport_scale_x,
         // offset_y + (h - (y + h)) * viewport_scale_y,

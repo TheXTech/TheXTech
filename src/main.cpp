@@ -41,7 +41,6 @@ uint32_t __stacksize__ = 0x00020000;
 
 #ifdef VITA
 #include <tclap/CmdLine.h>
-int _newlib_heap_size_user = 128 * 1024 * 1024;
 #endif
 
 #include "game_main.h"
@@ -168,7 +167,7 @@ int main(int argc, char**argv)
 #if !defined(__3DS__) && !defined(VITA)
     CrashHandler::initSigs();
 #endif
-    
+
 
     AppPathManager::initAppPath();
     AppPath = AppPathManager::assetsRoot();
@@ -336,8 +335,8 @@ int main(int argc, char**argv)
             setup.renderType = RENDER_ACCELERATED_VSYNC;
         else if(rt == "hw")
             setup.renderType = RENDER_ACCELERATED;
-        
-        
+
+
 
         if(setup.renderType > RENDER_AUTO)
             g_videoSettings.renderMode = setup.renderType;
