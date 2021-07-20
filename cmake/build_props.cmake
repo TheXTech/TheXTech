@@ -92,6 +92,7 @@ if(VITA)
     set(VITA_APP_NAME "TheXTech Vita Edition")
     set(VITA_TITLEID "THEXTECH0")
     set(VERSION "01.00")
+    set(VITA_MKSFOEX_FLAGS "-d ATTRIBUTE2=12")
 
     set(VITA_ADDTL_LIBS
         FLAC
