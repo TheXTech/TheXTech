@@ -26,7 +26,7 @@
 /// DEFINE THIS FLAG TO USE STBI IMAGE LOADER INSTEAD
 /// THEXTECH'S DEFAULT LIBFREEIMAGELOADER
 #ifndef USE_STBI
-#define USE_STBI
+// #define USE_STBI
 #endif
 
 /// DEFINE THIS FLAG TO USE EXPERIMENTAL STBI
@@ -102,6 +102,36 @@ static const int vgl_phycont_threshold = 1 * 1024 * 1024;
 static const int vgl_pool_ram_threshold = vgl_pool_size * 2;//0x1000000
 static const SceGxmMultisampleMode vgl_msaa = SCE_GXM_MULTISAMPLE_NONE;
 static int ram_pool_count = vgl_pool_size;
+
+static void dumpFullFile(std::vector<char> &dst, const std::string &path)
+{
+    // Clear the destination buffer.
+    dst.clear();
+    SDL_RWops *f;
+
+    // Open binary read of our raw texture file (compressed)
+    f = SDL_RWFromFile(path.c_str(), "rb");
+    if(!f)
+        return;
+
+    // Try and get the size of the file
+    Sint64 fSize = SDL_RWsize(f);
+    if(fSize < 0)
+    {
+        pLogWarning("Failed to get size of the file: %s", path.c_str());
+        SDL_RWclose(f);
+        return;
+    }
+
+    // Resizing our destination buffer to fit the size of our file.
+    dst.resize(size_t(fSize));
+    if(SDL_RWread(f, dst.data(), 1, fSize) != size_t(fSize)) // We succeed if the bytes we read match the file size we stat-ed.
+    {
+        pLogWarning("Failed to dump file on read operation: %s", path.c_str());
+    }
+
+    SDL_RWclose(f);
+}
 
 FrmMain::FrmMain()
 {
@@ -639,6 +669,7 @@ StdPicture FrmMain::LoadPicture(std::string path)
 StdPicture FrmMain::lazyLoadPicture(std::string path)
 {
     StdPicture target;
+    PGE_Size tSize; // the size of the target image.
     if(!GameIsActive)
         return target;
 
@@ -647,6 +678,38 @@ StdPicture FrmMain::lazyLoadPicture(std::string path)
     if(target.path.empty())
         return target;
 
+    // if(Files::hasSuffix(path, ".png"))
+    // {
+    //   // TODO: does vita StdPicture struct even have mask paths?
+    //
+    //   // maskPath.clear();
+    // }
+
+    if(!GraphicsHelps::getImageMetrics(path, &tSize))
+    {
+        pLogWarning(
+            "Error loading of image file:\n%s\nReason: %s.",
+            path.c_str(),
+            (Files::fileExists(path) ? "wrong image format" : "file not exist")
+        );
+        return target;
+    }
+
+    target.w = tSize.w();
+    target.h = tSize.h();
+
+    // TODO: Dump full file for Vita.
+    dumpFullFile(target.raw, path);
+
+    // TODO: Check for mask logic.
+
+    target.inited = true;
+    target.lazyLoaded = true;
+    target.texture = 0; // Decompressed texture is 0 because we haven't fully loaded in yet.
+
+    return target;
+
+/** This is a leftover relic from porting the 3DS version to the Vita.
     target.inited = true;
     target.lazyLoaded = true;
 
@@ -675,6 +738,7 @@ StdPicture FrmMain::lazyLoadPicture(std::string path)
         lazyUnLoad(target);
         printf("lazyLoadPicture: Couldn't open size file.\n");
     }
+*/
 
     return target;
 }
@@ -731,12 +795,12 @@ void FrmMain::lazyLoad(StdPicture &target)
     sourceImage = stbi_load(target.path.c_str(), &width, &height, &channels, STBI_rgb_alpha);
 #else
     FIBITMAP* sourceImage;
-    sourceImage = GraphicsHelps::loadImage(target.path);
+    sourceImage = GraphicsHelps::loadImage(target.raw);
 #endif
 
     if(!sourceImage)
     {
-        printf("[lazyLoad] Failed to load %s. Not implemented or no free memory.\n", target.path.c_str());
+        printf("[lazyLoad] Lazy decompress to load has failed: invalid image data. (%s)", target.path.c_str());
         target.inited = false;
         return;
     }
@@ -745,8 +809,38 @@ void FrmMain::lazyLoad(StdPicture &target)
     loadTexture(target, width, height, sourceImage);
 #else
 
+    // Try and read image width/height now that we've loaded
+    // in the raw image data.
     uint32_t w = static_cast<uint32_t>(FreeImage_GetWidth(sourceImage));
     uint32_t h = static_cast<uint32_t>(FreeImage_GetHeight(sourceImage));
+
+    if((w == 0) || (h == 0))
+    {
+        GraphicsHelps::closeImage(sourceImage);
+        pLogWarning(
+            "Error lazy-decompressing of image file:\n",
+            "Reason: Zero Image Size!"
+        );
+    }
+
+    // TODO: Does Vita declare this?
+    m_lazyLoadedBytes += (w * h * 4);
+
+    // bool shrink2x = false;
+    // if(g_videoSettings.scaleDownAllTextures || GraphicsHelps::validateFor2xScaleDown(sourceImage, StdPictureGetOrigPath(target)))
+    // {
+    //     pLogDebug("Normally, we'd be scaling down textures here. But, this time we're not for testing.");
+    //
+    //     // target.w_orig = int(w);
+    //     // target.h_orig = int();
+    //     // w /= 2;
+    //     // h /= 2;
+    //     // shrink2x = true;
+    // }
+
+    // TODO: Implement scaling down of the texture if it's technically too big
+    // for the hardware. this hasn't been ported yet to ensure stability.
+
     GLubyte *textura = reinterpret_cast<GLubyte *>(FreeImage_GetBits(sourceImage));
     loadTexture(target, w, h, textura);
 #endif
@@ -1110,11 +1204,12 @@ void FrmMain::renderTextureScale(int xDst, int yDst, int wDst, int hDst, StdPict
 
 size_t FrmMain::lazyLoadedBytes()
 {
-    return 0;
+    return m_lazyLoadedBytes;
 }
 
 void FrmMain::lazyLoadedBytesReset()
 {
+    m_lazyLoadedBytes = 0;
 }
 
 void FrmMain::clearBuffer()
