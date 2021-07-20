@@ -119,6 +119,8 @@ public:
     void InitAsController();
     void ExpandAsJoystick();
     void ExpandAsController();
+    void SaveConfig_Legacy(IniProcessing* ctl);
+    void LoadConfig_Legacy(IniProcessing* ctl);
 
     // Polls a new (secondary) device button for the i'th player button
     // Returns true on success and false if no button pressed

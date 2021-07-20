@@ -626,42 +626,105 @@ void InputMethodProfile_Joystick::SaveConfig(IniProcessing* ctl)
     for(size_t i = 0; i < PlayerControls::n_buttons; i++)
     {
         name = PlayerControls::GetButtonName_INI(i);
-        // ctl->setValue(name, this->m_keys[i]);
-        // for(size_t c = 0; c < 20; c++)
-        // {
-        //     if(c+2 == 20 || name[c] == '\0')
-        //     {
-        //         name2[c] = '2';
-        //         name2[c+1] = '\0';
-        //         break;
-        //     }
-        //     name2[c] = name[c];
-        // }
-        // ctl->setValue(name2, this->m_keys2[i]);
+        size_t orig_l = name.size();
+
+        ctl->setValue(name.replace(orig_l, std::string::npos, "-type").c_str(),
+            this->m_keys[i].type);
+        ctl->setValue(name.replace(orig_l, std::string::npos, "-id").c_str(),
+            this->m_keys[i].id);
+        ctl->setValue(name.replace(orig_l, std::string::npos, "-val").c_str(),
+            this->m_keys[i].val);
+
+        ctl->setValue(name.replace(orig_l, std::string::npos, "2-type").c_str(),
+            this->m_keys2[i].type);
+        ctl->setValue(name.replace(orig_l, std::string::npos, "2-id").c_str(),
+            this->m_keys2[i].id);
+        ctl->setValue(name.replace(orig_l, std::string::npos, "2-val").c_str(),
+            this->m_keys2[i].val);
     }
+
+    ctl->setValue("enable-rumble", this->m_rumbleEnabled);
+    ctl->setValue("old-joystick", !this->m_controllerProfile);
 }
 
 void InputMethodProfile_Joystick::LoadConfig(IniProcessing* ctl)
 {
-/*
-    char name2[20];
+    std::string name;
     for(size_t i = 0; i < PlayerControls::n_buttons; i++)
     {
-        const char* name = PlayerControls::GetButtonName_INI(i);
-        ctl->read(name, this->m_keys[i], this->m_keys[i]);
-        for(size_t c = 0; c < 20; c++)
-        {
-            if(c+2 == 20 || name[c] == '\0')
-            {
-                name2[c] = '2';
-                name2[c+1] = '\0';
-                break;
-            }
-            name2[c] = name[c];
-        }
-        ctl->read(name2, this->m_keys2[i], this->m_keys2[i]);
+        name = PlayerControls::GetButtonName_INI(i);
+        size_t orig_l = name.size();
+
+        ctl->read(name.replace(orig_l, std::string::npos, "-type").c_str(),
+            this->m_keys[i].type, this->m_keys[i].type);
+        ctl->read(name.replace(orig_l, std::string::npos, "-id").c_str(),
+            this->m_keys[i].id, this->m_keys[i].id);
+        ctl->read(name.replace(orig_l, std::string::npos, "-val").c_str(),
+            this->m_keys[i].val, this->m_keys[i].val);
+
+        ctl->read(name.replace(orig_l, std::string::npos, "2-type").c_str(),
+            this->m_keys2[i].type, this->m_keys2[i].type);
+        ctl->read(name.replace(orig_l, std::string::npos, "2-id").c_str(),
+            this->m_keys2[i].id, this->m_keys2[i].id);
+        ctl->read(name.replace(orig_l, std::string::npos, "2-val").c_str(),
+            this->m_keys2[i].val, this->m_keys2[i].val);
     }
-*/
+
+    ctl->read("enable-rumble", this->m_rumbleEnabled, true);
+
+    bool legacyProfile;
+    ctl->read("old-joystick", legacyProfile, false);
+    this->m_controllerProfile = !legacyProfile;
+}
+
+void InputMethodProfile_Joystick::SaveConfig_Legacy(IniProcessing* ctl)
+{
+    std::string name;
+    for(size_t i = 0; i < PlayerControls::n_buttons; i++)
+    {
+        name = PlayerControls::GetButtonName_INI(i);
+        size_t orig_l = name.size();
+
+        ctl->setValue(name.replace(orig_l, std::string::npos, "-ctrl-type").c_str(),
+            this->m_keys[i].type);
+        ctl->setValue(name.replace(orig_l, std::string::npos, "-ctrl-id").c_str(),
+            this->m_keys[i].id);
+        ctl->setValue(name.replace(orig_l, std::string::npos, "-ctrl-val").c_str(),
+            this->m_keys[i].val);
+
+        ctl->setValue(name.replace(orig_l, std::string::npos, "-type").c_str(),
+            this->m_keys2[i].type);
+        ctl->setValue(name.replace(orig_l, std::string::npos, "-id").c_str(),
+            this->m_keys2[i].id);
+        ctl->setValue(name.replace(orig_l, std::string::npos, "-val").c_str(),
+            this->m_keys2[i].val);
+    }
+}
+
+void InputMethodProfile_Joystick::LoadConfig_Legacy(IniProcessing* ctl)
+{
+    std::string name;
+    for(size_t i = 0; i < PlayerControls::n_buttons; i++)
+    {
+        name = PlayerControls::GetButtonName_INI(i);
+        size_t orig_l = name.size();
+
+        ctl->read(name.replace(orig_l, std::string::npos, "-ctrl-type").c_str(),
+            this->m_keys[i].type, this->m_keys[i].type);
+        ctl->read(name.replace(orig_l, std::string::npos, "-ctrl-id").c_str(),
+            this->m_keys[i].id, this->m_keys[i].id);
+        ctl->read(name.replace(orig_l, std::string::npos, "-ctrl-val").c_str(),
+            this->m_keys[i].val, this->m_keys[i].val);
+
+        ctl->read(name.replace(orig_l, std::string::npos, "-type").c_str(),
+            this->m_keys2[i].type, this->m_keys2[i].type);
+        ctl->read(name.replace(orig_l, std::string::npos, "-id").c_str(),
+            this->m_keys2[i].id, this->m_keys2[i].id);
+        ctl->read(name.replace(orig_l, std::string::npos, "-val").c_str(),
+            this->m_keys2[i].val, this->m_keys2[i].val);
+    }
+
+    this->m_legacyProfile = true;
 }
 
 // How many per-type special options are there?
@@ -731,7 +794,6 @@ InputMethodProfile* InputMethodType_Joystick::AllocateProfile() noexcept
 InputMethodType_Joystick::InputMethodType_Joystick()
 {
     this->Name = "Joystick";
-    this->LegacyName = "joystick";
 
     SDL_JoystickEventState(SDL_ENABLE);
     int num = SDL_NumJoysticks();
@@ -822,7 +884,7 @@ InputMethod* InputMethodType_Joystick::Poll(const std::vector<InputMethod*>& act
 
     // 1. cleverly look for profile by GUID and player...
     std::unordered_map<std::string, InputMethodProfile*>::iterator found
-        = this->m_lastProfileByGUID.find(active_joystick->guid+"-p"+std::to_string(my_index));
+        = this->m_lastProfileByGUID.find(std::to_string(my_index+1)+"-"+active_joystick->guid);
 
     // ...then by just GUID.
     if(found == this->m_lastProfileByGUID.end())
@@ -838,7 +900,7 @@ InputMethod* InputMethodType_Joystick::Poll(const std::vector<InputMethod*>& act
         if(profile->m_legacyProfile)
         {
             // expanding a legacy profile based on information from controller
-            profile->Name = method->Name + " P" + std::to_string(my_index);
+            profile->Name = method->Name + " P" + std::to_string(my_index+1);
             if(active_joystick->ctrl)
             {
                 profile->ExpandAsController();
@@ -1021,7 +1083,7 @@ bool InputMethodType_Joystick::CloseJoystick(int instance_id)
             continue;
         if(m->m_devices == devices)
         {
-            pLogDebug("  unset m_devices of InputMethod %s using Profile %s.", m->Name.c_str(), m->Profile->Name.c_str());
+            pLogDebug("  unset m_devices of InputMethod '%s' using Profile '%s'.", m->Name.c_str(), m->Profile->Name.c_str());
             m->m_devices = nullptr;
         }
     }
@@ -1073,7 +1135,7 @@ bool InputMethodType_Joystick::SetProfile_Custom(InputMethod* method, int player
         return false;
 
     // set in map!
-    this->m_lastProfileByGUID[m->m_devices->guid+"-p"+std::to_string(player_no)] = profile;
+    this->m_lastProfileByGUID[std::to_string(player_no+1)+"-"+m->m_devices->guid] = profile;
     this->m_lastProfileByGUID[m->m_devices->guid] = profile;
 
     pLogDebug("Setting default controller for GUID '%s' and player %d to %s.",
@@ -1159,10 +1221,91 @@ bool InputMethodType_Joystick::OptionChange(size_t i)
 
 void InputMethodType_Joystick::SaveConfig_Custom(IniProcessing* ctl)
 {
+    std::string name = "last-profile-";
+    int uuid_begin = name.size();
+
+    // set all default controller profiles
+    for(auto it = m_lastProfileByGUID.begin(); it != m_lastProfileByGUID.end(); ++it)
+    {
+        std::vector<InputMethodProfile*>::iterator loc
+            = std::find(this->m_profiles.begin(), this->m_profiles.end(), it->second);
+        size_t index = loc - this->m_profiles.begin();
+        if(index == this->m_profiles.size())
+        {
+            // this probably a legacy profile, let's check.
+            InputMethodProfile_Joystick* p = dynamic_cast<InputMethodProfile_Joystick*>(it->second);
+            if(p && p->m_legacyProfile)
+            {
+                ctl->endGroup();
+                ctl->beginGroup("joystick-uuid-" + it->first);
+                p->SaveConfig_Legacy(ctl);
+                ctl->endGroup();
+                ctl->beginGroup(this->Name);
+            }
+        }
+        else
+        {
+            ctl->setValue(name.replace(uuid_begin, std::string::npos, it->first).c_str(), index);
+        }
+    }
 }
 
 void InputMethodType_Joystick::LoadConfig_Custom(IniProcessing* ctl)
 {
+    // load all default controller profiles
+    std::vector<std::string> keys = ctl->allKeys();
+    std::string keyNeed = "last-profile-";
+
+    for(std::string& k : keys)
+    {
+        std::string::size_type r = k.find(keyNeed);
+        if(r != std::string::npos && r == 0)
+        {
+            std::string guid = k.substr(13); // length of "last-profile-"
+            int index;
+            ctl->read(k.c_str(), index, -1);
+            if(index >= 0 && index < (int)this->m_profiles.size() && this->m_profiles[index])
+            {
+                this->m_lastProfileByGUID[guid] = this->m_profiles[index];
+                pLogDebug("Set default profile for '%s' to '%s'.", guid.c_str(), this->m_profiles[index]->Name.c_str());
+            }
+        }
+    }
+
+    ctl->endGroup();
+
+    // load legacy controller profiles
+    keys = ctl->childGroups();
+    keyNeed = "joystick-uuid-";
+
+    for(std::string& k : keys)
+    {
+        std::string::size_type r = k.find(keyNeed);
+        if(r != std::string::npos && r == 0)
+        {
+            std::string guid = k.substr(14); // length of "joystick-uuid-"
+
+            // once legacy controller has been converted, forget about it
+            if(this->m_lastProfileByGUID.find(guid) != this->m_lastProfileByGUID.end())
+                continue;
+
+            ctl->beginGroup(k);
+            InputMethodProfile_Joystick* profile = new(std::nothrow) InputMethodProfile_Joystick;
+            if(profile)
+            {
+                profile->LoadConfig_Legacy(ctl);
+                this->m_lastProfileByGUID[guid] = profile;
+                pLogDebug("Loaded legacy profile as '%s'.", guid.c_str());
+            }
+            else
+            {
+                pLogWarning("Could not allocate legacy profile (OOM).");
+            }
+            ctl->endGroup();
+        }
+    }
+
+    ctl->beginGroup(this->Name);
 }
 
 } // namespace Controls
