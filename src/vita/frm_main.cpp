@@ -216,16 +216,6 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
 
     _debugPrintf_("--Before vglInit--");
     print_memory_info();
-
-    //void vglInitWithCustomThreshold(int pool_size, int width, int height, int ram_threshold, int cdram_threshold, int phycont_threshold, SceGxmMultisampleMode msaa)
-    // vglInitWithCustomThreshold(
-    //     vgl_pool_size,
-    //     DISPLAY_WIDTH_DEF, DISPLAY_HEIGHT_DEF,
-    //     vgl_pool_ram_threshold,
-    //     vgl_cdram_threshold,
-    //     vgl_phycont_threshold,
-    //     vgl_msaa);
-    // vglInit(vgl_pool_size);
     vglInitExtended(0x1400000, DISPLAY_WIDTH_DEF, DISPLAY_HEIGHT_DEF, vgl_ram_threshold, SCE_GXM_MULTISAMPLE_NONE);
     // vglUseVram(GL_TRUE);
 
@@ -241,7 +231,7 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(0, 960, 544, 0, -1, 1);
+	glOrtho(0, DISPLAY_WIDTH_DEF, DISPLAY_HEIGHT_DEF, 0, -1, 1);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
@@ -291,7 +281,7 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
 
     clearBuffer();
     m_keyboardState = SDL_GetKeyboardState(nullptr);
-    updateViewport();
+    setViewport(0, 0, DISPLAY_WIDTH_DEF, DISPLAY_HEIGHT_DEF);
     clearBuffer();
     setTargetScreen();
     repaint();
@@ -583,11 +573,7 @@ static inline SceUID _allocate_resize_cache(size_t size, unsigned char** output_
 StdPicture FrmMain::LoadPicture(std::string path)
 {
     StdPicture target;
-#ifdef USE_STBI
-    stbi_uc *sourceImage;
-#else
     FIBITMAP *sourceImage;
-#endif
 
     if(!GameIsActive) return target;
     target.inited = false;
@@ -595,69 +581,7 @@ StdPicture FrmMain::LoadPicture(std::string path)
     target.origPath = path;
 
     if(target.path.empty()) return target;
-#ifdef USE_STBI
-    int w = 0, h = 0, channels = 0;
-    sourceImage = stbi_load(path.c_str(), &w, &h, &channels, STBI_rgb_alpha);
 
-    target.inited = true;
-    target.lazyLoaded = false;
-
-    if((w == 0) || (h == 0))
-    {
-        // FreeImage_Unload(sourceImage);
-        stbi_image_free(sourceImage);
-        pLogWarning("Error loading of image file:\n%s\nReason: Zero Image size.", path.c_str());
-        return target;
-    }
-#ifdef USE_STBI_RESIZE
-    else
-    {
-        size_t _cache_size = (((w / 2)) * ((h / 2))) * channels;
-        pLogDebug("VITA: stb_image resizing, %d x %d (%d ch) = %d bytes", w, h, channels);
-
-        stbi_uc *output_pixels = nullptr;
-        // SceUID cache = _allocate_resize_cache(_cache_size, &output_pixels);
-        SceUID cache = -1;
-
-        if(cache > 0)
-        {
-            pLogDebug("[LoadPicture] VITA: Cache: %ld starting addr %p", cache, output_pixels);
-        }
-        else
-        {
-            pLogDebug("VITA: malloc (for now) cache with sizeof %d", _cache_size);
-            output_pixels = (unsigned char*)malloc(_cache_size);
-        }
-
-        if(stbir_resize_uint8(sourceImage, w, h, 0,
-                               output_pixels, w / 2, h / 2, 0, channels) == 0)
-        {
-            pLogWarning("Error resizing stbi_uc: stbir_resize_uint8 returned 0.");
-            return target;
-        }
-
-        if(output_pixels == nullptr)
-        {
-            pLogWarning("Error resizing stbi_uc: output_pixels is nullptr.");
-            return target;
-        }
-
-        stbi_image_free(sourceImage);
-        sourceImage = output_pixels;
-
-        if(sourceImage == nullptr)
-        {
-            pLogWarning("Error: sourceImage is nullptr after setting to output_pixels ptr.");
-            return target;
-        }
-
-        w = w / 2;
-        h = h / 2;
-        // target.w = w / 2;
-        // target.h = h / 2;
-    }
-#endif
-#else
     sourceImage = GraphicsHelps::loadImage(path);
     if(sourceImage == nullptr)
     {
@@ -667,11 +591,10 @@ StdPicture FrmMain::LoadPicture(std::string path)
 
     uint32_t w = static_cast<uint32_t>(FreeImage_GetWidth(sourceImage));
     uint32_t h = static_cast<uint32_t>(FreeImage_GetHeight(sourceImage));
-    uint32_t channels = 4;
+    uint32_t channels = FreeImage_GetBPP(sourceImage) / 8;
 
     target.inited = true;
     target.lazyLoaded = false;
-
 
     if((w == 0) || (h == 0))
     {
@@ -679,8 +602,6 @@ StdPicture FrmMain::LoadPicture(std::string path)
         pLogWarning("Error loading of image file:\n%s\nReason: Zero image size in either w or h!", path.c_str());
         return target;
     }
-#endif
-
     if(!sourceImage)
     {
         pLogDebug("Error");
@@ -692,21 +613,30 @@ StdPicture FrmMain::LoadPicture(std::string path)
         pLogDebug("VITA: Successfully loaded %s. Size: %d x %d with %d channels.", path.c_str(), w, h, channels);
     }
 
+    RGBQUAD upperColor;
+    FreeImage_GetPixelColor(sourceImage, 0, 0, &upperColor);
+    target.ColorUpper.r = float(upperColor.rgbRed) / 255.0f;
+    target.ColorUpper.b = float(upperColor.rgbBlue) / 255.0f;
+    target.ColorUpper.g = float(upperColor.rgbGreen) / 255.0f;
+    RGBQUAD lowerColor;
+    FreeImage_GetPixelColor(sourceImage, 0, 0, &lowerColor);
+    target.ColorLower.r = float(lowerColor.rgbRed) / 255.0f;
+    target.ColorLower.b = float(lowerColor.rgbBlue) / 255.0f;
+    target.ColorLower.g = float(lowerColor.rgbGreen) / 255.0f;
+    FreeImage_FlipVertical(sourceImage);
+    target.nOfColors = GL_RGBA;
+    target.format = GL_BGRA;
+    target.w = static_cast<int>(w);
+    target.h = static_cast<int>(h);
+    target.frame_w = static_cast<int>(w);
+    target.frame_h = static_cast<int>(h);
 
-
-
-    GLubyte* textura = reinterpret_cast<GLubyte*>(sourceImage);
+    GLubyte* textura = reinterpret_cast<GLubyte*>(FreeImage_GetBits(sourceImage));
     loadTexture(target, w, h, textura);
 
     num_textures_loaded++;
 
-#ifdef USE_STBI
-#ifndef USE_STBI_RESIZE
-    stbi_image_free(sourceImage);
-#endif
-#else
     GraphicsHelps::closeImage(sourceImage);
-#endif
 
     if(!target.texture)
         printf("FAILED TO LOAD!!!! %s\n", path.c_str());
@@ -807,25 +737,25 @@ void FrmMain::loadTexture(StdPicture &target, uint32_t width, uint32_t height, u
     glTexImage2D(
         GL_TEXTURE_2D,
         0,
-        GL_RGBA,
+        target.nOfColors,
         width, height,
         0,
-        GL_BGRA,
+        target.format,
         GL_UNSIGNED_BYTE,
         (const GLvoid*)RGBApixels
     );
 
     if(_newTexture != 0)
     {
+        target.w_orig = target.w;
+        target.h_orig = target.h;
         target.w = width;
         target.h = height;
+        target.w_scale = float(width) / float(target.w_orig);
+        target.h_scale = float(height) / float(target.h_orig);
         // pLogDebug("VITA: loaded texture with GLuint %d and size %d x %d.", _newTexture, width, height);
     }
-    else
-    {
-        pLogWarning("VITA: loadTexture: _newTexture was 0 after glGenTextures.");
-        return;
-    }
+    else return;
 
     num_textures_loaded++;
     m_textureBank.insert(_newTexture);
@@ -836,27 +766,14 @@ void FrmMain::lazyLoad(StdPicture &target)
     if(!target.inited || !target.lazyLoaded || target.texture)
         return;
 
-    // Try and load source image data from disk.
-    // EG:
-#ifdef USE_STBI
-    stbi_uc* sourceImage;
-    int width = 0, height = 0, channels = 0;
-    sourceImage = stbi_load(target.path.c_str(), &width, &height, &channels, STBI_rgb_alpha);
-#else
     FIBITMAP* sourceImage;
     sourceImage = GraphicsHelps::loadImage(target.raw);
-#endif
-
     if(!sourceImage)
     {
         printf("[lazyLoad] Lazy decompress to load has failed: invalid image data. (%s)", target.path.c_str());
         target.inited = false;
         return;
     }
-
-#ifdef USE_STBI
-    loadTexture(target, width, height, sourceImage);
-#else
 
     // Try and read image width/height now that we've loaded
     // in the raw image data.
@@ -870,45 +787,64 @@ void FrmMain::lazyLoad(StdPicture &target)
             "Error lazy-decompressing of image file:\n",
             "Reason: Zero Image Size!"
         );
+        return;
     }
 
     // TODO: Does Vita declare this?
     m_lazyLoadedBytes += (w * h * 4);
 
-    // bool shrink2x = false;
-    // if(g_videoSettings.scaleDownAllTextures || GraphicsHelps::validateFor2xScaleDown(sourceImage, StdPictureGetOrigPath(target)))
-    // {
-    //     pLogDebug("Normally, we'd be scaling down textures here. But, this time we're not for testing.");
-    //
-    //     // target.w_orig = int(w);
-    //     // target.h_orig = int();
-    //     // w /= 2;
-    //     // h /= 2;
-    //     // shrink2x = true;
-    // }
+    RGBQUAD upperColor;
+    FreeImage_GetPixelColor(sourceImage, 0, 0, &upperColor);
+    target.ColorUpper.r = float(upperColor.rgbRed) / 255.0f;
+    target.ColorUpper.b = float(upperColor.rgbBlue) / 255.0f;
+    target.ColorUpper.g = float(upperColor.rgbGreen) / 255.0f;
+    RGBQUAD lowerColor;
+    FreeImage_GetPixelColor(sourceImage, 0, static_cast<unsigned int>(h - 1), &lowerColor);
+    target.ColorLower.r = float(lowerColor.rgbRed) / 255.0f;
+    target.ColorLower.b = float(lowerColor.rgbBlue) / 255.0f;
+    target.ColorLower.g = float(lowerColor.rgbGreen) / 255.0f;
+    FreeImage_FlipVertical(sourceImage);
+    target.nOfColors = GL_RGBA;
+    target.format = GL_BGRA;
+    target.w = static_cast<int>(w);
+    target.h = static_cast<int>(h);
+    target.frame_w = static_cast<int>(w);
+    target.frame_h = static_cast<int>(h);
 
-    // TODO: Implement scaling down of the texture if it's technically too big
-    // for the hardware. this hasn't been ported yet to ensure stability.
+    bool wExceeded = w > Uint32(4096);
+    bool hExceeded = h > Uint32(4096);
 
-    GLubyte *textura = reinterpret_cast<GLubyte *>(FreeImage_GetBits(sourceImage));
+    if(wExceeded || hExceeded)
+    {
+        // if(shrink2x)
+        target.w_orig = int(w);
+        target.h_orig = int(h);
+
+        if(w > Uint32(4096))
+            w = Uint32(4096);
+        if(h > Uint32(4096))
+            h = Uint32(4096);
+
+        if(wExceeded || hExceeded)
+        {
+            pLogWarning("Texture too big, shrinking.");
+        }
+
+        FIBITMAP *d = FreeImage_Rescale(sourceImage, int(w), int(h), FILTER_BOX);
+        if(d)
+        {
+            GraphicsHelps::closeImage(sourceImage);
+            sourceImage = d;
+        }
+
+        target.w_scale = float(w) / float(target.w_orig);
+        target.h_scale = float(h) / float(target.h_orig);
+    }
+
+    GLubyte *textura = reinterpret_cast<GLubyte*>(FreeImage_GetBits(sourceImage));
     loadTexture(target, w, h, textura);
-#endif
-
-
-
     num_textures_loaded++;
-
-#ifdef USE_STBI
-    stbi_image_free(sourceImage);
-#else
     GraphicsHelps::closeImage(sourceImage);
-#endif
-
-    // TODO: Track free ram space?
-    // TODO: free texture memory every so often?
-    // TODO: Why does VitaGL take up so much memory at start?
-    // TODO: Do I need to track "big textures" and have them
-    // split like the 3DS version?
 }
 
 void FrmMain::lazyUnLoad(StdPicture &target)
@@ -982,31 +918,8 @@ void FrmMain::clearAllTextures()
 
 void FrmMain::renderRect(int x, int y, int w, int h, float red, float green, float blue, float alpha, bool filled)
 {
-    // uint32_t clr = C2D_Color32f(red, green, blue, alpha);
-
     // TODO: Filled or not?
     DrawRectSolid(x, y, w, h, red, green, blue, alpha);
-
-    // Filled is always True in this game
-    // if (filled)
-    //     C2D_DrawRectSolid(x/2+viewport_offset_x,
-    //                       y/2+viewport_offset_y,
-    //                       0, w/2, h/2, clr);
-    // else
-    // {
-    //     C2D_DrawRectangle(x/2+viewport_offset_x,
-    //                       y/2+viewport_offset_y,
-    //                       0, 1, h/2, clr, clr, clr, clr);
-    //     C2D_DrawRectangle(x/2+viewport_offset_x+w/2-1,
-    //                       y/2+viewport_offset_y,
-    //                       0, 1, h/2, clr, clr, clr, clr);
-    //     C2D_DrawRectangle(x/2+viewport_offset_x,
-    //                       y/2+viewport_offset_y,
-    //                       0, w/2, 1, clr, clr, clr, clr);
-    //     C2D_DrawRectangle(x/2+viewport_offset_x,
-    //                       y/2+viewport_offset_y+h/2-1,
-    //                       0, w/2, 1, clr, clr, clr, clr);
-    // }
 }
 
 void FrmMain::renderRectBR(int _left, int _top, int _right, int _bottom, float red, float green, float blue, float alpha)
@@ -1021,8 +934,6 @@ void FrmMain::renderTexturePrivate(float xDst, float yDst, float wDst, float hDs
                              float red, float green, float blue, float alpha)
 {
     // This is mostly lifted from the 3DS version so thank you, ds-sloth <3
-
-
     if(!tx.inited)
         return;
 
@@ -1130,15 +1041,14 @@ void FrmMain::renderTexturePrivate(float xDst, float yDst, float wDst, float hDs
         // C2D_DrawImage_Custom_Rotated(*to_draw, xDst+viewport_offset_x, yDst+viewport_offset_y, wDst, hDst,
     // else
 
-    // pLogDebug("Drawing %s", tx.path.c_str());
     Vita_DrawImage(
         tx,
         xDst+viewport_offset_x, // x1
         yDst+viewport_offset_y, // y1
         wDst, // x2
         hDst, // y2
-        xSrc, ySrc,
-        wSrc, hSrc,
+        xSrc, ySrc, // ani_left, ani_top
+        wSrc, hSrc, // ani_right, ani_bottom
         flip,
         red, green, blue, alpha);
 
@@ -1270,8 +1180,8 @@ void FrmMain::clearBuffer()
 
 void FrmMain::updateViewport()
 {
-    resetViewport();
-    offsetViewport(0, 0);
+    // resetViewport();
+    // offsetViewport(0, 0);
 }
 
 void FrmMain::resetViewport()
@@ -1281,8 +1191,6 @@ void FrmMain::resetViewport()
 
 void FrmMain::setViewport(int x, int y, int w, int h)
 {
-
-
     int offset_x = viewport_offset_x - viewport_x;
     int offset_y = viewport_offset_y - viewport_y;
     viewport_x = x/2;

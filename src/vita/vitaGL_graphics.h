@@ -5,6 +5,23 @@
 
 #include "../std_picture.h"
 
+typedef struct _RectF_
+{
+    float x,
+          y,
+          w,
+          h,
+          top,
+          left,
+          bottom,
+          right;
+} RectF;
+
+extern _RectF_ MakeRectF(float x,
+                         float y,
+                         float w,
+                         float h);
+
 extern void DrawRectSolid(int x, 
         int y, 
         int width, 
