@@ -25,7 +25,7 @@
 #ifdef VITA
 #include <debugnet.h>
 #ifndef NETDBG_IP_SERVER
-#define NETDBG_IP_SERVER "192.168.0.4"
+#define NETDBG_IP_SERVER "192.168.0.22"
 #endif
 
 #ifndef NETDBG_PORT_SERVER
