@@ -170,7 +170,13 @@ int main(int argc, char**argv)
 
 
     AppPathManager::initAppPath();
+#ifdef VITA
+    AppPathManager::setAssetsRoot("ux0:/data/TheXTech");
     AppPath = AppPathManager::assetsRoot();
+    pLogDebug("PS VITA: Assets root is now %s", AppPath.c_str());
+#else
+    AppPath = AppPathManager::assetsRoot();
+#endif
 
     OpenConfig_preSetup();
 
