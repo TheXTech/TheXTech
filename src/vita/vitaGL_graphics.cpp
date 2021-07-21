@@ -41,14 +41,26 @@ static inline void DrawRectSolid(int x,
                                  float _b,
                                  float _a)
 {
+    if(width == 0 || height == 0)
+    {
+        // Don't render quads that don't have proper width/height.
+        return;
+    }
+
+    float v_x = x,
+        v_x2 = x + width,
+        v_y = y,
+        v_y2 = y + height;
+    pLogDebug("DrawRectSolid: @ %.2f, %.2f size: (%.2f x %.2f)", v_x, v_y, width, height);
+
     glBindTexture(GL_TEXTURE_2D, 0);
     glBegin(GL_QUADS);
 
     glColor4f(_r, _g, _b, _a);
-    glVertex2f(x, y);
-    glVertex2f(x + width, y);
-    glVertex2f(x + width, y + height);
-    glVertex2f(x, y + height);
+    glVertex2f(v_x, v_y);
+    glVertex2f(v_x2, v_y);
+    glVertex2f(v_x2, v_y2);
+    glVertex2f(v_x, v_y2);
 
     glEnd();
 }
