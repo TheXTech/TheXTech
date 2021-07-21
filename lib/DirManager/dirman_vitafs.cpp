@@ -103,22 +103,9 @@ bool DirMan::DirMan_private::getListOfFiles(std::vector<std::string> &list, cons
                 snprintf(new_path, MAX_PATH_LENGTH, "%s%s%s", m_dirPath.c_str(), hasEndSlash(m_dirPath.c_str()) ? "" : "/", dirEntry.d_name);
                 pLogDebug("Discovered new path `%s`", new_path);
 
-                if (SCE_S_ISDIR(dirEntry.d_stat.st_mode))
+                // matching non-directories
+                if (!SCE_S_ISDIR(dirEntry.d_stat.st_mode))
                 {
-                    // Get Path info 
-                    // int ret = getPathInfo(new_path, size, folders, files, handler);
-                    int ret = 0;
-                    if (ret <= 0)
-                    {
-                        free(new_path);
-                        sceIoDclose(dfd);
-                        return ret;
-                    }
-                }
-                else // Discovered file, add it to the list also
-                {
-                    // if (size)
-                        // (*size) += dir.d_stat.st_size;
                     if(matchSuffixFilters(dirEntry.d_name , suffix_filters))
                             list.push_back(dirEntry.d_name);
                 }
@@ -226,14 +213,14 @@ bool DirMan::DirMan_private::getListOfFolders(std::vector<std::string>& list, co
                         pLogDebug("Directory match! `%s`", dirEntry.d_name);
                             list.push_back(dirEntry.d_name);
                     }
-                    // Get Path info 
-                    int ret = quick_stat_folders(m_dirPath.c_str(), dirEntry.d_name, list, suffix_filters);
-                    if (ret <= 0)
-                    {
-                        free(new_path);
-                        sceIoDclose(dfd);
-                        return ret;
-                    }
+                    // // Get Path info 
+                    // int ret = quick_stat_folders(m_dirPath.c_str(), dirEntry.d_name, list, suffix_filters);
+                    // if (ret <= 0)
+                    // {
+                    //     free(new_path);
+                    //     sceIoDclose(dfd);
+                    //     return ret;
+                    // }
                 }
 
                 free(new_path);
@@ -322,6 +309,8 @@ bool DirMan::exists(const std::string &dirPath)
     PUT_THREAD_GUARD();
 
     SceIoStat _stat;
+    if(dirPath == "/")
+        return false;
 
     if(sceIoGetstat(dirPath.c_str(), &_stat) < 0)
     {
@@ -364,28 +353,39 @@ bool DirMan::mkAbsPath(const std::string &dirPath)
     char tmp[PATH_MAX];
     char *p = NULL;
     size_t len;
+    uint16_t first_slash = 0;
 
     snprintf(tmp, sizeof(tmp), "%s", dirPath.c_str());
     len = strlen(tmp);
 
     if(tmp[len - 1] == '/')
         tmp[len - 1] = 0;
+    
+    for(int i = 0; i < len; i++)
+    {
+        if(tmp[i] == '/')
+            first_slash = i;
+    }
 
-    for(p = tmp + 1; *p; p++)
+    for(p = (tmp + first_slash + 1); *p; p++)
     {
         if(*p == '/')
         {
             *p = 0;
             int err = sceIoMkdir(tmp, SCE_S_IRWXU | SCE_S_IRWXG);
-            if((err != 0) && (errno != EEXIST))
+            if((err != 0))
             {
+                pLogDebug("err != 0 when calling sceIoMkdir for mkabspath (%s was the path)", tmp);
                 *p = '/';
                 return false;
             }
             *p = '/';
         }
     }
-    return sceIoMkdir(tmp, SCE_S_IRWXU | SCE_S_IRWXG) == 0;
+
+    bool rv = sceIoMkdir(tmp, SCE_S_IRWXU | SCE_S_IRWXG) == 0;
+    pLogDebug("    mkAbsPath: %s. Success: %s", tmp, (rv ? "TRUE" : "FALSE"));
+    return rv;
 }
 
 bool DirMan::rmAbsPath(const std::string &dirPath)
