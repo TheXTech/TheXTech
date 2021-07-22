@@ -18,7 +18,6 @@
 #endif
 
 #if defined(arm) && !defined(__SOFTFP__) && !defined(__VFP_FP__) && !defined(__MAVERICK__)
-#define MIXED_ENDIANESS
 inline void swap_halfes(uint64_t &x)
 {
     uint64_t y = ((x & 0xFFFFFFFF00000000) >> 32) & 0xFFFFFFFF;
