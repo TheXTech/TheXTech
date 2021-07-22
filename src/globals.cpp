@@ -725,7 +725,10 @@ int vb6Round(double x)
 static SDL_INLINE double toNearest(double x)
 {
     #ifdef VITA
-    return round(x);
+    int firstPlace = ( (int)(floor( fabs( x ) * 10 ) ) ) % 10;
+    if(firstPlace >= 6)
+        return ceil(x);
+    return floor(x);
     #else
     int round_old = std::fegetround();
     if(round_old == FE_TONEAREST)
