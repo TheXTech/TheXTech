@@ -719,6 +719,14 @@ elseif(VITA)
     vita_create_vpk(${THEXTECH_EXECUTABLE_NAME}.vpk ${VITA_TITLEID} ${THEXTECH_EXECUTABLE_NAME}.self
         VERSION ${VITA_VERSION}
         NAME ${VITA_APP_NAME}
+        FILE    ${CMAKE_SOURCE_DIR}/resources/vita/sce_sys/icon0.png sce_sys/icon0.png
+                ${CMAKE_SOURCE_DIR}/resources/vita/sce_sys/livearea/contents/bg.png sce_sys/livearea/contents/bg.png
+                ${CMAKE_SOURCE_DIR}/resources/vita/sce_sys/livearea/contents/startup.png sce_sys/livearea/contents/startup.png
+                ${CMAKE_SOURCE_DIR}/resources/vita/sce_sys/livearea/contents/template.xml sce_sys/livearea/contents/template.xml
+    )
+    add_custom_target(copy 
+        COMMAND cp ${THEXTECH_EXECUTABLE_NAME}.self eboot.bin
+        DEPENDS ${THEXTECH_EXECUTABLE_NAME}.self
     )
 else()
     install(TARGETS thextech
