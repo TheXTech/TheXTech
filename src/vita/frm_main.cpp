@@ -68,9 +68,11 @@ int _newlib_heap_size_user = 256 * 1024 * 1024;
 #endif
 
 #ifndef DISPLAY_WIDTH_DEF
+//960
 #define DISPLAY_WIDTH_DEF 960
 #endif
 #ifndef DISPLAY_HEIGHT_DEF
+//544
 #define DISPLAY_HEIGHT_DEF 544
 #endif
 
@@ -95,41 +97,11 @@ int _newlib_heap_size_user = 256 * 1024 * 1024;
 #endif
 
 static unsigned int num_textures_loaded = 0;
-static const int vgl_ram_threshold = 0x2000000;//0x1000000;
-static const int vgl_pool_size = 0x100000;
-static const int vgl_cdram_threshold = 256 * 1024;
-static const int vgl_phycont_threshold = 1 * 1024 * 1024;
-static const int vgl_pool_ram_threshold = vgl_pool_size * 2;//0x1000000
+static const int vgl_ram_threshold = (16 * 1024 * 1024); // leave 84mb
+static const int vgl_legacy_pool_size = (16 * 1024 * 1024); // 32mb for legacy OGL.
+
 static const SceGxmMultisampleMode vgl_msaa = SCE_GXM_MULTISAMPLE_NONE;
-static int ram_pool_count = vgl_pool_size;
-
-inline uint32_t pow2roundup(uint32_t x)
-{
-    if(x == 0)
-        return 0;
-
-    --x;
-    x |= x >> 1;
-    x |= x >> 2;
-    x |= x >> 4;
-    x |= x >> 8;
-    x |= x >> 16;
-    return x + 1;
-}
-
-inline int32_t pow2roundup(int32_t x)
-{
-    if(x < 0)
-        return 0;
-
-    --x;
-    x |= x >> 1;
-    x |= x >> 2;
-    x |= x >> 4;
-    x |= x >> 8;
-    x |= x >> 16;
-    return x + 1;
-}
+static int ram_pool_count = vgl_legacy_pool_size;
 
 static void dumpFullFile(std::vector<char> &dst, const std::string &path)
 {
@@ -159,17 +131,6 @@ static void dumpFullFile(std::vector<char> &dst, const std::string &path)
     }
 
     SDL_RWclose(f);
-}
-
-static void toPowofTwo(FIBITMAP **image)
-{
-    unsigned int width = FreeImage_GetWidth(*image);
-    unsigned int height = FreeImage_GetHeight(*image);
-    width = pow2roundup(width);
-    height = pow2roundup(height);
-    FIBITMAP *newImage = FreeImage_Rescale(*image, static_cast<int>(width), static_cast<int>(height), FILTER_BOX);
-    FreeImage_Unload(*image);
-    *image = newImage;
 }
 
 FrmMain::FrmMain()
@@ -217,7 +178,7 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
     _debugPrintf_("--Before vglInit--");
     print_memory_info();
 #if 1
-    vglInitExtended(0x1400000, DISPLAY_WIDTH_DEF, DISPLAY_HEIGHT_DEF, vgl_ram_threshold, SCE_GXM_MULTISAMPLE_NONE);
+    vglInitExtended(vgl_legacy_pool_size, DISPLAY_WIDTH_DEF, DISPLAY_HEIGHT_DEF, vgl_ram_threshold, vgl_msaa);
 #else
     vglInitExtended(DISPLAY_WIDTH_DEF, DISPLAY_HEIGHT_DEF, vgl_ram_threshold, SCE_GXM_MULTISAMPLE_NONE);
 #endif
@@ -225,7 +186,7 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
     // vglUseVram(GL_TRUE);
 
     _debugPrintf_("--After vglInit--");
-    _debugPrintf_("PS VITA: Init with pool size of %.4fMB", (vgl_pool_size / (float)MEMORY_DIVISOR));
+    _debugPrintf_("PS VITA: Init with pool size of %.4fMB", (vgl_legacy_pool_size / (float)MEMORY_DIVISOR));
     print_memory_info();
 
     // glClearColor(0.5, 0.1, 0.1, 0); Debug Red

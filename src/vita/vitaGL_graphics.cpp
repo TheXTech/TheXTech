@@ -136,8 +136,8 @@ void DrawRectSolid(int x,
     glDisableClientState(GL_COLOR_ARRAY);
 
     glEnd();
-#elseif 0
-    // glBindTexture(GL_TEXTURE_2D, 0);
+#else
+    glBindTexture(GL_TEXTURE_2D, 0);
     glBegin(GL_QUADS);
     
 
