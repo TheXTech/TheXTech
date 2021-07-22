@@ -11,10 +11,8 @@ list(APPEND DIRMANAGER_SRCS
 
 if(WIN32)
     list(APPEND DIRMANAGER_SRCS ${CMAKE_CURRENT_LIST_DIR}/dirman_winapi.cpp)
-elseif(NOT VITA)
+elseif(VITA)
+    list(APPEND DIRMANAGER_SRCS ${CMAKE_CURRENT_LIST_DIR}/dirman_vitafs.cpp)
+else()
     list(APPEND DIRMANAGER_SRCS ${CMAKE_CURRENT_LIST_DIR}/dirman_posix.cpp)    
-endif()
-
-if(VITA)
-    list(APPEND DIRMANAGER_SRCS ${CMAKE_CURRENT_LIST_DIR}/dirman_vita.cpp ${CMAKE_CURRENT_LIST_DIR}/dirman_vitafs.cpp)
 endif()

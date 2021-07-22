@@ -24,17 +24,18 @@ DEALINGS IN THE SOFTWARE.
 
 
 #ifdef VITA
-// #include <sys/stat.h>
+#include <sys/dirent.h>
+
+#include <psp2/io/devctl.h>
+#include <psp2/io/dirent.h>
+#include <psp2/io/fcntl.h>
+#include <psp2/io/stat.h>
 #include <sys/fcntl.h>
 #include <dirent.h>
 #endif
 
 #include <unistd.h>
 #include <memory.h>
-
-#ifdef VITA
-#include "dirman_vita.h"
-#endif
 
 
 
@@ -46,11 +47,11 @@ DEALINGS IN THE SOFTWARE.
 #include <Logger/logger.h>
 
 #ifndef PATH_MAX
-#define PATH_MAX 2048
+#define PATH_MAX 1024
 #endif
 
 #ifndef MAX_PATH_LENGTH
-#define MAX_PATH_LENGTH 1024
+#define MAX_PATH_LENGTH PATH_MAX
 #endif
 
 
@@ -99,9 +100,9 @@ bool DirMan::DirMan_private::getListOfFiles(std::vector<std::string> &list, cons
             res = sceIoDread(dfd, &dirEntry);
             if(res > 0)
             {
-                char *new_path = malloc(strlen(m_dirPath.c_str()) + strlen(dirEntry.d_name) + 2);
-                snprintf(new_path, MAX_PATH_LENGTH, "%s%s%s", m_dirPath.c_str(), hasEndSlash(m_dirPath.c_str()) ? "" : "/", dirEntry.d_name);
-                pLogDebug("Discovered new path `%s`", new_path);
+                char *new_path = (char*)malloc(strlen(m_dirPath.c_str()) + strlen(dirEntry.d_name) + 2);
+                snprintf(new_path, MAX_PATH_LENGTH, "%s%s%s", m_dirPath.c_str(), hasEndSlash((char*)m_dirPath.c_str()) ? "" : "/", dirEntry.d_name);
+                // pLogDebug("Discovered new path `%s`", new_path);
 
                 // matching non-directories
                 if (!SCE_S_ISDIR(dirEntry.d_stat.st_mode))
@@ -164,9 +165,9 @@ static inline int quick_stat_folders(
             res = sceIoDread(dfd, &dirEntry);
             if(res > 0)
             {
-                char *new_path = malloc(strlen(m_dirPath) + strlen(dirEntry.d_name) + 2);
+                char *new_path = (char*)malloc(strlen(m_dirPath) + strlen(dirEntry.d_name) + 2);
                 snprintf(new_path, MAX_PATH_LENGTH, "%s%s%s", m_dirPath, hasEndSlash(m_dirPath) ? "" : "/", dirEntry.d_name);
-                pLogDebug("Discovered new path `%s`", new_path);
+                // pLogDebug("Discovered new path `%s`", new_path);
 
                 if (SCE_S_ISDIR(dirEntry.d_stat.st_mode))
                 {
@@ -202,16 +203,15 @@ bool DirMan::DirMan_private::getListOfFolders(std::vector<std::string>& list, co
             res = sceIoDread(dfd, &dirEntry);
             if(res > 0)
             {
-                char *new_path = malloc(strlen(m_dirPath.c_str()) + strlen(dirEntry.d_name) + 2);
-                snprintf(new_path, MAX_PATH_LENGTH, "%s%s%s", m_dirPath.c_str(), hasEndSlash(m_dirPath.c_str()) ? "" : "/", dirEntry.d_name);
-                pLogDebug("Discovered new path `%s`", new_path);
+                char *new_path = (char*)malloc(strlen(m_dirPath.c_str()) + strlen(dirEntry.d_name) + 2);
+                snprintf(new_path, MAX_PATH_LENGTH, "%s%s%s", m_dirPath.c_str(), hasEndSlash((char*)m_dirPath.c_str()) ? "" : "/", dirEntry.d_name);
+                // pLogDebug("Discovered new path `%s`", new_path);
 
                 if (SCE_S_ISDIR(dirEntry.d_stat.st_mode))
                 {
                     if(matchSuffixFilters(dirEntry.d_name , suffix_filters))
                     {
-                        pLogDebug("Directory match! `%s`", dirEntry.d_name);
-                            list.push_back(dirEntry.d_name);
+                        list.push_back(dirEntry.d_name);
                     }
                     // // Get Path info 
                     // int ret = quick_stat_folders(m_dirPath.c_str(), dirEntry.d_name, list, suffix_filters);
@@ -361,7 +361,7 @@ bool DirMan::mkAbsPath(const std::string &dirPath)
     if(tmp[len - 1] == '/')
         tmp[len - 1] = 0;
     
-    for(int i = 0; i < len; i++)
+    for(size_t i = 0; i < len; i++)
     {
         if(tmp[i] == '/')
             first_slash = i;
@@ -392,6 +392,7 @@ bool DirMan::rmAbsPath(const std::string &dirPath)
 {
     PUT_THREAD_GUARD();
     pLogWarning("TODO: need to remove abs path for %s", dirPath.c_str());
+    return -1;
 
 
     // int ret = 0;
@@ -450,4 +451,42 @@ bool DirMan::rmAbsPath(const std::string &dirPath)
     // }
 
     // return (ret == 0);
+}
+
+extern "C" {
+    int mkdir(const char *path, mode_t mode)
+    {
+        return sceIoMkdir(path, mode);
+    }
+
+    int rmdir(const char *__path)
+    {
+        return sceIoRmdir(__path);
+    }
+
+    int dup2(int oldfd, int newfd)
+    {
+        (void)oldfd;
+        (void)newfd;
+        return oldfd;
+    }
+
+    int pipe(int pipefd[2])
+    {
+        (void)pipefd;
+        return 0;
+    }
+
+    long sysconf(int name)
+    {
+        (void)name;
+        return 0;
+    }
+
+    char *realpath(const char* input, char* resolved_path)
+    {
+        (void)resolved_path;
+        resolved_path = (char*)input;
+        return (char*)input;
+    }
 }
