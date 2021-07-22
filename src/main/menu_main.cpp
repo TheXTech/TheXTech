@@ -1252,10 +1252,10 @@ bool mainMenuUpdate()
         else if(MenuMode == MENU_OPTIONS)
         {
             int optionsMenuLength = 2; // P1, P2, Credits
-#if !defined(__ANDROID__) && !defined(__3DS__)
+#if !defined(__ANDROID__) && !defined(__3DS__) && !defined(VITA)
             optionsMenuLength ++; // Fullscreen
 #endif
-#ifndef __3DS__
+#if !defined(__3DS__) && !defined(VITA)
             optionsMenuLength ++; // ScaleMode
 #endif
 #ifndef FIXED_RES
@@ -1278,7 +1278,7 @@ bool mainMenuUpdate()
                             menuLen = 18 * std::strlen("player 1 controls") - 4;
                         else if(A == i++)
                             menuLen = 18 * std::strlen("player 2 controls") - 4;
-#if !defined(__ANDROID__) && !defined(__3DS__)
+#if !defined(__ANDROID__) && !defined(__3DS__) && !defined(VITA)
                         else if(A == i++)
                         {
                             if(resChanged)
@@ -1287,7 +1287,7 @@ bool mainMenuUpdate()
                                 menuLen = 18 * std::strlen("fullscreen mode");
                         }
 #endif
-#if !defined(__3DS__)
+#if !defined(__3DS__) && !defined(VITA)
                         else if(A == i++)
                             menuLen = 18 * (7 + ScaleMode_strings.at(g_videoSettings.scaleMode).length());
 #endif
@@ -1352,7 +1352,7 @@ bool mainMenuUpdate()
                         ChangeScreen();
                     }
 #endif
-#if !defined(__3DS__)
+#if !defined(__3DS__) && !defined(VITA)
                     else if(MenuCursor == i++)
                     {
                         PlaySoundMenu(SFX_Do);
@@ -2093,14 +2093,14 @@ void mainMenuDraw()
         SuperPrint("PLAYER 1 CONTROLS", 3, MenuX, MenuY);
         SuperPrint("PLAYER 2 CONTROLS", 3, MenuX, MenuY + 30);
         A = 2;
-#if !defined(__ANDROID__) && !defined(__3DS__)
+#if !defined(__ANDROID__) && !defined(__3DS__) && !defined(VITA)
         if(resChanged)
             SuperPrint("WINDOWED MODE", 3, MenuX, MenuY + 30*A);
         else
             SuperPrint("FULLSCREEN MODE", 3, MenuX, MenuY + 30*A);
         A ++;
 #endif
-#ifndef __3DS__
+#if !defined(__3DS__) && !defined(VITA)
         SuperPrint("SCALE: "+ScaleMode_strings.at(g_videoSettings.scaleMode), 3, MenuX, MenuY + 30*A);
         A ++;
 #endif
@@ -2156,6 +2156,7 @@ void mainMenuDraw()
     // Player controls setup
     else if(MenuMode == MENU_INPUT_SETTINGS_P1 || MenuMode == MENU_INPUT_SETTINGS_P2)
     {
+#ifndef VITA
         if(useJoystick[MenuMode - MENU_INPUT_SETTINGS_BASE] == 0)
         {
             auto &ck = conKeyboard[MenuMode - MENU_INPUT_SETTINGS_BASE];
@@ -2174,8 +2175,14 @@ void mainMenuDraw()
         }
         else
         {
+#endif
             auto &cj = conJoystick[MenuMode - MENU_INPUT_SETTINGS_BASE];
+#ifndef VITA
             SuperPrint("INPUT......" + joyGetName(useJoystick[MenuMode - MENU_INPUT_SETTINGS_BASE] - 1), 3, MenuX, MenuY - 90);
+#else
+            // TODO: Can Vita support DS4 through SDL?
+            SuperPrint("INPUT......" + joyGetName(useJoystick[0]), 3, MenuX, MenuY - 90);
+#endif
             SuperPrint(fmt::format_ne("UP.........{0}", getJoyKeyName(cj.isGameController, cj.Up)), 3, MenuX, MenuY - 60);
             SuperPrint(fmt::format_ne("DOWN.......{0}", getJoyKeyName(cj.isGameController, cj.Down)), 3, MenuX, MenuY - 30);
             SuperPrint(fmt::format_ne("LEFT.......{0}", getJoyKeyName(cj.isGameController, cj.Left)), 3, MenuX, MenuY);
@@ -2187,7 +2194,9 @@ void mainMenuDraw()
             SuperPrint(fmt::format_ne("DROP ITEM..{0}", getJoyKeyName(cj.isGameController, cj.Drop)), 3, MenuX, MenuY + 180);
             SuperPrint(fmt::format_ne("PAUSE......{0}", getJoyKeyName(cj.isGameController, cj.Start)), 3, MenuX, MenuY + 210);
             SuperPrint("Reset to default", 3, MenuX, MenuY + 240);
+#ifndef VITA
         }
+#endif
 
         frmMain.renderTexture(MenuX - 20, MenuY - 90 + (MenuCursor * 30),
                               GFX.MCursor[0].w, GFX.MCursor[0].h, GFX.MCursor[0], 0, 0);

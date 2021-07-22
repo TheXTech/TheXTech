@@ -261,6 +261,13 @@ void SetupCredits()
     AddCredit("");
     AddCredit("");
 #endif
+#ifdef VITA
+    AddCredit("PS Vita Port By:");
+    AddCredit("");
+    AddCredit("Axiom");
+    AddCredit("");
+    AddCredit("");
+#endif
 
     if(!WorldCredits[1].empty())
     {

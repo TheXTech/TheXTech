@@ -61,7 +61,7 @@
 
 #include "../frm_main.h"
 
-int _newlib_heap_size_user = 64 * 1024 * 1024;
+int _newlib_heap_size_user = 256 * 1024 * 1024;
 
 #ifndef NO_SDL
 #include <SDL2/SDL.h>
@@ -216,7 +216,12 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
 
     _debugPrintf_("--Before vglInit--");
     print_memory_info();
+#if 1
     vglInitExtended(0x1400000, DISPLAY_WIDTH_DEF, DISPLAY_HEIGHT_DEF, vgl_ram_threshold, SCE_GXM_MULTISAMPLE_NONE);
+#else
+    vglInitExtended(DISPLAY_WIDTH_DEF, DISPLAY_HEIGHT_DEF, vgl_ram_threshold, SCE_GXM_MULTISAMPLE_NONE);
+#endif
+
     // vglUseVram(GL_TRUE);
 
     _debugPrintf_("--After vglInit--");
@@ -234,6 +239,13 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
 	glOrtho(0, DISPLAY_WIDTH_DEF, DISPLAY_HEIGHT_DEF, 0, -1, 1);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
+
+    glViewport(
+        0,
+        -DISPLAY_HEIGHT_DEF,
+        DISPLAY_WIDTH_DEF * 2,
+        DISPLAY_HEIGHT_DEF * 2
+    );
 
     glEnable(GL_TEXTURE_2D);
 
@@ -924,7 +936,8 @@ void FrmMain::renderRect(int x, int y, int w, int h, float red, float green, flo
 
 void FrmMain::renderRectBR(int _left, int _top, int _right, int _bottom, float red, float green, float blue, float alpha)
 {
-    renderRect(_left, _top, _right-_left, _bottom-_top, red, green, blue, alpha, true);
+    // TODO:
+    // renderRect(_left, _top, _right-_left, _bottom-_top, red, green, blue, alpha, true);
 }
 
 void FrmMain::renderTexturePrivate(float xDst, float yDst, float wDst, float hDst,
@@ -1180,12 +1193,13 @@ void FrmMain::clearBuffer()
 
 void FrmMain::updateViewport()
 {
-    // resetViewport();
-    // offsetViewport(0, 0);
+    resetViewport();
+    offsetViewport(0, 0);
 }
 
 void FrmMain::resetViewport()
 {
+    pLogDebug("resetViewport called!");
     setViewport(0, 0, ScreenW, ScreenH);
 }
 
@@ -1193,22 +1207,18 @@ void FrmMain::setViewport(int x, int y, int w, int h)
 {
     int offset_x = viewport_offset_x - viewport_x;
     int offset_y = viewport_offset_y - viewport_y;
-    viewport_x = x/2;
-    viewport_y = y/2;
-    viewport_w = w * 2;
-    viewport_h = h * 2;
+    viewport_x = x / 2;
+    viewport_y = y / 2;
+    viewport_w = w / 2;
+    viewport_h = h / 2;
     viewport_offset_x = viewport_x + offset_x;
     viewport_offset_y = viewport_y + offset_y;
 
+    // pLogDebug("Viewport Params: %d, %d (%d x %d)", x, y, w, h);
+    // pLogDebug("Viewport: %.3f, %.3f (%.3f x %.3f)", 0.f, float(y - (h / (float)1)), float(viewport_w), float(viewport_h));
 
-    glViewport(
-        // offset_x + x * viewport_scale_x,
-        // offset_y + (h - (y + h)) * viewport_scale_y,
-        0,
-        y - (h / (float)1),
-        viewport_w,
-        viewport_h
-    );
+
+    
 }
 
 void FrmMain::offsetViewport(int x, int y)
@@ -1330,6 +1340,7 @@ void FrmMain::eventMouseDown(SDL_MouseButtonEvent &event)
 void FrmMain::eventMouseMove(SDL_MouseMotionEvent &event)
 {
     SDL_Point p = MapToScr(event.x, event.y);
+
     MenuMouseX = p.x;// int(event.x * ScreenW / ScaleWidth);
     MenuMouseY = p.y;//int(event.y * ScreenH / ScaleHeight);
     MenuMouseMove = true;
