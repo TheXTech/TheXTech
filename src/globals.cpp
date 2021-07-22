@@ -35,6 +35,14 @@
 #include <cmath>
 #include <cfenv>
 
+#if defined(VITA) || defined(__3DS__)
+#define USE_CUSTOM_TONEAREST
+#endif
+
+#ifdef USE_CUSTOM_TONEAREST
+#include <pge_tonearest.h>
+#endif
+
 FrmMain frmMain;
 GFX_t GFX;
 
@@ -722,14 +730,11 @@ int vb6Round(double x)
     return static_cast<int>(vb6Round(x, 0));
 }
 
+#ifdef USE_CUSTOM_TONEAREST
+#   define toNearest pge_toNearest
+#else
 static SDL_INLINE double toNearest(double x)
 {
-    #ifdef VITA
-    int firstPlace = ( (int)(floor( fabs( x ) * 10 ) ) ) % 10;
-    if(firstPlace >= 6)
-        return ceil(x);
-    return floor(x);
-    #else
     int round_old = std::fegetround();
     if(round_old == FE_TONEAREST)
         return std::nearbyint(x);
@@ -740,8 +745,8 @@ static SDL_INLINE double toNearest(double x)
         std::fesetround(round_old);
         return x;
     }
-    #endif
 }
+#endif
 
 double vb6Round(double x, int decimals)
 {
