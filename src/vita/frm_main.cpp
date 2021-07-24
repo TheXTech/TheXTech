@@ -133,6 +133,45 @@ static void dumpFullFile(std::vector<char> &dst, const std::string &path)
     SDL_RWclose(f);
 }
 
+inline bool GET_GL_ERROR(GLenum error, char* output)
+{
+    switch(error)
+    {
+    case GL_INVALID_ENUM:
+        *output = "GL_INVALID_ENUM";
+        break;
+    case GL_INVALID_VALUE:
+        *output = "GL_INVALID_VALUE";
+        break;
+    case GL_INVALID_OPERATION:
+        *output = "GL_INVALID_OPERATION";
+        break;
+    // case GL_INVALID_FRAMEBUFFER_OPERATION:
+    //     *output = "GL_INVALID_FRAMEBUFFER_OPERATION";
+    //     break;
+    case GL_OUT_OF_MEMORY:
+        *output = "GL_OUT_OF_MEMORY";
+        break;
+    case GL_STACK_UNDERFLOW:
+        *output = "GL_STACK_UNDERFLOW";
+        break;
+    case GL_STACK_OVERFLOW:
+        *output = "GL_STACK_OVERFLOW";
+        break;
+    }
+}
+
+inline bool CHECK_GL_ERROR(char* prefix) 
+{
+    GLenum gl_error = 0;
+    char error_buffer[64];
+    if((gl_error = glGetError()) != GL_NO_ERROR)
+    {
+        GET_GL_ERROR(gl_error, error_buffer);
+        pLogWarning("[%s] OPENGL ERROR: %s", prefix, error_buffer);
+    }
+}
+
 FrmMain::FrmMain()
 {
     ScaleWidth = ScreenW;
@@ -182,12 +221,14 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
 #else
     vglInitExtended(DISPLAY_WIDTH_DEF, DISPLAY_HEIGHT_DEF, vgl_ram_threshold, SCE_GXM_MULTISAMPLE_NONE);
 #endif
+    CHECK_GL_ERROR("::initSDL");
 
     // vglUseVram(GL_TRUE);
 
     _debugPrintf_("--After vglInit--");
     _debugPrintf_("PS VITA: Init with pool size of %.4fMB", (vgl_legacy_pool_size / (float)MEMORY_DIVISOR));
     print_memory_info();
+    CHECK_GL_ERROR("::initSDL");
 
     // glClearColor(0.5, 0.1, 0.1, 0); Debug Red
     glClearColor(0.f, 0.f, 0.f, 1.0f);
@@ -207,6 +248,7 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
         DISPLAY_WIDTH_DEF * 2,
         DISPLAY_HEIGHT_DEF * 2
     );
+    CHECK_GL_ERROR("::initSDL");
 
     glEnable(GL_TEXTURE_2D);
 
@@ -436,6 +478,8 @@ void FrmMain::repaint()
 
 
     vglSwapBuffers(GL_FALSE);
+
+    CHECK_GL_ERROR("::repaint");
 }
 
 #define align_mem(addr, align) (((addr) + ((align) - 1)) & ~((align) - 1))
@@ -565,6 +609,7 @@ StdPicture FrmMain::LoadPicture(std::string path)
     uint32_t w = static_cast<uint32_t>(FreeImage_GetWidth(sourceImage));
     uint32_t h = static_cast<uint32_t>(FreeImage_GetHeight(sourceImage));
     uint32_t channels = FreeImage_GetBPP(sourceImage) / 8;
+    uint32_t stride = FreeImage_GetPitch(sourceImage);
 
     target.inited = true;
     target.lazyLoaded = false;
@@ -583,7 +628,7 @@ StdPicture FrmMain::LoadPicture(std::string path)
     }
     else
     {
-        pLogDebug("VITA: Successfully loaded %s. Size: %d x %d with %d channels.", path.c_str(), w, h, channels);
+        pLogDebug("VITA: Successfully loaded %s. Size: %d x %d with %d channels. Stride = %d", path.c_str(), w, h, channels, stride);
     }
 
     RGBQUAD upperColor;
