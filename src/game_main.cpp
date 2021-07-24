@@ -24,9 +24,12 @@
  */
 
 #ifndef NO_SDL
-#include <SDL2/SDL_timer.h>
+#   include <SDL2/SDL_timer.h>
+#   if !defined(PGE_NO_THREADING) && defined(VITA)
+#       include <SDL2/SDL.h>
+#   endif
 #else
-#include "SDL_supplement.h"
+#   include "SDL_supplement.h"
 #endif
 
 #ifndef NO_INTPROC
@@ -74,12 +77,6 @@
 #include "editor/new_editor.h"
 
 #include "pseudo_vb.h"
-
-#ifndef PGE_NO_THREADING
-#ifdef VITA // TODO: Do other platforms also need this?
-#include <SDL2/SDL.h>
-#endif
-#endif
 
 
 void CheckActive();
