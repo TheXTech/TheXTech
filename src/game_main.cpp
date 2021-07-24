@@ -75,6 +75,13 @@
 
 #include "pseudo_vb.h"
 
+#ifndef PGE_NO_THREADING
+#ifdef VITA // TODO: Do other platforms also need this?
+#include <SDL2/SDL.h>
+#endif
+#endif
+
+
 void CheckActive();
 // set up sizable blocks
 void SizableBlocks();
