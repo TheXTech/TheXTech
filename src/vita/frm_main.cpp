@@ -53,11 +53,13 @@
 #include <FreeImageLite.h>
 #include "../editor/new_editor.h"
 
-
 #include <vitasdk.h>
-#include <vitaGL.h>
 #include "vitaGL_graphics.h"
-
+#ifdef USE_VITA2D
+#include <vita2d.h>
+#else
+#include <vitaGL.h>
+#endif
 
 #include "../frm_main.h"
 
@@ -133,6 +135,7 @@ static void dumpFullFile(std::vector<char> &dst, const std::string &path)
     SDL_RWclose(f);
 }
 
+#ifndef USE_VITA2D
 inline bool GET_GL_ERROR(GLenum error, char* output)
 {
     switch(error)
@@ -171,6 +174,7 @@ inline bool CHECK_GL_ERROR(char* prefix)
         pLogWarning("[%s] OPENGL ERROR: %s", prefix, error_buffer);
     }
 }
+#endif
 
 FrmMain::FrmMain()
 {
@@ -214,20 +218,31 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
     GraphicsHelps::initFreeImage();
 #endif
 
-    _debugPrintf_("--Before vglInit--");
+    _debugPrintf_("--Before graphics init--");
     print_memory_info();
+#ifdef USE_VITA2D
+    _debugPrintf_("---  Using Vita2D for graphics API.");
+    vita2d_init();
+#else
+    _debugPrintf_("--- Using vitaGL for graphics API.");
 #if 1
     vglInitExtended(vgl_legacy_pool_size, DISPLAY_WIDTH_DEF, DISPLAY_HEIGHT_DEF, vgl_ram_threshold, vgl_msaa);
 #else
     vglInitExtended(DISPLAY_WIDTH_DEF, DISPLAY_HEIGHT_DEF, vgl_ram_threshold, SCE_GXM_MULTISAMPLE_NONE);
-#endif
     CHECK_GL_ERROR("::initSDL");
+#endif
+#endif
+    
 
     // vglUseVram(GL_TRUE);
 
-    _debugPrintf_("--After vglInit--");
-    _debugPrintf_("PS VITA: Init with pool size of %.4fMB", (vgl_legacy_pool_size / (float)MEMORY_DIVISOR));
+    _debugPrintf_("--After graphics init--");
     print_memory_info();
+
+#ifdef USE_VITA2D
+    // that's it for vita2d!
+    vita2d_set_clear_color(RGBA8(0x40, 0x40, 0x40, 0xFF));
+#else
     CHECK_GL_ERROR("::initSDL");
 
     // glClearColor(0.5, 0.1, 0.1, 0); Debug Red
@@ -251,18 +266,8 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
     CHECK_GL_ERROR("::initSDL");
 
     glEnable(GL_TEXTURE_2D);
+#endif
 
-
-    if(_debugPrintf_ != 0)
-    {
-        _debugPrintf_("PS VITA: TODO, init vitaGL and init SDL BUT only init SDL for input and audio.");
-    }
-    else
-    {
-        _debugPrintf_ = pLogWarning;
-        _debugPrintf_("PS VITA: _debugPrintf_ assigned to pLogWarning.");
-        _debugPrintf_("PS VITA: TODO, init vitaGL and init SDL BUT only init SDL for input and audio.");
-    }
 
     Uint32 sdlInitFlags = 0;
     sdlInitFlags |= SDL_INIT_TIMER;
@@ -311,40 +316,49 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
 
 bool FrmMain::freeTextureMem() // make it take an amount of memory, someday.....
 {
-    printf("Freeing texture memory...\n");
-    StdPicture* oldest = nullptr;
-    uint32_t earliestDraw = 0;
-    StdPicture* second_oldest = nullptr;
-    uint32_t second_earliestDraw = 0;
-    for (StdPicture* poss : m_textureBank)
-    {
-        if (poss->texture && poss->lazyLoaded && (poss->lastDrawFrame+30 < currentFrame))
-        {
-            if ((oldest == nullptr) || (poss->lastDrawFrame < earliestDraw))
-            {
-                second_oldest = oldest;
-                second_earliestDraw = earliestDraw;
-                oldest = poss;
-                earliestDraw = poss->lastDrawFrame;
-            }
-            else if ((second_oldest == nullptr) || (poss->lastDrawFrame < second_earliestDraw))
-            {
-                second_oldest = poss;
-                second_earliestDraw = poss->lastDrawFrame;
-            }
-        }
-    }
-    if (oldest == nullptr) return false;
-    printf("Clearing %p, %p\n", oldest, second_oldest);
-    printf("Clearing %s, %s\n", oldest->path.c_str(), (second_oldest) ? second_oldest->path.c_str() : "");
-    lazyUnLoad(*oldest);
-    if (second_oldest) lazyUnLoad(*second_oldest);
-    return true;
+    pLogDebug("TODO: Implement ::freeTextureMem on PS Vita again.");
+    // printf("Freeing texture memory...\n");
+    // StdPicture* oldest = nullptr;
+    // uint32_t earliestDraw = 0;
+    // StdPicture* second_oldest = nullptr;
+    // uint32_t second_earliestDraw = 0;
+    // for (StdPicture* poss : m_textureBank)
+    // {
+    //     if (poss->texture && poss->lazyLoaded && (poss->lastDrawFrame+30 < currentFrame))
+    //     {
+    //         if ((oldest == nullptr) || (poss->lastDrawFrame < earliestDraw))
+    //         {
+    //             second_oldest = oldest;
+    //             second_earliestDraw = earliestDraw;
+    //             oldest = poss;
+    //             earliestDraw = poss->lastDrawFrame;
+    //         }
+    //         else if ((second_oldest == nullptr) || (poss->lastDrawFrame < second_earliestDraw))
+    //         {
+    //             second_oldest = poss;
+    //             second_earliestDraw = poss->lastDrawFrame;
+    //         }
+    //     }
+    // }
+    // if (oldest == nullptr) return false;
+    // printf("Clearing %p, %p\n", oldest, second_oldest);
+    // printf("Clearing %s, %s\n", oldest->path.c_str(), (second_oldest) ? second_oldest->path.c_str() : "");
+    // lazyUnLoad(*oldest);
+    // if (second_oldest) lazyUnLoad(*second_oldest);
+    // return true;
 }
 
 void FrmMain::freeSDL()
 {
+
     pLogDebug("<Application Closing>");
+#ifdef USE_VITA2D
+    pLogDebug("vita2d_fini");
+    vita2d_fini();
+#else
+    pLogDebug("vglEnd");
+    vglEnd();
+#endif
 
     pLogDebug("GraphicsHelps::closeFreeImage");
     GraphicsHelps::closeFreeImage();
@@ -365,9 +379,6 @@ void FrmMain::freeSDL()
 
     pLogDebug("SDL_Quit");
     SDL_Quit();
-
-    pLogDebug("vglEnd");
-    vglEnd();
 
     // TODO: Fix "has not currently been declared"
     // GraphicsHelps::closeFreeImage();
@@ -475,11 +486,14 @@ void FrmMain::doEvents()
 void FrmMain::repaint()
 {
     // paint from render target to screen.
-
-
-    vglSwapBuffers(GL_FALSE);
+#if USE_VITA2D
+    vita2d_end_drawing();
+    vita2d_swap_buffers();
+#else
+    glSwapBuffers(GL_FALSE);
 
     CHECK_GL_ERROR("::repaint");
+#endif
 }
 
 #define align_mem(addr, align) (((addr) + ((align) - 1)) & ~((align) - 1))
@@ -630,7 +644,7 @@ StdPicture FrmMain::LoadPicture(std::string path)
     {
         pLogDebug("VITA: Successfully loaded %s. Size: %d x %d with %d channels. Stride = %d", path.c_str(), w, h, channels, stride);
     }
-
+#ifndef USE_VITA2D
     RGBQUAD upperColor;
     FreeImage_GetPixelColor(sourceImage, 0, 0, &upperColor);
     target.ColorUpper.r = float(upperColor.rgbRed) / 255.0f;
@@ -641,15 +655,23 @@ StdPicture FrmMain::LoadPicture(std::string path)
     target.ColorLower.r = float(lowerColor.rgbRed) / 255.0f;
     target.ColorLower.b = float(lowerColor.rgbBlue) / 255.0f;
     target.ColorLower.g = float(lowerColor.rgbGreen) / 255.0f;
-    FreeImage_FlipVertical(sourceImage);
+    
     target.nOfColors = GL_RGBA;
     target.format = GL_BGRA;
+#endif
+
+    FreeImage_FlipVertical(sourceImage);
     target.w = static_cast<int>(w);
     target.h = static_cast<int>(h);
     target.frame_w = static_cast<int>(w);
     target.frame_h = static_cast<int>(h);
 
+#ifdef USE_VITA2D
+    uint8_t* textura = reinterpret_cast<uint8_t*>(FreeImage_GetBits(sourceImage));
+#else
     GLubyte* textura = reinterpret_cast<GLubyte*>(FreeImage_GetBits(sourceImage));
+#endif
+
     loadTexture(target, w, h, textura);
 
     num_textures_loaded++;
@@ -672,13 +694,6 @@ StdPicture FrmMain::lazyLoadPicture(std::string path)
     target.path = path;
     if(target.path.empty())
         return target;
-
-    // if(Files::hasSuffix(path, ".png"))
-    // {
-    //   // TODO: does vita StdPicture struct even have mask paths?
-    //
-    //   // maskPath.clear();
-    // }
 
     if(!GraphicsHelps::getImageMetrics(path, &tSize))
     {
@@ -703,43 +718,45 @@ StdPicture FrmMain::lazyLoadPicture(std::string path)
     target.texture = 0; // Decompressed texture is 0 because we haven't fully loaded in yet.
 
     return target;
-
-/** This is a leftover relic from porting the 3DS version to the Vita.
-    target.inited = true;
-    target.lazyLoaded = true;
-
-    // Check for existing .size file
-    std::string sizePath = path + ".size";
-    FILE *fs;
-    fs = fopen(sizePath.c_str(), "r");
-
-    char contents[10];
-    if(fs != nullptr)
-    {
-        fread(&contents[0], 1, 10, fs);
-
-        // null terminate for atoi to convert
-        contents[4] = '\0';
-        contents[9] = '\0';
-
-        target.w = atoi(&contents[0]);
-        target.h = atoi(&contents[5]);
-
-        if(fclose(fs)) printf("lazyLoadPicture: Couldn't close file.\n");
-    }
-    else
-    {
-        lazyLoad(target);
-        lazyUnLoad(target);
-        printf("lazyLoadPicture: Couldn't open size file.\n");
-    }
-*/
-
-    return target;
 }
 
 void FrmMain::loadTexture(StdPicture &target, uint32_t width, uint32_t height, uint8_t *RGBApixels)
 {
+#if USE_VITA2D
+
+    // vita2d_texture *_newTexture = vita2d_load_BMP_buffer((void*)RGBApixels);
+
+    vita2d_texture *_newTexture = vita2d_create_empty_texture(width, height);
+
+    void* texture_data = vita2d_texture_get_datap(_newTexture);
+    memcpy(texture_data, RGBApixels, width * height);
+
+    if(!_newTexture)
+    {
+        pLogCritical("::loadTexture failed: vita2d_load_BMP_buffer failed.");
+        return;
+    }
+
+    target.texture = _newTexture;
+
+
+    // vita2d_texture *new_texture = vita2d_create_empty_texture(width, height);
+    // if(!new_texture)
+    // {
+    //     pLogCritical("COULDNT CREATE NEW EMPTY VITA2D TEXTURE OF SIZE %d x %d", width, height);
+    //     return;
+    // }
+    // target.texture_stride for stride.
+
+    // void* texture_data = vita2d_texture_get_datap(new_texture);
+    // unsigned int _stride = vita2d_texture_get_stride(texture);
+    // int i;
+    // for(i = 0; i < height; i++) {
+    //     (texture_data + (i * _stride)) = (unsigned char)(RGBApixels + i);
+    // }
+
+    // target.texture = new_texture;
+#else
     // Take our raw bytes and load them in as an OpenGL image.
     GLuint _newTexture = 0;
     glGenTextures(1, &(target.texture));
@@ -762,6 +779,7 @@ void FrmMain::loadTexture(StdPicture &target, uint32_t width, uint32_t height, u
         GL_UNSIGNED_BYTE,
         (const GLvoid*)RGBApixels
     );
+#endif
 
     if(_newTexture != 0)
     {
@@ -811,6 +829,7 @@ void FrmMain::lazyLoad(StdPicture &target)
     // TODO: Does Vita declare this?
     m_lazyLoadedBytes += (w * h * 4);
 
+#ifndef USE_VITA2D
     RGBQUAD upperColor;
     FreeImage_GetPixelColor(sourceImage, 0, 0, &upperColor);
     target.ColorUpper.r = float(upperColor.rgbRed) / 255.0f;
@@ -821,9 +840,12 @@ void FrmMain::lazyLoad(StdPicture &target)
     target.ColorLower.r = float(lowerColor.rgbRed) / 255.0f;
     target.ColorLower.b = float(lowerColor.rgbBlue) / 255.0f;
     target.ColorLower.g = float(lowerColor.rgbGreen) / 255.0f;
-    FreeImage_FlipVertical(sourceImage);
+
     target.nOfColors = GL_RGBA;
     target.format = GL_BGRA;
+#endif
+    FreeImage_FlipVertical(sourceImage);
+    
     target.w = static_cast<int>(w);
     target.h = static_cast<int>(h);
     target.frame_w = static_cast<int>(w);
@@ -858,8 +880,11 @@ void FrmMain::lazyLoad(StdPicture &target)
         target.w_scale = float(w) / float(target.w_orig);
         target.h_scale = float(h) / float(target.h_orig);
     }
-
+#ifdef USE_VITA2D
+    uint8_t *textura = reinterpret_cast<uint8_t*>(FreeImage_GetBits(sourceImage));
+#else 
     GLubyte *textura = reinterpret_cast<GLubyte*>(FreeImage_GetBits(sourceImage));
+#endif
     loadTexture(target, w, h, textura);
     num_textures_loaded++;
     GraphicsHelps::closeImage(sourceImage);
@@ -892,9 +917,13 @@ void FrmMain::deleteTexture(StdPicture &tx, bool lazyUnload)
         if(m_textureBank.find(tx.texture) != m_textureBank.end())
             m_textureBank.erase(tx.texture);
 
+#ifdef USE_VITA2D
+        // vita2d_free_texture(tx.texture)
+        vita2d_free_texture(tx.texture);
+#else
         // Free sprite from memory.
         glDeleteTextures(1, &tx.texture);
-
+#endif
         // For good measure.
         tx.texture = 0;
     }
@@ -915,21 +944,23 @@ void FrmMain::clearAllTextures()
 #if DEBUG_BUILD
     int texturesDeleted = 0;
 #endif
+#ifdef USE_VITA2D
+    for(vita2d_texture *tx : m_textureBank)
+#else
     for(GLuint tx : m_textureBank)
+#endif
     {
         if(tx != 0)
         {
-            #if DEBUG_BUILD
-            texturesDeleted++;
-            #endif
-
+#ifdef USE_VITA2D
+            vita2d_free_texture(tx);
+#else
             glDeleteTextures(1, &tx);
+#endif
         }
     }
 
-    #if DEBUG_BUILD
     pLogDebug("Cleared %d textures from vram.\n", texturesDeleted);
-    #endif
 
     m_textureBank.clear();
 }
@@ -1031,12 +1062,6 @@ void FrmMain::renderTexturePrivate(float xDst, float yDst, float wDst, float hDs
         hDst = (viewport_h - yDst);
     }
 
-    // figure out GLuint textures to draw.
-    GLuint to_draw = 0;
-    // TODO: Should I be rendering large images in multiple parts?
-
-    // Don't go more than size of texture
-    // Failure conditions should only happen if texture is smaller than expected
     if(xSrc + wSrc > tx.w/2)
     {
         wDst = (tx.w/2 - xSrc) * wDst/wSrc;
@@ -1051,14 +1076,6 @@ void FrmMain::renderTexturePrivate(float xDst, float yDst, float wDst, float hDs
         if(hDst < 0.f)
             return;
     }
-
-    if(tx.texture) to_draw = tx.texture;
-
-    // VitaGL_DrawImage_Custom code here.
-    // Todo also in the future, rotation ?!? !
-    // if(rotateAngle != 0.0)
-        // C2D_DrawImage_Custom_Rotated(*to_draw, xDst+viewport_offset_x, yDst+viewport_offset_y, wDst, hDst,
-    // else
 
     Vita_DrawImage(
         tx,
@@ -1192,9 +1209,13 @@ void FrmMain::lazyLoadedBytesReset()
 
 void FrmMain::clearBuffer()
 {
+#ifdef USE_VITA2D
+    vita2d_start_drawing();
+    vita2d_clear_screen();
+#else
     // Clear the render buffer texture
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    return;
+#endif
 }
 
 void FrmMain::updateViewport()

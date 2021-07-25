@@ -38,6 +38,9 @@
 
 #ifdef VITA
 #include <string>
+#ifdef USE_VITA2D
+#include <vita2d.h>
+#endif
 #endif
 
 typedef unsigned int    GLenum;
@@ -97,11 +100,17 @@ struct StdPicture
     std::string path = "";
     uint32_t lastDrawFrame = 0;
     std::vector<char> raw;
+
+#if USE_VITA2D
+    vita2d_texture *texture;
+    uint32_t texture_stride = 0;
+#else
     GLuint texture = 0;
     GLenum format = 0;
     GLint  nOfColors = 0;
     PGEColor ColorUpper;
     PGEColor ColorLower;
+#endif
 #endif
 };
 

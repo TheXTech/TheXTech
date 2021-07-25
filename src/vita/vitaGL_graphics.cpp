@@ -3,34 +3,9 @@
 #include <Logger/logger.h>
 #include "math.h"
 
-// TODO: Backport Moondust's common rectangle to TheXTech for PS Vita?
-
-// RectF MakeRectF(float x, float y, float w, float h)
-// {
-//     RectF _rect;
-//     _rect.x = x;
-//     _rect.y = y;
-//     _rect.w = w;
-//     _rect.h = h;
-//     _rect.left = x;
-//     _rect.right = x + w;
-//     _rect.top = y;
-//     _rect.bottom = y + h;
-//     return _rect;
-// }
-
-// inline RectF MapToGl(float x, 
-//                               float y, 
-//                               float w, 
-//                               float h)
-// {
-//     RectF rect;
-//     rect.setLeft(static_cast<double>(roundf(x) / (viewport_w_half) - 1.0f));
-//     rect.setTop(static_cast<double>((viewport_h - (roundf(y))) / viewport_h_half - 1.0f));
-//     rect.setRight(static_cast<double>(roundf(x + w) / (viewport_w_half) - 1.0f));
-//     rect.setBottom(static_cast<double>((viewport_h - (roundf(y + h))) / viewport_h_half - 1.0f));
-//     return rect;
-// }
+#ifdef USE_VITA2D
+#include <vita2d.h>
+#endif
 
 float _colors[] =
 {
@@ -85,14 +60,23 @@ uint16_t _indices[] =
 };
 
 void DrawRectSolid(int x,
-                                 int y,
-                                 int width,
-                                 int height,
-                                 float _r,
-                                 float _g,
-                                 float _b,
-                                 float _a)
+                   int y,
+                   int width,
+                   int height,
+                   float _r,
+                   float _g,
+                   float _b,
+                   float _a)
 {
+#ifdef USE_VITA2D
+    uint32_t color = RGBA8((unsigned char)(_r * 255),
+                           (unsigned char)(_g * 255),
+                           (unsigned char)(_b * 255),
+                           (unsigned char)(_a * 255)
+                          );
+    vita2d_draw_rectangle(x, y, width, height, color);
+#endif
+
 #if 0
     // pLogDebug("Draw Rect Solid: %d, %d (%d x %d)", x, y, width, height);
     if(width == 0 || height == 0)
@@ -136,7 +120,8 @@ void DrawRectSolid(int x,
     glDisableClientState(GL_COLOR_ARRAY);
 
     glEnd();
-#else
+#endif
+#if 0
     glBindTexture(GL_TEXTURE_2D, 0);
     glBegin(GL_QUADS);
     
@@ -216,7 +201,17 @@ void Vita_DrawImage(
     float n_src_y = (src_y / tex_h);
     float n_src_y2 = ((src_y + src_h) / tex_h);
 
-#if 0
+#ifdef USE_VITA2D
+    if(texture.texture == nullptr)
+    {
+        return;
+    }
+
+    // TODO: Draw texture tint part?
+
+    vita2d_draw_texture_part(texture.texture, x, y, src_x, src_y, texture.w, texture.h);
+#else
+#if 1
     _vglsetup_arrays(x, y, wDst, hDst, n_src_x, n_src_x2, n_src_y, n_src_y2);
 
 ////////////////////////////////////
@@ -262,6 +257,7 @@ void Vita_DrawImage(
     glVertex2f(x, (y + (hDst * 1)));
 
     glEnd();
+#endif
 #endif
 
     // glBindTexture(GL_TEXTURE_2D, 0);

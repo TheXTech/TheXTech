@@ -40,6 +40,12 @@
 #include <citro2d.h>
 #endif
 
+#ifdef VITA
+#ifdef USE_VITA2D
+#include <vita2d.h>
+#endif
+#endif
+
 #include <string>
 #include <set>
 
@@ -66,8 +72,12 @@ class FrmMain
     std::set<SDL_Texture *> m_textureBank;
 #else
     // VITA SPECIFIC
+#ifdef USE_VITA2D
+    std::set<struct vita2d_texture*> m_textureBank;
+#else
     std::set<GLuint> m_textureBank;
     GLuint m_renderTarget;
+#endif
     uint32_t currentFrame = 0;
     
 #endif
