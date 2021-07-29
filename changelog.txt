@@ -33,6 +33,8 @@ Changes for 1.3.5.2
 -Added the opt-in 2x scale down optimization for all textures to reduce the memory usage
 -Fixed the confusion when using the modern section auto-scroll settings when an auto-scroll fix was disabled
 -License was changed into GPLv3 (see details: https://github.com/Wohlstand/TheXTech/issues/162)
+-Enabled the work on the Android TV
+-Fixed the game start error after granting the storage permission on Android 9 and lower
 
 Changes for 1.3.5.1
 -Episodes and battle levels lists now loading in the separated thread with a progress showing
