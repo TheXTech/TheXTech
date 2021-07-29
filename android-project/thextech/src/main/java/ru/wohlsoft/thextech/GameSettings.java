@@ -69,6 +69,12 @@ public class GameSettings extends AppCompatActivity
         return file.exists() && file.isDirectory();
     }
 
+    private static boolean isFileExist(String dir)
+    {
+        File file = new File(dir);
+        return file.exists() && file.isFile();
+    }
+
     public static boolean verifyAssetsPath(String path)
     {
         if(path.isEmpty())
@@ -84,6 +90,9 @@ public class GameSettings extends AppCompatActivity
             return false;
 
         if(!isDirectoryExist(path + "/music"))
+            return false;
+
+        if(!isFileExist(path + "/intro.lvlx") && !isFileExist(path + "/intro.lvl"))
             return false;
 
         return true;

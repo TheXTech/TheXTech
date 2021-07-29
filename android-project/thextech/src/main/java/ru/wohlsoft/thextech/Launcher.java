@@ -1,6 +1,7 @@
 package ru.wohlsoft.thextech;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -25,6 +26,7 @@ public class Launcher extends AppCompatActivity
 {
     final String LOG_TAG = "TheXTech";
     public static final int READWRITE_PERMISSION_FOR_GAME = 1;
+    private Context m_context = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -66,9 +68,19 @@ public class Launcher extends AppCompatActivity
 
     public void OnStartGameClick(View view)
     {
+        if(m_context == null)
+            m_context = view.getContext();
+
         // Here, thisActivity is the current activity
         if(checkFilePermissions(READWRITE_PERMISSION_FOR_GAME) || !hasManageAppFS())
             return;
+
+        tryStartGame(m_context);
+    }
+
+    private void tryStartGame(Context context)
+    {
+        assert(context != null);
 
         SharedPreferences setup = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         String gameAssetsPath = setup.getString("setup_assets_path", "");
@@ -91,11 +103,11 @@ public class Launcher extends AppCompatActivity
                 }
             };
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setMessage(R.string.launcher_no_resources_question)
-                .setPositiveButton(android.R.string.yes, dialogClickListener)
-                .setNegativeButton(android.R.string.no, dialogClickListener)
-            .show();
+                    .setPositiveButton(android.R.string.yes, dialogClickListener)
+                    .setNegativeButton(android.R.string.no, dialogClickListener)
+                    .show();
             return;
         }
 
@@ -193,7 +205,7 @@ public class Launcher extends AppCompatActivity
             return;
 
         if(requestCode == READWRITE_PERMISSION_FOR_GAME)
-            startGame();
+            tryStartGame(m_context);
     }
 
     public void startGame()
