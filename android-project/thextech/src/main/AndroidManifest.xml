@@ -55,6 +55,7 @@
         android:launchMode="singleInstance"
         android:requestLegacyExternalStorage="true"
         android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+        android:isGame="true"
         tools:targetApi="lollipop">
 
         <activity
