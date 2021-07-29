@@ -6,6 +6,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Shader;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Build;
 import androidx.annotation.NonNull;
@@ -21,12 +25,38 @@ import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 public class Launcher extends AppCompatActivity
 {
     final String LOG_TAG = "TheXTech";
     public static final int READWRITE_PERMISSION_FOR_GAME = 1;
     private Context m_context = null;
+
+    /* ============ Animated background code ============ */
+    private int m_bgAnimatorFrames = 1;
+    private int m_bgAnimatorCurrentFrame = 0;
+    private Bitmap m_bgAnimatorBitmap;
+    private final UIUpdater m_bgAnimator = new UIUpdater(new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            m_bgAnimatorCurrentFrame++;
+            if(m_bgAnimatorCurrentFrame >= m_bgAnimatorFrames)
+                m_bgAnimatorCurrentFrame = 0;
+            RelativeLayout launcher = findViewById(R.id.LauncherLayout);
+            int fHeight = m_bgAnimatorBitmap.getHeight() / m_bgAnimatorFrames;
+            int fOffset = m_bgAnimatorCurrentFrame * fHeight;
+            Bitmap bitmap = Bitmap.createBitmap(m_bgAnimatorBitmap, 0, fOffset, m_bgAnimatorBitmap.getWidth(), fHeight);
+            BitmapDrawable drawable = new BitmapDrawable(Launcher.this.getResources(), bitmap);
+            drawable.setTileModeX(Shader.TileMode.REPEAT);
+            drawable.getPaint().setFilterBitmap(false);
+            launcher.setBackground(drawable);
+        }
+    });
+    /* ================================================== */
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -41,9 +71,16 @@ public class Launcher extends AppCompatActivity
         initUiSetup();
     }
 
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+        updateOverlook();
+    }
+
     private void initUiSetup()
     {
-        Button startGame = (Button) findViewById(R.id.startGame);
+        Button startGame = findViewById(R.id.startGame);
         startGame.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -53,7 +90,7 @@ public class Launcher extends AppCompatActivity
             }
         });
 
-        Button gameSettings = (Button) findViewById(R.id.gameSettings);
+        Button gameSettings = findViewById(R.id.gameSettings);
         gameSettings.setOnClickListener(
         new View.OnClickListener()
         {
@@ -64,6 +101,8 @@ public class Launcher extends AppCompatActivity
                 Launcher.this.startActivity(myIntent);
             }
         });
+
+        updateOverlook();
     }
 
     public void OnStartGameClick(View view)
@@ -94,7 +133,7 @@ public class Launcher extends AppCompatActivity
                 {
                     switch (which){
                         case DialogInterface.BUTTON_POSITIVE:
-                            GameSettings.selectAssetsPath(Launcher.this);
+                            GameSettings.selectAssetsPath(Launcher.this, Launcher.this);
                             break;
                         case DialogInterface.BUTTON_NEGATIVE:
                             //No button clicked
@@ -112,6 +151,66 @@ public class Launcher extends AppCompatActivity
         }
 
         startGame();
+    }
+
+    public void updateOverlook()
+    {
+        SharedPreferences setup = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        String gameAssetsPath = setup.getString("setup_assets_path", "");
+
+        String logoImagePath = "graphics/ui/MenuGFX2.png";
+        String bgImagePath = "graphics/background2/background2-2.png";
+        int bgImageFrames = 1;
+        int bgImageFramesDelay = 125;
+
+        String giPath = gameAssetsPath + "/gameinfo.ini";
+        boolean hasGameInfo = !gameAssetsPath.isEmpty() && GameSettings.isFileExist(giPath);
+        if(hasGameInfo)
+        {
+            IniFile gi = new IniFile(giPath);
+            logoImagePath = gi.getString("android", "logo", logoImagePath);
+            bgImagePath = gi.getString("android", "background", bgImagePath);
+            bgImageFrames = gi.getInt("android", "background-frames", 1);
+            bgImageFramesDelay = gi.getInt("android", "background-delay", 125);
+        }
+
+        String bgPath = gameAssetsPath + "/" + bgImagePath;
+        String logoPath = gameAssetsPath + "/" + logoImagePath;
+
+        m_bgAnimator.stopUpdates();
+
+        RelativeLayout launcher = findViewById(R.id.LauncherLayout);
+        if(!gameAssetsPath.isEmpty() && GameSettings.isFileExist(bgPath))
+        {
+            Bitmap bitmap = BitmapFactory.decodeFile(bgPath);
+            if(bgImageFrames > 1)
+            {
+                m_bgAnimatorBitmap = Bitmap.createBitmap(bitmap);
+                bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight() / bgImageFrames);
+                m_bgAnimatorFrames = bgImageFrames;
+                m_bgAnimatorCurrentFrame = 0;
+                m_bgAnimator.setInterval(bgImageFramesDelay);
+            }
+            BitmapDrawable drawable = new BitmapDrawable(this.getResources(), bitmap);
+            drawable.setTileModeX(Shader.TileMode.REPEAT);
+            drawable.getPaint().setFilterBitmap(false);
+            launcher.setBackground(drawable);
+            if(bgImageFrames > 1)
+                m_bgAnimator.startUpdates();
+        }
+        else
+            launcher.setBackgroundResource(R.drawable.background);
+
+        ImageView gameLogo = findViewById(R.id.gameLogo);
+        if(!gameAssetsPath.isEmpty() && GameSettings.isFileExist(logoPath))
+        {
+            Bitmap bitmap = BitmapFactory.decodeFile(logoPath);
+            BitmapDrawable drawable = new BitmapDrawable(this.getResources(), bitmap);
+            drawable.getPaint().setFilterBitmap(false);
+            gameLogo.setImageDrawable(drawable);
+        }
+        else
+            gameLogo.setImageResource(R.drawable.logo);
     }
 
     private boolean checkFilePermissions(int requestCode)

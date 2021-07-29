@@ -54,7 +54,7 @@ public class GameSettings extends AppCompatActivity
                         Context ctx = getContext();
                         if(ctx == null)
                             return false;// Null context, not allowed!
-                        return selectAssetsPath(ctx);
+                        return selectAssetsPath(ctx, null);
                     }
                 });
             }
@@ -69,7 +69,7 @@ public class GameSettings extends AppCompatActivity
         return file.exists() && file.isDirectory();
     }
 
-    private static boolean isFileExist(String dir)
+    public static boolean isFileExist(String dir)
     {
         File file = new File(dir);
         return file.exists() && file.isFile();
@@ -98,7 +98,7 @@ public class GameSettings extends AppCompatActivity
         return true;
     }
 
-    public static boolean selectAssetsPath(Context ctx)
+    public static boolean selectAssetsPath(Context ctx, final Launcher l)
     {
         if(ctx == null)
             return false;// Null context, not allowed!
@@ -125,6 +125,8 @@ public class GameSettings extends AppCompatActivity
                     {
                         SharedPreferences setup = PreferenceManager.getDefaultSharedPreferences(ctx);
                         setup.edit().putString("setup_assets_path", lastPath).apply();
+                        if(l != null)
+                            l.updateOverlook();
                     }
                     @Override
                     public void OnSelectedFile(Context ctx, String fileName, String lastPath){}
