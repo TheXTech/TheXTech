@@ -64,40 +64,44 @@ public class IniFile
     public String getString(String section, String key, String defaultvalue)
     {
         Map<String, String> kv = _entries.get(section);
-        if (kv == null)
-        {
+        if(kv == null)
             return defaultvalue;
-        }
-        return kv.get(key);
+        String ret = kv.get(key);
+        if(ret == null)
+            return defaultvalue;
+        return ret;
     }
 
     public int getInt(String section, String key, int defaultvalue)
     {
         Map<String, String> kv = _entries.get(section);
-        if (kv == null)
-        {
+        if(kv == null)
             return defaultvalue;
-        }
-        return Integer.parseInt(kv.get(key));
+        String ret = kv.get(key);
+        if(ret == null)
+            return defaultvalue;
+        return Integer.parseInt(ret);
     }
 
     public float getFloat(String section, String key, float defaultvalue)
     {
         Map<String, String> kv = _entries.get(section);
-        if (kv == null)
-        {
+        if(kv == null)
             return defaultvalue;
-        }
-        return Float.parseFloat(kv.get(key));
+        String ret = kv.get(key);
+        if(ret == null)
+            return defaultvalue;
+        return Float.parseFloat(ret);
     }
 
     public double getDouble(String section, String key, double defaultvalue)
     {
         Map<String, String> kv = _entries.get(section);
-        if (kv == null)
-        {
+        if(kv == null)
             return defaultvalue;
-        }
-        return Double.parseDouble(kv.get(key));
+        String ret = kv.get(key);
+        if(ret == null)
+            return defaultvalue;
+        return Double.parseDouble(ret);
     }
 }
