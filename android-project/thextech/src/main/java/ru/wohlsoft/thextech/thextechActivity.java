@@ -99,6 +99,10 @@ public class thextechActivity extends SDLActivity
         setTouchScreenShowOnStart(setup.getBoolean("touchscreen_gamepad_showalways", false));
         setTouchPadStyle(Integer.parseInt(setup.getString("setup_touchscreen_style", "0")));
 
+        setVibrationEnabled(setup.getBoolean("touchscreen_feedback_enabled", false));
+        setVibrationStrength(Float.parseFloat(setup.getString("touchscreen_vibration_strength", "1.0")));
+        setVibrationLength(Integer.parseInt(setup.getString("touchscreen_vibration_length", "12")));
+
         String gameAssetsPath = setup.getString("setup_assets_path", "");
         if(!gameAssetsPath.isEmpty())
         {
