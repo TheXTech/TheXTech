@@ -53,13 +53,9 @@
 #include <FreeImageLite.h>
 #include "../editor/new_editor.h"
 
-#include <vitasdk.h>
-#include "vitaGL_graphics.h"
-#ifdef USE_VITA2D
-#include <vita2d.h>
-#else
+#include "vgl_renderer.h"
+#include "SHADERS.h"
 #include <vitaGL.h>
-#endif
 
 #include "../frm_main.h"
 
@@ -77,8 +73,6 @@ int _newlib_heap_size_user = 256 * 1024 * 1024;
 //544
 #define DISPLAY_HEIGHT_DEF 544
 #endif
-
-
 
 #ifdef USE_STBI
 #ifndef STB_IMAGE_IMPLEMENTATION
@@ -103,7 +97,6 @@ static const int vgl_ram_threshold = (16 * 1024 * 1024); // leave 84mb
 static const int vgl_legacy_pool_size = (16 * 1024 * 1024); // 32mb for legacy OGL.
 
 static const SceGxmMultisampleMode vgl_msaa = SCE_GXM_MULTISAMPLE_NONE;
-static int ram_pool_count = vgl_legacy_pool_size;
 
 static void dumpFullFile(std::vector<char> &dst, const std::string &path)
 {
@@ -134,47 +127,6 @@ static void dumpFullFile(std::vector<char> &dst, const std::string &path)
 
     SDL_RWclose(f);
 }
-
-#ifndef USE_VITA2D
-inline bool GET_GL_ERROR(GLenum error, char* output)
-{
-    switch(error)
-    {
-    case GL_INVALID_ENUM:
-        *output = "GL_INVALID_ENUM";
-        break;
-    case GL_INVALID_VALUE:
-        *output = "GL_INVALID_VALUE";
-        break;
-    case GL_INVALID_OPERATION:
-        *output = "GL_INVALID_OPERATION";
-        break;
-    // case GL_INVALID_FRAMEBUFFER_OPERATION:
-    //     *output = "GL_INVALID_FRAMEBUFFER_OPERATION";
-    //     break;
-    case GL_OUT_OF_MEMORY:
-        *output = "GL_OUT_OF_MEMORY";
-        break;
-    case GL_STACK_UNDERFLOW:
-        *output = "GL_STACK_UNDERFLOW";
-        break;
-    case GL_STACK_OVERFLOW:
-        *output = "GL_STACK_OVERFLOW";
-        break;
-    }
-}
-
-inline bool CHECK_GL_ERROR(char* prefix) 
-{
-    GLenum gl_error = 0;
-    char error_buffer[64];
-    if((gl_error = glGetError()) != GL_NO_ERROR)
-    {
-        GET_GL_ERROR(gl_error, error_buffer);
-        pLogWarning("[%s] OPENGL ERROR: %s", prefix, error_buffer);
-    }
-}
-#endif
 
 FrmMain::FrmMain()
 {
@@ -209,8 +161,6 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
     bool res = false;
     LoadLogSettings(setup.interprocess, setup.verboseLogging);
 
-
-
 #ifdef USE_STBI
     _debugPrintf_("VITA: Using stb_image for graphics loading!");
 #else
@@ -220,33 +170,60 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
 
     _debugPrintf_("--Before graphics init--");
     print_memory_info();
-#ifdef USE_VITA2D
-    _debugPrintf_("---  Using Vita2D for graphics API.");
-    vita2d_init();
-#else
-    _debugPrintf_("--- Using vitaGL for graphics API.");
-#if 1
-    vglInitExtended(vgl_legacy_pool_size, DISPLAY_WIDTH_DEF, DISPLAY_HEIGHT_DEF, vgl_ram_threshold, vgl_msaa);
-#else
-    vglInitExtended(DISPLAY_WIDTH_DEF, DISPLAY_HEIGHT_DEF, vgl_ram_threshold, SCE_GXM_MULTISAMPLE_NONE);
-    CHECK_GL_ERROR("::initSDL");
-#endif
-#endif
-    
 
-    // vglUseVram(GL_TRUE);
+    _debugPrintf_("--- Using vitaGL for graphics API.");
+    int init_ret = 0;
+    init_ret = initGL(&pLogDebug);
+    if(init_ret != 0)
+    {
+        _debugPrintf_("initGL FAILED!!! Returned %d", init_ret);
+        return false;
+    }
+
+    init_ret = initGLAdv();
+    if(init_ret != 0)
+    {
+        _debugPrintf_("initGLAdv FAILED!!!!! Returned %d.", init_ret);
+        return false;
+    }
+
+    const char* _vert = "app0:vert.cgv";
+    const char* _frag = "app0:frag.cgf";
+
+    size_t _vert_text_size, _frag_text_size;
+
+    char* _vert_text_buf = malloc(2);
+    char* _frag_text_buf = malloc(2);
+
+    init_ret = _Vita_ReadShaderFromFile(_vert, &_vert_text_size, &_vert_text_buf);
+    if(init_ret != 0)
+    {
+        _debugPrintf_("Failed to read vertex shader from file located at `%s`.", _vert);
+        return false;
+    }
+
+    init_ret = _Vita_ReadShaderFromFile(_frag, &_frag_text_size, &_frag_text_buf);
+    if(init_ret != 0)
+    {
+        _debugPrintf_("Failed to read fragment shader from file located at `%s`.", _frag);
+        return false;
+    }
+    
+    init_ret = initGLShading2(_vert_text_buf, _frag_text_buf);
+    if(init_ret != 0)
+    {
+        _debugPrintf_("initGLShading2 FAILED!!! (probably linker related?) Returned %d.", init_ret);
+        return false;
+    }
 
     _debugPrintf_("--After graphics init--");
     print_memory_info();
 
-#ifdef USE_VITA2D
-    // that's it for vita2d!
-    vita2d_set_clear_color(RGBA8(0x40, 0x40, 0x40, 0xFF));
-#else
     CHECK_GL_ERROR("::initSDL");
 
+/*
     // glClearColor(0.5, 0.1, 0.1, 0); Debug Red
-    glClearColor(0.f, 0.f, 0.f, 1.0f);
+    glClearColor(0.2f, 0.5f, 0.2f, 1.0f);
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_BLEND);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -264,9 +241,8 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
         DISPLAY_HEIGHT_DEF * 2
     );
     CHECK_GL_ERROR("::initSDL");
-
+*/
     glEnable(GL_TEXTURE_2D);
-#endif
 
 
     Uint32 sdlInitFlags = 0;
@@ -352,13 +328,9 @@ void FrmMain::freeSDL()
 {
 
     pLogDebug("<Application Closing>");
-#ifdef USE_VITA2D
-    pLogDebug("vita2d_fini");
-    vita2d_fini();
-#else
     pLogDebug("vglEnd");
+    deInitGL();
     vglEnd();
-#endif
 
     pLogDebug("GraphicsHelps::closeFreeImage");
     GraphicsHelps::closeFreeImage();
@@ -411,6 +383,7 @@ void FrmMain::eventResize()
 
 int FrmMain::setFullScreen(bool fs)
 {
+    (void)fs;
     return 0;
 }
 
@@ -485,15 +458,7 @@ void FrmMain::doEvents()
 
 void FrmMain::repaint()
 {
-    // paint from render target to screen.
-#if USE_VITA2D
-    vita2d_end_drawing();
-    vita2d_swap_buffers();
-#else
-    glSwapBuffers(GL_FALSE);
-
-    CHECK_GL_ERROR("::repaint");
-#endif
+    Vita_Repaint();
 }
 
 #define align_mem(addr, align) (((addr) + ((align) - 1)) & ~((align) - 1))
@@ -644,7 +609,7 @@ StdPicture FrmMain::LoadPicture(std::string path)
     {
         pLogDebug("VITA: Successfully loaded %s. Size: %d x %d with %d channels. Stride = %d", path.c_str(), w, h, channels, stride);
     }
-#ifndef USE_VITA2D
+
     RGBQUAD upperColor;
     FreeImage_GetPixelColor(sourceImage, 0, 0, &upperColor);
     target.ColorUpper.r = float(upperColor.rgbRed) / 255.0f;
@@ -658,19 +623,15 @@ StdPicture FrmMain::LoadPicture(std::string path)
     
     target.nOfColors = GL_RGBA;
     target.format = GL_BGRA;
-#endif
-
     FreeImage_FlipVertical(sourceImage);
+
+    
     target.w = static_cast<int>(w);
     target.h = static_cast<int>(h);
     target.frame_w = static_cast<int>(w);
     target.frame_h = static_cast<int>(h);
 
-#ifdef USE_VITA2D
-    uint8_t* textura = reinterpret_cast<uint8_t*>(FreeImage_GetBits(sourceImage));
-#else
     GLubyte* textura = reinterpret_cast<GLubyte*>(FreeImage_GetBits(sourceImage));
-#endif
 
     loadTexture(target, w, h, textura);
 
@@ -715,51 +676,28 @@ StdPicture FrmMain::lazyLoadPicture(std::string path)
 
     target.inited = true;
     target.lazyLoaded = true;
-    target.texture = 0; // Decompressed texture is 0 because we haven't fully loaded in yet.
+    target.texture = 0;
+    target.ex_data.textureID = 0; // Decompressed texture is 0 because we haven't fully loaded in yet.
 
     return target;
 }
 
+
 void FrmMain::loadTexture(StdPicture &target, uint32_t width, uint32_t height, uint8_t *RGBApixels)
 {
-#if USE_VITA2D
-
-    // vita2d_texture *_newTexture = vita2d_load_BMP_buffer((void*)RGBApixels);
-
-    vita2d_texture *_newTexture = vita2d_create_empty_texture(width, height);
-
-    void* texture_data = vita2d_texture_get_datap(_newTexture);
-    memcpy(texture_data, RGBApixels, width * height);
-
-    if(!_newTexture)
-    {
-        pLogCritical("::loadTexture failed: vita2d_load_BMP_buffer failed.");
-        return;
-    }
-
-    target.texture = _newTexture;
+    target.ex_data.piv_x = 0.f;
+    target.ex_data.piv_y = 0.f;
+    target.ex_data.rot_x = 0.f;
+    target.ex_data.rot_y = 0.f;
+    target.ex_data.rot_z = 0.f;
+    target.ex_data.scale = 1.f;
 
 
-    // vita2d_texture *new_texture = vita2d_create_empty_texture(width, height);
-    // if(!new_texture)
-    // {
-    //     pLogCritical("COULDNT CREATE NEW EMPTY VITA2D TEXTURE OF SIZE %d x %d", width, height);
-    //     return;
-    // }
-    // target.texture_stride for stride.
-
-    // void* texture_data = vita2d_texture_get_datap(new_texture);
-    // unsigned int _stride = vita2d_texture_get_stride(texture);
-    // int i;
-    // for(i = 0; i < height; i++) {
-    //     (texture_data + (i * _stride)) = (unsigned char)(RGBApixels + i);
-    // }
-
-    // target.texture = new_texture;
-#else
     // Take our raw bytes and load them in as an OpenGL image.
     GLuint _newTexture = 0;
     glGenTextures(1, &(target.texture));
+    target.ex_data.textureID = target.texture;
+
     glBindTexture(GL_TEXTURE_2D, (target.texture));
 
     // Nearest neighbor filtering.
@@ -779,7 +717,6 @@ void FrmMain::loadTexture(StdPicture &target, uint32_t width, uint32_t height, u
         GL_UNSIGNED_BYTE,
         (const GLvoid*)RGBApixels
     );
-#endif
 
     if(_newTexture != 0)
     {
@@ -829,7 +766,6 @@ void FrmMain::lazyLoad(StdPicture &target)
     // TODO: Does Vita declare this?
     m_lazyLoadedBytes += (w * h * 4);
 
-#ifndef USE_VITA2D
     RGBQUAD upperColor;
     FreeImage_GetPixelColor(sourceImage, 0, 0, &upperColor);
     target.ColorUpper.r = float(upperColor.rgbRed) / 255.0f;
@@ -843,8 +779,8 @@ void FrmMain::lazyLoad(StdPicture &target)
 
     target.nOfColors = GL_RGBA;
     target.format = GL_BGRA;
-#endif
     FreeImage_FlipVertical(sourceImage);
+    
     
     target.w = static_cast<int>(w);
     target.h = static_cast<int>(h);
@@ -880,13 +816,12 @@ void FrmMain::lazyLoad(StdPicture &target)
         target.w_scale = float(w) / float(target.w_orig);
         target.h_scale = float(h) / float(target.h_orig);
     }
-#ifdef USE_VITA2D
-    uint8_t *textura = reinterpret_cast<uint8_t*>(FreeImage_GetBits(sourceImage));
-#else 
+
     GLubyte *textura = reinterpret_cast<GLubyte*>(FreeImage_GetBits(sourceImage));
-#endif
+
     loadTexture(target, w, h, textura);
     num_textures_loaded++;
+
     GraphicsHelps::closeImage(sourceImage);
 }
 
@@ -917,15 +852,11 @@ void FrmMain::deleteTexture(StdPicture &tx, bool lazyUnload)
         if(m_textureBank.find(tx.texture) != m_textureBank.end())
             m_textureBank.erase(tx.texture);
 
-#ifdef USE_VITA2D
-        // vita2d_free_texture(tx.texture)
-        vita2d_free_texture(tx.texture);
-#else
         // Free sprite from memory.
         glDeleteTextures(1, &tx.texture);
-#endif
         // For good measure.
         tx.texture = 0;
+        tx.ex_data.textureID = 0;
     }
 
     if(!lazyUnload)
@@ -944,19 +875,12 @@ void FrmMain::clearAllTextures()
 #if DEBUG_BUILD
     int texturesDeleted = 0;
 #endif
-#ifdef USE_VITA2D
-    for(vita2d_texture *tx : m_textureBank)
-#else
+
     for(GLuint tx : m_textureBank)
-#endif
     {
         if(tx != 0)
         {
-#ifdef USE_VITA2D
-            vita2d_free_texture(tx);
-#else
             glDeleteTextures(1, &tx);
-#endif
         }
     }
 
@@ -967,12 +891,25 @@ void FrmMain::clearAllTextures()
 
 void FrmMain::renderRect(int x, int y, int w, int h, float red, float green, float blue, float alpha, bool filled)
 {
+    (void)filled;
     // TODO: Filled or not?
-    DrawRectSolid(x, y, w, h, red, green, blue, alpha);
+
+    Vita_DrawRectColor(x, y, w, h, red, green, blue, alpha);
+
+    // DrawRectSolid(x, y, w, h, red, green, blue, alpha);
 }
 
 void FrmMain::renderRectBR(int _left, int _top, int _right, int _bottom, float red, float green, float blue, float alpha)
 {
+    (void)_left;
+    (void)_top;
+    (void)_right;
+    (void)_bottom;
+    (void)red;
+    (void)green;
+    (void)blue;
+    (void)alpha;
+    Vita_DrawRectColor(_left, _top, _right-_left, _bottom-_top, red, green, blue, alpha);
     // TODO:
     // renderRect(_left, _top, _right-_left, _bottom-_top, red, green, blue, alpha, true);
 }
@@ -983,6 +920,9 @@ void FrmMain::renderTexturePrivate(float xDst, float yDst, float wDst, float hDs
                              float rotateAngle, SDL_Point *center, unsigned int flip,
                              float red, float green, float blue, float alpha)
 {
+    (void)center;
+    (void)rotateAngle;
+
     // This is mostly lifted from the 3DS version so thank you, ds-sloth <3
     if(!tx.inited)
         return;
@@ -994,8 +934,10 @@ void FrmMain::renderTexturePrivate(float xDst, float yDst, float wDst, float hDs
 
     if(!tx.texture)
         return;
+
     if(xDst > this->viewport_w || yDst > this->viewport_h)
         return;
+
 
     unsigned int mode = 0;
     while(ySrc >= tx.h / 2 && mode < 3)
@@ -1077,6 +1019,26 @@ void FrmMain::renderTexturePrivate(float xDst, float yDst, float wDst, float hDs
             return;
     }
 
+    if(tx.texture != tx.ex_data.textureID)
+    {
+        pLogDebug("WARNING: texture IDs differ for a specific drawcall: %u %u.", tx.texture, tx.ex_data.textureID);
+    }
+
+    // pLogDebug("Drawing tex with ID %d and size of (%d x %d)", tx.texture, tx.w_orig, tx.h_orig);
+    Vita_DrawTextureAnimColorExData(
+        xDst + viewport_offset_x,
+        yDst + viewport_offset_y,
+        wDst,
+        hDst,
+        tx.ex_data.textureID,
+        tx.w / 2, tx.h / 2,
+        xSrc, ySrc,
+        wSrc, hSrc,
+        red, green, blue, alpha,
+        &tx.ex_data
+    );
+    return;
+/*
     Vita_DrawImage(
         tx,
         xDst+viewport_offset_x, // x1
@@ -1087,6 +1049,7 @@ void FrmMain::renderTexturePrivate(float xDst, float yDst, float wDst, float hDs
         wSrc, hSrc, // ani_right, ani_bottom
         flip,
         red, green, blue, alpha);
+*/
 
 }
 
@@ -1209,13 +1172,7 @@ void FrmMain::lazyLoadedBytesReset()
 
 void FrmMain::clearBuffer()
 {
-#ifdef USE_VITA2D
-    vita2d_start_drawing();
-    vita2d_clear_screen();
-#else
-    // Clear the render buffer texture
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-#endif
+    Vita_Clear();
 }
 
 void FrmMain::updateViewport()
@@ -1240,12 +1197,6 @@ void FrmMain::setViewport(int x, int y, int w, int h)
     viewport_h = h / 2;
     viewport_offset_x = viewport_x + offset_x;
     viewport_offset_y = viewport_y + offset_y;
-
-    // pLogDebug("Viewport Params: %d, %d (%d x %d)", x, y, w, h);
-    // pLogDebug("Viewport: %.3f, %.3f (%.3f x %.3f)", 0.f, float(y - (h / (float)1)), float(viewport_w), float(viewport_h));
-
-
-    
 }
 
 void FrmMain::offsetViewport(int x, int y)

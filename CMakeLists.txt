@@ -426,7 +426,8 @@ elseif(VITA)
     endif()
 
     list(APPEND THEXTECH_SRC
-    src/vita/vitaGL_graphics.cpp # I lied
+        # src/vita/vitaGL_graphics.cpp # I lied
+        src/vita/vgl_renderer.c
         src/main/cheat_code.cpp # This will change one day also.
         src/editor/text_input.cpp # This will change one day, as the Vita has its own keyboard overlay.
     )
@@ -738,6 +739,8 @@ elseif(VITA)
                 ${CMAKE_SOURCE_DIR}/resources/vita/sce_sys/livearea/contents/bg.png sce_sys/livearea/contents/bg.png
                 ${CMAKE_SOURCE_DIR}/resources/vita/sce_sys/livearea/contents/startup.png sce_sys/livearea/contents/startup.png
                 ${CMAKE_SOURCE_DIR}/resources/vita/sce_sys/livearea/contents/template.xml sce_sys/livearea/contents/template.xml
+                ${CMAKE_SOURCE_DIR}/resources/vita/vert.cgv vert.cgv
+                ${CMAKE_SOURCE_DIR}/resources/vita/frag.cgf frag.cgf
     )
     add_custom_target(copy 
         COMMAND cp ${THEXTECH_EXECUTABLE_NAME}.self eboot.bin

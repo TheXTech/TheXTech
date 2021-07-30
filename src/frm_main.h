@@ -38,6 +38,7 @@
 #ifdef VITA
 #ifdef USE_VITA2D
 #include <vita2d.h>
+#include <FreeImageLite.h>
 #endif
 #endif
 

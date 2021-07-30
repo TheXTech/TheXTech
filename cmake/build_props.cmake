@@ -94,6 +94,8 @@ if(VITA)
     set(VERSION "01.00")
     set(VITA_MKSFOEX_FLAGS "-d ATTRIBUTE2=12")
 
+    
+    
     set(VITA_ADDTL_LIBS
         FLAC
         modplug
@@ -104,7 +106,16 @@ if(VITA)
         vorbis
         ogg
         jpeg
-        vitaGL
+    )
+
+    if(USE_VITA2D_VID)
+        set(VITA_ADDTL_LIBS "${VITA_ADDTL_LIBS}" vita2d)
+    else()
+        set(VITA_ADDTL_LIBS "${VITA_ADDTL_LIBS}" vitaGL cglm)
+    endif()
+
+    set(VITA_ADDTL_LIBS 
+        ${VITA_ADDTL_LIBS} 
         debugnet
         mathneon
         SceCtrl_stub
@@ -135,6 +146,7 @@ if(VITA)
         SceSysmem_stub
         SceIofilemgr_stub
         SceKernelThreadMgr_stub
+        SceKernelDmacMgr_stub
     )
 
     set(VITA_CMAKE_FLAGS
