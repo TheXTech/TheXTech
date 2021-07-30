@@ -35,6 +35,13 @@
 #include <citro2d.h>
 #endif
 
+#ifdef VITA
+#ifdef USE_VITA2D
+#include <vita2d.h>
+#include <FreeImageLite.h>
+#endif
+#endif
+
 #include <string>
 #include <set>
 
@@ -54,10 +61,22 @@ class FrmMain
     std::string m_windowTitle;
 #ifndef NO_SDL
     SDL_Window *m_window = nullptr;
+#if !defined(VITA) || defined(USE_SDL_VID)
     SDL_Renderer *m_gRenderer = nullptr;
     SDL_Texture  *m_tBuffer = nullptr;
     SDL_Texture  *m_recentTarget = nullptr;
     std::set<SDL_Texture *> m_textureBank;
+#else
+    // VITA SPECIFIC
+#ifdef USE_VITA2D
+    std::set<struct vita2d_texture*> m_textureBank;
+#else
+    std::set<GLuint> m_textureBank;
+    GLuint m_renderTarget;
+#endif
+    uint32_t currentFrame = 0;
+    
+#endif
     bool m_sdlLoaded = false;
     const Uint8 *m_keyboardState = nullptr;
     Uint32 m_lastMousePress = 0;
@@ -90,6 +109,10 @@ class FrmMain
     size_t m_lazyLoadedBytes = 0;
 
 public:
+#ifdef VITA
+    // TODO: Make this private and put in proper getters/setters.
+    void (*_debugPrintf_)(const char*, ...);    
+#endif
     int ScaleWidth = 800;
     int ScaleHeight = 600;
 
@@ -164,7 +187,7 @@ public:
      */
     void setTargetScreen();
 
-#ifndef __3DS__
+#if !defined(__3DS__) && (!defined(VITA) || defined(USE_SDL_VID))
     StdPicture LoadPicture(std::string path, std::string maskPath = std::string(), std::string maskFallbackPath = std::string());
     StdPicture lazyLoadPicture(std::string path, std::string maskPath = std::string(), std::string maskFallbackPath = std::string());
 #else
@@ -173,7 +196,7 @@ public:
 #endif
     void deleteTexture(StdPicture &tx, bool lazyUnload = false);
     void clearAllTextures();
-#ifdef __3DS__
+#if defined(__3DS__) || (defined(VITA) && !defined(USE_SDL_VID))
     bool freeTextureMem();
 #endif
 
@@ -189,7 +212,7 @@ public:
     // these operate in render coordinates on 3DS and should not be called by external units
 private:
     // Similar to BitBlt, but without masks, just draw a texture or it's fragment!
-#ifdef __3DS__
+#if defined(__3DS__) || (defined(VITA) && !defined(USE_SDL_VID))
     void renderTexturePrivate(float xDst, float yDst, float wDst, float hDst,
                              StdPicture &tx,
                              float xSrc, float ySrc, float wSrc, float hSrc,

@@ -256,6 +256,8 @@ void AppPathManager::initAppPath()
     }
 #elif defined(__3DS__)
     ApplicationPathSTD = "romfs:/";
+#elif defined(VITA)
+    ApplicationPathSTD = "ux0:/data/TheXTech/";
 #else
     char *path = SDL_GetBasePath();
     if(!path)
@@ -553,7 +555,7 @@ bool AppPathManager::isPortable()
 
 bool AppPathManager::checkPortable()
 {
-#ifdef __3DS__
+#if defined(__3DS__) || defined(VITA)
     return false;
 #endif
     if(m_settingsPath.empty())

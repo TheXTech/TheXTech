@@ -68,8 +68,15 @@ static SDL_bool IsFullScreen(SDL_Window *win)
 
 FrmMain::FrmMain()
 {
+#ifdef VITA
+    ScaleWidth = 960;
+    ScaleHeight = 544;
+    viewport_w = 960;
+    viewport_h = 544;
+#else
     ScaleWidth = ScreenW;
     ScaleHeight = ScreenH;
+#endif
 }
 
 SDL_Window *FrmMain::getWindow()
@@ -1192,6 +1199,7 @@ void FrmMain::lazyLoad(StdPicture &target)
 
     if(g_videoSettings.scaleDownAllTextures || GraphicsHelps::validateFor2xScaleDown(sourceImage, StdPictureGetOrigPath(target)))
     {
+        pLogDebug("VITA CAUSE: Scaling down textures");
         target.w_orig = int(w);
         target.h_orig = int(h);
         w /= 2;

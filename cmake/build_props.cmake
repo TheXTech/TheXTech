@@ -83,6 +83,96 @@ if(ANDROID)
     )
 endif()
 
+if(VITA)
+    message("Set CMAKE Flags for Vita.")
+    include("$ENV{VITASDK}/share/vita.cmake" REQUIRED)
+
+    cmake_policy(SET CMP0077 OLD)
+
+    set(VITA_APP_NAME "TheXTech Vita Edition")
+    set(VITA_TITLEID "THEXTECH0")
+    set(VERSION "01.00")
+    set(VITA_MKSFOEX_FLAGS "-d ATTRIBUTE2=12")
+
+    
+    
+    set(VITA_ADDTL_LIBS
+        FLAC
+        modplug
+        mad
+        opusfile
+        opus
+        vorbisfile
+        vorbis
+        ogg
+        jpeg
+    )
+
+    if(USE_VITA2D_VID)
+        set(VITA_ADDTL_LIBS "${VITA_ADDTL_LIBS}" vita2d)
+    else()
+        set(VITA_ADDTL_LIBS "${VITA_ADDTL_LIBS}" vitaGL cglm)
+    endif()
+
+    set(VITA_ADDTL_LIBS 
+        ${VITA_ADDTL_LIBS} 
+        debugnet
+        mathneon
+        SceCtrl_stub
+        SceMotion_stub
+        SceHid_stub
+        SceRtc_stub
+        SceNetCtl_stub
+        SceNet_stub
+        SceLibKernel_stub
+        ScePvf_stub
+        SceAppMgr_stub
+        SceAppUtil_stub
+        ScePgf_stub
+        freetype
+        png
+        SceCommonDialog_stub
+        m
+        zip
+        z
+        pthread
+        SceGxm_stub
+        SceDisplay_stub
+        SceSysmodule_stub
+        SceTouch_stub
+        SceAudio_stub
+        vitashark
+        SceShaccCg_stub
+        SceSysmem_stub
+        SceIofilemgr_stub
+        SceKernelThreadMgr_stub
+        SceKernelDmacMgr_stub
+    )
+
+    set(VITA_CMAKE_FLAGS
+        "-DVITA=1"
+        "-DENABLE_FPIC=0"
+    )
+
+    # option(USE_SYSTEM_LIBS ON)
+    # option(USE_STATIC_LIBC OFF)
+    # option(USE_SYSTEM_LIBS_DEFAULT ON)
+    # option(USE_SYSTEM_LIBS ON) Pass these in Vita_CMAKE_FLAGS instead
+    # option(USE_SYSTEM_SDL2 ON)
+    # option(NO_INTPTROC ON FORCE)
+    # option(USE_GME OFF FORCE)
+    # option(USE_MIDI OFF FORCE)
+
+    if(USE_SDL_VID)
+        set(VITA_CMAKE_FLAGS "${VITA_CMAKE_FLAGS} -DUSE_SDL_VID=1")
+    else()
+        set(VITA_CMAKE_FLAGS "${VITA_CMAKE_FLAGS} -DNO_SCREENSHOT=1")
+    endif()
+
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -I../src -g -fcompare-debug-second")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I../src -g -O0 -DVITA=1 -fpermissive -fcompare-debug-second -fno-optimize-sibling-calls -Wno-class-conversion")
+endif()
+
 string(TOLOWER "${CMAKE_BUILD_TYPE}" CMAKE_BUILD_TYPE_LOWER)
 if (CMAKE_BUILD_TYPE_LOWER STREQUAL "release")
     add_definitions(-DNDEBUG)
@@ -129,7 +219,8 @@ if(MSVC)
 endif()
 
 # -fPIC thing
-if(LIBRARY_PROJECT AND NOT WIN32)
+if(LIBRARY_PROJECT AND NOT WIN32 AND NOT VITA)
+    message("cmake/buildprops CAUSES FPIC ON ")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 endif()

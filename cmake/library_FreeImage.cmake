@@ -2,8 +2,23 @@
 
 add_library(PGE_FreeImage INTERFACE)
 
-option(USE_SHARED_FREEIMAGE "Use shared build of FreeImage" OFF)
-option(USE_FREEIMAGE_SYSTEM_LIBS "Let FreeImage to use libPNG and libJPEG from the system" OFF)
+if(NOT VITA AND NOT 3DS AND NOT EMSCRIPTEN)
+    option(USE_SHARED_FREEIMAGE "Use shared build of FreeImage" OFF)
+else()
+    set(USE_SHARED_FREEIMAGE OFF)
+endif()
+
+if(NOT VITA)
+    option(USE_FREEIMAGE_SYSTEM_LIBS "Let FreeImage to use libPNG and libJPEG from the system" OFF)
+else()
+    set(USE_FREEIMAGE_SYSTEM_LIBS ON)
+endif()
+
+if(NOT VITA AND NOT 3DS AND NOT EMSCRIPTEN)
+    set(FREEIMAGE_PIC OFF)
+else()
+    set(FREEIMAGE_PIC OFF)
+endif()
 
 if(USE_SHARED_FREEIMAGE)
     set_shared_lib(libFreeImage_Libs "${DEPENDENCIES_INSTALL_DIR}/lib" FreeImageLite)
@@ -30,7 +45,7 @@ ExternalProject_Add(
         "-DCMAKE_INSTALL_PREFIX=${DEPENDENCIES_INSTALL_DIR}"
         "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
         "-DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}"
-        "-DCMAKE_POSITION_INDEPENDENT_CODE=ON"
+        "-DCMAKE_POSITION_INDEPENDENT_CODE=${FREEIMAGE_PIC}"
         "-DCMAKE_DEBUG_POSTFIX=${PGE_LIBS_DEBUG_SUFFIX}"
         "-DFREEIMAGE_USE_SYSTEM_LIBPNG=${USE_FREEIMAGE_SYSTEM_LIBS}"
         "-DFREEIMAGE_USE_SYSTEM_LIBJPEG=${USE_FREEIMAGE_SYSTEM_LIBS}"
@@ -41,6 +56,7 @@ ExternalProject_Add(
         $<$<BOOL:APPLE>:-DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}>
         $<$<BOOL:APPLE>:-DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}>
         ${ANDROID_CMAKE_FLAGS}
+        ${VITA_CMAKE_FLAGS}
     BUILD_BYPRODUCTS
         "${libFreeImage_Libs}"
 )

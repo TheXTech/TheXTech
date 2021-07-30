@@ -24,12 +24,18 @@
 #include "SDL_supplement.h"
 #endif
 
-#ifndef __3DS__
+#if !defined(__3DS__) && !defined(VITA)
 #include <tclap/CmdLine.h>
 #include <CrashHandler/crash_handler.h>
 #else
+#if defined(__3DS__)
 uint32_t __stacksize__ = 0x00020000;
 #include <3ds.h>
+#endif
+#endif
+
+#ifdef VITA
+#include <tclap/CmdLine.h>
 #endif
 
 #include "game_main.h"
@@ -140,6 +146,10 @@ static void strToPlayerSetup(int player, const std::string &setupString)
     }
 }
 
+#ifdef VITA
+#include <Logger/logger.h>
+#endif
+
 extern "C"
 int main(int argc, char**argv)
 {
@@ -149,20 +159,29 @@ int main(int argc, char**argv)
 
     CmdLineSetup_t setup;
 
-#ifndef __3DS__
+#if !defined(__3DS__) && !defined(VITA)
     CrashHandler::initSigs();
 #endif
 
+
     AppPathManager::initAppPath();
+#ifdef VITA
+    AppPathManager::setAssetsRoot("ux0:/data/TheXTech");
     AppPath = AppPathManager::assetsRoot();
+    pLogDebug("PS VITA: Assets root is now %s", AppPath.c_str());
+#else
+    AppPath = AppPathManager::assetsRoot();
+#endif
 
     OpenConfig_preSetup();
+
+
 
     testPlayer.fill(Player_t());
     testPlayer[1].Character = 1;
     testPlayer[2].Character = 2;
 
-#ifndef __3DS__
+#if !defined(__3DS__) && !defined(VITA)
     try
     {
         // Define the command line object.
@@ -318,6 +337,8 @@ int main(int argc, char**argv)
         else if(rt == "hw")
             setup.renderType = RENDER_ACCELERATED;
 
+
+
         if(setup.renderType > RENDER_AUTO)
             g_videoSettings.renderMode = setup.renderType;
 
@@ -414,6 +435,12 @@ int main(int argc, char**argv)
 #endif // #ifndef __3DS__
 
     initGameInfo();
+
+#ifdef VITA
+    g_videoSettings.scaleDownAllTextures = true;
+    pLogDebug("\n\n\n\n\n----FORCING  g_videoSettings.scaleDownAllTextures TO TRUE FOR PS VITA\n\n\n");
+    frmMain._debugPrintf_ = pLogDebug;
+#endif
 
     // set this flag before SDL initialization to allow game be quit when closing a window before a loading process will be completed
     GameIsActive = true;

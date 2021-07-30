@@ -35,7 +35,9 @@ static const int maxSfxChannels = 91;
 bool SI_Init()
 {
 	int ret;
+
 	const int initFlags = MIX_INIT_MID|MIX_INIT_MOD|MIX_INIT_FLAC|MIX_INIT_OGG|MIX_INIT_OPUS|MIX_INIT_MP3;
+
 	pLogDebug("Opening sound...");
 	ret = Mix_Init(initFlags);
 
@@ -65,7 +67,9 @@ bool SI_Init()
 	{
 	    std::string msg = fmt::format_ne("Can't open audio stream, continuing without audio: ({0})", Mix_GetError());
 	    pLogCritical(msg.c_str());
+#ifndef VITA // Note: I think this has to remain for now.
 	    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Sound opening error", msg.c_str(), nullptr);
+#endif
 	    return false;
 	}
 

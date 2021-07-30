@@ -290,7 +290,7 @@ void SaveConfig()
     config.endGroup();
 
 #if !defined(NO_SDL)
-#   if !defined(__3DS__)
+#   if !defined(__3DS__) && !defined(VITA)
     config.beginGroup("video");
     {
 #       if !defined(__EMSCRIPTEN__) && !defined(__ANDROID__) // Don't remember fullscreen state for Emscripten!
