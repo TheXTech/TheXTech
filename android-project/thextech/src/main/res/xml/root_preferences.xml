@@ -31,6 +31,25 @@
             android:key="touchscreen_gamepad_showalways"
             android:title="@string/setup_touchscreen_alwaysshow" />
     </PreferenceCategory>
+    <PreferenceCategory android:title="@string/setup_feedback">
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="touchscreen_feedback_enabled"
+            android:title="@string/setup_feedback_enable_vibration" />
+        <ListPreference
+            android:defaultValue="1.0"
+            android:entries="@array/feedBackStrength"
+            android:entryValues="@array/feedBackStrengthValues"
+            android:key="touchscreen_vibration_strength"
+            android:title="@string/setup_feedback_vibration_strength" />
+        <ListPreference
+            android:defaultValue="12"
+            android:entries="@array/feedBackLength"
+            android:entryValues="@array/feedBackLengthValues"
+            android:key="touchscreen_vibration_length"
+            android:title="@string/setup_feedback_vibration_length" />
+    </PreferenceCategory>
     <PreferenceCategory android:title="@string/setup_display_cat">
         <CheckBoxPreference
             android:defaultValue="false"
