@@ -32,11 +32,9 @@
 #endif
 
 #ifdef VITA
-#include "vita/vgl_renderer.h"
 #include <string>
-#ifdef USE_VITA2D
-#include <vita2d.h>
-#endif
+
+#include "vita/vgl_renderer_types.h"
 #endif
 
 typedef unsigned int    GLenum;
@@ -101,7 +99,7 @@ struct StdPicture
     vita2d_texture *texture;
     uint32_t texture_stride = 0;
 #else
-    obj_extra_data ex_data;
+    struct _obj_extra_data ex_data;
     GLuint texture = 0;
     GLenum format = 0;
     GLint  nOfColors = 0;

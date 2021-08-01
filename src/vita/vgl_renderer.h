@@ -48,41 +48,9 @@ extern "C" {
 
 #define VERTEX_ATTRIB_TOTAL_SIZE_1 (VERTEX_ATTR_ELEM_COUNT * sizeof(float)) + (sizeof(void *))
 
+#include "vgl_renderer_types.h"
+
 typedef unsigned int GLuint;
-
-typedef struct _vert 
-{
-    float x, y;
-    float s, v; // Tex Coord X, Tex Coord Y
-    float _r, _g, _b, _a;
-
-    void *obj_ptr;
-} __attribute__ ((packed)) vert;
-
-typedef struct _obj_extra_data 
-{
-    GLuint textureID;
-    float piv_x;
-    float piv_y;
-    float rot_x;
-    float rot_y;
-    float rot_z;
-    float scale;
-} __attribute__ ((packed)) obj_extra_data;
-
-typedef struct _shading_pass
-{
-    unsigned int ProgramObjectID;
-    unsigned int VertexShaderID;
-    unsigned int FragmentShaderID;
-    float offset_x;
-    float offset_y;
-} __attribute__ ((packed)) ShadingPass;
-
-typedef struct _DrawCall
-{
-    struct _vert verts[VERTICES_PER_PRIM];
-} __attribute__ ((packed)) DrawCall;
 
 static const char* GLINVALIDENUM = "GL_INVALID_ENUM";
 static const char* GLINVALIDVALUE = "GL_INVALID_VALUE";
@@ -200,6 +168,7 @@ int initGLShading2(char* vertex_shader, char* fragment_shader);
 int deInitGL();
 
 // TODO: Function prefixes for these.
+void Vita_SetClearColor(float r, float g, float b, float a);
 void Vita_Clear();
 void Vita_Repaint();
 

@@ -630,7 +630,7 @@ int Vita_AddShaderPass(char* vert_shader, char* frag_shader, int order)
         _debugPrintf("!!!!! ERROR: Could not link shader.\n");
         GLint length;
 	    glGetProgramiv(_newProgProgram,GL_INFO_LOG_LENGTH,&length);
-	    unsigned char* log = (unsigned char*)malloc(length);
+	    char* log = (char*)malloc(length);
 		
 	    glGetProgramInfoLog(_newProgProgram,200,&length,log);
 
@@ -837,10 +837,12 @@ int deInitGL()
     return 0;
 }
 
+#ifndef VITA
 static void glfwError(int id, const char* description)
 {
     _debugPrintf("[GLFW] ERROR ID %d: %s\n", id, description);
 }
+#endif
 
 int initGL(void (*dbgPrintFn)(const char*, ...))
 {
@@ -930,6 +932,12 @@ int initGL(void (*dbgPrintFn)(const char*, ...))
 
 // ------------------------------------------ END INIT FUNCTIONS
 
+void Vita_SetClearColor(float r, float g, float b, float a)
+{
+    _debugPrintf("[vgl_renderer.c] Setting clear color to (%.1f, %.1f, %.1f, %.1f)", r, g, b, a);
+    glClearColor(r, g, b, a);
+}
+
 /**
  * Vita_Clear(): 
  *  Clears the screen's color buffer using glClear.
@@ -971,11 +979,6 @@ void Vita_Repaint()
     {
         // Get pointer to the pending drawcalls.
         struct _DrawCall *calls = Vita_GetDrawCallsPending();
-        int i = 0;
-
-        uint32_t offset = 0; // OFFSET: byte offset into memory. where to PUT our element.
-        uint32_t sizeCopy = 0; // the size of one vertex.
-        GLint gpuBufferSize = 0; // total size of the GPU buffer, so we make sure not to overload.
 
         glBindBuffer(GL_ARRAY_BUFFER, _vbo); // Bind our vbo through OpenGL.
         CHECK_GL_ERROR("bind");
@@ -985,10 +988,9 @@ void Vita_Repaint()
     }
     else return;
 
-    // TODO: Is this necessary? Our _vbo should still be bound.
-    glBindBuffer(GL_ARRAY_BUFFER, _vbo); // Bind the vbo we've written to.
-    glUseProgram(programObjectID); // Begin using our vert/frag shader combo (program)
+    // TODO: Did removing glBindBuffer from here cause issues?
 
+    glUseProgram(programObjectID); // Begin using our vert/frag shader combo (program)
 
     // ONLY enable these for data that you want to be
     // defined/ passed through the vertex attribute array.
@@ -1012,7 +1014,7 @@ void Vita_Repaint()
 
     // This is a "hack around".
     // Ideally, I'd be able to batch this all at once.
-    int i;
+    GLuint i;
     GLuint _curBoundTex = 0;
     DrawCall _curDrawCall;
 #if 0

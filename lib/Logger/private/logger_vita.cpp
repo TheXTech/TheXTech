@@ -21,21 +21,20 @@
 #include "logger_sets.h"
 #include "logger_private.h"
 #include <cstdio>
-
-#ifdef VITA
 #include <debugnet.h>
 #ifndef NETDBG_IP_SERVER
-#define NETDBG_IP_SERVER "192.168.0.22"
+#define NETDBG_IP_SERVER "192.168.0.45"
 #endif
 
 #ifndef NETDBG_PORT_SERVER
 #define NETDBG_PORT_SERVER 18194
 #endif
 
-static char __string_buffer[128];
-static char __string_buffer2[128];
+#define VITA_TEMP_BUFFER_SIZE (1024 * 1024)
+
+static char __string_buffer[VITA_TEMP_BUFFER_SIZE];
+static char __string_buffer2[VITA_TEMP_BUFFER_SIZE];
 static int __vita_debug_setup = 0;
-#endif
 
 #ifndef NO_FILE_LOGGING
 //! Output file
@@ -65,22 +64,21 @@ void LoggerPrivate_pLogConsole(int level, const char *label, const char *format,
 {
     if(__vita_debug_setup == 0)
     {
-        int ret = debugNetInit(NETDBG_IP_SERVER, NETDBG_PORT_SERVER, DEBUG);
+        debugNetInit(NETDBG_IP_SERVER, NETDBG_PORT_SERVER, DEBUG);
     }
 
-    // va_start(arg, format);
-    vsprintf(__string_buffer, format, arg);
-    sprintf(__string_buffer2, "%s\n", __string_buffer);
+    // Print arg list to first string buffer.
+    vsnprintf(__string_buffer, VITA_TEMP_BUFFER_SIZE - 4, format, arg);
+    // Print that string buffer into second string buffer with new line & null termination.
+    snprintf(__string_buffer2, VITA_TEMP_BUFFER_SIZE, "%s\n", __string_buffer);
+    
+    // Print to network.
     debugNetPrintf(DEBUG, __string_buffer2);
-    // debugNetPrintf(DEBUG, "\n");
-    // va_end(arg);
 
     (void)level;
     (void)label;
     (void)format;
     (void)arg;
-
-
 }
 
 void LoggerPrivate_pLogFile(int level, const char *label, const char *format, va_list arg)

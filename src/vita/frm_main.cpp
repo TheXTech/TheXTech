@@ -59,6 +59,7 @@
 
 #include "../frm_main.h"
 
+static const char* _str_init_sdl = "::initSDL";
 int _newlib_heap_size_user = 256 * 1024 * 1024;
 
 #ifndef NO_SDL
@@ -158,22 +159,21 @@ static inline void print_memory_info()
 
 bool FrmMain::initSDL(const CmdLineSetup_t &setup)
 {
+
     bool res = false;
     LoadLogSettings(setup.interprocess, setup.verboseLogging);
 
-#ifdef USE_STBI
-    _debugPrintf_("VITA: Using stb_image for graphics loading!");
-#else
-    _debugPrintf_("VITA: Using libFreeImageLite for graphics loading.");
     GraphicsHelps::initFreeImage();
-#endif
 
-    _debugPrintf_("--Before graphics init--");
+    _debugPrintf_("-- Before graphics init --");
     print_memory_info();
 
-    _debugPrintf_("--- Using vitaGL for graphics API.");
+    _debugPrintf_("-- Using vitaGL for graphics API.");
+
     int init_ret = 0;
     init_ret = initGL(&pLogDebug);
+
+    Vita_SetClearColor(0.f, 0.f, 0.f, 1.f);
     if(init_ret != 0)
     {
         _debugPrintf_("initGL FAILED!!! Returned %d", init_ret);
@@ -192,8 +192,8 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
 
     size_t _vert_text_size, _frag_text_size;
 
-    char* _vert_text_buf = malloc(2);
-    char* _frag_text_buf = malloc(2);
+    char* _vert_text_buf = (char*)malloc(2);
+    char* _frag_text_buf = (char*)malloc(2);
 
     init_ret = _Vita_ReadShaderFromFile(_vert, &_vert_text_size, &_vert_text_buf);
     if(init_ret != 0)
@@ -219,7 +219,7 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
     _debugPrintf_("--After graphics init--");
     print_memory_info();
 
-    CHECK_GL_ERROR("::initSDL");
+    CHECK_GL_ERROR((char*)_str_init_sdl);
 
 /*
     // glClearColor(0.5, 0.1, 0.1, 0); Debug Red
@@ -286,6 +286,11 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
     // m_gif.init();
 
     _debugPrintf_("SDL has initialized.\n");
+#ifdef PGE_NO_THREADING
+    pLogDebug("THREADING DISABLED! Loading will be slow.");
+#else
+    pLogDebug("THREADING ENABLED! Loading may be buggy. CGFX may be broken.");
+#endif
 
     return res;
 }
@@ -293,6 +298,8 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
 bool FrmMain::freeTextureMem() // make it take an amount of memory, someday.....
 {
     pLogDebug("TODO: Implement ::freeTextureMem on PS Vita again.");
+    return false;
+
     // printf("Freeing texture memory...\n");
     // StdPicture* oldest = nullptr;
     // uint32_t earliestDraw = 0;
@@ -460,110 +467,6 @@ void FrmMain::repaint()
 {
     Vita_Repaint();
 }
-
-#define align_mem(addr, align) (((addr) + ((align) - 1)) & ~((align) - 1))
-
-static SceUID _stb_resize_cache = 0;
-static size_t _stb_resize_cache_size = 0;
-
-static inline int _realloc(SceUID* sceUID, size_t old_size, size_t new_size, uint32_t mem_type)
-{
-    size_t new_size_aligned = 0;
-
-    if(mem_type == SCE_KERNEL_MEMBLOCK_TYPE_USER_CDRAM_RW)
-        new_size_aligned = align_mem(new_size, 256 * 1024);
-    else
-        new_size_aligned = align_mem(new_size, 4 * 1024);
-
-    pLogDebug("\tRealloc UID %d from %d -> %d (%d aligned)", *sceUID, old_size, new_size, new_size_aligned);
-
-    int ret = sceKernelFreeMemBlock(*sceUID);
-    if(ret < 0)
-    {
-        pLogWarning("\tERROR: Failed to free mem block with UID %d", *sceUID);
-        return ret;
-    }
-
-    *sceUID = sceKernelAllocMemBlock("stb_resize_cache",
-                mem_type,
-                new_size,
-                0);
-    if(*sceUID < 0)
-    {
-        pLogWarning("\tUnable to alloc memblock of size %d of type %d ( returned %d )", new_size, mem_type, *sceUID);
-        return *sceUID;
-    }
-
-    return 0;
-}
-
-static inline SceUID _allocate_resize_cache(size_t size, unsigned char** output_mem)
-{
-    int ret = 0;
-    uint32_t mem_type = SCE_KERNEL_MEMBLOCK_TYPE_USER_RW;
-    if (mem_type == SCE_KERNEL_MEMBLOCK_TYPE_USER_CDRAM_RW)
-		size = align_mem(size, 256 * 1024);
-	else
-		size = align_mem(size, 4 * 1024);
-
-    if(_stb_resize_cache == 0)
-    {
-        _stb_resize_cache =
-            sceKernelAllocMemBlock("stb_resize_cache",
-                mem_type,
-                size,
-                0);
-        if(_stb_resize_cache < 0)
-        {
-            pLogWarning("   Unable to alloc memblock of size %d of type SCE_KERNEL_MEMBLOCK_TYPE_USER_RW\n(returned %d)", size, _stb_resize_cache);
-            return -1;
-        }
-        else
-        {
-            pLogWarning("   Allocated %d successfully, thank you sceKernelAllocMemBlock.", size);
-            ret = sceKernelGetMemBlockBase(_stb_resize_cache, output_mem);
-            pLogWarning("   sceKernelGetMemBlockBase(%d, %p): 0x%d\n\toutput_mem addr: %p", _stb_resize_cache, output_mem, ret, *output_mem);
-            if(ret != 0) {
-                return -1;
-            }
-
-            _stb_resize_cache_size = size;
-        }
-        return _stb_resize_cache;
-    }
-    else
-    {
-        pLogDebug("     _stb_resize_cache already contains a memory block of size %d (we want %d)", _stb_resize_cache_size, size);
-        if(size > _stb_resize_cache_size)
-        {
-            int realloc_ret = _realloc(&_stb_resize_cache, _stb_resize_cache_size, size, mem_type);
-            if(realloc_ret < 0)
-            {
-                pLogWarning("\tUnable to realloc stb resize cache from %d to %d. (Probably out of memory)", _stb_resize_cache_size, size);
-                return -1;
-            }
-
-            // Update size after successful re-alloc.
-            _stb_resize_cache_size = size;
-        }
-
-        ret = sceKernelGetMemBlockBase(_stb_resize_cache, output_mem);
-        if(ret != 0)
-        {
-            pLogWarning("   Unable to retrieve MEM BLOCK with SceUID %d", _stb_resize_cache);
-            return -1;
-        }
-        else
-        {
-            pLogWarning("   (EXISTING) sceKernelGetMemBlockBase(%d, %p): 0x%d\n\toutput_mem addr: %p", _stb_resize_cache, output_mem, ret, *output_mem);
-            return _stb_resize_cache;
-        }
-    }
-
-    return 0;
-}
-
-
 
 /// INCOMPLETE
 StdPicture FrmMain::LoadPicture(std::string path)
@@ -1122,7 +1025,7 @@ void FrmMain::renderTextureScale(double xDst, double yDst, double wDst, double h
 void FrmMain::renderTexture(double xDst, double yDst, double wDst, double hDst,
                             StdPicture &tx,
                             int xSrc, int ySrc,
-                            float red = 1.f, float green, float blue, float alpha)
+                            float red, float green, float blue, float alpha)
 {
     float w = ROUNDDIV2(wDst);
     float h = ROUNDDIV2(hDst);
