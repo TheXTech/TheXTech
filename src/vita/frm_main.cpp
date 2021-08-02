@@ -41,6 +41,7 @@
 #include "../control/joystick.h"
 #include "../sound.h"
 #include "../editor/editor.h"
+#include "../frame_timer.h"
 
 #include <AppPath/app_path.h>
 #include <Logger/logger.h>
@@ -291,6 +292,8 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
 #else
     pLogDebug("THREADING ENABLED! Loading may be buggy. CGFX may be broken.");
 #endif
+
+    g_stats.enabled = true;
 
     return res;
 }
@@ -1129,6 +1132,10 @@ void FrmMain::eventKeyDown(SDL_KeyboardEvent &evt)
 {
     int KeyCode = evt.keysym.scancode;
     inputKey = KeyCode;
+
+    pLogDebug("inputKey: %d", inputKey);
+
+    //g_stats.enabled = !g_stats.enabled;
 
     // bool ctrlF = ((evt.keysym.mod & KMOD_CTRL) != 0 && evt.keysym.scancode == SDL_SCANCODE_F);
     // bool altEnter = ((evt.keysym.mod & KMOD_ALT) != 0 && (evt.keysym.scancode == SDL_SCANCODE_RETURN || evt.keysym.scancode == SDL_SCANCODE_KP_ENTER));

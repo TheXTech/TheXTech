@@ -127,6 +127,20 @@ mat4 _scale_arb;
 
 // ------------------------------------------   INTERNAL FUNCTIONS
 
+static inline int _Vita_SortDrawCalls(const void *s1, const void *s2)
+{
+    DrawCall *dc1 = (DrawCall *)s1;
+    DrawCall *dc2 = (DrawCall *)s2;
+
+    if(dc1->verts[0].obj_ptr != NULL 
+        && dc2->verts[0].obj_ptr != NULL)
+    {
+        return (((obj_extra_data *)dc1->verts[0].obj_ptr)->textureID) - (((obj_extra_data *)dc2->verts[0].obj_ptr)->textureID);
+    }
+
+    return +1;
+}
+
 /**
  * Vita_AddPass():
  *  Sets the information from the `passInfo` variable
@@ -368,6 +382,9 @@ void Vita_DrawRect4xColor(float x, float y,
 {
     DrawCall *_curDrawCall = _Vita_GetAvailableDrawCall();
     if(_curDrawCall == 0) {return;}
+
+    for(int i = 0; i < 4; i++)
+        _curDrawCall->verts[i].obj_ptr = 0;
 
     _Vita_WriteVertices4xColor(_curDrawCall, x, y, wDst, hDst, 0.f, 1.f, 0.f, 1.f, rgba0, rgba1, rgba2, rgba3);
 
@@ -973,6 +990,8 @@ void Vita_Repaint()
         _debugPrintf("Too many calls (%d / %d).\n", draw_calls, GL_MAX_VERTEX_ATTRIBS);
     }
 
+    // qsort(_vgl_pending_calls, draw_calls, sizeof(DrawCall), _Vita_SortDrawCalls);
+
     GLuint _vbo = Vita_GetVertexBufferID(); // Get OpenGL handle to our vbo. (On the GPU)
     
     if(_vbo != 0)
@@ -1015,113 +1034,97 @@ void Vita_Repaint()
     // This is a "hack around".
     // Ideally, I'd be able to batch this all at once.
     GLuint i;
-    GLuint _curBoundTex = 0;
+    GLuint _curBoundTex = -1;
+    GLuint _curReqTex = 0;
     DrawCall _curDrawCall;
-#if 0
-    for (int p = 0; p < 6; p++)
+
+    glm_mat4_identity(_scale_arb);
+    glm_mat4_identity(_rot_arb);
+
+    glUniformMatrix4fv(UNIFORM_SCALE_INDEX, 1, GL_FALSE, (const GLfloat *)_scale_arb);
+    glUniformMatrix4fv(UNIFORM_ROTMAT_INDEX, 1, GL_FALSE, (const GLfloat *)_rot_arb);
+
+    int thisBatchStart = 0;
+    int thisBatch = 0;
+    for (i = 0; i < draw_calls; i++)
     {
-#if 0
-        _debugPrintf("Pass [%d]: ProgramID: %d, offset: (%.2f, %.2f)\n",
-                     p,
-                     _shading_passes[p].ProgramObjectID, _shading_passes[p].offset_x, _shading_passes[p].offset_y);
+        _curDrawCall = _vgl_pending_calls[i];
 
-
-        if (p == 5)
-            _debugPrintf("\n");
-#endif
-
-        if (_shading_passes[p].ProgramObjectID != 0)
+        if (_curDrawCall.verts != NULL && _curDrawCall.verts[0].obj_ptr != NULL)
         {
-            ShadingPass curPass = _shading_passes[p];
-            // _debugPrintf("!! New pass with program ID: %d\n", _shading_passes[p].ProgramObjectID);
-#endif
-            glm_mat4_identity(_scale_arb);
-            glm_mat4_identity(_rot_arb);
-            for (i = 0; i < draw_calls; i++)
+            obj_extra_data ex_data = *((obj_extra_data *)_curDrawCall.verts[0].obj_ptr);
+            _curReqTex = (_curDrawCall.verts[0].obj_ptr != NULL) ? ex_data.textureID : 0;
+
+            // Only re-bind texture when it's different
+            // from what's currently bound.
+            if (_curBoundTex != _curReqTex)
             {
-                _curDrawCall = _vgl_pending_calls[i];
+                if (ex_data.textureID == 0)
+                    glUniform1i(UNIFORM_USE_TEXTURE_BOOL_INDEX, 0);
+                else
+                    glUniform1i(UNIFORM_USE_TEXTURE_BOOL_INDEX, 1);
+
+                // _debugPrintf("[vgl_renderer] repaint(): TODO change bind texture from id %u to id %u\n", _curBoundTex, ex_data.textureID);
+                glBindTexture(GL_TEXTURE_2D, ex_data.textureID);
+                _curBoundTex = ex_data.textureID;
 
                 
 
-                if (_curDrawCall.verts != NULL && _curDrawCall.verts[0].obj_ptr != NULL)
-                {
-                    // _debugPrintf("!!!!!\t!!!!! HAS extra data ptr!\n");
-                    DEBUG_PRINT_OBJ_EX_DATA(((obj_extra_data *)_curDrawCall.verts[0].obj_ptr));
-                    obj_extra_data ex_data = *((obj_extra_data *)_curDrawCall.verts[0].obj_ptr);
-
-                    // Only re-bind texture when it's different
-                    // from what's currently bound.
-                    if (_curBoundTex != ex_data.textureID)
-                    {
-
-                        if (ex_data.textureID == 0)
-                            glUniform1i(UNIFORM_USE_TEXTURE_BOOL_INDEX, 0);
-                        else
-                            glUniform1i(UNIFORM_USE_TEXTURE_BOOL_INDEX, 1);
-
-                        // _debugPrintf("[vgl_renderer] repaint(): TODO change bind texture from id %u to id %u\n", _curBoundTex, ex_data.textureID);
-                        glBindTexture(GL_TEXTURE_2D, ex_data.textureID);
-                        _curBoundTex = ex_data.textureID;
-                    }
-
-                    // TODO: Add offset to the basic shader.
-                    // glm_translate(cpu_mvp, (vec3){curPass.offset_x, curPass.offset_y, 0.f});
-
-                    /*
-
-                    glm_mat4_identity(_rot_arb);
-                    glm_rotate_atm(
-                        _rot_arb,
-                        (vec3){ex_data.piv_x, ex_data.piv_y, 0.f},
-                        glm_rad(ex_data.rot_z),
-                        (vec3){0.f, 0.f, 1.f});
-
-                    vec3 refVector = {ex_data.piv_x, ex_data.piv_y, 0.f};
-                    vec3 nRefVector = {-ex_data.piv_x, -ex_data.piv_y, 0.f};
-
-                    mat4 transRefTo;
-                    mat4 transRefFrom;
-                    mat4 transfScale;
-                    mat4 _temp1;
-                    glm_mat4_identity(transRefTo);
-                    glm_mat4_identity(transRefFrom);
-                    glm_mat4_identity(transfScale);
-                    glm_mat4_identity(_temp1);
-                    glm_translate(transRefTo, nRefVector);
-                    glm_translate(transRefFrom, refVector);
-
-                    glm_scale(transfScale, (vec3){ex_data.scale, ex_data.scale, ex_data.scale});
-                    glm_mat4_mul(transRefFrom, transfScale, _temp1);
-                    glm_mat4_mul(_temp1, transRefTo, _scale_arb);
-
-                    */
-                }
-
-                glUniformMatrix4fv(UNIFORM_SCALE_INDEX, 1, GL_FALSE, (const GLfloat *)_scale_arb);
-                glUniformMatrix4fv(UNIFORM_ROTMAT_INDEX, 1, GL_FALSE, (const GLfloat *)_rot_arb);
-
-                glDrawArrays(GL_TRIANGLE_STRIP, i * VERTICES_PER_PRIM, VERTICES_PER_PRIM);
-
-                glm_mat4_identity(_scale_arb);
-                glm_mat4_identity(_rot_arb);
+                // reset batch start 
+                // thisBatchStart = i * VERTICES_PER_PRIM;
+                // thisBatch = 0;
             }
-        //}
-        // Revert shader state. 
-        glUniform1i(UNIFORM_USE_TEXTURE_BOOL_INDEX, 0);
-        glBindTexture(GL_TEXTURE_2D, 0);
-    //}
+            else
+            {
+                // Increment to batch vertices that have the same textures
+                // thisBatch += VERTICES_PER_PRIM;
+            }
 
-    // glFlush();
-    
-    
+            // draw
+            glDrawArrays(GL_TRIANGLE_STRIP, i * VERTICES_PER_PRIM, VERTICES_PER_PRIM);
+
+            // TODO: Add offset to the basic shader.
+            // glm_translate(cpu_mvp, (vec3){curPass.offset_x, curPass.offset_y, 0.f});
+            /*
+            glm_mat4_identity(_rot_arb);
+            glm_rotate_atm(
+                _rot_arb,
+                (vec3){ex_data.piv_x, ex_data.piv_y, 0.f},
+                glm_rad(ex_data.rot_z),
+                (vec3){0.f, 0.f, 1.f});
+
+            vec3 refVector = {ex_data.piv_x, ex_data.piv_y, 0.f};
+            vec3 nRefVector = {-ex_data.piv_x, -ex_data.piv_y, 0.f};
+
+            mat4 transRefTo;
+            mat4 transRefFrom;
+            mat4 transfScale;
+            mat4 _temp1;
+            glm_mat4_identity(transRefTo);
+            glm_mat4_identity(transRefFrom);
+            glm_mat4_identity(transfScale);
+            glm_mat4_identity(_temp1);
+            glm_translate(transRefTo, nRefVector);
+            glm_translate(transRefFrom, refVector);
+
+            glm_scale(transfScale, (vec3){ex_data.scale, ex_data.scale, ex_data.scale});
+            glm_mat4_mul(transRefFrom, transfScale, _temp1);
+            glm_mat4_mul(_temp1, transRefTo, _scale_arb);
+            */
+        }
+    }
+
+    // Revert shader state.
+    glUniform1i(UNIFORM_USE_TEXTURE_BOOL_INDEX, 0);
+    glBindTexture(GL_TEXTURE_2D, 0);
 
     // Reverting state.
     glDisableVertexAttribArray(VERTEX_POS_INDEX);
     glDisableVertexAttribArray(VERTEX_TEXCOORD_INDEX);
     glDisableVertexAttribArray(VERTEX_COLOR_INDEX);
     
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glUseProgram(0);
+    // glBindBuffer(GL_ARRAY_BUFFER, 0);
+    // glUseProgram(0);
 
     
     // glFinish();

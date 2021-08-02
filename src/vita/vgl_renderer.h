@@ -62,7 +62,6 @@ static const char* GLUNKNOWN = "GL_UNKNOWN. Sorry.";
 
 static inline void DEBUG_PRINT_OBJ_EX_DATA(struct _obj_extra_data *ex_data)
 {
-    return;
     if(ex_data == NULL) return;
 
     printf("\tEX_DATA\n\ttex ID: %d\n\tpiv: %.2f, %.2f\n\trot: %.2f, %.2f, %.2f\n\tscale: %.2f\n\n",
