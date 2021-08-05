@@ -381,7 +381,6 @@ void Vita_DrawRect4xColor(float x, float y,
                           float rgba3[4])
 {
     DrawCall *_curDrawCall = _Vita_GetAvailableDrawCall();
-    if(_curDrawCall == 0) {return;}
 
     for(int i = 0; i < 4; i++)
         _curDrawCall->verts[i].obj_ptr = 0;
@@ -503,12 +502,17 @@ void Vita_DrawTextureAnimColorExData(
 {
 
     DrawCall *_curDrawCall = _Vita_GetAvailableDrawCall();
-    if(_curDrawCall == NULL) return;
+    if(_curDrawCall == NULL)
+    { 
+        _debugPrintf("WARNING: Got null draw call.\n");
+        return;
+    }
 
-    if(ex_data != NULL && ex_data->textureID != texId)
+    if(ex_data != NULL)
     {
-        if(texId == 0) _debugPrintf("WARNING: Draw Texture called without texture passed.");
-        ex_data->textureID = texId;
+        if(texId == 0) _debugPrintf("WARNING: Draw Texture called without texture passed.\n");
+        if(ex_data != NULL && ex_data->textureID != texId)
+            ex_data->textureID = texId;
     }
 
     for(int i = 0; i < VERTICES_PER_PRIM; i++)
@@ -868,6 +872,8 @@ int initGL(void (*dbgPrintFn)(const char*, ...))
         return -1;
     }
 
+    start_time_s = time(NULL);
+
     _debugPrintf = dbgPrintFn;
 
     for(int i = 0; i < 6; i++)
@@ -951,7 +957,7 @@ int initGL(void (*dbgPrintFn)(const char*, ...))
 
 void Vita_SetClearColor(float r, float g, float b, float a)
 {
-    _debugPrintf("[vgl_renderer.c] Setting clear color to (%.1f, %.1f, %.1f, %.1f)", r, g, b, a);
+    _debugPrintf("[vgl_renderer.c] Setting clear color to (%.1f, %.1f, %.1f, %.1f)\n", r, g, b, a);
     glClearColor(r, g, b, a);
 }
 
@@ -1036,6 +1042,7 @@ void Vita_Repaint()
     GLuint i;
     GLuint _curBoundTex = -1;
     GLuint _curReqTex = 0;
+    int totalTextureSwaps = 0;
     DrawCall _curDrawCall;
 
     glm_mat4_identity(_scale_arb);
@@ -1050,7 +1057,7 @@ void Vita_Repaint()
     {
         _curDrawCall = _vgl_pending_calls[i];
 
-        if (_curDrawCall.verts != NULL && _curDrawCall.verts[0].obj_ptr != NULL)
+        if(_curDrawCall.verts[0].obj_ptr != NULL)
         {
             obj_extra_data ex_data = *((obj_extra_data *)_curDrawCall.verts[0].obj_ptr);
             _curReqTex = (_curDrawCall.verts[0].obj_ptr != NULL) ? ex_data.textureID : 0;
@@ -1064,27 +1071,14 @@ void Vita_Repaint()
                 else
                     glUniform1i(UNIFORM_USE_TEXTURE_BOOL_INDEX, 1);
 
-                // _debugPrintf("[vgl_renderer] repaint(): TODO change bind texture from id %u to id %u\n", _curBoundTex, ex_data.textureID);
                 glBindTexture(GL_TEXTURE_2D, ex_data.textureID);
                 _curBoundTex = ex_data.textureID;
-
-                
-
-                // reset batch start 
-                // thisBatchStart = i * VERTICES_PER_PRIM;
-                // thisBatch = 0;
+                totalTextureSwaps++;
             }
-            else
-            {
-                // Increment to batch vertices that have the same textures
-                // thisBatch += VERTICES_PER_PRIM;
-            }
-
-            // draw
-            glDrawArrays(GL_TRIANGLE_STRIP, i * VERTICES_PER_PRIM, VERTICES_PER_PRIM);
 
             // TODO: Add offset to the basic shader.
             // glm_translate(cpu_mvp, (vec3){curPass.offset_x, curPass.offset_y, 0.f});
+
             /*
             glm_mat4_identity(_rot_arb);
             glm_rotate_atm(
@@ -1112,6 +1106,22 @@ void Vita_Repaint()
             glm_mat4_mul(_temp1, transRefTo, _scale_arb);
             */
         }
+        else
+        {
+            glUniform1i(UNIFORM_USE_TEXTURE_BOOL_INDEX, 0);
+            glBindTexture(GL_TEXTURE_2D, 0);
+            _curBoundTex = 0;
+            totalTextureSwaps++;
+        }
+
+        // draw
+        glDrawArrays(GL_TRIANGLE_STRIP, i * VERTICES_PER_PRIM, VERTICES_PER_PRIM);
+    }
+
+    if(last_frame_time_s != 0)
+    {
+        clock_t cur_time = clock();
+        last_frame_time_consumed_s = (cur_time - last_frame_time_s);
     }
 
     // Revert shader state.
@@ -1122,12 +1132,6 @@ void Vita_Repaint()
     glDisableVertexAttribArray(VERTEX_POS_INDEX);
     glDisableVertexAttribArray(VERTEX_TEXCOORD_INDEX);
     glDisableVertexAttribArray(VERTEX_COLOR_INDEX);
-    
-    // glBindBuffer(GL_ARRAY_BUFFER, 0);
-    // glUseProgram(0);
-
-    
-    // glFinish();
 
 FINISH_DRAWING:
 #ifdef VITA
@@ -1135,9 +1139,25 @@ FINISH_DRAWING:
 #else
     glfwSwapBuffers(_game_window);
     glfwPollEvents();
+
+    char temp[128];
+    snprintf(temp, 128, "Draw Calls: %d; Texture Swaps: %d; Frame Time Ticks: %lu (%.6f s, %.4f ms)", draw_calls, totalTextureSwaps, last_frame_time_consumed_s, ((float)clock() - (float)last_frame_time_s) / CLOCKS_PER_SEC, (((float)clock() - (float)last_frame_time_s) / CLOCKS_PER_SEC) * 1000.f);
+
+    glfwSetWindowTitle(_game_window, temp);
 #endif
 
+    if(last_printf_time == 0)
+        last_printf_time = clock();
+    if(clock() - last_printf_time > (2 * CLOCKS_PER_SEC))
+    {
+        last_printf_time = clock();
+        _debugPrintf("Draw Calls: %d; Texture Swaps: %d; Frame Time Ticks: %lu (%.6f s, %.4f ms)\n", draw_calls, totalTextureSwaps, last_frame_time_consumed_s, ((float)clock() - (float)last_frame_time_s) / CLOCKS_PER_SEC, (((float)clock() - (float)last_frame_time_s) / CLOCKS_PER_SEC) * 1000.f);
+    }
+
+
+    // Finish, reset total calls, and set the last frame time.
     Vita_ResetTotalCalls();
+    last_frame_time_s = clock();
 }
 
 #ifdef __cplusplus

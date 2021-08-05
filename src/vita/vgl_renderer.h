@@ -27,6 +27,7 @@ extern "C" {
 #include <stdlib.h>
 #include <memory.h>
 #include <string.h>
+#include <time.h>
 
 #define VERTICES_PER_QUAD 4
 #define VERTICES_PER_TRI 3
@@ -44,13 +45,18 @@ extern "C" {
 // for just x & y, it's 2. this is used for stride.
 // In this case, we have (x, y) (s, v) and (r,g,b,a) available to us.
 #define VERTEX_ATTR_ELEM_COUNT 8
-#define MAX_VERTICES 1024 // TODO: This should be renamed to MAX_DRAWCALLS. We allocate our VBO with memory to fill MAX_VERTICES * sizeof(DrawCall)
+#define MAX_VERTICES 8096 // TODO: This should be renamed to MAX_DRAWCALLS. We allocate our VBO with memory to fill MAX_VERTICES * sizeof(DrawCall)
 
 #define VERTEX_ATTRIB_TOTAL_SIZE_1 (VERTEX_ATTR_ELEM_COUNT * sizeof(float)) + (sizeof(void *))
 
 #include "vgl_renderer_types.h"
 
 typedef unsigned int GLuint;
+
+static clock_t start_time_s = 0;
+static clock_t last_frame_time_s = 0;
+static clock_t last_frame_time_consumed_s = 0; // cur_time - last_frame_time
+static clock_t last_printf_time = 0;
 
 static const char* GLINVALIDENUM = "GL_INVALID_ENUM";
 static const char* GLINVALIDVALUE = "GL_INVALID_VALUE";
