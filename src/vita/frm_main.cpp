@@ -790,7 +790,7 @@ void FrmMain::clearAllTextures()
         }
     }
 
-    pLogDebug("Cleared %d textures from vram.\n", texturesDeleted);
+    // pLogDebug("Cleared %d textures from vram.\n", texturesDeleted);
 
     m_textureBank.clear();
 }
