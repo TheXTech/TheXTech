@@ -51,7 +51,7 @@ struct PGEColor
 struct SDL_Texture;
 struct StdPicture
 {
-#ifdef DEBUG_BUILD
+#if defined(DEBUG_BUILD) || defined(VITA)
     std::string origPath;
 #endif
     bool inited = false;
