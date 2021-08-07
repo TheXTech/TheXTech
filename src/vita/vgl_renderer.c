@@ -871,9 +871,9 @@ int initGL(void (*dbgPrintFn)(const char*, ...))
     {
         return -1;
     }
-
+#ifdef DEBUG_BUILD
     start_time_s = time(NULL);
-
+#endif
     _debugPrintf = dbgPrintFn;
 
     for(int i = 0; i < 6; i++)
@@ -1117,12 +1117,13 @@ void Vita_Repaint()
         // draw
         glDrawArrays(GL_TRIANGLE_STRIP, i * VERTICES_PER_PRIM, VERTICES_PER_PRIM);
     }
-
+#if DEBUG_BUILD
     if(last_frame_time_s != 0)
     {
         clock_t cur_time = clock();
         last_frame_time_consumed_s = (cur_time - last_frame_time_s);
     }
+#endif
 
     // Revert shader state.
     glUniform1i(UNIFORM_USE_TEXTURE_BOOL_INDEX, 0);
@@ -1139,13 +1140,15 @@ FINISH_DRAWING:
 #else
     glfwSwapBuffers(_game_window);
     glfwPollEvents();
-
+#if DEBUG_BUILD
     char temp[128];
     snprintf(temp, 128, "Draw Calls: %d; Texture Swaps: %d; Frame Time Ticks: %lu (%.6f s, %.4f ms)", draw_calls, totalTextureSwaps, last_frame_time_consumed_s, ((float)clock() - (float)last_frame_time_s) / CLOCKS_PER_SEC, (((float)clock() - (float)last_frame_time_s) / CLOCKS_PER_SEC) * 1000.f);
 
     glfwSetWindowTitle(_game_window, temp);
 #endif
+#endif
 
+#if DEBUG_BUILD
     if(last_printf_time == 0)
         last_printf_time = clock();
     if(clock() - last_printf_time > (2 * CLOCKS_PER_SEC))
@@ -1153,11 +1156,15 @@ FINISH_DRAWING:
         last_printf_time = clock();
         _debugPrintf("Draw Calls: %d; Texture Swaps: %d; Frame Time Ticks: %lu (%.6f s, %.4f ms)\n", draw_calls, totalTextureSwaps, last_frame_time_consumed_s, ((float)clock() - (float)last_frame_time_s) / CLOCKS_PER_SEC, (((float)clock() - (float)last_frame_time_s) / CLOCKS_PER_SEC) * 1000.f);
     }
+#endif
 
 
     // Finish, reset total calls, and set the last frame time.
     Vita_ResetTotalCalls();
+
+#if DEBUG_BUILD
     last_frame_time_s = clock();
+#endif
 }
 
 #ifdef __cplusplus

@@ -53,10 +53,12 @@ extern "C" {
 
 typedef unsigned int GLuint;
 
+#ifdef DEBUG_BUILD
 static clock_t start_time_s = 0;
 static clock_t last_frame_time_s = 0;
 static clock_t last_frame_time_consumed_s = 0; // cur_time - last_frame_time
 static clock_t last_printf_time = 0;
+#endif
 
 static const char* GLINVALIDENUM = "GL_INVALID_ENUM";
 static const char* GLINVALIDVALUE = "GL_INVALID_VALUE";

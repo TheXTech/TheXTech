@@ -1560,6 +1560,7 @@ bool mainMenuUpdate()
             {
                 if(getNewKeyboard)
                 {
+#ifndef VITA
                     if(inputKey != 0)
                     {
                         getNewKeyboard = false;
@@ -1567,6 +1568,7 @@ bool mainMenuUpdate()
                         PlaySoundMenu(SFX_Do);
                         setKey(conKeyboard[MenuMode - MENU_INPUT_SETTINGS_BASE], MenuCursor, inputKey);
                     }
+#endif
 
                 }
                 else if(getNewJoystick)
@@ -2151,7 +2153,6 @@ void mainMenuDraw()
     // Player controls setup
     else if(MenuMode == MENU_INPUT_SETTINGS_P1 || MenuMode == MENU_INPUT_SETTINGS_P2)
     {
-#ifndef VITA
         if(useJoystick[MenuMode - MENU_INPUT_SETTINGS_BASE] == 0)
         {
             auto &ck = conKeyboard[MenuMode - MENU_INPUT_SETTINGS_BASE];
@@ -2170,14 +2171,8 @@ void mainMenuDraw()
         }
         else
         {
-#endif
             auto &cj = conJoystick[MenuMode - MENU_INPUT_SETTINGS_BASE];
-#ifndef VITA
             SuperPrint("INPUT......" + joyGetName(useJoystick[MenuMode - MENU_INPUT_SETTINGS_BASE] - 1), 3, MenuX, MenuY - 90);
-#else
-            // TODO: Can Vita support DS4 through SDL?
-            SuperPrint("INPUT......" + joyGetName(useJoystick[0]), 3, MenuX, MenuY - 90);
-#endif
             SuperPrint(fmt::format_ne("UP.........{0}", getJoyKeyName(cj.isGameController, cj.Up)), 3, MenuX, MenuY - 60);
             SuperPrint(fmt::format_ne("DOWN.......{0}", getJoyKeyName(cj.isGameController, cj.Down)), 3, MenuX, MenuY - 30);
             SuperPrint(fmt::format_ne("LEFT.......{0}", getJoyKeyName(cj.isGameController, cj.Left)), 3, MenuX, MenuY);
@@ -2189,9 +2184,7 @@ void mainMenuDraw()
             SuperPrint(fmt::format_ne("DROP ITEM..{0}", getJoyKeyName(cj.isGameController, cj.Drop)), 3, MenuX, MenuY + 180);
             SuperPrint(fmt::format_ne("PAUSE......{0}", getJoyKeyName(cj.isGameController, cj.Start)), 3, MenuX, MenuY + 210);
             SuperPrint("Reset to default", 3, MenuX, MenuY + 240);
-#ifndef VITA
         }
-#endif
 
         frmMain.renderTexture(MenuX - 20, MenuY - 90 + (MenuCursor * 30),
                               GFX.MCursor[0].w, GFX.MCursor[0].h, GFX.MCursor[0], 0, 0);
