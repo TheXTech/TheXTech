@@ -179,7 +179,7 @@ if(VITA)
     )
 
     set(VITA_MIXERX_CMAKE_FLAGS
-        "-DUSE_OGG_VORBIS_TREMOR=ON"
+        "-DUSE_OGG_VORBIS_TREMOR=OFF"
         "-DUSE_SYSTEM_SDL2=ON"
         "-DUSE_SYSTEM_AUDIO_LIBRARIES_DEFAULT=ON"
         "-DSDL_MIXER_X_SHARED=OFF"
@@ -189,6 +189,8 @@ if(VITA)
         "-DLIBOPUS_LIB=opus"
         "-DCMAKE_C_FLAGS=-I$ENV{VITASDK}/arm-vita-eabi/include/opus"
         "-DLIBVORBISIDEC_LIB=vorbisidec"
+        "-DLIBVORBIS_LIB=vorbis"
+        "-DLIBVORBISFILE_LIB=vorbisfile"
         "-DMAD_LIBRARIES=mad"
     )
 

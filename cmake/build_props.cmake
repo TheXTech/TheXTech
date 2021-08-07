@@ -43,8 +43,14 @@ elseif(NOT MSVC)
             CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}")
         string(REGEX REPLACE "-O3" ""
             CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
-        set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O3 -fdata-sections -ffunction-sections")
-        set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -fdata-sections -ffunction-sections")
+
+        if(CMAKE_BUILD_TYPE MATCHES DEBUG)
+            set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -g -O0 -fdata-sections -ffunction-sections")
+            set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -g -O0 -fdata-sections -ffunction-sections")
+        elseif(NOT VITA)
+            set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -g -O3 -fdata-sections -ffunction-sections")
+            set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -g -O3 -fdata-sections -ffunction-sections")
+        endif()
         if(ANDROID)
             set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -funwind-tables")
             set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -funwind-tables")
@@ -52,9 +58,14 @@ elseif(NOT MSVC)
             set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -Wl,--gc-sections")
             set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wl,--gc-sections")
             set(LINK_FLAGS_RELEASE  "${LINK_FLAGS_RELEASE} -Wl,--gc-sections")
+        elseif(VITA)
+            # VitaSDK specifies -O2 for release configurations.
+            set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -I../src -Wl,--gc-sections -DVITA=1 -fcompare-debug-second")
+            set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -I../src -Wl,--gc-sections -DVITA=1 -fpermissive -fcompare-debug-second -fno-optimize-sibling-calls -Wno-class-conversion")
+            set(LINK_FLAGS_RELEASE  "${LINK_FLAGS_RELEASE} -Wl,--gc-sections")
         elseif(NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
             set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -s -Wl,--gc-sections -Wl,-s")
-            set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -s -Wl,--gc-sections -Wl,-s")
+            set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}-s -Wl,--gc-sections -Wl,-s")
             set(LINK_FLAGS_RELEASE  "${LINK_FLAGS_RELEASE} -Wl,--gc-sections -Wl,-s")
         else()
             set(LINK_FLAGS_RELEASE  "${LINK_FLAGS_RELEASE} -dead_strip")
@@ -92,10 +103,8 @@ if(VITA)
     set(VITA_APP_NAME "TheXTech Vita Edition")
     set(VITA_TITLEID "THEXTECH0")
     set(VERSION "01.00")
-    set(VITA_MKSFOEX_FLAGS "-d ATTRIBUTE2=12")
+    set(VITA_MKSFOEX_FLAGS "-d ATTRIBUTE2=12") # ATTRIBUTE2=12 specifies we need more RAM.
 
-    
-    
     set(VITA_ADDTL_LIBS
         FLAC
         modplug
@@ -152,25 +161,14 @@ if(VITA)
     set(VITA_CMAKE_FLAGS
         "-DVITA=1"
         "-DENABLE_FPIC=0"
+        "-DBUILD_OGG_VORBIS=1"
     )
-
-    # option(USE_SYSTEM_LIBS ON)
-    # option(USE_STATIC_LIBC OFF)
-    # option(USE_SYSTEM_LIBS_DEFAULT ON)
-    # option(USE_SYSTEM_LIBS ON) Pass these in Vita_CMAKE_FLAGS instead
-    # option(USE_SYSTEM_SDL2 ON)
-    # option(NO_INTPTROC ON FORCE)
-    # option(USE_GME OFF FORCE)
-    # option(USE_MIDI OFF FORCE)
 
     if(USE_SDL_VID)
         set(VITA_CMAKE_FLAGS "${VITA_CMAKE_FLAGS} -DUSE_SDL_VID=1")
     else()
         set(VITA_CMAKE_FLAGS "${VITA_CMAKE_FLAGS} -DNO_SCREENSHOT=1")
     endif()
-
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -I../src -g -fcompare-debug-second")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I../src -g -O0 -DVITA=1 -fpermissive -fcompare-debug-second -fno-optimize-sibling-calls -Wno-class-conversion")
 endif()
 
 string(TOLOWER "${CMAKE_BUILD_TYPE}" CMAKE_BUILD_TYPE_LOWER)
