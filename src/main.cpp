@@ -166,7 +166,7 @@ int main(int argc, char**argv)
 
     AppPathManager::initAppPath();
 #ifdef VITA
-    AppPathManager::setAssetsRoot("ux0:/data/TheXTech");
+    AppPathManager::setAssetsRoot("ux0:data/TheXTech");
     AppPath = AppPathManager::assetsRoot();
     pLogDebug("PS VITA: Assets root is now %s", AppPath.c_str());
 #else
@@ -438,7 +438,6 @@ int main(int argc, char**argv)
 
 #ifdef VITA
     g_videoSettings.scaleDownAllTextures = true;
-    pLogDebug("\n\n\n\n\n----FORCING  g_videoSettings.scaleDownAllTextures TO TRUE FOR PS VITA\n\n\n");
     frmMain._debugPrintf_ = pLogDebug;
 #endif
 
