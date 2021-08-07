@@ -341,9 +341,7 @@ void FrmMain::freeSDL()
 {
 
     pLogDebug("<Application Closing>");
-    pLogDebug("vglEnd");
-    deInitGL();
-    vglEnd();
+    
 
     pLogDebug("GraphicsHelps::closeFreeImage");
     GraphicsHelps::closeFreeImage();
@@ -364,6 +362,10 @@ void FrmMain::freeSDL()
 
     pLogDebug("SDL_Quit");
     SDL_Quit();
+
+    pLogDebug("vglEnd");
+    deInitGL();
+    vglEnd();
 
     // TODO: Fix "has not currently been declared"
     // GraphicsHelps::closeFreeImage();
@@ -803,7 +805,8 @@ void FrmMain::renderRect(int x, int y, int w, int h, float red, float green, flo
     (void)filled;
     // TODO: Filled or not?
 
-    Vita_DrawRectColor(x, y, w, h, red, green, blue, alpha);
+
+    Vita_DrawRectColor(x - (w * .5f), y - (h * .5f), w - (w * .25f), h - (h * .25f), red, green, blue, alpha);
 
     // DrawRectSolid(x, y, w, h, red, green, blue, alpha);
 }
@@ -818,7 +821,12 @@ void FrmMain::renderRectBR(int _left, int _top, int _right, int _bottom, float r
     (void)green;
     (void)blue;
     (void)alpha;
-    Vita_DrawRectColor(_left, _top, _right-_left, _bottom-_top, red, green, blue, alpha);
+
+    float w = (_right - _left);
+    float h = (_bottom - _top);
+
+
+    Vita_DrawRectColor(_left - w, _top - h, _right-_left, _bottom-_top, red, green, blue, alpha);
     // TODO:
     // renderRect(_left, _top, _right-_left, _bottom-_top, red, green, blue, alpha, true);
 }

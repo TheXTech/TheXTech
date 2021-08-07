@@ -1053,6 +1053,10 @@ void Vita_Repaint()
 
     int thisBatchStart = 0;
     int thisBatch = 0;
+
+    glUniform1i(UNIFORM_USE_TEXTURE_BOOL_INDEX, 0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
     for (i = 0; i < draw_calls; i++)
     {
         _curDrawCall = _vgl_pending_calls[i];
