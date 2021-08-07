@@ -61,7 +61,7 @@
 #include "../frm_main.h"
 
 static const char* _str_init_sdl = "::initSDL";
-int _newlib_heap_size_user = 256 * 1024 * 1024;
+int _newlib_heap_size_user = 210 * 1024 * 1024; // 128mb to newlib
 
 #ifndef NO_SDL
 #include <SDL2/SDL.h>
@@ -94,9 +94,11 @@ int _newlib_heap_size_user = 256 * 1024 * 1024;
 #endif
 #endif
 
+
+
 static unsigned int num_textures_loaded = 0;
-static const int vgl_ram_threshold = (16 * 1024 * 1024); // leave 84mb
-static const int vgl_legacy_pool_size = (16 * 1024 * 1024); // 32mb for legacy OGL.
+static const int vgl_ram_threshold = (16 * 1024 * 1024);
+static const int vgl_legacy_pool_size = (16 * 1024 * 1024);
 
 static const SceGxmMultisampleMode vgl_msaa = SCE_GXM_MULTISAMPLE_NONE;
 
@@ -287,13 +289,14 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
     // m_gif.init();
 
     _debugPrintf_("SDL has initialized.\n");
+
 #ifdef PGE_NO_THREADING
     pLogDebug("THREADING DISABLED! Loading will be slow.");
 #else
     pLogDebug("THREADING ENABLED! Loading may be buggy. CGFX may be broken.");
 #endif
 
-    g_stats.enabled = true;
+//    g_stats.enabled = true;
 
     return res;
 }
