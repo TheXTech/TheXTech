@@ -40,6 +40,10 @@
 
 #include "pseudo_vb.h"
 
+#ifndef PATH_MAX
+#define PATH_MAX 2048
+#endif
+
 // Public musicPlaying As Boolean
 bool musicPlaying = false;
 // Public musicLoop As Integer
@@ -445,7 +449,7 @@ void PlayInitSound()
     sounds.read("total", totalSounds, 0);
     sounds.endGroup();
 
-    char buffer[64] = {0};
+    char buffer[PATH_MAX] = {0};
 
     if(totalSounds >= 29)
     {
@@ -454,7 +458,7 @@ void PlayInitSound()
         sounds.read("file", p, std::string());
         sounds.endGroup();
         
-        snprintf(buffer, 64, "%s%s", SfxRoot.c_str(), p.c_str());
+        snprintf(buffer, PATH_MAX, "%s%s", SfxRoot.c_str(), p.c_str());
 
         // PS Vita had a problem with performing (SfxRoot + p).c_str()
         // pLogDebug("Playing: `%s` (or, `%s` if you will)\n", buffer, buffer);
