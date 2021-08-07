@@ -445,16 +445,22 @@ void PlayInitSound()
     sounds.read("total", totalSounds, 0);
     sounds.endGroup();
 
+    char buffer[64] = {0};
+
     if(totalSounds >= 29)
     {
         std::string p;
         sounds.beginGroup("sound-29");
         sounds.read("file", p, std::string());
         sounds.endGroup();
+        
+        snprintf(buffer, 64, "%s%s", SfxRoot.c_str(), p.c_str());
 
+        // PS Vita had a problem with performing (SfxRoot + p).c_str()
+        // pLogDebug("Playing: `%s` (or, `%s` if you will)\n", buffer, buffer);
         if(!p.empty())
         {
-            SI_PlayLoadSound((SfxRoot + p).c_str());
+            SI_PlayLoadSound(buffer);
             do // Synchroniously play the loading sound to don't distort it during the SFX loading
             {
                 PGE_Delay(15);
