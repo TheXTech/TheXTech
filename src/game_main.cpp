@@ -188,8 +188,9 @@ int GameMain(const CmdLineSetup_t &setup)
 #endif
 
     if(!noSound)
+    {
         InitMixerX();
-
+    }
 #if !defined(PGE_NO_THREADING)
     gfxLoaderThreadingMode = true;
 #endif

@@ -94,6 +94,8 @@ struct StdPicture
     std::string path = "";
     uint32_t lastDrawFrame = 0;
     std::vector<char> raw;
+    std::vector<char> rawMask;
+    bool isMaskPng = false;
 
 #if USE_VITA2D
     vita2d_texture *texture;

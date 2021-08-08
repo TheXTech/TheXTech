@@ -58,6 +58,11 @@ bool SI_Init()
 	        pLogWarning("MixerX: Failed to initialize MP3 module");
 	}
 
+#ifdef VITA
+	Mix_ADLMIDI_setEmulator(ADLMIDI_OPL3_EMU_DOSBOX);
+    Mix_OPNMIDI_setEmulator(OPNMIDI_OPN2_EMU_MIME);
+#endif
+
 	ret = Mix_OpenAudio(g_audioSetup.sampleRate,
 	                    g_audioSetup.format,
 	                    g_audioSetup.channels,
@@ -75,6 +80,8 @@ bool SI_Init()
 
 	Mix_VolumeMusic(MIX_MAX_VOLUME);
 	Mix_AllocateChannels(maxSfxChannels);
+
+
 
 	return true;
 }

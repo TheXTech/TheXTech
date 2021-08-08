@@ -477,7 +477,7 @@ void FrmMain::repaint()
 }
 
 /// INCOMPLETE
-StdPicture FrmMain::LoadPicture(std::string path)
+StdPicture FrmMain::LoadPicture(std::string path, std::string maskPath, std::string maskFallbackPath)
 {
     StdPicture target;
     FIBITMAP *sourceImage;
@@ -490,11 +490,42 @@ StdPicture FrmMain::LoadPicture(std::string path)
     if(target.path.empty()) return target;
 
     sourceImage = GraphicsHelps::loadImage(path);
+
+    // Don't load mask if PNG image is used
+    if(Files::hasSuffix(path, ".png"))
+    {
+        maskPath.clear();
+        maskFallbackPath.clear();
+    }
+
     if(sourceImage == nullptr)
     {
         pLogWarning("Error loading of image file:\n%s\nReason: GraphicsHelps::loadImage returned nullptr.", path.c_str());
         return target;
     }
+
+    //Apply Alpha mask
+    if(!maskPath.empty() && Files::fileExists(maskPath))
+    {
+#ifdef DEBUG_BUILD
+        maskMergingTime.start();
+#endif
+        GraphicsHelps::mergeWithMask(sourceImage, maskPath);
+#ifdef DEBUG_BUILD
+        maskElapsed = maskMergingTime.nanoelapsed();
+#endif
+    }
+    else if(!maskFallbackPath.empty())
+    {
+#ifdef DEBUG_BUILD
+        maskMergingTime.start();
+#endif
+        GraphicsHelps::mergeWithMask(sourceImage, "", maskFallbackPath);
+#ifdef DEBUG_BUILD
+        maskElapsed = maskMergingTime.nanoelapsed();
+#endif
+    }
+
 
     uint32_t w = static_cast<uint32_t>(FreeImage_GetWidth(sourceImage));
     uint32_t h = static_cast<uint32_t>(FreeImage_GetHeight(sourceImage));
@@ -555,7 +586,7 @@ StdPicture FrmMain::LoadPicture(std::string path)
     return target;
 }
 
-StdPicture FrmMain::lazyLoadPicture(std::string path)
+StdPicture FrmMain::lazyLoadPicture(std::string path, std::string maskPath, std::string maskFallbackPath)
 {
     StdPicture target;
     PGE_Size tSize; // the size of the target image.
@@ -659,6 +690,9 @@ void FrmMain::lazyLoad(StdPicture &target)
         return;
     }
 
+    if(!target.rawMask.empty())
+        GraphicsHelps::mergeWithMask(sourceImage, target.rawMask, target.isMaskPng);
+
     // Try and read image width/height now that we've loaded
     // in the raw image data.
     uint32_t w = static_cast<uint32_t>(FreeImage_GetWidth(sourceImage));
@@ -676,6 +710,8 @@ void FrmMain::lazyLoad(StdPicture &target)
 
     // TODO: Does Vita declare this?
     m_lazyLoadedBytes += (w * h * 4);
+    if(!target.rawMask.empty())
+        m_lazyLoadedBytes += (w * h * 4);
 
     RGBQUAD upperColor;
     FreeImage_GetPixelColor(sourceImage, 0, 0, &upperColor);
