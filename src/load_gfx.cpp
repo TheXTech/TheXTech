@@ -76,6 +76,11 @@ static std::set<std::string> g_customLevelCGFXPathsCache;
 static std::vector<GFXBackup_t> g_defaultWorldGfxBackup;
 static std::set<std::string> g_customWorldCGFXPathsCache;
 
+static std::string getGfxDir()
+{
+    return AppPath + "graphics/";
+}
+
 static void loadCGFX(const std::set<std::string> &files,
                      const std::string &origPath,
                      const std::string &dEpisode,
@@ -92,6 +97,9 @@ static void loadCGFX(const std::set<std::string> &files,
     std::string imgPathC = dEpisode + dData + "/" + s_dirEpisode.resolveFileCase(fName + ".png");
     std::string gifPathC = dEpisode + dData + "/" + s_dirCustom.resolveFileCase(fName + ".gif");
     std::string maskPathC = dEpisode + dData + "/" + s_dirCustom.resolveFileCase(fName + "m.gif");
+
+    std::string maskPathFall = getGfxDir() + "fallback/" + fName + "m.gif";
+
     bool alreadyLoaded = false;
 
     std::string loadedPath;
@@ -142,6 +150,8 @@ static void loadCGFX(const std::set<std::string> &files,
             maskToUse = maskPathC;
         else if(files.find(maskPath) != files.end())
             maskToUse = maskPath;
+        else if(files.find(maskPathFall) != files.end())
+            maskToUse = maskPathFall;
 
 #ifdef DEBUG_BUILD
         pLogDebug("Trying to load custom GFX: %s with mask %s", imgToUse.c_str(), maskToUse.c_str());
@@ -226,7 +236,7 @@ static void restoreWorldBackupTextures()
 void LoadGFX()
 {
     std::string p;
-    std::string GfxRoot = AppPath + "graphics/";
+    std::string GfxRoot = getGfxDir();
 
     for(int c = 0; c < numCharacters; ++c)
     {
@@ -479,15 +489,26 @@ static SDL_INLINE void getExistingFiles(std::set<std::string> &existingFiles)
     DirMan searchDir(FileNamePath);
     std::vector<std::string> files;
     searchDir.getListOfFiles(files, {".png", ".gif"});
+
     for(auto &p : files)
         existingFiles.insert(FileNamePath + p);
 
-    if(DirMan::exists(FileNamePath + FileName))
+    std::string epFileData = FileNamePath + FileName;
+    if(DirMan::exists(epFileData))
     {
-        DirMan searchDataDir(FileNamePath + FileName);
+        DirMan searchDataDir(epFileData);
         searchDataDir.getListOfFiles(files, {".png", ".gif"});
         for(auto &p : files)
-            existingFiles.insert(FileNamePath + FileName  + "/"+ p);
+            existingFiles.insert(epFileData  + "/"+ p);
+    }
+
+    std::string fallBacksDir = getGfxDir() + "fallback";
+    if(DirMan::exists(fallBacksDir))
+    {
+        DirMan searchDataDir(fallBacksDir);
+        searchDataDir.getListOfFiles(files, {"m.gif"});
+        for(auto &p : files)
+            existingFiles.insert(fallBacksDir  + "/"+ p);
     }
 }
 
