@@ -4015,7 +4015,7 @@ static SDL_INLINE bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool
                 NewEffect(10, NPC[plr.HoldingNPC].Location);
                 warp.Locked = false;
                 int allBGOs = numBackground + numLocked;
-                for(int C = numBackground; C <= allBGOs; C++)
+                for(int C = numBackground + 1; C <= allBGOs; C++)
                 {
                     if(Background[C].Type == 98)
                     {
@@ -4036,7 +4036,7 @@ static SDL_INLINE bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool
 
                 int allBGOs = numBackground + numLocked;
 
-                for(int C = numBackground; C <= allBGOs; C++)
+                for(int C = numBackground + 1; C <= allBGOs; C++)
                 {
                     if(Background[C].Type == 98)
                     {
@@ -4053,7 +4053,7 @@ static SDL_INLINE bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool
                 plr.HasKey = false;
                 warp.Locked = false;
                 int allBGOs = numBackground + numLocked;
-                for(int C = numBackground; C <= allBGOs; C++)
+                for(int C = numBackground + 1; C <= allBGOs; C++)
                 {
                     if(Background[C].Type == 98)
                     {
