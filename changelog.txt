@@ -20,6 +20,7 @@ Changes for 1.3.5.2
 -Fixed the game start error after granting the storage permission on Android 9 and lower
 -Added an ability to change the look of the launcher screen on Android via gameinfo.ini (Change the logo, change the background, and set up the simple animation)
 -Added mask fallback support for custom graphics mask compatibility for old episodes
+-Fixed vanilla bug: Attempt to enter the locked warp or take the star with star-locked warp the game will crash if a level has no BGO at all
 
 Changes for 1.3.5.1
 -Episodes and battle levels lists now loading in the separated thread with a progress showing
