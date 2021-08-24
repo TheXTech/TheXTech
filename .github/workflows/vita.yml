@@ -112,7 +112,7 @@ jobs:
         cp ../README.ESP.md "package/${{ matrix.config.subdir_name }}/"
         cp thextech.vpk "package/${{ matrix.config.subdir_name }}/"
         cd package
-        zip -9 "thextech-vita-${{ steps.vars.outputs.short_ref }}.zip" "${{ matrix.config.subdir_name }}"
+        zip -9 -r "thextech-vita-${{ steps.vars.outputs.short_ref }}.zip" "${{ matrix.config.subdir_name }}"
         rm -Rf "${{ matrix.config.subdir_name }}"
         cd ../..
 
