@@ -25,7 +25,7 @@ jobs:
             name: "Vita build",
             os: ubuntu-20.04,
             extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech -DCMAKE_TOOLCHAIN_FILE=/usr/local/vitasdk/share/vita.toolchain.cmake",
-            deps_cmdline: "sudo apt-get update -qq && sudo apt-get install -qq cmake ninja-build cmake ninja-build lftp git-core python",
+            deps_cmdline: "sudo apt-get update -qq && sudo apt-get install -qq cmake ninja-build cmake ninja-build lftp git-core python zip",
             generator: "Ninja",
             build_type: "MinSizeRel",
             executable_name: "thextech",
@@ -112,7 +112,7 @@ jobs:
         cp ../README.ESP.md "package/${{ matrix.config.subdir_name }}/"
         cp thextech.vpk "package/${{ matrix.config.subdir_name }}/"
         cd package
-        tar -cvzf "thextech-vita-${{ steps.vars.outputs.short_ref }}.tar.gz" "${{ matrix.config.subdir_name }}"
+        zip -9 "thextech-vita-${{ steps.vars.outputs.short_ref }}.zip" "${{ matrix.config.subdir_name }}"
         rm -Rf "${{ matrix.config.subdir_name }}"
         cd ../..
 
@@ -120,7 +120,7 @@ jobs:
       if: success()
       uses: actions/upload-artifact@v2
       with:
-        path: build/package/thextech-vita-${{ steps.vars.outputs.short_ref }}.tar.gz
+        path: build/package/thextech-vita-${{ steps.vars.outputs.short_ref }}.zip
         name: ${{ matrix.config.name }} ${{ matrix.config.build_type }}
 
     - name: Deploy to builds.wohlsoft.ru
@@ -131,7 +131,7 @@ jobs:
           export PATH=${{ matrix.config.extra_path }}:${PATH}
         fi
         UPLOAD_LIST="set ssl:verify-certificate no;"
-        UPLOAD_LIST="${UPLOAD_LIST} put -O ${{ matrix.config.upload_directory }} ./build/package/thextech-vita-${{ steps.vars.outputs.short_ref }}.tar.gz;"
+        UPLOAD_LIST="${UPLOAD_LIST} put -O ${{ matrix.config.upload_directory }} ./build/package/thextech-vita-${{ steps.vars.outputs.short_ref }}.zip;"
         lftp -e "${UPLOAD_LIST} exit" -u ${{ secrets.builds_login }},${{ secrets.builds_password }} ${{ secrets.builds_host }}
 
     - name: List Build Directory
