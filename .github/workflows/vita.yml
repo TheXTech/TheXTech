@@ -31,7 +31,6 @@ jobs:
             executable_name: "thextech",
             assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-adventure-of-demo-assets-full.7z",
             subdir_name: "thextech-vita",
-            package_filename_game: "thextech-vita",
             upload_directory: "www/vita/"
           }
 
@@ -113,7 +112,7 @@ jobs:
         cp ../README.ESP.md "package/${{ matrix.config.subdir_name }}/"
         cp thextech.vpk "package/${{ matrix.config.subdir_name }}/"
         cd package
-        tar -cvzf "thextech-${{ matrix.config.package_filename_game }}-vita-${{ steps.vars.outputs.short_ref }}.tar.gz" "${{ matrix.config.subdir_name }}"
+        tar -cvzf "thextech-vita-${{ steps.vars.outputs.short_ref }}.tar.gz" "${{ matrix.config.subdir_name }}"
         rm -Rf "${{ matrix.config.subdir_name }}"
         cd ../..
 
@@ -121,7 +120,7 @@ jobs:
       if: success()
       uses: actions/upload-artifact@v2
       with:
-        path: build/package/thextech-${{ matrix.config.package_filename_game }}-vita-${{ steps.vars.outputs.short_ref }}.tar.gz
+        path: build/package/thextech-vita-${{ steps.vars.outputs.short_ref }}.tar.gz
         name: ${{ matrix.config.name }} ${{ matrix.config.build_type }}
 
     - name: Deploy to builds.wohlsoft.ru
@@ -132,7 +131,7 @@ jobs:
           export PATH=${{ matrix.config.extra_path }}:${PATH}
         fi
         UPLOAD_LIST="set ssl:verify-certificate no;"
-        UPLOAD_LIST="${UPLOAD_LIST} put -O ${{ matrix.config.upload_directory }} ./build/package/thextech-${{ matrix.config.package_filename_game }}-vita-${{ steps.vars.outputs.short_ref }}.tar.gz;"
+        UPLOAD_LIST="${UPLOAD_LIST} put -O ${{ matrix.config.upload_directory }} ./build/package/thextech-vita-${{ steps.vars.outputs.short_ref }}.tar.gz;"
         lftp -e "${UPLOAD_LIST} exit" -u ${{ secrets.builds_login }},${{ secrets.builds_password }} ${{ secrets.builds_host }}
 
     - name: List Build Directory
