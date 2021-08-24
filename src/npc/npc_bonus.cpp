@@ -113,7 +113,7 @@ void CheckAfterStarTake(bool many)
         auto &w = Warp[c];
         if((!many && (w.Stars == numStars)) || (many && (w.Stars <= numStars)))
         {
-            for(int d = numBackground; d <= allBGOs; d++)
+            for(int d = numBackground + 1; d <= allBGOs; d++)
             {
                 auto &b = Background[d];
                 if(b.Type == 160 && CheckCollision(w.Entrance, b.Location))
