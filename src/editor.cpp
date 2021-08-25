@@ -1386,7 +1386,8 @@ void UpdateEditor()
                             Block[numBlock] = EditorCursor.Block;
                             Block[numBlock].DefaultType = Block[numBlock].Type;
                             Block[numBlock].DefaultSpecial = Block[numBlock].Special;
-                            if(MagicHand == true)
+                            Block[numBlock].DefaultSpecial2 = Block[numBlock].Special2;
+                            if(MagicHand)
                             {
                                 for(A = -FLBlocks; A <= FLBlocks; A++)
                                 {
@@ -3094,6 +3095,7 @@ void BlockFill(Location_t Loc)
         Block[numBlock] = EditorCursor.Block;
         Block[numBlock].DefaultType = Block[numBlock].Type;
         Block[numBlock].DefaultSpecial = Block[numBlock].Special;
+        Block[numBlock].DefaultSpecial2 = Block[numBlock].Special2;
         Block[numBlock].Location = Loc;
         tempLoc = Loc;
         tempLoc.X = tempLoc.X - Loc.Width;

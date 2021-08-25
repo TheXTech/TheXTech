@@ -726,6 +726,8 @@ struct Block_t
     int DefaultType = 0;
 //    DefaultSpecial As Integer
     int DefaultSpecial = 0;
+//! EXTRA: second special
+    int DefaultSpecial2 = 0;
 //'for event triggers
 //    TriggerHit As String
     std::string TriggerHit;
@@ -743,6 +745,8 @@ struct Block_t
     Location_t Location;
 //    Special As Integer 'what is in the block?
     int Special = 0;
+//! EXTRA: second special
+    int Special2 = 0;
 //'for the shake effect after hitting ablock
 //    ShakeY As Integer
     int ShakeY = 0;

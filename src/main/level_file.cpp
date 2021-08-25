@@ -246,6 +246,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         block.Location.Width = double(b.w);
         block.Type = int(b.id);
         block.DefaultType = block.Type;
+
         block.Special = int(b.npc_id > 0 ? b.npc_id + 1000 : -1 * b.npc_id);
         if(block.Special == 100)
             block.Special = 1009;
@@ -256,6 +257,12 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         if(block.Special == 105)
             block.Special = 1095;
         block.DefaultSpecial = block.Special;
+
+        block.Special2 = 0;
+        if(b.id == 90 && lvl.meta.RecentFormat == LevelData::SMBX64 && lvl.meta.RecentFormatVersion < 20)
+            block.Special2 = 1; // Restore bricks algorithm for turn blocks for SMBX19 and lower
+        block.DefaultSpecial2 = block.Special2;
+
         block.Invis = b.invisible;
         block.Slippy = b.slippery;
         block.Layer = b.layer;
