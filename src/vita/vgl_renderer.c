@@ -56,7 +56,19 @@ static int UNIFORM_SAMPLER_TEXTURE_INDEX = 0;
 static const GLuint VERTEX_SIZE = VERTEX_POS_SIZE + VERTEX_TEXCOORD_SIZE + VERTEX_COLOR_SIZE;
 
 // ------------------------------------------   SHADERS
-static DrawCall *_vgl_pending_calls; // ARRAY OF PENDING DRAW CALLS (DrawCall _vgl_pending_calls[MAX_VERTICES];)
+
+// ARRAYS OF PENDING DRAW CALLS (DrawCall _vgl_pending_calls[MAX_VERTICES];)
+static char __vgl_repaint_inprog = 0;
+
+static DrawCall *_curBufferA;
+static DrawCall *_curBufferB;
+
+// Current read buffer
+static DrawCall *_vgl_pending_calls; 
+
+// Current write buffer
+static DrawCall *_vgl_current_write_buffer;
+
 static unsigned int _vgl_pending_offset; // INDEX
 static size_t _vgl_pending_total_size; // SIZE IN BYTES
 static unsigned int _DrawCalls = 0; // DRAW CALL COUNT
@@ -191,7 +203,7 @@ static inline DrawCall *_Vita_GetAvailableDrawCall()
         return NULL;
     }
 
-    return (_vgl_pending_calls + _vgl_pending_offset);
+    return (_vgl_current_write_buffer + _vgl_pending_offset);
 }
 
 /**
@@ -248,13 +260,10 @@ _Vita_WriteVertices4xColor(DrawCall *drawCall,
     drawCall->verts[2].s = n_src_x2; // Tex Coord X
     drawCall->verts[2].v = n_src_y; // Tex Coord Y
 
-    if(VERTICES_PER_PRIM == 4)
-    {
-        drawCall->verts[3].x = x + wDst;
-        drawCall->verts[3].y = y + hDst;
-        drawCall->verts[3].s = n_src_x2; // Tex Coord X
-        drawCall->verts[3].v = n_src_y2; // Tex Coord Y
-    }
+    drawCall->verts[3].x = x + wDst;
+    drawCall->verts[3].y = y + hDst;
+    drawCall->verts[3].s = n_src_x2; // Tex Coord X
+    drawCall->verts[3].v = n_src_y2; // Tex Coord Y
 
     drawCall->verts[0]._r = rgba0[0];
     drawCall->verts[0]._g = rgba0[1];
@@ -305,22 +314,22 @@ _Vita_WriteVertices(DrawCall *drawCall,
                               rgba0, rgba0, rgba0, rgba0);
 }
 
-static GLuint Vita_GetVertexBufferID() { return _vertexBufferID; }
+static inline GLuint Vita_GetVertexBufferID() { return _vertexBufferID; }
+static inline unsigned int Vita_GetTotalCalls() {return _DrawCalls;}
+static inline DrawCall *Vita_GetDrawCallsPending() {return _vgl_pending_calls;}
 
-unsigned int Vita_GetTotalCalls()
+static inline void _Vita_SwapBuffers()
 {
-    return _DrawCalls;
+    DrawCall *_curDrawBuffer = _vgl_pending_calls;
+
+    _vgl_pending_calls = _vgl_current_write_buffer;
+    _vgl_current_write_buffer = _curDrawBuffer;
 }
 
-void Vita_ResetTotalCalls()
+static inline void Vita_ResetTotalCalls()
 {
     _DrawCalls = 0;
     _vgl_pending_offset = 0;
-}
-
-DrawCall *Vita_GetDrawCallsPending()
-{
-    return _vgl_pending_calls;
 }
 
 GLuint LoadShader(GLenum type, const char *shaderSrc)
@@ -650,10 +659,10 @@ int Vita_AddShaderPass(char* vert_shader, char* frag_shader, int order)
     {
         _debugPrintf("!!!!! ERROR: Could not link shader.\n");
         GLint length;
-	    glGetProgramiv(_newProgProgram,GL_INFO_LOG_LENGTH,&length);
-	    char* log = (char*)malloc(length);
-		
-	    glGetProgramInfoLog(_newProgProgram,200,&length,log);
+        glGetProgramiv(_newProgProgram,GL_INFO_LOG_LENGTH,&length);
+        char* log = (char*)malloc(length);
+        
+        glGetProgramInfoLog(_newProgProgram,200,&length,log);
 
         _debugPrintf("Error Message: %s\n", log);
 
@@ -824,8 +833,16 @@ int initGLShading()
 int initGLAdv()
 {
     _vgl_pending_total_size = sizeof(DrawCall) * MAX_VERTICES;
-    _vgl_pending_calls = (DrawCall*)malloc(_vgl_pending_total_size);
-    memset(_vgl_pending_calls, 0, _vgl_pending_total_size);
+
+    _curBufferA = (DrawCall*)malloc(_vgl_pending_total_size);
+    _curBufferB = (DrawCall*)malloc(_vgl_pending_total_size);
+
+    memset(_curBufferA, 0, _vgl_pending_total_size);
+    memset(_curBufferB, 0, _vgl_pending_total_size);
+
+    _vgl_pending_calls = _curBufferA;
+    _vgl_current_write_buffer = _curBufferB;
+    
 
     // Generate vbo
     glGenBuffers(1, &_vertexBufferID);
@@ -847,7 +864,11 @@ int initGLAdv()
 
 int deInitGL()
 {
-    free(_vgl_pending_calls);
+    _vgl_pending_calls = 0;
+    _vgl_current_write_buffer = 0;
+
+    free(_curBufferA);
+    free(_curBufferB);
     
 #ifdef VITA
     vglEnd();
@@ -988,28 +1009,29 @@ void Vita_Clear()
  */
 void Vita_Repaint()
 {
+    __vgl_repaint_inprog = 1;
+    _Vita_SwapBuffers();
+
     const GLsizei stride = VERTEX_ATTRIB_TOTAL_SIZE_1; // NOT Tightly packed. 4 verts per GL_TRIANGLE_STRIP
     uint32_t draw_calls = Vita_GetTotalCalls();
+
     if(draw_calls == 0) goto FINISH_DRAWING;
     if(draw_calls > GL_MAX_VERTEX_ATTRIBS)
     {
         _debugPrintf("Too many calls (%d / %d).\n", draw_calls, GL_MAX_VERTEX_ATTRIBS);
     }
 
-    // qsort(_vgl_pending_calls, draw_calls, sizeof(DrawCall), _Vita_SortDrawCalls);
-
+    // Get pointer to the first pending drawcall.
+    struct _DrawCall *calls = Vita_GetDrawCallsPending();
     GLuint _vbo = Vita_GetVertexBufferID(); // Get OpenGL handle to our vbo. (On the GPU)
     
+    // Buffer Data.
     if(_vbo != 0)
     {
-        // Get pointer to the pending drawcalls.
-        struct _DrawCall *calls = Vita_GetDrawCallsPending();
-
         glBindBuffer(GL_ARRAY_BUFFER, _vbo); // Bind our vbo through OpenGL.
         CHECK_GL_ERROR("bind");
 
         glBufferData(GL_ARRAY_BUFFER, draw_calls * sizeof(DrawCall), calls, GL_DYNAMIC_DRAW);
-        // _debugPrintf("Handled %d drawcalls. (%d vertice count)\n", draw_calls, draw_calls * VERTICES_PER_QUAD);
     }
     else return;
 
@@ -1059,7 +1081,7 @@ void Vita_Repaint()
 
     for (i = 0; i < draw_calls; i++)
     {
-        _curDrawCall = _vgl_pending_calls[i];
+        _curDrawCall = *(calls + i);
 
         if(_curDrawCall.verts[0].obj_ptr != NULL)
         {
@@ -1169,6 +1191,7 @@ FINISH_DRAWING:
 #if DEBUG_BUILD
     last_frame_time_s = clock();
 #endif
+    __vgl_repaint_inprog = 0;
 }
 
 #ifdef __cplusplus

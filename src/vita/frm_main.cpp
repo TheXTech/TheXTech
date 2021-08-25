@@ -365,12 +365,13 @@ void FrmMain::freeSDL()
 
     pLogDebug("vglEnd");
     deInitGL();
-    vglEnd();
 
     // TODO: Fix "has not currently been declared"
     // GraphicsHelps::closeFreeImage();
     pLogDebug("<Application Closed>");
     CloseLog();
+
+    
 }
 
 void FrmMain::show()
