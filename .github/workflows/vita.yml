@@ -49,9 +49,7 @@ jobs:
         fi
         # Pull submodules
         git submodule init
-        git submodule update
-        cd ./3rdparty/PGE_File_Formats 
-        git pull
+        git submodule update --recursive --remote
 
     - name: Install Vita SDK
       run: |
