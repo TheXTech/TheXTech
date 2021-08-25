@@ -36,7 +36,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
-
+    
     - name: Set output
       id: vars
       run: echo ::set-output name=short_ref::${GITHUB_REF#refs/*/}
@@ -50,6 +50,7 @@ jobs:
         # Pull submodules
         git submodule init
         git submodule update
+        cd 3rdparty/PGE_File_Formats && git pull
 
     - name: Install Vita SDK
       run: |
