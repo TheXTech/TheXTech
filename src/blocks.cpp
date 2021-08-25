@@ -169,7 +169,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
     b.Invis = false;
 
-    if(HitDown == true && b.Special > 0)
+    if(HitDown && b.Special > 0)
     {
         tempBool = false;
         // auto tmpNumBlocks = numBlock;
@@ -1422,7 +1422,7 @@ void BlockHitHard(int A)
     if(Block[A].Hidden)
         return;
 
-    if(Block[A].Type == 90)
+    if(Block[A].Type == 90 && Block[A].Special2 != 1)
     {
         // Block(A).Hidden = True
         // NewEffect 82, Block(A).Location, , A
@@ -1828,6 +1828,7 @@ void UpdateBlocks()
                                 if(Block[A].Type != Block[A].DefaultType)
                                     NewEffect(10, newLoc(Block[A].Location.X + Block[A].Location.Width / 2.0 - EffectWidth[10] / 2, Block[A].Location.Y + Block[A].Location.Height / 2.0 - EffectHeight[10] / 2));
                                 Block[A].Special = Block[A].DefaultSpecial;
+                                Block[A].Special2 = Block[A].DefaultSpecial2;
                                 Block[A].Type = Block[A].DefaultType;
                             }
 
@@ -1869,7 +1870,7 @@ void UpdateBlocks()
                     Block[iBlock[A]].Type = 283;
                 else if(Block[iBlock[A]].Type == 283)
                     Block[iBlock[A]].Type = 282;
-                if(Block[iBlock[A]].Type == 90 && Block[iBlock[A]].Special == 0)
+                if(Block[iBlock[A]].Type == 90 && Block[iBlock[A]].Special == 0 && Block[iBlock[A]].Special2 != 1)
                 {
                     Block[iBlock[A]].Hidden = true;
                     NewEffect(82, Block[iBlock[A]].Location, 1, iBlock[A]);

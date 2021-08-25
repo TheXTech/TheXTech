@@ -167,6 +167,7 @@ void ShowLayer(std::string LayerName, bool NoEffect)
                 if(Block[A].Layer == LayerName)
                     Block[A].Layer = "Default";
                 Block[A].Special = Block[A].DefaultSpecial;
+                Block[A].Special2 = Block[A].DefaultSpecial2;
                 Block[A].Type = Block[A].DefaultType;
                 syncLayersTrees_Block(A);
             }
