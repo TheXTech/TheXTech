@@ -136,7 +136,11 @@ set_static_lib(AC_ADLMIDI      "${CODECS_LIBRARIES_DIR}" ADLMIDI)
 set_static_lib(AC_OPNMIDI      "${CODECS_LIBRARIES_DIR}" OPNMIDI)
 set_static_lib(AC_TIMIDITYSDL  "${CODECS_LIBRARIES_DIR}" timidity_sdl2)
 set_static_lib(AC_GME          "${CODECS_LIBRARIES_DIR}" gme)
-set_static_lib(AC_LIBXMP       "${CODECS_LIBRARIES_DIR}" xmp)
+if(MSVC) # MSVC-built libxmp has the "libxmp" name
+    set_static_lib(AC_LIBXMP       "${CODECS_LIBRARIES_DIR}" libxmp)
+else()
+    set_static_lib(AC_LIBXMP       "${CODECS_LIBRARIES_DIR}" xmp)
+endif()
 set_static_lib(AC_MODPLUG      "${CODECS_LIBRARIES_DIR}" modplug)
 set_static_lib(AC_ZLIB         "${CODECS_LIBRARIES_DIR}" zlib)
 
