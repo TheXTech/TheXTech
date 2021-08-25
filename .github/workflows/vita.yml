@@ -27,7 +27,7 @@ jobs:
             extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech -DCMAKE_TOOLCHAIN_FILE=/usr/local/vitasdk/share/vita.toolchain.cmake",
             deps_cmdline: "sudo apt-get update -qq && sudo apt-get install -qq cmake ninja-build cmake ninja-build lftp git-core python zip",
             generator: "Ninja",
-            build_type: "MinSizeRel",
+            build_type: "Release",
             executable_name: "thextech",
             assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-adventure-of-demo-assets-full.7z",
             subdir_name: "thextech-vita",
