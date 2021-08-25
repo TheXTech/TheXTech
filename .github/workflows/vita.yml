@@ -36,7 +36,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
-    
+
     - name: Set output
       id: vars
       run: echo ::set-output name=short_ref::${GITHUB_REF#refs/*/}
@@ -107,9 +107,9 @@ jobs:
         mkdir "package/${{ matrix.config.subdir_name }}"
         cp ../changelog.txt "package/${{ matrix.config.subdir_name }}/"
         cp ../LICENSE "package/${{ matrix.config.subdir_name }}/License.TheXTech.txt"
-        cat ../README_VITA.md ../README.md >> "package/${{ matrix.config.subdir_name }}/README.md"
-        cp ../README.RUS.md "package/${{ matrix.config.subdir_name }}/"
-        cp ../README.ESP.md "package/${{ matrix.config.subdir_name }}/"
+        cat ../docs/README_VITA.md ../README.md >> "package/${{ matrix.config.subdir_name }}/README.md"
+        cat ../docs/README_VITA.RUS.md ../README.RUS.md >> "package/${{ matrix.config.subdir_name }}/README.RUS.md"
+        cat ../docs/README_VITA.ESP.md ../README.ESP.md >> "package/${{ matrix.config.subdir_name }}/README.ESP.md"
         cp thextech.vpk "package/${{ matrix.config.subdir_name }}/"
         cd package
         zip -9 -r "thextech-vita-${{ steps.vars.outputs.short_ref }}.zip" "${{ matrix.config.subdir_name }}"
