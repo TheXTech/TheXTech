@@ -39,6 +39,7 @@ Changes for 1.3.5.2
 -Added mask fallback support for custom graphics mask compatibility for old episodes
 -Fixed vanilla bug: Attempt to enter the locked warp or take the star with star-locked warp the game will crash if a level has no BGO at all
 -Make turn blocks (block-90) work as bricks when SMBX19 and lower level file version is open
+-Added a workaround for the yellow platform (NPC-60) at "The Invasion 1" episode where it won't move at level42
 
 Changes for 1.3.5.1
 -Episodes and battle levels lists now loading in the separated thread with a progress showing
