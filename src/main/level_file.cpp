@@ -377,6 +377,15 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
                 npc.Special7 = n.special_data;
         }
 
+        if(npc.Type == 60)
+        {
+            if(lvl.meta.RecentFormat == LevelData::SMBX64 &&
+               lvl.meta.RecentFormatVersion < 9)
+                npc.Special7 = 1.0; // Workaround for yellow platform at The Invasion 1
+            else
+                npc.Special7 = 0.0;
+        }
+
         npc.Generator = n.generator;
         if(npc.Generator)
         {
