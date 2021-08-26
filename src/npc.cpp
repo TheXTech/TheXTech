@@ -2340,7 +2340,7 @@ void NPCSpecial(int A)
             tempBool = false;
             tempBool2 = false;
             tempLocation = npc.Location;
-            tempLocation.Y = npc.Location.Y + 15;
+            tempLocation.Y = npc.Location.Y + 15 + (npc.Type == 60 && fEqual(npc.Special7, 1.0) ? -1 : 0);
             tempLocation.Height = 2;
             tempLocation.X = npc.Location.X + 47;
             tempLocation.Width = 2;
