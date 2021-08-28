@@ -109,15 +109,16 @@ void OpenConfig_preSetup()
         config.beginGroup("sound");
         config.read("disable-sound", g_audioSetup.disableSound, false);
         config.read("sample-rate", g_audioSetup.sampleRate, 44100);
-#ifdef VITA // VITA defaults.
+
+#if VITA // VITA defaults.
         config.read("channels", g_audioSetup.channels, 1);
         config.readEnum("format", g_audioSetup.format, (uint16_t)AUDIO_S16LSB, sampleFormats);
-        config.read("buffer-size", g_audioSetup.bufferSize, 1024);
+        config.read("buffer-size", g_audioSetup.bufferSize, 2048);
 #else
         config.read("channels", g_audioSetup.channels, 2);
         config.readEnum("format", g_audioSetup.format, (uint16_t)AUDIO_F32, sampleFormats);
         config.read("buffer-size", g_audioSetup.bufferSize, 512);
-#endif
+#endif // if VITA
         config.endGroup();
 #endif // #ifndef NO_SDL
 
