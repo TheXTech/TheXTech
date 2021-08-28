@@ -509,21 +509,21 @@ StdPicture FrmMain::LoadPicture(std::string path, std::string maskPath, std::str
     if(!maskPath.empty() && Files::fileExists(maskPath))
     {
 #ifdef DEBUG_BUILD
-        maskMergingTime.start();
+        //maskMergingTime.start();
 #endif
         GraphicsHelps::mergeWithMask(sourceImage, maskPath);
 #ifdef DEBUG_BUILD
-        maskElapsed = maskMergingTime.nanoelapsed();
+        //maskElapsed = maskMergingTime.nanoelapsed();
 #endif
     }
     else if(!maskFallbackPath.empty())
     {
 #ifdef DEBUG_BUILD
-        maskMergingTime.start();
+        //maskMergingTime.start();
 #endif
         GraphicsHelps::mergeWithMask(sourceImage, "", maskFallbackPath);
 #ifdef DEBUG_BUILD
-        maskElapsed = maskMergingTime.nanoelapsed();
+        //maskElapsed = maskMergingTime.nanoelapsed();
 #endif
     }
 
