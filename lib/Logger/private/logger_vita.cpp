@@ -21,6 +21,8 @@
 #include "logger_sets.h"
 #include "logger_private.h"
 #include <cstdio>
+
+#ifdef DEBUG_BUILD
 #include <debugnet.h>
 #ifndef NETDBG_IP_SERVER
 #define NETDBG_IP_SERVER "192.168.0.45"
@@ -30,11 +32,13 @@
 #define NETDBG_PORT_SERVER 18194
 #endif
 
+
 #define VITA_TEMP_BUFFER_SIZE (1024 * 1024)
 
 static char __string_buffer[VITA_TEMP_BUFFER_SIZE];
 static char __string_buffer2[VITA_TEMP_BUFFER_SIZE];
 static int __vita_debug_setup = 0;
+#endif
 
 #ifndef NO_FILE_LOGGING
 //! Output file
@@ -62,6 +66,7 @@ void LogWriter::CloseLog()
 
 void LoggerPrivate_pLogConsole(int level, const char *label, const char *format, va_list arg)
 {
+#ifdef DEBUG_BUILD
     if(__vita_debug_setup == 0)
     {
         debugNetInit(NETDBG_IP_SERVER, NETDBG_PORT_SERVER, DEBUG);
@@ -74,7 +79,7 @@ void LoggerPrivate_pLogConsole(int level, const char *label, const char *format,
     
     // Print to network.
     debugNetPrintf(DEBUG, __string_buffer2);
-
+#endif
     (void)level;
     (void)label;
     (void)format;
