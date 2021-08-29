@@ -153,6 +153,7 @@ if(VITA)
         SceIofilemgr_stub
         SceKernelThreadMgr_stub
         SceKernelDmacMgr_stub
+        SceVshBridge_stub
     )
 
     set(VITA_CMAKE_FLAGS
