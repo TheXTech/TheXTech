@@ -71,7 +71,7 @@ jobs:
         cmake --build build-vita --target all
         cmake --build build-vita --target install
 
-     - name: Install Latest VitaGL
+    - name: Install Latest vitaGL
        run: |
          cd ..
          export PATH=$VITASDK/bin:$PATH
