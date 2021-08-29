@@ -136,6 +136,7 @@ if(VITA)
         ScePgf_stub
         freetype
         png
+        jpeg
         SceCommonDialog_stub
         m
         zip
@@ -155,9 +156,39 @@ if(VITA)
     )
 
     set(VITA_CMAKE_FLAGS
+        # General/TheXTech
         "-DVITA=1"
         "-DENABLE_FPIC=0"
         "-DBUILD_OGG_VORBIS=1"
+        "-DPGE_NO_THREADING=1"
+        "-DLOW_MEM=1"
+        "-DPRELOAD_LEVELS=1"
+        "-DUSE_SYSTEM_SDL2_DEFAULT=ON"
+        "-DUSE_SYSTEM_SDL2=ON"
+        "-DNO_INTPTROC=ON"
+        "-DUSE_STATIC_LIBC=OFF"
+        "-DNO_SCREENSHOT=1"
+
+        # Free Image
+        "-DCMAKE_POSITION_INDEPENDENT_CODE=OFF"
+        "-DFREEIMAGE_SHARED=OFF"
+        "-DFREEIMAGE_USE_SYSTEM_LIBPNG=ON"
+        "-DFREEIMAGE_USE_SYSTEM_LIBJPEG=ON"
+
+        # Audio Mixer
+        "-DPGE_SHARED_SDLMIXER=OFF"
+        "-DPGE_USE_LOCAL_SDL2=OFF"
+        "-DUSE_SYSTEM_SDL2=ON"
+        
+        "-DUSE_GME=ON"
+        "-DUSE_MIDI=ON"
+        "-DADLMIDI_LIBRARY="
+        "-DBUILD_OGG_VORBIS=1"
+        # VitaSDK has local Opus available through vdpm (usually installed as part of a default install)
+        # BUILDS LOCALLY NOW!
+        # "-DBUILD_OPUS=OFF"
+        # "-DLIBOPUSFILE_LIB=${vita_opusfile}"
+        # "-DLIBOPUS_LIB=${vita_opus}"
     )
 
     if(USE_SDL_VID)
