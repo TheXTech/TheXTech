@@ -1568,7 +1568,7 @@ void StartBattleMode()
     PGE_Delay(500);
     ClearLevel();
 
-    if(NumSelectWorld <= 1)
+    if(NumSelectBattle <= 1)
     {
         MessageText = "Can't start battle because of no levels available";
         PauseGame(1);
@@ -1577,13 +1577,13 @@ void StartBattleMode()
     else
     {
         if(selWorld == 1)
-            selWorld = (iRand(NumSelectWorld - 1)) + 2;
+            selWorld = (iRand(NumSelectBattle - 1)) + 2;
     }
 
-    std::string levelPath = SelectWorld[selWorld].WorldPath + SelectWorld[selWorld].WorldFile;
+    std::string levelPath = SelectBattle[selWorld].WorldPath + SelectBattle[selWorld].WorldFile;
     if(!OpenLevel(levelPath))
     {
-        MessageText = fmt::format_ne("ERROR: Can't open \"{0}\": file doesn't exist or corrupted.", SelectWorld[selWorld].WorldFile);
+        MessageText = fmt::format_ne("ERROR: Can't open \"{0}\": file doesn't exist or corrupted.", SelectBattle[selWorld].WorldFile);
         PauseGame(1);
         ErrorQuit = true;
     }

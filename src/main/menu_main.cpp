@@ -309,7 +309,7 @@ void FindLevels()
                 w.WorldName = head.LevelName;
                 if(w.WorldName.empty())
                     w.WorldName = fName;
-                SelectWorld.push_back(w);
+                SelectBattle.push_back(w);
             }
 #ifndef PGE_NO_THREADING
             SDL_AtomicAdd(&loadingProgrss, 1);
@@ -929,7 +929,8 @@ bool mainMenuUpdate()
                     }
                     else
                     {
-                        FindSaves();
+                        if(MenuMode != MENU_BATTLE_MODE)
+                            FindSaves();
 
                         For(A, 1, numCharacters)
                         {
