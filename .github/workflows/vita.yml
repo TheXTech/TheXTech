@@ -81,7 +81,7 @@ jobs:
         make install
 
     - name: Install Latest vitaGL
-       run: |
+      run: |
          cd ..
          export PATH=$VITASDK/bin:$PATH
          git clone https://github.com/Rinnegatamante/vitaGL.git
