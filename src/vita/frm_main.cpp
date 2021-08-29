@@ -305,36 +305,6 @@ bool FrmMain::freeTextureMem() // make it take an amount of memory, someday.....
 {
     pLogDebug("TODO: Implement ::freeTextureMem on PS Vita again.");
     return false;
-
-    // printf("Freeing texture memory...\n");
-    // StdPicture* oldest = nullptr;
-    // uint32_t earliestDraw = 0;
-    // StdPicture* second_oldest = nullptr;
-    // uint32_t second_earliestDraw = 0;
-    // for (StdPicture* poss : m_textureBank)
-    // {
-    //     if (poss->texture && poss->lazyLoaded && (poss->lastDrawFrame+30 < currentFrame))
-    //     {
-    //         if ((oldest == nullptr) || (poss->lastDrawFrame < earliestDraw))
-    //         {
-    //             second_oldest = oldest;
-    //             second_earliestDraw = earliestDraw;
-    //             oldest = poss;
-    //             earliestDraw = poss->lastDrawFrame;
-    //         }
-    //         else if ((second_oldest == nullptr) || (poss->lastDrawFrame < second_earliestDraw))
-    //         {
-    //             second_oldest = poss;
-    //             second_earliestDraw = poss->lastDrawFrame;
-    //         }
-    //     }
-    // }
-    // if (oldest == nullptr) return false;
-    // printf("Clearing %p, %p\n", oldest, second_oldest);
-    // printf("Clearing %s, %s\n", oldest->path.c_str(), (second_oldest) ? second_oldest->path.c_str() : "");
-    // lazyUnLoad(*oldest);
-    // if (second_oldest) lazyUnLoad(*second_oldest);
-    // return true;
 }
 
 void FrmMain::freeSDL()
@@ -400,7 +370,7 @@ void FrmMain::eventResize()
 int FrmMain::setFullScreen(bool fs)
 {
     (void)fs;
-    return 0;
+    return 1;
 }
 
 bool FrmMain::isSdlError()
@@ -615,7 +585,17 @@ StdPicture FrmMain::lazyLoadPicture(std::string path, std::string maskPath, std:
     // TODO: Dump full file for Vita.
     dumpFullFile(target.raw, path);
 
-    // TODO: Check for mask logic.
+    //Apply Alpha mask
+    if(!maskPath.empty() && Files::fileExists(maskPath))
+    {
+        dumpFullFile(target.rawMask, maskPath);
+        target.isMaskPng = false;
+    }
+    else if(!maskFallbackPath.empty())
+    {
+        dumpFullFile(target.rawMask, maskFallbackPath);
+        target.isMaskPng = true;
+    }
 
     target.inited = true;
     target.lazyLoaded = true;
@@ -637,7 +617,6 @@ void FrmMain::loadTexture(StdPicture &target, uint32_t width, uint32_t height, u
 
 
     // Take our raw bytes and load them in as an OpenGL image.
-    GLuint _newTexture = 0;
     glGenTextures(1, &(target.texture));
     target.ex_data.textureID = target.texture;
 
@@ -664,7 +643,7 @@ void FrmMain::loadTexture(StdPicture &target, uint32_t width, uint32_t height, u
         (const GLvoid*)RGBApixels
     );
 
-    if(_newTexture != 0)
+    if(target.texture != 0)
     {
         target.w_orig = target.w;
         target.h_orig = target.h;
@@ -674,10 +653,20 @@ void FrmMain::loadTexture(StdPicture &target, uint32_t width, uint32_t height, u
         target.h_scale = float(height) / float(target.h_orig);
         // pLogDebug("VITA: loaded texture with GLuint %d and size %d x %d.", _newTexture, width, height);
     }
-    else return;
+    else
+    {
+        pLogWarning("Vita Renderer: Failed to load texture (%s)", target.path.c_str());
+        glDeleteTextures(1, &target.texture);
+        target.texture = 0;
+        target.ex_data.textureID = 0;
+        target.inited = false;
+        return;
+    }
 
     num_textures_loaded++;
-    m_textureBank.insert(_newTexture);
+    m_textureBank.insert(target.texture);
+
+    target.inited = true;
 }
 
 void FrmMain::lazyLoad(StdPicture &target)
@@ -754,7 +743,7 @@ void FrmMain::lazyLoad(StdPicture &target)
 
         if(wExceeded || hExceeded)
         {
-            pLogWarning("Texture too big, shrinking.");
+            pLogWarning("!!!!!! TEXTURE (%s) too big, shrinking.", target.path.c_str());
         }
 
         FIBITMAP *d = FreeImage_Rescale(sourceImage, int(w), int(h), FILTER_BOX);
@@ -771,7 +760,6 @@ void FrmMain::lazyLoad(StdPicture &target)
     GLubyte *textura = reinterpret_cast<GLubyte*>(FreeImage_GetBits(sourceImage));
 
     loadTexture(target, w, h, textura);
-    num_textures_loaded++;
 
     GraphicsHelps::closeImage(sourceImage);
 }
@@ -806,7 +794,9 @@ void FrmMain::deleteTexture(StdPicture &tx, bool lazyUnload)
         // Free sprite from memory.
         glDeleteTextures(1, &tx.texture);
         // For good measure.
+        
         tx.texture = 0;
+        
         tx.ex_data.textureID = 0;
     }
 
@@ -995,19 +985,6 @@ void FrmMain::renderTexturePrivate(float xDst, float yDst, float wDst, float hDs
         &tx.ex_data
     );
     return;
-/*
-    Vita_DrawImage(
-        tx,
-        xDst+viewport_offset_x, // x1
-        yDst+viewport_offset_y, // y1
-        wDst, // x2
-        hDst, // y2
-        xSrc, ySrc, // ani_left, ani_top
-        wSrc, hSrc, // ani_right, ani_bottom
-        flip,
-        red, green, blue, alpha);
-*/
-
 }
 
 inline int ROUNDDIV2(int x)

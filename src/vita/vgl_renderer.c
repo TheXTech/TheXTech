@@ -886,6 +886,40 @@ static void glfwError(int id, const char* description)
 }
 #endif
 
+#ifdef VITA
+#include <psp2/kernel/clib.h>
+#include <psp2/io/stat.h>
+
+// as always rinne, thank you for this small code snippet
+// Checks to make sure the uer has the shader compiler installed.
+// If they don't, display a message and exit gracefully from the process.
+static int _userHasLibshaccg()
+{
+    SceCommonDialogConfigParam cmnDlgCfgParam;
+    sceCommonDialogConfigParamInit(&cmnDlgCfgParam);
+
+    SceIoStat st1, st2;
+    if (!(sceIoGetstat("ur0:/data/libshacccg.suprx", &st1) >= 0 || sceIoGetstat("ur0:/data/external/libshacccg.suprx", &st2) >= 0)) {
+        SceMsgDialogUserMessageParam msg_param;
+        sceClibMemset(&msg_param, 0, sizeof(SceMsgDialogUserMessageParam));
+        msg_param.buttonType = SCE_MSG_DIALOG_BUTTON_TYPE_OK;
+        msg_param.msg = (const SceChar8*)"Error: Runtime shader compiler (libshacccg.suprx) is not installed.";
+        _debugPrintf("\n\n\nError: Runtime shader compiler (libshacccg.suprx) is not installed.\n\n\n");
+        SceMsgDialogParam param;
+        sceMsgDialogParamInit(&param);
+        param.mode = SCE_MSG_DIALOG_MODE_USER_MSG;
+        param.userMsgParam = &msg_param;
+        sceMsgDialogInit(&param);
+        while (sceMsgDialogGetStatus() != SCE_COMMON_DIALOG_STATUS_FINISHED) {
+            vglSwapBuffers(GL_TRUE);
+        }
+        sceKernelExitProcess(0);
+    }
+
+    return 1; // TRUE
+}
+#endif
+
 int initGL(void (*dbgPrintFn)(const char*, ...))
 {
     if(dbgPrintFn == NULL)
@@ -917,6 +951,7 @@ int initGL(void (*dbgPrintFn)(const char*, ...))
                            8 * 1024 * 1024, 
                            4 * 1024 * 1024, 
                            SCE_GXM_MULTISAMPLE_NONE);
+    _userHasLibshaccg();
 #endif
 #ifndef VITA
     glewExperimental = 1;
@@ -1177,7 +1212,7 @@ FINISH_DRAWING:
 #if DEBUG_BUILD
     if(last_printf_time == 0)
         last_printf_time = clock();
-    if(clock() - last_printf_time > (2 * CLOCKS_PER_SEC))
+    if(clock() - last_printf_time > (6 * CLOCKS_PER_SEC))
     {
         last_printf_time = clock();
         _debugPrintf("Draw Calls: %d; Texture Swaps: %d; Frame Time Ticks: %lu (%.6f s, %.4f ms)\n", draw_calls, totalTextureSwaps, last_frame_time_consumed_s, ((float)clock() - (float)last_frame_time_s) / CLOCKS_PER_SEC, (((float)clock() - (float)last_frame_time_s) / CLOCKS_PER_SEC) * 1000.f);
