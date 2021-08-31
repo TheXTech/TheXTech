@@ -122,7 +122,7 @@ public class HIDDeviceManager {
                         // If our context is an activity, exit rather than crashing when we can't
                         // call our native functions.
                         Activity activity = (Activity)context;
-
+        
                         activity.finish();
                     }
                     catch (ClassCastException cce) {
@@ -134,7 +134,7 @@ public class HIDDeviceManager {
 
             return;
         }
-
+        
         HIDDeviceRegisterCallback();
 
         mSharedPreferences = mContext.getSharedPreferences("hidapi", Context.MODE_PRIVATE);
@@ -200,7 +200,7 @@ public class HIDDeviceManager {
                 Log.i(TAG,"  Interface protocol: " + mUsbInterface.getInterfaceProtocol());
                 Log.i(TAG,"  Endpoint count: " + mUsbInterface.getEndpointCount());
 
-                // Get endpoint details
+                // Get endpoint details 
                 for (int epi = 0; epi < mUsbInterface.getEndpointCount(); epi++)
                 {
                     UsbEndpoint mEndpoint = mUsbInterface.getEndpoint(epi);
@@ -276,6 +276,7 @@ public class HIDDeviceManager {
             0x15e4, // Numark
             0x162e, // Joytech
             0x1689, // Razer Onza
+            0x1949, // Lab126, Inc.
             0x1bad, // Harmonix
             0x24c6, // PowerA
         };
@@ -548,7 +549,7 @@ public class HIDDeviceManager {
             for (HIDDevice device : mDevicesById.values()) {
                 device.setFrozen(frozen);
             }
-        }
+        }        
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////
