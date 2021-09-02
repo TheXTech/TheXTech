@@ -4376,6 +4376,31 @@ void UpdateNPCs()
                     }
                     else
                     {
+                        int shootStep = 10;
+                        int shootStepSpin = 20;
+                        int shootStepCar = 5;
+                        bool keepProjectile = false;
+
+                        int shootBehavior = int(NPC[A].Special7);
+
+                        switch(shootBehavior)
+                        {
+                        default:
+                        case 0:
+                            // SMBX 1.2.1 and newer (shoot fast, don't shoot while projectile)
+                            break;
+                        case 1:
+                            // SMBX 1.2 (shoot fast, keep shoot while projectile)
+                            keepProjectile = true;
+                            break;
+                        case 2:
+                            // SMBX older than 1.2 (shoot slow, keep shoot while projectile)
+                            keepProjectile = true;
+                            shootStep = 5;
+                            shootStepSpin = 10;
+                            break;
+                        }
+
                         if(NPC[A].HoldingPlayer > 0)
                         {
                             if(Player[NPC[A].HoldingPlayer].SpinJump)
@@ -4383,21 +4408,19 @@ void UpdateNPCs()
                                 if(NPC[A].Direction != Player[NPC[A].HoldingPlayer].SpinFireDir)
                                 {
                                     if(Player[NPC[A].HoldingPlayer].Effect == 0)
-                                        NPC[A].Special = NPC[A].Special + 20;
+                                        NPC[A].Special += shootStepSpin;
                                 }
                             }
                             else
                             {
                                 if(Player[NPC[A].HoldingPlayer].Effect == 0)
-                                    NPC[A].Special = NPC[A].Special + 10;
+                                    NPC[A].Special += shootStep;
                             }
                         }
                         else if(NPC[A].standingOnPlayer > 0)
-                            NPC[A].Special = NPC[A].Special + 5;
-                        else if(NPC[A].Projectile)
-                        {
-                            // .Special = .Special + 10
-                        }
+                            NPC[A].Special += shootStepCar;
+                        else if(NPC[A].Projectile && keepProjectile)
+                            NPC[A].Special += shootStep;
                     }
 
                     if(NPC[A].Special >= 200)

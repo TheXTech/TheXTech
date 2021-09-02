@@ -368,6 +368,16 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             npc.DefaultSpecial = int(npc.Special);
         }
 
+        if(npc.Type == 22) // billy gun
+        {
+            if(lvl.meta.RecentFormat == LevelData::SMBX64 && lvl.meta.RecentFormatVersion < 28)
+                npc.Special7 = 2.0; // SMBX 1.1.x and 1.0.x behavior
+            else if(lvl.meta.RecentFormat == LevelData::SMBX64 && lvl.meta.RecentFormatVersion < 51)
+                npc.Special7 = 1.0; // SMBX 1.2 behavior
+            else
+                npc.Special7 = n.special_data; // SMBX 1.2.1 and newer behavior, customizable behavior
+        }
+
         if(npc.Type == 86)
         {
             if(lvl.meta.RecentFormat == LevelData::SMBX64 &&
