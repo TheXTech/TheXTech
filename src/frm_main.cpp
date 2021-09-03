@@ -1323,8 +1323,6 @@ void FrmMain::drawBatteryStatus()
 
 #ifndef __ANDROID__
     const bool isFullScreen = resChanged;
-#else
-    const bool isFullScreen = true;
 #endif
 
     if(g_videoSettings.batteryStatus == BATTERY_STATUS_OFF)
@@ -1356,10 +1354,19 @@ void FrmMain::drawBatteryStatus()
     if(segments == 0)
         segments = 2;
 
-    if((g_videoSettings.batteryStatus == BATTERY_STATUS_ALWAYS_ON) ||
-       (g_videoSettings.batteryStatus == BATTERY_STATUS_ANY_WHEN_LOW && isLow) ||
-       (g_videoSettings.batteryStatus == BATTERY_STATUS_FULLSCREEN_WHEN_LOW && isLow && isFullScreen) ||
-       (g_videoSettings.batteryStatus == BATTERY_STATUS_FULLSCREEN_ON && isFullScreen))
+    bool showBattery = false;
+
+    showBattery |= (g_videoSettings.batteryStatus == BATTERY_STATUS_ALWAYS_ON);
+    showBattery |= (g_videoSettings.batteryStatus == BATTERY_STATUS_ANY_WHEN_LOW && isLow);
+#ifndef __ANDROID__
+    showBattery |= (g_videoSettings.batteryStatus == BATTERY_STATUS_FULLSCREEN_WHEN_LOW && isLow && isFullScreen);
+    showBattery |= (g_videoSettings.batteryStatus == BATTERY_STATUS_FULLSCREEN_ON && isFullScreen);
+#else
+    showBattery |= (g_videoSettings.batteryStatus == BATTERY_STATUS_FULLSCREEN_WHEN_LOW && isLow);
+    showBattery |= (g_videoSettings.batteryStatus == BATTERY_STATUS_FULLSCREEN_ON);
+#endif
+
+    if(showBattery)
     {
         setTargetTexture();
 
