@@ -274,6 +274,16 @@ int main(int argc, char**argv)
         TCLAP::SwitchArg switchSpeedRunSemiTransparent(std::string(), "speed-run-semitransparent",
                                                        "Make the speed-runner mode timer be drawn transparently", false);
         TCLAP::SwitchArg switchDisplayControls(std::string(), "show-controls", "Display current controller state while the game process", false);
+        TCLAP::ValueArg<unsigned int> showBatteryStatus(std::string(), "show-battery-status",
+                                                   "Display the battery status indicator (if available):\n"
+                                                   "  0 - Never show [Default]\n"
+                                                   "  1 - Show on fullscreen only when battery low\n"
+                                                   "  2 - Show when battery low\n"
+                                                   "  3 - Show always on fullscreen only\n"
+                                                   "  4 - Always show",
+                                                    false, 0u,
+                                                   "0, 1, 2, 3, or 4",
+                                                   cmd);
 
         TCLAP::SwitchArg switchVerboseLog(std::string(), "verbose", "Enable log output into the terminal", false);
 
@@ -395,6 +405,9 @@ int main(int argc, char**argv)
         setup.speedRunnerMode = speedRunMode.getValue();
         setup.speedRunnerSemiTransparent = switchSpeedRunSemiTransparent.getValue();
         setup.showControllerState = switchDisplayControls.getValue();
+
+        if(showBatteryStatus.getValue() > 0 && showBatteryStatus.getValue() <= 4)
+            g_videoSettings.batteryStatus = showBatteryStatus.getValue();
 
         setup.recordReplay = recordReplay.getValue();
         setup.recordRecord = recordRecord.getValue();

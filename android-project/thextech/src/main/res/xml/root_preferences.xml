@@ -62,6 +62,16 @@
             android:defaultValue="false"
             android:key="enable_max_fps"
             android:title="@string/setup_max_framerate_mode" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="setup_show_controller_state"
+            android:title="@string/setup_show_controller_state_label" />
+        <ListPreference
+            android:defaultValue="0"
+            android:entries="@array/batteryStatusShow"
+            android:entryValues="@array/batteryStatusShowValues"
+            android:key="setup_show_battery_status"
+            android:title="@string/setup_show_battery_status_label" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/setup_speedrunner">
         <ListPreference

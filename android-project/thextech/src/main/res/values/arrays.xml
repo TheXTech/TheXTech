@@ -34,6 +34,17 @@
         <item>2</item>
     </string-array>
 
+    <string-array name="batteryStatusShow">
+        <item>Never show</item>
+        <item>Show when low battery</item>
+        <item>Show always</item>
+    </string-array>
+    <string-array name="batteryStatusShowValues">
+        <item>0</item>
+        <item>2</item>
+        <item>4</item>
+    </string-array>
+
     <string-array name="feedBackStrength">
         <item>0.1</item>
         <item>0.2</item>

@@ -15,4 +15,9 @@
         <item>Стиль Nintendo/Xbox (A/B/X/Y)</item>
         <item>Стиль PlayStation (X/O/D/A)</item>
     </string-array>
+    <string-array name="batteryStatusShow">
+        <item>Скрывать</item>
+        <item>Показывать при слабом заряде</item>
+        <item>Показывать всегда</item>
+    </string-array>
 </resources>

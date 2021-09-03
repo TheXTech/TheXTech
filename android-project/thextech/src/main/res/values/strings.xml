@@ -27,4 +27,6 @@
     <string name="setup_feedback_vibration_length">Vibration length</string>
     <string name="setup_feedback">Feedback</string>
     <string name="touchscreen_vibration_test_label">Test feedback</string>
+    <string name="setup_show_battery_status_label">Device battery status</string>
+    <string name="setup_show_controller_state_label">Show a game controller state</string>
 </resources>
