@@ -410,6 +410,7 @@ std::string AppPathManager::assetsRoot()
 {
     if(!m_customAssetsRoot.empty())
         return m_customAssetsRoot;
+
 #if defined(FIXED_ASSETS_PATH) // Fixed assets path, for the rest of UNIX-like OS packages
     std::string assets(FIXED_ASSETS_PATH);
     if(!assets.empty() && assets.back() != '/')
