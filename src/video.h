@@ -12,6 +12,15 @@ enum RenderMode_t
     RENDER_ACCELERATED_VSYNC
 };
 
+enum BatteryStatus_t
+{
+    BATTERY_STATUS_OFF = 0,
+    BATTERY_STATUS_FULLSCREEN_WHEN_LOW,
+    BATTERY_STATUS_ANY_WHEN_LOW,
+    BATTERY_STATUS_FULLSCREEN_ON,
+    BATTERY_STATUS_ALWAYS_ON,
+};
+
 enum ScaleModes
 {
     SCALE_DYNAMIC_INTEGER = -2,
@@ -34,10 +43,12 @@ extern struct VideoSettings_t
 {
     //! Render mode
     int    renderMode = RENDER_ACCELERATED;
-    //! THe currently running render mode
+    //! The currently running render mode
     int    renderModeObtained = RENDER_AUTO;
     //! Render scaling mode
     int    scaleMode = SCALE_DYNAMIC_NEAREST;
+    //! Device battery status indicator
+    int    batteryStatus = BATTERY_STATUS_OFF;
     //! Allow game to work when window is not active
     bool   allowBgWork = false;
     //! Allow background input handling for game controllers

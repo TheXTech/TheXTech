@@ -55,6 +55,15 @@ void OpenConfig_preSetup()
         {"2", RENDER_ACCELERATED_VSYNC}
     };
 
+    const IniProcessing::StrEnumMap batteryStatus =
+    {
+        {"off", BATTERY_STATUS_OFF},
+        {"fullscreen-low", BATTERY_STATUS_FULLSCREEN_WHEN_LOW},
+        {"low", BATTERY_STATUS_ANY_WHEN_LOW},
+        {"fullscreen", BATTERY_STATUS_FULLSCREEN_ON},
+        {"on", BATTERY_STATUS_ALWAYS_ON}
+    };
+
 #ifndef NO_SDL
     const IniProcessing::StrEnumMap sampleFormats =
     {
@@ -103,6 +112,7 @@ void OpenConfig_preSetup()
         config.read("show-fps", g_videoSettings.showFrameRate, false);
         config.read("scale-down-all-textures", g_videoSettings.scaleDownAllTextures, false);
         config.read("display-controllers", g_drawController, false);
+        config.readEnum("battery-status", g_videoSettings.batteryStatus, (int)BATTERY_STATUS_OFF, batteryStatus);
         config.endGroup();
 
 #ifndef NO_SDL
@@ -316,6 +326,15 @@ void SaveConfig()
             {RENDER_ACCELERATED_VSYNC, "vsync"},
         };
 
+        std::unordered_map<int, std::string> batteryStatus =
+        {
+            {BATTERY_STATUS_OFF, "off"},
+            {BATTERY_STATUS_FULLSCREEN_WHEN_LOW, "fullscreen-low"},
+            {BATTERY_STATUS_ANY_WHEN_LOW, "low"},
+            {BATTERY_STATUS_FULLSCREEN_ON, "fullscreen"},
+            {BATTERY_STATUS_ALWAYS_ON, "on"}
+        };
+
         config.setValue("render", renderMode[g_videoSettings.renderMode]);
         config.setValue("background-work", g_videoSettings.allowBgWork);
         config.setValue("background-controller-input", g_videoSettings.allowBgControllerInput);
@@ -323,6 +342,7 @@ void SaveConfig()
         config.setValue("show-fps", g_videoSettings.showFrameRate);
         config.setValue("scale-down-all-textures", g_videoSettings.scaleDownAllTextures);
         config.setValue("display-controllers", g_drawController);
+        config.setValue("battery-status", batteryStatus[g_videoSettings.batteryStatus]);
     }
     config.endGroup();
 #   endif // !defined(__3DS__)

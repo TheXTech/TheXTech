@@ -273,8 +273,12 @@ public:
 #endif
 
 private:
-#ifndef NO_SCREENSHOT
 
+#ifndef __EMSCRIPTEN__
+    void drawBatteryStatus();
+#endif
+
+#ifndef NO_SCREENSHOT
     struct PGE_GL_shoot
     {
         FrmMain *me = nullptr;
