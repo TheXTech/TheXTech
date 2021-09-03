@@ -1313,7 +1313,7 @@ void FrmMain::drawBatteryStatus()
     int bh = 22;
     int bx = ScreenW - (bw + 8);
     int by = 24;
-    int segmentsFullLen = 15;
+    int segmentsFullLen = 14;
     int segments = 0;
     float alhpa = 0.7f;
     float alhpaB = 0.8f;
