@@ -217,6 +217,7 @@ static int s_joyDeviceAdd(int i)
         bool exist1 = s_joystickControls[0].find(guidStr) != s_joystickControls[0].end();
         bool exist2 = s_joystickControls[1].find(guidStr) != s_joystickControls[1].end();
         auto &j = s_joystickControls[0][guidStr];
+        int power = SDL_JoystickCurrentPowerLevel(joy.joystick);
 
 //            j.hwGUID = guidStr;
         j.isValid = true;
@@ -239,6 +240,30 @@ static int s_joyDeviceAdd(int i)
             pLogDebug("Supported by the game controller interface!");
         if(j.isHaptic)
             pLogDebug("Is the haptic device!");
+        switch(power)
+        {
+        case SDL_JOYSTICK_POWER_UNKNOWN:
+            pLogDebug("Power level: <unknown>");
+            break;
+        case SDL_JOYSTICK_POWER_EMPTY:
+            pLogDebug("Power level: Empty battery");
+            break;
+        case SDL_JOYSTICK_POWER_LOW:
+            pLogDebug("Power level: Low battery");
+            break;
+        case SDL_JOYSTICK_POWER_MEDIUM:
+            pLogDebug("Power level: Medium battery");
+            break;
+        case SDL_JOYSTICK_POWER_FULL:
+            pLogDebug("Power level: Full battery");
+            break;
+        case SDL_JOYSTICK_POWER_WIRED:
+            pLogDebug("Power level: <wired gamepad>");
+            break;
+        case SDL_JOYSTICK_POWER_MAX:
+            pLogDebug("Power level: <max>");
+            break;
+        }
 
         if(j.isGameController)
         {

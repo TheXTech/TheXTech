@@ -23,6 +23,7 @@
 #include "globals.h"
 #include "graphics.h"
 #include "compat.h"
+#include "../control/joystick.h"
 
 #include "gameplay_timer.h"
 
@@ -103,10 +104,20 @@ void speedRun_renderControls(int player, int screenZ)
     if(player < 1 || player > 2)
         return;
 
+    int jNum = useJoystick[player] - 1;
+
+    // Controller
     int x = 4;
     int y = ScreenH - 34;
     int w = 76;
     int h = 30;
+
+    // Battery status
+    int bx = x + w + 4;
+    int by = y + 4;
+    int bw = 40;
+    int bh = 22;
+
     bool drawLabel = false;
 
     if(screenZ >= 0)
@@ -114,6 +125,8 @@ void speedRun_renderControls(int player, int screenZ)
         auto &scr = vScreen[screenZ];
         x = scr.Left > 0 ? (int)(scr.Left + scr.Width) - (w + 4) : (int)scr.Left + 4;
         y = (int)(scr.Top + scr.Height) - 34;
+        bx = scr.Left > 0 ? x - (bw + 4) : (x + w + 4);
+        by = y + 4;
     }
     else
     {
@@ -135,9 +148,11 @@ void speedRun_renderControls(int player, int screenZ)
         {
         case 1:
             x = 4;
+            bx = x + w + 4;
             break;
         case 2:
             x = (ScreenW - (w + 4));
+            bx = x - (bw + 4);
             break;
         }
 #endif
@@ -204,6 +219,33 @@ void speedRun_renderControls(int player, int screenZ)
 
     if(drawLabel)
         SuperPrint(fmt::format_ne("P{0}", player), 3, x + 22, y + 2, 1.f, 1.f, 1.f, 0.5f);
+
+    if(jNum >= 0 && jNum < joyCount())
+    {
+        int power = joyGetPowerLevel(jNum);
+
+        if(power != SDL_JOYSTICK_POWER_UNKNOWN && power != SDL_JOYSTICK_POWER_WIRED)
+        {
+            frmMain.renderRect(bx, by, bw - 4, bh, 0.f, 0.f, 0.f, alhpa, true);//Edge
+            frmMain.renderRect(bx + 2, by + 2, bw - 8, bh - 4, r, g, b, alhpa, true);//Box
+            frmMain.renderRect(bx + 36, by + 6, 4, 10, 0.f, 0.f, 0.f, alhpa, true);//Edge
+            frmMain.renderRect(bx + 34, by + 8, 4, 6, r, g, b, alhpa, true);//Box
+
+            switch(power)
+            {
+            case SDL_JOYSTICK_POWER_FULL:
+                frmMain.renderRect(bx + 24, by + 4, 8, 14, 0.f, 0.f, 0.f, alhpaB, true); // fallthrough
+            case SDL_JOYSTICK_POWER_MEDIUM:
+                frmMain.renderRect(bx + 14, by + 4, 8, 14, 0.f, 0.f, 0.f, alhpaB, true); // fallthrough
+            case SDL_JOYSTICK_POWER_LOW:
+                frmMain.renderRect(bx + 4, by + 4, 8, 14, 0.f, 0.f, 0.f, alhpaB, true);
+                break;
+            case SDL_JOYSTICK_POWER_EMPTY:
+                frmMain.renderRect(bx + 4, by + 4, 8, 14, 1.f, 0.f, 0.f, alhpaB / 2.f, true);
+                break;
+            }
+        }
+    }
 }
 
 #undef bool2alpha
