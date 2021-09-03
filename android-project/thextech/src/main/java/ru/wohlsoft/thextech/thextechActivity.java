@@ -85,6 +85,16 @@ public class thextechActivity extends SDLActivity
         if(setup.getBoolean("enable_max_fps", false))
             args.add("--max-fps");
 
+        if(setup.getBoolean("setup_show_controller_state", false))
+            args.add("--show-controls");
+
+        int showBatteryStatus = Integer.parseInt(setup.getString("setup_show_battery_status", "0"));
+        if(showBatteryStatus > 0)
+        {
+            args.add("--show-battery-status");
+            args.add(String.valueOf(showBatteryStatus));
+        }
+
         int speedRunMode = Integer.parseInt(setup.getString("setup_speedRunMode", "0"));
         if(speedRunMode > 0)
         {

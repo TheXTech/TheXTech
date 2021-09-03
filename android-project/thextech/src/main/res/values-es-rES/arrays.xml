@@ -15,4 +15,9 @@
         <item>Estilo Nintendo/Xbox (A/B/X/Y)</item>
         <item>Estilo PlayStation (X/O/D/A)</item>
     </string-array>
+    <string-array name="batteryStatusShow">
+        <item>[X]Never show</item>
+        <item>[X]Show when low battery</item>
+        <item>[X]Show always</item>
+    </string-array>
 </resources>

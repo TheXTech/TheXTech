@@ -15,4 +15,9 @@
         <item>字母形式 (A/B/X/Y)</item>
         <item>图形形式 (X/O/D/A)</item>
     </string-array>
+    <string-array name="batteryStatusShow">
+        <item>[X]Never show</item>
+        <item>[X]Show when low battery</item>
+        <item>[X]Show always</item>
+    </string-array>
 </resources>
