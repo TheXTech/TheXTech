@@ -175,7 +175,9 @@ public:
 #endif
 
 private:
+
 #ifndef __EMSCRIPTEN__
+    void drawBatteryStatus();
 
     struct PGE_GL_shoot
     {

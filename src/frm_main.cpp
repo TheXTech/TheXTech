@@ -659,6 +659,7 @@ void FrmMain::repaint()
 
 #ifndef __EMSCRIPTEN__
     processRecorder();
+    drawBatteryStatus();
 #endif
 
     // Get the size of surface where to draw the scene
@@ -1195,6 +1196,76 @@ void FrmMain::makeShot()
 #endif
 
 }
+
+#ifndef __EMSCRIPTEN__
+void FrmMain::drawBatteryStatus()
+{
+    int secs, pct, status;
+    // Battery status
+    int bw = 40;
+    int bh = 22;
+    int bx = ScreenW - (bw + 8);
+    int by = 24;
+    int segmentsFullLen = 15;
+    int segments = 0;
+    float alhpa = 0.7f;
+    float alhpaB = 0.8f;
+    float r = 0.4f, g = 0.4f, b = 0.4f;
+    float br = 0.0f, bg = 0.0f, bb = 0.0f;
+    bool isLow = false;
+
+#ifndef __ANDROID__
+    const bool isFullScreen = resChanged;
+#else
+    const bool isFullScreen = true;
+#endif
+
+    if(g_videoSettings.batteryStatus == BATTERY_STATUS_OFF)
+        return;
+
+    status = SDL_GetPowerInfo(&secs, &pct);
+
+    if(status == SDL_POWERSTATE_NO_BATTERY || status == SDL_POWERSTATE_UNKNOWN)
+        return;
+
+    isLow = (pct <= 15);
+
+    if(status == SDL_POWERSTATE_CHARGED)
+    {
+        br = 0.f;
+        bg = 1.f;
+        bb = 0.f;
+    }
+    else if(status == SDL_POWERSTATE_CHARGING)
+    {
+        br = 1.f;
+        bg = 0.64f;
+        bb = 0.f;
+    }
+    else if(isLow)
+        br = 1.f;
+
+    segments = ((pct * segmentsFullLen) / 100) * 2;
+    if(segments == 0)
+        segments = 2;
+
+    if((g_videoSettings.batteryStatus == BATTERY_STATUS_ALWAYS_ON) ||
+       (g_videoSettings.batteryStatus == BATTERY_STATUS_ANY_WHEN_LOW && isLow) ||
+       (g_videoSettings.batteryStatus == BATTERY_STATUS_FULLSCREEN_WHEN_LOW && isLow && isFullScreen) ||
+       (g_videoSettings.batteryStatus == BATTERY_STATUS_FULLSCREEN_ON && isFullScreen))
+    {
+        setTargetTexture();
+
+        frmMain.renderRect(bx, by, bw - 4, bh, 0.f, 0.f, 0.f, alhpa, true);//Edge
+        frmMain.renderRect(bx + 2, by + 2, bw - 8, bh - 4, r, g, b, alhpa, true);//Box
+        frmMain.renderRect(bx + 36, by + 6, 4, 10, 0.f, 0.f, 0.f, alhpa, true);//Edge
+        frmMain.renderRect(bx + 34, by + 8, 4, 6, r, g, b, alhpa, true);//Box
+        frmMain.renderRect(bx + 4, by + 4, segments, 14, br, bg, bb, alhpaB / 2.f, true);//Level
+
+        setTargetScreen();
+    }
+}
+#endif
 
 static std::string shoot_getTimedString(std::string path, const char *ext = "png")
 {
