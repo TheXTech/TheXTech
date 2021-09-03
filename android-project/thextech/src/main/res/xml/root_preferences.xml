@@ -49,6 +49,9 @@
             android:entryValues="@array/feedBackLengthValues"
             android:key="touchscreen_vibration_length"
             android:title="@string/setup_feedback_vibration_length" />
+        <Preference
+            android:key="touchscreen_vibration_test"
+            android:title="@string/touchscreen_vibration_test_label" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/setup_display_cat">
         <CheckBoxPreference
