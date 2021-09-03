@@ -27,4 +27,5 @@
     <string name="setup_feedback_enable_vibration">Enable vibration</string>
     <string name="setup_feedback_vibration_strength">Vibration strength</string>
     <string name="setup_feedback_vibration_length">Vibration length</string>
+    <string name="touchscreen_vibration_test_label">Test feedback</string>
 </resources>

@@ -27,4 +27,5 @@
     <string name="setup_feedback_enable_vibration">Включить вибрацию</string>
     <string name="setup_feedback_vibration_strength">Сила вибрации</string>
     <string name="setup_feedback_vibration_length">Длина вибрации</string>
+    <string name="touchscreen_vibration_test_label">Тест обратной отдачи</string>
 </resources>
