@@ -55,9 +55,11 @@ private:
      * @brief Makes settings path if not exists
      */
     static void initSettingsPath();
-    //! Full path to settings INI file
+    //! Location for writable settings and game-saves
     static std::string m_settingsPath;
+    //! Location for writable user directory
     static std::string m_userPath;
+    //! Location for read-only custom assets root
     static std::string m_customAssetsRoot;
 #ifdef __APPLE__
     static std::string m_userDataRoot; // A game media root at home directory
