@@ -1333,7 +1333,7 @@ void FrmMain::drawBatteryStatus()
     if(status == SDL_POWERSTATE_NO_BATTERY || status == SDL_POWERSTATE_UNKNOWN)
         return;
 
-    isLow = (pct <= 15);
+    isLow = (pct <= 35);
 
     if(status == SDL_POWERSTATE_CHARGED)
     {
