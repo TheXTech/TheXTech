@@ -41,6 +41,7 @@ public:
     static std::string screenshotsDir(); // Must be writable
     static std::string gifRecordsDir(); // Must be writable
     static std::string gameSaveRootDir(); // Must be writable
+    static std::string gameplayRecordsRootDir(); // Must be writable
     static std::string userWorldsRootDir(); // Read-Only, appears at writable directory
     static std::string userBattleRootDir(); // Read-Only, appears at writable directory
 #ifdef __3DS__
@@ -60,14 +61,17 @@ private:
      * @brief Makes settings path if not exists
      */
     static void initSettingsPath();
+
 #ifdef __3DS__
     // load any user worlds from .romfs files in the userDir.
     static void findUserWorlds(DirMan userDir);
     static std::vector<std::string> m_worldRootDirs;
 #endif
-    //! Full path to settings INI file
+    //! Location for writable settings and game-saves
     static std::string m_settingsPath;
+    //! Location for writable user directory
     static std::string m_userPath;
+    //! Location for read-only custom assets root
     static std::string m_customAssetsRoot;
 #ifdef __APPLE__
     static std::string m_userDataRoot; // A game media root at home directory
