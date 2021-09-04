@@ -150,6 +150,7 @@ public class thextechActivity extends SDLActivity
         super.onCreate(savedInstanceState);
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setSdCardPath(Environment.getExternalStorageDirectory().getAbsolutePath());
+        setAppDataPath(getApplication().getApplicationContext().getFilesDir().getAbsolutePath());
 
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
@@ -170,6 +171,7 @@ public class thextechActivity extends SDLActivity
     public static native void setScreenSize(double screenSize, double width, double height);
     public static native void setTouchPadStyle(int style);
     public static native void setSdCardPath(String path);
+    public static native void setAppDataPath(String path);
     public static native void setGameAssetsPath(String path);
     // Touch-screen controller feeback
     public static native void setVibrationEnabled(boolean enabled);
