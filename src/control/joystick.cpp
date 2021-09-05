@@ -757,6 +757,7 @@ static bool bindJoystickKey(SDL_Joystick *joy, KM_Key &k)
             k.val = val;
             k.id = i;
             k.type = (int)ConJoystick_t::JoyButton;
+            D_pLogDebug("Joystick button %d", i);
             return true;
         }
     }
@@ -770,6 +771,7 @@ static bool bindJoystickKey(SDL_Joystick *joy, KM_Key &k)
             k.val = val;
             k.id = i;
             k.type = (int)ConJoystick_t::JoyHat;
+            D_pLogDebug("Joystick hat state %d", val);
             return true;
         }
     }
@@ -787,6 +789,7 @@ static bool bindJoystickKey(SDL_Joystick *joy, KM_Key &k)
             k.val = val;
             k.id = i;
             k.type = (int)ConJoystick_t::JoyAxis;
+            D_pLogDebug("Joystick axis %d value %d", i, val);
             return true;
         }
     }
@@ -802,6 +805,7 @@ static bool bindJoystickKey(SDL_Joystick *joy, KM_Key &k)
             k.val = dx;
             k.id = i;
             k.type = (int)ConJoystick_t::JoyBallX;
+            D_pLogDebug("Joystick ball %d value %d dx", i, dx);
             return true;
         }
         else if(dy != 0)
@@ -809,6 +813,7 @@ static bool bindJoystickKey(SDL_Joystick *joy, KM_Key &k)
             k.val = dy;
             k.id = i;
             k.type = (int)ConJoystick_t::JoyBallY;
+            D_pLogDebug("Joystick ball %d value %d dy", i, dy);
             return true;
         }
     }
