@@ -630,7 +630,7 @@ bool AppPathManager::checkPortable()
 
 bool AppPathManager::userDirIsAvailable()
 {
-    return (m_userPath != ApplicationPathSTD);
+    return (m_userPath != assetsRoot());
 }
 
 #ifdef __EMSCRIPTEN__
