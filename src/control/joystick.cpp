@@ -27,6 +27,8 @@
 
 #include <unordered_map>
 #include <Logger/logger.h>
+#include <AppPath/app_path.h>
+#include <Utils/files.h>
 
 #include "../globals.h"
 #include "../sound.h"
@@ -1002,6 +1004,25 @@ int joyInitJoysticks()
 {
 #ifdef USE_TOUCHSCREEN_CONTROLLER
     s_touch.init();
+#endif
+
+#if SDL_VERSION_ATLEAST(2, 0, 10)
+    std::string dbAssets = AppPathManager::assetsRoot() + "gamecontrollerdb.txt";
+    std::string dbUserDir = AppPathManager::userAppDirSTD() + "gamecontrollerdb.txt";
+
+    if(Files::fileExists(dbAssets))
+    {
+        pLogDebug("Loading game controller mapping file: %s", dbAssets.c_str());
+        if(SDL_GameControllerAddMappingsFromFile(dbAssets.c_str()) < 0)
+            pLogWarning("Failed to load game controller mapping [%s]: %s", dbAssets.c_str(), SDL_GetError());
+    }
+
+    if(AppPathManager::userDirIsAvailable() && Files::fileExists(dbUserDir))
+    {
+        pLogDebug("Loading game controller mapping file: %s", dbUserDir.c_str());
+        if(SDL_GameControllerAddMappingsFromFile(dbUserDir.c_str()) < 0)
+            pLogWarning("Failed to load game controller mapping [%s]: %s", dbUserDir.c_str(), SDL_GetError());
+    }
 #endif
 
     SDL_JoystickEventState(SDL_ENABLE);
