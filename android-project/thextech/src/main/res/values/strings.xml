@@ -22,7 +22,7 @@
     <string name="managePermExplainTitle">All files access permission is required</string>
     <string name="managePermExplainText">This game uses resources (such as levels, episodes, graphics, music, sounds, configs, etc.) that were placed by the user on the local store directly. This concept allows users to modify and extend the content for their own purposes like that was done at the desktop version of this game. Unfortunately, Android 11+ doesn\'t give the way to grant individual read permission for the specified directory instead of a single file. To run this game you should grand access to all files for the game because of explained reasons.</string>
     <string name="setup_assets_path_label">Change the resources absolute path</string>
-    <string name="launcher_no_resources_question">Download the game resources to start the game. Do you want to select an already unpacked folder\?</string>
+    <string name="launcher_no_resources_question">Whoops, the game can\'t start because the game resources directory is not selected. This game requires you to manually download and unpack the archive with game assets, and then select the directory that contains them. If you downloaded and unpacked them already, please select the directory that contains the game assets. Do you want to select the assets directory for now\?</string>
     <string name="setup_feedback_enable_vibration">Enable vibration</string>
     <string name="setup_feedback_vibration_strength">Vibration strength</string>
     <string name="setup_feedback_vibration_length">Vibration length</string>
