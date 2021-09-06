@@ -47,6 +47,27 @@ static SDL_INLINE bool isWorldMusicNotSame(WorldMusic_t &mus)
     return ret;
 }
 
+static SDL_INLINE bool s_worldUpdateMusic(const Location_t &loc)
+{
+    bool ret = false;
+
+    for(auto *t : treeWorldMusicQuery(loc, false))
+    {
+        WorldMusic_t &mus = *t;
+        if(CheckCollision(loc, mus.Location))
+        {
+            if(isWorldMusicNotSame(mus))
+            {
+                curWorldMusicFile = mus.MusicFile;
+                StartMusic(mus.Type);
+                ret = true;
+            }
+        }
+    }
+
+    return ret;
+}
+
 void WorldLoop()
 {
     bool musicReset = false;
@@ -74,19 +95,7 @@ void WorldLoop()
     {
         if(LevelBeatCode > 0)
         {
-            //for(A = 1; A <= numWorldMusic; A++)
-            for(auto *t : treeWorldMusicQuery(WorldPlayer[1].Location, false))
-            {
-                WorldMusic_t &mus = *t;
-                if(CheckCollision(WorldPlayer[1].Location, mus.Location))
-                {
-                    if(isWorldMusicNotSame(mus))
-                    {
-                        curWorldMusicFile = mus.MusicFile;
-                        StartMusic(mus.Type);
-                    }
-                }
-            }
+            s_worldUpdateMusic(WorldPlayer[1].Location);
 
             for(A = 1; A <= 4; A++)
             {
@@ -102,19 +111,7 @@ void WorldLoop()
         }
         else if(LevelBeatCode == -1)
         {
-            //for(A = 1; A <= numWorldMusic; A++)
-            for(auto *t : treeWorldMusicQuery(WorldPlayer[1].Location, false))
-            {
-                WorldMusic_t &mus = *t;
-                if(CheckCollision(WorldPlayer[1].Location, mus.Location))
-                {
-                    if(isWorldMusicNotSame(mus))
-                    {
-                        curWorldMusicFile = mus.MusicFile;
-                        StartMusic(mus.Type);
-                    }
-                }
-            }
+            s_worldUpdateMusic(WorldPlayer[1].Location);
 
             //for(A = 1; A <= numWorldLevels; A++)
             for(auto *t : treeWorldLevelQuery(WorldPlayer[1].Location, false))
@@ -193,10 +190,10 @@ void WorldLoop()
     if(WorldPlayer[1].Move == 0)
     {
         tempLocation = WorldPlayer[1].Location;
-        tempLocation.Width = tempLocation.Width - 8;
-        tempLocation.Height = tempLocation.Height - 8;
-        tempLocation.X = tempLocation.X + 4;
-        tempLocation.Y = tempLocation.Y + 4;
+        tempLocation.Width -= 8;
+        tempLocation.Height -= 8;
+        tempLocation.X += 4;
+        tempLocation.Y += 4;
         WorldPlayer[1].LevelName.clear();
 
 #ifndef NO_SDL
@@ -468,20 +465,8 @@ void WorldLoop()
 
         WorldPlayer[1].LastMove = 0;
 
-        //for(A = 1; A <= numWorldMusic; A++)
-        for(auto *t : treeWorldMusicQuery(tempLocation, true))
-        {
-            WorldMusic_t &mus = *t;
-            if(CheckCollision(WorldPlayer[1].Location, mus.Location))
-            {
-                if(isWorldMusicNotSame(mus))
-                {
-                    curWorldMusicFile = mus.MusicFile;
-                    StartMusic(mus.Type);
-                    musicReset = false;
-                }
-            }
-        }
+        if(s_worldUpdateMusic(WorldPlayer[1].Location))
+            musicReset = false;
 
         if(musicReset) // Resume the last playing music after teleportation
         {
@@ -569,11 +554,11 @@ void LevelPath(const WorldLevel_t &Lvl, int Direction, bool Skp)
     if(Direction == 1 || Direction == 5)
     {
         tempLocation = Lvl.Location;
-        tempLocation.X = tempLocation.X + 4;
-        tempLocation.Y = tempLocation.Y + 4;
-        tempLocation.Width = tempLocation.Width - 8;
-        tempLocation.Height = tempLocation.Height - 8;
-        tempLocation.Y = tempLocation.Y - 32;
+        tempLocation.X +=  4;
+        tempLocation.Y +=  4;
+        tempLocation.Width -= 8;
+        tempLocation.Height -=  8;
+        tempLocation.Y -= 32;
 
         //for(A = 1; A <= numWorldPaths; A++)
         for(auto *t : treeWorldPathQuery(tempLocation, false))
@@ -593,11 +578,11 @@ void LevelPath(const WorldLevel_t &Lvl, int Direction, bool Skp)
     if(Direction == 2 || Direction == 5)
     {
         tempLocation = Lvl.Location;
-        tempLocation.X = tempLocation.X + 4;
-        tempLocation.Y = tempLocation.Y + 4;
-        tempLocation.Width = tempLocation.Width - 8;
-        tempLocation.Height = tempLocation.Height - 8;
-        tempLocation.X = tempLocation.X - 32;
+        tempLocation.X += 4;
+        tempLocation.Y += 4;
+        tempLocation.Width -= 8;
+        tempLocation.Height -= 8;
+        tempLocation.X -= 32;
 
         //for(A = 1; A <= numWorldPaths; A++)
         for(auto *t : treeWorldPathQuery(tempLocation, false))
@@ -617,11 +602,11 @@ void LevelPath(const WorldLevel_t &Lvl, int Direction, bool Skp)
     if(Direction == 3 || Direction == 5)
     {
         tempLocation = Lvl.Location;
-        tempLocation.X = tempLocation.X + 4;
-        tempLocation.Y = tempLocation.Y + 4;
-        tempLocation.Width = tempLocation.Width - 8;
-        tempLocation.Height = tempLocation.Height - 8;
-        tempLocation.Y = tempLocation.Y + 32;
+        tempLocation.X += 4;
+        tempLocation.Y += 4;
+        tempLocation.Width -= 8;
+        tempLocation.Height -= 8;
+        tempLocation.Y += 32;
 
         //for(A = 1; A <= numWorldPaths; A++)
         for(auto *t : treeWorldPathQuery(tempLocation, false))
@@ -641,11 +626,11 @@ void LevelPath(const WorldLevel_t &Lvl, int Direction, bool Skp)
     if(Direction == 4 || Direction == 5)
     {
         tempLocation = Lvl.Location;
-        tempLocation.X = tempLocation.X + 4;
-        tempLocation.Y = tempLocation.Y + 4;
-        tempLocation.Width = tempLocation.Width - 8;
-        tempLocation.Height = tempLocation.Height - 8;
-        tempLocation.X = tempLocation.X + 32;
+        tempLocation.X += 4;
+        tempLocation.Y += 4;
+        tempLocation.Width -= 8;
+        tempLocation.Height -= 8;
+        tempLocation.X += 32;
 
         //for(A = 1; A <= numWorldPaths; A++)
         for(auto *t : treeWorldPathQuery(tempLocation, false))
@@ -730,10 +715,10 @@ void PathPath(WorldPath_t &Pth, bool Skp)
 
     Location_t tempLocation;
     tempLocation = Pth.Location;
-    tempLocation.X = tempLocation.X + 4;
-    tempLocation.Y = tempLocation.Y + 4;
-    tempLocation.Width = tempLocation.Width - 8;
-    tempLocation.Height = tempLocation.Height - 8;
+    tempLocation.X += 4;
+    tempLocation.Y += 4;
+    tempLocation.Width -= 8;
+    tempLocation.Height -= 8;
 
     //for(A = 1; A <= numScenes; A++)
     for(auto *t : treeWorldSceneQuery(tempLocation, true))
