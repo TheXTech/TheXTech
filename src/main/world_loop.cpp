@@ -52,6 +52,7 @@ void WorldLoop()
     larr2.reserve(20);
     marr.reserve(20);
 
+    bool musicReset = false;
     Location_t tempLocation;
     int A = 0;
     int B = 0;
@@ -438,6 +439,7 @@ void WorldLoop()
                     }
                     else if(int(level.WarpX) != -1 || int(level.WarpY) != -1)
                     {
+                        musicReset = true;
                         StopMusic();
                         PlaySound(SFX_LevelSelect);
                         frmMain.setTargetTexture();
@@ -475,8 +477,15 @@ void WorldLoop()
                 {
                     curWorldMusicFile = mus.MusicFile;
                     StartMusic(mus.Type);
+                    musicReset = false;
                 }
             }
+        }
+
+        if(musicReset) // Resume the last playing music after teleportation
+        {
+            StartMusic(curWorldMusic);
+            // musicReset = false;
         }
     }
     else if(WorldPlayer[1].Move == 1)

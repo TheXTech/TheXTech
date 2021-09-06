@@ -28,6 +28,7 @@ Changes for 1.3.5.2
 -Added device battery status displaying at the right-top corner when enabled at the settings
 -Fixed an inability to save the game when game assets were stored at SD Card on an Android device
 -Added support for gamecontrollerdb.txt at the assets root and at the user directory
+-Fixed vanilla bug: World map music won't resume after going through the warp that leads to no music points or the music point with the same song
 
 Changes for 1.3.5.1
 -Episodes and battle levels lists now loading in the separated thread with a progress showing
