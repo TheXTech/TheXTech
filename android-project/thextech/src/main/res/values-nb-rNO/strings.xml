@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="managePermExplainText">På Android 11+ trengs må full filtilgang innvilges til spillressursmappen (nivåer, episoder, grafikk, musikk, lyder, oppsett, osv.) som er å finne i lokallager.</string>
+    <string name="launcher_no_resources_question">Last ned spillressursene for å starte spillet. Ønsker du å velge en allerede utpakket mappe\?</string>
+    <string name="settings_enable_frameskip">Hopp over rammer</string>
+    <string name="setup_assets_path_label">Endre absolutt sti for ressurser</string>
+    <string name="managePermExplainTitle">Full filtilgang kreves</string>
+    <string name="setup_touchpad_style">Kontrollerstil</string>
+    <string name="setup_speedrunner">Hastighetsfullfører</string>
+    <string name="setup_sr_stopwatchSemiTransparent">Gjør stoppeklokke half-gjennomsiktig</string>
+    <string name="setup_sr_speedrunMode">Hastighetsfullføringsmodus</string>
+    <string name="setup_feedback_vibration_length">Varighet</string>
+    <string name="setup_feedback_vibration_strength">Styrke</string>
+    <string name="setup_feedback_enable_vibration">Vibrasjon</string>
+    <string name="setup_show_controller_state_label">Vis spillkontrollertilstand</string>
+    <string name="setup_show_battery_status_label">Enhetsbatteristatus</string>
+    <string name="touchscreen_vibration_test_label">Test-tilbakemelding</string>
+    <string name="setup_feedback">Tilbakemelding</string>
+    <string name="setup_touchscreen_mode">Kontrollermodus</string>
+    <string name="setup_max_framerate_mode">Tak for rammetakt</string>
+    <string name="setup_show_framerate">Vis rammetaktsverdi</string>
+    <string name="setup_touchscreen_alwaysshow">Vis pekeskjermskontrolleren ved programstart</string>
+    <string name="setup_touchscreen_controller_enable">Bruk pekeskjermskontroller</string>
+    <string name="setup_display_cat">Skjerm</string>
+    <string name="setup_control_cat">Pekeskjermskontroller</string>
+    <string name="setup_general_cat">Generelt</string>
+    <string name="setup_disable_sound">Skru av lyd</string>
+    <string name="game_logo_label">Spill-logo</string>
+    <string name="settings_button">Innstillinger</string>
+    <string name="start_game_button">Start spill</string>
+    <string name="title_activity_game_settings">Spillinnstillinger</string>
+    <string name="app_name">X-Tech-motoren</string>
+</resources>
