@@ -39,6 +39,14 @@
 #include "../pseudo_vb.h"
 
 
+static SDL_INLINE bool isWorldMusicNotSame(WorldMusic_t &mus)
+{
+    bool ret = false;
+    ret |= (curWorldMusic != mus.Type);
+    ret |= (mus.Type == CustomWorldMusicId() && curWorldMusicFile != mus.MusicFile);
+    return ret;
+}
+
 void WorldLoop()
 {
     // Keep them static to don't re-alloc them for every iteration
@@ -84,8 +92,11 @@ void WorldLoop()
                 WorldMusic_t &mus = *t;
                 if(CheckCollision(WorldPlayer[1].Location, mus.Location))
                 {
-                    if(curWorldMusic != mus.Type)
+                    if(isWorldMusicNotSame(mus))
+                    {
+                        curWorldMusicFile = mus.MusicFile;
                         StartMusic(mus.Type);
+                    }
                 }
             }
 
@@ -110,8 +121,11 @@ void WorldLoop()
                 WorldMusic_t &mus = *t;
                 if(CheckCollision(WorldPlayer[1].Location, mus.Location))
                 {
-                    if(curWorldMusic != mus.Type)
+                    if(isWorldMusicNotSame(mus))
+                    {
+                        curWorldMusicFile = mus.MusicFile;
                         StartMusic(mus.Type);
+                    }
                 }
             }
 
@@ -472,8 +486,7 @@ void WorldLoop()
             WorldMusic_t &mus = *t;
             if(CheckCollision(WorldPlayer[1].Location, mus.Location))
             {
-                if((curWorldMusic != mus.Type) ||
-                   (mus.Type == CustomWorldMusicId() && curWorldMusicFile != mus.MusicFile))
+                if(isWorldMusicNotSame(mus))
                 {
                     curWorldMusicFile = mus.MusicFile;
                     StartMusic(mus.Type);
