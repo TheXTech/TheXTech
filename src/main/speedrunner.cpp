@@ -111,8 +111,7 @@ void speedRun_renderControls(int player, int screenZ, int align)
     int jNum = useJoystick[player] - 1;
 
     // Battery status
-    int bx = x + w + 4;
-    int by = y + 4;
+    int bx, by;
     int bw = 40;
     int bh = 22;
 
