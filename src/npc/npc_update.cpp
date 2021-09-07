@@ -968,6 +968,7 @@ void UpdateNPCs()
             if(NPC[A].TimeLeft < 1)
                 Deactivate(A);
             NPC[A].TimeLeft = NPC[A].TimeLeft - 1;
+            // results in TimeLeft = -1 after deactivation
             if(NPC[A].Effect == 0)
             {
 
