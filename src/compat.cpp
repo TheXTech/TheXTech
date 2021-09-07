@@ -49,6 +49,7 @@ static void compatInit(Compatibility_t &c)
         }
     }
 
+    // 1.3.4
     c.enable_last_warp_hub_resume = true;
     c.fix_platforms_acceleration = true;
     c.fix_pokey_collapse = true;
@@ -63,15 +64,20 @@ static void compatInit(Compatibility_t &c)
     c.fix_skull_raft = true;
     c.fix_peach_escape_shell_surf = true;
     c.fix_keyhole_framerate = true;
+    // 1.3.5
     c.fix_link_clowncar_fairy = true;
     c.fix_dont_switch_player_by_clowncar = true;
     c.enable_multipoints = true;
     c.fix_autoscroll_speed = false;
+    // 1.3.5.1
     c.fix_blooper_stomp_effect = true;
     c.keep_bullet_bill_dir = true;
     c.fix_pswitch_dragon_coin = true;
+    // 1.3.5.2
     c.fix_swooper_start_while_inactive = true;
     c.fix_FreezeNPCs_no_reset = true;
+    // 1.3.6
+
 
     if(s_compatLevel >= COMPAT_SMBX2) // Make sure that bugs were same as on SMBX2 Beta 4 on this moment
     {
@@ -85,23 +91,29 @@ static void compatInit(Compatibility_t &c)
         c.enable_climb_bgo_layer_move = false;
         c.fix_skull_raft = false;
         c.fix_peach_escape_shell_surf = false;
+        // 1.3.5
         c.fix_keyhole_framerate = false;
         c.fix_link_clowncar_fairy = false;
         c.fix_dont_switch_player_by_clowncar = false;
         c.enable_multipoints = false;
         c.fix_autoscroll_speed = false;
+        // 1.3.5.1
         c.fix_blooper_stomp_effect = false;
         c.keep_bullet_bill_dir = false;
         c.fix_pswitch_dragon_coin = false;
+        // 1.3.5.2
         c.fix_swooper_start_while_inactive = false;
         c.fix_FreezeNPCs_no_reset = false;
+        // 1.3.6
     }
 
     if(s_compatLevel >= COMPAT_SMBX13) // Strict vanilla SMBX
     {
+        // 1.3.4
         c.fix_player_filter_bounce = false;
         c.fix_player_downward_clip = false;
         c.fix_player_clip_wall_at_npc = false;
+        // 1.3.6
     }
 
     c.speedrun_stop_timer_by = Compatibility_t::SPEEDRUN_STOP_NONE;
@@ -146,6 +158,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
     compat.beginGroup("compatibility");
     if(s_compatLevel < COMPAT_SMBX2) // Ignore options are still not been fixed at the SMBX2
     {
+        // 1.3.4
         compat.read("enable-last-warp-hub-resume", c.enable_last_warp_hub_resume, c.enable_last_warp_hub_resume);
         compat.read("fix-platform-acceleration", c.fix_platforms_acceleration, c.fix_platforms_acceleration);
         compat.read("fix-pokey-collapse", c.fix_pokey_collapse, c.fix_pokey_collapse);
@@ -157,19 +170,25 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         compat.read("fix-skull-raft", c.fix_skull_raft, c.fix_skull_raft);
         compat.read("fix-peach-escape-shell-surf", c.fix_peach_escape_shell_surf, c.fix_peach_escape_shell_surf);
         compat.read("fix-keyhole-framerate", c.fix_keyhole_framerate, c.fix_keyhole_framerate);
+        // 1.3.5
         compat.read("fix-link-clowncar-fairy", c.fix_link_clowncar_fairy, c.fix_link_clowncar_fairy);
         compat.read("fix-dont-switch-player-by-clowncar", c.fix_dont_switch_player_by_clowncar, c.fix_dont_switch_player_by_clowncar);
         compat.read("enable-multipoints", c.enable_multipoints, c.enable_multipoints);
         compat.read("fix-autoscroll-speed", c.fix_autoscroll_speed, c.fix_autoscroll_speed);
+        // 1.3.5.1
         compat.read("fix-blooper-stomp-effect", c.fix_blooper_stomp_effect, c.fix_blooper_stomp_effect);
         compat.read("keep-bullet-bill-direction", c.keep_bullet_bill_dir, c.keep_bullet_bill_dir);
         compat.read("fix-pswitch-dragon-coin", c.fix_pswitch_dragon_coin, c.fix_pswitch_dragon_coin);
+        // 1.3.5.2
         compat.read("fix-swooper-start-while-inactive", c.fix_swooper_start_while_inactive, c.fix_swooper_start_while_inactive);
         compat.read("fix-FreezeNPCs-no-reset", c.fix_FreezeNPCs_no_reset, c.fix_FreezeNPCs_no_reset);
+        // 1.3.6
     }
+    // 1.3.4
     compat.read("fix-player-filter-bounce", c.fix_player_filter_bounce, c.fix_player_filter_bounce);
     compat.read("fix-player-downward-clip", c.fix_player_downward_clip, c.fix_player_downward_clip);
     compat.read("fix-npc-downward-clip", c.fix_npc_downward_clip, c.fix_npc_downward_clip);
+    // 1.3.6
     compat.endGroup();
 }
 

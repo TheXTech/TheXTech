@@ -23,6 +23,7 @@
 
 struct Compatibility_t
 {
+    // 1.3.4
     bool enable_last_warp_hub_resume;
     bool fix_pokey_collapse;
     bool fix_platforms_acceleration;
@@ -37,15 +38,20 @@ struct Compatibility_t
     bool fix_skull_raft;
     bool fix_peach_escape_shell_surf;
     bool fix_keyhole_framerate;
+    // 1.3.5
     bool fix_link_clowncar_fairy;
     bool fix_dont_switch_player_by_clowncar;
     bool enable_multipoints;
     bool fix_autoscroll_speed;
+    // 1.3.5.1
     bool fix_blooper_stomp_effect;
     bool keep_bullet_bill_dir;
     bool fix_pswitch_dragon_coin;
+    // 1.3.5.2
     bool fix_swooper_start_while_inactive;
     bool fix_FreezeNPCs_no_reset;
+    // 1.3.6
+
 
     // SpeedRun section
     enum
