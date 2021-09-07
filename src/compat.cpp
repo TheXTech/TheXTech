@@ -75,7 +75,7 @@ static void compatInit(Compatibility_t &c)
     c.fix_pswitch_dragon_coin = true;
     // 1.3.5.2
     c.fix_swooper_start_while_inactive = true;
-    c.fix_FreezeNPCs_no_reset = true;
+    c.fix_FreezeNPCs_no_reset = false;
     // 1.3.6
 
 
