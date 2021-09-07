@@ -2477,20 +2477,28 @@ void NPCSpecial(int A)
             npc.Location.SpeedY = 0;
         }
 
+        // this could probably be wrapped in the conditional as well,
+        //   but I will leave it out in case the game's semantics depend
+        //   on it in some corner case.
         Block[npc.tempBlock].Location = npc.Location;
         Block[npc.tempBlock].Location.X = Block[npc.tempBlock].Location.X + npc.Location.SpeedX;
 
         if(npc.Location.SpeedY < 0)
             Block[npc.tempBlock].Location.Y += npc.Location.SpeedY;
 
-        // necessary for tree update
-        Block[npc.tempBlock].LocationInLayer = Block[npc.tempBlock].Location;
-        if(Block[npc.tempBlock].LayerIndex != -1)
+        // only update the quadtree if the tempBlock exists
+        if(npc.tempBlock > 0)
         {
-            Block[npc.tempBlock].LocationInLayer.X -= Layer[Block[npc.tempBlock].LayerIndex].OffsetX;
-            Block[npc.tempBlock].LocationInLayer.Y -= Layer[Block[npc.tempBlock].LayerIndex].OffsetY;
+            // necessary for tree update
+            Block[npc.tempBlock].LocationInLayer = Block[npc.tempBlock].Location;
+            if(Block[npc.tempBlock].LayerIndex != -1)
+            {
+                Block[npc.tempBlock].LocationInLayer.X -= Layer[Block[npc.tempBlock].LayerIndex].OffsetX;
+                Block[npc.tempBlock].LocationInLayer.Y -= Layer[Block[npc.tempBlock].LayerIndex].OffsetY;
+            }
+
+            treeBlockUpdateLayer(Block[npc.tempBlock].LayerIndex, &Block[npc.tempBlock]);
         }
-        treeBlockUpdateLayer(Block[npc.tempBlock].LayerIndex, &Block[npc.tempBlock]);
 
         if(npc.Type == 179)
         {
