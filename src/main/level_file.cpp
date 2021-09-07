@@ -463,7 +463,8 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         }
         else
         {
-            npc.TimeLeft = 0;
+            // TimeLeft = -1 is the outcome of a normal Deactivate call followed by TimeLeft -= 1
+            npc.TimeLeft = -1;
             npc.Active = false;
             npc.JustActivated = 0;
             npc.Reset[1] = true;

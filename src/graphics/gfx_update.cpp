@@ -727,7 +727,7 @@ void UpdateGraphics(bool skipRepaint)
                     NPC_Draw_Queue_p.add(A);
 
                     if(g_compatibility.NPC_activate_mode != NPC_activate_modes::onscreen
-                        && !NPC[A].Active)
+                        && !NPC[A].Active && !FreezeNPCs)
                     {
                         NPCFrames(A);
                     }
