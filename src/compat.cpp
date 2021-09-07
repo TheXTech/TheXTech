@@ -80,6 +80,7 @@ static void compatInit(Compatibility_t &c)
     c.free_level_res = true;
     c.free_world_res = true;
     c.NPC_activate_mode = NPC_activate_modes::smart;
+    c.fix_FreezeNPCs_no_reset = true;
 
     if(s_compatLevel >= COMPAT_SMBX2) // Make sure that bugs were same as on SMBX2 Beta 4 on this moment
     {
@@ -105,6 +106,7 @@ static void compatInit(Compatibility_t &c)
         c.free_level_res = false;
         c.free_world_res = false;
         c.NPC_activate_mode = NPC_activate_modes::onscreen;
+        c.fix_FreezeNPCs_no_reset = false;
     }
 
     if(s_compatLevel >= COMPAT_SMBX13) // Strict vanilla SMBX
@@ -175,6 +177,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         compat.read("keep-bullet-bill-direction", c.keep_bullet_bill_dir, c.keep_bullet_bill_dir);
         compat.read("fix-pswitch-dragon-coin", c.fix_pswitch_dragon_coin, c.fix_pswitch_dragon_coin);
         compat.read("fix-swooper-start-while-inactive", c.fix_swooper_start_while_inactive, c.fix_swooper_start_while_inactive);
+        compat.read("fix-FreezeNPCs-no-reset", c.fix_FreezeNPCs_no_reset, c.fix_FreezeNPCs_no_reset);
         compat.read("free-level-res", c.free_level_res, c.free_level_res);
         compat.read("free-world-res", c.free_world_res, c.free_world_res);
         const IniProcessing::StrEnumMap activModes =
