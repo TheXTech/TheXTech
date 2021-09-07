@@ -480,7 +480,7 @@ void MenuLoop()
     if(mainMenuUpdate())
         return;
 
-    if(g_gameInfo.introEnableActivity)
+    if(g_gameInfo.introEnableActivity && g_gameInfo.introMaxPlayersCount > 0)
         updateIntroLevelActivity();
     else
     {
