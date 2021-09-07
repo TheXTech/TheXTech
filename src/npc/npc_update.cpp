@@ -154,7 +154,11 @@ void UpdateNPCs()
             NPC[A].JustActivated = 0;
             NPC[A].Chat = false;
             if(NPC[A].TimeLeft == 0)
+            {
                 Deactivate(A);
+                if(g_compatibility.fix_FreezeNPCs_no_reset)
+                    NPC[A].TimeLeft = -1;
+            }
             if(NPC[A].Killed > 0)
             {
                 if(NPC[A].Location.SpeedX == 0.0)

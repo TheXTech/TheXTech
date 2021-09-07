@@ -71,6 +71,7 @@ static void compatInit(Compatibility_t &c)
     c.keep_bullet_bill_dir = true;
     c.fix_pswitch_dragon_coin = true;
     c.fix_swooper_start_while_inactive = true;
+    c.fix_FreezeNPCs_no_reset = true;
 
     if(s_compatLevel >= COMPAT_SMBX2) // Make sure that bugs were same as on SMBX2 Beta 4 on this moment
     {
@@ -93,6 +94,7 @@ static void compatInit(Compatibility_t &c)
         c.keep_bullet_bill_dir = false;
         c.fix_pswitch_dragon_coin = false;
         c.fix_swooper_start_while_inactive = false;
+        c.fix_FreezeNPCs_no_reset = false;
     }
 
     if(s_compatLevel >= COMPAT_SMBX13) // Strict vanilla SMBX
@@ -163,6 +165,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         compat.read("keep-bullet-bill-direction", c.keep_bullet_bill_dir, c.keep_bullet_bill_dir);
         compat.read("fix-pswitch-dragon-coin", c.fix_pswitch_dragon_coin, c.fix_pswitch_dragon_coin);
         compat.read("fix-swooper-start-while-inactive", c.fix_swooper_start_while_inactive, c.fix_swooper_start_while_inactive);
+        compat.read("fix-FreezeNPCs-no-reset", c.fix_FreezeNPCs_no_reset, c.fix_FreezeNPCs_no_reset);
     }
     compat.read("fix-player-filter-bounce", c.fix_player_filter_bounce, c.fix_player_filter_bounce);
     compat.read("fix-player-downward-clip", c.fix_player_downward_clip, c.fix_player_downward_clip);
