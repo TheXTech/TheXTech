@@ -1,2 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="setup_feedback">Réactions</string>
+    <string name="setup_show_controller_state_label">Afficher l\'état d\'une manette de jeu</string>
+    <string name="setup_show_battery_status_label">État de la batterie de l\'appareil</string>
+    <string name="touchscreen_vibration_test_label">Tester les réactions</string>
+    <string name="setup_feedback_vibration_length">Durée des vibrations</string>
+    <string name="setup_feedback_vibration_strength">Intensité des vibrations</string>
+    <string name="setup_feedback_enable_vibration">Activer les vibrations</string>
+    <string name="launcher_no_resources_question">Le jeu nécessite un paquet de ressources. Veuillez télécharger les ressources du jeu et les décompresser dans le répertoire de votre choix. Voulez-vous sélectionner un dossier déjà décompressé \?</string>
+    <string name="setup_assets_path_label">Modifier le chemin absolu des ressources</string>
+    <string name="managePermExplainText">Ce jeu utilise des ressources (comme des niveaux, des épisodes, des graphiques, de la musique, des sons, des configurations, etc.) qui ont été placées par l\'utilisateur directement sur le magasin local. Ce concept permet aux utilisateurs de modifier et d\'étendre le contenu pour leurs propres besoins, comme cela a été fait pour la version de bureau de ce jeu. Malheureusement, Android 11+ ne permet pas d\'accorder des droits de lecture individuels pour le répertoire spécifié au lieu d\'un seul fichier. Pour exécuter ce jeu, vous devez avoir accès à tous les fichiers du jeu pour les raisons expliquées.</string>
+    <string name="managePermExplainTitle">L\'autorisation d\'accès à tous les fichiers est nécessaire</string>
+    <string name="setup_touchpad_style">Style de manette</string>
+    <string name="setup_speedrunner">Speed-runneur</string>
+    <string name="setup_sr_stopwatchSemiTransparent">Rendre le chronomètre semi-transparent</string>
+    <string name="setup_sr_speedrunMode">Mode speed-run</string>
+    <string name="setup_touchscreen_mode">Mode manette</string>
+    <string name="setup_max_framerate_mode">Mode de fréquence d\'images maximal</string>
+    <string name="setup_show_framerate">Afficher la valeur de la fréquence d\'images</string>
+    <string name="setup_touchscreen_alwaysshow">Afficher la manette tactile au démarrage</string>
+    <string name="setup_touchscreen_controller_enable">Utiliser la manette tactile</string>
+    <string name="setup_display_cat">Affichage</string>
+    <string name="setup_control_cat">Manette tactile</string>
+    <string name="setup_general_cat">Général</string>
+    <string name="setup_disable_sound">Désactiver le son</string>
+    <string name="settings_enable_frameskip">Activer le saut de trame</string>
+    <string name="game_logo_label">Logo du jeu</string>
+    <string name="settings_button">Paramètres</string>
+    <string name="start_game_button">Démarrer le jeu</string>
+    <string name="title_activity_game_settings">Paramètres du jeu</string>
+    <string name="app_name">The X-Tech Engine</string>
+</resources>
