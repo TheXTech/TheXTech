@@ -28,19 +28,20 @@ class AppPathManager
 {
 public:
     static void initAppPath();
-    static std::string settingsFileSTD();
-    static std::string settingsControlsFileSTD();
-    static std::string userAppDirSTD();
-    static std::string assetsRoot();
+
+    static std::string settingsFileSTD(); // Must be writable
+    static std::string settingsControlsFileSTD(); // Must be writable
+    static std::string userAppDirSTD(); // Must be writable
+    static std::string assetsRoot(); // Read-Only
     static void setAssetsRoot(const std::string &root);
-    static std::string logsDir();
-    static std::string languagesDir();
-    static std::string screenshotsDir();
-    static std::string gifRecordsDir();
-    static std::string gameSaveRootDir();
-    static std::string gameplayRecordsRootDir();
-    static std::string userWorldsRootDir();
-    static std::string userBattleRootDir();
+    static std::string logsDir(); // Must be writable
+    static std::string languagesDir(); // Read-Only
+    static std::string screenshotsDir(); // Must be writable
+    static std::string gifRecordsDir(); // Must be writable
+    static std::string gameSaveRootDir(); // Must be writable
+    static std::string userWorldsRootDir(); // Read-Only, appears at writable directory
+    static std::string userBattleRootDir(); // Read-Only, appears at writable directory
+
     static void install();
     static bool checkPortable();
     static bool isPortable();
@@ -54,9 +55,11 @@ private:
      * @brief Makes settings path if not exists
      */
     static void initSettingsPath();
-    //! Full path to settings INI file
+    //! Location for writable settings and game-saves
     static std::string m_settingsPath;
+    //! Location for writable user directory
     static std::string m_userPath;
+    //! Location for read-only custom assets root
     static std::string m_customAssetsRoot;
 #ifdef __APPLE__
     static std::string m_userDataRoot; // A game media root at home directory

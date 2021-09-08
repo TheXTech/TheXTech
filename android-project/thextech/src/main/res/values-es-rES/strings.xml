@@ -1,9 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">El motor X-Tech</string>
     <string name="title_activity_game_settings">Ajustes de juegl</string>
     <string name="start_game_button">Jugar</string>
     <string name="settings_button">Ajustes</string>
-    <string name="game_logo_label">Game logo</string>
+    <string name="game_logo_label">Logo del Juego</string>
     <string name="settings_enable_frameskip">Activar omisión de fotogramas</string>
     <string name="setup_disable_sound">Desactivar sonido</string>
     <string name="setup_general_cat">General</string>
@@ -22,4 +23,11 @@
     <string name="managePermExplainText">Este juego usa recursos (Niveles, gráficos, música, etc.) que han sido descargados por el usuario manualmente. Esto nos permite conservar todas las funciones de la versión de PC en movil. Sin embargo, desde Android 11 en adelante el acceso a los archivos está severamente limitado. Por eso, para poder disfrutar de este juego debes darle acceso a todos los archivos de tu sistema.</string>
     <string name="setup_assets_path_label">Cambiar la ruta de los recursos</string>
     <string name="launcher_no_resources_question">Ups, el juego no puede empezar porque no hay ningún directorio de recursos seleccionado. Este juego requiere que los descargues manualmente, y los selecciones en ajustes. Si los has descargado ya, por favor descomprimelos y selecciona el directorio que los contiene. Quieres seleccionar el directorio ahora?</string>
+    <string name="setup_feedback">[x]Feedback</string>
+    <string name="setup_feedback_enable_vibration">Activar la vibración</string>
+    <string name="setup_feedback_vibration_strength">Fuerza de vibración</string>
+    <string name="setup_feedback_vibration_length">[x]Longitud de vibración</string>
+    <string name="touchscreen_vibration_test_label">[x]Comentarios de prueba</string>
+    <string name="setup_show_battery_status_label">[x]Device battery status</string>
+    <string name="setup_show_controller_state_label">[x]Show a game controller state</string>
 </resources>

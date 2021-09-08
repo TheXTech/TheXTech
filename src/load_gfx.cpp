@@ -4,23 +4,18 @@
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
  * Copyright (c) 2020-2021 Vitaly Novichkov <admin@wohlnet.ru>
  *
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation the
- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
- * sell copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
  *
- * The above copyright notice and this permission notice shall be included
- * in all copies or substantial portions of the Software.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
- * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
- * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
- * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
- * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <SDL2/SDL_timer.h>
@@ -77,6 +72,11 @@ static std::set<std::string> g_customLevelCGFXPathsCache;
 static std::vector<GFXBackup_t> g_defaultWorldGfxBackup;
 static std::set<std::string> g_customWorldCGFXPathsCache;
 
+static std::string getGfxDir()
+{
+    return AppPath + "graphics/";
+}
+
 static void loadCGFX(const std::set<std::string> &files,
                      const std::string &origPath,
                      const std::string &dEpisode,
@@ -93,6 +93,9 @@ static void loadCGFX(const std::set<std::string> &files,
     std::string imgPathC = dEpisode + dData + "/" + s_dirEpisode.resolveFileCase(fName + ".png");
     std::string gifPathC = dEpisode + dData + "/" + s_dirCustom.resolveFileCase(fName + ".gif");
     std::string maskPathC = dEpisode + dData + "/" + s_dirCustom.resolveFileCase(fName + "m.gif");
+
+    std::string maskPathFall = getGfxDir() + "fallback/" + fName + "m.gif";
+
     bool alreadyLoaded = false;
 
     std::string loadedPath;
@@ -143,6 +146,8 @@ static void loadCGFX(const std::set<std::string> &files,
             maskToUse = maskPathC;
         else if(files.find(maskPath) != files.end())
             maskToUse = maskPath;
+        else if(files.find(maskPathFall) != files.end())
+            maskToUse = maskPathFall;
 
 #ifdef DEBUG_BUILD
         pLogDebug("Trying to load custom GFX: %s with mask %s", imgToUse.c_str(), maskToUse.c_str());
@@ -223,7 +228,7 @@ static void restoreWorldBackupTextures()
 void LoadGFX()
 {
     std::string p;
-    std::string GfxRoot = AppPath + "graphics/";
+    std::string GfxRoot = getGfxDir();
 
     for(int c = 0; c < numCharacters; ++c)
     {
@@ -470,15 +475,26 @@ static SDL_INLINE void getExistingFiles(std::set<std::string> &existingFiles)
     DirMan searchDir(FileNamePath);
     std::vector<std::string> files;
     searchDir.getListOfFiles(files, {".png", ".gif"});
+
     for(auto &p : files)
         existingFiles.insert(FileNamePath + p);
 
-    if(DirMan::exists(FileNamePath + FileName))
+    std::string epFileData = FileNamePath + FileName;
+    if(DirMan::exists(epFileData))
     {
-        DirMan searchDataDir(FileNamePath + FileName);
+        DirMan searchDataDir(epFileData);
         searchDataDir.getListOfFiles(files, {".png", ".gif"});
         for(auto &p : files)
-            existingFiles.insert(FileNamePath + FileName  + "/"+ p);
+            existingFiles.insert(epFileData  + "/"+ p);
+    }
+
+    std::string fallBacksDir = getGfxDir() + "fallback";
+    if(DirMan::exists(fallBacksDir))
+    {
+        DirMan searchDataDir(fallBacksDir);
+        searchDataDir.getListOfFiles(files, {"m.gif"});
+        for(auto &p : files)
+            existingFiles.insert(fallBacksDir  + "/"+ p);
     }
 }
 

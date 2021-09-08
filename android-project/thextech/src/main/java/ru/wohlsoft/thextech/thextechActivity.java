@@ -85,6 +85,16 @@ public class thextechActivity extends SDLActivity
         if(setup.getBoolean("enable_max_fps", false))
             args.add("--max-fps");
 
+        if(setup.getBoolean("setup_show_controller_state", false))
+            args.add("--show-controls");
+
+        int showBatteryStatus = Integer.parseInt(setup.getString("setup_show_battery_status", "0"));
+        if(showBatteryStatus > 0)
+        {
+            args.add("--show-battery-status");
+            args.add(String.valueOf(showBatteryStatus));
+        }
+
         int speedRunMode = Integer.parseInt(setup.getString("setup_speedRunMode", "0"));
         if(speedRunMode > 0)
         {
@@ -98,6 +108,10 @@ public class thextechActivity extends SDLActivity
         setTouchScreenMode(Integer.parseInt(setup.getString("setup_touchscreen_mode", "1")));
         setTouchScreenShowOnStart(setup.getBoolean("touchscreen_gamepad_showalways", false));
         setTouchPadStyle(Integer.parseInt(setup.getString("setup_touchscreen_style", "0")));
+
+        setVibrationEnabled(setup.getBoolean("touchscreen_feedback_enabled", false));
+        setVibrationStrength(Float.parseFloat(setup.getString("touchscreen_vibration_strength", "1.0")));
+        setVibrationLength(Integer.parseInt(setup.getString("touchscreen_vibration_length", "12")));
 
         String gameAssetsPath = setup.getString("setup_assets_path", "");
         if(!gameAssetsPath.isEmpty())
@@ -136,6 +150,7 @@ public class thextechActivity extends SDLActivity
         super.onCreate(savedInstanceState);
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setSdCardPath(Environment.getExternalStorageDirectory().getAbsolutePath());
+        setAppDataPath(getApplication().getApplicationContext().getFilesDir().getAbsolutePath());
 
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
@@ -156,6 +171,7 @@ public class thextechActivity extends SDLActivity
     public static native void setScreenSize(double screenSize, double width, double height);
     public static native void setTouchPadStyle(int style);
     public static native void setSdCardPath(String path);
+    public static native void setAppDataPath(String path);
     public static native void setGameAssetsPath(String path);
     // Touch-screen controller feeback
     public static native void setVibrationEnabled(boolean enabled);

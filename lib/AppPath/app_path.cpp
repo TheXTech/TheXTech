@@ -29,6 +29,8 @@
 #include <fmt/fmt_format.h>
 
 #ifdef __ANDROID__
+#   include <unistd.h>
+//#   include <md5/md5.h>
 #   include <jni.h>
 #   if 1
 #       undef JNIEXPORT
@@ -104,7 +106,7 @@ static void saveCustomState()
 #include "app_path.h"
 #include "../version.h"
 
-std::string  ApplicationPathSTD;
+std::string ApplicationPathSTD;
 
 std::string AppPathManager::m_settingsPath;
 std::string AppPathManager::m_userPath;
@@ -115,6 +117,8 @@ std::string AppPathManager::m_customAssetsRoot;
 static std::string m_androidSdCardPath = "/storage/emulated/0";
 //! Customized absolute path to the game assets directory
 static std::string m_androidGameAssetsPath;
+//! Application data absolute directory path (may be inaccessible from file managers since Android 11, etc.)
+static std::string m_androidAppDataPath;
 
 JNIEXPORT void JNICALL
 Java_ru_wohlsoft_thextech_thextechActivity_setSdCardPath(
@@ -128,6 +132,20 @@ Java_ru_wohlsoft_thextech_thextechActivity_setSdCardPath(
     sdcardPath = env->GetStringUTFChars(sdcardPath_j, nullptr);
     m_androidSdCardPath = sdcardPath;
     env->ReleaseStringUTFChars(sdcardPath_j, sdcardPath);
+}
+
+JNIEXPORT void JNICALL
+Java_ru_wohlsoft_thextech_thextechActivity_setAppDataPath(
+    JNIEnv *env,
+    jclass type,
+    jstring appDataPath_j
+)
+{
+    const char *appDataPath;
+    (void)type;
+    appDataPath = env->GetStringUTFChars(appDataPath_j, nullptr);
+    m_androidAppDataPath = appDataPath;
+    env->ReleaseStringUTFChars(appDataPath_j, appDataPath);
 }
 
 JNIEXPORT void JNICALL
@@ -196,7 +214,17 @@ static std::string getPgeUserDirectory()
 
 #elif defined(__ANDROID__)
     if(!m_androidGameAssetsPath.empty())
+    {
+        if(access(m_androidGameAssetsPath.c_str(), W_OK) != 0) // If assets directory is not writable
+        {
+            // Use the application's data directory for logs / settings / screenshots / GIFs
+            return fmt::format("{0}/{1}",
+                               m_androidAppDataPath,
+                               Files::basename(m_androidGameAssetsPath));
+        }
+
         return m_androidGameAssetsPath; // Don't search the path, simply re-use the defined path
+    }
 
     path = m_androidSdCardPath;
 
@@ -223,7 +251,7 @@ static std::string getPgeUserDirectory()
 
 void AppPathManager::initAppPath()
 {
-#ifdef __APPLE__
+#if defined(__APPLE__)
     {
         CFURLRef appUrlRef;
         appUrlRef = CFBundleCopyBundleURL(CFBundleGetMainBundle());
@@ -243,7 +271,11 @@ void AppPathManager::initAppPath()
         }
         CFRelease(appUrlRef);
     }
-#else //__APPLE__
+
+#elif defined(__ANDROID__)
+    ApplicationPathSTD = m_androidAppDataPath;
+
+#else // all other platforms (Windows, Linux, Haiku, etc.)
     char *path = SDL_GetBasePath();
     if(!path)
     {
@@ -258,7 +290,9 @@ void AppPathManager::initAppPath()
     std::replace(ApplicationPathSTD.begin(), ApplicationPathSTD.end(), '\\', '/');
 #   endif
     SDL_free(path);
-#endif //__APPLE__
+
+#endif // __APPLE__/__ANDROID__
+
 
 #ifdef __EMSCRIPTEN__
     loadCustomState();
@@ -291,6 +325,7 @@ void AppPathManager::initAppPath()
         }
 #endif
         m_userPath = appDir.absolutePath();
+
 #if !defined(__EMSCRIPTEN__) && !defined(USER_DIR_NAME)
 #   if defined(__ANDROID__)
         if(m_androidGameAssetsPath.empty())
@@ -321,25 +356,26 @@ defaultSettingsPath:
 #endif
 }
 
-std::string AppPathManager::settingsFileSTD()
+std::string AppPathManager::settingsFileSTD() // Writable
 {
     return m_settingsPath + "thextech.ini";
 }
 
-std::string AppPathManager::settingsControlsFileSTD()
+std::string AppPathManager::settingsControlsFileSTD() // Writable
 {
     return m_settingsPath + "controls.ini";
 }
 
-std::string AppPathManager::userAppDirSTD()
+std::string AppPathManager::userAppDirSTD() // Writable
 {
     return m_userPath;
 }
 
-std::string AppPathManager::assetsRoot()
+std::string AppPathManager::assetsRoot() // Readable
 {
     if(!m_customAssetsRoot.empty())
         return m_customAssetsRoot;
+
 #if defined(FIXED_ASSETS_PATH) // Fixed assets path, for the rest of UNIX-like OS packages
     std::string assets(FIXED_ASSETS_PATH);
     if(!assets.empty() && assets.back() != '/')
@@ -359,7 +395,10 @@ std::string AppPathManager::assetsRoot()
     return path;
 
 #elif defined(__ANDROID__)
-    return m_userPath; //"assets/";
+    std::string assets = m_androidGameAssetsPath;
+    if(!assets.empty() && assets.back() != '/')
+        assets.push_back('/');
+    return assets;
 
 #else
     return m_userPath;
@@ -374,12 +413,12 @@ void AppPathManager::setAssetsRoot(const std::string &root)
         m_customAssetsRoot.push_back('/');
 }
 
-std::string AppPathManager::logsDir()
+std::string AppPathManager::logsDir() // Writable
 {
-    return ApplicationPathSTD + "logs";
+    return m_userPath + "logs";
 }
 
-std::string AppPathManager::languagesDir()
+std::string AppPathManager::languagesDir() // Readable
 {
 #if defined(__APPLE__)
     CFURLRef appUrlRef;
@@ -392,17 +431,21 @@ std::string AppPathManager::languagesDir()
     if(path.compare(0, 7, "file://") == 0)
         path.erase(0, 7);
     return path;
+
 #elif defined(__ANDROID__)
-    return "languages";
+    return AppPathManager::assetsRoot() + "languages";
+
 #else
     return ApplicationPathSTD + "languages";
+
 #endif
 }
 
-std::string AppPathManager::screenshotsDir()
+std::string AppPathManager::screenshotsDir() // Writable
 {
 #ifndef __APPLE__
     return m_userPath + "screenshots";
+
 #else
     std::string path = m_userPath;
     char *base_path = getScreenCaptureDir();
@@ -412,13 +455,15 @@ std::string AppPathManager::screenshotsDir()
         SDL_free(base_path);
     }
     return path + "/TheXTech Game Screenshots";
+
 #endif
 }
 
-std::string AppPathManager::gifRecordsDir()
+std::string AppPathManager::gifRecordsDir() // Writable
 {
 #ifndef __APPLE__
     return m_userPath + "gif-recordings";
+
 #else
     std::string path = m_userPath;
     char *base_path = getScreenCaptureDir();
@@ -428,20 +473,16 @@ std::string AppPathManager::gifRecordsDir()
         SDL_free(base_path);
     }
     return path + "/TheXTech Game Screenshots/gif-recordings";
+
 #endif
 }
 
-std::string AppPathManager::gameSaveRootDir()
+std::string AppPathManager::gameSaveRootDir() // Writable
 {
     return m_settingsPath + "gamesaves";
 }
 
-std::string AppPathManager::gameplayRecordsRootDir()
-{
-    return m_userPath + "gameplay-records";
-}
-
-std::string AppPathManager::userWorldsRootDir()
+std::string AppPathManager::userWorldsRootDir() // Readable
 {
 #ifdef __APPLE__
     return m_userDataRoot + "worlds";
@@ -450,7 +491,7 @@ std::string AppPathManager::userWorldsRootDir()
 #endif
 }
 
-std::string AppPathManager::userBattleRootDir()
+std::string AppPathManager::userBattleRootDir() // Readable
 {
 #ifdef __APPLE__
     return m_userDataRoot + "battle";
@@ -502,7 +543,7 @@ bool AppPathManager::checkPortable()
 
 bool AppPathManager::userDirIsAvailable()
 {
-    return (m_userPath != ApplicationPathSTD);
+    return (m_userPath != assetsRoot());
 }
 
 #ifdef __EMSCRIPTEN__
@@ -543,7 +584,7 @@ void AppPathManager::initSettingsPath()
     if(!DirMan::exists(m_settingsPath))
         DirMan::mkAbsPath(m_settingsPath);
 
-    // Also make the gamesaves root folder to be exist
+    // Also make the game saves root folder to be exist
     if(!DirMan::exists(gameSaveRootDir()))
         DirMan::mkAbsPath(gameSaveRootDir());
 }

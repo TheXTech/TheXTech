@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - devel
       - versus-ci-android
       - stable-1.3.5.x
 

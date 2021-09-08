@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">The X-Tech Engine</string>
     <string name="title_activity_game_settings">Game settings</string>
@@ -19,7 +20,14 @@
     <string name="setup_speedrunner">Speed-runner</string>
     <string name="setup_touchpad_style">Controller style</string>
     <string name="managePermExplainTitle">All files access permission is required</string>
-    <string name="managePermExplainText">This game uses resources (such as levels, episodes, graphics, music, sounds, configs, etc.) that was placed by user on the local storage directly. This allows users to modify and extend the content for their own purposes like that was done at the desktop version of this game. Unfortunately, Android 11+ doesn\'t gives the way to grant an individual permission for the specific directory instead of a single file. To run this game you should grand the access to all files to the game because of explained reason.</string>
+    <string name="managePermExplainText">This game uses resources (such as levels, episodes, graphics, music, sounds, configs, etc.) that were placed by the user on the local store directly. This concept allows users to modify and extend the content for their own purposes like that was done at the desktop version of this game. Unfortunately, Android 11+ doesn\'t give the way to grant individual read permission for the specified directory instead of a single file. To run this game you should grand access to all files for the game because of explained reasons.</string>
     <string name="setup_assets_path_label">Change the resources absolute path</string>
-    <string name="launcher_no_resources_question">Whoops, the game can\'t start because the game resources directory is not selected. This game requires you to manually download and unpack the archive with game assets, and then select the directory that contains them. If you downloaded and unpacked them already, please select the directory that contains the game assets. Do you want to select the assets directory for now?</string>
+    <string name="launcher_no_resources_question">The game requires a resource package for the work. Please download the game resources and unpack them at any convenient directory. Do you want to select an already unpacked folder\?</string>
+    <string name="setup_feedback_enable_vibration">Enable vibration</string>
+    <string name="setup_feedback_vibration_strength">Vibration strength</string>
+    <string name="setup_feedback_vibration_length">Vibration length</string>
+    <string name="setup_feedback">Feedback</string>
+    <string name="touchscreen_vibration_test_label">Test feedback</string>
+    <string name="setup_show_battery_status_label">Device battery status</string>
+    <string name="setup_show_controller_state_label">Show a game controller state</string>
 </resources>

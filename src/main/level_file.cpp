@@ -4,23 +4,18 @@
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
  * Copyright (c) 2020-2021 Vitaly Novichkov <admin@wohlnet.ru>
  *
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation the
- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
- * sell copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
  *
- * The above copyright notice and this permission notice shall be included
- * in all copies or substantial portions of the Software.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
- * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
- * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
- * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
- * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "../globals.h"
@@ -255,6 +250,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         block.Location.Width = double(b.w);
         block.Type = int(b.id);
         block.DefaultType = block.Type;
+
         block.Special = int(b.npc_id > 0 ? b.npc_id + 1000 : -1 * b.npc_id);
         if(block.Special == 100)
             block.Special = 1009;
@@ -265,6 +261,12 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         if(block.Special == 105)
             block.Special = 1095;
         block.DefaultSpecial = block.Special;
+
+        block.Special2 = 0;
+        if(b.id == 90 && lvl.meta.RecentFormat == LevelData::SMBX64 && lvl.meta.RecentFormatVersion < 20)
+            block.Special2 = 1; // Restore bricks algorithm for turn blocks for SMBX19 and lower
+        block.DefaultSpecial2 = block.Special2;
+
         block.Invis = b.invisible;
         block.Slippy = b.slippery;
         block.Layer = b.layer;
@@ -370,6 +372,16 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             npc.DefaultSpecial = int(npc.Special);
         }
 
+        if(npc.Type == 22) // billy gun
+        {
+            if(lvl.meta.RecentFormat == LevelData::SMBX64 && lvl.meta.RecentFormatVersion < 28)
+                npc.Special7 = 2.0; // SMBX 1.1.x and 1.0.x behavior
+            else if(lvl.meta.RecentFormat == LevelData::SMBX64 && lvl.meta.RecentFormatVersion < 51)
+                npc.Special7 = 1.0; // SMBX 1.2 behavior
+            else
+                npc.Special7 = n.special_data; // SMBX 1.2.1 and newer behavior, customizable behavior
+        }
+
         if(npc.Type == 86)
         {
             if(lvl.meta.RecentFormat == LevelData::SMBX64 &&
@@ -377,6 +389,15 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
                 npc.Special7 = 1.0; // Keep original behavior of Bowser as in SMBX 1.0
             else
                 npc.Special7 = n.special_data;
+        }
+
+        if(npc.Type == 60)
+        {
+            if(lvl.meta.RecentFormat == LevelData::SMBX64 &&
+               lvl.meta.RecentFormatVersion < 9)
+                npc.Special7 = 1.0; // Workaround for yellow platform at The Invasion 1
+            else
+                npc.Special7 = 0.0;
         }
 
         npc.Generator = n.generator;
@@ -814,6 +835,8 @@ void ClearLevel()
     qScreen = false;
     UnloadCustomGFX();
     doShakeScreenClear();
+
+    AutoUseModern = false;
 
     numSections = 0;
 

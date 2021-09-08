@@ -4,24 +4,20 @@
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
  * Copyright (c) 2020-2021 Vitaly Novichkov <admin@wohlnet.ru>
  *
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation the
- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
- * sell copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
  *
- * The above copyright notice and this permission notice shall be included
- * in all copies or substantial portions of the Software.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
- * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
- * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
- * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
- * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 
 #include <SDL2/SDL_timer.h>
 
@@ -168,7 +164,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
     b.Invis = false;
 
-    if(HitDown == true && b.Special > 0)
+    if(HitDown && b.Special > 0)
     {
         tempBool = false;
         auto tmpNumBlocks = numBlock;
@@ -1405,7 +1401,7 @@ void BlockHitHard(int A)
     if(Block[A].Hidden)
         return;
 
-    if(Block[A].Type == 90)
+    if(Block[A].Type == 90 && Block[A].Special2 != 1)
     {
         // Block(A).Hidden = True
         // NewEffect 82, Block(A).Location, , A
@@ -1802,6 +1798,7 @@ void UpdateBlocks()
                                 if(Block[A].Type != Block[A].DefaultType)
                                     NewEffect(10, newLoc(Block[A].Location.X + Block[A].Location.Width / 2.0 - EffectWidth[10] / 2, Block[A].Location.Y + Block[A].Location.Height / 2.0 - EffectHeight[10] / 2));
                                 Block[A].Special = Block[A].DefaultSpecial;
+                                Block[A].Special2 = Block[A].DefaultSpecial2;
                                 Block[A].Type = Block[A].DefaultType;
                             }
 
@@ -1843,7 +1840,7 @@ void UpdateBlocks()
                     Block[iBlock[A]].Type = 283;
                 else if(Block[iBlock[A]].Type == 283)
                     Block[iBlock[A]].Type = 282;
-                if(Block[iBlock[A]].Type == 90 && Block[iBlock[A]].Special == 0)
+                if(Block[iBlock[A]].Type == 90 && Block[iBlock[A]].Special == 0 && Block[iBlock[A]].Special2 != 1)
                 {
                     Block[iBlock[A]].Hidden = true;
                     NewEffect(82, Block[iBlock[A]].Location, 1, iBlock[A]);

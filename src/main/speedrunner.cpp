@@ -4,23 +4,18 @@
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
  * Copyright (c) 2020-2021 Vitaly Novichkov <admin@wohlnet.ru>
  *
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation the
- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
- * sell copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
  *
- * The above copyright notice and this permission notice shall be included
- * in all copies or substantial portions of the Software.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
- * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
- * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
- * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
- * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <fmt_format_ne.h>
@@ -28,6 +23,7 @@
 #include "globals.h"
 #include "graphics.h"
 #include "compat.h"
+#include "../controls.h"
 
 #include "gameplay_timer.h"
 
@@ -108,10 +104,20 @@ void speedRun_renderControls(int player, int screenZ)
     if(player < 1 || player > 2)
         return;
 
+    int jNum = useJoystick[player] - 1;
+
+    // Controller
     int x = 4;
     int y = ScreenH - 34;
     int w = 76;
     int h = 30;
+
+    // Battery status
+    int bx = x + w + 4;
+    int by = y + 4;
+    int bw = 40;
+    int bh = 22;
+
     bool drawLabel = false;
 
     if(screenZ >= 0)
@@ -119,6 +125,8 @@ void speedRun_renderControls(int player, int screenZ)
         auto &scr = vScreen[screenZ];
         x = scr.Left > 0 ? (int)(scr.Left + scr.Width) - (w + 4) : (int)scr.Left + 4;
         y = (int)(scr.Top + scr.Height) - 34;
+        bx = scr.Left > 0 ? x - (bw + 4) : (x + w + 4);
+        by = y + 4;
     }
     else
     {
@@ -140,9 +148,11 @@ void speedRun_renderControls(int player, int screenZ)
         {
         case 1:
             x = 4;
+            bx = x + w + 4;
             break;
         case 2:
             x = (ScreenW - (w + 4));
+            bx = x - (bw + 4);
             break;
         }
 #endif
@@ -209,6 +219,33 @@ void speedRun_renderControls(int player, int screenZ)
 
     if(drawLabel)
         SuperPrint(fmt::format_ne("P{0}", player), 3, x + 22, y + 2, 1.f, 1.f, 1.f, 0.5f);
+
+    if(jNum >= 0 && jNum < joyCount())
+    {
+        int power = joyGetPowerLevel(jNum);
+
+        if(power != SDL_JOYSTICK_POWER_UNKNOWN && power != SDL_JOYSTICK_POWER_WIRED)
+        {
+            frmMain.renderRect(bx, by, bw - 4, bh, 0.f, 0.f, 0.f, alhpa, true);//Edge
+            frmMain.renderRect(bx + 2, by + 2, bw - 8, bh - 4, r, g, b, alhpa, true);//Box
+            frmMain.renderRect(bx + 36, by + 6, 4, 10, 0.f, 0.f, 0.f, alhpa, true);//Edge
+            frmMain.renderRect(bx + 34, by + 8, 4, 6, r, g, b, alhpa, true);//Box
+
+            switch(power)
+            {
+            case SDL_JOYSTICK_POWER_FULL:
+                frmMain.renderRect(bx + 24, by + 4, 8, 14, 0.f, 0.f, 0.f, alhpaB, true); // fallthrough
+            case SDL_JOYSTICK_POWER_MEDIUM:
+                frmMain.renderRect(bx + 14, by + 4, 8, 14, 0.f, 0.f, 0.f, alhpaB, true); // fallthrough
+            case SDL_JOYSTICK_POWER_LOW:
+                frmMain.renderRect(bx + 4, by + 4, 8, 14, 0.f, 0.f, 0.f, alhpaB, true);
+                break;
+            case SDL_JOYSTICK_POWER_EMPTY:
+                frmMain.renderRect(bx + 4, by + 4, 8, 14, 1.f, 0.f, 0.f, alhpaB / 2.f, true);
+                break;
+            }
+        }
+    }
 }
 
 #undef bool2alpha

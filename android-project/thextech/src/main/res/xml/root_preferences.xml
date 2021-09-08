@@ -31,6 +31,28 @@
             android:key="touchscreen_gamepad_showalways"
             android:title="@string/setup_touchscreen_alwaysshow" />
     </PreferenceCategory>
+    <PreferenceCategory android:title="@string/setup_feedback">
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="touchscreen_feedback_enabled"
+            android:title="@string/setup_feedback_enable_vibration" />
+        <ListPreference
+            android:defaultValue="1.0"
+            android:entries="@array/feedBackStrength"
+            android:entryValues="@array/feedBackStrengthValues"
+            android:key="touchscreen_vibration_strength"
+            android:title="@string/setup_feedback_vibration_strength" />
+        <ListPreference
+            android:defaultValue="12"
+            android:entries="@array/feedBackLength"
+            android:entryValues="@array/feedBackLengthValues"
+            android:key="touchscreen_vibration_length"
+            android:title="@string/setup_feedback_vibration_length" />
+        <Preference
+            android:key="touchscreen_vibration_test"
+            android:title="@string/touchscreen_vibration_test_label" />
+    </PreferenceCategory>
     <PreferenceCategory android:title="@string/setup_display_cat">
         <CheckBoxPreference
             android:defaultValue="false"
@@ -40,6 +62,16 @@
             android:defaultValue="false"
             android:key="enable_max_fps"
             android:title="@string/setup_max_framerate_mode" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="setup_show_controller_state"
+            android:title="@string/setup_show_controller_state_label" />
+        <ListPreference
+            android:defaultValue="0"
+            android:entries="@array/batteryStatusShow"
+            android:entryValues="@array/batteryStatusShowValues"
+            android:key="setup_show_battery_status"
+            android:title="@string/setup_show_battery_status_label" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/setup_speedrunner">
         <ListPreference

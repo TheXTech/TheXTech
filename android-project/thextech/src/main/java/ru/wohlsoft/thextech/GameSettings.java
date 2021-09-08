@@ -1,12 +1,12 @@
 package ru.wohlsoft.thextech;
 
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 
 import java.io.File;
 
@@ -54,7 +54,44 @@ public class GameSettings extends AppCompatActivity
                         Context ctx = getContext();
                         if(ctx == null)
                             return false;// Null context, not allowed!
-                        return selectAssetsPath(ctx);
+                        return selectAssetsPath(ctx, null);
+                    }
+                });
+            }
+
+            Preference fb_test = getPreferenceManager().findPreference("touchscreen_vibration_test");
+            if (fb_test != null)
+            {
+                fb_test.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
+                {
+                    @Override
+                    public boolean onPreferenceClick(Preference arg0)
+                    {
+                        Context ctx = getContext();
+                        if(ctx == null)
+                            return false;// Null context, not allowed!
+
+                        SharedPreferences setup = PreferenceManager.getDefaultSharedPreferences(ctx);
+                        float vibratorStrength = Float.parseFloat(setup.getString("touchscreen_vibration_strength", "1.0"));
+                        int vibratorLength = Integer.parseInt(setup.getString("touchscreen_vibration_length", "12"));
+
+                        int vibeValue = Math.round(vibratorStrength * 255);
+
+                        Vibrator v = (Vibrator)ctx.getSystemService(Context.VIBRATOR_SERVICE);
+
+                        if (vibeValue > 255) {
+                            vibeValue = 255;
+                        }
+                        if (vibeValue < 1) {
+                            return false;
+                        }
+                        // Vibrate for X milliseconds
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                            v.vibrate(VibrationEffect.createOneShot(vibratorLength, vibeValue));
+                        else
+                            v.vibrate(vibratorLength); //deprecated in API 26
+
+                        return true;
                     }
                 });
             }
@@ -67,6 +104,12 @@ public class GameSettings extends AppCompatActivity
     {
         File file = new File(dir);
         return file.exists() && file.isDirectory();
+    }
+
+    public static boolean isFileExist(String dir)
+    {
+        File file = new File(dir);
+        return file.exists() && file.isFile();
     }
 
     public static boolean verifyAssetsPath(String path)
@@ -86,10 +129,13 @@ public class GameSettings extends AppCompatActivity
         if(!isDirectoryExist(path + "/music"))
             return false;
 
+        if(!isFileExist(path + "/intro.lvlx") && !isFileExist(path + "/intro.lvl"))
+            return false;
+
         return true;
     }
 
-    public static boolean selectAssetsPath(Context ctx)
+    public static boolean selectAssetsPath(Context ctx, final Launcher l)
     {
         if(ctx == null)
             return false;// Null context, not allowed!
@@ -116,6 +162,8 @@ public class GameSettings extends AppCompatActivity
                     {
                         SharedPreferences setup = PreferenceManager.getDefaultSharedPreferences(ctx);
                         setup.edit().putString("setup_assets_path", lastPath).apply();
+                        if(l != null)
+                            l.updateOverlook();
                     }
                     @Override
                     public void OnSelectedFile(Context ctx, String fileName, String lastPath){}

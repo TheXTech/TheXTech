@@ -4,23 +4,18 @@
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
  * Copyright (c) 2020-2021 Vitaly Novichkov <admin@wohlnet.ru>
  *
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation the
- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
- * sell copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
  *
- * The above copyright notice and this permission notice shall be included
- * in all copies or substantial portions of the Software.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
- * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
- * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
- * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
- * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <SDL2/SDL.h>
@@ -665,6 +660,7 @@ void FrmMain::repaint()
 
 #ifndef __EMSCRIPTEN__
     processRecorder();
+    drawBatteryStatus();
 #endif
 
     // Get the size of surface where to draw the scene
@@ -1043,7 +1039,6 @@ void FrmMain::loadTexture(StdPicture &target, uint32_t width, uint32_t height, u
     target.inited = true;
 }
 
-
 void FrmMain::lazyLoad(StdPicture &target)
 {
     if(!target.inited || !target.lazyLoaded || target.texture)
@@ -1094,20 +1089,23 @@ void FrmMain::lazyLoad(StdPicture &target)
     target.frame_w = static_cast<int>(w);
     target.frame_h = static_cast<int>(h);
 
-    if(g_videoSettings.scaleDownAllTextures)
+    bool shrink2x = false;
+
+    if(g_videoSettings.scaleDownAllTextures || GraphicsHelps::validateFor2xScaleDown(sourceImage, StdPictureGetOrigPath(target)))
     {
         target.w_orig = int(w);
         target.h_orig = int(h);
         w /= 2;
         h /= 2;
+        shrink2x = true;
     }
 
     bool wLimitExcited = m_ri.max_texture_width > 0 && w > Uint32(m_ri.max_texture_width);
     bool hLimitExcited = m_ri.max_texture_height > 0 && h > Uint32(m_ri.max_texture_height);
 
-    if(wLimitExcited || hLimitExcited || g_videoSettings.scaleDownAllTextures)
+    if(wLimitExcited || hLimitExcited || shrink2x)
     {
-        if(!g_videoSettings.scaleDownAllTextures)
+        if(!shrink2x)
         {
             target.w_orig = int(w);
             target.h_orig = int(h);
@@ -1197,6 +1195,83 @@ void FrmMain::makeShot()
 #endif
 
 }
+
+#ifndef __EMSCRIPTEN__
+void FrmMain::drawBatteryStatus()
+{
+    int secs, pct, status;
+    // Battery status
+    int bw = 40;
+    int bh = 22;
+    int bx = ScreenW - (bw + 8);
+    int by = 24;
+    int segmentsFullLen = 14;
+    int segments = 0;
+    float alhpa = 0.7f;
+    float alhpaB = 0.8f;
+    float r = 0.4f, g = 0.4f, b = 0.4f;
+    float br = 0.0f, bg = 0.0f, bb = 0.0f;
+    bool isLow = false;
+
+#ifndef __ANDROID__
+    const bool isFullScreen = resChanged;
+#endif
+
+    if(g_videoSettings.batteryStatus == BATTERY_STATUS_OFF)
+        return;
+
+    status = SDL_GetPowerInfo(&secs, &pct);
+
+    if(status == SDL_POWERSTATE_NO_BATTERY || status == SDL_POWERSTATE_UNKNOWN)
+        return;
+
+    isLow = (pct <= 35);
+
+    if(status == SDL_POWERSTATE_CHARGED)
+    {
+        br = 0.f;
+        bg = 1.f;
+        bb = 0.f;
+    }
+    else if(status == SDL_POWERSTATE_CHARGING)
+    {
+        br = 1.f;
+        bg = 0.64f;
+        bb = 0.f;
+    }
+    else if(isLow)
+        br = 1.f;
+
+    segments = ((pct * segmentsFullLen) / 100) * 2;
+    if(segments == 0)
+        segments = 2;
+
+    bool showBattery = false;
+
+    showBattery |= (g_videoSettings.batteryStatus == BATTERY_STATUS_ALWAYS_ON);
+    showBattery |= (g_videoSettings.batteryStatus == BATTERY_STATUS_ANY_WHEN_LOW && isLow);
+#ifndef __ANDROID__
+    showBattery |= (g_videoSettings.batteryStatus == BATTERY_STATUS_FULLSCREEN_WHEN_LOW && isLow && isFullScreen);
+    showBattery |= (g_videoSettings.batteryStatus == BATTERY_STATUS_FULLSCREEN_ON && isFullScreen);
+#else
+    showBattery |= (g_videoSettings.batteryStatus == BATTERY_STATUS_FULLSCREEN_WHEN_LOW && isLow);
+    showBattery |= (g_videoSettings.batteryStatus == BATTERY_STATUS_FULLSCREEN_ON);
+#endif
+
+    if(showBattery)
+    {
+        setTargetTexture();
+
+        frmMain.renderRect(bx, by, bw - 4, bh, 0.f, 0.f, 0.f, alhpa, true);//Edge
+        frmMain.renderRect(bx + 2, by + 2, bw - 8, bh - 4, r, g, b, alhpa, true);//Box
+        frmMain.renderRect(bx + 36, by + 6, 4, 10, 0.f, 0.f, 0.f, alhpa, true);//Edge
+        frmMain.renderRect(bx + 34, by + 8, 4, 6, r, g, b, alhpa, true);//Box
+        frmMain.renderRect(bx + 4, by + 4, segments, 14, br, bg, bb, alhpaB / 2.f, true);//Level
+
+        setTargetScreen();
+    }
+}
+#endif
 
 static std::string shoot_getTimedString(std::string path, const char *ext = "png")
 {

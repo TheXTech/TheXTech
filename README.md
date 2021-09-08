@@ -97,3 +97,7 @@ To build it, you need to have the following things:
 - Git (required to pull submodules and clone source of dependent libraries to build them in place)
 - Mercurial (required to clone an official SDL2 repository to build it in place here)
 - Optionally: system-wide installed dependencies: SDL2, libFreeImageLite (a modded implementation of the FreeImage), MixerX sound library, AudioCodecs collection of libraries. Having them be installed in a system gives a major build speed up. However, it's possible to build all these dependencies in place here with a cost of extra build time being added.
+
+## Localization
+
+Some parts of TheXTech (such as Android launcher) can be localized, you may help to translate them using WebLate platform: https://hosted.weblate.org/projects/thextech/

@@ -283,11 +283,13 @@ void GraphicsHelps::mergeWithMask(FIBITMAP *image, FIBITMAP *mask)
 {
     unsigned int img_w = FreeImage_GetWidth(image);
     unsigned int img_h = FreeImage_GetHeight(image);
+    unsigned int img_pitch = FreeImage_GetPitch(image);
     unsigned int mask_w = FreeImage_GetWidth(mask);
     unsigned int mask_h = FreeImage_GetHeight(mask);
+    unsigned int mask_pitch = FreeImage_GetPitch(image);
     BYTE *img_bits  = FreeImage_GetBits(image);
     BYTE *mask_bits = FreeImage_GetBits(mask);
-    BYTE *FPixP = img_bits;
+    BYTE *FPixP = nullptr;
     BYTE *SPixP = mask_bits;
     RGBQUAD Npix = {0x00, 0x00, 0x00, 0xFF};   //Destination pixel color
     BYTE Bpix[] = {0x00, 0x00, 0x00, 0xFF};   //Dummy black pixel
@@ -299,9 +301,9 @@ void GraphicsHelps::mergeWithMask(FIBITMAP *image, FIBITMAP *mask)
 
     while(1)
     {
-        FPixP = img_bits + (img_w * y * 4);
+        FPixP = img_bits + (img_pitch * y);
         if(!endOfY)
-            SPixP = mask_bits + (mask_w * ym * 4);
+            SPixP = mask_bits + (mask_pitch * ym);
 
         for(unsigned int x = 0; (x < img_w); x++)
         {
@@ -403,6 +405,47 @@ void GraphicsHelps::getMaskedImageInfo(std::string rootDir, std::string in_imgNa
         imgSize->setWidth(int(w));
         imgSize->setHeight(int(h));
     }
+}
+
+bool GraphicsHelps::validateFor2xScaleDown(FIBITMAP *image, const std::string &origPath)
+{
+    if(!image)
+        return false;
+
+    (void)origPath; // supress warning when build the release build
+
+    uint32_t w = static_cast<uint32_t>(FreeImage_GetWidth(image));
+    uint32_t h = static_cast<uint32_t>(FreeImage_GetHeight(image));
+    uint32_t pitch = static_cast<uint32_t>(FreeImage_GetPitch(image));
+    BYTE *img_bits  = FreeImage_GetBits(image);
+
+    if(w % 2 || h % 2)
+    {
+        D_pLogWarning("Texture can't be shrank, non-multiple size: %u x %u (%s)", w, h, origPath.c_str());
+        return false; // Not multiple two!
+    }
+
+    BYTE *line1 = img_bits;
+    BYTE *line2 = (img_bits + pitch);
+
+    for(uint32_t y = 0; y < h; y += 2)
+    {
+        for(uint32_t x = 0; x < w; x += 2)
+        {
+            BYTE *p1 = line1 + (y * pitch) + (x * 4);
+            BYTE *p2 = line2 + (y * pitch) + (x * 4);
+            if(SDL_memcmp(p1, p1 + 4, 4) != 0 ||
+               SDL_memcmp(p1, p2, 4) != 0 ||
+               SDL_memcmp(p1, p2 + 4, 4) != 0)
+            {
+                D_pLogWarning("Texture can't be shrank: Pixel colors at the %u x %u sector (2x2 square) aren't equal (%s)", x, y, origPath.c_str());
+                return false;
+            }
+        }
+    }
+
+    D_pLogDebug("Texture CAN be shrank (%s)", origPath.c_str());
+    return true;
 }
 
 bool GraphicsHelps::setWindowIcon(SDL_Window *window, FIBITMAP *img, int iconSize)

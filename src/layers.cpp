@@ -4,23 +4,18 @@
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
  * Copyright (c) 2020-2021 Vitaly Novichkov <admin@wohlnet.ru>
  *
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation the
- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
- * sell copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
  *
- * The above copyright notice and this permission notice shall be included
- * in all copies or substantial portions of the Software.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
- * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
- * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
- * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
- * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <SDL2/SDL_timer.h>
@@ -144,6 +139,7 @@ void ShowLayer(std::string LayerName, bool NoEffect)
                 if(Block[A].Layer == LayerName)
                     Block[A].Layer = "Default";
                 Block[A].Special = Block[A].DefaultSpecial;
+                Block[A].Special2 = Block[A].DefaultSpecial2;
                 Block[A].Type = Block[A].DefaultType;
             }
         }
@@ -328,6 +324,8 @@ void ProcEvent(std::string EventName, bool NoEffect)
                 /* Per-Section autoscroll setup */
                 if(s.autoscroll)
                 {
+                    if(!AutoUseModern) // First attemt to use modern autoscrolling will block futher use of the legacy autoscrolling
+                        AutoUseModern = true;
                     autoScrollerChanged = true;
                     AutoX[B] = s.autoscroll_x;
                     AutoY[B] = s.autoscroll_y;
@@ -553,23 +551,26 @@ void ProcEvent(std::string EventName, bool NoEffect)
                 }
             }
 
-            if(g_compatibility.fix_autoscroll_speed)
+            if(!AutoUseModern) // Use legacy auto-scrolling when modern autoscrolling was never used here
             {
-                if(!autoScrollerChanged)
+                if(g_compatibility.fix_autoscroll_speed)
                 {
-                    // Do set the autoscrool when non-zero values only, don't zero by other autoruns
-                    if((evt.AutoX != 0.0 || evt.AutoY != 0.0) && IF_INRANGE(evt.AutoSection, 0, maxSections))
+                    if(!autoScrollerChanged)
                     {
-                        AutoX[evt.AutoSection] = evt.AutoX;
-                        AutoY[evt.AutoSection] = evt.AutoY;
+                        // Do set the autoscrool when non-zero values only, don't zero by other autoruns
+                        if((evt.AutoX != 0.0 || evt.AutoY != 0.0) && IF_INRANGE(evt.AutoSection, 0, maxSections))
+                        {
+                            AutoX[evt.AutoSection] = evt.AutoX;
+                            AutoY[evt.AutoSection] = evt.AutoY;
+                        }
                     }
                 }
-            }
-            else if(IF_INRANGE(evt.AutoSection, 0, maxSections) && IF_INRANGE(evt.AutoSection, 0, maxEvents))
-            {
-                // Buggy behavior, see https://github.com/Wohlstand/TheXTech/issues/44
-                AutoX[evt.AutoSection] = Events[evt.AutoSection].AutoX;
-                AutoY[evt.AutoSection] = Events[evt.AutoSection].AutoY;
+                else if(IF_INRANGE(evt.AutoSection, 0, maxSections) && IF_INRANGE(evt.AutoSection, 0, maxEvents))
+                {
+                    // Buggy behavior, see https://github.com/Wohlstand/TheXTech/issues/44
+                    AutoX[evt.AutoSection] = Events[evt.AutoSection].AutoX;
+                    AutoY[evt.AutoSection] = Events[evt.AutoSection].AutoY;
+                }
             }
 
             if(!evt.Text.empty())

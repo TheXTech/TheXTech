@@ -4,23 +4,18 @@
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
  * Copyright (c) 2020-2021 Vitaly Novichkov <admin@wohlnet.ru>
  *
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation the
- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
- * sell copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
  *
- * The above copyright notice and this permission notice shall be included
- * in all copies or substantial portions of the Software.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
- * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
- * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
- * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
- * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <SDL2/SDL.h>
@@ -155,7 +150,7 @@ int main(int argc, char**argv)
         // Define the command line object.
         TCLAP::CmdLine  cmd("TheXTech Engine\n"
                             "Copyright (c) 2020-2021 Vitaly Novichkov <admin@wohlnet.ru>\n\n"
-                            "This program is distributed under the MIT license\n\n", ' ', "1.3");
+                            "This program is distributed under the GPLv3 license\n\n", ' ', "1.3");
 
         TCLAP::ValueArg<std::string> customAssetsPath("c", "assets-root", "Specify the different assets root directory to play",
                                                       false, "",
@@ -241,6 +236,16 @@ int main(int argc, char**argv)
         TCLAP::SwitchArg switchSpeedRunSemiTransparent(std::string(), "speed-run-semitransparent",
                                                        "Make the speed-runner mode timer be drawn transparently", false);
         TCLAP::SwitchArg switchDisplayControls(std::string(), "show-controls", "Display current controller state while the game process", false);
+        TCLAP::ValueArg<unsigned int> showBatteryStatus(std::string(), "show-battery-status",
+                                                   "Display the battery status indicator (if available):\n"
+                                                   "  0 - Never show [Default]\n"
+                                                   "  1 - Show on fullscreen only when battery low\n"
+                                                   "  2 - Show when battery low\n"
+                                                   "  3 - Show always on fullscreen only\n"
+                                                   "  4 - Always show",
+                                                    false, 0u,
+                                                   "0, 1, 2, 3, or 4",
+                                                   cmd);
 
         TCLAP::SwitchArg switchVerboseLog(std::string(), "verbose", "Enable log output into the terminal", false);
 
@@ -358,6 +363,9 @@ int main(int argc, char**argv)
         setup.speedRunnerMode = speedRunMode.getValue();
         setup.speedRunnerSemiTransparent = switchSpeedRunSemiTransparent.getValue();
         setup.showControllerState = switchDisplayControls.getValue();
+
+        if(showBatteryStatus.getValue() > 0 && showBatteryStatus.getValue() <= 4)
+            g_videoSettings.batteryStatus = showBatteryStatus.getValue();
 
         setup.recordReplay = recordReplay.getValue();
         setup.recordRecord = recordRecord.getValue();

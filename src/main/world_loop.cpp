@@ -4,23 +4,18 @@
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
  * Copyright (c) 2020-2021 Vitaly Novichkov <admin@wohlnet.ru>
  *
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation the
- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
- * sell copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
  *
- * The above copyright notice and this permission notice shall be included
- * in all copies or substantial portions of the Software.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
- * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
- * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
- * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
- * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <SDL2/SDL_timer.h>
@@ -44,19 +39,57 @@
 #include "../pseudo_vb.h"
 
 
+static SDL_INLINE bool isWorldMusicNotSame(WorldMusic_t &mus)
+{
+    bool ret = false;
+    ret |= (curWorldMusic != mus.Type);
+    ret |= (mus.Type == CustomWorldMusicId() && curWorldMusicFile != mus.MusicFile);
+    return ret;
+}
+
+static SDL_INLINE bool s_worldUpdateMusic(const Location_t &loc)
+{
+    bool ret = false;
+    static WorldMusicPtrArr marr;
+
+    if(marr.capacity() < 20)
+        marr.reserve(20);
+
+    treeWorldMusicQuery(loc, marr, false);
+
+    for(auto *t : marr)
+    {
+        WorldMusic_t &mus = *t;
+        if(CheckCollision(loc, mus.Location))
+        {
+            if(isWorldMusicNotSame(mus))
+            {
+                curWorldMusicFile = mus.MusicFile;
+                StartMusic(mus.Type);
+                ret = true;
+            }
+        }
+    }
+
+    return ret;
+}
+
 void WorldLoop()
 {
     // Keep them static to don't re-alloc them for every iteration
     static WorldPathPtrArr parr;
     static WorldLevelPtrArr larr;
     static WorldLevelPtrArr larr2;
-    static WorldMusicPtrArr marr;
-    // Reserve 20 elements per every array
-    parr.reserve(20);
-    larr.reserve(20);
-    larr2.reserve(20);
-    marr.reserve(20);
 
+    // Reserve 20 elements per every array
+    if(parr.capacity() < 20)
+        parr.reserve(20);
+    if(larr2.capacity() < 20)
+        larr2.reserve(20);
+    if(larr2.capacity() < 20)
+        larr2.reserve(20);
+
+    bool musicReset = false;
     Location_t tempLocation;
     int A = 0;
     int B = 0;
@@ -81,17 +114,7 @@ void WorldLoop()
     {
         if(LevelBeatCode > 0)
         {
-            treeWorldMusicQuery(WorldPlayer[1].Location, marr, false);
-            //for(A = 1; A <= numWorldMusic; A++)
-            for(auto *t : marr)
-            {
-                WorldMusic_t &mus = *t;
-                if(CheckCollision(WorldPlayer[1].Location, mus.Location))
-                {
-                    if(curWorldMusic != mus.Type)
-                        StartMusic(mus.Type);
-                }
-            }
+            s_worldUpdateMusic(WorldPlayer[1].Location);
 
             for(A = 1; A <= 4; A++)
             {
@@ -107,17 +130,7 @@ void WorldLoop()
         }
         else if(LevelBeatCode == -1)
         {
-            treeWorldMusicQuery(WorldPlayer[1].Location, marr, false);
-            //for(A = 1; A <= numWorldMusic; A++)
-            for(auto *t : marr)
-            {
-                WorldMusic_t &mus = *t;
-                if(CheckCollision(WorldPlayer[1].Location, mus.Location))
-                {
-                    if(curWorldMusic != mus.Type)
-                        StartMusic(mus.Type);
-                }
-            }
+            s_worldUpdateMusic(WorldPlayer[1].Location);
 
             treeWorldLevelQuery(WorldPlayer[1].Location, larr, false);
             //for(A = 1; A <= numWorldLevels; A++)
@@ -197,10 +210,10 @@ void WorldLoop()
     if(WorldPlayer[1].Move == 0)
     {
         tempLocation = WorldPlayer[1].Location;
-        tempLocation.Width = tempLocation.Width - 8;
-        tempLocation.Height = tempLocation.Height - 8;
-        tempLocation.X = tempLocation.X + 4;
-        tempLocation.Y = tempLocation.Y + 4;
+        tempLocation.Width -= 8;
+        tempLocation.Height -= 8;
+        tempLocation.X += 4;
+        tempLocation.Y += 4;
         WorldPlayer[1].LevelName.clear();
 
         bool pausePress = Player[1].Controls.Start || SharedControls.Pause;
@@ -435,6 +448,7 @@ void WorldLoop()
                     }
                     else if(int(level.WarpX) != -1 || int(level.WarpY) != -1)
                     {
+                        musicReset = true;
                         StopMusic();
                         PlaySound(SFX_LevelSelect);
                         frmMain.setTargetTexture();
@@ -460,20 +474,13 @@ void WorldLoop()
             PlaySound(SFX_Slide);
         }
 
-        treeWorldMusicQuery(tempLocation, marr, true);
-        //for(A = 1; A <= numWorldMusic; A++)
-        for(auto *t : marr)
+        if(s_worldUpdateMusic(WorldPlayer[1].Location))
+            musicReset = false;
+
+        if(musicReset) // Resume the last playing music after teleportation
         {
-            WorldMusic_t &mus = *t;
-            if(CheckCollision(WorldPlayer[1].Location, mus.Location))
-            {
-                if((curWorldMusic != mus.Type) ||
-                   (mus.Type == CustomWorldMusicId() && curWorldMusicFile != mus.MusicFile))
-                {
-                    curWorldMusicFile = mus.MusicFile;
-                    StartMusic(mus.Type);
-                }
-            }
+            StartMusic(curWorldMusic);
+            // musicReset = false;
         }
     }
     else if(WorldPlayer[1].Move == 1)
@@ -554,11 +561,11 @@ void LevelPath(const WorldLevel_t &Lvl, int Direction, bool Skp)
     if(Direction == 1 || Direction == 5)
     {
         tempLocation = Lvl.Location;
-        tempLocation.X = tempLocation.X + 4;
-        tempLocation.Y = tempLocation.Y + 4;
-        tempLocation.Width = tempLocation.Width - 8;
-        tempLocation.Height = tempLocation.Height - 8;
-        tempLocation.Y = tempLocation.Y - 32;
+        tempLocation.X +=  4;
+        tempLocation.Y +=  4;
+        tempLocation.Width -= 8;
+        tempLocation.Height -=  8;
+        tempLocation.Y -= 32;
 
         treeWorldPathQuery(tempLocation, parr, false);
         //for(A = 1; A <= numWorldPaths; A++)
@@ -579,11 +586,11 @@ void LevelPath(const WorldLevel_t &Lvl, int Direction, bool Skp)
     if(Direction == 2 || Direction == 5)
     {
         tempLocation = Lvl.Location;
-        tempLocation.X = tempLocation.X + 4;
-        tempLocation.Y = tempLocation.Y + 4;
-        tempLocation.Width = tempLocation.Width - 8;
-        tempLocation.Height = tempLocation.Height - 8;
-        tempLocation.X = tempLocation.X - 32;
+        tempLocation.X += 4;
+        tempLocation.Y += 4;
+        tempLocation.Width -= 8;
+        tempLocation.Height -= 8;
+        tempLocation.X -= 32;
 
         treeWorldPathQuery(tempLocation, parr, false);
         //for(A = 1; A <= numWorldPaths; A++)
@@ -604,11 +611,11 @@ void LevelPath(const WorldLevel_t &Lvl, int Direction, bool Skp)
     if(Direction == 3 || Direction == 5)
     {
         tempLocation = Lvl.Location;
-        tempLocation.X = tempLocation.X + 4;
-        tempLocation.Y = tempLocation.Y + 4;
-        tempLocation.Width = tempLocation.Width - 8;
-        tempLocation.Height = tempLocation.Height - 8;
-        tempLocation.Y = tempLocation.Y + 32;
+        tempLocation.X += 4;
+        tempLocation.Y += 4;
+        tempLocation.Width -= 8;
+        tempLocation.Height -= 8;
+        tempLocation.Y += 32;
 
         treeWorldPathQuery(tempLocation, parr, false);
         //for(A = 1; A <= numWorldPaths; A++)
@@ -629,11 +636,11 @@ void LevelPath(const WorldLevel_t &Lvl, int Direction, bool Skp)
     if(Direction == 4 || Direction == 5)
     {
         tempLocation = Lvl.Location;
-        tempLocation.X = tempLocation.X + 4;
-        tempLocation.Y = tempLocation.Y + 4;
-        tempLocation.Width = tempLocation.Width - 8;
-        tempLocation.Height = tempLocation.Height - 8;
-        tempLocation.X = tempLocation.X + 32;
+        tempLocation.X += 4;
+        tempLocation.Y += 4;
+        tempLocation.Width -= 8;
+        tempLocation.Height -= 8;
+        tempLocation.X += 32;
 
         treeWorldPathQuery(tempLocation, parr, false);
         //for(A = 1; A <= numWorldPaths; A++)
@@ -664,10 +671,10 @@ void PathPath(WorldPath_t &Pth, bool Skp)
 
     Location_t tempLocation;
     tempLocation = Pth.Location;
-    tempLocation.X = tempLocation.X + 4;
-    tempLocation.Y = tempLocation.Y + 4;
-    tempLocation.Width = tempLocation.Width - 8;
-    tempLocation.Height = tempLocation.Height - 8;
+    tempLocation.X += 4;
+    tempLocation.Y += 4;
+    tempLocation.Width -= 8;
+    tempLocation.Height -= 8;
 
     treeWorldSceneQuery(tempLocation, sarr, true);
     //for(A = 1; A <= numScenes; A++)

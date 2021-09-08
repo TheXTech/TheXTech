@@ -21,8 +21,9 @@ android {
         }
         minSdkVersion 16
         targetSdkVersion 30
-        versionName "1.3.5"
-        versionCode 010305
+// FIXME: Automatize the version taking from the version.cmake at the repository root
+        versionName "1.3.5.2"
+        versionCode 01030502
         externalNativeBuild {
             // REPLACE THIS with CMAKE build, HOW TO:
             // https://stackoverflow.com/questions/47604628/use-externalproject-add-to-include-opus-in-android

@@ -4,23 +4,18 @@
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
  * Copyright (c) 2020-2021 Vitaly Novichkov <admin@wohlnet.ru>
  *
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation the
- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
- * sell copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
  *
- * The above copyright notice and this permission notice shall be included
- * in all copies or substantial portions of the Software.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
- * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
- * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
- * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
- * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "../globals.h"
@@ -110,7 +105,7 @@ void CheckAfterStarTake(bool many)
         auto &w = Warp[c];
         if((!many && (w.Stars == numStars)) || (many && (w.Stars <= numStars)))
         {
-            for(int d = numBackground; d <= allBGOs; d++)
+            for(int d = numBackground + 1; d <= allBGOs; d++)
             {
                 auto &b = Background[d];
                 if(b.Type == 160 && CheckCollision(w.Entrance, b.Location))
@@ -283,7 +278,7 @@ void TouchBonus(int A, int B)
             else
                 PlaySound(SFX_GotItem);
             if(NPC[B].Effect != 2)
-                MoreScore(6, NPC[B].Location);
+                MoreScore(NPCScore[NPC[B].Type], NPC[B].Location);
         }
         else if(NPC[B].Type == 14 || NPC[B].Type == 182 || NPC[B].Type == 183) // Bonus is a fire flower
         {
@@ -315,7 +310,7 @@ void TouchBonus(int A, int B)
                     PlaySound(SFX_GotItem);
             }
             if(NPC[B].Effect != 2)
-                MoreScore(6, NPC[B].Location);
+                MoreScore(NPCScore[NPC[B].Type], NPC[B].Location);
         }
         else if(NPC[B].Type == 264 || NPC[B].Type == 277) // Bonus is an ice flower
         {
@@ -348,7 +343,7 @@ void TouchBonus(int A, int B)
                     PlaySound(SFX_GotItem);
             }
             if(NPC[B].Effect != 2)
-                MoreScore(6, NPC[B].Location);
+                MoreScore(NPCScore[NPC[B].Type], NPC[B].Location);
         }
         else if(NPC[B].Type == 34) // Bonus is a leaf
         {
@@ -375,7 +370,7 @@ void TouchBonus(int A, int B)
                     PlaySound(SFX_GotItem);
             }
             if(NPC[B].Effect != 2)
-                MoreScore(6, NPC[B].Location);
+                MoreScore(NPCScore[NPC[B].Type], NPC[B].Location);
         }
         else if(NPC[B].Type == 169) // Bonus is a Tanooki Suit
         {
@@ -402,7 +397,7 @@ void TouchBonus(int A, int B)
                     PlaySound(SFX_GotItem);
             }
             if(NPC[B].Effect != 2)
-                MoreScore(6, NPC[B].Location);
+                MoreScore(NPCScore[NPC[B].Type], NPC[B].Location);
         }
         else if(NPC[B].Type == 170) // Bonus is a Hammer Suit
         {
@@ -429,7 +424,7 @@ void TouchBonus(int A, int B)
                     PlaySound(SFX_GotItem);
             }
             if(NPC[B].Effect != 2)
-                MoreScore(6, NPC[B].Location);
+                MoreScore(NPCScore[NPC[B].Type], NPC[B].Location);
         }
         else if(NPCIsACoin[NPC[B].Type]) // Bonus is a coin
         {

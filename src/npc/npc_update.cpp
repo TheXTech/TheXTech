@@ -4,23 +4,18 @@
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
  * Copyright (c) 2020-2021 Vitaly Novichkov <admin@wohlnet.ru>
  *
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation the
- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
- * sell copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
  *
- * The above copyright notice and this permission notice shall be included
- * in all copies or substantial portions of the Software.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
- * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
- * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
- * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
- * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "../globals.h"
@@ -159,7 +154,11 @@ void UpdateNPCs()
             NPC[A].JustActivated = 0;
             NPC[A].Chat = false;
             if(NPC[A].TimeLeft == 0)
+            {
                 Deactivate(A);
+                if(g_compatibility.fix_FreezeNPCs_no_reset)
+                    NPC[A].TimeLeft = -1;
+            }
             if(NPC[A].Killed > 0)
             {
                 if(NPC[A].Location.SpeedX == 0.0)
@@ -4207,7 +4206,13 @@ void UpdateNPCs()
                                 {
                                     // fBlock = FirstBlock[long(level[NPC[A].Section].X / 32) - 1];
                                     // lBlock = LastBlock[long((level[NPC[A].Section].Width) / 32.0) + 2];
-                                    blockTileGet(level[NPC[A].Section], fBlock, lBlock);
+                                    {
+                                        auto &sec = level[NPC[A].Section];
+                                        Location_t toShake;
+                                        toShake.X = sec.X;
+                                        toShake.Width = (sec.Width - sec.X);
+                                        blockTileGet(toShake, fBlock, lBlock);
+                                    }
 
                                     // Shake all blocks up
                                     for(int B = (int)fBlock; B <= lBlock; B++)
@@ -4375,6 +4380,31 @@ void UpdateNPCs()
                     }
                     else
                     {
+                        int shootStep = 10;
+                        int shootStepSpin = 20;
+                        int shootStepCar = 5;
+                        bool keepProjectile = false;
+
+                        int shootBehavior = int(NPC[A].Special7);
+
+                        switch(shootBehavior)
+                        {
+                        default:
+                        case 0:
+                            // SMBX 1.2.1 and newer (shoot fast, don't shoot while projectile)
+                            break;
+                        case 1:
+                            // SMBX 1.2 (shoot fast, keep shoot while projectile)
+                            keepProjectile = true;
+                            break;
+                        case 2:
+                            // SMBX older than 1.2 (shoot slow, keep shoot while projectile)
+                            keepProjectile = true;
+                            shootStep = 5;
+                            shootStepSpin = 10;
+                            break;
+                        }
+
                         if(NPC[A].HoldingPlayer > 0)
                         {
                             if(Player[NPC[A].HoldingPlayer].SpinJump)
@@ -4382,21 +4412,19 @@ void UpdateNPCs()
                                 if(NPC[A].Direction != Player[NPC[A].HoldingPlayer].SpinFireDir)
                                 {
                                     if(Player[NPC[A].HoldingPlayer].Effect == 0)
-                                        NPC[A].Special = NPC[A].Special + 20;
+                                        NPC[A].Special += shootStepSpin;
                                 }
                             }
                             else
                             {
                                 if(Player[NPC[A].HoldingPlayer].Effect == 0)
-                                    NPC[A].Special = NPC[A].Special + 10;
+                                    NPC[A].Special += shootStep;
                             }
                         }
                         else if(NPC[A].standingOnPlayer > 0)
-                            NPC[A].Special = NPC[A].Special + 5;
-                        else if(NPC[A].Projectile)
-                        {
-                            // .Special = .Special + 10
-                        }
+                            NPC[A].Special += shootStepCar;
+                        else if(NPC[A].Projectile && keepProjectile)
+                            NPC[A].Special += shootStep;
                     }
 
                     if(NPC[A].Special >= 200)
