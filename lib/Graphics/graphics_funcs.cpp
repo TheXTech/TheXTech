@@ -286,7 +286,7 @@ void GraphicsHelps::mergeWithMask(FIBITMAP *image, FIBITMAP *mask)
     unsigned int img_pitch = FreeImage_GetPitch(image);
     unsigned int mask_w = FreeImage_GetWidth(mask);
     unsigned int mask_h = FreeImage_GetHeight(mask);
-    unsigned int mask_pitch = FreeImage_GetPitch(image);
+    unsigned int mask_pitch = FreeImage_GetPitch(mask);
     BYTE *img_bits  = FreeImage_GetBits(image);
     BYTE *mask_bits = FreeImage_GetBits(mask);
     BYTE *FPixP = nullptr;
