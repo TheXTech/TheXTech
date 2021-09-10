@@ -138,6 +138,9 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
     FileName = dirEpisode.resolveDirCase(lvl.meta.filename);
     FileNamePath = lvl.meta.path + "/";
 
+    bool compatModern = (CompatGetLevel() == COMPAT_MODERN);
+    bool isSmbx64 = (lvl.meta.RecentFormat == LevelData::SMBX64);
+    int  fVersion = lvl.meta.RecentFormatVersion;
 
     if(!FilePath.empty())
     {
@@ -373,9 +376,9 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 
         if(npc.Type == NPCID_CANNONITEM) // billy gun
         {
-            if(lvl.meta.RecentFormat == LevelData::SMBX64 && lvl.meta.RecentFormatVersion < 28)
+            if(compatModern && isSmbx64 && fVersion < 28)
                 npc.Special7 = 2.0; // SMBX 1.1.x and 1.0.x behavior
-            else if(lvl.meta.RecentFormat == LevelData::SMBX64 && lvl.meta.RecentFormatVersion < 51)
+            else if(compatModern && isSmbx64 && fVersion < 51)
                 npc.Special7 = 1.0; // SMBX 1.2 behavior
             else
                 npc.Special7 = n.special_data; // SMBX 1.2.1 and newer behavior, customizable behavior
@@ -383,8 +386,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 
         if(npc.Type == NPCID_THWOMP_SMB3)
         {
-            if(lvl.meta.RecentFormat == LevelData::SMBX64 &&
-               lvl.meta.RecentFormatVersion < 9)
+            if(compatModern && isSmbx64 && fVersion < 9)
                 npc.Special7 = 1.0; // Make twomps to fall always
             else
                 npc.Special7 = n.special_data;
@@ -392,8 +394,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 
         if(npc.Type == NPCID_BOWSER_SMB3)
         {
-            if(lvl.meta.RecentFormat == LevelData::SMBX64 &&
-               lvl.meta.RecentFormatVersion < 9)
+            if(compatModern && isSmbx64 && fVersion < 9)
                 npc.Special7 = 1.0; // Keep original behavior of Bowser as in SMBX 1.0
             else
                 npc.Special7 = n.special_data;
@@ -401,8 +402,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 
         if(npc.Type == NPCID_YELBLOCKS)
         {
-            if(lvl.meta.RecentFormat == LevelData::SMBX64 &&
-               lvl.meta.RecentFormatVersion < 9)
+            if(compatModern && isSmbx64 && fVersion < 9)
                 npc.Special7 = 1.0; // Workaround for yellow platform at The Invasion 1
             else
                 npc.Special7 = 0.0;
