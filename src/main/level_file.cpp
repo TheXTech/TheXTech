@@ -378,6 +378,15 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
                 npc.Special7 = n.special_data; // SMBX 1.2.1 and newer behavior, customizable behavior
         }
 
+        if(npc.Type == 37)
+        {
+            if(lvl.meta.RecentFormat == LevelData::SMBX64 &&
+               lvl.meta.RecentFormatVersion < 9)
+                npc.Special7 = 1.0; // Make twomps to fall always
+            else
+                npc.Special7 = n.special_data;
+        }
+
         if(npc.Type == 86)
         {
             if(lvl.meta.RecentFormat == LevelData::SMBX64 &&
