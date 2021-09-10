@@ -4575,7 +4575,10 @@ void SpecialNPC(int A)
                 C = 0;
                 for(B = 1; B <= numPlayers; B++)
                 {
-                    if(!CanComeOut(NPC[A].Location, Player[B].Location) && Player[B].Location.Y >= NPC[A].Location.Y)
+                    bool playerLower = Player[B].Location.Y >= NPC[A].Location.Y;
+                    // When mode 1, simulate older behavior and do always fall
+                    playerLower |= fEqual(NPC[A].Special7, 1.0);
+                    if(!CanComeOut(NPC[A].Location, Player[B].Location) && playerLower)
                         C = B;
                 }
                 if(C > 0)
