@@ -408,7 +408,6 @@ if(3DS)
     )
 elseif(VITA)
     list(APPEND THEXTECH_SRC
-        src/sound_internal.cpp # Vita may one day be supported by SDL_mixer_ext, but for now it just fails to initialize despite building.
         src/control/joystick.cpp # Vita is supported by SDL for joystick.
     )
 
