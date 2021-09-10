@@ -673,6 +673,7 @@ void CheatCode(char NewKey)
                 tempLocation.X = Player[B].Location.X + Player[B].Location.Width / 2.0 - 16;
                 NewEffect(10, tempLocation);
             }
+            UpdateYoshiMusic();
             CheatString.clear();
             cheated = true;
         }
@@ -697,6 +698,7 @@ void CheatCode(char NewKey)
                 tempLocation.X = Player[B].Location.X + Player[B].Location.Width / 2.0 - 16;
                 NewEffect(10, tempLocation);
             }
+            UpdateYoshiMusic();
             CheatString.clear();
             cheated = true;
         }
@@ -721,6 +723,7 @@ void CheatCode(char NewKey)
                 tempLocation.X = Player[B].Location.X + Player[B].Location.Width / 2.0 - 16;
                 NewEffect(10, tempLocation);
             }
+            UpdateYoshiMusic();
             CheatString.clear();
             cheated = true;
         }
@@ -746,6 +749,7 @@ void CheatCode(char NewKey)
                 tempLocation.X = Player[B].Location.X + Player[B].Location.Width / 2.0 - 16;
                 NewEffect(10, tempLocation);
             }
+            UpdateYoshiMusic();
             CheatString.clear();
             cheated = true;
         }
@@ -770,6 +774,7 @@ void CheatCode(char NewKey)
                 tempLocation.X = Player[B].Location.X + Player[B].Location.Width / 2.0 - 16;
                 NewEffect(10, tempLocation);
             }
+            UpdateYoshiMusic();
             CheatString.clear();
             cheated = true;
         }
