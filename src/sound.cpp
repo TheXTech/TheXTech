@@ -22,6 +22,8 @@
 #include <SDL2/SDL_messagebox.h>
 #include <SDL2/SDL_timer.h>
 #include <SDL2/SDL_mixer_ext.h>
+#else
+#error FIXME: Please re-implement the MixerX' layer over 3DS sound API and use SDL-simulation heads
 #endif
 
 #include "globals.h"
