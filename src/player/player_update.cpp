@@ -1225,6 +1225,7 @@ void UpdatePlayer()
                             Player[A].CanJump = false;
                             Player[A].StandingOnNPC = 0;
                             Player[A].Mount = 0;
+                            UpdateYoshiMusic();
                             numNPCs++;
                             NPC[numNPCs] = NPC_t();
                             NPC[numNPCs].Direction = Player[A].Direction;
@@ -1942,6 +1943,7 @@ void UpdatePlayer()
                     {
                         PlayerHurt(A);
                         Player[A].Mount = 0;
+                        UpdateYoshiMusic();
                     }
                     if(Player[A].Slide)
                         Player[A].Slide = false;
