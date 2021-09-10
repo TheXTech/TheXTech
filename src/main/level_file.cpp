@@ -29,6 +29,7 @@
 #include "../layers.h"
 #include "../compat.h"
 #include "../graphics.h"
+#include "../npc_id.h"
 #include "level_file.h"
 
 #include <DirManager/dirman.h>
@@ -338,13 +339,15 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             npc.Type = 1;
         }
 
-        if(npc.Type == 91 || npc.Type == 96 || npc.Type == 283 || npc.Type == 284)
+        if(npc.Type == NPCID_BURIEDPLANT || npc.Type == NPCID_YOSHIEGG ||
+           npc.Type == NPCID_BUBBLE || npc.Type == NPCID_LAKITU_SMW)
         {
             npc.Special = n.contents;
             npc.DefaultSpecial = int(npc.Special);
         }
 
-        if(npc.Type == 288 || npc.Type == 289 || (npc.Type == 91 && n.contents == 288))
+        if(npc.Type == NPCID_POTION || npc.Type == NPCID_POTIONDOOR ||
+          (npc.Type == NPCID_BURIEDPLANT && n.contents == NPCID_POTION))
         {
             npc.Special2 = n.special_data;
             npc.DefaultSpecial2 = int(npc.Special2);
@@ -362,13 +365,13 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             npc.DefaultSpecial = int(npc.Special);
         }
 
-        if(npc.Type == 260)
+        if(npc.Type == NPCID_FIREBAR)
         {
             npc.Special = n.special_data;
             npc.DefaultSpecial = int(npc.Special);
         }
 
-        if(npc.Type == 22) // billy gun
+        if(npc.Type == NPCID_CANNONITEM) // billy gun
         {
             if(lvl.meta.RecentFormat == LevelData::SMBX64 && lvl.meta.RecentFormatVersion < 28)
                 npc.Special7 = 2.0; // SMBX 1.1.x and 1.0.x behavior
@@ -378,7 +381,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
                 npc.Special7 = n.special_data; // SMBX 1.2.1 and newer behavior, customizable behavior
         }
 
-        if(npc.Type == 37)
+        if(npc.Type == NPCID_THWOMP_SMB3)
         {
             if(lvl.meta.RecentFormat == LevelData::SMBX64 &&
                lvl.meta.RecentFormatVersion < 9)
@@ -387,7 +390,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
                 npc.Special7 = n.special_data;
         }
 
-        if(npc.Type == 86)
+        if(npc.Type == NPCID_BOWSER_SMB3)
         {
             if(lvl.meta.RecentFormat == LevelData::SMBX64 &&
                lvl.meta.RecentFormatVersion < 9)
@@ -396,7 +399,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
                 npc.Special7 = n.special_data;
         }
 
-        if(npc.Type == 60)
+        if(npc.Type == NPCID_YELBLOCKS)
         {
             if(lvl.meta.RecentFormat == LevelData::SMBX64 &&
                lvl.meta.RecentFormatVersion < 9)
@@ -416,7 +419,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         npc.Text = n.msg;
 
         npc.Inert = n.friendly;
-        if(npc.Type == 151)
+        if(npc.Type == NPCID_SIGN)
             npc.Inert = true;
         npc.Stuck = n.nomove;
         npc.DefaultStuck = npc.Stuck;
@@ -441,13 +444,13 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 
         CheckSectionNPC(numNPCs);
 
-        if(npc.Type == 192) // Is a checkpoint
+        if(npc.Type == NPCID_CHECKPOINT) // Is a checkpoint
         {
             checkPointId++;
             npc.Special = checkPointId;
             npc.DefaultSpecial = int(npc.Special);
         }
-        else if(npc.Type == 97 || npc.Type == 196) // Is a star
+        else if(npc.Type == NPCID_STAR_SMB3 || npc.Type == NPCID_STAR_SMW) // Is a star
         {
             bool tempBool = false;
             for(B = 1; B <= numStars; ++B)
@@ -460,7 +463,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             {
                 npc.Special = 1;
                 npc.DefaultSpecial = 1;
-                if(npc.Type == 196)
+                if(npc.Type == NPCID_STAR_SMW)
                     npc.Killed = 9;
             }
         }
