@@ -143,6 +143,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                 tempLocation.Y = p.Location.Y + p.Location.Height / 2.0 - 16;
                 tempLocation.X = p.Location.X + p.Location.Width / 2.0 - 16;
                 NewEffect(10, tempLocation);
+                UpdateYoshiMusic();
             }
             else
             {

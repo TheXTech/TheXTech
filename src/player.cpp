@@ -421,6 +421,7 @@ void SetupPlayers()
     //        Netplay::sendData "1d" + (nPlay.MySlot + 1) + "|" + Player[nPlay.MySlot + 1].Character + "|" + Player[nPlay.MySlot + 1].State + LB + Netplay::PutPlayerLoc(nPlay.MySlot + 1);
     //        StartMusic Player[nPlay.MySlot + 1].Section;
     //    }
+    UpdateYoshiMusic();
     SetupScreens(); // setup the screen depending on how many players there are
     setupCheckpoints(); // setup the checkpoint and restpore the player at it if needed
 }
@@ -525,6 +526,7 @@ void PlayerHurt(int A)
                 Player[A].GroundPound2 = false;
                 Player[A].YoshiYellow = false;
                 Player[A].Dismount = Player[A].Immune;
+                UpdateYoshiMusic();
                 numNPCs++;
                 NPC[numNPCs] = NPC_t();
                 if(Player[A].YoshiNPC > 0 || Player[A].YoshiPlayer > 0)
@@ -858,6 +860,7 @@ void KillPlayer(int A)
             tempLocation.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - tempLocation.Width / 2.0;
             tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height / 2.0 - tempLocation.Height / 2.0;
             NewEffect(131, tempLocation);
+            UpdateYoshiMusic();
         }
     }
 }
@@ -5386,6 +5389,7 @@ void PlayerEffects(int A)
                 Player[A].MountType = 0;
                 Player[A].MountOffsetY = 0;
                 SizeCheck(A);
+                UpdateYoshiMusic();
             }
 
             if(warp_dir_exit == 1)
@@ -5809,6 +5813,7 @@ void PlayerEffects(int A)
                 SizeCheck(A);
                 Player[A].MountOffsetY = 0;
                 Player[A].Frame = 1;
+                UpdateYoshiMusic();
             }
 
             Player[A].Location.X = warp_exit.X + warp_exit.Width / 2.0 - Player[A].Location.Width / 2.0;

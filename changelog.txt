@@ -32,6 +32,7 @@ Changes for 1.3.5.2
 -Fixed the improper custom music change when going through the warp on the world map
 -Fixed vanilla bug: Offscreen NPC can now respawn during the stopwatch freeze
 -Added Thwomp (NPC-37) behavior compatibility with SMBX 1.0.x
+-Added the Yoshi mode support for specified songs at the music.ini: mute selected track number without Yoshi, enable it back when Yoshi is presented
 
 Changes for 1.3.5.1
 -Episodes and battle levels lists now loading in the separated thread with a progress showing

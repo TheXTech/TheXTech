@@ -185,6 +185,8 @@ void BlockSound();
 // Public Sub UpdateSound() 'checks to loop music and update the soundpause variable
 // checks to loop music and update the soundpause variable
 void UpdateSound();
+
+void UpdateYoshiMusic();
 // EXTRA: Fade out music
 void FadeOutMusic(int ms);
 // EXTRA: load custom sounds.ini and music.ini from episode and custom folder!

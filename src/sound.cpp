@@ -75,6 +75,9 @@ static bool s_useNewIceSfx = false;
 static int g_errorsSfx = 0;
 // static int g_errorsMusic = 0; // Unued yet
 
+static bool s_musicHasYoshiMode = false;
+static int  s_musicYoshiTrackNumber = -1;
+
 static std::string MusicRoot;
 static std::string SfxRoot;
 
@@ -85,6 +88,7 @@ struct Music_t
 {
     std::string path;
     int volume = 52;
+    int yoshiModeTrack = -1;
 };
 
 struct SFX_t
@@ -194,6 +198,7 @@ static void AddMusic(const std::string &root,
     {
         Music_t m;
         m.path = root + f;
+        ini.read("yoshi-mode-track", m.yoshiModeTrack, -1);
         m.volume = volume;
         pLogDebug("Adding music [%s] '%s'", alias.c_str(), m.path.c_str());
         auto a = music.find(alias);
@@ -330,12 +335,27 @@ void SoundResumeAll()
 
 static void processPathArgs(std::string &path,
                             const std::string &episodeRoot,
-                            const std::string &dataDirName)
+                            const std::string &dataDirName,
+                            int *yoshiModeTrack = nullptr)
 {
     if(path.find('|') == std::string::npos)
         return; // Nothing to do
     Strings::List p;
     Strings::split(p, path, '|');
+
+    if(yoshiModeTrack)
+    {
+        *yoshiModeTrack = -1;
+        Strings::List args;
+        Strings::split(args, p[1], ';');
+        for(auto &arg : args)
+        {
+            if(arg.compare(0, 3, "ym=") != 0)
+                continue;
+            *yoshiModeTrack = SDL_atoi(arg.substr(3).c_str());
+        }
+    }
+
     Strings::replaceInAll(p[1], "{e}", episodeRoot);
     Strings::replaceInAll(p[1], "{d}", episodeRoot + dataDirName);
     Strings::replaceInAll(p[1], "{r}", MusicRoot);
@@ -367,6 +387,9 @@ void PlayMusic(std::string Alias, int fadeInMs)
         else
         {
             Mix_VolumeMusicStream(g_curMusic, m.volume);
+            s_musicYoshiTrackNumber = m.yoshiModeTrack;
+            s_musicHasYoshiMode = (s_musicYoshiTrackNumber >= 0 && (Mix_GetMusicTracks(g_curMusic) > s_musicYoshiTrackNumber));
+            UpdateYoshiMusic();
             if(fadeInMs > 0)
                 Mix_FadeInMusic(g_curMusic, -1, fadeInMs);
             else
@@ -415,6 +438,8 @@ void StartMusic(int A, int fadeInMs)
             std::string p = FileNamePath + "/" + curWorldMusicFile;
             processPathArgs(p, FileNamePath + "/", FileName + "/");
             g_curMusic = Mix_LoadMUS(p.c_str());
+            s_musicHasYoshiMode = false;
+            s_musicYoshiTrackNumber = -1;
             Mix_VolumeMusicStream(g_curMusic, 64);
             if(fadeInMs > 0)
                 Mix_FadeInMusic(g_curMusic, -1, fadeInMs);
@@ -453,8 +478,11 @@ void StartMusic(int A, int fadeInMs)
             if(g_curMusic)
                 Mix_FreeMusic(g_curMusic);
             std::string p = FileNamePath + "/" + CustomMusic[A];
-            processPathArgs(p, FileNamePath + "/", FileName + "/");
+            s_musicYoshiTrackNumber = -1;
+            processPathArgs(p, FileNamePath + "/", FileName + "/", &s_musicYoshiTrackNumber);
             g_curMusic = Mix_LoadMUS(p.c_str());
+            s_musicHasYoshiMode = (s_musicYoshiTrackNumber >= 0 && (Mix_GetMusicTracks(g_curMusic) > s_musicYoshiTrackNumber));
+            UpdateYoshiMusic();
             Mix_VolumeMusicStream(g_curMusic, 52);
             if(fadeInMs > 0)
                 Mix_FadeInMusic(g_curMusic, -1, fadeInMs);
@@ -843,4 +871,17 @@ void UnloadCustomSound()
     restoreDefaultSfx();
     g_customMusicInDataFolder = false;
     g_customSoundsInDataFolder = false;
+}
+
+void UpdateYoshiMusic()
+{
+    if(!s_musicHasYoshiMode)
+        return;
+
+    bool hasYoshi = false;
+
+    for(int i = 1; i <= maxPlayers; ++i)
+        hasYoshi |= (Player[i].Mount == 3);
+
+    Mix_SetMusicTrackMute(g_curMusic, s_musicYoshiTrackNumber, hasYoshi ? 0 : 1);
 }
