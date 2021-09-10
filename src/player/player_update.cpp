@@ -1466,6 +1466,7 @@ void UpdatePlayer()
                                 if(Player[A].SpinJump)
                                     Player[A].Jump = Player[A].Jump - 6;
                                 Player[A].Mount = 0;
+                                UpdateYoshiMusic();
                                 numNPCs++;
                                 NPC[numNPCs] = NPC_t();
                                 NPC[numNPCs].Direction = Player[A].Direction;
@@ -3829,6 +3830,7 @@ void UpdatePlayer()
                                                     Player[A].YoshiTonugeBool = false;
                                                     Player[A].YoshiTongueLength = 0;
                                                     PlaySound(SFX_Yoshi);
+                                                    UpdateYoshiMusic();
                                                     YoshiHeight(A);
                                                 }
                                             }
