@@ -2790,7 +2790,7 @@ void SizeCheck(int A)
     }
     else if(Player[A].Mount == 3)
     {
-        if(Player[A].Duck == false)
+        if(!Player[A].Duck)
         {
             if(Player[A].State == 1)
             {
@@ -2847,7 +2847,7 @@ void YoshiEatCode(int A)
     int B = 0;
     Location_t tempLocation;
 
-    if(Player[A].Mount == 3 && Player[A].Fairy == false)
+    if(Player[A].Mount == 3 && !Player[A].Fairy)
     {
     // Shell Colors
         if(Player[A].MountSpecial == 0)
