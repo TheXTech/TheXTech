@@ -1,3 +1,7 @@
+<p align="center">
+<a href="https://github.com/Wohlstand/TheXTech/releases"><img src="https://raw.githubusercontent.com/Wohlstand/TheXTech/master/resources/icon/thextech_512.png" alt="TheXTech"></a>
+</p>
+
 # TheXTech
 
 SMBX engine, rewritten into C++ from VisualBasic 6.
