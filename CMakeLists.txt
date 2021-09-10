@@ -379,7 +379,6 @@ if(3DS)
     )
 else()
     list(APPEND THEXTECH_SRC
-        src/sound_internal.cpp
         src/control/joystick.cpp
         src/frm_main.cpp
         src/main/cheat_code.cpp
