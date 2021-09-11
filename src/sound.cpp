@@ -18,12 +18,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef NO_SDL
+#if !defined(NO_SDL) && !defined(__3DS__)
 #include <SDL2/SDL_messagebox.h>
 #include <SDL2/SDL_timer.h>
 #include <SDL2/SDL_mixer_ext.h>
 #else
-#error FIXME: Please re-implement the MixerX' layer over 3DS sound API and use SDL-simulation heads
+#error "FIXME: Please re-implement the MixerX' layer over 3DS sound API and use SDL-simulation heads"
 #endif
 
 #include "globals.h"
