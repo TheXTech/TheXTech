@@ -277,6 +277,13 @@ void OpenConfig()
         ChangeScreen();
 #endif
 
+    if(g_config.UseNewEditor && !GFX.EIcons.texture)
+    {
+        pLogWarning("Can't enable Editor because of missing \"graphics/ui/EditorIcons.png\" important"
+                    "texture. Please update your assets to enable the Editor support.");
+        g_config.UseNewEditor = false;
+    }
+
     pLogDebug("Loaded config: %s", configPath.c_str());
 }
 
