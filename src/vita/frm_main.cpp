@@ -57,50 +57,83 @@
 #include "vgl_renderer.h"
 #include "SHADERS.h"
 #include <vitaGL.h>
+#include <psp2/kernel/sysmem.h>
 
 #include "../frm_main.h"
 
 static const char* _str_init_sdl = "::initSDL";
-int _newlib_heap_size_user = 210 * 1024 * 1024; // 128mb to newlib
+static unsigned int num_textures_loaded = 0; // Debug
+int _newlib_heap_size_user = 210 * 1024 * 1024; // PS Vita Specific
 
 #ifndef NO_SDL
 #include <SDL2/SDL.h>
 #endif
 
 #ifndef DISPLAY_WIDTH_DEF
-//960
 #define DISPLAY_WIDTH_DEF 960
 #endif
 #ifndef DISPLAY_HEIGHT_DEF
-//544
 #define DISPLAY_HEIGHT_DEF 544
 #endif
 
-#ifdef USE_STBI
-#ifndef STB_IMAGE_IMPLEMENTATION
-#define STB_IMAGE_IMPLEMENTATION
-#define STBI_NO_HDR
-#define STBI_NO_PIC
-#define STBI_NO_PSD
-#define STBI_ONLY_BMP
-#define STBI_ONLY_GIF
-#define STBI_ONLY_JPEG
-#define STBI_ONLY_PNG
-#define STBI_ONLY_PNM
-#define STBI_ONLY_TGA
-#include "stb_image.h"
-#define STB_IMAGE_RESIZE_IMPLEMENTATION
-#include "stb_image_resize.h"
+typedef struct _PGE_RectF
+{
+    double left, top, right, bottom;
+} PGE_RectF;
+
+#define _VITA_DO_NORMALIZE
+#ifdef _VITA_DO_NORMALIZE
+static inline PGE_RectF 
+__NormalizeToGL(float x, float y, float w, float h, float viewport_w, float viewport_h)
+{
+    float viewport_w_half = viewport_w / 2;
+    float viewport_h_half = viewport_h / 2;
+
+    PGE_RectF rect = 
+    {
+        // left
+        static_cast<double>(roundf(x) / (viewport_w_half) - 1.0f),
+        // right
+        static_cast<double>((viewport_h - (roundf(y))) / viewport_h_half - 1.0f),
+        // right
+        static_cast<double>(roundf(x + w) / (viewport_w_half) - 1.0f),
+        // bottom
+        static_cast<double>((viewport_h - (roundf(y + h))) / viewport_h_half - 1.0f)
+    };
+
+    return rect;
+}
+#else
+static inline PGE_RectF
+__NormalizeToGL(float x, float y, float w, float h, float viewport_w, float viewport_h)
+{
+    return 
+    {
+        x, y,
+        x + w,
+        y + h
+    };
+}
 #endif
-#endif
 
+static inline void print_memory_info()
+{
+    constexpr int MEMORY_DIVISOR = 1e+6;
+    SceKernelFreeMemorySizeInfo info;
+    info.size = sizeof(SceKernelFreeMemorySizeInfo);
+    if(sceKernelGetFreeMemorySize(&info) < 0)
+    {
+        pLogCritical("sceKernelGetFreeMemorySize returned less than 0.");
+        return;
+    }
 
-
-static unsigned int num_textures_loaded = 0;
-static const int vgl_ram_threshold = (16 * 1024 * 1024);
-static const int vgl_legacy_pool_size = (16 * 1024 * 1024);
-
-static const SceGxmMultisampleMode vgl_msaa = SCE_GXM_MULTISAMPLE_NONE;
+    pLogDebug(
+        "PS VITA MEMORY STATS\nUSER_RW MEMORY FREE: %.2fMB\nUSER_CDRAM_RW: %.2fMB\nUSER_MAIN_PHYCONT_*_RW: %.2fMB\n\n",
+        (info.size_user / (float)MEMORY_DIVISOR),
+        (info.size_cdram / (float)MEMORY_DIVISOR),
+        (info.size_phycont / (float)MEMORY_DIVISOR)
+    );
+}
 
 static void dumpFullFile(std::vector<char> &dst, const std::string &path)
 {
@@ -132,32 +165,13 @@ static void dumpFullFile(std::vector<char> &dst, const std::string &path)
     SDL_RWclose(f);
 }
 
+
+// ======================= Begin frm_main.cpp impl for PS Vita ========================== //
+
 FrmMain::FrmMain()
 {
     ScaleWidth = ScreenW;
     ScaleHeight = ScreenH;
-}
-
-#include <psp2/kernel/sysmem.h>
-
-static const int MEMORY_DIVISOR = 1e+6;
-
-static inline void print_memory_info()
-{
-    SceKernelFreeMemorySizeInfo info;
-    info.size = sizeof(SceKernelFreeMemorySizeInfo);
-    if(sceKernelGetFreeMemorySize(&info) < 0)
-    {
-        pLogCritical("sceKernelGetFreeMemorySize returned less than 0.");
-        return;
-    }
-
-    pLogDebug(
-        "PS VITA MEMORY STATS\nUSER_RW MEMORY FREE: %.2fMB\nUSER_CDRAM_RW: %.2fMB\nUSER_MAIN_PHYCONT_*_RW: %.2fMB\n\n",
-        (info.size_user / (float)MEMORY_DIVISOR),
-        (info.size_cdram / (float)MEMORY_DIVISOR),
-        (info.size_phycont / (float)MEMORY_DIVISOR)
-    );
 }
 
 bool FrmMain::initSDL(const CmdLineSetup_t &setup)
@@ -224,30 +238,6 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
 
     CHECK_GL_ERROR((char*)_str_init_sdl);
 
-/*
-    // glClearColor(0.5, 0.1, 0.1, 0); Debug Red
-    glClearColor(0.2f, 0.5f, 0.2f, 1.0f);
-    glEnable(GL_TEXTURE_2D);
-    glEnable(GL_BLEND);
-    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0, DISPLAY_WIDTH_DEF, DISPLAY_HEIGHT_DEF, 0, -1, 1);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-
-    glViewport(
-        0,
-        -DISPLAY_HEIGHT_DEF,
-        DISPLAY_WIDTH_DEF * 2,
-        DISPLAY_HEIGHT_DEF * 2
-    );
-    CHECK_GL_ERROR("::initSDL");
-*/
-    glEnable(GL_TEXTURE_2D);
-
-
     Uint32 sdlInitFlags = 0;
     sdlInitFlags |= SDL_INIT_TIMER;
     sdlInitFlags |= SDL_INIT_AUDIO;
@@ -293,10 +283,8 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
 #ifdef PGE_NO_THREADING
     pLogDebug("THREADING DISABLED! Loading will be slow.");
 #else
-    pLogDebug("THREADING ENABLED! Loading may be buggy. CGFX may be broken.");
+    pLogDebug("THREADING ENABLED!");
 #endif
-
-//    g_stats.enabled = true;
 
     return res;
 }
@@ -400,13 +388,6 @@ void FrmMain::processEvent()
         {
             eventResize();
         }
-//#ifndef __EMSCRIPTEN__
-//        else if(m_event.window.event == SDL_WINDOWEVENT_MAXIMIZED)
-//        {
-//            SDL_RestoreWindow(m_window);
-//            SetRes();
-//        }
-//#endif
         break;
     case SDL_KEYDOWN:
         eventKeyDown(m_event.key);
@@ -553,7 +534,7 @@ StdPicture FrmMain::LoadPicture(std::string path, std::string maskPath, std::str
     GraphicsHelps::closeImage(sourceImage);
 
     if(!target.texture)
-        printf("FAILED TO LOAD!!!! %s\n", path.c_str());
+        pLogWarning("FAILED TO LOAD!!!! %s\n", path.c_str());
     return target;
 }
 
@@ -582,7 +563,6 @@ StdPicture FrmMain::lazyLoadPicture(std::string path, std::string maskPath, std:
     target.w = tSize.w();
     target.h = tSize.h();
 
-    // TODO: Dump full file for Vita.
     dumpFullFile(target.raw, path);
 
     //Apply Alpha mask
@@ -701,7 +681,6 @@ void FrmMain::lazyLoad(StdPicture &target)
         return;
     }
 
-    // TODO: Does Vita declare this?
     m_lazyLoadedBytes += (w * h * 4);
     if(!target.rawMask.empty())
         m_lazyLoadedBytes += (w * h * 4);
@@ -822,43 +801,31 @@ void FrmMain::clearAllTextures()
         if(tx != 0)
         {
             glDeleteTextures(1, &tx);
+#if DEBUG_BUILD
+        texturesDeleted++;
+#endif
         }
     }
 
-    // pLogDebug("Cleared %d textures from vram.\n", texturesDeleted);
-
+#if DEBUG_BUILD
+    pLogDebug("Cleared %d textures from vram.\n", texturesDeleted);
+#endif 
     m_textureBank.clear();
 }
+
 
 void FrmMain::renderRect(int x, int y, int w, int h, float red, float green, float blue, float alpha, bool filled)
 {
     (void)filled;
     // TODO: Filled or not?
-
-
-    Vita_DrawRectColor(x - (w * .5f), y - (h * .5f), w - (w * .25f), h - (h * .25f), red, green, blue, alpha);
-
-    // DrawRectSolid(x, y, w, h, red, green, blue, alpha);
+    PGE_RectF rect = __NormalizeToGL(x + viewport_offset_x, y + viewport_offset_y, w, h, viewport_w, viewport_h);
+    Vita_DrawRectColor(rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, red, green, blue, alpha);
 }
 
 void FrmMain::renderRectBR(int _left, int _top, int _right, int _bottom, float red, float green, float blue, float alpha)
 {
-    (void)_left;
-    (void)_top;
-    (void)_right;
-    (void)_bottom;
-    (void)red;
-    (void)green;
-    (void)blue;
-    (void)alpha;
-
-    float w = (_right - _left);
-    float h = (_bottom - _top);
-
-
-    Vita_DrawRectColor(_left - w, _top - h, _right-_left, _bottom-_top, red, green, blue, alpha);
-    // TODO:
-    // renderRect(_left, _top, _right-_left, _bottom-_top, red, green, blue, alpha, true);
+    PGE_RectF rect = __NormalizeToGL(_left + viewport_offset_x, _top + viewport_offset_y, _right - _left, _bottom - _top, viewport_w, viewport_h);
+    Vita_DrawRectColor(_left, _top, _right-_left, _bottom-_top, red, green, blue, alpha);
 }
 
 void FrmMain::renderTexturePrivate(float xDst, float yDst, float wDst, float hDst,
@@ -885,85 +852,27 @@ void FrmMain::renderTexturePrivate(float xDst, float yDst, float wDst, float hDs
     if(xDst > this->viewport_w || yDst > this->viewport_h)
         return;
 
-
+    // automatic flipping based on SMBX style!
     unsigned int mode = 0;
-    while(ySrc >= tx.h / 2 && mode < 3)
+    while(ySrc >= tx.h && mode < 3)
     {
-        ySrc -= tx.h / 2;
+        ySrc -= tx.h;
         mode += 1;
     }
     flip ^= mode;
 
-    // texture boundaries
-    // this never happens unless there was an invalid input
-    // if((xSrc < 0.f) || (ySrc < 0.f)) return;
-
-    // TODO: graphics tests for how offscreen draws interact with flips
-    //       handling rotations properly is probably impossible
-    if(xDst < 0.f)
+    // Don't go more than size of texture
+    if(xSrc + wDst > tx.w)
     {
-        if(!(flip & SDL_FLIP_HORIZONTAL))
-            xSrc -= xDst * wSrc/wDst;
-        if (wDst+xDst > viewport_w)
-        {
-            if(flip & SDL_FLIP_HORIZONTAL)
-                xSrc += (wDst+xDst-viewport_w) * wSrc/wDst;
-            wSrc = viewport_w * wSrc/wDst;
-            wDst = viewport_w;
-        }
-        else
-        {
-            wSrc += xDst * wSrc/wDst;
-            wDst += xDst;
-        }
-        xDst = 0.f;
+        wDst = tx.w - xSrc;
+        if(wDst < 0)
+            wDst = 0;
     }
-    else if(xDst + wDst > viewport_w)
+    if(ySrc + hDst > tx.h)
     {
-        if(flip & SDL_FLIP_HORIZONTAL)
-            xSrc += (wDst+xDst-viewport_w) * wSrc/wDst;
-        wSrc = (viewport_w - xDst) * wSrc/wDst;
-        wDst = (viewport_w - xDst);
-    }
-    if(yDst < 0.f)
-    {
-        if(!(flip & SDL_FLIP_VERTICAL))
-            ySrc -= yDst * hSrc/hDst;
-        if (hDst+yDst > viewport_h)
-        {
-            if(flip & SDL_FLIP_VERTICAL)
-                ySrc += (hDst+yDst-viewport_h) * hSrc/hDst;
-            hSrc = viewport_h * hSrc/hDst;
-            hDst = viewport_h;
-        }
-        else
-        {
-            hSrc += yDst * hSrc/hDst;
-            hDst += yDst;
-        }
-        yDst = 0.f;
-    }
-    else if(yDst + hDst > viewport_h)
-    {
-        if(flip & SDL_FLIP_VERTICAL)
-            ySrc += (hDst+yDst-viewport_h) * hSrc/hDst;
-        hSrc = (viewport_h - yDst) * hSrc/hDst;
-        hDst = (viewport_h - yDst);
-    }
-
-    if(xSrc + wSrc > tx.w/2)
-    {
-        wDst = (tx.w/2 - xSrc) * wDst/wSrc;
-        wSrc = tx.w/2 - xSrc;
-        if(wDst < 0.f)
-            return;
-    }
-    if(ySrc + hSrc > tx.h/2)
-    {
-        hDst = (tx.h/2 - ySrc) * hDst/hSrc;
-        hSrc = tx.h/2 - ySrc;
-        if(hDst < 0.f)
-            return;
+        hDst = tx.h - ySrc;
+        if(hDst < 0)
+            hDst = 0;
     }
 
     if(tx.texture != tx.ex_data.textureID)
@@ -971,40 +880,33 @@ void FrmMain::renderTexturePrivate(float xDst, float yDst, float wDst, float hDs
         pLogDebug("WARNING: texture IDs differ for a specific drawcall: %u %u.", tx.texture, tx.ex_data.textureID);
     }
 
-    // pLogDebug("Drawing tex with ID %d and size of (%d x %d)", tx.texture, tx.w_orig, tx.h_orig);
+    PGE_RectF rect = __NormalizeToGL(xDst + viewport_offset_x, yDst + viewport_offset_y, wDst, hDst, viewport_w, viewport_h);
     Vita_DrawTextureAnimColorExData(
-        xDst + viewport_offset_x,
-        yDst + viewport_offset_y,
-        wDst,
-        hDst,
+        rect.left,
+        rect.top,
+        rect.right - rect.left,
+        rect.bottom - rect.top,
         tx.ex_data.textureID,
-        tx.w / 2, tx.h / 2,
+        tx.w, tx.h,
         xSrc, ySrc,
         wSrc, hSrc,
         red, green, blue, alpha,
         &tx.ex_data
     );
+
+    // Vita_DrawTextureAnimColorExData(
+    //     xDst + viewport_offset_x,
+    //     yDst + viewport_offset_y,
+    //     wDst,
+    //     hDst,
+    //     tx.ex_data.textureID,
+    //     tx.w / 2, tx.h / 2,
+    //     xSrc, ySrc,
+    //     wSrc, hSrc,
+    //     red, green, blue, alpha,
+    //     &tx.ex_data
+    // );
     return;
-}
-
-inline int ROUNDDIV2(int x)
-{
-    return (x<0)?(x-1)/2:x/2;
-}
-
-inline float ROUNDDIV2(float x)
-{
-    return std::nearbyintf(std::roundf(x)/2.f);
-}
-
-inline float ROUNDDIV2(double x)
-{
-    return std::nearbyintf(std::roundf((float)x)/2.f);
-}
-
-inline float FLOORDIV2(float x)
-{
-    return std::floor(x/2.f);
 }
 
 void FrmMain::renderTextureI(int xDst, int yDst, int wDst, int hDst,
@@ -1013,6 +915,8 @@ void FrmMain::renderTextureI(int xDst, int yDst, int wDst, int hDst,
                         double rotateAngle, SDL_Point *center, unsigned int flip,
                         float red, float green, float blue, float alpha)
 {
+    renderTexturePrivate(xDst, yDst, wDst, hDst, tx, xSrc, ySrc, wDst, hDst, rotateAngle, center, flip, red, green, blue, alpha);
+    /*
     int w = wDst/2;
     int h = hDst/2;
     renderTexturePrivate(
@@ -1021,6 +925,7 @@ void FrmMain::renderTextureI(int xDst, int yDst, int wDst, int hDst,
         xSrc/2, ySrc/2, w, h,
         rotateAngle, center, flip,
         red, green, blue, alpha);
+    */
 }
 
 void FrmMain::renderTextureScaleI(int xDst, int yDst, int wDst, int hDst,
@@ -1031,11 +936,19 @@ void FrmMain::renderTextureScaleI(int xDst, int yDst, int wDst, int hDst,
                              float red, float green, float blue, float alpha)
 {
     renderTexturePrivate(
+        xDst, yDst, wDst, hDst, 
+        tx, 
+        xSrc, ySrc, wSrc, hSrc,
+        rotateAngle, center, flip, 
+        red, green, blue, alpha);
+    /*
+    renderTexturePrivate(
         ROUNDDIV2(xDst), ROUNDDIV2(yDst), wDst/2, hDst/2,
         tx,
         xSrc/2, ySrc/2, wSrc/2, hSrc/2,
         rotateAngle, center, flip,
         red, green, blue, alpha);
+    */
 }
 
 // public draw methods
@@ -1045,12 +958,19 @@ void FrmMain::renderTextureScale(double xDst, double yDst, double wDst, double h
                             int xSrc, int ySrc, int wSrc, int hSrc,
                             float red, float green, float blue, float alpha)
 {
+    renderTexturePrivate(xDst, yDst, wDst, hDst, 
+        tx, 
+        xSrc, ySrc, wSrc, hSrc,
+        0.f, nullptr, SDL_FLIP_NONE, 
+        red, green, blue, alpha);
+    /*
     renderTexturePrivate(
         ROUNDDIV2(xDst), ROUNDDIV2(yDst), ROUNDDIV2(wDst), ROUNDDIV2(hDst),
         tx,
         xSrc/2, ySrc/2, wSrc/2, hSrc/2,
         0.f, nullptr, SDL_FLIP_NONE,
         red, green, blue, alpha);
+        */
 }
 
 void FrmMain::renderTexture(double xDst, double yDst, double wDst, double hDst,
@@ -1058,6 +978,8 @@ void FrmMain::renderTexture(double xDst, double yDst, double wDst, double hDst,
                             int xSrc, int ySrc,
                             float red, float green, float blue, float alpha)
 {
+    renderTexturePrivate(xDst, yDst, wDst, hDst, tx, xSrc, ySrc, wDst, hDst, 0.f, nullptr, SDL_FLIP_NONE, red, green, blue, alpha);
+    /*
     float w = ROUNDDIV2(wDst);
     float h = ROUNDDIV2(hDst);
     renderTexturePrivate(
@@ -1066,10 +988,19 @@ void FrmMain::renderTexture(double xDst, double yDst, double wDst, double hDst,
         xSrc/2, ySrc/2, w, h,
         0.f, nullptr, SDL_FLIP_NONE,
         red, green, blue, alpha);
+    */
 }
 
 void FrmMain::renderTexture(int xDst, int yDst, StdPicture &tx, float red, float green, float blue, float alpha)
 {
+    int w = tx.w;
+    int h = tx.h;
+    renderTexturePrivate(
+        xDst, yDst, w, h, 
+        tx, 0.f, 0.f, w, h, 
+        0.f, nullptr, SDL_FLIP_NONE, 
+        red, green, blue, alpha);
+    /*
     int w = tx.w/2;
     int h = tx.h/2;
     renderTexturePrivate(
@@ -1078,16 +1009,20 @@ void FrmMain::renderTexture(int xDst, int yDst, StdPicture &tx, float red, float
         0.f, 0.f, w, h,
         0.f, nullptr, SDL_FLIP_NONE,
         red, green, blue, alpha);
+    */
 }
 
 void FrmMain::renderTextureScale(int xDst, int yDst, int wDst, int hDst, StdPicture &tx, float red, float green, float blue, float alpha)
 {
+    renderTexturePrivate(xDst, yDst, wDst, hDst, tx, 0.f, 0.f, wDst, hDst, 0.f, nullptr, SDL_FLIP_NONE, red, green, blue, alpha);
+    /*
     renderTexturePrivate(
         ROUNDDIV2(xDst), ROUNDDIV2(yDst), tx.w/2, tx.h/2,
         tx,
         0.f, 0.f, wDst/2, hDst/2,
         0.f, nullptr, SDL_FLIP_NONE,
         red, green, blue, alpha);
+    */
 }
 
 ///// MORE BORING, FAIRLY CROSS IMPLEMENTATION DEPENDENT STUFF HERE
@@ -1113,33 +1048,38 @@ void FrmMain::updateViewport()
 {
     resetViewport();
     offsetViewport(0, 0);
+
+    if(GameMenu)
+    {
+        SetupScreens();
+        CenterScreens();
+        GameMenu = false;
+        GetvScreenAverage();
+        GameMenu = true;
+    }
 }
 
 void FrmMain::resetViewport()
 {
-    pLogDebug("resetViewport called!");
-    setViewport(0, 0, ScreenW, ScreenH);
+    setViewport(0, 0, DISPLAY_WIDTH_DEF, DISPLAY_HEIGHT_DEF);
 }
 
 void FrmMain::setViewport(int x, int y, int w, int h)
 {
     int offset_x = viewport_offset_x - viewport_x;
     int offset_y = viewport_offset_y - viewport_y;
-    viewport_x = x / 2;
-    viewport_y = y / 2;
-    viewport_w = w / 2;
-    viewport_h = h / 2;
-    viewport_offset_x = viewport_x + offset_x;
-    viewport_offset_y = viewport_y + offset_y;
+    viewport_x = x;
+    viewport_y = y;
+    viewport_w = w;
+    viewport_h = h;
+    // viewport_offset_x = viewport_x + offset_x;
+    // viewport_offset_y = viewport_y + offset_y;
 }
 
 void FrmMain::offsetViewport(int x, int y)
 {
-#ifdef VITA
-    pLogDebug("VITA: Offset viewport by [%d, %d]", x, y);
-#endif
-    viewport_offset_x = viewport_x+x/2;
-    viewport_offset_y = viewport_y+y/2;
+    viewport_offset_x = viewport_x + x;
+    viewport_offset_y = viewport_y + y;
 }
 
 SDL_Window *FrmMain::getWindow()
@@ -1154,19 +1094,14 @@ Uint8 FrmMain::getKeyState(SDL_Scancode key)
     return 0;
 }
 
-
 /////// SDL REIMPLEMENTATION KEY EVENTS
+
 void FrmMain::eventKeyDown(SDL_KeyboardEvent &evt)
 {
     int KeyCode = evt.keysym.scancode;
     inputKey = KeyCode;
 
     pLogDebug("inputKey: %d", inputKey);
-
-    //g_stats.enabled = !g_stats.enabled;
-
-    // bool ctrlF = ((evt.keysym.mod & KMOD_CTRL) != 0 && evt.keysym.scancode == SDL_SCANCODE_F);
-    // bool altEnter = ((evt.keysym.mod & KMOD_ALT) != 0 && (evt.keysym.scancode == SDL_SCANCODE_RETURN || evt.keysym.scancode == SDL_SCANCODE_KP_ENTER));
 }
 
 void FrmMain::eventDoubleClick()
@@ -1289,4 +1224,5 @@ void FrmMain::eventMouseUp(SDL_MouseButtonEvent &event)
         m_lastMousePress = 0;
     }
 }
-///////
+
+// ======================= End frm_main.cpp impl for PS Vita ========================== //

@@ -985,26 +985,32 @@ int initGL(void (*dbgPrintFn)(const char*, ...))
     glEnable(GL_BLEND);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    // glMatrixMode(GL_PROJECTION);
-    // glLoadIdentity();
-    // glOrtho(0, DISPLAY_WIDTH, DISPLAY_HEIGHT, 0, -1, 1);
-
 #ifdef __APPLE__
     // TODO: Check for retina on Apple machines.
     glm_ortho_lh_zo(0, DISPLAY_WIDTH, DISPLAY_HEIGHT, 0, -1, 1, cpu_mvp);
 #else
-    glm_ortho_lh_zo(0, DISPLAY_WIDTH, DISPLAY_HEIGHT, 0, -1, 1, cpu_mvp);
+    // glm_ortho_lh_zo(0, DISPLAY_WIDTH, DISPLAY_HEIGHT, 0, -1, 1, cpu_mvp);
+    // glm_ortho(0, DISPLAY_WIDTH, DISPLAY_HEIGHT, 0, -1, 1, cpu_mvp);
+    glm_mat4_identity(cpu_mvp);
 #endif
 
     // glMatrixMode(GL_MODELVIEW);
     // glLoadIdentity();
 
+    int a = 0,
+        //b = -(DISPLAY_HEIGHT / 1),
+        b = 0,
+        c = DISPLAY_WIDTH,
+        d = DISPLAY_HEIGHT;
+
     glViewport(
-        0,
-        -DISPLAY_HEIGHT,
-        DISPLAY_WIDTH * 2,
-        DISPLAY_HEIGHT * 2
+        a,
+        b,
+        c,
+        d
     );
+
+    _debugPrintf("glViewport Params: %d, %d, %d, %d", a, b, c, d);
 
     return 0;
 }
