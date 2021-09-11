@@ -19,7 +19,7 @@ ExternalProject_Add(
 #    GIT_REPOSITORY https://github.com/WohlSoft/libFreeImage.git
 #    UPDATE_COMMAND ""
     DOWNLOAD_COMMAND ""
-    SOURCE_DIR ${CMAKE_SOURCE_DIR}/3rdparty/FreeImageLite
+    SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/../3rdparty/FreeImageLite
     CMAKE_ARGS
         "-DCMAKE_INSTALL_PREFIX=${DEPENDENCIES_INSTALL_DIR}"
         "-DFREEIMAGE_SHARED=${USE_SHARED_FREEIMAGE}"
