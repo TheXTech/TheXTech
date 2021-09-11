@@ -297,6 +297,13 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         bgo.Location.X = double(b.x);
         bgo.Location.Y = double(b.y);
         bgo.Type = int(b.id);
+
+        if(IF_OUTRANGE(bgo.Type, 1, maxBackgroundType)) // Drop ID to 1 for BGOs of out of range IDs
+        {
+            pLogWarning("BGO-%d ID is out of range (max types %d), reset to BGO-1", bgo.Type, maxBackgroundType);
+            bgo.Type = 1;
+        }
+
         bgo.Layer = b.layer;
         bgo.Location.Width = GFXBackgroundWidth[bgo.Type];
         bgo.Location.Height = BackgroundHeight[bgo.Type];
@@ -307,12 +314,6 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         bgo.zOffset = b.z_offset;
 
         bgoApplyZMode(&bgo, int(b.smbx64_sp));
-
-        if(IF_OUTRANGE(bgo.Type, 1, maxBackgroundType)) // Drop ID to 1 for BGOs of out of range IDs
-        {
-            pLogWarning("BGO-%d ID is out of range (max types %d), reset to BGO-1", bgo.Type, maxBackgroundType);
-            bgo.Type = 1;
-        }
     }
 
 
