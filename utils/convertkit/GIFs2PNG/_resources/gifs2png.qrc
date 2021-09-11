@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>cat_gif2png.icns</file>
+        <file>cat_gif2png.ico</file>
+    </qresource>
+</RCC>
