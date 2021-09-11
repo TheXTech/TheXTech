@@ -64,27 +64,27 @@ static std::mutex g_dirManMutex;
 
 void DirMan::DirMan_private::setPath(const std::string &dirPath)
 {
-    #ifdef VITA
-    if(dirPath.empty()) return;
+    PUT_THREAD_GUARD()
+#ifdef VITA
+    if(dirPath.empty())
+    {
+        pLogWarning("[dirman_vitafs] WARNING: ::setPath called with dirPath of %s", dirPath.c_str());
+        return;
+    }
     m_dirPath = dirPath;
-    return;
-    #endif
-
-    char resolved_path[PATH_MAX];
-    memset(resolved_path, 0, PATH_MAX);
-    char* realPath = realpath(dirPath.c_str(), resolved_path);
-    (void)realPath;
-    m_dirPath = resolved_path;
     delEnd(m_dirPath, '/');
+#endif
 }
 
 static inline int hasEndSlash(char* string)
 {
+    if(string == NULL) return -1;
     return string[strlen(string) - 1] == '/';
 }
 
 bool DirMan::DirMan_private::getListOfFiles(std::vector<std::string> &list, const std::vector<std::string> &suffix_filters)
 {
+    PUT_THREAD_GUARD()
     list.clear();
 
     // open directory fd
@@ -102,7 +102,7 @@ bool DirMan::DirMan_private::getListOfFiles(std::vector<std::string> &list, cons
             {
                 char *new_path = (char*)malloc(strlen(m_dirPath.c_str()) + strlen(dirEntry.d_name) + 2);
                 snprintf(new_path, MAX_PATH_LENGTH, "%s%s%s", m_dirPath.c_str(), hasEndSlash((char*)m_dirPath.c_str()) ? "" : "/", dirEntry.d_name);
-                // pLogDebug("Discovered new path `%s`", new_path);
+                // pLogDebug("Discovered new FILE path `%s`", new_path);
 
                 // matching non-directories
                 if (!SCE_S_ISDIR(dirEntry.d_stat.st_mode))
@@ -189,6 +189,7 @@ static inline int quick_stat_folders(
 
 bool DirMan::DirMan_private::getListOfFolders(std::vector<std::string>& list, const std::vector<std::string>& suffix_filters)
 {
+    PUT_THREAD_GUARD()
     list.clear();
     
     SceUID dfd = sceIoDopen(m_dirPath.c_str());
@@ -205,7 +206,7 @@ bool DirMan::DirMan_private::getListOfFolders(std::vector<std::string>& list, co
             {
                 char *new_path = (char*)malloc(strlen(m_dirPath.c_str()) + strlen(dirEntry.d_name) + 2);
                 snprintf(new_path, MAX_PATH_LENGTH, "%s%s%s", m_dirPath.c_str(), hasEndSlash((char*)m_dirPath.c_str()) ? "" : "/", dirEntry.d_name);
-                // pLogDebug("Discovered new path `%s`", new_path);
+                // pLogDebug("Discovered new FOLDER path `%s`", new_path);
 
                 if (SCE_S_ISDIR(dirEntry.d_stat.st_mode))
                 {
@@ -266,6 +267,7 @@ bool DirMan::DirMan_private::getListOfFolders(std::vector<std::string>& list, co
 bool DirMan::DirMan_private::fetchListFromWalker(std::string &curPath, std::vector<std::string> &list)
 {
     PUT_THREAD_GUARD();
+    pLogWarning("[dirman_vitafs] ::fetchListFromWalker called. CurPath: %s", curPath.c_str());
 
 
     // if(m_walkerState.digStack.empty())
@@ -309,12 +311,15 @@ bool DirMan::exists(const std::string &dirPath)
     PUT_THREAD_GUARD();
 
     SceIoStat _stat;
-    if(dirPath == "/")
-        return false;
 
+    if(dirPath == "/")
+    {
+        pLogWarning("[dirman_vitafs] WARNING: dirPath was / (dirPath: `%s`)", dirPath.c_str());
+        return false;
+    }
     if(sceIoGetstat(dirPath.c_str(), &_stat) < 0)
     {
-        pLogWarning("  File at path %s doesn't exist.", dirPath.c_str());
+        pLogWarning("[dirman_vitafs]  File at path %s doesn't exist.", dirPath.c_str());
         return false;
     }
 
@@ -481,12 +486,5 @@ extern "C" {
     {
         (void)name;
         return 0;
-    }
-
-    char *realpath(const char* input, char* resolved_path)
-    {
-        (void)resolved_path;
-        resolved_path = (char*)input;
-        return (char*)input;
     }
 }

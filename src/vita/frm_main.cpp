@@ -495,14 +495,15 @@ StdPicture FrmMain::LoadPicture(std::string path, std::string maskPath, std::str
     }
     if(!sourceImage)
     {
-        pLogDebug("Error");
         pLogWarning("Error, loading of image file:\n%s", path.c_str());
         return target;
     }
+#ifdef DEBUG_BUILD
     else
     {
         pLogDebug("VITA: Successfully loaded %s. Size: %d x %d with %d channels. Stride = %d", path.c_str(), w, h, channels, stride);
     }
+#endif
 
     RGBQUAD upperColor;
     FreeImage_GetPixelColor(sourceImage, 0, 0, &upperColor);
@@ -631,7 +632,9 @@ void FrmMain::loadTexture(StdPicture &target, uint32_t width, uint32_t height, u
         target.h = height;
         target.w_scale = float(width) / float(target.w_orig);
         target.h_scale = float(height) / float(target.h_orig);
-        // pLogDebug("VITA: loaded texture with GLuint %d and size %d x %d.", _newTexture, width, height);
+#ifdef DEBUG_BUILD
+        pLogDebug("VITA: loaded texture with GLuint %d and size %d x %d. (%s)", target.ex_data.textureID, width, height, target.path.c_str());
+#endif
     }
     else
     {
@@ -706,6 +709,7 @@ void FrmMain::lazyLoad(StdPicture &target)
     target.frame_w = static_cast<int>(w);
     target.frame_h = static_cast<int>(h);
 
+    
     bool wExceeded = w > Uint32(4096);
     bool hExceeded = h > Uint32(4096);
 
@@ -825,7 +829,7 @@ void FrmMain::renderRect(int x, int y, int w, int h, float red, float green, flo
 void FrmMain::renderRectBR(int _left, int _top, int _right, int _bottom, float red, float green, float blue, float alpha)
 {
     PGE_RectF rect = __NormalizeToGL(_left + viewport_offset_x, _top + viewport_offset_y, _right - _left, _bottom - _top, viewport_w, viewport_h);
-    Vita_DrawRectColor(_left, _top, _right-_left, _bottom-_top, red, green, blue, alpha);
+    Vita_DrawRectColor(rect.left, rect.top, rect.right-rect.left, rect.bottom-rect.top, red, green, blue, alpha);
 }
 
 void FrmMain::renderTexturePrivate(float xDst, float yDst, float wDst, float hDst,
@@ -853,6 +857,7 @@ void FrmMain::renderTexturePrivate(float xDst, float yDst, float wDst, float hDs
         return;
 
     // automatic flipping based on SMBX style!
+    
     unsigned int mode = 0;
     while(ySrc >= tx.h && mode < 3)
     {
@@ -860,19 +865,76 @@ void FrmMain::renderTexturePrivate(float xDst, float yDst, float wDst, float hDs
         mode += 1;
     }
     flip ^= mode;
+    
+    // TODO: graphics tests for how offscreen draws interact with flips
+    //       handling rotations properly is probably impossible
+    if(xDst < 0.f)
+    {
+        if(!(flip & SDL_FLIP_HORIZONTAL))
+            xSrc -= xDst * wSrc/wDst;
+        if (wDst+xDst > viewport_w)
+        {
+            if(flip & SDL_FLIP_HORIZONTAL)
+                xSrc += (wDst+xDst-viewport_w) * wSrc/wDst;
+            wSrc = viewport_w * wSrc/wDst;
+            wDst = viewport_w;
+        }
+        else
+        {
+            wSrc += xDst * wSrc/wDst;
+            wDst += xDst;
+        }
+        xDst = 0.f;
+    }
+    else if(xDst + wDst > viewport_w)
+    {
+        if(flip & SDL_FLIP_HORIZONTAL)
+            xSrc += (wDst+xDst-viewport_w) * wSrc/wDst;
+        wSrc = (viewport_w - xDst) * wSrc/wDst;
+        wDst = (viewport_w - xDst);
+    }
+    if(yDst < 0.f)
+    {
+        if(!(flip & SDL_FLIP_VERTICAL))
+            ySrc -= yDst * hSrc/hDst;
+        if (hDst+yDst > viewport_h)
+        {
+            if(flip & SDL_FLIP_VERTICAL)
+                ySrc += (hDst+yDst-viewport_h) * hSrc/hDst;
+            hSrc = viewport_h * hSrc/hDst;
+            hDst = viewport_h;
+        }
+        else
+        {
+            hSrc += yDst * hSrc/hDst;
+            hDst += yDst;
+        }
+        yDst = 0.f;
+    }
+    else if(yDst + hDst > viewport_h)
+    {
+        if(flip & SDL_FLIP_VERTICAL)
+            ySrc += (hDst+yDst-viewport_h) * hSrc/hDst;
+        hSrc = (viewport_h - yDst) * hSrc/hDst;
+        hDst = (viewport_h - yDst);
+    }
+
 
     // Don't go more than size of texture
-    if(xSrc + wDst > tx.w)
+    // Failure conditions should only happen if texture is smaller than expected
+    if(xSrc + wSrc > tx.w)
     {
-        wDst = tx.w - xSrc;
-        if(wDst < 0)
-            wDst = 0;
+        wDst = (tx.w - xSrc) * wDst/wSrc;
+        wSrc = tx.w - xSrc;
+        if(wDst < 0.f)
+            return;
     }
-    if(ySrc + hDst > tx.h)
+    if(ySrc + hSrc > tx.h)
     {
-        hDst = tx.h - ySrc;
-        if(hDst < 0)
-            hDst = 0;
+        hDst = (tx.h - ySrc) * hDst/hSrc;
+        hSrc = tx.h - ySrc;
+        if(hDst < 0.f)
+            return;
     }
 
     if(tx.texture != tx.ex_data.textureID)
@@ -880,16 +942,26 @@ void FrmMain::renderTexturePrivate(float xDst, float yDst, float wDst, float hDs
         pLogDebug("WARNING: texture IDs differ for a specific drawcall: %u %u.", tx.texture, tx.ex_data.textureID);
     }
 
-    PGE_RectF rect = __NormalizeToGL(xDst + viewport_offset_x, yDst + viewport_offset_y, wDst, hDst, viewport_w, viewport_h);
+    PGE_RectF dest = __NormalizeToGL(xDst + viewport_offset_x, yDst + viewport_offset_y, wDst, hDst, DISPLAY_WIDTH_DEF, DISPLAY_HEIGHT_DEF);
+    PGE_RectF src;
+    if(tx.w_orig == 0 && tx.h_orig == 0)
+        src = {xSrc, ySrc, wSrc, hSrc};
+    else
+    {
+        src = {tx.w_scale * xSrc, tx.h_scale * ySrc, tx.w_scale * wSrc, tx.h_scale * hSrc};
+    }
+
     Vita_DrawTextureAnimColorExData(
-        rect.left,
-        rect.top,
-        rect.right - rect.left,
-        rect.bottom - rect.top,
+        dest.left,
+        dest.top,
+        dest.right - dest.left,
+        dest.bottom - dest.top,
         tx.ex_data.textureID,
         tx.w, tx.h,
-        xSrc, ySrc,
-        wSrc, hSrc,
+        src.left, src.top,
+        src.right, src.bottom,
+        //xSrc, ySrc,
+        //wSrc, hSrc,
         red, green, blue, alpha,
         &tx.ex_data
     );
@@ -1061,7 +1133,7 @@ void FrmMain::updateViewport()
 
 void FrmMain::resetViewport()
 {
-    setViewport(0, 0, DISPLAY_WIDTH_DEF, DISPLAY_HEIGHT_DEF);
+    setViewport(0, 0, ScreenW, ScreenH);
 }
 
 void FrmMain::setViewport(int x, int y, int w, int h)
@@ -1072,8 +1144,9 @@ void FrmMain::setViewport(int x, int y, int w, int h)
     viewport_y = y;
     viewport_w = w;
     viewport_h = h;
-    // viewport_offset_x = viewport_x + offset_x;
-    // viewport_offset_y = viewport_y + offset_y;
+    viewport_offset_x = viewport_x + offset_x;
+    viewport_offset_y = viewport_y + offset_y;
+    // glViewport(viewport_offset_x, viewport_offset_y, DISPLAY_WIDTH_DEF, DISPLAY_HEIGHT_DEF);
 }
 
 void FrmMain::offsetViewport(int x, int y)
