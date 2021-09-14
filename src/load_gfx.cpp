@@ -38,8 +38,13 @@
 
 #include <set>
 
+static std::string s_pathEpisode;
+static std::string s_pathCustom;
+static std::string s_pathFallback;
+
 static DirListCI s_dirEpisode;
 static DirListCI s_dirCustom;
+static DirListCI s_dirFallback;
 
 bool gfxLoaderTestMode = false;
 bool gfxLoaderThreadingMode = false;
@@ -81,24 +86,21 @@ static std::string getGfxDir()
     return AppPath + "graphics/";
 }
 
-static void loadCGFX(const std::set<std::string> &files,
-                     const std::string &origPath,
-                     const std::string &dEpisode,
-                     const std::string &dData,
+static void loadCGFX(const std::string &origPath,
                      const std::string &fName,
                      int *width, int *height, bool& isCustom, StdPicture &texture,
                      bool world = false,
                      bool skipMask = false)
 {
-    std::string imgPath = dEpisode + s_dirEpisode.resolveFileCase(fName + ".png");
-    std::string gifPath = dEpisode + s_dirEpisode.resolveFileCase(fName + ".gif");
-    std::string maskPath = dEpisode + s_dirEpisode.resolveFileCase(fName + "m.gif");
+    std::string imgPath = s_dirEpisode.resolveFileCaseExists(fName + ".png");
+    std::string gifPath = s_dirEpisode.resolveFileCaseExists(fName + ".gif");
+    std::string maskPath = s_dirEpisode.resolveFileCaseExists(fName + "m.gif");
 
-    std::string imgPathC = dEpisode + dData + "/" + s_dirEpisode.resolveFileCase(fName + ".png");
-    std::string gifPathC = dEpisode + dData + "/" + s_dirCustom.resolveFileCase(fName + ".gif");
-    std::string maskPathC = dEpisode + dData + "/" + s_dirCustom.resolveFileCase(fName + "m.gif");
+    std::string imgPathC = s_dirCustom.resolveFileCaseExists(fName + ".png");
+    std::string gifPathC = s_dirCustom.resolveFileCaseExists(fName + ".gif");
+    std::string maskPathC = s_dirCustom.resolveFileCaseExists(fName + "m.gif");
 
-    std::string maskPathFall = getGfxDir() + "fallback/" + fName + "m.gif";
+    std::string maskPathFall = s_dirFallback.resolveFileCaseExists(fName + "m.gif");
 
     bool alreadyLoaded = false;
 
@@ -121,16 +123,16 @@ static void loadCGFX(const std::set<std::string> &files,
     std::string maskToUse;
     bool isGif = false;
 
-    if(files.find(imgPathC) != files.end()) {
-        imgToUse = imgPathC;
-    } else if(files.find(gifPathC) != files.end()) {
+    if(!imgPathC.empty()) {
+        imgToUse = s_pathCustom + "/" + imgPathC;
+    } else if(!gifPathC.empty()) {
         isGif = true;
-        imgToUse = gifPathC;
-    } else if(files.find(imgPath) != files.end()) {
-        imgToUse = imgPath;
-    } else if(files.find(gifPath) != files.end()) {
+        imgToUse = s_pathCustom + "/" + gifPathC;
+    } else if(!imgPath.empty()) {
+        imgToUse = s_pathEpisode + "/" + imgPath;
+    } else if(!gifPath.empty()) {
         isGif = true;
-        imgToUse = gifPath;
+        imgToUse = s_pathEpisode + "/" + gifPath;
     }
 
     if(imgToUse.empty())
@@ -146,22 +148,17 @@ static void loadCGFX(const std::set<std::string> &files,
 
     if(isGif && !skipMask)
     {
-        if(files.find(maskPathC) != files.end())
-            maskToUse = maskPathC;
-        else if(files.find(maskPath) != files.end())
-            maskToUse = maskPath;
-        else if(files.find(maskPathFall) != files.end())
-            maskToUse = maskPathFall;
+        if(!maskPathC.empty())
+            maskToUse = s_pathCustom + "/" + maskPathC;
+        else if(!maskPath.empty())
+            maskToUse = s_pathEpisode + "/" + maskPath;
+        else if(!maskPathFall.empty())
+            maskToUse = s_pathFallback + "/" + maskPathFall;
 
 #ifdef DEBUG_BUILD
         pLogDebug("Trying to load custom GFX: %s with mask %s", imgToUse.c_str(), maskToUse.c_str());
 #endif
-#ifdef __3DS__
-        // 3DS never uses masks
-        newTexture = frmMain.lazyLoadPicture(imgToUse);
-#else
         newTexture = frmMain.lazyLoadPicture(imgToUse, maskToUse, origPath);
-#endif
         success = newTexture.inited;
         loadedPath = imgToUse;
     }
@@ -237,16 +234,19 @@ static void restoreWorldBackupTextures()
 void LoadGFX()
 {
     std::string p;
-    std::string GfxRoot = getGfxDir();
+    std::string CurRoot = getGfxDir();
+    DirListCI CurDir;
 
     for(int c = 0; c < numCharacters; ++c)
     {
+        CurRoot = getGfxDir() + GFXPlayerNames[c];
+        CurDir.setCurDir(CurRoot);
         For(A, 1, 10)
         {
-            p = GfxRoot + fmt::format_ne("{1}/{1}-{0}.png", A, GFXPlayerNames[c]);
-            if(Files::fileExists(p))
+            p = CurDir.resolveFileCaseExists(fmt::format_ne("{1}-{0}.png", A, GFXPlayerNames[c]));
+            if(!p.empty())
             {
-                (*GFXCharacterBMP[c])[A] = frmMain.lazyLoadPicture(p);
+                (*GFXCharacterBMP[c])[A] = frmMain.lazyLoadPicture(CurRoot + "/" + p);
                 (*GFXCharacterWidth[c])[A] = GFXMarioBMP[A].w;
                 (*GFXCharacterHeight[c])[A] = GFXMarioBMP[A].h;
             }
@@ -254,12 +254,14 @@ void LoadGFX()
         UpdateLoad();
     }
 
+    CurRoot = getGfxDir() + "block";
+    CurDir.setCurDir(CurRoot);
     for(int A = 1; A <= maxBlockType; ++A)
     {
-        p = GfxRoot + fmt::format_ne("block/block-{0}.png", A);
-        if(Files::fileExists(p))
+        p = CurDir.resolveFileCaseExists(fmt::format_ne("block-{0}.png", A));
+        if(!p.empty())
         {
-            GFXBlockBMP[A] = frmMain.lazyLoadPicture(p);
+            GFXBlockBMP[A] = frmMain.lazyLoadPicture(CurRoot + "/" + p);
         }
         else
         {
@@ -270,12 +272,14 @@ void LoadGFX()
     }
     UpdateLoad();
 
+    CurRoot = getGfxDir() + "background2";
+    CurDir.setCurDir(CurRoot);
     for(int A = 1; A <= numBackground2; ++A)
     {
-        p = GfxRoot + fmt::format_ne("background2/background2-{0}.png", A);
-        if(Files::fileExists(p))
+        p = CurDir.resolveFileCaseExists(fmt::format_ne("background2-{0}.png", A));
+        if(!p.empty())
         {
-            GFXBackground2BMP[A] = frmMain.lazyLoadPicture(p);
+            GFXBackground2BMP[A] = frmMain.lazyLoadPicture(CurRoot + "/" + p);
             GFXBackground2Width[A] = GFXBackground2BMP[A].w;
             GFXBackground2Height[A] = GFXBackground2BMP[A].h;
         }
@@ -289,12 +293,14 @@ void LoadGFX()
     }
     UpdateLoad();
 
+    CurRoot = getGfxDir() + "npc";
+    CurDir.setCurDir(CurRoot);
     for(int A = 1; A <= maxNPCType; ++A)
     {
-        p = GfxRoot + fmt::format_ne("npc/npc-{0}.png", A);
-        if(Files::fileExists(p))
+        p = CurDir.resolveFileCaseExists(fmt::format_ne("npc-{0}.png", A));
+        if(!p.empty())
         {
-            GFXNPCBMP[A] = frmMain.lazyLoadPicture(p);
+            GFXNPCBMP[A] = frmMain.lazyLoadPicture(CurRoot + "/" + p);
             GFXNPCWidth[A] = GFXNPCBMP[A].w;
             GFXNPCHeight[A] = GFXNPCBMP[A].h;
             if(A % 20 == 0)
@@ -309,12 +315,14 @@ void LoadGFX()
     }
     UpdateLoad();
 
+    CurRoot = getGfxDir() + "effect";
+    CurDir.setCurDir(CurRoot);
     for(int A = 1; A <= maxEffectType; ++A)
     {
-        p = GfxRoot + fmt::format_ne("effect/effect-{0}.png", A);
-        if(Files::fileExists(p))
+        p = CurDir.resolveFileCaseExists(fmt::format_ne("effect-{0}.png", A));
+        if(!p.empty())
         {
-            GFXEffectBMP[A] = frmMain.lazyLoadPicture(p);
+            GFXEffectBMP[A] = frmMain.lazyLoadPicture(CurRoot + "/" + p);
             GFXEffectWidth[A] = GFXEffectBMP[A].w;
             GFXEffectHeight[A] = GFXEffectBMP[A].h;
             if(A % 20 == 0)
@@ -329,12 +337,14 @@ void LoadGFX()
     }
     UpdateLoad();
 
+    CurRoot = getGfxDir() + "yoshi";
+    CurDir.setCurDir(CurRoot);
     for(int A = 1; A <= maxYoshiGfx; ++A)
     {
-        p = GfxRoot + fmt::format_ne("yoshi/yoshib-{0}.png", A);
-        if(Files::fileExists(p))
+        p = CurDir.resolveFileCaseExists(fmt::format_ne("yoshib-{0}.png", A));
+        if(!p.empty())
         {
-            GFXYoshiBBMP[A] = frmMain.lazyLoadPicture(p);
+            GFXYoshiBBMP[A] = frmMain.lazyLoadPicture(CurRoot + "/" + p);
             if(A % 20 == 0)
                 UpdateLoad();
         }
@@ -347,10 +357,10 @@ void LoadGFX()
 
     for(int A = 1; A <= maxYoshiGfx; ++A)
     {
-        p = GfxRoot + fmt::format_ne("yoshi/yoshit-{0}.png", A);
-        if(Files::fileExists(p))
+        p = CurDir.resolveFileCaseExists(fmt::format_ne("yoshit-{0}.png", A));
+        if(!p.empty())
         {
-            GFXYoshiTBMP[A] = frmMain.lazyLoadPicture(p);
+            GFXYoshiTBMP[A] = frmMain.lazyLoadPicture(CurRoot + "/" + p);
             if(A % 20 == 0)
                 UpdateLoad();
         }
@@ -361,12 +371,14 @@ void LoadGFX()
     }
     UpdateLoad();
 
+    CurRoot = getGfxDir() + "background";
+    CurDir.setCurDir(CurRoot);
     for(int A = 1; A <= maxBackgroundType; ++A)
     {
-        p = GfxRoot + fmt::format_ne("background/background-{0}.png", A);
-        if(Files::fileExists(p))
+        p = CurDir.resolveFileCaseExists(fmt::format_ne("background-{0}.png", A));
+        if(!p.empty())
         {
-            GFXBackgroundBMP[A] = frmMain.lazyLoadPicture(p);
+            GFXBackgroundBMP[A] = frmMain.lazyLoadPicture(CurRoot + "/" + p);
             GFXBackgroundWidth[A] = GFXBackgroundBMP[A].w;
             GFXBackgroundHeight[A] = GFXBackgroundBMP[A].h;
             BackgroundWidth[A] = GFXBackgroundWidth[A];
@@ -383,12 +395,14 @@ void LoadGFX()
 
 
 // 'world map
+    CurRoot = getGfxDir() + "tile";
+    CurDir.setCurDir(CurRoot);
     for(int A = 1; A <= maxTileType; ++A)
     {
-        p = GfxRoot + fmt::format_ne("tile/tile-{0}.png", A);
-        if(Files::fileExists(p))
+        p = CurDir.resolveFileCaseExists(fmt::format_ne("tile-{0}.png", A));
+        if(!p.empty())
         {
-            GFXTileBMP[A] = frmMain.lazyLoadPicture(p);
+            GFXTileBMP[A] = frmMain.lazyLoadPicture(CurRoot + "/" + p);
             GFXTileWidth[A] = GFXTileBMP[A].w;
             GFXTileHeight[A] = GFXTileBMP[A].h;
             if(A % 20 == 0)
@@ -401,12 +415,14 @@ void LoadGFX()
     }
     UpdateLoad();
 
+    CurRoot = getGfxDir() + "level";
+    CurDir.setCurDir(CurRoot);
     for(int A = 0; A <= maxLevelType; ++A)
     {
-        p = GfxRoot + fmt::format_ne("level/level-{0}.png", A);
-        if(Files::fileExists(p))
+        p = CurDir.resolveFileCaseExists(fmt::format_ne("level-{0}.png", A));
+        if(!p.empty())
         {
-            GFXLevelBMP[A] = frmMain.lazyLoadPicture(p);
+            GFXLevelBMP[A] = frmMain.lazyLoadPicture(CurRoot + "/" + p);
             GFXLevelWidth[A] = GFXLevelBMP[A].w;
             GFXLevelHeight[A] = GFXLevelBMP[A].h;
             if(A % 20 == 0)
@@ -419,12 +435,14 @@ void LoadGFX()
     }
     UpdateLoad();
 
+    CurRoot = getGfxDir() + "scene";
+    CurDir.setCurDir(CurRoot);
     for(int A = 1; A <= maxSceneType; ++A)
     {
-        p = GfxRoot + fmt::format_ne("scene/scene-{0}.png", A);
-        if(Files::fileExists(p))
+        p = CurDir.resolveFileCaseExists(fmt::format_ne("scene-{0}.png", A));
+        if(!p.empty())
         {
-            GFXSceneBMP[A] = frmMain.lazyLoadPicture(p);
+            GFXSceneBMP[A] = frmMain.lazyLoadPicture(CurRoot + "/" + p);
             GFXSceneWidth[A] = GFXSceneBMP[A].w;
             GFXSceneHeight[A] = GFXSceneBMP[A].h;
             if(A % 20 == 0)
@@ -437,12 +455,14 @@ void LoadGFX()
     }
     UpdateLoad();
 
+    CurRoot = getGfxDir() + "player";
+    CurDir.setCurDir(CurRoot);
     for(int A = 1; A <= numCharacters; ++A)
     {
-        p = GfxRoot + fmt::format_ne("player/player-{0}.png", A);
-        if(Files::fileExists(p))
+        p = CurDir.resolveFileCaseExists(fmt::format_ne("player-{0}.png", A));
+        if(!p.empty())
         {
-            GFXPlayerBMP[A] = frmMain.lazyLoadPicture(p);
+            GFXPlayerBMP[A] = frmMain.lazyLoadPicture(CurRoot + "/" + p);
             GFXPlayerWidth[A] = GFXPlayerBMP[A].w;
             GFXPlayerHeight[A] = GFXPlayerBMP[A].h;
             if(A % 20 == 0)
@@ -455,12 +475,14 @@ void LoadGFX()
     }
     UpdateLoad();
 
+    CurRoot = getGfxDir() + "path";
+    CurDir.setCurDir(CurRoot);
     for(int A = 1; A <= maxPathType; ++A)
     {
-        p = GfxRoot + fmt::format_ne("path/path-{0}.png", A);
-        if(Files::fileExists(p))
+        p = CurDir.resolveFileCaseExists(fmt::format_ne("path-{0}.png", A));
+        if(!p.empty())
         {
-            GFXPathBMP[A] = frmMain.lazyLoadPicture(p);
+            GFXPathBMP[A] = frmMain.lazyLoadPicture(CurRoot + "/" + p);
             GFXPathWidth[A] = GFXPathBMP[A].w;
             GFXPathHeight[A] = GFXPathBMP[A].h;
             if(A % 20 == 0)
@@ -479,55 +501,28 @@ void UnloadGFX()
     // Do nothing
 }
 
-static SDL_INLINE void getExistingFiles(std::set<std::string> &existingFiles)
-{
-    DirMan searchDir(FileNamePath);
-    std::vector<std::string> files;
-    searchDir.getListOfFiles(files, {".png", ".gif"});
-
-    for(auto &p : files)
-        existingFiles.insert(FileNamePath + p);
-
-    std::string epFileData = FileNamePath + FileName;
-    if(DirMan::exists(epFileData))
-    {
-        DirMan searchDataDir(epFileData);
-        searchDataDir.getListOfFiles(files, {".png", ".gif"});
-        for(auto &p : files)
-            existingFiles.insert(epFileData  + "/"+ p);
-    }
-
-    std::string fallBacksDir = getGfxDir() + "fallback";
-    if(DirMan::exists(fallBacksDir))
-    {
-        DirMan searchDataDir(fallBacksDir);
-        searchDataDir.getListOfFiles(files, {"m.gif"});
-        for(auto &p : files)
-            existingFiles.insert(fallBacksDir  + "/"+ p);
-    }
-}
-
 void LoadCustomGFX()
 {
     std::string GfxRoot = AppPath + "graphics/";
-    std::set<std::string> existingFiles;
-    getExistingFiles(existingFiles);
+
+    s_pathEpisode = FileNamePath;
+    s_pathCustom = FileNamePath + FileName;
+    s_pathFallback = getGfxDir() + "fallback";
 
     s_dirEpisode.setCurDir(FileNamePath);
     s_dirCustom.setCurDir(FileNamePath + FileName);
+    s_dirFallback.setCurDir(getGfxDir() + "fallback");
 
     for(int A = 1; A < maxBlockType; ++A)
     {
-        loadCGFX(existingFiles, GfxRoot + fmt::format_ne("block/block-{0}.png", A),
-                 FileNamePath, FileName,
+        loadCGFX(GfxRoot + fmt::format_ne("block/block-{0}.png", A),
                  fmt::format_ne("block-{0}", A),
                  nullptr, nullptr, GFXBlockCustom[A], GFXBlockBMP[A]);
     }
 
     for(int A = 1; A < numBackground2; ++A)
     {
-        loadCGFX(existingFiles, GfxRoot + fmt::format_ne("background2/background2-{0}.png", A),
-                 FileNamePath, FileName,
+        loadCGFX(GfxRoot + fmt::format_ne("background2/background2-{0}.png", A),
                  fmt::format_ne("background2-{0}", A),
                  &GFXBackground2Width[A], &GFXBackground2Height[A], GFXBackground2Custom[A], GFXBackground2BMP[A],
                  false, true);
@@ -535,16 +530,14 @@ void LoadCustomGFX()
 
     for(int A = 1; A < maxNPCType; ++A)
     {
-        loadCGFX(existingFiles, GfxRoot + fmt::format_ne("npc/npc-{0}.png", A),
-                 FileNamePath, FileName,
+        loadCGFX(GfxRoot + fmt::format_ne("npc/npc-{0}.png", A),
                  fmt::format_ne("npc-{0}", A),
                  &GFXNPCWidth[A], &GFXNPCHeight[A], GFXNPCCustom[A], GFXNPCBMP[A]);
     }
 
     for(int A = 1; A < maxEffectType; ++A)
     {
-        loadCGFX(existingFiles, GfxRoot + fmt::format_ne("effect/effect-{0}.png", A),
-                 FileNamePath, FileName,
+        loadCGFX(GfxRoot + fmt::format_ne("effect/effect-{0}.png", A),
                  fmt::format_ne("effect-{0}", A),
                  &GFXEffectWidth[A], &GFXEffectHeight[A], GFXEffectCustom[A], GFXEffectBMP[A]);
 
@@ -557,24 +550,21 @@ void LoadCustomGFX()
 
     for(int A = 1; A < maxBackgroundType; ++A)
     {
-        loadCGFX(existingFiles, GfxRoot + fmt::format_ne("background/background-{0}.png", A),
-                 FileNamePath, FileName,
+        loadCGFX(GfxRoot + fmt::format_ne("background/background-{0}.png", A),
                  fmt::format_ne("background-{0}", A),
                  &GFXBackgroundWidth[A], &GFXBackgroundHeight[A], GFXBackgroundCustom[A], GFXBackgroundBMP[A]);
     }
 
     for(int A = 1; A < maxYoshiGfx; ++A)
     {
-        loadCGFX(existingFiles, GfxRoot + fmt::format_ne("yoshi/yoshib-{0}.png", A),
-                 FileNamePath, FileName,
+        loadCGFX(GfxRoot + fmt::format_ne("yoshi/yoshib-{0}.png", A),
                  fmt::format_ne("yoshib-{0}", A),
                  nullptr, nullptr, GFXYoshiBCustom[A], GFXYoshiBBMP[A]);
     }
 
     for(int A = 1; A < maxYoshiGfx; ++A)
     {
-        loadCGFX(existingFiles, GfxRoot + fmt::format_ne("yoshi/yoshit-{0}.png", A),
-                 FileNamePath, FileName,
+        loadCGFX(GfxRoot + fmt::format_ne("yoshi/yoshit-{0}.png", A),
                  fmt::format_ne("yoshit-{0}", A),
                  nullptr, nullptr, GFXYoshiTCustom[A], GFXYoshiTBMP[A]);
     }
@@ -583,8 +573,7 @@ void LoadCustomGFX()
     {
         for(int A = 1; A <= numStates; ++A)
         {
-            loadCGFX(existingFiles, GfxRoot + fmt::format_ne("{1}/{1}-{0}.png", A, GFXPlayerNames[c]),
-                     FileNamePath, FileName,
+            loadCGFX(GfxRoot + fmt::format_ne("{1}/{1}-{0}.png", A, GFXPlayerNames[c]),
                      fmt::format_ne("{1}-{0}", A, GFXPlayerNames[c]),
                      &(*GFXCharacterWidth[c])[A], &(*GFXCharacterHeight[c])[A],
                      (*GFXCharacterCustom[c])[A], (*GFXCharacterBMP[c])[A]);
@@ -609,48 +598,46 @@ void UnloadCustomGFX()
 void LoadWorldCustomGFX()
 {
     std::string GfxRoot = AppPath + "graphics/";
-    std::set<std::string> existingFiles;
-    getExistingFiles(existingFiles);
+
+    s_pathEpisode = FileNamePath;
+    s_pathCustom = FileNamePath + FileName;
+    s_pathFallback = getGfxDir() + "fallback";
 
     s_dirEpisode.setCurDir(FileNamePath);
     s_dirCustom.setCurDir(FileNamePath + FileName);
+    s_dirFallback.setCurDir(getGfxDir() + "fallback");
 
     for(int A = 1; A < maxTileType; ++A)
     {
-        loadCGFX(existingFiles, GfxRoot + fmt::format_ne("tile/tile-{0}.png", A),
-                 FileNamePath, FileName,
+        loadCGFX(GfxRoot + fmt::format_ne("tile/tile-{0}.png", A),
                  fmt::format_ne("tile-{0}", A),
                  &GFXTileWidth[A], &GFXTileHeight[A], GFXTileCustom[A], GFXTileBMP[A], true);
     }
 
     for(int A = 0; A < maxLevelType; ++A)
     {
-        loadCGFX(existingFiles, GfxRoot + fmt::format_ne("level/level-{0}.png", A),
-                 FileNamePath, FileName,
+        loadCGFX(GfxRoot + fmt::format_ne("level/level-{0}.png", A),
                  fmt::format_ne("level-{0}", A),
                  &GFXLevelWidth[A], &GFXLevelHeight[A], GFXLevelCustom[A], GFXLevelBMP[A], true);
     }
 
     for(int A = 1; A < maxSceneType; ++A)
     {
-        loadCGFX(existingFiles, GfxRoot + fmt::format_ne("scene/scene-{0}.png", A),
-                 FileNamePath, FileName,
+        loadCGFX(GfxRoot + fmt::format_ne("scene/scene-{0}.png", A),
                  fmt::format_ne("scene-{0}", A),
                  &GFXSceneWidth[A], &GFXSceneHeight[A], GFXSceneCustom[A], GFXSceneBMP[A], true);
     }
 
     for(int A = 1; A < numCharacters; ++A)
     {
-        loadCGFX(existingFiles, GfxRoot + fmt::format_ne("player/player-{0}.png", A),
-                 FileNamePath, FileName,
+        loadCGFX(GfxRoot + fmt::format_ne("player/player-{0}.png", A),
                  fmt::format_ne("player-{0}", A),
                  &GFXPlayerWidth[A], &GFXPlayerHeight[A], GFXPlayerCustom[A], GFXPlayerBMP[A], true);
     }
 
     for(int A = 1; A < maxPathType; ++A)
     {
-        loadCGFX(existingFiles, GfxRoot + fmt::format_ne("path/path-{0}.png", A),
-                 FileNamePath, FileName,
+        loadCGFX(GfxRoot + fmt::format_ne("path/path-{0}.png", A),
                  fmt::format_ne("path-{0}", A),
                  &GFXPathWidth[A], &GFXPathHeight[A], GFXPathCustom[A], GFXPathBMP[A], true);
     }
