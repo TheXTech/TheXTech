@@ -327,18 +327,18 @@ void SoundPauseAll()
 {
     if(noSound)
         return;
+
     pLogDebug("Pause all sound");
-    Mix_Pause(-1);
-    Mix_PauseMusic();
+    Mix_PauseAudio(1);
 }
 
 void SoundResumeAll()
 {
     if(noSound)
         return;
+
     pLogDebug("Resume all sound");
-    Mix_Resume(-1);
-    Mix_ResumeMusic();
+    Mix_PauseAudio(0);
 }
 
 static void processPathArgs(std::string &path,
