@@ -392,7 +392,7 @@ void FrmMain::processEvent()
         case SDL_WINDOWEVENT_MOVED:
             eventResize();
             break;
-#if !defined(__EMSCRIPTEN__) && !defined(__ANDROID__)
+#if !defined(__EMSCRIPTEN__) && !defined(__ANDROID__) && !defined(VITA)
         case SDL_WINDOWEVENT_FOCUS_GAINED:
             if(!neverPause)
                 SoundPauseEngine(0);
