@@ -1334,7 +1334,7 @@ void CheckActive()
     // It's useless on Emscripten as no way to check activity (or just differently)
     // and on Android as it has built-in application pauser
 #if !defined(__EMSCRIPTEN__) && !defined(__ANDROID__)
-    bool MusicPaused = false;
+//    bool MusicPaused = false;
     bool focusLost = false;
 
     if(neverPause)
@@ -1365,11 +1365,11 @@ void CheckActive()
             focusLost = true;
         }
 
-        if(musicPlaying && !MusicPaused)
-        {
-            MusicPaused = true;
-            SoundPauseAll();
-        }
+//        if(musicPlaying && !MusicPaused)
+//        {
+//            MusicPaused = true;
+//            SoundPauseEngine(1);
+//        }
 
         if(!GameIsActive)
         {
@@ -1381,8 +1381,8 @@ void CheckActive()
     if(focusLost)
         pLogDebug("Window Focus got back");
 
-    if(MusicPaused)
-        SoundResumeAll();
+//    if(MusicPaused)
+//        SoundPauseEngine(0);
 
 /* // Useless condition
     if(!noSound && MusicPaused)
