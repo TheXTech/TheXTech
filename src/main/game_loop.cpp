@@ -152,19 +152,13 @@ void GameLoop()
                             {
                                 FreezeNPCs = false;
                                 if(PSwitchTime > 0)
-                                {
-                                    if(!noSound)
-                                        SoundResumeAll();
-                                }
+                                    SoundResumeAll();
                             }
                             else
                             {
                                 FreezeNPCs = true;
                                 if(PSwitchTime > 0)
-                                {
-                                    if(!noSound)
-                                        SoundPauseAll();
-                                }
+                                    SoundPauseAll();
                             }
                             PlaySound(SFX_Pause);
                         }

@@ -364,17 +364,29 @@ void FrmMain::processEvent()
         joyDeviceRemoveEvent(&m_event.jdevice);
         break;
     case SDL_WINDOWEVENT:
-        if((m_event.window.event == SDL_WINDOWEVENT_RESIZED) || (m_event.window.event == SDL_WINDOWEVENT_MOVED))
+        switch(m_event.window.event)
         {
+        case SDL_WINDOWEVENT_RESIZED:
+        case SDL_WINDOWEVENT_MOVED:
             eventResize();
-        }
-//#ifndef __EMSCRIPTEN__
-//        else if(m_event.window.event == SDL_WINDOWEVENT_MAXIMIZED)
-//        {
+            break;
+#if !defined(__EMSCRIPTEN__) && !defined(__ANDROID__)
+        case SDL_WINDOWEVENT_FOCUS_GAINED:
+            if(!neverPause)
+                SoundPauseEngine(0);
+            break;
+        case SDL_WINDOWEVENT_FOCUS_LOST:
+            if(!neverPause)
+                SoundPauseEngine(1);
+            break;
+//        case SDL_WINDOWEVENT_MAXIMIZED:
 //            SDL_RestoreWindow(m_window);
 //            SetRes();
-//        }
-//#endif
+//            break;
+#endif
+        default:
+            break;
+        }
         break;
     case SDL_KEYDOWN:
         eventKeyDown(m_event.key);
