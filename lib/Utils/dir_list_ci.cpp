@@ -56,6 +56,7 @@ std::string DirListCI::resolveFileCaseExists(const std::string &in_name)
     auto subDir = name.find('/');
     if(subDir != std::string::npos)
     {
+        // THIS BEHAVIOR IS EXPENSIVE AND WASTEFUL, AVOID INVOKING AT ALL COSTS!!!
         auto sdName = resolveDirCase(name.substr(0, subDir));
         DirListCI sd(m_curDir + "/" + sdName);
         std::string found = sd.resolveFileCase(name.substr(subDir + 1));
