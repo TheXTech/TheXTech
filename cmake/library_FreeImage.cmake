@@ -10,6 +10,7 @@ endif()
 
 if(NOT VITA)
     option(USE_FREEIMAGE_SYSTEM_LIBS "Let FreeImage to use libPNG and libJPEG from the system" OFF)
+    option(USE_PNG_HARDWARE_OPTIMIZATIONS "Enable hardware optimizations for the FreeImage internal build of libPNG" ON)
 else()
     set(USE_FREEIMAGE_SYSTEM_LIBS ON)
 endif()
@@ -49,6 +50,7 @@ ExternalProject_Add(
         "-DCMAKE_DEBUG_POSTFIX=${PGE_LIBS_DEBUG_SUFFIX}"
         "-DFREEIMAGE_USE_SYSTEM_LIBPNG=${USE_FREEIMAGE_SYSTEM_LIBS}"
         "-DFREEIMAGE_USE_SYSTEM_LIBJPEG=${USE_FREEIMAGE_SYSTEM_LIBS}"
+        "-DPNG_HARDWARE_OPTIMIZATIONS=${USE_PNG_HARDWARE_OPTIMIZATIONS}"
         #"-DFREEIMAGE_PNG_INCLUDE=${PNG_INCLUDE_DIRS}"
         #"-DFREEIMAGE_ZLIB_INCLUDE=${ZLIB_INCLUDE_DIRS}"
         #"-DFREEIMAGE_PNG_LIB=${libPNG_A_Lib}"
