@@ -1224,9 +1224,9 @@ void FrmMain::lazyLoad(StdPicture &target)
         }
 
         // WORKAROUND: down-scale too big textures
-        if(w > Uint32(m_ri.max_texture_width))
+        if(m_ri.max_texture_width > 0 && w > Uint32(m_ri.max_texture_width))
             w = Uint32(m_ri.max_texture_width);
-        if(h > Uint32(m_ri.max_texture_height))
+        if(m_ri.max_texture_height > 0 && h > Uint32(m_ri.max_texture_height))
             h = Uint32(m_ri.max_texture_height);
 
         if(wLimitExcited || hLimitExcited)
