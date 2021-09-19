@@ -356,7 +356,7 @@ void PlayMusic(std::string Alias, int fadeInMs)
     {
         auto &m = mus->second;
         std::string p = m.path;
-        processPathArgs(p, FileNamePath + "/", FileName + "/");
+        processPathArgs(p, FileNamePath, FileName + "/");
         g_curMusic = Mix_LoadMUS(p.c_str());
         if(!g_curMusic)
         {
@@ -428,8 +428,8 @@ void StartMusic(int A, int fadeInMs)
             pLogDebug("Starting custom music [%s]", curWorldMusicFile.c_str());
             if(g_curMusic)
                 Mix_FreeMusic(g_curMusic);
-            std::string p = FileNamePath + "/" + curWorldMusicFile;
-            processPathArgs(p, FileNamePath + "/", FileName + "/");
+            std::string p = FileNamePath + curWorldMusicFile;
+            processPathArgs(p, FileNamePath, FileName + "/");
             g_curMusic = Mix_LoadMUS(p.c_str());
             s_musicHasYoshiMode = false;
             s_musicYoshiTrackNumber = -1;
@@ -470,9 +470,9 @@ void StartMusic(int A, int fadeInMs)
             pLogDebug("Starting custom music [%s]", CustomMusic[A].c_str());
             if(g_curMusic)
                 Mix_FreeMusic(g_curMusic);
-            std::string p = FileNamePath + "/" + CustomMusic[A];
+            std::string p = FileNamePath + CustomMusic[A];
             s_musicYoshiTrackNumber = -1;
-            processPathArgs(p, FileNamePath + "/", FileName + "/", &s_musicYoshiTrackNumber);
+            processPathArgs(p, FileNamePath, FileName + "/", &s_musicYoshiTrackNumber);
             g_curMusic = Mix_LoadMUS(p.c_str());
             s_musicHasYoshiMode = (s_musicYoshiTrackNumber >= 0 && (Mix_GetMusicTracks(g_curMusic) > s_musicYoshiTrackNumber));
             UpdateYoshiMusic();

@@ -306,7 +306,7 @@ void FindCustomPlayers()
             // Episode-wide custom player setup
             playerPath = s_dirEpisode.resolveFileCaseExists(fmt::format_ne("{1}-{0}.ini", S, s_playerFileName[C]));
             // Level-wide custom player setup
-            playerPathC = s_dirCustom.resolveFileCase(fmt::format_ne("{1}-{0}.ini", S, s_playerFileName[C]));
+            playerPathC = s_dirCustom.resolveFileCaseExists(fmt::format_ne("{1}-{0}.ini", S, s_playerFileName[C]));
 
             if(!playerPath.empty())
                 LoadCustomPlayer(C, S, FileNamePath + playerPath);
