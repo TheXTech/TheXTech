@@ -143,10 +143,6 @@ static void strToPlayerSetup(int player, const std::string &setupString)
 extern "C"
 int main(int argc, char**argv)
 {
-#ifdef __3DS__
-    romfsInit();
-#endif
-
     CmdLineSetup_t setup;
 
 #ifndef __3DS__
