@@ -164,13 +164,8 @@ public:
      */
     void setTargetScreen();
 
-#ifndef __3DS__
     StdPicture LoadPicture(std::string path, std::string maskPath = std::string(), std::string maskFallbackPath = std::string());
     StdPicture lazyLoadPicture(std::string path, std::string maskPath = std::string(), std::string maskFallbackPath = std::string());
-#else
-    StdPicture LoadPicture(std::string path);
-    StdPicture lazyLoadPicture(std::string path);
-#endif
     void deleteTexture(StdPicture &tx, bool lazyUnload = false);
     void clearAllTextures();
 #ifdef __3DS__

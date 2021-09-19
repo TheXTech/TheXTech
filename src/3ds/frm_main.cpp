@@ -388,8 +388,11 @@ void FrmMain::offsetViewport(int x, int y)
     viewport_offset_y = viewport_y+y/2;
 }
 
-StdPicture FrmMain::LoadPicture(std::string path)
+StdPicture FrmMain::LoadPicture(std::string path, std::string maskPath, std::string maskFallbackPath)
 {
+    (void)maskPath;
+    (void)maskFallbackPath;
+
     StdPicture target;
     C2D_SpriteSheet sourceImage;
     if(!GameIsActive)
@@ -404,18 +407,22 @@ StdPicture FrmMain::LoadPicture(std::string path)
     target.lazyLoaded = false;
 
     sourceImage = C2D_SpriteSheetLoad(target.path.c_str());
-    loadTexture(target, sourceImage);
+    if(sourceImage)
+        loadTexture(target, sourceImage);
 
     num_textures_loaded ++;
 
     if(!target.texture)
-        printf("FAILED TO LOAD!!! %s\n", path.c_str());
+        pLogWarning("FAILED TO LOAD!!! %s\n", path.c_str());
     return target;
 }
 
 
-StdPicture FrmMain::lazyLoadPicture(std::string path)
+StdPicture FrmMain::lazyLoadPicture(std::string path, std::string maskPath, std::string maskFallbackPath)
 {
+    (void)maskPath;
+    (void)maskFallbackPath;
+
     StdPicture target;
     if(!GameIsActive)
         return target; // do nothing when game is closed
@@ -441,14 +448,14 @@ StdPicture FrmMain::lazyLoadPicture(std::string path)
         contents[9] = '\0';
         target.w = atoi(&contents[0]);
         target.h = atoi(&contents[5]);
-        if (fclose(fs)) printf("lazyLoadPicture: Couldn't close file.\n");
+        if (fclose(fs)) pLogWarning("lazyLoadPicture: Couldn't close file.");
     }
     // lazy load and unload to read dimensions if it doesn't exist.
     // unload is essential because lazy load would save the address incorrectly.
     else {
         lazyLoad(target);
         lazyUnLoad(target);
-        printf("lazyLoadPicture: Couldn't open size file.\n");
+        pLogWarning("lazyLoadPicture: Couldn't open size file.");
     }
 
     return target;
