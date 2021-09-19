@@ -1136,7 +1136,7 @@ void FrmMain::loadTexture(StdPicture &target, uint32_t width, uint32_t height, u
     texture = SDL_CreateTextureFromSurface(m_gRenderer, surface);
     if(!texture)
     {
-        pLogWarning("Render SW-SDL: Failed to load texture! (%s)", SDL_GetError());
+        pLogWarning("Render SDL: Failed to load texture! (%s)", SDL_GetError());
         SDL_FreeSurface(surface);
         target.texture = nullptr;
         target.inited = false;
