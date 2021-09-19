@@ -163,6 +163,10 @@ int GameMain(const CmdLineSetup_t &setup)
     LoadingInProcess = true;
 
     ShowFPS = setup.testShowFPS;
+// temporary
+#ifdef __3DS__
+    ShowFPS = true;
+#endif
     MaxFPS = setup.testMaxFPS; // || (g_videoSettings.renderModeObtained == RENDER_ACCELERATED_VSYNC);
 
     InitControls(); // init player's controls

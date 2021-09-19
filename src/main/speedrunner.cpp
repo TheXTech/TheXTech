@@ -224,6 +224,8 @@ void speedRun_renderControls(int player, int screenZ, int align)
     if(drawLabel)
         SuperPrint(fmt::format_ne("P{0}", player), 3, x + 22, y + 2, 1.f, 1.f, 1.f, 0.5f);
 
+// will be replaced with cross-platform code very soon anyway.
+#ifndef NO_SDL
     if(jNum >= 0 && jNum < joyCount())
     {
         int power = joyGetPowerLevel(jNum);
@@ -250,6 +252,7 @@ void speedRun_renderControls(int player, int screenZ, int align)
             }
         }
     }
+#endif // NO_SDL
 }
 
 #undef bool2alpha

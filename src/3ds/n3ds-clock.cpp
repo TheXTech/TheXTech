@@ -9,6 +9,9 @@ void InitClockSpeed()
     bool isN3DS;
     APT_CheckNew3DS(&isN3DS);
     if (!isN3DS) n3ds_clocked = -1;
+    // temporary, until settings are fixed up
+    if (isN3DS && n3ds_clocked == 0)
+        SwapClockSpeed();
 }
 
 void SwapClockSpeed()
