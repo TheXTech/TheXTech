@@ -304,6 +304,13 @@ void SoundResumeAll()
     Mix_PauseAudio(0);
 }
 
+void SoundPauseEngine(int paused)
+{
+    if(noSound)
+        return;
+    Mix_PauseAudio(paused);
+}
+
 static void processPathArgs(std::string &path,
                             const std::string &episodeRoot,
                             const std::string &dataDirName,

@@ -158,6 +158,7 @@ void SetMusicVolume(std::string Alias, long Volume);
 void SoundPauseAll();
 // Public Sub SoundResumeAll()
 void SoundResumeAll();
+void SoundPauseEngine(int paused);
 // Public Sub PlayMusic(Alias As String)
 void PlayMusic(std::string Alias, int fadeInMs = 0);
 // Public Sub PlaySfx(Alias As String)

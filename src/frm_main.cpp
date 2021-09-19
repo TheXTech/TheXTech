@@ -379,17 +379,29 @@ void FrmMain::processEvent()
         joyDeviceRemoveEvent(&m_event.jdevice);
         break;
     case SDL_WINDOWEVENT:
-        if((m_event.window.event == SDL_WINDOWEVENT_RESIZED) || (m_event.window.event == SDL_WINDOWEVENT_MOVED))
+        switch(m_event.window.event)
         {
+        case SDL_WINDOWEVENT_RESIZED:
+        case SDL_WINDOWEVENT_MOVED:
             eventResize();
-        }
-//#ifndef __EMSCRIPTEN__
-//        else if(m_event.window.event == SDL_WINDOWEVENT_MAXIMIZED)
-//        {
+            break;
+#if !defined(__EMSCRIPTEN__) && !defined(__ANDROID__)
+        case SDL_WINDOWEVENT_FOCUS_GAINED:
+            if(!neverPause)
+                SoundPauseEngine(0);
+            break;
+        case SDL_WINDOWEVENT_FOCUS_LOST:
+            if(!neverPause)
+                SoundPauseEngine(1);
+            break;
+//        case SDL_WINDOWEVENT_MAXIMIZED:
 //            SDL_RestoreWindow(m_window);
 //            SetRes();
-//        }
-//#endif
+//            break;
+#endif
+        default:
+            break;
+        }
         break;
     case SDL_KEYDOWN:
         eventKeyDown(m_event.key);
@@ -1124,7 +1136,7 @@ void FrmMain::loadTexture(StdPicture &target, uint32_t width, uint32_t height, u
     texture = SDL_CreateTextureFromSurface(m_gRenderer, surface);
     if(!texture)
     {
-        pLogWarning("Render SW-SDL: Failed to load texture! (%s)", SDL_GetError());
+        pLogWarning("Render SDL: Failed to load texture! (%s)", SDL_GetError());
         SDL_FreeSurface(surface);
         target.texture = nullptr;
         target.inited = false;
@@ -1212,9 +1224,9 @@ void FrmMain::lazyLoad(StdPicture &target)
         }
 
         // WORKAROUND: down-scale too big textures
-        if(w > Uint32(m_ri.max_texture_width))
+        if(m_ri.max_texture_width > 0 && w > Uint32(m_ri.max_texture_width))
             w = Uint32(m_ri.max_texture_width);
-        if(h > Uint32(m_ri.max_texture_height))
+        if(m_ri.max_texture_height > 0 && h > Uint32(m_ri.max_texture_height))
             h = Uint32(m_ri.max_texture_height);
 
         if(wLimitExcited || hLimitExcited)
