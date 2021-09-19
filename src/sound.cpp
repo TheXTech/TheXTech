@@ -18,13 +18,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined(NO_SDL) && !defined(__3DS__)
+#ifndef NO_SDL
 #include <SDL2/SDL_messagebox.h>
-#include <SDL2/SDL_timer.h>
-#include <SDL2/SDL_mixer_ext.h>
 #else
-#error "FIXME: Please re-implement the MixerX' layer over 3DS sound API and use SDL-simulation heads"
+#include "SDL_supplement.h"
 #endif
+
+#include "mixer_imports.h"
 
 #include "globals.h"
 #include "load_gfx.h"
@@ -111,8 +111,6 @@ struct SFX_t
 static std::unordered_map<std::string, Music_t> music;
 static std::unordered_map<std::string, SFX_t>   sound;
 
-static const int maxSfxChannels = 91;
-
 int CustomWorldMusicId()
 {
     return g_customWldMusicId;
@@ -120,51 +118,16 @@ int CustomWorldMusicId()
 
 void InitMixerX()
 {
-    int ret;
-    const int initFlags = MIX_INIT_MID|MIX_INIT_MOD|MIX_INIT_FLAC|MIX_INIT_OGG|MIX_INIT_OPUS|MIX_INIT_MP3;
     MusicRoot = AppPath + "music/";
     SfxRoot = AppPath + "sound/";
 
     if(g_mixerLoaded)
         return;
 
-    pLogDebug("Opening sound...");
-    ret = Mix_Init(initFlags);
-
-    if(ret != initFlags)
-    {
-        pLogWarning("MixerX: Some modules aren't properly initialized");
-        if((initFlags & MIX_INIT_MID) != MIX_INIT_MID)
-            pLogWarning("MixerX: Failed to initialize MIDI module");
-        if((initFlags & MIX_INIT_MOD) != MIX_INIT_MOD)
-            pLogWarning("MixerX: Failed to initialize Tracker music module");
-        if((initFlags & MIX_INIT_FLAC) != MIX_INIT_FLAC)
-            pLogWarning("MixerX: Failed to initialize FLAC module");
-        if((initFlags & MIX_INIT_OGG) != MIX_INIT_OGG)
-            pLogWarning("MixerX: Failed to initialize OGG Vorbis module");
-        if((initFlags & MIX_INIT_OPUS) != MIX_INIT_OPUS)
-            pLogWarning("MixerX: Failed to initialize Opus module");
-        if((initFlags & MIX_INIT_MP3) != MIX_INIT_MP3)
-            pLogWarning("MixerX: Failed to initialize MP3 module");
-    }
-
-    ret = Mix_OpenAudio(g_audioSetup.sampleRate,
-                        g_audioSetup.format,
-                        g_audioSetup.channels,
-                        g_audioSetup.bufferSize);
-
-    if(ret < 0)
-    {
-        std::string msg = fmt::format_ne("Can't open audio stream, continuing without audio: ({0})", Mix_GetError());
-        pLogCritical(msg.c_str());
-        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Sound opening error", msg.c_str(), nullptr);
+    if(!MixPlatform_Init())
         noSound = true;
-    }
-
-    Mix_VolumeMusic(MIX_MAX_VOLUME);
-    Mix_AllocateChannels(maxSfxChannels);
-
-    g_mixerLoaded = true;
+    else
+        g_mixerLoaded = true;
 }
 
 void QuitMixerX()
@@ -182,11 +145,13 @@ void QuitMixerX()
         auto &s = it->second;
         if(s.chunk)
             Mix_FreeChunk(s.chunk);
+        if(s.chunkOrig)
+            Mix_FreeChunk(s.chunkOrig);
     }
     sound.clear();
     music.clear();
-    Mix_CloseAudio();
-    Mix_Quit();
+    MixPlatform_Quit();
+    g_mixerLoaded = false;
 }
 
 static void AddMusic(const std::string &root,
@@ -259,9 +224,10 @@ static void AddSfx(const std::string &root,
                 Mix_Chunk *backup = m.chunk;
                 bool backup_isSilent = m.isSilent;
                 m.customPath = newPath;
-                if(!isSilent)
-                    m.chunk = Mix_LoadWAV((root + f).c_str());
-                if(m.chunk || isSilent)
+                bool no_preload = MixPlatform_NoPreload((root + f).c_str());
+                if(!no_preload && !isSilent)
+                    m.chunk = MixPlatform_LoadWAV((root + f).c_str());
+                if(no_preload || m.chunk || isSilent)
                 {
                     if(!m.isCustom && !m.chunkOrig)
                     {
@@ -277,7 +243,7 @@ static void AddSfx(const std::string &root,
                 {
                     m.chunk = backup;
                     m.isSilent = backup_isSilent;
-                    pLogWarning("ERROR: SFX '%s' loading error: %s", m.path.c_str(), Mix_GetError());
+                    pLogWarning("ERROR: SFX '%s' loading error: %s", m.path.c_str(), MixPlatform_GetError());
                 }
             }
         }
@@ -288,10 +254,11 @@ static void AddSfx(const std::string &root,
             m.volume = 128;
             m.isSilent = isSilent;
             pLogDebug("Adding SFX [%s] '%s'", alias.c_str(), isSilent ? "<silence>" : m.path.c_str());
-            if(!isSilent)
-                m.chunk = Mix_LoadWAV(m.path.c_str());
+            bool no_preload = MixPlatform_NoPreload(m.path.c_str());
+            if(!isSilent && !no_preload)
+                m.chunk = MixPlatform_LoadWAV(m.path.c_str());
             m.channel = -1;
-            if(m.chunk || isSilent)
+            if(no_preload || m.chunk || isSilent)
             {
                 bool isSingleChannel = false;
                 ini.read("single-channel", isSingleChannel, false);
@@ -301,7 +268,7 @@ static void AddSfx(const std::string &root,
             }
             else
             {
-                pLogWarning("ERROR: SFX '%s' loading error: %s", m.path.c_str(), Mix_GetError());
+                pLogWarning("ERROR: SFX '%s' loading error: %s", m.path.c_str(), MixPlatform_GetError());
                 if(!isCustom)
                     g_errorsSfx++;
             }
@@ -372,7 +339,7 @@ void PlayMusic(std::string Alias, int fadeInMs)
         return;
     if(g_curMusic)
     {
-        Mix_HaltMusic();
+        Mix_HaltMusicStream(g_curMusic);
         Mix_FreeMusic(g_curMusic);
         g_curMusic = nullptr;
     }
@@ -386,7 +353,7 @@ void PlayMusic(std::string Alias, int fadeInMs)
         g_curMusic = Mix_LoadMUS(p.c_str());
         if(!g_curMusic)
         {
-            pLogWarning("Music '%s' opening error: %s", m.path.c_str(), Mix_GetError());
+            pLogWarning("Music '%s' opening error: %s", m.path.c_str(), MixPlatform_GetError());
         }
         else
         {
@@ -408,8 +375,18 @@ void PlaySfx(std::string Alias, int loops)
     if(sfx != sound.end())
     {
         auto &s = sfx->second;
-        if(!s.isSilent)
-            Mix_PlayChannel(s.channel, s.chunk, loops);
+        if(!s.isSilent && s.chunk)
+        {
+            MixPlatform_PlayChannel(s.channel, s.chunk, loops);
+        }
+        else if(!s.isSilent && s.isCustom)
+        {
+            MixPlatform_PlayStream(s.channel, s.customPath.c_str(), loops);
+        }
+        else if(!s.isSilent)
+        {
+            MixPlatform_PlayStream(s.channel, s.path.c_str(), loops);
+        }
     }
 }
 
@@ -511,9 +488,11 @@ void StopMusic()
 
     pLogDebug("Stopping music");
 
-    Mix_HaltMusic();
     if(g_curMusic)
+    {
+        Mix_HaltMusicStream(g_curMusic);
         Mix_FreeMusic(g_curMusic);
+    }
     g_curMusic = nullptr;
     musicPlaying = false;
 }
@@ -523,7 +502,8 @@ void FadeOutMusic(int ms)
     if(!musicPlaying || noSound)
         return;
     pLogDebug("Fading out music");
-    Mix_FadeOutMusic(ms);
+    if(g_curMusic)
+        Mix_FadeOutMusicStream(g_curMusic, ms);
     musicPlaying = false;
 }
 
@@ -546,6 +526,8 @@ void PlayInitSound()
 
         if(!p.empty())
         {
+            // make it a streamed sound
+#ifndef __3DS__
             g_curMusic = Mix_LoadMUS((SfxRoot + p).c_str());
             Mix_PlayMusic(g_curMusic, 0);
             do // Synchroniously play the loading sound to don't distort it during the SFX loading
@@ -553,6 +535,9 @@ void PlayInitSound()
                 PGE_Delay(15);
                 UpdateLoadREAL();
             } while(Mix_PlayingMusicStream(g_curMusic));
+#else
+            MixPlatform_PlayStream(-1, (SfxRoot + p).c_str(), 0);
+#endif
         }
     }
 }

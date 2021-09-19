@@ -374,7 +374,7 @@ if(3DS)
         src/3ds/n3ds-clock.cpp
         src/3ds/SDL_supplement.cpp
         src/3ds/second_screen.cpp
-        src/3ds/sound_internal.cpp
+        src/3ds/mixer_platform.cpp
         src/3ds/text_input.cpp
     )
 else()
@@ -383,6 +383,7 @@ else()
         src/frm_main.cpp
         src/main/cheat_code.cpp
         src/editor/text_input.cpp
+        src/mixer_platform.cpp
     )
 endif()
 

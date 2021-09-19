@@ -22,16 +22,16 @@ void myAudioCallback(void *const nul_) {
     LightEvent_Signal(&sound_event);
 }
 
-inline uint32_t getSoundId(volatile SimpleChannel *channel)
+inline SoundId getSoundId(volatile SimpleChannel *channel)
 {
     return channel->channel_id+channel->index*32;
 }
 
-inline volatile SimpleChannel* validateSoundId(uint32_t id)
+inline volatile SimpleChannel* validateSoundId(SoundId id)
 {
     if (id == INVALID_ID) return nullptr;
     int channel_id = id % 32;
-    uint32_t index = id / 32;
+    SoundId index = id / 32;
     if (channels[channel_id].index == index)
     {
         return &channels[channel_id];
@@ -256,7 +256,7 @@ int loadWaveFileData(FILE* f, uint16_t* nChannels, uint32_t* sampleRate)
     return 0;
 }
 
-uint32_t playSoundWAV(const char* path, int loops) {
+SoundId playSoundWAV(const char* path, int loops) {
     // printf("Playin sound %s\n", path);
     for (size_t ci = 0; ci < NUM_CHANNELS; ci++)
     {
@@ -290,7 +290,7 @@ uint32_t playSoundWAV(const char* path, int loops) {
     return INVALID_ID;
 }
 
-uint32_t playSoundMem(const WaveObject* wave, int loops) {
+SoundId playSoundMem(const WaveObject* wave, int loops) {
     for (size_t ci = 0; ci < NUM_CHANNELS; ci++)
     {
         volatile SimpleChannel *channel = &channels[ci];
@@ -368,7 +368,7 @@ void loadOGG_Thread(void* passed_val)
     LightEvent_Signal(&sound_event);
 }
 
-uint32_t playSoundOGG(const char* path, int loops) {
+SoundId playSoundOGG(const char* path, int loops) {
     // printf("Playin music %s\n", path);
     for (size_t ci = 0; ci < NUM_CHANNELS; ci++)
     {
@@ -380,7 +380,7 @@ uint32_t playSoundOGG(const char* path, int loops) {
         channel->loops = loops;
         channel->format = FORMAT_LOADING;
         channel->data_pointer = (void*)f;
-        uint32_t uniquePlayId = getSoundId(channel);
+        SoundId uniquePlayId = getSoundId(channel);
 
         // Set the thread priority to the main thread's priority ...
         int32_t priority = 0x30;
@@ -413,7 +413,7 @@ uint32_t playSoundOGG(const char* path, int loops) {
 
 // }
 
-uint32_t playSoundGME(const char* path, int loops) {
+SoundId playSoundGME(const char* path, int loops) {
     // printf("Playin music GME %s\n", path);
     for (size_t ci = 0; ci < NUM_CHANNELS; ci++)
     {
@@ -442,7 +442,7 @@ uint32_t playSoundGME(const char* path, int loops) {
             ndspChnSetRate(channel->channel_id, 22050);
 
         channel->format = FORMAT_GME_FILE;
-        uint32_t uniquePlayId = getSoundId(channel);
+        SoundId uniquePlayId = getSoundId(channel);
         return uniquePlayId;
     }
     return INVALID_ID;
@@ -456,7 +456,7 @@ const char* get_filename_ext(const char* filename) {
     return dot + 1;
 }
 
-uint32_t playSoundAuto(const char* path, int loops)
+SoundId playSoundAuto(const char* path, int loops)
 {
     const char* ext = get_filename_ext(path);
     if (!strcasecmp(ext, "ogg"))
@@ -567,7 +567,7 @@ void audioResume() {
     }
 }
 
-void killSound(uint32_t soundId)
+void killSound(SoundId soundId)
 {
     volatile SimpleChannel* channel = validateSoundId(soundId);
     if (channel) channel->kill = true;

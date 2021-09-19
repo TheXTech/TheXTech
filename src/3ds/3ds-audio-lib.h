@@ -10,6 +10,8 @@
 
 #endif
 
+typedef uintptr_t SoundId;
+
 typedef enum _CHANNEL_FORMAT {
  FORMAT_FREE = 1 << 0,
  FORMAT_LOADING = 1 << 1,
@@ -29,7 +31,7 @@ typedef struct _SimpleChannel {
     bool kill;
     bool stereo;
     int loops;
-    uint32_t index;
+    SoundId index;
 } SimpleChannel;
 
 typedef struct _WaveObject {
@@ -39,7 +41,7 @@ typedef struct _WaveObject {
     uint32_t length;
 } WaveObject;
 
-static const uint32_t INVALID_ID = -1;
+static const SoundId INVALID_ID = -1;
 
 bool audioInit();
 
@@ -52,17 +54,17 @@ void audioResume();
 
 const char* get_filename_ext(const char* filename);
 
-uint32_t playSoundWAV(const char* path, int loops=0);
+SoundId playSoundWAV(const char* path, int loops=0);
 
-uint32_t playSoundMem(const WaveObject* wave, int loops=0);
+SoundId playSoundMem(const WaveObject* wave, int loops=0);
 
-uint32_t playSoundOGG(const char* path, int loops=-1);
+SoundId playSoundOGG(const char* path, int loops=-1);
 
-uint32_t playSoundGME(const char* path, int loops=-1);
+SoundId playSoundGME(const char* path, int loops=-1);
 
-uint32_t playSoundAuto(const char* path, int loops=-1);
+SoundId playSoundAuto(const char* path, int loops=-1);
 
-void killSound(uint32_t soundId);
+void killSound(SoundId soundId);
 
 WaveObject* audioLoadWave(const char* path);
 

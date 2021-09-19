@@ -1,6 +1,8 @@
 #ifndef SDL_SUPPLEMENT_H
 #define SDL_SUPPLEMENT_H
 
+#ifdef NO_SDL
+
 #include <cstdint>
 
 // include any platform-specific information
@@ -40,8 +42,11 @@ typedef bool SDL_bool;
 #define SDL_fmod fmod
 #define SDL_floor floor
 #define SDL_ceil ceil
+#define SDL_atoi atoi
 
 inline void SDL_assert_release(bool arg) { (void)arg; };
 inline void SDL_assert(bool arg) { (void)arg; };
 
-#endif // SDL_SUPPLEMENT_H
+#endif // #ifdef NO_SDL
+
+#endif // #ifndef SDL_SUPPLEMENT_H
