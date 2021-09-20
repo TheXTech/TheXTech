@@ -1507,7 +1507,7 @@ void NPCSpecial(int A)
                 npc.Special = 20;
                 numNPCs++;
                 NPC[numNPCs] = NPC_t();
-                NPC[numNPCs].Layer = "Spawned NPCs";
+                NPC[numNPCs].Layer = LAYER_SPAWNED_NPCS;
                 NPC[numNPCs].Active = true;
                 NPC[numNPCs].Direction = npc.Direction;
                 NPC[numNPCs].Type = 134;
@@ -1841,7 +1841,7 @@ void NPCSpecial(int A)
             NPC[numNPCs].Location.X = npc.Location.X + 2;
             NPC[numNPCs].Location.Y = npc.Location.Y;
             NPC[numNPCs].Section = npc.Section;
-            NPC[numNPCs].Layer = "Spawned NPCs";
+            NPC[numNPCs].Layer = LAYER_SPAWNED_NPCS;
             NPC[numNPCs].Type = 210;
             NPC[numNPCs].Active = true;
             NPC[numNPCs].TimeLeft = 50;
@@ -2561,7 +2561,7 @@ void NPCSpecial(int A)
                 NPC[numNPCs].Type = NPCID_ENEMYHAMMER;
                 NPC[numNPCs].Active = true;
                 NPC[numNPCs].TimeLeft = 50;
-                NPC[numNPCs].Layer = "Spawned NPCs";
+                NPC[numNPCs].Layer = LAYER_SPAWNED_NPCS;
                 NPC[numNPCs].Location.SpeedY = -8;
                 NPC[numNPCs].Location.SpeedX = 3 * NPC[numNPCs].Direction;
                 syncLayers_NPC(numNPCs);
@@ -2588,7 +2588,7 @@ void NPCSpecial(int A)
                     NPC[numNPCs].TimeLeft = 100;
                     NPC[numNPCs].Direction = npc.Direction;
                     NPC[numNPCs].Section = npc.Section;
-                    NPC[numNPCs].Layer = "Spawned NPCs";
+                    NPC[numNPCs].Layer = LAYER_SPAWNED_NPCS;
                     NPC[numNPCs].Type = NPCID_EXT_FIRE_A;
                     if(NPC[numNPCs].Direction == 1)
                         NPC[numNPCs].Frame = 4;

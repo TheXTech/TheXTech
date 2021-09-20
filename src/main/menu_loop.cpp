@@ -52,7 +52,7 @@ static void updateIntroLevelActivity()
 
     if(CheckLiving() == 0)
     {
-        ShowLayer("Destroyed Blocks");
+        ShowLayer(LAYER_DESTROYED_BLOCKS);
 
         For(A, 1, numNPCs)
         {

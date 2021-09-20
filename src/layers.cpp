@@ -46,9 +46,10 @@ RangeArr<Layer_t, 0, maxLayers> Layer;
 int numEvents = 0;
 RangeArr<Events_t, 0, maxEvents> Events;
 
-RangeArr<std::string, 1, maxEvents> NewEvent;
+RangeArrI<eventindex_t, 1, maxEvents, EVENT_NONE> NewEvent;
 RangeArrI<int, 1, maxEvents, 0> newEventDelay;
 int newEventNum = 0;
+layerindex_t LAYER_USED_P_SWITCH = LAYER_NONE;
 
 static SDL_INLINE bool equalCase(const std::string &x, const std::string &y)
 {
@@ -60,24 +61,20 @@ static SDL_INLINE bool equalCase(const char *x, const char *y)
     return (SDL_strcasecmp(x, y) == 0);
 }
 
-void ShowLayer(std::string LayerName, bool NoEffect)
+void ShowLayer(layerindex_t L, bool NoEffect)
 {
+    if(L == LAYER_NONE)
+        return;
+
     int A = 0;
     int B = 0;
     Location_t tempLocation;
 
-    if(LayerName.empty())
-        return;
-
-    for(int L = 0; L <= maxLayers; L++)
     {
-        if(!equalCase(Layer[L].Name, LayerName))
-            continue;
-
         Layer[L].Hidden = false;
-        if(Layer[L].Name == "Destroyed Blocks")
+        if(L == LAYER_DESTROYED_BLOCKS)
             Layer[L].Hidden = true;
-        if(Layer[L].Name == "Spawned NPCs")
+        if(L == LAYER_SPAWNED_NPCS)
             Layer[L].Hidden = false;
 
         for (int A : Layer[L].NPCs)
@@ -158,14 +155,19 @@ void ShowLayer(std::string LayerName, bool NoEffect)
         }
     }
 
-    if(LayerName == "Destroyed Blocks")
+    if(L == LAYER_DESTROYED_BLOCKS)
     {
+        // restore all hit blocks, even non-destroyed
         for(A = 1; A <= numBlock; A++)
         {
             if(Block[A].DefaultType > 0)
             {
-                if(Block[A].Layer == LayerName)
-                    Block[A].Layer = "Default";
+                // could be nice to have an "orig_layer" variable,
+                //  would eliminate certain vanilla peculiarities,
+                //  especially if done cleverly with the block's
+                //  layer offset
+                if(Block[A].Layer == L)
+                    Block[A].Layer = LAYER_DEFAULT;
                 Block[A].Special = Block[A].DefaultSpecial;
                 Block[A].Special2 = Block[A].DefaultSpecial2;
                 Block[A].Type = Block[A].DefaultType;
@@ -175,34 +177,27 @@ void ShowLayer(std::string LayerName, bool NoEffect)
     }
 }
 
-bool ExistsLayer(const std::string LayerName)
+layerindex_t FindLayer(const std::string LayerName)
 {
     if(LayerName.empty())
-        return false;
+        return LAYER_NONE;
 
-    if(equalCase(LayerName, "Default"))
-        return true;
-
-    for(int A = 0; A <= maxLayers; A++)
+    for(layerindex_t A = 0; A <= maxLayers; A++)
     {
         if(equalCase(Layer[A].Name, LayerName))
-            return true;
+            return A;
     }
 
-    return false;
+    return LAYER_NONE;
 }
 
-void HideLayer(std::string LayerName, bool NoEffect)
+void HideLayer(layerindex_t L, bool NoEffect)
 {
-    Location_t tempLocation;
-    if(LayerName.empty())
+    if(L == LAYER_NONE)
         return;
+    Location_t tempLocation;
 
-    for(int L = 0; L <= maxLayers; L++)
     {
-        if(!equalCase(Layer[L].Name, LayerName))
-            continue;
-
         Layer[L].Hidden = true;
 
         for (int A : Layer[L].NPCs)
@@ -262,14 +257,106 @@ void HideLayer(std::string LayerName, bool NoEffect)
     }
 }
 
-void SetLayer(std::string /*LayerName*/)
+void SetLayer(layerindex_t /*LayerName*/)
 {
     // Unused
 }
 
-bool RenameLayer(const std::string OldName, const std::string NewName)
+bool SwapLayers(layerindex_t index_1, layerindex_t index_2)
 {
-    if(OldName.empty())
+    if(index_1 == LAYER_NONE || index_2 == LAYER_NONE)
+        return false;
+
+    std::swap(Layer[index_1], Layer[index_2]);
+
+    // repoint all of Layer 1's objects to index 2
+    for (int A : Layer[index_1].NPCs)
+        NPC[A].Layer = index_2;
+
+    for (int A : Layer[index_1].blocks)
+        Block[A].Layer = index_2;
+
+    for (int A : Layer[index_1].BGOs)
+        Background[A].Layer = index_2;
+
+    for (int A : Layer[index_1].warps)
+        Warp[A].Layer = index_2;
+
+    for (int A : Layer[index_1].waters)
+        Water[A].Layer = index_2;
+
+    // repoint all of Layer 2's objects to index 1
+    for (int A : Layer[index_2].NPCs)
+        NPC[A].Layer = index_1;
+
+    for (int A : Layer[index_2].blocks)
+        Block[A].Layer = index_1;
+
+    for (int A : Layer[index_2].BGOs)
+        Background[A].Layer = index_1;
+
+    for (int A : Layer[index_2].warps)
+        Warp[A].Layer = index_1;
+
+    for (int A : Layer[index_2].waters)
+        Water[A].Layer = index_1;
+
+    // swap AttLayers
+    for(int A = 1; A <= numNPCs; A++)
+    {
+        if(NPC[A].AttLayer == index_1)
+            NPC[A].AttLayer = index_2;
+        else if(NPC[A].AttLayer == index_2)
+            NPC[A].AttLayer = index_1;
+    }
+
+    // swap event layer refs
+    for(int A = 0; A <= numEvents; A++)
+    {
+        for(layerindex_t& l : Events[A].HideLayer)
+        {
+            if(l == index_1)
+                l = index_2;
+            else if(l == index_2)
+                l = index_1;
+        }
+
+        for(layerindex_t& l : Events[A].ShowLayer)
+        {
+            if(l == index_1)
+                l = index_2;
+            else if(l == index_2)
+                l = index_1;
+        }
+
+        for(layerindex_t& l : Events[A].ToggleLayer)
+        {
+            if(l == index_1)
+                l = index_2;
+            else if(l == index_2)
+                l = index_1;
+        }
+
+        if(Events[A].MoveLayer == index_1)
+            Events[A].MoveLayer = index_2;
+        else if(Events[A].MoveLayer == index_2)
+            Events[A].MoveLayer = index_1;
+    }
+
+    // swap EditorCursor layer
+    if(EditorCursor.Layer == index_1)
+        EditorCursor.Layer = index_2;
+    else if(EditorCursor.Layer == index_2)
+        EditorCursor.Layer = index_1;
+
+    LAYER_USED_P_SWITCH = FindLayer("Used P Switch");
+
+    return true;
+}
+
+bool RenameLayer(layerindex_t L, const std::string NewName)
+{
+    if(L == LAYER_NONE)
         return false;
     if(NewName.empty())
         return false;
@@ -282,132 +369,100 @@ bool RenameLayer(const std::string OldName, const std::string NewName)
             return false;
     }
 
-    for(int L = 0; L <= maxLayers; L++)
-    {
-        if(!equalCase(Layer[L].Name, OldName))
-            continue;
+    Layer[L].Name = NewName;
 
-        Layer[L].Name = NewName;
-
-        for (int A : Layer[L].NPCs)
-            NPC[A].Layer = NewName;
-
-        for (int A : Layer[L].blocks)
-            Block[A].Layer = NewName;
-
-        for (int A : Layer[L].BGOs)
-            Background[A].Layer = NewName;
-
-        for (int A : Layer[L].warps)
-            Warp[A].Layer = NewName;
-
-        for (int A : Layer[L].waters)
-            Water[A].Layer = NewName;
-    }
-
-    for(A = 1; A <= numNPCs; A++)
-    {
-        if(equalCase(NPC[A].AttLayer, OldName))
-            NPC[A].AttLayer = NewName;
-    }
-
-    for(A = 0; A <= numEvents; A++)
-    {
-        for(std::string& l : Events[A].HideLayer)
-        {
-            if(equalCase(l, OldName))
-                l = NewName;
-        }
-
-        for(std::string& l : Events[A].ShowLayer)
-        {
-            if(equalCase(l, OldName))
-                l = NewName;
-        }
-
-        for(std::string& l : Events[A].ToggleLayer)
-        {
-            if(equalCase(l, OldName))
-                l = NewName;
-        }
-
-        if(equalCase(Events[A].MoveLayer, OldName))
-            Events[A].MoveLayer = NewName;
-    }
-
-    if(equalCase(EditorCursor.Layer, OldName))
-        EditorCursor.Layer = NewName;
+    LAYER_USED_P_SWITCH = FindLayer("Used P Switch");
 
     return true;
 }
 
-bool DeleteLayer(const std::string LayerName, bool killall)
+bool DeleteLayer(layerindex_t L, bool killall)
 {
-    if(LayerName.empty())
+    if(L == LAYER_NONE)
         return false;
 
     int A = 0;
 
+    // order is important here, thus the unoptimized loops
     for(A = numNPCs; A >= 1; A--)
     {
-        if(equalCase(NPC[A].Layer, LayerName))
+        if(NPC[A].AttLayer == L)
+            NPC[A].AttLayer = LAYER_NONE;
+        if(NPC[A].Layer == L)
         {
             if (killall)
                 KillNPC(A, 9);
             else
-                NPC[A].Layer.clear();
+            {
+                NPC[A].Layer = LAYER_DEFAULT;
+                syncLayers_NPC(A);
+            }
         }
-        if(equalCase(NPC[A].AttLayer, LayerName))
-            NPC[A].AttLayer.clear();
     }
 
     for(A = numBlock; A >= 1; A--)
     {
-        if(equalCase(Block[A].Layer, LayerName))
+        if(Block[A].Layer == L)
         {
             if (killall)
                 KillBlock(A, false);
             else
-                Block[A].Layer.clear();
+            {
+                Block[A].Layer = LAYER_DEFAULT;
+                syncLayersTrees_Block(A);
+            }
         }
     }
 
     for(A = numWarps; A >= 1; A--)
     {
-        if(equalCase(Warp[A].Layer, LayerName))
+        if(Warp[A].Layer == L)
         {
             if (killall)
                 KillWarp(A);
             else
-                Warp[A].Layer.clear();
+            {
+                Warp[A].Layer = LAYER_DEFAULT;
+                syncLayers_Warp(A);
+            }
         }
     }
 
     for(A = numBackground; A >= 1; A--)
     {
-        if(equalCase(Background[A].Layer, LayerName))
+        if(Background[A].Layer == L)
         {
             if (killall)
             {
                 Background[A] = Background[numBackground];
                 numBackground --;
+                syncLayers_BGO(A);
+                syncLayers_BGO(numWater+1);
             }
             else
-                Background[A].Layer.clear();
+            {
+                Background[A].Layer = LAYER_DEFAULT;
+                syncLayers_BGO(A);
+            }
         }
     }
 
     for(A = numWater; A >= 1; A--)
     {
-        if(equalCase(Water[A].Layer, LayerName))
+        if(Water[A].Layer == L)
         {
             if (killall)
             {
                 Water[A] = Water[numWater];
                 numWater --;
+                syncLayers_Water(A);
+                syncLayers_Water(numWater+1);
             }
             else
-                Water[A].Layer.clear();
+            {
+                Water[A].Layer = LAYER_DEFAULT;
+                syncLayers_Water(A);
+            }
         }
     }
 
@@ -416,42 +471,38 @@ bool DeleteLayer(const std::string LayerName, bool killall)
         for (auto it = Events[A].HideLayer.end(); it != Events[A].HideLayer.begin();)
         {
             it--;
-            if (equalCase(*it, LayerName))
+            if (*it == L)
                 it = Events[A].HideLayer.erase(it);
         }
 
         for (auto it = Events[A].ShowLayer.end(); it != Events[A].ShowLayer.begin();)
         {
             it--;
-            if (equalCase(*it, LayerName))
+            if (*it == L)
                 it = Events[A].ShowLayer.erase(it);
         }
 
         for (auto it = Events[A].ToggleLayer.end(); it != Events[A].ToggleLayer.begin();)
         {
             it--;
-            if (equalCase(*it, LayerName))
+            if (*it == L)
                 it = Events[A].ToggleLayer.erase(it);
         }
 
-        if(equalCase(Events[A].MoveLayer, LayerName))
-            Events[A].MoveLayer.clear();
+        if(Events[A].MoveLayer == L)
+            Events[A].MoveLayer = LAYER_NONE;
     }
 
-    for(A = numLayers; A >= 0; A--)
-    {
-        if(equalCase(Layer[A].Name, LayerName))
-        {
-            for (int B = A; B <= numLayers - 1; B++)
-                std::swap(Layer[B], Layer[B+1]);
+    for (int B = L; B <= numLayers - 1; B++)
+        SwapLayers(B, B+1);
 
-            Layer[numLayers] = Layer_t();
-            numLayers --;
-        }
-    }
+    Layer[numLayers] = Layer_t();
+    numLayers --;
 
-    if(equalCase(EditorCursor.Layer, LayerName))
-        EditorCursor.Layer.clear();
+    if(EditorCursor.Layer == L)
+        EditorCursor.Layer = LAYER_DEFAULT;
+
+    LAYER_USED_P_SWITCH = FindLayer("Used P Switch");
 
     return true;
 }
@@ -461,134 +512,156 @@ void InitializeEvent(Events_t& event)
     event = Events_t();
     for (int i = 0; i <= maxSections; i++)
     {
-        event.section[i].music_id = EventSection_t::LESet_Nothing;
-        event.section[i].background_id = EventSection_t::LESet_Nothing;
+        event.section[i] = EventSection_t();
         event.section[i].position.X = EventSection_t::LESet_Nothing;
     }
 }
 
-bool ExistsEvent(const std::string EventName)
+eventindex_t FindEvent(const std::string EventName)
 {
     if(EventName.empty())
-        return false;
+        return EVENT_NONE;
 
-    for(int A = 0; A <= maxEvents; A++)
+    for(eventindex_t A = 0; A <= maxEvents; A++)
     {
         if(equalCase(Events[A].Name, EventName))
-            return true;
+            return A;
     }
 
-    return false;
+    return EVENT_NONE;
 }
 
-bool RenameEvent(const std::string OldName, const std::string NewName)
+bool RenameEvent(eventindex_t index, const std::string NewName)
 {
-    if(OldName.empty())
+    if(index == EVENT_NONE)
         return false;
     if(NewName.empty())
         return false;
 
+    Events[index].Name = NewName;
+
+    return true;
+}
+
+bool SwapEvents(eventindex_t index_1, eventindex_t index_2)
+{
+    if(index_1 == EVENT_NONE || index_2 == EVENT_NONE)
+        return false;
+
     int A = 0;
 
-    for(A = 0; A <= maxEvents; A++)
-    {
-        if(equalCase(Events[A].Name, NewName))
-            return false;
-    }
-
-    for(A = 0; A <= maxEvents; A++)
-    {
-        if(equalCase(Events[A].Name, OldName))
-            Events[A].Name = NewName;
-    }
-
+    // swap EVERYTHING
     for(A = 1; A <= numNPCs; A++)
     {
-        if(equalCase(NPC[A].TriggerTalk, OldName))
-            NPC[A].TriggerTalk = NewName;
-        if(equalCase(NPC[A].TriggerDeath, OldName))
-            NPC[A].TriggerDeath = NewName;
-        if(equalCase(NPC[A].TriggerLast, OldName))
-            NPC[A].TriggerLast = NewName;
-        if(equalCase(NPC[A].TriggerActivate, OldName))
-            NPC[A].TriggerActivate = NewName;
+        if(NPC[A].TriggerTalk == index_1)
+            NPC[A].TriggerTalk = index_2;
+        else if(NPC[A].TriggerTalk == index_2)
+            NPC[A].TriggerTalk = index_1;
+        if(NPC[A].TriggerDeath == index_1)
+            NPC[A].TriggerDeath = index_2;
+        else if(NPC[A].TriggerDeath == index_2)
+            NPC[A].TriggerDeath = index_1;
+        if(NPC[A].TriggerLast == index_1)
+            NPC[A].TriggerLast = index_2;
+        else if(NPC[A].TriggerLast == index_2)
+            NPC[A].TriggerLast = index_1;
+        if(NPC[A].TriggerActivate == index_1)
+            NPC[A].TriggerActivate = index_2;
+        else if(NPC[A].TriggerActivate == index_2)
+            NPC[A].TriggerActivate = index_1;
     }
 
     for(A = 1; A <= numBlock; A++)
     {
-        if(equalCase(Block[A].TriggerHit, OldName))
-            Block[A].TriggerHit = NewName;
-        if(equalCase(Block[A].TriggerDeath, OldName))
-            Block[A].TriggerDeath = NewName;
-        if(equalCase(Block[A].TriggerLast, OldName))
-            Block[A].TriggerLast = NewName;
+        if(Block[A].TriggerHit == index_1)
+            Block[A].TriggerHit = index_2;
+        else if(Block[A].TriggerHit == index_2)
+            Block[A].TriggerHit = index_1;
+        if(Block[A].TriggerDeath == index_1)
+            Block[A].TriggerDeath = index_2;
+        else if(Block[A].TriggerDeath == index_2)
+            Block[A].TriggerDeath = index_1;
+        if(Block[A].TriggerLast == index_1)
+            Block[A].TriggerLast = index_2;
+        else if(Block[A].TriggerLast == index_2)
+            Block[A].TriggerLast = index_1;
     }
 
+    for(A = 0; A <= numWarps; A++)
+    {
+        if(Warp[A].TriggerEnter == index_1)
+            Warp[A].TriggerEnter = index_2;
+        else if(Warp[A].TriggerEnter == index_2)
+            Warp[A].TriggerEnter = index_1;
+    }
 
     for(A = 0; A <= numEvents; A++)
     {
-        if(equalCase(Events[A].TriggerEvent, OldName))
-            Events[A].TriggerEvent = NewName;
+        if(Events[A].TriggerEvent == index_1)
+            Events[A].TriggerEvent = index_2;
+        else if(Events[A].TriggerEvent == index_2)
+            Events[A].TriggerEvent = index_1;
     }
 
     return true;
 }
 
-bool DeleteEvent(const std::string EventName)
+bool DeleteEvent(eventindex_t index)
 {
-    if(EventName.empty())
+    if(index == EVENT_NONE)
         return false;
 
     int A = 0;
 
     for(A = 1; A <= numNPCs; A++)
     {
-        if(equalCase(NPC[A].TriggerTalk, EventName))
-            NPC[A].TriggerTalk.clear();
-        if(equalCase(NPC[A].TriggerDeath, EventName))
-            NPC[A].TriggerDeath.clear();
-        if(equalCase(NPC[A].TriggerLast, EventName))
-            NPC[A].TriggerLast.clear();
-        if(equalCase(NPC[A].TriggerActivate, EventName))
-            NPC[A].TriggerActivate.clear();
+        if(NPC[A].TriggerTalk == index)
+            NPC[A].TriggerTalk = EVENT_NONE;
+        if(NPC[A].TriggerDeath == index)
+            NPC[A].TriggerDeath = EVENT_NONE;
+        if(NPC[A].TriggerLast == index)
+            NPC[A].TriggerLast = EVENT_NONE;
+        if(NPC[A].TriggerActivate == index)
+            NPC[A].TriggerActivate = EVENT_NONE;
     }
 
     for(A = 1; A <= numBlock; A++)
     {
-        if(equalCase(Block[A].TriggerHit, EventName))
-            Block[A].TriggerHit.clear();
-        if(equalCase(Block[A].TriggerDeath, EventName))
-            Block[A].TriggerDeath.clear();
-        if(equalCase(Block[A].TriggerLast, EventName))
-            Block[A].TriggerLast.clear();
+        if(Block[A].TriggerHit == index)
+            Block[A].TriggerHit = EVENT_NONE;
+        if(Block[A].TriggerDeath == index)
+            Block[A].TriggerDeath = EVENT_NONE;
+        if(Block[A].TriggerLast == index)
+            Block[A].TriggerLast = EVENT_NONE;
     }
 
+    for(A = 0; A <= numWarps; A++)
+    {
+        if(Warp[A].TriggerEnter == index)
+            Warp[A].TriggerEnter = EVENT_NONE;
+    }
 
     for(A = 0; A <= numEvents; A++)
     {
-        if(equalCase(Events[A].TriggerEvent, EventName))
-            Events[A].TriggerEvent.clear();
+        if(Events[A].TriggerEvent == index)
+            Events[A].TriggerEvent = EVENT_NONE;
     }
 
-    for(A = numEvents; A >= 0; A--)
-    {
-        if(equalCase(Events[A].Name, EventName))
-        {
-            for (int B = A; B <= numEvents - 1; B++)
-                std::swap(Events[B], Events[B+1]);
+    for (int B = index; B <= numEvents - 1; B++)
+        SwapEvents(B, B+1);
 
-            Events[numEvents] = Events_t();
-            numEvents --;
-        }
-    }
+    Events[numEvents] = Events_t();
+    numEvents --;
 
     return true;
 }
 
-void ProcEvent(std::string EventName, bool NoEffect)
+void ProcEvent(eventindex_t index, bool NoEffect)
 {
+    if(index == EVENT_NONE || LevelEditor)
+        return;
+
     // this is for events that have just been triggered
-    int A = 0;
     int B = 0;
     int C = 0;
     int D = 0;
@@ -601,15 +674,10 @@ void ProcEvent(std::string EventName, bool NoEffect)
     // Ignore vanilla autoscroll if newer way has been used
     bool autoScrollerChanged = false;
 
-    if(EventName.empty() || LevelEditor)
-        return;
-
-    for(A = 0; A <= numEvents; A++)
     {
-        auto &evt = Events[A];
-        if(equalCase(EventName, evt.Name))
+        auto &evt = Events[index];
         {
-            if(g_compatibility.speedrun_stop_timer_by == Compatibility_t::SPEEDRUN_STOP_EVENT && equalCase(EventName.c_str(), g_compatibility.speedrun_stop_timer_at))
+            if(g_compatibility.speedrun_stop_timer_by == Compatibility_t::SPEEDRUN_STOP_EVENT && equalCase(evt.Name.c_str(), g_compatibility.speedrun_stop_timer_at))
                 speedRun_bossDeadEvent();
 
             for(B = 0; B <= numSections; B++)
@@ -771,19 +839,10 @@ void ProcEvent(std::string EventName, bool NoEffect)
 
             for(auto &l : evt.ToggleLayer)
             {
-                if(l.empty())
-                    continue;
-
-                for(C = 0; C <= numLayers; C++)
-                {
-                    if(Layer[C].Name == l)
-                    {
-                        if(Layer[C].Hidden)
-                            ShowLayer(Layer[C].Name, evt.LayerSmoke);
-                        else
-                            HideLayer(Layer[C].Name, evt.LayerSmoke);
-                    }
-                }
+                if(Layer[l].Hidden)
+                    ShowLayer(l, evt.LayerSmoke);
+                else
+                    HideLayer(l, evt.LayerSmoke);
             }
 
 #if 0 // Obsolete, replaced with a code above
@@ -820,11 +879,10 @@ void ProcEvent(std::string EventName, bool NoEffect)
             }
 #endif
 
-            if(!evt.MoveLayer.empty())
+            if(evt.MoveLayer != LAYER_NONE)
             {
-                for(B = 0; B <= maxLayers; B++)
                 {
-                    if(Layer[B].Name == evt.MoveLayer)
+                    B = evt.MoveLayer;
                     {
                         Layer[B].EffectStop = true;
                         Layer[B].SpeedX = evt.SpeedX;
@@ -884,7 +942,7 @@ void ProcEvent(std::string EventName, bool NoEffect)
                 }
             }
 
-            if(!evt.Text.empty())
+            if(evt.Text != "")
             {
                 MessageText = evt.Text;
                 PauseGame(1);
@@ -921,21 +979,12 @@ void ProcEvent(std::string EventName, bool NoEffect)
             ForcedControl = evt.Controls;
 
             tempBool = false;
-            if(!evt.TriggerEvent.empty())
+            if(evt.TriggerEvent != EVENT_NONE)
             {
                 if(std::round(evt.TriggerDelay) == 0.0)
                 {
-                    for(B = 0; B <= maxEvents; B++)
-                    {
-                        if(Events[B].Name == evt.TriggerEvent)
-                        {
-                            if(Events[B].TriggerEvent == evt.Name)
-                                tempBool = true;
-                            break;
-                        }
-                    }
-
-                    if(!tempBool)
+                    // no order-2 circles allowed
+                    if(Events[evt.TriggerEvent].TriggerEvent != index)
                         ProcEvent(evt.TriggerEvent);
                 }
                 else
@@ -1020,7 +1069,6 @@ void UpdateLayers()
     // this is mainly for moving layers
     int A = 0;
     int B = 0;
-    int C = 0;
 
     bool FreezeLayers = false;
 
@@ -1152,16 +1200,18 @@ void UpdateLayers()
 
                             if(!NPC[B].Active)
                             {
-                                if(!NPC[B].AttLayer.empty())
+                                if(NPC[B].AttLayer != LAYER_NONE)
                                 {
-                                     for(C = 1; C <= maxLayers; C++)
-                                     {
-                                         if(NPC[B].AttLayer == Layer[C].Name)
-                                         {
-                                             Layer[C].SpeedX = Layer[A].SpeedX;
-                                             Layer[C].SpeedY = Layer[A].SpeedY;
-                                         }
-                                     }
+                                    Layer[NPC[B].AttLayer].SpeedX = Layer[A].SpeedX;
+                                    Layer[NPC[B].AttLayer].SpeedY = Layer[A].SpeedY;
+                                    // for(C = 1; C <= maxLayers; C++)
+                                    // {
+                                    //     if(NPC[B].AttLayer == Layer[C].Name)
+                                    //     {
+                                    //         Layer[C].SpeedX = Layer[A].SpeedX;
+                                    //         Layer[C].SpeedY = Layer[A].SpeedY;
+                                    //     }
+                                    // }
                                  }
                              }
                         }
@@ -1189,47 +1239,52 @@ void syncLayersTrees_AllBlocks()
 
 void syncLayersTrees_Block(int block)
 {
-    int foundLayer = false;
     for (int layer = 0; layer <= numLayers; layer++)
     {
-        if (block <= numBlock && Block[block].Layer == Layer[layer].Name)
-        {
-            if(!foundLayer)
-            {
-                Block[block].LayerIndex = layer;
-                Block[block].LocationInLayer = Block[block].Location;
-                Block[block].LocationInLayer.X = Block[block].Location.X - Layer[layer].OffsetX;
-                Block[block].LocationInLayer.Y = Block[block].Location.Y - Layer[layer].OffsetY;
-                treeBlockAddLayer(layer, &Block[block]);
-                foundLayer = true;
-            }
-            else
-                treeBlockRemoveLayer(layer, &Block[block]);
-            Layer[layer].blocks.insert(block);
-        }
-        else
+        if(layer != Block[block].Layer)
         {
             Layer[layer].blocks.erase(block);
             treeBlockRemoveLayer(layer, &Block[block]);
         }
     }
-    if(!foundLayer && block <= numBlock)
+    int layer = Block[block].Layer;
+    if (block <= numBlock)
     {
-        Block[block].LayerIndex = -1;
-        Block[block].LocationInLayer = Block[block].Location;
-        treeBlockAddLayer(-1, &Block[block]);
+        if(layer != LAYER_NONE)
+        {
+            Block[block].LayerIndex = layer;
+            Block[block].LocationInLayer = Block[block].Location;
+            Block[block].LocationInLayer.X = Block[block].Location.X - Layer[layer].OffsetX;
+            Block[block].LocationInLayer.Y = Block[block].Location.Y - Layer[layer].OffsetY;
+            treeBlockAddLayer(layer, &Block[block]);
+            Layer[layer].blocks.insert(block);
+        }
+        else
+        {
+            Block[block].LayerIndex = -1;
+            Block[block].LocationInLayer = Block[block].Location;
+            treeBlockAddLayer(-1, &Block[block]);
+        }
     }
     else
     {
-        treeBlockRemoveLayer(-1, &Block[block]);
+        if(layer != LAYER_NONE)
+        {
+            treeBlockRemoveLayer(layer, &Block[block]);
+            Layer[layer].blocks.erase(block);
+        }
+        else
+        {
+            treeBlockRemoveLayer(-1, &Block[block]);
+        }
     }
 }
 
 void syncLayersTrees_Block_SetHidden(int block) // set block hidden based on layer
 {
     syncLayersTrees_Block(block);
-    if(Block[block].LayerIndex != -1)
-        Block[block].Hidden = Layer[Block[block].LayerIndex].Hidden;
+    if(Block[block].Layer != LAYER_NONE)
+        Block[block].Hidden = Layer[Block[block].Layer].Hidden;
 }
 
 void syncLayers_AllNPCs()
@@ -1244,7 +1299,7 @@ void syncLayers_NPC(int npc)
 {
     for (int layer = 0; layer <= numLayers; layer++)
     {
-        if (npc <= numNPCs && NPC[npc].Layer == Layer[layer].Name)
+        if (npc <= numNPCs && NPC[npc].Layer == layer)
             Layer[layer].NPCs.insert(npc);
         else
             Layer[layer].NPCs.erase(npc);
@@ -1263,7 +1318,7 @@ void syncLayers_BGO(int bgo)
 {
     for (int layer = 0; layer <= numLayers; layer++)
     {
-        if (bgo <= numBackground + numLocked && Background[bgo].Layer == Layer[layer].Name)
+        if (bgo <= numBackground + numLocked && Background[bgo].Layer == layer)
             Layer[layer].BGOs.insert(bgo);
         else
             Layer[layer].BGOs.erase(bgo);
@@ -1274,7 +1329,7 @@ void syncLayers_Warp(int warp)
 {
     for (int layer = 0; layer <= numLayers; layer++)
     {
-        if (warp <= numWarps && Warp[warp].Layer == Layer[layer].Name)
+        if (warp <= numWarps && Warp[warp].Layer == layer)
             Layer[layer].warps.insert(warp);
         else
             Layer[layer].warps.erase(warp);
@@ -1285,7 +1340,7 @@ void syncLayers_Water(int water)
 {
     for (int layer = 0; layer <= numLayers; layer++)
     {
-        if (water <= numWater && Water[water].Layer == Layer[layer].Name)
+        if (water <= numWater && Water[water].Layer == layer)
             Layer[layer].waters.insert(water);
         else
             Layer[layer].waters.erase(water);

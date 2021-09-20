@@ -138,7 +138,7 @@ void SaveLevel(std::string FilePath, int format, int version)   // saves the lev
 
         block.invisible = b.Invis;
         block.slippery = b.Slippy;
-        block.layer = b.Layer;
+        block.layer = GetL(b.Layer);
 
         // fix this to update as needed
         if(block.layer.empty())
@@ -160,7 +160,7 @@ void SaveLevel(std::string FilePath, int format, int version)   // saves the lev
         bgo.id = b.Type;
         bgo.x = b.Location.X;
         bgo.y = b.Location.Y;
-        bgo.layer = b.Layer;
+        bgo.layer = GetL(b.Layer);
 
         bgo.z_mode = b.zMode;
         bgo.z_offset = b.zOffset;
@@ -197,19 +197,19 @@ void SaveLevel(std::string FilePath, int format, int version)   // saves the lev
         npc.generator_direct = n.GeneratorDirection;
         npc.generator_period = n.GeneratorTimeMax;
         npc.generator_type = n.GeneratorEffect;
-        npc.attach_layer = n.AttLayer;
+        npc.attach_layer = GetL(n.AttLayer);
 
-        npc.msg = n.Text;
+        npc.msg = GetS(n.Text);
         npc.friendly = n.Inert;
         npc.nomove = n.Stuck;
         npc.is_boss = n.Legacy;
 
-        npc.layer = n.Layer;
+        npc.layer = GetL(n.Layer);
 
-        npc.event_activate = n.TriggerActivate;
-        npc.event_die = n.TriggerDeath;
-        npc.event_talk = n.TriggerTalk;
-        npc.event_emptylayer = n.TriggerLast;
+        npc.event_activate = GetE(n.TriggerActivate);
+        npc.event_die = GetE(n.TriggerDeath);
+        npc.event_talk = GetE(n.TriggerTalk);
+        npc.event_emptylayer = GetE(n.TriggerLast);
 
         // fix this to update as needed
         if(npc.layer.empty())
@@ -238,7 +238,7 @@ void SaveLevel(std::string FilePath, int format, int version)   // saves the lev
 
         warp.type = w.Effect;
         warp.two_way = w.twoWay;
-        warp.lname = w.level;
+        warp.lname = GetS(w.level);
 
         warp.warpto = w.LevelWarp;
         warp.lvl_i = w.LevelEnt;
@@ -248,7 +248,7 @@ void SaveLevel(std::string FilePath, int format, int version)   // saves the lev
         warp.world_y = w.MapY;
 
         warp.stars = w.Stars;
-        warp.layer = w.Layer;
+        warp.layer = GetL(w.Layer);
         warp.unknown = w.Hidden;
 
         warp.novehicles = w.NoYoshi;
@@ -257,7 +257,7 @@ void SaveLevel(std::string FilePath, int format, int version)   // saves the lev
 
         warp.cannon_exit = w.cannonExit;
         warp.cannon_exit_speed = w.cannonExitSpeed;
-        warp.event_enter = w.eventEnter;
+        warp.event_enter = GetE(w.TriggerEnter);
         warp.stars_msg = w.StarsMsg;
         warp.star_num_hide = w.noPrintStars;
         warp.hide_entering_scene = w.noEntranceScene;
@@ -280,7 +280,7 @@ void SaveLevel(std::string FilePath, int format, int version)   // saves the lev
         pez.h = p.Location.Height;
         pez.buoy = p.Buoy;
         pez.env_type = p.Quicksand ? LevelPhysEnv::ENV_QUICKSAND : LevelPhysEnv::ENV_WATER;
-        pez.layer = p.Layer;
+        pez.layer = GetL(p.Layer);
 
         // fix this to update as needed
         if(pez.layer.empty())
@@ -309,9 +309,21 @@ void SaveLevel(std::string FilePath, int format, int version)   // saves the lev
         evt.msg = e.Text;
         evt.sound_id = e.Sound;
         evt.end_game = e.EndGame;
-        evt.layers_hide = e.HideLayer;
-        evt.layers_show = e.ShowLayer;
-        evt.layers_toggle = e.ToggleLayer;
+        evt.layers_hide.clear();
+        for(layerindex_t i : e.HideLayer)
+        {
+            evt.layers_hide.push_back(GetL(i));
+        }
+        evt.layers_show.clear();
+        for(layerindex_t i : e.ShowLayer)
+        {
+            evt.layers_show.push_back(GetL(i));
+        }
+        evt.layers_toggle.clear();
+        for(layerindex_t i : e.ToggleLayer)
+        {
+            evt.layers_toggle.push_back(GetL(i));
+        }
 
         LevelEvent_Sets s;
 
@@ -339,7 +351,7 @@ void SaveLevel(std::string FilePath, int format, int version)   // saves the lev
                 evt.sets[j] = s;
         }
 
-        evt.trigger = e.TriggerEvent;
+        evt.trigger = GetE(e.TriggerEvent);
         evt.trigger_timer = e.TriggerDelay;
 
         evt.nosmoke = e.LayerSmoke;
@@ -356,7 +368,7 @@ void SaveLevel(std::string FilePath, int format, int version)   // saves the lev
         evt.ctrl_up     = e.Controls.Up;
 
         evt.autostart = e.AutoStart;
-        evt.movelayer = e.MoveLayer;
+        evt.movelayer = GetL(e.MoveLayer);
         evt.layer_speed_x = e.SpeedX;
         evt.layer_speed_y = e.SpeedY;
 

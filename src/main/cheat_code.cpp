@@ -237,7 +237,7 @@ void CheatCode(char NewKey)
         }
         else if(SDL_strstr(CheatString.c_str(), "istillplaywithlegos") || SDL_strstr(CheatString.c_str(), "istillplazwithlegos"))
         {
-            ShowLayer("Destroyed Blocks");
+            ShowLayer(LAYER_DESTROYED_BLOCKS);
             PlaySound(SFX_Raccoon);
             CheatString.clear();
             cheated = true;

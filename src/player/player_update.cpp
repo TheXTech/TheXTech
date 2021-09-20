@@ -2955,7 +2955,7 @@ void UpdatePlayer()
                                 Player[A].Location.SpeedX = Player[A].GrabSpeed;
                                 Player[A].GrabSpeed = 0;
                                 Block[B].Hidden = true;
-                                Block[B].Layer = "Destroyed Blocks";
+                                Block[B].Layer = LAYER_DESTROYED_BLOCKS;
                                 syncLayersTrees_Block(B);
                                 NewEffect(10, Block[B].Location);
                                 Effect[numEffects].Location.SpeedY = -2;
@@ -3504,7 +3504,7 @@ void UpdatePlayer()
                                     if(NPC[B].Inert) // if the npc is friendly then you can't touch it
                                     {
                                         HitSpot = 0;
-                                        if(NPC[B].Text != "" && Player[A].Controls.Up && !FreezeNPCs)
+                                        if(NPC[B].Text != STRING_NONE && Player[A].Controls.Up && !FreezeNPCs)
                                             MessageNPC = B;
                                     }
                                     if(Player[A].Stoned && HitSpot != 1) // if you are a statue then SLAM into the npc
@@ -4500,10 +4500,10 @@ void UpdatePlayer()
                 // Talk to NPC
                 if(MessageNPC > 0)
                 {
-                    MessageText = NPC[MessageNPC].Text;
+                    MessageText = GetS(NPC[MessageNPC].Text);
                     PauseGame(A);
                     MessageText = "";
-                    if(NPC[MessageNPC].TriggerTalk != "")
+                    if(NPC[MessageNPC].TriggerTalk != EVENT_NONE)
                         ProcEvent(NPC[MessageNPC].TriggerTalk);
                     MessageNPC = 0;
                 }

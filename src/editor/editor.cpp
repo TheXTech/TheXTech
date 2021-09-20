@@ -364,17 +364,17 @@ void UpdateEditor()
                                 if(n.id == 86)
                                     n.special_data = (long)EditorCursor.NPC.Special7;
 
-                                n.msg = EditorCursor.NPC.Text;
+                                n.msg = GetS(EditorCursor.NPC.Text);
                                 n.friendly = EditorCursor.NPC.Inert;
                                 n.nomove = EditorCursor.NPC.Stuck;
                                 n.is_boss = EditorCursor.NPC.Legacy;
 
-                                n.layer = EditorCursor.NPC.Layer;
-                                n.event_activate = EditorCursor.NPC.TriggerActivate;
-                                n.event_die = EditorCursor.NPC.TriggerDeath;
-                                n.event_emptylayer = EditorCursor.NPC.TriggerLast;
-                                n.event_talk = EditorCursor.NPC.TriggerTalk;
-                                n.attach_layer = EditorCursor.NPC.AttLayer;
+                                n.layer = GetL(EditorCursor.NPC.Layer);
+                                n.event_activate = GetE(EditorCursor.NPC.TriggerActivate);
+                                n.event_die = GetE(EditorCursor.NPC.TriggerDeath);
+                                n.event_emptylayer = GetE(EditorCursor.NPC.TriggerLast);
+                                n.event_talk = GetE(EditorCursor.NPC.TriggerTalk);
+                                n.attach_layer = GetL(EditorCursor.NPC.AttLayer);
                                 IntProc::sendTakenNPC(n);
                             }
 #endif
@@ -418,16 +418,16 @@ void UpdateEditor()
                                     block.h = EditorCursor.Location.Height;
                                     block.invisible = EditorCursor.Block.Invis;
                                     block.slippery = EditorCursor.Block.Slippy;
-                                    block.layer = EditorCursor.Block.Layer;
+                                    block.layer = GetL(EditorCursor.Block.Layer);
                                     if(EditorCursor.Block.Special >= 1000)
                                         block.npc_id = EditorCursor.Block.Special - 1000;
                                     else if(EditorCursor.Block.Special <= 0)
                                         block.npc_id = 0;
                                     else if(EditorCursor.Block.Special < 1000)
                                         block.npc_id = -EditorCursor.Block.Special;
-                                    block.event_hit = EditorCursor.Block.TriggerHit;
-                                    block.event_emptylayer = EditorCursor.Block.TriggerLast;
-                                    block.event_destroy = EditorCursor.Block.TriggerDeath;
+                                    block.event_hit = GetE(EditorCursor.Block.TriggerHit);
+                                    block.event_emptylayer = GetE(EditorCursor.Block.TriggerLast);
+                                    block.event_destroy = GetE(EditorCursor.Block.TriggerDeath);
                                     IntProc::sendTakenBlock(block);
                                 }
 #endif
@@ -451,7 +451,7 @@ void UpdateEditor()
                             EditorCursor.Mode = OptCursor_t::LVL_WARPS;
                             EditorCursor.SubMode = 1;
                             EditorControls.MouseClick = false; /* Simulate "Focus out" inside of SMBX Editor */
-                            if(Warp[A].LevelEnt || EditorCursor.Warp.MapWarp || EditorCursor.Warp.level != "")
+                            if(Warp[A].LevelEnt || EditorCursor.Warp.MapWarp || EditorCursor.Warp.level != STRING_NONE)
                                 Warp[A].PlacedExit = false;
                             EditorCursor.Warp = Warp[A];
                             if (!Warp[A].PlacedEnt && !Warp[A].PlacedExit)
@@ -469,7 +469,7 @@ void UpdateEditor()
                             EditorCursor.SubMode = 2;
                             EditorControls.MouseClick = false; /* Simulate "Focus out" inside of SMBX Editor */
                             // TODO: additional testing of these situations
-                            if(Warp[A].LevelEnt || EditorCursor.Warp.MapWarp || EditorCursor.Warp.level != "")
+                            if(Warp[A].LevelEnt || EditorCursor.Warp.MapWarp || EditorCursor.Warp.level != STRING_NONE)
                                 Warp[A].PlacedEnt = false;
                             EditorCursor.Warp = Warp[A];
                             if (!Warp[A].PlacedEnt && !Warp[A].PlacedExit)
@@ -514,7 +514,7 @@ void UpdateEditor()
                             {
                                 LevelBGO b;
                                 b.id = EditorCursor.Background.Type;
-                                b.layer = EditorCursor.Background.Layer;
+                                b.layer = GetL(EditorCursor.Background.Layer);
                                 b.z_mode = EditorCursor.Background.zMode;
                                 b.z_offset = EditorCursor.Background.zOffset;
                                 if(EditorCursor.Background.zMode == LevelBGO::ZDefault)
@@ -563,16 +563,16 @@ void UpdateEditor()
                                     block.h = EditorCursor.Location.Height;
                                     block.invisible = EditorCursor.Block.Invis;
                                     block.slippery = EditorCursor.Block.Slippy;
-                                    block.layer = EditorCursor.Block.Layer;
+                                    block.layer = GetL(EditorCursor.Block.Layer);
                                     if(EditorCursor.Block.Special >= 1000)
                                         block.npc_id = EditorCursor.Block.Special - 1000;
                                     else if(EditorCursor.Block.Special <= 0)
                                         block.npc_id = 0;
                                     else if(EditorCursor.Block.Special < 1000)
                                         block.npc_id = -EditorCursor.Block.Special;
-                                    block.event_hit = EditorCursor.Block.TriggerHit;
-                                    block.event_emptylayer = EditorCursor.Block.TriggerLast;
-                                    block.event_destroy = EditorCursor.Block.TriggerDeath;
+                                    block.event_hit = GetE(EditorCursor.Block.TriggerHit);
+                                    block.event_emptylayer = GetE(EditorCursor.Block.TriggerLast);
+                                    block.event_destroy = GetE(EditorCursor.Block.TriggerDeath);
                                     IntProc::sendTakenBlock(block);
                                 }
 #endif
@@ -1276,6 +1276,11 @@ void UpdateEditor()
 //                        }
 
                         NPC[numNPCs] = EditorCursor.NPC;
+                        if(NPC[numNPCs].Text != STRING_NONE)
+                        {
+                            NPC[numNPCs].Text = STRING_NONE;
+                            SetS(NPC[numNPCs].Text, GetS(EditorCursor.NPC.Text));
+                        }
                         syncLayers_NPC(numNPCs);
 //                        Netplay::sendData Netplay::AddNPC(numNPCs);
                         if(!MagicHand)
@@ -1311,19 +1316,30 @@ void UpdateEditor()
                 if(A > numWarps)
                     numWarps = A;
 
-                if(EditorCursor.SubMode == 1 || EditorCursor.Warp.level != "" || EditorCursor.Warp.LevelEnt == true || EditorCursor.Warp.MapWarp == true)
+                if(EditorCursor.SubMode == 1 || EditorCursor.Warp.level != STRING_NONE || EditorCursor.Warp.LevelEnt == true || EditorCursor.Warp.MapWarp == true)
                 {
                     EditorCursor.Warp.Entrance = EditorCursor.Location;
                     EditorControls.MouseClick = false;
                     EditorCursor.Warp.PlacedEnt = true;
                 }
-                if(EditorCursor.SubMode == 2 || EditorCursor.Warp.level != "" || EditorCursor.Warp.LevelEnt == true || EditorCursor.Warp.MapWarp == true)
+                if(EditorCursor.SubMode == 2 || EditorCursor.Warp.level != STRING_NONE || EditorCursor.Warp.LevelEnt == true || EditorCursor.Warp.MapWarp == true)
                 {
                     EditorCursor.Warp.Exit = EditorCursor.Location;
                     EditorControls.MouseClick = false;
                     EditorCursor.Warp.PlacedExit = true;
                 }
                 Warp[A] = EditorCursor.Warp;
+                // de-duplicate strings
+                if(Warp[A].level != STRING_NONE)
+                {
+                    Warp[A].level = STRING_NONE;
+                    SetS(Warp[A].level, GetS(EditorCursor.Warp.level));
+                }
+                if(Warp[A].StarsMsg != STRING_NONE)
+                {
+                    Warp[A].StarsMsg = STRING_NONE;
+                    SetS(Warp[A].StarsMsg, GetS(EditorCursor.Warp.StarsMsg));
+                }
                 Warp[A].Layer = EditorCursor.Layer;
                 if (Warp[A].PlacedEnt && Warp[A].PlacedExit)
                 {
@@ -1502,7 +1518,7 @@ void UpdateInterprocess()
 
     case IntProc::SetLayer:
     {
-        EditorCursor.Layer = IntProc::getCMD();
+        EditorCursor.Layer = FindLayer(IntProc::getCMD());
 
         EditorCursor.Block.Layer = EditorCursor.Layer;
         EditorCursor.Background.Layer = EditorCursor.Layer;
@@ -1550,7 +1566,7 @@ void UpdateInterprocess()
                EditorCursor.Block.Type != int(b.id))
                 PlaySound(SFX_Grab);
 
-            EditorCursor.Layer = b.layer;
+            EditorCursor.Layer = FindLayer(b.layer);
 
             EditorCursor.Mode = OptCursor_t::LVL_BLOCKS;
             EditorCursor.Block = Block_t();
@@ -1569,10 +1585,10 @@ void UpdateInterprocess()
             EditorCursor.Block.Invis = b.invisible;
             EditorCursor.Block.Slippy = b.slippery;
             EditorCursor.Block.Special = b.npc_id > 0 ? int(b.npc_id + 1000) : int(-b.npc_id);
-            EditorCursor.Block.Layer = b.layer;
-            EditorCursor.Block.TriggerHit = b.event_hit;
-            EditorCursor.Block.TriggerLast = b.event_emptylayer;
-            EditorCursor.Block.TriggerDeath = b.event_destroy;
+            EditorCursor.Block.Layer = FindLayer(b.layer);
+            EditorCursor.Block.TriggerHit = FindEvent(b.event_hit);
+            EditorCursor.Block.TriggerLast = FindEvent(b.event_emptylayer);
+            EditorCursor.Block.TriggerDeath = FindEvent(b.event_destroy);
 
             if(EditorCursor.Block.Type > maxBlockType) // Avoid out of range crash
                 EditorCursor.Block.Type = 1;
@@ -1593,14 +1609,14 @@ void UpdateInterprocess()
                EditorCursor.Background.Type != int(b.id))
                 PlaySound(SFX_Grab);
 
-            EditorCursor.Layer = b.layer;
+            EditorCursor.Layer = FindLayer(b.layer);
 
             EditorCursor.Mode = OptCursor_t::LVL_BGOS;
             EditorCursor.Background = Background_t();
             EditorCursor.Background.Type = int(b.id);
             EditorCursor.Location.X = b.x;
             EditorCursor.Location.Y = b.y;
-            EditorCursor.Background.Layer = b.layer;
+            EditorCursor.Background.Layer = FindLayer(b.layer);
             EditorCursor.Background.SortPriority = -1;
             EditorCursor.Background.uid = (numBackground + 1);
             EditorCursor.Background.zMode = b.z_mode;
@@ -1627,7 +1643,7 @@ void UpdateInterprocess()
                EditorCursor.NPC.Type != int(n.id))
                 PlaySound(SFX_Grab);
 
-            EditorCursor.Layer = n.layer;
+            EditorCursor.Layer = FindLayer(n.layer);
 
             EditorCursor.Mode = OptCursor_t::LVL_NPCS;
             EditorCursor.NPC = NPC_t();
@@ -1680,7 +1696,8 @@ void UpdateInterprocess()
                 EditorCursor.NPC.GeneratorTimeMax = n.generator_period;
             }
 
-            EditorCursor.NPC.Text = n.msg;
+            if(!n.msg.empty())
+                SetS(EditorCursor.NPC.Text, n.msg);
 
             EditorCursor.NPC.Inert = n.friendly;
             if(EditorCursor.NPC.Type == 151)
@@ -1690,12 +1707,12 @@ void UpdateInterprocess()
 
             EditorCursor.NPC.Legacy = n.is_boss;
 
-            EditorCursor.NPC.Layer = n.layer;
-            EditorCursor.NPC.TriggerActivate = n.event_activate;
-            EditorCursor.NPC.TriggerDeath = n.event_die;
-            EditorCursor.NPC.TriggerTalk = n.event_talk;
-            EditorCursor.NPC.TriggerLast = n.event_emptylayer;
-            EditorCursor.NPC.AttLayer = n.attach_layer;
+            EditorCursor.NPC.Layer = FindLayer(n.layer);
+            EditorCursor.NPC.TriggerActivate = FindEvent(n.event_activate);
+            EditorCursor.NPC.TriggerDeath = FindEvent(n.event_die);
+            EditorCursor.NPC.TriggerTalk = FindEvent(n.event_talk);
+            EditorCursor.NPC.TriggerLast = FindEvent(n.event_emptylayer);
+            EditorCursor.NPC.AttLayer = FindLayer(n.attach_layer);
 
             EditorCursor.NPC.DefaultType = EditorCursor.NPC.Type;
             EditorCursor.NPC.Location.Width = NPCWidth[EditorCursor.NPC.Type];

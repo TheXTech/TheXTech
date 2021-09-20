@@ -1441,7 +1441,6 @@ void KillBlock(int A, bool Splode)
 {
     Block_t blankBlock;
     bool tempBool = false;
-    int C = 0;
 
     if(Block[A].Hidden)
         return;
@@ -1486,18 +1485,18 @@ void KillBlock(int A, bool Splode)
     {
         Score += 50;
 
-        if(!Block[A].TriggerDeath.empty())
+        if(Block[A].TriggerDeath != EVENT_NONE)
         {
             ProcEvent(Block[A].TriggerDeath);
         }
 
-        if(!Block[A].TriggerLast.empty())
+        if(Block[A].TriggerLast != EVENT_NONE)
         {
             tempBool = false;
 
-            for(C = 0; C <= numLayers; C++)
+            int C = Block[A].Layer;
+            if(C != LAYER_NONE)
             {
-                if(Layer[C].Name != Block[A].Layer) continue;
                 for(int npc : Layer[C].NPCs)
                 {
                     if(NPC[npc].Generator == false)
@@ -1506,17 +1505,17 @@ void KillBlock(int A, bool Splode)
                         break;
                     }
                 }
-                if(tempBool)
-                    break;
-                for (int other_block : Layer[C].blocks)
+                if(!tempBool)
                 {
-                    if(other_block != A)
+                    for (int other_block : Layer[C].blocks)
                     {
-                        tempBool = true;
-                        break;
+                        if(other_block != A)
+                        {
+                            tempBool = true;
+                            break;
+                        }
                     }
                 }
-                if (tempBool) break;
             }
             if(!tempBool)
             {
@@ -1525,7 +1524,7 @@ void KillBlock(int A, bool Splode)
         }
 
         Block[A].Hidden = true;
-        Block[A].Layer = "Destroyed Blocks";
+        Block[A].Layer = LAYER_DESTROYED_BLOCKS;
         Block[A].Kill = false;
         syncLayersTrees_Block(A);
     }
@@ -1798,7 +1797,7 @@ void UpdateBlocks()
                 Block[A].RespawnDelay = Block[A].RespawnDelay + 1;
                 if(Block[A].RespawnDelay >= 65 * 60)
                 {
-                    if(Block[A].DefaultType > 0 || Block[A].DefaultSpecial > 0 || Block[A].Layer == "Destroyed Blocks")
+                    if(Block[A].DefaultType > 0 || Block[A].DefaultSpecial > 0 || Block[A].Layer == LAYER_DESTROYED_BLOCKS)
                     {
                         for(B = 1; B <= numPlayers; B++)
                         {
@@ -1810,8 +1809,8 @@ void UpdateBlocks()
                         }
                         if(B > 0)
                         {
-                            if(Block[A].Layer == "Destroyed Blocks")
-                                Block[A].Layer = "Default";
+                            if(Block[A].Layer == LAYER_DESTROYED_BLOCKS)
+                                Block[A].Layer = LAYER_DEFAULT;
 
                             if(Block[A].Hidden)
                             {
@@ -1862,7 +1861,7 @@ void UpdateBlocks()
 
             if(Block[iBlock[A]].ShakeY == 0)
             {
-                if(!Block[iBlock[A]].TriggerHit.empty())
+                if(Block[iBlock[A]].TriggerHit != EVENT_NONE)
                 {
                     ProcEvent(Block[iBlock[A]].TriggerHit);
                 }
@@ -1888,7 +1887,7 @@ void UpdateBlocks()
 
             if(Block[iBlock[A]].ShakeY == 0)
             {
-                if(Block[iBlock[A]].TriggerHit != "")
+                if(Block[iBlock[A]].TriggerHit != EVENT_NONE)
                 {
                     ProcEvent(Block[iBlock[A]].TriggerHit);
                 }
@@ -2144,7 +2143,7 @@ void PSwitch(bool enabled)
             }
         }
 
-        ProcEvent("P Switch - Start", true);
+        ProcEvent(EVENT_PSWITCH_START, true);
     }
     else
     {
@@ -2205,7 +2204,7 @@ void PSwitch(bool enabled)
                     CheckSectionNPC(numNPCs);
                     NPC[numNPCs].Killed = 0;
                     KillBlock(A, false);
-                    Block[A].Layer = "Used P Switch";
+                    Block[A].Layer = LAYER_USED_P_SWITCH;
                     syncLayersTrees_Block(A);
                     // this is as close to a permanent death as blocks get in the game,
                     // because this layer usually doesn't exist
@@ -2213,7 +2212,7 @@ void PSwitch(bool enabled)
             }
         }
 
-        ProcEvent("P Switch - End", true);
+        ProcEvent(EVENT_PSWITCH_END, true);
     }
 
     // so glad we can eliminate this now!

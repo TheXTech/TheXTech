@@ -263,7 +263,11 @@ void OpenWorld(std::string FilePath)
         box.Location.X = m.x;
         box.Location.Y = m.y;
         box.Type = int(m.id);
-        box.MusicFile = dirEpisode.resolveFileCase(m.music_file);
+        std::string music_file = dirEpisode.resolveFileCaseExists(m.music_file);
+        if(!music_file.empty())
+        {
+            SetS(box.MusicFile, music_file);
+        }
 
         // In game they are smaller (30x30), in world they are 32x32
         box.Location.Width = 30;
@@ -355,6 +359,7 @@ void ClearWorld()
     for(A = 1; A <= numWorldMusic; A++)
         WorldMusic[A] = WorldMusic_t();
 
+    LevelString.clear();
     MaxWorldStars = 0;
     numTiles = 0;
     numWorldPaths = 0;

@@ -341,7 +341,7 @@ void UpdateNPCs()
                             }
                             else if(NPC[A].GeneratorEffect == 2) // projectile
                             {
-                                NPC[numNPCs].Layer = "Spawned NPCs";
+                                NPC[numNPCs].Layer = LAYER_SPAWNED_NPCS;
                                 PlaySound(SFX_Bullet);
                                 NPC[numNPCs].Projectile = true;
                                 if(NPC[numNPCs].Type == 17) // Normal Bullet Bills
@@ -389,7 +389,7 @@ void UpdateNPCs()
                             NPC[numNPCs].TriggerLast = NPC[A].TriggerLast;
                             NPC[numNPCs].TriggerTalk = NPC[A].TriggerTalk;
                             CheckSectionNPC(numNPCs);
-                            if(NPC[numNPCs].TriggerActivate != "")
+                            if(NPC[numNPCs].TriggerActivate != EVENT_NONE)
                                 ProcEvent(NPC[numNPCs].TriggerActivate);
                             if(NPC[numNPCs].Type == 287)
                                 NPC[numNPCs].Type = RandomBonus();
@@ -431,7 +431,7 @@ void UpdateNPCs()
                NPC[A].Type != 57 && NPC[A].Type != 46 &&
                NPC[A].Type != 212 && !NPCIsACoin[NPC[A].Type]) // And .Type <> 47
             {
-                if(NPC[A].TriggerActivate != "")
+                if(NPC[A].TriggerActivate != EVENT_NONE)
                     ProcEvent(NPC[A].TriggerActivate);
                 tempLocation = NPC[A].Location;
                 tempLocation.Y = tempLocation.Y - 32;
@@ -453,7 +453,7 @@ void UpdateNPCs()
                             NPC[B].Section = NPC[A].Section;
                             if(B < A)
                             {
-                                if(NPC[B].TriggerActivate != "")
+                                if(NPC[B].TriggerActivate != EVENT_NONE)
                                     ProcEvent(NPC[B].TriggerActivate);
                             }
                         }
@@ -494,7 +494,7 @@ void UpdateNPCs()
                                     NPC[B].Section = NPC[newAct[C]].Section;
                                     if(B < A)
                                     {
-                                        if(NPC[B].TriggerActivate != "")
+                                        if(NPC[B].TriggerActivate != EVENT_NONE)
                                             ProcEvent(NPC[B].TriggerActivate);
                                     }
 
@@ -911,7 +911,7 @@ void UpdateNPCs()
                 NPC[A].Location.X = NPC[A].Location.X - NPC[A].Location.Width / 2.0;
                 NPC[A].Location.Y = NPC[A].Location.Y - NPC[A].Location.Height / 2.0;
             }
-            if(NPC[A].Text != "")
+            if(NPC[A].Text != STRING_NONE)
             {
                 NPC[A].Chat = false;
                 tempLocation = NPC[A].Location;
@@ -2117,7 +2117,7 @@ void UpdateNPCs()
                                                                     Block[B].Type = 109;
                                                                 else
                                                                 {
-                                                                    Block[B].Layer = "Destroyed Blocks";
+                                                                    Block[B].Layer = LAYER_DESTROYED_BLOCKS;
                                                                     Block[B].Hidden = true;
                                                                     syncLayersTrees_Block(B);
                                                                     numNPCs++;
@@ -4977,7 +4977,7 @@ void UpdateNPCs()
                 NPCFrames(A);
 
                 if(NPC[A].Effect == 0 && NPC[A].Type != 91)
-                    NPC[A].Layer = "Spawned NPCs";
+                    NPC[A].Layer = LAYER_SPAWNED_NPCS;
                 syncLayers_NPC(A);
             }
             else if(NPC[A].Effect == 5) // Grabbed by Yoshi
@@ -5019,14 +5019,10 @@ void UpdateNPCs()
             NPC[A].Location.SpeedX = NPC[A].Location.SpeedX * double(speedVar);
         }
 
-        if(NPC[A].AttLayer != "" && NPC[A].HoldingPlayer == 0)
+        if(NPC[A].AttLayer != LAYER_NONE && NPC[A].HoldingPlayer == 0)
         {
-            for(B = 1; B <= maxLayers; B++)
+            int B = NPC[A].AttLayer;
             {
-                if(Layer[B].Name != "")
-                {
-                    if(Layer[B].Name == NPC[A].AttLayer)
-                    {
                         if(NPC[A].Location.X - lyrX == 0.0 && NPC[A].Location.Y - lyrY == 0.0)
                         {
                             if(Layer[B].SpeedX != 0.0f || Layer[B].SpeedY != 0.0f)
@@ -5069,10 +5065,6 @@ void UpdateNPCs()
                             Layer[B].SpeedX = float(NPC[A].Location.X - lyrX);
                             Layer[B].SpeedY = float(NPC[A].Location.Y - lyrY);
                         }
-                    }
-                }
-                else
-                    break;
             }
         }
 

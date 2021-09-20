@@ -507,10 +507,10 @@ void EditorScreen::UpdateNPCScreen()
         // Text
         if (EditorCursor.NPC.Inert)
         {
-            MessageText = EditorCursor.NPC.Text;
+            MessageText = GetS(EditorCursor.NPC.Text);
             SuperPrint("TEXT", 3, e_ScreenW - 200, 160);
-            if (UpdateButton(e_ScreenW - 160 + 4, 180 + 4, GFX.EIcons, !EditorCursor.NPC.Text.empty(), 0, 32*Icon::pencil, 32, 32))
-                EditorCursor.NPC.Text = GetTextInput("NPC text", EditorCursor.NPC.Text);
+            if (UpdateButton(e_ScreenW - 160 + 4, 180 + 4, GFX.EIcons, EditorCursor.NPC.Text != STRING_NONE, 0, 32*Icon::pencil, 32, 32))
+                SetS(EditorCursor.NPC.Text, GetTextInput("NPC text", GetS(EditorCursor.NPC.Text)));
         }
         // Generator
         SuperPrint("GEN", 3, e_ScreenW - 110, 160);
@@ -595,21 +595,21 @@ void EditorScreen::UpdateNPCScreen()
 
         // Events
         SuperPrint("EVENTS:", 3, e_ScreenW - 200, 294);
-        SuperPrint("A:" + EditorCursor.NPC.TriggerActivate, 3, e_ScreenW - 240, 320);
-        SuperPrint("D:" + EditorCursor.NPC.TriggerDeath, 3, e_ScreenW - 240, 340);
-        SuperPrint("T:" + EditorCursor.NPC.TriggerTalk, 3, e_ScreenW - 240, 360);
-        SuperPrint("L:" + EditorCursor.NPC.TriggerLast, 3, e_ScreenW - 240, 380);
+        SuperPrint("A:" + GetE(EditorCursor.NPC.TriggerActivate), 3, e_ScreenW - 240, 320);
+        SuperPrint("D:" + GetE(EditorCursor.NPC.TriggerDeath), 3, e_ScreenW - 240, 340);
+        SuperPrint("T:" + GetE(EditorCursor.NPC.TriggerTalk), 3, e_ScreenW - 240, 360);
+        SuperPrint("L:" + GetE(EditorCursor.NPC.TriggerLast), 3, e_ScreenW - 240, 380);
         if (UpdateButton(e_ScreenW - 80 + 4, 280 + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
             m_special_page = SPECIAL_PAGE_OBJ_TRIGGERS;
 
         // Layers
         SuperPrint("LAYER:", 3, e_ScreenW - 200, 414);
-        if (EditorCursor.NPC.Layer.empty())
+        if (EditorCursor.NPC.Layer == LAYER_NONE)
             SuperPrint("DEFAULT", 3, e_ScreenW - 240, 440);
         else
-            SuperPrint(EditorCursor.NPC.Layer, 3, e_ScreenW - 240, 440);
-        if (!EditorCursor.NPC.AttLayer.empty())
-            SuperPrint("ATT: " + EditorCursor.NPC.AttLayer, 3, e_ScreenW - 240, 460);
+            SuperPrint(GetL(EditorCursor.NPC.Layer), 3, e_ScreenW - 240, 440);
+        if (EditorCursor.NPC.AttLayer != LAYER_NONE)
+            SuperPrint("ATT: " + GetL(EditorCursor.NPC.AttLayer), 3, e_ScreenW - 240, 460);
         if (UpdateButton(e_ScreenW - 80 + 4, 400 + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
             m_special_page = SPECIAL_PAGE_OBJ_LAYER;
     }
@@ -892,7 +892,7 @@ void EditorScreen::UpdateEventsScreen()
         SuperPrint("YES: DELETE EVENT", 3, 60, 110);
         if (UpdateButton(20 + 4, 100 + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
         {
-            DeleteEvent(Events[m_current_event].Name);
+            DeleteEvent((eventindex_t)m_current_event);
             m_special_page = SPECIAL_PAGE_EVENTS;
             m_current_event = 0;
         }
@@ -943,16 +943,16 @@ void EditorScreen::UpdateEventsScreen()
             {
                 std::string new_name = GetTextInput("New event name", Events[e].Name);
                 if (!new_name.empty())
-                    RenameEvent(Events[e].Name, new_name);
+                    RenameEvent((eventindex_t)e, new_name);
             }
 
             // shift up
             if (e > 3 && UpdateButton(440 + 4, 80 + 40*i + 4, GFX.EIcons, false, 0, 32*Icon::up, 32, 32))
-                std::swap(Events[e-1], Events[e]);
+                SwapEvents(e-1, e);
 
             // shift down
             if (e < numEvents - 1 && UpdateButton(480 + 4, 80 + 40*i + 4, GFX.EIcons, false, 0, 32*Icon::down, 32, 32))
-                std::swap(Events[e], Events[e+1]);
+                SwapEvents(e, e+1);
 
             // delete
             if (e < numEvents && UpdateButton(520 + 4, 80 + 40*i + 4, GFX.EIcons, false, 0, 32*Icon::x, 32, 32))
@@ -970,7 +970,7 @@ void EditorScreen::UpdateEventsScreen()
             if (UpdateButton(400 + 4, 80 + 40*i + 4, GFX.EIcons, false, 0, 32*Icon::pencil, 32, 32))
             {
                 std::string new_name = GetTextInput("New event name", "");
-                if (!new_name.empty() && !ExistsEvent(new_name))
+                if (!new_name.empty() && FindEvent(new_name) == EVENT_NONE)
                 {
                     InitializeEvent(Events[e]);
                     Events[e].Name = new_name;
@@ -1074,16 +1074,16 @@ void EditorScreen::UpdateEventSettingsScreen()
         layer_line ++;
         SuperPrint("SHOW:", 3, e_ScreenW-200, 40 + 20*layer_line);
         layer_line ++;
-        SuperPrint(Events[m_current_event].ShowLayer[0], 3, e_ScreenW-240, 40 + 20*layer_line);
+        SuperPrint(GetL(Events[m_current_event].ShowLayer[0]), 3, e_ScreenW-240, 40 + 20*layer_line);
         layer_line ++;
         if (Events[m_current_event].ShowLayer.size() >= 2)
         {
-            SuperPrint(Events[m_current_event].ShowLayer[1], 3, e_ScreenW-240, 40 + 20*layer_line);
+            SuperPrint(GetL(Events[m_current_event].ShowLayer[1]), 3, e_ScreenW-240, 40 + 20*layer_line);
             layer_line ++;
         }
         if (Events[m_current_event].ShowLayer.size() == 3)
         {
-            SuperPrint(Events[m_current_event].ShowLayer[2], 3, e_ScreenW-240, 40 + 20*layer_line);
+            SuperPrint(GetL(Events[m_current_event].ShowLayer[2]), 3, e_ScreenW-240, 40 + 20*layer_line);
             layer_line ++;
         }
         else if (Events[m_current_event].ShowLayer.size() > 3)
@@ -1097,16 +1097,16 @@ void EditorScreen::UpdateEventSettingsScreen()
         layer_line ++;
         SuperPrint("HIDE:", 3, e_ScreenW-200, 40 + 20*layer_line);
         layer_line ++;
-        SuperPrint(Events[m_current_event].HideLayer[0], 3, e_ScreenW-240, 40 + 20*layer_line);
+        SuperPrint(GetL(Events[m_current_event].HideLayer[0]), 3, e_ScreenW-240, 40 + 20*layer_line);
         layer_line ++;
         if (Events[m_current_event].HideLayer.size() >= 2)
         {
-            SuperPrint(Events[m_current_event].HideLayer[1], 3, e_ScreenW-240, 40 + 20*layer_line);
+            SuperPrint(GetL(Events[m_current_event].HideLayer[1]), 3, e_ScreenW-240, 40 + 20*layer_line);
             layer_line ++;
         }
         if (Events[m_current_event].HideLayer.size() == 3)
         {
-            SuperPrint(Events[m_current_event].HideLayer[2], 3, e_ScreenW-240, 40 + 20*layer_line);
+            SuperPrint(GetL(Events[m_current_event].HideLayer[2]), 3, e_ScreenW-240, 40 + 20*layer_line);
             layer_line ++;
         }
         else if (Events[m_current_event].HideLayer.size() > 3)
@@ -1120,16 +1120,16 @@ void EditorScreen::UpdateEventSettingsScreen()
         layer_line ++;
         SuperPrint("TOGGLE:", 3, e_ScreenW-200, 40 + 20*layer_line);
         layer_line ++;
-        SuperPrint(Events[m_current_event].ToggleLayer[0], 3, e_ScreenW-240, 40 + 20*layer_line);
+        SuperPrint(GetL(Events[m_current_event].ToggleLayer[0]), 3, e_ScreenW-240, 40 + 20*layer_line);
         layer_line ++;
         if (Events[m_current_event].ToggleLayer.size() >= 2)
         {
-            SuperPrint(Events[m_current_event].ToggleLayer[1], 3, e_ScreenW-240, 40 + 20*layer_line);
+            SuperPrint(GetL(Events[m_current_event].ToggleLayer[1]), 3, e_ScreenW-240, 40 + 20*layer_line);
             layer_line ++;
         }
         if (Events[m_current_event].ToggleLayer.size() == 3)
         {
-            SuperPrint(Events[m_current_event].ToggleLayer[2], 3, e_ScreenW-240, 40 + 20*layer_line);
+            SuperPrint(GetL(Events[m_current_event].ToggleLayer[2]), 3, e_ScreenW-240, 40 + 20*layer_line);
             layer_line ++;
         }
         else if (Events[m_current_event].ToggleLayer.size() > 3)
@@ -1138,13 +1138,13 @@ void EditorScreen::UpdateEventSettingsScreen()
             layer_line ++;
         }
     }
-    // MoveLayer is a string, not a vector
-    if (!Events[m_current_event].MoveLayer.empty())
+    // MoveLayer is a layerindex_t, not a vector
+    if (Events[m_current_event].MoveLayer != LAYER_NONE)
     {
         layer_line ++;
         SuperPrint("MOVE:", 3, e_ScreenW-200, 40 + 20*layer_line);
         layer_line ++;
-        SuperPrint(Events[m_current_event].MoveLayer, 3, e_ScreenW-240, 40 + 20*layer_line);
+        SuperPrint(GetL(Events[m_current_event].MoveLayer), 3, e_ScreenW-240, 40 + 20*layer_line);
         layer_line ++;
         // settings for this...
         int sy = (vb6Round)(Events[m_current_event].SpeedY*10);
@@ -1366,9 +1366,9 @@ void EditorScreen::UpdateEventSettingsScreen()
     SuperPrint("TRIGGER:", 3, 54, 220);
     if (UpdateButton(10 + 4, 220 + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
         m_special_page = SPECIAL_PAGE_EVENT_TRIGGER;
-    if (!Events[m_current_event].TriggerEvent.empty())
+    if (Events[m_current_event].TriggerEvent != EVENT_NONE)
     {
-        SuperPrint(Events[m_current_event].TriggerEvent.substr(0,19), 3, 54, 240);
+        SuperPrint(GetE(Events[m_current_event].TriggerEvent).substr(0,19), 3, 54, 240);
         if (Events[m_current_event].TriggerDelay > 0)
         {
             SuperPrint("AFTER", 3, 54, 260);
@@ -1805,32 +1805,32 @@ void EditorScreen::UpdateEventsSubScreen()
     else if (EditorCursor.Mode == OptCursor_t::LVL_NPCS)
     {
         SuperPrint("ACTIVATE:", 3, e_ScreenW - 200, 200 + 2);
-        if (!EditorCursor.NPC.TriggerActivate.empty())
-            SuperPrint(EditorCursor.NPC.TriggerActivate, 3, e_ScreenW - 200, 220 + 2);
+        if (EditorCursor.NPC.TriggerActivate != EVENT_NONE)
+            SuperPrint(GetE(EditorCursor.NPC.TriggerActivate), 3, e_ScreenW - 200, 220 + 2);
         else
             SuperPrint("NONE", 3, e_ScreenW - 200, 220 + 2);
         if (UpdateButton(e_ScreenW - 240 + 4, 200 + 4, GFX.ECursor[1], m_special_subpage == 1, 0, 0, 32, 32))
             m_special_subpage = 1;
 
         SuperPrint("DEATH:", 3, e_ScreenW - 200, 240 + 2);
-        if (!EditorCursor.NPC.TriggerDeath.empty())
-            SuperPrint(EditorCursor.NPC.TriggerDeath, 3, e_ScreenW - 200, 260 + 2);
+        if (EditorCursor.NPC.TriggerDeath != EVENT_NONE)
+            SuperPrint(GetE(EditorCursor.NPC.TriggerDeath), 3, e_ScreenW - 200, 260 + 2);
         else
             SuperPrint("NONE", 3, e_ScreenW - 200, 260 + 2);
         if (UpdateButton(e_ScreenW - 240 + 4, 240 + 4, GFX.ECursor[1], m_special_subpage == 2, 0, 0, 32, 32))
             m_special_subpage = 2;
 
         SuperPrint("TALK:", 3, e_ScreenW - 200, 280 + 2);
-        if (!EditorCursor.NPC.TriggerTalk.empty())
-            SuperPrint(EditorCursor.NPC.TriggerTalk, 3, e_ScreenW - 200, 300 + 2);
+        if (EditorCursor.NPC.TriggerTalk != EVENT_NONE)
+            SuperPrint(GetE(EditorCursor.NPC.TriggerTalk), 3, e_ScreenW - 200, 300 + 2);
         else
             SuperPrint("NONE", 3, e_ScreenW - 200, 300 + 2);
         if (UpdateButton(e_ScreenW - 240 + 4, 280 + 4, GFX.ECursor[1], m_special_subpage == 3, 0, 0, 32, 32))
             m_special_subpage = 3;
 
         SuperPrint("LAYER CLEAR:", 3, e_ScreenW - 200, 320 + 2);
-        if (!EditorCursor.NPC.TriggerLast.empty())
-            SuperPrint(EditorCursor.NPC.TriggerLast, 3, e_ScreenW - 200, 340 + 2);
+        if (EditorCursor.NPC.TriggerLast != EVENT_NONE)
+            SuperPrint(GetE(EditorCursor.NPC.TriggerLast), 3, e_ScreenW - 200, 340 + 2);
         else
             SuperPrint("NONE", 3, e_ScreenW - 200, 340 + 2);
         if (UpdateButton(e_ScreenW - 240 + 4, 320 + 4, GFX.ECursor[1], m_special_subpage == 4, 0, 0, 32, 32))
@@ -1839,24 +1839,24 @@ void EditorScreen::UpdateEventsSubScreen()
     else if (EditorCursor.Mode == OptCursor_t::LVL_BLOCKS)
     {
         SuperPrint("HIT:", 3, e_ScreenW - 200, 200 + 2);
-        if (!EditorCursor.Block.TriggerHit.empty())
-            SuperPrint(EditorCursor.Block.TriggerHit, 3, e_ScreenW - 200, 220 + 2);
+        if (EditorCursor.Block.TriggerHit != EVENT_NONE)
+            SuperPrint(GetE(EditorCursor.Block.TriggerHit), 3, e_ScreenW - 200, 220 + 2);
         else
             SuperPrint("NONE", 3, e_ScreenW - 200, 220 + 2);
         if (UpdateButton(e_ScreenW - 240 + 4, 200 + 4, GFX.ECursor[1], m_special_subpage == 1, 0, 0, 32, 32))
             m_special_subpage = 1;
 
         SuperPrint("DESTROY:", 3, e_ScreenW - 200, 240 + 2);
-        if (!EditorCursor.Block.TriggerDeath.empty())
-            SuperPrint(EditorCursor.Block.TriggerDeath, 3, e_ScreenW - 200, 260 + 2);
+        if (EditorCursor.Block.TriggerDeath != EVENT_NONE)
+            SuperPrint(GetE(EditorCursor.Block.TriggerDeath), 3, e_ScreenW - 200, 260 + 2);
         else
             SuperPrint("NONE", 3, e_ScreenW - 200, 260 + 2);
         if (UpdateButton(e_ScreenW - 240 + 4, 240 + 4, GFX.ECursor[1], m_special_subpage == 2, 0, 0, 32, 32))
             m_special_subpage = 2;
 
         SuperPrint("LAYER CLEAR:", 3, e_ScreenW - 200, 280 + 2);
-        if (!EditorCursor.Block.TriggerLast.empty())
-            SuperPrint(EditorCursor.Block.TriggerLast, 3, e_ScreenW - 200, 300 + 2);
+        if (EditorCursor.Block.TriggerLast != EVENT_NONE)
+            SuperPrint(GetE(EditorCursor.Block.TriggerLast), 3, e_ScreenW - 200, 300 + 2);
         else
             SuperPrint("NONE", 3, e_ScreenW - 200, 300 + 2);
         if (UpdateButton(e_ScreenW - 240 + 4, 280 + 4, GFX.ECursor[1], m_special_subpage == 3, 0, 0, 32, 32))
@@ -1876,7 +1876,7 @@ void EditorScreen::UpdateEventsSubScreen()
     std::string event_desc;
     std::string event_desc_2;
     std::string event_desc_3;
-    std::string* event_to_set;
+    eventindex_t* event_to_set;
     if (m_special_page == SPECIAL_PAGE_EVENT_TRIGGER)
     {
         event_name = "NEXT";
@@ -1961,20 +1961,20 @@ void EditorScreen::UpdateEventsSubScreen()
 
     // render current event
     SuperPrint(event_name + " EVENT:", 3, 10, 40);
-    if (event_to_set->empty())
+    if (*event_to_set == EVENT_NONE)
         SuperPrint("NONE", 3, 10, 56);
     else
-        SuperPrint(*event_to_set, 3, 10, 56);
+        SuperPrint(Events[*event_to_set].Name, 3, 10, 56);
 
     // render event selector
     for (int i = 0; i < 10; i++)
     {
-        int e = m_events_page*10 + i - 1;
-        if (e == -1)
+        eventindex_t e = m_events_page*10 + i - 1;
+        if (e == EVENT_NONE)
         {
             SuperPrint("NONE", 3, 54, 80 + 40*i + 12);
-            if (UpdateButton(10 + 4, 80 + 40*i + 4, GFX.ECursor[2], event_to_set->empty(), 0, 0, 32, 32))
-                *event_to_set = "";
+            if (UpdateButton(10 + 4, 80 + 40*i + 4, GFX.ECursor[2], *event_to_set == EVENT_NONE, 0, 0, 32, 32))
+                *event_to_set = EVENT_NONE;
         }
         else if (!Events[e].Name.empty())
         {
@@ -1985,8 +1985,8 @@ void EditorScreen::UpdateEventsSubScreen()
                 SuperPrint(Events[e].Name.substr(0,19), 3, 54, 80 + 40*i + 2);
                 SuperPrint(Events[e].Name.substr(19), 3, 54, 80 + 40*i + 20);
             }
-            if (UpdateButton(10 + 4, 80 + 40*i + 4, GFX.ECursor[2], (*event_to_set) == Events[e].Name, 0, 0, 32, 32))
-                *event_to_set = Events[e].Name;
+            if (UpdateButton(10 + 4, 80 + 40*i + 4, GFX.ECursor[2], *event_to_set == e, 0, 0, 32, 32))
+                *event_to_set = e;
         }
     }
 }
@@ -2000,14 +2000,14 @@ void EditorScreen::UpdateLayersScreen()
         SuperPrint("YES: MOVE TO DEFAULT LAYER", 3, 60, 110);
         if (UpdateButton(20 + 4, 100 + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
         {
-            DeleteLayer(Layer[m_special_subpage].Name, false);
+            DeleteLayer((layerindex_t)m_special_subpage, false);
             m_special_subpage = 0;
             m_special_page = SPECIAL_PAGE_LAYERS;
         }
         SuperPrint("NO: *DELETE ALL CONTENTS*", 3, 60, 150);
         if (UpdateButton(20 + 4, 140 + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
         {
-            DeleteLayer(Layer[m_special_subpage].Name, true);
+            DeleteLayer((layerindex_t)m_special_subpage, true);
             m_special_subpage = 0;
             m_special_page = SPECIAL_PAGE_LAYERS;
         }
@@ -2034,18 +2034,18 @@ void EditorScreen::UpdateLayersScreen()
     if (m_special_page == SPECIAL_PAGE_OBJ_LAYER && EditorCursor.Mode == OptCursor_t::LVL_NPCS)
     {
         SuperPrint("LAYER:", 3, e_ScreenW - 200, 200 + 2);
-        if (EditorCursor.Layer.empty())
+        if (EditorCursor.Layer == LAYER_NONE)
             SuperPrint("DEFAULT", 3, e_ScreenW - 200, 220 + 2);
         else
-            SuperPrint(EditorCursor.Layer, 3, e_ScreenW - 200, 220 + 2);
+            SuperPrint(GetL(EditorCursor.Layer), 3, e_ScreenW - 200, 220 + 2);
         if (UpdateButton(e_ScreenW - 240 + 4, 200 + 4, GFX.ECursor[1], m_special_subpage == 0, 0, 0, 32, 32))
             m_special_subpage = 0;
 
         SuperPrint("ATTACHED:", 3, e_ScreenW - 200, 260 + 2);
-        if (EditorCursor.NPC.AttLayer.empty())
+        if (EditorCursor.NPC.AttLayer == LAYER_NONE)
             SuperPrint("NONE", 3, e_ScreenW - 200, 280 + 2);
         else
-            SuperPrint(EditorCursor.NPC.AttLayer, 3, e_ScreenW - 200, 280 + 2);
+            SuperPrint(GetL(EditorCursor.NPC.AttLayer), 3, e_ScreenW - 200, 280 + 2);
         if (UpdateButton(e_ScreenW - 240 + 4, 260 + 4, GFX.ECursor[1], m_special_subpage == 1, 0, 0, 32, 32))
             m_special_subpage = 1;
     }
@@ -2077,7 +2077,7 @@ void EditorScreen::UpdateLayersScreen()
 
     // prepare selector
     std::string layer_name;
-    std::string* layer_to_set;
+    layerindex_t* layer_to_set;
     if (m_special_page == SPECIAL_PAGE_OBJ_LAYER && m_special_subpage == 1)
     {
         layer_name = "ATTACHED LAYER:";
@@ -2109,7 +2109,7 @@ void EditorScreen::UpdateLayersScreen()
 
     // render current layer
     SuperPrint(layer_name, 3, 10, 40);
-    if (layer_to_set->empty())
+    if (*layer_to_set == LAYER_NONE)
     {
         if (m_special_subpage == 1 || m_special_page == SPECIAL_PAGE_EVENT_LAYERS)
             SuperPrint("NONE", 3, 10, 56);
@@ -2117,7 +2117,7 @@ void EditorScreen::UpdateLayersScreen()
             SuperPrint("DEFAULT", 3, 10, 56);
     }
     else
-        SuperPrint(*layer_to_set, 3, 10, 56);
+        SuperPrint(GetL(*layer_to_set), 3, 10, 56);
 
     // render layer selector
     for (int i = 0; i < 10; i++)
@@ -2133,17 +2133,17 @@ void EditorScreen::UpdateLayersScreen()
         if (l == -1)
         {
             SuperPrint("NONE", 3, 54, 80 + 40*i + 12);
-            if (m_special_page != SPECIAL_PAGE_EVENT_LAYERS && UpdateButton(10 + 4, 80 + 40*i + 4, GFX.ECursor[2], layer_to_set->empty(), 0, 0, 32, 32))
-                *layer_to_set = "";
-            if (m_special_page == SPECIAL_PAGE_EVENT_LAYERS && UpdateButton(10 + 4, 80 + 40*i + 4, GFX.EIcons, layer_to_set->empty(), 0, 32*Icon::move, 32, 32))
-                *layer_to_set = "";
+            if (m_special_page != SPECIAL_PAGE_EVENT_LAYERS && UpdateButton(10 + 4, 80 + 40*i + 4, GFX.ECursor[2], *layer_to_set == LAYER_NONE, 0, 0, 32, 32))
+                *layer_to_set = LAYER_NONE;
+            if (m_special_page == SPECIAL_PAGE_EVENT_LAYERS && UpdateButton(10 + 4, 80 + 40*i + 4, GFX.EIcons, *layer_to_set == LAYER_NONE, 0, 32*Icon::move, 32, 32))
+                *layer_to_set = LAYER_NONE;
         }
         // default is a special case on OBJ page 1
         else if (l == 0 && ((m_special_page == SPECIAL_PAGE_OBJ_LAYER && m_special_subpage == 0) || m_special_page == SPECIAL_PAGE_LAYERS))
         {
             SuperPrint("DEFAULT", 3, 54, 80 + 40*i + 12);
-            if (UpdateButton(10 + 4, 80 + 40*i + 4, GFX.ECursor[2], layer_to_set->empty() || (*layer_to_set) == Layer[l].Name, 0, 0, 32, 32))
-                *layer_to_set = "";
+            if (UpdateButton(10 + 4, 80 + 40*i + 4, GFX.ECursor[2], *layer_to_set == LAYER_NONE || (*layer_to_set) == l, 0, 0, 32, 32))
+                *layer_to_set = LAYER_NONE;
         }
         else if (!Layer[l].Name.empty())
         {
@@ -2154,8 +2154,8 @@ void EditorScreen::UpdateLayersScreen()
                 SuperPrint(Layer[l].Name.substr(0,19), 3, 54, 80 + 40*i + 2);
                 SuperPrint(Layer[l].Name.substr(19), 3, 54, 80 + 40*i + 20);
             }
-            if (m_special_page != SPECIAL_PAGE_EVENT_LAYERS && UpdateButton(10 + 4, 80 + 40*i + 4, GFX.ECursor[2], (*layer_to_set) == Layer[l].Name, 0, 0, 32, 32))
-                *layer_to_set = Layer[l].Name;
+            if (m_special_page != SPECIAL_PAGE_EVENT_LAYERS && UpdateButton(10 + 4, 80 + 40*i + 4, GFX.ECursor[2], (*layer_to_set) == l, 0, 0, 32, 32))
+                *layer_to_set = l;
             // extra buttons for layers page
             if (m_special_page == SPECIAL_PAGE_LAYERS)
             {
@@ -2164,9 +2164,9 @@ void EditorScreen::UpdateLayersScreen()
                 if (UpdateButton(440 + 4, 80 + 40*i + 4, GFX.EIcons, !Layer[l].Hidden, 0, 32*Icon::show, 32, 32))
                 {
                     if (Layer[l].Hidden)
-                        ShowLayer(Layer[l].Name);
+                        ShowLayer(l);
                     else
-                        HideLayer(Layer[l].Name);
+                        HideLayer(l);
                 }
 
                 if (l <= 2)
@@ -2177,16 +2177,16 @@ void EditorScreen::UpdateLayersScreen()
                 {
                     std::string new_name = GetTextInput("New layer name", Layer[l].Name);
                     if (!new_name.empty())
-                        RenameLayer(Layer[l].Name, new_name);
+                        RenameLayer(l, new_name);
                 }
 
                 // shift up
                 if (l > 3 && UpdateButton(480 + 4, 80 + 40*i + 4, GFX.EIcons, false, 0, 32*Icon::up, 32, 32))
-                    std::swap(Layer[l-1], Layer[l]);
+                    SwapLayers(l-1, l);
 
                 // shift down
                 if (l < numLayers - 1 && UpdateButton(520 + 4, 80 + 40*i + 4, GFX.EIcons, false, 0, 32*Icon::down, 32, 32))
-                    std::swap(Layer[l], Layer[l+1]);
+                    SwapLayers(l, l+1);
 
                 // delete
                 if (l < numLayers && UpdateButton(560 + 4, 80 + 40*i + 4, GFX.EIcons, false, 0, 32*Icon::x, 32, 32))
@@ -2200,9 +2200,9 @@ void EditorScreen::UpdateLayersScreen()
             else if (m_special_page == SPECIAL_PAGE_EVENT_LAYERS)
             {
                 // nothing, hide, show, toggle
-                std::vector<std::string>::iterator hide_it = std::find(Events[m_current_event].HideLayer.begin(), Events[m_current_event].HideLayer.end(), Layer[l].Name);
-                std::vector<std::string>::iterator show_it = std::find(Events[m_current_event].ShowLayer.begin(), Events[m_current_event].ShowLayer.end(), Layer[l].Name);
-                std::vector<std::string>::iterator togg_it = std::find(Events[m_current_event].ToggleLayer.begin(), Events[m_current_event].ToggleLayer.end(), Layer[l].Name);
+                std::vector<layerindex_t>::iterator hide_it = std::find(Events[m_current_event].HideLayer.begin(), Events[m_current_event].HideLayer.end(), l);
+                std::vector<layerindex_t>::iterator show_it = std::find(Events[m_current_event].ShowLayer.begin(), Events[m_current_event].ShowLayer.end(), l);
+                std::vector<layerindex_t>::iterator togg_it = std::find(Events[m_current_event].ToggleLayer.begin(), Events[m_current_event].ToggleLayer.end(), l);
                 bool cur_hide = hide_it != Events[m_current_event].HideLayer.end();
                 bool cur_show = show_it != Events[m_current_event].ShowLayer.end();
                 bool cur_togg = togg_it != Events[m_current_event].ToggleLayer.end();
@@ -2217,13 +2217,13 @@ void EditorScreen::UpdateLayersScreen()
                 if (UpdateButton(440 + 4, 80 + 40*i + 4, GFX.EIcons, cur_show, 0, 32*Icon::show, 32, 32))
                 {
                     if (cur_hide) Events[m_current_event].HideLayer.erase(hide_it);
-                    if (!cur_show) Events[m_current_event].ShowLayer.push_back(Layer[l].Name);
+                    if (!cur_show) Events[m_current_event].ShowLayer.push_back(l);
                     if (cur_togg) Events[m_current_event].ToggleLayer.erase(togg_it);
                 }
                 // hide layer
                 if (UpdateButton(480 + 4, 80 + 40*i + 4, GFX.EIcons, cur_hide, 0, 32*Icon::hide, 32, 32))
                 {
-                    if (!cur_hide) Events[m_current_event].HideLayer.push_back(Layer[l].Name);
+                    if (!cur_hide) Events[m_current_event].HideLayer.push_back(l);
                     if (cur_show) Events[m_current_event].ShowLayer.erase(show_it);
                     if (cur_togg) Events[m_current_event].ToggleLayer.erase(togg_it);
                 }
@@ -2232,10 +2232,10 @@ void EditorScreen::UpdateLayersScreen()
                 {
                     if (cur_hide) Events[m_current_event].HideLayer.erase(hide_it);
                     if (cur_show) Events[m_current_event].ShowLayer.erase(show_it);
-                    if (!cur_togg) Events[m_current_event].ToggleLayer.push_back(Layer[l].Name);
+                    if (!cur_togg) Events[m_current_event].ToggleLayer.push_back(l);
                 }
-                if (UpdateButton(10 + 4, 80 + 40*i + 4, GFX.EIcons, (*layer_to_set) == Layer[l].Name, 0, 32*Icon::move, 32, 32))
-                    *layer_to_set = Layer[l].Name;
+                if (UpdateButton(10 + 4, 80 + 40*i + 4, GFX.EIcons, (*layer_to_set) == l, 0, 32*Icon::move, 32, 32))
+                    *layer_to_set = l;
             }
         }
         // create a new layer!
@@ -2246,7 +2246,7 @@ void EditorScreen::UpdateLayersScreen()
             if (UpdateButton(400 + 4, 80 + 40*i + 4, GFX.EIcons, false, 0, 32*Icon::pencil, 32, 32))
             {
                 std::string new_name = GetTextInput("New layer name", "");
-                if (!new_name.empty() && !ExistsLayer(new_name))
+                if (!new_name.empty() && FindLayer(new_name) == LAYER_NONE)
                 {
                     Layer[l] = Layer_t();
                     Layer[l].Name = new_name;
@@ -2359,18 +2359,18 @@ void EditorScreen::UpdateBlockScreen()
 
     // Events
     SuperPrint("EVENTS:", 3, e_ScreenW - 200, 334);
-    SuperPrint("H:" + EditorCursor.Block.TriggerHit, 3, e_ScreenW - 240, 360);
-    SuperPrint("D:" + EditorCursor.Block.TriggerDeath, 3, e_ScreenW - 240, 380);
-    SuperPrint("L:" + EditorCursor.Block.TriggerLast, 3, e_ScreenW - 240, 400);
+    SuperPrint("H:" + GetE(EditorCursor.Block.TriggerHit), 3, e_ScreenW - 240, 360);
+    SuperPrint("D:" + GetE(EditorCursor.Block.TriggerDeath), 3, e_ScreenW - 240, 380);
+    SuperPrint("L:" + GetE(EditorCursor.Block.TriggerLast), 3, e_ScreenW - 240, 400);
     if (UpdateButton(e_ScreenW - 80 + 4, 320 + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
         m_special_page = SPECIAL_PAGE_OBJ_TRIGGERS;
 
     // Layers
     SuperPrint("LAYER:", 3, e_ScreenW - 200, 434);
-    if (EditorCursor.Block.Layer.empty())
+    if (EditorCursor.Block.Layer == LAYER_NONE)
         SuperPrint("DEFAULT", 3, e_ScreenW - 240, 460);
     else
-        SuperPrint(EditorCursor.Block.Layer, 3, e_ScreenW - 240, 460);
+        SuperPrint(GetL(EditorCursor.Block.Layer), 3, e_ScreenW - 240, 460);
     if (UpdateButton(e_ScreenW - 80 + 4, 420 + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
         m_special_page = SPECIAL_PAGE_OBJ_LAYER;
 
@@ -2622,10 +2622,10 @@ void EditorScreen::UpdateBGOScreen()
 
     // Layers
     SuperPrint("LAYER:", 3, e_ScreenW - 200, 414);
-    if (EditorCursor.Background.Layer.empty())
+    if (EditorCursor.Background.Layer == LAYER_NONE)
         SuperPrint("DEFAULT", 3, e_ScreenW - 240, 440);
     else
-        SuperPrint(EditorCursor.Background.Layer, 3, e_ScreenW - 240, 440);
+        SuperPrint(GetL(EditorCursor.Background.Layer), 3, e_ScreenW - 240, 440);
     if (UpdateButton(e_ScreenW - 80 + 4, 400 + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
         m_special_page = SPECIAL_PAGE_OBJ_LAYER;
 
@@ -2793,10 +2793,10 @@ void EditorScreen::UpdateWaterScreen()
         EditorCursor.Water.Quicksand = true;
     // layers
     SuperPrint("LAYER:", 3, 246, 234);
-    if (EditorCursor.Layer.empty())
+    if (EditorCursor.Layer == LAYER_NONE)
         SuperPrint("DEFAULT", 3, 206, 260);
     else
-        SuperPrint(EditorCursor.Layer, 3, 206, 260);
+        SuperPrint(GetL(EditorCursor.Layer), 3, 206, 260);
     if (UpdateButton(380 + 4, 220 + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
         m_special_page = SPECIAL_PAGE_OBJ_LAYER;
 }
@@ -2805,7 +2805,7 @@ void EditorScreen::UpdateWarpScreen()
 {
     SuperPrint("WARP SETTINGS", 3, 200, 50);
     // placement selection
-    if (EditorCursor.Warp.level == "" && !EditorCursor.Warp.LevelEnt && !EditorCursor.Warp.MapWarp)
+    if (EditorCursor.Warp.level == STRING_NONE && !EditorCursor.Warp.LevelEnt && !EditorCursor.Warp.MapWarp)
     {
         if (EditorCursor.SubMode != 1 && EditorCursor.SubMode != 2)
             EditorCursor.SubMode = 1;
@@ -2829,7 +2829,7 @@ void EditorScreen::UpdateWarpScreen()
         if (UpdateButton(380 + 4, 120 + 4, GFX.EIcons, EditorCursor.Warp.Direction == 4, 0, 32*Icon::right, 32, 32))
             EditorCursor.Warp.Direction = 4;
     }
-    if (EditorCursor.Warp.level == "" && !EditorCursor.Warp.MapWarp)
+    if (EditorCursor.Warp.level == STRING_NONE && !EditorCursor.Warp.MapWarp)
     {
         SuperPrint("OUT DIRECTION", 3, 10, 170);
         if (UpdateButton(260 + 4, 160 + 4, GFX.EIcons, EditorCursor.Warp.Direction2 == 1, 0, 32*Icon::down, 32, 32))
@@ -2890,21 +2890,21 @@ void EditorScreen::UpdateWarpScreen()
         EditorCursor.Warp.MapWarp = !EditorCursor.Warp.MapWarp;
         if (EditorCursor.Warp.MapWarp)
         {
-            EditorCursor.Warp.level = "";
+            EditorCursor.Warp.level = STRING_NONE;
             EditorCursor.Warp.LevelEnt = false;
         }
     }
     SuperPrint("LVL WARP ENTER", 3, 210, 390);
-    if (UpdateButton(466 + 4, 380 + 4, GFX.EIcons, !EditorCursor.Warp.level.empty(), 0, 32*Icon::check, 32, 32))
+    if (UpdateButton(466 + 4, 380 + 4, GFX.EIcons, EditorCursor.Warp.level != STRING_NONE, 0, 32*Icon::check, 32, 32))
     {
-        if (EditorCursor.Warp.level.empty())
+        if (EditorCursor.Warp.level == STRING_NONE)
         {
-            EditorCursor.Warp.level = "...";
+            SetS(EditorCursor.Warp.level, "...");
             EditorCursor.Warp.MapWarp = false;
             EditorCursor.Warp.LevelEnt = false;
         }
         else
-            EditorCursor.Warp.level = "";
+            EditorCursor.Warp.level = STRING_NONE;
     }
     SuperPrint("EXIT", 3, 516, 390);
     if (UpdateButton(590 + 4, 380 + 4, GFX.EIcons, EditorCursor.Warp.LevelEnt, 0, 32*Icon::check, 32, 32))
@@ -2912,22 +2912,22 @@ void EditorScreen::UpdateWarpScreen()
         EditorCursor.Warp.LevelEnt = !EditorCursor.Warp.LevelEnt;
         if (EditorCursor.Warp.LevelEnt)
         {
-            EditorCursor.Warp.level = "";
+            EditorCursor.Warp.level = STRING_NONE;
             EditorCursor.Warp.MapWarp = false;
         }
     }
     // special options for lvl warp entrance
-    if (!EditorCursor.Warp.level.empty())
+    if (EditorCursor.Warp.level != STRING_NONE)
     {
-        if (EditorCursor.Warp.level.length() <= 10)
-            SuperPrint("TARGET: " + EditorCursor.Warp.level, 3, 10, 430);
+        if (GetS(EditorCursor.Warp.level).length() <= 10)
+            SuperPrint("TARGET: " + GetS(EditorCursor.Warp.level), 3, 10, 430);
         else
         {
-            SuperPrint("TARGET: " + EditorCursor.Warp.level.substr(0,10), 3, 10, 420);
-            SuperPrint(EditorCursor.Warp.level.substr(10), 3, 28, 440);
+            SuperPrint("TARGET: " + GetS(EditorCursor.Warp.level).substr(0,10), 3, 10, 420);
+            SuperPrint(GetS(EditorCursor.Warp.level).substr(10), 3, 28, 440);
         }
         if (UpdateButton(330 + 4, 420 + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
-            StartFileBrowser(&EditorCursor.Warp.level, FileNamePath, "", {".lvl", ".lvlx"}, BROWSER_MODE_OPEN);
+            StartFileBrowser(PtrS(EditorCursor.Warp.level), FileNamePath, "", {".lvl", ".lvlx"}, BROWSER_MODE_OPEN);
         if (EditorCursor.Warp.LevelWarp == 0)
             SuperPrint("LVL START", 3, 384, 430);
         else

@@ -131,11 +131,47 @@ extern int vb6Round(double x);
  */
 extern double vb6Round(double x, int decimals);
 
+// utilities for stringindex_t
+extern std::vector<std::string> LevelString;
+
+inline std::string GetS(stringindex_t index)
+{
+    if(index == STRING_NONE)
+    {
+        return "";
+    }
+    return LevelString[index];
+}
+inline void SetS(stringindex_t& index, const std::string& target)
+{
+    if(index == STRING_NONE && LevelString.size() < MaxLevelStrings)
+    {
+        index = (stringindex_t)LevelString.size();
+        LevelString.push_back(target);
+    }
+    else
+    {
+        LevelString[index] = target;
+    }
+}
+inline std::string* PtrS(stringindex_t& index)
+{
+    if(index == STRING_NONE)
+    {
+        if(LevelString.size() >= MaxLevelStrings)
+            return nullptr;
+        index = (stringindex_t)LevelString.size();
+        LevelString.push_back(std::string());
+    }
+    return &LevelString[index];
+}
+
 //'Saved Events
+// never implemented by Redigit; we can add back in later
 //Public numSavedEvents As Integer
-extern int numSavedEvents;
+// extern int numSavedEvents;
 //Public SavedEvents(1 To MaxSavedEvents) As String
-extern RangeArr<std::string, 1, MaxSavedEvents> SavedEvents;
+// extern RangeArr<std::string, 1, MaxSavedEvents> SavedEvents;
 //Public BlockSwitch(1 To 4) As Boolean
 extern RangeArrI<bool, 1, 4, false> BlockSwitch;
 //'Public PowerUpUnlock(2 To 7) As Boolean
@@ -245,7 +281,7 @@ extern RangeArrI<bool, 1, maxLocalPlayers, false> wantedKeyboard;
 struct NPC_t
 {
 //    AttLayer As String
-    std::string AttLayer;
+    layerindex_t AttLayer = LAYER_NONE;
 //    Quicksand As Integer
     int Quicksand = 0;
 //    RespawnDelay As Integeri
@@ -281,15 +317,15 @@ struct NPC_t
 //    Shadow As Boolean 'if true turn the NPC black and allow it to pass through walls.  only used for a cheat code
     bool Shadow = false;
 //    TriggerActivate As String 'for events - triggers when NPC gets activated
-    std::string TriggerActivate;
+    eventindex_t TriggerActivate = EVENT_NONE;
 //    TriggerDeath As String 'triggers when NPC dies
-    std::string TriggerDeath;
+    eventindex_t TriggerDeath = EVENT_NONE;
 //    TriggerTalk As String 'triggers when you talk to the NPC
-    std::string TriggerTalk;
+    eventindex_t TriggerTalk = EVENT_NONE;
 //    TriggerLast As String 'trigger when this is the last NPC in a layer to die
-    std::string TriggerLast;
+    eventindex_t TriggerLast = EVENT_NONE;
 //    Layer As String 'the layer name that the NPC is in
-    std::string Layer;
+    layerindex_t Layer = LAYER_NONE;
 //    Hidden As Boolean 'if the layer is hidden or not
     bool Hidden = false;
 //    Legacy As Boolean 'Legacy Boss
@@ -303,7 +339,7 @@ struct NPC_t
 //    DefaultStuck As Boolean
     bool DefaultStuck = false;
 //    Text As String 'the text that is displayed when you talk to the NPC
-    std::string Text;
+    stringindex_t Text = STRING_NONE;
 //    oldAddBelt As Single
     float oldAddBelt = 0.0f;
 //    PinchCount As Integer 'obsolete
@@ -674,7 +710,7 @@ struct Player_t
 struct Background_t
 {
 //    Layer As String
-    std::string Layer;
+    layerindex_t Layer = LAYER_NONE;
 //    Hidden As Boolean
     bool Hidden = false;
 //    Type As Integer
@@ -696,7 +732,7 @@ struct Background_t
 struct Water_t
 {
 //    Layer As String
-    std::string Layer;
+    layerindex_t Layer = LAYER_NONE;
 //    Hidden As Boolean
     bool Hidden = false;
 //    Buoy As Single 'not used
@@ -725,13 +761,13 @@ struct Block_t
     int DefaultSpecial2 = 0;
 //'for event triggers
 //    TriggerHit As String
-    std::string TriggerHit;
+    eventindex_t TriggerHit = EVENT_NONE;
 //    TriggerDeath As String
-    std::string TriggerDeath;
+    eventindex_t TriggerDeath = EVENT_NONE;
 //    TriggerLast As String
-    std::string TriggerLast;
+    eventindex_t TriggerLast = EVENT_NONE;
 //    Layer As String
-    std::string Layer;
+    layerindex_t Layer = LAYER_NONE;
     int LayerIndex;
     Location_t LocationInLayer;
 //    Hidden As Boolean
@@ -861,7 +897,7 @@ struct Warp_t
 //    NoYoshi As Boolean 'don't allow yoshi
     bool NoYoshi = false;
 //    Layer As String 'the name of the layer
-    std::string Layer;
+    layerindex_t Layer = LAYER_NONE;
 //    Hidden As Boolean 'if the layer is hidden
     bool Hidden = false;
 //    PlacedEnt As Boolean 'for the editor, flags the entranced as placed
@@ -877,7 +913,7 @@ struct Warp_t
 //    Effect As Integer 'style of warp. door/
     int Effect = 0;
 //    level As String 'filename of the level it should warp to
-    std::string level;
+    stringindex_t level = STRING_NONE;
 //    LevelWarp As Integer
     int LevelWarp = 0;
 //    LevelEnt As Boolean 'this warp can't be used if set to true (this is for level entrances)
@@ -902,8 +938,8 @@ struct Warp_t
     bool noEntranceScene = false;
     bool cannonExit = false;
     double cannonExitSpeed = 10.0;
-    std::string eventEnter;
-    std::string StarsMsg;
+    eventindex_t TriggerEnter = EVENT_NONE;
+    stringindex_t StarsMsg = STRING_NONE;
 //End Type
 };
 
@@ -954,7 +990,7 @@ struct WorldMusic_t
 //    Type As Integer
     int Type = 0;
 //    EXTRA: Custom Music
-    std::string MusicFile;
+    stringindex_t MusicFile = STRING_NONE;
 //End Type
     int64_t Z = 0;
     bool Active = true;
@@ -974,7 +1010,7 @@ struct EditorCursor_t
 //    Location As Location
     Location_t Location;
 //    Layer As String 'current layer
-    std::string Layer;
+    layerindex_t Layer = LAYER_NONE;
 //    Mode As Integer
     int Mode = 0;
     int SubMode = 0;
