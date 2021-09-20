@@ -156,16 +156,16 @@ void KillNPC(int A, int B)
             }
         }
     }
-    if(NPC[A].TriggerDeath != "" && LevelEditor == false)
+    if(NPC[A].TriggerDeath != EVENT_NONE && LevelEditor == false)
     {
         ProcEvent(NPC[A].TriggerDeath);
     }
-    if(NPC[A].TriggerLast != "")
+    if(NPC[A].TriggerLast != EVENT_NONE)
     {
         tempBool = false;
-        for(C = 0; C <= numLayers; C++)
+        int C = NPC[A].Layer;
+        if(C != LAYER_NONE)
         {
-            if(Layer[C].Name != NPC[A].Layer) continue;
             for (int other_npc : Layer[C].NPCs)
             {
                 if(other_npc != A && NPC[other_npc].Generator == false)
@@ -174,10 +174,8 @@ void KillNPC(int A, int B)
                     break;
                 }
             }
-            if (tempBool) break;
             if(!Layer[C].blocks.empty())
                 tempBool = true;
-            if (tempBool) break;
         }
         if(tempBool == false)
         {
@@ -1500,16 +1498,10 @@ void KillNPC(int A, int B)
     if(BattleMode == true)
         NPC[A].RespawnDelay = 65 * 30;
 
-    if(NPC[A].AttLayer != "")
+    if(NPC[A].AttLayer != LAYER_NONE)
     {
-        for(C = 1; C <= maxLayers; C++)
-        {
-            if(NPC[A].AttLayer == Layer[C].Name)
-            {
-                Layer[C].SpeedX = 0;
-                Layer[C].SpeedY = 0;
-            }
-        }
+        Layer[NPC[A].AttLayer].SpeedX = 0;
+        Layer[NPC[A].AttLayer].SpeedY = 0;
     }
 
     if((!GameMenu && !BattleMode) || NPC[A].DefaultType == 0)

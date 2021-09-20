@@ -403,8 +403,8 @@ void DrawEditorLevel(int Z)
         {
 //                    If .Mode = 5 Then
             frmMain.renderTexture(curX, curY, GFX.ECursor[2]);
-            if(!e.Layer.empty() && SDL_strcasecmp(e.Layer.c_str(), "Default") != 0)
-                SuperPrint(EditorCursor.Layer, 3, curX + 28 , curY + 34);
+            if(e.Layer != LAYER_NONE && e.Layer != LAYER_DEFAULT)
+                SuperPrint(GetL(e.Layer), 3, curX + 28 , curY + 34);
         }
 
 //            End With

@@ -101,7 +101,7 @@ void SaveWorld(std::string FilePath, int format, int version)   // Saves the wor
         musicbox.x = s.Location.X;
         musicbox.y = s.Location.Y;
         musicbox.id = s.Type;
-        musicbox.music_file = s.MusicFile;
+        musicbox.music_file = GetS(s.MusicFile);
         musicbox.meta.array_id = out.musicbox_array_id++;
         out.music.push_back(musicbox);
     }

@@ -634,7 +634,7 @@ void UpdateGraphics(bool skipRepaint)
                     onscreen = vScreenCollision(Z, NPC[A].Location) || (loc2_exists && vScreenCollision(Z, loc2));
                     bool onscreen_orig = vScreenCollisionCanonical(X, Y, NPC[A].Location) || (loc2_exists && vScreenCollisionCanonical(X, Y, loc2));
                     cannot_reset = (onscreen || onscreen_orig);
-                    if(ForcedControls || qScreen || !NPC[A].TriggerActivate.empty())
+                    if(ForcedControls || qScreen || NPC[A].TriggerActivate != EVENT_NONE)
                         can_activate = onscreen_orig;
                     // generators, Cheep Cheeps, Thwomps, and more!
                     else if(NPC[A].Generator

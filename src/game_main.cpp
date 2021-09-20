@@ -529,11 +529,11 @@ int GameMain(const CmdLineSetup_t &setup)
                 p.Dead = true;
             }
 
-            ProcEvent("Level - Start", true);
+            ProcEvent(EVENT_LEVEL_START, true);
             For(A, 2, maxEvents)
             {
                 if(Events[A].AutoStart)
-                    ProcEvent(Events[A].Name, true);
+                    ProcEvent(A, true);
             }
 
             resetFrameTimer();
@@ -788,12 +788,12 @@ int GameMain(const CmdLineSetup_t &setup)
 
             speedRun_resetCurrent();
 //'--------------------------------------------
-            ProcEvent("Level - Start", true);
+            ProcEvent(EVENT_LEVEL_START, true);
 
             for(int A = 2; A <= maxEvents; ++A)
             {
                 if(Events[A].AutoStart)
-                    ProcEvent(Events[A].Name, true);
+                    ProcEvent(A, true);
             }
 
             resetFrameTimer();

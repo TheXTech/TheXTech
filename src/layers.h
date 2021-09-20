@@ -62,7 +62,7 @@ struct EventSection_t
     //! Set new Music ID in this section (-1 - do nothing, -2 - reset to defaint, >=0 - set music ID)
     int music_id = LESet_Nothing;
     //! Set new Custom Music File path
-    std::string music_file;
+    stringindex_t music_file = STRING_NONE;
 
     //! Set new Background ID in this section (-1 - do nothing, -2 - reset to defaint, >=0 - set background ID)
     int background_id = LESet_Nothing;
@@ -82,10 +82,11 @@ struct EventSection_t
 //Public Type Events
 struct Events_t
 {
+    // never implemented by Redigit; we can add back in later
 //    addSavedEvent As String
-    std::string addSavedEvent;
+    // std::string addSavedEvent;
 //    RemoveSavedEvent As String
-    std::string RemoveSavedEvent;
+    // std::string RemoveSavedEvent;
 //    LayerSmoke As Boolean
     bool LayerSmoke = false;
 //    Sound As Integer
@@ -95,11 +96,11 @@ struct Events_t
 //    Text As String
     std::string Text;
 //    HideLayer(0 To 20) As String
-    std::vector<std::string> HideLayer;
+    std::vector<layerindex_t> HideLayer;
 //    ShowLayer(0 To 20) As String
-    std::vector<std::string> ShowLayer;
+    std::vector<layerindex_t> ShowLayer;
 //    ToggleLayer(0 To 20) As String
-    std::vector<std::string> ToggleLayer;
+    std::vector<layerindex_t> ToggleLayer;
 //    Music(0 To maxSections) As Integer
 //    RangeArrI<int, 0, maxSections, 0> Music;
 //    Background(0 To maxSections) As Integer
@@ -111,13 +112,13 @@ struct Events_t
 //    EndGame As Integer
     int EndGame = 0;
 //    TriggerEvent As String
-    std::string TriggerEvent;
+    eventindex_t TriggerEvent = EVENT_NONE;
 //    TriggerDelay As Double
     double TriggerDelay = 0.0;
 //    Controls As Controls
     Controls_t Controls;
 //    MoveLayer As String
-    std::string MoveLayer;
+    layerindex_t MoveLayer = LAYER_NONE;
 //    SpeedX As Single
     float SpeedX = 0.0f;
 //    SpeedY As Single
@@ -137,7 +138,7 @@ struct Events_t
 #ifdef LOW_MEM
 const int maxLayers = 100; // 100
 #else
-const int maxLayers = 255; // 100
+const int maxLayers = 254; // 100
 #endif
 extern int numLayers;
 extern RangeArr<Layer_t, 0, maxLayers> Layer;
@@ -146,13 +147,33 @@ extern RangeArr<Layer_t, 0, maxLayers> Layer;
 #ifdef LOW_MEM
 const int maxEvents = 100; // 100
 #else
-const int maxEvents = 255; // 100
+const int maxEvents = 254; // 100
 #endif
 extern int numEvents;
 extern RangeArr<Events_t, 0, maxEvents> Events;
 
+// utilities for layerindex_t and eventindex_t
+extern layerindex_t LAYER_USED_P_SWITCH;
+
+inline std::string GetL(layerindex_t index)
+{
+    if(index == LAYER_NONE)
+    {
+        return "";
+    }
+    return Layer[index].Name;
+}
+inline std::string GetE(eventindex_t index)
+{
+    if(index == EVENT_NONE)
+    {
+        return "";
+    }
+    return Events[index].Name;
+}
+
 //Public NewEvent(1 To 100) As String
-extern RangeArr<std::string, 1, maxEvents> NewEvent;
+extern RangeArrI<eventindex_t, 1, maxEvents, EVENT_NONE> NewEvent;
 //Public newEventDelay(1 To 100) As Integer
 extern RangeArrI<int, 1, maxEvents, 0> newEventDelay;
 //Public newEventNum As Integer
@@ -160,31 +181,35 @@ extern int newEventNum;
 
 // Public Sub ShowLayer(LayerName As String, Optional NoEffect As Boolean = False) 'shows a layer
 // shows a layer
-void ShowLayer(std::string LayerName, bool NoEffect = false);
+void ShowLayer(layerindex_t index, bool NoEffect = false);
 
 // Public Sub HideLayer(LayerName As String, Optional NoEffect As Boolean = False) 'hides a layer
 // hides a layer
-void HideLayer(std::string LayerName, bool NoEffect = false);
+void HideLayer(layerindex_t index, bool NoEffect = false);
 
 // Public Sub SetLayer(LayerName As String)
-void SetLayer(std::string LayerName);
+void SetLayer(layerindex_t index);
 
-bool ExistsLayer(const std::string LayerName);
+layerindex_t FindLayer(const std::string LayerName);
 
-bool RenameLayer(const std::string OldName, const std::string NewName);
+bool SwapLayers(layerindex_t index_1, layerindex_t index_2);
 
-bool DeleteLayer(const std::string LayerName, bool killall);
+bool RenameLayer(layerindex_t index, const std::string NewName);
+
+bool DeleteLayer(layerindex_t index, bool killall);
 
 void InitializeEvent(Events_t& event);
 
-bool ExistsEvent(const std::string EventName);
+eventindex_t FindEvent(const std::string EventName);
 
-bool RenameEvent(const std::string OldName, const std::string NewName);
+bool SwapEvents(eventindex_t index_1, eventindex_t index_2);
 
-bool DeleteEvent(const std::string EventName);
+bool RenameEvent(eventindex_t index, const std::string NewName);
+
+bool DeleteEvent(eventindex_t index);
 
 // Public Sub ProcEvent(EventName As String, Optional NoEffect As Boolean = False)
-void ProcEvent(std::string EventName, bool NoEffect = false);
+void ProcEvent(eventindex_t index, bool NoEffect = false);
 
 // Public Sub UpdateEvents()
 void UpdateEvents();

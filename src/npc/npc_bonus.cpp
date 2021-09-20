@@ -118,7 +118,7 @@ void CheckAfterStarTake(bool many)
                 auto &b = Background[d];
                 if(b.Type == 160 && CheckCollision(w.Entrance, b.Location))
                 {
-                    b.Layer.clear();
+                    b.Layer = LAYER_NONE;
                     b.Hidden = true;
                     syncLayers_BGO(d);
                 }

@@ -2195,7 +2195,7 @@ void TailSwipe(int plr, bool boo, bool Stab, int StabDir)
                             {
                                 PlaySound(SFX_ZeldaGrass);
                                 Block[A].Hidden = true;
-                                Block[A].Layer = "Destroyed Blocks";
+                                Block[A].Layer = LAYER_DESTROYED_BLOCKS;
                                 syncLayersTrees_Block(A);
                                 NewEffect(10, Block[A].Location);
                                 Effect[numEffects].Location.SpeedY = -2;
@@ -3989,14 +3989,14 @@ static SDL_INLINE bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool
 
     if(warp.Stars > numStars && canWarp)
     {
-        if(warp.StarsMsg.empty())
+        if(warp.StarsMsg == STRING_NONE)
         {
             if(warp.Stars == 1)
                 MessageText = "You need 1 star to enter.";
             else
                 MessageText = fmt::format_ne("You need {0} stars to enter.", warp.Stars);
         } else {
-            MessageText = warp.StarsMsg;
+            MessageText = GetS(warp.StarsMsg);
         }
         PauseGame(A);
         MessageText.clear();
@@ -4024,7 +4024,7 @@ static SDL_INLINE bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool
                     {
                         if(CheckCollision(entrance, Background[C].Location))
                         {
-                            Background[C].Layer.clear();
+                            Background[C].Layer = LAYER_NONE;
                             Background[C].Hidden = true;
                         }
                     }
@@ -4045,7 +4045,7 @@ static SDL_INLINE bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool
                     {
                         if(CheckCollision(entrance, Background[C].Location))
                         {
-                            Background[C].Layer.clear();
+                            Background[C].Layer = LAYER_NONE;
                             Background[C].Hidden = true;
                         }
                     }
@@ -4062,7 +4062,7 @@ static SDL_INLINE bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool
                     {
                         if(CheckCollision(entrance, Background[C].Location))
                         {
-                            Background[C].Layer.clear();
+                            Background[C].Layer = LAYER_NONE;
                             Background[C].Hidden = true;
                         }
                     }
@@ -4124,16 +4124,16 @@ static SDL_INLINE bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool
             plr.Location.SpeedY = 0;
         }
 
-        if(!warp.eventEnter.empty())
-            ProcEvent(warp.eventEnter);
+        if(warp.TriggerEnter != EVENT_NONE)
+            ProcEvent(warp.TriggerEnter);
 
         if(warp.Effect == 0 || warp.Effect == 3) // Instant / Portal
         {
             if(warp.Effect == 3)
             {
-                if(!warp.level.empty())
+                if(warp.level != STRING_NONE)
                 {
-                    GoToLevel = warp.level;
+                    GoToLevel = GetS(warp.level);
                     GoToLevelNoGameThing = warp.noEntranceScene;
                     plr.Effect = 8;
                     plr.Effect2 = 2921;
@@ -4541,7 +4541,7 @@ void PlayerGrabCode(int A, bool DontResetGrabTime)
                         NPC[numNPCs].Location.Height = NPCHeight[108];
                         NPC[numNPCs].Active = true;
                         NPC[numNPCs].TimeLeft = NPC[Player[A].HoldingNPC].TimeLeft;
-                        NPC[numNPCs].Layer = "Spawned NPCs";
+                        NPC[numNPCs].Layer = LAYER_SPAWNED_NPCS;
                         NPC[numNPCs].Location.Y = NPC[Player[A].HoldingNPC].Location.Y + NPC[Player[A].HoldingNPC].Location.Height - NPC[numNPCs].Location.Height;
                         NPC[numNPCs].Direction = Player[A].Direction;
                         if(NPC[numNPCs].Direction == 1)
@@ -4872,12 +4872,9 @@ void PlayerGrabCode(int A, bool DontResetGrabTime)
 
     if(LayerNPC > 0)
     {
-        for(B = 1; B <= maxLayers; B++)
+        int B = NPC[LayerNPC].AttLayer;
+        if(B != LAYER_NONE)
         {
-            if(!Layer[B].Name.empty())
-            {
-                if(Layer[B].Name == NPC[LayerNPC].AttLayer)
-                {
                     if(NPC[LayerNPC].Location.X - lyrX == 0.0 && NPC[LayerNPC].Location.Y - lyrY == 0.0)
                     {
                         if(Layer[B].SpeedX != 0.0f || Layer[B].SpeedY != 0.0f)
@@ -4917,10 +4914,6 @@ void PlayerGrabCode(int A, bool DontResetGrabTime)
                         Layer[B].SpeedX = NPC[LayerNPC].Location.X - lyrX;
                         Layer[B].SpeedY = NPC[LayerNPC].Location.Y - lyrY;
                     }
-                }
-            }
-            else
-                break;
         }
     }
 }
@@ -5527,9 +5520,9 @@ void PlayerEffects(int A)
                 }
             }
 
-            if(!warp.level.empty())
+            if(warp.level != STRING_NONE)
             {
-                GoToLevel = warp.level;
+                GoToLevel = GetS(warp.level);
                 GoToLevelNoGameThing = warp.noEntranceScene;
                 Player[A].Effect = 8;
                 Player[A].Effect2 = 2970;
@@ -5853,9 +5846,9 @@ void PlayerEffects(int A)
             Player[A].Effect2 = 0;
             Player[A].WarpCD = 40;
 
-            if(!warp.level.empty())
+            if(warp.level != STRING_NONE)
             {
-                GoToLevel = warp.level;
+                GoToLevel = GetS(warp.level);
                 GoToLevelNoGameThing = warp.noEntranceScene;
                 Player[A].Effect = 8;
                 Player[A].Effect2 = 3000;

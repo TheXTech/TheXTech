@@ -432,7 +432,7 @@ void PauseGame(int plr)
 #ifndef NO_INTPROC
                                 IntProc::sendStarsNumber(numStars);
 #endif
-                                numSavedEvents = 0;
+                                // numSavedEvents = 0;
                                 BlockSwitch.fill(false);
                                 PlaySound(SFX_Bullet);
                                 break;
