@@ -162,12 +162,12 @@ set_static_lib(AC_ZLIB         "${CODECS_LIBRARIES_DIR}" zlib)
 set(MixerX_CodecLibs
     "${AC_FLAC}"
     "${AC_FLUIDLITE}"
-    "${AC_VORBISFILE}"
-    "${AC_VORBIS}"
+#    "${AC_VORBISFILE}"
+#    "${AC_VORBIS}"
     "${AC_OPUSFILE}"
     "${AC_OPUS}"
     "${AC_OGG}"
-    "${AC_MAD}"
+#    "${AC_MAD}"
     "${AC_ADLMIDI}"
     "${AC_OPNMIDI}"
     "${AC_TIMIDITYSDL}"
@@ -233,6 +233,8 @@ ExternalProject_Add(
         "-DUSE_LOCAL_SDL2=${USE_LOCAL_SDL2}"
         "-DCMAKE_DEBUG_POSTFIX=${PGE_LIBS_DEBUG_SUFFIX}"
         "-DBUILD_MIKMOD=OFF"
+        "-DBUILD_OGG_VORBIS=OFF"
+        "-DBUILD_MP3_MAD=OFF"
         ${ANDROID_CMAKE_FLAGS}
         ${VITA_CMAKE_FLAGS}
         ${VITA_AUDIOCODECS_CMAKE_FLAGS}
@@ -271,6 +273,10 @@ ExternalProject_Add(
         "-DAUDIO_CODECS_SDL2_HG_BRANCH=${SDL_BRANCH}"
         "-DAUDIO_CODECS_SDL2_GIT_BRANCH=${SDL_GIT_BRANCH}"
         "-DWITH_SDL2_WASAPI=ON"
+        "-DUSE_MIDI_FLUIDLITE_OGG_STB=ON"
+        "-DUSE_MP3_MINIMP3=ON"
+        "-DUSE_OGG_VORBIS_STB=ON"
+        "-DUSE_MP3_MAD=OFF"
         ${ANDROID_CMAKE_FLAGS}
         ${VITA_CMAKE_FLAGS}
         ${VITA_MIXERX_CMAKE_FLAGS}
