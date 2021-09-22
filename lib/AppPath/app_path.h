@@ -39,6 +39,7 @@ public:
     static std::string screenshotsDir(); // Must be writable
     static std::string gifRecordsDir(); // Must be writable
     static std::string gameSaveRootDir(); // Must be writable
+    static std::string gameplayRecordsRootDir(); // Must be writable
     static std::string userWorldsRootDir(); // Read-Only, appears at writable directory
     static std::string userBattleRootDir(); // Read-Only, appears at writable directory
 

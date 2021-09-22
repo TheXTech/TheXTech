@@ -26,12 +26,12 @@ bool g_renderTouchscreen = false;
 InputMethod::~InputMethod() {}
 
 // Used for battery, latency, etc
-// If this is dynamically generated, you MUST use an instance-owned buffer
+// If the char* member is dynamically generated, you MUST use an instance-owned buffer
 // This will NOT be freed
 // returning a null pointer is allowed
-const char* InputMethod::StatusInfo()
+StatusInfo InputMethod::GetStatus()
 {
-    return nullptr;
+    return StatusInfo();
 }
 
 // Optional function allowing developer to consume an SDL event (on SDL clients)
@@ -737,6 +737,14 @@ void RumbleAllPlayers(int ms, float strength)
             continue;
         method->Rumble(ms, strength);
     }
+}
+
+
+StatusInfo GetStatus(int player)
+{
+    if(player < 1 || player > (int)g_InputMethods.size() + 1 || g_InputMethods[player - 1] == nullptr)
+        return StatusInfo();
+    return g_InputMethods[player - 1]->GetStatus();
 }
 
 

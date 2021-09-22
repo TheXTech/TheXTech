@@ -104,8 +104,6 @@ void speedRun_renderControls(int player, int screenZ)
     if(player < 1 || player > 2)
         return;
 
-    int jNum = useJoystick[player] - 1;
-
     // Controller
     int x = 4;
     int y = ScreenH - 34;
@@ -220,30 +218,43 @@ void speedRun_renderControls(int player, int screenZ)
     if(drawLabel)
         SuperPrint(fmt::format_ne("P{0}", player), 3, x + 22, y + 2, 1.f, 1.f, 1.f, 0.5f);
 
-    if(jNum >= 0 && jNum < joyCount())
+    Controls::StatusInfo status_info = Controls::GetStatus(player);
+
+    if(status_info.power_status != Controls::StatusInfo::POWER_UNKNOWN && status_info.power_status != Controls::StatusInfo::POWER_WIRED)
     {
-        int power = joyGetPowerLevel(jNum);
+        frmMain.renderRect(bx, by, bw - 4, bh, 0.f, 0.f, 0.f, alhpa, true);//Edge
+        frmMain.renderRect(bx + 2, by + 2, bw - 8, bh - 4, r, g, b, alhpa, true);//Box
+        frmMain.renderRect(bx + 36, by + 6, 4, 10, 0.f, 0.f, 0.f, alhpa, true);//Edge
+        frmMain.renderRect(bx + 34, by + 8, 4, 6, r, g, b, alhpa, true);//Box
 
-        if(power != SDL_JOYSTICK_POWER_UNKNOWN && power != SDL_JOYSTICK_POWER_WIRED)
+        int level;
+
+        if(status_info.power_level > .75f)
+            level = 3;
+        else if(status_info.power_level > .5f)
+            level = 2;
+        else if(status_info.power_level > .25f)
+            level = 1;
+        else
+            level = 0;
+
+        // eventually, want to flash to indicate charging.
+        // but want to avoid introducing new variable in static memory so not yet.
+
+        // if(charging_flash && level != 3) level += 1;
+
+        switch(level)
         {
-            frmMain.renderRect(bx, by, bw - 4, bh, 0.f, 0.f, 0.f, alhpa, true);//Edge
-            frmMain.renderRect(bx + 2, by + 2, bw - 8, bh - 4, r, g, b, alhpa, true);//Box
-            frmMain.renderRect(bx + 36, by + 6, 4, 10, 0.f, 0.f, 0.f, alhpa, true);//Edge
-            frmMain.renderRect(bx + 34, by + 8, 4, 6, r, g, b, alhpa, true);//Box
-
-            switch(power)
-            {
-            case SDL_JOYSTICK_POWER_FULL:
-                frmMain.renderRect(bx + 24, by + 4, 8, 14, 0.f, 0.f, 0.f, alhpaB, true); // fallthrough
-            case SDL_JOYSTICK_POWER_MEDIUM:
-                frmMain.renderRect(bx + 14, by + 4, 8, 14, 0.f, 0.f, 0.f, alhpaB, true); // fallthrough
-            case SDL_JOYSTICK_POWER_LOW:
-                frmMain.renderRect(bx + 4, by + 4, 8, 14, 0.f, 0.f, 0.f, alhpaB, true);
-                break;
-            case SDL_JOYSTICK_POWER_EMPTY:
-                frmMain.renderRect(bx + 4, by + 4, 8, 14, 1.f, 0.f, 0.f, alhpaB / 2.f, true);
-                break;
-            }
+        case 3:
+            frmMain.renderRect(bx + 24, by + 4, 8, 14, 0.f, 0.f, 0.f, alhpaB, true); // fallthrough
+        case 2:
+            frmMain.renderRect(bx + 14, by + 4, 8, 14, 0.f, 0.f, 0.f, alhpaB, true); // fallthrough
+        case 1:
+            frmMain.renderRect(bx + 4, by + 4, 8, 14, 0.f, 0.f, 0.f, alhpaB, true);
+            break;
+        case 0:
+            frmMain.renderRect(bx + 4, by + 4, 8, 14, 1.f, 0.f, 0.f, alhpaB / 2.f, true);
+            break;
         }
     }
 }

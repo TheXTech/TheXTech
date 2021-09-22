@@ -38,6 +38,7 @@ class InputMethodType;
 
 // a nulled pointer in here signifies a player whose controller has disconnected
 extern std::vector<InputMethod*> g_InputMethods;
+// no nulled pointers here
 extern std::vector<InputMethodType*> g_InputMethodTypes;
 extern bool g_renderTouchscreen;
 
@@ -147,6 +148,21 @@ namespace PlayerControls
     }
 } // namespace (Controls::)PlayerControls
 
+// information about a particular bound input method
+struct StatusInfo
+{
+    typedef enum _PowerStatus {
+        POWER_UNKNOWN = -1,
+        POWER_WIRED,
+        POWER_DISCHARGING,
+        POWER_CHARGING,
+        POWER_CHARGED
+    } PowerStatus;
+    PowerStatus power_status = POWER_UNKNOWN;
+    float power_level = 1.f;
+    const char* info_string = nullptr;
+};
+
 // represents a particular bound input method
 class InputMethod
 {
@@ -176,10 +192,10 @@ public:
     \*-----------------------*/
 
     // Used for battery, latency, etc
-    // If this is dynamically generated, you MUST use an instance-owned buffer
+    // If the char* member is dynamically generated, you MUST use an instance-owned buffer
     // This will NOT be freed
     // returning a null pointer is allowed
-    virtual const char* StatusInfo();
+    virtual StatusInfo GetStatus();
 
     // Optional function allowing developer to consume an SDL event (on SDL clients)
     //     usually used for hotkeys or for connect/disconnect events.
@@ -391,6 +407,8 @@ void ClearInputMethods();
 // player is 1-indexed here :(
 void Rumble(int player, int ms, float strength);
 void RumbleAllPlayers(int ms, float strength);
+
+StatusInfo GetStatus(int player);
 
 void RenderTouchControls();
 void UpdateTouchScreenSize();
