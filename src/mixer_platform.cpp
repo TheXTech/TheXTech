@@ -93,15 +93,24 @@ bool MixPlatform_NoPreload(const char *path)
     return false;
 }
 
-void MixPlatform_PlayStream(int channel, const char *path, int loops)
+int MixPlatform_PlayStream(int channel, const char *path, int loops)
 {
+    int ret;
     (void)channel;
+
     Mix_Music *mus = Mix_LoadMUS(path);
+
     if(!mus)
-        return;
-    Mix_PlayMusicStream(mus, loops);
-    Mix_SetFreeOnStop(mus, 1);
-    return;
+        return -1;
+
+    ret = Mix_PlayMusicStream(mus, loops);
+
+    if(ret < 0)
+        Mix_FreeMusic(mus);
+    else
+        Mix_SetFreeOnStop(mus, 1);
+
+    return ret;
 }
 
 Mix_Chunk *MixPlatform_LoadWAV(const char *path)
@@ -114,7 +123,12 @@ const char *MixPlatform_GetError()
     return Mix_GetError();
 }
 
-void MixPlatform_PlayChannel(int channel, Mix_Chunk *chunk, int loops)
+int MixPlatform_PlayChannelTimed(int channel, Mix_Chunk *chunk, int loops, int ticks)
 {
-    Mix_PlayChannel(channel, chunk, loops);
+    return Mix_PlayChannelTimed(channel, chunk, loops, ticks);
+}
+
+int MixPlatform_PlayChannelTimedVolume(int channel, Mix_Chunk *chunk, int loops, int ticks, int volume)
+{
+    return Mix_PlayChannelTimedVolume(channel, chunk, loops, ticks, volume);
 }
