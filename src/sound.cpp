@@ -42,7 +42,11 @@
 #include "pseudo_vb.h"
 
 #ifndef PATH_MAX
-#define PATH_MAX 2048
+#   ifdef MAX_PATH // on Windows
+#       define PATH_MAX MAX_PATH
+#   else
+#       define PATH_MAX 2048
+#   endif
 #endif
 
 // Public musicPlaying As Boolean
