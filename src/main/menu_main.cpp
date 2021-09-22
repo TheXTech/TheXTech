@@ -823,7 +823,7 @@ bool mainMenuUpdate()
             if(ScrollDelay > 0)
             {
                 MenuMouseMove = true;
-                ScrollDelay = ScrollDelay - 1;
+                ScrollDelay -= 1;
             }
 
             if(MenuMouseMove)
