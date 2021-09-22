@@ -387,11 +387,11 @@ void FrmMain::processEvent()
             break;
 #if !defined(__EMSCRIPTEN__) && !defined(__ANDROID__)
         case SDL_WINDOWEVENT_FOCUS_GAINED:
-            if(!neverPause)
+            if(!neverPause && !LoadingInProcess)
                 SoundPauseEngine(0);
             break;
         case SDL_WINDOWEVENT_FOCUS_LOST:
-            if(!neverPause)
+            if(!neverPause && !LoadingInProcess)
                 SoundPauseEngine(1);
             break;
 //        case SDL_WINDOWEVENT_MAXIMIZED:
