@@ -359,9 +359,7 @@ void PlayMusic(std::string Alias, int fadeInMs)
         processPathArgs(p, FileNamePath, FileName + "/");
         g_curMusic = Mix_LoadMUS(p.c_str());
         if(!g_curMusic)
-        {
             pLogWarning("Music '%s' opening error: %s", m.path.c_str(), MixPlatform_GetError());
-        }
         else
         {
             Mix_VolumeMusicStream(g_curMusic, m.volume);
@@ -467,20 +465,31 @@ void StartMusic(int A, int fadeInMs)
         std::string mus = fmt::format_ne("music{0}", curMusic);
         if(curMusic == g_customLvlMusicId)
         {
-            pLogDebug("Starting custom music [%s]", CustomMusic[A].c_str());
+            pLogDebug("Starting custom music [%s%s]", FileNamePath.c_str(), CustomMusic[A].c_str());
             if(g_curMusic)
                 Mix_FreeMusic(g_curMusic);
             std::string p = FileNamePath + CustomMusic[A];
             s_musicYoshiTrackNumber = -1;
             processPathArgs(p, FileNamePath, FileName + "/", &s_musicYoshiTrackNumber);
             g_curMusic = Mix_LoadMUS(p.c_str());
-            s_musicHasYoshiMode = (s_musicYoshiTrackNumber >= 0 && (Mix_GetMusicTracks(g_curMusic) > s_musicYoshiTrackNumber));
-            UpdateYoshiMusic();
-            Mix_VolumeMusicStream(g_curMusic, 52);
-            if(fadeInMs > 0)
-                Mix_FadeInMusic(g_curMusic, -1, fadeInMs);
+            if(!g_curMusic)
+                pLogWarning("Failed to open the music [%s]: ", p.c_str(), Mix_GetError());
             else
-                Mix_PlayMusic(g_curMusic, -1);
+            {
+                s_musicHasYoshiMode = (s_musicYoshiTrackNumber >= 0 && (Mix_GetMusicTracks(g_curMusic) > s_musicYoshiTrackNumber));
+                UpdateYoshiMusic();
+                Mix_VolumeMusicStream(g_curMusic, 52);
+                if(fadeInMs > 0)
+                {
+                    if(Mix_FadeInMusic(g_curMusic, -1, fadeInMs) < 0)
+                        pLogWarning("Failed to fade-in the music [%s]: %s", p.c_str(), Mix_GetError());
+                }
+                else
+                {
+                    if(Mix_PlayMusic(g_curMusic, -1) < 0)
+                        pLogWarning("Failed to play the music [%s]: %s", p.c_str(), Mix_GetError());
+                }
+            }
         }
         else
         {
