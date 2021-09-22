@@ -40,81 +40,95 @@ static const int maxSfxChannels = 91;
 
 bool MixPlatform_Init()
 {
-	int ret;
-	const int initFlags = MIX_INIT_MID|MIX_INIT_MOD|MIX_INIT_FLAC|MIX_INIT_OGG|MIX_INIT_OPUS|MIX_INIT_MP3;
-	pLogDebug("Opening sound...");
-	ret = Mix_Init(initFlags);
+    int ret;
+    const int initFlags = MIX_INIT_MID | MIX_INIT_MOD | MIX_INIT_FLAC | MIX_INIT_OGG | MIX_INIT_OPUS | MIX_INIT_MP3;
+    pLogDebug("Opening sound...");
+    ret = Mix_Init(initFlags);
 
-	if(ret != initFlags)
-	{
-	    pLogWarning("MixerX: Some modules aren't properly initialized");
-	    if((initFlags & MIX_INIT_MID) != MIX_INIT_MID)
-	        pLogWarning("MixerX: Failed to initialize MIDI module");
-	    if((initFlags & MIX_INIT_MOD) != MIX_INIT_MOD)
-	        pLogWarning("MixerX: Failed to initialize Tracker music module");
-	    if((initFlags & MIX_INIT_FLAC) != MIX_INIT_FLAC)
-	        pLogWarning("MixerX: Failed to initialize FLAC module");
-	    if((initFlags & MIX_INIT_OGG) != MIX_INIT_OGG)
-	        pLogWarning("MixerX: Failed to initialize OGG Vorbis module");
-	    if((initFlags & MIX_INIT_OPUS) != MIX_INIT_OPUS)
-	        pLogWarning("MixerX: Failed to initialize Opus module");
-	    if((initFlags & MIX_INIT_MP3) != MIX_INIT_MP3)
-	        pLogWarning("MixerX: Failed to initialize MP3 module");
-	}
+    if(ret != initFlags)
+    {
+        pLogWarning("MixerX: Some modules aren't properly initialized");
+        if((initFlags & MIX_INIT_MID) != MIX_INIT_MID)
+            pLogWarning("MixerX: Failed to initialize MIDI module");
+        if((initFlags & MIX_INIT_MOD) != MIX_INIT_MOD)
+            pLogWarning("MixerX: Failed to initialize Tracker music module");
+        if((initFlags & MIX_INIT_FLAC) != MIX_INIT_FLAC)
+            pLogWarning("MixerX: Failed to initialize FLAC module");
+        if((initFlags & MIX_INIT_OGG) != MIX_INIT_OGG)
+            pLogWarning("MixerX: Failed to initialize OGG Vorbis module");
+        if((initFlags & MIX_INIT_OPUS) != MIX_INIT_OPUS)
+            pLogWarning("MixerX: Failed to initialize Opus module");
+        if((initFlags & MIX_INIT_MP3) != MIX_INIT_MP3)
+            pLogWarning("MixerX: Failed to initialize MP3 module");
+    }
 
-	ret = Mix_OpenAudio(g_audioSetup.sampleRate,
-	                    g_audioSetup.format,
-	                    g_audioSetup.channels,
-	                    g_audioSetup.bufferSize);
+    ret = Mix_OpenAudio(g_audioSetup.sampleRate,
+                        g_audioSetup.format,
+                        g_audioSetup.channels,
+                        g_audioSetup.bufferSize);
 
-	if(ret < 0)
-	{
-	    std::string msg = fmt::format_ne("Can't open audio stream, continuing without audio: ({0})", Mix_GetError());
-	    pLogCritical(msg.c_str());
-	    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Sound opening error", msg.c_str(), nullptr);
-	    return false;
-	}
+    if(ret < 0)
+    {
+        std::string msg = fmt::format_ne("Can't open audio stream, continuing without audio: ({0})", Mix_GetError());
+        pLogCritical(msg.c_str());
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Sound opening error", msg.c_str(), nullptr);
+        return false;
+    }
 
-	Mix_VolumeMusic(MIX_MAX_VOLUME);
-	Mix_AllocateChannels(maxSfxChannels);
+    Mix_VolumeMusic(MIX_MAX_VOLUME);
+    Mix_AllocateChannels(maxSfxChannels);
 
-	return true;
+    return true;
 }
 
 void MixPlatform_Quit()
 {
-	Mix_CloseAudio();
-	Mix_Quit();
+    Mix_CloseAudio();
+    Mix_Quit();
 }
 
-bool MixPlatform_NoPreload(const char* path)
+bool MixPlatform_NoPreload(const char *path)
 {
-	(void)path;
-	return false;
+    (void)path;
+    return false;
 }
 
-void MixPlatform_PlayStream(int channel, const char* path, int loops)
+int MixPlatform_PlayStream(int channel, const char *path, int loops)
 {
-	(void)channel;
-	Mix_Music* mus = Mix_LoadMUS(path);
-	if(!mus)
-		return;
-	Mix_PlayMusicStream(mus, loops);
-	Mix_SetFreeOnStop(mus, 1);
-	return;
+    int ret;
+    (void)channel;
+
+    Mix_Music *mus = Mix_LoadMUS(path);
+
+    if(!mus)
+        return -1;
+
+    ret = Mix_PlayMusicStream(mus, loops);
+
+    if(ret < 0)
+        Mix_FreeMusic(mus);
+    else
+        Mix_SetFreeOnStop(mus, 1);
+
+    return ret;
 }
 
-Mix_Chunk* MixPlatform_LoadWAV(const char* path)
+Mix_Chunk *MixPlatform_LoadWAV(const char *path)
 {
-	return Mix_LoadWAV(path);
+    return Mix_LoadWAV(path);
 }
 
-const char* MixPlatform_GetError()
+const char *MixPlatform_GetError()
 {
-	return Mix_GetError();
+    return Mix_GetError();
 }
 
-void MixPlatform_PlayChannel(int channel, Mix_Chunk* chunk, int loops)
+int MixPlatform_PlayChannelTimed(int channel, Mix_Chunk *chunk, int loops, int ticks)
 {
-	Mix_PlayChannel(channel, chunk, loops);
+    return Mix_PlayChannelTimed(channel, chunk, loops, ticks);
+}
+
+int MixPlatform_PlayChannelTimedVolume(int channel, Mix_Chunk *chunk, int loops, int ticks, int volume)
+{
+    return Mix_PlayChannelTimedVolume(channel, chunk, loops, ticks, volume);
 }

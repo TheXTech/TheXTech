@@ -60,7 +60,7 @@ bool MixPlatform_NoPreload(const char* path)
         return false;
 }
 
-void MixPlatform_PlayStream(int channel, const char* path, int loops)
+int MixPlatform_PlayStream(int channel, const char* path, int loops)
 {
     if(!cur_sound || channel < 0)
     {
@@ -71,6 +71,7 @@ void MixPlatform_PlayStream(int channel, const char* path, int loops)
         killSound(cur_sound[channel]);
         cur_sound[channel] = playSoundAuto(path, loops);
     }
+    return 0;
 }
 
 Mix_Chunk* MixPlatform_LoadWAV(const char* path)
@@ -83,8 +84,9 @@ const char* MixPlatform_GetError()
     return "";
 }
 
-void MixPlatform_PlayChannel(int channel, Mix_Chunk* chunk, int loops)
+int MixPlatform_PlayChannelTimed(int channel, Mix_Chunk *chunk, int loops, int ticks)
 {
+    (void)ticks;
     if(!cur_sound || channel < 0)
     {
         playSoundMem((WaveObject*)chunk, loops);
@@ -94,15 +96,23 @@ void MixPlatform_PlayChannel(int channel, Mix_Chunk* chunk, int loops)
     cur_sound[channel] = playSoundMem((WaveObject*)chunk, loops);
 }
 
+int MixPlatform_PlayChannelTimedVolume(int channel, Mix_Chunk *chunk, int loops, int ticks, int volume)
+{
+    (void)volume;
+    return MixPlatform_PlayChannelTimed(channel, chunk, loops, ticks);
+}
+
+
 extern "C" {
 
-void Mix_ReserveChannels(int channels)
+int Mix_ReserveChannels(int channels)
 {
     cur_sound = (SoundId*)malloc(sizeof(SoundId)*channels);
     for(int i = 0; i < channels; i++)
     {
         cur_sound[i] = INVALID_ID;
     }
+    return 0;
 }
 
 void Mix_PauseAudio(int pause)
@@ -125,14 +135,16 @@ int Mix_VolumeMusicStream(Mix_Music* music, int volume)
     return 0;
 }
 
-void Mix_HaltMusicStream(Mix_Music* music)
+int Mix_HaltMusicStream(Mix_Music* music)
 {
     killSound((SoundId)music);
+    return 0;
 }
-void Mix_FadeOutMusicStream(Mix_Music* music, int ms)
+int Mix_FadeOutMusicStream(Mix_Music* music, int ms)
 {
     (void)ms;
     killSound((SoundId)music);
+    return 0;
 }
 int Mix_HaltChannel(int channel)
 {
@@ -145,19 +157,21 @@ int Mix_PlayingMusicStream(Mix_Music* music)
 {
     (void)music;
     // no problem on 3DS
-    return false;
+    return 0;
 }
 
-void Mix_PlayMusic(Mix_Music* music, int loops)
+int Mix_PlayMusic(Mix_Music* music, int loops)
 {
     (void)music;
     (void)loops;
+    return 0;
 }
-void Mix_FadeInMusic(Mix_Music* music, int loops, int fadeInMs)
+int Mix_FadeInMusic(Mix_Music* music, int loops, int fadeInMs)
 {
     (void)music;
     (void)loops;
     (void)fadeInMs;
+    return 0;
 }
 
 int Mix_GetMusicTracks(Mix_Music* music)
@@ -166,11 +180,12 @@ int Mix_GetMusicTracks(Mix_Music* music)
     return 1;
 }
 
-void Mix_SetMusicTrackMute(Mix_Music* music, int track, int mute)
+int Mix_SetMusicTrackMute(Mix_Music* music, int track, int mute)
 {
     (void)music;
     (void)track;
     (void)mute;
+    return 0;
 }
 
 void Mix_FreeMusic(Mix_Music* music)

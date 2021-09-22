@@ -226,7 +226,7 @@ static void AddSfx(const std::string &root,
                 m.customPath = newPath;
                 bool no_preload = MixPlatform_NoPreload((root + f).c_str());
                 if(!no_preload && !isSilent)
-                    m.chunk = MixPlatform_LoadWAV((root + f).c_str());
+                    m.chunk = Mix_LoadWAV((root + f).c_str());
                 if(no_preload || m.chunk || isSilent)
                 {
                     if(!m.isCustom && !m.chunkOrig)
@@ -243,7 +243,7 @@ static void AddSfx(const std::string &root,
                 {
                     m.chunk = backup;
                     m.isSilent = backup_isSilent;
-                    pLogWarning("ERROR: SFX '%s' loading error: %s", m.path.c_str(), MixPlatform_GetError());
+                    pLogWarning("ERROR: SFX '%s' loading error: %s", m.path.c_str(), Mix_GetError());
                 }
             }
         }
@@ -256,7 +256,7 @@ static void AddSfx(const std::string &root,
             pLogDebug("Adding SFX [%s] '%s'", alias.c_str(), isSilent ? "<silence>" : m.path.c_str());
             bool no_preload = MixPlatform_NoPreload(m.path.c_str());
             if(!isSilent && !no_preload)
-                m.chunk = MixPlatform_LoadWAV(m.path.c_str());
+                m.chunk = Mix_LoadWAV(m.path.c_str());
             m.channel = -1;
             if(no_preload || m.chunk || isSilent)
             {
@@ -268,7 +268,7 @@ static void AddSfx(const std::string &root,
             }
             else
             {
-                pLogWarning("ERROR: SFX '%s' loading error: %s", m.path.c_str(), MixPlatform_GetError());
+                pLogWarning("ERROR: SFX '%s' loading error: %s", m.path.c_str(), Mix_GetError());
                 if(!isCustom)
                     g_errorsSfx++;
             }
@@ -359,7 +359,7 @@ void PlayMusic(std::string Alias, int fadeInMs)
         processPathArgs(p, FileNamePath, FileName + "/");
         g_curMusic = Mix_LoadMUS(p.c_str());
         if(!g_curMusic)
-            pLogWarning("Music '%s' opening error: %s", m.path.c_str(), MixPlatform_GetError());
+            pLogWarning("Music '%s' opening error: %s", m.path.c_str(), Mix_GetError());
         else
         {
             Mix_VolumeMusicStream(g_curMusic, m.volume);
@@ -382,7 +382,7 @@ void PlaySfx(std::string Alias, int loops)
         auto &s = sfx->second;
         if(!s.isSilent && s.chunk)
         {
-            MixPlatform_PlayChannel(s.channel, s.chunk, loops);
+            Mix_PlayChannel(s.channel, s.chunk, loops);
         }
         else if(!s.isSilent && s.isCustom)
         {
