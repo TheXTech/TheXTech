@@ -87,7 +87,6 @@ static int loadingThread(void *waiter_ptr)
 #else
     UNUSED(waiter_ptr);
 #endif
-    InitSound(); // Setup sound effects
     SetupPhysics(); // Setup Physics
     SetupGraphics(); // setup graphics
 //    Load GFX 'load the graphics form
@@ -99,6 +98,8 @@ static int loadingThread(void *waiter_ptr)
     FindWorlds();
     FindLevels();
 #endif
+
+    InitSound(); // Setup sound effects
 
 #if !defined(PGE_NO_THREADING)
     if(waiter)
@@ -254,6 +255,15 @@ int GameMain(const CmdLineSetup_t &setup)
 #endif
 
     LoadingInProcess = false;
+
+    // Clear the screen
+    frmMain.setTargetTexture();
+    frmMain.clearBuffer();
+    frmMain.repaint();
+    DoEvents();
+
+    if(!neverPause && !frmMain.isWindowActive())
+        SoundPauseEngine(1);
 
     if(!setup.testLevel.empty() || setup.interprocess) // Start level testing immediately!
     {

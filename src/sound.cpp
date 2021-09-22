@@ -564,19 +564,28 @@ void PlayInitSound()
         sounds.read("file", p, std::string());
         sounds.endGroup();
 
-        snprintf(buffer, PATH_MAX, "%s%s", SfxRoot.c_str(), p.c_str());
+        SDL_snprintf(buffer, PATH_MAX, "%s%s", SfxRoot.c_str(), p.c_str());
 
         // PS Vita had a problem with performing (SfxRoot + p).c_str()
         // pLogDebug("Playing: `%s` (or, `%s` if you will)\n", buffer, buffer);
         if(!p.empty())
         {
-            g_curMusic = Mix_LoadMUS(buffer);
-            Mix_PlayMusic(g_curMusic, 0);
-            do // Synchroniously play the loading sound to don't distort it during the SFX loading
+#ifndef __3DS__
+            Mix_Music *loadsfx = Mix_LoadMUS(buffer);
+            if(loadsfx)
             {
-                PGE_Delay(15);
-                UpdateLoadREAL();
-            } while(Mix_PlayingMusicStream(g_curMusic));
+                Mix_PlayMusicStream(loadsfx, 0);
+                Mix_SetFreeOnStop(loadsfx, 1);
+//            do // Synchroniously play the loading sound to don't distort it during the SFX loading
+//            {
+//                PGE_Delay(15);
+//                UpdateLoadREAL();
+//            } while(Mix_PlayingMusicStream(loadsfx));
+//            Mix_FreeMusic(loadsfx);
+            }
+#else
+            MixPlatform_PlayStream(-1, buffer, 0);
+#endif
         }
     }
 }
