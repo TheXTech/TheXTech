@@ -136,7 +136,7 @@ extern std::vector<std::string> LevelString;
 
 inline std::string GetS(stringindex_t index)
 {
-    if(index == STRING_NONE)
+    if(index == STRINGINDEX_NONE)
     {
         return "";
     }
@@ -144,7 +144,7 @@ inline std::string GetS(stringindex_t index)
 }
 inline void SetS(stringindex_t& index, const std::string& target)
 {
-    if(index == STRING_NONE && LevelString.size() < MaxLevelStrings)
+    if(index == STRINGINDEX_NONE && LevelString.size() < MaxLevelStrings)
     {
         index = (stringindex_t)LevelString.size();
         LevelString.push_back(target);
@@ -156,7 +156,7 @@ inline void SetS(stringindex_t& index, const std::string& target)
 }
 inline std::string* PtrS(stringindex_t& index)
 {
-    if(index == STRING_NONE)
+    if(index == STRINGINDEX_NONE)
     {
         if(LevelString.size() >= MaxLevelStrings)
             return nullptr;
@@ -339,7 +339,7 @@ struct NPC_t
 //    DefaultStuck As Boolean
     bool DefaultStuck = false;
 //    Text As String 'the text that is displayed when you talk to the NPC
-    stringindex_t Text = STRING_NONE;
+    stringindex_t Text = STRINGINDEX_NONE;
 //    oldAddBelt As Single
     float oldAddBelt = 0.0f;
 //    PinchCount As Integer 'obsolete
@@ -913,7 +913,7 @@ struct Warp_t
 //    Effect As Integer 'style of warp. door/
     int Effect = 0;
 //    level As String 'filename of the level it should warp to
-    stringindex_t level = STRING_NONE;
+    stringindex_t level = STRINGINDEX_NONE;
 //    LevelWarp As Integer
     int LevelWarp = 0;
 //    LevelEnt As Boolean 'this warp can't be used if set to true (this is for level entrances)
@@ -939,7 +939,7 @@ struct Warp_t
     bool cannonExit = false;
     double cannonExitSpeed = 10.0;
     eventindex_t TriggerEnter = EVENT_NONE;
-    stringindex_t StarsMsg = STRING_NONE;
+    stringindex_t StarsMsg = STRINGINDEX_NONE;
 //End Type
 };
 
@@ -990,7 +990,7 @@ struct WorldMusic_t
 //    Type As Integer
     int Type = 0;
 //    EXTRA: Custom Music
-    stringindex_t MusicFile = STRING_NONE;
+    stringindex_t MusicFile = STRINGINDEX_NONE;
 //End Type
     int64_t Z = 0;
     bool Active = true;

@@ -509,7 +509,7 @@ void EditorScreen::UpdateNPCScreen()
         {
             MessageText = GetS(EditorCursor.NPC.Text);
             SuperPrint("TEXT", 3, e_ScreenW - 200, 160);
-            if (UpdateButton(e_ScreenW - 160 + 4, 180 + 4, GFX.EIcons, EditorCursor.NPC.Text != STRING_NONE, 0, 32*Icon::pencil, 32, 32))
+            if (UpdateButton(e_ScreenW - 160 + 4, 180 + 4, GFX.EIcons, EditorCursor.NPC.Text != STRINGINDEX_NONE, 0, 32*Icon::pencil, 32, 32))
                 SetS(EditorCursor.NPC.Text, GetTextInput("NPC text", GetS(EditorCursor.NPC.Text)));
         }
         // Generator
@@ -2805,7 +2805,7 @@ void EditorScreen::UpdateWarpScreen()
 {
     SuperPrint("WARP SETTINGS", 3, 200, 50);
     // placement selection
-    if (EditorCursor.Warp.level == STRING_NONE && !EditorCursor.Warp.LevelEnt && !EditorCursor.Warp.MapWarp)
+    if (EditorCursor.Warp.level == STRINGINDEX_NONE && !EditorCursor.Warp.LevelEnt && !EditorCursor.Warp.MapWarp)
     {
         if (EditorCursor.SubMode != 1 && EditorCursor.SubMode != 2)
             EditorCursor.SubMode = 1;
@@ -2829,7 +2829,7 @@ void EditorScreen::UpdateWarpScreen()
         if (UpdateButton(380 + 4, 120 + 4, GFX.EIcons, EditorCursor.Warp.Direction == 4, 0, 32*Icon::right, 32, 32))
             EditorCursor.Warp.Direction = 4;
     }
-    if (EditorCursor.Warp.level == STRING_NONE && !EditorCursor.Warp.MapWarp)
+    if (EditorCursor.Warp.level == STRINGINDEX_NONE && !EditorCursor.Warp.MapWarp)
     {
         SuperPrint("OUT DIRECTION", 3, 10, 170);
         if (UpdateButton(260 + 4, 160 + 4, GFX.EIcons, EditorCursor.Warp.Direction2 == 1, 0, 32*Icon::down, 32, 32))
@@ -2890,21 +2890,21 @@ void EditorScreen::UpdateWarpScreen()
         EditorCursor.Warp.MapWarp = !EditorCursor.Warp.MapWarp;
         if (EditorCursor.Warp.MapWarp)
         {
-            EditorCursor.Warp.level = STRING_NONE;
+            EditorCursor.Warp.level = STRINGINDEX_NONE;
             EditorCursor.Warp.LevelEnt = false;
         }
     }
     SuperPrint("LVL WARP ENTER", 3, 210, 390);
-    if (UpdateButton(466 + 4, 380 + 4, GFX.EIcons, EditorCursor.Warp.level != STRING_NONE, 0, 32*Icon::check, 32, 32))
+    if (UpdateButton(466 + 4, 380 + 4, GFX.EIcons, EditorCursor.Warp.level != STRINGINDEX_NONE, 0, 32*Icon::check, 32, 32))
     {
-        if (EditorCursor.Warp.level == STRING_NONE)
+        if (EditorCursor.Warp.level == STRINGINDEX_NONE)
         {
             SetS(EditorCursor.Warp.level, "...");
             EditorCursor.Warp.MapWarp = false;
             EditorCursor.Warp.LevelEnt = false;
         }
         else
-            EditorCursor.Warp.level = STRING_NONE;
+            EditorCursor.Warp.level = STRINGINDEX_NONE;
     }
     SuperPrint("EXIT", 3, 516, 390);
     if (UpdateButton(590 + 4, 380 + 4, GFX.EIcons, EditorCursor.Warp.LevelEnt, 0, 32*Icon::check, 32, 32))
@@ -2912,12 +2912,12 @@ void EditorScreen::UpdateWarpScreen()
         EditorCursor.Warp.LevelEnt = !EditorCursor.Warp.LevelEnt;
         if (EditorCursor.Warp.LevelEnt)
         {
-            EditorCursor.Warp.level = STRING_NONE;
+            EditorCursor.Warp.level = STRINGINDEX_NONE;
             EditorCursor.Warp.MapWarp = false;
         }
     }
     // special options for lvl warp entrance
-    if (EditorCursor.Warp.level != STRING_NONE)
+    if (EditorCursor.Warp.level != STRINGINDEX_NONE)
     {
         if (GetS(EditorCursor.Warp.level).length() <= 10)
             SuperPrint("TARGET: " + GetS(EditorCursor.Warp.level), 3, 10, 430);

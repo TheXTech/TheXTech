@@ -911,7 +911,7 @@ void UpdateNPCs()
                 NPC[A].Location.X = NPC[A].Location.X - NPC[A].Location.Width / 2.0;
                 NPC[A].Location.Y = NPC[A].Location.Y - NPC[A].Location.Height / 2.0;
             }
-            if(NPC[A].Text != STRING_NONE)
+            if(NPC[A].Text != STRINGINDEX_NONE)
             {
                 NPC[A].Chat = false;
                 tempLocation = NPC[A].Location;

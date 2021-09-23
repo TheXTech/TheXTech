@@ -3504,7 +3504,7 @@ void UpdatePlayer()
                                     if(NPC[B].Inert) // if the npc is friendly then you can't touch it
                                     {
                                         HitSpot = 0;
-                                        if(NPC[B].Text != STRING_NONE && Player[A].Controls.Up && !FreezeNPCs)
+                                        if(NPC[B].Text != STRINGINDEX_NONE && Player[A].Controls.Up && !FreezeNPCs)
                                             MessageNPC = B;
                                     }
                                     if(Player[A].Stoned && HitSpot != 1) // if you are a statue then SLAM into the npc

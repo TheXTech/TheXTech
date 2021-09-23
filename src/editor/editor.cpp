@@ -451,7 +451,7 @@ void UpdateEditor()
                             EditorCursor.Mode = OptCursor_t::LVL_WARPS;
                             EditorCursor.SubMode = 1;
                             EditorControls.MouseClick = false; /* Simulate "Focus out" inside of SMBX Editor */
-                            if(Warp[A].LevelEnt || EditorCursor.Warp.MapWarp || EditorCursor.Warp.level != STRING_NONE)
+                            if(Warp[A].LevelEnt || EditorCursor.Warp.MapWarp || EditorCursor.Warp.level != STRINGINDEX_NONE)
                                 Warp[A].PlacedExit = false;
                             EditorCursor.Warp = Warp[A];
                             if (!Warp[A].PlacedEnt && !Warp[A].PlacedExit)
@@ -469,7 +469,7 @@ void UpdateEditor()
                             EditorCursor.SubMode = 2;
                             EditorControls.MouseClick = false; /* Simulate "Focus out" inside of SMBX Editor */
                             // TODO: additional testing of these situations
-                            if(Warp[A].LevelEnt || EditorCursor.Warp.MapWarp || EditorCursor.Warp.level != STRING_NONE)
+                            if(Warp[A].LevelEnt || EditorCursor.Warp.MapWarp || EditorCursor.Warp.level != STRINGINDEX_NONE)
                                 Warp[A].PlacedEnt = false;
                             EditorCursor.Warp = Warp[A];
                             if (!Warp[A].PlacedEnt && !Warp[A].PlacedExit)
@@ -1276,9 +1276,9 @@ void UpdateEditor()
 //                        }
 
                         NPC[numNPCs] = EditorCursor.NPC;
-                        if(NPC[numNPCs].Text != STRING_NONE)
+                        if(NPC[numNPCs].Text != STRINGINDEX_NONE)
                         {
-                            NPC[numNPCs].Text = STRING_NONE;
+                            NPC[numNPCs].Text = STRINGINDEX_NONE;
                             SetS(NPC[numNPCs].Text, GetS(EditorCursor.NPC.Text));
                         }
                         syncLayers_NPC(numNPCs);
@@ -1316,13 +1316,13 @@ void UpdateEditor()
                 if(A > numWarps)
                     numWarps = A;
 
-                if(EditorCursor.SubMode == 1 || EditorCursor.Warp.level != STRING_NONE || EditorCursor.Warp.LevelEnt == true || EditorCursor.Warp.MapWarp == true)
+                if(EditorCursor.SubMode == 1 || EditorCursor.Warp.level != STRINGINDEX_NONE || EditorCursor.Warp.LevelEnt == true || EditorCursor.Warp.MapWarp == true)
                 {
                     EditorCursor.Warp.Entrance = EditorCursor.Location;
                     EditorControls.MouseClick = false;
                     EditorCursor.Warp.PlacedEnt = true;
                 }
-                if(EditorCursor.SubMode == 2 || EditorCursor.Warp.level != STRING_NONE || EditorCursor.Warp.LevelEnt == true || EditorCursor.Warp.MapWarp == true)
+                if(EditorCursor.SubMode == 2 || EditorCursor.Warp.level != STRINGINDEX_NONE || EditorCursor.Warp.LevelEnt == true || EditorCursor.Warp.MapWarp == true)
                 {
                     EditorCursor.Warp.Exit = EditorCursor.Location;
                     EditorControls.MouseClick = false;
@@ -1330,14 +1330,14 @@ void UpdateEditor()
                 }
                 Warp[A] = EditorCursor.Warp;
                 // de-duplicate strings
-                if(Warp[A].level != STRING_NONE)
+                if(Warp[A].level != STRINGINDEX_NONE)
                 {
-                    Warp[A].level = STRING_NONE;
+                    Warp[A].level = STRINGINDEX_NONE;
                     SetS(Warp[A].level, GetS(EditorCursor.Warp.level));
                 }
-                if(Warp[A].StarsMsg != STRING_NONE)
+                if(Warp[A].StarsMsg != STRINGINDEX_NONE)
                 {
-                    Warp[A].StarsMsg = STRING_NONE;
+                    Warp[A].StarsMsg = STRINGINDEX_NONE;
                     SetS(Warp[A].StarsMsg, GetS(EditorCursor.Warp.StarsMsg));
                 }
                 Warp[A].Layer = EditorCursor.Layer;

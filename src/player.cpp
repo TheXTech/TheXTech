@@ -3989,7 +3989,7 @@ static SDL_INLINE bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool
 
     if(warp.Stars > numStars && canWarp)
     {
-        if(warp.StarsMsg == STRING_NONE)
+        if(warp.StarsMsg == STRINGINDEX_NONE)
         {
             if(warp.Stars == 1)
                 MessageText = "You need 1 star to enter.";
@@ -4131,7 +4131,7 @@ static SDL_INLINE bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool
         {
             if(warp.Effect == 3)
             {
-                if(warp.level != STRING_NONE)
+                if(warp.level != STRINGINDEX_NONE)
                 {
                     GoToLevel = GetS(warp.level);
                     GoToLevelNoGameThing = warp.noEntranceScene;
@@ -5520,7 +5520,7 @@ void PlayerEffects(int A)
                 }
             }
 
-            if(warp.level != STRING_NONE)
+            if(warp.level != STRINGINDEX_NONE)
             {
                 GoToLevel = GetS(warp.level);
                 GoToLevelNoGameThing = warp.noEntranceScene;
@@ -5846,7 +5846,7 @@ void PlayerEffects(int A)
             Player[A].Effect2 = 0;
             Player[A].WarpCD = 40;
 
-            if(warp.level != STRING_NONE)
+            if(warp.level != STRINGINDEX_NONE)
             {
                 GoToLevel = GetS(warp.level);
                 GoToLevelNoGameThing = warp.noEntranceScene;

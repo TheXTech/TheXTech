@@ -62,7 +62,7 @@ struct EventSection_t
     //! Set new Music ID in this section (-1 - do nothing, -2 - reset to defaint, >=0 - set music ID)
     int music_id = LESet_Nothing;
     //! Set new Custom Music File path
-    stringindex_t music_file = STRING_NONE;
+    stringindex_t music_file = STRINGINDEX_NONE;
 
     //! Set new Background ID in this section (-1 - do nothing, -2 - reset to defaint, >=0 - set background ID)
     int background_id = LESet_Nothing;

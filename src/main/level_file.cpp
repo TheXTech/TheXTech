@@ -305,7 +305,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             auto &s = event.section[B];
             s.music_id = LevelEvent_Sets::LESet_Nothing;
             s.background_id = LevelEvent_Sets::LESet_Nothing;
-            s.music_file = STRING_NONE;
+            s.music_file = STRINGINDEX_NONE;
             s.position.X = LevelEvent_Sets::LESet_Nothing;
             s.position.Y = 0;
             s.position.Height = 0;
@@ -868,7 +868,7 @@ void ClearLevel()
             auto &ss = Events[A].section[B];
             ss.background_id = EventSection_t::LESet_Nothing;
             ss.music_id = EventSection_t::LESet_Nothing;
-            ss.music_file = STRING_NONE;
+            ss.music_file = STRINGINDEX_NONE;
             ss.position.X = EventSection_t::LESet_Nothing;
         }
     }
@@ -1019,7 +1019,7 @@ void FindStars()
     for(A = 1; A <= numWarps; A++)
     {
         auto &warp = Warp[A];
-        if(warp.level != STRING_NONE)
+        if(warp.level != STRINGINDEX_NONE)
         {
             std::string lFile = FileNamePath + GetS(warp.level);
             addMissingLvlSuffix(lFile);

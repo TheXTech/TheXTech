@@ -21,6 +21,8 @@
 #ifndef LIMITS_H
 #define LIMITS_H
 
+#include <stdint.h>
+
 // OBSERVE: layer and event references are no longer
 //   represented by strings but rather indices in the
 //   Layers / Events array.
@@ -45,7 +47,7 @@ const eventindex_t EVENT_LEVEL_START = 0;
 const eventindex_t EVENT_PSWITCH_START = 1;
 const eventindex_t EVENT_PSWITCH_END = 2;
 
-const stringindex_t STRING_NONE = 65535;
+const stringindex_t STRINGINDEX_NONE = 65535;
 
 const int MaxLevelStrings = 65535;
 
