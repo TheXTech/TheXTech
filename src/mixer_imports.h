@@ -25,7 +25,7 @@ bool MixPlatform_Init();
 void MixPlatform_Quit();
 
 bool MixPlatform_NoPreload(const char* path);
-void MixPlatform_PlayStream(int channel, const char* path, int loops);
+int  MixPlatform_PlayStream(int channel, const char* path, int loops);
 
 // need to do this because LoadWAV is not properly declared in MixerX.
 #define Mix_LoadWAV(file)   MixPlatform_LoadWAV(file);
