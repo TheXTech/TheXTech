@@ -35,17 +35,17 @@ typedef uint16_t stringindex_t;
 //   there are at most MAX(uint8_t) layers/events,
 //   leaving the -1 (255) index unused.
 // see layers.h for the respective maximums.
-constexpr layerindex_t LAYER_NONE = -1;
+constexpr layerindex_t LAYER_NONE = static_cast<layerindex_t>(-1);
 constexpr layerindex_t LAYER_DEFAULT = 0;
 constexpr layerindex_t LAYER_DESTROYED_BLOCKS = 1;
 constexpr layerindex_t LAYER_SPAWNED_NPCS = 2;
 
-constexpr eventindex_t EVENT_NONE = -1;
+constexpr eventindex_t EVENT_NONE = static_cast<eventindex_t>(-1);
 constexpr eventindex_t EVENT_LEVEL_START = 0;
 constexpr eventindex_t EVENT_PSWITCH_START = 1;
 constexpr eventindex_t EVENT_PSWITCH_END = 2;
 
-constexpr stringindex_t STRING_NONE = -1;
+constexpr stringindex_t STRING_NONE = static_cast<stringindex_t>(-1);
 
 const int MaxLevelStrings = 65535;
 
