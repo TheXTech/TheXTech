@@ -29,6 +29,7 @@
 #include <PGE_File_Formats/file_formats.h>
 
 #include "menu_main.h"
+#include "menu_engine.h"
 #include "game_info.h"
 
 #include "speedrunner.h"
@@ -50,6 +51,28 @@ static SDL_atomic_t         loadingProgrssMax;
 
 static SDL_Thread*          loadingThread = nullptr;
 
+// Menu lists
+static MenuList             s_menuMain;
+
+static void miRenderAction(MenuItem *self, int x, int y, int ix, int iy)
+{
+    SDL_assert_release(self);
+    UNUSED(ix);
+    UNUSED(iy);
+    SuperPrint(self->label, 3, x, y);
+}
+
+static int FindWorldsThread(void *);
+static int FindLevelsThread(void *);
+
+
+static int ScrollDelay = 0;
+static int menuPlayersNum = 0;
+static int menuBattleMode = false;
+
+static int menuCopySaveSrc = 0;
+static int menuCopySaveDst = 0;
+
 
 void initMainMenu()
 {
@@ -67,15 +90,126 @@ void initMainMenu()
 
     for(int i = 1; i <= numCharacters; ++i)
         g_mainMenu.selectPlayer[i] = fmt::format_ne("{0} game", g_gameInfo.characterName[i]);
+
+
+    // ---------------- main menu ----------------
+    s_menuMain.list.clear();
+    s_menuMain.x_base = 300;
+    s_menuMain.y_base = 350;
+    s_menuMain.menu_id = MENU_MAIN;
+
+    s_menuMain.action_back = [](MenuList *)->void
+    {
+        if(MenuCursor != 4)
+        {
+            MenuCursor = 4;
+            PlaySoundMenu(SFX_Slide);
+        }
+    };
+
+    {
+        MenuItem it;
+        it.label = g_mainMenu.main1PlayerGame;
+        it.render = miRenderAction;
+        it.trigger = [](MenuItem *)->bool
+        {
+            PlaySoundMenu(SFX_Do);
+            MenuMode = MENU_1PLAYER_GAME;
+            menuPlayersNum = 1;
+            menuBattleMode = false;
+#ifdef __EMSCRIPTEN__
+            FindWorlds();
+#else
+            SDL_AtomicSet(&loading, 1);
+            loadingThread = SDL_CreateThread(FindWorldsThread, "FindWorlds", NULL);
+#endif
+            MenuCursor = 0;
+            return false;
+        };
+        s_menuMain.list.push_back(it);
+    }
+
+    {
+        MenuItem it;
+        it.label = g_mainMenu.main2PlayerGame;
+        it.render = miRenderAction;
+        it.trigger = [](MenuItem *)->bool
+        {
+            PlaySoundMenu(SFX_Do);
+            MenuMode = MENU_2PLAYER_GAME;
+            menuPlayersNum = 2;
+            menuBattleMode = false;
+#ifdef __EMSCRIPTEN__
+            FindWorlds();
+#else
+            SDL_AtomicSet(&loading, 1);
+            loadingThread = SDL_CreateThread(FindWorldsThread, "FindWorlds", NULL);
+#endif
+            MenuCursor = 0;
+            return false;
+        };
+        s_menuMain.list.push_back(it);
+    }
+
+    {
+        MenuItem it;
+        it.label = g_mainMenu.mainBattleGame;
+        it.render = miRenderAction;
+        it.trigger = [](MenuItem *)->bool
+        {
+            PlaySoundMenu(SFX_Do);
+            MenuMode = MENU_BATTLE_MODE;
+            menuPlayersNum = 2;
+            menuBattleMode = true;
+#ifdef __EMSCRIPTEN__
+            FindLevels();
+#else
+            SDL_AtomicSet(&loading, 1);
+            loadingThread = SDL_CreateThread(FindLevelsThread, "FindLevels", NULL);
+#endif
+            MenuCursor = 0;
+            return false;
+        };
+        s_menuMain.list.push_back(it);
+    }
+
+    {
+        MenuItem it;
+        it.label = g_mainMenu.mainOptions;
+        it.render = miRenderAction;
+        it.trigger = [](MenuItem *)->bool
+        {
+            PlaySoundMenu(SFX_Do);
+            MenuMode = MENU_OPTIONS;
+            MenuCursor = 0;
+            return false;
+        };
+        s_menuMain.list.push_back(it);
+    }
+
+    {
+        MenuItem it;
+        it.label = g_mainMenu.mainExit;
+        it.render = miRenderAction;
+        it.trigger = [](MenuItem *)->bool
+        {
+            PlaySoundMenu(SFX_Do);
+            frmMain.setTargetTexture();
+            frmMain.clearBuffer();
+            StopMusic();
+            frmMain.repaint();
+            DoEvents();
+            PGE_Delay(500);
+            KillIt();
+            return true;
+        };
+        s_menuMain.list.push_back(it);
+    }
+
+    s_menuMain.prepare();
+
 }
 
-
-static int ScrollDelay = 0;
-static int menuPlayersNum = 0;
-static int menuBattleMode = false;
-
-static int menuCopySaveSrc = 0;
-static int menuCopySaveDst = 0;
 
 static int FindWorldsThread(void *)
 {
@@ -242,6 +376,11 @@ bool mainMenuUpdate()
     Location_t tempLocation;
     int menuLen;
     Player_t blankPlayer;
+
+    if(MenuMode == MENU_MAIN)
+    {
+        return s_menuMain.update(loading);
+    }
 
     bool altPressed = getKeyState(SDL_SCANCODE_LALT) == KEY_PRESSED ||
                       getKeyState(SDL_SCANCODE_RALT) == KEY_PRESSED;
@@ -1476,12 +1615,15 @@ void mainMenuDraw()
     // Main menu
     else if(MenuMode == MENU_MAIN)
     {
+#if 0
         SuperPrint(g_mainMenu.main1PlayerGame, 3, 300, 350);
         SuperPrint(g_mainMenu.main2PlayerGame, 3, 300, 380);
         SuperPrint(g_mainMenu.mainBattleGame, 3, 300, 410);
         SuperPrint(g_mainMenu.mainOptions, 3, 300, 440);
         SuperPrint(g_mainMenu.mainExit, 3, 300, 470);
         frmMain.renderTexture(300 - 20, 350 + (MenuCursor * 30), 16, 16, GFX.MCursor[0], 0, 0);
+#endif
+        s_menuMain.renderMenu();
     }
 
     // Character select
