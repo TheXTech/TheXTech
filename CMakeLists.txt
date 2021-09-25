@@ -290,7 +290,7 @@ set(THEXTECH_SRC
     src/main/level_file.cpp
     src/main/menu_loop.cpp
     src/main/menu_main.cpp
-    src/main/menu_playerselect.cpp
+    src/main/menu_connectscreen.cpp
     src/main/menu_controls.cpp
     src/main/cheat_code.cpp
     src/main/outro_loop.cpp
