@@ -7,7 +7,7 @@ extern int g_charSelect[maxLocalPlayers];
 namespace ConnectScreen
 {
 
-void StartGame_Start(int minPlayers);
+void MainMenu_Start(int minPlayers);
 void Reconnect_Start();
 void DropAdd_Start();
 

@@ -6,7 +6,7 @@
 #include "../globals.h"
 #include "../graphics.h"
 
-#include "menu_playerselect.h"
+#include "menu_connectscreen.h"
 #include "menu_main.h"
 
 int g_charSelect[maxLocalPlayers] = {0};
@@ -14,31 +14,31 @@ int g_charSelect[maxLocalPlayers] = {0};
 namespace ConnectScreen
 {
 
-enum class PlayerState : int
+enum class PlayerState
 {
-    Disconnected;
-    ChoosePlayer;
-    SelectChar;
-    ConfirmProfile;
-    TestControls;
-    StartGame;
+    Disconnected,
+    ChoosePlayer,
+    SelectChar,
+    ConfirmProfile,
+    TestControls,
+    StartGame
 };
 
-enum class Context : int
+enum class Context
 {
-    MainMenu;
-    Reconnect;
-    DropAdd;
+    MainMenu,
+    Reconnect,
+    DropAdd
 };
 
-static PlayerState s_playerState[maxLocalPlayers] = {false};
+static PlayerState s_playerState[maxLocalPlayers] = {PlayerState::Disconnected};
 static int s_menuItem[maxLocalPlayers] = {0};
 static bool s_inputReady[maxLocalPlayers] = {false};
 static int s_lastNumInputs = 0;
 static int s_minPlayers = 1;
 static Context s_context;
 
-void StartGame_Start(int minPlayers)
+void MainMenu_Start(int minPlayers)
 {
     Controls::ClearInputMethods();
     s_minPlayers = minPlayers;
@@ -49,7 +49,7 @@ void StartGame_Start(int minPlayers)
         s_menuItem[i] = 0;
         s_inputReady[i] = false;
     }
-    s_context = MainMenu;
+    s_context = Context::MainMenu;
     s_lastNumInputs = Controls::g_InputMethods.size();
 }
 
@@ -146,12 +146,12 @@ bool Player_Select(int p)
     {
         g_charSelect[p] = s_menuItem[p]+1;
         s_playerState[p] = PlayerState::StartGame;
-        if(CheckDone(s_minPlayers))
+        if(CheckDone())
             return true;
     }
     else if(s_playerState[p] == PlayerState::StartGame)
     {
-        if(CheckDone(s_minPlayers))
+        if(CheckDone())
             return true;
     }
 
@@ -164,7 +164,7 @@ void Player_Back(int p)
     s_inputReady[p] = false;
     if(s_playerState[p] == PlayerState::SelectChar)
     {
-        DeleteInputMethod(g_InputMethods[p]);
+        DeleteInputMethod(Controls::g_InputMethods[p]);
         s_playerState[p] = PlayerState::Disconnected;
         return;
     }
@@ -212,7 +212,7 @@ void Player_Down(int p)
     }
 }
 
-void Player_MouseItem(int p, int i)
+bool Player_MouseItem(int p, int i)
 {
     if(s_menuItem[p] != i)
     {
@@ -222,13 +222,16 @@ void Player_MouseItem(int p, int i)
 
     if(MenuMouseRelease && MenuMouseDown)
     {
-        Player_Select(p);
         MenuMouseRelease = false;
+        return Player_Select(p);
     }
+
+    return false;
 }
 
 bool Player_Mouse_Render(int p, int pX, int cX, int pW, int sY, int line, bool mouse, bool render)
 {
+    bool ret = false;
 
     // render the player's header
 
@@ -244,20 +247,20 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pW, int sY, int line, bool m
     {
         if(render)
             SuperPrintCenter(g_mainMenu.playerSelAttachController, 3, cX, sY+7*line);
-        return;
+        return ret;
     }
 
     // show the menu cursor for the player
     if(render)
     {
         if(s_menuItem[p] >= 0)
-            frmMain.renderTexture(lX - 20, sY+(4+s_menuItem[p])*line, GFX.MCursor[0]);
+            frmMain.renderTexture(pX - 20, sY+(4+s_menuItem[p])*line, GFX.MCursor[0]);
         else
-            frmMain.renderTexture(lX - 20, sY+(14+s_menuItem[p])*line, GFX.MCursor[0]);
+            frmMain.renderTexture(pX - 20, sY+(14+s_menuItem[p])*line, GFX.MCursor[0]);
     }
 
     // render the character select screen
-    if(p == 0 && s_playerState[p] == PlayerState::Disconnected
+    if((p == 0 && s_playerState[p] == PlayerState::Disconnected)
         || s_playerState[p] == PlayerState::SelectChar)
     {
         Player_ValidateChar(p);
@@ -269,25 +272,26 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pW, int sY, int line, bool m
             if(mouse)
             {
                 int menuLen = g_mainMenu.selectPlayer[c+1].size() * 18;
-                if(MenuMouseX >= lX && MenuMouseX <= lX + menuLen
+                if(MenuMouseX >= pX && MenuMouseX <= pX + menuLen
                     && MenuMouseY >= sY+(4+c)*line && MenuMouseY <= sY+(4+c)*line + 16)
                 {
-                    Player_MouseItem(p, c);
+                    ret |= Player_MouseItem(p, c);
                 }
             }
             if(render)
             {
-                SuperPrint(g_mainMenu.selectPlayer[c+1], 3, lX, sY+(4+c)*line);
+                SuperPrint(g_mainMenu.selectPlayer[c+1], 3, pX, sY+(4+c)*line);
             }
         }
     }
 
     // only happens when first player is connecting
-    if(s_playerState[p] == PlayerState::Disconnected || p >= g_InputMethods.size() || !g_InputMethods[p])
+    if(s_playerState[p] == PlayerState::Disconnected
+        || p >= (int)Controls::g_InputMethods.size() || !Controls::g_InputMethods[p])
     {
         if(render)
             SuperPrintCenter(g_mainMenu.playerSelAttachController, 3, cX, sY+11*line);
-        return;
+        return ret;
     }
 
     // global information about controller
@@ -305,16 +309,17 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pW, int sY, int line, bool m
     }
     if(mouse)
     {
-        if(MenuMouseX >= lX && MenuMouseX <= lX+pW)
+        if(MenuMouseX >= pX && MenuMouseX <= pX+pW)
         {
             if(MenuMouseY >= sY+11*line && MenuMouseY <= sY+11*line + 16)
-                Player_MouseItem(p, -3);
+                ret |= Player_MouseItem(p, -3);
             if(MenuMouseY >= sY+12*line && MenuMouseY <= sY+12*line + 16)
-                Player_MouseItem(p, -2);
+                ret |= Player_MouseItem(p, -2);
             if(MenuMouseY >= sY+13*line && MenuMouseY <= sY+13*line + 16)
-                Player_MouseItem(p, -1);
+                ret |= Player_MouseItem(p, -1);
         }
     }
+    return ret;
 }
 
 int Mouse_Render(bool mouse, bool render)
@@ -399,7 +404,8 @@ int Mouse_Render(bool mouse, bool render)
 
     if(render)
     {
-        SuperPrintScreenCenter(g_mainMenu.playerSelTitle, 3, sY);
+        if(s_context == Context::MainMenu)
+            SuperPrintScreenCenter(g_mainMenu.charSelTitle, 3, sY);
     }
 
     for(int p = 0; p < n; p++)
@@ -466,7 +472,7 @@ int Logic()
 
         // if player doesn't exist, or was lost *not on menu screen*
         if(p >= (int)Controls::g_InputMethods.size()
-            || (!Controls::g_InputMethods[p] && s_context != Context::MenuScreen))
+            || (!Controls::g_InputMethods[p] && s_context != Context::MainMenu))
         {
             s_playerState[p] = PlayerState::Disconnected;
             g_charSelect[p] = 0;
@@ -535,7 +541,7 @@ int Logic()
         }
     }
 
-    return menuPlayerSelect_MouseLogic();
+    return MouseLogic();
 }
 
 void Render()

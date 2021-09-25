@@ -233,7 +233,8 @@ int menuControls_Mouse_Render(bool mouse, bool render)
                 // should never be null
                 if(Controls::g_InputMethods[p]->Profile != nullptr)
                     SuperPrintCenter(Controls::g_InputMethods[p]->Profile->Name, 3, cX, sY+(max_line-2)*line);
-                SuperPrintCenter(g_mainMenu.rotateProfileMessage, 3, cX, sY+(max_line-1)*line);
+                // (get rid of rotation soon)
+                // SuperPrintCenter(g_mainMenu.rotateProfileMessage, 3, cX, sY+(max_line-1)*line);
             }
         }
     }

@@ -30,7 +30,7 @@
 
 #include "menu_main.h"
 #include "game_info.h"
-#include "menu_playerselect.h"
+#include "menu_connectscreen.h"
 #include "menu_controls.h"
 
 #include "speedrunner.h"
@@ -513,7 +513,7 @@ bool mainMenuUpdate()
         else if(MenuMode == MENU_CHARACTER_SELECT_NEW ||
                 MenuMode == MENU_CHARACTER_SELECT_NEW_BM)
         {
-            int ret = menuPlayerSelect_Logic(menuPlayersNum);
+            int ret = ConnectScreen::Logic();
             if(ret == -1)
             {
                 if(MenuMode == MENU_CHARACTER_SELECT_NEW_BM)
@@ -806,7 +806,7 @@ bool mainMenuUpdate()
                         if(MenuMode == MENU_BATTLE_MODE)
                         {
                             MenuMode = MENU_CHARACTER_SELECT_NEW_BM;
-                            menuPlayerSelect_Start();
+                            ConnectScreen::MainMenu_Start(2);
                         }
                         else
                         {
@@ -886,8 +886,11 @@ bool mainMenuUpdate()
                     else if(MenuCursor >= 0 && MenuCursor <= 2) // Select the save slot, but still need to select players
                     {
                         selSave = MenuCursor + 1;
+                        if(MenuMode == MENU_SELECT_SLOT_2P)
+                            ConnectScreen::MainMenu_Start(2);
+                        else
+                            ConnectScreen::MainMenu_Start(1);
                         MenuMode = MENU_CHARACTER_SELECT_NEW;
-                        menuPlayerSelect_Start();
                         MenuCursorCanMove = false;
                     }
                     else if(MenuCursor == 3) // Copy the gamesave
@@ -1274,7 +1277,7 @@ void mainMenuDraw()
     else if(MenuMode == MENU_CHARACTER_SELECT_NEW ||
             MenuMode == MENU_CHARACTER_SELECT_NEW_BM)
     {
-        menuPlayerSelect_Render(menuPlayersNum);
+        ConnectScreen::Render();
     }
     else if(MenuMode == MENU_CHARACTER_SELECT_1P ||
             MenuMode == MENU_CHARACTER_SELECT_2P_S1 ||
