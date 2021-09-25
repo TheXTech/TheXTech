@@ -81,7 +81,7 @@ void initMainMenu()
     g_mainMenu.playerSelAttachController = "Press A Button";
     g_mainMenu.phraseTestControls = "Test Controls";
     g_mainMenu.wordDisconnect = "Disconnect";
-    g_mainMenu.phraseHoldStartToReturn = "Hold Start To Return";
+    g_mainMenu.phraseHoldStartToReturn = "Hold Start";
     g_mainMenu.wordBack = "Back";
     g_mainMenu.wordResume = "Resume";
     g_mainMenu.wordWaiting = "Waiting";

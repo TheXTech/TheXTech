@@ -77,7 +77,7 @@ void speedRun_resetTotal()
 #define bool2yellow(b) (b ? 1.f : 0.0f), (b ? 1.f : 0.0f),  0.f
 #define bool2gray(b) (b ? 0.9f : 0.0f), (b ? 0.9f : 0.0f),  (b ? 0.9f : 0.0f)
 
-static Controls_t s_displayControls[2] = {Controls_t()};
+static Controls_t s_displayControls[maxLocalPlayers] = {Controls_t()};
 
 
 void speedRun_renderTimer()
@@ -93,72 +93,11 @@ void speedRun_renderTimer()
     SuperPrintRightAlign(fmt::format_ne("Mode {0}", g_speedRunnerMode), 3, ScreenW - 2, 2, 1.f, 0.3f, 0.3f, 0.5f);
 }
 
-void speedRun_renderControls(int player, int screenZ)
+static void GetControllerColor(int player, float& r, float& g, float& b, bool* drawLabel = nullptr)
 {
-    if(g_speedRunnerMode == SPEEDRUN_MODE_OFF && !g_drawController)
-        return; // Do nothing
-
-    if(GameMenu || GameOutro || BattleMode)
-        return; // Don't draw things at Menu and Outro
-
-    if(player < 1 || player > 2)
-        return;
-
-    // Controller
-    int x = 4;
-    int y = ScreenH - 34;
-    int w = 76;
-    int h = 30;
-
-    // Battery status
-    int bx = x + w + 4;
-    int by = y + 4;
-    int bw = 40;
-    int bh = 22;
-
-    bool drawLabel = false;
-
-    if(screenZ >= 0)
-    {
-        auto &scr = vScreen[screenZ];
-        x = scr.Left > 0 ? (int)(scr.Left + scr.Width) - (w + 4) : (int)scr.Left + 4;
-        y = (int)(scr.Top + scr.Height) - 34;
-        bx = scr.Left > 0 ? x - (bw + 4) : (x + w + 4);
-        by = y + 4;
-    }
-    else
-    {
-#if 0
-        bool firstLefter =   Player[1].Location.X + (Player[1].Location.Width / 2)
-                           < Player[2].Location.X + (Player[2].Location.Width / 2);
-
-        switch(player)
-        {
-        case 1:
-            x = firstLefter ? 4 : (ScreenW - (w + 4));
-            break;
-        case 2:
-            x = firstLefter ? (ScreenW - (w + 4)) : 4;
-            break;
-        }
-#else
-        switch(player)
-        {
-        case 1:
-            x = 4;
-            bx = x + w + 4;
-            break;
-        case 2:
-            x = (ScreenW - (w + 4));
-            bx = x - (bw + 4);
-            break;
-        }
-#endif
-    }
-
-    float alhpa = 0.7f;
-    float alhpaB = 0.8f;
-    float r = 0.4f, g = 0.4f, b = 0.4f;
+    r = 0.4f; g = 0.4f; b = 0.4f;
+    if(drawLabel)
+        *drawLabel = false;
 
     if(ScreenType == 5)  // TODO: VERIFY THIS
     {
@@ -193,14 +132,27 @@ void speedRun_renderControls(int player, int screenZ)
             break;
         }
 
-        drawLabel = true;
+        if(drawLabel)
+            *drawLabel = true;
     }
+}
 
-    const auto &c = s_displayControls[player - 1];
+void RenderControls(int player, int x, int y, int w, int h)
+{
+    float alhpa = 0.7f;
+    float alhpaB = 0.8f;
+    float r, g, b;
+    bool drawLabel;
+
+    GetControllerColor(player, r, g, b, &drawLabel);
 
     frmMain.renderRect(x, y, w, h, 0.f, 0.f, 0.f, alhpa, true);//Edge
     frmMain.renderRect(x + 2, y + 2, w - 4, h - 4, r, g, b, alhpa, true);//Box
 
+    if(0 > player || player >= maxLocalPlayers)
+        return;
+
+    const Controls_t& c = s_displayControls[player];
     frmMain.renderRect(x + 10, y + 12, 6, 6, 0.f, 0.f, 0.f, alhpaB, true);//Cender of D-Pad
     frmMain.renderRect(x + 10, y + 6, 6, 6, bool2gray(c.Up), alhpaB, true);
     frmMain.renderRect(x + 10, y + 18, 6, 6, bool2gray(c.Down), alhpaB, true);
@@ -217,6 +169,15 @@ void speedRun_renderControls(int player, int screenZ)
 
     if(drawLabel)
         SuperPrint(fmt::format_ne("P{0}", player), 3, x + 22, y + 2, 1.f, 1.f, 1.f, 0.5f);
+}
+
+void RenderControllerBattery(int player, int bx, int by, int bw, int bh)
+{
+    float alhpa = 0.7f;
+    float alhpaB = 0.8f;
+    float r, g, b;
+
+    GetControllerColor(player, r, g, b);
 
     Controls::StatusInfo status_info = Controls::GetStatus(player);
 
@@ -257,6 +218,72 @@ void speedRun_renderControls(int player, int screenZ)
             break;
         }
     }
+}
+
+void speedRun_renderControls(int player, int screenZ)
+{
+    if(g_speedRunnerMode == SPEEDRUN_MODE_OFF && !g_drawController)
+        return; // Do nothing
+
+    if(GameMenu || GameOutro || BattleMode)
+        return; // Don't draw things at Menu and Outro
+
+    if(player < 1 || player > 2)
+        return;
+
+    // Controller
+    int x = 4;
+    int y = ScreenH - 34;
+    int w = 76;
+    int h = 30;
+
+    // Battery status
+    int bx = x + w + 4;
+    int by = y + 4;
+    int bw = 40;
+    int bh = 22;
+
+    if(screenZ >= 0)
+    {
+        auto &scr = vScreen[screenZ];
+        x = scr.Left > 0 ? (int)(scr.Left + scr.Width) - (w + 4) : (int)scr.Left + 4;
+        y = (int)(scr.Top + scr.Height) - 34;
+        bx = scr.Left > 0 ? x - (bw + 4) : (x + w + 4);
+        by = y + 4;
+    }
+    else
+    {
+#if 0
+        bool firstLefter =   Player[1].Location.X + (Player[1].Location.Width / 2)
+                           < Player[2].Location.X + (Player[2].Location.Width / 2);
+
+        switch(player)
+        {
+        case 1:
+            x = firstLefter ? 4 : (ScreenW - (w + 4));
+            break;
+        case 2:
+            x = firstLefter ? (ScreenW - (w + 4)) : 4;
+            break;
+        }
+#else
+        switch(player)
+        {
+        case 1:
+            x = 4;
+            bx = x + w + 4;
+            break;
+        case 2:
+            x = (ScreenW - (w + 4));
+            bx = x - (bw + 4);
+            break;
+        }
+#endif
+    }
+
+    RenderControls(player, x, y, w, h);
+
+    RenderControllerBattery(player, bx, by, bw, bh);
 }
 
 #undef bool2alpha
@@ -313,11 +340,12 @@ void speedRun_setSemitransparentRender(bool r)
     s_gamePlayTimer.setSemitransparent(r);
 }
 
-void speedRun_syncControlKeys(int plr, Controls_t &keys)
+void speedRun_syncControlKeys(int plr, const Controls_t &keys)
 {
-    if(g_speedRunnerMode == SPEEDRUN_MODE_OFF && !g_drawController)
-        return; // Do nothing
+    // there are still reasons to sync control keys (eg control tests)
+    // if(g_speedRunnerMode == SPEEDRUN_MODE_OFF && !g_drawController)
+    //     return; // Do nothing
 
-    SDL_assert(plr >= 0 && plr < 2);
+    SDL_assert(plr >= 0 && plr < maxLocalPlayers);
     SDL_memcpy(&s_displayControls[plr], &keys, sizeof(Controls_t));
 }

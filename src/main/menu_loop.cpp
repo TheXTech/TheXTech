@@ -471,7 +471,9 @@ static void updateIntroLevelActivity()
 
 void MenuLoop()
 {
-    Controls::PollInputMethod();
+    // ConnectScreen handles its own input method polling
+    if(MenuMode != MENU_CHARACTER_SELECT_NEW)
+        Controls::PollInputMethod();
     Controls::Update();
 
     if(mainMenuUpdate())
