@@ -1,17 +1,24 @@
-#ifndef MENU_PLAYERSELECT_H
+#ifndef MENU_CONNECTSCREEN_H
 
-#define MENU_PLAYERSELECT_H
+#define MENU_CONNECTSCREEN_H
 
 extern int g_charSelect[maxLocalPlayers];
 
-void menuPlayerSelect_Start();
-void menuPlayerSelect_Resume();
-void menuPlayerSelect_Render(int minPlayers);
+namespace ConnectScreen
+{
+
+void StartGame_Start(int minPlayers);
+void Reconnect_Start();
+void DropAdd_Start();
+
+void Render();
 
 // return values:
 // -1 back
 // 0 continue
 // 1 next
-int menuPlayerSelect_Logic(int minPlayers);
+int Logic();
 
-#endif // MENU_PLAYERSELECT_H
+} // namespace ConnectScreen
+
+#endif // MENU_CONNECTSCREEN_H

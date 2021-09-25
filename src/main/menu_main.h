@@ -89,13 +89,26 @@ struct MainMenuContent
 
     RangeArr<std::string, 1, numCharacters> selectPlayer;
 
-    std::string playerSelTitle;
+    // ConnectScreen
+    std::string charSelTitle;
+    std::string reconnectTitle;
+    std::string dropAddTitle;
     std::string wordPlayer;
     std::string wordProfile;
     std::string playerSelStartGame;
     std::string playerSelAttachController;
-    std::string rotateProfileMessage;
+    std::string phraseTestControls;
+    std::string wordDisconnect;
+    std::string phraseHoldStartToReturn;
+    std::string wordBack;
+    std::string wordResume;
+    std::string wordWaiting;
+    std::string phraseForceResume;
+    std::string phraseDropOthers;
+    std::string phraseDropSelf;
+    std::string phraseChangeChar;
 
+    // Controls menus
     std::string controlsTitle;
     std::string controlsConnected;
     std::string controlsDeleteKey;

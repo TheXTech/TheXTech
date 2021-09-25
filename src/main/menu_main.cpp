@@ -72,12 +72,23 @@ void initMainMenu()
     for(int i = 1; i <= numCharacters; ++i)
         g_mainMenu.selectPlayer[i] = fmt::format_ne("{0} game", g_gameInfo.characterName[i]);
 
-    g_mainMenu.playerSelTitle = "Character Select";
+    g_mainMenu.charSelTitle = "Character Select";
+    g_mainMenu.reconnectTitle = "Reconnect";
+    g_mainMenu.dropAddTitle = "Drop/Add Players";
     g_mainMenu.wordPlayer = "Player";
     g_mainMenu.wordProfile = "Profile";
     g_mainMenu.playerSelStartGame = "Start Game";
     g_mainMenu.playerSelAttachController = "Press A Button";
-    g_mainMenu.rotateProfileMessage = "(L/R Rotate)";
+    g_mainMenu.phraseTestControls = "Test Controls";
+    g_mainMenu.wordDisconnect = "Disconnect";
+    g_mainMenu.phraseHoldStartToReturn = "Hold Start To Return";
+    g_mainMenu.wordBack = "Back";
+    g_mainMenu.wordResume = "Resume";
+    g_mainMenu.wordWaiting = "Waiting";
+    g_mainMenu.phraseForceResume = "Force Resume";
+    g_mainMenu.phraseDropOthers = "Drop Others";
+    g_mainMenu.phraseDropSelf = "Drop Self";
+    g_mainMenu.phraseChangeChar = "Change Character";
 
     g_mainMenu.controlsTitle = "Controls";
     g_mainMenu.controlsConnected = "Connected:";

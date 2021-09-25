@@ -657,6 +657,8 @@ InputMethod* PollInputMethod() noexcept
 
 void DeleteInputMethod(InputMethod* method)
 {
+    if(!method)
+        return;
     std::vector<InputMethod*>::iterator loc
         = std::find(g_InputMethods.begin(), g_InputMethods.end(), method);
     while(loc != g_InputMethods.end())

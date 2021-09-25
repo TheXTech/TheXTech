@@ -6,36 +6,63 @@
 #include "../globals.h"
 #include "../graphics.h"
 
+#include "menu_playerselect.h"
 #include "menu_main.h"
-
-static bool s_charSelectDone[maxLocalPlayers] = {false};
-static bool s_inputReady[maxLocalPlayers] = {false};
-static int s_lastNumInputs = 0;
 
 int g_charSelect[maxLocalPlayers] = {0};
 
-void menuPlayerSelect_Start()
+namespace ConnectScreen
+{
+
+enum class PlayerState : int
+{
+    Disconnected;
+    ChoosePlayer;
+    SelectChar;
+    ConfirmProfile;
+    TestControls;
+    StartGame;
+};
+
+enum class Context : int
+{
+    MainMenu;
+    Reconnect;
+    DropAdd;
+};
+
+static PlayerState s_playerState[maxLocalPlayers] = {false};
+static int s_menuItem[maxLocalPlayers] = {0};
+static bool s_inputReady[maxLocalPlayers] = {false};
+static int s_lastNumInputs = 0;
+static int s_minPlayers = 1;
+static Context s_context;
+
+void StartGame_Start(int minPlayers)
 {
     Controls::ClearInputMethods();
+    s_minPlayers = minPlayers;
     for(int i = 0; i < maxLocalPlayers; i++)
     {
         g_charSelect[i] = 0;
-        s_charSelectDone[i] = false;
+        s_playerState[i] = PlayerState::Disconnected;
+        s_menuItem[i] = 0;
         s_inputReady[i] = false;
     }
+    s_context = MainMenu;
     s_lastNumInputs = Controls::g_InputMethods.size();
 }
 
-void menuPlayerSelect_Resume()
-{
-    for(int i = 0; i < maxLocalPlayers; i++)
-    {
-        s_inputReady[i] = false;
-    }
-    s_lastNumInputs = Controls::g_InputMethods.size();
-}
+// void menuPlayerSelect_Resume()
+// {
+//     for(int i = 0; i < maxLocalPlayers; i++)
+//     {
+//         s_inputReady[i] = false;
+//     }
+//     s_lastNumInputs = Controls::g_InputMethods.size();
+// }
 
-bool charAvailable(int c)
+bool CharAvailable(int c)
 {
     if(c < 1 || c > 5)
         return false;
@@ -45,18 +72,18 @@ bool charAvailable(int c)
     {
         if(i == (int)Controls::g_InputMethods.size())
             break;
-        if(s_charSelectDone[i] && g_charSelect[i] == c)
+        if(g_charSelect[i] == c)
             return false;
     }
     return true;
 }
 
 
-bool menuPlayerSelect_CheckDone(int minPlayers)
+bool CheckDone()
 {
     int n = Controls::g_InputMethods.size();
-    if(n < minPlayers)
-        n = minPlayers;
+    if(n < s_minPlayers)
+        n = s_minPlayers;
     if(n > maxLocalPlayers)
         n = maxLocalPlayers;
 
@@ -64,11 +91,11 @@ bool menuPlayerSelect_CheckDone(int minPlayers)
     int menuPlayer;
     for(menuPlayer = 0; menuPlayer < n; menuPlayer++)
     {
-        if(!s_charSelectDone[menuPlayer])
+        if(s_playerState[menuPlayer] != PlayerState::StartGame)
             break;
     }
 
-    if(menuPlayer >= minPlayers && (int)Controls::g_InputMethods.size() >= minPlayers
+    if(menuPlayer >= s_minPlayers && (int)Controls::g_InputMethods.size() >= s_minPlayers
         && (menuPlayer == (int)Controls::g_InputMethods.size() || menuPlayer == maxLocalPlayers))
     {
         // everyone is done!
@@ -78,14 +105,226 @@ bool menuPlayerSelect_CheckDone(int minPlayers)
     return false;
 }
 
-int menuPlayerSelect_Mouse_Render(bool mouse, bool render, int minPlayers)
+void Player_ValidateChar(int p)
+{
+    // ensure that each character's selection is still valid
+    if(s_playerState[p] == PlayerState::SelectChar)
+    {
+        for(int i = 0; i < 5; i++)
+        {
+            if(CharAvailable(s_menuItem[p]+1))
+                break;
+            s_menuItem[p] ++;
+            if(s_menuItem[p] == 5)
+                s_menuItem[p] = 0;
+        }
+    }
+}
+
+bool Player_Remove(int p)
+{
+    Controls::DeleteInputMethodSlot(p);
+    s_lastNumInputs -= 1;
+    for(int p2 = p; p2+1 < maxLocalPlayers; p2++)
+    {
+        g_charSelect[p2] = g_charSelect[p2+1];
+        s_playerState[p2] = s_playerState[p2+1];
+        s_menuItem[p2] = s_menuItem[p2+1];
+        s_inputReady[p2] = s_inputReady[p2+1];
+    }
+    // in drop-add, will need to take even more drastic actions
+
+    if(Controls::g_InputMethods.empty())
+        return true;
+    return false;
+}
+
+bool Player_Select(int p)
+{
+    s_inputReady[p] = false;
+    if(s_playerState[p] == PlayerState::SelectChar)
+    {
+        g_charSelect[p] = s_menuItem[p]+1;
+        s_playerState[p] = PlayerState::StartGame;
+        if(CheckDone(s_minPlayers))
+            return true;
+    }
+    else if(s_playerState[p] == PlayerState::StartGame)
+    {
+        if(CheckDone(s_minPlayers))
+            return true;
+    }
+
+    PlaySoundMenu(SFX_Do);
+    return false;
+}
+
+void Player_Back(int p)
+{
+    s_inputReady[p] = false;
+    if(s_playerState[p] == PlayerState::SelectChar)
+    {
+        DeleteInputMethod(g_InputMethods[p]);
+        s_playerState[p] = PlayerState::Disconnected;
+        return;
+    }
+
+    PlaySoundMenu(SFX_Slide);
+    if(s_playerState[p] == PlayerState::StartGame)
+    {
+        s_playerState[p] = PlayerState::SelectChar;
+        s_menuItem[p] = g_charSelect[p] - 1;
+        g_charSelect[p] = 0;
+    }
+}
+
+void Player_Up(int p)
+{
+    s_inputReady[p] = false;
+    if(s_playerState[p] == PlayerState::SelectChar)
+    {
+        PlaySoundMenu(SFX_Slide);
+        for(int i = 0; i < 6; i++)
+        {
+            s_menuItem[p] ++;
+            if(s_menuItem[p] == 5)
+                s_menuItem[p] = -3;
+            if(s_menuItem[p] < 0 || CharAvailable(g_charSelect[p]+1))
+                break;
+        }
+    }
+}
+
+void Player_Down(int p)
+{
+    s_inputReady[p] = false;
+    if(s_playerState[p] == PlayerState::SelectChar)
+    {
+        PlaySoundMenu(SFX_Slide);
+        for(int i = 0; i < 6; i++)
+        {
+            if(s_menuItem[p] == -3)
+                s_menuItem[p] = 5;
+            s_menuItem[p] --;
+            if(s_menuItem[p] < 0 || CharAvailable(g_charSelect[p]+1))
+                break;
+        }
+    }
+}
+
+void Player_MouseItem(int p, int i)
+{
+    if(s_menuItem[p] != i)
+    {
+        PlaySoundMenu(SFX_Slide);
+        s_menuItem[p] = i;
+    }
+
+    if(MenuMouseRelease && MenuMouseDown)
+    {
+        Player_Select(p);
+        MenuMouseRelease = false;
+    }
+}
+
+bool Player_Mouse_Render(int p, int pX, int cX, int pW, int sY, int line, bool mouse, bool render)
+{
+
+    // render the player's header
+
+    if(render)
+    {
+        SuperPrintCenter(fmt::format_ne("{0} {1}", g_mainMenu.wordPlayer, p+1), 3, cX, sY+2*line);
+    }
+
+    // now render / process the player's menu as appropriate to its case
+
+    // if player is disconnected, show the attach controller message and return
+    if(p != 0 && s_playerState[p] == PlayerState::Disconnected)
+    {
+        if(render)
+            SuperPrintCenter(g_mainMenu.playerSelAttachController, 3, cX, sY+7*line);
+        return;
+    }
+
+    // show the menu cursor for the player
+    if(render)
+    {
+        if(s_menuItem[p] >= 0)
+            frmMain.renderTexture(lX - 20, sY+(4+s_menuItem[p])*line, GFX.MCursor[0]);
+        else
+            frmMain.renderTexture(lX - 20, sY+(14+s_menuItem[p])*line, GFX.MCursor[0]);
+    }
+
+    // render the character select screen
+    if(p == 0 && s_playerState[p] == PlayerState::Disconnected
+        || s_playerState[p] == PlayerState::SelectChar)
+    {
+        Player_ValidateChar(p);
+        for(int c = 0; c < 5; c++)
+        {
+            // don't render/mouse unavailable chars
+            if(!CharAvailable(c+1))
+                continue;
+            if(mouse)
+            {
+                int menuLen = g_mainMenu.selectPlayer[c+1].size() * 18;
+                if(MenuMouseX >= lX && MenuMouseX <= lX + menuLen
+                    && MenuMouseY >= sY+(4+c)*line && MenuMouseY <= sY+(4+c)*line + 16)
+                {
+                    Player_MouseItem(p, c);
+                }
+            }
+            if(render)
+            {
+                SuperPrint(g_mainMenu.selectPlayer[c+1], 3, lX, sY+(4+c)*line);
+            }
+        }
+    }
+
+    // only happens when first player is connecting
+    if(s_playerState[p] == PlayerState::Disconnected || p >= g_InputMethods.size() || !g_InputMethods[p])
+    {
+        if(render)
+            SuperPrintCenter(g_mainMenu.playerSelAttachController, 3, cX, sY+11*line);
+        return;
+    }
+
+    // global information about controller
+    if(render)
+        SuperPrintCenter(Controls::g_InputMethods[p]->Name, 3, cX, sY+10*line);
+    if(render)
+    {
+        // should never be null
+        if(Controls::g_InputMethods[p]->Profile != nullptr)
+            SuperPrintCenter(Controls::g_InputMethods[p]->Profile->Name, 3, cX, sY+11*line);
+        else
+            SuperPrintCenter(g_mainMenu.wordProfile, 3, cX, sY+11*line);
+        SuperPrintCenter(g_mainMenu.phraseTestControls, 3, cX, sY+12*line);
+        SuperPrintCenter(g_mainMenu.wordDisconnect, 3, cX, sY+13*line);
+    }
+    if(mouse)
+    {
+        if(MenuMouseX >= lX && MenuMouseX <= lX+pW)
+        {
+            if(MenuMouseY >= sY+11*line && MenuMouseY <= sY+11*line + 16)
+                Player_MouseItem(p, -3);
+            if(MenuMouseY >= sY+12*line && MenuMouseY <= sY+12*line + 16)
+                Player_MouseItem(p, -2);
+            if(MenuMouseY >= sY+13*line && MenuMouseY <= sY+13*line + 16)
+                Player_MouseItem(p, -1);
+        }
+    }
+}
+
+int Mouse_Render(bool mouse, bool render)
 {
     if(mouse && !MenuMouseMove && !render && !MenuMouseDown)
         return 0;
 
     int n = Controls::g_InputMethods.size();
-    if(n < minPlayers)
-        n = minPlayers;
+    if(n < s_minPlayers)
+        n = s_minPlayers;
     if(n > maxLocalPlayers)
         n = maxLocalPlayers;
 
@@ -93,7 +332,7 @@ int menuPlayerSelect_Mouse_Render(bool mouse, bool render, int minPlayers)
     int menuPlayer;
     for(menuPlayer = 0; menuPlayer < n; menuPlayer++)
     {
-        if(!s_charSelectDone[menuPlayer])
+        if(s_playerState[menuPlayer] != PlayerState::StartGame)
             break;
     }
 
@@ -165,23 +404,11 @@ int menuPlayerSelect_Mouse_Render(bool mouse, bool render, int minPlayers)
 
     for(int p = 0; p < n; p++)
     {
-        // ensure that each character's selection is still valid
-        if(!s_charSelectDone[p])
-        {
-            for(int i = 0; i < 5; i++)
-            {
-                if(charAvailable(g_charSelect[p]))
-                    break;
-                g_charSelect[p] ++;
-                if(g_charSelect[p] == 6)
-                    g_charSelect[p] = 1;
-            }
-        }
-
-        int lX = sX + p * p_width;
-        int cX = lX + p_width / 2;
+        // locate player's screen
         // lX is the position of aligned text
         // cX is the position of centered (possibly long) text
+        int lX = sX + p * p_width;
+        int cX = lX + p_width / 2;
         if(p_width > min_width)
         {
             lX += (p_width - min_width) / 2;
@@ -189,73 +416,10 @@ int menuPlayerSelect_Mouse_Render(bool mouse, bool render, int minPlayers)
         lX -= lX & 1;
         cX -= cX & 1;
 
-        if(render)
-        {
-            SuperPrintCenter(fmt::format_ne("{0} {1}", g_mainMenu.wordPlayer, p+1), 3, cX, sY+2*line);
-        }
-
-        if(p != 0 && p >= (int)Controls::g_InputMethods.size())
-        {
-            if(render)
-            {
-                SuperPrintCenter(g_mainMenu.playerSelAttachController, 3, cX, sY+7*line);
-            }
-            continue;
-        }
-
-        for(int c = 1; c < 6; c++)
-        {
-            // don't render/mouse unavailable chars, or ones the player didn't pick
-            if((!charAvailable(c) || s_charSelectDone[p]) && g_charSelect[p] != c)
-                continue;
-            if(mouse && !s_charSelectDone[p])
-            {
-                int menuLen = g_mainMenu.selectPlayer[c].size() * 18;
-                if(MenuMouseX >= lX && MenuMouseX <= lX + menuLen
-                    && MenuMouseY >= sY+(4+c-1)*line && MenuMouseY <= sY+(4+c-1)*line + 16)
-                {
-                    if(g_charSelect[p] != c)
-                    {
-                        PlaySoundMenu(SFX_Slide);
-                        g_charSelect[p] = c;
-                    }
-
-                    if(MenuMouseRelease && MenuMouseDown)
-                    {
-                        PlaySoundMenu(SFX_Do);
-                        s_charSelectDone[p] = true;
-                        MenuMouseRelease = false;
-                    }
-                }
-            }
-            if(render)
-            {
-                SuperPrint(g_mainMenu.selectPlayer[c], 3, lX, sY+(4+c-1)*line);
-                if(g_charSelect[p] == c)
-                    frmMain.renderTexture(lX - 20, sY+(4+c-1)*line, GFX.MCursor[0]);
-            }
-        }
-
-        if(render)
-        {
-            // only happens when first player is connecting
-            if(p >= (int)Controls::g_InputMethods.size() || Controls::g_InputMethods[p] == nullptr)
-            {
-                SuperPrintCenter(g_mainMenu.playerSelAttachController, 3, cX, sY+11*line);
-                continue;
-            }
-
-            SuperPrintCenter(Controls::g_InputMethods[p]->Name, 3, cX, sY+10*line);
-            SuperPrintCenter(g_mainMenu.wordProfile + ":", 3, cX, sY+11*line);
-            // should never be null
-            if(Controls::g_InputMethods[p]->Profile != nullptr)
-                SuperPrintCenter(Controls::g_InputMethods[p]->Profile->Name, 3, cX, sY+12*line);
-            if(!s_charSelectDone[p])
-                SuperPrintCenter(g_mainMenu.rotateProfileMessage, 3, cX, sY+13*line);
-        }
+        Player_Mouse_Render(p, lX, cX, p_width, sY, line, mouse, render);
     }
 
-    if(menuPlayerSelect_CheckDone(minPlayers))
+    if(CheckDone())
     {
         if(render)
             SuperPrintScreenCenter(g_mainMenu.playerSelStartGame, 3, sY+14*line);
@@ -270,12 +434,12 @@ int menuPlayerSelect_Mouse_Render(bool mouse, bool render, int minPlayers)
     return 0;
 }
 
-int menuPlayerSelect_MouseLogic(int minPlayers)
+int MouseLogic()
 {
-    return menuPlayerSelect_Mouse_Render(true, false, minPlayers);
+    return Mouse_Render(true, false);
 }
 
-int menuPlayerSelect_Logic(int minPlayers)
+int Logic()
 {
     if((int)Controls::g_InputMethods.size() > s_lastNumInputs)
     {
@@ -292,28 +456,19 @@ int menuPlayerSelect_Logic(int minPlayers)
     {
         if(menuPlayer == (int)Controls::g_InputMethods.size())
             break;
-        if(!s_charSelectDone[menuPlayer])
+        if(s_playerState[menuPlayer] != PlayerState::StartGame)
             break;
     }
 
     for(int p = 0; p < maxLocalPlayers; p++)
     {
-        // ensure the player's selection is still valid after other player selections
-        if(!s_charSelectDone[p])
-        {
-            for(int i = 0; i < 5; i++)
-            {
-                if(charAvailable(g_charSelect[p]))
-                    break;
-                g_charSelect[p] ++;
-                if(g_charSelect[p] == 6)
-                    g_charSelect[p] = 1;
-            }
-        }
+        Player_ValidateChar(p);
 
-        if(p >= (int)Controls::g_InputMethods.size())
+        // if player doesn't exist, or was lost *not on menu screen*
+        if(p >= (int)Controls::g_InputMethods.size()
+            || (!Controls::g_InputMethods[p] && s_context != Context::MenuScreen))
         {
-            s_charSelectDone[p] = false;
+            s_playerState[p] = PlayerState::Disconnected;
             g_charSelect[p] = 0;
             // because P1's UI is always shown,
             // allow the first controller to immediately act upon connection
@@ -324,19 +479,11 @@ int menuPlayerSelect_Logic(int minPlayers)
             continue;
         }
 
-        // make sure controller not lost
+        // if player was lost (necessarily on menu screen) remove them
         if(!Controls::g_InputMethods[p])
         {
-            Controls::DeleteInputMethodSlot(p);
-            s_lastNumInputs -= 1;
-            for(int p2 = p; p2+1 < maxLocalPlayers; p2++)
-            {
-                g_charSelect[p2] = g_charSelect[p2+1];
-                s_charSelectDone[p2] = s_charSelectDone[p2+1];
-                s_inputReady[p2] = s_inputReady[p2+1];
-            }
-            // if nobody's left, exit!
-            if(Controls::g_InputMethods.empty())
+            // if Player is last player, return to previous menu screen
+            if(Player_Remove(p))
             {
                 PlaySoundMenu(SFX_Slide);
                 return -1;
@@ -371,137 +518,29 @@ int menuPlayerSelect_Logic(int minPlayers)
         if(c.Run || (p == menuPlayer-1 && SharedControls.MenuBack)
             || (p == 0 && p == menuPlayer && SharedControls.MenuBack))
         {
-            if(s_charSelectDone[p])
-            {
-                PlaySoundMenu(SFX_Slide);
-                s_charSelectDone[p] = false;
-            }
-            else
-            {
-                Controls::DeleteInputMethodSlot(p);
-                s_lastNumInputs -= 1;
-                for(int p2 = p; p2+1 < maxLocalPlayers; p2++)
-                {
-                    g_charSelect[p2] = g_charSelect[p2+1];
-                    s_charSelectDone[p2] = s_charSelectDone[p2+1];
-                }
-                // if nobody's left, exit!
-                if(Controls::g_InputMethods.empty())
-                {
-                    PlaySoundMenu(SFX_Slide);
-                    return -1;
-                }
-                else
-                {
-                    PlaySoundMenu(SFX_PlayerDied2);
-                }
-                // either way, other players' controls invalidated
-                break;
-            }
-            s_inputReady[p] = false;
+            Player_Back(p);
         }
         else if(c.Jump || c.Start || (p == menuPlayer && SharedControls.MenuDo))
         {
-            if(!s_charSelectDone[p])
-            {
-                s_charSelectDone[p] = true;
-                PlaySoundMenu(SFX_Do);
-            }
-            else
-            {
-                if(menuPlayerSelect_CheckDone(minPlayers))
-                    return 1;
-            }
-            s_inputReady[p] = false;
-        }
-        // next options only apply if character is still being selected
-        else if(s_charSelectDone[p])
-        {
-            continue;
+            if(Player_Select(p))
+                return 1;
         }
         else if(c.Down || (p == menuPlayer && SharedControls.MenuDown))
         {
-            for(int i = 0; i < 6; i++)
-            {
-                PlaySoundMenu(SFX_Slide);
-                g_charSelect[p] ++;
-                if(g_charSelect[p] == 6)
-                    g_charSelect[p] = 1;
-                if(charAvailable(g_charSelect[p]))
-                    break;
-            }
-            s_inputReady[p] = false;
+            Player_Down(p);
         }
         else if(c.Up || (p == menuPlayer && SharedControls.MenuUp))
         {
-            for(int i = 0; i < 6; i++)
-            {
-                PlaySoundMenu(SFX_Slide);
-                g_charSelect[p] --;
-                if(g_charSelect[p] == 0)
-                    g_charSelect[p] = 5;
-                if(charAvailable(g_charSelect[p]))
-                    break;
-            }
-            s_inputReady[p] = false;
-        }
-        else if((c.Left || (p == menuPlayer && SharedControls.MenuLeft)) && Controls::g_InputMethods[p])
-        {
-            // rotate controls profile left
-            std::vector<Controls::InputMethodProfile*> profiles = Controls::g_InputMethods[p]->Type->GetProfiles();
-            std::vector<Controls::InputMethodProfile*>::iterator cur_profile
-                = std::find(profiles.begin(), profiles.end(), Controls::g_InputMethods[p]->Profile);
-            if(profiles.size() > 1 && cur_profile != profiles.end())
-            {
-                // try for a full rotation
-                for(size_t i = 0; i < profiles.size(); i++)
-                {
-                    if(cur_profile == profiles.begin())
-                        cur_profile = profiles.end() - 1;
-                    else
-                        cur_profile --;
-                    if(Controls::SetInputMethodProfile(p, *cur_profile))
-                        break;
-                }
-                PlaySoundMenu(SFX_Slide);
-            }
-            else
-            {
-                PlaySoundMenu(SFX_BlockHit);
-            }
-            s_inputReady[p] = false;
-        }
-        else if((c.Right || (p == menuPlayer && SharedControls.MenuRight)) && Controls::g_InputMethods[p])
-        {
-            // rotate controls profile right
-            std::vector<Controls::InputMethodProfile*> profiles = Controls::g_InputMethods[p]->Type->GetProfiles();
-            std::vector<Controls::InputMethodProfile*>::iterator cur_profile
-                = std::find(profiles.begin(), profiles.end(), Controls::g_InputMethods[p]->Profile);
-            if(profiles.size() > 1 && cur_profile != profiles.end())
-            {
-                // try for a full rotation
-                for(size_t i = 0; i < profiles.size(); i++)
-                {
-                    cur_profile ++;
-                    if(cur_profile == profiles.end())
-                        cur_profile = profiles.begin();
-                    if(Controls::SetInputMethodProfile(p, *cur_profile))
-                        break;
-                }
-                PlaySoundMenu(SFX_Slide);
-            }
-            else
-            {
-                PlaySoundMenu(SFX_BlockHit);
-            }
-            s_inputReady[p] = false;
+            Player_Up(p);
         }
     }
 
-    return menuPlayerSelect_MouseLogic(minPlayers);
+    return menuPlayerSelect_MouseLogic();
 }
 
-void menuPlayerSelect_Render(int minPlayers)
+void Render()
 {
-    menuPlayerSelect_Mouse_Render(false, true, minPlayers);
+    Mouse_Render(false, true);
 }
+
+} // namespace ConnectScreen
