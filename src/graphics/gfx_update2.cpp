@@ -458,6 +458,7 @@ void UpdateGraphics2(bool skipRepaint)
         frmMain.renderTexture(0, 534, 800, 66, GFX.Interface[4], 0, 534);
         frmMain.renderTexture(0, 130, 66, 404, GFX.Interface[4], 0, 130);
         frmMain.renderTexture(734, 130, 66, 404, GFX.Interface[4], 734, 130);
+
         for(A = 1; A <= numPlayers; A++)
         {
             Player[A].Direction = -1;
@@ -653,23 +654,21 @@ void UpdateGraphics2(bool skipRepaint)
             }
         }
         A = numPlayers + 1;
+
         // Print lives on the screen
         frmMain.renderTexture(32 + (48 * A), 126 - GFX.Interface[3].h, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0);
         frmMain.renderTexture(32 + (48 * A) + 40, 128 - GFX.Interface[3].h, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
-
         SuperPrint(std::to_string(int(Lives)), 1, 32 + (48 * A) + 62, 112);
+
         // Print coins on the screen
         if(Player[1].Character == 5)
-        {
             frmMain.renderTexture(32 + (48 * A) + 16, 88, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[6], 0, 0);
-        }
         else
-        {
             frmMain.renderTexture(32 + (48 * A) + 16, 88, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[2], 0, 0);
-        }
         frmMain.renderTexture(32 + (48 * A) + 40, 90, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
 
         SuperPrint(std::to_string(Coins), 1, 32 + (48 * A) + 62, 90);
+
         // Print stars on the screen
         if(numStars > 0)
         {
@@ -682,10 +681,11 @@ void UpdateGraphics2(bool skipRepaint)
         {
             SuperPrint(WorldPlayer[1].LevelName, 2, 32 + (48 * A) + 116, 109);
         }
-        if(GamePaused == true)
+
+        if(GamePaused)
         {
             frmMain.renderRect(210, 200, 380, 200, 0.f, 0.f, 0.f);
-            if(Cheater == false)
+            if(!Cheater)
             {
                 SuperPrint("CONTINUE", 3, 272, 257);
                 SuperPrint("SAVE & CONTINUE", 3, 272, 292);
