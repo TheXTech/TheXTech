@@ -683,15 +683,21 @@ void UpdateGraphics2(bool skipRepaint)
         // Print the level's name
         if(!WorldPlayer[1].LevelName.empty())
         {
-            int c = WorldPlayer[1].levelStarsCur;
-            int m = WorldPlayer[1].levelStarsMax;
+            auto &s = WorldPlayer[1].stars;
             int lnl = SuperTextPixLen(WorldPlayer[1].LevelName, 2);
             int lnlx = 32 + (48 * A) + 116;
+
             SuperPrint(WorldPlayer[1].LevelName, 2, lnlx, 109);
 
-            if(m > 0 && g_compatibility.enable_world_map_level_stars)
+            if(s.max > 0 && s.displayPolicy > Compatibility_t::STARS_DONT_SHOW)
             {
-                std::string label = fmt::format_ne("{0}/{1}", c, m);
+                std::string label;
+
+                if(s.displayPolicy >= Compatibility_t::STARS_SHOW_COLLECTED_AND_AVAILABLE)
+                    label = fmt::format_ne("{0}/{1}", s.cur, s.max);
+                else
+                    label = fmt::format_ne("{0}", s.cur);
+
                 int len = SuperTextPixLen(label, 3);
                 int totalLen = len + GFX.Interface[1].w + GFX.Interface[5].w + 8 + 4;
                 int x = 734;

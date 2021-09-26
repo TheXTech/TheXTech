@@ -76,7 +76,7 @@ static void compatInit(Compatibility_t &c)
     // 1.3.5.2
     c.fix_swooper_start_while_inactive = true;
     c.fix_FreezeNPCs_no_reset = false;
-    c.enable_world_map_level_stars = true;
+    c.world_map_stars_show_policy = Compatibility_t::STARS_UNSPECIFIED;
     // 1.3.6
 
 
@@ -105,7 +105,6 @@ static void compatInit(Compatibility_t &c)
         // 1.3.5.2
         c.fix_swooper_start_while_inactive = false;
         c.fix_FreezeNPCs_no_reset = false;
-        c.enable_world_map_level_stars = false;
         // 1.3.6
     }
 
@@ -184,7 +183,14 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         // 1.3.5.2
         compat.read("fix-swooper-start-while-inactive", c.fix_swooper_start_while_inactive, c.fix_swooper_start_while_inactive);
         compat.read("fix-FreezeNPCs-no-reset", c.fix_FreezeNPCs_no_reset, c.fix_FreezeNPCs_no_reset);
-        compat.read("enable-world-map-level-stars", c.enable_world_map_level_stars, c.enable_world_map_level_stars);
+        IniProcessing::StrEnumMap starsShowPolicy
+        {
+            {"unpsecified", Compatibility_t::STARS_UNSPECIFIED},
+            {"hide", Compatibility_t::STARS_DONT_SHOW},
+            {"show-collected", Compatibility_t::STARS_SHOW_COLLECTED_ONLY},
+            {"show", Compatibility_t::STARS_SHOW_COLLECTED_AND_AVAILABLE}
+        };
+        compat.readEnum("world-map-stars-show-policy", c.world_map_stars_show_policy, c.world_map_stars_show_policy, starsShowPolicy);
         // 1.3.6
     }
     // 1.3.4

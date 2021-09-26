@@ -33,11 +33,46 @@
 #include "../graphics.h"
 #include "../collision.h"
 #include "../main/trees.h"
+#include "../compat.h"
 #include "level_file.h"
 #include "speedrunner.h"
 
 #include "../pseudo_vb.h"
 
+
+static SDL_INLINE int computeStarsShowingPolicy(int ll, int cur)
+{
+    // Level individual
+    if(ll > Compatibility_t::STARS_UNSPECIFIED)
+    {
+        if(ll == Compatibility_t::STARS_SHOW_COLLECTED_ONLY && cur <= 0)
+            return Compatibility_t::STARS_DONT_SHOW;
+        return ll;
+    }
+
+    // World map-wide
+    if(WorldStarsShowPolicy > Compatibility_t::STARS_UNSPECIFIED)
+    {
+        if(WorldStarsShowPolicy == Compatibility_t::STARS_SHOW_COLLECTED_ONLY && cur <= 0)
+            return Compatibility_t::STARS_DONT_SHOW;
+        return WorldStarsShowPolicy;
+    }
+
+    // Compatibility settings
+    if(g_compatibility.world_map_stars_show_policy > Compatibility_t::STARS_UNSPECIFIED)
+    {
+        if(g_compatibility.world_map_stars_show_policy == Compatibility_t::STARS_SHOW_COLLECTED_ONLY && cur <= 0)
+            return Compatibility_t::STARS_DONT_SHOW;
+
+        return g_compatibility.world_map_stars_show_policy;
+    }
+
+    // Gameplay settings
+    if(WorldMapStarShowPolicyGlobal == Compatibility_t::STARS_SHOW_COLLECTED_ONLY && cur <= 0)
+        return Compatibility_t::STARS_DONT_SHOW;
+
+    return WorldMapStarShowPolicyGlobal;
+}
 
 static SDL_INLINE bool isWorldMusicNotSame(WorldMusic_t &mus)
 {
@@ -122,8 +157,10 @@ void WorldLoop()
                 {
                     auto &l = WorldLevel[curWorldLevel];
                     WorldPlayer[1].LevelName = l.LevelName;
-                    WorldPlayer[1].levelStarsCur = l.curStars;
-                    WorldPlayer[1].levelStarsMax = l.maxStars;
+                    auto &s = WorldPlayer[1].stars;
+                    s.cur = l.curStars;
+                    s.max = l.maxStars;
+                    s.displayPolicy = computeStarsShowingPolicy(l.starsShowPolicy, s.cur);
                     LevelPath(l, A);
                 }
             }
@@ -144,8 +181,10 @@ void WorldLoop()
                 {
                     curWorldLevel = l.index;
                     WorldPlayer[1].LevelName = l.LevelName;
-                    WorldPlayer[1].levelStarsCur = l.curStars;
-                    WorldPlayer[1].levelStarsMax = l.maxStars;
+                    auto &s = WorldPlayer[1].stars;
+                    s.cur = l.curStars;
+                    s.max = l.maxStars;
+                    s.displayPolicy = computeStarsShowingPolicy(l.starsShowPolicy, s.cur);
                     break;
                 }
             }
@@ -239,8 +278,10 @@ void WorldLoop()
             if(CheckCollision(tempLocation, l.Location))
             {
                 WorldPlayer[1].LevelName = l.LevelName;
-                WorldPlayer[1].levelStarsCur = l.curStars;
-                WorldPlayer[1].levelStarsMax = l.maxStars;
+                auto &s = WorldPlayer[1].stars;
+                s.cur = l.curStars;
+                s.max = l.maxStars;
+                s.displayPolicy = computeStarsShowingPolicy(l.starsShowPolicy, s.cur);
                 break;
             }
         }
