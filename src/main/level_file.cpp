@@ -1029,6 +1029,7 @@ void FindStars()
                 {
                     warp.maxStars = head.stars;
                     warp.curStars = 0;
+
                     for(int B = 1; B <= numStars; B++)
                     {
                         if(SDL_strcasecmp(Star[B].level.c_str(), warp.level.c_str()) == 0)

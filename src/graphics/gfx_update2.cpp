@@ -25,6 +25,9 @@
 #include "../player.h"
 #include "../main/speedrunner.h"
 #include "../main/trees.h"
+#include "../compat.h"
+
+#include <fmt_format_ne.h>
 
 
 // draws GFX to screen when on the world map/world map editor
@@ -676,10 +679,29 @@ void UpdateGraphics2(bool skipRepaint)
             frmMain.renderTexture(32 + (48 * A) + 40, 68, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
             SuperPrint(std::to_string(numStars), 1, 32 + (48 * A) + 62, 68);
         }
+
         // Print the level's name
-        if(WorldPlayer[1].LevelName != "")
+        if(!WorldPlayer[1].LevelName.empty())
         {
-            SuperPrint(WorldPlayer[1].LevelName, 2, 32 + (48 * A) + 116, 109);
+            int c = WorldPlayer[1].levelStarsCur;
+            int m = WorldPlayer[1].levelStarsMax;
+            int lnl = SuperTextPixLen(WorldPlayer[1].LevelName, 2);
+            int lnlx = 32 + (48 * A) + 116;
+            SuperPrint(WorldPlayer[1].LevelName, 2, lnlx, 109);
+
+            if(m > 0 && g_compatibility.enable_world_map_level_stars)
+            {
+                std::string label = fmt::format_ne("{0}/{1}", c, m);
+                int len = SuperTextPixLen(label, 3);
+                int totalLen = len + GFX.Interface[1].w + GFX.Interface[5].w + 8 + 4;
+                int x = 734;
+                int y = (lnl + lnlx >= x - totalLen ? 90 : 109); // Print stars count above the title if it gets too long
+                frmMain.renderTexture(x - len - (GFX.Interface[1].w + 4), y,
+                                      GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+                frmMain.renderTexture(x - len - (GFX.Interface[1].w + GFX.Interface[5].w + 8), y,
+                                      GFX.Interface[5].w, GFX.Interface[5].h, GFX.Interface[5], 0, 0);
+                SuperPrintRightAlign(label, 3, x, y);
+            }
         }
 
         if(GamePaused)
