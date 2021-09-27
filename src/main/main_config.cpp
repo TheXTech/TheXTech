@@ -160,6 +160,7 @@ void OpenConfig()
 
         config.beginGroup("gameplay");
         config.read("ground-pound-by-alt-run", GameplayPoundByAltRun, false);
+        config.read("world-map-stars-show-policy", WorldMapStarShowPolicyGlobal, 0);
         config.endGroup();
 
         config.beginGroup("effects");
@@ -315,6 +316,7 @@ void SaveConfig()
 
     config.beginGroup("gameplay");
     config.setValue("ground-pound-by-alt-run", GameplayPoundByAltRun);
+    config.setValue("world-map-stars-show-policy", WorldMapStarShowPolicyGlobal);
     config.endGroup();
 
     config.beginGroup("effects");

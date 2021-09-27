@@ -89,6 +89,7 @@ void OpenWorld(std::string FilePath)
     StartLevel = dirEpisode.resolveFileCase(wld.IntroLevel_file);
     NoMap = wld.HubStyledWorld;
     RestartLevel = wld.restartlevel;
+    WorldStarsShowPolicy = wld.starsShowPolicy;
 
     MaxWorldStars = int(wld.stars);
 
@@ -237,6 +238,7 @@ void OpenWorld(std::string FilePath)
         ll.WarpX = l.gotox;
         ll.WarpY = l.gotoy;
         ll.Path2 = l.bigpathbg;
+        ll.starsShowPolicy = l.starsShowPolicy;
         ll.Z = zCounter++;
         treeWorldLevelAdd(&ll);
 
@@ -359,6 +361,7 @@ void ClearWorld()
     numWorldPaths = 0;
     numWorldMusic = 0;
     RestartLevel = false;
+    WorldStarsShowPolicy = WorldData::STARS_UNSPECIFIED;
     NoMap = false;
     IsEpisodeIntro = false;
     StartLevel.clear();
@@ -383,4 +386,35 @@ void ClearWorld()
 //        frmWorld.txtStars = "";
 //        MaxWorldStars = 0;
 //    }
+}
+
+void FindWldStars()
+{
+    LevelData head;
+
+    for(int A = 1; A <= numWorldLevels; A++)
+    {
+        auto &l = WorldLevel[A];
+        if(!l.FileName.empty())
+        {
+            std::string lFile = FileNamePath + l.FileName;
+            addMissingLvlSuffix(lFile);
+
+            if(Files::fileExists(lFile))
+            {
+                if(FileFormats::OpenLevelFileHeader(lFile, head))
+                {
+                    l.maxStars = head.stars;
+                    l.curStars = 0;
+
+                    for(int B = 1; B <= numStars; B++)
+                    {
+                        if(SDL_strcasecmp(Star[B].level.c_str(), l.FileName.c_str()) == 0)
+                            l.curStars++;
+                    }
+                }
+            }
+
+        }
+    }
 }
