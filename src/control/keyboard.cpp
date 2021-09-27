@@ -301,6 +301,34 @@ void InputMethodType_Keyboard::UpdateControlsPost()
     bool leftPressed = this->m_keyboardState[SDL_SCANCODE_LEFT] == KEY_PRESSED;
     bool rightPressed = this->m_keyboardState[SDL_SCANCODE_RIGHT] == KEY_PRESSED;
 
+    // disable the shared keys if they are currently in use
+    for(InputMethod* method : g_InputMethods)
+    {
+        if(!method)
+            continue;
+        InputMethodProfile* p = method->Profile;
+        InputMethodProfile_Keyboard* profile = dynamic_cast<InputMethodProfile_Keyboard*>(p);
+        if(!profile)
+            continue;
+        for(size_t i = 0; i < PlayerControls::n_buttons; i++)
+        {
+            if(profile->m_keys[i] == SDL_SCANCODE_ESCAPE || profile->m_keys2[i] == SDL_SCANCODE_ESCAPE)
+                escPressed = false;
+            if(profile->m_keys[i] == SDL_SCANCODE_RETURN || profile->m_keys2[i] == SDL_SCANCODE_RETURN)
+                returnPressed = false;
+            if(profile->m_keys[i] == SDL_SCANCODE_SPACE || profile->m_keys2[i] == SDL_SCANCODE_SPACE)
+                spacePressed = false;
+            if(profile->m_keys[i] == SDL_SCANCODE_UP || profile->m_keys2[i] == SDL_SCANCODE_UP)
+                upPressed = false;
+            if(profile->m_keys[i] == SDL_SCANCODE_DOWN || profile->m_keys2[i] == SDL_SCANCODE_DOWN)
+                downPressed = false;
+            if(profile->m_keys[i] == SDL_SCANCODE_LEFT || profile->m_keys2[i] == SDL_SCANCODE_LEFT)
+                leftPressed = false;
+            if(profile->m_keys[i] == SDL_SCANCODE_RIGHT || profile->m_keys2[i] == SDL_SCANCODE_RIGHT)
+                rightPressed = false;
+        }
+    }
+
 #ifdef __ANDROID__ // Quit credits on BACK key press
     bool backPressed = this->m_keyboardState[SDL_SCANCODE_AC_BACK] == KEY_PRESSED;
 #else
