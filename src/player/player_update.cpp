@@ -4476,7 +4476,7 @@ void UpdatePlayer()
                 if(MessageNPC > 0)
                 {
                     MessageText = NPC[MessageNPC].Text;
-                    PauseGame(A);
+                    PauseGame(PauseCode::Message, A);
                     MessageText = "";
                     if(NPC[MessageNPC].TriggerTalk != "")
                         ProcEvent(NPC[MessageNPC].TriggerTalk);

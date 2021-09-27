@@ -38,14 +38,15 @@
 #include "../editor.h"
 #include "speedrunner.h"
 #include "menu_main.h"
-
+#include "menu_connectscreen.h"
 #include "../pseudo_vb.h"
 
 void CheckActive();//in game_main.cpp
 
 void GameLoop()
 {
-    Controls::Update();
+    if(!Controls::Update())
+        PauseGame(PauseCode::Reconnect, 0);
     if(LevelMacro > LEVELMACRO_OFF)
         UpdateMacro();
 
@@ -81,7 +82,7 @@ void GameLoop()
 
         speedRun_triggerLeave();
         NextLevel();
-        Controls::Update();
+        // Controls::Update();
     }
     else if(qScreen)
     {
@@ -136,7 +137,7 @@ void GameLoop()
                         if(SharedControls.Pause) // if(escPressed)
                         {
                             FreezeNPCs = false;
-                            PauseGame(1);
+                            PauseGame(PauseCode::PauseGame, 1);
                         }
                         else
                         {
@@ -164,7 +165,7 @@ void GameLoop()
                     }
                     else
                     {
-                        PauseGame(1);
+                        PauseGame(PauseCode::PauseGame, 1);
                     }
                 }
             }
@@ -195,31 +196,327 @@ void GameLoop()
     }
 }
 
-void PauseGame(int plr)
+void MessageScreen_Init()
 {
+    SoundPause[SFX_Message] = 0;
+    PlaySound(SFX_Message);
+    MenuCursorCanMove = false;
+}
+
+void PauseScreen_Init()
+{
+    PlaySound(SFX_Pause);
+    MenuCursor = 0;
+    MenuCursorCanMove = false;
+}
+
+bool PauseScreen_Logic(int plr)
+{
+    bool upPressed = SharedControls.MenuUp;
+    bool downPressed = SharedControls.MenuDown;
+
+    bool menuDoPress = SharedControls.MenuDo;
+    bool menuBackPress = SharedControls.MenuBack;
+
+    if(SingleCoop > 0 || numPlayers > 2)
+    {
+        for(int A = 1; A <= numPlayers; A++)
+            Player[A].Controls = Player[1].Controls;
+    }
+
+    auto &c = Player[plr].Controls;
+
+    menuDoPress |= (c.Start || c.Jump);
+    menuBackPress |= c.Run;
+
+    upPressed |= c.Up;
+    downPressed |= c.Down;
+
+    if(!MenuCursorCanMove)
+    {
+        if(!c.Down && !c.Up && !c.Run && !c.Jump && !c.Start &&
+           !menuDoPress && !menuBackPress && !upPressed && !downPressed)
+        {
+            MenuCursorCanMove = true;
+        }
+        return false;
+    }
+
     bool stopPause = false;
-    int A = 0;
-    int B = 0;
-    bool noButtons = false, quitNoSound = false;
+    bool playSound = true;
+    if(menuBackPress)
+    {
+        if(LevelSelect && !Cheater)
+        {
+            if(MenuCursor != 2)
+                PlaySound(SFX_Slide);
+            MenuCursor = 2;
+        }
+        else
+        {
+            if(MenuCursor != 1)
+                PlaySound(SFX_Slide);
+            if(TestLevel)
+                MenuCursor = 3;
+            else
+                MenuCursor = 1;
+        }
+        MenuCursorCanMove = false;
+    }
+    else if(menuDoPress)
+        stopPause = true;
+
+    if(upPressed)
+    {
+        PlaySound(SFX_Slide);
+        MenuCursor = MenuCursor - 1;
+        MenuCursorCanMove = false;
+    }
+    else if(downPressed)
+    {
+        PlaySound(SFX_Slide);
+        MenuCursor = MenuCursor + 1;
+        MenuCursorCanMove = false;
+    }
+
+    if(LevelSelect)
+    {
+        // unclear meaning given that A was numPlayers+1 after the above for loop
+        // if(Player[A].Character == 1 || Player[A].Character == 2)
+        //     Player[A].Hearts = 0;
+        for(int A = 1; A <= numPlayers; A++)
+        {
+            if(!Player[A].RunRelease)
+            {
+                if(!Player[A].Controls.Left && !Player[A].Controls.Right)
+                    Player[A].RunRelease = true;
+            }
+            else if(Player[A].Controls.Left || Player[A].Controls.Right)
+            {
+                AllCharBlock = 0;
+                for(int B = 1; B <= numCharacters; B++)
+                {
+                    if(!blockCharacter[B])
+                    {
+                        if(AllCharBlock == 0)
+                            AllCharBlock = B;
+                        else
+                        {
+                            AllCharBlock = 0;
+                            break;
+                        }
+                    }
+                }
+                if(AllCharBlock == 0)
+                {
+                    PlaySound(SFX_Slide);
+                    Player[A].RunRelease = false;
+                    // needs to be fixed for more than 2 players
+                    SDL_assert_release(maxLocalPlayers == 2);
+                    int B;
+                    if(A == 1)
+                        B = 2;
+                    else
+                        B = 1;
+                    if(numPlayers == 1)
+                        B = 0;
+                    Player[0].Character = 0;
+                    if(Player[A].Controls.Left)
+                    {
+                        do
+                        {
+                            Player[A].Character = Player[A].Character - 1;
+                            if(Player[A].Character <= 0)
+                                Player[A].Character = 5;
+                        } while(Player[A].Character == Player[B].Character || blockCharacter[Player[A].Character]);
+                    }
+                    else
+                    {
+                        do
+                        {
+                            Player[A].Character = Player[A].Character + 1;
+                            if(Player[A].Character >= 6)
+                                Player[A].Character = 1;
+                        } while(Player[A].Character == Player[B].Character || blockCharacter[Player[A].Character]);
+                    }
+                    Player[A] = SavedChar[Player[A].Character];
+                    SetupPlayers();
+                }
+            }
+        }
+    }
+
+    if(menuDoPress)
+    {
+        if(TestLevel) // Pause menu of a level testing
+        {
+            switch(MenuCursor)
+            {
+            case 0: // Continue
+                stopPause = true;
+                break;
+            case 1: // Restart level
+                stopPause = true;
+                playSound = false;
+                MenuMode = MENU_MAIN;
+                MenuCursor = 0;
+                frmMain.setTargetTexture();
+                frmMain.clearBuffer();
+                frmMain.repaint();
+                EndLevel = true;
+                StopMusic();
+                DoEvents();
+                break;
+            case 2: // Reset checkpoints
+                stopPause = true;
+                playSound = false;
+                pLogDebug("Clear check-points from a menu");
+                Checkpoint.clear();
+                CheckpointsList.clear();
+                numStars = 0;
+                IntProc::sendStarsNumber(numStars);
+                numSavedEvents = 0;
+                BlockSwitch.fill(false);
+                PlaySound(SFX_Bullet);
+                break;
+            case 3: // Quit testing
+                stopPause = true;
+                playSound = false;
+                MenuMode = MENU_MAIN;
+                MenuCursor = 0;
+                frmMain.setTargetTexture();
+                frmMain.clearBuffer();
+                frmMain.repaint();
+                EndLevel = true;
+                StopMusic();
+                DoEvents();
+                KillIt(); // Quit the game entirely
+                break;
+            default:
+                break;
+            }
+        }
+        else if(MenuCursor == 0) // Contunue
+        {
+            stopPause = true;
+        }
+        else if(MenuCursor == 1 && (LevelSelect || (/*StartLevel == FileName*/IsEpisodeIntro && NoMap)) && !Cheater) // "Save and continue"
+        {
+            SaveGame();
+            PlaySound(SFX_Checkpoint);
+            playSound = false;
+            stopPause = true;
+        }
+        else // "Quit" or "Save & Quit"
+        {
+            if(!Cheater && (LevelSelect || (/*StartLevel == FileName*/IsEpisodeIntro && NoMap)))
+                SaveGame(); // "Save & Quit"
+            else
+                speedRun_saveStats();
+            stopPause = true;
+            GameMenu = true;
+
+            MenuMode = MENU_MAIN;
+            MenuCursor = 0;
+
+            if(!LevelSelect)
+            {
+                LevelSelect = true;
+                EndLevel = true;
+            }
+            else
+                LevelSelect = false;
+
+            frmMain.setTargetTexture();
+            frmMain.clearBuffer();
+            frmMain.repaint();
+            StopMusic();
+            DoEvents();
+        }
+    }
+
+    if(TestLevel) // Level test pause menu (4 items)
+    {
+        if(MenuCursor > 3)
+            MenuCursor = 0;
+        if(MenuCursor < 0)
+            MenuCursor = 3;
+    }
+    else if(Cheater || !(LevelSelect || (/*StartLevel == FileName*/IsEpisodeIntro && NoMap))) // Level play menu (2 items)
+    {
+        if(MenuCursor > 1)
+            MenuCursor = 0;
+        if(MenuCursor < 0)
+            MenuCursor = 1;
+    }
+    else // World map or HUB (3 items)
+    {
+        if(MenuCursor > 2)
+            MenuCursor = 0;
+        if(MenuCursor < 0)
+            MenuCursor = 2;
+    }
+
+    if(stopPause && playSound)
+    {
+        PlaySound(SFX_Pause);
+    }
+
+    return stopPause;
+}
+
+bool MessageScreen_Logic(int plr)
+{
+    bool menuDoPress = SharedControls.MenuDo;
+    bool menuBackPress = SharedControls.MenuBack;
+
+    if(SingleCoop > 0 || numPlayers > 2)
+    {
+        for(int A = 1; A <= numPlayers; A++)
+            Player[A].Controls = Player[1].Controls;
+    }
+
+    auto &c = Player[plr].Controls;
+
+    menuDoPress |= (c.Start || c.Jump);
+    menuBackPress |= c.Run;
+
+    if(!MenuCursorCanMove)
+    {
+        if(!c.Run && !c.Jump && !c.Start &&
+           !menuDoPress && !menuBackPress)
+        {
+            MenuCursorCanMove = true;
+        }
+        return false;
+    }
+
+    if(MenuCursorCanMove && (menuDoPress || menuBackPress))
+    {
+        MessageText.clear();
+        return true;
+    }
+
+    return false;
+}
+
+void PauseGame(PauseCode code, int plr)
+{
 //    double fpsTime = 0;
 //    int fpsCount = 0;
 
-    for(A = numPlayers; A >= 1; A--)
+    for(int A = numPlayers; A >= 1; A--)
         SavedChar[Player[A].Character] = Player[A];
 
-//    if(TestLevel && MessageText.empty())
-//        return;
-    if(MessageText.empty())
-        PlaySound(SFX_Pause);
-    else
-    {
-        SoundPause[SFX_Message] = 0;
-        PlaySound(SFX_Message);
-    }
+    if(code == PauseCode::Message)
+        MessageScreen_Init();
+    else if(code == PauseCode::PauseGame)
+        PauseScreen_Init();
+    else if(code == PauseCode::Reconnect)
+        ConnectScreen::Reconnect_Start();
 
-    GamePaused = true;
-    MenuCursor = 0;
-    MenuCursorCanMove = false;
+    PauseCode old_code = GamePaused;
+    GamePaused = code;
 
     if(PSwitchTime > 0)
     {
@@ -245,284 +542,49 @@ void PauseGame(int plr)
                 UpdateGraphics2();
             else
                 UpdateGraphics();
-            Controls::Update();
+            if(!Controls::Update())
+            {
+                if(code != PauseCode::Reconnect)
+                {
+                    PauseGame(PauseCode::Reconnect, 0);
+                }
+            }
             UpdateSound();
             BlockFrames();
             UpdateEffects();
 
-            bool upPressed = SharedControls.MenuUp;
-            bool downPressed = SharedControls.MenuDown;
-
-            bool menuDoPress = SharedControls.MenuDo;
-            bool menuBackPress = SharedControls.MenuBack;
-
-            if(SingleCoop > 0 || numPlayers > 2)
+            if(qScreen)
             {
-                for(A = 1; A <= numPlayers; A++)
-                    Player[A].Controls = Player[1].Controls;
+                // prevent any logic or unpause from taking place
             }
-
-            auto &c = Player[plr].Controls;
-
-            menuDoPress |= (c.Start || c.Jump);
-            menuBackPress |= c.Run;
-
-            upPressed |= c.Up;
-            downPressed |= c.Down;
-
-            if(MessageText.empty())
+            if(GamePaused == PauseCode::PauseGame)
             {
-                // Pause menu
-                if(!noButtons)
-                {
-                    if(!c.Down && !c.Up && !c.Run && !c.Jump && !c.Start &&
-                       !menuDoPress && !menuBackPress && !upPressed && !downPressed)
-                    {
-                        noButtons = true;
-                    }
-                }
-                else
-                {
-                    if(menuBackPress)
-                    {
-                        if(LevelSelect && !Cheater)
-                        {
-                            if(MenuCursor != 2)
-                                PlaySound(SFX_Slide);
-                            MenuCursor = 2;
-                        }
-                        else
-                        {
-                            if(MenuCursor != 1)
-                                PlaySound(SFX_Slide);
-                            if(TestLevel)
-                                MenuCursor = 3;
-                            else
-                                MenuCursor = 1;
-                        }
-                        noButtons = false;
-                    }
-                    else if(menuDoPress)
-                        stopPause = true;
-
-                    if(upPressed)
-                    {
-                        PlaySound(SFX_Slide);
-                        MenuCursor = MenuCursor - 1;
-                        noButtons = false;
-                    }
-                    else if(downPressed)
-                    {
-                        PlaySound(SFX_Slide);
-                        MenuCursor = MenuCursor + 1;
-                        noButtons = false;
-                    }
-
-                    if(LevelSelect)
-                    {
-                        if(Player[A].Character == 1 || Player[A].Character == 2)
-                            Player[A].Hearts = 0;
-                        for(A = 1; A <= numPlayers; A++)
-                        {
-                            if(!Player[A].RunRelease)
-                            {
-                                if(!Player[A].Controls.Left && !Player[A].Controls.Right)
-                                    Player[A].RunRelease = true;
-                            }
-                            else if(Player[A].Controls.Left || Player[A].Controls.Right)
-                            {
-                                AllCharBlock = 0;
-                                for(B = 1; B <= numCharacters; B++)
-                                {
-                                    if(!blockCharacter[B])
-                                    {
-                                        if(AllCharBlock == 0)
-                                            AllCharBlock = B;
-                                        else
-                                        {
-                                            AllCharBlock = 0;
-                                            break;
-                                        }
-                                    }
-                                }
-                                if(AllCharBlock == 0)
-                                {
-                                    PlaySound(SFX_Slide);
-                                    Player[A].RunRelease = false;
-                                    if(A == 1)
-                                        B = 2;
-                                    else
-                                        B = 1;
-                                    if(numPlayers == 1)
-                                        B = 0;
-                                    Player[0].Character = 0;
-                                    if(Player[A].Controls.Left)
-                                    {
-                                        do
-                                        {
-                                            Player[A].Character = Player[A].Character - 1;
-                                            if(Player[A].Character <= 0)
-                                                Player[A].Character = 5;
-                                        } while(Player[A].Character == Player[B].Character || blockCharacter[Player[A].Character]);
-                                    }
-                                    else
-                                    {
-                                        do
-                                        {
-                                            Player[A].Character = Player[A].Character + 1;
-                                            if(Player[A].Character >= 6)
-                                                Player[A].Character = 1;
-                                        } while(Player[A].Character == Player[B].Character || blockCharacter[Player[A].Character]);
-                                    }
-                                    Player[A] = SavedChar[Player[A].Character];
-                                    SetupPlayers();
-                                }
-                            }
-                        }
-                    }
-
-                    if(menuDoPress)
-                    {
-                        if(TestLevel) // Pause menu of a level testing
-                        {
-                            switch(MenuCursor)
-                            {
-                            case 0: // Continue
-                                stopPause = true;
-                                break;
-                            case 1: // Restart level
-                                stopPause = true;
-                                MenuMode = MENU_MAIN;
-                                MenuCursor = 0;
-                                frmMain.setTargetTexture();
-                                frmMain.clearBuffer();
-                                frmMain.repaint();
-                                EndLevel = true;
-                                StopMusic();
-                                DoEvents();
-                                break;
-                            case 2: // Reset checkpoints
-                                stopPause = true;
-                                pLogDebug("Clear check-points from a menu");
-                                Checkpoint.clear();
-                                CheckpointsList.clear();
-                                numStars = 0;
-                                IntProc::sendStarsNumber(numStars);
-                                numSavedEvents = 0;
-                                BlockSwitch.fill(false);
-                                PlaySound(SFX_Bullet);
-                                break;
-                            case 3: // Quit testing
-                                stopPause = true;
-                                MenuMode = MENU_MAIN;
-                                MenuCursor = 0;
-                                frmMain.setTargetTexture();
-                                frmMain.clearBuffer();
-                                frmMain.repaint();
-                                EndLevel = true;
-                                StopMusic();
-                                DoEvents();
-                                KillIt(); // Quit the game entirely
-                                break;
-                            default:
-                                break;
-                            }
-                        }
-                        else if(MenuCursor == 0) // Contunue
-                        {
-                            stopPause = true;
-                        }
-                        else if(MenuCursor == 1 && (LevelSelect || (/*StartLevel == FileName*/IsEpisodeIntro && NoMap)) && !Cheater) // "Save and continue"
-                        {
-                            SaveGame();
-                            PlaySound(SFX_Checkpoint);
-                            quitNoSound = true;
-                            stopPause = true;
-                        }
-                        else // "Quit" or "Save & Quit"
-                        {
-                            if(!Cheater && (LevelSelect || (/*StartLevel == FileName*/IsEpisodeIntro && NoMap)))
-                                SaveGame(); // "Save & Quit"
-                            else
-                                speedRun_saveStats();
-                            stopPause = true;
-                            GameMenu = true;
-
-                            MenuMode = MENU_MAIN;
-                            MenuCursor = 0;
-
-                            if(!LevelSelect)
-                            {
-                                LevelSelect = true;
-                                EndLevel = true;
-                            }
-                            else
-                                LevelSelect = false;
-
-                            frmMain.setTargetTexture();
-                            frmMain.clearBuffer();
-                            frmMain.repaint();
-                            StopMusic();
-                            DoEvents();
-                        }
-                    }
-
-                    if(TestLevel) // Level test pause menu (4 items)
-                    {
-                        if(MenuCursor > 3)
-                            MenuCursor = 0;
-                        if(MenuCursor < 0)
-                            MenuCursor = 3;
-                    }
-                    else if(Cheater || !(LevelSelect || (/*StartLevel == FileName*/IsEpisodeIntro && NoMap))) // Level play menu (2 items)
-                    {
-                        if(MenuCursor > 1)
-                            MenuCursor = 0;
-                        if(MenuCursor < 0)
-                            MenuCursor = 1;
-                    }
-                    else // World map or HUB (3 items)
-                    {
-                        if(MenuCursor > 2)
-                            MenuCursor = 0;
-                        if(MenuCursor < 0)
-                            MenuCursor = 2;
-                    }
-                }
+                if(PauseScreen_Logic(plr))
+                    break;
             }
-            else // Message box
+            else if(GamePaused == PauseCode::Message)
             {
-                if(!noButtons)
-                {
-                    if(!c.Down && !c.Up && !c.Run && !c.Jump && !c.Start &&
-                       !menuDoPress && !menuBackPress && !upPressed && !downPressed)
-                    {
-                        noButtons = true;
-                    }
-                }
-                else
-                {
-                    if(menuBackPress || menuDoPress)
-                    {
-                        stopPause = true;
-                    }
-                }
+                if(MessageScreen_Logic(plr))
+                    break;
+            }
+            else if(GamePaused == PauseCode::Reconnect)
+            {
+                if(ConnectScreen::Logic())
+                    break;
             }
         }
 
-        if(qScreen)
-            stopPause = false;
         PGE_Delay(1);
         if(!GameIsActive)
             break;
-    } while(!(stopPause == true));
+    } while(true);
 
-    GamePaused = false;
-    Player[plr].UnStart = false;
-    Player[plr].CanJump = false;
-
-    if(!TestLevel && MessageText.empty() && !quitNoSound)
-        PlaySound(SFX_Pause);
+    GamePaused = old_code;
+    for(int i = 1; i <= numPlayers; i++)
+    {
+        Player[i].UnStart = false;
+        Player[i].CanJump = false;
+    }
 
     if(PSwitchTime > 0)
     {
@@ -530,7 +592,6 @@ void PauseGame(int plr)
         if(!noSound)
             SoundResumeAll();
     }
-    MessageText.clear();
 
     resetFrameTimer();
 }

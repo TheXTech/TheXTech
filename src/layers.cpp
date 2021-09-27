@@ -576,7 +576,7 @@ void ProcEvent(std::string EventName, bool NoEffect)
             if(!evt.Text.empty())
             {
                 MessageText = evt.Text;
-                PauseGame(1);
+                PauseGame(PauseCode::Message, 1);
                 MessageText = "";
             }
 

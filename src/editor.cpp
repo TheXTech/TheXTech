@@ -1756,7 +1756,7 @@ void UpdateInterprocess()
     case IntProc::MsgBox:
     {
         MessageText = IntProc::getCMD();
-        PauseGame(1);
+        PauseGame(PauseCode::Message, 1);
         break;
     }
 
@@ -2771,7 +2771,7 @@ void zTestLevel(bool magicHand, bool interProcess)
         // End If
     }
 
-    GamePaused = false;
+    GamePaused = PauseCode::None;
     MessageText.clear();
 //  frmNPCs::chkMessage.Value = 0;
     BattleLives[1] = 3;
@@ -2898,7 +2898,7 @@ void zTestLevel(bool magicHand, bool interProcess)
         if(!OpenLevel(FullFileName))
         {
             MessageText = fmt::format_ne("ERROR: Can't open \"{0}\": file doesn't exist or corrupted.", FullFileName);
-            PauseGame(1);
+            PauseGame(PauseCode::Message, 1);
             ErrorQuit = true;
         }
     }

@@ -341,7 +341,7 @@ TouchScreenController::FingerState &TouchScreenController::FingerState::operator
 static int buttonLeft(int player_no)
 {
     (void)player_no;
-    if(LevelSelect && GamePaused)
+    if(LevelSelect && GamePaused == PauseCode::PauseGame)
         return TouchScreenGFX_t::BUTTON_LEFT_CHAR;
     else
         return TouchScreenGFX_t::BUTTON_LEFT;
@@ -350,7 +350,7 @@ static int buttonLeft(int player_no)
 static int buttonRight(int player_no)
 {
     (void)player_no;
-    if(LevelSelect && GamePaused)
+    if(LevelSelect && GamePaused == PauseCode::PauseGame)
         return TouchScreenGFX_t::BUTTON_RIGHT_CHAR;
     else
         return TouchScreenGFX_t::BUTTON_RIGHT;
@@ -367,7 +367,7 @@ static int buttonA(int player_no)
         return TouchScreenGFX_t::BUTTON_A_PS;
     default:
     case TOUCHPAD_STYLE_ACTIONS:
-        if(GamePaused || GameMenu)
+        if(GamePaused != PauseCode::None || GameMenu)
             return TouchScreenGFX_t::BUTTON_A_DO;
         else if(GameOutro)
             return TouchScreenGFX_t::BUTTON_A_BLANK;
@@ -388,7 +388,7 @@ static int buttonX(int player_no)
         return TouchScreenGFX_t::BUTTON_X_PS;
     default:
     case TOUCHPAD_STYLE_ACTIONS:
-        if(GamePaused || GameMenu)
+        if(GamePaused != PauseCode::None || GameMenu)
             return TouchScreenGFX_t::BUTTON_X_BACK;
         else if(LevelSelect || GameOutro)
             return TouchScreenGFX_t::BUTTON_X_BLANK;
@@ -435,7 +435,7 @@ static int buttonB(int player_no)
         return TouchScreenGFX_t::BUTTON_B_PS;
     default:
     case TOUCHPAD_STYLE_ACTIONS:
-        if(LevelSelect || GamePaused || GameMenu || GameOutro)
+        if(LevelSelect || GamePaused != PauseCode::None || GameMenu || GameOutro)
             return TouchScreenGFX_t::BUTTON_B_BLANK;
         else
         {
@@ -462,7 +462,7 @@ static int buttonY(int player_no)
         return TouchScreenGFX_t::BUTTON_Y_PS;
     default:
     case TOUCHPAD_STYLE_ACTIONS:
-        if(LevelSelect || GamePaused || GameMenu || GameOutro)
+        if(LevelSelect || GamePaused != PauseCode::None || GameMenu || GameOutro)
             return TouchScreenGFX_t::BUTTON_Y_BLANK;
         else
         {
@@ -1251,7 +1251,7 @@ bool InputMethod_TouchScreen::Update(Controls_t& c)
     // This run lock logic has been modified to work as run invert code instead.
     // The original code always delayed running by one frame,
     //   even when run lock was not enabled.
-    if(!GamePaused && !GameMenu && !GameOutro && !LevelSelect)
+    if(GamePaused == PauseCode::None && !GameMenu && !GameOutro && !LevelSelect)
     {
         // Alt Run functions as normal
         if(t->m_controller.m_runHeld && c.AltRun)

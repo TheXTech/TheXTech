@@ -25,7 +25,7 @@
 #include "../player.h"
 #include "../main/speedrunner.h"
 #include "../main/trees.h"
-
+#include "../main/menu_connectscreen.h"
 
 // draws GFX to screen when on the world map/world map editor
 void UpdateGraphics2(bool skipRepaint)
@@ -682,7 +682,7 @@ void UpdateGraphics2(bool skipRepaint)
         {
             SuperPrint(WorldPlayer[1].LevelName, 2, 32 + (48 * A) + 116, 109);
         }
-        if(GamePaused == true)
+        if(GamePaused == PauseCode::PauseGame)
         {
             frmMain.renderRect(210, 200, 380, 200, 0.f, 0.f, 0.f);
             if(Cheater == false)
@@ -707,6 +707,11 @@ void UpdateGraphics2(bool skipRepaint)
 
         speedRun_renderControls(1, -1);
         speedRun_renderTimer();
+
+        if(GamePaused == PauseCode::Reconnect)
+        {
+            ConnectScreen::Render();
+        }
 
         if(!skipRepaint)
             frmMain.repaint();

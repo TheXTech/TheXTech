@@ -3988,7 +3988,7 @@ static SDL_INLINE bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool
         } else {
             MessageText = warp.StarsMsg;
         }
-        PauseGame(A);
+        PauseGame(PauseCode::Message, A);
         MessageText.clear();
         canWarp = false;
     }

@@ -456,7 +456,7 @@ bool Update()
         InputMethod* method = g_InputMethods[i];
         if(!method)
         {
-            okay = false;
+            // okay = false;
             continue;
         }
         if(!method->Update(controls))
@@ -514,7 +514,7 @@ bool Update()
 
             if(!(p.State == 5 && p.Mount == 0) && c.AltRun)
                 c.Run = true;
-            if(ForcedControls && !GamePaused)
+            if(ForcedControls && GamePaused == PauseCode::None)
             {
                 c = ForcedControl;
             }

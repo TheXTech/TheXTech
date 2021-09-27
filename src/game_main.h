@@ -74,7 +74,7 @@ void ClearGame(bool punnish = false);
 void DeleteSave(int world, int save);
 void CopySave(int world, int src, int dst);
 
-void PauseGame(int plr);
+void PauseGame(PauseCode code, int plr);
 
 // when a player's controller is disconnected, this function is called.
 // breaks the main game loop to allow the players to recover their controls.

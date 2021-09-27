@@ -149,10 +149,10 @@ void RenderControls(int player, int x, int y, int w, int h)
     frmMain.renderRect(x, y, w, h, 0.f, 0.f, 0.f, alhpa, true);//Edge
     frmMain.renderRect(x + 2, y + 2, w - 4, h - 4, r, g, b, alhpa, true);//Box
 
-    if(0 > player || player >= maxLocalPlayers)
+    if(player < 1 || player > maxLocalPlayers)
         return;
 
-    const Controls_t& c = s_displayControls[player];
+    const Controls_t& c = s_displayControls[player-1];
     frmMain.renderRect(x + 10, y + 12, 6, 6, 0.f, 0.f, 0.f, alhpaB, true);//Cender of D-Pad
     frmMain.renderRect(x + 10, y + 6, 6, 6, bool2gray(c.Up), alhpaB, true);
     frmMain.renderRect(x + 10, y + 18, 6, 6, bool2gray(c.Down), alhpaB, true);

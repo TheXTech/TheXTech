@@ -30,6 +30,7 @@
 #include "../main/menu_main.h"
 #include "../main/speedrunner.h"
 #include "../main/trees.h"
+#include "../main/menu_connectscreen.h"
 
 #include <fmt_format_ne.h>
 #include <Utils/maths.h>
@@ -1936,10 +1937,8 @@ void UpdateGraphics(bool skipRepaint)
 
 
     //                If GamePaused = True Then
-                if(GamePaused)
+                if(GamePaused == PauseCode::PauseGame)
                 {
-                    if(MessageText.empty())
-                    {
                         X = 0;
                         Y = 0;
 
@@ -1971,9 +1970,9 @@ void UpdateGraphics(bool skipRepaint)
                             SuperPrint("QUIT", 3, 272 + 56 + X, 310 + Y);
                             frmMain.renderTexture(252 + 56 + X, 275 + (MenuCursor * 35) + Y, 16, 16, GFX.MCursor[0], 0, 0);
                         }
-                    }
-                    else
-                    {
+                }
+                else if(GamePaused == PauseCode::Message)
+                {
                         X = 0;
                         Y = 0;
 
@@ -2058,7 +2057,6 @@ void UpdateGraphics(bool skipRepaint)
                         } while(!SuperText.empty());
 
                         frmMain.renderTexture(400 - GFX.TextBox.w / 2 + X, BoxY + Y + Y, GFX.TextBox.w, 10, GFX.TextBox, 0, GFX.TextBox.h - 10);
-                    }
                 }
     //            ElseIf GameOutro = False Then
             }
@@ -2072,7 +2070,7 @@ void UpdateGraphics(bool skipRepaint)
         }
 
 //        If LevelEditor = True Or MagicHand = True Then
-        if((LevelEditor || MagicHand) && !GamePaused)
+        if((LevelEditor || MagicHand) && GamePaused == PauseCode::None)
         {
 
 #if 0 //.Useless editor-only stuff
@@ -2575,6 +2573,11 @@ void UpdateGraphics(bool skipRepaint)
     } // For(Z, 2, numScreens)
 
     speedRun_renderTimer();
+
+    if(GamePaused == PauseCode::Reconnect)
+    {
+        ConnectScreen::Render();
+    }
 
     if(!skipRepaint)
         frmMain.repaint();

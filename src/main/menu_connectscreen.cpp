@@ -22,14 +22,14 @@ enum class PlayerState
     SelectProfile,
     ConfirmProfile,
     TestControls,
-    StartGame
+    StartGame,
 };
 
 enum class Context
 {
     MainMenu,
     Reconnect,
-    DropAdd
+    DropAdd,
 };
 
 static Context s_context;
@@ -55,6 +55,19 @@ void MainMenu_Start(int minPlayers)
         s_inputReady[i] = false;
     }
     s_context = Context::MainMenu;
+}
+
+void Reconnect_Start()
+{
+    s_minPlayers = numPlayers;
+    for(int i = 0; i < maxLocalPlayers; i++)
+    {
+        s_playerState[i] = PlayerState::Disconnected;
+        s_menuItem[i] = 0;
+        s_inputReady[i] = false;
+        g_charSelect[i] = Player[i+1].Character;
+    }
+    s_context = Context::Reconnect;
 }
 
 // void menuPlayerSelect_Resume()
@@ -112,16 +125,13 @@ bool CheckDone()
 void Player_ValidateChar(int p)
 {
     // ensure that each character's selection is still valid
-    if(s_playerState[p] == PlayerState::SelectChar)
+    for(int i = 0; i < 5; i++)
     {
-        for(int i = 0; i < 5; i++)
-        {
-            if(s_menuItem[p] < 0 || CharAvailable(s_menuItem[p]+1))
-                break;
-            s_menuItem[p] ++;
-            if(s_menuItem[p] == 5)
-                s_menuItem[p] = 0;
-        }
+        if(s_menuItem[p] < 0 || CharAvailable(s_menuItem[p]+1))
+            break;
+        s_menuItem[p] ++;
+        if(s_menuItem[p] == 5)
+            s_menuItem[p] = 0;
     }
 }
 
@@ -190,7 +200,8 @@ bool Player_Select(int p)
     {
         DeleteInputMethod(Controls::g_InputMethods[p]);
         s_playerState[p] = PlayerState::Disconnected;
-        g_charSelect[p] = 0;
+        if(s_context == Context::MainMenu)
+            g_charSelect[p] = 0;
         do_sentinel.active = false;
         return false;
     }
@@ -349,12 +360,20 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pW, int sY, int line, bool m
     if(render)
     {
         SuperPrintCenter(fmt::format_ne("{0} {1}", g_mainMenu.wordPlayer, p+1), 3, cX, sY+2*line);
+        if(g_charSelect[p] != 0)
+            SuperPrintCenter(g_mainMenu.selectPlayer[g_charSelect[p]], 3, cX, sY+3*line);
     }
 
     // now render / process the player's menu as appropriate to its case
 
+    // pretend that player 1 is connected in the main menu
+    bool pretend_connected;
+    if(p == 0 && s_context == Context::MainMenu && s_playerState[p] == PlayerState::Disconnected)
+        pretend_connected = true;
+    else
+        pretend_connected = false;
     // if player is disconnected, show the attach controller message and return
-    if(p != 0 && s_playerState[p] == PlayerState::Disconnected)
+    if(!pretend_connected && s_playerState[p] == PlayerState::Disconnected)
     {
         if(render)
             SuperPrintCenter(g_mainMenu.playerSelAttachController, 3, cX, sY+7*line);
@@ -362,8 +381,7 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pW, int sY, int line, bool m
     }
 
     // render the character select screen
-    if((p == 0 && s_playerState[p] == PlayerState::Disconnected)
-        || s_playerState[p] == PlayerState::SelectChar)
+    if(pretend_connected || s_playerState[p] == PlayerState::SelectChar)
     {
         Player_ValidateChar(p);
         // show the menu cursor for the player
@@ -454,6 +472,20 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pW, int sY, int line, bool m
                 n_stars = s_menuItem[p]/11;
             const std::string squeeze(n_stars, '*');
             SuperPrintCenter(squeeze, 3, cX, sY+8*line);
+        }
+    }
+
+    // render the (waiting for other players / game start screen)
+    if(s_playerState[p] == PlayerState::StartGame)
+    {
+        if(CheckDone())
+        {
+            SuperPrint(g_mainMenu.playerSelStartGame, 3, pX, sY+7*line);
+            frmMain.renderTexture(pX - 20, sY+7*line, GFX.MCursor[0]);
+        }
+        else
+        {
+            SuperPrintCenter(g_mainMenu.wordWaiting, 3, cX, sY+7*line);
         }
     }
 
@@ -634,6 +666,20 @@ int Logic()
         if(s_playerState[p] == PlayerState::TestControls || s_playerState[p] == PlayerState::ConfirmProfile)
             block_poll = true;
     }
+    if(s_context == Context::Reconnect)
+    {
+        if((int)Controls::g_InputMethods.size() < s_minPlayers)
+            block_poll = false;
+        else
+        {
+            block_poll = true;
+            for(Controls::InputMethod* method : Controls::g_InputMethods)
+            {
+                if(!method)
+                    block_poll = false;
+            }
+        }
+    }
     if(!block_poll && Controls::PollInputMethod())
     {
         if((int)Controls::g_InputMethods.size() > 1)
@@ -654,14 +700,16 @@ int Logic()
 
     for(int p = 0; p < maxLocalPlayers; p++)
     {
-        Player_ValidateChar(p);
+        if(s_playerState[p] == PlayerState::SelectChar)
+            Player_ValidateChar(p);
 
         // if player doesn't exist, or was lost *not on menu screen*
         if(p >= (int)Controls::g_InputMethods.size()
             || (!Controls::g_InputMethods[p] && s_context != Context::MainMenu))
         {
             s_playerState[p] = PlayerState::Disconnected;
-            g_charSelect[p] = 0;
+            if(s_context == Context::MainMenu)
+                g_charSelect[p] = 0;
             // because P1's UI is always shown,
             // allow the first controller to immediately act upon connection
             if(p == 0)
@@ -692,11 +740,17 @@ int Logic()
         if(s_playerState[p] == PlayerState::Disconnected)
         {
             s_inputReady[p] = false;
+            s_menuItem[p] = 0;
             if(s_context == Context::MainMenu)
             {
                 if(p == 0)
                     s_inputReady[p] = true;
                 s_playerState[p] = PlayerState::SelectChar;
+            }
+            else if(s_context == Context::Reconnect)
+            {
+                // just for now!
+                s_playerState[p] = PlayerState::StartGame;
             }
             // other states for other contexts
             // wait one frame to process them because Controls are not updated yet

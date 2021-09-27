@@ -165,6 +165,14 @@ extern std::string LB;
 //Public EoT As String  ' End of Transmission for WINSOCK
 extern std::string EoT;
 
+enum class PauseCode
+{
+    None,
+    PauseGame,
+    Message,
+    Reconnect,
+};
+
 // Moved back into "control_types.h"
 //     since "controls.h" is changing more rapidly
 #include "control_types.h"
@@ -1046,7 +1054,7 @@ extern int numLocked;
 //Public resChanged As Boolean 'true if in fullscreen mode
 extern bool resChanged;
 //Public GamePaused As Boolean 'true if the game is paused
-extern bool GamePaused;
+extern PauseCode GamePaused;
 //Public MessageText As String 'when talking to an npc
 extern std::string MessageText;
 //Public NumSelectWorld As Integer

@@ -107,7 +107,8 @@ void WorldLoop()
 
     speedRun_tick();
     UpdateGraphics2();
-    Controls::Update();
+    if(!Controls::Update())
+        PauseGame(PauseCode::Reconnect, 0);
     UpdateSound();
 
     if(curWorldLevel > 0)
@@ -233,7 +234,7 @@ void WorldLoop()
         if(pausePress)
         {
             if(Player[1].UnStart)
-                PauseGame(1);
+                PauseGame(PauseCode::PauseGame, 1);
         }
 
         if(Player[1].Controls.Up)
@@ -440,7 +441,7 @@ void WorldLoop()
                             if(!OpenLevel(levelPath))
                             {
                                 MessageText = fmt::format_ne("ERROR: Can't open \"{0}\": file doesn't exist or corrupted.", level.FileName);
-                                PauseGame(1);
+                                PauseGame(PauseCode::Message, 1);
                                 ErrorQuit = true;
                             }
                             break;

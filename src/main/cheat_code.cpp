@@ -79,7 +79,7 @@ void CheatCode(char NewKey)
                           "                           "
                           "     Time to be evil!      "
                           "      Mu-ha-ha-ha-ha!      ";
-            PauseGame(1);
+            PauseGame(PauseCode::Message, 1);
             MessageText.clear();
         }
         else
