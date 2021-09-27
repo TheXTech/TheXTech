@@ -50,6 +50,18 @@ struct Compatibility_t
     // 1.3.5.2
     bool fix_swooper_start_while_inactive;
     bool fix_FreezeNPCs_no_reset;
+    enum StarsShowPolicy_t
+    {
+        //! Prefer global settings
+        STARS_UNSPECIFIED = -1,
+        //! Never show stars counter
+        STARS_DONT_SHOW = 0,
+        //! Show collected only
+        STARS_SHOW_COLLECTED_ONLY = 1,
+        //! Show collected and available
+        STARS_SHOW_COLLECTED_AND_AVAILABLE = 2
+    };
+    int world_map_stars_show_policy;
     // 1.3.6
 
 
