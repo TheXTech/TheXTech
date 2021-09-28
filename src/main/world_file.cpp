@@ -268,7 +268,7 @@ void OpenWorld(std::string FilePath)
         std::string music_file = dirEpisode.resolveFileCaseExists(m.music_file);
         if(!music_file.empty())
         {
-            SetS(box.MusicFile, music_file);
+            SetS(box.MusicFile, music_file); // adds to LevelString
         }
 
         // In game they are smaller (30x30), in world they are 32x32
@@ -334,6 +334,7 @@ void OpenWorld(std::string FilePath)
 //            frmWorld::txtCredits(A).Text = WorldCredits[A];
 //        frmWorld.txtStars = MaxWorldStars;
 //    }
+    g_numWorldString = LevelString.size();
     resetFrameTimer();
 }
 
@@ -362,6 +363,7 @@ void ClearWorld()
         WorldMusic[A] = WorldMusic_t();
 
     LevelString.clear();
+    g_numWorldString = 0;
     MaxWorldStars = 0;
     numTiles = 0;
     numWorldPaths = 0;

@@ -25,6 +25,8 @@
 #include <string>
 #include <PGE_File_Formats/lvl_filedata.h>
 
+extern size_t g_numWorldString;
+
 struct Background_t;
 
 extern void bgoApplyZMode(Background_t *bgo, int smbx64sp);

@@ -42,6 +42,7 @@
 #include <Logger/logger.h>
 #include <PGE_File_Formats/file_formats.h>
 
+size_t g_numWorldString = 0;
 
 void bgoApplyZMode(Background_t *bgo, int smbx64sp)
 {
@@ -830,7 +831,7 @@ void ClearLevel()
     const Events_t blankEvent = Events_t();
     const Effect_t blankEffect = Effect_t();
     NPCScore[NPCID_DRAGONCOIN] = 6;
-    LevelString.clear();
+    LevelString.resize(g_numWorldString);
     LevelName.clear();
     ResetCompat();
     LoadNPCDefaults();
