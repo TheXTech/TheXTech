@@ -690,7 +690,6 @@ void UpdateGraphics2(bool skipRepaint)
         // Print the level's name
         if(!WorldPlayer[1].LevelName.empty())
         {
-            size_t availChars = (size_t)((sW - margin - (pX + 116))/16) + 1;
             WorldPlayer_t::StarsState_t& s = WorldPlayer[1].stars;
             if(s.max > 0 && s.displayPolicy > Compatibility_t::STARS_DONT_SHOW)
             {
@@ -703,21 +702,17 @@ void UpdateGraphics2(bool skipRepaint)
 
                 int len = SuperTextPixLen(label, 3);
                 int totalLen = len + GFX.Interface[1].w + GFX.Interface[5].w + 8 + 4;
-                int x = sW - margin;
-                int y = marginTop - 21;
-                // if it fits, but wouldn't after adding stars, put stars higher
-                //   otherwise, shorten string's area
-                if(WorldPlayer[1].LevelName.length() < availChars && availChars - WorldPlayer[1].LevelName.length() < 6)
-                    y -= 20;
-                else
-                    availChars -= 6;
-                frmMain.renderTexture(x - len - (GFX.Interface[1].w + 4), y,
-                                      GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
-                frmMain.renderTexture(x - len - (GFX.Interface[1].w + GFX.Interface[5].w + 8), y,
+                int x = vScreenX[Z] + WorldPlayer[1].Location.X + WorldPlayer[1].Location.Width / 2 - totalLen / 2;
+                int y = vScreenY[Z] + WorldPlayer[1].Location.Y - 32;
+
+                frmMain.renderTexture(x, y,
                                       GFX.Interface[5].w, GFX.Interface[5].h, GFX.Interface[5], 0, 0);
-                SuperPrintRightAlign(label, 3, x, y);
+                frmMain.renderTexture(x + GFX.Interface[5].w + 8, y,
+                                      GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+                SuperPrint(label, 3, x + GFX.Interface[1].w + GFX.Interface[5].w + 8 + 4, y);
             }
 
+            size_t availChars = (size_t)((sW - margin - (pX + 116))/16) + 1;
             if(WorldPlayer[1].LevelName.length() > availChars*2)
             {
                 SuperPrint(WorldPlayer[1].LevelName.substr(0, availChars), 2,
