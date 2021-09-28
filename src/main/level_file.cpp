@@ -844,6 +844,8 @@ void ClearLevel()
     doShakeScreenClear();
     treeLevelCleanAll();
 
+    AutoUseModern = false;
+
     numSections = 0;
 
     for(A = 1; A <= newEventNum; A++)
@@ -1011,25 +1013,28 @@ void ClearLevel()
 
 void FindStars()
 {
-    int A = 0;
-    int B = 0;
-    std::string newInput;
+//    int A = 0;
+//    int B = 0;
+//    std::string newInput;
     LevelData head;
 
-    for(A = 1; A <= numWarps; A++)
+    for(int A = 1; A <= numWarps; A++)
     {
         auto &warp = Warp[A];
+
         if(warp.level != STRINGINDEX_NONE)
         {
             std::string lFile = FileNamePath + GetS(warp.level);
             addMissingLvlSuffix(lFile);
+
             if(Files::fileExists(lFile))
             {
                 if(FileFormats::OpenLevelFileHeader(lFile, head))
                 {
                     warp.maxStars = head.stars;
                     warp.curStars = 0;
-                    for(B = 1; B <= numStars; B++)
+
+                    for(int B = 1; B <= numStars; B++)
                     {
                         if(SDL_strcasecmp(Star[B].level.c_str(), GetS(warp.level).c_str()) == 0)
                             warp.curStars++;

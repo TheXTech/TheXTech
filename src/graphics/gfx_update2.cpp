@@ -25,6 +25,9 @@
 #include "../player.h"
 #include "../main/speedrunner.h"
 #include "../main/trees.h"
+#include "../compat.h"
+
+#include <fmt_format_ne.h>
 
 
 // draws GFX to screen when on the world map/world map editor
@@ -683,10 +686,38 @@ void UpdateGraphics2(bool skipRepaint)
             frmMain.renderTexture(pX + 40, marginTop - 62, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
             SuperPrint(std::to_string(numStars), 1, pX + 62, marginTop - 62);
         }
+
         // Print the level's name
-        if(WorldPlayer[1].LevelName != "")
+        if(!WorldPlayer[1].LevelName.empty())
         {
             size_t availChars = (size_t)((sW - margin - (pX + 116))/16) + 1;
+            WorldPlayer_t::StarsState_t& s = WorldPlayer[1].stars;
+            if(s.max > 0 && s.displayPolicy > Compatibility_t::STARS_DONT_SHOW)
+            {
+                std::string label;
+
+                if(s.displayPolicy >= Compatibility_t::STARS_SHOW_COLLECTED_AND_AVAILABLE)
+                    label = fmt::format_ne("{0}/{1}", s.cur, s.max);
+                else
+                    label = fmt::format_ne("{0}", s.cur);
+
+                int len = SuperTextPixLen(label, 3);
+                int totalLen = len + GFX.Interface[1].w + GFX.Interface[5].w + 8 + 4;
+                int x = sW - margin;
+                int y = marginTop - 21;
+                // if it fits, but wouldn't after adding stars, put stars higher
+                //   otherwise, shorten string's area
+                if(WorldPlayer[1].LevelName.length() < availChars && availChars - WorldPlayer[1].LevelName.length() < 6)
+                    y -= 20;
+                else
+                    availChars -= 6;
+                frmMain.renderTexture(x - len - (GFX.Interface[1].w + 4), y,
+                                      GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+                frmMain.renderTexture(x - len - (GFX.Interface[1].w + GFX.Interface[5].w + 8), y,
+                                      GFX.Interface[5].w, GFX.Interface[5].h, GFX.Interface[5], 0, 0);
+                SuperPrintRightAlign(label, 3, x, y);
+            }
+
             if(WorldPlayer[1].LevelName.length() > availChars*2)
             {
                 SuperPrint(WorldPlayer[1].LevelName.substr(0, availChars), 2,

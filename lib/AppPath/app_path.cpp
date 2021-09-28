@@ -421,10 +421,10 @@ void AppPathManager::initAppPath()
             m_userPath.append("/thextech/");
         else
             m_userPath.append("/");
-#   elif !defined(__3DS__)
-        m_userPath.append("/thextech/");
-#else
+#   elif defined(__3DS__)
         m_userPath.append("/");
+#else
+        m_userPath.append("/thextech/");
 #   endif
 #else
         m_userPath.append("/");

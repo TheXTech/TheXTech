@@ -885,6 +885,11 @@ struct WorldLevel_t
 //End Type
     int64_t Z = 0;
     int index = 0;
+
+// Display number of stars (if available)
+    int curStars = 0;
+    int maxStars = 0;
+    int starsShowPolicy = -1;
 };
 
 //Public Type Warp 'warps such as pipes and doors
@@ -1058,6 +1063,13 @@ struct WorldPlayer_t
 //    LevelName As String
     std::string LevelName;
 //End Type
+
+    struct StarsState_t
+    {
+        int cur = 0;
+        int max = 0;
+        int displayPolicy = 0;
+    } stars;
 };
 
 //Public Type Layer
@@ -1125,6 +1137,7 @@ extern bool ShowFPS;
 extern double PrintFPS;
 // Do ground-point by alt-run key instead of down
 extern bool GameplayPoundByAltRun;
+extern int WorldMapStarShowPolicyGlobal;
 // Shake screen on thwomp falling
 extern bool GameplayShakeScreenThwomp;
 // Shake screen on Bowser III'rd ground pound
@@ -1205,6 +1218,8 @@ extern std::string StartLevel;
 extern bool NoMap;
 //Public RestartLevel As Boolean 'restart the level on death
 extern bool RestartLevel;
+//! Per-level stars showing policy
+extern int WorldStarsShowPolicy;
 //Public LevelChop(0 To maxSections) As Single 'for drawing backgrounds when the level has been shrunk
 extern float LevelChop[maxSections + 1];
 //'collision detection optimization. creates a table of contents for blocks
