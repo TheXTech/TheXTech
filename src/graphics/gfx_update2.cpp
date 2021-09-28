@@ -455,6 +455,32 @@ void UpdateGraphics2(bool skipRepaint)
                               WorldPlayer[1].Location.Width, WPHeight,
                               GFXPlayerBMP[WorldPlayer[1].Type], 0, WPHeight * WorldPlayer[1].Frame);
 
+        if(!WorldPlayer[1].LevelName.empty())
+        {
+             auto &s = WorldPlayer[1].stars;
+
+             if(s.max > 0 && s.displayPolicy > Compatibility_t::STARS_DONT_SHOW)
+             {
+                 std::string label;
+
+                 if(s.displayPolicy >= Compatibility_t::STARS_SHOW_COLLECTED_AND_AVAILABLE)
+                     label = fmt::format_ne("{0}/{1}", s.cur, s.max);
+                 else
+                     label = fmt::format_ne("{0}", s.cur);
+
+                 int len = SuperTextPixLen(label, 3);
+                 int totalLen = len + GFX.Interface[1].w + GFX.Interface[5].w + 8 + 4;
+                 int x = vScreenX[Z] + WorldPlayer[1].Location.X + (WorldPlayer[1].Location.Width / 2) - (totalLen / 2);
+                 int y = vScreenY[Z] + WorldPlayer[1].Location.Y - 32;
+
+                 frmMain.renderTexture(x, y,
+                                       GFX.Interface[5].w, GFX.Interface[5].h, GFX.Interface[5], 0, 0);
+                 frmMain.renderTexture(x + GFX.Interface[5].w + 8, y,
+                                       GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+                 SuperPrint(label, 3, x + GFX.Interface[1].w + GFX.Interface[5].w + 8 + 4, y);
+             }
+        }
+
 //        frmMain.renderTexture(0, 0, 800, 130, GFX.Interface[4], 0, 0);
 
         frmMain.renderTexture(0, 0, 800, 130, GFX.Interface[4], 0, 0);
@@ -683,31 +709,8 @@ void UpdateGraphics2(bool skipRepaint)
         // Print the level's name
         if(!WorldPlayer[1].LevelName.empty())
         {
-            auto &s = WorldPlayer[1].stars;
-            int lnl = SuperTextPixLen(WorldPlayer[1].LevelName, 2);
             int lnlx = 32 + (48 * A) + 116;
-
             SuperPrint(WorldPlayer[1].LevelName, 2, lnlx, 109);
-
-            if(s.max > 0 && s.displayPolicy > Compatibility_t::STARS_DONT_SHOW)
-            {
-                std::string label;
-
-                if(s.displayPolicy >= Compatibility_t::STARS_SHOW_COLLECTED_AND_AVAILABLE)
-                    label = fmt::format_ne("{0}/{1}", s.cur, s.max);
-                else
-                    label = fmt::format_ne("{0}", s.cur);
-
-                int len = SuperTextPixLen(label, 3);
-                int totalLen = len + GFX.Interface[1].w + GFX.Interface[5].w + 8 + 4;
-                int x = 734;
-                int y = (lnl + lnlx >= x - totalLen ? 90 : 109); // Print stars count above the title if it gets too long
-                frmMain.renderTexture(x - len - (GFX.Interface[1].w + 4), y,
-                                      GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
-                frmMain.renderTexture(x - len - (GFX.Interface[1].w + GFX.Interface[5].w + 8), y,
-                                      GFX.Interface[5].w, GFX.Interface[5].h, GFX.Interface[5], 0, 0);
-                SuperPrintRightAlign(label, 3, x, y);
-            }
         }
 
         if(GamePaused)
