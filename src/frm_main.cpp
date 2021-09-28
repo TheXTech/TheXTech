@@ -221,49 +221,42 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
     pLogDebug("Init renderer settings...");
 
     Uint32 renderFlags = 0;
-    if(g_videoSettings.renderMode == RENDER_SOFTWARE)
+
+    switch(setup.renderType)
     {
-        renderFlags = SDL_RENDERER_SOFTWARE;
-        g_videoSettings.renderModeObtained = RENDER_SOFTWARE;
-        pLogDebug("Using software rendering");
-    }
-    else if(g_videoSettings.renderMode == RENDER_ACCELERATED)
-    {
-        renderFlags = SDL_RENDERER_ACCELERATED;
-        g_videoSettings.renderModeObtained = RENDER_ACCELERATED;
-        pLogDebug("Using accelerated rendering");
-    }
-    else if(g_videoSettings.renderMode == RENDER_ACCELERATED_VSYNC)
-    {
+    case RENDER_ACCELERATED_VSYNC:
         renderFlags = SDL_RENDERER_ACCELERATED|SDL_RENDERER_PRESENTVSYNC;
         g_videoSettings.renderModeObtained = RENDER_ACCELERATED_VSYNC;
         pLogDebug("Using accelerated rendering with a vertical synchronization");
-    }
-
-    m_gRenderer = SDL_CreateRenderer(m_window, -1, renderFlags | SDL_RENDERER_TARGETTEXTURE); // Try to make renderer
-
-    if(!m_gRenderer && g_videoSettings.renderModeObtained == RENDER_ACCELERATED_VSYNC) // If was a V-Sync renderer, use non-V-Synced
-    {
+        m_gRenderer = SDL_CreateRenderer(m_window, -1, renderFlags | SDL_RENDERER_TARGETTEXTURE); // Try to make renderer
+        if(m_gRenderer)
+            break; // All okay
         pLogWarning("Failed to initialize V-Synced renderer, trying to create accelerated renderer...");
+
+        // fallthrough
+    case RENDER_ACCELERATED:
         renderFlags = SDL_RENDERER_ACCELERATED;
         g_videoSettings.renderModeObtained = RENDER_ACCELERATED;
-        m_gRenderer = SDL_CreateRenderer(m_window, -1, renderFlags | SDL_RENDERER_TARGETTEXTURE);
-    }
-
-    if(!m_gRenderer && g_videoSettings.renderModeObtained == RENDER_ACCELERATED) // Fall back to software
-    {
+        pLogDebug("Using accelerated rendering");
+        m_gRenderer = SDL_CreateRenderer(m_window, -1, renderFlags | SDL_RENDERER_TARGETTEXTURE); // Try to make renderer
+        if(m_gRenderer)
+            break; // All okay
         pLogWarning("Failed to initialize accelerated renderer, trying to create a software renderer...");
+
+        // fallthrough
+    case RENDER_SOFTWARE:
         renderFlags = SDL_RENDERER_SOFTWARE;
         g_videoSettings.renderModeObtained = RENDER_SOFTWARE;
-        m_gRenderer = SDL_CreateRenderer(m_window, -1, renderFlags | SDL_RENDERER_TARGETTEXTURE);
-    }
+        pLogDebug("Using software rendering");
+        m_gRenderer = SDL_CreateRenderer(m_window, -1, renderFlags | SDL_RENDERER_TARGETTEXTURE); // Try to make renderer
+        if(m_gRenderer)
+            break; // All okay
 
-    if(!m_gRenderer)
-    {
         pLogCritical("Unable to create renderer!");
         freeSDL();
         return false;
     }
+
 
     SDL_GetRendererInfo(m_gRenderer, &m_ri);
 
