@@ -35,6 +35,7 @@ uint32_t __stacksize__ = 0x00020000;
 #include "game_main.h"
 #include "sound.h"
 #include "video.h"
+#include "main/presetup.h"
 #include "main/game_info.h"
 #include "main/speedrunner.h"
 #include "compat.h"
@@ -347,6 +348,7 @@ int main(int argc, char**argv)
         else
         {
             setup.renderType = g_videoSettings.renderMode;
+        }
 
         setup.testLevel = testLevel.getValue();
 
@@ -404,9 +406,7 @@ int main(int argc, char**argv)
         }
         else
         {
-            std::cerr << "Error: Invalid value for the --compat-level argument: " << compatModeVal << std::endl;
-            std::cerr.flush();
-            return 2;
+            setup.compatibilityLevel = g_preSetup.compatibilityMode;
         }
 
         setup.speedRunnerMode = speedRunMode.isSet() ?
