@@ -128,7 +128,10 @@ FIBITMAP *GraphicsHelps::loadImage(std::vector<char> &raw, bool convertTo32bit)
     FREE_IMAGE_FORMAT formato = FreeImage_GetFileTypeFromMemory(imgMEM);
 
     if(formato  == FIF_UNKNOWN)
+    {
+        pLogDebug("FIF_UNKNOWN");
         return nullptr;
+    }
 
     FIBITMAP *img = FreeImage_LoadFromMemory(formato, imgMEM, 0);
     FreeImage_CloseMemory(imgMEM);

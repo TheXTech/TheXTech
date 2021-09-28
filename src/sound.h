@@ -35,10 +35,17 @@ extern int playerHammerSFX;
 extern struct AudioSetup_t
 {
     bool disableSound = false;
+#ifdef VITA
+    int sampleRate = 44100;
+    uint16_t format = 0x8010;
+    int channels = 2;
+    int bufferSize = 2048;
+#else
     int sampleRate = 44100;
     uint16_t format = 0x8120;
     int channels = 2;
     int bufferSize = 512;
+#endif
 } g_audioSetup;
 
 

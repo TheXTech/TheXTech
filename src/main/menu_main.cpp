@@ -1248,10 +1248,10 @@ bool mainMenuUpdate()
         else if(MenuMode == MENU_OPTIONS)
         {
             int optionsMenuLength = 2; // P1, P2, Credits
-#if !defined(__ANDROID__) && !defined(__3DS__)
+#if !defined(__ANDROID__) && !defined(__3DS__) && !defined(VITA)
             optionsMenuLength ++; // Fullscreen
 #endif
-#ifndef __3DS__
+#if !defined(__3DS__) && !defined(VITA)
             optionsMenuLength ++; // ScaleMode
 #endif
 #ifndef FIXED_RES
@@ -1274,7 +1274,7 @@ bool mainMenuUpdate()
                             menuLen = 18 * std::strlen("player 1 controls") - 4;
                         else if(A == i++)
                             menuLen = 18 * std::strlen("player 2 controls") - 4;
-#if !defined(__ANDROID__) && !defined(__3DS__)
+#if !defined(__ANDROID__) && !defined(__3DS__) && !defined(VITA)
                         else if(A == i++)
                         {
                             if(resChanged)
@@ -1283,7 +1283,7 @@ bool mainMenuUpdate()
                                 menuLen = 18 * std::strlen("fullscreen mode");
                         }
 #endif
-#if !defined(__3DS__)
+#if !defined(__3DS__) && !defined(VITA)
                         else if(A == i++)
                             menuLen = 18 * (7 + ScaleMode_strings.at(g_videoSettings.scaleMode).length());
 #endif
@@ -1348,7 +1348,7 @@ bool mainMenuUpdate()
                         ChangeScreen();
                     }
 #endif
-#if !defined(__3DS__)
+#if !defined(__3DS__) && !defined(VITA)
                     else if(MenuCursor == i++)
                     {
                         PlaySoundMenu(SFX_Do);
@@ -1561,6 +1561,7 @@ bool mainMenuUpdate()
             {
                 if(getNewKeyboard)
                 {
+#ifndef VITA
                     if(inputKey != 0)
                     {
                         getNewKeyboard = false;
@@ -1568,6 +1569,7 @@ bool mainMenuUpdate()
                         PlaySoundMenu(SFX_Do);
                         setKey(conKeyboard[MenuMode - MENU_INPUT_SETTINGS_BASE], MenuCursor, inputKey);
                     }
+#endif
 
                 }
                 else if(getNewJoystick)
@@ -2089,14 +2091,14 @@ void mainMenuDraw()
         SuperPrint("PLAYER 1 CONTROLS", 3, MenuX, MenuY);
         SuperPrint("PLAYER 2 CONTROLS", 3, MenuX, MenuY + 30);
         A = 2;
-#if !defined(__ANDROID__) && !defined(__3DS__)
+#if !defined(__ANDROID__) && !defined(__3DS__) && !defined(VITA)
         if(resChanged)
             SuperPrint("WINDOWED MODE", 3, MenuX, MenuY + 30*A);
         else
             SuperPrint("FULLSCREEN MODE", 3, MenuX, MenuY + 30*A);
         A ++;
 #endif
-#ifndef __3DS__
+#if !defined(__3DS__) && !defined(VITA)
         SuperPrint("SCALE: "+ScaleMode_strings.at(g_videoSettings.scaleMode), 3, MenuX, MenuY + 30*A);
         A ++;
 #endif

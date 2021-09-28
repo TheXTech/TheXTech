@@ -240,11 +240,13 @@ static std::string getCurrentUserName()
     user = std::string(userName);
 #elif defined(__EMSCRIPTEN__) || defined(__ANDROID__) || defined(__HAIKU__)
     user = "user"; // No way to get user, here is SINGLE generic user
-#else
+#elif defined(__gnu_linux__)
     struct passwd *pwd = getpwuid(getuid());
     if(pwd == nullptr)
         return "UnknownUser"; // Failed to get a user name!
     user = std::string(pwd->pw_name);
+#elif defined(VITA)
+    return "VitaHandheld";
 #endif
 
     return user;
@@ -270,12 +272,13 @@ static std::string getCurrentHomePath()
             return "/home/<unknown>"; // Failed to get a user name!
         homedir = std::string(home);
     }
-#else
+#elif defined(__gnu_linux__)
     struct passwd *pwd = getpwuid(getuid());
     if(pwd == nullptr)
         return "/home/<unknown>"; // Failed to get a user name!
     homedir = std::string(pwd->pw_dir);
-
+#elif defined(VITA)
+    return "ux0:/";
 #endif
 
     return homedir;
@@ -446,20 +449,20 @@ void LLVM_ATTRIBUTE_NORETURN CrashHandler::crashByFlood()
     abortEngine(-2);
 }
 
-#ifdef _WIN32//Unsupported signals by Windows
+#if defined(_WIN32) || defined(VITA) //Unsupported signals by Windows
 struct siginfo_t;
 #endif
 
 static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
 {
-#ifdef _WIN32  //Unsupported signals by Windows
+#if defined(_WIN32) || defined(VITA)  //Unsupported signals by Windows
     (void)siginfo;
 #endif
 
     // Find out which signal we're handling
     switch(signal)
     {
-#ifndef _WIN32  //Unsupported signals by Windows
+#if !defined(_WIN32) && !defined(VITA)  //Unsupported signals by Windows
 
     case SIGHUP:
         pLogWarning("Terminal was closed");
@@ -555,7 +558,7 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
     case SIGFPE:
     {
         std::string stack = getStacktrace();
-#ifndef _WIN32  //Unsupported signals by Windows
+#if !defined(_WIN32) && !defined(VITA)  //Unsupported signals by Windows
 
         if(siginfo)
         {
@@ -628,7 +631,7 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
                       "(if log ends before \"DONE\" will be shown, seems also trouble in the backtracing function too...)");
         std::string stack = getStacktrace();
 
-#ifndef _WIN32  //Unsupported signals by Windows
+#if !defined(_WIN32) && !defined(VITA)  //Unsupported signals by Windows & Vita
         if(siginfo)
         {
             switch(siginfo->si_code)
@@ -688,7 +691,7 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
     }
 }
 
-#ifndef _WIN32//Unsupported signals by Windows
+#if !defined(_WIN32) || !defined(VITA)//Unsupported signals by Windows
 static struct sigaction act;
 #else
 struct siginfo_t;
@@ -709,7 +712,7 @@ void CrashHandler::initSigs()
 
     std::set_new_handler(&crashByFlood);
     std::set_terminate(&crashByUnhandledException);
-#ifndef _WIN32//Unsupported signals by Windows
+#if !defined(_WIN32) && !defined(VITA)//Unsupported signals by Windows
     memset(&act, 0, sizeof(struct sigaction));
     sigemptyset(&act.sa_mask);
     act.sa_sigaction = handle_signal;
@@ -727,12 +730,14 @@ void CrashHandler::initSigs()
     sigaction(SIGSEGV, &act, nullptr);
     sigaction(SIGINT,  &act, nullptr);
     sigaction(SIGABRT, &act, nullptr);
-#else
+#elif defined(_WIN32)
     signal(SIGILL,  &handle_signalWIN32);
     signal(SIGFPE,  &handle_signalWIN32);
     signal(SIGSEGV, &handle_signalWIN32);
     signal(SIGINT,  &handle_signalWIN32);
     signal(SIGABRT, &handle_signalWIN32);
+#elif defined(VITA)
+    pLogInfo("TODO: Setup signals on Vita.");
 #endif
 }
 /* Signals End */

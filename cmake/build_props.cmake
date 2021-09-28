@@ -52,6 +52,11 @@ elseif(NOT MSVC)
             set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -Wl,--gc-sections")
             set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wl,--gc-sections")
             set(LINK_FLAGS_RELEASE  "${LINK_FLAGS_RELEASE} -Wl,--gc-sections")
+        elseif(VITA)
+            # VitaSDK specifies -O2 for release configurations.
+            set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -g -I../src -Wl,--gc-sections -DVITA=1 -fcompare-debug-second")
+            set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -g -I../src -Wl,--gc-sections -DVITA=1 -fpermissive -fcompare-debug-second -fno-optimize-sibling-calls -Wno-class-conversion")
+            set(LINK_FLAGS_RELEASE  "${LINK_FLAGS_RELEASE} -Wl,--gc-sections")
         elseif(NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
             set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -s -Wl,--gc-sections -Wl,-s")
             set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -s -Wl,--gc-sections -Wl,-s")
@@ -81,6 +86,115 @@ if(ANDROID)
         "-DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}"
         "-DANDROID_ARM_NEON=${ANDROID_ARM_NEON}"
     )
+endif()
+
+if(VITA)
+    message("Set CMAKE Flags for Vita.")
+    include("$ENV{VITASDK}/share/vita.cmake" REQUIRED)
+
+    cmake_policy(SET CMP0077 OLD)
+
+    set(VITA_APP_NAME "TheXTech Vita Edition")
+    set(VITA_TITLEID "THEXTECH0")
+    set(VERSION "01.00")
+    set(VITA_MKSFOEX_FLAGS "-d ATTRIBUTE2=12") # ATTRIBUTE2=12 specifies we need more RAM.
+
+    set(VITA_ADDTL_LIBS
+        FLAC
+        modplug
+        mad
+        opusfile
+        opus
+        vorbisfile
+        vorbis
+        ogg
+        jpeg
+    )
+
+    if(USE_VITA2D_VID)
+        set(VITA_ADDTL_LIBS "${VITA_ADDTL_LIBS}" vita2d)
+    else()
+        set(VITA_ADDTL_LIBS "${VITA_ADDTL_LIBS}" vitaGL cglm)
+    endif()
+
+    set(VITA_ADDTL_LIBS 
+        ${VITA_ADDTL_LIBS} 
+        debugnet
+        mathneon
+        SceCtrl_stub
+        SceMotion_stub
+        SceHid_stub
+        SceRtc_stub
+        SceNetCtl_stub
+        SceNet_stub
+        SceLibKernel_stub
+        ScePvf_stub
+        SceAppMgr_stub
+        SceAppUtil_stub
+        ScePgf_stub
+        freetype
+        png
+        jpeg
+        SceCommonDialog_stub
+        m
+        zip
+        z
+        pthread
+        SceGxm_stub
+        SceDisplay_stub
+        SceSysmodule_stub
+        SceTouch_stub
+        SceAudio_stub
+        vitashark
+        SceShaccCg_stub
+        SceSysmem_stub
+        SceIofilemgr_stub
+        SceKernelThreadMgr_stub
+        SceKernelDmacMgr_stub
+        SceVshBridge_stub
+    )
+
+    set(VITA_CMAKE_FLAGS
+        # General/TheXTech
+        "-DVITA=1"
+        "-DENABLE_FPIC=0"
+        "-DBUILD_OGG_VORBIS=1"
+        "-DPGE_NO_THREADING=1"
+        "-DLOW_MEM=1"
+        "-DPRELOAD_LEVELS=1"
+        "-DUSE_SYSTEM_SDL2_DEFAULT=ON"
+        "-DUSE_SYSTEM_SDL2=ON"
+        "-DNO_INTPTROC=ON"
+        "-DUSE_STATIC_LIBC=OFF"
+        "-DNO_SCREENSHOT=1"
+
+        # Free Image
+        "-DCMAKE_POSITION_INDEPENDENT_CODE=OFF"
+        "-DFREEIMAGE_SHARED=OFF"
+        "-DFREEIMAGE_USE_SYSTEM_LIBPNG=ON"
+        "-DFREEIMAGE_USE_SYSTEM_LIBJPEG=ON"
+
+        # Audio Mixer
+        "-DPGE_SHARED_SDLMIXER=OFF"
+        "-DPGE_USE_LOCAL_SDL2=OFF"
+        "-DUSE_SYSTEM_SDL2=ON"
+        
+        "-DUSE_GME=ON"
+        "-DUSE_MIDI=ON"
+        "-DADLMIDI_LIBRARY="
+        "-DBUILD_OGG_VORBIS=1"
+        # VitaSDK has local Opus available through vdpm (usually installed as part of a default install)
+        # BUILDS LOCALLY NOW!
+        # "-DBUILD_OPUS=OFF"
+        # "-DLIBOPUSFILE_LIB=${vita_opusfile}"
+        # "-DLIBOPUS_LIB=${vita_opus}"
+    )
+
+    if(USE_SDL_VID)
+        set(VITA_CMAKE_FLAGS "${VITA_CMAKE_FLAGS} -DUSE_SDL_VID=1")
+    else()
+        set(VITA_CMAKE_FLAGS "${VITA_CMAKE_FLAGS} -DNO_SCREENSHOT=1")
+    endif()
 endif()
 
 string(TOLOWER "${CMAKE_BUILD_TYPE}" CMAKE_BUILD_TYPE_LOWER)
@@ -129,7 +243,8 @@ if(MSVC)
 endif()
 
 # -fPIC thing
-if(LIBRARY_PROJECT AND NOT WIN32)
+if(LIBRARY_PROJECT AND NOT WIN32 AND NOT VITA)
+    message("cmake/buildprops CAUSES FPIC ON ")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 endif()

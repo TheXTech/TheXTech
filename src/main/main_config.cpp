@@ -81,9 +81,9 @@ void OpenConfig_preSetup()
         {"s16be", AUDIO_S16MSB},
         {"pcm_s16be", AUDIO_S16MSB},
         {"u16", AUDIO_U16SYS},
-        {"pcm_u16", AUDIO_U16SYS},
+        {"pcm_u16", AUDIO_U16SYS}, // works with spc, but choppy. crashes ogg
         {"u16le", AUDIO_U16LSB},
-        {"pcm_u16le", AUDIO_U16LSB},
+        {"pcm_u16le", AUDIO_U16LSB}, // works with spc, but choppy. 
         {"u16be", AUDIO_U16MSB},
         {"pcm_u16be", AUDIO_U16MSB},
         {"s32", AUDIO_S32SYS},
@@ -131,9 +131,16 @@ void OpenConfig_preSetup()
         config.beginGroup("sound");
         config.read("disable-sound", g_audioSetup.disableSound, false);
         config.read("sample-rate", g_audioSetup.sampleRate, 44100);
+
+#    if VITA // VITA defaults.
+        config.read("channels", g_audioSetup.channels, 1);
+        config.readEnum("format", g_audioSetup.format, (uint16_t)AUDIO_S16LSB, sampleFormats);
+        config.read("buffer-size", g_audioSetup.bufferSize, 2048);
+#    else
         config.read("channels", g_audioSetup.channels, 2);
         config.readEnum("format", g_audioSetup.format, (uint16_t)AUDIO_F32, sampleFormats);
         config.read("buffer-size", g_audioSetup.bufferSize, 512);
+#    endif // if VITA
         config.endGroup();
 #endif // #ifndef NO_SDL
 
@@ -340,7 +347,7 @@ void SaveConfig()
     config.endGroup();
 
 #if !defined(NO_SDL)
-#   if !defined(__3DS__)
+#   if !defined(__3DS__) && !defined(VITA)
     config.beginGroup("video");
     {
 #       if !defined(__EMSCRIPTEN__) && !defined(__ANDROID__) // Don't remember fullscreen state for Emscripten!

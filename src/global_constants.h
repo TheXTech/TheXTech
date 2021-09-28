@@ -37,17 +37,17 @@ typedef uint16_t stringindex_t;
 //   there are at most MAX(uint8_t) layers/events,
 //   leaving the -1 (255) index unused.
 // see layers.h for the respective maximums.
-const layerindex_t LAYER_NONE = 255;
-const layerindex_t LAYER_DEFAULT = 0;
-const layerindex_t LAYER_DESTROYED_BLOCKS = 1;
-const layerindex_t LAYER_SPAWNED_NPCS = 2;
+constexpr layerindex_t LAYER_NONE = -1;
+constexpr layerindex_t LAYER_DEFAULT = 0;
+constexpr layerindex_t LAYER_DESTROYED_BLOCKS = 1;
+constexpr layerindex_t LAYER_SPAWNED_NPCS = 2;
 
-const eventindex_t EVENT_NONE = 255;
-const eventindex_t EVENT_LEVEL_START = 0;
-const eventindex_t EVENT_PSWITCH_START = 1;
-const eventindex_t EVENT_PSWITCH_END = 2;
+constexpr eventindex_t EVENT_NONE = -1;
+constexpr eventindex_t EVENT_LEVEL_START = 0;
+constexpr eventindex_t EVENT_PSWITCH_START = 1;
+constexpr eventindex_t EVENT_PSWITCH_END = 2;
 
-const stringindex_t STRINGINDEX_NONE = 65535;
+constexpr stringindex_t STRINGINDEX_NONE = -1;
 
 const int MaxLevelStrings = 65535;
 
@@ -135,6 +135,9 @@ const int maxScenes = 5000;
 const int Max3DOffset = 20;
 const int ScreenW = 800 + 2 * Max3DOffset;
 const int ScreenH = 480;
+#elif VITA
+const int ScreenW = 960;
+const int ScreenH = 544;
 #elif defined(FIXED_RES)
 //Public Const ScreenW As Integer = 800  'Game Screen Width
 const int ScreenW = 800;
