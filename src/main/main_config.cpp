@@ -27,6 +27,7 @@
 #include "../video.h"
 #include "../control/joystick.h"
 #include "speedrunner.h"
+#include "presetup.h"
 
 #include <Utils/files.h>
 #include <Utils/strings.h>
@@ -35,6 +36,8 @@
 #include <AppPath/app_path.h>
 #include <Logger/logger.h>
 
+
+PreSetup_t g_preSetup;
 
 void OpenConfig_preSetup()
 {
@@ -89,6 +92,13 @@ void OpenConfig_preSetup()
         {"pcm_f32be", AUDIO_F32MSB}
     };
 
+    const IniProcessing::StrEnumMap compatMode =
+    {
+        {"native", 0},
+        {"smbx2", 1},
+        {"smbx13", 2}
+    };
+
     std::string configPath = AppPathManager::settingsFileSTD();
 
     if(Files::fileExists(configPath))
@@ -112,6 +122,15 @@ void OpenConfig_preSetup()
         config.read("channels", g_audioSetup.channels, 2);
         config.readEnum("format", g_audioSetup.format, (uint16_t)AUDIO_F32, sampleFormats);
         config.read("buffer-size", g_audioSetup.bufferSize, 512);
+        config.endGroup();
+
+        config.beginGroup("gameplay");
+        config.readEnum("compatibility-mode", g_preSetup.compatibilityMode, 0, compatMode);
+        config.endGroup();
+
+        config.beginGroup("speedrun");
+        config.read("mode", g_preSetup.speedRunMode, 0);
+        config.read("semi-transparent-timer", g_preSetup.speedRunSemiTransparentTimer, false);
         config.endGroup();
     }
 }
@@ -153,6 +172,7 @@ void OpenConfig()
          // Keep backward compatibility and restore old mappings from the "thextech.ini"
         IniProcessing *ctl = Files::fileExists(controlsPath) ? &controls : &config;
 
+        const IniProcessing::StrEnumMap starsShowPolicy =
         {
             {"hide", 0},
             {"dont-show", 0},
@@ -331,9 +351,22 @@ void SaveConfig()
             {2, "show-all"}
         };
 
+        std::unordered_map<int, std::string> compatMode =
+        {
+            {0, "native"},
+            {1, "smbx2"},
+            {2, "smbx13"}
+        };
+
         config.setValue("ground-pound-by-alt-run", GameplayPoundByAltRun);
         config.setValue("world-map-stars-show-policy", starsShowPolicy[WorldMapStarShowPolicyGlobal]);
+        config.setValue("compatibility-mode", compatMode[g_preSetup.compatibilityMode]);
     }
+    config.endGroup();
+
+    config.beginGroup("speedrun");
+    config.setValue("mode", g_preSetup.speedRunMode);
+    config.setValue("semi-transparent-timer", g_preSetup.speedRunSemiTransparentTimer);
     config.endGroup();
 
     config.beginGroup("effects");
