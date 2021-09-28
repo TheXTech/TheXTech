@@ -112,6 +112,8 @@ void OpenConfig_preSetup()
         config.read("show-fps", g_videoSettings.showFrameRate, false);
         config.read("scale-down-all-textures", g_videoSettings.scaleDownAllTextures, false);
         config.read("display-controllers", g_drawController, false);
+        config.read("show-episode-title", g_config.ShowEpisodeTitle, 0);
+        config.read("show-episode-title-small", g_config.ShowEpisodeTitle_SmallScreen, 0);
         config.readEnum("battery-status", g_videoSettings.batteryStatus, (int)BATTERY_STATUS_OFF, batteryStatus);
         config.endGroup();
 
@@ -189,6 +191,8 @@ void OpenConfig()
 
         config.beginGroup("video");
         config.read("full-screen", resBool, resBool);
+        config.read("show-episode-title", g_config.ShowEpisodeTitle, g_config.ShowEpisodeTitle);
+        config.read("show-episode-title-small", g_config.ShowEpisodeTitle_SmallScreen, g_config.ShowEpisodeTitle_SmallScreen);
         config.endGroup();
 
         config.beginGroup("gameplay");
@@ -344,6 +348,8 @@ void SaveConfig()
         config.setValue("scale-down-all-textures", g_videoSettings.scaleDownAllTextures);
         config.setValue("display-controllers", g_drawController);
         config.setValue("battery-status", batteryStatus[g_videoSettings.batteryStatus]);
+        config.setValue("show-episode-title", g_config.ShowEpisodeTitle);
+        config.setValue("show-episode-title-small", g_config.ShowEpisodeTitle_SmallScreen);
     }
     config.endGroup();
 #   endif // !defined(__3DS__)

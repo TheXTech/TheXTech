@@ -12,6 +12,9 @@ extern struct Config_t
     bool    FastMove = false;
     //! Dragon coin
     bool    ShowDragonCoins = false;
+    //! Show episode title
+    int     ShowEpisodeTitle = 0;
+    int     ShowEpisodeTitle_SmallScreen = 0;
 } g_config; // main_config.cpp
 
 #endif // #ifndef CONFIG_H
