@@ -180,6 +180,14 @@ void OpenConfig()
          // Keep backward compatibility and restore old mappings from the "thextech.ini"
         IniProcessing *ctl = Files::fileExists(controlsPath) ? &controls : &config;
 
+        {
+            {"hide", 0},
+            {"dont-show", 0},
+            {"collected-only", 1},
+            {"show", 2},
+            {"show-all", 2}
+        };
+
         config.beginGroup("main");
         config.read("release", FileRelease, curRelease);
         config.read("full-screen", resBool, false);
@@ -193,7 +201,7 @@ void OpenConfig()
 
         config.beginGroup("gameplay");
         config.read("ground-pound-by-alt-run", GameplayPoundByAltRun, false);
-        config.read("world-map-stars-show-policy", WorldMapStarShowPolicyGlobal, 0);
+        config.readEnum("world-map-stars-show-policy", WorldMapStarShowPolicyGlobal, 0, starsShowPolicy);
         config.read("world-map-fast-move", g_config.FastMove, false);
         config.read("show-dragon-coins", g_config.ShowDragonCoins, false);
         config.endGroup();
@@ -370,10 +378,19 @@ void SaveConfig()
 #endif // !defined(NO_SDL)
 
     config.beginGroup("gameplay");
-    config.setValue("ground-pound-by-alt-run", GameplayPoundByAltRun);
-    config.setValue("world-map-stars-show-policy", WorldMapStarShowPolicyGlobal);
-    config.setValue("world-map-fast-move", g_config.FastMove);
-    config.setValue("show-dragon-coins", g_config.ShowDragonCoins);
+    {
+        std::unordered_map<int, std::string> starsShowPolicy =
+        {
+            {0, "hide"},
+            {1, "collected-only"},
+            {2, "show-all"}
+        };
+
+        config.setValue("ground-pound-by-alt-run", GameplayPoundByAltRun);
+        config.setValue("world-map-stars-show-policy", starsShowPolicy[WorldMapStarShowPolicyGlobal]);
+        config.setValue("world-map-fast-move", g_config.FastMove);
+        config.setValue("show-dragon-coins", g_config.ShowDragonCoins);
+    }
     config.endGroup();
 
     config.beginGroup("effects");
