@@ -90,10 +90,11 @@ int MixPlatform_PlayChannelTimed(int channel, Mix_Chunk *chunk, int loops, int t
     if(!cur_sound || channel < 0)
     {
         playSoundMem((WaveObject*)chunk, loops);
-        return;
+        return 0;
     }
     killSound(cur_sound[channel]);
     cur_sound[channel] = playSoundMem((WaveObject*)chunk, loops);
+    return 0;
 }
 
 int MixPlatform_PlayChannelTimedVolume(int channel, Mix_Chunk *chunk, int loops, int ticks, int volume)
