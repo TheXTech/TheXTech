@@ -26,6 +26,7 @@
 #include "../main/speedrunner.h"
 #include "../main/trees.h"
 #include "../compat.h"
+#include "../config.h"
 
 #include <fmt_format_ne.h>
 
@@ -426,6 +427,32 @@ void UpdateGraphics2(bool skipRepaint)
                               WorldPlayer[1].Location.Width, WPHeight,
                               GFXPlayerBMP[WorldPlayer[1].Type], 0, WPHeight * WorldPlayer[1].Frame);
 
+        if(!WorldPlayer[1].LevelName.empty())
+        {
+            auto &s = WorldPlayer[1].stars;
+
+            if(s.max > 0 && s.displayPolicy > Compatibility_t::STARS_DONT_SHOW)
+            {
+                std::string label;
+
+                if(s.displayPolicy >= Compatibility_t::STARS_SHOW_COLLECTED_AND_AVAILABLE)
+                    label = fmt::format_ne("{0}/{1}", s.cur, s.max);
+                else
+                    label = fmt::format_ne("{0}", s.cur);
+
+                int len = SuperTextPixLen(label, 3);
+                int totalLen = len + GFX.Interface[1].w + GFX.Interface[5].w + 8 + 4;
+                int x = vScreenX[Z] + WorldPlayer[1].Location.X + WorldPlayer[1].Location.Width / 2 - totalLen / 2;
+                int y = vScreenY[Z] + WorldPlayer[1].Location.Y - 32;
+
+                frmMain.renderTexture(x, y,
+                                      GFX.Interface[5].w, GFX.Interface[5].h, GFX.Interface[5], 0, 0);
+                frmMain.renderTexture(x + GFX.Interface[5].w + 8, y,
+                                      GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+                SuperPrint(label, 3, x + GFX.Interface[1].w + GFX.Interface[5].w + 8 + 4, y);
+            }
+        }
+
 //        frmMain.renderTexture(0, 0, 800, 130, GFX.Interface[4], 0, 0);
 #ifdef __3DS__
         frmMain.setLayer(2);
@@ -690,28 +717,6 @@ void UpdateGraphics2(bool skipRepaint)
         // Print the level's name
         if(!WorldPlayer[1].LevelName.empty())
         {
-            WorldPlayer_t::StarsState_t& s = WorldPlayer[1].stars;
-            if(s.max > 0 && s.displayPolicy > Compatibility_t::STARS_DONT_SHOW)
-            {
-                std::string label;
-
-                if(s.displayPolicy >= Compatibility_t::STARS_SHOW_COLLECTED_AND_AVAILABLE)
-                    label = fmt::format_ne("{0}/{1}", s.cur, s.max);
-                else
-                    label = fmt::format_ne("{0}", s.cur);
-
-                int len = SuperTextPixLen(label, 3);
-                int totalLen = len + GFX.Interface[1].w + GFX.Interface[5].w + 8 + 4;
-                int x = vScreenX[Z] + WorldPlayer[1].Location.X + WorldPlayer[1].Location.Width / 2 - totalLen / 2;
-                int y = vScreenY[Z] + WorldPlayer[1].Location.Y - 32;
-
-                frmMain.renderTexture(x, y,
-                                      GFX.Interface[5].w, GFX.Interface[5].h, GFX.Interface[5], 0, 0);
-                frmMain.renderTexture(x + GFX.Interface[5].w + 8, y,
-                                      GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
-                SuperPrint(label, 3, x + GFX.Interface[1].w + GFX.Interface[5].w + 8 + 4, y);
-            }
-
             size_t availChars = (size_t)((sW - margin - (pX + 116))/16) + 1;
             if(WorldPlayer[1].LevelName.length() > availChars*2)
             {
@@ -761,6 +766,21 @@ void UpdateGraphics2(bool skipRepaint)
         SuperPrint(std::to_string(int(PrintFPS)), 1, 8, 8, 0.f, 1.f, 0.f);
 
     g_stats.print();
+    
+        if(!BattleMode && !GameMenu && g_config.ShowEpisodeTitle && ScreenH >= 640)
+    {
+        if(g_config.ShowEpisodeTitle == 2)
+            SuperPrintScreenCenter(WorldName, 3, 20, 1.f, 1.f, 1.f, 0.5f);
+        else
+            SuperPrintScreenCenter(WorldName, 3, 20, 1.f, 1.f, 1.f, 1.f);
+    }
+    else if(!BattleMode && !GameMenu && g_config.ShowEpisodeTitle_SmallScreen && ScreenH < 620)
+    {
+        if(g_config.ShowEpisodeTitle_SmallScreen == 2)
+            SuperPrintScreenCenter(WorldName, 3, ScreenH - 60, 1.f, 1.f, 1.f, 0.5f);
+        else
+            SuperPrintScreenCenter(WorldName, 3, ScreenH - 60, 1.f, 1.f, 1.f, 1.f);
+    }
 
     speedRun_renderTimer();
 
