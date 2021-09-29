@@ -68,8 +68,15 @@ static SDL_bool IsFullScreen(SDL_Window *win)
 
 FrmMain::FrmMain()
 {
+#ifdef VITA
+    ScaleWidth = 960;
+    ScaleHeight = 544;
+    viewport_w = 960;
+    viewport_h = 544;
+#else
     ScaleWidth = ScreenW;
     ScaleHeight = ScreenH;
+#endif
 }
 
 SDL_Window *FrmMain::getWindow()
@@ -378,7 +385,7 @@ void FrmMain::processEvent()
         case SDL_WINDOWEVENT_MOVED:
             eventResize();
             break;
-#if !defined(__EMSCRIPTEN__) && !defined(__ANDROID__)
+#if !defined(__EMSCRIPTEN__) && !defined(__ANDROID__) && !defined(VITA)
         case SDL_WINDOWEVENT_FOCUS_GAINED:
             if(!neverPause && !LoadingInProcess)
                 SoundPauseEngine(0);
@@ -1198,6 +1205,9 @@ void FrmMain::lazyLoad(StdPicture &target)
 
     if(g_videoSettings.scaleDownAllTextures || GraphicsHelps::validateFor2xScaleDown(sourceImage, StdPictureGetOrigPath(target)))
     {
+#ifdef VITA
+        pLogDebug("VITA CAUSE: Scaling down textures");
+#endif
         target.w_orig = int(w);
         target.h_orig = int(h);
         w /= 2;

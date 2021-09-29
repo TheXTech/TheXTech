@@ -7,14 +7,18 @@ add_library(PGE_SDLMixerX_static INTERFACE)
 set(SDL_BRANCH "release-2.0.12")
 set(SDL_GIT_BRANCH "origin/release-2.0.12")
 
-if(EMSCRIPTEN OR APPLE OR ANDROID)
+if(EMSCRIPTEN OR APPLE OR ANDROID OR VITA)
     set(PGE_SHARED_SDLMIXER_DEFAULT OFF)
 else()
     set(PGE_SHARED_SDLMIXER_DEFAULT ON)
 endif()
 
 option(PGE_SHARED_SDLMIXER "Link MixerX as a shared library (dll/so/dylib)" ${PGE_SHARED_SDLMIXER_DEFAULT})
-option(PGE_USE_LOCAL_SDL2 "Do use the locally-built SDL2 library from the AudioCodecs set. Otherwise, download and build the development top main version." ON)
+if(NOT VITA AND NOT 3DS)
+    option(PGE_USE_LOCAL_SDL2 "Do use the locally-built SDL2 library from the AudioCodecs set. Otherwise, download and build the development top main version." ON)
+else()
+    set(PGE_USE_LOCAL_SDL2 OFF)
+endif()
 
 #if(WIN32)
 #    if(MSVC)
@@ -37,13 +41,20 @@ set_shared_lib(SDLHIDAPI_SO_Lib "${DEPENDENCIES_INSTALL_DIR}/lib" hidapi)
 set_static_lib(SDL2_main_A_Lib "${DEPENDENCIES_INSTALL_DIR}/lib" SDL2main)
 
 set_static_lib(SDL_MixerX_A_Lib "${DEPENDENCIES_INSTALL_DIR}/lib" SDL2_mixer_ext${LIBRARY_STATIC_NAME_SUFFIX})
-set_static_lib(SDL2_A_Lib "${DEPENDENCIES_INSTALL_DIR}/lib" SDL2${LIBRARY_STATIC_NAME_SUFFIX})
+if(VITA AND USE_SYSTEM_SDL2)
+    message("VITA: SDL2_A_Lib is now -lSDL2")
+    set(SDL_MixerX_A_Lib "${DEPENDENCIES_INSTALL_DIR}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}SDL2_mixer_ext${PGE_LIBS_DEBUG_SUFFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}")
+    set(SDL2_A_Lib SDL2)
+else()
+    set_static_lib(SDL2_A_Lib "${DEPENDENCIES_INSTALL_DIR}/lib" SDL2${LIBRARY_STATIC_NAME_SUFFIX})
+endif()
 
 set(CODECS_LIBRARIES_DIR ${DEPENDENCIES_INSTALL_DIR}/lib)
 
 if(USE_SYSTEM_SDL2)
+    message("LIBRARY_SDLMIXERX.CMAKE using USE_SYSTEM_SDL2")
     set(USE_LOCAL_SDL2 OFF)
-    if(HAIKU)
+    if(HAIKU OR VITA)
         find_library(SDL2_LIBRARY SDL2)
         find_path(SDL2_INCLUDE_DIR "SDL.h" PATH_SUFFIXES SDL2)
         if(NOT SDL2_LIBRARY AND NOT SDL2_INCLUDE_DIR)
@@ -51,6 +62,10 @@ if(USE_SYSTEM_SDL2)
         endif()
         set(SDL2_INCLUDE_DIRS ${SDL2_INCLUDE_DIR})
         set(SDL2_LIBRARIES ${SDL2_LIBRARY})
+
+        message("library_SDLMixerX: SDL2 INCLUDE DIR: ${SDL2_INCLUDE_DIR}")
+        message("library_SDLMixerX: SDL2 LIBRARY DIR: ${SDL2_LIBRARY}")
+        message("library_SDLMixerX: CMAKE_FIND_ROOT_PATH: ${CMAKE_FIND_ROOT_PATH}")
     else()
         find_package(SDL2 REQUIRED)
         if(TARGET SDL2::SDL2)
@@ -162,6 +177,44 @@ set(MixerX_CodecLibs
     "${AC_ZLIB}"
 )
 
+if(VITA)
+    # Don't build libraries which already at the system
+    set(VITA_AUDIOCODECS_CMAKE_FLAGS
+        -DBUILD_OGG_VORBIS=OFF
+        -DBUILD_FLAC=OFF
+        -DBUILD_OPUS=OFF
+        -DBUILD_MP3_MAD=OFF
+        -DBUILD_MIKMOD=OFF # this library is not used here
+    )
+
+    set(VITA_MIXERX_CMAKE_FLAGS
+        "-DUSE_OGG_VORBIS_TREMOR=OFF"
+        "-DUSE_SYSTEM_SDL2=ON"
+        "-DUSE_SYSTEM_AUDIO_LIBRARIES_DEFAULT=ON"
+        "-DSDL_MIXER_X_SHARED=OFF"
+        "-DFLAC_LIBRARIES=FLAC"
+        "-DOGG_LIBRARIES=ogg"
+        "-DLIBOPUSFILE_LIB=opusfile"
+        "-DLIBOPUS_LIB=opus"
+        "-DCMAKE_C_FLAGS=-I$ENV{VITASDK}/arm-vita-eabi/include/opus"
+        "-DLIBVORBISIDEC_LIB=vorbisidec"
+        "-DLIBVORBIS_LIB=vorbis"
+        "-DLIBVORBISFILE_LIB=vorbisfile"
+        "-DMAD_LIBRARIES=mad"
+    )
+
+    set(MixerX_CodecLibs # Minimal list of libraries to link
+        "${AC_FLUIDLITE}"
+        "${AC_ADLMIDI}"
+        "${AC_OPNMIDI}"
+        "${AC_TIMIDITYSDL}"
+        "${AC_GME}"
+        "${AC_LIBXMP}"
+        "${AC_MODPLUG}"
+        "${AC_ZLIB}"
+    )
+endif()
+
 set(MixerX_Deps)
 set(AudioCodecs_Deps)
 
@@ -183,6 +236,8 @@ ExternalProject_Add(
         "-DBUILD_OGG_VORBIS=OFF"
         "-DBUILD_MP3_MAD=OFF"
         ${ANDROID_CMAKE_FLAGS}
+        ${VITA_CMAKE_FLAGS}
+        ${VITA_AUDIOCODECS_CMAKE_FLAGS}
         $<$<BOOL:APPLE>:-DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}>
         $<$<BOOL:APPLE>:-DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}>
         $<$<BOOL:WIN32>:-DCMAKE_SHARED_LIBRARY_PREFIX="">
@@ -223,6 +278,8 @@ ExternalProject_Add(
         "-DUSE_OGG_VORBIS_STB=ON"
         "-DUSE_MP3_MAD=OFF"
         ${ANDROID_CMAKE_FLAGS}
+        ${VITA_CMAKE_FLAGS}
+        ${VITA_MIXERX_CMAKE_FLAGS}
         $<$<BOOL:APPLE>:-DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}>
         $<$<BOOL:APPLE>:-DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}>
         $<$<BOOL:WIN32>:-DCMAKE_SHARED_LIBRARY_PREFIX="">

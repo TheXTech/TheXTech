@@ -31,6 +31,12 @@
 #include <string>
 #endif
 
+#ifdef VITA
+#include <string>
+
+#include "vita/vgl_renderer_types.h"
+#endif
+
 typedef unsigned int    GLenum;
 typedef int             GLint;
 typedef unsigned int    GLuint;
@@ -45,7 +51,7 @@ struct PGEColor
 struct SDL_Texture;
 struct StdPicture
 {
-#ifdef DEBUG_BUILD
+#if defined(DEBUG_BUILD) || defined(VITA)
     std::string origPath;
 #endif
     bool inited = false;
@@ -64,7 +70,7 @@ struct StdPicture
 
     bool lazyLoaded = false;
 
-#ifndef __3DS__
+#if !defined(__3DS__) && (!defined(VITA) || defined(USE_SDL_VID))
     std::vector<char> raw;
     std::vector<char> rawMask;
     bool isMaskPng = false;
@@ -83,6 +89,25 @@ struct StdPicture
     C2D_Image image2;
     C2D_SpriteSheet texture3 = nullptr;
     C2D_Image image3;
+#endif
+#if defined(VITA) && !defined(USE_SDL_VID)
+    std::string path = "";
+    uint32_t lastDrawFrame = 0;
+    std::vector<char> raw;
+    std::vector<char> rawMask;
+    bool isMaskPng = false;
+
+#    if USE_VITA2D
+    vita2d_texture *texture;
+    uint32_t texture_stride = 0;
+#    else
+    struct _obj_extra_data ex_data;
+    GLuint texture = 0;
+    GLenum format = 0;
+    GLint  nOfColors = 0;
+    PGEColor ColorUpper;
+    PGEColor ColorLower;
+#    endif
 #endif
 };
 

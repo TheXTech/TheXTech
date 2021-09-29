@@ -1,7 +1,7 @@
 #include "../globals.h"
 #include "../sound.h"
 
-#if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
+#if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__) && !defined(VITA)
 #include <tinyfiledialogs/tinyfiledialogs.h>
 #else
 #include <Logger/logger.h>
@@ -12,7 +12,7 @@ const std::string GetTextInput(const std::string& prompt, const std::string& ini
     SoundPauseAll();
     const char* get;
 
-#if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
+#if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__) && !defined(VITA)
     if (init.empty())
         get = tinyfd_inputBox(prompt.c_str(), nullptr, " ");
     else

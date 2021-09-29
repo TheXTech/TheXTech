@@ -94,23 +94,39 @@ include(cmake/git_version.cmake)
 #endif()
 set(USE_SYSTEM_LIBS_DEFAULT OFF)
 
-if(HAIKU)
+if(HAIKU OR VITA)
     set(USE_SYSTEM_SDL2_DEFAULT ON)  # Should be used on Haiku, own SDL2 Haiku build on CMake is broken
 else()
     set(USE_SYSTEM_SDL2_DEFAULT ${USE_SYSTEM_LIBS_DEFAULT})
 endif()
 
-option(USE_SYSTEM_LIBS "Use dependent libraries like SDL2, FreeImageLite and MixerX, installed in the system" ${USE_SYSTEM_LIBS_DEFAULT})
+if(NOT 3DS)
+    option(USE_SYSTEM_LIBS "Use dependent libraries like SDL2, FreeImageLite and MixerX, installed in the system" ${USE_SYSTEM_LIBS_DEFAULT})
+endif()
+
 option(USE_SYSTEM_SDL2 "Use SDL2 from a system even prefering system libraries" ${USE_SYSTEM_SDL2_DEFAULT})
 
-option(USE_STATIC_LIBC "Link libc and libstdc++ statically" OFF)
+if(NOT VITA)
+    option(USE_STATIC_LIBC "Link libc and libstdc++ statically" OFF)
+endif()
+
+if(3DS)
+    set(USE_STATIC_LIBC ON)
+else()
+    set(USE_STATIC_LIBC OFF)
+endif()
 
 option(RANGE_ARR_USE_HEAP "Store data of RangeArr<> template in a heap" OFF)
 
 option(ENABLE_ANTICHEAT_TRAP "Enable anti-cheating trap for the \"redigitiscool\" cheat code" OFF)
 option(ENABLE_OLD_CREDITS "Use original Redigit's credits without changes" OFF)
 option(ENABLE_LOGGING "Enable debug logging written into a file (may not work on some platfors)" ON)
-option(NO_INTPROC "Disable Interprocess" OFF)
+
+if(NOT VITA AND NOT 3DS AND NOT ANDROID AND NOT EMSCRIPTEN)
+    option(NO_INTPROC "Disable Interprocess" OFF)
+else()
+    set(NO_INTPROC ON)
+endif()
 
 option(THEXTECH_ENABLE_LUA "Enable lua scripting support" OFF)
 
@@ -145,12 +161,6 @@ if(NOT APPLE AND NOT ANDROID AND NOT EMSCRIPTEN)
     set(THEXTECH_USER_DIR_NAME "" CACHE STRING "The name of the user directory at user's home to store settings/episodes/etc. The 'PGE_Project/thextech' will be used by default.")
 endif()
 
-if(3DS)
-    set(NO_INTPROC ON CACHE BOOL "Disable interprocess." FORCE)
-    set(USE_STATIC_LIBC ON CACHE BOOL "Must use static linkage on 3DS." FORCE)
-    set(USE_SYSTEM_LIBS OFF CACHE BOOL "Cannot use system libs on 3DS." FORCE)
-endif()
-
 # ============ Customization ==end=========
 
 option(PGEFL_QT_SUPPORT "Build PGE-FL with Qt support [Unneeded]" OFF)
@@ -163,7 +173,11 @@ if(USE_STATIC_LIBC)
 endif()
 
 include(lib/DirManager/dirman.cmake)
-include(lib/FileMapper/FileMapper.cmake)
+
+if(NOT VITA)
+    include(lib/FileMapper/FileMapper.cmake)
+endif()
+
 include(lib/fmt/fmt.cmake)
 include(lib/IniProcessor/IniProcessor.cmake)
 include(lib/Utils/Utils.cmake)
@@ -226,6 +240,11 @@ endif()
 if(USE_SYSTEM_LIBS)
     find_package(SDL2 REQUIRED)
 
+    if(NOT SDL2_LIBRARIES)
+        find_library(SDL2_LIBRARIES SDL2)
+        message("SDL2_LIBRARIES: ${SDL2_LIBRARIES}")
+    endif()
+
     find_library(MIXERX_LIB NAMES SDL2_mixer_ext)
     find_path(MIXERX_HEAD_DIR SDL_mixer_ext.h PATH_SUFFIXES SDL2)
 
@@ -248,6 +267,7 @@ elseif(NOT 3DS)
     else()
         list(APPEND A2XT_LIBS PGE_SDLMixerX_static)
     endif()
+    message("SDL2 INCLUDE: ${SDL2_INCLUDE_DIR}")
     list(APPEND A2XT_INCS "${DEPENDENCIES_INSTALL_DIR}/include" ${SDL2_INCLUDE_DIRS})
     target_link_libraries(A2XT_Int INTERFACE ${A2XT_LIBS})
     list(APPEND A2XT_DEPS FreeImage_Local SDLMixerX_Local)
@@ -267,12 +287,17 @@ set(LIB_SRC
     ${PGE_FILE_LIBRARY_SRCS}
 )
 
-if(NOT 3DS)
+if(NOT 3DS AND NOT VITA)
     list(APPEND LIB_SRC
         ${FILEMAPPER_SRCS}
         ${STACK_WALKER_SRCS}
         3rdparty/tinyfiledialogs/tinyfiledialogs.c
         lib/CrashHandler/crash_handler.cpp
+    )
+endif()
+
+if(NOT 3DS)
+    list(APPEND LIB_SRC
         lib/Graphics/graphics_funcs.cpp
         lib/Graphics/image_size.cpp
         lib/Graphics/size.cpp
@@ -280,7 +305,7 @@ if(NOT 3DS)
     )
 endif()
 
-if(NOT 3DS AND NOT EMSCRIPTEN AND NOT ANDROID)
+if(NOT 3DS AND NOT EMSCRIPTEN AND NOT ANDROID AND NOT VITA)
     list(APPEND LIB_SRC
         3rdparty/tinyfiledialogs/tinyfiledialogs.c
     )
@@ -377,6 +402,26 @@ if(3DS)
         src/3ds/mixer_platform.cpp
         src/3ds/text_input.cpp
     )
+elseif(VITA)
+    if(USE_SDL_VID)
+        message("Using SDL video.")
+        list(APPEND THEXTECH_SRC src/frm_main.cpp)
+    elseif(USE_VITA2D_VID)
+        message("Using Vita2D video.")
+        list(APPEND THEXTECH_SRC src/vita/frm_main.cpp)
+    else()
+        message("Using vitaGL video.")
+        list(APPEND THEXTECH_SRC src/vita/frm_main.cpp)
+    endif()
+
+    list(APPEND THEXTECH_SRC
+        src/control/joystick.cpp # Vita is supported by SDL for joystick.
+        # src/vita/vitaGL_graphics.cpp # I lied
+        src/vita/vgl_renderer.c
+        src/main/cheat_code.cpp # This will change one day also.
+        src/editor/text_input.cpp # This will change one day, as the Vita has its own keyboard overlay.
+    )
+
 else()
     list(APPEND THEXTECH_SRC
         src/control/joystick.cpp
@@ -575,6 +620,26 @@ if(NO_INTPROC)
     target_compile_definitions(thextech PRIVATE -DNO_INTPROC)
 endif()
 
+if(VITA)
+    if(ENABLE_FAST_MATH)
+        message("FAST MATH ON! HAVE FUN!")
+        set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -ffast-math -mtune=cortex-a9 -mfpu=neon")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffast-math -mtune=cortex-a9 -mfpu=neon")
+    endif()
+
+    if(USE_VITA2D_VID)
+        target_compile_definitions(thextech PRIVATE -DUSE_VITA2D=1)
+    endif()
+
+    target_compile_definitions(thextech PRIVATE -DVITA -DVITA=1)
+    target_compile_definitions(thextech PRIVATE -DNO_SCREENSHOT)
+    # target_compile_definitions(thextech PRIVATE -DPGE_NO_THREADING)
+    # target_compile_definitions(thextech PRIVATE -DPRELOAD_LEVELS)
+    target_compile_definitions(thextech PRIVATE -DFIXED_RES)
+    target_compile_definitions(thextech PRIVATE -DLOW_MEM)
+    target_link_libraries(A2XT_Int INTERFACE ${VITA_ADDTL_LIBS})
+endif()
+
 if(3DS)
     target_compile_definitions(thextech PRIVATE -DPGE_NO_THREADING)
     target_compile_definitions(thextech PRIVATE -DNO_SCREENSHOT)
@@ -654,6 +719,23 @@ elseif(WIN32)
     install(FILES changelog.txt DESTINATION .)
     install(FILES README.md DESTINATION . RENAME ReadMe.txt)
     install(FILES LICENSE DESTINATION . RENAME License.TheXTech.txt)
+elseif(VITA)
+    install(TARGETS thextech DESTINATION .)
+    vita_create_self(${THEXTECH_EXECUTABLE_NAME}.self output/bin/thextech UNSAFE)
+    vita_create_vpk(${THEXTECH_EXECUTABLE_NAME}.vpk ${VITA_TITLEID} ${THEXTECH_EXECUTABLE_NAME}.self
+        VERSION ${VITA_VERSION}
+        NAME ${VITA_APP_NAME}
+        FILE    ${CMAKE_SOURCE_DIR}/resources/vita/sce_sys/icon0.png sce_sys/icon0.png
+                ${CMAKE_SOURCE_DIR}/resources/vita/sce_sys/livearea/contents/bg.png sce_sys/livearea/contents/bg.png
+                ${CMAKE_SOURCE_DIR}/resources/vita/sce_sys/livearea/contents/startup.png sce_sys/livearea/contents/startup.png
+                ${CMAKE_SOURCE_DIR}/resources/vita/sce_sys/livearea/contents/template.xml sce_sys/livearea/contents/template.xml
+                ${CMAKE_SOURCE_DIR}/resources/vita/vert.cgv vert.cgv
+                ${CMAKE_SOURCE_DIR}/resources/vita/frag.cgf frag.cgf
+    )
+    add_custom_target(copy 
+        COMMAND cp ${THEXTECH_EXECUTABLE_NAME}.self eboot.bin
+        DEPENDS ${THEXTECH_EXECUTABLE_NAME}.self
+    )
 else()
     install(TARGETS thextech
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}

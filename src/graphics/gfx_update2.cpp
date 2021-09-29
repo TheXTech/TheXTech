@@ -26,6 +26,7 @@
 #include "../main/speedrunner.h"
 #include "../main/trees.h"
 #include "../compat.h"
+#include "../config.h"
 
 #include <fmt_format_ne.h>
 
@@ -765,6 +766,21 @@ void UpdateGraphics2(bool skipRepaint)
         SuperPrint(std::to_string(int(PrintFPS)), 1, 8, 8, 0.f, 1.f, 0.f);
 
     g_stats.print();
+    
+    if(g_config.ShowEpisodeTitle && ScreenH >= 640)
+    {
+        if(g_config.ShowEpisodeTitle == 2)
+            SuperPrintScreenCenter(WorldName, 3, 20, 1.f, 1.f, 1.f, 0.5f);
+        else
+            SuperPrintScreenCenter(WorldName, 3, 20, 1.f, 1.f, 1.f, 1.f);
+    }
+    else if(g_config.ShowEpisodeTitle_SmallScreen && ScreenH < 620)
+    {
+        if(g_config.ShowEpisodeTitle_SmallScreen == 2)
+            SuperPrintScreenCenter(WorldName, 3, ScreenH - 60, 1.f, 1.f, 1.f, 0.5f);
+        else
+            SuperPrintScreenCenter(WorldName, 3, ScreenH - 60, 1.f, 1.f, 1.f, 1.f);
+    }
 
     speedRun_renderTimer();
 
