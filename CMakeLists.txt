@@ -420,6 +420,7 @@ elseif(VITA)
         src/vita/vgl_renderer.c
         src/main/cheat_code.cpp # This will change one day also.
         src/editor/text_input.cpp # This will change one day, as the Vita has its own keyboard overlay.
+        src/mixer_platform.cpp
     )
 
 else()
@@ -637,6 +638,7 @@ if(VITA)
     # target_compile_definitions(thextech PRIVATE -DPRELOAD_LEVELS)
     target_compile_definitions(thextech PRIVATE -DFIXED_RES)
     target_compile_definitions(thextech PRIVATE -DLOW_MEM)
+    target_include_directories(thextech PRIVATE "${SDL2_INCLUDE_DIR}" SYSTEM)
     target_link_libraries(A2XT_Int INTERFACE ${VITA_ADDTL_LIBS})
 endif()
 
