@@ -767,14 +767,14 @@ void UpdateGraphics2(bool skipRepaint)
 
     g_stats.print();
     
-        if(!BattleMode && !GameMenu && g_config.ShowEpisodeTitle && ScreenH >= 640)
+    if(g_config.ShowEpisodeTitle && ScreenH >= 640)
     {
         if(g_config.ShowEpisodeTitle == 2)
             SuperPrintScreenCenter(WorldName, 3, 20, 1.f, 1.f, 1.f, 0.5f);
         else
             SuperPrintScreenCenter(WorldName, 3, 20, 1.f, 1.f, 1.f, 1.f);
     }
-    else if(!BattleMode && !GameMenu && g_config.ShowEpisodeTitle_SmallScreen && ScreenH < 620)
+    else if(g_config.ShowEpisodeTitle_SmallScreen && ScreenH < 620)
     {
         if(g_config.ShowEpisodeTitle_SmallScreen == 2)
             SuperPrintScreenCenter(WorldName, 3, ScreenH - 60, 1.f, 1.f, 1.f, 0.5f);
