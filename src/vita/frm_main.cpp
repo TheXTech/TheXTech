@@ -822,13 +822,13 @@ void FrmMain::renderRect(int x, int y, int w, int h, float red, float green, flo
 {
     (void)filled;
     // TODO: Filled or not?
-    PGE_RectF rect = __NormalizeToGL(x + viewport_offset_x, y + viewport_offset_y, w, h, viewport_w, viewport_h);
+    PGE_RectF rect = __NormalizeToGL(x + viewport_offset_x, y + viewport_offset_y, w, h, ScreenW, ScreenH);
     Vita_DrawRectColor(rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, red, green, blue, alpha);
 }
 
 void FrmMain::renderRectBR(int _left, int _top, int _right, int _bottom, float red, float green, float blue, float alpha)
 {
-    PGE_RectF rect = __NormalizeToGL(_left + viewport_offset_x, _top + viewport_offset_y, _right - _left, _bottom - _top, viewport_w, viewport_h);
+    PGE_RectF rect = __NormalizeToGL(_left + viewport_offset_x, _top + viewport_offset_y, _right - _left, _bottom - _top, ScreenW, ScreenH);
     Vita_DrawRectColor(rect.left, rect.top, rect.right-rect.left, rect.bottom-rect.top, red, green, blue, alpha);
 }
 
@@ -942,7 +942,7 @@ void FrmMain::renderTexturePrivate(float xDst, float yDst, float wDst, float hDs
         pLogDebug("WARNING: texture IDs differ for a specific drawcall: %u %u.", tx.texture, tx.ex_data.textureID);
     }
 
-    PGE_RectF dest = __NormalizeToGL(xDst + viewport_offset_x, yDst + viewport_offset_y, wDst, hDst, DISPLAY_WIDTH_DEF, DISPLAY_HEIGHT_DEF);
+    PGE_RectF dest = __NormalizeToGL(xDst + viewport_offset_x, yDst + viewport_offset_y, wDst, hDst, ScreenW, ScreenH);
     PGE_RectF src;
     if(tx.w_orig == 0 && tx.h_orig == 0)
         src = {xSrc, ySrc, wSrc, hSrc};
