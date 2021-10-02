@@ -60,6 +60,9 @@ static const GLuint VERTEX_SIZE = VERTEX_POS_SIZE + VERTEX_TEXCOORD_SIZE + VERTE
 // ARRAYS OF PENDING DRAW CALLS (DrawCall _vgl_pending_calls[MAX_VERTICES];)
 static char __vgl_repaint_inprog = 0;
 
+// Filled by default
+static char _curBufferFillState[MAX_VERTICES] = {1};
+
 static DrawCall *_curBufferA;
 static DrawCall *_curBufferB;
 
@@ -241,29 +244,45 @@ _Vita_WriteVertices4xColor(DrawCall *drawCall,
                           float rgba0[4], 
                           float rgba1[4], 
                           float rgba2[4],
-                          float rgba3[4])
+                          float rgba3[4],
+                          char filled)
 {
     if(drawCall == nullptr) return;
 
+    // we haven't incremented until we call "Vita_DoneWithDrawCall()"
+    // so we can set this here.
+    _curBufferFillState[_vgl_pending_offset] = filled;
+
+    // filled order?
+    // x, y
+    //
+    // v0
     drawCall->verts[0].x = x;
     drawCall->verts[0].y = y;
     drawCall->verts[0].s = n_src_x; // Tex Coord X
     drawCall->verts[0].v = n_src_y; // Tex Coord Y
-    
+
+    // v1
     drawCall->verts[1].x = x;
     drawCall->verts[1].y = y + hDst;
-    drawCall->verts[1].s = n_src_x; // Tex Coord X
+    drawCall->verts[1].s = n_src_x;  // Tex Coord X
     drawCall->verts[1].v = n_src_y2; // Tex Coord Y
-    
-    drawCall->verts[2].x = x + wDst;
-    drawCall->verts[2].y = y;
-    drawCall->verts[2].s = n_src_x2; // Tex Coord X
-    drawCall->verts[2].v = n_src_y; // Tex Coord Y
 
-    drawCall->verts[3].x = x + wDst;
-    drawCall->verts[3].y = y + hDst;
-    drawCall->verts[3].s = n_src_x2; // Tex Coord X
-    drawCall->verts[3].v = n_src_y2; // Tex Coord Y
+    // If we're not drawing filled, then we need to swap
+    // the last two vertices to ensure proper draw order.
+    const int c = filled ? 2 : 3,
+              d = filled ? 3 : 2;
+    // v2
+    drawCall->verts[c].x = x + wDst;
+    drawCall->verts[c].y = y;
+    drawCall->verts[c].s = n_src_x2; // Tex Coord X
+    drawCall->verts[c].v = n_src_y;  // Tex Coord Y
+
+    // v3
+    drawCall->verts[d].x = x + wDst;
+    drawCall->verts[d].y = y + hDst;
+    drawCall->verts[d].s = n_src_x2; // Tex Coord X
+    drawCall->verts[d].v = n_src_y2; // Tex Coord Y
 
     drawCall->verts[0]._r = rgba0[0];
     drawCall->verts[0]._g = rgba0[1];
@@ -311,7 +330,7 @@ _Vita_WriteVertices(DrawCall *drawCall,
     _Vita_WriteVertices4xColor(drawCall, 
                               x, y, wDst, hDst, 
                               n_src_x, n_src_x2, n_src_y, n_src_y2, 
-                              rgba0, rgba0, rgba0, rgba0);
+                              rgba0, rgba0, rgba0, rgba0, true);
 }
 
 static inline GLuint Vita_GetVertexBufferID() { return _vertexBufferID; }
@@ -387,14 +406,15 @@ void Vita_DrawRect4xColor(float x, float y,
                           float rgba0[4],
                           float rgba1[4],
                           float rgba2[4],
-                          float rgba3[4])
+                          float rgba3[4],
+                          char filled)
 {
     DrawCall *_curDrawCall = _Vita_GetAvailableDrawCall();
 
     for(int i = 0; i < 4; i++)
         _curDrawCall->verts[i].obj_ptr = 0;
 
-    _Vita_WriteVertices4xColor(_curDrawCall, x, y, wDst, hDst, 0.f, 1.f, 0.f, 1.f, rgba0, rgba1, rgba2, rgba3);
+    _Vita_WriteVertices4xColor(_curDrawCall, x, y, wDst, hDst, 0.f, 1.f, 0.f, 1.f, rgba0, rgba1, rgba2, rgba3, filled);
 
     _Vita_DoneWithDrawCall();
 }
@@ -409,10 +429,11 @@ void Vita_DrawRectColor(float x, float y,
                         float _r, 
                         float _g,
                         float _b, 
-                        float _a)
+                        float _a,
+                        char filled)
 {
     float rgba0[4] = {_r, _g, _b, _a};
-    Vita_DrawRect4xColor(x, y, wDst, hDst, rgba0, rgba0, rgba0, rgba0);
+    Vita_DrawRect4xColor(x, y, wDst, hDst, rgba0, rgba0, rgba0, rgba0, filled);
 }
 
 /**
@@ -447,7 +468,7 @@ void Vita_DrawRectColorExData(float x, float y,
     // _curDrawCall->piv_x = x + (wDst * .5f);
     // _curDrawCall->piv_y = y + (hDst * .5f);
 
-    _Vita_WriteVertices4xColor(_curDrawCall, x, y, wDst, hDst, 1.f, 1.f, 1.f, 1.f, rgba0, rgba0, rgba0, rgba0);
+    _Vita_WriteVertices4xColor(_curDrawCall, x, y, wDst, hDst, 1.f, 1.f, 1.f, 1.f, rgba0, rgba0, rgba0, rgba0, true);
 
     _Vita_DoneWithDrawCall();
 
@@ -840,6 +861,9 @@ int initGLAdv()
     memset(_curBufferA, 0, _vgl_pending_total_size);
     memset(_curBufferB, 0, _vgl_pending_total_size);
 
+    // 1 to indicate filled by default
+    memset(_curBufferFillState, 1, MAX_VERTICES);
+
     _vgl_pending_calls = _curBufferA;
     _vgl_current_write_buffer = _curBufferB;
     
@@ -1103,7 +1127,7 @@ void Vita_Repaint()
     // This is a "hack around".
     // Ideally, I'd be able to batch this all at once.
     GLuint i;
-    GLuint _curBoundTex = -1;
+    GLuint _curBoundTex = 0;
     GLuint _curReqTex = 0;
     int totalTextureSwaps = 0;
     DrawCall _curDrawCall;
@@ -1182,7 +1206,7 @@ void Vita_Repaint()
         }
 
         // draw
-        glDrawArrays(GL_TRIANGLE_STRIP, i * VERTICES_PER_PRIM, VERTICES_PER_PRIM);
+        glDrawArrays( _curBufferFillState[i] == 1 ? GL_TRIANGLE_STRIP : GL_LINE_LOOP, i * VERTICES_PER_PRIM, VERTICES_PER_PRIM);
     }
 #if DEBUG_BUILD
     if(last_frame_time_s != 0)

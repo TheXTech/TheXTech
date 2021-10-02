@@ -193,8 +193,8 @@ void Vita_DrawRectColor(float x, float y,
                         float _r,
                         float _g,
                         float _b,
-                        float _a
-);
+                        float _a,
+                        char filled);
 
 /**
  * Vita_DrawRect4xColor():
@@ -206,7 +206,8 @@ void Vita_DrawRect4xColor(float x, float y,
                           float rgba0[4],
                           float rgba1[4],
                           float rgba2[4],
-                          float rgba3[4]
+                          float rgba3[4],
+                          char filled
 );
 
 /**
