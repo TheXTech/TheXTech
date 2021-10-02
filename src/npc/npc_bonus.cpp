@@ -267,7 +267,10 @@ void TouchBonus(int A, int B)
             else if(NPC[B].Type == 250)
                 PlaySound(SFX_ZeldaHeart);
             else
+            {
+                PlaySound(SFX_PlayerGrow);
                 PlaySound(SFX_GotItem);
+            }
             if(NPC[B].Effect != 2)
                 MoreScore(NPCScore[NPC[B].Type], NPC[B].Location);
         }
@@ -297,7 +300,10 @@ void TouchBonus(int A, int B)
                 if(Player[A].Character == 5)
                     PlaySound(SFX_ZeldaHeart);
                 else
+                {
+                    PlaySound(SFX_PlayerGrow);
                     PlaySound(SFX_GotItem);
+                }
             }
             if(NPC[B].Effect != 2)
                 MoreScore(NPCScore[NPC[B].Type], NPC[B].Location);
@@ -329,7 +335,10 @@ void TouchBonus(int A, int B)
                 if(Player[A].Character == 5)
                     PlaySound(SFX_ZeldaHeart);
                 else
+                {
+                    PlaySound(SFX_PlayerGrow);
                     PlaySound(SFX_GotItem);
+                }
             }
             if(NPC[B].Effect != 2)
                 MoreScore(NPCScore[NPC[B].Type], NPC[B].Location);
@@ -355,7 +364,10 @@ void TouchBonus(int A, int B)
                 if(Player[A].Character == 5)
                     PlaySound(SFX_ZeldaHeart);
                 else
+                {
+                    PlaySound(SFX_PlayerGrow);
                     PlaySound(SFX_GotItem);
+                }
             }
             if(NPC[B].Effect != 2)
                 MoreScore(NPCScore[NPC[B].Type], NPC[B].Location);
@@ -381,7 +393,10 @@ void TouchBonus(int A, int B)
                 if(Player[A].Character == 5)
                     PlaySound(SFX_ZeldaHeart);
                 else
+                {
+                    PlaySound(SFX_PlayerGrow);
                     PlaySound(SFX_GotItem);
+                }
             }
             if(NPC[B].Effect != 2)
                 MoreScore(NPCScore[NPC[B].Type], NPC[B].Location);
@@ -407,7 +422,10 @@ void TouchBonus(int A, int B)
                 if(Player[A].Character == 5)
                     PlaySound(SFX_ZeldaHeart);
                 else
+                {
+                    PlaySound(SFX_PlayerGrow);
                     PlaySound(SFX_GotItem);
+                }
             }
             if(NPC[B].Effect != 2)
                 MoreScore(NPCScore[NPC[B].Type], NPC[B].Location);
