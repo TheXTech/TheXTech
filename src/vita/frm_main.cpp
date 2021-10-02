@@ -823,13 +823,13 @@ void FrmMain::renderRect(int x, int y, int w, int h, float red, float green, flo
     (void)filled;
     // TODO: Filled or not?
     PGE_RectF rect = __NormalizeToGL(x + viewport_offset_x, y + viewport_offset_y, w, h, ScreenW, ScreenH);
-    Vita_DrawRectColor(rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, red, green, blue, alpha);
+    Vita_DrawRectColor(rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, red, green, blue, alpha, filled);
 }
 
 void FrmMain::renderRectBR(int _left, int _top, int _right, int _bottom, float red, float green, float blue, float alpha)
 {
     PGE_RectF rect = __NormalizeToGL(_left + viewport_offset_x, _top + viewport_offset_y, _right - _left, _bottom - _top, ScreenW, ScreenH);
-    Vita_DrawRectColor(rect.left, rect.top, rect.right-rect.left, rect.bottom-rect.top, red, green, blue, alpha);
+    Vita_DrawRectColor(rect.left, rect.top, rect.right-rect.left, rect.bottom-rect.top, red, green, blue, alpha, true);
 }
 
 void FrmMain::renderTexturePrivate(float xDst, float yDst, float wDst, float hDst,
