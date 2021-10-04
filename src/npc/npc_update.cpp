@@ -3549,38 +3549,27 @@ void UpdateNPCs()
 
                                     for(B = (int)fBlock2; B <= lBlock2; B++)
                                     {
-                                        //                                            If BlockNoClipping(Block(B).Type) = False And Block(B).Invis = False And Block(B).Hidden = False And Not (BlockIsSizable(Block(B).Type) And Block(B).Location.Y < .Location.Y + .Location.Height - 3) Then
+                                        //If BlockNoClipping(Block(B).Type) = False And Block(B).Invis = False And Block(B).Hidden = False And Not (BlockIsSizable(Block(B).Type) And Block(B).Location.Y < .Location.Y + .Location.Height - 3) Then
 
                                         // Don't collapse Pokey during walking on slopes and other touching surfaces
                                         if(g_compatibility.fix_pokey_collapse && isPokeyHead && Block[B].IsNPC != 247)
                                             continue;
 
-                                        if(tempLocation.X + tempLocation.Width >= Block[B].Location.X)
+                                        if((tempLocation.X + tempLocation.Width >= Block[B].Location.X) &&
+                                           (tempLocation.X <= Block[B].Location.X + Block[B].Location.Width) &&
+                                           (tempLocation.Y + tempLocation.Height >= Block[B].Location.Y) &&
+                                           (tempLocation.Y <= Block[B].Location.Y + Block[B].Location.Height) &&
+                                           (!BlockNoClipping[Block[B].Type] && !Block[B].Invis && !Block[B].Hidden && !(BlockIsSizable[Block[B].Type] && Block[B].Location.Y < NPC[A].Location.Y + NPC[A].Location.Height - 3)))
                                         {
-                                            if(tempLocation.X <= Block[B].Location.X + Block[B].Location.Width)
-                                            {
-                                                if(tempLocation.Y + tempLocation.Height >= Block[B].Location.Y)
-                                                {
-                                                    if(tempLocation.Y <= Block[B].Location.Y + Block[B].Location.Height)
-                                                    {
-                                                        if(!BlockNoClipping[Block[B].Type] && !Block[B].Invis && !Block[B].Hidden && !(BlockIsSizable[Block[B].Type] && Block[B].Location.Y < NPC[A].Location.Y + NPC[A].Location.Height - 3))
-                                                        {
-                                                            // If CheckCollision(tempLocation, Block(B).Location) = True Then
-                                                            tempTurn = false;
-                                                            break;
-                                                            // End If
-                                                        }
-                                                    }
-                                                }
-                                            }
+                                            // If CheckCollision(tempLocation, Block(B).Location) = True Then
+                                            tempTurn = false;
+                                            break;
+                                            // End If
                                         }
                                         else
                                         {
                                             // not working
                                         }
-
-
-
 
                                         // End If
                                     }
