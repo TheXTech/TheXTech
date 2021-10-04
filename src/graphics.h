@@ -37,6 +37,8 @@ void doShakeScreenClear();
 // Public Sub UpdateGraphics2() 'draws GFX to screen when on the world map/world map editor
 // draws GFX to screen when on the world map/world map editor
 void UpdateGraphics2(bool skipRepaint = false);
+// Unpack all visible lazily-loaded graphics
+void GraphicsLazyPreLoad();
 // Public Sub UpdateGraphics() 'This draws the graphic to the screen when in a level/game menu/outro/level editor
 // This draws the graphic to the screen when in a level/game menu/outro/level editor
 void UpdateGraphics(bool skipRepaint = false);

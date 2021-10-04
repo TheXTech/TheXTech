@@ -143,6 +143,124 @@ void doShakeScreenClear()
     s_shakeScreen.clear();
 }
 
+void GraphicsLazyPreLoad()
+{
+    int numScreens = 1;
+
+    if(ScreenType == 1)
+        numScreens = 2;
+    if(ScreenType == 4)
+        numScreens = 2;
+    if(ScreenType == 5)
+    {
+        DynamicScreen();
+        if(vScreen[2].Visible)
+            numScreens = 2;
+        else
+            numScreens = 1;
+    }
+    if(ScreenType == 8)
+        numScreens = 1;
+
+
+    if(SingleCoop == 2)
+        numScreens = 2;
+
+
+    For(Z, 1, numScreens)
+    {
+        if(SingleCoop == 2)
+            Z = 2;
+
+        int S = Player[Z].Section;
+
+        switch(Background2[S])
+        {
+        case 1: // Double-row background
+            frmMain.lazyPreLoad(GFXBackground2[1]);
+            frmMain.lazyPreLoad(GFXBackground2[2]);
+            break;
+
+        case 2: // Single-row clouds background
+            frmMain.lazyPreLoad(GFXBackground2[2]);
+            break;
+
+        case 3: // Double-row background
+            frmMain.lazyPreLoad(GFXBackground2[3]);
+            frmMain.lazyPreLoad(GFXBackground2[2]);
+            break;
+        case 4: case 5: case 6: case 7: case 8: case 9: case 10: case 11: case 12: case 13:
+            // All these backgrounds do use picture with the number less with 1
+            frmMain.lazyPreLoad(GFXBackground2[Background2[S] - 1]);
+            break;
+        case 22: // Double-row background
+            frmMain.lazyPreLoad(GFXBackground2[22]);
+            frmMain.lazyPreLoad(GFXBackground2[2]);
+            break;
+
+        default: // Any other normal backgrounds
+            frmMain.lazyPreLoad(GFXBackground2[Background2[S]]);
+            break;
+        }
+
+        For(A, 1, numPlayers)
+        {
+            Player_t &p = Player[A];
+            int c = p.Character;
+            int s = p.State;
+
+            switch(c)
+            {
+            case 1:
+                frmMain.lazyPreLoad(GFXMarioBMP[s]);
+                break;
+            case 2:
+                frmMain.lazyPreLoad(GFXLuigiBMP[s]);
+                break;
+            case 3:
+                frmMain.lazyPreLoad(GFXPeachBMP[s]);
+                break;
+            case 4:
+                frmMain.lazyPreLoad(GFXToadBMP[s]);
+                break;
+            case 5:
+                frmMain.lazyPreLoad(GFXLinkBMP[s]);
+                break;
+            default: // Trap
+                SDL_assert_release(false && "Please fix me up if you implemented a new playable character, see gfx_update.cpp!");
+                return;
+            }
+        }
+
+        For(A, 1, numBackground)
+        {
+            if(vScreenCollision(Z, Background[A].Location) && !Background[A].Hidden)
+            {
+                frmMain.lazyPreLoad(GFXBackgroundBMP[Background[A].Type]);
+            }
+        }
+
+        int64_t fBlock = 0;
+        int64_t lBlock = 0;
+        blockTileGet(-vScreenX[Z], vScreen[Z].Width, fBlock, lBlock);
+
+        For(A, fBlock, lBlock)
+        {
+            if(vScreenCollision(Z, Block[A].Location) && !Block[A].Hidden)
+            {
+                frmMain.lazyPreLoad(GFXBlock[Block[A].Type]);
+            }
+        }
+
+        for(int A = 1; A <= numNPCs; A++)
+        {
+            if(vScreenCollision(Z, NPC[A].Location))
+            {
+                frmMain.lazyPreLoad(GFXNPC[NPC[A].Type]);
+            }
+        }
+    }
+}
 
 // This draws the graphic to the screen when in a level/game menu/outro/level editor
 void UpdateGraphics(bool skipRepaint)

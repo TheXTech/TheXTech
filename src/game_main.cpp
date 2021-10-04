@@ -336,10 +336,8 @@ int GameMain(const CmdLineSetup_t &setup)
             GameOutroDoQuit = false;
             SetupCredits();
 
-            resetFrameTimer();
-
             // Update graphics before loop begin (to process an initial lazy-unpacking of used sprites)
-            UpdateGraphics(true);
+            GraphicsLazyPreLoad();
             resetFrameTimer();
 
             // Run the frame-loop
@@ -469,10 +467,8 @@ int GameMain(const CmdLineSetup_t &setup)
                     ProcEvent(Events[A].Name, true);
             }
 
-            resetFrameTimer();
-
             // Update graphics before loop begin (to process inital lazy-unpacking of used sprites)
-            UpdateGraphics(true);
+            GraphicsLazyPreLoad();
             resetFrameTimer();
             // Clear the speed-runner timer
             speedRun_resetTotal();
@@ -725,10 +721,8 @@ int GameMain(const CmdLineSetup_t &setup)
                     ProcEvent(Events[A].Name, true);
             }
 
-            resetFrameTimer();
-
             // Update graphics before loop begin (to process inital lazy-unpacking of used sprites)
-            UpdateGraphics(true);
+            GraphicsLazyPreLoad();
             resetFrameTimer();
 
             speedRun_triggerEnter();
