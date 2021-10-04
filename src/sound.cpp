@@ -427,8 +427,38 @@ void StopSfx(std::string Alias)
     }
 }
 
+
+static bool s_delayMusic = false;
+static bool s_delayedMusicRequested = false;
+static int  s_delayedMusicA = 0;
+static int  s_delayedMusicFadeInMs = 0;
+
+void setMusicStartDelay()
+{
+    s_delayMusic = true;
+    s_delayedMusicRequested = false;
+}
+
+void delayedMusicStart()
+{
+    s_delayMusic = false;
+    if(s_delayedMusicRequested)
+    {
+        StartMusic(s_delayedMusicA, s_delayedMusicFadeInMs);
+        s_delayedMusicRequested = false;
+    }
+}
+
 void StartMusic(int A, int fadeInMs)
 {
+    if(s_delayMusic)
+    {
+        s_delayedMusicA = A;
+        s_delayedMusicFadeInMs = fadeInMs;
+        s_delayedMusicRequested = true;
+        return;
+    }
+
     if(noSound)
     {
         // Keep world map music being remembered when sound disabled

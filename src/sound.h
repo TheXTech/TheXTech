@@ -166,6 +166,8 @@ void PlaySfx(std::string Alias, int loops = 0);
 // Public Sub StopSfx(Alias As String)
 void StopSfx(std::string Alias);
 // Public Sub StartMusic(A As Integer) 'play music
+void setMusicStartDelay();
+void delayedMusicStart();
 // play music
 void StartMusic(int A, int fadeInMs = 0);
 // Public Sub StopMusic() 'stop playing music

@@ -426,6 +426,8 @@ int GameMain(const CmdLineSetup_t &setup)
             OpenLevel(introPath);
             vScreenX[1] = -level[0].X;
 
+            setMusicStartDelay(); // Don't start music until all gfx will be loaded
+
             StartMusic(0);
             SetupPlayers();
 
@@ -472,6 +474,8 @@ int GameMain(const CmdLineSetup_t &setup)
             resetFrameTimer();
             // Clear the speed-runner timer
             speedRun_resetTotal();
+
+            delayedMusicStart(); // Allow music being started
 
             // Main menu loop
             runFrameLoop(&MenuLoop, nullptr, []()->bool{ return GameMenu;});
@@ -562,6 +566,8 @@ int GameMain(const CmdLineSetup_t &setup)
             }
             else
             {
+                setMusicStartDelay(); // Don't start music until all gfx will be loaded
+
                 if(curWorldMusic > 0)
                     StartMusic(curWorldMusic);
 
@@ -574,6 +580,8 @@ int GameMain(const CmdLineSetup_t &setup)
                 // Update graphics before loop begin (to process inital lazy-unpacking of used sprites)
                 UpdateGraphics2(true);
                 resetFrameTimer();
+
+                delayedMusicStart(); // Allow music being started
 
                 // 'level select loop
                 runFrameLoop(nullptr, &WorldLoop,
@@ -613,6 +621,8 @@ int GameMain(const CmdLineSetup_t &setup)
                 if(Player[A].Mount == 2)
                     Player[A].Mount = 0; // take players off the clown car
             }
+
+            setMusicStartDelay(); // Don't start music until all gfx will be loaded
 
             SetupPlayers(); // Setup Players for the level
 
@@ -726,6 +736,8 @@ int GameMain(const CmdLineSetup_t &setup)
             resetFrameTimer();
 
             speedRun_triggerEnter();
+
+            delayedMusicStart(); // Allow music being started
 
             // MAIN GAME LOOP
             runFrameLoop(nullptr, &GameLoop,
