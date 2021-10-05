@@ -69,6 +69,11 @@ void YoshiEat(int A);
 void YoshiSpit(int A);
 // Public Sub YoshiPound(A As Integer, C As Integer, Optional BreakBlocks As Boolean = False)
 void YoshiPound(int A, int mount, bool BreakBlocks = false);
+
+
+// NEW (but derived from existing code) forces player to jump out of mount as they do for AltJump, bypassing all checks.
+void PlayerDismount(int A);
+
 // Public Sub SwapCoop()
 void SwapCoop();
 // Public Sub PlayerPush(A As Integer, HitSpot As Integer)
