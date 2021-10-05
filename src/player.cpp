@@ -690,6 +690,23 @@ void PlayerHurt(int A)
     }
 }
 
+void PlayerDeathEffect(int A)
+{
+    if(Player[A].Character == 1)
+        NewEffect(3, Player[A].Location, 1, 0, ShadowMode);
+    else if(Player[A].Character == 2)
+        NewEffect(5, Player[A].Location, 1, 0, ShadowMode);
+    else if(Player[A].Character == 3)
+        NewEffect(129, Player[A].Location, 1, 0, ShadowMode);
+    else if(Player[A].Character == 4)
+        NewEffect(130, Player[A].Location, 1, 0, ShadowMode);
+    else if(Player[A].Character == 5)
+    {
+        NewEffect(134, Player[A].Location, static_cast<float>(Player[A].Direction), 0, ShadowMode);
+        Effect[numEffects].Location.SpeedX = 2 * -Player[A].Direction;
+    }
+}
+
 void PlayerDead(int A)
 {
     Controls::Rumble(A, 400, 0.8);
@@ -768,19 +785,7 @@ void PlayerDead(int A)
     Player[A].HoldingNPC = 0;
     Player[A].GroundPound = false;
     Player[A].GroundPound2 = false;
-    if(Player[A].Character == 1)
-        NewEffect(3, Player[A].Location, 1, 0, ShadowMode);
-    else if(Player[A].Character == 2)
-        NewEffect(5, Player[A].Location, 1, 0, ShadowMode);
-    else if(Player[A].Character == 3)
-        NewEffect(129, Player[A].Location, 1, 0, ShadowMode);
-    else if(Player[A].Character == 4)
-        NewEffect(130, Player[A].Location, 1, 0, ShadowMode);
-    else if(Player[A].Character == 5)
-    {
-        NewEffect(134, Player[A].Location, static_cast<float>(Player[A].Direction), 0, ShadowMode);
-        Effect[numEffects].Location.SpeedX = 2 * -Player[A].Direction;
-    }
+    PlayerDeathEffect(A);
     Player[A].TimeToLive = 1;
     if(CheckLiving() == 0 && GameMenu == false && BattleMode == false)
     {
@@ -3328,6 +3333,36 @@ void YoshiEatCode(int A)
     }
 }
 
+void RespawnPlayer(int A, double Direction, double CenterX, double StopY)
+{
+    Player[A].Location.Width = Physics.PlayerWidth[Player[A].Character][Player[A].State];
+    Player[A].Location.Height = Physics.PlayerHeight[Player[A].Character][Player[A].State];
+    Player[A].Frame = 1;
+    Player[A].Direction = Direction;
+    Player[A].Dead = false;
+    Player[A].Location.SpeedX = 0;
+    Player[A].Location.SpeedY = 0;
+    Player[A].Effect = 6;
+    // location where player stops flashing
+    Player[A].Effect2 = StopY - Player[A].Location.Height;
+    Player[A].Location.Y = -vScreenY[1] - Player[A].Location.Height;
+    Player[A].Location.X = CenterX - Player[A].Location.Width / 2.0;
+}
+
+void RespawnPlayerTo(int A, int TargetPlayer)
+{
+    double CenterX = Player[TargetPlayer].Location.X + Player[TargetPlayer].Location.Width / 2.0;
+    double StopY;
+    if(Player[TargetPlayer].Mount == 2)
+        StopY = Player[TargetPlayer].Location.Y;
+    else
+        StopY = Player[TargetPlayer].Location.Y + Player[TargetPlayer].Location.Height;
+    // technically this would fix a vanilla bug (weird effects after Player 2 dies, Player 1 goes into Warp, Player 2 respawns)
+    //   so I will do it where it only affects the new code
+    // Player[A].Section = Player[TargetPlayer].Section;
+    RespawnPlayer(A, Player[TargetPlayer].Direction, CenterX, StopY);
+}
+
 void StealBonus()
 {
     int A = 0;
@@ -3348,41 +3383,25 @@ void StealBonus()
         {
             if(Player[A].Dead)
             {
+                // find other player
                 if(A == 1)
-                {
                     B = 2;
-                    C = 40;
-                }
                 else
-                {
                     B = 1;
-                    C = -40;
-                }
 
                 if(Lives > 0 && LevelMacro == LEVELMACRO_OFF)
                 {
                     if(Player[A].Controls.Jump || Player[A].Controls.Run)
                     {
                         Lives = Lives - 1;
-                        if(B == 1)
-                            C = -40;
-                        if(B == 2)
-                            C = 40;
                         Player[A].State = 1;
                         Player[A].Hearts = 1;
-                        Player[A].Location.Width = Physics.PlayerWidth[Player[A].Character][Player[A].State];
-                        Player[A].Location.Height = Physics.PlayerHeight[Player[A].Character][Player[A].State];
-                        Player[A].Frame = 1;
-                        Player[A].Direction = Player[B].Direction;
-                        Player[A].Dead = false;
-                        Player[A].Location.SpeedX = 0;
-                        Player[A].Location.SpeedY = 0;
-                        Player[A].Effect = 6;
-                        Player[A].Effect2 = Player[B].Location.Y + Player[B].Location.Height - Player[A].Location.Height;
-                        if(Player[B].Mount == 2)
-                            Player[A].Effect2 = Player[B].Location.Y - Player[A].Location.Height;
-                        Player[A].Location.Y = -vScreenY[1] - Player[A].Location.Height;
-                        Player[A].Location.X = Player[B].Location.X + Player[B].Location.Width / 2.0 - Player[A].Location.Width / 2.0;
+                        // old, dead HeldBonus code
+                        // if(B == 1)
+                        //     C = -40;
+                        // if(B == 2)
+                        //     C = 40;
+                        RespawnPlayerTo(A, B);
                         PlaySound(SFX_DropItem);
                     }
                 }
@@ -6614,14 +6633,154 @@ void PlayerEffects(int A)
 //    }
 }
 
-void DeletePlayer(int A)
+// make a death effect for player and release all items linked to them.
+// used for the Die SwapCharacter and for the DropPlayer.
+// do this BEFORE changing/erasing any player fields
+void PlayerGone(int A)
 {
+    PlaySound(SFX_PlayerDied2);
+    PlayerDismount(A);
+    if(Player[A].HoldingNPC > 0)
+    {
+        NPC[Player[A].HoldingNPC].HoldingPlayer = 0;
+        Player[A].HoldingNPC = 0;
+    }
+    PlayerDeathEffect(A);
+}
+
+void AddPlayer(int Character)
+{
+    numPlayers++;
+    Player_t& p = Player[numPlayers];
+    p = Player_t();
+    p.Character = Character;
+    p.State = SavedChar[p.Character].State;
+    p.HeldBonus = SavedChar[p.Character].HeldBonus;
+    p.Mount = SavedChar[p.Character].Mount;
+    p.MountType = SavedChar[p.Character].MountType;
+    p.Hearts = SavedChar[p.Character].Hearts;
+    if(p.State == 0)
+    {
+        p.State = 1;
+    }
+
+    p.Frame = 1;
+    if(p.Character == 3)
+        p.CanFloat = true;
+    p.Direction = 1.;
+
+    SizeCheck(numPlayers);
+
+    // the rest only matters during level play
+    if(LevelSelect && (StartLevel.empty() || !NoMap))
+        return;
+
+    int alivePlayer = CheckLiving();
+    if(alivePlayer == 0 || alivePlayer == Character)
+        alivePlayer = 1;
+    p.Section = Player[alivePlayer].Section;
+    RespawnPlayerTo(numPlayers, alivePlayer);
+
+    SetupScreens();
+}
+
+void DropPlayer(int A)
+{
+    PlayerGone(A);
     if(A < 1 || A > numPlayers)
         return;
+    // TODO - IMPORTANT - remove all references to player A,
+    //   decrement all references to higher players
+    // ...
+    // ...
+
     SavedChar[Player[A].Character] = Player[A];
     for(int B = A; B < numPlayers; B++)
     {
         Player[B] = std::move(Player[B+1]);
     }
+
     numPlayers --;
+
+    // the rest only matters during level play
+    if(LevelSelect && (StartLevel.empty() || !NoMap))
+        return;
+
+    SetupScreens();
+}
+
+void SwapCharacter(int A, int Character, bool Die, bool Block)
+{
+    // if already dead or respawning, don't die again
+    if(Player[A].Dead || Player[A].Effect == 6)
+        Die = false;
+    if(Die && Lives <= 0)
+    {
+        return;
+    }
+
+    if(Die)
+        PlayerGone(A);
+
+    SavedChar[Player[A].Character] = Player[A];
+
+    // the following is identical to the code moved from blocks.cpp
+    Player[A].Character = Character;
+    auto &p = Player[A];
+    p.State = SavedChar[p.Character].State;
+    p.HeldBonus = SavedChar[p.Character].HeldBonus;
+    p.Mount = SavedChar[p.Character].Mount;
+    p.MountType = SavedChar[p.Character].MountType;
+    p.Hearts = SavedChar[p.Character].Hearts;
+    if(p.State == 0)
+    {
+        p.State = 1;
+    }
+    p.FlySparks = false;
+    p.Immune = 50;
+    if(Block)
+    {
+        p.Effect = 8;
+        p.Effect2 = 14;
+    }
+
+    if(!Die)
+    {
+        if(Block)
+        {
+            // make player top match old player top, for bricks (from blocks.cpp)
+            if(p.Mount <= 1)
+            {
+                p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
+                if(p.Mount == 1 && p.State == 1)
+                {
+                    p.Location.Height = Physics.PlayerHeight[1][2];
+                }
+                p.StandUp = true;
+            }
+        }
+        else
+        {
+            // make player bottom match old player bottom, to avoid floor glitches
+            UnDuck(A);
+            SizeCheck(A);
+        }
+
+        Location_t tempLocation = p.Location;
+        tempLocation.Y = p.Location.Y + p.Location.Height / 2.0 - 16;
+        tempLocation.X = p.Location.X + p.Location.Width / 2.0 - 16;
+        NewEffect(10, tempLocation);
+
+        PlaySound(SFX_Raccoon);
+    }
+
+    if(Die)
+    {
+        // make player bottom match old player bottom, for respawn
+        Lives --;
+        UnDuck(A);
+        SizeCheck(A);
+        RespawnPlayerTo(A, A);
+        PlaySound(SFX_DropItem);
+    }
 }

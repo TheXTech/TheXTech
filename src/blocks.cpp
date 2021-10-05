@@ -65,6 +65,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
             for(auto B = 1; B <= tmpNumPlayers; B++)
             {
+                // why is this inside the for loop, seems silly.
                 SavedChar[Player[whatPlayer].Character] = Player[whatPlayer];
                 if(Player[B].Character == 1)
                 {
@@ -90,59 +91,30 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
             if(BlockFrame[b.Type] < 4)
             {
-                PlaySound(SFX_Raccoon);
-
                 // UnDuck whatPlayer
+
+                // moved SwapCharacter logic into player.cpp
+
                 if(b.Type == 622)
                 {
-                    Player[whatPlayer].Character = 1;
+                    SwapCharacter(whatPlayer, 1, false, true);
                 }
                 if(b.Type == 623)
                 {
-                    Player[whatPlayer].Character = 2;
+                    SwapCharacter(whatPlayer, 2, false, true);
                 }
                 if(b.Type == 624)
                 {
-                    Player[whatPlayer].Character = 3;
+                    SwapCharacter(whatPlayer, 3, false, true);
                 }
                 if(b.Type == 625)
                 {
-                    Player[whatPlayer].Character = 4;
+                    SwapCharacter(whatPlayer, 4, false, true);
                 }
                 if(b.Type == 631)
                 {
-                    Player[whatPlayer].Character = 5;
+                    SwapCharacter(whatPlayer, 5, false, true);
                 }
-
-                auto &p = Player[whatPlayer];
-                p.State = SavedChar[p.Character].State;
-                p.HeldBonus = SavedChar[p.Character].HeldBonus;
-                p.Mount = SavedChar[p.Character].Mount;
-                p.MountType = SavedChar[p.Character].MountType;
-                p.Hearts = SavedChar[p.Character].Hearts;
-                if(p.State == 0)
-                {
-                    p.State = 1;
-                }
-                p.FlySparks = false;
-                p.Immune = 50;
-                p.Effect = 8;
-                p.Effect2 = 14;
-
-                if(p.Mount <= 1)
-                {
-                    p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
-                    if(p.Mount == 1 && p.State == 1)
-                    {
-                        p.Location.Height = Physics.PlayerHeight[1][2];
-                    }
-                    p.StandUp = true;
-                }
-
-                tempLocation = p.Location;
-                tempLocation.Y = p.Location.Y + p.Location.Height / 2.0 - 16;
-                tempLocation.X = p.Location.X + p.Location.Width / 2.0 - 16;
-                NewEffect(10, tempLocation);
             }
             else
             {

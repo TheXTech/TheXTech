@@ -70,18 +70,22 @@ void GetvScreen(int A)
     {
         if(Player[A].Mount == 2)
             Player[A].Location.Height = 0;
-        vScreenX[A] = -Player[A].Location.X + (vScreen[A].Width * 0.5) - Player[A].Location.Width / 2.0;
-        vScreenY[A] = -Player[A].Location.Y + (vScreen[A].Height * 0.5) - vScreenYOffset - Player[A].Location.Height;
-        vScreenX[A] = vScreenX[A] - vScreen[A].tempX;
-        vScreenY[A] = vScreenY[A] - vScreen[A].TempY;
-        if(-vScreenX[A] < level[Player[A].Section].X)
-            vScreenX[A] = -level[Player[A].Section].X;
-        if(-vScreenX[A] + vScreen[A].Width > level[Player[A].Section].Width)
-            vScreenX[A] = -(level[Player[A].Section].Width - vScreen[A].Width);
-        if(-vScreenY[A] < level[Player[A].Section].Y)
-            vScreenY[A] = -level[Player[A].Section].Y;
-        if(-vScreenY[A] + vScreen[A].Height > level[Player[A].Section].Height)
-            vScreenY[A] = -(level[Player[A].Section].Height - vScreen[A].Height);
+        // this guard is new because players can now respawn in 1P mode through DropAdd
+        if(Player[A].Effect != 6)
+        {
+            vScreenX[A] = -Player[A].Location.X + (vScreen[A].Width * 0.5) - Player[A].Location.Width / 2.0;
+            vScreenY[A] = -Player[A].Location.Y + (vScreen[A].Height * 0.5) - vScreenYOffset - Player[A].Location.Height;
+            vScreenX[A] = vScreenX[A] - vScreen[A].tempX;
+            vScreenY[A] = vScreenY[A] - vScreen[A].TempY;
+            if(-vScreenX[A] < level[Player[A].Section].X)
+                vScreenX[A] = -level[Player[A].Section].X;
+            if(-vScreenX[A] + vScreen[A].Width > level[Player[A].Section].Width)
+                vScreenX[A] = -(level[Player[A].Section].Width - vScreen[A].Width);
+            if(-vScreenY[A] < level[Player[A].Section].Y)
+                vScreenY[A] = -level[Player[A].Section].Y;
+            if(-vScreenY[A] + vScreen[A].Height > level[Player[A].Section].Height)
+                vScreenY[A] = -(level[Player[A].Section].Height - vScreen[A].Height);
+        }
         if(vScreen[A].TempDelay > 0)
             vScreen[A].TempDelay = vScreen[A].TempDelay - 1;
         else
