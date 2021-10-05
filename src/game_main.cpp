@@ -292,7 +292,6 @@ int GameMain(const CmdLineSetup_t &setup)
                 outroPath = AppPath + "outro.lvl";
             OpenLevel(outroPath);
 
-            ScreenType = 7;
             SetupScreens();
             ClearBuffer = true;
 
@@ -349,7 +348,6 @@ int GameMain(const CmdLineSetup_t &setup)
                         nullptr,
                         []()->void
                         {
-                            ScreenType = 0;
                             SetupScreens();
                         });
         }
@@ -406,7 +404,6 @@ int GameMain(const CmdLineSetup_t &setup)
             SuperSpeed = false;
             FlyForever = false;
             BeatTheGame = false;
-            ScreenType = 2;
 
             SetupScreens();
 
@@ -596,20 +593,6 @@ int GameMain(const CmdLineSetup_t &setup)
             EndLevel = false;
 
             record_init(); // initializes level data recording
-
-            if(numPlayers == 1)
-                ScreenType = 0; // Follow 1 player
-            else if(numPlayers == 2)
-                ScreenType = 5; // Dynamic screen
-            else
-            {
-                // ScreenType = 3 'Average, no one leaves the screen
-                ScreenType = 2; // Average
-            }
-
-            if(SingleCoop > 0)
-                ScreenType = 6;
-//            If nPlay.Online = True Then ScreenType = 8 'Online
 
             for(int A = 1; A <= numPlayers; ++A)
             {

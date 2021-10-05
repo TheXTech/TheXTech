@@ -455,7 +455,7 @@ void UpdateGraphics(bool skipRepaint)
 //        End If
         }
 
-//        If GameOutro = True Then ScreenType = 7
+        // not sure why this is getting set over and over again
         if(GameOutro)
             ScreenType = 7;
 //        If LevelEditor = False Then

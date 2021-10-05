@@ -775,7 +775,6 @@ void CheatCode(char NewKey)
             if(B > 0)
             {
                 numPlayers = 128;
-                ScreenType = 2;
                 SetupScreens();
                 if(Player[B].Effect == 9)
                     Player[B].Effect = 0;
@@ -799,7 +798,6 @@ void CheatCode(char NewKey)
             if(B > 0)
             {
                 numPlayers = 64;
-                ScreenType = 2;
                 SetupScreens();
                 if(Player[B].Effect == 9)
                     Player[B].Effect = 0;
@@ -823,7 +821,6 @@ void CheatCode(char NewKey)
             if(B > 0)
             {
                 numPlayers = 32;
-                ScreenType = 2;
                 SetupScreens();
                 if(Player[B].Effect == 9)
                     Player[B].Effect = 0;
@@ -847,7 +844,6 @@ void CheatCode(char NewKey)
             if(B > 0)
             {
                 numPlayers = 16;
-                ScreenType = 2;
                 SetupScreens();
                 if(Player[B].Effect == 9)
                     Player[B].Effect = 0;
@@ -871,7 +867,6 @@ void CheatCode(char NewKey)
             if(B > 0)
             {
                 numPlayers = 8;
-                ScreenType = 2;
                 SetupScreens();
                 if(Player[B].Effect == 9)
                     Player[B].Effect = 0;
@@ -895,7 +890,6 @@ void CheatCode(char NewKey)
             if(B > 0)
             {
                 numPlayers = 4;
-                ScreenType = 2;
                 SetupScreens();
                 if(Player[B].Effect == 9)
                     Player[B].Effect = 0;
@@ -919,7 +913,6 @@ void CheatCode(char NewKey)
             if(B > 0)
             {
                 numPlayers = 2;
-                ScreenType = 6;
                 SingleCoop = 1;
                 SetupScreens();
                 if(Player[B].Effect == 9)
@@ -979,7 +972,6 @@ void CheatCode(char NewKey)
                     }
                 }
                 numPlayers = 1;
-                ScreenType = 0;
                 SingleCoop = 1;
                 SetupScreens();
                 if(Player[B].Effect == 9)
@@ -1009,7 +1001,6 @@ void CheatCode(char NewKey)
             if(B > 0)
             {
                 numPlayers = 2;
-                ScreenType = 5;
                 SingleCoop = 0;
                 SetupScreens();
                 if(Player[B].Effect == 9)

@@ -26,9 +26,36 @@
 #include "../load_gfx.h"
 
 
+void SetScreenType()
+{
+    // moved this code from game_main.cpp, but it occurs elsewhere also
+    //   better to have it in one place so it can be updated
+    if(numPlayers == 1)
+        ScreenType = 0; // Follow 1 player
+    else if(numPlayers == 2)
+        ScreenType = 5; // Dynamic screen
+    else
+    {
+        // ScreenType = 3 'Average, no one leaves the screen
+        ScreenType = 2; // Average
+    }
+
+    // special cases
+    if(SingleCoop > 0)
+        ScreenType = 6;
+    if(GameMenu)
+        ScreenType = 2;
+    if(GameOutro)
+        ScreenType = 7;
+    if(LevelEditor)
+        ScreenType = 0;
+}
+
 // Sets up the split lines
 void SetupScreens()
 {
+    SetScreenType();
+
     switch(ScreenType)
     {
     case 0: // Follows Player 1

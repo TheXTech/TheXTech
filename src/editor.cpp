@@ -93,7 +93,6 @@ void UpdateEditor()
 
     if(!MagicHand && ScreenType != 0)
     {
-        ScreenType = 0;
         SetupScreens();
     }
 
@@ -2903,8 +2902,6 @@ void zTestLevel(bool magicHand, bool interProcess)
         }
     }
 
-    if(SingleCoop > 0)
-        ScreenType = 6;
     SetupScreens();
     TestLevel = true;
     LevelSelect = false;
@@ -2914,11 +2911,6 @@ void zTestLevel(bool magicHand, bool interProcess)
 
     optCursor.current = 13;
     OptCursorSync();
-
-    if(numPlayers == 1)
-        ScreenType = 1;
-    else
-        ScreenType = 5;
 }
 
 void MouseMove(float X, float Y, bool /*nCur*/)
