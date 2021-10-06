@@ -35,6 +35,7 @@ struct GameInfo
     RangeArr<std::string, 1, numCharacters> characterName;
 
     bool disableBattleMode = true;
+    bool disableTwoPlayer = true;
 
     int creditsFont;
     std::string creditsHomePage;

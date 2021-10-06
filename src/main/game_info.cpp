@@ -78,6 +78,7 @@ void initGameInfo()
     g_gameInfo.outroWalkDirection = -1;
     g_gameInfo.outroAutoJump = true;
     g_gameInfo.outroDeadMode = false;
+    g_gameInfo.disableTwoPlayer = false;
     g_gameInfo.disableBattleMode = false;
 
     std::string gameInfoPath = AppPathManager::assetsRoot() + "gameinfo.ini";
@@ -90,6 +91,7 @@ void initGameInfo()
             if(config.hasKey("title"))
                 config.read("title", g_gameInfo.title, g_gameInfo.title);
             g_gameInfo.titleWindow = fmt::format_ne("{0} - (X-Tech v{1})", g_gameInfo.title, V_LATEST_STABLE);
+            config.read("disable-two-player", g_gameInfo.disableTwoPlayer, false);
             config.read("disable-battle-mode", g_gameInfo.disableBattleMode, false);
         }
         config.endGroup();
