@@ -359,6 +359,17 @@ int GameMain(const CmdLineSetup_t &setup)
             GraphicsLazyPreLoad();
             resetFrameTimer();
 
+            for(int A = 1; A <= numPlayers; ++A)
+            {
+                if(g_gameInfo.outroWalkDirection == 0 && A <= (int)g_gameInfo.outroInitialDirections.size())
+                {
+                    if(g_gameInfo.outroInitialDirections[A - 1] < 0)
+                        Player[A].Direction = -1;
+                    else if(g_gameInfo.outroInitialDirections[A - 1] > 0)
+                        Player[A].Direction = 1;
+                }
+            }
+
             if(g_gameInfo.outroDeadMode)
             {
                 CheckSection(1);
