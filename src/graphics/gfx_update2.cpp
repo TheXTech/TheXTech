@@ -23,6 +23,7 @@
 #include "../graphics.h"
 #include "../collision.h"
 #include "../player.h"
+#include "../compat.h"
 #include "../main/speedrunner.h"
 #include "../main/trees.h"
 #include "../main/menu_connectscreen.h"
@@ -688,14 +689,29 @@ void UpdateGraphics2(bool skipRepaint)
             if(Cheater == false)
             {
                 SuperPrint("CONTINUE", 3, 272, 257);
-                SuperPrint("SAVE & CONTINUE", 3, 272, 292);
-                SuperPrint("SAVE & QUIT", 3, 272, 327);
+                if(g_compatibility.allow_DropAdd)
+                {
+                    SuperPrint("DROP/ADD PLAYERS", 3, 272, 292);
+                    SuperPrint("SAVE & CONTINUE", 3, 272, 327);
+                    SuperPrint("SAVE & QUIT", 3, 272, 362);
+                }
+                else
+                {
+                    SuperPrint("SAVE & CONTINUE", 3, 272, 292);
+                    SuperPrint("SAVE & QUIT", 3, 272, 327);
+                }
                 frmMain.renderTexture(252, 257 + (MenuCursor * 35), 16, 16, GFX.MCursor[0], 0, 0);
             }
             else
             {
                 SuperPrint("CONTINUE", 3, 272 + 56, 275);
-                SuperPrint("QUIT", 3, 272 + 56, 310);
+                if(g_compatibility.allow_DropAdd)
+                {
+                    SuperPrint("DROP/ADD PLAYERS", 3, 272 + 56, 310);
+                    SuperPrint("QUIT", 3, 272 + 56, 345);
+                }
+                else
+                    SuperPrint("QUIT", 3, 272 + 56, 310);
                 frmMain.renderTexture(252 + 56, 275 + (MenuCursor * 35), 16, 16, GFX.MCursor[0], 0, 0);
             }
         }

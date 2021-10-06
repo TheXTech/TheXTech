@@ -36,6 +36,7 @@
 #include "../layers.h"
 #include "../player.h"
 #include "../editor.h"
+#include "../compat.h"
 #include "speedrunner.h"
 #include "menu_main.h"
 #include "menu_connectscreen.h"
@@ -244,23 +245,19 @@ bool PauseScreen_Logic(int plr)
 
     bool stopPause = false;
     bool playSound = true;
+    bool CanSave = (LevelSelect || (/*StartLevel == FileName*/IsEpisodeIntro && NoMap)) && !Cheater;
+    int max_item;
+    if(TestLevel) // Level test pause menu (5 items)
+        max_item = 3;
+    else if(!CanSave) // Level play menu (2 items)
+        max_item = 1;
+    else
+        max_item = 2;
     if(menuBackPress)
     {
-        if(LevelSelect && !Cheater)
-        {
-            if(MenuCursor != 2)
-                PlaySound(SFX_Slide);
-            MenuCursor = 2;
-        }
-        else
-        {
-            if(MenuCursor != 1)
-                PlaySound(SFX_Slide);
-            if(TestLevel)
-                MenuCursor = 3;
-            else
-                MenuCursor = 1;
-        }
+        if(MenuCursor != max_item)
+            PlaySound(SFX_Slide);
+        MenuCursor = max_item;
         MenuCursorCanMove = false;
     }
     else if(menuDoPress)
@@ -350,6 +347,13 @@ bool PauseScreen_Logic(int plr)
     {
         if(TestLevel) // Pause menu of a level testing
         {
+            // spaghetti code because I wanted to preserve the switch
+            //   this means that MenuCursor will be 3 whenever it is Quit (really 3/4)
+            //   and 4 whenever it is Drop/Add (really 3)
+            if(g_compatibility.allow_DropAdd && MenuCursor >= 3)
+            {
+                MenuCursor = 7 - MenuCursor;
+            }
             switch(MenuCursor)
             {
             case 0: // Continue
@@ -379,6 +383,10 @@ bool PauseScreen_Logic(int plr)
                 BlockSwitch.fill(false);
                 PlaySound(SFX_Bullet);
                 break;
+            case 4: // Drop/Add (if exists)
+                PauseGame(PauseCode::DropAdd, 0);
+                playSound = false;
+                break;
             case 3: // Quit testing
                 stopPause = true;
                 playSound = false;
@@ -395,12 +403,23 @@ bool PauseScreen_Logic(int plr)
             default:
                 break;
             }
+            if(g_compatibility.allow_DropAdd && MenuCursor >= 3)
+            {
+                MenuCursor = 7 - MenuCursor;
+            }
         }
         else if(MenuCursor == 0) // Contunue
         {
             stopPause = true;
         }
-        else if(MenuCursor == 1 && (LevelSelect || (/*StartLevel == FileName*/IsEpisodeIntro && NoMap)) && !Cheater) // "Save and continue"
+        else if(MenuCursor == 1 && g_compatibility.allow_DropAdd) // Drop/Add
+        {
+            PauseGame(PauseCode::DropAdd, 0);
+            playSound = false;
+        }
+        else if(CanSave
+            && ((MenuCursor == 1 && !g_compatibility.allow_DropAdd)
+                || (MenuCursor == 2 && g_compatibility.allow_DropAdd))) // "Save and continue"
         {
             SaveGame();
             PlaySound(SFX_Checkpoint);
@@ -409,7 +428,7 @@ bool PauseScreen_Logic(int plr)
         }
         else // "Quit" or "Save & Quit"
         {
-            if(!Cheater && (LevelSelect || (/*StartLevel == FileName*/IsEpisodeIntro && NoMap)))
+            if(CanSave)
                 SaveGame(); // "Save & Quit"
             else
                 speedRun_saveStats();
@@ -435,27 +454,13 @@ bool PauseScreen_Logic(int plr)
         }
     }
 
-    if(TestLevel) // Level test pause menu (4 items)
-    {
-        if(MenuCursor > 3)
-            MenuCursor = 0;
-        if(MenuCursor < 0)
-            MenuCursor = 3;
-    }
-    else if(Cheater || !(LevelSelect || (/*StartLevel == FileName*/IsEpisodeIntro && NoMap))) // Level play menu (2 items)
-    {
-        if(MenuCursor > 1)
-            MenuCursor = 0;
-        if(MenuCursor < 0)
-            MenuCursor = 1;
-    }
-    else // World map or HUB (3 items)
-    {
-        if(MenuCursor > 2)
-            MenuCursor = 0;
-        if(MenuCursor < 0)
-            MenuCursor = 2;
-    }
+    if(g_compatibility.allow_DropAdd)
+        max_item += 1;
+
+    if(MenuCursor < 0)
+        MenuCursor = max_item;
+    else if(MenuCursor > max_item)
+        MenuCursor = 0;
 
     if(stopPause && playSound)
     {
@@ -514,6 +519,8 @@ void PauseGame(PauseCode code, int plr)
         PauseScreen_Init();
     else if(code == PauseCode::Reconnect)
         ConnectScreen::Reconnect_Start();
+    else if(code == PauseCode::DropAdd)
+        ConnectScreen::DropAdd_Start();
 
     PauseCode old_code = GamePaused;
     GamePaused = code;
@@ -567,7 +574,7 @@ void PauseGame(PauseCode code, int plr)
                 if(MessageScreen_Logic(plr))
                     break;
             }
-            else if(GamePaused == PauseCode::Reconnect)
+            else if(GamePaused == PauseCode::Reconnect || GamePaused == PauseCode::DropAdd)
             {
                 if(ConnectScreen::Logic())
                     break;

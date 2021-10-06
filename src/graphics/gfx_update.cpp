@@ -31,6 +31,7 @@
 #include "../main/speedrunner.h"
 #include "../main/trees.h"
 #include "../main/menu_connectscreen.h"
+#include "../compat.h"
 
 #include <fmt_format_ne.h>
 #include <Utils/maths.h>
@@ -1954,21 +1955,37 @@ void UpdateGraphics(bool skipRepaint)
                             SuperPrint("CONTINUE", 3, 272 + X, 237 + Y);
                             SuperPrint("RESTART LEVEL", 3, 272 + X, 272 + Y);
                             SuperPrint("RESET CHECKPOINTS", 3, 272 + X, 307 + Y);
-                            SuperPrint("QUIT TESTING", 3, 272 + X, 342 + Y);
+                            if(g_compatibility.allow_DropAdd)
+                            {
+                                SuperPrint("DROP/ADD PLAYERS", 3, 272 + X, 342 + Y);
+                                SuperPrint("QUIT TESTING", 3, 272 + X, 377 + Y);
+                            }
+                            else
+                                SuperPrint("QUIT TESTING", 3, 272 + X, 342 + Y);
                             frmMain.renderTexture(252 + X, 237 + (MenuCursor * 35) + Y, 16, 16, GFX.MCursor[0], 0, 0);
                         }
                         else if(!Cheater && (LevelSelect || (/*StartLevel == FileName*/IsEpisodeIntro && NoMap)))
                         {
+                            frmMain.renderTexture(252 + X, 257 + (MenuCursor * 35) + Y, 16, 16, GFX.MCursor[0], 0, 0);
                             SuperPrint("CONTINUE", 3, 272 + X, 257 + Y);
+                            if(g_compatibility.allow_DropAdd)
+                            {
+                                SuperPrint("DROP/ADD PLAYERS", 3, 272 + X, 292 + Y);
+                                Y += 35;
+                            }
                             SuperPrint("SAVE & CONTINUE", 3, 272 + X, 292 + Y);
                             SuperPrint("SAVE & QUIT", 3, 272 + X, 327 + Y);
-                            frmMain.renderTexture(252 + X, 257 + (MenuCursor * 35) + Y, 16, 16, GFX.MCursor[0], 0, 0);
                         }
                         else
                         {
-                            SuperPrint("CONTINUE", 3, 272 + 56 + X, 275 + Y);
-                            SuperPrint("QUIT", 3, 272 + 56 + X, 310 + Y);
                             frmMain.renderTexture(252 + 56 + X, 275 + (MenuCursor * 35) + Y, 16, 16, GFX.MCursor[0], 0, 0);
+                            SuperPrint("CONTINUE", 3, 272 + 56 + X, 275 + Y);
+                            if(g_compatibility.allow_DropAdd)
+                            {
+                                SuperPrint("DROP/ADD", 3, 272 + 56 + X, 310 + Y);
+                                Y += 35;
+                            }
+                            SuperPrint("QUIT", 3, 272 + 56 + X, 310 + Y);
                         }
                 }
                 else if(GamePaused == PauseCode::Message)
