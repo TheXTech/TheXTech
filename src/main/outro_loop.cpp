@@ -158,10 +158,17 @@ void OutroLoop()
     for(A = 1; A <= numPlayers; A++)
     {
         Player[A].Controls = blankControls;
-        Player[A].Controls.Left = (g_gameInfo.outroWalkDirection < 0);
-        Player[A].Controls.Right = (g_gameInfo.outroWalkDirection > 0);
-        if(A <= (int)g_gameInfo.outroInitialDirections.size())
-            Player[A].Direction = g_gameInfo.outroInitialDirections[A - 1] > 0 ? 1.0 : -1.0;
+
+        if(g_gameInfo.outroWalkDirection < 0)
+            Player[A].Controls.Left = true;
+        else if(g_gameInfo.outroWalkDirection > 0)
+            Player[A].Controls.Right = true;
+
+        if(Player[A].Controls.Left)
+            Player[A].Direction = -1;
+        if(Player[A].Controls.Right)
+            Player[A].Direction = 1;
+
         jumpBool = true;
         tempLocation = Player[A].Location;
         tempLocation = Player[A].Location;

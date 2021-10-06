@@ -120,7 +120,7 @@ void initGameInfo()
         config.beginGroup("outro");
         {
             config.read("enable-activity", g_gameInfo.outroEnableActivity, true);
-            config.read("max-players-count", g_gameInfo.outroMaxPlayersCount, 6);
+            config.read("max-players-count", g_gameInfo.outroMaxPlayersCount, 5);
             config.read("characters", g_gameInfo.outroCharacters, {1, 2, 3, 4, 5});
             config.read("states", g_gameInfo.outroStates, {4, 7, 5, 3, 6});
             config.read("mounts", g_gameInfo.outroMounts, {0, 3, 0, 1, 0});
