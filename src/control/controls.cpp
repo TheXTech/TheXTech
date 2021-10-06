@@ -485,11 +485,13 @@ bool Update()
     For(B, 1, numPlayers)
     {
         int A;
-        if(B == 2 && numPlayers == 2) {
-            A = 2;
-        } else {
+        // if there is an input method bound to the player,
+        //   let them control themselves.
+        //   (same in spirit as old B == 2 && numPlayers == 2 case)
+        if(B-1 < (int)g_InputMethods.size() && g_InputMethods[B-1])
+            A = B;
+        else
             A = 1;
-        }
 
         // With Player(A).Controls
         {
@@ -518,6 +520,10 @@ bool Update()
             {
                 c = ForcedControl;
             }
+
+            // new location for multi-mario (SingleCoop, "supermario128") code
+            if(A != B)
+                Player[B].Controls = c;
         } // End With
     }
 
@@ -530,7 +536,6 @@ bool Update()
         if(SingleCoop == 1) {
             Player[2].Controls = blankControls;
         } else {
-            Player[2].Controls = Player[1].Controls;
             Player[1].Controls = blankControls;
         }
     }
@@ -550,8 +555,14 @@ bool Update()
         }
     }
 
-    if(g_InputMethods.size() < numPlayers && !SingleCoop && !GameMenu && !g_recordControlReplay)
+    if(((int)g_InputMethods.size() < numPlayers) && (numPlayers <= maxLocalPlayers)
+        && !SingleCoop && !GameMenu && !g_recordControlReplay)
+    {
+        // fill with nullptrs
+        while((int)g_InputMethods.size() < numPlayers)
+            g_InputMethods.push_back(nullptr);
         okay = false;
+    }
 
     return okay;
 }

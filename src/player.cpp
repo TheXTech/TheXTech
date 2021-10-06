@@ -3422,8 +3422,9 @@ void ClownCar()
 
     for(A = 1; A <= numPlayers; A++) // Code for running the Koopa Clown Car
     {
-        if(numPlayers > 2 && GameMenu == false && LevelMacro == LEVELMACRO_OFF /*&& nPlay.Online == false*/)
-            Player[A].Controls = Player[1].Controls;
+        // (1) misplaced; (2) doesn't work with abstract controls
+        // if(numPlayers > 2 && GameMenu == false && LevelMacro == LEVELMACRO_OFF && nPlay.Online == false)
+        //     Player[A].Controls = Player[1].Controls;
         if(Player[A].Mount == 2 && Player[A].Dead == false && Player[A].TimeToLive == 0)
         {
             if(Player[A].Effect == 0)

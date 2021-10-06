@@ -304,12 +304,10 @@ bool PauseScreen_Logic(int plr)
                         }
                     }
                 }
-                if(AllCharBlock == 0)
+                if(AllCharBlock == 0 && numPlayers <= 2)
                 {
                     PlaySound(SFX_Slide);
                     Player[A].RunRelease = false;
-                    // needs to be fixed for more than 2 players
-                    SDL_assert_release(maxLocalPlayers == 2);
                     int B;
                     if(A == 1)
                         B = 2;
