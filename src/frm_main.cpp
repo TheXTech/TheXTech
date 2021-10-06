@@ -1706,7 +1706,8 @@ void FrmMain::renderCircle(int cx, int cy, int radius, float red, float green, f
     cx += viewport_offset_x;
     cy += viewport_offset_y;
 
-    for(double dy = 1; dy <= radius; dy += 1.0)
+    double dy = 1;
+    do //for(double dy = 1; dy <= radius; dy += 1.0)
     {
         double dx = std::floor(std::sqrt((2.0 * radius * dy) - (dy * dy)));
         SDL_RenderDrawLine(m_gRenderer,
@@ -1714,6 +1715,7 @@ void FrmMain::renderCircle(int cx, int cy, int radius, float red, float green, f
                            int(cy + dy - radius),
                            int(cx + dx),
                            int(cy + dy - radius));
+
         if(dy < radius) // Don't cross lines
         {
             SDL_RenderDrawLine(m_gRenderer,
@@ -1722,14 +1724,38 @@ void FrmMain::renderCircle(int cx, int cy, int radius, float red, float green, f
                                int(cx + dx),
                                int(cy - dy + radius));
         }
+
+        dy += 1.0;
+    } while(dy <= radius);
+}
+
+
+static SDL_INLINE void txColorMod(StdPicture &tx, float red, float green, float blue, float alpha)
+{
+    uint8_t modColor[4] = {static_cast<unsigned char>(255.f * red),
+                           static_cast<unsigned char>(255.f * green),
+                           static_cast<unsigned char>(255.f * blue),
+                           static_cast<unsigned char>(255.f * alpha)};
+
+    if(SDL_memcmp(tx.modColor, modColor, 3) != 0)
+    {
+        SDL_SetTextureColorMod(tx.texture, modColor[0], modColor[1], modColor[2]);
+        tx.modColor[0] = modColor[0];
+        tx.modColor[1] = modColor[1];
+        tx.modColor[2] = modColor[2];
+    }
+
+    if(tx.modColor[3] != modColor[3])
+    {
+        SDL_SetTextureAlphaMod(tx.texture, modColor[3]);
+        tx.modColor[3] = modColor[3];
     }
 }
 
-void FrmMain::renderTextureI(int xDst, int yDst, int wDst, int hDst,
-                             StdPicture &tx,
-                             int xSrc, int ySrc,
-                             double rotateAngle, SDL_Point *center, unsigned int flip,
-                             float red, float green, float blue, float alpha)
+void FrmMain::renderTexture(double xDstD, double yDstD, double wDstD, double hDstD,
+                            StdPicture &tx,
+                            int xSrc, int ySrc,
+                            float red, float green, float blue, float alpha)
 {
 #ifdef __ANDROID__
     SDL_assert(!m_blockRender);
@@ -1747,6 +1773,11 @@ void FrmMain::renderTextureI(int xDst, int yDst, int wDst, int hDst,
     }
 
     SDL_assert_release(tx.texture);
+
+    int xDst = Maths::iRound(xDstD);
+    int yDst = Maths::iRound(yDstD);
+    int wDst = Maths::iRound(wDstD);
+    int hDst = Maths::iRound(hDstD);
 
     // Don't go more than size of texture
     if(xSrc + wDst > tx.w)
@@ -1762,28 +1793,27 @@ void FrmMain::renderTextureI(int xDst, int yDst, int wDst, int hDst,
             hDst = 0;
     }
 
-    SDL_Rect destRect = {xDst + viewport_offset_x, yDst + viewport_offset_y, wDst, hDst};
+    SDL_FRect destRect = {(float)xDst + viewport_offset_x,
+                          (float)yDst + viewport_offset_y,
+                          (float)wDst,
+                          (float)hDst};
     SDL_Rect sourceRect;
+
     if(tx.w_orig == 0 && tx.h_orig == 0)
-        sourceRect = {xSrc, ySrc, wDst, hDst};
+        sourceRect = {xSrc, ySrc, (int)wDst, (int)hDst};
     else
         sourceRect = {int(tx.w_scale * xSrc), int(tx.h_scale * ySrc), int(tx.w_scale * wDst), int(tx.h_scale * hDst)};
 
-    SDL_SetTextureColorMod(tx.texture,
-                           static_cast<unsigned char>(255.f * red),
-                           static_cast<unsigned char>(255.f * green),
-                           static_cast<unsigned char>(255.f * blue));
-    SDL_SetTextureAlphaMod(tx.texture, static_cast<unsigned char>(255.f * alpha));
-    SDL_RenderCopyEx(m_gRenderer, tx.texture, &sourceRect, &destRect,
-                     rotateAngle, center, static_cast<SDL_RendererFlip>(flip));
+    txColorMod(tx, red, green, blue, alpha);
+    SDL_RenderCopyF(m_gRenderer, tx.texture, &sourceRect, &destRect);
 }
 
-void FrmMain::renderTextureScaleI(int xDst, int yDst, int wDst, int hDst,
-                             StdPicture &tx,
-                             int xSrc, int ySrc,
-                             int wSrc, int hSrc,
-                             double rotateAngle, SDL_Point *center, unsigned int flip,
-                             float red, float green, float blue, float alpha)
+void FrmMain::renderTextureScale(double xDstD, double yDstD, double wDstD, double hDstD,
+                                 StdPicture &tx,
+                                 int xSrc, int ySrc,
+                                 int wSrc, int hSrc,
+                                 double rotateAngle, SDL_FPoint *center, unsigned int flip,
+                                 float red, float green, float blue, float alpha)
 {
 #ifdef __ANDROID__
     SDL_assert(!m_blockRender);
@@ -1802,6 +1832,11 @@ void FrmMain::renderTextureScaleI(int xDst, int yDst, int wDst, int hDst,
 
     SDL_assert_release(tx.texture);
 
+    int xDst = Maths::iRound(xDstD);
+    int yDst = Maths::iRound(yDstD);
+    int wDst = Maths::iRound(wDstD);
+    int hDst = Maths::iRound(hDstD);
+
     // Don't go more than size of texture
     if(xSrc + wSrc > tx.w)
     {
@@ -1816,75 +1851,81 @@ void FrmMain::renderTextureScaleI(int xDst, int yDst, int wDst, int hDst,
             hSrc = 0;
     }
 
-    SDL_Rect destRect = {xDst + viewport_offset_x, yDst + viewport_offset_y, wDst, hDst};
+    SDL_FRect destRect = {(float)xDst + viewport_offset_x,
+                          (float)yDst + viewport_offset_y,
+                          (float)wDst,
+                          (float)hDst};
     SDL_Rect sourceRect;
     if(tx.w_orig == 0 && tx.h_orig == 0)
         sourceRect = {xSrc, ySrc, wSrc, hSrc};
     else
         sourceRect = {int(tx.w_scale * xSrc), int(tx.h_scale * ySrc), int(tx.w_scale * wSrc), int(tx.h_scale * hSrc)};
 
-    SDL_SetTextureColorMod(tx.texture,
-                           static_cast<unsigned char>(255.f * red),
-                           static_cast<unsigned char>(255.f * green),
-                           static_cast<unsigned char>(255.f * blue));
-    SDL_SetTextureAlphaMod(tx.texture, static_cast<unsigned char>(255.f * alpha));
-    SDL_RenderCopyEx(m_gRenderer, tx.texture, &sourceRect, &destRect,
-                     rotateAngle, center, static_cast<SDL_RendererFlip>(flip));
+    txColorMod(tx, red, green, blue, alpha);
+    SDL_RenderCopyExF(m_gRenderer, tx.texture, &sourceRect, &destRect,
+                      rotateAngle, center, static_cast<SDL_RendererFlip>(flip));
 }
 
-void FrmMain::renderTexture(double xDst, double yDst, double wDst, double hDst,
-                            StdPicture &tx,
-                            int xSrc, int ySrc,
-                            float red, float green, float blue, float alpha)
-{
-    const unsigned int flip = SDL_FLIP_NONE;
-    renderTextureI(Maths::iRound(xDst),
-                   Maths::iRound(yDst),
-                   Maths::iRound(wDst),
-                   Maths::iRound(hDst),
-                   tx,
-                   xSrc,
-                   ySrc,
-                   0.0, nullptr, flip,
-                   red, green, blue, alpha);
-}
-
-void FrmMain::renderTextureScale(double xDst, double yDst, double wDst, double hDst,
-                            StdPicture &tx,
-                            int xSrc, int ySrc,
-                            int wSrc, int hSrc,
-                            float red, float green, float blue, float alpha)
-{
-    const unsigned int flip = SDL_FLIP_NONE;
-    renderTextureScaleI(Maths::iRound(xDst),
-                        Maths::iRound(yDst),
-                        Maths::iRound(wDst),
-                        Maths::iRound(hDst),
-                        tx,
-                        xSrc, ySrc,
-                        wSrc, hSrc,
-                        0.0, nullptr, flip,
-                        red, green, blue, alpha);
-}
-
-void FrmMain::renderTextureFL(double xDst, double yDst, double wDst, double hDst,
+void FrmMain::renderTextureFL(double xDstD, double yDstD, double wDstD, double hDstD,
                               StdPicture &tx,
                               int xSrc, int ySrc,
-                              double rotateAngle, SDL_Point *center, unsigned int flip,
+                              double rotateAngle, SDL_FPoint *center, unsigned int flip,
                               float red, float green, float blue, float alpha)
 {
-    renderTextureI(Maths::iRound(xDst),
-                   Maths::iRound(yDst),
-                   Maths::iRound(wDst),
-                   Maths::iRound(hDst),
-                   tx,
-                   xSrc,
-                   ySrc,
-                   rotateAngle, center, flip,
-                   red, green, blue, alpha);
+#ifdef __ANDROID__
+    SDL_assert(!m_blockRender);
+#endif
+    if(!tx.inited)
+        return;
+
+    if(!tx.texture && tx.lazyLoaded)
+        lazyLoad(tx);
+
+    if(!tx.texture)
+    {
+        D_pLogWarningNA("Attempt to render an empty texture!");
+        return;
+    }
+
+    SDL_assert_release(tx.texture);
+
+    int xDst = Maths::iRound(xDstD);
+    int yDst = Maths::iRound(yDstD);
+    int wDst = Maths::iRound(wDstD);
+    int hDst = Maths::iRound(hDstD);
+
+    // Don't go more than size of texture
+    if(xSrc + wDst > tx.w)
+    {
+        wDst = tx.w - xSrc;
+        if(wDst < 0)
+            wDst = 0;
+    }
+    if(ySrc + hDst > tx.h)
+    {
+        hDst = tx.h - ySrc;
+        if(hDst < 0)
+            hDst = 0;
+    }
+
+    SDL_FRect destRect = {(float)xDst + viewport_offset_x,
+                          (float)yDst + viewport_offset_y,
+                          (float)wDst,
+                          (float)hDst};
+    SDL_Rect sourceRect;
+
+    if(tx.w_orig == 0 && tx.h_orig == 0)
+        sourceRect = {xSrc, ySrc, (int)wDst, (int)hDst};
+    else
+        sourceRect = {int(tx.w_scale * xSrc), int(tx.h_scale * ySrc), int(tx.w_scale * wDst), int(tx.h_scale * hDst)};
+
+    txColorMod(tx, red, green, blue, alpha);
+    SDL_RenderCopyExF(m_gRenderer, tx.texture, &sourceRect, &destRect,
+                      rotateAngle, center, static_cast<SDL_RendererFlip>(flip));
 }
 
-void FrmMain::renderTexture(int xDst, int yDst, StdPicture &tx, float red, float green, float blue, float alpha)
+void FrmMain::renderTexture(float xDst, float yDst, StdPicture &tx,
+                            float red, float green, float blue, float alpha)
 {
 #ifdef __ANDROID__
     SDL_assert(!m_blockRender);
@@ -1903,55 +1944,16 @@ void FrmMain::renderTexture(int xDst, int yDst, StdPicture &tx, float red, float
         return;
     }
 
-    SDL_Rect destRect = {xDst, yDst, tx.w, tx.h};
+    SDL_FRect destRect = {SDL_roundf(xDst), SDL_roundf(yDst), (float)tx.w, (float)tx.h};
     SDL_Rect sourceRect;
     if(tx.w_orig == 0 && tx.h_orig == 0)
         sourceRect = {0, 0, tx.w, tx.h};
     else
         sourceRect = {0, 0, tx.w_orig, tx.h_orig};
 
-    SDL_SetTextureColorMod(tx.texture,
-                           static_cast<unsigned char>(255.f * red),
-                           static_cast<unsigned char>(255.f * green),
-                           static_cast<unsigned char>(255.f * blue));
-    SDL_SetTextureAlphaMod(tx.texture, static_cast<unsigned char>(255.f * alpha));
-    SDL_RenderCopyEx(m_gRenderer, tx.texture, &sourceRect, &destRect,
-                     0.0, nullptr, static_cast<SDL_RendererFlip>(flip));
-}
-
-void FrmMain::renderTextureScale(int xDst, int yDst, int wDst, int hDst, StdPicture &tx, float red, float green, float blue, float alpha)
-{
-#ifdef __ANDROID__
-    SDL_assert(!m_blockRender);
-#endif
-    const unsigned int flip = SDL_FLIP_NONE;
-
-    if(!tx.inited)
-        return;
-
-    if(!tx.texture && tx.lazyLoaded)
-        lazyLoad(tx);
-
-    if(!tx.texture)
-    {
-        D_pLogWarningNA("Attempt to render an empty texture!");
-        return;
-    }
-
-    SDL_Rect destRect = {xDst, yDst, wDst, hDst};
-    SDL_Rect sourceRect;
-    if(tx.w_orig == 0 && tx.h_orig == 0)
-        sourceRect = {0, 0, tx.w, tx.h};
-    else
-        sourceRect = {0, 0, tx.w_orig, tx.h_orig};
-
-    SDL_SetTextureColorMod(tx.texture,
-                           static_cast<unsigned char>(255.f * red),
-                           static_cast<unsigned char>(255.f * green),
-                           static_cast<unsigned char>(255.f * blue));
-    SDL_SetTextureAlphaMod(tx.texture, static_cast<unsigned char>(255.f * alpha));
-    SDL_RenderCopyEx(m_gRenderer, tx.texture, &sourceRect, &destRect,
-                     0.0, nullptr, static_cast<SDL_RendererFlip>(flip));
+    txColorMod(tx, red, green, blue, alpha);
+    SDL_RenderCopyExF(m_gRenderer, tx.texture, &sourceRect, &destRect,
+                      0.0, nullptr, static_cast<SDL_RendererFlip>(flip));
 }
 
 void FrmMain::getScreenPixels(int x, int y, int w, int h, unsigned char *pixels)

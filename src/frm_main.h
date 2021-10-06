@@ -123,22 +123,24 @@ public:
     void renderCircle(int cx, int cy, int radius, float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f, bool filled = true);
 
     // Similar to BitBlt, but without masks, just draw a texture or it's fragment!
-    void renderTextureI(int xDst, int yDst, int wDst, int hDst,
-                        StdPicture &tx,
-                        int xSrc, int ySrc,
-                        double rotateAngle = 0.0, SDL_Point *center = nullptr, unsigned int flip = SDL_FLIP_NONE,
-                        float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f);
-    void renderTextureScaleI(int xDst, int yDst, int wDst, int hDst,
-                             StdPicture &tx,
-                             int xSrc, int ySrc,
-                             int wSrc, int hSrc,
-                             double rotateAngle = 0.0, SDL_Point *center = nullptr, unsigned int flip = SDL_FLIP_NONE,
-                             float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f);
+//    void renderTextureI(int xDst, int yDst, int wDst, int hDst,
+//                        StdPicture &tx,
+//                        int xSrc, int ySrc,
+//                        double rotateAngle = 0.0, SDL_Point *center = nullptr, unsigned int flip = SDL_FLIP_NONE,
+//                        float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f);
+//    void renderTextureScaleI(int xDst, int yDst, int wDst, int hDst,
+//                             StdPicture &tx,
+//                             int xSrc, int ySrc,
+//                             int wSrc, int hSrc,
+//                             double rotateAngle = 0.0, SDL_Point *center = nullptr, unsigned int flip = SDL_FLIP_NONE,
+//                             float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f);
     void renderTextureScale(double xDst, double yDst, double wDst, double hDst,
                             StdPicture &tx,
                             int xSrc, int ySrc,
                             int wSrc, int hSrc,
+                            double rotateAngle = 0.0, SDL_FPoint *center = nullptr, unsigned int flip = SDL_FLIP_NONE,
                             float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f);
+
     void renderTexture(double xDst, double yDst, double wDst, double hDst,
                        StdPicture &tx,
                        int xSrc, int ySrc,
@@ -147,14 +149,14 @@ public:
     void renderTextureFL(double xDst, double yDst, double wDst, double hDst,
                          StdPicture &tx,
                          int xSrc, int ySrc,
-                         double rotateAngle = 0.0, SDL_Point *center = nullptr, unsigned int flip = SDL_FLIP_NONE,
+                         double rotateAngle = 0.0, SDL_FPoint *center = nullptr, unsigned int flip = SDL_FLIP_NONE,
                          float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f);
 
-    void renderTexture(int xDst, int yDst, StdPicture &tx,
+    void renderTexture(float xDst, float yDst, StdPicture &tx,
                        float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f);
-    void renderTextureScale(int xDst, int yDst, int wDst, int hDst,
-                            StdPicture &tx,
-                            float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f);
+//    void renderTextureScale(int xDst, int yDst, int wDst, int hDst,
+//                            StdPicture &tx,
+//                            float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f);
 
     void getScreenPixels(int x, int y, int w, int h, unsigned char *pixels);
     void getScreenPixelsRGBA(int x, int y, int w, int h, unsigned char *pixels);

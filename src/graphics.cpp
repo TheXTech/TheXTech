@@ -556,28 +556,28 @@ void DrawFrozenNPC(int Z, int A)
 // draw npc
         float c = n.Shadow ? 0.f : 1.f;
 
-        frmMain.renderTexture(int(vScreenX[Z] + n.Location.X + 2),
-                              int(vScreenY[Z] + n.Location.Y + 2),
-                              int(n.Location.Width - 4),
-                              int(n.Location.Height - 4),
+        frmMain.renderTexture(float(vScreenX[Z] + n.Location.X + 2),
+                              float(vScreenY[Z] + n.Location.Y + 2),
+                              float(n.Location.Width - 4),
+                              float(n.Location.Height - 4),
                               GFXNPCBMP[int(n.Special)],
                               2, 2 + int(n.Special2) * NPCHeight[int(n.Special)], c, c, c);
 
         // draw ice
-        frmMain.renderTexture(int(vScreenX[Z] + n.Location.X + NPCFrameOffsetX[n.Type]),
-                              int(vScreenY[Z] + n.Location.Y + NPCFrameOffsetY[n.Type]),
-                              int(n.Location.Width - 6), int(n.Location.Height - 6),
+        frmMain.renderTexture(float(vScreenX[Z] + n.Location.X + NPCFrameOffsetX[n.Type]),
+                              float(vScreenY[Z] + n.Location.Y + NPCFrameOffsetY[n.Type]),
+                              float(n.Location.Width - 6), float(n.Location.Height - 6),
                               GFXNPCBMP[n.Type], 0, 0, c, c, c);
-        frmMain.renderTexture(int(vScreenX[Z] + n.Location.X + NPCFrameOffsetX[n.Type] + n.Location.Width - 6),
-                              int(vScreenY[Z] + n.Location.Y + NPCFrameOffsetY[n.Type]),
-                              6, int(n.Location.Height - 6),
+        frmMain.renderTexture(float(vScreenX[Z] + n.Location.X + NPCFrameOffsetX[n.Type] + n.Location.Width - 6),
+                              float(vScreenY[Z] + n.Location.Y + NPCFrameOffsetY[n.Type]),
+                              6, float(n.Location.Height - 6),
                               GFXNPCBMP[n.Type], 128 - 6, 0, c, c, c);
-        frmMain.renderTexture(int(vScreenX[Z] + n.Location.X + NPCFrameOffsetX[n.Type]),
-                              int(vScreenY[Z] + n.Location.Y + NPCFrameOffsetY[n.Type] + n.Location.Height - 6),
-                              int(n.Location.Width - 6), 6,
+        frmMain.renderTexture(float(vScreenX[Z] + n.Location.X + NPCFrameOffsetX[n.Type]),
+                              float(vScreenY[Z] + n.Location.Y + NPCFrameOffsetY[n.Type] + n.Location.Height - 6),
+                              float(n.Location.Width - 6), 6,
                               GFXNPCBMP[n.Type], 0, 128 - 6, c, c, c);
-        frmMain.renderTexture(int(vScreenX[Z] + n.Location.X + NPCFrameOffsetX[n.Type] + n.Location.Width - 6),
-                              int(vScreenY[Z] + n.Location.Y + NPCFrameOffsetY[n.Type] + n.Location.Height - 6),
+        frmMain.renderTexture(float(vScreenX[Z] + n.Location.X + NPCFrameOffsetX[n.Type] + n.Location.Width - 6),
+                              float(vScreenY[Z] + n.Location.Y + NPCFrameOffsetY[n.Type] + n.Location.Height - 6),
                               6, 6, GFXNPCBMP[n.Type],
                               128 - 6, 128 - 6, c, c, c);
     }
