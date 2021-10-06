@@ -79,6 +79,7 @@ enum
 
 struct MainMenuContent
 {
+    std::string mainStartGame;
     std::string main1PlayerGame;
     std::string main2PlayerGame;
     std::string mainBattleGame;

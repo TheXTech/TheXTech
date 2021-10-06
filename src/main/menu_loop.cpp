@@ -218,10 +218,10 @@ static void updateIntroLevelActivity()
             p.TailCount = 0;
             p.Dead = false;
             p.TimeToLive = 0;
-            p.Character = (iRand() % 5) + 1;
+//            p.Character = (iRand() % 5) + 1;
 
-            if(A >= 1 && A <= 5)
-                p.Character = A;
+//            if(A >= 1 && A <= 5)
+            p.Character = g_gameInfo.introCharacterNext();
 
             p.HeldBonus = 0;
             p.Section = 0;
@@ -476,7 +476,7 @@ void MenuLoop()
     if(mainMenuUpdate())
         return;
 
-    if(g_gameInfo.introEnableActivity && g_gameInfo.introMaxPlayersCount > 0)
+    if(!g_gameInfo.introDeadMode)
         updateIntroLevelActivity();
     else
     {
@@ -484,7 +484,7 @@ void MenuLoop()
         UpdateNPCs();
         UpdateBlocks();
         UpdateEffects();
-        //UpdatePlayer();
+//        UpdatePlayer();
         UpdateGraphics();
         UpdateSound();
         UpdateEvents();

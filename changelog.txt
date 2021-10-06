@@ -36,6 +36,9 @@ Changes for 1.3.5.2
 -Fixed a bug when a last world map music is not remembered when sound is disabled
 -Fixed the wrong restart place when running the lasanha of levels and "restart level after death" option is enabled
 -Fixed the NPC logic distortion caused by early gfx update
+-Added an ability to customize an outro behaviour using gameinfo.ini
+-Battle mode access can be disabled via gameinfo.ini
+-Two-player game mode access can be disabled via gameinfo.ini
 
 Changes for 1.3.5.1
 -Episodes and battle levels lists now loading in the separated thread with a progress showing

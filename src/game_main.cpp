@@ -283,7 +283,9 @@ int GameMain(const CmdLineSetup_t &setup)
                 Player[A] = blankPlayer;
             }
 
-            numPlayers = 5;
+            numPlayers = g_gameInfo.outroMaxPlayersCount;
+            if(g_gameInfo.outroDeadMode)
+                numPlayers = 1; // Deadman mode
             GameMenu = false;
             StopMusic();
 
@@ -300,7 +302,9 @@ int GameMain(const CmdLineSetup_t &setup)
             {
                 Player_t &p = Player[A];
 
-                if(A == 1)
+                if(A <= (int)g_gameInfo.outroStates.size())
+                    p.State = g_gameInfo.outroStates[A - 1];
+                else if(A == 1)
                     p.State = 4;
                 else if(A == 2)
                     p.State = 7;
@@ -311,14 +315,29 @@ int GameMain(const CmdLineSetup_t &setup)
                 else
                     p.State = 6;
 
-                if(A == 4)
+                p.Character = g_gameInfo.outroCharacterNext();
+
+                if(A <= (int)g_gameInfo.outroMounts.size())
+                {
+                    p.Mount = g_gameInfo.outroMounts[A - 1];
+                    switch(p.Mount)
+                    {
+                    case 1:
+                        p.MountType = int(iRand() % 3) + 1;
+                        break;
+                    case 3:
+                        p.MountType = int(iRand() % 8) + 1;
+                        break;
+                    default:
+                        p.MountType = 0;
+                    }
+                }
+                else if(A == 4)
                 {
                     p.Mount = 1;
                     p.MountType = int(iRand() % 3) + 1;
                 }
-
-                p.Character = A;
-                if(A == 2)
+                else if(A == 2)
                 {
                     p.Mount = 3;
                     p.MountType = int(iRand() % 8) + 1;
@@ -339,6 +358,13 @@ int GameMain(const CmdLineSetup_t &setup)
             // Update graphics before loop begin (to process an initial lazy-unpacking of used sprites)
             GraphicsLazyPreLoad();
             resetFrameTimer();
+
+            if(g_gameInfo.outroDeadMode)
+            {
+                CheckSection(1);
+                for(int A = 1; A <= numPlayers; ++A)
+                    Player[A].Dead = true;
+            }
 
             // Run the frame-loop
             runFrameLoop(&OutroLoop,
@@ -417,7 +443,7 @@ int GameMain(const CmdLineSetup_t &setup)
             }
 
             numPlayers = g_gameInfo.introMaxPlayersCount;
-            if(!g_gameInfo.introEnableActivity || g_gameInfo.introMaxPlayersCount < 1)
+            if(g_gameInfo.introDeadMode)
                 numPlayers = 1;// one deadman should be
 
             auto introPath = AppPath + "intro.lvlx";
@@ -435,10 +461,10 @@ int GameMain(const CmdLineSetup_t &setup)
             {
                 Player_t &p = Player[A];
                 p.State = (iRand() % 6) + 2;
-                p.Character = (iRand() % 5) + 1;
+                // p.Character = (iRand() % 5) + 1;
 
-                if(A >= 1 && A <= 5)
-                    p.Character = A;
+                // if(A >= 1 && A <= 5)
+                p.Character = g_gameInfo.introCharacterNext();
 
                 p.HeldBonus = 0;
                 p.Section = 0;
