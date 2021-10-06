@@ -6689,15 +6689,58 @@ void DropPlayer(int A)
     PlayerGone(A);
     if(A < 1 || A > numPlayers)
         return;
-    // TODO - IMPORTANT - remove all references to player A,
-    //   decrement all references to higher players
-    // ...
-    // ...
 
+    // IMPORTANT - removes all references to player A,
+    //   decrements all references to higher players
+
+    for(int C = 1; C <= numNPCs; C++)
+    {
+        NPC_t& n = NPC[C];
+        // most of these should not be equal because PlayerGone has already been called.
+        if(n.standingOnPlayer > A)
+            n.standingOnPlayer --;
+        else if(n.standingOnPlayer == A)
+            n.standingOnPlayer = 0;
+        if(n.HoldingPlayer > A)
+            n.HoldingPlayer --;
+        else if(n.HoldingPlayer == A)
+            n.HoldingPlayer = 0;
+        if(n.CantHurt > A)
+            n.CantHurt --;
+        else if(n.CantHurt == A)
+            n.CantHurt = 0;
+        if(n.CantHurtPlayer > A)
+            n.CantHurtPlayer --;
+        else if(n.CantHurtPlayer == A)
+            n.CantHurtPlayer = 0;
+        if(n.BattleOwner > A)
+            n.BattleOwner --;
+        else if(n.BattleOwner == A)
+            n.BattleOwner = 0;
+        if(n.JustActivated > A)
+            n.JustActivated --;
+        else if(n.JustActivated == A)
+            n.JustActivated = 1;
+    }
+
+    // Block[B].IsPlayer is only set for tempBlocks, so no correction here
+
+    for(int B = 1; B <= numPlayers; B++)
+    {
+        if(Player[B].YoshiPlayer == A)
+            Player[B].YoshiPlayer = 0;
+        else if(Player[B].YoshiPlayer > A)
+            Player[B].YoshiPlayer --;
+    }
+
+    // saves player without their mount, but mount is still onscreen and available
     SavedChar[Player[A].Character] = Player[A];
     for(int B = A; B < numPlayers; B++)
     {
         Player[B] = std::move(Player[B+1]);
+        OwedMount[B] = OwedMount[B+1];
+        OwedMountType[B] = OwedMountType[B+1];
+        BattleLives[B] = BattleLives[B+1];
     }
 
     numPlayers --;
