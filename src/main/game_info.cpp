@@ -64,6 +64,20 @@ void initGameInfo()
 
     g_gameInfo.introEnableActivity = true;
     g_gameInfo.introMaxPlayersCount = 6;
+    g_gameInfo.introCharacters = {1, 2, 3, 4, 5};
+    g_gameInfo.introCharacterCurrent = 0;
+    g_gameInfo.introDeadMode = false;
+
+    g_gameInfo.outroEnableActivity = true;
+    g_gameInfo.outroMaxPlayersCount = 5;
+    g_gameInfo.outroCharacters = {1, 2, 3, 4, 5};
+    g_gameInfo.outroStates = {4, 7, 5, 3, 6};
+    g_gameInfo.outroMounts = {0, 3, 0, 1, 0};
+    g_gameInfo.outroCharacterCurrent = 0;
+    g_gameInfo.outroInitialDirections = {0, 0, 0, 0, 0};
+    g_gameInfo.outroWalkDirection = -1;
+    g_gameInfo.outroAutoJump = true;
+    g_gameInfo.outroDeadMode = false;
 
     std::string gameInfoPath = AppPathManager::assetsRoot() + "gameinfo.ini";
     if(Files::fileExists(gameInfoPath))
@@ -94,6 +108,28 @@ void initGameInfo()
         {
             config.read("enable-activity", g_gameInfo.introEnableActivity, true);
             config.read("max-players-count", g_gameInfo.introMaxPlayersCount, 6);
+            config.read("characters", g_gameInfo.introCharacters, {1, 2, 3, 4, 5});
+            g_gameInfo.introDeadMode = !g_gameInfo.introEnableActivity || g_gameInfo.introMaxPlayersCount < 1;
+        }
+        config.endGroup();
+
+        config.beginGroup("outro");
+        {
+            config.read("enable-activity", g_gameInfo.outroEnableActivity, true);
+            config.read("max-players-count", g_gameInfo.outroMaxPlayersCount, 6);
+            config.read("characters", g_gameInfo.outroCharacters, {1, 2, 3, 4, 5});
+            config.read("states", g_gameInfo.outroStates, {4, 7, 5, 3, 6});
+            config.read("mounts", g_gameInfo.outroMounts, {0, 3, 0, 1, 0});
+            config.read("auto-jump", g_gameInfo.outroAutoJump, true);
+            IniProcessing::StrEnumMap dirs
+            {
+                {"left", -1},
+                {"idle", 0},
+                {"right", +1}
+            };
+            config.read("walk-direction", g_gameInfo.outroWalkDirection, -1);
+            config.read("initial-directions", g_gameInfo.outroInitialDirections, {0, 0, 0, 0, 0});
+            g_gameInfo.outroDeadMode = !g_gameInfo.outroEnableActivity || g_gameInfo.outroMaxPlayersCount < 1;
         }
         config.endGroup();
 
@@ -117,4 +153,36 @@ void initGameInfo()
         }
         config.endGroup();
     }
+}
+
+int GameInfo::introCharacterNext()
+{
+    if(introCharacters.empty())
+        return 1;
+    if(g_gameInfo.introCharacterCurrent >= introCharacters.size())
+        g_gameInfo.introCharacterCurrent = 0;
+    int ret = g_gameInfo.introCharacters[g_gameInfo.introCharacterCurrent++];
+
+    if(ret > 5) // anti-idiot protection
+        ret = 5;
+    else if(ret < 1)
+        ret = 1;
+
+    return ret;
+}
+
+int GameInfo::outroCharacterNext()
+{
+    if(outroCharacters.empty())
+        return 1;
+    if(g_gameInfo.outroCharacterCurrent >= outroCharacters.size())
+        g_gameInfo.outroCharacterCurrent = 0;
+    int ret = g_gameInfo.outroCharacters[g_gameInfo.outroCharacterCurrent++];
+
+    if(ret > 5) // anti-idiot protection
+        ret = 5;
+    else if(ret < 1)
+        ret = 1;
+
+    return ret;
 }

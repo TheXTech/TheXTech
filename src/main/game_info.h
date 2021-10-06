@@ -40,6 +40,27 @@ struct GameInfo
 
     bool introEnableActivity = true;
     int  introMaxPlayersCount = 6;
+    std::vector<int> introCharacters;
+
+    bool introDeadMode = true;
+
+    bool outroEnableActivity = true;
+    int  outroMaxPlayersCount = 5;
+    bool outroAutoJump = true;
+    std::vector<int> outroCharacters;
+    std::vector<int> outroStates;
+    std::vector<int> outroMounts;
+    std::vector<int> outroInitialDirections;
+    int  outroWalkDirection = -1;
+
+    bool outroDeadMode = true;
+
+    // Carousel
+    int introCharacterNext();
+    size_t introCharacterCurrent = 0;
+
+    int outroCharacterNext();
+    size_t outroCharacterCurrent = 0;
 };
 
 extern GameInfo g_gameInfo;

@@ -24,6 +24,7 @@
 #include "game_main.h"
 #include "sound.h"
 #include "change_res.h"
+#include "main/game_info.h"
 
 #include "pseudo_vb.h"
 
@@ -172,9 +173,10 @@ void GetvScreenAverage2()
     int B = 0;
     vScreenX[1] = 0;
     vScreenY[1] = 0;
+
     for(A = 1; A <= numPlayers; A++)
     {
-        if(Player[A].Dead == false)
+        if(!Player[A].Dead)
         {
             vScreenX[1] = vScreenX[1] - Player[A].Location.X - Player[A].Location.Width / 2.0;
             if(Player[A].Mount == 2)
@@ -184,9 +186,12 @@ void GetvScreenAverage2()
             B = B + 1;
         }
     }
+
     A = 1;
+
     if(B == 0)
         return;
+
     vScreenX[1] = (vScreenX[1] / B) + (ScreenW * 0.5);
     vScreenY[1] = (vScreenY[1] / B) + (ScreenH * 0.5) - vScreenYOffset;
 }
@@ -461,23 +466,27 @@ void GetvScreenCredits()
 {
     int A = 0;
     int B = 0;
+
     vScreenX[1] = 0;
     vScreenY[1] = 0;
+
     for(A = 1; A <= numPlayers; A++)
     {
-        if(Player[A].Dead == false && Player[A].Effect != 6)
+        if((!Player[A].Dead || g_gameInfo.outroDeadMode) && Player[A].Effect != 6)
         {
             vScreenX[1] = vScreenX[1] - Player[A].Location.X - Player[A].Location.Width / 2.0;
             if(Player[A].Mount == 2)
                 vScreenY[1] = vScreenY[1] - Player[A].Location.Y;
             else
                 vScreenY[1] = vScreenY[1] - Player[A].Location.Y - Player[A].Location.Height;
-            B = B + 1;
+            B++;
         }
     }
+
     A = 1;
     if(B == 0)
         return;
+
     vScreenX[1] = (vScreenX[1] / B) + (ScreenW * 0.5);
     vScreenY[1] = (vScreenY[1] / B) + (ScreenH * 0.5) - vScreenYOffset;
     if(-vScreenX[A] < level[Player[1].Section].X)

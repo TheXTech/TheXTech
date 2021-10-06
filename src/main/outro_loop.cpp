@@ -133,12 +133,35 @@ void OutroLoop()
     bool jumpBool = false;
     int64_t fBlock = 0;
     int64_t lBlock = 0;
+
+    if(g_gameInfo.outroDeadMode)
+    {
+        UpdateControls();
+        UpdateNPCs();
+        UpdateBlocks();
+        UpdateEffects();
+        // UpdatePlayer();
+        DoCredits();
+        UpdateGraphics();
+        UpdateSound();
+
+        if(GameOutroDoQuit) // Don't unset the GameOutro before GFX update, otherwise a glitch will happen
+        {
+            GameOutro = false;
+            GameOutroDoQuit = false;
+        }
+        return;
+    }
+
     UpdateControls();
 
     for(A = 1; A <= numPlayers; A++)
     {
         Player[A].Controls = blankControls;
-        Player[A].Controls.Left = true;
+        Player[A].Controls.Left = (g_gameInfo.outroWalkDirection < 0);
+        Player[A].Controls.Right = (g_gameInfo.outroWalkDirection > 0);
+        if(A <= (int)g_gameInfo.outroInitialDirections.size())
+            Player[A].Direction = g_gameInfo.outroInitialDirections[A - 1] > 0 ? 1.0 : -1.0;
         jumpBool = true;
         tempLocation = Player[A].Location;
         tempLocation = Player[A].Location;
@@ -152,35 +175,35 @@ void OutroLoop()
             tempLocation.X = Player[A].Location.X + Player[A].Location.Width + 20;
         else
             tempLocation.X = Player[A].Location.X - tempLocation.Width - 20;
-        // fBlock = FirstBlock[long(tempLocation.X / 32) - 1];
-        // lBlock = LastBlock[long((tempLocation.X + tempLocation.Width) / 32.0) + 1];
-        blockTileGet(tempLocation, fBlock, lBlock);
 
-        for(B = (int)fBlock; B <= lBlock; B++)
+        if(g_gameInfo.outroAutoJump)
         {
-            if(tempLocation.X + tempLocation.Width >= Block[B].Location.X)
+            // fBlock = FirstBlock[long(tempLocation.X / 32) - 1];
+            // lBlock = LastBlock[long((tempLocation.X + tempLocation.Width) / 32.0) + 1];
+            blockTileGet(tempLocation, fBlock, lBlock);
+            for(B = (int)fBlock; B <= lBlock; B++)
             {
-                if(tempLocation.X <= Block[B].Location.X + Block[B].Location.Width)
+                if(tempLocation.X + tempLocation.Width >= Block[B].Location.X &&
+                   tempLocation.X <= Block[B].Location.X + Block[B].Location.Width &&
+                   tempLocation.Y + tempLocation.Height >= Block[B].Location.Y &&
+                   tempLocation.Y <= Block[B].Location.Y + Block[B].Location.Height)
                 {
-                    if(tempLocation.Y + tempLocation.Height >= Block[B].Location.Y)
-                    {
-                        if(tempLocation.Y <= Block[B].Location.Y + Block[B].Location.Height)
-                        {
-                            if(!BlockNoClipping[Block[B].Type] && !Block[B].Invis && !Block[B].Hidden && !(BlockIsSizable[Block[B].Type] && Block[B].Location.Y < Player[A].Location.Y + Player[A].Location.Height - 3))
-                                jumpBool = false;
-                        }
-                    }
+                    if(!BlockNoClipping[Block[B].Type] &&
+                       !Block[B].Invis && !Block[B].Hidden &&
+                       !(BlockIsSizable[Block[B].Type] &&
+                        Block[B].Location.Y < Player[A].Location.Y + Player[A].Location.Height - 3))
+                        jumpBool = false;
+                }
+                else
+                {
+                    if(BlocksSorted)
+                        break;
                 }
             }
-            else
-            {
-                if(BlocksSorted)
-                    break;
-            }
-        }
 
-        if(jumpBool || Player[A].Jump > 0)
-            Player[A].Controls.Jump = true;
+            if(jumpBool || Player[A].Jump > 0)
+                Player[A].Controls.Jump = true;
+        }
     }
 
     UpdateNPCs();
