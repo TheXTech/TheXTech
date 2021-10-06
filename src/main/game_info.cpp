@@ -131,7 +131,7 @@ void initGameInfo()
                 {"idle", 0},
                 {"right", +1}
             };
-            config.read("walk-direction", g_gameInfo.outroWalkDirection, -1);
+            config.readEnum("walk-direction", g_gameInfo.outroWalkDirection, -1, dirs);
             config.read("initial-directions", g_gameInfo.outroInitialDirections, {0, 0, 0, 0, 0});
             g_gameInfo.outroDeadMode = !g_gameInfo.outroEnableActivity || g_gameInfo.outroMaxPlayersCount < 1;
         }
