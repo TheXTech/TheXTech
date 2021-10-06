@@ -51,6 +51,7 @@ struct Compatibility_t
     bool fix_swooper_start_while_inactive;
     bool fix_FreezeNPCs_no_reset;
     // 1.3.6
+    bool allow_DropAdd;
 
 
     // SpeedRun section

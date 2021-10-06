@@ -708,7 +708,7 @@ void UpdateGraphics2(bool skipRepaint)
         speedRun_renderControls(1, -1);
         speedRun_renderTimer();
 
-        if(GamePaused == PauseCode::Reconnect)
+        if(GamePaused == PauseCode::Reconnect || GamePaused == PauseCode::DropAdd)
         {
             ConnectScreen::Render();
         }

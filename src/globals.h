@@ -171,6 +171,7 @@ enum class PauseCode
     PauseGame,
     Message,
     Reconnect,
+    DropAdd,
 };
 
 // Moved back into "control_types.h"

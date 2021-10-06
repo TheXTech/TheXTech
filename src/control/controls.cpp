@@ -550,6 +550,9 @@ bool Update()
         }
     }
 
+    if(g_InputMethods.size() < numPlayers && !SingleCoop && !GameMenu && !g_recordControlReplay)
+        okay = false;
+
     return okay;
 }
 
@@ -744,7 +747,7 @@ void RumbleAllPlayers(int ms, float strength)
 
 StatusInfo GetStatus(int player)
 {
-    if(player < 1 || player > (int)g_InputMethods.size() + 1 || g_InputMethods[player - 1] == nullptr)
+    if(player < 1 || player >= (int)g_InputMethods.size() + 1 || g_InputMethods[player - 1] == nullptr)
         return StatusInfo();
     return g_InputMethods[player - 1]->GetStatus();
 }

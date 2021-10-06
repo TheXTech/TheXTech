@@ -9,6 +9,7 @@ namespace ConnectScreen
 
 void MainMenu_Start(int minPlayers);
 void Reconnect_Start();
+void DropAdd_Start();
 
 void Render();
 
