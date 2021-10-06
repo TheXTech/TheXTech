@@ -34,6 +34,8 @@ struct GameInfo
     std::string titleCredits;
     RangeArr<std::string, 1, numCharacters> characterName;
 
+    bool disableBattleMode = true;
+
     int creditsFont;
     std::string creditsHomePage;
     std::vector<std::string> creditsGame;

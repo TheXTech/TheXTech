@@ -412,17 +412,24 @@ bool mainMenuUpdate()
                 }
                 else if(MenuCursor == 2)
                 {
-                    PlaySoundMenu(SFX_Do);
-                    MenuMode = MENU_BATTLE_MODE;
-                    menuPlayersNum = 2;
-                    menuBattleMode = true;
+                    if(g_gameInfo.disableBattleMode)
+                    {
+                        PlaySoundMenu(SFX_BlockHit);
+                    }
+                    else
+                    {
+                        PlaySoundMenu(SFX_Do);
+                        MenuMode = MENU_BATTLE_MODE;
+                        menuPlayersNum = 2;
+                        menuBattleMode = true;
 #ifdef __EMSCRIPTEN__
-                    FindLevels();
+                        FindLevels();
 #else
-                    SDL_AtomicSet(&loading, 1);
-                    loadingThread = SDL_CreateThread(FindLevelsThread, "FindLevels", NULL);
+                        SDL_AtomicSet(&loading, 1);
+                        loadingThread = SDL_CreateThread(FindLevelsThread, "FindLevels", NULL);
 #endif
-                    MenuCursor = 0;
+                        MenuCursor = 0;
+                    }
                 }
                 else if(MenuCursor == 3)
                 {
@@ -1478,7 +1485,10 @@ void mainMenuDraw()
     {
         SuperPrint(g_mainMenu.main1PlayerGame, 3, 300, 350);
         SuperPrint(g_mainMenu.main2PlayerGame, 3, 300, 380);
-        SuperPrint(g_mainMenu.mainBattleGame, 3, 300, 410);
+        if(g_gameInfo.disableBattleMode)
+            SuperPrint(g_mainMenu.mainBattleGame, 3, 300, 410, 0.5f, 0.5f, 0.5f);
+        else
+            SuperPrint(g_mainMenu.mainBattleGame, 3, 300, 410);
         SuperPrint(g_mainMenu.mainOptions, 3, 300, 440);
         SuperPrint(g_mainMenu.mainExit, 3, 300, 470);
         frmMain.renderTexture(300 - 20, 350 + (MenuCursor * 30), 16, 16, GFX.MCursor[0], 0, 0);
