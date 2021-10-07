@@ -15,19 +15,19 @@ It's a port of an old VB6 engine, purely written in C++. It completely reproduce
 
 ## Why did you make it?
 I have several purposes for making it:
-- It's a very convenient research model I want to use in developent of the PGE Engine.
+- It's a very convenient research model I want to use in developent of the Moondust Engine.
 - To provide a fully-compatible replica of the old engine for modern platforms, allowing to play old levels and episodes with the same feeling as if they were played on the original VB6-based SMBX game.
 - To make it work without the necessity to use Wine on non-Windows platforms and making it available on non-x86/x64 platforms.
 - Optimizing it to use fewer hardware resources than the original VB6-based game.
 
 
-## You have PGE Engine, why you have spent over a month to craft this thing?
-I need it for PGE Engine development directly, it's much easier to hack and inspect than an old, inconvenient VB6 environment.
+## You have Moondust Engine, why you have spent over a month to craft this thing?
+I need it for Moondust Engine development directly, it's much easier to hack and inspect than an old, inconvenient VB6 environment.
 
 
-## What's the future of PGE Engine now that TheXTech exists?
-I'll continue developing the PGE Engine as I have yet to reach the second goal of the project.
-Since it's foundation, the PGE Project had two goals: 1) save SMBX; 2) give a flexible toolkit for new platform games. The opening of SMBX's source-code and introducing TheXTech has solved the first goal: SMBX has been saved and now it's free/opensource cross-platform software. PGE Engine will be used for the second goal - giving a toolkit for new games. Unlike TheXTech, PGE Engine gives a high degree of flexibility that allows anyone to build something new from scratch without inheriting an old game base. However, TheXTech is needed for PGE Engine as a working research model to develop the new engine. It will be similar to GZDoom and Chocolate Doom ports of the Doom game: GZDoom is a powerful and functional engine, the best choice for modders; Chocolate Doom is an accurate port of the original game to a modern platform with the purpose to represent the original game including even bugs. The PGE Engine intends to be like GZDoom while TheXTech is an analog of Chocolate Doom to represent an original game on modern platforms.
+## What's the future of Moondust Engine now that TheXTech exists?
+I'll continue developing the Moondust Engine as I have yet to reach the second goal of the project.
+Since it's foundation, the Moondust Project had two goals: 1) save SMBX; 2) give a flexible toolkit for new platform games. The opening of SMBX's source-code and introducing TheXTech has solved the first goal: SMBX has been saved and now it's free/opensource cross-platform software. Moondust Engine will be used for the second goal - giving a toolkit for new games. Unlike TheXTech, Moondust Engine gives a high degree of flexibility that allows anyone to build something new from scratch without inheriting an old game base. However, TheXTech is needed for Moondust Engine as a working research model to develop the new engine. It will be similar to GZDoom and Chocolate Doom ports of the Doom game: GZDoom is a powerful and functional engine, the best choice for modders; Chocolate Doom is an accurate port of the original game to a modern platform with the purpose to represent the original game including even bugs. The Moondust Engine intends to be like GZDoom while TheXTech is an analog of Chocolate Doom to represent an original game on modern platforms.
 
 
 ## Can LunaLua work on this?
@@ -52,7 +52,7 @@ Here are many ways to play games with it:
 [Main]
 force-portable = true
 ```
-, music.ini, sounds.ini and additional "graphics/ui" folder. An important note: all default graphics must be converted into PNG, use GIFs2PNG tool from PGE Project over your "graphics" folder with a "-d" switch. Don't use "-r" switch to keep original GIFs together with new-made PNGs if you plan to continue the use of original VB6-written SMBX.
+, music.ini, sounds.ini and additional "graphics/ui" folder. An important note: all default graphics must be converted into PNG, use GIFs2PNG tool from Moondust Project over your "graphics" folder with a "-d" switch. Don't use "-r" switch to keep original GIFs together with new-made PNGs if you plan to continue the use of original VB6-written SMBX.
 - use it for debug mode: in your home directory, create the ".PGE_Project/thextech" folder (on macOS the "`~/Library/Application Support/PGE Project/thextech`") where you should put a full set of game resources and worlds stuff, this folder will work like a game root in the original game. This mode allows you to run an executable file from any folder location of your computer and use the same location of resources for all builds (except these are marked as portable by an INI file).
 
 
@@ -67,10 +67,10 @@ If you want to replace default assets with your own, you can modify the content 
 
 ## What is different with this thing in comparison to the original VB6 build?
 - First off, it's written in C++ while original (as we already know) is written in VB6.
-- Doesn't have an Editor. Instead, in has a deep integration with PGE Editor that allows to use it with the same functionality as in original editor (the "magic hand" functionality was kept to allow real-time editing of the level while testing, it's needed to use IPC communication with PGE Editor to get the ability to use it better).
+- Doesn't have an Editor. Instead, in has a deep integration with Moondust Editor that allows to use it with the same functionality as in original editor (the "magic hand" functionality was kept to allow real-time editing of the level while testing, it's needed to use IPC communication with Moondust Editor to get the ability to use it better).
 - Full support of UTF-8 in filename paths and internal text data (original game had the only 8bit ANSI support).
 - For graphics and controlling, it uses an SDL2 library while original game have used WinAPI calls and GDI library.
-- It uses PGE-FL that has better file formats support.
+- It uses PGE-FL library that has better file formats support.
 - A support for WLDX world maps are allowing unlimited credits lines and custom music without it being necessary to use a music.ini for music replacements.
 - Some LVLX exclusive features now working: vertical section wrap, two-way warps, custom "star needed" message, warp enter event, ability to disable stars printing in HUB episodes for specific doors, ability to disable interscene showing when going to another level through a warp.
 - Built-in support for episode and level wide music.ini and sounds.ini to override default music and sounds assets.
