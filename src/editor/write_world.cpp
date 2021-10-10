@@ -94,9 +94,9 @@ void SaveWorld(std::string FilePath, int format, int version)   // Saves the wor
         out.levels.push_back(level);
     }
 
-    for(int A = 1; A <= numWorldMusic; A++)
+    for(int i = 1; i <= numWorldMusic; i++)
     {
-        auto &s = WorldMusic[A];
+        auto &s = WorldMusic[i];
         musicbox = FileFormats::CreateWldMusicbox();
         musicbox.x = s.Location.X;
         musicbox.y = s.Location.Y;

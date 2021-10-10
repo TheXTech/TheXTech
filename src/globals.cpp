@@ -121,7 +121,9 @@ float LevelChop[maxSections + 1];
 // RangeArr<int, -FLBlocks, FLBlocks> FirstBlock;
 // RangeArr<int, -FLBlocks, FLBlocks> LastBlock;
 int MidBackground = 1;
-int LastBackground = 1;
+// was set to 1, but this caused crash on boot
+//   when the command-line argument level failed to load
+int LastBackground = 0;
 int iBlocks = 0;
 RangeArrI<int, 0, maxBlocks, 0> iBlock;
 int numTiles = 0;

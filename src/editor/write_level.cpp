@@ -80,7 +80,7 @@ void SaveLevel(std::string FilePath, int format, int version)   // saves the lev
     //     FileNamePath = Left(FileNamePath, Len(FileNamePath) - 1)
     // End If
 
-    for(int i = 0; i <= numSections; ++i)
+    for(int i = 0; i < numSections; ++i)
     {
         auto &s = level[i];
 
@@ -153,7 +153,7 @@ void SaveLevel(std::string FilePath, int format, int version)   // saves the lev
         out.blocks.push_back(block);
     }
 
-    for(int i = 1; i < numBackground; ++i)
+    for(int i = 1; i <= numBackground; ++i)
     {
         auto &b = Background[i];
 
@@ -174,7 +174,7 @@ void SaveLevel(std::string FilePath, int format, int version)   // saves the lev
         out.bgo.push_back(bgo);
     }
 
-    for(int i = 1; i < numNPCs; ++i)
+    for(int i = 1; i <= numNPCs; ++i)
     {
         auto &n = NPC[i];
 
@@ -219,7 +219,7 @@ void SaveLevel(std::string FilePath, int format, int version)   // saves the lev
         out.npc.push_back(npc);
     }
 
-    for(int i = 1; i < numWarps; ++i)
+    for(int i = 1; i <= numWarps; ++i)
     {
         auto &w = Warp[i];
 
@@ -270,9 +270,9 @@ void SaveLevel(std::string FilePath, int format, int version)   // saves the lev
         out.doors.push_back(warp);
     }
 
-    for(int i = 1; i < numWater; ++i)
+    for(int i = 1; i <= numWater; ++i)
     {
-        auto &p = Water[A];
+        auto &p = Water[i];
 
         pez.x = p.Location.X;
         pez.y = p.Location.Y;
@@ -292,7 +292,7 @@ void SaveLevel(std::string FilePath, int format, int version)   // saves the lev
 
     for(int i = 0; i < numLayers; ++i)
     {
-        auto &l = Layer[A];
+        auto &l = Layer[i];
 
         layer.name = l.Name;
         layer.hidden = l.Hidden;
@@ -330,6 +330,8 @@ void SaveLevel(std::string FilePath, int format, int version)   // saves the lev
         for(int j = 0; j < numSections; ++j)
         {
             auto &ss = e.section[j];
+
+            s.id = j;
 
             s.music_id = ss.music_id;
             s.background_id = ss.background_id;
