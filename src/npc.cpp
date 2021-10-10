@@ -2612,7 +2612,7 @@ void NPCSpecial(int A)
         {
             tempLocation = npc.Location;
             tempLocation.Height = 8000;
-            C = 0;
+            int C = 0;
             for(int i = 1; i <= numBlock; i++)
             {
                 if(CheckCollision(tempLocation, Block[i].Location))
