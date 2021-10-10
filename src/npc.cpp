@@ -2655,7 +2655,7 @@ void NPCSpecial(int A)
         {
             tempLocation = npc.Location;
             tempLocation.Height = 8000;
-            C = 0;
+            int C = 0;
             for(Block_t* block : treeBlockQuery(tempLocation, false))
             {
                 int i = block - &Block[1] + 1;

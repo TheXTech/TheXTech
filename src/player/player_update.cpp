@@ -2866,7 +2866,7 @@ void UpdatePlayer()
 
                                                 for(Block_t* block : treeBlockQuery(tempLocation, SORTMODE_LOC))
                                                 {
-                                                    C = block - &Block[1] + 1;
+                                                    int C = block - &Block[1] + 1;
                                                     if(CheckCollision(tempLocation, Block[C].Location) && !Block[C].Hidden)
                                                     {
                                                         if(BlockSlope[Block[C].Type] == 0)
@@ -4086,7 +4086,7 @@ void UpdatePlayer()
 
                                                     for(Block_t* block : treeBlockQuery(Player[A].Location, false))
                                                     {
-                                                        C = block - &Block[1] + 1;
+                                                        int C = block - &Block[1] + 1;
                                                         if(CheckCollision(Player[A].Location, Block[C].Location) &&
                                                            !Block[C].Hidden && !BlockIsSizable[Block[C].Type] &&
                                                            !BlockOnlyHitspot1[Block[C].Type])
@@ -4182,12 +4182,12 @@ void UpdatePlayer()
                                                     if(Player[A].Mount == 2)
                                                     {
                                                         D = Player[A].Location.X - D;
-                                                        for(C = 1; C <= numNPCs; C++)
+                                                        for(int C = 1; C <= numNPCs; C++)
                                                         {
                                                             if(NPC[C].standingOnPlayer == A)
                                                                 NPC[C].Location.X = NPC[C].Location.X + D;
                                                         }
-                                                        for(C = 1; C <= numPlayers; C++)
+                                                        for(int C = 1; C <= numPlayers; C++)
                                                         {
                                                             if(Player[C].StandingOnTempNPC == 56)
                                                                 Player[C].Location.X = Player[C].Location.X + D;
@@ -4617,7 +4617,7 @@ void UpdatePlayer()
         Player[A].DuckRelease = !Player[A].Controls.Down;
     }
 
-    C = 0;
+    // int C = 0;
     for(A = numNPCs; A >= 1; A--)
     {
         if(NPC[A].playerTemp)
@@ -4627,7 +4627,7 @@ void UpdatePlayer()
                 if(Player[B].StandingOnNPC == A)
                     Player[B].StandingOnTempNPC = NPC[A].Type;
             }
-            NPC[C] = NPC[A];
+            NPC[0] = NPC[A]; // was NPC[C] = NPC[A] but C was not mutated
             KillNPC(A, 9);
         }
     }
