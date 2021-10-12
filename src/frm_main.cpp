@@ -1944,7 +1944,7 @@ void FrmMain::renderTexture(float xDst, float yDst, StdPicture &tx,
         return;
     }
 
-    SDL_FRect destRect = {SDL_roundf(xDst), SDL_roundf(yDst), (float)tx.w, (float)tx.h};
+    SDL_FRect destRect = {Maths::fRound(xDst), Maths::fRound(yDst), (float)tx.w, (float)tx.h};
     SDL_Rect sourceRect;
     if(tx.w_orig == 0 && tx.h_orig == 0)
         sourceRect = {0, 0, tx.w, tx.h};
