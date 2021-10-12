@@ -817,7 +817,7 @@ void FrmMain::updateViewport()
     else
     {
         ScaleWidth = g_config.InternalW;
-        ScaleHeight = g_config.InternalH;   
+        ScaleHeight = g_config.InternalH;
     }
     Set_Resolution(ScaleWidth, ScaleHeight);
     SDL_DestroyTexture(m_tBuffer);
