@@ -699,4 +699,10 @@ void AppPathManager::initSettingsPath()
     // Also make the game saves root folder to be exist
     if(!DirMan::exists(gameSaveRootDir()))
         DirMan::mkAbsPath(gameSaveRootDir());
+
+    // And make empty worlds and battle directories too, make a hint for user
+    if(!DirMan::exists(userWorldsRootDir()))
+        DirMan::mkAbsPath(userWorldsRootDir());
+    if(!DirMan::exists(userBattleRootDir()))
+        DirMan::mkAbsPath(userBattleRootDir());
 }
