@@ -251,9 +251,15 @@ message("--- Detected system libraries list: ${MixerX_SysLibs} ---")
 target_link_libraries(PGE_SDLMixerX_static INTERFACE
     "${SDL_MixerX_A_Lib}"
     ${MixerX_CodecLibs}
-    "${SDL2_A_Lib}"
-    "${MixerX_SysLibs}"
 )
+
+if(USE_SYSTEM_SDL2)
+    target_link_libraries(PGE_SDLMixerX_static INTERFACE ${SDL2_LIBRARIES})
+else()
+    target_link_libraries(PGE_SDLMixerX_static INTERFACE "${SDL2_A_Lib}")
+endif()
+
+target_link_libraries(PGE_SDLMixerX_static INTERFACE "${MixerX_SysLibs}")
 
 if(ANDROID)
     target_link_libraries(PGE_SDLMixerX_static INTERFACE "${SDLHIDAPI_SO_Lib}")
