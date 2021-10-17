@@ -2312,7 +2312,9 @@ void NPCSpecial(int A)
                 tempBool = true;
         }
 
-        if(npc.Type == NPCID_SAW) // Grinder
+        int railAlgo = int(npc.Special7);
+
+        if(npc.Type == NPCID_SAW && railAlgo != 2) // Grinder
         {
             npc.Location.X -= 24;
             npc.Location.Width = 96;
@@ -2338,12 +2340,31 @@ void NPCSpecial(int A)
             }
 
             tempBool = false;
-            tempBool2 = false;
+            // tempBool2 = false; // "value set, but never unused"
+            bool centered = false;
+
             tempLocation = npc.Location;
-            tempLocation.Y = npc.Location.Y + 15 + (npc.Type == 60 && fEqual(npc.Special7, 1.0) ? -1 : 0);
-            tempLocation.Height = 2;
-            tempLocation.X = npc.Location.X + 47;
-            tempLocation.Width = 2;
+
+            switch(railAlgo) // The hot spot (the rail attachment point)
+            {
+            case 0:
+            case 1: // Fixed 15x47 hot spot
+                tempLocation.Y = npc.Location.Y + 15;
+                if(railAlgo == 1)
+                    tempLocation.Y -= 1; // Exclusive workaround for The Invasion 1 to fix the stuck at the "Clown Car Parking" level
+                tempLocation.Height = 2;
+                tempLocation.X = npc.Location.X + 47;
+                tempLocation.Width = 2;
+                break;
+
+            case 2: // Centered hot spot
+                centered = true;
+                tempLocation.Y = npc.Location.Y + (npc.Location.Height / 2);
+                tempLocation.Height = 2;
+                tempLocation.X = npc.Location.X + (npc.Location.Width / 2) - 1;
+                tempLocation.Width = 2;
+                break;
+            }
 
             C = 2; // The Speed
             D = 0;
@@ -2382,7 +2403,10 @@ void NPCSpecial(int A)
                                     else
                                         npc.Location.SpeedY = C;
                                     npc.Location.SpeedX = 0;
-                                    E = -npc.Location.X + Background[i].Location.X - 32;
+                                    if(centered)
+                                        E = -(npc.Location.X + (npc.Location.Width / 2)) + (Background[i].Location.X + (Background[i].Location.Width / 2));
+                                    else
+                                        E = -npc.Location.X + Background[i].Location.X - 32;
                                 }
                                 // Horizontal rail
                                 else if(Background[i].Type == 71)
@@ -2392,7 +2416,10 @@ void NPCSpecial(int A)
                                     else
                                         npc.Location.SpeedX = -C;
                                     npc.Location.SpeedY = 0;
-                                    D = -npc.Location.Y + Background[i].Location.Y;
+                                    if(centered)
+                                        D = -(npc.Location.Y + (npc.Location.Height / 2)) + (Background[i].Location.Y + (Background[i].Location.Height / 2));
+                                    else
+                                        D = -npc.Location.Y + Background[i].Location.Y;
                                 }
                                 // Diagonal rail left-bottom, right-top
                                 else if(Background[i].Type == 73)
@@ -2500,12 +2527,15 @@ void NPCSpecial(int A)
             treeBlockUpdateLayer(Block[npc.tempBlock].LayerIndex, &Block[npc.tempBlock]);
         }
 
-        if(npc.Type == 179)
+        if(npc.Type == NPCID_SAW)
         {
-            npc.Location.X += 24;
-            npc.Location.Width = 48;
-            npc.Location.Y -= 8;
-            npc.Location.Height = 48;
+            if(railAlgo != 2)
+            {
+                npc.Location.X += 24;
+                npc.Location.Width = 48;
+                npc.Location.Y -= 8;
+                npc.Location.Height = 48;
+            }
 
             if(npc.Location.SpeedX == 0 && fEqual((float)npc.Location.SpeedY, Physics.NPCGravity))
             {

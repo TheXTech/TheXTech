@@ -553,12 +553,22 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
                 npc.Special7 = n.special_data;
         }
 
-        if(npc.Type == NPCID_YELBLOCKS)
+        switch(npc.Type)
         {
+        case NPCID_YELBLOCKS:
+        case NPCID_BLUBLOCKS:
+        case NPCID_GRNBLOCKS:
+        case NPCID_REDBLOCKS:
+        case NPCID_PLATFORM_SMB3:
+        case NPCID_SAW:
             if(compatModern && isSmbx64 && fVersion < 9)
-                npc.Special7 = 1.0; // Workaround for yellow platform at The Invasion 1
+                npc.Special7 = 1.0; // Workaround for yellow platform at The Invasion 1 on the "Clown Car Parking" level
             else
-                npc.Special7 = 0.0;
+                npc.Special7 = n.special_data;
+            break;
+
+        default:
+            break;
         }
 
         npc.Generator = n.generator;
