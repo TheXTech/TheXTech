@@ -54,6 +54,11 @@ Changes for 1.3.5.2
 -Fixed the wrong restart place when running the lasanha of levels and "restart level after death" option is enabled
 -Added option to show number of stars available/obtained in level on world map
 -Added option to render episode title onscreen
+-Fixed the NPC logic distortion caused by early gfx update
+-Added an ability to customize an outro behaviour using gameinfo.ini
+-Battle mode access can be disabled via gameinfo.ini
+-Two-player game mode access can be disabled via gameinfo.ini
+-Added a fixed behavior for rail platforms and grinder (NPC-60, NPC-62, NPC-64, NPC-66, NPC-104, NPC-179). It can be enabled using new-added custom values
 
 Changes for 1.3.5.1
 -Episodes and battle levels lists now loading in the separated thread with a progress showing
