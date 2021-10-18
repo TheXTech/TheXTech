@@ -53,6 +53,12 @@
 #include "frm_main.h"
 #include "main/game_info.h"
 
+// Workaround for older SDL versions that lacks the floating-point based rects and points
+#ifdef XTECH_SDL_NO_RECTF_SUPPORT
+#define SDL_RenderCopyF SDL_RenderCopy
+#define SDL_RenderCopyExF SDL_RenderCopyEx
+#endif
+
 
 VideoSettings_t g_videoSettings;
 
@@ -1793,10 +1799,18 @@ void FrmMain::renderTexture(double xDstD, double yDstD, double wDstD, double hDs
             hDst = 0;
     }
 
+#ifndef XTECH_SDL_NO_RECTF_SUPPORT
     SDL_FRect destRect = {(float)xDst + viewport_offset_x,
                           (float)yDst + viewport_offset_y,
                           (float)wDst,
                           (float)hDst};
+#else
+    SDL_Rect destRect = {(int)xDst + viewport_offset_x,
+                         (int)yDst + viewport_offset_y,
+                         (int)wDst,
+                         (int)hDst};
+#endif
+
     SDL_Rect sourceRect;
 
     if(tx.w_orig == 0 && tx.h_orig == 0)
@@ -1851,10 +1865,22 @@ void FrmMain::renderTextureScale(double xDstD, double yDstD, double wDstD, doubl
             hSrc = 0;
     }
 
+#ifndef XTECH_SDL_NO_RECTF_SUPPORT
     SDL_FRect destRect = {(float)xDst + viewport_offset_x,
                           (float)yDst + viewport_offset_y,
                           (float)wDst,
                           (float)hDst};
+    auto &centerD = center;
+#else
+    SDL_Rect destRect = {(int)xDst + viewport_offset_x,
+                         (int)yDst + viewport_offset_y,
+                         (int)wDst,
+                         (int)hDst};
+    SDL_Point centerI = {center ? Maths::iRound(center->x) : 0,
+                         center ? Maths::iRound(center->y) : 0};
+    SDL_Point *centerD = center ? &centerI : nullptr;
+#endif
+
     SDL_Rect sourceRect;
     if(tx.w_orig == 0 && tx.h_orig == 0)
         sourceRect = {xSrc, ySrc, wSrc, hSrc};
@@ -1863,7 +1889,7 @@ void FrmMain::renderTextureScale(double xDstD, double yDstD, double wDstD, doubl
 
     txColorMod(tx, red, green, blue, alpha);
     SDL_RenderCopyExF(m_gRenderer, tx.texture, &sourceRect, &destRect,
-                      rotateAngle, center, static_cast<SDL_RendererFlip>(flip));
+                      rotateAngle, centerD, static_cast<SDL_RendererFlip>(flip));
 }
 
 void FrmMain::renderTextureFL(double xDstD, double yDstD, double wDstD, double hDstD,
@@ -1908,10 +1934,22 @@ void FrmMain::renderTextureFL(double xDstD, double yDstD, double wDstD, double h
             hDst = 0;
     }
 
+#ifndef XTECH_SDL_NO_RECTF_SUPPORT
     SDL_FRect destRect = {(float)xDst + viewport_offset_x,
                           (float)yDst + viewport_offset_y,
                           (float)wDst,
                           (float)hDst};
+    auto &centerD = center;
+#else
+    SDL_Rect destRect = {(int)xDst + viewport_offset_x,
+                         (int)yDst + viewport_offset_y,
+                         (int)wDst,
+                         (int)hDst};
+    SDL_Point centerI = {center ? Maths::iRound(center->x) : 0,
+                         center ? Maths::iRound(center->y) : 0};
+    SDL_Point *centerD = center ? &centerI : nullptr;
+#endif
+
     SDL_Rect sourceRect;
 
     if(tx.w_orig == 0 && tx.h_orig == 0)
@@ -1921,7 +1959,7 @@ void FrmMain::renderTextureFL(double xDstD, double yDstD, double wDstD, double h
 
     txColorMod(tx, red, green, blue, alpha);
     SDL_RenderCopyExF(m_gRenderer, tx.texture, &sourceRect, &destRect,
-                      rotateAngle, center, static_cast<SDL_RendererFlip>(flip));
+                      rotateAngle, centerD, static_cast<SDL_RendererFlip>(flip));
 }
 
 void FrmMain::renderTexture(float xDst, float yDst, StdPicture &tx,
@@ -1944,7 +1982,12 @@ void FrmMain::renderTexture(float xDst, float yDst, StdPicture &tx,
         return;
     }
 
+#ifndef XTECH_SDL_NO_RECTF_SUPPORT
     SDL_FRect destRect = {Maths::fRound(xDst), Maths::fRound(yDst), (float)tx.w, (float)tx.h};
+#else
+    SDL_Rect destRect = {Maths::iRound(xDst), Maths::iRound(yDst), tx.w, tx.h};
+#endif
+
     SDL_Rect sourceRect;
     if(tx.w_orig == 0 && tx.h_orig == 0)
         sourceRect = {0, 0, tx.w, tx.h};
