@@ -2683,13 +2683,14 @@ void UpdatePlayer()
                                         //if(Block[B].Type == 632 && Player[A].Character == 5)
                                         //    HitSpot = 0;
 
-                                        if(g_compatibility.fix_player_clip_wall_at_npc && HitSpot == 5 && oldStandingOnNpc > 0 && Player[A].Jump)
+                                        if(g_compatibility.fix_player_clip_wall_at_npc && (HitSpot == 5 || HitSpot == 3) && oldStandingOnNpc > 0 && Player[A].Jump)
                                         {
                                             // Re-compute the collision with a block to avoid the unnecessary clipping through the wall
                                             auto pLoc = Player[A].Location;
                                             pLoc.SpeedX += NPC[oldStandingOnNpc].Location.SpeedX;
                                             pLoc.SpeedY += NPC[oldStandingOnNpc].Location.SpeedY;
                                             HitSpot = FindRunningCollision(pLoc, Block[B].Location);
+                                            D_pLogDebug("Conveyor: Recomputed collision with block %d", B);
                                         }
 
                                         // the following code is where the collisions are handled
