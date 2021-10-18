@@ -144,7 +144,9 @@ jobs:
         if [[ ! -z "${{ matrix.config.extra_path }}" ]]; then
           export PATH=${{ matrix.config.extra_path }}:${PATH}
         fi
-        cpack -B build .
+        cd build
+        cpack  .
+        cd ..
 
     - name: Upload artifact
       if: success() && runner.os == 'Linux'
