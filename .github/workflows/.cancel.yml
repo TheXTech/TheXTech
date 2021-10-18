@@ -8,5 +8,6 @@ jobs:
     steps:
       - uses: styfle/cancel-workflow-action@0.9.1
         with:
+          workflow_id: android-ci.yml, emscripten.yml, continuous_integration.yml, macos-ci.yml, ubuntu-deb-ci.yml
           all_but_latest: true
           access_token: ${{ github.token }}
