@@ -43,7 +43,7 @@ typedef struct SDL_Thread SDL_Thread;
 typedef struct SDL_mutex SDL_mutex;
 
 // Workaround for older SDL versions that lacks the floating-point based rects and points
-#if SDL_COMPILEDVERSION < SDL_VERSIONNUM(2, 0, 14)
+#if SDL_COMPILEDVERSION < SDL_VERSIONNUM(2, 0, 10)
 #define XTECH_SDL_NO_RECTF_SUPPORT
 typedef struct SDL_FPoint
 {
