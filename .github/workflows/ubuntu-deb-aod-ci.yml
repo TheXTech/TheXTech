@@ -101,11 +101,6 @@ jobs:
     - name: Unpack all assets
       shell: bash
       run: |
-#        mkdir -p aod
-#        cd aod
-#        7z x ../aod.7z
-#        cd ..
-#        rm aod.7z
         mkdir -p aod
         cd aod
         7z x ../aod.7z
