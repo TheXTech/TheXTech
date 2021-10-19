@@ -146,6 +146,7 @@ jobs:
         fi
         cd build
         cpack  .
+        mv *.deb thextech-super-mario-bros-x-${{ matrix.config.package_filename_suffix }}-${BRANCH_NAME}.deb
         cd ..
 
     - name: Upload artifact
