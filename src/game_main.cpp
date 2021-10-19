@@ -1277,6 +1277,9 @@ void InitControls()
                 joyGetByIndex(player, ji, conJoystick[player]);
         }
     }
+
+    if(!Files::fileExists(AppPathManager::settingsFileSTD()))
+        SaveConfig(); // Create the config file on first run
 }
 
 
