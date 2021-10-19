@@ -146,11 +146,15 @@ public:
 //                             int wSrc, int hSrc,
 //                             double rotateAngle = 0.0, SDL_Point *center = nullptr, unsigned int flip = SDL_FLIP_NONE,
 //                             float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f);
+    void renderTextureScaleEx(double xDst, double yDst, double wDst, double hDst,
+                              StdPicture &tx,
+                              int xSrc, int ySrc,
+                              int wSrc, int hSrc,
+                              double rotateAngle = 0.0, SDL_FPoint *center = nullptr, unsigned int flip = SDL_FLIP_NONE,
+                              float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f);
+
     void renderTextureScale(double xDst, double yDst, double wDst, double hDst,
                             StdPicture &tx,
-                            int xSrc, int ySrc,
-                            int wSrc, int hSrc,
-                            double rotateAngle = 0.0, SDL_FPoint *center = nullptr, unsigned int flip = SDL_FLIP_NONE,
                             float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f);
 
     void renderTexture(double xDst, double yDst, double wDst, double hDst,
