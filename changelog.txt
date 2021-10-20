@@ -39,6 +39,7 @@ Changes for 1.3.5.2
 -Added an ability to customize an outro behaviour using gameinfo.ini
 -Battle mode access can be disabled via gameinfo.ini
 -Two-player game mode access can be disabled via gameinfo.ini
+-The Scores of Power-Ups (NPC-9, NPC-14, NPC-34, NPC-169, NPC-170, NPC-182, NPC-183, NPC-184, NPC-185, NPC-249, NPC-250, NPC-264, NPC-277) can be changed via npc-X.txt
 -Added a fixed behavior for rail platforms and grinder (NPC-60, NPC-62, NPC-64, NPC-66, NPC-104, NPC-179). It can be enabled using new-added custom values
 -Fixed the collision bug when an attempt of the player with the shoe to jump up at the moving NPC being pushed into the wall, causes the player to go through the wall
 -The settings/thextech.ini config file will be created on the first launch if not exist
