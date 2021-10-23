@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - devel
       - versus-ci-vita
       - stable-1.3.5.x
       - wip-vita-support
@@ -70,7 +71,7 @@ jobs:
         cmake -B build-vita -G Ninja -DCMAKE_INSTALL_PREFIX=$VITASDK/arm-vita-eabi -DCGLM_STATIC=ON -DCGLM_SHARED=OFF -DCMAKE_BUILD_TYPE=MinSizeRel -DCMAKE_TOOLCHAIN_FILE=/usr/local/vitasdk/share/vita.toolchain.cmake .
         cmake --build build-vita --target all
         cmake --build build-vita --target install
-        
+
     - name: Install Latest vitaGL
       run: |
         cd ..
