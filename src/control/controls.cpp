@@ -476,7 +476,7 @@ bool Update()
 
     // sync controls
     record_sync();
-    for(int i = 0; i < numPlayers; i++)
+    for(int i = 0; i < numPlayers && i < maxLocalPlayers; i++)
     {
         speedRun_syncControlKeys(i, Player[i+1].Controls);
     }
