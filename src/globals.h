@@ -173,7 +173,6 @@ enum class PauseCode
     Reconnect,
     DropAdd,
     TextEntry,
-    Cheats,
 };
 
 // Moved back into "control_types.h"

@@ -549,6 +549,10 @@ const char* InputMethodType_Keyboard::GetOptionName(size_t i)
     {
         return "MAX KBD PLAYERS";
     }
+    if(i == 1)
+    {
+        return "DIRECT TEXT ENTRY";
+    }
     return nullptr;
 }
 // get a char* describing the current option value
@@ -562,6 +566,13 @@ const char* InputMethodType_Keyboard::GetOptionValue(size_t i)
         snprintf(buf, 3, "%d", this->m_maxKeyboards);
         return buf;
     }
+    if(i == 1)
+    {
+        if(this->m_directText)
+            return "TRUE";
+        else
+            return "FALSE";
+    }
     return nullptr;
 }
 // called when A is pressed; allowed to interrupt main game loop
@@ -572,6 +583,11 @@ bool InputMethodType_Keyboard::OptionChange(size_t i)
         this->m_maxKeyboards ++;
         if(this->m_maxKeyboards > 6)
             this->m_maxKeyboards = 0;
+        return true;
+    }
+    if(i == 1)
+    {
+        this->m_directText = !this->m_directText;
         return true;
     }
     return false;
@@ -585,6 +601,11 @@ bool InputMethodType_Keyboard::OptionRotateLeft(size_t i)
             this->m_maxKeyboards --;
         return true;
     }
+    if(i == 1)
+    {
+        this->m_directText = !this->m_directText;
+        return true;
+    }
     return false;
 }
 // called when right is pressed
@@ -596,17 +617,24 @@ bool InputMethodType_Keyboard::OptionRotateRight(size_t i)
             this->m_maxKeyboards ++;
         return true;
     }
+    if(i == 1)
+    {
+        this->m_directText = !this->m_directText;
+        return true;
+    }
     return false;
 }
 
 void InputMethodType_Keyboard::SaveConfig_Custom(IniProcessing* ctl)
 {
     ctl->setValue("max-keyboards", this->m_maxKeyboards);
+    ctl->setValue("direct-text-entry", this->m_directText);
 }
 
 void InputMethodType_Keyboard::LoadConfig_Custom(IniProcessing* ctl)
 {
     ctl->read("max-keyboards", this->m_maxKeyboards, 2);
+    ctl->read("direct-text-entry", this->m_directText, true);
 }
 
 } // namespace Controls

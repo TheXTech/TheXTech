@@ -405,19 +405,7 @@ namespace Hotkeys
     }
 
     // function for activating a hotkey
-    inline void Activate(size_t i)
-    {
-        switch(i)
-        {
-            case Buttons::Fullscreen:
-            case Buttons::Screenshot:
-            case Buttons::RecordGif:
-            case Buttons::DebugInfo:
-            case Buttons::EnterCheats:
-            default:
-                return;
-        }
-    }
+    void Activate(size_t i);
 } // namespace (Controls::)Hotkeys
 
 // information about a particular bound input method

@@ -40,6 +40,7 @@
 #include "speedrunner.h"
 #include "menu_main.h"
 #include "menu_connectscreen.h"
+#include "screen_textentry.h"
 #include "../pseudo_vb.h"
 
 void CheckActive();//in game_main.cpp
@@ -519,6 +520,10 @@ void PauseGame(PauseCode code, int plr)
         ConnectScreen::Reconnect_Start();
     else if(code == PauseCode::DropAdd)
         ConnectScreen::DropAdd_Start();
+    else if(code == PauseCode::TextEntry)
+    {
+        // assume TextEntryScreen::Init has already been called.
+    }
 
     PauseCode old_code = GamePaused;
     GamePaused = code;
@@ -577,6 +582,11 @@ void PauseGame(PauseCode code, int plr)
                 if(ConnectScreen::Logic())
                     break;
             }
+            else if(GamePaused == PauseCode::TextEntry)
+            {
+                if(TextEntryScreen::Logic())
+                    break;
+            }
         }
 
         PGE_Delay(1);
@@ -600,9 +610,3 @@ void PauseGame(PauseCode code, int plr)
 
     resetFrameTimer();
 }
-
-void RecoverControls()
-{
-    // breaks the main game loop to allow the players to fix their controls
-}
-

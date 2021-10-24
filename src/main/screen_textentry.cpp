@@ -5,6 +5,12 @@
 namespace TextEntryScreen
 {
 
+std::string Text;
+static std::string s_Prompt;
+static int s_cursor = 0;
+static int s_mouse_up = 2;
+static int s_timer = 0;
+
 // KEYMAP!
 // we are assumed to be operating on a Nx5x12 (levels, rows, columns) grid.
 // special characters: \b is backspace, \x0e and \x0f are shift up and shift down (a grid level)
@@ -12,8 +18,7 @@ namespace TextEntryScreen
 // \n is a newline (actually, accept), and \x1d and \x1c are left and right.
 // special control character meanings: \x11 is "last button wider" and \x12 is "empty"
 
-// the UTF-8 character length encoding is not supported.
-
+// the UTF-8 character length encoding is not supported yet, but is being explored.
 // first bit unset: single char
 // first two bits set: 2 chars / one character
 // first three bits set: 3 chars / one character
@@ -22,16 +27,18 @@ static const char* s_keymap_US = "1234567890-\b"
     "qwertyuiop[]"
     "asdfghjkl;'="
     "`zxcvbnm,./\\"
-    "\x0e\x11 \x11\x11\x11\x12\x1d\x1c\x12\n\x11"
+    "\x0e\x11\x11 \x11\x11\x11\x11\x1d\x1c\n\x11"
     "!@#$%^&*()_\b"
     "QWERTYUIOP{}"
     "ASDFGHJKL:\"+"
     "~ZXCVBNM<>?|"
-    "\x0f\x11\x12 \x11\x11\x11\x12\x1d\x1c\n\x11";
+    "\x0f\x11\x11 \x11\x11\x11\x11\x1d\x1c\n\x11";
 
 // please help add more useful keymaps as soon as we have more printable characters.
 
 static const char* s_current_keymap = s_keymap_US;
+// will eventually be used to support UTF-8 characters
+// static const char** s_current_keymap_locs;
 static int s_cur_level = 0;
 static int s_cur_row = 0;
 static int s_cur_col = 0;
@@ -47,7 +54,7 @@ inline const char* get_char()
     return get_char(s_cur_level, s_cur_row, s_cur_col);
 }
 
-bool UpdateButton(int x, int y, const char* c, bool sel, bool mouse, bool render)
+bool UpdateButton(int x, int y, const char* c, bool sel, bool render)
 {
     if(*c == '\x12' || *c == '\x11') // empty space or someone else's continuation
         return false;
@@ -55,7 +62,7 @@ bool UpdateButton(int x, int y, const char* c, bool sel, bool mouse, bool render
     char print_char[6];
     if(*c == '\b')
     {
-        print_char[0] = 'b'; print_char[1] = 's'; print_char[2] = '\0';
+        print_char[0] = 'B'; print_char[1] = 'S'; print_char[2] = '\0';
     }
     else if(*c == '\x0e' || *c == '\x0f')
     {
@@ -110,24 +117,27 @@ bool UpdateButton(int x, int y, const char* c, bool sel, bool mouse, bool render
         && SharedCursor.Y >= y + 2 && SharedCursor.Y < y + 38)
         coll = true;
     // outline:
-    if(sel)
+    if(render)
     {
-        if(coll && SharedCursor.Primary)
-            frmMain.renderRect(x, y, width, 40, 0.f, 0.5f, 0.f, 1.0f, true);
+        if(sel)
+        {
+            if(coll && SharedCursor.Primary)
+                frmMain.renderRect(x, y, width, 40, 0.f, 0.5f, 0.5f, 1.0f, true);
+            else
+                frmMain.renderRect(x, y, width, 40, 0.f, 1.0f, 1.0f, 1.0f, true);
+        }
+        else if(coll && SharedCursor.Primary)
+            frmMain.renderRect(x, y, width, 40, 0.f, 0.f, 0.f, 1.0f, true);
+        // background:
+        if(SharedCursor.Primary && coll)
+            frmMain.renderRect(x+2, y+2, width-4, 36, 0.2f, 0.2f, 0.2f, 1.0f, true);
         else
-            frmMain.renderRect(x, y, width, 40, 0.f, 1.0f, 0.f, 1.0f, true);
+            frmMain.renderRect(x+2, y+2, width-4, 36, 0.5f, 0.5f, 0.5f, 0.8f, true);
+
+        SuperPrintCenter(print_char, 4, x+2+width/2, y+10);
     }
-    else if(coll && SharedCursor.Primary)
-        frmMain.renderRect(x, y, width, 40, 0.f, 0.f, 0.f, 1.0f, true);
-    // background:
-    if(SharedCursor.Primary && coll)
-        frmMain.renderRect(x+2, y+2, width-4, 36, 0.2f, 0.2f, 0.2f, true);
-    else
-        frmMain.renderRect(x+2, y+2, width-4, 36, 0.5f, 0.5f, 0.5f, true);
 
-    SuperPrintCenter(print_char, 4, x+width/2, y+10);
-
-    return (MenuMouseRelease && coll);
+    return (s_mouse_up == 1 && coll);
 }
 
 void GoLeft()
@@ -206,8 +216,135 @@ void GoUp()
         s_cur_col --;
 }
 
-void RenderKeyboard()
+inline void InsertUnicode(const char* c)
 {
+    char unicode[5];
+    unicode[0] = c[0];
+    if(c[0] & 1<<7)
+    {
+        unicode[1] = c[1];
+        if(c[0] & 1<<5)
+        {
+            unicode[2] = c[2];
+            if(c[0] & 1<<4)
+            {
+                unicode[3] = c[3];
+                unicode[4] = '\0';
+            }
+            else
+                unicode[3] = '\0';
+        }
+        else
+            unicode[2] = '\0';
+    }
+    else
+    {
+        unicode[1] = '\0';
+    }
+    Text.insert(s_cursor, unicode);
+}
+
+inline void Backspace()
+{
+    if(s_cursor > 0)
+    {
+        s_cursor --;
+        Text.erase(s_cursor, 1);
+    }
+}
+
+// returns true if the string is complete
+bool DoAction()
+{
+    // for now, no unicode processing, but wouldn't be hard at all...
+    const char* c = get_char(s_cur_level, s_cur_row, s_cur_col);
+
+    switch(*c)
+    {
+    // invalid chars
+    case '\x11':
+    case '\x12':
+        break;
+    // accept input
+    case '\n':
+        return true;
+    // left
+    case '\x1d':
+        if(s_cursor > 0)
+            s_cursor --;
+        break;
+    // right
+    case '\x1c':
+        if(s_cursor < Text.size())
+            s_cursor ++;
+        break;
+    // shift up
+    case '\x0e':
+        s_cur_level ++;
+        break;
+    // shift down
+    case '\x0f':
+        s_cur_level --;
+        break;
+    // backspace
+    case '\b':
+        Backspace();
+        break;
+    // proper text entry
+    default:
+        InsertUnicode(c);
+        s_cursor ++;
+    }
+    return false;
+}
+
+bool KeyboardMouseRender(bool mouse, bool render)
+{
+    int kb_height = 5*40;
+    int kb_width = 12*40;
+
+    int win_width = kb_width + 20;
+    int win_height = kb_height + 20;
+
+    int n_prompt_lines = ((s_Prompt.size() + 26) / 27);
+    int n_text_lines = ((Text.size() + 24) / 25);
+    if(n_text_lines == 0)
+        n_text_lines = 1;
+
+    win_height += n_prompt_lines * 20;
+    win_height += n_text_lines * 20;
+
+    int win_x = ScreenW / 2 - win_width / 2;
+    int kb_x = win_x + 10;
+
+    // bias towards bottom of screen
+    int win_y = ScreenH / 1.25 - win_height / 1.25;
+    // force even
+    win_y &= ~1;
+    int kb_y = win_y + 10 + n_prompt_lines*20+n_text_lines*20;
+
+    if(render)
+    {
+        frmMain.renderRect(win_x, win_y, win_width, win_height, 0.6f, 0.6f, 1.f, 0.8f);
+        for(int i = 0; i < n_prompt_lines; i ++)
+        {
+            SuperPrint(s_Prompt.substr(27*i, 27), 4, win_x + 10, win_y + 6 + 20*i);
+        }
+        frmMain.renderRect(win_x + 20, win_y+n_prompt_lines*20+4, win_width - 40, n_text_lines*20, 0.f, 0.f, 0.f, 0.8f);
+        for(int i = 0; i < n_text_lines; i ++)
+        {
+            SuperPrint(Text.substr(25*i, 25), 4, win_x + 10 + 16, win_y + 6 + 20*(n_prompt_lines+i));
+            // render cursor if it is on this line
+            if(s_cursor >= i*25 && s_cursor < (i+1)*25)
+            {
+                // after merging in, use the appropriate print library here.
+                // int cursor_offset = PrintLength(Text.substr(25*i, s_cursor - i*25))
+                int cursor_offset = (s_cursor - i*25) * 18;
+                frmMain.renderRect(win_x + 10 + 16 + cursor_offset - 2, win_y + 4 + 20*(n_prompt_lines+i), 2, 20, 1.f, 1.f, 1.f, 0.5f);
+            }
+        }
+        frmMain.renderRect(kb_x, kb_y, kb_width, kb_height, 0.f, 0.f, 0.f, 0.2f);
+    }
     for(int row = 0; row < 5; row ++)
     {
         for(int col = 0; col < 12; col ++)
@@ -215,9 +352,115 @@ void RenderKeyboard()
             bool sel = false;
             if(s_render_sel && s_cur_row == row && s_cur_col == col)
                 sel = true;
-            UpdateButton(40*col, 40*row, get_char(s_cur_level, row, col), sel, false, true);
+            if(UpdateButton(40*col + kb_x, 40*row + kb_y, get_char(s_cur_level, row, col), sel, render) && mouse)
+            {
+                s_render_sel = false;
+                s_cur_row = row;
+                s_cur_col = col;
+                if(DoAction())
+                    return true;
+            }
         }
     }
+    return false;
 }
 
-};
+void Init(const std::string& Prompt, const std::string Value)
+{
+    s_Prompt = Prompt;
+    Text = Value;
+    s_cursor = Text.size();
+    s_mouse_up = 2;
+    s_cur_level = 0;
+    s_cur_row = 0;
+    s_cur_col = 0;
+    MenuCursorCanMove = false;
+    s_render_sel = false;
+    s_timer = -1;
+}
+
+void Render()
+{
+    KeyboardMouseRender(false, true);
+}
+
+bool Logic()
+{
+    if(SharedCursor.Primary)
+        s_mouse_up = 0;
+    else if(s_mouse_up == 0)
+        s_mouse_up = 1;
+    else
+        s_mouse_up = 2;
+
+    if(KeyboardMouseRender(true, false))
+    {
+        MenuCursorCanMove = false;
+        MenuMouseRelease = false;
+        return true;
+    }
+
+    bool upPressed = SharedControls.MenuUp;
+    bool downPressed = SharedControls.MenuDown;
+    bool leftPressed = SharedControls.MenuLeft;
+    bool rightPressed = SharedControls.MenuRight;
+
+    bool startPressed = false;
+    bool doPressed = SharedControls.MenuDo;
+    bool backPressed = SharedControls.MenuBack;
+
+    for(int i = 0; i < maxLocalPlayers; i++)
+    {
+        Controls_t &c = Player[i+1].Controls;
+
+        startPressed |= c.Start;
+        doPressed |= c.Start || c.Jump || c.AltJump;
+        backPressed |= c.Run || c.AltRun;
+
+        upPressed |= c.Up;
+        downPressed |= c.Down;
+        leftPressed |= c.Left;
+        rightPressed |= c.Right;
+    }
+
+    if(MenuCursorCanMove)
+    {
+        if(upPressed)
+            GoUp();
+        if(downPressed)
+            GoDown();
+        if(leftPressed)
+            GoLeft();
+        if(rightPressed)
+            GoRight();
+        if(backPressed)
+            Backspace();
+        if(doPressed && DoAction() || startPressed)
+        {
+            MenuCursorCanMove = false;
+            MenuMouseRelease = false;
+            return true;
+        }
+    }
+
+
+    if(!upPressed && !downPressed && !leftPressed && !rightPressed && !doPressed && !backPressed && !startPressed)
+    {
+        MenuCursorCanMove = true;
+    }
+    else
+    {
+        s_render_sel = true;
+        MenuCursorCanMove = false;
+        s_timer --;
+        if(s_timer == 0)
+            MenuCursorCanMove = true;
+    }
+
+    if(MenuCursorCanMove)
+        s_timer = 10;
+
+    return false;
+}
+
+}; // namespace TextEntryScreen

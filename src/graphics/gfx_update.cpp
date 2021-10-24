@@ -31,6 +31,7 @@
 #include "../main/speedrunner.h"
 #include "../main/trees.h"
 #include "../main/menu_connectscreen.h"
+#include "../main/screen_textentry.h"
 #include "../compat.h"
 
 #include <fmt_format_ne.h>
@@ -2594,6 +2595,14 @@ void UpdateGraphics(bool skipRepaint)
     if(GamePaused == PauseCode::Reconnect || GamePaused == PauseCode::DropAdd)
     {
         ConnectScreen::Render();
+    }
+    if(GamePaused == PauseCode::TextEntry)
+    {
+        TextEntryScreen::Render();
+    }
+    if(GamePaused != PauseCode::None && GamePaused != PauseCode::Message)
+    {
+        frmMain.renderTexture(int(SharedCursor.X), int(SharedCursor.Y), GFX.ECursor[2]);
     }
 
     if(!skipRepaint)

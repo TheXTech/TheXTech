@@ -4,6 +4,10 @@
 #include "keyboard.h"
 #include "joystick.h"
 
+// for cheat screen
+#include "../game_main.h"
+#include "../main/screen_textentry.h"
+
 #ifndef NO_SDL
 #include "touchscreen.h"
 #endif
@@ -18,6 +22,26 @@ namespace Controls
 std::vector<InputMethod*> g_InputMethods;
 std::vector<InputMethodType*> g_InputMethodTypes;
 bool g_renderTouchscreen = false;
+
+void Hotkeys::Activate(size_t i)
+{
+    switch(i)
+    {
+        case Buttons::Fullscreen:
+        case Buttons::Screenshot:
+        case Buttons::RecordGif:
+        case Buttons::DebugInfo:
+            return;
+        case Buttons::EnterCheats:
+            TextEntryScreen::Init("Enter cheat:");
+            PauseGame(PauseCode::TextEntry, 0);
+            CheatString = TextEntryScreen::Text;
+            CheatCode(' ');
+            return;
+        default:
+            return;
+    }
+}
 
 /*====================================================*\
 || implementation for InputMethod                     ||

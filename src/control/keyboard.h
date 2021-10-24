@@ -65,7 +65,10 @@ class InputMethodType_Keyboard : public InputMethodType
 {
 private:
     bool m_canPoll = false;
+    // option
     int m_maxKeyboards = 2;
+    bool m_directText = true;
+
     int m_lastNumKeyboards = 0;
     bool m_touchscreenActive = false;
 

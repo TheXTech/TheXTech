@@ -830,7 +830,6 @@ int menuControls_Logic()
     bool rightPressed = SharedControls.MenuRight;
 
     bool menuDoPress = SharedControls.MenuDo;
-    // todo: integrate SharedCursor.Secondary soon!
     bool menuBackPress = SharedControls.MenuBack || (SharedCursor.Secondary && MenuMouseRelease);
 
     bool delPressed = false;
