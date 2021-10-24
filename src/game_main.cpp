@@ -20,8 +20,9 @@
 
 #ifndef NO_SDL
 #   include <SDL2/SDL_timer.h>
-#   if !defined(PGE_NO_THREADING) && defined(VITA)
-#       include <SDL2/SDL.h>
+#   if !defined(PGE_NO_THREADING) || defined(VITA)
+#       include <SDL2/SDL_atomic.h>
+#       include <SDL2/SDL_thread.h>
 #   endif
 #else
 #   include "SDL_supplement.h"

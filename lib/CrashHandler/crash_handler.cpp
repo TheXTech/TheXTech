@@ -691,7 +691,7 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
     }
 }
 
-#if !defined(_WIN32) || !defined(VITA)//Unsupported signals by Windows
+#if !defined(_WIN32) && !defined(VITA)//Unsupported signals by Windows
 static struct sigaction act;
 #else
 struct siginfo_t;
@@ -712,8 +712,9 @@ void CrashHandler::initSigs()
 
     std::set_new_handler(&crashByFlood);
     std::set_terminate(&crashByUnhandledException);
+
 #if !defined(_WIN32) && !defined(VITA)//Unsupported signals by Windows
-    memset(&act, 0, sizeof(struct sigaction));
+    SDL_memset(&act, 0, sizeof(struct sigaction));
     sigemptyset(&act.sa_mask);
     act.sa_sigaction = handle_signal;
     act.sa_flags = SA_SIGINFO;
