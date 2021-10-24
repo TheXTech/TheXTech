@@ -431,12 +431,19 @@ bool ProcessEvent(const SDL_Event* ev)
 //    a. May call or set changeScreen, frmMain.toggleGifRecorder, TakeScreen, g_stats.enabled, etc
 // 3. Calls the UpdateControlsPost hooks of loaded InputMethodTypes
 //    a. May call or set changeScreen, frmMain.toggleGifRecorder, TakeScreen, g_stats.enabled, etc
-//    b. If GameMenu or GameOutro is set, may update controls or Menu variables using hardcoded keys
+//    b. May update SharedControls or SharedCursor using hardcoded keys
 // 4. Updates speedrun and recording modules
 // 5. Resolves inconsistent control states (Left+Right, etc)
 bool Update()
 {
     bool okay = true;
+
+    // reset per-frame state for SharedCursor
+    SharedCursor.Move = false;
+    SharedCursor.Primary = false;
+    SharedCursor.Secondary = false;
+    SharedCursor.Tertiary = false;
+
     for(InputMethodType* type : g_InputMethodTypes)
     {
         type->UpdateControlsPre();
@@ -447,6 +454,8 @@ bool Update()
     for(size_t i = 0; i < maxLocalPlayers; i++)
     {
         Controls_t& controls = Player[i+1].Controls;
+        CursorControls_t& cursor = SharedCursor;
+        EditorControls_t& editor = ::EditorControls;
 
         controls = blankControls;
 
@@ -459,7 +468,7 @@ bool Update()
             // okay = false;
             continue;
         }
-        if(!method->Update(controls))
+        if(!method->Update(controls, cursor, editor))
         {
             okay = false;
             DeleteInputMethod(method);
@@ -472,6 +481,11 @@ bool Update()
     for(InputMethodType* type : g_InputMethodTypes)
     {
         type->UpdateControlsPost();
+    }
+
+    if(SharedCursor.Move && SharedCursor.X >= 0. && SharedCursor.Y >= 0.)
+    {
+        frmMain.PlaceMouse(SharedCursor.X, SharedCursor.Y);
     }
 
     // sync controls

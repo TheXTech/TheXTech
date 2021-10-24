@@ -521,22 +521,23 @@ void FrmMain::eventKeyUp(SDL_KeyboardEvent &evt)
 
 void FrmMain::eventMouseDown(SDL_MouseButtonEvent &event)
 {
+    return;
     if(Controls::g_renderTouchscreen && event.which == SDL_TOUCH_MOUSEID)
         return;
     if(event.button == SDL_BUTTON_LEFT)
     {
-        MenuMouseDown = true;
-        MenuMouseMove = true;
+        SharedCursor.Primary = true;
+        SharedCursor.Move = true;
         if(LevelEditor || MagicHand || TestLevel)
-            EditorControls.Mouse1 = true;
+            OldEditorControls.Mouse1 = true;
     }
     else if(event.button == SDL_BUTTON_RIGHT)
     {
-        MenuMouseBack = true;
+        SharedCursor.Secondary = true;
         if(LevelEditor || MagicHand || TestLevel)
         {
             optCursor.current = OptCursor_t::LVL_SELECT;
-            MouseMove(float(MenuMouseX), float(MenuMouseY));
+            MouseMove(float(SharedCursor.X), float(SharedCursor.Y));
             SetCursor();
         }
     }
@@ -545,7 +546,7 @@ void FrmMain::eventMouseDown(SDL_MouseButtonEvent &event)
         if(LevelEditor || MagicHand || TestLevel)
         {
             optCursor.current = OptCursor_t::LVL_ERASER;
-            MouseMove(float(MenuMouseX), float(MenuMouseY));
+            MouseMove(float(SharedCursor.X), float(SharedCursor.Y));
             SetCursor();
         }
     }
@@ -553,16 +554,17 @@ void FrmMain::eventMouseDown(SDL_MouseButtonEvent &event)
 
 void FrmMain::eventMouseMove(SDL_MouseMotionEvent &event)
 {
+    return;
     if(Controls::g_renderTouchscreen && event.which == SDL_TOUCH_MOUSEID)
     {
-        MenuMouseX = -100;
-        MenuMouseY = -100;
+        SharedCursor.X = -100;
+        SharedCursor.Y = -100;
         return;
     }
     SDL_Point p = MapToScr(event.x, event.y);
-    MenuMouseX = p.x;// int(event.x * ScreenW / ScaleWidth);
-    MenuMouseY = p.y;//int(event.y * ScreenH / ScaleHeight);
-    MenuMouseMove = true;
+    SharedCursor.X = p.x;// int(event.x * ScreenW / ScaleWidth);
+    SharedCursor.Y = p.y;//int(event.y * ScreenH / ScaleHeight);
+    SharedCursor.Move = true;
     if(LevelEditor || MagicHand || TestLevel)
     {
         EditorCursor.X = CursorPos.X;
@@ -574,13 +576,14 @@ void FrmMain::eventMouseMove(SDL_MouseMotionEvent &event)
 
 void FrmMain::eventMouseUp(SDL_MouseButtonEvent &event)
 {
+    return;
     if(Controls::g_renderTouchscreen && event.which == SDL_TOUCH_MOUSEID)
         return;
     bool doubleClick = false;
-    MenuMouseDown = false;
+    SharedCursor.Primary = false;
     MenuMouseRelease = true;
     if(LevelEditor || MagicHand || TestLevel)
-        EditorControls.Mouse1 = false;
+        OldEditorControls.Mouse1 = false;
 
     if(event.button == SDL_BUTTON_LEFT)
     {
@@ -1570,6 +1573,20 @@ SDL_Point FrmMain::MapToScr(int x, int y)
         static_cast<int>((static_cast<float>(x) - offset_x) / viewport_scale_x),
         static_cast<int>((static_cast<float>(y) - offset_y) / viewport_scale_y)
     };
+}
+
+void FrmMain::PlaceMouse(int scr_x, int scr_y)
+{
+    int old_window_x, old_window_y;
+    SDL_GetMouseState(&old_window_x, &old_window_y);
+    SDL_Point p = MapToScr(old_window_x, old_window_y);
+
+    if(p.x - scr_x < -2 || p.x - scr_x > 2 || p.y - scr_y < -2 || p.y - scr_y > 2)
+    {
+        int window_x = (float)scr_x * viewport_scale_x + offset_x;
+        int window_y = (float)scr_y * viewport_scale_y + offset_y;
+        SDL_WarpMouseInWindow(m_window, window_x, window_y);
+    }
 }
 
 void FrmMain::deleteTexture(StdPicture &tx, bool lazyUnload)

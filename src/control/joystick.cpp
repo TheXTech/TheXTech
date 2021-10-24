@@ -239,7 +239,7 @@ static bool s_bindControllerKey(SDL_GameController *ctrl, KM_Key &k)
 
 // Update functions that set player controls (and editor controls)
 // based on current device input. Return false if device lost.
-bool InputMethod_Joystick::Update(Controls_t& c)
+bool InputMethod_Joystick::Update(Controls_t& c, CursorControls_t& m, EditorControls_t& e)
 {
     InputMethodProfile_Joystick* p = dynamic_cast<InputMethodProfile_Joystick*>(this->Profile);
     if(!p || !this->m_devices)
@@ -409,7 +409,7 @@ void InputMethodProfile_Joystick::ExpandAsController()
     this->m_keys2[PlayerControls::Buttons::Right].assign(KM_Key::CtrlAxis, SDL_CONTROLLER_AXIS_LEFTX, 1);
 }
 
-bool InputMethodProfile_Joystick::PollPrimaryButton(size_t i)
+bool InputMethodProfile_Joystick::PollPrimaryButton(ControlsClass c, size_t i)
 {
     // note: m_canPoll is initialized to false
     InputMethodType_Joystick* t = dynamic_cast<InputMethodType_Joystick*>(this->Type);
@@ -465,7 +465,7 @@ bool InputMethodProfile_Joystick::PollPrimaryButton(size_t i)
     return true;
 }
 
-bool InputMethodProfile_Joystick::PollSecondaryButton(size_t i)
+bool InputMethodProfile_Joystick::PollSecondaryButton(ControlsClass c, size_t i)
 {
     // note: m_canPoll is initialized to false
     InputMethodType_Joystick* t = dynamic_cast<InputMethodType_Joystick*>(this->Type);
@@ -541,7 +541,7 @@ bool InputMethodProfile_Joystick::PollSecondaryButton(size_t i)
     return true;
 }
 
-bool InputMethodProfile_Joystick::DeleteSecondaryButton(size_t i)
+bool InputMethodProfile_Joystick::DeleteSecondaryButton(ControlsClass c, size_t i)
 {
     if(this->m_keys2[i].type != KM_Key::NoControl)
     {
@@ -610,12 +610,12 @@ static const char* s_nameButton(const KM_Key& k)
     return s_buttonNameBuffer;
 }
 
-const char* InputMethodProfile_Joystick::NamePrimaryButton(size_t i)
+const char* InputMethodProfile_Joystick::NamePrimaryButton(ControlsClass c, size_t i)
 {
     return s_nameButton(this->m_keys[i]);
 }
 
-const char* InputMethodProfile_Joystick::NameSecondaryButton(size_t i)
+const char* InputMethodProfile_Joystick::NameSecondaryButton(ControlsClass c, size_t i)
 {
     return s_nameButton(this->m_keys2[i]);
 }

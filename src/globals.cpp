@@ -235,8 +235,12 @@ RangeArrI<bool, 0, maxBlockType, false> BlockNoClipping;
 RangeArrI<int, 1, 10, 0> CoinFrame;
 RangeArrI<int, 1, 10, 0> CoinFrame2;
 EditorCursor_t EditorCursor;
+OldEditorControls_t OldEditorControls;
 EditorControls_t EditorControls;
 SharedControls_t SharedControls;
+
+CursorControls_t SharedCursor;
+// RangeArr<CursorControls_t, 1, maxLocalPlayers> PlayerCursor;
 
 RangeArrI<int, 1, numSounds, 0> Sound;
 RangeArrI<int, 1, numSounds, 0> SoundPause;
@@ -473,12 +477,12 @@ RangeArrI<int, 1, numCharacters, 0> GFXPlayerWidth;
 
 int PlayerCharacter = 0;
 int PlayerCharacter2 = 0;
-double MenuMouseX = 0.0;
-double MenuMouseY = 0.0;
-bool MenuMouseDown = false;
-bool MenuMouseBack = false;
+// double MenuMouseX = 0.0;
+// double MenuMouseY = 0.0;
+// bool MenuMouseDown = false;
+// bool MenuMouseBack = false;
 bool MenuMouseRelease = false;
-bool MenuMouseMove = false;
+// bool MenuMouseMove = false;
 bool MenuMouseClick = false;
 
 bool ForcedControls = false;

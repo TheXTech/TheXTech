@@ -475,6 +475,11 @@ void MenuLoop()
     if(MenuMode != MENU_CHARACTER_SELECT_NEW)
         Controls::PollInputMethod();
     Controls::Update();
+    if(!SharedCursor.Primary && !SharedCursor.Secondary)
+        MenuMouseRelease = true;
+    // replicates legacy behavior allowing clicks to be detected
+    if(SharedCursor.Primary || SharedCursor.Secondary || SharedCursor.Tertiary)
+        SharedCursor.Move = true;
 
     if(mainMenuUpdate())
         return;
@@ -493,11 +498,11 @@ void MenuLoop()
         UpdateEvents();
     }
 
-    if(MenuMouseDown)
+    if(SharedCursor.Primary)
     {
         if(dRand() * 100 > 40.0)
         {
-            NewEffect(80, newLoc(MenuMouseX - vScreenX[1], MenuMouseY - vScreenY[1]));
+            NewEffect(80, newLoc(SharedCursor.X - vScreenX[1], SharedCursor.Y - vScreenY[1]));
             Effect[numEffects].Location.SpeedX = dRand() * 4 - 2;
             Effect[numEffects].Location.SpeedY = dRand() * 4 - 2;
         }
@@ -506,13 +511,13 @@ void MenuLoop()
         {
             if(NPC[A].Active)
             {
-                if(CheckCollision(newLoc(MenuMouseX - vScreenX[1], MenuMouseY - vScreenY[1]), NPC[A].Location))
+                if(CheckCollision(newLoc(SharedCursor.X - vScreenX[1], SharedCursor.Y - vScreenY[1]), NPC[A].Location))
                 {
                     if(!NPCIsACoin[NPC[A].Type])
                     {
                         NPC[0] = NPC[A];
-                        NPC[0].Location.X = MenuMouseX - vScreenX[1];
-                        NPC[0].Location.Y = MenuMouseY - vScreenY[1];
+                        NPC[0].Location.X = SharedCursor.X - vScreenX[1];
+                        NPC[0].Location.Y = SharedCursor.Y - vScreenY[1];
                         NPCHit(A, 3, 0);
                     }
                     else
@@ -528,7 +533,7 @@ void MenuLoop()
         {
             if(!Block[A].Hidden)
             {
-                if(CheckCollision(newLoc(MenuMouseX - vScreenX[1], MenuMouseY - vScreenY[1]), Block[A].Location))
+                if(CheckCollision(newLoc(SharedCursor.X - vScreenX[1], SharedCursor.Y - vScreenY[1]), Block[A].Location))
                 {
                     BlockHit(A);
                     BlockHitHard(A);
@@ -537,15 +542,9 @@ void MenuLoop()
         }
     }
 
-    MenuMouseMove = false;
-    MenuMouseClick = false;
-
-    if(MenuMouseDown)
+    if(SharedCursor.Primary || SharedCursor.Secondary)
         MenuMouseRelease = false;
-    else
-        MenuMouseRelease = true;
-
-    MenuMouseBack = false;
+    MenuMouseClick = false;
 }
 
 void FindSaves()

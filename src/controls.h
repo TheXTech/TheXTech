@@ -42,6 +42,11 @@ extern std::vector<InputMethod*> g_InputMethods;
 extern std::vector<InputMethodType*> g_InputMethodTypes;
 extern bool g_renderTouchscreen;
 
+enum class ControlsClass
+{
+    Player, Cursor, Editor, Hotkey
+};
+
 // utility functions to access information from the Controls_t struct
 namespace PlayerControls
 {
@@ -148,6 +153,273 @@ namespace PlayerControls
     }
 } // namespace (Controls::)PlayerControls
 
+// utility functions to access information from the CursorControls_t struct
+// note that CursorX and CursorY are analogue and do not directly correspond with
+// the virtual buttons CursorUp, CursorDown, CursorLeft, and CursorRight
+namespace CursorControls
+{
+    // These attributes should be used by Input Methods and the game when possible
+    // to allow them to function even if the controls structures change.
+    static constexpr size_t n_buttons = 11;
+
+    // enumerate of the Cursor key indices (which are almost never used)
+    enum Buttons : size_t
+    {
+        CursorUp = 0, CursorDown, CursorLeft, CursorRight, Primary,
+        Secondary, Tertiary
+    };
+
+
+    // can be adapted for locale
+    inline const char* GetButtonName_INI(size_t i)
+    {
+        switch(i)
+        {
+            case Buttons::CursorUp:
+                return "cursor-up";
+            case Buttons::CursorDown:
+                return "scroll-down";
+            case Buttons::CursorLeft:
+                return "cursor-left";
+            case Buttons::CursorRight:
+                return "cursor-right";
+            case Buttons::Primary:
+                return "primary";
+            case Buttons::Secondary:
+                return "secondary";
+            case Buttons::Tertiary:
+                return "tertiary";
+            default:
+                return "NULL";
+        }
+    }
+
+    // can be adapted for locale
+    inline const char* GetButtonName_UI(size_t i)
+    {
+        switch(i)
+        {
+            case Buttons::CursorUp:
+                return "Cursor Up";
+            case Buttons::CursorDown:
+                return "Cursor Down";
+            case Buttons::CursorLeft:
+                return "Cursor Left";
+            case Buttons::CursorRight:
+                return "Cursor Right";
+            case Buttons::Primary:
+                return "Primary";
+            case Buttons::Secondary:
+                return "Secondary";
+            case Buttons::Tertiary:
+                return "Tertiary";
+            default:
+                return "NULL";
+        }
+    }
+
+    // convenience function for accessing a button index
+    inline bool& GetButton(CursorControls_t& c, size_t i)
+    {
+        switch(i)
+        {
+            case Buttons::Primary:
+                return c.Primary;
+            case Buttons::Secondary:
+                return c.Secondary;
+            case Buttons::Tertiary:
+                return c.Tertiary;
+            case Buttons::CursorUp:
+            case Buttons::CursorDown:
+            case Buttons::CursorLeft:
+            case Buttons::CursorRight:
+            default:
+                SDL_assert(false);
+                return c.Primary;
+        }
+    }
+} // namespace (Controls::)CursorControls
+
+// utility functions to access information from the EditorControls_t struct
+// note that ScrollUp, ScrollDown, ScrollLeft, and ScrollRight are analogue and are set separately
+namespace EditorControls
+{
+    // These attributes should be used by Input Methods and the game when possible
+    // to allow them to function even if the controls structures change.
+    static constexpr size_t n_buttons = 11;
+
+    // enumerate of the Player key indices (which are almost never used)
+    enum Buttons : size_t
+    {
+        ScrollUp = 0, ScrollDown, ScrollLeft, ScrollRight, FastScroll,
+        ModeSelect, ModeErase, NextSection, PrevSection, SwitchScreens, TestPlay
+    };
+
+
+    // can be adapted for locale
+    inline const char* GetButtonName_INI(size_t i)
+    {
+        switch(i)
+        {
+            case Buttons::ScrollUp:
+                return "scroll-up";
+            case Buttons::ScrollDown:
+                return "scroll-down";
+            case Buttons::ScrollLeft:
+                return "scroll-left";
+            case Buttons::ScrollRight:
+                return "scroll-right";
+            case Buttons::FastScroll:
+                return "fast-scroll";
+            case Buttons::ModeSelect:
+                return "mode-select";
+            case Buttons::ModeErase:
+                return "mode-erase";
+            case Buttons::NextSection:
+                return "next-section";
+            case Buttons::PrevSection:
+                return "prev-section";
+            case Buttons::SwitchScreens:
+                return "switch-screens";
+            case Buttons::TestPlay:
+                return "test-play";
+            default:
+                return "NULL";
+        }
+    }
+
+    // can be adapted for locale
+    inline const char* GetButtonName_UI(size_t i)
+    {
+        switch(i)
+        {
+            case Buttons::ScrollUp:
+                return "Scroll Up";
+            case Buttons::ScrollDown:
+                return "Scroll Down";
+            case Buttons::ScrollLeft:
+                return "Scroll Left";
+            case Buttons::ScrollRight:
+                return "Scroll Right";
+            case Buttons::FastScroll:
+                return "Fast Scroll";
+            case Buttons::ModeSelect:
+                return "Mode Select";
+            case Buttons::ModeErase:
+                return "Mode Erase";
+            case Buttons::NextSection:
+                return "Next Section";
+            case Buttons::PrevSection:
+                return "Prev Section";
+            case Buttons::SwitchScreens:
+                return "Switch Screens";
+            case Buttons::TestPlay:
+                return "Test Play";
+            default:
+                return "NULL";
+        }
+    }
+
+    // convenience function for accessing a button index
+    inline bool& GetButton(EditorControls_t& c, size_t i)
+    {
+        switch(i)
+        {
+            case Buttons::FastScroll:
+                return c.FastScroll;
+            case Buttons::ModeSelect:
+                return c.ModeSelect;
+            case Buttons::ModeErase:
+                return c.ModeErase;
+            case Buttons::NextSection:
+                return c.NextSection;
+            case Buttons::PrevSection:
+                return c.PrevSection;
+            case Buttons::SwitchScreens:
+                return c.SwitchScreens;
+            case Buttons::TestPlay:
+                return c.TestPlay;
+            case Buttons::ScrollUp:
+            case Buttons::ScrollDown:
+            case Buttons::ScrollLeft:
+            case Buttons::ScrollRight:
+            default:
+                SDL_assert(false);
+                return c.FastScroll;
+        }
+    }
+} // namespace (Controls::)EditorControls
+
+// utility functions to handle hotkeys. can accommodate new hotkeys.
+namespace Hotkeys
+{
+    // These attributes should be used by Input Methods and the game when possible
+    // to allow them to function even when hotkeys change / are added.
+    static constexpr size_t n_buttons = 5;
+
+    // enumerate of the Hotkey indices (which are almost never used)
+    enum Buttons : size_t
+    {
+        Fullscreen = 0, Screenshot, RecordGif, DebugInfo, EnterCheats
+    };
+
+
+    // can be adapted for locale
+    inline const char* GetButtonName_INI(size_t i)
+    {
+        switch(i)
+        {
+            case Buttons::Fullscreen:
+                return "fullscreen";
+            case Buttons::Screenshot:
+                return "screenshot";
+            case Buttons::RecordGif:
+                return "record-gif";
+            case Buttons::DebugInfo:
+                return "debug-info";
+            case Buttons::EnterCheats:
+                return "enter-cheats";
+            default:
+                return "NULL";
+        }
+    }
+
+    // can be adapted for locale
+    inline const char* GetButtonName_UI(size_t i)
+    {
+        switch(i)
+        {
+            case Buttons::Fullscreen:
+                return "Fullscreen";
+            case Buttons::Screenshot:
+                return "Screenshot";
+            case Buttons::RecordGif:
+                return "Record GIF";
+            case Buttons::DebugInfo:
+                return "Toggle Debug Info";
+            case Buttons::EnterCheats:
+                return "Enter Cheats";
+            default:
+                return "NULL";
+        }
+    }
+
+    // function for activating a hotkey
+    inline void Activate(size_t i)
+    {
+        switch(i)
+        {
+            case Buttons::Fullscreen:
+            case Buttons::Screenshot:
+            case Buttons::RecordGif:
+            case Buttons::DebugInfo:
+            case Buttons::EnterCheats:
+            default:
+                return;
+        }
+    }
+} // namespace (Controls::)Hotkeys
+
 // information about a particular bound input method
 struct StatusInfo
 {
@@ -180,10 +452,12 @@ public:
 
     virtual ~InputMethod();
 
-    // Update functions that set player controls (and editor controls)
-    // based on current device input. Return false if device lost.
-    virtual bool Update(Controls_t& c) = 0;
-    // virtual bool Update(EditorControls_t& c) = 0;
+    // Update function that sets player controls, cursor controls, and editor controls,
+    // as well as optionally processing hotkeys, based on current device input.
+    // Remember that hotkeys should only process once per hotkey press, so it may be easier
+    // to put them in ConsumeEvent.
+    // Return false if device lost.
+    virtual bool Update(Controls_t& c, CursorControls_t& m, EditorControls_t& e) = 0;
 
     virtual void Rumble(int ms, float strength) = 0;
 
@@ -224,19 +498,22 @@ public:
     /*-------------------------*\
     || PURE VIRTUAL FUNCTIONS  ||
     \*-------------------------*/
-    // Polls a new primary/secondary device button for the i'th player button
-    // Returns true on success and false if no button pressed
+    // Polls a new primary/secondary device button for the i'th button of class c
+    // Returns true on success and false if no button currently pressed
     // Never allows two player buttons to bind to the same device button
     // Expected to use ALL of the devices available to the InputMethodType
-    virtual bool PollPrimaryButton(size_t i) = 0;
-    virtual bool PollSecondaryButton(size_t i) = 0;
+    virtual bool PollPrimaryButton(ControlsClass c, size_t i) = 0;
+    virtual bool PollSecondaryButton(ControlsClass c, size_t i) = 0;
 
-    // Deletes a secondary device button for the i'th player button
-    virtual bool DeleteSecondaryButton(size_t i) = 0;
+    // Deletes a primary button for the i'th button of class c (only called for non-Player buttons)
+    inline bool DeletePrimaryButton(ControlsClass c, size_t i) {return false;};
 
-    // Gets strings for the device buttons currently used for the i'th player button
-    virtual const char* NamePrimaryButton(size_t i) = 0;
-    virtual const char* NameSecondaryButton(size_t i) = 0;
+    // Deletes a secondary device button for the i'th button of class c
+    virtual bool DeleteSecondaryButton(ControlsClass c, size_t i) = 0;
+
+    // Gets strings for the device buttons currently used for the i'th button of class c
+    virtual const char* NamePrimaryButton(ControlsClass c, size_t i) = 0;
+    virtual const char* NameSecondaryButton(ControlsClass c, size_t i) = 0;
 
     // assume that the IniProcessing* is already in the correct group
     virtual void SaveConfig(IniProcessing* ctl) = 0;
@@ -317,6 +594,7 @@ public:
     virtual void UpdateControlsPre() = 0;
     // Do post-update calls to global methods,
     //     emergency sets of the menu controls, etc.
+    // This is where shared controls should be modified.
     virtual void UpdateControlsPost() = 0;
 
     // null if no new input method is ready

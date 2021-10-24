@@ -254,11 +254,11 @@ static void s_handleMouseMove(int items, int x, int y, int maxWidth, int itemHei
 {
     For(A, 0, items)
     {
-        if(MenuMouseY >= y + A * itemHeight && MenuMouseY <= y + 16 + A * itemHeight)
+        if(SharedCursor.Y >= y + A * itemHeight && SharedCursor.Y <= y + 16 + A * itemHeight)
         {
-            if(MenuMouseX >= x && MenuMouseX <= x + maxWidth)
+            if(SharedCursor.X >= x && SharedCursor.X <= x + maxWidth)
             {
-                if(MenuMouseRelease && MenuMouseDown)
+                if(MenuMouseRelease && SharedCursor.Primary)
                     MenuMouseClick = true;
                 if(MenuCursor != A)
                 {
@@ -300,6 +300,8 @@ bool mainMenuUpdate()
         leftPressed |= c.Left;
         rightPressed |= c.Right;
     }
+
+    menuBackPress |= SharedCursor.Secondary && MenuMouseRelease;
 
     {
         if(frmMain.MousePointer != 99)
@@ -376,11 +378,11 @@ bool mainMenuUpdate()
         // Main Menu
         else if(MenuMode == MENU_MAIN)
         {
-            if(MenuMouseMove)
+            if(SharedCursor.Move)
             {
                 For(A, 0, 10)
                 {
-                    if(MenuMouseY >= 350 + A * 30 && MenuMouseY <= 366 + A * 30)
+                    if(SharedCursor.Y >= 350 + A * 30 && SharedCursor.Y <= 366 + A * 30)
                     {
                         int i = 0;
                         if(g_config.LegacyPlayerSelect && A == i++)
@@ -398,9 +400,9 @@ bool mainMenuUpdate()
                         else
                             break;
 
-                        if(MenuMouseX >= 300 && MenuMouseX <= 300 + menuLen)
+                        if(SharedCursor.X >= 300 && SharedCursor.X <= 300 + menuLen)
                         {
-                            if(MenuMouseRelease && MenuMouseDown)
+                            if(MenuMouseRelease && SharedCursor.Primary)
                                 MenuMouseClick = true;
 
                             if(MenuCursor != A)
@@ -551,7 +553,7 @@ bool mainMenuUpdate()
                 MenuMode == MENU_CHARACTER_SELECT_BM_S1 ||
                 MenuMode == MENU_CHARACTER_SELECT_BM_S2)
         {
-            if(MenuMouseMove)
+            if(SharedCursor.Move)
             {
                 B = 0;
                 For(A, 0, 4)
@@ -562,7 +564,7 @@ bool mainMenuUpdate()
                     }
                     else
                     {
-                        if(MenuMouseY >= 350 + A * 30 + B && MenuMouseY <= 366 + A * 30 + B)
+                        if(SharedCursor.Y >= 350 + A * 30 + B && SharedCursor.Y <= 366 + A * 30 + B)
                         {
                             if(A >= 0 && A < numCharacters)
                             {
@@ -575,9 +577,9 @@ bool mainMenuUpdate()
                                 menuLen = 180;
                             }
 
-                            if(MenuMouseX >= 300 && MenuMouseX <= 300 + menuLen)
+                            if(SharedCursor.X >= 300 && SharedCursor.X <= 300 + menuLen)
                             {
-                                if(MenuMouseRelease && MenuMouseDown)
+                                if(MenuMouseRelease && SharedCursor.Primary)
                                     MenuMouseClick = true;
                                 if(MenuCursor != A)
                                 {
@@ -600,9 +602,9 @@ bool mainMenuUpdate()
                 }
             }
 
-            if(MenuCursorCanMove || MenuMouseClick || MenuMouseBack)
+            if(MenuCursorCanMove || MenuMouseClick)
             {
-                if(menuBackPress || MenuMouseBack)
+                if(menuBackPress)
                 {
                     if(MenuMode == MENU_CHARACTER_SELECT_2P_S2)
                     {
@@ -725,23 +727,23 @@ bool mainMenuUpdate()
         {
             if(ScrollDelay > 0)
             {
-                MenuMouseMove = true;
+                SharedCursor.Move = true;
                 ScrollDelay = ScrollDelay - 1;
             }
 
-            if(MenuMouseMove)
+            if(SharedCursor.Move)
             {
                 B = 0;
 
                 For(A, minShow - 1, maxShow - 1)
                 {
-                    if(MenuMouseY >= 350 + B * 30 && MenuMouseY <= 366 + B * 30)
+                    if(SharedCursor.Y >= 350 + B * 30 && SharedCursor.Y <= 366 + B * 30)
                     {
                         menuLen = 19 * static_cast<int>(SelectWorld[A + 1].WorldName.size());
 
-                        if(MenuMouseX >= 300 && MenuMouseX <= 300 + menuLen)
+                        if(SharedCursor.X >= 300 && SharedCursor.X <= 300 + menuLen)
                         {
-                            if(MenuMouseRelease && MenuMouseDown)
+                            if(MenuMouseRelease && SharedCursor.Primary)
                                 MenuMouseClick = true;
 
                             if(MenuCursor != A && ScrollDelay == 0)
@@ -757,9 +759,9 @@ bool mainMenuUpdate()
                 }
             }
 
-            if(MenuCursorCanMove || MenuMouseClick || MenuMouseBack)
+            if(MenuCursorCanMove || MenuMouseClick)
             {
-                if(menuBackPress || MenuMouseBack)
+                if(menuBackPress)
                 {
                     MenuCursor = MenuMode - 1;
 
@@ -832,12 +834,12 @@ bool mainMenuUpdate()
         // Save Select
         else if(MenuMode == MENU_SELECT_SLOT_1P || MenuMode == MENU_SELECT_SLOT_2P)
         {
-            if(MenuMouseMove)
+            if(SharedCursor.Move)
                 s_handleMouseMove(4, 300, 350, 300, 30);
 
-            if(MenuCursorCanMove || MenuMouseClick || MenuMouseBack)
+            if(MenuCursorCanMove || MenuMouseClick)
             {
-                if(menuBackPress || MenuMouseBack)
+                if(menuBackPress)
                 {
 //'save select back
                     if(g_config.LegacyPlayerSelect)
@@ -919,12 +921,12 @@ bool mainMenuUpdate()
         else if(MenuMode == MENU_SELECT_SLOT_1P_COPY_S1 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S1 ||
                 MenuMode == MENU_SELECT_SLOT_1P_COPY_S2 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S2)
         {
-            if(MenuMouseMove)
+            if(SharedCursor.Move)
                 s_handleMouseMove(2, 300, 350, 300, 30);
 
-            if(MenuCursorCanMove || MenuMouseClick || MenuMouseBack)
+            if(MenuCursorCanMove || MenuMouseClick)
             {
-                if(menuBackPress || MenuMouseBack)
+                if(menuBackPress)
                 {
 //'save select back
                     if(MenuMode == MENU_SELECT_SLOT_1P_COPY_S2 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S2)
@@ -986,12 +988,12 @@ bool mainMenuUpdate()
         // Delete gamesave
         else if(MenuMode == MENU_SELECT_SLOT_1P_DELETE || MenuMode == MENU_SELECT_SLOT_1P_DELETE)
         {
-            if(MenuMouseMove)
+            if(SharedCursor.Move)
                 s_handleMouseMove(2, 300, 350, 300, 30);
 
-            if(MenuCursorCanMove || MenuMouseClick || MenuMouseBack)
+            if(MenuCursorCanMove || MenuMouseClick)
             {
-                if(menuBackPress || MenuMouseBack)
+                if(menuBackPress)
                 {
 //'save select back
                     MenuMode -= MENU_SELECT_SLOT_DELETE_ADD;
@@ -1026,11 +1028,11 @@ bool mainMenuUpdate()
             const int optionsMenuLength = 1;
 #endif
 
-            if(MenuMouseMove)
+            if(SharedCursor.Move)
             {
                 For(A, 0, optionsMenuLength)
                 {
-                    if(MenuMouseY >= 350 + A * 30 && MenuMouseY <= 366 + A * 30)
+                    if(SharedCursor.Y >= 350 + A * 30 && SharedCursor.Y <= 366 + A * 30)
                     {
                         int i = 0;
                         if(A == i++)
@@ -1047,9 +1049,9 @@ bool mainMenuUpdate()
                         else
                             menuLen = 18 * std::strlen("view credits") - 2;
 
-                        if(MenuMouseX >= 300 && MenuMouseX <= 300 + menuLen)
+                        if(SharedCursor.X >= 300 && SharedCursor.X <= 300 + menuLen)
                         {
-                            if(MenuMouseRelease && MenuMouseDown)
+                            if(MenuMouseRelease && SharedCursor.Primary)
                                 MenuMouseClick = true;
 
                             if(MenuCursor != A)
@@ -1062,9 +1064,9 @@ bool mainMenuUpdate()
                 }
             }
 
-            if(MenuCursorCanMove || MenuMouseClick || MenuMouseBack)
+            if(MenuCursorCanMove || MenuMouseClick)
             {
-                if(menuBackPress || MenuMouseBack)
+                if(menuBackPress)
                 {
                     int optionsIndex;
                     if(g_config.LegacyPlayerSelect)
@@ -1478,5 +1480,5 @@ void mainMenuDraw()
     }
 
     // Mouse cursor
-    frmMain.renderTexture(int(MenuMouseX), int(MenuMouseY), GFX.ECursor[2]);
+    frmMain.renderTexture(int(SharedCursor.X), int(SharedCursor.Y), GFX.ECursor[2]);
 }

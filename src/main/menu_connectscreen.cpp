@@ -569,7 +569,7 @@ bool Player_MouseItem(int p, int i)
         s_menuItem[p] = i;
     }
 
-    if(MenuMouseRelease && MenuMouseDown)
+    if(MenuMouseRelease && SharedCursor.Primary)
     {
         MenuMouseRelease = false;
         return Player_Select(p);
@@ -583,8 +583,8 @@ bool Player_MenuItem_Mouse_Render(int p, int i, const std::string& label, int X,
     if(mouse)
     {
         int menuLen = label.size() * 18;
-        if(MenuMouseX >= X && MenuMouseX <= X + menuLen
-            && MenuMouseY >= Y && MenuMouseY <= Y + 16)
+        if(SharedCursor.X >= X && SharedCursor.X <= X + menuLen
+            && SharedCursor.Y >= Y && SharedCursor.Y <= Y + 16)
         {
             return Player_MouseItem(p, i);
         }
@@ -792,13 +792,13 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pW, int sY, int line, bool m
     }
     if(mouse)
     {
-        if(MenuMouseX >= pX && MenuMouseX <= pX+pW)
+        if(SharedCursor.X >= pX && SharedCursor.X <= pX+pW)
         {
-            if(MenuMouseY >= sY+11*line && MenuMouseY <= sY+11*line + 16)
+            if(SharedCursor.Y >= sY+11*line && SharedCursor.Y <= sY+11*line + 16)
                 ret |= Player_MouseItem(p, -3);
-            if(MenuMouseY >= sY+12*line && MenuMouseY <= sY+12*line + 16)
+            if(SharedCursor.Y >= sY+12*line && SharedCursor.Y <= sY+12*line + 16)
                 ret |= Player_MouseItem(p, -2);
-            if(MenuMouseY >= sY+13*line && MenuMouseY <= sY+13*line + 16)
+            if(SharedCursor.Y >= sY+13*line && SharedCursor.Y <= sY+13*line + 16)
                 ret |= Player_MouseItem(p, -1);
         }
     }
@@ -807,7 +807,7 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pW, int sY, int line, bool m
 
 int Mouse_Render(bool mouse, bool render)
 {
-    if(mouse && !MenuMouseMove && !render && !MenuMouseDown)
+    if(mouse && !SharedCursor.Move && !render && !SharedCursor.Primary)
         return 0;
 
     int n = Controls::g_InputMethods.size();
@@ -912,7 +912,7 @@ int Mouse_Render(bool mouse, bool render)
     {
         if(render)
             SuperPrintScreenCenter(g_mainMenu.playerSelStartGame, 3, sY+14*line);
-        if(mouse && MenuMouseRelease && MenuMouseDown)
+        if(mouse && MenuMouseRelease && SharedCursor.Primary)
         {
             PlaySoundMenu(SFX_Do);
             MenuMouseRelease = false;

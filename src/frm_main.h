@@ -251,7 +251,9 @@ private:
     int viewport_w = 0;
     int viewport_h = 0;
 
+public:
     SDL_Point MapToScr(int x, int y);
+    void PlaceMouse(int scr_x, int scr_y);
 };
 
 #endif // FRMMAIN_H

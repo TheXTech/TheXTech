@@ -38,7 +38,7 @@ namespace Controls
 
 // Update functions that set player controls (and editor controls)
 // based on current device input. Return false if device lost.
-bool InputMethod_Duplicate::Update(Controls_t& c)
+bool InputMethod_Duplicate::Update(Controls_t& c, CursorControls_t& m, EditorControls_t& e)
 {
     if(this->player_no < 1 || this->player_no > maxLocalPlayers)
         return false;
@@ -65,31 +65,31 @@ InputMethodProfile_Duplicate::InputMethodProfile_Duplicate()
 {
 }
 
-bool InputMethodProfile_Duplicate::PollPrimaryButton(size_t i)
+bool InputMethodProfile_Duplicate::PollPrimaryButton(ControlsClass c, size_t i)
 {
     (void)i;
     return true;
 }
 
-bool InputMethodProfile_Duplicate::PollSecondaryButton(size_t i)
+bool InputMethodProfile_Duplicate::PollSecondaryButton(ControlsClass c, size_t i)
 {
     (void)i;
     return true;
 }
 
-bool InputMethodProfile_Duplicate::DeleteSecondaryButton(size_t i)
+bool InputMethodProfile_Duplicate::DeleteSecondaryButton(ControlsClass c, size_t i)
 {
     (void)i;
     return true;
 }
 
-const char* InputMethodProfile_Duplicate::NamePrimaryButton(size_t i)
+const char* InputMethodProfile_Duplicate::NamePrimaryButton(ControlsClass c, size_t i)
 {
     (void)i;
     return "(DUP)";
 }
 
-const char* InputMethodProfile_Duplicate::NameSecondaryButton(size_t i)
+const char* InputMethodProfile_Duplicate::NameSecondaryButton(ControlsClass c, size_t i)
 {
     (void)i;
     return "";

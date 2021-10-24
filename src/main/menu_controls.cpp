@@ -22,7 +22,7 @@ static bool s_deleteProfileSel = false;
 
 int menuControls_Mouse_Render(bool mouse, bool render)
 {
-    if(mouse && !MenuMouseMove && !render && !MenuMouseDown)
+    if(mouse && !SharedCursor.Move && !render && !SharedCursor.Primary)
         return 0;
 
     const int n_types = Controls::g_InputMethodTypes.size();
@@ -98,8 +98,8 @@ int menuControls_Mouse_Render(bool mouse, bool render)
         {
             // collision and click handling for "NO"
             int menuLen = g_mainMenu.wordNo.size() * 18;
-            if(MenuMouseX >= sX+width/4 && MenuMouseX <= sX+width/4 + menuLen
-                && MenuMouseY >= sY+line*3 && MenuMouseY <= sY+line*3 + 16)
+            if(SharedCursor.X >= sX+width/4 && SharedCursor.X <= sX+width/4 + menuLen
+                && SharedCursor.Y >= sY+line*3 && SharedCursor.Y <= sY+line*3 + 16)
             {
                 if(MenuCursor != 0)
                 {
@@ -107,7 +107,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
                     MenuCursor = 0;
                 }
 
-                if(MenuMouseRelease && MenuMouseDown)
+                if(MenuMouseRelease && SharedCursor.Primary)
                 {
                     PlaySoundMenu(SFX_Slide);
                     s_deleteProfileSel = false;
@@ -118,8 +118,8 @@ int menuControls_Mouse_Render(bool mouse, bool render)
             }
             // collision and click handling for "YES"
             menuLen = g_mainMenu.wordYes.size() * 18;
-            if(MenuMouseX >= sX+width/4 && MenuMouseX <= sX+width/4 + menuLen
-                && MenuMouseY >= sY+line*4 && MenuMouseY <= sY+line*4 + 16)
+            if(SharedCursor.X >= sX+width/4 && SharedCursor.X <= sX+width/4 + menuLen
+                && SharedCursor.Y >= sY+line*4 && SharedCursor.Y <= sY+line*4 + 16)
             {
                 if(MenuCursor != 1)
                 {
@@ -127,7 +127,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
                     MenuCursor = 1;
                 }
 
-                if(MenuMouseRelease && MenuMouseDown)
+                if(MenuMouseRelease && SharedCursor.Primary)
                 {
                     if(profile && type->DeleteProfile(profile, Controls::g_InputMethods))
                     {
@@ -190,8 +190,8 @@ int menuControls_Mouse_Render(bool mouse, bool render)
                     frmMain.renderTexture(sX + 24, sY+(3+i)*line, GFX.MCursor[0]);
             }
             int item_width = Controls::g_InputMethodTypes[scroll_start + i]->Name.size()*18;
-            if(mouse && MenuMouseX >= sX+48 && MenuMouseX <= sX+48 + item_width
-                && MenuMouseY >= sY+(3+i)*line && MenuMouseY <= sY+(3+i)*line + 16)
+            if(mouse && SharedCursor.X >= sX+48 && SharedCursor.X <= sX+48 + item_width
+                && SharedCursor.Y >= sY+(3+i)*line && SharedCursor.Y <= sY+(3+i)*line + 16)
             {
                 if(MenuCursor != scroll_start + i)
                 {
@@ -199,7 +199,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
                     MenuCursor = scroll_start + i;
                 }
 
-                if(MenuMouseRelease && MenuMouseDown)
+                if(MenuMouseRelease && SharedCursor.Primary)
                 {
                     PlaySoundMenu(SFX_Do);
                     s_curType = MenuCursor;
@@ -351,8 +351,8 @@ int menuControls_Mouse_Render(bool mouse, bool render)
                         item_width = g_mainMenu.controlsNewProfile.size()*18;
                     else
                         item_width = profiles[i]->Name.size()*18;
-                    if(MenuMouseX >= sX+48 && MenuMouseX <= sX+48 + item_width
-                        && MenuMouseY >= start_y + (i+1-scroll_start)*line && MenuMouseY <= start_y + (i+1-scroll_start)*line + 16)
+                    if(SharedCursor.X >= sX+48 && SharedCursor.X <= sX+48 + item_width
+                        && SharedCursor.Y >= start_y + (i+1-scroll_start)*line && SharedCursor.Y <= start_y + (i+1-scroll_start)*line + 16)
                     {
                         if(MenuCursor != i)
                         {
@@ -360,7 +360,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
                             MenuCursor = i;
                         }
 
-                        if(MenuMouseRelease && MenuMouseDown)
+                        if(MenuMouseRelease && SharedCursor.Primary)
                         {
                             if(MenuCursor != n_profiles)
                             {
@@ -409,8 +409,8 @@ int menuControls_Mouse_Render(bool mouse, bool render)
                 if(mouse && value)
                 {
                     int item_width = strlen(value)*18;
-                    if(MenuMouseX >= sX+48 && MenuMouseX <= sX+48 + item_width
-                        && MenuMouseY >= start_y + (o_base + 2*i + 1 - scroll_start)*line && MenuMouseY <= start_y + (o_base + 2*i + 1 - scroll_start)*line + 16)
+                    if(SharedCursor.X >= sX+48 && SharedCursor.X <= sX+48 + item_width
+                        && SharedCursor.Y >= start_y + (o_base + 2*i + 1 - scroll_start)*line && SharedCursor.Y <= start_y + (o_base + 2*i + 1 - scroll_start)*line + 16)
                     {
                         if(MenuCursor != i + n_profiles + 1)
                         {
@@ -418,7 +418,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
                             MenuCursor = i + n_profiles + 1;
                         }
 
-                        if(MenuMouseRelease && MenuMouseDown)
+                        if(MenuMouseRelease && SharedCursor.Primary)
                         {
                             PlaySoundMenu(SFX_Do);
                             type->OptionChange(i);
@@ -443,8 +443,8 @@ int menuControls_Mouse_Render(bool mouse, bool render)
                 }
                 if(mouse)
                 {
-                    if(MenuMouseX >= sX+48 && MenuMouseX <= sX+width-32
-                        && MenuMouseY >= start_y + (o_base + i - scroll_start)*line && MenuMouseY <= start_y + (o_base + i - scroll_start)*line + 16)
+                    if(SharedCursor.X >= sX+48 && SharedCursor.X <= sX+width-32
+                        && SharedCursor.Y >= start_y + (o_base + i - scroll_start)*line && SharedCursor.Y <= start_y + (o_base + i - scroll_start)*line + 16)
                     {
                         if(MenuCursor != i + n_profiles + 1)
                         {
@@ -452,7 +452,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
                             MenuCursor = i + n_profiles + 1;
                         }
 
-                        if(MenuMouseRelease && MenuMouseDown)
+                        if(MenuMouseRelease && SharedCursor.Primary)
                         {
                             PlaySoundMenu(SFX_Do);
                             type->OptionChange(i);
@@ -577,11 +577,11 @@ int menuControls_Mouse_Render(bool mouse, bool render)
                     if(MenuCursor == i && !s_secondaryInput && g_pollingInput)
                         SuperPrint("...", 3, sX+32, start_y+(b_base+2*i+1 - scroll_start)*line);
                     else
-                        SuperPrint(profile->NamePrimaryButton(i), 3, sX+32, start_y+(b_base+2*i+1 - scroll_start)*line);
+                        SuperPrint(profile->NamePrimaryButton(Controls::ControlsClass::Player, i), 3, sX+32, start_y+(b_base+2*i+1 - scroll_start)*line);
                     if(MenuCursor == i && s_secondaryInput && g_pollingInput)
                         SuperPrint("...", 3, sX+32+(width-32)/2, start_y+(b_base+2*i+1 - scroll_start)*line);
                     else
-                        SuperPrint(profile->NameSecondaryButton(i), 3, sX+32+(width-32)/2, start_y+(b_base+2*i+1 - scroll_start)*line);
+                        SuperPrint(profile->NameSecondaryButton(Controls::ControlsClass::Player, i), 3, sX+32+(width-32)/2, start_y+(b_base+2*i+1 - scroll_start)*line);
                     if(MenuCursor == i)
                     {
                         if(!s_secondaryInput)
@@ -599,11 +599,11 @@ int menuControls_Mouse_Render(bool mouse, bool render)
                     if(MenuCursor == i && !s_secondaryInput && g_pollingInput)
                         SuperPrint("...", 3, sX+width-420, start_y+(b_base+i - scroll_start)*line);
                     else
-                        SuperPrint(profile->NamePrimaryButton(i), 3, sX+width-420, start_y+(b_base+i - scroll_start)*line);
+                        SuperPrint(profile->NamePrimaryButton(Controls::ControlsClass::Player, i), 3, sX+width-420, start_y+(b_base+i - scroll_start)*line);
                     if(MenuCursor == i && s_secondaryInput && g_pollingInput)
                         SuperPrint("...", 3, sX+width-210, start_y+(b_base+i - scroll_start)*line);
                     else
-                        SuperPrint(profile->NameSecondaryButton(i), 3, sX+width-210, start_y+(b_base+i - scroll_start)*line);
+                        SuperPrint(profile->NameSecondaryButton(Controls::ControlsClass::Player, i), 3, sX+width-210, start_y+(b_base+i - scroll_start)*line);
                     if(MenuCursor == i)
                     {
                         if(!s_secondaryInput)
@@ -615,13 +615,13 @@ int menuControls_Mouse_Render(bool mouse, bool render)
             }
             if(mouse && !g_pollingInput)
             {
-                int primary_width = strlen(profile->NamePrimaryButton(i))*18;
+                int primary_width = strlen(profile->NamePrimaryButton(Controls::ControlsClass::Player, i))*18;
                 if(primary_width < 72)
                     primary_width = 72;
-                if((double_line && MenuMouseX >= sX+32 && MenuMouseX <= sX+32+primary_width
-                    && MenuMouseY >= start_y + (b_base + 2*i+1 - scroll_start)*line && MenuMouseY <= start_y + (b_base + 2*i+1 - scroll_start)*line + 16)
-                    || (!double_line && MenuMouseX >= sX+width-420 && MenuMouseX <= sX+width-420+primary_width
-                    && MenuMouseY >= start_y + (b_base + i - scroll_start)*line && MenuMouseY <= start_y + (b_base + i - scroll_start)*line + 16))
+                if((double_line && SharedCursor.X >= sX+32 && SharedCursor.X <= sX+32+primary_width
+                    && SharedCursor.Y >= start_y + (b_base + 2*i+1 - scroll_start)*line && SharedCursor.Y <= start_y + (b_base + 2*i+1 - scroll_start)*line + 16)
+                    || (!double_line && SharedCursor.X >= sX+width-420 && SharedCursor.X <= sX+width-420+primary_width
+                    && SharedCursor.Y >= start_y + (b_base + i - scroll_start)*line && SharedCursor.Y <= start_y + (b_base + i - scroll_start)*line + 16))
                 {
                     if(MenuCursor != i || s_secondaryInput)
                     {
@@ -630,7 +630,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
                         s_secondaryInput = false;
                     }
 
-                    if(MenuMouseRelease && MenuMouseDown)
+                    if(MenuMouseRelease && SharedCursor.Primary)
                     {
                         PlaySoundMenu(SFX_PSwitch);
                         g_pollingInput = true;
@@ -639,13 +639,13 @@ int menuControls_Mouse_Render(bool mouse, bool render)
                         return 0;
                     }
                 }
-                int secondary_width = strlen(profile->NameSecondaryButton(i))*18;
+                int secondary_width = strlen(profile->NameSecondaryButton(Controls::ControlsClass::Player, i))*18;
                 if(secondary_width < 72)
                     secondary_width = 72;
-                if((double_line && MenuMouseX >= sX+32+(width-32)/2 && MenuMouseX <= sX+32+(width-32)/2+secondary_width
-                    && MenuMouseY >= start_y + (b_base + 2*i+1 - scroll_start)*line && MenuMouseY <= start_y + (b_base + 2*i+1 - scroll_start)*line + 16)
-                    || (!double_line && MenuMouseX >= sX+width-210 && MenuMouseX <= sX+width-210+secondary_width
-                    && MenuMouseY >= start_y + (b_base + i - scroll_start)*line && MenuMouseY <= start_y + (b_base + i - scroll_start)*line + 16))
+                if((double_line && SharedCursor.X >= sX+32+(width-32)/2 && SharedCursor.X <= sX+32+(width-32)/2+secondary_width
+                    && SharedCursor.Y >= start_y + (b_base + 2*i+1 - scroll_start)*line && SharedCursor.Y <= start_y + (b_base + 2*i+1 - scroll_start)*line + 16)
+                    || (!double_line && SharedCursor.X >= sX+width-210 && SharedCursor.X <= sX+width-210+secondary_width
+                    && SharedCursor.Y >= start_y + (b_base + i - scroll_start)*line && SharedCursor.Y <= start_y + (b_base + i - scroll_start)*line + 16))
                 {
                     if(MenuCursor != i || !s_secondaryInput)
                     {
@@ -654,7 +654,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
                         s_secondaryInput = true;
                     }
 
-                    if(MenuMouseRelease && MenuMouseDown)
+                    if(MenuMouseRelease && SharedCursor.Primary)
                     {
                         PlaySoundMenu(SFX_PSwitch);
                         g_pollingInput = true;
@@ -703,8 +703,8 @@ int menuControls_Mouse_Render(bool mouse, bool render)
                 if(mouse && value)
                 {
                     int item_width = strlen(value)*18;
-                    if(MenuMouseX >= sX+48 && MenuMouseX <= sX+48 + item_width
-                        && MenuMouseY >= start_y + (o_base + 2*i + 1 - scroll_start)*line && MenuMouseY <= start_y + (o_base + 2*i + 1 - scroll_start)*line + 16)
+                    if(SharedCursor.X >= sX+48 && SharedCursor.X <= sX+48 + item_width
+                        && SharedCursor.Y >= start_y + (o_base + 2*i + 1 - scroll_start)*line && SharedCursor.Y <= start_y + (o_base + 2*i + 1 - scroll_start)*line + 16)
                     {
                         if(MenuCursor != i + n_playerButtons)
                         {
@@ -712,7 +712,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
                             MenuCursor = i + n_playerButtons;
                         }
 
-                        if(MenuMouseRelease && MenuMouseDown)
+                        if(MenuMouseRelease && SharedCursor.Primary)
                         {
                             PlaySoundMenu(SFX_Do);
                             type->OptionChange(i);
@@ -737,8 +737,8 @@ int menuControls_Mouse_Render(bool mouse, bool render)
                 }
                 if(mouse)
                 {
-                    if(MenuMouseX >= sX+48 && MenuMouseX <= sX+width-32
-                        && MenuMouseY >= start_y + (o_base + i - scroll_start)*line && MenuMouseY <= start_y + (o_base + i - scroll_start)*line + 16)
+                    if(SharedCursor.X >= sX+48 && SharedCursor.X <= sX+width-32
+                        && SharedCursor.Y >= start_y + (o_base + i - scroll_start)*line && SharedCursor.Y <= start_y + (o_base + i - scroll_start)*line + 16)
                     {
                         if(MenuCursor != i + n_playerButtons)
                         {
@@ -746,7 +746,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
                             MenuCursor = i + n_playerButtons;
                         }
 
-                        if(MenuMouseRelease && MenuMouseDown)
+                        if(MenuMouseRelease && SharedCursor.Primary)
                         {
                             PlaySoundMenu(SFX_Do);
                             type->OptionChange(i);
@@ -795,8 +795,8 @@ int menuControls_Logic()
             return 0;
         }
 
-        if((!s_secondaryInput && profile->PollPrimaryButton(MenuCursor))
-            || (s_secondaryInput && profile->PollSecondaryButton(MenuCursor)))
+        if((!s_secondaryInput && profile->PollPrimaryButton(Controls::ControlsClass::Player, MenuCursor))
+            || (s_secondaryInput && profile->PollSecondaryButton(Controls::ControlsClass::Player, MenuCursor)))
         {
             g_pollingInput = false;
             MenuCursorCanMove = false;
@@ -830,8 +830,8 @@ int menuControls_Logic()
     bool rightPressed = SharedControls.MenuRight;
 
     bool menuDoPress = SharedControls.MenuDo;
-    // todo: integrate MenuMouseBack soon!
-    bool menuBackPress = SharedControls.MenuBack || MenuMouseBack;
+    // todo: integrate SharedCursor.Secondary soon!
+    bool menuBackPress = SharedControls.MenuBack || (SharedCursor.Secondary && MenuMouseRelease);
 
     bool delPressed = false;
 
@@ -1172,7 +1172,7 @@ int menuControls_Logic()
             else if(delPressed && s_secondaryInput)
             {
                 PlaySoundMenu(SFX_PlayerDied2);
-                profile->DeleteSecondaryButton(MenuCursor);
+                profile->DeleteSecondaryButton(Controls::ControlsClass::Player, MenuCursor);
                 MenuCursorCanMove = false;
             }
         }

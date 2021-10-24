@@ -84,8 +84,7 @@ public:
 
     // Update functions that set player controls (and editor controls)
     // based on current device input. Return false if device lost.
-    bool Update(Controls_t& c);
-    // bool Update(EditorControls_t& c);
+    bool Update(Controls_t& c, CursorControls_t& m, EditorControls_t& e);
 
     void Rumble(int ms, float strength);
 };
@@ -120,15 +119,18 @@ public:
     // Polls a new (secondary) device button for the i'th player button
     // Returns true on success and false if no button pressed
     // Never allows two player buttons to bind to the same device button
-    bool PollPrimaryButton(size_t i);
-    bool PollSecondaryButton(size_t i);
+    bool PollPrimaryButton(ControlsClass c, size_t i);
+    bool PollSecondaryButton(ControlsClass c, size_t i);
 
-    // Deletes a secondary device button for the i'th player button
-    bool DeleteSecondaryButton(size_t i);
+    // Deletes a primary button for the i'th button of class c (only called for non-Player buttons)
+    bool DeletePrimaryButton(ControlsClass c, size_t i);
 
-    // Gets strings for the device buttons currently used for the i'th player button
-    const char* NamePrimaryButton(size_t i);
-    const char* NameSecondaryButton(size_t i);
+    // Deletes a secondary device button for the i'th button of class c
+    bool DeleteSecondaryButton(ControlsClass c, size_t i);
+
+    // Gets strings for the device buttons currently used for the i'th button of class c
+    const char* NamePrimaryButton(ControlsClass c, size_t i);
+    const char* NameSecondaryButton(ControlsClass c, size_t i);
 
     // one can assume that the IniProcessing* is already in the correct group
     void SaveConfig(IniProcessing* ctl);

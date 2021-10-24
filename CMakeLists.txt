@@ -291,6 +291,8 @@ set(THEXTECH_SRC
     src/main/menu_loop.cpp
     src/main/menu_main.cpp
     src/main/menu_connectscreen.cpp
+    src/main/screen_textentry.cpp
+    src/main/screen_cheats.cpp
     src/main/menu_controls.cpp
     src/main/cheat_code.cpp
     src/main/outro_loop.cpp

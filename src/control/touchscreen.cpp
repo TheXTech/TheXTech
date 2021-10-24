@@ -1012,6 +1012,14 @@ void TouchScreenController::processTouchDevice(int dev_i)
         float finger_x = f->x, finger_y = f->y, finger_pressure = f->pressure;
         (void)finger_pressure;
 
+        if(!m_cursorHeld)
+        {
+            m_cursorHeld = true;
+            SDL_Point p = frmMain.MapToScr(finger_x*m_screenWidth, finger_y*m_screenHeight);
+            m_cursorX = p.x;
+            m_cursorY = p.y;
+        }
+
         auto found = m_fingers.find(finger_id);
         if(found != m_fingers.end())
         {
@@ -1109,6 +1117,8 @@ void TouchScreenController::update()
 {
     if(!touchSupported())
         return;
+
+    m_cursorHeld = false;
 
     // If actually used in the game touch was found, use it
     if(m_actualDevice >= 0)
@@ -1236,7 +1246,7 @@ void TouchScreenController::resetState()
 
 // Update functions that set player controls (and editor controls)
 // based on current device input. Return false if device lost.
-bool InputMethod_TouchScreen::Update(Controls_t& c)
+bool InputMethod_TouchScreen::Update(Controls_t& c, CursorControls_t& m, EditorControls_t& e)
 {
     InputMethodType_TouchScreen* t = dynamic_cast<InputMethodType_TouchScreen*>(this->Type);
     if(!t)
@@ -1266,6 +1276,21 @@ bool InputMethod_TouchScreen::Update(Controls_t& c)
             c.Run = !c.Run;
     }
 
+    // use the touchscreen as a mouse if the buttons are currently hidden
+    if(t->m_controller.m_touchHidden && t->m_controller.m_cursorHeld)
+    {
+        m.Primary = true;
+        if(t->m_controller.m_cursorX - m.X <= 1 || t->m_controller.m_cursorX - m.X >= 1
+            || t->m_controller.m_cursorY - m.Y <= 1 || t->m_controller.m_cursorY - m.Y >= 1)
+        {
+            m.Move = true;
+            m.X = t->m_controller.m_cursorX;
+            m.Y = t->m_controller.m_cursorY;
+        }
+    }
+
+    // TODO: beautiful editor controls :)
+
     return true;
 }
 
@@ -1273,7 +1298,19 @@ void InputMethod_TouchScreen::Rumble(int ms, float strength)
 {
     (void)ms;
     (void)strength;
-    // TODO: shake the phone!!
+    InputMethodType_TouchScreen* t = dynamic_cast<InputMethodType_TouchScreen*>(this->Type);
+    if(!t)
+        return;
+
+    if(!t->m_controller.touchSupported())
+        return;
+
+    if(!t->m_controller.m_vibrator)
+        return;
+
+    pLogDebug("Trying to use SDL haptic rumble: %dms %f", ms, strength);
+    if(SDL_HapticRumblePlay(t->m_controller.m_vibrator, strength, ms) == 0)
+        return;
 }
 
 /*====================================================*\
@@ -1285,31 +1322,31 @@ InputMethodProfile_TouchScreen::InputMethodProfile_TouchScreen()
 {
 }
 
-bool InputMethodProfile_TouchScreen::PollPrimaryButton(size_t i)
+bool InputMethodProfile_TouchScreen::PollPrimaryButton(ControlsClass c, size_t i)
 {
     (void)i;
     return true;
 }
 
-bool InputMethodProfile_TouchScreen::PollSecondaryButton(size_t i)
+bool InputMethodProfile_TouchScreen::PollSecondaryButton(ControlsClass c, size_t i)
 {
     (void)i;
     return true;
 }
 
-bool InputMethodProfile_TouchScreen::DeleteSecondaryButton(size_t i)
+bool InputMethodProfile_TouchScreen::DeleteSecondaryButton(ControlsClass c, size_t i)
 {
     (void)i;
     return true;
 }
 
-const char* InputMethodProfile_TouchScreen::NamePrimaryButton(size_t i)
+const char* InputMethodProfile_TouchScreen::NamePrimaryButton(ControlsClass c, size_t i)
 {
     (void)i;
     return "(TOUCH)";
 }
 
-const char* InputMethodProfile_TouchScreen::NameSecondaryButton(size_t i)
+const char* InputMethodProfile_TouchScreen::NameSecondaryButton(ControlsClass c, size_t i)
 {
     (void)i;
     return "";

@@ -13,7 +13,7 @@ namespace Controls
 
 // Update functions that set player controls (and editor controls)
 // based on current device input. Return false if device lost.
-bool InputMethod_Keyboard::Update(Controls_t& c)
+bool InputMethod_Keyboard::Update(Controls_t& c, CursorControls_t& m, EditorControls_t& e)
 {
     InputMethodType_Keyboard* k = dynamic_cast<InputMethodType_Keyboard*>(this->Type);
     InputMethodProfile_Keyboard* p = dynamic_cast<InputMethodProfile_Keyboard*>(this->Profile);
@@ -76,7 +76,7 @@ InputMethodProfile_Keyboard::InputMethodProfile_Keyboard()
     }
 }
 
-bool InputMethodProfile_Keyboard::PollPrimaryButton(size_t i)
+bool InputMethodProfile_Keyboard::PollPrimaryButton(ControlsClass c, size_t i)
 {
     // note: m_canPoll is initialized to false
     InputMethodType_Keyboard* k = dynamic_cast<InputMethodType_Keyboard*>(this->Type);
@@ -131,7 +131,7 @@ bool InputMethodProfile_Keyboard::PollPrimaryButton(size_t i)
     return true;
 }
 
-bool InputMethodProfile_Keyboard::PollSecondaryButton(size_t i)
+bool InputMethodProfile_Keyboard::PollSecondaryButton(ControlsClass c, size_t i)
 {
     // note: m_canPoll is initialized to false
     InputMethodType_Keyboard* k = dynamic_cast<InputMethodType_Keyboard*>(this->Type);
@@ -206,7 +206,7 @@ bool InputMethodProfile_Keyboard::PollSecondaryButton(size_t i)
     return true;
 }
 
-bool InputMethodProfile_Keyboard::DeleteSecondaryButton(size_t i)
+bool InputMethodProfile_Keyboard::DeleteSecondaryButton(ControlsClass c, size_t i)
 {
     if(this->m_keys2[i] != null_key)
     {
@@ -216,14 +216,14 @@ bool InputMethodProfile_Keyboard::DeleteSecondaryButton(size_t i)
     return false;
 }
 
-const char* InputMethodProfile_Keyboard::NamePrimaryButton(size_t i)
+const char* InputMethodProfile_Keyboard::NamePrimaryButton(ControlsClass c, size_t i)
 {
     if(this->m_keys[i] == null_key)
         return "NONE";
     return SDL_GetScancodeName((SDL_Scancode)this->m_keys[i]);
 }
 
-const char* InputMethodProfile_Keyboard::NameSecondaryButton(size_t i)
+const char* InputMethodProfile_Keyboard::NameSecondaryButton(ControlsClass c, size_t i)
 {
     if(this->m_keys2[i] == null_key)
         return "NONE";
@@ -348,6 +348,36 @@ void InputMethodType_Keyboard::UpdateControlsPost()
     SharedControls.MenuRight |= rightPressed;
     SharedControls.MenuDo |= (returnPressed && !altPressed) || spacePressed;
     SharedControls.MenuBack |= (escPressed && !altPressed);
+
+    if(this->m_touchscreenActive)
+    {
+        // let the touchscreen input method handle that
+    }
+    // handle the mouse
+    else if(SDL_GetMouseFocus())
+    {
+        int window_x, window_y;
+        Uint32 buttons = SDL_GetMouseState(&window_x, &window_y);
+
+        SDL_Point p = frmMain.MapToScr(window_x, window_y);
+        if(p.x - SharedCursor.X <= 1 || p.x - SharedCursor.X >= 1
+            || p.y - SharedCursor.Y <= 1 || p.y - SharedCursor.Y >= 1)
+        {
+            SharedCursor.Move = true;
+            SharedCursor.X = p.x;
+            SharedCursor.Y = p.y;
+        }
+        if(buttons & SDL_BUTTON_LMASK)
+            SharedCursor.Primary = true;
+        if(buttons & SDL_BUTTON_RMASK)
+            SharedCursor.Secondary = true;
+        if(buttons & SDL_BUTTON_MMASK)
+            SharedCursor.Tertiary = true;
+    }
+    else if(SharedCursor.X >= 0 || SharedCursor.Y >= 0)
+    {
+        SharedCursor.GoOffscreen();
+    }
 }
 
 // this is challenging for the keyboard because we don't want to allocate 20 copies of it
@@ -464,6 +494,25 @@ InputMethod* InputMethodType_Keyboard::Poll(const std::vector<InputMethod*>& act
 /*-----------------------*\
 || OPTIONAL METHODS      ||
 \*-----------------------*/
+
+bool InputMethodType_Keyboard::ConsumeEvent(const SDL_Event* ev)
+{
+    bool is_touch = false;
+    switch(ev->type)
+    {
+        case SDL_MOUSEBUTTONDOWN:
+        case SDL_MOUSEBUTTONUP:
+            is_touch = (ev->button.which == SDL_TOUCH_MOUSEID);
+            break;
+        case SDL_MOUSEMOTION:
+            is_touch = (ev->motion.which == SDL_TOUCH_MOUSEID);
+            break;
+        default:
+            return false;
+    }
+    this->m_touchscreenActive = is_touch;
+    return false;
+}
 
 // optional function allowing developer to associate device information with profile, etc
 bool InputMethodType_Keyboard::SetProfile_Custom(InputMethod* method, int player_no, InputMethodProfile* profile,

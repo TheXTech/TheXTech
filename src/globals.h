@@ -172,6 +172,8 @@ enum class PauseCode
     Message,
     Reconnect,
     DropAdd,
+    TextEntry,
+    Cheats,
 };
 
 // Moved back into "control_types.h"
@@ -224,7 +226,7 @@ enum class PauseCode
 //End Type
 
 //Public Type EditorControls      'Controls for the editor
-struct EditorControls_t
+struct OldEditorControls_t
 {
 //    Up As Boolean
     bool Up = false;
@@ -1472,9 +1474,15 @@ extern RangeArrI<int, 1, 10, 0> CoinFrame2;
 //Public EditorCursor As EditorCursor
 extern EditorCursor_t EditorCursor;
 //Public EditorControls As EditorControls
-extern EditorControls_t EditorControls;
+extern OldEditorControls_t OldEditorControls;
 
 extern SharedControls_t SharedControls;
+
+extern CursorControls_t SharedCursor;
+
+extern EditorControls_t EditorControls;
+
+// extern RangeArr<CursorControls_t, 1, maxLocalPlayers> PlayerCursor;
 
 //Public Sound(1 To numSounds) As Integer
 extern RangeArrI<int, 1, numSounds, 0> Sound;
@@ -1994,18 +2002,19 @@ extern RangeArrI<int, 1, numCharacters, 0> GFXPlayerWidth;
 extern int PlayerCharacter;
 //Public PlayerCharacter2 As Integer
 extern int PlayerCharacter2;
+
+// replaced with cursor controls
 //Public MenuMouseX As Double
-extern double MenuMouseX;
+// extern double MenuMouseX;
 //Public MenuMouseY As Double
-extern double MenuMouseY;
+// extern double MenuMouseY;
 //Public MenuMouseDown As Boolean
-extern bool MenuMouseDown;
+// extern bool MenuMouseDown;
 //Public MenuMouseBack As Boolean
-extern bool MenuMouseBack;
+// extern bool MenuMouseBack;
+
 //Public MenuMouseRelease As Boolean
 extern bool MenuMouseRelease;
-//Public MenuMouseMove As Boolean
-extern bool MenuMouseMove;
 //Public MenuMouseClick As Boolean
 extern bool MenuMouseClick;
 

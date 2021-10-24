@@ -159,7 +159,7 @@ int GameMain(const CmdLineSetup_t &setup)
 #ifdef __EMSCRIPTEN__ // Workaround for a recent Chrome's policy to avoid sudden sound without user's interaction
     frmMain.show(); // Don't show window until playing an initial sound
 
-    while(!MenuMouseDown)
+    while(!SharedCursor.Primary)
     {
         frmMain.setTargetTexture();
         frmMain.clearBuffer();
@@ -369,10 +369,8 @@ int GameMain(const CmdLineSetup_t &setup)
                 OwedMountType[A] = 0;
             }
 
-            MenuMouseMove = false;
             MenuMouseRelease = false;
             MenuMouseClick = false;
-            MenuMouseBack = false;
             BattleMode = false;
 
             if(MenuMode != MENU_BATTLE_MODE)
