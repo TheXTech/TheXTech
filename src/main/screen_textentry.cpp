@@ -10,6 +10,7 @@ static std::string s_Prompt;
 static int s_cursor = 0;
 static int s_mouse_up = 2;
 static int s_timer = 0;
+static bool s_committed = false;
 
 // KEYMAP!
 // we are assumed to be operating on a Nx5x12 (levels, rows, columns) grid.
@@ -216,7 +217,13 @@ void GoUp()
         s_cur_col --;
 }
 
-inline void InsertUnicode(const char* c)
+void Insert(const char* c)
+{
+    Text.insert(s_cursor, c);
+    s_cursor += SDL_strlen(c);
+}
+
+inline void InsertUnicodeChar(const char* c)
 {
     char unicode[5];
     unicode[0] = c[0];
@@ -241,16 +248,33 @@ inline void InsertUnicode(const char* c)
     {
         unicode[1] = '\0';
     }
-    Text.insert(s_cursor, unicode);
+    Insert(unicode);
 }
 
-inline void Backspace()
+void CursorLeft()
+{
+    if(s_cursor > 0)
+        s_cursor --;
+}
+
+void CursorRight()
+{
+    if(s_cursor < Text.size())
+        s_cursor ++;
+}
+
+void Backspace()
 {
     if(s_cursor > 0)
     {
         s_cursor --;
         Text.erase(s_cursor, 1);
     }
+}
+
+void Commit()
+{
+    s_committed = true;
 }
 
 // returns true if the string is complete
@@ -270,13 +294,11 @@ bool DoAction()
         return true;
     // left
     case '\x1d':
-        if(s_cursor > 0)
-            s_cursor --;
+        CursorLeft();
         break;
     // right
     case '\x1c':
-        if(s_cursor < Text.size())
-            s_cursor ++;
+        CursorRight();
         break;
     // shift up
     case '\x0e':
@@ -292,7 +314,7 @@ bool DoAction()
         break;
     // proper text entry
     default:
-        InsertUnicode(c);
+        InsertUnicodeChar(c);
         s_cursor ++;
     }
     return false;
@@ -377,6 +399,7 @@ void Init(const std::string& Prompt, const std::string Value)
     MenuCursorCanMove = false;
     s_render_sel = false;
     s_timer = -1;
+    s_committed = false;
 }
 
 void Render()
@@ -460,7 +483,7 @@ bool Logic()
     if(MenuCursorCanMove)
         s_timer = 10;
 
-    return false;
+    return s_committed;
 }
 
 }; // namespace TextEntryScreen

@@ -1,5 +1,7 @@
 #include "../controls.h"
+#include "../globals.h"
 #include "keyboard.h"
+#include "../main/screen_textentry.h"
 
 namespace Controls
 {
@@ -19,6 +21,9 @@ bool InputMethod_Keyboard::Update(Controls_t& c, CursorControls_t& m, EditorCont
     InputMethodProfile_Keyboard* p = dynamic_cast<InputMethodProfile_Keyboard*>(this->Profile);
     if(!k || !p)
         return false;
+    if(k->m_directText && GamePaused == PauseCode::TextEntry)
+        return true;
+
     bool altPressed = (k->m_keyboardState[SDL_SCANCODE_LALT] == KEY_PRESSED
                 || k->m_keyboardState[SDL_SCANCODE_RALT] == KEY_PRESSED
                 || k->m_keyboardState[SDL_SCANCODE_LCTRL] == KEY_PRESSED
@@ -291,6 +296,9 @@ InputMethodType_Keyboard::InputMethodType_Keyboard()
 void InputMethodType_Keyboard::UpdateControlsPre() {}
 void InputMethodType_Keyboard::UpdateControlsPost()
 {
+    if(this->m_directText && GamePaused == PauseCode::TextEntry)
+        return;
+
     bool altPressed = this->m_keyboardState[SDL_SCANCODE_LALT] == KEY_PRESSED ||
                       this->m_keyboardState[SDL_SCANCODE_RALT] == KEY_PRESSED;
     bool escPressed = this->m_keyboardState[SDL_SCANCODE_ESCAPE] == KEY_PRESSED;
@@ -507,10 +515,31 @@ bool InputMethodType_Keyboard::ConsumeEvent(const SDL_Event* ev)
         case SDL_MOUSEMOTION:
             is_touch = (ev->motion.which == SDL_TOUCH_MOUSEID);
             break;
+        case SDL_TEXTINPUT:
+            if(this->m_directText && GamePaused == PauseCode::TextEntry)
+            {
+                TextEntryScreen::Insert(ev->text.text);
+                return true;
+            }
+            break;
+        case SDL_KEYDOWN:
+            if(this->m_directText && GamePaused == PauseCode::TextEntry)
+            {
+                if(ev->key.keysym.scancode == SDL_SCANCODE_RETURN || ev->key.keysym.scancode == SDL_SCANCODE_KP_ENTER)
+                    TextEntryScreen::Commit();
+                else if(ev->key.keysym.scancode == SDL_SCANCODE_LEFT)
+                    TextEntryScreen::CursorLeft();
+                else if(ev->key.keysym.scancode == SDL_SCANCODE_RIGHT)
+                    TextEntryScreen::CursorRight();
+                else if(ev->key.keysym.scancode == SDL_SCANCODE_BACKSPACE)
+                    TextEntryScreen::Backspace();
+                return true;
+            }
+            break;
         default:
             return false;
     }
-    this->m_touchscreenActive = is_touch;
+    this->m_touchscreenActive = is_touch && g_renderTouchscreen;
     return false;
 }
 
@@ -536,7 +565,7 @@ bool InputMethodType_Keyboard::SetProfile_Custom(InputMethod* method, int player
 // How many per-type special options are there?
 size_t InputMethodType_Keyboard::GetSpecialOptionCount()
 {
-    return 1;
+    return 2;
 }
 
 // Methods to manage per-profile options
