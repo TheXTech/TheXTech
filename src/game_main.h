@@ -74,7 +74,7 @@ void ClearGame(bool punnish = false);
 void DeleteSave(int world, int save);
 void CopySave(int world, int src, int dst);
 
-void PauseGame(PauseCode code, int plr);
+void PauseGame(PauseCode code, int plr = 0);
 
 void OpenConfig_preSetup();
 

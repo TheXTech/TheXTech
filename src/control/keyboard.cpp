@@ -296,6 +296,38 @@ InputMethodType_Keyboard::InputMethodType_Keyboard()
 void InputMethodType_Keyboard::UpdateControlsPre() {}
 void InputMethodType_Keyboard::UpdateControlsPost()
 {
+    if(this->m_touchscreenActive)
+    {
+        // let the touchscreen input method handle that
+    }
+    // handle the mouse
+    else if(SDL_GetMouseFocus())
+    {
+        int window_x, window_y;
+        Uint32 buttons = SDL_GetMouseState(&window_x, &window_y);
+
+        SDL_Point p = frmMain.MapToScr(window_x, window_y);
+        static SDL_Point last_p;
+        if(p.x - last_p.x <= -1 || p.x - last_p.x >= 1
+            || p.y - last_p.y <= -1 || p.y - last_p.y >= 1)
+        {
+            last_p = p;
+            SharedCursor.Move = true;
+            SharedCursor.X = p.x;
+            SharedCursor.Y = p.y;
+        }
+        if(buttons & SDL_BUTTON_LMASK)
+            SharedCursor.Primary = true;
+        if(buttons & SDL_BUTTON_RMASK)
+            SharedCursor.Secondary = true;
+        if(buttons & SDL_BUTTON_MMASK)
+            SharedCursor.Tertiary = true;
+    }
+    else if(!SharedCursor.Move && (SharedCursor.X >= 0 || SharedCursor.Y >= 0))
+    {
+        SharedCursor.GoOffscreen();
+    }
+
     if(this->m_directText && GamePaused == PauseCode::TextEntry)
         return;
 
@@ -356,36 +388,6 @@ void InputMethodType_Keyboard::UpdateControlsPost()
     SharedControls.MenuRight |= rightPressed;
     SharedControls.MenuDo |= (returnPressed && !altPressed) || spacePressed;
     SharedControls.MenuBack |= (escPressed && !altPressed);
-
-    if(this->m_touchscreenActive)
-    {
-        // let the touchscreen input method handle that
-    }
-    // handle the mouse
-    else if(SDL_GetMouseFocus())
-    {
-        int window_x, window_y;
-        Uint32 buttons = SDL_GetMouseState(&window_x, &window_y);
-
-        SDL_Point p = frmMain.MapToScr(window_x, window_y);
-        if(p.x - SharedCursor.X <= 1 || p.x - SharedCursor.X >= 1
-            || p.y - SharedCursor.Y <= 1 || p.y - SharedCursor.Y >= 1)
-        {
-            SharedCursor.Move = true;
-            SharedCursor.X = p.x;
-            SharedCursor.Y = p.y;
-        }
-        if(buttons & SDL_BUTTON_LMASK)
-            SharedCursor.Primary = true;
-        if(buttons & SDL_BUTTON_RMASK)
-            SharedCursor.Secondary = true;
-        if(buttons & SDL_BUTTON_MMASK)
-            SharedCursor.Tertiary = true;
-    }
-    else if(SharedCursor.X >= 0 || SharedCursor.Y >= 0)
-    {
-        SharedCursor.GoOffscreen();
-    }
 }
 
 // this is challenging for the keyboard because we don't want to allocate 20 copies of it
@@ -505,15 +507,20 @@ InputMethod* InputMethodType_Keyboard::Poll(const std::vector<InputMethod*>& act
 
 bool InputMethodType_Keyboard::ConsumeEvent(const SDL_Event* ev)
 {
-    bool is_touch = false;
     switch(ev->type)
     {
         case SDL_MOUSEBUTTONDOWN:
         case SDL_MOUSEBUTTONUP:
-            is_touch = (ev->button.which == SDL_TOUCH_MOUSEID);
+            if(ev->button.which == SDL_TOUCH_MOUSEID && g_renderTouchscreen)
+                this->m_touchscreenActive = true;
+            else
+                this->m_touchscreenActive = false;
             break;
         case SDL_MOUSEMOTION:
-            is_touch = (ev->motion.which == SDL_TOUCH_MOUSEID);
+            if(ev->motion.which == SDL_TOUCH_MOUSEID && g_renderTouchscreen)
+                this->m_touchscreenActive = true;
+            else
+                this->m_touchscreenActive = false;
             break;
         case SDL_TEXTINPUT:
             if(this->m_directText && GamePaused == PauseCode::TextEntry)
@@ -521,7 +528,7 @@ bool InputMethodType_Keyboard::ConsumeEvent(const SDL_Event* ev)
                 TextEntryScreen::Insert(ev->text.text);
                 return true;
             }
-            break;
+            return false;
         case SDL_KEYDOWN:
             if(this->m_directText && GamePaused == PauseCode::TextEntry)
             {
@@ -535,11 +542,10 @@ bool InputMethodType_Keyboard::ConsumeEvent(const SDL_Event* ev)
                     TextEntryScreen::Backspace();
                 return true;
             }
-            break;
+            return false;
         default:
             return false;
     }
-    this->m_touchscreenActive = is_touch && g_renderTouchscreen;
     return false;
 }
 

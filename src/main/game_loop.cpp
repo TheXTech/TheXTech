@@ -509,8 +509,11 @@ void PauseGame(PauseCode code, int plr)
 //    double fpsTime = 0;
 //    int fpsCount = 0;
 
-    for(int A = numPlayers; A >= 1; A--)
-        SavedChar[Player[A].Character] = Player[A];
+    if(!GameMenu)
+    {
+        for(int A = numPlayers; A >= 1; A--)
+            SavedChar[Player[A].Character] = Player[A];
+    }
 
     if(code == PauseCode::Message)
         MessageScreen_Init();
@@ -548,7 +551,7 @@ void PauseGame(PauseCode code, int plr)
             CheckActive();
 
             speedRun_tick();
-            if(LevelSelect)
+            if(LevelSelect && !GameMenu)
                 UpdateGraphics2();
             else
                 UpdateGraphics();

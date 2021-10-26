@@ -172,6 +172,7 @@ public:
 
 #ifndef __EMSCRIPTEN__
     void makeShot();
+    void toggleGifRecorder();
 #endif
 
 private:
@@ -214,7 +215,6 @@ private:
     GifRecorder m_gif;
 
     bool recordInProcess();
-    void toggleGifRecorder();
     void processRecorder();
     static int processRecorder_action(void *_pixels);
 #endif

@@ -7,6 +7,8 @@
 // for cheat screen
 #include "../game_main.h"
 #include "../main/screen_textentry.h"
+#include "../graphics.h"
+#include "../frame_timer.h"
 
 #ifndef NO_SDL
 #include "touchscreen.h"
@@ -22,21 +24,31 @@ namespace Controls
 std::vector<InputMethod*> g_InputMethods;
 std::vector<InputMethodType*> g_InputMethodTypes;
 bool g_renderTouchscreen = false;
+static bool s_enterCheatScreen = false;
+bool g_disallowHotkeys = false;
 
 void Hotkeys::Activate(size_t i)
 {
+    if(g_disallowHotkeys)
+        return;
     switch(i)
     {
         case Buttons::Fullscreen:
+            ChangeScreen();
+            return;
         case Buttons::Screenshot:
+            TakeScreen = true;
+            return;
         case Buttons::RecordGif:
+#ifndef __EMSCRIPTEN__ // later make this be no screenshots
+            frmMain.toggleGifRecorder();
+#endif
+            return;
         case Buttons::DebugInfo:
+            g_stats.enabled = !g_stats.enabled;
             return;
         case Buttons::EnterCheats:
-            TextEntryScreen::Init("Enter cheat:");
-            PauseGame(PauseCode::TextEntry, 0);
-            CheatString = TextEntryScreen::Text;
-            CheatCode(' ');
+            s_enterCheatScreen = true;
             return;
         default:
             return;
@@ -601,6 +613,17 @@ bool Update()
             g_InputMethods.push_back(nullptr);
         okay = false;
     }
+
+    if(s_enterCheatScreen && GamePaused != PauseCode::TextEntry)
+    {
+        TextEntryScreen::Init("Enter cheat:");
+        PauseGame(PauseCode::TextEntry, 0);
+        CheatString = TextEntryScreen::Text;
+        CheatCode(' ');
+        s_enterCheatScreen = false;
+    }
+
+    g_disallowHotkeys = false;
 
     return okay;
 }

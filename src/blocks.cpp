@@ -52,6 +52,9 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
     if(BattleMode && b.RespawnDelay == 0)
         b.RespawnDelay = 1;
 
+    // if(whatPlayer != 0)
+    //     Controls::Rumble(whatPlayer, 50, .1);
+
     if((b.Type >= 622 && b.Type <= 625) || b.Type == 631)
     {
         if(whatPlayer == 0)

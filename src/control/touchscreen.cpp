@@ -1142,8 +1142,8 @@ void TouchScreenController::render(int player_no)
 
     for(int key = key_BEGIN; key < key_END; key++)
     {
-        if((m_touchHidden && key != TouchScreenController::key_toggleKeysView) || LoadingInProcess)
-            key = TouchScreenController::key_toggleKeysView;
+        if((m_touchHidden && key != TouchScreenController::key_toggleKeysView) || LoadingInProcess || GamePaused == PauseCode::TextEntry)
+            continue;
         const auto &k = g_touchKeyMap.touchKeysMap[key];
         int x1 = Maths::iRound((k.x1 / g_touchKeyMap.touchCanvasWidth) * float(m_screenWidth));
         int y1 = Maths::iRound((k.y1 / g_touchKeyMap.touchCanvasHeight) * float(m_screenHeight));
@@ -1276,8 +1276,9 @@ bool InputMethod_TouchScreen::Update(Controls_t& c, CursorControls_t& m, EditorC
             c.Run = !c.Run;
     }
 
-    // use the touchscreen as a mouse if the buttons are currently hidden
-    if(t->m_controller.m_touchHidden && t->m_controller.m_cursorHeld)
+    // use the touchscreen as a mouse if the buttons are currently hidden or we are in TextEntry mode
+    bool allowed = t->m_controller.m_touchHidden || GamePaused == PauseCode::TextEntry;
+    if(allowed && t->m_controller.m_cursorHeld)
     {
         m.Primary = true;
         if(t->m_controller.m_cursorX - m.X <= 1 || t->m_controller.m_cursorX - m.X >= 1

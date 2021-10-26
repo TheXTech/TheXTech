@@ -253,22 +253,41 @@ inline void InsertUnicodeChar(const char* c)
 
 void CursorLeft()
 {
-    if(s_cursor > 0)
+    while(s_cursor > 0)
+    {
         s_cursor --;
+        if(s_cursor == 0)
+            break;
+        // break if not a continuation char (NOT 10bbbbbb)
+        if(!(Text[s_cursor] & 1<<7) || (Text[s_cursor] & 1<<6))
+            break;
+    }
 }
 
 void CursorRight()
 {
-    if(s_cursor < Text.size())
+    while(s_cursor < (int)Text.size())
+    {
         s_cursor ++;
+        if(s_cursor == (int)Text.size())
+            break;
+        // break if not a continuation char (NOT 10bbbbbb)
+        if(!(Text[s_cursor] & 1<<7) || (Text[s_cursor] & 1<<6))
+            break;
+    }
 }
 
 void Backspace()
 {
-    if(s_cursor > 0)
+    while(s_cursor > 0)
     {
         s_cursor --;
         Text.erase(s_cursor, 1);
+        if(s_cursor == 0)
+            break;
+        // break if not a continuation char (NOT 10bbbbbb)
+        if(!(Text[s_cursor] & 1<<7) || (Text[s_cursor] & 1<<6))
+            break;
     }
 }
 
@@ -315,7 +334,6 @@ bool DoAction()
     // proper text entry
     default:
         InsertUnicodeChar(c);
-        s_cursor ++;
     }
     return false;
 }
@@ -437,7 +455,7 @@ bool Logic()
         Controls_t &c = Player[i+1].Controls;
 
         startPressed |= c.Start;
-        doPressed |= c.Start || c.Jump || c.AltJump;
+        doPressed |= c.Jump || c.AltJump;
         backPressed |= c.Run || c.AltRun;
 
         upPressed |= c.Up;
@@ -458,7 +476,7 @@ bool Logic()
             GoRight();
         if(backPressed)
             Backspace();
-        if(doPressed && DoAction() || startPressed)
+        if((doPressed && DoAction()) || startPressed)
         {
             MenuCursorCanMove = false;
             MenuMouseRelease = false;

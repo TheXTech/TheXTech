@@ -41,10 +41,11 @@ extern std::vector<InputMethod*> g_InputMethods;
 // no nulled pointers here
 extern std::vector<InputMethodType*> g_InputMethodTypes;
 extern bool g_renderTouchscreen;
+extern bool g_disallowHotkeys;
 
 enum class ControlsClass
 {
-    Player, Cursor, Editor, Hotkey
+    None, Player, Cursor, Editor, Hotkey
 };
 
 // utility functions to access information from the Controls_t struct
@@ -160,7 +161,7 @@ namespace CursorControls
 {
     // These attributes should be used by Input Methods and the game when possible
     // to allow them to function even if the controls structures change.
-    static constexpr size_t n_buttons = 11;
+    static constexpr size_t n_buttons = 7;
 
     // enumerate of the Cursor key indices (which are almost never used)
     enum Buttons : size_t
@@ -200,13 +201,13 @@ namespace CursorControls
         switch(i)
         {
             case Buttons::CursorUp:
-                return "Cursor Up";
+                return "Mouse Up";
             case Buttons::CursorDown:
-                return "Cursor Down";
+                return "Mouse Down";
             case Buttons::CursorLeft:
-                return "Cursor Left";
+                return "Mouse Left";
             case Buttons::CursorRight:
-                return "Cursor Right";
+                return "Mouse Right";
             case Buttons::Primary:
                 return "Primary";
             case Buttons::Secondary:
@@ -294,25 +295,25 @@ namespace EditorControls
         switch(i)
         {
             case Buttons::ScrollUp:
-                return "Scroll Up";
+                return "Scrl Up";
             case Buttons::ScrollDown:
-                return "Scroll Down";
+                return "Scrl Down";
             case Buttons::ScrollLeft:
-                return "Scroll Left";
+                return "Scrl Left";
             case Buttons::ScrollRight:
-                return "Scroll Right";
+                return "Scrl Right";
             case Buttons::FastScroll:
-                return "Fast Scroll";
+                return "Fast Scrl";
             case Buttons::ModeSelect:
                 return "Mode Select";
             case Buttons::ModeErase:
                 return "Mode Erase";
             case Buttons::NextSection:
-                return "Next Section";
+                return "Next Sect";
             case Buttons::PrevSection:
-                return "Prev Section";
+                return "Prev Sect";
             case Buttons::SwitchScreens:
-                return "Switch Screens";
+                return "Show Pane";
             case Buttons::TestPlay:
                 return "Test Play";
             default:
@@ -396,9 +397,9 @@ namespace Hotkeys
             case Buttons::RecordGif:
                 return "Record GIF";
             case Buttons::DebugInfo:
-                return "Toggle Debug Info";
+                return "Debug Info";
             case Buttons::EnterCheats:
-                return "Enter Cheats";
+                return "Type Cheat";
             default:
                 return "NULL";
         }

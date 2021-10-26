@@ -79,6 +79,8 @@ class InputMethod_Joystick : public InputMethod
 public:
     JoystickDevices* m_devices;
 
+    bool m_hotkey_okay = false;
+
     using InputMethod::Type;
     using InputMethod::Profile;
 
@@ -106,6 +108,18 @@ public:
     KM_Key m_keys[PlayerControls::n_buttons];
     // secondary keys (also joystick keys in legacy mode)
     KM_Key m_keys2[PlayerControls::n_buttons];
+
+    // cursor keys
+    KM_Key m_cursor_keys[CursorControls::n_buttons];
+    KM_Key m_cursor_keys2[CursorControls::n_buttons];
+
+    // editor keys
+    KM_Key m_editor_keys[EditorControls::n_buttons];
+    KM_Key m_editor_keys2[EditorControls::n_buttons];
+
+    // hotkeys
+    KM_Key m_hotkeys[Hotkeys::n_buttons];
+    KM_Key m_hotkeys2[Hotkeys::n_buttons];
 
     InputMethodProfile_Joystick();
 
