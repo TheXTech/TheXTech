@@ -67,30 +67,42 @@ InputMethodProfile_Duplicate::InputMethodProfile_Duplicate()
 
 bool InputMethodProfile_Duplicate::PollPrimaryButton(ControlsClass c, size_t i)
 {
+    (void)c;
     (void)i;
     return true;
 }
 
 bool InputMethodProfile_Duplicate::PollSecondaryButton(ControlsClass c, size_t i)
 {
+    (void)c;
+    (void)i;
+    return true;
+}
+
+bool InputMethodProfile_Duplicate::DeletePrimaryButton(ControlsClass c, size_t i)
+{
+    (void)c;
     (void)i;
     return true;
 }
 
 bool InputMethodProfile_Duplicate::DeleteSecondaryButton(ControlsClass c, size_t i)
 {
+    (void)c;
     (void)i;
     return true;
 }
 
 const char* InputMethodProfile_Duplicate::NamePrimaryButton(ControlsClass c, size_t i)
 {
+    (void)c;
     (void)i;
     return "(DUP)";
 }
 
 const char* InputMethodProfile_Duplicate::NameSecondaryButton(ControlsClass c, size_t i)
 {
+    (void)c;
     (void)i;
     return "";
 }

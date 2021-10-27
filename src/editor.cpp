@@ -157,10 +157,8 @@ void UpdateEditor()
 //        frmLevelEditor::picLevel.Visible = true;
 //    }
 //    GetCursorPos(CursorPos);
-    CursorPos.X = SharedCursor.X;
-    CursorPos.Y = SharedCursor.Y;
 
-    if(!frmMain.hasWindowMouseFocus() || CursorPos.X < 0 || CursorPos.Y > ScreenW || CursorPos.Y < 0 || CursorPos.Y > ScreenH)
+    if(!frmMain.hasWindowMouseFocus() || SharedCursor.X < 0 || SharedCursor.Y > ScreenW || SharedCursor.Y < 0 || SharedCursor.Y > ScreenH)
         HideCursor();
 
     if(LevelEditor || MagicHand)
@@ -2162,6 +2160,24 @@ void GetEditorControls()
             OldEditorControls.Right = true;
         else
             OldEditorControls.Right = false;
+        OldEditorControls.Mouse1 = SharedCursor.Primary;
+        if((SharedCursor.Secondary || EditorControls.ModeSelect) && optCursor.current != OptCursor_t::LVL_SELECT)
+        {
+            optCursor.current = OptCursor_t::LVL_SELECT;
+            MouseMove(float(SharedCursor.X), float(SharedCursor.Y));
+            SetCursor();
+        }
+        if((SharedCursor.Tertiary || EditorControls.ModeErase) && optCursor.current != OptCursor_t::LVL_ERASER)
+        {
+            optCursor.current = OptCursor_t::LVL_ERASER;
+            MouseMove(float(SharedCursor.X), float(SharedCursor.Y));
+            SetCursor();
+        }
+        if(SharedCursor.Move)
+        {
+            MouseMove(SharedCursor.X, SharedCursor.Y, true);
+            MouseRelease = true;
+        }
     }
 }
 
@@ -2915,6 +2931,9 @@ void zTestLevel(bool magicHand, bool interProcess)
 
 void MouseMove(float X, float Y, bool /*nCur*/)
 {
+    EditorCursor.X = X;
+    EditorCursor.Y = Y;
+
     int A = 0;
     HasCursor = true;
     A = 1;

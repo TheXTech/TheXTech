@@ -477,8 +477,8 @@ bool InputMethod_Joystick::Update(Controls_t& c, CursorControls_t& m, EditorCont
             m.X = ScreenW/2;
         if(m.Y < 0)
             m.Y = ScreenH/2;
-        m.X += (cursor[3] - cursor[2])*32.;
-        m.Y += (cursor[1] - cursor[0])*32.;
+        m.X += (cursor[3] - cursor[2])*16.;
+        m.Y += (cursor[1] - cursor[0])*16.;
         if(m.X < 0)
             m.X = 0;
         else if(m.X >= ScreenW)
@@ -927,6 +927,53 @@ bool InputMethodProfile_Joystick::PollSecondaryButton(ControlsClass c, size_t i)
     return true;
 }
 
+bool InputMethodProfile_Joystick::DeletePrimaryButton(ControlsClass c, size_t i)
+{
+    // resolve the particular primary and secondary key arrays
+    KM_Key* keys;
+    KM_Key* keys2;
+    if(c == ControlsClass::Player)
+    {
+        keys = this->m_keys;
+        keys2 = this->m_keys2;
+    }
+    else if(c == ControlsClass::Cursor)
+    {
+        keys = this->m_cursor_keys;
+        keys2 = this->m_cursor_keys2;
+    }
+    else if(c == ControlsClass::Editor)
+    {
+        keys = this->m_editor_keys;
+        keys2 = this->m_editor_keys2;
+    }
+    else if(c == ControlsClass::Hotkey)
+    {
+        keys = this->m_hotkeys;
+        keys2 = this->m_hotkeys2;
+    }
+    else
+    {
+        // BAD!
+        return false;
+    }
+
+    if(keys2[i].type != KM_Key::NoControl)
+    {
+        keys[i] = keys2[i];
+        keys2[i] = KM_Key();
+        return true;
+    }
+    if(c == ControlsClass::Player)
+        return false;
+    if(keys[i].type != KM_Key::NoControl)
+    {
+        keys[i] = KM_Key();
+        return true;
+    }
+    return false;
+}
+
 bool InputMethodProfile_Joystick::DeleteSecondaryButton(ControlsClass c, size_t i)
 {
     // resolve the particular primary and secondary key arrays
@@ -942,7 +989,7 @@ bool InputMethodProfile_Joystick::DeleteSecondaryButton(ControlsClass c, size_t 
     else
     {
         // BAD!
-        return true;
+        return false;
     }
 
     if(keys2[i].type != KM_Key::NoControl)
@@ -1049,24 +1096,61 @@ const char* InputMethodProfile_Joystick::NameSecondaryButton(ControlsClass c, si
 void InputMethodProfile_Joystick::SaveConfig(IniProcessing* ctl)
 {
     std::string name;
-    for(size_t i = 0; i < PlayerControls::n_buttons; i++)
+    for(int a = 0; a < 4; a++)
     {
-        name = PlayerControls::GetButtonName_INI(i);
-        size_t orig_l = name.size();
+        KM_Key* keys;
+        KM_Key* keys2;
+        size_t key_max;
+        if(a == 0)
+        {
+            keys = this->m_keys;
+            keys2 = this->m_keys2;
+            key_max = PlayerControls::n_buttons;
+        }
+        else if(a == 1)
+        {
+            keys = this->m_cursor_keys;
+            keys2 = this->m_cursor_keys2;
+            key_max = CursorControls::n_buttons;
+        }
+        else if(a == 2)
+        {
+            keys = this->m_editor_keys;
+            keys2 = this->m_editor_keys2;
+            key_max = EditorControls::n_buttons;
+        }
+        else
+        {
+            keys = this->m_hotkeys;
+            keys2 = this->m_hotkeys2;
+            key_max = Hotkeys::n_buttons;
+        }
+        for(size_t i = 0; i < key_max; i++)
+        {
+            if(a == 0)
+                name = PlayerControls::GetButtonName_INI(i);
+            else if(a == 1)
+                name = CursorControls::GetButtonName_INI(i);
+            else if(a == 2)
+                name = EditorControls::GetButtonName_INI(i);
+            else
+                name = Hotkeys::GetButtonName_INI(i);
+            size_t orig_l = name.size();
 
-        ctl->setValue(name.replace(orig_l, std::string::npos, "-type").c_str(),
-            this->m_keys[i].type);
-        ctl->setValue(name.replace(orig_l, std::string::npos, "-id").c_str(),
-            this->m_keys[i].id);
-        ctl->setValue(name.replace(orig_l, std::string::npos, "-val").c_str(),
-            this->m_keys[i].val);
+            ctl->setValue(name.replace(orig_l, std::string::npos, "-type").c_str(),
+                keys[i].type);
+            ctl->setValue(name.replace(orig_l, std::string::npos, "-id").c_str(),
+                keys[i].id);
+            ctl->setValue(name.replace(orig_l, std::string::npos, "-val").c_str(),
+                keys[i].val);
 
-        ctl->setValue(name.replace(orig_l, std::string::npos, "2-type").c_str(),
-            this->m_keys2[i].type);
-        ctl->setValue(name.replace(orig_l, std::string::npos, "2-id").c_str(),
-            this->m_keys2[i].id);
-        ctl->setValue(name.replace(orig_l, std::string::npos, "2-val").c_str(),
-            this->m_keys2[i].val);
+            ctl->setValue(name.replace(orig_l, std::string::npos, "2-type").c_str(),
+                keys2[i].type);
+            ctl->setValue(name.replace(orig_l, std::string::npos, "2-id").c_str(),
+                keys2[i].id);
+            ctl->setValue(name.replace(orig_l, std::string::npos, "2-val").c_str(),
+                keys2[i].val);
+        }
     }
 
     ctl->setValue("enable-rumble", this->m_rumbleEnabled);
@@ -1076,25 +1160,63 @@ void InputMethodProfile_Joystick::SaveConfig(IniProcessing* ctl)
 void InputMethodProfile_Joystick::LoadConfig(IniProcessing* ctl)
 {
     std::string name;
-    for(size_t i = 0; i < PlayerControls::n_buttons; i++)
+    for(int a = 0; a < 4; a++)
     {
-        name = PlayerControls::GetButtonName_INI(i);
-        size_t orig_l = name.size();
+        KM_Key* keys;
+        KM_Key* keys2;
+        size_t key_max;
+        if(a == 0)
+        {
+            keys = this->m_keys;
+            keys2 = this->m_keys2;
+            key_max = PlayerControls::n_buttons;
+        }
+        else if(a == 1)
+        {
+            keys = this->m_cursor_keys;
+            keys2 = this->m_cursor_keys2;
+            key_max = CursorControls::n_buttons;
+        }
+        else if(a == 2)
+        {
+            keys = this->m_editor_keys;
+            keys2 = this->m_editor_keys2;
+            key_max = EditorControls::n_buttons;
+        }
+        else
+        {
+            keys = this->m_hotkeys;
+            keys2 = this->m_hotkeys2;
+            key_max = Hotkeys::n_buttons;
+        }
+        for(size_t i = 0; i < key_max; i++)
+        {
+            if(a == 0)
+                name = PlayerControls::GetButtonName_INI(i);
+            else if(a == 1)
+                name = CursorControls::GetButtonName_INI(i);
+            else if(a == 2)
+                name = EditorControls::GetButtonName_INI(i);
+            else
+                name = Hotkeys::GetButtonName_INI(i);
+            size_t orig_l = name.size();
 
-        ctl->read(name.replace(orig_l, std::string::npos, "-type").c_str(),
-            this->m_keys[i].type, this->m_keys[i].type);
-        ctl->read(name.replace(orig_l, std::string::npos, "-id").c_str(),
-            this->m_keys[i].id, this->m_keys[i].id);
-        ctl->read(name.replace(orig_l, std::string::npos, "-val").c_str(),
-            this->m_keys[i].val, this->m_keys[i].val);
+            ctl->read(name.replace(orig_l, std::string::npos, "-type").c_str(),
+                keys[i].type, keys[i].type);
+            ctl->read(name.replace(orig_l, std::string::npos, "-id").c_str(),
+                keys[i].id, keys[i].id);
+            ctl->read(name.replace(orig_l, std::string::npos, "-val").c_str(),
+                keys[i].val, keys[i].val);
 
-        ctl->read(name.replace(orig_l, std::string::npos, "2-type").c_str(),
-            this->m_keys2[i].type, this->m_keys2[i].type);
-        ctl->read(name.replace(orig_l, std::string::npos, "2-id").c_str(),
-            this->m_keys2[i].id, this->m_keys2[i].id);
-        ctl->read(name.replace(orig_l, std::string::npos, "2-val").c_str(),
-            this->m_keys2[i].val, this->m_keys2[i].val);
+            ctl->read(name.replace(orig_l, std::string::npos, "2-type").c_str(),
+                keys2[i].type, keys2[i].type);
+            ctl->read(name.replace(orig_l, std::string::npos, "2-id").c_str(),
+                keys2[i].id, keys2[i].id);
+            ctl->read(name.replace(orig_l, std::string::npos, "2-val").c_str(),
+                keys2[i].val, keys2[i].val);
+        }
     }
+
 
     ctl->read("enable-rumble", this->m_rumbleEnabled, true);
 

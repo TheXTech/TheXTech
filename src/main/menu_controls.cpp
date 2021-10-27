@@ -330,10 +330,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
         int start_y = sY + 2*line;
 
         if(render && 0 >= scroll_start && 0 < scroll_end)
-        {
             SuperPrint(g_mainMenu.wordProfiles, 3, sX+16, start_y + (0-scroll_start)*line);
-            SuperPrintRightAlign(g_mainMenu.controlsDeleteKey, 3, sX+width-16, start_y + (0-scroll_start)*line);
-        }
 
         for(int i = 0; i <= n_profiles; i++)
         {
@@ -1292,17 +1289,6 @@ int menuControls_Logic()
             return 0;
         }
 
-        // deletion
-        if(delPressed && MenuCursor >= 0 && MenuCursor < n_profiles)
-        {
-            PlaySoundMenu(SFX_PlayerDied2);
-            s_deleteProfileSel = true;
-            s_curProfile = MenuCursor;
-            MenuCursor = 0;
-            MenuCursorCanMove = false;
-            return 0;
-        }
-
         // creation
         if(menuDoPress && MenuCursor == n_profiles)
         {
@@ -1409,7 +1395,6 @@ int menuControls_Logic()
             {
                 PlaySoundMenu(SFX_PlayerDied2);
                 s_deleteProfileSel = true;
-                s_curProfile = MenuCursor;
                 MenuCursor = 0;
                 MenuCursorCanMove = false;
                 return 0;

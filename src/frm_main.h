@@ -51,7 +51,6 @@ class FrmMain
     std::set<SDL_Texture *> m_textureBank;
     bool m_sdlLoaded = false;
     const Uint8 *m_keyboardState = nullptr;
-    Uint32 m_lastMousePress = 0;
     SDL_Event m_event;
     SDL_RendererInfo m_ri;
 #ifdef __ANDROID__
@@ -83,13 +82,6 @@ public:
     bool isWindowActive();
     bool hasWindowMouseFocus();
 
-    void eventDoubleClick();
-    void eventKeyPress(SDL_Scancode KeyASCII);
-    void eventKeyDown(SDL_KeyboardEvent &evt);
-    void eventKeyUp(SDL_KeyboardEvent &evt);
-    void eventMouseDown(SDL_MouseButtonEvent &m_event);
-    void eventMouseMove(SDL_MouseMotionEvent &m_event);
-    void eventMouseUp(SDL_MouseButtonEvent &m_event);
     void eventResize();
     int setFullScreen(bool fs);
     bool isSdlError();

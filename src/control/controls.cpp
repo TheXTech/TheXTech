@@ -1,20 +1,23 @@
 #include "../controls.h"
 #include "../main/record.h"
 #include "../main/speedrunner.h"
-#include "keyboard.h"
-#include "joystick.h"
 
-// for cheat screen
+// for hotkeys screen
+#include "../main/menu_controls.h"
 #include "../game_main.h"
 #include "../main/screen_textentry.h"
 #include "../graphics.h"
 #include "../frame_timer.h"
 
+// Control methods
+
+#include "keyboard.h"
+#include "joystick.h"
+#include "duplicate.h"
+
 #ifndef NO_SDL
 #include "touchscreen.h"
 #endif
-
-#include "duplicate.h"
 
 #include <Logger/logger.h>
 
@@ -29,21 +32,24 @@ bool g_disallowHotkeys = false;
 
 void Hotkeys::Activate(size_t i)
 {
-    if(g_disallowHotkeys)
+    if(g_disallowHotkeys || g_pollingInput)
         return;
+    g_disallowHotkeys = true;
     switch(i)
     {
+#if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
         case Buttons::Fullscreen:
             ChangeScreen();
             return;
+#endif
+#ifndef __EMSCRIPTEN__ // later make this be no screenshots
         case Buttons::Screenshot:
             TakeScreen = true;
             return;
         case Buttons::RecordGif:
-#ifndef __EMSCRIPTEN__ // later make this be no screenshots
             frmMain.toggleGifRecorder();
-#endif
             return;
+#endif
         case Buttons::DebugInfo:
             g_stats.enabled = !g_stats.enabled;
             return;
@@ -519,9 +525,10 @@ bool Update()
         type->UpdateControlsPost();
     }
 
-    if(SharedCursor.Move && SharedCursor.X >= 0. && SharedCursor.Y >= 0.)
+    if(SharedCursor.Move)
     {
-        frmMain.PlaceMouse(SharedCursor.X, SharedCursor.Y);
+        if(SharedCursor.X >= 0. && SharedCursor.Y >= 0.)
+            frmMain.PlaceMouse(SharedCursor.X, SharedCursor.Y);
     }
 
     // sync controls
@@ -621,6 +628,9 @@ bool Update()
         CheatString = TextEntryScreen::Text;
         CheatCode(' ');
         s_enterCheatScreen = false;
+        MenuCursorCanMove = false;
+        MenuMouseRelease = false;
+        MouseRelease = false;
     }
 
     g_disallowHotkeys = false;

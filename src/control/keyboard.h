@@ -14,6 +14,8 @@ public:
     using InputMethod::Type;
     using InputMethod::Profile;
 
+    bool m_hotkey_okay = false;
+
     // Update functions that set player controls (and editor controls)
     // based on current device input. Return false if device lost.
     bool Update(Controls_t& c, CursorControls_t& m, EditorControls_t& e);
@@ -37,6 +39,9 @@ public:
     int m_editor_keys2[EditorControls::n_buttons] = {null_key};
 
     int m_cursor_keys2[CursorControls::n_buttons] = {null_key};
+
+    int m_hotkeys[Hotkeys::n_buttons] = {null_key};
+    int m_hotkeys2[Hotkeys::n_buttons] = {null_key};
 
     InputMethodProfile_Keyboard();
 
@@ -68,6 +73,7 @@ private:
 
     int m_lastNumKeyboards = 0;
     bool m_touchscreenActive = false;
+    Uint32 m_lastMousePress = 0;
 
     InputMethodProfile* AllocateProfile() noexcept;
 
@@ -100,6 +106,7 @@ protected:
     bool SetProfile_Custom(InputMethod* method, int player_no, InputMethodProfile* profile, const std::vector<InputMethod*>& active_methods);
 
 public:
+    bool DefaultHotkey(const SDL_Event* ev);
     bool ConsumeEvent(const SDL_Event* ev);
 
     // How many per-type special options are there?

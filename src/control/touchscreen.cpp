@@ -72,9 +72,12 @@ enum
 //! Is hardware keyboard presented?
 static bool s_showTouchscreenOnStart = true;
 static int  s_touchPadStyle = 0;
+
+#ifdef __ANDROID__
 static double s_screenSize = 0;
 static double s_screenWidth = 0;
 static double s_screenHeight = 0;
+#endif
 
 static bool     s_vibrationEnable = false;
 static float    s_vibrationStrength = 1.0;
@@ -856,7 +859,7 @@ void TouchScreenController::doVibration()
     if(!s_vibrationEnable || !m_vibrator)
         return;
 
-    int ret = SDL_HapticRumblePlay(m_vibrator, s_vibrationStrength, s_vibrationLength);
+    SDL_HapticRumblePlay(m_vibrator, s_vibrationStrength, s_vibrationLength);
     D_pLogDebug("TouchScreen: Vibration %g, %d ms, ret %d", s_vibrationStrength, s_vibrationLength, ret);
 }
 
@@ -1325,30 +1328,42 @@ InputMethodProfile_TouchScreen::InputMethodProfile_TouchScreen()
 
 bool InputMethodProfile_TouchScreen::PollPrimaryButton(ControlsClass c, size_t i)
 {
+    (void)c;
     (void)i;
     return true;
 }
 
 bool InputMethodProfile_TouchScreen::PollSecondaryButton(ControlsClass c, size_t i)
 {
+    (void)c;
+    (void)i;
+    return true;
+}
+
+bool InputMethodProfile_TouchScreen::DeletePrimaryButton(ControlsClass c, size_t i)
+{
+    (void)c;
     (void)i;
     return true;
 }
 
 bool InputMethodProfile_TouchScreen::DeleteSecondaryButton(ControlsClass c, size_t i)
 {
+    (void)c;
     (void)i;
     return true;
 }
 
 const char* InputMethodProfile_TouchScreen::NamePrimaryButton(ControlsClass c, size_t i)
 {
+    (void)c;
     (void)i;
     return "(TOUCH)";
 }
 
 const char* InputMethodProfile_TouchScreen::NameSecondaryButton(ControlsClass c, size_t i)
 {
+    (void)c;
     (void)i;
     return "";
 }

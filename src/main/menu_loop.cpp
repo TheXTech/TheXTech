@@ -41,6 +41,7 @@
 #include "menu_main.h"
 #include "game_info.h"
 #include "speedrunner.h"
+#include "menu_controls.h"
 
 #include "../pseudo_vb.h"
 
@@ -472,7 +473,7 @@ static void updateIntroLevelActivity()
 void MenuLoop()
 {
     // ConnectScreen handles its own input method polling
-    if(MenuMode != MENU_CHARACTER_SELECT_NEW)
+    if(MenuMode != MENU_CHARACTER_SELECT_NEW && !g_pollingInput)
         Controls::PollInputMethod();
     Controls::Update();
     if(!SharedCursor.Primary && !SharedCursor.Secondary)

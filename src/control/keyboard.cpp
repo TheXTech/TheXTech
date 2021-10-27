@@ -1,7 +1,10 @@
+#include <SDL2/SDL.h>
+
 #include "../controls.h"
 #include "../globals.h"
 #include "keyboard.h"
 #include "../main/screen_textentry.h"
+#include "../game_main.h"
 
 namespace Controls
 {
@@ -28,27 +31,136 @@ bool InputMethod_Keyboard::Update(Controls_t& c, CursorControls_t& m, EditorCont
                 || k->m_keyboardState[SDL_SCANCODE_RALT] == KEY_PRESSED
                 || k->m_keyboardState[SDL_SCANCODE_LCTRL] == KEY_PRESSED
                 || k->m_keyboardState[SDL_SCANCODE_RCTRL] == KEY_PRESSED);
-    for(size_t i = 0; i < PlayerControls::n_buttons; i++)
+    bool hotkey_okay = true;
+    for(int a = 0; a < 4; a++)
     {
-        int key = p->m_keys[i];
-        int key2 = p->m_keys2[i];
-        bool& b = PlayerControls::GetButton(c, i);
-
-        bool inhibit = altPressed && (key == SDL_SCANCODE_RETURN || key == SDL_SCANCODE_F);
-
-        if(inhibit)
-            b = false;
-        else if(k->m_keyboardState[key] != 0)
-            b = true;
-        else if(key2 != null_key && k->m_keyboardState[key2] != 0)
-            b = true;
+        int* keys;
+        int* keys2;
+        size_t key_start;
+        size_t key_max;
+        bool activate = false;
+        if(a == 0)
+        {
+            keys = p->m_keys;
+            keys2 = p->m_keys2;
+            key_start = 0;
+            key_max = PlayerControls::n_buttons;
+        }
+        else if(a == 1)
+        {
+            keys = nullptr;
+            keys2 = p->m_cursor_keys2;
+            key_start = 4;
+            key_max = CursorControls::n_buttons;
+        }
+        else if(a == 2)
+        {
+            keys = p->m_editor_keys;
+            keys2 = p->m_editor_keys2;
+            key_start = 4;
+            key_max = EditorControls::n_buttons;
+        }
         else
-            b = false;
+        {
+            keys = p->m_hotkeys;
+            keys2 = p->m_hotkeys2;
+            key_start = 0;
+            key_max = Hotkeys::n_buttons;
+        }
+        for(size_t i = key_start; i < key_max; i++)
+        {
+            int key;
+            if(keys)
+                key = keys[i];
+            else
+                key = null_key;
+            int key2 = keys2[i];
+
+            if(altPressed && (key == SDL_SCANCODE_F || key == SDL_SCANCODE_RETURN))
+                key = null_key;
+            if(altPressed && (key2 == SDL_SCANCODE_F || key2 == SDL_SCANCODE_RETURN))
+                key2 = null_key;
+
+            bool* b;
+            if(a == 0)
+            {
+                b = &PlayerControls::GetButton(c, i);
+                *b = false;
+            }
+            else if(a == 1)
+                b = &CursorControls::GetButton(m, i);
+            else if(a == 2)
+                b = &EditorControls::GetButton(e, i);
+            else
+            {
+                b = &activate;
+                *b = false;
+            }
+
+            if(key != null_key && k->m_keyboardState[key] != 0)
+                *b = true;
+            else if(key2 != null_key && k->m_keyboardState[key2] != 0)
+                *b = true;
+
+            if(a == 3 && *b)
+            {
+                if(this->m_hotkey_okay)
+                    Hotkeys::Activate(i);
+                hotkey_okay = false;
+            }
+        }
+    }
+    this->m_hotkey_okay = hotkey_okay;
+
+    double* const scroll[4] = {&e.ScrollUp, &e.ScrollDown, &e.ScrollLeft, &e.ScrollRight};
+    bool cursor[4];
+
+    for(int i = 0; i < 4; i++)
+    {
+        int key = p->m_editor_keys[i];
+        int key2 = p->m_editor_keys2[i];
+        if(key != null_key && k->m_keyboardState[key] != 0)
+            *scroll[i] = 1.;
+        else if(key2 != null_key && k->m_keyboardState[key2] != 0)
+            *scroll[i] = 1.;
+    }
+
+    for(int i = 0; i < 4; i++)
+    {
+        int key = p->m_cursor_keys2[i];
+        cursor[i] = (key != null_key && k->m_keyboardState[key]);
+    }
+
+    // Cursor control (UDLR)
+    if(cursor[0] || cursor[1] || cursor[2] || cursor[3])
+    {
+        if(m.X < 0)
+            m.X = ScreenW/2;
+        if(m.Y < 0)
+            m.Y = ScreenH/2;
+        if(cursor[3])
+            m.X += 16.;
+        if(cursor[2])
+            m.X -= 16.;
+        if(cursor[1])
+            m.Y += 16.;
+        if(cursor[0])
+            m.Y -= 16.;
+        if(m.X < 0)
+            m.X = 0;
+        else if(m.X >= ScreenW)
+            m.X = ScreenW-1;
+        if(m.Y < 0)
+            m.Y = 0;
+        else if(m.Y >= ScreenH)
+            m.Y = ScreenH-1;
+        m.Move = true;
     }
 
     // TODO: for debugging purposes, REMOVE
     if(c.Up && c.Down)
         return false;
+
     return true;
 }
 
@@ -75,14 +187,52 @@ InputMethodProfile_Keyboard::InputMethodProfile_Keyboard()
     this->m_keys[PlayerControls::Buttons::AltRun] = SDL_SCANCODE_S;
     this->m_keys[PlayerControls::Buttons::Drop] = SDL_SCANCODE_LSHIFT;
     this->m_keys[PlayerControls::Buttons::Start] = SDL_SCANCODE_ESCAPE;
+
+    this->m_editor_keys[EditorControls::Buttons::ScrollUp] = SDL_SCANCODE_UP;
+    this->m_editor_keys[EditorControls::Buttons::ScrollDown] = SDL_SCANCODE_DOWN;
+    this->m_editor_keys[EditorControls::Buttons::ScrollLeft] = SDL_SCANCODE_LEFT;
+    this->m_editor_keys[EditorControls::Buttons::ScrollRight] = SDL_SCANCODE_RIGHT;
+    this->m_editor_keys[EditorControls::Buttons::FastScroll] = SDL_SCANCODE_LSHIFT;
+    this->m_editor_keys[EditorControls::Buttons::ModeSelect] = SDL_SCANCODE_Z;
+    this->m_editor_keys[EditorControls::Buttons::ModeErase] = SDL_SCANCODE_X;
+    this->m_editor_keys[EditorControls::Buttons::PrevSection] = SDL_SCANCODE_A;
+    this->m_editor_keys[EditorControls::Buttons::NextSection] = SDL_SCANCODE_S;
+    this->m_editor_keys[EditorControls::Buttons::SwitchScreens] = SDL_SCANCODE_RSHIFT;
+    this->m_editor_keys[EditorControls::Buttons::TestPlay] = SDL_SCANCODE_RETURN;
+
+    this->m_hotkeys[Hotkeys::Buttons::DebugInfo] = SDL_SCANCODE_F3;
+    this->m_hotkeys[Hotkeys::Buttons::Fullscreen] = SDL_SCANCODE_F7;
+#ifdef __APPLE__
+    this->m_hotkeys[Hotkeys::Buttons::RecordGif] = SDL_SCANCODE_F10;
+#else
+    this->m_hotkeys[Hotkeys::Buttons::RecordGif] = SDL_SCANCODE_F11;
+#endif
+    this->m_hotkeys[Hotkeys::Buttons::Screenshot] = SDL_SCANCODE_F12;
+    this->m_hotkeys[Hotkeys::Buttons::EnterCheats] = SDL_SCANCODE_F2;
+
     for(size_t i = 0; i < PlayerControls::n_buttons; i++)
     {
         this->m_keys2[i] = null_key;
+    }
+    for(size_t i = 0; i < CursorControls::n_buttons; i++)
+    {
+        this->m_cursor_keys2[i] = null_key;
+    }
+    for(size_t i = 0; i < EditorControls::n_buttons; i++)
+    {
+        this->m_editor_keys2[i] = null_key;
+    }
+    for(size_t i = 0; i < Hotkeys::n_buttons; i++)
+    {
+        this->m_hotkeys2[i] = null_key;
     }
 }
 
 bool InputMethodProfile_Keyboard::PollPrimaryButton(ControlsClass c, size_t i)
 {
+    if(c == ControlsClass::Cursor)
+        return true;
+
     // note: m_canPoll is initialized to false
     InputMethodType_Keyboard* k = dynamic_cast<InputMethodType_Keyboard*>(this->Type);
     if(!k)
@@ -107,32 +257,60 @@ bool InputMethodProfile_Keyboard::PollPrimaryButton(ControlsClass c, size_t i)
     // reset canPoll for next time
     this->m_canPoll = false;
 
+    // resolve the particular primary and secondary key arrays
+    int* keys;
+    int* keys2;
+    size_t key_max;
+    if(c == ControlsClass::Player)
+    {
+        keys = this->m_keys;
+        keys2 = this->m_keys2;
+        key_max = PlayerControls::n_buttons;
+    }
+    else if(c == ControlsClass::Editor)
+    {
+        keys = this->m_editor_keys;
+        keys2 = this->m_editor_keys2;
+        key_max = EditorControls::n_buttons;
+    }
+    else if(c == ControlsClass::Hotkey)
+    {
+        keys = this->m_hotkeys;
+        keys2 = this->m_hotkeys2;
+        key_max = Hotkeys::n_buttons;
+    }
+    else
+    {
+        // BAD!
+        return true;
+    }
+
     // minor switching algorithm to ensure that every button always has at least one key
     // and no button ever has a non-unique key
     // if a button's secondary key (including the current one) is the new key, delete it.
     // if a button's primary key (excluding the current one) is the new key,
     //     and it has a secondary key, overwrite it with the secondary key.
     //     otherwise, replace it with the button the player is replacing.
-    for(size_t j = 0; j < PlayerControls::n_buttons; j++)
+    for(size_t j = 0; j < key_max; j++)
     {
-        if(this->m_keys2[j] == key)
+        if(keys2[j] == key)
         {
-            this->m_keys2[j] = null_key;
+            keys2[j] = null_key;
         }
-        else if(i != j && this->m_keys[j] == key)
+        else if(i != j && keys[j] == key)
         {
-            if(this->m_keys2[j] != null_key)
+            if(keys2[j] != null_key)
             {
-                this->m_keys[j] = this->m_keys2[j];
-                this->m_keys2[j] = null_key;
+                keys[j] = keys2[j];
+                keys2[j] = null_key;
             }
             else
             {
-                this->m_keys[j] = this->m_keys[i];
+                keys[j] = keys[i];
             }
         }
     }
-    this->m_keys[i] = key;
+    keys[i] = key;
     return true;
 }
 
@@ -162,14 +340,48 @@ bool InputMethodProfile_Keyboard::PollSecondaryButton(ControlsClass c, size_t i)
     // reset canPoll for next time
     m_canPoll = false;
 
+    // resolve the particular primary and secondary key arrays
+    int* keys;
+    int* keys2;
+    size_t key_max;
+    if(c == ControlsClass::Player)
+    {
+        keys = this->m_keys;
+        keys2 = this->m_keys2;
+        key_max = PlayerControls::n_buttons;
+    }
+    else if(c == ControlsClass::Cursor)
+    {
+        keys = nullptr;
+        keys2 = this->m_cursor_keys2;
+        key_max = CursorControls::n_buttons;
+    }
+    else if(c == ControlsClass::Editor)
+    {
+        keys = this->m_editor_keys;
+        keys2 = this->m_editor_keys2;
+        key_max = EditorControls::n_buttons;
+    }
+    else if(c == ControlsClass::Hotkey)
+    {
+        keys = this->m_hotkeys;
+        keys2 = this->m_hotkeys2;
+        key_max = Hotkeys::n_buttons;
+    }
+    else
+    {
+        // BAD!
+        return true;
+    }
+
     // minor switching algorithm to ensure that every button always has at least one key
     // and no button ever has a non-unique key
 
     // if the current button's primary key is the new key,
     //     delete its secondary key instead of setting it.
-    if(this->m_keys[i] == key)
+    if(keys && keys[i] == key)
     {
-        this->m_keys2[i] = null_key;
+        keys2[i] = null_key;
         return true;
     }
     // if another button's secondary key is the new key, delete it.
@@ -180,42 +392,100 @@ bool InputMethodProfile_Keyboard::PollSecondaryButton(ControlsClass c, size_t i)
     //         this button's PRIMARY key instead
 
     bool can_do_secondary = true;
-    for(size_t j = 0; j < PlayerControls::n_buttons; j++)
+    for(size_t j = 0; j < key_max; j++)
     {
-        if(i != j && this->m_keys2[j] == key)
+        if(i != j && keys2[j] == key)
         {
-            this->m_keys2[j] = null_key;
+            keys2[j] = null_key;
         }
-        else if(i != j && this->m_keys[j] == key)
+        else if(keys && i != j && keys[j] == key)
         {
-            if(this->m_keys2[j] != null_key)
+            if(keys2[j] != null_key)
             {
-                this->m_keys[j] = this->m_keys2[j];
-                this->m_keys2[j] = null_key;
+                keys[j] = keys2[j];
+                keys2[j] = null_key;
             }
-            else if(this->m_keys2[i] != null_key)
+            else if(keys2[i] != null_key)
             {
-                this->m_keys[j] = this->m_keys2[i];
+                keys[j] = keys2[i];
             }
             else
             {
-                this->m_keys[j] = this->m_keys[i];
+                keys[j] = keys[i];
                 can_do_secondary = false;
             }
         }
     }
     if(can_do_secondary)
-        this->m_keys2[i] = key;
-    else
-        this->m_keys[i] = key;
+        keys2[i] = key;
+    else if(keys)
+        keys[i] = key;
     return true;
+}
+
+bool InputMethodProfile_Keyboard::DeletePrimaryButton(ControlsClass c, size_t i)
+{
+    // resolve the particular primary and secondary key arrays
+    int* keys;
+    int* keys2;
+    if(c == ControlsClass::Player)
+    {
+        keys = this->m_keys;
+        keys2 = this->m_keys2;
+    }
+    else if(c == ControlsClass::Cursor)
+    {
+        return false;
+    }
+    else if(c == ControlsClass::Editor)
+    {
+        keys = this->m_editor_keys;
+        keys2 = this->m_editor_keys2;
+    }
+    else if(c == ControlsClass::Hotkey)
+    {
+        keys = this->m_hotkeys;
+        keys2 = this->m_hotkeys2;
+    }
+    else
+    {
+        // BAD!
+        return false;
+    }
+
+    if(keys2[i] != null_key)
+    {
+        keys[i] = keys2[i];
+        keys2[i] = null_key;
+        return true;
+    }
+    if(c == ControlsClass::Player)
+        return false;
+    if(keys[i] != null_key)
+    {
+        keys[i] = null_key;
+        return true;
+    }
+    return false;
 }
 
 bool InputMethodProfile_Keyboard::DeleteSecondaryButton(ControlsClass c, size_t i)
 {
-    if(this->m_keys2[i] != null_key)
+    int* keys2;
+    if(c == ControlsClass::Player)
+        keys2 = this->m_keys2;
+    else if(c == ControlsClass::Cursor)
+        keys2 = this->m_cursor_keys2;
+    else if(c == ControlsClass::Editor)
+        keys2 = this->m_editor_keys2;
+    else if(c == ControlsClass::Hotkey)
+        keys2 = this->m_hotkeys2;
+    else
+        return false;
+
+    if(keys2[i] != null_key)
     {
-        this->m_keys2[i] = null_key;
+        keys2[i] = null_key;
         return true;
     }
     return false;
@@ -223,57 +493,159 @@ bool InputMethodProfile_Keyboard::DeleteSecondaryButton(ControlsClass c, size_t 
 
 const char* InputMethodProfile_Keyboard::NamePrimaryButton(ControlsClass c, size_t i)
 {
-    if(this->m_keys[i] == null_key)
+    int* keys;
+    if(c == ControlsClass::Player)
+        keys = this->m_keys;
+    else if(c == ControlsClass::Cursor)
+        return "(MOUSE)";
+    else if(c == ControlsClass::Editor)
+        keys = this->m_editor_keys;
+    else if(c == ControlsClass::Hotkey)
+        keys = this->m_hotkeys;
+    else
+        return "";
+
+    if(keys[i] == null_key)
         return "NONE";
-    return SDL_GetScancodeName((SDL_Scancode)this->m_keys[i]);
+    return SDL_GetScancodeName((SDL_Scancode)keys[i]);
 }
 
 const char* InputMethodProfile_Keyboard::NameSecondaryButton(ControlsClass c, size_t i)
 {
-    if(this->m_keys2[i] == null_key)
+    int* keys2;
+    if(c == ControlsClass::Player)
+        keys2 = this->m_keys2;
+    else if(c == ControlsClass::Cursor)
+        keys2 = this->m_cursor_keys2;
+    else if(c == ControlsClass::Editor)
+        keys2 = this->m_editor_keys2;
+    else if(c == ControlsClass::Hotkey)
+        keys2 = this->m_hotkeys2;
+    else
+        return "";
+
+    if(keys2[i] == null_key)
         return "NONE";
-    return SDL_GetScancodeName((SDL_Scancode)this->m_keys2[i]);
+    return SDL_GetScancodeName((SDL_Scancode)keys2[i]);
 }
 
 void InputMethodProfile_Keyboard::SaveConfig(IniProcessing* ctl)
 {
     char name2[20];
-    for(size_t i = 0; i < PlayerControls::n_buttons; i++)
+    for(int a = 0; a < 4; a++)
     {
-        const char* name = PlayerControls::GetButtonName_INI(i);
-        ctl->setValue(name, this->m_keys[i]);
-        for(size_t c = 0; c < 20; c++)
+        int* keys;
+        int* keys2;
+        size_t key_max;
+        if(a == 0)
         {
-            if(c+2 == 20 || name[c] == '\0')
-            {
-                name2[c] = '2';
-                name2[c+1] = '\0';
-                break;
-            }
-            name2[c] = name[c];
+            keys = this->m_keys;
+            keys2 = this->m_keys2;
+            key_max = PlayerControls::n_buttons;
         }
-        ctl->setValue(name2, this->m_keys2[i]);
+        else if(a == 1)
+        {
+            keys = nullptr;
+            keys2 = this->m_cursor_keys2;
+            key_max = CursorControls::n_buttons;
+        }
+        else if(a == 2)
+        {
+            keys = this->m_editor_keys;
+            keys2 = this->m_editor_keys2;
+            key_max = EditorControls::n_buttons;
+        }
+        else
+        {
+            keys = this->m_hotkeys;
+            keys2 = this->m_hotkeys2;
+            key_max = Hotkeys::n_buttons;
+        }
+        for(size_t i = 0; i < key_max; i++)
+        {
+            const char* name;
+            if(a == 0)
+                name = PlayerControls::GetButtonName_INI(i);
+            else if(a == 1)
+                name = CursorControls::GetButtonName_INI(i);
+            else if(a == 2)
+                name = EditorControls::GetButtonName_INI(i);
+            else
+                name = Hotkeys::GetButtonName_INI(i);
+            if(keys)
+                ctl->setValue(name, keys[i]);
+            for(size_t c = 0; c < 20; c++)
+            {
+                if(c+2 == 20 || name[c] == '\0')
+                {
+                    name2[c] = '2';
+                    name2[c+1] = '\0';
+                    break;
+                }
+                name2[c] = name[c];
+            }
+            ctl->setValue(name2, keys2[i]);
+        }
     }
 }
 
 void InputMethodProfile_Keyboard::LoadConfig(IniProcessing* ctl)
 {
     char name2[20];
-    for(size_t i = 0; i < PlayerControls::n_buttons; i++)
+    for(int a = 0; a < 4; a++)
     {
-        const char* name = PlayerControls::GetButtonName_INI(i);
-        ctl->read(name, this->m_keys[i], this->m_keys[i]);
-        for(size_t c = 0; c < 20; c++)
+        int* keys;
+        int* keys2;
+        size_t key_max;
+        if(a == 0)
         {
-            if(c+2 == 20 || name[c] == '\0')
-            {
-                name2[c] = '2';
-                name2[c+1] = '\0';
-                break;
-            }
-            name2[c] = name[c];
+            keys = this->m_keys;
+            keys2 = this->m_keys2;
+            key_max = PlayerControls::n_buttons;
         }
-        ctl->read(name2, this->m_keys2[i], this->m_keys2[i]);
+        else if(a == 1)
+        {
+            keys = nullptr;
+            keys2 = this->m_cursor_keys2;
+            key_max = CursorControls::n_buttons;
+        }
+        else if(a == 2)
+        {
+            keys = this->m_editor_keys;
+            keys2 = this->m_editor_keys2;
+            key_max = EditorControls::n_buttons;
+        }
+        else
+        {
+            keys = this->m_hotkeys;
+            keys2 = this->m_hotkeys2;
+            key_max = Hotkeys::n_buttons;
+        }
+        for(size_t i = 0; i < key_max; i++)
+        {
+            const char* name;
+            if(a == 0)
+                name = PlayerControls::GetButtonName_INI(i);
+            else if(a == 1)
+                name = CursorControls::GetButtonName_INI(i);
+            else if(a == 2)
+                name = EditorControls::GetButtonName_INI(i);
+            else
+                name = Hotkeys::GetButtonName_INI(i);
+            if(keys)
+                ctl->read(name, keys[i], keys[i]);
+            for(size_t c = 0; c < 20; c++)
+            {
+                if(c+2 == 20 || name[c] == '\0')
+                {
+                    name2[c] = '2';
+                    name2[c+1] = '\0';
+                    break;
+                }
+                name2[c] = name[c];
+            }
+            ctl->read(name2, keys2[i], keys2[i]);
+        }
     }
 }
 
@@ -451,6 +823,30 @@ InputMethod* InputMethodType_Keyboard::Poll(const std::vector<InputMethod*>& act
                     break;
                 }
             }
+            for(size_t i = 0; i < EditorControls::n_buttons; i++)
+            {
+                if(p->m_editor_keys[i] == key || p->m_editor_keys2[i] == key)
+                {
+                    allowed = false;
+                    break;
+                }
+            }
+            for(size_t i = 0; i < CursorControls::n_buttons; i++)
+            {
+                if(p->m_cursor_keys2[i] == key)
+                {
+                    allowed = false;
+                    break;
+                }
+            }
+            for(size_t i = 0; i < Hotkeys::n_buttons; i++)
+            {
+                if(p->m_hotkeys[i] == key || p->m_hotkeys2[i] == key)
+                {
+                    allowed = false;
+                    break;
+                }
+            }
         }
         if(!allowed)
             continue;
@@ -504,13 +900,98 @@ InputMethod* InputMethodType_Keyboard::Poll(const std::vector<InputMethod*>& act
 /*-----------------------*\
 || OPTIONAL METHODS      ||
 \*-----------------------*/
+bool InputMethodType_Keyboard::DefaultHotkey(const SDL_Event* ev)
+{
+    const SDL_KeyboardEvent& evt = ev->key;
+
+    int KeyCode = evt.keysym.scancode;
+
+    bool ctrlF = ((evt.keysym.mod & KMOD_CTRL) != 0 && evt.keysym.scancode == SDL_SCANCODE_F);
+    bool altEnter = ((evt.keysym.mod & KMOD_ALT) != 0 && (evt.keysym.scancode == SDL_SCANCODE_RETURN || evt.keysym.scancode == SDL_SCANCODE_KP_ENTER));
+
+    if(ctrlF || altEnter)
+        Hotkeys::Activate(Hotkeys::Buttons::Fullscreen);
+
+    if(m_lastNumKeyboards == 0)
+    {
+        if(KeyCode == SDL_SCANCODE_F12)
+            Hotkeys::Activate(Hotkeys::Buttons::Screenshot);
+        else if(KeyCode == SDL_SCANCODE_F3)
+            Hotkeys::Activate(Hotkeys::Buttons::DebugInfo);
+#ifdef __APPLE__
+        else if(KeyCode == SDL_SCANCODE_F10) // Reserved by macOS as "show desktop"
+#else
+        else if(KeyCode == SDL_SCANCODE_F11)
+#endif
+            Hotkeys::Activate(Hotkeys::Buttons::RecordGif);
+    }
+
+    SDL_Scancode KeyASCII = evt.keysym.scancode;
+
+    // classic cheat codes
+    switch(KeyASCII)
+    {
+    case SDL_SCANCODE_A: CheatCode('a'); break;
+    case SDL_SCANCODE_B: CheatCode('b'); break;
+    case SDL_SCANCODE_C: CheatCode('c'); break;
+    case SDL_SCANCODE_D: CheatCode('d'); break;
+    case SDL_SCANCODE_E: CheatCode('e'); break;
+    case SDL_SCANCODE_F: CheatCode('f'); break;
+    case SDL_SCANCODE_G: CheatCode('g'); break;
+    case SDL_SCANCODE_H: CheatCode('h'); break;
+    case SDL_SCANCODE_I: CheatCode('i'); break;
+    case SDL_SCANCODE_J: CheatCode('j'); break;
+    case SDL_SCANCODE_K: CheatCode('k'); break;
+    case SDL_SCANCODE_L: CheatCode('l'); break;
+    case SDL_SCANCODE_M: CheatCode('m'); break;
+    case SDL_SCANCODE_N: CheatCode('n'); break;
+    case SDL_SCANCODE_O: CheatCode('o'); break;
+    case SDL_SCANCODE_P: CheatCode('p'); break;
+    case SDL_SCANCODE_Q: CheatCode('q'); break;
+    case SDL_SCANCODE_R: CheatCode('r'); break;
+    case SDL_SCANCODE_S: CheatCode('s'); break;
+    case SDL_SCANCODE_T: CheatCode('t'); break;
+    case SDL_SCANCODE_U: CheatCode('u'); break;
+    case SDL_SCANCODE_V: CheatCode('v'); break;
+    case SDL_SCANCODE_W: CheatCode('w'); break;
+    case SDL_SCANCODE_X: CheatCode('x'); break;
+    case SDL_SCANCODE_Y: CheatCode('y'); break;
+    case SDL_SCANCODE_Z: CheatCode('z'); break;
+    case SDL_SCANCODE_1: CheatCode('1'); break;
+    case SDL_SCANCODE_2: CheatCode('2'); break;
+    case SDL_SCANCODE_3: CheatCode('3'); break;
+    case SDL_SCANCODE_4: CheatCode('4'); break;
+    case SDL_SCANCODE_5: CheatCode('5'); break;
+    case SDL_SCANCODE_6: CheatCode('6'); break;
+    case SDL_SCANCODE_7: CheatCode('7'); break;
+    case SDL_SCANCODE_8: CheatCode('8'); break;
+    case SDL_SCANCODE_9: CheatCode('9'); break;
+    case SDL_SCANCODE_0: CheatCode('0'); break;
+    default: CheatCode(' '); break;
+    }
+
+    return true;
+}
 
 bool InputMethodType_Keyboard::ConsumeEvent(const SDL_Event* ev)
 {
     switch(ev->type)
     {
-        case SDL_MOUSEBUTTONDOWN:
         case SDL_MOUSEBUTTONUP:
+#if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
+            if(ev->button.button == SDL_BUTTON_LEFT && ev->button.which != SDL_TOUCH_MOUSEID)
+            {
+                bool doubleClick = (this->m_lastMousePress + 300) >= SDL_GetTicks();
+                this->m_lastMousePress = SDL_GetTicks();
+                if(doubleClick)
+                {
+                    this->m_lastMousePress = 0;
+                    Hotkeys::Activate(Hotkeys::Buttons::Fullscreen);
+                }
+            }
+#endif
+            // intentional fallthrough
+        case SDL_MOUSEBUTTONDOWN:
             if(ev->button.which == SDL_TOUCH_MOUSEID && g_renderTouchscreen)
                 this->m_touchscreenActive = true;
             else
@@ -542,6 +1023,8 @@ bool InputMethodType_Keyboard::ConsumeEvent(const SDL_Event* ev)
                     TextEntryScreen::Backspace();
                 return true;
             }
+            if(this->DefaultHotkey(ev))
+                return true;
             return false;
         default:
             return false;

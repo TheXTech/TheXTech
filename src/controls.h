@@ -253,7 +253,7 @@ namespace EditorControls
     enum Buttons : size_t
     {
         ScrollUp = 0, ScrollDown, ScrollLeft, ScrollRight, FastScroll,
-        ModeSelect, ModeErase, NextSection, PrevSection, SwitchScreens, TestPlay
+        ModeSelect, ModeErase, PrevSection, NextSection, SwitchScreens, TestPlay
     };
 
 
@@ -276,10 +276,10 @@ namespace EditorControls
                 return "mode-select";
             case Buttons::ModeErase:
                 return "mode-erase";
-            case Buttons::NextSection:
-                return "next-section";
             case Buttons::PrevSection:
                 return "prev-section";
+            case Buttons::NextSection:
+                return "next-section";
             case Buttons::SwitchScreens:
                 return "switch-screens";
             case Buttons::TestPlay:
@@ -308,10 +308,10 @@ namespace EditorControls
                 return "Mode Select";
             case Buttons::ModeErase:
                 return "Mode Erase";
-            case Buttons::NextSection:
-                return "Next Sect";
             case Buttons::PrevSection:
                 return "Prev Sect";
+            case Buttons::NextSection:
+                return "Next Sect";
             case Buttons::SwitchScreens:
                 return "Show Pane";
             case Buttons::TestPlay:
@@ -332,10 +332,10 @@ namespace EditorControls
                 return c.ModeSelect;
             case Buttons::ModeErase:
                 return c.ModeErase;
-            case Buttons::NextSection:
-                return c.NextSection;
             case Buttons::PrevSection:
                 return c.PrevSection;
+            case Buttons::NextSection:
+                return c.NextSection;
             case Buttons::SwitchScreens:
                 return c.SwitchScreens;
             case Buttons::TestPlay:
@@ -495,7 +495,7 @@ public:
     virtual bool PollSecondaryButton(ControlsClass c, size_t i) = 0;
 
     // Deletes a primary button for the i'th button of class c (only called for non-Player buttons)
-    inline bool DeletePrimaryButton(ControlsClass c, size_t i) {return false;};
+    virtual bool DeletePrimaryButton(ControlsClass c, size_t i) = 0;
 
     // Deletes a secondary device button for the i'th button of class c
     virtual bool DeleteSecondaryButton(ControlsClass c, size_t i) = 0;
