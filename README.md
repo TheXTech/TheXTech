@@ -46,23 +46,24 @@ The original author wrote most of the code in the "*src*" folder in VB6. I did a
 
 ## How to use this?
 Here are many ways to play games with it:
-- there are some ready-to-use packages, just take and play as you did it with SMBX.
-- [macOS users, skip this]: use by the same way as an original game: put an executable file into the game root folder with an "thextech.ini" that contains next text:
-```
+- There are some ready-to-use packages, just download them, unpack and run them as you did it with SMBX, absolutely same.
+- [macOS users, skip this]: Mix the game with existing assets directory: put an executable file into the game root folder with an "thextech.ini" that contains next text:
+```ini
 [Main]
 force-portable = true
 ```
 , music.ini, sounds.ini and additional "graphics/ui" folder. An important note: all default graphics must be converted into PNG, use GIFs2PNG tool from Moondust Project over your "graphics" folder with a "-d" switch. Don't use "-r" switch to keep original GIFs together with new-made PNGs if you plan to continue the use of original VB6-written SMBX.
-- use it for debug mode: in your home directory, create the ".PGE_Project/thextech" folder (on macOS the "`~/Library/Application Support/PGE Project/thextech`") where you should put a full set of game resources and worlds stuff, this folder will work like a game root in the original game. This mode allows you to run an executable file from any folder location of your computer and use the same location of resources for all builds (except these are marked as portable by an INI file).
+- Use it for debug mode: in your home directory, create the ".PGE_Project/thextech" folder (on macOS the "`~/TheXTech Games/Debug Assets/`") where you should put a full set of game resources and worlds stuff, this folder will work like a game root in the original game. This mode allows you to run an executable file from any folder location of your computer and use the same location of resources for all builds (except these are marked as portable by an INI file).
 
 
 ## How to add custom episodes for the macOS version?
 If you have a bundled build of TheXTech, all default resources are inside your .app: "Content/Resources/assets/". You can modify the content, but it's not recommended! Instead, after the first run of a game, in your home directory will appear the next directory:
 ```
-   ~/TheXTech Episodes
+   ~/TheXTech Games/<game name>/
 ```
-In this directory, you will find an empty "battle" and "worlds" folder to put your custom stuff. At the "`~/Library/Application Support/PGE Project/thextech`" path logs, settings and game saves will be stored.
-If you want to replace default assets with your own, you can modify the content of the app bundle or compile a new build with giving of the necessary CMake arguments which needed to pack your custom assets root and icon into the new bundle or make the assets-less build (if you give no arguments, the assets-less build will result). Therefore, you need to put the full content of the game root into the "`~/Library/Application Support/PGE Project/thextech`" folder, include default assets (graphics, music, sounds, intro and outro levels, default battle and worlds folders).
+In this directory, you will find an empty "battle" and "worlds" folder to put your custom stuff. At the "settings" sub-directory the game settings and game saves will be stored.
+At the "`~/Library/Application Support/PGE Project/thextech/logs/`" path logs will be stored.
+If you want to replace default assets with your own, you can modify the content of the app bundle or compile a new build with giving of the necessary CMake arguments which needed to pack your custom assets root and icon into the new bundle or make the assets-less build (if you give no arguments, the assets-less build will result). Therefore, you need to put the full content of the game root into the "`~/TheXTech Games/Debug Assets/`" folder, include default assets (graphics, music, sounds, intro and outro levels, default battle and worlds folders).
 
 
 ## What is different with this thing in comparison to the original VB6 build?
@@ -103,5 +104,4 @@ To build it, you need to have the following things:
 - Optionally: system-wide installed dependencies: SDL2, libFreeImageLite (a modded implementation of the FreeImage), MixerX sound library, AudioCodecs collection of libraries. Having them be installed in a system gives a major build speed up. However, it's possible to build all these dependencies in place here with a cost of extra build time being added.
 
 ## Localization
-
-Some parts of TheXTech (such as Android launcher) can be localized, you may help to translate them using WebLate platform: https://hosted.weblate.org/projects/thextech/
+Some parts of TheXTech (such as Android launcher) can be localized into many languages, you may help to translate them using WebLate platform: https://hosted.weblate.org/projects/thextech/
