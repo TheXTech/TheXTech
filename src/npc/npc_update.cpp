@@ -596,7 +596,7 @@ void UpdateNPCs()
                     }
                     Block[numBlock].Location.SpeedX = Block[numBlock].Location.SpeedX + NPC[A].BeltSpeed;
                     Block[numBlock].IsNPC = NPC[A].Type;
-                    numTempBlock = numTempBlock + 1;
+                    numTempBlock++;
                     NPC[A].tempBlock = numBlock;
                 }
             }

@@ -27,6 +27,7 @@
 #include "../game_main.h"
 #include "../blocks.h"
 #include "../graphics.h"
+#include "../npc_id.h"
 
 #include <Logger/logger.h>
 
@@ -47,14 +48,16 @@ void NPCHit(int A, int B, int C)
     // B = 9      Fell of a cliff
     // B = 10     Link stab
     // Frost Bolt check
-    if(B == 3 && NPC[A].Type != 263 && NPC[A].Type != 265)
+    if(B == 3 && NPC[A].Type != NPCID_ICE_CUBE && NPC[A].Type != NPCID_PLAYERICEBALL)
     {
-        if(NPC[C].Type == 265 && NPC[A].Location.Width > 8 && NPC[A].Location.Height > 8)
+        if(NPC[C].Type == NPCID_PLAYERICEBALL && NPC[A].Location.Width > 8 && NPC[A].Location.Height > 8)
         {
-            if(NPC[A].Type == 283)
+            if(NPC[A].Type == NPCID_BUBBLE)
                 NPCHit(A, 3, B);
-            if(NPCNoIceBall[NPC[A].Type] == true || NPC[A].Location.Width > 128 || NPC[A].Location.Height > 128)
+
+            if(NPCNoIceBall[NPC[A].Type] || NPC[A].Location.Width > 128 || NPC[A].Location.Height > 128)
                 return;
+
             if(NPC[A].Type == 3)
             {
                 NPC[A].Type = 2;
@@ -120,22 +123,26 @@ void NPCHit(int A, int B, int C)
                 NPC[A].Type = 1;
                 NPC[A].Frame = EditorNPCFrame(NPC[A].Type, NPC[A].Direction);
             }
+
             NPC[A].Special = NPC[A].Type;
             NPC[A].Special2 = NPC[A].Frame;
             // If .Type = 52 Or .Type = 51 Then
             NPC[A].Special3 = 1;
             NPC[A].Location.SpeedY = 0;
             // End If
+
             NPC[A].Location.SpeedX = 0;
-            if(NPC[A].Type == 52)
+
+            if(NPC[A].Type == NPCID_SIDEPIRHANA)
             {
                 if(NPC[A].Direction == -1)
                     NPC[A].Location.Width = static_cast<int>(floor(static_cast<double>(NPC[A].Location.Width))) - 0.01;
                 else
                     NPC[A].Location.X = static_cast<int>(floor(static_cast<double>(NPC[A].Location.X))) + 0.01;
             }
+
             NPC[A].Location.Height = static_cast<int>(floor(static_cast<double>(NPC[A].Location.Height)));
-            NPC[A].Type = 263;
+            NPC[A].Type = NPCID_ICE_CUBE;
             NPC[A].BeltSpeed = 0;
             NPC[A].Projectile = false;
             NPC[A].RealSpeedX = 0;
