@@ -564,13 +564,21 @@ void DrawFrozenNPC(int Z, int A)
     {
 // draw npc
         float c = n.Shadow ? 0.f : 1.f;
+        int content = int(n.Special);
+        int contentFrame = int(n.Special2);
 
-        frmMain.renderTexture(float(vScreenX[Z] + n.Location.X + 2),
-                              float(vScreenY[Z] + n.Location.Y + 2),
-                              float(n.Location.Width - 4),
-                              float(n.Location.Height - 4),
-                              GFXNPCBMP[int(n.Special)],
-                              2, 2 + int(n.Special2) * NPCHeight[int(n.Special)], c, c, c);
+        // SDL_assert_release(content >= 0 && content <= maxNPCType);
+
+        // Draw frozen NPC body in only condition the content value is valid
+        if(content > 0 && content <= maxNPCType)
+        {
+            frmMain.renderTexture(float(vScreenX[Z] + n.Location.X + 2),
+                                  float(vScreenY[Z] + n.Location.Y + 2),
+                                  float(n.Location.Width - 4),
+                                  float(n.Location.Height - 4),
+                                  GFXNPCBMP[content],
+                                  2, 2 + contentFrame * NPCHeight[content], c, c, c);
+        }
 
         // draw ice
         frmMain.renderTexture(float(vScreenX[Z] + n.Location.X + NPCFrameOffsetX[n.Type]),

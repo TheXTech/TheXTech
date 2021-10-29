@@ -1,5 +1,8 @@
 TheXTech Changelog.
 
+Changes for 1.3.5.3
+-Fixed the vanilla crash: Attempting to freeze any Pokey segments when they have the "noiceball=0" option set will cause the out-of-range error with NPC-ID=-3 in a random moment. (https://github.com/Wohlstand/TheXTech/issues/220)
+
 Changes for 1.3.5.2
 -Fixed the ARM64 building
 -Updated the log writer

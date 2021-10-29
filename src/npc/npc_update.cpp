@@ -30,6 +30,7 @@
 #include "../sorting.h"
 #include "../compat.h"
 #include "../main/trees.h"
+#include "../npc_id.h"
 
 #include <Utils/maths.h>
 
@@ -2548,7 +2549,8 @@ void UpdateNPCs()
                                                             NPCHit(A, 4, A);
 
                                                         // If a Pokey head stands on a top of another Pokey segment
-                                                        if(HitSpot == 1 && NPC[A].Type == 247 && Block[B].IsNPC == 247)
+                                                        if(HitSpot == 1 && NPC[A].Type == NPCID_POKEY && Block[B].IsNPC == NPCID_POKEY
+                                                            && NPC[Block[B].IsReally].Type == NPCID_POKEY) // Make sure Pokey didn't transformed into ice cube or anything also
                                                         {
                                                             NPC[Block[B].IsReally].Special = -3;
                                                             NPC[A].Special2 = 0;
