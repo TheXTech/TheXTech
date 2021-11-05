@@ -4,6 +4,8 @@ Changes for 1.3.5.3
 -Fixed the vanilla crash: Attempting to freeze any Pokey segments when they have the "noiceball=0" option set will cause the out-of-range error with NPC-ID=-3 in a random moment. (https://github.com/Wohlstand/TheXTech/issues/220)
 -Changed the user directory location for macOS-built games into the "~/TheXTech Games/<bundle name without .app suffix>/" to avoid conflict between different games ran on the same device.
 -Changed the debug assets location on macOS into "~/TheXTech Games/Debug Assets/" to simplify the debug environment installation.
+-Fixed BGO-65, Bowser III, and rail platforms compatibility with SMBX build version up to 30
+-Fixed the false positive that enables the Yoshi Mode of music when a player actually doesn't ride any Yoshi
 
 Changes for 1.3.5.2
 -Fixed the ARM64 building
