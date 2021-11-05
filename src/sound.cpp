@@ -938,7 +938,7 @@ void UpdateYoshiMusic()
 
     bool hasYoshi = false;
 
-    for(int i = 1; i <= maxPlayers; ++i)
+    for(int i = 1; i <= numPlayers; ++i)
         hasYoshi |= (Player[i].Mount == 3);
 
     Mix_SetMusicTrackMute(g_curMusic, s_musicYoshiTrackNumber, hasYoshi ? 0 : 1);
