@@ -395,7 +395,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 
         if(npc.Type == NPCID_BOWSER_SMB3)
         {
-            if(compatModern && isSmbx64 && fVersion < 9)
+            if(compatModern && isSmbx64 && fVersion < 30)
                 npc.Special7 = 1.0; // Keep original behavior of Bowser as in SMBX 1.0
             else
                 npc.Special7 = n.special_data;
@@ -409,7 +409,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         case NPCID_REDBLOCKS:
         case NPCID_PLATFORM_SMB3:
         case NPCID_SAW:
-            if(compatModern && isSmbx64 && fVersion < 9)
+            if(compatModern && isSmbx64 && fVersion < 30)
                 npc.Special7 = 1.0; // Workaround for yellow platform at The Invasion 1 on the "Clown Car Parking" level
             else
                 npc.Special7 = n.special_data;
