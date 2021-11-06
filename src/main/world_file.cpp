@@ -41,6 +41,7 @@ void OpenWorld(std::string FilePath)
     // USE PGE-FL here
     std::string newInput = "";
     int FileRelease = 64;
+    bool compatModern = (CompatGetLevel() == COMPAT_MODERN);
     int A = 0;
     int B = 0;
     long long zCounter = 0;
@@ -81,11 +82,22 @@ void OpenWorld(std::string FilePath)
 
     WorldName = wld.EpisodeTitle;
     wld.charactersToS64();
+
     blockCharacter[1] = wld.nocharacter1;
     blockCharacter[2] = wld.nocharacter2;
-    blockCharacter[3] = wld.nocharacter3;
-    blockCharacter[4] = wld.nocharacter4;
-    blockCharacter[5] = wld.nocharacter5;
+    if(FileRelease >= 58 || !compatModern)
+    {
+        blockCharacter[3] = wld.nocharacter3;
+        blockCharacter[4] = wld.nocharacter4;
+        blockCharacter[5] = wld.nocharacter5;
+    }
+    else
+    {
+        blockCharacter[3] = true;
+        blockCharacter[4] = true;
+        blockCharacter[5] = true;
+    }
+
     StartLevel = dirEpisode.resolveFileCase(wld.IntroLevel_file);
     NoMap = wld.HubStyledWorld;
     RestartLevel = wld.restartlevel;

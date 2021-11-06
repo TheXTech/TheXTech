@@ -38,6 +38,7 @@
 #include "../collision.h"
 #include "../graphics.h"
 #include "../control/joystick.h"
+#include "../compat.h"
 #include "level_file.h"
 #include "pge_delay.h"
 
@@ -86,6 +87,7 @@ static int FindWorldsThread(void *)
 
 void FindWorlds()
 {
+    bool compatModern = (CompatGetLevel() == COMPAT_MODERN);
     NumSelectWorld = 0;
 
     std::vector<std::string> worldRoots;
@@ -135,11 +137,23 @@ void FindWorlds()
                     w.WorldFile = fName;
                     if(w.WorldName.empty())
                         w.WorldName = fName;
+
                     w.blockChar[1] = head.nocharacter1;
                     w.blockChar[2] = head.nocharacter2;
-                    w.blockChar[3] = head.nocharacter3;
-                    w.blockChar[4] = head.nocharacter4;
-                    w.blockChar[5] = head.nocharacter5;
+
+                    if((head.meta.RecentFormat == LevelData::SMBX64 &&
+                        head.meta.RecentFormatVersion >= 58) || !compatModern)
+                    {
+                        w.blockChar[3] = head.nocharacter3;
+                        w.blockChar[4] = head.nocharacter4;
+                        w.blockChar[5] = head.nocharacter5;
+                    }
+                    else
+                    {
+                        w.blockChar[3] = true;
+                        w.blockChar[4] = true;
+                        w.blockChar[5] = true;
+                    }
 
                     SelectWorld.push_back(w);
                 }
