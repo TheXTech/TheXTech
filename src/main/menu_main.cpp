@@ -141,8 +141,7 @@ void FindWorlds()
                     w.blockChar[1] = head.nocharacter1;
                     w.blockChar[2] = head.nocharacter2;
 
-                    if((head.meta.RecentFormat == LevelData::SMBX64 &&
-                        head.meta.RecentFormatVersion >= 58) || !compatModern)
+                    if(head.meta.RecentFormat != LevelData::SMBX64 || head.meta.RecentFormatVersion >= 30 || !compatModern)
                     {
                         w.blockChar[3] = head.nocharacter3;
                         w.blockChar[4] = head.nocharacter4;

@@ -85,7 +85,8 @@ void OpenWorld(std::string FilePath)
 
     blockCharacter[1] = wld.nocharacter1;
     blockCharacter[2] = wld.nocharacter2;
-    if(FileRelease >= 58 || !compatModern)
+
+    if(FileRelease >= 30 || !compatModern)
     {
         blockCharacter[3] = wld.nocharacter3;
         blockCharacter[4] = wld.nocharacter4;
