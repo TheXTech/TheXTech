@@ -1071,7 +1071,7 @@ void UpdateGraphics(bool skipRepaint)
                                 tempLocation.Height = Player[A].Location.Height - MarioFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
                             else
                                 tempLocation.Height = Player[A].Location.Height - MarioFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] - 30;
-                            tempLocation.Width = 99;
+                            tempLocation.Width = 100;
                             tempLocation.X = tempLocation.X + MarioFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
                             tempLocation.Y = tempLocation.Y + MarioFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
                             Y2 = 0;
@@ -1091,8 +1091,8 @@ void UpdateGraphics(bool skipRepaint)
                         else
                         {
                             tempLocation = Player[A].Location;
-                            tempLocation.Height = 99;
-                            tempLocation.Width = 99;
+                            tempLocation.Height = 100;
+                            tempLocation.Width = 100;
                             tempLocation.X = tempLocation.X + MarioFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
                             tempLocation.Y = tempLocation.Y + MarioFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] + Player[A].MountOffsetY;
                             Y2 = 0;
@@ -1110,7 +1110,7 @@ void UpdateGraphics(bool skipRepaint)
                                 tempLocation.Height = Player[A].Location.Height - LuigiFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
                             else
                                 tempLocation.Height = Player[A].Location.Height - LuigiFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] - 30;
-                            tempLocation.Width = 99;
+                            tempLocation.Width = 100;
                             tempLocation.X = tempLocation.X + LuigiFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
                             tempLocation.Y = tempLocation.Y + LuigiFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
                             Y2 = 0;
@@ -1130,8 +1130,8 @@ void UpdateGraphics(bool skipRepaint)
                         else
                         {
                             tempLocation = Player[A].Location;
-                            tempLocation.Height = 99;
-                            tempLocation.Width = 99;
+                            tempLocation.Height = 100;
+                            tempLocation.Width = 100;
                             tempLocation.X = tempLocation.X + LuigiFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
                             tempLocation.Y = tempLocation.Y + LuigiFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] + Player[A].MountOffsetY;
                             Y2 = 0;
@@ -1149,7 +1149,7 @@ void UpdateGraphics(bool skipRepaint)
                                 tempLocation.Height = Player[A].Location.Height - PeachFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
                             else
                                 tempLocation.Height = Player[A].Location.Height - PeachFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] - 30;
-                            tempLocation.Width = 99;
+                            tempLocation.Width = 100;
                             tempLocation.X = tempLocation.X + PeachFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
                             tempLocation.Y = tempLocation.Y + PeachFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
                             Y2 = 0;
@@ -1181,8 +1181,8 @@ void UpdateGraphics(bool skipRepaint)
                         else
                         {
                             tempLocation = Player[A].Location;
-                            tempLocation.Height = 99;
-                            tempLocation.Width = 99;
+                            tempLocation.Height = 100;
+                            tempLocation.Width = 100;
                             tempLocation.X = tempLocation.X + PeachFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
                             tempLocation.Y = tempLocation.Y + PeachFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] + Player[A].MountOffsetY;
                             Y2 = 0;
@@ -1200,7 +1200,7 @@ void UpdateGraphics(bool skipRepaint)
                                 tempLocation.Height = Player[A].Location.Height - ToadFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
                             else
                                 tempLocation.Height = Player[A].Location.Height - ToadFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] - 26;
-                            tempLocation.Width = 99;
+                            tempLocation.Width = 100;
                             tempLocation.X = tempLocation.X + ToadFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
                             if(Player[A].State == 1)
                                 tempLocation.Y = tempLocation.Y + ToadFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] + 6;
@@ -1223,8 +1223,8 @@ void UpdateGraphics(bool skipRepaint)
                         else
                         {
                             tempLocation = Player[A].Location;
-                            tempLocation.Height = 99;
-                            tempLocation.Width = 99;
+                            tempLocation.Height = 100;
+                            tempLocation.Width = 100;
                             tempLocation.X = tempLocation.X + ToadFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
                             tempLocation.Y = tempLocation.Y + ToadFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] + Player[A].MountOffsetY;
                             Y2 = 0;
@@ -1238,8 +1238,8 @@ void UpdateGraphics(bool skipRepaint)
                         if(Player[A].Frame > 5)
                             Player[A].Frame = 1;
                         tempLocation = Player[A].Location;
-                        tempLocation.Height = 99;
-                        tempLocation.Width = 99;
+                        tempLocation.Height = 100;
+                        tempLocation.Width = 100;
                         tempLocation.X = tempLocation.X + LinkFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
                         tempLocation.Y = tempLocation.Y + LinkFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] + Player[A].MountOffsetY;
                         Y2 = 0;

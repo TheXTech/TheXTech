@@ -108,7 +108,7 @@ void DrawPlayer(int A, int Z)
                     frmMain.renderTexture(
                                 vScreenX[Z] + SDL_floor(Player[A].Location.X) + MarioFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
                                 vScreenY[Z] + Player[A].Location.Y + MarioFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
-                                99, 99,
+                                100, 100,
                                 GFXMario[Player[A].State],
                                 pfrX(100 + Player[A].Frame * Player[A].Direction),
                                 pfrY(100 + Player[A].Frame * Player[A].Direction),
@@ -121,7 +121,7 @@ void DrawPlayer(int A, int Z)
                         frmMain.renderTexture(
                                     vScreenX[Z] + SDL_floor(Player[A].Location.X) + MarioFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
                                     vScreenY[Z] + Player[A].Location.Y + MarioFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
-                                    99,
+                                    100,
                                     Player[A].Location.Height - 26 - Player[A].MountOffsetY - MarioFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
                                     GFXMario[Player[A].State],
                                     pfrX(100 + Player[A].Frame * Player[A].Direction),
@@ -141,7 +141,7 @@ void DrawPlayer(int A, int Z)
                 {
                     frmMain.renderTexture(vScreenX[Z] + SDL_floor(Player[A].Location.X) + MarioFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
                                           vScreenY[Z] + Player[A].Location.Y + MarioFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] + Player[A].MountOffsetY,
-                                          99, 99,
+                                          100, 100,
                                           GFXMario[Player[A].State],
                                           pfrX(100 + Player[A].Frame * Player[A].Direction),
                                           pfrY(100 + Player[A].Frame * Player[A].Direction),
@@ -155,7 +155,7 @@ void DrawPlayer(int A, int Z)
                     frmMain.renderTexture(
                                 vScreenX[Z] + SDL_floor(Player[A].Location.X) + LuigiFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
                                 vScreenY[Z] + Player[A].Location.Y + LuigiFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
-                                99, 99,
+                                100, 100,
                                 GFXLuigi[Player[A].State],
                                 pfrX(100 + Player[A].Frame * Player[A].Direction),
                                 pfrY(100 + Player[A].Frame * Player[A].Direction),
@@ -167,7 +167,7 @@ void DrawPlayer(int A, int Z)
                     {
                         frmMain.renderTexture(vScreenX[Z] + SDL_floor(Player[A].Location.X) + LuigiFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
                                               vScreenY[Z] + Player[A].Location.Y + LuigiFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
-                                              99,
+                                              100,
                                               Player[A].Location.Height - 26 - Player[A].MountOffsetY - LuigiFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
                                               GFXLuigi[Player[A].State],
                                               pfrX(100 + Player[A].Frame * Player[A].Direction),
@@ -187,7 +187,7 @@ void DrawPlayer(int A, int Z)
                 {
                     frmMain.renderTexture(vScreenX[Z] + SDL_floor(Player[A].Location.X) + LuigiFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
                                           vScreenY[Z] + Player[A].Location.Y + LuigiFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] + Player[A].MountOffsetY,
-                                          99, 99,
+                                          100, 100,
                                           GFXLuigi[Player[A].State],
                                           pfrX(100 + Player[A].Frame * Player[A].Direction),
                                           pfrY(100 + Player[A].Frame * Player[A].Direction),
@@ -201,7 +201,7 @@ void DrawPlayer(int A, int Z)
                     frmMain.renderTexture(
                                 vScreenX[Z] + Player[A].Location.X + PeachFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
                                 vScreenY[Z] + Player[A].Location.Y + PeachFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
-                                99, 99,
+                                100, 100,
                                 GFXPeach[Player[A].State],
                                 pfrX(100 + Player[A].Frame * Player[A].Direction),
                                 pfrY(100 + Player[A].Frame * Player[A].Direction),
@@ -213,7 +213,7 @@ void DrawPlayer(int A, int Z)
                     {
                         frmMain.renderTexture(vScreenX[Z] + SDL_floor(Player[A].Location.X) + PeachFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
                                               vScreenY[Z] + Player[A].Location.Y + PeachFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
-                                              99,
+                                              100,
                                               Player[A].Location.Height - 26 - PeachFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] - 2,
                                               GFXPeach[Player[A].State],
                                               pfrX(100 + Player[A].Frame * Player[A].Direction),
@@ -237,7 +237,7 @@ void DrawPlayer(int A, int Z)
                     frmMain.renderTexture(
                                 vScreenX[Z] + Player[A].Location.X + ToadFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
                                 vScreenY[Z] + Player[A].Location.Y + ToadFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
-                                99, 99,
+                                100, 100,
                                 GFXToad[Player[A].State],
                                 pfrX(100 + Player[A].Frame * Player[A].Direction),
                                 pfrY(100 + Player[A].Frame * Player[A].Direction),
@@ -251,7 +251,7 @@ void DrawPlayer(int A, int Z)
                         {
                             frmMain.renderTexture(vScreenX[Z] + SDL_floor(Player[A].Location.X) + ToadFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
                                                   6 + vScreenY[Z] + Player[A].Location.Y + ToadFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
-                                                  99,
+                                                  100,
                                                   Player[A].Location.Height - 26 - Player[A].MountOffsetY - ToadFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], GFXToad[Player[A].State],
                                                   pfrX(100 + Player[A].Frame * Player[A].Direction),
                                                   pfrY(100 + Player[A].Frame * Player[A].Direction),
@@ -261,7 +261,7 @@ void DrawPlayer(int A, int Z)
                         {
                             frmMain.renderTexture(vScreenX[Z] + SDL_floor(Player[A].Location.X) + ToadFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
                                                   vScreenY[Z] + Player[A].Location.Y + ToadFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
-                                                  99,
+                                                  100,
                                                   Player[A].Location.Height - 26 - Player[A].MountOffsetY - ToadFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
                                                   GFXToad[Player[A].State],
                                                   pfrX(100 + Player[A].Frame * Player[A].Direction),
@@ -284,7 +284,7 @@ void DrawPlayer(int A, int Z)
                 {
                     frmMain.renderTexture(vScreenX[Z] + Player[A].Location.X + LinkFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
                                           vScreenY[Z] + Player[A].Location.Y + LinkFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
-                                          99, 99,
+                                          100, 100,
                                           GFXLink[Player[A].State],
                                           pfrX(100 + Player[A].Frame * Player[A].Direction),
                                           pfrY(100 + Player[A].Frame * Player[A].Direction),
