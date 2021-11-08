@@ -501,6 +501,10 @@ void GetvScreenCredits()
 
 int pfrX(int plrFrame)
 {
+#if 1
+    plrFrame -= 100; // TODO: Remove all redundant "100 +" from all input code
+    return ((plrFrame + 49) / 10) * 100;
+#else
     int A;
     A = plrFrame;
     A = A - 50;
@@ -529,10 +533,15 @@ int pfrX(int plrFrame)
     else
         A = 0;
     return A * 100;
+#endif
 }
 
 int pfrY(int plrFrame)
 {
+#if 1
+    plrFrame -= 100; // TODO: Remove all redundant "100 +" from all input code
+    return ((plrFrame + 49) % 10) * 100;
+#else
     int A;
     A = plrFrame;
     A = A - 50;
@@ -542,6 +551,7 @@ int pfrY(int plrFrame)
     while(A > 9)
         A = A - 10;
     return A * 100;
+#endif
 }
 
 void ScreenShot()
