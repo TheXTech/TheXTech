@@ -1771,7 +1771,7 @@ void PlayerFrame(int A)
         }
         if(Player[A].Mount == 1) // Goomba's Shoe
         {
-            Player[A].MountOffsetY = -Player[A].Location.SpeedY / 2;
+            Player[A].MountOffsetY = 0;//-Player[A].Location.SpeedY / 2; FIXME: Verify this didn't broke anything
             if(Player[A].Duck || Player[A].StandingOnNPC != 0)
                 Player[A].MountOffsetY = 0;
             if(Player[A].Direction == 1)

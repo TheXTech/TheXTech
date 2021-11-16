@@ -9,6 +9,7 @@ Changes for 1.3.5.3
 -Mario and Luigi will be only available at episodes built with SMBX older than build version 30 (the first version that introduces Peach, Toad, and Link)
 -Fixed the invalid vertical offset while drawing a playable character sprite
 -Resolved the old jittering problem when drawing a playable character while moving the camera (thanks to @ds-sloth for the fix)
+-Fixed the minor graphical distortion of a playable character that appears while flying up and down with a shoe.
 
 Changes for 1.3.5.2
 -Fixed the ARM64 building
