@@ -237,10 +237,9 @@ void GraphicsLazyPreLoad()
 
         For(A, 1, numBackground)
         {
-            if(vScreenCollision(Z, Background[A].Location) && !Background[A].Hidden)
-            {
-                frmMain.lazyPreLoad(GFXBackgroundBMP[Background[A].Type]);
-            }
+            auto &b = Background[A];
+            if(vScreenCollision(Z, b.Location) && !b.Hidden && IF_INRANGE(b.Type, 1, maxBackgroundType))
+                frmMain.lazyPreLoad(GFXBackgroundBMP[b.Type]);
         }
 
         int64_t fBlock = 0;
@@ -249,18 +248,16 @@ void GraphicsLazyPreLoad()
 
         For(A, fBlock, lBlock)
         {
-            if(vScreenCollision(Z, Block[A].Location) && !Block[A].Hidden)
-            {
+            auto &b = Block[A];
+            if(vScreenCollision(Z, b.Location) && !b.Hidden && IF_INRANGE(b.Type, 1, maxBlockType))
                 frmMain.lazyPreLoad(GFXBlock[Block[A].Type]);
-            }
         }
 
         for(int A = 1; A <= numNPCs; A++)
         {
-            if(vScreenCollision(Z, NPC[A].Location))
-            {
-                frmMain.lazyPreLoad(GFXNPC[NPC[A].Type]);
-            }
+            auto &n = NPC[A];
+            if(vScreenCollision(Z, n.Location) && IF_INRANGE(n.Type, 0, maxNPCType))
+                frmMain.lazyPreLoad(GFXNPC[n.Type]);
         }
     }
 }
