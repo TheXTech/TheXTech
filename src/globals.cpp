@@ -64,6 +64,8 @@ bool GamePaused = false;
 std::string MessageText;
 int NumSelectWorld  = 0;
 std::vector<SelectWorld_t> SelectWorld;
+std::string g_recentWorld1p;
+std::string g_recentWorld2p;
 bool ShowFPS = false;
 double PrintFPS = 0.0;
 bool GameplayPoundByAltRun = false;

@@ -78,6 +78,7 @@ static int menuBattleMode = false;
 
 static int menuCopySaveSrc = 0;
 static int menuCopySaveDst = 0;
+static int menuRecentEpisode = -1;
 
 static int FindWorldsThread(void *)
 {
@@ -89,6 +90,7 @@ void FindWorlds()
 {
     bool compatModern = (CompatGetLevel() == COMPAT_MODERN);
     NumSelectWorld = 0;
+    menuRecentEpisode = -1;
 
     std::vector<std::string> worldRoots;
     worldRoots.push_back(AppPath + "worlds/");
@@ -154,6 +156,17 @@ void FindWorlds()
                         w.blockChar[5] = true;
                     }
 
+                    if(MenuMode == MENU_1PLAYER_GAME && wPath == g_recentWorld1p)
+                    {
+                        menuRecentEpisode = SelectWorld.size() - 1;
+                        w.highlight = true;
+                    }
+                    else if(MenuMode == MENU_2PLAYER_GAME && wPath == g_recentWorld2p)
+                    {
+                        menuRecentEpisode = SelectWorld.size() - 1;
+                        w.highlight = true;
+                    }
+
                     SelectWorld.push_back(w);
                 }
             }
@@ -163,6 +176,8 @@ void FindWorlds()
     }
 
     NumSelectWorld = (SelectWorld.size() - 1);
+
+    MenuCursor = (menuRecentEpisode < 0) ? 0 : menuRecentEpisode;
 
     SDL_AtomicSet(&loading, 0);
 }
@@ -404,11 +419,12 @@ bool mainMenuUpdate()
                     menuBattleMode = false;
 #ifdef __EMSCRIPTEN__
                     FindWorlds();
+                    MenuCursor = (menuRecentEpisode < 0) ? 0 : menuRecentEpisode;
 #else
+                    MenuCursor = 0;
                     SDL_AtomicSet(&loading, 1);
                     loadingThread = SDL_CreateThread(FindWorldsThread, "FindWorlds", NULL);
 #endif
-                    MenuCursor = 0;
                 }
                 else if(MenuCursor == 1)
                 {
@@ -424,11 +440,12 @@ bool mainMenuUpdate()
                         menuBattleMode = false;
 #ifdef __EMSCRIPTEN__
                         FindWorlds();
+                        MenuCursor = (menuRecentEpisode < 0) ? 0 : menuRecentEpisode;
 #else
+                        MenuCursor = 0;
                         SDL_AtomicSet(&loading, 1);
                         loadingThread = SDL_CreateThread(FindWorldsThread, "FindWorlds", NULL);
 #endif
-                        MenuCursor = 0;
                     }
                 }
                 else if(MenuCursor == 2)
@@ -839,7 +856,20 @@ bool mainMenuUpdate()
                         PGE_Delay(500);
                         ClearGame();
 
-                        OpenWorld(SelectWorld[selWorld].WorldPath + SelectWorld[selWorld].WorldFile);
+                        std::string wPath = SelectWorld[selWorld].WorldPath + SelectWorld[selWorld].WorldFile;
+
+                        if(numPlayers == 1 && g_recentWorld1p != wPath)
+                        {
+                            g_recentWorld1p = wPath;
+                            SaveConfig();
+                        }
+                        else if(numPlayers == 1 && g_recentWorld2p != wPath)
+                        {
+                            g_recentWorld2p = wPath;
+                            SaveConfig();
+                        }
+
+                        OpenWorld(wPath);
 
                         if(SaveSlot[selSave] >= 0)
                         {
@@ -1643,9 +1673,10 @@ void mainMenuDraw()
 
         for(auto A = minShow; A <= maxShow; A++)
         {
+            auto w = SelectWorld[A];
             B = A - minShow + 1;
-            tempStr = SelectWorld[A].WorldName;
-            SuperPrint(tempStr, 3, 300, 320 + (B * 30));
+            float r = w.highlight ? 0.f : 1.f;
+            SuperPrint(w.WorldName, 3, 300, 320 + (B * 30), r, 1.f, 1.f, 1.f);
         }
 
         if(minShow > 1)

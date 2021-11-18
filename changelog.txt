@@ -10,6 +10,7 @@ Changes for 1.3.5.3
 -Fixed the invalid vertical offset while drawing a playable character sprite
 -Resolved the old jittering problem when drawing a playable character while moving the camera (thanks to @ds-sloth for the fix)
 -Fixed the minor graphical distortion of a playable character that appears while flying up and down with a shoe.
+-The last played episode will be reminded and scrolled at the episode selection menu
 
 Changes for 1.3.5.2
 -Fixed the ARM64 building

@@ -186,6 +186,11 @@ void OpenConfig()
         config.read("full-screen", resBool, false);
         config.endGroup();
 
+        config.beginGroup("recent");
+        config.read("episode-1p", g_recentWorld1p, std::string());
+        config.read("episode-2p", g_recentWorld2p, std::string());
+        config.endGroup();
+
         config.beginGroup("gameplay");
         config.read("ground-pound-by-alt-run", GameplayPoundByAltRun, false);
         config.readEnum("world-map-stars-show-policy", WorldMapStarShowPolicyGlobal, 0, starsShowPolicy);
@@ -291,6 +296,11 @@ void SaveConfig()
     // TODO: Make sure, saving of those settings will not been confused by line arguments
 //    config.setValue("frame-skip", FrameSkip);
 //    config.setValue("show-fps", ShowFPS);
+    config.endGroup();
+
+    config.beginGroup("recent");
+    config.setValue("episode-1p", g_recentWorld1p);
+    config.setValue("episode-2p", g_recentWorld2p);
     config.endGroup();
 
     config.beginGroup("video");
