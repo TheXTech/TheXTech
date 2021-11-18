@@ -177,6 +177,8 @@ void FindWorlds()
 
     NumSelectWorld = (SelectWorld.size() - 1);
 
+    if(menuRecentEpisode >= 0)
+        worldCurs = menuRecentEpisode - 3;
     MenuCursor = (menuRecentEpisode < 0) ? 0 : menuRecentEpisode;
 
     SDL_AtomicSet(&loading, 0);
@@ -419,7 +421,6 @@ bool mainMenuUpdate()
                     menuBattleMode = false;
 #ifdef __EMSCRIPTEN__
                     FindWorlds();
-                    MenuCursor = (menuRecentEpisode < 0) ? 0 : menuRecentEpisode;
 #else
                     MenuCursor = 0;
                     SDL_AtomicSet(&loading, 1);
@@ -440,7 +441,6 @@ bool mainMenuUpdate()
                         menuBattleMode = false;
 #ifdef __EMSCRIPTEN__
                         FindWorlds();
-                        MenuCursor = (menuRecentEpisode < 0) ? 0 : menuRecentEpisode;
 #else
                         MenuCursor = 0;
                         SDL_AtomicSet(&loading, 1);
@@ -863,7 +863,7 @@ bool mainMenuUpdate()
                             g_recentWorld1p = wPath;
                             SaveConfig();
                         }
-                        else if(numPlayers == 1 && g_recentWorld2p != wPath)
+                        else if(numPlayers == 2 && g_recentWorld2p != wPath)
                         {
                             g_recentWorld2p = wPath;
                             SaveConfig();
