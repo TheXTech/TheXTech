@@ -407,6 +407,7 @@ int GameMain(const CmdLineSetup_t &setup)
             }
 
             MenuMouseMove = false;
+            MenuWheelMoved = false;
             MenuMouseRelease = false;
             MenuMouseClick = false;
             MenuMouseBack = false;

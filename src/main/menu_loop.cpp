@@ -536,6 +536,7 @@ void MenuLoop()
 
     MenuMouseMove = false;
     MenuMouseClick = false;
+    MenuWheelMoved = false;
 
     if(MenuMouseDown)
         MenuMouseRelease = false;

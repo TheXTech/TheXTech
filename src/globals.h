@@ -2029,6 +2029,10 @@ extern int PlayerCharacter2;
 extern double MenuMouseX;
 //Public MenuMouseY As Double
 extern double MenuMouseY;
+//! mouse wheel delta
+extern Sint32 MenuWheelDelta;
+//! mouse wheel event
+extern bool MenuWheelMoved;
 //Public MenuMouseDown As Boolean
 extern bool MenuMouseDown;
 //Public MenuMouseBack As Boolean

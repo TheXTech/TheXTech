@@ -403,6 +403,9 @@ void FrmMain::processEvent()
     case SDL_MOUSEMOTION:
         eventMouseMove(m_event.motion);
         break;
+    case SDL_MOUSEWHEEL:
+        eventMouseWheel(m_event.wheel);
+        break;
 #ifdef __ANDROID__
     case SDL_RENDER_DEVICE_RESET:
         D_pLogDebug("Android: Render Device Reset");
@@ -580,6 +583,12 @@ void FrmMain::eventMouseMove(SDL_MouseMotionEvent &event)
         MouseMove(EditorCursor.X, EditorCursor.Y, true);
         MouseRelease = true;
     }
+}
+
+void FrmMain::eventMouseWheel(SDL_MouseWheelEvent &m_event)
+{
+    MenuWheelDelta = m_event.y;
+    MenuWheelMoved = true;
 }
 
 void FrmMain::eventMouseUp(SDL_MouseButtonEvent &event)

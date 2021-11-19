@@ -288,6 +288,11 @@ bool mainMenuUpdate()
     bool menuDoPress = (returnPressed && !altPressed) || spacePressed;
     bool menuBackPress = (escPressed && !altPressed);
 
+    bool homePressed = getKeyState(SDL_SCANCODE_HOME) == KEY_PRESSED;
+    bool endPressed = getKeyState(SDL_SCANCODE_END) == KEY_PRESSED;
+    bool pageUpPressed = getKeyState(SDL_SCANCODE_PAGEUP) == KEY_PRESSED;
+    bool pageDownPressed = getKeyState(SDL_SCANCODE_PAGEDOWN) == KEY_PRESSED;
+
     {
         Controls_t &c = Player[1].Controls;
 
@@ -300,17 +305,20 @@ bool mainMenuUpdate()
             showCursor(0);
         }
 
-        if(!c.Up && !c.Down && !c.Jump && !c.Run && !c.Start)
+        if(!c.Up && !c.Down && !c.Left && !c.Right && !c.Jump && !c.Run && !c.Start)
         {
             bool k = false;
             k |= menuDoPress;
             k |= upPressed;
             k |= downPressed;
             k |= escPressed;
+            k |= homePressed;
+            k |= endPressed;
+            k |= pageUpPressed;
+            k |= pageDownPressed;
 
             if(!k)
                 MenuCursorCanMove = true;
-
         }
 
         if(!getNewKeyboard && !getNewJoystick)
@@ -749,12 +757,69 @@ bool mainMenuUpdate()
 
             }
 
+            bool dontWrap = false;
+
+            if(homePressed && MenuCursorCanMove)
+            {
+                PlaySoundMenu(SFX_Saw);
+                MenuCursor = 0;
+                MenuCursorCanMove = false;
+                dontWrap = true;
+            }
+            else if(endPressed && MenuCursorCanMove)
+            {
+                PlaySoundMenu(SFX_Saw);
+                MenuCursor = NumSelectWorld - 1;
+                MenuCursorCanMove = false;
+                dontWrap = true;
+            }
+            else if((c.Left || pageUpPressed) && MenuCursorCanMove)
+            {
+                PlaySoundMenu(SFX_Saw);
+                MenuCursor -= 3;
+                MenuCursorCanMove = false;
+                dontWrap = true;
+            }
+            else if((c.Right || pageDownPressed) && MenuCursorCanMove)
+            {
+                PlaySoundMenu(SFX_Saw);
+                MenuCursor += 3;
+                MenuCursorCanMove = false;
+                dontWrap = true;
+            }
+            else if(MenuWheelMoved && MenuWheelDelta > 0 && MenuCursorCanMove)
+            {
+                PlaySoundMenu(SFX_Saw);
+                MenuCursor -= 1;
+                worldCurs -= 1;
+                MenuCursorCanMove = false;
+                dontWrap = true;
+            }
+            else if(MenuWheelMoved && MenuWheelDelta < 0 && MenuCursorCanMove)
+            {
+                PlaySoundMenu(SFX_Saw);
+                MenuCursor += 1;
+                worldCurs += 1;
+                MenuCursorCanMove = false;
+                dontWrap = true;
+            }
+
             if(MenuMode < MENU_CHARACTER_SELECT_BASE)
             {
-                if(MenuCursor >= NumSelectWorld)
-                    MenuCursor = 0;
-                if(MenuCursor < 0)
-                    MenuCursor = NumSelectWorld - 1;
+                if(dontWrap)
+                {
+                    if(MenuCursor >= NumSelectWorld)
+                        MenuCursor = NumSelectWorld - 1;
+                    if(MenuCursor < 0)
+                        MenuCursor = 0;
+                }
+                else
+                {
+                    if(MenuCursor >= NumSelectWorld)
+                        MenuCursor = 0;
+                    if(MenuCursor < 0)
+                        MenuCursor = NumSelectWorld - 1;
+                }
             }
         } // World select
 

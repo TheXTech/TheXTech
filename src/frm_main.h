@@ -101,6 +101,7 @@ public:
     void eventKeyUp(SDL_KeyboardEvent &evt);
     void eventMouseDown(SDL_MouseButtonEvent &m_event);
     void eventMouseMove(SDL_MouseMotionEvent &m_event);
+    void eventMouseWheel(SDL_MouseWheelEvent &m_event);
     void eventMouseUp(SDL_MouseButtonEvent &m_event);
     void eventResize();
     int setFullScreen(bool fs);
