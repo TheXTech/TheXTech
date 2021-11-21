@@ -80,6 +80,9 @@ static int menuCopySaveSrc = 0;
 static int menuCopySaveDst = 0;
 static int menuRecentEpisode = -1;
 
+static int listMenuLastScroll = 0;
+static int listMenuLastCursor = 0;
+
 static int FindWorldsThread(void *)
 {
     FindWorlds();
@@ -273,6 +276,7 @@ bool mainMenuUpdate()
     Location_t tempLocation;
     int menuLen;
     Player_t blankPlayer;
+    const Controls_t blank;
 
     bool altPressed = getKeyState(SDL_SCANCODE_LALT) == KEY_PRESSED ||
                       getKeyState(SDL_SCANCODE_RALT) == KEY_PRESSED;
@@ -293,6 +297,8 @@ bool mainMenuUpdate()
     bool pageUpPressed = getKeyState(SDL_SCANCODE_PAGEUP) == KEY_PRESSED;
     bool pageDownPressed = getKeyState(SDL_SCANCODE_PAGEDOWN) == KEY_PRESSED;
 
+    bool deletePressed = getKeyState(SDL_SCANCODE_DELETE) == KEY_PRESSED;
+
     {
         Controls_t &c = Player[1].Controls;
 
@@ -305,7 +311,7 @@ bool mainMenuUpdate()
             showCursor(0);
         }
 
-        if(!c.Up && !c.Down && !c.Left && !c.Right && !c.Jump && !c.Run && !c.Start)
+        if(SDL_memcmp(&blank, &c, sizeof(Controls_t)) == 0)
         {
             bool k = false;
             k |= menuDoPress;
@@ -316,6 +322,7 @@ bool mainMenuUpdate()
             k |= endPressed;
             k |= pageUpPressed;
             k |= pageDownPressed;
+            k |= deletePressed;
 
             if(!k)
                 MenuCursorCanMove = true;
@@ -576,8 +583,11 @@ bool mainMenuUpdate()
                     }
                     else
                     {
-                        MenuCursor = selWorld - 1;
+                        // MenuCursor = selWorld - 1;
                         MenuMode /= MENU_CHARACTER_SELECT_BASE;
+                        // Restore menu state
+                        worldCurs = listMenuLastScroll;
+                        MenuCursor = listMenuLastCursor;
                     }
 
                     MenuCursorCanMove = false;
@@ -625,7 +635,9 @@ bool mainMenuUpdate()
                 }
             }
 
-            if(MenuMode > MENU_MAIN)
+            bool isListMenu = (MenuMode == MENU_1PLAYER_GAME || MenuMode == MENU_2PLAYER_GAME || MenuMode == MENU_BATTLE_MODE);
+
+            if(MenuMode > MENU_MAIN && !isListMenu)
             {
                 if(MenuCursor > numCharacters - 1)
                 {
@@ -651,10 +663,13 @@ bool mainMenuUpdate()
                 }
             }
 
-            while(((MenuMode == MENU_CHARACTER_SELECT_2P_S2 || MenuMode == MENU_CHARACTER_SELECT_BM_S2) && MenuCursor == PlayerCharacter - 1) ||
-                   blockCharacter[MenuCursor + 1])
+            if(!isListMenu)
             {
-                MenuCursor += 1;
+                while(((MenuMode == MENU_CHARACTER_SELECT_2P_S2 || MenuMode == MENU_CHARACTER_SELECT_BM_S2) && MenuCursor == PlayerCharacter - 1) ||
+                       blockCharacter[MenuCursor + 1])
+                {
+                    MenuCursor += 1;
+                }
             }
 
             if(MenuMode >= MENU_CHARACTER_SELECT_BASE && MenuMode <= MENU_CHARACTER_SELECT_BASE_END)
@@ -719,7 +734,7 @@ bool mainMenuUpdate()
 
             if(MenuCursorCanMove || MenuMouseClick || MenuMouseBack)
             {
-                if(menuBackPress || MenuMouseBack)
+                if((menuBackPress && !c.AltRun) || MenuMouseBack)
                 {
                     MenuCursor = MenuMode - 1;
 
@@ -734,6 +749,10 @@ bool mainMenuUpdate()
                 }
                 else if(menuDoPress || MenuMouseClick)
                 {
+                    // Save menu state
+                    listMenuLastScroll = worldCurs;
+                    listMenuLastCursor = MenuCursor;
+
                     PlaySoundMenu(SFX_Do);
                     selWorld = MenuCursor + 1;
                     FindSaves();
@@ -759,14 +778,14 @@ bool mainMenuUpdate()
 
             bool dontWrap = false;
 
-            if(homePressed && MenuCursorCanMove)
+            if((c.AltRun || homePressed) && MenuCursorCanMove)
             {
                 PlaySoundMenu(SFX_Saw);
                 MenuCursor = 0;
                 MenuCursorCanMove = false;
                 dontWrap = true;
             }
-            else if(endPressed && MenuCursorCanMove)
+            else if((c.AltJump || endPressed) && MenuCursorCanMove)
             {
                 PlaySoundMenu(SFX_Saw);
                 MenuCursor = NumSelectWorld - 1;
@@ -784,6 +803,13 @@ bool mainMenuUpdate()
             {
                 PlaySoundMenu(SFX_Saw);
                 MenuCursor += 3;
+                MenuCursorCanMove = false;
+                dontWrap = true;
+            }
+            else if((c.Drop || deletePressed) && menuRecentEpisode >= 0 && MenuCursorCanMove)
+            {
+                PlaySoundMenu(SFX_Camera);
+                MenuCursor = menuRecentEpisode;
                 MenuCursorCanMove = false;
                 dontWrap = true;
             }
@@ -837,7 +863,10 @@ bool mainMenuUpdate()
                     if(AllCharBlock > 0)
                     {
                         MenuMode /= MENU_SELECT_SLOT_BASE;
-                        MenuCursor = selWorld - 1;
+                        //MenuCursor = selWorld - 1;
+                        // Restore menu state
+                        worldCurs = listMenuLastScroll;
+                        MenuCursor = listMenuLastCursor;
                     }
                     else
                     {

@@ -11,6 +11,8 @@ Changes for 1.3.5.3
 -Resolved the old jittering problem when drawing a playable character while moving the camera (thanks to @ds-sloth for the fix)
 -Fixed the minor graphical distortion of a playable character that appears while flying up and down with a shoe.
 -The last played episode will be reminded and scrolled at the episode selection menu
+-Improved episodes menu control: added mouse wheel, page-up/page-down/home/end/delete, and left/right/alt-run/alt-jump/drop on controllers to scroll episodes lists
+-Fixed the vanilla bug: episodes list menu gets reset every attempt to go back from the character or the game save slot select menu
 
 Changes for 1.3.5.2
 -Fixed the ARM64 building
