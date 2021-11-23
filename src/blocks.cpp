@@ -561,6 +561,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             b.Location.Width = BlockWidth[newBlock];
         }
 
+#if 0 // Completely disable the DEAD the code that spawns the player
         if(NPCIsABonus[C] && C != 169 && C != 170) // check to see if it should spawn a dead player
         {
             tempPlayer = CheckDead();
@@ -574,6 +575,8 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         tempPlayer = 0;
 
         if(tempPlayer == 0) // Spawn the npc
+#endif
+        // Spawn the npc
         {
             numNPCs++; // create a new NPC
             NPC[numNPCs].Active = true;
@@ -767,6 +770,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                 NPC[numNPCs].TimeLeft = Physics.NPCTimeOffScreen * 20;
             }
         }
+#if 0 // don't spawn players from blocks anymore
         else // Spawn the player
         {
             PlaySound(SFX_Mushroom);
@@ -788,6 +792,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             Player[tempPlayer].Location.SpeedY = 0;
             Player[tempPlayer].Immune = 150;
         }
+#endif
 
     }
     else if(b.Special == 100) // Block contains a mushroom
