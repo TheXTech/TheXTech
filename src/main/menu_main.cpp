@@ -1112,7 +1112,7 @@ bool mainMenuUpdate()
         }
 
         // Delete gamesave
-        else if(MenuMode == MENU_SELECT_SLOT_1P_DELETE || MenuMode == MENU_SELECT_SLOT_1P_DELETE)
+        else if(MenuMode == MENU_SELECT_SLOT_1P_DELETE || MenuMode == MENU_SELECT_SLOT_2P_DELETE)
         {
             if(MenuMouseMove)
                 s_handleMouseMove(2, 300, 350, 300, 30);
@@ -1138,7 +1138,7 @@ bool mainMenuUpdate()
                 }
             }
 
-            if(MenuMode == MENU_SELECT_SLOT_1P_DELETE || MenuMode == MENU_SELECT_SLOT_1P_DELETE)
+            if(MenuMode == MENU_SELECT_SLOT_1P_DELETE || MenuMode == MENU_SELECT_SLOT_2P_DELETE)
             {
                 if(MenuCursor > 2) MenuCursor = 0;
                 if(MenuCursor < 0) MenuCursor = 2;
