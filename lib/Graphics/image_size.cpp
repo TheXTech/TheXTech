@@ -178,7 +178,7 @@ static bool tryJPEG(SDL_RWops* file, uint32_t *w, uint32_t *h)
       (SDL_strncmp(magic, JPG3_1, 4) != 0 && SDL_strncmp(magic + 6, JPG3_2, 6) != 0))
         return false;
 
-    do
+    while(true)
     {
         SDL_memset(raw, 0, JPEG_BUFFER_SIZE);
         pos = SDL_RWtell(file);
@@ -207,8 +207,7 @@ static bool tryJPEG(SDL_RWops* file, uint32_t *w, uint32_t *h)
             *w = BE16(head, 7);
             return true;
         }
-
-    } while(chunk_size > 0);
+    }
 
     return false;
 #undef BE16
