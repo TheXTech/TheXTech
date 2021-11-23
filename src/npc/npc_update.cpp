@@ -3578,7 +3578,7 @@ void UpdateNPCs()
                                 }
                                 else
                                 {
-                                    tempLocation.X -= tempLocation.Width + 20;
+                                    tempLocation.X += -tempLocation.Width + 20;
                                     if(isPokeyHead)
                                         tempLocation.X -= 16;
                                     // If .Type = 189 Then tempLocation.X = tempLocation.X + 10
