@@ -1002,7 +1002,8 @@ void UpdateNPCs()
                             if(!(NPC[A].Type == 21 || NPC[A].Type == 22 || NPC[A].Type == 26 || NPC[A].Type == 31 ||
                                  NPC[A].Type == 32 || NPC[A].Type == 238 || NPC[A].Type == 239 || NPC[A].Type == 193 ||
                                  NPC[A].Type == 191 || NPC[A].Type == 35 ||
-                                 NPC[A].Type == 193 || // FIXME: Duplicated segment [PVS Studio]
+                                 // Duplicated segment [PVS Studio]
+                                 // NPC[A].Type == 193 ||
                                  NPC[A].Type == 49 || NPCIsAnExit[NPC[A].Type]))
                                 NPC[A].DefaultType = 0;
 
@@ -1047,7 +1048,8 @@ void UpdateNPCs()
 
                         if(!(NPC[A].Type == 195 || NPC[A].Type == 22 || NPC[A].Type == 26 || NPC[A].Type == 32 ||
                              NPC[A].Type == 238 || NPC[A].Type == 239 || NPC[A].Type == 193 || NPC[A].Type == 35 || NPC[A].Type == 191 ||
-                             NPC[A].Type == 193 || // FIXME: Duplicated segment [PVS Studio]
+                             // Duplicated segment [PVS Studio]
+                             // NPC[A].Type == 193 ||
                              NPC[A].Type == 49 || NPC[A].Type == 134 || (NPC[A].Type >= 154 && NPC[A].Type <= 157) ||
                              NPC[A].Type == 31 || NPC[A].Type == 240 || NPC[A].Type == 278 || NPC[A].Type == 279 || NPC[A].Type == 292))
                         {
@@ -1299,7 +1301,7 @@ void UpdateNPCs()
                             NPC[A].Type == 67 || NPC[A].Type == 68 || NPC[A].Type == 69 || NPC[A].Type == 70 ||
                             (NPCIsVeggie[NPC[A].Type] && !NPC[A].Projectile) ||
                             (NPC[A].Type == 29 && NPC[A].Projectile) ||
-                            (NPC[A].Projectile && (NPC[A].Type == 54 && NPC[A].Type == 15)) || // FIXME: This segment is always false (type equal both 54 and 15, impossible!) [PVS Studio]
+                            /*(NPC[A].Projectile && (NPC[A].Type == 54 && NPC[A].Type == 15)) ||*/ // FIXME: This segment is always false (type equal both 54 and 15, impossible!) [PVS Studio]
                             NPC[A].Type == 75 || NPC[A].Type == 84 || NPC[A].Type == 181 || NPC[A].Type == 94 ||
                             NPC[A].Type == 198 || NPC[A].Type == 96 || NPC[A].Type == 134 || NPC[A].Type == 137 ||
                             NPC[A].Type == 101 || NPC[A].Type == 102 || (NPCIsYoshi[NPC[A].Type] && NPC[A].Special == 0) ||
@@ -2908,7 +2910,8 @@ void UpdateNPCs()
                                                                NPC[A].Type != 279 && NPC[A].Type != 191 && NPC[A].Type != 21 && NPC[A].Type != 22 &&
                                                                NPC[A].Type != 26 && NPC[A].Type != 29 && NPC[A].Type != 31 && NPC[A].Type != 32 &&
                                                                NPC[A].Type != 35 &&
-                                                               NPC[A].Type != 191 && // FIXME: Duplicated segment [PVS Studio]
+                                                               // Duplicated segment [PVS Studio]
+                                                               // NPC[A].Type != 191 &&
                                                                NPC[A].Type != 193 && NPC[A].Type != 49 &&
                                                                NPC[A].Type != 134 && NPC[A].Type != 158 && NPC[A].Type != 195 && NPC[A].Type != 241 &&
                                                                !((NPC[A].Type >= 154 && NPC[A].Type <= 157))) // walldeath stuff
@@ -4597,7 +4600,7 @@ void UpdateNPCs()
                     if(B == 0)
                         NPC[A].Killed = 9;
                 }
-                else if(NPC[A].Type == 49)
+                else if(NPC[A].Type == NPCID_TOOTHYPIPE)
                 {
                     if(NPC[A].HoldingPlayer == 0 && NPC[A].standingOnPlayer == 0)
                         NPC[A].Special = 0;
@@ -4605,9 +4608,10 @@ void UpdateNPCs()
                         NPC[NPC[A].Special2].Direction = NPC[A].Direction;
                     if(Player[NPC[A].HoldingPlayer].Effect != 0)
                         NPC[A].Special = 0;
+#if 1
                     // FIXME: In original game, this is a dead code because of "And 0" condition at end.
-                    // In this sample, the "& false" was been commented, still idk for what this logic needs
-                    // the NPC-49 is a "toothy's pipe"
+                    // In this sample, the "& false" was been commented
+                    // This code makes Toothy shown off the pipe when the pipe is a projectile, shooted by generator
                     if(NPC[A].Projectile && NPC[A].Special2 == 0.0 && NPC[A].Special == 0.0 /*&& false*/)
                     {
                         numNPCs++;
@@ -4616,7 +4620,7 @@ void UpdateNPCs()
                         NPC[numNPCs].Active = true;
                         NPC[numNPCs].Section = NPC[A].Section;
                         NPC[numNPCs].TimeLeft = 100;
-                        NPC[numNPCs].Type = 50;
+                        NPC[numNPCs].Type = NPCID_TOOTHY;
                         NPC[numNPCs].Location.Height = 32;
                         NPC[numNPCs].Location.Width = 48;
                         NPC[numNPCs].Special = 0;
@@ -4632,7 +4636,9 @@ void UpdateNPCs()
                             NPC[numNPCs].Location.X = NPC[A].Location.X - NPC[numNPCs].Location.Width;
                         NPC[numNPCs].Location.Y = NPC[A].Location.Y;
                     }
-                    if(NPC[NPC[A].Special2].Type == 50 && fEqual(NPC[NPC[A].Special2].Special2, A))
+#endif
+
+                    if(NPC[NPC[A].Special2].Type == NPCID_TOOTHY && fEqual(NPC[NPC[A].Special2].Special2, A))
                     {
                         NPC[NPC[A].Special2].Projectile = true;
                         NPC[NPC[A].Special2].Direction = NPC[A].Direction;
@@ -4642,6 +4648,7 @@ void UpdateNPCs()
                             NPC[NPC[A].Special2].Location.X = NPC[A].Location.X - NPC[NPC[A].Special2].Location.Width;
                         NPC[NPC[A].Special2].Location.Y = NPC[A].Location.Y;
                     }
+
                     if(NPC[A].standingOnPlayer > 0 && Player[NPC[A].standingOnPlayer].Controls.Run == false)
                         NPC[A].Special = 0;
                 }

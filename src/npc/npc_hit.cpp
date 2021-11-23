@@ -1548,12 +1548,16 @@ void NPCHit(int A, int B, int C)
             if(NPC[C].Projectile && !(NPC[C].Type >= 117 && NPC[C].Type <= 120))
             {
                 // FIXME: Why the condition is here if it always assigns B? [PVS Studio]
+#if 0
                 if(!(NPC[A].Type == 24 && NPC[C].Type == 13))
                     NPC[A].Killed = B;
                 else
                     NPC[A].Killed = B;
+#endif
+                NPC[A].Killed = B;
             }
         }
+
         if(NPC[A].Type == 195)
         {
             NPC[A].Killed = 0;
@@ -2112,7 +2116,7 @@ void NPCHit(int A, int B, int C)
             }
         }
         else if(NPC[A].Location.SpeedX != oldNPC.Location.SpeedX || NPC[A].Location.SpeedY != oldNPC.Location.SpeedY ||
-                NPC[A].Projectile != NPC[A].Projectile || // FIXME: Wrong condition, always false [PVS Studio]
+                /*NPC[A].Projectile != NPC[A].Projectile ||*/ // FIXME: Wrong condition, always false [PVS Studio]
                 NPC[A].Killed != oldNPC.Killed ||
                 NPC[A].Type != oldNPC.Type || NPC[A].Inert != oldNPC.Inert)
         {
@@ -2139,8 +2143,8 @@ void NPCHit(int A, int B, int C)
                 NewEffect(75, newLoc(NPC[A].Location.X, NPC[A].Location.Y + NPC[A].Location.Height - 16));
         }
         else if(NPC[A].Location.SpeedX != oldNPC.Location.SpeedX ||
-                NPC[A].Location.SpeedY != oldNPC.Location.SpeedY ||
-                NPC[A].Projectile != NPC[A].Projectile) // FIXME: Wrong condition, always false [PVS Studio]
+                NPC[A].Location.SpeedY != oldNPC.Location.SpeedY /*||
+                NPC[A].Projectile != NPC[A].Projectile*/) // FIXME: Wrong condition, always false [PVS Studio]
         {
             // MoreScore 1, .Location
             if(B == 2)

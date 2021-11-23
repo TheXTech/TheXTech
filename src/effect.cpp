@@ -1645,12 +1645,17 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
         Effect[numEffects].Location.Y = Location.Y;
         Effect[numEffects].Location.SpeedY = Location.SpeedY;
         Effect[numEffects].Location.SpeedX = Location.SpeedX;
+
         if(int(Direction) == -1)
             Effect[numEffects].Frame = 0;
         else
             Effect[numEffects].Frame = 1;
-        if(A == 48) // FIXME: This condition never works [PVS Studio]
+
+#if 0 // FIXME: This condition never works [PVS Studio]
+        if(A == 48)
             Effect[numEffects].Location.SpeedY = -8;
+#endif
+
         Effect[numEffects].Life = 120;
         Effect[numEffects].Type = A;
     }

@@ -332,14 +332,13 @@ static void updateIntroLevelActivity()
                                 n.Type == 91 || n.Type == 93 || (n.Type >= 104 && n.Type <= 108) ||
                                 n.Type == 125 || n.Type == 133 || (n.Type >= 148 && n.Type <= 151) ||
                                 n.Type == 159 || n.Type == 160 || n.Type == 164 || n.Type == 168 ||
+                                // n.Type == 159 || n.Type == 160 || n.Type == 164 || // Duplicated segment [PVS Studio]
                                 (n.Type >= 154 && n.Type <= 157) ||
-                                n.Type == 159 || // FIXME: Duplicated segment [PVS Studio]
-                                n.Type == 160 || // FIXME: Duplicated segment, also [PVS Studio]
-                                n.Type == 164 || // FIXME: Duplicated segment, again?! [PVS Studio]
                                 n.Type == 165 || n.Type == 171 || n.Type == 178 ||
                                 n.Type == 197 || n.Type == 180 || n.Type == 181 || n.Type == 190 ||
                                 n.Type == 192 || n.Type == 196 ||
-                                n.Type == 197 || // FIXME: Duplicated segment, .....! [PVS Studio]
+                                // Duplicated segment, .....! [PVS Studio]
+                                // n.Type == 197 ||
                                 (UnderWater[0] == true && NPCIsBoot[n.Type] == true) ||
                                 (n.Type >= 198 && n.Type <= 228) || n.Type == 234);
 

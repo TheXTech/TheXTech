@@ -1575,9 +1575,11 @@ void UpdatePlayer()
                                             Player[A].CanFloat = true;
                                             Player[A].FlySparks = true;
                                         }
+#if 0
                                         // FIXME: Duplicated "Character == 3" condition branch [PVS Studio]
                                         else if(Player[A].Character == 3) // special handling for peach
                                             Player[A].FlyCount = 280; // Length of flight time
+#endif
                                         else
                                             Player[A].FlyCount = 320; // Length of flight time
                                     }
@@ -2616,7 +2618,7 @@ void UpdatePlayer()
                                                             Player[A].StandingOnNPC = -A;
                                                             movingBlock = true;
                                                             if(
-                                                                // HERE WAS A BUG: Compare bool with 0 is always false
+                                                                // NOTE: Here was a bug that makes compare bool with 0 is always false
                                                                     (Player[A].Location.SpeedX - NPC[Player[A].StandingOnNPC].Location.SpeedX < 0 &&
                                                                      BlockSlope[Block[B].Type] < 0) ||
                                                                     (Player[A].Location.SpeedX - NPC[Player[A].StandingOnNPC].Location.SpeedX > 0 &&

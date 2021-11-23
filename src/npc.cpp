@@ -470,6 +470,7 @@ void NPCSpecial(int A)
         }
 
         // ====== TODO: Is this dead code really needed? ==============
+#if 0
         if(!tempBool)
         {
             // fBlock = FirstBlock[static_cast<int>(floor(static_cast<double>(tempLocation.X / 32))) - 1];
@@ -488,6 +489,7 @@ void NPCSpecial(int A)
                 }
             }
         }
+#endif
         // ============================================================
 
         if(!tempBool || npc.Special == 1.0)

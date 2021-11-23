@@ -281,7 +281,6 @@ void OpenConfig()
 
 void SaveConfig()
 {
-//    Dim A As Integer
     std::string configPath = AppPathManager::settingsFileSTD();
     std::string controlsPath = AppPathManager::settingsControlsFileSTD();
 
@@ -293,9 +292,6 @@ void SaveConfig()
 #if !defined(__EMSCRIPTEN__) && !defined(__ANDROID__) // Don't remember fullscreen state for Emscripten!
     config.setValue("full-screen", resChanged);
 #endif
-    // TODO: Make sure, saving of those settings will not been confused by line arguments
-//    config.setValue("frame-skip", FrameSkip);
-//    config.setValue("show-fps", ShowFPS);
     config.endGroup();
 
     config.beginGroup("recent");
