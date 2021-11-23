@@ -419,14 +419,14 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             }
             else
             {
-                Coins = Coins + 1;
+                Coins += 1;
                 if(Coins >= 100)
                 {
                     if(Lives < 99)
                     {
-                        Lives = Lives + 1;
+                        Lives += 1;
                         PlaySound(SFX_1up);
-                        Coins = Coins - 100;
+                        Coins -= 100;
                     }
                     else
                     {
@@ -435,7 +435,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                 }
                 PlaySound(SFX_Coin);
                 NewEffect(11, b.Location);
-                b.Special = b.Special - 1;
+                b.Special -= 1;
             }
         }
         else if(b.RapidHit > 0) // (whatPlayer > 0 And Player(whatPlayer).Character = 3)
@@ -483,18 +483,18 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                 NPC[numNPCs].Immune = 20;
                 PlaySound(SFX_Coin);
                 CheckSectionNPC(numNPCs);
-                b.Special = b.Special - 1;
+                b.Special -= 1;
             }
             else
             {
-                Coins = Coins + 1;
+                Coins += 1;
                 if(Coins >= 100)
                 {
                     if(Lives < 99)
                     {
-                        Lives = Lives + 1;
+                        Lives += 1;
                         PlaySound(SFX_1up);
-                        Coins = Coins - 100;
+                        Coins -= 100;
                     }
                     else
                     {
@@ -503,13 +503,13 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                 }
                 PlaySound(SFX_Coin);
                 NewEffect(11, b.Location);
-                b.Special = b.Special - 1;
+                b.Special -= 1;
             }
 
         }
         else
         {
-            Coins = Coins + 1;
+            Coins += 1;
             if(Coins >= 100)
             {
                 if(Lives < 99)
@@ -525,7 +525,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             }
             PlaySound(SFX_Coin);
             NewEffect(11, b.Location);
-            b.Special = b.Special - 1;
+            b.Special -= 1;
         }
 
         if(b.Special == 0 && !(b.Type == 55))
@@ -675,8 +675,8 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             // Make block a bit smaller to allow player take a bonus easier (Redigit's idea)
             if(fEqual(b.Location.Width, 32) && !b.wasShrinkResized)
             {
-                b.Location.Width = b.Location.Width - 0.1;
-                b.Location.X = b.Location.X + 0.05;
+                b.Location.Width -= 0.1;
+                b.Location.X += 0.05;
                 b.wasShrinkResized = true; // Don't move it!!!
             }
 
@@ -1341,8 +1341,8 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         NPC[numNPCs].Location = b.Location;
         NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
         NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
-        NPC[numNPCs].Location.X = NPC[numNPCs].Location.X + (b.Location.Width - NPC[numNPCs].Location.Width) / 2.0;
-        NPC[numNPCs].Location.Y = NPC[numNPCs].Location.Y - 0.01;
+        NPC[numNPCs].Location.X += (b.Location.Width - NPC[numNPCs].Location.Width) / 2.0;
+        NPC[numNPCs].Location.Y -= 0.01;
         NPC[numNPCs].DefaultLocation = NPC[numNPCs].Location;
         NPC[numNPCs].DefaultType = NPC[numNPCs].Type;
         CheckSectionNPC(numNPCs);
@@ -1397,7 +1397,7 @@ void BlockShakeDown(int A)
 
     if(A != iBlock[iBlocks])
     {
-        iBlocks = iBlocks + 1;
+        iBlocks += 1;
         iBlock[iBlocks] = A;
     }
 }
@@ -1416,7 +1416,7 @@ void BlockHitHard(int A)
     else
     {
         Block[A].Kill = true;
-        iBlocks = iBlocks + 1;
+        iBlocks += 1;
         iBlock[iBlocks] = A;
     }
 }
@@ -1462,7 +1462,7 @@ void KillBlock(int A, bool Splode)
         {
             Block[A] = Block[numBlock];
             Block[numBlock] = blankBlock;
-            numBlock = numBlock - 1;
+            numBlock -= 1;
         }
     }
     else
@@ -1518,40 +1518,40 @@ void BlockFrames()
         return;
 
     // Update block frame counter
-    BlockFrame2[4] = BlockFrame2[4] + 1;
+    BlockFrame2[4] += 1;
     if(BlockFrame2[4] == 8)
         BlockFrame2[4] = 0;
-    BlockFrame2[5] = BlockFrame2[5] + 1;
+    BlockFrame2[5] += 1;
     if(BlockFrame2[5] == 8)
         BlockFrame2[5] = 0;
-    BlockFrame2[30] = BlockFrame2[30] + 1;
+    BlockFrame2[30] += 1;
     if(BlockFrame2[30] == 8)
         BlockFrame2[30] = 0;
-    BlockFrame2[55] = BlockFrame2[55] + 1;
+    BlockFrame2[55] += 1;
     if(BlockFrame2[55] == 8)
         BlockFrame2[55] = 0;
-    BlockFrame2[88] = BlockFrame2[88] + 1;
+    BlockFrame2[88] += 1;
     if(BlockFrame2[88] == 8)
         BlockFrame2[88] = 0;
-    BlockFrame2[109] = BlockFrame2[109] + 1;
+    BlockFrame2[109] += 1;
     if(BlockFrame2[109] == 4)
         BlockFrame2[109] = 0;
-    BlockFrame2[371] = BlockFrame2[371] + 1;
+    BlockFrame2[371] += 1;
     if(BlockFrame2[371] == 8)
         BlockFrame2[371] = 0;
-    BlockFrame2[379] = BlockFrame2[379] + 1;
+    BlockFrame2[379] += 1;
     if(BlockFrame2[379] >= 12)
         BlockFrame2[379] = 0;
     // Check if the block type is ready for the next frame
     if(BlockFrame2[4] == 0)
     {
-        BlockFrame[4] = BlockFrame[4] + 1;
+        BlockFrame[4] += 1;
         if(BlockFrame[4] == 4)
             BlockFrame[4] = 0;
     }
     if(BlockFrame2[5] == 0)
     {
-        BlockFrame[5] = BlockFrame[5] + 1;
+        BlockFrame[5] += 1;
         if(BlockFrame[5] == 4)
             BlockFrame[5] = 0;
     }
@@ -1614,7 +1614,7 @@ void BlockFrames()
             BlockFrame[631] = 4;
     }
 
-    BlockFrame2[626] = BlockFrame2[626] + 1;
+    BlockFrame2[626] += 1;
     if(BlockFrame2[626] < 8)
         BlockFrame[626] = 3;
     else if(BlockFrame2[626] < 16)
@@ -1651,21 +1651,21 @@ void BlockFrames()
 
     if(BlockFrame2[30] == 0)
     {
-        BlockFrame[30] = BlockFrame[30] + 1;
+        BlockFrame[30] += 1;
         if(BlockFrame[30] == 4)
             BlockFrame[30] = 0;
     }
 
     if(BlockFrame2[55] == 0)
     {
-        BlockFrame[55] = BlockFrame[55] + 1;
+        BlockFrame[55] += 1;
         if(BlockFrame[55] == 4)
             BlockFrame[55] = 0;
     }
 
     if(BlockFrame2[88] == 0)
     {
-        BlockFrame[88] = BlockFrame[88] + 1;
+        BlockFrame[88] += 1;
         if(BlockFrame[88] == 4)
             BlockFrame[88] = 0;
     }
@@ -1674,21 +1674,21 @@ void BlockFrames()
 
     if(BlockFrame2[109] == 0)
     {
-        BlockFrame[109] = BlockFrame[109] + 1;
+        BlockFrame[109] += 1;
         if(BlockFrame[109] == 8)
             BlockFrame[109] = 0;
     }
 
     if(BlockFrame2[371] == 0)
     {
-        BlockFrame[371] = BlockFrame[371] + 1;
+        BlockFrame[371] += 1;
         if(BlockFrame[371] == 8)
             BlockFrame[371] = 0;
     }
 
     if(BlockFrame2[379] == 0)
     {
-        BlockFrame[379] = BlockFrame[379] + 1;
+        BlockFrame[379] += 1;
         if(BlockFrame[379] == 4)
             BlockFrame[379] = 0;
     }
@@ -1697,7 +1697,7 @@ void BlockFrames()
     BlockFrame[381] = BlockFrame[379];
     BlockFrame[382] = BlockFrame[379];
 
-    BlockFrame2[530] = BlockFrame2[530] + 1;
+    BlockFrame2[530] += 1;
 
     if(BlockFrame2[530] <= 8)
         BlockFrame[530] = 0;
@@ -1732,20 +1732,20 @@ void BlockFrames()
         }
         if(BlockFrame[458] < 5 && tempBool == true)
         {
-            BlockFrame2[458] = BlockFrame2[458] + 1;
+            BlockFrame2[458] += 1;
             if(BlockFrame2[458] >= 4)
             {
                 BlockFrame2[458] = 0;
-                BlockFrame[458] = BlockFrame[458] + 1;
+                BlockFrame[458] += 1;
             }
         }
         else if(BlockFrame[458] > 0 && tempBool == false)
         {
-            BlockFrame2[458] = BlockFrame2[458] + 1;
+            BlockFrame2[458] += 1;
             if(BlockFrame2[458] >= 4)
             {
                 BlockFrame2[458] = 0;
-                BlockFrame[458] = BlockFrame[458] - 1;
+                BlockFrame[458] -= 1;
             }
         }
         else
@@ -1769,7 +1769,7 @@ void UpdateBlocks()
             // respawn
             if(Block[A].RespawnDelay > 0)
             {
-                Block[A].RespawnDelay = Block[A].RespawnDelay + 1;
+                Block[A].RespawnDelay += 1;
                 if(Block[A].RespawnDelay >= 65 * 60)
                 {
                     if(Block[A].DefaultType > 0 || Block[A].DefaultSpecial > 0 || Block[A].Layer == "Destroyed Blocks")
@@ -1832,8 +1832,8 @@ void UpdateBlocks()
 
         if(Block[iBlock[A]].ShakeY < 0) // Block Shake Up
         {
-            Block[iBlock[A]].ShakeY = Block[iBlock[A]].ShakeY + 2;
-            Block[iBlock[A]].ShakeY3 = Block[iBlock[A]].ShakeY3 - 2;
+            Block[iBlock[A]].ShakeY += 2;
+            Block[iBlock[A]].ShakeY3 -= 2;
 
             if(Block[iBlock[A]].ShakeY == 0)
             {
@@ -1858,8 +1858,8 @@ void UpdateBlocks()
         }
         else if(Block[iBlock[A]].ShakeY > 0) // Block Shake Down
         {
-            Block[iBlock[A]].ShakeY = Block[iBlock[A]].ShakeY - 2;
-            Block[iBlock[A]].ShakeY3 = Block[iBlock[A]].ShakeY3 + 2;
+            Block[iBlock[A]].ShakeY -= 2;
+            Block[iBlock[A]].ShakeY3 += 2;
 
             if(Block[iBlock[A]].ShakeY == 0)
             {
@@ -1885,19 +1885,19 @@ void UpdateBlocks()
         }
         else if(Block[iBlock[A]].ShakeY2 > 0) // Come back down
         {
-            Block[iBlock[A]].ShakeY2 = Block[iBlock[A]].ShakeY2 - 2;
-            Block[iBlock[A]].ShakeY3 = Block[iBlock[A]].ShakeY3 + 2;
+            Block[iBlock[A]].ShakeY2 -= 2;
+            Block[iBlock[A]].ShakeY3 += 2;
 
             if(Block[iBlock[A]].RapidHit > 0 && Block[iBlock[A]].Special > 0 && Block[iBlock[A]].ShakeY3 == 0)
             {
                 BlockHit(iBlock[A]);
-                Block[iBlock[A]].RapidHit = Block[iBlock[A]].RapidHit - 1;
+                Block[iBlock[A]].RapidHit -= 1;
             }
         }
         else if(Block[iBlock[A]].ShakeY2 < 0) // Go back up
         {
-            Block[iBlock[A]].ShakeY2 = Block[iBlock[A]].ShakeY2 + 2;
-            Block[iBlock[A]].ShakeY3 = Block[iBlock[A]].ShakeY3 - 2;
+            Block[iBlock[A]].ShakeY2 += 2;
+            Block[iBlock[A]].ShakeY3 -= 2;
         }
 
         if(Block[iBlock[A]].ShakeY3 != 0)
@@ -1987,7 +1987,7 @@ void UpdateBlocks()
                 if(Block[iBlock[A]].ShakeY3 == 0)
                 {
                     iBlock[A] = iBlock[iBlocks];
-                    iBlocks = iBlocks - 1;
+                    iBlocks -= 1;
                 }
             }
         }
@@ -2060,7 +2060,7 @@ void PSwitch(bool enabled)
                     Block[numBlock].Location = NPC[A].Location;
                     Block[numBlock].Location.Width = BlockWidth[Block[numBlock].Type];
                     Block[numBlock].Location.Height = BlockHeight[Block[numBlock].Type];
-                    Block[numBlock].Location.X = Block[numBlock].Location.X + (NPC[A].Location.Width - Block[numBlock].Location.Width) / 2.0;
+                    Block[numBlock].Location.X += (NPC[A].Location.Width - Block[numBlock].Location.Width) / 2.0;
                     Block[numBlock].Location.SpeedX = 0;
                     Block[numBlock].Location.SpeedY = 0;
                     Block[numBlock].Special = 0;
@@ -2103,7 +2103,7 @@ void PSwitch(bool enabled)
                     NPC[numNPCs].Location.SpeedY = 0;
                     NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
                     NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
-                    NPC[numNPCs].Location.X = NPC[numNPCs].Location.X + (Block[A].Location.Width - NPC[numNPCs].Location.Width) / 2.0;
+                    NPC[numNPCs].Location.X += (Block[A].Location.Width - NPC[numNPCs].Location.Width) / 2.0;
                     NPC[numNPCs].DefaultLocation = NPC[numNPCs].Location;
                     NPC[numNPCs].DefaultType = NPC[numNPCs].Type;
                     CheckSectionNPC(numNPCs);
@@ -2136,7 +2136,7 @@ void PSwitch(bool enabled)
                     Block[numBlock].Location.SpeedY = 0;
                     Block[numBlock].Location.Width = BlockWidth[Block[numBlock].Type];
                     Block[numBlock].Location.Height = BlockHeight[Block[numBlock].Type];
-                    Block[numBlock].Location.X = Block[numBlock].Location.X + (NPC[A].Location.Width - Block[numBlock].Location.Width) / 2.0;
+                    Block[numBlock].Location.X += (NPC[A].Location.Width - Block[numBlock].Location.Width) / 2.0;
                     Block[numBlock].Special = 0;
                     Block[numBlock].Kill = false;
                 }
@@ -2166,7 +2166,7 @@ void PSwitch(bool enabled)
                     NPC[numNPCs].Location.SpeedY = 0;
                     NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
                     NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
-                    NPC[numNPCs].Location.X = NPC[numNPCs].Location.X + (Block[A].Location.Width - NPC[numNPCs].Location.Width) / 2.0;
+                    NPC[numNPCs].Location.X += (Block[A].Location.Width - NPC[numNPCs].Location.Width) / 2.0;
                     NPC[numNPCs].DefaultLocation = NPC[numNPCs].Location;
                     NPC[numNPCs].DefaultType = NPC[numNPCs].Type;
                     CheckSectionNPC(numNPCs);

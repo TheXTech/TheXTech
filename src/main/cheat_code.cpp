@@ -138,10 +138,10 @@ void CheatCode(char NewKey)
             for(B = 1; B <= numWorldPaths; B++)
             {
                 tempLocation = WorldPath[B].Location;
-                tempLocation.X = tempLocation.X + 4;
-                tempLocation.Y = tempLocation.Y + 4;
-                tempLocation.Width = tempLocation.Width - 8;
-                tempLocation.Height = tempLocation.Height - 8;
+                tempLocation.X += 4;
+                tempLocation.Y += 4;
+                tempLocation.Width -= 8;
+                tempLocation.Height -= 8;
                 WorldPath[B].Active = true;
                 for(C = 1; C <= numScenes; C++)
                 {
@@ -430,7 +430,7 @@ void CheatCode(char NewKey)
                               Player[B].Location.Y + Player[B].Location.Height / 2.0 - EffectHeight[10] / 2.0));
                 }
                 if(Player[B].Character >= 3 && Player[B].Hearts < 3)
-                    Player[B].Hearts = Player[B].Hearts + 1;
+                    Player[B].Hearts += 1;
             }
             CheatString.clear();
             cheated = true;
@@ -454,7 +454,7 @@ void CheatCode(char NewKey)
                               Player[B].Location.Y + Player[B].Location.Height / 2.0 - EffectHeight[10] / 2.0));
                 }
                 if(Player[B].Character >= 3 && Player[B].Hearts < 3)
-                    Player[B].Hearts = Player[B].Hearts + 1;
+                    Player[B].Hearts += 1;
             }
             CheatString.clear();
             cheated = true;
@@ -479,7 +479,7 @@ void CheatCode(char NewKey)
                               Player[B].Location.Y + Player[B].Location.Height / 2.0 - EffectHeight[10] / 2.0));
                 }
                 if(Player[B].Character >= 3 && Player[B].Hearts < 3)
-                    Player[B].Hearts = Player[B].Hearts + 1;
+                    Player[B].Hearts += 1;
             }
             CheatString.clear();
             cheated = true;
@@ -503,7 +503,7 @@ void CheatCode(char NewKey)
                               Player[B].Location.Y + Player[B].Location.Height / 2.0 - EffectHeight[10] / 2.0));
                 }
                 if(Player[B].Character >= 3 && Player[B].Hearts < 3)
-                    Player[B].Hearts = Player[B].Hearts + 1;
+                    Player[B].Hearts += 1;
             }
             CheatString.clear();
             cheated = true;
@@ -527,7 +527,7 @@ void CheatCode(char NewKey)
                               Player[B].Location.Y + Player[B].Location.Height / 2.0 - EffectHeight[10] / 2.0));
                 }
                 if(Player[B].Character >= 3 && Player[B].Hearts < 3)
-                    Player[B].Hearts = Player[B].Hearts + 1;
+                    Player[B].Hearts += 1;
             }
             CheatString.clear();
             cheated = true;
@@ -551,7 +551,7 @@ void CheatCode(char NewKey)
                               Player[B].Location.Y + Player[B].Location.Height / 2.0 - EffectHeight[10] / 2.0));
                 }
                 if(Player[B].Character >= 3 && Player[B].Hearts < 3)
-                    Player[B].Hearts = Player[B].Hearts + 1;
+                    Player[B].Hearts += 1;
             }
             CheatString.clear();
             cheated = true;
@@ -657,11 +657,11 @@ void CheatCode(char NewKey)
                 Player[B].Immune = 50;
                 if(Player[B].Mount <= 1)
                 {
-                    Player[B].Location.Y = Player[B].Location.Y + Player[B].Location.Height;
+                    Player[B].Location.Y += Player[B].Location.Height;
                     Player[B].Location.Height = Physics.PlayerHeight[Player[B].Character][Player[B].State];
                     if(Player[B].Mount == 1 && Player[B].State == 1)
                         Player[B].Location.Height = Physics.PlayerHeight[1][2];
-                    Player[B].Location.Y = Player[B].Location.Y - Player[B].Location.Height;
+                    Player[B].Location.Y += -Player[B].Location.Height;
                     Player[B].StandUp = true;
                 }
                 tempLocation = Player[B].Location;
@@ -682,11 +682,11 @@ void CheatCode(char NewKey)
                 Player[B].Immune = 50;
                 if(Player[B].Mount <= 1)
                 {
-                    Player[B].Location.Y = Player[B].Location.Y + Player[B].Location.Height;
+                    Player[B].Location.Y += Player[B].Location.Height;
                     Player[B].Location.Height = Physics.PlayerHeight[Player[B].Character][Player[B].State];
                     if(Player[B].Mount == 1 && Player[B].State == 1)
                         Player[B].Location.Height = Physics.PlayerHeight[1][2];
-                    Player[B].Location.Y = Player[B].Location.Y - Player[B].Location.Height;
+                    Player[B].Location.Y += -Player[B].Location.Height;
                     Player[B].StandUp = true;
                 }
                 tempLocation = Player[B].Location;
@@ -707,11 +707,11 @@ void CheatCode(char NewKey)
                 Player[B].Immune = 50;
                 if(Player[B].Mount <= 1)
                 {
-                    Player[B].Location.Y = Player[B].Location.Y + Player[B].Location.Height;
+                    Player[B].Location.Y += Player[B].Location.Height;
                     Player[B].Location.Height = Physics.PlayerHeight[Player[B].Character][Player[B].State];
                     if(Player[B].Mount == 1 && Player[B].State == 1)
                         Player[B].Location.Height = Physics.PlayerHeight[1][2];
-                    Player[B].Location.Y = Player[B].Location.Y - Player[B].Location.Height;
+                    Player[B].Location.Y += -Player[B].Location.Height;
                     Player[B].StandUp = true;
                 }
                 tempLocation = Player[B].Location;
@@ -733,11 +733,11 @@ void CheatCode(char NewKey)
                 Player[B].Immune = 50;
                 if(Player[B].Mount <= 1)
                 {
-                    Player[B].Location.Y = Player[B].Location.Y + Player[B].Location.Height;
+                    Player[B].Location.Y += Player[B].Location.Height;
                     Player[B].Location.Height = Physics.PlayerHeight[Player[B].Character][Player[B].State];
                     if(Player[B].Mount == 1 && Player[B].State == 1)
                         Player[B].Location.Height = Physics.PlayerHeight[1][2];
-                    Player[B].Location.Y = Player[B].Location.Y - Player[B].Location.Height;
+                    Player[B].Location.Y += -Player[B].Location.Height;
                     Player[B].StandUp = true;
                 }
                 tempLocation = Player[B].Location;
@@ -758,11 +758,11 @@ void CheatCode(char NewKey)
                 Player[B].Immune = 50;
                 if(Player[B].Mount <= 1)
                 {
-                    Player[B].Location.Y = Player[B].Location.Y + Player[B].Location.Height;
+                    Player[B].Location.Y += Player[B].Location.Height;
                     Player[B].Location.Height = Physics.PlayerHeight[Player[B].Character][Player[B].State];
                     if(Player[B].Mount == 1 && Player[B].State == 1)
                         Player[B].Location.Height = Physics.PlayerHeight[1][2];
-                    Player[B].Location.Y = Player[B].Location.Y - Player[B].Location.Height;
+                    Player[B].Location.Y += -Player[B].Location.Height;
                     Player[B].StandUp = true;
                 }
                 tempLocation = Player[B].Location;
@@ -942,11 +942,11 @@ void CheatCode(char NewKey)
                         Player[C].Character = 1;
                         if(Player[C].Mount <= 1)
                         {
-                            Player[C].Location.Y = Player[C].Location.Y + Player[C].Location.Height;
+                            Player[C].Location.Y += Player[C].Location.Height;
                             Player[C].Location.Height = Physics.PlayerHeight[Player[C].Character][Player[C].State];
                             if(Player[C].Mount == 1 && Player[C].State == 1)
                                 Player[C].Location.Height = Physics.PlayerHeight[1][2];
-                            Player[C].Location.Y = Player[C].Location.Y - Player[C].Location.Height;
+                            Player[C].Location.Y += -Player[C].Location.Height;
                             Player[C].StandUp = true;
                         }
                     }
@@ -955,11 +955,11 @@ void CheatCode(char NewKey)
                         Player[C].Character = 2;
                         if(Player[C].Mount <= 1)
                         {
-                            Player[C].Location.Y = Player[C].Location.Y + Player[C].Location.Height;
+                            Player[C].Location.Y += Player[C].Location.Height;
                             Player[C].Location.Height = Physics.PlayerHeight[Player[C].Character][Player[C].State];
                             if(Player[C].Mount == 1 && Player[C].State == 1)
                                 Player[C].Location.Height = Physics.PlayerHeight[1][2];
-                            Player[C].Location.Y = Player[C].Location.Y - Player[C].Location.Height;
+                            Player[C].Location.Y += -Player[C].Location.Height;
                             Player[C].StandUp = true;
                         }
                     }
@@ -994,11 +994,11 @@ void CheatCode(char NewKey)
                 Player[C].Character = 1;
                 if(Player[C].Mount <= 1)
                 {
-                    Player[C].Location.Y = Player[C].Location.Y + Player[C].Location.Height;
+                    Player[C].Location.Y += Player[C].Location.Height;
                     Player[C].Location.Height = Physics.PlayerHeight[Player[C].Character][Player[C].State];
                     if(Player[C].Mount == 1 && Player[C].State == 1)
                         Player[C].Location.Height = Physics.PlayerHeight[1][2];
-                    Player[C].Location.Y = Player[C].Location.Y - Player[C].Location.Height;
+                    Player[C].Location.Y += -Player[C].Location.Height;
                     Player[C].StandUp = true;
                 }
                 Player[C].Immune = 1;
@@ -1032,11 +1032,11 @@ void CheatCode(char NewKey)
                         Player[C].Character = 1;
                         if(Player[C].Mount <= 1)
                         {
-                            Player[C].Location.Y = Player[C].Location.Y + Player[C].Location.Height;
+                            Player[C].Location.Y += Player[C].Location.Height;
                             Player[C].Location.Height = Physics.PlayerHeight[Player[C].Character][Player[C].State];
                             if(Player[C].Mount == 1 && Player[C].State == 1)
                                 Player[C].Location.Height = Physics.PlayerHeight[1][2];
-                            Player[C].Location.Y = Player[C].Location.Y - Player[C].Location.Height;
+                            Player[C].Location.Y += -Player[C].Location.Height;
                             Player[C].StandUp = true;
                         }
                     }
@@ -1045,11 +1045,11 @@ void CheatCode(char NewKey)
                         Player[C].Character = 2;
                         if(Player[C].Mount <= 1)
                         {
-                            Player[C].Location.Y = Player[C].Location.Y + Player[C].Location.Height;
+                            Player[C].Location.Y += Player[C].Location.Height;
                             Player[C].Location.Height = Physics.PlayerHeight[Player[C].Character][Player[C].State];
                             if(Player[C].Mount == 1 && Player[C].State == 1)
                                 Player[C].Location.Height = Physics.PlayerHeight[1][2];
-                            Player[C].Location.Y = Player[C].Location.Y - Player[C].Location.Height;
+                            Player[C].Location.Y += -Player[C].Location.Height;
                             Player[C].StandUp = true;
                         }
                     }
@@ -1075,17 +1075,17 @@ void CheatCode(char NewKey)
                     )
                     {
                         PlaySound(SFX_Raccoon);
-                        NPC[B].Location.Y = NPC[B].Location.Y + NPC[B].Location.Height / 2.0;
-                        NPC[B].Location.X = NPC[B].Location.X + NPC[B].Location.Width / 2.0;
+                        NPC[B].Location.Y += NPC[B].Location.Height / 2.0;
+                        NPC[B].Location.X += NPC[B].Location.Width / 2.0;
                         tempLocation = NPC[B].Location;
-                        tempLocation.Y = tempLocation.Y - 16;
-                        tempLocation.X = tempLocation.X - 16;
+                        tempLocation.Y -= 16;
+                        tempLocation.X -= 16;
                         NewEffect(10, tempLocation);
                         NPC[B].Type = 10;
                         NPC[B].Location.Width = NPCWidth[NPC[B].Type];
                         NPC[B].Location.Height = NPCHeight[NPC[B].Type];
-                        NPC[B].Location.Y = NPC[B].Location.Y - NPC[B].Location.Height / 2.0;
-                        NPC[B].Location.X = NPC[B].Location.X - NPC[B].Location.Width / 2.0;
+                        NPC[B].Location.Y += -NPC[B].Location.Height / 2.0;
+                        NPC[B].Location.X += -NPC[B].Location.Width / 2.0;
                         NPC[B].Location.SpeedX = 0;
                         NPC[B].Location.SpeedY = 0;
                     }

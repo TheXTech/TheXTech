@@ -84,8 +84,8 @@ void ShowLayer(std::string LayerName, bool NoEffect)
                 if(!NoEffect && !NPC[A].Generator)
                 {
                     tempLocation = NPC[A].Location;
-                    tempLocation.X = tempLocation.X + tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
-                    tempLocation.Y = tempLocation.Y + tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
+                    tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
+                    tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
                     NewEffect(10, tempLocation);
                 }
 
@@ -124,8 +124,8 @@ void ShowLayer(std::string LayerName, bool NoEffect)
                 if(!NoEffect && !Block[A].Invis)
                 {
                     tempLocation = Block[A].Location;
-                    tempLocation.X = tempLocation.X + tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
-                    tempLocation.Y = tempLocation.Y + tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
+                    tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
+                    tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
                     NewEffect(10, tempLocation);
                 }
             }
@@ -156,8 +156,8 @@ void ShowLayer(std::string LayerName, bool NoEffect)
                 if(!NoEffect)
                 {
                     tempLocation = Background[A].Location;
-                    tempLocation.X = tempLocation.X + tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
-                    tempLocation.Y = tempLocation.Y + tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
+                    tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
+                    tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
                     NewEffect(10, tempLocation);
                 }
             }
@@ -200,8 +200,8 @@ void HideLayer(std::string LayerName, bool NoEffect)
                 if(!NoEffect && !NPC[A].Generator)
                 {
                     tempLocation = NPC[A].Location;
-                    tempLocation.X = tempLocation.X + tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
-                    tempLocation.Y = tempLocation.Y + tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
+                    tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
+                    tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
                     NewEffect(10, tempLocation);
                 }
             }
@@ -222,8 +222,8 @@ void HideLayer(std::string LayerName, bool NoEffect)
                 if(!NoEffect && !Block[A].Invis)
                 {
                     tempLocation = Block[A].Location;
-                    tempLocation.X = tempLocation.X + tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
-                    tempLocation.Y = tempLocation.Y + tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
+                    tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
+                    tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
                     NewEffect(10, tempLocation);
                 }
             }
@@ -241,8 +241,8 @@ void HideLayer(std::string LayerName, bool NoEffect)
                 if(!NoEffect)
                 {
                     tempLocation = Background[A].Location;
-                    tempLocation.X = tempLocation.X + tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
-                    tempLocation.Y = tempLocation.Y + tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
+                    tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
+                    tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
                     NewEffect(10, tempLocation);
                 }
             }
@@ -408,16 +408,16 @@ void ProcEvent(std::string EventName, bool NoEffect)
                             if(int(screenLoc.Width) == 400)
                             {
                                 if(qScreenX[1] < tX + screenLoc.Left)
-                                    qScreenX[1] = qScreenX[1] + 200;
+                                    qScreenX[1] += 200;
                                 else
-                                    qScreenX[1] = qScreenX[1] - 200;
+                                    qScreenX[1] -= 200;
                             }
                             if(int(screenLoc.Height) == 300)
                             {
                                 if(qScreenY[1] < tY + screenLoc.Top)
-                                    qScreenY[1] = qScreenY[1] + 150;
+                                    qScreenY[1] += 150;
                                 else
-                                    qScreenY[1] = qScreenY[1] - 150;
+                                    qScreenY[1] -= 150;
                             }
                             if(-qScreenX[1] < level[Player[C].Section].X)
                                 qScreenX[1] = -level[Player[C].Section].X;

@@ -1301,7 +1301,7 @@ void NPCyFix()
                 XnHfix = std::abs((int(XnH * 100) % 800) / 100);
             else
                 XnHfix = std::abs(8 - ((int(XnH * 100) % 800) / 100));
-            NPC[A].Location.Y = NPC[A].Location.Y + XnHfix;
+            NPC[A].Location.Y += XnHfix;
         }
     }
 }

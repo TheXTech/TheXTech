@@ -147,14 +147,14 @@ void SuperPrint(const std::string &SuperWords, int Font, float X, float Y,
 //                BitBlt myBackBuffer, X + B, Y, 18, 16, GFX.Font2Mask(2).hdc, 2, C, vbSrcAnd
 //                BitBlt myBackBuffer, X + B, Y, 18, 16, GFX.Font2(2).hdc, 2, C, vbSrcPaint
                 frmMain.renderTexture(X + B, Y, 18, 16, GFX.Font2[2], 2, C, r, g, b, a);
-//                B = B + 18
+//                B += 18
                 B += 18;
-//                If Left(Words, 1) = "M" Then B = B + 2
+//                If Left(Words, 1) = "M" Then B += 2
                 if(c == 'M')
                     B += 2;
 //            Else
             } else {
-//                B = B + 16
+//                B += 16
                 B += 16;
             }
 //            End If
@@ -175,11 +175,11 @@ void SuperPrint(const std::string &SuperWords, int Font, float X, float Y,
                 C = (c - 33) * 16;
 //                BitBlt myBackBuffer, X + B, Y, 18, 16, GFX.Font2(3).hdc, 2, C, vbSrcPaint
                 frmMain.renderTexture(X + B, Y, 18, 16, GFX.Font2[3], 2, C, r, g, b, a);
-//                B = B + 18
+//                B += 18
                 B += 18;
 //            Else
             } else {
-//                B = B + 18
+//                B += 18
                 B += 18;
 //            End If
             }

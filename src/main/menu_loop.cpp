@@ -287,7 +287,7 @@ static void updateIntroLevelActivity()
                     if(p.State == 1)
                     {
                         p.Location.Height = Physics.PlayerHeight[1][2];
-                        p.Location.Y = p.Location.Y - Physics.PlayerHeight[1][2] + Physics.PlayerHeight[p.Character][1];
+                        p.Location.Y += -Physics.PlayerHeight[1][2] + Physics.PlayerHeight[p.Character][1];
                     }
                 }
             }
@@ -298,9 +298,9 @@ static void updateIntroLevelActivity()
                 {
                     p.Mount = 3;
                     p.MountType = (iRand() % 7) + 1;
-                    p.Location.Y = p.Location.Y + p.Location.Height;
+                    p.Location.Y += p.Location.Height;
                     p.Location.Height = Physics.PlayerHeight[2][2];
-                    p.Location.Y = p.Location.Y - p.Location.Height - 0.01;
+                    p.Location.Y += -p.Location.Height - 0.01;
                 }
             }
 
@@ -419,7 +419,7 @@ static void updateIntroLevelActivity()
         {
             tempLocation = Player[A].Location;
             tempLocation.Width = 95;
-            tempLocation.Height = tempLocation.Height - 1;
+            tempLocation.Height -= 1;
 
             for(auto B = 1; B <= numBlock; B++)
             {
