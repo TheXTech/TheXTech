@@ -60,7 +60,7 @@ FIBITMAP *GraphicsHelps::loadImage(std::string file, bool convertTo32bit)
 #if  defined(__unix__) || defined(__APPLE__) || defined(_WIN32) || defined(__HAIKU__)
     FileMapper fileMap;
 
-    if(!fileMap.open_file(file.c_str()))
+    if(!fileMap.open_file(file))
         return nullptr;
 
     FIMEMORY *imgMEM = FreeImage_OpenMemory(reinterpret_cast<unsigned char *>(fileMap.data()),
