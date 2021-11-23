@@ -417,13 +417,15 @@ void UpdateNPCs()
                NPC[A].Type != 57 && NPC[A].Type != 46 &&
                NPC[A].Type != 212 && !NPCIsACoin[NPC[A].Type]) // And .Type <> 47
             {
-                if(NPC[A].TriggerActivate != "")
+                if(!NPC[A].TriggerActivate.empty())
                     ProcEvent(NPC[A].TriggerActivate);
+
                 tempLocation = NPC[A].Location;
-                tempLocation.Y = tempLocation.Y - 32;
-                tempLocation.X = tempLocation.X - 32;
-                tempLocation.Width = tempLocation.Width + 64;
-                tempLocation.Height = tempLocation.Height + 64;
+                tempLocation.Y -= 32;
+                tempLocation.X -= 32;
+                tempLocation.Width += 64;
+                tempLocation.Height += 64;
+
                 for(B = 1; B <= numNPCs; B++)
                 {
                     if((NPC[B].Active == false) && B != A && NPC[B].Reset[1] == true && NPC[B].Reset[2] == true)
@@ -985,19 +987,28 @@ void UpdateNPCs()
                         {
                             if(NPC[A].Special == 0.0)
                                 NPC[A].Special = 147;
+
                             NPC[A].Generator = false;
                             NPC[A].Frame = 0;
                             NPC[A].Type = NPC[A].Special;
                             NPC[A].Special = 0;
+
                             if(NPCIsYoshi[NPC[A].Type])
                             {
                                 NPC[A].Special = NPC[A].Type;
                                 NPC[A].Type = 96;
                             }
-                            if(!(NPC[A].Type == 21 || NPC[A].Type == 22 || NPC[A].Type == 26 || NPC[A].Type == 31 || NPC[A].Type == 32 || NPC[A].Type == 238 || NPC[A].Type == 239 || NPC[A].Type == 193 || NPC[A].Type == 191 || NPC[A].Type == 35 || NPC[A].Type == 193 || NPC[A].Type == 49 || NPCIsAnExit[NPC[A].Type]))
+
+                            if(!(NPC[A].Type == 21 || NPC[A].Type == 22 || NPC[A].Type == 26 || NPC[A].Type == 31 ||
+                                 NPC[A].Type == 32 || NPC[A].Type == 238 || NPC[A].Type == 239 || NPC[A].Type == 193 ||
+                                 NPC[A].Type == 191 || NPC[A].Type == 35 ||
+                                 NPC[A].Type == 193 || // FIXME: Duplicated segment [PVS Studio]
+                                 NPC[A].Type == 49 || NPCIsAnExit[NPC[A].Type]))
                                 NPC[A].DefaultType = 0;
+
                             NPC[A].Location.Height = NPCHeight[NPC[A].Type];
                             NPC[A].Location.Width = NPCWidth[NPC[A].Type];
+
                             if(NPC[A].Type == 147)
                             {
                                 B = iRand() % 9;
@@ -1026,12 +1037,19 @@ void UpdateNPCs()
                         }
                         NPC[A].TimeLeft = 100;
                         NPC[A].BeltSpeed = 0;
+
                         if(NPC[A].Type == (NPCIsCheep[NPC[A].Type] && NPC[A].Special == 2))
                             NPC[A].Special5 = 0;
+
                         NPC[A].Direction = Player[NPC[A].HoldingPlayer].Direction; // Face the player
                         NPC[A].Location.SpeedY = Player[NPC[A].HoldingPlayer].Location.SpeedY;
                         NPC[A].Location.SpeedX = 0;
-                        if(!(NPC[A].Type == 195 || NPC[A].Type == 22 || NPC[A].Type == 26 || NPC[A].Type == 32 || NPC[A].Type == 238 || NPC[A].Type == 239 || NPC[A].Type == 193 || NPC[A].Type == 35 || NPC[A].Type == 191 || NPC[A].Type == 193 || NPC[A].Type == 49 || NPC[A].Type == 134 || (NPC[A].Type >= 154 && NPC[A].Type <= 157) || NPC[A].Type == 31 || NPC[A].Type == 240 || NPC[A].Type == 278 || NPC[A].Type == 279 || NPC[A].Type == 292))
+
+                        if(!(NPC[A].Type == 195 || NPC[A].Type == 22 || NPC[A].Type == 26 || NPC[A].Type == 32 ||
+                             NPC[A].Type == 238 || NPC[A].Type == 239 || NPC[A].Type == 193 || NPC[A].Type == 35 || NPC[A].Type == 191 ||
+                             NPC[A].Type == 193 || // FIXME: Duplicated segment [PVS Studio]
+                             NPC[A].Type == 49 || NPC[A].Type == 134 || (NPC[A].Type >= 154 && NPC[A].Type <= 157) ||
+                             NPC[A].Type == 31 || NPC[A].Type == 240 || NPC[A].Type == 278 || NPC[A].Type == 279 || NPC[A].Type == 292))
                         {
                             for(B = 1; B <= numNPCs; B++)
                             {
@@ -1272,10 +1290,25 @@ void UpdateNPCs()
                     {
                         if(NPC[A].Location.SpeedX > -2.5 && NPC[A].Location.SpeedX < 2.5)
                             NPC[A].Location.SpeedX = 2.5 * NPC[A].Direction;
-
-                        // Slow things down that shouldnt move
                     }
-                    else if(NPC[A].Type == 21 || NPC[A].Type == 22 || NPC[A].Type == 25 || NPC[A].Type == 26 || NPC[A].Type == 31 || NPC[A].Type == 32 || NPC[A].Type == 238 || NPC[A].Type == 239 || NPC[A].Type == 35 || NPC[A].Type == 191 || NPC[A].Type == 193 || (NPC[A].Type == 40 && NPC[A].Projectile == true) || NPC[A].Type == 49 || NPC[A].Type == 58 || NPC[A].Type == 67 || NPC[A].Type == 68 || NPC[A].Type == 69 || NPC[A].Type == 70 || (NPCIsVeggie[NPC[A].Type] && NPC[A].Projectile == false) || (NPC[A].Type == 29 && NPC[A].Projectile == true) || (NPC[A].Projectile == true && (NPC[A].Type == 54 && NPC[A].Type == 15)) || NPC[A].Type == 75 || NPC[A].Type == 84 || NPC[A].Type == 181 || NPC[A].Type == 94 || NPC[A].Type == 198 || NPC[A].Type == 96 || NPC[A].Type == 134 || NPC[A].Type == 137 || NPC[A].Type == 101 || NPC[A].Type == 102 || (NPCIsYoshi[NPC[A].Type] && NPC[A].Special == 0) || (NPC[A].Type >= 154 && NPC[A].Type <= 157) || NPC[A].Type == 166 || (NPC[A].Type == 39 && NPC[A].Projectile == true) || NPC[A].Type == 170 || NPC[A].Type == 169 || NPC[A].Type == 183 || NPC[A].Type == 188 || NPC[A].Type == 97 || NPC[A].Type == 196 || NPC[A].Type == 182 || NPC[A].Type == 240 || NPC[A].Type == 241 || NPC[A].Type == 249 || NPC[A].Type == 250 || NPC[A].Type == 254 || NPC[A].Type == 255 || NPC[A].Type == 278 || NPC[A].Type == 279 || NPC[A].Type == 277 || NPC[A].Type == 264 || NPC[A].Type == 288 || NPC[A].Type == 275)
+                    // Slow things down that shouldnt move
+                    else if(NPC[A].Type == 21 || NPC[A].Type == 22 || NPC[A].Type == 25 || NPC[A].Type == 26 ||
+                            NPC[A].Type == 31 || NPC[A].Type == 32 || NPC[A].Type == 238 || NPC[A].Type == 239 ||
+                            NPC[A].Type == 35 || NPC[A].Type == 191 || NPC[A].Type == 193 ||
+                            (NPC[A].Type == 40 && NPC[A].Projectile) || NPC[A].Type == 49 || NPC[A].Type == 58 ||
+                            NPC[A].Type == 67 || NPC[A].Type == 68 || NPC[A].Type == 69 || NPC[A].Type == 70 ||
+                            (NPCIsVeggie[NPC[A].Type] && !NPC[A].Projectile) ||
+                            (NPC[A].Type == 29 && NPC[A].Projectile) ||
+                            (NPC[A].Projectile && (NPC[A].Type == 54 && NPC[A].Type == 15)) || // FIXME: This segment is always false (type equal both 54 and 15, impossible!) [PVS Studio]
+                            NPC[A].Type == 75 || NPC[A].Type == 84 || NPC[A].Type == 181 || NPC[A].Type == 94 ||
+                            NPC[A].Type == 198 || NPC[A].Type == 96 || NPC[A].Type == 134 || NPC[A].Type == 137 ||
+                            NPC[A].Type == 101 || NPC[A].Type == 102 || (NPCIsYoshi[NPC[A].Type] && NPC[A].Special == 0) ||
+                            (NPC[A].Type >= 154 && NPC[A].Type <= 157) || NPC[A].Type == 166 || (NPC[A].Type == 39 && NPC[A].Projectile) ||
+                            NPC[A].Type == 170 || NPC[A].Type == 169 || NPC[A].Type == 183 || NPC[A].Type == 188 ||
+                            NPC[A].Type == 97 || NPC[A].Type == 196 || NPC[A].Type == 182 || NPC[A].Type == 240 ||
+                            NPC[A].Type == 241 || NPC[A].Type == 249 || NPC[A].Type == 250 || NPC[A].Type == 254 ||
+                            NPC[A].Type == 255 || NPC[A].Type == 278 || NPC[A].Type == 279 || NPC[A].Type == 277 ||
+                            NPC[A].Type == 264 || NPC[A].Type == 288 || NPC[A].Type == 275)
                     {
                         if(NPC[A].Location.SpeedX > 0)
                             NPC[A].Location.SpeedX = NPC[A].Location.SpeedX - 0.05;
@@ -2865,10 +2898,20 @@ void UpdateNPCs()
                                                             if(NPC[A].Type == 13 || NPC[A].Type == 40)
                                                                 NPCHit(A, 4, A);
                                                             beltClear = true;
+
                                                             if(NPC[A].Type == 86)
                                                                 NPC[A].Location.SpeedX = 0;
+
                                                             NPC[A].onWall = true;
-                                                            if(NPC[A].WallDeath >= 5 && !NPCIsABonus[NPC[A].Type] && NPC[A].Type != 278 && NPC[A].Type != 279 && NPC[A].Type != 191 && NPC[A].Type != 21 && NPC[A].Type != 22 && NPC[A].Type != 26 && NPC[A].Type != 29 && NPC[A].Type != 31 && NPC[A].Type != 32 && NPC[A].Type != 35 && NPC[A].Type != 191 && NPC[A].Type != 193 && NPC[A].Type != 49 && NPC[A].Type != 134 && NPC[A].Type != 158 && NPC[A].Type != 195 && NPC[A].Type != 241 && !((NPC[A].Type >= 154 && NPC[A].Type <= 157))) // walldeath stuff
+
+                                                            if(NPC[A].WallDeath >= 5 && !NPCIsABonus[NPC[A].Type] && NPC[A].Type != 278 &&
+                                                               NPC[A].Type != 279 && NPC[A].Type != 191 && NPC[A].Type != 21 && NPC[A].Type != 22 &&
+                                                               NPC[A].Type != 26 && NPC[A].Type != 29 && NPC[A].Type != 31 && NPC[A].Type != 32 &&
+                                                               NPC[A].Type != 35 &&
+                                                               NPC[A].Type != 191 && // FIXME: Duplicated segment [PVS Studio]
+                                                               NPC[A].Type != 193 && NPC[A].Type != 49 &&
+                                                               NPC[A].Type != 134 && NPC[A].Type != 158 && NPC[A].Type != 195 && NPC[A].Type != 241 &&
+                                                               !((NPC[A].Type >= 154 && NPC[A].Type <= 157))) // walldeath stuff
                                                             {
                                                                 NPC[A].Location.SpeedX = Physics.NPCShellSpeed * 0.5 * NPC[A].Direction;
                                                                 if(NPCIsVeggie[NPC[A].Type])
@@ -3048,8 +3091,10 @@ void UpdateNPCs()
                             tempLocation.Y = tempLocation.Y + 1;
                             tempLocation.Height = tempLocation.Height - 2;
                             tempLocation.Width = tempLocation.Width / 2;
+
                             if(NPC[A].BeltSpeed > 0)
-                                tempLocation.X = tempLocation.X + tempLocation.Width;
+                                tempLocation.X += tempLocation.Width;
+
                             if(!(NPC[A].Type >= 79 && NPC[A].Type <= 83) && !NPC[A].Inert)
                             {
                                 for(int C = 1; C <= numNPCs; C++)
@@ -3172,9 +3217,10 @@ void UpdateNPCs()
                                                                         tempLocation = NPC[A].Location;
                                                                         tempLocation2 = NPC[B].Location;
                                                                         tempLocation.Width = 8;
-                                                                        tempLocation.X = tempLocation.X + 12;
+                                                                        tempLocation.X += 12;
                                                                         tempLocation2.Width = 8;
-                                                                        tempLocation2.X = tempLocation2.X + 12;
+                                                                        tempLocation2.X += 12;
+
                                                                         if(CheckCollision(tempLocation, tempLocation2))
                                                                         {
                                                                             NPC[B].Type = NPC[B].Type - 4;
@@ -3184,8 +3230,8 @@ void UpdateNPCs()
                                                                             NPC[B].Direction = NPC[A].Direction;
                                                                             NPC[B].Frame = EditorNPCFrame(NPC[B].Type, NPC[B].Direction);
                                                                         }
-                                                                        // NPC is a projectile
                                                                     }
+                                                                    // NPC is a projectile
                                                                     else if(NPC[A].Projectile && !(NPC[B].Type == 45 && NPC[B].Special == 0.0) && NPC[A].Type != 266)
                                                                     {
                                                                         if(!(NPC[A].Projectile && NPC[B].Projectile && NPC[A].Type == 17 && NPC[B].Type == 17 && NPC[A].CantHurtPlayer != NPC[B].CantHurtPlayer))
@@ -3522,14 +3568,14 @@ void UpdateNPCs()
                                 // If .Location.SpeedX > 0 Then
                                 if(NPC[A].Direction > 0)
                                 {
-                                    tempLocation.X = tempLocation.X + NPC[A].Location.Width - 20;
+                                    tempLocation.X += NPC[A].Location.Width - 20;
                                     if(isPokeyHead)
                                         tempLocation.X += 16;
                                     // If .Type = 189 Then tempLocation.X = tempLocation.X - 10
                                 }
                                 else
                                 {
-                                    tempLocation.X = tempLocation.X - tempLocation.Width + 20;
+                                    tempLocation.X -= tempLocation.Width + 20;
                                     if(isPokeyHead)
                                         tempLocation.X -= 16;
                                     // If .Type = 189 Then tempLocation.X = tempLocation.X + 10
@@ -4176,9 +4222,12 @@ void UpdateNPCs()
                                 NPC[A].Frame = 11;
                                 NPC[A].Projectile = false;
                                 tempLocation = NPC[A].Location;
-                                tempLocation.X = tempLocation.X; // + 16
-                                tempLocation.Width = tempLocation.Width; // - 32
-                                tempLocation.Y = tempLocation.Y + tempLocation.Height - 8;
+
+                                // Useless self-assignment code [PVS Studio]
+                                //tempLocation.X = tempLocation.X; // + 16
+                                //tempLocation.Width = tempLocation.Width; // - 32
+
+                                tempLocation.Y += tempLocation.Height - 8;
                                 tempLocation.Height = 16;
                                 // fBlock = FirstBlock[long(NPC[A].Location.X / 32) - 1];
                                 // lBlock = LastBlock[long((NPC[A].Location.X + NPC[A].Location.Width) / 32.0) + 1];
@@ -4606,9 +4655,10 @@ void UpdateNPCs()
                             {
                                 tempLocation = Background[B].Location;
                                 tempLocation.Width = 16;
-                                tempLocation.X = tempLocation.X + 8;
+                                tempLocation.X += 8;
                                 tempLocation.Height = 26;
-                                tempLocation.Y = tempLocation.Y + 2;
+                                tempLocation.Y += 2;
+
                                 if(CheckCollision(NPC[A].Location, tempLocation) == true)
                                 {
                                     PlaySound(SFX_Key);

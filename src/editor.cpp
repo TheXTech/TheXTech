@@ -99,7 +99,7 @@ void UpdateEditor()
 
     if(!MagicHand)
     {
-        if((getKeyState(vbKeyPageUp) == KEY_PRESSED) != 0)
+        if(getKeyState(vbKeyPageUp) == KEY_PRESSED)
         {
             if(ScrollRelease == true)
             {
@@ -112,7 +112,7 @@ void UpdateEditor()
 //                    frmLevelSettings::optSection(curSection).Value = true;
             }
         }
-        else if((getKeyState(vbKeyPageDown) == KEY_PRESSED) != 0)
+        else if(getKeyState(vbKeyPageDown) == KEY_PRESSED)
         {
             if(ScrollRelease == true)
             {
@@ -167,7 +167,7 @@ void UpdateEditor()
     if(LevelEditor || MagicHand)
     {
         GetEditorControls();
-        if((getKeyState(vbKeyShift) == KEY_PRESSED) != 0)
+        if(getKeyState(vbKeyShift) == KEY_PRESSED)
             ScrollDelay = 0;
 
         if(MagicHand)

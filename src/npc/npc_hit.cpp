@@ -1547,6 +1547,7 @@ void NPCHit(int A, int B, int C)
         {
             if(NPC[C].Projectile && !(NPC[C].Type >= 117 && NPC[C].Type <= 120))
             {
+                // FIXME: Why the condition is here if it always assigns B? [PVS Studio]
                 if(!(NPC[A].Type == 24 && NPC[C].Type == 13))
                     NPC[A].Killed = B;
                 else
@@ -1999,7 +2000,8 @@ void NPCHit(int A, int B, int C)
             else
             {
                 NPC[A].Location.Y = NPC[A].Location.Y + NPC[A].Location.Height;
-                NPC[A].Location.X = NPC[A].Location.X; // - (32 - .Location.Width) / 2
+                // useless self-assignment code [PVS-Studio]
+                //NPC[A].Location.X = NPC[A].Location.X; // - (32 - .Location.Width) / 2
                 NPC[A].Location.Height = 0;
                 PlaySound(SFX_Coin);
                 NewEffect(11, NPC[A].Location);
@@ -2109,7 +2111,10 @@ void NPCHit(int A, int B, int C)
                 }
             }
         }
-        else if(NPC[A].Location.SpeedX != oldNPC.Location.SpeedX || NPC[A].Location.SpeedY != oldNPC.Location.SpeedY || NPC[A].Projectile != NPC[A].Projectile || NPC[A].Killed != oldNPC.Killed || NPC[A].Type != oldNPC.Type || NPC[A].Inert != oldNPC.Inert)
+        else if(NPC[A].Location.SpeedX != oldNPC.Location.SpeedX || NPC[A].Location.SpeedY != oldNPC.Location.SpeedY ||
+                NPC[A].Projectile != NPC[A].Projectile || // FIXME: Wrong condition, always false [PVS Studio]
+                NPC[A].Killed != oldNPC.Killed ||
+                NPC[A].Type != oldNPC.Type || NPC[A].Inert != oldNPC.Inert)
         {
             if(NPC[A].Type == 15 && NPC[A].Killed == 0)
             {
@@ -2133,7 +2138,9 @@ void NPCHit(int A, int B, int C)
             if(B == 2)
                 NewEffect(75, newLoc(NPC[A].Location.X, NPC[A].Location.Y + NPC[A].Location.Height - 16));
         }
-        else if(NPC[A].Location.SpeedX != oldNPC.Location.SpeedX || NPC[A].Location.SpeedY != oldNPC.Location.SpeedY || NPC[A].Projectile != NPC[A].Projectile)
+        else if(NPC[A].Location.SpeedX != oldNPC.Location.SpeedX ||
+                NPC[A].Location.SpeedY != oldNPC.Location.SpeedY ||
+                NPC[A].Projectile != NPC[A].Projectile) // FIXME: Wrong condition, always false [PVS Studio]
         {
             // MoreScore 1, .Location
             if(B == 2)

@@ -1452,14 +1452,17 @@ void PlayerFrame(int A)
                             NewEffect(74, tempLocation, 1, 0, ShadowMode);
                         }
                     }
+
                     if(Player[A].Location.SpeedX != 0)
                     {
                         Player[A].FrameCount = Player[A].FrameCount + 2;
+
                         if(Player[A].Location.SpeedX > Physics.PlayerWalkSpeed || Player[A].Location.SpeedX < -Physics.PlayerWalkSpeed)
                             Player[A].FrameCount = Player[A].FrameCount + 3;
+
                         if(Player[A].FrameCount >= 10)
                         {
-                        Player[A].FrameCount = 0;
+                            Player[A].FrameCount = 0;
                             if(Player[A].Frame == 5)
                                 Player[A].Frame = 6;
                             else
@@ -1503,9 +1506,12 @@ void PlayerFrame(int A)
                     if(Player[A].WetFrame && Player[A].Quicksand == 0 && Player[A].Location.SpeedY != 0 && Player[A].Slope == 0 && Player[A].StandingOnNPC == 0 && Player[A].Character <= 2)
                         Player[A].Frame = 43;
                 }
-                Player[A].FrameCount = Player[A].FrameCount + 1;
+
+                Player[A].FrameCount += 1;
+
                 if(FlameThrower)
-                    Player[A].FrameCount = Player[A].FrameCount + 2;
+                    Player[A].FrameCount += 2;
+
                 if(Player[A].FrameCount > 118)
                     Player[A].FrameCount = 0;
             }
@@ -1576,7 +1582,6 @@ void PlayerFrame(int A)
                             Player[A].Frame = 5;
 
                     }
-
                 }
                 else
                 {
@@ -1584,7 +1589,7 @@ void PlayerFrame(int A)
                     {
                         if(Player[A].Location.SpeedX > 0 && (Player[A].Controls.Left || (Player[A].Direction == -1 && Player[A].Bumped)) && Player[A].Effect == 0 && Player[A].Duck == false && Player[A].Quicksand == 0)
                         {
-                            if(LevelSelect == false)
+                            if(!LevelSelect)
                             {
                                 if(!(Player[A].Mount == 2) && Player[A].Wet == 0)
                                 {
@@ -1602,7 +1607,7 @@ void PlayerFrame(int A)
                         }
                         else if(Player[A].Location.SpeedX < 0 && (Player[A].Controls.Right || (Player[A].Direction == 1 && Player[A].Bumped)) && Player[A].Effect == 0 && Player[A].Duck == false && Player[A].Quicksand == 0)
                         {
-                            if(LevelSelect == false)
+                            if(!LevelSelect)
                             {
                                 if(!(Player[A].Mount == 2) && Player[A].Wet == 0)
                                 {
@@ -1623,10 +1628,13 @@ void PlayerFrame(int A)
                             if(Player[A].Location.SpeedX != 0 && !(Player[A].Slippy && Player[A].Controls.Left == false && Player[A].Controls.Right == false))
                             {
                                 Player[A].FrameCount = Player[A].FrameCount + 1;
+
                                 if(Player[A].Location.SpeedX >= Physics.PlayerWalkSpeed || Player[A].Location.SpeedX <= -Physics.PlayerWalkSpeed)
                                     Player[A].FrameCount = Player[A].FrameCount + 1;
+
                                 if(Player[A].Location.SpeedX > Physics.PlayerWalkSpeed + 1.5 || Player[A].Location.SpeedX < -Physics.PlayerWalkSpeed - 1.5)
                                     Player[A].FrameCount = Player[A].FrameCount + 1;
+
                                 if(Player[A].FrameCount >= 5 && Player[A].FrameCount < 10)
                                 {
                                     if(Player[A].CanFly && Player[A].Character != 3)
@@ -1769,23 +1777,27 @@ void PlayerFrame(int A)
                 }
             }
         }
+
         if(Player[A].Mount == 1) // Goomba's Shoe
         {
             Player[A].MountOffsetY = 0;//-Player[A].Location.SpeedY / 2; FIXME: Verify this didn't broke anything
+
             if(Player[A].Duck || Player[A].StandingOnNPC != 0)
                 Player[A].MountOffsetY = 0;
             if(Player[A].Direction == 1)
                 Player[A].MountFrame = 2 + SpecialFrame[1];
             else
                 Player[A].MountFrame = 0 + SpecialFrame[1];
+
             Player[A].Frame = 1;
         }
         else if(Player[A].Mount == 2) // Koopa Clown Car
         {
             Player[A].Frame = 1;
             Player[A].MountFrame = SpecialFrame[2];
+
             if(Player[A].Direction == 1)
-                Player[A].MountFrame = Player[A].MountFrame + 4;
+                Player[A].MountFrame += 4;
         }
         else if(Player[A].Mount == 3) // Green Yoshi
         {
@@ -1797,6 +1809,7 @@ void PlayerFrame(int A)
             Player[A].YoshiBFrame = 0;
             Player[A].YoshiTFrame = 0;
             Player[A].MountOffsetY = 0;
+
             if(Player[A].Location.SpeedY < 0 && Player[A].StandingOnNPC == 0 && Player[A].Slope == 0)
             {
                 Player[A].YoshiBFrame = 3;
@@ -1812,11 +1825,14 @@ void PlayerFrame(int A)
                 if(Player[A].Location.SpeedX != 0.0)
                 {
                     if(Player[A].Effect == 0)
-                        Player[A].YoshiBFrameCount = Player[A].YoshiBFrameCount + 1 + (std::abs(Player[A].Location.SpeedX * 0.7));
+                        Player[A].YoshiBFrameCount += 1 + (std::abs(Player[A].Location.SpeedX * 0.7));
+
                     if((Player[A].Direction == -1 && Player[A].Location.SpeedX > 0) || (Player[A].Direction == 1 && Player[A].Location.SpeedX < 0))
                         Player[A].YoshiBFrameCount = 24;
+
                     if(Player[A].YoshiBFrameCount < 0)
                         Player[A].YoshiBFrameCount = 0;
+
                     if(Player[A].YoshiBFrameCount > 32)
                     {
                         Player[A].YoshiBFrame = 0;
@@ -1828,7 +1844,7 @@ void PlayerFrame(int A)
                         Player[A].YoshiTX = Player[A].YoshiTX - 1;
                         Player[A].YoshiTY = Player[A].YoshiTY + 2;
                         Player[A].YoshiBY = Player[A].YoshiBY + 1;
-                        Player[A].MountOffsetY = Player[A].MountOffsetY + 1;
+                        Player[A].MountOffsetY += 1;
                     }
                     else if(Player[A].YoshiBFrameCount > 16)
                     {
@@ -1836,7 +1852,7 @@ void PlayerFrame(int A)
                         Player[A].YoshiTX = Player[A].YoshiTX - 2;
                         Player[A].YoshiTY = Player[A].YoshiTY + 4;
                         Player[A].YoshiBY = Player[A].YoshiBY + 2;
-                        Player[A].MountOffsetY = Player[A].MountOffsetY + 2;
+                        Player[A].MountOffsetY += 2;
                     }
                     else if(Player[A].YoshiBFrameCount > 8)
                     {
@@ -1844,7 +1860,7 @@ void PlayerFrame(int A)
                         Player[A].YoshiTX = Player[A].YoshiTX - 1;
                         Player[A].YoshiTY = Player[A].YoshiTY + 2;
                         Player[A].YoshiBY = Player[A].YoshiBY + 1;
-                        Player[A].MountOffsetY = Player[A].MountOffsetY + 1;
+                        Player[A].MountOffsetY += 1;
                     }
                     else
                         Player[A].YoshiBFrame = 0;
@@ -1852,14 +1868,19 @@ void PlayerFrame(int A)
                 else
                     Player[A].YoshiBFrameCount = 0;
             }
+
             if(Player[A].MountSpecial == 1)
             {
-                if(Player[A].Controls.Up || (Player[A].StandingOnNPC == 0 && Player[A].Location.SpeedY != 0.0 && Player[A].Slope == 0 && Player[A].Controls.Down == false))
+                if(Player[A].Controls.Up ||
+                   (Player[A].StandingOnNPC == 0 && Player[A].Location.SpeedY != 0.0 &&
+                    Player[A].Slope == 0 && !Player[A].Controls.Down))
                 {
                     // .YoshiBFrame = 0
                     Player[A].YoshiTFrame = 3;
-                    Player[A].MountOffsetY = Player[A].MountOffsetY;
-                    Player[A].YoshiTongue.Y = Player[A].YoshiTongue.Y + Player[A].MountOffsetY;
+                    // useless self-assignment code [PVS-Studio]
+                    // Player[A].MountOffsetY = Player[A].MountOffsetY;
+                    Player[A].YoshiTongue.Y += Player[A].MountOffsetY;
+                    //Player[A].YoshiTongue.Y = Player[A].YoshiTongue.Y + Player[A].MountOffsetY;
                 }
                 else
                 {
@@ -1870,13 +1891,17 @@ void PlayerFrame(int A)
                     Player[A].YoshiTX = 20;
                     Player[A].YoshiBFrame = 5;
                     Player[A].YoshiTFrame = 4;
-                    Player[A].YoshiBY = Player[A].YoshiBY + 8;
-                    Player[A].YoshiTY = Player[A].YoshiTY + 24;
-                    Player[A].YoshiTX = Player[A].YoshiTX + 12;
+                    Player[A].YoshiBY += 8;
+                    Player[A].YoshiTY += 24;
+                    Player[A].YoshiTX += 12;
+                    /*
                     Player[A].MountOffsetY = 0;
                     Player[A].MountOffsetY = Player[A].MountOffsetY + 8;
+                    */
+                    Player[A].MountOffsetY = 8;
                 }
             }
+
             if(Player[A].Duck)
             {
                 Player[A].Frame = 31;
@@ -1884,10 +1909,12 @@ void PlayerFrame(int A)
                     Player[A].YoshiBFrame = 6;
                 Player[A].YoshiBFrameCount = 0;
             }
+
             if(Player[A].YoshiTFrameCount > 0)
             {
                 if(Player[A].YoshiNPC == 0 && Player[A].YoshiPlayer == 0)
-                    Player[A].YoshiTFrameCount = Player[A].YoshiTFrameCount + 1;
+                    Player[A].YoshiTFrameCount += 1;
+
                 if(Player[A].YoshiTFrameCount < 10)
                     Player[A].YoshiTFrame = 1;
                 else if(Player[A].YoshiTFrameCount < 20)
@@ -1897,36 +1924,40 @@ void PlayerFrame(int A)
             }
             else if(Player[A].YoshiTFrameCount < 0)
             {
-                Player[A].YoshiTFrameCount = Player[A].YoshiTFrameCount - 1;
+                Player[A].YoshiTFrameCount -= 1;
                 if(Player[A].YoshiTFrameCount > -10)
                     Player[A].YoshiTFrame = 3;
                 else
                     Player[A].YoshiTFrameCount = 0;
             }
+
             if(Player[A].Direction == 1)
             {
-                Player[A].YoshiTFrame = Player[A].YoshiTFrame + 5;
-                Player[A].YoshiBFrame = Player[A].YoshiBFrame + 7;
+                Player[A].YoshiTFrame += 5;
+                Player[A].YoshiBFrame += 7;
             }
             else
             {
                 Player[A].YoshiBX = -Player[A].YoshiBX;
                 Player[A].YoshiTX = -Player[A].YoshiTX;
             }
-            if(Player[A].Duck == false || Player[A].MountSpecial > 0)
+
+            if(!Player[A].Duck || Player[A].MountSpecial > 0)
             {
-                Player[A].MountOffsetY = Player[A].MountOffsetY - (72 - Player[A].Location.Height);
-                Player[A].YoshiBY = Player[A].YoshiBY - (72 - Player[A].Location.Height);
-                Player[A].YoshiTY = Player[A].YoshiTY - (72 - Player[A].Location.Height);
+                Player[A].MountOffsetY -= (72 - Player[A].Location.Height);
+                Player[A].YoshiBY -= (72 - Player[A].Location.Height);
+                Player[A].YoshiTY -= (72 - Player[A].Location.Height);
             }
             else
             {
-                Player[A].MountOffsetY = Player[A].MountOffsetY - (64 - Player[A].Location.Height);
-                Player[A].YoshiBY = Player[A].YoshiBY - (64 - Player[A].Location.Height);
-                Player[A].YoshiTY = Player[A].YoshiTY - (64 - Player[A].Location.Height);
+                Player[A].MountOffsetY -= (64 - Player[A].Location.Height);
+                Player[A].YoshiBY -= (64 - Player[A].Location.Height);
+                Player[A].YoshiTY -= (64 - Player[A].Location.Height);
             }
-            Player[A].YoshiBX = Player[A].YoshiBX - 4;
-            Player[A].YoshiTX = Player[A].YoshiTX - 4;
+
+            Player[A].YoshiBX -= 4;
+            Player[A].YoshiTX -= 4;
+
             if(Player[A].YoshiBlue)
             {
                 if(Player[A].Location.SpeedY == 0 || Player[A].StandingOnNPC != 0)
@@ -1964,6 +1995,7 @@ void PlayerFrame(int A)
             }
         }
     }
+
     if(Player[A].Mount == 1 && Player[A].MountType == 3)
     {
         if(Player[A].Location.SpeedY == 0.0 || Player[A].StandingOnNPC != 0)
@@ -1994,8 +2026,10 @@ void PlayerFrame(int A)
                 Player[A].YoshiWingsFrame = 0;
             }
         }
+
         if(Player[A].GroundPound)
             Player[A].YoshiWingsFrame = 0;
+
         if(Player[A].Direction == 1)
             Player[A].YoshiWingsFrame = Player[A].YoshiWingsFrame + 2;
     }

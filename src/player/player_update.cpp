@@ -1524,27 +1524,34 @@ void UpdatePlayer()
                                 else if(Player[A].Jump > 0)
                                     NPC[Player[A].StandingOnNPC].Location.SpeedY = Physics.PlayerJumpVelocity * 0.9;
 
-                                // if not surfing a shell then proceed like normal
                             }
+                            // if not surfing a shell then proceed like normal
                             else
                             {
-                                if((Player[A].Vine > 0 || Player[A].Location.SpeedY == 0 || Player[A].StandingOnNPC != 0 || MultiHop == true || Player[A].Slope > 0 || (Player[A].Location.SpeedY > 0 && Player[A].Quicksand > 0)) && Player[A].CanJump == true)
+                                if((Player[A].Vine > 0 || Player[A].Location.SpeedY == 0 || Player[A].StandingOnNPC != 0 ||
+                                    MultiHop || Player[A].Slope > 0 || (Player[A].Location.SpeedY > 0 && Player[A].Quicksand > 0)) && Player[A].CanJump)
                                 {
                                     PlaySound(SFX_Jump); // Jump sound
                                     Player[A].Location.SpeedY = Physics.PlayerJumpVelocity - tempSpeed;
                                     Player[A].Jump = Physics.PlayerJumpHeight;
-                                    if(Player[A].Character == 4 && (Player[A].State == 4 || Player[A].State == 5) && Player[A].SpinJump == false)
+
+                                    if(Player[A].Character == 4 && (Player[A].State == 4 || Player[A].State == 5) && !Player[A].SpinJump)
                                         Player[A].DoubleJump = true;
+
                                     if(Player[A].Character == 2)
                                         Player[A].Jump = Player[A].Jump + 3;
+
                                     if(Player[A].SpinJump)
                                         Player[A].Jump = Player[A].Jump - 6;
+
                                     if(Player[A].StandingOnNPC > 0 && !FreezeNPCs)
                                     {
                                         if(NPC[Player[A].StandingOnNPC].Type != 91)
                                             Player[A].Location.SpeedX = Player[A].Location.SpeedX - NPC[Player[A].StandingOnNPC].Location.SpeedX;
                                     }
+
                                     Player[A].StandingOnNPC = 0; // the player can't stand on an NPC after jumping
+
                                     if(Player[A].CanFly) // let's the player fly if the conditions are met
                                     {
                                         Player[A].StandingOnNPC = 0;
@@ -1556,6 +1563,7 @@ void UpdatePlayer()
                                         Player[A].CanFly = false;
                                         Player[A].RunCount = 0;
                                         Player[A].CanFly2 = true;
+
                                         if(Player[A].Character == 2) // luigi doesn't fly as long as mario
                                             Player[A].FlyCount = 300; // Length of flight time
                                         else if(Player[A].Character == 3) // special handling for peach
@@ -1567,6 +1575,7 @@ void UpdatePlayer()
                                             Player[A].CanFloat = true;
                                             Player[A].FlySparks = true;
                                         }
+                                        // FIXME: Duplicated "Character == 3" condition branch [PVS Studio]
                                         else if(Player[A].Character == 3) // special handling for peach
                                             Player[A].FlyCount = 280; // Length of flight time
                                         else

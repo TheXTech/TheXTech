@@ -565,7 +565,7 @@ void ProcEvent(std::string EventName, bool NoEffect)
                         }
                     }
                 }
-                else if(IF_INRANGE(evt.AutoSection, 0, maxSections) && IF_INRANGE(evt.AutoSection, 0, maxEvents))
+                else if(IF_INRANGE(evt.AutoSection, 0, SDL_min(maxSections, maxEvents)))
                 {
                     // Buggy behavior, see https://github.com/Wohlstand/TheXTech/issues/44
                     AutoX[evt.AutoSection] = Events[evt.AutoSection].AutoX;
