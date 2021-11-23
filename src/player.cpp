@@ -4203,7 +4203,7 @@ static SDL_INLINE bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool
 
             for(int C = 1; C <= numBackground; C++)
             {
-                if((CheckCollision(entrance, Background[C].Location) | CheckCollision(exit, Background[C].Location)) != 0)
+                if(CheckCollision(entrance, Background[C].Location) || CheckCollision(exit, Background[C].Location))
                 {
                     if(Background[C].Type == 88)
                         NewEffect(54, Background[C].Location);
