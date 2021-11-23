@@ -14,6 +14,7 @@ Changes for 1.3.5.3
 -Improved episodes menu control: added mouse wheel, page-up/page-down/home/end/delete, and left/right/alt-run/alt-jump/drop on controllers to scroll episodes lists
 -Fixed the vanilla bug: episodes list menu gets reset every attempt to go back from the character or the game save slot select menu
 -Fixed the soft-lock in an attempt to erase the gamesave using the two-player game menu
+-Order of episodes lists now alphabetical
 
 Changes for 1.3.5.2
 -Fixed the ARM64 building

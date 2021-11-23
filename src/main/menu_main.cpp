@@ -159,17 +159,6 @@ void FindWorlds()
                         w.blockChar[5] = true;
                     }
 
-                    if(MenuMode == MENU_1PLAYER_GAME && wPath == g_recentWorld1p)
-                    {
-                        menuRecentEpisode = SelectWorld.size() - 1;
-                        w.highlight = true;
-                    }
-                    else if(MenuMode == MENU_2PLAYER_GAME && wPath == g_recentWorld2p)
-                    {
-                        menuRecentEpisode = SelectWorld.size() - 1;
-                        w.highlight = true;
-                    }
-
                     SelectWorld.push_back(w);
                 }
             }
@@ -178,10 +167,36 @@ void FindWorlds()
         }
     }
 
-    NumSelectWorld = (SelectWorld.size() - 1);
+    // Sort all worlds by alphabetical order
+    std::sort(SelectWorld.begin(), SelectWorld.end(), [](const SelectWorld_t &a, const SelectWorld_t &b)
+    {
+        return a.WorldName < b.WorldName;
+    });
 
-    if(menuRecentEpisode >= 0)
-        worldCurs = menuRecentEpisode - 3;
+    if((MenuMode == MENU_1PLAYER_GAME && !g_recentWorld1p.empty()) ||
+       (MenuMode == MENU_2PLAYER_GAME && !g_recentWorld2p.empty()))
+    {
+        for(size_t i = 1; i < SelectWorld.size(); ++i)
+        {
+            auto &w = SelectWorld[i];
+            const std::string wPath = w.WorldPath + w.WorldFile;
+            if(MenuMode == MENU_1PLAYER_GAME && wPath == g_recentWorld1p)
+            {
+                menuRecentEpisode = i - 1;
+                w.highlight = true;
+            }
+            else if(MenuMode == MENU_2PLAYER_GAME && wPath == g_recentWorld2p)
+            {
+                menuRecentEpisode = i - 1;
+                w.highlight = true;
+            }
+        }
+
+        if(menuRecentEpisode >= 0)
+            worldCurs = menuRecentEpisode - 3;
+    }
+
+    NumSelectWorld = (SelectWorld.size() - 1);
     MenuCursor = (menuRecentEpisode < 0) ? 0 : menuRecentEpisode;
 
     SDL_AtomicSet(&loading, 0);
