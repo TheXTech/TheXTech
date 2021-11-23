@@ -156,7 +156,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
     if(b.ShakeY != 0 || b.ShakeY2 != 0 || b.ShakeY3 != 0) // if the block has just been hit, ignore
     {
-        if(b.RapidHit > 0 && Player[whatPlayer].Character == 4 && whatPlayer > 0)
+        if(b.RapidHit > 0 && IF_INRANGE(whatPlayer, 1, maxPlayers) && Player[whatPlayer].Character == 4)
         {
             b.RapidHit = (iRand() % 3) + 1;
         }
