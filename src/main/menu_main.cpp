@@ -980,10 +980,10 @@ bool mainMenuUpdate()
                                 tempLocation = WorldPath[A].Location;
                                 {
                                     Location_t &l =tempLocation;
-                                    l.X = l.X + 4;
-                                    l.Y = l.Y + 4;
-                                    l.Width = l.Width - 8;
-                                    l.Height = l.Height - 8;
+                                    l.X += 4;
+                                    l.Y += 4;
+                                    l.Width -= 8;
+                                    l.Height -= 8;
                                 }
 
                                 WorldPath[A].Active = true;
@@ -1678,11 +1678,11 @@ void mainMenuDraw()
             SuperPrint(g_mainMenu.selectPlayer[2], 3, 300, 380 + A);
         else
         {
-            A = A - 30;
+            A -= 30;
             if(MenuCursor + 1 >= 2)
-                B = B - 30;
+                B -= 30;
             if(PlayerCharacter >= 2)
-                C = C - 30;
+                C -= 30;
         }
 
         if(!blockCharacter[3])

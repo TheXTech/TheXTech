@@ -339,7 +339,7 @@ void UpdateGraphics(bool skipRepaint)
                             }
                             NPC[A].TimeLeft = Physics.NPCTimeOffScreen;
 //                            if(nPlay.Online == true && nPlay.NPCWaitCount >= 10 && nPlay.Mode == 0)
-//                                timeStr = timeStr + "2b" + std::to_string(A) + LB;
+//                                timeStr += "2b" + std::to_string(A) + LB;
                             NPC[A].Active = true;
                         }
                         NPC[A].Reset[1] = false;
@@ -424,19 +424,19 @@ void UpdateGraphics(bool skipRepaint)
             BackgroundFrame[161] = BackgroundFrame[18];
             BackgroundFrameCount[18] = 0;
         }
-        BackgroundFrameCount[36] = BackgroundFrameCount[36] + 1;
+        BackgroundFrameCount[36] += 1;
         if(BackgroundFrameCount[36] >= 2)
         {
-            BackgroundFrame[36] = BackgroundFrame[36] + 1;
+            BackgroundFrame[36] += 1;
             if(BackgroundFrame[36] >= 4)
                 BackgroundFrame[36] = 0;
             BackgroundFrameCount[36] = 0;
         }
         BackgroundFrame[68] = BackgroundFrame[36];
-        BackgroundFrameCount[65] = BackgroundFrameCount[65] + 1;
+        BackgroundFrameCount[65] += 1;
         if(BackgroundFrameCount[65] >= 8)
         {
-            BackgroundFrame[65] = BackgroundFrame[65] + 1;
+            BackgroundFrame[65] += 1;
             if(BackgroundFrame[65] >= 4)
                 BackgroundFrame[65] = 0;
             BackgroundFrameCount[65] = 0;
@@ -454,26 +454,26 @@ void UpdateGraphics(bool skipRepaint)
         BackgroundFrame[138] = BackgroundFrame[65];
 
 
-        BackgroundFrameCount[82] = BackgroundFrameCount[82] + 1;
+        BackgroundFrameCount[82] += 1;
         if(BackgroundFrameCount[82] >= 10)
         {
-            BackgroundFrame[82] = BackgroundFrame[82] + 1;
+            BackgroundFrame[82] += 1;
             if(BackgroundFrame[82] >= 4)
                 BackgroundFrame[82] = 0;
             BackgroundFrameCount[82] = 0;
         }
 
-        BackgroundFrameCount[170] = BackgroundFrameCount[170] + 1;
+        BackgroundFrameCount[170] += 1;
         if(BackgroundFrameCount[170] >= 8)
         {
-            BackgroundFrame[170] = BackgroundFrame[170] + 1;
+            BackgroundFrame[170] += 1;
             if(BackgroundFrame[170] >= 4)
                 BackgroundFrame[170] = 0;
             BackgroundFrame[171] = BackgroundFrame[170];
             BackgroundFrameCount[170] = 0;
         }
 
-        BackgroundFrameCount[125] = BackgroundFrameCount[125] + 1;
+        BackgroundFrameCount[125] += 1;
         if(BackgroundFrameCount[125] >= 4)
         {
             if(BackgroundFrame[125] == 0)
@@ -491,24 +491,24 @@ void UpdateGraphics(bool skipRepaint)
     if(BackgroundFrameCount[158] >= 6)
     {
         BackgroundFrameCount[158] = 0;
-        BackgroundFrame[158] = BackgroundFrame[158] + 1;
-        BackgroundFrame[159] = BackgroundFrame[159] + 1;
+        BackgroundFrame[158] += 1;
+        BackgroundFrame[159] += 1;
         if(BackgroundFrame[158] >= 4)
             BackgroundFrame[158] = 0;
         if(BackgroundFrame[159] >= 8)
             BackgroundFrame[159] = 0;
     }
 
-    BackgroundFrameCount[168] = BackgroundFrameCount[168] + 1;
+    BackgroundFrameCount[168] += 1;
     if(BackgroundFrameCount[168] >= 8)
     {
-        BackgroundFrame[168] = BackgroundFrame[168] + 1;
+        BackgroundFrame[168] += 1;
         if(BackgroundFrame[168] >= 8)
             BackgroundFrame[168] = 0;
         BackgroundFrameCount[168] = 0;
     }
 
-    BackgroundFrameCount[173] = BackgroundFrameCount[173] + 1;
+    BackgroundFrameCount[173] += 1;
     if(BackgroundFrameCount[173] >= 8)
     {
         BackgroundFrameCount[173] = 0;
@@ -518,10 +518,10 @@ void UpdateGraphics(bool skipRepaint)
             BackgroundFrame[173] = 0;
     }
 
-    BackgroundFrameCount[187] = BackgroundFrameCount[187] + 1;
+    BackgroundFrameCount[187] += 1;
     if(BackgroundFrameCount[187] >= 6)
     {
-        BackgroundFrame[187] = BackgroundFrame[187] + 1;
+        BackgroundFrame[187] += 1;
         if(BackgroundFrame[187] >= 4)
             BackgroundFrame[187] = 0;
         BackgroundFrame[188] = BackgroundFrame[187];
@@ -602,13 +602,13 @@ void UpdateGraphics(bool skipRepaint)
         if(qScreen)
         {
             if(vScreenX[1] < qScreenX[1] - 2)
-                qScreenX[1] = qScreenX[1] - 2;
+                qScreenX[1] -= 2;
             else if(vScreenX[1] > qScreenX[1] + 2)
-                qScreenX[1] = qScreenX[1] + 2;
+                qScreenX[1] += 2;
             if(vScreenY[1] < qScreenY[1] - 2)
-                qScreenY[1] = qScreenY[1] - 2;
+                qScreenY[1] -= 2;
             else if(vScreenY[1] > qScreenY[1] + 2)
-                qScreenY[1] = qScreenY[1] + 2;
+                qScreenY[1] += 2;
             if(qScreenX[1] < vScreenX[1] + 5 && qScreenX[1] > vScreenX[1] - 5 &&
                qScreenY[1] < vScreenY[1] + 5 && qScreenY[1] > vScreenY[1] - 5)
                 qScreen = false;
@@ -967,7 +967,7 @@ void UpdateGraphics(bool skipRepaint)
                             }
                             NPC[A].TimeLeft = Physics.NPCTimeOffScreen;
 //                            if(nPlay.Online == true && nPlay.NPCWaitCount >= 10 && nPlay.Mode == 0)
-//                                timeStr = timeStr + "2b" + std::to_string(A) + LB;
+//                                timeStr += "2b" + std::to_string(A) + LB;
                             NPC[A].Active = true;
                         }
                         NPC[A].Reset[1] = false;
@@ -1022,8 +1022,8 @@ void UpdateGraphics(bool skipRepaint)
                                 tempLocation.Width = NPCWidth[NPC[Player[A].HoldingNPC].Type];
                             }
 
-                            tempLocation.X = tempLocation.X + NPCFrameOffsetX[NPC[Player[A].HoldingNPC].Type];
-                            tempLocation.Y = tempLocation.Y + NPCFrameOffsetY[NPC[Player[A].HoldingNPC].Type];
+                            tempLocation.X += NPCFrameOffsetX[NPC[Player[A].HoldingNPC].Type];
+                            tempLocation.Y += NPCFrameOffsetY[NPC[Player[A].HoldingNPC].Type];
                             Y2 = 0;
                             X2 = 0;
 
@@ -1047,8 +1047,8 @@ void UpdateGraphics(bool skipRepaint)
                         tempLocation = Player[A].Location;
                         tempLocation.Height = 32;
                         tempLocation.Width = 32;
-                        tempLocation.X = tempLocation.X + Player[A].YoshiBX;
-                        tempLocation.Y = tempLocation.Y + Player[A].YoshiBY;
+                        tempLocation.X += Player[A].YoshiBX;
+                        tempLocation.Y += Player[A].YoshiBY;
                         Y2 = 0;
                         X2 = 0;
                         PlayerWarpGFX(A, tempLocation, X2, Y2);
@@ -1057,8 +1057,8 @@ void UpdateGraphics(bool skipRepaint)
                         tempLocation = Player[A].Location;
                         tempLocation.Height = 32;
                         tempLocation.Width = 32;
-                        tempLocation.X = tempLocation.X + Player[A].YoshiTX;
-                        tempLocation.Y = tempLocation.Y + Player[A].YoshiTY;
+                        tempLocation.X += Player[A].YoshiTX;
+                        tempLocation.Y += Player[A].YoshiTY;
                         Y2 = 0;
                         X2 = 0;
                         PlayerWarpGFX(A, tempLocation, X2, Y2);
@@ -1075,8 +1075,8 @@ void UpdateGraphics(bool skipRepaint)
                             else
                                 tempLocation.Height = Player[A].Location.Height - MarioFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] - 30;
                             tempLocation.Width = 100;
-                            tempLocation.X = tempLocation.X + MarioFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
-                            tempLocation.Y = tempLocation.Y + MarioFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
+                            tempLocation.X += MarioFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
+                            tempLocation.Y += MarioFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
                             Y2 = 0;
                             X2 = 0;
                             PlayerWarpGFX(A, tempLocation, X2, Y2);
@@ -1084,8 +1084,8 @@ void UpdateGraphics(bool skipRepaint)
                             tempLocation = Player[A].Location;
                             tempLocation.Height = 32;
                             tempLocation.Width = 32;
-                            tempLocation.X = tempLocation.X + Player[A].Location.Width / 2.0 - 16;
-                            tempLocation.Y = tempLocation.Y + Player[A].Location.Height - 30;
+                            tempLocation.X += Player[A].Location.Width / 2.0 - 16;
+                            tempLocation.Y += Player[A].Location.Height - 30;
                             Y2 = 0;
                             X2 = 0;
                             PlayerWarpGFX(A, tempLocation, X2, Y2);
@@ -1096,8 +1096,8 @@ void UpdateGraphics(bool skipRepaint)
                             tempLocation = Player[A].Location;
                             tempLocation.Height = 100;
                             tempLocation.Width = 100;
-                            tempLocation.X = tempLocation.X + MarioFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
-                            tempLocation.Y = tempLocation.Y + MarioFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] + Player[A].MountOffsetY;
+                            tempLocation.X += MarioFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
+                            tempLocation.Y += MarioFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] + Player[A].MountOffsetY;
                             Y2 = 0;
                             X2 = 0;
                             PlayerWarpGFX(A, tempLocation, X2, Y2);
@@ -1114,8 +1114,8 @@ void UpdateGraphics(bool skipRepaint)
                             else
                                 tempLocation.Height = Player[A].Location.Height - LuigiFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] - 30;
                             tempLocation.Width = 100;
-                            tempLocation.X = tempLocation.X + LuigiFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
-                            tempLocation.Y = tempLocation.Y + LuigiFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
+                            tempLocation.X += LuigiFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
+                            tempLocation.Y += LuigiFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
                             Y2 = 0;
                             X2 = 0;
                             PlayerWarpGFX(A, tempLocation, X2, Y2);
@@ -1123,8 +1123,8 @@ void UpdateGraphics(bool skipRepaint)
                             tempLocation = Player[A].Location;
                             tempLocation.Height = 32;
                             tempLocation.Width = 32;
-                            tempLocation.X = tempLocation.X + Player[A].Location.Width / 2.0 - 16;
-                            tempLocation.Y = tempLocation.Y + Player[A].Location.Height - 30;
+                            tempLocation.X += Player[A].Location.Width / 2.0 - 16;
+                            tempLocation.Y += Player[A].Location.Height - 30;
                             Y2 = 0;
                             X2 = 0;
                             PlayerWarpGFX(A, tempLocation, X2, Y2);
@@ -1135,8 +1135,8 @@ void UpdateGraphics(bool skipRepaint)
                             tempLocation = Player[A].Location;
                             tempLocation.Height = 100;
                             tempLocation.Width = 100;
-                            tempLocation.X = tempLocation.X + LuigiFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
-                            tempLocation.Y = tempLocation.Y + LuigiFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] + Player[A].MountOffsetY;
+                            tempLocation.X += LuigiFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
+                            tempLocation.Y += LuigiFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] + Player[A].MountOffsetY;
                             Y2 = 0;
                             X2 = 0;
                             PlayerWarpGFX(A, tempLocation, X2, Y2);
@@ -1155,8 +1155,8 @@ void UpdateGraphics(bool skipRepaint)
                                 tempLocation.Height = Player[A].Location.Height - PeachFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] - 30;
 
                             tempLocation.Width = 100;
-                            tempLocation.X = tempLocation.X + PeachFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
-                            tempLocation.Y = tempLocation.Y + PeachFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
+                            tempLocation.X += PeachFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
+                            tempLocation.Y += PeachFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
                             Y2 = 0;
                             X2 = 0;
                             PlayerWarpGFX(A, tempLocation, X2, Y2);
@@ -1170,8 +1170,8 @@ void UpdateGraphics(bool skipRepaint)
                             tempLocation = Player[A].Location;
                             tempLocation.Height = 32;
                             tempLocation.Width = 32;
-                            tempLocation.X = tempLocation.X + Player[A].Location.Width / 2.0 - 16;
-                            tempLocation.Y = tempLocation.Y + Player[A].Location.Height - 30;
+                            tempLocation.X += Player[A].Location.Width / 2.0 - 16;
+                            tempLocation.Y += Player[A].Location.Height - 30;
                             Y2 = 0;
                             X2 = 0;
                             PlayerWarpGFX(A, tempLocation, X2, Y2);
@@ -1188,8 +1188,8 @@ void UpdateGraphics(bool skipRepaint)
                             tempLocation = Player[A].Location;
                             tempLocation.Height = 100;
                             tempLocation.Width = 100;
-                            tempLocation.X = tempLocation.X + PeachFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
-                            tempLocation.Y = tempLocation.Y + PeachFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] + Player[A].MountOffsetY;
+                            tempLocation.X += PeachFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
+                            tempLocation.Y += PeachFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] + Player[A].MountOffsetY;
                             Y2 = 0;
                             X2 = 0;
                             PlayerWarpGFX(A, tempLocation, X2, Y2);
@@ -1206,11 +1206,11 @@ void UpdateGraphics(bool skipRepaint)
                             else
                                 tempLocation.Height = Player[A].Location.Height - ToadFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] - 26;
                             tempLocation.Width = 100;
-                            tempLocation.X = tempLocation.X + ToadFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
+                            tempLocation.X += ToadFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
                             if(Player[A].State == 1)
-                                tempLocation.Y = tempLocation.Y + ToadFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] + 6;
+                                tempLocation.Y += ToadFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] + 6;
                             else
-                                tempLocation.Y = tempLocation.Y + ToadFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] - 4;
+                                tempLocation.Y += ToadFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] - 4;
                             Y2 = 0;
                             X2 = 0;
                             PlayerWarpGFX(A, tempLocation, X2, Y2);
@@ -1218,8 +1218,8 @@ void UpdateGraphics(bool skipRepaint)
                             tempLocation = Player[A].Location;
                             tempLocation.Height = 32;
                             tempLocation.Width = 32;
-                            tempLocation.X = tempLocation.X + Player[A].Location.Width / 2.0 - 16;
-                            tempLocation.Y = tempLocation.Y + Player[A].Location.Height - 30;
+                            tempLocation.X += Player[A].Location.Width / 2.0 - 16;
+                            tempLocation.Y += Player[A].Location.Height - 30;
                             Y2 = 0;
                             X2 = 0;
                             PlayerWarpGFX(A, tempLocation, X2, Y2);
@@ -1230,8 +1230,8 @@ void UpdateGraphics(bool skipRepaint)
                             tempLocation = Player[A].Location;
                             tempLocation.Height = 100;
                             tempLocation.Width = 100;
-                            tempLocation.X = tempLocation.X + ToadFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
-                            tempLocation.Y = tempLocation.Y + ToadFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] + Player[A].MountOffsetY;
+                            tempLocation.X += ToadFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
+                            tempLocation.Y += ToadFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] + Player[A].MountOffsetY;
                             Y2 = 0;
                             X2 = 0;
                             PlayerWarpGFX(A, tempLocation, X2, Y2);
@@ -1245,8 +1245,8 @@ void UpdateGraphics(bool skipRepaint)
                         tempLocation = Player[A].Location;
                         tempLocation.Height = 100;
                         tempLocation.Width = 100;
-                        tempLocation.X = tempLocation.X + LinkFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
-                        tempLocation.Y = tempLocation.Y + LinkFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] + Player[A].MountOffsetY;
+                        tempLocation.X += LinkFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
+                        tempLocation.Y += LinkFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] + Player[A].MountOffsetY;
                         Y2 = 0;
                         X2 = 0;
                         PlayerWarpGFX(A, tempLocation, X2, Y2);
@@ -1277,8 +1277,8 @@ void UpdateGraphics(bool skipRepaint)
                             tempLocation.Width = NPCWidth[hNpc.Type];
                         }
 
-                        tempLocation.X = tempLocation.X + NPCFrameOffsetX[hNpc.Type];
-                        tempLocation.Y = tempLocation.Y + NPCFrameOffsetY[hNpc.Type];
+                        tempLocation.X += NPCFrameOffsetX[hNpc.Type];
+                        tempLocation.Y += NPCFrameOffsetY[hNpc.Type];
                         Y2 = 0;
                         X2 = 0;
 
@@ -1407,7 +1407,7 @@ void UpdateGraphics(bool skipRepaint)
 
                             NPC[A].TimeLeft = Physics.NPCTimeOffScreen;
 //                                if(nPlay.Online == true && nPlay.NPCWaitCount >= 10 && nPlay.Mode == 0)
-//                                    timeStr = timeStr + "2b" + std::to_string(A) + LB;
+//                                    timeStr += "2b" + std::to_string(A) + LB;
                             NPC[A].Active = true;
                         }
 
@@ -1458,7 +1458,7 @@ void UpdateGraphics(bool skipRepaint)
 
                         NPC[A].TimeLeft = Physics.NPCTimeOffScreen;
 //                        if(nPlay.Online == true && nPlay.NPCWaitCount >= 10 && nPlay.Mode == 0)
-//                            timeStr = timeStr + "2b" + std::to_string(A) + LB;
+//                            timeStr += "2b" + std::to_string(A) + LB;
                         NPC[A].Active = true;
                     }
                     NPC[A].Reset[1] = false;
@@ -1561,7 +1561,7 @@ void UpdateGraphics(bool skipRepaint)
                                     if(NPC[A].Special == 0.0)
                                     {
                                         if(!FreezeNPCs)
-                                            NPC[A].FrameCount = NPC[A].FrameCount + 1;
+                                            NPC[A].FrameCount += 1;
                                         if(NPC[A].FrameCount >= 70)
                                         {
                                             if(!FreezeNPCs)
@@ -1573,7 +1573,7 @@ void UpdateGraphics(bool skipRepaint)
                                     else
                                     {
                                         if(!FreezeNPCs)
-                                            NPC[A].FrameCount = NPC[A].FrameCount + 1;
+                                            NPC[A].FrameCount += 1;
                                         if(NPC[A].FrameCount > 8)
                                         {
                                             YoshiBFrame = 0;
@@ -1582,28 +1582,28 @@ void UpdateGraphics(bool skipRepaint)
                                         else if(NPC[A].FrameCount > 6)
                                         {
                                             YoshiBFrame = 1;
-                                            YoshiTX = YoshiTX - 1;
-                                            YoshiTY = YoshiTY + 2;
-                                            YoshiBY = YoshiBY + 1;
+                                            YoshiTX -= 1;
+                                            YoshiTY += 2;
+                                            YoshiBY += 1;
                                         }
                                         else if(NPC[A].FrameCount > 4)
                                         {
                                             YoshiBFrame = 2;
-                                            YoshiTX = YoshiTX - 2;
-                                            YoshiTY = YoshiTY + 4;
-                                            YoshiBY = YoshiBY + 2;
+                                            YoshiTX -= 2;
+                                            YoshiTY += 4;
+                                            YoshiBY += 2;
                                         }
                                         else if(NPC[A].FrameCount > 2)
                                         {
                                             YoshiBFrame = 1;
-                                            YoshiTX = YoshiTX - 1;
-                                            YoshiTY = YoshiTY + 2;
-                                            YoshiBY = YoshiBY + 1;
+                                            YoshiTX -= 1;
+                                            YoshiTY += 2;
+                                            YoshiBY += 1;
                                         }
                                         else
                                             YoshiBFrame = 0;
                                         if(!FreezeNPCs)
-                                            NPC[A].Special2 = NPC[A].Special2 + 1;
+                                            NPC[A].Special2 += 1;
                                         if(NPC[A].Special2 > 30)
                                         {
                                             YoshiTFrame = 0;
@@ -1616,21 +1616,21 @@ void UpdateGraphics(bool skipRepaint)
                                     }
                                     if(YoshiBFrame == 6)
                                     {
-                                        YoshiBY = YoshiBY + 10;
-                                        YoshiTY = YoshiTY + 10;
+                                        YoshiBY += 10;
+                                        YoshiTY += 10;
                                     }
                                     if(NPC[A].Direction == 1)
                                     {
-                                        YoshiTFrame = YoshiTFrame + 5;
-                                        YoshiBFrame = YoshiBFrame + 7;
+                                        YoshiTFrame += 5;
+                                        YoshiBFrame += 7;
                                     }
                                     else
                                     {
                                         YoshiBX = -YoshiBX;
                                         YoshiTX = -YoshiTX;
                                     }
-                                    // YoshiBX = YoshiBX + 4
-                                    // YoshiTX = YoshiTX + 4
+                                    // YoshiBX += 4
+                                    // YoshiTX += 4
                                     g_stats.renderedNPCs++;
                                     // Yoshi's Body
                                     frmMain.renderTexture(vScreenX[Z] + SDL_floor(NPC[A].Location.X) + YoshiBX, vScreenY[Z] + NPC[A].Location.Y + YoshiBY, 32, 32, GFXYoshiB[B], 0, 32 * YoshiBFrame, cn, cn, cn);
@@ -1655,7 +1655,7 @@ void UpdateGraphics(bool skipRepaint)
                                     NPC[A].TimeLeft = Physics.NPCTimeOffScreen * 20;
 
 //                                if(nPlay.Online == true && nPlay.NPCWaitCount >= 10 && nPlay.Mode == 0)
-//                                    timeStr = timeStr + "2b" + std::to_string(A) + LB;
+//                                    timeStr += "2b" + std::to_string(A) + LB;
                                 NPC[A].Active = true;
                             }
                             NPC[A].Reset[1] = false;
@@ -1891,7 +1891,7 @@ void UpdateGraphics(bool skipRepaint)
                                 }
                                 NPC[A].TimeLeft = Physics.NPCTimeOffScreen;
 //                                if(nPlay.Online == true && nPlay.NPCWaitCount >= 10 && nPlay.Mode == 0)
-//                                    timeStr = timeStr + "2b" + std::to_string(A) + LB;
+//                                    timeStr += "2b" + std::to_string(A) + LB;
                                 NPC[A].Active = true;
                             }
                             NPC[A].Reset[1] = false;
@@ -2082,7 +2082,7 @@ void UpdateGraphics(bool skipRepaint)
                                 {
                                     NPC[A].TimeLeft = Physics.NPCTimeOffScreen;
 //                                    if(nPlay.Online == true && nPlay.NPCWaitCount >= 10 && nPlay.Mode == 0)
-//                                        timeStr = timeStr + "2b" + std::to_string(A) + LB;
+//                                        timeStr += "2b" + std::to_string(A) + LB;
                                     NPC[A].Active = true;
                                 }
 
@@ -2241,7 +2241,7 @@ void UpdateGraphics(bool skipRepaint)
             if(LevelEditor)
             {
 
-    //            BlockFlash = BlockFlash + 1
+    //            BlockFlash += 1
                 BlockFlash += 1;
 
     //            If BlockFlash > 45 Then BlockFlash = 0
@@ -2350,12 +2350,12 @@ void UpdateGraphics(bool skipRepaint)
     //                        .Width = level(A).Width - .X
     //                        .Height = level(A).Height - .Y
     //                        If .X < -vScreenX(Z) Then
-    //                            .Width = .Width - (-vScreenX(Z) - .X)
+    //                            .Width += -(-vScreenX(Z) - .X)
     //                            .X = -vScreenX(Z)
 
     //                        End If
     //                        If .Y < -vScreenY(Z) Then
-    //                            .Height = .Height - (-vScreenY(Z) - .Y)
+    //                            .Height += -(-vScreenY(Z) - .Y)
     //                            .Y = -vScreenY(Z)
     //                        End If
     //                        BitBlt myBackBuffer, .X + vScreenX(Z), .Y + vScreenY(Z), .Width, .Height, 0, 0, 0, vbWhiteness
@@ -2747,27 +2747,27 @@ void UpdateGraphics(bool skipRepaint)
         ScreenShot();
 
     // Update Coin Frames
-    CoinFrame2[1] = CoinFrame2[1] + 1;
+    CoinFrame2[1] += 1;
     if(CoinFrame2[1] >= 6)
     {
         CoinFrame2[1] = 0;
-        CoinFrame[1] = CoinFrame[1] + 1;
+        CoinFrame[1] += 1;
         if(CoinFrame[1] >= 4)
             CoinFrame[1] = 0;
     }
-    CoinFrame2[2] = CoinFrame2[2] + 1;
+    CoinFrame2[2] += 1;
     if(CoinFrame2[2] >= 6)
     {
         CoinFrame2[2] = 0;
-        CoinFrame[2] = CoinFrame[2] + 1;
+        CoinFrame[2] += 1;
         if(CoinFrame[2] >= 7)
             CoinFrame[2] = 0;
     }
-    CoinFrame2[3] = CoinFrame2[3] + 1;
+    CoinFrame2[3] += 1;
     if(CoinFrame2[3] >= 7)
     {
         CoinFrame2[3] = 0;
-        CoinFrame[3] = CoinFrame[3] + 1;
+        CoinFrame[3] += 1;
         if(CoinFrame[3] >= 4)
             CoinFrame[3] = 0;
     }
@@ -2775,7 +2775,7 @@ void UpdateGraphics(bool skipRepaint)
 //    {
 //        if(nPlay.NPCWaitCount >= 11)
 //            nPlay.NPCWaitCount = 0;
-//        nPlay.NPCWaitCount = nPlay.NPCWaitCount + 2;
+//        nPlay.NPCWaitCount += 2;
 //        if(timeStr != "")
 //            Netplay::sendData timeStr + LB;
 //    }

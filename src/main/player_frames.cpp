@@ -106,7 +106,7 @@ void SetupPlayerFrames()
 
     For(A, 151, 349)
     {
-        ToadFrameY[A] = ToadFrameY[A] - 4;
+        ToadFrameY[A] -= 4;
     }
 
     ToadFrameY[227] = 0;
@@ -480,18 +480,18 @@ void SetupPlayerFrames()
     LuigiFrameX[421] = -16;
     For(A, 150, maxPlayerFrames) // Adjust the players frames to their new sizes
     {
-        MarioFrameX[A] = MarioFrameX[A] - 2;
-        LuigiFrameX[A] = LuigiFrameX[A] - 2;
-        LuigiFrameY[A] = LuigiFrameY[A] - 2;
+        MarioFrameX[A] -= 2;
+        LuigiFrameX[A] -= 2;
+        LuigiFrameY[A] -= 2;
     }
-    LuigiFrameY[101] = LuigiFrameY[101] - 2;
-    LuigiFrameY[102] = LuigiFrameY[102] - 2;
-    LuigiFrameY[105] = LuigiFrameY[105] - 2;
-    LuigiFrameY[106] = LuigiFrameY[106] - 2;
-    LuigiFrameY[99] = LuigiFrameY[99] - 2;
-    LuigiFrameY[98] = LuigiFrameY[98] - 2;
-    LuigiFrameY[95] = LuigiFrameY[95] - 2;
-    LuigiFrameY[94] = LuigiFrameY[94] - 2;
+    LuigiFrameY[101] -= 2;
+    LuigiFrameY[102] -= 2;
+    LuigiFrameY[105] -= 2;
+    LuigiFrameY[106] -= 2;
+    LuigiFrameY[99] -= 2;
+    LuigiFrameY[98] -= 2;
+    LuigiFrameY[95] -= 2;
+    LuigiFrameY[94] -= 2;
 // Yoshi Frames
     MarioFrameX[130] = -2 - 4;
     MarioFrameX[70] = 6 - 4;
@@ -661,12 +661,12 @@ void SetupPlayerFrames()
         LuigiFrameX[A + 100] = LuigiFrameX[A - 200];
         LuigiFrameY[A + 100] = LuigiFrameY[A - 200];
     }
-    MarioFrameY[508] = MarioFrameY[508] - 2;
-    MarioFrameY[509] = MarioFrameY[509] - 2;
-    MarioFrameY[510] = MarioFrameY[510] - 2;
-    MarioFrameY[492] = MarioFrameY[492] - 2;
-    MarioFrameY[491] = MarioFrameY[491] - 2;
-    MarioFrameY[490] = MarioFrameY[490] - 2;
+    MarioFrameY[508] -= 2;
+    MarioFrameY[509] -= 2;
+    MarioFrameY[510] -= 2;
+    MarioFrameY[492] -= 2;
+    MarioFrameY[491] -= 2;
+    MarioFrameY[490] -= 2;
     MarioFrameY[501] = -2;
     MarioFrameY[499] = -2;
     MarioFrameY[502] = -2;
@@ -689,9 +689,9 @@ void SetupPlayerFrames()
     MarioFrameX[518] = -16;
     MarioFrameX[517] = -16;
     MarioFrameX[516] = -16;
-    MarioFrameY[530] = MarioFrameY[530] - 2;
-    MarioFrameY[531] = MarioFrameY[531] - 2;
-    MarioFrameY[470] = MarioFrameY[470] - 2;
+    MarioFrameY[530] -= 2;
+    MarioFrameY[531] -= 2;
+    MarioFrameY[470] -= 2;
     MarioFrameY[569] = MarioFrameY[469] - 2;
     MarioFrameY[500] = -2;
     MarioFrameX[500] = -4;

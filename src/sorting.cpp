@@ -38,7 +38,7 @@ void qSortBlocksY(int min, int max)
     {
         while(Block[hi].Location.Y >= medBlock.Location.Y)
         {
-            hi = hi - 1;
+            hi -= 1;
             if(hi <= lo)
                 break;
         }
@@ -48,10 +48,10 @@ void qSortBlocksY(int min, int max)
             break;
         }
         Block[lo] = Block[hi];
-        lo = lo + 1;
+        lo += 1;
         while(Block[lo].Location.Y < medBlock.Location.Y)
         {
-            lo = lo + 1;
+            lo += 1;
             if(lo >= hi)
                 break;
         }
@@ -85,7 +85,7 @@ void qSortBlocksX(int min, int max)
     {
         while(Block[hi].Location.X >= medBlock.Location.X)
         {
-            hi = hi - 1;
+            hi -= 1;
             if(hi <= lo)
                 break;
         }
@@ -95,10 +95,10 @@ void qSortBlocksX(int min, int max)
             break;
         }
         Block[lo] = Block[hi];
-        lo = lo + 1;
+        lo += 1;
         while(Block[lo].Location.X < medBlock.Location.X)
         {
-            lo = lo + 1;
+            lo += 1;
             if(lo >= hi)
                 break;
         }
@@ -134,7 +134,7 @@ void qSortBackgrounds(int min, int max)
         while(BackGroundPri(hi) >= medBackgroundPri)
         {
 
-            hi = hi - 1;
+            hi -= 1;
             if(hi <= lo)
                 break;
         }
@@ -144,10 +144,10 @@ void qSortBackgrounds(int min, int max)
             break;
         }
         Background[lo] = Background[hi];
-        lo = lo + 1;
+        lo += 1;
         while(BackGroundPri(lo) < medBackgroundPri)
         {
-            lo = lo + 1;
+            lo += 1;
             if(lo >= hi)
                 break;
         }
@@ -392,7 +392,7 @@ void FindSBlocks()
     {
         if(BlockIsSizable[Block[A].Type])
         {
-            sBlockNum = sBlockNum + 1;
+            sBlockNum += 1;
             sBlockArray[sBlockNum] = A;
         }
     }
@@ -417,7 +417,7 @@ void qSortSBlocks(int min, int max)
     {
         while(Block[sBlockArray[hi]].Location.Y >= Block[medBlock].Location.Y)
         {
-            hi = hi - 1;
+            hi -= 1;
             if(hi <= lo)
                 break;
         }
@@ -427,10 +427,10 @@ void qSortSBlocks(int min, int max)
             break;
         }
         sBlockArray[lo] = sBlockArray[hi];
-        lo = lo + 1;
+        lo += 1;
         while(Block[sBlockArray[lo]].Location.Y < Block[medBlock].Location.Y)
         {
-            lo = lo + 1;
+            lo += 1;
             if(lo >= hi)
                 break;
         }
@@ -463,7 +463,7 @@ void qSortNPCsY(int min, int max)
     {
         while(NPC[hi].Location.Y < medNPC.Location.Y)
         {
-            hi = hi - 1;
+            hi -= 1;
             if(hi <= lo)
                 break;
         }
@@ -473,10 +473,10 @@ void qSortNPCsY(int min, int max)
             break;
         }
         NPC[lo] = NPC[hi];
-        lo = lo + 1;
+        lo += 1;
         while(NPC[lo].Location.Y >= medNPC.Location.Y)
         {
-            lo = lo + 1;
+            lo += 1;
             if(lo >= hi)
                 break;
         }
@@ -538,7 +538,7 @@ void qSortTempBlocksX(int min, int max)
     {
         while(Block[hi].Location.X >= medBlock.Location.X)
         {
-            hi = hi - 1;
+            hi -= 1;
             if(hi <= lo)
                 break;
         }
@@ -548,10 +548,10 @@ void qSortTempBlocksX(int min, int max)
             break;
         }
         Block[lo] = Block[hi];
-        lo = lo + 1;
+        lo += 1;
         while(Block[lo].Location.X < medBlock.Location.X)
         {
-            lo = lo + 1;
+            lo += 1;
             if(lo >= hi)
                 break;
         }

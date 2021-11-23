@@ -34,15 +34,15 @@ void NPCFrames(int A)
 
     if(NPCFrame[NPC[A].Type] > 0) // custom frames
     {
-        NPC[A].FrameCount = NPC[A].FrameCount + 1;
+        NPC[A].FrameCount += 1;
         if(NPCFrameStyle[NPC[A].Type] == 2 && (NPC[A].Projectile || NPC[A].HoldingPlayer > 0))
-            NPC[A].FrameCount = NPC[A].FrameCount + 1;
+            NPC[A].FrameCount += 1;
         if(NPC[A].FrameCount >= NPCFrameSpeed[NPC[A].Type])
         {
             if(NPCFrameStyle[NPC[A].Type] == 0)
-                NPC[A].Frame = NPC[A].Frame + 1 * NPC[A].Direction;
+                NPC[A].Frame += 1 * NPC[A].Direction;
             else
-                NPC[A].Frame = NPC[A].Frame + 1;
+                NPC[A].Frame += 1;
             NPC[A].FrameCount = 0;
         }
         if(NPCFrameStyle[NPC[A].Type] == 0)
@@ -147,11 +147,11 @@ void NPCFrames(int A)
     }
     else if(NPC[A].Type == 278 || NPC[A].Type == 279) // fly block
     {
-        NPC[A].FrameCount = NPC[A].FrameCount + 1;
+        NPC[A].FrameCount += 1;
         if(NPC[A].HoldingPlayer > 0)
-            NPC[A].FrameCount = NPC[A].FrameCount + 1;
+            NPC[A].FrameCount += 1;
         if(NPC[A].Location.SpeedY != 0)
-            NPC[A].FrameCount = NPC[A].FrameCount + 1;
+            NPC[A].FrameCount += 1;
         if(NPC[A].FrameCount <= 6)
             NPC[A].Frame = 0;
         else if(NPC[A].FrameCount <= 12)
@@ -170,13 +170,13 @@ void NPCFrames(int A)
             NPC[A].FrameCount = 0;
         }
         if(NPC[A].Type == 279 && NPC[A].Direction == 1)
-            NPC[A].Frame = NPC[A].Frame + 4;
+            NPC[A].Frame += 4;
     }
     else if(NPC[A].Type == 275) // fire plant thing
     {
         if(NPC[A].Special == 0)
         {
-            NPC[A].FrameCount = NPC[A].FrameCount + 1;
+            NPC[A].FrameCount += 1;
             if(NPC[A].FrameCount < 8)
                 NPC[A].Frame = 0;
             else if(NPC[A].FrameCount < 16)
@@ -189,7 +189,7 @@ void NPCFrames(int A)
         }
         else if(NPC[A].Special == 1)
         {
-            NPC[A].FrameCount = NPC[A].FrameCount + 1;
+            NPC[A].FrameCount += 1;
             if(NPC[A].FrameCount < 4)
                 NPC[A].Frame = 0;
             else if(NPC[A].FrameCount < 8)
@@ -205,10 +205,10 @@ void NPCFrames(int A)
     }
     else if(NPC[A].Type == 288) // potion
     {
-        NPC[A].FrameCount = NPC[A].FrameCount + 1;
+        NPC[A].FrameCount += 1;
         if(NPC[A].FrameCount >= 8)
         {
-            NPC[A].Frame = NPC[A].Frame + 1;
+            NPC[A].Frame += 1;
             NPC[A].FrameCount = 0;
         }
         if(NPC[A].Frame >= 4)
@@ -216,7 +216,7 @@ void NPCFrames(int A)
     }
     else if(NPC[A].Type == 283) // bubble
     {
-        NPC[A].FrameCount = NPC[A].FrameCount + 1;
+        NPC[A].FrameCount += 1;
         if(NPC[A].FrameCount < 6)
             NPC[A].Frame = 0;
         else if(NPC[A].FrameCount < 12)
@@ -237,11 +237,11 @@ void NPCFrames(int A)
             NPC[A].Frame = 0;
         else
             NPC[A].Frame = 2;
-        NPC[A].FrameCount = NPC[A].FrameCount + 1;
+        NPC[A].FrameCount += 1;
         if(NPC[A].FrameCount > 15)
             NPC[A].FrameCount = 0;
         else if(NPC[A].FrameCount >= 8)
-            NPC[A].Frame = NPC[A].Frame + 1;
+            NPC[A].Frame += 1;
     }
     else if(NPC[A].Type == 271) // bat thing
     {
@@ -250,23 +250,23 @@ void NPCFrames(int A)
         else
         {
             NPC[A].Frame = 1;
-            NPC[A].FrameCount = NPC[A].FrameCount + 1;
+            NPC[A].FrameCount += 1;
             if(NPC[A].FrameCount > 15)
                 NPC[A].FrameCount = 0;
             else if(NPC[A].FrameCount >= 8)
                 NPC[A].Frame = 2;
         }
         if(NPC[A].Direction == 1)
-            NPC[A].Frame = NPC[A].Frame + 3;
+            NPC[A].Frame += 3;
 
 
     }
     else if(NPC[A].Type == 270) // jumping plant
     {
-        NPC[A].FrameCount = NPC[A].FrameCount + 1;
+        NPC[A].FrameCount += 1;
         if(NPC[A].FrameCount >= 4)
         {
-            NPC[A].Frame = NPC[A].Frame + 1;
+            NPC[A].Frame += 1;
             NPC[A].FrameCount = 0;
         }
         if(NPC[A].Frame >= 4)
@@ -277,7 +277,7 @@ void NPCFrames(int A)
     {
         if(NPC[A].Location.SpeedY != 0)
         {
-            NPC[A].FrameCount = NPC[A].FrameCount + 1;
+            NPC[A].FrameCount += 1;
             if(NPC[A].FrameCount < 4)
                 NPC[A].Frame = 10;
             else if(NPC[A].FrameCount < 8)
@@ -292,7 +292,7 @@ void NPCFrames(int A)
         {
             if(NPC[A].Special == 0)
             {
-                NPC[A].FrameCount = NPC[A].FrameCount + 1;
+                NPC[A].FrameCount += 1;
                 if(NPC[A].Location.SpeedX == 0)
                     NPC[A].FrameCount = 10;
                 if(NPC[A].FrameCount < 4)
@@ -312,7 +312,7 @@ void NPCFrames(int A)
             else if(NPC[A].Special == 2)
                 NPC[A].Frame = 4;
             if(NPC[A].Direction == 1)
-                NPC[A].Frame = NPC[A].Frame + 5;
+                NPC[A].Frame += 5;
         }
 
 
@@ -327,10 +327,10 @@ void NPCFrames(int A)
         }
         else
         {
-            NPC[A].FrameCount = NPC[A].FrameCount + 1;
+            NPC[A].FrameCount += 1;
             if(NPC[A].FrameCount >= 4)
             {
-                NPC[A].Frame = NPC[A].Frame + NPC[A].Direction;
+                NPC[A].Frame += NPC[A].Direction;
                 NPC[A].FrameCount = 0;
             }
             if(NPC[A].Frame < 0)
@@ -342,14 +342,14 @@ void NPCFrames(int A)
     }
     else if(NPC[A].Type == 282) // ludwig fire
     {
-        NPC[A].FrameCount = NPC[A].FrameCount + 1;
+        NPC[A].FrameCount += 1;
         NPC[A].Frame = 0;
         if(NPC[A].FrameCount > 8)
             NPC[A].FrameCount = 0;
         else if(NPC[A].FrameCount >= 4)
             NPC[A].Frame = 1;
         if(NPC[A].Direction == 1)
-            NPC[A].Frame = NPC[A].Frame + 2;
+            NPC[A].Frame += 2;
 
     }
     else if(NPC[A].Type == 269) // larry magic
@@ -363,10 +363,10 @@ void NPCFrames(int A)
     }
     else if(NPC[A].Type == 268) // larry shell
     {
-        NPC[A].FrameCount = NPC[A].FrameCount + 1;
+        NPC[A].FrameCount += 1;
         if(NPC[A].FrameCount >= 4)
         {
-            NPC[A].Frame = NPC[A].Frame + NPC[A].Direction;
+            NPC[A].Frame += NPC[A].Direction;
             NPC[A].FrameCount = 0;
         }
         if(NPC[A].Frame < 0)
@@ -386,7 +386,7 @@ void NPCFrames(int A)
                     NPC[A].Frame = 0;
                 else
                 {
-                    NPC[A].FrameCount = NPC[A].FrameCount + 1;
+                    NPC[A].FrameCount += 1;
                     if(NPC[A].FrameCount < 8)
                         NPC[A].Frame = 0;
                     else if(NPC[A].FrameCount < 16)
@@ -403,7 +403,7 @@ void NPCFrames(int A)
         }
         else if(NPC[A].Special == 1)
         {
-            NPC[A].FrameCount = NPC[A].FrameCount + 1;
+            NPC[A].FrameCount += 1;
             if(NPC[A].FrameCount < 2)
                 NPC[A].Frame = 2;
             else if(NPC[A].FrameCount < 4)
@@ -420,7 +420,7 @@ void NPCFrames(int A)
         }
         else if(NPC[A].Special == 2)
         {
-            NPC[A].FrameCount = NPC[A].FrameCount + 1;
+            NPC[A].FrameCount += 1;
             if(NPC[A].FrameCount < 2)
                 NPC[A].Frame = 6;
             else if(NPC[A].FrameCount < 4)
@@ -436,7 +436,7 @@ void NPCFrames(int A)
             }
         }
         if(NPC[A].Direction == 1)
-            NPC[A].Frame = NPC[A].Frame + 10;
+            NPC[A].Frame += 10;
 
 
     }
@@ -445,16 +445,16 @@ void NPCFrames(int A)
         NPC[A].Frame = 0;
         if(NPC[A].Direction == 1)
             NPC[A].Frame = 4;
-        NPC[A].FrameCount = NPC[A].FrameCount + 1;
+        NPC[A].FrameCount += 1;
         if(NPC[A].FrameCount < 2)
         {
         }
         else if(NPC[A].FrameCount < 4)
-            NPC[A].Frame = NPC[A].Frame + 1;
+            NPC[A].Frame += 1;
         else if(NPC[A].FrameCount < 6)
-            NPC[A].Frame = NPC[A].Frame + 2;
+            NPC[A].Frame += 2;
         else if(NPC[A].FrameCount < 8)
-            NPC[A].Frame = NPC[A].Frame + 3;
+            NPC[A].Frame += 3;
         else
             NPC[A].FrameCount = 0;
 
@@ -464,7 +464,7 @@ void NPCFrames(int A)
     {
         if(NPC[A].Immune > 0)
         {
-            NPC[A].FrameCount = NPC[A].FrameCount + 1;
+            NPC[A].FrameCount += 1;
             if(NPC[A].FrameCount < 4)
                 NPC[A].Frame = 3;
             else if(NPC[A].FrameCount < 8)
@@ -479,11 +479,11 @@ void NPCFrames(int A)
                 NPC[A].FrameCount = 0;
             }
             if(NPC[A].Direction == 1)
-                NPC[A].Frame = NPC[A].Frame + 7;
+                NPC[A].Frame += 7;
         }
         else if(NPC[A].Special <= 0)
         {
-            NPC[A].FrameCount = NPC[A].FrameCount + 1;
+            NPC[A].FrameCount += 1;
             if(NPC[A].FrameCount < 8)
                 NPC[A].Frame = 1;
             else if(NPC[A].FrameCount < 15)
@@ -494,19 +494,19 @@ void NPCFrames(int A)
                 NPC[A].FrameCount = 0;
             }
             if(NPC[A].Direction == 1)
-                NPC[A].Frame = NPC[A].Frame + 7;
+                NPC[A].Frame += 7;
         }
         else
         {
             NPC[A].Frame = 0;
             if(NPC[A].Direction == 1)
-                NPC[A].Frame = NPC[A].Frame + 7;
+                NPC[A].Frame += 7;
         }
 
     }
     else if(NPC[A].Type == 261)
     {
-        NPC[A].FrameCount = NPC[A].FrameCount + 1;
+        NPC[A].FrameCount += 1;
         if(NPC[A].FrameCount < 8)
             NPC[A].Frame = 0;
         else if(NPC[A].FrameCount < 15)
@@ -517,9 +517,9 @@ void NPCFrames(int A)
             NPC[A].Frame = 1;
         }
         if(NPC[A].Direction == 1)
-            NPC[A].Frame = NPC[A].Frame + 4;
+            NPC[A].Frame += 4;
         if(NPC[A].Special > 0 && NPC[A].Location.SpeedY <= 0)
-            NPC[A].Frame = NPC[A].Frame + 2;
+            NPC[A].Frame += 2;
 
     }
     else if(NPC[A].Type == 260)
@@ -535,7 +535,7 @@ void NPCFrames(int A)
     }
     else if(NPC[A].Type == 259)
     {
-        NPC[A].Frame = NPC[A].Frame + 1;
+        NPC[A].Frame += 1;
         if(NPC[A].Frame >= 5)
             NPC[A].Frame = 0;
     }
@@ -543,11 +543,11 @@ void NPCFrames(int A)
         NPC[A].Frame = SpecialFrame[8];
     else if(NPC[A].Type == 238)
     {
-        NPC[A].FrameCount = NPC[A].FrameCount + 1;
+        NPC[A].FrameCount += 1;
         if(NPC[A].FrameCount >= 4)
         {
             NPC[A].FrameCount = 0;
-            NPC[A].Frame = NPC[A].Frame + 1;
+            NPC[A].Frame += 1;
         }
         if(NPC[A].Frame >= 3)
             NPC[A].Frame = 0;
@@ -566,7 +566,7 @@ void NPCFrames(int A)
             else
                 NPC[A].Frame = 0;
         }
-        NPC[A].FrameCount = NPC[A].FrameCount + 1;
+        NPC[A].FrameCount += 1;
         if(NPC[A].FrameCount >= 16)
             NPC[A].FrameCount = 0;
         else if(NPC[A].FrameCount > 8)
@@ -583,26 +583,26 @@ void NPCFrames(int A)
         if(Player[NPC[A].Special4].Location.X + Player[NPC[A].Special4].Location.Width / 2.0 > NPC[A].Location.X + NPC[A].Location.Width / 2.0)
             NPC[A].Frame = 2;
         if(Player[NPC[A].Special4].Location.Y + Player[NPC[A].Special4].Location.Height / 2.0 < NPC[A].Location.Y + 16)
-            NPC[A].Frame = NPC[A].Frame + 1;
+            NPC[A].Frame += 1;
     }
     else if(NPC[A].Type == 243)
     {
-        NPC[A].FrameCount = NPC[A].FrameCount + 1;
+        NPC[A].FrameCount += 1;
         if(NPC[A].FrameCount >= 4)
         {
             NPC[A].FrameCount = 0;
-            NPC[A].Frame = NPC[A].Frame + 1;
+            NPC[A].Frame += 1;
             if(NPC[A].Frame >= 2)
                 NPC[A].Frame = 0;
         }
     }
     else if(NPC[A].Type == 241) // POW block
     {
-        NPC[A].FrameCount = NPC[A].FrameCount + 1;
+        NPC[A].FrameCount += 1;
         if(NPC[A].FrameCount >= 8)
         {
             NPC[A].FrameCount = 0;
-            NPC[A].Frame = NPC[A].Frame + 1;
+            NPC[A].Frame += 1;
             if(NPC[A].Frame >= 7)
                 NPC[A].Frame = 0;
         }
@@ -616,7 +616,7 @@ void NPCFrames(int A)
     }
     else if(NPC[A].Type == 211)
     {
-        NPC[A].FrameCount = NPC[A].FrameCount + 1;
+        NPC[A].FrameCount += 1;
         if(NPC[A].FrameCount <= 6)
             NPC[A].Frame = 0;
         else if(NPC[A].FrameCount <= 12)
@@ -642,7 +642,7 @@ void NPCFrames(int A)
     }
     else if(NPC[A].Type == 210)
     {
-        NPC[A].FrameCount = NPC[A].FrameCount + 1;
+        NPC[A].FrameCount += 1;
         if(NPC[A].FrameCount <= 8)
             NPC[A].Frame = 0;
         else if(NPC[A].FrameCount <= 16)
@@ -664,7 +664,7 @@ void NPCFrames(int A)
         if(NPC[A].Special > 0 && NPC[A].Special < 15)
             NPC[A].Frame = 1;
         if(NPC[A].Direction == 1)
-            NPC[A].Frame = NPC[A].Frame + 2;
+            NPC[A].Frame += 2;
     }
     else if(NPC[A].Type == 208)
     {
@@ -679,30 +679,30 @@ void NPCFrames(int A)
         else
             NPC[A].Frame = 4;
         if(NPC[A].Direction == 1)
-            NPC[A].Frame = NPC[A].Frame + 5;
+            NPC[A].Frame += 5;
     }
     else if(NPC[A].Type == 207)
     {
-        NPC[A].FrameCount = NPC[A].FrameCount + 1;
+        NPC[A].FrameCount += 1;
         NPC[A].Frame = 0;
         if(NPC[A].FrameCount >= 16)
             NPC[A].FrameCount = 0;
         else if(NPC[A].FrameCount > 8)
             NPC[A].Frame = 1;
         if(NPC[A].Special == 4)
-            NPC[A].Frame = NPC[A].Frame + 4;
+            NPC[A].Frame += 4;
         else if(NPC[A].Special == 3)
-            NPC[A].Frame = NPC[A].Frame + 8;
+            NPC[A].Frame += 8;
         else if(NPC[A].Special == 2)
-            NPC[A].Frame = NPC[A].Frame + 12;
+            NPC[A].Frame += 12;
         if(NPC[A].Special2 == 1)
-            NPC[A].Frame = NPC[A].Frame + 2;
+            NPC[A].Frame += 2;
 
 
     }
     else if(NPC[A].Type == 205)
     {
-        NPC[A].FrameCount = NPC[A].FrameCount + 1;
+        NPC[A].FrameCount += 1;
         NPC[A].Frame = 0;
         if(NPC[A].FrameCount <= 6)
             NPC[A].Frame = 0;
@@ -717,17 +717,17 @@ void NPCFrames(int A)
         else
             NPC[A].FrameCount = 0;
         if(NPC[A].Special == 4)
-            NPC[A].Frame = NPC[A].Frame + 5;
+            NPC[A].Frame += 5;
         else if(NPC[A].Special == 3)
-            NPC[A].Frame = NPC[A].Frame + 10;
+            NPC[A].Frame += 10;
         else if(NPC[A].Special == 2)
-            NPC[A].Frame = NPC[A].Frame + 15;
+            NPC[A].Frame += 15;
 
 
     }
     else if(NPC[A].Type == 203 || NPC[A].Type == 204)
     {
-        NPC[A].FrameCount = NPC[A].FrameCount + 1;
+        NPC[A].FrameCount += 1;
         NPC[A].Frame = 0;
         if(NPC[A].FrameCount <= 6)
             NPC[A].Frame = 0;
@@ -740,14 +740,14 @@ void NPCFrames(int A)
         else
             NPC[A].FrameCount = 0;
         if(NPC[A].Direction == 1)
-            NPC[A].Frame = NPC[A].Frame + 4;
+            NPC[A].Frame += 4;
     }
     else if(NPC[A].Type == 201)
     {
         NPC[A].Frame = 0;
         if(NPC[A].Special == 0)
         {
-            NPC[A].FrameCount = NPC[A].FrameCount + 1;
+            NPC[A].FrameCount += 1;
             if(NPC[A].FrameCount < 8)
                 NPC[A].Frame = 0;
             else if(NPC[A].FrameCount < 16)
@@ -763,7 +763,7 @@ void NPCFrames(int A)
         }
         else if(NPC[A].Special == 2)
         {
-            NPC[A].FrameCount = NPC[A].FrameCount + 1;
+            NPC[A].FrameCount += 1;
             if(NPC[A].FrameCount < 8)
                 NPC[A].Frame = 3;
             else if(NPC[A].FrameCount < 16)
@@ -778,7 +778,7 @@ void NPCFrames(int A)
         if(NPC[A].Special == 3 || NPC[A].Special == 2)
         {
             NPC[A].Frame = 0;
-            NPC[A].FrameCount = NPC[A].FrameCount + 1;
+            NPC[A].FrameCount += 1;
             if(NPC[A].FrameCount < 4)
                 NPC[A].Frame = 5;
             else if(NPC[A].FrameCount < 8)
@@ -792,14 +792,14 @@ void NPCFrames(int A)
             }
         }
         if(NPC[A].Direction == 1)
-            NPC[A].Frame = NPC[A].Frame + 8;
+            NPC[A].Frame += 8;
     }
     else if(NPC[A].Type == 200) // King Koopa
     {
         NPC[A].Frame = 0;
         if(NPC[A].Special == 0)
         {
-            NPC[A].FrameCount = NPC[A].FrameCount + 1;
+            NPC[A].FrameCount += 1;
             if(NPC[A].FrameCount <= 8)
                 NPC[A].Frame = 1;
             else if(NPC[A].FrameCount <= 16)
@@ -822,15 +822,15 @@ void NPCFrames(int A)
             NPC[A].Frame = 4;
         }
         if(NPC[A].Direction == 1)
-            NPC[A].Frame = NPC[A].Frame + 5;
+            NPC[A].Frame += 5;
     }
     else if(NPC[A].Type == 196)
     {
-        NPC[A].FrameCount = NPC[A].FrameCount + 1;
+        NPC[A].FrameCount += 1;
         if(NPC[A].FrameCount >= 4)
         {
             NPC[A].FrameCount = 0;
-            NPC[A].Frame = NPC[A].Frame + 1;
+            NPC[A].Frame += 1;
             if(NPC[A].Frame >= 2)
                 NPC[A].Frame = 0;
         }
@@ -865,34 +865,34 @@ void NPCFrames(int A)
     }
     else if(NPC[A].Type == 292) // toad boomerang
     {
-        NPC[A].FrameCount = NPC[A].FrameCount + 1;
+        NPC[A].FrameCount += 1;
         if(NPC[A].FrameCount >= 6)
         {
             NPC[A].FrameCount = 0;
 
             if(NPC[A].Location.SpeedX > 0)
             {
-                NPC[A].Frame = NPC[A].Frame + 1;
+                NPC[A].Frame += 1;
                 if(NPC[A].Frame == 1)
-                    NPC[A].Location.X = NPC[A].Location.X + 4;
+                    NPC[A].Location.X += 4;
                 else if(NPC[A].Frame == 3)
-                    NPC[A].Location.X = NPC[A].Location.X - 4;
+                    NPC[A].Location.X -= 4;
                 else if(NPC[A].Frame == 2)
-                    NPC[A].Location.Y = NPC[A].Location.Y + 4;
+                    NPC[A].Location.Y += 4;
                 else
-                    NPC[A].Location.Y = NPC[A].Location.Y - 4;
+                    NPC[A].Location.Y -= 4;
             }
             else
             {
-                NPC[A].Frame = NPC[A].Frame - 1;
+                NPC[A].Frame -= 1;
                 if(NPC[A].Frame == 0)
-                    NPC[A].Location.X = NPC[A].Location.X - 4;
+                    NPC[A].Location.X -= 4;
                 else if(NPC[A].Frame == 1)
-                    NPC[A].Location.Y = NPC[A].Location.Y - 4;
+                    NPC[A].Location.Y -= 4;
                 else if(NPC[A].Frame == 2)
-                    NPC[A].Location.X = NPC[A].Location.X + 4;
+                    NPC[A].Location.X += 4;
                 else
-                    NPC[A].Location.Y = NPC[A].Location.Y + 4;
+                    NPC[A].Location.Y += 4;
             }
 
             if(NPC[A].Frame > 3)
@@ -913,33 +913,33 @@ void NPCFrames(int A)
     }
     else if(NPC[A].Type == 171) // Mario Hammer
     {
-        NPC[A].FrameCount = NPC[A].FrameCount + 1;
+        NPC[A].FrameCount += 1;
         if(NPC[A].FrameCount >= 4)
         {
             NPC[A].FrameCount = 0;
             if(NPC[A].Location.SpeedX > 0)
             {
-                NPC[A].Frame = NPC[A].Frame + 1;
+                NPC[A].Frame += 1;
                 if(NPC[A].Frame == 1)
-                    NPC[A].Location.X = NPC[A].Location.X + 8;
+                    NPC[A].Location.X += 8;
                 else if(NPC[A].Frame == 3)
-                    NPC[A].Location.X = NPC[A].Location.X - 8;
+                    NPC[A].Location.X -= 8;
                 else if(NPC[A].Frame == 2)
-                    NPC[A].Location.Y = NPC[A].Location.Y + 12;
+                    NPC[A].Location.Y += 12;
                 else
-                    NPC[A].Location.Y = NPC[A].Location.Y - 12;
+                    NPC[A].Location.Y -= 12;
             }
             else
             {
-                NPC[A].Frame = NPC[A].Frame - 1;
+                NPC[A].Frame -= 1;
                 if(NPC[A].Frame == 0)
-                    NPC[A].Location.X = NPC[A].Location.X - 8;
+                    NPC[A].Location.X -= 8;
                 else if(NPC[A].Frame == 1)
-                    NPC[A].Location.Y = NPC[A].Location.Y - 12;
+                    NPC[A].Location.Y -= 12;
                 else if(NPC[A].Frame == 2)
-                    NPC[A].Location.X = NPC[A].Location.X + 8;
+                    NPC[A].Location.X += 8;
                 else
-                    NPC[A].Location.Y = NPC[A].Location.Y + 12;
+                    NPC[A].Location.Y += 12;
             }
             if(NPC[A].Frame > 3)
                 NPC[A].Frame = 0;
@@ -954,7 +954,7 @@ void NPCFrames(int A)
     }
     else if(NPC[A].Type == 167) // smw paragoomba
     {
-        NPC[A].FrameCount = NPC[A].FrameCount + 1;
+        NPC[A].FrameCount += 1;
         if(NPC[A].Direction == 1)
             NPC[A].Frame = 4;
         else
@@ -962,40 +962,40 @@ void NPCFrames(int A)
         if(NPC[A].FrameCount >= 16)
             NPC[A].FrameCount = 0;
         else if(NPC[A].FrameCount >= 8)
-            NPC[A].Frame = NPC[A].Frame + 1;
+            NPC[A].Frame += 1;
 
         if(NPC[A].Effect == 0)
         {
             if(NPC[A].Special == 0)
-                NPC[A].Special2 = NPC[A].Special2 + 2;
+                NPC[A].Special2 += 2;
             else if(NPC[A].Special <= 60)
                 NPC[A].Special2 = 0;
             else if(NPC[A].Special < 65)
-                NPC[A].Special2 = NPC[A].Special2 + 1;
+                NPC[A].Special2 += 1;
             else
-                NPC[A].Special2 = NPC[A].Special2 + 2;
+                NPC[A].Special2 += 2;
             if(NPC[A].Special2 >= 16)
                 NPC[A].Special2 = 0;
             else if(NPC[A].Special2 >= 8)
-                NPC[A].Frame = NPC[A].Frame + 2;
+                NPC[A].Frame += 2;
         }
     }
     else if(NPC[A].Type == 3 || NPC[A].Type == 244) // Flying Goomba
     {
         if(NPC[A].Location.SpeedY == 0 || NPC[A].Slope > 0)
         {
-            NPC[A].FrameCount = NPC[A].FrameCount + 1;
+            NPC[A].FrameCount += 1;
             if(NPC[A].FrameCount >= 8)
             {
                 NPC[A].FrameCount = 0;
-                NPC[A].Frame = NPC[A].Frame + 1;
+                NPC[A].Frame += 1;
                 if(NPC[A].Frame >= 2)
                     NPC[A].Frame = 0;
             }
         }
         else
         {
-            NPC[A].FrameCount = NPC[A].FrameCount + 1;
+            NPC[A].FrameCount += 1;
             if(NPC[A].FrameCount >= 4)
             {
                 NPC[A].FrameCount = 0;
@@ -1012,7 +1012,7 @@ void NPCFrames(int A)
     }
     else if(NPC[A].Type == 134) // bomb
     {
-        NPC[A].FrameCount = NPC[A].FrameCount + 1;
+        NPC[A].FrameCount += 1;
         if(NPC[A].FrameCount < 4)
             NPC[A].Frame = 0;
         else if(NPC[A].FrameCount < 8)
@@ -1023,23 +1023,23 @@ void NPCFrames(int A)
             NPC[A].FrameCount = 0;
         if(NPC[A].Special2 == 1)
         {
-            NPC[A].Special3 = NPC[A].Special3 + 1;
+            NPC[A].Special3 += 1;
             if(NPC[A].Special3 < 4)
             {
             }
             else if(NPC[A].Special3 < 8)
-                NPC[A].Frame = NPC[A].Frame + 9;
+                NPC[A].Frame += 9;
             else if(NPC[A].Special3 < 12)
-                NPC[A].Frame = NPC[A].Frame + 3;
+                NPC[A].Frame += 3;
             else if(NPC[A].Special3 < 15)
-                NPC[A].Frame = NPC[A].Frame + 6;
+                NPC[A].Frame += 6;
             else
                 NPC[A].Special3 = 0;
         }
     }
     else if(NPC[A].Type == 291) // heart bomb
     {
-        NPC[A].FrameCount = NPC[A].FrameCount + 1;
+        NPC[A].FrameCount += 1;
         if(NPC[A].FrameCount < 4)
             NPC[A].Frame = 0;
         else if(NPC[A].FrameCount < 8)
@@ -1051,13 +1051,13 @@ void NPCFrames(int A)
             NPC[A].FrameCount = 0;
             NPC[A].Frame = 0;
         }
-        NPC[A].Special3 = NPC[A].Special3 + 1;
+        NPC[A].Special3 += 1;
         if(NPC[A].Special3 < 4)
         {}
         else if(NPC[A].Special3 < 8)
-            NPC[A].Frame = NPC[A].Frame + 3;
+            NPC[A].Frame += 3;
         else if(NPC[A].Special3 < 12)
-            NPC[A].Frame = NPC[A].Frame + 6;
+            NPC[A].Frame += 6;
         else // If .Special3 >= 16 Then
             NPC[A].Special3 = 0;
         if(fRand() * 10 > 9.2)
@@ -1089,22 +1089,22 @@ void NPCFrames(int A)
     }
     else if(NPC[A].Type == 194 || NPC[A].Type == 195) // Glowy Shell
     {
-        NPC[A].Special5 = NPC[A].Special5 + 1;
+        NPC[A].Special5 += 1;
         if(NPC[A].Special5 >= 16)
             NPC[A].Special5 = 0;
         if(NPC[A].Location.SpeedX > 0)
         {
             if(NPC[A].Type == 194)
-                NPC[A].FrameCount = NPC[A].FrameCount + 1;
+                NPC[A].FrameCount += 1;
             else
-                NPC[A].FrameCount = NPC[A].FrameCount - 1;
+                NPC[A].FrameCount -= 1;
         }
         else if(NPC[A].Location.SpeedX < 0)
         {
             if(NPC[A].Type == 194)
-                NPC[A].FrameCount = NPC[A].FrameCount - 1;
+                NPC[A].FrameCount -= 1;
             else
-                NPC[A].FrameCount = NPC[A].FrameCount + 1;
+                NPC[A].FrameCount += 1;
         }
         else
         {
@@ -1129,11 +1129,11 @@ void NPCFrames(int A)
         {
         }
         else if(NPC[A].Special5 < 8)
-            NPC[A].Frame = NPC[A].Frame + 4;
+            NPC[A].Frame += 4;
         else if(NPC[A].Special5 < 12)
-            NPC[A].Frame = NPC[A].Frame + 8;
+            NPC[A].Frame += 8;
         else if(NPC[A].Special5 < 16)
-            NPC[A].Frame = NPC[A].Frame + 12;
+            NPC[A].Frame += 12;
     }
     else if(NPCIsAShell[NPC[A].Type]) // Turtle shell
     {
@@ -1141,11 +1141,11 @@ void NPCFrames(int A)
             NPC[A].Frame = 0;
         else
         {
-            NPC[A].FrameCount = NPC[A].FrameCount + 1;
+            NPC[A].FrameCount += 1;
             if(NPC[A].FrameCount >= 4)
             {
                 NPC[A].FrameCount = 0;
-                NPC[A].Frame = NPC[A].Frame + 1;
+                NPC[A].Frame += 1;
                 if(NPC[A].Frame >= 4)
                     NPC[A].Frame = 0;
             }
@@ -1156,7 +1156,7 @@ void NPCFrames(int A)
         if(NPC[A].Location.SpeedY == 0 || NPC[A].Slope > 0)
         {
             NPC[A].Frame = 0;
-            NPC[A].FrameCount = NPC[A].FrameCount + 1;
+            NPC[A].FrameCount += 1;
             if(NPC[A].FrameCount >= 12)
                 NPC[A].FrameCount = 0;
             else if(NPC[A].FrameCount >= 6)
@@ -1173,7 +1173,7 @@ void NPCFrames(int A)
             NPC[A].FrameCount = 0;
         }
         if(NPC[A].Direction == 1)
-            NPC[A].Frame = NPC[A].Frame + 2;
+            NPC[A].Frame += 2;
     }
     else if(NPC[A].Type == 57) // smb3 belt
     {
@@ -1192,27 +1192,27 @@ void NPCFrames(int A)
     {
         NPC[A].Frame = 0;
         if(NPC[A].Direction == 1)
-            NPC[A].Frame = NPC[A].Frame + 3;
+            NPC[A].Frame += 3;
 
         if(NPC[A].Projectile || NPC[A].Special2 != 0)
         {
-            NPC[A].Frame = NPC[A].Frame + 2;
+            NPC[A].Frame += 2;
             NPC[A].FrameCount = 0;
         }
         else
         {
-            NPC[A].FrameCount = NPC[A].FrameCount + 1;
+            NPC[A].FrameCount += 1;
             if(NPC[A].FrameCount >= 16)
                 NPC[A].FrameCount = 0;
             else if(NPC[A].FrameCount >= 8)
-                NPC[A].Frame = NPC[A].Frame + 1;
+                NPC[A].Frame += 1;
         }
 
 
     }
     else if(NPC[A].Type == 78) // tank treads
     {
-        NPC[A].FrameCount = NPC[A].FrameCount + 1;
+        NPC[A].FrameCount += 1;
         if(NPC[A].FrameCount >= 8)
             NPC[A].Frame = 2;
         else if(NPC[A].FrameCount >= 4)
@@ -1222,7 +1222,7 @@ void NPCFrames(int A)
         if(NPC[A].FrameCount > 12)
             NPC[A].FrameCount = 0;
         if(NPC[A].Direction == 1)
-            NPC[A].Frame = NPC[A].Frame + 3;
+            NPC[A].Frame += 3;
     }
     else if(NPC[A].Type == 55) // nekkid koopa
     {
@@ -1231,11 +1231,11 @@ void NPCFrames(int A)
             NPC[A].Frame = 0;
             if(NPC[A].Direction == 1)
                 NPC[A].Frame = 3;
-            NPC[A].FrameCount = NPC[A].FrameCount + 1;
+            NPC[A].FrameCount += 1;
             if(NPC[A].FrameCount >= 15)
                 NPC[A].FrameCount = 0;
             else if(NPC[A].FrameCount >= 8)
-                NPC[A].Frame = NPC[A].Frame + 1;
+                NPC[A].Frame += 1;
         }
         else
         {
@@ -1254,7 +1254,7 @@ void NPCFrames(int A)
             else
             {
                 NPC[A].Frame = 3;
-                NPC[A].FrameCount = NPC[A].FrameCount + 1;
+                NPC[A].FrameCount += 1;
                 if(NPC[A].FrameCount >= 15)
                     NPC[A].FrameCount = 0;
                 else if(NPC[A].FrameCount >= 8)
@@ -1266,7 +1266,7 @@ void NPCFrames(int A)
             if(NPC[A].Special == 0)
             {
                 NPC[A].Frame = 0;
-                NPC[A].FrameCount = NPC[A].FrameCount + 1;
+                NPC[A].FrameCount += 1;
                 if(NPC[A].FrameCount >= 15)
                     NPC[A].FrameCount = 0;
                 else if(NPC[A].FrameCount >= 8)
@@ -1276,7 +1276,7 @@ void NPCFrames(int A)
                 NPC[A].Frame = 2;
         }
         if(NPC[A].Direction == 1)
-            NPC[A].Frame = NPC[A].Frame + 5;
+            NPC[A].Frame += 5;
     }
     else if(NPC[A].Type == 54) // bouncy bee
     {
@@ -1287,10 +1287,10 @@ void NPCFrames(int A)
         }
         else
         {
-            NPC[A].FrameCount = NPC[A].FrameCount + 1;
+            NPC[A].FrameCount += 1;
             if(NPC[A].FrameCount >= 3)
             {
-                NPC[A].Frame = NPC[A].Frame + 1;
+                NPC[A].Frame += 1;
                 if(NPC[A].Frame >= 2)
                     NPC[A].Frame = 0;
                 NPC[A].FrameCount = 0;
@@ -1301,7 +1301,7 @@ void NPCFrames(int A)
     {
         NPC[A].Frame = SpecialFrame[2];
         if(NPC[A].Direction == 1)
-            NPC[A].Frame = NPC[A].Frame + 4;
+            NPC[A].Frame += 4;
     }
     else if(NPC[A].Type == 45) // ice block
     {
@@ -1311,11 +1311,11 @@ void NPCFrames(int A)
         {
             if(NPC[A].Frame < 4)
                 NPC[A].Frame = 4;
-            NPC[A].FrameCount = NPC[A].FrameCount + 1;
+            NPC[A].FrameCount += 1;
             if(NPC[A].FrameCount >= 4)
             {
                 NPC[A].FrameCount = 0;
-                NPC[A].Frame = NPC[A].Frame + 1;
+                NPC[A].Frame += 1;
                 if(NPC[A].Frame >= 6)
                     NPC[A].Frame = 4;
             }
@@ -1324,27 +1324,27 @@ void NPCFrames(int A)
     }
     else if(NPC[A].Type == 87)
     {
-        NPC[A].FrameCount = NPC[A].FrameCount + 1;
+        NPC[A].FrameCount += 1;
         if(NPC[A].FrameCount >= 20)
             NPC[A].FrameCount = 0;
         NPC[A].Frame = static_cast<int>(floor(static_cast<double>(NPC[A].FrameCount / 5)));
         if(NPC[A].Direction == 1)
-            NPC[A].Frame = NPC[A].Frame + 4;
+            NPC[A].Frame += 4;
         // statue fireball
     }
     else if(NPC[A].Type == 85)
     {
-        NPC[A].FrameCount = NPC[A].FrameCount + 1;
+        NPC[A].FrameCount += 1;
         if(NPC[A].FrameCount >= 8)
             NPC[A].FrameCount = 0;
         NPC[A].Frame = static_cast<int>(floor(static_cast<double>(NPC[A].FrameCount / 2)));
         if(NPC[A].Direction == 1)
-            NPC[A].Frame = NPC[A].Frame + 4;
+            NPC[A].Frame += 4;
         // winged koopa
     }
     else if(NPC[A].Type == 76 || NPC[A].Type == 161)
     {
-        NPC[A].FrameCount = NPC[A].FrameCount + 1;
+        NPC[A].FrameCount += 1;
         if(NPC[A].Direction == -1 && NPC[A].Frame >= 4)
             NPC[A].Frame = 0;
         else if(NPC[A].Direction == 1 && NPC[A].Frame < 4)
@@ -1354,13 +1354,13 @@ void NPCFrames(int A)
             NPC[A].FrameCount = 0;
             if(NPC[A].Direction == -1)
             {
-                NPC[A].Frame = NPC[A].Frame + 1;
+                NPC[A].Frame += 1;
                 if(NPC[A].Frame >= 4)
                     NPC[A].Frame = 0;
             }
             else
             {
-                NPC[A].Frame = NPC[A].Frame + 1;
+                NPC[A].Frame += 1;
                 if(NPC[A].Frame >= 8)
                     NPC[A].Frame = 4;
             }
@@ -1368,7 +1368,7 @@ void NPCFrames(int A)
     }
     else if(NPC[A].Type == 137) // SMB3 Bomb
     {
-        NPC[A].FrameCount = NPC[A].FrameCount + 1;
+        NPC[A].FrameCount += 1;
         if(NPC[A].FrameCount < 8)
             NPC[A].Frame = 0;
         else if(NPC[A].FrameCount < 15)
@@ -1379,27 +1379,27 @@ void NPCFrames(int A)
             NPC[A].FrameCount = 0;
         }
         if(NPC[A].Direction == 1)
-            NPC[A].Frame = NPC[A].Frame + 6;
+            NPC[A].Frame += 6;
         if(NPC[A].Special2 == 1)
         {
-            NPC[A].Special3 = NPC[A].Special3 + 1;
+            NPC[A].Special3 += 1;
             if(NPC[A].Special3 < 4)
             {
             }
             else if(NPC[A].Special3 < 8)
-                NPC[A].Frame = NPC[A].Frame + 2;
+                NPC[A].Frame += 2;
             else if(NPC[A].Special3 < 11)
-                NPC[A].Frame = NPC[A].Frame + 4;
+                NPC[A].Frame += 4;
             else
             {
-                NPC[A].Frame = NPC[A].Frame + 4;
+                NPC[A].Frame += 4;
                 NPC[A].Special3 = 0;
             }
         }
     }
     else if(NPC[A].Type == 160) // Airship Jet
     {
-        NPC[A].FrameCount = NPC[A].FrameCount + 1;
+        NPC[A].FrameCount += 1;
         if(NPC[A].Direction == -1 && NPC[A].Frame >= 4)
             NPC[A].Frame = 0;
         else if(NPC[A].Direction == 1 && NPC[A].Frame < 4)
@@ -1409,13 +1409,13 @@ void NPCFrames(int A)
             NPC[A].FrameCount = 0;
             if(NPC[A].Direction == -1)
             {
-                NPC[A].Frame = NPC[A].Frame + 1;
+                NPC[A].Frame += 1;
                 if(NPC[A].Frame >= 4)
                     NPC[A].Frame = 0;
             }
             else
             {
-                NPC[A].Frame = NPC[A].Frame + 1;
+                NPC[A].Frame += 1;
                 if(NPC[A].Frame >= 8)
                     NPC[A].Frame = 4;
             }
@@ -1423,20 +1423,20 @@ void NPCFrames(int A)
     }
     else if(NPC[A].Type == 178)
     {
-        NPC[A].FrameCount = NPC[A].FrameCount + 1;
+        NPC[A].FrameCount += 1;
         if(NPC[A].FrameCount >= 8)
         {
             NPC[A].FrameCount = 0;
-            NPC[A].Frame = NPC[A].Frame + 1;
+            NPC[A].Frame += 1;
             if(NPC[A].Frame >= 3)
                 NPC[A].Frame = 0;
         }
     }
     else if(NPC[A].Type == 4 || NPC[A].Type == 6 || NPC[A].Type == 23 || NPC[A].Type == 36 || NPC[A].Type == 285 || NPC[A].Type == 42 || NPC[A].Type == 52 || NPC[A].Type == 72 || (NPC[A].Type >= 109 && NPC[A].Type <= 112) || (NPC[A].Type >= 121 && NPC[A].Type <= 124) || NPC[A].Type == 136 || NPC[A].Type == 159 || NPC[A].Type == 162 || NPC[A].Type == 163 || NPC[A].Type == 164 || NPC[A].Type == 165 || NPC[A].Type == 166 || NPC[A].Type == 173 || NPC[A].Type == 175 || NPC[A].Type == 176 || NPC[A].Type == 177 || NPC[A].Type == 199 || NPC[A].Type == 229 || NPC[A].Type == 236 || NPC[A].Type == 230 || NPC[A].Type == 232 || NPC[A].Type == 233) // Walking koopa troopa / hard thing / spiney
     {
-        NPC[A].FrameCount = NPC[A].FrameCount + 1;
+        NPC[A].FrameCount += 1;
         if(NPC[A].Type == 166 && NPC[A].Special > 360)
-            NPC[A].FrameCount = NPC[A].FrameCount + 1;
+            NPC[A].FrameCount += 1;
         if(NPC[A].Direction == -1 && NPC[A].Frame >= 2)
             NPC[A].Frame = 0;
         else if(NPC[A].Direction == 1 && NPC[A].Frame < 2)
@@ -1446,13 +1446,13 @@ void NPCFrames(int A)
             NPC[A].FrameCount = 0;
             if(NPC[A].Direction == -1)
             {
-                NPC[A].Frame = NPC[A].Frame + 1;
+                NPC[A].Frame += 1;
                 if(NPC[A].Frame >= 2)
                     NPC[A].Frame = 0;
             }
             else
             {
-                NPC[A].Frame = NPC[A].Frame + 1;
+                NPC[A].Frame += 1;
                 if(NPC[A].Frame >= 4)
                     NPC[A].Frame = 2;
             }
@@ -1461,18 +1461,18 @@ void NPCFrames(int A)
     }
     else if(NPC[A].Type == 234)
     {
-        NPC[A].FrameCount = NPC[A].FrameCount + 1;
+        NPC[A].FrameCount += 1;
         NPC[A].Frame = 0;
         if(NPC[A].Direction == 1)
             NPC[A].Frame = 3;
 
         if(NPC[A].FrameCount > 8)
-            NPC[A].Frame = NPC[A].Frame + 1;
+            NPC[A].Frame += 1;
 
         if(NPC[A].FrameCount > 16)
-            NPC[A].Frame = NPC[A].Frame + 1;
+            NPC[A].Frame += 1;
         if(NPC[A].FrameCount > 24)
-            NPC[A].Frame = NPC[A].Frame - 1;
+            NPC[A].Frame -= 1;
         if(NPC[A].FrameCount > 32)
             NPC[A].FrameCount = 0;
 
@@ -1481,9 +1481,9 @@ void NPCFrames(int A)
     {
         if(NPC[A].Special == 0)
         {
-            NPC[A].FrameCount = NPC[A].FrameCount + 1;
+            NPC[A].FrameCount += 1;
             if(NPC[A].Type == 166 && NPC[A].Special > 360)
-                NPC[A].FrameCount = NPC[A].FrameCount + 1;
+                NPC[A].FrameCount += 1;
             if(NPC[A].Direction == -1 && NPC[A].Frame >= 2)
                 NPC[A].Frame = 0;
             else if(NPC[A].Direction == 1 && NPC[A].Frame < 2)
@@ -1493,13 +1493,13 @@ void NPCFrames(int A)
                 NPC[A].FrameCount = 0;
                 if(NPC[A].Direction == -1)
                 {
-                    NPC[A].Frame = NPC[A].Frame + 1;
+                    NPC[A].Frame += 1;
                     if(NPC[A].Frame >= 2)
                         NPC[A].Frame = 0;
                 }
                 else
                 {
-                    NPC[A].Frame = NPC[A].Frame + 1;
+                    NPC[A].Frame += 1;
                     if(NPC[A].Frame >= 4)
                         NPC[A].Frame = 2;
                 }
@@ -1512,12 +1512,12 @@ void NPCFrames(int A)
             else
                 NPC[A].Frame = 5;
             if(NPC[A].Direction == 1)
-                NPC[A].Frame = NPC[A].Frame + 2;
+                NPC[A].Frame += 2;
         }
     }
     else if(NPC[A].Type == 274) // dragon coin
     {
-        NPC[A].FrameCount = NPC[A].FrameCount + 1;
+        NPC[A].FrameCount += 1;
         if(NPC[A].FrameCount < 6)
             NPC[A].Frame = 0;
         else if(NPC[A].FrameCount < 12)
@@ -1546,11 +1546,11 @@ void NPCFrames(int A)
     }
     else if(NPC[A].Type == 11) // Frame finder for Star/Flower/Mushroom Exit
     {
-        NPC[A].FrameCount = NPC[A].FrameCount + 1;
+        NPC[A].FrameCount += 1;
         if(NPC[A].FrameCount >= 8)
         {
             NPC[A].FrameCount = 0;
-            NPC[A].Frame = NPC[A].Frame + 1;
+            NPC[A].Frame += 1;
             if(NPC[A].Frame == 3)
                 NPC[A].Frame = 0;
         }
@@ -1561,9 +1561,9 @@ void NPCFrames(int A)
         NPC[A].Frame = 0;
         if(NPC[A].Direction == 1)
             NPC[A].Frame = 2;
-        NPC[A].FrameCount = NPC[A].FrameCount + 1;
+        NPC[A].FrameCount += 1;
         if(NPC[A].FrameCount >= 8)
-            NPC[A].Frame = NPC[A].Frame + 1;
+            NPC[A].Frame += 1;
         if(NPC[A].FrameCount >= 16)
             NPC[A].FrameCount = 0;
     }
@@ -1571,10 +1571,10 @@ void NPCFrames(int A)
     {
         if(NPC[A].HoldingPlayer == 0 && !Player[NPC[A].standingOnPlayer].Controls.Run && !NPC[A].Projectile)
         {
-            NPC[A].FrameCount = NPC[A].FrameCount + 1;
+            NPC[A].FrameCount += 1;
             if(NPC[A].FrameCount >= 4)
             {
-                NPC[A].Frame = NPC[A].Frame + 1;
+                NPC[A].Frame += 1;
                 NPC[A].FrameCount = 0;
             }
             if(NPC[A].Frame >= 5)
@@ -1584,10 +1584,10 @@ void NPCFrames(int A)
         {
             if(NPC[A].Direction == -1)
             {
-                NPC[A].FrameCount = NPC[A].FrameCount + 1;
+                NPC[A].FrameCount += 1;
                 if(NPC[A].FrameCount >= 4)
                 {
-                    NPC[A].Frame = NPC[A].Frame + 1;
+                    NPC[A].Frame += 1;
                     NPC[A].FrameCount = 0;
                 }
                 if(NPC[A].Frame >= 10 || NPC[A].Frame < 5)
@@ -1595,10 +1595,10 @@ void NPCFrames(int A)
             }
             else
             {
-                NPC[A].FrameCount = NPC[A].FrameCount + 1;
+                NPC[A].FrameCount += 1;
                 if(NPC[A].FrameCount >= 4)
                 {
-                    NPC[A].Frame = NPC[A].Frame + 1;
+                    NPC[A].Frame += 1;
                     NPC[A].FrameCount = 0;
                 }
                 if(NPC[A].Frame >= 15 || NPC[A].Frame < 10)
@@ -1608,11 +1608,11 @@ void NPCFrames(int A)
     }
     else if(NPC[A].Type == 12) // Frame finder for big fireball
     {
-        NPC[A].FrameCount = NPC[A].FrameCount + 1;
+        NPC[A].FrameCount += 1;
         if(NPC[A].FrameCount >= 4)
         {
             NPC[A].FrameCount = 0;
-            NPC[A].Frame = NPC[A].Frame + 1;
+            NPC[A].Frame += 1;
             if(NPC[A].Location.SpeedY < 0)
             {
                 if(NPC[A].Frame >= 2)
@@ -1718,11 +1718,11 @@ void NPCFrames(int A)
                     NewEffect(77, NPC[A].Location, static_cast<float>(NPC[A].Special), 0, NPC[A].Shadow);
             }
         }
-        NPC[A].FrameCount = NPC[A].FrameCount + 1;
+        NPC[A].FrameCount += 1;
         if(NPC[A].FrameCount >= 4)
         {
             NPC[A].FrameCount = 0;
-            NPC[A].Frame = NPC[A].Frame - NPC[A].Direction;
+            NPC[A].Frame += -NPC[A].Direction;
         }
         if(NPC[A].Special < 2 || (NPC[A].Type == 265 && NPC[A].Special != 5))
         {
@@ -1769,19 +1769,19 @@ void NPCFrames(int A)
             else
             {
                 if(NPC[A].FrameCount >= 0)
-                    NPC[A].FrameCount = NPC[A].FrameCount + 1;
+                    NPC[A].FrameCount += 1;
                 else
-                    NPC[A].FrameCount = NPC[A].FrameCount - 1;
+                    NPC[A].FrameCount -= 1;
                 if(NPC[A].FrameCount >= 5 || NPC[A].FrameCount <= -5)
                 {
                     if(NPC[A].FrameCount >= 0)
                     {
-                        NPC[A].Frame = NPC[A].Frame + 1;
+                        NPC[A].Frame += 1;
                         NPC[A].FrameCount = 1;
                     }
                     else
                     {
-                        NPC[A].Frame = NPC[A].Frame - 1;
+                        NPC[A].Frame -= 1;
                         NPC[A].FrameCount = -1;
                     }
                     if(NPC[A].Frame >= 5)
@@ -1801,7 +1801,7 @@ void NPCFrames(int A)
             NPC[A].Frame = 6;
         else if(NPC[A].Special == 4)
         {
-            NPC[A].FrameCount = NPC[A].FrameCount + 1;
+            NPC[A].FrameCount += 1;
             if(NPC[A].Frame < 7)
                 NPC[A].Frame = 7;
             if(NPC[A].FrameCount >= 8)
@@ -1837,7 +1837,7 @@ void NPCFrames(int A)
     }
     else if(NPC[A].Type == 135 && NPC[A].Special2 == 1)
     {
-        NPC[A].FrameCount = NPC[A].FrameCount + 1;
+        NPC[A].FrameCount += 1;
         if(NPC[A].FrameCount < 4)
             NPC[A].Frame = 8;
         else if(NPC[A].FrameCount < 8)
@@ -1850,15 +1850,15 @@ void NPCFrames(int A)
             NPC[A].FrameCount = 0;
         }
         if(NPC[A].HoldingPlayer > 0 || NPC[A].Projectile)
-            NPC[A].Frame = NPC[A].Frame + 6;
+            NPC[A].Frame += 6;
         if(NPC[A].Direction == 1)
-            NPC[A].Frame = NPC[A].Frame + 3;
+            NPC[A].Frame += 3;
     }
     else if(NPC[A].Type == 19 || NPC[A].Type == 20 || NPC[A].Type == 28 || (NPC[A].Type >= 129 && NPC[A].Type <= 132) || NPC[A].Type == 135 || NPC[A].Type == 158) // Shy guys / Jumping Fish
     {
         if(NPC[A].HoldingPlayer == 0 && !NPC[A].Projectile)
         {
-            NPC[A].FrameCount = NPC[A].FrameCount + 1;
+            NPC[A].FrameCount += 1;
             if(NPC[A].Direction == -1 && NPC[A].Frame >= 2)
                 NPC[A].Frame = 0;
             else if(NPC[A].Direction == 1 && NPC[A].Frame < 2)
@@ -1868,13 +1868,13 @@ void NPCFrames(int A)
                 NPC[A].FrameCount = 0;
                 if(NPC[A].Direction == -1)
                 {
-                    NPC[A].Frame = NPC[A].Frame + 1;
+                    NPC[A].Frame += 1;
                     if(NPC[A].Frame >= 2)
                         NPC[A].Frame = 0;
                 }
                 else
                 {
-                    NPC[A].Frame = NPC[A].Frame + 1;
+                    NPC[A].Frame += 1;
                     if(NPC[A].Frame >= 4)
                         NPC[A].Frame = 2;
                 }
@@ -1884,7 +1884,7 @@ void NPCFrames(int A)
         {
             if(NPC[A].Frame < 4)
                 NPC[A].Frame = 4;
-            NPC[A].FrameCount = NPC[A].FrameCount + 1;
+            NPC[A].FrameCount += 1;
             if(NPC[A].Direction == -1 && NPC[A].Frame >= 6)
                 NPC[A].Frame = 4;
             else if(NPC[A].Direction == 1 && NPC[A].Frame < 6)
@@ -1894,13 +1894,13 @@ void NPCFrames(int A)
                 NPC[A].FrameCount = 0;
                 if(NPC[A].Direction == -1)
                 {
-                    NPC[A].Frame = NPC[A].Frame + 1;
+                    NPC[A].Frame += 1;
                     if(NPC[A].Frame >= 6)
                         NPC[A].Frame = 4;
                 }
                 else
                 {
-                    NPC[A].Frame = NPC[A].Frame + 1;
+                    NPC[A].Frame += 1;
                     if(NPC[A].Frame >= 8)
                         NPC[A].Frame = 6;
                 }
@@ -1928,7 +1928,7 @@ void NPCFrames(int A)
         }
         else
         {
-            NPC[A].FrameCount = NPC[A].FrameCount + 1;
+            NPC[A].FrameCount += 1;
             if(NPC[A].Direction == -1 && NPC[A].Frame >= 6)
                 NPC[A].Frame = 4;
             else if(NPC[A].Direction == 1 && NPC[A].Frame < 6)
@@ -1938,13 +1938,13 @@ void NPCFrames(int A)
                 NPC[A].FrameCount = 0;
                 if(NPC[A].Direction == -1)
                 {
-                    NPC[A].Frame = NPC[A].Frame + 1;
+                    NPC[A].Frame += 1;
                     if(NPC[A].Frame >= 6)
                         NPC[A].Frame = 4;
                 }
                 else
                 {
-                    NPC[A].Frame = NPC[A].Frame + 1;
+                    NPC[A].Frame += 1;
                     if(NPC[A].Frame >= 8)
                         NPC[A].Frame = 6;
                 }
@@ -1953,11 +1953,11 @@ void NPCFrames(int A)
     }
     else if(NPC[A].Type == 22) // Bullet bill Gun
     {
-        NPC[A].FrameCount = NPC[A].FrameCount + 1;
+        NPC[A].FrameCount += 1;
         if(NPC[A].FrameCount >= 4)
         {
             NPC[A].FrameCount = 1;
-            NPC[A].Frame = NPC[A].Frame + 1;
+            NPC[A].Frame += 1;
             if(NPC[A].Frame == 5)
                 NPC[A].Frame = 0;
         }
@@ -1966,7 +1966,7 @@ void NPCFrames(int A)
     {
         if(NPC[A].Location.SpeedX == 0)
         {
-            NPC[A].FrameCount = NPC[A].FrameCount + 1;
+            NPC[A].FrameCount += 1;
             if(NPC[A].FrameCount < 4)
                 NPC[A].Frame = 0;
             else if(NPC[A].FrameCount < 7)
@@ -1979,7 +1979,7 @@ void NPCFrames(int A)
         }
         else
         {
-            NPC[A].FrameCount = NPC[A].FrameCount + 1;
+            NPC[A].FrameCount += 1;
             if(NPC[A].FrameCount < 4)
                 NPC[A].Frame = 0;
             else if(NPC[A].FrameCount < 8)
@@ -1995,7 +1995,7 @@ void NPCFrames(int A)
             }
         }
         if(NPC[A].Direction == 1)
-            NPC[A].Frame = NPC[A].Frame + 4;
+            NPC[A].Frame += 4;
     }
     else if(NPC[A].Type == 26) // Spring thing
     {
@@ -2004,7 +2004,7 @@ void NPCFrames(int A)
             if(NPC[A].Location.Height == 32)
             {
                 NPC[A].Location.Height = 16;
-                NPC[A].Location.Y = NPC[A].Location.Y + 16;
+                NPC[A].Location.Y += 16;
             }
             if(NPC[A].HoldingPlayer > 0)
                 NPC[A].Frame = 0;
@@ -2013,7 +2013,7 @@ void NPCFrames(int A)
                 C = 0;
                 tempLocation = NPC[A].Location;
                 tempLocation.Height = 24;
-                tempLocation.Y = tempLocation.Y - 8;
+                tempLocation.Y -= 8;
                 for(B = 1; B <= numPlayers; ++B)
                 {
                     if(CheckCollision(tempLocation, Player[B].Location) && Player[B].Mount != 2 && (Player[B].Location.SpeedY > 0 || Player[B].Location.SpeedY < Physics.PlayerJumpVelocity))
@@ -2026,7 +2026,7 @@ void NPCFrames(int A)
                 {
                     tempLocation = NPC[A].Location;
                     tempLocation.Height = 32;
-                    tempLocation.Y = tempLocation.Y - 16;
+                    tempLocation.Y -= 16;
                     for(B = 1; B <= numPlayers; ++B)
                     {
                         if(CheckCollision(tempLocation, Player[B].Location) && Player[B].Mount != 2 && (Player[B].Location.SpeedY > 0 || Player[B].Location.SpeedY < Physics.PlayerJumpVelocity))
@@ -2049,30 +2049,30 @@ void NPCFrames(int A)
         {
             if(NPC[A].Location.SpeedX != 0)
             {
-                NPC[A].FrameCount = NPC[A].FrameCount + 1;
+                NPC[A].FrameCount += 1;
                 if(NPC[A].FrameCount > 12)
                     NPC[A].FrameCount = 0;
                 else if(NPC[A].FrameCount >= 6)
-                    NPC[A].Frame = NPC[A].Frame + 1;
+                    NPC[A].Frame += 1;
             }
         }
         else if(NPC[A].Special < 0)
         {
-            NPC[A].Frame = NPC[A].Frame + 3;
-            NPC[A].FrameCount = NPC[A].FrameCount + 1;
+            NPC[A].Frame += 3;
+            NPC[A].FrameCount += 1;
             if(NPC[A].FrameCount > 8)
                 NPC[A].FrameCount = 0;
             else if(NPC[A].FrameCount >= 4)
-                NPC[A].Frame = NPC[A].Frame + 1;
+                NPC[A].Frame += 1;
         }
         else
-            NPC[A].Frame = NPC[A].Frame + 2;
+            NPC[A].Frame += 2;
     }
     else if(NPC[A].Type == 125) // Rat Head
     {
         NPC[A].Frame = NPC[A].FrameCount;
         if(NPC[A].Direction == 1)
-            NPC[A].Frame = NPC[A].Frame + 2;
+            NPC[A].Frame += 2;
     }
     else if(NPC[A].Type == 29) // SMB Hammer Bro
     {
@@ -2080,7 +2080,7 @@ void NPCFrames(int A)
         {
             if((NPC[A].Location.SpeedY < 1 && NPC[A].Location.SpeedY >= 0) || NPC[A].Slope > 0 || NPC[A].HoldingPlayer > 0)
             {
-                NPC[A].FrameCount = NPC[A].FrameCount + 1;
+                NPC[A].FrameCount += 1;
                 if(NPC[A].Direction == -1 && NPC[A].Frame >= 2)
                     NPC[A].Frame = 0;
                 else if(NPC[A].Direction == 1 && NPC[A].Frame < 3)
@@ -2090,13 +2090,13 @@ void NPCFrames(int A)
                     NPC[A].FrameCount = 0;
                     if(NPC[A].Direction == -1)
                     {
-                        NPC[A].Frame = NPC[A].Frame + 1;
+                        NPC[A].Frame += 1;
                         if(NPC[A].Frame >= 2)
                             NPC[A].Frame = 0;
                     }
                     else
                     {
-                        NPC[A].Frame = NPC[A].Frame + 1;
+                        NPC[A].Frame += 1;
                         if(NPC[A].Frame >= 5)
                             NPC[A].Frame = 3;
                     }
@@ -2120,7 +2120,7 @@ void NPCFrames(int A)
     }
     else if(NPC[A].Type == 108) // Yoshi Fireball
     {
-        NPC[A].FrameCount = NPC[A].FrameCount + 1;
+        NPC[A].FrameCount += 1;
         if(NPC[A].FrameCount >= 8)
         {
             NPC[A].Frame = 1;
@@ -2131,7 +2131,7 @@ void NPCFrames(int A)
         else
             NPC[A].Frame = 0;
         if(NPC[A].Direction == 1)
-            NPC[A].Frame = NPC[A].Frame + 2;
+            NPC[A].Frame += 2;
     }
     else if(NPC[A].Type == 35 || NPC[A].Type == 191 || NPC[A].Type == 193) // Goombas Shoe
     {
@@ -2146,22 +2146,22 @@ void NPCFrames(int A)
         if(NPC[A].Direction == 1)
             NPC[A].Frame = 2;
         if(NPC[A].Special == 1 || NPC[A].HoldingPlayer > 0)
-            NPC[A].Frame = NPC[A].Frame + 1;
+            NPC[A].Frame += 1;
     }
     else if(NPC[A].Type == 41) // smb2 birdo exit
     {
-        NPC[A].FrameCount = NPC[A].FrameCount + 1;
+        NPC[A].FrameCount += 1;
         if(NPC[A].FrameCount >= 8)
         {
             NPC[A].FrameCount = 1;
-            NPC[A].Frame = NPC[A].Frame + 1;
+            NPC[A].Frame += 1;
             if(NPC[A].Frame == 8)
                 NPC[A].Frame = 0;
         }
     }
     else if(NPC[A].Type == 97) // SMB3 Star
     {
-        NPC[A].FrameCount = NPC[A].FrameCount + 1;
+        NPC[A].FrameCount += 1;
         if(NPC[A].Special == 0)
         {
             if(NPC[A].FrameCount < 8)
@@ -2187,35 +2187,35 @@ void NPCFrames(int A)
     }
     else if(!(NPCIsABonus[NPC[A].Type] || NPC[A].Type == 21 || NPC[A].Type == 32)) // Frame finder for everything else
     {
-        NPC[A].FrameCount = NPC[A].FrameCount + 1;
+        NPC[A].FrameCount += 1;
         if(NPC[A].Type == 48 || NPC[A].Type == 206)
-            NPC[A].FrameCount = NPC[A].FrameCount + 1;
+            NPC[A].FrameCount += 1;
         if(NPC[A].FrameCount >= 8)
         {
             NPC[A].FrameCount = 1;
-            NPC[A].Frame = NPC[A].Frame + 1;
+            NPC[A].Frame += 1;
             if(NPC[A].Frame == 2)
                 NPC[A].Frame = 0;
         }
     }
     else if(NPC[A].Type == 183 || NPC[A].Type == 277)
     {
-        NPC[A].FrameCount = NPC[A].FrameCount + 1;
+        NPC[A].FrameCount += 1;
         if(NPC[A].FrameCount >= 12)
         {
             NPC[A].FrameCount = 1;
-            NPC[A].Frame = NPC[A].Frame + 1;
+            NPC[A].Frame += 1;
             if(NPC[A].Frame == 2)
                 NPC[A].Frame = 0;
         }
     }
     else if(NPC[A].Type == 182)
     {
-        NPC[A].FrameCount = NPC[A].FrameCount + 1;
+        NPC[A].FrameCount += 1;
         if(NPC[A].FrameCount >= 4)
         {
             NPC[A].FrameCount = 1;
-            NPC[A].Frame = NPC[A].Frame + 1;
+            NPC[A].Frame += 1;
             if(NPC[A].Frame == 4)
                 NPC[A].Frame = 0;
         }

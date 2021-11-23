@@ -41,8 +41,8 @@ void GetvScreen(int A)
 //            Player[nPlay.MySlot + 1].Location.Height = 0;
 //        vScreenX[1] = -Player[nPlay.MySlot + 1].Location.X + (vScreen[1].Width * 0.5) - Player[nPlay.MySlot + 1].Location.Width / 2.0;
 //        vScreenY[1] = -Player[nPlay.MySlot + 1].Location.Y + (vScreen[1].Height * 0.5) - vScreenYOffset - Player[nPlay.MySlot + 1].Location.Height;
-//        vScreenX[1] = vScreenX[1] - vScreen[1].tempX;
-//        vScreenY[1] = vScreenY[1] - vScreen[1].TempY;
+//        vScreenX[1] += -vScreen[1].tempX;
+//        vScreenY[1] += -vScreen[1].TempY;
 //        if(-vScreenX[1] < level[Player[nPlay.MySlot + 1].Section].X)
 //            vScreenX[1] = -level[Player[nPlay.MySlot + 1].Section].X;
 //        if(-vScreenX[1] + vScreen[1].Width > level[Player[nPlay.MySlot + 1].Section].Width)
@@ -52,17 +52,17 @@ void GetvScreen(int A)
 //        if(-vScreenY[1] + vScreen[1].Height > level[Player[nPlay.MySlot + 1].Section].Height)
 //            vScreenY[1] = -(level[Player[nPlay.MySlot + 1].Section].Height - vScreen[1].Height);
 //        if(vScreen[1].TempDelay > 0)
-//            vScreen[1].TempDelay = vScreen[1].TempDelay - 1;
+//            vScreen[1].TempDelay -= 1;
 //        else
 //        {
 //            if(vScreen[1].tempX > 0)
-//                vScreen[1].tempX = vScreen[1].tempX - 1;
+//                vScreen[1].tempX -= 1;
 //            if(vScreen[1].tempX < 0)
-//                vScreen[1].tempX = vScreen[1].tempX + 1;
+//                vScreen[1].tempX += 1;
 //            if(vScreen[1].TempY > 0)
-//                vScreen[1].TempY = vScreen[1].TempY - 1;
+//                vScreen[1].TempY -= 1;
 //            if(vScreen[1].TempY < 0)
-//                vScreen[1].TempY = vScreen[1].TempY + 1;
+//                vScreen[1].TempY += 1;
 //        }
 //        if(Player[nPlay.MySlot + 1].Mount == 2)
 //            Player[nPlay.MySlot + 1].Location.Height = 128;
@@ -73,8 +73,8 @@ void GetvScreen(int A)
             Player[A].Location.Height = 0;
         vScreenX[A] = -Player[A].Location.X + (vScreen[A].Width * 0.5) - Player[A].Location.Width / 2.0;
         vScreenY[A] = -Player[A].Location.Y + (vScreen[A].Height * 0.5) - vScreenYOffset - Player[A].Location.Height;
-        vScreenX[A] = vScreenX[A] - vScreen[A].tempX;
-        vScreenY[A] = vScreenY[A] - vScreen[A].TempY;
+        vScreenX[A] += -vScreen[A].tempX;
+        vScreenY[A] += -vScreen[A].TempY;
         if(-vScreenX[A] < level[Player[A].Section].X)
             vScreenX[A] = -level[Player[A].Section].X;
         if(-vScreenX[A] + vScreen[A].Width > level[Player[A].Section].Width)
@@ -84,17 +84,17 @@ void GetvScreen(int A)
         if(-vScreenY[A] + vScreen[A].Height > level[Player[A].Section].Height)
             vScreenY[A] = -(level[Player[A].Section].Height - vScreen[A].Height);
         if(vScreen[A].TempDelay > 0)
-            vScreen[A].TempDelay = vScreen[A].TempDelay - 1;
+            vScreen[A].TempDelay -= 1;
         else
         {
             if(vScreen[A].tempX > 0)
-                vScreen[A].tempX = vScreen[A].tempX - 1;
+                vScreen[A].tempX -= 1;
             if(vScreen[A].tempX < 0)
-                vScreen[A].tempX = vScreen[A].tempX + 1;
+                vScreen[A].tempX += 1;
             if(vScreen[A].TempY > 0)
-                vScreen[A].TempY = vScreen[A].TempY - 1;
+                vScreen[A].TempY -= 1;
             if(vScreen[A].TempY < 0)
-                vScreen[A].TempY = vScreen[A].TempY + 1;
+                vScreen[A].TempY += 1;
         }
         if(Player[A].Mount == 2)
             Player[A].Location.Height = 128;
@@ -120,12 +120,12 @@ void GetvScreenAverage()
     {
         if(!Player[A].Dead && Player[A].Effect != 6)
         {
-            vScreenX[1] = vScreenX[1] - Player[A].Location.X - Player[A].Location.Width / 2.0;
+            vScreenX[1] += -Player[A].Location.X - Player[A].Location.Width / 2.0;
             if(Player[A].Mount == 2)
-                vScreenY[1] = vScreenY[1] - Player[A].Location.Y;
+                vScreenY[1] += -Player[A].Location.Y;
             else
-                vScreenY[1] = vScreenY[1] - Player[A].Location.Y - Player[A].Location.Height;
-            B = B + 1;
+                vScreenY[1] += -Player[A].Location.Y - Player[A].Location.Height;
+            B += 1;
         }
     }
 
@@ -178,12 +178,12 @@ void GetvScreenAverage2()
     {
         if(!Player[A].Dead)
         {
-            vScreenX[1] = vScreenX[1] - Player[A].Location.X - Player[A].Location.Width / 2.0;
+            vScreenX[1] += -Player[A].Location.X - Player[A].Location.Width / 2.0;
             if(Player[A].Mount == 2)
-                vScreenY[1] = vScreenY[1] - Player[A].Location.Y;
+                vScreenY[1] += -Player[A].Location.Y;
             else
-                vScreenY[1] = vScreenY[1] - Player[A].Location.Y - Player[A].Location.Height;
-            B = B + 1;
+                vScreenY[1] += -Player[A].Location.Y - Player[A].Location.Height;
+            B += 1;
         }
     }
 
@@ -266,7 +266,7 @@ void PlayerWarpGFX(int A, Location_t &tempLocation, float &X2, float &Y2)
             {
                 Y2 = float(warp_enter.Y - tempLocation.Y);
                 tempLocation.Y = warp_enter.Y;
-                tempLocation.Height = tempLocation.Height - Y2;
+                tempLocation.Height += -Y2;
             }
         }
         else if(warp_dir_enter == 4) // Moving right
@@ -293,7 +293,7 @@ void PlayerWarpGFX(int A, Location_t &tempLocation, float &X2, float &Y2)
             {
                 Y2 = float(warp_exit.Y - tempLocation.Y);
                 tempLocation.Y = warp_exit.Y;
-                tempLocation.Height = tempLocation.Height - double(Y2);
+                tempLocation.Height += -double(Y2);
             }
         }
         else if(warp_dir_exit == 4) // Moving left
@@ -349,7 +349,7 @@ void NPCWarpGFX(int A, Location_t &tempLocation, float &X2, float &Y2)
             {
                 Y2 = float(warp_enter.Y - tempLocation.Y);
                 tempLocation.Y = warp_enter.Y;
-                tempLocation.Height = tempLocation.Height - double(Y2);
+                tempLocation.Height += -double(Y2);
             }
         }
         else if(warp_dir_enter == 4) // Moving right
@@ -376,7 +376,7 @@ void NPCWarpGFX(int A, Location_t &tempLocation, float &X2, float &Y2)
             {
                 Y2 = float(warp_exit.Y - tempLocation.Y);
                 tempLocation.Y = warp_exit.Y;
-                tempLocation.Height = tempLocation.Height - double(Y2);
+                tempLocation.Height += -double(Y2);
             }
         }
         else if(warp_dir_exit == 4) // Moving left
@@ -430,16 +430,16 @@ void ChangeScreen()
 //        frmMain.Width = 12240
 //        frmMain.Height = 9570
 //        Do While frmMain.ScaleWidth > 800
-//            frmMain.Width = frmMain.Width - 5
+//            frmMain.Width += -5
 //        Loop
 //        Do While frmMain.ScaleHeight > 600
-//            frmMain.Height = frmMain.Height - 5
+//            frmMain.Height += -5
 //        Loop
 //        Do While frmMain.ScaleWidth < 800
-//            frmMain.Width = frmMain.Width + 5
+//            frmMain.Width += 5
 //        Loop
 //        Do While frmMain.ScaleHeight < 600
-//            frmMain.Height = frmMain.Height + 5
+//            frmMain.Height += 5
 //        Loop
 //        SetRes
         SetRes();
@@ -474,11 +474,11 @@ void GetvScreenCredits()
     {
         if((!Player[A].Dead || g_gameInfo.outroDeadMode) && Player[A].Effect != 6)
         {
-            vScreenX[1] = vScreenX[1] - Player[A].Location.X - Player[A].Location.Width / 2.0;
+            vScreenX[1] += -Player[A].Location.X - Player[A].Location.Width / 2.0;
             if(Player[A].Mount == 2)
-                vScreenY[1] = vScreenY[1] - Player[A].Location.Y;
+                vScreenY[1] += -Player[A].Location.Y;
             else
-                vScreenY[1] = vScreenY[1] - Player[A].Location.Y - Player[A].Location.Height;
+                vScreenY[1] += -Player[A].Location.Y - Player[A].Location.Height;
             B++;
         }
     }
@@ -507,9 +507,9 @@ int pfrX(int plrFrame)
 #else
     int A;
     A = plrFrame;
-    A = A - 50;
+    A -= 50;
     while(A > 100)
-        A = A - 100;
+        A -= 100;
     if(A > 90)
         A = 9;
     else if(A > 90)
@@ -544,12 +544,12 @@ int pfrY(int plrFrame)
 #else
     int A;
     A = plrFrame;
-    A = A - 50;
+    A -= 50;
     while(A > 100)
-        A = A - 100;
-    A = A - 1;
+        A -= 100;
+    A -= 1;
     while(A > 9)
-        A = A - 10;
+        A -= 10;
     return A * 100;
 #endif
 }

@@ -730,7 +730,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 //        curSection = 0;
 //        vScreenY[1] = -(level[curSection].Height - 600);
 //        vScreenX[1] = -level[curSection].X;
-//        numWarps = numWarps + 1;
+//        numWarps += 1;
 //        for(A = 0; A < frmLevelSettings::optBackground.Count; A++)
 //        {
 //            if(Background2[0] == A)
@@ -785,7 +785,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         for(A = 0; A <= numSections; A++) // Automatically correct 608 section height to 600
         {
 //            if(int(level[A].Height - level[A].Y) == 608)
-//                level[A].Y = level[A].Y + 8;
+//                level[A].Y += 8;
             int height = int(level[A].Height - level[A].Y);
             if(height > 600 && height < 610)
                 level[A].Y = level[A].Height - 600; // Better and cleaner logic

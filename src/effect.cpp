@@ -86,12 +86,12 @@ void UpdateEffects()
         }
         else if(e.Type == 111)
         {
-            e.Location.SpeedY = e.Location.SpeedY + 0.5;
+            e.Location.SpeedY += 0.5;
             e.FrameCount += 1;
             if(e.FrameCount >= 4)
             {
                 e.FrameCount = 0;
-                e.Frame = e.Frame + 1;
+                e.Frame += 1;
                 if(e.Frame == 7)
                     e.Frame = 0;
                 if(e.Frame >= 14)
@@ -104,7 +104,7 @@ void UpdateEffects()
             if(e.FrameCount >= 4)
             {
                 e.FrameCount = 0;
-                e.Frame = e.Frame + 1;
+                e.Frame += 1;
             }
             if(e.Frame >= 7)
                 e.Life = 0;
@@ -112,8 +112,8 @@ void UpdateEffects()
         else if(e.Type == 136) // RotoDisk
         {
             if(e.Location.SpeedX != 0.0 || e.Location.SpeedY != 0.0)
-                e.Location.SpeedY = e.Location.SpeedY + 0.5;
-            e.Frame = e.Frame + 1;
+                e.Location.SpeedY += 0.5;
+            e.Frame += 1;
             if(e.Frame >= 5)
                 e.Frame = 0;
         }
@@ -131,7 +131,7 @@ void UpdateEffects()
         }
         else if(e.Type == 1 || e.Type == 21 || e.Type == 30 || e.Type == 51 || e.Type == 100 || e.Type == 135) // Block break
         {
-            e.Location.SpeedY = e.Location.SpeedY + 0.6;
+            e.Location.SpeedY += 0.6;
             e.Location.SpeedX = e.Location.SpeedX * 0.99;
             if(e.Location.SpeedY >= 10)
                 e.Location.SpeedY = 10;
@@ -139,7 +139,7 @@ void UpdateEffects()
             if(e.FrameCount >= 3)
             {
                 e.FrameCount = 0;
-                e.Frame = e.Frame + 1;
+                e.Frame += 1;
                 if(e.Frame == 4)
                     e.Frame = 0;
             }
@@ -149,7 +149,7 @@ void UpdateEffects()
             e.FrameCount += 1;
             if(e.FrameCount >= 4)
             {
-                e.Frame = e.Frame + 1;
+                e.Frame += 1;
                 e.FrameCount = 0;
             }
             if(e.Frame > 7)
@@ -213,16 +213,16 @@ void UpdateEffects()
         }
         else if(e.Type == 57) // egg shells
         {
-            e.Location.SpeedY = e.Location.SpeedY + 0.6;
+            e.Location.SpeedY += 0.6;
             e.Location.SpeedX = e.Location.SpeedX * 0.99;
             if(e.Location.SpeedY >= 10)
                 e.Location.SpeedY = 10;
         }
         else if(e.Type == 3 || e.Type == 5 || e.Type == 129 || e.Type == 130 || e.Type == 134) // Mario & Luigi death
-            e.Location.SpeedY = e.Location.SpeedY + 0.25;
+            e.Location.SpeedY += 0.25;
         else if(e.Type == 145 || e.Type == 110 || e.Type == 127 || e.Type == 4 || e.Type == 143 || e.Type == 142 || e.Type == 7 || e.Type == 22 || e.Type == 31 || e.Type == 33 || e.Type == 34 || e.Type == 38 || e.Type == 40 || e.Type == 42 || e.Type == 44 || e.Type == 46 || e.Type == 53 || e.Type == 117) // Goomba air ride of dooom
         {
-            e.Location.SpeedY = e.Location.SpeedY + 0.5;
+            e.Location.SpeedY += 0.5;
             if(e.Location.SpeedY >= 10)
                 e.Location.SpeedY = 10;
             e.FrameCount += 1;
@@ -231,14 +231,14 @@ void UpdateEffects()
             if(e.FrameCount >= 8)
             {
                 e.FrameCount = 0;
-                e.Frame = e.Frame + 1;
+                e.Frame += 1;
                 if(e.Frame == 2)
                     e.Frame = 0;
             }
         }
         else if(e.Type == 104) // Blaarg eyes
         {
-            e.Life = e.Life + 2;
+            e.Life += 2;
             if(e.Life <= 30)
                 e.Location.SpeedY = -2.8;
             else if(e.Life <= 40)
@@ -253,34 +253,34 @@ void UpdateEffects()
             if(e.FrameCount >= 16)
             {
                 e.FrameCount = 0;
-                e.Frame = e.Frame + 1;
+                e.Frame += 1;
                 if(e.Frame == 2)
                     e.Frame = 0;
             }
         }
         else if(e.Type == 61) // Beack Koopa
         {
-            e.Location.SpeedY = e.Location.SpeedY + 0.5;
+            e.Location.SpeedY += 0.5;
             if(e.Location.SpeedY >= 10)
                 e.Location.SpeedY = 10;
             e.FrameCount += 1;
             if(e.FrameCount >= 15)
             {
                 e.FrameCount = 0;
-                e.Frame = e.Frame - 1;
+                e.Frame -= 1;
             }
             else if(e.FrameCount == 8)
-                e.Frame = e.Frame + 1;
+                e.Frame += 1;
         }
         else if(e.Type == 8 || e.Type == 9 || e.Type == 15 || e.Type == 16 || e.Type == 19 || e.Type == 27 || e.Type == 146 || e.Type == 28 || e.Type == 29 || e.Type == 32 || e.Type == 36 || e.Type == 47 || e.Type == 60 || e.Type == 95 || e.Type == 96 || e.Type == 109) // Flying turtle shell / Bullet bill /hard thing
         {
-            e.Location.SpeedY = e.Location.SpeedY + 0.5;
+            e.Location.SpeedY += 0.5;
             if(e.Location.SpeedY >= 10)
                 e.Location.SpeedY = 10;
         }
         else if(e.Type == 26 || e.Type == 101 || e.Type == 102) // Goombas shoes
         {
-            e.Location.SpeedY = e.Location.SpeedY + 0.5;
+            e.Location.SpeedY += 0.5;
             if(e.Location.SpeedY >= 10)
                 e.Location.SpeedY = 10;
             if(e.Location.SpeedX > 0)
@@ -290,24 +290,24 @@ void UpdateEffects()
         }
         else if(e.Type == 10 || e.Type == 131) // SMW / SMB3 Puff of smoke
         {
-            e.Location.X = e.Location.X + e.Location.SpeedX;
+            e.Location.X += e.Location.SpeedX;
             e.FrameCount += 1;
             if(e.FrameCount >= 3)
             {
                 e.FrameCount = 0;
-                e.Frame = e.Frame + 1;
+                e.Frame += 1;
                 if(e.Frame == 4)
                     e.Life = 0;
             }
         }
         else if(e.Type == 147) // SMB2 Puff of smoke
         {
-            e.Location.X = e.Location.X + e.Location.SpeedX;
+            e.Location.X += e.Location.SpeedX;
             e.FrameCount += 1;
             if(e.FrameCount >= 6)
             {
                 e.FrameCount = 0;
-                e.Frame = e.Frame + 1;
+                e.Frame += 1;
                 if(e.Frame == 4)
                     e.Life = 0;
             }
@@ -318,7 +318,7 @@ void UpdateEffects()
             if(e.FrameCount >= 3)
             {
                 e.FrameCount = 0;
-                e.Frame = e.Frame + 1;
+                e.Frame += 1;
                 if(e.Frame == 2)
                 {
                     e.Life = 0;
@@ -332,7 +332,7 @@ void UpdateEffects()
             if(e.FrameCount >= 1)
             {
                 e.FrameCount = 0;
-                e.Frame = e.Frame + 1;
+                e.Frame += 1;
                 if(e.Frame == 4)
                     e.Frame = 0;
             }
@@ -349,7 +349,7 @@ void UpdateEffects()
                 // ElseIf .Frame = 1 Then
                     // .Frame = 3
                 // Else
-                e.Frame = e.Frame + 1;
+                e.Frame += 1;
                 if(e.Frame > 3)
                 {
                     e.Frame = 0;
@@ -363,7 +363,7 @@ void UpdateEffects()
             e.FrameCount += 1;
             if(e.FrameCount >= 4)
             {
-                e.Frame = e.Frame + 1;
+                e.Frame += 1;
                 if(e.Frame > 1)
                     e.Life = 0;
                 e.FrameCount = 0;
@@ -371,25 +371,25 @@ void UpdateEffects()
         }
         else if(e.Type == 76)
         {
-            e.Location.X = e.Location.X + e.Location.SpeedX;
-            e.Location.Y = e.Location.Y + e.Location.SpeedY;
+            e.Location.X += e.Location.SpeedX;
+            e.Location.Y += e.Location.SpeedY;
         }
         else if(e.Type == 81 || e.Type == 123 || e.Type == 124) // P Switch
         {
             if(e.Life == 1)
             {
-                e.Location.X = e.Location.X + e.Location.Width / 2.0 - EffectWidth[10] / 2.0;
-                e.Location.Y = e.Location.Y + e.Location.Height / 2.0 - EffectHeight[10] / 2.0;
+                e.Location.X += e.Location.Width / 2.0 - EffectWidth[10] / 2.0;
+                e.Location.Y += e.Location.Height / 2.0 - EffectHeight[10] / 2.0;
                 NewEffect(10, e.Location);
             }
         }
         else if(e.Type == 74) // Slide Smoke
         {
             e.FrameCount += 1;
-            e.Location.Y = e.Location.Y - 0.1;
+            e.Location.Y -= 0.1;
             if(e.FrameCount >= 4)
             {
-                e.Frame = e.Frame + 1;
+                e.Frame += 1;
                 e.FrameCount = 0;
                 if(e.Frame > 2)
                     e.Life = 0;
@@ -397,12 +397,12 @@ void UpdateEffects()
         }
         else if(e.Type == 63) // Zelda Smoke
         {
-            e.Location.X = e.Location.X + e.Location.SpeedX;
+            e.Location.X += e.Location.SpeedX;
             e.FrameCount += 1;
             if(e.FrameCount >= 4)
             {
                 e.FrameCount = 0;
-                e.Frame = e.Frame + 1;
+                e.Frame += 1;
                 if(e.Frame == 4)
                     e.Life = 0;
             }
@@ -411,7 +411,7 @@ void UpdateEffects()
         {
             if(e.Life == 1)
             {
-                CoinCount = CoinCount + 1;
+                CoinCount += 1;
                 if(CoinCount > 13)
                     CoinCount = 10;
                 MoreScore(CoinCount, e.Location);
@@ -433,12 +433,12 @@ void UpdateEffects()
             }
             else
             {
-                e.Location.SpeedY = e.Location.SpeedY + 0.4;
+                e.Location.SpeedY += 0.4;
                 e.FrameCount += 1;
                 if(e.FrameCount >= 3)
                 {
                     e.FrameCount = 0;
-                    e.Frame = e.Frame + 1;
+                    e.Frame += 1;
                     if(e.Frame >= 4)
                         e.Frame = 0;
                 }
@@ -452,7 +452,7 @@ void UpdateEffects()
             if(e.FrameCount >= 4)
             {
                 e.FrameCount = 0;
-                e.Frame = e.Frame + 1;
+                e.Frame += 1;
             }
         }
         else if(e.Type == 78) // Coin
@@ -463,7 +463,7 @@ void UpdateEffects()
             if(e.FrameCount >= 5)
             {
                 e.FrameCount = 0;
-                e.Frame = e.Frame + 1;
+                e.Frame += 1;
                 if(e.Frame == 3)
                     e.Life = 0;
             }
@@ -502,7 +502,7 @@ void UpdateEffects()
             if(e.FrameCount >= 8)
             {
                 e.FrameCount = 0;
-                e.Frame = e.Frame + 1;
+                e.Frame += 1;
                 if(e.Frame == 3)
                     e.Life = 0;
             }
@@ -515,7 +515,7 @@ void UpdateEffects()
             if(e.FrameCount >= 4)
             {
                 e.FrameCount = 0;
-                e.Frame = e.Frame + 1;
+                e.Frame += 1;
                 if(e.Frame == 3 || e.Frame == 6 || e.Frame == 9 || e.Frame == 12 || e.Frame == 15)
                     e.Life = 0;
             }
@@ -528,7 +528,7 @@ void UpdateEffects()
             if(e.FrameCount >= 6)
             {
                 e.FrameCount = 0;
-                e.Frame = e.Frame + 1;
+                e.Frame += 1;
                 e.FrameCount = 0;
             }
         }
@@ -540,7 +540,7 @@ void UpdateEffects()
             if(e.FrameCount >= 2)
             {
                 e.FrameCount = 0;
-                e.Frame = e.Frame + 1;
+                e.Frame += 1;
                 e.FrameCount = 0;
                 if(e.Frame >= 4)
                     e.Frame = 0;
@@ -551,7 +551,7 @@ void UpdateEffects()
             if(e.FrameCount == 0)
             {
                 NewEffect(71, e.Location, static_cast<float>(e.Frame));
-                e.Frame = e.Frame + 1;
+                e.Frame += 1;
                 if(e.Frame >= 4)
                     e.Frame = 0;
             }
@@ -565,7 +565,7 @@ void UpdateEffects()
                 if(e.FrameCount >= 4)
                 {
                     e.FrameCount = 0;
-                    e.Frame = e.Frame + 1;
+                    e.Frame += 1;
                     if(e.Frame >= 4)
                         e.Frame = 0;
                 }
@@ -582,7 +582,7 @@ void UpdateEffects()
                 if(e.FrameCount >= 4)
                 {
                     e.FrameCount = 0;
-                    e.Frame = e.Frame + 1;
+                    e.Frame += 1;
                     if(e.Frame >= 4)
                     {
                         e.Life = 0;
@@ -614,13 +614,13 @@ void UpdateEffects()
         }
         else if(e.Type == 15 || e.Type == 16 || e.Type == 25 || e.Type == 48 || e.Type == 49 || e.Type == 50 || e.Type == 68 || e.Type == 72 || e.Type == 89 || e.Type == 90 || e.Type == 91 || e.Type == 92 || e.Type == 93 || e.Type == 94 || e.Type == 98 || e.Type == 99 || e.Type == 105 || e.Type == 138 || e.Type == 106 || e.Type == 141) // Bullet Bill / Hammer Bro
         {
-            e.Location.SpeedY = e.Location.SpeedY + 0.5;
+            e.Location.SpeedY += 0.5;
             if(e.Location.SpeedY >= 10)
                 e.Location.SpeedY = 10;
         }
         else if(e.Type == 128)
         {
-            e.Location.SpeedY = e.Location.SpeedY + 0.5;
+            e.Location.SpeedY += 0.5;
             if(e.Location.SpeedY >= 10)
                 e.Location.SpeedY = 10;
             e.FrameCount += 1;
@@ -635,7 +635,7 @@ void UpdateEffects()
         }
         else if(e.Type == 17 || e.Type == 18 || e.Type == 20 || e.Type == 24 || (e.Type >= 64 && e.Type <= 67) || e.Type == 83) // Shy guy free falling
         {
-            e.Location.SpeedY = e.Location.SpeedY + 0.5;
+            e.Location.SpeedY += 0.5;
             if(e.Location.SpeedY >= 10)
                 e.Location.SpeedY = 10;
             e.FrameCount += 1;
@@ -654,7 +654,7 @@ void UpdateEffects()
         }
         else if(e.Type == 85 || e.Type == 86 || e.Type == 87 || e.Type == 88 || e.Type == 97 || e.Type == 115 || e.Type == 122 || e.Type == 116 || e.Type == 118 || e.Type == 119 || e.Type == 120 || e.Type == 121 || e.Type == 137) // Rex / mega mole / smw goomba free falling
         {
-            e.Location.SpeedY = e.Location.SpeedY + 0.5;
+            e.Location.SpeedY += 0.5;
             if(e.Location.SpeedY >= 10)
                 e.Location.SpeedY = 10;
             e.FrameCount += 1;
@@ -677,7 +677,7 @@ void UpdateEffects()
                 e.FrameCount = 19;
             e.FrameCount += 1;
             if(e.FrameCount == 10)
-                e.Frame = e.Frame + 1;
+                e.Frame += 1;
             else if(e.FrameCount == 20)
             {
                 e.Frame = 2;
@@ -701,8 +701,8 @@ void UpdateEffects()
                         NPC[numNPCs].Type = e.NewNpc;
                         NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
                         NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
-                        NPC[numNPCs].Location.Y = NPC[numNPCs].Location.Y + 32 - NPC[numNPCs].Location.Height;
-                        NPC[numNPCs].Location.X = NPC[numNPCs].Location.X - NPC[numNPCs].Location.Width / 2.0 + 16;
+                        NPC[numNPCs].Location.Y += 32 - NPC[numNPCs].Location.Height;
+                        NPC[numNPCs].Location.X += -NPC[numNPCs].Location.Width / 2.0 + 16;
                         if(NPC[numNPCs].Type == 34)
                             NPC[numNPCs].Location.SpeedY = -6;
                         CheckSectionNPC(numNPCs);
@@ -715,7 +715,7 @@ void UpdateEffects()
             e.FrameCount += 1;
             if(e.FrameCount >= 4)
             {
-                e.Frame = e.Frame + 1;
+                e.Frame += 1;
                 e.FrameCount = 0;
             }
             if(e.Frame >= 3)
@@ -752,19 +752,19 @@ void UpdateEffects()
                 CheckSectionNPC(numNPCs);
             }
             if(e.NewNpc == 98)
-                e.Frame = e.Frame + 2;
+                e.Frame += 2;
             else if(e.NewNpc == 99)
-                e.Frame = e.Frame + 4;
+                e.Frame += 4;
             else if(e.NewNpc == 100)
-                e.Frame = e.Frame + 6;
+                e.Frame += 6;
             else if(e.NewNpc == 148)
-                e.Frame = e.Frame + 8;
+                e.Frame += 8;
             else if(e.NewNpc == 149)
-                e.Frame = e.Frame + 10;
+                e.Frame += 10;
             else if(e.NewNpc == 150)
-                e.Frame = e.Frame + 12;
+                e.Frame += 12;
             else if(e.NewNpc == 228)
-                e.Frame = e.Frame + 14;
+                e.Frame += 14;
         }
         else if(e.Type == 79)
             e.Location.SpeedY = e.Location.SpeedY * 0.97;
@@ -975,8 +975,8 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
             else
                 Effect[numEffects].Frame = 2;
 
-            // .Location.SpeedX = .Location.SpeedX + Rnd * 2 - 1
-            // .Location.SpeedY = .Location.SpeedY + Rnd * 4 - 2
+            // .Location.SpeedX += Rnd * 2 - 1
+            // .Location.SpeedY += Rnd * 4 - 2
             if(B == 1)
             {
                 Effect[numEffects].Location.X = Location.X;
@@ -1158,8 +1158,8 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
         Effect[numEffects].Location.Height = EffectHeight[Effect[numEffects].Type];
         Effect[numEffects].Location.X = Location.X - Effect[numEffects].Location.Width * 0.5 + Location.Width * 0.5;
         Effect[numEffects].Location.Y = Location.Y - Effect[numEffects].Location.Height * 0.5 + Location.Height * 0.5;
-        Effect[numEffects].Location.X = Effect[numEffects].Location.X + dRand() * 32 - 16;
-        Effect[numEffects].Location.Y = Effect[numEffects].Location.Y + dRand() * 32 - 16;
+        Effect[numEffects].Location.X += dRand() * 32 - 16;
+        Effect[numEffects].Location.Y += dRand() * 32 - 16;
         Effect[numEffects].Location.SpeedY = -2;
         Effect[numEffects].Location.SpeedX = 0;
         Effect[numEffects].Frame = 0;
@@ -1214,8 +1214,8 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
                     Effect[numEffects].Location.SpeedY = -Effect[numEffects].Location.SpeedY;
                 if(B == 1 || B == 3)
                     Effect[numEffects].Location.SpeedX = -Effect[numEffects].Location.SpeedX;
-                Effect[numEffects].Location.Y = Effect[numEffects].Location.Y + Effect[numEffects].Location.SpeedY * 6;
-                Effect[numEffects].Location.X = Effect[numEffects].Location.X + Effect[numEffects].Location.SpeedX * 6;
+                Effect[numEffects].Location.Y += Effect[numEffects].Location.SpeedY * 6;
+                Effect[numEffects].Location.X += Effect[numEffects].Location.SpeedX * 6;
                 Effect[numEffects].Frame = 0;
             }
         }
@@ -1274,8 +1274,8 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
                 Effect[numEffects].Location.SpeedX = Effect[numEffects].Location.SpeedX * 0.5;
                 Effect[numEffects].Location.SpeedY = Effect[numEffects].Location.SpeedY * 0.5;
 
-                Effect[numEffects].Location.X = Effect[numEffects].Location.X + Effect[numEffects].Location.SpeedX * 3;
-                Effect[numEffects].Location.Y = Effect[numEffects].Location.Y + Effect[numEffects].Location.SpeedY * 3;
+                Effect[numEffects].Location.X += Effect[numEffects].Location.SpeedX * 3;
+                Effect[numEffects].Location.Y += Effect[numEffects].Location.SpeedY * 3;
 
                 Effect[numEffects].Frame = iRand() % 4;
                 Effect[numEffects].Type = A;
@@ -1387,13 +1387,13 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
             Effect[numEffects].Location.SpeedY = 0;
             Effect[numEffects].Location.SpeedX = 0;
             if(B == 1)
-                Effect[numEffects].Location.X = Effect[numEffects].Location.X - 10;
+                Effect[numEffects].Location.X -= 10;
             if(B == 3)
-                Effect[numEffects].Location.X = Effect[numEffects].Location.X + 10;
+                Effect[numEffects].Location.X += 10;
             if(B == 2)
-                Effect[numEffects].Location.Y = Effect[numEffects].Location.Y + 16;
+                Effect[numEffects].Location.Y += 16;
             if(B == 4)
-                Effect[numEffects].Location.Y = Effect[numEffects].Location.Y - 16;
+                Effect[numEffects].Location.Y -= 16;
             Effect[numEffects].Frame = 0 - B;
             Effect[numEffects].Life = 20 * B;
             Effect[numEffects].Type = A;
@@ -1626,8 +1626,8 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
         Effect[numEffects].Location.Y = Location.Y;
         Effect[numEffects].Location.SpeedY = Location.SpeedY;
         Effect[numEffects].Location.SpeedX = Location.SpeedX;
-        Effect[numEffects].Location.X = Effect[numEffects].Location.X + Effect[numEffects].Location.Width / 2.0 - 16;
-        Effect[numEffects].Location.Y = Effect[numEffects].Location.Y + Effect[numEffects].Location.Height / 2.0 - 16;
+        Effect[numEffects].Location.X += Effect[numEffects].Location.Width / 2.0 - 16;
+        Effect[numEffects].Location.Y += Effect[numEffects].Location.Height / 2.0 - 16;
         Effect[numEffects].Location.Width = 32;
         Effect[numEffects].Location.Height = 32;
         Effect[numEffects].Frame = 0;
@@ -1735,12 +1735,12 @@ void NewEffect(int A, Location_t Location, float Direction, int NewNpc, bool Sha
         Effect[numEffects].Location.SpeedX = -Location.SpeedX;
         if(A == 91)
         {
-            Effect[numEffects].Location.X = Effect[numEffects].Location.X + Effect[numEffects].Location.Width / 2.0;
-            Effect[numEffects].Location.Y = Effect[numEffects].Location.Y + Effect[numEffects].Location.Height / 2.0;
+            Effect[numEffects].Location.X += Effect[numEffects].Location.Width / 2.0;
+            Effect[numEffects].Location.Y += Effect[numEffects].Location.Height / 2.0;
             Effect[numEffects].Location.Width = EffectWidth[A];
             Effect[numEffects].Location.Height = EffectHeight[A];
-            Effect[numEffects].Location.X = Effect[numEffects].Location.X - Effect[numEffects].Location.Width / 2.0;
-            Effect[numEffects].Location.Y = Effect[numEffects].Location.Y - Effect[numEffects].Location.Height / 2.0;
+            Effect[numEffects].Location.X += -Effect[numEffects].Location.Width / 2.0;
+            Effect[numEffects].Location.Y += -Effect[numEffects].Location.Height / 2.0;
         }
         if(Effect[numEffects].Location.SpeedX != 0 && Effect[numEffects].Location.SpeedX > -2 && Effect[numEffects].Location.SpeedX < 2)
             Effect[numEffects].Location.SpeedX = 2 * -Direction;

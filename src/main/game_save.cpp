@@ -56,7 +56,7 @@ void SaveGame()
                 Star[numStars].level.clear();
                 Star[numStars].Section = 0;
             }
-            numStars = numStars - 1;
+            numStars -= 1;
         }
     }
 
