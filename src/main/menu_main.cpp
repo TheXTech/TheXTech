@@ -180,12 +180,9 @@ void FindWorlds()
         {
             auto &w = SelectWorld[i];
             const std::string wPath = w.WorldPath + w.WorldFile;
-            if(MenuMode == MENU_1PLAYER_GAME && wPath == g_recentWorld1p)
-            {
-                menuRecentEpisode = i - 1;
-                w.highlight = true;
-            }
-            else if(MenuMode == MENU_2PLAYER_GAME && wPath == g_recentWorld2p)
+
+            if((MenuMode == MENU_1PLAYER_GAME && wPath == g_recentWorld1p) ||
+               (MenuMode == MENU_2PLAYER_GAME && wPath == g_recentWorld2p))
             {
                 menuRecentEpisode = i - 1;
                 w.highlight = true;
