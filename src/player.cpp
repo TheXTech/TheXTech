@@ -3969,7 +3969,8 @@ static SDL_INLINE bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool
 {
     bool canWarp = false;
 
-    bool onGround = !g_compatibility.require_ground_to_enter_warps || (plr.Pinched1 == 2 || plr.Slope != 0);
+    bool onGround = !g_compatibility.require_ground_to_enter_warps ||
+                    (plr.Pinched1 == 2 || plr.Slope != 0 || plr.StandingOnNPC != 0);
 
     auto &entrance      = backward ? warp.Exit        : warp.Entrance;
     auto &exit          = backward ? warp.Entrance    : warp.Exit;
