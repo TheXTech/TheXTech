@@ -43,5 +43,7 @@ struct Location_t
 
 // creates a temp Location
 Location_t newLoc(double X, double Y, double Width = 0, double Height = 0);
+// creates a copy of location with a grid rounding
+Location_t roundLoc(const Location_t &inLoc, double grid);
 
 #endif // LOCATION_H

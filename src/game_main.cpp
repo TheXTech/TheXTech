@@ -1405,6 +1405,14 @@ Location_t newLoc(double X, double Y, double Width, double Height)
     return ret;
 }
 
+Location_t roundLoc(const Location_t &inLoc, double grid)
+{
+    Location_t ret = inLoc;
+    ret.X = Maths::roundTo(ret.X, grid);
+    ret.Y = Maths::roundTo(ret.Y, grid);
+    return ret;
+}
+
 void MoreScore(int addScore, Location_t Loc)
 {
     int mult = 0; // dummy

@@ -1044,7 +1044,7 @@ void UpdateGraphics(bool skipRepaint)
                     {
                         B = Player[A].MountType;
                         // Yoshi's Body
-                        tempLocation = Player[A].Location;
+                        tempLocation = roundLoc(Player[A].Location, 2.0);
                         tempLocation.Height = 32;
                         tempLocation.Width = 32;
                         tempLocation.X += Player[A].YoshiBX;
@@ -1054,7 +1054,7 @@ void UpdateGraphics(bool skipRepaint)
                         PlayerWarpGFX(A, tempLocation, X2, Y2);
                         frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, tempLocation.Width, tempLocation.Height, GFXYoshiB[B], X2, Y2 + 32 * Player[A].YoshiBFrame, c, c, c);
                         // Yoshi's Head
-                        tempLocation = Player[A].Location;
+                        tempLocation = roundLoc(Player[A].Location, 2.0);
                         tempLocation.Height = 32;
                         tempLocation.Width = 32;
                         tempLocation.X += Player[A].YoshiTX;
@@ -1065,11 +1065,12 @@ void UpdateGraphics(bool skipRepaint)
                         frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, tempLocation.Width, tempLocation.Height, GFXYoshiT[B], X2, Y2 + 32 * Player[A].YoshiTFrame);
                     }
 
+                    // FIXME: Convert this mess of duplicated code into united with usage of references, pointers, and ternary expressions
                     if(Player[A].Character == 1)
                     {
                         if(Player[A].Mount == 1)
                         {
-                            tempLocation = Player[A].Location;
+                            tempLocation = roundLoc(Player[A].Location, 2.0);
                             if(Player[A].State == 1)
                                 tempLocation.Height = Player[A].Location.Height - MarioFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
                             else
@@ -1093,7 +1094,7 @@ void UpdateGraphics(bool skipRepaint)
                         }
                         else
                         {
-                            tempLocation = Player[A].Location;
+                            tempLocation = roundLoc(Player[A].Location, 2.0);
                             tempLocation.Height = 100;
                             tempLocation.Width = 100;
                             tempLocation.X += MarioFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
@@ -1108,7 +1109,7 @@ void UpdateGraphics(bool skipRepaint)
                     {
                         if(Player[A].Mount == 1)
                         {
-                            tempLocation = Player[A].Location;
+                            tempLocation = roundLoc(Player[A].Location, 2.0);
                             if(Player[A].State == 1)
                                 tempLocation.Height = Player[A].Location.Height - LuigiFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
                             else
@@ -1120,7 +1121,7 @@ void UpdateGraphics(bool skipRepaint)
                             X2 = 0;
                             PlayerWarpGFX(A, tempLocation, X2, Y2);
                             frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, tempLocation.Width, tempLocation.Height, GFXLuigi[Player[A].State], pfrX(100 + Player[A].Frame * Player[A].Direction) + X2, pfrY(100 + Player[A].Frame * Player[A].Direction) + Y2);
-                            tempLocation = Player[A].Location;
+                            tempLocation = roundLoc(Player[A].Location, 2.0);
                             tempLocation.Height = 32;
                             tempLocation.Width = 32;
                             tempLocation.X += Player[A].Location.Width / 2.0 - 16;
@@ -1132,7 +1133,7 @@ void UpdateGraphics(bool skipRepaint)
                         }
                         else
                         {
-                            tempLocation = Player[A].Location;
+                            tempLocation = roundLoc(Player[A].Location, 2.0);
                             tempLocation.Height = 100;
                             tempLocation.Width = 100;
                             tempLocation.X += LuigiFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
@@ -1147,7 +1148,7 @@ void UpdateGraphics(bool skipRepaint)
                     {
                         if(Player[A].Mount == 1)
                         {
-                            tempLocation = Player[A].Location;
+                            tempLocation = roundLoc(Player[A].Location, 2.0);
 
                             if(Player[A].State == 1)
                                 tempLocation.Height = Player[A].Location.Height - PeachFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
@@ -1167,7 +1168,7 @@ void UpdateGraphics(bool skipRepaint)
                                                   GFXPeach[Player[A].State],
                                                   pfrX(100 + Player[A].Frame * Player[A].Direction) + X2,
                                                   pfrY(100 + Player[A].Frame * Player[A].Direction) + Y2);
-                            tempLocation = Player[A].Location;
+                            tempLocation = roundLoc(Player[A].Location, 2.0);
                             tempLocation.Height = 32;
                             tempLocation.Width = 32;
                             tempLocation.X += Player[A].Location.Width / 2.0 - 16;
@@ -1185,7 +1186,7 @@ void UpdateGraphics(bool skipRepaint)
                         }
                         else
                         {
-                            tempLocation = Player[A].Location;
+                            tempLocation = roundLoc(Player[A].Location, 2.0);
                             tempLocation.Height = 100;
                             tempLocation.Width = 100;
                             tempLocation.X += PeachFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
@@ -1200,7 +1201,7 @@ void UpdateGraphics(bool skipRepaint)
                     {
                         if(Player[A].Mount == 1)
                         {
-                            tempLocation = Player[A].Location;
+                            tempLocation = roundLoc(Player[A].Location, 2.0);
                             if(Player[A].State == 1)
                                 tempLocation.Height = Player[A].Location.Height - ToadFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
                             else
@@ -1215,7 +1216,7 @@ void UpdateGraphics(bool skipRepaint)
                             X2 = 0;
                             PlayerWarpGFX(A, tempLocation, X2, Y2);
                             frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, tempLocation.Width, tempLocation.Height, GFXToad[Player[A].State], pfrX(100 + Player[A].Frame * Player[A].Direction) + X2, pfrY(100 + Player[A].Frame * Player[A].Direction) + Y2);
-                            tempLocation = Player[A].Location;
+                            tempLocation = roundLoc(Player[A].Location, 2.0);
                             tempLocation.Height = 32;
                             tempLocation.Width = 32;
                             tempLocation.X += Player[A].Location.Width / 2.0 - 16;
@@ -1227,7 +1228,7 @@ void UpdateGraphics(bool skipRepaint)
                         }
                         else
                         {
-                            tempLocation = Player[A].Location;
+                            tempLocation = roundLoc(Player[A].Location, 2.0);
                             tempLocation.Height = 100;
                             tempLocation.Width = 100;
                             tempLocation.X += ToadFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
@@ -1242,7 +1243,7 @@ void UpdateGraphics(bool skipRepaint)
                     {
                         if(Player[A].Frame > 5)
                             Player[A].Frame = 1;
-                        tempLocation = Player[A].Location;
+                        tempLocation = roundLoc(Player[A].Location, 2.0);
                         tempLocation.Height = 100;
                         tempLocation.Width = 100;
                         tempLocation.X += LinkFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
@@ -1253,6 +1254,7 @@ void UpdateGraphics(bool skipRepaint)
                         frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, tempLocation.Width, tempLocation.Height, GFXLink[Player[A].State], pfrX(100 + Player[A].Frame * Player[A].Direction) + X2, pfrY(100 + Player[A].Frame * Player[A].Direction) + Y2, c, c, c);
                     }
                 }
+
                 if(Player[A].HoldingNPC > 0 && Player[A].Frame == 15)
                 {
                     auto &hNpc = NPC[Player[A].HoldingNPC];
