@@ -3969,6 +3969,8 @@ static SDL_INLINE bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool
 {
     bool canWarp = false;
 
+    bool onGround = !g_compatibility.require_ground_to_enter_warps || (plr.Pinched1 == 2 || plr.Slope != 0);
+
     auto &entrance      = backward ? warp.Exit        : warp.Entrance;
     auto &exit          = backward ? warp.Entrance    : warp.Exit;
     auto &direction     = backward ? warp.Direction2  : warp.Direction;
@@ -3982,22 +3984,22 @@ static SDL_INLINE bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool
         canWarp = true;
     else if(direction == 1 && plr.Controls.Up) // Pipe
     {
-        if(WarpCollision(plr.Location, entrance, direction))
+        if(WarpCollision(plr.Location, entrance, direction) && (warp.Effect != 2 || onGround))
             canWarp = true;
     }
     else if(direction == 2 && plr.Controls.Left)
     {
-        if(WarpCollision(plr.Location, entrance, direction))
+        if(WarpCollision(plr.Location, entrance, direction) && onGround)
             canWarp = true;
     }
     else if(direction == 3 && plr.Controls.Down)
     {
-        if(WarpCollision(plr.Location, entrance, direction))
+        if(WarpCollision(plr.Location, entrance, direction) && onGround)
             canWarp = true;
     }
     else if(direction == 4 && plr.Controls.Right)
     {
-        if(WarpCollision(plr.Location, entrance, direction))
+        if(WarpCollision(plr.Location, entrance, direction) && onGround)
             canWarp = true;
     }
     // NOTE: Would be correct to move this up, but leave this here for a compatibility to keep the same behavior

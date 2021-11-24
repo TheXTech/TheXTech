@@ -15,6 +15,7 @@ Changes for 1.3.5.3
 -Fixed the vanilla bug: episodes list menu gets reset every attempt to go back from the character or the game save slot select menu
 -Fixed the soft-lock in an attempt to erase the gamesave using the two-player game menu
 -Order of episodes lists now alphabetical
+-Added the "compat.ini" option to require players to be on the ground to enter warps
 
 Changes for 1.3.5.2
 -Fixed the ARM64 building
