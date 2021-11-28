@@ -1012,7 +1012,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             tempPlayer = 0;
         }
 
-        PlaySound(SFX_Mushroom);
+        // PlaySound(SFX_Mushroom);
 
         if(tempPlayer == 0)
         {
