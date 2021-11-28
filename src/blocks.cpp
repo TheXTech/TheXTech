@@ -795,6 +795,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 #endif
 
     }
+#if 1 // FIXME: Possibly dead code (because all such numbers were replaced with normal NPC ID at PGE-FL side)
     else if(b.Special == 100) // Block contains a mushroom
     {
         if(!HitDown)
@@ -1329,6 +1330,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         NPC[numNPCs].Effect2 = 0;
         CheckSectionNPC(numNPCs);
     }
+#endif
 
     if(PSwitchTime > 0 && newBlock == 89 && b.Special == 0 && oldSpecial > 0)
     {
