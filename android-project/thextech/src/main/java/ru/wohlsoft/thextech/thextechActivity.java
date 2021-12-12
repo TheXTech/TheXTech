@@ -50,7 +50,7 @@ public class thextechActivity extends SDLActivity
     protected String[] getLibraries()
     {
         return new String[] {
-            "hidapi",
+//            "hidapi",
 //            "SDL2",
             "thextech"
         };

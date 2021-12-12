@@ -377,11 +377,13 @@ if(ANDROID)
 
 #    add_library(hidapi SHARED IMPORTED DEPENDS AudioCodecs_Local)
 #    set_target_properties(hidapi PROPERTIES IMPORTED_LOCATION "${DEPENDENCIES_INSTALL_DIR}/lib/libhidapi.so")
-    add_custom_target(SDL_ApkPackLibs_hidapi ALL
-        COMMAND ${CMAKE_COMMAND} -E copy "${DEPENDENCIES_INSTALL_DIR}/lib/libhidapi.so" "${APK_PACK_LIBS}"
-        DEPENDS SDL_ApkPackLibs_makeDir "${DEPENDENCIES_INSTALL_DIR}/lib/libhidapi.so" AudioCodecs_Local
-    )
-    add_dependencies(thextech SDL_ApkPackLibs_hidapi)
+
+# libhidapi.so is NO LONGER required since SDL 2.0.18
+#    add_custom_target(SDL_ApkPackLibs_hidapi ALL
+#        COMMAND ${CMAKE_COMMAND} -E copy "${DEPENDENCIES_INSTALL_DIR}/lib/libhidapi.so" "${APK_PACK_LIBS}"
+#        DEPENDS SDL_ApkPackLibs_makeDir "${DEPENDENCIES_INSTALL_DIR}/lib/libhidapi.so" AudioCodecs_Local
+#    )
+#    add_dependencies(thextech SDL_ApkPackLibs_hidapi)
 else()
     add_executable(thextech ${THEXTECH_SRC} ${LIB_SRC})
     pge_set_nopie(thextech)

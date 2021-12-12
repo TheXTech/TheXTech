@@ -60,6 +60,7 @@
 
         <activity
             android:name=".Launcher"
+            android:exported="true"
             android:theme="@style/Theme.AppCompat.NoActionBar"
             android:launchMode="singleInstance"
             android:screenOrientation="landscape">

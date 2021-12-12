@@ -14,16 +14,16 @@ def db_pass_alias = System.env.DB_PASS_ALIAS
 
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
     defaultConfig {
         if (buildAsApplication) {
             applicationId "ru.wohlsoft.thextech"
         }
         minSdkVersion 16
-        targetSdkVersion 30
+        targetSdkVersion 31
 // FIXME: Automatize the version taking from the version.cmake at the repository root
         versionName "1.3.5.3"
-        versionCode 01030503
+        versionCode 1030503
         externalNativeBuild {
             // REPLACE THIS with CMAKE build, HOW TO:
             // https://stackoverflow.com/questions/47604628/use-externalproject-add-to-include-opus-in-android
@@ -94,12 +94,12 @@ android {
         abortOnError false
     }
 
-    packagingOptions {
-        pickFirst 'lib/armeabi-v7a/libhidapi.so'
-        pickFirst 'lib/arm64-v8a/libhidapi.so'
-        pickFirst 'lib/x86/libhidapi.so'
-        pickFirst 'lib/x86_64/libhidapi.so'
-    }
+//    packagingOptions {
+//        pickFirst 'lib/armeabi-v7a/libhidapi.so'
+//        pickFirst 'lib/arm64-v8a/libhidapi.so'
+//        pickFirst 'lib/x86/libhidapi.so'
+//        pickFirst 'lib/x86_64/libhidapi.so'
+//    }
 
     if (buildAsLibrary) {
         libraryVariants.all { variant ->
@@ -116,8 +116,8 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'jniLibs')
-    implementation 'androidx.appcompat:appcompat:1.2.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
-    implementation 'com.google.android.material:material:1.3.0'
+    implementation 'androidx.appcompat:appcompat:1.4.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.2'
+    implementation 'com.google.android.material:material:1.4.0'
     implementation 'androidx.preference:preference:1.1.1'
 }

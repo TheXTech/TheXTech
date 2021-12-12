@@ -16,6 +16,7 @@ endif()
 option(PGE_SHARED_SDLMIXER "Link MixerX as a shared library (dll/so/dylib)" ${PGE_SHARED_SDLMIXER_DEFAULT})
 option(PGE_USE_LOCAL_SDL2 "Do use the locally-built SDL2 library from the AudioCodecs set. Otherwise, download and build the development top main version." ON)
 
+
 #if(WIN32)
 #    if(MSVC)
 #        set(SDL_MixerX_SO_Lib "${DEPENDENCIES_INSTALL_DIR}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}SDL2_mixer_ext${PGE_LIBS_DEBUG_SUFFIX}.lib")
@@ -32,7 +33,8 @@ option(PGE_USE_LOCAL_SDL2 "Do use the locally-built SDL2 library from the AudioC
 set_shared_lib(SDL_MixerX_SO_Lib "${DEPENDENCIES_INSTALL_DIR}/lib" SDL2_mixer_ext)
 set_shared_lib(SDL2_SO_Lib "${DEPENDENCIES_INSTALL_DIR}/lib" SDL2)
 
-set_shared_lib(SDLHIDAPI_SO_Lib "${DEPENDENCIES_INSTALL_DIR}/lib" hidapi)
+# NO LONGER REQUIRED SINCE SDL 2.0.18 (https://github.com/libsdl-org/SDL/issues/4955#issuecomment-968366436)
+# set_shared_lib(SDLHIDAPI_SO_Lib "${DEPENDENCIES_INSTALL_DIR}/lib" hidapi)
 
 set_static_lib(SDL2_main_A_Lib "${DEPENDENCIES_INSTALL_DIR}/lib" SDL2main)
 
@@ -199,7 +201,7 @@ ExternalProject_Add(
         "${SDL2_SO_Lib}"
         "${SDL2_A_Lib}"
         "${SDL2_main_A_Lib}"
-        "${SDLHIDAPI_SO_Lib}"
+#        "${SDLHIDAPI_SO_Lib}" # No longer needed since SDL 2.0.18
         ${MixerX_CodecLibs}
 )
 
@@ -249,7 +251,7 @@ elseif(WIN32 AND MINGW)
 elseif(WIN32 AND MSVC)
     target_link_libraries(PGE_SDLMixerX INTERFACE "${SDL2_main_A_Lib}" "${SDL2_SO_Lib}")
 elseif(ANDROID)
-    target_link_libraries(PGE_SDLMixerX INTERFACE "${SDL2_SO_Lib}" "${SDLHIDAPI_SO_Lib}")
+    target_link_libraries(PGE_SDLMixerX INTERFACE "${SDL2_SO_Lib}") #  "${SDLHIDAPI_SO_Lib}" (No longer required since SDL 2.0.18)
 else()
     target_link_libraries(PGE_SDLMixerX INTERFACE "${SDL2_SO_Lib}")
 endif()
@@ -269,9 +271,9 @@ endif()
 
 target_link_libraries(PGE_SDLMixerX_static INTERFACE "${MixerX_SysLibs}")
 
-if(ANDROID)
-    target_link_libraries(PGE_SDLMixerX_static INTERFACE "${SDLHIDAPI_SO_Lib}")
-endif()
+#if(ANDROID) # No longer required since SDL 2.0.18
+#    target_link_libraries(PGE_SDLMixerX_static INTERFACE "${SDLHIDAPI_SO_Lib}")
+#endif()
 
 if(PGE_SHARED_SDLMIXER AND NOT WIN32)
     install(FILES ${SDL_MixerX_SO_Lib} DESTINATION "${PGE_INSTALL_DIRECTORY}")
