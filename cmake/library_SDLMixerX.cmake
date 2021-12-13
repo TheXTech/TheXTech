@@ -144,6 +144,7 @@ set_static_lib(AC_OGG          "${CODECS_LIBRARIES_DIR}" ogg)
 set_static_lib(AC_MAD          "${CODECS_LIBRARIES_DIR}" mad)
 set_static_lib(AC_ADLMIDI      "${CODECS_LIBRARIES_DIR}" ADLMIDI)
 set_static_lib(AC_OPNMIDI      "${CODECS_LIBRARIES_DIR}" OPNMIDI)
+set_static_lib(AC_EDMIDI       "${CODECS_LIBRARIES_DIR}" EDMIDI)
 set_static_lib(AC_TIMIDITYSDL  "${CODECS_LIBRARIES_DIR}" timidity_sdl2)
 set_static_lib(AC_GME          "${CODECS_LIBRARIES_DIR}" gme)
 if(MSVC) # MSVC-built libxmp has the "libxmp" name
@@ -165,6 +166,7 @@ set(MixerX_CodecLibs
 #    "${AC_MAD}"
     "${AC_ADLMIDI}"
     "${AC_OPNMIDI}"
+    "${AC_EDMIDI}"
     "${AC_TIMIDITYSDL}"
     "${AC_GME}"
     "${AC_LIBXMP}"
