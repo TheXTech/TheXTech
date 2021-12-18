@@ -268,7 +268,8 @@ void TouchBonus(int A, int B)
                 PlaySound(SFX_ZeldaHeart);
             else
             {
-                PlaySound(SFX_PlayerGrow);
+                if(SoundPlayerGrowWithGetItem)
+                    PlaySound(SFX_PlayerGrow);
                 PlaySound(SFX_GotItem);
             }
             if(NPC[B].Effect != 2)
@@ -301,7 +302,8 @@ void TouchBonus(int A, int B)
                     PlaySound(SFX_ZeldaHeart);
                 else
                 {
-                    PlaySound(SFX_PlayerGrow);
+                    if(SoundPlayerGrowWithGetItem)
+                        PlaySound(SFX_PlayerGrow);
                     PlaySound(SFX_GotItem);
                 }
             }
@@ -336,7 +338,8 @@ void TouchBonus(int A, int B)
                     PlaySound(SFX_ZeldaHeart);
                 else
                 {
-                    PlaySound(SFX_PlayerGrow);
+                    if(SoundPlayerGrowWithGetItem)
+                        PlaySound(SFX_PlayerGrow);
                     PlaySound(SFX_GotItem);
                 }
             }
@@ -365,7 +368,8 @@ void TouchBonus(int A, int B)
                     PlaySound(SFX_ZeldaHeart);
                 else
                 {
-                    PlaySound(SFX_PlayerGrow);
+                    if(SoundPlayerGrowWithGetItem)
+                        PlaySound(SFX_PlayerGrow);
                     PlaySound(SFX_GotItem);
                 }
             }
@@ -394,7 +398,8 @@ void TouchBonus(int A, int B)
                     PlaySound(SFX_ZeldaHeart);
                 else
                 {
-                    PlaySound(SFX_PlayerGrow);
+                    if(SoundPlayerGrowWithGetItem)
+                        PlaySound(SFX_PlayerGrow);
                     PlaySound(SFX_GotItem);
                 }
             }
@@ -423,7 +428,8 @@ void TouchBonus(int A, int B)
                     PlaySound(SFX_ZeldaHeart);
                 else
                 {
-                    PlaySound(SFX_PlayerGrow);
+                    if(SoundPlayerGrowWithGetItem)
+                        PlaySound(SFX_PlayerGrow);
                     PlaySound(SFX_GotItem);
                 }
             }

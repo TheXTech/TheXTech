@@ -1104,6 +1104,8 @@ extern bool GameplayShakeScreenThwomp;
 extern bool GameplayShakeScreenBowserIIIrd;
 // Shake screen on Yoshi ground pount
 extern bool GameplayShakeScreenPound;
+// Play "player grow" together with the "get item" sound to represent original games behaviour
+extern bool SoundPlayerGrowWithGetItem;
 // Enable usage of the rumble control
 extern bool JoystickEnableRumble;
 // Show the battery status for wireless gamepads
