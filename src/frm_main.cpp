@@ -1809,8 +1809,8 @@ void FrmMain::renderTexture(double xDstD, double yDstD, double wDstD, double hDs
                           (float)wDst,
                           (float)hDst};
 #else
-    SDL_Rect destRect = {(int)xDst + viewport_offset_x,
-                         (int)yDst + viewport_offset_y,
+    SDL_Rect destRect = {(int)xDst + m_viewport_offset_x,
+                         (int)yDst + m_viewport_offset_y,
                          (int)wDst,
                          (int)hDst};
 #endif
@@ -1876,8 +1876,8 @@ void FrmMain::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, dou
                           (float)hDst};
     auto &centerD = center;
 #else
-    SDL_Rect destRect = {(int)xDst + viewport_offset_x,
-                         (int)yDst + viewport_offset_y,
+    SDL_Rect destRect = {(int)xDst + m_viewport_offset_x,
+                         (int)yDst + m_viewport_offset_y,
                          (int)wDst,
                          (int)hDst};
     SDL_Point centerI = {center ? Maths::iRound(center->x) : 0,
@@ -1983,8 +1983,8 @@ void FrmMain::renderTextureFL(double xDstD, double yDstD, double wDstD, double h
                           (float)hDst};
     auto &centerD = center;
 #else
-    SDL_Rect destRect = {(int)xDst + viewport_offset_x,
-                         (int)yDst + viewport_offset_y,
+    SDL_Rect destRect = {(int)xDst + m_viewport_offset_x,
+                         (int)yDst + m_viewport_offset_y,
                          (int)wDst,
                          (int)hDst};
     SDL_Point centerI = {center ? Maths::iRound(center->x) : 0,
