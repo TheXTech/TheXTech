@@ -1,20 +1,21 @@
 /*
- * Moondust, a free game engine for platform game making
- * Copyright (c) 2014-2021 Vitaly Novichkov <admin@wohlnet.ru>
+ * TheXTech - A platform game engine ported from old source code for VB6
  *
- * This software is licensed under a dual license system (MIT or GPL version 3 or later).
- * This means you are free to choose with which of both licenses (MIT or GPL version 3 or later)
- * you want to use this software.
+ * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
+ * Copyright (c) 2020-2021 Vitaly Novichkov <admin@wohlnet.ru>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You can see text of MIT license in the LICENSE.mit file you can see in Engine folder,
- * or see https://mit-license.org/.
- *
- * You can see text of GPLv3 license in the LICENSE.gpl3 file you can see in Engine folder,
- * or see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 

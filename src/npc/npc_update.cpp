@@ -134,7 +134,7 @@ void UpdateNPCs()
         }
     }
 
-    if(FreezeNPCs == true) // When time is paused
+    if(FreezeNPCs) // When time is paused
     {
         StopHit = 0;
         for(A = numNPCs; A >= 1; A--) // check to see if NPCs should be killed
@@ -178,7 +178,7 @@ void UpdateNPCs()
     }
 
 
-    if(CoinMode == true) // this is a cheat code
+    if(CoinMode) // this is a cheat code
     {
         if(Lives >= 99 && Coins >= 99)
             CoinMode = false;
@@ -211,7 +211,7 @@ void UpdateNPCs()
             NPC[A].RespawnDelay -= 1;
         }
 
-        if(NPC[A].Hidden == true)
+        if(NPC[A].Hidden)
             Deactivate(A);
 
         if(NPC[A].TailCD > 0)
@@ -221,10 +221,10 @@ void UpdateNPCs()
             NPC[A].Killed = 9;
 
         // generator code
-        if(NPC[A].Generator == true)
+        if(NPC[A].Generator)
         {
             NPC[A].Active = false;
-            if(NPC[A].Hidden == false)
+            if(!NPC[A].Hidden)
             {
                 NPC[A].TimeLeft = 0;
                 NPC[A].GeneratorTime += 1;
@@ -232,7 +232,7 @@ void UpdateNPCs()
                 if(NPC[A].GeneratorTime >= NPC[A].GeneratorTimeMax * 6.5f)
                     NPC[A].GeneratorTime = NPC[A].GeneratorTimeMax * 6.5f;
 
-                if(NPC[A].GeneratorActive == true)
+                if(NPC[A].GeneratorActive)
                 {
                     NPC[A].GeneratorActive = false;
                     if(NPC[A].GeneratorTime >= NPC[A].GeneratorTimeMax * 6.5f)
@@ -240,7 +240,7 @@ void UpdateNPCs()
                         tempBool = false;
                         for(B = 1; B <= numNPCs; B++)
                         {
-                            if(B != A && NPC[B].Active == true && NPC[B].Type != 57)
+                            if(B != A && NPC[B].Active && NPC[B].Type != 57)
                             {
                                 if(CheckCollision(NPC[A].Location, NPC[B].Location))
                                     tempBool = true;
@@ -263,7 +263,7 @@ void UpdateNPCs()
                             {
                                 if(!Player[B].Dead && Player[B].TimeToLive == 0)
                                 {
-                                    if(CheckCollision(NPC[A].Location, Player[B].Location) == true)
+                                    if(CheckCollision(NPC[A].Location, Player[B].Location))
                                         tempBool = true;
                                 }
                             }
@@ -448,7 +448,7 @@ void UpdateNPCs()
                     }
                     else if(B != A && NPC[B].Active == true && NPC[B].TimeLeft < NPC[A].TimeLeft - 1)
                     {
-                        if(CheckCollision(tempLocation, NPC[B].Location) == true)
+                        if(CheckCollision(tempLocation, NPC[B].Location))
                             NPC[B].TimeLeft = NPC[A].TimeLeft - 1;
                     }
                 }
@@ -460,7 +460,7 @@ void UpdateNPCs()
                     C++;
                     if(NPC[newAct[C]].Type != 57 && NPC[newAct[C]].Type != 46 &&
                        NPC[newAct[C]].Type != 212 && NPC[newAct[C]].Type != 47 &&
-                       NPCIsACoin[NPC[newAct[C]].Type] == false)
+                       !NPCIsACoin[NPC[newAct[C]].Type])
                     {
                         tempLocation = NPC[newAct[C]].Location;
                         tempLocation.Y -= 32;
@@ -469,9 +469,9 @@ void UpdateNPCs()
                         tempLocation.Height += 64;
                         for(B = 1; B <= numNPCs; B++)
                         {
-                            if((NPC[B].Active == false) && B != A && NPC[B].Reset[1] == true && NPC[B].Reset[2] == true)
+                            if(!NPC[B].Active && B != A && NPC[B].Reset[1] && NPC[B].Reset[2])
                             {
-                                if(CheckCollision(tempLocation, NPC[B].Location) == true)
+                                if(CheckCollision(tempLocation, NPC[B].Location))
                                 {
                                     numAct += 1;
                                     SDL_assert_release(numAct <= maxNPCs);
@@ -497,9 +497,9 @@ void UpdateNPCs()
             {
                 for(B = 1; B <= numNPCs; B++)
                 {
-                    if(NPC[B].Type != 208 && NPC[B].Effect == 0 && NPC[B].Active == true)
+                    if(NPC[B].Type != 208 && NPC[B].Effect == 0 && NPC[B].Active)
                     {
-                        if(NPCNoClipping[NPC[B].Type] == false)
+                        if(!NPCNoClipping[NPC[B].Type])
                         {
                             if(NPC[A].Location.Y < NPC[B].Location.Y)
                             {
@@ -548,12 +548,12 @@ void UpdateNPCs()
         else if(fEqual(NPC[A].Location.Width, 128.0))
             NPC[A].Location.Width = 127.9;
 
-        if(NPC[A].Active == true && NPC[A].TimeLeft > 1)
+        if(NPC[A].Active && NPC[A].TimeLeft > 1)
         {
 
             if(NPC[A].Type == 45 && NPC[A].Special == 1)
             {
-                if(NPC[A].Projectile == true)
+                if(NPC[A].Projectile)
                     NPC[A].Special2 = 0;
                 else
                 {
@@ -566,11 +566,11 @@ void UpdateNPCs()
                 }
             }
 
-            if(NPCIsABlock[NPC[A].Type] || NPCIsAHit1Block[NPC[A].Type] || (NPCCanWalkOn[NPC[A].Type] == true && !(NPCIsCheep[NPC[A].Type] && NPC[A].Special == 2)))
+            if(NPCIsABlock[NPC[A].Type] || NPCIsAHit1Block[NPC[A].Type] || (NPCCanWalkOn[NPC[A].Type] && !(NPCIsCheep[NPC[A].Type] && NPC[A].Special == 2)))
             {
                 if(
                     (
-                        NPC[A].Projectile == false && NPC[A].HoldingPlayer == 0 &&
+                        !NPC[A].Projectile && NPC[A].HoldingPlayer == 0 &&
                         NPC[A].Effect == 0 && !(NPC[A].Type == 45 && NPC[A].Special == 1) &&
                        !((NPC[A].Type == 46 || NPC[A].Type == 212) && NPC[A].Special == 1)
                     ) || NPC[A].Type == 58 || NPC[A].Type == 67 || NPC[A].Type == 68 ||
@@ -587,9 +587,9 @@ void UpdateNPCs()
                     Block[numBlock].IsReally = A;
                     if(NPC[A].Type == 56)
                         Block[numBlock].Type = 25;
-                    if(NPCIsAHit1Block[NPC[A].Type] == true || (NPCCanWalkOn[NPC[A].Type] == true && !NPCIsABlock[NPC[A].Type]))
+                    if(NPCIsAHit1Block[NPC[A].Type] || (NPCCanWalkOn[NPC[A].Type] && !NPCIsABlock[NPC[A].Type]))
                         Block[numBlock].Type = 26;
-                    if(NPCCanWalkOn[NPC[A].Type] == true && NPCIsAHit1Block[NPC[A].Type] == false && NPCIsABlock[NPC[A].Type] == false)
+                    if(NPCCanWalkOn[NPC[A].Type] && !NPCIsAHit1Block[NPC[A].Type] && !NPCIsABlock[NPC[A].Type])
                         Block[numBlock].noProjClipping = true;
                     if(NPC[A].Type == 26 && Block[numBlock].Location.Height != 32)
                     {
@@ -639,7 +639,7 @@ void UpdateNPCs()
 
 
         StopHit = 0;
-        if(NPC[A].Projectile == false || NPC[A].Type == 50 || NPC[A].Type == 78)
+        if(!NPC[A].Projectile || NPC[A].Type == 50 || NPC[A].Type == 78)
             NPC[A].Multiplier = 0;
         if(NPC[A].Immune > 0)
             NPC[A].Immune -= 1;
@@ -647,7 +647,7 @@ void UpdateNPCs()
             NPC[A].TimeLeft = 100;
         if(NPC[A].JustActivated != 0)
         {
-            if(NPC[A].Active == true)
+            if(NPC[A].Active)
             {
                 if(NPC[A].Type == 197)
                 {
@@ -656,7 +656,7 @@ void UpdateNPCs()
                     int C = 0;
                     for(B = 1; B <= numBlock; B++)
                     {
-                        if(CheckCollision(tempLocation, Block[B].Location) == true)
+                        if(CheckCollision(tempLocation, Block[B].Location))
                         {
                             if(C == 0)
                                 C = B;
@@ -702,7 +702,7 @@ void UpdateNPCs()
                         NPC[A].Location.SpeedX = (1 + (NPC[A].Location.Y - NPC[A].DefaultLocation.Y) * 0.005) * NPC[A].Direction;
                         NPC[A].Special5 = 1;
                     }
-                    else if(!(NPC[A].Type == 42))
+                    else if(NPC[A].Type != 42)
                         PlaySound(SFX_Bullet);
                 }
                 else if(NPC[A].Type == 21)
@@ -718,9 +718,9 @@ void UpdateNPCs()
             if(NPC[A].Type == 22)
                 NPC[A].Projectile = false;
         }
-        else if(!(NPCIsCheep[NPC[A].Type] && Maths::iRound(NPC[A].Special) == 2) && !(NPC[A].Type == 12))
+        else if(!(NPCIsCheep[NPC[A].Type] && Maths::iRound(NPC[A].Special) == 2) && NPC[A].Type != 12)
         {
-            if(GameMenu == false && NPC[A].Location.Y > level[NPC[A].Section].Height + 16)
+            if(!GameMenu && NPC[A].Location.Y > level[NPC[A].Section].Height + 16)
                 NPCHit(A, 9);
         }
 
@@ -740,10 +740,8 @@ void UpdateNPCs()
                 NPC[A].Frame = SpecialFrame[7];
 
         }
-        else if(NPC[A].Active == true && NPC[A].Killed == 0 && NPC[A].Generator == false)
+        else if(NPC[A].Active && NPC[A].Killed == 0 && !NPC[A].Generator)
         {
-
-
             speedVar = 1;
             if(NPC[A].Slope > 0 && !(NPCIsAShell[NPC[A].Type] || (NPC[A].Type == 45 && NPC[A].Special == 1)))
             {
@@ -756,7 +754,7 @@ void UpdateNPCs()
             }
             speedVar = 1;
 
-            if(NPC[A].Projectile == false)
+            if(!NPC[A].Projectile)
                 speedVar = speedVar * NPCSpeedvar[NPC[A].Type];
 
             // water check
@@ -856,7 +854,7 @@ void UpdateNPCs()
                 if(NPC[A].Location.SpeedY < -3)
                     NPC[A].Location.SpeedY = -3;
             }
-            else if(!(NPC[A].Type != 190 && NPCIsCheep[NPC[A].Type] == false))
+            else if(!(NPC[A].Type != 190 && !NPCIsCheep[NPC[A].Type]))
             {
                 NPC[A].WallDeath += 2;
 
@@ -864,7 +862,7 @@ void UpdateNPCs()
                     NPC[A].WallDeath = 10;
             }
 
-            if(NPC[A].Quicksand > 0 && NPCNoClipping[NPC[A].Type] == false)
+            if(NPC[A].Quicksand > 0 && !NPCNoClipping[NPC[A].Type])
             {
                 NPC[A].Location.SpeedY += 1;
 
@@ -892,7 +890,8 @@ void UpdateNPCs()
                 NPC[A].Location.X += -NPC[A].Location.Width / 2.0;
                 NPC[A].Location.Y += -NPC[A].Location.Height / 2.0;
             }
-            if(NPC[A].Text != "")
+
+            if(!NPC[A].Text.empty())
             {
                 NPC[A].Chat = false;
                 tempLocation = NPC[A].Location;
@@ -902,12 +901,14 @@ void UpdateNPCs()
                 tempLocation.Width += 50;
                 for(B = 1; B <= numPlayers; B++)
                 {
-                    if(CheckCollision(tempLocation, Player[B].Location) == true)
+                    if(CheckCollision(tempLocation, Player[B].Location))
                         NPC[A].Chat = true;
                 }
             }
+
             oldDirection = NPC[A].Direction;
             UNUSED(oldDirection);
+
             if(NPC[A].Type == 17 || NPC[A].Type == 18)
             {
                 if(NPC[A].CantHurt > 0)
@@ -916,7 +917,7 @@ void UpdateNPCs()
                     if(NPC[A].Type == 18)
                         NPC[A].Location.SpeedX = 4 * NPC[A].Direction;
                 }
-                if(NPC[A].TimeLeft > 3 && BattleMode == false)
+                if(NPC[A].TimeLeft > 3 && !BattleMode)
                     NPC[A].TimeLeft = 3;
             }
 
@@ -924,7 +925,6 @@ void UpdateNPCs()
             {
                 if(NPC[A].TimeLeft > 1)
                     NPC[A].TimeLeft = Physics.NPCTimeOffScreen;
-
             }
 
             CheckSectionNPC(A);
@@ -948,7 +948,7 @@ void UpdateNPCs()
             }
             if((NPC[A].Type == 225 || NPC[A].Type == 226 || NPC[A].Type == 227) && NPC[A].TimeLeft > 10)
                 NPC[A].TimeLeft = 100;
-            if(NPC[A].TimeLeft > 10 && NoTurnBack[NPC[A].Section] == true)
+            if(NPC[A].TimeLeft > 10 && NoTurnBack[NPC[A].Section])
                 NPC[A].TurnBackWipe = true;
             if(NPC[A].TimeLeft < 1)
                 Deactivate(A);
@@ -968,9 +968,10 @@ void UpdateNPCs()
                         Player[NPC[A].HoldingPlayer].HoldingNPC = 0;
                         NPC[A].HoldingPlayer = 0;
                     }
-                    if(Player[NPC[A].HoldingPlayer].HoldingNPC == A && Player[NPC[A].HoldingPlayer].TimeToLive == 0 && Player[NPC[A].HoldingPlayer].Dead == false) // Player and NPC are on the same page
+                    if(Player[NPC[A].HoldingPlayer].HoldingNPC == A && Player[NPC[A].HoldingPlayer].TimeToLive == 0 && !Player[NPC[A].HoldingPlayer].Dead) // Player and NPC are on the same page
                     {
                         NPC[A].Multiplier = 0;
+
                         if(NPC[A].Type == 159)
                         {
                             Player[NPC[A].HoldingPlayer].HoldingNPC = 0;
@@ -978,11 +979,13 @@ void UpdateNPCs()
                             NPC[A].Killed = 9;
                             NewEffect(10, NPC[A].Location);
                         }
-                        if(NPCIsYoshi[NPC[A].Type] == true)
+
+                        if(NPCIsYoshi[NPC[A].Type])
                         {
                             NPC[A].Special = NPC[A].Type;
                             NPC[A].Type = 96;
                         }
+
                         if(NPC[A].Type == 91)
                         {
                             if(NPC[A].Special == 0.0)
@@ -1024,8 +1027,10 @@ void UpdateNPCs()
                                 NPC[A].Location.Y += -NPC[A].Location.Height / 2.0;
                             }
                         }
+
                         if(NPC[A].Type == 45)
                             NPC[A].Special = 1;
+
                         if(NPC[A].Type == 133)
                         {
                             NPC[A].Location.X += NPC[A].Location.Width / 2.0;
@@ -1036,6 +1041,7 @@ void UpdateNPCs()
                             NPC[A].Location.X += -NPC[A].Location.Width / 2.0;
                             NPC[A].Location.Y += -NPC[A].Location.Height / 2.0;
                         }
+
                         NPC[A].TimeLeft = 100;
                         NPC[A].BeltSpeed = 0;
 
@@ -1055,22 +1061,22 @@ void UpdateNPCs()
                         {
                             for(B = 1; B <= numNPCs; B++)
                             {
-                                if(B != A && NPC[B].Active == true &&
-                                    (NPC[B].HoldingPlayer == 0 || (BattleMode == true && NPC[B].HoldingPlayer != NPC[A].HoldingPlayer)) &&
-                                    !NPCIsABonus[NPC[B].Type] &&
-                                    (NPC[B].Type != 13  || (BattleMode == true && NPC[B].CantHurtPlayer != NPC[A].HoldingPlayer)) &&
-                                    (NPC[B].Type != 265 || (BattleMode == true && NPC[B].CantHurtPlayer != NPC[A].HoldingPlayer)) &&
+                                if(B != A && NPC[B].Active &&
+                                   (NPC[B].HoldingPlayer == 0 || (BattleMode && NPC[B].HoldingPlayer != NPC[A].HoldingPlayer)) &&
+                                   !NPCIsABonus[NPC[B].Type] &&
+                                   (NPC[B].Type != 13  || (BattleMode && NPC[B].CantHurtPlayer != NPC[A].HoldingPlayer)) &&
+                                   (NPC[B].Type != 265 || (BattleMode && NPC[B].CantHurtPlayer != NPC[A].HoldingPlayer)) &&
                                     NPC[B].Type != 21 && NPC[B].Type != 22 &&  NPC[B].Type != 26 && NPC[B].Type != 31 &&
                                     NPC[B].Type != 32 && NPC[B].Type != 238 && NPC[B].Type != 239 && NPC[B].Type != 191 &&
                                     NPC[B].Type != 35 && !(NPC[B].Type == 193 && NPC[A].Type == 193) &&
-                                    !(NPC[B].Type == 37) && !(NPC[B].Type == 180) && !(NPC[B].Type == 38) &&
-                                    !(NPC[B].Type == 39) && !(NPC[B].Type == 45 && NPC[B].Special == 0.0) &&
-                                    !(NPC[B].Type == 91) && !(NPC[B].Type == 159) && !(NPC[B].Type == 195) &&
-                                    !(NPC[B].Type == 30 && NPC[B].Projectile == true) && NPC[B].Type != 241 && NPC[B].Type != 263 && NPC[B].Type != 291)
+                                    NPC[B].Type != 37 && NPC[B].Type != 180 && NPC[B].Type != 38 &&
+                                    NPC[B].Type != 39 && !(NPC[B].Type == 45 && NPC[B].Special == 0.0) &&
+                                    NPC[B].Type != 91 && NPC[B].Type != 159 && NPC[B].Type != 195 &&
+                                   !(NPC[B].Type == 30 && NPC[B].Projectile) && NPC[B].Type != 241 && NPC[B].Type != 263 && NPC[B].Type != 291)
                                 {
-                                    if(NPC[A].CantHurtPlayer != NPC[B].CantHurtPlayer && NPC[B].Killed == 0 && (Player[NPC[A].HoldingPlayer].StandingOnNPC != B) && NPC[B].Inert == false)
+                                    if(NPC[A].CantHurtPlayer != NPC[B].CantHurtPlayer && NPC[B].Killed == 0 && (Player[NPC[A].HoldingPlayer].StandingOnNPC != B) && !NPC[B].Inert)
                                     {
-                                        if(CheckCollision(NPC[A].Location, NPC[B].Location) == true)
+                                        if(CheckCollision(NPC[A].Location, NPC[B].Location))
                                         {
                                             NPCHit(B, 3, A);
                                             if(NPC[B].Killed > 0)
@@ -1708,7 +1714,7 @@ void UpdateNPCs()
                                 }
                                 else if(NPCIsCheep[NPC[A].Type] && NPC[A].Special == 1 && NPC[A].Special5 == 1)
                                     NPC[A].Location.SpeedY += Physics.NPCGravity * 0.6;
-                                else if(NPC[A].Type == 278 || NPC[A].Type == 278)
+                                else if(NPC[A].Type == 278) // Here was a junk: duplicated "|| NPC[A].Type == 278" condition
                                 {
                                     NPC[A].Location.SpeedY += Physics.NPCGravity * 0.75;
                                     if(NPC[A].Location.SpeedY > Physics.NPCGravity * 15)
@@ -4889,9 +4895,9 @@ void UpdateNPCs()
                         }
                         for(B = (int)fBlock; B <= lBlock; B++)
                         {
-                            if(Block[B].Invis == false && !(BlockIsSizable[Block[B].Type] == true && NPC[A].Location.Y > Block[B].Location.Y) && Block[B].Hidden == false)
+                            if(!Block[B].Invis && !(BlockIsSizable[Block[B].Type] == true && NPC[A].Location.Y > Block[B].Location.Y) && Block[B].Hidden == false)
                             {
-                                if(CheckCollision(NPC[A].Location, Block[B].Location) == true)
+                                if(CheckCollision(NPC[A].Location, Block[B].Location))
                                 {
                                     NPC[A].Location.Y = Block[B].Location.Y - NPC[A].Location.Height - 0.1;
                                     break;
@@ -4908,6 +4914,7 @@ void UpdateNPCs()
                     NPC[A].Location.Y -= 1;
                     if(NPC[A].Type == 106)
                         NPC[A].Location.Y -= 1;
+
                     if(NPC[A].Location.Y + NPC[A].Location.Height <= NPC[A].Effect2)
                     {
                         NPC[A].Effect = 0;
@@ -4918,8 +4925,10 @@ void UpdateNPCs()
                 else if(NPC[A].Effect3 == 3)
                 {
                     NPC[A].Location.Y += 1;
+
                     if(NPC[A].Type == 106)
                         NPC[A].Location.Y += 1;
+
                     if(NPC[A].Location.Y >= NPC[A].Effect2)
                     {
                         NPC[A].Effect = 0;
@@ -4931,10 +4940,11 @@ void UpdateNPCs()
                 {
                     if(NPC[A].Type == 9 || NPC[A].Type == 90 || NPC[A].Type == 153 || NPC[A].Type == 184 || NPC[A].Type == 185 || NPC[A].Type == 186 || NPC[A].Type == 187 || NPC[A].Type == 163 || NPC[A].Type == 164)
                         NPC[A].Location.X -= double(Physics.NPCMushroomSpeed);
-                    else if(NPCCanWalkOn[NPC[A].Type] == true)
+                    else if(NPCCanWalkOn[NPC[A].Type])
                         NPC[A].Location.X -= 1;
                     else
                         NPC[A].Location.X -= double(Physics.NPCWalkingSpeed);
+
                     if(NPC[A].Location.X + NPC[A].Location.Width <= NPC[A].Effect2)
                     {
                         NPC[A].Effect = 0;
@@ -4946,10 +4956,11 @@ void UpdateNPCs()
                 {
                     if(NPC[A].Type == 9 || NPC[A].Type == 90 || NPC[A].Type == 153 || NPC[A].Type == 184 || NPC[A].Type == 185 || NPC[A].Type == 186 || NPC[A].Type == 187 || NPC[A].Type == 163 || NPC[A].Type == 164)
                         NPC[A].Location.X += double(Physics.NPCMushroomSpeed);
-                    else if(NPCCanWalkOn[NPC[A].Type] == true)
+                    else if(NPCCanWalkOn[NPC[A].Type])
                         NPC[A].Location.X += 1;
                     else
                         NPC[A].Location.X += double(Physics.NPCWalkingSpeed);
+
                     if(NPC[A].Location.X >= NPC[A].Effect2)
                     {
                         NPC[A].Effect = 0;

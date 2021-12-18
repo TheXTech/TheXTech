@@ -98,16 +98,23 @@ public:
      * \param pathToMask
      * \param pathToMaskFallback
      */
-    static void mergeWithMask(FIBITMAP *image, std::string pathToMask, std::string pathToMaskFallback = "");
+    static void mergeWithMask(FIBITMAP *image,
+                              const std::string &pathToMask,
+                              const std::string &pathToMaskFallback = std::string());
     static void mergeWithMask(FIBITMAP *image, std::vector<char> &maskRaw, bool maskIsPng = false);
     static void mergeWithMask(FIBITMAP *image, FIBITMAP *mask);
+
     /*!
      * \brief Gets metric from image file
      * \param [__in] imageFile Path to image file
      * \param [__out] imgSize Pointer to PGE_Size value
      */
-    static bool getImageMetrics(std::string imageFile, PGE_Size *imgSize);
-    static void getMaskedImageInfo(std::string rootDir, std::string in_imgName, std::string &out_maskName, std::string &out_errStr, PGE_Size *imgSize = nullptr);
+    static bool getImageMetrics(const std::string &imageFile, PGE_Size *imgSize);
+    static void getMaskedImageInfo(const std::string &rootDir,
+                                   const std::string &in_imgName,
+                                   std::string &out_maskName,
+                                   std::string &out_errStr,
+                                   PGE_Size *imgSize = nullptr);
 
     /*!
      * \brief Checks the possibility to shrink down the image with 2x factor without losses

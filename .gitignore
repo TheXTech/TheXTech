@@ -82,3 +82,7 @@ cmake-build-*/*
 .vscode/*
 .vs/*
 CMakeSettings.json
+
+# PVS-Studio related stuff
+*.PVS-Studio.*
+.PVS-Studio/

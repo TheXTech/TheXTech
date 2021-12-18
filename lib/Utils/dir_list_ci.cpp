@@ -1,12 +1,12 @@
-#include "dir_list_ci.h"
+#include <SDL2/SDL_stdinc.h>
 
 #include "../DirManager/dirman.h"
 #include "strings.h"
-#include <SDL2/SDL_stdinc.h>
+#include "dir_list_ci.h"
 
 
-DirListCI::DirListCI(const std::string &curDir)
-    : m_curDir(curDir)
+DirListCI::DirListCI(std::string curDir) noexcept
+    : m_curDir(std::move(curDir))
 {
     rescan();
 }

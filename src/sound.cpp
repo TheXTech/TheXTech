@@ -81,8 +81,8 @@ static int  s_musicYoshiTrackNumber = -1;
 static std::string MusicRoot;
 static std::string SfxRoot;
 
-static std::string musicIni = "music.ini";
-static std::string sfxIni = "sounds.ini";
+static std::string musicIni; // = "music.ini";
+static std::string sfxIni; // = "sounds.ini";
 
 struct Music_t
 {
@@ -130,17 +130,17 @@ void InitMixerX()
     if(ret != initFlags)
     {
         pLogWarning("MixerX: Some modules aren't properly initialized");
-        if((initFlags & MIX_INIT_MID) != MIX_INIT_MID)
+        if((ret & MIX_INIT_MID) != MIX_INIT_MID)
             pLogWarning("MixerX: Failed to initialize MIDI module");
-        if((initFlags & MIX_INIT_MOD) != MIX_INIT_MOD)
+        if((ret & MIX_INIT_MOD) != MIX_INIT_MOD)
             pLogWarning("MixerX: Failed to initialize Tracker music module");
-        if((initFlags & MIX_INIT_FLAC) != MIX_INIT_FLAC)
+        if((ret & MIX_INIT_FLAC) != MIX_INIT_FLAC)
             pLogWarning("MixerX: Failed to initialize FLAC module");
-        if((initFlags & MIX_INIT_OGG) != MIX_INIT_OGG)
+        if((ret & MIX_INIT_OGG) != MIX_INIT_OGG)
             pLogWarning("MixerX: Failed to initialize OGG Vorbis module");
-        if((initFlags & MIX_INIT_OPUS) != MIX_INIT_OPUS)
+        if((ret & MIX_INIT_OPUS) != MIX_INIT_OPUS)
             pLogWarning("MixerX: Failed to initialize Opus module");
-        if((initFlags & MIX_INIT_MP3) != MIX_INIT_MP3)
+        if((ret & MIX_INIT_MP3) != MIX_INIT_MP3)
             pLogWarning("MixerX: Failed to initialize MP3 module");
     }
 
@@ -173,9 +173,9 @@ void QuitMixerX()
         Mix_FreeMusic(g_curMusic);
     g_curMusic = nullptr;
 
-    for(auto it = sound.begin(); it != sound.end(); ++it)
+    for(auto & it : sound)
     {
-        auto &s = it->second;
+        auto &s = it.second;
         if(s.chunk)
             Mix_FreeChunk(s.chunk);
     }
@@ -187,8 +187,8 @@ void QuitMixerX()
 
 static void AddMusic(const std::string &root,
                      IniProcessing &ini,
-                     std::string alias,
-                     std::string group,
+                     const std::string &alias,
+                     const std::string &group,
                      int volume)
 {
     std::string f;
@@ -228,8 +228,8 @@ static void RestoreSfx(SFX_t &u)
 
 static void AddSfx(const std::string &root,
                    IniProcessing &ini,
-                   std::string alias,
-                   std::string group,
+                   const std::string &alias,
+                   const std::string &group,
                    bool isCustom = false)
 {
     std::string f;
@@ -281,12 +281,11 @@ static void AddSfx(const std::string &root,
         {
             SFX_t m;
             m.path = root + f;
-            m.volume = 128;
             m.isSilent = isSilent;
             pLogDebug("Adding SFX [%s] '%s'", alias.c_str(), isSilent ? "<silence>" : m.path.c_str());
             if(!isSilent)
                 m.chunk = Mix_LoadWAV(m.path.c_str());
-            m.channel = -1;
+
             if(m.chunk || isSilent)
             {
                 bool isSingleChannel = false;
@@ -298,15 +297,14 @@ static void AddSfx(const std::string &root,
             else
             {
                 pLogWarning("ERROR: SFX '%s' loading error: %s", m.path.c_str(), Mix_GetError());
-                if(!isCustom)
-                    g_errorsSfx++;
+                g_errorsSfx++;
             }
         }
     }
     ini.endGroup();
 }
 
-void SetMusicVolume(std::string Alias, long Volume)
+void SetMusicVolume(const std::string &Alias, long Volume)
 {
     auto mus = music.find(Alias);
     if(mus != music.end())
@@ -371,7 +369,7 @@ static void processPathArgs(std::string &path,
     path = p[0] + "|" + p[1];
 }
 
-void PlayMusic(std::string Alias, int fadeInMs)
+void PlayMusic(const std::string &Alias, int fadeInMs)
 {
     if(noSound)
         return;
@@ -405,7 +403,7 @@ void PlayMusic(std::string Alias, int fadeInMs)
     }
 }
 
-void PlaySfx(std::string Alias, int loops)
+void PlaySfx(const std::string &Alias, int loops)
 {
     auto sfx = sound.find(Alias);
     if(sfx != sound.end())
@@ -416,7 +414,7 @@ void PlaySfx(std::string Alias, int loops)
     }
 }
 
-void StopSfx(std::string Alias)
+void StopSfx(const std::string &Alias)
 {
     auto sfx = sound.find(Alias);
     if(sfx != sound.end())
@@ -579,7 +577,7 @@ void FadeOutMusic(int ms)
 
 void PlayInitSound()
 {
-    std::string doSound = AppPath + "sound/";
+    // std::string doSound = AppPath + "sound/";
     IniProcessing sounds(AppPath + "sounds.ini");
     unsigned int totalSounds;
     sounds.beginGroup("sound-main");

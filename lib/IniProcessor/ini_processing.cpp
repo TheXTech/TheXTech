@@ -240,7 +240,7 @@ inline void skipcomment(char *value)
     }
 }
 
-inline bool memfgets(char *&line, char *data, char *&pos, char *end)
+inline bool memfgets(char *&line, const char *data, char *&pos, const char *end)
 {
     line = pos;
 
@@ -269,9 +269,9 @@ inline bool memfgets(char *&line, char *data, char *&pos, char *end)
 bool IniProcessing::parseHelper(char *data, size_t size)
 {
     char *section = nullptr;
-    #if defined(INI_ALLOW_MULTILINE)
+#if defined(INI_ALLOW_MULTILINE)
     char *prev_name = nullptr;
-    #endif
+#endif
     char *start;
     char *end;
     char *name;
@@ -376,12 +376,10 @@ bool IniProcessing::parseHelper(char *data, size_t size)
         }
         }//switch(*start)
 
-        #if defined(INI_STOP_ON_FIRST_ERROR)
-
+#if defined(INI_STOP_ON_FIRST_ERROR)
         if(error)
             break;
-
-        #endif
+#endif
     }
 
     m_params.lineWithError = error;
@@ -393,7 +391,7 @@ bool IniProcessing::parseFile(const char *filename)
 {
     bool valid = true;
     char *tmp = nullptr;
-    #ifdef USE_FILE_MAPPER
+#ifdef USE_FILE_MAPPER
     //By mystical reasons, reading whole file form fread() is faster than mapper :-P
     PGE_FileMapper file(filename);
 
@@ -414,8 +412,8 @@ bool IniProcessing::parseFile(const char *filename)
     memcpy(tmp, file.data, static_cast<size_t>(file.size));
     *(tmp + file.size) = '\0';//null terminate last line
     valid = ini_parse_file(tmp, static_cast<size_t>(file.size));
-    #else
-    #ifdef _WIN32
+#else
+#   ifdef _WIN32
     //Convert UTF8 file path into UTF16 to support non-ASCII paths on Windows
     std::wstring dest;
     dest.resize(std::strlen(filename));
@@ -427,9 +425,9 @@ bool IniProcessing::parseFile(const char *filename)
                                       (int)dest.size());
     dest.resize(newSize);
     FILE *cFile = _wfopen(dest.c_str(), L"rb");
-    #else
+#   else
     FILE *cFile = fopen(filename, "rb");
-    #endif
+#   endif
 
     if(!cFile)
     {
@@ -471,7 +469,7 @@ bool IniProcessing::parseFile(const char *filename)
             m_params.errorCode = ERR_SECTION_SYNTAX;
         }
     }
-    #endif
+#endif
 
     free(tmp);
     return valid;
@@ -583,17 +581,17 @@ void IniProcessing::close()
     m_params.lineWithError = -1;
 }
 
-IniProcessing::ErrCode IniProcessing::lastError()
+IniProcessing::ErrCode IniProcessing::lastError() const
 {
     return m_params.errorCode;
 }
 
-int IniProcessing::lineWithError()
+int IniProcessing::lineWithError() const
 {
     return m_params.lineWithError;
 }
 
-bool IniProcessing::isOpened()
+bool IniProcessing::isOpened() const
 {
     return m_params.opened;
 }
@@ -603,7 +601,7 @@ bool IniProcessing::beginGroup(const std::string &groupName)
     //Keep the group name. If not exist, will be created on value write
     m_params.currentGroupName = groupName;
 
-    params::IniSections::iterator e = m_params.iniData.find(groupName);
+    auto e = m_params.iniData.find(groupName);
 
     if(e == m_params.iniData.end())
         return false;
@@ -618,16 +616,16 @@ bool IniProcessing::contains(const std::string &groupName)
     if(!m_params.opened)
         return false;
 
-    params::IniSections::iterator e = m_params.iniData.find(groupName);
+    auto e = m_params.iniData.find(groupName);
     return (e != m_params.iniData.end());
 }
 
-std::string IniProcessing::fileName()
+std::string IniProcessing::fileName() const
 {
     return m_params.filePath;
 }
 
-std::string IniProcessing::group()
+std::string IniProcessing::group() const
 {
     return m_params.currentGroupName;
 }
@@ -636,16 +634,14 @@ std::vector<std::string> IniProcessing::childGroups()
 {
     std::vector<std::string> groups;
     groups.reserve(m_params.iniData.size());
-    for(params::IniSections::iterator e = m_params.iniData.begin();
-        e != m_params.iniData.end();
-        e++)
+    for(auto & e : m_params.iniData)
     {
-        groups.push_back(e->first);
+        groups.push_back(e.first);
     }
     return groups;
 }
 
-bool IniProcessing::hasKey(const std::string &keyName)
+bool IniProcessing::hasKey(const std::string &keyName) const
 {
     if(!m_params.opened)
         return false;
@@ -653,11 +649,11 @@ bool IniProcessing::hasKey(const std::string &keyName)
     if(!m_params.currentGroup)
         return false;
 
-    params::IniKeys::iterator e = m_params.currentGroup->find(keyName);
+    auto e = m_params.currentGroup->find(keyName);
     return (e != m_params.currentGroup->end());
 }
 
-std::vector<std::string> IniProcessing::allKeys()
+std::vector<std::string> IniProcessing::allKeys() const
 {
     std::vector<std::string> keys;
     if(!m_params.opened)
@@ -667,11 +663,9 @@ std::vector<std::string> IniProcessing::allKeys()
 
     keys.reserve(m_params.currentGroup->size());
 
-    for(params::IniKeys::iterator it = m_params.currentGroup->begin();
-        it != m_params.currentGroup->end();
-        it++)
+    for(auto &it : *m_params.currentGroup)
     {
-        keys.push_back( it->first );
+        keys.push_back( it.first );
     }
 
     return keys;
@@ -986,7 +980,8 @@ inline void StrToNumVectorHelper(const std::string &source, TList &dest, const t
         std::string item;
         while(std::getline(ss, item, ','))
         {
-            std::remove(item.begin(), item.end(), ' ');
+            std::remove(item.begin(), item.end(), ' '); //-V530
+
             try
             {
                 if(std::is_same<T, int>::value ||
@@ -1302,6 +1297,7 @@ static inline bool isFloatValue(const std::string &str)
                     return false;
                 st = ST_DOT;
                 continue;
+
             case ST_DOT:
                 if(c != '.')
                     return false;
@@ -1311,16 +1307,19 @@ static inline bool isFloatValue(const std::string &str)
                 else
                     st = ST_EXPONENT;
                 continue;
+
             case ST_EXPONENT:
                 if((c != 'E') && (c != 'e'))
                     return false;
                 st = ST_EXPONENT_SIGN;
                 continue;
+
             case ST_EXPONENT_SIGN:
                 if(c != '-')
                     return false;
                 st = ST_TAIL;
                 continue;
+
             case ST_TAIL:
                 return false;
             }
@@ -1352,29 +1351,28 @@ bool IniProcessing::writeIniFile()
 #else
     FILE *cFile = fopen(m_params.filePath.c_str(), "wb");
 #endif
+
     if(!cFile)
         return false;
 
-    for(params::IniSections::iterator group = m_params.iniData.begin();
-        group != m_params.iniData.end();
-        group++)
+    for(auto &group : m_params.iniData)
     {
-        fprintf(cFile, "[%s]\n", group->first.c_str());
-        for(params::IniKeys::iterator key = group->second.begin();
-            key != group->second.end();
-            key++)
+        fprintf(cFile, "[%s]\n", group.first.c_str());
+
+        for(auto &key : group.second)
         {
-            if(isFloatValue(key->second))
+            if(isFloatValue(key.second))
             {
                 //Store as-is without quoting
-                fprintf(cFile, "%s = %s\n", key->first.c_str(), key->second.c_str());
+                fprintf(cFile, "%s = %s\n", key.first.c_str(), key.second.c_str());
             }
             else
             {
                 //Set escape quotes and put the string with a quotes
-                std::string &s = key->second;
+                std::string &s = key.second;
                 std::string escaped;
                 escaped.reserve(s.length() * 2);
+
                 for(char &c : s)
                 {
                     switch(c)
@@ -1388,13 +1386,17 @@ bool IniProcessing::writeIniFile()
                         escaped.push_back(c);
                     }
                 }
-                fprintf(cFile, "%s = \"%s\"\n", key->first.c_str(), escaped.c_str());
+
+                fprintf(cFile, "%s = \"%s\"\n", key.first.c_str(), escaped.c_str());
             }
         }
+
         fprintf(cFile, "\n");
         fflush(cFile);
     }
+
     fclose(cFile);
+
     return true;
 }
 

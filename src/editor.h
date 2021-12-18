@@ -60,7 +60,7 @@ extern void UpdateEditor();
 
 extern void UpdateInterprocess();
 
-extern int EditorNPCFrame(int A, float& C, int N = 0);
+extern int EditorNPCFrame(const int A, float& C, int N = 0);
 
 extern void GetEditorControls();
 
@@ -80,6 +80,6 @@ extern void MouseMove(float X, float Y, bool nCur = false);
 
 extern void ResetNPC(int A);
 
-extern void BlockFill(Location_t Loc);
+extern void BlockFill(const Location_t &Loc);
 
 #endif // EDITOR_H

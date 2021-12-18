@@ -29,13 +29,13 @@ void SetupPlayers();
 void UpdatePlayer();
 // Public Sub PlayerHurt(A As Integer) 'Player got hurt
 // Player got hurt
-void PlayerHurt(int A);
+void PlayerHurt(const int A);
 // Public Sub PlayerDead(A As Integer) 'Set player up to die
 // Set player up to die
-void PlayerDead(int A);
+void PlayerDead(const int A);
 // Public Sub KillPlayer(A As Integer) 'Kill the player
 // Kill the player
-void KillPlayer(int A);
+void KillPlayer(const int A);
 // Public Function CheckDead() As Integer 'Check if players are dead and return which one, returns 0 if everyones dead
 // Check if players are dead and return which one, returns 0 if everyones dead
 int CheckDead();
@@ -50,55 +50,55 @@ bool LivingPlayers();
 void EveryonesDead();
 // Public Sub UnDuck(A As Integer) 'Un Duck the player
 // Un Duck the player
-void UnDuck(int A);
+void UnDuck(const int A);
 // Public Sub CheckSection(A As Integer)
-void CheckSection(int A);
+void CheckSection(const int A);
 // Public Sub PlayerFrame(A As Integer)
-void PlayerFrame(int A);
+void PlayerFrame(const int A);
 // Public Sub UpdatePlayerBonus(A As Integer, B As Integer)
-void UpdatePlayerBonus(int A, int B);
+void UpdatePlayerBonus(const int A, const int B);
 // Public Sub TailSwipe(plr As Integer, Optional bool As Boolean = False, Optional Stab As Boolean = False, Optional StabDir As Integer = 0)  'for whacking something with the tail
 // for whacking something with the tail
-void TailSwipe(int plr, bool boo = false, bool Stab = false, int StabDir = 0);
+void TailSwipe(const int plr, bool boo = false, bool Stab = false, int StabDir = 0);
 // Public Sub YoshiHeight(A As Integer) 'fix the players height when on a yoshi
 // fix the players height when on a yoshi
-void YoshiHeight(int A);
+void YoshiHeight(const int A);
 // Public Sub YoshiEat(A As Integer)
-void YoshiEat(int A);
+void YoshiEat(const int A);
 // Public Sub YoshiSpit(A As Integer)
-void YoshiSpit(int A);
+void YoshiSpit(const int A);
 // Public Sub YoshiPound(A As Integer, C As Integer, Optional BreakBlocks As Boolean = False)
-void YoshiPound(int A, int mount, bool BreakBlocks = false);
+void YoshiPound(const int A, int mount, bool BreakBlocks = false);
 // Public Sub SwapCoop()
 void SwapCoop();
 // Public Sub PlayerPush(A As Integer, HitSpot As Integer)
-void PlayerPush(int A, int HitSpot);
+void PlayerPush(const int A, int HitSpot);
 // Public Sub SizeCheck(A As Integer)
-void SizeCheck(int A);
+void SizeCheck(const int A);
 // Public Sub YoshiEatCode(A As Integer)
-void YoshiEatCode(int A);
+void YoshiEatCode(const int A);
 // Public Sub StealBonus()
 void StealBonus();
 // Public Sub ClownCar()
 void ClownCar();
 
 // Private Sub WaterCheck(A As Integer)
-void WaterCheck(int A); //PRIVATE
+void WaterCheck(const int A); //PRIVATE
 // Private Sub Tanooki(A As Integer)
-void Tanooki(int A); //PRIVATE
+void Tanooki(const int A); //PRIVATE
 // Private Sub PowerUps(A As Integer)
-void PowerUps(int A); //PRIVATE
+void PowerUps(const int A); //PRIVATE
 // Private Sub SuperWarp(A As Integer)
-void SuperWarp(int A); //PRIVATE
+void SuperWarp(const int A); //PRIVATE
 // Private Sub PlayerCollide(A As Integer)
-void PlayerCollide(int A); //PRIVATE
+void PlayerCollide(const int A); //PRIVATE
 
 // Public Sub PlayerGrabCode(A As Integer, Optional DontResetGrabTime As Boolean = False)
-void PlayerGrabCode(int A, bool DontResetGrabTime = false);
+void PlayerGrabCode(const int A, bool DontResetGrabTime = false);
 // Public Sub LinkFrame(A As Integer)
-void LinkFrame(int A);
+void LinkFrame(const int A);
 // Private Sub PlayerEffects(A As Integer)
-void PlayerEffects(int A);
+void PlayerEffects(const int A);
 
 
 #endif // PLAYER_H

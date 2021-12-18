@@ -173,7 +173,8 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         {
             if(B != A)
             {
-                if(CheckCollision(b.Location, newLoc(Block[B].Location.X + 4, Block[B].Location.Y - 16, Block[B].Location.Width - 8, Block[B].Location.Height)))
+                const auto &bLoc = Block[B].Location;
+                if(CheckCollision(b.Location, newLoc(bLoc.X + 4, bLoc.Y - 16, bLoc.Width - 8, bLoc.Height)))
                 {
                     HitDown = false;
                     break;
@@ -350,7 +351,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
             for(auto B = 1; B <= numBlock; B++)
             {
-                if(B != A && Block[B].Hidden == false && (BlockOnlyHitspot1[Block[B].Type] & !BlockIsSizable[Block[B].Type]) == 0)
+                if(B != A && !Block[B].Hidden && !(BlockOnlyHitspot1[Block[B].Type] && !BlockIsSizable[Block[B].Type]))
                 {
                     if(CheckCollision(Block[B].Location, newLoc(b.Location.X + 1, b.Location.Y - 31, 30, 30)))
                     {
@@ -360,7 +361,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                 }
             }
 
-            if(tempBool == false)
+            if(!tempBool)
             {
                 for(auto B = 1; B <= b.Special; B++)
                 {

@@ -65,7 +65,7 @@ void SizableBlocks();
 static int loadingThread(void *waiter_ptr)
 {
 #ifndef PGE_NO_THREADING
-    SDL_atomic_t *waiter = (SDL_atomic_t *)waiter_ptr;
+    auto *waiter = (SDL_atomic_t *)waiter_ptr;
 #else
     UNUSED(waiter_ptr);
 #endif
@@ -190,7 +190,7 @@ int GameMain(const CmdLineSetup_t &setup)
         {
             gfxLoaderThreadingMode = false;
             pLogCritical("Failed to create the loading thread! Do running the load directly");
-            loadingThread(NULL);
+            loadingThread(nullptr);
         }
         else
         {
@@ -206,7 +206,7 @@ int GameMain(const CmdLineSetup_t &setup)
         }
     }
 #else
-    loadingThread(NULL);
+    loadingThread(nullptr);
 #endif
 
     LevelSelect = true; // world map is to be shown
@@ -279,9 +279,7 @@ int GameMain(const CmdLineSetup_t &setup)
             GoToLevelNoGameThing = false;
 
             for(int A = 1; A <= maxPlayers; A++)
-            {
                 Player[A] = blankPlayer;
-            }
 
             numPlayers = g_gameInfo.outroMaxPlayersCount;
             if(g_gameInfo.outroDeadMode)
@@ -423,7 +421,7 @@ int GameMain(const CmdLineSetup_t &setup)
             Checkpoint.clear();
             CheckpointsList.clear();
             WorldPlayer[1].Frame = 0;
-            CheatString = "";
+            CheatString.clear();
             LevelBeatCode = 0;
             curWorldLevel = 0;
 
@@ -944,38 +942,40 @@ void UpdateMacro()
     {
         for(A = 1; A <= numPlayers; A++)
         {
-            if(Player[A].Location.X < level[Player[A].Section].Width && !Player[A].Dead)
+            auto &p = Player[A];
+            auto &c = p.Controls;
+            if(p.Location.X < level[p.Section].Width && !p.Dead)
             {
                 OnScreen = true;
-                Player[A].Controls.Down = false;
-                Player[A].Controls.Drop = false;
-                Player[A].Controls.Jump = false;
-                Player[A].Controls.Left = false;
-                Player[A].Controls.Right = true;
-                Player[A].Controls.Run = false;
-                Player[A].Controls.Up = false;
-                Player[A].Controls.Start = false;
-                Player[A].Controls.AltJump = false;
-                Player[A].Controls.AltRun = false;
-                if(Player[A].Wet > 0 && Player[A].CanJump)
+                c.Down = false;
+                c.Drop = false;
+                c.Jump = false;
+                c.Left = false;
+                c.Right = true;
+                c.Run = false;
+                c.Up = false;
+                c.Start = false;
+                c.AltJump = false;
+                c.AltRun = false;
+                if(p.Wet > 0 && p.CanJump)
                 {
-                    if(Player[A].Location.SpeedY > 1)
-                        Player[A].Controls.Jump = true;
+                    if(p.Location.SpeedY > 1)
+                        c.Jump = true;
                 }
             }
             else
             {
-                Player[A].Location.SpeedY = -Physics.PlayerGravity;
-                Player[A].Controls.Down = false;
-                Player[A].Controls.Drop = false;
-                Player[A].Controls.Jump = false;
-                Player[A].Controls.Left = false;
-                Player[A].Controls.Right = true;
-                Player[A].Controls.Run = false;
-                Player[A].Controls.Up = false;
-                Player[A].Controls.Start = false;
-                Player[A].Controls.AltJump = false;
-                Player[A].Controls.AltRun = false;
+                p.Location.SpeedY = -Physics.PlayerGravity;
+                c.Down = false;
+                c.Drop = false;
+                c.Jump = false;
+                c.Left = false;
+                c.Right = true;
+                c.Run = false;
+                c.Up = false;
+                c.Start = false;
+                c.AltJump = false;
+                c.AltRun = false;
             }
         }
 
@@ -995,16 +995,17 @@ void UpdateMacro()
     {
         for(A = 1; A <= numPlayers; A++)
         {
-            Player[A].Controls.Down = false;
-            Player[A].Controls.Drop = false;
-            Player[A].Controls.Jump = false;
-            Player[A].Controls.Left = false;
-            Player[A].Controls.Right = false;
-            Player[A].Controls.Run = false;
-            Player[A].Controls.Up = false;
-            Player[A].Controls.Start = false;
-            Player[A].Controls.AltJump = false;
-            Player[A].Controls.AltRun = false;
+            auto &c = Player[A].Controls;
+            c.Down = false;
+            c.Drop = false;
+            c.Jump = false;
+            c.Left = false;
+            c.Right = false;
+            c.Run = false;
+            c.Up = false;
+            c.Start = false;
+            c.AltJump = false;
+            c.AltRun = false;
         }
 
         LevelMacroCounter += 1;
@@ -1079,16 +1080,17 @@ void UpdateMacro()
     {
         for(A = 1; A <= numPlayers; A++)
         {
-            Player[A].Controls.Down = false;
-            Player[A].Controls.Drop = false;
-            Player[A].Controls.Jump = false;
-            Player[A].Controls.Left = false;
-            Player[A].Controls.Right = false;
-            Player[A].Controls.Run = false;
-            Player[A].Controls.Up = false;
-            Player[A].Controls.Start = false;
-            Player[A].Controls.AltJump = false;
-            Player[A].Controls.AltRun = false;
+            auto &c = Player[A].Controls;
+            c.Down = false;
+            c.Drop = false;
+            c.Jump = false;
+            c.Left = false;
+            c.Right = false;
+            c.Run = false;
+            c.Up = false;
+            c.Start = false;
+            c.AltJump = false;
+            c.AltRun = false;
         }
 
         LevelMacroCounter += 1;
@@ -1106,16 +1108,17 @@ void UpdateMacro()
         // numNPCs = 0
         for(A = 1; A <= numPlayers; A++)
         {
-            Player[A].Controls.Down = false;
-            Player[A].Controls.Drop = false;
-            Player[A].Controls.Jump = false;
-            Player[A].Controls.Left = false;
-            Player[A].Controls.Right = false;
-            Player[A].Controls.Run = false;
-            Player[A].Controls.Up = false;
-            Player[A].Controls.Start = false;
-            Player[A].Controls.AltJump = false;
-            Player[A].Controls.AltRun = false;
+            auto &c = Player[A].Controls;
+            c.Down = false;
+            c.Drop = false;
+            c.Jump = false;
+            c.Left = false;
+            c.Right = false;
+            c.Run = false;
+            c.Up = false;
+            c.Start = false;
+            c.AltJump = false;
+            c.AltRun = false;
         }
 
         LevelMacroCounter += 1;
@@ -1141,16 +1144,17 @@ void UpdateMacro()
     {
         for(A = 1; A <= numPlayers; A++)
         {
-            Player[A].Controls.Down = false;
-            Player[A].Controls.Drop = false;
-            Player[A].Controls.Jump = false;
-            Player[A].Controls.Left = false;
-            Player[A].Controls.Right = false;
-            Player[A].Controls.Run = false;
-            Player[A].Controls.Up = false;
-            Player[A].Controls.Start = false;
-            Player[A].Controls.AltJump = false;
-            Player[A].Controls.AltRun = false;
+            auto &c = Player[A].Controls;
+            c.Down = false;
+            c.Drop = false;
+            c.Jump = false;
+            c.Left = false;
+            c.Right = false;
+            c.Run = false;
+            c.Up = false;
+            c.Start = false;
+            c.AltJump = false;
+            c.AltRun = false;
         }
 
         LevelMacroCounter += 1;
@@ -1166,32 +1170,35 @@ void UpdateMacro()
     {
         for(A = 1; A <= numPlayers; A++)
         {
-            if(Player[A].Location.X < level[Player[A].Section].Width && Player[A].Dead == false)
+            auto &p = Player[A];
+            auto &c = p.Controls;
+
+            if(p.Location.X < level[p.Section].Width && p.Dead == false)
             {
-                Player[A].Controls.Down = false;
-                Player[A].Controls.Drop = false;
-                Player[A].Controls.Jump = false;
-                Player[A].Controls.Left = false;
-                Player[A].Controls.Right = true;
-                Player[A].Controls.Run = false;
-                Player[A].Controls.Up = false;
-                Player[A].Controls.Start = false;
-                Player[A].Controls.AltJump = false;
-                Player[A].Controls.AltRun = false;
+                c.Down = false;
+                c.Drop = false;
+                c.Jump = false;
+                c.Left = false;
+                c.Right = true;
+                c.Run = false;
+                c.Up = false;
+                c.Start = false;
+                c.AltJump = false;
+                c.AltRun = false;
             }
             else
             {
-                Player[A].Location.SpeedY = -Physics.PlayerGravity;
-                Player[A].Controls.Down = false;
-                Player[A].Controls.Drop = false;
-                Player[A].Controls.Jump = false;
-                Player[A].Controls.Left = false;
-                Player[A].Controls.Right = true;
-                Player[A].Controls.Run = false;
-                Player[A].Controls.Up = false;
-                Player[A].Controls.Start = false;
-                Player[A].Controls.AltJump = false;
-                Player[A].Controls.AltRun = false;
+                p.Location.SpeedY = -Physics.PlayerGravity;
+                c.Down = false;
+                c.Drop = false;
+                c.Jump = false;
+                c.Left = false;
+                c.Right = true;
+                c.Run = false;
+                c.Up = false;
+                c.Start = false;
+                c.AltJump = false;
+                c.AltRun = false;
             }
         }
 
@@ -1292,6 +1299,7 @@ void NPCyFix()
     int A = 0;
     float XnH = 0;
     float XnHfix = 0;
+
     for(A = 1; A <= numNPCs; A++)
     {
         XnH = NPC[A].Location.Y + NPC[A].Location.Height;
@@ -1413,13 +1421,13 @@ Location_t roundLoc(const Location_t &inLoc, double grid)
     return ret;
 }
 
-void MoreScore(int addScore, Location_t Loc)
+void MoreScore(int addScore, const Location_t &Loc)
 {
     int mult = 0; // dummy
     MoreScore(addScore, Loc, mult);
 }
 
-void MoreScore(int addScore, Location_t Loc, int &Multiplier)
+void MoreScore(int addScore, const Location_t &Loc, int &Multiplier)
 {
     //int oldM = 0;
     int A = 0;
@@ -1490,15 +1498,17 @@ void StartBattleMode()
     int A = 0;
     Player_t blankPlayer;
     numPlayers = 2;
+
     for(A = 1; A <= numCharacters; A++)
     {
         SavedChar[A] = blankPlayer;
         SavedChar[A].Character = A;
         SavedChar[A].State = 1;
     }
+
     Player[1].State = 2;
     Player[1].Mount = 0;
-    Player[1].Character = 1;
+    // Player[1].Character = 1; // Assigned below
     Player[1].HeldBonus = 0;
     Player[1].CanFly = false;
     Player[1].CanFly2 = false;
@@ -1509,7 +1519,7 @@ void StartBattleMode()
     Player[1].Hearts = 2;
     Player[2].State = 2;
     Player[2].Mount = 0;
-    Player[2].Character = 2;
+    //Player[2].Character = 2; // Assigned below
     Player[2].HeldBonus = 0;
     Player[2].CanFly = false;
     Player[2].CanFly2 = false;

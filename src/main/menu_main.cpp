@@ -21,7 +21,7 @@
 #include <SDL2/SDL_timer.h>
 #include <SDL2/SDL_thread.h>
 #include <fmt_format_ne.h>
-#include <atomic>
+#include <array>
 
 #include <AppPath/app_path.h>
 #include <DirManager/dirman.h>
@@ -89,20 +89,29 @@ static int FindWorldsThread(void *)
     return 0;
 }
 
+#if (defined(__APPLE__) && defined(USE_BUNDLED_ASSETS)) || defined(FIXED_ASSETS_PATH)
+#   define USER_WORLDS_NEEDED
+#   define WORLD_ROOTS_SIZE 2
+#else
+#   define WORLD_ROOTS_SIZE 1
+#endif
+
 void FindWorlds()
 {
     bool compatModern = (CompatGetLevel() == COMPAT_MODERN);
     NumSelectWorld = 0;
     menuRecentEpisode = -1;
 
-    std::vector<std::string> worldRoots;
-    worldRoots.push_back(AppPath + "worlds/");
-#if (defined(__APPLE__) && defined(USE_BUNDLED_ASSETS)) || defined(FIXED_ASSETS_PATH)
-    worldRoots.push_back(AppPathManager::userWorldsRootDir() + "/");
+    std::array<std::string, WORLD_ROOTS_SIZE> worldRoots =
+    {
+        AppPath + "worlds/"
+#ifdef USER_WORLDS_NEEDED
+        , AppPathManager::userWorldsRootDir() + "/"
 #endif
+    };
 
     SelectWorld.clear();
-    SelectWorld.push_back(SelectWorld_t()); // Dummy entry
+    SelectWorld.emplace_back(SelectWorld_t()); // Dummy entry
 
     SDL_AtomicSet(&loadingProgrss, 0);
     SDL_AtomicSet(&loadingProgrssMax, 0);
@@ -112,7 +121,7 @@ void FindWorlds()
         std::vector<std::string> dirs;
         DirMan episodes(worldsRoot);
         episodes.getListOfFolders(dirs);
-        SDL_AtomicAdd(&loadingProgrssMax, dirs.size());
+        SDL_AtomicAdd(&loadingProgrssMax, (int)dirs.size());
     }
 
     for(const auto &worldsRoot : worldRoots)
@@ -193,7 +202,7 @@ void FindWorlds()
             worldCurs = menuRecentEpisode - 3;
     }
 
-    NumSelectWorld = (SelectWorld.size() - 1);
+    NumSelectWorld = (int)(SelectWorld.size() - 1);
     MenuCursor = (menuRecentEpisode < 0) ? 0 : menuRecentEpisode;
 
     SDL_AtomicSet(&loading, 0);
@@ -207,17 +216,19 @@ static int FindLevelsThread(void *)
 
 void FindLevels()
 {
-    std::vector<std::string> battleRoots;
-    battleRoots.push_back(AppPath + "battle/");
-#if (defined(__APPLE__) && defined(USE_BUNDLED_ASSETS)) || defined(FIXED_ASSETS_PATH)
-    battleRoots.push_back(AppPathManager::userBattleRootDir() + "/");
+    std::array<std::string, WORLD_ROOTS_SIZE> battleRoots =
+    {
+        AppPath + "battle/"
+#ifdef USER_WORLDS_NEEDED
+        , AppPathManager::userBattleRootDir() + "/"
 #endif
+    };
 
     SelectWorld.clear();
-    SelectWorld.push_back(SelectWorld_t()); // Dummy entry
+    SelectWorld.emplace_back(SelectWorld_t()); // Dummy entry
 
     NumSelectWorld = 1;
-    SelectWorld.push_back(SelectWorld_t()); // "random level" entry
+    SelectWorld.emplace_back(SelectWorld_t()); // "random level" entry
     SelectWorld[1].WorldName = "Random Level";
     LevelData head;
 
@@ -229,7 +240,7 @@ void FindLevels()
         std::vector<std::string> files;
         DirMan battleLvls(battleRoot);
         battleLvls.getListOfFiles(files, {".lvl", ".lvlx"});
-        SDL_AtomicAdd(&loadingProgrssMax, files.size());
+        SDL_AtomicAdd(&loadingProgrssMax, (int)files.size());
     }
 
     for(const auto &battleRoot : battleRoots)
@@ -1173,20 +1184,20 @@ bool mainMenuUpdate()
                     if(MenuMouseY >= 350 + A * 30 && MenuMouseY <= 366 + A * 30)
                     {
                         if(A == 0)
-                            menuLen = 18 * std::strlen("player 1 controls") - 4;
+                            menuLen = 18 * 17 - 4; // std::strlen("player 1 controls")
                         else if(A == 1)
-                            menuLen = 18 * std::strlen("player 2 controls") - 4;
+                            menuLen = 18 * 17 - 4; // std::strlen("player 2 controls")
 #ifndef __ANDROID__
                         else if(A == 2)
                         {
                             if(resChanged)
-                                menuLen = 18 * std::strlen("windowed mode");
+                                menuLen = 18 * 13; // std::strlen("windowed mode")
                             else
-                                menuLen = 18 * std::strlen("fullscreen mode");
+                                menuLen = 18 * 15; // std::strlen("fullscreen mode")
                         }
 #endif
                         else
-                            menuLen = 18 * std::strlen("view credits") - 2;
+                            menuLen = 18 * 12 - 2; // std::strlen("view credits")
 
                         if(MenuMouseX >= 300 && MenuMouseX <= 300 + menuLen)
                         {
@@ -1272,55 +1283,58 @@ bool mainMenuUpdate()
                     {
                         if(MenuMouseY >= 260 - 44 + A * 30 && MenuMouseY <= 276 - 44 + A * 30)
                         {
-                            auto &ck = conKeyboard[MenuMode - MENU_INPUT_SETTINGS_BASE];
+//                            auto &ck = conKeyboard[MenuMode - MENU_INPUT_SETTINGS_BASE];
                             switch(A)
                             {
                             default:
                             case 0:
-                                menuLen = 18 * std::strlen("INPUT......KEYBOARD");
+                                menuLen = 18 * 19; // std::strlen("INPUT......KEYBOARD");
                                 break;
-                            case 1:
-                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
-                                                        getKeyName(ck.Up)).size());
-                                break;
-                            case 2:
-                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
-                                                        getKeyName(ck.Down)).size());
-                                break;
-                            case 3:
-                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
-                                                        getKeyName(ck.Left)).size());
-                                break;
-                            case 4:
-                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
-                                                        getKeyName(ck.Right)).size());
-                                break;
-                            case 5:
-                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
-                                                        getKeyName(ck.Run)).size());
-                                break;
-                            case 6:
-                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
-                                                        getKeyName(ck.AltRun)).size());
-                                break;
-                            case 7:
-                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
-                                                        getKeyName(ck.Jump)).size());
-                                break;
-                            case 8:
-                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
-                                                        getKeyName(ck.AltJump)).size());
-                                break;
-                            case 9:
-                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
-                                                        getKeyName(ck.Drop)).size());
-                                break;
-                            case 10:
-                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
-                                                        getKeyName(ck.Start)).size());
-                                break;
+                            case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8: case 9: case 10:
+                                menuLen = 18 * 17;
+                                break; // Every printed key treated as always 17 characters
+//                            case 1:
+//                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
+//                                                        getKeyName(ck.Up)).size());
+//                                break;
+//                            case 2:
+//                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
+//                                                        getKeyName(ck.Down)).size());
+//                                break;
+//                            case 3:
+//                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
+//                                                        getKeyName(ck.Left)).size());
+//                                break;
+//                            case 4:
+//                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
+//                                                        getKeyName(ck.Right)).size());
+//                                break;
+//                            case 5:
+//                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
+//                                                        getKeyName(ck.Run)).size());
+//                                break;
+//                            case 6:
+//                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
+//                                                        getKeyName(ck.AltRun)).size());
+//                                break;
+//                            case 7:
+//                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
+//                                                        getKeyName(ck.Jump)).size());
+//                                break;
+//                            case 8:
+//                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
+//                                                        getKeyName(ck.AltJump)).size());
+//                                break;
+//                            case 9:
+//                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
+//                                                        getKeyName(ck.Drop)).size());
+//                                break;
+//                            case 10:
+//                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
+//                                                        getKeyName(ck.Start)).size());
+//                                break;
                             case 11:
-                                menuLen = 18 * std::strlen("Reset tp default");
+                                menuLen = 18 * 16; // std::strlen("Reset tp default");
                                 break;
                             }
 
@@ -1345,13 +1359,10 @@ bool mainMenuUpdate()
                         if(MenuMouseY >= 260 - 44 + A * 30 && MenuMouseY <= 276 + A * 30 - 44)
                         {
                             if(A == 0)
-                            {
-                                menuLen = 18 * std::strlen("INPUT......JOYSTICK 1") - 2;
-                            }
+                                menuLen = 18 * 21 - 2; // std::strlen("INPUT......JOYSTICK 1")
                             else
-                            {
-                                menuLen = 18 * std::strlen("RUN........_");
-                            }
+                                menuLen = 18 * 12; // std::strlen("RUN........_");
+
                             if(MenuMouseX >= 300 && MenuMouseX <= 300 + menuLen)
                             {
                                 if(MenuMouseRelease && MenuMouseDown)
@@ -1745,7 +1756,7 @@ void mainMenuDraw()
     else if(MenuMode == MENU_1PLAYER_GAME || MenuMode == MENU_2PLAYER_GAME || MenuMode == MENU_BATTLE_MODE)
     {
         s_drawGameTypeTitle(300, 280);
-        std::string tempStr;
+        // std::string tempStr;
 
         minShow = 1;
         maxShow = NumSelectWorld;

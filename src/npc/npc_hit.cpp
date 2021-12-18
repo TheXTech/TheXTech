@@ -1646,18 +1646,18 @@ void NPCHit(int A, int B, int C)
                 NPC[A].Killed = 3;
             }
         }
-        // Player Fireball
     }
+    // Player Fireball
     else if(NPC[A].Type == 13 || NPC[A].Type == 265)
     {
-        if(!(B == 7) && !(B == 9) && !(B == 2))
+        if(B != 7 && B != 9 && B != 2)
         {
             if(B == 3 || B == 4)
             {
                 if(NPC[C].Type != 171)
                 {
-                    if(B != 6)
-                        PlaySound(SFX_BlockHit);
+                    // if(B != 6) // Always true
+                    PlaySound(SFX_BlockHit);
                     NPC[A].Killed = B;
                 }
             }
@@ -1668,8 +1668,8 @@ void NPCHit(int A, int B, int C)
                 NPC[A].Killed = B;
             }
         }
-        // Yoshi Fireball
     }
+    // Yoshi Fireball
     else if(NPC[A].Type == 108)
     {
         if(B == 3 || B == 5)
@@ -1677,8 +1677,8 @@ void NPCHit(int A, int B, int C)
             PlaySound(SFX_BlockHit);
             NPC[A].Killed = B;
         }
-        // Hammer Bros.
     }
+    // Hammer Bros.
     else if(NPC[A].Type == 29)
         NPC[A].Killed = B;
     // Hammer Bros. Hammer
@@ -1686,11 +1686,11 @@ void NPCHit(int A, int B, int C)
     {
         if(B == 3)
             NPC[A].Killed = B;
-        // Boom Boom
     }
+    // Boom Boom
     else if(NPC[A].Type == 15)
     {
-        if(!(NPC[A].Special == 4))
+        if(NPC[A].Special != 4)
         {
             if((B == 1 || B == 10) && NPC[A].Special == 0.0)
             {
@@ -1729,8 +1729,8 @@ void NPCHit(int A, int B, int C)
         }
         if(NPC[A].Damage >= 9)
             NPC[A].Killed = B;
-        // Bullet Bills
     }
+    // Bullet Bills
     else if(NPC[A].Type == 17 || NPC[A].Type == 18)
     {
         if(B == 1 || B == 3 || B == 4 || B == 5 || B == 7 || B == 8 || B == 10)
@@ -1754,8 +1754,8 @@ void NPCHit(int A, int B, int C)
                 }
             }
         }
-        // Birdo
     }
+    // Birdo
     else if(NPC[A].Type == 39)
     {
         if(NPC[A].Special >= 0)

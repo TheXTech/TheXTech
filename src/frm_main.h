@@ -61,11 +61,10 @@ class FrmMain
     SDL_Texture  *m_tBuffer = nullptr;
     SDL_Texture  *m_recentTarget = nullptr;
     std::set<SDL_Texture *> m_textureBank;
-    bool m_sdlLoaded = false;
     const Uint8 *m_keyboardState = nullptr;
     Uint32 m_lastMousePress = 0;
-    SDL_Event m_event;
-    SDL_RendererInfo m_ri;
+    SDL_Event m_event = {};
+    SDL_RendererInfo m_ri = {};
 #ifdef __ANDROID__
     bool m_blockRender = false;
 #endif
@@ -78,7 +77,7 @@ public:
 
     int MousePointer = 0;
 
-    FrmMain();
+    FrmMain() noexcept;
 
     SDL_Window *getWindow();
 

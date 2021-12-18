@@ -230,7 +230,7 @@ void GraphicsLazyPreLoad()
                 frmMain.lazyPreLoad(GFXLinkBMP[s]);
                 break;
             default: // Trap
-                SDL_assert_release(false && "Please fix me up if you implemented a new playable character, see gfx_update.cpp!");
+                abort(); // "Please fix me up if you implemented a new playable character, see gfx_update.cpp!"
                 return;
             }
         }
@@ -268,7 +268,7 @@ void UpdateGraphics(bool skipRepaint)
 //    On Error Resume Next
     float c = ShadowMode ? 0.f : 1.f;
     int A = 0;
-    std::string timeStr;
+//    std::string timeStr;
     int Z = 0;
     int numScreens = 0;
 

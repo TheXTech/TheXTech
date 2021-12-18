@@ -153,18 +153,18 @@ void InitMixerX();
 // Public Sub QuitMixerX()
 void QuitMixerX();
 // Public Sub SetMusicVolume(Alias As String, Volume As Long)
-void SetMusicVolume(std::string Alias, long Volume);
+void SetMusicVolume(const std::string &Alias, long Volume);
 // Public Sub SoundPauseAll()
 void SoundPauseAll();
 // Public Sub SoundResumeAll()
 void SoundResumeAll();
 void SoundPauseEngine(int paused);
 // Public Sub PlayMusic(Alias As String)
-void PlayMusic(std::string Alias, int fadeInMs = 0);
+void PlayMusic(const std::string &Alias, int fadeInMs = 0);
 // Public Sub PlaySfx(Alias As String)
-void PlaySfx(std::string Alias, int loops = 0);
+void PlaySfx(const std::string &Alias, int loops = 0);
 // Public Sub StopSfx(Alias As String)
-void StopSfx(std::string Alias);
+void StopSfx(const std::string &Alias);
 // Public Sub StartMusic(A As Integer) 'play music
 void setMusicStartDelay();
 void delayedMusicStart();

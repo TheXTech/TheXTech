@@ -564,7 +564,7 @@ void MenuLoop()
 
 void FindSaves()
 {
-    std::string newInput;
+//    std::string newInput;
     std::string episode = SelectWorld[selWorld].WorldPath;
     GamesaveData f;
 

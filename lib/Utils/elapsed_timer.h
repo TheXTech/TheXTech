@@ -1,7 +1,7 @@
 #ifndef ELAPSED_TIMER_H
 #define ELAPSED_TIMER_H
 
-#include <stdint.h>
+#include <cstdint>
 
 struct ElapsedTimer_p;
 
@@ -12,12 +12,13 @@ public:
     ElapsedTimer();
     ElapsedTimer(const ElapsedTimer &et);
     ~ElapsedTimer();
+    ElapsedTimer & operator=(const ElapsedTimer &et);
 
     void start();
     void restart();
 
-    int     elapsed();
-    int64_t nanoelapsed();
+    int     elapsed() const;
+    int64_t nanoelapsed() const;
 };
 
 #endif // ELAPSED_TIMER_H

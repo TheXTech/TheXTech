@@ -69,10 +69,12 @@ static SDL_bool IsFullScreen(SDL_Window *win)
     return (flags & SDL_WINDOW_FULLSCREEN_DESKTOP) ? SDL_TRUE : SDL_FALSE;
 }
 
-FrmMain::FrmMain()
+FrmMain::FrmMain() noexcept
 {
     ScaleWidth = ScreenW;
     ScaleHeight = ScreenH;
+    SDL_memset(&m_event, 0, sizeof(SDL_Event));
+    SDL_memset(&m_ri, 0, sizeof(SDL_RendererInfo));
 }
 
 SDL_Window *FrmMain::getWindow()
@@ -131,7 +133,6 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
 
     // Initialize SDL
     res = (SDL_Init(sdlInitFlags) < 0);
-    m_sdlLoaded = !res;
 
     // Workaround: https://discourse.libsdl.org/t/26995
     setlocale(LC_NUMERIC, "C");
@@ -1014,7 +1015,7 @@ StdPicture FrmMain::lazyLoadPicture(std::string path, std::string maskPath, std:
     if(!maskPath.empty() && Files::fileExists(maskPath))
     {
         dumpFullFile(target.rawMask, maskPath);
-        target.isMaskPng = false;
+        target.isMaskPng = false; //-V1048
     }
     else if(!maskFallbackPath.empty())
     {
@@ -1024,7 +1025,7 @@ StdPicture FrmMain::lazyLoadPicture(std::string path, std::string maskPath, std:
 
     target.inited = true;
     target.lazyLoaded = true;
-    target.texture = nullptr;
+    target.texture = nullptr; //-V1048
 
     return target;
 }
@@ -1294,13 +1295,14 @@ void FrmMain::drawBatteryStatus()
 }
 #endif
 
-static std::string shoot_getTimedString(std::string path, const char *ext = "png")
+static std::string shoot_getTimedString(const std::string &path, const char *ext = "png")
 {
     auto now = std::chrono::system_clock::now();
     std::time_t in_time_t = std::chrono::system_clock::to_time_t(now);
     std::tm t = fmt::localtime_ne(in_time_t);
     static int prevSec = 0;
     static int prevSecCounter = 0;
+
     if(prevSec != t.tm_sec)
     {
         prevSec = t.tm_sec;
@@ -1602,18 +1604,10 @@ void FrmMain::deleteTexture(StdPicture &tx, bool lazyUnload)
         return;
     }
 
-    if(!tx.texture)
-    {
-        if(!lazyUnload)
-            tx.inited = false;
-        return;
-    }
-
     auto corpseIt = m_textureBank.find(tx.texture);
     if(corpseIt == m_textureBank.end())
     {
-        if(tx.texture)
-            SDL_DestroyTexture(tx.texture);
+        SDL_DestroyTexture(tx.texture);
         tx.texture = nullptr;
         if(!lazyUnload)
             tx.inited = false;
@@ -1626,11 +1620,10 @@ void FrmMain::deleteTexture(StdPicture &tx, bool lazyUnload)
     m_textureBank.erase(corpse);
 
     tx.texture = nullptr;
-    if(!lazyUnload)
-        tx.inited = false;
 
     if(!lazyUnload)
     {
+        tx.inited = false;
         tx.raw.clear();
         tx.rawMask.clear();
         tx.lazyLoaded = false;
@@ -1640,6 +1633,7 @@ void FrmMain::deleteTexture(StdPicture &tx, bool lazyUnload)
         tx.frame_w = 0;
         tx.frame_h = 0;
     }
+
     tx.format = 0;
     tx.nOfColors = 0;
     tx.ColorUpper.r = 0;
@@ -2083,13 +2077,15 @@ int FrmMain::getPixelDataSize(const StdPicture &tx)
 
 void FrmMain::getPixelData(const StdPicture &tx, unsigned char *pixelData)
 {
-    if(!tx.texture)
-        return;
     int pitch, w, h, a;
     void *pixels;
+
+    if(!tx.texture)
+        return;
+
     SDL_SetTextureBlendMode(tx.texture, SDL_BLENDMODE_BLEND);
     SDL_QueryTexture(tx.texture, nullptr, &a, &w, &h);
     SDL_LockTexture(tx.texture, nullptr, &pixels, &pitch);
-    std::memcpy(pixelData, pixels, static_cast<size_t>(pitch * h));
+    std::memcpy(pixelData, pixels, static_cast<size_t>(pitch) * h);
     SDL_UnlockTexture(tx.texture);
 }

@@ -1984,7 +1984,7 @@ void UpdateInterprocess()
     IntProc::cmdUnLock();
 }
 
-int EditorNPCFrame(int A, float& C, int N)
+int EditorNPCFrame(const int A, float& C, int N)
 {
     int ret = 0;
 // find the default left/right frames for NPCs
@@ -2519,11 +2519,13 @@ void SetCursor()
 //            }
 //        }
     }
+#if 0 // Dead code because of condition above: if(EditorCursor.Mode == OptCursor_t::LVL_ERASER0 || EditorCursor.Mode == OptCursor_t::LVL_ERASER) // Eraser
     else if(EditorCursor.Mode == OptCursor_t::LVL_ERASER) // Eraser
     {
         EditorCursor.Location.Width = 32;
         EditorCursor.Location.Height = 32;
     }
+#endif
     else if(EditorCursor.Mode == 7) // Tiles
     {
 //        for(A = 1; A <= frmTiles::Tile.Count; A++)
@@ -2881,7 +2883,7 @@ void zTestLevel(bool magicHand, bool interProcess)
         }
 
         data = IntProc::editor->m_acceptedLevel;
-        if(!timeOut && !data.meta.ReadFileValid)
+        if(!timeOut && !data.meta.ReadFileValid) //-V560
         {
             pLogWarning("Bad file format!");
             GameIsActive = false;
@@ -3058,7 +3060,7 @@ void ResetNPC(int A)
     NPC[0].Frame = 0;
 }
 
-void BlockFill(Location_t Loc)
+void BlockFill(const Location_t &Loc)
 {
     bool tempBool = false;
     Location_t tempLoc;

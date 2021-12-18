@@ -88,7 +88,7 @@ static void compatInit(Compatibility_t &c)
         c.fix_platforms_acceleration = false;
         c.fix_pokey_collapse = false;
         c.fix_npc_downward_clip = false;
-        c.fix_npc55_kick_ice_blocks = false;
+        c.fix_npc55_kick_ice_blocks = false; //-V1048
         c.fix_climb_invisible_fences = false;
         c.fix_climb_bgo_speed_adding = false;
         c.enable_climb_bgo_layer_move = false;
@@ -99,14 +99,14 @@ static void compatInit(Compatibility_t &c)
         c.fix_link_clowncar_fairy = false;
         c.fix_dont_switch_player_by_clowncar = false;
         c.enable_multipoints = false;
-        c.fix_autoscroll_speed = false;
+        c.fix_autoscroll_speed = false; //-V1048
         // 1.3.5.1
         c.fix_blooper_stomp_effect = false;
         c.keep_bullet_bill_dir = false;
         c.fix_pswitch_dragon_coin = false;
         // 1.3.5.2
         c.fix_swooper_start_while_inactive = false;
-        c.fix_FreezeNPCs_no_reset = false;
+        c.fix_FreezeNPCs_no_reset = false; //-V1048
         // 1.3.6
     }
 

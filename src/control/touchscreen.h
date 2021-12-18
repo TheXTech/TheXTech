@@ -118,7 +118,7 @@ public:
     /*!
      * \brief Constructor
      */
-    TouchScreenController();
+    TouchScreenController() noexcept;
 
     /*!
      * \brief Destructor

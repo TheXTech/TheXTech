@@ -198,7 +198,7 @@ static bool tryJPEG(SDL_RWops* file, uint32_t *w, uint32_t *h)
             if(SDL_memcmp(head, "\xFF\xE1", 2) == 0) /* EXIF, skip it!*/
             {
                 const Sint64 curPos = pos + (head - raw);
-                Sint64 toSkip = BE16(head, 2);
+                unsigned int toSkip = BE16(head, 2);
                 SDL_RWseek(file, curPos + toSkip + 2, RW_SEEK_SET);
                 continue;
             }
@@ -241,7 +241,7 @@ bool PGE_ImageInfo::getImageSizeRW(SDL_RWops *image, uint32_t *w, uint32_t *h, i
     return ret;
 }
 
-bool PGE_ImageInfo::getImageSize(PGEString imagePath, uint32_t *w, uint32_t *h, int *errCode)
+bool PGE_ImageInfo::getImageSize(const PGEString &imagePath, uint32_t *w, uint32_t *h, int *errCode)
 {
     if(errCode)
         *errCode = ERR_OK;
@@ -288,7 +288,7 @@ bool PGE_ImageInfo::getImageSizeFromMem(const char *mem, size_t size, uint32_t *
 }
 
 
-PGEString PGE_ImageInfo::getMaskName(PGEString imageFileName)
+PGEString PGE_ImageInfo::getMaskName(const PGEString &imageFileName)
 {
     std::string mask = PGEStringToStd(imageFileName);
     //Make mask filename

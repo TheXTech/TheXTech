@@ -29,10 +29,10 @@
 class GFX_t
 {
     std::vector<StdPicture*> m_loadedImages;
-    void loadImage(StdPicture &img, std::string path);
+    void loadImage(StdPicture &img, const std::string &path);
     int m_loadErrors = 0;
 public:
-    GFX_t();
+    GFX_t() noexcept;
     bool load();
     void unLoad();
 
