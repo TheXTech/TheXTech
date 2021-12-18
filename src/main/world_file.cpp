@@ -39,7 +39,7 @@
 void OpenWorld(std::string FilePath)
 {
     // USE PGE-FL here
-    std::string newInput = "";
+    // std::string newInput = "";
     int FileRelease = 64;
     bool compatModern = (CompatGetLevel() == COMPAT_MODERN);
     int A = 0;

@@ -1615,7 +1615,9 @@ void UpdatePlayer()
                         if(Player[A].SpinJump || (Player[A].State != 4 && Player[A].State != 5) || Player[A].StandingOnNPC > 0 || Player[A].Slope > 0 || Player[A].Location.SpeedY == 0)
                             Player[A].DoubleJump = false;
                         // double jump code
-                        if(Player[A].DoubleJump && Player[A].Jump == 0 && Player[A].Location.SpeedY != 0 && Player[A].Slope == 0 && Player[A].StandingOnNPC == 0 && Player[A].Wet == 0 && Player[A].Vine == 0 && Player[A].WetFrame == false && Player[A].Fairy == false && Player[A].CanFly2 == false)
+                        if(Player[A].DoubleJump && Player[A].Jump == 0 && Player[A].Location.SpeedY != 0 && Player[A].Slope == 0 &&
+                           Player[A].StandingOnNPC == 0 && Player[A].Wet == 0 && Player[A].Vine == 0 &&
+                           !Player[A].WetFrame && !Player[A].Fairy && !Player[A].CanFly2)
                         {
                             if(Player[A].Controls.Jump && Player[A].JumpRelease)
                             {
@@ -1692,7 +1694,8 @@ void UpdatePlayer()
                                 tempSpeed = Player[A].Location.SpeedX * 0.2;
                             else
                                 tempSpeed = -Player[A].Location.SpeedX * 0.2;
-                            if((Player[A].Vine > 0 || Player[A].Location.SpeedY == 0 || Player[A].StandingOnNPC != 0 || Player[A].Slope > 0 || MultiHop == true) && Player[A].CanAltJump == true) // Player Jumped
+
+                            if((Player[A].Vine > 0 || Player[A].Location.SpeedY == 0 || Player[A].StandingOnNPC != 0 || Player[A].Slope > 0 || MultiHop) && Player[A].CanAltJump) // Player Jumped
                             {
                                 if(!Player[A].Duck)
                                 {
@@ -1899,7 +1902,11 @@ void UpdatePlayer()
                         // Racoon Mario
                         if((Player[A].State == 4 || Player[A].State == 5) || Player[A].YoshiBlue || (Player[A].Mount == 1 && Player[A].MountType == 3))
                         {
-                            if((Player[A].Controls.Jump || Player[A].Controls.AltJump) && ((Player[A].Location.SpeedY > Physics.PlayerGravity * 5 && Player[A].Character != 3 && Player[A].Character != 4) || (Player[A].Location.SpeedY > Physics.PlayerGravity * 10 && Player[A].Character == 3) || (Player[A].Location.SpeedY > Physics.PlayerGravity * 7.5 && Player[A].Character == 4)) && Player[A].GroundPound == false && Player[A].Slope == 0 && Player[A].Character != 5)
+                            if((Player[A].Controls.Jump || Player[A].Controls.AltJump) &&
+                              ((Player[A].Location.SpeedY > Physics.PlayerGravity * 5 && Player[A].Character != 3 && Player[A].Character != 4) ||
+                                (Player[A].Location.SpeedY > Physics.PlayerGravity * 10 && Player[A].Character == 3) ||
+                                (Player[A].Location.SpeedY > Physics.PlayerGravity * 7.5 && Player[A].Character == 4)) &&
+                               !Player[A].GroundPound && Player[A].Slope == 0 && Player[A].Character != 5)
                             {
                                 if(!Player[A].ShellSurf)
                                 {
@@ -2146,7 +2153,8 @@ void UpdatePlayer()
                     }
                     if(Player[A].FireBallCD == 0 && Player[A].Wet == 0 && !Player[A].Fairy && Player[A].Mount == 0)
                     {
-                        if(!Player[A].Duck && Player[A].Location.SpeedY < Physics.PlayerGravity && Player[A].StandingOnNPC == 0 && Player[A].Slope == 0 && Player[A].Controls.Up == false && Player[A].Stoned == false) // Link ducks when jumping
+                        if(!Player[A].Duck && Player[A].Location.SpeedY < Physics.PlayerGravity && Player[A].StandingOnNPC == 0 &&
+                            Player[A].Slope == 0 && !Player[A].Controls.Up && !Player[A].Stoned) // Link ducks when jumping
                         {
                             Player[A].SwordPoke = 0;
                             Player[A].Duck = true;
@@ -2445,7 +2453,7 @@ void UpdatePlayer()
                                             HitSpot = 0;
 
                                         // this handles the collision for blocks that are sloped on the bottom
-                                        if(BlockSlope2[Block[B].Type] != 0 && (Player[A].Location.Y > Block[B].Location.Y || (HitSpot != 2 && HitSpot != 4)) && HitSpot != 1 && ShadowMode == false)
+                                        if(BlockSlope2[Block[B].Type] != 0 && (Player[A].Location.Y > Block[B].Location.Y || (HitSpot != 2 && HitSpot != 4)) && HitSpot != 1 && !ShadowMode)
                                         {
                                             HitSpot = 0;
                                             tempSlope = B;
@@ -2579,7 +2587,7 @@ void UpdatePlayer()
 
                                                         Player[A].Location.Y = Block[B].Location.Y + (Block[B].Location.Height * Slope) - Player[A].Location.Height - 0.1;
 
-                                                        if(Player[A].Location.SpeedY > Player[A].Location.SpeedX * (Block[B].Location.Height / static_cast<double>(Block[B].Location.Width)) * BlockSlope[Block[B].Type] || Player[A].Slide == false)
+                                                        if(Player[A].Location.SpeedY > Player[A].Location.SpeedX * (Block[B].Location.Height / static_cast<double>(Block[B].Location.Width)) * BlockSlope[Block[B].Type] || !Player[A].Slide)
                                                         {
                                                             if(!Player[A].WetFrame)
                                                             {
@@ -2952,7 +2960,7 @@ void UpdatePlayer()
                     {
                         DontResetGrabTime = true;
                         B = tempHit3;
-                        if(Player[A].TailCount == 0 && Player[A].Controls.Down && Player[A].Controls.Run && Player[A].Mount == 0 && Player[A].Stoned == false && Player[A].HoldingNPC == 0 && (Player[A].GrabTime > 0 || Player[A].RunRelease))
+                        if(Player[A].TailCount == 0 && Player[A].Controls.Down && Player[A].Controls.Run && Player[A].Mount == 0 && !Player[A].Stoned && Player[A].HoldingNPC == 0 && (Player[A].GrabTime > 0 || Player[A].RunRelease))
                         {
                             if((Player[A].GrabTime >= 12 && Player[A].Character < 3) || (Player[A].GrabTime >= 16 && Player[A].Character == 3) || (Player[A].GrabTime >= 8 && Player[A].Character == 4))
                             {
@@ -3385,7 +3393,7 @@ void UpdatePlayer()
                             {
                                 if(CheckCollision(Player[A].Location, NPC[B].Location))
                                 {
-                                    if((NPC[B].Type == 58 || NPC[B].Type == 21 || NPC[B].Type == 67 || NPC[B].Type == 68 || NPC[B].Type == 69 || NPC[B].Type == 70) && NPC[B].Projectile == true)
+                                    if((NPC[B].Type == 58 || NPC[B].Type == 21 || NPC[B].Type == 67 || NPC[B].Type == 68 || NPC[B].Type == 69 || NPC[B].Type == 70) && NPC[B].Projectile)
                                         PlayerHurt(A);
                                     if((Player[A].Mount == 1 || Player[A].Mount == 3 || Player[A].SpinJump || (Player[A].ShellSurf && NPCIsAShell[NPC[B].Type]) || (Player[A].Stoned && !NPCCanWalkOn[NPC[B].Type])) && !NPCMovesPlayer[NPC[B].Type])
                                         HitSpot = BootCollision(Player[A].Location, NPC[B].Location, NPCCanWalkOn[NPC[B].Type]); // find the hitspot for normal mario
@@ -3524,7 +3532,11 @@ void UpdatePlayer()
                                         {
                                             if(Player[A].Mount == 1 || Player[A].Mount == 2 || Player[A].Stoned)
                                                 NPCHit(B, 8, A);
-                                            else if(!(NPC[B].Type == 245 || NPC[B].Type == 275 || NPC[B].Type == 8 || NPC[B].Type == 12 || NPC[B].Type == 36 || NPC[B].Type == 285 || NPC[B].Type == 286 || NPC[B].Type == 51 || NPC[B].Type == 52 || NPC[B].Type == 53 || NPC[B].Type == 54 || NPC[B].Type == 74 || NPC[B].Type == 93 || NPC[B].Type == 200 || NPC[B].Type == 205 || NPC[B].Type == 207 || NPC[B].Type == 201 || NPC[B].Type == 261 || NPC[B].Type == 270) && NPCCanWalkOn[NPC[B].Type] == false)
+                                            else if(!(NPC[B].Type == 245 || NPC[B].Type == 275 || NPC[B].Type == 8 || NPC[B].Type == 12 ||
+                                                      NPC[B].Type == 36 || NPC[B].Type == 285 || NPC[B].Type == 286 || NPC[B].Type == 51 ||
+                                                      NPC[B].Type == 52 || NPC[B].Type == 53 || NPC[B].Type == 54 || NPC[B].Type == 74 ||
+                                                      NPC[B].Type == 93 || NPC[B].Type == 200 || NPC[B].Type == 205 || NPC[B].Type == 207 ||
+                                                      NPC[B].Type == 201 || NPC[B].Type == 261 || NPC[B].Type == 270) && !NPCCanWalkOn[NPC[B].Type])
                                             {
                                                 if(Player[A].Wet > 0 && (NPCIsCheep[NPC[B].Type] || NPC[B].Type == 231 || NPC[B].Type == 235))
                                                 {
@@ -3532,6 +3544,7 @@ void UpdatePlayer()
                                                 else
                                                     NPCHit(B, 8, A);
                                             }
+
                                             if(NPC[B].Killed == 8 || NPCIsCheep[NPC[B].Type] || NPC[B].Type == 179 ||
                                                NPC[B].Type == 37 || NPC[B].Type == 180 || NPC[B].Type == 38 ||
                                                NPC[B].Type == 42 || NPC[B].Type == 43 || NPC[B].Type == 44 ||
@@ -3850,7 +3863,7 @@ void UpdatePlayer()
                                             {
                                                 if(NPCIsABonus[NPC[B].Type]) // Bonus
                                                     TouchBonus(A, B);
-                                                else if(NPCIsAShell[NPC[B].Type] && NPC[B].Location.SpeedX == 0 && Player[A].HoldingNPC == 0 && Player[A].Controls.Run == true)
+                                                else if(NPCIsAShell[NPC[B].Type] && NPC[B].Location.SpeedX == 0 && Player[A].HoldingNPC == 0 && Player[A].Controls.Run)
                                                 {
                                                     // grab turtle shells
                                                     //if(nPlay.Online == false || nPlay.MySlot + 1 == A)
@@ -4064,8 +4077,8 @@ void UpdatePlayer()
                                             }
 
                                             // this is for NPC that physically push the player
-                                            if(NPCMovesPlayer[NPC[B].Type] && NPC[B].Projectile == 0 && !(Player[A].HoldingNPC == B) &&
-                                              !(Player[A].Mount == 2 && (NPC[B].Type == 31 || NPC[B].Type == 32)) &&
+                                            if(NPCMovesPlayer[NPC[B].Type] && NPC[B].Projectile == 0 && Player[A].HoldingNPC != B &&
+                                               !(Player[A].Mount == 2 && (NPC[B].Type == 31 || NPC[B].Type == 32)) &&
                                                !ShadowMode && NPC[B].Effect != 2)
                                             {
                                                 if(Player[A].StandUp && Player[A].StandingOnNPC == 0)

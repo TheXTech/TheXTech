@@ -37,7 +37,7 @@ struct GameInfo
     bool disableBattleMode = true;
     bool disableTwoPlayer = true;
 
-    int creditsFont;
+    int creditsFont = 4;
     std::string creditsHomePage;
     std::vector<std::string> creditsGame;
 

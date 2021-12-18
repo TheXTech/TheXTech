@@ -520,7 +520,7 @@ void PauseGame(int plr)
         PGE_Delay(1);
         if(!GameIsActive)
             break;
-    } while(!(stopPause == true));
+    } while(!stopPause);
 
     GamePaused = false;
     Player[plr].UnStart = false;

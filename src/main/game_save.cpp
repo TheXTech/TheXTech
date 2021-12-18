@@ -119,7 +119,7 @@ void LoadGame()
 {
     int A = 0;
     size_t i = 0;
-    std::string newInput;
+//    std::string newInput;
 
     GamesaveData sav;
     std::string savePath = makeGameSavePath(SelectWorld[selWorld].WorldPath,

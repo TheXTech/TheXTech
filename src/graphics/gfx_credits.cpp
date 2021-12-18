@@ -20,7 +20,6 @@
 
 #include "../globals.h"
 #include "../graphics.h"
-#include "../game_main.h"
 #include "main/game_info.h"
 
 

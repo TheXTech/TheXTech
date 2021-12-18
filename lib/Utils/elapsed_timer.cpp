@@ -29,6 +29,14 @@ ElapsedTimer::~ElapsedTimer()
     delete p;
 }
 
+ElapsedTimer & ElapsedTimer::operator=(const ElapsedTimer &et)
+{
+    p = new ElapsedTimer_p;
+    assert(p);
+    p->recent = et.p->recent;
+    return *this;
+}
+
 void ElapsedTimer::start()
 {
     assert(p);
@@ -41,7 +49,7 @@ void ElapsedTimer::restart()
     p->recent = std::chrono::high_resolution_clock::now();
 }
 
-int ElapsedTimer::elapsed()
+int ElapsedTimer::elapsed() const
 {
     assert(p);
     using std::chrono::milliseconds;
@@ -49,7 +57,7 @@ int ElapsedTimer::elapsed()
     return static_cast<int>(duration_cast<milliseconds>(std::chrono::high_resolution_clock::now() - p->recent).count());
 }
 
-int64_t ElapsedTimer::nanoelapsed()
+int64_t ElapsedTimer::nanoelapsed() const
 {
     assert(p);
     using std::chrono::nanoseconds;

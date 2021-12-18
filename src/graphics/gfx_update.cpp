@@ -26,10 +26,8 @@
 #include "../collision.h"
 #include "../editor.h"
 #include "../npc.h"
-#include "../location.h"
 #include "../main/menu_main.h"
 #include "../main/speedrunner.h"
-#include "../control/joystick.h"
 #include "../main/trees.h"
 
 #include <fmt_format_ne.h>
@@ -230,7 +228,7 @@ void GraphicsLazyPreLoad()
                 frmMain.lazyPreLoad(GFXLinkBMP[s]);
                 break;
             default: // Trap
-                SDL_assert_release(false && "Please fix me up if you implemented a new playable character, see gfx_update.cpp!");
+                abort(); // "Please fix me up if you implemented a new playable character, see gfx_update.cpp!"
                 return;
             }
         }
@@ -268,7 +266,7 @@ void UpdateGraphics(bool skipRepaint)
 //    On Error Resume Next
     float c = ShadowMode ? 0.f : 1.f;
     int A = 0;
-    std::string timeStr;
+//    std::string timeStr;
     int Z = 0;
     int numScreens = 0;
 
@@ -1418,7 +1416,9 @@ void UpdateGraphics(bool skipRepaint)
 
             if(NPC[A].Effect == 0)
             {
-                if(NPC[A].HoldingPlayer == 0 && (NPC[A].standingOnPlayer > 0 || NPC[A].Type == 56 || NPC[A].Type == 22 || NPC[A].Type == 49 || NPC[A].Type == 91 || NPC[A].Type == 160 || NPC[A].Type == 282 || NPCIsACoin[NPC[A].Type]) && (NPC[A].Generator == false || LevelEditor == true))
+                if(NPC[A].HoldingPlayer == 0 && (NPC[A].standingOnPlayer > 0 || NPC[A].Type == 56 ||
+                   NPC[A].Type == 22 || NPC[A].Type == 49 || NPC[A].Type == 91 || NPC[A].Type == 160 ||
+                   NPC[A].Type == 282 || NPCIsACoin[NPC[A].Type]) && (!NPC[A].Generator || LevelEditor))
                 {
                     auto npcALoc = newLoc(NPC[A].Location.X - (NPCWidthGFX[NPC[A].Type] - NPC[A].Location.Width) / 2.0,
                                           NPC[A].Location.Y,
@@ -1533,7 +1533,13 @@ void UpdateGraphics(bool skipRepaint)
             float cn = NPC[A].Shadow ? 0.f : 1.f;
             if(NPC[A].Effect == 0)
             {
-                if(!(NPC[A].HoldingPlayer > 0 || NPCIsAVine[NPC[A].Type] || NPC[A].Type == 209 || NPC[A].Type == 282 || NPC[A].Type == 270 || NPC[A].Type == 160 || NPC[A].Type == 159 || NPC[A].Type == 8 || NPC[A].Type == 245 || NPC[A].Type == 93 || NPC[A].Type == 51 || NPC[A].Type == 52 || NPC[A].Type == 74 || NPC[A].Type == 256 || NPC[A].Type == 257 || NPC[A].Type == 56 || NPC[A].Type == 22 || NPC[A].Type == 49 || NPC[A].Type == 91) && !(NPC[A].Type == 45 && NPC[A].Special == 0) && NPC[A].standingOnPlayer == 0 && NPCForeground[NPC[A].Type] == false && (NPC[A].Generator == false || LevelEditor == true) && NPC[A].Type != 179 && NPC[A].Type != 263)
+                if(!(NPC[A].HoldingPlayer > 0 || NPCIsAVine[NPC[A].Type] || NPC[A].Type == 209 || NPC[A].Type == 282 ||
+                     NPC[A].Type == 270 || NPC[A].Type == 160 || NPC[A].Type == 159 || NPC[A].Type == 8 || NPC[A].Type == 245 ||
+                     NPC[A].Type == 93 || NPC[A].Type == 51 || NPC[A].Type == 52 || NPC[A].Type == 74 || NPC[A].Type == 256 ||
+                     NPC[A].Type == 257 || NPC[A].Type == 56 || NPC[A].Type == 22 || NPC[A].Type == 49 || NPC[A].Type == 91) &&
+                   !(NPC[A].Type == 45 && NPC[A].Special == 0) && NPC[A].standingOnPlayer == 0 &&
+                   !NPCForeground[NPC[A].Type] && (!NPC[A].Generator || LevelEditor) &&
+                   NPC[A].Type != 179 && NPC[A].Type != 263)
                 {
                     if(!NPCIsACoin[NPC[A].Type])
                     {

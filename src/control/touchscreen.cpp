@@ -649,7 +649,7 @@ void TouchScreenController::doVibration()
 #endif
 }
 
-TouchScreenController::TouchScreenController() = default;
+TouchScreenController::TouchScreenController() noexcept = default;
 TouchScreenController::~TouchScreenController() = default;
 
 void TouchScreenController::init()

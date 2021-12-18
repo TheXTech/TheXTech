@@ -967,7 +967,7 @@ void NPCSpecial(int A)
                 if(C >= 20)
                     npc.Special5 = 1;
             }
-            while(!(npc.Special5 > 0));
+            while(npc.Special5 <= 0);
         }
 
         if(Player[npc.Special5].Location.X + Player[npc.Special5].Location.Width / 2.0 < npc.Location.X + npc.Location.Width / 2.0)
@@ -1095,13 +1095,13 @@ void NPCSpecial(int A)
             do
             {
                 int i = (iRand() % numPlayers) + 1;
-                if(Player[i].Dead == false && Player[i].Section == npc.Section && Player[i].TimeToLive == 0)
+                if(!Player[i].Dead && Player[i].Section == npc.Section && Player[i].TimeToLive == 0)
                     npc.Special5 = i;
                 C += 1;
                 if(C >= 20)
                     npc.Special5 = 1;
             }
-            while(!(npc.Special5 > 0));
+            while(npc.Special5 <= 0);
         }
 
         if(Player[npc.Special5].Location.X + Player[npc.Special5].Location.Width / 2.0 < npc.Location.X + npc.Location.Width / 2.0)

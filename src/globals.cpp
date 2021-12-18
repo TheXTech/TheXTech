@@ -702,7 +702,7 @@ double vb6Round(double x, int decimals)
 {
     double res = x, decmul;
 
-    if(decimals < 0 || decimals > 22)
+    if(decimals < 0 || decimals >= 22)
         decimals = 0;
 
     if(SDL_fabs(x) < 1.0e16)

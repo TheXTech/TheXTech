@@ -69,10 +69,12 @@ static SDL_bool IsFullScreen(SDL_Window *win)
     return (flags & SDL_WINDOW_FULLSCREEN_DESKTOP) ? SDL_TRUE : SDL_FALSE;
 }
 
-FrmMain::FrmMain()
+FrmMain::FrmMain() noexcept
 {
     ScaleWidth = ScreenW;
     ScaleHeight = ScreenH;
+    SDL_memset(&m_event, 0, sizeof(SDL_Event));
+    SDL_memset(&m_ri, 0, sizeof(SDL_RendererInfo));
 }
 
 SDL_Window *FrmMain::getWindow()
@@ -131,7 +133,6 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
 
     // Initialize SDL
     res = (SDL_Init(sdlInitFlags) < 0);
-    m_sdlLoaded = !res;
 
     // Workaround: https://discourse.libsdl.org/t/26995
     setlocale(LC_NUMERIC, "C");
@@ -585,9 +586,9 @@ void FrmMain::eventMouseMove(SDL_MouseMotionEvent &event)
     }
 }
 
-void FrmMain::eventMouseWheel(SDL_MouseWheelEvent &m_event)
+void FrmMain::eventMouseWheel(SDL_MouseWheelEvent &event)
 {
-    MenuWheelDelta = m_event.y;
+    MenuWheelDelta = event.y;
     MenuWheelMoved = true;
 }
 
@@ -749,32 +750,32 @@ void FrmMain::updateViewport()
     w1 = w;
     h1 = h;
 
-    scale_x = w / ScaleWidth;
-    scale_y = h / ScaleHeight;
-    viewport_scale_x = scale_x;
-    viewport_scale_y = scale_y;
+    m_scale_x = w / ScaleWidth;
+    m_scale_y = h / ScaleHeight;
+    m_viewport_scale_x = m_scale_x;
+    m_viewport_scale_y = m_scale_y;
 
-    viewport_offset_x = 0;
-    viewport_offset_y = 0;
+    m_viewport_offset_x = 0;
+    m_viewport_offset_y = 0;
 
-    if(scale_x > scale_y)
+    if(m_scale_x > m_scale_y)
     {
-        w1 = scale_y * ScaleWidth;
-        viewport_scale_x = w1 / ScaleWidth;
+        w1 = m_scale_y * ScaleWidth;
+        m_viewport_scale_x = w1 / ScaleWidth;
     }
-    else if(scale_x < scale_y)
+    else if(m_scale_x < m_scale_y)
     {
-        h1 = scale_x * ScaleHeight;
-        viewport_scale_y = h1 / ScaleHeight;
+        h1 = m_scale_x * ScaleHeight;
+        m_viewport_scale_y = h1 / ScaleHeight;
     }
 
-    offset_x = (w - w1) / 2;
-    offset_y = (h - h1) / 2;
+    m_offset_x = (w - w1) / 2;
+    m_offset_y = (h - h1) / 2;
 
-    viewport_x = 0;
-    viewport_y = 0;
-    viewport_w = static_cast<int>(w1);
-    viewport_h = static_cast<int>(h1);
+    m_viewport_x = 0;
+    m_viewport_y = 0;
+    m_viewport_w = static_cast<int>(w1);
+    m_viewport_h = static_cast<int>(h1);
 }
 
 void FrmMain::resetViewport()
@@ -788,18 +789,18 @@ void FrmMain::setViewport(int x, int y, int w, int h)
     SDL_Rect topLeftViewport = {x, y, w, h};
     SDL_RenderSetViewport(m_gRenderer, &topLeftViewport);
 
-    viewport_x = x;
-    viewport_y = y;
-    viewport_w = w;
-    viewport_h = h;
+    m_viewport_x = x;
+    m_viewport_y = y;
+    m_viewport_w = w;
+    m_viewport_h = h;
 }
 
 void FrmMain::offsetViewport(int x, int y)
 {
-    if(viewport_offset_x != x || viewport_offset_y != y)
+    if(m_viewport_offset_x != x || m_viewport_offset_y != y)
     {
-        viewport_offset_x = x;
-        viewport_offset_y = y;
+        m_viewport_offset_x = x;
+        m_viewport_offset_y = y;
     }
 }
 
@@ -819,10 +820,13 @@ void FrmMain::setTargetScreen()
     m_recentTarget = nullptr;
 }
 
-StdPicture FrmMain::LoadPicture(std::string path, std::string maskPath, std::string maskFallbackPath)
+StdPicture FrmMain::LoadPicture(const std::string &path,
+                                const std::string &maskPath,
+                                const std::string &maskFallbackPath)
 {
     StdPicture target;
     FIBITMAP *sourceImage;
+    bool useMask = true;
 
     if(!GameIsActive)
         return target; // do nothing when game is closed
@@ -838,10 +842,7 @@ StdPicture FrmMain::LoadPicture(std::string path, std::string maskPath, std::str
 
     // Don't load mask if PNG image is used
     if(Files::hasSuffix(path, ".png"))
-    {
-        maskPath.clear();
-        maskFallbackPath.clear();
-    }
+        useMask = false;
 
     if(!sourceImage)
     {
@@ -866,7 +867,7 @@ StdPicture FrmMain::LoadPicture(std::string path, std::string maskPath, std::str
 #endif
 
     //Apply Alpha mask
-    if(!maskPath.empty() && Files::fileExists(maskPath))
+    if(useMask && !maskPath.empty() && Files::fileExists(maskPath))
     {
 #ifdef DEBUG_BUILD
         maskMergingTime.start();
@@ -876,7 +877,7 @@ StdPicture FrmMain::LoadPicture(std::string path, std::string maskPath, std::str
         maskElapsed = maskMergingTime.nanoelapsed();
 #endif
     }
-    else if(!maskFallbackPath.empty())
+    else if(useMask && !maskFallbackPath.empty())
     {
 #ifdef DEBUG_BUILD
         maskMergingTime.start();
@@ -973,10 +974,14 @@ static void dumpFullFile(std::vector<char> &dst, const std::string &path)
     SDL_RWclose(f);
 }
 
-StdPicture FrmMain::lazyLoadPicture(std::string path, std::string maskPath, std::string maskFallbackPath)
+StdPicture FrmMain::lazyLoadPicture(const std::string &path,
+                                    const std::string &maskPath,
+                                    const std::string &maskFallbackPath)
 {
     StdPicture target;
     PGE_Size tSize;
+    bool useMask = true;
+
     if(!GameIsActive)
         return target; // do nothing when game is closed
 
@@ -989,10 +994,7 @@ StdPicture FrmMain::lazyLoadPicture(std::string path, std::string maskPath, std:
 
     // Don't load mask if PNG image is used
     if(Files::hasSuffix(path, ".png"))
-    {
-        maskPath.clear();
-        maskFallbackPath.clear();
-    }
+        useMask = false;
 
     if(!GraphicsHelps::getImageMetrics(path, &tSize))
     {
@@ -1011,12 +1013,12 @@ StdPicture FrmMain::lazyLoadPicture(std::string path, std::string maskPath, std:
     dumpFullFile(target.raw, path);
 
     //Apply Alpha mask
-    if(!maskPath.empty() && Files::fileExists(maskPath))
+    if(useMask && !maskPath.empty() && Files::fileExists(maskPath))
     {
         dumpFullFile(target.rawMask, maskPath);
-        target.isMaskPng = false;
+        target.isMaskPng = false; //-V1048
     }
-    else if(!maskFallbackPath.empty())
+    else if(useMask && !maskFallbackPath.empty())
     {
         dumpFullFile(target.rawMask, maskFallbackPath);
         target.isMaskPng = true;
@@ -1024,7 +1026,7 @@ StdPicture FrmMain::lazyLoadPicture(std::string path, std::string maskPath, std:
 
     target.inited = true;
     target.lazyLoaded = true;
-    target.texture = nullptr;
+    target.texture = nullptr; //-V1048
 
     return target;
 }
@@ -1294,13 +1296,14 @@ void FrmMain::drawBatteryStatus()
 }
 #endif
 
-static std::string shoot_getTimedString(std::string path, const char *ext = "png")
+static std::string shoot_getTimedString(const std::string &path, const char *ext = "png")
 {
     auto now = std::chrono::system_clock::now();
     std::time_t in_time_t = std::chrono::system_clock::to_time_t(now);
     std::tm t = fmt::localtime_ne(in_time_t);
     static int prevSec = 0;
     static int prevSecCounter = 0;
+
     if(prevSec != t.tm_sec)
     {
         prevSec = t.tm_sec;
@@ -1588,8 +1591,8 @@ int FrmMain::makeShot_action(void *_pixels)
 SDL_Point FrmMain::MapToScr(int x, int y)
 {
     return {
-        static_cast<int>((static_cast<float>(x) - offset_x) / viewport_scale_x),
-        static_cast<int>((static_cast<float>(y) - offset_y) / viewport_scale_y)
+        static_cast<int>((static_cast<float>(x) - m_offset_x) / m_viewport_scale_x),
+        static_cast<int>((static_cast<float>(y) - m_offset_y) / m_viewport_scale_y)
     };
 }
 
@@ -1602,18 +1605,10 @@ void FrmMain::deleteTexture(StdPicture &tx, bool lazyUnload)
         return;
     }
 
-    if(!tx.texture)
-    {
-        if(!lazyUnload)
-            tx.inited = false;
-        return;
-    }
-
     auto corpseIt = m_textureBank.find(tx.texture);
     if(corpseIt == m_textureBank.end())
     {
-        if(tx.texture)
-            SDL_DestroyTexture(tx.texture);
+        SDL_DestroyTexture(tx.texture);
         tx.texture = nullptr;
         if(!lazyUnload)
             tx.inited = false;
@@ -1626,11 +1621,10 @@ void FrmMain::deleteTexture(StdPicture &tx, bool lazyUnload)
     m_textureBank.erase(corpse);
 
     tx.texture = nullptr;
-    if(!lazyUnload)
-        tx.inited = false;
 
     if(!lazyUnload)
     {
+        tx.inited = false;
         tx.raw.clear();
         tx.rawMask.clear();
         tx.lazyLoaded = false;
@@ -1640,6 +1634,7 @@ void FrmMain::deleteTexture(StdPicture &tx, bool lazyUnload)
         tx.frame_w = 0;
         tx.frame_h = 0;
     }
+
     tx.format = 0;
     tx.nOfColors = 0;
     tx.ColorUpper.r = 0;
@@ -1671,8 +1666,8 @@ void FrmMain::renderRect(int x, int y, int w, int h, float red, float green, flo
 #ifdef __ANDROID__
     SDL_assert(!m_blockRender);
 #endif
-    SDL_Rect aRect = {x + viewport_offset_x,
-                      y + viewport_offset_y,
+    SDL_Rect aRect = {x + m_viewport_offset_x,
+                      y + m_viewport_offset_y,
                       w, h};
     SDL_SetRenderDrawColor(m_gRenderer,
                            static_cast<unsigned char>(255.f * red),
@@ -1692,8 +1687,8 @@ void FrmMain::renderRectBR(int _left, int _top, int _right, int _bottom, float r
 #ifdef __ANDROID__
     SDL_assert(!m_blockRender);
 #endif
-    SDL_Rect aRect = {_left + viewport_offset_x,
-                      _top + viewport_offset_y,
+    SDL_Rect aRect = {_left + m_viewport_offset_x,
+                      _top + m_viewport_offset_y,
                       _right - _left, _bottom - _top};
     SDL_SetRenderDrawColor(m_gRenderer,
                            static_cast<unsigned char>(255.f * red),
@@ -1718,8 +1713,8 @@ void FrmMain::renderCircle(int cx, int cy, int radius, float red, float green, f
                                static_cast<unsigned char>(255.f * alpha)
                           );
 
-    cx += viewport_offset_x;
-    cy += viewport_offset_y;
+    cx += m_viewport_offset_x;
+    cy += m_viewport_offset_y;
 
     double dy = 1;
     do //for(double dy = 1; dy <= radius; dy += 1.0)
@@ -1809,8 +1804,8 @@ void FrmMain::renderTexture(double xDstD, double yDstD, double wDstD, double hDs
     }
 
 #ifndef XTECH_SDL_NO_RECTF_SUPPORT
-    SDL_FRect destRect = {(float)xDst + viewport_offset_x,
-                          (float)yDst + viewport_offset_y,
+    SDL_FRect destRect = {(float)xDst + m_viewport_offset_x,
+                          (float)yDst + m_viewport_offset_y,
                           (float)wDst,
                           (float)hDst};
 #else
@@ -1875,8 +1870,8 @@ void FrmMain::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, dou
     }
 
 #ifndef XTECH_SDL_NO_RECTF_SUPPORT
-    SDL_FRect destRect = {(float)xDst + viewport_offset_x,
-                          (float)yDst + viewport_offset_y,
+    SDL_FRect destRect = {(float)xDst + m_viewport_offset_x,
+                          (float)yDst + m_viewport_offset_y,
                           (float)wDst,
                           (float)hDst};
     auto &centerD = center;
@@ -1982,8 +1977,8 @@ void FrmMain::renderTextureFL(double xDstD, double yDstD, double wDstD, double h
     }
 
 #ifndef XTECH_SDL_NO_RECTF_SUPPORT
-    SDL_FRect destRect = {(float)xDst + viewport_offset_x,
-                          (float)yDst + viewport_offset_y,
+    SDL_FRect destRect = {(float)xDst + m_viewport_offset_x,
+                          (float)yDst + m_viewport_offset_y,
                           (float)wDst,
                           (float)hDst};
     auto &centerD = center;
@@ -2083,13 +2078,15 @@ int FrmMain::getPixelDataSize(const StdPicture &tx)
 
 void FrmMain::getPixelData(const StdPicture &tx, unsigned char *pixelData)
 {
-    if(!tx.texture)
-        return;
     int pitch, w, h, a;
     void *pixels;
+
+    if(!tx.texture)
+        return;
+
     SDL_SetTextureBlendMode(tx.texture, SDL_BLENDMODE_BLEND);
     SDL_QueryTexture(tx.texture, nullptr, &a, &w, &h);
     SDL_LockTexture(tx.texture, nullptr, &pixels, &pitch);
-    std::memcpy(pixelData, pixels, static_cast<size_t>(pitch * h));
+    std::memcpy(pixelData, pixels, static_cast<size_t>(pitch) * h);
     SDL_UnlockTexture(tx.texture);
 }

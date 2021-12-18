@@ -45,7 +45,7 @@ class RangeArr
 #endif
 
 public:
-    RangeArr()
+    RangeArr() noexcept
     {
 #ifdef RANGE_ARR_USE_HEAP
         array = new T[size];
@@ -110,7 +110,7 @@ class RangeArrI
 #endif
 
 public:
-    RangeArrI()
+    RangeArrI() noexcept
     {
 #ifdef RANGE_ARR_USE_HEAP
         array = new T[size];

@@ -164,6 +164,7 @@ BlocksAllocatorAdaptor<T> &
 BlocksAllocatorAdaptor<T>::operator=(const BlocksAllocatorAdaptor<U> &other)
 {
     allocator_ = other.allocator_;
+    return *this;
 }
 
 template <typename T>

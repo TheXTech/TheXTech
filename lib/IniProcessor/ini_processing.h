@@ -142,18 +142,18 @@ public:
      * @brief Returns last happen error code
      * @return Error code
      */
-    ErrCode lastError();
+    ErrCode lastError() const;
     /**
      * @brief Line number which contains error
      * @return line number wit herror
      */
-    int  lineWithError();
+    int  lineWithError() const;
 
     /**
      * @brief State of INI Processor
      * @return true if any file is opened
      */
-    bool isOpened();
+    bool isOpened() const;
 
     /**
      * @brief Select a section to process
@@ -173,13 +173,13 @@ public:
      * @brief Currently opened file name
      * @return path to currently opened file
      */
-    std::string fileName();
+    std::string fileName() const;
 
     /**
      * @brief Currently processing section
      * @return name of current section
      */
-    std::string group();
+    std::string group() const;
 
     /**
      * @brief Get list of available groups
@@ -192,13 +192,13 @@ public:
      * @param keyName name of key
      * @return true if key is presented in this section
      */
-    bool hasKey(const std::string &keyName);
+    bool hasKey(const std::string &keyName) const;
 
     /**
      * @brief Get list of available keys in current groul
      * @return Array of strings
      */
-    std::vector<std::string> allKeys();
+    std::vector<std::string> allKeys() const;
 
     /**
      * @brief Release current section to choice another for process

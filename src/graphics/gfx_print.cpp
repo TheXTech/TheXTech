@@ -32,7 +32,7 @@ namespace std
 
 int SuperTextPixLen(const std::string &SuperWords, int Font)
 {
-    int len = 0;
+    int len;
 
     switch(Font)
     {

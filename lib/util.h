@@ -35,13 +35,13 @@
 
 namespace util
 {
-std::string filePath(std::string s);
+std::string filePath(const std::string &s);
 bool strempty(const char *str);
 
 std::string resolveRelativeOrAbsolute(const std::string &path, const std::vector<std::string> &relativeLookup);
 
-void CSV2IntArr(std::string source, std::vector<int> &dest);
-void CSV2DoubleArr(std::string source, std::vector<double> &dest);
+void CSV2IntArr(const std::string &source, std::vector<int> &dest);
+void CSV2DoubleArr(const std::string &source, std::vector<double> &dest);
 void base64_encode(std::string &ret, const unsigned char *bytes_to_encode, size_t in_len);
 void base64_decode(std::string &ret, std::string const &encoded_string);
 
