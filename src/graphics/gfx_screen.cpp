@@ -90,12 +90,6 @@ void SetupScreens()
         vScreen[2].Top = 0;
         break;
     case 7:
-        vScreen[1].Left = 0;
-        vScreen[1].Width = 800;
-        vScreen[1].Top = 0;
-        vScreen[1].Height = 600;
-        vScreen[2].Visible = false;
-        break;
     case 8: // netplay
         vScreen[1].Left = 0;
         vScreen[1].Width = 800;
@@ -103,6 +97,15 @@ void SetupScreens()
         vScreen[1].Height = 600;
         vScreen[2].Visible = false;
         break;
+#if 0 // Merged with the branch above because they both are same
+    case 8: // netplay
+        vScreen[1].Left = 0;
+        vScreen[1].Width = 800;
+        vScreen[1].Top = 0;
+        vScreen[1].Height = 600;
+        vScreen[2].Visible = false;
+        break;
+#endif
 //    End If
     }
 }
@@ -272,7 +275,7 @@ void DynamicScreen()
         if(vScreen[2].Visible)
         {
             vScreen[2].Visible = false;
-            vScreen[1].Visible = false;
+            // vScreen[1].Visible = false; // Useless, because code below sets it as TRUE back
             vScreen[1].Height = ScreenH;
             vScreen[1].Width = ScreenW;
             vScreen[1].Left = 0;

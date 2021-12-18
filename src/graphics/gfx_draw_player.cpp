@@ -83,7 +83,7 @@ void DrawPlayer(const int A, const int Z)
             {
                 p.Frame = 1;
 
-                if(!p.Immune2)
+                //if(!p.Immune2) // Always true because of covered condition above
                 {
                     frmMain.renderTexture(vScreenX[Z] + p.Location.X - 5,
                                           vScreenY[Z] + p.Location.Y - 2,

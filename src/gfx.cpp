@@ -20,8 +20,6 @@
 
 #include "globals.h"
 #include "gfx.h"
-#include "frm_main.h"
-#include <AppPath/app_path.h>
 #include <fmt_format_ne.h>
 #include <Logger/logger.h>
 #include <SDL2/SDL_messagebox.h>

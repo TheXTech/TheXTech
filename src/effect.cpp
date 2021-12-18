@@ -190,13 +190,13 @@ void UpdateEffects()
                 tempBool = false;
                 for(B = 1; B <= numWater; B++)
                 {
-                    if(CheckCollision(e.Location, Water[B].Location) && Water[B].Hidden == false)
+                    if(CheckCollision(e.Location, Water[B].Location) && !Water[B].Hidden)
                     {
                         tempBool = true;
                         break;
                     }
                 }
-                if(tempBool == false)
+                if(!tempBool)
                     e.Life = 0;
             }
             e.FrameCount += 1;
@@ -481,7 +481,7 @@ void UpdateEffects()
                 tempBool = false;
                 for(B = 1; B <= numPlayers; B++)
                 {
-                    if(Player[B].Dead == false && Player[B].TimeToLive == 0)
+                    if(!Player[B].Dead && Player[B].TimeToLive == 0)
                     {
                         if(CheckCollision(e.Location, Player[B].Location))
                         {
@@ -491,7 +491,7 @@ void UpdateEffects()
                     }
                 }
                 // tempBool = True
-                if(tempBool == false)
+                if(!tempBool)
                 {
                     e.Life = 0;
                     e.Frame = 3;
@@ -534,7 +534,7 @@ void UpdateEffects()
             {
                 e.FrameCount = 0;
                 e.Frame += 1;
-                e.FrameCount = 0;
+                // e.FrameCount = 0;
             }
         }
         else if(e.Type == 14) // Dead Big Koopa
@@ -546,7 +546,7 @@ void UpdateEffects()
             {
                 e.FrameCount = 0;
                 e.Frame += 1;
-                e.FrameCount = 0;
+                // e.FrameCount = 0;
                 if(e.Frame >= 4)
                     e.Frame = 0;
             }
@@ -633,7 +633,7 @@ void UpdateEffects()
             if(e.FrameCount >= 16)
             {
                 e.FrameCount = 0;
-                e.Frame = 5;
+                //e.Frame = 5; // Already 5!
             }
             else if(e.FrameCount > 8)
                 e.Frame = 4;
@@ -691,25 +691,26 @@ void UpdateEffects()
             else if(e.FrameCount == 30)
             {
                 e.Life = 0;
-                if(LevelEditor == false && e.NewNpc != 96)
+                if(!LevelEditor && e.NewNpc != 96)
                 {
                     if(NPCIsYoshi[e.NewNpc])
                         NewEffect(58, e.Location, 1, static_cast<float>(e.NewNpc));
                     else if(e.NewNpc > 0)
                     {
                         numNPCs++;
-                        NPC[numNPCs] = NPC_t();
-                        NPC[numNPCs].Location = e.Location;
-                        NPC[numNPCs].Active = true;
-                        NPC[numNPCs].TimeLeft = 100;
-                        NPC[numNPCs].Direction = 0;
-                        NPC[numNPCs].Type = e.NewNpc;
-                        NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
-                        NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
-                        NPC[numNPCs].Location.Y += 32 - NPC[numNPCs].Location.Height;
-                        NPC[numNPCs].Location.X += -NPC[numNPCs].Location.Width / 2.0 + 16;
-                        if(NPC[numNPCs].Type == 34)
-                            NPC[numNPCs].Location.SpeedY = -6;
+                        auto &nn = NPC[numNPCs];
+                        nn = NPC_t();
+                        nn.Location = e.Location;
+                        nn.Active = true;
+                        nn.TimeLeft = 100;
+                        nn.Direction = 0;
+                        nn.Type = e.NewNpc;
+                        nn.Location.Height = NPCHeight[nn.Type];
+                        nn.Location.Width = NPCWidth[nn.Type];
+                        nn.Location.Y += 32 - nn.Location.Height;
+                        nn.Location.X += -nn.Location.Width / 2.0 + 16;
+                        if(nn.Type == 34)
+                            nn.Location.SpeedY = -6;
                         CheckSectionNPC(numNPCs);
                     }
                 }
@@ -746,14 +747,15 @@ void UpdateEffects()
                 e.Frame = 1;
                 e.Life = 0;
                 numNPCs++;
-                NPC[numNPCs] = NPC_t();
-                NPC[numNPCs].Location = e.Location;
-                NPC[numNPCs].Active = true;
-                NPC[numNPCs].TimeLeft = 100;
-                NPC[numNPCs].Direction = 1;
-                NPC[numNPCs].Type = e.NewNpc;
-                NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
-                NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
+                auto &nn = NPC[numNPCs];
+                nn = NPC_t();
+                nn.Location = e.Location;
+                nn.Active = true;
+                nn.TimeLeft = 100;
+                nn.Direction = 1;
+                nn.Type = e.NewNpc;
+                nn.Location.Height = NPCHeight[nn.Type];
+                nn.Location.Width = NPCWidth[nn.Type];
                 CheckSectionNPC(numNPCs);
             }
             if(e.NewNpc == 98)
@@ -895,9 +897,10 @@ void NewEffect(int A, const Location_t &Location, float Direction, int NewNpc, b
         ne.FrameCount = 0;
         ne.Life = 100;
         ne.Type = A;
+
         if(A == 56)
         {
-            if(ne.NewNpc != 0 && ne.NewNpc != 96)
+            if(ne.NewNpc != 0 /*&& ne.NewNpc != 96*/) // never 96, because of condition above that replaces 96 with zero
                 PlaySound(SFX_YoshiEgg);
             else
                 PlaySound(SFX_Smash);
@@ -1200,8 +1203,8 @@ void NewEffect(int A, const Location_t &Location, float Direction, int NewNpc, b
                 ne.Location.Height = EffectHeight[A];
                 ne.Location.X = Location.X + Location.Width / 2.0 - ne.Location.Width / 2.0;
                 ne.Location.Y = Location.Y + Location.Height / 2.0 - ne.Location.Height / 2.0;
-                ne.Location.SpeedY = -0;
-                ne.Location.SpeedX = 0;
+                // ne.Location.SpeedY = -0; // Assigned below
+                // ne.Location.SpeedX = 0; // Assigned below
                 ne.Life = 15;
 
                 ne.Location.SpeedX = 3 * 0.8;
@@ -1374,8 +1377,8 @@ void NewEffect(int A, const Location_t &Location, float Direction, int NewNpc, b
             A == 32 || A == 145 || A == 33 || A == 34 ||
             A == 36 || A == 38 || A == 40 || A == 42 ||
             A == 44 || A == 46 || A == 47 || A == 53 || A == 60 ||
-            A == 9 || A == 6 || A == 95 || A == 96 || A == 110 ||
-            A == 117 || A == 121 || A == 127 || A == 142) // Flying goomba / turtle shell / hard thing shell
+            A == 6 || A == 95 || A == 96 || A == 110 ||
+            A == 117 || A == 121 || A == 127 || A == 142) // Flying goomba / turtle shell / hard thing shell /*A == 9 || - duplicated*/
     {
         numEffects++;
         auto &ne = Effect[numEffects];

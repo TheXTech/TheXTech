@@ -279,7 +279,7 @@ void BlockSort2()
                 }
             }
         }
-    } while(sortAgain == true);
+    } while(sortAgain);
 }
 
 void BackgroundSort()
@@ -309,7 +309,7 @@ void BackgroundSort()
                 }
             }
         }
-    } while(sortAgain == true);
+    } while(sortAgain);
 }
 
 double BackGroundPri(int A)
@@ -337,7 +337,7 @@ double BackGroundPri(int A)
         tempBackGroundPri = 80;
     else if(Background[A].Type == 65 || Background[A].Type == 165)
         tempBackGroundPri = 150;
-    else if(Foreground[Background[A].Type] == true)
+    else if(Foreground[Background[A].Type])
         tempBackGroundPri = 125;
     else if(Background[A].Type == 66)
         tempBackGroundPri = 50;

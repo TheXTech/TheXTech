@@ -839,7 +839,7 @@ void PathWait()
             computeFrameTime2();
         }
         PGE_Delay(1);
-    } while(!(C >= 24));
+    } while(C < 24);
 
     resetFrameTimer();
 }

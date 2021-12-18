@@ -36,9 +36,9 @@ extern struct AudioSetup_t
 {
     bool disableSound = false;
     int sampleRate = 44100;
-    uint16_t format = 0x8120;
     int channels = 2;
     int bufferSize = 512;
+    uint16_t format = 0x8120;
 } g_audioSetup;
 
 

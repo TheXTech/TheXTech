@@ -1173,7 +1173,7 @@ void UpdateMacro()
             auto &p = Player[A];
             auto &c = p.Controls;
 
-            if(p.Location.X < level[p.Section].Width && p.Dead == false)
+            if(p.Location.X < level[p.Section].Width && !p.Dead)
             {
                 c.Down = false;
                 c.Drop = false;

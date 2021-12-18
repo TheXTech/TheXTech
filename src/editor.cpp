@@ -48,7 +48,7 @@ static int ScrollDelay = 0; // slows down the camera movement when scrolling thr
 Point_t CursorPos;
 
 bool HasCursor = false;
-bool NoReallyKillIt = false;
+// bool NoReallyKillIt = false; //Unused
 int curSection = 0;
 
 OptCursor_t optCursor;
@@ -75,7 +75,7 @@ void UpdateEditor()
     if(!EditorControls.Mouse1)
         MouseRelease = true;
 
-    if(LevelEditor == true)
+    if(LevelEditor)
         numPlayers = 0;
 
     if(MagicHand)
@@ -101,7 +101,7 @@ void UpdateEditor()
     {
         if(getKeyState(vbKeyPageUp) == KEY_PRESSED)
         {
-            if(ScrollRelease == true)
+            if(ScrollRelease)
             {
                 ScrollRelease = false;
 //                frmLevelSettings::optSection(curSection).Value = false;
@@ -114,7 +114,7 @@ void UpdateEditor()
         }
         else if(getKeyState(vbKeyPageDown) == KEY_PRESSED)
         {
-            if(ScrollRelease == true)
+            if(ScrollRelease)
             {
                 ScrollRelease = false;
 //                frmLevelSettings::optSection(curSection).Value = false;
@@ -696,7 +696,7 @@ void UpdateEditor()
                 {
                     for(A = numBackground; A >= 1; A--)
                     {
-                        if(CursorCollision(EditorCursor.Location, Background[A].Location) == true && Background[A].Hidden == false)
+                        if(CursorCollision(EditorCursor.Location, Background[A].Location) && !Background[A].Hidden)
                         {
                             PlaySound(SFX_Grab);
 //                            frmLevelEditor::optCursor(3).Value = true;
@@ -1105,7 +1105,8 @@ void UpdateEditor()
                         tempLocation = NPC[A].Location;
                         if(NPC[A].Type == 91)
                             tempLocation.Y -= 16;
-                        if(CursorCollision(EditorCursor.Location, tempLocation) == true && NPC[A].Hidden == false)
+
+                        if(CursorCollision(EditorCursor.Location, tempLocation) && !NPC[A].Hidden)
                         {
                             if(static_cast<int>(floor(static_cast<double>(std::rand() % 2))) == 0)
                                 NPC[A].Location.SpeedX = double(Physics.NPCShellSpeed / 2);
@@ -1216,7 +1217,7 @@ void UpdateEditor()
                     for(int numWaterMax = numWater, A = 1; A <= numWaterMax; A++)
                     {
                         tempLocation = Water[A].Location;
-                        if(CursorCollision(EditorCursor.Location, tempLocation) == true && Water[A].Hidden == false)
+                        if(CursorCollision(EditorCursor.Location, tempLocation) && !Water[A].Hidden)
                         {
                             PlaySound(SFX_Smash);
 //                            if(nPlay.Online == true)
@@ -1233,7 +1234,7 @@ void UpdateEditor()
                 {
                     for(int numWorldMusicMax = numWorldMusic, A = 1; A <= numWorldMusicMax; A++)
                     {
-                        if(CursorCollision(EditorCursor.Location, WorldMusic[A].Location) == true)
+                        if(CursorCollision(EditorCursor.Location, WorldMusic[A].Location))
                         {
                             tempLocation = WorldMusic[A].Location;
                             tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2;
@@ -1252,7 +1253,7 @@ void UpdateEditor()
                 {
                     for(int numWorldPathsMax = numWorldPaths, A = 1; A <= numWorldPathsMax; A++)
                     {
-                        if(CursorCollision(EditorCursor.Location, WorldPath[A].Location) == true)
+                        if(CursorCollision(EditorCursor.Location, WorldPath[A].Location))
                         {
                             tempLocation = WorldPath[A].Location;
                             tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2;
@@ -1271,7 +1272,7 @@ void UpdateEditor()
                 {
                     for(A = numScenes; A >= 1; A--)
                     {
-                        if(CursorCollision(EditorCursor.Location, Scene[A].Location) == true)
+                        if(CursorCollision(EditorCursor.Location, Scene[A].Location))
                         {
                             tempLocation = Scene[A].Location;
                             tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2;
@@ -1291,7 +1292,7 @@ void UpdateEditor()
                 {
                     for(int numWorldLevelsMax = numWorldLevels, A = 1; A <= numWorldLevelsMax; A++)
                     {
-                        if(CursorCollision(EditorCursor.Location, WorldLevel[A].Location) == true)
+                        if(CursorCollision(EditorCursor.Location, WorldLevel[A].Location))
                         {
                             tempLocation = WorldLevel[A].Location;
                             tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2;
@@ -1310,7 +1311,7 @@ void UpdateEditor()
                 {
                     for(int numTilesMax = numTiles, A = 1; A <= numTilesMax; A++)
                     {
-                        if(CursorCollision(EditorCursor.Location, Tile[A].Location) == true)
+                        if(CursorCollision(EditorCursor.Location, Tile[A].Location))
                         {
                             tempLocation = Tile[A].Location;
                             tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2;
@@ -1357,7 +1358,7 @@ void UpdateEditor()
                     }
                     for(A = 1; A <= 2; A++)
                     {
-                        if(CursorCollision(EditorCursor.Location, PlayerStart[A]) == true && MagicHand == false)
+                        if(CursorCollision(EditorCursor.Location, PlayerStart[A]) && !MagicHand)
                             CanPlace = false;
                     }
                 }
@@ -1471,7 +1472,7 @@ void UpdateEditor()
                 {
                     if(EditorCursor.Background.Type == Background[A].Type)
                     {
-                        if(CursorCollision(EditorCursor.Location, Background[A].Location) == true && Background[A].Hidden == false)
+                        if(CursorCollision(EditorCursor.Location, Background[A].Location) && !Background[A].Hidden)
                             CanPlace = false;
                     }
                 }
@@ -1509,11 +1510,11 @@ void UpdateEditor()
 
                 for(A = 1; A <= numNPCs; A++)
                 {
-                    if(CursorCollision(EditorCursor.Location, NPC[A].Location) == true && NPC[A].Hidden == false && NPC[A].Active == true && (NPC[A].Type != 159 || EditorCursor.NPC.Type == 159))
+                    if(CursorCollision(EditorCursor.Location, NPC[A].Location) && !NPC[A].Hidden && NPC[A].Active && (NPC[A].Type != 159 || EditorCursor.NPC.Type == 159))
                     {
-                        if(NPC[A].Generator == false || NPC[A].Type == EditorCursor.NPC.Type)
+                        if(!NPC[A].Generator || NPC[A].Type == EditorCursor.NPC.Type)
                         {
-                            if((!(EditorCursor.NPC.Type == 208) && !(NPC[A].Type == 208)) || (EditorCursor.NPC.Type == 208 && NPC[A].Type == 208))
+                            if((EditorCursor.NPC.Type != 208 && NPC[A].Type != 208) || (EditorCursor.NPC.Type == 208 && NPC[A].Type == 208))
                             {
                                 if(!NPCIsAVine[NPC[A].Type])
                                     CanPlace = false;
@@ -1524,7 +1525,7 @@ void UpdateEditor()
 
                 for(A = 1; A <= 2; A++)
                 {
-                    if(CursorCollision(EditorCursor.Location, PlayerStart[A]) == true && MagicHand == false)
+                    if(CursorCollision(EditorCursor.Location, PlayerStart[A]) && !MagicHand)
                         CanPlace = false;
                 }
 
@@ -1566,7 +1567,7 @@ void UpdateEditor()
             {
                 for(int numWarpsMax = numWarps + 1, A = 1; A <= numWarpsMax; A++)
                 {
-                    if(Warp[A].PlacedEnt == false || Warp[A].PlacedExit == false)
+                    if(!Warp[A].PlacedEnt || !Warp[A].PlacedExit)
                         break;
                 }
 
@@ -1616,7 +1617,7 @@ void UpdateEditor()
             {
                 for(A = 1; A <= numTiles; A++)
                 {
-                    if(CursorCollision(EditorCursor.Location, Tile[A].Location) == true)
+                    if(CursorCollision(EditorCursor.Location, Tile[A].Location))
                         CanPlace = false;
                 }
 
@@ -1633,7 +1634,7 @@ void UpdateEditor()
             {
                 for(A = 1; A <= numScenes; A++)
                 {
-                    if(CursorCollision(EditorCursor.Location, Scene[A].Location) == true)
+                    if(CursorCollision(EditorCursor.Location, Scene[A].Location))
                     {
                         if(EditorCursor.Scene.Type == Scene[A].Type)
                         {
@@ -1646,7 +1647,7 @@ void UpdateEditor()
 
                 for(A = 1; A <= numWorldLevels; A++)
                 {
-                    if(CursorCollision(EditorCursor.Location, WorldLevel[A].Location) == true)
+                    if(CursorCollision(EditorCursor.Location, WorldLevel[A].Location))
                         CanPlace = false;
                 }
 
@@ -1663,19 +1664,19 @@ void UpdateEditor()
             {
                 for(A = 1; A <= numWorldPaths; A++)
                 {
-                    if(CursorCollision(EditorCursor.Location, WorldPath[A].Location) == true)
+                    if(CursorCollision(EditorCursor.Location, WorldPath[A].Location))
                         CanPlace = false;
                 }
 
                 for(A = 1; A <= numScenes; A++)
                 {
-                    if(CursorCollision(EditorCursor.Location, Scene[A].Location) == true)
+                    if(CursorCollision(EditorCursor.Location, Scene[A].Location))
                         CanPlace = false;
                 }
 
                 for(A = 1; A <= numWorldLevels; A++)
                 {
-                    if(CursorCollision(EditorCursor.Location, WorldLevel[A].Location) == true)
+                    if(CursorCollision(EditorCursor.Location, WorldLevel[A].Location))
                     {
                         CanPlace = false;
                         qLevel = A;
@@ -1696,13 +1697,13 @@ void UpdateEditor()
             {
                 for(A = 1; A <= numWorldPaths; A++)
                 {
-                    if(CursorCollision(EditorCursor.Location, WorldPath[A].Location) == true)
+                    if(CursorCollision(EditorCursor.Location, WorldPath[A].Location))
                         CanPlace = false;
                 }
 
                 for(A = 1; A <= numWorldLevels; A++)
                 {
-                    if(CursorCollision(EditorCursor.Location, WorldLevel[A].Location) == true)
+                    if(CursorCollision(EditorCursor.Location, WorldLevel[A].Location))
                         CanPlace = false;
                 }
 
@@ -1719,7 +1720,7 @@ void UpdateEditor()
             {
                 for(A = 1; A <= numWorldMusic; A++)
                 {
-                    if(CursorCollision(EditorCursor.Location, WorldMusic[A].Location) == true)
+                    if(CursorCollision(EditorCursor.Location, WorldMusic[A].Location))
                         CanPlace = false;
                 }
 
@@ -1998,7 +1999,7 @@ int EditorNPCFrame(const int A, float& C, int N)
     while(int(B) == 0)
         B = (iRand() % 3) - 1;
 
-    if(LevelEditor == false)
+    if(!LevelEditor)
         C = B;
     if(A == 241)
         ret = 4;

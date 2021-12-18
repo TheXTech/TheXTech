@@ -123,8 +123,14 @@ public:
     void setTargetScreen();
 
 
-    StdPicture LoadPicture(std::string path, std::string maskPath = std::string(), std::string maskFallbackPath = std::string());
-    StdPicture lazyLoadPicture(std::string path, std::string maskPath = std::string(), std::string maskFallbackPath = std::string());
+    StdPicture LoadPicture(const std::string &path,
+                           const std::string &maskPath = std::string(),
+                           const std::string &maskFallbackPath = std::string());
+
+    StdPicture lazyLoadPicture(const std::string &path,
+                               const std::string &maskPath = std::string(),
+                               const std::string &maskFallbackPath = std::string());
+
     void deleteTexture(StdPicture &tx, bool lazyUnload = false);
     void clearAllTextures();
 
@@ -252,22 +258,22 @@ private:
 #endif
 
     //Scale of virtual and window resolutuins
-    float scale_x = 1.f;
-    float scale_y = 1.f;
+    float m_scale_x = 1.f;
+    float m_scale_y = 1.f;
     //Side offsets to keep ratio
-    float offset_x = 0.f;
-    float offset_y = 0.f;
+    float m_offset_x = 0.f;
+    float m_offset_y = 0.f;
     //Offset to shake screen
-    int viewport_offset_x = 0.f;
-    int viewport_offset_y = 0.f;
+    int m_viewport_offset_x = 0.f;
+    int m_viewport_offset_y = 0.f;
     //Need to calculate relative viewport position when screen was scaled
-    float viewport_scale_x = 1.0f;
-    float viewport_scale_y = 1.0f;
+    float m_viewport_scale_x = 1.0f;
+    float m_viewport_scale_y = 1.0f;
 
-    int viewport_x = 0;
-    int viewport_y = 0;
-    int viewport_w = 0;
-    int viewport_h = 0;
+    int m_viewport_x = 0;
+    int m_viewport_y = 0;
+    int m_viewport_w = 0;
+    int m_viewport_h = 0;
 
     SDL_Point MapToScr(int x, int y);
 };

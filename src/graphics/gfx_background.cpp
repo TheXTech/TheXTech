@@ -30,7 +30,7 @@ void DrawBackground(int S, int Z)
     Location_t tempLocation;
     Location_t tempLevel;
     tempLevel = level[S];
-    if(LevelEditor == true)
+    if(LevelEditor)
         LevelREAL[S] = level[S];
     level[S] = LevelREAL[S];
 

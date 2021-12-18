@@ -37,6 +37,7 @@ static void compatInit(Compatibility_t &c)
     {
         switch(g_speedRunnerMode)
         {
+        default:
         case SPEEDRUN_MODE_1:
             CompatSetEnforcedLevel(COMPAT_MODERN);
             break;
@@ -232,12 +233,12 @@ void ResetCompat()
     compatInit(g_compatibility);
 }
 
-void CompatSetEnforcedLevel(int level)
+void CompatSetEnforcedLevel(int cLevel)
 {
-    if(s_compatLevel == level)
+    if(s_compatLevel == cLevel)
         return;
 
-    s_compatLevel = level;
+    s_compatLevel = cLevel;
 
     switch(s_compatLevel)
     {

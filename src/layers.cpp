@@ -54,7 +54,7 @@ static SDL_INLINE bool equalCase(const char *x, const char *y)
     return (SDL_strcasecmp(x, y) == 0);
 }
 
-void ShowLayer(std::string LayerName, bool NoEffect)
+void ShowLayer(const std::string &LayerName, bool NoEffect)
 {
     int A = 0;
     int B = 0;
@@ -105,7 +105,7 @@ void ShowLayer(std::string LayerName, bool NoEffect)
             NPC[A].GeneratorActive = true;
             NPC[A].Reset[1] = true;
             NPC[A].Reset[2] = true;
-            if(NPC[A].Generator == false)
+            if(!NPC[A].Generator)
             {
                 NPC[A].Active = true;
                 NPC[A].TimeLeft = 1;
@@ -119,7 +119,7 @@ void ShowLayer(std::string LayerName, bool NoEffect)
         if(equalCase(Block[A].Layer, LayerName))
         {
             // If Not (Block(A).DefaultType = 0 And Block(A).Layer = "Destroyed Blocks") Then
-            if(Block[A].Hidden == true)
+            if(Block[A].Hidden)
             {
                 if(!NoEffect && !Block[A].Invis)
                 {
@@ -178,7 +178,7 @@ void ShowLayer(std::string LayerName, bool NoEffect)
     }
 }
 
-void HideLayer(std::string LayerName, bool NoEffect)
+void HideLayer(const std::string &LayerName, bool NoEffect)
 {
     int A = 0;
     Location_t tempLocation;
@@ -263,12 +263,12 @@ void HideLayer(std::string LayerName, bool NoEffect)
     }
 }
 
-void SetLayer(std::string /*LayerName*/)
+void SetLayer(const std::string & /*LayerName*/)
 {
     // Unused
 }
 
-void ProcEvent(std::string EventName, bool NoEffect)
+void ProcEvent(const std::string &EventName, bool NoEffect)
 {
     // this is for events that have just been triggered
     int A = 0;
@@ -443,12 +443,12 @@ void ProcEvent(std::string EventName, bool NoEffect)
 
             for(auto &l : evt.HideLayer)
             {
-                HideLayer(l, NoEffect ? true : evt.LayerSmoke);
+                HideLayer(l, NoEffect || evt.LayerSmoke);
             }
 
             for(auto &l : evt.ShowLayer)
             {
-                ShowLayer(l, NoEffect ? true : evt.LayerSmoke);
+                ShowLayer(l, NoEffect || evt.LayerSmoke);
             }
 
             for(auto &l : evt.ToggleLayer)
@@ -778,7 +778,7 @@ void UpdateLayers()
                     {
                         if(Layer[A].SpeedX != 0.f)
                         {
-                            if(BlocksSorted == true)
+                            if(BlocksSorted)
                             {
                                 for(C = (int)(-FLBlocks); C <= FLBlocks; C++)
                                 {

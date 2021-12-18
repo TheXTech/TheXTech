@@ -104,13 +104,14 @@ void DrawInterface(int Z, int numScreens)
             }
             C = 40;
 
-            if(BattleMode == false)
+            if(!BattleMode)
             {
                 // Print coins on the screen
-                if((Player[1].HasKey | Player[2].HasKey) != 0)
+                if(Player[1].HasKey || Player[2].HasKey)
                 {
                     frmMain.renderTexture(-24 + 40 + 20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96, 16 + 10, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[0], 0, 0);
                 }
+
                 if(Player[1].Character == 5)
                 {
                     frmMain.renderTexture(40 + 20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96, 16 + 10, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[6], 0, 0);
@@ -205,6 +206,7 @@ void DrawInterface(int Z, int numScreens)
                     frmMain.renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 12, 16 + 12, NPCWidth[Player[Z].HeldBonus], NPCHeight[Player[Z].HeldBonus], GFXNPC[Player[Z].HeldBonus], 0, 0);
                 }
             }
+
             if(Player[Z].Character == 5 && Player[Z].Bombs > 0)
             {
 
@@ -212,10 +214,11 @@ void DrawInterface(int Z, int numScreens)
                 frmMain.renderTexture(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 - 10, 53, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
                 SuperPrint(std::to_string(Player[Z].Bombs), 1, 20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 12, 53);
             }
-            if(BattleMode == false)
+
+            if(!BattleMode)
             {
                 // Print coins on the screen
-                if(Player[Z].HasKey == true)
+                if(Player[Z].HasKey)
                 {
                     frmMain.renderTexture(-24 + 20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96, 16 + 10, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[0], 0, 0);
                 }
@@ -382,10 +385,11 @@ void DrawInterface(int Z, int numScreens)
         }
 
         // Print coins on the screen
-        if(Player[1].HasKey == true)
+        if(Player[1].HasKey)
         {
             frmMain.renderTexture(-24 + 20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96, 16 + 10, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[0], 0, 0);
         }
+
         if(Player[1].Character == 5)
         {
             frmMain.renderTexture(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96, 16 + 10, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[6], 0, 0);
@@ -394,6 +398,7 @@ void DrawInterface(int Z, int numScreens)
         {
             frmMain.renderTexture(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96, 16 + 10, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[2], 0, 0);
         }
+
         frmMain.renderTexture(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96 + 8 + GFX.Interface[2].w, 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
         SuperPrint(coinsStr, 1,
                    float(20 - int(coinsStr.size()) * 18 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 80 + 4 + 12 + 18 + 32 + GFX.Interface[3].w),

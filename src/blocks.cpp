@@ -366,30 +366,32 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                 for(auto B = 1; B <= b.Special; B++)
                 {
                     numNPCs++;
-                    NPC[numNPCs] = NPC_t();
-                    NPC[numNPCs].Active = true;
-                    NPC[numNPCs].TimeLeft = 100;
+                    auto &nn = NPC[numNPCs];
+
+                    nn = NPC_t();
+                    nn.Active = true;
+                    nn.TimeLeft = 100;
 
                     if(newBlock == 89)
                     {
-                        NPC[numNPCs].Type = 33;
+                        nn.Type = 33;
                     }
                     else if(newBlock == 192)
                     {
-                        NPC[numNPCs].Type = 88;
+                        nn.Type = 88;
                     }
                     else
                     {
-                        NPC[numNPCs].Type = 10;
+                        nn.Type = 10;
                     }
 
                     if(Player[whatPlayer].Character == 5)
                     {
-                        NPC[numNPCs].Type = 251;
+                        nn.Type = 251;
                         if(dRand() * 20 <= 3.0)
-                            NPC[numNPCs].Type = 252;
+                            nn.Type = 252;
                         if(dRand() * 60 <= 3.0)
-                            NPC[numNPCs].Type = 253;
+                            nn.Type = 253;
                         PlaySound(SFX_ZeldaRupee);
                     }
                     else
@@ -397,24 +399,26 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                         PlaySound(SFX_Coin);
                     }
 
-                    NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
-                    NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
-                    NPC[numNPCs].Location.X = b.Location.X + b.Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
-                    NPC[numNPCs].Location.Y = b.Location.Y - NPC[numNPCs].Location.Height - 0.01;
-                    NPC[numNPCs].Location.SpeedX = dRand() * 3 - 1.5;
-                    NPC[numNPCs].Location.SpeedY = -(dRand() * 4) - 3;
+                    auto &nLoc = nn.Location;
+                    nLoc.Width = NPCWidth[nn.Type];
+                    nLoc.Height = NPCHeight[nn.Type];
+                    nLoc.X = b.Location.X + b.Location.Width / 2.0 - nLoc.Width / 2.0;
+                    nLoc.Y = b.Location.Y - nLoc.Height - 0.01;
+                    nLoc.SpeedX = dRand() * 3 - 1.5;
+                    nLoc.SpeedY = -(dRand() * 4) - 3
+                            ;
                     if(HitDown)
                     {
-                        NPC[numNPCs].Location.SpeedY = -NPC[numNPCs].Location.SpeedY * 0.5;
-                        NPC[numNPCs].Location.Y = b.Location.Y + b.Location.Height;
+                        nLoc.SpeedY = -nLoc.SpeedY * 0.5;
+                        nLoc.Y = b.Location.Y + b.Location.Height;
                     }
-                    NPC[numNPCs].Special = 1;
-                    NPC[numNPCs].Immune = 20;
+
+                    nn.Special = 1;
+                    nn.Immune = 20;
                     CheckSectionNPC(numNPCs);
+
                     if(B > 20 || (Player[whatPlayer].Character == 5 && B > 5))
-                    {
                         break;
-                    }
                 }
                 b.Special = 0;
             }
@@ -445,7 +449,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
             for(auto B = 1; B <= numBlock; B++)
             {
-                if(B != A && Block[B].Hidden == false && (BlockOnlyHitspot1[Block[B].Type] & !BlockIsSizable[Block[B].Type]) == 0)
+                if(B != A && !Block[B].Hidden && !(BlockOnlyHitspot1[Block[B].Type] && !BlockIsSizable[Block[B].Type]))
                 {
                     if(CheckCollision(Block[B].Location, newLoc(b.Location.X + 1, b.Location.Y - 31, 30, 30)))
                     {
@@ -458,30 +462,36 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             if(!tempBool)
             {
                 numNPCs++;
-                NPC[numNPCs] = NPC_t();
-                NPC[numNPCs].Active = true;
-                NPC[numNPCs].TimeLeft = 100;
+                auto &nn = NPC[numNPCs];
+                nn = NPC_t();
+                nn.Active = true;
+                nn.TimeLeft = 100;
+
+                // FIXME: This code was already broken by Redigit. It should spawn a coin depending on thematic block
+#if 0 // Useless code, needs a fix. Right now its broken by overriding by constant value
                 if(newBlock == 89)
                 {
-                    NPC[numNPCs].Type = 33;
+                    nn.Type = NPCID_COIN_SMW;
                 }
                 else if(newBlock == 192)
                 {
-                    NPC[numNPCs].Type = 88;
+                    nn.Type = NPCID_COIN_SMB;
                 }
                 else
                 {
-                    NPC[numNPCs].Type = 10;
+                    nn.Type = NPCID_COIN_SMB3;
                 }
-                NPC[numNPCs].Type = 138;
-                NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
-                NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
-                NPC[numNPCs].Location.X = b.Location.X + b.Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
-                NPC[numNPCs].Location.Y = b.Location.Y - NPC[numNPCs].Location.Height - 0.01;
-                NPC[numNPCs].Location.SpeedX = dRand() * 3.0 - 1.5;
-                NPC[numNPCs].Location.SpeedY = -(dRand() * 4) - 3;
-                NPC[numNPCs].Special = 1;
-                NPC[numNPCs].Immune = 20;
+#endif
+                nn.Type = NPCID_COIN_SMB2;
+
+                nn.Location.Width = NPCWidth[nn.Type];
+                nn.Location.Height = NPCHeight[nn.Type];
+                nn.Location.X = b.Location.X + b.Location.Width / 2.0 - nn.Location.Width / 2.0;
+                nn.Location.Y = b.Location.Y - nn.Location.Height - 0.01;
+                nn.Location.SpeedX = dRand() * 3.0 - 1.5;
+                nn.Location.SpeedY = -(dRand() * 4) - 3;
+                nn.Special = 1;
+                nn.Immune = 20;
                 PlaySound(SFX_Coin);
                 CheckSectionNPC(numNPCs);
                 b.Special -= 1;
@@ -529,7 +539,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             b.Special -= 1;
         }
 
-        if(b.Special == 0 && !(b.Type == 55))
+        if(b.Special == 0 && b.Type != 55)
         {
             b.Type = newBlock;
             b.Location.Height = BlockHeight[newBlock];
@@ -555,7 +565,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
         b.Special = 0;
 
-        if(!(b.Type == 55)) // 55 is the bouncy note block
+        if(b.Type != 55) // 55 is the bouncy note block
         {
             b.Type = newBlock;
             b.Location.Height = BlockHeight[newBlock];
@@ -580,17 +590,18 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         // Spawn the npc
         {
             numNPCs++; // create a new NPC
-            NPC[numNPCs].Active = true;
-            NPC[numNPCs].TimeLeft = 1000;
+            auto &nn = NPC[numNPCs];
+            nn.Active = true;
+            nn.TimeLeft = 1000;
 
             if(NPCIsYoshi[C])
             {
-                NPC[numNPCs].Type = 96;
-                NPC[numNPCs].Special = C;
+                nn.Type = 96;
+                nn.Special = C;
             }
             else if(numPlayers > 2)
             {
-                NPC[numNPCs].Type = C;
+                nn.Type = C;
             }
             else if(C == 14 || C == 34 || C == 264 || C == 277)
             {
@@ -604,11 +615,11 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
                 if(!makeShroom)
                 {
-                    NPC[numNPCs].Type = C;
+                    nn.Type = C;
                 }
                 else
                 {
-                    NPC[numNPCs].Type = 9;
+                    nn.Type = 9;
                 }
             }
             else if(C == 183)
@@ -623,11 +634,11 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
                 if(!makeShroom)
                 {
-                    NPC[numNPCs].Type = C;
+                    nn.Type = C;
                 }
                 else
                 {
-                    NPC[numNPCs].Type = 185;
+                    nn.Type = 185;
                 }
             }
             else if(C == 182)
@@ -642,36 +653,36 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
                 if(!makeShroom)
                 {
-                    NPC[numNPCs].Type = C;
+                    nn.Type = C;
                 }
                 else
                 {
-                    NPC[numNPCs].Type = 184;
+                    nn.Type = 184;
                 }
             }
             else
             {
-                NPC[numNPCs].Type = C;
+                nn.Type = C;
             }
 
             if(makeShroom && whatPlayer > 0 &&
                (Player[whatPlayer].State > 1 || Player[whatPlayer].Character == 5)) // set the NPC type if the conditions are met
             {
-                NPC[numNPCs].Type = C;
+                nn.Type = C;
             }
 
             if(makeShroom && BattleMode) // always spawn the item in battlemode
             {
-                NPC[numNPCs].Type = C;
+                nn.Type = C;
             }
 
-            if(NPC[numNPCs].Type == 287)
+            if(nn.Type == 287)
             {
-                NPC[numNPCs].Type = RandomBonus();
+                nn.Type = RandomBonus();
             }
 
             CharStuff(numNPCs);
-            NPC[numNPCs].Location.Width = NPCWidth[C];
+            nn.Location.Width = NPCWidth[C];
 
             // Make block a bit smaller to allow player take a bonus easier (Redigit's idea)
             if(fEqual(b.Location.Width, 32) && !b.wasShrinkResized)
@@ -681,60 +692,60 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                 b.wasShrinkResized = true; // Don't move it!!!
             }
 
-            NPC[numNPCs].Location.Height = 0;
-            NPC[numNPCs].Location.X = (b.Location.X + b.Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0);
-            NPC[numNPCs].Location.SpeedX = 0;
-            NPC[numNPCs].Location.SpeedY = 0;
+            nn.Location.Height = 0;
+            nn.Location.X = (b.Location.X + b.Location.Width / 2.0 - nn.Location.Width / 2.0);
+            nn.Location.SpeedX = 0;
+            nn.Location.SpeedY = 0;
 
             if(NPCIsYoshi[C]) // if the npc is yoshi then set the color of the egg
             {
                 if(C == 98)
                 {
-                    NPC[numNPCs].Frame = 1;
+                    nn.Frame = 1;
                 }
                 else if(C == 99)
                 {
-                    NPC[numNPCs].Frame = 2;
+                    nn.Frame = 2;
                 }
                 else if(C == 100)
                 {
-                    NPC[numNPCs].Frame = 3;
+                    nn.Frame = 3;
                 }
                 else if(C == 148)
                 {
-                    NPC[numNPCs].Frame = 4;
+                    nn.Frame = 4;
                 }
                 else if(C == 149)
                 {
-                    NPC[numNPCs].Frame = 5;
+                    nn.Frame = 5;
                 }
                 else if(C == 150)
                 {
-                    NPC[numNPCs].Frame = 6;
+                    nn.Frame = 6;
                 }
             }
 
             if(!HitDown)
             {
-                NPC[numNPCs].Location.Y = b.Location.Y; // - 0.1
-                NPC[numNPCs].Location.Height = 0;
+                nn.Location.Y = b.Location.Y; // - 0.1
+                nn.Location.Height = 0;
                 if(NPCIsYoshi[C])
                 {
-                    NPC[numNPCs].Effect = 0;
-                    NPC[numNPCs].Location.Height = 32;
-                    NPC[numNPCs].Location.Y = b.Location.Y - 32;
+                    nn.Effect = 0;
+                    nn.Location.Height = 32;
+                    nn.Location.Y = b.Location.Y - 32;
                 }
-                else if(NPC[numNPCs].Type == NPCID_LEAF)
+                else if(nn.Type == NPCID_LEAF)
                 {
-                    NPC[numNPCs].Effect = 0;
-                    NPC[numNPCs].Location.Y = b.Location.Y - 32;
-                    NPC[numNPCs].Location.SpeedY = -6;
-                    NPC[numNPCs].Location.Height = NPCHeight[C];
+                    nn.Effect = 0;
+                    nn.Location.Y = b.Location.Y - 32;
+                    nn.Location.SpeedY = -6;
+                    nn.Location.Height = NPCHeight[C];
                     // PlaySound(SFX_Mushroom); // Don't play mushroom sound on leaf, like in original SMB3
                 }
                 else
                 {
-                    NPC[numNPCs].Effect = 1;
+                    nn.Effect = 1;
                     switch(C)
                     {
                     case NPCID_VINEHEAD_GREEN_SMB3:
@@ -750,25 +761,25 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             }
             else
             {
-                NPC[numNPCs].Location.Y = b.Location.Y + 4;
-                NPC[numNPCs].Location.Height = NPCHeight[C];
-                NPC[numNPCs].Effect = 3;
+                nn.Location.Y = b.Location.Y + 4;
+                nn.Location.Height = NPCHeight[C];
+                nn.Effect = 3;
                 PlaySound(SFX_Mushroom);
             }
 
-            NPC[numNPCs].Effect2 = 0;
+            nn.Effect2 = 0;
             CheckSectionNPC(numNPCs);
-            if(NPCIsYoshi[NPC[numNPCs].Type] ||
-               NPCIsBoot[NPC[numNPCs].Type] || NPC[numNPCs].Type == 9 ||
-               NPC[numNPCs].Type == 14 || NPC[numNPCs].Type == 22 ||
-               NPC[numNPCs].Type == 90 || NPC[numNPCs].Type == 153 ||
-               NPC[numNPCs].Type == 169 || NPC[numNPCs].Type == 170 ||
-               NPC[numNPCs].Type == 182 || NPC[numNPCs].Type == 183 ||
-               NPC[numNPCs].Type == 184 || NPC[numNPCs].Type == 185 ||
-               NPC[numNPCs].Type == 186 || NPC[numNPCs].Type == 187 ||
-               NPC[numNPCs].Type == 188 || NPC[numNPCs].Type == 195)
+            if(NPCIsYoshi[nn.Type] ||
+               NPCIsBoot[nn.Type] || nn.Type == 9 ||
+               nn.Type == 14 || nn.Type == 22 ||
+               nn.Type == 90 || nn.Type == 153 ||
+               nn.Type == 169 || nn.Type == 170 ||
+               nn.Type == 182 || nn.Type == 183 ||
+               nn.Type == 184 || nn.Type == 185 ||
+               nn.Type == 186 || nn.Type == 187 ||
+               nn.Type == 188 || nn.Type == 195)
             {
-                NPC[numNPCs].TimeLeft = Physics.NPCTimeOffScreen * 20;
+                nn.TimeLeft = Physics.NPCTimeOffScreen * 20;
             }
         }
 #if 0 // don't spawn players from blocks anymore
@@ -810,7 +821,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
         b.Special = 0;
 
-        if(!(b.Type == 55))
+        if(b.Type != 55)
         {
             b.Type = newBlock;
             b.Location.Height = BlockHeight[newBlock];
@@ -828,51 +839,53 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         if(tempPlayer == 0)
         {
             numNPCs++;
-            NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Active = true;
-            NPC[numNPCs].TimeLeft = 1000;
-            NPC[numNPCs].Type = 9;
-            NPC[numNPCs].Location.Width = NPCWidth[9];
-            NPC[numNPCs].Location.X = (b.Location.X + b.Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0);
-            NPC[numNPCs].Location.SpeedX = 0;
-            NPC[numNPCs].Location.SpeedY = 0;
+            auto &nn = NPC[numNPCs];
+            nn = NPC_t();
+            nn.Active = true;
+            nn.TimeLeft = 1000;
+            nn.Type = 9;
+            nn.Location.Width = NPCWidth[9];
+            nn.Location.X = (b.Location.X + b.Location.Width / 2.0 - nn.Location.Width / 2.0);
+            nn.Location.SpeedX = 0;
+            nn.Location.SpeedY = 0;
 
             if(!HitDown)
             {
-                NPC[numNPCs].Location.Y = b.Location.Y - 0.1;
-                NPC[numNPCs].Location.Height = 0;
-                NPC[numNPCs].Effect = 1;
+                nn.Location.Y = b.Location.Y - 0.1;
+                nn.Location.Height = 0;
+                nn.Effect = 1;
             }
             else
             {
-                NPC[numNPCs].Location.Y = b.Location.Y + 4;
-                NPC[numNPCs].Location.Height = 32;
-                NPC[numNPCs].Effect = 3;
+                nn.Location.Y = b.Location.Y + 4;
+                nn.Location.Height = 32;
+                nn.Effect = 3;
             }
 
-            NPC[numNPCs].Effect2 = 0;
+            nn.Effect2 = 0;
             CheckSectionNPC(numNPCs);
         }
         else
         {
-            Player[tempPlayer].Location.Width = Physics.PlayerWidth[Player[tempPlayer].Character][Player[tempPlayer].State];
-            Player[tempPlayer].Location.Height = Physics.PlayerHeight[Player[tempPlayer].Character][Player[tempPlayer].State];
-            Player[tempPlayer].Frame = 1;
-            Player[tempPlayer].Dead = false;
-            Player[tempPlayer].Location.X = b.Location.X + b.Location.Width * 0.5 - Player[tempPlayer].Location.Width * 0.5;
+            auto &tp = Player[tempPlayer];
+            tp.Location.Width = Physics.PlayerWidth[tp.Character][tp.State];
+            tp.Location.Height = Physics.PlayerHeight[tp.Character][tp.State];
+            tp.Frame = 1;
+            tp.Dead = false;
+            tp.Location.X = b.Location.X + b.Location.Width * 0.5 - tp.Location.Width * 0.5;
 
             if(!HitDown)
             {
-                Player[tempPlayer].Location.Y = b.Location.Y - 0.1 - Player[tempPlayer].Location.Height;
+                tp.Location.Y = b.Location.Y - 0.1 - tp.Location.Height;
             }
             else
             {
-                Player[tempPlayer].Location.Y = b.Location.Y + 0.1 + b.Location.Height;
+                tp.Location.Y = b.Location.Y + 0.1 + b.Location.Height;
             }
 
-            Player[tempPlayer].Location.SpeedX = 0;
-            Player[tempPlayer].Location.SpeedY = 0;
-            Player[tempPlayer].Immune = 150;
+            tp.Location.SpeedX = 0;
+            tp.Location.SpeedY = 0;
+            tp.Immune = 150;
         }
     }
     else if(b.Special == 102) // Block contains a fire flower
@@ -888,7 +901,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
         b.Special = 0;
 
-        if(!(b.Type == 55))
+        if(b.Type != 55)
         {
             b.Type = newBlock;
             b.Location.Height = BlockHeight[newBlock];
@@ -916,9 +929,10 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         if(tempPlayer == 0)
         {
             numNPCs++;
-            NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Active = true;
-            NPC[numNPCs].TimeLeft = 1000;
+            auto &nn = NPC[numNPCs];
+            nn = NPC_t();
+            nn.Active = true;
+            nn.TimeLeft = 1000;
 
             for(auto B = 1; B <= numPlayers; B++)
             {
@@ -930,52 +944,53 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
             if(!makeShroom)
             {
-                NPC[numNPCs].Type = 14;
+                nn.Type = 14;
             }
             else
             {
-                NPC[numNPCs].Type = 9;
+                nn.Type = 9;
             }
 
-            NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
-            NPC[numNPCs].Location.X = (b.Location.X + b.Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0);
-            NPC[numNPCs].Location.SpeedX = 0;
-            NPC[numNPCs].Location.SpeedY = 0;
+            nn.Location.Width = NPCWidth[nn.Type];
+            nn.Location.X = (b.Location.X + b.Location.Width / 2.0 - nn.Location.Width / 2.0);
+            nn.Location.SpeedX = 0;
+            nn.Location.SpeedY = 0;
 
             if(!HitDown)
             {
-                NPC[numNPCs].Location.Y = b.Location.Y - 0.1;
-                NPC[numNPCs].Location.Height = 0;
-                NPC[numNPCs].Effect = 1;
+                nn.Location.Y = b.Location.Y - 0.1;
+                nn.Location.Height = 0;
+                nn.Effect = 1;
             }
             else
             {
-                NPC[numNPCs].Location.Y = b.Location.Y + 4;
-                NPC[numNPCs].Location.Height = 32;
-                NPC[numNPCs].Effect = 3;
+                nn.Location.Y = b.Location.Y + 4;
+                nn.Location.Height = 32;
+                nn.Effect = 3;
             }
 
-            NPC[numNPCs].Effect2 = 0;
+            nn.Effect2 = 0;
             CheckSectionNPC(numNPCs);
         }
         else // Rez player
         {
-            Player[tempPlayer].Frame = 1;
-            Player[tempPlayer].Dead = false;
-            Player[tempPlayer].Location.Width = Physics.PlayerWidth[Player[tempPlayer].Character][Player[tempPlayer].State];
-            Player[tempPlayer].Location.Height = Physics.PlayerHeight[Player[tempPlayer].Character][Player[tempPlayer].State];
-            Player[tempPlayer].Location.X = b.Location.X + b.Location.Width * 0.5 - Player[tempPlayer].Location.Width * 0.5;
+            auto &tp = Player[tempPlayer];
+            tp.Frame = 1;
+            tp.Dead = false;
+            tp.Location.Width = Physics.PlayerWidth[tp.Character][tp.State];
+            tp.Location.Height = Physics.PlayerHeight[tp.Character][tp.State];
+            tp.Location.X = b.Location.X + b.Location.Width * 0.5 - tp.Location.Width * 0.5;
             if(!HitDown)
             {
-                Player[tempPlayer].Location.Y = b.Location.Y - 0.1 - Player[tempPlayer].Location.Height;
+                tp.Location.Y = b.Location.Y - 0.1 - tp.Location.Height;
             }
             else
             {
-                Player[tempPlayer].Location.Y = b.Location.Y + 0.1 + b.Location.Height;
+                tp.Location.Y = b.Location.Y + 0.1 + b.Location.Height;
             }
-            Player[tempPlayer].Location.SpeedX = 0;
-            Player[tempPlayer].Location.SpeedY = 0;
-            Player[tempPlayer].Immune = 150;
+            tp.Location.SpeedX = 0;
+            tp.Location.SpeedY = 0;
+            tp.Immune = 150;
         }
     }
     else if(b.Special == 103) // Block contains a Leaf
@@ -991,7 +1006,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
         b.Special = 0;
 
-        if(!(b.Type == 55))
+        if(b.Type != 55)
         {
             b.Type = newBlock;
             b.Location.Height = BlockHeight[b.Type];
@@ -1019,9 +1034,10 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         if(tempPlayer == 0)
         {
             numNPCs++;
-            NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Active = true;
-            NPC[numNPCs].TimeLeft = 1000;
+            auto &nn = NPC[numNPCs];
+            nn = NPC_t();
+            nn.Active = true;
+            nn.TimeLeft = 1000;
 
             for(auto B = 1; B <= numPlayers; B++)
             {
@@ -1033,63 +1049,64 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
             if(!makeShroom)
             {
-                NPC[numNPCs].Type = 34;
+                nn.Type = 34;
             }
             else
             {
-                NPC[numNPCs].Type = 9;
+                nn.Type = 9;
             }
 
-            NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
-            NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
-            NPC[numNPCs].Location.X = (b.Location.X + b.Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0);
-            NPC[numNPCs].Location.SpeedX = 0;
+            nn.Location.Width = NPCWidth[nn.Type];
+            nn.Location.Height = NPCHeight[nn.Type];
+            nn.Location.X = (b.Location.X + b.Location.Width / 2.0 - nn.Location.Width / 2.0);
+            nn.Location.SpeedX = 0;
 
             if(!HitDown)
             {
-                if(NPC[numNPCs].Type == 34)
+                if(nn.Type == 34)
                 {
-                    NPC[numNPCs].Location.Y = b.Location.Y - 32;
-                    NPC[numNPCs].Location.SpeedY = -6;
-                    NPC[numNPCs].Location.Height = NPCHeight[34];
+                    nn.Location.Y = b.Location.Y - 32;
+                    nn.Location.SpeedY = -6;
+                    nn.Location.Height = NPCHeight[34];
                 }
                 else
                 {
-                    NPC[numNPCs].Location.Y = b.Location.Y - 0.1;
-                    NPC[numNPCs].Location.Height = 0;
-                    NPC[numNPCs].Effect = 1;
+                    nn.Location.Y = b.Location.Y - 0.1;
+                    nn.Location.Height = 0;
+                    nn.Effect = 1;
                 }
             }
             else
             {
-                NPC[numNPCs].Location.Y = b.Location.Y + 4;
-                NPC[numNPCs].Location.Height = 32;
-                NPC[numNPCs].Effect = 3;
+                nn.Location.Y = b.Location.Y + 4;
+                nn.Location.Height = 32;
+                nn.Effect = 3;
             }
 
-            NPC[numNPCs].Effect2 = 0;
+            nn.Effect2 = 0;
             CheckSectionNPC(numNPCs);
         }
         else // Rez player
         {
-            Player[tempPlayer].Location.Width = Physics.PlayerWidth[Player[tempPlayer].Character][Player[tempPlayer].State];
-            Player[tempPlayer].Location.Height = Physics.PlayerHeight[Player[tempPlayer].Character][Player[tempPlayer].State];
-            Player[tempPlayer].Frame = 1;
-            Player[tempPlayer].Dead = false;
-            Player[tempPlayer].Location.X = b.Location.X + b.Location.Width * 0.5 - Player[tempPlayer].Location.Width * 0.5;
+            auto &tp = Player[tempPlayer];
+            tp.Location.Width = Physics.PlayerWidth[tp.Character][tp.State];
+            tp.Location.Height = Physics.PlayerHeight[tp.Character][tp.State];
+            tp.Frame = 1;
+            tp.Dead = false;
+            tp.Location.X = b.Location.X + b.Location.Width * 0.5 - tp.Location.Width * 0.5;
 
             if(!HitDown)
             {
-                Player[tempPlayer].Location.Y = b.Location.Y - 0.1 - Player[tempPlayer].Location.Height;
+                tp.Location.Y = b.Location.Y - 0.1 - tp.Location.Height;
             }
             else
             {
-                Player[tempPlayer].Location.Y = b.Location.Y + 0.1 + b.Location.Height;
+                tp.Location.Y = b.Location.Y + 0.1 + b.Location.Height;
             }
 
-            Player[tempPlayer].Location.SpeedX = 0;
-            Player[tempPlayer].Location.SpeedY = 0;
-            Player[tempPlayer].Immune = 150;
+            tp.Location.SpeedX = 0;
+            tp.Location.SpeedY = 0;
+            tp.Immune = 150;
         }
     }
     else if(b.Special == 104) // Block contains a Shoe
@@ -1124,31 +1141,32 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
         PlaySound(SFX_Mushroom);
         numNPCs++;
-        NPC[numNPCs] = NPC_t();
-        NPC[numNPCs].Active = true;
-        NPC[numNPCs].TimeLeft = 100;
-        NPC[numNPCs].Type = 35;
-        NPC[numNPCs].Direction = -1;
-        NPC[numNPCs].Location.Width = NPCWidth[35];
-        NPC[numNPCs].Location.X = (b.Location.X + b.Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0);
-        NPC[numNPCs].Location.Y = b.Location.Y - 0.1;
-        NPC[numNPCs].Location.SpeedX = 0;
-        NPC[numNPCs].Location.SpeedY = 0;
+        auto &nn = NPC[numNPCs];
+        nn = NPC_t();
+        nn.Active = true;
+        nn.TimeLeft = 100;
+        nn.Type = 35;
+        nn.Direction = -1;
+        nn.Location.Width = NPCWidth[35];
+        nn.Location.X = (b.Location.X + b.Location.Width / 2.0 - nn.Location.Width / 2.0);
+        nn.Location.Y = b.Location.Y - 0.1;
+        nn.Location.SpeedX = 0;
+        nn.Location.SpeedY = 0;
 
         if(!HitDown)
         {
-            NPC[numNPCs].Location.Y = b.Location.Y - 0.1;
-            NPC[numNPCs].Location.Height = 0;
-            NPC[numNPCs].Effect = 1;
+            nn.Location.Y = b.Location.Y - 0.1;
+            nn.Location.Height = 0;
+            nn.Effect = 1;
         }
         else
         {
-            NPC[numNPCs].Location.Y = b.Location.Y + 4;
-            NPC[numNPCs].Location.Height = 32;
-            NPC[numNPCs].Effect = 3;
+            nn.Location.Y = b.Location.Y + 4;
+            nn.Location.Height = 32;
+            nn.Effect = 3;
         }
 
-        NPC[numNPCs].Effect2 = 0;
+        nn.Effect2 = 0;
         CheckSectionNPC(numNPCs);
     }
     else if(b.Special == 105) // Block contains a Green Yoshi
@@ -1185,33 +1203,34 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         }
 
         numNPCs++;
-        NPC[numNPCs] = NPC_t();
-        NPC[numNPCs].Active = true;
-        NPC[numNPCs].TimeLeft = 100;
-        NPC[numNPCs].Type = 96;
-        NPC[numNPCs].Special = 95;
-        NPC[numNPCs].Direction = 1;
-        NPC[numNPCs].Location.Width = NPCWidth[96];
-        NPC[numNPCs].Location.X = (b.Location.X + b.Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0);
-        NPC[numNPCs].Location.Y = b.Location.Y - 0.1;
-        NPC[numNPCs].Location.SpeedX = 0;
-        NPC[numNPCs].Location.SpeedY = 0;
+        auto &nn = NPC[numNPCs];
+        nn = NPC_t();
+        nn.Active = true;
+        nn.TimeLeft = 100;
+        nn.Type = 96;
+        nn.Special = 95;
+        nn.Direction = 1;
+        nn.Location.Width = NPCWidth[96];
+        nn.Location.X = (b.Location.X + b.Location.Width / 2.0 - nn.Location.Width / 2.0);
+        nn.Location.Y = b.Location.Y - 0.1;
+        nn.Location.SpeedX = 0;
+        nn.Location.SpeedY = 0;
 
         if(!HitDown)
         {
-            NPC[numNPCs].Location.Height = 32;
-            NPC[numNPCs].Location.Y = b.Location.Y - 32;
-            NPC[numNPCs].Effect = 0;
+            nn.Location.Height = 32;
+            nn.Location.Y = b.Location.Y - 32;
+            nn.Effect = 0;
         }
         else
         {
             PlaySound(SFX_Mushroom);
-            NPC[numNPCs].Location.Y = b.Location.Y + 4;
-            NPC[numNPCs].Location.Height = 32;
-            NPC[numNPCs].Effect = 3;
+            nn.Location.Y = b.Location.Y + 4;
+            nn.Location.Height = 32;
+            nn.Effect = 3;
         }
 
-        NPC[numNPCs].Effect2 = 0;
+        nn.Effect2 = 0;
         CheckSectionNPC(numNPCs);
     }
     else if(b.Special == 101) // Block contains a Goomba
@@ -1247,30 +1266,31 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         PlaySound(SFX_Mushroom);
 
         numNPCs++;
-        NPC[numNPCs] = NPC_t();
-        NPC[numNPCs].Active = true;
-        NPC[numNPCs].TimeLeft = 100;
-        NPC[numNPCs].Type = 1;
-        NPC[numNPCs].Location.Width = NPCWidth[9];
-        NPC[numNPCs].Location.X = (b.Location.X + b.Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0);
-        NPC[numNPCs].Location.Y = b.Location.Y - 0.1;
-        NPC[numNPCs].Location.SpeedX = 0;
-        NPC[numNPCs].Location.SpeedY = 0;
+        auto &nn = NPC[numNPCs];
+        nn = NPC_t();
+        nn.Active = true;
+        nn.TimeLeft = 100;
+        nn.Type = 1;
+        nn.Location.Width = NPCWidth[9];
+        nn.Location.X = (b.Location.X + b.Location.Width / 2.0 - nn.Location.Width / 2.0);
+        nn.Location.Y = b.Location.Y - 0.1;
+        nn.Location.SpeedX = 0;
+        nn.Location.SpeedY = 0;
 
         if(!HitDown)
         {
-            NPC[numNPCs].Location.Y = b.Location.Y - 0.1;
-            NPC[numNPCs].Location.Height = 0;
-            NPC[numNPCs].Effect = 1;
+            nn.Location.Y = b.Location.Y - 0.1;
+            nn.Location.Height = 0;
+            nn.Effect = 1;
         }
         else
         {
-            NPC[numNPCs].Location.Y = b.Location.Y + 4;
-            NPC[numNPCs].Location.Height = 32;
-            NPC[numNPCs].Effect = 3;
+            nn.Location.Y = b.Location.Y + 4;
+            nn.Location.Height = 32;
+            nn.Effect = 3;
         }
 
-        NPC[numNPCs].Effect2 = 0;
+        nn.Effect2 = 0;
         CheckSectionNPC(numNPCs);
     }
     else if(b.Special == 201) // Block contains a 1-up
@@ -1305,30 +1325,31 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
         PlaySound(SFX_Mushroom);
         numNPCs++;
-        NPC[numNPCs] = NPC_t();
-        NPC[numNPCs].Active = true;
-        NPC[numNPCs].TimeLeft = 100;
-        NPC[numNPCs].Type = 90;
-        NPC[numNPCs].Location.Width = NPCWidth[90];
-        NPC[numNPCs].Location.X = (b.Location.X + b.Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0);
-        NPC[numNPCs].Location.Y = b.Location.Y - 0.1;
-        NPC[numNPCs].Location.SpeedX = 0;
-        NPC[numNPCs].Location.SpeedY = 0;
+        auto &nn = NPC[numNPCs];
+        nn = NPC_t();
+        nn.Active = true;
+        nn.TimeLeft = 100;
+        nn.Type = 90;
+        nn.Location.Width = NPCWidth[90];
+        nn.Location.X = (b.Location.X + b.Location.Width / 2.0 - nn.Location.Width / 2.0);
+        nn.Location.Y = b.Location.Y - 0.1;
+        nn.Location.SpeedX = 0;
+        nn.Location.SpeedY = 0;
 
         if(!HitDown)
         {
-            NPC[numNPCs].Location.Y = b.Location.Y - 0.1;
-            NPC[numNPCs].Location.Height = 0;
-            NPC[numNPCs].Effect = 1;
+            nn.Location.Y = b.Location.Y - 0.1;
+            nn.Location.Height = 0;
+            nn.Effect = 1;
         }
         else
         {
-            NPC[numNPCs].Location.Y = b.Location.Y + 4;
-            NPC[numNPCs].Location.Height = 32;
-            NPC[numNPCs].Effect = 3;
+            nn.Location.Y = b.Location.Y + 4;
+            nn.Location.Height = 32;
+            nn.Effect = 3;
         }
 
-        NPC[numNPCs].Effect2 = 0;
+        nn.Effect2 = 0;
         CheckSectionNPC(numNPCs);
     }
 #endif
@@ -1336,18 +1357,19 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
     if(PSwitchTime > 0 && newBlock == 89 && b.Special == 0 && oldSpecial > 0)
     {
         numNPCs++;
-        NPC[numNPCs] = NPC_t();
-        NPC[numNPCs].Active = true;
-        NPC[numNPCs].TimeLeft = 1;
-        NPC[numNPCs].Type = 33;
-        NPC[numNPCs].Block = 89;
-        NPC[numNPCs].Location = b.Location;
-        NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
-        NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
-        NPC[numNPCs].Location.X += (b.Location.Width - NPC[numNPCs].Location.Width) / 2.0;
-        NPC[numNPCs].Location.Y -= 0.01;
-        NPC[numNPCs].DefaultLocation = NPC[numNPCs].Location;
-        NPC[numNPCs].DefaultType = NPC[numNPCs].Type;
+        auto &nn = NPC[numNPCs];
+        nn = NPC_t();
+        nn.Active = true;
+        nn.TimeLeft = 1;
+        nn.Type = 33;
+        nn.Block = 89;
+        nn.Location = b.Location;
+        nn.Location.Width = NPCWidth[nn.Type];
+        nn.Location.Height = NPCHeight[nn.Type];
+        nn.Location.X += (b.Location.Width - nn.Location.Width) / 2.0;
+        nn.Location.Y -= 0.01;
+        nn.DefaultLocation = nn.Location;
+        nn.DefaultType = nn.Type;
         CheckSectionNPC(numNPCs);
         b = blankBlock;
     }
@@ -1369,7 +1391,7 @@ void BlockShakeUp(int A)
 
     if(A != iBlock[iBlocks])
     {
-        iBlocks += 1;
+        iBlocks++;
         iBlock[iBlocks] = A;
     }
 }
@@ -1384,7 +1406,7 @@ void BlockShakeUpPow(int A)
     Block[A].ShakeY3 = 0;
     if(A != iBlock[iBlocks])
     {
-        iBlocks += 1;
+        iBlocks++;
         iBlock[iBlocks] = A;
     }
 }
@@ -1400,7 +1422,7 @@ void BlockShakeDown(int A)
 
     if(A != iBlock[iBlocks])
     {
-        iBlocks += 1;
+        iBlocks++;
         iBlock[iBlocks] = A;
     }
 }
@@ -1419,7 +1441,7 @@ void BlockHitHard(int A)
     else
     {
         Block[A].Kill = true;
-        iBlocks += 1;
+        iBlocks++;
         iBlock[iBlocks] = A;
     }
 }
@@ -1641,15 +1663,15 @@ void BlockFrames()
             pChar[Player[A].Character] = true;
     }
 
-    if(pChar[1] == false)
+    if(!pChar[1])
         BlockFrame[626] = 0;
-    if(pChar[2] == false)
+    if(!pChar[2])
         BlockFrame[627] = 0;
-    if(pChar[3] == false)
+    if(!pChar[3])
         BlockFrame[628] = 0;
-    if(pChar[4] == false)
+    if(!pChar[4])
         BlockFrame[629] = 0;
-    if(pChar[5] == false)
+    if(!pChar[5])
         BlockFrame[632] = 0;
 
     if(BlockFrame2[30] == 0)
@@ -1727,13 +1749,13 @@ void BlockFrames()
         tempBool = false;
         for(A = 1; A <= numPlayers; A++)
         {
-            if(Player[A].Stoned == true)
+            if(Player[A].Stoned)
             {
                 tempBool = true;
                 break;
             }
         }
-        if(BlockFrame[458] < 5 && tempBool == true)
+        if(BlockFrame[458] < 5 && tempBool)
         {
             BlockFrame2[458] += 1;
             if(BlockFrame2[458] >= 4)
@@ -1742,7 +1764,7 @@ void BlockFrames()
                 BlockFrame[458] += 1;
             }
         }
-        else if(BlockFrame[458] > 0 && tempBool == false)
+        else if(BlockFrame[458] > 0 && !tempBool)
         {
             BlockFrame2[458] += 1;
             if(BlockFrame2[458] >= 4)
@@ -1769,17 +1791,18 @@ void UpdateBlocks()
     {
         for(A = 1; A <= numBlock; A++)
         {
+            auto &b = Block[A];
             // respawn
-            if(Block[A].RespawnDelay > 0)
+            if(b.RespawnDelay > 0)
             {
-                Block[A].RespawnDelay += 1;
-                if(Block[A].RespawnDelay >= 65 * 60)
+                b.RespawnDelay += 1;
+                if(b.RespawnDelay >= 65 * 60)
                 {
-                    if(Block[A].DefaultType > 0 || Block[A].DefaultSpecial > 0 || Block[A].Layer == "Destroyed Blocks")
+                    if(b.DefaultType > 0 || b.DefaultSpecial > 0 || b.Layer == "Destroyed Blocks")
                     {
                         for(B = 1; B <= numPlayers; B++)
                         {
-                            if(CheckCollision(Block[A].Location, newLoc(Player[B].Location.X - 64, Player[B].Location.Y - 64, 128, 128)))
+                            if(CheckCollision(b.Location, newLoc(Player[B].Location.X - 64, Player[B].Location.Y - 64, 128, 128)))
                             {
                                 B = 0;
                                 break;
@@ -1787,37 +1810,37 @@ void UpdateBlocks()
                         }
                         if(B > 0)
                         {
-                            if(Block[A].Layer == "Destroyed Blocks")
-                                Block[A].Layer = "Default";
+                            if(b.Layer == "Destroyed Blocks")
+                                b.Layer = "Default";
 
-                            if(Block[A].Hidden)
+                            if(b.Hidden)
                             {
                                 for(B = 0; B <= maxLayers; B++)
                                 {
-                                    if(Layer[B].Name == Block[A].Layer)
-                                        Block[A].Hidden = Layer[B].Hidden;
+                                    if(Layer[B].Name == b.Layer)
+                                        b.Hidden = Layer[B].Hidden;
                                 }
 
-                                if(!Block[A].Hidden)
-                                    NewEffect(10, newLoc(Block[A].Location.X + Block[A].Location.Width / 2.0 - EffectWidth[10] / 2, Block[A].Location.Y + Block[A].Location.Height / 2.0 - EffectHeight[10] / 2));
+                                if(!b.Hidden)
+                                    NewEffect(10, newLoc(b.Location.X + b.Location.Width / 2.0 - EffectWidth[10] / 2, b.Location.Y + b.Location.Height / 2.0 - EffectHeight[10] / 2));
                             }
 
-                            if(Block[A].Type != Block[A].DefaultType || Block[A].Special != Block[A].DefaultSpecial)
+                            if(b.Type != b.DefaultType || b.Special != b.DefaultSpecial)
                             {
-                                if(Block[A].Type != Block[A].DefaultType)
-                                    NewEffect(10, newLoc(Block[A].Location.X + Block[A].Location.Width / 2.0 - EffectWidth[10] / 2, Block[A].Location.Y + Block[A].Location.Height / 2.0 - EffectHeight[10] / 2));
-                                Block[A].Special = Block[A].DefaultSpecial;
-                                Block[A].Special2 = Block[A].DefaultSpecial2;
-                                Block[A].Type = Block[A].DefaultType;
+                                if(b.Type != b.DefaultType)
+                                    NewEffect(10, newLoc(b.Location.X + b.Location.Width / 2.0 - EffectWidth[10] / 2, b.Location.Y + b.Location.Height / 2.0 - EffectHeight[10] / 2));
+                                b.Special = b.DefaultSpecial;
+                                b.Special2 = b.DefaultSpecial2;
+                                b.Type = b.DefaultType;
                             }
 
-                            Block[A].RespawnDelay = 0;
+                            b.RespawnDelay = 0;
                         }
                         else
-                            Block[A].RespawnDelay = 65 * 30;
+                            b.RespawnDelay = 65 * 30;
                     }
                     else
-                        Block[A].RespawnDelay = 0;
+                        b.RespawnDelay = 0;
                 }
             }
         }
@@ -1825,107 +1848,106 @@ void UpdateBlocks()
 
     for(auto A = 1; A <= iBlocks; A++)
     {
+        auto &ib = Block[iBlock[A]];
         // Update the shake effect
-        if(Block[iBlock[A]].Hidden == true)
+        if(ib.Hidden)
         {
-            Block[iBlock[A]].ShakeY = 0;
-            Block[iBlock[A]].ShakeY2 = 0;
-            Block[iBlock[A]].ShakeY3 = 0;
+            ib.ShakeY = 0;
+            ib.ShakeY2 = 0;
+            ib.ShakeY3 = 0;
         }
 
-        if(Block[iBlock[A]].ShakeY < 0) // Block Shake Up
+        if(ib.ShakeY < 0) // Block Shake Up
         {
-            Block[iBlock[A]].ShakeY += 2;
-            Block[iBlock[A]].ShakeY3 -= 2;
+            ib.ShakeY += 2;
+            ib.ShakeY3 -= 2;
 
-            if(Block[iBlock[A]].ShakeY == 0)
+            if(ib.ShakeY == 0)
             {
-                if(!Block[iBlock[A]].TriggerHit.empty())
+                if(!ib.TriggerHit.empty())
                 {
-                    ProcEvent(Block[iBlock[A]].TriggerHit);
+                    ProcEvent(ib.TriggerHit);
                 }
 
-                if(Block[iBlock[A]].Type == 282)
-                    Block[iBlock[A]].Type = 283;
-                else if(Block[iBlock[A]].Type == 283)
-                    Block[iBlock[A]].Type = 282;
-                if(Block[iBlock[A]].Type == 90 && Block[iBlock[A]].Special == 0 && Block[iBlock[A]].Special2 != 1)
+                if(ib.Type == 282)
+                    ib.Type = 283;
+                else if(ib.Type == 283)
+                    ib.Type = 282;
+                if(ib.Type == 90 && ib.Special == 0 && ib.Special2 != 1)
                 {
-                    Block[iBlock[A]].Hidden = true;
-                    NewEffect(82, Block[iBlock[A]].Location, 1, iBlock[A]);
-                    Block[iBlock[A]].ShakeY = 0;
-                    Block[iBlock[A]].ShakeY2 = 0;
-                    Block[iBlock[A]].ShakeY3 = 0;
+                    ib.Hidden = true;
+                    NewEffect(82, ib.Location, 1, iBlock[A]);
+                    ib.ShakeY = 0;
+                    ib.ShakeY2 = 0;
+                    ib.ShakeY3 = 0;
                 }
             }
         }
-        else if(Block[iBlock[A]].ShakeY > 0) // Block Shake Down
+        else if(ib.ShakeY > 0) // Block Shake Down
         {
-            Block[iBlock[A]].ShakeY -= 2;
-            Block[iBlock[A]].ShakeY3 += 2;
+            ib.ShakeY -= 2;
+            ib.ShakeY3 += 2;
 
-            if(Block[iBlock[A]].ShakeY == 0)
+            if(ib.ShakeY == 0)
             {
-                if(Block[iBlock[A]].TriggerHit != "")
-                {
-                    ProcEvent(Block[iBlock[A]].TriggerHit);
-                }
+                if(!ib.TriggerHit.empty())
+                    ProcEvent(ib.TriggerHit);
 
-                if(Block[iBlock[A]].Type == 282)
-                    Block[iBlock[A]].Type = 283;
-                else if(Block[iBlock[A]].Type == 283)
-                    Block[iBlock[A]].Type = 282;
+                if(ib.Type == 282)
+                    ib.Type = 283;
+                else if(ib.Type == 283)
+                    ib.Type = 282;
 
-                if(Block[iBlock[A]].Type == 90)
+                if(ib.Type == 90)
                 {
-                    Block[iBlock[A]].Hidden = true;
-                    NewEffect(82, Block[iBlock[A]].Location, 1, iBlock[A]);
-                    Block[iBlock[A]].ShakeY = 0;
-                    Block[iBlock[A]].ShakeY2 = 0;
-                    Block[iBlock[A]].ShakeY3 = 0;
+                    ib.Hidden = true;
+                    NewEffect(82, ib.Location, 1, iBlock[A]);
+                    ib.ShakeY = 0;
+                    ib.ShakeY2 = 0;
+                    ib.ShakeY3 = 0;
                 }
             }
         }
-        else if(Block[iBlock[A]].ShakeY2 > 0) // Come back down
+        else if(ib.ShakeY2 > 0) // Come back down
         {
-            Block[iBlock[A]].ShakeY2 -= 2;
-            Block[iBlock[A]].ShakeY3 += 2;
+            ib.ShakeY2 -= 2;
+            ib.ShakeY3 += 2;
 
-            if(Block[iBlock[A]].RapidHit > 0 && Block[iBlock[A]].Special > 0 && Block[iBlock[A]].ShakeY3 == 0)
+            if(ib.RapidHit > 0 && ib.Special > 0 && ib.ShakeY3 == 0)
             {
                 BlockHit(iBlock[A]);
-                Block[iBlock[A]].RapidHit -= 1;
+                ib.RapidHit -= 1;
             }
         }
-        else if(Block[iBlock[A]].ShakeY2 < 0) // Go back up
+        else if(ib.ShakeY2 < 0) // Go back up
         {
-            Block[iBlock[A]].ShakeY2 += 2;
-            Block[iBlock[A]].ShakeY3 -= 2;
+            ib.ShakeY2 += 2;
+            ib.ShakeY3 -= 2;
         }
 
-        if(Block[iBlock[A]].ShakeY3 != 0)
+        if(ib.ShakeY3 != 0)
         {
             for(auto B = 1; B <= numNPCs; B++)
             {
                 if(NPC[B].Active)
                 {
-                    if(NPC[B].Killed == 0 && NPC[B].Effect == 0 && NPC[B].HoldingPlayer == 0 && (NPCNoClipping[NPC[B].Type] == false || NPCIsACoin[NPC[B].Type] == true))
+                    if(NPC[B].Killed == 0 && NPC[B].Effect == 0 && NPC[B].HoldingPlayer == 0 && (!NPCNoClipping[NPC[B].Type] || NPCIsACoin[NPC[B].Type]))
                     {
-                        if(!(Block[iBlock[A]].ShakeY3 > 0) || NPCIsACoin[NPC[B].Type])
+                        if(ib.ShakeY3 <= 0 || NPCIsACoin[NPC[B].Type])
                         {
-                            if(ShakeCollision(NPC[B].Location, Block[iBlock[A]].Location, Block[iBlock[A]].ShakeY3) == true)
+                            if(ShakeCollision(NPC[B].Location, ib.Location, ib.ShakeY3))
                             {
                                 if(iBlock[A] != NPC[B].tempBlock)
                                 {
-                                    if(Block[iBlock[A]].IsReally != B)
+                                    if(ib.IsReally != B)
                                     {
-                                        if(BlockIsSizable[Block[iBlock[A]].Type] == false && BlockOnlyHitspot1[Block[iBlock[A]].Type] == false)
+                                        if(!BlockIsSizable[ib.Type] && !BlockOnlyHitspot1[ib.Type])
                                         {
                                             NPCHit(B, 2, iBlock[A]);
                                         }
                                         else
                                         {
-                                            if(Block[iBlock[A]].Location.Y + 1 >= NPC[B].Location.Y + NPC[B].Location.Height - 1)
+                                            if(ib.Location.Y + 1 >= NPC[B].Location.Y + NPC[B].Location.Height - 1)
                                             {
                                                 NPCHit(B, 2, iBlock[A]);
                                             }
@@ -1941,11 +1963,11 @@ void UpdateBlocks()
             {
                 if(!Player[B].Dead)
                 {
-                    if(Player[B].Effect == 0 && Block[iBlock[A]].Type != 55)
+                    if(Player[B].Effect == 0 && ib.Type != 55)
                     {
-                        if(ShakeCollision(Player[B].Location, Block[iBlock[A]].Location, Block[iBlock[A]].ShakeY3))
+                        if(ShakeCollision(Player[B].Location, ib.Location, ib.ShakeY3))
                         {
-                            if(!BlockIsSizable[Block[iBlock[A]].Type] && !BlockOnlyHitspot1[Block[iBlock[A]].Type])
+                            if(!BlockIsSizable[ib.Type] && !BlockOnlyHitspot1[ib.Type])
                             {
                                 Player[B].Location.SpeedY = double(Physics.PlayerJumpVelocity);
                                 Player[B].StandUp = true;
@@ -1953,7 +1975,7 @@ void UpdateBlocks()
                             }
                             else
                             {
-                                if(Block[iBlock[A]].Location.Y + 1 >= Player[B].Location.Y + Player[B].Location.Height - 1)
+                                if(ib.Location.Y + 1 >= Player[B].Location.Y + Player[B].Location.Height - 1)
                                 {
                                     Player[B].Location.SpeedY = double(Physics.PlayerJumpVelocity);
                                     Player[B].StandUp = true;
@@ -1966,16 +1988,16 @@ void UpdateBlocks()
             }
         }
 
-        if(Block[iBlock[A]].Kill) // See if block should be broke
+        if(ib.Kill) // See if block should be broke
         {
-            Block[iBlock[A]].Kill = false;
+            ib.Kill = false;
 
-            if(Block[iBlock[A]].Special == 0)
+            if(ib.Special == 0)
             {
-                if(Block[iBlock[A]].Type == 4 || Block[iBlock[A]].Type == 60 ||
-                   Block[iBlock[A]].Type == 90 || Block[iBlock[A]].Type == 188 ||
-                   Block[iBlock[A]].Type == 226 || Block[iBlock[A]].Type == 293 ||
-                   Block[iBlock[A]].Type == 526) // Check to see if it is breakable
+                if(ib.Type == 4 || ib.Type == 60 ||
+                   ib.Type == 90 || ib.Type == 188 ||
+                   ib.Type == 226 || ib.Type == 293 ||
+                   ib.Type == 526) // Check to see if it is breakable
                     KillBlock(iBlock[A]); // Destroy the block
             }
         }
@@ -1983,11 +2005,12 @@ void UpdateBlocks()
 
     for(auto A = iBlocks; A >= 1; A--)
     {
-        if(Block[iBlock[A]].ShakeY == 0)
+        auto &ib = Block[iBlock[A]];
+        if(ib.ShakeY == 0)
         {
-            if(Block[iBlock[A]].ShakeY2 == 0)
+            if(ib.ShakeY2 == 0)
             {
-                if(Block[iBlock[A]].ShakeY3 == 0)
+                if(ib.ShakeY3 == 0)
                 {
                     iBlock[A] = iBlock[iBlocks];
                     iBlocks -= 1;
@@ -2040,35 +2063,36 @@ void PSwitch(bool enabled)
                 if(numBlock < maxBlocks)
                 {
                     numBlock++;
+                    auto &nb = Block[numBlock];
 
                     if((NPC[A].Type == 251 || NPC[A].Type == 252 || NPC[A].Type == 253) && NPC[A].DefaultType != 0)
                         NPC[A].Type = NPC[A].DefaultType;
 
                     if(NPC[A].Type == 33 || NPC[A].Type == 258)
-                        Block[numBlock].Type = 89;
+                        nb.Type = 89;
                     else if(NPC[A].Type == 88)
-                        Block[numBlock].Type = 188;
+                        nb.Type = 188;
                     else if(NPC[A].Type == 103)
-                        Block[numBlock].Type = 280;
+                        nb.Type = 280;
                     else if(NPC[A].Type == 138)
-                        Block[numBlock].Type = 293;
+                        nb.Type = 293;
                     else
-                        Block[numBlock].Type = 4;
+                        nb.Type = 4;
 
-                    Block[numBlock].TriggerDeath = NPC[A].TriggerDeath;
-                    Block[numBlock].TriggerLast = NPC[A].TriggerLast;
-                    Block[numBlock].Layer = NPC[A].Layer;
-                    Block[numBlock].Invis = false;
-                    Block[numBlock].Hidden = false;
-                    Block[numBlock].Location = NPC[A].Location;
-                    Block[numBlock].Location.Width = BlockWidth[Block[numBlock].Type];
-                    Block[numBlock].Location.Height = BlockHeight[Block[numBlock].Type];
-                    Block[numBlock].Location.X += (NPC[A].Location.Width - Block[numBlock].Location.Width) / 2.0;
-                    Block[numBlock].Location.SpeedX = 0;
-                    Block[numBlock].Location.SpeedY = 0;
-                    Block[numBlock].Special = 0;
-                    Block[numBlock].Kill = false;
-                    Block[numBlock].NPC = NPC[A].Type;
+                    nb.TriggerDeath = NPC[A].TriggerDeath;
+                    nb.TriggerLast = NPC[A].TriggerLast;
+                    nb.Layer = NPC[A].Layer;
+                    nb.Invis = false;
+                    nb.Hidden = false;
+                    nb.Location = NPC[A].Location;
+                    nb.Location.Width = BlockWidth[nb.Type];
+                    nb.Location.Height = BlockHeight[nb.Type];
+                    nb.Location.X += (NPC[A].Location.Width - nb.Location.Width) / 2.0;
+                    nb.Location.SpeedX = 0;
+                    nb.Location.SpeedY = 0;
+                    nb.Special = 0;
+                    nb.Kill = false;
+                    nb.NPC = NPC[A].Type;
                 }
                 NPC[A].Killed = 9;
             }
@@ -2081,34 +2105,35 @@ void PSwitch(bool enabled)
                 if(numNPCs < maxNPCs)
                 {
                     numNPCs++;
-                    NPC[numNPCs] = NPC_t();
-                    NPC[numNPCs].Active = true;
-                    NPC[numNPCs].TimeLeft = 1;
+                    auto &nn = NPC[numNPCs];
+                    nn = NPC_t();
+                    nn.Active = true;
+                    nn.TimeLeft = 1;
 
                     if(Block[A].Type == 89)
-                        NPC[numNPCs].Type = 33;
+                        nn.Type = 33;
                     else if(Block[A].Type == 188 || Block[A].Type == 60)
-                        NPC[numNPCs].Type = 88;
+                        nn.Type = 88;
                     else if(Block[A].Type == 280)
-                        NPC[numNPCs].Type = 103;
+                        nn.Type = 103;
                     else if(Block[A].Type == 293)
-                        NPC[numNPCs].Type = 138;
+                        nn.Type = 138;
                     else
-                        NPC[numNPCs].Type = 10;
+                        nn.Type = 10;
 
-                    NPC[numNPCs].Layer = Block[A].Layer;
-                    NPC[numNPCs].TriggerDeath = Block[A].TriggerDeath;
-                    NPC[numNPCs].TriggerLast = Block[A].TriggerLast;
-                    NPC[numNPCs].Block = Block[A].Type;
-                    NPC[numNPCs].Hidden = false;
-                    NPC[numNPCs].Location = Block[A].Location;
-                    NPC[numNPCs].Location.SpeedX = 0;
-                    NPC[numNPCs].Location.SpeedY = 0;
-                    NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
-                    NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
-                    NPC[numNPCs].Location.X += (Block[A].Location.Width - NPC[numNPCs].Location.Width) / 2.0;
-                    NPC[numNPCs].DefaultLocation = NPC[numNPCs].Location;
-                    NPC[numNPCs].DefaultType = NPC[numNPCs].Type;
+                    nn.Layer = Block[A].Layer;
+                    nn.TriggerDeath = Block[A].TriggerDeath;
+                    nn.TriggerLast = Block[A].TriggerLast;
+                    nn.Block = Block[A].Type;
+                    nn.Hidden = false;
+                    nn.Location = Block[A].Location;
+                    nn.Location.SpeedX = 0;
+                    nn.Location.SpeedY = 0;
+                    nn.Location.Width = NPCWidth[nn.Type];
+                    nn.Location.Height = NPCHeight[nn.Type];
+                    nn.Location.X += (Block[A].Location.Width - nn.Location.Width) / 2.0;
+                    nn.DefaultLocation = nn.Location;
+                    nn.DefaultType = nn.Type;
                     CheckSectionNPC(numNPCs);
                     Block[A] = Block[numBlock];
                     Block[numBlock] = blankBlock;
@@ -2128,20 +2153,21 @@ void PSwitch(bool enabled)
                 if(numBlock < maxBlocks)
                 {
                     numBlock++;
-                    Block[numBlock].Layer = NPC[A].Layer;
-                    Block[numBlock].TriggerDeath = NPC[A].TriggerDeath;
-                    Block[numBlock].TriggerLast = NPC[A].TriggerLast;
-                    Block[numBlock].Hidden = NPC[A].Hidden;
-                    Block[numBlock].Invis = false;
-                    Block[numBlock].Type = NPC[A].Block;
-                    Block[numBlock].Location = NPC[A].Location;
-                    Block[numBlock].Location.SpeedX = 0;
-                    Block[numBlock].Location.SpeedY = 0;
-                    Block[numBlock].Location.Width = BlockWidth[Block[numBlock].Type];
-                    Block[numBlock].Location.Height = BlockHeight[Block[numBlock].Type];
-                    Block[numBlock].Location.X += (NPC[A].Location.Width - Block[numBlock].Location.Width) / 2.0;
-                    Block[numBlock].Special = 0;
-                    Block[numBlock].Kill = false;
+                    auto &nb = Block[numBlock];
+                    nb.Layer = NPC[A].Layer;
+                    nb.TriggerDeath = NPC[A].TriggerDeath;
+                    nb.TriggerLast = NPC[A].TriggerLast;
+                    nb.Hidden = NPC[A].Hidden;
+                    nb.Invis = false;
+                    nb.Type = NPC[A].Block;
+                    nb.Location = NPC[A].Location;
+                    nb.Location.SpeedX = 0;
+                    nb.Location.SpeedY = 0;
+                    nb.Location.Width = BlockWidth[nb.Type];
+                    nb.Location.Height = BlockHeight[nb.Type];
+                    nb.Location.X += (NPC[A].Location.Width - nb.Location.Width) / 2.0;
+                    nb.Special = 0;
+                    nb.Kill = false;
                 }
                 NPC[A].Killed = 9;
             }
@@ -2156,24 +2182,25 @@ void PSwitch(bool enabled)
                 if(numNPCs < maxNPCs)
                 {
                     numNPCs++;
-                    NPC[numNPCs] = NPC_t();
-                    NPC[numNPCs].Layer = Block[A].Layer;
-                    NPC[numNPCs].TriggerDeath = Block[A].TriggerDeath;
-                    NPC[numNPCs].TriggerLast = Block[A].TriggerLast;
-                    NPC[numNPCs].Active = true;
-                    NPC[numNPCs].TimeLeft = 1;
-                    NPC[numNPCs].Hidden = Block[A].Hidden;
-                    NPC[numNPCs].Type = Block[A].NPC;
-                    NPC[numNPCs].Location = Block[A].Location;
-                    NPC[numNPCs].Location.SpeedX = 0;
-                    NPC[numNPCs].Location.SpeedY = 0;
-                    NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
-                    NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
-                    NPC[numNPCs].Location.X += (Block[A].Location.Width - NPC[numNPCs].Location.Width) / 2.0;
-                    NPC[numNPCs].DefaultLocation = NPC[numNPCs].Location;
-                    NPC[numNPCs].DefaultType = NPC[numNPCs].Type;
+                    auto &nn = NPC[numNPCs];
+                    nn = NPC_t();
+                    nn.Layer = Block[A].Layer;
+                    nn.TriggerDeath = Block[A].TriggerDeath;
+                    nn.TriggerLast = Block[A].TriggerLast;
+                    nn.Active = true;
+                    nn.TimeLeft = 1;
+                    nn.Hidden = Block[A].Hidden;
+                    nn.Type = Block[A].NPC;
+                    nn.Location = Block[A].Location;
+                    nn.Location.SpeedX = 0;
+                    nn.Location.SpeedY = 0;
+                    nn.Location.Width = NPCWidth[nn.Type];
+                    nn.Location.Height = NPCHeight[nn.Type];
+                    nn.Location.X += (Block[A].Location.Width - nn.Location.Width) / 2.0;
+                    nn.DefaultLocation = nn.Location;
+                    nn.DefaultType = nn.Type;
                     CheckSectionNPC(numNPCs);
-                    NPC[numNPCs].Killed = 0;
+                    nn.Killed = 0;
                     KillBlock(A, false);
                     Block[A].Layer = "Used P Switch";
                 }

@@ -462,7 +462,7 @@ bool mainMenuUpdate()
 #else
                     MenuCursor = 0;
                     SDL_AtomicSet(&loading, 1);
-                    loadingThread = SDL_CreateThread(FindWorldsThread, "FindWorlds", NULL);
+                    loadingThread = SDL_CreateThread(FindWorldsThread, "FindWorlds", nullptr);
 #endif
                 }
                 else if(MenuCursor == 1)
@@ -482,7 +482,7 @@ bool mainMenuUpdate()
 #else
                         MenuCursor = 0;
                         SDL_AtomicSet(&loading, 1);
-                        loadingThread = SDL_CreateThread(FindWorldsThread, "FindWorlds", NULL);
+                        loadingThread = SDL_CreateThread(FindWorldsThread, "FindWorlds", nullptr);
 #endif
                     }
                 }
