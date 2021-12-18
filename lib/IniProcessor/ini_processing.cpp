@@ -1299,11 +1299,10 @@ static inline bool isFloatValue(const std::string &str)
                 continue;
 
             case ST_DOT:
-                if(c != '.')
-                    return false;
-                else
                 if((c == 'E') || (c == 'e'))
                     st = ST_EXPONENT_SIGN;
+                else if(c != '.')
+                    return false;
                 else
                     st = ST_EXPONENT;
                 continue;
