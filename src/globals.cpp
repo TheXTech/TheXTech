@@ -64,6 +64,8 @@ bool GamePaused = false;
 std::string MessageText;
 int NumSelectWorld  = 0;
 std::vector<SelectWorld_t> SelectWorld;
+std::string g_recentWorld1p;
+std::string g_recentWorld2p;
 bool ShowFPS = false;
 double PrintFPS = 0.0;
 bool GameplayPoundByAltRun = false;
@@ -485,6 +487,8 @@ int PlayerCharacter = 0;
 int PlayerCharacter2 = 0;
 double MenuMouseX = 0.0;
 double MenuMouseY = 0.0;
+Sint32 MenuWheelDelta = 0;
+bool MenuWheelMoved = false;
 bool MenuMouseDown = false;
 bool MenuMouseBack = false;
 bool MenuMouseRelease = false;
@@ -698,7 +702,7 @@ double vb6Round(double x, int decimals)
 {
     double res = x, decmul;
 
-    if(decimals < 0 || decimals > 22)
+    if(decimals < 0 || decimals >= 22)
         decimals = 0;
 
     if(SDL_fabs(x) < 1.0e16)

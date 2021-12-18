@@ -15,19 +15,19 @@ It's a port of an old VB6 engine, purely written in C++. It completely reproduce
 
 ## Why did you make it?
 I have several purposes for making it:
-- It's a very convenient research model I want to use in developent of the PGE Engine.
+- It's a very convenient research model I want to use in developent of the Moondust Engine.
 - To provide a fully-compatible replica of the old engine for modern platforms, allowing to play old levels and episodes with the same feeling as if they were played on the original VB6-based SMBX game.
 - To make it work without the necessity to use Wine on non-Windows platforms and making it available on non-x86/x64 platforms.
 - Optimizing it to use fewer hardware resources than the original VB6-based game.
 
 
-## You have PGE Engine, why you have spent over a month to craft this thing?
-I need it for PGE Engine development directly, it's much easier to hack and inspect than an old, inconvenient VB6 environment.
+## You have Moondust Engine, why you have spent over a month to craft this thing?
+I need it for Moondust Engine development directly, it's much easier to hack and inspect than an old, inconvenient VB6 environment.
 
 
-## What's the future of PGE Engine now that TheXTech exists?
-I'll continue developing the PGE Engine as I have yet to reach the second goal of the project.
-Since it's foundation, the PGE Project had two goals: 1) save SMBX; 2) give a flexible toolkit for new platform games. The opening of SMBX's source-code and introducing TheXTech has solved the first goal: SMBX has been saved and now it's free/opensource cross-platform software. PGE Engine will be used for the second goal - giving a toolkit for new games. Unlike TheXTech, PGE Engine gives a high degree of flexibility that allows anyone to build something new from scratch without inheriting an old game base. However, TheXTech is needed for PGE Engine as a working research model to develop the new engine. It will be similar to GZDoom and Chocolate Doom ports of the Doom game: GZDoom is a powerful and functional engine, the best choice for modders; Chocolate Doom is an accurate port of the original game to a modern platform with the purpose to represent the original game including even bugs. The PGE Engine intends to be like GZDoom while TheXTech is an analog of Chocolate Doom to represent an original game on modern platforms.
+## What's the future of Moondust Engine now that TheXTech exists?
+I'll continue developing the Moondust Engine as I have yet to reach the second goal of the project.
+Since it's foundation, the Moondust Project had two goals: 1) save SMBX; 2) give a flexible toolkit for new platform games. The opening of SMBX's source-code and introducing TheXTech has solved the first goal: SMBX has been saved and now it's free/opensource cross-platform software. Moondust Engine will be used for the second goal - giving a toolkit for new games. Unlike TheXTech, Moondust Engine gives a high degree of flexibility that allows anyone to build something new from scratch without inheriting an old game base. However, TheXTech is needed for Moondust Engine as a working research model to develop the new engine. It will be similar to GZDoom and Chocolate Doom ports of the Doom game: GZDoom is a powerful and functional engine, the best choice for modders; Chocolate Doom is an accurate port of the original game to a modern platform with the purpose to represent the original game including even bugs. The Moondust Engine intends to be like GZDoom while TheXTech is an analog of Chocolate Doom to represent an original game on modern platforms.
 
 
 ## Can LunaLua work on this?
@@ -46,31 +46,32 @@ The original author wrote most of the code in the "*src*" folder in VB6. I did a
 
 ## How to use this?
 Here are many ways to play games with it:
-- there are some ready-to-use packages, just take and play as you did it with SMBX.
-- [macOS users, skip this]: use by the same way as an original game: put an executable file into the game root folder with an "thextech.ini" that contains next text:
-```
+- There are some ready-to-use packages, just download them, unpack and run them as you did it with SMBX, absolutely same.
+- [macOS users, skip this]: Mix the game with existing assets directory: put an executable file into the game root folder with an "thextech.ini" that contains next text:
+```ini
 [Main]
 force-portable = true
 ```
-, music.ini, sounds.ini and additional "graphics/ui" folder. An important note: all default graphics must be converted into PNG, use GIFs2PNG tool from PGE Project over your "graphics" folder with a "-d" switch. Don't use "-r" switch to keep original GIFs together with new-made PNGs if you plan to continue the use of original VB6-written SMBX.
-- use it for debug mode: in your home directory, create the ".PGE_Project/thextech" folder (on macOS the "`~/Library/Application Support/PGE Project/thextech`") where you should put a full set of game resources and worlds stuff, this folder will work like a game root in the original game. This mode allows you to run an executable file from any folder location of your computer and use the same location of resources for all builds (except these are marked as portable by an INI file).
+, music.ini, sounds.ini and additional "graphics/ui" folder. An important note: all default graphics must be converted into PNG, use GIFs2PNG tool from Moondust Project over your "graphics" folder with a "-d" switch. Don't use "-r" switch to keep original GIFs together with new-made PNGs if you plan to continue the use of original VB6-written SMBX.
+- Use it for debug mode: in your home directory, create the ".PGE_Project/thextech" folder (on macOS the "`~/TheXTech Games/Debug Assets/`") where you should put a full set of game resources and worlds stuff, this folder will work like a game root in the original game. This mode allows you to run an executable file from any folder location of your computer and use the same location of resources for all builds (except these are marked as portable by an INI file).
 
 
 ## How to add custom episodes for the macOS version?
 If you have a bundled build of TheXTech, all default resources are inside your .app: "Content/Resources/assets/". You can modify the content, but it's not recommended! Instead, after the first run of a game, in your home directory will appear the next directory:
 ```
-   ~/TheXTech Episodes
+   ~/TheXTech Games/<game name>/
 ```
-In this directory, you will find an empty "battle" and "worlds" folder to put your custom stuff. At the "`~/Library/Application Support/PGE Project/thextech`" path logs, settings and game saves will be stored.
-If you want to replace default assets with your own, you can modify the content of the app bundle or compile a new build with giving of the necessary CMake arguments which needed to pack your custom assets root and icon into the new bundle or make the assets-less build (if you give no arguments, the assets-less build will result). Therefore, you need to put the full content of the game root into the "`~/Library/Application Support/PGE Project/thextech`" folder, include default assets (graphics, music, sounds, intro and outro levels, default battle and worlds folders).
+In this directory, you will find an empty "battle" and "worlds" folder to put your custom stuff. At the "settings" sub-directory the game settings and game saves will be stored.
+At the "`~/Library/Application Support/PGE Project/thextech/logs/`" path logs will be stored.
+If you want to replace default assets with your own, you can modify the content of the app bundle or compile a new build with giving of the necessary CMake arguments which needed to pack your custom assets root and icon into the new bundle or make the assets-less build (if you give no arguments, the assets-less build will result). Therefore, you need to put the full content of the game root into the "`~/TheXTech Games/Debug Assets/`" folder, include default assets (graphics, music, sounds, intro and outro levels, default battle and worlds folders).
 
 
 ## What is different with this thing in comparison to the original VB6 build?
 - First off, it's written in C++ while original (as we already know) is written in VB6.
-- Doesn't have an Editor. Instead, in has a deep integration with PGE Editor that allows to use it with the same functionality as in original editor (the "magic hand" functionality was kept to allow real-time editing of the level while testing, it's needed to use IPC communication with PGE Editor to get the ability to use it better).
+- Doesn't have an Editor. Instead, in has a deep integration with Moondust Editor that allows to use it with the same functionality as in original editor (the "magic hand" functionality was kept to allow real-time editing of the level while testing, it's needed to use IPC communication with Moondust Editor to get the ability to use it better).
 - Full support of UTF-8 in filename paths and internal text data (original game had the only 8bit ANSI support).
 - For graphics and controlling, it uses an SDL2 library while original game have used WinAPI calls and GDI library.
-- It uses PGE-FL that has better file formats support.
+- It uses PGE-FL library that has better file formats support.
 - A support for WLDX world maps are allowing unlimited credits lines and custom music without it being necessary to use a music.ini for music replacements.
 - Some LVLX exclusive features now working: vertical section wrap, two-way warps, custom "star needed" message, warp enter event, ability to disable stars printing in HUB episodes for specific doors, ability to disable interscene showing when going to another level through a warp.
 - Built-in support for episode and level wide music.ini and sounds.ini to override default music and sounds assets.
@@ -103,5 +104,4 @@ To build it, you need to have the following things:
 - Optionally: system-wide installed dependencies: SDL2, libFreeImageLite (a modded implementation of the FreeImage), MixerX sound library, AudioCodecs collection of libraries. Having them be installed in a system gives a major build speed up. However, it's possible to build all these dependencies in place here with a cost of extra build time being added.
 
 ## Localization
-
-Some parts of TheXTech (such as Android launcher) can be localized, you may help to translate them using WebLate platform: https://hosted.weblate.org/projects/thextech/
+Some parts of TheXTech (such as Android launcher) can be localized into many languages, you may help to translate them using WebLate platform: https://hosted.weblate.org/projects/thextech/

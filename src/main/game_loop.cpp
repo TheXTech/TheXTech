@@ -313,13 +313,13 @@ void PauseGame(int plr)
                     if(upPressed)
                     {
                         PlaySound(SFX_Slide);
-                        MenuCursor = MenuCursor - 1;
+                        MenuCursor -= 1;
                         noButtons = false;
                     }
                     else if(downPressed)
                     {
                         PlaySound(SFX_Slide);
-                        MenuCursor = MenuCursor + 1;
+                        MenuCursor += 1;
                         noButtons = false;
                     }
 
@@ -365,7 +365,7 @@ void PauseGame(int plr)
                                     {
                                         do
                                         {
-                                            Player[A].Character = Player[A].Character - 1;
+                                            Player[A].Character -= 1;
                                             if(Player[A].Character <= 0)
                                                 Player[A].Character = 5;
                                         } while(Player[A].Character == Player[B].Character || blockCharacter[Player[A].Character]);
@@ -374,7 +374,7 @@ void PauseGame(int plr)
                                     {
                                         do
                                         {
-                                            Player[A].Character = Player[A].Character + 1;
+                                            Player[A].Character += 1;
                                             if(Player[A].Character >= 6)
                                                 Player[A].Character = 1;
                                         } while(Player[A].Character == Player[B].Character || blockCharacter[Player[A].Character]);
@@ -520,7 +520,7 @@ void PauseGame(int plr)
         PGE_Delay(1);
         if(!GameIsActive)
             break;
-    } while(!(stopPause == true));
+    } while(!stopPause);
 
     GamePaused = false;
     Player[plr].UnStart = false;

@@ -37,6 +37,7 @@ static void compatInit(Compatibility_t &c)
     {
         switch(g_speedRunnerMode)
         {
+        default:
         case SPEEDRUN_MODE_1:
             CompatSetEnforcedLevel(COMPAT_MODERN);
             break;
@@ -77,6 +78,8 @@ static void compatInit(Compatibility_t &c)
     c.fix_swooper_start_while_inactive = true;
     c.fix_FreezeNPCs_no_reset = false;
     c.world_map_stars_show_policy = Compatibility_t::STARS_UNSPECIFIED;
+    // 1.3.5.3
+    c.require_ground_to_enter_warps = false;
     // 1.3.6
 
 
@@ -86,7 +89,7 @@ static void compatInit(Compatibility_t &c)
         c.fix_platforms_acceleration = false;
         c.fix_pokey_collapse = false;
         c.fix_npc_downward_clip = false;
-        c.fix_npc55_kick_ice_blocks = false;
+        c.fix_npc55_kick_ice_blocks = false; //-V1048
         c.fix_climb_invisible_fences = false;
         c.fix_climb_bgo_speed_adding = false;
         c.enable_climb_bgo_layer_move = false;
@@ -97,14 +100,14 @@ static void compatInit(Compatibility_t &c)
         c.fix_link_clowncar_fairy = false;
         c.fix_dont_switch_player_by_clowncar = false;
         c.enable_multipoints = false;
-        c.fix_autoscroll_speed = false;
+        c.fix_autoscroll_speed = false; //-V1048
         // 1.3.5.1
         c.fix_blooper_stomp_effect = false;
         c.keep_bullet_bill_dir = false;
         c.fix_pswitch_dragon_coin = false;
         // 1.3.5.2
         c.fix_swooper_start_while_inactive = false;
-        c.fix_FreezeNPCs_no_reset = false;
+        c.fix_FreezeNPCs_no_reset = false; //-V1048
         // 1.3.6
     }
 
@@ -197,6 +200,8 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
     compat.read("fix-player-filter-bounce", c.fix_player_filter_bounce, c.fix_player_filter_bounce);
     compat.read("fix-player-downward-clip", c.fix_player_downward_clip, c.fix_player_downward_clip);
     compat.read("fix-npc-downward-clip", c.fix_npc_downward_clip, c.fix_npc_downward_clip);
+    // 1.3.5.3
+    compat.read("require-ground-to-enter-warps", c.require_ground_to_enter_warps, c.require_ground_to_enter_warps);
     // 1.3.6
     compat.endGroup();
 }
@@ -228,12 +233,12 @@ void ResetCompat()
     compatInit(g_compatibility);
 }
 
-void CompatSetEnforcedLevel(int level)
+void CompatSetEnforcedLevel(int cLevel)
 {
-    if(s_compatLevel == level)
+    if(s_compatLevel == cLevel)
         return;
 
-    s_compatLevel = level;
+    s_compatLevel = cLevel;
 
     switch(s_compatLevel)
     {

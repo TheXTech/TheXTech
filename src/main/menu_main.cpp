@@ -21,7 +21,7 @@
 #include <SDL2/SDL_timer.h>
 #include <SDL2/SDL_thread.h>
 #include <fmt_format_ne.h>
-#include <atomic>
+#include <array>
 
 #include <AppPath/app_path.h>
 #include <DirManager/dirman.h>
@@ -38,6 +38,7 @@
 #include "../collision.h"
 #include "../graphics.h"
 #include "../control/joystick.h"
+#include "../compat.h"
 #include "level_file.h"
 #include "pge_delay.h"
 
@@ -57,6 +58,7 @@ void initMainMenu()
     SDL_AtomicSet(&loadingProgrss, 0);
     SDL_AtomicSet(&loadingProgrssMax, 0);
 
+    g_mainMenu.mainStartGame = "Start Game";
     g_mainMenu.main1PlayerGame = "1 Player Game";
     g_mainMenu.main2PlayerGame = "2 Player Game";
     g_mainMenu.mainBattleGame = "Battle Game";
@@ -76,6 +78,10 @@ static int menuBattleMode = false;
 
 static int menuCopySaveSrc = 0;
 static int menuCopySaveDst = 0;
+static int menuRecentEpisode = -1;
+
+static int listMenuLastScroll = 0;
+static int listMenuLastCursor = 0;
 
 static int FindWorldsThread(void *)
 {
@@ -83,18 +89,29 @@ static int FindWorldsThread(void *)
     return 0;
 }
 
-void FindWorlds()
-{
-    NumSelectWorld = 0;
-
-    std::vector<std::string> worldRoots;
-    worldRoots.push_back(AppPath + "worlds/");
 #if (defined(__APPLE__) && defined(USE_BUNDLED_ASSETS)) || defined(FIXED_ASSETS_PATH)
-    worldRoots.push_back(AppPathManager::userWorldsRootDir() + "/");
+#   define USER_WORLDS_NEEDED
+#   define WORLD_ROOTS_SIZE 2
+#else
+#   define WORLD_ROOTS_SIZE 1
 #endif
 
+void FindWorlds()
+{
+    bool compatModern = (CompatGetLevel() == COMPAT_MODERN);
+    NumSelectWorld = 0;
+    menuRecentEpisode = -1;
+
+    std::array<std::string, WORLD_ROOTS_SIZE> worldRoots =
+    {
+        AppPath + "worlds/"
+#ifdef USER_WORLDS_NEEDED
+        , AppPathManager::userWorldsRootDir() + "/"
+#endif
+    };
+
     SelectWorld.clear();
-    SelectWorld.push_back(SelectWorld_t()); // Dummy entry
+    SelectWorld.emplace_back(SelectWorld_t()); // Dummy entry
 
     SDL_AtomicSet(&loadingProgrss, 0);
     SDL_AtomicSet(&loadingProgrssMax, 0);
@@ -104,7 +121,7 @@ void FindWorlds()
         std::vector<std::string> dirs;
         DirMan episodes(worldsRoot);
         episodes.getListOfFolders(dirs);
-        SDL_AtomicAdd(&loadingProgrssMax, dirs.size());
+        SDL_AtomicAdd(&loadingProgrssMax, (int)dirs.size());
     }
 
     for(const auto &worldsRoot : worldRoots)
@@ -134,11 +151,22 @@ void FindWorlds()
                     w.WorldFile = fName;
                     if(w.WorldName.empty())
                         w.WorldName = fName;
+
                     w.blockChar[1] = head.nocharacter1;
                     w.blockChar[2] = head.nocharacter2;
-                    w.blockChar[3] = head.nocharacter3;
-                    w.blockChar[4] = head.nocharacter4;
-                    w.blockChar[5] = head.nocharacter5;
+
+                    if(head.meta.RecentFormat != LevelData::SMBX64 || head.meta.RecentFormatVersion >= 30 || !compatModern)
+                    {
+                        w.blockChar[3] = head.nocharacter3;
+                        w.blockChar[4] = head.nocharacter4;
+                        w.blockChar[5] = head.nocharacter5;
+                    }
+                    else
+                    {
+                        w.blockChar[3] = true;
+                        w.blockChar[4] = true;
+                        w.blockChar[5] = true;
+                    }
 
                     SelectWorld.push_back(w);
                 }
@@ -148,7 +176,34 @@ void FindWorlds()
         }
     }
 
-    NumSelectWorld = (SelectWorld.size() - 1);
+    // Sort all worlds by alphabetical order
+    std::sort(SelectWorld.begin(), SelectWorld.end(), [](const SelectWorld_t &a, const SelectWorld_t &b)
+    {
+        return a.WorldName < b.WorldName;
+    });
+
+    if((MenuMode == MENU_1PLAYER_GAME && !g_recentWorld1p.empty()) ||
+       (MenuMode == MENU_2PLAYER_GAME && !g_recentWorld2p.empty()))
+    {
+        for(size_t i = 1; i < SelectWorld.size(); ++i)
+        {
+            auto &w = SelectWorld[i];
+            const std::string wPath = w.WorldPath + w.WorldFile;
+
+            if((MenuMode == MENU_1PLAYER_GAME && wPath == g_recentWorld1p) ||
+               (MenuMode == MENU_2PLAYER_GAME && wPath == g_recentWorld2p))
+            {
+                menuRecentEpisode = i - 1;
+                w.highlight = true;
+            }
+        }
+
+        if(menuRecentEpisode >= 0)
+            worldCurs = menuRecentEpisode - 3;
+    }
+
+    NumSelectWorld = (int)(SelectWorld.size() - 1);
+    MenuCursor = (menuRecentEpisode < 0) ? 0 : menuRecentEpisode;
 
     SDL_AtomicSet(&loading, 0);
 }
@@ -161,17 +216,19 @@ static int FindLevelsThread(void *)
 
 void FindLevels()
 {
-    std::vector<std::string> battleRoots;
-    battleRoots.push_back(AppPath + "battle/");
-#if (defined(__APPLE__) && defined(USE_BUNDLED_ASSETS)) || defined(FIXED_ASSETS_PATH)
-    battleRoots.push_back(AppPathManager::userBattleRootDir() + "/");
+    std::array<std::string, WORLD_ROOTS_SIZE> battleRoots =
+    {
+        AppPath + "battle/"
+#ifdef USER_WORLDS_NEEDED
+        , AppPathManager::userBattleRootDir() + "/"
 #endif
+    };
 
     SelectWorld.clear();
-    SelectWorld.push_back(SelectWorld_t()); // Dummy entry
+    SelectWorld.emplace_back(SelectWorld_t()); // Dummy entry
 
     NumSelectWorld = 1;
-    SelectWorld.push_back(SelectWorld_t()); // "random level" entry
+    SelectWorld.emplace_back(SelectWorld_t()); // "random level" entry
     SelectWorld[1].WorldName = "Random Level";
     LevelData head;
 
@@ -183,7 +240,7 @@ void FindLevels()
         std::vector<std::string> files;
         DirMan battleLvls(battleRoot);
         battleLvls.getListOfFiles(files, {".lvl", ".lvlx"});
-        SDL_AtomicAdd(&loadingProgrssMax, files.size());
+        SDL_AtomicAdd(&loadingProgrssMax, (int)files.size());
     }
 
     for(const auto &battleRoot : battleRoots)
@@ -242,6 +299,7 @@ bool mainMenuUpdate()
     Location_t tempLocation;
     int menuLen;
     Player_t blankPlayer;
+    const Controls_t blank;
 
     bool altPressed = getKeyState(SDL_SCANCODE_LALT) == KEY_PRESSED ||
                       getKeyState(SDL_SCANCODE_RALT) == KEY_PRESSED;
@@ -257,6 +315,13 @@ bool mainMenuUpdate()
     bool menuDoPress = (returnPressed && !altPressed) || spacePressed;
     bool menuBackPress = (escPressed && !altPressed);
 
+    bool homePressed = getKeyState(SDL_SCANCODE_HOME) == KEY_PRESSED;
+    bool endPressed = getKeyState(SDL_SCANCODE_END) == KEY_PRESSED;
+    bool pageUpPressed = getKeyState(SDL_SCANCODE_PAGEUP) == KEY_PRESSED;
+    bool pageDownPressed = getKeyState(SDL_SCANCODE_PAGEDOWN) == KEY_PRESSED;
+
+    bool deletePressed = getKeyState(SDL_SCANCODE_DELETE) == KEY_PRESSED;
+
     {
         Controls_t &c = Player[1].Controls;
 
@@ -269,17 +334,21 @@ bool mainMenuUpdate()
             showCursor(0);
         }
 
-        if(!c.Up && !c.Down && !c.Jump && !c.Run && !c.Start)
+        if(SDL_memcmp(&blank, &c, sizeof(Controls_t)) == 0)
         {
             bool k = false;
             k |= menuDoPress;
             k |= upPressed;
             k |= downPressed;
             k |= escPressed;
+            k |= homePressed;
+            k |= endPressed;
+            k |= pageUpPressed;
+            k |= pageDownPressed;
+            k |= deletePressed;
 
             if(!k)
                 MenuCursorCanMove = true;
-
         }
 
         if(!getNewKeyboard && !getNewJoystick)
@@ -343,7 +412,7 @@ bool mainMenuUpdate()
                     if(MenuMouseY >= 350 + A * 30 && MenuMouseY <= 366 + A * 30)
                     {
                         if(A == 0)
-                            menuLen = 18 * g_mainMenu.main1PlayerGame.size() - 2;
+                            menuLen = 18 * (g_gameInfo.disableTwoPlayer ? g_mainMenu.main1PlayerGame.size() : g_mainMenu.mainStartGame.size()) - 2;
                         else if(A == 1)
                             menuLen = 18 * g_mainMenu.main2PlayerGame.size() - 2;
                         else if(A == 2)
@@ -391,38 +460,52 @@ bool mainMenuUpdate()
 #ifdef __EMSCRIPTEN__
                     FindWorlds();
 #else
-                    SDL_AtomicSet(&loading, 1);
-                    loadingThread = SDL_CreateThread(FindWorldsThread, "FindWorlds", NULL);
-#endif
                     MenuCursor = 0;
+                    SDL_AtomicSet(&loading, 1);
+                    loadingThread = SDL_CreateThread(FindWorldsThread, "FindWorlds", nullptr);
+#endif
                 }
                 else if(MenuCursor == 1)
                 {
-                    PlaySoundMenu(SFX_Do);
-                    MenuMode = MENU_2PLAYER_GAME;
-                    menuPlayersNum = 2;
-                    menuBattleMode = false;
+                    if(g_gameInfo.disableTwoPlayer)
+                    {
+                        PlaySoundMenu(SFX_BlockHit);
+                    }
+                    else
+                    {
+                        PlaySoundMenu(SFX_Do);
+                        MenuMode = MENU_2PLAYER_GAME;
+                        menuPlayersNum = 2;
+                        menuBattleMode = false;
 #ifdef __EMSCRIPTEN__
-                    FindWorlds();
+                        FindWorlds();
 #else
-                    SDL_AtomicSet(&loading, 1);
-                    loadingThread = SDL_CreateThread(FindWorldsThread, "FindWorlds", NULL);
+                        MenuCursor = 0;
+                        SDL_AtomicSet(&loading, 1);
+                        loadingThread = SDL_CreateThread(FindWorldsThread, "FindWorlds", nullptr);
 #endif
-                    MenuCursor = 0;
+                    }
                 }
                 else if(MenuCursor == 2)
                 {
-                    PlaySoundMenu(SFX_Do);
-                    MenuMode = MENU_BATTLE_MODE;
-                    menuPlayersNum = 2;
-                    menuBattleMode = true;
+                    if(g_gameInfo.disableBattleMode)
+                    {
+                        PlaySoundMenu(SFX_BlockHit);
+                    }
+                    else
+                    {
+                        PlaySoundMenu(SFX_Do);
+                        MenuMode = MENU_BATTLE_MODE;
+                        menuPlayersNum = 2;
+                        menuBattleMode = true;
 #ifdef __EMSCRIPTEN__
-                    FindLevels();
+                        FindLevels();
 #else
-                    SDL_AtomicSet(&loading, 1);
-                    loadingThread = SDL_CreateThread(FindLevelsThread, "FindLevels", NULL);
+                        SDL_AtomicSet(&loading, 1);
+                        loadingThread = SDL_CreateThread(FindLevelsThread, "FindLevels", NULL);
 #endif
-                    MenuCursor = 0;
+                        MenuCursor = 0;
+                    }
                 }
                 else if(MenuCursor == 3)
                 {
@@ -523,8 +606,11 @@ bool mainMenuUpdate()
                     }
                     else
                     {
-                        MenuCursor = selWorld - 1;
+                        // MenuCursor = selWorld - 1;
                         MenuMode /= MENU_CHARACTER_SELECT_BASE;
+                        // Restore menu state
+                        worldCurs = listMenuLastScroll;
+                        MenuCursor = listMenuLastCursor;
                     }
 
                     MenuCursorCanMove = false;
@@ -572,7 +658,9 @@ bool mainMenuUpdate()
                 }
             }
 
-            if(MenuMode > MENU_MAIN)
+            bool isListMenu = (MenuMode == MENU_1PLAYER_GAME || MenuMode == MENU_2PLAYER_GAME || MenuMode == MENU_BATTLE_MODE);
+
+            if(MenuMode > MENU_MAIN && !isListMenu)
             {
                 if(MenuCursor > numCharacters - 1)
                 {
@@ -598,10 +686,13 @@ bool mainMenuUpdate()
                 }
             }
 
-            while(((MenuMode == MENU_CHARACTER_SELECT_2P_S2 || MenuMode == MENU_CHARACTER_SELECT_BM_S2) && MenuCursor == PlayerCharacter - 1) ||
-                   blockCharacter[MenuCursor + 1])
+            if(!isListMenu)
             {
-                MenuCursor += 1;
+                while(((MenuMode == MENU_CHARACTER_SELECT_2P_S2 || MenuMode == MENU_CHARACTER_SELECT_BM_S2) && MenuCursor == PlayerCharacter - 1) ||
+                       blockCharacter[MenuCursor + 1])
+                {
+                    MenuCursor += 1;
+                }
             }
 
             if(MenuMode >= MENU_CHARACTER_SELECT_BASE && MenuMode <= MENU_CHARACTER_SELECT_BASE_END)
@@ -666,7 +757,7 @@ bool mainMenuUpdate()
 
             if(MenuCursorCanMove || MenuMouseClick || MenuMouseBack)
             {
-                if(menuBackPress || MenuMouseBack)
+                if((menuBackPress && !c.AltRun) || MenuMouseBack)
                 {
                     MenuCursor = MenuMode - 1;
 
@@ -681,6 +772,10 @@ bool mainMenuUpdate()
                 }
                 else if(menuDoPress || MenuMouseClick)
                 {
+                    // Save menu state
+                    listMenuLastScroll = worldCurs;
+                    listMenuLastCursor = MenuCursor;
+
                     PlaySoundMenu(SFX_Do);
                     selWorld = MenuCursor + 1;
                     FindSaves();
@@ -704,12 +799,76 @@ bool mainMenuUpdate()
 
             }
 
+            bool dontWrap = false;
+
+            if((c.AltRun || homePressed) && MenuCursorCanMove)
+            {
+                PlaySoundMenu(SFX_Saw);
+                MenuCursor = 0;
+                MenuCursorCanMove = false;
+                dontWrap = true;
+            }
+            else if((c.AltJump || endPressed) && MenuCursorCanMove)
+            {
+                PlaySoundMenu(SFX_Saw);
+                MenuCursor = NumSelectWorld - 1;
+                MenuCursorCanMove = false;
+                dontWrap = true;
+            }
+            else if((c.Left || pageUpPressed) && MenuCursorCanMove)
+            {
+                PlaySoundMenu(SFX_Saw);
+                MenuCursor -= 3;
+                MenuCursorCanMove = false;
+                dontWrap = true;
+            }
+            else if((c.Right || pageDownPressed) && MenuCursorCanMove)
+            {
+                PlaySoundMenu(SFX_Saw);
+                MenuCursor += 3;
+                MenuCursorCanMove = false;
+                dontWrap = true;
+            }
+            else if((c.Drop || deletePressed) && menuRecentEpisode >= 0 && MenuCursorCanMove)
+            {
+                PlaySoundMenu(SFX_Camera);
+                MenuCursor = menuRecentEpisode;
+                MenuCursorCanMove = false;
+                dontWrap = true;
+            }
+            else if(MenuWheelMoved && MenuWheelDelta > 0 && MenuCursorCanMove)
+            {
+                PlaySoundMenu(SFX_Saw);
+                MenuCursor -= 1;
+                worldCurs -= 1;
+                MenuCursorCanMove = false;
+                dontWrap = true;
+            }
+            else if(MenuWheelMoved && MenuWheelDelta < 0 && MenuCursorCanMove)
+            {
+                PlaySoundMenu(SFX_Saw);
+                MenuCursor += 1;
+                worldCurs += 1;
+                MenuCursorCanMove = false;
+                dontWrap = true;
+            }
+
             if(MenuMode < MENU_CHARACTER_SELECT_BASE)
             {
-                if(MenuCursor >= NumSelectWorld)
-                    MenuCursor = 0;
-                if(MenuCursor < 0)
-                    MenuCursor = NumSelectWorld - 1;
+                if(dontWrap)
+                {
+                    if(MenuCursor >= NumSelectWorld)
+                        MenuCursor = NumSelectWorld - 1;
+                    if(MenuCursor < 0)
+                        MenuCursor = 0;
+                }
+                else
+                {
+                    if(MenuCursor >= NumSelectWorld)
+                        MenuCursor = 0;
+                    if(MenuCursor < 0)
+                        MenuCursor = NumSelectWorld - 1;
+                }
             }
         } // World select
 
@@ -727,7 +886,10 @@ bool mainMenuUpdate()
                     if(AllCharBlock > 0)
                     {
                         MenuMode /= MENU_SELECT_SLOT_BASE;
-                        MenuCursor = selWorld - 1;
+                        //MenuCursor = selWorld - 1;
+                        // Restore menu state
+                        worldCurs = listMenuLastScroll;
+                        MenuCursor = listMenuLastCursor;
                     }
                     else
                     {
@@ -811,7 +973,20 @@ bool mainMenuUpdate()
                         PGE_Delay(500);
                         ClearGame();
 
-                        OpenWorld(SelectWorld[selWorld].WorldPath + SelectWorld[selWorld].WorldFile);
+                        std::string wPath = SelectWorld[selWorld].WorldPath + SelectWorld[selWorld].WorldFile;
+
+                        if(numPlayers == 1 && g_recentWorld1p != wPath)
+                        {
+                            g_recentWorld1p = wPath;
+                            SaveConfig();
+                        }
+                        else if(numPlayers == 2 && g_recentWorld2p != wPath)
+                        {
+                            g_recentWorld2p = wPath;
+                            SaveConfig();
+                        }
+
+                        OpenWorld(wPath);
 
                         if(SaveSlot[selSave] >= 0)
                         {
@@ -828,10 +1003,10 @@ bool mainMenuUpdate()
                                 tempLocation = WorldPath[A].Location;
                                 {
                                     Location_t &l =tempLocation;
-                                    l.X = l.X + 4;
-                                    l.Y = l.Y + 4;
-                                    l.Width = l.Width - 8;
-                                    l.Height = l.Height - 8;
+                                    l.X += 4;
+                                    l.Y += 4;
+                                    l.Width -= 8;
+                                    l.Height -= 8;
                                 }
 
                                 WorldPath[A].Active = true;
@@ -960,7 +1135,7 @@ bool mainMenuUpdate()
         }
 
         // Delete gamesave
-        else if(MenuMode == MENU_SELECT_SLOT_1P_DELETE || MenuMode == MENU_SELECT_SLOT_1P_DELETE)
+        else if(MenuMode == MENU_SELECT_SLOT_1P_DELETE || MenuMode == MENU_SELECT_SLOT_2P_DELETE)
         {
             if(MenuMouseMove)
                 s_handleMouseMove(2, 300, 350, 300, 30);
@@ -986,7 +1161,7 @@ bool mainMenuUpdate()
                 }
             }
 
-            if(MenuMode == MENU_SELECT_SLOT_1P_DELETE || MenuMode == MENU_SELECT_SLOT_1P_DELETE)
+            if(MenuMode == MENU_SELECT_SLOT_1P_DELETE || MenuMode == MENU_SELECT_SLOT_2P_DELETE)
             {
                 if(MenuCursor > 2) MenuCursor = 0;
                 if(MenuCursor < 0) MenuCursor = 2;
@@ -1009,20 +1184,20 @@ bool mainMenuUpdate()
                     if(MenuMouseY >= 350 + A * 30 && MenuMouseY <= 366 + A * 30)
                     {
                         if(A == 0)
-                            menuLen = 18 * std::strlen("player 1 controls") - 4;
+                            menuLen = 18 * 17 - 4; // std::strlen("player 1 controls")
                         else if(A == 1)
-                            menuLen = 18 * std::strlen("player 2 controls") - 4;
+                            menuLen = 18 * 17 - 4; // std::strlen("player 2 controls")
 #ifndef __ANDROID__
                         else if(A == 2)
                         {
                             if(resChanged)
-                                menuLen = 18 * std::strlen("windowed mode");
+                                menuLen = 18 * 13; // std::strlen("windowed mode")
                             else
-                                menuLen = 18 * std::strlen("fullscreen mode");
+                                menuLen = 18 * 15; // std::strlen("fullscreen mode")
                         }
 #endif
                         else
-                            menuLen = 18 * std::strlen("view credits") - 2;
+                            menuLen = 18 * 12 - 2; // std::strlen("view credits")
 
                         if(MenuMouseX >= 300 && MenuMouseX <= 300 + menuLen)
                         {
@@ -1108,55 +1283,58 @@ bool mainMenuUpdate()
                     {
                         if(MenuMouseY >= 260 - 44 + A * 30 && MenuMouseY <= 276 - 44 + A * 30)
                         {
-                            auto &ck = conKeyboard[MenuMode - MENU_INPUT_SETTINGS_BASE];
+//                            auto &ck = conKeyboard[MenuMode - MENU_INPUT_SETTINGS_BASE];
                             switch(A)
                             {
                             default:
                             case 0:
-                                menuLen = 18 * std::strlen("INPUT......KEYBOARD");
+                                menuLen = 18 * 19; // std::strlen("INPUT......KEYBOARD");
                                 break;
-                            case 1:
-                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
-                                                        getKeyName(ck.Up)).size());
-                                break;
-                            case 2:
-                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
-                                                        getKeyName(ck.Down)).size());
-                                break;
-                            case 3:
-                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
-                                                        getKeyName(ck.Left)).size());
-                                break;
-                            case 4:
-                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
-                                                        getKeyName(ck.Right)).size());
-                                break;
-                            case 5:
-                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
-                                                        getKeyName(ck.Run)).size());
-                                break;
-                            case 6:
-                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
-                                                        getKeyName(ck.AltRun)).size());
-                                break;
-                            case 7:
-                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
-                                                        getKeyName(ck.Jump)).size());
-                                break;
-                            case 8:
-                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
-                                                        getKeyName(ck.AltJump)).size());
-                                break;
-                            case 9:
-                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
-                                                        getKeyName(ck.Drop)).size());
-                                break;
-                            case 10:
-                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
-                                                        getKeyName(ck.Start)).size());
-                                break;
+                            case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8: case 9: case 10:
+                                menuLen = 18 * 17;
+                                break; // Every printed key treated as always 17 characters
+//                            case 1:
+//                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
+//                                                        getKeyName(ck.Up)).size());
+//                                break;
+//                            case 2:
+//                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
+//                                                        getKeyName(ck.Down)).size());
+//                                break;
+//                            case 3:
+//                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
+//                                                        getKeyName(ck.Left)).size());
+//                                break;
+//                            case 4:
+//                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
+//                                                        getKeyName(ck.Right)).size());
+//                                break;
+//                            case 5:
+//                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
+//                                                        getKeyName(ck.Run)).size());
+//                                break;
+//                            case 6:
+//                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
+//                                                        getKeyName(ck.AltRun)).size());
+//                                break;
+//                            case 7:
+//                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
+//                                                        getKeyName(ck.Jump)).size());
+//                                break;
+//                            case 8:
+//                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
+//                                                        getKeyName(ck.AltJump)).size());
+//                                break;
+//                            case 9:
+//                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
+//                                                        getKeyName(ck.Drop)).size());
+//                                break;
+//                            case 10:
+//                                menuLen = 18 * static_cast<int>(fmt::format_ne("UP.........{0}",
+//                                                        getKeyName(ck.Start)).size());
+//                                break;
                             case 11:
-                                menuLen = 18 * std::strlen("Reset tp default");
+                                menuLen = 18 * 16; // std::strlen("Reset tp default");
                                 break;
                             }
 
@@ -1181,13 +1359,10 @@ bool mainMenuUpdate()
                         if(MenuMouseY >= 260 - 44 + A * 30 && MenuMouseY <= 276 + A * 30 - 44)
                         {
                             if(A == 0)
-                            {
-                                menuLen = 18 * std::strlen("INPUT......JOYSTICK 1") - 2;
-                            }
+                                menuLen = 18 * 21 - 2; // std::strlen("INPUT......JOYSTICK 1")
                             else
-                            {
-                                menuLen = 18 * std::strlen("RUN........_");
-                            }
+                                menuLen = 18 * 12; // std::strlen("RUN........_");
+
                             if(MenuMouseX >= 300 && MenuMouseX <= 300 + menuLen)
                             {
                                 if(MenuMouseRelease && MenuMouseDown)
@@ -1476,9 +1651,21 @@ void mainMenuDraw()
     // Main menu
     else if(MenuMode == MENU_MAIN)
     {
-        SuperPrint(g_mainMenu.main1PlayerGame, 3, 300, 350);
-        SuperPrint(g_mainMenu.main2PlayerGame, 3, 300, 380);
-        SuperPrint(g_mainMenu.mainBattleGame, 3, 300, 410);
+        if(g_gameInfo.disableTwoPlayer)
+            SuperPrint(g_mainMenu.mainStartGame, 3, 300, 350);
+        else
+            SuperPrint(g_mainMenu.main1PlayerGame, 3, 300, 350);
+
+        if(g_gameInfo.disableTwoPlayer)
+            SuperPrint(g_mainMenu.main2PlayerGame, 3, 300, 380, 0.5f, 0.5f, 0.5f);
+        else
+            SuperPrint(g_mainMenu.main2PlayerGame, 3, 300, 380);
+
+        if(g_gameInfo.disableBattleMode)
+            SuperPrint(g_mainMenu.mainBattleGame, 3, 300, 410, 0.5f, 0.5f, 0.5f);
+        else
+            SuperPrint(g_mainMenu.mainBattleGame, 3, 300, 410);
+
         SuperPrint(g_mainMenu.mainOptions, 3, 300, 440);
         SuperPrint(g_mainMenu.mainExit, 3, 300, 470);
         frmMain.renderTexture(300 - 20, 350 + (MenuCursor * 30), 16, 16, GFX.MCursor[0], 0, 0);
@@ -1514,11 +1701,11 @@ void mainMenuDraw()
             SuperPrint(g_mainMenu.selectPlayer[2], 3, 300, 380 + A);
         else
         {
-            A = A - 30;
+            A -= 30;
             if(MenuCursor + 1 >= 2)
-                B = B - 30;
+                B -= 30;
             if(PlayerCharacter >= 2)
-                C = C - 30;
+                C -= 30;
         }
 
         if(!blockCharacter[3])
@@ -1569,7 +1756,7 @@ void mainMenuDraw()
     else if(MenuMode == MENU_1PLAYER_GAME || MenuMode == MENU_2PLAYER_GAME || MenuMode == MENU_BATTLE_MODE)
     {
         s_drawGameTypeTitle(300, 280);
-        std::string tempStr;
+        // std::string tempStr;
 
         minShow = 1;
         maxShow = NumSelectWorld;
@@ -1603,9 +1790,10 @@ void mainMenuDraw()
 
         for(auto A = minShow; A <= maxShow; A++)
         {
+            auto w = SelectWorld[A];
             B = A - minShow + 1;
-            tempStr = SelectWorld[A].WorldName;
-            SuperPrint(tempStr, 3, 300, 320 + (B * 30));
+            float r = w.highlight ? 0.f : 1.f;
+            SuperPrint(w.WorldName, 3, 300, 320 + (B * 30), r, 1.f, 1.f, 1.f);
         }
 
         if(minShow > 1)

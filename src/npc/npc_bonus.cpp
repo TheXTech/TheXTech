@@ -127,7 +127,7 @@ void TouchBonus(int A, int B)
         {
             if(NPC[B].Type == 34 || NPC[B].Type == 169 || NPC[B].Type == 170)
             {
-                Player[A].Hearts = Player[A].Hearts + 1;
+                Player[A].Hearts += 1;
                 if(Player[A].Hearts > 3)
                     Player[A].Hearts = 3;
             }
@@ -247,7 +247,7 @@ void TouchBonus(int A, int B)
                 Player[A].State = 2;
             if(Player[A].Character == 3 || Player[A].Character == 4 || Player[A].Character == 5)
             {
-                Player[A].Hearts = Player[A].Hearts + 1;
+                Player[A].Hearts += 1;
                 if(Player[A].Hearts > 3)
                     Player[A].Hearts = 3;
             }
@@ -278,7 +278,7 @@ void TouchBonus(int A, int B)
         {
             if(Player[A].Character == 3 || Player[A].Character == 4 || Player[A].Character == 5)
             {
-                Player[A].Hearts = Player[A].Hearts + 1;
+                Player[A].Hearts += 1;
                 if(Player[A].Hearts > 3)
                     Player[A].Hearts = 3;
             }
@@ -312,7 +312,7 @@ void TouchBonus(int A, int B)
         {
             if(Player[A].Character == 3 || Player[A].Character == 4 || Player[A].Character == 5)
             {
-                Player[A].Hearts = Player[A].Hearts + 1;
+                Player[A].Hearts += 1;
                 if(Player[A].Hearts > 3)
                     Player[A].Hearts = 3;
             }
@@ -439,18 +439,18 @@ void TouchBonus(int A, int B)
             else if(NPC[B].Type != 274)
                 PlaySound(SFX_Coin);
             if(NPC[B].Type == 252 || NPC[B].Type == 258)
-                Coins = Coins + 5;
+                Coins += 5;
             else if(NPC[B].Type == 253)
-                Coins = Coins + 20;
+                Coins += 20;
             else
-                Coins = Coins + 1;
+                Coins += 1;
             if(Coins >= 100)
             {
                 if(Lives < 99)
                 {
-                    Lives = Lives + 1;
+                    Lives += 1;
                     PlaySound(SFX_1up);
-                    Coins = Coins - 100;
+                    Coins -= 100;
                 }
                 else
                     Coins = 99;
@@ -459,7 +459,7 @@ void TouchBonus(int A, int B)
             {
                 PlaySound(SFX_DraginCoin);
                 MoreScore(NPCScore[NPC[B].Type], NPC[B].Location);
-                NPCScore[274] = NPCScore[274] + 1;
+                NPCScore[274] += 1;
                 if(NPCScore[274] > 14)
                     NPCScore[274] = 14;
             }

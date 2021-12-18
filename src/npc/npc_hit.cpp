@@ -27,6 +27,7 @@
 #include "../game_main.h"
 #include "../blocks.h"
 #include "../graphics.h"
+#include "../npc_id.h"
 
 #include <Logger/logger.h>
 
@@ -47,14 +48,16 @@ void NPCHit(int A, int B, int C)
     // B = 9      Fell of a cliff
     // B = 10     Link stab
     // Frost Bolt check
-    if(B == 3 && NPC[A].Type != 263 && NPC[A].Type != 265)
+    if(B == 3 && NPC[A].Type != NPCID_ICE_CUBE && NPC[A].Type != NPCID_PLAYERICEBALL)
     {
-        if(NPC[C].Type == 265 && NPC[A].Location.Width > 8 && NPC[A].Location.Height > 8)
+        if(NPC[C].Type == NPCID_PLAYERICEBALL && NPC[A].Location.Width > 8 && NPC[A].Location.Height > 8)
         {
-            if(NPC[A].Type == 283)
+            if(NPC[A].Type == NPCID_BUBBLE)
                 NPCHit(A, 3, B);
-            if(NPCNoIceBall[NPC[A].Type] == true || NPC[A].Location.Width > 128 || NPC[A].Location.Height > 128)
+
+            if(NPCNoIceBall[NPC[A].Type] || NPC[A].Location.Width > 128 || NPC[A].Location.Height > 128)
                 return;
+
             if(NPC[A].Type == 3)
             {
                 NPC[A].Type = 2;
@@ -120,22 +123,26 @@ void NPCHit(int A, int B, int C)
                 NPC[A].Type = 1;
                 NPC[A].Frame = EditorNPCFrame(NPC[A].Type, NPC[A].Direction);
             }
+
             NPC[A].Special = NPC[A].Type;
             NPC[A].Special2 = NPC[A].Frame;
             // If .Type = 52 Or .Type = 51 Then
             NPC[A].Special3 = 1;
             NPC[A].Location.SpeedY = 0;
             // End If
+
             NPC[A].Location.SpeedX = 0;
-            if(NPC[A].Type == 52)
+
+            if(NPC[A].Type == NPCID_SIDEPIRHANA)
             {
                 if(NPC[A].Direction == -1)
                     NPC[A].Location.Width = static_cast<int>(floor(static_cast<double>(NPC[A].Location.Width))) - 0.01;
                 else
                     NPC[A].Location.X = static_cast<int>(floor(static_cast<double>(NPC[A].Location.X))) + 0.01;
             }
+
             NPC[A].Location.Height = static_cast<int>(floor(static_cast<double>(NPC[A].Location.Height)));
-            NPC[A].Type = 263;
+            NPC[A].Type = NPCID_ICE_CUBE;
             NPC[A].BeltSpeed = 0;
             NPC[A].Projectile = false;
             NPC[A].RealSpeedX = 0;
@@ -176,25 +183,25 @@ void NPCHit(int A, int B, int C)
     //        }
     //    }
 
-    if(NPC[A].Active == false)
+    if(!NPC[A].Active)
         return;
 
 
     // Safety
-    StopHit = StopHit + 1;
+    StopHit += 1;
     if(NPC[A].Killed > 0)
         return;
     if(B == 3 || B == 4)
     {
-        if(NPC[C].Generator == true)
+        if(NPC[C].Generator)
             return;
     }
-    if((NPC[A].Type == 235 || NPC[A].Type == 231 || NPCIsCheep[NPC[A].Type] == true) && B == 1)
+    if((NPC[A].Type == 235 || NPC[A].Type == 231 || NPCIsCheep[NPC[A].Type]) && B == 1)
     {
         if(Player[C].Wet > 0)
             return;
     }
-    if(NPC[A].Inert == true || StopHit > 2 || NPC[A].Immune > 0 || NPC[A].Killed > 0 || NPC[A].Effect == 208 || NPC[A].Generator == true)
+    if(NPC[A].Inert || StopHit > 2 || NPC[A].Immune > 0 || NPC[A].Killed > 0 || NPC[A].Effect == 208 || NPC[A].Generator)
         return;
     if(B == 6 && NPC[A].Killed == 6)
         return;
@@ -213,7 +220,7 @@ void NPCHit(int A, int B, int C)
 
     if(B == 10 && NPC[A].Type == 31)
     {
-        if(Player[C].Character == 5 && Player[C].HasKey == false)
+        if(Player[C].Character == 5 && !Player[C].HasKey)
         {
             NPC[A].Killed = 9;
             Player[C].HasKey = true;
@@ -267,9 +274,9 @@ void NPCHit(int A, int B, int C)
     else if(B == 10 && NPC[A].Type == 134 && NPC[A].CantHurt == 0 && !NPC[A].Projectile) // link picks up bombs
     {
         if(Player[C].Bombs < 9)
-            Player[C].Bombs = Player[C].Bombs + 1;
-        // .Location.X = .Location.X + .Location.Width / 2 - EffectWidth(10) / 2
-        // .Location.Y = .Location.Y + .Location.Height / 2 - EffectHeight(10) / 2
+            Player[C].Bombs += 1;
+        // .Location.X += .Location.Width / 2 - EffectWidth(10) / 2
+        // .Location.Y += .Location.Height / 2 - EffectHeight(10) / 2
         // NewEffect 10, .Location
         NPC[A].Killed = 9;
         PlaySound(SFX_ZeldaHeart);
@@ -300,7 +307,7 @@ void NPCHit(int A, int B, int C)
     {
         if(NPC[A].Type == 91)
         {
-            NPC[A].Location.Y = NPC[A].Location.Y - NPC[A].Location.Height;
+            NPC[A].Location.Y += -NPC[A].Location.Height;
             NPC[A].Type = NPC[A].Special;
         }
         PlaySound(SFX_ZeldaGrass);
@@ -309,7 +316,7 @@ void NPCHit(int A, int B, int C)
         {
             PlaySound(SFX_Bullet);
             NPC[A].Location.SpeedX = 5 * Player[C].Direction;
-            NPC[A].Location.Y = NPC[A].Location.Y + NPC[A].Location.Height;
+            NPC[A].Location.Y += NPC[A].Location.Height;
         }
         NPC[A].Direction = Player[C].Direction;
         NPC[A].Generator = false;
@@ -324,12 +331,12 @@ void NPCHit(int A, int B, int C)
         }
         if(!(NPC[A].Type == 21 || NPC[A].Type == 22 || NPC[A].Type == 26 || NPC[A].Type == 31 || NPC[A].Type == 32 || NPC[A].Type == 35 || NPC[A].Type == 191 || NPC[A].Type == 193 || NPC[A].Type == 49 || NPCIsAnExit[NPC[A].Type]))
         {
-            if(BattleMode == false)
+            if(!BattleMode)
                 NPC[A].DefaultType = 0;
         }
         NPC[A].Location.Height = NPCHeight[NPC[A].Type];
         NPC[A].Location.Width = NPCWidth[NPC[A].Type];
-        NPC[A].Location.Y = NPC[A].Location.Y - NPC[A].Location.Height;
+        NPC[A].Location.Y += -NPC[A].Location.Height;
         NPC[A].Location.SpeedX = (3 + dRand() * 1) * Player[C].Direction;
         if(NPC[A].Type == 17)
             NPC[A].Location.SpeedX = 5 * Player[C].Direction;
@@ -346,17 +353,17 @@ void NPCHit(int A, int B, int C)
                 NPC[A].Type = 252;
             if(dRand() * 40 < 3)
                 NPC[A].Type = 253;
-            NPC[A].Location.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0;
-            NPC[A].Location.Y = NPC[A].Location.Y + NPC[A].Location.Height;
+            NPC[A].Location.X += NPC[A].Location.Width / 2.0;
+            NPC[A].Location.Y += NPC[A].Location.Height;
             NPC[A].Location.Width = NPCWidth[NPC[A].Type];
             NPC[A].Location.Height = NPCHeight[NPC[A].Type];
-            NPC[A].Location.X = NPC[A].Location.X - NPC[A].Location.Width / 2.0;
-            NPC[A].Location.Y = NPC[A].Location.Y - NPC[A].Location.Height;
+            NPC[A].Location.X += -NPC[A].Location.Width / 2.0;
+            NPC[A].Location.Y += -NPC[A].Location.Height;
         }
         if(NPCIsAShell[NPC[A].Type])
             NPC[A].Location.SpeedX = Physics.NPCShellSpeed * Player[C].Direction;
         NPCFrames(A);
-        if(NPCIsACoin[NPC[A].Type] == false)
+        if(!NPCIsACoin[NPC[A].Type])
             NPC[A].Projectile = true;
         else
             NPC[A].Special = 1;
@@ -389,7 +396,7 @@ void NPCHit(int A, int B, int C)
         {
             if(NPC[C].Type == 13 || NPC[C].Type == 108)
             {
-                NPC[A].Damage = NPC[A].Damage + 1;
+                NPC[A].Damage += 1;
                 PlaySound(SFX_ShellHit);
             }
             else
@@ -417,16 +424,16 @@ void NPCHit(int A, int B, int C)
             NPC[A].Special4 = 0;
             NPC[A].Special5 = 0;
             NPC[A].Special6 = 0;
-            NPC[A].Location.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0;
-            NPC[A].Location.Y = NPC[A].Location.Y + NPC[A].Location.Height;
+            NPC[A].Location.X += NPC[A].Location.Width / 2.0;
+            NPC[A].Location.Y += NPC[A].Location.Height;
             if(NPC[A].Type == 267)
                 NPC[A].Type = 268;
             else
                 NPC[A].Type = 281;
             NPC[A].Location.Width = NPCWidth[NPC[A].Type];
             NPC[A].Location.Height = NPCHeight[NPC[A].Type];
-            NPC[A].Location.X = NPC[A].Location.X - NPC[A].Location.Width / 2.0;
-            NPC[A].Location.Y = NPC[A].Location.Y - NPC[A].Location.Height;
+            NPC[A].Location.X += -NPC[A].Location.Width / 2.0;
+            NPC[A].Location.Y += -NPC[A].Location.Height;
             NPC[A].Location.SpeedX = 0;
             NPC[A].Location.SpeedY = 0;
             oldNPC = NPC[A];
@@ -444,9 +451,9 @@ void NPCHit(int A, int B, int C)
             {
 
                 if(Player[C].Location.X + Player[C].Location.Width / 2.0 < NPC[A].Location.X + NPC[A].Location.Width / 2.0)
-                    Player[C].Location.SpeedX = Player[C].Location.SpeedX - 3;
+                    Player[C].Location.SpeedX -= 3;
                 else
-                    Player[C].Location.SpeedX = Player[C].Location.SpeedX + 3;
+                    Player[C].Location.SpeedX += 3;
 
             }
             PlaySound(SFX_Stomp);
@@ -455,20 +462,20 @@ void NPCHit(int A, int B, int C)
         {
             if(NPC[C].Type == 13 || NPC[C].Type == 108)
             {
-                NPC[A].Damage = NPC[A].Damage + 1;
+                NPC[A].Damage += 1;
                 PlaySound(SFX_ShellHit);
             }
             else
             {
                 NPCHit(C, 3, B);
                 NPC[A].Special = 5;
-                NPC[A].Damage = NPC[A].Damage + 5;
+                NPC[A].Damage += 5;
                 PlaySound(SFX_BirdoHit);
             }
         }
         else if(B == 10)
         {
-            NPC[A].Damage = NPC[A].Damage + 2;
+            NPC[A].Damage += 2;
             PlaySound(SFX_ZeldaHit);
         }
         else if(B == 6)
@@ -481,7 +488,7 @@ void NPCHit(int A, int B, int C)
     {
         if(B == 10)
         {
-            if(Player[C].HasKey == true)
+            if(Player[C].HasKey)
             {
                 Player[C].HasKey = false;
                 NPC[A].Killed = 3;
@@ -500,10 +507,10 @@ void NPCHit(int A, int B, int C)
         {
             if(NPC[A].Type == 162)
             {
-                NPC[A].Location.Y = NPC[A].Location.Y + NPC[A].Location.Height;
+                NPC[A].Location.Y += NPC[A].Location.Height;
                 NPC[A].Location.Height = 32;
                 NPC[A].Type = 163;
-                NPC[A].Location.Y = NPC[A].Location.Y - NPC[A].Location.Height;
+                NPC[A].Location.Y += -NPC[A].Location.Height;
                 PlaySound(SFX_Stomp);
             }
             else if(NPC[A].Type != 234)
@@ -534,11 +541,12 @@ void NPCHit(int A, int B, int C)
         int D = 0;
         bool tempBool;
         tempBool = false;
+
         for(D = 1; D <= numNPCs; D++)
         {
             if(NPC[D].Type == 208)
             {
-                if(NPC[D].Active == true)
+                if(NPC[D].Active)
                 {
                     if(NPC[D].Section == NPC[A].Section)
                     {
@@ -552,7 +560,8 @@ void NPCHit(int A, int B, int C)
                 }
             }
         }
-        if(tempBool == false)
+
+        if(!tempBool)
         {
             if(B == 3 || B == 10)
             {
@@ -567,7 +576,7 @@ void NPCHit(int A, int B, int C)
                         NPC[A].Immune = 20;
                     NPC[A].Special = 1;
                     PlaySound(SFX_SMBossHit);
-                    NPC[A].Damage = NPC[A].Damage + 1;
+                    NPC[A].Damage += 1;
                     if(NPC[A].Damage >= 10)
                         NPC[A].Killed = 3;
                 }
@@ -595,12 +604,12 @@ void NPCHit(int A, int B, int C)
                     NPC[A].Immune = 60;
                 else
                     NPC[A].Immune = 20;
-                NPC[A].Damage = NPC[A].Damage + 3;
+                NPC[A].Damage += 3;
             }
         }
         else if(B == 10)
         {
-            NPC[A].Damage = NPC[A].Damage + 3;
+            NPC[A].Damage += 3;
             NPC[A].Immune = 10;
         }
         if(NPC[A].Damage >= 15)
@@ -625,7 +634,7 @@ void NPCHit(int A, int B, int C)
             if(NPC[C].Type != 13 && NPC[C].Type != 108)
                 NPC[A].Killed = B;
         }
-        else if(!(B == 1))
+        else if(B != 1)
             NPC[A].Killed = B;
         // Metroid Crawler
     }
@@ -634,9 +643,9 @@ void NPCHit(int A, int B, int C)
         if(B == 3)
         {
             if(NPC[C].Type == 13)
-                NPC[A].Damage = NPC[A].Damage + 1;
+                NPC[A].Damage += 1;
             else
-                NPC[A].Damage = NPC[A].Damage + 3;
+                NPC[A].Damage += 3;
             if(NPC[A].Damage >= 3)
                 NPC[A].Killed = B;
             else
@@ -644,7 +653,7 @@ void NPCHit(int A, int B, int C)
         }
         else if(B == 8)
         {
-            NPC[A].Damage = NPC[A].Damage + 1;
+            NPC[A].Damage += 1;
             if(NPC[A].Damage >= 3)
                 NPC[A].Killed = B;
             else
@@ -665,11 +674,11 @@ void NPCHit(int A, int B, int C)
         {
             if(NPC[C].Type != 13)
             {
-                NPC[A].Damage = NPC[A].Damage + 5;
+                NPC[A].Damage += 5;
                 NPC[A].Immune = 60;
             }
             else
-                NPC[A].Damage = NPC[A].Damage + 1;
+                NPC[A].Damage += 1;
         }
         else if(B == 6)
         {
@@ -678,7 +687,7 @@ void NPCHit(int A, int B, int C)
         }
         else if(B == 10)
         {
-            NPC[A].Damage = NPC[A].Damage + 2;
+            NPC[A].Damage += 2;
             NPC[A].Immune = 20;
         }
         if(NPC[A].Damage >= 20)
@@ -709,7 +718,7 @@ void NPCHit(int A, int B, int C)
                 if(NPC[A].Special == 1)
                 {
                     PlaySound(SFX_BirdoHit);
-                    NPC[A].Damage = NPC[A].Damage + 5;
+                    NPC[A].Damage += 5;
                     NPC[A].Immune = 20;
                     NPC[C].Killed = 9;
                 }
@@ -719,13 +728,13 @@ void NPCHit(int A, int B, int C)
                 if(NPC[C].Type != 13)
                 {
                     PlaySound(SFX_BirdoHit);
-                    NPC[A].Damage = NPC[A].Damage + 5;
+                    NPC[A].Damage += 5;
                     NPC[A].Immune = 20;
                 }
                 else
                 {
                     PlaySound(SFX_ShellHit);
-                    NPC[A].Damage = NPC[A].Damage + 1;
+                    NPC[A].Damage += 1;
                 }
             }
         }
@@ -737,7 +746,7 @@ void NPCHit(int A, int B, int C)
         else if(B == 10)
         {
             PlaySound(SFX_BirdoHit);
-            NPC[A].Damage = NPC[A].Damage + 5;
+            NPC[A].Damage += 5;
             NPC[A].Immune = 20;
         }
         // King Koopa
@@ -753,19 +762,19 @@ void NPCHit(int A, int B, int C)
             if(NPC[C].Type != 13)
             {
                 PlaySound(SFX_BirdoHit);
-                NPC[A].Damage = NPC[A].Damage + 3;
+                NPC[A].Damage += 3;
             }
             else
             {
                 PlaySound(SFX_ShellHit);
-                NPC[A].Damage = NPC[A].Damage + 1;
+                NPC[A].Damage += 1;
             }
         }
         else if(B == 10)
         {
             PlaySound(SFX_BirdoHit);
             NPC[A].Immune = 20;
-            NPC[A].Damage = NPC[A].Damage + 1;
+            NPC[A].Damage += 1;
         }
         else if(B == 6)
             NPC[A].Killed = B;
@@ -803,7 +812,7 @@ void NPCHit(int A, int B, int C)
         {
             if(B == 3 && NPC[C].Type == 45)
                 NPCHit(C, 3, C);
-            NPC[A].Damage = NPC[A].Damage + 1;
+            NPC[A].Damage += 1;
             NPC[A].Immune = 30;
             if(NPC[A].Damage >= 3)
                 NPC[A].Killed = B;
@@ -819,7 +828,7 @@ void NPCHit(int A, int B, int C)
     {
         if((B == 3 && NPC[C].Type != 13) || B == 4)
         {
-            if(!(NPC[A].Type == 259) && NPC[C].Type != 58) // roto disks don't die form falling blocks
+            if(NPC[A].Type != 259 && NPC[C].Type != 58) // roto disks don't die form falling blocks
             {
                 if(NPC[A].Type != 179)
                     NPC[A].Killed = B;
@@ -1020,7 +1029,7 @@ void NPCHit(int A, int B, int C)
         // in VB6, it does check and causes a crash, because C is an index of block when B is 4
         else if(B == 4 && (NPC[C].Type != NPC[A].Type || A == C))
         {
-            if(!(NPC[C].Type == 202) && !(NPC[C].Type == 201))
+            if(NPC[C].Type != 202 && NPC[C].Type != 201)
             {
                 if(NPC[A].Location.SpeedY > -4)
                     NPC[A].Location.SpeedY = -4;
@@ -1131,7 +1140,7 @@ void NPCHit(int A, int B, int C)
             NPC[A].Location.Height = 28;
         // Friendly NPCs (Toad, Peach, Link, Luigi, Etc.)
     }
-    else if(NPCIsToad[NPC[A].Type] == true)
+    else if(NPCIsToad[NPC[A].Type])
     {
         if(B == 2 && NPC[A].Location.SpeedY > -4)
         {
@@ -1209,13 +1218,13 @@ void NPCHit(int A, int B, int C)
                 {
                     NPC[A].Killed = B;
                     NewEffect(75, NPC[A].Location);
-                    Effect[numEffects].Location.X = Effect[numEffects].Location.X + NPC[A].Location.SpeedX;
-                    Effect[numEffects].Location.Y = Effect[numEffects].Location.Y + NPC[A].Location.SpeedY;
+                    Effect[numEffects].Location.X += NPC[A].Location.SpeedX;
+                    Effect[numEffects].Location.Y += NPC[A].Location.SpeedY;
                 }
             }
             else if(B == 3)
             {
-                if(!(NPC[C].Type == 13))
+                if(NPC[C].Type != 13)
                     NPC[A].Killed = B;
                 if(NPC[C].Killed == 0)
                     NPCHit(C, 3, A);
@@ -1229,7 +1238,7 @@ void NPCHit(int A, int B, int C)
     {
         if(B == 2)
         {
-            NPC[A].Location.Y = NPC[A].Location.Y - 1;
+            NPC[A].Location.Y -= 1;
             NPC[A].Location.SpeedY = -1;
         }
         // Things With Shells (Koopa Troopa, Buzzy Beetle, Etc.)
@@ -1269,7 +1278,7 @@ void NPCHit(int A, int B, int C)
                 NPC[A].Type = 24;
             else if(NPC[A].Type >= 121 && NPC[A].Type <= 124) // smw winged koopas
             {
-                NPC[A].Type = NPC[A].Type - 12;
+                NPC[A].Type -= 12;
                 NPC[A].Special = 0;
             }
             else
@@ -1283,7 +1292,7 @@ void NPCHit(int A, int B, int C)
                 NPC[numNPCs].Direction = Player[C].Direction;
                 NPC[numNPCs].Location.SpeedY = 0;
                 NPC[numNPCs].Location.SpeedX = double(Physics.NPCShellSpeed * NPC[numNPCs].Direction);
-                NPC[numNPCs].Location.X = NPC[numNPCs].Location.X - 16.0 + NPC[numNPCs].Location.SpeedX;
+                NPC[numNPCs].Location.X += -16.0 + NPC[numNPCs].Location.SpeedX;
                 CheckSectionNPC(numNPCs);
                 NPC[numNPCs].CantHurtPlayer = C;
                 NPC[numNPCs].CantHurt = 6;
@@ -1294,7 +1303,7 @@ void NPCHit(int A, int B, int C)
             NPC[A].Location.Height = NPCHeight[NPC[A].Type];
             NPC[A].Location.Width = NPCWidth[NPC[A].Type];
             NPC[A].Location.Y -= NPC[A].Location.Height;
-            NPC[A].Location.X = NPC[A].Location.X - (NPC[A].Location.Width / 2.0) - double(NPC[A].Direction * 2.f);
+            NPC[A].Location.X += -(NPC[A].Location.Width / 2.0) - double(NPC[A].Direction * 2.f);
             NPC[A].Location.SpeedX = 0;
             NPC[A].Location.SpeedY = 0;
             NPC[A].RealSpeedX = 0;
@@ -1308,8 +1317,8 @@ void NPCHit(int A, int B, int C)
         {
             PlaySound(SFX_ShellHit);
             NPC[A].Projectile = true;
-            NPC[A].Location.Y = NPC[A].Location.Y + NPC[A].Location.Height;
-            NPC[A].Location.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0;
+            NPC[A].Location.Y += NPC[A].Location.Height;
+            NPC[A].Location.X += NPC[A].Location.Width / 2.0;
             if(NPC[A].Type == 4 || NPC[A].Type == 76)
                 NPC[A].Type = 5;
             else if(NPC[A].Type == 6 || NPC[A].Type == 161)
@@ -1342,11 +1351,11 @@ void NPCHit(int A, int B, int C)
                 NPC[A].Type = 24;
             else if(NPC[A].Type >= 121 && NPC[A].Type <= 124)
             {
-                NPC[A].Type = NPC[A].Type - 12;
+                NPC[A].Type -= 12;
                 NPC[A].Special = 0;
             }
             else
-                NPC[A].Type = NPC[A].Type + 4;
+                NPC[A].Type += 4;
             if(B == 7 && NPC[A].Type >= 113 && NPC[A].Type <= 117)
             {
                 numNPCs++;
@@ -1358,7 +1367,7 @@ void NPCHit(int A, int B, int C)
                 NPC[numNPCs].Direction = Player[C].Direction;
                 NPC[numNPCs].Location.SpeedY = 0;
                 NPC[numNPCs].Location.SpeedX = double(Physics.NPCShellSpeed * NPC[numNPCs].Direction);
-                NPC[numNPCs].Location.X = NPC[numNPCs].Location.X - (16.0 + double(32.0f * NPC[numNPCs].Direction));
+                NPC[numNPCs].Location.X += -(16.0 + double(32.0f * NPC[numNPCs].Direction));
                 CheckSectionNPC(numNPCs);
                 NPC[numNPCs].CantHurtPlayer = C;
                 NPC[numNPCs].CantHurt = 6;
@@ -1368,7 +1377,7 @@ void NPCHit(int A, int B, int C)
             NPC[A].Location.Height = NPCHeight[NPC[A].Type];
             NPC[A].Location.Width = NPCWidth[NPC[A].Type];
             NPC[A].Location.Y -= NPC[A].Location.Height;
-            NPC[A].Location.X = NPC[A].Location.X - (NPC[A].Location.Width / 2.0) - double(NPC[A].Direction * 2.f);
+            NPC[A].Location.X += -(NPC[A].Location.Width / 2.0) - double(NPC[A].Direction * 2.f);
             NPC[A].Location.SpeedX = 0;
             NPC[A].Special = 0;
             NPC[A].Frame = 0;
@@ -1395,7 +1404,7 @@ void NPCHit(int A, int B, int C)
         if(B == 9)
         {
             NPC[A].Killed = 6;
-            if(NPC[A].Legacy == true)
+            if(NPC[A].Legacy)
             {
                 bgMusic[NPC[A].Section] = 0;
                 StopMusic();
@@ -1420,12 +1429,12 @@ void NPCHit(int A, int B, int C)
                 if(NPC[C].Type != 13)
                 {
                     PlaySound(SFX_BirdoHit);
-                    NPC[A].Damage = NPC[A].Damage + 10;
+                    NPC[A].Damage += 10;
                 }
                 else
                 {
                     PlaySound(SFX_ShellHit);
-                    NPC[A].Damage = NPC[A].Damage + 1;
+                    NPC[A].Damage += 1;
                 }
             }
         }
@@ -1435,14 +1444,14 @@ void NPCHit(int A, int B, int C)
         {
             NPC[A].Immune = 10;
             PlaySound(SFX_BirdoHit);
-            NPC[A].Damage = NPC[A].Damage + 10;
+            NPC[A].Damage += 10;
         }
         if(NPC[A].Damage >= 200)
         {
             NPC[A].Location.SpeedY = -13;
             NPC[A].Location.SpeedX = double(4 * NPC[C].Direction);
             NPC[A].Killed = B;
-            if(NPC[A].Legacy == true)
+            if(NPC[A].Legacy)
             {
                 bgMusic[NPC[A].Section] = 0;
                 StopMusic();
@@ -1526,7 +1535,7 @@ void NPCHit(int A, int B, int C)
             else
                 NPC[A].Killed = B;
         }
-        else if(!(B == 4))
+        else if(B != 4)
         {
             if(B == 3)
             {
@@ -1540,12 +1549,17 @@ void NPCHit(int A, int B, int C)
         {
             if(NPC[C].Projectile && !(NPC[C].Type >= 117 && NPC[C].Type <= 120))
             {
+                // FIXME: Why the condition is here if it always assigns B? [PVS Studio]
+#if 0
                 if(!(NPC[A].Type == 24 && NPC[C].Type == 13))
                     NPC[A].Killed = B;
                 else
                     NPC[A].Killed = B;
+#endif
+                NPC[A].Killed = B;
             }
         }
+
         if(NPC[A].Type == 195)
         {
             NPC[A].Killed = 0;
@@ -1553,7 +1567,7 @@ void NPCHit(int A, int B, int C)
             {
                 PlaySound(SFX_ShellHit);
                 NPC[A].Location.SpeedX = Physics.NPCShellSpeed * -NPC[A].Direction;
-                NPC[A].Location.X = NPC[A].Location.X + NPC[A].Location.SpeedX;
+                NPC[A].Location.X += NPC[A].Location.SpeedX;
                 NPC[A].CantHurt = Physics.NPCCanHurtWait;
                 NPC[A].CantHurtPlayer = C;
                 NPC[A].Projectile = true;
@@ -1575,14 +1589,14 @@ void NPCHit(int A, int B, int C)
                     if(NPC[C].Type == 13)
                     {
                         PlaySound(SFX_BirdoHit);
-                        NPC[A].Damage = NPC[A].Damage + 1;
+                        NPC[A].Damage += 1;
                         NPC[A].Special3 = 10;
                         if(NPC[A].Special2 == 2)
                             NPC[A].Special = 50;
                     }
                     else
                     {
-                        NPC[A].Damage = NPC[A].Damage + 3;
+                        NPC[A].Damage += 3;
                         PlaySound(SFX_BirdoHit);
                         NPC[A].Special3 = 30;
                         if(NPC[A].Special2 == 2)
@@ -1591,7 +1605,7 @@ void NPCHit(int A, int B, int C)
                 }
                 else if(B == 10)
                 {
-                    NPC[A].Damage = NPC[A].Damage + 2;
+                    NPC[A].Damage += 2;
                     PlaySound(SFX_BirdoHit);
                     NPC[A].Special3 = 10;
                     if(NPC[A].Special2 == 2)
@@ -1634,18 +1648,18 @@ void NPCHit(int A, int B, int C)
                 NPC[A].Killed = 3;
             }
         }
-        // Player Fireball
     }
+    // Player Fireball
     else if(NPC[A].Type == 13 || NPC[A].Type == 265)
     {
-        if(!(B == 7) && !(B == 9) && !(B == 2))
+        if(B != 7 && B != 9 && B != 2)
         {
             if(B == 3 || B == 4)
             {
                 if(NPC[C].Type != 171)
                 {
-                    if(B != 6)
-                        PlaySound(SFX_BlockHit);
+                    // if(B != 6) // Always true
+                    PlaySound(SFX_BlockHit);
                     NPC[A].Killed = B;
                 }
             }
@@ -1656,8 +1670,8 @@ void NPCHit(int A, int B, int C)
                 NPC[A].Killed = B;
             }
         }
-        // Yoshi Fireball
     }
+    // Yoshi Fireball
     else if(NPC[A].Type == 108)
     {
         if(B == 3 || B == 5)
@@ -1665,8 +1679,8 @@ void NPCHit(int A, int B, int C)
             PlaySound(SFX_BlockHit);
             NPC[A].Killed = B;
         }
-        // Hammer Bros.
     }
+    // Hammer Bros.
     else if(NPC[A].Type == 29)
         NPC[A].Killed = B;
     // Hammer Bros. Hammer
@@ -1674,11 +1688,11 @@ void NPCHit(int A, int B, int C)
     {
         if(B == 3)
             NPC[A].Killed = B;
-        // Boom Boom
     }
+    // Boom Boom
     else if(NPC[A].Type == 15)
     {
-        if(!(NPC[A].Special == 4))
+        if(NPC[A].Special != 4)
         {
             if((B == 1 || B == 10) && NPC[A].Special == 0.0)
             {
@@ -1717,8 +1731,8 @@ void NPCHit(int A, int B, int C)
         }
         if(NPC[A].Damage >= 9)
             NPC[A].Killed = B;
-        // Bullet Bills
     }
+    // Bullet Bills
     else if(NPC[A].Type == 17 || NPC[A].Type == 18)
     {
         if(B == 1 || B == 3 || B == 4 || B == 5 || B == 7 || B == 8 || B == 10)
@@ -1742,8 +1756,8 @@ void NPCHit(int A, int B, int C)
                 }
             }
         }
-        // Birdo
     }
+    // Birdo
     else if(NPC[A].Type == 39)
     {
         if(NPC[A].Special >= 0)
@@ -1753,7 +1767,7 @@ void NPCHit(int A, int B, int C)
                 if(NPC[C].Type != 13)
                 {
                     NPC[A].Special = -30;
-                    NPC[A].Damage = NPC[A].Damage + 1;
+                    NPC[A].Damage += 1;
                     NPC[A].Direction = -NPC[A].Direction;
                     PlaySound(SFX_BirdoHit);
                 }
@@ -1763,7 +1777,7 @@ void NPCHit(int A, int B, int C)
             else if(B == 10)
             {
                 NPC[A].Special = -30;
-                NPC[A].Damage = NPC[A].Damage + 1;
+                NPC[A].Damage += 1;
                 NPC[A].Direction = -NPC[A].Direction;
                 PlaySound(SFX_BirdoHit);
             }
@@ -1853,9 +1867,9 @@ void NPCHit(int A, int B, int C)
                 else
                 {
                     if(NPC[A].Type == 26)
-                        NPC[A].Location.Y = NPC[A].Location.Y - 16;
+                        NPC[A].Location.Y -= 16;
                     NewEffect(10, NPC[A].Location);
-                    if(NPC[A].NoLavaSplash == false)
+                    if(!NPC[A].NoLavaSplash)
                         NewEffect(13, NPC[A].Location);
                     PlaySound(SFX_Lava);
                     NPC[A].Location = NPC[A].DefaultLocation;
@@ -1948,7 +1962,7 @@ void NPCHit(int A, int B, int C)
             NPC[A].Location.SpeedY = 0;
             NPC[A].Location.SpeedX = 0;
         }
-        else if(B == 1 && NPCCanWalkOn[NPC[A].Type] == false && NPCJumpHurt[NPC[A].Type] == false)
+        else if(B == 1 && !NPCCanWalkOn[NPC[A].Type] && !NPCJumpHurt[NPC[A].Type])
         {
             NPC[A].Killed = B;
             NPC[A].Location.SpeedY = 0.123;
@@ -1973,7 +1987,7 @@ void NPCHit(int A, int B, int C)
     }
     else if(NPCIsACoin[NPC[A].Type])
     {
-        if(LevelEditor == true)
+        if(LevelEditor)
             PlaySound(SFX_ShellHit);
         if(B == 2)
         {
@@ -1991,26 +2005,27 @@ void NPCHit(int A, int B, int C)
             }
             else
             {
-                NPC[A].Location.Y = NPC[A].Location.Y + NPC[A].Location.Height;
-                NPC[A].Location.X = NPC[A].Location.X; // - (32 - .Location.Width) / 2
+                NPC[A].Location.Y += NPC[A].Location.Height;
+                // useless self-assignment code [PVS-Studio]
+                //NPC[A].Location.X = NPC[A].Location.X; // - (32 - .Location.Width) / 2
                 NPC[A].Location.Height = 0;
                 PlaySound(SFX_Coin);
                 NewEffect(11, NPC[A].Location);
             }
             NPC[A].Killed = 9;
             if(NPC[A].Type == 252 || NPC[A].Type == 258)
-                Coins = Coins + 5;
+                Coins += 5;
             else if(NPC[A].Type == 253)
-                Coins = Coins + 20;
+                Coins += 20;
             else
-                Coins = Coins + 1;
+                Coins += 1;
             if(Coins >= 100)
             {
                 if(Lives < 99)
                 {
-                    Lives = Lives + 1;
+                    Lives += 1;
                     PlaySound(SFX_1up);
-                    Coins = Coins - 100;
+                    Coins -= 100;
                 }
                 else
                     Coins = 99;
@@ -2078,21 +2093,21 @@ void NPCHit(int A, int B, int C)
     }
     if(NPC[A].Killed == 10)
     {
-        if(tempBool == true)
+        if(tempBool)
             MoreScore(NPCScore[NPC[A].Type], NPC[A].Location, NPC[C].Multiplier);
         else
             MoreScore(NPCScore[NPC[A].Type], NPC[A].Location, Player[C].Multiplier);
     }
     // Calculate Score
     Player[0].Multiplier = 0;
-    if((B == 1 || B == 8) && C <= numPlayers && NPCIsABonus[NPC[A].Type] == false)
+    if((B == 1 || B == 8) && C <= numPlayers && !NPCIsABonus[NPC[A].Type])
     {
         if(NPC[A].Type == 13 || NPC[A].Type == 32 || NPC[A].Type == 238 || NPC[A].Type == 239)
         {
         }
-        else if(oldNPC.Type == 137 || NPC[A].Type == 45 || oldNPC.Type == 166 || NPC[A].Type == 168 || (NPCIsAShell[oldNPC.Type] && !(B == 8)))
+        else if(oldNPC.Type == 137 || NPC[A].Type == 45 || oldNPC.Type == 166 || NPC[A].Type == 168 || (NPCIsAShell[oldNPC.Type] && B != 8))
         {
-            if(!(B == 8)) // (.Type = 45 And B = 8) Then
+            if(B != 8) // (.Type = 45 And B = 8) Then
             {
                 if(NPC[A].Type != 195)
                 {
@@ -2102,7 +2117,10 @@ void NPCHit(int A, int B, int C)
                 }
             }
         }
-        else if(NPC[A].Location.SpeedX != oldNPC.Location.SpeedX || NPC[A].Location.SpeedY != oldNPC.Location.SpeedY || NPC[A].Projectile != NPC[A].Projectile || NPC[A].Killed != oldNPC.Killed || NPC[A].Type != oldNPC.Type || NPC[A].Inert != oldNPC.Inert)
+        else if(NPC[A].Location.SpeedX != oldNPC.Location.SpeedX || NPC[A].Location.SpeedY != oldNPC.Location.SpeedY ||
+                /*NPC[A].Projectile != NPC[A].Projectile ||*/ // FIXME: Wrong condition, always false [PVS Studio]
+                NPC[A].Killed != oldNPC.Killed ||
+                NPC[A].Type != oldNPC.Type || NPC[A].Inert != oldNPC.Inert)
         {
             if(NPC[A].Type == 15 && NPC[A].Killed == 0)
             {
@@ -2118,7 +2136,7 @@ void NPCHit(int A, int B, int C)
             }
         }
     }
-    if((B == 2 || B == 7) && NPCIsABonus[NPC[A].Type] == false && oldNPC.Type != 194 && NPC[A].Type != 241)
+    if((B == 2 || B == 7) && !NPCIsABonus[NPC[A].Type] && oldNPC.Type != 194 && NPC[A].Type != 241)
     {
         if(NPC[A].Killed != 0 || NPC[A].Type != oldNPC.Type)
         {
@@ -2126,14 +2144,16 @@ void NPCHit(int A, int B, int C)
             if(B == 2)
                 NewEffect(75, newLoc(NPC[A].Location.X, NPC[A].Location.Y + NPC[A].Location.Height - 16));
         }
-        else if(NPC[A].Location.SpeedX != oldNPC.Location.SpeedX || NPC[A].Location.SpeedY != oldNPC.Location.SpeedY || NPC[A].Projectile != NPC[A].Projectile)
+        else if(NPC[A].Location.SpeedX != oldNPC.Location.SpeedX ||
+                NPC[A].Location.SpeedY != oldNPC.Location.SpeedY /*||
+                NPC[A].Projectile != NPC[A].Projectile*/) // FIXME: Wrong condition, always false [PVS Studio]
         {
             // MoreScore 1, .Location
             if(B == 2)
                 NewEffect(75, newLoc(NPC[A].Location.X, NPC[A].Location.Y + NPC[A].Location.Height - 16));
         }
     }
-    if(B == 4 && NPC[A].Killed == 4 && NPCIsACoin[NPC[A].Type] == false && C != A && NPC[A].Type != 13 && NPC[A].Type != 265 && NPC[A].Type != 108 && NPC[A].Type != 241)
+    if(B == 4 && NPC[A].Killed == 4 && !NPCIsACoin[NPC[A].Type] && C != A && NPC[A].Type != 13 && NPC[A].Type != 265 && NPC[A].Type != 108 && NPC[A].Type != 241)
     {
         if(NPC[C].Type != 208)
         {
@@ -2153,7 +2173,7 @@ void NPCHit(int A, int B, int C)
     }
     if(B == 6 && NPC[A].Killed == 6 && (NPC[A].Type == 209 || NPC[A].Type == 200 || NPC[A].Type == 201 || NPC[A].Type == 15 || NPC[A].Type == 39 || NPC[A].Type == 86))
     {
-        if(NPCWontHurt[NPC[A].Type] == false && NPCIsABonus[NPC[A].Type] == false && NPC[A].Type != 13)
+        if(!NPCWontHurt[NPC[A].Type] && !NPCIsABonus[NPC[A].Type] && NPC[A].Type != 13)
             MoreScore(NPCScore[NPC[A].Type], NPC[A].Location);
     }
     if(!NPCIsACoin[NPC[A].Type] && B == 3 && C != A &&
@@ -2186,7 +2206,7 @@ void NPCHit(int A, int B, int C)
     }
     if(NPC[A].Killed == 6)
     {
-        if(BlockKills2[Block[C].Type] == true)
+        if(BlockKills2[Block[C].Type])
             NPC[A].NoLavaSplash = true;
     }
     if(NPC[A].Killed == 0 && NPC[A].Location.SpeedX == 0.0 && oldNPC.Location.SpeedX != 0.0)

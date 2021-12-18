@@ -29,7 +29,7 @@ public:
     PGE_SizeF(const PGE_SizeF &p) = default;
     PGE_SizeF(const PGE_Size &p);
     PGE_SizeF(double w, double h);
-    ~PGE_SizeF();
+    ~PGE_SizeF() = default;
     void setSize(double w, double h);
     void setWidth(double w);
     void setHeight(double h);

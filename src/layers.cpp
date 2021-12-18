@@ -54,7 +54,7 @@ static SDL_INLINE bool equalCase(const char *x, const char *y)
     return (SDL_strcasecmp(x, y) == 0);
 }
 
-void ShowLayer(std::string LayerName, bool NoEffect)
+void ShowLayer(const std::string &LayerName, bool NoEffect)
 {
     int A = 0;
     int B = 0;
@@ -84,8 +84,8 @@ void ShowLayer(std::string LayerName, bool NoEffect)
                 if(!NoEffect && !NPC[A].Generator)
                 {
                     tempLocation = NPC[A].Location;
-                    tempLocation.X = tempLocation.X + tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
-                    tempLocation.Y = tempLocation.Y + tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
+                    tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
+                    tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
                     NewEffect(10, tempLocation);
                 }
 
@@ -105,7 +105,7 @@ void ShowLayer(std::string LayerName, bool NoEffect)
             NPC[A].GeneratorActive = true;
             NPC[A].Reset[1] = true;
             NPC[A].Reset[2] = true;
-            if(NPC[A].Generator == false)
+            if(!NPC[A].Generator)
             {
                 NPC[A].Active = true;
                 NPC[A].TimeLeft = 1;
@@ -119,13 +119,13 @@ void ShowLayer(std::string LayerName, bool NoEffect)
         if(equalCase(Block[A].Layer, LayerName))
         {
             // If Not (Block(A).DefaultType = 0 And Block(A).Layer = "Destroyed Blocks") Then
-            if(Block[A].Hidden == true)
+            if(Block[A].Hidden)
             {
                 if(!NoEffect && !Block[A].Invis)
                 {
                     tempLocation = Block[A].Location;
-                    tempLocation.X = tempLocation.X + tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
-                    tempLocation.Y = tempLocation.Y + tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
+                    tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
+                    tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
                     NewEffect(10, tempLocation);
                 }
             }
@@ -156,8 +156,8 @@ void ShowLayer(std::string LayerName, bool NoEffect)
                 if(!NoEffect)
                 {
                     tempLocation = Background[A].Location;
-                    tempLocation.X = tempLocation.X + tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
-                    tempLocation.Y = tempLocation.Y + tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
+                    tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
+                    tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
                     NewEffect(10, tempLocation);
                 }
             }
@@ -178,7 +178,7 @@ void ShowLayer(std::string LayerName, bool NoEffect)
     }
 }
 
-void HideLayer(std::string LayerName, bool NoEffect)
+void HideLayer(const std::string &LayerName, bool NoEffect)
 {
     int A = 0;
     Location_t tempLocation;
@@ -200,8 +200,8 @@ void HideLayer(std::string LayerName, bool NoEffect)
                 if(!NoEffect && !NPC[A].Generator)
                 {
                     tempLocation = NPC[A].Location;
-                    tempLocation.X = tempLocation.X + tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
-                    tempLocation.Y = tempLocation.Y + tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
+                    tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
+                    tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
                     NewEffect(10, tempLocation);
                 }
             }
@@ -222,8 +222,8 @@ void HideLayer(std::string LayerName, bool NoEffect)
                 if(!NoEffect && !Block[A].Invis)
                 {
                     tempLocation = Block[A].Location;
-                    tempLocation.X = tempLocation.X + tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
-                    tempLocation.Y = tempLocation.Y + tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
+                    tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
+                    tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
                     NewEffect(10, tempLocation);
                 }
             }
@@ -241,8 +241,8 @@ void HideLayer(std::string LayerName, bool NoEffect)
                 if(!NoEffect)
                 {
                     tempLocation = Background[A].Location;
-                    tempLocation.X = tempLocation.X + tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
-                    tempLocation.Y = tempLocation.Y + tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
+                    tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
+                    tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
                     NewEffect(10, tempLocation);
                 }
             }
@@ -263,12 +263,12 @@ void HideLayer(std::string LayerName, bool NoEffect)
     }
 }
 
-void SetLayer(std::string /*LayerName*/)
+void SetLayer(const std::string & /*LayerName*/)
 {
     // Unused
 }
 
-void ProcEvent(std::string EventName, bool NoEffect)
+void ProcEvent(const std::string &EventName, bool NoEffect)
 {
     // this is for events that have just been triggered
     int A = 0;
@@ -408,16 +408,16 @@ void ProcEvent(std::string EventName, bool NoEffect)
                             if(int(screenLoc.Width) == 400)
                             {
                                 if(qScreenX[1] < tX + screenLoc.Left)
-                                    qScreenX[1] = qScreenX[1] + 200;
+                                    qScreenX[1] += 200;
                                 else
-                                    qScreenX[1] = qScreenX[1] - 200;
+                                    qScreenX[1] -= 200;
                             }
                             if(int(screenLoc.Height) == 300)
                             {
                                 if(qScreenY[1] < tY + screenLoc.Top)
-                                    qScreenY[1] = qScreenY[1] + 150;
+                                    qScreenY[1] += 150;
                                 else
-                                    qScreenY[1] = qScreenY[1] - 150;
+                                    qScreenY[1] -= 150;
                             }
                             if(-qScreenX[1] < level[Player[C].Section].X)
                                 qScreenX[1] = -level[Player[C].Section].X;
@@ -443,12 +443,12 @@ void ProcEvent(std::string EventName, bool NoEffect)
 
             for(auto &l : evt.HideLayer)
             {
-                HideLayer(l, NoEffect ? true : evt.LayerSmoke);
+                HideLayer(l, NoEffect || evt.LayerSmoke);
             }
 
             for(auto &l : evt.ShowLayer)
             {
-                ShowLayer(l, NoEffect ? true : evt.LayerSmoke);
+                ShowLayer(l, NoEffect || evt.LayerSmoke);
             }
 
             for(auto &l : evt.ToggleLayer)
@@ -565,7 +565,7 @@ void ProcEvent(std::string EventName, bool NoEffect)
                         }
                     }
                 }
-                else if(IF_INRANGE(evt.AutoSection, 0, maxSections) && IF_INRANGE(evt.AutoSection, 0, maxEvents))
+                else if(IF_INRANGE(evt.AutoSection, 0, SDL_min(maxSections, maxEvents)))
                 {
                     // Buggy behavior, see https://github.com/Wohlstand/TheXTech/issues/44
                     AutoX[evt.AutoSection] = Events[evt.AutoSection].AutoX;
@@ -778,7 +778,7 @@ void UpdateLayers()
                     {
                         if(Layer[A].SpeedX != 0.f)
                         {
-                            if(BlocksSorted == true)
+                            if(BlocksSorted)
                             {
                                 for(C = (int)(-FLBlocks); C <= FLBlocks; C++)
                                 {

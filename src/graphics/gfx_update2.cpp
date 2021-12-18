@@ -82,11 +82,11 @@ void UpdateGraphics2(bool skipRepaint)
     vScreen[Z].Width = ScreenW;
     vScreen[Z].Height = ScreenH;
     SpecialFrames();
-    SceneFrame2[1] = SceneFrame2[1] + 1;
+    SceneFrame2[1] += 1;
     if(SceneFrame2[1] >= 12)
     {
         SceneFrame2[1] = 0;
-        SceneFrame[1] = SceneFrame[1] + 1;
+        SceneFrame[1] += 1;
         if(SceneFrame[1] >= 4)
             SceneFrame[1] = 0;
         SceneFrame[4] = SceneFrame[1];
@@ -101,18 +101,18 @@ void UpdateGraphics2(bool skipRepaint)
         SceneFrame[54] = SceneFrame[1];
         SceneFrame[55] = SceneFrame[1];
     }
-    SceneFrame2[27] = SceneFrame2[27] + 1;
+    SceneFrame2[27] += 1;
     if(SceneFrame2[27] >= 8)
     {
         SceneFrame2[27] = 0;
-        SceneFrame[27] = SceneFrame[27] + 1;
+        SceneFrame[27] += 1;
         if(SceneFrame[27] >= 12)
             SceneFrame[27] = 0;
         SceneFrame[28] = SceneFrame[27];
         SceneFrame[29] = SceneFrame[27];
         SceneFrame[30] = SceneFrame[27];
     }
-    SceneFrame2[33] = SceneFrame2[33] + 1;
+    SceneFrame2[33] += 1;
     if(SceneFrame2[33] >= 4)
     {
         SceneFrame2[33] = 0;
@@ -121,20 +121,20 @@ void UpdateGraphics2(bool skipRepaint)
             SceneFrame[33] = 0;
         SceneFrame[34] = SceneFrame[33];
     }
-    SceneFrame2[62] = SceneFrame2[62] + 1;
+    SceneFrame2[62] += 1;
     if(SceneFrame2[62] >= 8)
     {
         SceneFrame2[62] = 0;
-        SceneFrame[62] = SceneFrame[62] + 1;
+        SceneFrame[62] += 1;
         if(SceneFrame[62] >= 8)
             SceneFrame[62] = 0;
         SceneFrame[63] = SceneFrame[62];
     }
-    LevelFrame2[2] = LevelFrame2[2] + 1;
+    LevelFrame2[2] += 1;
     if(LevelFrame2[2] >= 6)
     {
         LevelFrame2[2] = 0;
-        LevelFrame[2] = LevelFrame[2] + 1;
+        LevelFrame[2] += 1;
         if(LevelFrame[2] >= 6)
             LevelFrame[2] = 0;
         LevelFrame[9] = LevelFrame[2];
@@ -144,36 +144,36 @@ void UpdateGraphics2(bool skipRepaint)
         LevelFrame[31] = LevelFrame[2];
         LevelFrame[32] = LevelFrame[2];
     }
-    LevelFrame2[8] = LevelFrame2[8] + 1;
+    LevelFrame2[8] += 1;
     if(LevelFrame2[8] >= 12)
     {
         LevelFrame2[8] = 0;
-        LevelFrame[8] = LevelFrame[8] + 1;
+        LevelFrame[8] += 1;
         if(LevelFrame[8] >= 4)
             LevelFrame[8] = 0;
     }
-    LevelFrame2[12] = LevelFrame2[12] + 1;
+    LevelFrame2[12] += 1;
     if(LevelFrame2[12] >= 8)
     {
         LevelFrame2[12] = 0;
-        LevelFrame[12] = LevelFrame[12] + 1;
+        LevelFrame[12] += 1;
         if(LevelFrame[12] >= 2)
             LevelFrame[12] = 0;
     }
-    LevelFrame2[25] = LevelFrame2[25] + 1;
+    LevelFrame2[25] += 1;
     if(LevelFrame2[25] >= 8)
     {
         LevelFrame2[25] = 0;
-        LevelFrame[25] = LevelFrame[25] + 1;
+        LevelFrame[25] += 1;
         if(LevelFrame[25] >= 4)
             LevelFrame[25] = 0;
         LevelFrame[26] = LevelFrame[25];
     }
-    TileFrame2[14] = TileFrame2[14] + 1;
+    TileFrame2[14] += 1;
     if(TileFrame2[14] >= 14)
     {
         TileFrame2[14] = 0;
-        TileFrame[14] = TileFrame[14] + 1;
+        TileFrame[14] += 1;
         if(TileFrame[14] >= 4)
             TileFrame[14] = 0;
         TileFrame[27] = TileFrame[14];
@@ -521,7 +521,9 @@ void UpdateGraphics2(bool skipRepaint)
                     frmMain.renderTexture(32 + (48 * A) + MarioFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
                                           124 - Player[A].Location.Height + MarioFrameY[(Player[A].State * 100) +
                                             (Player[A].Frame * Player[A].Direction)] + Player[A].MountOffsetY,
-                                          99, 99, GFXMarioBMP[Player[A].State], pfrX(100 + Player[A].Frame * Player[A].Direction),
+                                          100, 100,
+                                          GFXMarioBMP[Player[A].State],
+                                          pfrX(100 + Player[A].Frame * Player[A].Direction),
                                           pfrY(100 + Player[A].Frame * Player[A].Direction), c, c, c);
                 }
                 else if(Player[A].Mount == 1)
@@ -533,7 +535,7 @@ void UpdateGraphics2(bool skipRepaint)
                         height = Player[A].Location.Height - MarioFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] - 30;
                     frmMain.renderTexture(32 + (48 * A) + MarioFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
                                           124 - Player[A].Location.Height + MarioFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
-                                          99,
+                                          100,
                                           height,
                                           GFXMarioBMP[Player[A].State],
                                           pfrX(100 + Player[A].Frame * Player[A].Direction),
@@ -544,7 +546,7 @@ void UpdateGraphics2(bool skipRepaint)
 
                     if(Player[A].MountType == 3)
                     {
-                        Player[A].YoshiWingsFrameCount = Player[A].YoshiWingsFrameCount + 1;
+                        Player[A].YoshiWingsFrameCount += 1;
                         Player[A].YoshiWingsFrame = 0;
                         if(Player[A].YoshiWingsFrameCount <= 12)
                             Player[A].YoshiWingsFrame = 1;
@@ -563,7 +565,7 @@ void UpdateGraphics2(bool skipRepaint)
                     frmMain.renderTexture(32 + (48 * A) + LuigiFrameX[(Player[A].State * 100) +
                                             (Player[A].Frame * Player[A].Direction)],
                                           124 - Player[A].Location.Height + LuigiFrameY[(Player[A].State * 100) +
-                                            (Player[A].Frame * Player[A].Direction)] + Player[A].MountOffsetY, 99, 99,
+                                            (Player[A].Frame * Player[A].Direction)] + Player[A].MountOffsetY, 100, 100,
                                           GFXLuigiBMP[Player[A].State], pfrX(100 + Player[A].Frame * Player[A].Direction),
                                           pfrY(100 + Player[A].Frame * Player[A].Direction), c, c, c);
                 }
@@ -576,7 +578,7 @@ void UpdateGraphics2(bool skipRepaint)
                         height = Player[A].Location.Height - LuigiFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] - 30;
                     frmMain.renderTexture(32 + (48 * A) + LuigiFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
                                           124 - Player[A].Location.Height + LuigiFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
-                                          99,
+                                          100,
                                           height,
                                           GFXLuigiBMP[Player[A].State],
                                           pfrX(100 + Player[A].Frame * Player[A].Direction),
@@ -586,7 +588,7 @@ void UpdateGraphics2(bool skipRepaint)
 
                     if(Player[A].MountType == 3)
                     {
-                        Player[A].YoshiWingsFrameCount = Player[A].YoshiWingsFrameCount + 1;
+                        Player[A].YoshiWingsFrameCount += 1;
                         Player[A].YoshiWingsFrame = 0;
                         if(Player[A].YoshiWingsFrameCount <= 12)
                             Player[A].YoshiWingsFrame = 1;
@@ -603,7 +605,7 @@ void UpdateGraphics2(bool skipRepaint)
                 {
                     frmMain.renderTexture(32 + (48 * A) + PeachFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
                                           124 - Player[A].Location.Height + PeachFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] + Player[A].MountOffsetY,
-                                          99, 99,
+                                          100, 100,
                                           GFXPeachBMP[Player[A].State],
                                           pfrX(100 + Player[A].Frame * Player[A].Direction),
                                           pfrY(100 + Player[A].Frame * Player[A].Direction), c, c, c);
@@ -617,7 +619,7 @@ void UpdateGraphics2(bool skipRepaint)
                         height = Player[A].Location.Height - PeachFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] - 30;
                     frmMain.renderTexture(32 + (48 * A) + PeachFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
                                           124 - Player[A].Location.Height + PeachFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
-                                          99,
+                                          100,
                                           height,
                                           GFXPeachBMP[Player[A].State],
                                           pfrX(100 + Player[A].Frame * Player[A].Direction),
@@ -627,7 +629,7 @@ void UpdateGraphics2(bool skipRepaint)
 
                     if(Player[A].MountType == 3)
                     {
-                        Player[A].YoshiWingsFrameCount = Player[A].YoshiWingsFrameCount + 1;
+                        Player[A].YoshiWingsFrameCount += 1;
                         Player[A].YoshiWingsFrame = 0;
                         if(Player[A].YoshiWingsFrameCount <= 12)
                             Player[A].YoshiWingsFrame = 1;
@@ -642,13 +644,13 @@ void UpdateGraphics2(bool skipRepaint)
             {
                 if(Player[A].Mount == 0 || Player[A].Mount == 3)
                 {
-                    frmMain.renderTexture(32 + (48 * A) + ToadFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], 124 - Player[A].Location.Height + ToadFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] + Player[A].MountOffsetY, 99, 99, GFXToadBMP[Player[A].State], pfrX(100 + Player[A].Frame * Player[A].Direction), pfrY(100 + Player[A].Frame * Player[A].Direction), c, c, c);
+                    frmMain.renderTexture(32 + (48 * A) + ToadFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], 124 - Player[A].Location.Height + ToadFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] + Player[A].MountOffsetY, 100, 100, GFXToadBMP[Player[A].State], pfrX(100 + Player[A].Frame * Player[A].Direction), pfrY(100 + Player[A].Frame * Player[A].Direction), c, c, c);
                 }
                 else if(Player[A].Mount == 1)
                 {
                     if(Player[A].State == 1)
                     {
-                        frmMain.renderTexture(32 + (48 * A) + ToadFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], 6 + 124 - Player[A].Location.Height + ToadFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], 99, Player[A].Location.Height - 24, GFXToadBMP[Player[A].State], pfrX(100 + Player[A].Frame * Player[A].Direction), pfrY(100 + Player[A].Frame * Player[A].Direction), c, c, c);
+                        frmMain.renderTexture(32 + (48 * A) + ToadFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], 6 + 124 - Player[A].Location.Height + ToadFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], 100, Player[A].Location.Height - 24, GFXToadBMP[Player[A].State], pfrX(100 + Player[A].Frame * Player[A].Direction), pfrY(100 + Player[A].Frame * Player[A].Direction), c, c, c);
                     }
                     else
                     {
@@ -659,7 +661,7 @@ void UpdateGraphics2(bool skipRepaint)
                             height = Player[A].Location.Height - ToadFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] - 26;
                         frmMain.renderTexture(32 + (48 * A) + ToadFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
                                               124 - Player[A].Location.Height + ToadFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
-                                              99,
+                                              100,
                                               height,
                                               GFXToadBMP[Player[A].State], pfrX(100 + Player[A].Frame * Player[A].Direction), pfrY(100 + Player[A].Frame * Player[A].Direction), c, c, c);
                     }
@@ -667,7 +669,7 @@ void UpdateGraphics2(bool skipRepaint)
 
                     if(Player[A].MountType == 3)
                     {
-                        Player[A].YoshiWingsFrameCount = Player[A].YoshiWingsFrameCount + 1;
+                        Player[A].YoshiWingsFrameCount += 1;
                         Player[A].YoshiWingsFrame = 0;
                         if(Player[A].YoshiWingsFrameCount <= 12)
                             Player[A].YoshiWingsFrame = 1;
@@ -679,7 +681,13 @@ void UpdateGraphics2(bool skipRepaint)
             }
             else if(Player[A].Character == 5)
             {
-                frmMain.renderTexture(32 + (48 * A) + LinkFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], 124 - Player[A].Location.Height + LinkFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)], 99, 99, GFXLinkBMP[Player[A].State], pfrX(100 + Player[A].Frame * Player[A].Direction), pfrY(100 + Player[A].Frame * Player[A].Direction), c, c, c);
+                frmMain.renderTexture(32 + (48 * A) + LinkFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
+                                      124 - Player[A].Location.Height + LinkFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
+                                      100, 100,
+                                      GFXLinkBMP[Player[A].State],
+                                      pfrX(100 + Player[A].Frame * Player[A].Direction),
+                                      pfrY(100 + Player[A].Frame * Player[A].Direction),
+                                      c, c, c);
             }
         }
         A = numPlayers + 1;

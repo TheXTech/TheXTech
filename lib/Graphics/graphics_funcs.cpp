@@ -60,7 +60,7 @@ FIBITMAP *GraphicsHelps::loadImage(std::string file, bool convertTo32bit)
 #if  defined(__unix__) || defined(__APPLE__) || defined(_WIN32) || defined(__HAIKU__)
     FileMapper fileMap;
 
-    if(!fileMap.open_file(file.c_str()))
+    if(!fileMap.open_file(file))
         return nullptr;
 
     FIMEMORY *imgMEM = FreeImage_OpenMemory(reinterpret_cast<unsigned char *>(fileMap.data()),
@@ -230,7 +230,9 @@ SDL_Surface *GraphicsHelps::fi2sdl(FIBITMAP *img)
     return surf;
 }
 
-void GraphicsHelps::mergeWithMask(FIBITMAP *image, std::string pathToMask, std::string pathToMaskFallback)
+void GraphicsHelps::mergeWithMask(FIBITMAP *image,
+                                  const std::string &pathToMask,
+                                  const std::string &pathToMaskFallback)
 {
     if(!image)
         return;
@@ -351,7 +353,7 @@ void GraphicsHelps::mergeWithMask(FIBITMAP *image, FIBITMAP *mask)
     }
 }
 
-bool GraphicsHelps::getImageMetrics(std::string imageFile, PGE_Size* imgSize)
+bool GraphicsHelps::getImageMetrics(const std::string &imageFile, PGE_Size* imgSize)
 {
     if(!imgSize)
         return false;
@@ -366,7 +368,11 @@ bool GraphicsHelps::getImageMetrics(std::string imageFile, PGE_Size* imgSize)
     return true;
 }
 
-void GraphicsHelps::getMaskedImageInfo(std::string rootDir, std::string in_imgName, std::string& out_maskName, std::string& out_errStr, PGE_Size* imgSize)
+void GraphicsHelps::getMaskedImageInfo(const std::string &rootDir,
+                                       const std::string &in_imgName,
+                                       std::string& out_maskName,
+                                       std::string& out_errStr,
+                                       PGE_Size* imgSize)
 {
     if(in_imgName.empty())
     {
@@ -381,6 +387,11 @@ void GraphicsHelps::getMaskedImageInfo(std::string rootDir, std::string in_imgNa
     {
         switch(errorCode)
         {
+        default:
+        case PGE_ImageInfo::ERR_UNKNOWN:
+            out_errStr = "Unknown error has occurred: " + rootDir + in_imgName;
+            break;
+
         case PGE_ImageInfo::ERR_UNSUPPORTED_FILETYPE:
             out_errStr = "Unsupported or corrupted file format: " + rootDir + in_imgName;
             break;
@@ -414,9 +425,9 @@ bool GraphicsHelps::validateFor2xScaleDown(FIBITMAP *image, const std::string &o
 
     (void)origPath; // supress warning when build the release build
 
-    uint32_t w = static_cast<uint32_t>(FreeImage_GetWidth(image));
-    uint32_t h = static_cast<uint32_t>(FreeImage_GetHeight(image));
-    uint32_t pitch = static_cast<uint32_t>(FreeImage_GetPitch(image));
+    auto w = static_cast<uint32_t>(FreeImage_GetWidth(image));
+    auto h = static_cast<uint32_t>(FreeImage_GetHeight(image));
+    auto pitch = static_cast<uint32_t>(FreeImage_GetPitch(image));
     BYTE *img_bits  = FreeImage_GetBits(image);
 
     if(w % 2 || h % 2)

@@ -21,6 +21,7 @@
 #ifndef FRMMAIN_H
 #define FRMMAIN_H
 
+#include <SDL2/SDL_version.h>
 #include <SDL2/SDL_stdinc.h>
 #include <SDL2/SDL_scancode.h>
 #include <SDL2/SDL_events.h>
@@ -41,6 +42,17 @@
 typedef struct SDL_Thread SDL_Thread;
 typedef struct SDL_mutex SDL_mutex;
 
+// Workaround for older SDL versions that lacks the floating-point based rects and points
+#if SDL_COMPILEDVERSION < SDL_VERSIONNUM(2, 0, 10)
+#define XTECH_SDL_NO_RECTF_SUPPORT
+typedef struct SDL_FPoint
+{
+    float x;
+    float y;
+} SDL_FPoint;
+#endif
+
+
 class FrmMain
 {
     std::string m_windowTitle;
@@ -49,11 +61,10 @@ class FrmMain
     SDL_Texture  *m_tBuffer = nullptr;
     SDL_Texture  *m_recentTarget = nullptr;
     std::set<SDL_Texture *> m_textureBank;
-    bool m_sdlLoaded = false;
     const Uint8 *m_keyboardState = nullptr;
     Uint32 m_lastMousePress = 0;
-    SDL_Event m_event;
-    SDL_RendererInfo m_ri;
+    SDL_Event m_event = {};
+    SDL_RendererInfo m_ri = {};
 #ifdef __ANDROID__
     bool m_blockRender = false;
 #endif
@@ -66,7 +77,7 @@ public:
 
     int MousePointer = 0;
 
-    FrmMain();
+    FrmMain() noexcept;
 
     SDL_Window *getWindow();
 
@@ -89,6 +100,7 @@ public:
     void eventKeyUp(SDL_KeyboardEvent &evt);
     void eventMouseDown(SDL_MouseButtonEvent &m_event);
     void eventMouseMove(SDL_MouseMotionEvent &m_event);
+    void eventMouseWheel(SDL_MouseWheelEvent &m_event);
     void eventMouseUp(SDL_MouseButtonEvent &m_event);
     void eventResize();
     int setFullScreen(bool fs);
@@ -111,8 +123,14 @@ public:
     void setTargetScreen();
 
 
-    StdPicture LoadPicture(std::string path, std::string maskPath = std::string(), std::string maskFallbackPath = std::string());
-    StdPicture lazyLoadPicture(std::string path, std::string maskPath = std::string(), std::string maskFallbackPath = std::string());
+    StdPicture LoadPicture(const std::string &path,
+                           const std::string &maskPath = std::string(),
+                           const std::string &maskFallbackPath = std::string());
+
+    StdPicture lazyLoadPicture(const std::string &path,
+                               const std::string &maskPath = std::string(),
+                               const std::string &maskFallbackPath = std::string());
+
     void deleteTexture(StdPicture &tx, bool lazyUnload = false);
     void clearAllTextures();
 
@@ -123,22 +141,28 @@ public:
     void renderCircle(int cx, int cy, int radius, float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f, bool filled = true);
 
     // Similar to BitBlt, but without masks, just draw a texture or it's fragment!
-    void renderTextureI(int xDst, int yDst, int wDst, int hDst,
-                        StdPicture &tx,
-                        int xSrc, int ySrc,
-                        double rotateAngle = 0.0, SDL_Point *center = nullptr, unsigned int flip = SDL_FLIP_NONE,
-                        float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f);
-    void renderTextureScaleI(int xDst, int yDst, int wDst, int hDst,
-                             StdPicture &tx,
-                             int xSrc, int ySrc,
-                             int wSrc, int hSrc,
-                             double rotateAngle = 0.0, SDL_Point *center = nullptr, unsigned int flip = SDL_FLIP_NONE,
-                             float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f);
+//    void renderTextureI(int xDst, int yDst, int wDst, int hDst,
+//                        StdPicture &tx,
+//                        int xSrc, int ySrc,
+//                        double rotateAngle = 0.0, SDL_Point *center = nullptr, unsigned int flip = SDL_FLIP_NONE,
+//                        float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f);
+//    void renderTextureScaleI(int xDst, int yDst, int wDst, int hDst,
+//                             StdPicture &tx,
+//                             int xSrc, int ySrc,
+//                             int wSrc, int hSrc,
+//                             double rotateAngle = 0.0, SDL_Point *center = nullptr, unsigned int flip = SDL_FLIP_NONE,
+//                             float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f);
+    void renderTextureScaleEx(double xDst, double yDst, double wDst, double hDst,
+                              StdPicture &tx,
+                              int xSrc, int ySrc,
+                              int wSrc, int hSrc,
+                              double rotateAngle = 0.0, SDL_FPoint *center = nullptr, unsigned int flip = SDL_FLIP_NONE,
+                              float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f);
+
     void renderTextureScale(double xDst, double yDst, double wDst, double hDst,
                             StdPicture &tx,
-                            int xSrc, int ySrc,
-                            int wSrc, int hSrc,
                             float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f);
+
     void renderTexture(double xDst, double yDst, double wDst, double hDst,
                        StdPicture &tx,
                        int xSrc, int ySrc,
@@ -147,14 +171,14 @@ public:
     void renderTextureFL(double xDst, double yDst, double wDst, double hDst,
                          StdPicture &tx,
                          int xSrc, int ySrc,
-                         double rotateAngle = 0.0, SDL_Point *center = nullptr, unsigned int flip = SDL_FLIP_NONE,
+                         double rotateAngle = 0.0, SDL_FPoint *center = nullptr, unsigned int flip = SDL_FLIP_NONE,
                          float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f);
 
-    void renderTexture(int xDst, int yDst, StdPicture &tx,
+    void renderTexture(float xDst, float yDst, StdPicture &tx,
                        float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f);
-    void renderTextureScale(int xDst, int yDst, int wDst, int hDst,
-                            StdPicture &tx,
-                            float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f);
+//    void renderTextureScale(int xDst, int yDst, int wDst, int hDst,
+//                            StdPicture &tx,
+//                            float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f);
 
     void getScreenPixels(int x, int y, int w, int h, unsigned char *pixels);
     void getScreenPixelsRGBA(int x, int y, int w, int h, unsigned char *pixels);
@@ -234,22 +258,22 @@ private:
 #endif
 
     //Scale of virtual and window resolutuins
-    float scale_x = 1.f;
-    float scale_y = 1.f;
+    float m_scale_x = 1.f;
+    float m_scale_y = 1.f;
     //Side offsets to keep ratio
-    float offset_x = 0.f;
-    float offset_y = 0.f;
+    float m_offset_x = 0.f;
+    float m_offset_y = 0.f;
     //Offset to shake screen
-    int viewport_offset_x = 0.f;
-    int viewport_offset_y = 0.f;
+    int m_viewport_offset_x = 0.f;
+    int m_viewport_offset_y = 0.f;
     //Need to calculate relative viewport position when screen was scaled
-    float viewport_scale_x = 1.0f;
-    float viewport_scale_y = 1.0f;
+    float m_viewport_scale_x = 1.0f;
+    float m_viewport_scale_y = 1.0f;
 
-    int viewport_x = 0;
-    int viewport_y = 0;
-    int viewport_w = 0;
-    int viewport_h = 0;
+    int m_viewport_x = 0;
+    int m_viewport_y = 0;
+    int m_viewport_w = 0;
+    int m_viewport_h = 0;
 
     SDL_Point MapToScr(int x, int y);
 };

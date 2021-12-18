@@ -66,6 +66,7 @@ struct StdPicture
     GLint  nOfColors = 0;
     PGEColor ColorUpper;
     PGEColor ColorLower;
+    uint8_t modColor[4] = {255,255,255,255};
 };
 
 // This macro allows to get the original texture path when debug build is on,

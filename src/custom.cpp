@@ -21,12 +21,15 @@
 #include "globals.h"
 #include "custom.h"
 
+#include <utility>
+
 #include <IniProcessor/ini_processing.h>
 #include <DirManager/dirman.h>
 #include <Utils/files.h>
 #include <Utils/dir_list_ci.h>
 #include <PGE_File_Formats/file_formats.h>
 #include <fmt_format_ne.h>
+
 
 static DirListCI s_dirEpisode;
 static DirListCI s_dirCustom;
@@ -396,8 +399,8 @@ void FindCustomNPCs(/*std::string cFilePath*/)
 {
     pLogDebug("Trying to load custom NPC configs...");
 
-    const std::string GfxRoot = AppPath + "graphics/";
-    std::string npcPathG, npcPath, npcPathC;
+    //const std::string GfxRoot = AppPath + "graphics/";
+    std::string /*npcPathG,*/ npcPath, npcPathC;
     DirMan searchDir(FileNamePath);
 //    std::set<std::string> existingFiles;
 //    std::vector<std::string> files;
@@ -433,7 +436,7 @@ void FindCustomNPCs(/*std::string cFilePath*/)
 void LoadCustomNPC(int A, std::string cFileName)
 {
     NPCConfigFile npc;
-    FileFormats::ReadNpcTXTFileF(cFileName, npc, true);
+    FileFormats::ReadNpcTXTFileF(std::move(cFileName), npc, true);
 
     if(npc.en_gfxoffsetx)
         NPCFrameOffsetX[A] = npc.gfxoffsetx;

@@ -1089,6 +1089,8 @@ extern int NumSelectWorld;
 struct SelectWorld_t;
 //extern RangeArr<SelectWorld_t, 1, maxSelectWorlds> SelectWorld;
 extern std::vector<SelectWorld_t> SelectWorld;
+extern std::string g_recentWorld1p;
+extern std::string g_recentWorld2p;
 //Public ShowFPS As Boolean
 extern bool ShowFPS;
 //Public PrintFPS As Double
@@ -1133,6 +1135,7 @@ struct SelectWorld_t
     std::string WorldFile;
 //    blockChar(1 To numCharacters) As Boolean
     RangeArrI<bool, 1, numCharacters, false> blockChar;
+    bool highlight = false;
 //End Type
 };
 
@@ -2026,6 +2029,10 @@ extern int PlayerCharacter2;
 extern double MenuMouseX;
 //Public MenuMouseY As Double
 extern double MenuMouseY;
+//! mouse wheel delta
+extern Sint32 MenuWheelDelta;
+//! mouse wheel event
+extern bool MenuWheelMoved;
 //Public MenuMouseDown As Boolean
 extern bool MenuMouseDown;
 //Public MenuMouseBack As Boolean

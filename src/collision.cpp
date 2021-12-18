@@ -322,7 +322,7 @@ int BootCollision(const Location_t &Loc1, const Location_t &Loc2, bool StandOn)
     {
         if(Loc1.Y + Loc1.Height - Loc1.SpeedY <= Loc2.Y - Loc2.SpeedY + 16)
         {
-            if(Loc1.SpeedY > Loc2.SpeedY || StandOn == true)
+            if(Loc1.SpeedY > Loc2.SpeedY || StandOn)
             {
                 tempBootCollision = COLLISION_TOP;
             }

@@ -37,12 +37,14 @@ enum ErrCodes
 {
     //! No errors, everything is OK
     ERR_OK,
+    //! Unknown error
+    ERR_UNKNOWN,
     //! Image file type is not supported
     ERR_UNSUPPORTED_FILETYPE,
     //! File not exists
     ERR_NOT_EXISTS,
     //! Can't open the file
-    ERR_CANT_OPEN
+    ERR_CANT_OPEN,
 };
 
 bool getImageSizeRW(SDL_RWops *image, uint32_t *w, uint32_t *h, int *errCode=nullptr);
@@ -55,16 +57,16 @@ bool getImageSizeRW(SDL_RWops *image, uint32_t *w, uint32_t *h, int *errCode=nul
  * @param [out] errCode Error code
  * @return true if successfully finished, false if error occouped
  */
-bool getImageSize(PGEString imagePath, uint32_t *w, uint32_t *h, int *errCode=nullptr);
+bool getImageSize(const PGEString &imagePath, uint32_t *w, uint32_t *h, int *errCode = nullptr);
 
-bool getImageSizeFromMem(const char *mem, size_t size, uint32_t *w, uint32_t *h, int *errCode=nullptr);
+bool getImageSizeFromMem(const char *mem, size_t size, uint32_t *w, uint32_t *h, int *errCode = nullptr);
 
 /**
  * @brief Returns filename of masked image
  * @param [in] imageFileName foreground image file-name
  * @return masked image filename
  */
-PGEString getMaskName(PGEString imageFileName);
+PGEString getMaskName(const PGEString &imageFileName);
 
 }//PGE_ImageInfo
 

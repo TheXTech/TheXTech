@@ -26,6 +26,7 @@
 #include "../control/joystick.h"
 #include "../npc.h"
 #include "../blocks.h"
+#include "../collision.h"
 #include "../effect.h"
 #include "../player.h"
 #include "../graphics.h"
@@ -126,61 +127,95 @@ void DoCredits()
 
 void OutroLoop()
 {
-    Controls_t blankControls;
-    int A = 0;
-    int B = 0;
-    Location_t tempLocation;
-    bool jumpBool = false;
-    int64_t fBlock = 0;
-    int64_t lBlock = 0;
+    const Controls_t blankControls;
+
+    if(g_gameInfo.outroDeadMode)
+    {
+        UpdateControls();
+        UpdateNPCs();
+        UpdateBlocks();
+        UpdateEffects();
+        // UpdatePlayer();
+        DoCredits();
+        UpdateGraphics();
+        UpdateSound();
+
+        if(GameOutroDoQuit) // Don't unset the GameOutro before GFX update, otherwise a glitch will happen
+        {
+            GameOutro = false;
+            GameOutroDoQuit = false;
+        }
+        return;
+    }
+
     UpdateControls();
 
-    for(A = 1; A <= numPlayers; A++)
+    for(int A = 1; A <= numPlayers; A++)
     {
-        Player[A].Controls = blankControls;
-        Player[A].Controls.Left = true;
-        jumpBool = true;
-        tempLocation = Player[A].Location;
-        tempLocation = Player[A].Location;
+        auto &pp = Player[A];
+        pp.Controls = blankControls;
+
+        if(g_gameInfo.outroWalkDirection < 0)
+            pp.Controls.Left = true;
+        else if(g_gameInfo.outroWalkDirection > 0)
+            pp.Controls.Right = true;
+
+        if(pp.Controls.Left)
+            pp.Direction = -1;
+        if(pp.Controls.Right)
+            pp.Direction = 1;
+
+        Location_t tempLocation = pp.Location;
+        // tempLocation = pp.Location; // Why here was the duplicated location assignment?
         tempLocation.SpeedX = 0;
         tempLocation.SpeedY = 0;
-        tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height - 8;
-        tempLocation.Height = 16;
+        double pp_bottom = pp.Location.Y + pp.Location.Height;
+        tempLocation.Y = pp_bottom - 8;
+        tempLocation.Height = pp.Mount == 1 ? 50 : 25;
         tempLocation.Width = 16;
 
-        if(Player[A].Location.SpeedX > 0)
-            tempLocation.X = Player[A].Location.X + Player[A].Location.Width + 20;
+        if(pp.Location.SpeedX > 0)
+            tempLocation.X = (pp.Location.X + pp.Location.Width) + 20;
         else
-            tempLocation.X = Player[A].Location.X - tempLocation.Width - 20;
-        // fBlock = FirstBlock[long(tempLocation.X / 32) - 1];
-        // lBlock = LastBlock[long((tempLocation.X + tempLocation.Width) / 32.0) + 1];
-        blockTileGet(tempLocation, fBlock, lBlock);
+            tempLocation.X = pp.Location.X - (tempLocation.Width + 20);
 
-        for(B = (int)fBlock; B <= lBlock; B++)
+        if(g_gameInfo.outroAutoJump)
         {
-            if(tempLocation.X + tempLocation.Width >= Block[B].Location.X)
+            int64_t fBlock = 0;
+            int64_t lBlock = 0;
+            // fBlock = FirstBlock[long(tempLocation.X / 32) - 1];
+            // lBlock = LastBlock[long((tempLocation.X + tempLocation.Width) / 32.0) + 1];
+            blockTileGet(tempLocation, fBlock, lBlock);
+            if(!BlocksSorted)
             {
-                if(tempLocation.X <= Block[B].Location.X + Block[B].Location.Width)
+                fBlock = 1;
+                lBlock = numBlock;
+            }
+
+            bool doJump = true;
+
+            for(auto B = fBlock; B <= lBlock; B++)
+            {
+                const auto &bb = Block[B];
+//                if(tempLocation.X + tempLocation.Width >= Block[B].Location.X &&
+//                   tempLocation.X <= Block[B].Location.X + Block[B].Location.Width &&
+//                   tempLocation.Y + tempLocation.Height >= Block[B].Location.Y &&
+//                   tempLocation.Y <= Block[B].Location.Y + Block[B].Location.Height)
+                if(CheckCollision(tempLocation, bb.Location))
                 {
-                    if(tempLocation.Y + tempLocation.Height >= Block[B].Location.Y)
+                    if(!BlockNoClipping[bb.Type] &&
+                       !bb.Invis && !bb.Hidden &&
+                       !(BlockIsSizable[bb.Type] && bb.Location.Y < pp_bottom - 3))
                     {
-                        if(tempLocation.Y <= Block[B].Location.Y + Block[B].Location.Height)
-                        {
-                            if(!BlockNoClipping[Block[B].Type] && !Block[B].Invis && !Block[B].Hidden && !(BlockIsSizable[Block[B].Type] && Block[B].Location.Y < Player[A].Location.Y + Player[A].Location.Height - 3))
-                                jumpBool = false;
-                        }
+                        doJump = false;
                     }
                 }
             }
-            else
-            {
-                if(BlocksSorted)
-                    break;
-            }
-        }
 
-        if(jumpBool || Player[A].Jump > 0)
-            Player[A].Controls.Jump = true;
+            // D_pLogDebug("Player %d jumped: doJump %d, ppJump: %d", A, doJump ? 1 : 0, pp.Jump);
+            if(doJump || pp.Jump > 0)
+                pp.Controls.Jump = true;
+        }
     }
 
     UpdateNPCs();

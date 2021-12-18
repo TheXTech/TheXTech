@@ -102,7 +102,7 @@ void Strings::split(Strings::List& out, const std::string& str, char delimiter)
         end = str.find(delimiter, beg);
         if(end == std::string::npos)
             end = str.size();
-        out.push_back( str.substr(beg, end-beg) );
+        out.emplace_back(str.substr(beg, end-beg));
         beg = end + 1;
     }
     while(end < str.size() - 1);
@@ -117,7 +117,7 @@ void Strings::split(Strings::List& out, const std::string& str, const std::strin
         end = str.find(delimiter, beg);
         if(end == std::string::npos)
             end = str.size();
-        out.push_back( str.substr(beg, end-beg) );
+        out.emplace_back(str.substr(beg, end-beg));
         beg = end + delimiter.size();
     }
     while(end < str.size() - 1);
@@ -137,7 +137,7 @@ Strings::List Strings::split(const std::string& str, const std::string& delimite
     return res;
 }
 
-void Strings::replaceInAll(std::string &src, std::string from, std::string to)
+void Strings::replaceInAll(std::string &src, const std::string &from, const std::string &to)
 {
     if(from.empty())
         return;
@@ -150,7 +150,7 @@ void Strings::replaceInAll(std::string &src, std::string from, std::string to)
     }
 }
 
-void Strings::removeInAll(std::string &src, std::string substr)
+void Strings::removeInAll(std::string &src, const std::string &substr)
 {
     std::string::size_type foundpos = src.find(substr);
     if(foundpos != std::string::npos)
@@ -158,13 +158,13 @@ void Strings::removeInAll(std::string &src, std::string substr)
                      src.begin() + std::string::difference_type(foundpos + substr.length()));
 }
 
-std::string Strings::removeAll(std::string src, std::string substr)
+std::string Strings::removeAll(std::string src, const std::string &substr)
 {
     removeInAll(src, substr);
     return src;
 }
 
-std::string Strings::replaceAll(std::string src, std::string from, std::string to)
+std::string Strings::replaceAll(std::string src, const std::string &from, const std::string &to)
 {
     replaceInAll(src, from, to);
     return src;

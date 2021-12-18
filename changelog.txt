@@ -1,5 +1,22 @@
 TheXTech Changelog.
 
+Changes for 1.3.5.3
+-Fixed the vanilla crash: Attempting to freeze any Pokey segments when they have the "noiceball=0" option set will cause the out-of-range error with NPC-ID=-3 in a random moment. (https://github.com/Wohlstand/TheXTech/issues/220)
+-Changed the user directory location for macOS-built games into the "~/TheXTech Games/<bundle name without .app suffix>/" to avoid conflict between different games ran on the same device.
+-Changed the debug assets location on macOS into "~/TheXTech Games/Debug Assets/" to simplify the debug environment installation.
+-Fixed BGO-65, Bowser III, and rail platforms compatibility with SMBX build version up to 30
+-Fixed the false positive that enables the Yoshi Mode of music when a player actually doesn't ride any Yoshi
+-Mario and Luigi will be only available at episodes built with SMBX older than build version 30 (the first version that introduces Peach, Toad, and Link)
+-Fixed the invalid vertical offset while drawing a playable character sprite
+-Resolved the old jittering problem when drawing a playable character while moving the camera (thanks to @ds-sloth for the fix)
+-Fixed the minor graphical distortion of a playable character that appears while flying up and down with a shoe.
+-The last played episode will be reminded and scrolled at the episode selection menu
+-Improved episodes menu control: added mouse wheel, page-up/page-down/home/end/delete, and left/right/alt-run/alt-jump/drop on controllers to scroll episodes lists
+-Fixed the vanilla bug: episodes list menu gets reset every attempt to go back from the character or the game save slot select menu
+-Fixed the soft-lock in an attempt to erase the gamesave using the two-player game menu
+-Order of episodes lists now alphabetical
+-Added the "compat.ini" option to require players to be on the ground to enter warps
+
 Changes for 1.3.5.2
 -Fixed the ARM64 building
 -Updated the log writer
@@ -10,7 +27,7 @@ Changes for 1.3.5.2
 -Added an option to enable the background game controller input handling
 -Portal warps have been allowed to be used for level entrances and level exits (Instant warps kept unsupported to avoid possible compatibility issues)
 -Added the cannon pipes that can shoot the player with a given speed
--Added the workaround for custom background2-42 that has non-multiple 4 height (there are several custom sprites with the 3455 invalid height, they must be 3466)
+-Added the workaround for custom background2-42 that has non-multiple 4 height (there are several custom sprites with the 3455 invalid height, they must be 3456)
 -Fixed an incorrect speed-run timer render at multiplayer mode
 -The controller state print has been replaced with a controller drawing to indicate the pressure state of buttons
 -Added the opt-in 2x scale down optimization for all textures to reduce the memory usage
@@ -35,6 +52,14 @@ Changes for 1.3.5.2
 -Added the Yoshi mode support for specified songs at the music.ini: mute selected track number without Yoshi, enable it back when Yoshi is presented
 -Fixed a bug when a last world map music is not remembered when sound is disabled
 -Fixed the wrong restart place when running the lasanha of levels and "restart level after death" option is enabled
+-Fixed the NPC logic distortion caused by early gfx update
+-Added an ability to customize an outro behaviour using gameinfo.ini
+-Battle mode access can be disabled via gameinfo.ini
+-Two-player game mode access can be disabled via gameinfo.ini
+-The Scores of Power-Ups (NPC-9, NPC-14, NPC-34, NPC-169, NPC-170, NPC-182, NPC-183, NPC-184, NPC-185, NPC-249, NPC-250, NPC-264, NPC-277) can be changed via npc-X.txt
+-Added a fixed behavior for rail platforms and grinder (NPC-60, NPC-62, NPC-64, NPC-66, NPC-104, NPC-179). It can be enabled using new-added custom values
+-Fixed the collision bug when an attempt of the player with the shoe to jump up at the moving NPC being pushed into the wall, causes the player to go through the wall
+-The settings/thextech.ini config file will be created on the first launch if not exist
 
 Changes for 1.3.5.1
 -Episodes and battle levels lists now loading in the separated thread with a progress showing

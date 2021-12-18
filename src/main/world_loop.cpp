@@ -214,11 +214,11 @@ void WorldLoop()
 
     if(WorldPlayer[1].Move > 0)
     {
-        WorldPlayer[1].Frame2 = WorldPlayer[1].Frame2 + 1;
+        WorldPlayer[1].Frame2 += 1;
         if(WorldPlayer[1].Frame2 >= 8)
         {
             WorldPlayer[1].Frame2 = 0;
-            WorldPlayer[1].Frame = WorldPlayer[1].Frame + 1;
+            WorldPlayer[1].Frame += 1;
         }
         if(WorldPlayer[1].Move == 1)
         {
@@ -294,7 +294,7 @@ void WorldLoop()
 
         if(Player[1].Controls.Up)
         {
-            tempLocation.Y = tempLocation.Y - 32;
+            tempLocation.Y -= 32;
             treeWorldPathQuery(tempLocation, parr, true);
             //for(A = 1; A <= numWorldPaths; A++)
             for(auto *t : parr)
@@ -332,7 +332,7 @@ void WorldLoop()
         }
         else if(Player[1].Controls.Left)
         {
-            tempLocation.X = tempLocation.X - 32;
+            tempLocation.X -= 32;
             treeWorldPathQuery(tempLocation, parr, true);
             //for(A = 1; A <= numWorldPaths; A++)
             for(auto *t : parr)
@@ -371,7 +371,7 @@ void WorldLoop()
         }
         else if(Player[1].Controls.Down)
         {
-            tempLocation.Y = tempLocation.Y + 32;
+            tempLocation.Y += 32;
             treeWorldPathQuery(tempLocation, parr, true);
             //for(A = 1; A <= numWorldPaths; A++)
             for(auto *t : parr)
@@ -410,7 +410,7 @@ void WorldLoop()
         }
         else if(Player[1].Controls.Right)
         {
-            tempLocation.X = tempLocation.X + 32;
+            tempLocation.X += 32;
             treeWorldPathQuery(tempLocation, parr, true);
             //for(A = 1; A <= numWorldPaths; A++)
             for(auto *t : parr)
@@ -541,12 +541,12 @@ void WorldLoop()
     }
     else if(WorldPlayer[1].Move == 1)
     {
-        WorldPlayer[1].Move2 = WorldPlayer[1].Move2 + 2;
-        WorldPlayer[1].Location.Y = WorldPlayer[1].Location.Y - 2;
+        WorldPlayer[1].Move2 += 2;
+        WorldPlayer[1].Location.Y -= 2;
         if(WalkAnywhere)
         {
-            WorldPlayer[1].Move2 = WorldPlayer[1].Move2 + 2;
-            WorldPlayer[1].Location.Y = WorldPlayer[1].Location.Y - 2;
+            WorldPlayer[1].Move2 += 2;
+            WorldPlayer[1].Location.Y -= 2;
         }
         if(WorldPlayer[1].Move2 >= 32)
         {
@@ -557,12 +557,12 @@ void WorldLoop()
     }
     else if(WorldPlayer[1].Move == 2)
     {
-        WorldPlayer[1].Move2 = WorldPlayer[1].Move2 + 2;
-        WorldPlayer[1].Location.X = WorldPlayer[1].Location.X - 2;
+        WorldPlayer[1].Move2 += 2;
+        WorldPlayer[1].Location.X -= 2;
         if(WalkAnywhere)
         {
-            WorldPlayer[1].Move2 = WorldPlayer[1].Move2 + 2;
-            WorldPlayer[1].Location.X = WorldPlayer[1].Location.X - 2;
+            WorldPlayer[1].Move2 += 2;
+            WorldPlayer[1].Location.X -= 2;
         }
         if(WorldPlayer[1].Move2 >= 32)
         {
@@ -573,12 +573,12 @@ void WorldLoop()
     }
     else if(WorldPlayer[1].Move == 3)
     {
-        WorldPlayer[1].Move2 = WorldPlayer[1].Move2 + 2;
-        WorldPlayer[1].Location.Y = WorldPlayer[1].Location.Y + 2;
+        WorldPlayer[1].Move2 += 2;
+        WorldPlayer[1].Location.Y += 2;
         if(WalkAnywhere)
         {
-            WorldPlayer[1].Move2 = WorldPlayer[1].Move2 + 2;
-            WorldPlayer[1].Location.Y = WorldPlayer[1].Location.Y + 2;
+            WorldPlayer[1].Move2 += 2;
+            WorldPlayer[1].Location.Y += 2;
         }
         if(WorldPlayer[1].Move2 >= 32)
         {
@@ -589,12 +589,12 @@ void WorldLoop()
     }
     else if(WorldPlayer[1].Move == 4)
     {
-        WorldPlayer[1].Move2 = WorldPlayer[1].Move2 + 2;
-        WorldPlayer[1].Location.X = WorldPlayer[1].Location.X + 2;
+        WorldPlayer[1].Move2 += 2;
+        WorldPlayer[1].Location.X += 2;
         if(WalkAnywhere)
         {
-            WorldPlayer[1].Move2 = WorldPlayer[1].Move2 + 2;
-            WorldPlayer[1].Location.X = WorldPlayer[1].Location.X + 2;
+            WorldPlayer[1].Move2 += 2;
+            WorldPlayer[1].Location.X += 2;
         }
         if(WorldPlayer[1].Move2 >= 32)
         {
@@ -839,7 +839,7 @@ void PathWait()
             computeFrameTime2();
         }
         PGE_Delay(1);
-    } while(!(C >= 24));
+    } while(C < 24);
 
     resetFrameTimer();
 }

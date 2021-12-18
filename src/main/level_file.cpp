@@ -395,18 +395,28 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 
         if(npc.Type == NPCID_BOWSER_SMB3)
         {
-            if(compatModern && isSmbx64 && fVersion < 9)
+            if(compatModern && isSmbx64 && fVersion < 30)
                 npc.Special7 = 1.0; // Keep original behavior of Bowser as in SMBX 1.0
             else
                 npc.Special7 = n.special_data;
         }
 
-        if(npc.Type == NPCID_YELBLOCKS)
+        switch(npc.Type)
         {
-            if(compatModern && isSmbx64 && fVersion < 9)
-                npc.Special7 = 1.0; // Workaround for yellow platform at The Invasion 1
+        case NPCID_YELBLOCKS:
+        case NPCID_BLUBLOCKS:
+        case NPCID_GRNBLOCKS:
+        case NPCID_REDBLOCKS:
+        case NPCID_PLATFORM_SMB3:
+        case NPCID_SAW:
+            if(compatModern && isSmbx64 && fVersion < 30)
+                npc.Special7 = 1.0; // Workaround for yellow platform at The Invasion 1 on the "Clown Car Parking" level
             else
-                npc.Special7 = 0.0;
+                npc.Special7 = n.special_data;
+            break;
+
+        default:
+            break;
         }
 
         npc.Generator = n.generator;
@@ -720,7 +730,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 //        curSection = 0;
 //        vScreenY[1] = -(level[curSection].Height - 600);
 //        vScreenX[1] = -level[curSection].X;
-//        numWarps = numWarps + 1;
+//        numWarps += 1;
 //        for(A = 0; A < frmLevelSettings::optBackground.Count; A++)
 //        {
 //            if(Background2[0] == A)
@@ -775,7 +785,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         for(A = 0; A <= numSections; A++) // Automatically correct 608 section height to 600
         {
 //            if(int(level[A].Height - level[A].Y) == 608)
-//                level[A].Y = level[A].Y + 8;
+//                level[A].Y += 8;
             int height = int(level[A].Height - level[A].Y);
             if(height > 600 && height < 610)
                 level[A].Y = level[A].Height - 600; // Better and cleaner logic

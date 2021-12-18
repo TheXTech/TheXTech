@@ -1,20 +1,21 @@
 /*
- * Moondust, a free game engine for platform game making
- * Copyright (c) 2014-2021 Vitaly Novichkov <admin@wohlnet.ru>
+ * TheXTech - A platform game engine ported from old source code for VB6
  *
- * This software is licensed under a dual license system (MIT or GPL version 3 or later).
- * This means you are free to choose with which of both licenses (MIT or GPL version 3 or later)
- * you want to use this software.
+ * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
+ * Copyright (c) 2020-2021 Vitaly Novichkov <admin@wohlnet.ru>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You can see text of MIT license in the LICENSE.mit file you can see in Engine folder,
- * or see https://mit-license.org/.
- *
- * You can see text of GPLv3 license in the LICENSE.gpl3 file you can see in Engine folder,
- * or see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 
@@ -112,6 +113,12 @@ std::string AppPathManager::m_settingsPath;
 std::string AppPathManager::m_userPath;
 std::string AppPathManager::m_customAssetsRoot;
 
+#if defined(__APPLE__)
+//! The name of application bundle to be re-used as the user directory name
+static std::string s_bundleName;
+static std::string s_defaultAssetsRoot;
+#endif
+
 #if defined(__ANDROID__)
 //! Default path to the internal sotrage directory
 static std::string m_androidSdCardPath = "/storage/emulated/0";
@@ -166,7 +173,7 @@ Java_ru_wohlsoft_thextech_thextechActivity_setGameAssetsPath(
 #ifdef __APPLE__
 
 #   ifndef USERDATA_ROOT_NAME
-#       define USERDATA_ROOT_NAME "TheXTech Episodes"
+#       define USERDATA_ROOT_NAME "TheXTech"
 #   endif
 
 std::string AppPathManager::m_userDataRoot;
@@ -261,11 +268,24 @@ void AppPathManager::initAppPath()
         CFStringGetCString(filePathRef, temporaryCString, PATH_MAX, kCFStringEncodingUTF8);
         ApplicationPathSTD = PGE_URLDEC(std::string(temporaryCString));
         {
-            std::string::size_type i = ApplicationPathSTD.find_last_of(".app");
+            s_bundleName = USERDATA_ROOT_NAME;
+
+            auto i = ApplicationPathSTD.find_last_of(".app");
+
+            auto j = ApplicationPathSTD.find_last_of('/', i);
+            if(j != std::string::npos)
+            {
+                s_bundleName = ApplicationPathSTD.substr(j + 1);
+                auto k = s_bundleName.find_last_of(".app") - 3;
+                s_bundleName.erase(k, s_bundleName.size() - k);
+            }
+
             i = ApplicationPathSTD.find_last_of('/', i);
+
             ApplicationPathSTD.erase(i, ApplicationPathSTD.size() - i);
             if(ApplicationPathSTD.compare(0, 7, "file://") == 0)
                 ApplicationPathSTD.erase(0, 7);
+
             if(!ApplicationPathSTD.empty() && (ApplicationPathSTD.back() != '/'))
                 ApplicationPathSTD.push_back('/');
         }
@@ -382,7 +402,8 @@ std::string AppPathManager::assetsRoot() // Readable
         assets.push_back('/');
     return assets;
 
-#elif defined(__APPLE__) && defined(USE_BUNDLED_ASSETS)
+#elif defined(__APPLE__)
+#   if defined(USE_BUNDLED_ASSETS) // When its release game with assets shipped with a game
     CFURLRef appUrlRef;
     appUrlRef = CFBundleCopyResourceURL(CFBundleGetMainBundle(), CFSTR("assets"), NULL, NULL);
     CFStringRef filePathRef = CFURLGetString(appUrlRef);
@@ -393,6 +414,9 @@ std::string AppPathManager::assetsRoot() // Readable
     if(path.compare(0, 7, "file://") == 0)
         path.erase(0, 7);
     return path;
+#   else // When it's debug-mode built bundle, external assets will be used
+    return s_defaultAssetsRoot;
+#   endif
 
 #elif defined(__ANDROID__)
     std::string assets = m_androidGameAssetsPath;
@@ -563,7 +587,7 @@ void AppPathManager::initSettingsPath()
         const char *homeDir = std::getenv("HOME");
         if(homeDir)
         {
-            m_userDataRoot = std::string(homeDir) + "/" USERDATA_ROOT_NAME;
+            m_userDataRoot = std::string(homeDir) + "/TheXTech Games/" + s_bundleName;
             m_userDataRoot.append("/");
             // Automatically create an infrastructure
             if(!DirMan::exists(m_userDataRoot))
@@ -572,6 +596,9 @@ void AppPathManager::initSettingsPath()
                 DirMan::mkAbsPath(m_userDataRoot + "worlds");
             if(!DirMan::exists(m_userDataRoot + "battle"))
                 DirMan::mkAbsPath(m_userDataRoot + "battle");
+            m_settingsPath = m_userDataRoot + "settings/";
+
+            s_defaultAssetsRoot = std::string(homeDir) + "/TheXTech Games/Debug Assets/";
         }
         else
             m_userDataRoot = m_userPath;
@@ -587,4 +614,10 @@ void AppPathManager::initSettingsPath()
     // Also make the game saves root folder to be exist
     if(!DirMan::exists(gameSaveRootDir()))
         DirMan::mkAbsPath(gameSaveRootDir());
+
+    // And make empty worlds and battle directories too, make a hint for user
+    if(!DirMan::exists(userWorldsRootDir()))
+        DirMan::mkAbsPath(userWorldsRootDir());
+    if(!DirMan::exists(userBattleRootDir()))
+        DirMan::mkAbsPath(userBattleRootDir());
 }

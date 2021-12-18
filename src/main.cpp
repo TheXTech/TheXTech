@@ -151,7 +151,7 @@ int main(int argc, char**argv)
         // Define the command line object.
         TCLAP::CmdLine  cmd("TheXTech Engine\n"
                             "Copyright (c) 2020-2021 Vitaly Novichkov <admin@wohlnet.ru>\n\n"
-                            "This program is distributed under the MIT license\n\n", ' ', "1.3");
+                            "This program is distributed under the GPLv3 license\n\n", ' ', "1.3");
 
         TCLAP::ValueArg<std::string> customAssetsPath("c", "assets-root", "Specify the different assets root directory to play",
                                                       false, "",

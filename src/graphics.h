@@ -37,12 +37,14 @@ void doShakeScreenClear();
 // Public Sub UpdateGraphics2() 'draws GFX to screen when on the world map/world map editor
 // draws GFX to screen when on the world map/world map editor
 void UpdateGraphics2(bool skipRepaint = false);
+// Unpack all visible lazily-loaded graphics
+void GraphicsLazyPreLoad();
 // Public Sub UpdateGraphics() 'This draws the graphic to the screen when in a level/game menu/outro/level editor
 // This draws the graphic to the screen when in a level/game menu/outro/level editor
 void UpdateGraphics(bool skipRepaint = false);
 // Public Sub GetvScreen(A As Integer) ' Get the screen position
 //  Get the screen position
-void GetvScreen(int A);
+void GetvScreen(const int A);
 // Public Sub GetvScreenAverage() ' Get the average screen position for all players
 //  Get the average screen position for all players
 void GetvScreenAverage();
@@ -101,7 +103,7 @@ int pfrY(int plrFrame);
 // Public Sub GameThing()
 void GameThing();
 // Public Sub DrawPlayer(A As Integer, Z As Integer)
-void DrawPlayer(int A, int Z);
+void DrawPlayer(const int A, const int Z);
 // Public Sub ScreenShot()
 void ScreenShot();
 // Public Sub DrawFrozenNPC(Z As Integer, A As Integer)

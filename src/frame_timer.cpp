@@ -440,7 +440,7 @@ void frameRenderEnd()
             newTime = c_frameRateNano * 25;
         }
         s_doUpdate += newTime;
-        s_goalTime = SDL_GetTicks() + (newTime / 1000000);
+        s_goalTime = double(SDL_GetTicks() + (newTime / 1000000));
     }
 #endif
 }

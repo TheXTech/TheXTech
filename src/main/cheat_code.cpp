@@ -19,10 +19,14 @@
  */
 
 #include <SDL2/SDL_stdinc.h>
+#ifdef ENABLE_ANTICHEAT_TRAP
 #include <SDL2/SDL_messagebox.h>
+#endif
 
 #include <Logger/logger.h>
+#ifdef ENABLE_ANTICHEAT_TRAP
 #include <pge_delay.h>
+#endif
 
 #include "../globals.h"
 #include "../sound.h"
@@ -138,10 +142,10 @@ void CheatCode(char NewKey)
             for(B = 1; B <= numWorldPaths; B++)
             {
                 tempLocation = WorldPath[B].Location;
-                tempLocation.X = tempLocation.X + 4;
-                tempLocation.Y = tempLocation.Y + 4;
-                tempLocation.Width = tempLocation.Width - 8;
-                tempLocation.Height = tempLocation.Height - 8;
+                tempLocation.X += 4;
+                tempLocation.Y += 4;
+                tempLocation.Width -= 8;
+                tempLocation.Height -= 8;
                 WorldPath[B].Active = true;
                 for(C = 1; C <= numScenes; C++)
                 {
@@ -157,7 +161,7 @@ void CheatCode(char NewKey)
         }
         else if(SDL_strstr(CheatString.c_str(), "illparkwhereiwant") || SDL_strstr(CheatString.c_str(), "parkinglot"))
         {
-            if(WalkAnywhere == true)
+            if(WalkAnywhere)
             {
                 WalkAnywhere = false;
                 PlaySound(SFX_PlayerShrink);
@@ -183,7 +187,7 @@ void CheatCode(char NewKey)
         }
         else if(SDL_strstr(CheatString.c_str(), "fairymagic") || SDL_strstr(CheatString.c_str(), "fairzmagic"))
         {
-            if(Player[1].Fairy == true)
+            if(Player[1].Fairy)
             {
                 for(B = 1; B <= numPlayers; B++)
                 {
@@ -218,9 +222,9 @@ void CheatCode(char NewKey)
         {
             for(C = 1; C <= numNPCs; C++)
             {
-                if(NPC[C].Active == true)
+                if(NPC[C].Active)
                 {
-                    if(NPCNoIceBall[NPC[C].Type] == false && NPC[C].Type != 263 && NPCIsABonus[NPC[C].Type] == false)
+                    if(!NPCNoIceBall[NPC[C].Type] && NPC[C].Type != 263 && !NPCIsABonus[NPC[C].Type])
                     {
                         NPC[0].Type = 265;
                         NPCHit(C, 3, 0);
@@ -293,7 +297,7 @@ void CheatCode(char NewKey)
             }
             for(B = 0; B <= numSections; B++)
             {
-                if(UnderWater[B] == true)
+                if(UnderWater[B])
                 {
                     UnderWater[B] = false;
                     if(Background2REAL[B] == 55)
@@ -357,7 +361,7 @@ void CheatCode(char NewKey)
             PlaySound(SFX_Raccoon);
             for(B = 1; B <= numPlayers; B++)
             {
-                if(Player[B].Dead == false && Player[B].TimeToLive == 0)
+                if(!Player[B].Dead && Player[B].TimeToLive == 0)
                 {
                     StopMusic();
                     StartMusic(Player[B].Section);
@@ -430,7 +434,7 @@ void CheatCode(char NewKey)
                               Player[B].Location.Y + Player[B].Location.Height / 2.0 - EffectHeight[10] / 2.0));
                 }
                 if(Player[B].Character >= 3 && Player[B].Hearts < 3)
-                    Player[B].Hearts = Player[B].Hearts + 1;
+                    Player[B].Hearts += 1;
             }
             CheatString.clear();
             cheated = true;
@@ -454,7 +458,7 @@ void CheatCode(char NewKey)
                               Player[B].Location.Y + Player[B].Location.Height / 2.0 - EffectHeight[10] / 2.0));
                 }
                 if(Player[B].Character >= 3 && Player[B].Hearts < 3)
-                    Player[B].Hearts = Player[B].Hearts + 1;
+                    Player[B].Hearts += 1;
             }
             CheatString.clear();
             cheated = true;
@@ -479,7 +483,7 @@ void CheatCode(char NewKey)
                               Player[B].Location.Y + Player[B].Location.Height / 2.0 - EffectHeight[10] / 2.0));
                 }
                 if(Player[B].Character >= 3 && Player[B].Hearts < 3)
-                    Player[B].Hearts = Player[B].Hearts + 1;
+                    Player[B].Hearts += 1;
             }
             CheatString.clear();
             cheated = true;
@@ -503,7 +507,7 @@ void CheatCode(char NewKey)
                               Player[B].Location.Y + Player[B].Location.Height / 2.0 - EffectHeight[10] / 2.0));
                 }
                 if(Player[B].Character >= 3 && Player[B].Hearts < 3)
-                    Player[B].Hearts = Player[B].Hearts + 1;
+                    Player[B].Hearts += 1;
             }
             CheatString.clear();
             cheated = true;
@@ -527,7 +531,7 @@ void CheatCode(char NewKey)
                               Player[B].Location.Y + Player[B].Location.Height / 2.0 - EffectHeight[10] / 2.0));
                 }
                 if(Player[B].Character >= 3 && Player[B].Hearts < 3)
-                    Player[B].Hearts = Player[B].Hearts + 1;
+                    Player[B].Hearts += 1;
             }
             CheatString.clear();
             cheated = true;
@@ -551,7 +555,7 @@ void CheatCode(char NewKey)
                               Player[B].Location.Y + Player[B].Location.Height / 2.0 - EffectHeight[10] / 2.0));
                 }
                 if(Player[B].Character >= 3 && Player[B].Hearts < 3)
-                    Player[B].Hearts = Player[B].Hearts + 1;
+                    Player[B].Hearts += 1;
             }
             CheatString.clear();
             cheated = true;
@@ -641,10 +645,13 @@ void CheatCode(char NewKey)
                 tempLocation.X = Player[B].Location.X + Player[B].Location.Width / 2.0 - 16;
                 NewEffect(10, tempLocation);
             }
-            if(ShadowMode == true)
-                ShadowMode = false;
-            else
-                ShadowMode = true;
+
+            ShadowMode = !ShadowMode;
+
+            //if(ShadowMode)
+            //    ShadowMode = false;
+            //else
+            //    ShadowMode = true;
             CheatString.clear();
             cheated = true;
         }
@@ -657,11 +664,11 @@ void CheatCode(char NewKey)
                 Player[B].Immune = 50;
                 if(Player[B].Mount <= 1)
                 {
-                    Player[B].Location.Y = Player[B].Location.Y + Player[B].Location.Height;
+                    Player[B].Location.Y += Player[B].Location.Height;
                     Player[B].Location.Height = Physics.PlayerHeight[Player[B].Character][Player[B].State];
                     if(Player[B].Mount == 1 && Player[B].State == 1)
                         Player[B].Location.Height = Physics.PlayerHeight[1][2];
-                    Player[B].Location.Y = Player[B].Location.Y - Player[B].Location.Height;
+                    Player[B].Location.Y += -Player[B].Location.Height;
                     Player[B].StandUp = true;
                 }
                 tempLocation = Player[B].Location;
@@ -682,11 +689,11 @@ void CheatCode(char NewKey)
                 Player[B].Immune = 50;
                 if(Player[B].Mount <= 1)
                 {
-                    Player[B].Location.Y = Player[B].Location.Y + Player[B].Location.Height;
+                    Player[B].Location.Y += Player[B].Location.Height;
                     Player[B].Location.Height = Physics.PlayerHeight[Player[B].Character][Player[B].State];
                     if(Player[B].Mount == 1 && Player[B].State == 1)
                         Player[B].Location.Height = Physics.PlayerHeight[1][2];
-                    Player[B].Location.Y = Player[B].Location.Y - Player[B].Location.Height;
+                    Player[B].Location.Y += -Player[B].Location.Height;
                     Player[B].StandUp = true;
                 }
                 tempLocation = Player[B].Location;
@@ -707,11 +714,11 @@ void CheatCode(char NewKey)
                 Player[B].Immune = 50;
                 if(Player[B].Mount <= 1)
                 {
-                    Player[B].Location.Y = Player[B].Location.Y + Player[B].Location.Height;
+                    Player[B].Location.Y += Player[B].Location.Height;
                     Player[B].Location.Height = Physics.PlayerHeight[Player[B].Character][Player[B].State];
                     if(Player[B].Mount == 1 && Player[B].State == 1)
                         Player[B].Location.Height = Physics.PlayerHeight[1][2];
-                    Player[B].Location.Y = Player[B].Location.Y - Player[B].Location.Height;
+                    Player[B].Location.Y += -Player[B].Location.Height;
                     Player[B].StandUp = true;
                 }
                 tempLocation = Player[B].Location;
@@ -733,11 +740,11 @@ void CheatCode(char NewKey)
                 Player[B].Immune = 50;
                 if(Player[B].Mount <= 1)
                 {
-                    Player[B].Location.Y = Player[B].Location.Y + Player[B].Location.Height;
+                    Player[B].Location.Y += Player[B].Location.Height;
                     Player[B].Location.Height = Physics.PlayerHeight[Player[B].Character][Player[B].State];
                     if(Player[B].Mount == 1 && Player[B].State == 1)
                         Player[B].Location.Height = Physics.PlayerHeight[1][2];
-                    Player[B].Location.Y = Player[B].Location.Y - Player[B].Location.Height;
+                    Player[B].Location.Y += -Player[B].Location.Height;
                     Player[B].StandUp = true;
                 }
                 tempLocation = Player[B].Location;
@@ -758,11 +765,11 @@ void CheatCode(char NewKey)
                 Player[B].Immune = 50;
                 if(Player[B].Mount <= 1)
                 {
-                    Player[B].Location.Y = Player[B].Location.Y + Player[B].Location.Height;
+                    Player[B].Location.Y += Player[B].Location.Height;
                     Player[B].Location.Height = Physics.PlayerHeight[Player[B].Character][Player[B].State];
                     if(Player[B].Mount == 1 && Player[B].State == 1)
                         Player[B].Location.Height = Physics.PlayerHeight[1][2];
-                    Player[B].Location.Y = Player[B].Location.Y - Player[B].Location.Height;
+                    Player[B].Location.Y += -Player[B].Location.Height;
                     Player[B].StandUp = true;
                 }
                 tempLocation = Player[B].Location;
@@ -942,11 +949,11 @@ void CheatCode(char NewKey)
                         Player[C].Character = 1;
                         if(Player[C].Mount <= 1)
                         {
-                            Player[C].Location.Y = Player[C].Location.Y + Player[C].Location.Height;
+                            Player[C].Location.Y += Player[C].Location.Height;
                             Player[C].Location.Height = Physics.PlayerHeight[Player[C].Character][Player[C].State];
                             if(Player[C].Mount == 1 && Player[C].State == 1)
                                 Player[C].Location.Height = Physics.PlayerHeight[1][2];
-                            Player[C].Location.Y = Player[C].Location.Y - Player[C].Location.Height;
+                            Player[C].Location.Y += -Player[C].Location.Height;
                             Player[C].StandUp = true;
                         }
                     }
@@ -955,11 +962,11 @@ void CheatCode(char NewKey)
                         Player[C].Character = 2;
                         if(Player[C].Mount <= 1)
                         {
-                            Player[C].Location.Y = Player[C].Location.Y + Player[C].Location.Height;
+                            Player[C].Location.Y += Player[C].Location.Height;
                             Player[C].Location.Height = Physics.PlayerHeight[Player[C].Character][Player[C].State];
                             if(Player[C].Mount == 1 && Player[C].State == 1)
                                 Player[C].Location.Height = Physics.PlayerHeight[1][2];
-                            Player[C].Location.Y = Player[C].Location.Y - Player[C].Location.Height;
+                            Player[C].Location.Y += -Player[C].Location.Height;
                             Player[C].StandUp = true;
                         }
                     }
@@ -994,11 +1001,11 @@ void CheatCode(char NewKey)
                 Player[C].Character = 1;
                 if(Player[C].Mount <= 1)
                 {
-                    Player[C].Location.Y = Player[C].Location.Y + Player[C].Location.Height;
+                    Player[C].Location.Y += Player[C].Location.Height;
                     Player[C].Location.Height = Physics.PlayerHeight[Player[C].Character][Player[C].State];
                     if(Player[C].Mount == 1 && Player[C].State == 1)
                         Player[C].Location.Height = Physics.PlayerHeight[1][2];
-                    Player[C].Location.Y = Player[C].Location.Y - Player[C].Location.Height;
+                    Player[C].Location.Y += -Player[C].Location.Height;
                     Player[C].StandUp = true;
                 }
                 Player[C].Immune = 1;
@@ -1032,11 +1039,11 @@ void CheatCode(char NewKey)
                         Player[C].Character = 1;
                         if(Player[C].Mount <= 1)
                         {
-                            Player[C].Location.Y = Player[C].Location.Y + Player[C].Location.Height;
+                            Player[C].Location.Y += Player[C].Location.Height;
                             Player[C].Location.Height = Physics.PlayerHeight[Player[C].Character][Player[C].State];
                             if(Player[C].Mount == 1 && Player[C].State == 1)
                                 Player[C].Location.Height = Physics.PlayerHeight[1][2];
-                            Player[C].Location.Y = Player[C].Location.Y - Player[C].Location.Height;
+                            Player[C].Location.Y += -Player[C].Location.Height;
                             Player[C].StandUp = true;
                         }
                     }
@@ -1045,11 +1052,11 @@ void CheatCode(char NewKey)
                         Player[C].Character = 2;
                         if(Player[C].Mount <= 1)
                         {
-                            Player[C].Location.Y = Player[C].Location.Y + Player[C].Location.Height;
+                            Player[C].Location.Y += Player[C].Location.Height;
                             Player[C].Location.Height = Physics.PlayerHeight[Player[C].Character][Player[C].State];
                             if(Player[C].Mount == 1 && Player[C].State == 1)
                                 Player[C].Location.Height = Physics.PlayerHeight[1][2];
-                            Player[C].Location.Y = Player[C].Location.Y - Player[C].Location.Height;
+                            Player[C].Location.Y += -Player[C].Location.Height;
                             Player[C].StandUp = true;
                         }
                     }
@@ -1063,7 +1070,7 @@ void CheatCode(char NewKey)
         {
             for(B = 1; B <= numNPCs; B++)
             {
-                if(NPC[B].Active == true)
+                if(NPC[B].Active)
                 {
                     if(!NPCWontHurt[NPC[B].Type] &&
                        !NPCIsABlock[NPC[B].Type] &&
@@ -1071,21 +1078,21 @@ void CheatCode(char NewKey)
                        !NPCIsACoin[NPC[B].Type] &&
                        !NPCIsAnExit[NPC[B].Type] &&
                         NPC[B].Type != 91 && !NPC[B].Generator &&
-                        NPC[B].Inert == false
+                       !NPC[B].Inert
                     )
                     {
                         PlaySound(SFX_Raccoon);
-                        NPC[B].Location.Y = NPC[B].Location.Y + NPC[B].Location.Height / 2.0;
-                        NPC[B].Location.X = NPC[B].Location.X + NPC[B].Location.Width / 2.0;
+                        NPC[B].Location.Y += NPC[B].Location.Height / 2.0;
+                        NPC[B].Location.X += NPC[B].Location.Width / 2.0;
                         tempLocation = NPC[B].Location;
-                        tempLocation.Y = tempLocation.Y - 16;
-                        tempLocation.X = tempLocation.X - 16;
+                        tempLocation.Y -= 16;
+                        tempLocation.X -= 16;
                         NewEffect(10, tempLocation);
                         NPC[B].Type = 10;
                         NPC[B].Location.Width = NPCWidth[NPC[B].Type];
                         NPC[B].Location.Height = NPCHeight[NPC[B].Type];
-                        NPC[B].Location.Y = NPC[B].Location.Y - NPC[B].Location.Height / 2.0;
-                        NPC[B].Location.X = NPC[B].Location.X - NPC[B].Location.Width / 2.0;
+                        NPC[B].Location.Y += -NPC[B].Location.Height / 2.0;
+                        NPC[B].Location.X += -NPC[B].Location.Width / 2.0;
                         NPC[B].Location.SpeedX = 0;
                         NPC[B].Location.SpeedY = 0;
                     }
@@ -1098,7 +1105,7 @@ void CheatCode(char NewKey)
         {
             for(B = 1; B <= numPlayers; B++)
             {
-                if(Player[B].Mount == 0 && Player[B].Dead == false && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
+                if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
                 {
                     numNPCs++;
                     NPC[numNPCs] = NPC_t();
@@ -1123,7 +1130,7 @@ void CheatCode(char NewKey)
         {
             for(B = 1; B <= numPlayers; B++)
             {
-                if(Player[B].Mount == 0 && Player[B].Dead == false && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
+                if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
                 {
                     numNPCs++;
                     NPC[numNPCs] = NPC_t();
@@ -1148,7 +1155,7 @@ void CheatCode(char NewKey)
         {
             for(B = 1; B <= numPlayers; B++)
             {
-                if(Player[B].Mount == 0 && Player[B].Dead == false && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
+                if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
                 {
                     numNPCs++;
                     NPC[numNPCs] = NPC_t();
@@ -1175,7 +1182,7 @@ void CheatCode(char NewKey)
         {
             for(B = 1; B <= numPlayers; B++)
             {
-                if(Player[B].Mount == 0 && Player[B].Dead == false && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
+                if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
                 {
                     numNPCs++;
                     NPC[numNPCs] = NPC_t();
@@ -1200,7 +1207,7 @@ void CheatCode(char NewKey)
         {
             for(B = 1; B <= numPlayers; B++)
             {
-                if(Player[B].Mount == 0 && Player[B].Dead == false && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
+                if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
                 {
                     numNPCs++;
                     NPC[numNPCs] = NPC_t();
@@ -1227,7 +1234,7 @@ void CheatCode(char NewKey)
         {
             for(B = 1; B <= numPlayers; B++)
             {
-                if(Player[B].Mount == 0 && Player[B].Dead == false && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
+                if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
                 {
                     numNPCs++;
                     NPC[numNPCs] = NPC_t();
@@ -1254,7 +1261,7 @@ void CheatCode(char NewKey)
         {
             for(B = 1; B <= numPlayers; B++)
             {
-                if(Player[B].Mount == 0 && Player[B].Dead == false && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
+                if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
                 {
                     numNPCs++;
                     NPC[numNPCs] = NPC_t();
@@ -1281,7 +1288,7 @@ void CheatCode(char NewKey)
         {
             for(B = 1; B <= numPlayers; B++)
             {
-                if(Player[B].Mount == 0 && Player[B].Dead == false && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
+                if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
                 {
                     numNPCs++;
                     NPC[numNPCs] = NPC_t();
@@ -1308,7 +1315,7 @@ void CheatCode(char NewKey)
         {
             for(B = 1; B <= numPlayers; B++)
             {
-                if(Player[B].Mount == 0 && Player[B].Dead == false && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
+                if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
                 {
                     numNPCs++;
                     NPC[numNPCs] = NPC_t();
@@ -1335,7 +1342,7 @@ void CheatCode(char NewKey)
         {
             for(B = 1; B <= numPlayers; B++)
             {
-                if(Player[B].Mount == 0 && Player[B].Dead == false && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
+                if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
                 {
                     numNPCs++;
                     NPC[numNPCs] = NPC_t();
@@ -1361,7 +1368,7 @@ void CheatCode(char NewKey)
         {
             for(B = 1; B <= numPlayers; B++)
             {
-                if(Player[B].Mount == 0 && Player[B].Dead == false && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
+                if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
                 {
                     numNPCs++;
                     NPC[numNPCs] = NPC_t();
@@ -1388,7 +1395,7 @@ void CheatCode(char NewKey)
         {
             for(B = 1; B <= numPlayers; B++)
             {
-                if(Player[B].Mount == 0 && Player[B].Dead == false && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
+                if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
                 {
                     numNPCs++;
                     NPC[numNPCs] = NPC_t();
@@ -1416,7 +1423,7 @@ void CheatCode(char NewKey)
         {
             for(B = 1; B <= numPlayers; B++)
             {
-                if(Player[B].Mount == 0 && Player[B].Dead == false && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
+                if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
                 {
                     numNPCs++;
                     NPC[numNPCs] = NPC_t();
@@ -1443,7 +1450,7 @@ void CheatCode(char NewKey)
         {
             for(B = 1; B <= numPlayers; B++)
             {
-                if(Player[B].Mount == 0 && Player[B].Dead == false && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
+                if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
                 {
                     numNPCs++;
                     NPC[numNPCs] = NPC_t();
@@ -1470,7 +1477,7 @@ void CheatCode(char NewKey)
         {
             for(B = 1; B <= numPlayers; B++)
             {
-                if(Player[B].Mount == 0 && Player[B].Dead == false && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
+                if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
                 {
                     numNPCs++;
                     NPC[numNPCs] = NPC_t();
@@ -1498,7 +1505,7 @@ void CheatCode(char NewKey)
         {
             for(B = 1; B <= numPlayers; B++)
             {
-                if(Player[B].Mount == 0 && Player[B].Dead == false && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
+                if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
                 {
                     numNPCs++;
                     NPC[numNPCs] = NPC_t();
@@ -1525,7 +1532,7 @@ void CheatCode(char NewKey)
         {
             for(B = 1; B <= numPlayers; B++)
             {
-                if(Player[B].Mount == 0 && Player[B].Dead == false && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
+                if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
                 {
                     numNPCs++;
                     NPC[numNPCs] = NPC_t();
@@ -1563,7 +1570,7 @@ void CheatCode(char NewKey)
         }
         else if(SDL_strstr(CheatString.c_str(), "stickyfingers") || SDL_strstr(CheatString.c_str(), "stickzfingers"))
         {
-            if(GrabAll == true)
+            if(GrabAll)
             {
 //                if(TestLevel == true)
 //                    frmTestSettings::chkGrabAll.Value = 0;
@@ -1579,7 +1586,7 @@ void CheatCode(char NewKey)
             }
             for(B = 1; B <= 128; B++)
             {
-                if(GrabAll == true)
+                if(GrabAll)
                     Player[B].CanGrabNPCs = true;
                 else
                     Player[B].CanGrabNPCs = false;
@@ -1589,7 +1596,7 @@ void CheatCode(char NewKey)
         }
         else if(SDL_strstr(CheatString.c_str(), "captainn"))
         {
-            if(CaptainN == true)
+            if(CaptainN)
             {
                 CaptainN = false;
                 PlaySound(SFX_PlayerShrink);
@@ -1604,7 +1611,7 @@ void CheatCode(char NewKey)
         }
         else if(SDL_strstr(CheatString.c_str(), "flamethrower"))
         {
-            if(FlameThrower == true)
+            if(FlameThrower)
             {
                 FlameThrower = false;
                 PlaySound(SFX_PlayerShrink);
@@ -1619,7 +1626,7 @@ void CheatCode(char NewKey)
         }
         else if(SDL_strstr(CheatString.c_str(), "moneytree") || SDL_strstr(CheatString.c_str(), "moneztree"))
         {
-            if(CoinMode == true)
+            if(CoinMode)
             {
                 CoinMode = false;
                 PlaySound(SFX_PlayerShrink);
@@ -1634,7 +1641,7 @@ void CheatCode(char NewKey)
         }
         else if(SDL_strstr(CheatString.c_str(), "donthurtme") || SDL_strstr(CheatString.c_str(), "godmode"))
         {
-            if(GodMode == true)
+            if(GodMode)
             {
 //                if(TestLevel == true)
 //                    frmTestSettings::chkGodMode.Value = 0;
@@ -1653,7 +1660,7 @@ void CheatCode(char NewKey)
         }
         else if(SDL_strstr(CheatString.c_str(), "wingman"))
         {
-            if(FlyForever == true)
+            if(FlyForever)
             {
                 FlyForever = false;
                 PlaySound(SFX_PlayerShrink);
@@ -1668,7 +1675,7 @@ void CheatCode(char NewKey)
         }
         else if(SDL_strstr(CheatString.c_str(), "tooslow"))
         {
-            if(SuperSpeed == true)
+            if(SuperSpeed)
             {
                 SuperSpeed = false;
                 PlaySound(SFX_PlayerShrink);
@@ -1683,7 +1690,7 @@ void CheatCode(char NewKey)
         }
         else if(SDL_strstr(CheatString.c_str(), "ahippinandahoppin") || SDL_strstr(CheatString.c_str(), "jumpman"))
         {
-            if(MultiHop == true)
+            if(MultiHop)
             {
                 MultiHop = false;
                 PlaySound(SFX_PlayerShrink);
@@ -1718,7 +1725,7 @@ void CheatCode(char NewKey)
         }
         else if(SDL_strstr(CheatString.c_str(), "speeddemon"))
         {
-            if(MaxFPS == true)
+            if(MaxFPS)
             {
                 MaxFPS = false;
 //                if(TestLevel == true)

@@ -279,7 +279,7 @@ static std::string getCurrentHomePath()
     return homedir;
 }
 
-static void replaceStr(std::string &data, std::string toSearch, std::string replaceStr)
+static void replaceStr(std::string &data, const std::string &toSearch, const std::string &replaceStr)
 {
     size_t pos = data.find(toSearch);
 

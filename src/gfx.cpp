@@ -20,26 +20,25 @@
 
 #include "globals.h"
 #include "gfx.h"
-#include "frm_main.h"
-#include <AppPath/app_path.h>
 #include <fmt_format_ne.h>
 #include <Logger/logger.h>
 #include <SDL2/SDL_messagebox.h>
 
-void GFX_t::loadImage(StdPicture &img, std::string path)
+void GFX_t::loadImage(StdPicture &img, const std::string &path)
 {
     pLogDebug("Loading texture %s...", path.c_str());
     img = frmMain.LoadPicture(path);
+
     if(!img.texture)
     {
         pLogWarning("Failed to load texture: %s...", path.c_str());
         m_loadErrors++;
     }
+
     m_loadedImages.push_back(&img);
 }
 
-GFX_t::GFX_t()
-{}
+GFX_t::GFX_t() noexcept = default;
 
 bool GFX_t::load()
 {
