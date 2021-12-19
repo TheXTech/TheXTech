@@ -1112,8 +1112,8 @@ void UpdateGraphics(bool skipRepaint)
                                                   tempLocation.Width,
                                                   tempLocation.Height,
                                                   GFXMario[Player[A].State],
-                                                  pfrX(100 + Player[A].Frame * Player[A].Direction) + X2,
-                                                  pfrY(100 + Player[A].Frame * Player[A].Direction) + Y2);
+                                                  pfrX(Player[A].Frame * Player[A].Direction) + X2,
+                                                  pfrY(Player[A].Frame * Player[A].Direction) + Y2);
                             tempLocation = roundLoc(Player[A].Location, 2.0);
                             tempLocation.Height = 32;
                             tempLocation.Width = 32;
@@ -1144,8 +1144,8 @@ void UpdateGraphics(bool skipRepaint)
                                                   tempLocation.Width,
                                                   tempLocation.Height,
                                                   GFXMario[Player[A].State],
-                                                  pfrX(100 + Player[A].Frame * Player[A].Direction) + X2,
-                                                  pfrY(100 + Player[A].Frame * Player[A].Direction) + Y2,
+                                                  pfrX(Player[A].Frame * Player[A].Direction) + X2,
+                                                  pfrY(Player[A].Frame * Player[A].Direction) + Y2,
                                                   c, c, c);
                         }
                     }
@@ -1164,7 +1164,11 @@ void UpdateGraphics(bool skipRepaint)
                             Y2 = 0;
                             X2 = 0;
                             PlayerWarpGFX(A, tempLocation, X2, Y2);
-                            frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, tempLocation.Width, tempLocation.Height, GFXLuigi[Player[A].State], pfrX(100 + Player[A].Frame * Player[A].Direction) + X2, pfrY(100 + Player[A].Frame * Player[A].Direction) + Y2);
+                            frmMain.renderTexture(vScreenX[Z] + tempLocation.X,  vScreenY[Z] + tempLocation.Y,
+                                                  tempLocation.Width, tempLocation.Height,
+                                                  GFXLuigi[Player[A].State],
+                                                  pfrX(Player[A].Frame * Player[A].Direction) + X2,
+                                                  pfrY(Player[A].Frame * Player[A].Direction) + Y2);
                             tempLocation = roundLoc(Player[A].Location, 2.0);
                             tempLocation.Height = 32;
                             tempLocation.Width = 32;
@@ -1173,7 +1177,10 @@ void UpdateGraphics(bool skipRepaint)
                             Y2 = 0;
                             X2 = 0;
                             PlayerWarpGFX(A, tempLocation, X2, Y2);
-                            frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, tempLocation.Width, tempLocation.Height, GFX.Boot[Player[A].MountType], X2, Y2 + 32 * Player[A].MountFrame, c, c, c);
+                            frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y,
+                                                  tempLocation.Width, tempLocation.Height,
+                                                  GFX.Boot[Player[A].MountType],
+                                                  X2, Y2 + 32 * Player[A].MountFrame, c, c, c);
                         }
                         else
                         {
@@ -1185,7 +1192,10 @@ void UpdateGraphics(bool skipRepaint)
                             Y2 = 0;
                             X2 = 0;
                             PlayerWarpGFX(A, tempLocation, X2, Y2);
-                            frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, tempLocation.Width, tempLocation.Height, GFXLuigi[Player[A].State], pfrX(100 + Player[A].Frame * Player[A].Direction) + X2, pfrY(100 + Player[A].Frame * Player[A].Direction) + Y2);
+                            frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y,
+                                                  tempLocation.Width, tempLocation.Height, GFXLuigi[Player[A].State],
+                                                  pfrX(Player[A].Frame * Player[A].Direction) + X2,
+                                                  pfrY(Player[A].Frame * Player[A].Direction) + Y2);
                         }
                     }
                     else if(Player[A].Character == 3)
@@ -1210,8 +1220,8 @@ void UpdateGraphics(bool skipRepaint)
                                                   tempLocation.Width,
                                                   tempLocation.Height,
                                                   GFXPeach[Player[A].State],
-                                                  pfrX(100 + Player[A].Frame * Player[A].Direction) + X2,
-                                                  pfrY(100 + Player[A].Frame * Player[A].Direction) + Y2);
+                                                  pfrX(Player[A].Frame * Player[A].Direction) + X2,
+                                                  pfrY(Player[A].Frame * Player[A].Direction) + Y2);
                             tempLocation = roundLoc(Player[A].Location, 2.0);
                             tempLocation.Height = 32;
                             tempLocation.Width = 32;
@@ -1238,7 +1248,11 @@ void UpdateGraphics(bool skipRepaint)
                             Y2 = 0;
                             X2 = 0;
                             PlayerWarpGFX(A, tempLocation, X2, Y2);
-                            frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, tempLocation.Width, tempLocation.Height, GFXPeach[Player[A].State], pfrX(100 + Player[A].Frame * Player[A].Direction) + X2, pfrY(100 + Player[A].Frame * Player[A].Direction) + Y2, c, c, c);
+                            frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y,
+                                                  tempLocation.Width, tempLocation.Height,
+                                                  GFXPeach[Player[A].State],
+                                                  pfrX(Player[A].Frame * Player[A].Direction) + X2,
+                                                  pfrY(Player[A].Frame * Player[A].Direction) + Y2, c, c, c);
                         }
                     }
                     else if(Player[A].Character == 4)
@@ -1259,7 +1273,11 @@ void UpdateGraphics(bool skipRepaint)
                             Y2 = 0;
                             X2 = 0;
                             PlayerWarpGFX(A, tempLocation, X2, Y2);
-                            frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, tempLocation.Width, tempLocation.Height, GFXToad[Player[A].State], pfrX(100 + Player[A].Frame * Player[A].Direction) + X2, pfrY(100 + Player[A].Frame * Player[A].Direction) + Y2);
+                            frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y,
+                                                  tempLocation.Width, tempLocation.Height,
+                                                  GFXToad[Player[A].State],
+                                                  pfrX(Player[A].Frame * Player[A].Direction) + X2,
+                                                  pfrY(Player[A].Frame * Player[A].Direction) + Y2);
                             tempLocation = roundLoc(Player[A].Location, 2.0);
                             tempLocation.Height = 32;
                             tempLocation.Width = 32;
@@ -1268,7 +1286,10 @@ void UpdateGraphics(bool skipRepaint)
                             Y2 = 0;
                             X2 = 0;
                             PlayerWarpGFX(A, tempLocation, X2, Y2);
-                            frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, tempLocation.Width, tempLocation.Height, GFX.Boot[Player[A].MountType], X2, Y2 + 32 * Player[A].MountFrame, c, c, c);
+                            frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y,
+                                                  tempLocation.Width, tempLocation.Height,
+                                                  GFX.Boot[Player[A].MountType],
+                                                  X2, Y2 + 32 * Player[A].MountFrame, c, c, c);
                         }
                         else
                         {
@@ -1280,7 +1301,11 @@ void UpdateGraphics(bool skipRepaint)
                             Y2 = 0;
                             X2 = 0;
                             PlayerWarpGFX(A, tempLocation, X2, Y2);
-                            frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, tempLocation.Width, tempLocation.Height, GFXToad[Player[A].State], pfrX(100 + Player[A].Frame * Player[A].Direction) + X2, pfrY(100 + Player[A].Frame * Player[A].Direction) + Y2, c, c, c);
+                            frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y,
+                                                  tempLocation.Width, tempLocation.Height,
+                                                  GFXToad[Player[A].State],
+                                                  pfrX(Player[A].Frame * Player[A].Direction) + X2,
+                                                  pfrY(Player[A].Frame * Player[A].Direction) + Y2, c, c, c);
                         }
                     }
                     else if(Player[A].Character == 5)
@@ -1295,7 +1320,11 @@ void UpdateGraphics(bool skipRepaint)
                         Y2 = 0;
                         X2 = 0;
                         PlayerWarpGFX(A, tempLocation, X2, Y2);
-                        frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, tempLocation.Width, tempLocation.Height, GFXLink[Player[A].State], pfrX(100 + Player[A].Frame * Player[A].Direction) + X2, pfrY(100 + Player[A].Frame * Player[A].Direction) + Y2, c, c, c);
+                        frmMain.renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y,
+                                              tempLocation.Width, tempLocation.Height,
+                                              GFXLink[Player[A].State],
+                                              pfrX(Player[A].Frame * Player[A].Direction) + X2,
+                                              pfrY(Player[A].Frame * Player[A].Direction) + Y2, c, c, c);
                     }
                 }
 
@@ -1812,8 +1841,8 @@ void UpdateGraphics(bool skipRepaint)
                         99,
                         Player[A].Location.Height - 20 - Player[A].MountOffsetY,
                         *playerGfx,
-                        pfrX(100 + Player[A].Frame * Player[A].Direction),
-                        pfrY(100 + Player[A].Frame * Player[A].Direction),
+                        pfrX(Player[A].Frame * Player[A].Direction),
+                        pfrY(Player[A].Frame * Player[A].Direction),
                         c, c, c);
                 frmMain.renderTexture(
                         vScreenX[Z] + SDL_floor(Player[A].Location.X) + Player[A].Location.Width / 2.0 - 64,
