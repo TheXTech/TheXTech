@@ -920,6 +920,8 @@ void TouchScreenController::render()
     if(!touchSupported())
         return;
 
+    frmMain.offsetViewportIgnore(true);
+
     for(int key = key_BEGIN; key < key_END; key++)
     {
         if((m_touchHidden && key != TouchScreenController::key_toggleKeysView) || LoadingInProcess)
@@ -1007,4 +1009,6 @@ void TouchScreenController::render()
         frmMain.renderRect(x1, y1, w, h, r, g, 0.f, 0.3f);
 #endif
     }
+
+    frmMain.offsetViewportIgnore(false);
 }

@@ -111,6 +111,7 @@ public:
     void resetViewport();
     void setViewport(int x, int y, int w, int h);
     void offsetViewport(int x, int y); // for screen-shaking
+    void offsetViewportIgnore(bool en);
 
     /*!
      * \brief Set render target into the virtual in-game screen (use to render in-game world)
@@ -257,15 +258,21 @@ private:
     SDL_Thread *m_screenshot_thread = nullptr;
 #endif
 
-    //Scale of virtual and window resolutuins
+    // Scale of virtual and window resolutuins
     float m_scale_x = 1.f;
     float m_scale_y = 1.f;
-    //Side offsets to keep ratio
+    // Side offsets to keep ratio
     float m_offset_x = 0.f;
     float m_offset_y = 0.f;
-    //Offset to shake screen
-    int m_viewport_offset_x = 0.f;
-    int m_viewport_offset_y = 0.f;
+    // Offset to shake screen
+    int m_viewport_offset_x = 0;
+    int m_viewport_offset_y = 0;
+    // Keep zero viewport offset while this flag is on
+    bool m_viewport_offset_ignore = false;
+    // Carried set value for viewport offset (used to preserve values while ignore option is on)
+    int m_viewport_offset_x_cur = 0;
+    int m_viewport_offset_y_cur = 0;
+
     //Need to calculate relative viewport position when screen was scaled
     float m_viewport_scale_x = 1.0f;
     float m_viewport_scale_y = 1.0f;

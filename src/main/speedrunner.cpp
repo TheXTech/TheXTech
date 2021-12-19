@@ -88,9 +88,12 @@ void speedRun_renderTimer()
     if(GameMenu || GameOutro || BattleMode)
         return; // Don't draw things at Menu and Outro
 
-    s_gamePlayTimer.render();
+    frmMain.offsetViewportIgnore(true);
 
+    s_gamePlayTimer.render();
     SuperPrintRightAlign(fmt::format_ne("Mode {0}", g_speedRunnerMode), 3, ScreenW - 2, 2, 1.f, 0.3f, 0.3f, 0.5f);
+
+    frmMain.offsetViewportIgnore(false);
 }
 
 void speedRun_renderControls(int player, int screenZ)
@@ -103,6 +106,8 @@ void speedRun_renderControls(int player, int screenZ)
 
     if(player < 1 || player > 2)
         return;
+
+    frmMain.offsetViewportIgnore(true);
 
     int jNum = useJoystick[player] - 1;
 
@@ -246,6 +251,8 @@ void speedRun_renderControls(int player, int screenZ)
             }
         }
     }
+
+    frmMain.offsetViewportIgnore(false);
 }
 
 #undef bool2alpha

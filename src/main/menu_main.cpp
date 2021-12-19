@@ -1625,6 +1625,8 @@ void mainMenuDraw()
     int B = 0;
     int C = 0;
 
+    frmMain.offsetViewportIgnore(true);
+
     if(MenuMode != MENU_1PLAYER_GAME && MenuMode != MENU_2PLAYER_GAME && MenuMode != MENU_BATTLE_MODE)
         worldCurs = 0;
 
@@ -1910,4 +1912,6 @@ void mainMenuDraw()
 
     // Mouse cursor
     frmMain.renderTexture(int(MenuMouseX), int(MenuMouseY), GFX.ECursor[2]);
+
+    frmMain.offsetViewportIgnore(false);
 }

@@ -32,6 +32,8 @@ void DrawInterface(int Z, int numScreens)
     std::string livesStr = std::to_string(int(Lives));
     std::string numStarsStr = std::to_string(numStars);
 
+    frmMain.offsetViewportIgnore(true);
+
     if(ScreenType == 5 || ScreenType == 6) // 2 Players
     {
         if(static_cast<int>(numScreens) == 1 && ScreenType != 6) // Only 1 screen
@@ -424,6 +426,7 @@ void DrawInterface(int Z, int numScreens)
                        16 + 31);
         }
     }
+
     if(BattleIntro > 0)
     {
         if(BattleIntro > 45 || BattleIntro % 2 == 1)
@@ -433,9 +436,12 @@ void DrawInterface(int Z, int numScreens)
             frmMain.renderTexture(50 + vScreen[Z].Width / 2.0, -96 + vScreen[Z].Height / 2.0 - GFX.CharacterName[Player[2].Character].h / 2, GFX.CharacterName[Player[2].Character].w, GFX.CharacterName[Player[2].Character].h, GFX.CharacterName[Player[2].Character], 0, 0);
         }
     }
+
     if(BattleOutro > 0)
     {
         frmMain.renderTexture(10 + vScreen[Z].Width / 2.0, -96 + vScreen[Z].Height / 2.0 - GFX.BMWin.h / 2, GFX.BMWin.w, GFX.BMWin.h, GFX.BMWin, 0, 0);
         frmMain.renderTexture(-10 + vScreen[Z].Width / 2.0 - GFX.CharacterName[Player[BattleWinner].Character].w, -96 + vScreen[Z].Height / 2.0 - GFX.CharacterName[Player[BattleWinner].Character].h / 2, GFX.CharacterName[Player[BattleWinner].Character].w, GFX.CharacterName[Player[BattleWinner].Character].h, GFX.CharacterName[Player[BattleWinner].Character], 0, 0);
     }
+
+    frmMain.offsetViewportIgnore(false);
 }
