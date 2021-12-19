@@ -25,7 +25,9 @@
 #include "../player.h"
 #include "../main/speedrunner.h"
 #include "../main/trees.h"
+#include "../main/world_globals.h"
 #include "../compat.h"
+#include "../screen_fader.h"
 
 #include <fmt_format_ne.h>
 
@@ -752,6 +754,8 @@ void UpdateGraphics2(bool skipRepaint)
                 frmMain.renderTexture(252 + 56, 275 + (MenuCursor * 35), 16, 16, GFX.MCursor[0], 0, 0);
             }
         }
+
+        g_worldScreenFader.draw();
 
         if(PrintFPS > 0)
             SuperPrint(std::to_string(int(PrintFPS)), 1, 8, 8, 0.f, 1.f, 0.f);

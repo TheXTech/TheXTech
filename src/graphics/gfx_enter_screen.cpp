@@ -23,7 +23,7 @@
 #include "../player.h"
 
 
-void GameThing()
+void GameThing(bool noSetup)
 {
     int A = 0;
 //    int B = 0;
@@ -34,7 +34,9 @@ void GameThing()
     tempPlayer[1] = Player[1];
     tempPlayer[2] = Player[2];
 
-    SetupPlayers();
+    if(!noSetup)
+        SetupPlayers();
+
     Player[1].Location.SpeedY = 0;
     Player[2].Location.SpeedY = 0;
 

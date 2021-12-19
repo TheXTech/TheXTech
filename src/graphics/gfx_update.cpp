@@ -29,6 +29,7 @@
 #include "../main/menu_main.h"
 #include "../main/speedrunner.h"
 #include "../main/trees.h"
+#include "../main/game_globals.h"
 
 #include <fmt_format_ne.h>
 #include <Utils/maths.h>
@@ -2825,6 +2826,8 @@ void UpdateGraphics(bool skipRepaint)
 
 //    Next Z
     } // For(Z, 2, numScreens)
+
+    g_levelScreenFader.draw();
 
     speedRun_renderTimer();
 

@@ -168,6 +168,7 @@ void StopSfx(const std::string &Alias);
 // Public Sub StartMusic(A As Integer) 'play music
 void setMusicStartDelay();
 void delayedMusicStart();
+bool delayMusicIsSet();
 // play music
 void StartMusic(int A, int fadeInMs = 0);
 // Public Sub StopMusic() 'stop playing music

@@ -38,6 +38,7 @@
 #include "editor.h"
 #include "layers.h"
 #include "main/level_file.h"
+#include "main/game_globals.h"
 #include "main/trees.h"
 #include "main/menu_main.h"
 #include "compat.h"
@@ -6194,23 +6195,28 @@ void PlayerEffects(const int A)
         {
             p.Effect2 -= 1;
 
+            auto &w = Warp[p.Warp];
+
+            if((w.MapWarp || !w.level.empty()) && Maths::iRound(p.Effect2) == 2955)
+                g_levelScreenFader.setupFader(2, 0, 65, ScreenFader::S_FADE);
+
             if(fEqual(p.Effect2, 2920))
             {
-                if(Warp[p.Warp].MapWarp)
+                if(w.MapWarp)
                 {
                     LevelBeatCode = 6;
 
-                    if(!(Warp[p.Warp].MapX == -1 && Warp[p.Warp].MapY == -1))
+                    if(!(w.MapX == -1 && w.MapY == -1))
                     {
-                        WorldPlayer[1].Location.X = Warp[p.Warp].MapX;
-                        WorldPlayer[1].Location.Y = Warp[p.Warp].MapY;
+                        WorldPlayer[1].Location.X = w.MapX;
+                        WorldPlayer[1].Location.Y = w.MapY;
 
-                        for(B = 1; B <= numWorldLevels; B++)
+                        for(int l = 1; l <= numWorldLevels; ++l)
                         {
-                            if(CheckCollision(WorldPlayer[1].Location, WorldLevel[B].Location))
+                            if(CheckCollision(WorldPlayer[1].Location, WorldLevel[l].Location))
                             {
-                                WorldLevel[B].Active = true;
-                                curWorldLevel = B;
+                                WorldLevel[l].Active = true;
+                                curWorldLevel = l;
                             }
                         }
                     }

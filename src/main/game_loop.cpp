@@ -36,10 +36,16 @@
 #include "../layers.h"
 #include "../player.h"
 #include "../editor.h"
+#include "game_globals.h"
+#include "world_globals.h"
 #include "speedrunner.h"
 #include "menu_main.h"
 
 #include "../pseudo_vb.h"
+
+//! Holds the screen overlay for the level
+ScreenFader g_levelScreenFader;
+
 
 void CheckActive();//in game_main.cpp
 
@@ -54,6 +60,10 @@ void GameLoop()
         if(BattleOutro > 0)
         {
             BattleOutro++;
+
+            if(BattleOutro == 195)
+                g_levelScreenFader.setupFader(1, 0, 65, ScreenFader::S_FADE);
+
             if(BattleOutro == 260)
                 EndLevel = true;
         }
@@ -88,6 +98,7 @@ void GameLoop()
         UpdateEffects();
         speedRun_tick();
         UpdateGraphics();
+        g_levelScreenFader.update();
     }
     else if(BattleIntro > 0)
     {
@@ -95,12 +106,11 @@ void GameLoop()
         BlockFrames();
         UpdateSound();
         For(A, 1, numNPCs)
-        {
             NPCFrames(A);
-        }
         BattleIntro--;
         if(BattleIntro == 1)
             PlaySound(SFX_Checkpoint);
+        g_levelScreenFader.update();
     }
     else
     {
@@ -121,6 +131,8 @@ void GameLoop()
 //        If MagicHand = True Then UpdateEditor
         if(MagicHand)
             UpdateEditor();
+
+        g_levelScreenFader.update();
 
         bool altPressed = getKeyState(SDL_SCANCODE_LALT) == KEY_PRESSED ||
                           getKeyState(SDL_SCANCODE_RALT) == KEY_PRESSED;
@@ -249,6 +261,11 @@ void PauseGame(int plr)
             UpdateSound();
             BlockFrames();
             UpdateEffects();
+
+            if(LevelSelect)
+                g_worldScreenFader.update();
+            else
+                g_levelScreenFader.update();
 
             bool altPressed = getKeyState(SDL_SCANCODE_LALT) == KEY_PRESSED ||
                               getKeyState(SDL_SCANCODE_RALT) == KEY_PRESSED;

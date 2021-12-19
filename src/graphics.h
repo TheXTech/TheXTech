@@ -107,7 +107,11 @@ int pfrX(int plrFrame);
 //! Get Y offset at the player sprite
 int pfrY(int plrFrame);
 // Public Sub GameThing()
-void GameThing();
+/*!
+ * \brief Draw the level enter scene
+ * \param noSetup Avoid player settings re-setup
+ */
+void GameThing(bool noSetup = false);
 // Public Sub DrawPlayer(A As Integer, Z As Integer)
 void DrawPlayer(const int A, const int Z);
 // Public Sub ScreenShot()

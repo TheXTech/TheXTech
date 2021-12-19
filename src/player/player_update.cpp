@@ -34,6 +34,12 @@
 #include "../game_main.h"
 #include "../compat.h"
 #include "../main/trees.h"
+#include "../main/game_globals.h"
+#include "../frame_timer.h"
+#include "../graphics.h"
+
+#include <SDL2/SDL_timer.h>
+#include "pge_delay.h"
 
 
 void UpdatePlayer()
@@ -2218,28 +2224,43 @@ void UpdatePlayer()
                 // Walk offscreen exit
                 if(!hBoundsHandled && OffScreenExit[Player[A].Section])
                 {
+                    bool offScreenExit = false;
                     if(Player[A].Location.X + Player[A].Location.Width < level[Player[A].Section].X)
                     {
-                        LevelBeatCode = 3;
-                        EndLevel = true;
+                        offScreenExit = true;
                         for(B = 1; B <= numPlayers; B++)
                             Player[B].TailCount = 0;
-                        LevelMacro = LEVELMACRO_OFF;
-                        LevelMacroCounter = 0;
-                        frmMain.setTargetTexture();
-                        frmMain.clearBuffer();
-                        frmMain.repaint();
                     }
                     else if(Player[A].Location.X > level[Player[A].Section].Width)
                     {
+                        offScreenExit = true;
+                    }
+
+                    if(offScreenExit)
+                    {
                         LevelBeatCode = 3;
                         EndLevel = true;
                         LevelMacro = LEVELMACRO_OFF;
                         LevelMacroCounter = 0;
-                        frmMain.setTargetTexture();
-                        frmMain.clearBuffer();
-                        frmMain.repaint();
+                        g_levelScreenFader.setupFader(4, 0, 65, ScreenFader::S_FADE);
+
+                        while(!g_levelScreenFader.m_full && GameIsActive)
+                        {
+                            DoEvents();
+
+                            if(canProceedFrame())
+                            {
+                                computeFrameTime1();
+                                UpdateGraphics();
+                                UpdateSound();
+                                DoEvents();
+                                computeFrameTime2();
+                                g_levelScreenFader.update();
+                            }
+                            PGE_Delay(1);
+                        }
                     }
+
                     hBoundsHandled = true;
                 }
 

@@ -433,8 +433,14 @@ static int  s_delayedMusicFadeInMs = 0;
 
 void setMusicStartDelay()
 {
+    if(!s_delayMusic)
+        s_delayedMusicRequested = false;
     s_delayMusic = true;
-    s_delayedMusicRequested = false;
+}
+
+bool delayMusicIsSet()
+{
+    return s_delayMusic;
 }
 
 void delayedMusicStart()
