@@ -97,8 +97,14 @@ void DrawCredits();
 // draws the games interface
 void DrawInterface(int Z, int numScreens);
 // Public Function pfrX(plrFrame As Integer) As Integer
-int pfrX(int plrFrame);
+//! Get X offset at the player sprite (old call, required to add 100 into source value)
+int pfrXo(int plrFrame);
 // Public Function pfrY(plrFrame As Integer) As Integer
+//! Get Y offset at the player sprite (old call, required to add 100 into source value)
+int pfrYo(int plrFrame);
+//! Get X offset at the player sprite
+int pfrX(int plrFrame);
+//! Get Y offset at the player sprite
 int pfrY(int plrFrame);
 // Public Sub GameThing()
 void GameThing();

@@ -111,8 +111,8 @@ void DrawPlayer(const int A, const int Z)
                                 vScreenY[Z] + p.Location.Y + MarioFrameY[(p.State * 100) + (p.Frame * p.Direction)],
                                 100, 100,
                                 GFXMario[p.State],
-                                pfrX(100 + p.Frame * p.Direction),
-                                pfrY(100 + p.Frame * p.Direction),
+                                pfrX(p.Frame * p.Direction),
+                                pfrY(p.Frame * p.Direction),
                                 s, s, s);
                 }
                 else if(p.Mount == 1)
@@ -125,8 +125,8 @@ void DrawPlayer(const int A, const int Z)
                                     100,
                                     p.Location.Height - 26 /*- p.MountOffsetY*/ - MarioFrameY[(p.State * 100) + (p.Frame * p.Direction)],
                                     GFXMario[p.State],
-                                    pfrX(100 + p.Frame * p.Direction),
-                                    pfrY(100 + p.Frame * p.Direction),
+                                    pfrX(p.Frame * p.Direction),
+                                    pfrY(p.Frame * p.Direction),
                                     s, s, s);
                     }
 
@@ -144,8 +144,8 @@ void DrawPlayer(const int A, const int Z)
                                           vScreenY[Z] + p.Location.Y + MarioFrameY[(p.State * 100) + (p.Frame * p.Direction)] + p.MountOffsetY,
                                           100, 100,
                                           GFXMario[p.State],
-                                          pfrX(100 + p.Frame * p.Direction),
-                                          pfrY(100 + p.Frame * p.Direction),
+                                          pfrX(p.Frame * p.Direction),
+                                          pfrY(p.Frame * p.Direction),
                                           s, s, s);
                 }
             }
@@ -158,8 +158,8 @@ void DrawPlayer(const int A, const int Z)
                                 vScreenY[Z] + p.Location.Y + LuigiFrameY[(p.State * 100) + (p.Frame * p.Direction)],
                                 100, 100,
                                 GFXLuigi[p.State],
-                                pfrX(100 + p.Frame * p.Direction),
-                                pfrY(100 + p.Frame * p.Direction),
+                                pfrX(p.Frame * p.Direction),
+                                pfrY(p.Frame * p.Direction),
                                 s, s, s);
                 }
                 else if(p.Mount == 1)
@@ -171,8 +171,8 @@ void DrawPlayer(const int A, const int Z)
                                               100,
                                               p.Location.Height - 26 /*- p.MountOffsetY*/ - LuigiFrameY[(p.State * 100) + (p.Frame * p.Direction)],
                                               GFXLuigi[p.State],
-                                              pfrX(100 + p.Frame * p.Direction),
-                                              pfrY(100 + p.Frame * p.Direction),
+                                              pfrX(p.Frame * p.Direction),
+                                              pfrY(p.Frame * p.Direction),
                                               s, s, s);
                     }
 
@@ -190,8 +190,8 @@ void DrawPlayer(const int A, const int Z)
                                           vScreenY[Z] + p.Location.Y + LuigiFrameY[(p.State * 100) + (p.Frame * p.Direction)] + p.MountOffsetY,
                                           100, 100,
                                           GFXLuigi[p.State],
-                                          pfrX(100 + p.Frame * p.Direction),
-                                          pfrY(100 + p.Frame * p.Direction),
+                                          pfrX(p.Frame * p.Direction),
+                                          pfrY(p.Frame * p.Direction),
                                           s, s, s);
                 }
             }
@@ -204,8 +204,8 @@ void DrawPlayer(const int A, const int Z)
                                 vScreenY[Z] + p.Location.Y + PeachFrameY[(p.State * 100) + (p.Frame * p.Direction)],
                                 100, 100,
                                 GFXPeach[p.State],
-                                pfrX(100 + p.Frame * p.Direction),
-                                pfrY(100 + p.Frame * p.Direction),
+                                pfrX(p.Frame * p.Direction),
+                                pfrY(p.Frame * p.Direction),
                                 s, s, s);
                 }
                 else if(p.Mount == 1)
@@ -217,8 +217,8 @@ void DrawPlayer(const int A, const int Z)
                                               100,
                                               p.Location.Height - 26 - PeachFrameY[(p.State * 100) + (p.Frame * p.Direction)] - 2,
                                               GFXPeach[p.State],
-                                              pfrX(100 + p.Frame * p.Direction),
-                                              pfrY(100 + p.Frame * p.Direction),
+                                              pfrX(p.Frame * p.Direction),
+                                              pfrY(p.Frame * p.Direction),
                                               s, s, s);
                     }
 
@@ -240,8 +240,8 @@ void DrawPlayer(const int A, const int Z)
                                 vScreenY[Z] + p.Location.Y + ToadFrameY[(p.State * 100) + (p.Frame * p.Direction)],
                                 100, 100,
                                 GFXToad[p.State],
-                                pfrX(100 + p.Frame * p.Direction),
-                                pfrY(100 + p.Frame * p.Direction),
+                                pfrX(p.Frame * p.Direction),
+                                pfrY(p.Frame * p.Direction),
                                 s, s, s);
                 }
                 else if(p.Mount == 1)
@@ -254,8 +254,8 @@ void DrawPlayer(const int A, const int Z)
                                                   6 + vScreenY[Z] + p.Location.Y + ToadFrameY[(p.State * 100) + (p.Frame * p.Direction)],
                                                   100,
                                                   p.Location.Height - 26 /*- p.MountOffsetY*/ - ToadFrameY[(p.State * 100) + (p.Frame * p.Direction)], GFXToad[p.State],
-                                                  pfrX(100 + p.Frame * p.Direction),
-                                                  pfrY(100 + p.Frame * p.Direction),
+                                                  pfrX(p.Frame * p.Direction),
+                                                  pfrY(p.Frame * p.Direction),
                                                   s, s, s);
                         }
                         else
@@ -265,8 +265,8 @@ void DrawPlayer(const int A, const int Z)
                                                   100,
                                                   p.Location.Height - 26 /*- p.MountOffsetY*/ - ToadFrameY[(p.State * 100) + (p.Frame * p.Direction)],
                                                   GFXToad[p.State],
-                                                  pfrX(100 + p.Frame * p.Direction),
-                                                  pfrY(100 + p.Frame * p.Direction),
+                                                  pfrX(p.Frame * p.Direction),
+                                                  pfrY(p.Frame * p.Direction),
                                                   s, s, s);
                         }
                     }
@@ -287,8 +287,8 @@ void DrawPlayer(const int A, const int Z)
                                           vScreenY[Z] + p.Location.Y + LinkFrameY[(p.State * 100) + (p.Frame * p.Direction)],
                                           100, 100,
                                           GFXLink[p.State],
-                                          pfrX(100 + p.Frame * p.Direction),
-                                          pfrY(100 + p.Frame * p.Direction),
+                                          pfrX(p.Frame * p.Direction),
+                                          pfrY(p.Frame * p.Direction),
                                           s, s, s);
                 }
             }

@@ -502,12 +502,12 @@ void GetvScreenCredits()
         vScreenY[A] = -(level[Player[1].Section].Height - ScreenH) - 100;
 }
 
-int pfrX(int plrFrame)
+int pfrXo(int plrFrame)
 {
 #if 1
-    plrFrame -= 100; // TODO: Remove all redundant "100 +" from all input code
-    return ((plrFrame + 49) / 10) * 100;
+    return pfrX(plrFrame - 100);
 #else
+    // Old Redigit's code, does the same as a small one-line formula
     int A;
     A = plrFrame;
     A -= 50;
@@ -539,12 +539,12 @@ int pfrX(int plrFrame)
 #endif
 }
 
-int pfrY(int plrFrame)
+int pfrYo(int plrFrame)
 {
 #if 1
-    plrFrame -= 100; // TODO: Remove all redundant "100 +" from all input code
-    return ((plrFrame + 49) % 10) * 100;
+    return pfrX(plrFrame - 100);
 #else
+    // Old Redigit's code, does the same as a small one-line formula
     int A;
     A = plrFrame;
     A -= 50;
@@ -555,6 +555,16 @@ int pfrY(int plrFrame)
         A -= 10;
     return A * 100;
 #endif
+}
+
+int pfrX(int plrFrame)
+{
+    return ((plrFrame + 49) / 10) * 100;
+}
+
+int pfrY(int plrFrame)
+{
+    return ((plrFrame + 49) % 10) * 100;
 }
 
 void ScreenShot()
