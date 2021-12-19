@@ -243,6 +243,7 @@ target_include_directories(A2XT_Int INTERFACE ${A2XT_INCS})
 
 set(LIB_SRC
     lib/util.cpp
+    lib/fader.cpp
     lib/AppPath/app_path.cpp
     ${DIRMANAGER_SRCS}
     ${FILEMAPPER_SRCS}
