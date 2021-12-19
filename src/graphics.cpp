@@ -172,12 +172,12 @@ void GetvScreenAverage()
 // Get the average screen position for all players with no level edge detection
 void GetvScreenAverage2()
 {
-    int A = 0;
+    // int A = 0;
     int B = 0;
     vScreenX[1] = 0;
     vScreenY[1] = 0;
 
-    for(A = 1; A <= numPlayers; A++)
+    for(int A = 1; A <= numPlayers; A++)
     {
         if(!Player[A].Dead)
         {
@@ -190,7 +190,7 @@ void GetvScreenAverage2()
         }
     }
 
-    A = 1;
+    //A = 1; // Stored value gets never read
 
     if(B == 0)
         return;
