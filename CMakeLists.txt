@@ -6,6 +6,7 @@ include(CheckCXXCompilerFlag)
 include(ExternalProject)
 include(CheckLibraryExists)
 include(GNUInstallDirs)
+include(FindBacktrace)
 
 include(cmake/git_info.cmake)
 message("== Current GIT hash [${GIT_COMMIT_HASH}], branch [${GIT_BRANCH}], package [${PACKAGE_SUFFIX}] ==")
@@ -86,6 +87,10 @@ include(version.cmake)
 # Default GIT version
 include(cmake/git_version.cmake)
 
+
+configure_file(lib/CrashHandler/backtrace.h.in
+               generated-include/lib/CrashHandler/backtrace.h)
+include_directories(${CMAKE_CURRENT_BINARY_DIR}/generated-include)
 
 #if(WIN32 OR EMSCRIPTEN OR HAIKU)
 #    set(USE_SYSTEM_LIBS_DEFAULT OFF)
@@ -520,6 +525,10 @@ if(USE_STATIC_LIBC AND NOT USE_SYSTEM_LIBS)
         target_compile_options(thextech PRIVATE /MT)
         target_link_options(thextech PRIVATE /INCREMENTAL:NO /NODEFAULTLIB:MSVCRT)
     endif()
+endif()
+
+if (Backtrace_FOUND)
+    set_property(TARGET thextech APPEND_STRING PROPERTY LINK_FLAGS " ${Backtrace_LIBRARIES}")
 endif()
 
 if(WIN32)
