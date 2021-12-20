@@ -6,6 +6,9 @@ on:
       - master
       - devel
       - versus-ci-android
+  pull_request:
+    branches:
+      - master
 
 defaults:
   run:
@@ -19,8 +22,14 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Set output
+        if: success() && github.event_name != 'pull_request'
         id: vars
         run: echo ::set-output name=short_ref::${GITHUB_REF#refs/*/}
+
+      - name: Set output (pull-requests only)
+        if: success() && github.event_name == 'pull_request'
+        id: vars
+        run: echo ::set-output name=short_ref::pull-request
 
       - name: Install Dependencies
         shell: bash
