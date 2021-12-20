@@ -17,6 +17,7 @@ Changes for 1.3.5.3
 -Order of episodes lists now alphabetical
 -Added the "compat.ini" option to require players to be on the ground to enter warps
 -On-screen elements such as HUD and other printing debug information will not shake with in-game happenings
+-Fixed the vanilla bug: The deadlock in the form of a looped message box showing will happen in the condition: the first NPC activates another NPC using recursive activation of all touching NPCs. And when the second NPC has an on-activation event trigger that hides its layer and shows a message box
 
 Changes for 1.3.5.2
 -Fixed the ARM64 building
