@@ -441,7 +441,7 @@ void UpdateNPCs()
                             NPC[B].Section = NPC[A].Section;
                             if(B < A)
                             {
-                                if(NPC[B].TriggerActivate != "")
+                                if(!NPC[B].TriggerActivate.empty())
                                     ProcEvent(NPC[B].TriggerActivate);
                             }
                         }
@@ -484,7 +484,7 @@ void UpdateNPCs()
                                     NPC[B].Section = NPC[newAct[C]].Section;
                                     if(B < A)
                                     {
-                                        if(NPC[B].TriggerActivate != "")
+                                        if(!NPC[B].TriggerActivate.empty())
                                             ProcEvent(NPC[B].TriggerActivate);
                                     }
 
