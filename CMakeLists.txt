@@ -88,8 +88,9 @@ include(version.cmake)
 include(cmake/git_version.cmake)
 
 
-configure_file(lib/CrashHandler/backtrace.h.in lib/CrashHandler/backtrace.h)
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
+configure_file(lib/CrashHandler/backtrace.h.in
+               generated-include/lib/CrashHandler/backtrace.h)
+include_directories(${CMAKE_CURRENT_BINARY_DIR}/generated-include)
 
 #if(WIN32 OR EMSCRIPTEN OR HAIKU)
 #    set(USE_SYSTEM_LIBS_DEFAULT OFF)
