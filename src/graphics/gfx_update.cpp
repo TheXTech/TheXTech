@@ -2182,6 +2182,8 @@ void UpdateGraphics(bool skipRepaint)
     //                If GamePaused = True Then
                 if(GamePaused)
                 {
+                    frmMain.offsetViewportIgnore(true);
+
                     if(MessageText.empty())
                     {
                         X = 0;
@@ -2304,6 +2306,8 @@ void UpdateGraphics(bool skipRepaint)
                         frmMain.renderTexture(400 - GFX.TextBox.w / 2 + X, BoxY + Y + Y, GFX.TextBox.w, 10, GFX.TextBox, 0, GFX.TextBox.h - 10);
                     }
                 }
+
+                frmMain.offsetViewportIgnore(false);
     //            ElseIf GameOutro = False Then
             }
 
@@ -2311,7 +2315,11 @@ void UpdateGraphics(bool skipRepaint)
                 mainMenuDraw();
 
             if(PrintFPS > 0)
+            {
+                frmMain.offsetViewportIgnore(true);
                 SuperPrint(fmt::format_ne("{0}", int(PrintFPS)), 1, 8, 8, 0.f, 1.f, 0.f);
+                frmMain.offsetViewportIgnore(false);
+            }
             g_stats.print();
         }
 

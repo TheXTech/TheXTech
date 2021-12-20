@@ -65,6 +65,8 @@ void PerformanceStats_t::print()
     if(!enabled)
         return;
 
+    frmMain.offsetViewportIgnore(true);
+
     if(LevelSelect && !GameMenu)
     {
         SuperPrint(fmt::sprintf_ne("DRAW: T=%03d S=%03d P=%03d L=%03d, SUM=%03d",
@@ -102,6 +104,8 @@ void PerformanceStats_t::print()
         SuperPrint(fmt::sprintf_ne("MENU-MODE: %d", MenuMode),
                    3, 45, 70, 0.5f, 1.f, 1.f);
     }
+
+    frmMain.offsetViewportIgnore(false);
 }
 
 //#if !defined(__EMSCRIPTEN__)

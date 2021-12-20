@@ -757,6 +757,9 @@ void FrmMain::updateViewport()
 
     m_viewport_offset_x = 0;
     m_viewport_offset_y = 0;
+    m_viewport_offset_x_cur = 0;
+    m_viewport_offset_y_cur = 0;
+    m_viewport_offset_ignore = false;
 
     if(m_scale_x > m_scale_y)
     {
@@ -799,9 +802,21 @@ void FrmMain::offsetViewport(int x, int y)
 {
     if(m_viewport_offset_x != x || m_viewport_offset_y != y)
     {
-        m_viewport_offset_x = x;
-        m_viewport_offset_y = y;
+        m_viewport_offset_x_cur = x;
+        m_viewport_offset_y_cur = y;
+        m_viewport_offset_x = m_viewport_offset_ignore ? 0 : m_viewport_offset_x_cur;
+        m_viewport_offset_y = m_viewport_offset_ignore ? 0 : m_viewport_offset_y_cur;
     }
+}
+
+void FrmMain::offsetViewportIgnore(bool en)
+{
+    if(m_viewport_offset_ignore != en)
+    {
+        m_viewport_offset_x = en ? 0 : m_viewport_offset_x_cur;
+        m_viewport_offset_y = en ? 0 : m_viewport_offset_y_cur;
+    }
+    m_viewport_offset_ignore = en;
 }
 
 void FrmMain::setTargetTexture()
@@ -1372,6 +1387,8 @@ void FrmMain::GifRecorder::drawRecCircle()
         }
     }
 
+    frmMain.offsetViewportIgnore(true);
+
     if(doFinalize)
     {
         frmMain.renderCircle(50, 50, 20, 0.f, 0.6f, 0.f, fadeValue, true);
@@ -1382,6 +1399,8 @@ void FrmMain::GifRecorder::drawRecCircle()
         frmMain.renderCircle(50, 50, 20, 1.f, 0.f, 0.f, fadeValue, true);
         SuperPrint("REC", 3, 25, 80, 1.f, 0.f, 0.f, fadeValue);
     }
+
+    frmMain.offsetViewportIgnore(false);
 }
 
 bool FrmMain::GifRecorder::hasSome()
@@ -1918,9 +1937,15 @@ void FrmMain::renderTextureScale(double xDst, double yDst, double wDst, double h
     }
 
 #ifndef XTECH_SDL_NO_RECTF_SUPPORT
-    SDL_FRect destRect = {Maths::fRound(xDst), Maths::fRound(yDst), (float)wDst, (float)hDst};
+    SDL_FRect destRect = {Maths::fRound(xDst) + m_viewport_offset_x,
+                          Maths::fRound(yDst) + m_viewport_offset_y,
+                          (float)wDst,
+                          (float)hDst};
 #else
-    SDL_Rect destRect = {Maths::iRound(xDst), Maths::iRound(yDst), (int)wDst, (int)hDst};
+    SDL_Rect destRect = {Maths::iRound(xDst) + m_viewport_offset_x,
+                         Maths::iRound(yDst) + m_viewport_offset_y,
+                         (int)wDst,
+                         (int)hDst};
 #endif
 
     SDL_Rect sourceRect;
