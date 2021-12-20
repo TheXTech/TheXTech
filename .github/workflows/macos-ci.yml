@@ -36,12 +36,14 @@ jobs:
     - name: Set output
       if: success() && github.event_name != 'pull_request'
       id: vars
-      run: echo ::set-output name=short_ref::${GITHUB_REF#refs/*/}
-
-    - name: Set output (pull-requests only)
-      if: success() && github.event_name == 'pull_request'
-      id: vars
-      run: echo ::set-output name=short_ref::pull-request
+      run: |
+        if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo ::set-output name=short_ref::pull-request
+            echo "Is Pull-Request"
+        else
+            echo ::set-output name=short_ref::${GITHUB_REF#refs/*/}
+            echo "Is normal build at the branch: ${{ steps.vars.outputs.short_ref }}"
+        fi
 
     - name: Install Dependencies
       shell: bash
