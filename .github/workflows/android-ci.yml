@@ -22,7 +22,6 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Set output
-        if: success() && github.event_name != 'pull_request'
         id: vars
         run: |
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
