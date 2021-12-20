@@ -141,7 +141,13 @@ jobs:
         fi
         cd build
         cpack  .
-        mv *.deb thextech-adventures-of-demo-${{ matrix.config.package_filename_suffix }}-${BRANCH_NAME}.deb
+        if [[ "${BRANCH_NAME}" == *"merge"* ]]; then
+            BRANCH_NAME_RES="pull-request"
+            echo "-- Pull-request detected!"
+        else
+            BRANCH_NAME_RES=${BRANCH_NAME}
+        fi
+        mv *.deb thextech-adventures-of-demo-${{ matrix.config.package_filename_suffix }}-${BRANCH_NAME_RES}.deb
         cd ..
 
     - name: Upload artifact
