@@ -602,14 +602,16 @@ int GameMain(const CmdLineSetup_t &setup)
                 }
 
                 if(!GoToLevelNoGameThing)
+                {
                     GameThing(true);
+                    PGE_Delay(1000);
+                }
                 else
                 {
                     frmMain.setTargetTexture();
                     frmMain.clearBuffer();
                     frmMain.repaint();
                 }
-                PGE_Delay(1000);
             }
             else
             {
