@@ -140,7 +140,7 @@ void OpenConfig()
         config.beginGroup("main");
         config.read("release", FileRelease, curRelease);
         config.read("full-screen", resBool, false);
-        config.read("record-gameplay", g_recordControlRecord, g_recordControlRecord);
+        config.read("record-gameplay", g_config.RecordGameplayData, g_config.RecordGameplayData);
         config.endGroup();
 
         config.beginGroup("gameplay");
@@ -183,7 +183,7 @@ void SaveConfig()
     // by separating config settings from global active settings
 //    config.setValue("frame-skip", FrameSkip);
 //    config.setValue("show-fps", ShowFPS);
-//    config.setValue("record-gameplay", g_recordControlRecord);
+    config.setValue("record-gameplay", g_config.RecordGameplayData);
     config.endGroup();
 
     config.beginGroup("video");

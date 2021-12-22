@@ -50,12 +50,6 @@ struct CmdLineSetup_t
     bool speedRunnerSemiTransparent = false;
 
     bool showControllerState = false;
-    //! Index to replay
-    int  recordReplayId = -1;
-    //! Record gameplay data
-    bool recordRecord = false;
-    //! Replay previous gameplay
-    bool recordReplay = false;
 };
 
 #endif // CMD_LINE_SETUP_H

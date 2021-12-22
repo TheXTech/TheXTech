@@ -27,6 +27,12 @@
 extern void seedRandom(int seed);
 
 /**
+ * @brief Reads the most recently set seed and resets the seed to that seed
+ * @return current seed
+ */
+extern int readSeed();
+
+/**
  * @brief Random number generator in float format, between 0.0f to 1.0f (exclusive)
  * @return random float value
  */

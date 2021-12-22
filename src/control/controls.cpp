@@ -532,7 +532,7 @@ bool Update()
     }
 
     // sync controls
-    record_sync();
+    Record::Sync();
     for(int i = 0; i < numPlayers && i < maxLocalPlayers; i++)
     {
         speedRun_syncControlKeys(i, Player[i+1].Controls);
@@ -613,7 +613,7 @@ bool Update()
     }
 
     if(((int)g_InputMethods.size() < numPlayers) && (numPlayers <= maxLocalPlayers)
-        && !SingleCoop && !GameMenu && !g_recordControlReplay)
+        && !SingleCoop && !GameMenu && !Record::replay_file)
     {
         // fill with nullptrs
         while((int)g_InputMethods.size() < numPlayers)

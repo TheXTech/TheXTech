@@ -10,12 +10,17 @@
 #include "../rand.h"
 #include "../frame_timer.h"
 #include "../compat.h"
+#include "../config.h"
 #include "record.h"
 #include "speedrunner.h"
 #include "game_main.h"
 
+#include <SDL2/SDL.h>
+#include <chrono>
+#include <fmt_time_ne.h>
+#include <fmt_format_ne.h>
+
 #include <cinttypes>
-#include <SDL2/SDL_stdinc.h>
 #include <Utils/files.h>
 #include <DirManager/dirman.h>
 #include <AppPath/app_path.h>
@@ -34,82 +39,82 @@
 #   define PRId64		__PRI64_PREFIX "d"
 #endif
 
-
-std::string makeRecordPrefix(int index)
+std::string makeRecordPrefix()
 {
-    // want to figure out path of filename relative to game engine, then save in the recording root.
-    std::string recordDir = AppPathManager::gameplayRecordsRootDir() + "/"
-        + Files::basename(Files::dirname(FullFileName));
-    if(!DirMan::exists(recordDir))
-        DirMan::mkAbsPath(recordDir);
+    auto now = std::chrono::system_clock::now();
+    std::time_t in_time_t = std::chrono::system_clock::to_time_t(now);
+    std::tm t = fmt::localtime_ne(in_time_t);
 
-    return recordDir + "/" + FileNameFull + "." + std::to_string(index);
+    return fmt::sprintf_ne("%s/%s_%s_%04d-%02d-%02d_%02d-%02d-%02d.rec",
+                           AppPathManager::gameplayRecordsRootDir(), FileName, SHORT_VERSION,
+                           (1900 + t.tm_year), (1 + t.tm_mon), t.tm_mday,
+                           t.tm_hour, t.tm_min, t.tm_sec);
 }
 
-std::string findRecordPrefix(int index)
+// std::string makeRecordPrefix()
+// {
+//     // want to figure out path of filename relative to game engine, then save in the recording root.
+//     std::string recordDir = AppPathManager::gameplayRecordsRootDir() + "/"
+//         + Files::basename(Files::dirname(FullFileName));
+//     if(!DirMan::exists(recordDir))
+//         DirMan::mkAbsPath(recordDir);
+
+//     return recordDir + "/" + FileNameFull + ".rec";
+// }
+
+namespace Record
 {
-    std::string recordPath = AppPathManager::gameplayRecordsRootDir()
-        + "/" + Files::basename(Files::dirname(FullFileName))
-        + "/" + FileNameFull + "." + std::to_string(index);
 
-    FILE* e;
-    if((e = Files::utf8_fopen((recordPath + ".c.txt").c_str(), "rb")))
-    {
-        fclose(e);
-        return recordPath;
-    }
+// public
 
-    return std::string();
-}
-
-bool    g_recordControlReplay = false;
-bool    g_recordControlRecord = false;
-int     g_recordReplayId = -1;
+FILE* record_file = nullptr;
+FILE* replay_file = nullptr;
 
 // private
-static FILE* s_recordControlFile = nullptr;
-static FILE* s_recordGameplayFile = nullptr;
-static FILE* s_recordOldGameplayFile = nullptr;
 
-static bool         s_in_level = false;
-static bool         s_diverged = false;
-static int64_t      s_frame_no = 0;
-static int64_t      s_next_delta_frame = 0;
-static Controls_t   s_last_controls[maxPlayers];
+bool         in_level = false;
+bool         diverged = false;
+int64_t      frame_no = 0;
+int64_t      next_record_frame = 0;
+uint32_t     last_status_tick = 0;
+Controls_t   last_controls[maxPlayers];
 
-void record_writestate()
+void write_header()
 {
     // write all necessary state variables!
-    fprintf(s_recordGameplayFile, "Init\r\n");
-    fprintf(s_recordGameplayFile, "%s\r\n", LONG_VERSION); // game version / commit
-    fprintf(s_recordGameplayFile, " %d \r\n", CompatGetLevel()); // compatibility mode
-    fprintf(s_recordGameplayFile, "%s\r\n", FileNameFull.c_str()); // level that was played
-    fprintf(s_recordGameplayFile, " %d \r\n", (Checkpoint == FullFileName) ? 1 : 0);
-    fprintf(s_recordGameplayFile, " %d \r\n", StartWarp);
-    fprintf(s_recordGameplayFile, " %d \r\n", ReturnWarp);
-    fprintf(s_recordGameplayFile, " %d \r\n", (int)Lives);
-    fprintf(s_recordGameplayFile, " %d \r\n", Coins);
-    fprintf(s_recordGameplayFile, " %d \r\n", Score);
-    fprintf(s_recordGameplayFile, " %d \r\n", numStars);
+    fprintf(record_file, "Header\r\n");
+    fprintf(record_file, "%s\r\n", LONG_VERSION); // game version / commit
+    fprintf(record_file, " %d \r\n", CompatGetLevel()); // compatibility mode
+    fprintf(record_file, "%s\r\n", FullFileName.c_str()); // level that was played
+    fprintf(record_file, " %d \r\n", readSeed());
+    fprintf(record_file, " %d \r\n", (Checkpoint == FullFileName) ? 1 : 0); // update for multipoints?
+    fprintf(record_file, " %d \r\n", StartWarp);
+    fprintf(record_file, " %d \r\n", ReturnWarp);
+    fprintf(record_file, " %d \r\n", (int)Lives);
+    fprintf(record_file, " %d \r\n", Coins);
+    fprintf(record_file, " %d \r\n", Score);
+    fprintf(record_file, " %d \r\n", numStars);
 
     for(int A = 1; A <= numStars; A++)
     {
-        fprintf(s_recordGameplayFile, "Star\r\n");
-        fprintf(s_recordGameplayFile, "%s\r\n", Star[A].level.c_str());
-        fprintf(s_recordGameplayFile, " %d \r\n", Star[A].Section);
+        fprintf(record_file, "Star\r\n");
+        fprintf(record_file, "%s\r\n", Star[A].level.c_str());
+        fprintf(record_file, " %d \r\n", Star[A].Section);
     }
 
-    fprintf(s_recordGameplayFile, " %d \r\n", numPlayers);
+    fprintf(record_file, " %d \r\n", numPlayers);
 
     for(int A = 1; A <= numPlayers; A++)
     {
-        fprintf(s_recordGameplayFile, "Player\r\n %d \r\n %d \r\n %d \r\n %d \r\n",
+        fprintf(record_file, "Player\r\n %d \r\n %d \r\n %d \r\n %d \r\n",
                 Player[A].Character, Player[A].State, Player[A].MountType, Player[A].HeldBonus);
     }
 }
 
-void record_readstate()
+void read_header()
 {
+    rewind(replay_file); // fseek(replay_file, 0, SEEK_SET);
+
     // buffer is a 1024-character buffer used for reading strings, shared with the record_init() function.
     char buffer[1024];
 
@@ -117,513 +122,502 @@ void record_readstate()
     int n;
 
     // read all necessary state variables!
-    fgets(buffer, 1024, s_recordOldGameplayFile); // "Init"
-    fgets(buffer, 1024, s_recordOldGameplayFile); // game version / commit
-    fscanf(s_recordOldGameplayFile, "%d\r\n", &n); // compatibility mode
+    fgets(buffer, 1024, replay_file); // "Header"
+    fgets(buffer, 1024, replay_file); // game version / commit
+    fscanf(replay_file, "%d\r\n", &n); // compatibility mode
 
     CompatSetEnforcedLevel(n);
 
     if(CompatGetLevel() < COMPAT_SMBX2)
         pLogWarning("compatibility mode is not a long-term support version. Do not expect identical results.");
 
-    fgets(buffer, 1024, s_recordOldGameplayFile); // level that was played
+    fgets(buffer, 1024, replay_file); // level that was played
 
     for(int i = 0; i < 1024; i++)
         if(buffer[i] == '\r') buffer[i] = '\0'; // clip the newline :(
 
-    if(SDL_strcasecmp(buffer, FileNameFull.c_str()))
-        pLogWarning("FileName does not match.");
+    // now SET the filename
+    FullFileName = buffer;
+    // if(SDL_strcasecmp(buffer, FileNameFull.c_str()))
+    //     pLogWarning("FileName does not match.");
 
-    fscanf(s_recordOldGameplayFile, "%d\r\n", &n); // is there a checkpoint?
+    fscanf(replay_file, "%d\r\n", &n); // random seed
+    seedRandom(n);
+
+    fscanf(replay_file, "%d\r\n", &n); // is there a checkpoint?
 
     Checkpoint = n ? FullFileName : "";
-    /*if(n)
-        Checkpoint = n ? FullFileName : "";
-    else
-        Checkpoint = "";*/
 
-    fscanf(s_recordOldGameplayFile, "%d\r\n", &StartWarp);
-    fscanf(s_recordOldGameplayFile, "%d\r\n", &ReturnWarp);
-    fscanf(s_recordOldGameplayFile, "%d\r\n", &n);
+    fscanf(replay_file, "%d\r\n", &StartWarp);
+    fscanf(replay_file, "%d\r\n", &ReturnWarp);
+    fscanf(replay_file, "%d\r\n", &n);
     Lives = n;
-    fscanf(s_recordOldGameplayFile, "%d\r\n", &Coins);
-    fscanf(s_recordOldGameplayFile, "%d\r\n", &Score);
-    fscanf(s_recordOldGameplayFile, "%d\r\n", &numStars);
+    fscanf(replay_file, "%d\r\n", &Coins);
+    fscanf(replay_file, "%d\r\n", &Score);
+    fscanf(replay_file, "%d\r\n", &numStars);
 
     for(int A = 1; A <= numStars; A++)
     {
-        fgets(buffer, 1024, s_recordOldGameplayFile); // "Star"
-        fgets(buffer, 1024, s_recordOldGameplayFile); // section
+        fgets(buffer, 1024, replay_file); // "Star"
+        fgets(buffer, 1024, replay_file); // section
 
         for(int i = 0; i < 1024; i++)
             if(buffer[i] == '\r') buffer[i] = '\0'; // clip the newline :(
 
         Star[A].level = buffer;
-        fscanf(s_recordOldGameplayFile, "%d\r\n", &Star[A].Section);
+        fscanf(replay_file, "%d\r\n", &Star[A].Section);
     }
 
-    fscanf(s_recordOldGameplayFile, "%d\r\n", &numPlayers);
+    fscanf(replay_file, "%d\r\n", &numPlayers);
 
     for(int A = 1; A <= numPlayers; A++)
     {
-        fscanf(s_recordOldGameplayFile, "Player\r\n%d\r\n%d\r\n%d\r\n%d\r\n",
+        fscanf(replay_file, "Player\r\n%d\r\n%d\r\n%d\r\n%d\r\n",
             &Player[A].Character, &Player[A].State, &Player[A].MountType, &Player[A].HeldBonus);
     }
 
     Cheater = true; // important to avoid losing player save data in replay mode.
+    TestLevel = false;
+    MaxFPS = true;
+    ShowFPS = true;
 }
 
-void record_init()
+void write_end()
 {
-    if(!g_recordControlReplay && !g_recordControlRecord)
+    fprintf(record_file, " %" PRId64 " \r\nEnd\r\n %d \r\n", frame_no+1, LevelBeatCode);
+}
+
+void read_end()
+{
+    int b;
+
+    if(fscanf(replay_file, "End\r\n%d\r\n", &b) != 1)
+    {
+        pLogWarning("old gameplay file diverged (invalid end header).");
+        diverged = true;
+    }
+
+    if(next_record_frame-1 != frame_no)
+    {
+        pLogWarning("final frame_no diverged (old: %" PRId64 ", new: %" PRId64 ").", next_record_frame-1, frame_no);
+        diverged = true;
+    }
+
+    if(b != LevelBeatCode)
+    {
+        pLogWarning("LevelBeatCode diverged (old: %d, new: %d).", b, LevelBeatCode);
+        diverged = true;
+    }
+}
+
+void write_control()
+{
+    for(int i = 0; i < numPlayers; i++)
+    {
+        const Controls_t& keys = Player[i+1].Controls;
+
+        if(!last_controls[i].Up && keys.Up)
+            fprintf(record_file, " %" PRId64 "\r\nC+%dU\r\n", frame_no, i+1);
+        else if(last_controls[i].Up && !keys.Up)
+            fprintf(record_file, " %" PRId64 "\r\nC-%dU\r\n", frame_no, i+1);
+
+        if(!last_controls[i].Down && keys.Down)
+            fprintf(record_file, " %" PRId64 "\r\nC+%dD\r\n", frame_no, i+1);
+        else if(last_controls[i].Down && !keys.Down)
+            fprintf(record_file, " %" PRId64 "\r\nC-%dD\r\n", frame_no, i+1);
+
+        if(!last_controls[i].Left && keys.Left)
+            fprintf(record_file, " %" PRId64 "\r\nC+%dL\r\n", frame_no, i+1);
+        else if(last_controls[i].Left && !keys.Left)
+            fprintf(record_file, " %" PRId64 "\r\nC-%dL\r\n", frame_no, i+1);
+
+        if(!last_controls[i].Right && keys.Right)
+            fprintf(record_file, " %" PRId64 "\r\nC+%dR\r\n", frame_no, i+1);
+        else if(last_controls[i].Right && !keys.Right)
+            fprintf(record_file, " %" PRId64 "\r\nC-%dR\r\n", frame_no, i+1);
+
+        if(!last_controls[i].Start && keys.Start)
+            fprintf(record_file, " %" PRId64 "\r\nC+%dS\r\n", frame_no, i+1);
+        else if(last_controls[i].Start && !keys.Start)
+            fprintf(record_file, " %" PRId64 "\r\nC-%dS\r\n", frame_no, i+1);
+
+        if(!last_controls[i].Drop && keys.Drop)
+            fprintf(record_file, " %" PRId64 "\r\nC+%dI\r\n", frame_no, i+1);
+        else if(last_controls[i].Drop && !keys.Drop)
+            fprintf(record_file, " %" PRId64 "\r\nC-%dI\r\n", frame_no, i+1);
+
+        if(!last_controls[i].Jump && keys.Jump)
+            fprintf(record_file, " %" PRId64 "\r\nC+%dA\r\n", frame_no, i+1);
+        else if(last_controls[i].Jump && !keys.Jump)
+            fprintf(record_file, " %" PRId64 "\r\nC-%dA\r\n", frame_no, i+1);
+
+        if(!last_controls[i].Run && keys.Run)
+            fprintf(record_file, " %" PRId64 "\r\nC+%dB\r\n", frame_no, i+1);
+        else if(last_controls[i].Run && !keys.Run)
+            fprintf(record_file, " %" PRId64 "\r\nC-%dB\r\n", frame_no, i+1);
+
+        if(!last_controls[i].AltJump && keys.AltJump)
+            fprintf(record_file, " %" PRId64 "\r\nC+%dX\r\n", frame_no, i+1);
+        else if(last_controls[i].AltJump && !keys.AltJump)
+            fprintf(record_file, " %" PRId64 "\r\nC-%dX\r\n", frame_no, i+1);
+
+        if(!last_controls[i].AltRun && keys.AltRun)
+            fprintf(record_file, " %" PRId64 "\r\nC+%dY\r\n", frame_no, i+1);
+        else if(last_controls[i].AltRun && !keys.AltRun)
+            fprintf(record_file, " %" PRId64 "\r\nC-%dY\r\n", frame_no, i+1);
+
+        last_controls[i] = keys;
+    }
+
+    fflush(record_file);
+}
+
+void read_control()
+{
+    int p;
+    char mode, key;
+
+    if(fscanf(replay_file, "C%c%d%c\r\n", &mode, &p, &key) != 3)
+    {
+        return;
+    }
+
+    bool set = (mode != '-');
+
+    if(key == 'U')
+        last_controls[p-1].Up = set;
+    else if(key == 'D')
+        last_controls[p-1].Down = set;
+    else if(key == 'L')
+        last_controls[p-1].Left = set;
+    else if(key == 'R')
+        last_controls[p-1].Right = set;
+    else if(key == 'S')
+        last_controls[p-1].Start = set;
+    else if(key == 'I')
+        last_controls[p-1].Drop = set;
+    else if(key == 'A')
+        last_controls[p-1].Jump = set;
+    else if(key == 'B')
+        last_controls[p-1].Run = set;
+    else if(key == 'X')
+        last_controls[p-1].AltJump = set;
+    else if(key == 'Y')
+        last_controls[p-1].AltRun = set;
+
+    // replicate the controls changes in the new recording
+    if(record_file)
+    {
+        fprintf(record_file, " %" PRId64 "\r\nC%c%d%c\r\n", frame_no, mode, p, key);
+    }
+}
+
+void write_status()
+{
+    if(frame_no == 0)
+    {
+        g_stats.renderedNPCs = 0;
+        g_stats.renderedBlocks = 0;
+        g_stats.renderedSzBlocks = 0;
+        g_stats.renderedBGOs = 0;
+    }
+
+    fprintf(record_file, " %" PRId64 " \r\nStatus\r\n", frame_no);
+    uint32_t status_tick = SDL_GetTicks();
+    fprintf(record_file, " %d \r\n", SDL_GetTicks() - last_status_tick);
+    last_status_tick = status_tick;
+    fprintf(record_file, " %d \r\n", Score);
+    fprintf(record_file, " %d \r\n", numNPCs);
+
+    int numActiveNPCs = 0;
+    if(frame_no != 0)
+    {
+        for(int i = 1; i <= numNPCs; i++)
+        {
+            if(NPC[i].Active)
+                numActiveNPCs ++;
+        }
+    }
+
+    fprintf(record_file, " %d \r\n", numActiveNPCs);
+    fprintf(record_file, " %d \r\n %d \r\n %d \r\n",
+        g_stats.renderedNPCs, g_stats.renderedBlocks + g_stats.renderedSzBlocks, g_stats.renderedBGOs);
+
+    for(int i = 1; i <= numPlayers; i++)
+    {
+        fprintf(record_file, "%lf\r\n%lf\r\n",
+            Player[i].Location.X, Player[i].Location.Y);
+    }
+
+    fflush(record_file);
+}
+
+void read_status()
+{
+    if(frame_no == 0)
+    {
+        g_stats.renderedNPCs = 0;
+        g_stats.renderedBlocks = 0;
+        g_stats.renderedSzBlocks = 0;
+        g_stats.renderedBGOs = 0;
+    }
+
+    int o_ticks, o_Score, o_numNPCs, o_numActiveNPCs, o_renderedNPCs, o_renderedBlocks, o_renderedBGOs;
+
+    int success = 0;
+
+    fscanf(replay_file, "Status\r\n%n", &success);
+
+    if(!success)
+    {
+        pLogWarning("old gameplay file diverged (invalid status header) at frame %" PRId64 ".", frame_no);
+        diverged = true;
+        return;
+    }
+    if(fscanf(replay_file, "%d\r\n%d\r\n%d\r\n%d\r\n%d\r\n%d\r\n%d\r\n",
+        &o_ticks, &o_Score, &o_numNPCs, &o_numActiveNPCs, &o_renderedNPCs, &o_renderedBlocks, &o_renderedBGOs) != 7)
+    {
+        pLogWarning("old gameplay file diverged (invalid status info) at frame %" PRId64 ".", frame_no);
+        diverged = true;
+        return;
+    }
+
+    if(o_Score != Score)
+    {
+        pLogWarning("score diverged (old: %d, new: %d) at frame %" PRId64 ".", o_Score, Score, frame_no);
+        diverged = true;
+    }
+
+    if(o_numNPCs != numNPCs)
+    {
+        pLogWarning("numNPCs diverged (old: %d, new: %d) at frame %" PRId64 ".", o_numNPCs, numNPCs, frame_no);
+        diverged = true;
+    }
+
+    int numActiveNPCs = 0;
+    if(frame_no != 0)
+    {
+        for(int i = 1; i <= numNPCs; i++)
+        {
+            if(NPC[i].Active)
+                numActiveNPCs ++;
+        }
+    }
+
+    if(o_numActiveNPCs != numActiveNPCs)
+    {
+        pLogWarning("numActiveNPCs diverged (old: %d, new: %d) at frame %" PRId64 ".", o_numActiveNPCs, numActiveNPCs, frame_no);
+        diverged = true;
+    }
+
+    if(o_renderedNPCs != g_stats.renderedNPCs)
+    {
+        pLogWarning("renderedNPCs diverged (old: %d, new: %d) at frame %" PRId64 ".", o_renderedNPCs, g_stats.renderedNPCs, frame_no);
+        diverged = true;
+    }
+
+    if(o_renderedBlocks != g_stats.renderedBlocks + g_stats.renderedSzBlocks)
+    {
+        pLogWarning("renderedBlocks diverged (old: %d, new: %d) at frame %" PRId64 ".", o_renderedNPCs, g_stats.renderedNPCs + g_stats.renderedSzBlocks, frame_no);
+        diverged = true;
+    }
+
+    if(o_renderedBGOs != g_stats.renderedBGOs)
+    {
+        pLogWarning("renderedBGOs diverged (old: %d, new: %d) at frame %" PRId64 ".", o_renderedBGOs, g_stats.renderedBGOs, frame_no);
+        diverged = true;
+    }
+
+    for(int i = 1; i <= numPlayers; i++)
+    {
+        double px, py;
+
+        if(fscanf(replay_file, "%lf\r\n%lf\r\n", &px, &py) != 2)
+        {
+            pLogWarning("old gameplay file diverged (invalid player %d info) at frame %" PRId64 ".", i, frame_no);
+            diverged = true;
+            break;
+        }
+
+        // quite non-strict because in a true divergence situation, it will get continually worse
+        if(SDL_fabs(px - Player[i].Location.X) > 0.01 || SDL_fabs(py - Player[i].Location.Y) > 0.01)
+        {
+            pLogWarning("player %d position diverged (old: %f %f, new: %f %f) at frame %" PRId64 ".", i, px, py, Player[i].Location.X, Player[i].Location.Y, frame_no);
+            diverged = true;
+        }
+    }
+}
+
+void write_NPCs()
+{
+    fprintf(record_file, " %" PRId64 " \r\nNPCs\r\n", frame_no);
+}
+
+void read_NPCs()
+{
+    int success = 0;
+
+    fscanf(replay_file, "NPCs\r\n%n", &success);
+
+    if(!success)
+    {
+        pLogWarning("old gameplay file diverged (invalid NPC header) at frame %" PRId64 ".", frame_no);
+        diverged = true;
+        return;
+    }
+}
+
+void InitRecording()
+{
+    if(LevelEditor || GameMenu || GameOutro)
         return;
 
-    s_in_level = true;
-    s_diverged = false;
-    s_frame_no = 0;
-    s_next_delta_frame = -1;
+    if(!g_config.RecordGameplayData && !replay_file)
+        return;
+
+    in_level = true;
+    diverged = false;
+    frame_no = 0;
+    next_record_frame = -1;
+    last_status_tick = SDL_GetTicks();
     g_stats.renderedNPCs = 0;
     g_stats.renderedBlocks = 0;
     g_stats.renderedBGOs = 0;
 
-    seedRandom(310);
+    std::string filename = makeRecordPrefix();
 
-    // figure out how many runs have already happened
-    int next_run;
-    if(g_recordReplayId != -1)
-    {
-        next_run = g_recordReplayId + 1;
-    }
-    else
-    {
-        next_run = 0;
-        while(!findRecordPrefix(next_run).empty())
-        {
-            next_run ++;
-        }
-    }
-
-    if(g_recordControlRecord && !g_recordControlReplay)
-    {
-        std::string filename = makeRecordPrefix(next_run)+".c.txt";
-
-        if(!s_recordControlFile)
-        {
-            s_recordControlFile = Files::utf8_fopen(filename.c_str(), "wb");
-        }
-
-        if(!s_recordGameplayFile)
-        {
-            filename.end()[-5] = 'g';
-            s_recordGameplayFile = Files::utf8_fopen(filename.c_str(), "wb");
-        }
-    }
-    else if(g_recordControlReplay)
-    {
-        std::string filename = findRecordPrefix(next_run-1);
-
-        if(filename.empty())
-        {
-            // nothing to reproduce
-            return;
-        }
-
-        filename += ".c.txt";
-
-        if(!s_recordControlFile)
-            s_recordControlFile = Files::utf8_fopen(filename.c_str(), "rb");
-
-        if(!s_recordOldGameplayFile)
-        {
-            filename.end()[-5] = 'g';
-            s_recordOldGameplayFile = Files::utf8_fopen(filename.c_str(), "rb");
-            if(s_recordOldGameplayFile)
-            {
-                record_readstate();
-            }
-        }
-
-        if(s_recordControlFile && !s_recordGameplayFile)
-        {
-            filename.replace(filename.end()-5, filename.end(), "r." SHORT_VERSION ".txt");
-            s_recordGameplayFile = Files::utf8_fopen(filename.c_str(), "wb");
-        }
-    }
+    if(!record_file)
+        record_file = Files::utf8_fopen(filename.c_str(), "wb");
 
     // start of gameplay data
-    if(s_recordGameplayFile)
-        record_writestate();
+    seedRandom(iRand());
+    if(replay_file)
+    {
+        read_header();
+        if(!fscanf(replay_file, "%" PRId64 "\r\n", &next_record_frame))
+        {
+            pLogWarning("Replayed recording file has prematurely ended.");
+            diverged = true;
+            EndRecording();
+        }
+    }
+    if(record_file)
+        write_header();
 
     for(int i = 0; i < numPlayers; i++)
     {
-        s_last_controls[i] = Controls_t();
+        last_controls[i] = Controls_t();
     }
 }
 
 // need to preload level info from the replay to load with proper compat
-void record_preload()
+void LoadReplay(std::string recording_path)
 {
-    if(!g_recordControlReplay && !g_recordControlRecord)
-        return;
-
     if(LevelEditor || GameMenu || GameOutro)
         return;
 
     // figure out how many runs have already happened
-    int next_run;
-
-    if(g_recordReplayId != -1)
+    if(!replay_file)
     {
-        next_run = g_recordReplayId + 1;
-    }
-    else
-    {
-        next_run = 0;
-        while(!findRecordPrefix(next_run).empty())
-            next_run ++;
-    }
-
-    if(g_recordControlReplay)
-    {
-        std::string filename = findRecordPrefix(next_run-1);
-        if(filename.empty())
-        {
-            // nothing to reproduce
-            return;
-        }
-
-        if(!s_recordOldGameplayFile)
-        {
-            filename += ".g.txt";
-            s_recordOldGameplayFile = Files::utf8_fopen(filename.c_str(), "rb");
-            if(s_recordOldGameplayFile)
-            {
-                record_readstate();
-                fclose(s_recordOldGameplayFile);
-                s_recordOldGameplayFile = nullptr;
-            }
-        }
+        replay_file = Files::utf8_fopen(recording_path.c_str(), "rb");
+        if(replay_file)
+            read_header();
     }
 }
 
-void record_finish()
+void EndRecording()
 {
-    if(!g_recordControlReplay && !g_recordControlRecord)
+    if(!record_file && !replay_file)
         return;
 
-    s_in_level = false;
+    in_level = false;
 
-    if(s_recordControlFile)
+    if(record_file)
+        write_end();
+
+    if(replay_file)
     {
-        fclose(s_recordControlFile);
-        s_recordControlFile = nullptr;
-    }
+        read_end();
 
-    if(s_recordGameplayFile)
-        fprintf(s_recordGameplayFile, "End\r\n %" PRId64 " \r\n %d \r\n", s_frame_no, LevelBeatCode);
-
-    if(s_recordOldGameplayFile)
-    {
-        int64_t f;
-        int b;
-
-        if(fscanf(s_recordOldGameplayFile, "End\r\n%" PRId64 "\r\n%d\r\n", &f, &b) != 2)
-        {
-            pLogWarning("old gameplay file diverged (invalid end header).");
-            s_diverged = true;
-        }
-
-        if(f != s_frame_no)
-        {
-            pLogWarning("final frame_no diverged (old: %" PRId64 ", new: %" PRId64 ").", f, s_frame_no);
-            s_diverged = true;
-        }
-
-        if(b != LevelBeatCode)
-        {
-            pLogWarning("LevelBeatCode diverged (old: %d, new: %d).", b, LevelBeatCode);
-            s_diverged = true;
-        }
-
-        if(!s_diverged)
+        if(!diverged)
         {
             pLogDebug("CONGRATULATIONS! Your build's run did not diverge from the old run.");
             printf("CONGRATULATIONS! Your build's run did not diverge from the old run.\n");
-            if(s_recordGameplayFile)
-                fprintf(s_recordGameplayFile, "DID NOT diverge from old run.\n");
+            if(record_file)
+                fprintf(record_file, "DID NOT diverge from old run.\r\n");
         }
 
-        fclose(s_recordOldGameplayFile);
-        s_recordOldGameplayFile = nullptr;
+        fclose(replay_file);
+        replay_file = nullptr;
+
+        GameIsActive = false;
     }
 
-    if(s_diverged)
+    if(diverged)
     {
         pLogWarning("I'm sorry, but your build's run DIVERGED from the old run.");
         printf("I'm sorry, but your build's run DIVERGED from the old run.\n");
-        if(s_recordGameplayFile)
-            fprintf(s_recordGameplayFile, "DIVERGED from old run.\n");
+        if(record_file)
+            fprintf(record_file, "DIVERGED from old run.\r\n");
     }
 
-    if(s_recordGameplayFile)
+    if(record_file)
     {
-        fclose(s_recordGameplayFile);
-        s_recordGameplayFile = nullptr;
+        fclose(record_file);
+        record_file = nullptr;
     }
-
-    s_in_level = false;
-
-    if(TestLevel)
-        GameIsActive = false;
 }
 
-void record_sync()
+void Sync()
 {
-    if(!s_in_level)
-        return;
-    if(!g_recordControlReplay && !g_recordControlRecord)
-        return;
-    if(!s_recordControlFile && !s_recordGameplayFile)
+    if(!record_file && !replay_file)
         return; // Do nothing
 
-    if(g_recordControlReplay)
+    if(replay_file)
     {
-        if(s_next_delta_frame == -1 && s_recordControlFile)
+        while(next_record_frame == frame_no && replay_file)
         {
-            if(!fscanf(s_recordControlFile, "%" PRId64 "\r\n", &s_next_delta_frame))
+            int type = fgetc(replay_file);
+            fseek(replay_file, -1, SEEK_CUR);
+
+            if(type == 'S')
+                read_status();
+            else if(type == 'E')
+                read_end();
+            else if(type == 'N')
+                read_NPCs();
+            else if(type == 'C')
+                read_control();
+
+            if(!fscanf(replay_file, "%" PRId64 "\r\n", &next_record_frame))
             {
-                fclose(s_recordControlFile);
-                s_recordControlFile = nullptr;
-            }
-        }
-
-        while(s_next_delta_frame == s_frame_no && s_recordControlFile)
-        {
-            int p;
-            char mode, key;
-
-            if(fscanf(s_recordControlFile, "%c%d%c\r\n", &mode, &p, &key) != 3)
-            {
-                fclose(s_recordControlFile);
-                s_recordControlFile = nullptr;
-                break;
-            }
-
-            bool set = (mode != '-');
-
-            if(key == 'U')
-                s_last_controls[p-1].Up = set;
-            else if(key == 'D')
-                s_last_controls[p-1].Down = set;
-            else if(key == 'L')
-                s_last_controls[p-1].Left = set;
-            else if(key == 'R')
-                s_last_controls[p-1].Right = set;
-            else if(key == 'S')
-                s_last_controls[p-1].Start = set;
-            else if(key == 'I')
-                s_last_controls[p-1].Drop = set;
-            else if(key == 'A')
-                s_last_controls[p-1].Jump = set;
-            else if(key == 'B')
-                s_last_controls[p-1].Run = set;
-            else if(key == 'X')
-                s_last_controls[p-1].AltJump = set;
-            else if(key == 'Y')
-                s_last_controls[p-1].AltRun = set;
-
-            if(!fscanf(s_recordControlFile, "%" PRId64 "\r\n", &s_next_delta_frame))
-            {
-                fclose(s_recordControlFile);
-                s_recordControlFile = nullptr;
+                pLogWarning("Replayed recording file has prematurely ended.");
+                diverged = true;
+                EndRecording();
             }
         }
 
         for(int i = 0; i < numPlayers; i++)
         {
-            Player[i+1].Controls = s_last_controls[i];
+            Player[i+1].Controls = last_controls[i];
         }
     }
-    else if(g_recordControlRecord && s_recordControlFile)
+    if(record_file)
     {
-        for(int i = 0; i < numPlayers; i++)
+        write_control();
+
+        if(!(frame_no % 60))
         {
-            const Controls_t& keys = Player[i+1].Controls;
+            write_status();
+        }
 
-            if(!s_last_controls[i].Up && keys.Up)
-                fprintf(s_recordControlFile, "%" PRId64 "\r\n+%dU\r\n", s_frame_no, i+1);
-            else if(s_last_controls[i].Up && !keys.Up)
-                fprintf(s_recordControlFile, "%" PRId64 "\r\n-%dU\r\n", s_frame_no, i+1);
-
-            if(!s_last_controls[i].Down && keys.Down)
-                fprintf(s_recordControlFile, "%" PRId64 "\r\n+%dD\r\n", s_frame_no, i+1);
-            else if(s_last_controls[i].Down && !keys.Down)
-                fprintf(s_recordControlFile, "%" PRId64 "\r\n-%dD\r\n", s_frame_no, i+1);
-
-            if(!s_last_controls[i].Left && keys.Left)
-                fprintf(s_recordControlFile, "%" PRId64 "\r\n+%dL\r\n", s_frame_no, i+1);
-            else if(s_last_controls[i].Left && !keys.Left)
-                fprintf(s_recordControlFile, "%" PRId64 "\r\n-%dL\r\n", s_frame_no, i+1);
-
-            if(!s_last_controls[i].Right && keys.Right)
-                fprintf(s_recordControlFile, "%" PRId64 "\r\n+%dR\r\n", s_frame_no, i+1);
-            else if(s_last_controls[i].Right && !keys.Right)
-                fprintf(s_recordControlFile, "%" PRId64 "\r\n-%dR\r\n", s_frame_no, i+1);
-
-            if(!s_last_controls[i].Start && keys.Start)
-                fprintf(s_recordControlFile, "%" PRId64 "\r\n+%dS\r\n", s_frame_no, i+1);
-            else if(s_last_controls[i].Start && !keys.Start)
-                fprintf(s_recordControlFile, "%" PRId64 "\r\n-%dS\r\n", s_frame_no, i+1);
-
-            if(!s_last_controls[i].Drop && keys.Drop)
-                fprintf(s_recordControlFile, "%" PRId64 "\r\n+%dI\r\n", s_frame_no, i+1);
-            else if(s_last_controls[i].Drop && !keys.Drop)
-                fprintf(s_recordControlFile, "%" PRId64 "\r\n-%dI\r\n", s_frame_no, i+1);
-
-            if(!s_last_controls[i].Jump && keys.Jump)
-                fprintf(s_recordControlFile, "%" PRId64 "\r\n+%dA\r\n", s_frame_no, i+1);
-            else if(s_last_controls[i].Jump && !keys.Jump)
-                fprintf(s_recordControlFile, "%" PRId64 "\r\n-%dA\r\n", s_frame_no, i+1);
-
-            if(!s_last_controls[i].Run && keys.Run)
-                fprintf(s_recordControlFile, "%" PRId64 "\r\n+%dB\r\n", s_frame_no, i+1);
-            else if(s_last_controls[i].Run && !keys.Run)
-                fprintf(s_recordControlFile, "%" PRId64 "\r\n-%dB\r\n", s_frame_no, i+1);
-
-            if(!s_last_controls[i].AltJump && keys.AltJump)
-                fprintf(s_recordControlFile, "%" PRId64 "\r\n+%dX\r\n", s_frame_no, i+1);
-            else if(s_last_controls[i].AltJump && !keys.AltJump)
-                fprintf(s_recordControlFile, "%" PRId64 "\r\n-%dX\r\n", s_frame_no, i+1);
-
-            if(!s_last_controls[i].AltRun && keys.AltRun)
-                fprintf(s_recordControlFile, "%" PRId64 "\r\n+%dY\r\n", s_frame_no, i+1);
-            else if(s_last_controls[i].AltRun && !keys.AltRun)
-                fprintf(s_recordControlFile, "%" PRId64 "\r\n-%dY\r\n", s_frame_no, i+1);
-
-            fflush(s_recordControlFile);
-
-            s_last_controls[i] = keys;
+        if(!(frame_no % 900))
+        {
+            write_NPCs();
         }
     }
 
-    if(s_recordGameplayFile && !(s_frame_no % 60))
-    {
-        if(s_frame_no == 0)
-        {
-            g_stats.renderedNPCs = 0;
-            g_stats.renderedBlocks = 0;
-            g_stats.renderedSzBlocks = 0;
-            g_stats.renderedBGOs = 0;
-        }
-
-        fprintf(s_recordGameplayFile, "Frame\r\n %" PRId64 " \r\n", s_frame_no);
-        fprintf(s_recordGameplayFile, " %d \r\n", Score);
-        fprintf(s_recordGameplayFile, " %d \r\n", numNPCs);
-
-        int numActiveNPCs = 0;
-        if(s_frame_no != 0)
-        {
-            for(int i = 1; i <= numNPCs; i++)
-            {
-                if(NPC[i].Active)
-                    numActiveNPCs ++;
-            }
-        }
-
-        fprintf(s_recordGameplayFile, " %d \r\n", numActiveNPCs);
-        fprintf(s_recordGameplayFile, " %d \r\n %d \r\n %d \r\n",
-            g_stats.renderedNPCs, g_stats.renderedBlocks + g_stats.renderedSzBlocks, g_stats.renderedBGOs);
-
-        for(int i = 1; i <= numPlayers; i++)
-        {
-            fprintf(s_recordGameplayFile, "%lf\r\n%lf\r\n",
-                Player[i].Location.X, Player[i].Location.Y);
-        }
-
-        fflush(s_recordGameplayFile);
-
-        if(s_recordOldGameplayFile)
-        {
-            int64_t f;
-            int o_Score, o_numNPCs, o_numActiveNPCs, o_renderedNPCs, o_renderedBlocks, o_renderedBGOs;
-
-            if(!fscanf(s_recordOldGameplayFile, "Frame\r\n%" PRId64 "\r\n", &f) || f != s_frame_no)
-            {
-                pLogWarning("old gameplay file diverged (invalid frame header) at frame %" PRId64 ".", s_frame_no);
-                s_diverged = true;
-                fclose(s_recordOldGameplayFile);
-                s_recordOldGameplayFile = nullptr;
-                KillIt();
-            }
-            else if(fscanf(s_recordOldGameplayFile, "%d\r\n%d\r\n%d\r\n%d\r\n%d\r\n%d\r\n",
-                &o_Score, &o_numNPCs, &o_numActiveNPCs, &o_renderedNPCs, &o_renderedBlocks, &o_renderedBGOs) != 6)
-            {
-                pLogWarning("old gameplay file diverged (invalid frame info) at frame %" PRId64 ".", s_frame_no);
-                s_diverged = true;
-                fclose(s_recordOldGameplayFile);
-                s_recordOldGameplayFile = nullptr;
-            }
-            else
-            {
-                if(o_Score != Score)
-                {
-                    pLogWarning("score diverged (old: %d, new: %d) at frame %" PRId64 ".", o_Score, Score, s_frame_no);
-                    s_diverged = true;
-                }
-
-                if(o_numNPCs != numNPCs)
-                {
-                    pLogWarning("numNPCs diverged (old: %d, new: %d) at frame %" PRId64 ".", o_numNPCs, numNPCs, s_frame_no);
-                    s_diverged = true;
-                }
-
-                if(o_numActiveNPCs != numActiveNPCs)
-                {
-                    pLogWarning("numActiveNPCs diverged (old: %d, new: %d) at frame %" PRId64 ".", o_numActiveNPCs, numActiveNPCs, s_frame_no);
-                    s_diverged = true;
-                }
-
-                if(o_renderedNPCs != g_stats.renderedNPCs)
-                {
-                    pLogWarning("renderedNPCs diverged (old: %d, new: %d) at frame %" PRId64 ".", o_renderedNPCs, g_stats.renderedNPCs, s_frame_no);
-                    s_diverged = true;
-                }
-
-                if(o_renderedBlocks != g_stats.renderedBlocks + g_stats.renderedSzBlocks)
-                {
-                    pLogWarning("renderedBlocks diverged (old: %d, new: %d) at frame %" PRId64 ".", o_renderedNPCs, g_stats.renderedNPCs + g_stats.renderedSzBlocks, s_frame_no);
-                    s_diverged = true;
-                }
-
-                if(o_renderedBGOs != g_stats.renderedBGOs)
-                {
-                    pLogWarning("renderedBGOs diverged (old: %d, new: %d) at frame %" PRId64 ".", o_renderedBGOs, g_stats.renderedBGOs, s_frame_no);
-                    s_diverged = true;
-                }
-
-                for(int i = 1; i <= numPlayers; i++)
-                {
-                    double px, py;
-
-                    if(fscanf(s_recordOldGameplayFile, "%lf\r\n%lf\r\n", &px, &py) != 2)
-                    {
-                        pLogWarning("old gameplay file diverged (invalid player %d info) at frame %" PRId64 ".", i, s_frame_no);
-                        s_diverged = true;
-                        fclose(s_recordOldGameplayFile);
-                        s_recordOldGameplayFile = nullptr;
-                        break;
-                    }
-
-                    // quite non-strict because in a true divergence situation, it will get continually worse
-                    if(SDL_fabs(px - Player[i].Location.X) > 0.01 || SDL_fabs(py - Player[i].Location.Y) > 0.01)
-                    {
-                        pLogWarning("player %d position diverged (old: %f %f, new: %f %f) at frame %" PRId64 ".", i, px, py, Player[i].Location.X, Player[i].Location.Y, s_frame_no);
-                        s_diverged = true;
-                    }
-                }
-            }
-        }
-    }
-
-    s_frame_no++;
+    frame_no++;
 }
+
+}; // namespace Record

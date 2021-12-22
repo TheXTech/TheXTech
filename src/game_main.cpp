@@ -113,10 +113,6 @@ int GameMain(const CmdLineSetup_t &setup)
     g_drawController |= setup.showControllerState;
     speedRun_setSemitransparentRender(setup.speedRunnerSemiTransparent);
 
-    g_recordControlReplay = setup.recordReplay;
-    g_recordControlRecord = setup.recordRecord;
-    g_recordReplayId = setup.recordReplayId;
-
     ResetCompat();
 
     // [ !Here was a starting dialog! ]
@@ -229,7 +225,14 @@ int GameMain(const CmdLineSetup_t &setup)
     {
         GameMenu = false;
         LevelSelect = false;
-        FullFileName = setup.testLevel;
+        if(Files::hasSuffix(setup.testLevel, ".rec"))
+        {
+            Record::LoadReplay(setup.testLevel);
+        }
+        else
+        {
+            FullFileName = setup.testLevel;
+        }
         if(setup.testBattleMode)
         {
             numPlayers = 2;
@@ -590,7 +593,7 @@ int GameMain(const CmdLineSetup_t &setup)
             CheatString.clear();
             EndLevel = false;
 
-            record_init(); // initializes level data recording
+            Record::InitRecording(); // initializes level data recording
 
             for(int A = 1; A <= numPlayers; ++A)
             {
@@ -729,7 +732,7 @@ int GameMain(const CmdLineSetup_t &setup)
                 return false;
             });
 
-            record_finish();
+            Record::EndRecording();
 
             if(!GameIsActive)
             {

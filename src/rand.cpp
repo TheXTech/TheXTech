@@ -25,11 +25,19 @@
 
 static std::random_device rd;
 static std::mt19937 engine(rd());
+static int last_seed = 310;
 
 void seedRandom(int seed)
 {
+    last_seed = seed;
     engine.seed(seed);
 }
+
+int readSeed()
+{
+    engine.seed(last_seed);
+    return last_seed;
+};
 
 double dRand()
 {

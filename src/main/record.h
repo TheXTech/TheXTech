@@ -4,16 +4,20 @@
 #ifndef RECORD_H
 #define RECORD_H
 
-extern bool g_recordControlReplay;
-extern bool g_recordControlRecord;
-extern int g_recordReplayId;
+namespace Record
+{
 
-void record_preload();
+extern FILE* record_file;
+extern FILE* replay_file;
 
-void record_init();
+void LoadReplay(std::string recording_path);
 
-void record_finish();
+void InitRecording();
 
-void record_sync();
+void Sync();
+
+void EndRecording();
+
+}; // namespace Record
 
 #endif // #ifndef RECORD_H

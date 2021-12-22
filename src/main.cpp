@@ -249,17 +249,7 @@ int main(int argc, char**argv)
 
         TCLAP::SwitchArg switchVerboseLog(std::string(), "verbose", "Enable log output into the terminal", false);
 
-        TCLAP::UnlabeledValueArg<std::string> inputFileNames("levelpath", "Path to level file to run the test", false, std::string(), "path to file");
-
-        TCLAP::ValueArg<int> recordReplayId(std::string(), "replay-id",
-                                                   "Index of recording data to replay.\n",
-                                                    false, -1,
-                                                   "index found in recording filename",
-                                                   cmd);
-        TCLAP::SwitchArg recordReplay(std::string(), "replay",
-                                        "Replay previous game data.", false);
-        TCLAP::SwitchArg recordRecord(std::string(), "record",
-                                        "Record your gameplay data.", false);
+        TCLAP::UnlabeledValueArg<std::string> inputFileNames("levelpath", "Path to level file or replay data to run the test", false, std::string(), "path to file");
 
         cmd.add(&switchFrameSkip);
         cmd.add(&switchDisableFrameSkip);
@@ -278,9 +268,6 @@ int main(int argc, char**argv)
         cmd.add(&switchSpeedRunSemiTransparent);
         cmd.add(&switchDisplayControls);
         cmd.add(&inputFileNames);
-
-        cmd.add(&recordReplay);
-        cmd.add(&recordRecord);
 
         cmd.parse(argc, argv);
 
@@ -316,6 +303,11 @@ int main(int argc, char**argv)
         {
             auto fpath = inputFileNames.getValue();
             if(Files::hasSuffix(fpath, ".lvl") || Files::hasSuffix(fpath, ".lvlx"))
+            {
+                setup.testLevel = fpath;
+            }
+
+            if(Files::hasSuffix(fpath, ".rec"))
             {
                 setup.testLevel = fpath;
             }
@@ -366,23 +358,6 @@ int main(int argc, char**argv)
 
         if(showBatteryStatus.getValue() > 0 && showBatteryStatus.getValue() <= 4)
             g_videoSettings.batteryStatus = showBatteryStatus.getValue();
-
-        setup.recordReplay = recordReplay.getValue();
-        setup.recordRecord = recordRecord.getValue();
-        setup.recordReplayId = recordReplayId.getValue();
-
-        if(setup.recordReplayId != -1)
-            setup.recordReplay = true;
-
-        if(setup.recordReplay || setup.recordRecord)
-            setup.frameSkip = false;
-
-        if(setup.testLevelMode && setup.recordReplay)
-        {
-            setup.testShowFPS = true;
-            setup.testMaxFPS = true;
-            setup.neverPause = true;
-        }
 
         if(setup.speedRunnerMode >= 1) // Always show FPS and don't pause the game work when focusing other windows
         {

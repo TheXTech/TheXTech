@@ -150,9 +150,6 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         FullFileName = FileNamePath + FileName + ".lvlx";
     }
 
-    // load compatibility settings from previous recording
-    record_preload();
-
     IsEpisodeIntro = (StartLevel == FileNameFull);
 
     numBlock = 0;
