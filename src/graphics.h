@@ -23,6 +23,7 @@
 
 #include <string>
 #include "location.h"
+#include "globals.h"
 
 enum
 {
@@ -111,9 +112,10 @@ int pfrY(int plrFrame);
  * \brief Draw the level enter scene
  * \param noSetup Avoid player settings re-setup
  */
-void GameThing(bool noSetup = false);
+void GameThing(int waitms = 0, int fadeSpeed = 0);
 // Public Sub DrawPlayer(A As Integer, Z As Integer)
 void DrawPlayer(const int A, const int Z);
+void DrawPlayer(Player_t &p, const int Z);
 // Public Sub ScreenShot()
 void ScreenShot();
 // Public Sub DrawFrozenNPC(Z As Integer, A As Integer)

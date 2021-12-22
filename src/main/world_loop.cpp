@@ -528,8 +528,7 @@ void WorldLoop()
                                 ErrorQuit = true;
                             }
 
-                            GameThing(true);
-                            PGE_Delay(1000);
+                            GameThing(1000, 3);
 
                             break;
                         }

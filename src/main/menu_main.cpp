@@ -1026,7 +1026,7 @@ bool mainMenuUpdate()
 
                         if(!StartLevel.empty())
                         {
-                            PlaySoundMenu(SFX_LevelSelect);
+                            //PlaySoundMenu(SFX_LevelSelect);
                             SoundPause[26] = 200;
                             LevelSelect = false;
 
@@ -1042,8 +1042,7 @@ bool mainMenuUpdate()
                                 ErrorQuit = true;
                             }
 
-                            GameThing(true);
-                            PGE_Delay(1000);
+                            GameThing(1000, 3);
                         }
                         return true;
                     }

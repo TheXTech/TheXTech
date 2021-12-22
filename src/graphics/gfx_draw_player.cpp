@@ -25,10 +25,15 @@
 
 void DrawPlayer(const int A, const int Z)
 {
+    DrawPlayer(Player[A], Z);
+}
+
+void DrawPlayer(Player_t &p, const int Z)
+{
     int B = 0;
     double C = 0;
     float s = ShadowMode ? 0.f : 1.f;
-    auto &p = Player[A];
+    //auto &p = Player[A];
 
     if(!p.Dead && !p.Immune2 && p.TimeToLive == 0 && !(p.Effect == 3 || p.Effect == 5 || p.Effect == 8 || p.Effect == 10))
     {

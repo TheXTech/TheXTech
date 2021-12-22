@@ -2906,7 +2906,7 @@ void zTestLevel(bool magicHand, bool interProcess)
         }
     }
 
-    GameThing(true);
+    GameThing(0, 0);
 
     if(SingleCoop > 0)
         ScreenType = 6;

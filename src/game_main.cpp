@@ -573,8 +573,8 @@ int GameMain(const CmdLineSetup_t &setup)
                 Player[1].Vine = 0;
                 Player[2].Vine = 0;
 
-                if(!GoToLevelNoGameThing)
-                    PlaySound(SFX_LevelSelect);
+//                if(!GoToLevelNoGameThing)
+//                    PlaySound(SFX_LevelSelect);
                 SoundPause[26] = 2000;
 
                 LevelSelect = false;
@@ -603,8 +603,7 @@ int GameMain(const CmdLineSetup_t &setup)
 
                 if(!GoToLevelNoGameThing)
                 {
-                    GameThing(true);
-                    PGE_Delay(1000);
+                    GameThing(1000, 3);
                 }
                 else
                 {

@@ -1136,9 +1136,14 @@ void CheckSection(const int A)
 
 void PlayerFrame(const int A)
 {
+    PlayerFrame(Player[A]);
+}
+
+void PlayerFrame(Player_t &p)
+{
 // updates the players GFX
     Location_t tempLocation;
-    auto &p = Player[A];
+//    auto &p = Player[A];
 
 // cause the flicker when he is immune
     if(p.Effect != 9)
@@ -1162,7 +1167,7 @@ void PlayerFrame(const int A)
 // find frames for link
     if(p.Character == 5)
     {
-        LinkFrame(A);
+        LinkFrame(p);
         return;
     }
 
@@ -5102,8 +5107,13 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
 
 void LinkFrame(const int A)
 {
+    LinkFrame(Player[A]);
+}
+
+void LinkFrame(Player_t &p)
+{
     Location_t tempLocation;
-    auto &p = Player[A];
+    //auto &p = Player[A];
 
     p.MountOffsetY = 0;
 
