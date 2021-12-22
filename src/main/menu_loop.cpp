@@ -258,7 +258,7 @@ static void updateIntroLevelActivity()
             p.GroundPound = false;
             p.Hearts = 3;
 
-            PlayerFrame(A);
+            PlayerFrame(p);
 
             p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
             p.Location.Width = Physics.PlayerWidth[p.Character][p.State];

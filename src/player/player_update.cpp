@@ -4595,7 +4595,7 @@ void UpdatePlayer()
 //                    Player[A].JumpRelease = false;
                 Player[A].JumpRelease = !Player[A].Controls.Jump && !Player[A].Controls.AltJump;
 
-                PlayerFrame(A); // Update players frames
+                PlayerFrame(Player[A]); // Update players frames
                 Player[A].StandUp = false; // Fixes a block collision bug
                 Player[A].StandUp2 = false;
                 if(Player[A].ForceHitSpot3)

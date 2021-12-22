@@ -5559,7 +5559,7 @@ void PlayerEffects(const int A)
                     NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width - Physics.PlayerGrabSpotX[p.Character][p.State] - NPC[p.HoldingNPC].Location.Width;
                 }
                 p.Location.SpeedX = -0.5;
-                PlayerFrame(A);
+                PlayerFrame(p);
                 p.Location.SpeedX = 0;
             }
             else if(warp_dir_enter == 4)
@@ -5583,7 +5583,7 @@ void PlayerEffects(const int A)
 //                        NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width - Physics.PlayerGrabSpotX[p.Character][p.State] - NPC[p.HoldingNPC].Location.Width;
                 }
                 p.Location.SpeedX = 0.5;
-                PlayerFrame(A);
+                PlayerFrame(p);
                 p.Location.SpeedX = 0;
             }
         }
@@ -5821,7 +5821,7 @@ void PlayerEffects(const int A)
                     if(p.Character >= 3) // peach/toad leaving a pipe
                     {
                         p.Location.SpeedX = 1;
-                        PlayerFrame(A);
+                        PlayerFrame(p);
                         NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
 
 //                        if(p.Direction < 0) // always true
@@ -5849,7 +5849,7 @@ void PlayerEffects(const int A)
                 else
                 {
                     p.Location.SpeedX = -0.5;
-                    PlayerFrame(A);
+                    PlayerFrame(p);
                     p.Location.SpeedX = 0;
                 }
             }
@@ -5866,7 +5866,7 @@ void PlayerEffects(const int A)
                     if(p.Character >= 3) // peach/toad leaving a pipe
                     {
                         p.Location.SpeedX = 1;
-                        PlayerFrame(A);
+                        PlayerFrame(p);
                         NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
 
 //                        if(p.Direction < 0) // always false
@@ -5894,7 +5894,7 @@ void PlayerEffects(const int A)
                 else
                 {
                     p.Location.SpeedX = -0.5;
-                    PlayerFrame(A);
+                    PlayerFrame(p);
                     p.Location.SpeedX = 0;
                 }
             }
@@ -6647,7 +6647,7 @@ void PlayerEffects(const int A)
 
     if(p.Mount == 3 && p.Effect != 9)
     {
-        PlayerFrame(A);
+        PlayerFrame(p);
     }
 //    if(Player[A].Effect == 0)
 //    {

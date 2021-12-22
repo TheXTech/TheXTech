@@ -1899,7 +1899,7 @@ void UpdateGraphics(bool skipRepaint)
         for(int A = numPlayers; A >= 1; A--)// Players in front of blocks
         {
 //            DrawPlayer A, Z
-            DrawPlayer(A, Z);
+            DrawPlayer(Player[A], Z);
 //        Next A
         }
 //'normal player end

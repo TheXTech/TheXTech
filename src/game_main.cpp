@@ -740,7 +740,7 @@ int GameMain(const CmdLineSetup_t &setup)
 //                            End If
                         }
 
-                        PlayerFrame(A);
+                        PlayerFrame(p);
                         CheckSection(A);
                         SoundPause[17] = 0;
                         p.Effect = 8;
