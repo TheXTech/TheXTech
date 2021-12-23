@@ -80,6 +80,7 @@ static void compatInit(Compatibility_t &c)
     c.world_map_stars_show_policy = Compatibility_t::STARS_UNSPECIFIED;
     // 1.3.5.3
     c.require_ground_to_enter_warps = false;
+    c.fix_npc_activation_event_loop_bug = true;
     c.ignore_got_item_setting = false;
     // 1.3.6
 
@@ -109,6 +110,8 @@ static void compatInit(Compatibility_t &c)
         // 1.3.5.2
         c.fix_swooper_start_while_inactive = false;
         c.fix_FreezeNPCs_no_reset = false; //-V1048
+        // 1.3.5.3
+        c.fix_npc_activation_event_loop_bug = false;
         // 1.3.6
     }
 
@@ -204,6 +207,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
     compat.read("fix-npc-downward-clip", c.fix_npc_downward_clip, c.fix_npc_downward_clip);
     // 1.3.5.3
     compat.read("require-ground-to-enter-warps", c.require_ground_to_enter_warps, c.require_ground_to_enter_warps);
+    compat.read("fix-npc-activation-event-loop-bug", c.fix_npc_activation_event_loop_bug, c.fix_npc_activation_event_loop_bug);
     compat.read("ignore-got-item-setting", c.ignore_got_item_setting, c.ignore_got_item_setting);
     // 1.3.6
     compat.endGroup();

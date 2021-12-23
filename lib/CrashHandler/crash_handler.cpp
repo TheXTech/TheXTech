@@ -26,7 +26,9 @@
 #include <cstdlib>
 #include <signal.h>
 
-#if defined(DEBUG_BUILD) && (defined(__gnu_linux__) || defined(_WIN32))
+#include <lib/CrashHandler/backtrace.h>
+
+#if defined(DEBUG_BUILD) && (Backtrace_FOUND || defined(_WIN32))
 #define PGE_ENGINE_DEBUG
 #endif
 
@@ -86,7 +88,6 @@ static int isDebuggerPresent()
 #   include <dbghelp.h>
 #   include <shlobj.h>
 #elif (defined(__linux__) && !defined(__ANDROID__) || defined(__APPLE__))
-#   include <execinfo.h>
 #   include <pwd.h>
 #   include <unistd.h>
 #elif defined(__ANDROID__)
@@ -315,7 +316,7 @@ static std::string getStacktrace()
 #if defined(_WIN32)
     GetStackWalk(bkTrace);
 
-#elif (defined(__linux__) && !defined(__ANDROID__) || defined(__APPLE__))
+#elif Backtrace_FOUND
     void  *array[400];
     int size;
     char **strings;

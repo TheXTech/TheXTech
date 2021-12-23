@@ -441,7 +441,7 @@ void UpdateNPCs()
                             NPC[B].Section = NPC[A].Section;
                             if(B < A)
                             {
-                                if(NPC[B].TriggerActivate != "")
+                                if(!NPC[B].TriggerActivate.empty())
                                     ProcEvent(NPC[B].TriggerActivate);
                             }
                         }
@@ -469,7 +469,9 @@ void UpdateNPCs()
                         tempLocation.Height += 64;
                         for(B = 1; B <= numNPCs; B++)
                         {
-                            if(!NPC[B].Active && B != A && NPC[B].Reset[1] && NPC[B].Reset[2])
+                            if(!NPC[B].Active &&
+                              (!NPC[B].Hidden || !g_compatibility.fix_npc_activation_event_loop_bug) &&
+                               B != A && NPC[B].Reset[1] && NPC[B].Reset[2])
                             {
                                 if(CheckCollision(tempLocation, NPC[B].Location))
                                 {
@@ -482,7 +484,7 @@ void UpdateNPCs()
                                     NPC[B].Section = NPC[newAct[C]].Section;
                                     if(B < A)
                                     {
-                                        if(NPC[B].TriggerActivate != "")
+                                        if(!NPC[B].TriggerActivate.empty())
                                             ProcEvent(NPC[B].TriggerActivate);
                                     }
 
