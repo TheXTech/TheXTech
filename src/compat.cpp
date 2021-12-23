@@ -82,6 +82,7 @@ static void compatInit(Compatibility_t &c)
     c.require_ground_to_enter_warps = false;
     c.fix_npc_activation_event_loop_bug = true;
     c.ignore_got_item_setting = false;
+    c.enable_player_grow_with_got_item = false;
     // 1.3.6
 
 
@@ -209,6 +210,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
     compat.read("require-ground-to-enter-warps", c.require_ground_to_enter_warps, c.require_ground_to_enter_warps);
     compat.read("fix-npc-activation-event-loop-bug", c.fix_npc_activation_event_loop_bug, c.fix_npc_activation_event_loop_bug);
     compat.read("ignore-got-item-setting", c.ignore_got_item_setting, c.ignore_got_item_setting);
+    compat.read("enable-player-grow-with-got-item", c.enable_player_grow_with_got_item, c.enable_player_grow_with_got_item);
     // 1.3.6
     compat.endGroup();
 }

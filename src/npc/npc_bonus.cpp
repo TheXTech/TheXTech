@@ -33,6 +33,13 @@
 #include <InterProcess/intproc.h>
 
 
+static bool doPlayGrowWithGotItem()
+{
+    return (!g_compatibility.ignore_got_item_setting && SoundPlayerGrowWithGetItem) ||
+           (g_compatibility.ignore_got_item_setting && g_compatibility.enable_player_grow_with_got_item);
+}
+
+
 void DropBonus(int A)
 {
     int B = 0;
@@ -269,7 +276,7 @@ void TouchBonus(int A, int B)
                 PlaySound(SFX_ZeldaHeart);
             else
             {
-                if(SoundPlayerGrowWithGetItem && !g_compatibility.ignore_got_item_setting)
+                if(doPlayGrowWithGotItem())
                     PlaySound(SFX_PlayerGrow);
                 PlaySound(SFX_GotItem);
             }
@@ -303,7 +310,7 @@ void TouchBonus(int A, int B)
                     PlaySound(SFX_ZeldaHeart);
                 else
                 {
-                    if(SoundPlayerGrowWithGetItem && !g_compatibility.ignore_got_item_setting)
+                    if(doPlayGrowWithGotItem())
                         PlaySound(SFX_PlayerGrow);
                     PlaySound(SFX_GotItem);
                 }
@@ -339,7 +346,7 @@ void TouchBonus(int A, int B)
                     PlaySound(SFX_ZeldaHeart);
                 else
                 {
-                    if(SoundPlayerGrowWithGetItem && !g_compatibility.ignore_got_item_setting)
+                    if(doPlayGrowWithGotItem())
                         PlaySound(SFX_PlayerGrow);
                     PlaySound(SFX_GotItem);
                 }
@@ -369,7 +376,7 @@ void TouchBonus(int A, int B)
                     PlaySound(SFX_ZeldaHeart);
                 else
                 {
-                    if(SoundPlayerGrowWithGetItem && !g_compatibility.ignore_got_item_setting)
+                    if(doPlayGrowWithGotItem())
                         PlaySound(SFX_PlayerGrow);
                     PlaySound(SFX_GotItem);
                 }
@@ -399,7 +406,7 @@ void TouchBonus(int A, int B)
                     PlaySound(SFX_ZeldaHeart);
                 else
                 {
-                    if(SoundPlayerGrowWithGetItem && !g_compatibility.ignore_got_item_setting)
+                    if(doPlayGrowWithGotItem())
                         PlaySound(SFX_PlayerGrow);
                     PlaySound(SFX_GotItem);
                 }
@@ -429,7 +436,7 @@ void TouchBonus(int A, int B)
                     PlaySound(SFX_ZeldaHeart);
                 else
                 {
-                    if(SoundPlayerGrowWithGetItem && !g_compatibility.ignore_got_item_setting)
+                    if(doPlayGrowWithGotItem())
                         PlaySound(SFX_PlayerGrow);
                     PlaySound(SFX_GotItem);
                 }

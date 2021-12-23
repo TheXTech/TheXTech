@@ -73,7 +73,7 @@ int WorldMapStarShowPolicyGlobal = 0;
 bool GameplayShakeScreenThwomp = true;
 bool GameplayShakeScreenBowserIIIrd = true;
 bool GameplayShakeScreenPound = true;
-bool SoundPlayerGrowWithGetItem = true;
+bool SoundPlayerGrowWithGetItem = false;
 bool JoystickEnableRumble = true;
 bool JoystickEnableBatteryStatus = true;
 RangeArr<vScreen_t, 0, 2> vScreen;
