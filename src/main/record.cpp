@@ -450,7 +450,17 @@ void read_status()
 
 void write_NPCs()
 {
-    fprintf(record_file, " %" PRId64 " \r\nNPCs\r\n", frame_no);
+    fprintf(record_file, " %" PRId64 " \r\nNPCs\r\n %d \r\n", frame_no, numNPCs);
+    for(int i = 1; i <= numNPCs; i++)
+    {
+        const NPC_t& n = NPC[i];
+        fprintf(record_file, "NPC %d\r\n", i);
+        fprintf(record_file, "Type %d\r\n", n.Type);
+        fprintf(record_file, "Active %d\r\n", n.Active);
+        fprintf(record_file, "Dir %lf\r\n", n.Direction);
+        fprintf(record_file, "XYWH %lf %lf %lf %lf\r\n", n.Location.X, n.Location.Y, n.Location.Width, n.Location.Height);
+        fprintf(record_file, "S %lf %lf %lf %lf %lf %lf\r\n", n.Special, n.Special2, n.Special3, n.Special4, n.Special5, n.Special6);
+    }
 }
 
 void read_NPCs()
@@ -458,6 +468,68 @@ void read_NPCs()
     int success = 0;
 
     fscanf(replay_file, "NPCs\r\n%n", &success);
+    int o_numNPCs;
+    if(!success || fscanf(replay_file, " %d \r\n", &o_numNPCs) != 1)
+        success = 0;
+    else if(o_numNPCs != numNPCs)
+    {
+        pLogWarning("old gameplay file diverged (new numNPCs %d, old %d) at frame %" PRId64 ".", numNPCs, o_numNPCs, frame_no);
+        diverged = true;
+        return;
+    }
+
+    if(success)
+    {
+        for(int i = 1; i <= o_numNPCs; i++)
+        {
+            int N, T, A;
+            double D, X, Y, W, H, S1, S2, S3, S4, S5, S6;
+            if(fscanf(replay_file, "NPC %d\r\nType %d\r\nActive %d\r\n", &N, &T, &A) != 3
+                || fscanf(replay_file, "Dir %lf\r\nXYWH %lf %lf %lf %lf\r\nS %lf %lf %lf %lf %lf %lf\r\n",
+                    &D, &X, &Y, &W, &H, &S1, &S2, &S3, &S4, &S5, &S6) != 11)
+            {
+                pLogWarning("old gameplay file diverged (invalid NPC %d data) at frame %" PRId64 ".", i, frame_no);
+                diverged = true;
+                return;
+            }
+            if(N != i)
+            {
+                pLogWarning("old gameplay file diverged (NPC %d index listed as %d) at frame %" PRId64 ".", i, N, frame_no);
+                diverged = true;
+                continue;
+            }
+            if(i > numNPCs)
+                continue;
+            const NPC_t& n = NPC[i];
+            if(T != n.Type)
+            {
+                pLogWarning("old gameplay file diverged (new NPC[%d].Type %d, old %d) at frame %" PRId64 ".", i, n.Type, T, frame_no);
+                diverged = true;
+            }
+            if(A != n.Active)
+            {
+                pLogWarning("old gameplay file diverged (new NPC[%d].Active %d, old %d) at frame %" PRId64 ".", i, n.Active, A, frame_no);
+                diverged = true;
+            }
+            if(D != n.Direction)
+            {
+                pLogWarning("old gameplay file diverged (new NPC[%d].Direction %f, old %f) at frame %" PRId64 ".", i, n.Direction, D, frame_no);
+                diverged = true;
+            }
+            if(SDL_fabs(X - n.Location.X) > 0.01 || SDL_fabs(Y - n.Location.Y) > 0.01 || SDL_fabs(W - n.Location.Width) > 0.01 || SDL_fabs(H - n.Location.Height) > 0.01)
+            {
+                pLogWarning("old gameplay file diverged (new NPC[%d].Location %lf %lf %lf %lf, old %lf %lf %lf %lf) at frame %" PRId64 ".", i,
+                    n.Location.X, n.Location.Y, n.Location.Width, n.Location.Height, X, Y, W, H, frame_no);
+                diverged = true;
+            }
+            if(S1 != n.Special || S2 != n.Special2 || S3 != n.Special3 || S4 != n.Special4 || S5 != n.Special5 || S6 != n.Special6)
+            {
+                pLogWarning("old gameplay file diverged (new NPC[%d].Special* %f %f %f %f %f %f, old %f %f %f %f %f %f) at frame %" PRId64 ".", i,
+                    n.Special, n.Special2, n.Special3, n.Special4, n.Special5, n.Special6, S1, S2, S3, S4, S5, S6, frame_no);
+                diverged = true;
+            }
+        }
+    }
 
     if(!success)
     {
@@ -588,12 +660,20 @@ void Sync()
                 read_NPCs();
             else if(type == 'C')
                 read_control();
+            else if(!feof(replay_file))
+            {
+                pLogWarning("Invalid record type %c in replayed recording file.", type);
+                diverged = true;
+                EndRecording();
+                return;
+            }
 
-            if(!fscanf(replay_file, "%" PRId64 "\r\n", &next_record_frame))
+            if(feof(replay_file) || fscanf(replay_file, "%" PRId64 "\r\n", &next_record_frame) != 1)
             {
                 pLogWarning("Replayed recording file has prematurely ended.");
                 diverged = true;
                 EndRecording();
+                return;
             }
         }
 
