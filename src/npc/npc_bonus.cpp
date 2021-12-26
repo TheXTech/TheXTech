@@ -26,10 +26,26 @@
 #include "../graphics.h"
 #include "../player.h"
 #include "../game_main.h"
+#include "../compat.h"
 
 #include <Utils/maths.h>
 #include <Logger/logger.h>
 #include <InterProcess/intproc.h>
+
+
+static bool doPlayGrowWithGotItem()
+{
+    switch(g_compatibility.sfx_player_grow_with_got_item)
+    {
+    default:
+    case Compatibility_t::SPGWGI_UNSPECIFIED:
+        return SoundPlayerGrowWithGetItem;
+    case Compatibility_t::SPGWGI_ENABLE:
+        return true;
+    case Compatibility_t::SPGWGI_DISABLE:
+        return false;
+    }
+}
 
 
 void DropBonus(int A)
@@ -267,7 +283,11 @@ void TouchBonus(int A, int B)
             else if(NPC[B].Type == 250)
                 PlaySound(SFX_ZeldaHeart);
             else
+            {
+                if(doPlayGrowWithGotItem())
+                    PlaySound(SFX_PlayerGrow);
                 PlaySound(SFX_GotItem);
+            }
             if(NPC[B].Effect != 2)
                 MoreScore(NPCScore[NPC[B].Type], NPC[B].Location);
         }
@@ -297,7 +317,11 @@ void TouchBonus(int A, int B)
                 if(Player[A].Character == 5)
                     PlaySound(SFX_ZeldaHeart);
                 else
+                {
+                    if(doPlayGrowWithGotItem())
+                        PlaySound(SFX_PlayerGrow);
                     PlaySound(SFX_GotItem);
+                }
             }
             if(NPC[B].Effect != 2)
                 MoreScore(NPCScore[NPC[B].Type], NPC[B].Location);
@@ -329,7 +353,11 @@ void TouchBonus(int A, int B)
                 if(Player[A].Character == 5)
                     PlaySound(SFX_ZeldaHeart);
                 else
+                {
+                    if(doPlayGrowWithGotItem())
+                        PlaySound(SFX_PlayerGrow);
                     PlaySound(SFX_GotItem);
+                }
             }
             if(NPC[B].Effect != 2)
                 MoreScore(NPCScore[NPC[B].Type], NPC[B].Location);
@@ -355,7 +383,11 @@ void TouchBonus(int A, int B)
                 if(Player[A].Character == 5)
                     PlaySound(SFX_ZeldaHeart);
                 else
+                {
+                    if(doPlayGrowWithGotItem())
+                        PlaySound(SFX_PlayerGrow);
                     PlaySound(SFX_GotItem);
+                }
             }
             if(NPC[B].Effect != 2)
                 MoreScore(NPCScore[NPC[B].Type], NPC[B].Location);
@@ -381,7 +413,11 @@ void TouchBonus(int A, int B)
                 if(Player[A].Character == 5)
                     PlaySound(SFX_ZeldaHeart);
                 else
+                {
+                    if(doPlayGrowWithGotItem())
+                        PlaySound(SFX_PlayerGrow);
                     PlaySound(SFX_GotItem);
+                }
             }
             if(NPC[B].Effect != 2)
                 MoreScore(NPCScore[NPC[B].Type], NPC[B].Location);
@@ -407,7 +443,11 @@ void TouchBonus(int A, int B)
                 if(Player[A].Character == 5)
                     PlaySound(SFX_ZeldaHeart);
                 else
+                {
+                    if(doPlayGrowWithGotItem())
+                        PlaySound(SFX_PlayerGrow);
                     PlaySound(SFX_GotItem);
+                }
             }
             if(NPC[B].Effect != 2)
                 MoreScore(NPCScore[NPC[B].Type], NPC[B].Location);
