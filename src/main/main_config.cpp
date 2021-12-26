@@ -381,7 +381,7 @@ void SaveConfig()
         config.setValue("enable-thwomp-screen-shake", GameplayShakeScreenThwomp);
         config.setValue("enable-yoshi-ground-pound-screen-shake", GameplayShakeScreenPound);
         config.setValue("enable-bowser-iiird-screen-shake", GameplayShakeScreenBowserIIIrd);
-        config.setValue("enable-player-grow-with-got-item", SoundPlayerGrowWithGetItem);
+        config.setValue("sfx-player-grow-with-got-item", SoundPlayerGrowWithGetItem);
     }
     config.endGroup();
 

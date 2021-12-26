@@ -66,13 +66,13 @@ struct Compatibility_t
     bool require_ground_to_enter_warps;
     bool fix_npc_activation_event_loop_bug;
     bool ignore_got_item_setting;
-    enum SoundPlayerGrowWithGetItem_t
+    enum SfxPlayerGrowWithGetItem_t
     {
         SPGWGI_UNSPECIFIED = 0,
         SPGWGI_ENABLE,
         SPGWGI_DISABLE
     };
-    int enable_player_grow_with_got_item;
+    int sfx_player_grow_with_got_item;
     // 1.3.6
 
 

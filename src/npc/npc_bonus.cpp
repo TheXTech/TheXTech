@@ -35,7 +35,7 @@
 
 static bool doPlayGrowWithGotItem()
 {
-    switch(g_compatibility.enable_player_grow_with_got_item)
+    switch(g_compatibility.sfx_player_grow_with_got_item)
     {
     default:
     case Compatibility_t::SPGWGI_UNSPECIFIED:

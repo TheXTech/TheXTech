@@ -82,7 +82,7 @@ static void compatInit(Compatibility_t &c)
     c.require_ground_to_enter_warps = false;
     c.fix_npc_activation_event_loop_bug = true;
     c.ignore_got_item_setting = false;
-    c.enable_player_grow_with_got_item = Compatibility_t::SPGWGI_UNSPECIFIED;
+    c.sfx_player_grow_with_got_item = Compatibility_t::SPGWGI_UNSPECIFIED;
     // 1.3.6
 
 
@@ -168,7 +168,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
             {"disable", Compatibility_t::SPGWGI_DISABLE},
             {"false", Compatibility_t::SPGWGI_DISABLE}
         };
-        compat.readEnum("enable-player-grow-with-got-item", c.enable_player_grow_with_got_item, c.enable_player_grow_with_got_item, spgwgi);
+        compat.readEnum("sfx-player-grow-with-got-item", c.sfx_player_grow_with_got_item, c.sfx_player_grow_with_got_item, spgwgi);
     }
 
     if(s_compatLevel >= COMPAT_SMBX13)
