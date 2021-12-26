@@ -35,20 +35,15 @@
 
 static bool doPlayGrowWithGotItem()
 {
-    switch(SoundPlayerGrowWithGetItem)
+    switch(g_compatibility.enable_player_grow_with_got_item)
     {
-    case SPGWGI_DISABLE:
-        return false;
-
-    case SPGWGI_ALLOW:
-        return g_compatibility.ignore_got_item_setting && g_compatibility.enable_player_grow_with_got_item;
-
-    case SPGWGI_ENABLE:
-        return !g_compatibility.ignore_got_item_setting ||
-                (g_compatibility.ignore_got_item_setting && g_compatibility.enable_player_grow_with_got_item);
-
     default:
+    case Compatibility_t::SPGWGI_UNSPECIFIED:
+        return SoundPlayerGrowWithGetItem;
+    case Compatibility_t::SPGWGI_ENABLE:
         return true;
+    case Compatibility_t::SPGWGI_DISABLE:
+        return false;
     }
 }
 

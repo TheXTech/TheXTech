@@ -1105,13 +1105,7 @@ extern bool GameplayShakeScreenBowserIIIrd;
 // Shake screen on Yoshi ground pount
 extern bool GameplayShakeScreenPound;
 // Play "player grow" together with the "get item" sound to represent original games behaviour
-enum SoundPlayerGrowWithGetItem_t
-{
-    SPGWGI_DISABLE = 0,
-    SPGWGI_ALLOW,
-    SPGWGI_ENABLE
-};
-extern SoundPlayerGrowWithGetItem_t SoundPlayerGrowWithGetItem;
+extern bool SoundPlayerGrowWithGetItem;
 // Enable usage of the rumble control
 extern bool JoystickEnableRumble;
 // Show the battery status for wireless gamepads
