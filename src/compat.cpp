@@ -164,7 +164,9 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         {
             {"unpsecified", Compatibility_t::SPGWGI_UNSPECIFIED},
             {"enable", Compatibility_t::SPGWGI_ENABLE},
-            {"disable", Compatibility_t::SPGWGI_DISABLE}
+            {"true", Compatibility_t::SPGWGI_ENABLE},
+            {"disable", Compatibility_t::SPGWGI_DISABLE},
+            {"false", Compatibility_t::SPGWGI_DISABLE}
         };
         compat.readEnum("enable-player-grow-with-got-item", c.enable_player_grow_with_got_item, c.enable_player_grow_with_got_item, spgwgi);
     }
