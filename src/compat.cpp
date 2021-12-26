@@ -81,6 +81,8 @@ static void compatInit(Compatibility_t &c)
     // 1.3.5.3
     c.require_ground_to_enter_warps = false;
     c.fix_npc_activation_event_loop_bug = true;
+    c.ignore_got_item_setting = false;
+    c.sfx_player_grow_with_got_item = Compatibility_t::SPGWGI_UNSPECIFIED;
     // 1.3.6
 
 
@@ -120,6 +122,7 @@ static void compatInit(Compatibility_t &c)
         c.fix_player_filter_bounce = false;
         c.fix_player_downward_clip = false;
         c.fix_player_clip_wall_at_npc = false;
+        c.ignore_got_item_setting = true;
         // 1.3.6
     }
 
@@ -154,6 +157,19 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         SDL_strlcpy(c.speedrun_stop_timer_at, buffer.c_str(), sizeof(c.speedrun_stop_timer_at));
     }
     compat.endGroup();
+
+    compat.beginGroup("effects");
+    {
+        IniProcessing::StrEnumMap spgwgi
+        {
+            {"unpsecified", Compatibility_t::SPGWGI_UNSPECIFIED},
+            {"enable", Compatibility_t::SPGWGI_ENABLE},
+            {"true", Compatibility_t::SPGWGI_ENABLE},
+            {"disable", Compatibility_t::SPGWGI_DISABLE},
+            {"false", Compatibility_t::SPGWGI_DISABLE}
+        };
+        compat.readEnum("sfx-player-grow-with-got-item", c.sfx_player_grow_with_got_item, c.sfx_player_grow_with_got_item, spgwgi);
+    }
 
     if(s_compatLevel >= COMPAT_SMBX13)
     {
