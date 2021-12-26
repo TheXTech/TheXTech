@@ -65,7 +65,6 @@ struct Compatibility_t
     // 1.3.5.3
     bool require_ground_to_enter_warps;
     bool fix_npc_activation_event_loop_bug;
-    bool ignore_got_item_setting;
     enum SfxPlayerGrowWithGetItem_t
     {
         SPGWGI_UNSPECIFIED = 0,
