@@ -33,6 +33,12 @@ extern void seedRandom(int seed);
 extern int readSeed();
 
 /**
+ * @brief Reads the number of calls to random functions since the seed was set
+ * @return number of calls
+ */
+extern long random_ncalls();
+
+/**
  * @brief Random number generator in float format, between 0.0f to 1.0f (exclusive)
  * @return random float value
  */
@@ -45,16 +51,19 @@ extern float fRand();
 extern double dRand();
 
 /**
- * @brief Random number generator in integer format, between 0.0 to RAND_MAX
- * @return random integer value
- */
-extern int iRand();
-
-/**
  * @brief Random number generator in integer format, between 0 to argument max (exclusive)
+ * Equivalent to `Int(dRand() * max)`
  * @return random integer value
  */
 extern int iRand(int max);
+
+/**
+ * @brief Random number generator in integer format, between 0 to argument max (inclusive)
+ * Each midpoint has probability 1/max. Each endpoint has probability 1/2max.
+ * Equivalent to casting `dRand() * max` to an Int in vb6
+ * @return random integer value
+ */
+extern int vb6Cast_iRand(int max);
 
 
 #endif // RAND_H

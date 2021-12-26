@@ -83,30 +83,33 @@ void write_header()
 {
     // write all necessary state variables!
     fprintf(record_file, "Header\r\n");
-    fprintf(record_file, "%s\r\n", LONG_VERSION); // game version / commit
-    fprintf(record_file, " %d \r\n", CompatGetLevel()); // compatibility mode
-    fprintf(record_file, "%s\r\n", FullFileName.c_str()); // level that was played
-    fprintf(record_file, " %d \r\n", readSeed());
-    fprintf(record_file, " %d \r\n", (Checkpoint == FullFileName) ? 1 : 0); // update for multipoints?
-    fprintf(record_file, " %d \r\n", StartWarp);
-    fprintf(record_file, " %d \r\n", ReturnWarp);
-    fprintf(record_file, " %d \r\n", (int)Lives);
-    fprintf(record_file, " %d \r\n", Coins);
-    fprintf(record_file, " %d \r\n", Score);
-    fprintf(record_file, " %d \r\n", numStars);
+    fprintf(record_file, "Version %s\r\n", LONG_VERSION); // game version / commit
+    fprintf(record_file, "CompatLevel %d\r\n", CompatGetLevel()); // compatibility mode
+    if(FullFileName.compare(0, AppPath.size(), AppPath) == 0)
+        fprintf(record_file, "%s\r\n", FullFileName.c_str()+AppPath.size()); // level that was played
+    else
+        fprintf(record_file, "%s\r\n", FullFileName.c_str()); // level that was played
+    fprintf(record_file, "Seed %d\r\n", readSeed());
+    fprintf(record_file, "Checkpoint %d\r\n", (Checkpoint == FullFileName) ? 1 : 0); // update for multipoints?
+    fprintf(record_file, "StartWarp %d\r\n", StartWarp);
+    fprintf(record_file, "ReturnWarp %d\r\n", ReturnWarp);
+    fprintf(record_file, "Lives %d\r\n", (int)Lives);
+    fprintf(record_file, "Coins %d\r\n", Coins);
+    fprintf(record_file, "Score %d\r\n", Score);
+    fprintf(record_file, "Stars %d\r\n", numStars);
 
     for(int A = 1; A <= numStars; A++)
     {
         fprintf(record_file, "Star\r\n");
         fprintf(record_file, "%s\r\n", Star[A].level.c_str());
-        fprintf(record_file, " %d \r\n", Star[A].Section);
+        fprintf(record_file, "Section %d\r\n", Star[A].Section);
     }
 
-    fprintf(record_file, " %d \r\n", numPlayers);
+    fprintf(record_file, "Players %d\r\n", numPlayers);
 
     for(int A = 1; A <= numPlayers; A++)
     {
-        fprintf(record_file, "Player\r\n %d \r\n %d \r\n %d \r\n %d \r\n",
+        fprintf(record_file, "Player\r\nChar %d\r\nState %d\r\nMountType %d\r\nHeldBonus %d\r\n",
                 Player[A].Character, Player[A].State, Player[A].MountType, Player[A].HeldBonus);
     }
 }
@@ -124,7 +127,7 @@ void read_header()
     // read all necessary state variables!
     fgets(buffer, 1024, replay_file); // "Header"
     fgets(buffer, 1024, replay_file); // game version / commit
-    fscanf(replay_file, "%d\r\n", &n); // compatibility mode
+    fscanf(replay_file, "CompatLevel %d\r\n", &n); // compatibility mode
 
     CompatSetEnforcedLevel(n);
 
@@ -141,38 +144,38 @@ void read_header()
     // if(SDL_strcasecmp(buffer, FileNameFull.c_str()))
     //     pLogWarning("FileName does not match.");
 
-    fscanf(replay_file, "%d\r\n", &n); // random seed
+    fscanf(replay_file, "Seed %d\r\n", &n); // random seed
     seedRandom(n);
 
-    fscanf(replay_file, "%d\r\n", &n); // is there a checkpoint?
+    fscanf(replay_file, "Checkpoint %d\r\n", &n); // is there a checkpoint?
 
     Checkpoint = n ? FullFileName : "";
 
-    fscanf(replay_file, "%d\r\n", &StartWarp);
-    fscanf(replay_file, "%d\r\n", &ReturnWarp);
-    fscanf(replay_file, "%d\r\n", &n);
+    fscanf(replay_file, "StartWarp %d\r\n", &StartWarp);
+    fscanf(replay_file, "ReturnWarp %d\r\n", &ReturnWarp);
+    fscanf(replay_file, "Lives %d\r\n", &n);
     Lives = n;
-    fscanf(replay_file, "%d\r\n", &Coins);
-    fscanf(replay_file, "%d\r\n", &Score);
-    fscanf(replay_file, "%d\r\n", &numStars);
+    fscanf(replay_file, "Coins %d\r\n", &Coins);
+    fscanf(replay_file, "Score %d\r\n", &Score);
+    fscanf(replay_file, "Stars %d\r\n", &numStars);
 
     for(int A = 1; A <= numStars; A++)
     {
         fgets(buffer, 1024, replay_file); // "Star"
-        fgets(buffer, 1024, replay_file); // section
+        fgets(buffer, 1024, replay_file); // level
 
         for(int i = 0; i < 1024; i++)
             if(buffer[i] == '\r') buffer[i] = '\0'; // clip the newline :(
 
         Star[A].level = buffer;
-        fscanf(replay_file, "%d\r\n", &Star[A].Section);
+        fscanf(replay_file, "Section %d\r\n", &Star[A].Section);
     }
 
-    fscanf(replay_file, "%d\r\n", &numPlayers);
+    fscanf(replay_file, "Players %d\r\n", &numPlayers);
 
     for(int A = 1; A <= numPlayers; A++)
     {
-        fscanf(replay_file, "Player\r\n%d\r\n%d\r\n%d\r\n%d\r\n",
+        fscanf(replay_file, "Player\r\nChar %d\r\nState %d\r\nMountType %d\r\nHeldBonus %d\r\n",
             &Player[A].Character, &Player[A].State, &Player[A].MountType, &Player[A].HeldBonus);
     }
 
@@ -180,18 +183,19 @@ void read_header()
     TestLevel = false;
     MaxFPS = true;
     ShowFPS = true;
+    FrameSkip = false;
 }
 
 void write_end()
 {
-    fprintf(record_file, " %" PRId64 " \r\nEnd\r\n %d \r\n", frame_no+1, LevelBeatCode);
+    fprintf(record_file, " %" PRId64 " \r\nEnd\r\nLevelBeatCode %d\r\n", frame_no+1, LevelBeatCode);
 }
 
 void read_end()
 {
     int b;
 
-    if(fscanf(replay_file, "End\r\n%d\r\n", &b) != 1)
+    if(fscanf(replay_file, "End\r\nLevelBeatCode %d\r\n", &b) != 1)
     {
         pLogWarning("old gameplay file diverged (invalid end header).");
         diverged = true;
@@ -324,10 +328,11 @@ void write_status()
 
     fprintf(record_file, " %" PRId64 " \r\nStatus\r\n", frame_no);
     uint32_t status_tick = SDL_GetTicks();
-    fprintf(record_file, " %d \r\n", SDL_GetTicks() - last_status_tick);
+    fprintf(record_file, "Ticks %d\r\n", SDL_GetTicks() - last_status_tick);
     last_status_tick = status_tick;
-    fprintf(record_file, " %d \r\n", Score);
-    fprintf(record_file, " %d \r\n", numNPCs);
+    fprintf(record_file, "randCalls %ld\r\n", random_ncalls());
+    fprintf(record_file, "Score %d\r\n", Score);
+    fprintf(record_file, "numNPCs %d\r\n", numNPCs);
 
     int numActiveNPCs = 0;
     if(frame_no != 0)
@@ -339,14 +344,14 @@ void write_status()
         }
     }
 
-    fprintf(record_file, " %d \r\n", numActiveNPCs);
-    fprintf(record_file, " %d \r\n %d \r\n %d \r\n",
+    fprintf(record_file, "numActiveNPCs %d\r\n", numActiveNPCs);
+    fprintf(record_file, "numRenderNPCs %d\r\nnumRenderBlocks %d\r\nnumRenderBGOs %d\r\n",
         g_stats.renderedNPCs, g_stats.renderedBlocks + g_stats.renderedSzBlocks, g_stats.renderedBGOs);
 
     for(int i = 1; i <= numPlayers; i++)
     {
-        fprintf(record_file, "%lf\r\n%lf\r\n",
-            Player[i].Location.X, Player[i].Location.Y);
+        fprintf(record_file, "p%dx %lf\r\np%dy %lf\r\n",
+            i, Player[i].Location.X, i, Player[i].Location.Y);
     }
 
     fflush(record_file);
@@ -362,7 +367,7 @@ void read_status()
         g_stats.renderedBGOs = 0;
     }
 
-    int o_ticks, o_Score, o_numNPCs, o_numActiveNPCs, o_renderedNPCs, o_renderedBlocks, o_renderedBGOs;
+    int o_ticks, o_randCalls, o_Score, o_numNPCs, o_numActiveNPCs, o_renderedNPCs, o_renderedBlocks, o_renderedBGOs;
 
     int success = 0;
 
@@ -374,12 +379,18 @@ void read_status()
         diverged = true;
         return;
     }
-    if(fscanf(replay_file, "%d\r\n%d\r\n%d\r\n%d\r\n%d\r\n%d\r\n%d\r\n",
-        &o_ticks, &o_Score, &o_numNPCs, &o_numActiveNPCs, &o_renderedNPCs, &o_renderedBlocks, &o_renderedBGOs) != 7)
+    if(fscanf(replay_file, "Ticks %d\r\nrandCalls %d\r\nScore %d\r\nnumNPCs %d\r\nnumActiveNPCs %d\r\nnumRenderNPCs %d\r\nnumRenderBlocks %d\r\nnumRenderBGOs %d\r\n",
+        &o_ticks, &o_randCalls, &o_Score, &o_numNPCs, &o_numActiveNPCs, &o_renderedNPCs, &o_renderedBlocks, &o_renderedBGOs) != 8)
     {
         pLogWarning("old gameplay file diverged (invalid status info) at frame %" PRId64 ".", frame_no);
         diverged = true;
         return;
+    }
+
+    if(o_randCalls != random_ncalls())
+    {
+        pLogWarning("randCalls diverged (old: %d, new: %ld) at frame %" PRId64 ".", o_randCalls, random_ncalls(), frame_no);
+        diverged = true;
     }
 
     if(o_Score != Score)
@@ -432,7 +443,7 @@ void read_status()
     {
         double px, py;
 
-        if(fscanf(replay_file, "%lf\r\n%lf\r\n", &px, &py) != 2)
+        if(fscanf(replay_file, "p%dx %lf\r\np%dy %lf\r\n", &success, &px, &success, &py) != 4)
         {
             pLogWarning("old gameplay file diverged (invalid player %d info) at frame %" PRId64 ".", i, frame_no);
             diverged = true;
@@ -450,7 +461,7 @@ void read_status()
 
 void write_NPCs()
 {
-    fprintf(record_file, " %" PRId64 " \r\nNPCs\r\n %d \r\n", frame_no, numNPCs);
+    fprintf(record_file, " %" PRId64 " \r\nNPCs\r\nnumNPCs %d\r\n", frame_no, numNPCs);
     for(int i = 1; i <= numNPCs; i++)
     {
         const NPC_t& n = NPC[i];
@@ -469,7 +480,7 @@ void read_NPCs()
 
     fscanf(replay_file, "NPCs\r\n%n", &success);
     int o_numNPCs;
-    if(!success || fscanf(replay_file, " %d \r\n", &o_numNPCs) != 1)
+    if(!success || fscanf(replay_file, "numNPCs %d\r\n", &o_numNPCs) != 1)
         success = 0;
     else if(o_numNPCs != numNPCs)
     {
@@ -562,7 +573,7 @@ void InitRecording()
         record_file = Files::utf8_fopen(filename.c_str(), "wb");
 
     // start of gameplay data
-    seedRandom(iRand());
+    seedRandom(iRand(32767));
     if(replay_file)
     {
         read_header();

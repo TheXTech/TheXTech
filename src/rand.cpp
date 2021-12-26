@@ -18,18 +18,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <random>
 #include <cstdlib>
+#include <cmath>
+#include <iostream>
+#include <pcg/pcg_random.hpp>
 
+#include "globals.h"
 #include "rand.h"
 
-static std::random_device rd;
-static std::mt19937 engine(rd());
+static pcg32 engine;
 static int last_seed = 310;
+static long n_calls = 0;
 
 void seedRandom(int seed)
 {
     last_seed = seed;
+    n_calls = 0;
     engine.seed(seed);
 }
 
@@ -39,9 +43,15 @@ int readSeed()
     return last_seed;
 };
 
+long random_ncalls()
+{
+    return n_calls;
+}
+
 double dRand()
 {
-    return (double)(engine()) / (double)0x100000000;
+    n_calls ++;
+    return ldexp(engine(), -32);
 }
 
 float fRand()
@@ -49,20 +59,19 @@ float fRand()
     return (float)dRand();
 }
 
-// NEVER USED IN SMBX
-int iRand()
-{
-    return engine() & 0x7fffffff;
-}
-
-// this is how the original VB6 code does it
+// these are how the original VB6 code does it
 int iRand(int max)
 {
     return (int)(dRand() * max);
 }
 
+int vb6Cast_iRand(int max)
+{
+    return vb6Round(dRand() * max);
+}
+
 // Also note that many VB6 calls use dRand * x
 // and then assign the result to an Integer.
-// The result is NOT iRand(x) but rather vb6RRound(dRand()*x),
-// which has a different probability distribution
+// The result is NOT iRand(x) but rather vb6Round(dRand()*x),
+// vb6Cast_iRand, which has a different probability distribution
 // (prob 1/(2x) of being 0 or x and 1/x of being each number in between)
