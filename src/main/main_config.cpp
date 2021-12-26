@@ -200,7 +200,7 @@ void OpenConfig()
         config.read("enable-thwomp-screen-shake", GameplayShakeScreenThwomp, true);
         config.read("enable-yoshi-ground-pound-screen-shake", GameplayShakeScreenPound, true);
         config.read("enable-bowser-iiird-screen-shake", GameplayShakeScreenBowserIIIrd, true);
-        config.read("enable-player-grow-with-got-item", SoundPlayerGrowWithGetItem, false);
+        config.read("sfx-player-grow-with-got-item", SoundPlayerGrowWithGetItem, false);
         config.endGroup();
 
         config.beginGroup("joystick");
