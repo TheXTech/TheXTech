@@ -1192,7 +1192,7 @@ void PlayerFrame(const int A)
             {
                 if(p.SlideCounter <= 0)
                 {
-                    p.SlideCounter = 2 + dRand() * 2;
+                    p.SlideCounter = 2 + iRand_round(2); // p(2) = 25%, p(3) = 50%, p(4) = 25%
                     tempLocation.Y = p.Location.Y + p.Location.Height - 5;
                     tempLocation.X = p.Location.X + p.Location.Width / 2.0 - 4;
                     NewEffect(74, tempLocation, 1, 0, ShadowMode);
@@ -1211,7 +1211,7 @@ void PlayerFrame(const int A)
             {
                 if(p.SlideCounter <= 0 && p.SlideKill)
                 {
-                    p.SlideCounter = 2 + dRand() * 2;
+                    p.SlideCounter = 2 + iRand_round(2);
                     tempLocation.Y = p.Location.Y + p.Location.Height - 4;
                     if(p.Location.SpeedX < 0)
                         tempLocation.X = p.Location.X + p.Location.Width / 2.0 - 4 + 6;
@@ -1393,7 +1393,7 @@ void PlayerFrame(const int A)
                                     PlaySound(SFX_Skid);
                                     if(p.SlideCounter <= 0)
                                     {
-                                        p.SlideCounter = 2 + dRand() * 2;
+                                        p.SlideCounter = 2 + iRand_round(2);
                                         tempLocation.Y = p.Location.Y + p.Location.Height - 5;
                                         tempLocation.X = p.Location.X + p.Location.Width / 2.0 - 4 + 8 * -p.Direction;
                                         NewEffect(74, tempLocation, 1, 0, ShadowMode);
@@ -1412,7 +1412,7 @@ void PlayerFrame(const int A)
                                     PlaySound(SFX_Skid);
                                     if(p.SlideCounter <= 0)
                                     {
-                                        p.SlideCounter = 2 + iRand() % 2;
+                                        p.SlideCounter = 2 + iRand_round(2);
                                         tempLocation.Y = p.Location.Y + p.Location.Height - 5;
                                         tempLocation.X = p.Location.X + p.Location.Width / 2.0 - 4 + 8 * -p.Direction;
                                         NewEffect(74, tempLocation, 1, 0, ShadowMode);
@@ -1471,7 +1471,7 @@ void PlayerFrame(const int A)
                         PlaySound(SFX_Skid);
                         if(p.SlideCounter <= 0)
                         {
-                            p.SlideCounter = 2 + iRand() % 2;
+                            p.SlideCounter = 2 + iRand_round(2);
                             tempLocation.Y = p.Location.Y + p.Location.Height - 5;
                             tempLocation.X = p.Location.X + p.Location.Width / 2.0 - 4 + 10 * -p.Direction;
                             NewEffect(74, tempLocation, 1, 0, ShadowMode);
@@ -1623,7 +1623,7 @@ void PlayerFrame(const int A)
                                     PlaySound(SFX_Skid);
                                     if(p.SlideCounter <= 0)
                                     {
-                                        p.SlideCounter = 2 + iRand() % 2;
+                                        p.SlideCounter = 2 + iRand_round(2);
                                         tempLocation.Y = p.Location.Y + p.Location.Height - 5;
                                         tempLocation.X = p.Location.X + p.Location.Width / 2.0 - 4 + 6 * -p.Direction;
                                         NewEffect(74, tempLocation, 1, 0, ShadowMode);
@@ -1642,7 +1642,7 @@ void PlayerFrame(const int A)
                                     PlaySound(SFX_Skid);
                                     if(p.SlideCounter <= 0)
                                     {
-                                        p.SlideCounter = 2 + iRand() % 2;
+                                        p.SlideCounter = 2 + iRand_round(2);
                                         tempLocation.Y = p.Location.Y + p.Location.Height - 5;
                                         tempLocation.X = p.Location.X + p.Location.Width / 2.0 - 4 + 10 * -p.Direction;
                                         NewEffect(74, tempLocation, 1, 0, ShadowMode);
@@ -1770,7 +1770,7 @@ void PlayerFrame(const int A)
                         PlaySound(SFX_Skid);
                         if(p.SlideCounter <= 0)
                         {
-                            p.SlideCounter = 2 + iRand() % 2;
+                            p.SlideCounter = 2 + iRand_round(2);
                             tempLocation.Y = p.Location.Y + p.Location.Height - 5;
                             tempLocation.X = p.Location.X + p.Location.Width / 2.0 - 4 + 10 * -p.Direction;
                             NewEffect(74, tempLocation, 1, 0, ShadowMode);
@@ -2491,7 +2491,7 @@ void YoshiEat(const int A)
 
                 if(n.Type == 147)
                 {
-                    n.Type = 139 + (iRand() % 9);
+                    n.Type = 139 + iRand(9);
                     if(n.Type == 147)
                         n.Type = 92;
                     n.Location.X += n.Location.Width / 2.0;
@@ -3228,7 +3228,7 @@ void YoshiEatCode(const int A)
             }
             else if(p.MountType == 7 && !NPCIsABonus[NPC[p.YoshiNPC].Type])
             {
-                B = (iRand() % 9);
+                B = iRand(9);
                 NPC[p.YoshiNPC].Type = 139 + B;
                 if(NPC[p.YoshiNPC].Type == 147)
                     NPC[p.YoshiNPC].Type = 92;
@@ -3654,7 +3654,7 @@ void WaterCheck(const int A)
     }
     else if(p.Wet == 2 && p.Quicksand == 0)
     {
-        if(dRand() * 100.0 > 97.0)
+        if(iRand(100) >= 97)
         {
             if(p.Direction == 1)
                 tempLocation = newLoc(p.Location.X + p.Location.Width - dRand() * 8, p.Location.Y + 4 + dRand() * 8, 8, 8);
@@ -4520,7 +4520,7 @@ void PlayerCollide(const int A)
                         p1.Bumped2 = -1;
                         p2.Bumped2 = 1;
                     }
-                    else if(iRand() % 2 == 1)
+                    else if(iRand(2) == 0)
                     {
                         p1.Bumped2 = -1;
                         p2.Bumped2 = 1;
@@ -4624,7 +4624,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                         NPC[p.StandingOnNPC].Location.Width = NPCWidth[NPC[p.StandingOnNPC].Type];
                         if(NPC[p.StandingOnNPC].Type == 147)
                         {
-                            B = (iRand() % 9);
+                            B = iRand(9);
                             NPC[p.StandingOnNPC].Type = 139 + B;
                             if(NPC[p.StandingOnNPC].Type == 147)
                                 NPC[p.StandingOnNPC].Type = 92;
@@ -5135,7 +5135,7 @@ void LinkFrame(const int A)
             {
                 if(p.SlideCounter <= 0)
                 {
-                    p.SlideCounter = 2 + dRand() * 2;
+                    p.SlideCounter = 2 + iRand_round(2);
                     tempLocation.Y = p.Location.Y + p.Location.Height - 5;
                     tempLocation.X = p.Location.X + p.Location.Width / 2.0 - 4;
                     NewEffect(74, tempLocation, 1, 0, ShadowMode);
@@ -5256,7 +5256,7 @@ void LinkFrame(const int A)
             if(p.SlideCounter <= 0)
             {
                 PlaySound(SFX_ZeldaDash);
-                p.SlideCounter = 2 + dRand() * 2;
+                p.SlideCounter = 2 + iRand_round(2);
                 tempLocation.Y = p.Location.Y + p.Location.Height - 4;
 
                 if(p.Location.SpeedX < 0)

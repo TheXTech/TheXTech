@@ -574,7 +574,7 @@ void UpdateEffects()
                     if(e.Frame >= 4)
                         e.Frame = 0;
                 }
-            if(e.Type == 148 && (dRand() * 10.0) > 8.0)
+            if(e.Type == 148 && iRand(10) >= 8)
             {
                 NewEffect(77, e.Location, 3);
                 Effect[numEffects].Location.SpeedX = dRand() * 3 - 1.5;
@@ -1305,7 +1305,7 @@ void NewEffect(int A, const Location_t &Location, float Direction, int NewNpc, b
                 ne.Location.X += ne.Location.SpeedX * 3;
                 ne.Location.Y += ne.Location.SpeedY * 3;
 
-                ne.Frame = iRand() % 4;
+                ne.Frame = iRand(4);
                 ne.Type = A;
             }
         }
@@ -1547,9 +1547,9 @@ void NewEffect(int A, const Location_t &Location, float Direction, int NewNpc, b
         ne.Location.SpeedY = -2 - dRand() * 10;
         ne.Location.SpeedX = dRand() * 8 - 4;
         ne.Frame = 0;
-        if((iRand() % 2) == 1)
+        if(iRand(2) == 0)
             ne.Frame = 7;
-        ne.Frame += iRand() % 7;
+        ne.Frame += iRand(7);
         ne.Life = 300;
         ne.Type = A;
     }

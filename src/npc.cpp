@@ -598,7 +598,7 @@ void NPCSpecial(int A)
                 NewEffect(80, newLoc(npc.Location.X + npc.Location.Width / 2.0 - 4, npc.Location.Y + npc.Location.Height / 2.0 - 6), 1, 0, npc.Shadow);
                 Effect[numEffects].Location.SpeedX = dRand() * 6 - 3;
                 Effect[numEffects].Location.SpeedY = dRand() * 6 - 3;
-                Effect[numEffects].Frame = (iRand() % 3);
+                Effect[numEffects].Frame = iRand(3);
             }
         }
     }
@@ -757,7 +757,7 @@ void NPCSpecial(int A)
 
             if(Maths::iRound(npc.Direction) == 0)
             {
-                if(iRand() % 2 == 1)
+                if(iRand(2) == 0)
                     npc.Direction = 1;
                 else
                     npc.Direction = -1;
@@ -960,7 +960,8 @@ void NPCSpecial(int A)
             C = 0;
             do
             {
-                int i = (iRand() % numPlayers) + 1;
+                // TODO: COMPAT BUGFIX. Should be iRand(numPlayers) + 1
+                int i = iRand(1) * numPlayers + 1; // always 1
                 if(!Player[i].Dead && Player[i].Section == npc.Section && Player[i].TimeToLive == 0)
                     npc.Special5 = i;
                 C += 1;
@@ -1094,7 +1095,9 @@ void NPCSpecial(int A)
             C = 0;
             do
             {
-                int i = (iRand() % numPlayers) + 1;
+                // TODO: COMPAT BUGFIX
+                int i = iRand(1) * numPlayers + 1; // always 1
+                // should be int i = iRand(numPlayers) + 1;
                 if(!Player[i].Dead && Player[i].Section == npc.Section && Player[i].TimeToLive == 0)
                     npc.Special5 = i;
                 C += 1;
@@ -1129,7 +1132,7 @@ void NPCSpecial(int A)
             if(fEqual((float)npc.Location.SpeedY, Physics.NPCGravity))
             {
                 npc.Special3 += 1;
-                if(npc.Special3 >= 30 + dRand() * 100)
+                if(npc.Special3 > 30 + iRand(100))
                 {
                     npc.Special3 = 0;
                     npc.Location.SpeedY = -5 - dRand() * 4;
@@ -1140,7 +1143,7 @@ void NPCSpecial(int A)
 
             // attack timer
             npc.Special4 += 1;
-            if(npc.Special4 >= 100 + dRand() * 100 && fEqual((float)npc.Location.SpeedY, Physics.NPCGravity))
+            if(npc.Special4 > 100 + iRand(100) && fEqual((float)npc.Location.SpeedY, Physics.NPCGravity))
             {
                 npc.Special = 1;
                 npc.Special5 = 0;
@@ -1243,7 +1246,8 @@ void NPCSpecial(int A)
             C = 0;
             do
             {
-                int i = (iRand() % numPlayers) + 1;
+                // TODO: COMPAT BUGFIX
+                int i = iRand(1) * numPlayers + 1; // always 1
                 if(!Player[i].Dead && Player[i].Section == npc.Section && Player[i].TimeToLive == 0)
                     npc.Special5 = i;
                 C += 1;
@@ -1406,11 +1410,11 @@ void NPCSpecial(int A)
                 NewEffect(80, tempLocation);
                 Effect[numEffects].Location.SpeedX = npc.Location.SpeedX * 0.3 + dRand() * 2 - 1;
                 Effect[numEffects].Location.SpeedY = dRand() * 1 - 0.5;
-                Effect[numEffects].Frame = (iRand() % 3);
+                Effect[numEffects].Frame = iRand(3);
             }
         }
 
-        if(dRand() * 10 > 5.0)
+        if(iRand(2) == 0)
         {
             tempLocation.Height = EffectHeight[80];
             tempLocation.Width = EffectWidth[80];
@@ -1421,7 +1425,7 @@ void NPCSpecial(int A)
             NewEffect(80, tempLocation);
             Effect[numEffects].Location.SpeedX = npc.Location.SpeedX * 0.15;
             Effect[numEffects].Location.SpeedY = npc.Location.SpeedY; // + Rnd * 2 - 1
-            Effect[numEffects].Frame = (iRand() % 2) + 1;
+            Effect[numEffects].Frame = iRand(2) + 1;
         }
 
 
@@ -1449,7 +1453,7 @@ void NPCSpecial(int A)
         }
         else
         {
-            if(dRand() * 100 > 90)
+            if(iRand(10) == 0)
                 npc.Direction = -npc.Direction;
             npc.Special3 = 0;
             npc.Special4 = 0;
@@ -1474,13 +1478,13 @@ void NPCSpecial(int A)
                 npc.Special3 += 1;
                 npc.Special4 += 1;
 
-                if(npc.Special3 >= 100 + dRand() * 200)
+                if(npc.Special3 > 100 + iRand(200))
                 {
                     npc.Special3 = 0;
                     npc.Location.SpeedX = 0;
                     npc.Location.SpeedY = -5;
                 }
-                else if(npc.Special4 >= 20 + dRand() * 200)
+                else if(npc.Special4 > 20 + iRand(200))
                 {
                     npc.Special4 = 0;
                     npc.Special = -10;
@@ -1788,7 +1792,7 @@ void NPCSpecial(int A)
             double E;
             npc.Special2 += 1;
 
-            if(npc.Special2 >= 80 + dRand() * 20)
+            if(npc.Special2 > 80 + iRand(20))
             {
                 npc.Special = 1;
                 C = 0;
@@ -1849,7 +1853,7 @@ void NPCSpecial(int A)
         {
             if(Maths::iRound(npc.Direction) == 0)
             {
-                if(iRand() % 2 == 1)
+                if(iRand(2) == 1)
                     npc.Direction = 1;
                 else
                     npc.Direction = -1;
@@ -2204,7 +2208,7 @@ void NPCSpecial(int A)
         {
             npc.Special3 += 1;
 
-            if(npc.Special3 >= 160 + dRand() * 140)
+            if(npc.Special3 > 160 + iRand(140))
             {
                 npc.Special = 1;
                 npc.Special3 = 0;
@@ -2251,7 +2255,7 @@ void NPCSpecial(int A)
                 NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * (1 - (npc.Special3 / 140));
             }
 
-            if(npc.Special3 >= 120 + dRand() * 40)
+            if(npc.Special3 > 120 + iRand(40))
             {
                 npc.Special = 0;
                 npc.Special3 = 0;
@@ -2528,7 +2532,7 @@ void NPCSpecial(int A)
 
         npc.Special5 = D;
 
-        if(dRand() * 300 > 297 && npc.Special == 0.0)
+        if(iRand(300) >= 297 && npc.Special == 0.0)
             npc.Special = 1;
 
         npc.Special4 += 1;
@@ -2536,9 +2540,9 @@ void NPCSpecial(int A)
         if(npc.Inert)
             npc.Special4 = 150;
 
-        if(npc.Special4 <= 80 + dRand() * 40)
+        if(npc.Special4 <= 80 + iRand(40))
         {
-            if((dRand() * 100 > 40) && int(npc.Special4) % 16 == 0)
+            if((iRand(100) >= 40) && int(npc.Special4) % 16 == 0)
             {
                 PlaySound(SFX_HammerToss);
                 numNPCs++;
@@ -2557,7 +2561,7 @@ void NPCSpecial(int A)
                 NPC[numNPCs].Location.SpeedX = 3 * NPC[numNPCs].Direction;
             }
         }
-        else if(npc.Special4 > 300 + dRand() * 50)
+        else if(npc.Special4 > 300 + iRand(50))
             npc.Special4 = 0;
 
         if(npc.Inert)
@@ -2623,7 +2627,7 @@ void NPCSpecial(int A)
             }
             if(fEqual(npc.Location.SpeedY, double(Physics.NPCGravity)) || npc.Slope > 0)
             {
-                if(dRand() * 200 >= 198)
+                if(iRand(100) == 0)
                     npc.Location.SpeedY = -8;
             }
         }
@@ -2928,9 +2932,9 @@ void SpecialNPC(int A)
                                 Effect[numEffects].Location.SpeedY = dRand() * 3 - 1.5 - NPC[A].Location.SpeedY * 0.1;
 
                                 if(Effect[numEffects].Frame == 0)
-                                    Effect[numEffects].Frame = -(iRand() % 3);
+                                    Effect[numEffects].Frame = -iRand(3);
                                 else
-                                    Effect[numEffects].Frame = 5 + (iRand() % 3);
+                                    Effect[numEffects].Frame = 5 + iRand(3);
                             }
                         }
 
@@ -3096,7 +3100,7 @@ void SpecialNPC(int A)
     }
     else if(NPC[A].Type == 237 || NPC[A].Type == 263) // Yoshi Ice
     {
-        if(dRand() * 100 > 93)
+        if(iRand(100) >= 93)
         {
             tempLocation.Height = EffectHeight[80];
             tempLocation.Width = EffectWidth[80];
@@ -3108,7 +3112,7 @@ void SpecialNPC(int A)
         }
         if(NPC[A].Projectile)
         {
-            if(dRand() * 100 > 80)
+            if(iRand(5) == 0)
             {
                 tempLocation.Height = EffectHeight[80];
                 tempLocation.Width = EffectWidth[80];
@@ -3886,7 +3890,7 @@ void SpecialNPC(int A)
                 NPC[A].Location.Height = 54;
             }
             NPC[A].Special2 += dRand() * 2;
-            if(NPC[A].Special2 >= 250 + (iRand() % 250))
+            if(NPC[A].Special2 >= 250 + iRand(250))
             {
                 NPC[A].Special = 2;
                 NPC[A].Special2 = 0;
@@ -3909,7 +3913,7 @@ void SpecialNPC(int A)
                 NPC[A].Location.Height = 40;
             }
             NPC[A].Special2 += dRand() * 2;
-            if(NPC[A].Special2 >= 100 + (iRand() % 100))
+            if(NPC[A].Special2 >= 100 + iRand(100))
             {
                 NPC[A].Special = 3;
                 NPC[A].Special2 = 0;
@@ -4152,7 +4156,7 @@ void SpecialNPC(int A)
     else if(NPC[A].Type == 84 || NPC[A].Type == 181)
     {
         NPC[A].Special += 1;
-        if(NPC[A].Special >= 200 + dRand() * 200)
+        if(NPC[A].Special > 200 + iRand(200))
         {
             NPC[A].Special = 0;
             numNPCs++;
@@ -4175,7 +4179,7 @@ void SpecialNPC(int A)
             NPC[numNPCs].Location.SpeedX = 4 * NPC[numNPCs].Direction;
             if(NPC[numNPCs].Direction == 1)
                 NPC[numNPCs].Frame = 4;
-            NPC[numNPCs].FrameCount = (float)(iRand() % 8);
+            NPC[numNPCs].FrameCount = iRand(8);
             PlaySound(SFX_BigFireball);
         }
     // Hammer Bro
@@ -5263,7 +5267,7 @@ void CharStuff(int WhatNPC, bool CheckEggs)
 
 int RandomBonus()
 {
-    int B = iRand() % 6;
+    int B = iRand(6);
 
     switch(B)
     {

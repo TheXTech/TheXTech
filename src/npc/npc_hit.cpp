@@ -159,7 +159,7 @@ void NPCHit(int A, int B, int C)
                 NewEffect(80, tempLocation);
                 Effect[numEffects].Location.SpeedX = dRand() * 2 - 1;
                 Effect[numEffects].Location.SpeedY = dRand() * 2 - 1;
-                Effect[numEffects].Frame = iRand() % 3;
+                Effect[numEffects].Frame = iRand(3);
             }
 
             PlaySound(SFX_Freeze);
@@ -349,9 +349,9 @@ void NPCHit(int A, int B, int C)
                 NPC[A].Type = 251;
             NPC[A].Location.SpeedX = (1 + dRand() * 0.5) * Player[C].Direction;
             NPC[A].Location.SpeedY = -5;
-            if(dRand() * 20 < 3)
+            if(iRand(20) < 3)
                 NPC[A].Type = 252;
-            if(dRand() * 40 < 3)
+            if(iRand(40) < 3)
                 NPC[A].Type = 253;
             NPC[A].Location.X += NPC[A].Location.Width / 2.0;
             NPC[A].Location.Y += NPC[A].Location.Height;
@@ -1035,7 +1035,7 @@ void NPCHit(int A, int B, int C)
                     NPC[A].Location.SpeedY = -4;
                 if(NPC[A].Location.SpeedX == 0.0)
                 {
-                    if(iRand() % 2 == 1)
+                    if(iRand(2) == 0)
                         NPC[A].Location.SpeedX = 2;
                     else
                         NPC[A].Location.SpeedX = -2;

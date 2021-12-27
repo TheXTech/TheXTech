@@ -158,7 +158,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
     {
         if(b.RapidHit > 0 && IF_INRANGE(whatPlayer, 1, maxPlayers) && Player[whatPlayer].Character == 4)
         {
-            b.RapidHit = (iRand() % 3) + 1;
+            b.RapidHit = iRand(3) + 1;
         }
         return;
     }
@@ -332,7 +332,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
     {
         if(whatPlayer > 0 && Player[whatPlayer].Character == 4)
         {
-            b.RapidHit = (iRand() % 3) + 1;
+            b.RapidHit = iRand(3) + 1;
         }
 
         if(!HitDown)
@@ -388,9 +388,9 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                     if(Player[whatPlayer].Character == 5)
                     {
                         nn.Type = 251;
-                        if(dRand() * 20 <= 3.0)
+                        if(iRand(20) < 3)
                             nn.Type = 252;
-                        if(dRand() * 60 <= 3.0)
+                        if(iRand(60) < 3)
                             nn.Type = 253;
                         PlaySound(SFX_ZeldaRupee);
                     }
@@ -405,8 +405,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                     nLoc.X = b.Location.X + b.Location.Width / 2.0 - nLoc.Width / 2.0;
                     nLoc.Y = b.Location.Y - nLoc.Height - 0.01;
                     nLoc.SpeedX = dRand() * 3 - 1.5;
-                    nLoc.SpeedY = -(dRand() * 4) - 3
-                            ;
+                    nLoc.SpeedY = -(dRand() * 4) - 3;
                     if(HitDown)
                     {
                         nLoc.SpeedY = -nLoc.SpeedY * 0.5;

@@ -321,10 +321,10 @@ int GameMain(const CmdLineSetup_t &setup)
                     switch(p.Mount)
                     {
                     case 1:
-                        p.MountType = int(iRand() % 3) + 1;
+                        p.MountType = iRand(3) + 1;
                         break;
                     case 3:
-                        p.MountType = int(iRand() % 8) + 1;
+                        p.MountType = iRand(8) + 1;
                         break;
                     default:
                         p.MountType = 0;
@@ -333,12 +333,12 @@ int GameMain(const CmdLineSetup_t &setup)
                 else if(A == 4)
                 {
                     p.Mount = 1;
-                    p.MountType = int(iRand() % 3) + 1;
+                    p.MountType = iRand(3) + 1;
                 }
                 else if(A == 2)
                 {
                     p.Mount = 3;
-                    p.MountType = int(iRand() % 8) + 1;
+                    p.MountType = iRand(8) + 1;
                 }
 
                 p.HeldBonus = 0;
@@ -470,7 +470,7 @@ int GameMain(const CmdLineSetup_t &setup)
             For(A, 1, numPlayers)
             {
                 Player_t &p = Player[A];
-                p.State = (iRand() % 6) + 2;
+                p.State = iRand(6) + 2;
                 // p.Character = (iRand() % 5) + 1;
 
                 // if(A >= 1 && A <= 5)
@@ -1556,7 +1556,7 @@ void StartBattleMode()
     else
     {
         if(selWorld == 1)
-            selWorld = (iRand() % (NumSelectWorld - 1)) + 2;
+            selWorld = iRand(NumSelectWorld - 1) + 2;
     }
 
     std::string levelPath = SelectWorld[selWorld].WorldPath + SelectWorld[selWorld].WorldFile;

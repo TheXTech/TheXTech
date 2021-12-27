@@ -999,13 +999,13 @@ void UpdatePlayer()
                 // fairy stuff
                 if(Player[A].FairyTime != 0 && Player[A].Fairy)
                 {
-                    if(dRand() * 10.0 > 9.0)
+                    if(iRand(10) == 0)
                     {
                         NewEffect(80,
                                   newLoc(Player[A].Location.X - 8 + dRand() * (Player[A].Location.Width + 16) - 4,
                                          Player[A].Location.Y - 8 + dRand() * (Player[A].Location.Height + 16)), 1, 0, ShadowMode);
-                        Effect[numEffects].Location.SpeedX = std::fmod(dRand(), 0.5) - 0.25;
-                        Effect[numEffects].Location.SpeedY = std::fmod(dRand(), 0.5) - 0.25;
+                        Effect[numEffects].Location.SpeedX = dRand() * 0.5 - 0.25;
+                        Effect[numEffects].Location.SpeedY = dRand() * 0.5 - 0.25;
                         Effect[numEffects].Frame = 1;
                     }
                     if(Player[A].FairyTime > 0)
@@ -1634,7 +1634,7 @@ void UpdatePlayer()
                                 {
                                     NewEffect(80, tempLocation);
                                     Effect[numEffects].Location.SpeedX = (dRand() * 3) - 1.5;
-                                    Effect[numEffects].Location.SpeedY = (dRand() *0.5) + (1.5 - std::abs(Effect[numEffects].Location.SpeedX)) * 0.5;
+                                    Effect[numEffects].Location.SpeedY = (dRand() * 0.5) + (1.5 - std::abs(Effect[numEffects].Location.SpeedX)) * 0.5;
                                     Effect[numEffects].Location.SpeedX += -Player[A].Location.SpeedX * 0.2;
                                 }
                             }
@@ -1668,12 +1668,12 @@ void UpdatePlayer()
                             else
 #endif
                             {
-                                if(dRand() * 10.0 > 3.0)
+                                if(iRand(10) >= 3)
                                 {
                                     tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height - 2 + dRand() * (NPC[Player[A].StandingOnNPC].Location.Height - 8) + 4;
                                     tempLocation.X = Player[A].Location.X - 4 + dRand() * (Player[A].Location.Width - 8) + 4 - 8 * Player[A].Direction;
                                     NewEffect(80, tempLocation, 1, 0, ShadowMode);
-                                    Effect[numEffects].Frame = iRand() % 3;
+                                    Effect[numEffects].Frame = iRand(3);
                                     Effect[numEffects].Location.SpeedY = (Player[A].Location.Y + Player[A].Location.Height + NPC[Player[A].StandingOnNPC].Location.Height / 32.0 - tempLocation.Y + 12) * 0.05;
                                 }
                             }
@@ -1930,7 +1930,7 @@ void UpdatePlayer()
                                         )
                                  )
                                 {
-                                    if(dRand() * 10.0 > 9.0)
+                                    if(iRand(10) == 0)
                                     {
                                         NewEffect(80, newLoc(Player[A].Location.X - 8 + dRand() * (Player[A].Location.Width + 16) - 4,
                                                              Player[A].Location.Y - 8 + dRand() * (Player[A].Location.Height + 16)), 1, 0, ShadowMode);
@@ -2281,7 +2281,7 @@ void UpdatePlayer()
                         ) || Player[A].FlySparks
                         )
                 {
-                    if(dRand() * 4.0 > 3.0)
+                    if(iRand(4) == 0)
                     {
                         NewEffect(80,
                                   newLoc(Player[A].Location.X - 8 + dRand() * (Player[A].Location.Width + 16) - 4,
@@ -3645,9 +3645,9 @@ void UpdatePlayer()
                                                 Effect[numEffects].Location.SpeedX = dRand() * 3 - 1.5 + NPC[B].Location.SpeedX * 0.1;
                                                 Effect[numEffects].Location.SpeedY = dRand() * 3 - 1.5 - NPC[B].Location.SpeedY * 0.1;
                                                 if(Effect[numEffects].Frame == 0)
-                                                    Effect[numEffects].Frame = -(iRand() % 3);
+                                                    Effect[numEffects].Frame = -iRand(3);
                                                 else
-                                                    Effect[numEffects].Frame = 5 + (iRand() % 3);
+                                                    Effect[numEffects].Frame = 5 + iRand(3);
                                             }
                                             NPC[B].Location.X += NPC[B].Location.Width / 2.0 - EffectWidth[10] / 2.0;
                                             NPC[B].Location.Y += NPC[B].Location.Height / 2.0 - EffectHeight[10] / 2.0;

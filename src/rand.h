@@ -21,23 +21,64 @@
 #ifndef RAND_H
 #define RAND_H
 
-/**
- * @brief Random number generator in float format, between 0.0f to 1.0f
- * @return random float value
- */
-extern float fRand();
+#include <cmath>
+#include <pcg/pcg_random.hpp>
+
+extern pcg32 g_random_engine;
+extern long g_random_n_calls;
 
 /**
- * @brief Random number generator in double format, between 0.0 to 1.0
+ * @brief Seeds the random number generator with argument seed for reproducible results
+ */
+extern void seedRandom(int seed);
+
+/**
+ * @brief Reads the most recently set seed and resets the seed to that seed
+ * @return current seed
+ */
+extern int readSeed();
+
+/**
+ * @brief Reads the number of calls to random functions since the seed was set
+ * @return number of calls
+ */
+extern long random_ncalls();
+
+/**
+ * @brief Random number generator in double format, between 0.0 to 1.0 (exclusive)
  * @return random double value
  */
-extern double dRand();
+inline double dRand()
+{
+    g_random_n_calls ++;
+    return ldexp(g_random_engine(), -32);
+}
 
 /**
- * @brief Random number generator in integer format, between 0.0 to RAND_MAX
+ * @brief Random number generator in integer format, between 0 to argument max (exclusive)
+ * Distribution equivalent to `Int(dRand() * max)`
  * @return random integer value
  */
-extern int iRand();
+inline int iRand(int max)
+{
+    g_random_n_calls ++;
+    return g_random_engine() % max;
+}
+
+/**
+ * @brief Random number generator in integer format, between 0 to argument max (inclusive)
+ * Each midpoint has probability 1/max. Each endpoint has probability 1/2max.
+ * Distribution equivalent to implicitly casting `dRand() * max` to an Int in vb6
+ * @return random integer value
+ */
+inline int iRand_round(int max)
+{
+    // let 0 represent top endpoint, otherwise use iRand(max*2)/2.
+    int i = iRand(max*2);
+    if(i == 0)
+        return max;
+    return i/2;
+}
 
 
 #endif // RAND_H

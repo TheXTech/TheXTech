@@ -24,6 +24,7 @@
 #include "../game_main.h"
 #include "../graphics.h"
 #include "../sound.h"
+#include "../config.h"
 #include "../video.h"
 #include "../control/joystick.h"
 #include "speedrunner.h"
@@ -36,6 +37,8 @@
 #include <AppPath/app_path.h>
 #include <Logger/logger.h>
 
+Config_t g_config;
+VideoSettings_t g_videoSettings;
 
 PreSetup_t g_preSetup;
 
@@ -184,6 +187,7 @@ void OpenConfig()
         config.beginGroup("main");
         config.read("release", FileRelease, curRelease);
         config.read("full-screen", resBool, false);
+        config.read("record-gameplay", g_config.RecordGameplayData, g_config.RecordGameplayData);
         config.endGroup();
 
         config.beginGroup("recent");
@@ -293,6 +297,7 @@ void SaveConfig()
 #if !defined(__EMSCRIPTEN__) && !defined(__ANDROID__) // Don't remember fullscreen state for Emscripten!
     config.setValue("full-screen", resChanged);
 #endif
+    config.setValue("record-gameplay", g_config.RecordGameplayData);
     config.endGroup();
 
     config.beginGroup("recent");

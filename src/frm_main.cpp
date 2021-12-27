@@ -60,7 +60,6 @@
 #endif
 
 
-VideoSettings_t g_videoSettings;
 
 
 static SDL_bool IsFullScreen(SDL_Window *win)
