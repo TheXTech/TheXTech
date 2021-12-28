@@ -860,7 +860,7 @@ void TouchScreenController::doVibration()
         return;
 
     SDL_HapticRumblePlay(m_vibrator, s_vibrationStrength, s_vibrationLength);
-    D_pLogDebug("TouchScreen: Vibration %g, %d ms, ret %d", s_vibrationStrength, s_vibrationLength, ret);
+    D_pLogDebug("TouchScreen: Vibration %g, %d ms", s_vibrationStrength, s_vibrationLength);
 }
 
 TouchScreenController::~TouchScreenController()
