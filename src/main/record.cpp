@@ -99,7 +99,16 @@ void write_header()
     else
         fprintf(record_file, "%s\r\n", FullFileName.c_str()); // level that was played
     fprintf(record_file, "Seed %d\r\n", readSeed());
-    fprintf(record_file, "Checkpoint %d\r\n", (Checkpoint == FullFileName) ? 1 : 0); // update for multipoints?
+    fprintf(record_file, "Checkpoint %d\r\n", (Checkpoint == FullFileName) ? 1 : 0);
+    if(g_compatibility.enable_multipoints && Checkpoint == FullFileName)
+    {
+        fprintf(record_file, "Multipoints %d: ", CheckpointsList.size());
+        for(const Checkpoint_t& cp : CheckpointsList)
+        {
+            fprintf(record_file, "%d,", cp.id);
+        }
+        fprintf(record_file, "\r\n");
+    }
     fprintf(record_file, "StartWarp %d\r\n", StartWarp);
     fprintf(record_file, "ReturnWarp %d\r\n", ReturnWarp);
     fprintf(record_file, "Lives %d\r\n", (int)Lives);
@@ -159,6 +168,18 @@ void read_header()
     fscanf(replay_file, "Checkpoint %d\r\n", &n); // is there a checkpoint?
 
     Checkpoint = n ? FullFileName : "";
+
+    if(g_compatibility.enable_multipoints && Checkpoint == FullFileName)
+    {
+        CheckpointsList.clear();
+        fscanf(replay_file, "Multipoints %d: ", &n);
+        CheckpointsList.resize(n);
+        for(int i = 0; i < n; i++)
+        {
+            fscanf(replay_file, "%d,", &CheckpointsList[i].id);
+        }
+        fscanf(replay_file, "\r\n");
+    }
 
     fscanf(replay_file, "StartWarp %d\r\n", &StartWarp);
     fscanf(replay_file, "ReturnWarp %d\r\n", &ReturnWarp);

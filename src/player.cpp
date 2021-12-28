@@ -111,7 +111,10 @@ static void setupCheckpoints()
 
     pLogDebug("Trying to restore %zu checkpoints...", CheckpointsList.size());
     if(!g_compatibility.enable_multipoints && CheckpointsList.empty())
+    {
+        pLogDebug("Using legacy algorithm");
         CheckpointsList.push_back(Checkpoint_t());
+    }
     for(int cpId = 0; cpId < int(CheckpointsList.size()); cpId++)
     {
         auto &cp = CheckpointsList[size_t(cpId)];
