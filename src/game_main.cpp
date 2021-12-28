@@ -53,6 +53,7 @@
 #include "main/speedrunner.h"
 #include "main/menu_main.h"
 #include "main/game_info.h"
+#include "main/record.h"
 
 #include "pseudo_vb.h"
 
@@ -229,7 +230,14 @@ int GameMain(const CmdLineSetup_t &setup)
     {
         GameMenu = false;
         LevelSelect = false;
-        FullFileName = setup.testLevel;
+        if(Files::hasSuffix(setup.testLevel, ".rec"))
+        {
+            Record::LoadReplay(setup.testLevel);
+        }
+        else
+        {
+            FullFileName = setup.testLevel;
+        }
         if(setup.testBattleMode)
         {
             numPlayers = 2;
@@ -638,6 +646,8 @@ int GameMain(const CmdLineSetup_t &setup)
             CheatString.clear();
             EndLevel = false;
 
+            Record::InitRecording(); // initializes level data recording
+
             if(numPlayers == 1)
                 ScreenType = 0; // Follow 1 player
             else if(numPlayers == 2)
@@ -787,6 +797,8 @@ int GameMain(const CmdLineSetup_t &setup)
                 }
                 return false;
             });
+
+            Record::EndRecording();
 
             if(!GameIsActive)
             {

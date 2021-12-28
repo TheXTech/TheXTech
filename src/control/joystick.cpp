@@ -36,6 +36,7 @@
 #include "../pseudo_vb.h"
 #include "../main/speedrunner.h"
 #include "../main/menu_main.h"
+#include "../main/record.h"
 
 #ifdef USE_TOUCHSCREEN_CONTROLLER
 #include "touchscreen.h"
@@ -922,6 +923,27 @@ void UpdateControls()
                 } // s_touch.m_touchHidden
             }
 #endif
+        }
+    }
+
+    // sync controls, other recording data
+    Record::Sync();
+
+    For(B, 1, numPlayers)
+    {
+        if(B == 2 && numPlayers == 2) {
+            A = 2;
+        } else {
+            A = 1;
+        }
+
+        auto &joyCon = conJoystick[A];
+        auto &keyCon = conKeyboard[A];
+
+        // With Player(A).Controls
+        {
+            auto &p = Player[A];
+            Controls_t &c = p.Controls;
 
             if(B == 1 || B == 2) // Push the controls state into the speed-runner to properly display
                 speedRun_syncControlKeys(B - 1, c);

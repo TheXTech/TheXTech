@@ -250,7 +250,7 @@ int main(int argc, char**argv)
 
         TCLAP::SwitchArg switchVerboseLog(std::string(), "verbose", "Enable log output into the terminal", false);
 
-        TCLAP::UnlabeledValueArg<std::string> inputFileNames("levelpath", "Path to level file to run the test", false, std::string(), "path to file");
+        TCLAP::UnlabeledValueArg<std::string> inputFileNames("levelpath", "Path to level file or replay data to run the test", false, std::string(), "path to file");
 
         cmd.add(&switchFrameSkip);
         cmd.add(&switchDisableFrameSkip);
@@ -325,6 +325,11 @@ int main(int argc, char**argv)
         {
             auto fpath = inputFileNames.getValue();
             if(Files::hasSuffix(fpath, ".lvl") || Files::hasSuffix(fpath, ".lvlx"))
+            {
+                setup.testLevel = fpath;
+            }
+
+            if(Files::hasSuffix(fpath, ".rec"))
             {
                 setup.testLevel = fpath;
             }
