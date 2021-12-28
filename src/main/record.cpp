@@ -102,7 +102,7 @@ void write_header()
     fprintf(record_file, "Checkpoint %d\r\n", (Checkpoint == FullFileName) ? 1 : 0);
     if(g_compatibility.enable_multipoints && Checkpoint == FullFileName)
     {
-        fprintf(record_file, "Multipoints %d: ", CheckpointsList.size());
+        fprintf(record_file, "Multipoints %d: ", (int)CheckpointsList.size());
         for(const Checkpoint_t& cp : CheckpointsList)
         {
             fprintf(record_file, "%d,", cp.id);
@@ -500,7 +500,7 @@ void write_NPCs()
         fprintf(record_file, "Active %d\r\n", n.Active);
         fprintf(record_file, "Dir %lf\r\n", n.Direction);
         fprintf(record_file, "XYWH %lf %lf %lf %lf\r\n", n.Location.X, n.Location.Y, n.Location.Width, n.Location.Height);
-        fprintf(record_file, "S %lf %lf %lf %lf %lf %lf\r\n", n.Special, n.Special2, n.Special3, n.Special4, n.Special5, n.Special6);
+        fprintf(record_file, "S %lf %lf %lf %lf %lf %lf %lf\r\n", n.Special, n.Special2, n.Special3, n.Special4, n.Special5, n.Special6, n.Special7);
     }
 }
 
@@ -514,7 +514,7 @@ void read_NPCs()
         success = 0;
     else if(o_numNPCs != numNPCs)
     {
-        pLogWarning("old gameplay file diverged (new numNPCs %d, old %d) at frame %" PRId64 ".", numNPCs, o_numNPCs, frame_no);
+        pLogWarning("numNPCs diverged (old %d, new %d) at frame %" PRId64 ".", o_numNPCs, numNPCs, frame_no);
         diverged = true;
         return;
     }
@@ -524,14 +524,24 @@ void read_NPCs()
         for(int i = 1; i <= o_numNPCs; i++)
         {
             int N, T, A;
-            double D, X, Y, W, H, S1, S2, S3, S4, S5, S6;
+            double D, X, Y, W, H, S1, S2, S3, S4, S5, S6, S7;
             if(fscanf(replay_file, "NPC %d\r\nType %d\r\nActive %d\r\n", &N, &T, &A) != 3
-                || fscanf(replay_file, "Dir %lf\r\nXYWH %lf %lf %lf %lf\r\nS %lf %lf %lf %lf %lf %lf\r\n",
+                || fscanf(replay_file, "Dir %lf\r\nXYWH %lf %lf %lf %lf\r\nS %lf %lf %lf %lf %lf %lf",
                     &D, &X, &Y, &W, &H, &S1, &S2, &S3, &S4, &S5, &S6) != 11)
             {
                 pLogWarning("old gameplay file diverged (invalid NPC %d data) at frame %" PRId64 ".", i, frame_no);
                 diverged = true;
                 return;
+            }
+            // either '\r' (no S7) or ' ' (S7)
+            if(fgetc(replay_file) == ' ')
+            {
+                fscanf(replay_file, "%lf\r\n", &S7);
+            }
+            else
+            {
+                S7 = 0;
+                fgetc(replay_file); // '\n'
             }
             if(N != i)
             {
@@ -544,29 +554,29 @@ void read_NPCs()
             const NPC_t& n = NPC[i];
             if(T != n.Type)
             {
-                pLogWarning("old gameplay file diverged (new NPC[%d].Type %d, old %d) at frame %" PRId64 ".", i, n.Type, T, frame_no);
+                pLogWarning("NPC[%d].Type diverged (old %d, new %d) at frame %" PRId64 ".", i, T, n.Type, frame_no);
                 diverged = true;
             }
             if(A != n.Active)
             {
-                pLogWarning("old gameplay file diverged (new NPC[%d].Active %d, old %d) at frame %" PRId64 ".", i, n.Active, A, frame_no);
+                pLogWarning("NPC[%d].Active diverged (old %d, new %d; type %d) at frame %" PRId64 ".", i, A, n.Active, n.Type, frame_no);
                 diverged = true;
             }
             if(D != n.Direction)
             {
-                pLogWarning("old gameplay file diverged (new NPC[%d].Direction %f, old %f) at frame %" PRId64 ".", i, n.Direction, D, frame_no);
+                pLogWarning("NPC[%d].Direction diverged (old %f, new %f; type %d) at frame %" PRId64 ".", i, D, n.Direction, n.Type, frame_no);
                 diverged = true;
             }
             if(SDL_fabs(X - n.Location.X) > 0.01 || SDL_fabs(Y - n.Location.Y) > 0.01 || SDL_fabs(W - n.Location.Width) > 0.01 || SDL_fabs(H - n.Location.Height) > 0.01)
             {
-                pLogWarning("old gameplay file diverged (new NPC[%d].Location %lf %lf %lf %lf, old %lf %lf %lf %lf) at frame %" PRId64 ".", i,
-                    n.Location.X, n.Location.Y, n.Location.Width, n.Location.Height, X, Y, W, H, frame_no);
+                pLogWarning("NPC[%d].Location diverged (old %lf %lf %lf %lf, new %lf %lf %lf %lf; type %d) at frame %" PRId64 ".", i,
+                    X, Y, W, H, n.Location.X, n.Location.Y, n.Location.Width, n.Location.Height, n.Type, frame_no);
                 diverged = true;
             }
-            if(S1 != n.Special || S2 != n.Special2 || S3 != n.Special3 || S4 != n.Special4 || S5 != n.Special5 || S6 != n.Special6)
+            if(S1 != n.Special || S2 != n.Special2 || S3 != n.Special3 || S4 != n.Special4 || S5 != n.Special5 || S6 != n.Special6 || S7 != n.Special7)
             {
-                pLogWarning("old gameplay file diverged (new NPC[%d].Special* %f %f %f %f %f %f, old %f %f %f %f %f %f) at frame %" PRId64 ".", i,
-                    n.Special, n.Special2, n.Special3, n.Special4, n.Special5, n.Special6, S1, S2, S3, S4, S5, S6, frame_no);
+                pLogWarning("NPC[%d].Special* diverged (old %f %f %f %f %f %f %f, new %f %f %f %f %f %f %f; type %d) at frame %" PRId64 ".", i,
+                    S1, S2, S3, S4, S5, S6, S7, n.Special, n.Special2, n.Special3, n.Special4, n.Special5, n.Special6, n.Special7, n.Type, frame_no);
                 diverged = true;
             }
         }
