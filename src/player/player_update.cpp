@@ -2255,7 +2255,7 @@ void UpdatePlayer()
                                 UpdateSound();
                                 DoEvents();
                                 computeFrameTime2();
-                                g_levelScreenFader.update();
+                                updateScreenFaders();
                             }
                             PGE_Delay(1);
                         }

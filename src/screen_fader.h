@@ -48,6 +48,8 @@ struct ScreenFader
     void clearFader()
     {
         m_active = false;
+        m_scale = 0.0f;
+        m_full = false;
     }
 
     void setupFader(int step, int start, int goal, Shape shape)

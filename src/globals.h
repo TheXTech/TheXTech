@@ -910,6 +910,7 @@ struct Warp_t
     double cannonExitSpeed = 10.0;
     std::string eventEnter;
     std::string StarsMsg;
+    int transitEffect = 0;
 //End Type
 };
 

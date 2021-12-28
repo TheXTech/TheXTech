@@ -22,8 +22,12 @@
 #define GAME_GLOBALS_H
 
 #include "../screen_fader.h"
+#include "../range_arr.hpp"
 
 extern ScreenFader g_levelScreenFader;
+extern RangeArr<ScreenFader, 0, 2> g_levelVScreenFader;
+
+extern void updateScreenFaders();
 
 
 #endif // GAME_GLOBALS_H

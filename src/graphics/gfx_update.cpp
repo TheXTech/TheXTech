@@ -2107,7 +2107,10 @@ void UpdateGraphics(bool skipRepaint)
         // player names
         /* Dropped */
 
-
+            if(numPlayers == 1) // Always draw for single-player
+                g_levelVScreenFader[Z].draw();
+            else if(numScreens != 1) // Don't draw when many players at the same screen
+                g_levelVScreenFader[Z].draw();
 
     //    'Interface
     //            B = 0
@@ -2823,7 +2826,6 @@ void UpdateGraphics(bool skipRepaint)
         {
             speedRun_renderControls(Z, Z);
         }
-
 //    Next Z
     } // For(Z, 2, numScreens)
 

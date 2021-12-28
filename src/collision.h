@@ -104,4 +104,6 @@ void CompareNpcWalkBlock(int &tempHitBlock, int &tempHitOldBlock,
                          double &tempHit,   double &tempHitOld,
                          int &tempHitIsSlope, NPC_t *npc);
 
+bool SectionCollision(const int section, const Location_t &loc);
+
 #endif // COLLISION_H

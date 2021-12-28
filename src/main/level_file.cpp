@@ -504,6 +504,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         warp.Direction2 = w.odirect;
         warp.Effect = w.type;
         warp.twoWay = w.two_way;
+        warp.transitEffect = w.transition_effect;
 
         // Work around filenames with no extension suffix and case missmatch
         if(!Strings::endsWith(w.lname, ".lvl") && !Strings::endsWith(w.lname, ".lvlx"))

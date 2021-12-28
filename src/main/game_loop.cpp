@@ -45,6 +45,15 @@
 
 //! Holds the screen overlay for the level
 ScreenFader g_levelScreenFader;
+RangeArr<ScreenFader, 0, 2> g_levelVScreenFader;
+
+void updateScreenFaders()
+{
+    g_levelScreenFader.update();
+
+    for(int s = 0; s < 3; ++s)
+        g_levelVScreenFader[s].update();
+}
 
 
 void CheckActive();//in game_main.cpp
@@ -98,7 +107,7 @@ void GameLoop()
         UpdateEffects();
         speedRun_tick();
         UpdateGraphics();
-        g_levelScreenFader.update();
+        updateScreenFaders();
     }
     else if(BattleIntro > 0)
     {
@@ -110,7 +119,7 @@ void GameLoop()
         BattleIntro--;
         if(BattleIntro == 1)
             PlaySound(SFX_Checkpoint);
-        g_levelScreenFader.update();
+        updateScreenFaders();
     }
     else
     {
@@ -132,7 +141,7 @@ void GameLoop()
         if(MagicHand)
             UpdateEditor();
 
-        g_levelScreenFader.update();
+        updateScreenFaders();
 
         bool altPressed = getKeyState(SDL_SCANCODE_LALT) == KEY_PRESSED ||
                           getKeyState(SDL_SCANCODE_RALT) == KEY_PRESSED;
@@ -265,7 +274,7 @@ void PauseGame(int plr)
             if(LevelSelect)
                 g_worldScreenFader.update();
             else
-                g_levelScreenFader.update();
+                updateScreenFaders();
 
             bool altPressed = getKeyState(SDL_SCANCODE_LALT) == KEY_PRESSED ||
                               getKeyState(SDL_SCANCODE_RALT) == KEY_PRESSED;

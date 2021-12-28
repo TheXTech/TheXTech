@@ -5510,14 +5510,19 @@ void PlayerEffects(const int A)
 
         if(p.Effect2 == 0.0) // Entering pipe
         {
+            double leftToGoal = 0.0;
             if(warp_dir_enter == 3)
             {
                 p.Location.Y += 1;
                 p.Location.X = warp_enter.X + warp_enter.Width / 2.0 - p.Location.Width / 2.0;
+                leftToGoal = SDL_fabs((warp_enter.Y + warp_enter.Height) - p.Location.Y);
+
                 if(p.Location.Y > warp_enter.Y + warp_enter.Height + 8)
                     p.Effect2 = 1;
+
                 if(p.Mount == 0)
                     p.Frame = 15;
+
                 if(p.HoldingNPC > 0)
                 {
                     NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
@@ -5528,8 +5533,11 @@ void PlayerEffects(const int A)
             {
                 p.Location.Y -= 1;
                 p.Location.X = warp_enter.X + warp_enter.Width / 2.0 - p.Location.Width / 2.0;
+                leftToGoal = SDL_fabs(warp_enter.Y - (p.Location.Y + p.Location.Height));
+
                 if(p.Location.Y + p.Location.Height + 8 < warp_enter.Y)
                     p.Effect2 = 1;
+
                 if(p.HoldingNPC > 0)
                 {
                     NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
@@ -5545,11 +5553,15 @@ void PlayerEffects(const int A)
                     p.Duck = true;
                     p.Location.Height = 30;
                 }
+
                 p.Direction = -1; // makes (p.Direction > 0) always false
                 p.Location.Y = warp_enter.Y + warp_enter.Height - p.Location.Height - 2;
                 p.Location.X -= 0.5;
+                leftToGoal = SDL_fabs((warp_enter.X - (p.Location.X + p.Location.Width)) * 2);
+
                 if(p.Location.X + p.Location.Width + 8 < warp_enter.X)
                     p.Effect2 = 1;
+
                 if(p.HoldingNPC > 0)
                 {
                     NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
@@ -5572,8 +5584,11 @@ void PlayerEffects(const int A)
                 p.Direction = 1; // Makes (p.Direction > 0) always true
                 p.Location.Y = warp_enter.Y + warp_enter.Height - p.Location.Height - 2;
                 p.Location.X += 0.5;
+                leftToGoal = SDL_fabs(((warp_enter.X + warp_enter.Width) - p.Location.X) * 2);
+
                 if(p.Location.X > warp_enter.X + warp_enter.Width + 8)
                     p.Effect2 = 1;
+
                 if(p.HoldingNPC > 0)
                 {
                     NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
@@ -5586,8 +5601,17 @@ void PlayerEffects(const int A)
                 PlayerFrame(p);
                 p.Location.SpeedX = 0;
             }
+
+            D_pLogDebug("Warping: %g (same section? %s!)", leftToGoal, SectionCollision(p.Section, warp_exit) ? "yes" : "no");
+            switch(warp.transitEffect)
+            {
+            default:
+            case LevelDoor::TRANSIT_NONE:
+                if(Maths::iRound(leftToGoal) == 0 && warp.level.empty() && !warp.MapWarp && !SectionCollision(p.Section, warp_exit))
+                    g_levelVScreenFader[A].setupFader(8, 0, 65, ScreenFader::S_FADE);
+            }
         }
-        else if(fEqual(p.Effect2, 1))  // Exiting pipe
+        else if(fEqual(p.Effect2, 1))  // Exiting pipe (initialization)
         {
             if(warp.NoYoshi)
             {
@@ -5603,6 +5627,9 @@ void PlayerEffects(const int A)
                 SizeCheck(A);
                 UpdateYoshiMusic();
             }
+
+            if(g_levelVScreenFader[A].m_full || g_levelVScreenFader[A].m_active)
+                g_levelVScreenFader[A].setupFader(8, 65, 0, ScreenFader::S_FADE);
 
             if(warp_dir_exit == 1)
             {
@@ -5736,7 +5763,7 @@ void PlayerEffects(const int A)
                 p.Effect2 = 2970;
             }
         }
-        else if(p.Effect2 >= 100)
+        else if(p.Effect2 >= 100) // Waiting until exit pipe
         {
             p.Effect2 += 1;
 
@@ -5747,7 +5774,7 @@ void PlayerEffects(const int A)
                     PlaySound(SFX_Warp);
             }
         }
-        else if(fEqual(p.Effect2, 2))
+        else if(fEqual(p.Effect2, 2)) // Proceeding the pipe exiting
         {
             if(!backward && warp.cannonExit)
             {
@@ -5899,7 +5926,7 @@ void PlayerEffects(const int A)
                 }
             }
         }
-        else if(fEqual(p.Effect2, 3))
+        else if(fEqual(p.Effect2, 3)) // Finishing the pipe exiting / shooting
         {
             if(!backward && warp.cannonExit)
             {
@@ -6010,6 +6037,17 @@ void PlayerEffects(const int A)
         if(p.Character == 5)
             p.Frame = 1;
 
+        if(fEqual(p.Effect2, 20))
+        {
+            switch(warp.transitEffect)
+            {
+            default:
+            case LevelDoor::TRANSIT_NONE:
+                if(warp.level.empty() && !warp.MapWarp && !SectionCollision(p.Section, warp_exit))
+                    g_levelVScreenFader[A].setupFader(9, 0, 65, ScreenFader::S_FADE);
+            }
+        }
+
         if(p.Effect2 >= 30)
         {
             if(warp.NoYoshi)
@@ -6044,6 +6082,9 @@ void PlayerEffects(const int A)
             p.Effect = 0;
             p.Effect2 = 0;
             p.WarpCD = 40;
+
+            if(g_levelVScreenFader[A].m_full || g_levelVScreenFader[A].m_active)
+                g_levelVScreenFader[A].setupFader(8, 65, 0, ScreenFader::S_FADE);
 
             if(!warp.level.empty())
             {

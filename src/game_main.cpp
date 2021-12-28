@@ -378,6 +378,8 @@ int GameMain(const CmdLineSetup_t &setup)
             }
 
             g_levelScreenFader.clearFader();
+            for(int s = 0; s < 3; ++s)
+                g_levelVScreenFader[s].clearFader();
 
             // Run the frame-loop
             runFrameLoop(&OutroLoop,
