@@ -42,6 +42,10 @@ void ScreenFader::clearFader()
     m_focusY = -1;
     m_focusScreen = -1;
     m_focusSet = false;
+    m_focusTrackX = nullptr;
+    m_focusTrackY = nullptr;
+    m_focusOffsetX = 0.0;
+    m_focusOffsetY = 0.0;
 }
 
 void ScreenFader::setupFader(int step, int start, int goal, Shape shape, bool useFocus, int focusX, int focusY, int screen)
@@ -56,6 +60,18 @@ void ScreenFader::setupFader(int step, int start, int goal, Shape shape, bool us
     m_focusX = focusX;
     m_focusY = focusY;
     m_focusScreen = screen;
+    m_focusTrackX = nullptr;
+    m_focusTrackY = nullptr;
+    m_focusOffsetX = 0.0;
+    m_focusOffsetY = 0.0;
+}
+
+void ScreenFader::setTrackedFocus(double *x, double *y, double offX, double offY)
+{
+    m_focusTrackX = x;
+    m_focusTrackY = y;
+    m_focusOffsetX = offX;
+    m_focusOffsetY = offY;
 }
 
 void ScreenFader::update()
@@ -69,6 +85,14 @@ void ScreenFader::update()
             m_active = false;
         else if(m_scale >= 1.0f)
             m_full = true;
+    }
+
+    if(m_focusSet)
+    {
+        if(m_focusTrackX)
+            m_focusX = *m_focusTrackX + m_focusOffsetX;
+        if(m_focusTrackY)
+            m_focusY = *m_focusTrackY + m_focusOffsetY;
     }
 
     m_fader.tickFader(1000.0 / 65.0);

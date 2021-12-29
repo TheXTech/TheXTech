@@ -41,6 +41,11 @@ struct ScreenFader
     int m_focusScreen = -1;
     bool m_focusSet = false;
 
+    double *m_focusTrackX = nullptr;
+    double *m_focusTrackY = nullptr;
+    double m_focusOffsetX = 0.0;
+    double m_focusOffsetY = 0.0;
+
     enum Shape
     {
         S_FADE = 0,
@@ -53,6 +58,7 @@ struct ScreenFader
     void clearFader();
 
     void setupFader(int step, int start, int goal, Shape shape, bool useFocus = false, int focusX = -1, int focusY = -1, int screen = -1);
+    void setTrackedFocus(double *x, double *y, double offX, double offY);
 
     void update();
 
