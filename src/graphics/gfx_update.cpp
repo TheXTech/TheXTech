@@ -863,6 +863,7 @@ void UpdateGraphics(bool skipRepaint)
 //                End With
 //            Next A
 //        Else
+        if(numBackground > 0)
         { // NOT AN EDITOR
             for(A = MidBackground; A <= LastBackground; A++) // Second backgrounds
             {
