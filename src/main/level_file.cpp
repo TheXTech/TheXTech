@@ -535,6 +535,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         warp.NoYoshi = w.novehicles;
         warp.WarpNPC = w.allownpc;
         warp.Locked = w.locked;
+        warp.stoodRequired = w.stood_state_required;
 
         warp.cannonExit = w.cannon_exit;
         warp.cannonExitSpeed = w.cannon_exit_speed;

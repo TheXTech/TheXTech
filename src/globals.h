@@ -907,6 +907,7 @@ struct Warp_t
     bool noPrintStars = false;
     bool noEntranceScene = false;
     bool cannonExit = false;
+    bool stoodRequired = false; // Require player stood on the ground to enter this warp
     double cannonExitSpeed = 10.0;
     std::string eventEnter;
     std::string StarsMsg;
