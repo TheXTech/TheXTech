@@ -41,10 +41,10 @@
 #include <cstring>
 #include <cassert>
 #include <limits>
-#include <iostream>
+// #include <iostream>
 #include <type_traits>
 #include <utility>
-#include <locale>
+// #include <locale>
 #include <iterator>
 #include <utility>
 
@@ -60,37 +60,6 @@
     #define PCG_NOINLINE __attribute__((noinline))
 #else
     #define PCG_NOINLINE
-#endif
-
-/*
- * Some members of the PCG library use 128-bit math.  When compiling on 64-bit
- * platforms, both GCC and Clang provide 128-bit integer types that are ideal
- * for the job.
- *
- * On 32-bit platforms (or with other compilers), we fall back to a C++
- * class that provides 128-bit unsigned integers instead.  It may seem
- * like we're reinventing the wheel here, because libraries already exist
- * that support large integers, but most existing libraries provide a very
- * generic multiprecision code, but here we're operating at a fixed size.
- * Also, most other libraries are fairly heavyweight.  So we use a direct
- * implementation.  Sadly, it's much slower than hand-coded assembly or
- * direct CPU support.
- *
- */
-#if __SIZEOF_INT128__
-    namespace pcg_extras {
-        typedef __uint128_t pcg128_t;
-    }
-    #define PCG_128BIT_CONSTANT(high,low) \
-            ((pcg128_t(high) << 64) + low)
-#else
-    #include "pcg_uint128.hpp"
-    namespace pcg_extras {
-        typedef pcg_extras::uint_x4<uint32_t,uint64_t> pcg128_t;
-    }
-    #define PCG_128BIT_CONSTANT(high,low) \
-            pcg128_t(high,low)
-    #define PCG_EMULATED_128BIT_MATH 1
 #endif
 
 
@@ -119,91 +88,6 @@ namespace pcg_extras {
  * and zero-padded in hex.  It's not a full-featured implementation.
  */
 
-template <typename CharT, typename Traits>
-std::basic_ostream<CharT,Traits>&
-operator<<(std::basic_ostream<CharT,Traits>& out, pcg128_t value)
-{
-    auto desired_base = out.flags() & out.basefield;
-    bool want_hex = desired_base == out.hex;
-
-    if (want_hex) {
-        uint64_t highpart = uint64_t(value >> 64);
-        uint64_t lowpart  = uint64_t(value);
-        auto desired_width = out.width();
-        if (desired_width > 16) {
-            out.width(desired_width - 16);
-        }
-        if (highpart != 0 || desired_width > 16)
-            out << highpart;
-        CharT oldfill;
-        if (highpart != 0) {
-            out.width(16);
-            oldfill = out.fill('0');
-        }
-        auto oldflags = out.setf(decltype(desired_base){}, out.showbase);
-        out << lowpart;
-        out.setf(oldflags);
-        if (highpart != 0) {
-            out.fill(oldfill);
-        }
-        return out;
-    }
-    constexpr size_t MAX_CHARS_128BIT = 40;
-
-    char buffer[MAX_CHARS_128BIT];
-    char* pos = buffer+sizeof(buffer);
-    *(--pos) = '\0';
-    constexpr auto BASE = pcg128_t(10ULL);
-    do {
-        auto div = value / BASE;
-        auto mod = uint32_t(value - (div * BASE));
-        *(--pos) = '0' + mod;
-        value = div;
-    } while(value != pcg128_t(0ULL));
-    return out << pos;
-}
-
-template <typename CharT, typename Traits>
-std::basic_istream<CharT,Traits>&
-operator>>(std::basic_istream<CharT,Traits>& in, pcg128_t& value)
-{
-    typename std::basic_istream<CharT,Traits>::sentry s(in);
-
-    if (!s)
-         return in;
-
-    constexpr auto BASE = pcg128_t(10ULL);
-    pcg128_t current(0ULL);
-    bool did_nothing = true;
-    bool overflow = false;
-    for(;;) {
-        CharT wide_ch = in.get();
-        if (!in.good())
-            break;
-        auto ch = in.narrow(wide_ch, '\0');
-        if (ch < '0' || ch > '9') {
-            in.unget();
-            break;
-        }
-        did_nothing = false;
-        pcg128_t digit(uint32_t(ch - '0'));
-        pcg128_t timesbase = current*BASE;
-        overflow = overflow || timesbase < current;
-        current = timesbase + digit;
-        overflow = overflow || current < digit;
-    }
-
-    if (did_nothing || overflow) {
-        in.setstate(std::ios::failbit);
-        if (overflow)
-            current = ~pcg128_t(0ULL);
-    }
-
-    value = current;
-
-    return in;
-}
-
 /*
  * Likewise, if people use tiny rngs, we'll be serializing uint8_t.
  * If we just used the provided IO operators, they'd read/write chars,
@@ -211,43 +95,10 @@ operator>>(std::basic_istream<CharT,Traits>& in, pcg128_t& value)
  * here because we're in our own namespace.
  */
 
-template <typename CharT, typename Traits>
-std::basic_ostream<CharT,Traits>&
-operator<<(std::basic_ostream<CharT,Traits>&out, uint8_t value)
-{
-    return out << uint32_t(value);
-}
-
-template <typename CharT, typename Traits>
-std::basic_istream<CharT,Traits>&
-operator>>(std::basic_istream<CharT,Traits>& in, uint8_t target)
-{
-    uint32_t value = 0xdecea5edU;
-    in >> value;
-    if (!in && value == 0xdecea5edU)
-        return in;
-    if (value > uint8_t(~0)) {
-        in.setstate(std::ios::failbit);
-        value = ~0U;
-    }
-    target = uint8_t(value);
-    return in;
-}
-
 /* Unfortunately, the above functions don't get found in preference to the
  * built in ones, so we create some more specific overloads that will.
  * Ugh.
  */
-
-inline std::ostream& operator<<(std::ostream& out, uint8_t value)
-{
-    return pcg_extras::operator<< <char>(out, value);
-}
-
-inline std::istream& operator>>(std::istream& in, uint8_t& value)
-{
-    return pcg_extras::operator>> <char>(in, value);
-}
 
 
 
@@ -614,23 +465,6 @@ public:
 
 template <typename T>
 struct printable_typename {};
-
-template <typename T>
-std::ostream& operator<<(std::ostream& out, printable_typename<T>) {
-    const char *implementation_typename = typeid(T).name();
-#ifdef __GNUC__
-    int status;
-    const char* pretty_name =
-        abi::__cxa_demangle(implementation_typename, NULL, NULL, &status);
-    if (status == 0)
-        out << pretty_name;
-    free((void*) pretty_name);
-    if (status == 0)
-        return out;
-#endif
-    out << implementation_typename;
-    return out;
-}
 
 } // namespace pcg_extras
 
