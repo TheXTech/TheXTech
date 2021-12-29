@@ -26,12 +26,19 @@
 pcg32 g_random_engine;
 long g_random_n_calls = 0;
 
+#ifdef DEBUG_RANDOM_CALLS
+std::vector<void*> g_random_calls;
+#endif
+
 static int last_seed = 310;
 
 void seedRandom(int seed)
 {
     last_seed = seed;
     g_random_n_calls = 0;
+#ifdef DEBUG_RANDOM_CALLS
+    g_random_calls.clear();
+#endif
     g_random_engine.seed(seed);
 }
 

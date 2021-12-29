@@ -27,6 +27,14 @@
 extern pcg32 g_random_engine;
 extern long g_random_n_calls;
 
+// supported only on gcc
+// #define DEBUG_RANDOM_CALLS
+#ifdef DEBUG_RANDOM_CALLS
+#   include <execinfo.h>
+#   include <vector>
+extern std::vector<void*> g_random_calls;
+#endif
+
 /**
  * @brief Seeds the random number generator with argument seed for reproducible results
  */
@@ -51,6 +59,11 @@ extern long random_ncalls();
 inline double dRand()
 {
     g_random_n_calls ++;
+#ifdef DEBUG_RANDOM_CALLS
+    void* stack[2] = {nullptr, nullptr};
+    backtrace(stack, 2);
+    g_random_calls.push_back(stack[1]);
+#endif
     return ldexp(g_random_engine(), -32);
 }
 
