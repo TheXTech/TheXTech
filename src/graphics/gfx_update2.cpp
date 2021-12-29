@@ -74,10 +74,10 @@ void UpdateGraphics2(bool skipRepaint)
 
     int A = 0;
     int B = 0;
-    int Z = 0;
+    const int Z = 1;
     int WPHeight = 0;
 //    Location_t tempLocation;
-    Z = 1;
+    //Z = 1;
 
     vScreen[Z].Left = 0;
     vScreen[Z].Top = 0;
@@ -434,22 +434,22 @@ void UpdateGraphics2(bool skipRepaint)
     { // NOT AN EDITOR!!!
         if(WorldPlayer[1].Type == 0)
             WorldPlayer[1].Type = 1;
-        if(Player[1].Character == 1)
-            WorldPlayer[1].Type = 1;
-        if(Player[1].Character == 2)
-            WorldPlayer[1].Type = 2;
-        if(Player[1].Character == 3)
-            WorldPlayer[1].Type = 3;
-        if(Player[1].Character == 4)
-            WorldPlayer[1].Type = 4;
-        if(Player[1].Character == 5)
-            WorldPlayer[1].Type = 5;
-        if(WorldPlayer[1].Type == 3)
+
+        WorldPlayer[1].Type = Player[1].Character;
+
+        switch(WorldPlayer[1].Type)
+        {
+        case 3:
             WPHeight = 44;
-        else if(WorldPlayer[1].Type == 4)
+            break;
+        case 4:
             WPHeight = 40;
-        else
+            break;
+        default:
             WPHeight = 32;
+            break;
+        }
+
 //        frmMain.renderTexture(vScreenX[Z] + WorldPlayer[1].Location.X, vScreenY[Z] + WorldPlayer[1].Location.Y - 10 + WorldPlayer[1].Location.Height - WPHeight, WorldPlayer[1].Location.Width, WPHeight, GFXPlayerMask[WorldPlayer[1].Type], 0, WPHeight * WorldPlayer[1].Frame);
 //        frmMain.renderTexture(vScreenX[Z] + WorldPlayer[1].Location.X, vScreenY[Z] + WorldPlayer[1].Location.Y - 10 + WorldPlayer[1].Location.Height - WPHeight, WorldPlayer[1].Location.Width, WPHeight, GFXPlayer[WorldPlayer[1].Type], 0, WPHeight * WorldPlayer[1].Frame);
         frmMain.renderTexture(vScreenX[Z] + WorldPlayer[1].Location.X,

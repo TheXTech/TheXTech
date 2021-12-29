@@ -21,11 +21,7 @@
 #ifndef SCREEN_FADER_H
 #define SCREEN_FADER_H
 
-#include "frm_main.h"
 #include "fader.h"
-#include "global_constants.h"
-
-extern FrmMain frmMain;
 
 
 struct ScreenFader
@@ -39,81 +35,28 @@ struct ScreenFader
     float color_g = 0.f;
     float color_b = 0.f;
 
+    // Focus on the point (using circle or rectangular effect)
+    int m_focusX = -1;
+    int m_focusY = -1;
+    int m_focusScreen = -1;
+    bool m_focusSet = false;
+
     enum Shape
     {
         S_FADE = 0,
-        S_RECT
+        S_RECT,
+        S_CIRCLE,
+        S_FLIP_H,
+        S_FLIP_V
     } m_shape = S_FADE;
 
-    void clearFader()
-    {
-        m_active = false;
-        m_scale = 0.0f;
-        m_full = false;
-    }
+    void clearFader();
 
-    void setupFader(int step, int start, int goal, Shape shape)
-    {
-        m_shape = shape;
-        m_fader.setRatio(start / 65.0);
-        m_fader.setFade(15, goal / 65.0, step / 65.0);
-        m_scale = (float)m_fader.fadeRatio();
-        m_active = true;
-        m_full = false;
-    }
+    void setupFader(int step, int start, int goal, Shape shape, bool useFocus = false, int focusX = -1, int focusY = -1, int screen = -1);
 
-    void update()
-    {
-        if(!m_active)
-            return;
+    void update();
 
-        if(!m_fader.isFading())
-        {
-            if(m_scale <= 0.0f)
-                m_active = false;
-            else if(m_scale >= 1.0f)
-                m_full = true;
-        }
-
-        m_fader.tickFader(1000.0 / 65.0);
-        m_scale = (float)m_fader.fadeRatio();
-    }
-
-    void draw()
-    {
-        if(!m_active)
-            return;
-
-        frmMain.offsetViewportIgnore(true);
-
-        switch(m_shape)
-        {
-        case S_FADE:
-            frmMain.renderRect(0, 0, ScreenW, ScreenH, color_r, color_b, color_g, m_scale, true);
-            break;
-
-        case S_RECT:
-        {
-            if(m_scale >= 1.0f)
-                frmMain.renderRect(0, 0, ScreenW, ScreenH, color_r, color_b, color_g, m_scale, true);
-            else
-            {
-                float hw = (ScreenW / 2) * m_scale, hh = (ScreenH / 2) * m_scale;
-                // Left side
-                frmMain.renderRect(0, 0, hw, ScreenH, color_r, color_b, color_g, 1.f, true);
-                // right side
-                frmMain.renderRect(ScreenW - hw + 1, 0, hw, ScreenH, color_r, color_b, color_g, 1.f, true);
-                // Top side
-                frmMain.renderRect(0, 0, ScreenW, hh, color_r, color_b, color_g, 1.f, true);
-                // Bottom side
-                frmMain.renderRect(0, ScreenH - hh + 1, ScreenW, hh, color_r, color_b, color_g, 1.f, true);
-            }
-        }
-            break;
-        }
-
-        frmMain.offsetViewportIgnore(false);
-    }
+    void draw();
 };
 
 #endif // SCREEN_FADER_H

@@ -5511,11 +5511,15 @@ void PlayerEffects(const int A)
         if(p.Effect2 == 0.0) // Entering pipe
         {
             double leftToGoal = 0.0;
+            double sign = +1.0;
+
             if(warp_dir_enter == 3)
             {
                 p.Location.Y += 1;
                 p.Location.X = warp_enter.X + warp_enter.Width / 2.0 - p.Location.Width / 2.0;
-                leftToGoal = SDL_fabs((warp_enter.Y + warp_enter.Height) - p.Location.Y);
+
+                sign = (warp_enter.Y + warp_enter.Height) > p.Location.Y ? +1.0 : -1.0;
+                leftToGoal = SDL_fabs((warp_enter.Y + warp_enter.Height) - p.Location.Y) * sign;
 
                 if(p.Location.Y > warp_enter.Y + warp_enter.Height + 8)
                     p.Effect2 = 1;
@@ -5533,7 +5537,9 @@ void PlayerEffects(const int A)
             {
                 p.Location.Y -= 1;
                 p.Location.X = warp_enter.X + warp_enter.Width / 2.0 - p.Location.Width / 2.0;
-                leftToGoal = SDL_fabs(warp_enter.Y - (p.Location.Y + p.Location.Height));
+
+                sign = (p.Location.Y + p.Location.Height) > warp_enter.Y ? +1.0 : -1.0;
+                leftToGoal = SDL_fabs(warp_enter.Y - (p.Location.Y + p.Location.Height)) * sign;
 
                 if(p.Location.Y + p.Location.Height + 8 < warp_enter.Y)
                     p.Effect2 = 1;
@@ -5557,7 +5563,9 @@ void PlayerEffects(const int A)
                 p.Direction = -1; // makes (p.Direction > 0) always false
                 p.Location.Y = warp_enter.Y + warp_enter.Height - p.Location.Height - 2;
                 p.Location.X -= 0.5;
-                leftToGoal = SDL_fabs((warp_enter.X - (p.Location.X + p.Location.Width)) * 2);
+
+                sign = (p.Location.X + p.Location.Width) > warp_enter.X ? +1.0 : -1.0;
+                leftToGoal = SDL_fabs((warp_enter.X - (p.Location.X + p.Location.Width)) * 2) * sign;
 
                 if(p.Location.X + p.Location.Width + 8 < warp_enter.X)
                     p.Effect2 = 1;
@@ -5584,7 +5592,9 @@ void PlayerEffects(const int A)
                 p.Direction = 1; // Makes (p.Direction > 0) always true
                 p.Location.Y = warp_enter.Y + warp_enter.Height - p.Location.Height - 2;
                 p.Location.X += 0.5;
-                leftToGoal = SDL_fabs(((warp_enter.X + warp_enter.Width) - p.Location.X) * 2);
+
+                sign = p.Location.X < (warp_enter.X + warp_enter.Width) ? +1.0 : -1.0;
+                leftToGoal = SDL_fabs(((warp_enter.X + warp_enter.Width) - p.Location.X) * 2) * sign;
 
                 if(p.Location.X > warp_enter.X + warp_enter.Width + 8)
                     p.Effect2 = 1;
@@ -5606,9 +5616,35 @@ void PlayerEffects(const int A)
             switch(warp.transitEffect)
             {
             default:
+            case LevelDoor::TRANSIT_SCROLL:
+                // TODO: Implement the scrolling method
             case LevelDoor::TRANSIT_NONE:
                 if(Maths::iRound(leftToGoal) == 0 && warp.level.empty() && !warp.MapWarp && !SectionCollision(p.Section, warp_exit))
                     g_levelVScreenFader[A].setupFader(8, 0, 65, ScreenFader::S_FADE);
+                break;
+
+            case LevelDoor::TRANSIT_FADE:
+                if(Maths::iRound(leftToGoal) == 24)
+                    g_levelVScreenFader[A].setupFader(3, 0, 65, ScreenFader::S_FADE);
+                break;
+
+            case LevelDoor::TRANSIT_CIRCLE_FADE:
+                if(Maths::iRound(leftToGoal) == 24)
+                    g_levelVScreenFader[A].setupFader(3, 0, 65, ScreenFader::S_CIRCLE,
+                                                      true,
+                                                      Maths::iRound(warp_enter.X + warp_enter.Width / 2),
+                                                      Maths::iRound(warp_enter.Y + warp_enter.Height / 2), A);
+                break;
+
+            case LevelDoor::TRANSIT_FLIP_H:
+                if(Maths::iRound(leftToGoal) == 24)
+                    g_levelVScreenFader[A].setupFader(3, 0, 65, ScreenFader::S_FLIP_H);
+                break;
+
+            case LevelDoor::TRANSIT_FLIP_V:
+                if(Maths::iRound(leftToGoal) == 24)
+                    g_levelVScreenFader[A].setupFader(3, 0, 65, ScreenFader::S_FLIP_V);
+                break;
             }
         }
         else if(fEqual(p.Effect2, 1))  // Exiting pipe (initialization)
@@ -5627,9 +5663,6 @@ void PlayerEffects(const int A)
                 SizeCheck(A);
                 UpdateYoshiMusic();
             }
-
-            if(g_levelVScreenFader[A].m_full || g_levelVScreenFader[A].m_active)
-                g_levelVScreenFader[A].setupFader(8, 65, 0, ScreenFader::S_FADE);
 
             if(warp_dir_exit == 1)
             {
@@ -5743,6 +5776,39 @@ void PlayerEffects(const int A)
                             CheckSectionNPC(Player[B].HoldingNPC);
                         }
                     }
+                }
+            }
+
+            if(g_levelVScreenFader[A].m_full || g_levelVScreenFader[A].m_active)
+            {
+                switch(warp.transitEffect)
+                {
+                default:
+                case LevelDoor::TRANSIT_SCROLL:
+                    // TODO: Implement the scrolling method
+                case LevelDoor::TRANSIT_NONE:
+                    g_levelVScreenFader[A].setupFader(8, 65, 0, ScreenFader::S_FADE);
+                    break;
+
+                case LevelDoor::TRANSIT_FADE:
+                    g_levelVScreenFader[A].setupFader(3, 65, 0, ScreenFader::S_FADE);
+                    break;
+
+                case LevelDoor::TRANSIT_CIRCLE_FADE:
+                    g_levelVScreenFader[A].setupFader(2, 65, 0, ScreenFader::S_CIRCLE,
+                                                      true,
+                                                      Maths::iRound(warp_exit.X + warp_exit.Width / 2),
+                                                      Maths::iRound(warp_exit.Y + warp_exit.Height /2),
+                                                      A);
+                    break;
+
+                case LevelDoor::TRANSIT_FLIP_H:
+                    g_levelVScreenFader[A].setupFader(3, 65, 0, ScreenFader::S_FLIP_H);
+                    break;
+
+                case LevelDoor::TRANSIT_FLIP_V:
+                    g_levelVScreenFader[A].setupFader(3, 65, 0, ScreenFader::S_FLIP_V);
+                    break;
                 }
             }
 
@@ -6021,6 +6087,7 @@ void PlayerEffects(const int A)
     {
         bool backward = p.WarpBackward;
         auto &warp = Warp[p.Warp];
+        auto &warp_enter = backward ? warp.Exit : warp.Entrance;
         auto &warp_exit = backward ? warp.Entrance : warp.Exit;
 
         if(p.HoldingNPC > 0)
@@ -6037,15 +6104,38 @@ void PlayerEffects(const int A)
         if(p.Character == 5)
             p.Frame = 1;
 
-        if(fEqual(p.Effect2, 20))
+        switch(warp.transitEffect)
         {
-            switch(warp.transitEffect)
-            {
-            default:
-            case LevelDoor::TRANSIT_NONE:
-                if(warp.level.empty() && !warp.MapWarp && !SectionCollision(p.Section, warp_exit))
-                    g_levelVScreenFader[A].setupFader(9, 0, 65, ScreenFader::S_FADE);
-            }
+        default:
+        case LevelDoor::TRANSIT_SCROLL:
+            // TODO: Implement the scrolling method
+        case LevelDoor::TRANSIT_NONE:
+            if(fEqual(p.Effect2, 20) && warp.level.empty() && !warp.MapWarp && !SectionCollision(p.Section, warp_exit))
+                g_levelVScreenFader[A].setupFader(9, 0, 65, ScreenFader::S_FADE);
+            break;
+
+        case LevelDoor::TRANSIT_FADE:
+            if(fEqual(p.Effect2, 5))
+                g_levelVScreenFader[A].setupFader(3, 0, 65, ScreenFader::S_FADE);
+            break;
+
+        case LevelDoor::TRANSIT_CIRCLE_FADE:
+            if(fEqual(p.Effect2, 5))
+                g_levelVScreenFader[A].setupFader(3, 0, 65, ScreenFader::S_CIRCLE,
+                                                  true,
+                                                  Maths::iRound(warp_enter.X + warp_enter.Width / 2),
+                                                  Maths::iRound(warp_enter.Y + warp_enter.Height / 2), A);
+            break;
+
+        case LevelDoor::TRANSIT_FLIP_H:
+            if(fEqual(p.Effect2, 5))
+                g_levelVScreenFader[A].setupFader(3, 0, 65, ScreenFader::S_FLIP_H);
+            break;
+
+        case LevelDoor::TRANSIT_FLIP_V:
+            if(fEqual(p.Effect2, 5))
+                g_levelVScreenFader[A].setupFader(3, 0, 65, ScreenFader::S_FLIP_V);
+            break;
         }
 
         if(p.Effect2 >= 30)
@@ -6084,7 +6174,37 @@ void PlayerEffects(const int A)
             p.WarpCD = 40;
 
             if(g_levelVScreenFader[A].m_full || g_levelVScreenFader[A].m_active)
-                g_levelVScreenFader[A].setupFader(8, 65, 0, ScreenFader::S_FADE);
+            {
+                switch(warp.transitEffect)
+                {
+                default:
+                case LevelDoor::TRANSIT_SCROLL:
+                    // TODO: Implement the scrolling method
+                case LevelDoor::TRANSIT_NONE:
+                    g_levelVScreenFader[A].setupFader(8, 65, 0, ScreenFader::S_FADE);
+                    break;
+
+                case LevelDoor::TRANSIT_FADE:
+                    g_levelVScreenFader[A].setupFader(3, 65, 0, ScreenFader::S_FADE);
+                    break;
+
+                case LevelDoor::TRANSIT_CIRCLE_FADE:
+                    g_levelVScreenFader[A].setupFader(2, 65, 0, ScreenFader::S_CIRCLE,
+                                                      true,
+                                                      Maths::iRound(warp_exit.X + warp_exit.Width / 2),
+                                                      Maths::iRound(warp_exit.Y + warp_exit.Height /2),
+                                                      A);
+                    break;
+
+                case LevelDoor::TRANSIT_FLIP_H:
+                    g_levelVScreenFader[A].setupFader(3, 65, 0, ScreenFader::S_FLIP_H);
+                    break;
+
+                case LevelDoor::TRANSIT_FLIP_V:
+                    g_levelVScreenFader[A].setupFader(3, 65, 0, ScreenFader::S_FLIP_V);
+                    break;
+                }
+            }
 
             if(!warp.level.empty())
             {

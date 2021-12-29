@@ -113,6 +113,42 @@ static SDL_INLINE bool s_worldUpdateMusic(const Location_t &loc)
     return ret;
 }
 
+static SDL_INLINE double getWPHeight()
+{
+    switch(WorldPlayer[1].Type)
+    {
+    case 3:
+        return 44.0;
+        break;
+    case 4:
+        return 40.0;
+        break;
+    default:
+        return 32.0;
+        break;
+    }
+}
+
+//static SDL_INLINE double getWorldPlayerX()
+//{
+//    return WorldPlayer[1].Location.X;
+//}
+
+//static SDL_INLINE double getWorldPlayerY()
+//{
+//    return WorldPlayer[1].Location.Y - 10 + WorldPlayer[1].Location.Height - getWPHeight();
+//}
+
+static SDL_INLINE double getWorldPlayerCenterX()
+{
+    return WorldPlayer[1].Location.X + WorldPlayer[1].Location.Width / 2;
+}
+
+static SDL_INLINE double getWorldPlayerCenterY()
+{
+    return WorldPlayer[1].Location.Y - 10 + WorldPlayer[1].Location.Height - getWPHeight() / 2;
+}
+
 void WorldLoop()
 {
     // Keep them static to don't re-alloc them for every iteration
@@ -494,7 +530,9 @@ void WorldLoop()
                             StartWarp = level.StartWarp;
                             StopMusic();
                             PlaySound(SFX_LevelSelect);
-                            g_worldScreenFader.setupFader(2, 0, 65, ScreenFader::S_RECT);
+                            g_worldScreenFader.setupFader(2, 0, 65, ScreenFader::S_RECT,
+                                                          true,
+                                                          getWorldPlayerCenterX(), getWorldPlayerCenterY(), 1);
 
                             while(!g_worldScreenFader.m_full && GameIsActive)
                             {
@@ -544,7 +582,10 @@ void WorldLoop()
 //                        DoEvents();
 //                        PGE_Delay(1000);
                         int waitTicks = 65;
-                        g_worldScreenFader.setupFader(3, 0, 65, ScreenFader::S_RECT);
+
+                        g_worldScreenFader.setupFader(3, 0, 65, ScreenFader::S_RECT,
+                                                      true,
+                                                      getWorldPlayerCenterX(), getWorldPlayerCenterY(), 1);
                         while(waitTicks >= 0 && GameIsActive)
                         {
                             DoEvents();
@@ -582,7 +623,9 @@ void WorldLoop()
                         }
                         // -----------------------
 
-                        g_worldScreenFader.setupFader(3, 65, 0, ScreenFader::S_RECT);
+                        g_worldScreenFader.setupFader(3, 65, 0, ScreenFader::S_RECT,
+                                                      true,
+                                                      getWorldPlayerCenterX(), getWorldPlayerCenterY(), 1);
 //                        resetFrameTimer();
                     }
                 }

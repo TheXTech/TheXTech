@@ -327,6 +327,7 @@ set(THEXTECH_SRC
     src/player.cpp
     src/rand.cpp
     src/sorting.cpp
+    src/screen_fader.cpp
     src/npc/npc_hit.cpp
     src/npc/npc_kill.cpp
     src/npc/npc_update.cpp
