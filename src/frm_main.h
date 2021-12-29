@@ -140,6 +140,7 @@ public:
     void renderRectBR(int _left, int _top, int _right, int _bottom, float red, float green, float blue, float alpha);
 
     void renderCircle(int cx, int cy, int radius, float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f, bool filled = true);
+    void renderCircleHole(int cx, int cy, int radius, float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f);
 
     // Similar to BitBlt, but without masks, just draw a texture or it's fragment!
 //    void renderTextureI(int xDst, int yDst, int wDst, int hDst,
