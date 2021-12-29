@@ -516,7 +516,6 @@ void read_NPCs()
     {
         pLogWarning("numNPCs diverged (old %d, new %d) at frame %" PRId64 ".", o_numNPCs, numNPCs, frame_no);
         diverged = true;
-        return;
     }
 
     if(success)
