@@ -63,19 +63,20 @@ struct ScreenShake_t
 
         if(forceX <= 0 && forceY <= 0)
         {
-            frmMain.offsetViewport(0, 0);
             forceX = 0.0;
             forceY = 0.0;
             active = false;
         }
-        else
+        // always perform this section to keep the number of random calls consistent w/legacy sources
         {
             switch(type)
             {
             default:
             case SHAKE_RANDOM:
+                printf("forceX %f, forceY %f\n", forceX, forceY);
                 offsetX = iRand(forceX * 4) - forceX * 2;
                 offsetY = iRand(forceY * 4) - forceY * 2;
+                printf("offsetX %d, offsetY %d\n", offsetX, offsetY);
                 break;
             case SHAKE_SEQUENTIAL:
                 offsetX = forceX > 0 ? (int)round(sign * forceX) : 0;
