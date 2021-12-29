@@ -420,7 +420,6 @@ void read_status()
     if(o_randCalls != random_ncalls())
     {
         pLogWarning("randCalls diverged (old: %d, new: %ld) at frame %" PRId64 ".", o_randCalls, random_ncalls(), frame_no);
-        g_random_n_calls = o_randCalls;
         diverged = true;
 #ifdef DEBUG_RANDOM_CALLS
         for(int i = 0; i < g_random_calls.size(); i++)
