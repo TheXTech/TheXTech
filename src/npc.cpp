@@ -2190,7 +2190,7 @@ void NPCSpecial(int A)
     {
         npc.Direction = npc.DefaultDirection;
 
-        if(npc.Immune > 0)
+        if(npc.Immune > 0 && !fEqual(npc.Special, 3))
             npc.Special = 2;
 
         if(npc.Damage >= 30)
