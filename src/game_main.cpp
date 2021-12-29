@@ -1082,6 +1082,8 @@ void UpdateMacro()
                     computeFrameTime2();
                 }
 
+                updateScreenFaders();
+
                 LevelMacroCounter++;
 
                 if(LevelMacroCounter == (keyholeMax - 65))
