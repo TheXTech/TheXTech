@@ -2246,7 +2246,10 @@ void UpdatePlayer()
                         EndLevel = true;
                         LevelMacro = LEVELMACRO_OFF;
                         LevelMacroCounter = 0;
-                        g_levelScreenFader.setupFader(4, 0, 65, ScreenFader::S_FADE);
+                        if(g_config.EnableInterLevelFade)
+                            g_levelScreenFader.setupFader(4, 0, 65, ScreenFader::S_FADE);
+                        else
+                            g_levelScreenFader.setupFader(65, 0, 65, ScreenFader::S_FADE);
                         levelWaitForFade();
                     }
 

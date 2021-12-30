@@ -950,7 +950,10 @@ bool LivingPlayers() // Checks if anybody alive
 
 void ProcessLastDead()
 {
-    if(!BattleMode && LivingPlayersLeft() <= 1)
+    if(!g_config.EnableInterLevelFade || BattleMode)
+        return;
+
+    if(LivingPlayersLeft() <= 1)
     {
         FadeOutMusic(500);
         g_levelScreenFader.setupFader(3, 0, 65, ScreenFader::S_FADE);
@@ -6404,7 +6407,7 @@ void PlayerEffects(const int A)
 
             auto &w = Warp[p.Warp];
 
-            if((w.MapWarp || !w.level.empty()) && Maths::iRound(p.Effect2) == 2955 && !g_levelScreenFader.isFadingIn())
+            if(g_config.EnableInterLevelFade && (w.MapWarp || !w.level.empty()) && Maths::iRound(p.Effect2) == 2955 && !g_levelScreenFader.isFadingIn())
                 g_levelScreenFader.setupFader(2, 0, 65, ScreenFader::S_FADE);
 
             if(fEqual(p.Effect2, 2920))

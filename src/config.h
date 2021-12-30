@@ -48,6 +48,8 @@ extern struct Config_t
     bool    GameplayShakeScreenBowserIIIrd = true;
     //! Play "player grow" together with the "get item" sound to represent original games behaviour
     bool    SoundPlayerGrowWithGetItem = false;
+    //! Enables the inter-level fade effect
+    bool    EnableInterLevelFade = true;
 
 
     /* ---- Joystick ----*/

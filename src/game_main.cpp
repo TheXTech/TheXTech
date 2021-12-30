@@ -34,6 +34,7 @@
 #include "globals.h"
 #include "game_main.h"
 
+#include "config.h"
 #include "frame_timer.h"
 #include "compat.h"
 #include "blocks.h"
@@ -472,7 +473,10 @@ int GameMain(const CmdLineSetup_t &setup)
             OpenLevel(introPath);
             vScreenX[1] = -level[0].X;
 
-            g_levelScreenFader.setupFader(3, 65, 0, ScreenFader::S_FADE);
+            if(g_config.EnableInterLevelFade)
+                g_levelScreenFader.setupFader(3, 65, 0, ScreenFader::S_FADE);
+            else
+                clearScreenFaders();
 
             setMusicStartDelay(); // Don't start music until all gfx will be loaded
 
@@ -635,7 +639,10 @@ int GameMain(const CmdLineSetup_t &setup)
                 UpdateGraphics2(true);
                 resetFrameTimer();
 
-                g_worldScreenFader.setupFader(4, 65, 0, ScreenFader::S_FADE);
+                if(g_config.EnableInterLevelFade)
+                    g_worldScreenFader.setupFader(4, 65, 0, ScreenFader::S_FADE);
+                else
+                    g_worldScreenFader.clearFader();
 
                 // WorldLoop will automatically resume the music as needed
                 // delayedMusicStart(); // Allow music being started
@@ -796,7 +803,10 @@ int GameMain(const CmdLineSetup_t &setup)
 
             speedRun_triggerEnter();
 
-            g_levelScreenFader.setupFader(2, 65, 0, ScreenFader::S_FADE);
+            if(g_config.EnableInterLevelFade)
+                g_levelScreenFader.setupFader(2, 65, 0, ScreenFader::S_FADE);
+            else
+                clearScreenFaders();
 
             delayedMusicStart(); // Allow music being started
 
@@ -1009,7 +1019,7 @@ void UpdateMacro()
         {
             LevelMacroCounter++;
 
-            if(LevelMacroCounter == 34)
+            if(g_config.EnableInterLevelFade && LevelMacroCounter == 34)
                 g_levelScreenFader.setupFader(1, 0, 65, ScreenFader::S_FADE);
 
             if(LevelMacroCounter >= 100)
@@ -1040,7 +1050,7 @@ void UpdateMacro()
 
         LevelMacroCounter++;
 
-        if(LevelMacroCounter == 395)
+        if(g_config.EnableInterLevelFade && LevelMacroCounter == 395)
             g_levelScreenFader.setupFader(1, 0, 65, ScreenFader::S_FADE);
 
         if(LevelMacroCounter >= 460)
@@ -1094,7 +1104,7 @@ void UpdateMacro()
 
                 LevelMacroCounter++;
 
-                if(LevelMacroCounter == (keyholeMax - 65))
+                if(g_config.EnableInterLevelFade && LevelMacroCounter == (keyholeMax - 65))
                     g_levelScreenFader.setupFader(1, 0, 65, ScreenFader::S_FADE);
 
                 if(LevelMacroCounter >= keyholeMax) /*300*/
@@ -1135,7 +1145,7 @@ void UpdateMacro()
 
         LevelMacroCounter++;
 
-        if(LevelMacroCounter == 235)
+        if(g_config.EnableInterLevelFade && LevelMacroCounter == 235)
             g_levelScreenFader.setupFader(1, 0, 65, ScreenFader::S_FADE);
 
         if(LevelMacroCounter >= 300)
@@ -1170,7 +1180,7 @@ void UpdateMacro()
         if(LevelMacroCounter == 250)
             PlaySound(SFX_GameBeat);
 
-        if(LevelMacroCounter == 735)
+        if(g_config.EnableInterLevelFade && LevelMacroCounter == 735)
             g_levelScreenFader.setupFader(1, 0, 65, ScreenFader::S_FADE);
 
         if(LevelMacroCounter >= 800)
@@ -1208,7 +1218,7 @@ void UpdateMacro()
 
         LevelMacroCounter++;
 
-        if(LevelMacroCounter == 235)
+        if(g_config.EnableInterLevelFade && LevelMacroCounter == 235)
             g_levelScreenFader.setupFader(1, 0, 65, ScreenFader::S_FADE);
 
         if(LevelMacroCounter >= 300)
@@ -1257,7 +1267,7 @@ void UpdateMacro()
 
         LevelMacroCounter++;
 
-        if(LevelMacroCounter == 598)
+        if(g_config.EnableInterLevelFade && LevelMacroCounter == 598)
         {
             bool canTrack = (Player[1].Location.X < level[Player[1].Section].Width);
             double focusX = canTrack ?

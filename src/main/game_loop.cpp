@@ -25,6 +25,7 @@
 #include <InterProcess/intproc.h>
 
 #include "../globals.h"
+#include "../config.h"
 #include "../frame_timer.h"
 #include "../game_main.h"
 #include "../sound.h"
@@ -96,7 +97,7 @@ void GameLoop()
         {
             BattleOutro++;
 
-            if(BattleOutro == 195)
+            if(g_config.EnableInterLevelFade && BattleOutro == 195)
                 g_levelScreenFader.setupFader(1, 0, 65, ScreenFader::S_FADE);
 
             if(BattleOutro == 260)

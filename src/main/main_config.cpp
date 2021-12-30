@@ -205,6 +205,7 @@ void OpenConfig()
         config.read("enable-yoshi-ground-pound-screen-shake", g_config.GameplayShakeScreenPound, true);
         config.read("enable-bowser-iiird-screen-shake", g_config.GameplayShakeScreenBowserIIIrd, true);
         config.read("sfx-player-grow-with-got-item", g_config.SoundPlayerGrowWithGetItem, false);
+        config.read("enable-inter-level-fade-effect", g_config.EnableInterLevelFade, true);
         config.endGroup();
 
         config.beginGroup("joystick");
@@ -387,6 +388,7 @@ void SaveConfig()
         config.setValue("enable-yoshi-ground-pound-screen-shake", g_config.GameplayShakeScreenPound);
         config.setValue("enable-bowser-iiird-screen-shake", g_config.GameplayShakeScreenBowserIIIrd);
         config.setValue("sfx-player-grow-with-got-item", g_config.SoundPlayerGrowWithGetItem);
+        config.setValue("enable-inter-level-fade-effect", g_config.EnableInterLevelFade);
     }
     config.endGroup();
 
