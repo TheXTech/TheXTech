@@ -486,8 +486,7 @@ static void updateIntroLevelActivity()
     UpdateGraphics();
     UpdateSound();
     UpdateEvents();
-
-    g_levelScreenFader.update();
+    updateScreenFaders();
 }
 
 void MenuLoop()
@@ -509,7 +508,7 @@ void MenuLoop()
         UpdateGraphics();
         UpdateSound();
         UpdateEvents();
-        g_levelScreenFader.update();
+        updateScreenFaders();
     }
 
     if(MenuMouseDown)

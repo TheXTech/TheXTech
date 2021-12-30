@@ -377,9 +377,7 @@ int GameMain(const CmdLineSetup_t &setup)
                     Player[A].Dead = true;
             }
 
-            g_levelScreenFader.clearFader();
-            for(int s = 0; s < 3; ++s)
-                g_levelVScreenFader[s].clearFader();
+            clearScreenFaders();
 
             // Run the frame-loop
             runFrameLoop(&OutroLoop,

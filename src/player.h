@@ -42,12 +42,14 @@ int CheckDead();
 // Public Function CheckLiving() As Integer 'Check if players are alive, returns the first player or 0 if everyones dead
 // Check if players are alive, returns the first player or 0 if everyones dead
 int CheckLiving();
+int LivingPlayersLeft();
 // Public Function LivingPlayers() As Boolean 'true if there are still living players
 // true if there are still living players
 bool LivingPlayers();
 // Public Sub EveryonesDead() 'Handles the game when all players have died
 // Handles the game when all players have died
 void EveryonesDead();
+void ProcessLastDead();
 // Public Sub UnDuck(A As Integer) 'Un Duck the player
 // Un Duck the player
 void UnDuck(const int A);

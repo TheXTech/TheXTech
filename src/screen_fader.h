@@ -28,6 +28,7 @@ struct ScreenFader
 {
     bool m_active = false;
     bool m_full = false;
+    bool m_complete = false;
     PGE_Fader m_fader;
     float m_scale = 0.0f;
 
@@ -59,6 +60,9 @@ struct ScreenFader
 
     void setupFader(int step, int start, int goal, Shape shape, bool useFocus = false, int focusX = -1, int focusY = -1, int screen = -1);
     void setTrackedFocus(double *x, double *y, double offX, double offY);
+
+    bool isComplete();
+    bool isVisible();
 
     void update();
 

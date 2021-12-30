@@ -913,16 +913,43 @@ int CheckLiving()
     return 0;
 }
 
-bool LivingPlayers()
+int LivingPlayersLeft()
 {
-    bool tempLivingPlayers = false;
-    int A = 0;
-    for(A = 1; A <= numPlayers; A++)
+    int ret = 0;
+
+    for(int A = 1; A <= numPlayers; A++)
     {
         if(!Player[A].Dead)
-            tempLivingPlayers = true;
+            ret++;
     }
-    return tempLivingPlayers;
+
+    return ret;
+}
+
+bool LivingPlayers() // Checks if anybody alive
+{
+    bool ret = false;
+
+    for(int A = 1; A <= numPlayers; A++)
+    {
+        if(!Player[A].Dead)
+        {
+            ret = true;
+            break;
+        }
+    }
+
+    return ret;
+}
+
+void ProcessLastDead()
+{
+    if(!BattleMode && LivingPlayersLeft() <= 1)
+    {
+        FadeOutMusic(500);
+        g_levelScreenFader.setupFader(3, 0, 65, ScreenFader::S_FADE);
+        levelWaitForFade();
+    }
 }
 
 void EveryonesDead()
@@ -930,16 +957,19 @@ void EveryonesDead()
 //    int A = 0; // UNUSED
     if(BattleMode)
         return;
+
+    StopMusic();
     LevelMacro = LEVELMACRO_OFF;
     FreezeNPCs = false;
-    StopMusic();
-    frmMain.setTargetTexture();
-    frmMain.clearBuffer();
-    frmMain.repaint();
+
+// Play fade effect instead of wait (see ProcessLastDead() above)
+//    frmMain.setTargetTexture();
+//    frmMain.clearBuffer();
+//    frmMain.repaint();
 //    if(MagicHand)
 //        BitBlt frmLevelWindow::vScreen[1].hdc, 0, 0, frmLevelWindow::vScreen[1].ScaleWidth, frmLevelWindow::vScreen[1].ScaleHeight, 0, 0, 0, vbWhiteness;
 
-    PGE_Delay(500);
+    //PGE_Delay(500);
 
     Lives--;
     if(Lives >= 0.f)
@@ -5779,7 +5809,7 @@ void PlayerEffects(const int A)
                 }
             }
 
-            if(g_levelVScreenFader[A].m_full || g_levelVScreenFader[A].m_active)
+            if(g_levelVScreenFader[A].isVisible())
             {
                 switch(warp.transitEffect)
                 {
@@ -6173,7 +6203,7 @@ void PlayerEffects(const int A)
             p.Effect2 = 0;
             p.WarpCD = 40;
 
-            if(g_levelVScreenFader[A].m_full || g_levelVScreenFader[A].m_active)
+            if(g_levelVScreenFader[A].isVisible())
             {
                 switch(warp.transitEffect)
                 {

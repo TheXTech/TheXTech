@@ -47,12 +47,38 @@
 ScreenFader g_levelScreenFader;
 RangeArr<ScreenFader, 0, 2> g_levelVScreenFader;
 
+void clearScreenFaders()
+{
+    g_levelScreenFader.clearFader();
+    for(int s = 0; s < 3; ++s)
+        g_levelVScreenFader[s].clearFader();
+}
+
 void updateScreenFaders()
 {
     g_levelScreenFader.update();
 
     for(int s = 0; s < 3; ++s)
         g_levelVScreenFader[s].update();
+}
+
+void levelWaitForFade()
+{
+    while(!g_levelScreenFader.isComplete() && GameIsActive)
+    {
+        DoEvents();
+
+        if(canProceedFrame())
+        {
+            computeFrameTime1();
+            UpdateGraphics();
+            UpdateSound();
+            DoEvents();
+            computeFrameTime2();
+            updateScreenFaders();
+        }
+        PGE_Delay(1);
+    }
 }
 
 

@@ -262,7 +262,10 @@ void UpdatePlayer()
                         KillPlayer(A);
                 }
                 else if(Player[A].TimeToLive >= 200) // ScreenType = 1
+                {
+                    ProcessLastDead(); // Fade out screen if the last player died
                     KillPlayer(A); // Time to die
+                }
             }
         }
         else if(Player[A].Dead)
@@ -2243,22 +2246,7 @@ void UpdatePlayer()
                         LevelMacro = LEVELMACRO_OFF;
                         LevelMacroCounter = 0;
                         g_levelScreenFader.setupFader(4, 0, 65, ScreenFader::S_FADE);
-
-                        while(!g_levelScreenFader.m_full && GameIsActive)
-                        {
-                            DoEvents();
-
-                            if(canProceedFrame())
-                            {
-                                computeFrameTime1();
-                                UpdateGraphics();
-                                UpdateSound();
-                                DoEvents();
-                                computeFrameTime2();
-                                updateScreenFaders();
-                            }
-                            PGE_Delay(1);
-                        }
+                        levelWaitForFade();
                     }
 
                     hBoundsHandled = true;

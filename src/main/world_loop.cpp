@@ -43,6 +43,29 @@
 //! Holds the screen overlay for the world map
 ScreenFader g_worldScreenFader;
 
+void worldWaitForFade(int waitTicks)
+{
+    bool ticks = waitTicks > 0;
+    while(((!ticks && !g_worldScreenFader.isComplete()) || (ticks && waitTicks >= 0)) && GameIsActive)
+    {
+        DoEvents();
+
+        if(canProceedFrame())
+        {
+            computeFrameTime1();
+            UpdateGraphics2();
+            UpdateSound();
+            DoEvents();
+            computeFrameTime2();
+            g_worldScreenFader.update();
+            if(waitTicks >= 0)
+                waitTicks--;
+        }
+
+        PGE_Delay(1);
+    }
+}
+
 
 static SDL_INLINE int computeStarsShowingPolicy(int ll, int cur)
 {
@@ -533,23 +556,7 @@ void WorldLoop()
                             g_worldScreenFader.setupFader(2, 0, 65, ScreenFader::S_RECT,
                                                           true,
                                                           getWorldPlayerCenterX(), getWorldPlayerCenterY(), 1);
-
-                            while(!g_worldScreenFader.m_full && GameIsActive)
-                            {
-                                DoEvents();
-
-                                if(canProceedFrame())
-                                {
-                                    computeFrameTime1();
-                                    UpdateGraphics2();
-                                    UpdateSound();
-                                    DoEvents();
-                                    computeFrameTime2();
-                                    g_worldScreenFader.update();
-                                }
-
-                                PGE_Delay(1);
-                            }
+                            worldWaitForFade();
 
                             SoundPause[26] = 200;
                             curWorldLevel = level.index;
@@ -581,27 +588,10 @@ void WorldLoop()
 //                        frmMain.repaint();
 //                        DoEvents();
 //                        PGE_Delay(1000);
-                        int waitTicks = 65;
-
                         g_worldScreenFader.setupFader(3, 0, 65, ScreenFader::S_RECT,
                                                       true,
                                                       getWorldPlayerCenterX(), getWorldPlayerCenterY(), 1);
-                        while(waitTicks >= 0 && GameIsActive)
-                        {
-                            DoEvents();
-                            if(canProceedFrame())
-                            {
-                                computeFrameTime1();
-                                UpdateGraphics2();
-                                UpdateSound();
-                                DoEvents();
-                                computeFrameTime2();
-                                g_worldScreenFader.update();
-                                waitTicks--;
-                            }
-
-                            PGE_Delay(1);
-                        }
+                        worldWaitForFade(65);
 
                         // Moved from above
                         if(int(level.WarpX) != -1)

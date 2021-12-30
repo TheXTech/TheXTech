@@ -56,6 +56,7 @@ void ScreenFader::setupFader(int step, int start, int goal, Shape shape, bool us
     m_scale = (float)m_fader.fadeRatio();
     m_active = true;
     m_full = false;
+    m_complete = false;
     m_focusSet = useFocus;
     m_focusX = focusX;
     m_focusY = focusY;
@@ -74,6 +75,16 @@ void ScreenFader::setTrackedFocus(double *x, double *y, double offX, double offY
     m_focusOffsetY = offY;
 }
 
+bool ScreenFader::isComplete()
+{
+    return m_complete;
+}
+
+bool ScreenFader::isVisible()
+{
+    return m_active || m_full;
+}
+
 void ScreenFader::update()
 {
     if(!m_active)
@@ -82,9 +93,15 @@ void ScreenFader::update()
     if(!m_fader.isFading())
     {
         if(m_scale <= 0.0f)
+        {
             m_active = false;
+            m_complete = true;
+        }
         else if(m_scale >= 1.0f)
+        {
             m_full = true;
+            m_complete = true;
+        }
     }
 
     if(m_focusSet)
