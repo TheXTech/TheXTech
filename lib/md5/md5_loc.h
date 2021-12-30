@@ -17,12 +17,13 @@
 
 /// For now we are assuming everything is in little endian byte-order
 
-namespace md5 {
+namespace md5
+{
     /*
      * NOTE: the following is assumed to generate a 32-bit unsigned data
      * type.
      */
-    const unsigned int UINT32_MAX = 4294967295U;
+    const unsigned int X_UINT32_MAX = 4294967295U;
 
     /*
      * T denotes the integer part of the i-th element of the function:
@@ -54,10 +55,10 @@ namespace md5 {
         return (data << shift_bits) | (data >> (32 - shift_bits));
     }
 
-    inline unsigned int F(unsigned int x, unsigned int y, unsigned int z) {return (x & y) | (~x & z);};
-    inline unsigned int G(unsigned int x, unsigned int y, unsigned int z) {return (x & z) | (y & ~z);};
-    inline unsigned int H(unsigned int x, unsigned int y, unsigned int z) {return x ^ y ^ z;};
-    inline unsigned int I(unsigned int x, unsigned int y, unsigned int z) {return y ^ (x | ~z);};
+    inline unsigned int F(unsigned int x, unsigned int y, unsigned int z) {return (x & y) | (~x & z);}
+    inline unsigned int G(unsigned int x, unsigned int y, unsigned int z) {return (x & z) | (y & ~z);}
+    inline unsigned int H(unsigned int x, unsigned int y, unsigned int z) {return x ^ y ^ z;}
+    inline unsigned int I(unsigned int x, unsigned int y, unsigned int z) {return y ^ (x | ~z);}
 
     inline void FF(unsigned int &a, unsigned int b, unsigned int c, unsigned int d, unsigned int Xk, unsigned int s, unsigned int i) {
         #if MD5_DEBUG
@@ -71,7 +72,7 @@ namespace md5 {
         #if MD5_DEBUG
             std::cout << "A = " << a << "\n";
         #endif
-    };
+    }
 
     inline void GG(unsigned int &a, unsigned int b, unsigned int c, unsigned int d, unsigned int Xk, unsigned int s, unsigned int i) {
         #if MD5_DEBUG
@@ -85,7 +86,7 @@ namespace md5 {
         #if MD5_DEBUG
             std::cout << "A = " << a << "\n";
         #endif // MD5_DEBUG
-    };
+    }
 
     inline void HH(unsigned int &a, unsigned int b, unsigned int c, unsigned int d, unsigned int Xk, unsigned int s, unsigned int i) {
         #if MD5_DEBUG
@@ -99,7 +100,7 @@ namespace md5 {
         #if MD5_DEBUG
             std::cout << "A = " << a << "\n";
         #endif // MD5_DEBUG
-    };
+    }
     inline void II(unsigned int &a, unsigned int b, unsigned int c, unsigned int d, unsigned int Xk, unsigned int s, unsigned int i) {
         #if MD5_DEBUG
             std::cout << "\nA: " << a << "\nB: " << b << "\nC: " << c << "\nD: " << d << "\nX[" << i - 48 << "]: " << Xk << "\ns: " << S4[s] << "\nT: " << T[i] << "\n";
@@ -112,7 +113,7 @@ namespace md5 {
         #if MD5_DEBUG
             std::cout << "A = " << a << "\n";
         #endif // MD5_DEBUG
-    };
+    }
 
     /*
      * Define my endian-ness.  Could not do in a portable manner using the

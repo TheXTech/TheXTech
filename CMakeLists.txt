@@ -169,6 +169,7 @@ include(lib/IniProcessor/IniProcessor.cmake)
 include(lib/Utils/Utils.cmake)
 include(lib/Logger/logger.cmake)
 include(lib/tclap/tclap.cmake)
+include(lib/md5/md5.cmake)
 if(WIN32)
     include(lib/CrashHandler/StackWalker/StackWalker.cmake)
 endif()
@@ -254,6 +255,7 @@ set(LIB_SRC
     ${FILEMAPPER_SRCS}
     ${FMT_SRCS}
     ${STACK_WALKER_SRCS}
+    ${MD5_SRCS}
     lib/CrashHandler/crash_handler.cpp
     lib/Graphics/graphics_funcs.cpp
     lib/Graphics/image_size.cpp
