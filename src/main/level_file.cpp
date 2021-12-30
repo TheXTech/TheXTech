@@ -458,8 +458,11 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         if(npc.Type == NPCID_CHECKPOINT) // Is a checkpoint
         {
             checkPointId++;
-            npc.Special = checkPointId;
-            npc.DefaultSpecial = int(npc.Special);
+            if(compatModern)
+            {
+                npc.Special = checkPointId;
+                npc.DefaultSpecial = int(npc.Special);
+            }
         }
         else if(npc.Type == NPCID_STAR_SMB3 || npc.Type == NPCID_STAR_SMW) // Is a star
         {
