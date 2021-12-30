@@ -48,7 +48,7 @@ int readSeed()
 {
     g_random_engine.seed(last_seed);
     return last_seed;
-};
+}
 
 long random_ncalls()
 {
