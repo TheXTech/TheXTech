@@ -34,10 +34,37 @@
 #include "../collision.h"
 #include "../main/trees.h"
 #include "../compat.h"
+#include "world_globals.h"
 #include "level_file.h"
 #include "speedrunner.h"
 
 #include "../pseudo_vb.h"
+
+//! Holds the screen overlay for the world map
+ScreenFader g_worldScreenFader;
+
+void worldWaitForFade(int waitTicks)
+{
+    bool ticks = waitTicks > 0;
+    while(((!ticks && !g_worldScreenFader.isComplete()) || (ticks && waitTicks >= 0)) && GameIsActive)
+    {
+        DoEvents();
+
+        if(canProceedFrame())
+        {
+            computeFrameTime1();
+            UpdateGraphics2();
+            UpdateSound();
+            DoEvents();
+            computeFrameTime2();
+            g_worldScreenFader.update();
+            if(waitTicks >= 0)
+                waitTicks--;
+        }
+
+        PGE_Delay(1);
+    }
+}
 
 
 static SDL_INLINE int computeStarsShowingPolicy(int ll, int cur)
@@ -109,6 +136,42 @@ static SDL_INLINE bool s_worldUpdateMusic(const Location_t &loc)
     return ret;
 }
 
+static SDL_INLINE double getWPHeight()
+{
+    switch(WorldPlayer[1].Type)
+    {
+    case 3:
+        return 44.0;
+        break;
+    case 4:
+        return 40.0;
+        break;
+    default:
+        return 32.0;
+        break;
+    }
+}
+
+//static SDL_INLINE double getWorldPlayerX()
+//{
+//    return WorldPlayer[1].Location.X;
+//}
+
+//static SDL_INLINE double getWorldPlayerY()
+//{
+//    return WorldPlayer[1].Location.Y - 10 + WorldPlayer[1].Location.Height - getWPHeight();
+//}
+
+static SDL_INLINE double getWorldPlayerCenterX()
+{
+    return WorldPlayer[1].Location.X + WorldPlayer[1].Location.Width / 2;
+}
+
+static SDL_INLINE double getWorldPlayerCenterY()
+{
+    return WorldPlayer[1].Location.Y - 10 + WorldPlayer[1].Location.Height - getWPHeight() / 2;
+}
+
 void WorldLoop()
 {
     // Keep them static to don't re-alloc them for every iteration
@@ -144,6 +207,8 @@ void WorldLoop()
     UpdateGraphics2();
     UpdateControls();
     UpdateSound();
+
+    g_worldScreenFader.update();
 
     if(curWorldLevel > 0)
     {
@@ -456,6 +521,7 @@ void WorldLoop()
                 WorldLevel_t &level = *t;
                 if(CheckCollision(tempLocation, level.Location))
                 {
+#if 0 // Moved into the handler of level ending
                     if(int(level.WarpX) != -1)
                         WorldPlayer[1].Location.X = level.WarpX;
 
@@ -477,6 +543,7 @@ void WorldLoop()
                             }
                         }
                     }
+#endif
 
                     if(!level.FileName.empty() && level.FileName != ".lvl" && level.FileName != ".lvlx")
                     {
@@ -486,19 +553,28 @@ void WorldLoop()
                             StartWarp = level.StartWarp;
                             StopMusic();
                             PlaySound(SFX_LevelSelect);
+                            g_worldScreenFader.setupFader(2, 0, 65, ScreenFader::S_RECT,
+                                                          true,
+                                                          getWorldPlayerCenterX(), getWorldPlayerCenterY(), 1);
+                            worldWaitForFade();
+
                             SoundPause[26] = 200;
                             curWorldLevel = level.index;
                             LevelSelect = false;
-                            GameThing();
+
                             ClearLevel();
-                            PGE_Delay(1000);
+
                             std::string levelPath = SelectWorld[selWorld].WorldPath + level.FileName;
                             if(!OpenLevel(levelPath))
                             {
+                                delayedMusicStart(); // Allow music being started
                                 MessageText = fmt::format_ne("ERROR: Can't open \"{0}\": file doesn't exist or corrupted.", level.FileName);
                                 PauseGame(1);
                                 ErrorQuit = true;
                             }
+
+                            GameThing(1000, 3);
+
                             break;
                         }
                     }
@@ -506,13 +582,41 @@ void WorldLoop()
                     {
                         musicReset = true;
                         StopMusic();
-                        PlaySound(SFX_LevelSelect);
-                        frmMain.setTargetTexture();
-                        frmMain.clearBuffer();
-                        frmMain.repaint();
-                        DoEvents();
-                        PGE_Delay(1000);
-                        resetFrameTimer();
+                        PlaySound(SFX_Warp);
+//                        frmMain.setTargetTexture();
+//                        frmMain.clearBuffer();
+//                        frmMain.repaint();
+//                        DoEvents();
+//                        PGE_Delay(1000);
+                        g_worldScreenFader.setupFader(3, 0, 65, ScreenFader::S_RECT,
+                                                      true,
+                                                      getWorldPlayerCenterX(), getWorldPlayerCenterY(), 1);
+                        worldWaitForFade(65);
+
+                        // Moved from above
+                        if(int(level.WarpX) != -1)
+                            WorldPlayer[1].Location.X = level.WarpX;
+                        if(int(level.WarpY) != -1)
+                            WorldPlayer[1].Location.Y = level.WarpY;
+
+                        LevelBeatCode = 6;
+                        treeWorldLevelQuery(WorldPlayer[1].Location, larr2, true);
+                        //for(B = 1; B <= numWorldLevels; B++)
+                        for(auto *t2 : larr2)
+                        {
+                            WorldLevel_t &level2 = *t2;
+                            if(CheckCollision(WorldPlayer[1].Location, level2.Location))
+                            {
+                                level2.Active = true;
+                                curWorldLevel = level2.index;
+                            }
+                        }
+                        // -----------------------
+
+                        g_worldScreenFader.setupFader(3, 65, 0, ScreenFader::S_RECT,
+                                                      true,
+                                                      getWorldPlayerCenterX(), getWorldPlayerCenterY(), 1);
+//                        resetFrameTimer();
                     }
                 }
             }
@@ -538,6 +642,9 @@ void WorldLoop()
             StartMusic(curWorldMusic);
             // musicReset = false;
         }
+
+        if(delayMusicIsSet())
+            delayedMusicStart();
     }
     else if(WorldPlayer[1].Move == 1)
     {
@@ -603,7 +710,6 @@ void WorldLoop()
             WorldPlayer[1].Move3 = true;
         }
     }
-
 }
 
 void LevelPath(const WorldLevel_t &Lvl, int Direction, bool Skp)
@@ -832,6 +938,10 @@ void PathWait()
             speedRun_tick();
             UpdateGraphics2();
             UpdateSound();
+            g_worldScreenFader.update();
+
+            if(delayMusicIsSet())
+                delayedMusicStart();
 
             C++;
             computeFrameTime1();

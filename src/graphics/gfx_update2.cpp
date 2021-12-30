@@ -25,7 +25,9 @@
 #include "../player.h"
 #include "../main/speedrunner.h"
 #include "../main/trees.h"
+#include "../main/world_globals.h"
 #include "../compat.h"
+#include "../screen_fader.h"
 
 #include <fmt_format_ne.h>
 
@@ -72,10 +74,10 @@ void UpdateGraphics2(bool skipRepaint)
 
     int A = 0;
     int B = 0;
-    int Z = 0;
+    const int Z = 1;
     int WPHeight = 0;
 //    Location_t tempLocation;
-    Z = 1;
+    //Z = 1;
 
     vScreen[Z].Left = 0;
     vScreen[Z].Top = 0;
@@ -432,22 +434,22 @@ void UpdateGraphics2(bool skipRepaint)
     { // NOT AN EDITOR!!!
         if(WorldPlayer[1].Type == 0)
             WorldPlayer[1].Type = 1;
-        if(Player[1].Character == 1)
-            WorldPlayer[1].Type = 1;
-        if(Player[1].Character == 2)
-            WorldPlayer[1].Type = 2;
-        if(Player[1].Character == 3)
-            WorldPlayer[1].Type = 3;
-        if(Player[1].Character == 4)
-            WorldPlayer[1].Type = 4;
-        if(Player[1].Character == 5)
-            WorldPlayer[1].Type = 5;
-        if(WorldPlayer[1].Type == 3)
+
+        WorldPlayer[1].Type = Player[1].Character;
+
+        switch(WorldPlayer[1].Type)
+        {
+        case 3:
             WPHeight = 44;
-        else if(WorldPlayer[1].Type == 4)
+            break;
+        case 4:
             WPHeight = 40;
-        else
+            break;
+        default:
             WPHeight = 32;
+            break;
+        }
+
 //        frmMain.renderTexture(vScreenX[Z] + WorldPlayer[1].Location.X, vScreenY[Z] + WorldPlayer[1].Location.Y - 10 + WorldPlayer[1].Location.Height - WPHeight, WorldPlayer[1].Location.Width, WPHeight, GFXPlayerMask[WorldPlayer[1].Type], 0, WPHeight * WorldPlayer[1].Frame);
 //        frmMain.renderTexture(vScreenX[Z] + WorldPlayer[1].Location.X, vScreenY[Z] + WorldPlayer[1].Location.Y - 10 + WorldPlayer[1].Location.Height - WPHeight, WorldPlayer[1].Location.Width, WPHeight, GFXPlayer[WorldPlayer[1].Type], 0, WPHeight * WorldPlayer[1].Frame);
         frmMain.renderTexture(vScreenX[Z] + WorldPlayer[1].Location.X,
@@ -497,7 +499,7 @@ void UpdateGraphics2(bool skipRepaint)
             Player[A].Controls.Right = false;
             if(Player[A].Duck)
                 UnDuck(A);
-            PlayerFrame(A);
+            PlayerFrame(Player[A]);
 
             if(Player[A].Mount == 3)
             {
@@ -752,6 +754,8 @@ void UpdateGraphics2(bool skipRepaint)
                 frmMain.renderTexture(252 + 56, 275 + (MenuCursor * 35), 16, 16, GFX.MCursor[0], 0, 0);
             }
         }
+
+        g_worldScreenFader.draw();
 
         if(PrintFPS > 0)
             SuperPrint(std::to_string(int(PrintFPS)), 1, 8, 8, 0.f, 1.f, 0.f);

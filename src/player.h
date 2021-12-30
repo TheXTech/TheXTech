@@ -42,12 +42,14 @@ int CheckDead();
 // Public Function CheckLiving() As Integer 'Check if players are alive, returns the first player or 0 if everyones dead
 // Check if players are alive, returns the first player or 0 if everyones dead
 int CheckLiving();
+int LivingPlayersLeft();
 // Public Function LivingPlayers() As Boolean 'true if there are still living players
 // true if there are still living players
 bool LivingPlayers();
 // Public Sub EveryonesDead() 'Handles the game when all players have died
 // Handles the game when all players have died
 void EveryonesDead();
+void ProcessLastDead();
 // Public Sub UnDuck(A As Integer) 'Un Duck the player
 // Un Duck the player
 void UnDuck(const int A);
@@ -55,6 +57,7 @@ void UnDuck(const int A);
 void CheckSection(const int A);
 // Public Sub PlayerFrame(A As Integer)
 void PlayerFrame(const int A);
+void PlayerFrame(Player_t &p);
 // Public Sub UpdatePlayerBonus(A As Integer, B As Integer)
 void UpdatePlayerBonus(const int A, const int B);
 // Public Sub TailSwipe(plr As Integer, Optional bool As Boolean = False, Optional Stab As Boolean = False, Optional StabDir As Integer = 0)  'for whacking something with the tail
@@ -97,6 +100,7 @@ void PlayerCollide(const int A); //PRIVATE
 void PlayerGrabCode(const int A, bool DontResetGrabTime = false);
 // Public Sub LinkFrame(A As Integer)
 void LinkFrame(const int A);
+void LinkFrame(Player_t &p);
 // Private Sub PlayerEffects(A As Integer)
 void PlayerEffects(const int A);
 

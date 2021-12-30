@@ -38,6 +38,7 @@
 #include "editor.h"
 #include "layers.h"
 #include "main/level_file.h"
+#include "main/game_globals.h"
 #include "main/trees.h"
 #include "main/menu_main.h"
 #include "compat.h"
@@ -917,16 +918,43 @@ int CheckLiving()
     return 0;
 }
 
-bool LivingPlayers()
+int LivingPlayersLeft()
 {
-    bool tempLivingPlayers = false;
-    int A = 0;
-    for(A = 1; A <= numPlayers; A++)
+    int ret = 0;
+
+    for(int A = 1; A <= numPlayers; A++)
     {
         if(!Player[A].Dead)
-            tempLivingPlayers = true;
+            ret++;
     }
-    return tempLivingPlayers;
+
+    return ret;
+}
+
+bool LivingPlayers() // Checks if anybody alive
+{
+    bool ret = false;
+
+    for(int A = 1; A <= numPlayers; A++)
+    {
+        if(!Player[A].Dead)
+        {
+            ret = true;
+            break;
+        }
+    }
+
+    return ret;
+}
+
+void ProcessLastDead()
+{
+    if(!BattleMode && LivingPlayersLeft() <= 1)
+    {
+        FadeOutMusic(500);
+        g_levelScreenFader.setupFader(3, 0, 65, ScreenFader::S_FADE);
+        levelWaitForFade();
+    }
 }
 
 void EveryonesDead()
@@ -934,16 +962,19 @@ void EveryonesDead()
 //    int A = 0; // UNUSED
     if(BattleMode)
         return;
+
+    StopMusic();
     LevelMacro = LEVELMACRO_OFF;
     FreezeNPCs = false;
-    StopMusic();
-    frmMain.setTargetTexture();
-    frmMain.clearBuffer();
-    frmMain.repaint();
+
+// Play fade effect instead of wait (see ProcessLastDead() above)
+//    frmMain.setTargetTexture();
+//    frmMain.clearBuffer();
+//    frmMain.repaint();
 //    if(MagicHand)
 //        BitBlt frmLevelWindow::vScreen[1].hdc, 0, 0, frmLevelWindow::vScreen[1].ScaleWidth, frmLevelWindow::vScreen[1].ScaleHeight, 0, 0, 0, vbWhiteness;
 
-    PGE_Delay(500);
+    //PGE_Delay(500);
 
     Lives--;
     if(Lives >= 0.f)
@@ -1140,9 +1171,14 @@ void CheckSection(const int A)
 
 void PlayerFrame(const int A)
 {
+    PlayerFrame(Player[A]);
+}
+
+void PlayerFrame(Player_t &p)
+{
 // updates the players GFX
     Location_t tempLocation;
-    auto &p = Player[A];
+//    auto &p = Player[A];
 
 // cause the flicker when he is immune
     if(p.Effect != 9)
@@ -1166,7 +1202,7 @@ void PlayerFrame(const int A)
 // find frames for link
     if(p.Character == 5)
     {
-        LinkFrame(A);
+        LinkFrame(p);
         return;
     }
 
@@ -5106,8 +5142,13 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
 
 void LinkFrame(const int A)
 {
+    LinkFrame(Player[A]);
+}
+
+void LinkFrame(Player_t &p)
+{
     Location_t tempLocation;
-    auto &p = Player[A];
+    //auto &p = Player[A];
 
     p.MountOffsetY = 0;
 
@@ -5504,14 +5545,23 @@ void PlayerEffects(const int A)
 
         if(p.Effect2 == 0.0) // Entering pipe
         {
+            double leftToGoal = 0.0;
+            double sign = +1.0;
+
             if(warp_dir_enter == 3)
             {
                 p.Location.Y += 1;
                 p.Location.X = warp_enter.X + warp_enter.Width / 2.0 - p.Location.Width / 2.0;
+
+                sign = (warp_enter.Y + warp_enter.Height) > p.Location.Y ? +1.0 : -1.0;
+                leftToGoal = SDL_fabs((warp_enter.Y + warp_enter.Height) - p.Location.Y) * sign;
+
                 if(p.Location.Y > warp_enter.Y + warp_enter.Height + 8)
                     p.Effect2 = 1;
+
                 if(p.Mount == 0)
                     p.Frame = 15;
+
                 if(p.HoldingNPC > 0)
                 {
                     NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
@@ -5522,8 +5572,13 @@ void PlayerEffects(const int A)
             {
                 p.Location.Y -= 1;
                 p.Location.X = warp_enter.X + warp_enter.Width / 2.0 - p.Location.Width / 2.0;
+
+                sign = (p.Location.Y + p.Location.Height) > warp_enter.Y ? +1.0 : -1.0;
+                leftToGoal = SDL_fabs(warp_enter.Y - (p.Location.Y + p.Location.Height)) * sign;
+
                 if(p.Location.Y + p.Location.Height + 8 < warp_enter.Y)
                     p.Effect2 = 1;
+
                 if(p.HoldingNPC > 0)
                 {
                     NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
@@ -5539,11 +5594,17 @@ void PlayerEffects(const int A)
                     p.Duck = true;
                     p.Location.Height = 30;
                 }
+
                 p.Direction = -1; // makes (p.Direction > 0) always false
                 p.Location.Y = warp_enter.Y + warp_enter.Height - p.Location.Height - 2;
                 p.Location.X -= 0.5;
+
+                sign = (p.Location.X + p.Location.Width) > warp_enter.X ? +1.0 : -1.0;
+                leftToGoal = SDL_fabs((warp_enter.X - (p.Location.X + p.Location.Width)) * 2) * sign;
+
                 if(p.Location.X + p.Location.Width + 8 < warp_enter.X)
                     p.Effect2 = 1;
+
                 if(p.HoldingNPC > 0)
                 {
                     NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
@@ -5553,7 +5614,7 @@ void PlayerEffects(const int A)
                     NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width - Physics.PlayerGrabSpotX[p.Character][p.State] - NPC[p.HoldingNPC].Location.Width;
                 }
                 p.Location.SpeedX = -0.5;
-                PlayerFrame(A);
+                PlayerFrame(p);
                 p.Location.SpeedX = 0;
             }
             else if(warp_dir_enter == 4)
@@ -5566,8 +5627,13 @@ void PlayerEffects(const int A)
                 p.Direction = 1; // Makes (p.Direction > 0) always true
                 p.Location.Y = warp_enter.Y + warp_enter.Height - p.Location.Height - 2;
                 p.Location.X += 0.5;
+
+                sign = p.Location.X < (warp_enter.X + warp_enter.Width) ? +1.0 : -1.0;
+                leftToGoal = SDL_fabs(((warp_enter.X + warp_enter.Width) - p.Location.X) * 2) * sign;
+
                 if(p.Location.X > warp_enter.X + warp_enter.Width + 8)
                     p.Effect2 = 1;
+
                 if(p.HoldingNPC > 0)
                 {
                     NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
@@ -5577,11 +5643,46 @@ void PlayerEffects(const int A)
 //                        NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width - Physics.PlayerGrabSpotX[p.Character][p.State] - NPC[p.HoldingNPC].Location.Width;
                 }
                 p.Location.SpeedX = 0.5;
-                PlayerFrame(A);
+                PlayerFrame(p);
                 p.Location.SpeedX = 0;
             }
+
+            D_pLogDebug("Warping: %g (same section? %s!)", leftToGoal, SectionCollision(p.Section, warp_exit) ? "yes" : "no");
+            switch(warp.transitEffect)
+            {
+            default:
+            case LevelDoor::TRANSIT_SCROLL:
+                // TODO: Implement the scrolling method
+            case LevelDoor::TRANSIT_NONE:
+                if(Maths::iRound(leftToGoal) == 0 && warp.level.empty() && !warp.MapWarp && !SectionCollision(p.Section, warp_exit))
+                    g_levelVScreenFader[A].setupFader(8, 0, 65, ScreenFader::S_FADE);
+                break;
+
+            case LevelDoor::TRANSIT_FADE:
+                if(Maths::iRound(leftToGoal) == 24)
+                    g_levelVScreenFader[A].setupFader(3, 0, 65, ScreenFader::S_FADE);
+                break;
+
+            case LevelDoor::TRANSIT_CIRCLE_FADE:
+                if(Maths::iRound(leftToGoal) == 24)
+                    g_levelVScreenFader[A].setupFader(3, 0, 65, ScreenFader::S_CIRCLE,
+                                                      true,
+                                                      Maths::iRound(warp_enter.X + warp_enter.Width / 2),
+                                                      Maths::iRound(warp_enter.Y + warp_enter.Height / 2), A);
+                break;
+
+            case LevelDoor::TRANSIT_FLIP_H:
+                if(Maths::iRound(leftToGoal) == 24)
+                    g_levelVScreenFader[A].setupFader(3, 0, 65, ScreenFader::S_FLIP_H);
+                break;
+
+            case LevelDoor::TRANSIT_FLIP_V:
+                if(Maths::iRound(leftToGoal) == 24)
+                    g_levelVScreenFader[A].setupFader(3, 0, 65, ScreenFader::S_FLIP_V);
+                break;
+            }
         }
-        else if(fEqual(p.Effect2, 1))  // Exiting pipe
+        else if(fEqual(p.Effect2, 1))  // Exiting pipe (initialization)
         {
             if(warp.NoYoshi)
             {
@@ -5713,6 +5814,39 @@ void PlayerEffects(const int A)
                 }
             }
 
+            if(g_levelVScreenFader[A].isVisible())
+            {
+                switch(warp.transitEffect)
+                {
+                default:
+                case LevelDoor::TRANSIT_SCROLL:
+                    // TODO: Implement the scrolling method
+                case LevelDoor::TRANSIT_NONE:
+                    g_levelVScreenFader[A].setupFader(8, 65, 0, ScreenFader::S_FADE);
+                    break;
+
+                case LevelDoor::TRANSIT_FADE:
+                    g_levelVScreenFader[A].setupFader(3, 65, 0, ScreenFader::S_FADE);
+                    break;
+
+                case LevelDoor::TRANSIT_CIRCLE_FADE:
+                    g_levelVScreenFader[A].setupFader(2, 65, 0, ScreenFader::S_CIRCLE,
+                                                      true,
+                                                      Maths::iRound(warp_exit.X + warp_exit.Width / 2),
+                                                      Maths::iRound(warp_exit.Y + warp_exit.Height /2),
+                                                      A);
+                    break;
+
+                case LevelDoor::TRANSIT_FLIP_H:
+                    g_levelVScreenFader[A].setupFader(3, 65, 0, ScreenFader::S_FLIP_H);
+                    break;
+
+                case LevelDoor::TRANSIT_FLIP_V:
+                    g_levelVScreenFader[A].setupFader(3, 65, 0, ScreenFader::S_FLIP_V);
+                    break;
+                }
+            }
+
             if(!warp.level.empty())
             {
                 GoToLevel = warp.level;
@@ -5730,7 +5864,7 @@ void PlayerEffects(const int A)
                 p.Effect2 = 2970;
             }
         }
-        else if(p.Effect2 >= 100)
+        else if(p.Effect2 >= 100) // Waiting until exit pipe
         {
             p.Effect2 += 1;
 
@@ -5741,7 +5875,7 @@ void PlayerEffects(const int A)
                     PlaySound(SFX_Warp);
             }
         }
-        else if(fEqual(p.Effect2, 2))
+        else if(fEqual(p.Effect2, 2)) // Proceeding the pipe exiting
         {
             if(!backward && warp.cannonExit)
             {
@@ -5815,7 +5949,7 @@ void PlayerEffects(const int A)
                     if(p.Character >= 3) // peach/toad leaving a pipe
                     {
                         p.Location.SpeedX = 1;
-                        PlayerFrame(A);
+                        PlayerFrame(p);
                         NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
 
 //                        if(p.Direction < 0) // always true
@@ -5843,7 +5977,7 @@ void PlayerEffects(const int A)
                 else
                 {
                     p.Location.SpeedX = -0.5;
-                    PlayerFrame(A);
+                    PlayerFrame(p);
                     p.Location.SpeedX = 0;
                 }
             }
@@ -5860,7 +5994,7 @@ void PlayerEffects(const int A)
                     if(p.Character >= 3) // peach/toad leaving a pipe
                     {
                         p.Location.SpeedX = 1;
-                        PlayerFrame(A);
+                        PlayerFrame(p);
                         NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
 
 //                        if(p.Direction < 0) // always false
@@ -5888,12 +6022,12 @@ void PlayerEffects(const int A)
                 else
                 {
                     p.Location.SpeedX = -0.5;
-                    PlayerFrame(A);
+                    PlayerFrame(p);
                     p.Location.SpeedX = 0;
                 }
             }
         }
-        else if(fEqual(p.Effect2, 3))
+        else if(fEqual(p.Effect2, 3)) // Finishing the pipe exiting / shooting
         {
             if(!backward && warp.cannonExit)
             {
@@ -5988,6 +6122,7 @@ void PlayerEffects(const int A)
     {
         bool backward = p.WarpBackward;
         auto &warp = Warp[p.Warp];
+        auto &warp_enter = backward ? warp.Exit : warp.Entrance;
         auto &warp_exit = backward ? warp.Entrance : warp.Exit;
 
         if(p.HoldingNPC > 0)
@@ -6003,6 +6138,40 @@ void PlayerEffects(const int A)
 
         if(p.Character == 5)
             p.Frame = 1;
+
+        switch(warp.transitEffect)
+        {
+        default:
+        case LevelDoor::TRANSIT_SCROLL:
+            // TODO: Implement the scrolling method
+        case LevelDoor::TRANSIT_NONE:
+            if(fEqual(p.Effect2, 20) && warp.level.empty() && !warp.MapWarp && !SectionCollision(p.Section, warp_exit))
+                g_levelVScreenFader[A].setupFader(9, 0, 65, ScreenFader::S_FADE);
+            break;
+
+        case LevelDoor::TRANSIT_FADE:
+            if(fEqual(p.Effect2, 5))
+                g_levelVScreenFader[A].setupFader(3, 0, 65, ScreenFader::S_FADE);
+            break;
+
+        case LevelDoor::TRANSIT_CIRCLE_FADE:
+            if(fEqual(p.Effect2, 5))
+                g_levelVScreenFader[A].setupFader(3, 0, 65, ScreenFader::S_CIRCLE,
+                                                  true,
+                                                  Maths::iRound(warp_enter.X + warp_enter.Width / 2),
+                                                  Maths::iRound(warp_enter.Y + warp_enter.Height / 2), A);
+            break;
+
+        case LevelDoor::TRANSIT_FLIP_H:
+            if(fEqual(p.Effect2, 5))
+                g_levelVScreenFader[A].setupFader(3, 0, 65, ScreenFader::S_FLIP_H);
+            break;
+
+        case LevelDoor::TRANSIT_FLIP_V:
+            if(fEqual(p.Effect2, 5))
+                g_levelVScreenFader[A].setupFader(3, 0, 65, ScreenFader::S_FLIP_V);
+            break;
+        }
 
         if(p.Effect2 >= 30)
         {
@@ -6038,6 +6207,39 @@ void PlayerEffects(const int A)
             p.Effect = 0;
             p.Effect2 = 0;
             p.WarpCD = 40;
+
+            if(g_levelVScreenFader[A].isVisible())
+            {
+                switch(warp.transitEffect)
+                {
+                default:
+                case LevelDoor::TRANSIT_SCROLL:
+                    // TODO: Implement the scrolling method
+                case LevelDoor::TRANSIT_NONE:
+                    g_levelVScreenFader[A].setupFader(8, 65, 0, ScreenFader::S_FADE);
+                    break;
+
+                case LevelDoor::TRANSIT_FADE:
+                    g_levelVScreenFader[A].setupFader(3, 65, 0, ScreenFader::S_FADE);
+                    break;
+
+                case LevelDoor::TRANSIT_CIRCLE_FADE:
+                    g_levelVScreenFader[A].setupFader(2, 65, 0, ScreenFader::S_CIRCLE,
+                                                      true,
+                                                      Maths::iRound(warp_exit.X + warp_exit.Width / 2),
+                                                      Maths::iRound(warp_exit.Y + warp_exit.Height /2),
+                                                      A);
+                    break;
+
+                case LevelDoor::TRANSIT_FLIP_H:
+                    g_levelVScreenFader[A].setupFader(3, 65, 0, ScreenFader::S_FLIP_H);
+                    break;
+
+                case LevelDoor::TRANSIT_FLIP_V:
+                    g_levelVScreenFader[A].setupFader(3, 65, 0, ScreenFader::S_FLIP_V);
+                    break;
+                }
+            }
 
             if(!warp.level.empty())
             {
@@ -6199,23 +6401,28 @@ void PlayerEffects(const int A)
         {
             p.Effect2 -= 1;
 
+            auto &w = Warp[p.Warp];
+
+            if((w.MapWarp || !w.level.empty()) && Maths::iRound(p.Effect2) == 2955 && !g_levelScreenFader.isFadingIn())
+                g_levelScreenFader.setupFader(2, 0, 65, ScreenFader::S_FADE);
+
             if(fEqual(p.Effect2, 2920))
             {
-                if(Warp[p.Warp].MapWarp)
+                if(w.MapWarp)
                 {
                     LevelBeatCode = 6;
 
-                    if(!(Warp[p.Warp].MapX == -1 && Warp[p.Warp].MapY == -1))
+                    if(!(w.MapX == -1 && w.MapY == -1))
                     {
-                        WorldPlayer[1].Location.X = Warp[p.Warp].MapX;
-                        WorldPlayer[1].Location.Y = Warp[p.Warp].MapY;
+                        WorldPlayer[1].Location.X = w.MapX;
+                        WorldPlayer[1].Location.Y = w.MapY;
 
-                        for(B = 1; B <= numWorldLevels; B++)
+                        for(int l = 1; l <= numWorldLevels; ++l)
                         {
-                            if(CheckCollision(WorldPlayer[1].Location, WorldLevel[B].Location))
+                            if(CheckCollision(WorldPlayer[1].Location, WorldLevel[l].Location))
                             {
-                                WorldLevel[B].Active = true;
-                                curWorldLevel = B;
+                                WorldLevel[l].Active = true;
+                                curWorldLevel = l;
                             }
                         }
                     }
@@ -6636,7 +6843,7 @@ void PlayerEffects(const int A)
 
     if(p.Mount == 3 && p.Effect != 9)
     {
-        PlayerFrame(A);
+        PlayerFrame(p);
     }
 //    if(Player[A].Effect == 0)
 //    {

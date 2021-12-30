@@ -41,6 +41,7 @@
 #include "menu_main.h"
 #include "game_info.h"
 #include "speedrunner.h"
+#include "game_globals.h"
 
 #include "../pseudo_vb.h"
 
@@ -258,7 +259,7 @@ static void updateIntroLevelActivity()
             p.GroundPound = false;
             p.Hearts = 3;
 
-            PlayerFrame(A);
+            PlayerFrame(p);
 
             p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
             p.Location.Width = Physics.PlayerWidth[p.Character][p.State];
@@ -486,6 +487,7 @@ static void updateIntroLevelActivity()
     UpdateGraphics();
     UpdateSound();
     UpdateEvents();
+    updateScreenFaders();
 }
 
 void MenuLoop()
@@ -507,6 +509,7 @@ void MenuLoop()
         UpdateGraphics();
         UpdateSound();
         UpdateEvents();
+        updateScreenFaders();
     }
 
     if(MenuMouseDown)

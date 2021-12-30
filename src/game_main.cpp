@@ -49,6 +49,8 @@
 #include "video.h"
 #include "editor.h"
 #include "custom.h"
+#include "main/world_globals.h"
+#include "main/game_globals.h"
 #include "main/level_file.h"
 #include "main/speedrunner.h"
 #include "main/menu_main.h"
@@ -383,6 +385,8 @@ int GameMain(const CmdLineSetup_t &setup)
                     Player[A].Dead = true;
             }
 
+            clearScreenFaders();
+
             // Run the frame-loop
             runFrameLoop(&OutroLoop,
                          nullptr,
@@ -469,6 +473,8 @@ int GameMain(const CmdLineSetup_t &setup)
                 introPath = AppPath + "intro.lvl";
             OpenLevel(introPath);
             vScreenX[1] = -level[0].X;
+
+            g_levelScreenFader.setupFader(3, 65, 0, ScreenFader::S_FADE);
 
             setMusicStartDelay(); // Don't start music until all gfx will be loaded
 
@@ -575,22 +581,17 @@ int GameMain(const CmdLineSetup_t &setup)
                 Player[1].Vine = 0;
                 Player[2].Vine = 0;
 
-                if(!GoToLevelNoGameThing)
-                    PlaySound(SFX_LevelSelect);
+//                if(!GoToLevelNoGameThing)
+//                    PlaySound(SFX_LevelSelect);
                 SoundPause[26] = 2000;
 
                 LevelSelect = false;
 
-                if(!GoToLevelNoGameThing)
-                    GameThing();
-                else
-                {
-                    frmMain.setTargetTexture();
-                    frmMain.clearBuffer();
-                    frmMain.repaint();
-                }
+                frmMain.setTargetTexture();
+                frmMain.clearBuffer();
+                frmMain.repaint();
+
                 ClearLevel();
-                PGE_Delay(1000);
 
                 std::string levelPath;
                 if(GoToLevel.empty())
@@ -606,6 +607,17 @@ int GameMain(const CmdLineSetup_t &setup)
                     MessageText = fmt::format_ne("ERROR: Can't open \"{0}\": file doesn't exist or corrupted.", levelPath);
                     PauseGame(1);
                     ErrorQuit = true;
+                }
+
+                if(!GoToLevelNoGameThing)
+                {
+                    GameThing(1000, 3);
+                }
+                else
+                {
+                    frmMain.setTargetTexture();
+                    frmMain.clearBuffer();
+                    frmMain.repaint();
                 }
             }
             else
@@ -625,7 +637,10 @@ int GameMain(const CmdLineSetup_t &setup)
                 UpdateGraphics2(true);
                 resetFrameTimer();
 
-                delayedMusicStart(); // Allow music being started
+                g_worldScreenFader.setupFader(4, 65, 0, ScreenFader::S_FADE);
+
+                // WorldLoop will automatically resume the music as needed
+                // delayedMusicStart(); // Allow music being started
 
                 // 'level select loop
                 runFrameLoop(nullptr, &WorldLoop,
@@ -735,7 +750,7 @@ int GameMain(const CmdLineSetup_t &setup)
 //                            End If
                         }
 
-                        PlayerFrame(A);
+                        PlayerFrame(p);
                         CheckSection(A);
                         SoundPause[17] = 0;
                         p.Effect = 8;
@@ -783,6 +798,8 @@ int GameMain(const CmdLineSetup_t &setup)
 
             speedRun_triggerEnter();
 
+            g_levelScreenFader.setupFader(2, 65, 0, ScreenFader::S_FADE);
+
             delayedMusicStart(); // Allow music being started
 
             // MAIN GAME LOOP
@@ -823,7 +840,6 @@ int GameMain(const CmdLineSetup_t &setup)
                 else
                 {
                     GameThing();
-                    PGE_Delay(500);
                     zTestLevel(setup.testMagicHand, setup.interprocess); // Restart level
                 }
 
@@ -993,7 +1009,11 @@ void UpdateMacro()
 
         if(!OnScreen)
         {
-            LevelMacroCounter += 1;
+            LevelMacroCounter++;
+
+            if(LevelMacroCounter == 34)
+                g_levelScreenFader.setupFader(1, 0, 65, ScreenFader::S_FADE);
+
             if(LevelMacroCounter >= 100)
             {
                 LevelBeatCode = 1;
@@ -1020,7 +1040,11 @@ void UpdateMacro()
             c.AltRun = false;
         }
 
-        LevelMacroCounter += 1;
+        LevelMacroCounter++;
+
+        if(LevelMacroCounter == 395)
+            g_levelScreenFader.setupFader(1, 0, 65, ScreenFader::S_FADE);
+
         if(LevelMacroCounter >= 460)
         {
             LevelBeatCode = 2;
@@ -1068,7 +1092,13 @@ void UpdateMacro()
                     computeFrameTime2();
                 }
 
-                LevelMacroCounter += 1;
+                updateScreenFaders();
+
+                LevelMacroCounter++;
+
+                if(LevelMacroCounter == (keyholeMax - 65))
+                    g_levelScreenFader.setupFader(1, 0, 65, ScreenFader::S_FADE);
+
                 if(LevelMacroCounter >= keyholeMax) /*300*/
                     break;
             }
@@ -1105,7 +1135,11 @@ void UpdateMacro()
             c.AltRun = false;
         }
 
-        LevelMacroCounter += 1;
+        LevelMacroCounter++;
+
+        if(LevelMacroCounter == 235)
+            g_levelScreenFader.setupFader(1, 0, 65, ScreenFader::S_FADE);
+
         if(LevelMacroCounter >= 300)
         {
             LevelBeatCode = 5;
@@ -1133,9 +1167,14 @@ void UpdateMacro()
             c.AltRun = false;
         }
 
-        LevelMacroCounter += 1;
+        LevelMacroCounter++;
+
         if(LevelMacroCounter == 250)
             PlaySound(SFX_GameBeat);
+
+        if(LevelMacroCounter == 735)
+            g_levelScreenFader.setupFader(1, 0, 65, ScreenFader::S_FADE);
+
         if(LevelMacroCounter >= 800)
         {
             EndLevel = true;
@@ -1169,7 +1208,11 @@ void UpdateMacro()
             c.AltRun = false;
         }
 
-        LevelMacroCounter += 1;
+        LevelMacroCounter++;
+
+        if(LevelMacroCounter == 235)
+            g_levelScreenFader.setupFader(1, 0, 65, ScreenFader::S_FADE);
+
         if(LevelMacroCounter >= 300)
         {
             LevelBeatCode = 7;
@@ -1214,7 +1257,25 @@ void UpdateMacro()
             }
         }
 
-        LevelMacroCounter += 1;
+        LevelMacroCounter++;
+
+        if(LevelMacroCounter == 598)
+        {
+            bool canTrack = (Player[1].Location.X < level[Player[1].Section].Width);
+            double focusX = canTrack ?
+                            Player[1].Location.X + Player[1].Location.Width / 2 :
+                            level[Player[1].Section].Width;
+            double focusY = Player[1].Location.Y + Player[1].Location.Height / 2;
+
+            g_levelScreenFader.setupFader(2, 0, 65, ScreenFader::S_CIRCLE, true, focusX, focusY, 1);
+
+            if(canTrack)
+                g_levelScreenFader.setTrackedFocus(&Player[1].Location.X,
+                                                   &Player[1].Location.Y,
+                                                   Player[1].Location.Width / 2,
+                                                   Player[1].Location.Height / 2);
+        }
+
         if(LevelMacroCounter >= 630)
         {
             LevelBeatCode = 8;

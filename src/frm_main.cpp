@@ -1724,6 +1724,9 @@ void FrmMain::renderCircle(int cx, int cy, int radius, float red, float green, f
 #endif
     UNUSED(filled);
 
+    if(radius <= 0)
+        return; // Nothing to draw
+
     SDL_SetRenderDrawColor(m_gRenderer,
                                static_cast<unsigned char>(255.f * red),
                                static_cast<unsigned char>(255.f * green),
@@ -1750,6 +1753,62 @@ void FrmMain::renderCircle(int cx, int cy, int radius, float red, float green, f
                                int(cx - dx),
                                int(cy - dy + radius),
                                int(cx + dx),
+                               int(cy - dy + radius));
+        }
+
+        dy += 1.0;
+    } while(dy <= radius);
+}
+
+void FrmMain::renderCircleHole(int cx, int cy, int radius, float red, float green, float blue, float alpha)
+{
+#ifdef __ANDROID__
+    SDL_assert(!m_blockRender);
+#endif
+
+    if(radius <= 0)
+        return; // Nothing to draw
+
+    SDL_SetRenderDrawColor(m_gRenderer,
+                               static_cast<unsigned char>(255.f * red),
+                               static_cast<unsigned char>(255.f * green),
+                               static_cast<unsigned char>(255.f * blue),
+                               static_cast<unsigned char>(255.f * alpha)
+                          );
+
+    cx += m_viewport_offset_x;
+    cy += m_viewport_offset_y;
+
+    double dy = 1;
+    do //for(double dy = 1; dy <= radius; dy += 1.0)
+    {
+        double dx = std::floor(std::sqrt((2.0 * radius * dy) - (dy * dy)));
+
+        SDL_RenderDrawLine(m_gRenderer,
+                           int(cx - radius),
+                           int(cy + dy - radius),
+                           int(cx - dx),
+                           int(cy + dy - radius));
+
+        SDL_RenderDrawLine(m_gRenderer,
+                           int(cx + dx),
+                           int(cy + dy - radius),
+                           int(cx + radius),
+                           int(cy + dy - radius));
+
+
+        if(dy < radius) // Don't cross lines
+        {
+            SDL_RenderDrawLine(m_gRenderer,
+                               int(cx - radius),
+                               int(cy - dy + radius),
+                               int(cx - dx),
+                               int(cy - dy + radius));
+
+            SDL_RenderDrawLine(m_gRenderer,
+                               int(cx + dx),
+                               int(cy - dy + radius),
+                               int(cx + radius),
                                int(cy - dy + radius));
         }
 

@@ -29,6 +29,7 @@
 #include "../main/menu_main.h"
 #include "../main/speedrunner.h"
 #include "../main/trees.h"
+#include "../main/game_globals.h"
 
 #include <fmt_format_ne.h>
 #include <Utils/maths.h>
@@ -1898,7 +1899,7 @@ void UpdateGraphics(bool skipRepaint)
         for(int A = numPlayers; A >= 1; A--)// Players in front of blocks
         {
 //            DrawPlayer A, Z
-            DrawPlayer(A, Z);
+            DrawPlayer(Player[A], Z);
 //        Next A
         }
 //'normal player end
@@ -2106,7 +2107,10 @@ void UpdateGraphics(bool skipRepaint)
         // player names
         /* Dropped */
 
-
+            if(numPlayers == 1) // Always draw for single-player
+                g_levelVScreenFader[Z].draw();
+            else if(numScreens != 1) // Don't draw when many players at the same screen
+                g_levelVScreenFader[Z].draw();
 
     //    'Interface
     //            B = 0
@@ -2822,9 +2826,10 @@ void UpdateGraphics(bool skipRepaint)
         {
             speedRun_renderControls(Z, Z);
         }
-
 //    Next Z
     } // For(Z, 2, numScreens)
+
+    g_levelScreenFader.draw();
 
     speedRun_renderTimer();
 

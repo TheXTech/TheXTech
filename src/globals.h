@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#pragma once
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
@@ -910,6 +911,7 @@ struct Warp_t
     double cannonExitSpeed = 10.0;
     std::string eventEnter;
     std::string StarsMsg;
+    int transitEffect = 0;
 //End Type
 };
 

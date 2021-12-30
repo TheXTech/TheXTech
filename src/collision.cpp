@@ -773,3 +773,23 @@ void CompareNpcWalkBlock(int &tempHitBlock, int &tempHitOldBlock,
         }
     }
 }
+
+bool SectionCollision(const int section, const Location_t &loc)
+{
+    const auto &sec = level[section];
+    const double gap = 64.0;
+
+    if(loc.X + loc.Width < sec.X - gap)
+        return false;
+
+    if(loc.X > sec.Width + gap)
+        return false;
+
+    if(loc.Y + loc.Height < sec.Y - gap)
+        return false;
+
+    if(loc.Y > sec.Height)
+        return false;
+
+    return true;
+}

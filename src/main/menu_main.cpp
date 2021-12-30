@@ -1026,14 +1026,14 @@ bool mainMenuUpdate()
 
                         if(!StartLevel.empty())
                         {
-                            PlaySoundMenu(SFX_LevelSelect);
+                            //PlaySoundMenu(SFX_LevelSelect);
                             SoundPause[26] = 200;
                             LevelSelect = false;
 
-                            GameThing();
-                            ClearLevel();
+//                            GameThing();
+//                            PGE_Delay(1000);
 
-                            PGE_Delay(1000);
+                            ClearLevel();
                             std::string levelPath = SelectWorld[selWorld].WorldPath + StartLevel;
                             if(!OpenLevel(levelPath))
                             {
@@ -1041,6 +1041,8 @@ bool mainMenuUpdate()
                                 PauseGame(1);
                                 ErrorQuit = true;
                             }
+
+                            GameThing(1000, 3);
                         }
                         return true;
                     }
