@@ -148,6 +148,13 @@ PCG_DEFINE_CONSTANT(uint32_t, default, increment,  2891336453U)
 PCG_DEFINE_CONSTANT(uint64_t, default, multiplier, 6364136223846793005ULL)
 PCG_DEFINE_CONSTANT(uint64_t, default, increment,  1442695040888963407ULL)
 
+#ifdef PCG_HAS_ALWAYS_INLINE
+#define PCG_ALWAYS_INLINE __attribute__((always_inline))
+#else
+#define PCG_ALWAYS_INLINE inline
+#endif
+
+
 
 /*
  * Each PCG generator is available in four variants, based on how it applies
@@ -1114,7 +1121,7 @@ public:
         return baseclass::period_pow2() + table_size*extvalclass::period_pow2();
     }
 
-    __attribute__((always_inline)) result_type operator()()
+    PCG_ALWAYS_INLINE result_type operator()()
     {
         result_type rhs = get_extended_value();
         result_type lhs = this->baseclass::operator()();
