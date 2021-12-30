@@ -24,13 +24,12 @@
 #ifndef RECORD_H
 #define RECORD_H
 
+#include <string>
+
 namespace Record
 {
 
-extern FILE* record_file;
-extern FILE* replay_file;
-
-void LoadReplay(std::string recording_path);
+void LoadReplay(const std::string &recording_path);
 
 void InitRecording();
 
@@ -38,6 +37,6 @@ void Sync();
 
 void EndRecording();
 
-}; // namespace Record
+} // namespace Record
 
 #endif // #ifndef RECORD_H

@@ -45,6 +45,8 @@
 #include <DirManager/dirman.h>
 #include <AppPath/app_path.h>
 #include <Logger/logger.h>
+#include <md5tools.hpp>
+
 
 #ifndef PRId64 /*Workaround*/
 #   ifndef __PRI64_PREFIX
@@ -59,7 +61,7 @@
 #   define PRId64		__PRI64_PREFIX "d"
 #endif
 
-std::string makeRecordPrefix()
+static std::string makeRecordPrefix()
 {
     auto now = std::chrono::system_clock::now();
     std::time_t in_time_t = std::chrono::system_clock::to_time_t(now);
@@ -76,39 +78,48 @@ namespace Record
 
 // public
 
-FILE* record_file = nullptr;
-FILE* replay_file = nullptr;
+static FILE* record_file = nullptr;
+static FILE* replay_file = nullptr;
+
+static const int c_recordVersion = 2;
 
 // private
 
-bool         in_level = false;
-bool         diverged = false;
-int64_t      frame_no = 0;
-int64_t      next_record_frame = 0;
-uint32_t     last_status_tick = 0;
-Controls_t   last_controls[maxPlayers];
+static bool         in_level = false;
+static bool         diverged = false;
+static int64_t      frame_no = 0;
+static int64_t      next_record_frame = 0;
+static uint32_t     last_status_tick = 0;
+static Controls_t   last_controls[maxPlayers];
 
-void write_header()
+
+static void write_header()
 {
     // write all necessary state variables!
     fprintf(record_file, "Header\r\n");
+    fprintf(record_file, "RecordVersion %d\r\n", c_recordVersion); // Version of record file
     fprintf(record_file, "Version %s\r\n", LONG_VERSION); // game version / commit
     fprintf(record_file, "CompatLevel %d\r\n", CompatGetLevel()); // compatibility mode
     if(FullFileName.compare(0, AppPath.size(), AppPath) == 0)
         fprintf(record_file, "%s\r\n", FullFileName.c_str()+AppPath.size()); // level that was played
     else
         fprintf(record_file, "%s\r\n", FullFileName.c_str()); // level that was played
+
+    std::string md5sum = md5::file_to_hashGC(FullFileName);
+    fprintf(record_file, "SumMD5 %s\r\n", md5sum.c_str()); // level that was played
     fprintf(record_file, "Seed %d\r\n", readSeed());
     fprintf(record_file, "Checkpoint %d\r\n", (Checkpoint == FullFileName) ? 1 : 0);
+
     if(g_compatibility.enable_multipoints && Checkpoint == FullFileName)
     {
         fprintf(record_file, "Multipoints %d: ", (int)CheckpointsList.size());
+
         for(const Checkpoint_t& cp : CheckpointsList)
-        {
             fprintf(record_file, "%d,", cp.id);
-        }
+
         fprintf(record_file, "\r\n");
     }
+
     fprintf(record_file, "StartWarp %d\r\n", StartWarp);
     fprintf(record_file, "ReturnWarp %d\r\n", ReturnWarp);
     fprintf(record_file, "Lives %d\r\n", (int)Lives);
@@ -132,18 +143,27 @@ void write_header()
     }
 }
 
-void read_header()
+static void read_header()
 {
     rewind(replay_file); // fseek(replay_file, 0, SEEK_SET);
 
     // buffer is a 1024-character buffer used for reading strings, shared with the record_init() function.
     char buffer[1024];
+    char md5hash[1024];
+    std::string thisHash;
 
     // n is an integer for some implicit conversions
     int n;
+    // Version of record file
+    int recordVersion = 0;
 
     // read all necessary state variables!
     fgets(buffer, 1024, replay_file); // "Header"
+    fscanf(replay_file, "RecordVersion %d\r\n", &recordVersion);
+
+    if(recordVersion < 2)
+        pLogCritical("Record file is invalid! (version below than minimally supported: %d)", recordVersion);
+
     fgets(buffer, 1024, replay_file); // game version / commit
     fscanf(replay_file, "CompatLevel %d\r\n", &n); // compatibility mode
 
@@ -162,22 +182,33 @@ void read_header()
     // if(SDL_strcasecmp(buffer, FileNameFull.c_str()))
     //     pLogWarning("FileName does not match.");
 
+    thisHash = md5::file_to_hashGC(FullFileName);
+    if(thisHash.empty())
+        pLogCritical("Failed to retrieve the MD5 hash for %s file (probably, it doesn't exist)", FullFileName.c_str());
+
+    fgets(buffer, 1024, replay_file); // File's hash
+    SDL_memset(md5hash, 0, sizeof(md5hash));
+    fscanf(replay_file, "SumMD5 %s\r\n", md5hash); // File's hash
+    pLogDebug("Replay file (loaded %s, expected %s)", thisHash.c_str(), md5hash);
+    if(thisHash.compare(md5hash) != 0)
+        pLogCritical("Loaded level file is not matched to expected (check sum missmatch)");
+
     fscanf(replay_file, "Seed %d\r\n", &n); // random seed
     seedRandom(n);
 
     fscanf(replay_file, "Checkpoint %d\r\n", &n); // is there a checkpoint?
 
-    Checkpoint = n ? FullFileName : "";
+    Checkpoint = n ? FullFileName : std::string();
 
     if(g_compatibility.enable_multipoints && Checkpoint == FullFileName)
     {
         CheckpointsList.clear();
         fscanf(replay_file, "Multipoints %d: ", &n);
         CheckpointsList.resize(n);
+
         for(int i = 0; i < n; i++)
-        {
             fscanf(replay_file, "%d,", &CheckpointsList[i].id);
-        }
+
         fscanf(replay_file, "\r\n");
     }
 
@@ -216,12 +247,12 @@ void read_header()
     FrameSkip = false;
 }
 
-void write_end()
+static void write_end()
 {
     fprintf(record_file, " %" PRId64 " \r\nEnd\r\nLevelBeatCode %d\r\n", frame_no+1, LevelBeatCode);
 }
 
-void read_end()
+static void read_end()
 {
     int b;
 
@@ -244,7 +275,7 @@ void read_end()
     }
 }
 
-void write_control()
+static void write_control()
 {
     for(int i = 0; i < numPlayers; i++)
     {
@@ -306,15 +337,13 @@ void write_control()
     fflush(record_file);
 }
 
-void read_control()
+static void read_control()
 {
     int p;
     char mode, key;
 
     if(fscanf(replay_file, "C%c%d%c\r\n", &mode, &p, &key) != 3)
-    {
         return;
-    }
 
     bool set = (mode != '-');
 
@@ -346,7 +375,7 @@ void read_control()
     }
 }
 
-void write_status()
+static void write_status()
 {
     if(frame_no == 0)
     {
@@ -387,7 +416,7 @@ void write_status()
     fflush(record_file);
 }
 
-void read_status()
+static void read_status()
 {
     if(frame_no == 0)
     {
@@ -496,7 +525,7 @@ void read_status()
     }
 }
 
-void write_NPCs()
+static void write_NPCs()
 {
     fprintf(record_file, " %" PRId64 " \r\nNPCs\r\nnumNPCs %d\r\n", frame_no, numNPCs);
     for(int i = 1; i <= numNPCs; i++)
@@ -511,12 +540,13 @@ void write_NPCs()
     }
 }
 
-void read_NPCs()
+static void read_NPCs()
 {
     int success = 0;
 
     fscanf(replay_file, "NPCs\r\n%n", &success);
     int o_numNPCs;
+
     if(!success || fscanf(replay_file, "numNPCs %d\r\n", &o_numNPCs) != 1)
         success = 0;
     else if(o_numNPCs != numNPCs)
@@ -640,7 +670,7 @@ void InitRecording()
 }
 
 // need to preload level info from the replay to load with proper compat
-void LoadReplay(std::string recording_path)
+void LoadReplay(const std::string &recording_path)
 {
     if(LevelEditor || GameMenu || GameOutro)
         return;
@@ -672,6 +702,7 @@ void EndRecording()
         {
             pLogDebug("CONGRATULATIONS! Your build's run did not diverge from the old run.");
             printf("CONGRATULATIONS! Your build's run did not diverge from the old run.\n");
+
             if(record_file)
                 fprintf(record_file, "DID NOT diverge from old run.\r\n");
         }
@@ -739,22 +770,19 @@ void Sync()
             Player[i+1].Controls = last_controls[i];
         }
     }
+
     if(record_file)
     {
         write_control();
 
         if(!(frame_no % 60))
-        {
             write_status();
-        }
 
         if(!(frame_no % 900))
-        {
             write_NPCs();
-        }
     }
 
     frame_no++;
 }
 
-}; // namespace Record
+} // namespace Record
