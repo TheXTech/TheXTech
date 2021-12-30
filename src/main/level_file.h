@@ -19,6 +19,7 @@
  */
 
 
+#pragma once
 #ifndef LEVEL_FILE_H
 #define LEVEL_FILE_H
 

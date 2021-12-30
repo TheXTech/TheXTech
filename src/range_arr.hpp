@@ -23,6 +23,7 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#pragma once
 #ifndef RANGE_ARR_HPP
 #define RANGE_ARR_HPP
 

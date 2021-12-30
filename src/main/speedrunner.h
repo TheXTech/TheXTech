@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#pragma once
 #ifndef SPEEDRUNNER_H
 #define SPEEDRUNNER_H
 

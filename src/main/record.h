@@ -21,6 +21,7 @@
 // this module handles the control recording and playback functions
 // and the gameplay stats recording functions
 
+#pragma once
 #ifndef RECORD_H
 #define RECORD_H
 

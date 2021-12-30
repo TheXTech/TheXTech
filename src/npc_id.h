@@ -18,6 +18,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#pragma once
+
+#ifndef ENUMNPCID_HHH
+#define ENUMNPCID_HHH
+
 enum NPCID
 {
     NPCID_GOOMBA_SMB3 = 1,
@@ -343,3 +348,6 @@ enum NPCID
     NPCID_PEACHBOMB = 291,
     NPCID_BOOMERANG = 292,
 };
+
+
+#endif // ENUMNPCID_HHH
