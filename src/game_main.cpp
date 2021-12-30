@@ -228,18 +228,16 @@ int GameMain(const CmdLineSetup_t &setup)
     if(!neverPause && !frmMain.isWindowActive())
         SoundPauseEngine(1);
 
-    if(!setup.testLevel.empty() || setup.interprocess) // Start level testing immediately!
+    if(!setup.testLevel.empty() || !setup.testReplay.empty() || setup.interprocess) // Start level testing immediately!
     {
         GameMenu = false;
         LevelSelect = false;
-        if(Files::hasSuffix(setup.testLevel, ".rec"))
-        {
-            Record::LoadReplay(setup.testLevel);
-        }
+
+        if(!setup.testReplay.empty())
+            Record::LoadReplay(setup.testReplay, setup.testLevel);
         else
-        {
             FullFileName = setup.testLevel;
-        }
+
         if(setup.testBattleMode)
         {
             numPlayers = 2;

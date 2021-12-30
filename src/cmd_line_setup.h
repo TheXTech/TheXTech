@@ -19,6 +19,8 @@ struct CmdLineSetup_t
     bool testLevelMode = false;
     //! Level file to test
     std::string testLevel;
+    //! Replay file to run
+    std::string testReplay;
     //! Number of players for level test
     int testNumPlayers = 1;
     //! Run a test in battle mode

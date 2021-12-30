@@ -250,7 +250,7 @@ int main(int argc, char**argv)
 
         TCLAP::SwitchArg switchVerboseLog(std::string(), "verbose", "Enable log output into the terminal", false);
 
-        TCLAP::UnlabeledValueArg<std::string> inputFileNames("levelpath", "Path to level file or replay data to run the test", false, std::string(), "path to file");
+        TCLAP::UnlabeledMultiArg<std::string> inputFileNames("levelpath", "Path to level file or replay data to run the test", false, std::string(), "path to file");
 
         cmd.add(&switchFrameSkip);
         cmd.add(&switchDisableFrameSkip);
@@ -323,22 +323,19 @@ int main(int argc, char**argv)
 
         if(inputFileNames.isSet())
         {
-            auto fpath = inputFileNames.getValue();
-            if(Files::hasSuffix(fpath, ".lvl") || Files::hasSuffix(fpath, ".lvlx"))
+            for(const auto &fpath : inputFileNames.getValue())
             {
-                setup.testLevel = fpath;
-            }
+                if(Files::hasSuffix(fpath, ".lvl") || Files::hasSuffix(fpath, ".lvlx"))
+                    setup.testLevel = fpath;
+                else if(Files::hasSuffix(fpath, ".rec"))
+                    setup.testReplay = fpath;
 
-            if(Files::hasSuffix(fpath, ".rec"))
-            {
-                setup.testLevel = fpath;
-            }
+//                //TODO: Implement a world map running and testing
+//                else if(Files::hasSuffix(fpath, ".wld") || Files::hasSuffix(fpath, ".wldx"))
+//                {
 
-            //TODO: Implement a world map running and testing
-//            if(Files::hasSuffix(fpath, ".wld") || Files::hasSuffix(fpath, ".wldx"))
-//            {
-//
-//            }
+//                }
+            }
         }
 
         setup.verboseLogging = switchVerboseLog.getValue();

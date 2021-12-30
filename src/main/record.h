@@ -29,7 +29,7 @@
 namespace Record
 {
 
-void LoadReplay(const std::string &recording_path);
+void LoadReplay(const std::string &recording_path, const std::string &level_path);
 
 void InitRecording();
 
