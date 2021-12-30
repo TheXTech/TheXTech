@@ -22,10 +22,6 @@
 #define RAND_H
 
 #include <cmath>
-#include <pcg/pcg_random.hpp>
-
-extern pcg32 g_random_engine;
-extern long g_random_n_calls;
 
 // supported only on gcc
 // #define DEBUG_RANDOM_CALLS
@@ -56,37 +52,14 @@ extern long random_ncalls();
  * @brief Random number generator in double format, between 0.0 to 1.0 (exclusive)
  * @return random double value
  */
-inline double dRand()
-{
-    g_random_n_calls ++;
-#ifdef DEBUG_RANDOM_CALLS
-    void* stack[2] = {nullptr, nullptr};
-    backtrace(stack, 2);
-    g_random_calls.push_back(stack[1]);
-#endif
-    return ldexp(g_random_engine(), -32);
-}
+extern double dRand();
 
 /**
  * @brief Random number generator in integer format, between 0 to argument max (exclusive)
  * Distribution equivalent to `Int(dRand() * max)`
  * @return random integer value
  */
-inline int iRand(int max)
-{
-    g_random_n_calls ++;
-#ifdef DEBUG_RANDOM_CALLS
-    void* stack[2] = {nullptr, nullptr};
-    backtrace(stack, 2);
-    g_random_calls.push_back(stack[1]);
-#endif
-    if(max == 0)
-    {
-        g_random_engine();
-        return 0;
-    }
-    return g_random_engine() % max;
-}
+extern int iRand(int max);
 
 /**
  * @brief Random number generator in integer format, between 0 to argument max (inclusive)

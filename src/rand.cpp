@@ -20,11 +20,13 @@
 
 #include <cstdlib>
 
+#include <pcg/pcg_random.hpp>
+
 #include "globals.h"
 #include "rand.h"
 
-pcg32 g_random_engine;
-long g_random_n_calls = 0;
+static pcg32 g_random_engine;
+static long g_random_n_calls = 0;
 
 #ifdef DEBUG_RANDOM_CALLS
 std::vector<void*> g_random_calls;
@@ -58,3 +60,34 @@ long random_ncalls()
 // The result is NOT iRand(x) but rather vb6Round(dRand()*x),
 // iRand_round, which has a different probability distribution
 // (prob 1/(2x) of being 0 or x and 1/x of being each number in between)
+
+int iRand(int max)
+{
+    g_random_n_calls ++;
+#ifdef DEBUG_RANDOM_CALLS
+    void* stack[2] = {nullptr, nullptr};
+    backtrace(stack, 2);
+    g_random_calls.push_back(stack[1]);
+#endif
+
+    if(max == 0)
+    {
+        g_random_engine();
+        return 0;
+    }
+
+    return g_random_engine() % max;
+}
+
+double dRand()
+{
+    g_random_n_calls ++;
+
+#ifdef DEBUG_RANDOM_CALLS
+    void* stack[2] = {nullptr, nullptr};
+    backtrace(stack, 2);
+    g_random_calls.push_back(stack[1]);
+#endif
+
+    return std::ldexp(g_random_engine(), -32);
+}
