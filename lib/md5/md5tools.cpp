@@ -10,7 +10,7 @@ std::string md5::string_to_hash(const std::string &input)
     h.process((const void*)input.c_str(), (int)input.size());
     h.finish();
 
-    out.resize(MD5_STRING_SIZE);
+    out.resize(MD5_STRING_SIZE - 1);
 
     h.get_string(&out[0]);
 
@@ -36,7 +36,7 @@ std::string md5::file_to_hash(const std::string &filePath)
     } while(got == 64);
 
     h.finish();
-    out.resize(MD5_STRING_SIZE);
+    out.resize(MD5_STRING_SIZE - 1);
     h.get_string(&out[0]);
 
     std::fclose(f);
@@ -51,7 +51,7 @@ std::string md5::mem_to_hash(const void *data, size_t size)
 
     h.process((const void*)data, (int)size);
     h.finish();
-    out.resize(MD5_STRING_SIZE);
+    out.resize(MD5_STRING_SIZE - 1);
     h.get_string(&out[0]);
 
     return out;
