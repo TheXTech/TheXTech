@@ -937,9 +937,6 @@ void UpdateControls()
             A = 1;
         }
 
-        auto &joyCon = conJoystick[A];
-        auto &keyCon = conKeyboard[A];
-
         // With Player(A).Controls
         {
             auto &p = Player[A];
