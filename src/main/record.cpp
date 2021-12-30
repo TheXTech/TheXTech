@@ -143,6 +143,8 @@ static void write_header()
     }
 }
 
+// FIXME: Implement the error returning and on-failure abortation with leading abortation of record replaying startup
+
 static void read_header()
 {
     rewind(replay_file); // fseek(replay_file, 0, SEEK_SET);
