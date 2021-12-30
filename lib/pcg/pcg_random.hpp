@@ -88,7 +88,7 @@
 #include <utility>
 // #include <locale>
 #include <new>
-// #include <stdexcept>
+#include <stdexcept>
 
 /*
  * The pcg_extras namespace contains some support code that is likley to
