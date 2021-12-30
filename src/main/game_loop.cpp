@@ -234,6 +234,9 @@ bool PauseScreen_Logic(int plr)
     upPressed |= c.Up;
     downPressed |= c.Down;
 
+    if(menuBackPress && menuDoPress)
+        menuDoPress = false;
+
     if(!MenuCursorCanMove)
     {
         if(!c.Down && !c.Up && !c.Run && !c.Jump && !c.Start &&

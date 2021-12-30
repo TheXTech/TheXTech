@@ -1079,6 +1079,9 @@ int menuControls_Logic()
         delPressed |= c.AltJump;
     }
 
+    if(menuBackPress && menuDoPress)
+        menuDoPress = false;
+
     if(delPressed && s_canDelete)
     {
         s_canDelete = false;

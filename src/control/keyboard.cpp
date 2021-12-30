@@ -186,7 +186,7 @@ InputMethodProfile_Keyboard::InputMethodProfile_Keyboard()
     this->m_keys[PlayerControls::Buttons::Run] = SDL_SCANCODE_X;
     this->m_keys[PlayerControls::Buttons::AltRun] = SDL_SCANCODE_S;
     this->m_keys[PlayerControls::Buttons::Drop] = SDL_SCANCODE_LSHIFT;
-    this->m_keys[PlayerControls::Buttons::Start] = SDL_SCANCODE_ESCAPE;
+    this->m_keys[PlayerControls::Buttons::Start] = SDL_SCANCODE_RETURN;
 
     this->m_editor_keys[EditorControls::Buttons::ScrollUp] = SDL_SCANCODE_UP;
     this->m_editor_keys[EditorControls::Buttons::ScrollDown] = SDL_SCANCODE_DOWN;
@@ -670,7 +670,7 @@ void InputMethodType_Keyboard::UpdateControlsPost()
 {
     if(this->m_touchscreenActive)
     {
-        // let the touchscreen input method handle that
+        // let the touchscreen input method handle the mouse
     }
     // handle the mouse
     else if(SDL_GetMouseFocus())
@@ -725,7 +725,11 @@ void InputMethodType_Keyboard::UpdateControlsPost()
         for(size_t i = 0; i < PlayerControls::n_buttons; i++)
         {
             if(profile->m_keys[i] == SDL_SCANCODE_ESCAPE || profile->m_keys2[i] == SDL_SCANCODE_ESCAPE)
-                escPressed = false;
+            {
+                // allow escape to count even when it is a player's start key, important for correct menu behavior
+                if(i != PlayerControls::Buttons::Start)
+                    escPressed = false;
+            }
             if(profile->m_keys[i] == SDL_SCANCODE_RETURN || profile->m_keys2[i] == SDL_SCANCODE_RETURN)
                 returnPressed = false;
             if(profile->m_keys[i] == SDL_SCANCODE_SPACE || profile->m_keys2[i] == SDL_SCANCODE_SPACE)
@@ -803,7 +807,7 @@ InputMethod* InputMethodType_Keyboard::Poll(const std::vector<InputMethod*>& act
         if(!this->m_keyboardState[key])
             continue;
         bool allowed = true;
-        if(key == SDL_SCANCODE_LALT || key == SDL_SCANCODE_RALT || key == SDL_SCANCODE_LCTRL || key == SDL_SCANCODE_RCTRL)
+        if(key == SDL_SCANCODE_LALT || key == SDL_SCANCODE_RALT || key == SDL_SCANCODE_LCTRL || key == SDL_SCANCODE_RCTRL || key == SDL_SCANCODE_ESCAPE)
             allowed = false;
         // ban attachment from active profile
         for(InputMethod* method : active_methods)

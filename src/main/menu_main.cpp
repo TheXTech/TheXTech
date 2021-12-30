@@ -303,6 +303,9 @@ bool mainMenuUpdate()
 
     menuBackPress |= SharedCursor.Secondary && MenuMouseRelease;
 
+    if(menuBackPress && menuDoPress)
+        menuDoPress = false;
+
     {
         if(frmMain.MousePointer != 99)
         {
