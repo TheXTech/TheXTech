@@ -475,6 +475,8 @@ int GameMain(const CmdLineSetup_t &setup)
             // Clear the speed-runner timer
             speedRun_resetTotal();
 
+            MenuCursorCanMove = false;
+
             // Main menu loop
             runFrameLoop(&MenuLoop, nullptr, []()->bool{ return GameMenu;});
             if(!GameIsActive)
