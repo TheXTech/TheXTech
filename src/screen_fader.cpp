@@ -54,6 +54,7 @@ void ScreenFader::setupFader(int step, int start, int goal, Shape shape, bool us
     m_fader.setRatio(start / 65.0);
     m_fader.setFade(15, goal / 65.0, step / 65.0);
     m_scale = (float)m_fader.fadeRatio();
+    m_dirUp = start < goal;
     m_active = true;
     m_full = false;
     m_complete = false;
@@ -83,6 +84,16 @@ bool ScreenFader::isComplete()
 bool ScreenFader::isVisible()
 {
     return m_active || m_full;
+}
+
+bool ScreenFader::isFadingIn()
+{
+    return m_active && m_dirUp;
+}
+
+bool ScreenFader::isFadingOut()
+{
+    return m_active && !m_dirUp;
 }
 
 void ScreenFader::update()

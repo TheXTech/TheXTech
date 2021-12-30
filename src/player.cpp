@@ -6398,7 +6398,7 @@ void PlayerEffects(const int A)
 
             auto &w = Warp[p.Warp];
 
-            if((w.MapWarp || !w.level.empty()) && Maths::iRound(p.Effect2) == 2955)
+            if((w.MapWarp || !w.level.empty()) && Maths::iRound(p.Effect2) == 2955 && !g_levelScreenFader.isFadingIn())
                 g_levelScreenFader.setupFader(2, 0, 65, ScreenFader::S_FADE);
 
             if(fEqual(p.Effect2, 2920))

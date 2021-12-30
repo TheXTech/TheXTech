@@ -29,6 +29,7 @@ struct ScreenFader
     bool m_active = false;
     bool m_full = false;
     bool m_complete = false;
+    bool m_dirUp = false;
     PGE_Fader m_fader;
     float m_scale = 0.0f;
 
@@ -63,6 +64,8 @@ struct ScreenFader
 
     bool isComplete();
     bool isVisible();
+    bool isFadingIn();
+    bool isFadingOut();
 
     void update();
 
