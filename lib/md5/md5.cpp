@@ -91,7 +91,7 @@ namespace md5 {
              * bytes first, and the new data is large enough to create a complete block then
              * we process these bytes first.
              */
-            if (stored_size and input_length + stored_size >= md5::BLOCK_SIZE) {
+            if (stored_size && input_length + stored_size >= md5::BLOCK_SIZE) {
                 unsigned char block[md5::BLOCK_SIZE];
                 memcpy(block, stored, stored_size);
                 memcpy(block + stored_size, input, md5::BLOCK_SIZE - stored_size);
