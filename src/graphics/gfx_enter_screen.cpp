@@ -21,6 +21,7 @@
 #include <SDL2/SDL_timer.h>
 
 #include "../globals.h"
+#include "../config.h"
 #include "../graphics.h"
 #include "../player.h"
 #include "../frame_timer.h"
@@ -174,7 +175,7 @@ void GameThing(int waitms, int fadeSpeed)
         ScreenFader fader;
         Uint32 targetTime = SDL_GetTicks() + waitms;
 
-        if(fadeSpeed > 0)
+        if(g_config.EnableInterLevelFade && fadeSpeed > 0)
             fader.setupFader(fadeSpeed, 65, 0, ScreenFader::S_FADE);
 
         while(SDL_GetTicks() < targetTime && GameIsActive)
