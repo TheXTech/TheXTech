@@ -25,6 +25,7 @@
 #include <fmt_format_ne.h>
 
 #include "../globals.h"
+#include "../config.h"
 #include "../frame_timer.h"
 #include "../game_main.h"
 #include "../sound.h"
@@ -95,10 +96,10 @@ static SDL_INLINE int computeStarsShowingPolicy(int ll, int cur)
     }
 
     // Gameplay settings
-    if(WorldMapStarShowPolicyGlobal == Compatibility_t::STARS_SHOW_COLLECTED_ONLY && cur <= 0)
+    if(g_config.WorldMapStarShowPolicyGlobal == Compatibility_t::STARS_SHOW_COLLECTED_ONLY && cur <= 0)
         return Compatibility_t::STARS_DONT_SHOW;
 
-    return WorldMapStarShowPolicyGlobal;
+    return g_config.WorldMapStarShowPolicyGlobal;
 }
 
 static SDL_INLINE bool isWorldMusicNotSame(WorldMusic_t &mus)

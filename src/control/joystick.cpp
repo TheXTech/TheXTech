@@ -31,6 +31,7 @@
 #include <Utils/files.h>
 
 #include "../globals.h"
+#include "../config.h"
 #include "../sound.h"
 #include "joystick.h"
 #include "../pseudo_vb.h"
@@ -481,7 +482,7 @@ int joyGetPowerLevel(int joyNum)
 
 void joyRumble(int joyNum, int ms, float strength)
 {
-    if(!JoystickEnableRumble || GameMenu || GameOutro)
+    if(!g_config.JoystickEnableRumble || GameMenu || GameOutro)
         return;
 
     SDL_assert(joyNum >= 0 && (size_t)joyNum < s_joysticks.size());
@@ -514,7 +515,7 @@ void joyRumble(int joyNum, int ms, float strength)
 
 void joyRumbleAllPlayers(int ms, float strength)
 {
-    if(!JoystickEnableRumble)
+    if(!g_config.JoystickEnableRumble)
         return;
 
     for(int plr = 1; plr <= numPlayers && plr <= maxLocalPlayers; ++plr)

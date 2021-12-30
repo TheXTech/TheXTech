@@ -23,6 +23,7 @@
 #include <Utils/maths.h>
 
 #include "../globals.h"
+#include "../config.h"
 #include "../player.h"
 #include "../collision.h"
 #include "../sound.h"
@@ -306,7 +307,7 @@ void UpdatePlayer()
                 {
                     if(Player[A].Mount == 3 && Player[A].MountType == 6) // Purple Yoshi Pound
                     {
-                        bool poundKeyPressed = GameplayPoundByAltRun ? Player[A].Controls.AltRun : Player[A].Controls.Down;
+                        bool poundKeyPressed = g_config.GameplayPoundByAltRun ? Player[A].Controls.AltRun : Player[A].Controls.Down;
                         if(poundKeyPressed && Player[A].DuckRelease && Player[A].CanPound)
                         {
                             Player[A].GroundPound = true;
@@ -324,7 +325,7 @@ void UpdatePlayer()
                     if(!Player[A].CanPound && Player[A].Location.SpeedY < 0)
                         Player[A].GroundPound = false;
 
-                    if(GameplayPoundByAltRun)
+                    if(g_config.GameplayPoundByAltRun)
                         Player[A].Controls.AltRun = true;
                     else
                         Player[A].Controls.Down = true;

@@ -29,6 +29,7 @@
 #include "editor.h"
 #include "blocks.h"
 #include "compat.h"
+#include "config.h"
 #include "control/joystick.h"
 #include "main/trees.h"
 #include "npc_id.h"
@@ -4576,7 +4577,7 @@ void SpecialNPC(int A)
                 if(NPC[A].Special2 == 0)
                 {
                     PlaySound(SFX_Twomp);
-                    if(GameplayShakeScreenThwomp)
+                    if(g_config.GameplayShakeScreenThwomp)
                         doShakeScreen(0, 4, SHAKE_SEQUENTIAL, 5, 0.2);
                     tempLocation.Width = 32;
                     tempLocation.Height = 32;

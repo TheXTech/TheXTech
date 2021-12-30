@@ -29,6 +29,7 @@
 #include "../blocks.h"
 #include "../sorting.h"
 #include "../compat.h"
+#include "../config.h"
 #include "../main/trees.h"
 #include "../npc_id.h"
 
@@ -4350,7 +4351,7 @@ void UpdateNPCs()
                                         KillBlock(B);
                                 }
 
-                                if(!legacy && GameplayShakeScreenBowserIIIrd)
+                                if(!legacy && g_config.GameplayShakeScreenBowserIIIrd)
                                     doShakeScreen(0, 4, SHAKE_SEQUENTIAL, 7, 0.15);
 
                                 if(legacy) // Classic SMBX 1.0's behavior when Bowser stomps a floor

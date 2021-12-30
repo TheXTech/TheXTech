@@ -1098,21 +1098,6 @@ extern std::string g_recentWorld2p;
 extern bool ShowFPS;
 //Public PrintFPS As Double
 extern double PrintFPS;
-// Do ground-point by alt-run key instead of down
-extern bool GameplayPoundByAltRun;
-extern int WorldMapStarShowPolicyGlobal;
-// Shake screen on thwomp falling
-extern bool GameplayShakeScreenThwomp;
-// Shake screen on Bowser III'rd ground pound
-extern bool GameplayShakeScreenBowserIIIrd;
-// Shake screen on Yoshi ground pount
-extern bool GameplayShakeScreenPound;
-// Play "player grow" together with the "get item" sound to represent original games behaviour
-extern bool SoundPlayerGrowWithGetItem;
-// Enable usage of the rumble control
-extern bool JoystickEnableRumble;
-// Show the battery status for wireless gamepads
-extern bool JoystickEnableBatteryStatus;
 //Public vScreen(0 To 2) As vScreen 'Sets up the players screens
 extern RangeArr<vScreen_t, 0, 2> vScreen;
 //Public ScreenType As Integer 'The screen/view type

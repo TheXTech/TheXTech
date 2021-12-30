@@ -37,6 +37,7 @@
 #include "blocks.h"
 #include "editor.h"
 #include "layers.h"
+#include "config.h"
 #include "main/level_file.h"
 #include "main/game_globals.h"
 #include "main/trees.h"
@@ -2771,7 +2772,7 @@ void YoshiPound(const int A, int mount, bool BreakBlocks)
         NewEffect(10, tempLocation);
         Effect[numEffects].Location.SpeedX = 2;
         PlaySound(SFX_Twomp);
-        if(BreakBlocks && GameplayShakeScreenPound)
+        if(BreakBlocks && g_config.GameplayShakeScreenPound)
             doShakeScreen(0, 4, SHAKE_SEQUENTIAL, 4, 0.2);
     }
 }

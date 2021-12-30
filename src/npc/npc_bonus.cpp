@@ -27,6 +27,7 @@
 #include "../player.h"
 #include "../game_main.h"
 #include "../compat.h"
+#include "../config.h"
 
 #include <Utils/maths.h>
 #include <Logger/logger.h>
@@ -39,7 +40,7 @@ static bool doPlayGrowWithGotItem()
     {
     default:
     case Compatibility_t::SPGWGI_UNSPECIFIED:
-        return SoundPlayerGrowWithGetItem;
+        return g_config.SoundPlayerGrowWithGetItem;
     case Compatibility_t::SPGWGI_ENABLE:
         return true;
     case Compatibility_t::SPGWGI_DISABLE:

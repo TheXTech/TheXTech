@@ -187,7 +187,7 @@ void OpenConfig()
         config.beginGroup("main");
         config.read("release", FileRelease, curRelease);
         config.read("full-screen", resBool, false);
-        config.read("record-gameplay", g_config.RecordGameplayData, g_config.RecordGameplayData);
+        config.read("record-gameplay", g_config.RecordGameplayData, false);
         config.endGroup();
 
         config.beginGroup("recent");
@@ -196,20 +196,20 @@ void OpenConfig()
         config.endGroup();
 
         config.beginGroup("gameplay");
-        config.read("ground-pound-by-alt-run", GameplayPoundByAltRun, false);
-        config.readEnum("world-map-stars-show-policy", WorldMapStarShowPolicyGlobal, 0, starsShowPolicy);
+        config.read("ground-pound-by-alt-run", g_config.GameplayPoundByAltRun, false);
+        config.readEnum("world-map-stars-show-policy", g_config.WorldMapStarShowPolicyGlobal, 0, starsShowPolicy);
         config.endGroup();
 
         config.beginGroup("effects");
-        config.read("enable-thwomp-screen-shake", GameplayShakeScreenThwomp, true);
-        config.read("enable-yoshi-ground-pound-screen-shake", GameplayShakeScreenPound, true);
-        config.read("enable-bowser-iiird-screen-shake", GameplayShakeScreenBowserIIIrd, true);
-        config.read("sfx-player-grow-with-got-item", SoundPlayerGrowWithGetItem, false);
+        config.read("enable-thwomp-screen-shake", g_config.GameplayShakeScreenThwomp, true);
+        config.read("enable-yoshi-ground-pound-screen-shake", g_config.GameplayShakeScreenPound, true);
+        config.read("enable-bowser-iiird-screen-shake", g_config.GameplayShakeScreenBowserIIIrd, true);
+        config.read("sfx-player-grow-with-got-item", g_config.SoundPlayerGrowWithGetItem, false);
         config.endGroup();
 
         config.beginGroup("joystick");
-        config.read("enable-rumble", JoystickEnableRumble, true);
-        config.read("enable-battery-status", JoystickEnableBatteryStatus, true);
+        config.read("enable-rumble", g_config.JoystickEnableRumble, true);
+        config.read("enable-battery-status", g_config.JoystickEnableBatteryStatus, true);
         config.endGroup();
 
         For(A, 1, 2)
@@ -370,8 +370,8 @@ void SaveConfig()
             {2, "smbx13"}
         };
 
-        config.setValue("ground-pound-by-alt-run", GameplayPoundByAltRun);
-        config.setValue("world-map-stars-show-policy", starsShowPolicy[WorldMapStarShowPolicyGlobal]);
+        config.setValue("ground-pound-by-alt-run", g_config.GameplayPoundByAltRun);
+        config.setValue("world-map-stars-show-policy", starsShowPolicy[g_config.WorldMapStarShowPolicyGlobal]);
         config.setValue("compatibility-mode", compatMode[g_preSetup.compatibilityMode]);
     }
     config.endGroup();
@@ -383,16 +383,16 @@ void SaveConfig()
 
     config.beginGroup("effects");
     {
-        config.setValue("enable-thwomp-screen-shake", GameplayShakeScreenThwomp);
-        config.setValue("enable-yoshi-ground-pound-screen-shake", GameplayShakeScreenPound);
-        config.setValue("enable-bowser-iiird-screen-shake", GameplayShakeScreenBowserIIIrd);
-        config.setValue("sfx-player-grow-with-got-item", SoundPlayerGrowWithGetItem);
+        config.setValue("enable-thwomp-screen-shake", g_config.GameplayShakeScreenThwomp);
+        config.setValue("enable-yoshi-ground-pound-screen-shake", g_config.GameplayShakeScreenPound);
+        config.setValue("enable-bowser-iiird-screen-shake", g_config.GameplayShakeScreenBowserIIIrd);
+        config.setValue("sfx-player-grow-with-got-item", g_config.SoundPlayerGrowWithGetItem);
     }
     config.endGroup();
 
     config.beginGroup("joystick");
-    config.setValue("enable-rumble", JoystickEnableRumble);
-    config.setValue("enable-battery-status", JoystickEnableBatteryStatus);
+    config.setValue("enable-rumble", g_config.JoystickEnableRumble);
+    config.setValue("enable-battery-status", g_config.JoystickEnableBatteryStatus);
     config.endGroup();
 
     For(A, 1, 2)
