@@ -53,6 +53,7 @@
 #include "main/speedrunner.h"
 #include "main/menu_main.h"
 #include "main/game_info.h"
+#include "main/record.h"
 
 #include "pseudo_vb.h"
 
@@ -229,7 +230,14 @@ int GameMain(const CmdLineSetup_t &setup)
     {
         GameMenu = false;
         LevelSelect = false;
-        FullFileName = setup.testLevel;
+        if(Files::hasSuffix(setup.testLevel, ".rec"))
+        {
+            Record::LoadReplay(setup.testLevel);
+        }
+        else
+        {
+            FullFileName = setup.testLevel;
+        }
         if(setup.testBattleMode)
         {
             numPlayers = 2;
@@ -321,10 +329,10 @@ int GameMain(const CmdLineSetup_t &setup)
                     switch(p.Mount)
                     {
                     case 1:
-                        p.MountType = int(iRand() % 3) + 1;
+                        p.MountType = iRand(3) + 1;
                         break;
                     case 3:
-                        p.MountType = int(iRand() % 8) + 1;
+                        p.MountType = iRand(8) + 1;
                         break;
                     default:
                         p.MountType = 0;
@@ -333,12 +341,12 @@ int GameMain(const CmdLineSetup_t &setup)
                 else if(A == 4)
                 {
                     p.Mount = 1;
-                    p.MountType = int(iRand() % 3) + 1;
+                    p.MountType = iRand(3) + 1;
                 }
                 else if(A == 2)
                 {
                     p.Mount = 3;
-                    p.MountType = int(iRand() % 8) + 1;
+                    p.MountType = iRand(8) + 1;
                 }
 
                 p.HeldBonus = 0;
@@ -470,7 +478,7 @@ int GameMain(const CmdLineSetup_t &setup)
             For(A, 1, numPlayers)
             {
                 Player_t &p = Player[A];
-                p.State = (iRand() % 6) + 2;
+                p.State = iRand(6) + 2;
                 // p.Character = (iRand() % 5) + 1;
 
                 // if(A >= 1 && A <= 5)
@@ -638,6 +646,8 @@ int GameMain(const CmdLineSetup_t &setup)
             CheatString.clear();
             EndLevel = false;
 
+            Record::InitRecording(); // initializes level data recording
+
             if(numPlayers == 1)
                 ScreenType = 0; // Follow 1 player
             else if(numPlayers == 2)
@@ -787,6 +797,8 @@ int GameMain(const CmdLineSetup_t &setup)
                 }
                 return false;
             });
+
+            Record::EndRecording();
 
             if(!GameIsActive)
             {
@@ -1556,7 +1568,7 @@ void StartBattleMode()
     else
     {
         if(selWorld == 1)
-            selWorld = (iRand() % (NumSelectWorld - 1)) + 2;
+            selWorld = iRand(NumSelectWorld - 1) + 2;
     }
 
     std::string levelPath = SelectWorld[selWorld].WorldPath + SelectWorld[selWorld].WorldFile;

@@ -94,7 +94,7 @@ static void updateIntroLevelActivity()
 
         if(p.HoldingNPC ==0)
         {
-            if((p.State ==3 || p.State == 6 || p.State == 7) && (dRand() * 100.0) > 90.0)
+            if((p.State ==3 || p.State == 6 || p.State == 7) && iRand(100) >= 90)
             {
                 if(p.FireBallCD == 0 && !p.RunRelease)
                     p.Controls.Run = false;
@@ -212,12 +212,13 @@ static void updateIntroLevelActivity()
         if(-vScreenX[1] <= level[0].X && (p.Dead || p.TimeToLive > 0) && g_gameInfo.introMaxPlayersCount > 0)
         {
             p.ForceHold = 65;
-            p.State = (iRand() % 6) + 2;
+            p.State = iRand(6) + 2;
             p.CanFly = false;
             p.CanFly2 = false;
             p.TailCount = 0;
             p.Dead = false;
             p.TimeToLive = 0;
+            iRand(1); // advance the random state by one
 //            p.Character = (iRand() % 5) + 1;
 
 //            if(A >= 1 && A <= 5)
@@ -280,10 +281,10 @@ static void updateIntroLevelActivity()
 
             if(!UnderWater[p.Section])
             {
-                if((iRand() % 25) + 1 == 25)
+                if(iRand(25) == 0)
                 {
                     p.Mount = 1;
-                    p.MountType = (iRand() % 3) + 1;
+                    p.MountType = iRand(3) + 1;
                     if(p.State == 1)
                     {
                         p.Location.Height = Physics.PlayerHeight[1][2];
@@ -294,10 +295,10 @@ static void updateIntroLevelActivity()
 
             if(p.Mount == 0 && p.Character <= 2)
             {
-                if((iRand() % 15) + 1 == 15)
+                if(iRand(15) == 0)
                 {
                     p.Mount = 3;
-                    p.MountType = (iRand() % 7) + 1;
+                    p.MountType = iRand(7) + 1;
                     p.Location.Y += p.Location.Height;
                     p.Location.Height = Physics.PlayerHeight[2][2];
                     p.Location.Y += -p.Location.Height - 0.01;
@@ -320,7 +321,7 @@ static void updateIntroLevelActivity()
                     {
                         do
                         {
-                            n.Type = (iRand() % 286) + 1;
+                            n.Type = iRand(286) + 1;
                         } while(n.Type == 11 || n.Type == 16 || n.Type == 18 || n.Type == 15 ||
                                 n.Type == 21 || n.Type == 12 || n.Type == 13 || n.Type == 30 ||
                                 n.Type == 17 || n.Type == 31 || n.Type == 32 ||
@@ -372,17 +373,17 @@ static void updateIntroLevelActivity()
         {
             if(p.Location.SpeedY == 0.0 || p.Slope > 0)
                 p.CanJump = true;
-            if((dRand() * 100) > 98.0 || p.Location.SpeedY == 0.0 || p.Slope > 0)
+            if(iRand(100) >= 98 || p.Location.SpeedY == 0.0 || p.Slope > 0)
                 p.Controls.Jump = true;
         }
 
-        if((dRand() * 100) > 95.0 && Player[A].HoldingNPC == 0 && !Player[A].Slide && Player[A].CanAltJump && Player[A].Mount == 0)
+        if(iRand(20) == 0 && Player[A].HoldingNPC == 0 && !Player[A].Slide && Player[A].CanAltJump && Player[A].Mount == 0)
             Player[A].Controls.AltJump = true;
 
-        if(dRand() * 1000 >= 999 && !Player[A].CanFly2)
+        if(iRand(1000) == 0 && !Player[A].CanFly2)
             Player[A].Controls.Run = false;
 
-        if(Player[A].Mount == 3 && dRand() * 100 >= 98 && !Player[A].RunRelease)
+        if(Player[A].Mount == 3 && iRand(50) == 0 && !Player[A].RunRelease)
             Player[A].Controls.Run = false;
 
         if(NPC[Player[A].HoldingNPC].Type == 22 || NPC[Player[A].HoldingNPC].Type == 49)
@@ -403,15 +404,15 @@ static void updateIntroLevelActivity()
             Player[A].Controls.Jump = true;
         }
 
-        if(Player[A].FloatTime > 0 || (Player[A].CanFloat && Player[A].FloatRelease && Player[A].Jump == 0 && Player[A].Location.SpeedY > 0 && (dRand() * 100) > 95.0))
+        if(Player[A].FloatTime > 0 || (Player[A].CanFloat && Player[A].FloatRelease && Player[A].Jump == 0 && Player[A].Location.SpeedY > 0 && iRand(20) == 0))
             Player[A].Controls.Jump = true;
 
-        if(NPC[Player[A].HoldingNPC].Type == 13 && (dRand() * 100) > 95.0)
+        if(NPC[Player[A].HoldingNPC].Type == 13 && iRand(20) == 0)
         {
             Player[A].Controls.Run = false;
-            if(iRand() % 2 == 1)
+            if(iRand(2) == 0)
                 Player[A].Controls.Up = true;
-            if(iRand() % 2 == 1)
+            if(iRand(2) == 0)
                 Player[A].Controls.Right = false;
         }
 
@@ -510,7 +511,7 @@ void MenuLoop()
 
     if(MenuMouseDown)
     {
-        if(dRand() * 100 > 40.0)
+        if(iRand(5) >= 2)
         {
             NewEffect(80, newLoc(MenuMouseX - vScreenX[1], MenuMouseY - vScreenY[1]));
             Effect[numEffects].Location.SpeedX = dRand() * 4 - 2;

@@ -18,43 +18,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <cstdlib>
+// this module handles the control recording and playback functions
+// and the gameplay stats recording functions
 
-#include "globals.h"
-#include "rand.h"
+#ifndef RECORD_H
+#define RECORD_H
 
-pcg32 g_random_engine;
-long g_random_n_calls = 0;
-
-#ifdef DEBUG_RANDOM_CALLS
-std::vector<void*> g_random_calls;
-#endif
-
-static int last_seed = 310;
-
-void seedRandom(int seed)
+namespace Record
 {
-    last_seed = seed;
-    g_random_n_calls = 0;
-#ifdef DEBUG_RANDOM_CALLS
-    g_random_calls.clear();
-#endif
-    g_random_engine.seed(seed);
-}
 
-int readSeed()
-{
-    g_random_engine.seed(last_seed);
-    return last_seed;
-};
+extern FILE* record_file;
+extern FILE* replay_file;
 
-long random_ncalls()
-{
-    return g_random_n_calls;
-}
+void LoadReplay(std::string recording_path);
 
-// Also note that many VB6 calls use dRand * x
-// and then assign the result to an Integer.
-// The result is NOT iRand(x) but rather vb6Round(dRand()*x),
-// iRand_round, which has a different probability distribution
-// (prob 1/(2x) of being 0 or x and 1/x of being each number in between)
+void InitRecording();
+
+void Sync();
+
+void EndRecording();
+
+}; // namespace Record
+
+#endif // #ifndef RECORD_H

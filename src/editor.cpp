@@ -1108,7 +1108,7 @@ void UpdateEditor()
 
                         if(CursorCollision(EditorCursor.Location, tempLocation) && !NPC[A].Hidden)
                         {
-                            if(static_cast<int>(floor(static_cast<double>(std::rand() % 2))) == 0)
+                            if(iRand(2) == 0)
                                 NPC[A].Location.SpeedX = double(Physics.NPCShellSpeed / 2);
                             else
                                 NPC[A].Location.SpeedX = -double(Physics.NPCShellSpeed / 2);
@@ -1997,7 +1997,7 @@ int EditorNPCFrame(const int A, float& C, int N)
     int E = 0;
     B = C;
     while(int(B) == 0)
-        B = (iRand() % 3) - 1;
+        B = iRand(3) - 1;
 
     if(!LevelEditor)
         C = B;

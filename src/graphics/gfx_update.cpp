@@ -63,19 +63,18 @@ struct ScreenShake_t
 
         if(forceX <= 0 && forceY <= 0)
         {
-            frmMain.offsetViewport(0, 0);
             forceX = 0.0;
             forceY = 0.0;
             active = false;
         }
-        else
+        // always perform this section to keep the number of random calls consistent w/legacy sources
         {
             switch(type)
             {
             default:
             case SHAKE_RANDOM:
-                offsetX = forceX > 0 ? (int)round((SDL_fmod(iRand(), forceX) * 4) - forceX * 2) : 0;
-                offsetY = forceY > 0 ? (int)round((SDL_fmod(iRand(), forceY) * 4) - forceY * 2) : 0;
+                offsetX = iRand(forceX * 4) - forceX * 2;
+                offsetY = iRand(forceY * 4) - forceY * 2;
                 break;
             case SHAKE_SEQUENTIAL:
                 offsetX = forceX > 0 ? (int)round(sign * forceX) : 0;
