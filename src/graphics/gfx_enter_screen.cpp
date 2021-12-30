@@ -28,9 +28,9 @@
 #include "pge_delay.h"
 
 
-static void initPlayers(Player_t tempPlayer[2])
+static void initPlayers(Player_t tempPlayer[maxLocalPlayers])
 {
-    for(int A = 0; A < numPlayers; ++A)
+    for(int A = 0; A < numPlayers && A < maxLocalPlayers; ++A)
     {
         auto &ref = Player[A + 1];
         auto &dst = tempPlayer[A];
@@ -137,7 +137,7 @@ static void initPlayers(Player_t tempPlayer[2])
 }
 
 
-static void drawEnterScreen(Player_t tempPlayer[2])
+static void drawEnterScreen(Player_t tempPlayer[maxLocalPlayers])
 {
     for(int A = 0; A < numPlayers; ++A)
         DrawPlayer(tempPlayer[A], 0);
@@ -158,7 +158,7 @@ static void drawEnterScreen(Player_t tempPlayer[2])
 
 void GameThing(int waitms, int fadeSpeed)
 {
-    Player_t tempPlayer[2];
+    Player_t tempPlayer[maxLocalPlayers];
     initPlayers(tempPlayer);
 
     if(waitms <= 0)
