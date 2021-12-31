@@ -77,7 +77,7 @@ static void compatInit(Compatibility_t &c)
     c.fix_swooper_start_while_inactive = true;
     c.fix_FreezeNPCs_no_reset = false;
     // 1.3.6
-    c.modern_player_select = true;
+    c.pause_on_disconnect = true;
     c.allow_DropAdd = true;
     c.multiplayer_pause_controls = true;
 
@@ -108,7 +108,7 @@ static void compatInit(Compatibility_t &c)
         c.fix_swooper_start_while_inactive = false;
         c.fix_FreezeNPCs_no_reset = false;
         // 1.3.6
-        c.modern_player_select = false;
+        c.pause_on_disconnect = false;
         c.allow_DropAdd = false;
         c.multiplayer_pause_controls = false;
     }
@@ -189,7 +189,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         compat.read("fix-swooper-start-while-inactive", c.fix_swooper_start_while_inactive, c.fix_swooper_start_while_inactive);
         compat.read("fix-FreezeNPCs-no-reset", c.fix_FreezeNPCs_no_reset, c.fix_FreezeNPCs_no_reset);
         // 1.3.6
-        compat.read("modern-player-select", c.modern_player_select, c.modern_player_select);
+        compat.read("pause-on-disconnect", c.pause_on_disconnect, c.pause_on_disconnect);
         compat.read("allow-DropAdd", c.allow_DropAdd, c.allow_DropAdd);
         compat.read("multiplayer-pause-controls", c.multiplayer_pause_controls, c.multiplayer_pause_controls);
     }

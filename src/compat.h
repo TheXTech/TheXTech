@@ -51,7 +51,7 @@ struct Compatibility_t
     bool fix_swooper_start_while_inactive;
     bool fix_FreezeNPCs_no_reset;
     // 1.3.6
-    bool modern_player_select;
+    bool pause_on_disconnect;
     bool allow_DropAdd;
     bool multiplayer_pause_controls;
 

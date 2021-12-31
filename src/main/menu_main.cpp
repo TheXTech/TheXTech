@@ -62,8 +62,7 @@ void initMainMenu()
     SDL_AtomicSet(&loadingProgrssMax, 0);
 
     g_mainMenu.main1PlayerGame = "1 Player Game";
-    g_mainMenu.main2PlayerGame = "2 Player Game";
-    g_mainMenu.mainMultiplayerGame = "Co-op Game";
+    g_mainMenu.mainMultiplayerGame = "2 Player Game";
     g_mainMenu.mainBattleGame = "Battle Game";
     g_mainMenu.mainOptions = "Options";
     g_mainMenu.mainExit = "Exit";
@@ -391,10 +390,8 @@ bool mainMenuUpdate()
                         int i = 0;
                         if(A == i++)
                             menuLen = 18 * g_mainMenu.main1PlayerGame.size() - 2;
-                        else if(g_compatibility.modern_player_select && A == i++)
+                        else if(A == i++)
                             menuLen = 18 * g_mainMenu.mainMultiplayerGame.size() - 2;
-                        else if(!g_compatibility.modern_player_select && A == i++)
-                            menuLen = 18 * g_mainMenu.main2PlayerGame.size() - 2;
                         else if(A == i++)
                             menuLen = 18 * g_mainMenu.mainBattleGame.size();
                         else if(A == i++)
@@ -786,26 +783,15 @@ bool mainMenuUpdate()
                             blockCharacter[A] = SelectWorld[selWorld].blockChar[A];
                     }
 
-                    if(!g_compatibility.modern_player_select)
+                    if(MenuMode == MENU_BATTLE_MODE)
                     {
-                        MenuMode *= MENU_CHARACTER_SELECT_BASE;
-                        MenuCursor = 0;
-
-                        if(MenuMode == MENU_CHARACTER_SELECT_BM_S1 && PlayerCharacter != 0)
-                            MenuCursor = PlayerCharacter - 1;
+                        MenuMode = MENU_CHARACTER_SELECT_NEW_BM;
+                        ConnectScreen::MainMenu_Start(2);
                     }
                     else
                     {
-                        if(MenuMode == MENU_BATTLE_MODE)
-                        {
-                            MenuMode = MENU_CHARACTER_SELECT_NEW_BM;
-                            ConnectScreen::MainMenu_Start(2);
-                        }
-                        else
-                        {
-                            MenuMode *= MENU_SELECT_SLOT_BASE;
-                            MenuCursor = 0;
-                        }
+                        MenuMode *= MENU_SELECT_SLOT_BASE;
+                        MenuCursor = 0;
                     }
 
                     MenuCursorCanMove = false;
@@ -833,32 +819,8 @@ bool mainMenuUpdate()
                 if(menuBackPress)
                 {
 //'save select back
-                    if(!g_compatibility.modern_player_select)
-                    {
-                        if(AllCharBlock > 0)
-                        {
-                            MenuMode /= MENU_SELECT_SLOT_BASE;
-                            MenuCursor = selWorld - 1;
-                        }
-                        else
-                        {
-                            if(MenuMode == MENU_SELECT_SLOT_1P)
-                            {
-                                MenuCursor = PlayerCharacter - 1;
-                                MenuMode = MENU_CHARACTER_SELECT_1P;
-                            }
-                            else
-                            {
-                                MenuCursor = PlayerCharacter2 - 1;
-                                MenuMode = MENU_CHARACTER_SELECT_2P_S2;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        MenuMode /= MENU_SELECT_SLOT_BASE;
-                        MenuCursor = selWorld - 1;
-                    }
+                    MenuMode /= MENU_SELECT_SLOT_BASE;
+                    MenuCursor = selWorld - 1;
 
                     MenuCursorCanMove = false;
                     PlaySoundMenu(SFX_Slide);
@@ -867,16 +829,7 @@ bool mainMenuUpdate()
                 {
                     PlaySoundMenu(SFX_Do);
 
-                    if(MenuCursor >= 0 && MenuCursor <= 2 && !g_compatibility.modern_player_select) // Select the save slot
-                    {
-                        selSave = MenuCursor + 1;
-                        numPlayers = MenuMode / MENU_SELECT_SLOT_BASE;
-
-                        StartEpisode();
-
-                        return true;
-                    }
-                    else if(MenuCursor >= 0 && MenuCursor <= 2) // Select the save slot, but still need to select players
+                    if(MenuCursor >= 0 && MenuCursor <= 2) // Select the save slot, but still need to select players
                     {
                         selSave = MenuCursor + 1;
                         if(MenuMode == MENU_SELECT_SLOT_2P)
@@ -1170,15 +1123,6 @@ static void s_drawGameTypeTitle(int x, int y)
 {
     if(menuBattleMode)
         SuperPrint(g_mainMenu.mainBattleGame, 3, x, y, 0.3f, 0.3f, 1.0f);
-    else if(g_compatibility.modern_player_select)
-    {
-        float r = menuPlayersNum == 1 ? 1.f : 0.3f;
-        float g = menuPlayersNum == 2 ? 1.f : 0.3f;
-        if(menuPlayersNum == 1)
-            SuperPrint(g_mainMenu.main1PlayerGame, 3, x, y, r, g, 0.3f);
-        else
-            SuperPrint(g_mainMenu.mainMultiplayerGame, 3, x, y, r, g, 0.3f);
-    }
     else
     {
         float r = menuPlayersNum == 1 ? 1.f : 0.3f;
@@ -1186,7 +1130,7 @@ static void s_drawGameTypeTitle(int x, int y)
         if(menuPlayersNum == 1)
             SuperPrint(g_mainMenu.main1PlayerGame, 3, x, y, r, g, 0.3f);
         else
-            SuperPrint(g_mainMenu.main2PlayerGame, 3, x, y, r, g, 0.3f);
+            SuperPrint(g_mainMenu.mainMultiplayerGame, 3, x, y, r, g, 0.3f);
     }
 }
 
@@ -1256,10 +1200,7 @@ void mainMenuDraw()
     {
         int i = 0;
         SuperPrint(g_mainMenu.main1PlayerGame, 3, 300, 350+30*(i++));
-        if(g_compatibility.modern_player_select)
-            SuperPrint(g_mainMenu.mainMultiplayerGame, 3, 300, 350+30*(i++));
-        else
-            SuperPrint(g_mainMenu.main2PlayerGame, 3, 300, 350+30*(i++));
+        SuperPrint(g_mainMenu.mainMultiplayerGame, 3, 300, 350+30*(i++));
         SuperPrint(g_mainMenu.mainBattleGame, 3, 300, 350+30*(i++));
         SuperPrint(g_mainMenu.mainOptions, 3, 300, 350+30*(i++));
         SuperPrint(g_mainMenu.mainExit, 3, 300, 350+30*(i++));
