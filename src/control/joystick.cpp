@@ -1309,9 +1309,16 @@ const char* InputMethodProfile_Joystick::GetOptionValue(size_t i)
 // called when A is pressed; allowed to interrupt main game loop
 bool InputMethodProfile_Joystick::OptionChange(size_t i)
 {
-    if(i == 0)
+    if(i == 0) // rumble
     {
         this->m_rumbleEnabled = !this->m_rumbleEnabled;
+        for(InputMethod* m : g_InputMethods)
+        {
+            if(!m || m->Profile != this)
+                continue;
+            if(this->m_rumbleEnabled)
+                m->Rumble(200, .5);
+        }
         return true;
     }
     else
