@@ -441,7 +441,7 @@ void WorldLoop()
                             if(!OpenLevel(levelPath))
                             {
                                 MessageText = fmt::format_ne("ERROR: Can't open \"{0}\": file doesn't exist or corrupted.", level.FileName);
-                                PauseGame(PauseCode::Message, 1);
+                                PauseGame(PauseCode::Message);
                                 ErrorQuit = true;
                             }
                             break;

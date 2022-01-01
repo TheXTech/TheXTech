@@ -125,73 +125,57 @@ void GameLoop()
         if(MagicHand)
             UpdateEditor();
 
-        bool pausePress = Player[1].Controls.Start || SharedControls.Pause;
-
-        if(pausePress)
+        // Pause game and CaptainN logic
+        if(LevelMacro == LEVELMACRO_OFF && CheckLiving() > 0)
         {
-            if(LevelMacro == LEVELMACRO_OFF && CheckLiving() > 0)
+            // this is always able to pause the game even when CaptainN is enabled.
+            if(SharedControls.Pause)
+                PauseGame(PauseCode::PauseGame, 0);
+            // don't let double-pause or double-toggle happen
+            else
             {
-                if(Player[1].UnStart)
+                for(int p = 1; p <= numPlayers && p <= maxLocalPlayers; p++)
                 {
-                    if((CaptainN || FreezeNPCs) && PSwitchStop == 0)
+                    // only consider new start presses
+                    if(!Player[p].UnStart || !Player[p].Controls.Start)
+                        continue;
+                    // use limited, buggy code for non-player 1 in compat case
+                    if(p != 1 && !g_compatibility.multiplayer_pause_controls)
                     {
-                        // not sure I understand why this distinction is here
-                        if(SharedControls.Pause) // if(escPressed)
+                        if(CaptainN || FreezeNPCs)
                         {
-                            FreezeNPCs = false;
-                            PauseGame(PauseCode::PauseGame, 1);
-                        }
-                        else
-                        {
-                            Player[1].UnStart = false;
-                            if(FreezeNPCs)
-                            {
-                                FreezeNPCs = false;
-                                if(PSwitchTime > 0)
-                                {
-                                    if(!noSound)
-                                        SoundResumeAll();
-                                }
-                            }
-                            else
-                            {
-                                FreezeNPCs = true;
-                                if(PSwitchTime > 0)
-                                {
-                                    if(!noSound)
-                                        SoundPauseAll();
-                                }
-                            }
+                            Player[p].UnStart = false;
+                            FreezeNPCs = !FreezeNPCs;
                             PlaySound(SFX_Pause);
                         }
+                        // don't let double-pause or double-toggle happen
+                        break;
                     }
-                    else
+                    // the special NPC freeze toggling functionality from CaptainN
+                    if((CaptainN || FreezeNPCs) && PSwitchStop == 0)
                     {
-                        PauseGame(PauseCode::PauseGame, 1);
-                    }
-                }
-            }
-        }
-        else if(numPlayers == 2 && Player[2].Controls.Start)
-        {
-            if(LevelMacro == LEVELMACRO_OFF && CheckLiving() > 0)
-            {
-                if(Player[2].UnStart)
-                {
-                    // not sure I understand why the PSwitchStop is missing here
-                    if(CaptainN || FreezeNPCs)
-                    {
-                        Player[2].UnStart = false;
+                        Player[p].UnStart = false;
                         if(FreezeNPCs)
                         {
                             FreezeNPCs = false;
+                            if(PSwitchTime > 0 && !noSound)
+                                SoundResumeAll();
                         }
                         else
                         {
                             FreezeNPCs = true;
+                            if(PSwitchTime > 0 && !noSound)
+                                SoundPauseAll();
                         }
                         PlaySound(SFX_Pause);
                     }
+                    // normally pause the game
+                    else
+                    {
+                        PauseGame(PauseCode::PauseGame, p);
+                    }
+                    // don't let double-pause or double-toggle happen
+                    break;
                 }
             }
         }
@@ -226,21 +210,40 @@ bool PauseScreen_Logic(int plr)
             Player[A].Controls = Player[1].Controls;
     }
 
-    auto &c = Player[plr].Controls;
+    if(!g_compatibility.multiplayer_pause_controls && plr == 0)
+        plr = 1;
 
-    menuDoPress |= (c.Start || c.Jump);
-    menuBackPress |= c.Run;
+    if(plr == 0)
+    {
+        for(int i = 1; i <= numPlayers; i++)
+        {
+            const Controls_t& c = Player[i].Controls;
 
-    upPressed |= c.Up;
-    downPressed |= c.Down;
+            menuDoPress |= (c.Start || c.Jump);
+            menuBackPress |= c.Run;
+
+            upPressed |= c.Up;
+            downPressed |= c.Down;
+        }
+    }
+    else
+    {
+        const Controls_t& c = Player[plr].Controls;
+
+        menuDoPress |= (c.Start || c.Jump);
+        menuBackPress |= c.Run;
+
+        upPressed |= c.Up;
+        downPressed |= c.Down;
+
+    }
 
     if(menuBackPress && menuDoPress)
         menuDoPress = false;
 
     if(!MenuCursorCanMove)
     {
-        if(!c.Down && !c.Up && !c.Run && !c.Jump && !c.Start &&
-           !menuDoPress && !menuBackPress && !upPressed && !downPressed)
+        if(!menuDoPress && !menuBackPress && !upPressed && !downPressed)
         {
             MenuCursorCanMove = true;
         }
@@ -477,21 +480,37 @@ bool MessageScreen_Logic(int plr)
     bool menuDoPress = SharedControls.MenuDo;
     bool menuBackPress = SharedControls.MenuBack;
 
+    // this might no longer be necessary...
     if(SingleCoop > 0 || numPlayers > 2)
     {
         for(int A = 1; A <= numPlayers; A++)
             Player[A].Controls = Player[1].Controls;
     }
 
-    auto &c = Player[plr].Controls;
+    if(!g_compatibility.multiplayer_pause_controls && plr == 0)
+        plr = 1;
 
-    menuDoPress |= (c.Start || c.Jump);
-    menuBackPress |= c.Run;
+    if(plr == 0)
+    {
+        for(int i = 1; i <= numPlayers; i++)
+        {
+            const Controls_t& c = Player[i].Controls;
+
+            menuDoPress |= (c.Start || c.Jump);
+            menuBackPress |= c.Run;
+        }
+    }
+    else
+    {
+        const Controls_t& c = Player[plr].Controls;
+
+        menuDoPress |= (c.Start || c.Jump);
+        menuBackPress |= c.Run;
+    }
 
     if(!MenuCursorCanMove)
     {
-        if(!c.Run && !c.Jump && !c.Start &&
-           !menuDoPress && !menuBackPress)
+        if(!menuDoPress && !menuBackPress)
         {
             MenuCursorCanMove = true;
         }
@@ -573,7 +592,7 @@ void PauseGame(PauseCode code, int plr)
             {
                 // prevent any logic or unpause from taking place
             }
-            if(GamePaused == PauseCode::PauseGame)
+            else if(GamePaused == PauseCode::PauseGame)
             {
                 if(PauseScreen_Logic(plr))
                     break;
