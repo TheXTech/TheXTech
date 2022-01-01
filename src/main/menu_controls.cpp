@@ -29,6 +29,8 @@ static bool s_deleteProfileSel = false;
 
 static Controls::ControlsClass s_profileTab = Controls::ControlsClass::None;
 
+// only partially refactored from the mouse and standard menu logic functions
+//   (which currently duplicate part of their logic)
 int menuControls_Do()
 {
     if(s_curType == -1)
@@ -37,6 +39,7 @@ int menuControls_Do()
     else if(s_curProfile == -1)
     {
         Controls::InputMethodType* type = Controls::g_InputMethodTypes[s_curType];
+        (void)type;
     }
     else if(s_profileTab == Controls::ControlsClass::None)
     {
@@ -109,6 +112,7 @@ int menuControls_Do()
             return 0;
         }
     }
+    return 0;
 }
 
 int menuControls_Mouse_Render(bool mouse, bool render)
