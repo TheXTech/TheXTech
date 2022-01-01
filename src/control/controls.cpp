@@ -657,6 +657,17 @@ void LoadConfig(IniProcessing* ctl)
 
 InputMethod* PollInputMethod() noexcept
 {
+    // don't poll unless there is a free slot
+    size_t player_no = 0;
+    while(player_no < g_InputMethods.size() && g_InputMethods[player_no] != nullptr)
+    {
+        player_no ++;
+    }
+
+    if(player_no >= maxLocalPlayers)
+        return nullptr;
+ 
+    // try all input method types
     InputMethod* new_method = nullptr;
     for(InputMethodType* type : g_InputMethodTypes)
     {
@@ -670,11 +681,7 @@ InputMethod* PollInputMethod() noexcept
     if(!new_method->Type)
         return nullptr;
 
-    size_t player_no = 0;
-    while(player_no < g_InputMethods.size() && g_InputMethods[player_no] != nullptr)
-    {
-        player_no ++;
-    }
+    // try a number of ways of assigning a profile if one has not already been assigned
     if(!new_method->Profile)
     {
         // fallback 1: last profile used by this player index
@@ -751,7 +758,7 @@ void DeleteInputMethod(InputMethod* method)
         *loc = nullptr;
         loc = std::find(g_InputMethods.begin(), g_InputMethods.end(), method);
     }
-    pLogDebug("Just deleted %s '%s' with profile '%s'.",
+    pLogDebug("Just disconnected %s '%s' with profile '%s'.",
         method->Type->Name.c_str(),  method->Name.c_str(), method->Profile->Name.c_str());
     delete method;
 }

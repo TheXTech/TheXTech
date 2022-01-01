@@ -1073,7 +1073,7 @@ const char* InputMethodType_Keyboard::GetOptionName(size_t i)
     }
     if(i == 1)
     {
-        return "DIRECT TEXT ENTRY";
+        return "TEXT ENTRY STYLE";
     }
     return nullptr;
 }
@@ -1091,9 +1091,9 @@ const char* InputMethodType_Keyboard::GetOptionValue(size_t i)
     if(i == 1)
     {
         if(this->m_directText)
-            return "TRUE";
+            return "KEYBOARD";
         else
-            return "FALSE";
+            return "GAMEPAD";
     }
     return nullptr;
 }

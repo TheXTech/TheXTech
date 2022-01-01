@@ -41,6 +41,7 @@
 #include "../graphics.h"
 #include "../controls.h"
 #include "../config.h"
+#include "../compat.h"
 #include "level_file.h"
 #include "pge_delay.h"
 
@@ -60,9 +61,9 @@ void initMainMenu()
     SDL_AtomicSet(&loadingProgrss, 0);
     SDL_AtomicSet(&loadingProgrssMax, 0);
 
-    g_mainMenu.mainGame = "Main Game";
     g_mainMenu.main1PlayerGame = "1 Player Game";
     g_mainMenu.main2PlayerGame = "2 Player Game";
+    g_mainMenu.mainMultiplayerGame = "Co-op Game";
     g_mainMenu.mainBattleGame = "Battle Game";
     g_mainMenu.mainOptions = "Options";
     g_mainMenu.mainExit = "Exit";
@@ -388,12 +389,12 @@ bool mainMenuUpdate()
                     if(SharedCursor.Y >= 350 + A * 30 && SharedCursor.Y <= 366 + A * 30)
                     {
                         int i = 0;
-                        if(g_config.LegacyPlayerSelect && A == i++)
+                        if(A == i++)
                             menuLen = 18 * g_mainMenu.main1PlayerGame.size() - 2;
-                        else if(g_config.LegacyPlayerSelect && A == i++)
+                        else if(g_compatibility.modern_player_select && A == i++)
+                            menuLen = 18 * g_mainMenu.mainMultiplayerGame.size() - 2;
+                        else if(!g_compatibility.modern_player_select && A == i++)
                             menuLen = 18 * g_mainMenu.main2PlayerGame.size() - 2;
-                        else if(!g_config.LegacyPlayerSelect && A == i++)
-                            menuLen = 18 * g_mainMenu.mainGame.size() - 2;
                         else if(A == i++)
                             menuLen = 18 * g_mainMenu.mainBattleGame.size();
                         else if(A == i++)
@@ -420,11 +421,7 @@ bool mainMenuUpdate()
 
             if(menuBackPress && MenuCursorCanMove)
             {
-                int quitKeyPos;
-                if(g_config.LegacyPlayerSelect)
-                    quitKeyPos = 4;
-                else
-                    quitKeyPos = 3;
+                int quitKeyPos = 4;
 
                 if(MenuCursor != quitKeyPos)
                 {
@@ -453,7 +450,7 @@ bool mainMenuUpdate()
 #endif
                     MenuCursor = 0;
                 }
-                else if(g_config.LegacyPlayerSelect && MenuCursor == i++)
+                else if(MenuCursor == i++)
                 {
                     PlaySoundMenu(SFX_Do);
                     MenuMode = MENU_2PLAYER_GAME;
@@ -503,11 +500,7 @@ bool mainMenuUpdate()
             }
 
 
-            int quitKeyPos;
-            if(g_config.LegacyPlayerSelect)
-                quitKeyPos = 4;
-            else
-                quitKeyPos = 3;
+            int quitKeyPos = 4;
             if(MenuCursor > quitKeyPos)
                 MenuCursor = 0;
             if(MenuCursor < 0)
@@ -770,12 +763,7 @@ bool mainMenuUpdate()
 
                     if(MenuMode == MENU_BATTLE_MODE)
                     {
-                        int battleIndex;
-                        if(g_config.LegacyPlayerSelect)
-                            battleIndex = 2;
-                        else
-                            battleIndex = 1;
-                        MenuCursor = battleIndex;
+                        MenuCursor = 2;
                     }
 
                     MenuMode = MENU_MAIN;
@@ -798,7 +786,7 @@ bool mainMenuUpdate()
                             blockCharacter[A] = SelectWorld[selWorld].blockChar[A];
                     }
 
-                    if(g_config.LegacyPlayerSelect)
+                    if(!g_compatibility.modern_player_select)
                     {
                         MenuMode *= MENU_CHARACTER_SELECT_BASE;
                         MenuCursor = 0;
@@ -845,7 +833,7 @@ bool mainMenuUpdate()
                 if(menuBackPress)
                 {
 //'save select back
-                    if(g_config.LegacyPlayerSelect)
+                    if(!g_compatibility.modern_player_select)
                     {
                         if(AllCharBlock > 0)
                         {
@@ -879,7 +867,7 @@ bool mainMenuUpdate()
                 {
                     PlaySoundMenu(SFX_Do);
 
-                    if(MenuCursor >= 0 && MenuCursor <= 2 && g_config.LegacyPlayerSelect) // Select the save slot
+                    if(MenuCursor >= 0 && MenuCursor <= 2 && !g_compatibility.modern_player_select) // Select the save slot
                     {
                         selSave = MenuCursor + 1;
                         numPlayers = MenuMode / MENU_SELECT_SLOT_BASE;
@@ -1071,11 +1059,7 @@ bool mainMenuUpdate()
             {
                 if(menuBackPress)
                 {
-                    int optionsIndex;
-                    if(g_config.LegacyPlayerSelect)
-                        optionsIndex = 3;
-                    else
-                        optionsIndex = 2;
+                    int optionsIndex = 3;
                     MenuMode = MENU_MAIN;
                     MenuCursor = optionsIndex;
                     MenuCursorCanMove = false;
@@ -1186,9 +1170,14 @@ static void s_drawGameTypeTitle(int x, int y)
 {
     if(menuBattleMode)
         SuperPrint(g_mainMenu.mainBattleGame, 3, x, y, 0.3f, 0.3f, 1.0f);
-    else if(!g_config.LegacyPlayerSelect)
+    else if(g_compatibility.modern_player_select)
     {
-        SuperPrint(g_mainMenu.mainGame, 3, x, y);
+        float r = menuPlayersNum == 1 ? 1.f : 0.3f;
+        float g = menuPlayersNum == 2 ? 1.f : 0.3f;
+        if(menuPlayersNum == 1)
+            SuperPrint(g_mainMenu.main1PlayerGame, 3, x, y, r, g, 0.3f);
+        else
+            SuperPrint(g_mainMenu.mainMultiplayerGame, 3, x, y, r, g, 0.3f);
     }
     else
     {
@@ -1266,11 +1255,10 @@ void mainMenuDraw()
     else if(MenuMode == MENU_MAIN)
     {
         int i = 0;
-        if(g_config.LegacyPlayerSelect)
-            SuperPrint(g_mainMenu.main1PlayerGame, 3, 300, 350+30*(i++));
+        SuperPrint(g_mainMenu.main1PlayerGame, 3, 300, 350+30*(i++));
+        if(g_compatibility.modern_player_select)
+            SuperPrint(g_mainMenu.mainMultiplayerGame, 3, 300, 350+30*(i++));
         else
-            SuperPrint(g_mainMenu.mainGame, 3, 300, 350+30*(i++));
-        if(g_config.LegacyPlayerSelect)
             SuperPrint(g_mainMenu.main2PlayerGame, 3, 300, 350+30*(i++));
         SuperPrint(g_mainMenu.mainBattleGame, 3, 300, 350+30*(i++));
         SuperPrint(g_mainMenu.mainOptions, 3, 300, 350+30*(i++));

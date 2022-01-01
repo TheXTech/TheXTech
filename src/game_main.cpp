@@ -1369,7 +1369,7 @@ void StartEpisode()
         Player[i].Hearts = 0;
     }
 
-    if(g_config.LegacyPlayerSelect)
+    if(!g_compatibility.modern_player_select)
     {
         if(numPlayers <= 2 && PlayerCharacter > 0)
         {
@@ -1496,7 +1496,7 @@ void StartBattleMode()
         Player[i].YoshiYellow = false;
         Player[i].Hearts = 2;
     }
-    if(g_config.LegacyPlayerSelect)
+    if(!g_compatibility.modern_player_select)
     {
         numPlayers = 2;
         Player[1].Character = PlayerCharacter;

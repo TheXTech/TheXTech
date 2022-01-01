@@ -621,7 +621,15 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pW, int sY, int line, bool m
     if(!pretend_connected && s_playerState[p] == PlayerState::Disconnected)
     {
         if(render)
-            SuperPrintCenter(g_mainMenu.playerSelAttachController, 3, cX, sY+7*line);
+        {
+            BlockFlash += 1;
+
+            if(BlockFlash >= 90)
+                BlockFlash = 0;
+
+            if(BlockFlash < 45)
+                SuperPrintCenter(g_mainMenu.playerSelAttachController, 3, cX, sY+7*line);
+    }
         return ret;
     }
 
@@ -728,15 +736,25 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pW, int sY, int line, bool m
     // render the (waiting for other players / game start screen)
     if(s_playerState[p] == PlayerState::StartGame)
     {
-        if(CheckDone())
+        if(CheckDone() && render)
         {
             SuperPrint(g_mainMenu.playerSelStartGame, 3, pX, sY+7*line);
             frmMain.renderTexture(pX - 20, sY+7*line, GFX.MCursor[0]);
         }
         else
         {
-            // make this flash
-            SuperPrintCenter(g_mainMenu.wordWaiting, 3, cX, sY+7*line);
+            // make the "Waiting" text flash
+            if(render)
+            {
+                BlockFlash += 1;
+
+                if(BlockFlash >= 90)
+                    BlockFlash = 0;
+
+                if(BlockFlash < 45)
+                    SuperPrintCenter(g_mainMenu.wordWaiting, 3, cX, sY+7*line);
+            }
+
             if((s_context == Context::DropAdd || (s_context == Context::Reconnect && g_compatibility.allow_DropAdd))
                 && s_menuItem[p] != -4)
             {

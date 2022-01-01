@@ -144,7 +144,6 @@ void OpenConfig()
         config.endGroup();
 
         config.beginGroup("gameplay");
-        config.read("legacy-player-select", g_config.LegacyPlayerSelect, false);
         config.read("ground-pound-by-alt-run", GameplayPoundByAltRun, false);
         config.endGroup();
 
@@ -237,7 +236,6 @@ void SaveConfig()
 
     config.beginGroup("gameplay");
     config.setValue("ground-pound-by-alt-run", GameplayPoundByAltRun);
-    config.setValue("legacy-player-select", g_config.LegacyPlayerSelect);
     config.endGroup();
 
     config.beginGroup("effects");

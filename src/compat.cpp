@@ -77,7 +77,9 @@ static void compatInit(Compatibility_t &c)
     c.fix_swooper_start_while_inactive = true;
     c.fix_FreezeNPCs_no_reset = false;
     // 1.3.6
+    c.modern_player_select = true;
     c.allow_DropAdd = true;
+    c.multiplayer_pause_controls = true;
 
 
     if(s_compatLevel >= COMPAT_SMBX2) // Make sure that bugs were same as on SMBX2 Beta 4 on this moment
@@ -106,7 +108,9 @@ static void compatInit(Compatibility_t &c)
         c.fix_swooper_start_while_inactive = false;
         c.fix_FreezeNPCs_no_reset = false;
         // 1.3.6
+        c.modern_player_select = false;
         c.allow_DropAdd = false;
+        c.multiplayer_pause_controls = false;
     }
 
     if(s_compatLevel >= COMPAT_SMBX13) // Strict vanilla SMBX
@@ -185,7 +189,9 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         compat.read("fix-swooper-start-while-inactive", c.fix_swooper_start_while_inactive, c.fix_swooper_start_while_inactive);
         compat.read("fix-FreezeNPCs-no-reset", c.fix_FreezeNPCs_no_reset, c.fix_FreezeNPCs_no_reset);
         // 1.3.6
+        compat.read("modern-player-select", c.modern_player_select, c.modern_player_select);
         compat.read("allow-DropAdd", c.allow_DropAdd, c.allow_DropAdd);
+        compat.read("multiplayer-pause-controls", c.multiplayer_pause_controls, c.multiplayer_pause_controls);
     }
     // 1.3.4
     compat.read("fix-player-filter-bounce", c.fix_player_filter_bounce, c.fix_player_filter_bounce);

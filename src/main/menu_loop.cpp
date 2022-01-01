@@ -472,8 +472,8 @@ static void updateIntroLevelActivity()
 
 void MenuLoop()
 {
-    // ConnectScreen handles its own input method polling
-    if(MenuMode != MENU_CHARACTER_SELECT_NEW && !g_pollingInput)
+    // ConnectScreen and ControlsSettings screens handles its own input method polling
+    if(MenuMode != MENU_CHARACTER_SELECT_NEW && MenuMode != MENU_INPUT_SETTINGS && !g_pollingInput)
         Controls::PollInputMethod();
     Controls::Update();
     if(!SharedCursor.Primary && !SharedCursor.Secondary)

@@ -3,8 +3,6 @@
 
 extern struct Config_t
 {
-    //! Use SMBX player select screens
-    bool    LegacyPlayerSelect = true;
     //! Use strict Drop/Add (lose life on Add after Drop, SwapCharacter)
     bool    StrictDropAdd = false;
     //! Record gameplay data
