@@ -323,7 +323,23 @@ int menuControls_Mouse_Render(bool mouse, bool render)
         {
             if(render)
             {
-                SuperPrint(Controls::g_InputMethodTypes[scroll_start + i]->Name, 3, sX+48, sY+(3+i)*line);
+                bool in_use = false;
+
+                for(Controls::InputMethod* method : Controls::g_InputMethods)
+                {
+                    if(!method)
+                        continue;
+                    if(method->Type == Controls::g_InputMethodTypes[scroll_start + i])
+                    {
+                        in_use = true;
+                        break;
+                    }
+                }
+
+                if(in_use)
+                    SuperPrint(Controls::g_InputMethodTypes[scroll_start + i]->Name + " " + g_mainMenu.controlsInUse, 3, sX+48, sY+(3+i)*line);
+                else
+                    SuperPrint(Controls::g_InputMethodTypes[scroll_start + i]->Name, 3, sX+48, sY+(3+i)*line);
                 if(MenuCursor == scroll_start + i)
                     frmMain.renderTexture(sX + 24, sY+(3+i)*line, GFX.MCursor[0]);
             }
@@ -470,8 +486,23 @@ int menuControls_Mouse_Render(bool mouse, bool render)
             {
                 if(render)
                 {
+                    bool in_use = false;
+
+                    for(Controls::InputMethod* method : Controls::g_InputMethods)
+                    {
+                        if(!method || i == n_profiles)
+                            continue;
+                        if(method->Profile == profiles[i])
+                        {
+                            in_use = true;
+                            break;
+                        }
+                    }
+
                     if(i == n_profiles)
                         SuperPrint(g_mainMenu.controlsNewProfile, 3, sX+48, start_y + (i+1-scroll_start)*line);
+                    else if(in_use)
+                        SuperPrint(profiles[i]->Name + " " + g_mainMenu.controlsInUse, 3, sX+48, start_y + (i+1-scroll_start)*line);
                     else
                         SuperPrint(profiles[i]->Name, 3, sX+48, start_y + (i+1-scroll_start)*line);
                     if(MenuCursor == i)
