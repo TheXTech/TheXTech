@@ -906,6 +906,7 @@ StdPicture FrmMain::LoadPicture(const std::string &path,
 
     uint32_t w = static_cast<uint32_t>(FreeImage_GetWidth(sourceImage));
     uint32_t h = static_cast<uint32_t>(FreeImage_GetHeight(sourceImage));
+    uint32_t pitch = static_cast<uint32_t>(FreeImage_GetPitch(sourceImage));
 
     if((w == 0) || (h == 0))
     {
@@ -940,16 +941,20 @@ StdPicture FrmMain::LoadPicture(const std::string &path,
     target.frame_w = static_cast<int>(w);
     target.frame_h = static_cast<int>(h);
     GLubyte *textura = reinterpret_cast<GLubyte *>(FreeImage_GetBits(sourceImage));
-    loadTexture(target, w, h, textura);
+
+    loadTexture(target, w, h, textura, pitch);
+
 #ifdef DEBUG_BUILD
     bindElapsed = bindingTime.nanoelapsed();
     unloadTime.start();
 #endif
     //SDL_FreeSurface(sourceImage);
     GraphicsHelps::closeImage(sourceImage);
+
 #ifdef DEBUG_BUILD
     unloadElapsed = unloadTime.nanoelapsed();
 #endif
+
 #ifdef DEBUG_BUILD
     pLogDebug("Mask merging of %s passed in %d nanoseconds", path.c_str(), static_cast<int>(maskElapsed));
     pLogDebug("Binding time of %s passed in %d nanoseconds", path.c_str(), static_cast<int>(bindElapsed));
@@ -1047,7 +1052,11 @@ StdPicture FrmMain::lazyLoadPicture(const std::string &path,
     return target;
 }
 
-void FrmMain::loadTexture(StdPicture &target, uint32_t width, uint32_t height, uint8_t *RGBApixels)
+void FrmMain::loadTexture(StdPicture &target,
+                          uint32_t width,
+                          uint32_t height,
+                          uint8_t *RGBApixels,
+                          uint32_t pitch)
 {
     SDL_Surface *surface;
     SDL_Texture *texture;
@@ -1055,7 +1064,7 @@ void FrmMain::loadTexture(StdPicture &target, uint32_t width, uint32_t height, u
                                        static_cast<int>(width),
                                        static_cast<int>(height),
                                        32,
-                                       static_cast<int>(width * 4),
+                                       static_cast<int>(pitch),
                                        FI_RGBA_RED_MASK,
                                        FI_RGBA_GREEN_MASK,
                                        FI_RGBA_BLUE_MASK,
@@ -1095,6 +1104,7 @@ void FrmMain::lazyLoad(StdPicture &target)
 
     uint32_t w = static_cast<uint32_t>(FreeImage_GetWidth(sourceImage));
     uint32_t h = static_cast<uint32_t>(FreeImage_GetHeight(sourceImage));
+    uint32_t pitch = static_cast<uint32_t>(FreeImage_GetPitch(sourceImage));
 
     if((w == 0) || (h == 0))
     {
@@ -1172,10 +1182,12 @@ void FrmMain::lazyLoad(StdPicture &target)
         }
         target.w_scale = float(w) / float(target.w_orig);
         target.h_scale = float(h) / float(target.h_orig);
+        pitch = FreeImage_GetPitch(d);
     }
 
     GLubyte *textura = reinterpret_cast<GLubyte *>(FreeImage_GetBits(sourceImage));
-    loadTexture(target, w, h, textura);
+
+    loadTexture(target, w, h, textura, pitch);
 
     GraphicsHelps::closeImage(sourceImage);
 }
