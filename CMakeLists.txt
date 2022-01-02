@@ -339,6 +339,21 @@ set(THEXTECH_SRC
     src/player/player_update.cpp
 )
 
+# Add heads into the list
+file(GLOB THEXTECH_HEADS_SRC
+    lib/*.h
+    lib/AppPath/*.h
+    lib/CrashHandler/*.h
+    lib/Graphics/*.h
+    lib/InterProcess/*.h
+    src/*.h
+    src/*.hpp
+    src/control/*.h
+    src/main/*.h
+    src/main/QuadTree/*.h
+)
+list(APPEND THEXTECH_SRC ${THEXTECH_HEADS_SRC})
+
 if(WIN32 AND NOT EMSCRIPTEN)
     list(APPEND THEXTECH_SRC resources/thextech.rc)
 endif()
