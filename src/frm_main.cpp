@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <memory>
 #include <SDL2/SDL.h>
 
 #include "globals.h"
@@ -74,7 +75,7 @@ Uint8 FrmMain::getKeyState(SDL_Scancode key)
 
 bool FrmMain::initSDL(const CmdLineSetup_t &setup)
 {
-    RenderSDL_t *render;
+    std::unique_ptr<RenderSDL_t> render;
     bool res = false;
 
     m_windowTitle = g_gameInfo.titleWindow;
@@ -125,7 +126,7 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
 
     SDL_GL_ResetAttributes();
 
-    render = new RenderSDL_t();
+    render.reset(new RenderSDL_t());
     render->init();
 
     m_window = SDL_CreateWindow(m_windowTitle.c_str(),
@@ -141,7 +142,6 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
     {
         pLogCritical("Unable to create window!");
         SDL_ClearError();
-        delete render;
         return false;
     }
 
@@ -149,7 +149,6 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
     {
         pLogCritical("Unable to create window!");
         SDL_ClearError();
-        delete render;
         return false;
     }
 
@@ -216,7 +215,6 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
 
     if(!render->initRender(setup, m_window))
     {
-        delete render;
         freeSDL();
         return false;
     }
@@ -224,7 +222,8 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
     m_keyboardState = SDL_GetKeyboardState(nullptr);
     doEvents();
 
-    g_render = render;
+    g_render = render.get();
+    render.release();
 
     return res;
 }
