@@ -482,6 +482,8 @@ void FrmMain::eventKeyDown(SDL_KeyboardEvent &evt)
         TakeScreen = true;
     else if(KeyCode == SDL_SCANCODE_F3)
         g_stats.enabled = !g_stats.enabled;
+    else if(KeyCode == SDL_SCANCODE_F4)
+        ShowOnScreenMeta = !ShowOnScreenMeta;
 #   ifdef __APPLE__
     else if(KeyCode == SDL_SCANCODE_F10) // Reserved by macOS as "show desktop"
 #   else

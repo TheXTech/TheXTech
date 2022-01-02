@@ -2140,7 +2140,8 @@ void UpdateGraphics(bool skipRepaint)
                 }
 
     //                DrawInterface Z, numScreens
-                DrawInterface(Z, numScreens);
+                if(ShowOnScreenMeta)
+                    DrawInterface(Z, numScreens);
 
                 For(A, 1, numNPCs) // Display NPCs that got dropped from the container
                 {
@@ -2318,13 +2319,17 @@ void UpdateGraphics(bool skipRepaint)
             else if(!GameOutro)
                 mainMenuDraw();
 
-            if(PrintFPS > 0)
+            if(ShowOnScreenMeta)
             {
-                frmMain.offsetViewportIgnore(true);
-                SuperPrint(fmt::format_ne("{0}", int(PrintFPS)), 1, 8, 8, 0.f, 1.f, 0.f);
-                frmMain.offsetViewportIgnore(false);
+                if(PrintFPS > 0)
+                {
+                    frmMain.offsetViewportIgnore(true);
+                    SuperPrint(fmt::format_ne("{0}", int(PrintFPS)), 1, 8, 8, 0.f, 1.f, 0.f);
+                    frmMain.offsetViewportIgnore(false);
+                }
+
+                g_stats.print();
             }
-            g_stats.print();
         }
 
 //        If LevelEditor = True Or MagicHand = True Then
@@ -2816,15 +2821,16 @@ void UpdateGraphics(bool skipRepaint)
             s_shakeScreen.update();
         }
 
-        // TODO: VERIFY THIS
-        if(ScreenType == 5 && numScreens == 1)
+        if(ShowOnScreenMeta)
         {
-            speedRun_renderControls(1, -1);
-            speedRun_renderControls(2, -1);
-        }
-        else
-        {
-            speedRun_renderControls(Z, Z);
+            // TODO: VERIFY THIS
+            if(ScreenType == 5 && numScreens == 1)
+            {
+                speedRun_renderControls(1, -1);
+                speedRun_renderControls(2, -1);
+            }
+            else
+                speedRun_renderControls(Z, Z);
         }
 //    Next Z
     } // For(Z, 2, numScreens)

@@ -42,6 +42,7 @@ bool StartMenu = false;
 int BlockFlash = 0;
 bool ScrollRelease = false;
 bool TakeScreen = false;
+bool ShowOnScreenMeta = true;
 std::string LB;
 std::string EoT;
 RangeArr<ConKeyboard_t, 1, maxLocalPlayers> conKeyboard;
