@@ -103,8 +103,8 @@ int GameMain(const CmdLineSetup_t &setup)
     bool tempBool = false;
     int lastWarpEntered = 0;
 
-    LB = "\n";
-    EoT = "";
+//    LB = "\n";
+//    EoT = "";
 
     FrameSkip = setup.frameSkip;
     noSound = setup.noSound;

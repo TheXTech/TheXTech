@@ -163,9 +163,9 @@ extern bool TakeScreen;
 // EXTRA: Show any on-screen meta (HUD, debug prints, etc.)
 extern bool ShowOnScreenMeta;
 //Public LB As String  ' Line Break
-extern std::string LB;
+//extern std::string LB;
 //Public EoT As String  ' End of Transmission for WINSOCK
-extern std::string EoT;
+//extern std::string EoT;
 
 //Public Type Controls 'Controls for the player
 //moved into "controls.h"
