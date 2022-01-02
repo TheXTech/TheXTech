@@ -20,10 +20,10 @@
 
 #include "globals.h"
 #include "gfx.h"
+#include "frm_main.h"
 #include "core/render.h"
 #include <fmt_format_ne.h>
 #include <Logger/logger.h>
-#include <SDL2/SDL_messagebox.h>
 
 
 GFX_t GFX;
@@ -161,7 +161,7 @@ bool GFX_t::load()
                                          "\n\n"
                                          "It's possible that you didn't installed the game assets package, or you had installed it at the incorrect directory.",
                                          getLogFilePath());
-        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "UI image assets loading error", msg.c_str(), nullptr);
+        frmMain.simpleMsgBox(FrmMain::MESSAGEBOX_ERROR, "UI image assets loading error", msg);
         return false;
     }
 

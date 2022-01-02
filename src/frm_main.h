@@ -101,7 +101,24 @@ public:
     void eventMouseWheel(SDL_MouseWheelEvent &m_event);
     void eventMouseUp(SDL_MouseButtonEvent &m_event);
     void eventResize();
+
     int setFullScreen(bool fs);
+    void setWindowSize(int w, int h);
+    void getWindowSize(int *w, int *h);
+
+
+    enum MessageBoxFlags
+    {
+        MESSAGEBOX_ERROR                 = 0x00000010,   /**< error dialog */
+        MESSAGEBOX_WARNING               = 0x00000020,   /**< warning dialog */
+        MESSAGEBOX_INFORMATION           = 0x00000040,   /**< informational dialog */
+        MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT = 0x00000080,   /**< buttons placed left to right */
+        MESSAGEBOX_BUTTONS_RIGHT_TO_LEFT = 0x00000100    /**< buttons placed right to left */
+    };
+    int simpleMsgBox(uint32_t flags, const std::string &title, const std::string &message);
+
+    void errorMsgBox(const std::string &title, const std::string &message);
+
     bool isSdlError();
 
 private:

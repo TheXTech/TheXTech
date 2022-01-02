@@ -701,7 +701,7 @@ void TouchScreenController::quit()
 
 void TouchScreenController::updateScreenSize()
 {
-    SDL_GetWindowSize(frmMain.getWindow(), &m_screenWidth, &m_screenHeight);
+    frmMain.getWindowSize(&m_screenWidth, &m_screenHeight);
 }
 
 static void updateKeyValue(bool &key, bool state)

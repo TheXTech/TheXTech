@@ -28,12 +28,15 @@ void SetOrigRes()
 {
     frmMain.setFullScreen(false);
     resChanged = false;
-    SDL_SetWindowSize(frmMain.getWindow(), ScreenW, ScreenH);
+    frmMain.setWindowSize(ScreenW, ScreenH);
+
 #ifdef __EMSCRIPTEN__
     frmMain.eventResize();
 #endif
+
     if(LoadingInProcess)
         UpdateLoad();
+
     if(!GameMenu && !MagicHand)
         showCursor(1);
 }
@@ -41,6 +44,7 @@ void SetOrigRes()
 void ChangeRes(int, int, int, int)
 {
     frmMain.setFullScreen(true);
+
     if(LoadingInProcess)
         UpdateLoad();
 }

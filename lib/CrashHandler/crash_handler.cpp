@@ -350,39 +350,6 @@ static std::string getStacktrace()
     return bkTrace;
 }
 
-static void msgBox(std::string title, std::string text)
-{
-    std::string &ttl = title;
-    std::string &msg = text;
-    SDL_MessageBoxData mbox;
-    SDL_MessageBoxButtonData mboxButton;
-    const SDL_MessageBoxColorScheme colorScheme =
-    {
-        { /* .colors (.r, .g, .b) */
-            /* [SDL_MESSAGEBOX_COLOR_BACKGROUND] */
-            { 200, 200, 200 },
-            /* [SDL_MESSAGEBOX_COLOR_TEXT] */
-            {   0,   0,   0 },
-            /* [SDL_MESSAGEBOX_COLOR_BUTTON_BORDER] */
-            { 255, 255, 255 },
-            /* [SDL_MESSAGEBOX_COLOR_BUTTON_BACKGROUND] */
-            { 150, 150, 150 },
-            /* [SDL_MESSAGEBOX_COLOR_BUTTON_SELECTED] */
-            { 255, 255, 255 }
-        }
-    };
-    mboxButton.buttonid = 0;
-    mboxButton.flags    = SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT | SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT;
-    mboxButton.text     = "Ok";
-    mbox.flags          = SDL_MESSAGEBOX_ERROR;
-    mbox.window         = frmMain.getWindow();
-    mbox.title          = ttl.c_str();
-    mbox.message        = msg.c_str();
-    mbox.numbuttons     = 1;
-    mbox.buttons        = &mboxButton;
-    mbox.colorScheme    = &colorScheme;
-    SDL_ShowMessageBox(&mbox, nullptr);
-}
 
 #ifdef __GNUC__
 #define LLVM_ATTRIBUTE_NORETURN __attribute__((noreturn))
@@ -423,7 +390,7 @@ void LLVM_ATTRIBUTE_NORETURN CrashHandler::crashByUnhandledException()
     pLogFatal("<Unhandled exception! %s>\n"
               STACK_FORMAT, exc.c_str(),
               stack.c_str(), g_messageToUser);
-    msgBox(
+    frmMain.errorMsgBox(
         //% "Unhandled exception!"
         "Unhandled exception!",
         //% "Engine has crashed because accepted unhandled exception!"
@@ -437,7 +404,7 @@ void LLVM_ATTRIBUTE_NORETURN CrashHandler::crashByFlood()
     pLogFatal("<Out of memory!>\n"
               STACK_FORMAT,
               stack.c_str(), g_messageToUser);
-    msgBox(
+    frmMain.errorMsgBox(
         //% "Out of memory!"
         "Out of memory!",
         //% "Engine has crashed because out of memory! Try to close other applications and restart game."
@@ -475,7 +442,7 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
     case SIGALRM:
     {
         pLogFatal("<alarm() time out!>");
-        msgBox(
+        frmMain.errorMsgBox(
             //% "Time out!"
             "Time out!",
             //% "Engine has abourted because alarm() time out!"
@@ -522,7 +489,7 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
                       stack.c_str(), g_messageToUser);
         }
 
-        msgBox(
+        frmMain.errorMsgBox(
             //% "Physical memory address error!"
             "Physical memory address error!",
             //% "Engine has crashed because a physical memory address error"
@@ -541,7 +508,7 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
         pLogFatal("<Wrong CPU Instruction>\n"
                   STACK_FORMAT,
                   stack.c_str(), g_messageToUser);
-        msgBox(
+        frmMain.errorMsgBox(
             //% "Wrong CPU Instruction!"
             "Wrong CPU Instruction!",
             //% "Engine has crashed because a wrong CPU instruction"
@@ -598,7 +565,7 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
                       stack.c_str(), g_messageToUser);
         }
 
-        msgBox(
+        frmMain.errorMsgBox(
             //% "Wrong arithmetical operation"
             "Wrong arithmetical operation",
             //% "Engine has crashed because of a wrong arithmetical operation!"
@@ -612,7 +579,7 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
         pLogFatal("<Aborted!>\n"
                   STACK_FORMAT,
                   stack.c_str(), g_messageToUser);
-        msgBox(
+        frmMain.errorMsgBox(
             //% "Aborted"
             "Aborted",
             //% "Engine has been aborted because critical error was occouped."
@@ -659,7 +626,7 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
                       stack.c_str(), g_messageToUser);
         }
 
-        msgBox(
+        frmMain.errorMsgBox(
             //% "Segmentation fault"
             "Segmentation fault",
             /*% "Engine has crashed because of a Segmentation fault.\n"
@@ -674,7 +641,7 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
     case SIGINT:
     {
         pLogFatal("<Interrupted!>");
-        msgBox(
+        frmMain.errorMsgBox(
             //% "Interrupt"
             "Interrupt",
             //% "Engine has been interrupted"

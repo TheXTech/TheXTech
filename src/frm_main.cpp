@@ -588,6 +588,75 @@ int FrmMain::setFullScreen(bool fs)
     return 0;
 }
 
+void FrmMain::setWindowSize(int w, int h)
+{
+    SDL_SetWindowSize(m_window, w, h);
+}
+
+void FrmMain::getWindowSize(int *w, int *h)
+{
+    SDL_GetWindowSize(m_window, w, h);
+}
+
+int FrmMain::simpleMsgBox(uint32_t flags, const std::string &title, const std::string &message)
+{
+    Uint32 dFlags = 0;
+
+    if(flags & MESSAGEBOX_ERROR)
+        dFlags |= SDL_MESSAGEBOX_ERROR;
+
+    if(flags & MESSAGEBOX_WARNING)
+        dFlags |= SDL_MESSAGEBOX_WARNING;
+
+    if(flags & MESSAGEBOX_INFORMATION)
+        dFlags |= SDL_MESSAGEBOX_INFORMATION;
+
+    if(flags & MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT)
+        dFlags |= SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT;
+
+    if(flags & MESSAGEBOX_BUTTONS_RIGHT_TO_LEFT)
+        dFlags |= SDL_MESSAGEBOX_BUTTONS_RIGHT_TO_LEFT;
+
+    return SDL_ShowSimpleMessageBox(dFlags,
+                                    title.c_str(),
+                                    message.c_str(),
+                                    m_window);
+}
+
+void FrmMain::errorMsgBox(const std::string &title, const std::string &message)
+{
+    const std::string &ttl = title;
+    const std::string &msg = message;
+    SDL_MessageBoxData mbox;
+    SDL_MessageBoxButtonData mboxButton;
+    const SDL_MessageBoxColorScheme colorScheme =
+    {
+        { /* .colors (.r, .g, .b) */
+            /* [SDL_MESSAGEBOX_COLOR_BACKGROUND] */
+            { 200, 200, 200 },
+            /* [SDL_MESSAGEBOX_COLOR_TEXT] */
+            {   0,   0,   0 },
+            /* [SDL_MESSAGEBOX_COLOR_BUTTON_BORDER] */
+            { 255, 255, 255 },
+            /* [SDL_MESSAGEBOX_COLOR_BUTTON_BACKGROUND] */
+            { 150, 150, 150 },
+            /* [SDL_MESSAGEBOX_COLOR_BUTTON_SELECTED] */
+            { 255, 255, 255 }
+        }
+    };
+    mboxButton.buttonid = 0;
+    mboxButton.flags    = SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT | SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT;
+    mboxButton.text     = "Ok";
+    mbox.flags          = SDL_MESSAGEBOX_ERROR;
+    mbox.window         = m_window;
+    mbox.title          = ttl.c_str();
+    mbox.message        = msg.c_str();
+    mbox.numbuttons     = 1;
+    mbox.buttons        = &mboxButton;
+    mbox.colorScheme    = &colorScheme;
+    SDL_ShowMessageBox(&mbox, nullptr);
+}
+
 bool FrmMain::isSdlError()
 {
     const char *error = SDL_GetError();
