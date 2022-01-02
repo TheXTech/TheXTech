@@ -37,6 +37,7 @@
 #include "../layers.h"
 #include "../player.h"
 #include "../editor.h"
+#include "../core/render.h"
 #include "game_globals.h"
 #include "world_globals.h"
 #include "speedrunner.h"
@@ -110,7 +111,7 @@ void GameLoop()
         EndLevel = true;
         ErrorQuit = false;
         pLogWarning("Quit level because of an error");
-        frmMain.clearBuffer();
+        g_render->clearBuffer();
     }
 
     if(EndLevel)
@@ -452,9 +453,9 @@ void PauseGame(int plr)
                                 stopPause = true;
                                 MenuMode = MENU_MAIN;
                                 MenuCursor = 0;
-                                frmMain.setTargetTexture();
-                                frmMain.clearBuffer();
-                                frmMain.repaint();
+                                g_render->setTargetTexture();
+                                g_render->clearBuffer();
+                                g_render->repaint();
                                 EndLevel = true;
                                 StopMusic();
                                 DoEvents();
@@ -474,9 +475,9 @@ void PauseGame(int plr)
                                 stopPause = true;
                                 MenuMode = MENU_MAIN;
                                 MenuCursor = 0;
-                                frmMain.setTargetTexture();
-                                frmMain.clearBuffer();
-                                frmMain.repaint();
+                                g_render->setTargetTexture();
+                                g_render->clearBuffer();
+                                g_render->repaint();
                                 EndLevel = true;
                                 StopMusic();
                                 DoEvents();
@@ -517,9 +518,9 @@ void PauseGame(int plr)
                             else
                                 LevelSelect = false;
 
-                            frmMain.setTargetTexture();
-                            frmMain.clearBuffer();
-                            frmMain.repaint();
+                            g_render->setTargetTexture();
+                            g_render->clearBuffer();
+                            g_render->repaint();
                             StopMusic();
                             DoEvents();
                         }

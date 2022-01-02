@@ -57,6 +57,7 @@
 #include "main/menu_main.h"
 #include "main/game_info.h"
 #include "main/record.h"
+#include "core/render.h"
 
 #include "pseudo_vb.h"
 
@@ -156,11 +157,11 @@ int GameMain(const CmdLineSetup_t &setup)
 
     while(!MenuMouseDown)
     {
-        frmMain.setTargetTexture();
-        frmMain.clearBuffer();
+        g_render->setTargetTexture();
+        g_render->clearBuffer();
         SuperPrint("Click to start a game", 3, 230, 280);
-        frmMain.repaint();
-        frmMain.setTargetScreen();
+        g_render->repaint();
+        g_render->setTargetScreen();
         DoEvents();
         PGE_Delay(10);
     }
@@ -221,9 +222,9 @@ int GameMain(const CmdLineSetup_t &setup)
     LoadingInProcess = false;
 
     // Clear the screen
-    frmMain.setTargetTexture();
-    frmMain.clearBuffer();
-    frmMain.repaint();
+    g_render->setTargetTexture();
+    g_render->clearBuffer();
+    g_render->repaint();
     DoEvents();
 
     if(!neverPause && !frmMain.isWindowActive())
@@ -589,9 +590,9 @@ int GameMain(const CmdLineSetup_t &setup)
 
                 LevelSelect = false;
 
-                frmMain.setTargetTexture();
-                frmMain.clearBuffer();
-                frmMain.repaint();
+                g_render->setTargetTexture();
+                g_render->clearBuffer();
+                g_render->repaint();
 
                 ClearLevel();
 
@@ -617,9 +618,9 @@ int GameMain(const CmdLineSetup_t &setup)
                 }
                 else
                 {
-                    frmMain.setTargetTexture();
-                    frmMain.clearBuffer();
-                    frmMain.repaint();
+                    g_render->setTargetTexture();
+                    g_render->clearBuffer();
+                    g_render->repaint();
                 }
             }
             else
@@ -910,8 +911,8 @@ void KillIt()
     if(resChanged)
         SetOrigRes();
 #else
-    frmMain.clearBuffer();
-    frmMain.repaint();
+    g_render->clearBuffer();
+    g_render->repaint();
 #endif
     QuitMixerX();
     UnloadGFX();
@@ -930,9 +931,9 @@ void NextLevel()
     LevelMacroCounter = 0;
     StopMusic();
     ClearLevel();
-    frmMain.setTargetTexture();
-    frmMain.clearBuffer();
-    frmMain.repaint();
+    g_render->setTargetTexture();
+    g_render->clearBuffer();
+    g_render->repaint();
     DoEvents();
 
     if(!TestLevel && GoToLevel.empty() && !NoMap)
@@ -1059,7 +1060,7 @@ void UpdateMacro()
             EndLevel = true;
             LevelMacro = LEVELMACRO_OFF;
             LevelMacroCounter = 0;
-            frmMain.clearBuffer();
+            g_render->clearBuffer();
         }
     }
     else if(LevelMacro == LEVELMACRO_KEYHOLE_EXIT)
@@ -1124,7 +1125,7 @@ void UpdateMacro()
         EndLevel = true;
         LevelMacro = LEVELMACRO_OFF;
         LevelMacroCounter = 0;
-        frmMain.clearBuffer();
+        g_render->clearBuffer();
     }
     else if(LevelMacro == LEVELMACRO_CRYSTAL_BALL_EXIT)
     {
@@ -1154,7 +1155,7 @@ void UpdateMacro()
             EndLevel = true;
             LevelMacro = LEVELMACRO_OFF;
             LevelMacroCounter = 0;
-            frmMain.clearBuffer();
+            g_render->clearBuffer();
         }
     }
     else if(LevelMacro == LEVELMACRO_GAME_COMPLETE_EXIT)
@@ -1196,7 +1197,7 @@ void UpdateMacro()
                 MenuMode = MENU_MAIN;
                 MenuCursor = 0;
             }
-            frmMain.clearBuffer();
+            g_render->clearBuffer();
         }
     }
     else if(LevelMacro == LEVELMACRO_STAR_EXIT) // Star Exit
@@ -1620,9 +1621,9 @@ void StartBattleMode()
     LevelSelect = false;
     GameMenu = false;
     BattleMode = true;
-    frmMain.setTargetTexture();
-    frmMain.clearBuffer();
-    frmMain.repaint();
+    g_render->setTargetTexture();
+    g_render->clearBuffer();
+    g_render->repaint();
     StopMusic();
     DoEvents();
     PGE_Delay(500);

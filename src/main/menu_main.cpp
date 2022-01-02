@@ -38,6 +38,7 @@
 #include "../collision.h"
 #include "../graphics.h"
 #include "../control/joystick.h"
+#include "../core/render.h"
 #include "../compat.h"
 #include "level_file.h"
 #include "pge_delay.h"
@@ -516,10 +517,10 @@ bool mainMenuUpdate()
                 else if(MenuCursor == 4)
                 {
                     PlaySoundMenu(SFX_Do);
-                    frmMain.setTargetTexture();
-                    frmMain.clearBuffer();
+                    g_render->setTargetTexture();
+                    g_render->clearBuffer();
                     StopMusic();
-                    frmMain.repaint();
+                    g_render->repaint();
                     DoEvents();
                     PGE_Delay(500);
                     KillIt();
@@ -965,9 +966,9 @@ bool mainMenuUpdate()
                         Lives = 3;
                         LevelSelect = true;
                         GameMenu = false;
-                        frmMain.setTargetTexture();
-                        frmMain.clearBuffer();
-                        frmMain.repaint();
+                        g_render->setTargetTexture();
+                        g_render->clearBuffer();
+                        g_render->repaint();
                         StopMusic();
                         DoEvents();
                         PGE_Delay(500);
@@ -1598,10 +1599,10 @@ static void s_drawGameSaves()
             SuperPrint(fmt::format_ne("SLOT {0} ... {1}%", A, SaveSlot[A]), 3, 300, 320 + (A * 30));
             if(SaveStars[A] > 0)
             {
-                frmMain.renderTexture(560, 320 + (A * 30) + 1,
+                g_render->renderTexture(560, 320 + (A * 30) + 1,
                                       GFX.Interface[5].w, GFX.Interface[5].h,
                                       GFX.Interface[5], 0, 0);
-                frmMain.renderTexture(560 + 24, 320 + (A * 30) + 2,
+                g_render->renderTexture(560 + 24, 320 + (A * 30) + 2,
                                       GFX.Interface[1].w, GFX.Interface[1].h,
                                       GFX.Interface[1], 0, 0);
                 SuperPrint(fmt::format_ne(" {0}", SaveStars[A]), 3, 588, 320 + (A * 30));
@@ -1627,18 +1628,18 @@ void mainMenuDraw()
     int B = 0;
     int C = 0;
 
-    frmMain.offsetViewportIgnore(true);
+    g_render->offsetViewportIgnore(true);
 
     if(MenuMode != MENU_1PLAYER_GAME && MenuMode != MENU_2PLAYER_GAME && MenuMode != MENU_BATTLE_MODE)
         worldCurs = 0;
 
     int menuFix = -44; // for Input Settings
 
-    frmMain.renderTexture(0, 0, GFX.MenuGFX[1].w, GFX.MenuGFX[1].h, GFX.MenuGFX[1], 0, 0);
-    frmMain.renderTexture(ScreenW / 2 - GFX.MenuGFX[2].w / 2, 70,
+    g_render->renderTexture(0, 0, GFX.MenuGFX[1].w, GFX.MenuGFX[1].h, GFX.MenuGFX[1], 0, 0);
+    g_render->renderTexture(ScreenW / 2 - GFX.MenuGFX[2].w / 2, 70,
             GFX.MenuGFX[2].w, GFX.MenuGFX[2].h, GFX.MenuGFX[2], 0, 0);
 
-    frmMain.renderTexture(ScreenW / 2 - GFX.MenuGFX[3].w / 2, 576,
+    g_render->renderTexture(ScreenW / 2 - GFX.MenuGFX[3].w / 2, 576,
             GFX.MenuGFX[3].w, GFX.MenuGFX[3].h, GFX.MenuGFX[3], 0, 0);
 
     if(SDL_AtomicGet(&loading))
@@ -1672,7 +1673,7 @@ void mainMenuDraw()
 
         SuperPrint(g_mainMenu.mainOptions, 3, 300, 440);
         SuperPrint(g_mainMenu.mainExit, 3, 300, 470);
-        frmMain.renderTexture(300 - 20, 350 + (MenuCursor * 30), 16, 16, GFX.MCursor[0], 0, 0);
+        g_render->renderTexture(300 - 20, 350 + (MenuCursor * 30), 16, 16, GFX.MCursor[0], 0, 0);
     }
 
     // Character select
@@ -1747,12 +1748,12 @@ void mainMenuDraw()
 
         if(MenuMode == MENU_CHARACTER_SELECT_2P_S2 || MenuMode == MENU_CHARACTER_SELECT_BM_S2)
         {
-            frmMain.renderTexture(300 - 20, B + 350 + (MenuCursor * 30), GFX.MCursor[3]);
-            frmMain.renderTexture(300 - 20, B + 350 + ((PlayerCharacter - 1) * 30), GFX.MCursor[0]);
+            g_render->renderTexture(300 - 20, B + 350 + (MenuCursor * 30), GFX.MCursor[3]);
+            g_render->renderTexture(300 - 20, B + 350 + ((PlayerCharacter - 1) * 30), GFX.MCursor[0]);
         }
         else
         {
-            frmMain.renderTexture(300 - 20, B + 350 + (MenuCursor * 30), GFX.MCursor[0]);
+            g_render->renderTexture(300 - 20, B + 350 + (MenuCursor * 30), GFX.MCursor[0]);
         }
     }
 
@@ -1801,16 +1802,16 @@ void mainMenuDraw()
         }
 
         if(minShow > 1)
-            frmMain.renderTexture(400 - 8, 350 - 20, GFX.MCursor[1]);
+            g_render->renderTexture(400 - 8, 350 - 20, GFX.MCursor[1]);
 
 
         if(maxShow < NumSelectWorld)
-            frmMain.renderTexture(400 - 8, 490, GFX.MCursor[2]);
+            g_render->renderTexture(400 - 8, 490, GFX.MCursor[2]);
 
         B = MenuCursor - minShow + 1;
 
         if(B >= 0 && B < 5)
-            frmMain.renderTexture(300 - 20, 350 + (B * 30), GFX.MCursor[0].w, GFX.MCursor[0].h, GFX.MCursor[0], 0, 0);
+            g_render->renderTexture(300 - 20, 350 + (B * 30), GFX.MCursor[0].w, GFX.MCursor[0].h, GFX.MCursor[0], 0, 0);
     }
 
     else if(MenuMode == MENU_SELECT_SLOT_1P || MenuMode == MENU_SELECT_SLOT_2P) // Save Select
@@ -1818,7 +1819,7 @@ void mainMenuDraw()
         s_drawGameTypeTitle(300, 280);
         SuperPrint(SelectWorld[selWorld].WorldName, 3, 300, 310, 0.6f, 1.f, 1.f);
         s_drawGameSaves();
-        frmMain.renderTexture(300 - 20, 350 + (MenuCursor * 30), GFX.MCursor[0]);
+        g_render->renderTexture(300 - 20, 350 + (MenuCursor * 30), GFX.MCursor[0]);
     }
 
     else if(MenuMode == MENU_SELECT_SLOT_1P_COPY_S1 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S1 ||
@@ -1835,11 +1836,11 @@ void mainMenuDraw()
 
         if(MenuMode == MENU_SELECT_SLOT_1P_COPY_S2 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S2)
         {
-            frmMain.renderTexture(300 - 20, 350 + ((menuCopySaveSrc - 1) * 30), GFX.MCursor[0]);
-            frmMain.renderTexture(300 - 20, 350 + (MenuCursor * 30), GFX.MCursor[3]);
+            g_render->renderTexture(300 - 20, 350 + ((menuCopySaveSrc - 1) * 30), GFX.MCursor[0]);
+            g_render->renderTexture(300 - 20, 350 + (MenuCursor * 30), GFX.MCursor[3]);
         }
         else
-            frmMain.renderTexture(300 - 20, 350 + (MenuCursor * 30), GFX.MCursor[0]);
+            g_render->renderTexture(300 - 20, 350 + (MenuCursor * 30), GFX.MCursor[0]);
     }
 
     else if(MenuMode == MENU_SELECT_SLOT_1P_DELETE || MenuMode == MENU_SELECT_SLOT_2P_DELETE) // Copy save
@@ -1850,7 +1851,7 @@ void mainMenuDraw()
 
         SuperPrint("Select the slot to erase", 3, 300, 320 + (5 * 30), 1.0f, 0.7f, 0.7f);
 
-        frmMain.renderTexture(300 - 20, 350 + (MenuCursor * 30), GFX.MCursor[0]);
+        g_render->renderTexture(300 - 20, 350 + (MenuCursor * 30), GFX.MCursor[0]);
     }
 
     // Options Menu
@@ -1868,7 +1869,7 @@ void mainMenuDraw()
 
         SuperPrint("VIEW CREDITS", 3, 300, 440);
 #endif
-        frmMain.renderTexture(300 - 20, 350 + (MenuCursor * 30),
+        g_render->renderTexture(300 - 20, 350 + (MenuCursor * 30),
                               GFX.MCursor[0].w, GFX.MCursor[0].h, GFX.MCursor[0], 0, 0);
     }
 
@@ -1908,12 +1909,12 @@ void mainMenuDraw()
             SuperPrint("Reset to default", 3, 300, 590 + menuFix);
         }
 
-        frmMain.renderTexture(300 - 20, 260 + (MenuCursor * 30) + menuFix,
+        g_render->renderTexture(300 - 20, 260 + (MenuCursor * 30) + menuFix,
                               GFX.MCursor[0].w, GFX.MCursor[0].h, GFX.MCursor[0], 0, 0);
     }
 
     // Mouse cursor
-    frmMain.renderTexture(int(MenuMouseX), int(MenuMouseY), GFX.ECursor[2]);
+    g_render->renderTexture(int(MenuMouseX), int(MenuMouseY), GFX.ECursor[2]);
 
-    frmMain.offsetViewportIgnore(false);
+    g_render->offsetViewportIgnore(false);
 }

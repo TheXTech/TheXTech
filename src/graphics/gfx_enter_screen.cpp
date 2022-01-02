@@ -26,6 +26,7 @@
 #include "../player.h"
 #include "../frame_timer.h"
 #include "../screen_fader.h"
+#include "../core/render.h"
 #include "pge_delay.h"
 
 
@@ -149,8 +150,8 @@ static void drawEnterScreen(Player_t tempPlayer[maxLocalPlayers])
     }
     else
     {
-        frmMain.renderTexture(ScreenW / 2.0 - 46, ScreenH / 2.0 + 31, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0);
-        frmMain.renderTexture(ScreenW / 2.0 - GFX.Interface[1].w / 2, ScreenH / 2.0 + 32, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+        g_render->renderTexture(ScreenW / 2.0 - 46, ScreenH / 2.0 + 31, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0);
+        g_render->renderTexture(ScreenW / 2.0 - GFX.Interface[1].w / 2, ScreenH / 2.0 + 32, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
         SuperPrint(std::to_string(int(Lives)), 1, ScreenW / 2.0 + 12, ScreenH / 2.0 + 32);
     }
 
@@ -164,10 +165,10 @@ void GameThing(int waitms, int fadeSpeed)
 
     if(waitms <= 0)
     {
-        frmMain.setTargetTexture();
-        frmMain.clearBuffer();
+        g_render->setTargetTexture();
+        g_render->clearBuffer();
         drawEnterScreen(tempPlayer);
-        frmMain.repaint();
+        g_render->repaint();
         DoEvents();
     }
     else
@@ -185,8 +186,8 @@ void GameThing(int waitms, int fadeSpeed)
             if(canProceedFrame())
             {
                 computeFrameTime1();
-                frmMain.setTargetTexture();
-                frmMain.clearBuffer();
+                g_render->setTargetTexture();
+                g_render->clearBuffer();
                 drawEnterScreen(tempPlayer);
 
                 if(fadeSpeed > 0 && fader.m_active)
@@ -195,7 +196,7 @@ void GameThing(int waitms, int fadeSpeed)
                     fader.draw();
                 }
 
-                frmMain.repaint();
+                g_render->repaint();
                 DoEvents();
                 computeFrameTime2();
             }

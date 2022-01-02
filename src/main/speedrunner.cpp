@@ -22,6 +22,7 @@
 #include "speedrunner.h"
 #include "globals.h"
 #include "graphics.h"
+#include "core/render.h"
 #include "compat.h"
 #include "../control/joystick.h"
 
@@ -88,12 +89,12 @@ void speedRun_renderTimer()
     if(GameMenu || GameOutro || BattleMode)
         return; // Don't draw things at Menu and Outro
 
-    frmMain.offsetViewportIgnore(true);
+    g_render->offsetViewportIgnore(true);
 
     s_gamePlayTimer.render();
     SuperPrintRightAlign(fmt::format_ne("Mode {0}", g_speedRunnerMode), 3, ScreenW - 2, 2, 1.f, 0.3f, 0.3f, 0.5f);
 
-    frmMain.offsetViewportIgnore(false);
+    g_render->offsetViewportIgnore(false);
 }
 
 void speedRun_renderControls(int player, int screenZ)
@@ -107,7 +108,7 @@ void speedRun_renderControls(int player, int screenZ)
     if(player < 1 || player > 2)
         return;
 
-    frmMain.offsetViewportIgnore(true);
+    g_render->offsetViewportIgnore(true);
 
     int jNum = useJoystick[player] - 1;
 
@@ -205,22 +206,22 @@ void speedRun_renderControls(int player, int screenZ)
 
     const auto &c = s_displayControls[player - 1];
 
-    frmMain.renderRect(x, y, w, h, 0.f, 0.f, 0.f, alhpa, true);//Edge
-    frmMain.renderRect(x + 2, y + 2, w - 4, h - 4, r, g, b, alhpa, true);//Box
+    g_render->renderRect(x, y, w, h, 0.f, 0.f, 0.f, alhpa, true);//Edge
+    g_render->renderRect(x + 2, y + 2, w - 4, h - 4, r, g, b, alhpa, true);//Box
 
-    frmMain.renderRect(x + 10, y + 12, 6, 6, 0.f, 0.f, 0.f, alhpaB, true);//Cender of D-Pad
-    frmMain.renderRect(x + 10, y + 6, 6, 6, bool2gray(c.Up), alhpaB, true);
-    frmMain.renderRect(x + 10, y + 18, 6, 6, bool2gray(c.Down), alhpaB, true);
-    frmMain.renderRect(x + 4, y + 12, 6, 6, bool2gray(c.Left), alhpaB, true);
-    frmMain.renderRect(x + 16, y + 12, 6, 6, bool2gray(c.Right), alhpaB, true);
+    g_render->renderRect(x + 10, y + 12, 6, 6, 0.f, 0.f, 0.f, alhpaB, true);//Cender of D-Pad
+    g_render->renderRect(x + 10, y + 6, 6, 6, bool2gray(c.Up), alhpaB, true);
+    g_render->renderRect(x + 10, y + 18, 6, 6, bool2gray(c.Down), alhpaB, true);
+    g_render->renderRect(x + 4, y + 12, 6, 6, bool2gray(c.Left), alhpaB, true);
+    g_render->renderRect(x + 16, y + 12, 6, 6, bool2gray(c.Right), alhpaB, true);
 
-    frmMain.renderRect(x + 64, y + 18, 6, 6, bool2green(c.Jump), alhpaB, true);
-    frmMain.renderRect(x + 66, y + 8, 6, 6, bool2red(c.AltJump), alhpaB, true);
-    frmMain.renderRect(x + 54, y + 16, 6, 6, bool2blue(c.Run), alhpaB, true);
-    frmMain.renderRect(x + 56, y + 6, 6, 6, bool2yellow(c.AltRun), alhpaB, true);
+    g_render->renderRect(x + 64, y + 18, 6, 6, bool2green(c.Jump), alhpaB, true);
+    g_render->renderRect(x + 66, y + 8, 6, 6, bool2red(c.AltJump), alhpaB, true);
+    g_render->renderRect(x + 54, y + 16, 6, 6, bool2blue(c.Run), alhpaB, true);
+    g_render->renderRect(x + 56, y + 6, 6, 6, bool2yellow(c.AltRun), alhpaB, true);
 
-    frmMain.renderRect(x + 26, y + 22, 10, 4, bool2gray(c.Drop), alhpaB, true);
-    frmMain.renderRect(x + 40, y + 22, 10, 4, bool2gray(c.Start), alhpaB, true);
+    g_render->renderRect(x + 26, y + 22, 10, 4, bool2gray(c.Drop), alhpaB, true);
+    g_render->renderRect(x + 40, y + 22, 10, 4, bool2gray(c.Start), alhpaB, true);
 
     if(drawLabel)
         SuperPrint(fmt::format_ne("P{0}", player), 3, x + 22, y + 2, 1.f, 1.f, 1.f, 0.5f);
@@ -231,28 +232,28 @@ void speedRun_renderControls(int player, int screenZ)
 
         if(power != SDL_JOYSTICK_POWER_UNKNOWN && power != SDL_JOYSTICK_POWER_WIRED)
         {
-            frmMain.renderRect(bx, by, bw - 4, bh, 0.f, 0.f, 0.f, alhpa, true);//Edge
-            frmMain.renderRect(bx + 2, by + 2, bw - 8, bh - 4, r, g, b, alhpa, true);//Box
-            frmMain.renderRect(bx + 36, by + 6, 4, 10, 0.f, 0.f, 0.f, alhpa, true);//Edge
-            frmMain.renderRect(bx + 34, by + 8, 4, 6, r, g, b, alhpa, true);//Box
+            g_render->renderRect(bx, by, bw - 4, bh, 0.f, 0.f, 0.f, alhpa, true);//Edge
+            g_render->renderRect(bx + 2, by + 2, bw - 8, bh - 4, r, g, b, alhpa, true);//Box
+            g_render->renderRect(bx + 36, by + 6, 4, 10, 0.f, 0.f, 0.f, alhpa, true);//Edge
+            g_render->renderRect(bx + 34, by + 8, 4, 6, r, g, b, alhpa, true);//Box
 
             switch(power)
             {
             case SDL_JOYSTICK_POWER_FULL:
-                frmMain.renderRect(bx + 24, by + 4, 8, 14, 0.f, 0.f, 0.f, alhpaB, true); // fallthrough
+                g_render->renderRect(bx + 24, by + 4, 8, 14, 0.f, 0.f, 0.f, alhpaB, true); // fallthrough
             case SDL_JOYSTICK_POWER_MEDIUM:
-                frmMain.renderRect(bx + 14, by + 4, 8, 14, 0.f, 0.f, 0.f, alhpaB, true); // fallthrough
+                g_render->renderRect(bx + 14, by + 4, 8, 14, 0.f, 0.f, 0.f, alhpaB, true); // fallthrough
             case SDL_JOYSTICK_POWER_LOW:
-                frmMain.renderRect(bx + 4, by + 4, 8, 14, 0.f, 0.f, 0.f, alhpaB, true);
+                g_render->renderRect(bx + 4, by + 4, 8, 14, 0.f, 0.f, 0.f, alhpaB, true);
                 break;
             case SDL_JOYSTICK_POWER_EMPTY:
-                frmMain.renderRect(bx + 4, by + 4, 8, 14, 1.f, 0.f, 0.f, alhpaB / 2.f, true);
+                g_render->renderRect(bx + 4, by + 4, 8, 14, 1.f, 0.f, 0.f, alhpaB / 2.f, true);
                 break;
             }
         }
     }
 
-    frmMain.offsetViewportIgnore(false);
+    g_render->offsetViewportIgnore(false);
 }
 
 #undef bool2alpha

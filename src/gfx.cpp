@@ -20,6 +20,7 @@
 
 #include "globals.h"
 #include "gfx.h"
+#include "core/render.h"
 #include <fmt_format_ne.h>
 #include <Logger/logger.h>
 #include <SDL2/SDL_messagebox.h>
@@ -27,7 +28,7 @@
 void GFX_t::loadImage(StdPicture &img, const std::string &path)
 {
     pLogDebug("Loading texture %s...", path.c_str());
-    img = frmMain.LoadPicture(path);
+    img = g_render->LoadPicture(path);
 
     if(!img.texture)
     {
@@ -166,6 +167,6 @@ bool GFX_t::load()
 void GFX_t::unLoad()
 {
     for(StdPicture *p : m_loadedImages)
-        frmMain.deleteTexture(*p);
+        g_render->deleteTexture(*p);
     m_loadedImages.clear();
 }

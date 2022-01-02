@@ -46,11 +46,11 @@ enum RendererFlip_t
     X_FLIP_VERTICAL   = 0x00000002     /**< flip vertically */
 };
 
-typedef struct FPoint_t
+struct FPoint_t
 {
     float x;
     float y;
-} FPoint_t;
+};
 
 
 class AbstractRender_t
@@ -99,7 +99,7 @@ public:
     /*!
      * \brief Close the renderer
      */
-    virtual void close() = 0;
+    virtual void close();
 
     /*!
      * \brief Call the repaint
@@ -143,6 +143,15 @@ public:
     virtual void offsetViewportIgnore(bool en) = 0;
 
     /*!
+     * \brief Map absolute point coordinate into screen relative
+     * \param x Window X position
+     * \param y Window Y position
+     * \param dx Destinition on-screen X position
+     * \param dy Destinition on-screen Y position
+     */
+    virtual void mapToScreen(int x, int y, int *dx, int *dy) = 0;
+
+    /*!
      * \brief Set render target into the virtual in-game screen (use to render in-game world)
      */
     virtual void setTargetTexture() = 0;
@@ -173,6 +182,10 @@ public:
 
     void lazyLoad(StdPicture &target);
     void lazyUnLoad(StdPicture &target);
+    void lazyPreLoad(StdPicture &target);
+
+    size_t lazyLoadedBytes();
+    void lazyLoadedBytesReset();
 
     virtual void deleteTexture(StdPicture &tx, bool lazyUnload = false) = 0;
     virtual void clearAllTextures() = 0;
@@ -303,6 +316,10 @@ public:
 #endif // USE_SCREENSHOTS_AND_RECS
 
 };
+
+
+//! Globally available renderer instance
+extern AbstractRender_t* g_render;
 
 
 #endif // RENDER_H

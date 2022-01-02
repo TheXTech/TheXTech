@@ -42,6 +42,7 @@
 #include "main/game_globals.h"
 #include "main/trees.h"
 #include "main/menu_main.h"
+#include "core/render.h"
 #include "compat.h"
 
 
@@ -974,9 +975,9 @@ void EveryonesDead()
 // Play fade effect instead of wait (see ProcessLastDead() above)
     if(!g_config.EnableInterLevelFade)
     {
-        frmMain.setTargetTexture();
-        frmMain.clearBuffer();
-        frmMain.repaint();
+        g_render->setTargetTexture();
+        g_render->clearBuffer();
+        g_render->repaint();
 //    if(MagicHand)
 //        BitBlt frmLevelWindow::vScreen[1].hdc, 0, 0, frmLevelWindow::vScreen[1].ScaleWidth, frmLevelWindow::vScreen[1].ScaleHeight, 0, 0, 0, vbWhiteness;
         PGE_Delay(500);

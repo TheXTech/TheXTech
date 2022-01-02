@@ -23,6 +23,7 @@
 
 #include "../globals.h"
 #include "../game_main.h"
+#include "../core/render.h"
 #include "../control/joystick.h"
 #include "../npc.h"
 #include "../blocks.h"
@@ -116,7 +117,7 @@ void DoCredits()
         {
             CreditChop = static_cast<float>(screenH_half);
             EndCredits = 0;
-            frmMain.clearBuffer();
+            g_render->clearBuffer();
             SetupCredits();
             GameMenu = true;
             GameOutroDoQuit = true;

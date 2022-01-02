@@ -47,6 +47,9 @@
 #include "graphics.h"
 
 
+AbstractRender_t* g_render = nullptr;
+
+
 
 bool AbstractRender_t::init()
 {
@@ -60,6 +63,13 @@ bool AbstractRender_t::init()
     m_gif.init(this);
 #endif
     return true;
+}
+
+void AbstractRender_t::close()
+{
+#ifdef USE_SCREENSHOTS_AND_RECS
+    m_gif.quit();
+#endif
 }
 
 StdPicture AbstractRender_t::LoadPicture(const std::string &path,
@@ -386,6 +396,22 @@ void AbstractRender_t::lazyUnLoad(StdPicture &target)
     if(!target.inited || !target.lazyLoaded || !target.texture)
         return;
     deleteTexture(target, true);
+}
+
+void AbstractRender_t::lazyPreLoad(StdPicture &target)
+{
+    if(!target.texture && target.lazyLoaded)
+        lazyLoad(target);
+}
+
+size_t AbstractRender_t::lazyLoadedBytes()
+{
+    return m_lazyLoadedBytes;
+}
+
+void AbstractRender_t::lazyLoadedBytesReset()
+{
+    m_lazyLoadedBytes = 0;
 }
 
 

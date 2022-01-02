@@ -27,6 +27,7 @@
 #include "frame_timer.h"
 #include "globals.h"
 #include "graphics.h"
+#include "core/render.h"
 
 
 PerformanceStats_t g_stats;
@@ -65,7 +66,7 @@ void PerformanceStats_t::print()
     if(!enabled)
         return;
 
-    frmMain.offsetViewportIgnore(true);
+    g_render->offsetViewportIgnore(true);
 
     if(LevelSelect && !GameMenu)
     {
@@ -80,7 +81,7 @@ void PerformanceStats_t::print()
     }
     else
     {
-        frmMain.renderRect(42, 6, 745, 72, 0.0f,0.0f, 0.0f, 0.3f, true);
+        g_render->renderRect(42, 6, 745, 72, 0.0f,0.0f, 0.0f, 0.3f, true);
         SuperPrint(fmt::sprintf_ne("DRAW: B=%05d Z=%04d G=%04d N=%04d, E=%03d",
                                    renderedBlocks, renderedSzBlocks, renderedBGOs, renderedNPCs, renderedEffects,
                                    (renderedBlocks + renderedSzBlocks + renderedBGOs + renderedNPCs + renderedEffects)),
@@ -105,7 +106,7 @@ void PerformanceStats_t::print()
                    3, 45, 70, 0.5f, 1.f, 1.f);
     }
 
-    frmMain.offsetViewportIgnore(false);
+    g_render->offsetViewportIgnore(false);
 }
 
 //#if !defined(__EMSCRIPTEN__)
