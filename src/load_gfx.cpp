@@ -21,6 +21,7 @@
 #include <SDL2/SDL_timer.h>
 
 #include "globals.h"
+#include "gfx.h"
 #include "load_gfx.h"
 #include "graphics.h" // SuperPrint
 #include "core/render.h"

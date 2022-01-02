@@ -22,6 +22,7 @@
 #include "../graphics.h"
 #include "../collision.h"
 #include "../core/render.h"
+#include "../gfx.h"
 
 
 void DrawPlayer(const int A, const int Z)

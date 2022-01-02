@@ -23,6 +23,7 @@
 #include <SDL2/SDL_mixer_ext.h>
 
 #include "globals.h"
+#include "frm_main.h"
 #include "load_gfx.h"
 #include "pge_delay.h"
 

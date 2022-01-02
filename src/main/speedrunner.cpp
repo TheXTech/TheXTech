@@ -18,6 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <SDL2/SDL_joystick.h>
+
 #include <fmt_format_ne.h>
 #include "speedrunner.h"
 #include "globals.h"

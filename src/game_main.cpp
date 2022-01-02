@@ -33,6 +33,8 @@
 
 #include "globals.h"
 #include "game_main.h"
+#include "frm_main.h"
+#include "gfx.h"
 
 #include "config.h"
 #include "frame_timer.h"

@@ -101,7 +101,7 @@ static int isDebuggerPresent()
 #include "../Logger/logger.h"
 
 #include "../../version.h"
-#include "globals.h"
+#include "frm_main.h"
 
 #define STACK_FORMAT    \
     "====Stack trace====\n" \

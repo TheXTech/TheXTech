@@ -4561,15 +4561,17 @@ void UpdatePlayer()
                             Player[A].Location.X = -vScreenX[1] + 1;
                             Player[A].Location.SpeedX = 4;
                         }
-                        else if(Player[A].Location.X > -vScreenX[1] + frmMain.ScaleWidth - Player[A].Location.Width)
+                        else if(Player[A].Location.X > -vScreenX[1] + ScreenW/*frmMain.ScaleWidth*/ - Player[A].Location.Width)
                         {
-                            Player[A].Location.X = -vScreenX[1] + frmMain.ScaleWidth - Player[A].Location.Width - 1;
+                            Player[A].Location.X = -vScreenX[1] + ScreenW/*frmMain.ScaleWidth*/ - Player[A].Location.Width - 1;
                             Player[A].Location.SpeedX = -4;
                         }
                     }
                 }
+
                 if(Player[A].Location.Y > level[Player[A].Section].Height + 64)
                     PlayerDead(A);
+
                 if(!NPCIsAShell[NPC[Player[A].StandingOnNPC].Type])
                     Player[A].ShellSurf = false;
 

@@ -19,6 +19,8 @@
  */
 
 #include "../globals.h"
+#include "../frm_main.h"
+#include "../gfx.h"
 #include "../frame_timer.h"
 #include "../graphics.h"
 #include "../collision.h"

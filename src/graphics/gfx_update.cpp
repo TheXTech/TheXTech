@@ -26,6 +26,7 @@
 #include "../collision.h"
 #include "../editor.h"
 #include "../npc.h"
+#include "../gfx.h"
 #include "../main/menu_main.h"
 #include "../main/speedrunner.h"
 #include "../main/trees.h"

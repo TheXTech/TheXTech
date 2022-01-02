@@ -30,6 +30,8 @@
 
 #include "menu_main.h"
 #include "game_info.h"
+#include "../frm_main.h"
+#include "../gfx.h"
 
 #include "speedrunner.h"
 #include "../game_main.h"

@@ -21,6 +21,8 @@
 #include <SDL2/SDL.h>
 
 #include "game_main.h"
+#include "frm_main.h"
+#include "gfx.h"
 #include "sound.h"
 #include "video.h"
 #include "main/presetup.h"

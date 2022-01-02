@@ -20,6 +20,7 @@
 
 #include <SDL2/SDL_timer.h>
 
+#include "../gfx.h"
 #include "../globals.h"
 #include "../config.h"
 #include "../graphics.h"

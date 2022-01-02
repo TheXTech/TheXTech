@@ -25,6 +25,10 @@
 #include <Logger/logger.h>
 #include <SDL2/SDL_messagebox.h>
 
+
+GFX_t GFX;
+
+
 void GFX_t::loadImage(StdPicture &img, const std::string &path)
 {
     pLogDebug("Loading texture %s...", path.c_str());

@@ -28,9 +28,7 @@
 #include <vector>
 #include <cstdlib>
 
-#include "frm_main.h"
 #include "std_picture.h"
-#include "gfx.h"
 
 #include "location.h"
 #include "range_arr.hpp"
@@ -67,10 +65,6 @@
 #define IF_OUTRANGE(x, l, r)  ((x) < (l) || (x) > (r))
 #define IF_INRANGE(x, l, r)  ((x) >= (l) && (x) <= (r))
 
-//! Main window
-extern FrmMain frmMain;
-//! Container of "hardcoded" (no more) graphics
-extern GFX_t GFX;
 
 //! Showing that game is works. It gets false when closing a window or exiting a game by menu. To mean that application must be closed.
 extern bool GameIsActive;
@@ -92,7 +86,7 @@ extern void DoEvents();
  */
 extern int showCursor(int show);
 
-extern Uint8 getKeyState(SDL_Scancode key);
+extern Uint8 getKeyState(int key);
 extern Uint8 getKeyStateI(int key);
 
 //Public Const KEY_PRESSED As Integer = &H1000    'For control information

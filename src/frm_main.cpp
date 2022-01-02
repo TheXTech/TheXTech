@@ -26,6 +26,7 @@
 #include "graphics.h"
 #include "control/joystick.h"
 #include "sound.h"
+#include "gfx.h"
 #include "editor.h"
 
 #include <Logger/logger.h>
@@ -44,6 +45,8 @@
 #include "main/game_info.h"
 
 
+FrmMain frmMain;
+
 
 static SDL_bool IsFullScreen(SDL_Window *win)
 {
@@ -53,8 +56,6 @@ static SDL_bool IsFullScreen(SDL_Window *win)
 
 FrmMain::FrmMain() noexcept
 {
-    ScaleWidth = ScreenW;
-    ScaleHeight = ScreenH;
     SDL_memset(&m_event, 0, sizeof(SDL_Event));
     SDL_memset(&m_ri, 0, sizeof(SDL_RendererInfo));
 }
@@ -130,7 +131,7 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
     m_window = SDL_CreateWindow(m_windowTitle.c_str(),
                               SDL_WINDOWPOS_CENTERED,
                               SDL_WINDOWPOS_CENTERED,
-                              ScaleWidth, ScaleHeight,
+                              ScreenW, ScreenH,
                               SDL_WINDOW_RESIZABLE |
                               SDL_WINDOW_HIDDEN |
                               SDL_WINDOW_ALLOW_HIGHDPI |
@@ -157,7 +158,7 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
 #elif defined(__ANDROID__) // Set as small as possible
     SDL_SetWindowMinimumSize(m_window, 200, 150);
 #else
-    SDL_SetWindowMinimumSize(m_window, ScaleWidth, ScaleHeight);
+    SDL_SetWindowMinimumSize(m_window, ScreenW, ScreenH);
 #endif //__EMSCRIPTEN__
 
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");

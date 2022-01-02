@@ -21,6 +21,8 @@
 #include "globals.h"
 #include "change_res.h"
 #include "load_gfx.h"
+#include "frm_main.h"
+
 
 void SetOrigRes()
 {

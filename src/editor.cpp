@@ -27,6 +27,7 @@
 #include <fmt_format_ne.h>
 
 #include "globals.h"
+#include "frm_main.h"
 #include "editor.h"
 #include "graphics.h"
 #include "sound.h"

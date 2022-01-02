@@ -73,9 +73,6 @@ class FrmMain
     size_t m_lazyLoadedBytes = 0;
 
 public:
-    int ScaleWidth = 800;
-    int ScaleHeight = 600;
-
     int MousePointer = 0;
 
     FrmMain() noexcept;
@@ -110,5 +107,8 @@ public:
 private:
     void processEvent();
 };
+
+//! Main window
+extern FrmMain frmMain;
 
 #endif // FRMMAIN_H

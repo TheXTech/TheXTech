@@ -19,14 +19,15 @@
  */
 
 #include <SDL2/SDL_version.h>
+#include <SDL2/SDL_scancode.h>
+#include <SDL2/SDL_mouse.h>
 
+#include "frm_main.h"
 #include "globals.h"
 #include <fmt_format_ne.h>
 #include <cmath>
 #include <cfenv>
 
-FrmMain frmMain;
-GFX_t GFX;
 
 bool GameIsActive = false;
 std::string AppPath;
@@ -514,9 +515,9 @@ int showCursor(int show)
     return SDL_ShowCursor(show);
 }
 
-Uint8 getKeyState(SDL_Scancode key)
+Uint8 getKeyState(int key)
 {
-    return frmMain.getKeyState(key);
+    return frmMain.getKeyState(static_cast<SDL_Scancode>(key));
 }
 
 Uint8 getKeyStateI(int key)

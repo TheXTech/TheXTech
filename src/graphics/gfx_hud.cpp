@@ -21,6 +21,7 @@
 #include "../globals.h"
 #include "../graphics.h"
 #include "../core/render.h"
+#include "../gfx.h"
 
 
 void DrawInterface(int Z, int numScreens)

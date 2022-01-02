@@ -23,7 +23,7 @@
 
 #include "touchscreen.h"
 #include "../core/render.h"
-#include "../globals.h"
+#include "frm_main.h"
 #ifdef __ANDROID__
 #include "../gfx.h"
 #endif
