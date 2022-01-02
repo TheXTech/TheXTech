@@ -285,6 +285,7 @@ set(THEXTECH_SRC
     src/npc.cpp
     src/sound.cpp
     src/frame_timer.cpp
+    src/core/render.cpp
     src/main/world_loop.cpp
     src/main/world_file.cpp
     src/main/game_info.cpp
@@ -349,6 +350,7 @@ file(GLOB THEXTECH_HEADS_SRC
     src/*.h
     src/*.hpp
     src/control/*.h
+    src/core/*.h
     src/main/*.h
     src/main/QuadTree/*.h
 )
