@@ -19,8 +19,10 @@
  */
 
 #include <SDL2/SDL_messagebox.h>
+#include <SDL2/SDL_version.h>
 
 #include "msgbox_sdl.h"
+
 
 MsgBoxSDL::MsgBoxSDL() :
     AbstractMsgBox_t()
@@ -50,11 +52,13 @@ int MsgBoxSDL::simpleMsgBox(uint32_t flags, const std::string &title, const std:
     if(flags & MESSAGEBOX_INFORMATION)
         dFlags |= SDL_MESSAGEBOX_INFORMATION;
 
+#if SDL_COMPILEDVERSION < SDL_VERSIONNUM(2, 0, 12)
     if(flags & MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT)
         dFlags |= SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT;
 
     if(flags & MESSAGEBOX_BUTTONS_RIGHT_TO_LEFT)
         dFlags |= SDL_MESSAGEBOX_BUTTONS_RIGHT_TO_LEFT;
+#endif
 
     return SDL_ShowSimpleMessageBox(dFlags,
                                     title.c_str(),
