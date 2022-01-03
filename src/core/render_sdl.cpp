@@ -231,8 +231,8 @@ void RenderSDL::updateViewport()
     }
     else
     {
-        wi = ScreenW;
-        hi = ScreenH;
+        wi = ScaleWidth;
+        hi = ScaleHeight;
     }
 #endif
 
