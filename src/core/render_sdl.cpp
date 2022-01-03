@@ -18,6 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <SDL2/SDL_version.h>
+#include <SDL2/SDL_render.h>
 #ifdef __ANDROID__
 #include <SDL2/SDL_assert.h>
 #endif
@@ -36,7 +38,8 @@
 #endif
 
 // Workaround for older SDL versions that lacks the floating-point based rects and points
-#ifdef XTECH_SDL_NO_RECTF_SUPPORT
+#if SDL_COMPILEDVERSION < SDL_VERSIONNUM(2, 0, 10)
+#define XTECH_SDL_NO_RECTF_SUPPORT
 #define SDL_RenderCopyF SDL_RenderCopy
 #define SDL_RenderCopyExF SDL_RenderCopyEx
 #endif
@@ -110,9 +113,10 @@ bool RenderSDL::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
         return false;
     }
 
-    SDL_GetRendererInfo(m_gRenderer, &m_ri);
-    m_maxTextureWidth = m_ri.max_texture_width;
-    m_maxTextureHeight = m_ri.max_texture_height;
+    SDL_RendererInfo ri;
+    SDL_GetRendererInfo(m_gRenderer, &ri);
+    m_maxTextureWidth = ri.max_texture_width;
+    m_maxTextureHeight = ri.max_texture_height;
 
     m_tBuffer = SDL_CreateTexture(m_gRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, ScaleWidth, ScaleHeight);
     if(!m_tBuffer)

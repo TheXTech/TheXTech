@@ -22,13 +22,14 @@
 #ifndef RENDERSDL_T_H
 #define RENDERSDL_T_H
 
-#include <SDL2/SDL_render.h>
-
 #include <set>
 
 #include "render.h"
 #include "cmd_line_setup.h"
 
+struct SDL_Renderer;
+struct SDL_Texture;
+struct SDL_Window;
 
 class RenderSDL : public AbstractRender_t
 {
@@ -38,7 +39,6 @@ class RenderSDL : public AbstractRender_t
     SDL_Texture  *m_tBuffer = nullptr;
     SDL_Texture  *m_recentTarget = nullptr;
     std::set<SDL_Texture *> m_textureBank;
-    SDL_RendererInfo m_ri = {};
 
     // Scale of virtual and window resolutuins
     float m_scale_x = 1.f;
