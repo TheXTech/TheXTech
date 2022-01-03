@@ -26,6 +26,9 @@
 #include <vector>
 #include "../range_arr.hpp"
 #include "con_control.h"
+#ifdef USE_TOUCHSCREEN_CONTROLLER
+#include "../controls.h"
+#endif
 
 struct SDL_JoyDeviceEvent;
 
