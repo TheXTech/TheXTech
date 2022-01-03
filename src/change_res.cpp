@@ -21,7 +21,6 @@
 #include "globals.h"
 #include "change_res.h"
 #include "load_gfx.h"
-#include "frm_main.h"
 #include "core/window.h"
 
 
@@ -39,7 +38,7 @@ void SetOrigRes()
         UpdateLoad();
 
     if(!GameMenu && !MagicHand)
-        showCursor(1);
+        g_window->showCursor(1);
 }
 
 void ChangeRes(int, int, int, int)

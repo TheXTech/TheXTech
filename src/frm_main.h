@@ -66,13 +66,8 @@ public:
     bool initSystem(const CmdLineSetup_t &setup);
     void freeSystem();
 
-    void show();
-    void hide();
     void doEvents();
     void waitEvents();
-
-    bool hasWindowInputFocus();
-    bool hasWindowMouseFocus();
 
     void eventDoubleClick();
     void eventKeyPress(SDL_Scancode KeyASCII);

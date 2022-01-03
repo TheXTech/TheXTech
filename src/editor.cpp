@@ -40,6 +40,7 @@
 #include "game_main.h"
 #include "main/level_file.h"
 #include "load_gfx.h"
+#include "core/window.h"
 
 #include "pseudo_vb.h"
 
@@ -162,7 +163,7 @@ void UpdateEditor()
     CursorPos.X = MenuMouseX;
     CursorPos.Y = MenuMouseY;
 
-    if(!frmMain.hasWindowMouseFocus() || CursorPos.X < 0 || CursorPos.Y > ScreenW || CursorPos.Y < 0 || CursorPos.Y > ScreenH)
+    if(!g_window->hasWindowMouseFocus() || CursorPos.X < 0 || CursorPos.Y > ScreenW || CursorPos.Y < 0 || CursorPos.Y > ScreenH)
         HideCursor();
 
     if(LevelEditor || MagicHand)

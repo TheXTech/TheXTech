@@ -60,6 +60,7 @@
 #include "main/game_info.h"
 #include "main/record.h"
 #include "core/render.h"
+#include "core/window.h"
 
 #include "pseudo_vb.h"
 
@@ -175,7 +176,7 @@ int GameMain(const CmdLineSetup_t &setup)
 #ifndef PGE_NO_THREADING
     gfxLoaderThreadingMode = true;
 #endif
-    frmMain.show(); // Don't show window until playing an initial sound
+    g_window->show(); // Don't show window until playing an initial sound
 
     if(!noSound)
     {
@@ -229,7 +230,7 @@ int GameMain(const CmdLineSetup_t &setup)
     g_render->repaint();
     DoEvents();
 
-    if(!neverPause && !frmMain.hasWindowInputFocus())
+    if(!neverPause && !g_window->hasWindowInputFocus())
         SoundPauseEngine(1);
 
     if(!setup.testLevel.empty() || !setup.testReplay.empty() || setup.interprocess) // Start level testing immediately!
@@ -909,7 +910,7 @@ void KillIt()
 {
     GameIsActive = false;
 #ifndef __ANDROID__
-    frmMain.hide();
+    g_window->hide();
     if(resChanged)
         SetOrigRes();
 #else
@@ -918,7 +919,7 @@ void KillIt()
 #endif
     QuitMixerX();
     UnloadGFX();
-    showCursor(1);
+    g_window->showCursor(1);
 }
 
 
@@ -1415,7 +1416,7 @@ void CheckActive()
 //    If nPlay.Online = True Then Exit Sub
     // If LevelEditor = False And TestLevel = False Then Exit Sub
     // If LevelEditor = False Then Exit Sub
-    while(!frmMain.hasWindowInputFocus())
+    while(!g_window->hasWindowInputFocus())
     {
         frmMain.waitEvents();
 //        If LevelEditor = True Or MagicHand = True Then frmLevelWindow.vScreen(1).MousePointer = 0

@@ -129,16 +129,6 @@ void FrmMain::freeSystem()
     CloseLog();
 }
 
-void FrmMain::show()
-{
-    g_window->show();
-}
-
-void FrmMain::hide()
-{
-    g_window->hide();
-}
-
 void FrmMain::doEvents()
 {
     while(SDL_PollEvent(&m_event))
@@ -226,16 +216,6 @@ void FrmMain::waitEvents()
     if(SDL_WaitEventTimeout(&m_event, 1000))
         processEvent();
     doEvents();
-}
-
-bool FrmMain::hasWindowInputFocus()
-{
-    return g_window->hasWindowInputFocus();
-}
-
-bool FrmMain::hasWindowMouseFocus()
-{
-    return g_window->hasWindowMouseFocus();
 }
 
 void FrmMain::eventDoubleClick()
