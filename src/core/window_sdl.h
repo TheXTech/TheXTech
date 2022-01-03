@@ -33,6 +33,7 @@ class WindowSDL : public AbstractWindow_t
 {
     std::string m_windowTitle;
     SDL_Window *m_window = nullptr;
+    Cursor_t m_cursor = CURSOR_DEFAULT;
 
 public:
     WindowSDL();
@@ -65,6 +66,18 @@ public:
      *  \return 1 if the cursor is shown, or 0 if the cursor is hidden.
      */
     int showCursor(int show) override;
+
+    /*!
+     * \brief Change the displayable cursor type
+     * \param cursor cursor type
+     */
+    void setCursor(Cursor_t cursor) override;
+
+    /*!
+     * \brief Get the current cursor type
+     * \return Cursor type
+     */
+    Cursor_t getCursor() override;
 
     /*!
      * \brief Is full-screen mode active?

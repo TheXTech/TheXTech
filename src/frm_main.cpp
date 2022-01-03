@@ -18,39 +18,40 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "control/joystick.h"
-#include "gfx.h"
 
 #include <Logger/logger.h>
 #include <Graphics/graphics_funcs.h>
 
-#include "core/render.h"
-#include "core/render_sdl.h"
+#include "control/joystick.h"
+#include "gfx.h"
 
-#include "core/window.h"
-#include "core/window_sdl.h"
+#ifdef CORE_EVERYTHING_SDL
+#   include "core/render_sdl.h"
+typedef RenderSDL RenderUsed;
+#   define USE_CORE_RENDER_SDL
 
-#include "core/msgbox.h"
-#include "core/msgbox_sdl.h"
+#   include "core/window_sdl.h"
+typedef WindowSDL WindowUsed;
+#   define USE_CORE_WINDOW_SDL
 
-#include "core/events.h"
-#include "core/events_sdl.h"
+#   include "core/msgbox_sdl.h"
+typedef MsgBoxSDL MsgBoxUsed;
+#   define USE_CORE_MSGBOX_SDL
+
+#   include "core/events_sdl.h"
+typedef EventsSDL EventsUsed;
+#   define USE_CORE_EVENTS_SDL
+#endif
 
 #include "frm_main.h"
 
 
-FrmMain frmMain;
-
-
-FrmMain::FrmMain() noexcept
-{}
-
 bool FrmMain::initSystem(const CmdLineSetup_t &setup)
 {
-    std::unique_ptr<RenderSDL> render;
-    std::unique_ptr<WindowSDL> window;
-    std::unique_ptr<MsgBoxSDL> msgbox;
-    std::unique_ptr<EventsSDL> events;
+    std::unique_ptr<RenderUsed> render;
+    std::unique_ptr<WindowUsed> window;
+    std::unique_ptr<MsgBoxUsed> msgbox;
+    std::unique_ptr<EventsUsed> events;
     bool res = false;
 
     LoadLogSettings(setup.interprocess, setup.verboseLogging);
@@ -60,23 +61,37 @@ bool FrmMain::initSystem(const CmdLineSetup_t &setup)
     //Initialize FreeImage
     GraphicsHelps::initFreeImage();
 
-    window.reset(new WindowSDL());
-    render.reset(new RenderSDL());
-    msgbox.reset(new MsgBoxSDL());
-    events.reset(new EventsSDL());
+    window.reset(new WindowUsed());
+    render.reset(new RenderUsed());
+    msgbox.reset(new MsgBoxUsed());
+    events.reset(new EventsUsed());
 
     render->init();
+#ifdef USE_CORE_WINDOW_SDL
     res = window->initSDL(setup, render->SDL_InitFlags());
+#else
+#error "FIXME: Implement supported window initialization here"
+#endif
 
     if(!res)
         return true;
 
+#if defined(USE_CORE_WINDOW_SDL) && defined(USE_CORE_MSGBOX_SDL)
     msgbox->init(window->getWindow());
+#else
+#error "FIXME: Implement supported message boxes initialization here"
+#endif
     events->init(this);
 
     pLogDebug("Init renderer settings...");
 
-    if(!render->initRender(setup, window->getWindow()))
+#if defined(USE_CORE_WINDOW_SDL) && defined(USE_CORE_RENDER_SDL)
+    res = render->initRender(setup, window->getWindow());
+#else
+#error "FIXME: Implement supported render initialization here"
+#endif
+
+    if(!res)
     {
         freeSystem();
         return true;
@@ -95,7 +110,7 @@ bool FrmMain::initSystem(const CmdLineSetup_t &setup)
     render.release();
 
     g_window = window.get();
-    m_win.reset(window.get());
+    m_window.reset(window.get());
     window.release();
 
     return !res;
@@ -120,8 +135,8 @@ void FrmMain::freeSystem()
     m_events.reset();
     g_events = nullptr;
 
-    m_win->close();
-    m_win.reset();
+    m_window->close();
+    m_window.reset();
     g_window = nullptr;
     GraphicsHelps::closeFreeImage();
 

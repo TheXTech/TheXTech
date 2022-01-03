@@ -24,42 +24,28 @@
 
 #include <memory>
 #include <string>
-#include <set>
 
-#ifndef __EMSCRIPTEN__
-#include <deque>
-#endif
-
-#include <gif_writer.h>
-
-#include "std_picture.h"
 #include "cmd_line_setup.h"
 
-typedef struct SDL_Thread SDL_Thread;
-typedef struct SDL_mutex SDL_mutex;
+#include "core/render.h"
+#include "core/window.h"
+#include "core/msgbox.h"
+#include "core/events.h"
 
-class AbstractWindow_t;
-class AbstractRender_t;
-class AbstractMsgBox_t;
-class AbstractEvents_t;
 
 class FrmMain
 {
-    std::unique_ptr<AbstractWindow_t> m_win;
+    std::unique_ptr<AbstractWindow_t> m_window;
     std::unique_ptr<AbstractRender_t> m_render;
     std::unique_ptr<AbstractMsgBox_t> m_msgbox;
     std::unique_ptr<AbstractEvents_t> m_events;
 
 public:
-    int MousePointer = 0;
-
-    FrmMain() noexcept;
+    FrmMain() noexcept = default;
+    ~FrmMain() = default;
 
     bool initSystem(const CmdLineSetup_t &setup);
     void freeSystem();
 };
-
-//! Main window
-extern FrmMain frmMain;
 
 #endif // FRMMAIN_H

@@ -33,7 +33,6 @@
 
 #include "globals.h"
 #include "game_main.h"
-#include "frm_main.h"
 #include "gfx.h"
 
 #include "config.h"
@@ -265,12 +264,12 @@ int GameMain(const CmdLineSetup_t &setup)
     {
         if(GameMenu || MagicHand || LevelEditor)
         {
-            frmMain.MousePointer = 99;
+            g_window->setCursor(AbstractWindow_t::CURSOR_NONE);
             g_window->showCursor(0);
         }
         else if(!resChanged)
         {
-            frmMain.MousePointer = 0;
+            g_window->setCursor(AbstractWindow_t::CURSOR_DEFAULT);
             g_window->showCursor(1);
         }
 

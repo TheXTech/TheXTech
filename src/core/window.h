@@ -55,6 +55,27 @@ public:
     virtual int showCursor(int show) = 0;
 
     /*!
+     * \brief Cursor type
+     */
+    enum Cursor_t
+    {
+        CURSOR_DEFAULT = 0,
+        CURSOR_NONE
+    };
+
+    /*!
+     * \brief Change the displayable cursor type
+     * \param cursor cursor type
+     */
+    virtual void setCursor(Cursor_t cursor) = 0;
+
+    /*!
+     * \brief Get the current cursor type
+     * \return Cursor type
+     */
+    virtual Cursor_t getCursor() = 0;
+
+    /*!
      * \brief Is full-screen mode active?
      * \return True if the full-screen mode works right now
      */

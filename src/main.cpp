@@ -138,6 +138,7 @@ extern "C"
 int main(int argc, char**argv)
 {
     CmdLineSetup_t setup;
+    FrmMain frmMain;
 
     CrashHandler::initSigs();
 

@@ -30,7 +30,6 @@
 
 #include "menu_main.h"
 #include "game_info.h"
-#include "../frm_main.h"
 #include "../gfx.h"
 
 #include "speedrunner.h"
@@ -332,9 +331,9 @@ bool mainMenuUpdate()
         menuDoPress |= (c.Start || c.Jump) && !altPressed;
         menuBackPress |= c.Run && !altPressed;
 
-        if(frmMain.MousePointer != 99)
+        if(g_window->getCursor() != AbstractWindow_t::CURSOR_NONE)
         {
-            frmMain.MousePointer = 99;
+            g_window->setCursor(AbstractWindow_t::CURSOR_NONE);
             g_window->showCursor(0);
         }
 

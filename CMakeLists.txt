@@ -286,13 +286,9 @@ set(THEXTECH_SRC
     src/sound.cpp
     src/frame_timer.cpp
     src/core/render.cpp
-    src/core/render_sdl.cpp
     src/core/window.cpp
-    src/core/window_sdl.cpp
     src/core/msgbox.cpp
-    src/core/msgbox_sdl.cpp
     src/core/events.cpp
-    src/core/events_sdl.cpp
     src/main/world_loop.cpp
     src/main/world_file.cpp
     src/main/game_info.cpp
@@ -345,6 +341,14 @@ set(THEXTECH_SRC
     src/npc/npc_frames.cpp
     src/npc/npc_bonus.cpp
     src/player/player_update.cpp
+)
+
+add_definitions(-DCORE_EVERYTHING_SDL)
+list(APPEND THEXTECH_SRC
+    src/core/render_sdl.cpp
+    src/core/window_sdl.cpp
+    src/core/msgbox_sdl.cpp
+    src/core/events_sdl.cpp
 )
 
 # Add heads into the list
