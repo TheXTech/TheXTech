@@ -210,11 +210,11 @@ void EventsSDL::processEvent()
         D_pLogDebug("Android: Render Device Reset");
         break;
     case SDL_APP_WILLENTERBACKGROUND:
-        g_render->m_blockRender = true;
+        g_render->setBlockRender(true);
         D_pLogDebug("Android: Entering background");
         break;
     case SDL_APP_DIDENTERFOREGROUND:
-        g_render->m_blockRender = false;
+        g_render->setBlockRender(false);
         D_pLogDebug("Android: Resumed foreground");
         break;
 #endif

@@ -30,6 +30,7 @@
 
 #include "render_sdl.h"
 #include "video.h"
+#include "window.h"
 
 #include "control/joystick.h"
 
@@ -223,11 +224,11 @@ void RenderSDL::updateViewport()
     int   wi, hi;
 
 #ifndef __EMSCRIPTEN__
-    SDL_GetWindowSize(m_window, &wi, &hi);
+    g_window->getWindowSize(&wi, &hi);
 #else
-    if(IsFullScreen(m_window))
+    if(g_window->isFullScreen())
     {
-        SDL_GetWindowSize(m_window, &wi, &hi);
+        g_window->getWindowSize(&wi, &hi);
     }
     else
     {

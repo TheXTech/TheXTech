@@ -421,6 +421,11 @@ bool AbstractRender_t::renderBlocked()
 {
     return m_blockRender;
 }
+
+void AbstractRender_t::setBlockRender(bool b)
+{
+    m_blockRender = b;
+}
 #endif
 
 
