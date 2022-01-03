@@ -20,7 +20,7 @@
 
 #include <SDL2/SDL_stdinc.h>
 #ifdef ENABLE_ANTICHEAT_TRAP
-#include "frm_main.h"
+#include "core/msgbox.h"
 #include "core/render.h"
 #endif
 
@@ -90,14 +90,14 @@ void CheatCode(char NewKey)
         }
         else
         {
-            frmMain.simpleMsgBox(FrmMain::MESSAGEBOX_ERROR,
-                                     "Die, cheater!",
-                                     "       Die, cheater!       \n"
-                                     "Now play the game all over \n"
-                                     "    from the beginning!    \n"
-                                     "                           \n"
-                                     "     Time to be evil!      \n"
-                                     "      Mu-ha-ha-ha-ha!      ");
+            simpleMsgBox(AbstractMsgBox_t::MESSAGEBOX_ERROR,
+                         "Die, cheater!",
+                         "       Die, cheater!       \n"
+                         "Now play the game all over \n"
+                         "    from the beginning!    \n"
+                         "                           \n"
+                         "     Time to be evil!      \n"
+                         "      Mu-ha-ha-ha-ha!      ");
         }
 
         for(int A = 1; A <= numPlayers; ++A)
