@@ -260,6 +260,7 @@ public:
     // Screenshots, GIF recordings, etc., etc.
 #ifdef __ANDROID__
     bool renderBlocked();
+    void setBlockRender(bool b);
 #endif
 
 #ifdef USE_SCREENSHOTS_AND_RECS
