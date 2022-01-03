@@ -46,6 +46,7 @@ typedef struct SDL_mutex SDL_mutex;
 
 class AbstractWindow_t;
 class AbstractRender_t;
+class AbstractMsgBox_t;
 
 class FrmMain
 {
@@ -55,6 +56,7 @@ class FrmMain
 
     std::unique_ptr<AbstractWindow_t> m_win;
     std::unique_ptr<AbstractRender_t> m_render;
+    std::unique_ptr<AbstractMsgBox_t> m_msgbox;
 
 public:
     int MousePointer = 0;
@@ -78,19 +80,6 @@ public:
     void eventMouseWheel(SDL_MouseWheelEvent &m_event);
     void eventMouseUp(SDL_MouseButtonEvent &m_event);
     void eventResize();
-
-
-    enum MessageBoxFlags
-    {
-        MESSAGEBOX_ERROR                 = 0x00000010,   /**< error dialog */
-        MESSAGEBOX_WARNING               = 0x00000020,   /**< warning dialog */
-        MESSAGEBOX_INFORMATION           = 0x00000040,   /**< informational dialog */
-        MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT = 0x00000080,   /**< buttons placed left to right */
-        MESSAGEBOX_BUTTONS_RIGHT_TO_LEFT = 0x00000100    /**< buttons placed right to left */
-    };
-    int simpleMsgBox(uint32_t flags, const std::string &title, const std::string &message);
-
-    void errorMsgBox(const std::string &title, const std::string &message);
 
 private:
     void processEvent();

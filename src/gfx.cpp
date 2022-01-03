@@ -20,7 +20,7 @@
 
 #include "globals.h"
 #include "gfx.h"
-#include "frm_main.h"
+#include "core/msgbox.h"
 #include "core/render.h"
 #include <fmt_format_ne.h>
 #include <Logger/logger.h>
@@ -161,7 +161,7 @@ bool GFX_t::load()
                                          "\n\n"
                                          "It's possible that you didn't installed the game assets package, or you had installed it at the incorrect directory.",
                                          getLogFilePath());
-        frmMain.simpleMsgBox(FrmMain::MESSAGEBOX_ERROR, "UI image assets loading error", msg);
+        simpleMsgBox(AbstractMsgBox_t::MESSAGEBOX_ERROR, "UI image assets loading error", msg);
         return false;
     }
 

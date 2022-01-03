@@ -44,6 +44,9 @@
 #include "core/window.h"
 #include "core/window_sdl.h"
 
+#include "core/msgbox.h"
+#include "core/msgbox_sdl.h"
+
 #include "video.h"
 #include "frm_main.h"
 #include "main/game_info.h"
@@ -68,6 +71,7 @@ bool FrmMain::initSystem(const CmdLineSetup_t &setup)
 {
     std::unique_ptr<RenderSDL> render;
     std::unique_ptr<WindowSDL> window;
+    std::unique_ptr<MsgBoxSDL> msgbox;
     bool res = false;
 
     LoadLogSettings(setup.interprocess, setup.verboseLogging);
@@ -79,12 +83,15 @@ bool FrmMain::initSystem(const CmdLineSetup_t &setup)
 
     window.reset(new WindowSDL());
     render.reset(new RenderSDL());
+    msgbox.reset(new MsgBoxSDL());
 
     render->init();
     res = window->initSDL(setup, render->SDL_InitFlags());
 
     if(!res)
         return true;
+
+    msgbox->init(window->getWindow());
 
     pLogDebug("Init renderer settings...");
 
@@ -96,6 +103,10 @@ bool FrmMain::initSystem(const CmdLineSetup_t &setup)
 
     m_keyboardState = SDL_GetKeyboardState(nullptr);
     doEvents();
+
+    g_msgBox = msgbox.get();
+    m_msgbox.reset(msgbox.get());
+    msgbox.release();
 
     g_render = render.get();
     m_render.reset(render.get());
@@ -119,6 +130,10 @@ void FrmMain::freeSystem()
     m_render->close();
     m_render.reset();
     g_render = nullptr;
+
+    m_msgbox->close();
+    m_msgbox.reset();
+    g_msgBox = nullptr;
 
     m_win->close();
     m_win.reset();
@@ -397,64 +412,4 @@ void FrmMain::eventResize()
 #ifdef USE_TOUCHSCREEN_CONTROLLER
     UpdateTouchScreenSize();
 #endif
-}
-
-
-int FrmMain::simpleMsgBox(uint32_t flags, const std::string &title, const std::string &message)
-{
-    Uint32 dFlags = 0;
-
-    if(flags & MESSAGEBOX_ERROR)
-        dFlags |= SDL_MESSAGEBOX_ERROR;
-
-    if(flags & MESSAGEBOX_WARNING)
-        dFlags |= SDL_MESSAGEBOX_WARNING;
-
-    if(flags & MESSAGEBOX_INFORMATION)
-        dFlags |= SDL_MESSAGEBOX_INFORMATION;
-
-    if(flags & MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT)
-        dFlags |= SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT;
-
-    if(flags & MESSAGEBOX_BUTTONS_RIGHT_TO_LEFT)
-        dFlags |= SDL_MESSAGEBOX_BUTTONS_RIGHT_TO_LEFT;
-
-    return SDL_ShowSimpleMessageBox(dFlags,
-                                    title.c_str(),
-                                    message.c_str(),
-                                    nullptr);
-}
-
-void FrmMain::errorMsgBox(const std::string &title, const std::string &message)
-{
-    const std::string &ttl = title;
-    const std::string &msg = message;
-    SDL_MessageBoxData mbox;
-    SDL_MessageBoxButtonData mboxButton;
-    const SDL_MessageBoxColorScheme colorScheme =
-    {
-        { /* .colors (.r, .g, .b) */
-            /* [SDL_MESSAGEBOX_COLOR_BACKGROUND] */
-            { 200, 200, 200 },
-            /* [SDL_MESSAGEBOX_COLOR_TEXT] */
-            {   0,   0,   0 },
-            /* [SDL_MESSAGEBOX_COLOR_BUTTON_BORDER] */
-            { 255, 255, 255 },
-            /* [SDL_MESSAGEBOX_COLOR_BUTTON_BACKGROUND] */
-            { 150, 150, 150 },
-            /* [SDL_MESSAGEBOX_COLOR_BUTTON_SELECTED] */
-            { 255, 255, 255 }
-        }
-    };
-    mboxButton.buttonid = 0;
-    mboxButton.flags    = SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT | SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT;
-    mboxButton.text     = "Ok";
-    mbox.flags          = SDL_MESSAGEBOX_ERROR;
-    mbox.window         = nullptr;
-    mbox.title          = ttl.c_str();
-    mbox.message        = msg.c_str();
-    mbox.numbuttons     = 1;
-    mbox.buttons        = &mboxButton;
-    mbox.colorScheme    = &colorScheme;
-    SDL_ShowMessageBox(&mbox, nullptr);
 }

@@ -289,6 +289,8 @@ set(THEXTECH_SRC
     src/core/render_sdl.cpp
     src/core/window.cpp
     src/core/window_sdl.cpp
+    src/core/msgbox.cpp
+    src/core/msgbox_sdl.cpp
     src/main/world_loop.cpp
     src/main/world_file.cpp
     src/main/game_info.cpp
