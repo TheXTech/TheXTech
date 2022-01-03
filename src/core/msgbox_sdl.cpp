@@ -52,7 +52,7 @@ int MsgBoxSDL::simpleMsgBox(uint32_t flags, const std::string &title, const std:
     if(flags & MESSAGEBOX_INFORMATION)
         dFlags |= SDL_MESSAGEBOX_INFORMATION;
 
-#if SDL_COMPILEDVERSION < SDL_VERSIONNUM(2, 0, 12)
+#if SDL_COMPILEDVERSION >= SDL_VERSIONNUM(2, 0, 12)
     if(flags & MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT)
         dFlags |= SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT;
 
