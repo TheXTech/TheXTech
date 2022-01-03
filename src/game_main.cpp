@@ -139,7 +139,7 @@ int GameMain(const CmdLineSetup_t &setup)
 
 //    If LevelEditor = False Then
 //        frmMain.Show // Show window a bit later
-//    frmMain.show();
+//    g_window->show();
 //        GameMenu = True
     GameMenu = true;
 //    Else
@@ -156,7 +156,7 @@ int GameMain(const CmdLineSetup_t &setup)
     DoEvents();
 
 #ifdef __EMSCRIPTEN__ // Workaround for a recent Chrome's policy to avoid sudden sound without user's interaction
-    frmMain.show(); // Don't show window until playing an initial sound
+    g_window->show(); // Don't show window until playing an initial sound
 
     while(!MenuMouseDown)
     {
