@@ -109,7 +109,7 @@ bool WindowSDL::initSDL(const CmdLineSetup_t &setup, uint32_t windowInitFlags)
     }
 
 #ifdef __EMSCRIPTEN__ //Set canvas be 1/2 size for a faster rendering
-    SDL_SetWindowMinimumSize(m_window, ScaleWidth / 2, ScaleHeight / 2);
+    SDL_SetWindowMinimumSize(m_window, ScreenW / 2, ScreenH / 2);
 #elif defined(__ANDROID__) // Set as small as possible
     SDL_SetWindowMinimumSize(m_window, 200, 150);
 #else
@@ -251,7 +251,7 @@ int WindowSDL::setFullScreen(bool fs)
                 return -1;
             }
 #ifdef __EMSCRIPTEN__
-            SDL_SetWindowSize(m_window, ScaleWidth, ScaleHeight);
+            SDL_SetWindowSize(m_window, ScreenW, ScreenH);
 #endif
             return 0;
         }
