@@ -43,56 +43,8 @@ class AbstractRender_t;
 class AbstractMsgBox_t;
 class AbstractEvents_t;
 
-enum MouseButton_t
-{
-    MOUSE_BUTTON_NONE = 0,
-    MOUSE_BUTTON_LEFT,
-    MOUSE_BUTTON_MIDDLE,
-    MOUSE_BUTTON_RIGHT
-};
-
-struct MouseButtonEvent_t
-{
-    int button = MOUSE_BUTTON_NONE;
-};
-
-struct MouseMoveEvent_t
-{
-    int x;
-    int y;
-};
-
-struct MouseWheelEvent_t
-{
-    int x;
-    int y;
-};
-
-enum KeyboardModifier_t
-{
-    KEYMOD_NONE = 0x0000,
-    KEYMOD_LSHIFT = 0x0001,
-    KEYMOD_RSHIFT = 0x0002,
-    KEYMOD_LCTRL = 0x0040,
-    KEYMOD_RCTRL = 0x0080,
-    KEYMOD_LALT = 0x0100,
-    KEYMOD_RALT = 0x0200,
-
-    KEYMOD_CTRL = KEYMOD_LCTRL | KEYMOD_RCTRL,
-    KEYMOD_SHIFT = KEYMOD_LSHIFT | KEYMOD_RSHIFT,
-    KEYMOD_ALT = KEYMOD_LALT | KEYMOD_RALT,
-};
-
-struct KeyboardEvent_t
-{
-    int scancode;
-    int mod;
-};
-
 class FrmMain
 {
-    uint32_t m_lastMousePress = 0;
-
     std::unique_ptr<AbstractWindow_t> m_win;
     std::unique_ptr<AbstractRender_t> m_render;
     std::unique_ptr<AbstractMsgBox_t> m_msgbox;
@@ -105,16 +57,6 @@ public:
 
     bool initSystem(const CmdLineSetup_t &setup);
     void freeSystem();
-
-    void eventDoubleClick();
-    void eventKeyPress(int scan_code);
-    void eventKeyDown(const KeyboardEvent_t &evt);
-    void eventKeyUp(const KeyboardEvent_t &evt);
-    void eventMouseDown(const MouseButtonEvent_t &event);
-    void eventMouseMove(const MouseMoveEvent_t &event);
-    void eventMouseWheel(const MouseWheelEvent_t &event);
-    void eventMouseUp(const MouseButtonEvent_t &event);
-    void eventResize();
 };
 
 //! Main window

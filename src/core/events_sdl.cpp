@@ -114,7 +114,7 @@ void EventsSDL::processEvent()
         {
         case SDL_WINDOWEVENT_RESIZED:
         case SDL_WINDOWEVENT_MOVED:
-            m_form->eventResize();
+            eventResize();
             break;
 #if !defined(__EMSCRIPTEN__) && !defined(__ANDROID__)
         case SDL_WINDOWEVENT_FOCUS_GAINED:
@@ -140,8 +140,8 @@ void EventsSDL::processEvent()
         e.scancode = m_event.key.keysym.scancode;
         e.mod = keyModConvert(m_event.key.keysym.mod);
 
-        m_form->eventKeyDown(e);
-        m_form->eventKeyPress(e.scancode);
+        eventKeyDown(e);
+        eventKeyPress(e.scancode);
         break;
     }
     case SDL_KEYUP:
@@ -150,7 +150,7 @@ void EventsSDL::processEvent()
         e.scancode = m_event.key.keysym.scancode;
         e.mod = keyModConvert(m_event.key.keysym.mod);
 
-        m_form->eventKeyUp(e);
+        eventKeyUp(e);
         break;
     }
     case SDL_MOUSEBUTTONDOWN:
@@ -168,7 +168,7 @@ void EventsSDL::processEvent()
             e.button = MOUSE_BUTTON_RIGHT;
             break;
         }
-        m_form->eventMouseDown(e);
+        eventMouseDown(e);
         break;
     }
     case SDL_MOUSEBUTTONUP:
@@ -186,7 +186,7 @@ void EventsSDL::processEvent()
             e.button = MOUSE_BUTTON_RIGHT;
             break;
         }
-        m_form->eventMouseUp(e);
+        eventMouseUp(e);
         break;
     }
     case SDL_MOUSEMOTION:
@@ -194,7 +194,7 @@ void EventsSDL::processEvent()
         MouseMoveEvent_t e;
         e.x = m_event.motion.x;
         e.y = m_event.motion.y;
-        m_form->eventMouseMove(e);
+        eventMouseMove(e);
         break;
     }
     case SDL_MOUSEWHEEL:
@@ -202,7 +202,7 @@ void EventsSDL::processEvent()
         MouseWheelEvent_t e;
         e.x = m_event.wheel.x;
         e.y = m_event.wheel.y;
-        m_form->eventMouseWheel(e);
+        eventMouseWheel(e);
         break;
     }
 #ifdef __ANDROID__

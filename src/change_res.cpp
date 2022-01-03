@@ -22,6 +22,9 @@
 #include "change_res.h"
 #include "load_gfx.h"
 #include "core/window.h"
+#ifdef __EMSCRIPTEN__
+#include "core/events.h"
+#endif
 
 
 void SetOrigRes()
@@ -31,7 +34,7 @@ void SetOrigRes()
     g_window->setWindowSize(ScreenW, ScreenH);
 
 #ifdef __EMSCRIPTEN__
-    frmMain.eventResize();
+    g_events->eventResize();
 #endif
 
     if(LoadingInProcess)
