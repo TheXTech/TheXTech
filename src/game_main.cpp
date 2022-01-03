@@ -61,6 +61,7 @@
 #include "main/record.h"
 #include "core/render.h"
 #include "core/window.h"
+#include "core/events.h"
 
 #include "pseudo_vb.h"
 
@@ -265,12 +266,12 @@ int GameMain(const CmdLineSetup_t &setup)
         if(GameMenu || MagicHand || LevelEditor)
         {
             frmMain.MousePointer = 99;
-            showCursor(0);
+            g_window->showCursor(0);
         }
         else if(!resChanged)
         {
             frmMain.MousePointer = 0;
-            showCursor(1);
+            g_window->showCursor(1);
         }
 
 //        If LevelEditor = True Then 'Load the level editor
@@ -1418,10 +1419,10 @@ void CheckActive()
     // If LevelEditor = False Then Exit Sub
     while(!g_window->hasWindowInputFocus())
     {
-        frmMain.waitEvents();
+        g_events->waitEvents();
 //        If LevelEditor = True Or MagicHand = True Then frmLevelWindow.vScreen(1).MousePointer = 0
         if(LevelEditor || MagicHand)
-            showCursor(0);
+            g_window->showCursor(0);
 
         resetFrameTimer();
 

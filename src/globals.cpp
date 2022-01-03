@@ -21,8 +21,9 @@
 #include <SDL2/SDL_version.h>
 #include <SDL2/SDL_scancode.h>
 #include <SDL2/SDL_mouse.h>
+#include <SDL2/SDL_gamecontroller.h>
 
-#include "frm_main.h"
+#include "core/events.h"
 #include "globals.h"
 #include <fmt_format_ne.h>
 #include <cmath>
@@ -507,32 +508,26 @@ std::string LevelName;
 
 void DoEvents()
 {
-    frmMain.doEvents();
-}
-
-int showCursor(int show)
-{
-    return SDL_ShowCursor(show);
+    g_events->doEvents();
 }
 
 Uint8 getKeyState(int key)
 {
-    return frmMain.getKeyState(static_cast<SDL_Scancode>(key));
+    return g_events->getKeyState(key);
 }
 
 Uint8 getKeyStateI(int key)
 {
     if(key < 0)
         return 0;
-    return frmMain.getKeyState(static_cast<SDL_Scancode>(key));
+    return g_events->getKeyState(key);
 }
 
 const char *getKeyName(int key)
 {
     if(key < 0)
         return " ... ";
-    SDL_Scancode k = static_cast<SDL_Scancode>(key);
-    return SDL_GetScancodeName(k);
+    return g_events->getScanCodeName(key);
 }
 
 std::string getJoyKeyName(bool isController, const KM_Key &key)

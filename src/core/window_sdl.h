@@ -56,9 +56,13 @@ public:
      */
     void hide() override;
 
-    /*!
-     * \brief Show mouse cursor
-     * \param show Showing state
+    /**
+     *  \brief Toggle whether or not the cursor is shown.
+     *
+     *  \param toggle 1 to show the cursor, 0 to hide it, -1 to query the current
+     *                state.
+     *
+     *  \return 1 if the cursor is shown, or 0 if the cursor is hidden.
      */
     int showCursor(int show) override;
 

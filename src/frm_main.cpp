@@ -18,8 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <memory>
-#include <SDL2/SDL.h>
+#include <SDL2/SDL_scancode.h>
+#include <SDL2/SDL_timer.h>
 
 #include "globals.h"
 #include "frame_timer.h"
@@ -47,6 +47,9 @@
 #include "core/msgbox.h"
 #include "core/msgbox_sdl.h"
 
+#include "core/events.h"
+#include "core/events_sdl.h"
+
 #include "video.h"
 #include "frm_main.h"
 #include "main/game_info.h"
@@ -56,22 +59,14 @@ FrmMain frmMain;
 
 
 FrmMain::FrmMain() noexcept
-{
-    SDL_memset(&m_event, 0, sizeof(SDL_Event));
-}
-
-Uint8 FrmMain::getKeyState(SDL_Scancode key)
-{
-    if(m_keyboardState)
-        return m_keyboardState[key];
-    return 0;
-}
+{}
 
 bool FrmMain::initSystem(const CmdLineSetup_t &setup)
 {
     std::unique_ptr<RenderSDL> render;
     std::unique_ptr<WindowSDL> window;
     std::unique_ptr<MsgBoxSDL> msgbox;
+    std::unique_ptr<EventsSDL> events;
     bool res = false;
 
     LoadLogSettings(setup.interprocess, setup.verboseLogging);
@@ -84,6 +79,7 @@ bool FrmMain::initSystem(const CmdLineSetup_t &setup)
     window.reset(new WindowSDL());
     render.reset(new RenderSDL());
     msgbox.reset(new MsgBoxSDL());
+    events.reset(new EventsSDL());
 
     render->init();
     res = window->initSDL(setup, render->SDL_InitFlags());
@@ -92,6 +88,7 @@ bool FrmMain::initSystem(const CmdLineSetup_t &setup)
         return true;
 
     msgbox->init(window->getWindow());
+    events->init(this);
 
     pLogDebug("Init renderer settings...");
 
@@ -101,12 +98,13 @@ bool FrmMain::initSystem(const CmdLineSetup_t &setup)
         return true;
     }
 
-    m_keyboardState = SDL_GetKeyboardState(nullptr);
-    doEvents();
-
     g_msgBox = msgbox.get();
     m_msgbox.reset(msgbox.get());
     msgbox.release();
+
+    g_events = events.get();
+    m_events.reset(events.get());
+    events.release();
 
     g_render = render.get();
     m_render.reset(render.get());
@@ -135,6 +133,9 @@ void FrmMain::freeSystem()
     m_msgbox.reset();
     g_msgBox = nullptr;
 
+    m_events.reset();
+    g_events = nullptr;
+
     m_win->close();
     m_win.reset();
     g_window = nullptr;
@@ -142,95 +143,6 @@ void FrmMain::freeSystem()
 
     pLogDebug("<Application closed>");
     CloseLog();
-}
-
-void FrmMain::doEvents()
-{
-    while(SDL_PollEvent(&m_event))
-    {
-        processEvent();
-    }
-}
-
-void FrmMain::processEvent()
-{
-    switch(m_event.type)
-    {
-    case SDL_QUIT:
-        showCursor(1);
-        KillIt();
-        break;
-    case SDL_JOYDEVICEADDED:
-        joyDeviceAddEvent(&m_event.jdevice);
-        break;
-    case SDL_JOYDEVICEREMOVED:
-        joyDeviceRemoveEvent(&m_event.jdevice);
-        break;
-    case SDL_WINDOWEVENT:
-        switch(m_event.window.event)
-        {
-        case SDL_WINDOWEVENT_RESIZED:
-        case SDL_WINDOWEVENT_MOVED:
-            eventResize();
-            break;
-#if !defined(__EMSCRIPTEN__) && !defined(__ANDROID__)
-        case SDL_WINDOWEVENT_FOCUS_GAINED:
-            if(!neverPause && !LoadingInProcess)
-                SoundPauseEngine(0);
-            break;
-        case SDL_WINDOWEVENT_FOCUS_LOST:
-            if(!neverPause && !LoadingInProcess)
-                SoundPauseEngine(1);
-            break;
-//        case SDL_WINDOWEVENT_MAXIMIZED:
-//            SDL_RestoreWindow(m_window);
-//            SetRes();
-//            break;
-#endif
-        default:
-            break;
-        }
-        break;
-    case SDL_KEYDOWN:
-        eventKeyDown(m_event.key);
-        eventKeyPress(m_event.key.keysym.scancode);
-        break;
-    case SDL_KEYUP:
-        eventKeyUp(m_event.key);
-        break;
-    case SDL_MOUSEBUTTONDOWN:
-        eventMouseDown(m_event.button);
-        break;
-    case SDL_MOUSEBUTTONUP:
-        eventMouseUp(m_event.button);
-        break;
-    case SDL_MOUSEMOTION:
-        eventMouseMove(m_event.motion);
-        break;
-    case SDL_MOUSEWHEEL:
-        eventMouseWheel(m_event.wheel);
-        break;
-#ifdef __ANDROID__
-    case SDL_RENDER_DEVICE_RESET:
-        D_pLogDebug("Android: Render Device Reset");
-        break;
-    case SDL_APP_WILLENTERBACKGROUND:
-        g_render->m_blockRender = true;
-        D_pLogDebug("Android: Entering background");
-        break;
-    case SDL_APP_DIDENTERFOREGROUND:
-        g_render->m_blockRender = false;
-        D_pLogDebug("Android: Resumed foreground");
-        break;
-#endif
-    }
-}
-
-void FrmMain::waitEvents()
-{
-    if(SDL_WaitEventTimeout(&m_event, 1000))
-        processEvent();
-    doEvents();
 }
 
 void FrmMain::eventDoubleClick()
@@ -253,13 +165,13 @@ void FrmMain::eventDoubleClick()
 #endif
 }
 
-void FrmMain::eventKeyDown(SDL_KeyboardEvent &evt)
+void FrmMain::eventKeyDown(const KeyboardEvent_t &evt)
 {
-    int KeyCode = evt.keysym.scancode;
+    int KeyCode = evt.scancode;
     inputKey = KeyCode;
 
-    bool ctrlF = ((evt.keysym.mod & KMOD_CTRL) != 0 && evt.keysym.scancode == SDL_SCANCODE_F);
-    bool altEnter = ((evt.keysym.mod & KMOD_ALT) != 0 && (evt.keysym.scancode == SDL_SCANCODE_RETURN || evt.keysym.scancode == SDL_SCANCODE_KP_ENTER));
+    bool ctrlF = ((evt.mod & KEYMOD_CTRL) != 0 && evt.scancode == SDL_SCANCODE_F);
+    bool altEnter = ((evt.mod & KEYMOD_ALT) != 0 && (evt.scancode == SDL_SCANCODE_RETURN || evt.scancode == SDL_SCANCODE_KP_ENTER));
 
 #ifndef __ANDROID__
     if(ctrlF || altEnter)
@@ -282,9 +194,9 @@ void FrmMain::eventKeyDown(SDL_KeyboardEvent &evt)
 #endif // USE_SCREENSHOTS_AND_RECS
 }
 
-void FrmMain::eventKeyPress(SDL_Scancode KeyASCII)
+void FrmMain::eventKeyPress(int scan_code)
 {
-    switch(KeyASCII)
+    switch(scan_code)
     {
     case SDL_SCANCODE_A: CheatCode('a'); break;
     case SDL_SCANCODE_B: CheatCode('b'); break;
@@ -326,21 +238,25 @@ void FrmMain::eventKeyPress(SDL_Scancode KeyASCII)
     }
 }
 
-void FrmMain::eventKeyUp(SDL_KeyboardEvent &evt)
+void FrmMain::eventKeyUp(const KeyboardEvent_t &evt)
 {
     UNUSED(evt);
 }
 
-void FrmMain::eventMouseDown(SDL_MouseButtonEvent &event)
+void FrmMain::eventMouseDown(const MouseButtonEvent_t &event)
 {
-    if(event.button == SDL_BUTTON_LEFT)
+    switch(event.button)
+    {
+    case MOUSE_BUTTON_LEFT:
     {
         MenuMouseDown = true;
         MenuMouseMove = true;
         if(LevelEditor || MagicHand || TestLevel)
             EditorControls.Mouse1 = true;
+        break;
     }
-    else if(event.button == SDL_BUTTON_RIGHT)
+
+    case MOUSE_BUTTON_RIGHT:
     {
         MenuMouseBack = true;
         if(LevelEditor || MagicHand || TestLevel)
@@ -349,8 +265,10 @@ void FrmMain::eventMouseDown(SDL_MouseButtonEvent &event)
             MouseMove(float(MenuMouseX), float(MenuMouseY));
             SetCursor();
         }
+        break;
     }
-    else if(event.button == SDL_BUTTON_MIDDLE)
+
+    case MOUSE_BUTTON_MIDDLE:
     {
         if(LevelEditor || MagicHand || TestLevel)
         {
@@ -358,15 +276,17 @@ void FrmMain::eventMouseDown(SDL_MouseButtonEvent &event)
             MouseMove(float(MenuMouseX), float(MenuMouseY));
             SetCursor();
         }
+        break;
+    }
     }
 }
 
-void FrmMain::eventMouseMove(SDL_MouseMotionEvent &event)
+void FrmMain::eventMouseMove(const MouseMoveEvent_t &event)
 {
-    SDL_Point p;
-    g_render->mapToScreen(event.x, event.y, &p.x, &p.y);
-    MenuMouseX = p.x;// int(event.x * ScreenW / ScaleWidth);
-    MenuMouseY = p.y;//int(event.y * ScreenH / ScaleHeight);
+    int px, py;
+    g_render->mapToScreen(event.x, event.y, &px, &py);
+    MenuMouseX = px; //int(event.x * ScreenW / ScaleWidth);
+    MenuMouseY = py; //int(event.y * ScreenH / ScaleHeight);
     MenuMouseMove = true;
 
     if(LevelEditor || MagicHand || TestLevel)
@@ -378,13 +298,13 @@ void FrmMain::eventMouseMove(SDL_MouseMotionEvent &event)
     }
 }
 
-void FrmMain::eventMouseWheel(SDL_MouseWheelEvent &event)
+void FrmMain::eventMouseWheel(const MouseWheelEvent_t &event)
 {
     MenuWheelDelta = event.y;
     MenuWheelMoved = true;
 }
 
-void FrmMain::eventMouseUp(SDL_MouseButtonEvent &event)
+void FrmMain::eventMouseUp(const MouseButtonEvent_t &event)
 {
     bool doubleClick = false;
     MenuMouseDown = false;
@@ -392,7 +312,7 @@ void FrmMain::eventMouseUp(SDL_MouseButtonEvent &event)
     if(LevelEditor || MagicHand || TestLevel)
         EditorControls.Mouse1 = false;
 
-    if(event.button == SDL_BUTTON_LEFT)
+    if(event.button == MOUSE_BUTTON_LEFT)
     {
         doubleClick = (m_lastMousePress + 300) >= SDL_GetTicks();
         m_lastMousePress = SDL_GetTicks();

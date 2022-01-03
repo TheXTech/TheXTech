@@ -76,16 +76,6 @@ extern std::string AppPath;
  */
 extern void DoEvents();
 
-/**
- *  \brief Toggle whether or not the cursor is shown.
- *
- *  \param toggle 1 to show the cursor, 0 to hide it, -1 to query the current
- *                state.
- *
- *  \return 1 if the cursor is shown, or 0 if the cursor is hidden.
- */
-extern int showCursor(int show);
-
 extern Uint8 getKeyState(int key);
 extern Uint8 getKeyStateI(int key);
 

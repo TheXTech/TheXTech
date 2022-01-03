@@ -41,6 +41,7 @@
 #include "../graphics.h"
 #include "../control/joystick.h"
 #include "../core/render.h"
+#include "../core/window.h"
 #include "../compat.h"
 #include "level_file.h"
 #include "pge_delay.h"
@@ -334,7 +335,7 @@ bool mainMenuUpdate()
         if(frmMain.MousePointer != 99)
         {
             frmMain.MousePointer = 99;
-            showCursor(0);
+            g_window->showCursor(0);
         }
 
         if(SDL_memcmp(&blank, &c, sizeof(Controls_t)) == 0)

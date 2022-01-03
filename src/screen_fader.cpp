@@ -19,15 +19,14 @@
  */
 
 #include <cmath>
+#include <SDL2/SDL_stdinc.h>
 
-#include "frm_main.h"
 #include "global_constants.h"
 #include "range_arr.hpp"
 #include "core/render.h"
 
 #include "screen_fader.h"
 
-extern FrmMain frmMain;
 //Public vScreenX(0 To maxPlayers) As Double  'vScreen offset
 extern RangeArr<double, 0, maxPlayers> vScreenX;
 //Public vScreenY(0 To maxPlayers) As Double 'vScreen offset

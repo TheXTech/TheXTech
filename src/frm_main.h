@@ -22,12 +22,6 @@
 #ifndef FRMMAIN_H
 #define FRMMAIN_H
 
-#include <SDL2/SDL_version.h>
-#include <SDL2/SDL_stdinc.h>
-#include <SDL2/SDL_scancode.h>
-#include <SDL2/SDL_events.h>
-#include <SDL2/SDL_render.h>
-
 #include <memory>
 #include <string>
 #include <set>
@@ -47,42 +41,80 @@ typedef struct SDL_mutex SDL_mutex;
 class AbstractWindow_t;
 class AbstractRender_t;
 class AbstractMsgBox_t;
+class AbstractEvents_t;
+
+enum MouseButton_t
+{
+    MOUSE_BUTTON_NONE = 0,
+    MOUSE_BUTTON_LEFT,
+    MOUSE_BUTTON_MIDDLE,
+    MOUSE_BUTTON_RIGHT
+};
+
+struct MouseButtonEvent_t
+{
+    int button = MOUSE_BUTTON_NONE;
+};
+
+struct MouseMoveEvent_t
+{
+    int x;
+    int y;
+};
+
+struct MouseWheelEvent_t
+{
+    int x;
+    int y;
+};
+
+enum KeyboardModifier_t
+{
+    KEYMOD_NONE = 0x0000,
+    KEYMOD_LSHIFT = 0x0001,
+    KEYMOD_RSHIFT = 0x0002,
+    KEYMOD_LCTRL = 0x0040,
+    KEYMOD_RCTRL = 0x0080,
+    KEYMOD_LALT = 0x0100,
+    KEYMOD_RALT = 0x0200,
+
+    KEYMOD_CTRL = KEYMOD_LCTRL | KEYMOD_RCTRL,
+    KEYMOD_SHIFT = KEYMOD_LSHIFT | KEYMOD_RSHIFT,
+    KEYMOD_ALT = KEYMOD_LALT | KEYMOD_RALT,
+};
+
+struct KeyboardEvent_t
+{
+    int scancode;
+    int mod;
+};
 
 class FrmMain
 {
-    const Uint8 *m_keyboardState = nullptr;
-    Uint32 m_lastMousePress = 0;
-    SDL_Event m_event = {};
+    uint32_t m_lastMousePress = 0;
 
     std::unique_ptr<AbstractWindow_t> m_win;
     std::unique_ptr<AbstractRender_t> m_render;
     std::unique_ptr<AbstractMsgBox_t> m_msgbox;
+    std::unique_ptr<AbstractEvents_t> m_events;
 
 public:
     int MousePointer = 0;
 
     FrmMain() noexcept;
 
-    Uint8 getKeyState(SDL_Scancode key);
-
     bool initSystem(const CmdLineSetup_t &setup);
     void freeSystem();
 
-    void doEvents();
-    void waitEvents();
-
     void eventDoubleClick();
-    void eventKeyPress(SDL_Scancode KeyASCII);
-    void eventKeyDown(SDL_KeyboardEvent &evt);
-    void eventKeyUp(SDL_KeyboardEvent &evt);
-    void eventMouseDown(SDL_MouseButtonEvent &m_event);
-    void eventMouseMove(SDL_MouseMotionEvent &m_event);
-    void eventMouseWheel(SDL_MouseWheelEvent &m_event);
-    void eventMouseUp(SDL_MouseButtonEvent &m_event);
+    void eventKeyPress(int scan_code);
+    void eventKeyDown(const KeyboardEvent_t &evt);
+    void eventKeyUp(const KeyboardEvent_t &evt);
+    void eventMouseDown(const MouseButtonEvent_t &event);
+    void eventMouseMove(const MouseMoveEvent_t &event);
+    void eventMouseWheel(const MouseWheelEvent_t &event);
+    void eventMouseUp(const MouseButtonEvent_t &event);
     void eventResize();
-
-private:
-    void processEvent();
 };
 
 //! Main window
