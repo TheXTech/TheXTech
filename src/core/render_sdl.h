@@ -30,7 +30,7 @@
 #include "cmd_line_setup.h"
 
 
-class RenderSDL_t : public AbstractRender_t
+class RenderSDL : public AbstractRender_t
 {
     SDL_Window   *m_window = nullptr;
 
@@ -65,7 +65,8 @@ class RenderSDL_t : public AbstractRender_t
     int m_viewport_h = 0;
 
 public:
-    RenderSDL_t();
+    RenderSDL();
+    ~RenderSDL() override;
 
 
     unsigned int SDL_InitFlags() override;

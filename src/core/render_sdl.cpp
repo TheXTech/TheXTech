@@ -43,22 +43,29 @@
 
 
 
-RenderSDL_t::RenderSDL_t()
+RenderSDL::RenderSDL() :
+    AbstractRender_t()
 {
     AbstractRender_t::init();
 }
 
-unsigned int RenderSDL_t::SDL_InitFlags()
+RenderSDL::~RenderSDL()
+{
+    if(m_window)
+        RenderSDL::close();
+}
+
+unsigned int RenderSDL::SDL_InitFlags()
 {
     return 0;
 }
 
-bool RenderSDL_t::isWorking()
+bool RenderSDL::isWorking()
 {
     return m_gRenderer && m_tBuffer;
 }
 
-bool RenderSDL_t::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
+bool RenderSDL::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
 {
     pLogDebug("Init renderer settings...");
 
@@ -132,9 +139,9 @@ bool RenderSDL_t::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
     return true;
 }
 
-void RenderSDL_t::close()
+void RenderSDL::close()
 {
-    clearAllTextures();
+    RenderSDL::clearAllTextures();
     AbstractRender_t::close();
 
     if(m_tBuffer)
@@ -146,7 +153,7 @@ void RenderSDL_t::close()
     m_gRenderer = nullptr;
 }
 
-void RenderSDL_t::repaint()
+void RenderSDL::repaint()
 {
 #ifdef __ANDROID__
     if(m_blockRender)
@@ -206,7 +213,7 @@ void RenderSDL_t::repaint()
     SDL_RenderPresent(m_gRenderer);
 }
 
-void RenderSDL_t::updateViewport()
+void RenderSDL::updateViewport()
 {
     float w, w1, h, h1;
     int   wi, hi;
@@ -261,13 +268,13 @@ void RenderSDL_t::updateViewport()
     m_viewport_h = static_cast<int>(h1);
 }
 
-void RenderSDL_t::resetViewport()
+void RenderSDL::resetViewport()
 {
     updateViewport();
     SDL_RenderSetViewport(m_gRenderer, nullptr);
 }
 
-void RenderSDL_t::setViewport(int x, int y, int w, int h)
+void RenderSDL::setViewport(int x, int y, int w, int h)
 {
     SDL_Rect topLeftViewport = {x, y, w, h};
     SDL_RenderSetViewport(m_gRenderer, &topLeftViewport);
@@ -278,7 +285,7 @@ void RenderSDL_t::setViewport(int x, int y, int w, int h)
     m_viewport_h = h;
 }
 
-void RenderSDL_t::offsetViewport(int x, int y)
+void RenderSDL::offsetViewport(int x, int y)
 {
     if(m_viewport_offset_x != x || m_viewport_offset_y != y)
     {
@@ -289,7 +296,7 @@ void RenderSDL_t::offsetViewport(int x, int y)
     }
 }
 
-void RenderSDL_t::offsetViewportIgnore(bool en)
+void RenderSDL::offsetViewportIgnore(bool en)
 {
     if(m_viewport_offset_ignore != en)
     {
@@ -299,13 +306,13 @@ void RenderSDL_t::offsetViewportIgnore(bool en)
     m_viewport_offset_ignore = en;
 }
 
-void RenderSDL_t::mapToScreen(int x, int y, int *dx, int *dy)
+void RenderSDL::mapToScreen(int x, int y, int *dx, int *dy)
 {
     *dx = static_cast<int>((static_cast<float>(x) - m_offset_x) / m_viewport_scale_x);
     *dy = static_cast<int>((static_cast<float>(y) - m_offset_y) / m_viewport_scale_y);
 }
 
-void RenderSDL_t::setTargetTexture()
+void RenderSDL::setTargetTexture()
 {
     if(m_recentTarget == m_tBuffer)
         return;
@@ -313,7 +320,7 @@ void RenderSDL_t::setTargetTexture()
     m_recentTarget = m_tBuffer;
 }
 
-void RenderSDL_t::setTargetScreen()
+void RenderSDL::setTargetScreen()
 {
     if(m_recentTarget == nullptr)
         return;
@@ -321,7 +328,7 @@ void RenderSDL_t::setTargetScreen()
     m_recentTarget = nullptr;
 }
 
-void RenderSDL_t::loadTexture(StdPicture &target, uint32_t width, uint32_t height, uint8_t *RGBApixels, uint32_t pitch)
+void RenderSDL::loadTexture(StdPicture &target, uint32_t width, uint32_t height, uint8_t *RGBApixels, uint32_t pitch)
 {
     SDL_Surface *surface;
     SDL_Texture *texture;
@@ -352,7 +359,7 @@ void RenderSDL_t::loadTexture(StdPicture &target, uint32_t width, uint32_t heigh
     target.inited = true;
 }
 
-void RenderSDL_t::deleteTexture(StdPicture &tx, bool lazyUnload)
+void RenderSDL::deleteTexture(StdPicture &tx, bool lazyUnload)
 {
     if(!tx.inited || !tx.texture)
     {
@@ -401,14 +408,14 @@ void RenderSDL_t::deleteTexture(StdPicture &tx, bool lazyUnload)
     tx.ColorLower.b = 0;
 }
 
-void RenderSDL_t::clearAllTextures()
+void RenderSDL::clearAllTextures()
 {
     for(SDL_Texture *tx : m_textureBank)
         SDL_DestroyTexture(tx);
     m_textureBank.clear();
 }
 
-void RenderSDL_t::clearBuffer()
+void RenderSDL::clearBuffer()
 {
 #ifdef __ANDROID__
     SDL_assert(!m_blockRender);
@@ -417,7 +424,7 @@ void RenderSDL_t::clearBuffer()
     SDL_RenderClear(m_gRenderer);
 }
 
-void RenderSDL_t::renderRect(int x, int y, int w, int h, float red, float green, float blue, float alpha, bool filled)
+void RenderSDL::renderRect(int x, int y, int w, int h, float red, float green, float blue, float alpha, bool filled)
 {
 #ifdef __ANDROID__
     SDL_assert(!m_blockRender);
@@ -438,7 +445,7 @@ void RenderSDL_t::renderRect(int x, int y, int w, int h, float red, float green,
         SDL_RenderDrawRect(m_gRenderer, &aRect);
 }
 
-void RenderSDL_t::renderRectBR(int _left, int _top, int _right, int _bottom, float red, float green, float blue, float alpha)
+void RenderSDL::renderRectBR(int _left, int _top, int _right, int _bottom, float red, float green, float blue, float alpha)
 {
 #ifdef __ANDROID__
     SDL_assert(!m_blockRender);
@@ -455,7 +462,7 @@ void RenderSDL_t::renderRectBR(int _left, int _top, int _right, int _bottom, flo
     SDL_RenderFillRect(m_gRenderer, &aRect);
 }
 
-void RenderSDL_t::renderCircle(int cx, int cy, int radius, float red, float green, float blue, float alpha, bool filled)
+void RenderSDL::renderCircle(int cx, int cy, int radius, float red, float green, float blue, float alpha, bool filled)
 {
 #ifdef __ANDROID__
     SDL_assert(!m_blockRender);
@@ -498,7 +505,7 @@ void RenderSDL_t::renderCircle(int cx, int cy, int radius, float red, float gree
     } while(dy <= radius);
 }
 
-void RenderSDL_t::renderCircleHole(int cx, int cy, int radius, float red, float green, float blue, float alpha)
+void RenderSDL::renderCircleHole(int cx, int cy, int radius, float red, float green, float blue, float alpha)
 {
 #ifdef __ANDROID__
     SDL_assert(!m_blockRender);
@@ -578,7 +585,7 @@ static SDL_INLINE void txColorMod(StdPicture &tx, float red, float green, float 
     }
 }
 
-void RenderSDL_t::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, double hDstD,
+void RenderSDL::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, double hDstD,
                                        StdPicture &tx,
                                        int xSrc, int ySrc,
                                        int wSrc, int hSrc,
@@ -648,7 +655,7 @@ void RenderSDL_t::renderTextureScaleEx(double xDstD, double yDstD, double wDstD,
                       rotateAngle, centerD, static_cast<SDL_RendererFlip>(flip));
 }
 
-void RenderSDL_t::renderTextureScale(double xDst, double yDst, double wDst, double hDst,
+void RenderSDL::renderTextureScale(double xDst, double yDst, double wDst, double hDst,
                                      StdPicture &tx,
                                      float red, float green, float blue, float alpha)
 {
@@ -692,7 +699,7 @@ void RenderSDL_t::renderTextureScale(double xDst, double yDst, double wDst, doub
                       0.0, nullptr, static_cast<SDL_RendererFlip>(flip));
 }
 
-void RenderSDL_t::renderTexture(double xDstD, double yDstD, double wDstD, double hDstD,
+void RenderSDL::renderTexture(double xDstD, double yDstD, double wDstD, double hDstD,
                                 StdPicture &tx,
                                 int xSrc, int ySrc,
                                 float red, float green, float blue, float alpha)
@@ -756,7 +763,7 @@ void RenderSDL_t::renderTexture(double xDstD, double yDstD, double wDstD, double
     SDL_RenderCopyF(m_gRenderer, tx.texture, &sourceRect, &destRect);
 }
 
-void RenderSDL_t::renderTextureFL(double xDstD, double yDstD, double wDstD, double hDstD,
+void RenderSDL::renderTextureFL(double xDstD, double yDstD, double wDstD, double hDstD,
                                   StdPicture &tx,
                                   int xSrc, int ySrc,
                                   double rotateAngle, FPoint_t *center, unsigned int flip,
@@ -827,7 +834,7 @@ void RenderSDL_t::renderTextureFL(double xDstD, double yDstD, double wDstD, doub
                       rotateAngle, centerD, static_cast<SDL_RendererFlip>(flip));
 }
 
-void RenderSDL_t::renderTexture(float xDst, float yDst,
+void RenderSDL::renderTexture(float xDst, float yDst,
                                 StdPicture &tx,
                                 float red, float green, float blue, float alpha)
 {
@@ -865,7 +872,7 @@ void RenderSDL_t::renderTexture(float xDst, float yDst,
                       0.0, nullptr, static_cast<SDL_RendererFlip>(flip));
 }
 
-void RenderSDL_t::getScreenPixels(int x, int y, int w, int h, unsigned char *pixels)
+void RenderSDL::getScreenPixels(int x, int y, int w, int h, unsigned char *pixels)
 {
     SDL_Rect rect;
     rect.x = x;
@@ -879,7 +886,7 @@ void RenderSDL_t::getScreenPixels(int x, int y, int w, int h, unsigned char *pix
                          w * 3 + (w % 4));
 }
 
-void RenderSDL_t::getScreenPixelsRGBA(int x, int y, int w, int h, unsigned char *pixels)
+void RenderSDL::getScreenPixelsRGBA(int x, int y, int w, int h, unsigned char *pixels)
 {
     SDL_Rect rect;
     rect.x = x;
@@ -893,14 +900,14 @@ void RenderSDL_t::getScreenPixelsRGBA(int x, int y, int w, int h, unsigned char 
                          w * 4);
 }
 
-int RenderSDL_t::getPixelDataSize(const StdPicture &tx)
+int RenderSDL::getPixelDataSize(const StdPicture &tx)
 {
     if(!tx.texture)
         return 0;
     return (tx.w * tx.h * 4);
 }
 
-void RenderSDL_t::getPixelData(const StdPicture &tx, unsigned char *pixelData)
+void RenderSDL::getPixelData(const StdPicture &tx, unsigned char *pixelData)
 {
     int pitch, w, h, a;
     void *pixels;

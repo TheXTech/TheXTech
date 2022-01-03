@@ -18,39 +18,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "globals.h"
-#include "change_res.h"
-#include "load_gfx.h"
-#include "frm_main.h"
-#include "core/window.h"
+#include "window.h"
 
+AbstractWindow_t*g_window = nullptr;
 
-void SetOrigRes()
-{
-    g_window->setFullScreen(false);
-    resChanged = false;
-    g_window->setWindowSize(ScreenW, ScreenH);
+AbstractWindow_t::AbstractWindow_t()
+{}
 
-#ifdef __EMSCRIPTEN__
-    frmMain.eventResize();
-#endif
-
-    if(LoadingInProcess)
-        UpdateLoad();
-
-    if(!GameMenu && !MagicHand)
-        showCursor(1);
-}
-
-void ChangeRes(int, int, int, int)
-{
-    g_window->setFullScreen(true);
-
-    if(LoadingInProcess)
-        UpdateLoad();
-}
-
-//void SaveIt(int ScX, int ScY, int ScC, int ScF, std::string ScreenChanged)
-//{
-
-//}
+AbstractWindow_t::~AbstractWindow_t()
+{}

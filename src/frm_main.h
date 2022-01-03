@@ -28,6 +28,7 @@
 #include <SDL2/SDL_events.h>
 #include <SDL2/SDL_render.h>
 
+#include <memory>
 #include <string>
 #include <set>
 
@@ -43,53 +44,34 @@
 typedef struct SDL_Thread SDL_Thread;
 typedef struct SDL_mutex SDL_mutex;
 
-// Workaround for older SDL versions that lacks the floating-point based rects and points
-#if SDL_COMPILEDVERSION < SDL_VERSIONNUM(2, 0, 10)
-#define XTECH_SDL_NO_RECTF_SUPPORT
-typedef struct SDL_FPoint
-{
-    float x;
-    float y;
-} SDL_FPoint;
-#endif
-
+class AbstractWindow_t;
+class AbstractRender_t;
 
 class FrmMain
 {
-    std::string m_windowTitle;
-    SDL_Window *m_window = nullptr;
-    SDL_Renderer *m_gRenderer = nullptr;
-    SDL_Texture  *m_tBuffer = nullptr;
-    SDL_Texture  *m_recentTarget = nullptr;
-    std::set<SDL_Texture *> m_textureBank;
     const Uint8 *m_keyboardState = nullptr;
     Uint32 m_lastMousePress = 0;
     SDL_Event m_event = {};
-    SDL_RendererInfo m_ri = {};
-#ifdef __ANDROID__
-    bool m_blockRender = false;
-#endif
 
-    size_t m_lazyLoadedBytes = 0;
+    std::unique_ptr<AbstractWindow_t> m_win;
+    std::unique_ptr<AbstractRender_t> m_render;
 
 public:
     int MousePointer = 0;
 
     FrmMain() noexcept;
 
-    SDL_Window *getWindow();
-
     Uint8 getKeyState(SDL_Scancode key);
 
-    bool initSDL(const CmdLineSetup_t &setup);
-    void freeSDL();
+    bool initSystem(const CmdLineSetup_t &setup);
+    void freeSystem();
 
     void show();
     void hide();
     void doEvents();
     void waitEvents();
 
-    bool isWindowActive();
+    bool hasWindowInputFocus();
     bool hasWindowMouseFocus();
 
     void eventDoubleClick();
@@ -101,10 +83,6 @@ public:
     void eventMouseWheel(SDL_MouseWheelEvent &m_event);
     void eventMouseUp(SDL_MouseButtonEvent &m_event);
     void eventResize();
-
-    int setFullScreen(bool fs);
-    void setWindowSize(int w, int h);
-    void getWindowSize(int *w, int *h);
 
 
     enum MessageBoxFlags
@@ -118,8 +96,6 @@ public:
     int simpleMsgBox(uint32_t flags, const std::string &title, const std::string &message);
 
     void errorMsgBox(const std::string &title, const std::string &message);
-
-    bool isSdlError();
 
 private:
     void processEvent();

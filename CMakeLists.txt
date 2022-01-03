@@ -287,6 +287,8 @@ set(THEXTECH_SRC
     src/frame_timer.cpp
     src/core/render.cpp
     src/core/render_sdl.cpp
+    src/core/window.cpp
+    src/core/window_sdl.cpp
     src/main/world_loop.cpp
     src/main/world_file.cpp
     src/main/game_info.cpp

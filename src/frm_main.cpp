@@ -41,6 +41,9 @@
 #include "core/render.h"
 #include "core/render_sdl.h"
 
+#include "core/window.h"
+#include "core/window_sdl.h"
+
 #include "video.h"
 #include "frm_main.h"
 #include "main/game_info.h"
@@ -49,21 +52,9 @@
 FrmMain frmMain;
 
 
-static SDL_bool IsFullScreen(SDL_Window *win)
-{
-    Uint32 flags = SDL_GetWindowFlags(win);
-    return (flags & SDL_WINDOW_FULLSCREEN_DESKTOP) ? SDL_TRUE : SDL_FALSE;
-}
-
 FrmMain::FrmMain() noexcept
 {
     SDL_memset(&m_event, 0, sizeof(SDL_Event));
-    SDL_memset(&m_ri, 0, sizeof(SDL_RendererInfo));
-}
-
-SDL_Window *FrmMain::getWindow()
-{
-    return m_window;
 }
 
 Uint8 FrmMain::getKeyState(SDL_Scancode key)
@@ -73,12 +64,11 @@ Uint8 FrmMain::getKeyState(SDL_Scancode key)
     return 0;
 }
 
-bool FrmMain::initSDL(const CmdLineSetup_t &setup)
+bool FrmMain::initSystem(const CmdLineSetup_t &setup)
 {
-    std::unique_ptr<RenderSDL_t> render;
+    std::unique_ptr<RenderSDL> render;
+    std::unique_ptr<WindowSDL> window;
     bool res = false;
-
-    m_windowTitle = g_gameInfo.titleWindow;
 
     LoadLogSettings(setup.interprocess, setup.verboseLogging);
     //Write into log the application start event
@@ -87,166 +77,52 @@ bool FrmMain::initSDL(const CmdLineSetup_t &setup)
     //Initialize FreeImage
     GraphicsHelps::initFreeImage();
 
-    if(setup.allowBgInput)
-        SDL_SetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, "1");
+    window.reset(new WindowSDL());
+    render.reset(new RenderSDL());
 
-#if defined(__ANDROID__) || (defined(__APPLE__) && (defined(TARGET_IPHONE_SIMULATOR) || defined(TARGET_OS_IPHONE)))
-    // Restrict the landscape orientation only
-    SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight");
-#endif
-
-#if defined(__ANDROID__)
-    SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 5);
-    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 6);
-    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 5);
-#endif
-
-    Uint32 sdlInitFlags = 0;
-    // Prepare flags for SDL initialization
-#ifndef __EMSCRIPTEN__
-    sdlInitFlags |= SDL_INIT_TIMER;
-#endif
-    sdlInitFlags |= SDL_INIT_AUDIO;
-    sdlInitFlags |= SDL_INIT_VIDEO;
-    sdlInitFlags |= SDL_INIT_EVENTS;
-    sdlInitFlags |= SDL_INIT_JOYSTICK;
-    sdlInitFlags |= SDL_INIT_HAPTIC;
-    sdlInitFlags |= SDL_INIT_GAMECONTROLLER;
-
-    // Initialize SDL
-    res = (SDL_Init(sdlInitFlags) < 0);
-
-    // Workaround: https://discourse.libsdl.org/t/26995
-    setlocale(LC_NUMERIC, "C");
-
-    const char *error = SDL_GetError();
-    if(*error != '\0')
-        pLogWarning("Error while SDL Initialization: %s", error);
-    SDL_ClearError();
-
-    SDL_GL_ResetAttributes();
-
-    render.reset(new RenderSDL_t());
     render->init();
+    res = window->initSDL(setup, render->SDL_InitFlags());
 
-    m_window = SDL_CreateWindow(m_windowTitle.c_str(),
-                              SDL_WINDOWPOS_CENTERED,
-                              SDL_WINDOWPOS_CENTERED,
-                              ScreenW, ScreenH,
-                              SDL_WINDOW_RESIZABLE |
-                              SDL_WINDOW_HIDDEN |
-                              SDL_WINDOW_ALLOW_HIGHDPI |
-                              render->SDL_InitFlags());
-
-    if(m_window == nullptr)
-    {
-        pLogCritical("Unable to create window!");
-        SDL_ClearError();
-        return false;
-    }
-
-    if(isSdlError())
-    {
-        pLogCritical("Unable to create window!");
-        SDL_ClearError();
-        return false;
-    }
-
-#ifdef __EMSCRIPTEN__ //Set canvas be 1/2 size for a faster rendering
-    SDL_SetWindowMinimumSize(m_window, ScaleWidth / 2, ScaleHeight / 2);
-#elif defined(__ANDROID__) // Set as small as possible
-    SDL_SetWindowMinimumSize(m_window, 200, 150);
-#else
-    SDL_SetWindowMinimumSize(m_window, ScreenW, ScreenH);
-#endif //__EMSCRIPTEN__
-
-    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
-
-#if defined(__ANDROID__) // Use a full-screen on Android mode by default
-    setFullScreen(true);
-    show();
-#endif
-
-
-#ifdef _WIN32
-    FIBITMAP *img[2];
-    img[0] = GraphicsHelps::loadImage(AppPath + "/graphics/ui/icon/thextech_16.png");
-    img[1] = GraphicsHelps::loadImage(AppPath + "/graphics/ui/icon/thextech_32.png");
-
-    if(img[0] && !GraphicsHelps::setWindowIcon(m_window, img[0], 16))
-    {
-        pLogWarning("Unable to setup window icon!");
-        SDL_ClearError();
-    }
-
-    if(img[1] && !GraphicsHelps::setWindowIcon(m_window, img[1], 32))
-    {
-        pLogWarning("Unable to setup window icon!");
-        SDL_ClearError();
-    }
-
-    GraphicsHelps::closeImage(img[0]);
-    GraphicsHelps::closeImage(img[1]);
-#else//IF _WIN32
-
-    FIBITMAP *img;
-#   ifdef __APPLE__
-    img = GraphicsHelps::loadImage(AppPath + "/graphics/ui/icon/thextech_256.png");
-#   else
-    img = GraphicsHelps::loadImage(AppPath + "/graphics/ui/icon/thextech_32.png");
-#   endif //__APPLE__
-
-    if(img)
-    {
-        SDL_Surface *sIcon = GraphicsHelps::fi2sdl(img);
-        SDL_SetWindowIcon(m_window, sIcon);
-        GraphicsHelps::closeImage(img);
-        SDL_FreeSurface(sIcon);
-
-        if(isSdlError())
-        {
-            pLogWarning("Unable to setup window icon!");
-            SDL_ClearError();
-        }
-    }
-#endif//IF _WIN32 #else
+    if(!res)
+        return true;
 
     pLogDebug("Init renderer settings...");
 
-    if(!render->initRender(setup, m_window))
+    if(!render->initRender(setup, window->getWindow()))
     {
-        freeSDL();
-        return false;
+        freeSystem();
+        return true;
     }
 
     m_keyboardState = SDL_GetKeyboardState(nullptr);
     doEvents();
 
     g_render = render.get();
+    m_render.reset(render.get());
     render.release();
 
-    return res;
+    g_window = window.get();
+    m_win.reset(window.get());
+    window.release();
+
+    return !res;
 }
 
-void FrmMain::freeSDL()
+void FrmMain::freeSystem()
 {
     GFX.unLoad();
-    if(g_render)
-        g_render->clearAllTextures();
+    if(m_render)
+        m_render->clearAllTextures();
+
     joyCloseJoysticks();
 
-    if(g_render)
-    {
-        g_render->close();
-        delete g_render;
-        g_render = nullptr;
-    }
+    m_render->close();
+    m_render.reset();
+    g_render = nullptr;
 
-    if(m_window)
-        SDL_DestroyWindow(m_window);
-    m_window = nullptr;
-
-    SDL_Quit();
+    m_win->close();
+    m_win.reset();
+    g_window = nullptr;
     GraphicsHelps::closeFreeImage();
 
     pLogDebug("<Application closed>");
@@ -255,13 +131,12 @@ void FrmMain::freeSDL()
 
 void FrmMain::show()
 {
-    SDL_ShowWindow(m_window);
+    g_window->show();
 }
 
 void FrmMain::hide()
 {
-    SDL_HideWindow(m_window);
-    showCursor(1);
+    g_window->hide();
 }
 
 void FrmMain::doEvents()
@@ -353,35 +228,30 @@ void FrmMain::waitEvents()
     doEvents();
 }
 
-bool FrmMain::isWindowActive()
+bool FrmMain::hasWindowInputFocus()
 {
-    if(!m_window)
-        return false;
-    Uint32 flags = SDL_GetWindowFlags(m_window);
-    return (flags & SDL_WINDOW_INPUT_FOCUS) != 0;
+    return g_window->hasWindowInputFocus();
 }
 
 bool FrmMain::hasWindowMouseFocus()
 {
-    if(!m_window)
-        return false;
-    Uint32 flags = SDL_GetWindowFlags(m_window);
-    return (flags & SDL_WINDOW_MOUSE_FOCUS) != 0;
+    return g_window->hasWindowMouseFocus();
 }
 
 void FrmMain::eventDoubleClick()
 {
     if(MagicHand)
         return; // Don't toggle fullscreen/window when magic hand is active
+
 #if !defined(__EMSCRIPTEN__) && !defined(__ANDROID__)
     if(resChanged)
     {
-        frmMain.setFullScreen(false);
+        g_window->setFullScreen(false);
         resChanged = false;
-        SDL_RestoreWindow(m_window);
-        SDL_SetWindowSize(m_window, ScreenW, ScreenH);
+        g_window->restoreWindow();
+        g_window->setWindowSize(ScreenW, ScreenH);
         if(!GameMenu && !MagicHand)
-            showCursor(1);
+            g_window->showCursor(1);
     }
     else
         SetRes();
@@ -549,53 +419,6 @@ void FrmMain::eventResize()
 #endif
 }
 
-int FrmMain::setFullScreen(bool fs)
-{
-    if(m_window == nullptr)
-        return -1;
-
-    if(fs != IsFullScreen(m_window))
-    {
-        if(fs)
-        {
-            // Swith to FULLSCREEN mode
-            if(SDL_SetWindowFullscreen(m_window, SDL_WINDOW_FULLSCREEN_DESKTOP) < 0)
-            {
-                //Hide mouse cursor in full screen mdoe
-                pLogWarning("Setting fullscreen failed: %s", SDL_GetError());
-                return -1;
-            }
-
-            SDL_ShowCursor(SDL_DISABLE);
-            return 1;
-        }
-        else
-        {
-            // Swith to WINDOWED mode
-            if(SDL_SetWindowFullscreen(m_window, SDL_FALSE) < 0)
-            {
-                pLogWarning("Setting windowed failed: %s", SDL_GetError());
-                return -1;
-            }
-#ifdef __EMSCRIPTEN__
-            SDL_SetWindowSize(m_window, ScaleWidth, ScaleHeight);
-#endif
-            return 0;
-        }
-    }
-
-    return 0;
-}
-
-void FrmMain::setWindowSize(int w, int h)
-{
-    SDL_SetWindowSize(m_window, w, h);
-}
-
-void FrmMain::getWindowSize(int *w, int *h)
-{
-    SDL_GetWindowSize(m_window, w, h);
-}
 
 int FrmMain::simpleMsgBox(uint32_t flags, const std::string &title, const std::string &message)
 {
@@ -619,7 +442,7 @@ int FrmMain::simpleMsgBox(uint32_t flags, const std::string &title, const std::s
     return SDL_ShowSimpleMessageBox(dFlags,
                                     title.c_str(),
                                     message.c_str(),
-                                    m_window);
+                                    nullptr);
 }
 
 void FrmMain::errorMsgBox(const std::string &title, const std::string &message)
@@ -647,17 +470,11 @@ void FrmMain::errorMsgBox(const std::string &title, const std::string &message)
     mboxButton.flags    = SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT | SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT;
     mboxButton.text     = "Ok";
     mbox.flags          = SDL_MESSAGEBOX_ERROR;
-    mbox.window         = m_window;
+    mbox.window         = nullptr;
     mbox.title          = ttl.c_str();
     mbox.message        = msg.c_str();
     mbox.numbuttons     = 1;
     mbox.buttons        = &mboxButton;
     mbox.colorScheme    = &colorScheme;
     SDL_ShowMessageBox(&mbox, nullptr);
-}
-
-bool FrmMain::isSdlError()
-{
-    const char *error = SDL_GetError();
-    return (*error != '\0');
 }

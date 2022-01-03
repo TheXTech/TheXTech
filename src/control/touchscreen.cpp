@@ -23,7 +23,10 @@
 
 #include "touchscreen.h"
 #include "../core/render.h"
-#include "frm_main.h"
+#include "../core/window.h"
+#include "globals.h"
+#include "gfx.h"
+
 #ifdef __ANDROID__
 #include "../gfx.h"
 #endif
@@ -701,7 +704,7 @@ void TouchScreenController::quit()
 
 void TouchScreenController::updateScreenSize()
 {
-    frmMain.getWindowSize(&m_screenWidth, &m_screenHeight);
+    g_window->getWindowSize(&m_screenWidth, &m_screenHeight);
 }
 
 static void updateKeyValue(bool &key, bool state)

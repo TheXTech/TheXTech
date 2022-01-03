@@ -229,7 +229,7 @@ int GameMain(const CmdLineSetup_t &setup)
     g_render->repaint();
     DoEvents();
 
-    if(!neverPause && !frmMain.isWindowActive())
+    if(!neverPause && !frmMain.hasWindowInputFocus())
         SoundPauseEngine(1);
 
     if(!setup.testLevel.empty() || !setup.testReplay.empty() || setup.interprocess) // Start level testing immediately!
@@ -1415,7 +1415,7 @@ void CheckActive()
 //    If nPlay.Online = True Then Exit Sub
     // If LevelEditor = False And TestLevel = False Then Exit Sub
     // If LevelEditor = False Then Exit Sub
-    while(!frmMain.isWindowActive())
+    while(!frmMain.hasWindowInputFocus())
     {
         frmMain.waitEvents();
 //        If LevelEditor = True Or MagicHand = True Then frmLevelWindow.vScreen(1).MousePointer = 0
