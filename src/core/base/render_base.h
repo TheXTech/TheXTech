@@ -75,7 +75,7 @@ protected:
     static int    ScaleHeight;
 
 #ifdef USE_RENDER_BLOCKING
-    static bool m_blockRender = false;
+    static bool m_blockRender;
 #endif
 
 public:

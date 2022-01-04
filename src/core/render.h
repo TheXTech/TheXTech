@@ -386,7 +386,7 @@ SDL_FORCE_INLINE bool renderBlocked()
 
 SDL_FORCE_INLINE void setBlockRender(bool b)
 {
-    AbstractRender_t::setBlockRender();
+    AbstractRender_t::setBlockRender(b);
 }
 #endif // USE_RENDER_BLOCKING
 

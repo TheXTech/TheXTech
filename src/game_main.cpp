@@ -165,7 +165,7 @@ int GameMain(const CmdLineSetup_t &setup)
         SuperPrint("Click to start a game", 3, 230, 280);
         XRender::repaint();
         XRender::setTargetScreen();
-        DoEvents();
+        XEvents::doEvents();
         PGE_Delay(10);
     }
 #endif
