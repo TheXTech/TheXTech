@@ -41,6 +41,9 @@ namespace Controls
 {
 
 
+// forward declaration for the TouchScreenController
+class InputMethod_TouchScreen;
+
 /*!
  * \brief A basic class including graphics for touchscreen controller
  */
@@ -164,6 +167,14 @@ public:
         key_END
     };
 
+    enum styles
+    {
+        style_actions = 0,
+        style_abxy,
+        style_xoda,
+        style_END
+    };
+
     enum sizes
     {
         size_small = 0,
@@ -171,7 +182,16 @@ public:
         size_large,
         size_END
     };
-    int m_preferredSize = size_medium;
+
+    // touchscreen settings (duplicated from InputMethodProfile_TouchScreen)
+    int m_size = TouchScreenController::size_medium;
+    int m_touchpad_style = TouchScreenController::style_actions;
+    float m_vibration_strength = 0.f;
+    int m_vibration_length = 12;
+    bool m_hold_run = false;
+
+    // active InputMethod (nullable, used for configuration)
+    InputMethod* m_active_method = nullptr;
 
     //! In-game controls pressed
     Controls_t m_current_keys;
@@ -191,8 +211,8 @@ public:
         bool keyAltRunOnce = false;
     } m_current_extra_keys;
 
-    //! Touch hidden by default, re-enablable by left-top corder
-    bool       m_touchHidden = true;
+    //! Touch can be hidden by left-top corner to use virtual mouse
+    bool       m_touchHidden = false;
     bool       m_runHeld = false;
 
     struct FingerState
@@ -244,6 +264,8 @@ public:
     using InputMethod::Type;
     using InputMethod::Profile;
 
+    ~InputMethod_TouchScreen();
+
     // Update functions that set player controls (and editor controls)
     // based on current device input. Return false if device lost.
     bool Update(Controls_t& c, CursorControls_t& m, EditorControls_t& e);
@@ -256,6 +278,14 @@ class InputMethodProfile_TouchScreen : public InputMethodProfile
 public:
     using InputMethodProfile::Name;
     using InputMethodProfile::Type;
+
+    // touchscreen settings
+    int m_size = TouchScreenController::size_medium;
+    int m_touchpad_style = TouchScreenController::style_actions;
+    float m_vibration_strength = 0.f;
+    int m_vibration_length = 12;
+    bool m_hold_run = false;
+
 
     InputMethodProfile_TouchScreen();
 
@@ -278,33 +308,18 @@ public:
     // one can assume that the IniProcessing* is already in the correct group
     void SaveConfig(IniProcessing* ctl);
     void LoadConfig(IniProcessing* ctl);
-};
-
-class InputMethodType_TouchScreen : public InputMethodType
-{
-private:
-    bool m_canPoll = false;
-
-    InputMethodProfile* AllocateProfile() noexcept;
-
-public:
-    using InputMethodType::Name;
-    using InputMethodType::m_profiles;
-
-    TouchScreenController m_controller;
-
-    InputMethodType_TouchScreen();
-
-    void UpdateControlsPre();
-    void UpdateControlsPost();
-
-    // null if no input method is ready
-    // allocates the new InputMethod on the heap
-    InputMethod* Poll(const std::vector<InputMethod*>& active_methods) noexcept;
 
     /*-----------------------*\
     || OPTIONAL METHODS      ||
     \*-----------------------*/
+    enum options
+    {
+        o_size,
+        o_style,
+        o_v_strength,
+        o_v_length,
+        o_hold_run
+    };
 public:
     // How many per-type special options are there?
     size_t GetSpecialOptionCount();
@@ -323,12 +338,31 @@ public:
     bool OptionRotateLeft(size_t i);
     // called when right is pressed
     bool OptionRotateRight(size_t i);
+};
 
-protected:
-    void SaveConfig_Custom(IniProcessing* ctl);
-    void LoadConfig_Custom(IniProcessing* ctl);
+class InputMethodType_TouchScreen : public InputMethodType
+{
+private:
+    bool m_canPoll = false;
+
+    InputMethodProfile* AllocateProfile() noexcept;
+
+public:
+    using InputMethodType::Name;
+    using InputMethodType::m_profiles;
+
+    TouchScreenController m_controller;
+
+    InputMethodType_TouchScreen();
+
     bool TestProfileType(InputMethodProfile* profile);
 
+    void UpdateControlsPre();
+    void UpdateControlsPost();
+
+    // null if no input method is ready
+    // allocates the new InputMethod on the heap
+    InputMethod* Poll(const std::vector<InputMethod*>& active_methods) noexcept;
 };
 
 } // namespace Controls

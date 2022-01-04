@@ -14,10 +14,7 @@
 #include "keyboard.h"
 #include "joystick.h"
 #include "duplicate.h"
-
-#ifndef NO_SDL
 #include "touchscreen.h"
-#endif
 
 #include <Logger/logger.h>
 

@@ -45,54 +45,13 @@ namespace Controls
 {
 
 /*-----------------*\
-|| definitions     ||
-\*-----------------*/
-
-enum
-{
-    KEYBOARD_NOKEYS = 0x00000001,
-    KEYBOARD_QWERTY = 0x00000002,
-    KEYBOARD_12KEY = 0x00000003
-};
-
-enum
-{
-    TOUCHSCREEN_DISABLE = 0,
-    TOUCHSCREEN_DISABLE_ON_KEYBOARD = 1,
-    TOUCHSCREEN_ENABLE = 2,
-};
-
-enum
-{
-    TOUCHPAD_STYLE_ACTIONS = 0,
-    TOUCHPAD_STYLE_ABXY = 1,
-    TOUCHPAD_STYLE_XODA = 2
-};
-
-//! Is hardware keyboard presented?
-static bool s_showTouchscreenOnStart = true;
-static int  s_touchPadStyle = 0;
-
-#ifdef __ANDROID__
-static double s_screenSize = 0;
-static double s_screenWidth = 0;
-static double s_screenHeight = 0;
-#endif
-
-static bool     s_vibrationEnable = false;
-static float    s_vibrationStrength = 1.0;
-static int      s_vibrationLength = 12;
-
-/*-----------------*\
 || Java interface  ||
 \*-----------------*/
 
+// all stubs now
+// @Wohlstand please remove the configuration options from the Android launcher
+
 #ifdef __ANDROID__
-
-static int s_TouchScreenPresence = KEYBOARD_NOKEYS;
-static int s_touchscreenMode = TOUCHSCREEN_DISABLE_ON_TouchScreen;
-
-static void initTouchMap();
 
 JNIEXPORT void JNICALL
 Java_ru_wohlsoft_thextech_thextechActivity_setHardwareKeyboardPresence(
@@ -103,7 +62,7 @@ Java_ru_wohlsoft_thextech_thextechActivity_setHardwareKeyboardPresence(
 {
     (void)env;
     (void)type;
-    s_TouchScreenPresence = keyboard;
+    (void)keyboard;
 }
 
 JNIEXPORT void JNICALL
@@ -115,7 +74,7 @@ Java_ru_wohlsoft_thextech_thextechActivity_setTouchScreenMode(
 {
     (void)env;
     (void)type;
-    s_touchscreenMode = mode;
+    (void)mode;
 }
 
 JNIEXPORT void JNICALL
@@ -127,7 +86,7 @@ Java_ru_wohlsoft_thextech_thextechActivity_setTouchScreenShowOnStart(
 {
     (void)env;
     (void)type;
-    s_showTouchscreenOnStart = showOnStart;
+    (void)showOnStart;
 }
 
 JNIEXPORT void JNICALL
@@ -141,10 +100,9 @@ Java_ru_wohlsoft_thextech_thextechActivity_setScreenSize(
 {
     (void)env;
     (void)type;
-    s_screenSize = screenSize;
-    s_screenWidth = screenWidth;
-    s_screenHeight = screenHeight;
-    initTouchMap();
+    (void)screenSize;
+    (void)screenWidth;
+    (void)screenHeight;
 }
 
 JNIEXPORT void JNICALL
@@ -156,7 +114,7 @@ Java_ru_wohlsoft_thextech_thextechActivity_setTouchPadStyle(
 {
     (void)env;
     (void)type;
-    s_touchPadStyle = style;
+    (void)style;
 }
 
 JNIEXPORT void JNICALL
@@ -168,7 +126,7 @@ Java_ru_wohlsoft_thextech_thextechActivity_setVibrationEnabled(
 {
     (void)env;
     (void)type;
-    s_vibrationEnable = enableVibration;
+    (void)enableVibration;
 }
 
 JNIEXPORT void JNICALL
@@ -180,7 +138,7 @@ Java_ru_wohlsoft_thextech_thextechActivity_setVibrationStrength(
 {
     (void)env;
     (void)type;
-    s_vibrationStrength = strength;
+    (void)strength;
 }
 
 JNIEXPORT void JNICALL
@@ -192,7 +150,7 @@ Java_ru_wohlsoft_thextech_thextechActivity_setVibrationLength(
 {
     (void)env;
     (void)type;
-    s_vibrationLength = length;
+    (void)length;
 }
 #endif
 
@@ -341,35 +299,37 @@ TouchScreenController::FingerState &TouchScreenController::FingerState::operator
     return *this;
 }
 
-static int buttonLeft(int player_no)
+static int buttonLeft(int player_no, int style)
 {
     (void)player_no;
+    (void)style;
     if(LevelSelect && GamePaused == PauseCode::PauseGame)
         return TouchScreenGFX_t::BUTTON_LEFT_CHAR;
     else
         return TouchScreenGFX_t::BUTTON_LEFT;
 }
 
-static int buttonRight(int player_no)
+static int buttonRight(int player_no, int style)
 {
     (void)player_no;
+    (void)style;
     if(LevelSelect && GamePaused == PauseCode::PauseGame)
         return TouchScreenGFX_t::BUTTON_RIGHT_CHAR;
     else
         return TouchScreenGFX_t::BUTTON_RIGHT;
 }
 
-static int buttonA(int player_no)
+static int buttonA(int player_no, int style)
 {
     (void)player_no;
-    switch(s_touchPadStyle)
+    switch(style)
     {
-    case TOUCHPAD_STYLE_ABXY:
+    case TouchScreenController::style_abxy:
         return TouchScreenGFX_t::BUTTON_A;
-    case TOUCHPAD_STYLE_XODA:
+    case TouchScreenController::style_xoda:
         return TouchScreenGFX_t::BUTTON_A_PS;
     default:
-    case TOUCHPAD_STYLE_ACTIONS:
+    case TouchScreenController::style_actions:
         if(GamePaused != PauseCode::None || GameMenu)
             return TouchScreenGFX_t::BUTTON_A_DO;
         else if(GameOutro)
@@ -381,16 +341,16 @@ static int buttonA(int player_no)
     }
 }
 
-static int buttonX(int player_no)
+static int buttonX(int player_no, int style)
 {
-    switch(s_touchPadStyle)
+    switch(style)
     {
-    case TOUCHPAD_STYLE_ABXY:
+    case TouchScreenController::style_abxy:
         return TouchScreenGFX_t::BUTTON_X;
-    case TOUCHPAD_STYLE_XODA:
+    case TouchScreenController::style_xoda:
         return TouchScreenGFX_t::BUTTON_X_PS;
     default:
-    case TOUCHPAD_STYLE_ACTIONS:
+    case TouchScreenController::style_actions:
         if(GamePaused != PauseCode::None || GameMenu)
             return TouchScreenGFX_t::BUTTON_X_BACK;
         else if(LevelSelect || GameOutro)
@@ -428,16 +388,16 @@ static int buttonX(int player_no)
     }
 }
 
-static int buttonB(int player_no)
+static int buttonB(int player_no, int style)
 {
-    switch(s_touchPadStyle)
+    switch(style)
     {
-    case TOUCHPAD_STYLE_ABXY:
+    case TouchScreenController::style_abxy:
         return TouchScreenGFX_t::BUTTON_B;
-    case TOUCHPAD_STYLE_XODA:
+    case TouchScreenController::style_xoda:
         return TouchScreenGFX_t::BUTTON_B_PS;
     default:
-    case TOUCHPAD_STYLE_ACTIONS:
+    case TouchScreenController::style_actions:
         if(LevelSelect || GamePaused != PauseCode::None || GameMenu || GameOutro)
             return TouchScreenGFX_t::BUTTON_B_BLANK;
         else
@@ -455,16 +415,16 @@ static int buttonB(int player_no)
     }
 }
 
-static int buttonY(int player_no)
+static int buttonY(int player_no, int style)
 {
-    switch(s_touchPadStyle)
+    switch(style)
     {
-    case TOUCHPAD_STYLE_ABXY:
+    case TouchScreenController::style_abxy:
         return TouchScreenGFX_t::BUTTON_Y;
-    case TOUCHPAD_STYLE_XODA:
+    case TouchScreenController::style_xoda:
         return TouchScreenGFX_t::BUTTON_Y_PS;
     default:
-    case TOUCHPAD_STYLE_ACTIONS:
+    case TouchScreenController::style_actions:
         if(LevelSelect || GamePaused != PauseCode::None || GameMenu || GameOutro)
             return TouchScreenGFX_t::BUTTON_Y_BLANK;
         else
@@ -774,46 +734,6 @@ static const TouchKeyMap::KeyPos c_largeAutoMap[TouchScreenController::key_END] 
 };
 /*---------------------------------------------------------------------------------------*/
 
-#if 0
-static void oldTouchMap()
-{
-    if(s_screenSize >= 9.0) // Big tablets
-    {
-        g_touchKeyMap.touchCanvasWidth = 1300.0f;
-        g_touchKeyMap.touchCanvasHeight = 812.0f;
-        SDL_memcpy(g_touchKeyMap.touchKeysMap, c_10_6_tablet, sizeof(g_touchKeyMap.touchKeysMap));
-    }
-    else if(s_screenSize >= 7.0) // Middle tablets
-    {
-        g_touchKeyMap.touchCanvasWidth = 1024.0f;
-        g_touchKeyMap.touchCanvasHeight = 600.0f;
-        SDL_memcpy(g_touchKeyMap.touchKeysMap, c_7_tablet, sizeof(g_touchKeyMap.touchKeysMap));
-    }
-    else if(s_screenSize < 4.0) // Very small phones
-    {
-        g_touchKeyMap.touchCanvasWidth = 640.0f;
-        g_touchKeyMap.touchCanvasHeight = 480.0f;
-        SDL_memcpy(g_touchKeyMap.touchKeysMap, c_4_tinyPhoneMap, sizeof(g_touchKeyMap.touchKeysMap));
-    }
-    else // All other devices
-    {
-        // Longer screens (big ratio between sides, more like a stick)
-        if((s_screenWidth / s_screenHeight) > 1.6f)
-        {
-            g_touchKeyMap.touchCanvasWidth = 1396.0f;
-            g_touchKeyMap.touchCanvasHeight = 720.0f;
-            SDL_memcpy(g_touchKeyMap.touchKeysMap, c_averagePhoneLongMap, sizeof(g_touchKeyMap.touchKeysMap));
-        }
-        else // Shorter screens (smaller ratio between sides, more like a square)
-        {
-            g_touchKeyMap.touchCanvasWidth = 1024.0f;
-            g_touchKeyMap.touchCanvasHeight = 600.0f;
-            SDL_memcpy(g_touchKeyMap.touchKeysMap, c_averagePhoneMap, sizeof(g_touchKeyMap.touchKeysMap));
-        }
-    }
-}
-#endif
-
 static void updateTouchMap(int preferredSize, float screenWidth, float screenHeight)
 {
     if(screenWidth > screenHeight)
@@ -856,11 +776,14 @@ static void updateTouchMap(int preferredSize, float screenWidth, float screenHei
 
 void TouchScreenController::doVibration()
 {
-    if(!s_vibrationEnable || !m_vibrator)
+    if(!m_vibrator)
         return;
 
-    SDL_HapticRumblePlay(m_vibrator, s_vibrationStrength, s_vibrationLength);
-    D_pLogDebug("TouchScreen: Vibration %g, %d ms", s_vibrationStrength, s_vibrationLength);
+    if(m_vibration_strength == 0.f)
+        return;
+
+    SDL_HapticRumblePlay(m_vibrator, m_vibration_strength, m_vibration_length);
+    D_pLogDebug("TouchScreen: Vibration %g, %d ms", m_vibration_strength, m_vibration_length);
 }
 
 TouchScreenController::~TouchScreenController()
@@ -876,15 +799,11 @@ TouchScreenController::TouchScreenController()
 
     for(int key = key_BEGIN; key < key_END; ++key)
         m_keysHeld[key] = false;
-    m_touchHidden = !s_showTouchscreenOnStart;
     pLogDebug("Initialization of touch-screen controller...");
     m_touchDevicesCount = SDL_GetNumTouchDevices();
     pLogDebug("Found %d touch devices, screen size: %d x %d",
                 m_touchDevicesCount,
                 m_screenWidth, m_screenHeight);
-#ifdef __ANDROID__
-    pLogDebug("The Android reported screen size: %g inches (%g x %g)", s_screenSize, s_screenWidth, s_screenHeight);
-#endif
 
     m_vibrator = nullptr;
     int numHaptics = SDL_NumHaptics();
@@ -910,7 +829,8 @@ TouchScreenController::TouchScreenController()
 void TouchScreenController::updateScreenSize()
 {
     SDL_GetWindowSize(frmMain.getWindow(), &m_screenWidth, &m_screenHeight);
-    updateTouchMap(m_preferredSize, m_screenWidth, m_screenHeight);
+
+    updateTouchMap(m_size, m_screenWidth, m_screenHeight);
 }
 
 static void updateKeyValue(bool &key, bool state)
@@ -1121,6 +1041,33 @@ void TouchScreenController::update()
     if(!touchSupported())
         return;
 
+    if(this->m_active_method)
+    {
+        InputMethodProfile_TouchScreen* p = dynamic_cast<InputMethodProfile_TouchScreen*>(this->m_active_method->Profile);
+        if(p)
+        {
+            this->m_touchpad_style = p->m_touchpad_style;
+            if(this->m_vibration_strength != p->m_vibration_strength
+                || this->m_vibration_length != p->m_vibration_length)
+            {
+                this->m_vibration_strength = p->m_vibration_strength;
+                this->m_vibration_length = p->m_vibration_length;
+                this->doVibration();
+            }
+            if(this->m_hold_run != p->m_hold_run)
+            {
+                this->m_hold_run = p->m_hold_run;
+                this->m_runHeld = this->m_hold_run;
+            }
+            if(this->m_size != p->m_size)
+            {
+                this->m_size = p->m_size;
+                this->updateScreenSize();
+            }
+        }
+    }
+
+
     m_cursorHeld = false;
 
     // If actually used in the game touch was found, use it
@@ -1142,6 +1089,8 @@ void TouchScreenController::render(int player_no)
 {
     if(!touchSupported())
         return;
+
+    int style = m_touchpad_style;
 
     for(int key = key_BEGIN; key < key_END; key++)
     {
@@ -1182,10 +1131,10 @@ void TouchScreenController::render(int player_no)
             frmMain.renderTextureScale(x1, y1, w, h, m_GFX.touch[TouchScreenGFX_t::BUTTON_UP], 1.f, 1.f, 1.f, a);
             break;
         case TouchScreenController::key_left:
-            frmMain.renderTextureScale(x1, y1, w, h, m_GFX.touch[buttonLeft(player_no)], 1.f, 1.f, 1.f, a);
+            frmMain.renderTextureScale(x1, y1, w, h, m_GFX.touch[buttonLeft(player_no, style)], 1.f, 1.f, 1.f, a);
             break;
         case TouchScreenController::key_right:
-            frmMain.renderTextureScale(x1, y1, w, h, m_GFX.touch[buttonRight(player_no)], 1.f, 1.f, 1.f, a);
+            frmMain.renderTextureScale(x1, y1, w, h, m_GFX.touch[buttonRight(player_no, style)], 1.f, 1.f, 1.f, a);
             break;
         case TouchScreenController::key_down:
             frmMain.renderTextureScale(x1, y1, w, h, m_GFX.touch[TouchScreenGFX_t::BUTTON_DOWN], 1.f, 1.f, 1.f, a);
@@ -1210,16 +1159,16 @@ void TouchScreenController::render(int player_no)
                                        1.f, 1.f, 1.f, a);
             break;
         case TouchScreenController::key_jump:
-            frmMain.renderTextureScale(x1, y1, w, h, m_GFX.touch[buttonA(player_no)], 1.f, 1.f, 1.f, a);
+            frmMain.renderTextureScale(x1, y1, w, h, m_GFX.touch[buttonA(player_no, style)], 1.f, 1.f, 1.f, a);
             break;
         case TouchScreenController::key_run:
-            frmMain.renderTextureScale(x1, y1, w, h, m_GFX.touch[buttonX(player_no)], 1.f, 1.f, 1.f, a);
+            frmMain.renderTextureScale(x1, y1, w, h, m_GFX.touch[buttonX(player_no, style)], 1.f, 1.f, 1.f, a);
             break;
         case TouchScreenController::key_altjump:
-            frmMain.renderTextureScale(x1, y1, w, h, m_GFX.touch[buttonB(player_no)], 1.f, 1.f, 1.f, a);
+            frmMain.renderTextureScale(x1, y1, w, h, m_GFX.touch[buttonB(player_no, style)], 1.f, 1.f, 1.f, a);
             break;
         case TouchScreenController::key_altrun:
-            frmMain.renderTextureScale(x1, y1, w, h, m_GFX.touch[buttonY(player_no)], 1.f, 1.f, 1.f, a);
+            frmMain.renderTextureScale(x1, y1, w, h, m_GFX.touch[buttonY(player_no, style)], 1.f, 1.f, 1.f, a);
             break;
         default:
             frmMain.renderRect(x1, y1, w, h, r, g, 0.f, 0.3f);
@@ -1246,6 +1195,16 @@ void TouchScreenController::resetState()
 /*====================================================*\
 || implementation for InputMethod_TouchScreen         ||
 \*====================================================*/
+
+InputMethod_TouchScreen::~InputMethod_TouchScreen()
+{
+    InputMethodType_TouchScreen* t = dynamic_cast<InputMethodType_TouchScreen*>(this->Type);
+    if(!t)
+        return;
+
+    if(t->m_controller.m_active_method == this)
+        t->m_controller.m_active_method = nullptr;
+}
 
 // Update functions that set player controls (and editor controls)
 // based on current device input. Return false if device lost.
@@ -1370,12 +1329,163 @@ const char* InputMethodProfile_TouchScreen::NameSecondaryButton(ControlsClass c,
 
 void InputMethodProfile_TouchScreen::SaveConfig(IniProcessing* ctl)
 {
-    (void)ctl;
+    ctl->setValue("ui-size", this->m_size);
+    ctl->setValue("ui-style", this->m_touchpad_style);
+    ctl->setValue("vibration-strength", this->m_vibration_strength);
+    ctl->setValue("vibration-length", this->m_vibration_length);
+    ctl->setValue("hold-run", this->m_hold_run);
 }
 
 void InputMethodProfile_TouchScreen::LoadConfig(IniProcessing* ctl)
 {
-    (void)ctl;
+    ctl->read("ui-size", this->m_size, TouchScreenController::size_medium);
+    ctl->read("ui-style", this->m_touchpad_style, TouchScreenController::style_actions);
+    ctl->read("vibration-strength", this->m_vibration_strength, 0.f);
+    ctl->read("vibration-length", this->m_vibration_length, 12);
+    ctl->read("hold-run", this->m_hold_run, false);
+}
+
+// How many per-type special options are there?
+size_t InputMethodProfile_TouchScreen::GetSpecialOptionCount()
+{
+    return 5;
+}
+
+// Methods to manage per-profile options
+// It is guaranteed that none of these will be called if
+// GetOptionCount() returns 0.
+// get a char* describing the option
+const char* InputMethodProfile_TouchScreen::GetOptionName(size_t i)
+{
+    switch(i)
+    {
+    case o_size:
+        return "INTERFACE SIZE";
+    case o_style:
+        return "INTERFACE STYLE";
+    case o_v_strength:
+        return "VIBRATE STRENGTH";
+    case o_v_length:
+        return "VIBRATE LENGTH";
+    case o_hold_run:
+        return "HOLD RUN ON START";
+    }
+    return nullptr;
+}
+// get a char* describing the current option value
+// must be allocated in static or instance memory
+// WILL NOT be freed
+const char* InputMethodProfile_TouchScreen::GetOptionValue(size_t i)
+{
+    static char length_buf[8];
+    switch(i)
+    {
+    case o_size:
+        if(this->m_size == TouchScreenController::size_small)
+            return "SMALL";
+        else if(this->m_size == TouchScreenController::size_medium)
+            return "MEDIUM";
+        else
+            return "LARGE";
+    case o_style:
+        if(this->m_touchpad_style == TouchScreenController::style_actions)
+            return "ACTIONS";
+        else if(this->m_touchpad_style == TouchScreenController::style_abxy)
+            return "ABXY";
+        else
+            return "XODA";
+    case o_v_strength:
+        if(this->m_vibration_strength == 0.f)
+            return "OFF";
+        else if(this->m_vibration_strength == 0.25f)
+            return "25%";
+        else if(this->m_vibration_strength == 0.50f)
+            return "50%";
+        else if(this->m_vibration_strength == 0.75f)
+            return "75%";
+        else
+            return "100%";
+    case o_v_length:
+        SDL_snprintf(length_buf, 8, "%d MS", this->m_vibration_length);
+        return length_buf;
+    case o_hold_run:
+        if(this->m_hold_run)
+            return "ON";
+        else
+            return "OFF";
+    }
+    return nullptr;
+}
+// called when A is pressed; allowed to interrupt main game loop
+bool InputMethodProfile_TouchScreen::OptionChange(size_t i)
+{
+    return this->OptionRotateRight(i);
+}
+// called when left is pressed
+bool InputMethodProfile_TouchScreen::OptionRotateLeft(size_t i)
+{
+    switch(i)
+    {
+    case o_size:
+        if(this->m_size > 0)
+            this->m_size --;
+        else
+            this->m_size = TouchScreenController::size_END - 1;
+        return true;
+    case o_style:
+        if(this->m_touchpad_style > 0)
+            this->m_touchpad_style --;
+        else
+            this->m_touchpad_style = TouchScreenController::style_END - 1;
+        return true;
+    case o_v_strength:
+        if(this->m_vibration_strength > 0.f)
+        {
+            this->m_vibration_strength -= 0.25f;
+            return true;
+        }
+        return false;
+    case o_v_length:
+        if(this->m_vibration_length > 2)
+        {
+            this->m_vibration_length -= 2;
+            return true;
+        }
+        return false;
+    case o_hold_run:
+        this->m_hold_run = !this->m_hold_run;
+    }
+    return false;
+}
+// called when right is pressed
+bool InputMethodProfile_TouchScreen::OptionRotateRight(size_t i)
+{
+    switch(i)
+    {
+    case o_size:
+        this->m_size ++;
+        if(this->m_size >= TouchScreenController::size_END)
+            this->m_size = 0;
+        return true;
+    case o_style:
+        this->m_touchpad_style ++;
+        if(this->m_touchpad_style >= TouchScreenController::style_END)
+            this->m_touchpad_style = 0;
+        return true;
+    case o_v_strength:
+        if(this->m_vibration_strength < 1.f)
+        {
+            this->m_vibration_strength += 0.25f;
+            return true;
+        }
+        return false;
+    case o_v_length:
+        this->m_vibration_length += 2;
+        return true;
+    case o_hold_run:
+        this->m_hold_run = !this->m_hold_run;
+    }
+    return false;
 }
 
 /*====================================================*\
@@ -1458,93 +1568,9 @@ InputMethod* InputMethodType_TouchScreen::Poll(const std::vector<InputMethod*>& 
     method->Name = "Touchscreen";
     method->Type = this;
 
+    this->m_controller.m_active_method = method;
+
     return (InputMethod*)method;
-}
-
-/*-----------------------*\
-|| OPTIONAL METHODS      ||
-\*-----------------------*/
-
-// How many per-type special options are there?
-size_t InputMethodType_TouchScreen::GetSpecialOptionCount()
-{
-    return 1;
-}
-
-// Methods to manage per-profile options
-// It is guaranteed that none of these will be called if
-// GetOptionCount() returns 0.
-// get a char* describing the option
-const char* InputMethodType_TouchScreen::GetOptionName(size_t i)
-{
-    if(i == 0)
-    {
-        return "INTERFACE SIZE";
-    }
-    return nullptr;
-}
-// get a char* describing the current option value
-// must be allocated in static or instance memory
-// WILL NOT be freed
-const char* InputMethodType_TouchScreen::GetOptionValue(size_t i)
-{
-    if(i == 0)
-    {
-        if(this->m_controller.m_preferredSize == TouchScreenController::size_small)
-            return "SMALL";
-        else if(this->m_controller.m_preferredSize == TouchScreenController::size_medium)
-            return "MEDIUM";
-        else
-            return "LARGE";
-    }
-    return nullptr;
-}
-// called when A is pressed; allowed to interrupt main game loop
-bool InputMethodType_TouchScreen::OptionChange(size_t i)
-{
-    if(i == 0)
-    {
-        this->OptionRotateRight(i);
-    }
-    return false;
-}
-// called when left is pressed
-bool InputMethodType_TouchScreen::OptionRotateLeft(size_t i)
-{
-    if(i == 0)
-    {
-        if(this->m_controller.m_preferredSize > 0)
-            this->m_controller.m_preferredSize --;
-        else
-            this->m_controller.m_preferredSize = TouchScreenController::size_END - 1;
-        this->m_controller.updateScreenSize();
-        return true;
-    }
-    return false;
-}
-// called when right is pressed
-bool InputMethodType_TouchScreen::OptionRotateRight(size_t i)
-{
-    if(i == 0)
-    {
-        this->m_controller.m_preferredSize ++;
-        if(this->m_controller.m_preferredSize >= TouchScreenController::size_END)
-            this->m_controller.m_preferredSize = 0;
-        this->m_controller.updateScreenSize();
-        return true;
-    }
-    return false;
-}
-
-void InputMethodType_TouchScreen::SaveConfig_Custom(IniProcessing* ctl)
-{
-    ctl->setValue("ui-size", this->m_controller.m_preferredSize);
-}
-
-void InputMethodType_TouchScreen::LoadConfig_Custom(IniProcessing* ctl)
-{
-    ctl->read("ui-size", this->m_controller.m_preferredSize, TouchScreenController::size_medium);
-    this->m_controller.updateScreenSize();
 }
 
 } // namespace Controls
