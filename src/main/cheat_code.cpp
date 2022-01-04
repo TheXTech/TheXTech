@@ -22,6 +22,7 @@
 #ifdef ENABLE_ANTICHEAT_TRAP
 #include "core/msgbox.h"
 #include "core/render.h"
+#include "core/events.h"
 #endif
 
 #include <Logger/logger.h>
@@ -90,14 +91,14 @@ void CheatCode(char NewKey)
         }
         else
         {
-            simpleMsgBox(AbstractMsgBox_t::MESSAGEBOX_ERROR,
-                         "Die, cheater!",
-                         "       Die, cheater!       \n"
-                         "Now play the game all over \n"
-                         "    from the beginning!    \n"
-                         "                           \n"
-                         "     Time to be evil!      \n"
-                         "      Mu-ha-ha-ha-ha!      ");
+            XMsgBox::simpleMsgBox(AbstractMsgBox_t::MESSAGEBOX_ERROR,
+                                  "Die, cheater!",
+                                  "       Die, cheater!       \n"
+                                  "Now play the game all over \n"
+                                  "    from the beginning!    \n"
+                                  "                           \n"
+                                  "     Time to be evil!      \n"
+                                  "      Mu-ha-ha-ha-ha!      ");
         }
 
         for(int A = 1; A <= numPlayers; ++A)
@@ -119,7 +120,7 @@ void CheatCode(char NewKey)
             XRender::clearBuffer();
             XRender::repaint();
             StopMusic();
-            DoEvents();
+            XEvents::doEvents();
             PGE_Delay(500);
         }
         return;
