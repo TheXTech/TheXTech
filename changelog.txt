@@ -3,6 +3,9 @@ TheXTech Changelog.
 Changelog for 1.3.6 [WIP]
 -Added an ability to toggle drawing of the HUD and other on-screen meta data using F4 key
 
+Changes for 1.3.5.3-1
+-Fixed autostart events behaviour
+
 Changes for 1.3.5.3
 -Fixed the vanilla crash: Attempting to freeze any Pokey segments when they have the "noiceball=0" option set will cause the out-of-range error with NPC-ID=-3 in a random moment. (https://github.com/Wohlstand/TheXTech/issues/220)
 -Changed the user directory location for macOS-built games into the "~/TheXTech Games/<bundle name without .app suffix>/" to avoid conflict between different games ran on the same device.
