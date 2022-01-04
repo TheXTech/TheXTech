@@ -38,6 +38,7 @@
 #include "../player.h"
 #include "../editor.h"
 #include "../core/render.h"
+#include "../core/events.h"
 #include "game_globals.h"
 #include "world_globals.h"
 #include "speedrunner.h"
@@ -68,14 +69,14 @@ void levelWaitForFade()
 {
     while(!g_levelScreenFader.isComplete() && GameIsActive)
     {
-        DoEvents();
+        XEvents::doEvents();
 
         if(canProceedFrame())
         {
             computeFrameTime1();
             UpdateGraphics();
             UpdateSound();
-            DoEvents();
+            XEvents::doEvents();
             computeFrameTime2();
             updateScreenFaders();
         }
@@ -111,7 +112,7 @@ void GameLoop()
         EndLevel = true;
         ErrorQuit = false;
         pLogWarning("Quit level because of an error");
-        g_render->clearBuffer();
+        XRender::clearBuffer();
     }
 
     if(EndLevel)
@@ -171,12 +172,12 @@ void GameLoop()
 
         updateScreenFaders();
 
-        bool altPressed = getKeyState(SDL_SCANCODE_LALT) == KEY_PRESSED ||
-                          getKeyState(SDL_SCANCODE_RALT) == KEY_PRESSED;
+        bool altPressed = XEvents::getKeyState(SDL_SCANCODE_LALT) ||
+                          XEvents::getKeyState(SDL_SCANCODE_RALT);
 
-        bool escPressed = getKeyState(SDL_SCANCODE_ESCAPE) == KEY_PRESSED;
+        bool escPressed = XEvents::getKeyState(SDL_SCANCODE_ESCAPE);
 #ifdef __ANDROID__
-        escPressed |= getKeyState(SDL_SCANCODE_AC_BACK) == KEY_PRESSED;
+        escPressed |= XEvents::getKeyState(SDL_SCANCODE_AC_BACK);
 #endif
 
         bool pausePress = (Player[1].Controls.Start || escPressed) && !altPressed;
@@ -286,7 +287,7 @@ void PauseGame(int plr)
             computeFrameTime1();
             computeFrameTime2();
 
-            DoEvents();
+            XEvents::doEvents();
             CheckActive();
 
             speedRun_tick();
@@ -304,13 +305,13 @@ void PauseGame(int plr)
             else
                 updateScreenFaders();
 
-            bool altPressed = getKeyState(SDL_SCANCODE_LALT) == KEY_PRESSED ||
-                              getKeyState(SDL_SCANCODE_RALT) == KEY_PRESSED;
-            bool escPressed = getKeyState(SDL_SCANCODE_ESCAPE) == KEY_PRESSED;
-            bool spacePressed = getKeyState(SDL_SCANCODE_SPACE) == KEY_PRESSED;
-            bool returnPressed = getKeyState(SDL_SCANCODE_RETURN) == KEY_PRESSED;
-            bool upPressed = getKeyState(SDL_SCANCODE_UP) == KEY_PRESSED;
-            bool downPressed = getKeyState(SDL_SCANCODE_DOWN) == KEY_PRESSED;
+            bool altPressed = XEvents::getKeyState(SDL_SCANCODE_LALT) ||
+                              XEvents::getKeyState(SDL_SCANCODE_RALT);
+            bool escPressed = XEvents::getKeyState(SDL_SCANCODE_ESCAPE);
+            bool spacePressed = XEvents::getKeyState(SDL_SCANCODE_SPACE);
+            bool returnPressed = XEvents::getKeyState(SDL_SCANCODE_RETURN);
+            bool upPressed = XEvents::getKeyState(SDL_SCANCODE_UP);
+            bool downPressed = XEvents::getKeyState(SDL_SCANCODE_DOWN);
 
             bool menuDoPress = (returnPressed && !altPressed) || spacePressed;
             bool menuBackPress = (escPressed && !altPressed);
@@ -453,12 +454,12 @@ void PauseGame(int plr)
                                 stopPause = true;
                                 MenuMode = MENU_MAIN;
                                 MenuCursor = 0;
-                                g_render->setTargetTexture();
-                                g_render->clearBuffer();
-                                g_render->repaint();
+                                XRender::setTargetTexture();
+                                XRender::clearBuffer();
+                                XRender::repaint();
                                 EndLevel = true;
                                 StopMusic();
-                                DoEvents();
+                                XEvents::doEvents();
                                 break;
                             case 2: // Reset checkpoints
                                 stopPause = true;
@@ -475,12 +476,12 @@ void PauseGame(int plr)
                                 stopPause = true;
                                 MenuMode = MENU_MAIN;
                                 MenuCursor = 0;
-                                g_render->setTargetTexture();
-                                g_render->clearBuffer();
-                                g_render->repaint();
+                                XRender::setTargetTexture();
+                                XRender::clearBuffer();
+                                XRender::repaint();
                                 EndLevel = true;
                                 StopMusic();
-                                DoEvents();
+                                XEvents::doEvents();
                                 KillIt(); // Quit the game entirely
                                 break;
                             default:
@@ -518,11 +519,11 @@ void PauseGame(int plr)
                             else
                                 LevelSelect = false;
 
-                            g_render->setTargetTexture();
-                            g_render->clearBuffer();
-                            g_render->repaint();
+                            XRender::setTargetTexture();
+                            XRender::clearBuffer();
+                            XRender::repaint();
                             StopMusic();
-                            DoEvents();
+                            XEvents::doEvents();
                         }
                     }
 

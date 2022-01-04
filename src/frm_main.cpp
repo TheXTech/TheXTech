@@ -26,19 +26,19 @@
 #include "gfx.h"
 
 #ifdef CORE_EVERYTHING_SDL
-#   include "core/render_sdl.h"
+#   include "core/sdl/render_sdl.h"
 typedef RenderSDL RenderUsed;
 #   define USE_CORE_RENDER_SDL
 
-#   include "core/window_sdl.h"
+#   include "core/sdl/window_sdl.h"
 typedef WindowSDL WindowUsed;
 #   define USE_CORE_WINDOW_SDL
 
-#   include "core/msgbox_sdl.h"
+#   include "core/sdl/msgbox_sdl.h"
 typedef MsgBoxSDL MsgBoxUsed;
 #   define USE_CORE_MSGBOX_SDL
 
-#   include "core/events_sdl.h"
+#   include "core/sdl/events_sdl.h"
 typedef EventsSDL EventsUsed;
 #   define USE_CORE_EVENTS_SDL
 #endif
@@ -48,10 +48,6 @@ typedef EventsSDL EventsUsed;
 
 bool FrmMain::initSystem(const CmdLineSetup_t &setup)
 {
-    std::unique_ptr<RenderUsed> render;
-    std::unique_ptr<WindowUsed> window;
-    std::unique_ptr<MsgBoxUsed> msgbox;
-    std::unique_ptr<EventsUsed> events;
     bool res = false;
 
     LoadLogSettings(setup.interprocess, setup.verboseLogging);
@@ -61,12 +57,25 @@ bool FrmMain::initSystem(const CmdLineSetup_t &setup)
     //Initialize FreeImage
     GraphicsHelps::initFreeImage();
 
-    window.reset(new WindowUsed());
-    render.reset(new RenderUsed());
-    msgbox.reset(new MsgBoxUsed());
-    events.reset(new EventsUsed());
+    // Build interfaces
+    WindowUsed *window = new WindowUsed();
+    RenderUsed *render = new RenderUsed();
+    MsgBoxUsed *msgbox = new MsgBoxUsed();
+    EventsUsed *events = new EventsUsed();
 
-    render->init();
+    m_window.reset(window);
+    m_render.reset(render);
+    m_msgbox.reset(msgbox);
+    m_events.reset(events);
+
+    g_window = m_window.get();
+    g_msgBox = m_msgbox.get();
+    g_events = m_events.get();
+    g_render = m_render.get();
+
+
+    // Initializing window
+
 #ifdef USE_CORE_WINDOW_SDL
     res = window->initSDL(setup, render->SDL_InitFlags());
 #else
@@ -76,13 +85,22 @@ bool FrmMain::initSystem(const CmdLineSetup_t &setup)
     if(!res)
         return true;
 
+
+    // Initializing message box
+
 #if defined(USE_CORE_WINDOW_SDL) && defined(USE_CORE_MSGBOX_SDL)
     msgbox->init(window->getWindow());
 #else
 #error "FIXME: Implement supported message boxes initialization here"
 #endif
+
+
+
+    // Initializing events
     events->init(this);
 
+
+    // Initializing render
     pLogDebug("Init renderer settings...");
 
 #if defined(USE_CORE_WINDOW_SDL) && defined(USE_CORE_RENDER_SDL)
@@ -96,22 +114,6 @@ bool FrmMain::initSystem(const CmdLineSetup_t &setup)
         freeSystem();
         return true;
     }
-
-    g_msgBox = msgbox.get();
-    m_msgbox.reset(msgbox.get());
-    msgbox.release();
-
-    g_events = events.get();
-    m_events.reset(events.get());
-    events.release();
-
-    g_render = render.get();
-    m_render.reset(render.get());
-    render.release();
-
-    g_window = window.get();
-    m_window.reset(window.get());
-    window.release();
 
     return !res;
 }

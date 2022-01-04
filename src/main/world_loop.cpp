@@ -34,6 +34,7 @@
 #include "../graphics.h"
 #include "../collision.h"
 #include "../main/trees.h"
+#include "../core/events.h"
 #include "../compat.h"
 #include "world_globals.h"
 #include "level_file.h"
@@ -49,14 +50,14 @@ void worldWaitForFade(int waitTicks)
     bool ticks = waitTicks > 0;
     while(((!ticks && !g_worldScreenFader.isComplete()) || (ticks && waitTicks >= 0)) && GameIsActive)
     {
-        DoEvents();
+        XEvents::doEvents();
 
         if(canProceedFrame())
         {
             computeFrameTime1();
             UpdateGraphics2();
             UpdateSound();
-            DoEvents();
+            XEvents::doEvents();
             computeFrameTime2();
             g_worldScreenFader.update();
             if(waitTicks >= 0)
@@ -326,12 +327,12 @@ void WorldLoop()
         tempLocation.Y += 4;
         WorldPlayer[1].LevelName.clear();
 
-        bool altPressed = getKeyState(SDL_SCANCODE_LALT) == KEY_PRESSED ||
-                          getKeyState(SDL_SCANCODE_RALT) == KEY_PRESSED;
+        bool altPressed = XEvents::getKeyState(SDL_SCANCODE_LALT) ||
+                          XEvents::getKeyState(SDL_SCANCODE_RALT);
 
-        bool escPressed = getKeyState(SDL_SCANCODE_ESCAPE) == KEY_PRESSED;
+        bool escPressed = XEvents::getKeyState(SDL_SCANCODE_ESCAPE);
 #ifdef __ANDROID__
-        escPressed |= getKeyState(SDL_SCANCODE_AC_BACK) == KEY_PRESSED;
+        escPressed |= XEvents::getKeyState(SDL_SCANCODE_AC_BACK);
 #endif
 
         bool pausePress = (Player[1].Controls.Start || escPressed) && !altPressed;
@@ -933,7 +934,7 @@ void PathWait()
 
     do
     {
-        DoEvents();
+        XEvents::doEvents();
         if(canProceedFrame())
         {
             speedRun_tick();
@@ -946,7 +947,7 @@ void PathWait()
 
             C++;
             computeFrameTime1();
-            DoEvents();
+            XEvents::doEvents();
             computeFrameTime2();
         }
         PGE_Delay(1);

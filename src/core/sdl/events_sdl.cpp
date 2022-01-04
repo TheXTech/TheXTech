@@ -25,10 +25,10 @@
 #include "events_sdl.h"
 #include "core/render.h"
 #include "core/window.h"
-#include "../frm_main.h"
-#include "../game_main.h"
-#include "../sound.h"
-#include "../control/joystick.h"
+#include "frm_main.h"
+#include "game_main.h"
+#include "sound.h"
+#include "control/joystick.h"
 
 
 EventsSDL::EventsSDL() :
@@ -62,10 +62,10 @@ void EventsSDL::waitEvents()
     doEvents();
 }
 
-uint8_t EventsSDL::getKeyState(int scan_code)
+bool EventsSDL::getKeyState(int scan_code)
 {
     if(m_keyboardState)
-        return m_keyboardState[scan_code];
+        return m_keyboardState[scan_code] == 1;
     return 0;
 }
 
@@ -100,7 +100,7 @@ void EventsSDL::processEvent()
     switch(m_event.type)
     {
     case SDL_QUIT:
-        g_window->showCursor(1);
+        XWindow::showCursor(1);
         KillIt();
         break;
     case SDL_JOYDEVICEADDED:
@@ -205,16 +205,16 @@ void EventsSDL::processEvent()
         eventMouseWheel(e);
         break;
     }
-#ifdef __ANDROID__
+#ifdef USE_RENDER_BLOCKING
     case SDL_RENDER_DEVICE_RESET:
         D_pLogDebug("Android: Render Device Reset");
         break;
     case SDL_APP_WILLENTERBACKGROUND:
-        g_render->setBlockRender(true);
+        XRender::setBlockRender(true);
         D_pLogDebug("Android: Entering background");
         break;
     case SDL_APP_DIDENTERFOREGROUND:
-        g_render->setBlockRender(false);
+        XRender::setBlockRender(false);
         D_pLogDebug("Android: Resumed foreground");
         break;
 #endif

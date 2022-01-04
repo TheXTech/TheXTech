@@ -28,6 +28,7 @@
 #include "../frame_timer.h"
 #include "../screen_fader.h"
 #include "../core/render.h"
+#include "../core/events.h"
 #include "pge_delay.h"
 
 
@@ -151,8 +152,8 @@ static void drawEnterScreen(Player_t tempPlayer[maxLocalPlayers])
     }
     else
     {
-        g_render->renderTexture(ScreenW / 2.0 - 46, ScreenH / 2.0 + 31, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0);
-        g_render->renderTexture(ScreenW / 2.0 - GFX.Interface[1].w / 2, ScreenH / 2.0 + 32, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+        XRender::renderTexture(ScreenW / 2.0 - 46, ScreenH / 2.0 + 31, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0);
+        XRender::renderTexture(ScreenW / 2.0 - GFX.Interface[1].w / 2, ScreenH / 2.0 + 32, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
         SuperPrint(std::to_string(int(Lives)), 1, ScreenW / 2.0 + 12, ScreenH / 2.0 + 32);
     }
 
@@ -166,11 +167,11 @@ void GameThing(int waitms, int fadeSpeed)
 
     if(waitms <= 0)
     {
-        g_render->setTargetTexture();
-        g_render->clearBuffer();
+        XRender::setTargetTexture();
+        XRender::clearBuffer();
         drawEnterScreen(tempPlayer);
-        g_render->repaint();
-        DoEvents();
+        XRender::repaint();
+        XEvents::doEvents();
     }
     else
     {
@@ -182,13 +183,13 @@ void GameThing(int waitms, int fadeSpeed)
 
         while(SDL_GetTicks() < targetTime && GameIsActive)
         {
-            DoEvents();
+            XEvents::doEvents();
 
             if(canProceedFrame())
             {
                 computeFrameTime1();
-                g_render->setTargetTexture();
-                g_render->clearBuffer();
+                XRender::setTargetTexture();
+                XRender::clearBuffer();
                 drawEnterScreen(tempPlayer);
 
                 if(fadeSpeed > 0 && fader.m_active)
@@ -197,8 +198,8 @@ void GameThing(int waitms, int fadeSpeed)
                     fader.draw();
                 }
 
-                g_render->repaint();
-                DoEvents();
+                XRender::repaint();
+                XEvents::doEvents();
                 computeFrameTime2();
             }
             PGE_Delay(1);

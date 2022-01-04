@@ -139,7 +139,7 @@ int GameMain(const CmdLineSetup_t &setup)
 
 //    If LevelEditor = False Then
 //        frmMain.Show // Show window a bit later
-//    g_window->show();
+//    XWindow::show();
 //        GameMenu = True
     GameMenu = true;
 //    Else
@@ -153,18 +153,18 @@ int GameMain(const CmdLineSetup_t &setup)
     MaxFPS = setup.testMaxFPS; // || (g_videoSettings.renderModeObtained == RENDER_ACCELERATED_VSYNC);
 
     InitControls(); // init player's controls
-    DoEvents();
+    XEvents::doEvents();
 
 #ifdef __EMSCRIPTEN__ // Workaround for a recent Chrome's policy to avoid sudden sound without user's interaction
-    g_window->show(); // Don't show window until playing an initial sound
+    XWindow::show(); // Don't show window until playing an initial sound
 
     while(!MenuMouseDown)
     {
-        g_render->setTargetTexture();
-        g_render->clearBuffer();
+        XRender::setTargetTexture();
+        XRender::clearBuffer();
         SuperPrint("Click to start a game", 3, 230, 280);
-        g_render->repaint();
-        g_render->setTargetScreen();
+        XRender::repaint();
+        XRender::setTargetScreen();
         DoEvents();
         PGE_Delay(10);
     }
@@ -176,7 +176,7 @@ int GameMain(const CmdLineSetup_t &setup)
 #ifndef PGE_NO_THREADING
     gfxLoaderThreadingMode = true;
 #endif
-    g_window->show(); // Don't show window until playing an initial sound
+    XWindow::show(); // Don't show window until playing an initial sound
 
     if(!noSound)
     {
@@ -225,12 +225,12 @@ int GameMain(const CmdLineSetup_t &setup)
     LoadingInProcess = false;
 
     // Clear the screen
-    g_render->setTargetTexture();
-    g_render->clearBuffer();
-    g_render->repaint();
-    DoEvents();
+    XRender::setTargetTexture();
+    XRender::clearBuffer();
+    XRender::repaint();
+    XEvents::doEvents();
 
-    if(!neverPause && !g_window->hasWindowInputFocus())
+    if(!neverPause && !XWindow::hasWindowInputFocus())
         SoundPauseEngine(1);
 
     if(!setup.testLevel.empty() || !setup.testReplay.empty() || setup.interprocess) // Start level testing immediately!
@@ -264,13 +264,13 @@ int GameMain(const CmdLineSetup_t &setup)
     {
         if(GameMenu || MagicHand || LevelEditor)
         {
-            g_window->setCursor(AbstractWindow_t::CURSOR_NONE);
-            g_window->showCursor(0);
+            XWindow::setCursor(AbstractWindow_t::CURSOR_NONE);
+            XWindow::showCursor(0);
         }
         else if(!resChanged)
         {
-            g_window->setCursor(AbstractWindow_t::CURSOR_DEFAULT);
-            g_window->showCursor(1);
+            XWindow::setCursor(AbstractWindow_t::CURSOR_DEFAULT);
+            XWindow::showCursor(1);
         }
 
 //        If LevelEditor = True Then 'Load the level editor
@@ -593,9 +593,9 @@ int GameMain(const CmdLineSetup_t &setup)
 
                 LevelSelect = false;
 
-                g_render->setTargetTexture();
-                g_render->clearBuffer();
-                g_render->repaint();
+                XRender::setTargetTexture();
+                XRender::clearBuffer();
+                XRender::repaint();
 
                 ClearLevel();
 
@@ -621,9 +621,9 @@ int GameMain(const CmdLineSetup_t &setup)
                 }
                 else
                 {
-                    g_render->setTargetTexture();
-                    g_render->clearBuffer();
-                    g_render->repaint();
+                    XRender::setTargetTexture();
+                    XRender::clearBuffer();
+                    XRender::repaint();
                 }
             }
             else
@@ -909,17 +909,17 @@ void EditorLoop()
 void KillIt()
 {
     GameIsActive = false;
-#ifndef __ANDROID__
-    g_window->hide();
+#ifndef RENDER_FULLSCREEN_ALWAYS
+    XWindow::hide();
     if(resChanged)
         SetOrigRes();
 #else
-    g_render->clearBuffer();
-    g_render->repaint();
+    XRender::clearBuffer();
+    XRender::repaint();
 #endif
     QuitMixerX();
     UnloadGFX();
-    g_window->showCursor(1);
+    XWindow::showCursor(1);
 }
 
 
@@ -934,10 +934,10 @@ void NextLevel()
     LevelMacroCounter = 0;
     StopMusic();
     ClearLevel();
-    g_render->setTargetTexture();
-    g_render->clearBuffer();
-    g_render->repaint();
-    DoEvents();
+    XRender::setTargetTexture();
+    XRender::clearBuffer();
+    XRender::repaint();
+    XEvents::doEvents();
 
     if(!TestLevel && GoToLevel.empty() && !NoMap)
         PGE_Delay(500);
@@ -1063,7 +1063,7 @@ void UpdateMacro()
             EndLevel = true;
             LevelMacro = LEVELMACRO_OFF;
             LevelMacroCounter = 0;
-            g_render->clearBuffer();
+            XRender::clearBuffer();
         }
     }
     else if(LevelMacro == LEVELMACRO_KEYHOLE_EXIT)
@@ -1080,7 +1080,7 @@ void UpdateMacro()
 //            if(tempTime > (float)(gameTime + 0.01f) || tempTime < gameTime)
 
             if(g_compatibility.fix_keyhole_framerate)
-                DoEvents();
+                XEvents::doEvents();
 
             if(g_compatibility.fix_keyhole_framerate ?
                canProceedFrame() :
@@ -1091,7 +1091,7 @@ void UpdateMacro()
                 if(g_compatibility.fix_keyhole_framerate)
                     computeFrameTime1();
                 else
-                    DoEvents();
+                    XEvents::doEvents();
 
                 speedRun_tick();
                 UpdateGraphics();
@@ -1100,7 +1100,7 @@ void UpdateMacro()
 
                 if(g_compatibility.fix_keyhole_framerate)
                 {
-                    DoEvents();
+                    XEvents::doEvents();
                     computeFrameTime2();
                 }
 
@@ -1128,7 +1128,7 @@ void UpdateMacro()
         EndLevel = true;
         LevelMacro = LEVELMACRO_OFF;
         LevelMacroCounter = 0;
-        g_render->clearBuffer();
+        XRender::clearBuffer();
     }
     else if(LevelMacro == LEVELMACRO_CRYSTAL_BALL_EXIT)
     {
@@ -1158,7 +1158,7 @@ void UpdateMacro()
             EndLevel = true;
             LevelMacro = LEVELMACRO_OFF;
             LevelMacroCounter = 0;
-            g_render->clearBuffer();
+            XRender::clearBuffer();
         }
     }
     else if(LevelMacro == LEVELMACRO_GAME_COMPLETE_EXIT)
@@ -1200,7 +1200,7 @@ void UpdateMacro()
                 MenuMode = MENU_MAIN;
                 MenuCursor = 0;
             }
-            g_render->clearBuffer();
+            XRender::clearBuffer();
         }
     }
     else if(LevelMacro == LEVELMACRO_STAR_EXIT) // Star Exit
@@ -1416,12 +1416,12 @@ void CheckActive()
 //    If nPlay.Online = True Then Exit Sub
     // If LevelEditor = False And TestLevel = False Then Exit Sub
     // If LevelEditor = False Then Exit Sub
-    while(!g_window->hasWindowInputFocus())
+    while(!XWindow::hasWindowInputFocus())
     {
-        g_events->waitEvents();
+        XEvents::waitEvents();
 //        If LevelEditor = True Or MagicHand = True Then frmLevelWindow.vScreen(1).MousePointer = 0
         if(LevelEditor || MagicHand)
-            g_window->showCursor(0);
+            XWindow::showCursor(0);
 
         resetFrameTimer();
 
@@ -1624,11 +1624,11 @@ void StartBattleMode()
     LevelSelect = false;
     GameMenu = false;
     BattleMode = true;
-    g_render->setTargetTexture();
-    g_render->clearBuffer();
-    g_render->repaint();
+    XRender::setTargetTexture();
+    XRender::clearBuffer();
+    XRender::repaint();
     StopMusic();
-    DoEvents();
+    XEvents::doEvents();
     PGE_Delay(500);
     ClearLevel();
 

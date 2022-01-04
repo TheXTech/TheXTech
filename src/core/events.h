@@ -19,117 +19,84 @@
  */
 
 #pragma once
-#ifndef ABSTRACTEVENTS_T_H
-#define ABSTRACTEVENTS_T_H
+#ifndef EVENTS_HHHHHHH
+#define EVENTS_HHHHHHH
 
 #include <stdint.h>
 
-class FrmMain;
+#include <SDL2/SDL_stdinc.h>
+#include "base/events_base.h"
+
+#ifndef EVENTS_CUSTOM
+#   define E_INLINE SDL_FORCE_INLINE
+#   define TAIL
+#else
+#   define E_INLINE    extern
+#   define TAIL ;
+#endif
 
 
-enum MouseButton_t
+/*!
+ *  Events interface
+ */
+namespace XEvents
 {
-    MOUSE_BUTTON_NONE = 0,
-    MOUSE_BUTTON_LEFT,
-    MOUSE_BUTTON_MIDDLE,
-    MOUSE_BUTTON_RIGHT
-};
 
-struct MouseButtonEvent_t
+/*!
+ * \brief Process events
+ */
+E_INLINE void doEvents() TAIL
+
+#ifndef EVENTS_CUSTOM
 {
-    int button = MOUSE_BUTTON_NONE;
-};
+    g_events->doEvents();
+}
+#endif
 
-struct MouseMoveEvent_t
+/*!
+ * \brief Wait until any events will happen
+ */
+E_INLINE void waitEvents() TAIL
+
+#ifndef EVENTS_CUSTOM
 {
-    int x;
-    int y;
-};
+    g_events->waitEvents();
+}
+#endif
 
-struct MouseWheelEvent_t
+/*!
+ * \brief Get key state by scancode
+ * \param scan_code Scancode of the backend
+ * \return Key state value
+ */
+E_INLINE bool getKeyState(int scan_code) TAIL
+
+#ifndef EVENTS_CUSTOM
 {
-    int x;
-    int y;
-};
+    if(scan_code < 0)
+        return false;
+    return g_events->getKeyState(scan_code);
+}
+#endif
 
-enum KeyboardModifier_t
+/*!
+ * \brief Get the name of the key by scancode
+ * \param scan_code Scancode of the backend
+ * \return Human-readable name of the key
+ */
+E_INLINE const char *getScanCodeName(int scan_code) TAIL
+
+#ifndef EVENTS_CUSTOM
 {
-    KEYMOD_NONE = 0x0000,
-    KEYMOD_LSHIFT = 0x0001,
-    KEYMOD_RSHIFT = 0x0002,
-    KEYMOD_LCTRL = 0x0040,
-    KEYMOD_RCTRL = 0x0080,
-    KEYMOD_LALT = 0x0100,
-    KEYMOD_RALT = 0x0200,
+    return g_events->getScanCodeName(scan_code);
+}
+#endif
 
-    KEYMOD_CTRL = KEYMOD_LCTRL | KEYMOD_RCTRL,
-    KEYMOD_SHIFT = KEYMOD_LSHIFT | KEYMOD_RSHIFT,
-    KEYMOD_ALT = KEYMOD_LALT | KEYMOD_RALT,
-};
+} // XEvents
 
-struct KeyboardEvent_t
-{
-    int scancode;
-    int mod;
-};
+#ifndef EVENTS_CUSTOM
+#   undef E_INLINE
+#   undef TAIL
+#endif
 
-
-class AbstractEvents_t
-{
-    friend void SetOrigRes();
-
-    uint32_t m_lastMousePress = 0;
-
-protected:
-    FrmMain *m_form = nullptr;
-
-public:
-    AbstractEvents_t() = default;
-    virtual ~AbstractEvents_t() = default;
-
-    /*!
-     * \brief Initialize the events processor
-     * \param form Pointer to the main form
-     */
-    virtual void init(FrmMain *form);
-
-    /*!
-     * \brief Process events
-     */
-    virtual void doEvents() = 0;
-
-    /*!
-     * \brief Wait until any events will happen
-     */
-    virtual void waitEvents() = 0;
-
-    /*!
-     * \brief Get key state by scancode
-     * \param scan_code Scancode of the backend
-     * \return Key state value
-     */
-    virtual uint8_t getKeyState(int scan_code) = 0;
-
-    /*!
-     * \brief Get the name of the key by scancode
-     * \param scan_code Scancode of the backend
-     * \return Human-readable name of the key
-     */
-    virtual const char *getScanCodeName(int scan_code) = 0;
-
-
-protected:
-    void eventDoubleClick();
-    void eventKeyPress(int scan_code);
-    void eventKeyDown(const KeyboardEvent_t &evt);
-    void eventKeyUp(const KeyboardEvent_t &evt);
-    void eventMouseDown(const MouseButtonEvent_t &event);
-    void eventMouseMove(const MouseMoveEvent_t &event);
-    void eventMouseWheel(const MouseWheelEvent_t &event);
-    void eventMouseUp(const MouseButtonEvent_t &event);
-    void eventResize();
-};
-
-extern AbstractEvents_t *g_events;
-
-#endif // ABSTRACTEVENTS_T_H
+#endif // EVENTS_HHHHHHH

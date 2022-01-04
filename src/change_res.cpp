@@ -29,24 +29,24 @@
 
 void SetOrigRes()
 {
-    g_window->setFullScreen(false);
+    XWindow::setFullScreen(false);
     resChanged = false;
-    g_window->setWindowSize(ScreenW, ScreenH);
+    XWindow::setWindowSize(ScreenW, ScreenH);
 
 #ifdef __EMSCRIPTEN__
-    g_events->eventResize();
+    XEvents::eventResize();
 #endif
 
     if(LoadingInProcess)
         UpdateLoad();
 
     if(!GameMenu && !MagicHand)
-        g_window->showCursor(1);
+        XWindow::showCursor(1);
 }
 
 void ChangeRes(int, int, int, int)
 {
-    g_window->setFullScreen(true);
+    XWindow::setFullScreen(true);
 
     if(LoadingInProcess)
         UpdateLoad();

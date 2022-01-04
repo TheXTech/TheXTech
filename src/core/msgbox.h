@@ -19,52 +19,59 @@
  */
 
 #pragma once
-#ifndef ABSTRACTMSGBOX_H
-#define ABSTRACTMSGBOX_H
+#ifndef MSGBOX_HHHHH
+#define MSGBOX_HHHHH
 
-#include <string>
+#ifndef MSGBOX_CUSTOM
+#   include <SDL2/SDL_stdinc.h>
+#   define E_INLINE SDL_FORCE_INLINE
+#   define TAIL
+#   include "base/msgbox_base.h"
+#else
+#   define E_INLINE    extern
+#   define TAIL ;
+#endif
 
 
-class AbstractMsgBox_t
+/*!
+ *  Message boxinterface
+ */
+namespace XMsgBox
 {
-public:
-    AbstractMsgBox_t() = default;
-    virtual ~AbstractMsgBox_t() = default;
+/*!
+ * \brief Show the simple message box
+ * \param flags Message box flags
+ * \param title Title of the message box
+ * \param message Message text
+ * \return 0 on success or a negative error code on failure
+ */
+E_INLINE int simpleMsgBox(uint32_t flags, const std::string &title, const std::string &message) TAIL
+#ifndef MSGBOX_CUSTOM
+{
+    if(g_msgBox)
+        return g_msgBox->simpleMsgBox(flags, title, message);
+    return -1;
+}
+#endif
 
-    /*!
-     * \brief De-Initialize the message box
-     */
-    virtual void close() = 0;
+/*!
+ * \brief Show the error message box
+ * \param title Title of the message box
+ * \param message Text of the emssage box
+ */
+E_INLINE void errorMsgBox(const std::string &title, const std::string &message) TAIL
+#ifndef MSGBOX_CUSTOM
+{
+    if(g_msgBox)
+        g_msgBox->errorMsgBox(title, message);
+}
+#endif
 
-    enum MessageBoxFlags
-    {
-        MESSAGEBOX_ERROR                 = 0x00000010,   /**< error dialog */
-        MESSAGEBOX_WARNING               = 0x00000020,   /**< warning dialog */
-        MESSAGEBOX_INFORMATION           = 0x00000040,   /**< informational dialog */
-        MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT = 0x00000080,   /**< buttons placed left to right */
-        MESSAGEBOX_BUTTONS_RIGHT_TO_LEFT = 0x00000100    /**< buttons placed right to left */
-    };
+} // XMsgBox
 
-    /*!
-     * \brief Show the simple message box
-     * \param flags Message box flags
-     * \param title Title of the message box
-     * \param message Message text
-     * \return 0 on success or a negative error code on failure
-     */
-    virtual int simpleMsgBox(uint32_t flags, const std::string &title, const std::string &message) = 0;
+#ifndef MSGBOX_CUSTOM
+#   undef E_INLINE
+#   undef TAIL
+#endif
 
-    /*!
-     * \brief Show the error message box
-     * \param title Title of the message box
-     * \param message Text of the emssage box
-     */
-    virtual void errorMsgBox(const std::string &title, const std::string &message) = 0;
-};
-
-extern AbstractMsgBox_t *g_msgBox;
-
-extern int simpleMsgBox(uint32_t flags, const std::string &title, const std::string &message);
-extern void errorMsgBox(const std::string &title, const std::string &message);
-
-#endif // ABSTRACTMSGBOX_H
+#endif // MSGBOX_HHHHH

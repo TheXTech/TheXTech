@@ -27,6 +27,7 @@
 #include "main/game_info.h"
 #include "window_sdl.h"
 
+
 //! Path to game resources assets (by default it's ~/.PGE_Project/thextech/)
 extern std::string AppPath;
 

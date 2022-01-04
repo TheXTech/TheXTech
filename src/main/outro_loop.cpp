@@ -24,6 +24,7 @@
 #include "../globals.h"
 #include "../game_main.h"
 #include "../core/render.h"
+#include "../core/events.h"
 #include "../control/joystick.h"
 #include "../npc.h"
 #include "../blocks.h"
@@ -98,16 +99,16 @@ void DoCredits()
 //        for(A = 1; A <= 2; A++) // Useless loop
 //        {
         bool quitKey = false;
-        quitKey |= (getKeyState(vbKeyEscape) == KEY_PRESSED);
-        quitKey |= (getKeyState(vbKeySpace) == KEY_PRESSED);
-        quitKey |= (getKeyState(vbKeyReturn) == KEY_PRESSED);
+        quitKey |= XEvents::getKeyState(vbKeyEscape);
+        quitKey |= XEvents::getKeyState(vbKeySpace);
+        quitKey |= XEvents::getKeyState(vbKeyReturn);
         for(int p = 1; p <= maxLocalPlayers; ++p)
         {
             if(useJoystick[p] > 0)
                 quitKey |= joyIsKeyDown(useJoystick[p] - 1, conJoystick[p].Start);
         }
 #ifdef __ANDROID__ // Quit credits on BACK key press
-        quitKey |= (getKeyState(SDL_SCANCODE_AC_BACK) == KEY_PRESSED);
+        quitKey |= XEvents::getKeyState(SDL_SCANCODE_AC_BACK);
 #endif
 #ifdef USE_TOUCHSCREEN_CONTROLLER // Quit when pressed the "Start" on a touchscreen controller
         quitKey |= CurrentTouchControls().Start;
@@ -117,7 +118,7 @@ void DoCredits()
         {
             CreditChop = static_cast<float>(screenH_half);
             EndCredits = 0;
-            g_render->clearBuffer();
+            XRender::clearBuffer();
             SetupCredits();
             GameMenu = true;
             GameOutroDoQuit = true;

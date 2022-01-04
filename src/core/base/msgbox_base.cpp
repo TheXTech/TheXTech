@@ -18,12 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "window.h"
+#include "msgbox_base.h"
 
-AbstractWindow_t*g_window = nullptr;
 
-AbstractWindow_t::AbstractWindow_t()
-{}
-
-AbstractWindow_t::~AbstractWindow_t()
-{}
+AbstractMsgBox_t *g_msgBox = nullptr;

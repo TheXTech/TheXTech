@@ -19,43 +19,30 @@
  */
 
 #pragma once
-#ifndef WINDOWSDL_H
-#define WINDOWSDL_H
-
-#include <string>
-#include "window.h"
-#include "cmd_line_setup.h"
+#ifndef ABSTRACTWINDOW_T_H
+#define ABSTRACTWINDOW_T_H
 
 
-typedef struct SDL_Window SDL_Window;
-
-class WindowSDL : public AbstractWindow_t
+class AbstractWindow_t
 {
-    std::string m_windowTitle;
-    SDL_Window *m_window = nullptr;
-    Cursor_t m_cursor = CURSOR_DEFAULT;
-
 public:
-    WindowSDL();
-    virtual ~WindowSDL();
+    AbstractWindow_t();
+    virtual ~AbstractWindow_t();
 
-    bool initSDL(const CmdLineSetup_t &setup, uint32_t windowInitFlags);
-
-    void close() override;
-
-    SDL_Window *getWindow();
-
-    bool isSdlError();
+    /*!
+     * \brief De-Init the stuff and close
+     */
+    virtual void close() = 0;
 
     /*!
      * \brief Show the window
      */
-    void show() override;
+    virtual void show() = 0;
 
     /*!
      * \brief Hide the window
      */
-    void hide() override;
+    virtual void hide() = 0;
 
     /**
      *  \brief Toggle whether or not the cursor is shown.
@@ -65,63 +52,74 @@ public:
      *
      *  \return 1 if the cursor is shown, or 0 if the cursor is hidden.
      */
-    int showCursor(int show) override;
+    virtual int showCursor(int show) = 0;
+
+    /*!
+     * \brief Cursor type
+     */
+    enum Cursor_t
+    {
+        CURSOR_DEFAULT = 0,
+        CURSOR_NONE
+    };
 
     /*!
      * \brief Change the displayable cursor type
      * \param cursor cursor type
      */
-    void setCursor(Cursor_t cursor) override;
+    virtual void setCursor(Cursor_t cursor) = 0;
 
     /*!
      * \brief Get the current cursor type
      * \return Cursor type
      */
-    Cursor_t getCursor() override;
+    virtual Cursor_t getCursor() = 0;
 
     /*!
      * \brief Is full-screen mode active?
      * \return True if the full-screen mode works right now
      */
-    bool isFullScreen() override;
+    virtual bool isFullScreen() = 0;
 
     /*!
      * \brief Change between fullscreen and windowed modes
      * \param fs Fullscreen state
      * \return 1 when full-screen mode toggled, 0 when windowed mode toggled, -1 on any errors
      */
-    int setFullScreen(bool fs) override;
+    virtual int setFullScreen(bool fs) = 0;
 
     /*!
      * \brief Restore the size and position of a minimized or maximized window.
      */
-    void restoreWindow() override;
+    virtual void restoreWindow() = 0;
 
     /**
      * @brief Change window size
      * @param w Width
      * @param h Height
      */
-    void setWindowSize(int w, int h) override;
+    virtual void setWindowSize(int w, int h) = 0;
 
     /*!
      * \brief Get the current size of the window
      * \param w Width
      * \param h Height
      */
-    void getWindowSize(int *w, int *h) override;
+    virtual void getWindowSize(int *w, int *h) = 0;
 
     /*!
      * \brief Does window has an input focus?
      * \return true if window active
      */
-    bool hasWindowInputFocus() override;
+    virtual bool hasWindowInputFocus() = 0;
 
     /*!
      * \brief Does window has a mouse focus?
      * \return true if window has a mouse focus
      */
-    bool hasWindowMouseFocus() override;
+    virtual bool hasWindowMouseFocus() = 0;
 };
 
-#endif // WINDOWSDL_H
+extern AbstractWindow_t *g_window;
+
+#endif // ABSTRACTWINDOW_T_H

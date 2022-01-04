@@ -19,308 +19,404 @@
  */
 
 #pragma once
-#ifndef RENDER_H
-#define RENDER_H
+#ifndef RENDER_HHHHHH
+#define RENDER_HHHHHH
 
-#ifndef __EMSCRIPTEN__
-#include <deque>
-#endif
-#include <string>
-#include <gif_writer.h>
+#   include <SDL2/SDL_stdinc.h>
+#   include "base/render_base.h"
 
-#include "../std_picture.h"
-
-#ifndef __EMSCRIPTEN__
-#   define USE_SCREENSHOTS_AND_RECS
-#endif
-
-
-typedef struct SDL_Thread SDL_Thread;
-typedef struct SDL_mutex SDL_mutex;
-
-
-enum RendererFlip_t
-{
-    X_FLIP_NONE       = 0x00000000,    /**< Do not flip */
-    X_FLIP_HORIZONTAL = 0x00000001,    /**< flip horizontally */
-    X_FLIP_VERTICAL   = 0x00000002     /**< flip vertically */
-};
-
-struct FPoint_t
-{
-    float x;
-    float y;
-};
-
-
-class AbstractRender_t
-{
-    friend class FrmMain;
-
-    size_t m_lazyLoadedBytes = 0;
-
-protected:
-    //! Maximum texture width
-    int    m_maxTextureWidth = 0;
-    //! Maximum texture height
-    int    m_maxTextureHeight = 0;
-
-    int    ScaleWidth = 0;
-    int    ScaleHeight = 0;
-
-#ifdef __ANDROID__
-    bool m_blockRender = false;
+#ifndef RENDER_CUSTOM
+#   define E_INLINE SDL_FORCE_INLINE
+#   define TAIL
+#else
+#   define E_INLINE    extern
+#   define TAIL ;
 #endif
 
-public:
-    AbstractRender_t() = default;
-    virtual ~AbstractRender_t() = default;
+namespace XRender
+{
 
 
-    /*!
-     * \brief Flags needed to initialize SDL-based window
-     * \return Bitwise flags of SDL Window or 0 if no special flags set
-     */
-    virtual unsigned int SDL_InitFlags() = 0;
+/*!
+ * \brief Identify does render engine works or not
+ * \return true if render initialized and works
+ */
+E_INLINE bool isWorking() TAIL
+#ifndef RENDER_CUSTOM
+{
+    return g_render->isWorking();
+}
+#endif
+
+/*!
+ * \brief Call the repaint
+ */
+E_INLINE void repaint() TAIL
+#ifndef RENDER_CUSTOM
+{
+    g_render->repaint();
+}
+#endif
+
+/*!
+ * \brief Update viewport (mainly after screen resize)
+ */
+E_INLINE void updateViewport() TAIL
+#ifndef RENDER_CUSTOM
+{
+    g_render->updateViewport();
+}
+#endif
+
+/*!
+ * \brief Reset viewport into default state
+ */
+E_INLINE void resetViewport() TAIL
+#ifndef RENDER_CUSTOM
+{
+    g_render->resetViewport();
+}
+#endif
+
+/*!
+ * \brief Set the viewport area
+ * \param x X position
+ * \param y Y position
+ * \param w Viewport Width
+ * \param h Viewport Height
+ */
+E_INLINE void setViewport(int x, int y, int w, int h) TAIL
+#ifndef RENDER_CUSTOM
+{
+    g_render->setViewport(x, y, w, h);
+}
+#endif
+
+/*!
+ * \brief Set the render offset
+ * \param x X offset
+ * \param y Y offset
+ *
+ * All drawing objects will be drawn with a small offset
+ */
+E_INLINE void offsetViewport(int x, int y) TAIL // for screen-shaking
+#ifndef RENDER_CUSTOM
+{
+    g_render->offsetViewport(x, y);
+}
+#endif
+
+/*!
+ * \brief Set temporary ignore of render offset
+ * \param en Enable viewport offset ignore
+ *
+ * Use this to draw certain objects with ignorign of the GFX offset
+ */
+E_INLINE void offsetViewportIgnore(bool en) TAIL
+#ifndef RENDER_CUSTOM
+{
+    g_render->offsetViewportIgnore(en);
+}
+#endif
+
+/*!
+ * \brief Map absolute point coordinate into screen relative
+ * \param x Window X position
+ * \param y Window Y position
+ * \param dx Destinition on-screen X position
+ * \param dy Destinition on-screen Y position
+ */
+E_INLINE void mapToScreen(int x, int y, int *dx, int *dy) TAIL
+#ifndef RENDER_CUSTOM
+{
+    g_render->mapToScreen(x, y, dx, dy);
+}
+#endif
+
+/*!
+ * \brief Set render target into the E_INLINE in-game screen (use to render in-game world)
+ */
+E_INLINE void setTargetTexture() TAIL
+#ifndef RENDER_CUSTOM
+{
+    g_render->setTargetTexture();
+}
+#endif
+
+/*!
+ * \brief Set render target into the real window or screen (use to render on-screen buttons and other meta-info)
+ */
+E_INLINE void setTargetScreen() TAIL
+#ifndef RENDER_CUSTOM
+{
+    g_render->setTargetScreen();
+}
+#endif
 
 
-    /*!
-     * \brief Identify does render engine works or not
-     * \return true if render initialized and works
-     */
-    virtual bool isWorking() = 0;
 
-    /*!
-     * \brief Initialize defaults of the renderer
-     * \return false on error, true on success
-     */
-    virtual bool init();
+SDL_FORCE_INLINE StdPicture LoadPicture(const std::string &path,
+                                        const std::string &maskPath = std::string(),
+                                        const std::string &maskFallbackPath = std::string())
+{
+    return AbstractRender_t::LoadPicture(path, maskPath, maskFallbackPath);
+}
 
-    /*!
-     * \brief Close the renderer
-     */
-    virtual void close();
-
-    /*!
-     * \brief Call the repaint
-     */
-    virtual void repaint() = 0;
-
-    /*!
-     * \brief Update viewport (mainly after screen resize)
-     */
-    virtual void updateViewport() = 0;
-
-    /*!
-     * \brief Reset viewport into default state
-     */
-    virtual void resetViewport() = 0;
-
-    /*!
-     * \brief Set the viewport area
-     * \param x X position
-     * \param y Y position
-     * \param w Viewport Width
-     * \param h Viewport Height
-     */
-    virtual void setViewport(int x, int y, int w, int h) = 0;
-
-    /*!
-     * \brief Set the render offset
-     * \param x X offset
-     * \param y Y offset
-     *
-     * All drawing objects will be drawn with a small offset
-     */
-    virtual void offsetViewport(int x, int y) = 0; // for screen-shaking
-
-    /*!
-     * \brief Set temporary ignore of render offset
-     * \param en Enable viewport offset ignore
-     *
-     * Use this to draw certain objects with ignorign of the GFX offset
-     */
-    virtual void offsetViewportIgnore(bool en) = 0;
-
-    /*!
-     * \brief Map absolute point coordinate into screen relative
-     * \param x Window X position
-     * \param y Window Y position
-     * \param dx Destinition on-screen X position
-     * \param dy Destinition on-screen Y position
-     */
-    virtual void mapToScreen(int x, int y, int *dx, int *dy) = 0;
-
-    /*!
-     * \brief Set render target into the virtual in-game screen (use to render in-game world)
-     */
-    virtual void setTargetTexture() = 0;
-
-    /*!
-     * \brief Set render target into the real window or screen (use to render on-screen buttons and other meta-info)
-     */
-    virtual void setTargetScreen() = 0;
+SDL_FORCE_INLINE StdPicture lazyLoadPicture(const std::string &path,
+                                            const std::string &maskPath = std::string(),
+                                            const std::string &maskFallbackPath = std::string())
+{
+    return AbstractRender_t::lazyLoadPicture(path, maskPath, maskFallbackPath);
+}
 
 
 
+E_INLINE void loadTexture(StdPicture &target,
+                          uint32_t width,
+                          uint32_t height,
+                          uint8_t *RGBApixels,
+                          uint32_t pitch) TAIL
+#ifndef RENDER_CUSTOM
+{
+    g_render->loadTexture(target, width, height, RGBApixels, pitch);
+}
+#endif
 
-    // Load and unload textures
+SDL_FORCE_INLINE void lazyLoad(StdPicture &target)
+{
+    AbstractRender_t::lazyLoad(target);
+}
 
-    StdPicture LoadPicture(const std::string &path,
-                           const std::string &maskPath = std::string(),
-                           const std::string &maskFallbackPath = std::string());
+SDL_FORCE_INLINE void lazyUnLoad(StdPicture &target)
+{
+    AbstractRender_t::lazyUnLoad(target);
+}
 
-    StdPicture lazyLoadPicture(const std::string &path,
-                               const std::string &maskPath = std::string(),
-                               const std::string &maskFallbackPath = std::string());
+SDL_FORCE_INLINE void lazyPreLoad(StdPicture &target)
+{
+    AbstractRender_t::lazyPreLoad(target);
+}
 
-    virtual void loadTexture(StdPicture &target,
-                             uint32_t width,
-                             uint32_t height,
-                             uint8_t *RGBApixels,
-                             uint32_t pitch) = 0;
+SDL_FORCE_INLINE size_t lazyLoadedBytes()
+{
+    return AbstractRender_t::lazyLoadedBytes();
+}
 
-    void lazyLoad(StdPicture &target);
-    void lazyUnLoad(StdPicture &target);
-    void lazyPreLoad(StdPicture &target);
-
-    size_t lazyLoadedBytes();
-    void lazyLoadedBytesReset();
-
-    virtual void deleteTexture(StdPicture &tx, bool lazyUnload = false) = 0;
-    virtual void clearAllTextures() = 0;
-
-    virtual void clearBuffer() = 0;
+SDL_FORCE_INLINE void lazyLoadedBytesReset()
+{
+    AbstractRender_t::lazyLoadedBytesReset();
+}
 
 
 
+E_INLINE void deleteTexture(StdPicture &tx, bool lazyUnload = false) TAIL
+#ifndef RENDER_CUSTOM
+{
+    g_render->deleteTexture(tx, lazyUnload);
+}
+#endif
 
-    // Draw primitives
+E_INLINE void clearAllTextures() TAIL
+#ifndef RENDER_CUSTOM
+{
+    g_render->clearAllTextures();
+}
+#endif
 
-    virtual void renderRect(int x, int y, int w, int h,
-                            float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f,
-                            bool filled = true) = 0;
+E_INLINE void clearBuffer() TAIL
+#ifndef RENDER_CUSTOM
+{
+    g_render->clearBuffer();
+}
+#endif
 
-    virtual void renderRectBR(int _left, int _top, int _right,
-                              int _bottom, float red, float green, float blue, float alpha) = 0;
 
-    virtual void renderCircle(int cx, int cy,
+
+// Draw primitives
+
+E_INLINE void renderRect(int x, int y, int w, int h,
+                        float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f,
+                        bool filled = true) TAIL
+#ifndef RENDER_CUSTOM
+{
+    g_render->renderRect(x, y, w, h,
+                         red, green, blue, alpha,
+                         filled);
+}
+#endif
+
+E_INLINE void renderRectBR(int _left, int _top, int _right, int _bottom,
+                           float red, float green, float blue, float alpha) TAIL
+#ifndef RENDER_CUSTOM
+{
+    g_render->renderRectBR(_left, _top, _right, _bottom,
+                           red, green, blue, alpha);
+}
+#endif
+
+E_INLINE void renderCircle(int cx, int cy,
+                          int radius,
+                          float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f,
+                          bool filled = true) TAIL
+#ifndef RENDER_CUSTOM
+{
+    g_render->renderCircle(cx, cy,
+                           radius,
+                           red, green, blue, alpha,
+                           filled);
+}
+#endif
+
+E_INLINE void renderCircleHole(int cx, int cy,
                               int radius,
-                              float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f,
-                              bool filled = true) = 0;
-
-    virtual void renderCircleHole(int cx, int cy,
-                                  int radius,
-                                  float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f) =0;
-
-
-
-
-    // Draw texture
-
-    virtual void renderTextureScaleEx(double xDst, double yDst, double wDst, double hDst,
-                              StdPicture &tx,
-                              int xSrc, int ySrc,
-                              int wSrc, int hSrc,
-                              double rotateAngle = 0.0, FPoint_t *center = nullptr, unsigned int flip = X_FLIP_NONE,
-                              float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f) = 0;
-
-    virtual void renderTextureScale(double xDst, double yDst, double wDst, double hDst,
-                            StdPicture &tx,
-                            float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f) = 0;
-
-    virtual void renderTexture(double xDst, double yDst, double wDst, double hDst,
-                               StdPicture &tx,
-                               int xSrc, int ySrc,
-                               float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f) = 0;
-
-    virtual void renderTextureFL(double xDst, double yDst, double wDst, double hDst,
-                                 StdPicture &tx,
-                                 int xSrc, int ySrc,
-                                 double rotateAngle = 0.0, FPoint_t *center = nullptr, unsigned int flip = X_FLIP_NONE,
-                                 float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f) = 0;
-
-    virtual void renderTexture(float xDst, float yDst, StdPicture &tx,
-                               float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f) = 0;
-
-
-
-    // Retrieve raw pixel data
-
-    virtual void getScreenPixels(int x, int y, int w, int h, unsigned char *pixels) = 0;
-
-    virtual void getScreenPixelsRGBA(int x, int y, int w, int h, unsigned char *pixels) = 0;
-
-    virtual int  getPixelDataSize(const StdPicture &tx) = 0;
-
-    virtual void getPixelData(const StdPicture &tx, unsigned char *pixelData) = 0;
-
-
-
-    // Screenshots, GIF recordings, etc., etc.
-#ifdef __ANDROID__
-    bool renderBlocked();
-    void setBlockRender(bool b);
+                              float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f) TAIL
+#ifndef RENDER_CUSTOM
+{
+    g_render->renderCircleHole(cx, cy,
+                               radius,
+                               red, green, blue, alpha);
+}
 #endif
+
+
+// Draw texture
+
+E_INLINE void renderTextureScaleEx(double xDst, double yDst, double wDst, double hDst,
+                          StdPicture &tx,
+                          int xSrc, int ySrc,
+                          int wSrc, int hSrc,
+                          double rotateAngle = 0.0, FPoint_t *center = nullptr, unsigned int flip = X_FLIP_NONE,
+                          float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f) TAIL
+#ifndef RENDER_CUSTOM
+{
+    g_render->renderTextureScaleEx(xDst, yDst, wDst, hDst,
+                                   tx,
+                                   xSrc, ySrc,
+                                   wSrc, hSrc,
+                                   rotateAngle, center, flip,
+                                   red, green, blue, alpha);
+}
+#endif
+
+E_INLINE void renderTextureScale(double xDst, double yDst, double wDst, double hDst,
+                        StdPicture &tx,
+                        float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f) TAIL
+#ifndef RENDER_CUSTOM
+{
+    g_render->renderTextureScale(xDst, yDst, wDst, hDst,
+                                 tx,
+                                 red, green, blue, alpha);
+}
+#endif
+
+E_INLINE void renderTexture(double xDst, double yDst, double wDst, double hDst,
+                           StdPicture &tx,
+                           int xSrc, int ySrc,
+                           float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f) TAIL
+#ifndef RENDER_CUSTOM
+{
+    g_render->renderTexture(xDst, yDst, wDst, hDst,
+                            tx,
+                            xSrc, ySrc,
+                            red, green, blue, alpha);
+}
+#endif
+
+E_INLINE void renderTextureFL(double xDst, double yDst, double wDst, double hDst,
+                             StdPicture &tx,
+                             int xSrc, int ySrc,
+                             double rotateAngle = 0.0, FPoint_t *center = nullptr, unsigned int flip = X_FLIP_NONE,
+                             float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f) TAIL
+#ifndef RENDER_CUSTOM
+{
+    g_render->renderTextureFL(xDst, yDst, wDst, hDst,
+                              tx,
+                              xSrc, ySrc,
+                              rotateAngle, center, flip,
+                              red, green, blue, alpha);
+}
+#endif
+
+E_INLINE void renderTexture(float xDst, float yDst, StdPicture &tx,
+                           float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f) TAIL
+#ifndef RENDER_CUSTOM
+{
+    g_render->renderTexture(xDst, yDst, tx,
+                            red, green, blue, alpha);
+}
+#endif
+
+
+
+// Retrieve raw pixel data
+
+E_INLINE void getScreenPixels(int x, int y, int w, int h, unsigned char *pixels) TAIL
+#ifndef RENDER_CUSTOM
+{
+    g_render->getScreenPixels(x, y, w, h, pixels);
+}
+#endif
+
+E_INLINE void getScreenPixelsRGBA(int x, int y, int w, int h, unsigned char *pixels) TAIL
+#ifndef RENDER_CUSTOM
+{
+    g_render->getScreenPixelsRGBA(x, y, w, h, pixels);
+}
+#endif
+
+E_INLINE int  getPixelDataSize(const StdPicture &tx) TAIL
+#ifndef RENDER_CUSTOM
+{
+    return g_render->getPixelDataSize(tx);
+}
+#endif
+
+E_INLINE void getPixelData(const StdPicture &tx, unsigned char *pixelData) TAIL
+#ifndef RENDER_CUSTOM
+{
+    g_render->getPixelData(tx, pixelData);
+}
+#endif
+
+#ifdef USE_RENDER_BLOCKING
+SDL_FORCE_INLINE bool renderBlocked()
+{
+    return AbstractRender_t::renderBlocked();
+}
+
+SDL_FORCE_INLINE void setBlockRender(bool b)
+{
+    AbstractRender_t::setBlockRender();
+}
+#endif // USE_RENDER_BLOCKING
+
 
 #ifdef USE_SCREENSHOTS_AND_RECS
-    void makeShot();
 
-    static int makeShot_action(void *_pixels);
-    SDL_Thread *m_screenshot_thread = nullptr;
+SDL_FORCE_INLINE void makeShot()
+{
+    AbstractRender_t::makeShot();
+}
 
+SDL_FORCE_INLINE void toggleGifRecorder()
+{
+    AbstractRender_t::toggleGifRecorder();
+}
 
-    void drawBatteryStatus();
+SDL_FORCE_INLINE void processRecorder()
+{
+    AbstractRender_t::processRecorder();
+}
 
-    struct PGE_GL_shoot
-    {
-        AbstractRender_t *me = nullptr;
-        uint8_t *pixels = nullptr;
-        int pitch = 0;
-        int w = 0, h = 0;
-    };
-
-    struct GifRecorder
-    {
-        AbstractRender_t *m_self = nullptr;
-        GIF_H::GifWriter  writer      = {nullptr, nullptr, true, false};
-        SDL_Thread *worker      = nullptr;
-        uint32_t    delay       = 4;
-        uint32_t    delayTimer  = 0;
-        bool        enabled     = false;
-        unsigned char padding[7] = {0, 0, 0, 0, 0, 0, 0};
-        bool        fadeForward = true;
-        float       fadeValue = 0.5f;
-
-        std::deque<PGE_GL_shoot> queue;
-        SDL_mutex  *mutex = nullptr;
-        bool        doFinalize = false;
-
-        void init(AbstractRender_t *self);
-        void quit();
-
-        void drawRecCircle();
-        bool hasSome();
-        void enqueue(const PGE_GL_shoot &entry);
-        PGE_GL_shoot dequeue();
-    };
-
-    GifRecorder m_gif;
-
-    bool recordInProcess();
-    void toggleGifRecorder();
-    void processRecorder();
-    static int processRecorder_action(void *_recorder);
-
-    std::string m_screenshotPath;
-    std::string m_gifRecordPath;
 #endif // USE_SCREENSHOTS_AND_RECS
 
-};
+
+} // XRender
+
+#ifndef RENDER_CUSTOM
+#   undef E_INLINE
+#   undef TAIL
+#endif
 
 
-//! Globally available renderer instance
-extern AbstractRender_t* g_render;
-
-
-#endif // RENDER_H
+#endif // RENDER_HHHHHH

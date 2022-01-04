@@ -27,10 +27,10 @@
 
 #include "cmd_line_setup.h"
 
-#include "core/render.h"
-#include "core/window.h"
-#include "core/msgbox.h"
-#include "core/events.h"
+#include "core/base/render_base.h"
+#include "core/base/window_base.h"
+#include "core/base/msgbox_base.h"
+#include "core/base/events_base.h"
 
 
 class FrmMain

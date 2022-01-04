@@ -19,24 +19,31 @@
  */
 
 #pragma once
-#ifndef MSGBOXSDL_H
-#define MSGBOXSDL_H
+#ifndef ABSTRACTMSGBOX_H
+#define ABSTRACTMSGBOX_H
 
-#include "msgbox.h"
+#include <string>
 
-typedef struct SDL_Window SDL_Window;
 
-class MsgBoxSDL : public AbstractMsgBox_t
+class AbstractMsgBox_t
 {
-    SDL_Window *m_window = nullptr;
-
 public:
-    MsgBoxSDL();
-    ~MsgBoxSDL();
+    AbstractMsgBox_t() = default;
+    virtual ~AbstractMsgBox_t() = default;
 
-    void init(SDL_Window *ptr);
+    /*!
+     * \brief De-Initialize the message box
+     */
+    virtual void close() = 0;
 
-    void close() override;
+    enum MessageBoxFlags
+    {
+        MESSAGEBOX_ERROR                 = 0x00000010,   /**< error dialog */
+        MESSAGEBOX_WARNING               = 0x00000020,   /**< warning dialog */
+        MESSAGEBOX_INFORMATION           = 0x00000040,   /**< informational dialog */
+        MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT = 0x00000080,   /**< buttons placed left to right */
+        MESSAGEBOX_BUTTONS_RIGHT_TO_LEFT = 0x00000100    /**< buttons placed right to left */
+    };
 
     /*!
      * \brief Show the simple message box
@@ -45,14 +52,16 @@ public:
      * \param message Message text
      * \return 0 on success or a negative error code on failure
      */
-    int simpleMsgBox(uint32_t flags, const std::string &title, const std::string &message) override;
+    virtual int simpleMsgBox(uint32_t flags, const std::string &title, const std::string &message) = 0;
 
     /*!
      * \brief Show the error message box
      * \param title Title of the message box
      * \param message Text of the emssage box
      */
-    void errorMsgBox(const std::string &title, const std::string &message) override;
+    virtual void errorMsgBox(const std::string &title, const std::string &message) = 0;
 };
 
-#endif // MSGBOXSDL_H
+extern AbstractMsgBox_t *g_msgBox;
+
+#endif // ABSTRACTMSGBOX_H

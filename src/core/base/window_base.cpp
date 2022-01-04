@@ -18,21 +18,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "msgbox.h"
+#include "window_base.h"
 
+AbstractWindow_t*g_window = nullptr;
 
-AbstractMsgBox_t *g_msgBox = nullptr;
+AbstractWindow_t::AbstractWindow_t()
+{}
 
-
-int simpleMsgBox(uint32_t flags, const std::string &title, const std::string &message)
-{
-    if(g_msgBox)
-        return g_msgBox->simpleMsgBox(flags, title, message);
-    return -1;
-}
-
-void errorMsgBox(const std::string &title, const std::string &message)
-{
-    if(g_msgBox)
-        g_msgBox->errorMsgBox(title, message);
-}
+AbstractWindow_t::~AbstractWindow_t()
+{}

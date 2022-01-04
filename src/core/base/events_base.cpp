@@ -21,18 +21,23 @@
 #include <SDL2/SDL_scancode.h>
 #include <SDL2/SDL_timer.h>
 
-#include "events.h"
-#include "render.h"
-#include "window.h"
-#include "../control/joystick.h"
-#include "../globals.h"
-#include "../graphics.h"
-#include "../game_main.h"
-#include "../editor.h"
-#include "../frame_timer.h"
+#include "events_base.h"
+#include "window_base.h"
+#include "../render.h"
+#include "../window.h"
+#include "control/joystick.h"
+#include "globals.h"
+#include "graphics.h"
+#include "game_main.h"
+#include "editor.h"
+#include "frame_timer.h"
 
 
 AbstractEvents_t *g_events = nullptr;
+
+uint32_t AbstractEvents_t::m_lastMousePress = 0;
+FrmMain *AbstractEvents_t::m_form = nullptr;
+
 
 void AbstractEvents_t::init(FrmMain *form)
 {
@@ -47,12 +52,12 @@ void AbstractEvents_t::eventDoubleClick()
 #if !defined(__EMSCRIPTEN__) && !defined(__ANDROID__)
     if(resChanged)
     {
-        g_window->setFullScreen(false);
+        XWindow::setFullScreen(false);
         resChanged = false;
-        g_window->restoreWindow();
-        g_window->setWindowSize(ScreenW, ScreenH);
+        XWindow::restoreWindow();
+        XWindow::setWindowSize(ScreenW, ScreenH);
         if(!GameMenu && !MagicHand)
-            g_window->showCursor(1);
+            XWindow::showCursor(1);
     }
     else
         SetRes();
@@ -128,7 +133,7 @@ void AbstractEvents_t::eventKeyDown(const KeyboardEvent_t &evt)
 #   else
     else if(KeyCode == SDL_SCANCODE_F11)
 #   endif
-        g_render->toggleGifRecorder();
+        XRender::toggleGifRecorder();
 #endif // USE_SCREENSHOTS_AND_RECS
 }
 
@@ -178,7 +183,7 @@ void AbstractEvents_t::eventMouseDown(const MouseButtonEvent_t &event)
 void AbstractEvents_t::eventMouseMove(const MouseMoveEvent_t &event)
 {
     int px, py;
-    g_render->mapToScreen(event.x, event.y, &px, &py);
+    XRender::mapToScreen(event.x, event.y, &px, &py);
     MenuMouseX = px; //int(event.x * ScreenW / ScaleWidth);
     MenuMouseY = py; //int(event.y * ScreenH / ScaleHeight);
     MenuMouseMove = true;
@@ -221,7 +226,7 @@ void AbstractEvents_t::eventMouseUp(const MouseButtonEvent_t &event)
 
 void AbstractEvents_t::eventResize()
 {
-    g_render->updateViewport();
+    XRender::updateViewport();
     SetupScreens();
 #ifdef USE_TOUCHSCREEN_CONTROLLER
     UpdateTouchScreenSize();

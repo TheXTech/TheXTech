@@ -32,7 +32,7 @@ GFX_t GFX;
 void GFX_t::loadImage(StdPicture &img, const std::string &path)
 {
     pLogDebug("Loading texture %s...", path.c_str());
-    img = g_render->LoadPicture(path);
+    img = XRender::LoadPicture(path);
 
     if(!img.texture)
     {
@@ -161,7 +161,7 @@ bool GFX_t::load()
                                          "\n\n"
                                          "It's possible that you didn't installed the game assets package, or you had installed it at the incorrect directory.",
                                          getLogFilePath());
-        simpleMsgBox(AbstractMsgBox_t::MESSAGEBOX_ERROR, "UI image assets loading error", msg);
+        XMsgBox::simpleMsgBox(AbstractMsgBox_t::MESSAGEBOX_ERROR, "UI image assets loading error", msg);
         return false;
     }
 
@@ -171,6 +171,6 @@ bool GFX_t::load()
 void GFX_t::unLoad()
 {
     for(StdPicture *p : m_loadedImages)
-        g_render->deleteTexture(*p);
+        XRender::deleteTexture(*p);
     m_loadedImages.clear();
 }

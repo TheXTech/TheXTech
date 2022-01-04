@@ -41,16 +41,93 @@
 
 #include <chrono>
 
-#include "render.h"
+#include "render_base.h"
+#include "../render.h"
 #include "video.h"
 #include "globals.h"
 #include "sound.h"
 #include "graphics.h"
 
+#ifdef USE_SCREENSHOTS_AND_RECS
+#include <deque>
+#endif
+
 
 AbstractRender_t* g_render = nullptr;
 
+size_t AbstractRender_t::m_lazyLoadedBytes = 0;
+int    AbstractRender_t::m_maxTextureWidth = 0;
+int    AbstractRender_t::m_maxTextureHeight = 0;
 
+int    AbstractRender_t::ScaleWidth = 0;
+int    AbstractRender_t::ScaleHeight = 0;
+
+#ifdef USE_RENDER_BLOCKING
+bool   AbstractRender_t::m_blockRender = false;
+#endif
+
+
+#ifdef USE_SCREENSHOTS_AND_RECS
+
+static int makeShot_action(void *_pixels);
+static SDL_Thread *s_screenshot_thread = nullptr;
+
+static int processRecorder_action(void *_recorder);
+
+GifRecorder *AbstractRender_t::m_gif = nullptr;
+
+
+struct PGE_GL_shoot
+{
+    uint8_t *pixels = nullptr;
+    int pitch = 0;
+    int w = 0, h = 0;
+};
+
+struct GifRecorder
+{
+    AbstractRender_t *m_self = nullptr;
+    GIF_H::GifWriter  writer      = {nullptr, nullptr, true, false};
+    SDL_Thread *worker      = nullptr;
+    uint32_t    delay       = 4;
+    uint32_t    delayTimer  = 0;
+    bool        enabled     = false;
+    unsigned char padding[7] = {0, 0, 0, 0, 0, 0, 0};
+    bool        fadeForward = true;
+    float       fadeValue = 0.5f;
+
+    std::deque<PGE_GL_shoot> queue;
+    SDL_mutex  *mutex = nullptr;
+    bool        doFinalize = false;
+
+    void init(AbstractRender_t *self);
+    void quit();
+
+    void drawRecCircle();
+    bool hasSome();
+    void enqueue(const PGE_GL_shoot &entry);
+    PGE_GL_shoot dequeue();
+};
+
+#endif // USE_SCREENSHOTS_AND_RECS
+
+
+
+
+AbstractRender_t::AbstractRender_t()
+{
+#ifdef USE_SCREENSHOTS_AND_RECS
+    m_gif = new GifRecorder();
+#endif
+}
+
+AbstractRender_t::~AbstractRender_t()
+{
+#ifdef USE_SCREENSHOTS_AND_RECS
+    delete m_gif;
+    m_gif = nullptr;
+#endif
+}
 
 bool AbstractRender_t::init()
 {
@@ -58,10 +135,7 @@ bool AbstractRender_t::init()
     ScaleHeight = ScreenH;
 
 #ifdef USE_SCREENSHOTS_AND_RECS
-    m_screenshotPath = AppPathManager::screenshotsDir();
-    m_gifRecordPath = AppPathManager::gifRecordsDir();
-
-    m_gif.init(this);
+    m_gif->init(this);
 #endif
     return true;
 }
@@ -69,7 +143,7 @@ bool AbstractRender_t::init()
 void AbstractRender_t::close()
 {
 #ifdef USE_SCREENSHOTS_AND_RECS
-    m_gif.quit();
+    m_gif->quit();
 #endif
 }
 
@@ -179,7 +253,7 @@ StdPicture AbstractRender_t::LoadPicture(const std::string &path,
     target.frame_h = static_cast<int>(h);
     GLubyte *textura = reinterpret_cast<GLubyte *>(FreeImage_GetBits(sourceImage));
 
-    loadTexture(target, w, h, textura, pitch);
+    XRender::loadTexture(target, w, h, textura, pitch);
 
 #ifdef DEBUG_BUILD
     bindElapsed = bindingTime.nanoelapsed();
@@ -387,7 +461,7 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
 
     GLubyte *textura = reinterpret_cast<GLubyte *>(FreeImage_GetBits(sourceImage));
 
-    loadTexture(target, w, h, textura, pitch);
+    XRender::loadTexture(target, w, h, textura, pitch);
 
     GraphicsHelps::closeImage(sourceImage);
 }
@@ -396,7 +470,7 @@ void AbstractRender_t::lazyUnLoad(StdPicture &target)
 {
     if(!target.inited || !target.lazyLoaded || !target.texture)
         return;
-    deleteTexture(target, true);
+    XRender::deleteTexture(target, true);
 }
 
 void AbstractRender_t::lazyPreLoad(StdPicture &target)
@@ -416,7 +490,7 @@ void AbstractRender_t::lazyLoadedBytesReset()
 }
 
 
-#ifdef __ANDROID__
+#ifdef USE_RENDER_BLOCKING
 bool AbstractRender_t::renderBlocked()
 {
     return m_blockRender;
@@ -426,9 +500,87 @@ void AbstractRender_t::setBlockRender(bool b)
 {
     m_blockRender = b;
 }
+#endif // USE_RENDER_BLOCKING
+
+
+#ifdef USE_DRAW_BATTERY_STATUS
+void AbstractRender_t::drawBatteryStatus()
+{
+#ifdef USE_SDL_POWER
+    int secs, pct, status;
+    // Battery status
+    int bw = 40;
+    int bh = 22;
+    int bx = ScreenW - (bw + 8);
+    int by = 24;
+    int segmentsFullLen = 14;
+    int segments = 0;
+    float alhpa = 0.7f;
+    float alhpaB = 0.8f;
+    float r = 0.4f, g = 0.4f, b = 0.4f;
+    float br = 0.0f, bg = 0.0f, bb = 0.0f;
+    bool isLow = false;
+
+#ifndef RENDER_FULLSCREEN_ALWAYS
+    const bool isFullScreen = resChanged;
 #endif
 
+    if(g_videoSettings.batteryStatus == BATTERY_STATUS_OFF)
+        return;
 
+    status = SDL_GetPowerInfo(&secs, &pct);
+
+    if(status == SDL_POWERSTATE_NO_BATTERY || status == SDL_POWERSTATE_UNKNOWN)
+        return;
+
+    isLow = (pct <= 35);
+
+    if(status == SDL_POWERSTATE_CHARGED)
+    {
+        br = 0.f;
+        bg = 1.f;
+        bb = 0.f;
+    }
+    else if(status == SDL_POWERSTATE_CHARGING)
+    {
+        br = 1.f;
+        bg = 0.64f;
+        bb = 0.f;
+    }
+    else if(isLow)
+        br = 1.f;
+
+    segments = ((pct * segmentsFullLen) / 100) * 2;
+    if(segments == 0)
+        segments = 2;
+
+    bool showBattery = false;
+
+    showBattery |= (g_videoSettings.batteryStatus == BATTERY_STATUS_ALWAYS_ON);
+    showBattery |= (g_videoSettings.batteryStatus == BATTERY_STATUS_ANY_WHEN_LOW && isLow);
+#ifndef RENDER_FULLSCREEN_ALWAYS
+    showBattery |= (g_videoSettings.batteryStatus == BATTERY_STATUS_FULLSCREEN_WHEN_LOW && isLow && isFullScreen);
+    showBattery |= (g_videoSettings.batteryStatus == BATTERY_STATUS_FULLSCREEN_ON && isFullScreen);
+#else
+    showBattery |= (g_videoSettings.batteryStatus == BATTERY_STATUS_FULLSCREEN_WHEN_LOW && isLow);
+    showBattery |= (g_videoSettings.batteryStatus == BATTERY_STATUS_FULLSCREEN_ON);
+#endif
+
+    if(showBattery)
+    {
+        XRender::setTargetTexture();
+
+        XRender::renderRect(bx, by, bw - 4, bh, 0.f, 0.f, 0.f, alhpa, true);//Edge
+        XRender::renderRect(bx + 2, by + 2, bw - 8, bh - 4, r, g, b, alhpa, true);//Box
+        XRender::renderRect(bx + 36, by + 6, 4, 10, 0.f, 0.f, 0.f, alhpa, true);//Edge
+        XRender::renderRect(bx + 34, by + 8, 4, 6, r, g, b, alhpa, true);//Box
+        XRender::renderRect(bx + 4, by + 4, segments, 14, br, bg, bb, alhpaB / 2.f, true);//Level
+
+        XRender::setTargetScreen();
+    }
+#endif
+}
+#endif // USE_DRAW_BATTERY_STATUS
 
 
 /* --------------- Screenshots and GIF recording (not for Emscripten!) ----------------- */
@@ -470,33 +622,33 @@ static std::string shoot_getTimedString(const std::string &path, const char *ext
     }
 }
 
+
+
 void AbstractRender_t::makeShot()
 {
-    if(!isWorking())
+    if(!XRender::isWorking())
         return;
 
     const int w = ScaleWidth, h = ScaleHeight;
     uint8_t *pixels = new uint8_t[size_t(4 * w * h)];
-    getScreenPixelsRGBA(0, 0, w, h, pixels);
+    XRender::getScreenPixelsRGBA(0, 0, w, h, pixels);
     PGE_GL_shoot *shoot = new PGE_GL_shoot();
     shoot->pixels = pixels;
     shoot->w = w;
     shoot->h = h;
     shoot->pitch = w * 4;
-    shoot->me = this;
 
 #ifndef PGE_NO_THREADING
-    m_screenshot_thread = SDL_CreateThread(makeShot_action, "scrn_maker", reinterpret_cast<void *>(shoot));
+    s_screenshot_thread = SDL_CreateThread(makeShot_action, "scrn_maker", reinterpret_cast<void *>(shoot));
 #else
     makeShot_action(reinterpret_cast<void *>(shoot));
 #endif
 }
 
-
-int AbstractRender_t::makeShot_action(void *_pixels)
+static int makeShot_action(void *_pixels)
 {
     PGE_GL_shoot *shoot = reinterpret_cast<PGE_GL_shoot *>(_pixels);
-    AbstractRender_t *me = shoot->me;
+//    AbstractRender_t *me = shoot->me;
     FIBITMAP *shotImg = FreeImage_AllocateT(FIT_BITMAP, shoot->w, shoot->h, 32);
 
     if(!shotImg)
@@ -504,7 +656,7 @@ int AbstractRender_t::makeShot_action(void *_pixels)
         delete []shoot->pixels;
         shoot->pixels = nullptr;
         delete shoot;
-        me->m_screenshot_thread = nullptr;
+        s_screenshot_thread = nullptr;
         return 0;
     }
 
@@ -526,10 +678,10 @@ int AbstractRender_t::makeShot_action(void *_pixels)
         }
     }
 
-    if(!DirMan::exists(me->m_screenshotPath))
-        DirMan::mkAbsPath(me->m_screenshotPath);
+    if(!DirMan::exists(AppPathManager::screenshotsDir()))
+        DirMan::mkAbsPath(AppPathManager::screenshotsDir());
 
-    std::string saveTo = shoot_getTimedString(me->m_screenshotPath, "png");
+    std::string saveTo = shoot_getTimedString(AppPathManager::screenshotsDir(), "png");
     pLogDebug("%s %d %d", saveTo.c_str(), shoot->w, shoot->h);
 
     if(FreeImage_HasPixels(shotImg) == FALSE)
@@ -549,123 +701,45 @@ int AbstractRender_t::makeShot_action(void *_pixels)
     shoot->pixels = nullptr;
     delete shoot;
 
-    me->m_screenshot_thread = nullptr;
+    s_screenshot_thread = nullptr;
     return 0;
-}
-
-
-void AbstractRender_t::drawBatteryStatus()
-{
-#ifdef USE_SDL_POWER
-    int secs, pct, status;
-    // Battery status
-    int bw = 40;
-    int bh = 22;
-    int bx = ScreenW - (bw + 8);
-    int by = 24;
-    int segmentsFullLen = 14;
-    int segments = 0;
-    float alhpa = 0.7f;
-    float alhpaB = 0.8f;
-    float r = 0.4f, g = 0.4f, b = 0.4f;
-    float br = 0.0f, bg = 0.0f, bb = 0.0f;
-    bool isLow = false;
-
-#ifndef __ANDROID__
-    const bool isFullScreen = resChanged;
-#endif
-
-    if(g_videoSettings.batteryStatus == BATTERY_STATUS_OFF)
-        return;
-
-    status = SDL_GetPowerInfo(&secs, &pct);
-
-    if(status == SDL_POWERSTATE_NO_BATTERY || status == SDL_POWERSTATE_UNKNOWN)
-        return;
-
-    isLow = (pct <= 35);
-
-    if(status == SDL_POWERSTATE_CHARGED)
-    {
-        br = 0.f;
-        bg = 1.f;
-        bb = 0.f;
-    }
-    else if(status == SDL_POWERSTATE_CHARGING)
-    {
-        br = 1.f;
-        bg = 0.64f;
-        bb = 0.f;
-    }
-    else if(isLow)
-        br = 1.f;
-
-    segments = ((pct * segmentsFullLen) / 100) * 2;
-    if(segments == 0)
-        segments = 2;
-
-    bool showBattery = false;
-
-    showBattery |= (g_videoSettings.batteryStatus == BATTERY_STATUS_ALWAYS_ON);
-    showBattery |= (g_videoSettings.batteryStatus == BATTERY_STATUS_ANY_WHEN_LOW && isLow);
-#ifndef __ANDROID__
-    showBattery |= (g_videoSettings.batteryStatus == BATTERY_STATUS_FULLSCREEN_WHEN_LOW && isLow && isFullScreen);
-    showBattery |= (g_videoSettings.batteryStatus == BATTERY_STATUS_FULLSCREEN_ON && isFullScreen);
-#else
-    showBattery |= (g_videoSettings.batteryStatus == BATTERY_STATUS_FULLSCREEN_WHEN_LOW && isLow);
-    showBattery |= (g_videoSettings.batteryStatus == BATTERY_STATUS_FULLSCREEN_ON);
-#endif
-
-    if(showBattery)
-    {
-        setTargetTexture();
-
-        renderRect(bx, by, bw - 4, bh, 0.f, 0.f, 0.f, alhpa, true);//Edge
-        renderRect(bx + 2, by + 2, bw - 8, bh - 4, r, g, b, alhpa, true);//Box
-        renderRect(bx + 36, by + 6, 4, 10, 0.f, 0.f, 0.f, alhpa, true);//Edge
-        renderRect(bx + 34, by + 8, 4, 6, r, g, b, alhpa, true);//Box
-        renderRect(bx + 4, by + 4, segments, 14, br, bg, bb, alhpaB / 2.f, true);//Level
-
-        setTargetScreen();
-    }
-#endif
 }
 
 bool AbstractRender_t::recordInProcess()
 {
-    return m_gif.enabled;
+    return m_gif->enabled;
 }
 
 void AbstractRender_t::toggleGifRecorder()
 {
     UNUSED(GIF_H::GifOverwriteLastDelay);// shut up a warning about unused function
 
-    if(!m_gif.enabled)
+    if(!m_gif->enabled)
     {
-        if(!DirMan::exists(m_gifRecordPath))
-            DirMan::mkAbsPath(m_gifRecordPath);
+        if(!DirMan::exists(AppPathManager::gifRecordsDir()))
+            DirMan::mkAbsPath(AppPathManager::gifRecordsDir());
 
-        std::string saveTo = shoot_getTimedString(m_gifRecordPath, "gif");
+        std::string saveTo = shoot_getTimedString(AppPathManager::gifRecordsDir(), "gif");
 
-        if(m_gif.worker)
-            SDL_WaitThread(m_gif.worker, nullptr);
-        m_gif.worker = nullptr;
+        if(m_gif->worker)
+            SDL_WaitThread(m_gif->worker, nullptr);
+        m_gif->worker = nullptr;
 
         FILE *gifFile = Files::utf8_fopen(saveTo.data(), "wb");
-        if(GIF_H::GifBegin(&m_gif.writer, gifFile, ScreenW, ScreenH, m_gif.delay, false))
+        if(GIF_H::GifBegin(&m_gif->writer, gifFile, ScreenW, ScreenH, m_gif->delay, false))
         {
-            m_gif.enabled = true;
-            m_gif.doFinalize = false;
+            m_gif->enabled = true;
+            m_gif->doFinalize = false;
             PlaySound(SFX_PlayerGrow);
         }
 
-        m_gif.worker = SDL_CreateThread(processRecorder_action, "gif_recorder", reinterpret_cast<void *>(&m_gif));
+        m_gif->worker = SDL_CreateThread(processRecorder_action, "gif_recorder", reinterpret_cast<void *>(m_gif));
     }
     else
     {
-        if(!m_gif.doFinalize)
+        if(!m_gif->doFinalize)
         {
-            m_gif.doFinalize = true;
+            m_gif->doFinalize = true;
             PlaySound(SFX_PlayerShrink);
         }
         else
@@ -677,18 +751,20 @@ void AbstractRender_t::toggleGifRecorder()
 
 void AbstractRender_t::processRecorder()
 {
-    if(!m_gif.enabled)
+    if(!m_gif->enabled)
         return;
 
-    setTargetTexture();
+    XRender::setTargetTexture();
 
-    m_gif.delayTimer += int(1000.0 / 65.0);
-    if(m_gif.delayTimer >= m_gif.delay * 10)
-        m_gif.delayTimer = 0.0;
-    if(m_gif.doFinalize || (m_gif.delayTimer != 0.0))
+    m_gif->delayTimer += int(1000.0 / 65.0);
+
+    if(m_gif->delayTimer >= m_gif->delay * 10)
+        m_gif->delayTimer = 0.0;
+
+    if(m_gif->doFinalize || (m_gif->delayTimer != 0.0))
     {
-        m_gif.drawRecCircle();
-        setTargetScreen();
+        m_gif->drawRecCircle();
+        XRender::setTargetScreen();
         return;
     }
 
@@ -698,26 +774,25 @@ void AbstractRender_t::processRecorder()
     if(!pixels)
     {
         pLogCritical("Can't allocate memory for a next GIF frame: out of memory");
-        setTargetScreen();
+        XRender::setTargetScreen();
         return; // Drop frame (out of memory)
     }
 
-    getScreenPixelsRGBA(0, 0, w, h, pixels);
+    XRender::getScreenPixelsRGBA(0, 0, w, h, pixels);
 
     PGE_GL_shoot shoot;
     shoot.pixels = pixels;
     shoot.w = w;
     shoot.h = h;
     shoot.pitch = w * 4;
-    shoot.me = this;
 
-    m_gif.enqueue(shoot);
+    m_gif->enqueue(shoot);
 
-    m_gif.drawRecCircle();
-    setTargetScreen();
+    m_gif->drawRecCircle();
+    XRender::setTargetScreen();
 }
 
-int AbstractRender_t::processRecorder_action(void *_recorder)
+static int processRecorder_action(void *_recorder)
 {
     GifRecorder *recorder = reinterpret_cast<GifRecorder *>(_recorder);
 
@@ -748,13 +823,14 @@ int AbstractRender_t::processRecorder_action(void *_recorder)
     return 0;
 }
 
-void AbstractRender_t::GifRecorder::init(AbstractRender_t *self)
+void GifRecorder::init(AbstractRender_t *self)
 {
     m_self = self;
-    mutex = SDL_CreateMutex();
+    if(!mutex)
+        mutex = SDL_CreateMutex();
 }
 
-void AbstractRender_t::GifRecorder::quit()
+void GifRecorder::quit()
 {
     if(enabled)
     {
@@ -765,11 +841,12 @@ void AbstractRender_t::GifRecorder::quit()
         worker = nullptr; // and only then, quit a thing
     }
 
-    SDL_DestroyMutex(mutex);
+    if(mutex)
+        SDL_DestroyMutex(mutex);
     mutex = nullptr;
 }
 
-void AbstractRender_t::GifRecorder::drawRecCircle()
+void GifRecorder::drawRecCircle()
 {
     if(fadeForward)
     {
@@ -806,7 +883,7 @@ void AbstractRender_t::GifRecorder::drawRecCircle()
     m_self->offsetViewportIgnore(false);
 }
 
-bool AbstractRender_t::GifRecorder::hasSome()
+bool GifRecorder::hasSome()
 {
     SDL_LockMutex(mutex);
     bool ret = !queue.empty();
@@ -814,14 +891,14 @@ bool AbstractRender_t::GifRecorder::hasSome()
     return ret;
 }
 
-void AbstractRender_t::GifRecorder::enqueue(const PGE_GL_shoot &entry)
+void GifRecorder::enqueue(const PGE_GL_shoot &entry)
 {
     SDL_LockMutex(mutex);
     queue.push_back(entry);
     SDL_UnlockMutex(mutex);
 }
 
-AbstractRender_t::PGE_GL_shoot AbstractRender_t::GifRecorder::dequeue()
+PGE_GL_shoot GifRecorder::dequeue()
 {
     SDL_LockMutex(mutex);
     PGE_GL_shoot ret = queue.front();

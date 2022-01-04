@@ -20,9 +20,6 @@
 
 #include <SDL2/SDL_version.h>
 #include <SDL2/SDL_render.h>
-#ifdef __ANDROID__
-#include <SDL2/SDL_assert.h>
-#endif
 
 #include <FreeImageLite.h>
 #include <Logger/logger.h>
@@ -30,7 +27,11 @@
 
 #include "render_sdl.h"
 #include "video.h"
-#include "window.h"
+#include "../window.h"
+
+#ifdef USE_RENDER_BLOCKING
+#include <SDL2/SDL_assert.h>
+#endif
 
 #include "control/joystick.h"
 
@@ -49,9 +50,7 @@
 
 RenderSDL::RenderSDL() :
     AbstractRender_t()
-{
-    AbstractRender_t::init();
-}
+{}
 
 RenderSDL::~RenderSDL()
 {
@@ -160,7 +159,7 @@ void RenderSDL::close()
 
 void RenderSDL::repaint()
 {
-#ifdef __ANDROID__
+#ifdef USE_RENDER_BLOCKING
     if(m_blockRender)
         return;
 #endif
@@ -170,8 +169,11 @@ void RenderSDL::repaint()
 
     setTargetScreen();
 
-#ifndef __EMSCRIPTEN__
+#ifdef USE_SCREENSHOTS_AND_RECS
     processRecorder();
+#endif
+
+#ifdef USE_DRAW_BATTERY_STATUS
     drawBatteryStatus();
 #endif
 
@@ -224,11 +226,11 @@ void RenderSDL::updateViewport()
     int   wi, hi;
 
 #ifndef __EMSCRIPTEN__
-    g_window->getWindowSize(&wi, &hi);
+    XWindow::getWindowSize(&wi, &hi);
 #else
-    if(g_window->isFullScreen())
+    if(XWindow::isFullScreen())
     {
-        g_window->getWindowSize(&wi, &hi);
+        XWindow::getWindowSize(&wi, &hi);
     }
     else
     {
@@ -422,7 +424,7 @@ void RenderSDL::clearAllTextures()
 
 void RenderSDL::clearBuffer()
 {
-#ifdef __ANDROID__
+#ifdef USE_RENDER_BLOCKING
     SDL_assert(!m_blockRender);
 #endif
     SDL_SetRenderDrawColor(m_gRenderer, 0, 0, 0, 255);
@@ -431,7 +433,7 @@ void RenderSDL::clearBuffer()
 
 void RenderSDL::renderRect(int x, int y, int w, int h, float red, float green, float blue, float alpha, bool filled)
 {
-#ifdef __ANDROID__
+#ifdef USE_RENDER_BLOCKING
     SDL_assert(!m_blockRender);
 #endif
     SDL_Rect aRect = {x + m_viewport_offset_x,
@@ -452,7 +454,7 @@ void RenderSDL::renderRect(int x, int y, int w, int h, float red, float green, f
 
 void RenderSDL::renderRectBR(int _left, int _top, int _right, int _bottom, float red, float green, float blue, float alpha)
 {
-#ifdef __ANDROID__
+#ifdef USE_RENDER_BLOCKING
     SDL_assert(!m_blockRender);
 #endif
     SDL_Rect aRect = {_left + m_viewport_offset_x,
@@ -469,7 +471,7 @@ void RenderSDL::renderRectBR(int _left, int _top, int _right, int _bottom, float
 
 void RenderSDL::renderCircle(int cx, int cy, int radius, float red, float green, float blue, float alpha, bool filled)
 {
-#ifdef __ANDROID__
+#ifdef USE_RENDER_BLOCKING
     SDL_assert(!m_blockRender);
 #endif
     UNUSED(filled);
@@ -512,7 +514,7 @@ void RenderSDL::renderCircle(int cx, int cy, int radius, float red, float green,
 
 void RenderSDL::renderCircleHole(int cx, int cy, int radius, float red, float green, float blue, float alpha)
 {
-#ifdef __ANDROID__
+#ifdef USE_RENDER_BLOCKING
     SDL_assert(!m_blockRender);
 #endif
 
@@ -597,7 +599,7 @@ void RenderSDL::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, d
                                        double rotateAngle, FPoint_t *center, unsigned int flip,
                                        float red, float green, float blue, float alpha)
 {
-#ifdef __ANDROID__
+#ifdef USE_RENDER_BLOCKING
     SDL_assert(!m_blockRender);
 #endif
     if(!tx.inited)
@@ -664,7 +666,7 @@ void RenderSDL::renderTextureScale(double xDst, double yDst, double wDst, double
                                      StdPicture &tx,
                                      float red, float green, float blue, float alpha)
 {
-#ifdef __ANDROID__
+#ifdef USE_RENDER_BLOCKING
     SDL_assert(!m_blockRender);
 #endif
     const unsigned int flip = SDL_FLIP_NONE;
@@ -709,7 +711,7 @@ void RenderSDL::renderTexture(double xDstD, double yDstD, double wDstD, double h
                                 int xSrc, int ySrc,
                                 float red, float green, float blue, float alpha)
 {
-#ifdef __ANDROID__
+#ifdef USE_RENDER_BLOCKING
     SDL_assert(!m_blockRender);
 #endif
     if(!tx.inited)
@@ -774,7 +776,7 @@ void RenderSDL::renderTextureFL(double xDstD, double yDstD, double wDstD, double
                                   double rotateAngle, FPoint_t *center, unsigned int flip,
                                   float red, float green, float blue, float alpha)
 {
-#ifdef __ANDROID__
+#ifdef USE_RENDER_BLOCKING
     SDL_assert(!m_blockRender);
 #endif
     if(!tx.inited)
@@ -843,7 +845,7 @@ void RenderSDL::renderTexture(float xDst, float yDst,
                                 StdPicture &tx,
                                 float red, float green, float blue, float alpha)
 {
-#ifdef __ANDROID__
+#ifdef USE_RENDER_BLOCKING
     SDL_assert(!m_blockRender);
 #endif
     const unsigned int flip = SDL_FLIP_NONE;

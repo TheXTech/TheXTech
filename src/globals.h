@@ -71,16 +71,15 @@ extern bool GameIsActive;
 //! Path to game resources assets (by default it's ~/.PGE_Project/thextech/)
 extern std::string AppPath;
 
-/**
- * @brief Process internal events (mouse, keyboard, joysticks, window's update, OS communications, etc.)
- */
-extern void DoEvents();
 
-extern Uint8 getKeyState(int key);
-extern Uint8 getKeyStateI(int key);
+// Process internal events (mouse, keyboard, joysticks, window's update, OS communications, etc.)
+//extern void DoEvents(); /* Replaced with "XEvents::doEvents()" from `core/events.h` */
+
+//extern Uint8 getKeyState(int key);
+//extern Uint8 getKeyStateI(int key);
 
 //Public Const KEY_PRESSED As Integer = &H1000    'For control information
-const int KEY_PRESSED = 1;
+//const int KEY_PRESSED = 1;
 
 /**
  * @brief Get name of key from a keycode

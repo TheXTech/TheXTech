@@ -35,7 +35,7 @@ void DrawInterface(int Z, int numScreens)
     std::string livesStr = std::to_string(int(Lives));
     std::string numStarsStr = std::to_string(numStars);
 
-    g_render->offsetViewportIgnore(true);
+    XRender::offsetViewportIgnore(true);
 
     if(ScreenType == 5 || ScreenType == 6) // 2 Players
     {
@@ -55,27 +55,27 @@ void DrawInterface(int Z, int numScreens)
                     int hGfx;
 
                     hGfx = Player[B].Hearts > 0 ? 1 : 2;
-                    g_render->renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[hGfx].w / 2 + C - 32 + 17 * D, 16,
+                    XRender::renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[hGfx].w / 2 + C - 32 + 17 * D, 16,
                                             GFX.Heart[hGfx].w, GFX.Heart[hGfx].h,
                                             GFX.Heart[hGfx], 0, 0);
 
                     hGfx = Player[B].Hearts > 1 ? 1 : 2;
-                    g_render->renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[hGfx].w / 2 + C + 17 * D, 16,
+                    XRender::renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[hGfx].w / 2 + C + 17 * D, 16,
                                             GFX.Heart[hGfx].w, GFX.Heart[hGfx].h,
                                             GFX.Heart[hGfx], 0, 0);
 
                     hGfx = Player[B].Hearts > 2 ? 1 : 2;
-                    g_render->renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[hGfx].w / 2 + C + 32 + 17 * D, 16,
+                    XRender::renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[hGfx].w / 2 + C + 32 + 17 * D, 16,
                                             GFX.Heart[hGfx].w, GFX.Heart[hGfx].h,
                                             GFX.Heart[hGfx], 0, 0);
                 }
                 else
                 {
                     // 2 players 1 screen heldbonus
-                    g_render->renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C, 16, GFX.Container[1].w, GFX.Container[1].h, GFX.Container[Player[B].Character], 0, 0);
+                    XRender::renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C, 16, GFX.Container[1].w, GFX.Container[1].h, GFX.Container[Player[B].Character], 0, 0);
                     if(Player[B].HeldBonus > 0)
                     {
-                        g_render->renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C + 12, 16 + 12,
+                        XRender::renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C + 12, 16 + 12,
                                                 NPCWidth[Player[B].HeldBonus], NPCHeight[Player[B].HeldBonus],
                                                 GFXNPC[Player[B].HeldBonus], 0, 0);
                     }
@@ -88,8 +88,8 @@ void DrawInterface(int Z, int numScreens)
 
                 if(Player[B].Character == 5 && Player[B].Bombs > 0)
                 {
-                    g_render->renderTexture(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 - 34 + C, 52, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[8], 0, 0);
-                    g_render->renderTexture(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 - 10 + C, 53, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+                    XRender::renderTexture(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 - 34 + C, 52, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[8], 0, 0);
+                    XRender::renderTexture(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 - 10 + C, 53, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
                     SuperPrint(std::to_string(Player[B].Bombs), 1,
                                float(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 12 + C),
                                53);
@@ -103,19 +103,19 @@ void DrawInterface(int Z, int numScreens)
                 // Print coins on the screen
                 if(Player[1].HasKey || Player[2].HasKey)
                 {
-                    g_render->renderTexture(-24 + 40 + 20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96, 16 + 10, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[0], 0, 0);
+                    XRender::renderTexture(-24 + 40 + 20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96, 16 + 10, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[0], 0, 0);
                 }
 
                 if(Player[1].Character == 5)
                 {
-                    g_render->renderTexture(40 + 20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96, 16 + 10, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[6], 0, 0);
+                    XRender::renderTexture(40 + 20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96, 16 + 10, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[6], 0, 0);
                 }
                 else
                 {
-                    g_render->renderTexture(40 + 20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96, 16 + 10, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[2], 0, 0);
+                    XRender::renderTexture(40 + 20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96, 16 + 10, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[2], 0, 0);
                 }
 
-                g_render->renderTexture(40 + 20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96 + 8 + GFX.Interface[2].w, 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+                XRender::renderTexture(40 + 20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96 + 8 + GFX.Interface[2].w, 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
 
                 SuperPrint(coinsStr, 1,
                            40 + 20 - (int(coinsStr.size()) * 18) +
@@ -128,8 +128,8 @@ void DrawInterface(int Z, int numScreens)
                            16 + 31);
 
                 // Print lives on the screen
-                g_render->renderTexture(-80 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 - 16, 16 + 10, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0);
-                g_render->renderTexture(-80 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 10 + GFX.Interface[1].w, 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+                XRender::renderTexture(-80 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 - 16, 16 + 10, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0);
+                XRender::renderTexture(-80 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 10 + GFX.Interface[1].w, 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
 
                 SuperPrint(livesStr, 1,
                            float(-80 + (vScreen[Z].Width / 2.0) - (GFX.Container[1].w / 2) + C - 122 + 12 + 18 + GFX.Interface[5].w),
@@ -137,8 +137,8 @@ void DrawInterface(int Z, int numScreens)
                 // Print stars on the screen
                 if(numStars > 0)
                 {
-                    g_render->renderTexture(-80 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122, 16 + 30, GFX.Interface[5].w, GFX.Interface[5].h, GFX.Interface[5], 0, 0);
-                    g_render->renderTexture(-80 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 10 + GFX.Interface[1].w, 16 + 31, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+                    XRender::renderTexture(-80 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122, 16 + 30, GFX.Interface[5].w, GFX.Interface[5].h, GFX.Interface[5], 0, 0);
+                    XRender::renderTexture(-80 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 10 + GFX.Interface[1].w, 16 + 31, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
                     SuperPrint(numStarsStr, 1,
                                float(-80 + (vScreen[Z].Width / 2.0) - (GFX.Container[1].w / 2) + C - 122 + 12 + 18 + GFX.Interface[5].w),
                                16 + 31);
@@ -147,15 +147,15 @@ void DrawInterface(int Z, int numScreens)
             else
             {
                 // plr 1 score
-                g_render->renderTexture(-80 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 - 16, 16 + 10, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0);
-                g_render->renderTexture(-80 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 10 + GFX.Interface[1].w, 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+                XRender::renderTexture(-80 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 - 16, 16 + 10, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0);
+                XRender::renderTexture(-80 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 10 + GFX.Interface[1].w, 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
                 SuperPrint(std::to_string(BattleLives[1]), 1,
                            float(-80 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 12 + 18 + GFX.Interface[5].w),
                            16 + 11);
 
                 // plr 2 score
-                g_render->renderTexture(40 + 20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96 - 16, 16 + 10, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[7], 0, 0);
-                g_render->renderTexture(40 + 20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96 + 8 + GFX.Interface[2].w, 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+                XRender::renderTexture(40 + 20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96 - 16, 16 + 10, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[7], 0, 0);
+                XRender::renderTexture(40 + 20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96 + 8 + GFX.Interface[2].w, 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
                 SuperPrint(std::to_string(BattleLives[2]), 1,
                            float(24 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 80 + 4 + 12 + 18 + 32 + GFX.Interface[3].w),
                            16 + 11);
@@ -171,38 +171,38 @@ void DrawInterface(int Z, int numScreens)
             {
                 if(Player[Z].Hearts > 0)
                 {
-                    g_render->renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C - 32, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[1], 0, 0);
+                    XRender::renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C - 32, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[1], 0, 0);
                 }
                 else
                 {
-                    g_render->renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C - 32, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[2], 0, 0);
+                    XRender::renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C - 32, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[2], 0, 0);
                 }
 
                 if(Player[Z].Hearts > 1)
                 {
-                    g_render->renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[1], 0, 0);
+                    XRender::renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[1], 0, 0);
                 }
                 else
                 {
-                    g_render->renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[2], 0, 0);
+                    XRender::renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[2], 0, 0);
                 }
 
                 if(Player[Z].Hearts > 2)
                 {
-                    g_render->renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C + 32, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[1], 0, 0);
+                    XRender::renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C + 32, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[1], 0, 0);
                 }
                 else
                 {
-                    g_render->renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C + 32, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[2], 0, 0);
+                    XRender::renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C + 32, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[2], 0, 0);
                 }
             }
             else
             {
 
-                g_render->renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2, 16, GFX.Container[1].w + B, GFX.Container[1].h, GFX.Container[Player[Z].Character], 0, 0);
+                XRender::renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2, 16, GFX.Container[1].w + B, GFX.Container[1].h, GFX.Container[Player[Z].Character], 0, 0);
                 if(Player[Z].HeldBonus > 0)
                 {
-                    g_render->renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 12, 16 + 12,
+                    XRender::renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 12, 16 + 12,
                                             NPCWidth[Player[Z].HeldBonus], NPCHeight[Player[Z].HeldBonus],
                                             GFXNPC[Player[Z].HeldBonus], 0, 0);
                 }
@@ -210,8 +210,8 @@ void DrawInterface(int Z, int numScreens)
 
             if(Player[Z].Character == 5 && Player[Z].Bombs > 0)
             {
-                g_render->renderTexture(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 - 34, 52, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[8], 0, 0);
-                g_render->renderTexture(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 - 10, 53, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+                XRender::renderTexture(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 - 34, 52, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[8], 0, 0);
+                XRender::renderTexture(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 - 10, 53, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
                 SuperPrint(std::to_string(Player[Z].Bombs), 1, 20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 12, 53);
             }
 
@@ -220,19 +220,19 @@ void DrawInterface(int Z, int numScreens)
                 // Print coins on the screen
                 if(Player[Z].HasKey)
                 {
-                    g_render->renderTexture(-24 + 20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96, 16 + 10, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[0], 0, 0);
+                    XRender::renderTexture(-24 + 20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96, 16 + 10, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[0], 0, 0);
                 }
                 if(Player[Z].Character == 5)
                 {
-                    g_render->renderTexture(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96, 16 + 10, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[6], 0, 0);
+                    XRender::renderTexture(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96, 16 + 10, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[6], 0, 0);
                 }
                 else
                 {
-                    g_render->renderTexture(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96, 16 + 10, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[2], 0, 0);
+                    XRender::renderTexture(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96, 16 + 10, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[2], 0, 0);
                 }
 
 
-                g_render->renderTexture(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96 + 8 + GFX.Interface[2].w, 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+                XRender::renderTexture(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96 + 8 + GFX.Interface[2].w, 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
                 SuperPrint(coinsStr, 1,
                            float(20 - int(coinsStr.size()) * 18 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 80 + 4 + 12 + 18 + 32 + GFX.Interface[3].w),
                            16 + 11);
@@ -243,16 +243,16 @@ void DrawInterface(int Z, int numScreens)
                            16 + 31);
                 // Print lives on the screen
 
-                g_render->renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 - 16, 16 + 10, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0);
-                g_render->renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 10 + GFX.Interface[1].w, 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+                XRender::renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 - 16, 16 + 10, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0);
+                XRender::renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 10 + GFX.Interface[1].w, 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
                 SuperPrint(livesStr, 1,
                            float(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 12 + 18 + GFX.Interface[5].w),
                            16 + 11);
                 // Print stars on the screen
                 if(numStars > 0)
                 {
-                    g_render->renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122, 16 + 30, GFX.Interface[5].w, GFX.Interface[5].h, GFX.Interface[5], 0, 0);
-                    g_render->renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 10 + GFX.Interface[1].w, 16 + 31, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+                    XRender::renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122, 16 + 30, GFX.Interface[5].w, GFX.Interface[5].h, GFX.Interface[5], 0, 0);
+                    XRender::renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 10 + GFX.Interface[1].w, 16 + 31, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
                     SuperPrint(numStarsStr, 1,
                                float(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 12 + 18 + GFX.Interface[5].w),
                                16 + 31);
@@ -262,7 +262,7 @@ void DrawInterface(int Z, int numScreens)
             {
                 if(Z == 1)
                 {
-                    g_render->renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122,
+                    XRender::renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122,
                                           16 + 10,
                                           GFX.Interface[3].w,
                                           GFX.Interface[3].h,
@@ -271,7 +271,7 @@ void DrawInterface(int Z, int numScreens)
                 }
                 else
                 {
-                    g_render->renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122,
+                    XRender::renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122,
                                           16 + 10,
                                           GFX.Interface[3].w,
                                           GFX.Interface[3].h,
@@ -279,7 +279,7 @@ void DrawInterface(int Z, int numScreens)
                                           0, 0);
                 }
 
-                g_render->renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 10 + GFX.Interface[1].w + 16, 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+                XRender::renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 10 + GFX.Interface[1].w + 16, 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
                 SuperPrint(std::to_string(BattleLives[Z]), 1,
                            float(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 12 + 18 + GFX.Interface[5].w + 16),
                            16 + 11);
@@ -299,35 +299,35 @@ void DrawInterface(int Z, int numScreens)
 //                BitBlt myBackBuffer, vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C + 32, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX::HeartMask(1).hdc, 0, 0, vbSrcAnd;
                 if(Player[1].Hearts > 0)
                 {
-                    g_render->renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C - 32, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[1], 0, 0);
+                    XRender::renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C - 32, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[1], 0, 0);
                 }
                 else
                 {
-                    g_render->renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C - 32, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[2], 0, 0);
+                    XRender::renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C - 32, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[2], 0, 0);
                 }
                 if(Player[1].Hearts > 1)
                 {
-                    g_render->renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[1], 0, 0);
+                    XRender::renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[1], 0, 0);
                 }
                 else
                 {
-                    g_render->renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[2], 0, 0);
+                    XRender::renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[2], 0, 0);
                 }
                 if(Player[1].Hearts > 2)
                 {
-                    g_render->renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C + 32, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[1], 0, 0);
+                    XRender::renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C + 32, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[1], 0, 0);
                 }
                 else
                 {
-                    g_render->renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C + 32, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[2], 0, 0);
+                    XRender::renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C + 32, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[2], 0, 0);
                 }
             }
             else
             {
-                g_render->renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2, 16, GFX.Container[1].w + B, GFX.Container[1].h, GFX.Container[0], 0, 0);
+                XRender::renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2, 16, GFX.Container[1].w + B, GFX.Container[1].h, GFX.Container[0], 0, 0);
                 if(Player[1].HeldBonus > 0)
                 {
-                    g_render->renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 12, 16 + 12, NPCWidth[Player[1].HeldBonus], NPCHeight[Player[1].HeldBonus], GFXNPC[Player[1].HeldBonus], 0, 0);
+                    XRender::renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 12, 16 + 12, NPCWidth[Player[1].HeldBonus], NPCHeight[Player[1].HeldBonus], GFXNPC[Player[1].HeldBonus], 0, 0);
                 }
             }
         }
@@ -340,27 +340,27 @@ void DrawInterface(int Z, int numScreens)
 ////                BitBlt myBackBuffer, vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C + 32, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX::HeartMask(1).hdc, 0, 0, vbSrcAnd;
 //                if(Player[nPlay.MySlot + 1].Hearts > 0)
 //                {
-//                    g_render->renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C - 32, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[1], 0, 0);
+//                    XRender::renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C - 32, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[1], 0, 0);
 //                }
 //                else
 //                {
-//                    g_render->renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C - 32, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[2], 0, 0);
+//                    XRender::renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C - 32, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[2], 0, 0);
 //                }
 //                if(Player[nPlay.MySlot + 1].Hearts > 1)
 //                {
-//                    g_render->renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[1], 0, 0);
+//                    XRender::renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[1], 0, 0);
 //                }
 //                else
 //                {
-//                    g_render->renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[2], 0, 0);
+//                    XRender::renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[2], 0, 0);
 //                }
 //                if(Player[nPlay.MySlot + 1].Hearts > 2)
 //                {
-//                    g_render->renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C + 32, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[1], 0, 0);
+//                    XRender::renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C + 32, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[1], 0, 0);
 //                }
 //                else
 //                {
-//                    g_render->renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C + 32, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[2], 0, 0);
+//                    XRender::renderTexture(vScreen[Z].Width / 2.0 - GFX.Heart[1].w / 2 + C + 32, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[2], 0, 0);
 //                }
 //            }
 //            else
@@ -369,8 +369,8 @@ void DrawInterface(int Z, int numScreens)
 //                BitBlt myBackBuffer, vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2, 16, GFX.Container[1].w + B, GFX.Container[1].h, GFX::Container(0).hdc, 0, 0, vbSrcPaint;
 //                if(Player[nPlay.MySlot + 1].HeldBonus > 0)
 //                {
-//                    g_render->renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 12, 16 + 12, NPCWidth[Player[nPlay.MySlot + 1].HeldBonus], NPCHeight[Player[nPlay.MySlot + 1].HeldBonus], GFXNPCMask[Player[nPlay.MySlot + 1].HeldBonus], 0, 0);
-//                    g_render->renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 12, 16 + 12, NPCWidth[Player[nPlay.MySlot + 1].HeldBonus], NPCHeight[Player[nPlay.MySlot + 1].HeldBonus], GFXNPC[Player[nPlay.MySlot + 1].HeldBonus], 0, 0);
+//                    XRender::renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 12, 16 + 12, NPCWidth[Player[nPlay.MySlot + 1].HeldBonus], NPCHeight[Player[nPlay.MySlot + 1].HeldBonus], GFXNPCMask[Player[nPlay.MySlot + 1].HeldBonus], 0, 0);
+//                    XRender::renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 12, 16 + 12, NPCWidth[Player[nPlay.MySlot + 1].HeldBonus], NPCHeight[Player[nPlay.MySlot + 1].HeldBonus], GFXNPC[Player[nPlay.MySlot + 1].HeldBonus], 0, 0);
 //                }
 //            }
 //        }
@@ -378,8 +378,8 @@ void DrawInterface(int Z, int numScreens)
         if(Player[1].Character == 5 && Player[1].Bombs > 0)
         {
 
-            g_render->renderTexture(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 - 34 + C, 52, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[8], 0, 0);
-            g_render->renderTexture(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 - 10 + C, 53, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+            XRender::renderTexture(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 - 34 + C, 52, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[8], 0, 0);
+            XRender::renderTexture(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 - 10 + C, 53, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
             SuperPrint(std::to_string(Player[1].Bombs), 1,
                        float(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 12 + C), 53);
         }
@@ -387,19 +387,19 @@ void DrawInterface(int Z, int numScreens)
         // Print coins on the screen
         if(Player[1].HasKey)
         {
-            g_render->renderTexture(-24 + 20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96, 16 + 10, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[0], 0, 0);
+            XRender::renderTexture(-24 + 20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96, 16 + 10, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[0], 0, 0);
         }
 
         if(Player[1].Character == 5)
         {
-            g_render->renderTexture(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96, 16 + 10, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[6], 0, 0);
+            XRender::renderTexture(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96, 16 + 10, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[6], 0, 0);
         }
         else
         {
-            g_render->renderTexture(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96, 16 + 10, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[2], 0, 0);
+            XRender::renderTexture(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96, 16 + 10, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[2], 0, 0);
         }
 
-        g_render->renderTexture(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96 + 8 + GFX.Interface[2].w, 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+        XRender::renderTexture(20 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 96 + 8 + GFX.Interface[2].w, 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
         SuperPrint(coinsStr, 1,
                    float(20 - int(coinsStr.size()) * 18 + vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + 80 + 4 + 12 + 18 + 32 + GFX.Interface[3].w),
                    16 + 11);
@@ -409,16 +409,16 @@ void DrawInterface(int Z, int numScreens)
                    float(vScreen[Z].Width) / 2.0f - GFX.Container[1].w / 2 + 80 + 12 + 4 + 18 + 32 + GFX.Interface[3].w,
                    16 + 31);
         // Print lives on the screen
-        g_render->renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 - 16, 16 + 10, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0);
-        g_render->renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 10 + GFX.Interface[1].w, 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+        XRender::renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 - 16, 16 + 10, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0);
+        XRender::renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 10 + GFX.Interface[1].w, 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
         SuperPrint(livesStr, 1,
                    float(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 12 + 18 + GFX.Interface[5].w),
                    16 + 11);
         // Print stars on the screen
         if(numStars > 0)
         {
-            g_render->renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122, 16 + 30, GFX.Interface[5].w, GFX.Interface[5].h, GFX.Interface[5], 0, 0);
-            g_render->renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 10 + GFX.Interface[1].w, 16 + 31, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+            XRender::renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122, 16 + 30, GFX.Interface[5].w, GFX.Interface[5].h, GFX.Interface[5], 0, 0);
+            XRender::renderTexture(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 10 + GFX.Interface[1].w, 16 + 31, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
             SuperPrint(numStarsStr, 1,
                        float(vScreen[Z].Width / 2.0 - GFX.Container[1].w / 2 + C - 122 + 12 + 18 + GFX.Interface[5].w),
                        16 + 31);
@@ -429,17 +429,17 @@ void DrawInterface(int Z, int numScreens)
     {
         if(BattleIntro > 45 || BattleIntro % 2 == 1)
         {
-            g_render->renderTexture(vScreen[Z].Width / 2.0 - GFX.BMVs.w / 2, -96 + vScreen[Z].Height / 2.0 - GFX.BMVs.h / 2, GFX.BMVs.w, GFX.BMVs.h, GFX.BMVs, 0, 0);
-            g_render->renderTexture(-50 + vScreen[Z].Width / 2.0 - GFX.CharacterName[Player[1].Character].w, -96 + vScreen[Z].Height / 2.0 - GFX.CharacterName[Player[1].Character].h / 2, GFX.CharacterName[Player[1].Character].w, GFX.CharacterName[Player[1].Character].h, GFX.CharacterName[Player[1].Character], 0, 0);
-            g_render->renderTexture(50 + vScreen[Z].Width / 2.0, -96 + vScreen[Z].Height / 2.0 - GFX.CharacterName[Player[2].Character].h / 2, GFX.CharacterName[Player[2].Character].w, GFX.CharacterName[Player[2].Character].h, GFX.CharacterName[Player[2].Character], 0, 0);
+            XRender::renderTexture(vScreen[Z].Width / 2.0 - GFX.BMVs.w / 2, -96 + vScreen[Z].Height / 2.0 - GFX.BMVs.h / 2, GFX.BMVs.w, GFX.BMVs.h, GFX.BMVs, 0, 0);
+            XRender::renderTexture(-50 + vScreen[Z].Width / 2.0 - GFX.CharacterName[Player[1].Character].w, -96 + vScreen[Z].Height / 2.0 - GFX.CharacterName[Player[1].Character].h / 2, GFX.CharacterName[Player[1].Character].w, GFX.CharacterName[Player[1].Character].h, GFX.CharacterName[Player[1].Character], 0, 0);
+            XRender::renderTexture(50 + vScreen[Z].Width / 2.0, -96 + vScreen[Z].Height / 2.0 - GFX.CharacterName[Player[2].Character].h / 2, GFX.CharacterName[Player[2].Character].w, GFX.CharacterName[Player[2].Character].h, GFX.CharacterName[Player[2].Character], 0, 0);
         }
     }
 
     if(BattleOutro > 0)
     {
-        g_render->renderTexture(10 + vScreen[Z].Width / 2.0, -96 + vScreen[Z].Height / 2.0 - GFX.BMWin.h / 2, GFX.BMWin.w, GFX.BMWin.h, GFX.BMWin, 0, 0);
-        g_render->renderTexture(-10 + vScreen[Z].Width / 2.0 - GFX.CharacterName[Player[BattleWinner].Character].w, -96 + vScreen[Z].Height / 2.0 - GFX.CharacterName[Player[BattleWinner].Character].h / 2, GFX.CharacterName[Player[BattleWinner].Character].w, GFX.CharacterName[Player[BattleWinner].Character].h, GFX.CharacterName[Player[BattleWinner].Character], 0, 0);
+        XRender::renderTexture(10 + vScreen[Z].Width / 2.0, -96 + vScreen[Z].Height / 2.0 - GFX.BMWin.h / 2, GFX.BMWin.w, GFX.BMWin.h, GFX.BMWin, 0, 0);
+        XRender::renderTexture(-10 + vScreen[Z].Width / 2.0 - GFX.CharacterName[Player[BattleWinner].Character].w, -96 + vScreen[Z].Height / 2.0 - GFX.CharacterName[Player[BattleWinner].Character].h / 2, GFX.CharacterName[Player[BattleWinner].Character].w, GFX.CharacterName[Player[BattleWinner].Character].h, GFX.CharacterName[Player[BattleWinner].Character], 0, 0);
     }
 
-    g_render->offsetViewportIgnore(false);
+    XRender::offsetViewportIgnore(false);
 }

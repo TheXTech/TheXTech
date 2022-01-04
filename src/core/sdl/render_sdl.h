@@ -24,14 +24,15 @@
 
 #include <set>
 
-#include "render.h"
+#include "../base/render_base.h"
 #include "cmd_line_setup.h"
+
 
 struct SDL_Renderer;
 struct SDL_Texture;
 struct SDL_Window;
 
-class RenderSDL : public AbstractRender_t
+class RenderSDL final : public AbstractRender_t
 {
     SDL_Window   *m_window = nullptr;
 

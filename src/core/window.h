@@ -19,107 +19,169 @@
  */
 
 #pragma once
-#ifndef ABSTRACTWINDOW_T_H
-#define ABSTRACTWINDOW_T_H
+#ifndef WINDOW_HHHH
+#define WINDOW_HHHH
+
+#include <SDL2/SDL_stdinc.h>
+#include "base/window_base.h"
+
+#ifndef WINDOW_CUSTOM
+#   define E_INLINE SDL_FORCE_INLINE
+#   define TAIL
+#else
+#   define E_INLINE    extern
+#   define TAIL ;
+#endif
 
 
-class AbstractWindow_t
+/*!
+ *  Window interface
+ */
+namespace XWindow
 {
-public:
-    AbstractWindow_t();
-    virtual ~AbstractWindow_t();
 
-    /*!
-     * \brief De-Init the stuff and close
-     */
-    virtual void close() = 0;
+/*!
+ * \brief Show the window
+ */
+E_INLINE void show() TAIL
+#ifndef WINDOW_CUSTOM
+{
+    g_window->show();
+}
+#endif
 
-    /*!
-     * \brief Show the window
-     */
-    virtual void show() = 0;
+/*!
+ * \brief Hide the window
+ */
+E_INLINE void hide() TAIL
+#ifndef WINDOW_CUSTOM
+{
+    g_window->hide();
+}
+#endif
 
-    /*!
-     * \brief Hide the window
-     */
-    virtual void hide() = 0;
+/**
+ *  \brief Toggle whether or not the cursor is shown.
+ *
+ *  \param toggle 1 to show the cursor, 0 to hide it, -1 to query the current
+ *                state.
+ *
+ *  \return 1 if the cursor is shown, or 0 if the cursor is hidden.
+ */
+E_INLINE int showCursor(int show) TAIL
+#ifndef WINDOW_CUSTOM
+{
+    return g_window->showCursor(show);
+}
+#endif
 
-    /**
-     *  \brief Toggle whether or not the cursor is shown.
-     *
-     *  \param toggle 1 to show the cursor, 0 to hide it, -1 to query the current
-     *                state.
-     *
-     *  \return 1 if the cursor is shown, or 0 if the cursor is hidden.
-     */
-    virtual int showCursor(int show) = 0;
+/*!
+ * \brief Change the displayable cursor type
+ * \param cursor cursor type
+ */
+E_INLINE void setCursor(AbstractWindow_t::Cursor_t cursor) TAIL
+#ifndef WINDOW_CUSTOM
+{
+    g_window->setCursor(cursor);
+}
+#endif
 
-    /*!
-     * \brief Cursor type
-     */
-    enum Cursor_t
-    {
-        CURSOR_DEFAULT = 0,
-        CURSOR_NONE
-    };
+/*!
+ * \brief Get the current cursor type
+ * \return Cursor type
+ */
+E_INLINE AbstractWindow_t::Cursor_t getCursor() TAIL
+#ifndef WINDOW_CUSTOM
+{
+    return g_window->getCursor();
+}
+#endif
 
-    /*!
-     * \brief Change the displayable cursor type
-     * \param cursor cursor type
-     */
-    virtual void setCursor(Cursor_t cursor) = 0;
+/*!
+ * \brief Is full-screen mode active?
+ * \return True if the full-screen mode works right now
+ */
+E_INLINE bool isFullScreen() TAIL
+#ifndef WINDOW_CUSTOM
+{
+    return g_window->isFullScreen();
+}
+#endif
 
-    /*!
-     * \brief Get the current cursor type
-     * \return Cursor type
-     */
-    virtual Cursor_t getCursor() = 0;
+/*!
+ * \brief Change between fullscreen and windowed modes
+ * \param fs Fullscreen state
+ * \return 1 when full-screen mode toggled, 0 when windowed mode toggled, -1 on any errors
+ */
+E_INLINE int setFullScreen(bool fs) TAIL
+#ifndef WINDOW_CUSTOM
+{
+    return g_window->setFullScreen(fs);
+}
+#endif
 
-    /*!
-     * \brief Is full-screen mode active?
-     * \return True if the full-screen mode works right now
-     */
-    virtual bool isFullScreen() = 0;
+/*!
+ * \brief Restore the size and position of a minimized or maximized window.
+ */
+E_INLINE void restoreWindow() TAIL
+#ifndef WINDOW_CUSTOM
+{
+    g_window->restoreWindow();
+}
+#endif
 
-    /*!
-     * \brief Change between fullscreen and windowed modes
-     * \param fs Fullscreen state
-     * \return 1 when full-screen mode toggled, 0 when windowed mode toggled, -1 on any errors
-     */
-    virtual int setFullScreen(bool fs) = 0;
+/**
+ * @brief Change window size
+ * @param w Width
+ * @param h Height
+ */
+E_INLINE void setWindowSize(int w, int h) TAIL
+#ifndef WINDOW_CUSTOM
+{
+    g_window->setWindowSize(w, h);
+}
+#endif
 
-    /*!
-     * \brief Restore the size and position of a minimized or maximized window.
-     */
-    virtual void restoreWindow() = 0;
+/*!
+ * \brief Get the current size of the window
+ * \param w Width
+ * \param h Height
+ */
+E_INLINE void getWindowSize(int *w, int *h) TAIL
+#ifndef WINDOW_CUSTOM
+{
+    g_window->getWindowSize(w, h);
+}
+#endif
 
-    /**
-     * @brief Change window size
-     * @param w Width
-     * @param h Height
-     */
-    virtual void setWindowSize(int w, int h) = 0;
+/*!
+ * \brief Does window has an input focus?
+ * \return true if window active
+ */
+E_INLINE bool hasWindowInputFocus() TAIL
+#ifndef WINDOW_CUSTOM
+{
+    return g_window->hasWindowInputFocus();
+}
+#endif
 
-    /*!
-     * \brief Get the current size of the window
-     * \param w Width
-     * \param h Height
-     */
-    virtual void getWindowSize(int *w, int *h) = 0;
+/*!
+ * \brief Does window has a mouse focus?
+ * \return true if window has a mouse focus
+ */
+E_INLINE bool hasWindowMouseFocus() TAIL
+#ifndef WINDOW_CUSTOM
+{
+    return g_window->hasWindowMouseFocus();
+}
+#endif
 
-    /*!
-     * \brief Does window has an input focus?
-     * \return true if window active
-     */
-    virtual bool hasWindowInputFocus() = 0;
+}
 
-    /*!
-     * \brief Does window has a mouse focus?
-     * \return true if window has a mouse focus
-     */
-    virtual bool hasWindowMouseFocus() = 0;
-};
+#ifndef WINDOW_CUSTOM
+#   undef E_INLINE
+#   undef TAIL
+#endif
 
-extern AbstractWindow_t *g_window;
 
-#endif // ABSTRACTWINDOW_T_H
+#endif // WINDOW_HHHH

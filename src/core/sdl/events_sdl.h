@@ -23,9 +23,10 @@
 #define EVENTSSDL_H
 
 #include <SDL2/SDL_events.h>
-#include "events.h"
+#include "../base/events_base.h"
 
-class EventsSDL : public AbstractEvents_t
+
+class EventsSDL final : public AbstractEvents_t
 {
     const Uint8 *m_keyboardState = nullptr;
     Uint32 m_lastMousePress = 0;
@@ -56,7 +57,7 @@ public:
      * \param scan_code Scancode of the backend
      * \return Key state value
      */
-    uint8_t getKeyState(int scan_code) override;
+    bool getKeyState(int scan_code) override;
 
     /*!
      * \brief Get the name of the key by scancode

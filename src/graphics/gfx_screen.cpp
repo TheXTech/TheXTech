@@ -300,5 +300,5 @@ void SetRes()
 //    GetCurrentRes(); // Dummy, useless
     resChanged = true;
     ChangeRes(800, 600, 16, 60); // 800x600 pixels, 16 bit Color, 60Hz
-    g_window->showCursor(0);
+    XWindow::showCursor(0);
 }

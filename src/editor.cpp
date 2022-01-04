@@ -40,6 +40,7 @@
 #include "main/level_file.h"
 #include "load_gfx.h"
 #include "core/window.h"
+#include "core/events.h"
 
 #include "pseudo_vb.h"
 
@@ -100,7 +101,7 @@ void UpdateEditor()
 
     if(!MagicHand)
     {
-        if(getKeyState(vbKeyPageUp) == KEY_PRESSED)
+        if(XEvents::getKeyState(vbKeyPageUp))
         {
             if(ScrollRelease)
             {
@@ -113,7 +114,7 @@ void UpdateEditor()
 //                    frmLevelSettings::optSection(curSection).Value = true;
             }
         }
-        else if(getKeyState(vbKeyPageDown) == KEY_PRESSED)
+        else if(XEvents::getKeyState(vbKeyPageDown))
         {
             if(ScrollRelease)
             {
@@ -162,13 +163,13 @@ void UpdateEditor()
     CursorPos.X = MenuMouseX;
     CursorPos.Y = MenuMouseY;
 
-    if(!g_window->hasWindowMouseFocus() || CursorPos.X < 0 || CursorPos.Y > ScreenW || CursorPos.Y < 0 || CursorPos.Y > ScreenH)
+    if(!XWindow::hasWindowMouseFocus() || CursorPos.X < 0 || CursorPos.Y > ScreenW || CursorPos.Y < 0 || CursorPos.Y > ScreenH)
         HideCursor();
 
     if(LevelEditor || MagicHand)
     {
         GetEditorControls();
-        if(getKeyState(vbKeyShift) == KEY_PRESSED)
+        if(XEvents::getKeyState(vbKeyShift))
             ScrollDelay = 0;
 
         if(MagicHand)
@@ -2149,19 +2150,19 @@ void GetEditorControls()
 {
     if(HasCursor)
     {
-        if((getKeyState(vbKeyUp) == KEY_PRESSED))
+        if((XEvents::getKeyState(vbKeyUp)))
             EditorControls.Up = true;
         else
             EditorControls.Up = false;
-        if((getKeyState(vbKeyDown) == KEY_PRESSED))
+        if((XEvents::getKeyState(vbKeyDown)))
             EditorControls.Down = true;
         else
             EditorControls.Down = false;
-        if((getKeyState(vbKeyLeft) == KEY_PRESSED))
+        if((XEvents::getKeyState(vbKeyLeft)))
             EditorControls.Left = true;
         else
             EditorControls.Left = false;
-        if((getKeyState(vbKeyRight) == KEY_PRESSED))
+        if((XEvents::getKeyState(vbKeyRight)))
             EditorControls.Right = true;
         else
             EditorControls.Right = false;
@@ -2836,7 +2837,7 @@ void zTestLevel(bool magicHand, bool interProcess)
 #ifndef __ANDROID__
         ChangeScreen();
 #endif
-        DoEvents();
+        XEvents::doEvents();
         MagicHand = false;
     }
 

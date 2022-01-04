@@ -41,8 +41,8 @@ void UpdateGraphics2(bool skipRepaint)
     if(!GameIsActive)
         return;
 
-#ifdef __ANDROID__
-    if(g_render->renderBlocked())
+#ifdef USE_RENDER_BLOCKING
+    if(XRender::renderBlocked())
         return;
 #endif
 
@@ -52,7 +52,7 @@ void UpdateGraphics2(bool skipRepaint)
     if(FrameSkip && frameSkipNeeded())
         return;
 
-    g_render->setTargetTexture();
+    XRender::setTargetTexture();
 
     frameNextInc();
     frameRenderStart();
@@ -187,13 +187,13 @@ void UpdateGraphics2(bool skipRepaint)
 
 //    if(WorldEditor == true)
 //    {
-//        g_render->renderTexture(0, 0, ScreenW, ScreenH, 0, 0, 0);
+//        XRender::renderTexture(0, 0, ScreenW, ScreenH, 0, 0, 0);
 //    }
 //    else
 //    {
-//        g_render->renderTexture(0, 0, ScreenW, ScreenH, 0, 0, 0);
+//        XRender::renderTexture(0, 0, ScreenW, ScreenH, 0, 0, 0);
 //    }
-    g_render->clearBuffer();
+    XRender::clearBuffer();
 
 //    if(TakeScreen == true)
 //    {
@@ -266,8 +266,8 @@ void UpdateGraphics2(bool skipRepaint)
             if(vScreenCollision2(1, tile.Location))
             {
                 g_stats.renderedTiles++;
-//                g_render->renderTexture(vScreenX[Z] + Tile[A].Location.X, vScreenY[Z] + Tile[A].Location.Y, Tile[A].Location.Width, Tile[A].Location.Height, GFXTile[Tile[A].Type], 0, TileHeight[Tile[A].Type] * TileFrame[Tile[A].Type]);
-                g_render->renderTexture(vScreenX[Z] + tile.Location.X,
+//                XRender::renderTexture(vScreenX[Z] + Tile[A].Location.X, vScreenY[Z] + Tile[A].Location.Y, Tile[A].Location.Width, Tile[A].Location.Height, GFXTile[Tile[A].Type], 0, TileHeight[Tile[A].Type] * TileFrame[Tile[A].Type]);
+                XRender::renderTexture(vScreenX[Z] + tile.Location.X,
                                       vScreenY[Z] + tile.Location.Y,
                                       tile.Location.Width,
                                       tile.Location.Height,
@@ -286,9 +286,9 @@ void UpdateGraphics2(bool skipRepaint)
             if(vScreenCollision2(1, scene.Location) && scene.Active)
             {
                 g_stats.renderedScenes++;
-//                g_render->renderTexture(vScreenX[Z] + scene.Location.X, vScreenY[Z] + scene.Location.Y, scene.Location.Width, scene.Location.Height, GFXSceneMask[scene.Type], 0, SceneHeight[scene.Type] * SceneFrame[scene.Type]);
-//                g_render->renderTexture(vScreenX[Z] + scene.Location.X, vScreenY[Z] + scene.Location.Y, scene.Location.Width, scene.Location.Height, GFXScene[scene.Type], 0, SceneHeight[scene.Type] * SceneFrame[scene.Type]);
-                g_render->renderTexture(vScreenX[Z] + scene.Location.X,
+//                XRender::renderTexture(vScreenX[Z] + scene.Location.X, vScreenY[Z] + scene.Location.Y, scene.Location.Width, scene.Location.Height, GFXSceneMask[scene.Type], 0, SceneHeight[scene.Type] * SceneFrame[scene.Type]);
+//                XRender::renderTexture(vScreenX[Z] + scene.Location.X, vScreenY[Z] + scene.Location.Y, scene.Location.Width, scene.Location.Height, GFXScene[scene.Type], 0, SceneHeight[scene.Type] * SceneFrame[scene.Type]);
+                XRender::renderTexture(vScreenX[Z] + scene.Location.X,
                                       vScreenY[Z] + scene.Location.Y,
                                       scene.Location.Width, scene.Location.Height,
                                       GFXSceneBMP[scene.Type], 0, SceneHeight[scene.Type] * SceneFrame[scene.Type]);
@@ -306,9 +306,9 @@ void UpdateGraphics2(bool skipRepaint)
             if(vScreenCollision2(1, path.Location) && path.Active)
             {
                 g_stats.renderedPaths++;
-//                g_render->renderTexture(vScreenX[Z] + path.Location.X, vScreenY[Z] + path.Location.Y, path.Location.Width, path.Location.Height, GFXPathMask[path.Type], 0, 0);
-//                g_render->renderTexture(vScreenX[Z] + path.Location.X, vScreenY[Z] + path.Location.Y, path.Location.Width, path.Location.Height, GFXPath[path.Type], 0, 0);
-                g_render->renderTexture(vScreenX[Z] + path.Location.X,
+//                XRender::renderTexture(vScreenX[Z] + path.Location.X, vScreenY[Z] + path.Location.Y, path.Location.Width, path.Location.Height, GFXPathMask[path.Type], 0, 0);
+//                XRender::renderTexture(vScreenX[Z] + path.Location.X, vScreenY[Z] + path.Location.Y, path.Location.Width, path.Location.Height, GFXPath[path.Type], 0, 0);
+                XRender::renderTexture(vScreenX[Z] + path.Location.X,
                                       vScreenY[Z] + path.Location.Y,
                                       path.Location.Width, path.Location.Height,
                                       GFXPathBMP[path.Type], 0, 0);
@@ -328,7 +328,7 @@ void UpdateGraphics2(bool skipRepaint)
                 g_stats.renderedLevels++;
                 if(level.Path)
                 {
-                    g_render->renderTexture(vScreenX[Z] + level.Location.X,
+                    XRender::renderTexture(vScreenX[Z] + level.Location.X,
                                           vScreenY[Z] + level.Location.Y,
                                           level.Location.Width,
                                           level.Location.Height,
@@ -336,21 +336,21 @@ void UpdateGraphics2(bool skipRepaint)
                 }
                 if(level.Path2)
                 {
-                    g_render->renderTexture(vScreenX[Z] + level.Location.X - 16,
+                    XRender::renderTexture(vScreenX[Z] + level.Location.X - 16,
                                           vScreenY[Z] + 8 + level.Location.Y,
                                           64, 32,
                                           GFXLevelBMP[29], 0, 0);
                 }
                 if(GFXLevelBig[level.Type])
                 {
-                    g_render->renderTexture(vScreenX[Z] + level.Location.X - (GFXLevelWidth[level.Type] - 32) / 2.0,
+                    XRender::renderTexture(vScreenX[Z] + level.Location.X - (GFXLevelWidth[level.Type] - 32) / 2.0,
                                           vScreenY[Z] + level.Location.Y - GFXLevelHeight[level.Type] + 32,
                                           GFXLevelWidth[level.Type], GFXLevelHeight[level.Type],
                                           GFXLevelBMP[level.Type], 0, 32 * LevelFrame[level.Type]);
                 }
                 else
                 {
-                    g_render->renderTexture(vScreenX[Z] + level.Location.X,
+                    XRender::renderTexture(vScreenX[Z] + level.Location.X,
                                           vScreenY[Z] + level.Location.Y,
                                           level.Location.Width, level.Location.Height,
                                           GFXLevelBMP[level.Type], 0, 32 * LevelFrame[level.Type]);
@@ -453,9 +453,9 @@ void UpdateGraphics2(bool skipRepaint)
             break;
         }
 
-//        g_render->renderTexture(vScreenX[Z] + WorldPlayer[1].Location.X, vScreenY[Z] + WorldPlayer[1].Location.Y - 10 + WorldPlayer[1].Location.Height - WPHeight, WorldPlayer[1].Location.Width, WPHeight, GFXPlayerMask[WorldPlayer[1].Type], 0, WPHeight * WorldPlayer[1].Frame);
-//        g_render->renderTexture(vScreenX[Z] + WorldPlayer[1].Location.X, vScreenY[Z] + WorldPlayer[1].Location.Y - 10 + WorldPlayer[1].Location.Height - WPHeight, WorldPlayer[1].Location.Width, WPHeight, GFXPlayer[WorldPlayer[1].Type], 0, WPHeight * WorldPlayer[1].Frame);
-        g_render->renderTexture(vScreenX[Z] + WorldPlayer[1].Location.X,
+//        XRender::renderTexture(vScreenX[Z] + WorldPlayer[1].Location.X, vScreenY[Z] + WorldPlayer[1].Location.Y - 10 + WorldPlayer[1].Location.Height - WPHeight, WorldPlayer[1].Location.Width, WPHeight, GFXPlayerMask[WorldPlayer[1].Type], 0, WPHeight * WorldPlayer[1].Frame);
+//        XRender::renderTexture(vScreenX[Z] + WorldPlayer[1].Location.X, vScreenY[Z] + WorldPlayer[1].Location.Y - 10 + WorldPlayer[1].Location.Height - WPHeight, WorldPlayer[1].Location.Width, WPHeight, GFXPlayer[WorldPlayer[1].Type], 0, WPHeight * WorldPlayer[1].Frame);
+        XRender::renderTexture(vScreenX[Z] + WorldPlayer[1].Location.X,
                               vScreenY[Z] + WorldPlayer[1].Location.Y - 10 + WorldPlayer[1].Location.Height - WPHeight,
                               WorldPlayer[1].Location.Width, WPHeight,
                               GFXPlayerBMP[WorldPlayer[1].Type], 0, WPHeight * WorldPlayer[1].Frame);
@@ -478,20 +478,20 @@ void UpdateGraphics2(bool skipRepaint)
                  int x = vScreenX[Z] + WorldPlayer[1].Location.X + (WorldPlayer[1].Location.Width / 2) - (totalLen / 2);
                  int y = vScreenY[Z] + WorldPlayer[1].Location.Y - 32;
 
-                 g_render->renderTexture(x, y,
+                 XRender::renderTexture(x, y,
                                        GFX.Interface[5].w, GFX.Interface[5].h, GFX.Interface[5], 0, 0);
-                 g_render->renderTexture(x + GFX.Interface[5].w + 8, y,
+                 XRender::renderTexture(x + GFX.Interface[5].w + 8, y,
                                        GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
                  SuperPrint(label, 3, x + GFX.Interface[1].w + GFX.Interface[5].w + 8 + 4, y);
              }
         }
 
-//        g_render->renderTexture(0, 0, 800, 130, GFX.Interface[4], 0, 0);
+//        XRender::renderTexture(0, 0, 800, 130, GFX.Interface[4], 0, 0);
 
-        g_render->renderTexture(0, 0, 800, 130, GFX.Interface[4], 0, 0);
-        g_render->renderTexture(0, 534, 800, 66, GFX.Interface[4], 0, 534);
-        g_render->renderTexture(0, 130, 66, 404, GFX.Interface[4], 0, 130);
-        g_render->renderTexture(734, 130, 66, 404, GFX.Interface[4], 734, 130);
+        XRender::renderTexture(0, 0, 800, 130, GFX.Interface[4], 0, 0);
+        XRender::renderTexture(0, 534, 800, 66, GFX.Interface[4], 0, 534);
+        XRender::renderTexture(0, 130, 66, 404, GFX.Interface[4], 0, 130);
+        XRender::renderTexture(734, 130, 66, 404, GFX.Interface[4], 734, 130);
 
         for(A = 1; A <= numPlayers; A++)
         {
@@ -510,11 +510,11 @@ void UpdateGraphics2(bool skipRepaint)
                     Player[A].MountType = 1;
                 B = Player[A].MountType;
                 // Yoshi's Body
-                g_render->renderTexture(32 + (48 * A) + Player[A].YoshiBX, 124 - Player[A].Location.Height + Player[A].YoshiBY,
+                XRender::renderTexture(32 + (48 * A) + Player[A].YoshiBX, 124 - Player[A].Location.Height + Player[A].YoshiBY,
                                       32, 32, GFXYoshiBBMP[B], 0, 32 * Player[A].YoshiBFrame, c, c, c);
 
                 // Yoshi's Head
-                g_render->renderTexture(32 + (48 * A) + Player[A].YoshiTX,
+                XRender::renderTexture(32 + (48 * A) + Player[A].YoshiTX,
                                       124 - Player[A].Location.Height + Player[A].YoshiTY,
                                       32, 32, GFXYoshiTBMP[B], 0, 32 * Player[A].YoshiTFrame, c, c, c);
             }
@@ -523,7 +523,7 @@ void UpdateGraphics2(bool skipRepaint)
             {
                 if(Player[A].Mount == 0 || Player[A].Mount == 3)
                 {
-                    g_render->renderTexture(32 + (48 * A) + MarioFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
+                    XRender::renderTexture(32 + (48 * A) + MarioFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
                                           124 - Player[A].Location.Height + MarioFrameY[(Player[A].State * 100) +
                                             (Player[A].Frame * Player[A].Direction)] + Player[A].MountOffsetY,
                                           100, 100,
@@ -538,7 +538,7 @@ void UpdateGraphics2(bool skipRepaint)
                         height = Player[A].Location.Height - MarioFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
                     else
                         height = Player[A].Location.Height - MarioFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] - 30;
-                    g_render->renderTexture(32 + (48 * A) + MarioFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
+                    XRender::renderTexture(32 + (48 * A) + MarioFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
                                           124 - Player[A].Location.Height + MarioFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
                                           100,
                                           height,
@@ -546,7 +546,7 @@ void UpdateGraphics2(bool skipRepaint)
                                           pfrX(Player[A].Frame * Player[A].Direction),
                                           pfrY(Player[A].Frame * Player[A].Direction), c, c, c);
 
-                    g_render->renderTexture(32 + (48 * A) + Player[A].Location.Width / 2.0 - 16, 124 - 30, 32, 32,
+                    XRender::renderTexture(32 + (48 * A) + Player[A].Location.Width / 2.0 - 16, 124 - 30, 32, 32,
                                           GFX.Boot[Player[A].MountType], 0, 32 * Player[A].MountFrame, c, c, c);
 
                     if(Player[A].MountType == 3)
@@ -558,7 +558,7 @@ void UpdateGraphics2(bool skipRepaint)
                         else if(Player[A].YoshiWingsFrameCount >= 24)
                             Player[A].YoshiWingsFrameCount = 0;
 
-                        g_render->renderTexture(32 + (48 * A) + Player[A].Location.Width / 2.0 - 16 + 20, 124 - 30 - 10, 32, 32,
+                        XRender::renderTexture(32 + (48 * A) + Player[A].Location.Width / 2.0 - 16 + 20, 124 - 30 - 10, 32, 32,
                                               GFX.YoshiWings, 0, 0 + 32 * Player[A].YoshiWingsFrame);
                     }
                 }
@@ -567,7 +567,7 @@ void UpdateGraphics2(bool skipRepaint)
             {
                 if(Player[A].Mount == 0 || Player[A].Mount == 3)
                 {
-                    g_render->renderTexture(32 + (48 * A) + LuigiFrameX[(Player[A].State * 100) +
+                    XRender::renderTexture(32 + (48 * A) + LuigiFrameX[(Player[A].State * 100) +
                                             (Player[A].Frame * Player[A].Direction)],
                                           124 - Player[A].Location.Height + LuigiFrameY[(Player[A].State * 100) +
                                             (Player[A].Frame * Player[A].Direction)] + Player[A].MountOffsetY, 100, 100,
@@ -582,7 +582,7 @@ void UpdateGraphics2(bool skipRepaint)
                         height = Player[A].Location.Height - LuigiFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
                     else
                         height = Player[A].Location.Height - LuigiFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] - 30;
-                    g_render->renderTexture(32 + (48 * A) + LuigiFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
+                    XRender::renderTexture(32 + (48 * A) + LuigiFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
                                           124 - Player[A].Location.Height + LuigiFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
                                           100,
                                           height,
@@ -590,7 +590,7 @@ void UpdateGraphics2(bool skipRepaint)
                                           pfrX(Player[A].Frame * Player[A].Direction),
                                           pfrY(Player[A].Frame * Player[A].Direction), c, c, c);
 
-                    g_render->renderTexture(32 + (48 * A) + Player[A].Location.Width / 2.0 - 16, 124 - 30, 32, 32, GFX.Boot[Player[A].MountType], 0, 32 * Player[A].MountFrame, c, c, c);
+                    XRender::renderTexture(32 + (48 * A) + Player[A].Location.Width / 2.0 - 16, 124 - 30, 32, 32, GFX.Boot[Player[A].MountType], 0, 32 * Player[A].MountFrame, c, c, c);
 
                     if(Player[A].MountType == 3)
                     {
@@ -601,7 +601,7 @@ void UpdateGraphics2(bool skipRepaint)
                         else if(Player[A].YoshiWingsFrameCount >= 24)
                             Player[A].YoshiWingsFrameCount = 0;
 
-                        g_render->renderTexture(32 + (48 * A) + Player[A].Location.Width / 2.0 - 16 + 20, 124 - 30 - 10, 32, 32, GFX.YoshiWings, 0, 0 + 32 * Player[A].YoshiWingsFrame, c, c, c);
+                        XRender::renderTexture(32 + (48 * A) + Player[A].Location.Width / 2.0 - 16 + 20, 124 - 30 - 10, 32, 32, GFX.YoshiWings, 0, 0 + 32 * Player[A].YoshiWingsFrame, c, c, c);
                     }
                 }
             }
@@ -609,7 +609,7 @@ void UpdateGraphics2(bool skipRepaint)
             {
                 if(Player[A].Mount == 0 || Player[A].Mount == 3)
                 {
-                    g_render->renderTexture(32 + (48 * A) + PeachFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
+                    XRender::renderTexture(32 + (48 * A) + PeachFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
                                           124 - Player[A].Location.Height + PeachFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] + Player[A].MountOffsetY,
                                           100, 100,
                                           GFXPeachBMP[Player[A].State],
@@ -623,7 +623,7 @@ void UpdateGraphics2(bool skipRepaint)
                         height = Player[A].Location.Height - PeachFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
                     else
                         height = Player[A].Location.Height - PeachFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] - 30;
-                    g_render->renderTexture(32 + (48 * A) + PeachFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
+                    XRender::renderTexture(32 + (48 * A) + PeachFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
                                           124 - Player[A].Location.Height + PeachFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
                                           100,
                                           height,
@@ -631,7 +631,7 @@ void UpdateGraphics2(bool skipRepaint)
                                           pfrX(Player[A].Frame * Player[A].Direction),
                                           pfrY(Player[A].Frame * Player[A].Direction), c, c, c);
 
-                    g_render->renderTexture(32 + (48 * A) + Player[A].Location.Width / 2.0 - 16, 124 - 30, 32, 32, GFX.Boot[Player[A].MountType], 0, 32 * Player[A].MountFrame, c, c, c);
+                    XRender::renderTexture(32 + (48 * A) + Player[A].Location.Width / 2.0 - 16, 124 - 30, 32, 32, GFX.Boot[Player[A].MountType], 0, 32 * Player[A].MountFrame, c, c, c);
 
                     if(Player[A].MountType == 3)
                     {
@@ -642,7 +642,7 @@ void UpdateGraphics2(bool skipRepaint)
                         else if(Player[A].YoshiWingsFrameCount >= 24)
                             Player[A].YoshiWingsFrameCount = 0;
 
-                        g_render->renderTexture(32 + (48 * A) + Player[A].Location.Width / 2.0 - 16 + 20, 124 - 30 - 10, 32, 32, GFX.YoshiWings, 0, 0 + 32 * Player[A].YoshiWingsFrame, c, c, c);
+                        XRender::renderTexture(32 + (48 * A) + Player[A].Location.Width / 2.0 - 16 + 20, 124 - 30 - 10, 32, 32, GFX.YoshiWings, 0, 0 + 32 * Player[A].YoshiWingsFrame, c, c, c);
                     }
                 }
             }
@@ -650,7 +650,7 @@ void UpdateGraphics2(bool skipRepaint)
             {
                 if(Player[A].Mount == 0 || Player[A].Mount == 3)
                 {
-                    g_render->renderTexture(32 + (48 * A) + ToadFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
+                    XRender::renderTexture(32 + (48 * A) + ToadFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
                                           124 - Player[A].Location.Height + ToadFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] + Player[A].MountOffsetY,
                                           100, 100,
                                           GFXToadBMP[Player[A].State],
@@ -661,7 +661,7 @@ void UpdateGraphics2(bool skipRepaint)
                 {
                     if(Player[A].State == 1)
                     {
-                        g_render->renderTexture(32 + (48 * A) + ToadFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
+                        XRender::renderTexture(32 + (48 * A) + ToadFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
                                               6 + 124 - Player[A].Location.Height + ToadFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
                                               100,
                                               Player[A].Location.Height - 24,
@@ -676,7 +676,7 @@ void UpdateGraphics2(bool skipRepaint)
                             height = Player[A].Location.Height - ToadFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
                         else
                             height = Player[A].Location.Height - ToadFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] - 26;
-                        g_render->renderTexture(32 + (48 * A) + ToadFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
+                        XRender::renderTexture(32 + (48 * A) + ToadFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
                                               124 - Player[A].Location.Height + ToadFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
                                               100,
                                               height,
@@ -684,7 +684,7 @@ void UpdateGraphics2(bool skipRepaint)
                                               pfrX(Player[A].Frame * Player[A].Direction),
                                               pfrY(Player[A].Frame * Player[A].Direction), c, c, c);
                     }
-                    g_render->renderTexture(32 + (48 * A) + Player[A].Location.Width / 2.0 - 16, 124 - 30, 32, 32, GFX.Boot[Player[A].MountType], 0, 32 * Player[A].MountFrame, c, c, c);
+                    XRender::renderTexture(32 + (48 * A) + Player[A].Location.Width / 2.0 - 16, 124 - 30, 32, 32, GFX.Boot[Player[A].MountType], 0, 32 * Player[A].MountFrame, c, c, c);
 
                     if(Player[A].MountType == 3)
                     {
@@ -694,13 +694,13 @@ void UpdateGraphics2(bool skipRepaint)
                             Player[A].YoshiWingsFrame = 1;
                         else if(Player[A].YoshiWingsFrameCount >= 24)
                             Player[A].YoshiWingsFrameCount = 0;
-                        g_render->renderTexture(32 + (48 * A) + Player[A].Location.Width / 2.0 - 16 + 20, 124 - 30 - 10, 32, 32, GFX.YoshiWings, 0, 0 + 32 * Player[A].YoshiWingsFrame, c, c, c);
+                        XRender::renderTexture(32 + (48 * A) + Player[A].Location.Width / 2.0 - 16 + 20, 124 - 30 - 10, 32, 32, GFX.YoshiWings, 0, 0 + 32 * Player[A].YoshiWingsFrame, c, c, c);
                     }
                 }
             }
             else if(Player[A].Character == 5)
             {
-                g_render->renderTexture(32 + (48 * A) + LinkFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
+                XRender::renderTexture(32 + (48 * A) + LinkFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
                                       124 - Player[A].Location.Height + LinkFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
                                       100, 100,
                                       GFXLinkBMP[Player[A].State],
@@ -712,24 +712,24 @@ void UpdateGraphics2(bool skipRepaint)
         A = numPlayers + 1;
 
         // Print lives on the screen
-        g_render->renderTexture(32 + (48 * A), 126 - GFX.Interface[3].h, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0);
-        g_render->renderTexture(32 + (48 * A) + 40, 128 - GFX.Interface[3].h, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+        XRender::renderTexture(32 + (48 * A), 126 - GFX.Interface[3].h, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0);
+        XRender::renderTexture(32 + (48 * A) + 40, 128 - GFX.Interface[3].h, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
         SuperPrint(std::to_string(int(Lives)), 1, 32 + (48 * A) + 62, 112);
 
         // Print coins on the screen
         if(Player[1].Character == 5)
-            g_render->renderTexture(32 + (48 * A) + 16, 88, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[6], 0, 0);
+            XRender::renderTexture(32 + (48 * A) + 16, 88, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[6], 0, 0);
         else
-            g_render->renderTexture(32 + (48 * A) + 16, 88, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[2], 0, 0);
-        g_render->renderTexture(32 + (48 * A) + 40, 90, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+            XRender::renderTexture(32 + (48 * A) + 16, 88, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[2], 0, 0);
+        XRender::renderTexture(32 + (48 * A) + 40, 90, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
 
         SuperPrint(std::to_string(Coins), 1, 32 + (48 * A) + 62, 90);
 
         // Print stars on the screen
         if(numStars > 0)
         {
-            g_render->renderTexture(32 + (48 * A) + 16, 66, GFX.Interface[5].w, GFX.Interface[5].h, GFX.Interface[5], 0, 0);
-            g_render->renderTexture(32 + (48 * A) + 40, 68, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+            XRender::renderTexture(32 + (48 * A) + 16, 66, GFX.Interface[5].w, GFX.Interface[5].h, GFX.Interface[5], 0, 0);
+            XRender::renderTexture(32 + (48 * A) + 40, 68, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
             SuperPrint(std::to_string(numStars), 1, 32 + (48 * A) + 62, 68);
         }
 
@@ -742,19 +742,19 @@ void UpdateGraphics2(bool skipRepaint)
 
         if(GamePaused)
         {
-            g_render->renderRect(210, 200, 380, 200, 0.f, 0.f, 0.f);
+            XRender::renderRect(210, 200, 380, 200, 0.f, 0.f, 0.f);
             if(!Cheater)
             {
                 SuperPrint("CONTINUE", 3, 272, 257);
                 SuperPrint("SAVE & CONTINUE", 3, 272, 292);
                 SuperPrint("SAVE & QUIT", 3, 272, 327);
-                g_render->renderTexture(252, 257 + (MenuCursor * 35), 16, 16, GFX.MCursor[0], 0, 0);
+                XRender::renderTexture(252, 257 + (MenuCursor * 35), 16, 16, GFX.MCursor[0], 0, 0);
             }
             else
             {
                 SuperPrint("CONTINUE", 3, 272 + 56, 275);
                 SuperPrint("QUIT", 3, 272 + 56, 310);
-                g_render->renderTexture(252 + 56, 275 + (MenuCursor * 35), 16, 16, GFX.MCursor[0], 0, 0);
+                XRender::renderTexture(252 + 56, 275 + (MenuCursor * 35), 16, 16, GFX.MCursor[0], 0, 0);
             }
         }
 
@@ -773,9 +773,9 @@ void UpdateGraphics2(bool skipRepaint)
         speedRun_renderTimer();
 
         if(!skipRepaint)
-            g_render->repaint();
+            XRender::repaint();
 
-        g_render->setTargetScreen();
+        XRender::setTargetScreen();
     }
 
     if(TakeScreen)
@@ -783,7 +783,7 @@ void UpdateGraphics2(bool skipRepaint)
 
     frameRenderEnd();
 
-//    if(g_render->lazyLoadedBytes() > 200000) // Reset timer while loading many pictures at the same time
+//    if(XRender::lazyLoadedBytes() > 200000) // Reset timer while loading many pictures at the same time
 //        resetFrameTimer();
-    g_render->lazyLoadedBytesReset();
+    XRender::lazyLoadedBytesReset();
 }

@@ -506,22 +506,22 @@ int BattleIntro = 0;
 int BattleOutro = 0;
 std::string LevelName;
 
-void DoEvents()
-{
-    g_events->doEvents();
-}
+//void DoEvents()
+//{
+//    g_events->doEvents();
+//}
 
-Uint8 getKeyState(int key)
-{
-    return g_events->getKeyState(key);
-}
+//Uint8 getKeyState(int key)
+//{
+//    return XEvents::getKeyState(key);
+//}
 
-Uint8 getKeyStateI(int key)
-{
-    if(key < 0)
-        return 0;
-    return g_events->getKeyState(key);
-}
+//Uint8 getKeyStateI(int key)
+//{
+//    if(key < 0)
+//        return 0;
+//    return XEvents::getKeyState(key);
+//}
 
 const char *getKeyName(int key)
 {

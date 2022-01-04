@@ -116,8 +116,8 @@ void CheatCode(char NewKey)
             GameMenu = true;
             MenuMode = 0;
             MenuCursor = 0;
-            g_render->clearBuffer();
-            g_render->repaint();
+            XRender::clearBuffer();
+            XRender::repaint();
             StopMusic();
             DoEvents();
             PGE_Delay(500);
