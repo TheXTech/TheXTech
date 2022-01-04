@@ -77,7 +77,6 @@ struct KeyboardEvent_t
 class AbstractEvents_t
 {
     friend void SetOrigRes();
-
     static uint32_t m_lastMousePress;
 
 protected:
@@ -127,6 +126,7 @@ protected:
     static void eventMouseMove(const MouseMoveEvent_t &event);
     static void eventMouseWheel(const MouseWheelEvent_t &event);
     static void eventMouseUp(const MouseButtonEvent_t &event);
+public:
     static void eventResize();
 };
 

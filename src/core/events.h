@@ -92,6 +92,12 @@ E_INLINE const char *getScanCodeName(int scan_code) TAIL
 }
 #endif
 
+
+SDL_FORCE_INLINE void eventResize()
+{
+    g_events->eventResize();
+}
+
 } // XEvents
 
 #ifndef EVENTS_CUSTOM
