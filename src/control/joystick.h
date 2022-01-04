@@ -195,6 +195,8 @@ public:
 
     InputMethodType_Joystick();
 
+    bool TestProfileType(InputMethodProfile* profile);
+
     void UpdateControlsPre();
     void UpdateControlsPost();
 

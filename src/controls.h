@@ -578,6 +578,9 @@ public:
     /*-------------------------*\
     || PURE VIRTUAL FUNCTIONS  ||
     \*-------------------------*/
+    // Tests whether a profile is of the corresponding type using RTTI
+    virtual bool TestProfileType(InputMethodProfile* profile) = 0;
+
     // Hooks that are called before and after Player controls are updated
     // Update any information that the InputMethods will reference
     virtual void UpdateControlsPre() = 0;

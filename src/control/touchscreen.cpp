@@ -1392,6 +1392,11 @@ InputMethodType_TouchScreen::InputMethodType_TouchScreen()
     this->Name = "Touchscreen";
 }
 
+bool InputMethodType_TouchScreen::TestProfileType(InputMethodProfile* profile)
+{
+    return (bool)dynamic_cast<InputMethodProfile_TouchScreen*>(profile);
+}
+
 void InputMethodType_TouchScreen::UpdateControlsPre()
 {
     this->m_controller.update();

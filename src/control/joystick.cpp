@@ -1359,6 +1359,11 @@ InputMethodType_Joystick::InputMethodType_Joystick()
     }
 }
 
+bool InputMethodType_Joystick::TestProfileType(InputMethodProfile* profile)
+{
+    return (bool)dynamic_cast<InputMethodProfile_Joystick*>(profile);
+}
+
 void InputMethodType_Joystick::UpdateControlsPre() {}
 void InputMethodType_Joystick::UpdateControlsPost() {}
 

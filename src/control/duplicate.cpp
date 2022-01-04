@@ -131,6 +131,11 @@ InputMethodType_Duplicate::InputMethodType_Duplicate()
     this->Name = "Duplicate";
 }
 
+bool InputMethodType_Duplicate::TestProfileType(InputMethodProfile* profile)
+{
+    return (bool)dynamic_cast<InputMethodProfile_Duplicate*>(profile);
+}
+
 void InputMethodType_Duplicate::UpdateControlsPre()
 {
 }

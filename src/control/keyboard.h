@@ -90,6 +90,8 @@ public:
 
     InputMethodType_Keyboard();
 
+    bool TestProfileType(InputMethodProfile* profile);
+
     void UpdateControlsPre();
     void UpdateControlsPost();
 

@@ -665,6 +665,11 @@ InputMethodType_Keyboard::InputMethodType_Keyboard()
     this->LegacyName = "keyboard";
 }
 
+bool InputMethodType_Keyboard::TestProfileType(InputMethodProfile* profile)
+{
+    return (bool)dynamic_cast<InputMethodProfile_Keyboard*>(profile);
+}
+
 void InputMethodType_Keyboard::UpdateControlsPre() {}
 void InputMethodType_Keyboard::UpdateControlsPost()
 {

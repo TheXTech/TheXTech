@@ -327,6 +327,8 @@ public:
 protected:
     void SaveConfig_Custom(IniProcessing* ctl);
     void LoadConfig_Custom(IniProcessing* ctl);
+    bool TestProfileType(InputMethodProfile* profile);
+
 };
 
 } // namespace Controls

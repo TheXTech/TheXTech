@@ -237,6 +237,9 @@ bool InputMethodType::SetProfile(InputMethod* method, int player_no, InputMethod
         return false;
     }
 
+    if(!this->TestProfileType(profile))
+        return false;
+
     if(!this->SetProfile_Custom(method, player_no, profile, active_methods))
     {
         return false;

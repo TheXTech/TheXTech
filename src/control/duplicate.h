@@ -86,6 +86,8 @@ public:
 
     InputMethodType_Duplicate();
 
+    bool TestProfileType(InputMethodProfile* profile);
+
     void UpdateControlsPre();
     void UpdateControlsPost();
 
