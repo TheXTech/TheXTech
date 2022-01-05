@@ -52,7 +52,11 @@ struct StdPictureLoad
     //! Height scale factor
     float h_scale = 1.0f;
 
-
+    /*!
+     * \brief Clear all held data
+     *
+     * Must be called by renderer backend after texture deletion
+     */
     void clear()
     {
         raw.clear();

@@ -94,6 +94,11 @@ struct StdPicture
     //! Platform specific texture data
     StdPictureData d;
 
+    /*!
+     * \brief Reset all values into initial state.
+     *
+     * This must be called by renderer backend after texture deletion
+     */
     inline void resetAll()
     {
         inited = false;
