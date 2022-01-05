@@ -18,6 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <vector>
+
 #include <SDL2/SDL_stdinc.h>
 #ifdef ENABLE_ANTICHEAT_TRAP
 #include "core/msgbox.h"
@@ -1685,6 +1687,139 @@ static void speedDemon()
 }
 
 
+struct CheatCode_t
+{
+    const char *key;
+    void (*call)();
+    bool isCheat;
+};
+
+static std::vector<CheatCode_t> s_cheatsListGlobal =
+{
+#ifdef ENABLE_ANTICHEAT_TRAP
+    {"redigitiscool", dieCheater, false},
+#else
+    {"redigitiscool", redigitIsCool, false},
+#endif
+    {"\x77\x6f\x68\x6c\x73\x74\x61\x6e\x64\x69\x73\x74\x73\x65\x68\x72\x67\x75\x74", redigitIsCool, false}
+};
+
+
+static std::vector<CheatCode_t> s_cheatsListWorld =
+{
+    {"imtiredofallthiswalking", moonWalk, true},
+    {"moonwalk", moonWalk, true},
+    {"skywalk", moonWalk, true},
+    {"skzwalk", moonWalk, true},
+
+    {"illparkwhereiwant", illParkWhereIWant, true},
+    {"parkinglot", illParkWhereIWant, true},
+};
+
+static std::vector<CheatCode_t> s_cheatsListLevel =
+{
+    {"needashell", needAShell, true},
+    {"fairymagic", fairyMagic, true},
+    {"fairzmagic", fairyMagic, true},
+    {"iceage", iceAge, true},
+    {"istillplaywithlegos", iStillPlayWithLegos, true},
+    {"istillplazwithlegos", iStillPlayWithLegos, true},
+    {"itsrainingmen", itsRainingMen, true},
+    {"donttypethis", dontTypeThis, true},
+    {"donttzpethis", dontTypeThis, true},
+    {"wetwater", wetWater, true},
+    {"needaredshell", needARedShell, true},
+    {"needablueshell", needABlueShell, true},
+    {"needayellowshell", needAYellowShell, true},
+    {"needazellowshell", needAYellowShell, true},
+    {"needaturnip", needATurnip, true},
+    {"needa1up", needA1Up, true},
+    {"needatanookisuit", needATanookiSuit, true},
+    {"needahammersuit", needAHammerSuit, true},
+    {"hammertime", needAHammerSuit, true},
+    {"needamushroom", needAMushroom, true},
+    {"needaflower", needAFlower, true},
+    {"niceflower", needAnIceFlower, true},
+    {"needaleaf", needALeaf, true},
+    {"needanegg", needANegg, true},
+    {"needaplant", needAPlant, true},
+    {"needagun", needAGun, true},
+    {"needaswitch", needASwitch, true},
+    {"needaclock", needAClock, true},
+    {"needabomb", needABomb, true},
+    {"needashoe", needAShoe, true},
+    {"redshoe", redShoe, true},
+    {"blueshoe", blueShoe, true},
+    {"shadowstar", shadowStar, true},
+
+    {"ibakedacakeforyou", becomeAsPeach, true},
+    {"ibakedacakeforzou", becomeAsPeach, true},
+    {"itsamepeach", becomeAsPeach, true},
+    {"anothercastle", becomeAsToad, true},
+    {"itsametoad", becomeAsToad, true},
+    {"iamerror", becomeAsLink, true},
+    {"itsamelink", becomeAsLink, true},
+    {"itsamemario", becomeAsMario, true},
+    {"plumberboy", becomeAsMario, true},
+    {"plumberboz", becomeAsMario, true},
+    {"moustacheman", becomeAsMario, true},
+    {"itsameluigi", becomeAsLuigi, true},
+    {"greenmario", becomeAsLuigi, true},
+
+    {"supermario128", superbDemo128, true},
+    {"supermario64", superbDemo64, true},
+    {"supermario32", superbDemo32, true},
+    {"supermario16", superbDemo16, true},
+    {"supermario8", superbDemo8, true},
+    {"supermario4", superbDemo4, true},
+    {"supermario2", superbDemo2, true},
+    {"1player", onePlayer, true},
+    {"1plazer", onePlayer, true},
+    {"2player", twoPlayer, true},
+    {"2plazer", twoPlayer, true},
+
+    {"wariotime", warioTime, true},
+    {"carkeys", carKeys, true},
+    {"carkezs", carKeys, true},
+    {"boingyboing", boingyBoing, true},
+    {"boingzboing", boingyBoing, true},
+    {"bombsaway", bombsAway, true},
+    {"firemissiles", fireMissiles, true},
+    {"burnthehousedown", hellFire, true},
+    {"hellfire", hellFire, true},
+    {"upandout", upAndOut, true},
+    {"powhammer", powHammer, true},
+    {"hammerinmypants", hammerInMyPants, true},
+    {"hammerinmzpants", hammerInMyPants, true},
+    {"rainbowrider", rainbowRider, true},
+
+    {"greenegg", greenEgg, true},
+    {"blueegg", blueEgg, true},
+    {"yellowegg", yellowEgg, true},
+    {"zellowegg", yellowEgg, true},
+    {"redegg", redEgg, true},
+    {"blackegg", blackEgg, true},
+    {"purpleegg", purpleEgg, true},
+    {"pinkegg", pinkEgg, true},
+    {"coldegg", coldEgg, true},
+    {"stophittingme", stopHittingMe, true},
+    {"uncle", stopHittingMe, true},
+    {"stickyfingers", stickyFingers, true},
+    {"stickzfingers", stickyFingers, true},
+    {"captainn", capitanN, true},
+    {"flamethrower", flameThrower, true},
+    {"moneytree", moneyTree, true},
+    {"moneztree", moneyTree, true},
+    {"donthurtme", godMode, true},
+    {"godmode", godMode, true},
+    {"wingman", wingMan, true},
+    {"tooslow", tooSlow, true},
+    {"ahippinandahoppin", ahippinAndAHopping, true},
+    {"jumpman", ahippinAndAHopping, true},
+    {"framerate", frameRate, false},
+    {"speeddemon", speedDemon, true}
+};
+
 
 
 /*!
@@ -1708,479 +1843,26 @@ void CheatCode(char NewKey)
         CheatString.erase(0, 1);
     oldString = CheatString;
 
-//    D_pLogDebug("Cheat string: [%s]\n", CheatString.c_str());
 
-#ifdef ENABLE_ANTICHEAT_TRAP
-    if(SDL_strstr(CheatString.c_str(), "redigitiscool"))
+    for(const auto &c : s_cheatsListGlobal)
     {
-        dieCheater();
-        return;
-    }
-    else if(SDL_strstr(CheatString.c_str(), "\x77\x6f\x68\x6c\x73\x74\x61\x6e\x64\x69\x73\x74\x73\x65\x68\x72\x67\x75\x74"))
-#else
-    if(SDL_strstr(CheatString.c_str(), "redigitiscool") || SDL_strstr(CheatString.c_str(), "\x77\x6f\x68\x6c\x73\x74\x61\x6e\x64\x69\x73\x74\x73\x65\x68\x72\x67\x75\x74"))
-#endif
-    {
-        redigitIsCool();
-        CheatString.clear();
-        return;
+        if(SDL_strstr(CheatString.c_str(), c.key))
+        {
+            c.call();
+            CheatString.clear();
+            cheated = c.isCheat;
+            break;
+        }
     }
 
-
-    if(LevelSelect) // On world map
+    for(const auto &c : (LevelSelect ? s_cheatsListWorld : s_cheatsListLevel))
     {
-        if(SDL_strstr(CheatString.c_str(), "imtiredofallthiswalking") || SDL_strstr(CheatString.c_str(), "moonwalk") || SDL_strstr(CheatString.c_str(), "skywalk") || SDL_strstr(CheatString.c_str(), "skzwalk"))
+        if(SDL_strstr(CheatString.c_str(), c.key))
         {
-            moonWalk();
+            c.call();
             CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "illparkwhereiwant") || SDL_strstr(CheatString.c_str(), "parkinglot"))
-        {
-            illParkWhereIWant();
-            CheatString.clear();
-            cheated = true;
-        }
-    }
-    else // On level
-    {
-        if(SDL_strstr(CheatString.c_str(), "needashell"))
-        {
-            needAShell();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "fairymagic") || SDL_strstr(CheatString.c_str(), "fairzmagic"))
-        {
-            fairyMagic();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "iceage"))
-        {
-            iceAge();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "istillplaywithlegos") || SDL_strstr(CheatString.c_str(), "istillplazwithlegos"))
-        {
-            iStillPlayWithLegos();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "itsrainingmen"))
-        {
-            itsRainingMen();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "donttypethis") || SDL_strstr(CheatString.c_str(), "donttzpethis"))
-        {
-            dontTypeThis();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "wetwater"))
-        {
-            wetWater();
-            CheatString.clear();
-            cheated = true;
-        }
-
-
-
-
-        else if(SDL_strstr(CheatString.c_str(), "needaredshell"))
-        {
-            needARedShell();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "needablueshell"))
-        {
-            needABlueShell();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "needayellowshell") || SDL_strstr(CheatString.c_str(), "needazellowshell"))
-        {
-            needAYellowShell();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "needaturnip"))
-        {
-            needATurnip();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "needa1up"))
-        {
-            needA1Up();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "needatanookisuit"))
-        {
-            needATanookiSuit();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "needahammersuit") || SDL_strstr(CheatString.c_str(), "hammertime"))
-        {
-            needAHammerSuit();
-            CheatString.clear();
-            cheated = true;
-        }
-
-        else if(SDL_strstr(CheatString.c_str(), "needamushroom"))
-        {
-            needAMushroom();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "needaflower"))
-        {
-            needAFlower();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "niceflower"))
-        {
-            needAnIceFlower();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "needaleaf"))
-        {
-            needALeaf();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "needanegg"))
-        {
-            needANegg();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "needaplant"))
-        {
-            needAPlant();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "needagun"))
-        {
-            needAGun();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "needaswitch"))
-        {
-            needASwitch();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "needaclock"))
-        {
-            needAClock();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "needabomb"))
-        {
-            needABomb();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "needashoe"))
-        {
-            needAShoe();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "redshoe"))
-        {
-            redShoe();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "blueshoe"))
-        {
-            blueShoe();
-            CheatString.clear();
-            cheated = true;
-        }
-
-
-        else if(SDL_strstr(CheatString.c_str(), "shadowstar"))
-        {
-            shadowStar();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "ibakedacakeforyou") || SDL_strstr(CheatString.c_str(), "ibakedacakeforzou") || SDL_strstr(CheatString.c_str(), "itsamepeach"))
-        {
-            becomeAsPeach();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "anothercastle") || SDL_strstr(CheatString.c_str(), "itsametoad"))
-        {
-            becomeAsToad();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "iamerror") || SDL_strstr(CheatString.c_str(), "itsamelink"))
-        {
-            becomeAsLink();
-            CheatString.clear();
-            cheated = true;
-        }
-
-        else if(SDL_strstr(CheatString.c_str(), "itsamemario") || SDL_strstr(CheatString.c_str(), "plumberboy") || SDL_strstr(CheatString.c_str(), "plumberboz") || SDL_strstr(CheatString.c_str(), "moustacheman"))
-        {
-            becomeAsMario();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "itsameluigi") || SDL_strstr(CheatString.c_str(), "greenmario"))
-        {
-            becomeAsLuigi();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "supermario128"))
-        {
-            superbDemo128();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "supermario64"))
-        {
-            superbDemo64();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "supermario32"))
-        {
-            superbDemo32();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "supermario16"))
-        {
-            superbDemo16();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "supermario8"))
-        {
-            superbDemo8();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "supermario4"))
-        {
-            superbDemo4();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "supermario2"))
-        {
-            superbDemo2();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "1player") || SDL_strstr(CheatString.c_str(), "1plazer"))
-        {
-            onePlayer();
-            CheatString.clear();
-            cheated = true;
-        }
-
-        else if(SDL_strstr(CheatString.c_str(), "2player") || SDL_strstr(CheatString.c_str(), "2plazer"))
-        {
-            twoPlayer();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "wariotime"))
-        {
-            warioTime();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "carkeys") || SDL_strstr(CheatString.c_str(), "carkezs"))
-        {
-            carKeys();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "boingyboing") || SDL_strstr(CheatString.c_str(), "boingzboing"))
-        {
-            boingyBoing();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "bombsaway"))
-        {
-            bombsAway();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "firemissiles"))
-        {
-            fireMissiles();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "burnthehousedown") || SDL_strstr(CheatString.c_str(), "hellfire"))
-        {
-            hellFire();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "upandout"))
-        {
-            upAndOut();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "powhammer"))
-        {
-            powHammer();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "hammerinmypants") || SDL_strstr(CheatString.c_str(), "hammerinmzpants"))
-        {
-            hammerInMyPants();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "rainbowrider"))
-        {
-            rainbowRider();
-            CheatString.clear();
-            cheated = true;
-        }
-
-
-        else if(SDL_strstr(CheatString.c_str(), "greenegg"))
-        {
-            greenEgg();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "blueegg"))
-        {
-            blueEgg();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "yellowegg") || SDL_strstr(CheatString.c_str(), "zellowegg"))
-        {
-            yellowEgg();
-            CheatString.clear();
-            cheated = true;
-        }
-
-        else if(SDL_strstr(CheatString.c_str(), "redegg"))
-        {
-            redEgg();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "blackegg"))
-        {
-            blackEgg();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "purpleegg"))
-        {
-            purpleEgg();
-            CheatString.clear();
-            cheated = true;
-        }
-
-        else if(SDL_strstr(CheatString.c_str(), "pinkegg"))
-        {
-            pinkEgg();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "coldegg"))
-        {
-            coldEgg();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "stophittingme") || SDL_strstr(CheatString.c_str(), "uncle"))
-        {
-            stopHittingMe();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "stickyfingers") || SDL_strstr(CheatString.c_str(), "stickzfingers"))
-        {
-            stickyFingers();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "captainn"))
-        {
-            capitanN();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "flamethrower"))
-        {
-            flameThrower();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "moneytree") || SDL_strstr(CheatString.c_str(), "moneztree"))
-        {
-            moneyTree();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "donthurtme") || SDL_strstr(CheatString.c_str(), "godmode"))
-        {
-            godMode();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "wingman"))
-        {
-            wingMan();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "tooslow"))
-        {
-            tooSlow();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "ahippinandahoppin") || SDL_strstr(CheatString.c_str(), "jumpman"))
-        {
-            ahippinAndAHopping();
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "framerate"))
-        {
-            frameRate();
-            CheatString.clear();
-        }
-        else if(SDL_strstr(CheatString.c_str(), "speeddemon"))
-        {
-            speedDemon();
-            CheatString.clear();
-            cheated = true;
+            cheated = c.isCheat;
+            break;
         }
     }
 
