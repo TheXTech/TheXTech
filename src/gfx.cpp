@@ -34,7 +34,7 @@ void GFX_t::loadImage(StdPicture &img, const std::string &path)
     pLogDebug("Loading texture %s...", path.c_str());
     img = XRender::LoadPicture(path);
 
-    if(!img.texture)
+    if(!img.d.hasTexture())
     {
         pLogWarning("Failed to load texture: %s...", path.c_str());
         m_loadErrors++;

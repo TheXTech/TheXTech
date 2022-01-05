@@ -23,8 +23,11 @@
 #define STD_PICTURE_H
 
 #include <vector>
+#include "core/picture_data.h"
+
 #ifdef DEBUG_BUILD
 #   include <string>
+#   define STD_PICTURE_HAS_ORIG_PATH
 #endif
 
 typedef unsigned int    GLenum;
@@ -48,10 +51,11 @@ struct SDL_Texture;
  */
 struct StdPicture
 {
-#ifdef DEBUG_BUILD
+#ifdef STD_PICTURE_HAS_ORIG_PATH
     //! Debug-only file path to the original picture
     std::string origPath;
 #endif
+
     //! Was this texture initialized by graphical engine or not?
     bool inited = false;
 
@@ -78,35 +82,59 @@ struct StdPicture
     //! Height scale factor
     float h_scale = 1.0f;
 
+    // These colors were used to auto-choose the fill color for the background
+    //! Left-top pixel color
+    PGEColor ColorUpper;
+    //! Left-bottom pixel color
+    PGEColor ColorLower;
+
+    /*!
+     * \brief Reset colors into black
+     */
+    inline void resetColors()
+    {
+        ColorUpper.r = 0;
+        ColorUpper.g = 0;
+        ColorUpper.b = 0;
+        ColorLower.r = 0;
+        ColorLower.g = 0;
+        ColorLower.b = 0;
+    }
+
+
+    /* Loader related stuff */
+
     //! Is this a lazy-loaded texture?
     bool lazyLoaded = false;
     //! Original compressed data of the front image
     std::vector<char> raw;
     //! Original compressed data of the mask image (if presented)
     std::vector<char> rawMask;
-
     //! Was mask restored from the PNG at default graphics?
     bool isMaskPng = false;
-    //! Texture instance pointer for SDL Render
-    SDL_Texture *texture = nullptr;
-    //! texture ID for OpenGL and other render engines
-    GLint        texture_id = 0;
 
-    //! Texture format at OpenGL-renderer
-    GLenum format = 0;
-    //! Number of colors
-    GLint  nOfColors = 0;
-    //! Left-top pixel color
-    PGEColor ColorUpper;
-    //! Left-bottom pixel color
-    PGEColor ColorLower;
-    //! Cached color modifier
-    uint8_t modColor[4] = {255,255,255,255};
+    //! Platform specific picture data
+    StdPictureData d;
+
+    inline void resetAll()
+    {
+        inited = false;
+        raw.clear();
+        rawMask.clear();
+        lazyLoaded = false;
+        isMaskPng = false;
+        w = 0;
+        h = 0;
+        w_orig = 0;
+        h_orig = 0;
+        frame_w = 0;
+        frame_h = 0;
+    }
 };
 
 // This macro allows to get the original texture path when debug build is on,
 // and safely return the blank string when the release build is
-#ifdef DEBUG_BUILD
+#ifdef STD_PICTURE_HAS_ORIG_PATH
 #   define StdPictureGetOrigPath(x) x.origPath
 #else
 #   define StdPictureGetOrigPath(x) std::string()

@@ -19,7 +19,6 @@
  */
 
 #include <SDL2/SDL_thread.h>
-#include <SDL2/SDL_opengl.h>
 #include <SDL2/SDL_power.h>
 #include <SDL2/SDL_timer.h>
 #include <SDL2/SDL_rwops.h>
@@ -234,25 +233,26 @@ StdPicture AbstractRender_t::LoadPicture(const std::string &path,
 #ifdef DEBUG_BUILD
     bindingTime.start();
 #endif
+
     RGBQUAD upperColor;
     FreeImage_GetPixelColor(sourceImage, 0, 0, &upperColor);
     target.ColorUpper.r = float(upperColor.rgbRed) / 255.0f;
     target.ColorUpper.b = float(upperColor.rgbBlue) / 255.0f;
     target.ColorUpper.g = float(upperColor.rgbGreen) / 255.0f;
+
     RGBQUAD lowerColor;
     FreeImage_GetPixelColor(sourceImage, 0, static_cast<unsigned int>(h - 1), &lowerColor);
     target.ColorLower.r = float(lowerColor.rgbRed) / 255.0f;
     target.ColorLower.b = float(lowerColor.rgbBlue) / 255.0f;
     target.ColorLower.g = float(lowerColor.rgbGreen) / 255.0f;
+
     FreeImage_FlipVertical(sourceImage);
-    target.nOfColors = GL_RGBA;
-    target.format = GL_BGRA;
     target.w = static_cast<int>(w);
     target.h = static_cast<int>(h);
     target.frame_w = static_cast<int>(w);
     target.frame_h = static_cast<int>(h);
-    GLubyte *textura = reinterpret_cast<GLubyte *>(FreeImage_GetBits(sourceImage));
 
+    uint8_t *textura = reinterpret_cast<uint8_t *>(FreeImage_GetBits(sourceImage));
     XRender::loadTexture(target, w, h, textura, pitch);
 
 #ifdef DEBUG_BUILD
@@ -356,14 +356,14 @@ StdPicture AbstractRender_t::lazyLoadPicture(const std::string &path,
 
     target.inited = true;
     target.lazyLoaded = true;
-    target.texture = nullptr; //-V1048
+    target.d.clear();
 
     return target;
 }
 
 void AbstractRender_t::lazyLoad(StdPicture &target)
 {
-    if(!target.inited || !target.lazyLoaded || target.texture)
+    if(!target.inited || !target.lazyLoaded || target.d.hasTexture())
         return;
 
     FIBITMAP *sourceImage = GraphicsHelps::loadImage(target.raw);
@@ -399,14 +399,14 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
     target.ColorUpper.r = float(upperColor.rgbRed) / 255.0f;
     target.ColorUpper.b = float(upperColor.rgbBlue) / 255.0f;
     target.ColorUpper.g = float(upperColor.rgbGreen) / 255.0f;
+
     RGBQUAD lowerColor;
     FreeImage_GetPixelColor(sourceImage, 0, static_cast<unsigned int>(h - 1), &lowerColor);
     target.ColorLower.r = float(lowerColor.rgbRed) / 255.0f;
     target.ColorLower.b = float(lowerColor.rgbBlue) / 255.0f;
     target.ColorLower.g = float(lowerColor.rgbGreen) / 255.0f;
+
     FreeImage_FlipVertical(sourceImage);
-    target.nOfColors = GL_RGBA;
-    target.format = GL_BGRA;
     target.w = static_cast<int>(w);
     target.h = static_cast<int>(h);
     target.frame_w = static_cast<int>(w);
@@ -459,7 +459,7 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
         pitch = FreeImage_GetPitch(d);
     }
 
-    GLubyte *textura = reinterpret_cast<GLubyte *>(FreeImage_GetBits(sourceImage));
+    uint8_t *textura = reinterpret_cast<uint8_t *>(FreeImage_GetBits(sourceImage));
 
     XRender::loadTexture(target, w, h, textura, pitch);
 
@@ -468,14 +468,14 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
 
 void AbstractRender_t::lazyUnLoad(StdPicture &target)
 {
-    if(!target.inited || !target.lazyLoaded || !target.texture)
+    if(!target.inited || !target.lazyLoaded || !target.d.hasTexture())
         return;
     XRender::deleteTexture(target, true);
 }
 
 void AbstractRender_t::lazyPreLoad(StdPicture &target)
 {
-    if(!target.texture && target.lazyLoaded)
+    if(!target.d.hasTexture() && target.lazyLoaded)
         lazyLoad(target);
 }
 
