@@ -35,9 +35,9 @@
  */
 struct PGEColor
 {
-    float r = 0.0f;
-    float g = 0.0f;
-    float b = 0.0f;
+    uint8_t r = 0;
+    uint8_t g = 0;
+    uint8_t b = 0;
 };
 
 struct SDL_Texture;
@@ -65,18 +65,6 @@ struct StdPicture
     int frame_w = 0;
     //1 Animation frame height
     int frame_h = 0;
-
-    // Original size (if texture got scaled while loading)
-    //! Original width
-    int w_orig = 0;
-    //! Original height
-    int h_orig = 0;
-
-    // Difference between original and initial size
-    //! Width scale factor
-    float w_scale = 1.0f;
-    //! Height scale factor
-    float h_scale = 1.0f;
 
     // These colors were used to auto-choose the fill color for the background
     //! Left-top pixel color
@@ -112,8 +100,6 @@ struct StdPicture
         l.clear();
         w = 0;
         h = 0;
-        w_orig = 0;
-        h_orig = 0;
         frame_w = 0;
         frame_h = 0;
     }

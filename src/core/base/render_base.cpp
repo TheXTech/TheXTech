@@ -236,15 +236,15 @@ StdPicture AbstractRender_t::LoadPicture(const std::string &path,
 
     RGBQUAD upperColor;
     FreeImage_GetPixelColor(sourceImage, 0, 0, &upperColor);
-    target.ColorUpper.r = float(upperColor.rgbRed) / 255.0f;
-    target.ColorUpper.b = float(upperColor.rgbBlue) / 255.0f;
-    target.ColorUpper.g = float(upperColor.rgbGreen) / 255.0f;
+    target.ColorUpper.r = upperColor.rgbRed;
+    target.ColorUpper.g = upperColor.rgbGreen;
+    target.ColorUpper.b = upperColor.rgbBlue;
 
     RGBQUAD lowerColor;
     FreeImage_GetPixelColor(sourceImage, 0, static_cast<unsigned int>(h - 1), &lowerColor);
-    target.ColorLower.r = float(lowerColor.rgbRed) / 255.0f;
-    target.ColorLower.b = float(lowerColor.rgbBlue) / 255.0f;
-    target.ColorLower.g = float(lowerColor.rgbGreen) / 255.0f;
+    target.ColorLower.r = lowerColor.rgbRed;
+    target.ColorLower.b = lowerColor.rgbBlue;
+    target.ColorLower.g = lowerColor.rgbGreen;
 
     FreeImage_FlipVertical(sourceImage);
     target.w = static_cast<int>(w);
@@ -416,8 +416,8 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
 
     if(g_videoSettings.scaleDownAllTextures || GraphicsHelps::validateFor2xScaleDown(sourceImage, StdPictureGetOrigPath(target)))
     {
-        target.w_orig = int(w);
-        target.h_orig = int(h);
+        target.l.w_orig = int(w);
+        target.l.h_orig = int(h);
         w /= 2;
         h /= 2;
         shrink2x = true;
@@ -430,8 +430,8 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
     {
         if(!shrink2x)
         {
-            target.w_orig = int(w);
-            target.h_orig = int(h);
+            target.l.w_orig = int(w);
+            target.l.h_orig = int(h);
         }
 
         // WORKAROUND: down-scale too big textures
@@ -454,8 +454,9 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
             GraphicsHelps::closeImage(sourceImage);
             sourceImage = d;
         }
-        target.w_scale = float(w) / float(target.w_orig);
-        target.h_scale = float(h) / float(target.h_orig);
+
+        target.l.w_scale = float(w) / float(target.l.w_orig);
+        target.l.h_scale = float(h) / float(target.l.h_orig);
         pitch = FreeImage_GetPitch(d);
     }
 

@@ -40,12 +40,29 @@ struct StdPictureLoad
     //! Was mask restored from the PNG at default graphics?
     bool isMaskPng = false;
 
+    // Original size (if texture got scaled while loading)
+    //! Original width
+    int w_orig = 0;
+    //! Original height
+    int h_orig = 0;
+
+    // Difference between original and initial size
+    //! Width scale factor
+    float w_scale = 1.0f;
+    //! Height scale factor
+    float h_scale = 1.0f;
+
+
     void clear()
     {
         raw.clear();
         rawMask.clear();
         lazyLoaded = false;
         isMaskPng = false;
+        w_orig = 0;
+        h_orig = 0;
+        w_scale = 1.f;
+        h_scale = 1.f;
     }
 };
 

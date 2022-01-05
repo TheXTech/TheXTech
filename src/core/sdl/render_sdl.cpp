@@ -644,10 +644,11 @@ void RenderSDL::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, d
 #endif
 
     SDL_Rect sourceRect;
-    if(tx.w_orig == 0 && tx.h_orig == 0)
+    if(tx.l.w_orig == 0 && tx.l.h_orig == 0)
         sourceRect = {xSrc, ySrc, wSrc, hSrc};
     else
-        sourceRect = {int(tx.w_scale * xSrc), int(tx.h_scale * ySrc), int(tx.w_scale * wSrc), int(tx.h_scale * hSrc)};
+        sourceRect = {int(tx.l.w_scale * xSrc), int(tx.l.h_scale * ySrc),
+                      int(tx.l.w_scale * wSrc), int(tx.l.h_scale * hSrc)};
 
     txColorMod(tx.d, red, green, blue, alpha);
     SDL_RenderCopyExF(m_gRenderer, tx.d.texture, &sourceRect, &destRect,
@@ -688,10 +689,10 @@ void RenderSDL::renderTextureScale(double xDst, double yDst, double wDst, double
 #endif
 
     SDL_Rect sourceRect;
-    if(tx.w_orig == 0 && tx.h_orig == 0)
+    if(tx.l.w_orig == 0 && tx.l.h_orig == 0)
         sourceRect = {0, 0, tx.w, tx.h};
     else
-        sourceRect = {0, 0, tx.w_orig, tx.h_orig};
+        sourceRect = {0, 0, tx.l.w_orig, tx.l.h_orig};
 
     txColorMod(tx.d, red, green, blue, alpha);
     SDL_RenderCopyExF(m_gRenderer, tx.d.texture, &sourceRect, &destRect,
@@ -732,6 +733,7 @@ void RenderSDL::renderTexture(double xDstD, double yDstD, double wDstD, double h
         if(wDst < 0)
             wDst = 0;
     }
+
     if(ySrc + hDst > tx.h)
     {
         hDst = tx.h - ySrc;
@@ -753,10 +755,11 @@ void RenderSDL::renderTexture(double xDstD, double yDstD, double wDstD, double h
 
     SDL_Rect sourceRect;
 
-    if(tx.w_orig == 0 && tx.h_orig == 0)
+    if(tx.l.w_orig == 0 && tx.l.h_orig == 0)
         sourceRect = {xSrc, ySrc, (int)wDst, (int)hDst};
     else
-        sourceRect = {int(tx.w_scale * xSrc), int(tx.h_scale * ySrc), int(tx.w_scale * wDst), int(tx.h_scale * hDst)};
+        sourceRect = {int(tx.l.w_scale * xSrc), int(tx.l.h_scale * ySrc),
+                      int(tx.l.w_scale * wDst), int(tx.l.h_scale * hDst)};
 
     txColorMod(tx.d, red, green, blue, alpha);
     SDL_RenderCopyF(m_gRenderer, tx.d.texture, &sourceRect, &destRect);
@@ -823,10 +826,11 @@ void RenderSDL::renderTextureFL(double xDstD, double yDstD, double wDstD, double
 
     SDL_Rect sourceRect;
 
-    if(tx.w_orig == 0 && tx.h_orig == 0)
+    if(tx.l.w_orig == 0 && tx.l.h_orig == 0)
         sourceRect = {xSrc, ySrc, (int)wDst, (int)hDst};
     else
-        sourceRect = {int(tx.w_scale * xSrc), int(tx.h_scale * ySrc), int(tx.w_scale * wDst), int(tx.h_scale * hDst)};
+        sourceRect = {int(tx.l.w_scale * xSrc), int(tx.l.h_scale * ySrc),
+                      int(tx.l.w_scale * wDst), int(tx.l.h_scale * hDst)};
 
     txColorMod(tx.d, red, green, blue, alpha);
     SDL_RenderCopyExF(m_gRenderer, tx.d.texture, &sourceRect, &destRect,
@@ -861,10 +865,10 @@ void RenderSDL::renderTexture(float xDst, float yDst,
 #endif
 
     SDL_Rect sourceRect;
-    if(tx.w_orig == 0 && tx.h_orig == 0)
+    if(tx.l.w_orig == 0 && tx.l.h_orig == 0)
         sourceRect = {0, 0, tx.w, tx.h};
     else
-        sourceRect = {0, 0, tx.w_orig, tx.h_orig};
+        sourceRect = {0, 0, tx.l.w_orig, tx.l.h_orig};
 
     txColorMod(tx.d, red, green, blue, alpha);
     SDL_RenderCopyExF(m_gRenderer, tx.d.texture, &sourceRect, &destRect,
