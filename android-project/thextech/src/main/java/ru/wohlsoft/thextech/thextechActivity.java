@@ -105,14 +105,6 @@ public class thextechActivity extends SDLActivity
                 args.add("--speed-run-semitransparent");
         }
 
-        setTouchScreenMode(Integer.parseInt(setup.getString("setup_touchscreen_mode", "1")));
-        setTouchScreenShowOnStart(setup.getBoolean("touchscreen_gamepad_showalways", false));
-        setTouchPadStyle(Integer.parseInt(setup.getString("setup_touchscreen_style", "0")));
-
-        setVibrationEnabled(setup.getBoolean("touchscreen_feedback_enabled", false));
-        setVibrationStrength(Float.parseFloat(setup.getString("touchscreen_vibration_strength", "1.0")));
-        setVibrationLength(Integer.parseInt(setup.getString("touchscreen_vibration_length", "12")));
-
         String gameAssetsPath = setup.getString("setup_assets_path", "");
         if(!gameAssetsPath.isEmpty())
         {
@@ -133,7 +125,6 @@ public class thextechActivity extends SDLActivity
     {
         super.onStart();
         gameRunning = true;
-        setHardwareKeyboardPresence(getResources().getConfiguration().keyboard);
     }
 
 
@@ -154,7 +145,6 @@ public class thextechActivity extends SDLActivity
 
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        setScreenSize(SDLActivity.getDiagonal(), displayMetrics.widthPixels, displayMetrics.heightPixels);
     }
 
     @Override
@@ -165,16 +155,7 @@ public class thextechActivity extends SDLActivity
         System.exit(0);
     }
 
-    public static native void setHardwareKeyboardPresence(int keyboard);
-    public static native void setTouchScreenMode(int mode);
-    public static native void setTouchScreenShowOnStart(boolean showOnStart);
-    public static native void setScreenSize(double screenSize, double width, double height);
-    public static native void setTouchPadStyle(int style);
     public static native void setSdCardPath(String path);
     public static native void setAppDataPath(String path);
     public static native void setGameAssetsPath(String path);
-    // Touch-screen controller feeback
-    public static native void setVibrationEnabled(boolean enabled);
-    public static native void setVibrationStrength(float strength);
-    public static native void setVibrationLength(int length);
 }
