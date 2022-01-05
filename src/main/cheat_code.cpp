@@ -1606,28 +1606,11 @@ static void stopHittingMe()
 
 static void stickyFingers()
 {
-    if(GrabAll)
-    {
-//                if(TestLevel == true)
-//                    frmTestSettings::chkGrabAll.Value = 0;
-        GrabAll = false;
-        PlaySound(SFX_PlayerShrink);
-    }
-    else
-    {
-//                if(TestLevel == true)
-//                    frmTestSettings::chkGrabAll.Value = 1;
-        GrabAll = true;
-        PlaySound(SFX_PlayerGrow);
-    }
+    GrabAll = !GrabAll;
+    PlaySound(GrabAll ? SFX_PlayerGrow : SFX_PlayerShrink);
 
-    for(int B = 1; B <= 128; B++)
-    {
-        if(GrabAll)
-            Player[B].CanGrabNPCs = true;
-        else
-            Player[B].CanGrabNPCs = false;
-    }
+    for(int B = 1; B <= maxPlayers; B++)
+        Player[B].CanGrabNPCs = GrabAll;
 }
 
 static void capitanN()
