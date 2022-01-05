@@ -22,17 +22,13 @@
 #ifndef STD_PICTURE_H
 #define STD_PICTURE_H
 
-#include <vector>
 #include "core/picture_data.h"
+#include "core/picture_load.h"
 
 #ifdef DEBUG_BUILD
 #   include <string>
 #   define STD_PICTURE_HAS_ORIG_PATH
 #endif
-
-typedef unsigned int    GLenum;
-typedef int             GLint;
-typedef unsigned int    GLuint;
 
 /*!
  * \brief RGB pixel color
@@ -104,25 +100,16 @@ struct StdPicture
 
     /* Loader related stuff */
 
-    //! Is this a lazy-loaded texture?
-    bool lazyLoaded = false;
-    //! Original compressed data of the front image
-    std::vector<char> raw;
-    //! Original compressed data of the mask image (if presented)
-    std::vector<char> rawMask;
-    //! Was mask restored from the PNG at default graphics?
-    bool isMaskPng = false;
+    //! Loader-related data
+    StdPictureLoad l;
 
-    //! Platform specific picture data
+    //! Platform specific texture data
     StdPictureData d;
 
     inline void resetAll()
     {
         inited = false;
-        raw.clear();
-        rawMask.clear();
-        lazyLoaded = false;
-        isMaskPng = false;
+        l.clear();
         w = 0;
         h = 0;
         w_orig = 0;

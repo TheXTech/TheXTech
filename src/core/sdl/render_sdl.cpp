@@ -597,7 +597,7 @@ void RenderSDL::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, d
     if(!tx.inited)
         return;
 
-    if(!tx.d.texture && tx.lazyLoaded)
+    if(!tx.d.texture && tx.l.lazyLoaded)
         lazyLoad(tx);
 
     if(!tx.d.texture)
@@ -666,7 +666,7 @@ void RenderSDL::renderTextureScale(double xDst, double yDst, double wDst, double
     if(!tx.inited)
         return;
 
-    if(!tx.d.texture && tx.lazyLoaded)
+    if(!tx.d.texture && tx.l.lazyLoaded)
         lazyLoad(tx);
 
     if(!tx.d.texture)
@@ -709,7 +709,7 @@ void RenderSDL::renderTexture(double xDstD, double yDstD, double wDstD, double h
     if(!tx.inited)
         return;
 
-    if(!tx.d.texture && tx.lazyLoaded)
+    if(!tx.d.texture && tx.l.lazyLoaded)
         lazyLoad(tx);
 
     if(!tx.d.texture)
@@ -774,7 +774,7 @@ void RenderSDL::renderTextureFL(double xDstD, double yDstD, double wDstD, double
     if(!tx.inited)
         return;
 
-    if(!tx.d.texture && tx.lazyLoaded)
+    if(!tx.d.texture && tx.l.lazyLoaded)
         lazyLoad(tx);
 
     if(!tx.d.texture)
@@ -845,7 +845,7 @@ void RenderSDL::renderTexture(float xDst, float yDst,
     if(!tx.inited)
         return;
 
-    if(!tx.d.texture && tx.lazyLoaded)
+    if(!tx.d.texture && tx.l.lazyLoaded)
         lazyLoad(tx);
 
     if(!tx.d.texture)

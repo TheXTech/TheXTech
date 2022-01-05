@@ -340,22 +340,22 @@ StdPicture AbstractRender_t::lazyLoadPicture(const std::string &path,
     target.w = tSize.w();
     target.h = tSize.h();
 
-    dumpFullFile(target.raw, path);
+    dumpFullFile(target.l.raw, path);
 
     //Apply Alpha mask
     if(useMask && !maskPath.empty() && Files::fileExists(maskPath))
     {
-        dumpFullFile(target.rawMask, maskPath);
-        target.isMaskPng = false; //-V1048
+        dumpFullFile(target.l.rawMask, maskPath);
+        target.l.isMaskPng = false; //-V1048
     }
     else if(useMask && !maskFallbackPath.empty())
     {
-        dumpFullFile(target.rawMask, maskFallbackPath);
-        target.isMaskPng = true;
+        dumpFullFile(target.l.rawMask, maskFallbackPath);
+        target.l.isMaskPng = true;
     }
 
     target.inited = true;
-    target.lazyLoaded = true;
+    target.l.lazyLoaded = true;
     target.d.clear();
 
     return target;
@@ -363,18 +363,18 @@ StdPicture AbstractRender_t::lazyLoadPicture(const std::string &path,
 
 void AbstractRender_t::lazyLoad(StdPicture &target)
 {
-    if(!target.inited || !target.lazyLoaded || target.d.hasTexture())
+    if(!target.inited || !target.l.lazyLoaded || target.d.hasTexture())
         return;
 
-    FIBITMAP *sourceImage = GraphicsHelps::loadImage(target.raw);
+    FIBITMAP *sourceImage = GraphicsHelps::loadImage(target.l.raw);
     if(!sourceImage)
     {
         pLogCritical("Lazy-decompress has failed: invalid image data");
         return;
     }
 
-    if(!target.rawMask.empty())
-        GraphicsHelps::mergeWithMask(sourceImage, target.rawMask, target.isMaskPng);
+    if(!target.l.rawMask.empty())
+        GraphicsHelps::mergeWithMask(sourceImage, target.l.rawMask, target.l.isMaskPng);
 
     uint32_t w = static_cast<uint32_t>(FreeImage_GetWidth(sourceImage));
     uint32_t h = static_cast<uint32_t>(FreeImage_GetHeight(sourceImage));
@@ -391,7 +391,7 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
     }
 
     m_lazyLoadedBytes += (w * h * 4);
-    if(!target.rawMask.empty())
+    if(!target.l.rawMask.empty())
         m_lazyLoadedBytes += (w * h * 4);
 
     RGBQUAD upperColor;
@@ -468,14 +468,14 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
 
 void AbstractRender_t::lazyUnLoad(StdPicture &target)
 {
-    if(!target.inited || !target.lazyLoaded || !target.d.hasTexture())
+    if(!target.inited || !target.l.lazyLoaded || !target.d.hasTexture())
         return;
     XRender::deleteTexture(target, true);
 }
 
 void AbstractRender_t::lazyPreLoad(StdPicture &target)
 {
-    if(!target.d.hasTexture() && target.lazyLoaded)
+    if(!target.d.hasTexture() && target.l.lazyLoaded)
         lazyLoad(target);
 }
 
