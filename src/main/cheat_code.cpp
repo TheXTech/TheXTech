@@ -20,11 +20,14 @@
 
 #include <SDL2/SDL_stdinc.h>
 #ifdef ENABLE_ANTICHEAT_TRAP
-#include <SDL2/SDL_messagebox.h>
+#include "core/msgbox.h"
+#include "core/render.h"
+#include "core/events.h"
 #endif
 
 #include <Logger/logger.h>
 #ifdef ENABLE_ANTICHEAT_TRAP
+#include <SDL2/SDL_timer.h>
 #include <pge_delay.h>
 #endif
 
@@ -88,15 +91,14 @@ void CheatCode(char NewKey)
         }
         else
         {
-            SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,
-                                     "Die, cheater!",
-                                     "       Die, cheater!       \n"
-                                     "Now play the game all over \n"
-                                     "    from the beginning!    \n"
-                                     "                           \n"
-                                     "     Time to be evil!      \n"
-                                     "      Mu-ha-ha-ha-ha!      ",
-                                     frmMain.getWindow());
+            XMsgBox::simpleMsgBox(AbstractMsgBox_t::MESSAGEBOX_ERROR,
+                                  "Die, cheater!",
+                                  "       Die, cheater!       \n"
+                                  "Now play the game all over \n"
+                                  "    from the beginning!    \n"
+                                  "                           \n"
+                                  "     Time to be evil!      \n"
+                                  "      Mu-ha-ha-ha-ha!      ");
         }
 
         for(int A = 1; A <= numPlayers; ++A)
@@ -115,10 +117,10 @@ void CheatCode(char NewKey)
             GameMenu = true;
             MenuMode = 0;
             MenuCursor = 0;
-            frmMain.clearBuffer();
-            frmMain.repaint();
+            XRender::clearBuffer();
+            XRender::repaint();
             StopMusic();
-            DoEvents();
+            XEvents::doEvents();
             PGE_Delay(500);
         }
         return;

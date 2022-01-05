@@ -21,8 +21,11 @@
 #include <SDL2/SDL_timer.h>
 
 #include "globals.h"
+#include "gfx.h"
 #include "load_gfx.h"
 #include "graphics.h" // SuperPrint
+#include "core/render.h"
+#include "core/events.h"
 #include <Utils/files.h>
 #include <Utils/dir_list_ci.h>
 #include <DirManager/dirman.h>
@@ -152,7 +155,7 @@ static void loadCGFX(const std::set<std::string> &files,
 #ifdef DEBUG_BUILD
         pLogDebug("Trying to load custom GFX: %s with mask %s", imgToUse.c_str(), maskToUse.c_str());
 #endif
-        newTexture = frmMain.lazyLoadPicture(imgToUse, maskToUse, origPath);
+        newTexture = XRender::lazyLoadPicture(imgToUse, maskToUse, origPath);
         success = newTexture.inited;
         loadedPath = imgToUse;
     }
@@ -161,7 +164,7 @@ static void loadCGFX(const std::set<std::string> &files,
 #ifdef DEBUG_BUILD
         pLogDebug("Trying to load custom GFX: %s", imgToUse.c_str());
 #endif
-        newTexture = frmMain.lazyLoadPicture(imgToUse);
+        newTexture = XRender::lazyLoadPicture(imgToUse);
         success = newTexture.inited;
         loadedPath = imgToUse;
     }
@@ -199,7 +202,7 @@ static void restoreLevelBackupTextures()
         if(t.remote_isCustom)
             *t.remote_isCustom = false;
         SDL_assert_release(t.remote_texture);
-        frmMain.deleteTexture(*t.remote_texture);
+        XRender::deleteTexture(*t.remote_texture);
         *t.remote_texture = t.texture;
     }
     g_customLevelCGFXPathsCache.clear();
@@ -217,7 +220,7 @@ static void restoreWorldBackupTextures()
         if(t.remote_isCustom)
             *t.remote_isCustom = false;
         SDL_assert_release(t.remote_texture);
-        frmMain.deleteTexture(*t.remote_texture);
+        XRender::deleteTexture(*t.remote_texture);
         *t.remote_texture = t.texture;
     }
     g_customWorldCGFXPathsCache.clear();
@@ -237,7 +240,7 @@ void LoadGFX()
             p = GfxRoot + fmt::format_ne("{1}/{1}-{0}.png", A, GFXPlayerNames[c]);
             if(Files::fileExists(p))
             {
-                (*GFXCharacterBMP[c])[A] = frmMain.lazyLoadPicture(p);
+                (*GFXCharacterBMP[c])[A] = XRender::lazyLoadPicture(p);
                 (*GFXCharacterWidth[c])[A] = GFXMarioBMP[A].w;
                 (*GFXCharacterHeight[c])[A] = GFXMarioBMP[A].h;
             }
@@ -250,7 +253,7 @@ void LoadGFX()
         p = GfxRoot + fmt::format_ne("block/block-{0}.png", A);
         if(Files::fileExists(p))
         {
-            GFXBlockBMP[A] = frmMain.lazyLoadPicture(p);
+            GFXBlockBMP[A] = XRender::lazyLoadPicture(p);
         }
         else
         {
@@ -266,7 +269,7 @@ void LoadGFX()
         p = GfxRoot + fmt::format_ne("background2/background2-{0}.png", A);
         if(Files::fileExists(p))
         {
-            GFXBackground2BMP[A] = frmMain.lazyLoadPicture(p);
+            GFXBackground2BMP[A] = XRender::lazyLoadPicture(p);
             GFXBackground2Width[A] = GFXBackground2BMP[A].w;
             GFXBackground2Height[A] = GFXBackground2BMP[A].h;
         }
@@ -285,7 +288,7 @@ void LoadGFX()
         p = GfxRoot + fmt::format_ne("npc/npc-{0}.png", A);
         if(Files::fileExists(p))
         {
-            GFXNPCBMP[A] = frmMain.lazyLoadPicture(p);
+            GFXNPCBMP[A] = XRender::lazyLoadPicture(p);
             GFXNPCWidth[A] = GFXNPCBMP[A].w;
             GFXNPCHeight[A] = GFXNPCBMP[A].h;
             if(A % 20 == 0)
@@ -305,7 +308,7 @@ void LoadGFX()
         p = GfxRoot + fmt::format_ne("effect/effect-{0}.png", A);
         if(Files::fileExists(p))
         {
-            GFXEffectBMP[A] = frmMain.lazyLoadPicture(p);
+            GFXEffectBMP[A] = XRender::lazyLoadPicture(p);
             GFXEffectWidth[A] = GFXEffectBMP[A].w;
             GFXEffectHeight[A] = GFXEffectBMP[A].h;
             if(A % 20 == 0)
@@ -325,7 +328,7 @@ void LoadGFX()
         p = GfxRoot + fmt::format_ne("yoshi/yoshib-{0}.png", A);
         if(Files::fileExists(p))
         {
-            GFXYoshiBBMP[A] = frmMain.lazyLoadPicture(p);
+            GFXYoshiBBMP[A] = XRender::lazyLoadPicture(p);
             if(A % 20 == 0)
                 UpdateLoad();
         }
@@ -341,7 +344,7 @@ void LoadGFX()
         p = GfxRoot + fmt::format_ne("yoshi/yoshit-{0}.png", A);
         if(Files::fileExists(p))
         {
-            GFXYoshiTBMP[A] = frmMain.lazyLoadPicture(p);
+            GFXYoshiTBMP[A] = XRender::lazyLoadPicture(p);
             if(A % 20 == 0)
                 UpdateLoad();
         }
@@ -357,7 +360,7 @@ void LoadGFX()
         p = GfxRoot + fmt::format_ne("background/background-{0}.png", A);
         if(Files::fileExists(p))
         {
-            GFXBackgroundBMP[A] = frmMain.lazyLoadPicture(p);
+            GFXBackgroundBMP[A] = XRender::lazyLoadPicture(p);
             GFXBackgroundWidth[A] = GFXBackgroundBMP[A].w;
             GFXBackgroundHeight[A] = GFXBackgroundBMP[A].h;
             BackgroundWidth[A] = GFXBackgroundWidth[A];
@@ -379,7 +382,7 @@ void LoadGFX()
         p = GfxRoot + fmt::format_ne("tile/tile-{0}.png", A);
         if(Files::fileExists(p))
         {
-            GFXTileBMP[A] = frmMain.lazyLoadPicture(p);
+            GFXTileBMP[A] = XRender::lazyLoadPicture(p);
             GFXTileWidth[A] = GFXTileBMP[A].w;
             GFXTileHeight[A] = GFXTileBMP[A].h;
             if(A % 20 == 0)
@@ -397,7 +400,7 @@ void LoadGFX()
         p = GfxRoot + fmt::format_ne("level/level-{0}.png", A);
         if(Files::fileExists(p))
         {
-            GFXLevelBMP[A] = frmMain.lazyLoadPicture(p);
+            GFXLevelBMP[A] = XRender::lazyLoadPicture(p);
             GFXLevelWidth[A] = GFXLevelBMP[A].w;
             GFXLevelHeight[A] = GFXLevelBMP[A].h;
             if(A % 20 == 0)
@@ -415,7 +418,7 @@ void LoadGFX()
         p = GfxRoot + fmt::format_ne("scene/scene-{0}.png", A);
         if(Files::fileExists(p))
         {
-            GFXSceneBMP[A] = frmMain.lazyLoadPicture(p);
+            GFXSceneBMP[A] = XRender::lazyLoadPicture(p);
             GFXSceneWidth[A] = GFXSceneBMP[A].w;
             GFXSceneHeight[A] = GFXSceneBMP[A].h;
             if(A % 20 == 0)
@@ -433,7 +436,7 @@ void LoadGFX()
         p = GfxRoot + fmt::format_ne("player/player-{0}.png", A);
         if(Files::fileExists(p))
         {
-            GFXPlayerBMP[A] = frmMain.lazyLoadPicture(p);
+            GFXPlayerBMP[A] = XRender::lazyLoadPicture(p);
             GFXPlayerWidth[A] = GFXPlayerBMP[A].w;
             GFXPlayerHeight[A] = GFXPlayerBMP[A].h;
             if(A % 20 == 0)
@@ -451,7 +454,7 @@ void LoadGFX()
         p = GfxRoot + fmt::format_ne("path/path-{0}.png", A);
         if(Files::fileExists(p))
         {
-            GFXPathBMP[A] = frmMain.lazyLoadPicture(p);
+            GFXPathBMP[A] = XRender::lazyLoadPicture(p);
             GFXPathWidth[A] = GFXPathBMP[A].w;
             GFXPathHeight[A] = GFXPathBMP[A].h;
             if(A % 20 == 0)
@@ -656,6 +659,7 @@ void UpdateLoadREAL()
 {
     std::string state;
     bool draw = false;
+
     if(IntProc::isEnabled())
     {
         state = IntProc::getState();
@@ -679,17 +683,17 @@ void UpdateLoadREAL()
         draw = true;
     }
 
-#ifdef __ANDROID__
-    if(frmMain.renderBlocked())
+#ifdef USE_RENDER_BLOCKING
+    if(XRender::renderBlocked())
         return;
 #endif
 
     if(draw)
     {
-        frmMain.setTargetTexture();
-        frmMain.clearBuffer();
+        XRender::setTargetTexture();
+        XRender::clearBuffer();
         if(!gfxLoaderTestMode)
-            frmMain.renderTexture(0, 0, GFX.MenuGFX[4]);
+            XRender::renderTexture(0, 0, GFX.MenuGFX[4]);
         else
         {
             if(!state.empty())
@@ -697,15 +701,16 @@ void UpdateLoadREAL()
             else
                 SuperPrint("Loading data...", 3, 10, 10);
         }
-        frmMain.renderTexture(632, 576, GFX.Loader);
-        frmMain.renderTexture(760, 560, GFX.LoadCoin.w, GFX.LoadCoin.h / 4, GFX.LoadCoin, 0, 32 * LoadCoins);
+
+        XRender::renderTexture(632, 576, GFX.Loader);
+        XRender::renderTexture(760, 560, GFX.LoadCoin.w, GFX.LoadCoin.h / 4, GFX.LoadCoin, 0, 32 * LoadCoins);
 
         if(gfxLoaderThreadingMode && alphaFader >= 0.f)
-            frmMain.renderRect(0, 0, ScreenW, ScreenH, 0.f, 0.f, 0.f, alphaFader);
+            XRender::renderRect(0, 0, ScreenW, ScreenH, 0.f, 0.f, 0.f, alphaFader);
 
-        frmMain.repaint();
-        frmMain.setTargetScreen();
-        DoEvents();
+        XRender::repaint();
+        XRender::setTargetScreen();
+        XEvents::doEvents();
 #ifdef __EMSCRIPTEN__
         emscripten_sleep(1); // To repaint screenn, it's required to send a sleep signal
 #endif

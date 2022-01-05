@@ -26,6 +26,7 @@
 #include "../graphics.h"
 #include "../player.h"
 #include "../game_main.h"
+#include "../core/events.h"
 #include "../compat.h"
 #include "../config.h"
 
@@ -522,7 +523,7 @@ void TouchBonus(int A, int B)
                     }
                 }
                 StopMusic();
-                DoEvents();
+                XEvents::doEvents();
                 PlaySound(SFX_CardRouletteClear);
             }
             else if(NPC[B].Type == 16)

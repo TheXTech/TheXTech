@@ -33,6 +33,7 @@
 
 #include "globals.h"
 #include "game_main.h"
+#include "gfx.h"
 
 #include "config.h"
 #include "frame_timer.h"
@@ -57,6 +58,9 @@
 #include "main/menu_main.h"
 #include "main/game_info.h"
 #include "main/record.h"
+#include "core/render.h"
+#include "core/window.h"
+#include "core/events.h"
 
 #include "pseudo_vb.h"
 
@@ -100,8 +104,8 @@ int GameMain(const CmdLineSetup_t &setup)
     bool tempBool = false;
     int lastWarpEntered = 0;
 
-    LB = "\n";
-    EoT = "";
+//    LB = "\n";
+//    EoT = "";
 
     FrameSkip = setup.frameSkip;
     noSound = setup.noSound;
@@ -135,7 +139,7 @@ int GameMain(const CmdLineSetup_t &setup)
 
 //    If LevelEditor = False Then
 //        frmMain.Show // Show window a bit later
-//    frmMain.show();
+//    XWindow::show();
 //        GameMenu = True
     GameMenu = true;
 //    Else
@@ -149,19 +153,19 @@ int GameMain(const CmdLineSetup_t &setup)
     MaxFPS = setup.testMaxFPS; // || (g_videoSettings.renderModeObtained == RENDER_ACCELERATED_VSYNC);
 
     InitControls(); // init player's controls
-    DoEvents();
+    XEvents::doEvents();
 
 #ifdef __EMSCRIPTEN__ // Workaround for a recent Chrome's policy to avoid sudden sound without user's interaction
-    frmMain.show(); // Don't show window until playing an initial sound
+    XWindow::show(); // Don't show window until playing an initial sound
 
     while(!MenuMouseDown)
     {
-        frmMain.setTargetTexture();
-        frmMain.clearBuffer();
+        XRender::setTargetTexture();
+        XRender::clearBuffer();
         SuperPrint("Click to start a game", 3, 230, 280);
-        frmMain.repaint();
-        frmMain.setTargetScreen();
-        DoEvents();
+        XRender::repaint();
+        XRender::setTargetScreen();
+        XEvents::doEvents();
         PGE_Delay(10);
     }
 #endif
@@ -172,7 +176,7 @@ int GameMain(const CmdLineSetup_t &setup)
 #ifndef PGE_NO_THREADING
     gfxLoaderThreadingMode = true;
 #endif
-    frmMain.show(); // Don't show window until playing an initial sound
+    XWindow::show(); // Don't show window until playing an initial sound
 
     if(!noSound)
     {
@@ -221,12 +225,12 @@ int GameMain(const CmdLineSetup_t &setup)
     LoadingInProcess = false;
 
     // Clear the screen
-    frmMain.setTargetTexture();
-    frmMain.clearBuffer();
-    frmMain.repaint();
-    DoEvents();
+    XRender::setTargetTexture();
+    XRender::clearBuffer();
+    XRender::repaint();
+    XEvents::doEvents();
 
-    if(!neverPause && !frmMain.isWindowActive())
+    if(!neverPause && !XWindow::hasWindowInputFocus())
         SoundPauseEngine(1);
 
     if(!setup.testLevel.empty() || !setup.testReplay.empty() || setup.interprocess) // Start level testing immediately!
@@ -260,13 +264,13 @@ int GameMain(const CmdLineSetup_t &setup)
     {
         if(GameMenu || MagicHand || LevelEditor)
         {
-            frmMain.MousePointer = 99;
-            showCursor(0);
+            XWindow::setCursor(AbstractWindow_t::CURSOR_NONE);
+            XWindow::showCursor(0);
         }
         else if(!resChanged)
         {
-            frmMain.MousePointer = 0;
-            showCursor(1);
+            XWindow::setCursor(AbstractWindow_t::CURSOR_DEFAULT);
+            XWindow::showCursor(1);
         }
 
 //        If LevelEditor = True Then 'Load the level editor
@@ -589,9 +593,9 @@ int GameMain(const CmdLineSetup_t &setup)
 
                 LevelSelect = false;
 
-                frmMain.setTargetTexture();
-                frmMain.clearBuffer();
-                frmMain.repaint();
+                XRender::setTargetTexture();
+                XRender::clearBuffer();
+                XRender::repaint();
 
                 ClearLevel();
 
@@ -617,9 +621,9 @@ int GameMain(const CmdLineSetup_t &setup)
                 }
                 else
                 {
-                    frmMain.setTargetTexture();
-                    frmMain.clearBuffer();
-                    frmMain.repaint();
+                    XRender::setTargetTexture();
+                    XRender::clearBuffer();
+                    XRender::repaint();
                 }
             }
             else
@@ -905,17 +909,17 @@ void EditorLoop()
 void KillIt()
 {
     GameIsActive = false;
-#ifndef __ANDROID__
-    frmMain.hide();
+#ifndef RENDER_FULLSCREEN_ALWAYS
+    XWindow::hide();
     if(resChanged)
         SetOrigRes();
 #else
-    frmMain.clearBuffer();
-    frmMain.repaint();
+    XRender::clearBuffer();
+    XRender::repaint();
 #endif
     QuitMixerX();
     UnloadGFX();
-    showCursor(1);
+    XWindow::showCursor(1);
 }
 
 
@@ -930,10 +934,10 @@ void NextLevel()
     LevelMacroCounter = 0;
     StopMusic();
     ClearLevel();
-    frmMain.setTargetTexture();
-    frmMain.clearBuffer();
-    frmMain.repaint();
-    DoEvents();
+    XRender::setTargetTexture();
+    XRender::clearBuffer();
+    XRender::repaint();
+    XEvents::doEvents();
 
     if(!TestLevel && GoToLevel.empty() && !NoMap)
         PGE_Delay(500);
@@ -1059,7 +1063,7 @@ void UpdateMacro()
             EndLevel = true;
             LevelMacro = LEVELMACRO_OFF;
             LevelMacroCounter = 0;
-            frmMain.clearBuffer();
+            XRender::clearBuffer();
         }
     }
     else if(LevelMacro == LEVELMACRO_KEYHOLE_EXIT)
@@ -1076,7 +1080,7 @@ void UpdateMacro()
 //            if(tempTime > (float)(gameTime + 0.01f) || tempTime < gameTime)
 
             if(g_compatibility.fix_keyhole_framerate)
-                DoEvents();
+                XEvents::doEvents();
 
             if(g_compatibility.fix_keyhole_framerate ?
                canProceedFrame() :
@@ -1087,7 +1091,7 @@ void UpdateMacro()
                 if(g_compatibility.fix_keyhole_framerate)
                     computeFrameTime1();
                 else
-                    DoEvents();
+                    XEvents::doEvents();
 
                 speedRun_tick();
                 UpdateGraphics();
@@ -1096,7 +1100,7 @@ void UpdateMacro()
 
                 if(g_compatibility.fix_keyhole_framerate)
                 {
-                    DoEvents();
+                    XEvents::doEvents();
                     computeFrameTime2();
                 }
 
@@ -1124,7 +1128,7 @@ void UpdateMacro()
         EndLevel = true;
         LevelMacro = LEVELMACRO_OFF;
         LevelMacroCounter = 0;
-        frmMain.clearBuffer();
+        XRender::clearBuffer();
     }
     else if(LevelMacro == LEVELMACRO_CRYSTAL_BALL_EXIT)
     {
@@ -1154,7 +1158,7 @@ void UpdateMacro()
             EndLevel = true;
             LevelMacro = LEVELMACRO_OFF;
             LevelMacroCounter = 0;
-            frmMain.clearBuffer();
+            XRender::clearBuffer();
         }
     }
     else if(LevelMacro == LEVELMACRO_GAME_COMPLETE_EXIT)
@@ -1196,7 +1200,7 @@ void UpdateMacro()
                 MenuMode = MENU_MAIN;
                 MenuCursor = 0;
             }
-            frmMain.clearBuffer();
+            XRender::clearBuffer();
         }
     }
     else if(LevelMacro == LEVELMACRO_STAR_EXIT) // Star Exit
@@ -1412,12 +1416,12 @@ void CheckActive()
 //    If nPlay.Online = True Then Exit Sub
     // If LevelEditor = False And TestLevel = False Then Exit Sub
     // If LevelEditor = False Then Exit Sub
-    while(!frmMain.isWindowActive())
+    while(!XWindow::hasWindowInputFocus())
     {
-        frmMain.waitEvents();
+        XEvents::waitEvents();
 //        If LevelEditor = True Or MagicHand = True Then frmLevelWindow.vScreen(1).MousePointer = 0
         if(LevelEditor || MagicHand)
-            showCursor(0);
+            XWindow::showCursor(0);
 
         resetFrameTimer();
 
@@ -1620,11 +1624,11 @@ void StartBattleMode()
     LevelSelect = false;
     GameMenu = false;
     BattleMode = true;
-    frmMain.setTargetTexture();
-    frmMain.clearBuffer();
-    frmMain.repaint();
+    XRender::setTargetTexture();
+    XRender::clearBuffer();
+    XRender::repaint();
     StopMusic();
-    DoEvents();
+    XEvents::doEvents();
     PGE_Delay(500);
     ClearLevel();
 

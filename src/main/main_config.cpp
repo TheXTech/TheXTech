@@ -277,7 +277,7 @@ void OpenConfig()
         }
     }
 //    If resBool = True And resChanged = False And LevelEditor = False Then ChangeScreen
-#ifndef __ANDROID__
+#ifndef RENDER_FULLSCREEN_ALWAYS
     if(resBool && !resChanged)
         ChangeScreen();
 #endif

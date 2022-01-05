@@ -21,6 +21,8 @@
 #include <SDL2/SDL.h>
 
 #include "game_main.h"
+#include "frm_main.h"
+#include "gfx.h"
 #include "sound.h"
 #include "video.h"
 #include "main/presetup.h"
@@ -136,6 +138,7 @@ extern "C"
 int main(int argc, char**argv)
 {
     CmdLineSetup_t setup;
+    FrmMain frmMain;
 
     CrashHandler::initSigs();
 
@@ -411,9 +414,9 @@ int main(int argc, char**argv)
     // set this flag before SDL initialization to allow game be quit when closing a window before a loading process will be completed
     GameIsActive = true;
 
-    if(frmMain.initSDL(setup))
+    if(frmMain.initSystem(setup))
     {
-        frmMain.freeSDL();
+        frmMain.freeSystem();
         return 1;
     }
 
@@ -443,7 +446,7 @@ int main(int argc, char**argv)
         return 1;
 #endif
 
-    frmMain.freeSDL();
+    frmMain.freeSystem();
 
     return ret;
 }

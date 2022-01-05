@@ -25,6 +25,8 @@
 #include "sound.h"
 #include "change_res.h"
 #include "main/game_info.h"
+#include "core/render.h"
+#include "core/events.h"
 
 #include "pseudo_vb.h"
 
@@ -414,7 +416,7 @@ void ChangeScreen()
 //        SetOrigRes
         SetOrigRes();
 //        DoEvents
-        DoEvents();
+        XEvents::doEvents();
 //        DeleteDC myBackBuffer
 //        DeleteObject myBufferBMP
 //        DoEvents
@@ -447,7 +449,7 @@ void ChangeScreen()
 //        SetRes
         SetRes();
 //        DoEvents
-        DoEvents();
+        XEvents::doEvents();
 //        DeleteDC myBackBuffer
 //        DeleteObject myBufferBMP
 //        DoEvents
@@ -569,10 +571,10 @@ int pfrY(int plrFrame)
 
 void ScreenShot()
 {
-#ifndef __EMSCRIPTEN__
-    frmMain.setTargetTexture();
-    frmMain.makeShot();
-    frmMain.setTargetScreen();
+#ifdef USE_SCREENSHOTS_AND_RECS
+    XRender::setTargetTexture();
+    XRender::makeShot();
+    XRender::setTargetScreen();
     PlaySound(SFX_GotItem);
 #endif
     TakeScreen = false;
@@ -595,30 +597,30 @@ void DrawFrozenNPC(int Z, int A)
         // Draw frozen NPC body in only condition the content value is valid
         if(content > 0 && content <= maxNPCType)
         {
-            frmMain.renderTexture(float(vScreenX[Z] + n.Location.X + 2),
-                                  float(vScreenY[Z] + n.Location.Y + 2),
-                                  float(n.Location.Width - 4),
-                                  float(n.Location.Height - 4),
-                                  GFXNPCBMP[content],
-                                  2, 2 + contentFrame * NPCHeight[content], c, c, c);
+             XRender::renderTexture(float(vScreenX[Z] + n.Location.X + 2),
+                                    float(vScreenY[Z] + n.Location.Y + 2),
+                                    float(n.Location.Width - 4),
+                                    float(n.Location.Height - 4),
+                                    GFXNPCBMP[content],
+                                    2, 2 + contentFrame * NPCHeight[content], c, c, c);
         }
 
         // draw ice
-        frmMain.renderTexture(float(vScreenX[Z] + n.Location.X + NPCFrameOffsetX[n.Type]),
-                              float(vScreenY[Z] + n.Location.Y + NPCFrameOffsetY[n.Type]),
-                              float(n.Location.Width - 6), float(n.Location.Height - 6),
-                              GFXNPCBMP[n.Type], 0, 0, c, c, c);
-        frmMain.renderTexture(float(vScreenX[Z] + n.Location.X + NPCFrameOffsetX[n.Type] + n.Location.Width - 6),
-                              float(vScreenY[Z] + n.Location.Y + NPCFrameOffsetY[n.Type]),
-                              6, float(n.Location.Height - 6),
-                              GFXNPCBMP[n.Type], 128 - 6, 0, c, c, c);
-        frmMain.renderTexture(float(vScreenX[Z] + n.Location.X + NPCFrameOffsetX[n.Type]),
-                              float(vScreenY[Z] + n.Location.Y + NPCFrameOffsetY[n.Type] + n.Location.Height - 6),
-                              float(n.Location.Width - 6), 6,
-                              GFXNPCBMP[n.Type], 0, 128 - 6, c, c, c);
-        frmMain.renderTexture(float(vScreenX[Z] + n.Location.X + NPCFrameOffsetX[n.Type] + n.Location.Width - 6),
-                              float(vScreenY[Z] + n.Location.Y + NPCFrameOffsetY[n.Type] + n.Location.Height - 6),
-                              6, 6, GFXNPCBMP[n.Type],
-                              128 - 6, 128 - 6, c, c, c);
+         XRender::renderTexture(float(vScreenX[Z] + n.Location.X + NPCFrameOffsetX[n.Type]),
+                                float(vScreenY[Z] + n.Location.Y + NPCFrameOffsetY[n.Type]),
+                                float(n.Location.Width - 6), float(n.Location.Height - 6),
+                                GFXNPCBMP[n.Type], 0, 0, c, c, c);
+         XRender::renderTexture(float(vScreenX[Z] + n.Location.X + NPCFrameOffsetX[n.Type] + n.Location.Width - 6),
+                                float(vScreenY[Z] + n.Location.Y + NPCFrameOffsetY[n.Type]),
+                                6, float(n.Location.Height - 6),
+                                GFXNPCBMP[n.Type], 128 - 6, 0, c, c, c);
+         XRender::renderTexture(float(vScreenX[Z] + n.Location.X + NPCFrameOffsetX[n.Type]),
+                                float(vScreenY[Z] + n.Location.Y + NPCFrameOffsetY[n.Type] + n.Location.Height - 6),
+                                float(n.Location.Width - 6), 6,
+                                GFXNPCBMP[n.Type], 0, 128 - 6, c, c, c);
+         XRender::renderTexture(float(vScreenX[Z] + n.Location.X + NPCFrameOffsetX[n.Type] + n.Location.Width - 6),
+                                float(vScreenY[Z] + n.Location.Y + NPCFrameOffsetY[n.Type] + n.Location.Height - 6),
+                                6, 6, GFXNPCBMP[n.Type],
+                                128 - 6, 128 - 6, c, c, c);
     }
 }

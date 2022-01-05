@@ -22,57 +22,97 @@
 #ifndef STD_PICTURE_H
 #define STD_PICTURE_H
 
-#include <vector>
+#include "core/picture_data.h"
+#include "core/picture_load.h"
+
 #ifdef DEBUG_BUILD
-#include <string>
+#   include <string>
+#   define STD_PICTURE_HAS_ORIG_PATH
 #endif
 
-typedef unsigned int    GLenum;
-typedef int             GLint;
-typedef unsigned int    GLuint;
-
+/*!
+ * \brief RGB pixel color
+ */
 struct PGEColor
 {
-    float r = 0.0f;
-    float g = 0.0f;
-    float b = 0.0f;
+    uint8_t r = 0;
+    uint8_t g = 0;
+    uint8_t b = 0;
 };
 
 struct SDL_Texture;
+
+/**
+ * @brief Handler of a graphical texture
+ */
 struct StdPicture
 {
-#ifdef DEBUG_BUILD
+#ifdef STD_PICTURE_HAS_ORIG_PATH
+    //! Debug-only file path to the original picture
     std::string origPath;
 #endif
-    bool inited = false;
-    // Width and height
-    int w = 0;
-    int h = 0;
-    // Frame width and height (for animation sprite textures)
-    int frame_w = 0;
-    int frame_h = 0;
-    // Original size (if texture got scaled while loading)
-    int w_orig = 0;
-    int h_orig = 0;
-    // Difference between original and initial size
-    float w_scale = 1.0f;
-    float h_scale = 1.0f;
 
-    bool lazyLoaded = false;
-    std::vector<char> raw;
-    std::vector<char> rawMask;
-    bool isMaskPng = false;
-    SDL_Texture *texture = nullptr;
-    GLenum format = 0;
-    GLint  nOfColors = 0;
+    //! Was this texture initialized by graphical engine or not?
+    bool inited = false;
+
+    //! Width of texture
+    int w = 0;
+    //! Height of texture
+    int h = 0;
+
+    // Frame width and height (for animation sprite textures)
+    //! Animation frame width
+    int frame_w = 0;
+    //1 Animation frame height
+    int frame_h = 0;
+
+    // These colors were used to auto-choose the fill color for the background
+    //! Left-top pixel color
     PGEColor ColorUpper;
+    //! Left-bottom pixel color
     PGEColor ColorLower;
-    uint8_t modColor[4] = {255,255,255,255};
+
+    /*!
+     * \brief Reset colors into black
+     */
+    inline void resetColors()
+    {
+        ColorUpper.r = 0;
+        ColorUpper.g = 0;
+        ColorUpper.b = 0;
+        ColorLower.r = 0;
+        ColorLower.g = 0;
+        ColorLower.b = 0;
+    }
+
+
+    /* Loader related stuff */
+
+    //! Loader-related data
+    StdPictureLoad l;
+
+    //! Platform specific texture data
+    StdPictureData d;
+
+    /*!
+     * \brief Reset all values into initial state.
+     *
+     * This must be called by renderer backend after texture deletion
+     */
+    inline void resetAll()
+    {
+        inited = false;
+        l.clear();
+        w = 0;
+        h = 0;
+        frame_w = 0;
+        frame_h = 0;
+    }
 };
 
 // This macro allows to get the original texture path when debug build is on,
 // and safely return the blank string when the release build is
-#ifdef DEBUG_BUILD
+#ifdef STD_PICTURE_HAS_ORIG_PATH
 #   define StdPictureGetOrigPath(x) x.origPath
 #else
 #   define StdPictureGetOrigPath(x) std::string()

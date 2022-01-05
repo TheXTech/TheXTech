@@ -24,6 +24,7 @@
 #include "../sound.h"
 #include "../change_res.h"
 #include "../load_gfx.h"
+#include "../core/window.h"
 
 
 // Sets up the split lines
@@ -299,5 +300,5 @@ void SetRes()
 //    GetCurrentRes(); // Dummy, useless
     resChanged = true;
     ChangeRes(800, 600, 16, 60); // 800x600 pixels, 16 bit Color, 60Hz
-    showCursor(0);
+    XWindow::showCursor(0);
 }

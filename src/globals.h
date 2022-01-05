@@ -28,9 +28,7 @@
 #include <vector>
 #include <cstdlib>
 
-#include "frm_main.h"
 #include "std_picture.h"
-#include "gfx.h"
 
 #include "location.h"
 #include "range_arr.hpp"
@@ -67,36 +65,21 @@
 #define IF_OUTRANGE(x, l, r)  ((x) < (l) || (x) > (r))
 #define IF_INRANGE(x, l, r)  ((x) >= (l) && (x) <= (r))
 
-//! Main window
-extern FrmMain frmMain;
-//! Container of "hardcoded" (no more) graphics
-extern GFX_t GFX;
 
 //! Showing that game is works. It gets false when closing a window or exiting a game by menu. To mean that application must be closed.
 extern bool GameIsActive;
 //! Path to game resources assets (by default it's ~/.PGE_Project/thextech/)
 extern std::string AppPath;
 
-/**
- * @brief Process internal events (mouse, keyboard, joysticks, window's update, OS communications, etc.)
- */
-extern void DoEvents();
 
-/**
- *  \brief Toggle whether or not the cursor is shown.
- *
- *  \param toggle 1 to show the cursor, 0 to hide it, -1 to query the current
- *                state.
- *
- *  \return 1 if the cursor is shown, or 0 if the cursor is hidden.
- */
-extern int showCursor(int show);
+// Process internal events (mouse, keyboard, joysticks, window's update, OS communications, etc.)
+//extern void DoEvents(); /* Replaced with "XEvents::doEvents()" from `core/events.h` */
 
-extern Uint8 getKeyState(SDL_Scancode key);
-extern Uint8 getKeyStateI(int key);
+//extern Uint8 getKeyState(int key);
+//extern Uint8 getKeyStateI(int key);
 
 //Public Const KEY_PRESSED As Integer = &H1000    'For control information
-const int KEY_PRESSED = 1;
+//const int KEY_PRESSED = 1;
 
 /**
  * @brief Get name of key from a keycode
@@ -169,9 +152,9 @@ extern bool TakeScreen;
 // EXTRA: Show any on-screen meta (HUD, debug prints, etc.)
 extern bool ShowOnScreenMeta;
 //Public LB As String  ' Line Break
-extern std::string LB;
+//extern std::string LB;
 //Public EoT As String  ' End of Transmission for WINSOCK
-extern std::string EoT;
+//extern std::string EoT;
 
 //Public Type Controls 'Controls for the player
 //moved into "controls.h"

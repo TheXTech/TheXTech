@@ -119,4 +119,7 @@ public:
 #endif
 };
 
+//! Container of "hardcoded" (no more) graphics
+extern GFX_t GFX;
+
 #endif // GFX_H

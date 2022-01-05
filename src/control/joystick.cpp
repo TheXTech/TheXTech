@@ -19,6 +19,7 @@
  */
 
 #include <SDL2/SDL_version.h>
+#include <SDL2/SDL_events.h>
 #include <SDL2/SDL_joystick.h>
 #include <SDL2/SDL_gamecontroller.h>
 #include <SDL2/SDL_haptic.h>
@@ -38,6 +39,7 @@
 #include "../main/speedrunner.h"
 #include "../main/menu_main.h"
 #include "../main/record.h"
+#include "../core/events.h"
 
 #ifdef USE_TOUCHSCREEN_CONTROLLER
 #include "touchscreen.h"
@@ -742,7 +744,7 @@ void UpdateControls()
 //    If TestLevel = True And Not (nPlay.Online = True And nPlay.Mode = 0) Then
 //    if(TestLevel)
 //    {
-//        if(getKeyState(vbKeyEscape) == KEY_PRESSED)
+//        if(XEvents::getKeyState(vbKeyEscape))
 //        {
 //            EndLevel = true;
 //        }
@@ -838,43 +840,43 @@ void UpdateControls()
 
             if(useJoystick[A] == 0) // Keyboard controls
             {
-                if(getKeyStateI(keyCon.Up)) {
+                if(XEvents::getKeyState(keyCon.Up)) {
                     c.Up = true;
                 }
 
-                if(getKeyStateI(keyCon.Down)) {
+                if(XEvents::getKeyState(keyCon.Down)) {
                     c.Down = true;
                 }
 
-                if(getKeyStateI(keyCon.Left)) {
+                if(XEvents::getKeyState(keyCon.Left)) {
                     c.Left = true;
                 }
 
-                if(getKeyStateI(keyCon.Right)) {
+                if(XEvents::getKeyState(keyCon.Right)) {
                     c.Right = true;
                 }
 
-                if(getKeyStateI(keyCon.Jump)) {
+                if(XEvents::getKeyState(keyCon.Jump)) {
                     c.Jump = true;
                 }
 
-                if(getKeyStateI(keyCon.Run)) {
+                if(XEvents::getKeyState(keyCon.Run)) {
                     c.Run = true;
                 }
 
-                if(getKeyStateI(keyCon.Drop)) {
+                if(XEvents::getKeyState(keyCon.Drop)) {
                     c.Drop = true;
                 }
 
-                if(getKeyStateI(keyCon.Start)) {
+                if(XEvents::getKeyState(keyCon.Start)) {
                     c.Start = true;
                 }
 
-                if(getKeyStateI(keyCon.AltJump)) {
+                if(XEvents::getKeyState(keyCon.AltJump)) {
                     c.AltJump = true;
                 }
 
-                if(getKeyStateI(keyCon.AltRun)) {
+                if(XEvents::getKeyState(keyCon.AltRun)) {
                     c.AltRun = true;
                 }
             }

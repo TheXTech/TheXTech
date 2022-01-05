@@ -32,6 +32,7 @@
 #include "config.h"
 #include "control/joystick.h"
 #include "main/trees.h"
+#include "core/events.h"
 #include "npc_id.h"
 
 #include <Utils/maths.h>
@@ -2707,7 +2708,7 @@ void NPCSpecial(int A)
                             }
 
                             StopMusic();
-                            DoEvents();
+                            XEvents::doEvents();
                             PlaySound(SFX_TapeExit);
                             break;
                         }

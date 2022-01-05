@@ -19,14 +19,16 @@
  */
 
 #include <SDL2/SDL_version.h>
+#include <SDL2/SDL_scancode.h>
+#include <SDL2/SDL_mouse.h>
+#include <SDL2/SDL_gamecontroller.h>
 
+#include "core/events.h"
 #include "globals.h"
 #include <fmt_format_ne.h>
 #include <cmath>
 #include <cfenv>
 
-FrmMain frmMain;
-GFX_t GFX;
 
 bool GameIsActive = false;
 std::string AppPath;
@@ -504,34 +506,28 @@ int BattleIntro = 0;
 int BattleOutro = 0;
 std::string LevelName;
 
-void DoEvents()
-{
-    frmMain.doEvents();
-}
+//void DoEvents()
+//{
+//    g_events->doEvents();
+//}
 
-int showCursor(int show)
-{
-    return SDL_ShowCursor(show);
-}
+//Uint8 getKeyState(int key)
+//{
+//    return XEvents::getKeyState(key);
+//}
 
-Uint8 getKeyState(SDL_Scancode key)
-{
-    return frmMain.getKeyState(key);
-}
-
-Uint8 getKeyStateI(int key)
-{
-    if(key < 0)
-        return 0;
-    return frmMain.getKeyState(static_cast<SDL_Scancode>(key));
-}
+//Uint8 getKeyStateI(int key)
+//{
+//    if(key < 0)
+//        return 0;
+//    return XEvents::getKeyState(key);
+//}
 
 const char *getKeyName(int key)
 {
     if(key < 0)
         return " ... ";
-    SDL_Scancode k = static_cast<SDL_Scancode>(key);
-    return SDL_GetScancodeName(k);
+    return g_events->getScanCodeName(key);
 }
 
 std::string getJoyKeyName(bool isController, const KM_Key &key)

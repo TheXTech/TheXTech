@@ -18,12 +18,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <SDL2/SDL_messagebox.h>
 #include <SDL2/SDL_timer.h>
 #include <SDL2/SDL_mixer_ext.h>
 
 #include "globals.h"
 #include "load_gfx.h"
+#include "core/msgbox.h"
 #include "pge_delay.h"
 
 #include "sound.h"
@@ -153,7 +153,7 @@ void InitMixerX()
     {
         std::string msg = fmt::format_ne("Can't open audio stream, continuing without audio: ({0})", Mix_GetError());
         pLogCritical(msg.c_str());
-        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Sound opening error", msg.c_str(), nullptr);
+        XMsgBox::simpleMsgBox(AbstractMsgBox_t::MESSAGEBOX_ERROR, "Sound opening error", msg);
         noSound = true;
     }
 
@@ -194,6 +194,7 @@ static void AddMusic(const std::string &root,
     std::string f;
     ini.beginGroup(group);
     ini.read("file", f, std::string());
+
     if(!f.empty())
     {
         Music_t m;
@@ -201,12 +202,15 @@ static void AddMusic(const std::string &root,
         ini.read("yoshi-mode-track", m.yoshiModeTrack, -1);
         m.volume = volume;
         pLogDebug("Adding music [%s] '%s'", alias.c_str(), m.path.c_str());
+
         auto a = music.find(alias);
+
         if(a == music.end())
             music.insert({alias, m});
         else
             a->second = m;
     }
+
     ini.endGroup();
 }
 
@@ -237,15 +241,18 @@ static void AddSfx(const std::string &root,
     ini.beginGroup(group);
     ini.read("file", f, std::string());
     ini.read("silent", isSilent, false);
+
     if(!f.empty() || isSilent)
     {
         if(isCustom)
         {
             auto s = sound.find(alias);
+
             if(s != sound.end())
             {
                 auto &m = s->second;
                 std::string newPath = root + f;
+
                 if(!isSilent && m.isCustom && newPath == m.customPath)
                 {
                     ini.endGroup();
@@ -255,8 +262,10 @@ static void AddSfx(const std::string &root,
                 Mix_Chunk *backup = m.chunk;
                 bool backup_isSilent = m.isSilent;
                 m.customPath = newPath;
+
                 if(!isSilent)
                     m.chunk = Mix_LoadWAV((root + f).c_str());
+
                 if(m.chunk || isSilent)
                 {
                     if(!m.isCustom && !m.chunkOrig)
@@ -266,6 +275,7 @@ static void AddSfx(const std::string &root,
                     }
                     else if(backup)
                         Mix_FreeChunk(backup);
+
                     m.isCustom = true;
                     m.isSilent = isSilent;
                 }
@@ -699,10 +709,9 @@ void InitSound()
     if(!Files::fileExists(musicIni) && !Files::fileExists(sfxIni))
     {
         pLogWarning("music.ini and sounds.ini are missing");
-        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,
-                                 "music.ini and sounds.ini are missing",
-                                 "Files music.ini and sounds.ini are not exist, game will work without default music and SFX.",
-                                 frmMain.getWindow());
+        XMsgBox::simpleMsgBox(AbstractMsgBox_t::MESSAGEBOX_ERROR,
+                     "music.ini and sounds.ini are missing",
+                     "Files music.ini and sounds.ini are not exist, game will work without default music and SFX.");
         g_customLvlMusicId = 24;
         g_customWldMusicId = 17;
         return;
@@ -710,18 +719,16 @@ void InitSound()
     else if(!Files::fileExists(musicIni))
     {
         pLogWarning("music.ini is missing");
-        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,
-                                 "music.ini is missing",
-                                 "File music.ini is not exist, game will work without default music.",
-                                 frmMain.getWindow());
+        XMsgBox::simpleMsgBox(AbstractMsgBox_t::MESSAGEBOX_ERROR,
+                     "music.ini is missing",
+                     "File music.ini is not exist, game will work without default music.");
     }
     else if(!Files::fileExists(sfxIni))
     {
         pLogWarning("sounds.ini is missing");
-        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,
-                                 "sounds.ini is missing",
-                                 "File sounds.ini is not exist, game will work without SFX.",
-                                 frmMain.getWindow());
+        XMsgBox::simpleMsgBox(AbstractMsgBox_t::MESSAGEBOX_ERROR,
+                     "sounds.ini is missing",
+                     "File sounds.ini is not exist, game will work without SFX.");
     }
 
     loadMusicIni(MusicRoot, musicIni, false);
@@ -757,8 +764,9 @@ void InitSound()
 
     if(g_errorsSfx > 0)
     {
-        std::string msg = fmt::format_ne("Failed to load some SFX assets. Loo a log file to get more details:\n{0}", getLogFilePath());
-        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Sounds loading error", msg.c_str(), frmMain.getWindow());
+        XMsgBox::simpleMsgBox(AbstractMsgBox_t::MESSAGEBOX_ERROR,
+                              "Sounds loading error",
+                              fmt::format_ne("Failed to load some SFX assets. Loo a log file to get more details:\n{0}", getLogFilePath()));
     }
 }
 

@@ -19,14 +19,14 @@
  */
 
 #include <cmath>
+#include <SDL2/SDL_stdinc.h>
 
-#include "frm_main.h"
 #include "global_constants.h"
 #include "range_arr.hpp"
+#include "core/render.h"
 
 #include "screen_fader.h"
 
-extern FrmMain frmMain;
 //Public vScreenX(0 To maxPlayers) As Double  'vScreen offset
 extern RangeArr<double, 0, maxPlayers> vScreenX;
 //Public vScreenY(0 To maxPlayers) As Double 'vScreen offset
@@ -132,17 +132,17 @@ void ScreenFader::draw()
     if(!m_active)
         return;
 
-    frmMain.offsetViewportIgnore(true);
+    XRender::offsetViewportIgnore(true);
 
     switch(m_shape)
     {
     case S_FADE:
-        frmMain.renderRect(0, 0, ScreenW, ScreenH, color_r, color_b, color_g, m_scale, true);
+        XRender::renderRect(0, 0, ScreenW, ScreenH, color_r, color_b, color_g, m_scale, true);
         break;
 
     case S_RECT:
         if(m_scale >= 1.0f)
-            frmMain.renderRect(0, 0, ScreenW, ScreenH, color_r, color_b, color_g, m_scale, true);
+            XRender::renderRect(0, 0, ScreenW, ScreenH, color_r, color_b, color_g, m_scale, true);
         else
         {
             int focusX = m_focusSet ? m_focusX : (ScreenW / 2);
@@ -162,19 +162,19 @@ void ScreenFader::draw()
                     bottomY = ScreenH - SDL_ceil(bottomH * m_scale) + 1; // bottom side
 
             // Left side
-            frmMain.renderRect(0, 0, leftW, ScreenH, color_r, color_b, color_g, 1.f, true);
+            XRender::renderRect(0, 0, leftW, ScreenH, color_r, color_b, color_g, 1.f, true);
             // right side
-            frmMain.renderRect(rightX, 0, rightW * m_scale, ScreenH, color_r, color_b, color_g, 1.f, true);
+            XRender::renderRect(rightX, 0, rightW * m_scale, ScreenH, color_r, color_b, color_g, 1.f, true);
             // Top side
-            frmMain.renderRect(0, 0, ScreenW, topY, color_r, color_b, color_g, 1.f, true);
+            XRender::renderRect(0, 0, ScreenW, topY, color_r, color_b, color_g, 1.f, true);
             // Bottom side
-            frmMain.renderRect(0, bottomY, ScreenW, bottomH * m_scale, color_r, color_b, color_g, 1.f, true);
+            XRender::renderRect(0, bottomY, ScreenW, bottomH * m_scale, color_r, color_b, color_g, 1.f, true);
         }
         break;
 
     case S_CIRCLE:
         if(m_scale >= 1.0f)
-            frmMain.renderRect(0, 0, ScreenW, ScreenH, color_r, color_b, color_g, m_scale, true);
+            XRender::renderRect(0, 0, ScreenW, ScreenH, color_r, color_b, color_g, m_scale, true);
         else
         {
             int focusX = m_focusSet ? m_focusX : (ScreenW / 2);
@@ -211,42 +211,42 @@ void ScreenFader::draw()
 
             int radius = maxRadius - (maxRadius * m_scale);
 
-            frmMain.renderCircleHole(focusX, focusY, radius, color_r, color_b, color_g, 1.f);
+            XRender::renderCircleHole(focusX, focusY, radius, color_r, color_b, color_g, 1.f);
             // left side
-            frmMain.renderRect(0, 0, focusX - radius, ScreenH, color_r, color_b, color_g, 1.f, true);
+            XRender::renderRect(0, 0, focusX - radius, ScreenH, color_r, color_b, color_g, 1.f, true);
             // right side
-            frmMain.renderRect(focusX + radius, 0, ScreenW - (focusX + radius), ScreenH, color_r, color_b, color_g, 1.f, true);
+            XRender::renderRect(focusX + radius, 0, ScreenW - (focusX + radius), ScreenH, color_r, color_b, color_g, 1.f, true);
             // Top side
-            frmMain.renderRect(0, 0, ScreenW, focusY - radius + 1, color_r, color_b, color_g, 1.f, true);
+            XRender::renderRect(0, 0, ScreenW, focusY - radius + 1, color_r, color_b, color_g, 1.f, true);
             // Bottom side
-            frmMain.renderRect(0, focusY + radius, ScreenW, ScreenH - (focusY + radius), color_r, color_b, color_g, 1.f, true);
+            XRender::renderRect(0, focusY + radius, ScreenW, ScreenH - (focusY + radius), color_r, color_b, color_g, 1.f, true);
         }
         break;
 
     case S_FLIP_H:
         if(m_scale >= 1.0f)
-            frmMain.renderRect(0, 0, ScreenW, ScreenH, color_r, color_b, color_g, m_scale, true);
+            XRender::renderRect(0, 0, ScreenW, ScreenH, color_r, color_b, color_g, m_scale, true);
         else
         {
             float center = (ScreenH / 2);
             float sideHeight = SDL_ceil(center * m_scale);
-            frmMain.renderRect(0, 0, ScreenW, sideHeight, color_r, color_b, color_g, 1.f, true);
-            frmMain.renderRect(0, ScreenH - sideHeight, ScreenW, sideHeight, color_r, color_b, color_g, 1.f, true);
+            XRender::renderRect(0, 0, ScreenW, sideHeight, color_r, color_b, color_g, 1.f, true);
+            XRender::renderRect(0, ScreenH - sideHeight, ScreenW, sideHeight, color_r, color_b, color_g, 1.f, true);
         }
         break;
 
     case S_FLIP_V:
         if(m_scale >= 1.0f)
-            frmMain.renderRect(0, 0, ScreenW, ScreenH, color_r, color_b, color_g, m_scale, true);
+            XRender::renderRect(0, 0, ScreenW, ScreenH, color_r, color_b, color_g, m_scale, true);
         else
         {
             float center = (ScreenW / 2);
             float sideWidth = SDL_ceil(center * m_scale);
-            frmMain.renderRect(0, 0, sideWidth, ScreenH, color_r, color_b, color_g, 1.f, true);
-            frmMain.renderRect(ScreenW - sideWidth, 0, sideWidth, ScreenH, color_r, color_b, color_g, 1.f, true);
+            XRender::renderRect(0, 0, sideWidth, ScreenH, color_r, color_b, color_g, 1.f, true);
+            XRender::renderRect(ScreenW - sideWidth, 0, sideWidth, ScreenH, color_r, color_b, color_g, 1.f, true);
         }
         break;
     }
 
-    frmMain.offsetViewportIgnore(false);
+    XRender::offsetViewportIgnore(false);
 }

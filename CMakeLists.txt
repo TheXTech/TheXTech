@@ -285,6 +285,10 @@ set(THEXTECH_SRC
     src/npc.cpp
     src/sound.cpp
     src/frame_timer.cpp
+    src/core/base/render_base.cpp
+    src/core/base/window_base.cpp
+    src/core/base/msgbox_base.cpp
+    src/core/base/events_base.cpp
     src/main/world_loop.cpp
     src/main/world_file.cpp
     src/main/game_info.cpp
@@ -338,6 +342,32 @@ set(THEXTECH_SRC
     src/npc/npc_bonus.cpp
     src/player/player_update.cpp
 )
+
+add_definitions(-DCORE_EVERYTHING_SDL)
+list(APPEND THEXTECH_SRC
+    src/core/sdl/render_sdl.cpp
+    src/core/sdl/window_sdl.cpp
+    src/core/sdl/msgbox_sdl.cpp
+    src/core/sdl/events_sdl.cpp
+)
+
+# Add heads into the list
+file(GLOB THEXTECH_HEADS_SRC
+    lib/*.h
+    lib/AppPath/*.h
+    lib/CrashHandler/*.h
+    lib/Graphics/*.h
+    lib/InterProcess/*.h
+    src/*.h
+    src/*.hpp
+    src/control/*.h
+    src/core/*.h
+    src/core/base/*.h
+    src/core/sdl/*.h
+    src/main/*.h
+    src/main/QuadTree/*.h
+)
+list(APPEND THEXTECH_SRC ${THEXTECH_HEADS_SRC})
 
 if(WIN32 AND NOT EMSCRIPTEN)
     list(APPEND THEXTECH_SRC resources/thextech.rc)

@@ -405,6 +405,7 @@ void ProcEvent(const std::string &EventName, bool NoEffect)
                             qScreen = true;
                             qScreenX[1] = vScreenX[1];
                             qScreenY[1] = vScreenY[1];
+
                             if(int(screenLoc.Width) == 400)
                             {
                                 if(qScreenX[1] < tX + screenLoc.Left)
@@ -412,6 +413,7 @@ void ProcEvent(const std::string &EventName, bool NoEffect)
                                 else
                                     qScreenX[1] -= 200;
                             }
+
                             if(int(screenLoc.Height) == 300)
                             {
                                 if(qScreenY[1] < tY + screenLoc.Top)
@@ -419,13 +421,14 @@ void ProcEvent(const std::string &EventName, bool NoEffect)
                                 else
                                     qScreenY[1] -= 150;
                             }
+
                             if(-qScreenX[1] < level[Player[C].Section].X)
                                 qScreenX[1] = -level[Player[C].Section].X;
-                            if(-qScreenX[1] + frmMain.ScaleWidth > level[Player[C].Section].Width)
+                            if(-qScreenX[1] + ScreenW /*FrmMain.ScaleWidth*/ > level[Player[C].Section].Width)
                                 qScreenX[1] = -(level[Player[C].Section].Width - ScreenW);
                             if(-qScreenY[1] < level[Player[C].Section].Y)
                                 qScreenY[1] = -level[Player[C].Section].Y;
-                            if(-qScreenY[1] + frmMain.ScaleHeight > level[Player[C].Section].Height)
+                            if(-qScreenY[1] + ScreenH /*FrmMain.ScaleHeight*/ > level[Player[C].Section].Height)
                                 qScreenY[1] = -(level[Player[C].Section].Height - ScreenH);
                             level[B] = s.position;
                         }
