@@ -892,7 +892,7 @@ void TouchScreenController::processTouchDevice(int dev_i)
         it++;
     }
 
-    if(m_current_extra_keys.keyToggleViewOnce)
+    if(m_current_extra_keys.keyToggleViewOnce && !m_current_keys.Start)
         m_touchHidden = !m_touchHidden;
 
     if(m_current_extra_keys.keyHoldRunOnce)

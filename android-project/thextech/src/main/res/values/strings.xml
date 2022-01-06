@@ -30,4 +30,7 @@
     <string name="touchscreen_vibration_test_label">Test feedback</string>
     <string name="setup_show_battery_status_label">Device battery status</string>
     <string name="setup_show_controller_state_label">Show a game controller state</string>
+    <string name="cheat_dialog_cancel">Cancel</string>
+    <string name="cheat_dialog_ok">Run</string>
+    <string name="cheat_dialog_title">Type command:</string>
 </resources>

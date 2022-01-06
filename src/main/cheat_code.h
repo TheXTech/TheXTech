@@ -67,6 +67,10 @@ extern void cheats_erase(CheatsScope scope, const std::string &source);
 
 extern void cheats_setBuffer(const std::string &line);
 
+#ifdef __ANDROID__
+extern void cheats_callDialog();
+#endif
+
 extern void cheats_clearBuffer();
 
 /*!
