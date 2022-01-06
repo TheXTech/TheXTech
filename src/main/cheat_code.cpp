@@ -76,7 +76,7 @@ static void dieCheater()
     GodMode = false;
     ClearGame(true); // As a penalty, remove the saved game
     Cheater = true;
-    CheatString.clear();
+    cheats_clearBuffer();
 
     if(!LevelSelect)
     {
