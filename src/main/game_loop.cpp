@@ -467,7 +467,9 @@ void PauseGame(int plr)
                                 Checkpoint.clear();
                                 CheckpointsList.clear();
                                 numStars = 0;
+#ifdef THEXTECH_INTERPROC_SUPPORTED
                                 IntProc::sendStarsNumber(numStars);
+#endif // THEXTECH_INTERPROC_SUPPORTED
                                 numSavedEvents = 0;
                                 BlockSwitch.fill(false);
                                 PlaySound(SFX_Bullet);

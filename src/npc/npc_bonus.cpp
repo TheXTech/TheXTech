@@ -32,7 +32,9 @@
 
 #include <Utils/maths.h>
 #include <Logger/logger.h>
-#include <InterProcess/intproc.h>
+#ifdef THEXTECH_INTERPROC_SUPPORTED
+#   include <InterProcess/intproc.h>
+#endif
 
 
 static bool doPlayGrowWithGotItem()
@@ -577,7 +579,9 @@ void TouchBonus(int A, int B)
                     numStars += 1;
                     Star[numStars].level = FileNameFull;
                     Star[numStars].Section = NPC[B].Section;
+#ifdef THEXTECH_INTERPROC_SUPPORTED
                     IntProc::sendStarsNumber(numStars);
+#endif
                     CheckAfterStarTake(false);
                 }
 
