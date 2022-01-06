@@ -1914,7 +1914,7 @@ SDL_FORCE_INLINE void convertArray(std::vector<CheatCode_t> &dst, const CheatCod
 
     while(src->key && src->call)
     {
-        CheatCode_t cd;
+        CheatCode_t cd = {};
         SDL_memset(cd.key, 0, sizeof(cd.key));
         SDL_strlcpy(cd.key, src->key, sizeof(cd.key));
         cd.keyLen = SDL_strlen(cd.key);
@@ -2011,7 +2011,7 @@ void cheats_addAlias(CheatsScope scope, const std::string &source, const std::st
 
     for(auto &c : *dst)
     {
-        if(source.compare(c.key) == 0)
+        if(source == c.key)
         {
             auto cc = c;
             SDL_memset(cc.key, 0, sizeof(cc.key));
@@ -2044,7 +2044,7 @@ void cheats_rename(CheatsScope scope, const std::string &source, const std::stri
 
     for(auto &c : *dst)
     {
-        if(source.compare(c.key) == 0)
+        if(source == c.key)
         {
             SDL_memset(c.key, 0, sizeof(c.key));
             SDL_strlcpy(c.key, alias.c_str(), SDL_min(sizeof(c.key), alias.size() + 1));
@@ -2076,7 +2076,7 @@ void cheats_erase(CheatsScope scope, const std::string &source)
 
     for(auto it = dst->begin(); it != dst->end(); ++it)
     {
-        if(source.compare(it->key) == 0)
+        if(source == it->key)
         {
             dst->erase(it);
             break;
@@ -2131,7 +2131,7 @@ struct CheatBuffer_t
         return buffer[t];
     }
 
-    size_t getBugLen()
+    size_t getBugLen() const
     {
         return bufLen;
     }
