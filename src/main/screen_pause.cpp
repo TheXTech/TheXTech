@@ -162,16 +162,6 @@ void Init()
 	    	s_items.push_back(MenuItem{"ENTER CHEAT", s_CheatScreen});
 	    s_items.push_back(MenuItem{"QUIT TESTING", s_QuitTesting});
     }
-    else if(CanSave)
-    {
-    	s_items.push_back(MenuItem{"CONTINUE", s_Continue});
-    	if(g_compatibility.allow_DropAdd)
-	    	s_items.push_back(MenuItem{"DROP/ADD PLAYERS", s_DropAddScreen});
-	    if(g_config.enter_cheats_menu_item)
-	    	s_items.push_back(MenuItem{"ENTER CHEAT", s_CheatScreen});
-	    s_items.push_back(MenuItem{"SAVE & CONTINUE", s_SaveAndContinue});
-	    s_items.push_back(MenuItem{"SAVE & QUIT", s_Quit});
-    }
     else
     {
     	s_items.push_back(MenuItem{"CONTINUE", s_Continue});
@@ -179,7 +169,15 @@ void Init()
 	    	s_items.push_back(MenuItem{"DROP/ADD PLAYERS", s_DropAddScreen});
 	    if(g_config.enter_cheats_menu_item)
 	    	s_items.push_back(MenuItem{"ENTER CHEAT", s_CheatScreen});
-	    s_items.push_back(MenuItem{"QUIT", s_Quit});
+	    if(CanSave)
+        {
+            s_items.push_back(MenuItem{"SAVE & CONTINUE", s_SaveAndContinue});
+            s_items.push_back(MenuItem{"SAVE & QUIT", s_Quit});
+        }
+        else
+        {
+            s_items.push_back(MenuItem{"QUIT", s_Quit});
+        }
     }
 }
 
