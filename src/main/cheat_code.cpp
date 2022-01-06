@@ -1705,22 +1705,22 @@ static const std::vector<CheatCodeDefault_t> s_cheatsListGlobalDefault =
 
 static const std::vector<CheatCodeDefault_t> s_cheatsListWorldDefault =
 {
-    {"imtiredofallthiswalking", moonWalk, true}, {"moonwalk", moonWalk, true}, {"skywalk", moonWalk, true}, {"skzwalk", moonWalk, true},
+    {"imtiredofallthiswalking", moonWalk, true}, {"moonwalk", moonWalk, true}, {"skywalk", moonWalk, true},
     {"illparkwhereiwant", illParkWhereIWant, true}, {"parkinglot", illParkWhereIWant, true},
 };
 
 static const std::vector<CheatCodeDefault_t> s_cheatsListLevelDefault =
 {
     {"needashell", needAShell, true},
-    {"fairymagic", fairyMagic, true}, {"fairzmagic", fairyMagic, true},
+    {"fairymagic", fairyMagic, true},
     {"iceage", iceAge, true},
-    {"istillplaywithlegos", iStillPlayWithLegos, true}, {"istillplazwithlegos", iStillPlayWithLegos, true},
+    {"istillplaywithlegos", iStillPlayWithLegos, true},
     {"itsrainingmen", itsRainingMen, true},
-    {"donttypethis", dontTypeThis, true}, {"donttzpethis", dontTypeThis, true},
+    {"donttypethis", dontTypeThis, true},
     {"wetwater", wetWater, true},
     {"needaredshell", needARedShell, true},
     {"needablueshell", needABlueShell, true},
-    {"needayellowshell", needAYellowShell, true}, {"needazellowshell", needAYellowShell, true},
+    {"needayellowshell", needAYellowShell, true},
     {"needaturnip", needATurnip, true},
     {"needa1up", needA1Up, true},
     {"needatanookisuit", needATanookiSuit, true},
@@ -1740,10 +1740,10 @@ static const std::vector<CheatCodeDefault_t> s_cheatsListLevelDefault =
     {"blueshoe", blueShoe, true},
     {"shadowstar", shadowStar, true},
 
-    {"ibakedacakeforyou", becomeAsPeach, true}, {"ibakedacakeforzou", becomeAsPeach, true}, {"itsamepeach", becomeAsPeach, true},
+    {"ibakedacakeforyou", becomeAsPeach, true}, {"itsamepeach", becomeAsPeach, true},
     {"anothercastle", becomeAsToad, true}, {"itsametoad", becomeAsToad, true},
     {"iamerror", becomeAsLink, true}, {"itsamelink", becomeAsLink, true},
-    {"itsamemario", becomeAsMario, true}, {"plumberboy", becomeAsMario, true}, {"plumberboz", becomeAsMario, true}, {"moustacheman", becomeAsMario, true},
+    {"itsamemario", becomeAsMario, true}, {"plumberboy", becomeAsMario, true}, {"moustacheman", becomeAsMario, true},
     {"itsameluigi", becomeAsLuigi, true}, {"greenmario", becomeAsLuigi, true},
 
     {"supermario128", superbDemo128, true},
@@ -1753,33 +1753,33 @@ static const std::vector<CheatCodeDefault_t> s_cheatsListLevelDefault =
     {"supermario8", superbDemo8, true},
     {"supermario4", superbDemo4, true},
     {"supermario2", superbDemo2, true},
-    {"1player", onePlayer, true}, {"1plazer", onePlayer, true},
-    {"2player", twoPlayer, true}, {"2plazer", twoPlayer, true},
+    {"1player", onePlayer, true},
+    {"2player", twoPlayer, true},
 
     {"wariotime", warioTime, true},
-    {"carkeys", carKeys, true}, {"carkezs", carKeys, true},
-    {"boingyboing", boingyBoing, true}, {"boingzboing", boingyBoing, true},
+    {"carkeys", carKeys, true},
+    {"boingyboing", boingyBoing, true},
     {"bombsaway", bombsAway, true},
     {"firemissiles", fireMissiles, true},
     {"burnthehousedown", hellFire, true}, {"hellfire", hellFire, true},
     {"upandout", upAndOut, true},
     {"powhammer", powHammer, true},
-    {"hammerinmypants", hammerInMyPants, true}, {"hammerinmzpants", hammerInMyPants, true},
+    {"hammerinmypants", hammerInMyPants, true},
     {"rainbowrider", rainbowRider, true},
 
     {"greenegg", greenEgg, true},
     {"blueegg", blueEgg, true},
-    {"yellowegg", yellowEgg, true}, {"zellowegg", yellowEgg, true},
+    {"yellowegg", yellowEgg, true},
     {"redegg", redEgg, true},
     {"blackegg", blackEgg, true},
     {"purpleegg", purpleEgg, true},
     {"pinkegg", pinkEgg, true},
     {"coldegg", coldEgg, true},
     {"stophittingme", stopHittingMe, true}, {"uncle", stopHittingMe, true},
-    {"stickyfingers", stickyFingers, true}, {"stickzfingers", stickyFingers, true},
+    {"stickyfingers", stickyFingers, true},
     {"captainn", capitanN, true},
     {"flamethrower", flameThrower, true},
-    {"moneytree", moneyTree, true}, {"moneztree", moneyTree, true},
+    {"moneytree", moneyTree, true},
     {"donthurtme", godMode, true}, {"godmode", godMode, true},
     {"wingman", wingMan, true},
     {"tooslow", tooSlow, true},
@@ -1855,6 +1855,13 @@ SDL_FORCE_INLINE void convertArray(std::vector<CheatCode_t> &dst, const std::vec
         cd.call = cs.call;
         cd.isCheat = cs.isCheat;
         dst.push_back(cd);
+
+        if(hasQWERTZ(cd.key)) // Automatically add QWERTZ alias
+        {
+            std::string z = toQWERTZ(cd.key);
+            SDL_strlcpy(cd.key, z.c_str(), SDL_min(sizeof(cd.key), z.size() + 1));
+            dst.push_back(cd);
+        }
     }
 }
 
