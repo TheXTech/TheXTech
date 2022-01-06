@@ -143,7 +143,7 @@ static void initPlayers(Player_t tempPlayer[maxLocalPlayers])
 
 static void drawEnterScreen(Player_t tempPlayer[maxLocalPlayers])
 {
-    for(int A = 0; A < maxLocalPlayers; ++A)
+    for(int A = 0; A < numPlayers && A < maxLocalPlayers; ++A)
         DrawPlayer(tempPlayer[A], 0);
 
     if(TestLevel)
