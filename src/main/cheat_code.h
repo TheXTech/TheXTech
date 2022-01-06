@@ -64,10 +64,15 @@ extern void cheats_rename(CheatsScope scope,
  */
 extern void cheats_erase(CheatsScope scope, const std::string &source);
 
+
+extern void cheats_setBuffer(const std::string &line);
+
+extern void cheats_clearBuffer();
+
 /*!
  * \brief Adds one charracter into the cheat buffer and executes cheat if buffer has enough
- * \param NewKey ASCII character to add into the cheat buffer
+ * \param sym ASCII character to add into the cheat buffer
  */
-extern void CheatCode(char NewKey);
+extern void CheatCode(char sym);
 
 #endif // CHEAT_CODE_H

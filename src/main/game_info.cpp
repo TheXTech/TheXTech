@@ -41,6 +41,8 @@ static void readCheats(IniProcessing &conf, std::vector<GameInfo::CheatAlias> &d
             GameInfo::CheatAlias ca;
             ca.first = k;
             conf.read(k.c_str(), ca.second, std::string());
+            if(ca.second.empty())
+                continue; // Skip empty aliases
             dst.push_back(ca);
         }
     }

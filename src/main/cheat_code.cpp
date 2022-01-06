@@ -1688,28 +1688,31 @@ struct CheatCodeDefault_t
 struct CheatCode_t
 {
     char key[25];
+    size_t keyLen;
     void (*call)();
     bool isCheat;
 };
 
-static const std::vector<CheatCodeDefault_t> s_cheatsListGlobalDefault =
+static const CheatCodeDefault_t s_cheatsListGlobalDefault[] =
 {
 #ifdef ENABLE_ANTICHEAT_TRAP
     {"redigitiscool", dieCheater, false},
 #else
     {"redigitiscool", redigitIsCool, false},
 #endif
-    {"\x77\x6f\x68\x6c\x73\x74\x61\x6e\x64\x69\x73\x74\x73\x65\x68\x72\x67\x75\x74", redigitIsCool, false}
+    {"\x77\x6f\x68\x6c\x73\x74\x61\x6e\x64\x69\x73\x74\x73\x65\x68\x72\x67\x75\x74", redigitIsCool, false},
+    {nullptr, nullptr, false}
 };
 
 
-static const std::vector<CheatCodeDefault_t> s_cheatsListWorldDefault =
+static const CheatCodeDefault_t s_cheatsListWorldDefault[] =
 {
     {"imtiredofallthiswalking", moonWalk, true}, {"moonwalk", moonWalk, true}, {"skywalk", moonWalk, true},
     {"illparkwhereiwant", illParkWhereIWant, true}, {"parkinglot", illParkWhereIWant, true},
+    {nullptr, nullptr, false}
 };
 
-static const std::vector<CheatCodeDefault_t> s_cheatsListLevelDefault =
+static const CheatCodeDefault_t s_cheatsListLevelDefault[] =
 {
     {"needashell", needAShell, true},
     {"fairymagic", fairyMagic, true},
@@ -1785,7 +1788,8 @@ static const std::vector<CheatCodeDefault_t> s_cheatsListLevelDefault =
     {"tooslow", tooSlow, true},
     {"ahippinandahoppin", ahippinAndAHopping, true}, {"jumpman", ahippinAndAHopping, true},
     {"framerate", frameRate, false},
-    {"speeddemon", speedDemon, true}
+    {"speeddemon", speedDemon, true},
+    {nullptr, nullptr, false}
 };
 
 
@@ -1904,31 +1908,39 @@ SDL_FORCE_INLINE std::string toAZERTY(std::string s)
     return s;
 }
 
-SDL_FORCE_INLINE void convertArray(std::vector<CheatCode_t> &dst, const std::vector<CheatCodeDefault_t> &src)
+SDL_FORCE_INLINE void convertArray(std::vector<CheatCode_t> &dst, const CheatCodeDefault_t *src)
 {
     dst.clear();
 
-    for(auto &cs : src)
+    while(src->key && src->call)
     {
         CheatCode_t cd;
-        SDL_strlcpy(cd.key, cs.key, sizeof(cd.key));
-        cd.call = cs.call;
-        cd.isCheat = cs.isCheat;
+        SDL_memset(cd.key, 0, sizeof(cd.key));
+        SDL_strlcpy(cd.key, src->key, sizeof(cd.key));
+        cd.keyLen = SDL_strlen(cd.key);
+        cd.call = src->call;
+        cd.isCheat = src->isCheat;
         dst.push_back(cd);
 
-        if(hasQWERTZ(cs.key)) // Automatically add QWERTZ alias
+        if(hasQWERTZ(src->key)) // Automatically add QWERTZ alias
         {
-            std::string z = toQWERTZ(cs.key);
+            std::string z = toQWERTZ(src->key);
+            SDL_memset(cd.key, 0, sizeof(cd.key));
             SDL_strlcpy(cd.key, z.c_str(), SDL_min(sizeof(cd.key), z.size() + 1));
+            cd.keyLen = SDL_strlen(cd.key);
             dst.push_back(cd);
         }
 
-        if(hasAZERTY(cs.key)) // Automatically add AZERTY alias
+        if(hasAZERTY(src->key)) // Automatically add AZERTY alias
         {
-            std::string z = toAZERTY(cs.key);
+            std::string z = toAZERTY(src->key);
+            SDL_memset(cd.key, 0, sizeof(cd.key));
             SDL_strlcpy(cd.key, z.c_str(), SDL_min(sizeof(cd.key), z.size() + 1));
+            cd.keyLen = SDL_strlen(cd.key);
             dst.push_back(cd);
         }
+
+        ++src;
     }
 }
 
@@ -2002,7 +2014,9 @@ void cheats_addAlias(CheatsScope scope, const std::string &source, const std::st
         if(source.compare(c.key) == 0)
         {
             auto cc = c;
-            SDL_strlcpy(cc.key, alias.c_str(), SDL_min(sizeof(cc.key) - 1, alias.size() + 1));
+            SDL_memset(cc.key, 0, sizeof(cc.key));
+            SDL_strlcpy(cc.key, alias.c_str(), SDL_min(sizeof(cc.key), alias.size() + 1));
+            cc.keyLen = SDL_strlen(cc.key);
             dst->push_back(cc);
             break;
         }
@@ -2032,7 +2046,9 @@ void cheats_rename(CheatsScope scope, const std::string &source, const std::stri
     {
         if(source.compare(c.key) == 0)
         {
-            SDL_strlcpy(c.key, alias.c_str(), SDL_min(sizeof(c.key) - 1, alias.size() + 1));
+            SDL_memset(c.key, 0, sizeof(c.key));
+            SDL_strlcpy(c.key, alias.c_str(), SDL_min(sizeof(c.key), alias.size() + 1));
+            c.keyLen = SDL_strlen(c.key);
             break;
         }
     }
@@ -2069,53 +2085,134 @@ void cheats_erase(CheatsScope scope, const std::string &source)
 }
 
 
-/*!
- * \brief Process the cheat buffer
- * \param NewKey New key symbol
- */
-void CheatCode(char NewKey)
+struct CheatBuffer_t
 {
-    std::string newCheat;
-    std::string oldString;
-    bool cheated = false;
+    static const size_t maxLen = 25;
+    char buffer[2][maxLen + 1] = {};
+    size_t t = 0;
+    size_t bufLen = 0;
 
-    if(LevelEditor || GameMenu || /*nPlay.Online ||*/ BattleMode)
+    void clear()
     {
-        CheatString.clear();
-        return;
+        buffer[0][0] = 0;
+        buffer[1][0] = 0;
+        bufLen = 0;
     }
 
-    CheatString.push_back(NewKey);
-    if(CheatString.size() > 23)
-        CheatString.erase(0, 1);
-    oldString = CheatString;
+    void setBuffer(const std::string &line)
+    {
+        bufLen = SDL_min(maxLen, line.size());
+        SDL_memcpy(buffer[t], line.c_str(), bufLen);
+        buffer[t][bufLen] = 0;
+    }
 
+    void addSym(char c)
+    {
+        if(bufLen < maxLen)
+        {
+            buffer[t][bufLen++] = c;
+            buffer[t][bufLen] = 0;
+        }
+        else
+        {
+            size_t ts = t,
+                   td = !t;
+            SDL_memcpy(buffer[td], buffer[ts] + 1, bufLen - 1);
+            t = td;
+            buffer[t][bufLen - 1] = c;
+            buffer[t][bufLen] = 0;
+        }
+    }
+
+    const char *getString()
+    {
+        if(bufLen == 0)
+            return "";
+        return buffer[t];
+    }
+
+    size_t getBugLen()
+    {
+        return bufLen;
+    }
+};
+
+static CheatBuffer_t s_buffer;
+
+
+SDL_FORCE_INLINE bool cheatCompare(size_t bufLen, const char *buf,
+                                   size_t keyLen, const char *key)
+{
+    if(bufLen < keyLen)
+        return false;
+
+    return SDL_memcmp(buf + (bufLen - keyLen), key, keyLen) == 0;
+}
+
+static void processCheats()
+{
+    std::string oldString;
+    const char *buf = s_buffer.getString();
+    auto bufLen = s_buffer.getBugLen();
+    bool cheated = false;
+
+    D_pLogDebug("Cheat buffer [%s]\n", buf);
 
     for(const auto &c : s_cheatsListGlobal)
     {
-        if(CheatString.find(c.key) != std::string::npos)
-        {
-            c.call();
-            CheatString.clear();
-            cheated = c.isCheat;
-            break;
-        }
+        if(!cheatCompare(bufLen, buf, c.keyLen, c.key))
+            continue;
+
+        c.call();
+        oldString = buf;
+        s_buffer.clear();
+        cheated = c.isCheat;
+        break;
     }
 
     for(const auto &c : (LevelSelect ? s_cheatsListWorld : s_cheatsListLevel))
     {
-        if(CheatString.find(c.key) != std::string::npos)
-        {
-            c.call();
-            CheatString.clear();
-            cheated = c.isCheat;
-            break;
-        }
+        if(!cheatCompare(bufLen, buf, c.keyLen, c.key))
+            continue;
+
+        c.call();
+        oldString = buf;
+        s_buffer.clear();
+        cheated = c.isCheat;
+        break;
     }
 
     if(cheated)
     {
-        pLogDebug("Cheating detected!!! [%s]\n", newCheat.c_str());
+        pLogDebug("Cheating detected!!! [%s]\n", oldString.c_str());
         Cheater = true;
     }
+}
+
+void cheats_setBuffer(const std::string &line)
+{
+    s_buffer.setBuffer(line);
+    processCheats();
+}
+
+void cheats_clearBuffer()
+{
+    s_buffer.clear();
+}
+
+/*!
+ * \brief Process the cheat buffer
+ * \param sym New key symbol
+ */
+void CheatCode(char sym)
+{
+    if(LevelEditor || GameMenu || /*nPlay.Online ||*/ BattleMode)
+    {
+        s_buffer.clear();
+        return;
+    }
+
+    s_buffer.addSym(sym);
+
+    processCheats();
 }

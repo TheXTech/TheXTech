@@ -310,7 +310,7 @@ bool TestFullscreen = false;
 //bool keyDownEnter = false;
 bool BlocksSorted = false;
 int SingleCoop = 0;
-std::string CheatString;
+//std::string CheatString;
 bool GameOutro = false;
 bool GameOutroDoQuit = false;
 float CreditChop = 0.0f;
