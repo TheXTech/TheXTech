@@ -26,9 +26,9 @@
 #include "../render.h"
 #include "../window.h"
 #include "control/joystick.h"
+#include "main/cheat_code.h"
 #include "globals.h"
 #include "graphics.h"
-#include "game_main.h"
 #include "editor.h"
 #include "frame_timer.h"
 

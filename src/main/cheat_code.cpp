@@ -42,6 +42,10 @@
 #include "../npc.h"
 #include "../layers.h"
 #include "../game_main.h"
+#include "game_info.h"
+
+#include "cheat_code.h"
+
 
 
 static void redigitIsCool()
@@ -1670,14 +1674,25 @@ static void speedDemon()
 }
 
 
-struct CheatCode_t
+
+
+
+
+struct CheatCodeDefault_t
 {
-    const char *key;
+    const char*key;
     void (*call)();
     bool isCheat;
 };
 
-static std::vector<CheatCode_t> s_cheatsListGlobal =
+struct CheatCode_t
+{
+    char key[25];
+    void (*call)();
+    bool isCheat;
+};
+
+static const std::vector<CheatCodeDefault_t> s_cheatsListGlobalDefault =
 {
 #ifdef ENABLE_ANTICHEAT_TRAP
     {"redigitiscool", dieCheater, false},
@@ -1688,13 +1703,13 @@ static std::vector<CheatCode_t> s_cheatsListGlobal =
 };
 
 
-static std::vector<CheatCode_t> s_cheatsListWorld =
+static const std::vector<CheatCodeDefault_t> s_cheatsListWorldDefault =
 {
     {"imtiredofallthiswalking", moonWalk, true}, {"moonwalk", moonWalk, true}, {"skywalk", moonWalk, true}, {"skzwalk", moonWalk, true},
     {"illparkwhereiwant", illParkWhereIWant, true}, {"parkinglot", illParkWhereIWant, true},
 };
 
-static std::vector<CheatCode_t> s_cheatsListLevel =
+static const std::vector<CheatCodeDefault_t> s_cheatsListLevelDefault =
 {
     {"needashell", needAShell, true},
     {"fairymagic", fairyMagic, true}, {"fairzmagic", fairyMagic, true},
@@ -1709,8 +1724,7 @@ static std::vector<CheatCode_t> s_cheatsListLevel =
     {"needaturnip", needATurnip, true},
     {"needa1up", needA1Up, true},
     {"needatanookisuit", needATanookiSuit, true},
-    {"needahammersuit", needAHammerSuit, true},
-    {"hammertime", needAHammerSuit, true},
+    {"needahammersuit", needAHammerSuit, true}, {"hammertime", needAHammerSuit, true},
     {"needamushroom", needAMushroom, true},
     {"needaflower", needAFlower, true},
     {"niceflower", needAnIceFlower, true},
@@ -1747,8 +1761,7 @@ static std::vector<CheatCode_t> s_cheatsListLevel =
     {"boingyboing", boingyBoing, true}, {"boingzboing", boingyBoing, true},
     {"bombsaway", bombsAway, true},
     {"firemissiles", fireMissiles, true},
-    {"burnthehousedown", hellFire, true},
-    {"hellfire", hellFire, true},
+    {"burnthehousedown", hellFire, true}, {"hellfire", hellFire, true},
     {"upandout", upAndOut, true},
     {"powhammer", powHammer, true},
     {"hammerinmypants", hammerInMyPants, true}, {"hammerinmzpants", hammerInMyPants, true},
@@ -1762,8 +1775,7 @@ static std::vector<CheatCode_t> s_cheatsListLevel =
     {"purpleegg", purpleEgg, true},
     {"pinkegg", pinkEgg, true},
     {"coldegg", coldEgg, true},
-    {"stophittingme", stopHittingMe, true},
-    {"uncle", stopHittingMe, true},
+    {"stophittingme", stopHittingMe, true}, {"uncle", stopHittingMe, true},
     {"stickyfingers", stickyFingers, true}, {"stickzfingers", stickyFingers, true},
     {"captainn", capitanN, true},
     {"flamethrower", flameThrower, true},
@@ -1776,6 +1788,203 @@ static std::vector<CheatCode_t> s_cheatsListLevel =
     {"speeddemon", speedDemon, true}
 };
 
+
+//! Current list of global cheats
+static std::vector<CheatCode_t> s_cheatsListGlobal;
+//! Current list of world map specific cheats
+static std::vector<CheatCode_t> s_cheatsListWorld;
+//! Current list of level specific cheats
+static std::vector<CheatCode_t> s_cheatsListLevel;
+
+
+/*!
+ * \brief hasQWERTZ
+ * \param s Checks does string is suitable for conversion into QWERTZ
+ * \return true if string can be converted into QWERTZ
+ */
+SDL_FORCE_INLINE bool hasQWERTZ(const std::string &s)
+{
+    for(const char &c : s)
+    {
+        switch(c)
+        {
+        case 'y':
+        case 'z':
+            return true;
+        default:
+            continue;
+        }
+    }
+
+    return false;
+}
+
+/*!
+ * \brief convert string into QWERTZ
+ * \param s Source string in QWERTY
+ * \return QWERTZ string
+ */
+SDL_FORCE_INLINE std::string toQWERTZ(std::string s)
+{
+    for(char &c : s)
+    {
+        switch(c)
+        {
+        case 'y':
+            c = 'z';
+            break;
+        case 'z':
+            c = 'y';
+            break;
+        default:
+            continue;
+        }
+    }
+
+    return s;
+}
+
+SDL_FORCE_INLINE void convertArray(std::vector<CheatCode_t> &dst, const std::vector<CheatCodeDefault_t> &src)
+{
+    dst.clear();
+
+    for(auto &cs : src)
+    {
+        CheatCode_t cd;
+        SDL_strlcpy(cd.key, cs.key, sizeof(cd.key));
+        cd.call = cs.call;
+        cd.isCheat = cs.isCheat;
+        dst.push_back(cd);
+    }
+}
+
+SDL_FORCE_INLINE void addAliasCheats(CheatsScope scope, std::vector<GameInfo::CheatAlias> &list)
+{
+    for(const auto &c : list)
+    {
+        cheats_addAlias(scope, c.first, c.second);
+        if(hasQWERTZ(c.second)) // Add QWERTZ version for new string
+            cheats_addAlias(scope, c.first, toQWERTZ(c.second));
+    }
+}
+
+SDL_FORCE_INLINE void addRenameCheats(CheatsScope scope, std::vector<GameInfo::CheatAlias> &list)
+{
+    for(const auto &c : list)
+    {
+        cheats_rename(scope, c.first, c.second);
+        if(hasQWERTZ(c.first)) // Remove no longer relevant QWERTZ version of string
+            cheats_erase(scope, toQWERTZ(c.first));
+        if(hasQWERTZ(c.second)) // Add QWERTZ version for new string if needed
+            cheats_addAlias(scope, c.second, toQWERTZ(c.second));
+    }
+}
+
+void cheats_reset()
+{
+    convertArray(s_cheatsListGlobal, s_cheatsListGlobalDefault);
+    convertArray(s_cheatsListWorld, s_cheatsListWorldDefault);
+    convertArray(s_cheatsListLevel, s_cheatsListLevelDefault);
+
+    addAliasCheats(CHEAT_SCOPE_GLOBAL,  g_gameInfo.cheatsGlobalAliases);
+    addRenameCheats(CHEAT_SCOPE_GLOBAL, g_gameInfo.cheatsGlobalRenames);
+
+    addAliasCheats(CHEAT_SCOPE_WORLD,  g_gameInfo.cheatsWorldAliases);
+    addRenameCheats(CHEAT_SCOPE_WORLD, g_gameInfo.cheatsWorldRenames);
+
+    addAliasCheats(CHEAT_SCOPE_LEVEL,  g_gameInfo.cheatsLevelAliases);
+    addRenameCheats(CHEAT_SCOPE_LEVEL, g_gameInfo.cheatsLevelRenames);
+}
+
+void cheats_addAlias(CheatsScope scope, const std::string &source, const std::string &alias)
+{
+    std::vector<CheatCode_t> *dst = nullptr;
+
+    switch(scope)
+    {
+    case CHEAT_SCOPE_GLOBAL:
+        dst = &s_cheatsListGlobal;
+        break;
+    case CHEAT_SCOPE_WORLD:
+        dst = &s_cheatsListWorld;
+        break;
+    case CHEAT_SCOPE_LEVEL:
+        dst = &s_cheatsListLevel;
+        break;
+    }
+
+    SDL_assert(dst);
+
+    for(auto &c : *dst)
+    {
+        if(source.compare(c.key) == 0)
+        {
+            auto cc = c;
+            SDL_strlcpy(cc.key, alias.c_str(), SDL_min(sizeof(cc.key) - 1, alias.size() + 1));
+            dst->push_back(cc);
+            break;
+        }
+    }
+}
+
+void cheats_rename(CheatsScope scope, const std::string &source, const std::string &alias)
+{
+    std::vector<CheatCode_t> *dst = nullptr;
+
+    switch(scope)
+    {
+    case CHEAT_SCOPE_GLOBAL:
+        dst = &s_cheatsListGlobal;
+        break;
+    case CHEAT_SCOPE_WORLD:
+        dst = &s_cheatsListWorld;
+        break;
+    case CHEAT_SCOPE_LEVEL:
+        dst = &s_cheatsListLevel;
+        break;
+    }
+
+    SDL_assert(dst);
+
+    for(auto &c : *dst)
+    {
+        if(source.compare(c.key) == 0)
+        {
+            SDL_strlcpy(c.key, alias.c_str(), SDL_min(sizeof(c.key) - 1, alias.size() + 1));
+            break;
+        }
+    }
+
+}
+
+void cheats_erase(CheatsScope scope, const std::string &source)
+{
+    std::vector<CheatCode_t> *dst = nullptr;
+
+    switch(scope)
+    {
+    case CHEAT_SCOPE_GLOBAL:
+        dst = &s_cheatsListGlobal;
+        break;
+    case CHEAT_SCOPE_WORLD:
+        dst = &s_cheatsListWorld;
+        break;
+    case CHEAT_SCOPE_LEVEL:
+        dst = &s_cheatsListLevel;
+        break;
+    }
+
+    SDL_assert(dst);
+
+    for(auto it = dst->begin(); it != dst->end(); ++it)
+    {
+        if(source.compare(it->key) == 0)
+        {
+            dst->erase(it);
+            break;
+        }
+    }
+}
 
 
 /*!
@@ -1802,7 +2011,7 @@ void CheatCode(char NewKey)
 
     for(const auto &c : s_cheatsListGlobal)
     {
-        if(SDL_strstr(CheatString.c_str(), c.key))
+        if(CheatString.find(c.key) != std::string::npos)
         {
             c.call();
             CheatString.clear();
@@ -1813,7 +2022,7 @@ void CheatCode(char NewKey)
 
     for(const auto &c : (LevelSelect ? s_cheatsListWorld : s_cheatsListLevel))
     {
-        if(SDL_strstr(CheatString.c_str(), c.key))
+        if(CheatString.find(c.key) != std::string::npos)
         {
             c.call();
             CheatString.clear();

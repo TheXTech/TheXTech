@@ -58,6 +58,17 @@ struct GameInfo
 
     bool outroDeadMode = true;
 
+    typedef std::pair<std::string, std::string> CheatAlias;
+
+    std::vector<CheatAlias> cheatsGlobalAliases;
+    std::vector<CheatAlias> cheatsGlobalRenames;
+
+    std::vector<CheatAlias> cheatsWorldAliases;
+    std::vector<CheatAlias> cheatsWorldRenames;
+
+    std::vector<CheatAlias> cheatsLevelAliases;
+    std::vector<CheatAlias> cheatsLevelRenames;
+
     // Carousel
     int introCharacterNext();
     size_t introCharacterCurrent = 0;

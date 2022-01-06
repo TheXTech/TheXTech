@@ -52,6 +52,7 @@
 #include "editor.h"
 #include "custom.h"
 #include "main/world_globals.h"
+#include "main/cheat_code.h"
 #include "main/game_globals.h"
 #include "main/level_file.h"
 #include "main/speedrunner.h"
@@ -118,6 +119,7 @@ int GameMain(const CmdLineSetup_t &setup)
     speedRun_setSemitransparentRender(setup.speedRunnerSemiTransparent);
 
     ResetCompat();
+    cheats_reset();
 
     // [ !Here was a starting dialog! ]
 
