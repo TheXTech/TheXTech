@@ -1,0 +1,12 @@
+Source: thextech-smbx
+Section: games
+Priority: optional
+Maintainer: Vitaly Novichkov <admin@wohlnet.ru>
+Build-Depends: cmake, build-essential, ninja-build, libsdl2-dev, libpng-dev, libjpeg-dev
+Homepage: https://wohlsoft.ru
+
+Package: thextech-smbx
+Architecture: any
+Depends: libsdl2-2.0-0, libpng16-16, libjpeg8
+Description: The Mario fan game
+ The Super Mario fan game developed by Andrew Spinks in the past

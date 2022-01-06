@@ -145,9 +145,14 @@ if(APPLE)
 endif()
 
 if(NOT APPLE AND NOT ANDROID AND NOT EMSCRIPTEN)
-    set(THEXTECH_FIXED_ASSETS_PATH "" CACHE STRING "Fixed assets path (The '/usr/share/games/<game-name>/' suggested). Unused by default.")
+    set(DEFAULT_THEXTECH_SOURCE_ASSETS_PATH "${CMAKE_CURRENT_SOURCE_DIR}/assets") # For source packages creation with vendored assets
+    if(NOT EXISTS "${DEFAULT_THEXTECH_SOURCE_ASSETS_PATH}")
+        unset(DEFAULT_THEXTECH_SOURCE_ASSETS_PATH)
+    endif()
+
+    set(THEXTECH_FIXED_ASSETS_PATH "${DEFAULT_THEXTECH_FIXED_ASSETS_PATH}" CACHE STRING "Fixed assets path (The '/usr/share/games/<game-name>/' suggested). Unused by default.")
     set(THEXTECH_USER_DIR_NAME "" CACHE STRING "The name of the user directory at user's home to store settings/episodes/etc. The 'PGE_Project/thextech' will be used by default.")
-    set(THEXTECH_SOURCE_ASSETS_PATH "" CACHE STRING "Path to resources root used with the package to create")
+    set(THEXTECH_SOURCE_ASSETS_PATH "${DEFAULT_THEXTECH_SOURCE_ASSETS_PATH}" CACHE STRING "Path to resources root used with the package to create")
     set(THEXTECH_UNIX_INSTALL TRUE)
 endif()
 

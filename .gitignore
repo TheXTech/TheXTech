@@ -86,3 +86,6 @@ CMakeSettings.json
 # PVS-Studio related stuff
 *.PVS-Studio.*
 .PVS-Studio/
+
+# Vendored assets packages shouldn't appear at the GIT history
+/assets/
