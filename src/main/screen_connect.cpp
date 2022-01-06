@@ -178,16 +178,18 @@ bool Player_Remove(int p)
     return false;
 }
 
-void DropNotDone()
+void DropNotDone(bool strict)
 {
-    int n = Controls::g_InputMethods.size();
-    if(n > maxLocalPlayers)
-        n = maxLocalPlayers;
-    if(n > numPlayers-1)
-        n = numPlayers-1;
+    int n = Controls::g_InputMethods.size()-1;
+    if(n >= maxLocalPlayers)
+        n = maxLocalPlayers-1;
+    // remove all not fully added players
+    for(; n >= numPlayers; n--)
+        Player_Remove(n);
+    // if strict, remove all unfinished players
     for(; n >= 0 && numPlayers > s_minPlayers; n--)
     {
-        if(s_playerState[n] != PlayerState::StartGame)
+        if(strict && s_playerState[n] != PlayerState::StartGame)
             Player_Remove(n);
     }
 }
@@ -393,12 +395,15 @@ bool Player_Select(int p)
         else if(s_context == Context::DropAdd || (s_context == Context::Reconnect && g_compatibility.allow_DropAdd))
         {
             if(s_menuItem[p] == 0) // FORCE RESUME
+            {
+                DropNotDone(false);
                 return true;
+            }
             else if(s_menuItem[p] == 1 && numPlayers > s_minPlayers) // DROP OTHERS
             {
                 Context c = s_context;
                 s_context = Context::DropAdd;
-                DropNotDone();
+                DropNotDone(true);
                 s_context = c;
                 return true;
             }
@@ -486,8 +491,10 @@ void Player_Up(int p)
         {
             if(s_context == Context::Reconnect)
                 s_menuItem[p] = 0;
-            else
+            else if(numPlayers > s_minPlayers)
                 s_menuItem[p] = 2;
+            else
+                s_menuItem[p] = 1;
         }
         else
             s_menuItem[p] --;
@@ -538,6 +545,8 @@ void Player_Down(int p)
     {
         PlaySoundMenu(SFX_Slide);
         if(s_menuItem[p] == 0 && s_context == Context::Reconnect)
+            s_menuItem[p] = -3;
+        else if(s_menuItem[p] == 1 && s_context == Context::DropAdd && numPlayers <= s_minPlayers)
             s_menuItem[p] = -3;
         else if(s_menuItem[p] == 2 && s_context == Context::DropAdd)
             s_menuItem[p] = -3;
@@ -728,8 +737,11 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pW, int sY, int line, bool m
         {
             Player_MenuItem_Mouse_Render(p, 1, "CHANGE CHAR",
                 pX, sY+(4+1)*line, mouse, render);
-            Player_MenuItem_Mouse_Render(p, 2, "DROP ME",
-                pX, sY+(4+2)*line, mouse, render);
+            if(numPlayers > s_minPlayers)
+            {
+                Player_MenuItem_Mouse_Render(p, 2, "DROP ME",
+                    pX, sY+(4+2)*line, mouse, render);
+            }
         }
     }
 
@@ -993,8 +1005,15 @@ int Logic()
 
     for(int p = 0; p < maxLocalPlayers; p++)
     {
+        // ensure that the selected menu item is valid for select char and drop me
         if(s_playerState[p] == PlayerState::SelectChar)
             Player_ValidateChar(p);
+
+        if(s_context == Context::DropAdd && s_playerState[p] == PlayerState::ReconnectMain
+            && s_menuItem[p] == 2 && numPlayers <= s_minPlayers)
+        {
+            s_menuItem[p] = 1;
+        }
 
         // if player doesn't exist, or was lost *not on menu screen*
         if(p >= (int)Controls::g_InputMethods.size()
