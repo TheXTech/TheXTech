@@ -38,6 +38,7 @@
 
 #include "../pseudo_vb.h"
 
+#include "../compat.h"
 #include "../config.h"
 #include "screen_quickreconnect.h"
 
@@ -112,7 +113,7 @@ void WorldLoop()
 
     if(!Controls::Update())
     {
-        if(g_config.NoPauseReconnect)
+        if(g_config.NoPauseReconnect || !g_compatibility.allow_DropAdd)
             QuickReconnectScreen::g_active = true;
         else
             PauseGame(PauseCode::Reconnect, 0);

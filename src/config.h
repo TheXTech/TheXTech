@@ -9,6 +9,8 @@ extern struct Config_t
     bool    RecordGameplayData = false;
     //! Use the quick (non-pausing) reconnect screen
     bool    NoPauseReconnect = false;
+    //! Access the Cheat Screen from the pause menu
+    bool    enter_cheats_menu_item = false;
 } g_config; // main_config.cpp
 
 #endif // CONFIG_H

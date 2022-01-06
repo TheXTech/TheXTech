@@ -289,6 +289,7 @@ set(THEXTECH_SRC
     src/main/level_file.cpp
     src/main/menu_loop.cpp
     src/main/menu_main.cpp
+    src/main/screen_pause.cpp
     src/main/screen_connect.cpp
     src/main/screen_quickreconnect.cpp
     src/main/screen_textentry.cpp

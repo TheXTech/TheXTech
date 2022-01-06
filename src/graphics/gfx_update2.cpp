@@ -26,8 +26,10 @@
 #include "../compat.h"
 #include "../main/speedrunner.h"
 #include "../main/trees.h"
+#include "../main/screen_pause.h"
 #include "../main/screen_connect.h"
 #include "../main/screen_quickreconnect.h"
+#include "../main/screen_textentry.h"
 
 // draws GFX to screen when on the world map/world map editor
 void UpdateGraphics2(bool skipRepaint)
@@ -684,38 +686,6 @@ void UpdateGraphics2(bool skipRepaint)
         {
             SuperPrint(WorldPlayer[1].LevelName, 2, 32 + (48 * A) + 116, 109);
         }
-        if(GamePaused == PauseCode::PauseGame)
-        {
-            frmMain.renderRect(210, 200, 380, 200, 0.f, 0.f, 0.f);
-            if(Cheater == false)
-            {
-                SuperPrint("CONTINUE", 3, 272, 257);
-                if(g_compatibility.allow_DropAdd)
-                {
-                    SuperPrint("DROP/ADD PLAYERS", 3, 272, 292);
-                    SuperPrint("SAVE & CONTINUE", 3, 272, 327);
-                    SuperPrint("SAVE & QUIT", 3, 272, 362);
-                }
-                else
-                {
-                    SuperPrint("SAVE & CONTINUE", 3, 272, 292);
-                    SuperPrint("SAVE & QUIT", 3, 272, 327);
-                }
-                frmMain.renderTexture(252, 257 + (MenuCursor * 35), 16, 16, GFX.MCursor[0], 0, 0);
-            }
-            else
-            {
-                SuperPrint("CONTINUE", 3, 272 + 56, 275);
-                if(g_compatibility.allow_DropAdd)
-                {
-                    SuperPrint("DROP/ADD PLAYERS", 3, 272 + 56, 310);
-                    SuperPrint("QUIT", 3, 272 + 56, 345);
-                }
-                else
-                    SuperPrint("QUIT", 3, 272 + 56, 310);
-                frmMain.renderTexture(252 + 56, 275 + (MenuCursor * 35), 16, 16, GFX.MCursor[0], 0, 0);
-            }
-        }
 
         if(PrintFPS > 0)
             SuperPrint(std::to_string(int(PrintFPS)), 1, 8, 8, 0.f, 1.f, 0.f);
@@ -726,11 +696,17 @@ void UpdateGraphics2(bool skipRepaint)
         speedRun_renderTimer();
 
         // render special screens
+        if(GamePaused == PauseCode::PauseGame)
+            PauseScreen::Render();
+
         if(QuickReconnectScreen::g_active)
             QuickReconnectScreen::Render();
 
         if(GamePaused == PauseCode::Reconnect || GamePaused == PauseCode::DropAdd)
             ConnectScreen::Render();
+
+        if(GamePaused == PauseCode::TextEntry)
+            TextEntryScreen::Render();
 
         if(!skipRepaint)
             frmMain.repaint();

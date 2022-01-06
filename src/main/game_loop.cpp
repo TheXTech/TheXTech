@@ -22,7 +22,6 @@
 
 #include <Logger/logger.h>
 #include <pge_delay.h>
-#include <InterProcess/intproc.h>
 
 #include "../globals.h"
 #include "../frame_timer.h"
@@ -40,6 +39,7 @@
 #include "../config.h"
 #include "speedrunner.h"
 #include "menu_main.h"
+#include "screen_pause.h"
 #include "screen_connect.h"
 #include "screen_quickreconnect.h"
 #include "screen_textentry.h"
@@ -51,7 +51,7 @@ void GameLoop()
 {
     if(!Controls::Update())
     {
-        if(g_config.NoPauseReconnect)
+        if(g_config.NoPauseReconnect || !g_compatibility.allow_DropAdd)
             QuickReconnectScreen::g_active = true;
         else
             PauseGame(PauseCode::Reconnect, 0);
@@ -200,292 +200,6 @@ void MessageScreen_Init()
     MenuCursorCanMove = false;
 }
 
-void PauseScreen_Init()
-{
-    PlaySound(SFX_Pause);
-    MenuCursor = 0;
-    MenuCursorCanMove = false;
-}
-
-bool PauseScreen_Logic(int plr)
-{
-    bool upPressed = SharedControls.MenuUp;
-    bool downPressed = SharedControls.MenuDown;
-
-    bool menuDoPress = SharedControls.MenuDo;
-    bool menuBackPress = SharedControls.MenuBack;
-
-    if(SingleCoop > 0 || numPlayers > 2)
-    {
-        for(int A = 1; A <= numPlayers; A++)
-            Player[A].Controls = Player[1].Controls;
-    }
-
-    if(!g_compatibility.multiplayer_pause_controls && plr == 0)
-        plr = 1;
-
-    if(plr == 0)
-    {
-        for(int i = 1; i <= numPlayers; i++)
-        {
-            const Controls_t& c = Player[i].Controls;
-
-            menuDoPress |= (c.Start || c.Jump);
-            menuBackPress |= c.Run;
-
-            upPressed |= c.Up;
-            downPressed |= c.Down;
-        }
-    }
-    else
-    {
-        const Controls_t& c = Player[plr].Controls;
-
-        menuDoPress |= (c.Start || c.Jump);
-        menuBackPress |= c.Run;
-
-        upPressed |= c.Up;
-        downPressed |= c.Down;
-
-    }
-
-    if(menuBackPress && menuDoPress)
-        menuDoPress = false;
-
-    if(!MenuCursorCanMove)
-    {
-        if(!menuDoPress && !menuBackPress && !upPressed && !downPressed)
-        {
-            MenuCursorCanMove = true;
-        }
-        return false;
-    }
-
-    bool stopPause = false;
-    bool playSound = true;
-    bool CanSave = (LevelSelect || (/*StartLevel == FileName*/IsEpisodeIntro && NoMap)) && !Cheater;
-    int max_item;
-    if(TestLevel) // Level test pause menu (5 items)
-        max_item = 3;
-    else if(!CanSave) // Level play menu (2 items)
-        max_item = 1;
-    else
-        max_item = 2;
-    if(menuBackPress)
-    {
-        if(MenuCursor != max_item)
-            PlaySound(SFX_Slide);
-        MenuCursor = max_item;
-        MenuCursorCanMove = false;
-    }
-    else if(menuDoPress)
-        stopPause = true;
-
-    if(upPressed)
-    {
-        PlaySound(SFX_Slide);
-        MenuCursor = MenuCursor - 1;
-        MenuCursorCanMove = false;
-    }
-    else if(downPressed)
-    {
-        PlaySound(SFX_Slide);
-        MenuCursor = MenuCursor + 1;
-        MenuCursorCanMove = false;
-    }
-
-    if(LevelSelect)
-    {
-        // unclear meaning given that A was numPlayers+1 after the above for loop
-        // if(Player[A].Character == 1 || Player[A].Character == 2)
-        //     Player[A].Hearts = 0;
-        for(int A = 1; A <= numPlayers; A++)
-        {
-            if(!Player[A].RunRelease)
-            {
-                if(!Player[A].Controls.Left && !Player[A].Controls.Right)
-                    Player[A].RunRelease = true;
-            }
-            else if(Player[A].Controls.Left || Player[A].Controls.Right)
-            {
-                AllCharBlock = 0;
-                for(int B = 1; B <= numCharacters; B++)
-                {
-                    if(!blockCharacter[B])
-                    {
-                        if(AllCharBlock == 0)
-                            AllCharBlock = B;
-                        else
-                        {
-                            AllCharBlock = 0;
-                            break;
-                        }
-                    }
-                }
-                if(AllCharBlock == 0 && numPlayers <= 2)
-                {
-                    PlaySound(SFX_Slide);
-                    Player[A].RunRelease = false;
-                    int B;
-                    if(A == 1)
-                        B = 2;
-                    else
-                        B = 1;
-                    if(numPlayers == 1)
-                        B = 0;
-                    Player[0].Character = 0;
-                    if(Player[A].Controls.Left)
-                    {
-                        do
-                        {
-                            Player[A].Character = Player[A].Character - 1;
-                            if(Player[A].Character <= 0)
-                                Player[A].Character = 5;
-                        } while(Player[A].Character == Player[B].Character || blockCharacter[Player[A].Character]);
-                    }
-                    else
-                    {
-                        do
-                        {
-                            Player[A].Character = Player[A].Character + 1;
-                            if(Player[A].Character >= 6)
-                                Player[A].Character = 1;
-                        } while(Player[A].Character == Player[B].Character || blockCharacter[Player[A].Character]);
-                    }
-                    Player[A] = SavedChar[Player[A].Character];
-                    SetupPlayers();
-                }
-            }
-        }
-    }
-
-    if(menuDoPress)
-    {
-        if(TestLevel) // Pause menu of a level testing
-        {
-            // spaghetti code because I wanted to preserve the switch
-            //   this means that MenuCursor will be 3 whenever it is Quit (really 3/4)
-            //   and 4 whenever it is Drop/Add (really 3)
-            if(g_compatibility.allow_DropAdd && MenuCursor >= 3)
-            {
-                MenuCursor = 7 - MenuCursor;
-            }
-            switch(MenuCursor)
-            {
-            case 0: // Continue
-                stopPause = true;
-                break;
-            case 1: // Restart level
-                stopPause = true;
-                playSound = false;
-                MenuMode = MENU_MAIN;
-                MenuCursor = 0;
-                frmMain.setTargetTexture();
-                frmMain.clearBuffer();
-                frmMain.repaint();
-                EndLevel = true;
-                StopMusic();
-                DoEvents();
-                break;
-            case 2: // Reset checkpoints
-                stopPause = true;
-                playSound = false;
-                pLogDebug("Clear check-points from a menu");
-                Checkpoint.clear();
-                CheckpointsList.clear();
-                numStars = 0;
-                IntProc::sendStarsNumber(numStars);
-                numSavedEvents = 0;
-                BlockSwitch.fill(false);
-                PlaySound(SFX_Bullet);
-                break;
-            case 4: // Drop/Add (if exists)
-                PauseGame(PauseCode::DropAdd, 0);
-                playSound = false;
-                break;
-            case 3: // Quit testing
-                stopPause = true;
-                playSound = false;
-                MenuMode = MENU_MAIN;
-                MenuCursor = 0;
-                frmMain.setTargetTexture();
-                frmMain.clearBuffer();
-                frmMain.repaint();
-                EndLevel = true;
-                StopMusic();
-                DoEvents();
-                KillIt(); // Quit the game entirely
-                break;
-            default:
-                break;
-            }
-            if(g_compatibility.allow_DropAdd && MenuCursor >= 3)
-            {
-                MenuCursor = 7 - MenuCursor;
-            }
-        }
-        else if(MenuCursor == 0) // Contunue
-        {
-            stopPause = true;
-        }
-        else if(MenuCursor == 1 && g_compatibility.allow_DropAdd) // Drop/Add
-        {
-            PauseGame(PauseCode::DropAdd, 0);
-            playSound = false;
-        }
-        else if(CanSave
-            && ((MenuCursor == 1 && !g_compatibility.allow_DropAdd)
-                || (MenuCursor == 2 && g_compatibility.allow_DropAdd))) // "Save and continue"
-        {
-            SaveGame();
-            PlaySound(SFX_Checkpoint);
-            playSound = false;
-            stopPause = true;
-        }
-        else // "Quit" or "Save & Quit"
-        {
-            if(CanSave)
-                SaveGame(); // "Save & Quit"
-            else
-                speedRun_saveStats();
-            stopPause = true;
-            GameMenu = true;
-
-            MenuMode = MENU_MAIN;
-            MenuCursor = 0;
-
-            if(!LevelSelect)
-            {
-                LevelSelect = true;
-                EndLevel = true;
-            }
-            else
-                LevelSelect = false;
-
-            frmMain.setTargetTexture();
-            frmMain.clearBuffer();
-            frmMain.repaint();
-            StopMusic();
-            DoEvents();
-        }
-    }
-
-    if(g_compatibility.allow_DropAdd)
-        max_item += 1;
-
-    if(MenuCursor < 0)
-        MenuCursor = max_item;
-    else if(MenuCursor > max_item)
-        MenuCursor = 0;
-
-    if(stopPause && playSound)
-    {
-        PlaySound(SFX_Pause);
-    }
-
-    return stopPause;
-}
-
 bool MessageScreen_Logic(int plr)
 {
     bool menuDoPress = SharedControls.MenuDo;
@@ -551,7 +265,7 @@ void PauseGame(PauseCode code, int plr)
     if(code == PauseCode::Message)
         MessageScreen_Init();
     else if(code == PauseCode::PauseGame)
-        PauseScreen_Init();
+        PauseScreen::Init();
     else if(code == PauseCode::Reconnect)
         ConnectScreen::Reconnect_Start();
     else if(code == PauseCode::DropAdd)
@@ -592,7 +306,10 @@ void PauseGame(PauseCode code, int plr)
             {
                 if(code != PauseCode::Reconnect)
                 {
-                    PauseGame(PauseCode::Reconnect, 0);
+                    if(g_config.NoPauseReconnect || !g_compatibility.allow_DropAdd)
+                        QuickReconnectScreen::g_active = true;
+                    else
+                        PauseGame(PauseCode::Reconnect, 0);
                 }
             }
             UpdateSound();
@@ -605,7 +322,7 @@ void PauseGame(PauseCode code, int plr)
             }
             else if(GamePaused == PauseCode::PauseGame)
             {
-                if(PauseScreen_Logic(plr))
+                if(PauseScreen::Logic(plr))
                     break;
             }
             else if(GamePaused == PauseCode::Message)

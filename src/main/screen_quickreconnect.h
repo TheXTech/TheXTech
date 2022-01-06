@@ -1,3 +1,7 @@
+#ifndef SCREEN_QUICKRECONNECT_H
+
+#define SCREEN_QUICKRECONNECT_H
+
 namespace QuickReconnectScreen
 {
 
@@ -7,3 +11,5 @@ void Render();
 void Logic();
 
 };
+
+#endif // #ifndef SCREEN_QUICKRECONNECT_H
