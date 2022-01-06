@@ -145,6 +145,8 @@ void OpenConfig()
 
         config.beginGroup("gameplay");
         config.read("ground-pound-by-alt-run", GameplayPoundByAltRun, false);
+        config.read("strict-drop-add", g_config.StrictDropAdd, false);
+        config.read("no-pause-reconnect", g_config.NoPauseReconnect, false);
         config.endGroup();
 
         config.beginGroup("effects");
@@ -236,6 +238,8 @@ void SaveConfig()
 
     config.beginGroup("gameplay");
     config.setValue("ground-pound-by-alt-run", GameplayPoundByAltRun);
+    config.setValue("strict-drop-add", g_config.StrictDropAdd);
+    config.setValue("no-pause-reconnect", g_config.NoPauseReconnect);
     config.endGroup();
 
     config.beginGroup("effects");

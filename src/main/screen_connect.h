@@ -1,6 +1,9 @@
-#ifndef MENU_CONNECTSCREEN_H
+#ifndef SCREEN_CONNECT_H
 
-#define MENU_CONNECTSCREEN_H
+#define SCREEN_CONNECT_H
+
+// for maxLocalPlayers
+#include "../global_constants.h"
 
 extern int g_charSelect[maxLocalPlayers];
 
@@ -21,4 +24,4 @@ int Logic();
 
 } // namespace ConnectScreen
 
-#endif // MENU_CONNECTSCREEN_H
+#endif // SCREEN_CONNECT_H

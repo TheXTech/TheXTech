@@ -9,7 +9,7 @@
 #include "../compat.h"
 #include "../config.h"
 
-#include "menu_connectscreen.h"
+#include "screen_connect.h"
 #include "menu_main.h"
 #include "speedrunner.h"
 
@@ -628,7 +628,7 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pW, int sY, int line, bool m
                 BlockFlash = 0;
 
             if(BlockFlash < 45)
-                SuperPrintCenter(g_mainMenu.playerSelAttachController, 3, cX, sY+7*line);
+                SuperPrintCenter(g_mainMenu.phrasePressAButton, 3, cX, sY+7*line);
     }
         return ret;
     }
@@ -782,7 +782,7 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pW, int sY, int line, bool m
         || p >= (int)Controls::g_InputMethods.size() || !Controls::g_InputMethods[p])
     {
         if(render)
-            SuperPrintCenter(g_mainMenu.playerSelAttachController, 3, cX, sY+11*line);
+            SuperPrintCenter(g_mainMenu.phrasePressAButton, 3, cX, sY+11*line);
         return ret;
     }
 
@@ -907,6 +907,10 @@ int Mouse_Render(bool mouse, bool render)
     {
         if(s_context == Context::MainMenu)
             SuperPrintScreenCenter(g_mainMenu.charSelTitle, 3, sY);
+        else if(s_context == Context::DropAdd)
+            SuperPrintScreenCenter(g_mainMenu.dropAddTitle, 3, sY);
+        else if(s_context == Context::Reconnect)
+            SuperPrintScreenCenter(g_mainMenu.reconnectTitle, 3, sY);
     }
 
     for(int p = 0; p < n; p++)

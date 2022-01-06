@@ -26,7 +26,8 @@
 #include "../compat.h"
 #include "../main/speedrunner.h"
 #include "../main/trees.h"
-#include "../main/menu_connectscreen.h"
+#include "../main/screen_connect.h"
+#include "../main/screen_quickreconnect.h"
 
 // draws GFX to screen when on the world map/world map editor
 void UpdateGraphics2(bool skipRepaint)
@@ -724,10 +725,12 @@ void UpdateGraphics2(bool skipRepaint)
         speedRun_renderControls(1, -1);
         speedRun_renderTimer();
 
+        // render special screens
+        if(QuickReconnectScreen::g_active)
+            QuickReconnectScreen::Render();
+
         if(GamePaused == PauseCode::Reconnect || GamePaused == PauseCode::DropAdd)
-        {
             ConnectScreen::Render();
-        }
 
         if(!skipRepaint)
             frmMain.repaint();

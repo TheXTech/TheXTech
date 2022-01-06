@@ -7,6 +7,8 @@ extern struct Config_t
     bool    StrictDropAdd = false;
     //! Record gameplay data
     bool    RecordGameplayData = false;
+    //! Use the quick (non-pausing) reconnect screen
+    bool    NoPauseReconnect = false;
 } g_config; // main_config.cpp
 
 #endif // CONFIG_H

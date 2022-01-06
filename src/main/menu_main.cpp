@@ -30,7 +30,7 @@
 
 #include "menu_main.h"
 #include "game_info.h"
-#include "menu_connectscreen.h"
+#include "screen_connect.h"
 #include "menu_controls.h"
 
 #include "speedrunner.h"
@@ -78,7 +78,7 @@ void initMainMenu()
     g_mainMenu.wordPlayer = "Player";
     g_mainMenu.wordProfile = "Profile";
     g_mainMenu.playerSelStartGame = "Start Game";
-    g_mainMenu.playerSelAttachController = "Press A Button";
+    g_mainMenu.phrasePressAButton = "Press A Button";
     g_mainMenu.phraseTestControls = "Test Controls";
     g_mainMenu.wordDisconnect = "Disconnect";
     g_mainMenu.phraseHoldStartToReturn = "Hold Start";

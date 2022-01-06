@@ -37,9 +37,11 @@
 #include "../player.h"
 #include "../editor.h"
 #include "../compat.h"
+#include "../config.h"
 #include "speedrunner.h"
 #include "menu_main.h"
-#include "menu_connectscreen.h"
+#include "screen_connect.h"
+#include "screen_quickreconnect.h"
 #include "screen_textentry.h"
 #include "../pseudo_vb.h"
 
@@ -48,7 +50,16 @@ void CheckActive();//in game_main.cpp
 void GameLoop()
 {
     if(!Controls::Update())
-        PauseGame(PauseCode::Reconnect, 0);
+    {
+        if(g_config.NoPauseReconnect)
+            QuickReconnectScreen::g_active = true;
+        else
+            PauseGame(PauseCode::Reconnect, 0);
+    }
+
+    if(QuickReconnectScreen::g_active)
+        QuickReconnectScreen::Logic();
+
     if(LevelMacro > LEVELMACRO_OFF)
         UpdateMacro();
 

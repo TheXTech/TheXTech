@@ -30,7 +30,8 @@
 #include "../main/menu_main.h"
 #include "../main/speedrunner.h"
 #include "../main/trees.h"
-#include "../main/menu_connectscreen.h"
+#include "../main/screen_connect.h"
+#include "../main/screen_quickreconnect.h"
 #include "../main/screen_textentry.h"
 #include "../compat.h"
 
@@ -2576,7 +2577,6 @@ void UpdateGraphics(bool skipRepaint)
             s_shakeScreen.update();
         }
 
-        // TODO: VERIFY THIS
         if(ScreenType == 5 && numScreens == 1)
         {
             speedRun_renderControls(1, -1);
@@ -2592,18 +2592,19 @@ void UpdateGraphics(bool skipRepaint)
 
     speedRun_renderTimer();
 
+    // render special screens
+    if(QuickReconnectScreen::g_active)
+        QuickReconnectScreen::Render();
+
     if(GamePaused == PauseCode::Reconnect || GamePaused == PauseCode::DropAdd)
-    {
         ConnectScreen::Render();
-    }
+
     if(GamePaused == PauseCode::TextEntry)
-    {
         TextEntryScreen::Render();
-    }
+
+    // render the mouse
     if(GamePaused != PauseCode::None && GamePaused != PauseCode::Message)
-    {
         frmMain.renderTexture(int(SharedCursor.X), int(SharedCursor.Y), GFX.ECursor[2]);
-    }
 
     if(!skipRepaint)
         frmMain.repaint();

@@ -95,7 +95,7 @@ struct MainMenuContent
     std::string wordPlayer;
     std::string wordProfile;
     std::string playerSelStartGame;
-    std::string playerSelAttachController;
+    std::string phrasePressAButton;
     std::string phraseTestControls;
     std::string wordDisconnect;
     std::string phraseHoldStartToReturn;

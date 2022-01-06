@@ -59,7 +59,7 @@
 #include "controls.h"
 
 #include "config.h"
-#include "main/menu_connectscreen.h"
+#include "main/screen_connect.h"
 
 void CheckActive();
 // set up sizable blocks

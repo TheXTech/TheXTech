@@ -64,7 +64,6 @@ endif()
 if(ANDROID)
     include(cmake/ndk-stl-config.cmake)
     set(ANDROID_STL "c++_static")
-    set(USE_TOUCHSCREEN_CONTROLLER TRUE)
 endif()
 
 if(WIN32 AND NOT EMSCRIPTEN)
@@ -290,7 +289,8 @@ set(THEXTECH_SRC
     src/main/level_file.cpp
     src/main/menu_loop.cpp
     src/main/menu_main.cpp
-    src/main/menu_connectscreen.cpp
+    src/main/screen_connect.cpp
+    src/main/screen_quickreconnect.cpp
     src/main/screen_textentry.cpp
     src/main/screen_cheats.cpp
     src/main/menu_controls.cpp
@@ -447,10 +447,6 @@ endif()
 
 if(ANDROID)
     target_link_libraries(A2XT_Int INTERFACE log)
-endif()
-
-if(USE_TOUCHSCREEN_CONTROLLER)
-    target_compile_definitions(thextech PRIVATE -DUSE_TOUCHSCREEN_CONTROLLER)
 endif()
 
 if(THEXTECH_FIXED_ASSETS_PATH AND NOT THEXTECH_FIXED_ASSETS_PATH STREQUAL "")

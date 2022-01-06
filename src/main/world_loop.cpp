@@ -38,6 +38,8 @@
 
 #include "../pseudo_vb.h"
 
+#include "../config.h"
+#include "screen_quickreconnect.h"
 
 static SDL_INLINE bool isWorldMusicNotSame(WorldMusic_t &mus)
 {
@@ -107,8 +109,18 @@ void WorldLoop()
 
     speedRun_tick();
     UpdateGraphics2();
+
     if(!Controls::Update())
-        PauseGame(PauseCode::Reconnect, 0);
+    {
+        if(g_config.NoPauseReconnect)
+            QuickReconnectScreen::g_active = true;
+        else
+            PauseGame(PauseCode::Reconnect, 0);
+    }
+
+    if(QuickReconnectScreen::g_active)
+        QuickReconnectScreen::Logic();
+
     UpdateSound();
 
     if(curWorldLevel > 0)
