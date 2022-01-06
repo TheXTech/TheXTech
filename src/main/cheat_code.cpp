@@ -1844,6 +1844,66 @@ SDL_FORCE_INLINE std::string toQWERTZ(std::string s)
     return s;
 }
 
+/*!
+ * \brief hasAZERTY
+ * \param s Checks does string is suitable for conversion into AZERTY
+ * \return true if string can be converted into AZERTY
+ */
+SDL_FORCE_INLINE bool hasAZERTY(const std::string &s)
+{
+    for(const char &c : s)
+    {
+        switch(c)
+        {
+        case 'q':
+        case 'w':
+        case 'a':
+        case ';':
+        case 'z':
+        case 'm':
+            return true;
+        default:
+            continue;
+        }
+    }
+
+    return false;
+}
+
+/*!
+ * \brief convert string into AZERTY
+ * \param s Source string in AZERTY
+ * \return AZERTY string
+ */
+SDL_FORCE_INLINE std::string toAZERTY(std::string s)
+{
+    for(char &c : s)
+    {
+        switch(c)
+        {
+        case 'q':
+            c = 'a';
+            break;
+        case 'w':
+            c = 'z';
+            break;
+        case 'a':
+            c = 'q';
+            break;
+        case 'z':
+            c = 'w';
+            break;
+        case 'm':
+            c = ';';
+            break;
+        default:
+            continue;
+        }
+    }
+
+    return s;
+}
+
 SDL_FORCE_INLINE void convertArray(std::vector<CheatCode_t> &dst, const std::vector<CheatCodeDefault_t> &src)
 {
     dst.clear();
@@ -1856,9 +1916,16 @@ SDL_FORCE_INLINE void convertArray(std::vector<CheatCode_t> &dst, const std::vec
         cd.isCheat = cs.isCheat;
         dst.push_back(cd);
 
-        if(hasQWERTZ(cd.key)) // Automatically add QWERTZ alias
+        if(hasQWERTZ(cs.key)) // Automatically add QWERTZ alias
         {
-            std::string z = toQWERTZ(cd.key);
+            std::string z = toQWERTZ(cs.key);
+            SDL_strlcpy(cd.key, z.c_str(), SDL_min(sizeof(cd.key), z.size() + 1));
+            dst.push_back(cd);
+        }
+
+        if(hasAZERTY(cs.key)) // Automatically add AZERTY alias
+        {
+            std::string z = toAZERTY(cs.key);
             SDL_strlcpy(cd.key, z.c_str(), SDL_min(sizeof(cd.key), z.size() + 1));
             dst.push_back(cd);
         }
@@ -1872,6 +1939,8 @@ SDL_FORCE_INLINE void addAliasCheats(CheatsScope scope, std::vector<GameInfo::Ch
         cheats_addAlias(scope, c.first, c.second);
         if(hasQWERTZ(c.second)) // Add QWERTZ version for new string
             cheats_addAlias(scope, c.first, toQWERTZ(c.second));
+        if(hasAZERTY(c.second)) // Add AZERTY version for new string
+            cheats_addAlias(scope, c.first, toAZERTY(c.second));
     }
 }
 
@@ -1880,10 +1949,16 @@ SDL_FORCE_INLINE void addRenameCheats(CheatsScope scope, std::vector<GameInfo::C
     for(const auto &c : list)
     {
         cheats_rename(scope, c.first, c.second);
+
         if(hasQWERTZ(c.first)) // Remove no longer relevant QWERTZ version of string
             cheats_erase(scope, toQWERTZ(c.first));
+        if(hasAZERTY(c.first)) // Remove no longer relevant AZERTY version of string
+            cheats_erase(scope, toAZERTY(c.first));
+
         if(hasQWERTZ(c.second)) // Add QWERTZ version for new string if needed
             cheats_addAlias(scope, c.second, toQWERTZ(c.second));
+        if(hasAZERTY(c.second)) // Add AZERTY version for new string if needed
+            cheats_addAlias(scope, c.second, toAZERTY(c.second));
     }
 }
 
