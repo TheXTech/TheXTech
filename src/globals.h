@@ -1684,7 +1684,7 @@ extern bool BlocksSorted;
 //Public SingleCoop As Integer 'cheat code
 extern int SingleCoop;
 //Public CheatString As String 'logs keys for cheats
-extern std::string CheatString;
+//extern std::string CheatString; // Made static at cheat_code.cpp
 //Public GameOutro As Boolean 'true if showing credits
 extern bool GameOutro;
 extern bool GameOutroDoQuit;

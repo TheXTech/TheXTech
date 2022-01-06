@@ -88,7 +88,8 @@ void SaveConfig();
 
 void NPCyFix();
 
-void CheatCode(char NewKey);
+// void CheatCode(char NewKey);// Moved into "main/cheat_code.h"
+
 //! credit loop
 void OutroLoop();
 

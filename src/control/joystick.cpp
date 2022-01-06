@@ -43,6 +43,9 @@
 
 #ifdef USE_TOUCHSCREEN_CONTROLLER
 #include "touchscreen.h"
+#   ifdef __ANDROID__
+#       include "../main/cheat_code.h"
+#   endif
 #endif
 
 
@@ -922,6 +925,13 @@ void UpdateControls()
                             c.Run |= true;
                         else if(te.keyRunOnce && c.Run)
                             c.Run = false;
+                    }
+
+                    // Call cheat type dialog when hold start and press the key toggle button
+                    if(!LevelEditor && !GameMenu && !BattleMode)
+                    {
+                        if(t.Start && te.keyToggleViewOnce)
+                            cheats_callDialog();
                     }
                 } // s_touch.m_touchHidden
             }

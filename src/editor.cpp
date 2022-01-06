@@ -40,6 +40,7 @@
 #include "effect.h"
 #include "game_main.h"
 #include "main/level_file.h"
+#include "main/cheat_code.h"
 #include "load_gfx.h"
 #include "core/window.h"
 #include "core/events.h"
@@ -1774,8 +1775,7 @@ void UpdateInterprocess()
 
     case IntProc::Cheat:
     {
-        CheatString = IntProc::getCMD();
-        CheatCode(CheatString[0]);
+        cheats_setBuffer(IntProc::getCMD());
         break;
     }
 

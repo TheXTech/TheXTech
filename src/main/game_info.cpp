@@ -23,11 +23,31 @@
 #include <AppPath/app_path.h>
 #include <IniProcessor/ini_processing.h>
 #include "game_info.h"
+#include "cheat_code.h"
 
 #include "../version.h"
 
 
 GameInfo g_gameInfo;
+
+static void readCheats(IniProcessing &conf, std::vector<GameInfo::CheatAlias> &dst, const std::string &group)
+{
+    dst.clear();
+    conf.beginGroup(group);
+    {
+        auto ak = conf.allKeys();
+        for(const auto &k : ak)
+        {
+            GameInfo::CheatAlias ca;
+            ca.first = k;
+            conf.read(k.c_str(), ca.second, std::string());
+            if(ca.second.empty())
+                continue; // Skip empty aliases
+            dst.push_back(ca);
+        }
+    }
+    conf.endGroup();
+}
 
 void initGameInfo()
 {
@@ -156,6 +176,13 @@ void initGameInfo()
             }
         }
         config.endGroup();
+
+        readCheats(config, g_gameInfo.cheatsGlobalAliases, "cheats-global-aliases");
+        readCheats(config, g_gameInfo.cheatsGlobalRenames, "cheats-global-renames");
+        readCheats(config, g_gameInfo.cheatsWorldAliases, "cheats-world-aliases");
+        readCheats(config, g_gameInfo.cheatsWorldRenames, "cheats-world-renames");
+        readCheats(config, g_gameInfo.cheatsLevelAliases, "cheats-level-aliases");
+        readCheats(config, g_gameInfo.cheatsLevelRenames, "cheats-level-renames");
     }
 }
 

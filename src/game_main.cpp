@@ -57,6 +57,7 @@
 #include "editor.h"
 #include "custom.h"
 #include "main/world_globals.h"
+#include "main/cheat_code.h"
 #include "main/game_globals.h"
 #include "main/level_file.h"
 #include "main/speedrunner.h"
@@ -123,6 +124,7 @@ int GameMain(const CmdLineSetup_t &setup)
     speedRun_setSemitransparentRender(setup.speedRunnerSemiTransparent);
 
     ResetCompat();
+    cheats_reset();
 
     // [ !Here was a starting dialog! ]
 
@@ -443,7 +445,7 @@ int GameMain(const CmdLineSetup_t &setup)
             Checkpoint.clear();
             CheckpointsList.clear();
             WorldPlayer[1].Frame = 0;
-            CheatString.clear();
+            cheats_clearBuffer();
             LevelBeatCode = 0;
             curWorldLevel = 0;
 
@@ -552,7 +554,8 @@ int GameMain(const CmdLineSetup_t &setup)
         // World Map
         else if(LevelSelect)
         {
-            CheatString.clear();
+            cheats_clearBuffer();
+
             For(A, 1, numPlayers)
             {
                 if(Player[A].Mount == 0 || Player[A].Mount == 2)
@@ -566,6 +569,7 @@ int GameMain(const CmdLineSetup_t &setup)
                             Player[A].MountType = 1;
                     }
                 }
+
                 OwedMount[A] = 0;
                 OwedMountType[A] = 0;
             }
@@ -674,7 +678,7 @@ int GameMain(const CmdLineSetup_t &setup)
         // MAIN GAME
         else
         {
-            CheatString.clear();
+            cheats_clearBuffer();
             EndLevel = false;
 
             Record::InitRecording(); // initializes level data recording
