@@ -110,6 +110,7 @@ void OpenConfig_preSetup()
         config.read("scale-down-all-textures", g_videoSettings.scaleDownAllTextures, false);
         config.read("display-controllers", g_drawController, false);
         config.readEnum("battery-status", g_videoSettings.batteryStatus, (int)BATTERY_STATUS_OFF, batteryStatus);
+        config.read("osk-fill-screen", g_config.osk_fill_screen, false);
         config.endGroup();
 
         config.beginGroup("sound");
@@ -214,6 +215,7 @@ void SaveConfig()
         config.setValue("scale-down-all-textures", g_videoSettings.scaleDownAllTextures);
         config.setValue("display-controllers", g_drawController);
         config.setValue("battery-status", batteryStatus[g_videoSettings.batteryStatus]);
+        config.setValue("osk-fill-screen", g_config.osk_fill_screen);
     }
     config.endGroup();
 

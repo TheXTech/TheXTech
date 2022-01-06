@@ -1,6 +1,7 @@
 #include "../frm_main.h"
 #include "../globals.h"
 #include "../graphics.h"
+#include "../config.h"
 
 namespace TextEntryScreen
 {
@@ -55,7 +56,7 @@ inline const char* get_char()
     return get_char(s_cur_level, s_cur_row, s_cur_col);
 }
 
-bool UpdateButton(int x, int y, const char* c, bool sel, bool render)
+bool UpdateButton(int x, int y, int size, const char* c, bool sel, bool render)
 {
     if(*c == '\x12' || *c == '\x11') // empty space or someone else's continuation
         return false;
@@ -104,18 +105,18 @@ bool UpdateButton(int x, int y, const char* c, bool sel, bool render)
         print_char[1] = '\0';
     }
 
-    int width = 40;
+    int width = size;
 
     while(*next_char == '\x11') // wider
     {
-        width += 40;
+        width += size;
         next_char ++;
     }
 
     // the button is 36x36 and outlined by a 2 pixel box
     bool coll = false;
     if(SharedCursor.X >= x + 2 && SharedCursor.X < x + width - 2
-        && SharedCursor.Y >= y + 2 && SharedCursor.Y < y + 38)
+        && SharedCursor.Y >= y + 2 && SharedCursor.Y < y + size - 2)
         coll = true;
     // outline:
     if(render)
@@ -123,19 +124,19 @@ bool UpdateButton(int x, int y, const char* c, bool sel, bool render)
         if(sel)
         {
             if(coll && SharedCursor.Primary)
-                frmMain.renderRect(x, y, width, 40, 0.f, 0.5f, 0.5f, 1.0f, true);
+                frmMain.renderRect(x, y, width, size, 0.f, 0.5f, 0.5f, 1.0f, true);
             else
-                frmMain.renderRect(x, y, width, 40, 0.f, 1.0f, 1.0f, 1.0f, true);
+                frmMain.renderRect(x, y, width, size, 0.f, 1.0f, 1.0f, 1.0f, true);
         }
         else if(coll && SharedCursor.Primary)
-            frmMain.renderRect(x, y, width, 40, 0.f, 0.f, 0.f, 1.0f, true);
+            frmMain.renderRect(x, y, width, size, 0.f, 0.f, 0.f, 1.0f, true);
         // background:
         if(SharedCursor.Primary && coll)
-            frmMain.renderRect(x+2, y+2, width-4, 36, 0.2f, 0.2f, 0.2f, 1.0f, true);
+            frmMain.renderRect(x+2, y+2, width-4, size-4, 0.2f, 0.2f, 0.2f, 1.0f, true);
         else
-            frmMain.renderRect(x+2, y+2, width-4, 36, 0.5f, 0.5f, 0.5f, 0.8f, true);
+            frmMain.renderRect(x+2, y+2, width-4, size-4, 0.5f, 0.5f, 0.5f, 0.8f, true);
 
-        SuperPrintCenter(print_char, 4, x+2+width/2, y+10);
+        SuperPrintCenter(print_char, 4, x+width/2, y+size/2-10);
     }
 
     return (s_mouse_up == 1 && coll);
@@ -340,8 +341,16 @@ bool DoAction()
 
 bool KeyboardMouseRender(bool mouse, bool render)
 {
-    int kb_height = 5*40;
-    int kb_width = 12*40;
+    int key_size = 40;
+    if(g_config.osk_fill_screen)
+    {
+        key_size = (ScreenW - 40) / 12;
+        // force even
+        key_size &= ~1;
+    }
+
+    int kb_height = 5*key_size;
+    int kb_width = 12*key_size;
 
     int win_width = kb_width + 20;
     int win_height = kb_height + 20;
@@ -392,7 +401,7 @@ bool KeyboardMouseRender(bool mouse, bool render)
             bool sel = false;
             if(s_render_sel && s_cur_row == row && s_cur_col == col)
                 sel = true;
-            if(UpdateButton(40*col + kb_x, 40*row + kb_y, get_char(s_cur_level, row, col), sel, render) && mouse)
+            if(UpdateButton(key_size*col + kb_x, key_size*row + kb_y, key_size, get_char(s_cur_level, row, col), sel, render) && mouse)
             {
                 s_render_sel = false;
                 s_cur_row = row;
