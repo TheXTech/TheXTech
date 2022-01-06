@@ -342,7 +342,9 @@ int main(int argc, char**argv)
         }
 
         setup.verboseLogging = switchVerboseLog.getValue();
+#ifdef THEXTECH_INTERPROC_SUPPORTED
         setup.interprocess = switchTestInterprocess.getValue();
+#endif
         setup.testLevelMode = !setup.testLevel.empty() || setup.interprocess;
         setup.testNumPlayers = int(numPlayers.getValue());
         if(setup.testNumPlayers > 2)

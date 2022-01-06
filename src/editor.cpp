@@ -20,7 +20,9 @@
 
 #include <SDL2/SDL_timer.h>
 
-#include <InterProcess/intproc.h>
+#ifdef THEXTECH_INTERPROC_SUPPORTED
+#   include <InterProcess/intproc.h>
+#endif
 #include <Logger/logger.h>
 #include <Utils/elapsed_timer.h>
 #include <pge_delay.h>
@@ -215,9 +217,10 @@ void UpdateEditor()
         SetCursor();
 
         // this is where objects are placed/grabbed/deleted
-
+#ifdef THEXTECH_INTERPROC_SUPPORTED
         if(IntProc::isEnabled())
             UpdateInterprocess();
+#endif
 
         if(EditorControls.Mouse1)
         {
@@ -411,6 +414,7 @@ void UpdateEditor()
                             tempBool = true;
                             UNUSED(tempBool);
 
+#ifdef THEXTECH_INTERPROC_SUPPORTED
                             if(IntProc::isEnabled()) // Report the taken block into the Editor
                             {
                                 LevelNPC n;
@@ -450,7 +454,7 @@ void UpdateEditor()
                                 n.attach_layer = EditorCursor.NPC.AttLayer;
                                 IntProc::sendTakenNPC(n);
                             }
-
+#endif
                             break;
                         }
                     }
@@ -559,6 +563,7 @@ void UpdateEditor()
                                 EditorControls.Mouse1 = false; /* Simulate "Focus out" inside of SMBX Editor */
                                 FindSBlocks();
 
+#ifdef THEXTECH_INTERPROC_SUPPORTED
                                 if(IntProc::isEnabled()) // Report the taken block into the Editor
                                 {
                                     LevelBlock block;
@@ -579,6 +584,7 @@ void UpdateEditor()
                                     block.event_destroy = EditorCursor.Block.TriggerDeath;
                                     IntProc::sendTakenBlock(block);
                                 }
+#endif // THEXTECH_INTERPROC_SUPPORTED
 
                                 break;
                             }
@@ -736,6 +742,7 @@ void UpdateEditor()
                             MouseRelease = false;
                             EditorControls.Mouse1 = false; /* Simulate "Focus out" inside of SMBX Editor */
 
+#ifdef THEXTECH_INTERPROC_SUPPORTED
                             if(IntProc::isEnabled()) // Report the taken block into the Editor
                             {
                                 LevelBGO b;
@@ -747,7 +754,7 @@ void UpdateEditor()
                                     b.smbx64_sp = EditorCursor.Background.SortPriority;
                                 IntProc::sendTakenBGO(b);
                             }
-
+#endif // THEXTECH_INTERPROC_SUPPORTED
                             break;
                         }
                     }
@@ -858,6 +865,7 @@ void UpdateEditor()
                                 EditorControls.Mouse1 = false; /* Simulate "Focus out" inside of SMBX Editor */
                                 FindSBlocks();
 
+#ifdef THEXTECH_INTERPROC_SUPPORTED
                                 if(IntProc::isEnabled()) // Report the taken block into the Editor
                                 {
                                     LevelBlock block;
@@ -878,7 +886,7 @@ void UpdateEditor()
                                     block.event_destroy = EditorCursor.Block.TriggerDeath;
                                     IntProc::sendTakenBlock(block);
                                 }
-
+#endif // THEXTECH_INTERPROC_SUPPORTED
                                 break;
                             }
                         }
@@ -1747,6 +1755,7 @@ void UpdateEditor()
     }
 }
 
+#ifdef THEXTECH_INTERPROC_SUPPORTED
 void UpdateInterprocess()
 {
     if(!IntProc::hasCommand())
@@ -1986,6 +1995,7 @@ void UpdateInterprocess()
 
     IntProc::cmdUnLock();
 }
+#endif // THEXTECH_INTERPROC_SUPPORTED
 
 int EditorNPCFrame(const int A, float& C, int N)
 {
@@ -2181,6 +2191,7 @@ void SetCursor()
 //        }
 //    }
 
+#ifdef THEXTECH_INTERPROC_SUPPORTED
     if(IntProc::isWorking() && EditorCursor.Mode != optCursor.current)
     {
         switch(optCursor.current) // Tell the IPC Editor to close the properties dialog
@@ -2204,6 +2215,7 @@ void SetCursor()
             break;
         }
     }
+#endif
 
     EditorCursor.Mode = optCursor.current;
 
@@ -2760,6 +2772,10 @@ void zTestLevel(bool magicHand, bool interProcess)
     Player_t blankPlayer;
     qScreen = false;
 
+#ifndef THEXTECH_INTERPROC_SUPPORTED
+    UNUSED(interProcess);
+#endif
+
     for(A = 1; A <= numCharacters; A++)
     {
         SavedChar[A] = blankPlayer;
@@ -2841,6 +2857,7 @@ void zTestLevel(bool magicHand, bool interProcess)
         MagicHand = false;
     }
 
+#ifdef THEXTECH_INTERPROC_SUPPORTED
     if(interProcess)
     {
         LevelData data;
@@ -2899,6 +2916,7 @@ void zTestLevel(bool magicHand, bool interProcess)
         IntProc::setState("Done. Starting game...");
     }
     else
+#endif // THEXTECH_INTERPROC_SUPPORTED
     {
         if(!OpenLevel(FullFileName))
         {

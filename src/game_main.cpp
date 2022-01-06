@@ -19,11 +19,16 @@
  */
 
 #include <SDL2/SDL_timer.h>
+#include <SDL2/SDL_atomic.h>
+#include <SDL2/SDL_thread.h>
 
 #include <Logger/logger.h>
 #include <Utils/files.h>
 #include <AppPath/app_path.h>
-#include <InterProcess/intproc.h>
+#include <PGE_File_Formats/file_formats.h>
+#ifdef THEXTECH_INTERPROC_SUPPORTED
+#   include <InterProcess/intproc.h>
+#endif
 #include <pge_delay.h>
 #include <fmt_format_ne.h>
 
@@ -221,8 +226,10 @@ int GameMain(const CmdLineSetup_t &setup)
 
     LevelSelect = true; // world map is to be shown
 
+#ifdef THEXTECH_INTERPROC_SUPPORTED
     if(setup.interprocess)
         IntProc::init();
+#endif
 
     LoadingInProcess = false;
 
@@ -973,6 +980,7 @@ void UpdateMacro()
     int A = 0;
     bool OnScreen = false;
 
+#ifdef THEXTECH_INTERPROC_SUPPORTED
     if(LevelMacro != LEVELMACRO_OFF && LevelMacroCounter == 0 && IntProc::isEnabled())
     {
         for(int i = 0; i < numPlayers; ++i)
@@ -981,6 +989,7 @@ void UpdateMacro()
             IntProc::sendPlayerSettings(i, p.Character, p.State, p.Mount, p.MountType);
         }
     }
+#endif
 
     if(LevelMacro == LEVELMACRO_CARD_ROULETTE_EXIT) // SMB3 Exit
     {

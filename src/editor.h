@@ -59,7 +59,9 @@ extern OptCursor_t optCursor;
 // it is still called when the player is testing a level in the editor in windowed mode
 extern void UpdateEditor();
 
+#ifdef THEXTECH_INTERPROC_SUPPORTED
 extern void UpdateInterprocess();
+#endif
 
 extern int EditorNPCFrame(const int A, float& C, int N = 0);
 

@@ -261,13 +261,20 @@ set(LIB_SRC
     lib/Graphics/image_size.cpp
     lib/Graphics/size.cpp
     lib/Graphics/sizef.cpp
-    lib/InterProcess/editor_pipe.cpp
-    lib/InterProcess/intproc.cpp
     ${INIPROCESSOR_SRCS}
     ${LOGGER_SRCS}
     ${UTILS_SRCS}
     ${LIB_SRC_EXTRA}
 )
+
+if(NOT ANDROID AND NOT EMSCRIPTEN AND NOT VITA AND NOT 3DS)
+    list(APPEND LIB_SRC
+        lib/InterProcess/editor_pipe.cpp
+        lib/InterProcess/intproc.cpp
+    )
+    set(THEXTECH_INTERPROC_SUPPORTED ON)
+endif()
+
 
 if(APPLE)
     file(GLOB PGE_FILE_ICONS "${CMAKE_CURRENT_SOURCE_DIR}/resources/file_icons/*.icns")
@@ -543,6 +550,10 @@ endif()
 
 if(EMSCRIPTEN)
     target_compile_definitions(thextech PRIVATE -DPGE_NO_THREADING -DNO_FILE_LOGGING)
+endif()
+
+if(THEXTECH_INTERPROC_SUPPORTED)
+    target_compile_definitions(thextech PRIVATE -DTHEXTECH_INTERPROC_SUPPORTED)
 endif()
 
 if(NOT USE_SYSTEM_LIBS)

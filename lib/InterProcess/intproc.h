@@ -20,6 +20,8 @@
 #ifndef INTPROC_H
 #define INTPROC_H
 
+#ifdef THEXTECH_INTERPROC_SUPPORTED
+
 #include <mutex>
 #include <deque>
 #include <string>
@@ -87,5 +89,7 @@ namespace IntProc
     extern EditorPipe *editor;
 
 }// namespace IntProc
+
+#endif // THEXTECH_INTERPROC_SUPPORTED
 
 #endif // INTPROC_H

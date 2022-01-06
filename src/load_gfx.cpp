@@ -29,7 +29,9 @@
 #include <Utils/files.h>
 #include <Utils/dir_list_ci.h>
 #include <DirManager/dirman.h>
-#include <InterProcess/intproc.h>
+#ifdef THEXTECH_INTERPROC_SUPPORTED
+#   include <InterProcess/intproc.h>
+#endif
 #include <fmt_format_ne.h>
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
@@ -660,11 +662,13 @@ void UpdateLoadREAL()
     std::string state;
     bool draw = false;
 
+#ifdef THEXTECH_INTERPROC_SUPPORTED
     if(IntProc::isEnabled())
     {
         state = IntProc::getState();
         draw = true;
     }
+#endif // THEXTECH_INTERPROC_SUPPORTED
 
     static float alphaFader = 1.0f;
 
