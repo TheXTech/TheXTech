@@ -555,6 +555,8 @@ void InputMethodProfile_Joystick::InitAsJoystick()
     this->m_keys2[PlayerControls::Buttons::Down].assign(KM_Key::JoyAxis, 1, 1);
     this->m_keys2[PlayerControls::Buttons::Left].assign(KM_Key::JoyAxis, 0, -1);
     this->m_keys2[PlayerControls::Buttons::Right].assign(KM_Key::JoyAxis, 0, 1);
+    this->m_keys2[PlayerControls::Buttons::AltRun].assign(KM_Key::JoyButton, 4, 1);
+    this->m_keys2[PlayerControls::Buttons::AltJump].assign(KM_Key::JoyButton, 5, 1);
 
     // clear all of the non-standard controls, then fill in some of them
     for(size_t i = 0; i < CursorControls::n_buttons; i++)
@@ -605,6 +607,8 @@ void InputMethodProfile_Joystick::InitAsController()
     this->m_keys2[PlayerControls::Buttons::Down].assign(KM_Key::CtrlAxis, SDL_CONTROLLER_AXIS_LEFTY, 1);
     this->m_keys2[PlayerControls::Buttons::Left].assign(KM_Key::CtrlAxis, SDL_CONTROLLER_AXIS_LEFTX, -1);
     this->m_keys2[PlayerControls::Buttons::Right].assign(KM_Key::CtrlAxis, SDL_CONTROLLER_AXIS_LEFTX, 1);
+    this->m_keys2[PlayerControls::Buttons::AltRun].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_LEFTSHOULDER, 1);
+    this->m_keys2[PlayerControls::Buttons::AltJump].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER, 1);
 
     // clear all of the non-standard controls, then fill in some of them
     for(size_t i = 0; i < CursorControls::n_buttons; i++)

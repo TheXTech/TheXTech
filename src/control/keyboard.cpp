@@ -177,6 +177,23 @@ void InputMethod_Keyboard::Rumble(int ms, float strength)
 // the job of this function is to initialize the class in a consistent state
 InputMethodProfile_Keyboard::InputMethodProfile_Keyboard()
 {
+    for(size_t i = 0; i < PlayerControls::n_buttons; i++)
+    {
+        this->m_keys2[i] = null_key;
+    }
+    for(size_t i = 0; i < CursorControls::n_buttons; i++)
+    {
+        this->m_cursor_keys2[i] = null_key;
+    }
+    for(size_t i = 0; i < EditorControls::n_buttons; i++)
+    {
+        this->m_editor_keys2[i] = null_key;
+    }
+    for(size_t i = 0; i < Hotkeys::n_buttons; i++)
+    {
+        this->m_hotkeys2[i] = null_key;
+    }
+
     this->m_keys[PlayerControls::Buttons::Up] = SDL_SCANCODE_UP;
     this->m_keys[PlayerControls::Buttons::Down] = SDL_SCANCODE_DOWN;
     this->m_keys[PlayerControls::Buttons::Left] = SDL_SCANCODE_LEFT;
@@ -200,6 +217,8 @@ InputMethodProfile_Keyboard::InputMethodProfile_Keyboard()
     this->m_editor_keys[EditorControls::Buttons::SwitchScreens] = SDL_SCANCODE_RSHIFT;
     this->m_editor_keys[EditorControls::Buttons::TestPlay] = SDL_SCANCODE_RETURN;
 
+    this->m_hotkeys[Hotkeys::Buttons::EnterCheats] = null_key;
+    this->m_hotkeys[Hotkeys::Buttons::ToggleHUD] = SDL_SCANCODE_F1;
     this->m_hotkeys[Hotkeys::Buttons::DebugInfo] = SDL_SCANCODE_F3;
     this->m_hotkeys[Hotkeys::Buttons::Fullscreen] = SDL_SCANCODE_F7;
 #ifdef __APPLE__
@@ -208,24 +227,7 @@ InputMethodProfile_Keyboard::InputMethodProfile_Keyboard()
     this->m_hotkeys[Hotkeys::Buttons::RecordGif] = SDL_SCANCODE_F11;
 #endif
     this->m_hotkeys[Hotkeys::Buttons::Screenshot] = SDL_SCANCODE_F12;
-    this->m_hotkeys[Hotkeys::Buttons::EnterCheats] = SDL_SCANCODE_F2;
-
-    for(size_t i = 0; i < PlayerControls::n_buttons; i++)
-    {
-        this->m_keys2[i] = null_key;
-    }
-    for(size_t i = 0; i < CursorControls::n_buttons; i++)
-    {
-        this->m_cursor_keys2[i] = null_key;
-    }
-    for(size_t i = 0; i < EditorControls::n_buttons; i++)
-    {
-        this->m_editor_keys2[i] = null_key;
-    }
-    for(size_t i = 0; i < Hotkeys::n_buttons; i++)
-    {
-        this->m_hotkeys2[i] = null_key;
-    }
+    this->m_hotkeys2[Hotkeys::Buttons::Screenshot] = SDL_SCANCODE_F2;
 }
 
 bool InputMethodProfile_Keyboard::PollPrimaryButton(ControlsClass c, size_t i)

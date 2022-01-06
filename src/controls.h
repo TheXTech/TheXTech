@@ -53,13 +53,14 @@ namespace PlayerControls
 {
     // These attributes should be used by Input Methods and the game when possible
     // to allow them to function even if the controls structures change.
-    static constexpr size_t n_buttons = 10;
 
     // enumerate of the Player key indices (which are almost never used)
     enum Buttons : size_t
     {
-        Up = 0, Down, Left, Right, Jump, AltJump, Run, AltRun, Drop, Start
+        Up = 0, Down, Left, Right, Jump, AltJump, Run, AltRun, Drop, Start, MAX
     };
+
+    static constexpr size_t n_buttons = Buttons::MAX;
 
 
     // can be adapted for locale
@@ -161,14 +162,15 @@ namespace CursorControls
 {
     // These attributes should be used by Input Methods and the game when possible
     // to allow them to function even if the controls structures change.
-    static constexpr size_t n_buttons = 7;
 
     // enumerate of the Cursor key indices (which are almost never used)
     enum Buttons : size_t
     {
         CursorUp = 0, CursorDown, CursorLeft, CursorRight, Primary,
-        Secondary, Tertiary
+        Secondary, Tertiary, MAX
     };
+
+    static constexpr size_t n_buttons = Buttons::MAX;
 
 
     // can be adapted for locale
@@ -247,15 +249,15 @@ namespace EditorControls
 {
     // These attributes should be used by Input Methods and the game when possible
     // to allow them to function even if the controls structures change.
-    static constexpr size_t n_buttons = 11;
 
-    // enumerate of the Player key indices (which are almost never used)
+    // enumerate of the Editor key indices (which are almost never used)
     enum Buttons : size_t
     {
         ScrollUp = 0, ScrollDown, ScrollLeft, ScrollRight, FastScroll,
-        ModeSelect, ModeErase, PrevSection, NextSection, SwitchScreens, TestPlay
+        ModeSelect, ModeErase, PrevSection, NextSection, SwitchScreens, TestPlay, MAX
     };
 
+    static constexpr size_t n_buttons = Buttons::MAX;
 
     // can be adapted for locale
     inline const char* GetButtonName_INI(size_t i)
@@ -356,14 +358,14 @@ namespace Hotkeys
 {
     // These attributes should be used by Input Methods and the game when possible
     // to allow them to function even when hotkeys change / are added.
-    static constexpr size_t n_buttons = 5;
 
     // enumerate of the Hotkey indices (which are almost never used)
     enum Buttons : size_t
     {
-        Fullscreen = 0, Screenshot, RecordGif, DebugInfo, EnterCheats
+        Fullscreen = 0, Screenshot, RecordGif, DebugInfo, EnterCheats, ToggleHUD, MAX
     };
 
+    constexpr size_t n_buttons = Buttons::MAX;
 
     // can be adapted for locale
     inline const char* GetButtonName_INI(size_t i)
@@ -380,6 +382,8 @@ namespace Hotkeys
                 return "debug-info";
             case Buttons::EnterCheats:
                 return "enter-cheats";
+            case Buttons::ToggleHUD:
+                return "toggle-hud";
             default:
                 return "NULL";
         }
@@ -399,7 +403,9 @@ namespace Hotkeys
             case Buttons::DebugInfo:
                 return "Debug Info";
             case Buttons::EnterCheats:
-                return "Type Cheat";
+                return "Enter Cheat";
+            case Buttons::ToggleHUD:
+                return "Toggle HUD";
             default:
                 return "NULL";
         }

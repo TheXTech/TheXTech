@@ -53,6 +53,10 @@ void Hotkeys::Activate(size_t i)
         case Buttons::EnterCheats:
             s_enterCheatScreen = true;
             return;
+        case Buttons::ToggleHUD:
+            // implement after merge
+            pLogDebug("Toggle HUD Called...");
+            return;
         default:
             return;
     }
