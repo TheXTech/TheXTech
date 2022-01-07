@@ -18,8 +18,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIMITS_H
-#define LIMITS_H
+#pragma once
+#ifndef GLOBALCONSTANTS_H
+#define GLOBALCONSTANTS_H
 
 //Public Const MaxSavedEvents As Integer = 200
 const int MaxSavedEvents = 200;
@@ -98,4 +99,4 @@ const int ScreenW = 800;
 //Public Const ScreenH As Integer = 600  'Game Screen Height
 const int ScreenH = 600;
 
-#endif // LIMITS_H
+#endif // GLOBALCONSTANTS_H

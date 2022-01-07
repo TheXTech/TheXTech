@@ -1,7 +1,9 @@
 #include <vector>
 #include <string>
 
+#ifdef THEXTECH_INTERPROC_SUPPORTED
 #include <InterProcess/intproc.h>
+#endif // #ifdef THEXTECH_INTERPROC_SUPPORTED
 #include <Logger/logger.h>
 
 #include "../globals.h"
@@ -56,7 +58,9 @@ static bool s_ResetCheckpoints()
 	Checkpoint.clear();
 	CheckpointsList.clear();
 	numStars = 0;
+#ifdef THEXTECH_INTERPROC_SUPPORTED
 	IntProc::sendStarsNumber(numStars);
+#endif
 	numSavedEvents = 0;
 	BlockSwitch.fill(false);
 	PlaySound(SFX_Bullet);

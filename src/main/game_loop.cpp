@@ -24,6 +24,8 @@
 #include <pge_delay.h>
 
 #include "../globals.h"
+#include "../config.h"
+#include "../compat.h"
 #include "../frame_timer.h"
 #include "../game_main.h"
 #include "../sound.h"
@@ -35,8 +37,10 @@
 #include "../layers.h"
 #include "../player.h"
 #include "../editor.h"
-#include "../compat.h"
-#include "../config.h"
+#include "../core/render.h"
+#include "../core/events.h"
+#include "game_globals.h"
+#include "world_globals.h"
 #include "speedrunner.h"
 #include "menu_main.h"
 #include "screen_pause.h"
@@ -44,6 +48,45 @@
 #include "screen_quickreconnect.h"
 #include "screen_textentry.h"
 #include "../pseudo_vb.h"
+
+//! Holds the screen overlay for the level
+ScreenFader g_levelScreenFader;
+RangeArr<ScreenFader, 0, 2> g_levelVScreenFader;
+
+void clearScreenFaders()
+{
+    g_levelScreenFader.clearFader();
+    for(int s = 0; s < 3; ++s)
+        g_levelVScreenFader[s].clearFader();
+}
+
+void updateScreenFaders()
+{
+    g_levelScreenFader.update();
+
+    for(int s = 0; s < 3; ++s)
+        g_levelVScreenFader[s].update();
+}
+
+void levelWaitForFade()
+{
+    while(!g_levelScreenFader.isComplete() && GameIsActive)
+    {
+        XEvents::doEvents();
+
+        if(canProceedFrame())
+        {
+            computeFrameTime1();
+            UpdateGraphics();
+            UpdateSound();
+            XEvents::doEvents();
+            computeFrameTime2();
+            updateScreenFaders();
+        }
+        PGE_Delay(1);
+    }
+}
+
 
 void CheckActive();//in game_main.cpp
 
@@ -68,6 +111,10 @@ void GameLoop()
         if(BattleOutro > 0)
         {
             BattleOutro++;
+
+            if(g_config.EnableInterLevelFade && BattleOutro == 195)
+                g_levelScreenFader.setupFader(1, 0, 65, ScreenFader::S_FADE);
+
             if(BattleOutro == 260)
                 EndLevel = true;
         }
@@ -78,7 +125,7 @@ void GameLoop()
         EndLevel = true;
         ErrorQuit = false;
         pLogWarning("Quit level because of an error");
-        frmMain.clearBuffer();
+        XRender::clearBuffer();
     }
 
     if(EndLevel)
@@ -102,6 +149,7 @@ void GameLoop()
         UpdateEffects();
         speedRun_tick();
         UpdateGraphics();
+        updateScreenFaders();
     }
     else if(BattleIntro > 0)
     {
@@ -109,12 +157,11 @@ void GameLoop()
         BlockFrames();
         UpdateSound();
         For(A, 1, numNPCs)
-        {
             NPCFrames(A);
-        }
         BattleIntro--;
         if(BattleIntro == 1)
             PlaySound(SFX_Checkpoint);
+        updateScreenFaders();
     }
     else
     {
@@ -135,6 +182,8 @@ void GameLoop()
 //        If MagicHand = True Then UpdateEditor
         if(MagicHand)
             UpdateEditor();
+
+        updateScreenFaders();
 
         // Pause game and CaptainN logic
         if(LevelMacro == LEVELMACRO_OFF && CheckLiving() > 0)
@@ -294,7 +343,7 @@ void PauseGame(PauseCode code, int plr)
             computeFrameTime1();
             computeFrameTime2();
 
-            DoEvents();
+            XEvents::doEvents();
             CheckActive();
 
             speedRun_tick();
@@ -315,6 +364,11 @@ void PauseGame(PauseCode code, int plr)
             UpdateSound();
             BlockFrames();
             UpdateEffects();
+
+            if(LevelSelect)
+                g_worldScreenFader.update();
+            else
+                updateScreenFaders();
 
             if(qScreen)
             {

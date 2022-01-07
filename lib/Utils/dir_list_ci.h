@@ -13,7 +13,7 @@ class DirListCI
     std::vector<std::string> m_fileList;
     std::vector<std::string> m_dirList;
 public:
-    DirListCI(const std::string &curDir = std::string());
+    DirListCI(std::string curDir = std::string()) noexcept;
     void setCurDir(const std::string &path);
 
     std::string resolveFileCase(const std::string &name);

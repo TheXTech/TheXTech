@@ -23,11 +23,31 @@
 #include <AppPath/app_path.h>
 #include <IniProcessor/ini_processing.h>
 #include "game_info.h"
+#include "cheat_code.h"
 
 #include "../version.h"
 
 
 GameInfo g_gameInfo;
+
+static void readCheats(IniProcessing &conf, std::vector<GameInfo::CheatAlias> &dst, const std::string &group)
+{
+    dst.clear();
+    conf.beginGroup(group);
+    {
+        auto ak = conf.allKeys();
+        for(const auto &k : ak)
+        {
+            GameInfo::CheatAlias ca;
+            ca.first = k;
+            conf.read(k.c_str(), ca.second, std::string());
+            if(ca.second.empty())
+                continue; // Skip empty aliases
+            dst.push_back(ca);
+        }
+    }
+    conf.endGroup();
+}
 
 void initGameInfo()
 {
@@ -64,6 +84,22 @@ void initGameInfo()
 
     g_gameInfo.introEnableActivity = true;
     g_gameInfo.introMaxPlayersCount = 6;
+    g_gameInfo.introCharacters = {1, 2, 3, 4, 5};
+    g_gameInfo.introCharacterCurrent = 0;
+    g_gameInfo.introDeadMode = false;
+
+    g_gameInfo.outroEnableActivity = true;
+    g_gameInfo.outroMaxPlayersCount = 5;
+    g_gameInfo.outroCharacters = {1, 2, 3, 4, 5};
+    g_gameInfo.outroStates = {4, 7, 5, 3, 6};
+    g_gameInfo.outroMounts = {0, 3, 0, 1, 0};
+    g_gameInfo.outroCharacterCurrent = 0;
+    g_gameInfo.outroInitialDirections = {0, 0, 0, 0, 0};
+    g_gameInfo.outroWalkDirection = -1;
+    g_gameInfo.outroAutoJump = true;
+    g_gameInfo.outroDeadMode = false;
+    g_gameInfo.disableTwoPlayer = false;
+    g_gameInfo.disableBattleMode = false;
 
     std::string gameInfoPath = AppPathManager::assetsRoot() + "gameinfo.ini";
     if(Files::fileExists(gameInfoPath))
@@ -75,6 +111,8 @@ void initGameInfo()
             if(config.hasKey("title"))
                 config.read("title", g_gameInfo.title, g_gameInfo.title);
             g_gameInfo.titleWindow = fmt::format_ne("{0} - (X-Tech v{1})", g_gameInfo.title, V_LATEST_STABLE);
+            config.read("disable-two-player", g_gameInfo.disableTwoPlayer, false);
+            config.read("disable-battle-mode", g_gameInfo.disableBattleMode, false);
         }
         config.endGroup();
 
@@ -94,6 +132,28 @@ void initGameInfo()
         {
             config.read("enable-activity", g_gameInfo.introEnableActivity, true);
             config.read("max-players-count", g_gameInfo.introMaxPlayersCount, 6);
+            config.read("characters", g_gameInfo.introCharacters, {1, 2, 3, 4, 5});
+            g_gameInfo.introDeadMode = !g_gameInfo.introEnableActivity || g_gameInfo.introMaxPlayersCount < 1;
+        }
+        config.endGroup();
+
+        config.beginGroup("outro");
+        {
+            config.read("enable-activity", g_gameInfo.outroEnableActivity, true);
+            config.read("max-players-count", g_gameInfo.outroMaxPlayersCount, 5);
+            config.read("characters", g_gameInfo.outroCharacters, {1, 2, 3, 4, 5});
+            config.read("states", g_gameInfo.outroStates, {4, 7, 5, 3, 6});
+            config.read("mounts", g_gameInfo.outroMounts, {0, 3, 0, 1, 0});
+            config.read("auto-jump", g_gameInfo.outroAutoJump, true);
+            IniProcessing::StrEnumMap dirs
+            {
+                {"left", -1},
+                {"idle", 0},
+                {"right", +1}
+            };
+            config.readEnum("walk-direction", g_gameInfo.outroWalkDirection, -1, dirs);
+            config.read("initial-directions", g_gameInfo.outroInitialDirections, {0, 0, 0, 0, 0});
+            g_gameInfo.outroDeadMode = !g_gameInfo.outroEnableActivity || g_gameInfo.outroMaxPlayersCount < 1;
         }
         config.endGroup();
 
@@ -116,5 +176,44 @@ void initGameInfo()
             }
         }
         config.endGroup();
+
+        readCheats(config, g_gameInfo.cheatsGlobalAliases, "cheats-global-aliases");
+        readCheats(config, g_gameInfo.cheatsGlobalRenames, "cheats-global-renames");
+        readCheats(config, g_gameInfo.cheatsWorldAliases, "cheats-world-aliases");
+        readCheats(config, g_gameInfo.cheatsWorldRenames, "cheats-world-renames");
+        readCheats(config, g_gameInfo.cheatsLevelAliases, "cheats-level-aliases");
+        readCheats(config, g_gameInfo.cheatsLevelRenames, "cheats-level-renames");
     }
+}
+
+int GameInfo::introCharacterNext()
+{
+    if(introCharacters.empty())
+        return 1;
+    if(g_gameInfo.introCharacterCurrent >= introCharacters.size())
+        g_gameInfo.introCharacterCurrent = 0;
+    int ret = g_gameInfo.introCharacters[g_gameInfo.introCharacterCurrent++];
+
+    if(ret > 5) // anti-idiot protection
+        ret = 5;
+    else if(ret < 1)
+        ret = 1;
+
+    return ret;
+}
+
+int GameInfo::outroCharacterNext()
+{
+    if(outroCharacters.empty())
+        return 1;
+    if(g_gameInfo.outroCharacterCurrent >= outroCharacters.size())
+        g_gameInfo.outroCharacterCurrent = 0;
+    int ret = g_gameInfo.outroCharacters[g_gameInfo.outroCharacterCurrent++];
+
+    if(ret > 5) // anti-idiot protection
+        ret = 5;
+    else if(ret < 1)
+        ret = 1;
+
+    return ret;
 }

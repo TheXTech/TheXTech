@@ -19,11 +19,16 @@
  */
 
 #include <SDL2/SDL_timer.h>
+#include <SDL2/SDL_atomic.h>
+#include <SDL2/SDL_thread.h>
 
 #include <Logger/logger.h>
 #include <Utils/files.h>
 #include <AppPath/app_path.h>
-#include <InterProcess/intproc.h>
+#include <PGE_File_Formats/file_formats.h>
+#ifdef THEXTECH_INTERPROC_SUPPORTED
+#   include <InterProcess/intproc.h>
+#endif
 #include <pge_delay.h>
 #include <fmt_format_ne.h>
 
@@ -33,7 +38,9 @@
 
 #include "globals.h"
 #include "game_main.h"
+#include "gfx.h"
 
+#include "config.h"
 #include "frame_timer.h"
 #include "compat.h"
 #include "blocks.h"
@@ -48,11 +55,17 @@
 #include "video.h"
 #include "editor.h"
 #include "custom.h"
+#include "main/world_globals.h"
+#include "main/cheat_code.h"
+#include "main/game_globals.h"
 #include "main/level_file.h"
 #include "main/speedrunner.h"
 #include "main/menu_main.h"
 #include "main/game_info.h"
 #include "main/record.h"
+#include "core/render.h"
+#include "core/window.h"
+#include "core/events.h"
 
 #include "pseudo_vb.h"
 
@@ -70,11 +83,10 @@ void SizableBlocks();
 static int loadingThread(void *waiter_ptr)
 {
 #ifndef PGE_NO_THREADING
-    SDL_atomic_t *waiter = (SDL_atomic_t *)waiter_ptr;
+    auto *waiter = (SDL_atomic_t *)waiter_ptr;
 #else
     UNUSED(waiter_ptr);
 #endif
-    InitSound(); // Setup sound effects
     SetupPhysics(); // Setup Physics
     SetupGraphics(); // setup graphics
 //    Load GFX 'load the graphics form
@@ -82,6 +94,8 @@ static int loadingThread(void *waiter_ptr)
     SizableBlocks();
     LoadGFX(); // load the graphics from file
     SetupVars(); //Setup Variables
+
+    InitSound(); // Setup sound effects
 
 #ifndef PGE_NO_THREADING
     if(waiter)
@@ -100,8 +114,8 @@ int GameMain(const CmdLineSetup_t &setup)
     bool tempBool = false;
     int lastWarpEntered = 0;
 
-    LB = "\n";
-    EoT = "";
+//    LB = "\n";
+//    EoT = "";
 
     FrameSkip = setup.frameSkip;
     noSound = setup.noSound;
@@ -114,6 +128,7 @@ int GameMain(const CmdLineSetup_t &setup)
     speedRun_setSemitransparentRender(setup.speedRunnerSemiTransparent);
 
     ResetCompat();
+    cheats_reset();
 
     // [ !Here was a starting dialog! ]
 
@@ -135,7 +150,7 @@ int GameMain(const CmdLineSetup_t &setup)
 
 //    If LevelEditor = False Then
 //        frmMain.Show // Show window a bit later
-//    frmMain.show();
+//    XWindow::show();
 //        GameMenu = True
     GameMenu = true;
 //    Else
@@ -150,19 +165,20 @@ int GameMain(const CmdLineSetup_t &setup)
 
     OpenConfig();
 
-    DoEvents();
+    XEvents::doEvents();
 
 #ifdef __EMSCRIPTEN__ // Workaround for a recent Chrome's policy to avoid sudden sound without user's interaction
-    frmMain.show(); // Don't show window until playing an initial sound
+    XWindow::show(); // Don't show window until playing an initial sound
 
     while(!SharedCursor.Primary)
     {
-        frmMain.setTargetTexture();
-        frmMain.clearBuffer();
+        XRender::setTargetTexture();
+        XRender::clearBuffer();
         SuperPrint("Click to start a game", 3, 230, 280);
-        frmMain.repaint();
-        frmMain.setTargetScreen();
-        DoEvents();
+        XRender::repaint();
+        XRender::setTargetScreen();
+        XEvents::doEvents();
+        // TODO: may need to add more than just doEvents here.
         PGE_Delay(10);
     }
 #endif
@@ -173,7 +189,7 @@ int GameMain(const CmdLineSetup_t &setup)
 #ifndef PGE_NO_THREADING
     gfxLoaderThreadingMode = true;
 #endif
-    frmMain.show(); // Don't show window until playing an initial sound
+    XWindow::show(); // Don't show window until playing an initial sound
 
     if(!noSound)
     {
@@ -195,7 +211,7 @@ int GameMain(const CmdLineSetup_t &setup)
         {
             gfxLoaderThreadingMode = false;
             pLogCritical("Failed to create the loading thread! Do running the load directly");
-            loadingThread(NULL);
+            loadingThread(nullptr);
         }
         else
         {
@@ -211,28 +227,37 @@ int GameMain(const CmdLineSetup_t &setup)
         }
     }
 #else
-    loadingThread(NULL);
+    loadingThread(nullptr);
 #endif
 
     LevelSelect = true; // world map is to be shown
 
+#ifdef THEXTECH_INTERPROC_SUPPORTED
     if(setup.interprocess)
         IntProc::init();
+#endif
 
     LoadingInProcess = false;
 
-    if(!setup.testLevel.empty() || setup.interprocess) // Start level testing immediately!
+    // Clear the screen
+    XRender::setTargetTexture();
+    XRender::clearBuffer();
+    XRender::repaint();
+    XEvents::doEvents();
+
+    if(!neverPause && !XWindow::hasWindowInputFocus())
+        SoundPauseEngine(1);
+
+    if(!setup.testLevel.empty() || !setup.testReplay.empty() || setup.interprocess) // Start level testing immediately!
     {
         GameMenu = false;
         LevelSelect = false;
-        if(Files::hasSuffix(setup.testLevel, ".rec"))
-        {
-            Record::LoadReplay(setup.testLevel);
-        }
+
+        if(!setup.testReplay.empty())
+            Record::LoadReplay(setup.testReplay, setup.testLevel);
         else
-        {
             FullFileName = setup.testLevel;
-        }
+
         if(setup.testBattleMode)
         {
             numPlayers = 2;
@@ -254,13 +279,13 @@ int GameMain(const CmdLineSetup_t &setup)
     {
         if(GameMenu || MagicHand || LevelEditor)
         {
-            frmMain.MousePointer = 99;
-            showCursor(0);
+            XWindow::setCursor(AbstractWindow_t::CURSOR_NONE);
+            XWindow::showCursor(0);
         }
         else if(!resChanged)
         {
-            frmMain.MousePointer = 0;
-            showCursor(1);
+            XWindow::setCursor(AbstractWindow_t::CURSOR_DEFAULT);
+            XWindow::showCursor(1);
         }
 
 //        If LevelEditor = True Then 'Load the level editor
@@ -282,11 +307,11 @@ int GameMain(const CmdLineSetup_t &setup)
             GoToLevelNoGameThing = false;
 
             for(int A = 1; A <= maxPlayers; A++)
-            {
                 Player[A] = blankPlayer;
-            }
 
-            numPlayers = 5;
+            numPlayers = g_gameInfo.outroMaxPlayersCount;
+            if(g_gameInfo.outroDeadMode)
+                numPlayers = 1; // Deadman mode
             GameMenu = false;
             StopMusic();
 
@@ -302,7 +327,9 @@ int GameMain(const CmdLineSetup_t &setup)
             {
                 Player_t &p = Player[A];
 
-                if(A == 1)
+                if(A <= (int)g_gameInfo.outroStates.size())
+                    p.State = g_gameInfo.outroStates[A - 1];
+                else if(A == 1)
                     p.State = 4;
                 else if(A == 2)
                     p.State = 7;
@@ -313,17 +340,32 @@ int GameMain(const CmdLineSetup_t &setup)
                 else
                     p.State = 6;
 
-                if(A == 4)
+                p.Character = g_gameInfo.outroCharacterNext();
+
+                if(A <= (int)g_gameInfo.outroMounts.size())
+                {
+                    p.Mount = g_gameInfo.outroMounts[A - 1];
+                    switch(p.Mount)
+                    {
+                    case 1:
+                        p.MountType = iRand(3) + 1;
+                        break;
+                    case 3:
+                        p.MountType = iRand(8) + 1;
+                        break;
+                    default:
+                        p.MountType = 0;
+                    }
+                }
+                else if(A == 4)
                 {
                     p.Mount = 1;
-                    p.MountType = int(iRand(3)) + 1;
+                    p.MountType = iRand(3) + 1;
                 }
-
-                p.Character = A;
-                if(A == 2)
+                else if(A == 2)
                 {
                     p.Mount = 3;
-                    p.MountType = int(iRand(8)) + 1;
+                    p.MountType = iRand(8) + 1;
                 }
 
                 p.HeldBonus = 0;
@@ -338,11 +380,29 @@ int GameMain(const CmdLineSetup_t &setup)
             GameOutroDoQuit = false;
             SetupCredits();
 
+            // Update graphics before loop begin (to process an initial lazy-unpacking of used sprites)
+            GraphicsLazyPreLoad();
             resetFrameTimer();
 
-            // Update graphics before loop begin (to process an initial lazy-unpacking of used sprites)
-            UpdateGraphics(true);
-            resetFrameTimer();
+            for(int A = 1; A <= numPlayers; ++A)
+            {
+                if(g_gameInfo.outroWalkDirection == 0 && A <= (int)g_gameInfo.outroInitialDirections.size())
+                {
+                    if(g_gameInfo.outroInitialDirections[A - 1] < 0)
+                        Player[A].Direction = -1;
+                    else if(g_gameInfo.outroInitialDirections[A - 1] > 0)
+                        Player[A].Direction = 1;
+                }
+            }
+
+            if(g_gameInfo.outroDeadMode)
+            {
+                CheckSection(1);
+                for(int A = 1; A <= numPlayers; ++A)
+                    Player[A].Dead = true;
+            }
+
+            clearScreenFaders();
 
             // Run the frame-loop
             runFrameLoop(&OutroLoop,
@@ -374,6 +434,7 @@ int GameMain(const CmdLineSetup_t &setup)
 
             MenuMouseRelease = false;
             MenuMouseClick = false;
+            MenuCursorCanMove = false;
             BattleMode = false;
 
             if(MenuMode != MENU_BATTLE_MODE)
@@ -386,7 +447,7 @@ int GameMain(const CmdLineSetup_t &setup)
             Checkpoint.clear();
             CheckpointsList.clear();
             WorldPlayer[1].Frame = 0;
-            CheatString = "";
+            cheats_clearBuffer();
             LevelBeatCode = 0;
             curWorldLevel = 0;
 
@@ -417,7 +478,7 @@ int GameMain(const CmdLineSetup_t &setup)
             }
 
             numPlayers = g_gameInfo.introMaxPlayersCount;
-            if(!g_gameInfo.introEnableActivity || g_gameInfo.introMaxPlayersCount < 1)
+            if(g_gameInfo.introDeadMode)
                 numPlayers = 1;// one deadman should be
 
             auto introPath = AppPath + "intro.lvlx";
@@ -426,17 +487,24 @@ int GameMain(const CmdLineSetup_t &setup)
             OpenLevel(introPath);
             vScreenX[1] = -level[0].X;
 
+            if(g_config.EnableInterLevelFade)
+                g_levelScreenFader.setupFader(3, 65, 0, ScreenFader::S_FADE);
+            else
+                clearScreenFaders();
+
+            setMusicStartDelay(); // Don't start music until all gfx will be loaded
+
             StartMusic(0);
             SetupPlayers();
 
             For(A, 1, numPlayers)
             {
                 Player_t &p = Player[A];
-                p.State = (iRand(6)) + 2;
-                p.Character = (iRand(5)) + 1;
+                p.State = iRand(6) + 2;
+                // p.Character = (iRand() % 5) + 1;
 
-                if(A >= 1 && A <= 5)
-                    p.Character = A;
+                // if(A >= 1 && A <= 5)
+                p.Character = g_gameInfo.introCharacterNext();
 
                 p.HeldBonus = 0;
                 p.Section = 0;
@@ -460,22 +528,20 @@ int GameMain(const CmdLineSetup_t &setup)
                 p.Dead = true;
             }
 
+            // Update graphics before loop begin (to process inital lazy-unpacking of used sprites)
+            GraphicsLazyPreLoad();
+            resetFrameTimer();
+            // Clear the speed-runner timer
+            speedRun_resetTotal();
+
+            delayedMusicStart(); // Allow music being started
+
             ProcEvent("Level - Start", true);
             For(A, 2, maxEvents)
             {
                 if(Events[A].AutoStart)
                     ProcEvent(Events[A].Name, true);
             }
-
-            resetFrameTimer();
-
-            // Update graphics before loop begin (to process inital lazy-unpacking of used sprites)
-            UpdateGraphics(true);
-            resetFrameTimer();
-            // Clear the speed-runner timer
-            speedRun_resetTotal();
-
-            MenuCursorCanMove = false;
 
             // Main menu loop
             runFrameLoop(&MenuLoop, nullptr, []()->bool{ return GameMenu;});
@@ -489,7 +555,8 @@ int GameMain(const CmdLineSetup_t &setup)
         // World Map
         else if(LevelSelect)
         {
-            CheatString.clear();
+            cheats_clearBuffer();
+
             For(A, 1, numPlayers)
             {
                 if(Player[A].Mount == 0 || Player[A].Mount == 2)
@@ -503,6 +570,7 @@ int GameMain(const CmdLineSetup_t &setup)
                             Player[A].MountType = 1;
                     }
                 }
+
                 OwedMount[A] = 0;
                 OwedMountType[A] = 0;
             }
@@ -520,6 +588,9 @@ int GameMain(const CmdLineSetup_t &setup)
             LoadCustomSound();
             SetupPlayers();
 
+            if(!NoMap)
+                FindWldStars();
+
             if((!StartLevel.empty() && NoMap) || !GoToLevel.empty())
             {
                 if(NoMap)
@@ -528,22 +599,17 @@ int GameMain(const CmdLineSetup_t &setup)
                 Player[1].Vine = 0;
                 Player[2].Vine = 0;
 
-                if(!GoToLevelNoGameThing)
-                    PlaySound(SFX_LevelSelect);
+//                if(!GoToLevelNoGameThing)
+//                    PlaySound(SFX_LevelSelect);
                 SoundPause[26] = 2000;
 
                 LevelSelect = false;
 
-                if(!GoToLevelNoGameThing)
-                    GameThing();
-                else
-                {
-                    frmMain.setTargetTexture();
-                    frmMain.clearBuffer();
-                    frmMain.repaint();
-                }
+                XRender::setTargetTexture();
+                XRender::clearBuffer();
+                XRender::repaint();
+
                 ClearLevel();
-                PGE_Delay(1000);
 
                 std::string levelPath;
                 if(GoToLevel.empty())
@@ -560,9 +626,22 @@ int GameMain(const CmdLineSetup_t &setup)
                     PauseGame(PauseCode::Message);
                     ErrorQuit = true;
                 }
+
+                if(!GoToLevelNoGameThing)
+                {
+                    GameThing(1000, 3);
+                }
+                else
+                {
+                    XRender::setTargetTexture();
+                    XRender::clearBuffer();
+                    XRender::repaint();
+                }
             }
             else
             {
+                setMusicStartDelay(); // Don't start music until all gfx will be loaded
+
                 if(curWorldMusic > 0)
                     StartMusic(curWorldMusic);
 
@@ -575,6 +654,14 @@ int GameMain(const CmdLineSetup_t &setup)
                 // Update graphics before loop begin (to process inital lazy-unpacking of used sprites)
                 UpdateGraphics2(true);
                 resetFrameTimer();
+
+                if(g_config.EnableInterLevelFade)
+                    g_worldScreenFader.setupFader(4, 65, 0, ScreenFader::S_FADE);
+                else
+                    g_worldScreenFader.clearFader();
+
+                // WorldLoop will automatically resume the music as needed
+                // delayedMusicStart(); // Allow music being started
 
                 // 'level select loop
                 runFrameLoop(nullptr, &WorldLoop,
@@ -592,7 +679,7 @@ int GameMain(const CmdLineSetup_t &setup)
         // MAIN GAME
         else
         {
-            CheatString.clear();
+            cheats_clearBuffer();
             EndLevel = false;
 
             Record::InitRecording(); // initializes level data recording
@@ -603,6 +690,8 @@ int GameMain(const CmdLineSetup_t &setup)
                     Player[A].Mount = 0; // take players off the clown car
             }
 
+            setMusicStartDelay(); // Don't start music until all gfx will be loaded
+
             SetupPlayers(); // Setup Players for the level
 
             if(LevelRestartRequested && Checkpoint.empty())
@@ -610,6 +699,9 @@ int GameMain(const CmdLineSetup_t &setup)
 
             qScreen = false;
             LevelRestartRequested = false;
+
+            if(lastWarpEntered != StartWarp)
+                lastWarpEntered = StartWarp; // Re-use it when player re-enters a level after death (when option is toggled on)
 
 // for warp entrances
             if((ReturnWarp > 0 && IsEpisodeIntro/*FileName == StartLevel*/) || (StartWarp > 0))
@@ -665,7 +757,7 @@ int GameMain(const CmdLineSetup_t &setup)
 //                            End If
                         }
 
-                        PlayerFrame(A);
+                        PlayerFrame(p);
                         CheckSection(A);
                         SoundPause[17] = 0;
                         p.Effect = 8;
@@ -692,34 +784,33 @@ int GameMain(const CmdLineSetup_t &setup)
                 }
 
                 if(StartWarp > 0)
-                {
-                    lastWarpEntered = StartWarp; // Re-use it when player re-enters a level after death (when option is toggled on)
                     StartWarp = 0;
-                }
                 else
-                {
-                    lastWarpEntered = 0;
                     ReturnWarp = 0;
-                }
             }
 
             speedRun_resetCurrent();
 //'--------------------------------------------
-            ProcEvent("Level - Start", true);
 
+            // Update graphics before loop begin (to process inital lazy-unpacking of used sprites)
+            GraphicsLazyPreLoad();
+            resetFrameTimer();
+
+            speedRun_triggerEnter();
+
+            if(g_config.EnableInterLevelFade)
+                g_levelScreenFader.setupFader(2, 65, 0, ScreenFader::S_FADE);
+            else
+                clearScreenFaders();
+
+            delayedMusicStart(); // Allow music being started
+
+            ProcEvent("Level - Start", true);
             for(int A = 2; A <= maxEvents; ++A)
             {
                 if(Events[A].AutoStart)
                     ProcEvent(Events[A].Name, true);
             }
-
-            resetFrameTimer();
-
-            // Update graphics before loop begin (to process inital lazy-unpacking of used sprites)
-            UpdateGraphics(true);
-            resetFrameTimer();
-
-            speedRun_triggerEnter();
 
             // MAIN GAME LOOP
             runFrameLoop(nullptr, &GameLoop,
@@ -759,7 +850,6 @@ int GameMain(const CmdLineSetup_t &setup)
                 else
                 {
                     GameThing();
-                    PGE_Delay(500);
                     zTestLevel(setup.testMagicHand, setup.interprocess); // Restart level
                 }
 
@@ -817,17 +907,17 @@ void EditorLoop()
 void KillIt()
 {
     GameIsActive = false;
-#ifndef __ANDROID__
-    frmMain.hide();
+#ifndef RENDER_FULLSCREEN_ALWAYS
+    XWindow::hide();
     if(resChanged)
         SetOrigRes();
 #else
-    frmMain.clearBuffer();
-    frmMain.repaint();
+    XRender::clearBuffer();
+    XRender::repaint();
 #endif
     QuitMixerX();
     UnloadGFX();
-    showCursor(1);
+    XWindow::showCursor(1);
 }
 
 
@@ -842,10 +932,10 @@ void NextLevel()
     LevelMacroCounter = 0;
     StopMusic();
     ClearLevel();
-    frmMain.setTargetTexture();
-    frmMain.clearBuffer();
-    frmMain.repaint();
-    DoEvents();
+    XRender::setTargetTexture();
+    XRender::clearBuffer();
+    XRender::repaint();
+    XEvents::doEvents();
 
     if(!TestLevel && GoToLevel.empty() && !NoMap)
         PGE_Delay(500);
@@ -877,6 +967,7 @@ void UpdateMacro()
     int A = 0;
     bool OnScreen = false;
 
+#ifdef THEXTECH_INTERPROC_SUPPORTED
     if(LevelMacro != LEVELMACRO_OFF && LevelMacroCounter == 0 && IntProc::isEnabled())
     {
         for(int i = 0; i < numPlayers; ++i)
@@ -885,49 +976,56 @@ void UpdateMacro()
             IntProc::sendPlayerSettings(i, p.Character, p.State, p.Mount, p.MountType);
         }
     }
+#endif
 
     if(LevelMacro == LEVELMACRO_CARD_ROULETTE_EXIT) // SMB3 Exit
     {
         for(A = 1; A <= numPlayers; A++)
         {
-            if(Player[A].Location.X < level[Player[A].Section].Width && !Player[A].Dead)
+            auto &p = Player[A];
+            auto &c = p.Controls;
+            if(p.Location.X < level[p.Section].Width && !p.Dead)
             {
                 OnScreen = true;
-                Player[A].Controls.Down = false;
-                Player[A].Controls.Drop = false;
-                Player[A].Controls.Jump = false;
-                Player[A].Controls.Left = false;
-                Player[A].Controls.Right = true;
-                Player[A].Controls.Run = false;
-                Player[A].Controls.Up = false;
-                Player[A].Controls.Start = false;
-                Player[A].Controls.AltJump = false;
-                Player[A].Controls.AltRun = false;
-                if(Player[A].Wet > 0 && Player[A].CanJump)
+                c.Down = false;
+                c.Drop = false;
+                c.Jump = false;
+                c.Left = false;
+                c.Right = true;
+                c.Run = false;
+                c.Up = false;
+                c.Start = false;
+                c.AltJump = false;
+                c.AltRun = false;
+                if(p.Wet > 0 && p.CanJump)
                 {
-                    if(Player[A].Location.SpeedY > 1)
-                        Player[A].Controls.Jump = true;
+                    if(p.Location.SpeedY > 1)
+                        c.Jump = true;
                 }
             }
             else
             {
-                Player[A].Location.SpeedY = -Physics.PlayerGravity;
-                Player[A].Controls.Down = false;
-                Player[A].Controls.Drop = false;
-                Player[A].Controls.Jump = false;
-                Player[A].Controls.Left = false;
-                Player[A].Controls.Right = true;
-                Player[A].Controls.Run = false;
-                Player[A].Controls.Up = false;
-                Player[A].Controls.Start = false;
-                Player[A].Controls.AltJump = false;
-                Player[A].Controls.AltRun = false;
+                p.Location.SpeedY = -Physics.PlayerGravity;
+                c.Down = false;
+                c.Drop = false;
+                c.Jump = false;
+                c.Left = false;
+                c.Right = true;
+                c.Run = false;
+                c.Up = false;
+                c.Start = false;
+                c.AltJump = false;
+                c.AltRun = false;
             }
         }
 
         if(!OnScreen)
         {
-            LevelMacroCounter += 1;
+            LevelMacroCounter++;
+
+            if(g_config.EnableInterLevelFade && LevelMacroCounter == 34)
+                g_levelScreenFader.setupFader(1, 0, 65, ScreenFader::S_FADE);
+
             if(LevelMacroCounter >= 100)
             {
                 LevelBeatCode = 1;
@@ -941,26 +1039,31 @@ void UpdateMacro()
     {
         for(A = 1; A <= numPlayers; A++)
         {
-            Player[A].Controls.Down = false;
-            Player[A].Controls.Drop = false;
-            Player[A].Controls.Jump = false;
-            Player[A].Controls.Left = false;
-            Player[A].Controls.Right = false;
-            Player[A].Controls.Run = false;
-            Player[A].Controls.Up = false;
-            Player[A].Controls.Start = false;
-            Player[A].Controls.AltJump = false;
-            Player[A].Controls.AltRun = false;
+            auto &c = Player[A].Controls;
+            c.Down = false;
+            c.Drop = false;
+            c.Jump = false;
+            c.Left = false;
+            c.Right = false;
+            c.Run = false;
+            c.Up = false;
+            c.Start = false;
+            c.AltJump = false;
+            c.AltRun = false;
         }
 
-        LevelMacroCounter += 1;
+        LevelMacroCounter++;
+
+        if(g_config.EnableInterLevelFade && LevelMacroCounter == 395)
+            g_levelScreenFader.setupFader(1, 0, 65, ScreenFader::S_FADE);
+
         if(LevelMacroCounter >= 460)
         {
             LevelBeatCode = 2;
             EndLevel = true;
             LevelMacro = LEVELMACRO_OFF;
             LevelMacroCounter = 0;
-            frmMain.clearBuffer();
+            XRender::clearBuffer();
         }
     }
     else if(LevelMacro == LEVELMACRO_KEYHOLE_EXIT)
@@ -977,7 +1080,7 @@ void UpdateMacro()
 //            if(tempTime > (float)(gameTime + 0.01f) || tempTime < gameTime)
 
             if(g_compatibility.fix_keyhole_framerate)
-                DoEvents();
+                XEvents::doEvents();
 
             if(g_compatibility.fix_keyhole_framerate ?
                canProceedFrame() :
@@ -988,7 +1091,7 @@ void UpdateMacro()
                 if(g_compatibility.fix_keyhole_framerate)
                     computeFrameTime1();
                 else
-                    DoEvents();
+                    XEvents::doEvents();
 
                 speedRun_tick();
                 UpdateGraphics();
@@ -997,11 +1100,17 @@ void UpdateMacro()
 
                 if(g_compatibility.fix_keyhole_framerate)
                 {
-                    DoEvents();
+                    XEvents::doEvents();
                     computeFrameTime2();
                 }
 
-                LevelMacroCounter += 1;
+                updateScreenFaders();
+
+                LevelMacroCounter++;
+
+                if(g_config.EnableInterLevelFade && LevelMacroCounter == (keyholeMax - 65))
+                    g_levelScreenFader.setupFader(1, 0, 65, ScreenFader::S_FADE);
+
                 if(LevelMacroCounter >= keyholeMax) /*300*/
                     break;
             }
@@ -1019,32 +1128,37 @@ void UpdateMacro()
         EndLevel = true;
         LevelMacro = LEVELMACRO_OFF;
         LevelMacroCounter = 0;
-        frmMain.clearBuffer();
+        XRender::clearBuffer();
     }
     else if(LevelMacro == LEVELMACRO_CRYSTAL_BALL_EXIT)
     {
         for(A = 1; A <= numPlayers; A++)
         {
-            Player[A].Controls.Down = false;
-            Player[A].Controls.Drop = false;
-            Player[A].Controls.Jump = false;
-            Player[A].Controls.Left = false;
-            Player[A].Controls.Right = false;
-            Player[A].Controls.Run = false;
-            Player[A].Controls.Up = false;
-            Player[A].Controls.Start = false;
-            Player[A].Controls.AltJump = false;
-            Player[A].Controls.AltRun = false;
+            auto &c = Player[A].Controls;
+            c.Down = false;
+            c.Drop = false;
+            c.Jump = false;
+            c.Left = false;
+            c.Right = false;
+            c.Run = false;
+            c.Up = false;
+            c.Start = false;
+            c.AltJump = false;
+            c.AltRun = false;
         }
 
-        LevelMacroCounter += 1;
+        LevelMacroCounter++;
+
+        if(g_config.EnableInterLevelFade && LevelMacroCounter == 235)
+            g_levelScreenFader.setupFader(1, 0, 65, ScreenFader::S_FADE);
+
         if(LevelMacroCounter >= 300)
         {
             LevelBeatCode = 5;
             EndLevel = true;
             LevelMacro = LEVELMACRO_OFF;
             LevelMacroCounter = 0;
-            frmMain.clearBuffer();
+            XRender::clearBuffer();
         }
     }
     else if(LevelMacro == LEVELMACRO_GAME_COMPLETE_EXIT)
@@ -1052,21 +1166,27 @@ void UpdateMacro()
         // numNPCs = 0
         for(A = 1; A <= numPlayers; A++)
         {
-            Player[A].Controls.Down = false;
-            Player[A].Controls.Drop = false;
-            Player[A].Controls.Jump = false;
-            Player[A].Controls.Left = false;
-            Player[A].Controls.Right = false;
-            Player[A].Controls.Run = false;
-            Player[A].Controls.Up = false;
-            Player[A].Controls.Start = false;
-            Player[A].Controls.AltJump = false;
-            Player[A].Controls.AltRun = false;
+            auto &c = Player[A].Controls;
+            c.Down = false;
+            c.Drop = false;
+            c.Jump = false;
+            c.Left = false;
+            c.Right = false;
+            c.Run = false;
+            c.Up = false;
+            c.Start = false;
+            c.AltJump = false;
+            c.AltRun = false;
         }
 
-        LevelMacroCounter += 1;
+        LevelMacroCounter++;
+
         if(LevelMacroCounter == 250)
             PlaySound(SFX_GameBeat);
+
+        if(g_config.EnableInterLevelFade && LevelMacroCounter == 735)
+            g_levelScreenFader.setupFader(1, 0, 65, ScreenFader::S_FADE);
+
         if(LevelMacroCounter >= 800)
         {
             EndLevel = true;
@@ -1080,26 +1200,31 @@ void UpdateMacro()
                 MenuMode = MENU_MAIN;
                 MenuCursor = 0;
             }
-            frmMain.clearBuffer();
+            XRender::clearBuffer();
         }
     }
     else if(LevelMacro == LEVELMACRO_STAR_EXIT) // Star Exit
     {
         for(A = 1; A <= numPlayers; A++)
         {
-            Player[A].Controls.Down = false;
-            Player[A].Controls.Drop = false;
-            Player[A].Controls.Jump = false;
-            Player[A].Controls.Left = false;
-            Player[A].Controls.Right = false;
-            Player[A].Controls.Run = false;
-            Player[A].Controls.Up = false;
-            Player[A].Controls.Start = false;
-            Player[A].Controls.AltJump = false;
-            Player[A].Controls.AltRun = false;
+            auto &c = Player[A].Controls;
+            c.Down = false;
+            c.Drop = false;
+            c.Jump = false;
+            c.Left = false;
+            c.Right = false;
+            c.Run = false;
+            c.Up = false;
+            c.Start = false;
+            c.AltJump = false;
+            c.AltRun = false;
         }
 
-        LevelMacroCounter += 1;
+        LevelMacroCounter++;
+
+        if(g_config.EnableInterLevelFade && LevelMacroCounter == 235)
+            g_levelScreenFader.setupFader(1, 0, 65, ScreenFader::S_FADE);
+
         if(LevelMacroCounter >= 300)
         {
             LevelBeatCode = 7;
@@ -1112,36 +1237,57 @@ void UpdateMacro()
     {
         for(A = 1; A <= numPlayers; A++)
         {
-            if(Player[A].Location.X < level[Player[A].Section].Width && Player[A].Dead == false)
+            auto &p = Player[A];
+            auto &c = p.Controls;
+
+            if(p.Location.X < level[p.Section].Width && !p.Dead)
             {
-                Player[A].Controls.Down = false;
-                Player[A].Controls.Drop = false;
-                Player[A].Controls.Jump = false;
-                Player[A].Controls.Left = false;
-                Player[A].Controls.Right = true;
-                Player[A].Controls.Run = false;
-                Player[A].Controls.Up = false;
-                Player[A].Controls.Start = false;
-                Player[A].Controls.AltJump = false;
-                Player[A].Controls.AltRun = false;
+                c.Down = false;
+                c.Drop = false;
+                c.Jump = false;
+                c.Left = false;
+                c.Right = true;
+                c.Run = false;
+                c.Up = false;
+                c.Start = false;
+                c.AltJump = false;
+                c.AltRun = false;
             }
             else
             {
-                Player[A].Location.SpeedY = -Physics.PlayerGravity;
-                Player[A].Controls.Down = false;
-                Player[A].Controls.Drop = false;
-                Player[A].Controls.Jump = false;
-                Player[A].Controls.Left = false;
-                Player[A].Controls.Right = true;
-                Player[A].Controls.Run = false;
-                Player[A].Controls.Up = false;
-                Player[A].Controls.Start = false;
-                Player[A].Controls.AltJump = false;
-                Player[A].Controls.AltRun = false;
+                p.Location.SpeedY = -Physics.PlayerGravity;
+                c.Down = false;
+                c.Drop = false;
+                c.Jump = false;
+                c.Left = false;
+                c.Right = true;
+                c.Run = false;
+                c.Up = false;
+                c.Start = false;
+                c.AltJump = false;
+                c.AltRun = false;
             }
         }
 
-        LevelMacroCounter += 1;
+        LevelMacroCounter++;
+
+        if(g_config.EnableInterLevelFade && LevelMacroCounter == 598)
+        {
+            bool canTrack = (Player[1].Location.X < level[Player[1].Section].Width);
+            double focusX = canTrack ?
+                            Player[1].Location.X + Player[1].Location.Width / 2 :
+                            level[Player[1].Section].Width;
+            double focusY = Player[1].Location.Y + Player[1].Location.Height / 2;
+
+            g_levelScreenFader.setupFader(2, 0, 65, ScreenFader::S_CIRCLE, true, focusX, focusY, 1);
+
+            if(canTrack)
+                g_levelScreenFader.setTrackedFocus(&Player[1].Location.X,
+                                                   &Player[1].Location.Y,
+                                                   Player[1].Location.Width / 2,
+                                                   Player[1].Location.Height / 2);
+        }
+
         if(LevelMacroCounter >= 630)
         {
             LevelBeatCode = 8;
@@ -1160,6 +1306,7 @@ void NPCyFix()
     int A = 0;
     float XnH = 0;
     float XnHfix = 0;
+
     for(A = 1; A <= numNPCs; A++)
     {
         XnH = NPC[A].Location.Y + NPC[A].Location.Height;
@@ -1169,7 +1316,7 @@ void NPCyFix()
                 XnHfix = std::abs((int(XnH * 100) % 800) / 100);
             else
                 XnHfix = std::abs(8 - ((int(XnH * 100) % 800) / 100));
-            NPC[A].Location.Y = NPC[A].Location.Y + XnHfix;
+            NPC[A].Location.Y += XnHfix;
         }
     }
 }
@@ -1179,7 +1326,7 @@ void CheckActive()
     // It's useless on Emscripten as no way to check activity (or just differently)
     // and on Android as it has built-in application pauser
 #if !defined(__EMSCRIPTEN__) && !defined(__ANDROID__)
-    bool MusicPaused = false;
+//    bool MusicPaused = false;
     bool focusLost = false;
 
     if(neverPause)
@@ -1191,12 +1338,12 @@ void CheckActive()
 //    If nPlay.Online = True Then Exit Sub
     // If LevelEditor = False And TestLevel = False Then Exit Sub
     // If LevelEditor = False Then Exit Sub
-    while(!frmMain.isWindowActive())
+    while(!XWindow::hasWindowInputFocus())
     {
-        frmMain.waitEvents();
+        XEvents::waitEvents();
 //        If LevelEditor = True Or MagicHand = True Then frmLevelWindow.vScreen(1).MousePointer = 0
         if(LevelEditor || MagicHand)
-            showCursor(0);
+            XWindow::showCursor(0);
 
         resetFrameTimer();
 
@@ -1210,11 +1357,11 @@ void CheckActive()
             focusLost = true;
         }
 
-        if(musicPlaying && !MusicPaused)
-        {
-            MusicPaused = true;
-            SoundPauseAll();
-        }
+//        if(musicPlaying && !MusicPaused)
+//        {
+//            MusicPaused = true;
+//            SoundPauseEngine(1);
+//        }
 
         if(!GameIsActive)
         {
@@ -1226,8 +1373,8 @@ void CheckActive()
     if(focusLost)
         pLogDebug("Window Focus got back");
 
-    if(MusicPaused)
-        SoundResumeAll();
+//    if(MusicPaused)
+//        SoundPauseEngine(0);
 
 /* // Useless condition
     if(!noSound && MusicPaused)
@@ -1273,13 +1420,21 @@ Location_t newLoc(double X, double Y, double Width, double Height)
     return ret;
 }
 
-void MoreScore(int addScore, Location_t Loc)
+Location_t roundLoc(const Location_t &inLoc, double grid)
+{
+    Location_t ret = inLoc;
+    ret.X = Maths::roundTo(ret.X, grid);
+    ret.Y = Maths::roundTo(ret.Y, grid);
+    return ret;
+}
+
+void MoreScore(int addScore, const Location_t &Loc)
 {
     int mult = 0; // dummy
     MoreScore(addScore, Loc, mult);
 }
 
-void MoreScore(int addScore, Location_t Loc, int &Multiplier)
+void MoreScore(int addScore, const Location_t &Loc, int &Multiplier)
 {
     //int oldM = 0;
     int A = 0;
@@ -1358,6 +1513,7 @@ void StartEpisode()
     {
         Player[i].State = 1;
         Player[i].Mount = 0;
+        // reassigned below unless something is wrong
         Player[i].Character = (i - 1) % 5 + 1;
         Player[i].HeldBonus = 0;
         Player[i].CanFly = false;
@@ -1389,15 +1545,29 @@ void StartEpisode()
     Lives = 3;
     LevelSelect = true;
     GameMenu = false;
-    frmMain.setTargetTexture();
-    frmMain.clearBuffer();
-    frmMain.repaint();
+    XRender::setTargetTexture();
+    XRender::clearBuffer();
+    XRender::repaint();
     StopMusic();
-    DoEvents();
+    XEvents::DoEvents();
+    // TODO: did Wohlstand change this?
     PGE_Delay(500);
     ClearGame();
 
-    OpenWorld(SelectWorld[selWorld].WorldPath + SelectWorld[selWorld].WorldFile);
+    std::string wPath = SelectWorld[selWorld].WorldPath + SelectWorld[selWorld].WorldFile;
+
+    if(numPlayers == 1 && g_recentWorld1p != wPath)
+    {
+        g_recentWorld1p = wPath;
+        SaveConfig();
+    }
+    else if(numPlayers >= 2 && g_recentWorld2p != wPath)
+    {
+        g_recentWorld2p = wPath;
+        SaveConfig();
+    }
+
+    OpenWorld(wPath);
 
     if(SaveSlot[selSave] >= 0)
     {
@@ -1413,11 +1583,11 @@ void StartEpisode()
         {
             Location_t tempLocation = WorldPath[A].Location;
             {
-                Location_t &l =tempLocation;
-                l.X = l.X + 4;
-                l.Y = l.Y + 4;
-                l.Width = l.Width - 8;
-                l.Height = l.Height - 8;
+                Location_t &l = tempLocation;
+                l.X += 4;
+                l.Y += 4;
+                l.Width -= 8;
+                l.Height -= 8;
             }
 
             WorldPath[A].Active = true;
@@ -1437,14 +1607,13 @@ void StartEpisode()
 
     if(!StartLevel.empty())
     {
+        // TODO: why did Wohlstand disable this?
         PlaySoundMenu(SFX_LevelSelect);
         SoundPause[26] = 200;
         LevelSelect = false;
 
-        GameThing();
+        // todo: update this!
         ClearLevel();
-
-        PGE_Delay(1000);
         std::string levelPath = SelectWorld[selWorld].WorldPath + StartLevel;
         if(!OpenLevel(levelPath))
         {
@@ -1452,6 +1621,7 @@ void StartEpisode()
             PauseGame(PauseCode::Message);
             ErrorQuit = true;
         }
+        GameThing(1000, 3);
     }
 }
 
@@ -1459,16 +1629,19 @@ void StartBattleMode()
 {
     int A = 0;
     Player_t blankPlayer;
+
     for(A = 1; A <= numCharacters; A++)
     {
         SavedChar[A] = blankPlayer;
         SavedChar[A].Character = A;
         SavedChar[A].State = 1;
     }
+
     for(int i = 1; i <= maxLocalPlayers; i++)
     {
         Player[i].State = 2;
         Player[i].Mount = 0;
+        // reassigned below unless something is wrong
         Player[i].Character = (i - 1) % 5 + 1;
         Player[i].HeldBonus = 0;
         Player[i].CanFly = false;
@@ -1503,11 +1676,11 @@ void StartBattleMode()
     LevelSelect = false;
     GameMenu = false;
     BattleMode = true;
-    frmMain.setTargetTexture();
-    frmMain.clearBuffer();
-    frmMain.repaint();
+    XRender::setTargetTexture();
+    XRender::clearBuffer();
+    XRender::repaint();
     StopMusic();
-    DoEvents();
+    XEvents::doEvents();
     PGE_Delay(500);
     ClearLevel();
 
@@ -1520,7 +1693,7 @@ void StartBattleMode()
     else
     {
         if(selWorld == 1)
-            selWorld = (iRand(NumSelectWorld - 1)) + 2;
+            selWorld = iRand(NumSelectWorld - 1) + 2;
     }
 
     std::string levelPath = SelectWorld[selWorld].WorldPath + SelectWorld[selWorld].WorldFile;

@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#pragma once
 #ifndef EDITOR_H
 #define EDITOR_H
 
@@ -57,9 +58,11 @@ extern OptCursor_t optCursor;
 // it is still called when the player is testing a level in the editor in windowed mode
 extern void UpdateEditor();
 
+#ifdef THEXTECH_INTERPROC_SUPPORTED
 extern void UpdateInterprocess();
+#endif
 
-extern int EditorNPCFrame(int A, float& C, int N = 0);
+extern int EditorNPCFrame(const int A, float& C, int N = 0);
 
 extern void GetEditorControls();
 
@@ -79,6 +82,6 @@ extern void MouseMove(float X, float Y, bool nCur = false);
 
 extern void ResetNPC(int A);
 
-extern void BlockFill(Location_t Loc);
+extern void BlockFill(const Location_t &Loc);
 
 #endif // EDITOR_H

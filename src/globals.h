@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#pragma once
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
@@ -27,9 +28,7 @@
 #include <vector>
 #include <cstdlib>
 
-#include "frm_main.h"
 #include "std_picture.h"
-#include "gfx.h"
 
 #include "location.h"
 #include "range_arr.hpp"
@@ -64,36 +63,21 @@
 #define IF_OUTRANGE(x, l, r)  ((x) < (l) || (x) > (r))
 #define IF_INRANGE(x, l, r)  ((x) >= (l) && (x) <= (r))
 
-//! Main window
-extern FrmMain frmMain;
-//! Container of "hardcoded" (no more) graphics
-extern GFX_t GFX;
 
 //! Showing that game is works. It gets false when closing a window or exiting a game by menu. To mean that application must be closed.
 extern bool GameIsActive;
 //! Path to game resources assets (by default it's ~/.PGE_Project/thextech/)
 extern std::string AppPath;
 
-/**
- * @brief Process internal events (mouse, keyboard, joysticks, window's update, OS communications, etc.)
- */
-extern void DoEvents();
 
-/**
- *  \brief Toggle whether or not the cursor is shown.
- *
- *  \param toggle 1 to show the cursor, 0 to hide it, -1 to query the current
- *                state.
- *
- *  \return 1 if the cursor is shown, or 0 if the cursor is hidden.
- */
-extern int showCursor(int show);
+// Process internal events (mouse, keyboard, joysticks, window's update, OS communications, etc.)
+//extern void DoEvents(); /* Replaced with "XEvents::doEvents()" from `core/events.h` */
 
-extern Uint8 getKeyState(SDL_Scancode key);
-extern Uint8 getKeyStateI(int key);
+//extern Uint8 getKeyState(int key);
+//extern Uint8 getKeyStateI(int key);
 
 //Public Const KEY_PRESSED As Integer = &H1000    'For control information
-const int KEY_PRESSED = 1;
+//const int KEY_PRESSED = 1;
 
 /**
  * @brief Get name of key from a keycode
@@ -160,10 +144,12 @@ extern int BlockFlash;
 extern bool ScrollRelease;
 //Public TakeScreen As Boolean
 extern bool TakeScreen;
+// EXTRA: Show any on-screen meta (HUD, debug prints, etc.)
+extern bool ShowOnScreenMeta;
 //Public LB As String  ' Line Break
-extern std::string LB;
+//extern std::string LB;
 //Public EoT As String  ' End of Transmission for WINSOCK
-extern std::string EoT;
+//extern std::string EoT;
 
 enum class PauseCode
 {
@@ -845,6 +831,11 @@ struct WorldLevel_t
 //End Type
     int64_t Z = 0;
     int index = 0;
+
+// Display number of stars (if available)
+    int curStars = 0;
+    int maxStars = 0;
+    int starsShowPolicy = -1;
 };
 
 //Public Type Warp 'warps such as pipes and doors
@@ -897,9 +888,11 @@ struct Warp_t
     bool noPrintStars = false;
     bool noEntranceScene = false;
     bool cannonExit = false;
+    bool stoodRequired = false; // Require player stood on the ground to enter this warp
     double cannonExitSpeed = 10.0;
     std::string eventEnter;
     std::string StarsMsg;
+    int transitEffect = 0;
 //End Type
 };
 
@@ -1016,6 +1009,13 @@ struct WorldPlayer_t
 //    LevelName As String
     std::string LevelName;
 //End Type
+
+    struct StarsState_t
+    {
+        int cur = 0;
+        int max = 0;
+        int displayPolicy = 0;
+    } stars;
 };
 
 //Public Type Layer
@@ -1065,22 +1065,12 @@ extern int NumSelectWorld;
 struct SelectWorld_t;
 //extern RangeArr<SelectWorld_t, 1, maxSelectWorlds> SelectWorld;
 extern std::vector<SelectWorld_t> SelectWorld;
+extern std::string g_recentWorld1p;
+extern std::string g_recentWorld2p;
 //Public ShowFPS As Boolean
 extern bool ShowFPS;
 //Public PrintFPS As Double
 extern double PrintFPS;
-// Do ground-point by alt-run key instead of down
-extern bool GameplayPoundByAltRun;
-// Shake screen on thwomp falling
-extern bool GameplayShakeScreenThwomp;
-// Shake screen on Bowser III'rd ground pound
-extern bool GameplayShakeScreenBowserIIIrd;
-// Shake screen on Yoshi ground pount
-extern bool GameplayShakeScreenPound;
-// Enable usage of the rumble control
-extern bool JoystickEnableRumble;
-// Show the battery status for wireless gamepads
-extern bool JoystickEnableBatteryStatus;
 //Public vScreen(0 To 2) As vScreen 'Sets up the players screens
 extern RangeArr<vScreen_t, 0, 2> vScreen;
 //Public ScreenType As Integer 'The screen/view type
@@ -1108,6 +1098,7 @@ struct SelectWorld_t
     std::string WorldFile;
 //    blockChar(1 To numCharacters) As Boolean
     RangeArrI<bool, 1, numCharacters, false> blockChar;
+    bool highlight = false;
 //End Type
 };
 
@@ -1151,6 +1142,8 @@ extern std::string StartLevel;
 extern bool NoMap;
 //Public RestartLevel As Boolean 'restart the level on death
 extern bool RestartLevel;
+//! Per-level stars showing policy
+extern int WorldStarsShowPolicy;
 //Public LevelChop(0 To maxSections) As Single 'for drawing backgrounds when the level has been shrunk
 extern float LevelChop[maxSections + 1];
 //'collision detection optimization. creates a table of contents for blocks
@@ -1687,7 +1680,7 @@ extern bool BlocksSorted;
 //Public SingleCoop As Integer 'cheat code
 extern int SingleCoop;
 //Public CheatString As String 'logs keys for cheats
-extern std::string CheatString;
+//extern std::string CheatString; // Made static at cheat_code.cpp
 //Public GameOutro As Boolean 'true if showing credits
 extern bool GameOutro;
 extern bool GameOutroDoQuit;
@@ -2007,6 +2000,10 @@ extern int PlayerCharacter2;
 // extern double MenuMouseX;
 //Public MenuMouseY As Double
 // extern double MenuMouseY;
+//! mouse wheel delta
+// extern Sint32 MenuWheelDelta;
+//! mouse wheel event
+// extern bool MenuWheelMoved;
 //Public MenuMouseDown As Boolean
 // extern bool MenuMouseDown;
 //Public MenuMouseBack As Boolean

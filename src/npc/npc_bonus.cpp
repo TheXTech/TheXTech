@@ -26,12 +26,32 @@
 #include "../graphics.h"
 #include "../player.h"
 #include "../game_main.h"
+#include "../core/events.h"
+#include "../compat.h"
+#include "../config.h"
 
 #include "../controls.h"
 
 #include <Utils/maths.h>
 #include <Logger/logger.h>
-#include <InterProcess/intproc.h>
+#ifdef THEXTECH_INTERPROC_SUPPORTED
+#   include <InterProcess/intproc.h>
+#endif
+
+
+static bool doPlayGrowWithGotItem()
+{
+    switch(g_compatibility.sfx_player_grow_with_got_item)
+    {
+    default:
+    case Compatibility_t::SPGWGI_UNSPECIFIED:
+        return g_config.SoundPlayerGrowWithGetItem;
+    case Compatibility_t::SPGWGI_ENABLE:
+        return true;
+    case Compatibility_t::SPGWGI_DISABLE:
+        return false;
+    }
+}
 
 
 inline void RumbleForPowerup(int A)
@@ -134,7 +154,7 @@ void TouchBonus(int A, int B)
         {
             if(NPC[B].Type == 34 || NPC[B].Type == 169 || NPC[B].Type == 170)
             {
-                Player[A].Hearts = Player[A].Hearts + 1;
+                Player[A].Hearts += 1;
                 if(Player[A].Hearts > 3)
                     Player[A].Hearts = 3;
             }
@@ -255,7 +275,7 @@ void TouchBonus(int A, int B)
                 Player[A].State = 2;
             if(Player[A].Character == 3 || Player[A].Character == 4 || Player[A].Character == 5)
             {
-                Player[A].Hearts = Player[A].Hearts + 1;
+                Player[A].Hearts += 1;
                 if(Player[A].Hearts > 3)
                     Player[A].Hearts = 3;
             }
@@ -276,7 +296,11 @@ void TouchBonus(int A, int B)
             else if(NPC[B].Type == 250)
                 PlaySound(SFX_ZeldaHeart);
             else
+            {
+                if(doPlayGrowWithGotItem())
+                    PlaySound(SFX_PlayerGrow);
                 PlaySound(SFX_GotItem);
+            }
             if(NPC[B].Effect != 2)
                 MoreScore(NPCScore[NPC[B].Type], NPC[B].Location);
         }
@@ -284,7 +308,7 @@ void TouchBonus(int A, int B)
         {
             if(Player[A].Character == 3 || Player[A].Character == 4 || Player[A].Character == 5)
             {
-                Player[A].Hearts = Player[A].Hearts + 1;
+                Player[A].Hearts += 1;
                 if(Player[A].Hearts > 3)
                     Player[A].Hearts = 3;
             }
@@ -307,7 +331,11 @@ void TouchBonus(int A, int B)
                 if(Player[A].Character == 5)
                     PlaySound(SFX_ZeldaHeart);
                 else
+                {
+                    if(doPlayGrowWithGotItem())
+                        PlaySound(SFX_PlayerGrow);
                     PlaySound(SFX_GotItem);
+                }
             }
             if(NPC[B].Effect != 2)
                 MoreScore(NPCScore[NPC[B].Type], NPC[B].Location);
@@ -316,7 +344,7 @@ void TouchBonus(int A, int B)
         {
             if(Player[A].Character == 3 || Player[A].Character == 4 || Player[A].Character == 5)
             {
-                Player[A].Hearts = Player[A].Hearts + 1;
+                Player[A].Hearts += 1;
                 if(Player[A].Hearts > 3)
                     Player[A].Hearts = 3;
             }
@@ -340,7 +368,11 @@ void TouchBonus(int A, int B)
                 if(Player[A].Character == 5)
                     PlaySound(SFX_ZeldaHeart);
                 else
+                {
+                    if(doPlayGrowWithGotItem())
+                        PlaySound(SFX_PlayerGrow);
                     PlaySound(SFX_GotItem);
+                }
             }
             if(NPC[B].Effect != 2)
                 MoreScore(NPCScore[NPC[B].Type], NPC[B].Location);
@@ -367,7 +399,11 @@ void TouchBonus(int A, int B)
                 if(Player[A].Character == 5)
                     PlaySound(SFX_ZeldaHeart);
                 else
+                {
+                    if(doPlayGrowWithGotItem())
+                        PlaySound(SFX_PlayerGrow);
                     PlaySound(SFX_GotItem);
+                }
             }
             if(NPC[B].Effect != 2)
                 MoreScore(NPCScore[NPC[B].Type], NPC[B].Location);
@@ -394,7 +430,11 @@ void TouchBonus(int A, int B)
                 if(Player[A].Character == 5)
                     PlaySound(SFX_ZeldaHeart);
                 else
+                {
+                    if(doPlayGrowWithGotItem())
+                        PlaySound(SFX_PlayerGrow);
                     PlaySound(SFX_GotItem);
+                }
             }
             if(NPC[B].Effect != 2)
                 MoreScore(NPCScore[NPC[B].Type], NPC[B].Location);
@@ -421,7 +461,11 @@ void TouchBonus(int A, int B)
                 if(Player[A].Character == 5)
                     PlaySound(SFX_ZeldaHeart);
                 else
+                {
+                    if(doPlayGrowWithGotItem())
+                        PlaySound(SFX_PlayerGrow);
                     PlaySound(SFX_GotItem);
+                }
             }
             if(NPC[B].Effect != 2)
                 MoreScore(NPCScore[NPC[B].Type], NPC[B].Location);
@@ -435,18 +479,18 @@ void TouchBonus(int A, int B)
             else if(NPC[B].Type != 274)
                 PlaySound(SFX_Coin);
             if(NPC[B].Type == 252 || NPC[B].Type == 258)
-                Coins = Coins + 5;
+                Coins += 5;
             else if(NPC[B].Type == 253)
-                Coins = Coins + 20;
+                Coins += 20;
             else
-                Coins = Coins + 1;
+                Coins += 1;
             if(Coins >= 100)
             {
                 if(Lives < 99)
                 {
-                    Lives = Lives + 1;
+                    Lives += 1;
                     PlaySound(SFX_1up);
-                    Coins = Coins - 100;
+                    Coins -= 100;
                 }
                 else
                     Coins = 99;
@@ -455,7 +499,7 @@ void TouchBonus(int A, int B)
             {
                 PlaySound(SFX_DraginCoin);
                 MoreScore(NPCScore[NPC[B].Type], NPC[B].Location);
-                NPCScore[274] = NPCScore[274] + 1;
+                NPCScore[274] += 1;
                 if(NPCScore[274] > 14)
                     NPCScore[274] = 14;
             }
@@ -495,7 +539,7 @@ void TouchBonus(int A, int B)
                     }
                 }
                 StopMusic();
-                DoEvents();
+                XEvents::doEvents();
                 PlaySound(SFX_CardRouletteClear);
             }
             else if(NPC[B].Type == 16)
@@ -549,7 +593,9 @@ void TouchBonus(int A, int B)
                     numStars += 1;
                     Star[numStars].level = FileNameFull;
                     Star[numStars].Section = NPC[B].Section;
+#ifdef THEXTECH_INTERPROC_SUPPORTED
                     IntProc::sendStarsNumber(numStars);
+#endif
                     CheckAfterStarTake(false);
                 }
 

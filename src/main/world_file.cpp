@@ -39,8 +39,9 @@
 void OpenWorld(std::string FilePath)
 {
     // USE PGE-FL here
-    std::string newInput = "";
+    // std::string newInput = "";
     int FileRelease = 64;
+    bool compatModern = (CompatGetLevel() == COMPAT_MODERN);
     int A = 0;
     int B = 0;
     long long zCounter = 0;
@@ -81,14 +82,27 @@ void OpenWorld(std::string FilePath)
 
     WorldName = wld.EpisodeTitle;
     wld.charactersToS64();
+
     blockCharacter[1] = wld.nocharacter1;
     blockCharacter[2] = wld.nocharacter2;
-    blockCharacter[3] = wld.nocharacter3;
-    blockCharacter[4] = wld.nocharacter4;
-    blockCharacter[5] = wld.nocharacter5;
+
+    if(FileRelease >= 30 || !compatModern)
+    {
+        blockCharacter[3] = wld.nocharacter3;
+        blockCharacter[4] = wld.nocharacter4;
+        blockCharacter[5] = wld.nocharacter5;
+    }
+    else
+    {
+        blockCharacter[3] = true;
+        blockCharacter[4] = true;
+        blockCharacter[5] = true;
+    }
+
     StartLevel = dirEpisode.resolveFileCase(wld.IntroLevel_file);
     NoMap = wld.HubStyledWorld;
     RestartLevel = wld.restartlevel;
+    WorldStarsShowPolicy = wld.starsShowPolicy;
 
     MaxWorldStars = int(wld.stars);
 
@@ -237,6 +251,7 @@ void OpenWorld(std::string FilePath)
         ll.WarpX = l.gotox;
         ll.WarpY = l.gotoy;
         ll.Path2 = l.bigpathbg;
+        ll.starsShowPolicy = l.starsShowPolicy;
         ll.Z = zCounter++;
         treeWorldLevelAdd(&ll);
 
@@ -269,8 +284,8 @@ void OpenWorld(std::string FilePath)
         // In game they are smaller (30x30), in world they are 32x32
         box.Location.Width = 30;
         box.Location.Height = 30;
-        box.Location.Y = box.Location.Y + 1;
-        box.Location.X = box.Location.X + 1;
+        box.Location.Y += 1;
+        box.Location.X += 1;
         box.Z = zCounter++;
         treeWorldMusicAdd(&box);
     }
@@ -359,6 +374,7 @@ void ClearWorld()
     numWorldPaths = 0;
     numWorldMusic = 0;
     RestartLevel = false;
+    WorldStarsShowPolicy = WorldData::STARS_UNSPECIFIED;
     NoMap = false;
     IsEpisodeIntro = false;
     StartLevel.clear();
@@ -383,4 +399,35 @@ void ClearWorld()
 //        frmWorld.txtStars = "";
 //        MaxWorldStars = 0;
 //    }
+}
+
+void FindWldStars()
+{
+    LevelData head;
+
+    for(int A = 1; A <= numWorldLevels; A++)
+    {
+        auto &l = WorldLevel[A];
+        if(!l.FileName.empty())
+        {
+            std::string lFile = FileNamePath + l.FileName;
+            addMissingLvlSuffix(lFile);
+
+            if(Files::fileExists(lFile))
+            {
+                if(FileFormats::OpenLevelFileHeader(lFile, head))
+                {
+                    l.maxStars = head.stars;
+                    l.curStars = 0;
+
+                    for(int B = 1; B <= numStars; B++)
+                    {
+                        if(SDL_strcasecmp(Star[B].level.c_str(), l.FileName.c_str()) == 0)
+                            l.curStars++;
+                    }
+                }
+            }
+
+        }
+    }
 }

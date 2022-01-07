@@ -18,8 +18,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#pragma once
 #ifndef RAND_H
 #define RAND_H
+
+#include <cmath>
+
+// supported only on gcc
+// #define DEBUG_RANDOM_CALLS
+#ifdef DEBUG_RANDOM_CALLS
+#   include <execinfo.h>
+#   include <vector>
+extern std::vector<void*> g_random_calls;
+#endif
 
 /**
  * @brief Seeds the random number generator with argument seed for reproducible results
@@ -39,12 +50,6 @@ extern int readSeed();
 extern long random_ncalls();
 
 /**
- * @brief Random number generator in float format, between 0.0f to 1.0f (exclusive)
- * @return random float value
- */
-extern float fRand();
-
-/**
  * @brief Random number generator in double format, between 0.0 to 1.0 (exclusive)
  * @return random double value
  */
@@ -52,7 +57,7 @@ extern double dRand();
 
 /**
  * @brief Random number generator in integer format, between 0 to argument max (exclusive)
- * Equivalent to `Int(dRand() * max)`
+ * Distribution equivalent to `Int(dRand() * max)`
  * @return random integer value
  */
 extern int iRand(int max);
@@ -60,10 +65,17 @@ extern int iRand(int max);
 /**
  * @brief Random number generator in integer format, between 0 to argument max (inclusive)
  * Each midpoint has probability 1/max. Each endpoint has probability 1/2max.
- * Equivalent to casting `dRand() * max` to an Int in vb6
+ * Distribution equivalent to implicitly casting `dRand() * max` to an Int in vb6
  * @return random integer value
  */
-extern int vb6Cast_iRand(int max);
+inline int iRand_round(int max)
+{
+    // let 0 represent top endpoint, otherwise use iRand(max*2)/2.
+    int i = iRand(max*2);
+    if(i == 0)
+        return max;
+    return i/2;
+}
 
 
 #endif // RAND_H

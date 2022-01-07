@@ -29,6 +29,7 @@
 #include "../layers.h"
 #include "../compat.h"
 #include "../graphics.h"
+#include "../npc_id.h"
 #include "level_file.h"
 #include "record.h"
 
@@ -138,6 +139,9 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
     FileName = dirEpisode.resolveDirCase(lvl.meta.filename);
     FileNamePath = lvl.meta.path + "/";
 
+    bool compatModern = (CompatGetLevel() == COMPAT_MODERN);
+    bool isSmbx64 = (lvl.meta.RecentFormat == LevelData::SMBX64);
+    int  fVersion = lvl.meta.RecentFormatVersion;
 
     if(!FilePath.empty())
     {
@@ -294,6 +298,13 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         bgo.Location.X = double(b.x);
         bgo.Location.Y = double(b.y);
         bgo.Type = int(b.id);
+
+        if(IF_OUTRANGE(bgo.Type, 1, maxBackgroundType)) // Drop ID to 1 for BGOs of out of range IDs
+        {
+            pLogWarning("BGO-%d ID is out of range (max types %d), reset to BGO-1", bgo.Type, maxBackgroundType);
+            bgo.Type = 1;
+        }
+
         bgo.Layer = b.layer;
         bgo.Location.Width = GFXBackgroundWidth[bgo.Type];
         bgo.Location.Height = BackgroundHeight[bgo.Type];
@@ -304,12 +315,6 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         bgo.zOffset = b.z_offset;
 
         bgoApplyZMode(&bgo, int(b.smbx64_sp));
-
-        if(IF_OUTRANGE(bgo.Type, 1, maxBackgroundType)) // Drop ID to 1 for BGOs of out of range IDs
-        {
-            pLogWarning("BGO-%d ID is out of range (max types %d), reset to BGO-1", bgo.Type, maxBackgroundType);
-            bgo.Type = 1;
-        }
     }
 
 
@@ -339,13 +344,15 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             npc.Type = 1;
         }
 
-        if(npc.Type == 91 || npc.Type == 96 || npc.Type == 283 || npc.Type == 284)
+        if(npc.Type == NPCID_BURIEDPLANT || npc.Type == NPCID_YOSHIEGG ||
+           npc.Type == NPCID_BUBBLE || npc.Type == NPCID_LAKITU_SMW)
         {
             npc.Special = n.contents;
             npc.DefaultSpecial = int(npc.Special);
         }
 
-        if(npc.Type == 288 || npc.Type == 289 || (npc.Type == 91 && n.contents == 288))
+        if(npc.Type == NPCID_POTION || npc.Type == NPCID_POTIONDOOR ||
+          (npc.Type == NPCID_BURIEDPLANT && n.contents == NPCID_POTION))
         {
             npc.Special2 = n.special_data;
             npc.DefaultSpecial2 = int(npc.Special2);
@@ -363,38 +370,54 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             npc.DefaultSpecial = int(npc.Special);
         }
 
-        if(npc.Type == 260)
+        if(npc.Type == NPCID_FIREBAR)
         {
             npc.Special = n.special_data;
             npc.DefaultSpecial = int(npc.Special);
         }
 
-        if(npc.Type == 22) // billy gun
+        if(npc.Type == NPCID_CANNONITEM) // billy gun
         {
-            if(lvl.meta.RecentFormat == LevelData::SMBX64 && lvl.meta.RecentFormatVersion < 28)
+            if(compatModern && isSmbx64 && fVersion < 28)
                 npc.Special7 = 2.0; // SMBX 1.1.x and 1.0.x behavior
-            else if(lvl.meta.RecentFormat == LevelData::SMBX64 && lvl.meta.RecentFormatVersion < 51)
+            else if(compatModern && isSmbx64 && fVersion < 51)
                 npc.Special7 = 1.0; // SMBX 1.2 behavior
             else
                 npc.Special7 = n.special_data; // SMBX 1.2.1 and newer behavior, customizable behavior
         }
 
-        if(npc.Type == 86)
+        if(npc.Type == NPCID_THWOMP_SMB3)
         {
-            if(lvl.meta.RecentFormat == LevelData::SMBX64 &&
-               lvl.meta.RecentFormatVersion < 9)
+            if(compatModern && isSmbx64 && fVersion < 9)
+                npc.Special7 = 1.0; // Make twomps to fall always
+            else
+                npc.Special7 = n.special_data;
+        }
+
+        if(npc.Type == NPCID_BOWSER_SMB3)
+        {
+            if(compatModern && isSmbx64 && fVersion < 30)
                 npc.Special7 = 1.0; // Keep original behavior of Bowser as in SMBX 1.0
             else
                 npc.Special7 = n.special_data;
         }
 
-        if(npc.Type == 60)
+        switch(npc.Type)
         {
-            if(lvl.meta.RecentFormat == LevelData::SMBX64 &&
-               lvl.meta.RecentFormatVersion < 9)
-                npc.Special7 = 1.0; // Workaround for yellow platform at The Invasion 1
+        case NPCID_YELBLOCKS:
+        case NPCID_BLUBLOCKS:
+        case NPCID_GRNBLOCKS:
+        case NPCID_REDBLOCKS:
+        case NPCID_PLATFORM_SMB3:
+        case NPCID_SAW:
+            if(compatModern && isSmbx64 && fVersion < 30)
+                npc.Special7 = 1.0; // Workaround for yellow platform at The Invasion 1 on the "Clown Car Parking" level
             else
-                npc.Special7 = 0.0;
+                npc.Special7 = n.special_data;
+            break;
+
+        default:
+            break;
         }
 
         npc.Generator = n.generator;
@@ -408,7 +431,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         npc.Text = n.msg;
 
         npc.Inert = n.friendly;
-        if(npc.Type == 151)
+        if(npc.Type == NPCID_SIGN)
             npc.Inert = true;
         npc.Stuck = n.nomove;
         npc.DefaultStuck = npc.Stuck;
@@ -433,13 +456,16 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 
         CheckSectionNPC(numNPCs);
 
-        if(npc.Type == 192) // Is a checkpoint
+        if(npc.Type == NPCID_CHECKPOINT) // Is a checkpoint
         {
             checkPointId++;
-            npc.Special = checkPointId;
-            npc.DefaultSpecial = int(npc.Special);
+            if(compatModern)
+            {
+                npc.Special = checkPointId;
+                npc.DefaultSpecial = int(npc.Special);
+            }
         }
-        else if(npc.Type == 97 || npc.Type == 196) // Is a star
+        else if(npc.Type == NPCID_STAR_SMB3 || npc.Type == NPCID_STAR_SMW) // Is a star
         {
             bool tempBool = false;
             for(B = 1; B <= numStars; ++B)
@@ -452,7 +478,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             {
                 npc.Special = 1;
                 npc.DefaultSpecial = 1;
-                if(npc.Type == 196)
+                if(npc.Type == NPCID_STAR_SMW)
                     npc.Killed = 9;
             }
         }
@@ -482,6 +508,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         warp.Direction2 = w.odirect;
         warp.Effect = w.type;
         warp.twoWay = w.two_way;
+        warp.transitEffect = w.transition_effect;
 
         // Work around filenames with no extension suffix and case missmatch
         if(!Strings::endsWith(w.lname, ".lvl") && !Strings::endsWith(w.lname, ".lvlx"))
@@ -512,6 +539,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         warp.NoYoshi = w.novehicles;
         warp.WarpNPC = w.allownpc;
         warp.Locked = w.locked;
+        warp.stoodRequired = w.stood_state_required;
 
         warp.cannonExit = w.cannon_exit;
         warp.cannonExitSpeed = w.cannon_exit_speed;
@@ -708,7 +736,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 //        curSection = 0;
 //        vScreenY[1] = -(level[curSection].Height - 600);
 //        vScreenX[1] = -level[curSection].X;
-//        numWarps = numWarps + 1;
+//        numWarps += 1;
 //        for(A = 0; A < frmLevelSettings::optBackground.Count; A++)
 //        {
 //            if(Background2[0] == A)
@@ -763,7 +791,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         for(A = 0; A <= numSections; A++) // Automatically correct 608 section height to 600
         {
 //            if(int(level[A].Height - level[A].Y) == 608)
-//                level[A].Y = level[A].Y + 8;
+//                level[A].Y += 8;
             int height = int(level[A].Height - level[A].Y);
             if(height > 600 && height < 610)
                 level[A].Y = level[A].Height - 600; // Better and cleaner logic
@@ -1000,25 +1028,28 @@ void ClearLevel()
 
 void FindStars()
 {
-    int A = 0;
-    int B = 0;
-    std::string newInput;
+//    int A = 0;
+//    int B = 0;
+//    std::string newInput;
     LevelData head;
 
-    for(A = 1; A <= numWarps; A++)
+    for(int A = 1; A <= numWarps; A++)
     {
         auto &warp = Warp[A];
+
         if(!warp.level.empty())
         {
             std::string lFile = FileNamePath + warp.level;
             addMissingLvlSuffix(lFile);
+
             if(Files::fileExists(lFile))
             {
                 if(FileFormats::OpenLevelFileHeader(lFile, head))
                 {
                     warp.maxStars = head.stars;
                     warp.curStars = 0;
-                    for(B = 1; B <= numStars; B++)
+
+                    for(int B = 1; B <= numStars; B++)
                     {
                         if(SDL_strcasecmp(Star[B].level.c_str(), warp.level.c_str()) == 0)
                             warp.curStars++;

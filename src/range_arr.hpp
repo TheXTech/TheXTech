@@ -23,6 +23,7 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#pragma once
 #ifndef RANGE_ARR_HPP
 #define RANGE_ARR_HPP
 
@@ -45,7 +46,7 @@ class RangeArr
 #endif
 
 public:
-    RangeArr()
+    RangeArr() noexcept
     {
 #ifdef RANGE_ARR_USE_HEAP
         array = new T[size];
@@ -110,7 +111,7 @@ class RangeArrI
 #endif
 
 public:
-    RangeArrI()
+    RangeArrI() noexcept
     {
 #ifdef RANGE_ARR_USE_HEAP
         array = new T[size];

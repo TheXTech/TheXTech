@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#pragma once
 #ifndef PSEUDO_VB_H
 #define PSEUDO_VB_H
 

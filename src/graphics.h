@@ -18,11 +18,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#pragma once
 #ifndef GRAPHICS_H
 #define GRAPHICS_H
 
 #include <string>
 #include "location.h"
+#include "globals.h"
 
 enum
 {
@@ -37,12 +39,14 @@ void doShakeScreenClear();
 // Public Sub UpdateGraphics2() 'draws GFX to screen when on the world map/world map editor
 // draws GFX to screen when on the world map/world map editor
 void UpdateGraphics2(bool skipRepaint = false);
+// Unpack all visible lazily-loaded graphics
+void GraphicsLazyPreLoad();
 // Public Sub UpdateGraphics() 'This draws the graphic to the screen when in a level/game menu/outro/level editor
 // This draws the graphic to the screen when in a level/game menu/outro/level editor
 void UpdateGraphics(bool skipRepaint = false);
 // Public Sub GetvScreen(A As Integer) ' Get the screen position
 //  Get the screen position
-void GetvScreen(int A);
+void GetvScreen(const int A);
 // Public Sub GetvScreenAverage() ' Get the average screen position for all players
 //  Get the average screen position for all players
 void GetvScreenAverage();
@@ -62,10 +66,11 @@ void SetupScreens();
 void DynamicScreen();
 // Public Sub SuperPrint(SuperWords As String, Font As Integer, X As Single, Y As Single) 'prints text to the screen
 // prints text to the screen
-void SuperPrint(std::string SuperWords, int Font, float X, float Y, float r = 1.f, float g = 1.f, float b = 1.f, float a = 1.f);
-void SuperPrintRightAlign(std::string SuperWords, int Font, float X, float Y, float r = 1.f, float g = 1.f, float b = 1.f, float a = 1.f);
-void SuperPrintCenter(std::string SuperWords, int Font, float X, float Y, float r = 1.f, float g = 1.f, float b = 1.f, float a = 1.f);
-void SuperPrintScreenCenter(std::string SuperWords, int Font, float Y, float r = 1.f, float g = 1.f, float b = 1.f, float a = 1.f);
+int SuperTextPixLen(const std::string &SuperWords, int Font);
+void SuperPrint(const std::string &SuperWords, int Font, float X, float Y, float r = 1.f, float g = 1.f, float b = 1.f, float a = 1.f);
+void SuperPrintRightAlign(const std::string &SuperWords, int Font, float X, float Y, float r = 1.f, float g = 1.f, float b = 1.f, float a = 1.f);
+void SuperPrintCenter(const std::string &SuperWords, int Font, float X, float Y, float r = 1.f, float g = 1.f, float b = 1.f, float a = 1.f);
+void SuperPrintScreenCenter(const std::string &SuperWords, int Font, float Y, float r = 1.f, float g = 1.f, float b = 1.f, float a = 1.f);
 // Public Sub SetRes()
 void SetRes();
 // Public Function CheckKey(newStrizzle As String) As String
@@ -95,13 +100,24 @@ void DrawCredits();
 // draws the games interface
 void DrawInterface(int Z, int numScreens);
 // Public Function pfrX(plrFrame As Integer) As Integer
-int pfrX(int plrFrame);
+//! Get X offset at the player sprite (old call, required to add 100 into source value)
+int pfrXo(int plrFrame);
 // Public Function pfrY(plrFrame As Integer) As Integer
+//! Get Y offset at the player sprite (old call, required to add 100 into source value)
+int pfrYo(int plrFrame);
+//! Get X offset at the player sprite
+int pfrX(int plrFrame);
+//! Get Y offset at the player sprite
 int pfrY(int plrFrame);
 // Public Sub GameThing()
-void GameThing();
+/*!
+ * \brief Draw the level enter scene
+ * \param noSetup Avoid player settings re-setup
+ */
+void GameThing(int waitms = 0, int fadeSpeed = 0);
 // Public Sub DrawPlayer(A As Integer, Z As Integer)
-void DrawPlayer(int A, int Z);
+void DrawPlayer(const int A, const int Z);
+void DrawPlayer(Player_t &p, const int Z);
 // Public Sub ScreenShot()
 void ScreenShot();
 // Public Sub DrawFrozenNPC(Z As Integer, A As Integer)

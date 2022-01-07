@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#pragma once
 #ifndef MAIN_H
 #define MAIN_H
 
@@ -47,6 +48,7 @@ void NextLevel();
 void UpdateMacro();
 //! loads the world
 void OpenWorld(std::string FilePath);
+void FindWldStars();
 //! Loop for world select
 void WorldLoop();
 
@@ -84,7 +86,8 @@ void SaveConfig();
 
 void NPCyFix();
 
-void CheatCode(char NewKey);
+// void CheatCode(char NewKey);// Moved into "main/cheat_code.h"
+
 //! credit loop
 void OutroLoop();
 
@@ -95,8 +98,8 @@ void SetupCredits();
 // for settings up the game's credits
 void AddCredit(std::string newCredit);
 // calcualtes scores based on the multiplyer and how much the NPC is worth
-void MoreScore(int addScore, Location_t Loc);
-void MoreScore(int addScore, Location_t Loc, int &Multiplier);
+void MoreScore(int addScore, const Location_t &Loc);
+void MoreScore(int addScore, const Location_t &Loc, int &Multiplier);
 // sets up player frame offsets so they are displayed correctly on the screen
 void SetupPlayerFrames();
 

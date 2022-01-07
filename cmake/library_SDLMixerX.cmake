@@ -16,6 +16,7 @@ endif()
 option(PGE_SHARED_SDLMIXER "Link MixerX as a shared library (dll/so/dylib)" ${PGE_SHARED_SDLMIXER_DEFAULT})
 option(PGE_USE_LOCAL_SDL2 "Do use the locally-built SDL2 library from the AudioCodecs set. Otherwise, download and build the development top main version." ON)
 
+
 #if(WIN32)
 #    if(MSVC)
 #        set(SDL_MixerX_SO_Lib "${DEPENDENCIES_INSTALL_DIR}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}SDL2_mixer_ext${PGE_LIBS_DEBUG_SUFFIX}.lib")
@@ -32,7 +33,8 @@ option(PGE_USE_LOCAL_SDL2 "Do use the locally-built SDL2 library from the AudioC
 set_shared_lib(SDL_MixerX_SO_Lib "${DEPENDENCIES_INSTALL_DIR}/lib" SDL2_mixer_ext)
 set_shared_lib(SDL2_SO_Lib "${DEPENDENCIES_INSTALL_DIR}/lib" SDL2)
 
-set_shared_lib(SDLHIDAPI_SO_Lib "${DEPENDENCIES_INSTALL_DIR}/lib" hidapi)
+# NO LONGER REQUIRED SINCE SDL 2.0.18 (https://github.com/libsdl-org/SDL/issues/4955#issuecomment-968366436)
+# set_shared_lib(SDLHIDAPI_SO_Lib "${DEPENDENCIES_INSTALL_DIR}/lib" hidapi)
 
 set_static_lib(SDL2_main_A_Lib "${DEPENDENCIES_INSTALL_DIR}/lib" SDL2main)
 
@@ -104,6 +106,14 @@ if(APPLE)
     list(APPEND MixerX_SysLibs ${COREAUDIO_LIBRARY})
     find_library(COREVIDEO_LIBRARY CoreVideo)
     list(APPEND MixerX_SysLibs ${COREVIDEO_LIBRARY})
+    find_library(COREHAPTICS_LIBRARY CoreHaptics)
+    if(COREHAPTICS_LIBRARY)
+        list(APPEND MixerX_SysLibs ${COREHAPTICS_LIBRARY})
+    endif()
+    find_library(GAMECONTROLLER_LIBRARY GameController)
+    if(GAMECONTROLLER_LIBRARY)
+        list(APPEND MixerX_SysLibs ${GAMECONTROLLER_LIBRARY})
+    endif()
     find_library(IOKIT_LIBRARY IOKit)
     list(APPEND MixerX_SysLibs ${IOKIT_LIBRARY})
     find_library(CARBON_LIBRARY Carbon)
@@ -134,6 +144,7 @@ set_static_lib(AC_OGG          "${CODECS_LIBRARIES_DIR}" ogg)
 set_static_lib(AC_MAD          "${CODECS_LIBRARIES_DIR}" mad)
 set_static_lib(AC_ADLMIDI      "${CODECS_LIBRARIES_DIR}" ADLMIDI)
 set_static_lib(AC_OPNMIDI      "${CODECS_LIBRARIES_DIR}" OPNMIDI)
+set_static_lib(AC_EDMIDI       "${CODECS_LIBRARIES_DIR}" EDMIDI)
 set_static_lib(AC_TIMIDITYSDL  "${CODECS_LIBRARIES_DIR}" timidity_sdl2)
 set_static_lib(AC_GME          "${CODECS_LIBRARIES_DIR}" gme)
 if(MSVC) # MSVC-built libxmp has the "libxmp" name
@@ -147,14 +158,15 @@ set_static_lib(AC_ZLIB         "${CODECS_LIBRARIES_DIR}" zlib)
 set(MixerX_CodecLibs
     "${AC_FLAC}"
     "${AC_FLUIDLITE}"
-    "${AC_VORBISFILE}"
-    "${AC_VORBIS}"
+#    "${AC_VORBISFILE}"
+#    "${AC_VORBIS}"
     "${AC_OPUSFILE}"
     "${AC_OPUS}"
     "${AC_OGG}"
-    "${AC_MAD}"
+#    "${AC_MAD}"
     "${AC_ADLMIDI}"
     "${AC_OPNMIDI}"
+    "${AC_EDMIDI}"
     "${AC_TIMIDITYSDL}"
     "${AC_GME}"
     "${AC_LIBXMP}"
@@ -180,6 +192,8 @@ ExternalProject_Add(
         "-DUSE_LOCAL_SDL2=${USE_LOCAL_SDL2}"
         "-DCMAKE_DEBUG_POSTFIX=${PGE_LIBS_DEBUG_SUFFIX}"
         "-DBUILD_MIKMOD=OFF"
+        "-DBUILD_OGG_VORBIS=OFF"
+        "-DBUILD_MP3_MAD=OFF"
         ${ANDROID_CMAKE_FLAGS}
         $<$<BOOL:APPLE>:-DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}>
         $<$<BOOL:APPLE>:-DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}>
@@ -189,7 +203,7 @@ ExternalProject_Add(
         "${SDL2_SO_Lib}"
         "${SDL2_A_Lib}"
         "${SDL2_main_A_Lib}"
-        "${SDLHIDAPI_SO_Lib}"
+#        "${SDLHIDAPI_SO_Lib}" # No longer needed since SDL 2.0.18
         ${MixerX_CodecLibs}
 )
 
@@ -216,6 +230,10 @@ ExternalProject_Add(
         "-DAUDIO_CODECS_SDL2_HG_BRANCH=${SDL_BRANCH}"
         "-DAUDIO_CODECS_SDL2_GIT_BRANCH=${SDL_GIT_BRANCH}"
         "-DWITH_SDL2_WASAPI=ON"
+        "-DUSE_MIDI_FLUIDLITE_OGG_STB=ON"
+        "-DUSE_MP3_MINIMP3=ON"
+        "-DUSE_OGG_VORBIS_STB=ON"
+        "-DUSE_MP3_MAD=OFF"
         ${ANDROID_CMAKE_FLAGS}
         $<$<BOOL:APPLE>:-DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}>
         $<$<BOOL:APPLE>:-DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}>
@@ -235,7 +253,7 @@ elseif(WIN32 AND MINGW)
 elseif(WIN32 AND MSVC)
     target_link_libraries(PGE_SDLMixerX INTERFACE "${SDL2_main_A_Lib}" "${SDL2_SO_Lib}")
 elseif(ANDROID)
-    target_link_libraries(PGE_SDLMixerX INTERFACE "${SDL2_SO_Lib}" "${SDLHIDAPI_SO_Lib}")
+    target_link_libraries(PGE_SDLMixerX INTERFACE "${SDL2_SO_Lib}") #  "${SDLHIDAPI_SO_Lib}" (No longer required since SDL 2.0.18)
 else()
     target_link_libraries(PGE_SDLMixerX INTERFACE "${SDL2_SO_Lib}")
 endif()
@@ -245,13 +263,19 @@ message("--- Detected system libraries list: ${MixerX_SysLibs} ---")
 target_link_libraries(PGE_SDLMixerX_static INTERFACE
     "${SDL_MixerX_A_Lib}"
     ${MixerX_CodecLibs}
-    "${SDL2_A_Lib}"
-    "${MixerX_SysLibs}"
 )
 
-if(ANDROID)
-    target_link_libraries(PGE_SDLMixerX_static INTERFACE "${SDLHIDAPI_SO_Lib}")
+if(USE_SYSTEM_SDL2)
+    target_link_libraries(PGE_SDLMixerX_static INTERFACE ${SDL2_LIBRARIES})
+else()
+    target_link_libraries(PGE_SDLMixerX_static INTERFACE "${SDL2_A_Lib}")
 endif()
+
+target_link_libraries(PGE_SDLMixerX_static INTERFACE "${MixerX_SysLibs}")
+
+#if(ANDROID) # No longer required since SDL 2.0.18
+#    target_link_libraries(PGE_SDLMixerX_static INTERFACE "${SDLHIDAPI_SO_Lib}")
+#endif()
 
 if(PGE_SHARED_SDLMIXER AND NOT WIN32)
     install(FILES ${SDL_MixerX_SO_Lib} DESTINATION "${PGE_INSTALL_DIRECTORY}")

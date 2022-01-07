@@ -24,12 +24,12 @@
 #include "../game_main.h"
 #include "../graphics.h"
 #include "../sound.h"
+#include "../config.h"
 #include "../video.h"
-#include "speedrunner.h"
 #include "../controls.h"
 
-#include "../config.h"
-
+#include "speedrunner.h"
+#include "presetup.h"
 #include "record.h"
 
 #include <Utils/files.h>
@@ -41,6 +41,8 @@
 
 Config_t g_config;
 VideoSettings_t g_videoSettings;
+
+PreSetup_t g_preSetup;
 
 void OpenConfig_preSetup()
 {
@@ -95,6 +97,13 @@ void OpenConfig_preSetup()
         {"pcm_f32be", AUDIO_F32MSB}
     };
 
+    const IniProcessing::StrEnumMap compatMode =
+    {
+        {"native", 0},
+        {"smbx2", 1},
+        {"smbx13", 2}
+    };
+
     std::string configPath = AppPathManager::settingsFileSTD();
 
     if(Files::fileExists(configPath))
@@ -120,6 +129,15 @@ void OpenConfig_preSetup()
         config.readEnum("format", g_audioSetup.format, (uint16_t)AUDIO_F32, sampleFormats);
         config.read("buffer-size", g_audioSetup.bufferSize, 512);
         config.endGroup();
+
+        config.beginGroup("gameplay");
+        config.readEnum("compatibility-mode", g_preSetup.compatibilityMode, 0, compatMode);
+        config.endGroup();
+
+        config.beginGroup("speedrun");
+        config.read("mode", g_preSetup.speedRunMode, 0);
+        config.read("semi-transparent-timer", g_preSetup.speedRunSemiTransparentTimer, false);
+        config.endGroup();
     }
 }
 
@@ -138,29 +156,46 @@ void OpenConfig()
          // Keep backward compatibility and restore old mappings from the "thextech.ini"
         IniProcessing *ctl = Files::fileExists(controlsPath) ? &controls : &config;
 
+        const IniProcessing::StrEnumMap starsShowPolicy =
+        {
+            {"hide", 0},
+            {"dont-show", 0},
+            {"collected-only", 1},
+            {"show", 2},
+            {"show-all", 2}
+        };
+
         config.beginGroup("main");
         config.read("release", FileRelease, curRelease);
         config.read("full-screen", resBool, false);
-        config.read("record-gameplay", g_config.RecordGameplayData, g_config.RecordGameplayData);
+        config.read("record-gameplay", g_config.RecordGameplayData, false);
+        config.endGroup();
+
+        config.beginGroup("recent");
+        config.read("episode-1p", g_recentWorld1p, std::string());
+        config.read("episode-2p", g_recentWorld2p, std::string());
         config.endGroup();
 
         config.beginGroup("gameplay");
-        config.read("ground-pound-by-alt-run", GameplayPoundByAltRun, false);
+        config.read("ground-pound-by-alt-run", g_config.GameplayPoundByAltRun, false);
+        config.readEnum("world-map-stars-show-policy", g_config.WorldMapStarShowPolicyGlobal, 0, starsShowPolicy);
         config.read("strict-drop-add", g_config.StrictDropAdd, false);
         config.read("no-pause-reconnect", g_config.NoPauseReconnect, false);
         config.read("enter-cheats-menu-item", g_config.enter_cheats_menu_item, false);
         config.endGroup();
 
         config.beginGroup("effects");
-        config.read("enable-thwomp-screen-shake", GameplayShakeScreenThwomp, true);
-        config.read("enable-yoshi-ground-pound-screen-shake", GameplayShakeScreenPound, true);
-        config.read("enable-bowser-iiird-screen-shake", GameplayShakeScreenBowserIIIrd, true);
+        config.read("enable-thwomp-screen-shake", g_config.GameplayShakeScreenThwomp, true);
+        config.read("enable-yoshi-ground-pound-screen-shake", g_config.GameplayShakeScreenPound, true);
+        config.read("enable-bowser-iiird-screen-shake", g_config.GameplayShakeScreenBowserIIIrd, true);
+        config.read("sfx-player-grow-with-got-item", g_config.SoundPlayerGrowWithGetItem, false);
+        config.read("enable-inter-level-fade-effect", g_config.EnableInterLevelFade, true);
         config.endGroup();
 
         Controls::LoadConfig(ctl);
     }
 //    If resBool = True And resChanged = False And LevelEditor = False Then ChangeScreen
-#ifndef __ANDROID__
+#ifndef RENDER_FULLSCREEN_ALWAYS
     if(resBool && !resChanged)
         ChangeScreen();
 #endif
@@ -170,7 +205,6 @@ void OpenConfig()
 
 void SaveConfig()
 {
-//    Dim A As Integer
     std::string configPath = AppPathManager::settingsFileSTD();
     std::string controlsPath = AppPathManager::settingsControlsFileSTD();
 
@@ -182,11 +216,12 @@ void SaveConfig()
 #if !defined(__EMSCRIPTEN__) && !defined(__ANDROID__) // Don't remember fullscreen state for Emscripten!
     config.setValue("full-screen", resChanged);
 #endif
-    // TODO: Make sure, saving of those settings will not been confused by line arguments
-    // by separating config settings from global active settings
-//    config.setValue("frame-skip", FrameSkip);
-//    config.setValue("show-fps", ShowFPS);
     config.setValue("record-gameplay", g_config.RecordGameplayData);
+    config.endGroup();
+
+    config.beginGroup("recent");
+    config.setValue("episode-1p", g_recentWorld1p);
+    config.setValue("episode-2p", g_recentWorld2p);
     config.endGroup();
 
     config.beginGroup("video");
@@ -240,16 +275,43 @@ void SaveConfig()
     config.endGroup();
 
     config.beginGroup("gameplay");
-    config.setValue("ground-pound-by-alt-run", GameplayPoundByAltRun);
+    {
+        std::unordered_map<int, std::string> starsShowPolicy =
+        {
+            {0, "hide"},
+            {1, "collected-only"},
+            {2, "show-all"}
+        };
+
+        std::unordered_map<int, std::string> compatMode =
+        {
+            {0, "native"},
+            {1, "smbx2"},
+            {2, "smbx13"}
+        };
+
+        config.setValue("ground-pound-by-alt-run", g_config.GameplayPoundByAltRun);
+        config.setValue("world-map-stars-show-policy", starsShowPolicy[g_config.WorldMapStarShowPolicyGlobal]);
+        config.setValue("compatibility-mode", compatMode[g_preSetup.compatibilityMode]);
+    }
     config.setValue("strict-drop-add", g_config.StrictDropAdd);
     config.setValue("no-pause-reconnect", g_config.NoPauseReconnect);
     config.setValue("enter-cheats-menu-item", g_config.enter_cheats_menu_item);
     config.endGroup();
 
+    config.beginGroup("speedrun");
+    config.setValue("mode", g_preSetup.speedRunMode);
+    config.setValue("semi-transparent-timer", g_preSetup.speedRunSemiTransparentTimer);
+    config.endGroup();
+
     config.beginGroup("effects");
-    config.setValue("enable-thwomp-screen-shake", GameplayShakeScreenThwomp);
-    config.setValue("enable-yoshi-ground-pound-screen-shake", GameplayShakeScreenPound);
-    config.setValue("enable-bowser-iiird-screen-shake", GameplayShakeScreenBowserIIIrd);
+    {
+        config.setValue("enable-thwomp-screen-shake", g_config.GameplayShakeScreenThwomp);
+        config.setValue("enable-yoshi-ground-pound-screen-shake", g_config.GameplayShakeScreenPound);
+        config.setValue("enable-bowser-iiird-screen-shake", g_config.GameplayShakeScreenBowserIIIrd);
+        config.setValue("sfx-player-grow-with-got-item", g_config.SoundPlayerGrowWithGetItem);
+        config.setValue("enable-inter-level-fade-effect", g_config.EnableInterLevelFade);
+    }
     config.endGroup();
 
     Controls::SaveConfig(&controls);

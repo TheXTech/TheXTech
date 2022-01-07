@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#pragma once
 #ifndef MENU_MAIN_H
 #define MENU_MAIN_H
 
@@ -78,6 +79,7 @@ enum
 
 struct MainMenuContent
 {
+    std::string mainStartGame;
     std::string main1PlayerGame;
     std::string mainMultiplayerGame;
     std::string mainBattleGame;

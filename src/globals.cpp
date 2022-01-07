@@ -20,13 +20,12 @@
 
 #include <SDL2/SDL_version.h>
 
+#include "core/events.h"
 #include "globals.h"
 #include <fmt_format_ne.h>
 #include <cmath>
 #include <cfenv>
 
-FrmMain frmMain;
-GFX_t GFX;
 
 bool GameIsActive = false;
 std::string AppPath;
@@ -42,6 +41,7 @@ bool StartMenu = false;
 int BlockFlash = 0;
 bool ScrollRelease = false;
 bool TakeScreen = false;
+bool ShowOnScreenMeta = true;
 std::string LB;
 std::string EoT;
 
@@ -56,14 +56,10 @@ PauseCode GamePaused = PauseCode::None;
 std::string MessageText;
 int NumSelectWorld  = 0;
 std::vector<SelectWorld_t> SelectWorld;
+std::string g_recentWorld1p;
+std::string g_recentWorld2p;
 bool ShowFPS = false;
 double PrintFPS = 0.0;
-bool GameplayPoundByAltRun = false;
-bool GameplayShakeScreenThwomp = true;
-bool GameplayShakeScreenBowserIIIrd = true;
-bool GameplayShakeScreenPound = true;
-bool JoystickEnableRumble = true;
-bool JoystickEnableBatteryStatus = true;
 RangeArr<vScreen_t, 0, 2> vScreen;
 int ScreenType = 0;
 int DScreenType = 0;
@@ -85,6 +81,7 @@ bool GoToLevelNoGameThing = false;
 std::string StartLevel;
 bool NoMap = false;
 bool RestartLevel = false;
+int WorldStarsShowPolicy = -1;
 float LevelChop[maxSections + 1];
 RangeArr<int, -FLBlocks, FLBlocks> FirstBlock;
 RangeArr<int, -FLBlocks, FLBlocks> LastBlock;
@@ -307,7 +304,7 @@ bool TestFullscreen = false;
 //bool keyDownEnter = false;
 bool BlocksSorted = false;
 int SingleCoop = 0;
-std::string CheatString;
+//std::string CheatString;
 bool GameOutro = false;
 bool GameOutroDoQuit = false;
 float CreditChop = 0.0f;
@@ -479,6 +476,8 @@ int PlayerCharacter = 0;
 int PlayerCharacter2 = 0;
 // double MenuMouseX = 0.0;
 // double MenuMouseY = 0.0;
+// Sint32 MenuWheelDelta = 0;
+// bool MenuWheelMoved = false;
 // bool MenuMouseDown = false;
 // bool MenuMouseBack = false;
 bool MenuMouseRelease = false;
@@ -500,34 +499,29 @@ int BattleIntro = 0;
 int BattleOutro = 0;
 std::string LevelName;
 
-void DoEvents()
-{
-    frmMain.doEvents();
-}
+//void DoEvents()
+//{
+//    g_events->doEvents();
+//}
 
-int showCursor(int show)
-{
-    return SDL_ShowCursor(show);
-}
+//Uint8 getKeyState(int key)
+//{
+//    return XEvents::getKeyState(key);
+//}
 
-Uint8 getKeyState(SDL_Scancode key)
-{
-    return frmMain.getKeyState(key);
-}
+//Uint8 getKeyStateI(int key)
+//{
+//    if(key < 0)
+//        return 0;
+//    return XEvents::getKeyState(key);
+//}
 
-Uint8 getKeyStateI(int key)
-{
-    if(key < 0)
-        return 0;
-    return frmMain.getKeyState(static_cast<SDL_Scancode>(key));
-}
-
+// TODO: is this still used?
 const char *getKeyName(int key)
 {
     if(key < 0)
         return " ... ";
-    SDL_Scancode k = static_cast<SDL_Scancode>(key);
-    return SDL_GetScancodeName(k);
+    return g_events->getScanCodeName(key);
 }
 
 void initAll()
@@ -622,7 +616,7 @@ double vb6Round(double x, int decimals)
 {
     double res = x, decmul;
 
-    if(decimals < 0 || decimals > 22)
+    if(decimals < 0 || decimals >= 22)
         decimals = 0;
 
     if(SDL_fabs(x) < 1.0e16)

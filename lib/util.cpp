@@ -41,7 +41,7 @@ static inline bool is_base64(unsigned char c)
     return (isalnum(c) || (c == '+') || (c == '/'));
 }
 
-std::string util::filePath(std::string s)
+std::string util::filePath(const std::string &s)
 {
     std::string t = s;
     std::replace(t.begin(), t.end(), '\\', '_');
@@ -124,12 +124,12 @@ inline void CSV2IntArr_CODE(const std::string &source, TList &dest, const typena
         dest.push_back(def);
 }
 
-void util::CSV2IntArr(std::string source, std::vector<int> &dest)
+void util::CSV2IntArr(const std::string &source, std::vector<int> &dest)
 {
     CSV2IntArr_CODE(source, dest, 0);
 }
 
-void util::CSV2DoubleArr(std::string source, std::vector<double> &dest)
+void util::CSV2DoubleArr(const std::string &source, std::vector<double> &dest)
 {
     CSV2IntArr_CODE(source, dest, 0.0);
 }

@@ -23,6 +23,7 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#pragma once
 #ifndef TOUCHSCREEN_H
 #define TOUCHSCREEN_H
 
@@ -237,7 +238,7 @@ public:
     /*!
      * \brief Constructor
      */
-    TouchScreenController();
+    TouchScreenController() noexcept;
 
     /*!
      * \brief Destructor

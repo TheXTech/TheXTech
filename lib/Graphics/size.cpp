@@ -37,9 +37,6 @@ PGE_Size::PGE_Size(int w, int h)
     m_h = h;
 }
 
-PGE_Size::~PGE_Size()
-{}
-
 void PGE_Size::setSize(int w, int h)
 {
     m_w = w;

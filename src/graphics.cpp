@@ -24,6 +24,9 @@
 #include "game_main.h"
 #include "sound.h"
 #include "change_res.h"
+#include "main/game_info.h"
+#include "core/render.h"
+#include "core/events.h"
 
 #include "pseudo_vb.h"
 
@@ -31,8 +34,11 @@
 
 
 //  Get the screen position
-void GetvScreen(int A)
+void GetvScreen(const int A)
 {
+    auto &p = Player[A];
+    auto &pLoc = p.Location;
+
     // Netplay code, disabled
 //    if(ScreenType == 8)
 //    {
@@ -40,8 +46,8 @@ void GetvScreen(int A)
 //            Player[nPlay.MySlot + 1].Location.Height = 0;
 //        vScreenX[1] = -Player[nPlay.MySlot + 1].Location.X + (vScreen[1].Width * 0.5) - Player[nPlay.MySlot + 1].Location.Width / 2.0;
 //        vScreenY[1] = -Player[nPlay.MySlot + 1].Location.Y + (vScreen[1].Height * 0.5) - vScreenYOffset - Player[nPlay.MySlot + 1].Location.Height;
-//        vScreenX[1] = vScreenX[1] - vScreen[1].tempX;
-//        vScreenY[1] = vScreenY[1] - vScreen[1].TempY;
+//        vScreenX[1] += -vScreen[1].tempX;
+//        vScreenY[1] += -vScreen[1].TempY;
 //        if(-vScreenX[1] < level[Player[nPlay.MySlot + 1].Section].X)
 //            vScreenX[1] = -level[Player[nPlay.MySlot + 1].Section].X;
 //        if(-vScreenX[1] + vScreen[1].Width > level[Player[nPlay.MySlot + 1].Section].Width)
@@ -51,56 +57,56 @@ void GetvScreen(int A)
 //        if(-vScreenY[1] + vScreen[1].Height > level[Player[nPlay.MySlot + 1].Section].Height)
 //            vScreenY[1] = -(level[Player[nPlay.MySlot + 1].Section].Height - vScreen[1].Height);
 //        if(vScreen[1].TempDelay > 0)
-//            vScreen[1].TempDelay = vScreen[1].TempDelay - 1;
+//            vScreen[1].TempDelay -= 1;
 //        else
 //        {
 //            if(vScreen[1].tempX > 0)
-//                vScreen[1].tempX = vScreen[1].tempX - 1;
+//                vScreen[1].tempX -= 1;
 //            if(vScreen[1].tempX < 0)
-//                vScreen[1].tempX = vScreen[1].tempX + 1;
+//                vScreen[1].tempX += 1;
 //            if(vScreen[1].TempY > 0)
-//                vScreen[1].TempY = vScreen[1].TempY - 1;
+//                vScreen[1].TempY -= 1;
 //            if(vScreen[1].TempY < 0)
-//                vScreen[1].TempY = vScreen[1].TempY + 1;
+//                vScreen[1].TempY += 1;
 //        }
 //        if(Player[nPlay.MySlot + 1].Mount == 2)
 //            Player[nPlay.MySlot + 1].Location.Height = 128;
 //    }
 //    else
     {
-        if(Player[A].Mount == 2)
-            Player[A].Location.Height = 0;
+        if(p.Mount == 2)
+            pLoc.Height = 0;
         // this guard is new because players can now respawn in 1P mode through DropAdd
         if(Player[A].Effect != 6)
         {
-            vScreenX[A] = -Player[A].Location.X + (vScreen[A].Width * 0.5) - Player[A].Location.Width / 2.0;
-            vScreenY[A] = -Player[A].Location.Y + (vScreen[A].Height * 0.5) - vScreenYOffset - Player[A].Location.Height;
-            vScreenX[A] = vScreenX[A] - vScreen[A].tempX;
-            vScreenY[A] = vScreenY[A] - vScreen[A].TempY;
-            if(-vScreenX[A] < level[Player[A].Section].X)
-                vScreenX[A] = -level[Player[A].Section].X;
-            if(-vScreenX[A] + vScreen[A].Width > level[Player[A].Section].Width)
-                vScreenX[A] = -(level[Player[A].Section].Width - vScreen[A].Width);
-            if(-vScreenY[A] < level[Player[A].Section].Y)
-                vScreenY[A] = -level[Player[A].Section].Y;
-            if(-vScreenY[A] + vScreen[A].Height > level[Player[A].Section].Height)
-                vScreenY[A] = -(level[Player[A].Section].Height - vScreen[A].Height);
+            vScreenX[A] = -pLoc.X + (vScreen[A].Width * 0.5) - pLoc.Width / 2.0;
+            vScreenY[A] = -pLoc.Y + (vScreen[A].Height * 0.5) - vScreenYOffset - pLoc.Height;
+            vScreenX[A] += -vScreen[A].tempX;
+            vScreenY[A] += -vScreen[A].TempY;
+            if(-vScreenX[A] < level[p.Section].X)
+                vScreenX[A] = -level[p.Section].X;
+            if(-vScreenX[A] + vScreen[A].Width > level[p.Section].Width)
+                vScreenX[A] = -(level[p.Section].Width - vScreen[A].Width);
+            if(-vScreenY[A] < level[p.Section].Y)
+                vScreenY[A] = -level[p.Section].Y;
+            if(-vScreenY[A] + vScreen[A].Height > level[p.Section].Height)
+                vScreenY[A] = -(level[p.Section].Height - vScreen[A].Height);
         }
         if(vScreen[A].TempDelay > 0)
-            vScreen[A].TempDelay = vScreen[A].TempDelay - 1;
+            vScreen[A].TempDelay -= 1;
         else
         {
             if(vScreen[A].tempX > 0)
-                vScreen[A].tempX = vScreen[A].tempX - 1;
+                vScreen[A].tempX -= 1;
             if(vScreen[A].tempX < 0)
-                vScreen[A].tempX = vScreen[A].tempX + 1;
+                vScreen[A].tempX += 1;
             if(vScreen[A].TempY > 0)
-                vScreen[A].TempY = vScreen[A].TempY - 1;
+                vScreen[A].TempY -= 1;
             if(vScreen[A].TempY < 0)
-                vScreen[A].TempY = vScreen[A].TempY + 1;
+                vScreen[A].TempY += 1;
         }
-        if(Player[A].Mount == 2)
-            Player[A].Location.Height = 128;
+        if(p.Mount == 2)
+            pLoc.Height = 128;
     }
 }
 
@@ -123,12 +129,12 @@ void GetvScreenAverage()
     {
         if(!Player[A].Dead && Player[A].Effect != 6)
         {
-            vScreenX[1] = vScreenX[1] - Player[A].Location.X - Player[A].Location.Width / 2.0;
+            vScreenX[1] += -Player[A].Location.X - Player[A].Location.Width / 2.0;
             if(Player[A].Mount == 2)
-                vScreenY[1] = vScreenY[1] - Player[A].Location.Y;
+                vScreenY[1] += -Player[A].Location.Y;
             else
-                vScreenY[1] = vScreenY[1] - Player[A].Location.Y - Player[A].Location.Height;
-            B = B + 1;
+                vScreenY[1] += -Player[A].Location.Y - Player[A].Location.Height;
+            B += 1;
         }
     }
 
@@ -172,25 +178,29 @@ void GetvScreenAverage()
 // Get the average screen position for all players with no level edge detection
 void GetvScreenAverage2()
 {
-    int A = 0;
+    // int A = 0;
     int B = 0;
     vScreenX[1] = 0;
     vScreenY[1] = 0;
-    for(A = 1; A <= numPlayers; A++)
+
+    for(int A = 1; A <= numPlayers; A++)
     {
-        if(Player[A].Dead == false)
+        if(!Player[A].Dead)
         {
-            vScreenX[1] = vScreenX[1] - Player[A].Location.X - Player[A].Location.Width / 2.0;
+            vScreenX[1] += -Player[A].Location.X - Player[A].Location.Width / 2.0;
             if(Player[A].Mount == 2)
-                vScreenY[1] = vScreenY[1] - Player[A].Location.Y;
+                vScreenY[1] += -Player[A].Location.Y;
             else
-                vScreenY[1] = vScreenY[1] - Player[A].Location.Y - Player[A].Location.Height;
-            B = B + 1;
+                vScreenY[1] += -Player[A].Location.Y - Player[A].Location.Height;
+            B += 1;
         }
     }
-    A = 1;
+
+    //A = 1; // Stored value gets never read
+
     if(B == 0)
         return;
+
     vScreenX[1] = (vScreenX[1] / B) + (ScreenW * 0.5);
     vScreenY[1] = (vScreenY[1] / B) + (ScreenH * 0.5) - vScreenYOffset;
 }
@@ -265,7 +275,7 @@ void PlayerWarpGFX(int A, Location_t &tempLocation, float &X2, float &Y2)
             {
                 Y2 = float(warp_enter.Y - tempLocation.Y);
                 tempLocation.Y = warp_enter.Y;
-                tempLocation.Height = tempLocation.Height - Y2;
+                tempLocation.Height += -Y2;
             }
         }
         else if(warp_dir_enter == 4) // Moving right
@@ -292,7 +302,7 @@ void PlayerWarpGFX(int A, Location_t &tempLocation, float &X2, float &Y2)
             {
                 Y2 = float(warp_exit.Y - tempLocation.Y);
                 tempLocation.Y = warp_exit.Y;
-                tempLocation.Height = tempLocation.Height - double(Y2);
+                tempLocation.Height += -double(Y2);
             }
         }
         else if(warp_dir_exit == 4) // Moving left
@@ -348,7 +358,7 @@ void NPCWarpGFX(int A, Location_t &tempLocation, float &X2, float &Y2)
             {
                 Y2 = float(warp_enter.Y - tempLocation.Y);
                 tempLocation.Y = warp_enter.Y;
-                tempLocation.Height = tempLocation.Height - double(Y2);
+                tempLocation.Height += -double(Y2);
             }
         }
         else if(warp_dir_enter == 4) // Moving right
@@ -375,7 +385,7 @@ void NPCWarpGFX(int A, Location_t &tempLocation, float &X2, float &Y2)
             {
                 Y2 = float(warp_exit.Y - tempLocation.Y);
                 tempLocation.Y = warp_exit.Y;
-                tempLocation.Height = tempLocation.Height - double(Y2);
+                tempLocation.Height += -double(Y2);
             }
         }
         else if(warp_dir_exit == 4) // Moving left
@@ -410,7 +420,7 @@ void ChangeScreen()
 //        SetOrigRes
         SetOrigRes();
 //        DoEvents
-        DoEvents();
+        XEvents::doEvents();
 //        DeleteDC myBackBuffer
 //        DeleteObject myBufferBMP
 //        DoEvents
@@ -429,21 +439,21 @@ void ChangeScreen()
 //        frmMain.Width = 12240
 //        frmMain.Height = 9570
 //        Do While frmMain.ScaleWidth > 800
-//            frmMain.Width = frmMain.Width - 5
+//            frmMain.Width += -5
 //        Loop
 //        Do While frmMain.ScaleHeight > 600
-//            frmMain.Height = frmMain.Height - 5
+//            frmMain.Height += -5
 //        Loop
 //        Do While frmMain.ScaleWidth < 800
-//            frmMain.Width = frmMain.Width + 5
+//            frmMain.Width += 5
 //        Loop
 //        Do While frmMain.ScaleHeight < 600
-//            frmMain.Height = frmMain.Height + 5
+//            frmMain.Height += 5
 //        Loop
 //        SetRes
         SetRes();
 //        DoEvents
-        DoEvents();
+        XEvents::doEvents();
 //        DeleteDC myBackBuffer
 //        DeleteObject myBufferBMP
 //        DoEvents
@@ -465,23 +475,27 @@ void GetvScreenCredits()
 {
     int A = 0;
     int B = 0;
+
     vScreenX[1] = 0;
     vScreenY[1] = 0;
+
     for(A = 1; A <= numPlayers; A++)
     {
-        if(Player[A].Dead == false && Player[A].Effect != 6)
+        if((!Player[A].Dead || g_gameInfo.outroDeadMode) && Player[A].Effect != 6)
         {
-            vScreenX[1] = vScreenX[1] - Player[A].Location.X - Player[A].Location.Width / 2.0;
+            vScreenX[1] += -Player[A].Location.X - Player[A].Location.Width / 2.0;
             if(Player[A].Mount == 2)
-                vScreenY[1] = vScreenY[1] - Player[A].Location.Y;
+                vScreenY[1] += -Player[A].Location.Y;
             else
-                vScreenY[1] = vScreenY[1] - Player[A].Location.Y - Player[A].Location.Height;
-            B = B + 1;
+                vScreenY[1] += -Player[A].Location.Y - Player[A].Location.Height;
+            B++;
         }
     }
+
     A = 1;
     if(B == 0)
         return;
+
     vScreenX[1] = (vScreenX[1] / B) + (ScreenW * 0.5);
     vScreenY[1] = (vScreenY[1] / B) + (ScreenH * 0.5) - vScreenYOffset;
     if(-vScreenX[A] < level[Player[1].Section].X)
@@ -494,13 +508,17 @@ void GetvScreenCredits()
         vScreenY[A] = -(level[Player[1].Section].Height - ScreenH) - 100;
 }
 
-int pfrX(int plrFrame)
+int pfrXo(int plrFrame)
 {
+#if 1
+    return pfrX(plrFrame - 100);
+#else
+    // Old Redigit's code, does the same as a small one-line formula
     int A;
     A = plrFrame;
-    A = A - 50;
+    A -= 50;
     while(A > 100)
-        A = A - 100;
+        A -= 100;
     if(A > 90)
         A = 9;
     else if(A > 90)
@@ -524,27 +542,43 @@ int pfrX(int plrFrame)
     else
         A = 0;
     return A * 100;
+#endif
+}
+
+int pfrYo(int plrFrame)
+{
+#if 1
+    return pfrX(plrFrame - 100);
+#else
+    // Old Redigit's code, does the same as a small one-line formula
+    int A;
+    A = plrFrame;
+    A -= 50;
+    while(A > 100)
+        A -= 100;
+    A -= 1;
+    while(A > 9)
+        A -= 10;
+    return A * 100;
+#endif
+}
+
+int pfrX(int plrFrame)
+{
+    return ((plrFrame + 49) / 10) * 100;
 }
 
 int pfrY(int plrFrame)
 {
-    int A;
-    A = plrFrame;
-    A = A - 50;
-    while(A > 100)
-        A = A - 100;
-    A = A - 1;
-    while(A > 9)
-        A = A - 10;
-    return A * 100;
+    return ((plrFrame + 49) % 10) * 100;
 }
 
 void ScreenShot()
 {
-#ifndef __EMSCRIPTEN__
-    frmMain.setTargetTexture();
-    frmMain.makeShot();
-    frmMain.setTargetScreen();
+#ifdef USE_SCREENSHOTS_AND_RECS
+    XRender::setTargetTexture();
+    XRender::makeShot();
+    XRender::setTargetScreen();
     PlaySound(SFX_GotItem);
 #endif
     TakeScreen = false;
@@ -559,30 +593,38 @@ void DrawFrozenNPC(int Z, int A)
     {
 // draw npc
         float c = n.Shadow ? 0.f : 1.f;
+        int content = int(n.Special);
+        int contentFrame = int(n.Special2);
 
-        frmMain.renderTexture(int(vScreenX[Z] + n.Location.X + 2),
-                              int(vScreenY[Z] + n.Location.Y + 2),
-                              int(n.Location.Width - 4),
-                              int(n.Location.Height - 4),
-                              GFXNPCBMP[int(n.Special)],
-                              2, 2 + int(n.Special2) * NPCHeight[int(n.Special)], c, c, c);
+        // SDL_assert_release(content >= 0 && content <= maxNPCType);
+
+        // Draw frozen NPC body in only condition the content value is valid
+        if(content > 0 && content <= maxNPCType)
+        {
+             XRender::renderTexture(float(vScreenX[Z] + n.Location.X + 2),
+                                    float(vScreenY[Z] + n.Location.Y + 2),
+                                    float(n.Location.Width - 4),
+                                    float(n.Location.Height - 4),
+                                    GFXNPCBMP[content],
+                                    2, 2 + contentFrame * NPCHeight[content], c, c, c);
+        }
 
         // draw ice
-        frmMain.renderTexture(int(vScreenX[Z] + n.Location.X + NPCFrameOffsetX[n.Type]),
-                              int(vScreenY[Z] + n.Location.Y + NPCFrameOffsetY[n.Type]),
-                              int(n.Location.Width - 6), int(n.Location.Height - 6),
-                              GFXNPCBMP[n.Type], 0, 0, c, c, c);
-        frmMain.renderTexture(int(vScreenX[Z] + n.Location.X + NPCFrameOffsetX[n.Type] + n.Location.Width - 6),
-                              int(vScreenY[Z] + n.Location.Y + NPCFrameOffsetY[n.Type]),
-                              6, int(n.Location.Height - 6),
-                              GFXNPCBMP[n.Type], 128 - 6, 0, c, c, c);
-        frmMain.renderTexture(int(vScreenX[Z] + n.Location.X + NPCFrameOffsetX[n.Type]),
-                              int(vScreenY[Z] + n.Location.Y + NPCFrameOffsetY[n.Type] + n.Location.Height - 6),
-                              int(n.Location.Width - 6), 6,
-                              GFXNPCBMP[n.Type], 0, 128 - 6, c, c, c);
-        frmMain.renderTexture(int(vScreenX[Z] + n.Location.X + NPCFrameOffsetX[n.Type] + n.Location.Width - 6),
-                              int(vScreenY[Z] + n.Location.Y + NPCFrameOffsetY[n.Type] + n.Location.Height - 6),
-                              6, 6, GFXNPCBMP[n.Type],
-                              128 - 6, 128 - 6, c, c, c);
+         XRender::renderTexture(float(vScreenX[Z] + n.Location.X + NPCFrameOffsetX[n.Type]),
+                                float(vScreenY[Z] + n.Location.Y + NPCFrameOffsetY[n.Type]),
+                                float(n.Location.Width - 6), float(n.Location.Height - 6),
+                                GFXNPCBMP[n.Type], 0, 0, c, c, c);
+         XRender::renderTexture(float(vScreenX[Z] + n.Location.X + NPCFrameOffsetX[n.Type] + n.Location.Width - 6),
+                                float(vScreenY[Z] + n.Location.Y + NPCFrameOffsetY[n.Type]),
+                                6, float(n.Location.Height - 6),
+                                GFXNPCBMP[n.Type], 128 - 6, 0, c, c, c);
+         XRender::renderTexture(float(vScreenX[Z] + n.Location.X + NPCFrameOffsetX[n.Type]),
+                                float(vScreenY[Z] + n.Location.Y + NPCFrameOffsetY[n.Type] + n.Location.Height - 6),
+                                float(n.Location.Width - 6), 6,
+                                GFXNPCBMP[n.Type], 0, 128 - 6, c, c, c);
+         XRender::renderTexture(float(vScreenX[Z] + n.Location.X + NPCFrameOffsetX[n.Type] + n.Location.Width - 6),
+                                float(vScreenY[Z] + n.Location.Y + NPCFrameOffsetY[n.Type] + n.Location.Height - 6),
+                                6, 6, GFXNPCBMP[n.Type],
+                                128 - 6, 128 - 6, c, c, c);
     }
 }

@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=@DESKTOP_NAME@
+GenericName=@DESKTOP_GENERIC_NAME@
+Comment=@DESKTOP_COMMENT@
+Encoding=UTF-8
+Version=1.0
+Type=Application
+Terminal=false
+Icon=@DESKTOP_ICON@
+Exec=@DESKTOP_EXEC@ @F
+Categories=Game;
+StartupWMClass=@DESKTOP_WMCLASS@

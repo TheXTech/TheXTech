@@ -21,9 +21,13 @@
 #include <SDL2/SDL.h>
 
 #include "game_main.h"
+#include "frm_main.h"
+#include "gfx.h"
 #include "sound.h"
 #include "video.h"
+#include "main/presetup.h"
 #include "main/game_info.h"
+#include "main/speedrunner.h"
 #include "compat.h"
 #include "controls.h"
 #include <AppPath/app_path.h>
@@ -135,6 +139,7 @@ extern "C"
 int main(int argc, char**argv)
 {
     CmdLineSetup_t setup;
+    FrmMain frmMain;
 
     CrashHandler::initSigs();
 
@@ -249,7 +254,7 @@ int main(int argc, char**argv)
 
         TCLAP::SwitchArg switchVerboseLog(std::string(), "verbose", "Enable log output into the terminal", false);
 
-        TCLAP::UnlabeledValueArg<std::string> inputFileNames("levelpath", "Path to level file or replay data to run the test", false, std::string(), "path to file");
+        TCLAP::UnlabeledMultiArg<std::string> inputFileNames("levelpath", "Path to level file or replay data to run the test", false, std::string(), "path to file");
 
         cmd.add(&switchFrameSkip);
         cmd.add(&switchDisableFrameSkip);
@@ -279,48 +284,68 @@ int main(int argc, char**argv)
             AppPath = AppPathManager::assetsRoot();
         }
 
-        setup.frameSkip = !switchDisableFrameSkip.getValue() && (switchFrameSkip.getValue() || g_videoSettings.enableFrameSkip);
-        setup.noSound   = switchNoSound.getValue() || g_audioSetup.disableSound;
-        setup.neverPause = switchNoPause.getValue() || g_videoSettings.allowBgWork;
-        setup.allowBgInput = switchBgInput.getValue() || g_videoSettings.allowBgControllerInput;
+        if(switchDisableFrameSkip.isSet())
+            setup.frameSkip = !switchDisableFrameSkip.getValue();
+        else if(switchFrameSkip.isSet())
+            setup.frameSkip = switchFrameSkip.getValue();
+        else
+            setup.frameSkip = g_videoSettings.enableFrameSkip;
+
+        setup.noSound   = switchNoSound.isSet() ? switchNoSound.getValue() : g_audioSetup.disableSound;
+        setup.neverPause = switchNoPause.isSet() ? switchNoPause.getValue() : g_videoSettings.allowBgWork;
+        setup.allowBgInput = switchBgInput.isSet() ? switchBgInput.getValue() : g_videoSettings.allowBgControllerInput;
+
         if(setup.allowBgInput) // The BG-input depends on the never-pause option
             setup.neverPause = setup.allowBgInput;
 
-        std::string rt = renderType.getValue();
-        if(rt == "sw")
-            setup.renderType = SDL_RENDERER_SOFTWARE;
-        else if(rt == "vsync")
-            setup.renderType = RENDER_ACCELERATED_VSYNC;
-        else if(rt == "hw")
-            setup.renderType = RENDER_ACCELERATED;
-
-        if(setup.renderType > RENDER_AUTO)
-            g_videoSettings.renderMode = setup.renderType;
+        if(renderType.isSet())
+        {
+            std::string rt = renderType.getValue();
+            if(rt == "sw")
+                setup.renderType = RENDER_SOFTWARE;
+            else if(rt == "vsync")
+                setup.renderType = RENDER_ACCELERATED_VSYNC;
+            else if(rt == "hw")
+                setup.renderType = RENDER_ACCELERATED;
+            else
+            {
+                std::cerr << "Error: Invalid value for the --render argument: " << rt << std::endl;
+                std::cerr.flush();
+                return 2;
+            }
+#ifdef DEBUG_BUILD
+            std::cerr << "Manually selected renderer:" << rt << " - " << setup.renderType << std::endl;
+            std::cerr.flush();
+#endif
+        }
+        else
+        {
+            setup.renderType = g_videoSettings.renderMode;
+        }
 
         setup.testLevel = testLevel.getValue();
 
-        if(!inputFileNames.getValue().empty())
+        if(inputFileNames.isSet())
         {
-            auto fpath = inputFileNames.getValue();
-            if(Files::hasSuffix(fpath, ".lvl") || Files::hasSuffix(fpath, ".lvlx"))
+            for(const auto &fpath : inputFileNames.getValue())
             {
-                setup.testLevel = fpath;
-            }
+                if(Files::hasSuffix(fpath, ".lvl") || Files::hasSuffix(fpath, ".lvlx"))
+                    setup.testLevel = fpath;
+                else if(Files::hasSuffix(fpath, ".rec"))
+                    setup.testReplay = fpath;
 
-            if(Files::hasSuffix(fpath, ".rec"))
-            {
-                setup.testLevel = fpath;
-            }
+//                //TODO: Implement a world map running and testing
+//                else if(Files::hasSuffix(fpath, ".wld") || Files::hasSuffix(fpath, ".wldx"))
+//                {
 
-            //TODO: Implement a world map running and testing
-//            if(Files::hasSuffix(fpath, ".wld") || Files::hasSuffix(fpath, ".wldx"))
-//            {
-//
-//            }
+//                }
+            }
         }
 
         setup.verboseLogging = switchVerboseLog.getValue();
+#ifdef THEXTECH_INTERPROC_SUPPORTED
         setup.interprocess = switchTestInterprocess.getValue();
+#endif
         setup.testLevelMode = !setup.testLevel.empty() || setup.interprocess;
         setup.testNumPlayers = int(numPlayers.getValue());
         if(setup.testNumPlayers > 2)
@@ -334,29 +359,44 @@ int main(int argc, char**argv)
 
         setup.testGodMode = switchTestGodMode.getValue();
         setup.testGrabAll = switchTestGrabAll.getValue();
-        setup.testShowFPS = switchTestShowFPS.getValue() || g_videoSettings.showFrameRate;
+        setup.testShowFPS = switchTestShowFPS.isSet() ?
+                                switchTestShowFPS.getValue() :
+                                g_videoSettings.showFrameRate;
         setup.testMaxFPS = switchTestMaxFPS.getValue();
         setup.testMagicHand = switchTestMagicHand.getValue();
 
-        std::string compatModeVal = compatLevel.getValue();
-        if(compatModeVal == "smbx2")
-            setup.compatibilityLevel = COMPAT_SMBX2;
-        else if(compatModeVal == "smbx13")
-            setup.compatibilityLevel = COMPAT_SMBX13;
-        else if(compatModeVal == "modern")
-            setup.compatibilityLevel = COMPAT_MODERN;
+        if(compatLevel.isSet())
+        {
+            std::string compatModeVal = compatLevel.getValue();
+            if(compatModeVal == "smbx2")
+                setup.compatibilityLevel = COMPAT_SMBX2;
+            else if(compatModeVal == "smbx13")
+                setup.compatibilityLevel = COMPAT_SMBX13;
+            else if(compatModeVal == "modern")
+                setup.compatibilityLevel = COMPAT_MODERN;
+            else
+            {
+                std::cerr << "Error: Invalid value for the --compat-level argument: " << compatModeVal << std::endl;
+                std::cerr.flush();
+                return 2;
+            }
+        }
         else
         {
-            std::cerr << "Error: Invalid value for the --compat-level argument: " << compatModeVal << std::endl;
-            std::cerr.flush();
-            return 2;
+            setup.compatibilityLevel = g_preSetup.compatibilityMode;
         }
 
-        setup.speedRunnerMode = speedRunMode.getValue();
-        setup.speedRunnerSemiTransparent = switchSpeedRunSemiTransparent.getValue();
-        setup.showControllerState = switchDisplayControls.getValue();
+        setup.speedRunnerMode = speedRunMode.isSet() ?
+                                    speedRunMode.getValue() :
+                                    g_preSetup.speedRunMode;
+        setup.speedRunnerSemiTransparent = switchSpeedRunSemiTransparent.isSet() ?
+                                            switchSpeedRunSemiTransparent.getValue() :
+                                            g_preSetup.speedRunSemiTransparentTimer;
+        setup.showControllerState = switchDisplayControls.isSet() ?
+                                        switchDisplayControls.getValue() :
+                                        g_drawController;
 
-        if(showBatteryStatus.getValue() > 0 && showBatteryStatus.getValue() <= 4)
+        if(showBatteryStatus.isSet() && IF_INRANGE(showBatteryStatus.getValue(), 1, 4))
             g_videoSettings.batteryStatus = showBatteryStatus.getValue();
 
         if(setup.speedRunnerMode >= 1) // Always show FPS and don't pause the game work when focusing other windows
@@ -377,9 +417,9 @@ int main(int argc, char**argv)
     // set this flag before SDL initialization to allow game be quit when closing a window before a loading process will be completed
     GameIsActive = true;
 
-    if(frmMain.initSDL(setup))
+    if(frmMain.initSystem(setup))
     {
-        frmMain.freeSDL();
+        frmMain.freeSystem();
         return 1;
     }
 
@@ -413,7 +453,7 @@ int main(int argc, char**argv)
 
     Controls::Quit();
 
-    frmMain.freeSDL();
+    frmMain.freeSystem();
 
     return ret;
 }

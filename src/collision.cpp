@@ -322,7 +322,7 @@ int BootCollision(const Location_t &Loc1, const Location_t &Loc2, bool StandOn)
     {
         if(Loc1.Y + Loc1.Height - Loc1.SpeedY <= Loc2.Y - Loc2.SpeedY + 16)
         {
-            if(Loc1.SpeedY > Loc2.SpeedY || StandOn == true)
+            if(Loc1.SpeedY > Loc2.SpeedY || StandOn)
             {
                 tempBootCollision = COLLISION_TOP;
             }
@@ -772,4 +772,24 @@ void CompareNpcWalkBlock(int &tempHitBlock, int &tempHitOldBlock,
             }
         }
     }
+}
+
+bool SectionCollision(const int section, const Location_t &loc)
+{
+    const auto &sec = level[section];
+    const double gap = 64.0;
+
+    if(loc.X + loc.Width < sec.X - gap)
+        return false;
+
+    if(loc.X > sec.Width + gap)
+        return false;
+
+    if(loc.Y + loc.Height < sec.Y - gap)
+        return false;
+
+    if(loc.Y > sec.Height)
+        return false;
+
+    return true;
 }

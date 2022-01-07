@@ -21,7 +21,7 @@
 #include <SDL2/SDL_timer.h>
 #include <SDL2/SDL_thread.h>
 #include <fmt_format_ne.h>
-#include <atomic>
+#include <array>
 
 #include <AppPath/app_path.h>
 #include <DirManager/dirman.h>
@@ -30,6 +30,7 @@
 
 #include "menu_main.h"
 #include "game_info.h"
+#include "../gfx.h"
 #include "screen_connect.h"
 #include "menu_controls.h"
 
@@ -39,6 +40,9 @@
 #include "../player.h"
 #include "../collision.h"
 #include "../graphics.h"
+#include "../core/render.h"
+#include "../core/window.h"
+#include "../core/events.h"
 #include "../controls.h"
 #include "../config.h"
 #include "../compat.h"
@@ -61,6 +65,7 @@ void initMainMenu()
     SDL_AtomicSet(&loadingProgrss, 0);
     SDL_AtomicSet(&loadingProgrssMax, 0);
 
+    g_mainMenu.mainStartGame = "Start Game";
     g_mainMenu.main1PlayerGame = "1 Player Game";
     g_mainMenu.mainMultiplayerGame = "2 Player Game";
     g_mainMenu.mainBattleGame = "Battle Game";
@@ -113,6 +118,10 @@ static int menuBattleMode = false;
 
 static int menuCopySaveSrc = 0;
 static int menuCopySaveDst = 0;
+static int menuRecentEpisode = -1;
+
+static int listMenuLastScroll = 0;
+static int listMenuLastCursor = 0;
 
 static int FindWorldsThread(void *)
 {
@@ -120,18 +129,31 @@ static int FindWorldsThread(void *)
     return 0;
 }
 
-void FindWorlds()
-{
-    NumSelectWorld = 0;
-
-    std::vector<std::string> worldRoots;
-    worldRoots.push_back(AppPath + "worlds/");
 #if (defined(__APPLE__) && defined(USE_BUNDLED_ASSETS)) || defined(FIXED_ASSETS_PATH)
-    worldRoots.push_back(AppPathManager::userWorldsRootDir() + "/");
+#   define USER_WORLDS_NEEDED
+#   define WORLD_ROOTS_SIZE 2
+#else
+#   define WORLD_ROOTS_SIZE 1
 #endif
 
+void FindWorlds()
+{
+    bool compatModern = (CompatGetLevel() == COMPAT_MODERN);
+    NumSelectWorld = 0;
+    menuRecentEpisode = -1;
+
+    // will probably change back to vector since
+    // multiple world packages can be used on 3DS
+    std::array<std::string, WORLD_ROOTS_SIZE> worldRoots =
+    {
+        AppPath + "worlds/"
+#ifdef USER_WORLDS_NEEDED
+        , AppPathManager::userWorldsRootDir() + "/"
+#endif
+    };
+
     SelectWorld.clear();
-    SelectWorld.push_back(SelectWorld_t()); // Dummy entry
+    SelectWorld.emplace_back(SelectWorld_t()); // Dummy entry
 
     SDL_AtomicSet(&loadingProgrss, 0);
     SDL_AtomicSet(&loadingProgrssMax, 0);
@@ -141,7 +163,7 @@ void FindWorlds()
         std::vector<std::string> dirs;
         DirMan episodes(worldsRoot);
         episodes.getListOfFolders(dirs);
-        SDL_AtomicAdd(&loadingProgrssMax, dirs.size());
+        SDL_AtomicAdd(&loadingProgrssMax, (int)dirs.size());
     }
 
     for(const auto &worldsRoot : worldRoots)
@@ -171,11 +193,22 @@ void FindWorlds()
                     w.WorldFile = fName;
                     if(w.WorldName.empty())
                         w.WorldName = fName;
+
                     w.blockChar[1] = head.nocharacter1;
                     w.blockChar[2] = head.nocharacter2;
-                    w.blockChar[3] = head.nocharacter3;
-                    w.blockChar[4] = head.nocharacter4;
-                    w.blockChar[5] = head.nocharacter5;
+
+                    if(head.meta.RecentFormat != LevelData::SMBX64 || head.meta.RecentFormatVersion >= 30 || !compatModern)
+                    {
+                        w.blockChar[3] = head.nocharacter3;
+                        w.blockChar[4] = head.nocharacter4;
+                        w.blockChar[5] = head.nocharacter5;
+                    }
+                    else
+                    {
+                        w.blockChar[3] = true;
+                        w.blockChar[4] = true;
+                        w.blockChar[5] = true;
+                    }
 
                     SelectWorld.push_back(w);
                 }
@@ -185,7 +218,34 @@ void FindWorlds()
         }
     }
 
-    NumSelectWorld = (SelectWorld.size() - 1);
+    // Sort all worlds by alphabetical order
+    std::sort(SelectWorld.begin(), SelectWorld.end(), [](const SelectWorld_t &a, const SelectWorld_t &b)
+    {
+        return a.WorldName < b.WorldName;
+    });
+
+    if((MenuMode == MENU_1PLAYER_GAME && !g_recentWorld1p.empty()) ||
+       (MenuMode == MENU_2PLAYER_GAME && !g_recentWorld2p.empty()))
+    {
+        for(size_t i = 1; i < SelectWorld.size(); ++i)
+        {
+            auto &w = SelectWorld[i];
+            const std::string wPath = w.WorldPath + w.WorldFile;
+
+            if((MenuMode == MENU_1PLAYER_GAME && wPath == g_recentWorld1p) ||
+               (MenuMode == MENU_2PLAYER_GAME && wPath == g_recentWorld2p))
+            {
+                menuRecentEpisode = i - 1;
+                w.highlight = true;
+            }
+        }
+
+        if(menuRecentEpisode >= 0)
+            worldCurs = menuRecentEpisode - 3;
+    }
+
+    NumSelectWorld = (int)(SelectWorld.size() - 1);
+    MenuCursor = (menuRecentEpisode < 0) ? 0 : menuRecentEpisode;
 
     SDL_AtomicSet(&loading, 0);
 }
@@ -198,17 +258,19 @@ static int FindLevelsThread(void *)
 
 void FindLevels()
 {
-    std::vector<std::string> battleRoots;
-    battleRoots.push_back(AppPath + "battle/");
-#if (defined(__APPLE__) && defined(USE_BUNDLED_ASSETS)) || defined(FIXED_ASSETS_PATH)
-    battleRoots.push_back(AppPathManager::userBattleRootDir() + "/");
+    std::array<std::string, WORLD_ROOTS_SIZE> battleRoots =
+    {
+        AppPath + "battle/"
+#ifdef USER_WORLDS_NEEDED
+        , AppPathManager::userBattleRootDir() + "/"
 #endif
+    };
 
     SelectWorld.clear();
-    SelectWorld.push_back(SelectWorld_t()); // Dummy entry
+    SelectWorld.emplace_back(SelectWorld_t()); // Dummy entry
 
     NumSelectWorld = 1;
-    SelectWorld.push_back(SelectWorld_t()); // "random level" entry
+    SelectWorld.emplace_back(SelectWorld_t()); // "random level" entry
     SelectWorld[1].WorldName = "Random Level";
     LevelData head;
 
@@ -220,7 +282,7 @@ void FindLevels()
         std::vector<std::string> files;
         DirMan battleLvls(battleRoot);
         battleLvls.getListOfFiles(files, {".lvl", ".lvlx"});
-        SDL_AtomicAdd(&loadingProgrssMax, files.size());
+        SDL_AtomicAdd(&loadingProgrssMax, (int)files.size());
     }
 
     for(const auto &battleRoot : battleRoots)
@@ -307,10 +369,10 @@ bool mainMenuUpdate()
         menuDoPress = false;
 
     {
-        if(frmMain.MousePointer != 99)
+        if(XWindow::getCursor() != AbstractWindow_t::CURSOR_NONE)
         {
-            frmMain.MousePointer = 99;
-            showCursor(0);
+            XWindow::setCursor(AbstractWindow_t::CURSOR_NONE);
+            XWindow::showCursor(0);
         }
 
         {
@@ -324,7 +386,6 @@ bool mainMenuUpdate()
 
             if(!k)
                 MenuCursorCanMove = true;
-
         }
 
         if(!g_pollingInput && (MenuMode != MENU_CHARACTER_SELECT_NEW && MenuMode != MENU_CHARACTER_SELECT_NEW_BM))
@@ -389,10 +450,10 @@ bool mainMenuUpdate()
                     {
                         int i = 0;
                         if(A == i++)
-                            menuLen = 18 * g_mainMenu.main1PlayerGame.size() - 2;
-                        else if(A == i++)
+                            menuLen = 18 * (g_gameInfo.disableTwoPlayer ? g_mainMenu.main1PlayerGame.size() : g_mainMenu.mainStartGame.size()) - 2;
+                        else if(!g_gameInfo.disableTwoPlayer && A == i++)
                             menuLen = 18 * g_mainMenu.mainMultiplayerGame.size() - 2;
-                        else if(A == i++)
+                        else if(!g_gameInfo.disableBattleMode && A == i++)
                             menuLen = 18 * g_mainMenu.mainBattleGame.size();
                         else if(A == i++)
                             menuLen = 18 * g_mainMenu.mainOptions.size();
@@ -418,7 +479,11 @@ bool mainMenuUpdate()
 
             if(menuBackPress && MenuCursorCanMove)
             {
-                int quitKeyPos = 4;
+                int quitKeyPos = 2;
+                if(!g_gameInfo.disableTwoPlayer)
+                    quitKeyPos ++;
+                if(!g_gameInfo.disableBattleMode)
+                    quitKeyPos ++;
 
                 if(MenuCursor != quitKeyPos)
                 {
@@ -439,15 +504,15 @@ bool mainMenuUpdate()
                     MenuMode = MENU_1PLAYER_GAME;
                     menuPlayersNum = 1;
                     menuBattleMode = false;
+                    MenuCursor = 0;
 #ifdef __EMSCRIPTEN__
                     FindWorlds();
 #else
                     SDL_AtomicSet(&loading, 1);
-                    loadingThread = SDL_CreateThread(FindWorldsThread, "FindWorlds", NULL);
+                    loadingThread = SDL_CreateThread(FindWorldsThread, "FindWorlds", nullptr);
 #endif
-                    MenuCursor = 0;
                 }
-                else if(MenuCursor == i++)
+                else if(!g_gameInfo.disableTwoPlayer && MenuCursor == i++)
                 {
                     PlaySoundMenu(SFX_Do);
                     MenuMode = MENU_2PLAYER_GAME;
@@ -456,12 +521,12 @@ bool mainMenuUpdate()
 #ifdef __EMSCRIPTEN__
                     FindWorlds();
 #else
-                    SDL_AtomicSet(&loading, 1);
-                    loadingThread = SDL_CreateThread(FindWorldsThread, "FindWorlds", NULL);
-#endif
                     MenuCursor = 0;
+                    SDL_AtomicSet(&loading, 1);
+                    loadingThread = SDL_CreateThread(FindWorldsThread, "FindWorlds", nullptr);
+#endif
                 }
-                else if(MenuCursor == i++)
+                else if(!g_gameInfo.disableBattleMode && MenuCursor == i++)
                 {
                     PlaySoundMenu(SFX_Do);
                     MenuMode = MENU_BATTLE_MODE;
@@ -484,11 +549,11 @@ bool mainMenuUpdate()
                 else if(MenuCursor == i++)
                 {
                     PlaySoundMenu(SFX_Do);
-                    frmMain.setTargetTexture();
-                    frmMain.clearBuffer();
+                    XRender::setTargetTexture();
+                    XRender::clearBuffer();
                     StopMusic();
-                    frmMain.repaint();
-                    DoEvents();
+                    XRender::repaint();
+                    XEvents::doEvents();
                     PGE_Delay(500);
                     KillIt();
                     return true;
@@ -497,7 +562,11 @@ bool mainMenuUpdate()
             }
 
 
-            int quitKeyPos = 4;
+            int quitKeyPos = 2;
+            if(!g_gameInfo.disableTwoPlayer)
+                quitKeyPos ++;
+            if(!g_gameInfo.disableBattleMode)
+                quitKeyPos ++;
             if(MenuCursor > quitKeyPos)
                 MenuCursor = 0;
             if(MenuCursor < 0)
@@ -539,6 +608,7 @@ bool mainMenuUpdate()
                 }
             }
         }
+#if 0 // old code, no longer used
         // Character Select
         else if(MenuMode == MENU_CHARACTER_SELECT_1P ||
                 MenuMode == MENU_CHARACTER_SELECT_2P_S1 ||
@@ -611,8 +681,11 @@ bool mainMenuUpdate()
                     }
                     else
                     {
-                        MenuCursor = selWorld - 1;
+                        // MenuCursor = selWorld - 1;
                         MenuMode /= MENU_CHARACTER_SELECT_BASE;
+                        // Restore menu state
+                        worldCurs = listMenuLastScroll;
+                        MenuCursor = listMenuLastCursor;
                     }
 
                     MenuCursorCanMove = false;
@@ -660,7 +733,9 @@ bool mainMenuUpdate()
                 }
             }
 
-            if(MenuMode > MENU_MAIN)
+            bool isListMenu = (MenuMode == MENU_1PLAYER_GAME || MenuMode == MENU_2PLAYER_GAME || MenuMode == MENU_BATTLE_MODE);
+
+            if(MenuMode > MENU_MAIN && !isListMenu)
             {
                 if(MenuCursor > numCharacters - 1)
                 {
@@ -686,10 +761,13 @@ bool mainMenuUpdate()
                 }
             }
 
-            while(((MenuMode == MENU_CHARACTER_SELECT_2P_S2 || MenuMode == MENU_CHARACTER_SELECT_BM_S2) && MenuCursor == PlayerCharacter - 1) ||
-                   blockCharacter[MenuCursor + 1])
+            if(!isListMenu)
             {
-                MenuCursor += 1;
+                while(((MenuMode == MENU_CHARACTER_SELECT_2P_S2 || MenuMode == MENU_CHARACTER_SELECT_BM_S2) && MenuCursor == PlayerCharacter - 1) ||
+                       blockCharacter[MenuCursor + 1])
+                {
+                    MenuCursor += 1;
+                }
             }
 
             if(MenuMode >= MENU_CHARACTER_SELECT_BASE && MenuMode <= MENU_CHARACTER_SELECT_BASE_END)
@@ -714,6 +792,7 @@ bool mainMenuUpdate()
                 }
             }
         } // Character Select
+#endif
 
         // World Select
         else if(MenuMode == MENU_1PLAYER_GAME || MenuMode == MENU_2PLAYER_GAME || MenuMode == MENU_BATTLE_MODE)
@@ -721,7 +800,7 @@ bool mainMenuUpdate()
             if(ScrollDelay > 0)
             {
                 SharedCursor.Move = true;
-                ScrollDelay = ScrollDelay - 1;
+                ScrollDelay -= 1;
             }
 
             if(SharedCursor.Move)
@@ -760,7 +839,7 @@ bool mainMenuUpdate()
 
                     if(MenuMode == MENU_BATTLE_MODE)
                     {
-                        MenuCursor = 2;
+                        MenuCursor = g_gameInfo.disableTwoPlayer ? 1 : 2;
                     }
 
                     MenuMode = MENU_MAIN;
@@ -771,6 +850,10 @@ bool mainMenuUpdate()
                 }
                 else if(menuDoPress || MenuMouseClick)
                 {
+                    // Save menu state
+                    listMenuLastScroll = worldCurs;
+                    listMenuLastCursor = MenuCursor;
+
                     PlaySoundMenu(SFX_Do);
                     selWorld = MenuCursor + 1;
                     FindSaves();
@@ -799,12 +882,62 @@ bool mainMenuUpdate()
 
             }
 
+            bool dontWrap = false;
+
+            // TODO: hmmm..........
+            if((c.AltRun || homePressed) && MenuCursorCanMove)
+            {
+                PlaySoundMenu(SFX_Saw);
+                MenuCursor = 0;
+                MenuCursorCanMove = false;
+                dontWrap = true;
+            }
+            else if((c.AltJump || endPressed) && MenuCursorCanMove)
+            {
+                PlaySoundMenu(SFX_Saw);
+                MenuCursor = NumSelectWorld - 1;
+                MenuCursorCanMove = false;
+                dontWrap = true;
+            }
+            else if(leftPressed && MenuCursorCanMove)
+            {
+                PlaySoundMenu(SFX_Saw);
+                MenuCursor -= 3;
+                MenuCursorCanMove = false;
+                dontWrap = true;
+            }
+            else if(rightPressed && MenuCursorCanMove)
+            {
+                PlaySoundMenu(SFX_Saw);
+                MenuCursor += 3;
+                MenuCursorCanMove = false;
+                dontWrap = true;
+            }
+            else if((c.Drop || deletePressed) && menuRecentEpisode >= 0 && MenuCursorCanMove)
+            {
+                PlaySoundMenu(SFX_Camera);
+                MenuCursor = menuRecentEpisode;
+                MenuCursorCanMove = false;
+                dontWrap = true;
+            }
+            // ...???
+
             if(MenuMode == MENU_1PLAYER_GAME || MenuMode == MENU_2PLAYER_GAME || MenuMode == MENU_BATTLE_MODE)
             {
-                if(MenuCursor >= NumSelectWorld)
-                    MenuCursor = 0;
-                if(MenuCursor < 0)
-                    MenuCursor = NumSelectWorld - 1;
+                if(dontWrap)
+                {
+                    if(MenuCursor >= NumSelectWorld)
+                        MenuCursor = NumSelectWorld - 1;
+                    if(MenuCursor < 0)
+                        MenuCursor = 0;
+                }
+                else
+                {
+                    if(MenuCursor >= NumSelectWorld)
+                        MenuCursor = 0;
+                    if(MenuCursor < 0)
+                        MenuCursor = NumSelectWorld - 1;
+                }
             }
         } // World select
 
@@ -820,7 +953,9 @@ bool mainMenuUpdate()
                 {
 //'save select back
                     MenuMode /= MENU_SELECT_SLOT_BASE;
-                    MenuCursor = selWorld - 1;
+                    // Restore menu state
+                    worldCurs = listMenuLastScroll;
+                    MenuCursor = listMenuLastCursor;
 
                     MenuCursorCanMove = false;
                     PlaySoundMenu(SFX_Slide);
@@ -930,7 +1065,7 @@ bool mainMenuUpdate()
         }
 
         // Delete gamesave
-        else if(MenuMode == MENU_SELECT_SLOT_1P_DELETE || MenuMode == MENU_SELECT_SLOT_1P_DELETE)
+        else if(MenuMode == MENU_SELECT_SLOT_1P_DELETE || MenuMode == MENU_SELECT_SLOT_2P_DELETE)
         {
             if(SharedCursor.Move)
                 s_handleMouseMove(2, 300, 350, 300, 30);
@@ -956,7 +1091,7 @@ bool mainMenuUpdate()
                 }
             }
 
-            if(MenuMode == MENU_SELECT_SLOT_1P_DELETE || MenuMode == MENU_SELECT_SLOT_1P_DELETE)
+            if(MenuMode == MENU_SELECT_SLOT_1P_DELETE || MenuMode == MENU_SELECT_SLOT_2P_DELETE)
             {
                 if(MenuCursor > 2) MenuCursor = 0;
                 if(MenuCursor < 0) MenuCursor = 2;
@@ -966,7 +1101,7 @@ bool mainMenuUpdate()
         // Options
         else if(MenuMode == MENU_OPTIONS)
         {
-#ifndef __ANDROID__
+#ifndef RENDER_FULLSCREEN_ALWAYS
             const int optionsMenuLength = 2;
 #else
             const int optionsMenuLength = 1;
@@ -981,17 +1116,17 @@ bool mainMenuUpdate()
                         int i = 0;
                         if(A == i++)
                             menuLen = 18 * g_mainMenu.controlsTitle.size();
-#ifndef __ANDROID__
+#ifndef RENDER_FULLSCREEN_ALWAYS
                         else if(A == i++)
                         {
                             if(resChanged)
-                                menuLen = 18 * std::strlen("windowed mode");
+                                menuLen = 18 * 13; // std::strlen("windowed mode")
                             else
-                                menuLen = 18 * std::strlen("fullscreen mode");
+                                menuLen = 18 * 15; // std::strlen("fullscreen mode")
                         }
 #endif
                         else
-                            menuLen = 18 * std::strlen("view credits") - 2;
+                            menuLen = 18 * 12 - 2; // std::strlen("view credits")
 
                         if(SharedCursor.X >= 300 && SharedCursor.X <= 300 + menuLen)
                         {
@@ -1012,7 +1147,11 @@ bool mainMenuUpdate()
             {
                 if(menuBackPress)
                 {
-                    int optionsIndex = 3;
+                    int optionsIndex = 1;
+                    if(!g_gameInfo.disableTwoPlayer)
+                        optionsIndex++;
+                    if(!g_gameInfo.disableBattleMode)
+                        optionsIndex++;
                     MenuMode = MENU_MAIN;
                     MenuCursor = optionsIndex;
                     MenuCursorCanMove = false;
@@ -1065,13 +1204,14 @@ bool mainMenuUpdate()
             if(ret == -1)
             {
                 SaveConfig();
-                MenuCursor = 0;
+                MenuCursor = 0; // index of controls within options
                 MenuMode = MENU_OPTIONS;
                 MenuCursorCanMove = false;
             }
         }
     }
 
+#if 0 // unused now
 //'check for all characters blocked
     if(MenuMode == MENU_CHARACTER_SELECT_1P || MenuMode == MENU_CHARACTER_SELECT_2P_S1 || MenuMode == MENU_CHARACTER_SELECT_2P_S2)
     {
@@ -1115,6 +1255,7 @@ bool mainMenuUpdate()
             }
         }
     }
+#endif
 
     return false;
 }
@@ -1145,10 +1286,10 @@ static void s_drawGameSaves()
             SuperPrint(fmt::format_ne("SLOT {0} ... {1}%", A, SaveSlot[A]), 3, 300, 320 + (A * 30));
             if(SaveStars[A] > 0)
             {
-                frmMain.renderTexture(560, 320 + (A * 30) + 1,
+                XRender::renderTexture(560, 320 + (A * 30) + 1,
                                       GFX.Interface[5].w, GFX.Interface[5].h,
                                       GFX.Interface[5], 0, 0);
-                frmMain.renderTexture(560 + 24, 320 + (A * 30) + 2,
+                XRender::renderTexture(560 + 24, 320 + (A * 30) + 2,
                                       GFX.Interface[1].w, GFX.Interface[1].h,
                                       GFX.Interface[1], 0, 0);
                 SuperPrint(fmt::format_ne(" {0}", SaveStars[A]), 3, 588, 320 + (A * 30));
@@ -1174,14 +1315,17 @@ void mainMenuDraw()
     int B = 0;
     int C = 0;
 
+    // just don't call this during an offset!
+    // XRender::offsetViewportIgnore(true);
+
     if(MenuMode != MENU_1PLAYER_GAME && MenuMode != MENU_2PLAYER_GAME && MenuMode != MENU_BATTLE_MODE)
         worldCurs = 0;
 
-    frmMain.renderTexture(0, 0, GFX.MenuGFX[1].w, GFX.MenuGFX[1].h, GFX.MenuGFX[1], 0, 0);
-    frmMain.renderTexture(ScreenW / 2 - GFX.MenuGFX[2].w / 2, 70,
+    XRender::renderTexture(0, 0, GFX.MenuGFX[1].w, GFX.MenuGFX[1].h, GFX.MenuGFX[1], 0, 0);
+    XRender::renderTexture(ScreenW / 2 - GFX.MenuGFX[2].w / 2, 70,
             GFX.MenuGFX[2].w, GFX.MenuGFX[2].h, GFX.MenuGFX[2], 0, 0);
 
-    frmMain.renderTexture(ScreenW / 2 - GFX.MenuGFX[3].w / 2, 576,
+    XRender::renderTexture(ScreenW / 2 - GFX.MenuGFX[3].w / 2, 576,
             GFX.MenuGFX[3].w, GFX.MenuGFX[3].h, GFX.MenuGFX[3], 0, 0);
 
     if(SDL_AtomicGet(&loading))
@@ -1199,12 +1343,14 @@ void mainMenuDraw()
     else if(MenuMode == MENU_MAIN)
     {
         int i = 0;
-        SuperPrint(g_mainMenu.main1PlayerGame, 3, 300, 350+30*(i++));
-        SuperPrint(g_mainMenu.mainMultiplayerGame, 3, 300, 350+30*(i++));
-        SuperPrint(g_mainMenu.mainBattleGame, 3, 300, 350+30*(i++));
+        SuperPrint(g_gameInfo.disableTwoPlayer ? g_mainMenu.mainStartGame : g_mainMenu.main1PlayerGame, 3, 300, 350+30*(i++));
+        if(!g_gameInfo.disableTwoPlayer)
+            SuperPrint(g_mainMenu.mainMultiplayerGame, 3, 300, 350+30*(i++));
+        if(!g_gameInfo.disableBattleMode)
+            SuperPrint(g_mainMenu.mainBattleGame, 3, 300, 350+30*(i++));
         SuperPrint(g_mainMenu.mainOptions, 3, 300, 350+30*(i++));
         SuperPrint(g_mainMenu.mainExit, 3, 300, 350+30*(i++));
-        frmMain.renderTexture(300 - 20, 350 + (MenuCursor * 30), 16, 16, GFX.MCursor[0], 0, 0);
+        XRender::renderTexture(300 - 20, 350 + (MenuCursor * 30), 16, 16, GFX.MCursor[0], 0, 0);
     }
 
     // Character select
@@ -1213,6 +1359,7 @@ void mainMenuDraw()
     {
         ConnectScreen::Render();
     }
+#if 0 // dead now
     else if(MenuMode == MENU_CHARACTER_SELECT_1P ||
             MenuMode == MENU_CHARACTER_SELECT_2P_S1 ||
             MenuMode == MENU_CHARACTER_SELECT_2P_S2 ||
@@ -1242,11 +1389,11 @@ void mainMenuDraw()
             SuperPrint(g_mainMenu.selectPlayer[2], 3, 300, 380 + A);
         else
         {
-            A = A - 30;
+            A -= 30;
             if(MenuCursor + 1 >= 2)
-                B = B - 30;
+                B -= 30;
             if(PlayerCharacter >= 2)
-                C = C - 30;
+                C -= 30;
         }
 
         if(!blockCharacter[3])
@@ -1284,20 +1431,21 @@ void mainMenuDraw()
 
         if(MenuMode == MENU_CHARACTER_SELECT_2P_S2 || MenuMode == MENU_CHARACTER_SELECT_BM_S2)
         {
-            frmMain.renderTexture(300 - 20, B + 350 + (MenuCursor * 30), GFX.MCursor[3]);
-            frmMain.renderTexture(300 - 20, B + 350 + ((PlayerCharacter - 1) * 30), GFX.MCursor[0]);
+            XRender::renderTexture(300 - 20, B + 350 + (MenuCursor * 30), GFX.MCursor[3]);
+            XRender::renderTexture(300 - 20, B + 350 + ((PlayerCharacter - 1) * 30), GFX.MCursor[0]);
         }
         else
         {
-            frmMain.renderTexture(300 - 20, B + 350 + (MenuCursor * 30), GFX.MCursor[0]);
+            XRender::renderTexture(300 - 20, B + 350 + (MenuCursor * 30), GFX.MCursor[0]);
         }
     }
+#endif
 
     // Episode / Level selection
     else if(MenuMode == MENU_1PLAYER_GAME || MenuMode == MENU_2PLAYER_GAME || MenuMode == MENU_BATTLE_MODE)
     {
         s_drawGameTypeTitle(300, 280);
-        std::string tempStr;
+        // std::string tempStr;
 
         minShow = 1;
         maxShow = NumSelectWorld;
@@ -1331,22 +1479,23 @@ void mainMenuDraw()
 
         for(auto A = minShow; A <= maxShow; A++)
         {
+            auto w = SelectWorld[A];
             B = A - minShow + 1;
-            tempStr = SelectWorld[A].WorldName;
-            SuperPrint(tempStr, 3, 300, 320 + (B * 30));
+            float r = w.highlight ? 0.f : 1.f;
+            SuperPrint(w.WorldName, 3, 300, 320 + (B * 30), r, 1.f, 1.f, 1.f);
         }
 
         if(minShow > 1)
-            frmMain.renderTexture(400 - 8, 350 - 20, GFX.MCursor[1]);
+            XRender::renderTexture(400 - 8, 350 - 20, GFX.MCursor[1]);
 
 
         if(maxShow < NumSelectWorld)
-            frmMain.renderTexture(400 - 8, 490, GFX.MCursor[2]);
+            XRender::renderTexture(400 - 8, 490, GFX.MCursor[2]);
 
         B = MenuCursor - minShow + 1;
 
         if(B >= 0 && B < 5)
-            frmMain.renderTexture(300 - 20, 350 + (B * 30), GFX.MCursor[0].w, GFX.MCursor[0].h, GFX.MCursor[0], 0, 0);
+            XRender::renderTexture(300 - 20, 350 + (B * 30), GFX.MCursor[0].w, GFX.MCursor[0].h, GFX.MCursor[0], 0, 0);
     }
 
     else if(MenuMode == MENU_SELECT_SLOT_1P || MenuMode == MENU_SELECT_SLOT_2P) // Save Select
@@ -1354,7 +1503,7 @@ void mainMenuDraw()
         s_drawGameTypeTitle(300, 280);
         SuperPrint(SelectWorld[selWorld].WorldName, 3, 300, 310, 0.6f, 1.f, 1.f);
         s_drawGameSaves();
-        frmMain.renderTexture(300 - 20, 350 + (MenuCursor * 30), GFX.MCursor[0]);
+        XRender::renderTexture(300 - 20, 350 + (MenuCursor * 30), GFX.MCursor[0]);
     }
 
     else if(MenuMode == MENU_SELECT_SLOT_1P_COPY_S1 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S1 ||
@@ -1371,11 +1520,11 @@ void mainMenuDraw()
 
         if(MenuMode == MENU_SELECT_SLOT_1P_COPY_S2 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S2)
         {
-            frmMain.renderTexture(300 - 20, 350 + ((menuCopySaveSrc - 1) * 30), GFX.MCursor[0]);
-            frmMain.renderTexture(300 - 20, 350 + (MenuCursor * 30), GFX.MCursor[3]);
+            XRender::renderTexture(300 - 20, 350 + ((menuCopySaveSrc - 1) * 30), GFX.MCursor[0]);
+            XRender::renderTexture(300 - 20, 350 + (MenuCursor * 30), GFX.MCursor[3]);
         }
         else
-            frmMain.renderTexture(300 - 20, 350 + (MenuCursor * 30), GFX.MCursor[0]);
+            XRender::renderTexture(300 - 20, 350 + (MenuCursor * 30), GFX.MCursor[0]);
     }
 
     else if(MenuMode == MENU_SELECT_SLOT_1P_DELETE || MenuMode == MENU_SELECT_SLOT_2P_DELETE) // Copy save
@@ -1386,7 +1535,7 @@ void mainMenuDraw()
 
         SuperPrint("Select the slot to erase", 3, 300, 320 + (5 * 30), 1.0f, 0.7f, 0.7f);
 
-        frmMain.renderTexture(300 - 20, 350 + (MenuCursor * 30), GFX.MCursor[0]);
+        XRender::renderTexture(300 - 20, 350 + (MenuCursor * 30), GFX.MCursor[0]);
     }
 
     // Options Menu
@@ -1401,7 +1550,7 @@ void mainMenuDraw()
             SuperPrint("FULLSCREEN MODE", 3, 300, 350 + 30*i++);
 #endif
         SuperPrint("VIEW CREDITS", 3, 300, 350 + 30*i++);
-        frmMain.renderTexture(300 - 20, 350 + (MenuCursor * 30),
+        XRender::renderTexture(300 - 20, 350 + (MenuCursor * 30),
                               GFX.MCursor[0].w, GFX.MCursor[0].h, GFX.MCursor[0], 0, 0);
     }
 
@@ -1412,5 +1561,5 @@ void mainMenuDraw()
     }
 
     // Mouse cursor
-    frmMain.renderTexture(int(SharedCursor.X), int(SharedCursor.Y), GFX.ECursor[2]);
+    XRender::renderTexture(int(SharedCursor.X), int(SharedCursor.Y), GFX.ECursor[2]);
 }

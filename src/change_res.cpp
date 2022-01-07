@@ -21,24 +21,33 @@
 #include "globals.h"
 #include "change_res.h"
 #include "load_gfx.h"
+#include "core/window.h"
+#ifdef __EMSCRIPTEN__
+#include "core/events.h"
+#endif
+
 
 void SetOrigRes()
 {
-    frmMain.setFullScreen(false);
+    XWindow::setFullScreen(false);
     resChanged = false;
-    SDL_SetWindowSize(frmMain.getWindow(), ScreenW, ScreenH);
+    XWindow::setWindowSize(ScreenW, ScreenH);
+
 #ifdef __EMSCRIPTEN__
-    frmMain.eventResize();
+    XEvents::eventResize();
 #endif
+
     if(LoadingInProcess)
         UpdateLoad();
+
     if(!GameMenu && !MagicHand)
-        showCursor(1);
+        XWindow::showCursor(1);
 }
 
 void ChangeRes(int, int, int, int)
 {
-    frmMain.setFullScreen(true);
+    XWindow::setFullScreen(true);
+
     if(LoadingInProcess)
         UpdateLoad();
 }

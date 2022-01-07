@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#pragma once
 #ifndef COLLISION_H
 #define COLLISION_H
 
@@ -103,5 +104,7 @@ bool CompareWalkBlock(int oldBlockIdx, int newBlockIdx, const Location_t &refere
 void CompareNpcWalkBlock(int &tempHitBlock, int &tempHitOldBlock,
                          double &tempHit,   double &tempHitOld,
                          int &tempHitIsSlope, NPC_t *npc);
+
+bool SectionCollision(const int section, const Location_t &loc);
 
 #endif // COLLISION_H

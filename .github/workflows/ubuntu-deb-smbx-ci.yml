@@ -1,0 +1,183 @@
+name: Ubuntu DEB SMBX CI
+
+on:
+  push:
+    branches:
+      - master
+      - devel
+      - versus-ci
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    name: ${{ matrix.config.name }} | ${{ matrix.config.build_type }}
+    runs-on: ${{ matrix.config.os }}
+    container: ${{ matrix.config.container }}
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+        - {
+            name: "DEB Ubuntu 16.04 x86_64",
+            os: ubuntu-latest,
+            container: "ubuntu:16.04",
+            extra_options: "-DPGE_SHARED_SDLMIXER=OFF -DUSE_SYSTEM_SDL2=OFF -DUSE_FREEIMAGE_SYSTEM_LIBS=ON -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=MinSizeRel -DTHEXTECH_FIXED_ASSETS_PATH=/usr/share/games/smbx -DTHEXTECH_SOURCE_ASSETS_PATH=\"${GITHUB_WORKSPACE}/smbx13\" -DTHEXTECH_USER_DIR_NAME=\".thextech-smbx\" -DDESKTOP_NAME=\"Super Mario Bros. X\" -DDESKTOP_GENERIC_NAME=\"Super Mario Bros. X\" -DDESKTOP_COMMENT=\"The Mario fan game\" -DTHEXTECH_EXECUTABLE_NAME=\"thextech-smbx\" -DTHEXTECH_PACKAGE_NAME=\"thextech-smbx\" -DCPACK_GENERATOR=DEB DCPACK_DEBIAN_PACKAGE_HOMEPAGE=\"https://wohlsoft.ru\" -DCPACK_DEBIAN_PACKAGE_RELEASE=${GITHUB_RUN_NUMBER} -DCPACK_DEBIAN_PACKAGE_ARCHITECTURE=amd64 -DCPACK_DEBIAN_PACKAGE_DEPENDS=\"\" -DCPACK_DEBIAN_PACKAGE_DESCRIPTION=\"The Super Mario fan game developed by Andrew Spinks in the past\"",
+            deps_cmdline: "apt-get update -qq && apt-get install -qq sudo git p7zip-full wget ninja-build lftp \"^libxcb.*\" libx11-dev libx11-xcb-dev libgtk-3-dev libgegl-dev libxcursor-dev libxrender-dev libxrandr-dev libxext-dev libxi-dev libxss-dev libxt-dev libxv-dev libxxf86vm-dev libxinerama-dev libxkbcommon-dev libfontconfig1-dev libasound2-dev libpulse-dev libdbus-1-dev udev mtdev-tools webp libudev-dev libglm-dev libwayland-dev libegl1-mesa-dev mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev libgles2-mesa libgles2-mesa-dev libmirclient-dev libproxy-dev libsdl2-dev libpng-dev libjpeg-dev hashdeep dpkg debconf lintian && wget -q https://github.com/Kitware/CMake/releases/download/v3.15.4/cmake-3.15.4-Linux-x86_64.sh && chmod uog+x cmake-3.15.4-Linux-x86_64.sh && ./cmake-3.15.4-Linux-x86_64.sh --skip-license --prefix=/usr",
+            executable_name: "thextech-smbx",
+            generator: "Ninja",
+            build_type: "MinSizeRel",
+            executable_name_suffix: "",
+            package_filename_suffix: "ubuntu-16-04-amd64",
+            upload_directory: "www/ubuntu-16-04/"
+          }
+        - {
+            name: "DEB Ubuntu 16.04 32bit",
+            os: ubuntu-latest,
+            container: "ubuntu:16.04",
+            extra_options: "-DPGE_SHARED_SDLMIXER=OFF -DUSE_SYSTEM_SDL2=OFF -DUSE_FREEIMAGE_SYSTEM_LIBS=ON -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=MinSizeRel -DTHEXTECH_FIXED_ASSETS_PATH=/usr/share/games/smbx -DTHEXTECH_SOURCE_ASSETS_PATH=\"${GITHUB_WORKSPACE}/smbx13\" -DTHEXTECH_USER_DIR_NAME=\".thextech-smbx\" -DDESKTOP_NAME=\"Super Mario Bros. X\" -DDESKTOP_GENERIC_NAME=\"Super Mario Bros. X\" -DDESKTOP_COMMENT=\"The Mario fan game\" -DTHEXTECH_EXECUTABLE_NAME=\"thextech-smbx\" -DTHEXTECH_PACKAGE_NAME=\"thextech-smbx\" -DCPACK_GENERATOR=DEB DCPACK_DEBIAN_PACKAGE_HOMEPAGE=\"https://wohlsoft.ru\" -DCPACK_DEBIAN_PACKAGE_RELEASE=${GITHUB_RUN_NUMBER} -DCPACK_DEBIAN_PACKAGE_ARCHITECTURE=i386 -DCPACK_DEBIAN_PACKAGE_DEPENDS=\"\" -DCPACK_DEBIAN_PACKAGE_DESCRIPTION=\"The Super Mario fan game developed by Andrew Spinks in the past\" -DCMAKE_TOOLCHAIN_FILE=`pwd`/cmake/ci_linux_gcc_toolchain_x32.cmake",
+            deps_cmdline: "dpkg --add-architecture i386 && apt-get update -qq && apt-get install -y sudo git p7zip-full wget ninja-build lftp gcc-multilib g++-multilib libc6-dev:i386 \"^libxcb.*:i386\" libx11-dev:i386 libx11-xcb-dev:i386 libgtk-3-dev:i386 libxcursor-dev:i386 libxrender-dev:i386 libxrandr-dev:i386 libxext-dev:i386 libxi-dev:i386 libxss-dev:i386 libxt-dev:i386 libxv-dev:i386 libxxf86vm-dev:i386 libxinerama-dev:i386 libxkbcommon-dev:i386 libfontconfig1-dev:i386 libasound2-dev:i386 libpulse-dev:i386 libdbus-1-dev:i386 udev mtdev-tools webp libudev-dev:i386 libwayland-dev:i386 libegl1-mesa-dev:i386 mesa-common-dev:i386 libgl1-mesa-dev:i386 libglu1-mesa-dev:i386 libgles2-mesa:i386 libgles2-mesa-dev:i386 libproxy-dev:i386 libsdl2-dev:i386 libpng-dev:i386 libjpeg-dev:i386 hashdeep dpkg debconf lintian && wget -q https://github.com/Kitware/CMake/releases/download/v3.15.4/cmake-3.15.4-Linux-x86_64.sh && chmod uog+x cmake-3.15.4-Linux-x86_64.sh && ./cmake-3.15.4-Linux-x86_64.sh --skip-license --prefix=/usr",
+            executable_name: "thextech-smbx",
+            generator: "Ninja",
+            build_type: "MinSizeRel",
+            executable_name_suffix: "",
+            package_filename_suffix: "ubuntu-16-04-i386",
+            upload_directory: "www/ubuntu-16-04/"
+          }
+        - {
+            name: "DEB Ubuntu 18.04 x86_64",
+            os: ubuntu-18.04,
+            extra_options: "-DPGE_SHARED_SDLMIXER=OFF -DUSE_SYSTEM_SDL2=ON -DUSE_FREEIMAGE_SYSTEM_LIBS=ON -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=MinSizeRel -DTHEXTECH_FIXED_ASSETS_PATH=/usr/share/games/smbx -DTHEXTECH_SOURCE_ASSETS_PATH=\"${GITHUB_WORKSPACE}/smbx13\" -DTHEXTECH_USER_DIR_NAME=\".thextech-smbx\" -DDESKTOP_NAME=\"Super Mario Bros. X\" -DDESKTOP_GENERIC_NAME=\"Super Mario Bros. X\" -DDESKTOP_COMMENT=\"The Mario fan game\" -DTHEXTECH_EXECUTABLE_NAME=\"thextech-smbx\" -DTHEXTECH_PACKAGE_NAME=\"thextech-smbx\" -DCPACK_GENERATOR=DEB DCPACK_DEBIAN_PACKAGE_HOMEPAGE=\"https://wohlsoft.ru\" -DCPACK_DEBIAN_PACKAGE_RELEASE=${GITHUB_RUN_NUMBER} -DCPACK_DEBIAN_PACKAGE_ARCHITECTURE=amd64 -DCPACK_DEBIAN_PACKAGE_DEPENDS=\"libsdl2-2.0-0\" -DCPACK_DEBIAN_PACKAGE_DESCRIPTION=\"The Super Mario fan game developed by Andrew Spinks in the past\"",
+            deps_cmdline: "sudo apt-get update -qq && sudo apt-get install -qq cmake ninja-build lftp \"^libxcb.*\" libx11-dev libx11-xcb-dev libgtk-3-dev libgegl-dev libxcursor-dev libxrender-dev libxrandr-dev libxext-dev libxi-dev libxss-dev libxt-dev libxv-dev libxxf86vm-dev libxinerama-dev libxkbcommon-dev libfontconfig1-dev libasound2-dev libpulse-dev libdbus-1-dev udev mtdev-tools webp libudev-dev libglm-dev libwayland-dev libegl1-mesa-dev mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev libgles2-mesa libgles2-mesa-dev libmirclient-dev libproxy-dev libsdl2-dev libpng-dev libjpeg-dev hashdeep dpkg debconf lintian",
+            executable_name: "thextech-smbx",
+            generator: "Ninja",
+            build_type: "MinSizeRel",
+            executable_name_suffix: "",
+            package_filename_suffix: "ubuntu-18-04-amd64",
+            upload_directory: "www/ubuntu-18-04/"
+          }
+        - {
+            name: "DEB Ubuntu 20.04 x86_64",
+            os: ubuntu-20.04,
+            extra_options: "-DPGE_SHARED_SDLMIXER=OFF -DUSE_SYSTEM_SDL2=ON -DUSE_FREEIMAGE_SYSTEM_LIBS=ON -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=MinSizeRel -DTHEXTECH_FIXED_ASSETS_PATH=/usr/share/games/smbx -DTHEXTECH_SOURCE_ASSETS_PATH=\"${GITHUB_WORKSPACE}/smbx13\" -DTHEXTECH_USER_DIR_NAME=\".thextech-smbx\" -DDESKTOP_NAME=\"Super Mario Bros. X\" -DDESKTOP_GENERIC_NAME=\"Super Mario Bros. X\" -DDESKTOP_COMMENT=\"The Mario fan game\" -DTHEXTECH_EXECUTABLE_NAME=\"thextech-smbx\" -DTHEXTECH_PACKAGE_NAME=\"thextech-smbx\" -DCPACK_GENERATOR=DEB DCPACK_DEBIAN_PACKAGE_HOMEPAGE=\"https://wohlsoft.ru\" -DCPACK_DEBIAN_PACKAGE_RELEASE=${GITHUB_RUN_NUMBER} -DCPACK_DEBIAN_PACKAGE_ARCHITECTURE=amd64 -DCPACK_DEBIAN_PACKAGE_DEPENDS=\"libsdl2-2.0-0\" -DCPACK_DEBIAN_PACKAGE_DESCRIPTION=\"The Super Mario fan game developed by Andrew Spinks in the past\"",
+            deps_cmdline: "sudo apt-get update -qq && sudo apt-get install -qq cmake ninja-build lftp \"^libxcb.*\" libx11-dev libx11-xcb-dev libgtk-3-dev libgegl-dev libxcursor-dev libxrender-dev libxrandr-dev libxext-dev libxi-dev libxss-dev libxt-dev libxv-dev libxxf86vm-dev libxinerama-dev libxkbcommon-dev libfontconfig1-dev libasound2-dev libpulse-dev libdbus-1-dev udev mtdev-tools webp libudev-dev libglm-dev libwayland-dev libegl1-mesa-dev mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev libgles2-mesa libgles2-mesa-dev libmirclient-dev libproxy-dev libsdl2-dev libpng-dev libjpeg-dev hashdeep dpkg debconf lintian",
+            executable_name: "thextech-smbx",
+            generator: "Ninja",
+            build_type: "MinSizeRel",
+            executable_name_suffix: "",
+            package_filename_suffix: "ubuntu-20-04-amd64",
+            upload_directory: "www/ubuntu-20-04/"
+          }
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - uses: nelonoel/branch-name@v1.0.1
+
+    - name: Install Dependencies
+      shell: bash
+      run: |
+        if [[ ! -z "${{ matrix.config.deps_cmdline }}" ]]; then
+          eval ${{ matrix.config.deps_cmdline }}
+        fi
+        # Pull submodules
+        git submodule init
+        git submodule update
+        cmake --version
+
+    - name: Download SMBX assets
+      uses: carlosperate/download-file-action@v1.0.3
+      with:
+        file-url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-smbx13-assets-full.7z"
+        file-name: smbx13.7z
+
+#    - name: Download AoD assets
+#      uses: carlosperate/download-file-action@v1.0.3
+#      with:
+#        file-url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-adventure-of-demo-assets-full.7z"
+#        file-name: aod.7z
+
+    - name: Unpack all assets
+      shell: bash
+      run: |
+        mkdir -p smbx13
+        cd smbx13
+        7z x ../smbx13.7z
+        cd ..
+        rm smbx13.7z
+#        mkdir -p aod
+#        cd aod
+#        7z x ../aod.7z
+#        cd ..
+#        rm aod.7z
+
+    - name: Configure
+      shell: bash
+      run: |
+        if [[ ! -z "${{ matrix.config.extra_path }}" ]]; then
+          export PATH=${{ matrix.config.extra_path }}:${PATH}
+          echo "PATH environment: ${PATH}"
+        fi
+        cmake -B build -G "${{ matrix.config.generator }}" -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} ${{ matrix.config.extra_options }} .
+
+    - name: Build
+      shell: bash
+      run: |
+        if [[ ! -z "${{ matrix.config.extra_path }}" ]]; then
+          export PATH=${{ matrix.config.extra_path }}:${PATH}
+        fi
+        export MAKEFLAGS=--keep-going
+        cmake --build build --config ${{ matrix.config.build_type }} --parallel 3
+
+    - name: List dependent libraries
+      if: success() && runner.os == 'Linux'
+      shell: bash
+      run: |
+        file build/output/bin/${{ matrix.config.executable_name }}
+        ldd build/output/bin/${{ matrix.config.executable_name }}
+
+    - name: Create DEB packages
+      shell: bash
+      if: success()
+      run: |
+        if [[ ! -z "${{ matrix.config.extra_path }}" ]]; then
+          export PATH=${{ matrix.config.extra_path }}:${PATH}
+        fi
+        cd build
+        cpack  .
+        if [[ "${BRANCH_NAME}" == *"merge"* ]]; then
+            BRANCH_NAME_RES="pull-request"
+            echo "-- Pull-request detected!"
+        else
+            BRANCH_NAME_RES=${BRANCH_NAME}
+        fi
+        mv *.deb thextech-super-mario-bros-x-${{ matrix.config.package_filename_suffix }}-${BRANCH_NAME_RES}.deb
+        cd ..
+
+    - name: Upload artifact
+      if: success() && runner.os == 'Linux'
+      uses: actions/upload-artifact@v2
+      with:
+        path: build/*.deb
+        name: TheXTech ${{ matrix.config.name }} ${{ matrix.config.build_type }}
+
+    - name: Deploy to builds.wohlsoft.ru
+      if: success() && github.event_name != 'pull_request'
+      shell: bash
+      run: |
+        if [[ ! -z "${{ matrix.config.extra_path }}" ]]; then
+          export PATH=${{ matrix.config.extra_path }}:${PATH}
+        fi
+        UPLOAD_LIST="set ssl:verify-certificate no;"
+        for q in ./build/*.deb; do
+            UPLOAD_LIST="${UPLOAD_LIST} put -O ${{ matrix.config.upload_directory }} $q;"
+        done
+        lftp -e "${UPLOAD_LIST} exit" -u ${{ secrets.builds_login }},${{ secrets.builds_password }} ${{ secrets.builds_host }}
+
+    - name: List Build Directory
+      if: always()
+      shell: bash
+      run: |
+        git status
+        ls -lR build

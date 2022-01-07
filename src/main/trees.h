@@ -18,6 +18,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#pragma once
+#ifndef TREES_HHHH
+#define TREES_HHHH
 
 #include "globals.h"
 
@@ -75,3 +78,5 @@ extern void treeWorldMusicQuery(const Location_t &loc, WorldMusicPtrArr &list, b
 
 extern void blockTileGet(const Location_t &loc, int64_t &fBlock, int64_t &lBlock);
 extern void blockTileGet(double x, double w, int64_t &fBlock, int64_t &lBlock);
+
+#endif // TREES_HHHH

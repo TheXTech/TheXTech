@@ -18,7 +18,6 @@
  */
 
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_messagebox.h>
 #include <SDL2/SDL_version.h>
 #include <SDL2/SDL_mixer_ext.h>
 
@@ -26,7 +25,9 @@
 #include <cstdlib>
 #include <signal.h>
 
-#if defined(DEBUG_BUILD) && (defined(__gnu_linux__) || defined(_WIN32))
+#include <lib/CrashHandler/backtrace.h>
+
+#if defined(DEBUG_BUILD) && (Backtrace_FOUND || defined(_WIN32))
 #define PGE_ENGINE_DEBUG
 #endif
 
@@ -86,7 +87,6 @@ static int isDebuggerPresent()
 #   include <dbghelp.h>
 #   include <shlobj.h>
 #elif (defined(__linux__) && !defined(__ANDROID__) || defined(__APPLE__))
-#   include <execinfo.h>
 #   include <pwd.h>
 #   include <unistd.h>
 #elif defined(__ANDROID__)
@@ -100,7 +100,7 @@ static int isDebuggerPresent()
 #include "../Logger/logger.h"
 
 #include "../../version.h"
-#include "globals.h"
+#include "core/msgbox.h"
 
 #define STACK_FORMAT    \
     "====Stack trace====\n" \
@@ -279,7 +279,7 @@ static std::string getCurrentHomePath()
     return homedir;
 }
 
-static void replaceStr(std::string &data, std::string toSearch, std::string replaceStr)
+static void replaceStr(std::string &data, const std::string &toSearch, const std::string &replaceStr)
 {
     size_t pos = data.find(toSearch);
 
@@ -315,7 +315,7 @@ static std::string getStacktrace()
 #if defined(_WIN32)
     GetStackWalk(bkTrace);
 
-#elif (defined(__linux__) && !defined(__ANDROID__) || defined(__APPLE__))
+#elif Backtrace_FOUND
     void  *array[400];
     int size;
     char **strings;
@@ -349,39 +349,6 @@ static std::string getStacktrace()
     return bkTrace;
 }
 
-static void msgBox(std::string title, std::string text)
-{
-    std::string &ttl = title;
-    std::string &msg = text;
-    SDL_MessageBoxData mbox;
-    SDL_MessageBoxButtonData mboxButton;
-    const SDL_MessageBoxColorScheme colorScheme =
-    {
-        { /* .colors (.r, .g, .b) */
-            /* [SDL_MESSAGEBOX_COLOR_BACKGROUND] */
-            { 200, 200, 200 },
-            /* [SDL_MESSAGEBOX_COLOR_TEXT] */
-            {   0,   0,   0 },
-            /* [SDL_MESSAGEBOX_COLOR_BUTTON_BORDER] */
-            { 255, 255, 255 },
-            /* [SDL_MESSAGEBOX_COLOR_BUTTON_BACKGROUND] */
-            { 150, 150, 150 },
-            /* [SDL_MESSAGEBOX_COLOR_BUTTON_SELECTED] */
-            { 255, 255, 255 }
-        }
-    };
-    mboxButton.buttonid = 0;
-    mboxButton.flags    = SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT | SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT;
-    mboxButton.text     = "Ok";
-    mbox.flags          = SDL_MESSAGEBOX_ERROR;
-    mbox.window         = frmMain.getWindow();
-    mbox.title          = ttl.c_str();
-    mbox.message        = msg.c_str();
-    mbox.numbuttons     = 1;
-    mbox.buttons        = &mboxButton;
-    mbox.colorScheme    = &colorScheme;
-    SDL_ShowMessageBox(&mbox, nullptr);
-}
 
 #ifdef __GNUC__
 #define LLVM_ATTRIBUTE_NORETURN __attribute__((noreturn))
@@ -422,7 +389,7 @@ void LLVM_ATTRIBUTE_NORETURN CrashHandler::crashByUnhandledException()
     pLogFatal("<Unhandled exception! %s>\n"
               STACK_FORMAT, exc.c_str(),
               stack.c_str(), g_messageToUser);
-    msgBox(
+    XMsgBox::errorMsgBox(
         //% "Unhandled exception!"
         "Unhandled exception!",
         //% "Engine has crashed because accepted unhandled exception!"
@@ -436,7 +403,7 @@ void LLVM_ATTRIBUTE_NORETURN CrashHandler::crashByFlood()
     pLogFatal("<Out of memory!>\n"
               STACK_FORMAT,
               stack.c_str(), g_messageToUser);
-    msgBox(
+    XMsgBox::errorMsgBox(
         //% "Out of memory!"
         "Out of memory!",
         //% "Engine has crashed because out of memory! Try to close other applications and restart game."
@@ -474,7 +441,7 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
     case SIGALRM:
     {
         pLogFatal("<alarm() time out!>");
-        msgBox(
+        XMsgBox::errorMsgBox(
             //% "Time out!"
             "Time out!",
             //% "Engine has abourted because alarm() time out!"
@@ -521,7 +488,7 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
                       stack.c_str(), g_messageToUser);
         }
 
-        msgBox(
+        XMsgBox::errorMsgBox(
             //% "Physical memory address error!"
             "Physical memory address error!",
             //% "Engine has crashed because a physical memory address error"
@@ -540,7 +507,7 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
         pLogFatal("<Wrong CPU Instruction>\n"
                   STACK_FORMAT,
                   stack.c_str(), g_messageToUser);
-        msgBox(
+        XMsgBox::errorMsgBox(
             //% "Wrong CPU Instruction!"
             "Wrong CPU Instruction!",
             //% "Engine has crashed because a wrong CPU instruction"
@@ -597,7 +564,7 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
                       stack.c_str(), g_messageToUser);
         }
 
-        msgBox(
+        XMsgBox::errorMsgBox(
             //% "Wrong arithmetical operation"
             "Wrong arithmetical operation",
             //% "Engine has crashed because of a wrong arithmetical operation!"
@@ -611,7 +578,7 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
         pLogFatal("<Aborted!>\n"
                   STACK_FORMAT,
                   stack.c_str(), g_messageToUser);
-        msgBox(
+        XMsgBox::errorMsgBox(
             //% "Aborted"
             "Aborted",
             //% "Engine has been aborted because critical error was occouped."
@@ -658,7 +625,7 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
                       stack.c_str(), g_messageToUser);
         }
 
-        msgBox(
+        XMsgBox::errorMsgBox(
             //% "Segmentation fault"
             "Segmentation fault",
             /*% "Engine has crashed because of a Segmentation fault.\n"
@@ -673,7 +640,7 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
     case SIGINT:
     {
         pLogFatal("<Interrupted!>");
-        msgBox(
+        XMsgBox::errorMsgBox(
             //% "Interrupt"
             "Interrupt",
             //% "Engine has been interrupted"

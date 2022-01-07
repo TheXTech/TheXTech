@@ -22,6 +22,9 @@
 
 #include "../globals.h"
 #include "../graphics.h"
+#include "../core/render.h"
+#include "../gfx.h"
+
 
 #if defined(_MSC_VER) && _MSC_VER <= 1900 // Workaround for MSVC 2015
 namespace std
@@ -30,17 +33,19 @@ namespace std
 }
 #endif
 
-void SuperPrintRightAlign(std::string SuperWords, int Font, float X, float Y, float r, float g, float b, float a)
+int SuperTextPixLen(const std::string &SuperWords, int Font)
 {
+    int len;
+
     switch(Font)
     {
     default:
     case 1:
     case 4:
-        X -= SuperWords.length() * 18;
+        len = SuperWords.length() * 18;
         break;
     case 2:
-        X -= SuperWords.length() * 16;
+        len = SuperWords.length() * 16;
         break;
     case 3:
     {
@@ -57,55 +62,33 @@ void SuperPrintRightAlign(std::string SuperWords, int Font, float X, float Y, fl
                 B += 16;
             }
         }
-        X -= B;
+        len = B;
         break;
     }
     }
 
+    return len;
+}
+
+void SuperPrintRightAlign(const std::string &SuperWords, int Font, float X, float Y, float r, float g, float b, float a)
+{
+    X -= SuperTextPixLen(SuperWords, Font);
     SuperPrint(SuperWords, Font, X, Y, r, g, b, a);
 }
 
-void SuperPrintCenter(std::string SuperWords, int Font, float X, float Y, float r, float g, float b, float a)
+void SuperPrintCenter(const std::string &SuperWords, int Font, float X, float Y, float r, float g, float b, float a)
 {
-    switch(Font)
-    {
-    default:
-    case 1:
-    case 4:
-        X -= SuperWords.length() * 9;
-        break;
-    case 2:
-        X -= SuperWords.length() * 6;
-        break;
-    case 3:
-    {
-        int B = 0;
-        for(auto c : SuperWords)
-        {
-            c = std::toupper(c);
-            if(c >= 33 && c <= 126)
-            {
-                B += 9;
-                if(c == 'M')
-                    B += 1;
-            } else {
-                B += 8;
-            }
-        }
-        X -= B;
-        break;
-    }
-    }
-
+    X -= SuperTextPixLen(SuperWords, Font) / 2;
     SuperPrint(SuperWords, Font, X, Y, r, g, b, a);
 }
 
-void SuperPrintScreenCenter(std::string SuperWords, int Font, float Y, float r, float g, float b, float a)
+void SuperPrintScreenCenter(const std::string &SuperWords, int Font, float Y, float r, float g, float b, float a)
 {
-    SuperPrintCenter(SuperWords, Font, ScreenW / 2, Y, r, g, b, a);
+    float X = (ScreenW / 2) - (SuperTextPixLen(SuperWords, Font) / 2);
+    SuperPrint(SuperWords, Font, X, Y, r, g, b, a);
 }
 
-void SuperPrint(std::string SuperWords, int Font, float X, float Y,
+void SuperPrint(const std::string &SuperWords, int Font, float X, float Y,
                 float r, float g, float b, float a)
 {
 //    int A = 0;
@@ -117,7 +100,7 @@ void SuperPrint(std::string SuperWords, int Font, float X, float Y,
         for(auto c : SuperWords)
         {
             if(c >= '0' && c <= '9')
-                frmMain.renderTexture(int(X + B), int(Y), 16, 14, GFX.Font1[c - '0'], 0, 0, r, g, b, a);
+                XRender::renderTexture(X + B, Y, 16, 14, GFX.Font1[c - '0'], 0, 0, r, g, b, a);
             B += 18;
         }
     }
@@ -127,31 +110,31 @@ void SuperPrint(std::string SuperWords, int Font, float X, float Y,
         {
             if(c >= 48 && c <= 57) {
                 C = (c - 48) * 16;
-                frmMain.renderTexture(int(X + B), int(Y), 15, 17, GFX.Font2[1], C, 0, r, g, b, a);
+                XRender::renderTexture(X + B, Y, 15, 17, GFX.Font2[1], C, 0, r, g, b, a);
                 B += 16;
             } else if(c >= 65 && c <= 90) {
                 C = (c - 55) * 16;
-                frmMain.renderTexture(int(X + B), int(Y), 15, 17, GFX.Font2[1], C, 0, r, g, b, a);
+                XRender::renderTexture(X + B, Y, 15, 17, GFX.Font2[1], C, 0, r, g, b, a);
                 B += 16;
             } else if(c >= 97 && c <= 122) {
                 C = (c - 61) * 16;
-                frmMain.renderTexture(int(X + B), int(Y), 15, 17, GFX.Font2[1], C, 0, r, g, b, a);
+                XRender::renderTexture(X + B, Y, 15, 17, GFX.Font2[1], C, 0, r, g, b, a);
                 B += 16;
             } else if(c >= 33 && c <= 47) {
                 C = (c - 33) * 16;
-                frmMain.renderTexture(int(X + B), int(Y), 15, 17, GFX.Font2S, C, 0, r, g, b, a);
+                XRender::renderTexture(X + B, Y, 15, 17, GFX.Font2S, C, 0, r, g, b, a);
                 B += 16;
             } else if(c >= 58 && c <= 64) {
                 C = (c - 58 + 15) * 16;
-                frmMain.renderTexture(int(X + B), int(Y), 15, 17, GFX.Font2S, C, 0, r, g, b, a);
+                XRender::renderTexture(X + B, Y, 15, 17, GFX.Font2S, C, 0, r, g, b, a);
                 B += 16;
             } else if(c >= 91 && c <= 96) {
                 C = (c - 91 + 22) * 16;
-                frmMain.renderTexture(int(X + B), int(Y), 15, 17, GFX.Font2S, C, 0, r, g, b, a);
+                XRender::renderTexture(X + B, Y, 15, 17, GFX.Font2S, C, 0, r, g, b, a);
                 B += 16;
             } else if(c >= 123 && c <= 125) {
                 C = (c - 123 + 28) * 16;
-                frmMain.renderTexture(int(X + B), int(Y), 15, 17, GFX.Font2S, C, 0, r, g, b, a);
+                XRender::renderTexture(X + B, Y, 15, 17, GFX.Font2S, C, 0, r, g, b, a);
                 B += 16;
             } else {
                 B += 16;
@@ -172,15 +155,15 @@ void SuperPrint(std::string SuperWords, int Font, float X, float Y,
                 C = (c - 33) * 32;
 //                BitBlt myBackBuffer, X + B, Y, 18, 16, GFX.Font2Mask(2).hdc, 2, C, vbSrcAnd
 //                BitBlt myBackBuffer, X + B, Y, 18, 16, GFX.Font2(2).hdc, 2, C, vbSrcPaint
-                frmMain.renderTexture(int(X + B), int(Y), 18, 16, GFX.Font2[2], 2, C, r, g, b, a);
-//                B = B + 18
+                XRender::renderTexture(X + B, Y, 18, 16, GFX.Font2[2], 2, C, r, g, b, a);
+//                B += 18
                 B += 18;
-//                If Left(Words, 1) = "M" Then B = B + 2
+//                If Left(Words, 1) = "M" Then B += 2
                 if(c == 'M')
                     B += 2;
 //            Else
             } else {
-//                B = B + 16
+//                B += 16
                 B += 16;
             }
 //            End If
@@ -200,12 +183,12 @@ void SuperPrint(std::string SuperWords, int Font, float X, float Y,
 //                C = (Asc(Left(Words, 1)) - 33) * 16
                 C = (c - 33) * 16;
 //                BitBlt myBackBuffer, X + B, Y, 18, 16, GFX.Font2(3).hdc, 2, C, vbSrcPaint
-                frmMain.renderTexture(int(X + B), int(Y), 18, 16, GFX.Font2[3], 2, C, r, g, b, a);
-//                B = B + 18
+                XRender::renderTexture(X + B, Y, 18, 16, GFX.Font2[3], 2, C, r, g, b, a);
+//                B += 18
                 B += 18;
 //            Else
             } else {
-//                B = B + 18
+//                B += 18
                 B += 18;
 //            End If
             }

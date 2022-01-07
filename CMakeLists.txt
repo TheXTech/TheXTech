@@ -6,6 +6,7 @@ include(CheckCXXCompilerFlag)
 include(ExternalProject)
 include(CheckLibraryExists)
 include(GNUInstallDirs)
+include(FindBacktrace)
 
 include(cmake/git_info.cmake)
 message("== Current GIT hash [${GIT_COMMIT_HASH}], branch [${GIT_BRANCH}], package [${PACKAGE_SUFFIX}] ==")
@@ -86,6 +87,10 @@ include(version.cmake)
 include(cmake/git_version.cmake)
 
 
+configure_file(lib/CrashHandler/backtrace.h.in
+               generated-include/lib/CrashHandler/backtrace.h)
+include_directories(${CMAKE_CURRENT_BINARY_DIR}/generated-include)
+
 #if(WIN32 OR EMSCRIPTEN OR HAIKU)
 #    set(USE_SYSTEM_LIBS_DEFAULT OFF)
 #else()
@@ -139,8 +144,15 @@ if(APPLE)
 endif()
 
 if(NOT APPLE AND NOT ANDROID AND NOT EMSCRIPTEN)
-    set(THEXTECH_FIXED_ASSETS_PATH "" CACHE STRING "Fixed assets path (The '/usr/share/games/<game-name>/' suggested). Unused by default.")
+    set(DEFAULT_THEXTECH_SOURCE_ASSETS_PATH "${CMAKE_CURRENT_SOURCE_DIR}/assets") # For source packages creation with vendored assets
+    if(NOT EXISTS "${DEFAULT_THEXTECH_SOURCE_ASSETS_PATH}")
+        unset(DEFAULT_THEXTECH_SOURCE_ASSETS_PATH)
+    endif()
+
+    set(THEXTECH_FIXED_ASSETS_PATH "${DEFAULT_THEXTECH_FIXED_ASSETS_PATH}" CACHE STRING "Fixed assets path (The '/usr/share/games/<game-name>/' suggested). Unused by default.")
     set(THEXTECH_USER_DIR_NAME "" CACHE STRING "The name of the user directory at user's home to store settings/episodes/etc. The 'PGE_Project/thextech' will be used by default.")
+    set(THEXTECH_SOURCE_ASSETS_PATH "${DEFAULT_THEXTECH_SOURCE_ASSETS_PATH}" CACHE STRING "Path to resources root used with the package to create")
+    set(THEXTECH_UNIX_INSTALL TRUE)
 endif()
 
 # ============ Customization ==end=========
@@ -161,6 +173,7 @@ include(lib/IniProcessor/IniProcessor.cmake)
 include(lib/Utils/Utils.cmake)
 include(lib/Logger/logger.cmake)
 include(lib/tclap/tclap.cmake)
+include(lib/md5/md5.cmake)
 if(WIN32)
     include(lib/CrashHandler/StackWalker/StackWalker.cmake)
 endif()
@@ -240,23 +253,32 @@ target_include_directories(A2XT_Int INTERFACE ${A2XT_INCS})
 
 set(LIB_SRC
     lib/util.cpp
+    lib/fader.cpp
     lib/AppPath/app_path.cpp
     ${DIRMANAGER_SRCS}
     ${FILEMAPPER_SRCS}
     ${FMT_SRCS}
     ${STACK_WALKER_SRCS}
+    ${MD5_SRCS}
     lib/CrashHandler/crash_handler.cpp
     lib/Graphics/graphics_funcs.cpp
     lib/Graphics/image_size.cpp
     lib/Graphics/size.cpp
     lib/Graphics/sizef.cpp
-    lib/InterProcess/editor_pipe.cpp
-    lib/InterProcess/intproc.cpp
     ${INIPROCESSOR_SRCS}
     ${LOGGER_SRCS}
     ${UTILS_SRCS}
     ${LIB_SRC_EXTRA}
 )
+
+if(NOT ANDROID AND NOT EMSCRIPTEN AND NOT VITA AND NOT 3DS)
+    list(APPEND LIB_SRC
+        lib/InterProcess/editor_pipe.cpp
+        lib/InterProcess/intproc.cpp
+    )
+    set(THEXTECH_INTERPROC_SUPPORTED ON)
+endif()
+
 
 if(APPLE)
     file(GLOB PGE_FILE_ICONS "${CMAKE_CURRENT_SOURCE_DIR}/resources/file_icons/*.icns")
@@ -274,6 +296,10 @@ set(THEXTECH_SRC
     src/npc.cpp
     src/sound.cpp
     src/frame_timer.cpp
+    src/core/base/render_base.cpp
+    src/core/base/window_base.cpp
+    src/core/base/msgbox_base.cpp
+    src/core/base/events_base.cpp
     src/main/world_loop.cpp
     src/main/world_file.cpp
     src/main/game_info.cpp
@@ -329,6 +355,7 @@ set(THEXTECH_SRC
     src/player.cpp
     src/rand.cpp
     src/sorting.cpp
+    src/screen_fader.cpp
     src/npc/npc_hit.cpp
     src/npc/npc_kill.cpp
     src/npc/npc_update.cpp
@@ -336,6 +363,32 @@ set(THEXTECH_SRC
     src/npc/npc_bonus.cpp
     src/player/player_update.cpp
 )
+
+add_definitions(-DCORE_EVERYTHING_SDL)
+list(APPEND THEXTECH_SRC
+    src/core/sdl/render_sdl.cpp
+    src/core/sdl/window_sdl.cpp
+    src/core/sdl/msgbox_sdl.cpp
+    src/core/sdl/events_sdl.cpp
+)
+
+# Add heads into the list
+file(GLOB THEXTECH_HEADS_SRC
+    lib/*.h
+    lib/AppPath/*.h
+    lib/CrashHandler/*.h
+    lib/Graphics/*.h
+    lib/InterProcess/*.h
+    src/*.h
+    src/*.hpp
+    src/control/*.h
+    src/core/*.h
+    src/core/base/*.h
+    src/core/sdl/*.h
+    src/main/*.h
+    src/main/QuadTree/*.h
+)
+list(APPEND THEXTECH_SRC ${THEXTECH_HEADS_SRC})
 
 if(WIN32 AND NOT EMSCRIPTEN)
     list(APPEND THEXTECH_SRC resources/thextech.rc)
@@ -381,11 +434,13 @@ if(ANDROID)
 
 #    add_library(hidapi SHARED IMPORTED DEPENDS AudioCodecs_Local)
 #    set_target_properties(hidapi PROPERTIES IMPORTED_LOCATION "${DEPENDENCIES_INSTALL_DIR}/lib/libhidapi.so")
-    add_custom_target(SDL_ApkPackLibs_hidapi ALL
-        COMMAND ${CMAKE_COMMAND} -E copy "${DEPENDENCIES_INSTALL_DIR}/lib/libhidapi.so" "${APK_PACK_LIBS}"
-        DEPENDS SDL_ApkPackLibs_makeDir "${DEPENDENCIES_INSTALL_DIR}/lib/libhidapi.so" AudioCodecs_Local
-    )
-    add_dependencies(thextech SDL_ApkPackLibs_hidapi)
+
+# libhidapi.so is NO LONGER required since SDL 2.0.18
+#    add_custom_target(SDL_ApkPackLibs_hidapi ALL
+#        COMMAND ${CMAKE_COMMAND} -E copy "${DEPENDENCIES_INSTALL_DIR}/lib/libhidapi.so" "${APK_PACK_LIBS}"
+#        DEPENDS SDL_ApkPackLibs_makeDir "${DEPENDENCIES_INSTALL_DIR}/lib/libhidapi.so" AudioCodecs_Local
+#    )
+#    add_dependencies(thextech SDL_ApkPackLibs_hidapi)
 else()
     add_executable(thextech ${THEXTECH_SRC} ${LIB_SRC})
     pge_set_nopie(thextech)
@@ -454,7 +509,7 @@ if(THEXTECH_FIXED_ASSETS_PATH AND NOT THEXTECH_FIXED_ASSETS_PATH STREQUAL "")
     target_compile_definitions(thextech PRIVATE -DFIXED_ASSETS_PATH="${THEXTECH_FIXED_ASSETS_PATH}")
 endif()
 
-if(THEXTECH_GAME_NAME_TITLE AND NOT THEXTECH_USER_DIR_NAME STREQUAL "")
+if(THEXTECH_USER_DIR_NAME AND NOT THEXTECH_USER_DIR_NAME STREQUAL "")
     target_compile_definitions(thextech PRIVATE -DUSER_DIR_NAME="${THEXTECH_USER_DIR_NAME}")
 endif()
 
@@ -503,6 +558,10 @@ if(EMSCRIPTEN)
     target_compile_definitions(thextech PRIVATE -DPGE_NO_THREADING -DNO_FILE_LOGGING)
 endif()
 
+if(THEXTECH_INTERPROC_SUPPORTED)
+    target_compile_definitions(thextech PRIVATE -DTHEXTECH_INTERPROC_SUPPORTED)
+endif()
+
 if(NOT USE_SYSTEM_LIBS)
     add_dependencies(thextech ${A2XT_DEPS})
 endif()
@@ -517,6 +576,10 @@ if(USE_STATIC_LIBC AND NOT USE_SYSTEM_LIBS)
         target_compile_options(thextech PRIVATE /MT)
         target_link_options(thextech PRIVATE /INCREMENTAL:NO /NODEFAULTLIB:MSVCRT)
     endif()
+endif()
+
+if (Backtrace_FOUND)
+    set_property(TARGET thextech APPEND_STRING PROPERTY LINK_FLAGS " ${Backtrace_LIBRARIES}")
 endif()
 
 if(WIN32)
@@ -578,7 +641,52 @@ else()
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     )
-    install(FILES changelog.txt DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/thextech)
-    install(FILES README.md DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/thextech RENAME ReadMe.txt)
-    install(FILES LICENSE DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/thextech RENAME License.TheXTech.txt)
+
+    if(THEXTECH_UNIX_INSTALL)
+        if(THEXTECH_FIXED_ASSETS_PATH AND NOT THEXTECH_FIXED_ASSETS_PATH STREQUAL "" AND
+           THEXTECH_SOURCE_ASSETS_PATH AND NOT THEXTECH_SOURCE_ASSETS_PATH STREQUAL "")
+
+            if(NOT HAIKU)
+                if(NOT EXISTS "${DEPENDENCIES_INSTALL_DIR}/share/applications")
+                    file(MAKE_DIRECTORY "${DEPENDENCIES_INSTALL_DIR}/share/applications")
+                endif()
+
+                set(DESKTOP_EXEC ${THEXTECH_EXECUTABLE_NAME})
+                set(DESKTOP_ICON ${THEXTECH_EXECUTABLE_NAME})
+                set(DESKTOP_WMCLASS ${THEXTECH_EXECUTABLE_NAME})
+                configure_file("${CMAKE_CURRENT_SOURCE_DIR}/cmake/icon.desktop.in"
+                               "${DEPENDENCIES_INSTALL_DIR}/share/applications/${THEXTECH_EXECUTABLE_NAME}.desktop")
+                install(FILES "${DEPENDENCIES_INSTALL_DIR}/share/applications/${THEXTECH_EXECUTABLE_NAME}.desktop"
+                        DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/applications)
+
+                install(FILES "${THEXTECH_SOURCE_ASSETS_PATH}/graphics/ui/icon/thextech_16.png"
+                        DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/16x16/apps/" RENAME "${THEXTECH_EXECUTABLE_NAME}.png")
+                install(FILES "${THEXTECH_SOURCE_ASSETS_PATH}/graphics/ui/icon/thextech_32.png"
+                        DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/32x32/apps/" RENAME "${THEXTECH_EXECUTABLE_NAME}.png")
+                install(FILES "${THEXTECH_SOURCE_ASSETS_PATH}/graphics/ui/icon/thextech_48.png"
+                        DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/48x48/apps/" RENAME "${THEXTECH_EXECUTABLE_NAME}.png")
+                install(FILES "${THEXTECH_SOURCE_ASSETS_PATH}/graphics/ui/icon/thextech_128.png"
+                        DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/128x128/apps/" RENAME "${THEXTECH_EXECUTABLE_NAME}.png")
+                install(FILES "${THEXTECH_SOURCE_ASSETS_PATH}/graphics/ui/icon/thextech_256.png"
+                        DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/256x256/apps/" RENAME "${THEXTECH_EXECUTABLE_NAME}.png")
+            endif()
+
+            file(GLOB THEXTECH_ASSETS_FILES_ROOT_LIST LIST_DIRECTORIES false  "${THEXTECH_SOURCE_ASSETS_PATH}/*")
+            install(FILES ${THEXTECH_ASSETS_FILES_ROOT_LIST} DESTINATION "${THEXTECH_FIXED_ASSETS_PATH}")
+
+            install(DIRECTORY "${THEXTECH_SOURCE_ASSETS_PATH}/battle" DESTINATION "${THEXTECH_FIXED_ASSETS_PATH}")
+            install(DIRECTORY "${THEXTECH_SOURCE_ASSETS_PATH}/graphics" DESTINATION "${THEXTECH_FIXED_ASSETS_PATH}")
+            install(DIRECTORY "${THEXTECH_SOURCE_ASSETS_PATH}/music" DESTINATION "${THEXTECH_FIXED_ASSETS_PATH}")
+            install(DIRECTORY "${THEXTECH_SOURCE_ASSETS_PATH}/sound" DESTINATION "${THEXTECH_FIXED_ASSETS_PATH}")
+            install(DIRECTORY "${THEXTECH_SOURCE_ASSETS_PATH}/worlds" DESTINATION "${THEXTECH_FIXED_ASSETS_PATH}")
+
+            install(FILES changelog.txt DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/doc/${THEXTECH_EXECUTABLE_NAME})
+            install(FILES README.md DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/doc/${THEXTECH_EXECUTABLE_NAME} RENAME ReadMe.txt)
+            install(FILES LICENSE DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/doc/${THEXTECH_EXECUTABLE_NAME} RENAME License.TheXTech.txt)
+        endif()
+    else()
+        install(FILES changelog.txt DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/thextech)
+        install(FILES README.md DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/thextech RENAME ReadMe.txt)
+        install(FILES LICENSE DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/thextech RENAME License.TheXTech.txt)
+    endif()
 endif()

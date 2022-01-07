@@ -1,3 +1,7 @@
+<p align="center">
+<a href="https://github.com/Wohlstand/TheXTech/releases"><img src="https://raw.githubusercontent.com/Wohlstand/TheXTech/master/resources/icon/thextech_512.png" alt="TheXTech"></a>
+</p>
+
 # TheXTech 
 
 Motor SMBX, reescrito en C ++ a partir de VisualBasic 6. 
@@ -47,7 +51,7 @@ Aquí hay muchas formas de jugar con él:
 force-portable = true
 ```
 , music.ini, sounds.ini y una carpeta adicional "graphics/ui". Una nota importante: todos los gráficos predeterminados deben convertirse a PNG, use la herramienta GIFs2PNG de PGE Project en su carpeta "gráficos" con un interruptor "-d". No use el interruptor "-r" para mantener los GIF originales junto con los PNG recién creados si planea continuar usando SMBX original escrito en VB6.
-- use esto para el modo de depuración: en su directorio de inicio, cree la carpeta ".PGE_Project/thextech" (en macOS, la "`~/Library/Application Support/PGE Project/thextech`") donde debe colocar un set completo de recursos del juego y cosas de mundos, esta carpeta funcionará como la raíz del juego en el juego original. Este modo le permite ejecutar un archivo ejecutable desde cualquier ubicación de la carpeta en su computadora y usar la misma ubicación de recursos para todas las compilaciones (excepto las que están marcadas como portátiles por el archivo INI).
+- use esto para el modo de depuración: en su directorio de inicio, cree la carpeta ".PGE_Project/thextech" (en macOS, la "`~/TheXTech Games/Debug Assets/`") donde debe colocar un set completo de recursos del juego y cosas de mundos, esta carpeta funcionará como la raíz del juego en el juego original. Este modo le permite ejecutar un archivo ejecutable desde cualquier ubicación de la carpeta en su computadora y usar la misma ubicación de recursos para todas las compilaciones (excepto las que están marcadas como portátiles por el archivo INI).
 
 
 ## ¿Cómo agregar episodios personalizados para la versión de macOS?
@@ -56,7 +60,7 @@ Si tiene una compilación empaquetada de TheXTech, todos los recursos predetermi
    ~/TheXTech Episodes
 ''
 En este directorio, encontrará una carpeta vacía de "batalla" y "mundos" para colocar sus cosas personalizadas. En la ruta "`~/Library/Application Support/PGE Project/thextech` ", se almacenarán los registros, las configuraciones y las partidas guardadas.
-Si desea reemplazar los recursos predeterminados por los suyos, puede modificar el contenido del paquete de la aplicación o hacer una nueva compilación con los argumentos de CMake necesarios que se necesitan para empaquetar la raíz de los recursos personalizados y el icono en el nuevo paquete o crear la compilación sin recursos (si no das argumentos, resultará la compilación sin recursos). Por lo tanto, debes colocar el contenido completo de la raíz del juego en la carpeta "`~/Library/Application Support/PGE Project/thextech` ", incluye recursos predeterminados (gráficos, música, sonidos, niveles de introducción y salida, niveles de batalla predeterminados y carpetas de mundos).
+Si desea reemplazar los recursos predeterminados por los suyos, puede modificar el contenido del paquete de la aplicación o hacer una nueva compilación con los argumentos de CMake necesarios que se necesitan para empaquetar la raíz de los recursos personalizados y el icono en el nuevo paquete o crear la compilación sin recursos (si no das argumentos, resultará la compilación sin recursos). Por lo tanto, debes colocar el contenido completo de la raíz del juego en la carpeta "`~/TheXTech Games/Debug Assets/` ", incluye recursos predeterminados (gráficos, música, sonidos, niveles de introducción y salida, niveles de batalla predeterminados y carpetas de mundos).
 
 
 ## ¿Qué diferencia hay con esto en comparación con la versión original en VB6?

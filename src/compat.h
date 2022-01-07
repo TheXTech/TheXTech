@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#pragma once
 #ifndef COMPAT_H
 #define COMPAT_H
 
@@ -50,6 +51,28 @@ struct Compatibility_t
     // 1.3.5.2
     bool fix_swooper_start_while_inactive;
     bool fix_FreezeNPCs_no_reset;
+    enum StarsShowPolicy_t
+    {
+        //! Prefer global settings
+        STARS_UNSPECIFIED = -1,
+        //! Never show stars counter
+        STARS_DONT_SHOW = 0,
+        //! Show collected only
+        STARS_SHOW_COLLECTED_ONLY = 1,
+        //! Show collected and available
+        STARS_SHOW_COLLECTED_AND_AVAILABLE = 2
+    };
+    int world_map_stars_show_policy;
+    // 1.3.5.3
+    bool require_ground_to_enter_warps;
+    bool fix_npc_activation_event_loop_bug;
+    enum SfxPlayerGrowWithGetItem_t
+    {
+        SPGWGI_UNSPECIFIED = 0,
+        SPGWGI_ENABLE,
+        SPGWGI_DISABLE
+    };
+    int sfx_player_grow_with_got_item;
     // 1.3.6
     bool pause_on_disconnect;
     bool allow_DropAdd;

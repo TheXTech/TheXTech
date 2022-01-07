@@ -18,11 +18,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <vector>
+
 #include <SDL2/SDL_stdinc.h>
-#include <SDL2/SDL_messagebox.h>
+#ifdef ENABLE_ANTICHEAT_TRAP
+#include "core/msgbox.h"
+#include "core/render.h"
+#include "core/events.h"
+#endif
 
 #include <Logger/logger.h>
+#ifdef ENABLE_ANTICHEAT_TRAP
+#include <SDL2/SDL_timer.h>
 #include <pge_delay.h>
+#endif
 
 #include "../globals.h"
 #include "../sound.h"
@@ -33,1699 +42,2212 @@
 #include "../npc.h"
 #include "../layers.h"
 #include "../game_main.h"
+#include "game_info.h"
+
+#include "cheat_code.h"
+
+#ifdef __ANDROID__
+#   include <SDL2/SDL_system.h>
+#   include <jni.h>
+#   if 1
+#       undef JNIEXPORT
+#       undef JNICALL
+#       define JNIEXPORT extern "C"
+#       define JNICALL
+#   endif
+#endif
 
 
-void CheatCode(char NewKey)
+static void redigitIsCool()
 {
-    std::string newCheat;
-//    int A = 0;
-    int B = 0;
-    int C = 0;
-    Location_t tempLocation;
-    std::string oldString;
-    bool cheated = false;
+    PlaySound(SFX_SMCry);
+    Cheater = false;
+}
 
-    if(LevelEditor || GameMenu || /*nPlay.Online ||*/ BattleMode)
-    {
-        CheatString.clear();
-        return;
-    }
-
-    CheatString.push_back(NewKey);
-    if(CheatString.size() > 23)
-        CheatString.erase(0, 1);
-    oldString = CheatString;
-
-//    D_pLogDebug("Cheat string: [%s]\n", CheatString.c_str());
 
 #ifdef ENABLE_ANTICHEAT_TRAP
-    if(SDL_strstr(CheatString.c_str(), "redigitiscool"))
-    {
-        pLogCritical("redigitiscool code was been used, player got a punish!");
-        PlaySound(SFX_SMExplosion);
-        Score = 0; // Being very evil here, mu-ha-ha-ha-ha! >:D
-        Lives = 0;
-        Coins = 0;
-        GodMode = false;
-        ClearGame(true); // As a penalty, remove the saved game
-        Cheater = true;
-        CheatString.clear();
+static void dieCheater()
+{
+    pLogCritical("redigitiscool code was been used, player got a punish!");
+    PlaySound(SFX_SMExplosion);
+    Score = 0; // Being very evil here, mu-ha-ha-ha-ha! >:D
+    Lives = 0;
+    Coins = 0;
+    GodMode = false;
+    ClearGame(true); // As a penalty, remove the saved game
+    Cheater = true;
+    cheats_clearBuffer();
 
+    if(!LevelSelect)
+    {
+        MessageText = "       Die, cheater!       "
+                      "Now play the game all over "
+                      "    from the beginning!    "
+                      "                           "
+                      "     Time to be evil!      "
+                      "      Mu-ha-ha-ha-ha!      ";
+        PauseGame(PauseCode::Message);
+        MessageText.clear();
+    }
+    else
+    {
+        XMsgBox::simpleMsgBox(AbstractMsgBox_t::MESSAGEBOX_ERROR,
+                              "Die, cheater!",
+                              "       Die, cheater!       \n"
+                              "Now play the game all over \n"
+                              "    from the beginning!    \n"
+                              "                           \n"
+                              "     Time to be evil!      \n"
+                              "      Mu-ha-ha-ha-ha!      ");
+    }
+
+    for(int A = 1; A <= numPlayers; ++A)
+    {
+        Player[A].State = 0;
+        Player[A].Hearts = 1;
         if(!LevelSelect)
+            PlayerHurt(A);
+        else
+            KillPlayer(A);
+    }
+
+    if(LevelSelect)
+    {
+        LevelSelect = false;
+        GameMenu = true;
+        MenuMode = 0;
+        MenuCursor = 0;
+        XRender::clearBuffer();
+        XRender::repaint();
+        StopMusic();
+        XEvents::doEvents();
+        PGE_Delay(500);
+    }
+}
+#endif
+
+
+
+/* -----------------------------------*
+ *      World map only cheats         *
+ *------------------------------------*/
+
+/*!
+ * \brief Open all paths
+ */
+static void moonWalk()
+{
+    Location_t tempLocation;
+
+    for(int B = 1; B <= numWorldPaths; B++)
+    {
+        tempLocation = WorldPath[B].Location;
+        tempLocation.X += 4;
+        tempLocation.Y += 4;
+        tempLocation.Width -= 8;
+        tempLocation.Height -= 8;
+        WorldPath[B].Active = true;
+
+        for(int C = 1; C <= numScenes; C++)
         {
-            MessageText = "       Die, cheater!       "
-                          "Now play the game all over "
-                          "    from the beginning!    "
-                          "                           "
-                          "     Time to be evil!      "
-                          "      Mu-ha-ha-ha-ha!      ";
-            PauseGame(PauseCode::Message);
-            MessageText.clear();
+            if(CheckCollision(tempLocation, Scene[C].Location))
+                Scene[C].Active = false;
+        }
+    }
+
+    for(int B = 1; B <= numWorldLevels; B++)
+        WorldLevel[B].Active = true;
+
+    PlaySound(SFX_NewPath);
+}
+
+/*!
+ * \brief Allow player walk everywhere
+ */
+static void illParkWhereIWant()
+{
+    if(WalkAnywhere)
+    {
+        WalkAnywhere = false;
+        PlaySound(SFX_PlayerShrink);
+    }
+    else
+    {
+        WalkAnywhere = true;
+        PlaySound(SFX_PlayerGrow);
+    }
+}
+
+
+/* -----------------------------------*
+ *        Level only cheats           *
+ *------------------------------------*/
+
+
+static void needAShell()
+{
+    PlaySound(SFX_GotItem);
+    for(int B = 1; B <= numPlayers; B++)
+        Player[B].HeldBonus = 113;
+}
+
+static void fairyMagic()
+{
+    if(Player[1].Fairy)
+    {
+        for(int B = 1; B <= numPlayers; B++)
+        {
+            PlaySound(SFX_ZeldaFairy);
+            Player[B].Immune = 10;
+            Player[B].Effect = 8;
+            Player[B].Effect2 = 4;
+            Player[B].Fairy = false;
+            Player[B].FairyTime = 0;
+            SizeCheck(B);
+            NewEffect(63, Player[B].Location);
+        }
+    }
+    else
+    {
+        for(int B = 1; B <= numPlayers; B++)
+        {
+            PlaySound(SFX_ZeldaFairy);
+            Player[B].Immune = 10;
+            Player[B].Effect = 8;
+            Player[B].Effect2 = 4;
+            Player[B].Fairy = true;
+            Player[B].FairyTime = -1;
+            SizeCheck(B);
+            NewEffect(63, Player[B].Location);
+        }
+    }
+}
+
+static void iceAge()
+{
+    for(int C = 1; C <= numNPCs; C++)
+    {
+        if(NPC[C].Active)
+        {
+            if(!NPCNoIceBall[NPC[C].Type] && NPC[C].Type != 263 && !NPCIsABonus[NPC[C].Type])
+            {
+                NPC[0].Type = 265;
+                NPCHit(C, 3, 0);
+            }
+        }
+    }
+
+    PlaySound(SFX_Raccoon);
+}
+
+static void iStillPlayWithLegos()
+{
+    ShowLayer("Destroyed Blocks");
+    PlaySound(SFX_Raccoon);
+}
+
+static void itsRainingMen()
+{
+    for(int C = 1; C <= numPlayers; C++)
+    {
+        for(int B = -100; B <= 900; B += 34)
+        {
+            numNPCs++;
+            NPC[numNPCs] = NPC_t();
+            NPC[numNPCs].Type = 90;
+            NPC[numNPCs].Location.Y = Player[C].Location.Y - 600;
+            NPC[numNPCs].Location.X = Player[C].Location.X - 400 + B;
+            NPC[numNPCs].Location.Height = 32;
+            NPC[numNPCs].Location.Width = 32;
+            NPC[numNPCs].Stuck = true;
+            NPC[numNPCs].Active = true;
+            NPC[numNPCs].TimeLeft = 200;
+            NPC[numNPCs].Section = Player[C].Section;
+        }
+    }
+
+    PlaySound(SFX_Raccoon);
+}
+
+static void dontTypeThis()
+{
+    for(int C = 1; C <= numPlayers; C++)
+    {
+        for(int B = -100; B <= 900; B += 34)
+        {
+            numNPCs++;
+            NPC[numNPCs] = NPC_t();
+            NPC[numNPCs].Type = 134;
+            NPC[numNPCs].Location.Y = Player[C].Location.Y - 600;
+            NPC[numNPCs].Location.X = Player[C].Location.X - 400 + B;
+            NPC[numNPCs].Location.Height = 32;
+            NPC[numNPCs].Location.Width = 32;
+            NPC[numNPCs].Stuck = true;
+            NPC[numNPCs].Active = true;
+            NPC[numNPCs].TimeLeft = 200;
+            NPC[numNPCs].Section = Player[C].Section;
+        }
+    }
+
+    PlaySound(SFX_Raccoon);
+}
+
+static void wetWater()
+{
+    for(int B = 1; B <= numEffects; B++)
+    {
+        if(Effect[B].Type == 113)
+            Effect[B].Life = 0;
+    }
+
+    for(int B = 0; B <= numSections; B++)
+    {
+        if(UnderWater[B])
+        {
+            UnderWater[B] = false;
+
+            if(Background2REAL[B] == 55)
+                Background2[B] = 30;
+            else if(Background2REAL[B] == 56)
+                Background2[B] = 39;
+            else
+                Background2[B] = Background2REAL[B];
+
+            if(bgMusicREAL[B] == 46)
+            {
+                Background2[B] = 8;
+                bgMusic[B] = 7;
+            }
+            else if(bgMusicREAL[B] == 47)
+            {
+                Background2[B] = 39;
+                bgMusic[B] = 4;
+            }
+            else if(bgMusicREAL[B] == 48)
+            {
+                Background2[B] = 30;
+                bgMusic[B] = 29;
+            }
+            else if(bgMusicREAL[B] == 49)
+            {
+                Background2[B] = 30;
+                bgMusic[B] = 50;
+            }
+            else
+                bgMusic[B] = bgMusicREAL[B];
         }
         else
         {
-            SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,
-                                     "Die, cheater!",
-                                     "       Die, cheater!       \n"
-                                     "Now play the game all over \n"
-                                     "    from the beginning!    \n"
-                                     "                           \n"
-                                     "     Time to be evil!      \n"
-                                     "      Mu-ha-ha-ha-ha!      ",
-                                     frmMain.getWindow());
-        }
+            UnderWater[B] = true;
 
-        for(int A = 1; A <= numPlayers; ++A)
-        {
-            Player[A].State = 0;
-            Player[A].Hearts = 1;
-            if(!LevelSelect)
-                PlayerHurt(A);
-            else
-                KillPlayer(A);
-        }
-
-        if(LevelSelect)
-        {
-            LevelSelect = false;
-            GameMenu = true;
-            MenuMode = 0;
-            MenuCursor = 0;
-            frmMain.clearBuffer();
-            frmMain.repaint();
-            StopMusic();
-            DoEvents();
-            PGE_Delay(500);
-        }
-        return;
-    }
-    else if(SDL_strstr(CheatString.c_str(), "\x77\x6f\x68\x6c\x73\x74\x61\x6e\x64\x69\x73\x74\x73\x65\x68\x72\x67\x75\x74"))
-#else
-    if(SDL_strstr(CheatString.c_str(), "redigitiscool") || SDL_strstr(CheatString.c_str(), "\x77\x6f\x68\x6c\x73\x74\x61\x6e\x64\x69\x73\x74\x73\x65\x68\x72\x67\x75\x74"))
-#endif
-    {
-        PlaySound(SFX_SMCry);
-        Cheater = false;
-        CheatString.clear();
-        return;
-    }
-
-
-    if(LevelSelect) // On world map
-    {
-        if(SDL_strstr(CheatString.c_str(), "imtiredofallthiswalking") || SDL_strstr(CheatString.c_str(), "moonwalk") || SDL_strstr(CheatString.c_str(), "skywalk") || SDL_strstr(CheatString.c_str(), "skzwalk"))
-        {
-            for(B = 1; B <= numWorldPaths; B++)
+            if(Background2REAL[B] != 55 && Background2REAL[B] != 56)
             {
-                tempLocation = WorldPath[B].Location;
-                tempLocation.X = tempLocation.X + 4;
-                tempLocation.Y = tempLocation.Y + 4;
-                tempLocation.Width = tempLocation.Width - 8;
-                tempLocation.Height = tempLocation.Height - 8;
-                WorldPath[B].Active = true;
-                for(C = 1; C <= numScenes; C++)
-                {
-                    if(CheckCollision(tempLocation, Scene[C].Location))
-                        Scene[C].Active = false;
-                }
-            }
-            for(B = 1; B <= numWorldLevels; B++)
-                WorldLevel[B].Active = true;
-            PlaySound(SFX_NewPath);
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "illparkwhereiwant") || SDL_strstr(CheatString.c_str(), "parkinglot"))
-        {
-            if(WalkAnywhere == true)
-            {
-                WalkAnywhere = false;
-                PlaySound(SFX_PlayerShrink);
-            }
-            else
-            {
-                WalkAnywhere = true;
-                PlaySound(SFX_PlayerGrow);
-            }
-            CheatString.clear();
-            cheated = true;
-        }
-    }
-    else // On level
-    {
-        if(SDL_strstr(CheatString.c_str(), "needashell"))
-        {
-            PlaySound(SFX_GotItem);
-            for(B = 1; B <= numPlayers; B++)
-                Player[B].HeldBonus = 113;
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "fairymagic") || SDL_strstr(CheatString.c_str(), "fairzmagic"))
-        {
-            if(Player[1].Fairy == true)
-            {
-                for(B = 1; B <= numPlayers; B++)
-                {
-                    PlaySound(SFX_ZeldaFairy);
-                    Player[B].Immune = 10;
-                    Player[B].Effect = 8;
-                    Player[B].Effect2 = 4;
-                    Player[B].Fairy = false;
-                    Player[B].FairyTime = 0;
-                    SizeCheck(B);
-                    NewEffect(63, Player[B].Location);
-                }
-            }
-            else
-            {
-                for(B = 1; B <= numPlayers; B++)
-                {
-                    PlaySound(SFX_ZeldaFairy);
-                    Player[B].Immune = 10;
-                    Player[B].Effect = 8;
-                    Player[B].Effect2 = 4;
-                    Player[B].Fairy = true;
-                    Player[B].FairyTime = -1;
-                    SizeCheck(B);
-                    NewEffect(63, Player[B].Location);
-                }
-            }
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "iceage"))
-        {
-            for(C = 1; C <= numNPCs; C++)
-            {
-                if(NPC[C].Active == true)
-                {
-                    if(NPCNoIceBall[NPC[C].Type] == false && NPC[C].Type != 263 && NPCIsABonus[NPC[C].Type] == false)
-                    {
-                        NPC[0].Type = 265;
-                        NPCHit(C, 3, 0);
-                    }
-                }
-            }
-            PlaySound(SFX_Raccoon);
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "istillplaywithlegos") || SDL_strstr(CheatString.c_str(), "istillplazwithlegos"))
-        {
-            ShowLayer("Destroyed Blocks");
-            PlaySound(SFX_Raccoon);
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "itsrainingmen"))
-        {
-            for(C = 1; C <= numPlayers; C++)
-            {
-                for(B = -100; B <= 900; B += 34)
-                {
-                    numNPCs++;
-                    NPC[numNPCs] = NPC_t();
-                    NPC[numNPCs].Type = 90;
-                    NPC[numNPCs].Location.Y = Player[C].Location.Y - 600;
-                    NPC[numNPCs].Location.X = Player[C].Location.X - 400 + B;
-                    NPC[numNPCs].Location.Height = 32;
-                    NPC[numNPCs].Location.Width = 32;
-                    NPC[numNPCs].Stuck = true;
-                    NPC[numNPCs].Active = true;
-                    NPC[numNPCs].TimeLeft = 200;
-                    NPC[numNPCs].Section = Player[C].Section;
-                }
-            }
-            PlaySound(SFX_Raccoon);
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "donttypethis") || SDL_strstr(CheatString.c_str(), "donttzpethis"))
-        {
-            for(C = 1; C <= numPlayers; C++)
-            {
-                for(B = -100; B <= 900; B += 34)
-                {
-                    numNPCs++;
-                    NPC[numNPCs] = NPC_t();
-                    NPC[numNPCs].Type = 134;
-                    NPC[numNPCs].Location.Y = Player[C].Location.Y - 600;
-                    NPC[numNPCs].Location.X = Player[C].Location.X - 400 + B;
-                    NPC[numNPCs].Location.Height = 32;
-                    NPC[numNPCs].Location.Width = 32;
-                    NPC[numNPCs].Stuck = true;
-                    NPC[numNPCs].Active = true;
-                    NPC[numNPCs].TimeLeft = 200;
-                    NPC[numNPCs].Section = Player[C].Section;
-                }
-            }
-            PlaySound(SFX_Raccoon);
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "wetwater"))
-        {
-            for(B = 1; B <= numEffects; B++)
-            {
-                if(Effect[B].Type == 113)
-                    Effect[B].Life = 0;
-            }
-            for(B = 0; B <= numSections; B++)
-            {
-                if(UnderWater[B] == true)
-                {
-                    UnderWater[B] = false;
-                    if(Background2REAL[B] == 55)
-                        Background2[B] = 30;
-                    else if(Background2REAL[B] == 56)
-                        Background2[B] = 39;
-                    else
-                        Background2[B] = Background2REAL[B];
-                    if(bgMusicREAL[B] == 46)
-                    {
-                        Background2[B] = 8;
-                        bgMusic[B] = 7;
-                    }
-                    else if(bgMusicREAL[B] == 47)
-                    {
-                        Background2[B] = 39;
-                        bgMusic[B] = 4;
-                    }
-                    else if(bgMusicREAL[B] == 48)
-                    {
-                        Background2[B] = 30;
-                        bgMusic[B] = 29;
-                    }
-                    else if(bgMusicREAL[B] == 49)
-                    {
-                        Background2[B] = 30;
-                        bgMusic[B] = 50;
-                    }
-                    else
-                        bgMusic[B] = bgMusicREAL[B];
-                }
+                if(Background2REAL[B] == 12 || Background2REAL[B] == 13 || Background2REAL[B] == 19 || Background2REAL[B] == 29 ||
+                   Background2REAL[B] == 30 || Background2REAL[B] == 31 || Background2REAL[B] == 32 || Background2REAL[B] == 33 ||
+                   Background2REAL[B] == 34 || Background2REAL[B] == 42 || Background2REAL[B] == 43)
+                    Background2[B] = 55;
                 else
-                {
-                    UnderWater[B] = true;
-                    if(Background2REAL[B] != 55 && Background2REAL[B] != 56)
-                    {
-                        if(Background2REAL[B] == 12 || Background2REAL[B] == 13 || Background2REAL[B] == 19 || Background2REAL[B] == 29 || Background2REAL[B] == 30 || Background2REAL[B] == 31 || Background2REAL[B] == 32 || Background2REAL[B] == 33 || Background2REAL[B] == 34 || Background2REAL[B] == 42 || Background2REAL[B] == 43)
-                            Background2[B] = 55;
-                        else
-                            Background2[B] = 56;
-                    }
-                    else
-                        Background2[B] = Background2REAL[B];
-                    if(bgMusicREAL[B] < 46 || bgMusicREAL[B] > 49)
-                    {
-                        if(bgMusic[B] == 7 || bgMusic[B] == 9 || bgMusic[B] == 42)
-                            bgMusic[B] = 46;
-                        else if(bgMusic[B] == 1 || bgMusic[B] == 2 || bgMusic[B] == 3 || bgMusic[B] == 4 || bgMusic[B] == 6 || bgMusic[B] == 54)
-                            bgMusic[B] = 47;
-                        else if(bgMusic[B] == 10 || bgMusic[B] == 17 || bgMusic[B] == 28 || bgMusic[B] == 29 || bgMusic[B] == 41 || bgMusic[B] == 51)
-                            bgMusic[B] = 48;
-                        else if(bgMusic[B] == 14 || bgMusic[B] == 26 || bgMusic[B] == 27 || bgMusic[B] == 35 || bgMusic[B] == 36 || bgMusic[B] == 50)
-                            bgMusic[B] = 49;
-                        else
-                            bgMusic[B] = 18;
-                    }
-                    else
-                        bgMusic[B] = bgMusicREAL[B];
-                }
+                    Background2[B] = 56;
             }
-            PlaySound(SFX_Raccoon);
-            for(B = 1; B <= numPlayers; B++)
-            {
-                if(Player[B].Dead == false && Player[B].TimeToLive == 0)
-                {
-                    StopMusic();
-                    StartMusic(Player[B].Section);
-                    break;
-                }
-            }
-            CheatString.clear();
-            cheated = true;
-        }
-
-
-
-
-        else if(SDL_strstr(CheatString.c_str(), "needaredshell"))
-        {
-            PlaySound(SFX_GotItem);
-            for(B = 1; B <= numPlayers; B++)
-                Player[B].HeldBonus = 114;
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "needablueshell"))
-        {
-            PlaySound(SFX_GotItem);
-            for(B = 1; B <= numPlayers; B++)
-                Player[B].HeldBonus = 115;
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "needayellowshell") || SDL_strstr(CheatString.c_str(), "needazellowshell"))
-        {
-            PlaySound(SFX_GotItem);
-            for(B = 1; B <= numPlayers; B++)
-                Player[B].HeldBonus = 116;
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "needaturnip"))
-        {
-            PlaySound(SFX_GotItem);
-            for(B = 1; B <= numPlayers; B++)
-                Player[B].HeldBonus = 92;
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "needa1up"))
-        {
-            PlaySound(SFX_GotItem);
-            for(B = 1; B <= numPlayers; B++)
-                Player[B].HeldBonus = 90;
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "needatanookisuit"))
-        {
-            PlaySound(SFX_GotItem);
-            for(B = 1; B <= numPlayers; B++)
-            {
-                Player[B].HeldBonus = 169;
-                if(Player[B].Character >= 3 && Player[B].State != 5)
-                {
-                    PlaySound(SFX_Raccoon);
-                    Player[B].Immune = 30;
-                    Player[B].Effect = 8;
-                    Player[B].Effect2 = 4;
-                    Player[B].State = 5;
-                    SizeCheck(B);
-                    NewEffect(10,
-                              newLoc(Player[B].Location.X + Player[B].Location.Width / 2.0 - EffectWidth[10] / 2.0,
-                              Player[B].Location.Y + Player[B].Location.Height / 2.0 - EffectHeight[10] / 2.0));
-                }
-                if(Player[B].Character >= 3 && Player[B].Hearts < 3)
-                    Player[B].Hearts = Player[B].Hearts + 1;
-            }
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "needahammersuit") || SDL_strstr(CheatString.c_str(), "hammertime"))
-        {
-            PlaySound(SFX_GotItem);
-            for(B = 1; B <= numPlayers; B++)
-            {
-                Player[B].HeldBonus = 170;
-                if(Player[B].Character >= 3 && Player[B].State != 6)
-                {
-                    PlaySound(SFX_Raccoon);
-                    Player[B].Immune = 30;
-                    Player[B].Effect = 8;
-                    Player[B].Effect2 = 4;
-                    Player[B].State = 6;
-                    SizeCheck(B);
-                    NewEffect(10,
-                              newLoc(Player[B].Location.X + Player[B].Location.Width / 2.0 - EffectWidth[10] / 2.0,
-                              Player[B].Location.Y + Player[B].Location.Height / 2.0 - EffectHeight[10] / 2.0));
-                }
-                if(Player[B].Character >= 3 && Player[B].Hearts < 3)
-                    Player[B].Hearts = Player[B].Hearts + 1;
-            }
-            CheatString.clear();
-            cheated = true;
-        }
-
-        else if(SDL_strstr(CheatString.c_str(), "needamushroom"))
-        {
-            PlaySound(SFX_GotItem);
-            for(B = 1; B <= numPlayers; B++)
-            {
-                Player[B].HeldBonus = 9;
-                if(Player[B].Character >= 3 && Player[B].State == 1)
-                {
-                    PlaySound(SFX_Raccoon);
-                    Player[B].Immune = 30;
-                    Player[B].Effect = 8;
-                    Player[B].Effect2 = 4;
-                    Player[B].State = 2;
-                    SizeCheck(B);
-                    NewEffect(10,
-                              newLoc(Player[B].Location.X + Player[B].Location.Width / 2.0 - EffectWidth[10] / 2.0,
-                              Player[B].Location.Y + Player[B].Location.Height / 2.0 - EffectHeight[10] / 2.0));
-                }
-                if(Player[B].Character >= 3 && Player[B].Hearts < 3)
-                    Player[B].Hearts = Player[B].Hearts + 1;
-            }
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "needaflower"))
-        {
-            PlaySound(SFX_GotItem);
-            for(B = 1; B <= numPlayers; B++)
-            {
-                Player[B].HeldBonus = 14;
-                if(Player[B].Character >= 3 && Player[B].State != 3)
-                {
-                    PlaySound(SFX_Raccoon);
-                    Player[B].Immune = 30;
-                    Player[B].Effect = 8;
-                    Player[B].Effect2 = 4;
-                    Player[B].State = 3;
-                    SizeCheck(B);
-                    NewEffect(10,
-                              newLoc(Player[B].Location.X + Player[B].Location.Width / 2.0 - EffectWidth[10] / 2.0,
-                              Player[B].Location.Y + Player[B].Location.Height / 2.0 - EffectHeight[10] / 2.0));
-                }
-                if(Player[B].Character >= 3 && Player[B].Hearts < 3)
-                    Player[B].Hearts = Player[B].Hearts + 1;
-            }
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "niceflower"))
-        {
-            PlaySound(SFX_GotItem);
-            for(B = 1; B <= numPlayers; B++)
-            {
-                Player[B].HeldBonus = 264;
-                if(Player[B].Character >= 3 && Player[B].State != 7)
-                {
-                    PlaySound(SFX_Raccoon);
-                    Player[B].Immune = 30;
-                    Player[B].Effect = 8;
-                    Player[B].Effect2 = 4;
-                    Player[B].State = 7;
-                    SizeCheck(B);
-                    NewEffect(10,
-                              newLoc(Player[B].Location.X + Player[B].Location.Width / 2.0 - EffectWidth[10] / 2.0,
-                              Player[B].Location.Y + Player[B].Location.Height / 2.0 - EffectHeight[10] / 2.0));
-                }
-                if(Player[B].Character >= 3 && Player[B].Hearts < 3)
-                    Player[B].Hearts = Player[B].Hearts + 1;
-            }
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "needaleaf"))
-        {
-            PlaySound(SFX_GotItem);
-            for(B = 1; B <= numPlayers; B++)
-            {
-                Player[B].HeldBonus = 34;
-                if(Player[B].Character >= 3 && Player[B].State != 4)
-                {
-                    PlaySound(SFX_Raccoon);
-                    Player[B].Immune = 30;
-                    Player[B].Effect = 8;
-                    Player[B].Effect2 = 4;
-                    Player[B].State = 4;
-                    SizeCheck(B);
-                    NewEffect(10,
-                              newLoc(Player[B].Location.X + Player[B].Location.Width / 2.0 - EffectWidth[10] / 2.0,
-                              Player[B].Location.Y + Player[B].Location.Height / 2.0 - EffectHeight[10] / 2.0));
-                }
-                if(Player[B].Character >= 3 && Player[B].Hearts < 3)
-                    Player[B].Hearts = Player[B].Hearts + 1;
-            }
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "needanegg"))
-        {
-            PlaySound(SFX_GotItem);
-            for(B = 1; B <= numPlayers; B++)
-                Player[B].HeldBonus = 96;
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "needaplant"))
-        {
-            PlaySound(SFX_GotItem);
-            for(B = 1; B <= numPlayers; B++)
-                Player[B].HeldBonus = 49;
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "needagun"))
-        {
-            PlaySound(SFX_GotItem);
-            for(B = 1; B <= numPlayers; B++)
-                Player[B].HeldBonus = 22;
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "needaswitch"))
-        {
-            PlaySound(SFX_GotItem);
-            for(B = 1; B <= numPlayers; B++)
-                Player[B].HeldBonus = 32;
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "needaclock"))
-        {
-            PlaySound(SFX_GotItem);
-            for(B = 1; B <= numPlayers; B++)
-                Player[B].HeldBonus = 248;
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "needabomb"))
-        {
-            PlaySound(SFX_GotItem);
-            for(B = 1; B <= numPlayers; B++)
-                Player[B].HeldBonus = 135;
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "needashoe"))
-        {
-            PlaySound(SFX_GotItem);
-            for(B = 1; B <= numPlayers; B++)
-                Player[B].HeldBonus = 35;
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "redshoe"))
-        {
-            PlaySound(SFX_GotItem);
-            for(B = 1; B <= numPlayers; B++)
-                Player[B].HeldBonus = 191;
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "blueshoe"))
-        {
-            PlaySound(SFX_GotItem);
-            for(B = 1; B <= numPlayers; B++)
-                Player[B].HeldBonus = 193;
-            CheatString.clear();
-            cheated = true;
-        }
-
-
-        else if(SDL_strstr(CheatString.c_str(), "shadowstar"))
-        {
-            PlaySound(SFX_Raccoon);
-            for(B = 1; B <= numPlayers; B++)
-            {
-                Player[B].Immune = 50;
-                tempLocation = Player[B].Location;
-                tempLocation.Y = Player[B].Location.Y + Player[B].Location.Height / 2.0 - 16;
-                tempLocation.X = Player[B].Location.X + Player[B].Location.Width / 2.0 - 16;
-                NewEffect(10, tempLocation);
-            }
-            if(ShadowMode == true)
-                ShadowMode = false;
             else
-                ShadowMode = true;
-            CheatString.clear();
-            cheated = true;
+                Background2[B] = Background2REAL[B];
+
+            if(bgMusicREAL[B] < 46 || bgMusicREAL[B] > 49)
+            {
+                if(bgMusic[B] == 7 || bgMusic[B] == 9 || bgMusic[B] == 42)
+                    bgMusic[B] = 46;
+                else if(bgMusic[B] == 1 || bgMusic[B] == 2 || bgMusic[B] == 3 || bgMusic[B] == 4 || bgMusic[B] == 6 || bgMusic[B] == 54)
+                    bgMusic[B] = 47;
+                else if(bgMusic[B] == 10 || bgMusic[B] == 17 || bgMusic[B] == 28 || bgMusic[B] == 29 || bgMusic[B] == 41 || bgMusic[B] == 51)
+                    bgMusic[B] = 48;
+                else if(bgMusic[B] == 14 || bgMusic[B] == 26 || bgMusic[B] == 27 || bgMusic[B] == 35 || bgMusic[B] == 36 || bgMusic[B] == 50)
+                    bgMusic[B] = 49;
+                else
+                    bgMusic[B] = 18;
+            }
+            else
+                bgMusic[B] = bgMusicREAL[B];
         }
-        else if(SDL_strstr(CheatString.c_str(), "ibakedacakeforyou") || SDL_strstr(CheatString.c_str(), "ibakedacakeforzou") || SDL_strstr(CheatString.c_str(), "itsamepeach"))
+    }
+
+    PlaySound(SFX_Raccoon);
+
+    for(int B = 1; B <= numPlayers; B++)
+    {
+        if(!Player[B].Dead && Player[B].TimeToLive == 0)
+        {
+            StopMusic();
+            StartMusic(Player[B].Section);
+            break;
+        }
+    }
+}
+
+static void needARedShell()
+{
+    PlaySound(SFX_GotItem);
+    for(int B = 1; B <= numPlayers; B++)
+        Player[B].HeldBonus = 114;
+}
+
+static void needABlueShell()
+{
+    PlaySound(SFX_GotItem);
+    for(int B = 1; B <= numPlayers; B++)
+        Player[B].HeldBonus = 115;
+}
+
+static void needAYellowShell()
+{
+    PlaySound(SFX_GotItem);
+    for(int B = 1; B <= numPlayers; B++)
+        Player[B].HeldBonus = 116;
+}
+
+static void needATurnip()
+{
+    PlaySound(SFX_GotItem);
+    for(int B = 1; B <= numPlayers; B++)
+        Player[B].HeldBonus = 92;
+}
+
+static void needA1Up()
+{
+    PlaySound(SFX_GotItem);
+    for(int B = 1; B <= numPlayers; B++)
+        Player[B].HeldBonus = 90;
+}
+
+static void needATanookiSuit()
+{
+    PlaySound(SFX_GotItem);
+    for(int B = 1; B <= numPlayers; B++)
+    {
+        Player[B].HeldBonus = 169;
+
+        if(Player[B].Character >= 3 && Player[B].State != 5)
         {
             PlaySound(SFX_Raccoon);
-            for(B = 1; B <= numPlayers; B++)
-            {
-                Player[B].Character = 3;
-                Player[B].Immune = 50;
-                if(Player[B].Mount <= 1)
-                {
-                    Player[B].Location.Y = Player[B].Location.Y + Player[B].Location.Height;
-                    Player[B].Location.Height = Physics.PlayerHeight[Player[B].Character][Player[B].State];
-                    if(Player[B].Mount == 1 && Player[B].State == 1)
-                        Player[B].Location.Height = Physics.PlayerHeight[1][2];
-                    Player[B].Location.Y = Player[B].Location.Y - Player[B].Location.Height;
-                    Player[B].StandUp = true;
-                }
-                tempLocation = Player[B].Location;
-                tempLocation.Y = Player[B].Location.Y + Player[B].Location.Height / 2.0 - 16;
-                tempLocation.X = Player[B].Location.X + Player[B].Location.Width / 2.0 - 16;
-                NewEffect(10, tempLocation);
-            }
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "anothercastle") || SDL_strstr(CheatString.c_str(), "itsametoad"))
-        {
-            PlaySound(SFX_Raccoon);
-            for(B = 1; B <= numPlayers; B++)
-            {
-                Player[B].Character = 4;
-                Player[B].Immune = 50;
-                if(Player[B].Mount <= 1)
-                {
-                    Player[B].Location.Y = Player[B].Location.Y + Player[B].Location.Height;
-                    Player[B].Location.Height = Physics.PlayerHeight[Player[B].Character][Player[B].State];
-                    if(Player[B].Mount == 1 && Player[B].State == 1)
-                        Player[B].Location.Height = Physics.PlayerHeight[1][2];
-                    Player[B].Location.Y = Player[B].Location.Y - Player[B].Location.Height;
-                    Player[B].StandUp = true;
-                }
-                tempLocation = Player[B].Location;
-                tempLocation.Y = Player[B].Location.Y + Player[B].Location.Height / 2.0 - 16;
-                tempLocation.X = Player[B].Location.X + Player[B].Location.Width / 2.0 - 16;
-                NewEffect(10, tempLocation);
-            }
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "iamerror") || SDL_strstr(CheatString.c_str(), "itsamelink"))
-        {
-            PlaySound(SFX_Raccoon);
-            for(B = 1; B <= numPlayers; B++)
-            {
-                Player[B].Character = 5;
-                Player[B].Immune = 50;
-                if(Player[B].Mount <= 1)
-                {
-                    Player[B].Location.Y = Player[B].Location.Y + Player[B].Location.Height;
-                    Player[B].Location.Height = Physics.PlayerHeight[Player[B].Character][Player[B].State];
-                    if(Player[B].Mount == 1 && Player[B].State == 1)
-                        Player[B].Location.Height = Physics.PlayerHeight[1][2];
-                    Player[B].Location.Y = Player[B].Location.Y - Player[B].Location.Height;
-                    Player[B].StandUp = true;
-                }
-                tempLocation = Player[B].Location;
-                tempLocation.Y = Player[B].Location.Y + Player[B].Location.Height / 2.0 - 16;
-                tempLocation.X = Player[B].Location.X + Player[B].Location.Width / 2.0 - 16;
-                NewEffect(10, tempLocation);
-            }
-            CheatString.clear();
-            cheated = true;
+            Player[B].Immune = 30;
+            Player[B].Effect = 8;
+            Player[B].Effect2 = 4;
+            Player[B].State = 5;
+            SizeCheck(B);
+            NewEffect(10,
+                      newLoc(Player[B].Location.X + Player[B].Location.Width / 2.0 - EffectWidth[10] / 2.0,
+                      Player[B].Location.Y + Player[B].Location.Height / 2.0 - EffectHeight[10] / 2.0));
         }
 
-        else if(SDL_strstr(CheatString.c_str(), "itsamemario") || SDL_strstr(CheatString.c_str(), "plumberboy") || SDL_strstr(CheatString.c_str(), "plumberboz") || SDL_strstr(CheatString.c_str(), "moustacheman"))
+        if(Player[B].Character >= 3 && Player[B].Hearts < 3)
+            Player[B].Hearts += 1;
+    }
+}
+
+static void needAHammerSuit()
+{
+    PlaySound(SFX_GotItem);
+
+    for(int B = 1; B <= numPlayers; B++)
+    {
+        Player[B].HeldBonus = 170;
+
+        if(Player[B].Character >= 3 && Player[B].State != 6)
         {
             PlaySound(SFX_Raccoon);
-            for(B = 1; B <= numPlayers; B++)
-            {
-                Player[B].Character = 1;
-                Player[B].Immune = 50;
-                if(Player[B].Mount <= 1)
-                {
-                    Player[B].Location.Y = Player[B].Location.Y + Player[B].Location.Height;
-                    Player[B].Location.Height = Physics.PlayerHeight[Player[B].Character][Player[B].State];
-                    if(Player[B].Mount == 1 && Player[B].State == 1)
-                        Player[B].Location.Height = Physics.PlayerHeight[1][2];
-                    Player[B].Location.Y = Player[B].Location.Y - Player[B].Location.Height;
-                    Player[B].StandUp = true;
-                }
-                tempLocation = Player[B].Location;
-                tempLocation.Y = Player[B].Location.Y + Player[B].Location.Height / 2.0 - 16;
-                tempLocation.X = Player[B].Location.X + Player[B].Location.Width / 2.0 - 16;
-                NewEffect(10, tempLocation);
-            }
-            CheatString.clear();
-            cheated = true;
+            Player[B].Immune = 30;
+            Player[B].Effect = 8;
+            Player[B].Effect2 = 4;
+            Player[B].State = 6;
+            SizeCheck(B);
+            NewEffect(10,
+                      newLoc(Player[B].Location.X + Player[B].Location.Width / 2.0 - EffectWidth[10] / 2.0,
+                      Player[B].Location.Y + Player[B].Location.Height / 2.0 - EffectHeight[10] / 2.0));
         }
-        else if(SDL_strstr(CheatString.c_str(), "itsameluigi") || SDL_strstr(CheatString.c_str(), "greenmario"))
+
+        if(Player[B].Character >= 3 && Player[B].Hearts < 3)
+            Player[B].Hearts += 1;
+    }
+}
+
+static void needAMushroom()
+{
+    PlaySound(SFX_GotItem);
+
+    for(int B = 1; B <= numPlayers; B++)
+    {
+        Player[B].HeldBonus = 9;
+
+        if(Player[B].Character >= 3 && Player[B].State == 1)
         {
             PlaySound(SFX_Raccoon);
-            for(B = 1; B <= numPlayers; B++)
-            {
-                Player[B].Character = 2;
-                Player[B].Immune = 50;
-                if(Player[B].Mount <= 1)
-                {
-                    Player[B].Location.Y = Player[B].Location.Y + Player[B].Location.Height;
-                    Player[B].Location.Height = Physics.PlayerHeight[Player[B].Character][Player[B].State];
-                    if(Player[B].Mount == 1 && Player[B].State == 1)
-                        Player[B].Location.Height = Physics.PlayerHeight[1][2];
-                    Player[B].Location.Y = Player[B].Location.Y - Player[B].Location.Height;
-                    Player[B].StandUp = true;
-                }
-                tempLocation = Player[B].Location;
-                tempLocation.Y = Player[B].Location.Y + Player[B].Location.Height / 2.0 - 16;
-                tempLocation.X = Player[B].Location.X + Player[B].Location.Width / 2.0 - 16;
-                NewEffect(10, tempLocation);
-            }
-            CheatString.clear();
-            cheated = true;
+            Player[B].Immune = 30;
+            Player[B].Effect = 8;
+            Player[B].Effect2 = 4;
+            Player[B].State = 2;
+            SizeCheck(B);
+            NewEffect(10,
+                      newLoc(Player[B].Location.X + Player[B].Location.Width / 2.0 - EffectWidth[10] / 2.0,
+                      Player[B].Location.Y + Player[B].Location.Height / 2.0 - EffectHeight[10] / 2.0));
         }
-        else if(SDL_strstr(CheatString.c_str(), "supermario128"))
+
+        if(Player[B].Character >= 3 && Player[B].Hearts < 3)
+            Player[B].Hearts += 1;
+    }
+}
+
+static void needAFlower()
+{
+    PlaySound(SFX_GotItem);
+
+    for(int B = 1; B <= numPlayers; B++)
+    {
+        Player[B].HeldBonus = 14;
+
+        if(Player[B].Character >= 3 && Player[B].State != 3)
         {
-            B = CheckLiving();
-            if(B > 0)
-            {
-                numPlayers = 128;
-                SetupScreens();
-                if(Player[B].Effect == 9)
-                    Player[B].Effect = 0;
-                Player[B].Immune = 1;
-                for(C = 1; C <= numPlayers; C++)
-                {
-                    if(C != B)
-                    {
-                        Player[C] = Player[B];
-                        Player[C].Location.SpeedY = dRand() * 24 - 12;
-                    }
-                }
-                Bomb(Player[B].Location, iRand(2) + 2);
-            }
-            CheatString.clear();
-            cheated = true;
+            PlaySound(SFX_Raccoon);
+            Player[B].Immune = 30;
+            Player[B].Effect = 8;
+            Player[B].Effect2 = 4;
+            Player[B].State = 3;
+            SizeCheck(B);
+            NewEffect(10,
+                      newLoc(Player[B].Location.X + Player[B].Location.Width / 2.0 - EffectWidth[10] / 2.0,
+                      Player[B].Location.Y + Player[B].Location.Height / 2.0 - EffectHeight[10] / 2.0));
         }
-        else if(SDL_strstr(CheatString.c_str(), "supermario64"))
+
+        if(Player[B].Character >= 3 && Player[B].Hearts < 3)
+            Player[B].Hearts += 1;
+    }
+}
+
+static void needAnIceFlower()
+{
+    PlaySound(SFX_GotItem);
+
+    for(int B = 1; B <= numPlayers; B++)
+    {
+        Player[B].HeldBonus = 264;
+
+        if(Player[B].Character >= 3 && Player[B].State != 7)
         {
-            B = CheckLiving();
-            if(B > 0)
-            {
-                numPlayers = 64;
-                SetupScreens();
-                if(Player[B].Effect == 9)
-                    Player[B].Effect = 0;
-                Player[B].Immune = 1;
-                for(C = 1; C <= numPlayers; C++)
-                {
-                    if(C != B)
-                    {
-                        Player[C] = Player[B];
-                        Player[C].Location.SpeedY = dRand() * 24 - 12;
-                    }
-                }
-                Bomb(Player[B].Location, iRand(2) + 2);
-            }
-            CheatString.clear();
-            cheated = true;
+            PlaySound(SFX_Raccoon);
+            Player[B].Immune = 30;
+            Player[B].Effect = 8;
+            Player[B].Effect2 = 4;
+            Player[B].State = 7;
+            SizeCheck(B);
+            NewEffect(10,
+                      newLoc(Player[B].Location.X + Player[B].Location.Width / 2.0 - EffectWidth[10] / 2.0,
+                      Player[B].Location.Y + Player[B].Location.Height / 2.0 - EffectHeight[10] / 2.0));
         }
-        else if(SDL_strstr(CheatString.c_str(), "supermario32"))
+
+        if(Player[B].Character >= 3 && Player[B].Hearts < 3)
+            Player[B].Hearts += 1;
+    }
+}
+
+static void needALeaf()
+{
+    PlaySound(SFX_GotItem);
+    for(int B = 1; B <= numPlayers; B++)
+    {
+        Player[B].HeldBonus = 34;
+
+        if(Player[B].Character >= 3 && Player[B].State != 4)
         {
-            B = CheckLiving();
-            if(B > 0)
-            {
-                numPlayers = 32;
-                SetupScreens();
-                if(Player[B].Effect == 9)
-                    Player[B].Effect = 0;
-                Player[B].Immune = 1;
-                for(C = 1; C <= numPlayers; C++)
-                {
-                    if(C != B)
-                    {
-                        Player[C] = Player[B];
-                        Player[C].Location.SpeedY = dRand() * 24 - 12;
-                    }
-                }
-                Bomb(Player[B].Location, iRand(2) + 2);
-            }
-            CheatString.clear();
-            cheated = true;
+            PlaySound(SFX_Raccoon);
+            Player[B].Immune = 30;
+            Player[B].Effect = 8;
+            Player[B].Effect2 = 4;
+            Player[B].State = 4;
+            SizeCheck(B);
+            NewEffect(10,
+                      newLoc(Player[B].Location.X + Player[B].Location.Width / 2.0 - EffectWidth[10] / 2.0,
+                      Player[B].Location.Y + Player[B].Location.Height / 2.0 - EffectHeight[10] / 2.0));
         }
-        else if(SDL_strstr(CheatString.c_str(), "supermario16"))
+
+        if(Player[B].Character >= 3 && Player[B].Hearts < 3)
+            Player[B].Hearts += 1;
+    }
+}
+
+static void needANegg()
+{
+    PlaySound(SFX_GotItem);
+    for(int B = 1; B <= numPlayers; B++)
+        Player[B].HeldBonus = 96;
+}
+
+static void needAPlant()
+{
+    PlaySound(SFX_GotItem);
+    for(int B = 1; B <= numPlayers; B++)
+        Player[B].HeldBonus = 49;
+}
+
+static void needAGun()
+{
+    PlaySound(SFX_GotItem);
+    for(int B = 1; B <= numPlayers; B++)
+        Player[B].HeldBonus = 22;
+}
+
+static void needASwitch()
+{
+    PlaySound(SFX_GotItem);
+    for(int B = 1; B <= numPlayers; B++)
+        Player[B].HeldBonus = 32;
+}
+
+static void needAClock()
+{
+    PlaySound(SFX_GotItem);
+    for(int B = 1; B <= numPlayers; B++)
+        Player[B].HeldBonus = 248;
+}
+
+static void needABomb()
+{
+    PlaySound(SFX_GotItem);
+    for(int B = 1; B <= numPlayers; B++)
+        Player[B].HeldBonus = 135;
+}
+
+static void needAShoe()
+{
+    PlaySound(SFX_GotItem);
+    for(int B = 1; B <= numPlayers; B++)
+        Player[B].HeldBonus = 35;
+}
+
+static void redShoe()
+{
+    PlaySound(SFX_GotItem);
+    for(int B = 1; B <= numPlayers; B++)
+        Player[B].HeldBonus = 191;
+}
+
+static void blueShoe()
+{
+    PlaySound(SFX_GotItem);
+    for(int B = 1; B <= numPlayers; B++)
+        Player[B].HeldBonus = 193;
+}
+
+static void shadowStar()
+{
+    Location_t tempLocation;
+
+    PlaySound(SFX_Raccoon);
+
+    for(int B = 1; B <= numPlayers; B++)
+    {
+        Player[B].Immune = 50;
+        tempLocation = Player[B].Location;
+        tempLocation.Y = Player[B].Location.Y + Player[B].Location.Height / 2.0 - 16;
+        tempLocation.X = Player[B].Location.X + Player[B].Location.Width / 2.0 - 16;
+        NewEffect(10, tempLocation);
+    }
+
+    ShadowMode = !ShadowMode;
+
+    //if(ShadowMode)
+    //    ShadowMode = false;
+    //else
+    //    ShadowMode = true;
+}
+
+static void becomeAsPeach()
+{
+    Location_t tempLocation;
+
+    PlaySound(SFX_Raccoon);
+
+    for(int B = 1; B <= numPlayers; B++)
+    {
+        Player[B].Character = 3;
+        Player[B].Immune = 50;
+
+        if(Player[B].Mount <= 1)
         {
-            B = CheckLiving();
-            if(B > 0)
-            {
-                numPlayers = 16;
-                SetupScreens();
-                if(Player[B].Effect == 9)
-                    Player[B].Effect = 0;
-                Player[B].Immune = 1;
-                for(C = 1; C <= numPlayers; C++)
-                {
-                    if(C != B)
-                    {
-                        Player[C] = Player[B];
-                        Player[C].Location.SpeedY = dRand() * 24 - 12;
-                    }
-                }
-                Bomb(Player[B].Location, iRand(2) + 2);
-            }
-            CheatString.clear();
-            cheated = true;
+            Player[B].Location.Y += Player[B].Location.Height;
+            Player[B].Location.Height = Physics.PlayerHeight[Player[B].Character][Player[B].State];
+            if(Player[B].Mount == 1 && Player[B].State == 1)
+                Player[B].Location.Height = Physics.PlayerHeight[1][2];
+            Player[B].Location.Y += -Player[B].Location.Height;
+            Player[B].StandUp = true;
         }
-        else if(SDL_strstr(CheatString.c_str(), "supermario8"))
+
+        tempLocation = Player[B].Location;
+        tempLocation.Y = Player[B].Location.Y + Player[B].Location.Height / 2.0 - 16;
+        tempLocation.X = Player[B].Location.X + Player[B].Location.Width / 2.0 - 16;
+        NewEffect(10, tempLocation);
+    }
+
+    UpdateYoshiMusic();
+}
+
+static void becomeAsToad()
+{
+    Location_t tempLocation;
+
+    PlaySound(SFX_Raccoon);
+
+    for(int B = 1; B <= numPlayers; B++)
+    {
+        Player[B].Character = 4;
+        Player[B].Immune = 50;
+
+        if(Player[B].Mount <= 1)
         {
-            B = CheckLiving();
-            if(B > 0)
-            {
-                numPlayers = 8;
-                SetupScreens();
-                if(Player[B].Effect == 9)
-                    Player[B].Effect = 0;
-                Player[B].Immune = 1;
-                for(C = 1; C <= numPlayers; C++)
-                {
-                    if(C != B)
-                    {
-                        Player[C] = Player[B];
-                        Player[C].Location.SpeedY = dRand() * 24 - 12;
-                    }
-                }
-                Bomb(Player[B].Location, iRand(2) + 2);
-            }
-            CheatString.clear();
-            cheated = true;
+            Player[B].Location.Y += Player[B].Location.Height;
+            Player[B].Location.Height = Physics.PlayerHeight[Player[B].Character][Player[B].State];
+            if(Player[B].Mount == 1 && Player[B].State == 1)
+                Player[B].Location.Height = Physics.PlayerHeight[1][2];
+            Player[B].Location.Y += -Player[B].Location.Height;
+            Player[B].StandUp = true;
         }
-        else if(SDL_strstr(CheatString.c_str(), "supermario4"))
+
+        tempLocation = Player[B].Location;
+        tempLocation.Y = Player[B].Location.Y + Player[B].Location.Height / 2.0 - 16;
+        tempLocation.X = Player[B].Location.X + Player[B].Location.Width / 2.0 - 16;
+        NewEffect(10, tempLocation);
+    }
+
+    UpdateYoshiMusic();
+}
+
+static void becomeAsLink()
+{
+    Location_t tempLocation;
+
+    PlaySound(SFX_Raccoon);
+
+    for(int B = 1; B <= numPlayers; B++)
+    {
+        Player[B].Character = 5;
+        Player[B].Immune = 50;
+
+        if(Player[B].Mount <= 1)
         {
-            B = CheckLiving();
-            if(B > 0)
-            {
-                numPlayers = 4;
-                SetupScreens();
-                if(Player[B].Effect == 9)
-                    Player[B].Effect = 0;
-                Player[B].Immune = 1;
-                for(C = 1; C <= numPlayers; C++)
-                {
-                    if(C != B)
-                    {
-                        Player[C] = Player[B];
-                        Player[C].Location.SpeedY = dRand() * 24 - 12;
-                    }
-                }
-                Bomb(Player[B].Location, iRand(2) + 2);
-            }
-            CheatString.clear();
-            cheated = true;
+            Player[B].Location.Y += Player[B].Location.Height;
+            Player[B].Location.Height = Physics.PlayerHeight[Player[B].Character][Player[B].State];
+            if(Player[B].Mount == 1 && Player[B].State == 1)
+                Player[B].Location.Height = Physics.PlayerHeight[1][2];
+            Player[B].Location.Y += -Player[B].Location.Height;
+            Player[B].StandUp = true;
         }
-        else if(SDL_strstr(CheatString.c_str(), "supermario2"))
+
+        tempLocation = Player[B].Location;
+        tempLocation.Y = Player[B].Location.Y + Player[B].Location.Height / 2.0 - 16;
+        tempLocation.X = Player[B].Location.X + Player[B].Location.Width / 2.0 - 16;
+        NewEffect(10, tempLocation);
+    }
+
+    UpdateYoshiMusic();
+}
+
+static void becomeAsMario()
+{
+    Location_t tempLocation;
+
+    PlaySound(SFX_Raccoon);
+
+    for(int B = 1; B <= numPlayers; B++)
+    {
+        Player[B].Character = 1;
+        Player[B].Immune = 50;
+
+        if(Player[B].Mount <= 1)
         {
-            B = CheckLiving();
-            if(B > 0)
-            {
-                numPlayers = 2;
-                SingleCoop = 1;
-                SetupScreens();
-                if(Player[B].Effect == 9)
-                    Player[B].Effect = 0;
-                Player[B].Immune = 1;
-                for(C = 1; C <= numPlayers; C++)
-                {
-                    if(C != B)
-                    {
-                        Player[C] = Player[B];
-                        Player[C].Location.SpeedY = dRand() * 24 - 12;
-                    }
-                    if(C == 1)
-                    {
-                        Player[C].Character = 1;
-                        if(Player[C].Mount <= 1)
-                        {
-                            Player[C].Location.Y = Player[C].Location.Y + Player[C].Location.Height;
-                            Player[C].Location.Height = Physics.PlayerHeight[Player[C].Character][Player[C].State];
-                            if(Player[C].Mount == 1 && Player[C].State == 1)
-                                Player[C].Location.Height = Physics.PlayerHeight[1][2];
-                            Player[C].Location.Y = Player[C].Location.Y - Player[C].Location.Height;
-                            Player[C].StandUp = true;
-                        }
-                    }
-                    else
-                    {
-                        Player[C].Character = 2;
-                        if(Player[C].Mount <= 1)
-                        {
-                            Player[C].Location.Y = Player[C].Location.Y + Player[C].Location.Height;
-                            Player[C].Location.Height = Physics.PlayerHeight[Player[C].Character][Player[C].State];
-                            if(Player[C].Mount == 1 && Player[C].State == 1)
-                                Player[C].Location.Height = Physics.PlayerHeight[1][2];
-                            Player[C].Location.Y = Player[C].Location.Y - Player[C].Location.Height;
-                            Player[C].StandUp = true;
-                        }
-                    }
-                }
-                Bomb(Player[B].Location, iRand(2) + 2);
-            }
-            CheatString.clear();
-            cheated = true;
+            Player[B].Location.Y += Player[B].Location.Height;
+            Player[B].Location.Height = Physics.PlayerHeight[Player[B].Character][Player[B].State];
+            if(Player[B].Mount == 1 && Player[B].State == 1)
+                Player[B].Location.Height = Physics.PlayerHeight[1][2];
+            Player[B].Location.Y += -Player[B].Location.Height;
+            Player[B].StandUp = true;
         }
-        else if(SDL_strstr(CheatString.c_str(), "1player") || SDL_strstr(CheatString.c_str(), "1plazer"))
+
+        tempLocation = Player[B].Location;
+        tempLocation.Y = Player[B].Location.Y + Player[B].Location.Height / 2.0 - 16;
+        tempLocation.X = Player[B].Location.X + Player[B].Location.Width / 2.0 - 16;
+        NewEffect(10, tempLocation);
+    }
+
+    UpdateYoshiMusic();
+}
+
+static void becomeAsLuigi()
+{
+    Location_t tempLocation;
+
+    PlaySound(SFX_Raccoon);
+
+    for(int B = 1; B <= numPlayers; B++)
+    {
+        Player[B].Character = 2;
+        Player[B].Immune = 50;
+
+        if(Player[B].Mount <= 1)
         {
-            B = CheckLiving();
-            if(B > 0)
+            Player[B].Location.Y += Player[B].Location.Height;
+            Player[B].Location.Height = Physics.PlayerHeight[Player[B].Character][Player[B].State];
+            if(Player[B].Mount == 1 && Player[B].State == 1)
+                Player[B].Location.Height = Physics.PlayerHeight[1][2];
+            Player[B].Location.Y += -Player[B].Location.Height;
+            Player[B].StandUp = true;
+        }
+
+        tempLocation = Player[B].Location;
+        tempLocation.Y = Player[B].Location.Y + Player[B].Location.Height / 2.0 - 16;
+        tempLocation.X = Player[B].Location.X + Player[B].Location.Width / 2.0 - 16;
+        NewEffect(10, tempLocation);
+    }
+
+    UpdateYoshiMusic();
+}
+
+static void superbDemo128()
+{
+    int B = CheckLiving();
+    if(B > 0)
+    {
+        numPlayers = 128;
+        ScreenType = 2;
+
+        SetupScreens();
+
+        if(Player[B].Effect == 9)
+            Player[B].Effect = 0;
+        Player[B].Immune = 1;
+
+        for(int C = 1; C <= numPlayers; C++)
+        {
+            if(C != B)
             {
-                for(C = 1; C <= numPlayers; C++)
-                    Player[C].Immune = 1;
-                for(C = 1; C <= numPlayers; C++)
-                {
-                    if(C != B)
-                    {
-                        Bomb(Player[C].Location, iRand(2) + 2);
-                    }
-                }
-                numPlayers = 1;
-                SingleCoop = 1;
-                SetupScreens();
-                if(Player[B].Effect == 9)
-                    Player[B].Effect = 0;
-                C = 1;
                 Player[C] = Player[B];
+                Player[C].Location.SpeedY = dRand() * 24 - 12;
+            }
+        }
+
+        Bomb(Player[B].Location, iRand(2) + 2);
+    }
+}
+
+static void superbDemo64()
+{
+    int B = CheckLiving();
+    if(B > 0)
+    {
+        numPlayers = 64;
+        ScreenType = 2;
+        SetupScreens();
+        if(Player[B].Effect == 9)
+            Player[B].Effect = 0;
+        Player[B].Immune = 1;
+
+        for(int C = 1; C <= numPlayers; C++)
+        {
+            if(C != B)
+            {
+                Player[C] = Player[B];
+                Player[C].Location.SpeedY = dRand() * 24 - 12;
+            }
+        }
+
+        Bomb(Player[B].Location, iRand(2) + 2);
+    }
+}
+
+static void superbDemo32()
+{
+    int B = CheckLiving();
+    if(B > 0)
+    {
+        numPlayers = 32;
+        ScreenType = 2;
+        SetupScreens();
+
+        if(Player[B].Effect == 9)
+            Player[B].Effect = 0;
+
+        Player[B].Immune = 1;
+
+        for(int C = 1; C <= numPlayers; C++)
+        {
+            if(C != B)
+            {
+                Player[C] = Player[B];
+                Player[C].Location.SpeedY = dRand() * 24 - 12;
+            }
+        }
+
+        Bomb(Player[B].Location, iRand(2) + 2);
+    }
+}
+
+static void superbDemo16()
+{
+    int B = CheckLiving();
+    if(B > 0)
+    {
+        numPlayers = 16;
+        ScreenType = 2;
+        SetupScreens();
+
+        if(Player[B].Effect == 9)
+            Player[B].Effect = 0;
+
+        Player[B].Immune = 1;
+
+        for(int C = 1; C <= numPlayers; C++)
+        {
+            if(C != B)
+            {
+                Player[C] = Player[B];
+                Player[C].Location.SpeedY = dRand() * 24 - 12;
+            }
+        }
+
+        Bomb(Player[B].Location, iRand(2) + 2);
+    }
+}
+
+static void superbDemo8()
+{
+    int B = CheckLiving();
+    if(B > 0)
+    {
+        numPlayers = 8;
+        ScreenType = 2;
+        SetupScreens();
+
+        if(Player[B].Effect == 9)
+            Player[B].Effect = 0;
+
+        Player[B].Immune = 1;
+
+        for(int C = 1; C <= numPlayers; C++)
+        {
+            if(C != B)
+            {
+                Player[C] = Player[B];
+                Player[C].Location.SpeedY = dRand() * 24 - 12;
+            }
+        }
+
+        Bomb(Player[B].Location, iRand(2) + 2);
+    }
+}
+
+static void superbDemo4()
+{
+    int B = CheckLiving();
+    if(B > 0)
+    {
+        numPlayers = 4;
+        ScreenType = 2;
+        SetupScreens();
+
+        if(Player[B].Effect == 9)
+            Player[B].Effect = 0;
+
+        Player[B].Immune = 1;
+
+        for(int C = 1; C <= numPlayers; C++)
+        {
+            if(C != B)
+            {
+                Player[C] = Player[B];
+                Player[C].Location.SpeedY = dRand() * 24 - 12;
+            }
+        }
+
+        Bomb(Player[B].Location, iRand(2) + 2);
+    }
+}
+
+static void superbDemo2()
+{
+    int B = CheckLiving();
+
+    if(B > 0)
+    {
+        numPlayers = 2;
+        ScreenType = 6;
+        SingleCoop = 1;
+        SetupScreens();
+        if(Player[B].Effect == 9)
+            Player[B].Effect = 0;
+        Player[B].Immune = 1;
+
+        for(int C = 1; C <= numPlayers; C++)
+        {
+            if(C != B)
+            {
+                Player[C] = Player[B];
+                Player[C].Location.SpeedY = dRand() * 24 - 12;
+            }
+
+            if(C == 1)
+            {
                 Player[C].Character = 1;
                 if(Player[C].Mount <= 1)
                 {
-                    Player[C].Location.Y = Player[C].Location.Y + Player[C].Location.Height;
+                    Player[C].Location.Y += Player[C].Location.Height;
                     Player[C].Location.Height = Physics.PlayerHeight[Player[C].Character][Player[C].State];
                     if(Player[C].Mount == 1 && Player[C].State == 1)
                         Player[C].Location.Height = Physics.PlayerHeight[1][2];
-                    Player[C].Location.Y = Player[C].Location.Y - Player[C].Location.Height;
+                    Player[C].Location.Y += -Player[C].Location.Height;
                     Player[C].StandUp = true;
                 }
-                Player[C].Immune = 1;
-                Player[C].Immune2 = true;
             }
-            CheatString.clear();
-            cheated = true;
+            else
+            {
+                Player[C].Character = 2;
+                if(Player[C].Mount <= 1)
+                {
+                    Player[C].Location.Y += Player[C].Location.Height;
+                    Player[C].Location.Height = Physics.PlayerHeight[Player[C].Character][Player[C].State];
+                    if(Player[C].Mount == 1 && Player[C].State == 1)
+                        Player[C].Location.Height = Physics.PlayerHeight[1][2];
+                    Player[C].Location.Y += -Player[C].Location.Height;
+                    Player[C].StandUp = true;
+                }
+            }
         }
 
-        else if(SDL_strstr(CheatString.c_str(), "2player") || SDL_strstr(CheatString.c_str(), "2plazer"))
+        Bomb(Player[B].Location, iRand(2) + 2);
+    }
+}
+
+static void onePlayer()
+{
+    int B = CheckLiving();
+
+    if(B > 0)
+    {
+        for(int C = 1; C <= numPlayers; C++)
+            Player[C].Immune = 1;
+
+        for(int C = 1; C <= numPlayers; C++)
         {
-            B = CheckLiving();
-            if(B > 0)
+            if(C != B)
             {
-                numPlayers = 2;
-                SingleCoop = 0;
-                SetupScreens();
-                if(Player[B].Effect == 9)
-                    Player[B].Effect = 0;
-                Player[B].Immune = 1;
-                for(C = 1; C <= numPlayers; C++)
-                {
-                    if(C != B)
-                    {
-                        Player[C] = Player[B];
-                        Player[C].Location.SpeedY = dRand() * -12;
-                    }
-                    if(C == 1)
-                    {
-                        Player[C].Character = 1;
-                        if(Player[C].Mount <= 1)
-                        {
-                            Player[C].Location.Y = Player[C].Location.Y + Player[C].Location.Height;
-                            Player[C].Location.Height = Physics.PlayerHeight[Player[C].Character][Player[C].State];
-                            if(Player[C].Mount == 1 && Player[C].State == 1)
-                                Player[C].Location.Height = Physics.PlayerHeight[1][2];
-                            Player[C].Location.Y = Player[C].Location.Y - Player[C].Location.Height;
-                            Player[C].StandUp = true;
-                        }
-                    }
-                    else
-                    {
-                        Player[C].Character = 2;
-                        if(Player[C].Mount <= 1)
-                        {
-                            Player[C].Location.Y = Player[C].Location.Y + Player[C].Location.Height;
-                            Player[C].Location.Height = Physics.PlayerHeight[Player[C].Character][Player[C].State];
-                            if(Player[C].Mount == 1 && Player[C].State == 1)
-                                Player[C].Location.Height = Physics.PlayerHeight[1][2];
-                            Player[C].Location.Y = Player[C].Location.Y - Player[C].Location.Height;
-                            Player[C].StandUp = true;
-                        }
-                    }
-                }
-                Bomb(Player[B].Location, iRand(2) + 2);
+                Bomb(Player[C].Location, iRand(2) + 2);
             }
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "wariotime"))
-        {
-            for(B = 1; B <= numNPCs; B++)
-            {
-                if(NPC[B].Active == true)
-                {
-                    if(!NPCWontHurt[NPC[B].Type] &&
-                       !NPCIsABlock[NPC[B].Type] &&
-                       !NPCIsABonus[NPC[B].Type] &&
-                       !NPCIsACoin[NPC[B].Type] &&
-                       !NPCIsAnExit[NPC[B].Type] &&
-                        NPC[B].Type != 91 && !NPC[B].Generator &&
-                        NPC[B].Inert == false
-                    )
-                    {
-                        PlaySound(SFX_Raccoon);
-                        NPC[B].Location.Y = NPC[B].Location.Y + NPC[B].Location.Height / 2.0;
-                        NPC[B].Location.X = NPC[B].Location.X + NPC[B].Location.Width / 2.0;
-                        tempLocation = NPC[B].Location;
-                        tempLocation.Y = tempLocation.Y - 16;
-                        tempLocation.X = tempLocation.X - 16;
-                        NewEffect(10, tempLocation);
-                        NPC[B].Type = 10;
-                        NPC[B].Location.Width = NPCWidth[NPC[B].Type];
-                        NPC[B].Location.Height = NPCHeight[NPC[B].Type];
-                        NPC[B].Location.Y = NPC[B].Location.Y - NPC[B].Location.Height / 2.0;
-                        NPC[B].Location.X = NPC[B].Location.X - NPC[B].Location.Width / 2.0;
-                        NPC[B].Location.SpeedX = 0;
-                        NPC[B].Location.SpeedY = 0;
-                    }
-                }
-            }
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "carkeys") || SDL_strstr(CheatString.c_str(), "carkezs"))
-        {
-            for(B = 1; B <= numPlayers; B++)
-            {
-                if(Player[B].Mount == 0 && Player[B].Dead == false && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
-                {
-                    numNPCs++;
-                    NPC[numNPCs] = NPC_t();
-                    NPC[numNPCs].Type = 31;
-                    NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
-                    NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
-                    NPC[numNPCs].Location.SpeedX = 0;
-                    NPC[numNPCs].Location.SpeedY = 0;
-                    NPC[numNPCs].Active = true;
-                    NPC[numNPCs].TimeLeft = 200;
-                    NPC[numNPCs].HoldingPlayer = B;
-                    CheckSectionNPC(numNPCs);
-                    Player[B].HoldingNPC = numNPCs;
-                    Player[B].ForceHold = 60;
-                    PlaySound(SFX_Grab);
-                }
-            }
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "boingyboing") || SDL_strstr(CheatString.c_str(), "boingzboing"))
-        {
-            for(B = 1; B <= numPlayers; B++)
-            {
-                if(Player[B].Mount == 0 && Player[B].Dead == false && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
-                {
-                    numNPCs++;
-                    NPC[numNPCs] = NPC_t();
-                    NPC[numNPCs].Type = 26;
-                    NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
-                    NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
-                    NPC[numNPCs].Location.SpeedX = 0;
-                    NPC[numNPCs].Location.SpeedY = 0;
-                    NPC[numNPCs].Active = true;
-                    NPC[numNPCs].TimeLeft = 200;
-                    NPC[numNPCs].HoldingPlayer = B;
-                    CheckSectionNPC(numNPCs);
-                    Player[B].HoldingNPC = numNPCs;
-                    Player[B].ForceHold = 60;
-                    PlaySound(SFX_Grab);
-                }
-            }
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "bombsaway"))
-        {
-            for(B = 1; B <= numPlayers; B++)
-            {
-                if(Player[B].Mount == 0 && Player[B].Dead == false && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
-                {
-                    numNPCs++;
-                    NPC[numNPCs] = NPC_t();
-                    NPC[numNPCs].Type = 134;
-                    NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
-                    NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
-                    NPC[numNPCs].Location.X = Player[B].Location.X;
-                    NPC[numNPCs].Location.Y = Player[B].Location.Y;
-                    NPC[numNPCs].Location.SpeedX = 0;
-                    NPC[numNPCs].Location.SpeedY = 0;
-                    NPC[numNPCs].Active = true;
-                    NPC[numNPCs].TimeLeft = 200;
-                    NPC[numNPCs].HoldingPlayer = B;
-                    CheckSectionNPC(numNPCs);
-                    Player[B].HoldingNPC = numNPCs;
-                    Player[B].ForceHold = 60;
-                    PlaySound(SFX_Grab);
-                }
-            }
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "firemissiles"))
-        {
-            for(B = 1; B <= numPlayers; B++)
-            {
-                if(Player[B].Mount == 0 && Player[B].Dead == false && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
-                {
-                    numNPCs++;
-                    NPC[numNPCs] = NPC_t();
-                    NPC[numNPCs].Type = 17;
-                    NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
-                    NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
-                    NPC[numNPCs].Location.SpeedX = 0;
-                    NPC[numNPCs].Location.SpeedY = 0;
-                    NPC[numNPCs].Active = true;
-                    NPC[numNPCs].TimeLeft = 200;
-                    NPC[numNPCs].HoldingPlayer = B;
-                    CheckSectionNPC(numNPCs);
-                    Player[B].HoldingNPC = numNPCs;
-                    Player[B].ForceHold = 60;
-                    PlaySound(SFX_Grab);
-                }
-            }
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "burnthehousedown") || SDL_strstr(CheatString.c_str(), "hellfire"))
-        {
-            for(B = 1; B <= numPlayers; B++)
-            {
-                if(Player[B].Mount == 0 && Player[B].Dead == false && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
-                {
-                    numNPCs++;
-                    NPC[numNPCs] = NPC_t();
-                    NPC[numNPCs].Type = 279;
-                    NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
-                    NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
-                    NPC[numNPCs].Location.SpeedX = 0;
-                    NPC[numNPCs].Location.SpeedY = 0;
-                    NPC[numNPCs].Active = true;
-                    NPC[numNPCs].TimeLeft = 200;
-                    NPC[numNPCs].HoldingPlayer = B;
-                    NPC[numNPCs].Location.X = Player[B].Location.X;
-                    NPC[numNPCs].Location.Y = Player[B].Location.Y;
-                    NPC[numNPCs].Section = Player[B].Section;
-                    Player[B].HoldingNPC = numNPCs;
-                    Player[B].ForceHold = 60;
-                    PlaySound(SFX_Grab);
-                }
-            }
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "upandout"))
-        {
-            for(B = 1; B <= numPlayers; B++)
-            {
-                if(Player[B].Mount == 0 && Player[B].Dead == false && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
-                {
-                    numNPCs++;
-                    NPC[numNPCs] = NPC_t();
-                    NPC[numNPCs].Type = 278;
-                    NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
-                    NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
-                    NPC[numNPCs].Location.SpeedX = 0;
-                    NPC[numNPCs].Location.SpeedY = 0;
-                    NPC[numNPCs].Active = true;
-                    NPC[numNPCs].TimeLeft = 200;
-                    NPC[numNPCs].HoldingPlayer = B;
-                    NPC[numNPCs].Location.X = Player[B].Location.X;
-                    NPC[numNPCs].Location.Y = Player[B].Location.Y;
-                    NPC[numNPCs].Section = Player[B].Section;
-                    Player[B].HoldingNPC = numNPCs;
-                    Player[B].ForceHold = 60;
-                    PlaySound(SFX_Grab);
-                }
-            }
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "powhammer"))
-        {
-            for(B = 1; B <= numPlayers; B++)
-            {
-                if(Player[B].Mount == 0 && Player[B].Dead == false && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
-                {
-                    numNPCs++;
-                    NPC[numNPCs] = NPC_t();
-                    NPC[numNPCs].Type = 241;
-                    NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
-                    NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
-                    NPC[numNPCs].Location.SpeedX = 0;
-                    NPC[numNPCs].Location.SpeedY = 0;
-                    NPC[numNPCs].Active = true;
-                    NPC[numNPCs].TimeLeft = 200;
-                    NPC[numNPCs].HoldingPlayer = B;
-                    NPC[numNPCs].Location.X = Player[B].Location.X;
-                    NPC[numNPCs].Location.Y = Player[B].Location.Y;
-                    NPC[numNPCs].Section = Player[B].Section;
-                    Player[B].HoldingNPC = numNPCs;
-                    Player[B].ForceHold = 60;
-                    PlaySound(SFX_Grab);
-                }
-            }
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "hammerinmypants") || SDL_strstr(CheatString.c_str(), "hammerinmzpants"))
-        {
-            for(B = 1; B <= numPlayers; B++)
-            {
-                if(Player[B].Mount == 0 && Player[B].Dead == false && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
-                {
-                    numNPCs++;
-                    NPC[numNPCs] = NPC_t();
-                    NPC[numNPCs].Type = 29;
-                    NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
-                    NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
-                    NPC[numNPCs].Location.SpeedX = 0;
-                    NPC[numNPCs].Location.SpeedY = 0;
-                    NPC[numNPCs].Active = true;
-                    NPC[numNPCs].TimeLeft = 200;
-                    NPC[numNPCs].HoldingPlayer = B;
-                    NPC[numNPCs].Location.X = Player[B].Location.X;
-                    NPC[numNPCs].Location.Y = Player[B].Location.Y;
-                    NPC[numNPCs].Section = Player[B].Section;
-                    Player[B].HoldingNPC = numNPCs;
-                    Player[B].ForceHold = 60;
-                    PlaySound(SFX_Grab);
-                }
-            }
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "rainbowrider"))
-        {
-            for(B = 1; B <= numPlayers; B++)
-            {
-                if(Player[B].Mount == 0 && Player[B].Dead == false && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
-                {
-                    numNPCs++;
-                    NPC[numNPCs] = NPC_t();
-                    NPC[numNPCs].Type = 195;
-                    NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
-                    NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
-                    NPC[numNPCs].Location.SpeedX = 0;
-                    NPC[numNPCs].Location.SpeedY = 0;
-                    NPC[numNPCs].Effect = 2;
-                    NPC[numNPCs].Active = true;
-                    NPC[numNPCs].TimeLeft = 200;
-                    NPC[numNPCs].HoldingPlayer = B;
-                    Player[B].HoldingNPC = numNPCs;
-                    Player[B].ForceHold = 60;
-                    PlaySound(SFX_Grab);
-                }
-            }
-            CheatString.clear();
-            cheated = true;
         }
 
+        numPlayers = 1;
+        ScreenType = 0;
+        SingleCoop = 1;
+        SetupScreens();
+        if(Player[B].Effect == 9)
+            Player[B].Effect = 0;
 
-        else if(SDL_strstr(CheatString.c_str(), "greenegg"))
+        int C = 1;
+        Player[C] = Player[B];
+        Player[C].Character = 1;
+        if(Player[C].Mount <= 1)
         {
-            for(B = 1; B <= numPlayers; B++)
-            {
-                if(Player[B].Mount == 0 && Player[B].Dead == false && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
-                {
-                    numNPCs++;
-                    NPC[numNPCs] = NPC_t();
-                    NPC[numNPCs].Type = 96;
-                    NPC[numNPCs].Special = 95;
-                    NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
-                    NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
-                    NPC[numNPCs].Location.SpeedX = 0;
-                    NPC[numNPCs].Location.SpeedY = 0;
-                    NPC[numNPCs].Effect = 2;
-                    NPC[numNPCs].Active = true;
-                    NPC[numNPCs].TimeLeft = 200;
-                    NPC[numNPCs].HoldingPlayer = B;
-                    Player[B].HoldingNPC = numNPCs;
-                    Player[B].ForceHold = 60;
-                    PlaySound(SFX_Grab);
-                }
-            }
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "blueegg"))
-        {
-            for(B = 1; B <= numPlayers; B++)
-            {
-                if(Player[B].Mount == 0 && Player[B].Dead == false && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
-                {
-                    numNPCs++;
-                    NPC[numNPCs] = NPC_t();
-                    NPC[numNPCs].Type = 96;
-                    NPC[numNPCs].Frame = 1;
-                    NPC[numNPCs].Special = 98;
-                    NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
-                    NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
-                    NPC[numNPCs].Location.SpeedX = 0;
-                    NPC[numNPCs].Location.SpeedY = 0;
-                    NPC[numNPCs].Effect = 2;
-                    NPC[numNPCs].Active = true;
-                    NPC[numNPCs].TimeLeft = 200;
-                    NPC[numNPCs].HoldingPlayer = B;
-                    Player[B].HoldingNPC = numNPCs;
-                    Player[B].ForceHold = 60;
-                    PlaySound(SFX_Grab);
-                }
-            }
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "yellowegg") || SDL_strstr(CheatString.c_str(), "zellowegg"))
-        {
-            for(B = 1; B <= numPlayers; B++)
-            {
-                if(Player[B].Mount == 0 && Player[B].Dead == false && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
-                {
-                    numNPCs++;
-                    NPC[numNPCs] = NPC_t();
-                    NPC[numNPCs].Type = 96;
-                    NPC[numNPCs].Special = 99;
-                    NPC[numNPCs].Frame = 2;
-                    NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
-                    NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
-                    NPC[numNPCs].Location.SpeedX = 0;
-                    NPC[numNPCs].Location.SpeedY = 0;
-                    NPC[numNPCs].Effect = 2;
-                    NPC[numNPCs].Active = true;
-                    NPC[numNPCs].TimeLeft = 200;
-                    NPC[numNPCs].HoldingPlayer = B;
-                    Player[B].HoldingNPC = numNPCs;
-                    Player[B].ForceHold = 60;
-                    PlaySound(SFX_Grab);
-                }
-            }
-            CheatString.clear();
-            cheated = true;
+            Player[C].Location.Y += Player[C].Location.Height;
+            Player[C].Location.Height = Physics.PlayerHeight[Player[C].Character][Player[C].State];
+            if(Player[C].Mount == 1 && Player[C].State == 1)
+                Player[C].Location.Height = Physics.PlayerHeight[1][2];
+            Player[C].Location.Y += -Player[C].Location.Height;
+            Player[C].StandUp = true;
         }
 
-        else if(SDL_strstr(CheatString.c_str(), "redegg"))
+        Player[C].Immune = 1;
+        Player[C].Immune2 = true;
+    }
+}
+
+static void twoPlayer()
+{
+    int B = CheckLiving();
+    if(B > 0)
+    {
+        numPlayers = 2;
+        ScreenType = 5;
+        SingleCoop = 0;
+        SetupScreens();
+
+        if(Player[B].Effect == 9)
+            Player[B].Effect = 0;
+
+        Player[B].Immune = 1;
+        for(int C = 1; C <= numPlayers; C++)
         {
-            for(B = 1; B <= numPlayers; B++)
+            if(C != B)
             {
-                if(Player[B].Mount == 0 && Player[B].Dead == false && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
+                Player[C] = Player[B];
+                Player[C].Location.SpeedY = dRand() * -12;
+            }
+
+            if(C == 1)
+            {
+                Player[C].Character = 1;
+                if(Player[C].Mount <= 1)
                 {
-                    numNPCs++;
-                    NPC[numNPCs] = NPC_t();
-                    NPC[numNPCs].Type = 96;
-                    NPC[numNPCs].Special = 100;
-                    NPC[numNPCs].Frame = 3;
-                    NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
-                    NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
-                    NPC[numNPCs].Location.SpeedX = 0;
-                    NPC[numNPCs].Location.SpeedY = 0;
-                    NPC[numNPCs].Effect = 2;
-                    NPC[numNPCs].Active = true;
-                    NPC[numNPCs].TimeLeft = 200;
-                    NPC[numNPCs].HoldingPlayer = B;
-                    Player[B].HoldingNPC = numNPCs;
-                    Player[B].ForceHold = 60;
-                    PlaySound(SFX_Grab);
+                    Player[C].Location.Y += Player[C].Location.Height;
+                    Player[C].Location.Height = Physics.PlayerHeight[Player[C].Character][Player[C].State];
+                    if(Player[C].Mount == 1 && Player[C].State == 1)
+                        Player[C].Location.Height = Physics.PlayerHeight[1][2];
+                    Player[C].Location.Y += -Player[C].Location.Height;
+                    Player[C].StandUp = true;
                 }
             }
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "blackegg"))
-        {
-            for(B = 1; B <= numPlayers; B++)
+            else
             {
-                if(Player[B].Mount == 0 && Player[B].Dead == false && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
+                Player[C].Character = 2;
+                if(Player[C].Mount <= 1)
                 {
-                    numNPCs++;
-                    NPC[numNPCs] = NPC_t();
-                    NPC[numNPCs].Type = 96;
-                    NPC[numNPCs].Special = 148;
-                    NPC[numNPCs].Frame = 4;
-                    NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
-                    NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
-                    NPC[numNPCs].Location.SpeedX = 0;
-                    NPC[numNPCs].Location.SpeedY = 0;
-                    NPC[numNPCs].Effect = 2;
-                    NPC[numNPCs].Active = true;
-                    NPC[numNPCs].TimeLeft = 200;
-                    NPC[numNPCs].HoldingPlayer = B;
-                    Player[B].HoldingNPC = numNPCs;
-                    Player[B].ForceHold = 60;
-                    PlaySound(SFX_Grab);
+                    Player[C].Location.Y += Player[C].Location.Height;
+                    Player[C].Location.Height = Physics.PlayerHeight[Player[C].Character][Player[C].State];
+                    if(Player[C].Mount == 1 && Player[C].State == 1)
+                        Player[C].Location.Height = Physics.PlayerHeight[1][2];
+                    Player[C].Location.Y += -Player[C].Location.Height;
+                    Player[C].StandUp = true;
                 }
             }
-            CheatString.clear();
-            cheated = true;
-        }
-        else if(SDL_strstr(CheatString.c_str(), "purpleegg"))
-        {
-            for(B = 1; B <= numPlayers; B++)
-            {
-                if(Player[B].Mount == 0 && Player[B].Dead == false && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
-                {
-                    numNPCs++;
-                    NPC[numNPCs] = NPC_t();
-                    NPC[numNPCs].Type = 96;
-                    NPC[numNPCs].Special = 149;
-                    NPC[numNPCs].Frame = 5;
-                    NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
-                    NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
-                    NPC[numNPCs].Location.SpeedX = 0;
-                    NPC[numNPCs].Location.SpeedY = 0;
-                    NPC[numNPCs].Effect = 2;
-                    NPC[numNPCs].Active = true;
-                    NPC[numNPCs].TimeLeft = 200;
-                    NPC[numNPCs].HoldingPlayer = B;
-                    Player[B].HoldingNPC = numNPCs;
-                    Player[B].ForceHold = 60;
-                    PlaySound(SFX_Grab);
-                }
-            }
-            CheatString.clear();
-            cheated = true;
         }
 
-        else if(SDL_strstr(CheatString.c_str(), "pinkegg"))
+        Bomb(Player[B].Location, iRand(2) + 2);
+    }
+}
+
+static void warioTime()
+{
+    Location_t tempLocation;
+
+    for(int B = 1; B <= numNPCs; B++)
+    {
+        if(NPC[B].Active)
         {
-            for(B = 1; B <= numPlayers; B++)
+            if(!NPCWontHurt[NPC[B].Type] &&
+               !NPCIsABlock[NPC[B].Type] &&
+               !NPCIsABonus[NPC[B].Type] &&
+               !NPCIsACoin[NPC[B].Type] &&
+               !NPCIsAnExit[NPC[B].Type] &&
+                NPC[B].Type != 91 && !NPC[B].Generator &&
+               !NPC[B].Inert
+            )
             {
-                if(Player[B].Mount == 0 && Player[B].Dead == false && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
-                {
-                    numNPCs++;
-                    NPC[numNPCs] = NPC_t();
-                    NPC[numNPCs].Type = 96;
-                    NPC[numNPCs].Special = 150;
-                    NPC[numNPCs].Frame = 6;
-                    NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
-                    NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
-                    NPC[numNPCs].Location.SpeedX = 0;
-                    NPC[numNPCs].Location.SpeedY = 0;
-                    NPC[numNPCs].Effect = 2;
-                    NPC[numNPCs].Active = true;
-                    NPC[numNPCs].TimeLeft = 200;
-                    NPC[numNPCs].HoldingPlayer = B;
-                    Player[B].HoldingNPC = numNPCs;
-                    Player[B].ForceHold = 60;
-                    PlaySound(SFX_Grab);
-                }
+                PlaySound(SFX_Raccoon);
+                NPC[B].Location.Y += NPC[B].Location.Height / 2.0;
+                NPC[B].Location.X += NPC[B].Location.Width / 2.0;
+                tempLocation = NPC[B].Location;
+                tempLocation.Y -= 16;
+                tempLocation.X -= 16;
+                NewEffect(10, tempLocation);
+                NPC[B].Type = 10;
+                NPC[B].Location.Width = NPCWidth[NPC[B].Type];
+                NPC[B].Location.Height = NPCHeight[NPC[B].Type];
+                NPC[B].Location.Y += -NPC[B].Location.Height / 2.0;
+                NPC[B].Location.X += -NPC[B].Location.Width / 2.0;
+                NPC[B].Location.SpeedX = 0;
+                NPC[B].Location.SpeedY = 0;
             }
-            CheatString.clear();
-            cheated = true;
         }
-        else if(SDL_strstr(CheatString.c_str(), "coldegg"))
+    }
+}
+
+static void carKeys()
+{
+    for(int B = 1; B <= numPlayers; B++)
+    {
+        if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
         {
-            for(B = 1; B <= numPlayers; B++)
-            {
-                if(Player[B].Mount == 0 && Player[B].Dead == false && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
-                {
-                    numNPCs++;
-                    NPC[numNPCs] = NPC_t();
-                    NPC[numNPCs].Type = 96;
-                    NPC[numNPCs].Special = 228;
-                    NPC[numNPCs].Frame = 6;
-                    NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
-                    NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
-                    NPC[numNPCs].Location.SpeedX = 0;
-                    NPC[numNPCs].Location.SpeedY = 0;
-                    NPC[numNPCs].Effect = 2;
-                    NPC[numNPCs].Active = true;
-                    NPC[numNPCs].TimeLeft = 200;
-                    NPC[numNPCs].HoldingPlayer = B;
-                    Player[B].HoldingNPC = numNPCs;
-                    Player[B].ForceHold = 60;
-                    PlaySound(SFX_Grab);
-                }
-            }
-            CheatString.clear();
-            cheated = true;
+            numNPCs++;
+            NPC[numNPCs] = NPC_t();
+            NPC[numNPCs].Type = 31;
+            NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.SpeedX = 0;
+            NPC[numNPCs].Location.SpeedY = 0;
+            NPC[numNPCs].Active = true;
+            NPC[numNPCs].TimeLeft = 200;
+            NPC[numNPCs].HoldingPlayer = B;
+
+            CheckSectionNPC(numNPCs);
+
+            Player[B].HoldingNPC = numNPCs;
+            Player[B].ForceHold = 60;
+            PlaySound(SFX_Grab);
         }
-        else if(SDL_strstr(CheatString.c_str(), "stophittingme") || SDL_strstr(CheatString.c_str(), "uncle"))
+    }
+}
+
+static void boingyBoing()
+{
+    for(int B = 1; B <= numPlayers; B++)
+    {
+        if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
         {
-            bool tempBool;
-            tempBool = GodMode;
-            GodMode = false;
-            for(B = 1; B <= numPlayers; B++)
-            {
-                PlayerHurt(B);
-            }
-            GodMode = tempBool;
-            CheatString.clear();
-            cheated = true;
+            numNPCs++;
+            NPC[numNPCs] = NPC_t();
+            NPC[numNPCs].Type = 26;
+            NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.SpeedX = 0;
+            NPC[numNPCs].Location.SpeedY = 0;
+            NPC[numNPCs].Active = true;
+            NPC[numNPCs].TimeLeft = 200;
+            NPC[numNPCs].HoldingPlayer = B;
+
+            CheckSectionNPC(numNPCs);
+            Player[B].HoldingNPC = numNPCs;
+            Player[B].ForceHold = 60;
+            PlaySound(SFX_Grab);
         }
-        else if(SDL_strstr(CheatString.c_str(), "stickyfingers") || SDL_strstr(CheatString.c_str(), "stickzfingers"))
+    }
+}
+
+static void bombsAway()
+{
+    for(int B = 1; B <= numPlayers; B++)
+    {
+        if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
         {
-            if(GrabAll == true)
-            {
-//                if(TestLevel == true)
-//                    frmTestSettings::chkGrabAll.Value = 0;
-                GrabAll = false;
-                PlaySound(SFX_PlayerShrink);
-            }
-            else
-            {
-//                if(TestLevel == true)
-//                    frmTestSettings::chkGrabAll.Value = 1;
-                GrabAll = true;
-                PlaySound(SFX_PlayerGrow);
-            }
-            for(B = 1; B <= 128; B++)
-            {
-                if(GrabAll == true)
-                    Player[B].CanGrabNPCs = true;
-                else
-                    Player[B].CanGrabNPCs = false;
-            }
-            CheatString.clear();
-            cheated = true;
+            numNPCs++;
+            NPC[numNPCs] = NPC_t();
+            NPC[numNPCs].Type = 134;
+            NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.X = Player[B].Location.X;
+            NPC[numNPCs].Location.Y = Player[B].Location.Y;
+            NPC[numNPCs].Location.SpeedX = 0;
+            NPC[numNPCs].Location.SpeedY = 0;
+            NPC[numNPCs].Active = true;
+            NPC[numNPCs].TimeLeft = 200;
+            NPC[numNPCs].HoldingPlayer = B;
+
+            CheckSectionNPC(numNPCs);
+            Player[B].HoldingNPC = numNPCs;
+            Player[B].ForceHold = 60;
+            PlaySound(SFX_Grab);
         }
-        else if(SDL_strstr(CheatString.c_str(), "captainn"))
+    }
+}
+
+static void fireMissiles()
+{
+    for(int B = 1; B <= numPlayers; B++)
+    {
+        if(Player[B].Mount == 0 && !Player[B].Dead &&
+           Player[B].TimeToLive == 0 && Player[B].Effect == 0)
         {
-            if(CaptainN == true)
-            {
-                CaptainN = false;
-                PlaySound(SFX_PlayerShrink);
-            }
-            else
-            {
-                CaptainN = true;
-                PlaySound(SFX_PlayerGrow);
-            }
-            CheatString.clear();
-            cheated = true;
+            numNPCs++;
+            NPC[numNPCs] = NPC_t();
+            NPC[numNPCs].Type = 17;
+            NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.SpeedX = 0;
+            NPC[numNPCs].Location.SpeedY = 0;
+            NPC[numNPCs].Active = true;
+            NPC[numNPCs].TimeLeft = 200;
+            NPC[numNPCs].HoldingPlayer = B;
+
+            CheckSectionNPC(numNPCs);
+            Player[B].HoldingNPC = numNPCs;
+            Player[B].ForceHold = 60;
+            PlaySound(SFX_Grab);
         }
-        else if(SDL_strstr(CheatString.c_str(), "flamethrower"))
+    }
+}
+
+static void hellFire()
+{
+    for(int B = 1; B <= numPlayers; B++)
+    {
+        if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
         {
-            if(FlameThrower == true)
-            {
-                FlameThrower = false;
-                PlaySound(SFX_PlayerShrink);
-            }
-            else
-            {
-                FlameThrower = true;
-                PlaySound(SFX_PlayerGrow);
-            }
-            CheatString.clear();
-            cheated = true;
+            numNPCs++;
+            NPC[numNPCs] = NPC_t();
+            NPC[numNPCs].Type = 279;
+            NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.SpeedX = 0;
+            NPC[numNPCs].Location.SpeedY = 0;
+            NPC[numNPCs].Active = true;
+            NPC[numNPCs].TimeLeft = 200;
+            NPC[numNPCs].HoldingPlayer = B;
+            NPC[numNPCs].Location.X = Player[B].Location.X;
+            NPC[numNPCs].Location.Y = Player[B].Location.Y;
+            NPC[numNPCs].Section = Player[B].Section;
+
+            Player[B].HoldingNPC = numNPCs;
+            Player[B].ForceHold = 60;
+            PlaySound(SFX_Grab);
         }
-        else if(SDL_strstr(CheatString.c_str(), "moneytree") || SDL_strstr(CheatString.c_str(), "moneztree"))
+    }
+}
+
+static void upAndOut()
+{
+    for(int B = 1; B <= numPlayers; B++)
+    {
+        if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
         {
-            if(CoinMode == true)
-            {
-                CoinMode = false;
-                PlaySound(SFX_PlayerShrink);
-            }
-            else
-            {
-                CoinMode = true;
-                PlaySound(SFX_PlayerGrow);
-            }
-            CheatString.clear();
-            cheated = true;
+            numNPCs++;
+            NPC[numNPCs] = NPC_t();
+            NPC[numNPCs].Type = 278;
+            NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.SpeedX = 0;
+            NPC[numNPCs].Location.SpeedY = 0;
+            NPC[numNPCs].Active = true;
+            NPC[numNPCs].TimeLeft = 200;
+            NPC[numNPCs].HoldingPlayer = B;
+            NPC[numNPCs].Location.X = Player[B].Location.X;
+            NPC[numNPCs].Location.Y = Player[B].Location.Y;
+            NPC[numNPCs].Section = Player[B].Section;
+
+            Player[B].HoldingNPC = numNPCs;
+            Player[B].ForceHold = 60;
+            PlaySound(SFX_Grab);
         }
-        else if(SDL_strstr(CheatString.c_str(), "donthurtme") || SDL_strstr(CheatString.c_str(), "godmode"))
+    }
+}
+
+static void powHammer()
+{
+    for(int B = 1; B <= numPlayers; B++)
+    {
+        if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
         {
-            if(GodMode == true)
-            {
-//                if(TestLevel == true)
-//                    frmTestSettings::chkGodMode.Value = 0;
-                GodMode = false;
-                PlaySound(SFX_PlayerShrink);
-            }
-            else
-            {
-//                if(TestLevel == true)
-//                    frmTestSettings::chkGodMode.Value = 1;
-                GodMode = true;
-                PlaySound(SFX_PlayerGrow);
-            }
-            CheatString.clear();
-            cheated = true;
+            numNPCs++;
+            NPC[numNPCs] = NPC_t();
+            NPC[numNPCs].Type = 241;
+            NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.SpeedX = 0;
+            NPC[numNPCs].Location.SpeedY = 0;
+            NPC[numNPCs].Active = true;
+            NPC[numNPCs].TimeLeft = 200;
+            NPC[numNPCs].HoldingPlayer = B;
+            NPC[numNPCs].Location.X = Player[B].Location.X;
+            NPC[numNPCs].Location.Y = Player[B].Location.Y;
+            NPC[numNPCs].Section = Player[B].Section;
+
+            Player[B].HoldingNPC = numNPCs;
+            Player[B].ForceHold = 60;
+            PlaySound(SFX_Grab);
         }
-        else if(SDL_strstr(CheatString.c_str(), "wingman"))
+    }
+}
+
+static void hammerInMyPants()
+{
+    for(int B = 1; B <= numPlayers; B++)
+    {
+        if(Player[B].Mount == 0 && !Player[B].Dead &&
+           Player[B].TimeToLive == 0 && Player[B].Effect == 0)
         {
-            if(FlyForever == true)
-            {
-                FlyForever = false;
-                PlaySound(SFX_PlayerShrink);
-            }
-            else
-            {
-                FlyForever = true;
-                PlaySound(SFX_PlayerGrow);
-            }
-            CheatString.clear();
-            cheated = true;
+            numNPCs++;
+            NPC[numNPCs] = NPC_t();
+            NPC[numNPCs].Type = 29;
+            NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.SpeedX = 0;
+            NPC[numNPCs].Location.SpeedY = 0;
+            NPC[numNPCs].Active = true;
+            NPC[numNPCs].TimeLeft = 200;
+            NPC[numNPCs].HoldingPlayer = B;
+            NPC[numNPCs].Location.X = Player[B].Location.X;
+            NPC[numNPCs].Location.Y = Player[B].Location.Y;
+            NPC[numNPCs].Section = Player[B].Section;
+
+            Player[B].HoldingNPC = numNPCs;
+            Player[B].ForceHold = 60;
+            PlaySound(SFX_Grab);
         }
-        else if(SDL_strstr(CheatString.c_str(), "tooslow"))
+    }
+}
+
+static void rainbowRider()
+{
+    for(int B = 1; B <= numPlayers; B++)
+    {
+        if(Player[B].Mount == 0 && !Player[B].Dead &&
+           Player[B].TimeToLive == 0 && Player[B].Effect == 0)
         {
-            if(SuperSpeed == true)
-            {
-                SuperSpeed = false;
-                PlaySound(SFX_PlayerShrink);
-            }
-            else
-            {
-                SuperSpeed = true;
-                PlaySound(SFX_PlayerGrow);
-            }
-            CheatString.clear();
-            cheated = true;
+            numNPCs++;
+            NPC[numNPCs] = NPC_t();
+            NPC[numNPCs].Type = 195;
+            NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.SpeedX = 0;
+            NPC[numNPCs].Location.SpeedY = 0;
+            NPC[numNPCs].Effect = 2;
+            NPC[numNPCs].Active = true;
+            NPC[numNPCs].TimeLeft = 200;
+            NPC[numNPCs].HoldingPlayer = B;
+
+            Player[B].HoldingNPC = numNPCs;
+            Player[B].ForceHold = 60;
+            PlaySound(SFX_Grab);
         }
-        else if(SDL_strstr(CheatString.c_str(), "ahippinandahoppin") || SDL_strstr(CheatString.c_str(), "jumpman"))
+    }
+}
+
+static void greenEgg()
+{
+    for(int B = 1; B <= numPlayers; B++)
+    {
+        if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
         {
-            if(MultiHop == true)
-            {
-                MultiHop = false;
-                PlaySound(SFX_PlayerShrink);
-            }
-            else
-            {
-                MultiHop = true;
-                PlaySound(SFX_PlayerGrow);
-            }
-            CheatString.clear();
-            cheated = true;
+            numNPCs++;
+            NPC[numNPCs] = NPC_t();
+            NPC[numNPCs].Type = 96;
+            NPC[numNPCs].Special = 95;
+            NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.SpeedX = 0;
+            NPC[numNPCs].Location.SpeedY = 0;
+            NPC[numNPCs].Effect = 2;
+            NPC[numNPCs].Active = true;
+            NPC[numNPCs].TimeLeft = 200;
+            NPC[numNPCs].HoldingPlayer = B;
+
+            Player[B].HoldingNPC = numNPCs;
+            Player[B].ForceHold = 60;
+            PlaySound(SFX_Grab);
         }
-        else if(SDL_strstr(CheatString.c_str(), "framerate"))
+    }
+}
+
+static void blueEgg()
+{
+    for(int B = 1; B <= numPlayers; B++)
+    {
+        if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
         {
-            if(ShowFPS)
-            {
-//                if(TestLevel == true)
-//                    frmTestSettings::chkShowFPS.Value = 0;
-                ShowFPS = false;
-                PlaySound(SFX_PlayerShrink);
-                PrintFPS = 0;
-            }
-            else
-            {
-//                if(TestLevel == true)
-//                    frmTestSettings::chkShowFPS.Value = 1;
-                ShowFPS = true;
-                PlaySound(SFX_PlayerGrow);
-            }
-            CheatString.clear();
-            return;
+            numNPCs++;
+            NPC[numNPCs] = NPC_t();
+            NPC[numNPCs].Type = 96;
+            NPC[numNPCs].Frame = 1;
+            NPC[numNPCs].Special = 98;
+            NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.SpeedX = 0;
+            NPC[numNPCs].Location.SpeedY = 0;
+            NPC[numNPCs].Effect = 2;
+            NPC[numNPCs].Active = true;
+            NPC[numNPCs].TimeLeft = 200;
+            NPC[numNPCs].HoldingPlayer = B;
+
+            Player[B].HoldingNPC = numNPCs;
+            Player[B].ForceHold = 60;
+            PlaySound(SFX_Grab);
         }
-        else if(SDL_strstr(CheatString.c_str(), "speeddemon"))
+    }
+}
+
+static void yellowEgg()
+{
+    for(int B = 1; B <= numPlayers; B++)
+    {
+        if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
         {
-            if(MaxFPS == true)
-            {
-                MaxFPS = false;
-//                if(TestLevel == true)
-//                    frmTestSettings::chkMaxFPS.Value = 0;
-                PlaySound(SFX_PlayerShrink);
-            }
-            else
-            {
-//                if(TestLevel == true)
-//                    frmTestSettings::chkMaxFPS.Value = 1;
-                MaxFPS = true;
-                PlaySound(SFX_PlayerGrow);
-            }
-            CheatString.clear();
-            cheated = true;
+            numNPCs++;
+            NPC[numNPCs] = NPC_t();
+            NPC[numNPCs].Type = 96;
+            NPC[numNPCs].Special = 99;
+            NPC[numNPCs].Frame = 2;
+            NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.SpeedX = 0;
+            NPC[numNPCs].Location.SpeedY = 0;
+            NPC[numNPCs].Effect = 2;
+            NPC[numNPCs].Active = true;
+            NPC[numNPCs].TimeLeft = 200;
+            NPC[numNPCs].HoldingPlayer = B;
+            Player[B].HoldingNPC = numNPCs;
+            Player[B].ForceHold = 60;
+            PlaySound(SFX_Grab);
         }
+    }
+}
+
+static void redEgg()
+{
+    for(int B = 1; B <= numPlayers; B++)
+    {
+        if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
+        {
+            numNPCs++;
+            NPC[numNPCs] = NPC_t();
+            NPC[numNPCs].Type = 96;
+            NPC[numNPCs].Special = 100;
+            NPC[numNPCs].Frame = 3;
+            NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.SpeedX = 0;
+            NPC[numNPCs].Location.SpeedY = 0;
+            NPC[numNPCs].Effect = 2;
+            NPC[numNPCs].Active = true;
+            NPC[numNPCs].TimeLeft = 200;
+            NPC[numNPCs].HoldingPlayer = B;
+            Player[B].HoldingNPC = numNPCs;
+            Player[B].ForceHold = 60;
+            PlaySound(SFX_Grab);
+        }
+    }
+}
+
+static void blackEgg()
+{
+    for(int B = 1; B <= numPlayers; B++)
+    {
+        if(Player[B].Mount == 0 && !Player[B].Dead &&
+           Player[B].TimeToLive == 0 && Player[B].Effect == 0)
+        {
+            numNPCs++;
+            NPC[numNPCs] = NPC_t();
+            NPC[numNPCs].Type = 96;
+            NPC[numNPCs].Special = 148;
+            NPC[numNPCs].Frame = 4;
+            NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.SpeedX = 0;
+            NPC[numNPCs].Location.SpeedY = 0;
+            NPC[numNPCs].Effect = 2;
+            NPC[numNPCs].Active = true;
+            NPC[numNPCs].TimeLeft = 200;
+            NPC[numNPCs].HoldingPlayer = B;
+
+            Player[B].HoldingNPC = numNPCs;
+            Player[B].ForceHold = 60;
+            PlaySound(SFX_Grab);
+        }
+    }
+}
+
+static void purpleEgg()
+{
+    for(int B = 1; B <= numPlayers; B++)
+    {
+        if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
+        {
+            numNPCs++;
+            NPC[numNPCs] = NPC_t();
+            NPC[numNPCs].Type = 96;
+            NPC[numNPCs].Special = 149;
+            NPC[numNPCs].Frame = 5;
+            NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.SpeedX = 0;
+            NPC[numNPCs].Location.SpeedY = 0;
+            NPC[numNPCs].Effect = 2;
+            NPC[numNPCs].Active = true;
+            NPC[numNPCs].TimeLeft = 200;
+            NPC[numNPCs].HoldingPlayer = B;
+
+            Player[B].HoldingNPC = numNPCs;
+            Player[B].ForceHold = 60;
+            PlaySound(SFX_Grab);
+        }
+    }
+}
+
+static void pinkEgg()
+{
+    for(int B = 1; B <= numPlayers; B++)
+    {
+        if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
+        {
+            numNPCs++;
+            NPC[numNPCs] = NPC_t();
+            NPC[numNPCs].Type = 96;
+            NPC[numNPCs].Special = 150;
+            NPC[numNPCs].Frame = 6;
+            NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.SpeedX = 0;
+            NPC[numNPCs].Location.SpeedY = 0;
+            NPC[numNPCs].Effect = 2;
+            NPC[numNPCs].Active = true;
+            NPC[numNPCs].TimeLeft = 200;
+            NPC[numNPCs].HoldingPlayer = B;
+
+            Player[B].HoldingNPC = numNPCs;
+            Player[B].ForceHold = 60;
+            PlaySound(SFX_Grab);
+        }
+    }
+}
+
+static void coldEgg()
+{
+    for(int B = 1; B <= numPlayers; B++)
+    {
+        if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
+        {
+            numNPCs++;
+            NPC[numNPCs] = NPC_t();
+            NPC[numNPCs].Type = 96;
+            NPC[numNPCs].Special = 228;
+            NPC[numNPCs].Frame = 6;
+            NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.SpeedX = 0;
+            NPC[numNPCs].Location.SpeedY = 0;
+            NPC[numNPCs].Effect = 2;
+            NPC[numNPCs].Active = true;
+            NPC[numNPCs].TimeLeft = 200;
+            NPC[numNPCs].HoldingPlayer = B;
+
+            Player[B].HoldingNPC = numNPCs;
+            Player[B].ForceHold = 60;
+            PlaySound(SFX_Grab);
+        }
+    }
+}
+
+static void stopHittingMe()
+{
+    bool ret = GodMode;
+    GodMode = false;
+
+    for(int B = 1; B <= numPlayers; B++)
+        PlayerHurt(B);
+
+    GodMode = ret;
+}
+
+static void stickyFingers()
+{
+    GrabAll = !GrabAll;
+    PlaySound(GrabAll ? SFX_PlayerGrow : SFX_PlayerShrink);
+
+    for(int B = 1; B <= maxPlayers; B++)
+        Player[B].CanGrabNPCs = GrabAll;
+}
+
+static void capitanN()
+{
+    CaptainN = !CaptainN;
+    PlaySound(CaptainN ? SFX_PlayerGrow : SFX_PlayerShrink);
+}
+
+static void flameThrower()
+{
+    FlameThrower = !FlameThrower;
+    PlaySound(FlameThrower ? SFX_PlayerGrow : SFX_PlayerShrink);
+}
+
+static void moneyTree()
+{
+    CoinMode = !CoinMode;
+    PlaySound(CoinMode ? SFX_PlayerGrow : SFX_PlayerShrink);
+}
+
+static void godMode()
+{
+    GodMode = !GodMode;
+    PlaySound(GodMode ? SFX_PlayerGrow : SFX_PlayerShrink);
+}
+
+static void wingMan()
+{
+    FlyForever = !FlyForever;
+    PlaySound(FlyForever ? SFX_PlayerGrow : SFX_PlayerShrink);
+}
+
+static void tooSlow()
+{
+    SuperSpeed = !SuperSpeed;
+    PlaySound(SuperSpeed ? SFX_PlayerGrow : SFX_PlayerShrink);
+}
+
+static void ahippinAndAHopping()
+{
+    MultiHop = !MultiHop;
+    PlaySound(MultiHop ? SFX_PlayerGrow : SFX_PlayerShrink);
+}
+
+static void frameRate()
+{
+    ShowFPS = !ShowFPS;
+    PlaySound(ShowFPS ? SFX_PlayerGrow : SFX_PlayerShrink);
+    if(ShowFPS)
+        PrintFPS = 0;
+}
+
+static void speedDemon()
+{
+    MaxFPS = !MaxFPS;
+    PlaySound(MaxFPS ? SFX_PlayerGrow : SFX_PlayerShrink);
+}
+
+
+
+
+
+
+struct CheatCodeDefault_t
+{
+    const char*key;
+    void (*call)();
+    bool isCheat;
+};
+
+struct CheatCode_t
+{
+    char key[25];
+    size_t keyLen;
+    void (*call)();
+    bool isCheat;
+};
+
+static const CheatCodeDefault_t s_cheatsListGlobalDefault[] =
+{
+#ifdef ENABLE_ANTICHEAT_TRAP
+    {"redigitiscool", dieCheater, false},
+#else
+    {"redigitiscool", redigitIsCool, false},
+#endif
+    {"\x77\x6f\x68\x6c\x73\x74\x61\x6e\x64\x69\x73\x74\x73\x65\x68\x72\x67\x75\x74", redigitIsCool, false},
+    {nullptr, nullptr, false}
+};
+
+
+static const CheatCodeDefault_t s_cheatsListWorldDefault[] =
+{
+    {"imtiredofallthiswalking", moonWalk, true}, {"moonwalk", moonWalk, true}, {"skywalk", moonWalk, true},
+    {"illparkwhereiwant", illParkWhereIWant, true}, {"parkinglot", illParkWhereIWant, true},
+    {nullptr, nullptr, false}
+};
+
+static const CheatCodeDefault_t s_cheatsListLevelDefault[] =
+{
+    {"needashell", needAShell, true},
+    {"fairymagic", fairyMagic, true},
+    {"iceage", iceAge, true},
+    {"istillplaywithlegos", iStillPlayWithLegos, true},
+    {"itsrainingmen", itsRainingMen, true},
+    {"donttypethis", dontTypeThis, true},
+    {"wetwater", wetWater, true},
+    {"needaredshell", needARedShell, true},
+    {"needablueshell", needABlueShell, true},
+    {"needayellowshell", needAYellowShell, true},
+    {"needaturnip", needATurnip, true},
+    {"needa1up", needA1Up, true},
+    {"needatanookisuit", needATanookiSuit, true},
+    {"needahammersuit", needAHammerSuit, true}, {"hammertime", needAHammerSuit, true},
+    {"needamushroom", needAMushroom, true},
+    {"needaflower", needAFlower, true},
+    {"niceflower", needAnIceFlower, true},
+    {"needaleaf", needALeaf, true},
+    {"needanegg", needANegg, true},
+    {"needaplant", needAPlant, true},
+    {"needagun", needAGun, true},
+    {"needaswitch", needASwitch, true},
+    {"needaclock", needAClock, true},
+    {"needabomb", needABomb, true},
+    {"needashoe", needAShoe, true},
+    {"redshoe", redShoe, true},
+    {"blueshoe", blueShoe, true},
+    {"shadowstar", shadowStar, true},
+
+    {"ibakedacakeforyou", becomeAsPeach, true}, {"itsamepeach", becomeAsPeach, true},
+    {"anothercastle", becomeAsToad, true}, {"itsametoad", becomeAsToad, true},
+    {"iamerror", becomeAsLink, true}, {"itsamelink", becomeAsLink, true},
+    {"itsamemario", becomeAsMario, true}, {"plumberboy", becomeAsMario, true}, {"moustacheman", becomeAsMario, true},
+    {"itsameluigi", becomeAsLuigi, true}, {"greenmario", becomeAsLuigi, true},
+
+    {"supermario128", superbDemo128, true},
+    {"supermario64", superbDemo64, true},
+    {"supermario32", superbDemo32, true},
+    {"supermario16", superbDemo16, true},
+    {"supermario8", superbDemo8, true},
+    {"supermario4", superbDemo4, true},
+    {"supermario2", superbDemo2, true},
+    {"1player", onePlayer, true},
+    {"2player", twoPlayer, true},
+
+    {"wariotime", warioTime, true},
+    {"carkeys", carKeys, true},
+    {"boingyboing", boingyBoing, true},
+    {"bombsaway", bombsAway, true},
+    {"firemissiles", fireMissiles, true},
+    {"burnthehousedown", hellFire, true}, {"hellfire", hellFire, true},
+    {"upandout", upAndOut, true},
+    {"powhammer", powHammer, true},
+    {"hammerinmypants", hammerInMyPants, true},
+    {"rainbowrider", rainbowRider, true},
+
+    {"greenegg", greenEgg, true},
+    {"blueegg", blueEgg, true},
+    {"yellowegg", yellowEgg, true},
+    {"redegg", redEgg, true},
+    {"blackegg", blackEgg, true},
+    {"purpleegg", purpleEgg, true},
+    {"pinkegg", pinkEgg, true},
+    {"coldegg", coldEgg, true},
+    {"stophittingme", stopHittingMe, true}, {"uncle", stopHittingMe, true},
+    {"stickyfingers", stickyFingers, true},
+    {"captainn", capitanN, true},
+    {"flamethrower", flameThrower, true},
+    {"moneytree", moneyTree, true},
+    {"donthurtme", godMode, true}, {"godmode", godMode, true},
+    {"wingman", wingMan, true},
+    {"tooslow", tooSlow, true},
+    {"ahippinandahoppin", ahippinAndAHopping, true}, {"jumpman", ahippinAndAHopping, true},
+    {"framerate", frameRate, false},
+    {"speeddemon", speedDemon, true},
+    {nullptr, nullptr, false}
+};
+
+
+//! Current list of global cheats
+static std::vector<CheatCode_t> s_cheatsListGlobal;
+//! Current list of world map specific cheats
+static std::vector<CheatCode_t> s_cheatsListWorld;
+//! Current list of level specific cheats
+static std::vector<CheatCode_t> s_cheatsListLevel;
+
+
+/*!
+ * \brief hasQWERTZ
+ * \param s Checks does string is suitable for conversion into QWERTZ
+ * \return true if string can be converted into QWERTZ
+ */
+SDL_FORCE_INLINE bool hasQWERTZ(const std::string &s)
+{
+    for(const char &c : s)
+    {
+        switch(c)
+        {
+        case 'y':
+        case 'z':
+            return true;
+        default:
+            continue;
+        }
+    }
+
+    return false;
+}
+
+/*!
+ * \brief convert string into QWERTZ
+ * \param s Source string in QWERTY
+ * \return QWERTZ string
+ */
+SDL_FORCE_INLINE std::string toQWERTZ(std::string s)
+{
+    for(char &c : s)
+    {
+        switch(c)
+        {
+        case 'y':
+            c = 'z';
+            break;
+        case 'z':
+            c = 'y';
+            break;
+        default:
+            continue;
+        }
+    }
+
+    return s;
+}
+
+/*!
+ * \brief hasAZERTY
+ * \param s Checks does string is suitable for conversion into AZERTY
+ * \return true if string can be converted into AZERTY
+ */
+SDL_FORCE_INLINE bool hasAZERTY(const std::string &s)
+{
+    for(const char &c : s)
+    {
+        switch(c)
+        {
+        case 'q':
+        case 'w':
+        case 'a':
+        case ';':
+        case 'z':
+        case 'm':
+            return true;
+        default:
+            continue;
+        }
+    }
+
+    return false;
+}
+
+/*!
+ * \brief convert string into AZERTY
+ * \param s Source string in AZERTY
+ * \return AZERTY string
+ */
+SDL_FORCE_INLINE std::string toAZERTY(std::string s)
+{
+    for(char &c : s)
+    {
+        switch(c)
+        {
+        case 'q':
+            c = 'a';
+            break;
+        case 'w':
+            c = 'z';
+            break;
+        case 'a':
+            c = 'q';
+            break;
+        case 'z':
+            c = 'w';
+            break;
+        case 'm':
+            c = ';';
+            break;
+        default:
+            continue;
+        }
+    }
+
+    return s;
+}
+
+SDL_FORCE_INLINE void convertArray(std::vector<CheatCode_t> &dst, const CheatCodeDefault_t *src)
+{
+    dst.clear();
+
+    while(src->key && src->call)
+    {
+        CheatCode_t cd = {};
+        SDL_memset(cd.key, 0, sizeof(cd.key));
+        SDL_strlcpy(cd.key, src->key, sizeof(cd.key));
+        cd.keyLen = SDL_strlen(cd.key);
+        cd.call = src->call;
+        cd.isCheat = src->isCheat;
+        dst.push_back(cd);
+
+        if(hasQWERTZ(src->key)) // Automatically add QWERTZ alias
+        {
+            std::string z = toQWERTZ(src->key);
+            SDL_memset(cd.key, 0, sizeof(cd.key));
+            SDL_strlcpy(cd.key, z.c_str(), SDL_min(sizeof(cd.key), z.size() + 1));
+            cd.keyLen = SDL_strlen(cd.key);
+            dst.push_back(cd);
+        }
+
+        if(hasAZERTY(src->key)) // Automatically add AZERTY alias
+        {
+            std::string z = toAZERTY(src->key);
+            SDL_memset(cd.key, 0, sizeof(cd.key));
+            SDL_strlcpy(cd.key, z.c_str(), SDL_min(sizeof(cd.key), z.size() + 1));
+            cd.keyLen = SDL_strlen(cd.key);
+            dst.push_back(cd);
+        }
+
+        ++src;
+    }
+}
+
+SDL_FORCE_INLINE void addAliasCheats(CheatsScope scope, std::vector<GameInfo::CheatAlias> &list)
+{
+    for(const auto &c : list)
+    {
+        cheats_addAlias(scope, c.first, c.second);
+        if(hasQWERTZ(c.second)) // Add QWERTZ version for new string
+            cheats_addAlias(scope, c.first, toQWERTZ(c.second));
+        if(hasAZERTY(c.second)) // Add AZERTY version for new string
+            cheats_addAlias(scope, c.first, toAZERTY(c.second));
+    }
+}
+
+SDL_FORCE_INLINE void addRenameCheats(CheatsScope scope, std::vector<GameInfo::CheatAlias> &list)
+{
+    for(const auto &c : list)
+    {
+        cheats_rename(scope, c.first, c.second);
+
+        if(hasQWERTZ(c.first)) // Remove no longer relevant QWERTZ version of string
+            cheats_erase(scope, toQWERTZ(c.first));
+        if(hasAZERTY(c.first)) // Remove no longer relevant AZERTY version of string
+            cheats_erase(scope, toAZERTY(c.first));
+
+        if(hasQWERTZ(c.second)) // Add QWERTZ version for new string if needed
+            cheats_addAlias(scope, c.second, toQWERTZ(c.second));
+        if(hasAZERTY(c.second)) // Add AZERTY version for new string if needed
+            cheats_addAlias(scope, c.second, toAZERTY(c.second));
+    }
+}
+
+void cheats_reset()
+{
+    convertArray(s_cheatsListGlobal, s_cheatsListGlobalDefault);
+    convertArray(s_cheatsListWorld, s_cheatsListWorldDefault);
+    convertArray(s_cheatsListLevel, s_cheatsListLevelDefault);
+
+    addAliasCheats(CHEAT_SCOPE_GLOBAL,  g_gameInfo.cheatsGlobalAliases);
+    addRenameCheats(CHEAT_SCOPE_GLOBAL, g_gameInfo.cheatsGlobalRenames);
+
+    addAliasCheats(CHEAT_SCOPE_WORLD,  g_gameInfo.cheatsWorldAliases);
+    addRenameCheats(CHEAT_SCOPE_WORLD, g_gameInfo.cheatsWorldRenames);
+
+    addAliasCheats(CHEAT_SCOPE_LEVEL,  g_gameInfo.cheatsLevelAliases);
+    addRenameCheats(CHEAT_SCOPE_LEVEL, g_gameInfo.cheatsLevelRenames);
+}
+
+void cheats_addAlias(CheatsScope scope, const std::string &source, const std::string &alias)
+{
+    std::vector<CheatCode_t> *dst = nullptr;
+
+    switch(scope)
+    {
+    case CHEAT_SCOPE_GLOBAL:
+        dst = &s_cheatsListGlobal;
+        break;
+    case CHEAT_SCOPE_WORLD:
+        dst = &s_cheatsListWorld;
+        break;
+    case CHEAT_SCOPE_LEVEL:
+        dst = &s_cheatsListLevel;
+        break;
+    }
+
+    SDL_assert(dst);
+
+    for(auto &c : *dst)
+    {
+        if(source == c.key)
+        {
+            auto cc = c;
+            SDL_memset(cc.key, 0, sizeof(cc.key));
+            SDL_strlcpy(cc.key, alias.c_str(), SDL_min(sizeof(cc.key), alias.size() + 1));
+            cc.keyLen = SDL_strlen(cc.key);
+            dst->push_back(cc);
+            break;
+        }
+    }
+}
+
+void cheats_rename(CheatsScope scope, const std::string &source, const std::string &alias)
+{
+    std::vector<CheatCode_t> *dst = nullptr;
+
+    switch(scope)
+    {
+    case CHEAT_SCOPE_GLOBAL:
+        dst = &s_cheatsListGlobal;
+        break;
+    case CHEAT_SCOPE_WORLD:
+        dst = &s_cheatsListWorld;
+        break;
+    case CHEAT_SCOPE_LEVEL:
+        dst = &s_cheatsListLevel;
+        break;
+    }
+
+    SDL_assert(dst);
+
+    for(auto &c : *dst)
+    {
+        if(source == c.key)
+        {
+            SDL_memset(c.key, 0, sizeof(c.key));
+            SDL_strlcpy(c.key, alias.c_str(), SDL_min(sizeof(c.key), alias.size() + 1));
+            c.keyLen = SDL_strlen(c.key);
+            break;
+        }
+    }
+
+}
+
+void cheats_erase(CheatsScope scope, const std::string &source)
+{
+    std::vector<CheatCode_t> *dst = nullptr;
+
+    switch(scope)
+    {
+    case CHEAT_SCOPE_GLOBAL:
+        dst = &s_cheatsListGlobal;
+        break;
+    case CHEAT_SCOPE_WORLD:
+        dst = &s_cheatsListWorld;
+        break;
+    case CHEAT_SCOPE_LEVEL:
+        dst = &s_cheatsListLevel;
+        break;
+    }
+
+    SDL_assert(dst);
+
+    for(auto it = dst->begin(); it != dst->end(); ++it)
+    {
+        if(source == it->key)
+        {
+            dst->erase(it);
+            break;
+        }
+    }
+}
+
+
+struct CheatBuffer_t
+{
+    static const size_t maxLen = 25;
+    char buffer[2][maxLen + 1] = {};
+    size_t t = 0;
+    size_t bufLen = 0;
+
+    void clear()
+    {
+        buffer[0][0] = 0;
+        buffer[1][0] = 0;
+        bufLen = 0;
+    }
+
+    void setBuffer(const std::string &line)
+    {
+        bufLen = SDL_min(maxLen, line.size());
+        SDL_memcpy(buffer[t], line.c_str(), bufLen);
+        buffer[t][bufLen] = 0;
+    }
+
+    void addSym(char c)
+    {
+        if(bufLen < maxLen)
+        {
+            buffer[t][bufLen++] = c;
+            buffer[t][bufLen] = 0;
+        }
+        else
+        {
+            size_t ts = t,
+                   td = !t;
+            SDL_memcpy(buffer[td], buffer[ts] + 1, bufLen - 1);
+            t = td;
+            buffer[t][bufLen - 1] = c;
+            buffer[t][bufLen] = 0;
+        }
+    }
+
+    const char *getString()
+    {
+        if(bufLen == 0)
+            return "";
+        return buffer[t];
+    }
+
+    size_t getBugLen() const
+    {
+        return bufLen;
+    }
+};
+
+static CheatBuffer_t s_buffer;
+
+
+SDL_FORCE_INLINE bool cheatCompare(size_t bufLen, const char *buf,
+                                   size_t keyLen, const char *key)
+{
+    if(bufLen < keyLen)
+        return false;
+
+    return SDL_memcmp(buf + (bufLen - keyLen), key, keyLen) == 0;
+}
+
+static void processCheats()
+{
+    std::string oldString;
+    const char *buf = s_buffer.getString();
+    auto bufLen = s_buffer.getBugLen();
+    bool cheated = false;
+
+    D_pLogDebug("Cheat buffer [%s]\n", buf);
+
+    for(const auto &c : s_cheatsListGlobal)
+    {
+        if(!cheatCompare(bufLen, buf, c.keyLen, c.key))
+            continue;
+
+        c.call();
+        oldString = buf;
+        s_buffer.clear();
+        cheated = c.isCheat;
+        break;
+    }
+
+    for(const auto &c : (LevelSelect ? s_cheatsListWorld : s_cheatsListLevel))
+    {
+        if(!cheatCompare(bufLen, buf, c.keyLen, c.key))
+            continue;
+
+        c.call();
+        oldString = buf;
+        s_buffer.clear();
+        cheated = c.isCheat;
+        break;
     }
 
     if(cheated)
     {
-        pLogDebug("Cheating detected!!! [%s]\n", newCheat.c_str());
+        pLogDebug("Cheating detected!!! [%s]\n", oldString.c_str());
         Cheater = true;
     }
+}
+
+void cheats_setBuffer(const std::string &line)
+{
+    s_buffer.setBuffer(line);
+    processCheats();
+}
+
+#ifdef __ANDROID__
+
+JNIEXPORT void JNICALL
+Java_ru_wohlsoft_thextech_thextechActivity_cheats_1setBuffer(JNIEnv *env, jclass clazz, jstring line_j)
+{
+    const char *line;
+    (void)clazz;
+    line = env->GetStringUTFChars(line_j, nullptr);
+    cheats_setBuffer(line);
+    env->ReleaseStringUTFChars(line_j, line);
+}
+
+void cheats_callDialog()
+{
+    JNIEnv* env = (JNIEnv*)SDL_AndroidGetJNIEnv();
+    jobject activity = (jobject)SDL_AndroidGetActivity();
+    jclass clazz = env->GetObjectClass(activity);
+    jmethodID method = env->GetMethodID(clazz, "requestCheat", "()V");
+    env->CallVoidMethod(activity, method);
+    env->DeleteLocalRef(activity);
+    env->DeleteLocalRef(clazz);
+}
+
+#endif
+
+void cheats_clearBuffer()
+{
+    s_buffer.clear();
+}
+
+/*!
+ * \brief Process the cheat buffer
+ * \param sym New key symbol
+ */
+void CheatCode(char sym)
+{
+    if(LevelEditor || GameMenu || /*nPlay.Online ||*/ BattleMode)
+    {
+        s_buffer.clear();
+        return;
+    }
+
+    s_buffer.addSym(sym);
+
+    processCheats();
 }

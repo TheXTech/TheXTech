@@ -1,10 +1,14 @@
 package ru.wohlsoft.thextech;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Environment;
+import android.text.InputType;
 import android.util.DisplayMetrics;
+import android.widget.EditText;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -50,7 +54,7 @@ public class thextechActivity extends SDLActivity
     protected String[] getLibraries()
     {
         return new String[] {
-            "hidapi",
+//            "hidapi",
 //            "SDL2",
             "thextech"
         };
@@ -155,7 +159,75 @@ public class thextechActivity extends SDLActivity
         System.exit(0);
     }
 
+    private void requestCheatShow()
+    {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.cheat_dialog_title);
+
+        // Set up the input
+        final EditText input = new EditText(this);
+
+        input.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+        builder.setView(input);
+
+        builder.setPositiveButton(R.string.cheat_dialog_ok, new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+                cheats_setBuffer(input.getText().toString());
+                messageboxSelection[0] = 1;
+                dialog.dismiss();
+            }
+        });
+
+        builder.setNegativeButton(R.string.cheat_dialog_cancel, new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                messageboxSelection[0] = 1;
+                dialog.cancel();
+            }
+        });
+
+        final AlertDialog dialog = builder.create();
+        dialog.setCancelable(false);
+        dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface unused) {
+                synchronized (messageboxSelection) {
+                    messageboxSelection.notify();
+                }
+            }
+        });
+
+        dialog.show();
+    }
+
+    public void requestCheat()
+    {
+        messageboxSelection[0] = -1;
+
+        runOnUiThread(new Runnable()
+        {
+            @Override
+            public void run() {
+                requestCheatShow();
+            }
+        });
+
+        synchronized (messageboxSelection) {
+            try {
+                messageboxSelection.wait();
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
     public static native void setSdCardPath(String path);
     public static native void setAppDataPath(String path);
     public static native void setGameAssetsPath(String path);
+    // Send the cheat buffer line
+    public static native void cheats_setBuffer(String line);
 }

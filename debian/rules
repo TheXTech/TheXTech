@@ -1,0 +1,41 @@
+#!/usr/bin/make -f
+
+BUILDDIR = build_dir
+
+# secondly called by launchpad
+build:
+	mkdir $(BUILDDIR);
+	cd $(BUILDDIR); cmake -DPGE_SHARED_SDLMIXER=OFF \
+    -DUSE_SYSTEM_SDL2=ON \
+    -DUSE_FREEIMAGE_SYSTEM_LIBS=ON \
+    -DCMAKE_INSTALL_PREFIX=../debian/tmp/usr \
+    -DCMAKE_BUILD_TYPE=MinSizeRel \
+    -DTHEXTECH_FIXED_ASSETS_PATH=/usr/share/games/smbx \
+    -DTHEXTECH_SOURCE_ASSETS_PATH="/full/path/to/unpacket/assets/thextech-smbx13-assets-full" \
+    -DTHEXTECH_USER_DIR_NAME=".thextech-smbx" \
+    -DDESKTOP_NAME="Super Mario Bros. X" \
+    -DDESKTOP_GENERIC_NAME="Super Mario Bros. X" \
+    -DDESKTOP_COMMENT="The Mario fan game" \
+    -DTHEXTECH_EXECUTABLE_NAME="thextech-smbx" \
+    -DTHEXTECH_PACKAGE_NAME="thextech-smbx" \
+    ..
+	make -C $(BUILDDIR)
+
+# thirdly called by launchpad
+binary: binary-indep binary-arch
+
+binary-indep:
+	# nothing to be done
+
+binary-arch:
+	cd $(BUILDDIR); cmake -P cmake_install.cmake
+	mkdir debian/tmp/DEBIAN
+	dpkg-gencontrol -pthextech-smbx
+	dpkg --build debian/tmp ..
+
+# firstly called by launchpad
+clean:
+	rm -f build
+	rm -rf $(BUILDDIR)
+
+.PHONY: binary binary-arch binary-indep clean

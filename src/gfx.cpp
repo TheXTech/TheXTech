@@ -20,26 +20,30 @@
 
 #include "globals.h"
 #include "gfx.h"
-#include "frm_main.h"
-#include <AppPath/app_path.h>
+#include "core/msgbox.h"
+#include "core/render.h"
 #include <fmt_format_ne.h>
 #include <Logger/logger.h>
-#include <SDL2/SDL_messagebox.h>
 
-void GFX_t::loadImage(StdPicture &img, std::string path)
+
+GFX_t GFX;
+
+
+void GFX_t::loadImage(StdPicture &img, const std::string &path)
 {
     pLogDebug("Loading texture %s...", path.c_str());
-    img = frmMain.LoadPicture(path);
-    if(!img.texture)
+    img = XRender::LoadPicture(path);
+
+    if(!img.d.hasTexture())
     {
         pLogWarning("Failed to load texture: %s...", path.c_str());
         m_loadErrors++;
     }
+
     m_loadedImages.push_back(&img);
 }
 
-GFX_t::GFX_t()
-{}
+GFX_t::GFX_t() noexcept = default;
 
 bool GFX_t::load()
 {
@@ -157,7 +161,7 @@ bool GFX_t::load()
                                          "\n\n"
                                          "It's possible that you didn't installed the game assets package, or you had installed it at the incorrect directory.",
                                          getLogFilePath());
-        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "UI image assets loading error", msg.c_str(), nullptr);
+        XMsgBox::simpleMsgBox(AbstractMsgBox_t::MESSAGEBOX_ERROR, "UI image assets loading error", msg);
         return false;
     }
 
@@ -167,6 +171,6 @@ bool GFX_t::load()
 void GFX_t::unLoad()
 {
     for(StdPicture *p : m_loadedImages)
-        frmMain.deleteTexture(*p);
+        XRender::deleteTexture(*p);
     m_loadedImages.clear();
 }

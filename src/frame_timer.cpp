@@ -27,6 +27,8 @@
 #include "frame_timer.h"
 #include "globals.h"
 #include "graphics.h"
+#include "core/render.h"
+#include "core/events.h"
 
 
 PerformanceStats_t g_stats;
@@ -65,6 +67,8 @@ void PerformanceStats_t::print()
     if(!enabled)
         return;
 
+    XRender::offsetViewportIgnore(true);
+
     if(LevelSelect && !GameMenu)
     {
         SuperPrint(fmt::sprintf_ne("DRAW: T=%03d S=%03d P=%03d L=%03d, SUM=%03d",
@@ -78,7 +82,7 @@ void PerformanceStats_t::print()
     }
     else
     {
-        frmMain.renderRect(42, 6, 745, 72, 0.0f,0.0f, 0.0f, 0.3f, true);
+        XRender::renderRect(42, 6, 745, 72, 0.0f,0.0f, 0.0f, 0.3f, true);
         SuperPrint(fmt::sprintf_ne("DRAW: B=%05d Z=%04d G=%04d N=%04d, E=%03d",
                                    renderedBlocks, renderedSzBlocks, renderedBGOs, renderedNPCs, renderedEffects,
                                    (renderedBlocks + renderedSzBlocks + renderedBGOs + renderedNPCs + renderedEffects)),
@@ -102,6 +106,8 @@ void PerformanceStats_t::print()
         SuperPrint(fmt::sprintf_ne("MENU-MODE: %d", MenuMode),
                    3, 45, 70, 0.5f, 1.f, 1.f);
     }
+
+    XRender::offsetViewportIgnore(false);
 }
 
 //#if !defined(__EMSCRIPTEN__)
@@ -387,7 +393,7 @@ void runFrameLoop(LoopCall_t doLoopCallbackPre,
         if(preTimerExtraPre)
             preTimerExtraPre();
 
-        DoEvents();
+        XEvents::doEvents();
         s_currentTicks = SDL_GetTicks();
 
         if(preTimerExtraPost)
@@ -403,7 +409,7 @@ void runFrameLoop(LoopCall_t doLoopCallbackPre,
 
             if(doLoopCallbackPost)
                 doLoopCallbackPost(); // Run the loop callback
-            DoEvents();
+            XEvents::doEvents();
 
             COMPUTE_FRAME_TIME_2_REAL();
 
@@ -440,7 +446,7 @@ void frameRenderEnd()
             newTime = c_frameRateNano * 25;
         }
         s_doUpdate += newTime;
-        s_goalTime = SDL_GetTicks() + (newTime / 1000000);
+        s_goalTime = double(SDL_GetTicks() + (newTime / 1000000));
     }
 #endif
 }

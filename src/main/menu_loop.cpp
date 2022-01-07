@@ -41,6 +41,7 @@
 #include "menu_main.h"
 #include "game_info.h"
 #include "speedrunner.h"
+#include "game_globals.h"
 #include "menu_controls.h"
 
 #include "../pseudo_vb.h"
@@ -95,7 +96,7 @@ static void updateIntroLevelActivity()
 
         if(p.HoldingNPC ==0)
         {
-            if((p.State ==3 || p.State == 6 || p.State == 7) && (dRand() * 100.0) > 90.0)
+            if((p.State == 3 || p.State == 6 || p.State == 7) && iRand(100) >= 90)
             {
                 if(p.FireBallCD == 0 && !p.RunRelease)
                     p.Controls.Run = false;
@@ -201,7 +202,7 @@ static void updateIntroLevelActivity()
             }
         }
 
-        if(p.Location.X < -vScreenX[1] - p.Location.Width && !(-vScreenX[1] <= level[0].X))
+        if(p.Location.X < -vScreenX[1] - p.Location.Width && -vScreenX[1] > level[0].X)
             p.Dead = true;
 
         if(p.Location.X > -vScreenX[1] + 1000)
@@ -219,10 +220,11 @@ static void updateIntroLevelActivity()
             p.TailCount = 0;
             p.Dead = false;
             p.TimeToLive = 0;
-            p.Character = iRand(5) + 1;
+            iRand(1); // advance the random state by one
+//            p.Character = (iRand() % 5) + 1;
 
-            if(A >= 1 && A <= 5)
-                p.Character = A;
+//            if(A >= 1 && A <= 5)
+            p.Character = g_gameInfo.introCharacterNext();
 
             p.HeldBonus = 0;
             p.Section = 0;
@@ -258,7 +260,7 @@ static void updateIntroLevelActivity()
             p.GroundPound = false;
             p.Hearts = 3;
 
-            PlayerFrame(A);
+            PlayerFrame(p);
 
             p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
             p.Location.Width = Physics.PlayerWidth[p.Character][p.State];
@@ -281,27 +283,27 @@ static void updateIntroLevelActivity()
 
             if(!UnderWater[p.Section])
             {
-                if(iRand(25) + 1 == 25)
+                if(iRand(25) == 0)
                 {
                     p.Mount = 1;
                     p.MountType = iRand(3) + 1;
                     if(p.State == 1)
                     {
                         p.Location.Height = Physics.PlayerHeight[1][2];
-                        p.Location.Y = p.Location.Y - Physics.PlayerHeight[1][2] + Physics.PlayerHeight[p.Character][1];
+                        p.Location.Y += -Physics.PlayerHeight[1][2] + Physics.PlayerHeight[p.Character][1];
                     }
                 }
             }
 
             if(p.Mount == 0 && p.Character <= 2)
             {
-                if(iRand(15) + 1 == 15)
+                if(iRand(15) == 0)
                 {
                     p.Mount = 3;
                     p.MountType = iRand(7) + 1;
-                    p.Location.Y = p.Location.Y + p.Location.Height;
+                    p.Location.Y += p.Location.Height;
                     p.Location.Height = Physics.PlayerHeight[2][2];
-                    p.Location.Y = p.Location.Y - p.Location.Height - 0.01;
+                    p.Location.Y += -p.Location.Height - 0.01;
                 }
             }
 
@@ -333,11 +335,14 @@ static void updateIntroLevelActivity()
                                 n.Type == 91 || n.Type == 93 || (n.Type >= 104 && n.Type <= 108) ||
                                 n.Type == 125 || n.Type == 133 || (n.Type >= 148 && n.Type <= 151) ||
                                 n.Type == 159 || n.Type == 160 || n.Type == 164 || n.Type == 168 ||
-                                (n.Type >= 154 && n.Type <= 157) || n.Type == 159 || n.Type == 160 ||
-                                n.Type == 164 || n.Type == 165 || n.Type == 171 || n.Type == 178 ||
+                                // n.Type == 159 || n.Type == 160 || n.Type == 164 || // Duplicated segment [PVS Studio]
+                                (n.Type >= 154 && n.Type <= 157) ||
+                                n.Type == 165 || n.Type == 171 || n.Type == 178 ||
                                 n.Type == 197 || n.Type == 180 || n.Type == 181 || n.Type == 190 ||
-                                n.Type == 192 || n.Type == 196 || n.Type == 197 ||
-                                (UnderWater[0] == true && NPCIsBoot[n.Type] == true) ||
+                                n.Type == 192 || n.Type == 196 ||
+                                // Duplicated segment, .....! [PVS Studio]
+                                // n.Type == 197 ||
+                                (UnderWater[0] && NPCIsBoot[n.Type]) ||
                                 (n.Type >= 198 && n.Type <= 228) || n.Type == 234);
 
                     } while(n.Type == 235 || n.Type == 231 || n.Type == 179 || n.Type == 49 ||
@@ -370,51 +375,61 @@ static void updateIntroLevelActivity()
         {
             if(p.Location.SpeedY == 0.0 || p.Slope > 0)
                 p.CanJump = true;
-            if((dRand() * 100) > 98.0 || p.Location.SpeedY == 0.0 || p.Slope > 0)
+            if(iRand(100) >= 98 || p.Location.SpeedY == 0.0 || p.Slope > 0)
                 p.Controls.Jump = true;
         }
 
-        if((dRand() * 100) > 95.0 && Player[A].HoldingNPC == 0 && Player[A].Slide == false && Player[A].CanAltJump == true && Player[A].Mount == 0)
+        if(iRand(20) == 0 && Player[A].HoldingNPC == 0 && !Player[A].Slide && Player[A].CanAltJump && Player[A].Mount == 0)
             Player[A].Controls.AltJump = true;
-        if(dRand() * 1000 >= 999 && Player[A].CanFly2 == false)
+
+        if(iRand(1000) == 0 && !Player[A].CanFly2)
             Player[A].Controls.Run = false;
-        if(Player[A].Mount == 3 && dRand() * 100 >= 98 && Player[A].RunRelease == false)
+
+        if(Player[A].Mount == 3 && iRand(50) == 0 && !Player[A].RunRelease)
             Player[A].Controls.Run = false;
+
         if(NPC[Player[A].HoldingNPC].Type == 22 || NPC[Player[A].HoldingNPC].Type == 49)
             Player[A].Controls.Run = true;
-        if(Player[A].Slide == true && Player[A].CanJump == true)
+
+        if(Player[A].Slide && Player[A].CanJump)
         {
             if(Player[A].Location.SpeedX > -2 && Player[A].Location.SpeedX < 2)
                 Player[A].Controls.Jump = true;
         }
-        if(Player[A].CanFly == false && Player[A].CanFly2 == false && (Player[A].State == 4 || Player[A].State == 5) && Player[A].Slide == false)
+
+        if(!Player[A].CanFly && !Player[A].CanFly2 && (Player[A].State == 4 || Player[A].State == 5) && !Player[A].Slide)
             Player[A].Controls.Jump = true;
+
         if(Player[A].Quicksand > 0)
         {
             Player[A].CanJump = true;
             Player[A].Controls.Jump = true;
         }
-        if(Player[A].FloatTime > 0 || (Player[A].CanFloat == true && Player[A].FloatRelease == true && Player[A].Jump == 0 && Player[A].Location.SpeedY > 0 && (dRand() * 100) > 95.0))
+
+        if(Player[A].FloatTime > 0 || (Player[A].CanFloat && Player[A].FloatRelease && Player[A].Jump == 0 && Player[A].Location.SpeedY > 0 && iRand(20) == 0))
             Player[A].Controls.Jump = true;
-        if(NPC[Player[A].HoldingNPC].Type == 13 && (dRand() * 100) > 95.0)
+
+        if(NPC[Player[A].HoldingNPC].Type == 13 && iRand(20) == 0)
         {
             Player[A].Controls.Run = false;
-            if(iRand(2) == 1)
+            if(iRand(2) == 0)
                 Player[A].Controls.Up = true;
-            if(iRand(2) == 1)
+            if(iRand(2) == 0)
                 Player[A].Controls.Right = false;
         }
 
-        if(Player[A].Slide == false && (Player[A].Slope > 0 || Player[A].StandingOnNPC > 0 || Player[A].Location.SpeedY == 0.0))
+        if(!Player[A].Slide && (Player[A].Slope > 0 || Player[A].StandingOnNPC > 0 || Player[A].Location.SpeedY == 0.0))
         {
             tempLocation = Player[A].Location;
             tempLocation.Width = 95;
-            tempLocation.Height = tempLocation.Height - 1;
+            tempLocation.Height -= 1;
+
             for(auto B = 1; B <= numBlock; B++)
             {
-                if(BlockSlope[Block[B].Type] == 0 && BlockIsSizable[Block[B].Type] == false && BlockOnlyHitspot1[Block[B].Type] == false && Block[B].Hidden == false)
+                if(BlockSlope[Block[B].Type] == 0 && !BlockIsSizable[Block[B].Type] &&
+                   !BlockOnlyHitspot1[Block[B].Type] && !Block[B].Hidden)
                 {
-                    if(CheckCollision(Block[B].Location, tempLocation) == true)
+                    if(CheckCollision(Block[B].Location, tempLocation))
                     {
                         Player[A].CanJump = true;
                         Player[A].SpinJump = false;
@@ -424,7 +439,8 @@ static void updateIntroLevelActivity()
                 }
             }
         }
-        if(Player[A].Slope == 0 && Player[A].Slide == false && Player[A].StandingOnNPC == 0 && (Player[A].Slope > 0 || Player[A].Location.SpeedY == 0.0))
+
+        if(Player[A].Slope == 0 && !Player[A].Slide && Player[A].StandingOnNPC == 0 && (Player[A].Slope > 0 || Player[A].Location.SpeedY == 0.0))
         {
             tempBool = false;
             tempLocation = Player[A].Location;
@@ -432,25 +448,29 @@ static void updateIntroLevelActivity()
             tempLocation.Height = 16;
             tempLocation.X = Player[A].Location.X + Player[A].Location.Width;
             tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height;
+
             for(auto B = 1; B <= numBlock; B++)
             {
-                if((BlockIsSizable[Block[B].Type] == false || Block[B].Location.Y > Player[A].Location.Y + Player[A].Location.Height - 1) && BlockOnlyHitspot1[Block[B].Type] == false && Block[B].Hidden == false)
+                if((!BlockIsSizable[Block[B].Type] || Block[B].Location.Y > Player[A].Location.Y + Player[A].Location.Height - 1) &&
+                   !BlockOnlyHitspot1[Block[B].Type] && !Block[B].Hidden)
                 {
-                    if(CheckCollision(Block[B].Location, tempLocation) == true)
+                    if(CheckCollision(Block[B].Location, tempLocation))
                     {
                         tempBool = true;
                         break;
                     }
                 }
             }
-            if(tempBool == false)
+
+            if(!tempBool)
             {
                 Player[A].CanJump = true;
                 Player[A].SpinJump = false;
                 Player[A].Controls.Jump = true;
             }
         }
-        if(Player[A].Character == 5 && Player[A].Controls.Jump == true)
+
+        if(Player[A].Character == 5 && Player[A].Controls.Jump)
         {
             Player[A].Controls.AltJump = true;
             // .Controls.Jump = False
@@ -468,6 +488,7 @@ static void updateIntroLevelActivity()
     UpdateGraphics();
     UpdateSound();
     UpdateEvents();
+    updateScreenFaders();
 }
 
 void MenuLoop()
@@ -485,7 +506,7 @@ void MenuLoop()
     if(mainMenuUpdate())
         return;
 
-    if(g_gameInfo.introEnableActivity && g_gameInfo.introMaxPlayersCount > 0)
+    if(!g_gameInfo.introDeadMode)
         updateIntroLevelActivity();
     else
     {
@@ -493,15 +514,16 @@ void MenuLoop()
         UpdateNPCs();
         UpdateBlocks();
         UpdateEffects();
-        //UpdatePlayer();
+//        UpdatePlayer();
         UpdateGraphics();
         UpdateSound();
         UpdateEvents();
+        updateScreenFaders();
     }
 
     if(SharedCursor.Primary)
     {
-        if(dRand() * 100 > 40.0)
+        if(iRand(5) >= 2)
         {
             NewEffect(80, newLoc(SharedCursor.X - vScreenX[1], SharedCursor.Y - vScreenY[1]));
             Effect[numEffects].Location.SpeedX = dRand() * 4 - 2;
@@ -550,7 +572,7 @@ void MenuLoop()
 
 void FindSaves()
 {
-    std::string newInput;
+//    std::string newInput;
     std::string episode = SelectWorld[selWorld].WorldPath;
     GamesaveData f;
 

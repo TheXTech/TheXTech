@@ -19,59 +19,75 @@
  */
 
 #include <cstdlib>
-#include <cmath>
-#include <iostream>
+
 #include <pcg/pcg_random.hpp>
 
 #include "globals.h"
 #include "rand.h"
 
-static pcg32 engine;
+static pcg32 g_random_engine;
+static long g_random_n_calls = 0;
+
+#ifdef DEBUG_RANDOM_CALLS
+std::vector<void*> g_random_calls;
+#endif
+
 static int last_seed = 310;
-static long n_calls = 0;
 
 void seedRandom(int seed)
 {
     last_seed = seed;
-    n_calls = 0;
-    engine.seed(seed);
+    g_random_n_calls = 0;
+#ifdef DEBUG_RANDOM_CALLS
+    g_random_calls.clear();
+#endif
+    g_random_engine.seed(seed);
 }
 
 int readSeed()
 {
-    engine.seed(last_seed);
+    g_random_engine.seed(last_seed);
     return last_seed;
-};
+}
 
 long random_ncalls()
 {
-    return n_calls;
-}
-
-double dRand()
-{
-    n_calls ++;
-    return ldexp(engine(), -32);
-}
-
-float fRand()
-{
-    return (float)dRand();
-}
-
-// these are how the original VB6 code does it
-int iRand(int max)
-{
-    return (int)(dRand() * max);
-}
-
-int vb6Cast_iRand(int max)
-{
-    return vb6Round(dRand() * max);
+    return g_random_n_calls;
 }
 
 // Also note that many VB6 calls use dRand * x
 // and then assign the result to an Integer.
 // The result is NOT iRand(x) but rather vb6Round(dRand()*x),
-// vb6Cast_iRand, which has a different probability distribution
+// iRand_round, which has a different probability distribution
 // (prob 1/(2x) of being 0 or x and 1/x of being each number in between)
+
+int iRand(int max)
+{
+    g_random_n_calls ++;
+#ifdef DEBUG_RANDOM_CALLS
+    void* stack[2] = {nullptr, nullptr};
+    backtrace(stack, 2);
+    g_random_calls.push_back(stack[1]);
+#endif
+
+    if(max == 0)
+    {
+        g_random_engine();
+        return 0;
+    }
+
+    return g_random_engine() % max;
+}
+
+double dRand()
+{
+    g_random_n_calls ++;
+
+#ifdef DEBUG_RANDOM_CALLS
+    void* stack[2] = {nullptr, nullptr};
+    backtrace(stack, 2);
+    g_random_calls.push_back(stack[1]);
+#endif
+
+    return std::ldexp(g_random_engine(), -32);
+}

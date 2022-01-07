@@ -37,6 +37,7 @@ static void compatInit(Compatibility_t &c)
     {
         switch(g_speedRunnerMode)
         {
+        default:
         case SPEEDRUN_MODE_1:
             CompatSetEnforcedLevel(COMPAT_MODERN);
             break;
@@ -76,6 +77,11 @@ static void compatInit(Compatibility_t &c)
     // 1.3.5.2
     c.fix_swooper_start_while_inactive = true;
     c.fix_FreezeNPCs_no_reset = false;
+    c.world_map_stars_show_policy = Compatibility_t::STARS_UNSPECIFIED;
+    // 1.3.5.3
+    c.require_ground_to_enter_warps = false;
+    c.fix_npc_activation_event_loop_bug = true;
+    c.sfx_player_grow_with_got_item = Compatibility_t::SPGWGI_UNSPECIFIED;
     // 1.3.6
     c.pause_on_disconnect = true;
     c.allow_DropAdd = true;
@@ -88,7 +94,7 @@ static void compatInit(Compatibility_t &c)
         c.fix_platforms_acceleration = false;
         c.fix_pokey_collapse = false;
         c.fix_npc_downward_clip = false;
-        c.fix_npc55_kick_ice_blocks = false;
+        c.fix_npc55_kick_ice_blocks = false; //-V1048
         c.fix_climb_invisible_fences = false;
         c.fix_climb_bgo_speed_adding = false;
         c.enable_climb_bgo_layer_move = false;
@@ -99,14 +105,16 @@ static void compatInit(Compatibility_t &c)
         c.fix_link_clowncar_fairy = false;
         c.fix_dont_switch_player_by_clowncar = false;
         c.enable_multipoints = false;
-        c.fix_autoscroll_speed = false;
+        c.fix_autoscroll_speed = false; //-V1048
         // 1.3.5.1
         c.fix_blooper_stomp_effect = false;
         c.keep_bullet_bill_dir = false;
         c.fix_pswitch_dragon_coin = false;
         // 1.3.5.2
         c.fix_swooper_start_while_inactive = false;
-        c.fix_FreezeNPCs_no_reset = false;
+        c.fix_FreezeNPCs_no_reset = false; //-V1048
+        // 1.3.5.3
+        c.fix_npc_activation_event_loop_bug = false;
         // 1.3.6
         c.pause_on_disconnect = false;
         c.allow_DropAdd = false;
@@ -154,6 +162,19 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
     }
     compat.endGroup();
 
+    compat.beginGroup("effects");
+    {
+        IniProcessing::StrEnumMap spgwgi
+        {
+            {"unpsecified", Compatibility_t::SPGWGI_UNSPECIFIED},
+            {"enable", Compatibility_t::SPGWGI_ENABLE},
+            {"true", Compatibility_t::SPGWGI_ENABLE},
+            {"disable", Compatibility_t::SPGWGI_DISABLE},
+            {"false", Compatibility_t::SPGWGI_DISABLE}
+        };
+        compat.readEnum("sfx-player-grow-with-got-item", c.sfx_player_grow_with_got_item, c.sfx_player_grow_with_got_item, spgwgi);
+    }
+
     if(s_compatLevel >= COMPAT_SMBX13)
     {
         if(g_speedRunnerMode >= SPEEDRUN_MODE_3)
@@ -188,6 +209,14 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         // 1.3.5.2
         compat.read("fix-swooper-start-while-inactive", c.fix_swooper_start_while_inactive, c.fix_swooper_start_while_inactive);
         compat.read("fix-FreezeNPCs-no-reset", c.fix_FreezeNPCs_no_reset, c.fix_FreezeNPCs_no_reset);
+        IniProcessing::StrEnumMap starsShowPolicy
+        {
+            {"unpsecified", Compatibility_t::STARS_UNSPECIFIED},
+            {"hide", Compatibility_t::STARS_DONT_SHOW},
+            {"show-collected", Compatibility_t::STARS_SHOW_COLLECTED_ONLY},
+            {"show", Compatibility_t::STARS_SHOW_COLLECTED_AND_AVAILABLE}
+        };
+        compat.readEnum("world-map-stars-show-policy", c.world_map_stars_show_policy, c.world_map_stars_show_policy, starsShowPolicy);
         // 1.3.6
         compat.read("pause-on-disconnect", c.pause_on_disconnect, c.pause_on_disconnect);
         compat.read("allow-DropAdd", c.allow_DropAdd, c.allow_DropAdd);
@@ -197,6 +226,9 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
     compat.read("fix-player-filter-bounce", c.fix_player_filter_bounce, c.fix_player_filter_bounce);
     compat.read("fix-player-downward-clip", c.fix_player_downward_clip, c.fix_player_downward_clip);
     compat.read("fix-npc-downward-clip", c.fix_npc_downward_clip, c.fix_npc_downward_clip);
+    // 1.3.5.3
+    compat.read("require-ground-to-enter-warps", c.require_ground_to_enter_warps, c.require_ground_to_enter_warps);
+    compat.read("fix-npc-activation-event-loop-bug", c.fix_npc_activation_event_loop_bug, c.fix_npc_activation_event_loop_bug);
     // 1.3.6
     compat.endGroup();
 }
@@ -228,12 +260,12 @@ void ResetCompat()
     compatInit(g_compatibility);
 }
 
-void CompatSetEnforcedLevel(int level)
+void CompatSetEnforcedLevel(int cLevel)
 {
-    if(s_compatLevel == level)
+    if(s_compatLevel == cLevel)
         return;
 
-    s_compatLevel = level;
+    s_compatLevel = cLevel;
 
     switch(s_compatLevel)
     {

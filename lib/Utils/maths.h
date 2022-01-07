@@ -94,6 +94,10 @@ namespace Maths
     {
         return d >= 0.0 ? long(d + 0.5) : long(d - double(long(d - 1)) + 0.5) + long(d - 1);
     }
+    inline float fRound(double d)
+    {
+        return float(d >= 0.0 ? long(d + 0.5) : long(d - double(long(d - 1)) + 0.5) + long(d - 1));
+    }
 
     inline int iRound(float d)
     {
