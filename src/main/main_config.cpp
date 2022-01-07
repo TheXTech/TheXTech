@@ -193,6 +193,13 @@ void OpenConfig()
         config.endGroup();
 
         Controls::LoadConfig(ctl);
+
+        pLogDebug("Loaded config: %s", configPath.c_str());
+    }
+    else
+    {
+        pLogDebug("Writing new config on first run.");
+        SaveConfig(); // Create the config file on first run
     }
 //    If resBool = True And resChanged = False And LevelEditor = False Then ChangeScreen
 #ifndef RENDER_FULLSCREEN_ALWAYS
@@ -200,7 +207,6 @@ void OpenConfig()
         ChangeScreen();
 #endif
 
-    pLogDebug("Loaded config: %s", configPath.c_str());
 }
 
 void SaveConfig()
