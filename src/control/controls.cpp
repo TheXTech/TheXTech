@@ -80,8 +80,7 @@ void Hotkeys::Activate(size_t i)
             s_enterCheatScreen = true;
             return;
         case Buttons::ToggleHUD:
-            // implement after merge
-            pLogDebug("Toggle HUD Called...");
+            ShowOnScreenMeta = !ShowOnScreenMeta;
             return;
         default:
             return;
