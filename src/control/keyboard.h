@@ -74,6 +74,7 @@ private:
     int m_lastNumKeyboards = 0;
     bool m_touchscreenActive = false;
     Uint32 m_lastMousePress = 0;
+    int m_scroll = 0;
 
     InputMethodProfile* AllocateProfile() noexcept;
 

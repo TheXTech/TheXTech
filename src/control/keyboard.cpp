@@ -711,6 +711,17 @@ void InputMethodType_Keyboard::UpdateControlsPost()
         SharedCursor.GoOffscreen();
     }
 
+    if(this->m_scroll >= 1)
+    {
+        this->m_scroll -= 1;
+        SharedControls.MenuDown |= true;
+    }
+    else if(this->m_scroll <= -1)
+    {
+        this->m_scroll += 1;
+        SharedControls.MenuUp |= true;
+    }
+
     if(this->m_directText && GamePaused == PauseCode::TextEntry)
         return;
 
@@ -757,7 +768,7 @@ void InputMethodType_Keyboard::UpdateControlsPost()
     }
 
 #ifdef __ANDROID__ // Quit credits on BACK key press
-    bool backPressed = this->m_keyboardState[SDL_SCANCODE_AC_BACK] == KEY_PRESSED;
+    bool backPressed = this->m_keyboardState[SDL_SCANCODE_AC_BACK];
 #else
     bool backPressed = false;
 #endif
@@ -992,6 +1003,14 @@ bool InputMethodType_Keyboard::ConsumeEvent(const SDL_Event* ev)
 {
     switch(ev->type)
     {
+        case SDL_MOUSEWHEEL:
+            if(ev->wheel.which != SDL_TOUCH_MOUSEID)
+            {
+                this->m_scroll += ev->wheel.y;
+                return true;
+            }
+            else
+                return false;
         case SDL_MOUSEBUTTONUP:
             if(ev->button.button == SDL_BUTTON_LEFT && ev->button.which != SDL_TOUCH_MOUSEID)
             {
@@ -1001,6 +1020,7 @@ bool InputMethodType_Keyboard::ConsumeEvent(const SDL_Event* ev)
                 {
                     this->m_lastMousePress = 0;
                     Hotkeys::Activate(Hotkeys::Buttons::Fullscreen);
+                    return true;
                 }
             }
             // intentional fallthrough
