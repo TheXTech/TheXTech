@@ -913,7 +913,11 @@ void TouchScreenController::processTouchDevice(int dev_i)
     }
 
     if(m_current_extra_keys.keyToggleViewOnce)
+    {
         m_touchHidden = !m_touchHidden;
+        if(!m_touchHidden)
+            SharedCursor.GoOffscreen();
+    }
 
     if(m_current_extra_keys.keyHoldRunOnce)
         m_runHeld = !m_runHeld;

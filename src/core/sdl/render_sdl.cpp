@@ -214,9 +214,7 @@ void RenderSDL::repaint()
     SDL_SetTextureAlphaMod(m_tBuffer, 255);
     SDL_RenderCopyEx(m_gRenderer, m_tBuffer, &sourceRect, &destRect, 0.0, nullptr, SDL_FLIP_NONE);
 
-#ifdef USE_TOUCHSCREEN_CONTROLLER
-    RenderTouchControls();
-#endif
+    Controls::RenderTouchControls();
 
     SDL_RenderPresent(m_gRenderer);
 }
