@@ -60,12 +60,12 @@ void Hotkeys::Activate(size_t i)
     g_disallowHotkeys = true;
     switch(i)
     {
-#if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
+#ifndef RENDER_FULLSCREEN_ALWAYS
         case Buttons::Fullscreen:
             ChangeScreen();
             return;
 #endif
-#ifndef __EMSCRIPTEN__ // later make this be no screenshots
+#ifdef USE_SCREENSHOTS_AND_RECS
         case Buttons::Screenshot:
             TakeScreen = true;
             return;
