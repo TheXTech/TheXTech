@@ -579,7 +579,7 @@ void ScreenShot()
     XRender::setTargetTexture();
     XRender::makeShot();
     XRender::setTargetScreen();
-    PlaySound(SFX_GotItem);
+    PlaySoundMenu(SFX_GotItem);
 #endif
     TakeScreen = false;
 }
