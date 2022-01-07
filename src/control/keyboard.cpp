@@ -240,6 +240,7 @@ InputMethodProfile_Keyboard::InputMethodProfile_Keyboard()
     this->m_editor_keys[EditorControls::Buttons::SwitchScreens] = SDL_SCANCODE_RSHIFT;
     this->m_editor_keys[EditorControls::Buttons::TestPlay] = SDL_SCANCODE_RETURN;
 
+    // ALSO UPDATE InputMethodType_Keyboard::DefaultHotkey
     this->m_hotkeys[Hotkeys::Buttons::EnterCheats] = null_key;
     this->m_hotkeys[Hotkeys::Buttons::ToggleHUD] = SDL_SCANCODE_F1;
     this->m_hotkeys[Hotkeys::Buttons::DebugInfo] = SDL_SCANCODE_F3;
@@ -963,10 +964,13 @@ bool InputMethodType_Keyboard::DefaultHotkey(const SDL_Event* ev)
 
     if(m_lastNumKeyboards == 0)
     {
-        if(KeyCode == SDL_SCANCODE_F12)
+        // ALSO UPDATE InputMethodProfile_Keyboard::InputMethodProfile_Keyboard
+        if(KeyCode == SDL_SCANCODE_F12 || KeyCode == SDL_SCANCODE_F2)
             Hotkeys::Activate(Hotkeys::Buttons::Screenshot);
         else if(KeyCode == SDL_SCANCODE_F3)
             Hotkeys::Activate(Hotkeys::Buttons::DebugInfo);
+        else if(KeyCode == SDL_SCANCODE_F1)
+            Hotkeys::Activate(Hotkeys::Buttons::ToggleHUD);
 #ifdef __APPLE__
         else if(KeyCode == SDL_SCANCODE_F10) // Reserved by macOS as "show desktop"
 #else
