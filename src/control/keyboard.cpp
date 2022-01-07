@@ -916,12 +916,12 @@ InputMethod* InputMethodType_Keyboard::Poll(const std::vector<InputMethod*>& act
             if(target_profile)
                 break;
         }
-        if(target_profile)
+        if(target_profile || this->m_profiles.empty())
             break;
     }
 
-    // if didn't find any key, allow poll in future but return false
-    if(key == this->m_keyboardStateSize || target_profile == nullptr)
+    // if didn't find any key allow poll in future but return false
+    if(key == this->m_keyboardStateSize)
     {
         this->m_canPoll = true;
         return nullptr;
