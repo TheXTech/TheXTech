@@ -212,7 +212,7 @@ void WorldLoop()
 
     if(!Controls::Update())
     {
-        if(g_config.NoPauseReconnect || !g_compatibility.allow_DropAdd)
+        if(g_config.NoPauseReconnect || !g_compatibility.allow_drop_add)
             QuickReconnectScreen::g_active = true;
         else
             PauseGame(PauseCode::Reconnect, 0);

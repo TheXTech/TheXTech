@@ -395,7 +395,7 @@ bool Player_Select(int p)
             do_sentinel.active = false;
             s_menuItem[p] = 0;
         }
-        else if(s_context == Context::DropAdd || (s_context == Context::Reconnect && g_compatibility.allow_DropAdd))
+        else if(s_context == Context::DropAdd || (s_context == Context::Reconnect && g_compatibility.allow_drop_add))
         {
             if(s_menuItem[p] == 0) // FORCE RESUME
             {
@@ -770,7 +770,7 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pW, int sY, int line, bool m
                     SuperPrintCenter(g_mainMenu.wordWaiting, 3, cX, sY+7*line);
             }
 
-            if((s_context == Context::DropAdd || (s_context == Context::Reconnect && g_compatibility.allow_DropAdd))
+            if((s_context == Context::DropAdd || (s_context == Context::Reconnect && g_compatibility.allow_drop_add))
                 && s_menuItem[p] != -4)
             {
                 XRender::renderTexture(pX - 20, sY+(9+s_menuItem[p])*line, GFX.MCursor[0]);

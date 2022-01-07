@@ -163,7 +163,7 @@ void Init()
     	s_items.push_back(MenuItem{"CONTINUE", s_Continue});
     	s_items.push_back(MenuItem{"RESTART LEVEL", s_RestartLevel});
     	s_items.push_back(MenuItem{"RESET CHECKPOINTS", s_ResetCheckpoints});
-    	if(g_compatibility.allow_DropAdd)
+    	if(g_compatibility.allow_drop_add)
 	    	s_items.push_back(MenuItem{"DROP/ADD PLAYERS", s_DropAddScreen});
 	    if(g_config.enter_cheats_menu_item)
 	    	s_items.push_back(MenuItem{"ENTER CHEAT", s_CheatScreen});
@@ -172,7 +172,7 @@ void Init()
     else
     {
     	s_items.push_back(MenuItem{"CONTINUE", s_Continue});
-    	if(g_compatibility.allow_DropAdd)
+    	if(g_compatibility.allow_drop_add)
 	    	s_items.push_back(MenuItem{"DROP/ADD PLAYERS", s_DropAddScreen});
 	    if(g_config.enter_cheats_menu_item)
 	    	s_items.push_back(MenuItem{"ENTER CHEAT", s_CheatScreen});

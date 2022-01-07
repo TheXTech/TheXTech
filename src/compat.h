@@ -75,7 +75,7 @@ struct Compatibility_t
     int sfx_player_grow_with_got_item;
     // 1.3.6
     bool pause_on_disconnect;
-    bool allow_DropAdd;
+    bool allow_drop_add;
     bool multiplayer_pause_controls;
 
 

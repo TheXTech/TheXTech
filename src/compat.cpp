@@ -84,7 +84,7 @@ static void compatInit(Compatibility_t &c)
     c.sfx_player_grow_with_got_item = Compatibility_t::SPGWGI_UNSPECIFIED;
     // 1.3.6
     c.pause_on_disconnect = true;
-    c.allow_DropAdd = true;
+    c.allow_drop_add = true;
     c.multiplayer_pause_controls = true;
 
 
@@ -117,7 +117,7 @@ static void compatInit(Compatibility_t &c)
         c.fix_npc_activation_event_loop_bug = false;
         // 1.3.6
         c.pause_on_disconnect = false;
-        c.allow_DropAdd = false;
+        c.allow_drop_add = false;
         c.multiplayer_pause_controls = false;
     }
 
@@ -219,7 +219,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         compat.readEnum("world-map-stars-show-policy", c.world_map_stars_show_policy, c.world_map_stars_show_policy, starsShowPolicy);
         // 1.3.6
         compat.read("pause-on-disconnect", c.pause_on_disconnect, c.pause_on_disconnect);
-        compat.read("allow-DropAdd", c.allow_DropAdd, c.allow_DropAdd);
+        compat.read("allow-drop-add", c.allow_drop_add, c.allow_drop_add);
         compat.read("multiplayer-pause-controls", c.multiplayer_pause_controls, c.multiplayer_pause_controls);
     }
     // 1.3.4
