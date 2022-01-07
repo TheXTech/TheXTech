@@ -581,6 +581,7 @@ bool Update()
         //   (same in spirit as old B == 2 && numPlayers == 2 case)
         if((B-1 < (int)g_InputMethods.size() && g_InputMethods[B-1]) || QuickReconnectScreen::g_active)
             A = B;
+        // otherwise, let Player 1 control them (blank controls later for SingleCoop)
         else
             A = 1;
 
@@ -589,9 +590,8 @@ bool Update()
             auto &p = Player[A];
             Controls_t &c = p.Controls;
 
-            if(!c.Start && !c.Jump) {
+            if(!c.Start && !c.Jump)
                 p.UnStart = true;
-            }
 
             if(c.Up && c.Down)
             {
@@ -607,6 +607,7 @@ bool Update()
 
             if(!(p.State == 5 && p.Mount == 0) && c.AltRun)
                 c.Run = true;
+
             if(ForcedControls && GamePaused == PauseCode::None)
             {
                 c = ForcedControl;
@@ -624,11 +625,10 @@ bool Update()
         if(numPlayers == 1 || numPlayers > 2)
             SingleCoop = 0;
 
-        if(SingleCoop == 1) {
+        if(SingleCoop == 1)
             Player[2].Controls = blankControls;
-        } else {
+        else
             Player[1].Controls = blankControls;
-        }
     }
 
     For(A, 1, numPlayers)
@@ -636,13 +636,7 @@ bool Update()
         {
             Player_t &p = Player[A];
             if(p.SpinJump)
-            {
-                if(p.SpinFrame < 4 || p.SpinFrame > 9) {
-                    p.Direction = -1;
-                } else {
-                    p.Direction = 1;
-                }
-            }
+                p.Direction = (p.SpinFrame < 4 || p.SpinFrame > 9) ? -1 : 1;
         }
     }
 
@@ -711,60 +705,13 @@ InputMethod* PollInputMethod() noexcept
     }
     if(!new_method)
         return nullptr;
-    SDL_assert_release(new_method->Type != nullptr); // InputMethodType did not assign itself as Type
+
+    // check that the InputMethodType properly assigned itself as the new InputMethod's Type
+    SDL_assert_release(new_method->Type != nullptr); // InputMethodType did not assign itself as Type for new InputMethod
     if(!new_method->Type)
         return nullptr;
 
-    // try a number of ways of assigning a profile if one has not already been assigned
-    if(!new_method->Profile)
-    {
-        // fallback 1: last profile used by this player index
-        InputMethodProfile* default_profile = new_method->Type->GetDefaultProfile(player_no);
-        if(default_profile)
-        {
-            new_method->Profile = default_profile;
-        }
-        else
-        {
-            std::vector<InputMethodProfile*> profiles = new_method->Type->GetProfiles();
-            if(!profiles.empty())
-            {
-                // fallback 2: find first unused profile
-                size_t i;
-                for(i = 0; i < profiles.size(); i++)
-                {
-                    bool unused = true;
-                    for(InputMethod* other_method : g_InputMethods)
-                    {
-                        if(other_method && other_method->Profile == profiles[i])
-                        {
-                            unused = false;
-                            break;
-                        }
-                    }
-                    if(unused)
-                        break;
-                }
-                if(i != profiles.size())
-                    new_method->Profile = profiles[i];
-                // fallback 3: first profile
-                else
-                    new_method->Profile = profiles[0];
-            }
-            // fallback 4: new default profile
-            else
-            {
-                new_method->Profile = new_method->Type->AddProfile();
-            }
-        }
-    }
-    // should only be null if something is very wrong (alloc failed, etc)
-    if(!new_method->Profile)
-    {
-        pLogWarning("Failed to find/alloc profile for new %s.", new_method->Type->Name.c_str());
-        delete new_method;
-        return nullptr;
-    }
+    // tentatively add to the input method list so we can call SetInputMethodProfile
     if(player_no < g_InputMethods.size())
     {
         g_InputMethods[player_no] = new_method;
@@ -773,11 +720,68 @@ InputMethod* PollInputMethod() noexcept
     {
         g_InputMethods.push_back(new_method);
     }
-    if(!SetInputMethodProfile(player_no, new_method->Profile))
-        pLogWarning("Failed to set profile '%s' for new %s.",
-            new_method->Profile->Name.c_str(), new_method->Type->Name.c_str());
+
+    // try a number of ways of assigning a profile if one has not already been assigned
+    std::vector<InputMethodProfile*> profiles = new_method->Type->GetProfiles();
+
+    // fallback 1: last profile used by this player index
+    if(!new_method->Profile)
+    {
+        InputMethodProfile* default_profile = new_method->Type->GetDefaultProfile(player_no);
+
+        if(default_profile)
+        {
+            SetInputMethodProfile(player_no, default_profile);
+        }
+    }
+    // fallback 2: find first unused profile
+    if(!new_method->Profile)
+    {
+        size_t i;
+
+        for(i = 0; i < profiles.size(); i++)
+        {
+            bool unused = true;
+            for(InputMethod* other_method : g_InputMethods)
+            {
+                if(other_method && other_method->Profile == profiles[i])
+                {
+                    unused = false;
+                    break;
+                }
+            }
+
+            if(unused)
+                break;
+        }
+
+        if(i != profiles.size())
+            SetInputMethodProfile(player_no, profiles[i]);
+    }
+    // fallback 3: use first profile
+    if(!new_method->Profile && !profiles.empty())
+    {
+        SetInputMethodProfile(player_no, profiles[0]);
+    }
+    // fallback 4: new default profile
+    if(!new_method->Profile)
+    {
+        SetInputMethodProfile(player_no, new_method->Type->AddProfile());
+    }
+    // should only STILL be null if something is very wrong (alloc failed, etc)
+    if(!new_method->Profile)
+    {
+        pLogWarning("Failed to find/alloc/set profile for new %s.",
+            new_method->Type->Name.c_str());
+        delete new_method;
+        return nullptr;
+    }
+
     pLogDebug("Just activated new %s '%s' with profile '%s'.",
-        new_method->Type->Name.c_str(),  new_method->Name.c_str(), new_method->Profile->Name.c_str());
+        new_method->Type->Name.c_str(),
+        new_method->Name.c_str(),
+        new_method->Profile->Name.c_str());
+
     return new_method;
 }
 
