@@ -1016,6 +1016,7 @@ bool InputMethodType_Keyboard::DefaultHotkey(const SDL_Event* ev)
     case SDL_SCANCODE_8: CheatCode('8'); break;
     case SDL_SCANCODE_9: CheatCode('9'); break;
     case SDL_SCANCODE_0: CheatCode('0'); break;
+    case SDL_SCANCODE_SEMICOLON: CheatCode(';'); break; // for AZERTY support
     default: CheatCode(' '); break;
     }
 
