@@ -874,12 +874,6 @@ void RenderTouchControls()
             break;
         }
     }
-
-    if(g_InputMethods.size() > 0 && !active_touchscreen)
-        g_renderTouchscreen = false;
-    else if(active_touchscreen)
-        g_renderTouchscreen = true;
-
     if(!g_renderTouchscreen)
         return;
 

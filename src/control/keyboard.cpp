@@ -678,7 +678,7 @@ bool InputMethodType_Keyboard::TestProfileType(InputMethodProfile* profile)
 void InputMethodType_Keyboard::UpdateControlsPre() {}
 void InputMethodType_Keyboard::UpdateControlsPost()
 {
-    if(this->m_touchscreenActive)
+    if(this->m_touchscreenActive && g_renderTouchscreen)
     {
         // let the touchscreen input method handle the mouse
     }
@@ -1025,13 +1025,13 @@ bool InputMethodType_Keyboard::ConsumeEvent(const SDL_Event* ev)
             }
             // intentional fallthrough
         case SDL_MOUSEBUTTONDOWN:
-            if(ev->button.which == SDL_TOUCH_MOUSEID && g_renderTouchscreen)
+            if(ev->button.which == SDL_TOUCH_MOUSEID)
                 this->m_touchscreenActive = true;
             else
                 this->m_touchscreenActive = false;
             break;
         case SDL_MOUSEMOTION:
-            if(ev->motion.which == SDL_TOUCH_MOUSEID && g_renderTouchscreen)
+            if(ev->motion.which == SDL_TOUCH_MOUSEID)
                 this->m_touchscreenActive = true;
             else
                 this->m_touchscreenActive = false;
