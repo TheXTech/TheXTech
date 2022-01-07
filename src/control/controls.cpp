@@ -10,6 +10,7 @@
 #include "main/menu_controls.h"
 #include "../game_main.h"
 #include "main/screen_textentry.h"
+#include "main/screen_quickreconnect.h"
 #include "main/cheat_code.h"
 #include "../graphics.h"
 #include "../frame_timer.h"
@@ -558,7 +559,7 @@ bool Update()
         // if there is an input method bound to the player,
         //   let them control themselves.
         //   (same in spirit as old B == 2 && numPlayers == 2 case)
-        if(B-1 < (int)g_InputMethods.size() && g_InputMethods[B-1])
+        if((B-1 < (int)g_InputMethods.size() && g_InputMethods[B-1]) || QuickReconnectScreen::g_active)
             A = B;
         else
             A = 1;

@@ -849,12 +849,15 @@ InputMethod* InputMethodType_Keyboard::Poll(const std::vector<InputMethod*>& act
                     break;
                 }
             }
-            for(size_t i = 0; i < EditorControls::n_buttons; i++)
+            if(LevelEditor)
             {
-                if(p->m_editor_keys[i] == key || p->m_editor_keys2[i] == key)
+                for(size_t i = 0; i < EditorControls::n_buttons; i++)
                 {
-                    allowed = false;
-                    break;
+                    if(p->m_editor_keys[i] == key || p->m_editor_keys2[i] == key)
+                    {
+                        allowed = false;
+                        break;
+                    }
                 }
             }
             for(size_t i = 0; i < CursorControls::n_buttons; i++)
