@@ -1,9 +1,12 @@
 #include <fmt_format_ne.h>
 
+#include "../core/render.h"
+
 #include "../global_constants.h"
 #include "../controls.h"
 #include "../sound.h"
 #include "../globals.h"
+#include "../gfx.h"
 #include "../graphics.h"
 #include "../player.h"
 #include "../compat.h"
@@ -648,7 +651,7 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pW, int sY, int line, bool m
         Player_ValidateChar(p);
         // show the menu cursor for the player
         if(s_menuItem[p] >= 0)
-            frmMain.renderTexture(pX - 20, sY+(4+s_menuItem[p])*line, GFX.MCursor[0]);
+            XRender::renderTexture(pX - 20, sY+(4+s_menuItem[p])*line, GFX.MCursor[0]);
         for(int c = 0; c < 5; c++)
         {
             // don't render/mouse unavailable chars
@@ -682,7 +685,7 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pW, int sY, int line, bool m
 
         // show the menu cursor for the player
         if(s_menuItem[p] >= 0)
-            frmMain.renderTexture(pX - 20, sY+(4+s_menuItem[p]-scroll)*line, GFX.MCursor[0]);
+            XRender::renderTexture(pX - 20, sY+(4+s_menuItem[p]-scroll)*line, GFX.MCursor[0]);
 
         for(int i = 0; i < (int)profiles.size() + 1; i++)
         {
@@ -729,7 +732,7 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pW, int sY, int line, bool m
     if(s_playerState[p] == PlayerState::ReconnectMain)
     {
         if(s_menuItem[p] >= 0)
-            frmMain.renderTexture(pX - 20, sY+(4+s_menuItem[p])*line, GFX.MCursor[0]);
+            XRender::renderTexture(pX - 20, sY+(4+s_menuItem[p])*line, GFX.MCursor[0]);
 
         Player_MenuItem_Mouse_Render(p, 0, "CONTINUE",
             pX, sY+(4+0)*line, mouse, render);
@@ -751,7 +754,7 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pW, int sY, int line, bool m
         if(CheckDone() && render)
         {
             SuperPrint(g_mainMenu.playerSelStartGame, 3, pX, sY+7*line);
-            frmMain.renderTexture(pX - 20, sY+7*line, GFX.MCursor[0]);
+            XRender::renderTexture(pX - 20, sY+7*line, GFX.MCursor[0]);
         }
         else
         {
@@ -770,7 +773,7 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pW, int sY, int line, bool m
             if((s_context == Context::DropAdd || (s_context == Context::Reconnect && g_compatibility.allow_DropAdd))
                 && s_menuItem[p] != -4)
             {
-                frmMain.renderTexture(pX - 20, sY+(9+s_menuItem[p])*line, GFX.MCursor[0]);
+                XRender::renderTexture(pX - 20, sY+(9+s_menuItem[p])*line, GFX.MCursor[0]);
                 Player_MenuItem_Mouse_Render(p, 0, "FORCE RESUME",
                     pX, sY+(9+0)*line, mouse, render);
                 Player_MenuItem_Mouse_Render(p, 1, "DROP OTHERS",
@@ -780,7 +783,7 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pW, int sY, int line, bool m
             }
             else if(s_context == Context::Reconnect && s_menuItem[p] != -4)
             {
-                frmMain.renderTexture(pX - 20, sY+(9+s_menuItem[p])*line, GFX.MCursor[0]);
+                XRender::renderTexture(pX - 20, sY+(9+s_menuItem[p])*line, GFX.MCursor[0]);
                 Player_MenuItem_Mouse_Render(p, 0, "FORCE RESUME",
                     pX, sY+(9+0)*line, mouse, render);
                 Player_MenuItem_Mouse_Render(p, 1, "BACK",
@@ -810,7 +813,7 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pW, int sY, int line, bool m
 
         // show the menu cursor for the player
         if(s_menuItem[p] < 0)
-            frmMain.renderTexture(pX - 20, sY+(14+s_menuItem[p])*line, GFX.MCursor[0]);
+            XRender::renderTexture(pX - 20, sY+(14+s_menuItem[p])*line, GFX.MCursor[0]);
 
         // should never be null
         if(Controls::g_InputMethods[p]->Profile != nullptr)
@@ -908,7 +911,7 @@ int Mouse_Render(bool mouse, bool render)
 
     if(render)
     {
-        frmMain.renderRect(sX, sY - (line-16), p_width*n, line*15 + line-16, 0, 0, 0, .5);
+        XRender::renderRect(sX, sY - (line-16), p_width*n, line*15 + line-16, 0, 0, 0, .5);
     }
 
     /*--------------------*\

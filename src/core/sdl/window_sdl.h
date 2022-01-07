@@ -80,6 +80,12 @@ public:
     Cursor_t getCursor() override;
 
     /*!
+     * \brief Place cursor at desired window position
+     * \param x and y positions in physical window coordinates
+     */
+    void placeCursor(int window_x, int window_y) override;
+
+    /*!
      * \brief Is full-screen mode active?
      * \return True if the full-screen mode works right now
      */

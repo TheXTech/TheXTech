@@ -320,6 +320,12 @@ void RenderSDL::mapToScreen(int x, int y, int *dx, int *dy)
     *dy = static_cast<int>((static_cast<float>(y) - m_offset_y) / m_viewport_scale_y);
 }
 
+void RenderSDL::mapFromScreen(int scr_x, int scr_y, int *window_x, int *window_y)
+{
+    *window_x = (float)scr_x * m_viewport_scale_x + m_offset_x;
+    *window_y = (float)scr_y * m_viewport_scale_y + m_offset_y;
+}
+
 void RenderSDL::setTargetTexture()
 {
     if(m_recentTarget == m_tBuffer)

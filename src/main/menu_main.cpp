@@ -885,6 +885,7 @@ bool mainMenuUpdate()
             bool dontWrap = false;
 
             // TODO: hmmm..........
+#if 0
             if((c.AltRun || homePressed) && MenuCursorCanMove)
             {
                 PlaySoundMenu(SFX_Saw);
@@ -921,7 +922,8 @@ bool mainMenuUpdate()
                 dontWrap = true;
             }
             // ...???
-
+#endif
+            
             if(MenuMode == MENU_1PLAYER_GAME || MenuMode == MENU_2PLAYER_GAME || MenuMode == MENU_BATTLE_MODE)
             {
                 if(dontWrap)
@@ -1311,9 +1313,7 @@ static void s_drawGameSaves()
 
 void mainMenuDraw()
 {
-    int A = 0;
     int B = 0;
-    int C = 0;
 
     // just don't call this during an offset!
     // XRender::offsetViewportIgnore(true);

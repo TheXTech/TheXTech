@@ -124,8 +124,6 @@ void FrmMain::freeSystem()
     if(m_render)
         m_render->clearAllTextures();
 
-    joyCloseJoysticks();
-
     m_render->close();
     m_render.reset();
     g_render = nullptr;

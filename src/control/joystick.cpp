@@ -2,6 +2,7 @@
 #include <SDL2/SDL_joystick.h>
 #include <SDL2/SDL_gamecontroller.h>
 #include <SDL2/SDL_haptic.h>
+#include <SDL2/SDL_events.h>
 
 #include <Logger/logger.h>
 

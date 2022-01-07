@@ -103,7 +103,7 @@ void UpdateEditor()
 
     if(!MagicHand)
     {
-        if(XEvents::getKeyState(vbKeyPageUp))
+        if(EditorControls.PrevSection)
         {
             if(ScrollRelease)
             {
@@ -116,7 +116,7 @@ void UpdateEditor()
 //                    frmLevelSettings::optSection(curSection).Value = true;
             }
         }
-        else if(XEvents::getKeyState(vbKeyPageDown))
+        else if(EditorControls.NextSection)
         {
             if(ScrollRelease)
             {
@@ -169,7 +169,7 @@ void UpdateEditor()
     if(LevelEditor || MagicHand)
     {
         GetEditorControls();
-        if(XEvents::getKeyState(vbKeyShift))
+        if(EditorControls.FastScroll)
             ScrollDelay = 0;
 
         if(MagicHand)
@@ -177,6 +177,7 @@ void UpdateEditor()
 
         if(ScrollDelay <= 0)
         {
+            // EditorControls.ScrollUp is now analogue, think...!
             if(OldEditorControls.Up)
             {
                 vScreenY[1] += 32;
@@ -2157,22 +2158,11 @@ void GetEditorControls()
 {
     if(HasCursor)
     {
-        if((XEvents::getKeyState(vbKeyUp)))
-            OldEditorControls.Up = true;
-        else
-            OldEditorControls.Up = false;
-        if((XEvents::getKeyState(vbKeyDown)))
-            OldEditorControls.Down = true;
-        else
-            OldEditorControls.Down = false;
-        if((XEvents::getKeyState(vbKeyLeft)))
-            OldEditorControls.Left = true;
-        else
-            OldEditorControls.Left = false;
-        if((XEvents::getKeyState(vbKeyRight)))
-            OldEditorControls.Right = true;
-        else
-            OldEditorControls.Right = false;
+        // JUST FOR NOW, will replace with editorcontrols in future
+        OldEditorControls.Up = SharedControls.MenuUp;
+        OldEditorControls.Down = SharedControls.MenuDown;
+        OldEditorControls.Left = SharedControls.MenuLeft;
+        OldEditorControls.Right = SharedControls.MenuRight;
         OldEditorControls.Mouse1 = SharedCursor.Primary;
         if((SharedCursor.Secondary || EditorControls.ModeSelect) && optCursor.current != OptCursor_t::LVL_SELECT)
         {

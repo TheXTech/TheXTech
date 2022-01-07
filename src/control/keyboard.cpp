@@ -6,6 +6,9 @@
 #include "../main/screen_textentry.h"
 #include "../game_main.h"
 
+#include "core/render.h"
+#include "main/cheat_code.h"
+
 namespace Controls
 {
 
@@ -27,10 +30,10 @@ bool InputMethod_Keyboard::Update(Controls_t& c, CursorControls_t& m, EditorCont
     if(k->m_directText && GamePaused == PauseCode::TextEntry)
         return true;
 
-    bool altPressed = (k->m_keyboardState[SDL_SCANCODE_LALT] == KEY_PRESSED
-                || k->m_keyboardState[SDL_SCANCODE_RALT] == KEY_PRESSED
-                || k->m_keyboardState[SDL_SCANCODE_LCTRL] == KEY_PRESSED
-                || k->m_keyboardState[SDL_SCANCODE_RCTRL] == KEY_PRESSED);
+    bool altPressed = (k->m_keyboardState[SDL_SCANCODE_LALT]
+                || k->m_keyboardState[SDL_SCANCODE_RALT]
+                || k->m_keyboardState[SDL_SCANCODE_LCTRL]
+                || k->m_keyboardState[SDL_SCANCODE_RCTRL]);
     bool hotkey_okay = true;
     for(int a = 0; a < 4; a++)
     {
@@ -685,7 +688,8 @@ void InputMethodType_Keyboard::UpdateControlsPost()
         int window_x, window_y;
         Uint32 buttons = SDL_GetMouseState(&window_x, &window_y);
 
-        SDL_Point p = frmMain.MapToScr(window_x, window_y);
+        SDL_Point p;
+        XRender::mapToScreen(window_x, window_y, &p.x, &p.y);
         static SDL_Point last_p;
         if(p.x - last_p.x <= -1 || p.x - last_p.x >= 1
             || p.y - last_p.y <= -1 || p.y - last_p.y >= 1)
@@ -710,15 +714,15 @@ void InputMethodType_Keyboard::UpdateControlsPost()
     if(this->m_directText && GamePaused == PauseCode::TextEntry)
         return;
 
-    bool altPressed = this->m_keyboardState[SDL_SCANCODE_LALT] == KEY_PRESSED ||
-                      this->m_keyboardState[SDL_SCANCODE_RALT] == KEY_PRESSED;
-    bool escPressed = this->m_keyboardState[SDL_SCANCODE_ESCAPE] == KEY_PRESSED;
-    bool returnPressed = this->m_keyboardState[SDL_SCANCODE_RETURN] == KEY_PRESSED;
-    bool spacePressed = this->m_keyboardState[SDL_SCANCODE_SPACE] == KEY_PRESSED;
-    bool upPressed = this->m_keyboardState[SDL_SCANCODE_UP] == KEY_PRESSED;
-    bool downPressed = this->m_keyboardState[SDL_SCANCODE_DOWN] == KEY_PRESSED;
-    bool leftPressed = this->m_keyboardState[SDL_SCANCODE_LEFT] == KEY_PRESSED;
-    bool rightPressed = this->m_keyboardState[SDL_SCANCODE_RIGHT] == KEY_PRESSED;
+    bool altPressed = this->m_keyboardState[SDL_SCANCODE_LALT] ||
+                      this->m_keyboardState[SDL_SCANCODE_RALT];
+    bool escPressed = this->m_keyboardState[SDL_SCANCODE_ESCAPE];
+    bool returnPressed = this->m_keyboardState[SDL_SCANCODE_RETURN];
+    bool spacePressed = this->m_keyboardState[SDL_SCANCODE_SPACE];
+    bool upPressed = this->m_keyboardState[SDL_SCANCODE_UP];
+    bool downPressed = this->m_keyboardState[SDL_SCANCODE_DOWN];
+    bool leftPressed = this->m_keyboardState[SDL_SCANCODE_LEFT];
+    bool rightPressed = this->m_keyboardState[SDL_SCANCODE_RIGHT];
 
     // disable the shared keys if they are currently in use
     for(InputMethod* method : g_InputMethods)
@@ -989,18 +993,16 @@ bool InputMethodType_Keyboard::ConsumeEvent(const SDL_Event* ev)
     switch(ev->type)
     {
         case SDL_MOUSEBUTTONUP:
-#if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
             if(ev->button.button == SDL_BUTTON_LEFT && ev->button.which != SDL_TOUCH_MOUSEID)
             {
                 bool doubleClick = (this->m_lastMousePress + 300) >= SDL_GetTicks();
                 this->m_lastMousePress = SDL_GetTicks();
-                if(doubleClick)
+                if(doubleClick && !MagicHand)
                 {
                     this->m_lastMousePress = 0;
                     Hotkeys::Activate(Hotkeys::Buttons::Fullscreen);
                 }
             }
-#endif
             // intentional fallthrough
         case SDL_MOUSEBUTTONDOWN:
             if(ev->button.which == SDL_TOUCH_MOUSEID && g_renderTouchscreen)

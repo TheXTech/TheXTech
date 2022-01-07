@@ -516,13 +516,12 @@ std::string LevelName;
 //    return XEvents::getKeyState(key);
 //}
 
-// TODO: is this still used?
-const char *getKeyName(int key)
-{
-    if(key < 0)
-        return " ... ";
-    return g_events->getScanCodeName(key);
-}
+// const char *getKeyName(int key)
+// {
+//     if(key < 0)
+//         return " ... ";
+//     return g_events->getScanCodeName(key);
+// }
 
 void initAll()
 {

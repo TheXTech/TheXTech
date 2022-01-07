@@ -4,22 +4,27 @@
 #ifdef THEXTECH_INTERPROC_SUPPORTED
 #include <InterProcess/intproc.h>
 #endif // #ifdef THEXTECH_INTERPROC_SUPPORTED
+
 #include <Logger/logger.h>
 
 #include "../globals.h"
 
 #include "../player.h"
 #include "../sound.h"
+#include "../gfx.h"
 #include "../graphics.h"
 #include "../frm_main.h"
 #include "../compat.h"
 #include "../config.h"
+#include "../core/render.h"
+#include "../core/events.h"
 
 #include "../game_main.h"
 #include "menu_main.h"
 #include "screen_pause.h"
 #include "screen_textentry.h"
 #include "speedrunner.h"
+#include "cheat_code.h"
 
 namespace PauseScreen
 {
@@ -43,12 +48,12 @@ static bool s_RestartLevel()
 {
 	MenuMode = MENU_MAIN;
 	MenuCursor = 0;
-	frmMain.setTargetTexture();
-	frmMain.clearBuffer();
-	frmMain.repaint();
+	XRender::setTargetTexture();
+	XRender::clearBuffer();
+	XRender::repaint();
 	EndLevel = true;
 	StopMusic();
-	DoEvents();
+	XEvents::doEvents();
 	return true;
 }
 
@@ -75,11 +80,9 @@ static bool s_DropAddScreen()
 
 static bool s_CheatScreen()
 {
-	// TODO: UPDATE FOR WOHLSTAND'S NEW CHEAT IMPLEMENTATION
 	TextEntryScreen::Init("Enter cheat:");
 	PauseGame(PauseCode::TextEntry, 0);
-	CheatString = TextEntryScreen::Text;
-	CheatCode(' ');
+	cheats_setBuffer(TextEntryScreen::Text);
 	return true;
 }
 
@@ -87,12 +90,12 @@ static bool s_QuitTesting()
 {
 	MenuMode = MENU_MAIN;
 	MenuCursor = 0;
-	frmMain.setTargetTexture();
-	frmMain.clearBuffer();
-	frmMain.repaint();
+	XRender::setTargetTexture();
+	XRender::clearBuffer();
+	XRender::repaint();
 	EndLevel = true;
 	StopMusic();
-	DoEvents();
+	XEvents::doEvents();
 	// change this when editor is reimplemented!
 	KillIt(); // Quit the game entirely
 	return true;
@@ -135,11 +138,11 @@ static bool s_Quit()
 	else
 	    LevelSelect = false;
 
-	frmMain.setTargetTexture();
-	frmMain.clearBuffer();
-	frmMain.repaint();
+	XRender::setTargetTexture();
+	XRender::clearBuffer();
+	XRender::repaint();
 	StopMusic();
-	DoEvents();
+	XEvents::doEvents();
 
 	return true;
 }
@@ -205,13 +208,13 @@ void Render()
 		menu_left_X += 56;
 	int menu_top_Y = ScreenH/2 - total_menu_height/2;
 
-	frmMain.renderRect(ScreenW/2 - 190, ScreenH/2 - menu_box_height / 2, 380, menu_box_height, 0, 0, 0);
+	XRender::renderRect(ScreenW/2 - 190, ScreenH/2 - menu_box_height / 2, 380, menu_box_height, 0, 0, 0);
 
 	for(size_t i = 0; i < s_items.size(); i++)
 	{
 		SuperPrint(s_items[i].name, 3, menu_left_X, menu_top_Y + (i * 36));
 	}
-	frmMain.renderTexture(menu_left_X - 20, menu_top_Y + (MenuCursor * 36), 16, 16, GFX.MCursor[0], 0, 0);
+	XRender::renderTexture(menu_left_X - 20, menu_top_Y + (MenuCursor * 36), 16, 16, GFX.MCursor[0], 0, 0);
 }
 
 bool Logic(int plr)

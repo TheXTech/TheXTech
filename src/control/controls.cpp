@@ -1,11 +1,16 @@
+#include "../config.h"
 #include "../controls.h"
 #include "../main/record.h"
 #include "../main/speedrunner.h"
 
+#include "core/render.h"
+#include "core/window.h"
+
 // for hotkeys screen
-#include "../main/menu_controls.h"
+#include "main/menu_controls.h"
 #include "../game_main.h"
-#include "../main/screen_textentry.h"
+#include "main/screen_textentry.h"
+#include "main/cheat_code.h"
 #include "../graphics.h"
 #include "../frame_timer.h"
 
@@ -44,7 +49,7 @@ void Hotkeys::Activate(size_t i)
             TakeScreen = true;
             return;
         case Buttons::RecordGif:
-            frmMain.toggleGifRecorder();
+            XRender::toggleGifRecorder();
             return;
 #endif
         case Buttons::DebugInfo:
@@ -532,7 +537,11 @@ bool Update()
     if(SharedCursor.Move)
     {
         if(SharedCursor.X >= 0. && SharedCursor.Y >= 0.)
-            frmMain.PlaceMouse(SharedCursor.X, SharedCursor.Y);
+        {
+            int window_x, window_y;
+            XRender::mapFromScreen(SharedCursor.X, SharedCursor.Y, &window_x, &window_y);
+            XWindow::placeCursor(window_x, window_y);
+        }
     }
 
     // sync controls
@@ -627,10 +636,10 @@ bool Update()
 
     if(s_enterCheatScreen && GamePaused != PauseCode::TextEntry)
     {
+        // TODO: now, allow the Android specific
         TextEntryScreen::Init("Enter cheat:");
         PauseGame(PauseCode::TextEntry, 0);
-        CheatString = TextEntryScreen::Text;
-        CheatCode(' ');
+        cheats_setBuffer(TextEntryScreen::Text);
         s_enterCheatScreen = false;
         MenuCursorCanMove = false;
         MenuMouseRelease = false;
@@ -814,7 +823,7 @@ void ClearInputMethods()
 // player is 1-indexed :(
 void Rumble(int player, int ms, float strength)
 {
-    if(!JoystickEnableRumble || GameMenu || GameOutro)
+    if(!g_config.JoystickEnableRumble || GameMenu || GameOutro)
         return;
 
     if(player < 1 || player > (int)g_InputMethods.size())
@@ -826,7 +835,7 @@ void Rumble(int player, int ms, float strength)
 
 void RumbleAllPlayers(int ms, float strength)
 {
-    if(!JoystickEnableRumble || GameMenu || GameOutro)
+    if(!g_config.JoystickEnableRumble || GameMenu || GameOutro)
         return;
 
     for(InputMethod* method : g_InputMethods)

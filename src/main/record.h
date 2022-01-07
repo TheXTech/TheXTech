@@ -30,6 +30,10 @@
 namespace Record
 {
 
+// public to allow other systems to spy on status of the Record system
+extern FILE* record_file;
+extern FILE* replay_file;
+
 void LoadReplay(const std::string &recording_path, const std::string &level_path);
 
 void InitRecording();

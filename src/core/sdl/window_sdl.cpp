@@ -26,7 +26,7 @@
 
 #include "main/game_info.h"
 #include "window_sdl.h"
-
+#include "../render.h"
 
 //! Path to game resources assets (by default it's ~/.PGE_Project/thextech/)
 extern std::string AppPath;
@@ -215,6 +215,21 @@ void WindowSDL::setCursor(Cursor_t cursor)
 AbstractWindow_t::Cursor_t WindowSDL::getCursor()
 {
     return m_cursor;
+}
+
+void WindowSDL::placeCursor(int window_x, int window_y)
+{
+    int old_window_x, old_window_y;
+    SDL_GetMouseState(&old_window_x, &old_window_y);
+    int o_sx, o_sy, n_sx, n_sy;
+
+    XRender::mapToScreen(old_window_x, old_window_y, &o_sx, &o_sy);
+    XRender::mapToScreen(window_x, window_y, &n_sx, &n_sy);
+
+    if(n_sx - o_sx < -2 || n_sx - o_sx > 2 || n_sy - o_sy < -2 || n_sy - o_sy > 2)
+    {
+        SDL_WarpMouseInWindow(m_window, window_x, window_y);
+    }
 }
 
 bool WindowSDL::isFullScreen()

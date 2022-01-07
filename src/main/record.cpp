@@ -90,9 +90,9 @@ namespace Record
 {
 
 // public
+FILE* record_file = nullptr;
+FILE* replay_file = nullptr;
 
-static FILE* record_file = nullptr;
-static FILE* replay_file = nullptr;
 //! Externally providen level file path for the replay
 static std::string replayLevelFilePath;
 

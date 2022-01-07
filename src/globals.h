@@ -84,7 +84,7 @@ extern std::string AppPath;
  * @param key Key code
  * @return Human-readable key name
  */
-const char *getKeyName(int key);
+// const char *getKeyName(int key); // no longer used
 
 /**
  * @brief Rounding function that works same as in VB6

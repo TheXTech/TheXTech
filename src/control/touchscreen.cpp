@@ -28,6 +28,8 @@
 
 #include "touchscreen.h"
 #include "../globals.h"
+#include "../core/render.h"
+#include "../core/window.h"
 
 #include <SDL2/SDL_haptic.h>
 
@@ -42,7 +44,7 @@ void TouchScreenGFX_t::loadImage(StdPicture &img, std::string path)
 {
     pLogDebug("Loading texture %s...", path.c_str());
     img = XRender::LoadPicture(path);
-    if(!img.texture)
+    if(!img.inited)
     {
         pLogWarning("Failed to load texture: %s...", path.c_str());
         m_loadErrors++;
@@ -673,7 +675,7 @@ TouchScreenController::~TouchScreenController()
     m_vibrator = nullptr;
 }
 
-TouchScreenController::TouchScreenController()
+TouchScreenController::TouchScreenController() noexcept
 {
     updateScreenSize();
 
@@ -708,7 +710,7 @@ TouchScreenController::TouchScreenController()
 
 void TouchScreenController::updateScreenSize()
 {
-    SDL_GetWindowSize(XRender::getWindow(), &m_screenWidth, &m_screenHeight);
+    XWindow::getWindowSize(&m_screenWidth, &m_screenHeight);
 
     updateTouchMap(m_size, m_screenWidth, m_screenHeight);
 }
@@ -818,9 +820,10 @@ void TouchScreenController::processTouchDevice(int dev_i)
         if(!m_cursorHeld)
         {
             m_cursorHeld = true;
-            SDL_Point p = XRender::MapToScr(finger_x*m_screenWidth, finger_y*m_screenHeight);
-            m_cursorX = p.x;
-            m_cursorY = p.y;
+            int cX, cY;
+            XRender::mapToScreen(finger_x*m_screenWidth, finger_y*m_screenHeight, &cX, &cY);
+            m_cursorX = cX;
+            m_cursorY = cY;
         }
 
         auto found = m_fingers.find(finger_id);

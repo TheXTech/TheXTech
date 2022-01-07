@@ -28,7 +28,7 @@
 #include "frm_main.h"
 #include "game_main.h"
 #include "sound.h"
-#include "control/joystick.h"
+#include "controls.h"
 
 
 EventsSDL::EventsSDL() :
@@ -43,7 +43,6 @@ EventsSDL::~EventsSDL()
 void EventsSDL::init(FrmMain *form)
 {
     AbstractEvents_t::init(form);
-    m_keyboardState = SDL_GetKeyboardState(nullptr);
     doEvents();
 }
 
@@ -62,52 +61,15 @@ void EventsSDL::waitEvents()
     doEvents();
 }
 
-bool EventsSDL::getKeyState(int scan_code)
-{
-    if(m_keyboardState)
-        return m_keyboardState[scan_code] == 1;
-    return 0;
-}
-
-const char *EventsSDL::getScanCodeName(int scan_code)
-{
-    SDL_Scancode k = static_cast<SDL_Scancode>(scan_code);
-    return SDL_GetScancodeName(k);
-}
-
-static int keyModConvert(Uint16 mod)
-{
-    int ret = KEYMOD_NONE;
-
-    if(KMOD_LCTRL & mod)
-        ret |= KEYMOD_LCTRL;
-    if(KMOD_RCTRL & mod)
-        ret |= KEYMOD_RCTRL;
-    if(KMOD_LALT & mod)
-        ret |= KEYMOD_LALT;
-    if(KMOD_RALT & mod)
-        ret |= KEYMOD_RALT;
-    if(KMOD_LSHIFT & mod)
-        ret |= KEYMOD_LSHIFT;
-    if(KMOD_RSHIFT & mod)
-        ret |= KEYMOD_RSHIFT;
-
-    return ret;
-}
-
 void EventsSDL::processEvent()
 {
+    if(Controls::ProcessEvent(&m_event))
+        return;
     switch(m_event.type)
     {
     case SDL_QUIT:
         XWindow::showCursor(1);
         KillIt();
-        break;
-    case SDL_JOYDEVICEADDED:
-        joyDeviceAddEvent(&m_event.jdevice);
-        break;
-    case SDL_JOYDEVICEREMOVED:
-        joyDeviceRemoveEvent(&m_event.jdevice);
         break;
     case SDL_WINDOWEVENT:
         switch(m_event.window.event)
@@ -125,86 +87,11 @@ void EventsSDL::processEvent()
             if(!neverPause && !LoadingInProcess)
                 SoundPauseEngine(1);
             break;
-//        case SDL_WINDOWEVENT_MAXIMIZED:
-//            SDL_RestoreWindow(m_window);
-//            SetRes();
-//            break;
 #endif
         default:
             break;
         }
         break;
-    case SDL_KEYDOWN:
-    {
-        KeyboardEvent_t e;
-        e.scancode = m_event.key.keysym.scancode;
-        e.mod = keyModConvert(m_event.key.keysym.mod);
-
-        eventKeyDown(e);
-        eventKeyPress(e.scancode);
-        break;
-    }
-    case SDL_KEYUP:
-    {
-        KeyboardEvent_t e;
-        e.scancode = m_event.key.keysym.scancode;
-        e.mod = keyModConvert(m_event.key.keysym.mod);
-
-        eventKeyUp(e);
-        break;
-    }
-    case SDL_MOUSEBUTTONDOWN:
-    {
-        MouseButtonEvent_t e;
-        switch(m_event.button.button)
-        {
-        case SDL_BUTTON_LEFT:
-            e.button = MOUSE_BUTTON_LEFT;
-            break;
-        case SDL_BUTTON_MIDDLE:
-            e.button = MOUSE_BUTTON_MIDDLE;
-            break;
-        case SDL_BUTTON_RIGHT:
-            e.button = MOUSE_BUTTON_RIGHT;
-            break;
-        }
-        eventMouseDown(e);
-        break;
-    }
-    case SDL_MOUSEBUTTONUP:
-    {
-        MouseButtonEvent_t e;
-        switch(m_event.button.button)
-        {
-        case SDL_BUTTON_LEFT:
-            e.button = MOUSE_BUTTON_LEFT;
-            break;
-        case SDL_BUTTON_MIDDLE:
-            e.button = MOUSE_BUTTON_MIDDLE;
-            break;
-        case SDL_BUTTON_RIGHT:
-            e.button = MOUSE_BUTTON_RIGHT;
-            break;
-        }
-        eventMouseUp(e);
-        break;
-    }
-    case SDL_MOUSEMOTION:
-    {
-        MouseMoveEvent_t e;
-        e.x = m_event.motion.x;
-        e.y = m_event.motion.y;
-        eventMouseMove(e);
-        break;
-    }
-    case SDL_MOUSEWHEEL:
-    {
-        MouseWheelEvent_t e;
-        e.x = m_event.wheel.x;
-        e.y = m_event.wheel.y;
-        eventMouseWheel(e);
-        break;
-    }
 #ifdef USE_RENDER_BLOCKING
     case SDL_RENDER_DEVICE_RESET:
         D_pLogDebug("Android: Render Device Reset");

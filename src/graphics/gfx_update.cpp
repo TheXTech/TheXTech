@@ -154,6 +154,27 @@ void GraphicsLazyPreLoad()
     // TODO: check if this is needed at caller
     SetupScreens();
 
+    int numScreens = 1;
+
+    if(ScreenType == 1)
+        numScreens = 2;
+    if(ScreenType == 4)
+        numScreens = 2;
+    if(ScreenType == 5)
+    {
+        DynamicScreen();
+        if(vScreen[2].Visible)
+            numScreens = 2;
+        else
+            numScreens = 1;
+    }
+    if(ScreenType == 8)
+        numScreens = 1;
+
+
+    if(SingleCoop == 2)
+        numScreens = 1; // fine to be 1, since it would just be run for Z = 2 twice otherwise;
+
     For(Z, 1, numScreens)
     {
         if(SingleCoop == 2)
@@ -2262,7 +2283,7 @@ void UpdateGraphics(bool skipRepaint)
                             tempBool = true;
                         } while(!SuperText.empty());
 
-                        frmMain.renderTexture(400 - GFX.TextBox.w / 2 + X, BoxY + Y + Y, GFX.TextBox.w, 10, GFX.TextBox, 0, GFX.TextBox.h - 10);
+                        XRender::renderTexture(400 - GFX.TextBox.w / 2 + X, BoxY + Y + Y, GFX.TextBox.w, 10, GFX.TextBox, 0, GFX.TextBox.h - 10);
                 }
     //            ElseIf GameOutro = False Then
             }
@@ -2806,7 +2827,7 @@ void UpdateGraphics(bool skipRepaint)
 
     // render the mouse
     if(GamePaused != PauseCode::None && GamePaused != PauseCode::Message)
-        frmMain.renderTexture(int(SharedCursor.X), int(SharedCursor.Y), GFX.ECursor[2]);
+        XRender::renderTexture(int(SharedCursor.X), int(SharedCursor.Y), GFX.ECursor[2]);
 
     if(!skipRepaint)
         XRender::repaint();

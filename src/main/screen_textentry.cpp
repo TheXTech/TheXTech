@@ -2,6 +2,7 @@
 #include "../globals.h"
 #include "../graphics.h"
 #include "../config.h"
+#include "core/render.h"
 
 namespace TextEntryScreen
 {
@@ -124,17 +125,17 @@ bool UpdateButton(int x, int y, int size, const char* c, bool sel, bool render)
         if(sel)
         {
             if(coll && SharedCursor.Primary)
-                frmMain.renderRect(x, y, width, size, 0.f, 0.5f, 0.5f, 1.0f, true);
+                XRender::renderRect(x, y, width, size, 0.f, 0.5f, 0.5f, 1.0f, true);
             else
-                frmMain.renderRect(x, y, width, size, 0.f, 1.0f, 1.0f, 1.0f, true);
+                XRender::renderRect(x, y, width, size, 0.f, 1.0f, 1.0f, 1.0f, true);
         }
         else if(coll && SharedCursor.Primary)
-            frmMain.renderRect(x, y, width, size, 0.f, 0.f, 0.f, 1.0f, true);
+            XRender::renderRect(x, y, width, size, 0.f, 0.f, 0.f, 1.0f, true);
         // background:
         if(SharedCursor.Primary && coll)
-            frmMain.renderRect(x+2, y+2, width-4, size-4, 0.2f, 0.2f, 0.2f, 1.0f, true);
+            XRender::renderRect(x+2, y+2, width-4, size-4, 0.2f, 0.2f, 0.2f, 1.0f, true);
         else
-            frmMain.renderRect(x+2, y+2, width-4, size-4, 0.5f, 0.5f, 0.5f, 0.8f, true);
+            XRender::renderRect(x+2, y+2, width-4, size-4, 0.5f, 0.5f, 0.5f, 0.8f, true);
 
         SuperPrintCenter(print_char, 4, x+width/2, y+size/2-10);
     }
@@ -374,12 +375,12 @@ bool KeyboardMouseRender(bool mouse, bool render)
 
     if(render)
     {
-        frmMain.renderRect(win_x, win_y, win_width, win_height, 0.6f, 0.6f, 1.f, 0.8f);
+        XRender::renderRect(win_x, win_y, win_width, win_height, 0.6f, 0.6f, 1.f, 0.8f);
         for(int i = 0; i < n_prompt_lines; i ++)
         {
             SuperPrint(s_Prompt.substr(27*i, 27), 4, win_x + 10, win_y + 6 + 20*i);
         }
-        frmMain.renderRect(win_x + 20, win_y+n_prompt_lines*20+4, win_width - 40, n_text_lines*20, 0.f, 0.f, 0.f, 0.8f);
+        XRender::renderRect(win_x + 20, win_y+n_prompt_lines*20+4, win_width - 40, n_text_lines*20, 0.f, 0.f, 0.f, 0.8f);
         for(int i = 0; i < n_text_lines; i ++)
         {
             SuperPrint(Text.substr(25*i, 25), 4, win_x + 10 + 16, win_y + 6 + 20*(n_prompt_lines+i));
@@ -389,10 +390,10 @@ bool KeyboardMouseRender(bool mouse, bool render)
                 // after merging in, use the appropriate print library here.
                 // int cursor_offset = PrintLength(Text.substr(25*i, s_cursor - i*25))
                 int cursor_offset = (s_cursor - i*25) * 18;
-                frmMain.renderRect(win_x + 10 + 16 + cursor_offset - 2, win_y + 4 + 20*(n_prompt_lines+i), 2, 20, 1.f, 1.f, 1.f, 0.5f);
+                XRender::renderRect(win_x + 10 + 16 + cursor_offset - 2, win_y + 4 + 20*(n_prompt_lines+i), 2, 20, 1.f, 1.f, 1.f, 0.5f);
             }
         }
-        frmMain.renderRect(kb_x, kb_y, kb_width, kb_height, 0.f, 0.f, 0.f, 0.2f);
+        XRender::renderRect(kb_x, kb_y, kb_width, kb_height, 0.f, 0.f, 0.f, 0.2f);
     }
     for(int row = 0; row < 5; row ++)
     {

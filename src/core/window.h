@@ -98,6 +98,17 @@ E_INLINE AbstractWindow_t::Cursor_t getCursor() TAIL
 #endif
 
 /*!
+ * \brief Place cursor at desired window position
+ * \param x and y positions in physical window coordinates
+ */
+E_INLINE void placeCursor(int window_x, int window_y) TAIL
+#ifndef WINDOW_CUSTOM
+{
+    return g_window->placeCursor(window_x, window_y);
+}
+#endif
+
+/*!
  * \brief Is full-screen mode active?
  * \return True if the full-screen mode works right now
  */

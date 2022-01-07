@@ -1549,7 +1549,7 @@ void StartEpisode()
     XRender::clearBuffer();
     XRender::repaint();
     StopMusic();
-    XEvents::DoEvents();
+    XEvents::doEvents();
     // TODO: did Wohlstand change this?
     PGE_Delay(500);
     ClearGame();

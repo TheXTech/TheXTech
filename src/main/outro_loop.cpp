@@ -141,7 +141,7 @@ void OutroLoop()
     for(int A = 1; A <= numPlayers; A++)
     {
         auto &pp = Player[A];
-        pp.Controls = blankControls;
+        pp.Controls = Controls_t();
 
         if(g_gameInfo.outroWalkDirection < 0)
             pp.Controls.Left = true;

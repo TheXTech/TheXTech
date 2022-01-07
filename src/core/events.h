@@ -64,35 +64,6 @@ E_INLINE void waitEvents() TAIL
 }
 #endif
 
-/*!
- * \brief Get key state by scancode
- * \param scan_code Scancode of the backend
- * \return Key state value
- */
-E_INLINE bool getKeyState(int scan_code) TAIL
-
-#ifndef EVENTS_CUSTOM
-{
-    if(scan_code < 0)
-        return false;
-    return g_events->getKeyState(scan_code);
-}
-#endif
-
-/*!
- * \brief Get the name of the key by scancode
- * \param scan_code Scancode of the backend
- * \return Human-readable name of the key
- */
-E_INLINE const char *getScanCodeName(int scan_code) TAIL
-
-#ifndef EVENTS_CUSTOM
-{
-    return g_events->getScanCodeName(scan_code);
-}
-#endif
-
-
 SDL_FORCE_INLINE void eventResize()
 {
     g_events->eventResize();
