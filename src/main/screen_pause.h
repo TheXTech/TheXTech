@@ -10,6 +10,6 @@ void Init();
 bool Logic(int plr);
 void Render();
 
-}; // namespace PauseScreen
+} // namespace PauseScreen
 
 #endif // #ifndef SCREEN_PAUSE_H

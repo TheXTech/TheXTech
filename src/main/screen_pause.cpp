@@ -367,4 +367,4 @@ bool Logic(int plr)
     return stopPause;
 }
 
-}; // namespace PauseScreen
+} // namespace PauseScreen

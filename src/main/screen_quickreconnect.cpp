@@ -89,4 +89,4 @@ void Logic()
 		g_active = false;
 }
 
-}; // namespace QuickReconnectScreen
+} // namespace QuickReconnectScreen

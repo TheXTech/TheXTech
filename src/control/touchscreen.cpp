@@ -1063,7 +1063,7 @@ void TouchScreenController::render(int player_no)
 void TouchScreenController::resetState()
 {
     this->update();
-    for(std::pair<SDL_FingerID, Controls::TouchScreenController::FingerState>& state : m_fingers)
+    for(std::pair<const SDL_FingerID, Controls::TouchScreenController::FingerState>& state : m_fingers)
     {
         state.second.ignore = true;
     }

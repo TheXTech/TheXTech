@@ -514,4 +514,4 @@ bool Logic()
     return s_committed;
 }
 
-}; // namespace TextEntryScreen
+} // namespace TextEntryScreen
