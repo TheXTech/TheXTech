@@ -30,11 +30,9 @@
 #include "video.h"
 #include "../window.h"
 
-#ifdef USE_RENDER_BLOCKING
 #include <SDL2/SDL_assert.h>
-#endif
 
-#include "control/joystick.h"
+#include "controls.h"
 
 #ifndef UNUSED
 #define UNUSED(x) (void)x

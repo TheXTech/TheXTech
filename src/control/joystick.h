@@ -39,6 +39,7 @@ struct JoystickDevices
     SDL_GameController* ctrl = nullptr;
     SDL_Haptic* haptic = nullptr;
 
+    bool can_poll = false;
     std::string guid;
 };
 
@@ -83,6 +84,8 @@ public:
 
     using InputMethod::Type;
     using InputMethod::Profile;
+
+    ~InputMethod_Joystick();
 
     // Update functions that set player controls (and editor controls)
     // based on current device input. Return false if device lost.
@@ -174,7 +177,6 @@ public:
 class InputMethodType_Joystick : public InputMethodType
 {
 private:
-    bool m_canPoll = false;
     std::unordered_map<int, JoystickDevices*> m_availableJoysticks;
     std::unordered_map<std::string, InputMethodProfile*> m_lastProfileByGUID;
 

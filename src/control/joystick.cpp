@@ -355,6 +355,12 @@ static bool s_bindControllerKey(SDL_GameController *ctrl, KM_Key &k)
 || implementation for InputMethod_Joystick            ||
 \*====================================================*/
 
+InputMethod_Joystick::~InputMethod_Joystick()
+{
+    if(this->m_devices)
+        this->m_devices->can_poll = false;
+}
+
 // Update functions that set player controls (and editor controls)
 // based on current device input. Return false if device lost.
 bool InputMethod_Joystick::Update(Controls_t& c, CursorControls_t& m, EditorControls_t& e)
@@ -1398,28 +1404,24 @@ InputMethod* InputMethodType_Joystick::Poll(const std::vector<InputMethod*>& act
 
         KM_Key k;
         s_bindJoystickKey(joy, k);
-        if(k.type != KM_Key::NoControl)
+
+        // can_poll is set as false on joystick initialization and unbinding
+        if(k.type == KM_Key::NoControl)
+        {
+            p.second->can_poll = true;
+        }
+        else if(p.second->can_poll)
         {
             active_joystick = p.second;
             break;
         }
     }
 
-    // if didn't find any joystick, allow poll in future but return false right now
+    // if didn't find any joystick return false right now
     if(!active_joystick)
-    {
-        this->m_canPoll = true;
-        return nullptr;
-    }
-
-    // if poll not allowed, return nullptr
-    if(!this->m_canPoll)
         return nullptr;
 
     // we're going to create a new joystick!
-    // reset canPoll for next time
-    this->m_canPoll = false;
-
     InputMethod_Joystick* method = new(std::nothrow) InputMethod_Joystick;
 
     // alloc failed :(
@@ -1693,6 +1695,7 @@ bool InputMethodType_Joystick::SetProfile_Custom(InputMethod* method, int player
     if(!m || !p || !m->m_devices)
         return false;
 
+    // only allow controllerProfiles for controllers, joystick profiles for old joysticks
     // C++ has no proper logical XOR operator, so two lines
     if(p->m_controllerProfile && !m->m_devices->ctrl)
         return false;
