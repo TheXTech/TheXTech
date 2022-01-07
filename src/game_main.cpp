@@ -178,7 +178,7 @@ int GameMain(const CmdLineSetup_t &setup)
         XRender::repaint();
         XRender::setTargetScreen();
         XEvents::doEvents();
-        // TODO: may need to add more than just doEvents here.
+        Controls::Update();
         PGE_Delay(10);
     }
 #endif
