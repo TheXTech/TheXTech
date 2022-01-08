@@ -16,16 +16,6 @@
 #       define JNICALL
 #   endif
 
-JNIEXPORT void JNICALL
-Java_ru_wohlsoft_thextech_thextechActivity_textentry_1setBuffer(JNIEnv *env, jclass clazz, jstring line_j)
-{
-    const char *line;
-    (void)clazz;
-    line = env->GetStringUTFChars(line_j, nullptr);
-    Text = (std::string)line;
-    env->ReleaseStringUTFChars(line_j, line);
-}
-
 static void s_textEntry_callDialog()
 {
     JNIEnv* env = (JNIEnv*)SDL_AndroidGetJNIEnv();
@@ -37,7 +27,7 @@ static void s_textEntry_callDialog()
     env->DeleteLocalRef(clazz);
 }
 
-#endif
+#endif // #ifdef __ANDROID__
 
 namespace TextEntryScreen
 {
@@ -567,3 +557,17 @@ bool Logic()
 }
 
 } // namespace TextEntryScreen
+
+#ifdef __ANDROID__
+
+JNIEXPORT void JNICALL
+Java_ru_wohlsoft_thextech_thextechActivity_textentry_1setBuffer(JNIEnv *env, jclass clazz, jstring line_j)
+{
+    const char *line;
+    (void)clazz;
+    line = env->GetStringUTFChars(line_j, nullptr);
+    Text = (std::string)line;
+    env->ReleaseStringUTFChars(line_j, line);
+}
+
+#endif // #ifdef __ANDROID__
