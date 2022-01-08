@@ -446,9 +446,6 @@ const std::string& Run(const std::string& Prompt, const std::string Value)
     if(g_config.use_native_osk)
     {
         s_textEntry_callDialog();
-        // just here for debugging :)
-        if(Text == "change")
-            g_config.use_native_osk = !g_config.use_native_osk;
         return Text;
     }
 #endif
@@ -464,11 +461,6 @@ const std::string& Run(const std::string& Prompt, const std::string Value)
     s_timer = -1;
     s_committed = false;
     PauseGame(PauseCode::TextEntry, 0);
-#ifdef __ANDROID__
-    // just here for debugging :)
-    if(Text == "change")
-        g_config.use_native_osk = !g_config.use_native_osk;
-#endif
     return Text;
 }
 
