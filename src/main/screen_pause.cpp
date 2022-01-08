@@ -80,9 +80,7 @@ static bool s_DropAddScreen()
 
 static bool s_CheatScreen()
 {
-	TextEntryScreen::Init("Enter cheat:");
-	PauseGame(PauseCode::TextEntry, 0);
-	cheats_setBuffer(TextEntryScreen::Text);
+	cheats_setBuffer(TextEntryScreen::Run("Enter cheat:"));
 	return true;
 }
 

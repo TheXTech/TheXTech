@@ -46,17 +46,6 @@
 
 #include "cheat_code.h"
 
-#ifdef __ANDROID__
-#   include <SDL2/SDL_system.h>
-#   include <jni.h>
-#   if 1
-#       undef JNIEXPORT
-#       undef JNICALL
-#       define JNIEXPORT extern "C"
-#       define JNICALL
-#   endif
-#endif
-
 
 static void redigitIsCool()
 {
@@ -2204,31 +2193,6 @@ void cheats_setBuffer(const std::string &line)
     s_buffer.setBuffer(line);
     processCheats();
 }
-
-#ifdef __ANDROID__
-
-JNIEXPORT void JNICALL
-Java_ru_wohlsoft_thextech_thextechActivity_cheats_1setBuffer(JNIEnv *env, jclass clazz, jstring line_j)
-{
-    const char *line;
-    (void)clazz;
-    line = env->GetStringUTFChars(line_j, nullptr);
-    cheats_setBuffer(line);
-    env->ReleaseStringUTFChars(line_j, line);
-}
-
-void cheats_callDialog()
-{
-    JNIEnv* env = (JNIEnv*)SDL_AndroidGetJNIEnv();
-    jobject activity = (jobject)SDL_AndroidGetActivity();
-    jclass clazz = env->GetObjectClass(activity);
-    jmethodID method = env->GetMethodID(clazz, "requestCheat", "()V");
-    env->CallVoidMethod(activity, method);
-    env->DeleteLocalRef(activity);
-    env->DeleteLocalRef(clazz);
-}
-
-#endif
 
 void cheats_clearBuffer()
 {

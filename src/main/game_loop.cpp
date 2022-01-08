@@ -321,7 +321,7 @@ void PauseGame(PauseCode code, int plr)
         ConnectScreen::DropAdd_Start();
     else if(code == PauseCode::TextEntry)
     {
-        // assume TextEntryScreen::Init has already been called.
+        // assume TextEntryScreen has already been inited through its Run function.
     }
 
     PauseCode old_code = GamePaused;

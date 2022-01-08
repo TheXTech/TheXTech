@@ -85,9 +85,7 @@ int menuControls_Do()
         {
             PlaySoundMenu(SFX_Do);
             MenuCursorCanMove = false;
-            TextEntryScreen::Init("Rename profile:", profile->Name);
-            PauseGame(PauseCode::TextEntry);
-            profile->Name = TextEntryScreen::Text;
+            profile->Name = TextEntryScreen::Run("Rename profile:", profile->Name);
             MenuCursorCanMove = false;
             return 0;
         }

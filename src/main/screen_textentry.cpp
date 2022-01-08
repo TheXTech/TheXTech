@@ -3,6 +3,41 @@
 #include "../graphics.h"
 #include "../config.h"
 #include "core/render.h"
+#include "../game_main.h"
+
+#ifdef __ANDROID__
+
+#   include <SDL2/SDL_system.h>
+#   include <jni.h>
+#   if 1
+#       undef JNIEXPORT
+#       undef JNICALL
+#       define JNIEXPORT extern "C"
+#       define JNICALL
+#   endif
+
+JNIEXPORT void JNICALL
+Java_ru_wohlsoft_thextech_thextechActivity_textentry_1setBuffer(JNIEnv *env, jclass clazz, jstring line_j)
+{
+    const char *line;
+    (void)clazz;
+    line = env->GetStringUTFChars(line_j, nullptr);
+    Text = (std::string)line;
+    env->ReleaseStringUTFChars(line_j, line);
+}
+
+static void s_textEntry_callDialog()
+{
+    JNIEnv* env = (JNIEnv*)SDL_AndroidGetJNIEnv();
+    jobject activity = (jobject)SDL_AndroidGetActivity();
+    jclass clazz = env->GetObjectClass(activity);
+    jmethodID method = env->GetMethodID(clazz, "requestText", "()V");
+    env->CallVoidMethod(activity, method);
+    env->DeleteLocalRef(activity);
+    env->DeleteLocalRef(clazz);
+}
+
+#endif
 
 namespace TextEntryScreen
 {
@@ -415,8 +450,18 @@ bool KeyboardMouseRender(bool mouse, bool render)
     return false;
 }
 
-void Init(const std::string& Prompt, const std::string Value)
+const std::string& Run(const std::string& Prompt, const std::string Value)
 {
+#ifdef __ANDROID__
+    if(g_config.use_native_osk)
+    {
+        s_textEntry_callDialog();
+        // just here for debugging :)
+        if(Text == "change")
+            g_config.use_native_osk = !g_config.use_native_osk;
+        return Text;
+    }
+#endif
     s_Prompt = Prompt;
     Text = Value;
     s_cursor = Text.size();
@@ -428,6 +473,13 @@ void Init(const std::string& Prompt, const std::string Value)
     s_render_sel = false;
     s_timer = -1;
     s_committed = false;
+    PauseGame(PauseCode::TextEntry, 0);
+#ifdef __ANDROID__
+    // just here for debugging :)
+    if(Text == "change")
+        g_config.use_native_osk = !g_config.use_native_osk;
+#endif
+    return Text;
 }
 
 void Render()

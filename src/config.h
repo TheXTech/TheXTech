@@ -28,6 +28,8 @@ extern struct Config_t
 
     //! Record gameplay data
     bool    RecordGameplayData = false;
+    //! Use the native onscreen keyboard instead of the TheXTech one
+    bool    use_native_osk = false;
 
     /* ---- Video ----*/
 

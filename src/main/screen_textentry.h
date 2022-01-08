@@ -4,9 +4,8 @@
 namespace TextEntryScreen
 {
 
-extern std::string Text;
+const std::string& Run(const std::string& Prompt, const std::string Value = "");
 
-void Init(const std::string& Prompt, const std::string Value = "");
 void Render();
 bool Logic();
 

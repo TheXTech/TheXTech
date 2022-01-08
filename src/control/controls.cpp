@@ -650,10 +650,7 @@ bool Update()
 
     if(s_enterCheatScreen && GamePaused != PauseCode::TextEntry)
     {
-        // TODO: now, allow the Android specific
-        TextEntryScreen::Init("Enter cheat:");
-        PauseGame(PauseCode::TextEntry, 0);
-        cheats_setBuffer(TextEntryScreen::Text);
+        cheats_setBuffer(TextEntryScreen::Run("Enter cheat:"));
         s_enterCheatScreen = false;
         MenuCursorCanMove = false;
         MenuMouseRelease = false;

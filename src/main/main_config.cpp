@@ -169,6 +169,7 @@ void OpenConfig()
         config.read("release", FileRelease, curRelease);
         config.read("full-screen", resBool, false);
         config.read("record-gameplay", g_config.RecordGameplayData, false);
+        config.read("use-native-osk", g_config.use_native_osk, false);
         config.endGroup();
 
         config.beginGroup("recent");
@@ -223,6 +224,7 @@ void SaveConfig()
     config.setValue("full-screen", resChanged);
 #endif
     config.setValue("record-gameplay", g_config.RecordGameplayData);
+    config.setValue("use-native-osk", g_config.use_native_osk);
     config.endGroup();
 
     config.beginGroup("recent");

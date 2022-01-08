@@ -159,7 +159,7 @@ public class thextechActivity extends SDLActivity
         System.exit(0);
     }
 
-    private void requestCheatShow()
+    private void requestTextShow()
     {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.cheat_dialog_title);
@@ -175,7 +175,7 @@ public class thextechActivity extends SDLActivity
             @Override
             public void onClick(DialogInterface dialog, int which)
             {
-                cheats_setBuffer(input.getText().toString());
+                textentry_setBuffer(input.getText().toString());
                 messageboxSelection[0] = 1;
                 dialog.dismiss();
             }
@@ -204,7 +204,7 @@ public class thextechActivity extends SDLActivity
         dialog.show();
     }
 
-    public void requestCheat()
+    public void requestText()
     {
         messageboxSelection[0] = -1;
 
@@ -212,7 +212,7 @@ public class thextechActivity extends SDLActivity
         {
             @Override
             public void run() {
-                requestCheatShow();
+                requestTextShow();
             }
         });
 
@@ -229,5 +229,5 @@ public class thextechActivity extends SDLActivity
     public static native void setAppDataPath(String path);
     public static native void setGameAssetsPath(String path);
     // Send the cheat buffer line
-    public static native void cheats_setBuffer(String line);
+    public static native void textentry_setBuffer(String line);
 }
