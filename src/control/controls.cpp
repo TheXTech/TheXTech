@@ -878,7 +878,7 @@ StatusInfo GetStatus(int player)
 
 void RenderTouchControls()
 {
-#ifndef NO_SDL
+#ifdef TOUCHSCREEN_H
     // only want to render when the touchscreen is in use
     InputMethod_TouchScreen* active_touchscreen = nullptr;
     int player_no = 1;
@@ -918,13 +918,20 @@ void RenderTouchControls()
     if(!touchscreen)
         return;
 
+    // This is also called within Controls::Update.
+    //   We also need to call here, because of cases
+    //   such as GameThing where Controls::Update is
+    //   not called.
+    //   Will result in duplicated calls many frames,
+    //   but this is not a problem.
+    touchscreen->m_controller.update();
     touchscreen->m_controller.render(player_no);
-#endif
+#endif // #ifdef TOUCHSCREEN_H
 }
 
 void UpdateTouchScreenSize()
 {
-#ifndef NO_SDL
+#ifdef TOUCHSCREEN_H
     InputMethodType_TouchScreen* touchscreen = nullptr;
     for(InputMethodType* type : g_InputMethodTypes)
     {
@@ -942,7 +949,7 @@ void UpdateTouchScreenSize()
         return;
 
     touchscreen->m_controller.updateScreenSize();
-#endif
+#endif // #ifdef TOUCHSCREEN_H
 }
 
 } // namespace Controls

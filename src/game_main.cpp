@@ -1550,7 +1550,7 @@ void StartEpisode()
     XRender::repaint();
     StopMusic();
     XEvents::doEvents();
-    // TODO: did Wohlstand change this?
+    // Note: this causes the rendered touchscreen controller to freeze with button pressed.
     PGE_Delay(500);
     ClearGame();
 
