@@ -2200,6 +2200,8 @@ void UpdateGraphics(bool skipRepaint)
                 // TODO: use the improved code from multires
                 if(GamePaused == PauseCode::Message)
                 {
+                    XRender::offsetViewportIgnore(true);
+
                         X = 0;
                         Y = 0;
 
@@ -2286,6 +2288,7 @@ void UpdateGraphics(bool skipRepaint)
                         XRender::renderTexture(400 - GFX.TextBox.w / 2 + X, BoxY + Y + Y, GFX.TextBox.w, 10, GFX.TextBox, 0, GFX.TextBox.h - 10);
                 }
     //            ElseIf GameOutro = False Then
+                XRender::offsetViewportIgnore(false);
             }
 
             else if(!GameOutro)
@@ -2797,6 +2800,7 @@ void UpdateGraphics(bool skipRepaint)
         if(ShowOnScreenMeta)
         {
             // TODO: VERIFY THIS
+            XRender::offsetViewportIgnore(true);
             if(ScreenType == 5 && numScreens == 1)
             {
                 speedRun_renderControls(1, -1);
@@ -2804,12 +2808,14 @@ void UpdateGraphics(bool skipRepaint)
             }
             else
                 speedRun_renderControls(Z, Z);
+            XRender::offsetViewportIgnore(false);
         }
 //    Next Z
     } // For(Z, 2, numScreens)
 
     g_levelScreenFader.draw();
 
+    XRender::offsetViewportIgnore(true);
     speedRun_renderTimer();
 
     // render special screens
@@ -2828,6 +2834,8 @@ void UpdateGraphics(bool skipRepaint)
     // render the mouse
     if(GamePaused != PauseCode::None && GamePaused != PauseCode::Message)
         XRender::renderTexture(int(SharedCursor.X), int(SharedCursor.Y), GFX.ECursor[2]);
+
+    XRender::offsetViewportIgnore(false);
 
     if(!skipRepaint)
         XRender::repaint();
