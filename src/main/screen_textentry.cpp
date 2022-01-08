@@ -566,7 +566,7 @@ Java_ru_wohlsoft_thextech_thextechActivity_textentry_1setBuffer(JNIEnv *env, jcl
     const char *line;
     (void)clazz;
     line = env->GetStringUTFChars(line_j, nullptr);
-    Text = (std::string)line;
+    TextEntryScreen::Text = (std::string)line;
     env->ReleaseStringUTFChars(line_j, line);
 }
 
