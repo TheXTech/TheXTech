@@ -388,9 +388,9 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                     if(Player[whatPlayer].Character == 5)
                     {
                         nn.Type = 251;
-                        if(iRand(20) < 3)
+                        if(iRandN(20) < 3)
                             nn.Type = 252;
-                        if(iRand(60) < 3)
+                        if(iRandN(60) < 3)
                             nn.Type = 253;
                         PlaySound(SFX_ZeldaRupee);
                     }
