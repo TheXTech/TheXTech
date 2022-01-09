@@ -1060,7 +1060,7 @@ void NPCFrames(int A)
             NPC[A].Frame += 6;
         else // If .Special3 >= 16 Then
             NPC[A].Special3 = 0;
-        if(iRand(100) >= 92)
+        if(iRandN(100) >= 92)
         {
             NewEffect(80, newLoc(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - 4, NPC[A].Location.Y + NPC[A].Location.Height / 2.0 - 6), 1, 0, NPC[A].Shadow);
             Effect[numEffects].Location.SpeedX = dRand() * 1 - 0.5;

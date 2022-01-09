@@ -351,9 +351,9 @@ void NPCHit(int A, int B, int C)
                 NPC[A].Type = 251;
             NPC[A].Location.SpeedX = (1 + dRand() * 0.5) * Player[C].Direction;
             NPC[A].Location.SpeedY = -5;
-            if(iRand(20) < 3)
+            if(iRandN(20) < 3)
                 NPC[A].Type = 252;
-            if(iRand(40) < 3)
+            if(iRandN(40) < 3)
                 NPC[A].Type = 253;
             NPC[A].Location.X += NPC[A].Location.Width / 2.0;
             NPC[A].Location.Y += NPC[A].Location.Height;

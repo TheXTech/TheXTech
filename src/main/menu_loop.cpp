@@ -96,7 +96,7 @@ static void updateIntroLevelActivity()
 
         if(p.HoldingNPC ==0)
         {
-            if((p.State == 3 || p.State == 6 || p.State == 7) && iRand(100) >= 90)
+            if((p.State == 3 || p.State == 6 || p.State == 7) && iRandN(100) >= 90)
             {
                 if(p.FireBallCD == 0 && !p.RunRelease)
                     p.Controls.Run = false;
@@ -375,14 +375,14 @@ static void updateIntroLevelActivity()
         {
             if(p.Location.SpeedY == 0.0 || p.Slope > 0)
                 p.CanJump = true;
-            if(iRand(100) >= 98 || p.Location.SpeedY == 0.0 || p.Slope > 0)
+            if(iRandN(100) >= 98 || p.Location.SpeedY == 0.0 || p.Slope > 0)
                 p.Controls.Jump = true;
         }
 
-        if(iRand(20) == 0 && Player[A].HoldingNPC == 0 && !Player[A].Slide && Player[A].CanAltJump && Player[A].Mount == 0)
+        if(iRandN(20) == 0 && Player[A].HoldingNPC == 0 && !Player[A].Slide && Player[A].CanAltJump && Player[A].Mount == 0)
             Player[A].Controls.AltJump = true;
 
-        if(iRand(1000) == 0 && !Player[A].CanFly2)
+        if(iRandN(1000) == 0 && !Player[A].CanFly2)
             Player[A].Controls.Run = false;
 
         if(Player[A].Mount == 3 && iRand(50) == 0 && !Player[A].RunRelease)

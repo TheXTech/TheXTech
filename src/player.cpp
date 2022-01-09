@@ -3904,7 +3904,7 @@ void WaterCheck(const int A)
     }
     else if(p.Wet == 2 && p.Quicksand == 0)
     {
-        if(iRand(100) >= 97)
+        if(iRandN(100) >= 97)
         {
             if(p.Direction == 1)
                 tempLocation = newLoc(p.Location.X + p.Location.Width - dRand() * 8, p.Location.Y + 4 + dRand() * 8, 8, 8);
