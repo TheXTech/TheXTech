@@ -79,24 +79,6 @@ int iRand(int max)
     return g_random_engine() % max;
 }
 
-int iRandN(int max)
-{
-    g_random_n_calls ++;
-#ifdef DEBUG_RANDOM_CALLS
-    void* stack[2] = {nullptr, nullptr};
-    backtrace(stack, 2);
-    g_random_calls.push_back(stack[1]);
-#endif
-
-    if(max == 0)
-    {
-        g_random_engine();
-        return 0;
-    }
-
-    return g_random_engine() % (max + 1);
-}
-
 double dRand()
 {
     g_random_n_calls ++;

@@ -58,17 +58,9 @@ extern double dRand();
 /**
  * @brief Random number generator in integer format, between 0 to argument max (exclusive)
  * Distribution equivalent to `Int(dRand() * max)`
- * @param max Maximum number value
- * @return random integer value (maximum value max - 1)
+ * @return random integer value
  */
 extern int iRand(int max);
-
-/**
- * @brief Random number generator in integer format, between 0 to argument max (exclusive)
- * @param max Maximum number value
- * @return random integer value (maximum value max)
- */
-extern int iRandN(int max);
 
 /**
  * @brief Random number generator in integer format, between 0 to argument max (inclusive)

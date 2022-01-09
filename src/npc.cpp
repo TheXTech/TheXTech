@@ -1249,7 +1249,7 @@ void NPCSpecial(int A)
             do
             {
                 // TODO: COMPAT BUGFIX
-                int i = iRand(numPlayers) + 1; // always 1
+                int i = iRand(1) * numPlayers + 1; // always 1
                 if(!Player[i].Dead && Player[i].Section == npc.Section && Player[i].TimeToLive == 0)
                     npc.Special5 = i;
                 C += 1;
@@ -1480,13 +1480,13 @@ void NPCSpecial(int A)
                 npc.Special3 += 1;
                 npc.Special4 += 1;
 
-                if(npc.Special3 > 100 + iRandN(200))
+                if(npc.Special3 > 100 + iRand(200))
                 {
                     npc.Special3 = 0;
                     npc.Location.SpeedX = 0;
                     npc.Location.SpeedY = -5;
                 }
-                else if(npc.Special4 > 20 + iRandN(200))
+                else if(npc.Special4 > 20 + iRand(200))
                 {
                     npc.Special4 = 0;
                     npc.Special = -10;
@@ -1794,7 +1794,7 @@ void NPCSpecial(int A)
             double E;
             npc.Special2 += 1;
 
-            if(npc.Special2 > 80 + iRandN(20))
+            if(npc.Special2 > 80 + iRand(20))
             {
                 npc.Special = 1;
                 C = 0;
@@ -2210,7 +2210,7 @@ void NPCSpecial(int A)
         {
             npc.Special3 += 1;
 
-            if(npc.Special3 > 160 + iRandN(140))
+            if(npc.Special3 > 160 + iRand(140))
             {
                 npc.Special = 1;
                 npc.Special3 = 0;
@@ -2257,7 +2257,7 @@ void NPCSpecial(int A)
                 NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * (1 - (npc.Special3 / 140));
             }
 
-            if(npc.Special3 > 120 + iRandN(40))
+            if(npc.Special3 > 120 + iRand(40))
             {
                 npc.Special = 0;
                 npc.Special3 = 0;
@@ -2534,7 +2534,7 @@ void NPCSpecial(int A)
 
         npc.Special5 = D;
 
-        if(iRandN(300) >= 297 && npc.Special == 0.0)
+        if(iRand(300) >= 297 && npc.Special == 0.0)
             npc.Special = 1;
 
         npc.Special4 += 1;
@@ -2542,7 +2542,7 @@ void NPCSpecial(int A)
         if(npc.Inert)
             npc.Special4 = 150;
 
-        if(npc.Special4 <= 80 + iRandN(40))
+        if(npc.Special4 <= 80 + iRand(40))
         {
             if((iRand(100) >= 40) && int(npc.Special4) % 16 == 0)
             {
@@ -2563,7 +2563,7 @@ void NPCSpecial(int A)
                 NPC[numNPCs].Location.SpeedX = 3 * NPC[numNPCs].Direction;
             }
         }
-        else if(npc.Special4 > 300 + iRandN(50))
+        else if(npc.Special4 > 300 + iRand(50))
             npc.Special4 = 0;
 
         if(npc.Inert)
@@ -3102,7 +3102,7 @@ void SpecialNPC(int A)
     }
     else if(NPC[A].Type == 237 || NPC[A].Type == 263) // Yoshi Ice
     {
-        if(iRandN(100) >= 93)
+        if(iRand(100) >= 93)
         {
             tempLocation.Height = EffectHeight[80];
             tempLocation.Width = EffectWidth[80];
@@ -3112,7 +3112,6 @@ void SpecialNPC(int A)
             tempLocation.Y = NPC[A].Location.Y - tempLocation.Height / 2.0 + dRand() * NPC[A].Location.Height - 4;
             NewEffect(80, tempLocation);
         }
-
         if(NPC[A].Projectile)
         {
             if(iRand(5) == 0)
@@ -3893,7 +3892,7 @@ void SpecialNPC(int A)
                 NPC[A].Location.Height = 54;
             }
             NPC[A].Special2 += dRand() * 2;
-            if(NPC[A].Special2 >= 250 + iRandN(250))
+            if(NPC[A].Special2 >= 250 + iRand(250))
             {
                 NPC[A].Special = 2;
                 NPC[A].Special2 = 0;
@@ -3916,7 +3915,7 @@ void SpecialNPC(int A)
                 NPC[A].Location.Height = 40;
             }
             NPC[A].Special2 += dRand() * 2;
-            if(NPC[A].Special2 >= 100 + iRandN(100))
+            if(NPC[A].Special2 >= 100 + iRand(100))
             {
                 NPC[A].Special = 3;
                 NPC[A].Special2 = 0;
@@ -4159,7 +4158,7 @@ void SpecialNPC(int A)
     else if(NPC[A].Type == 84 || NPC[A].Type == 181)
     {
         NPC[A].Special += 1;
-        if(NPC[A].Special > 200 + iRandN(200))
+        if(NPC[A].Special > 200 + iRand(200))
         {
             NPC[A].Special = 0;
             numNPCs++;

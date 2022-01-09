@@ -202,14 +202,14 @@ void KillNPC(int A, int B)
             PlaySound(SFX_ZeldaKill);
             NewEffect(63 , NPC[A].Location);
             B = 9;
-            if(iRandN(10) < 3)
+            if(iRand(10) < 3)
             {
                 numNPCs++;
                 NPC[numNPCs] = NPC_t();
                 NPC[numNPCs].Type = 251;
                 if(iRand(5) == 0)
                     NPC[numNPCs].Type = 252;
-                if(iRandN(40) < 3)
+                if(iRand(40) < 3)
                     NPC[numNPCs].Type = 253;
                 NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
                 NPC[numNPCs].Location.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
