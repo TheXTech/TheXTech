@@ -213,7 +213,7 @@ void resetFrameTimer()
 #else
     s_goalTime = SDL_GetTicks() + 1000;
 #endif
-    D_pLogDebugNA("Time counter reset was called");
+    // D_pLogDebugNA("Time counter reset was called");
 }
 
 void resetTimeBuffer()

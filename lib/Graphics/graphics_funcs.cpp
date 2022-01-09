@@ -48,7 +48,7 @@ void GraphicsHelps::closeFreeImage()
     FreeImage_DeInitialise();
 }
 
-FIBITMAP *GraphicsHelps::loadImage(std::string file, bool convertTo32bit)
+FIBITMAP *GraphicsHelps::loadImage(const std::string &file, bool convertTo32bit)
 {
 #ifdef DEBUG_BUILD
     ElapsedTimer loadingTime;

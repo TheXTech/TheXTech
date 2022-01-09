@@ -76,7 +76,7 @@ int iRand(int max)
         return 0;
     }
 
-    return g_random_engine() % max;
+    return g_random_engine() % (max + 1);
 }
 
 double dRand()

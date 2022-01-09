@@ -59,7 +59,7 @@ public:
      * \param convertTo32bit need to convert image into 32bit RGBA
      * \return FreeImage descriptor to loaded image
      */
-    static FIBITMAP *loadImage(std::string file, bool convertTo32bit = true);
+    static FIBITMAP *loadImage(const std::string &file, bool convertTo32bit = true);
     static FIBITMAP *loadImage(std::vector<char> &raw, bool convertTo32bit = true);
     /*!
      * \brief Loads image from application resources

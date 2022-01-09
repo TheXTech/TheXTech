@@ -222,25 +222,32 @@ jobs:
       # ======================================= Super Mario Bros. X - a fan-game =======================================
       # Was made in 2009 by Andrew Spinks "Redigit", and supported up to 2011 by it's original author.
       run: |
+        if [[ "${BRANCH_NAME}" == *"merge"* ]]; then
+            BRANCH_NAME_RES="pull-request"
+            echo "-- Pull-request detected!"
+        else
+            BRANCH_NAME_RES=${BRANCH_NAME}
+        fi
+
         bash .github/ci-helper/pack-game.sh \
             "${{ runner.os }}" \
             "thextech-adventures-of-demo" \
             "advdemo${{ matrix.config.executable_name_suffix }}" \
-            "thextech-adventures-of-demo-${{ matrix.config.package_filename_suffix }}-${BRANCH_NAME}" \
+            "thextech-adventures-of-demo-${{ matrix.config.package_filename_suffix }}-${BRANCH_NAME_RES}" \
             "aod"
 
         bash .github/ci-helper/pack-game.sh \
             "${{ runner.os }}" \
             "thextech-super-mario-bros-x" \
             "smbx${{ matrix.config.executable_name_suffix }}" \
-            "thextech-super-mario-bros-x-${{ matrix.config.package_filename_suffix }}-${BRANCH_NAME}" \
+            "thextech-super-mario-bros-x-${{ matrix.config.package_filename_suffix }}-${BRANCH_NAME_RES}" \
             "smbx13"
 
         bash .github/ci-helper/pack-game.sh \
             "${{ runner.os }}" \
             "thextech-bin" \
             "thextech${{ matrix.config.executable_name_suffix }}" \
-            "thextech-bin-${{ matrix.config.package_filename_suffix }}-${BRANCH_NAME}" \
+            "thextech-bin-${{ matrix.config.package_filename_suffix }}-${BRANCH_NAME_RES}" \
             "none"
 
     - name: Upload artifact

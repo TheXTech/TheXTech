@@ -2155,7 +2155,7 @@ static void processCheats()
     auto bufLen = s_buffer.getBugLen();
     bool cheated = false;
 
-    D_pLogDebug("Cheat buffer [%s]\n", buf);
+    // D_pLogDebug("Cheat buffer [%s]\n", buf);
 
     for(const auto &c : s_cheatsListGlobal)
     {
