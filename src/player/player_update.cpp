@@ -1678,7 +1678,7 @@ void UpdatePlayer()
                             else
 #endif
                             {
-                                if(iRandN(10) >= 3)
+                                if(iRand(10) >= 3)
                                 {
                                     tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height - 2 + dRand() * (NPC[Player[A].StandingOnNPC].Location.Height - 8) + 4;
                                     tempLocation.X = Player[A].Location.X - 4 + dRand() * (Player[A].Location.Width - 8) + 4 - 8 * Player[A].Direction;

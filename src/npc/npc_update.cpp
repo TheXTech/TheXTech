@@ -1097,7 +1097,7 @@ void UpdateNPCs()
                         }
                         if(NPC[A].Type == 237 || NPC[A].Type == 263) // Yoshi Ice
                         {
-                            if(iRandN(100) >= 93)
+                            if(iRand(100) >= 93)
                             {
                                 tempLocation.Height = EffectHeight[80];
                                 tempLocation.Width = EffectWidth[80];

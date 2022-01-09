@@ -574,7 +574,7 @@ void UpdateEffects()
                     if(e.Frame >= 4)
                         e.Frame = 0;
                 }
-            if(e.Type == 148 && iRandN(10) >= 8)
+            if(e.Type == 148 && iRand(10) >= 8)
             {
                 NewEffect(77, e.Location, 3);
                 Effect[numEffects].Location.SpeedX = dRand() * 3 - 1.5;
