@@ -76,8 +76,8 @@ struct ScreenShake_t
             {
             default:
             case SHAKE_RANDOM:
-                offsetX = iRand(forceX * 4) - forceX * 2;
-                offsetY = iRand(forceY * 4) - forceY * 2;
+                offsetX = iRand2(forceX * 4) - forceX * 2;
+                offsetY = iRand2(forceY * 4) - forceY * 2;
                 break;
             case SHAKE_SEQUENTIAL:
                 offsetX = forceX > 0 ? (int)round(sign * forceX) : 0;

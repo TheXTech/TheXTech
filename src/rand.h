@@ -32,6 +32,9 @@
 extern std::vector<void*> g_random_calls;
 #endif
 
+extern void start_rand_track(const char *filePath);
+extern void stop_rand_track();
+
 /**
  * @brief Seeds the random number generator with argument seed for reproducible results
  */
@@ -54,6 +57,7 @@ extern long random_ncalls();
  * @return random double value
  */
 extern double dRand();
+extern double dRand2();
 
 /**
  * @brief Random number generator in integer format, between 0 to argument max (exclusive)
@@ -61,6 +65,7 @@ extern double dRand();
  * @return random integer value
  */
 extern int iRand(int max);
+extern int iRand2(int max);
 
 /**
  * @brief Random number generator in integer format, between 0 to argument max (inclusive)
@@ -68,14 +73,9 @@ extern int iRand(int max);
  * Distribution equivalent to implicitly casting `dRand() * max` to an Int in vb6
  * @return random integer value
  */
-inline int iRand_round(int max)
-{
-    // let 0 represent top endpoint, otherwise use iRand(max*2)/2.
-    int i = iRand(max*2);
-    if(i == 0)
-        return max;
-    return i/2;
-}
+extern int iRand_round(int max);
+
+extern int iRand_round2(int max);
 
 
 #endif // RAND_H

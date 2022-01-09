@@ -38,6 +38,8 @@ void Sync();
 
 void EndRecording();
 
+int64_t getFrameNo();
+
 } // namespace Record
 
 #endif // #ifndef RECORD_H

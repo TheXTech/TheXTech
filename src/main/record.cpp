@@ -95,6 +95,7 @@ static FILE* record_file = nullptr;
 static FILE* replay_file = nullptr;
 //! Externally providen level file path for the replay
 static std::string replayLevelFilePath;
+static std::string replayRecordingFilePath;
 
 static const int c_recordVersion = 2;
 
@@ -398,9 +399,7 @@ static void read_control()
 
     // replicate the controls changes in the new recording
     if(record_file)
-    {
         fprintf(record_file, " %" PRId64 "\r\nC%c%d%c\r\n", frame_no, mode, p, key);
-    }
 }
 
 static void write_status()
@@ -723,7 +722,7 @@ void InitRecording()
 
     std::string filename = makeRecordPrefix();
 
-    if(!record_file)
+    if(!record_file && !replay_file)
         record_file = Files::utf8_fopen(filename.c_str(), "wb");
 
     // start of gameplay data
@@ -731,6 +730,8 @@ void InitRecording()
 
     if(replay_file)
     {
+        std::string rvf = replayRecordingFilePath + "-rand-verify.txt";
+        start_rand_track(rvf.c_str());
         read_header();
         if(!fscanf(replay_file, "%" PRId64 "\r\n", &next_record_frame))
         {
@@ -753,6 +754,7 @@ void LoadReplay(const std::string &recording_path, const std::string &level_path
     if(LevelEditor || GameMenu || GameOutro)
         return;
 
+    replayRecordingFilePath = recording_path;
     replayLevelFilePath = level_path;
 
     // figure out how many runs have already happened
@@ -789,6 +791,8 @@ void EndRecording()
 
         fclose(replay_file);
         replay_file = nullptr;
+
+        stop_rand_track();
 
         GameIsActive = false;
     }
@@ -861,6 +865,11 @@ void Sync()
     }
 
     frame_no++;
+}
+
+int64_t getFrameNo()
+{
+    return frame_no;
 }
 
 } // namespace Record

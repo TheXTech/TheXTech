@@ -210,7 +210,7 @@ void UpdateEffects()
                 e.Frame = 0;
             }
             e.Location.Y -= 2;
-            e.Location.X += dRand() * 2.0 - 1.0;
+            e.Location.X += dRand2() * 2.0 - 1.0;
         }
         else if(e.Type == 57) // egg shells
         {
