@@ -48,6 +48,25 @@ struct StdPictureData
     //! Number of colors
     GLint       nOfColors = 0;
 
+    //! Enable the software simulation of the bitmask renderer to support some graphical tricks
+    bool        bitmask = false;
+
+    uint8_t     *mask_back = nullptr;
+    int         mask_back_pitch = 0;
+    int         mask_back_w = 0;
+    int         mask_back_h = 0;
+
+    uint8_t     *mask_front = nullptr;
+    int         mask_front_pitch = 0;
+    int         mask_front_w = 0;
+    int         mask_front_h = 0;
+
+    uint8_t     *mask_render_buffer = nullptr;
+    uint8_t     mask_render_buffer_pitch = 0;
+    uint8_t     mask_render_buffer_w = 0;
+    uint8_t     mask_render_buffer_h = 0;
+    SDL_Texture *mask_render = nullptr;
+
     //! Cached color modifier
     uint8_t     modColor[4] = {255,255,255,255};
 
@@ -55,12 +74,28 @@ struct StdPictureData
 
     inline bool hasTexture()
     {
-        return texture != nullptr;
+        return texture != nullptr || bitmask;
     }
 
     inline void clear()
     {
         texture = nullptr;
+        bitmask = false;
+
+        mask_back = nullptr;
+        mask_back_pitch = 0;
+        mask_back_w = 0;
+        mask_back_h = 0;
+
+        mask_front = nullptr;
+        mask_front_pitch = 0;
+        mask_front_w = 0;
+        mask_front_h = 0;
+
+        mask_render_buffer = nullptr;
+        mask_render_buffer_pitch = 0;
+        mask_render_buffer_w = 0;
+        mask_render_buffer_h = 0;
     }
 };
 

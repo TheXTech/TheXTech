@@ -48,7 +48,7 @@ void GraphicsHelps::closeFreeImage()
     FreeImage_DeInitialise();
 }
 
-FIBITMAP *GraphicsHelps::loadImage(std::string file, bool convertTo32bit)
+FIBITMAP *GraphicsHelps::loadImage(const std::string &file, bool convertTo32bit)
 {
 #ifdef DEBUG_BUILD
     ElapsedTimer loadingTime;
@@ -149,6 +149,48 @@ FIBITMAP *GraphicsHelps::loadImage(std::vector<char> &raw, bool convertTo32bit)
     }
 
     return img;
+}
+
+FIBITMAP *GraphicsHelps::loadMask(const std::string &file, bool maskIsPng, bool convertTo32bit)
+{
+    FIBITMAP *mask;
+
+    if(file.empty())
+        return nullptr; //Nothing to do
+    mask = loadImage(file, convertTo32bit);
+
+    if(!mask)
+        return nullptr;//Nothing to do
+
+    if(maskIsPng)
+    {
+        FIBITMAP *front = FreeImage_Copy(mask, 0, 0, int(FreeImage_GetWidth(mask)), int(FreeImage_GetHeight(mask)));
+        getMaskFromRGBA(front, mask);
+        closeImage(front);
+    }
+
+    return mask;
+}
+
+FIBITMAP *GraphicsHelps::loadMask(std::vector<char> &raw, bool maskIsPng, bool convertTo32bit)
+{
+    FIBITMAP *mask;
+
+    if(raw.empty())
+        return nullptr; //Nothing to do
+    mask = loadImage(raw, convertTo32bit);
+
+    if(!mask)
+        return nullptr;//Nothing to do
+
+    if(maskIsPng)
+    {
+        FIBITMAP *front = FreeImage_Copy(mask, 0, 0, int(FreeImage_GetWidth(mask)), int(FreeImage_GetHeight(mask)));
+        getMaskFromRGBA(front, mask);
+        closeImage(front);
+    }
+
+    return mask;
 }
 
 //FIBITMAP *GraphicsHelps::loadImageRC(const char *file)
@@ -457,6 +499,57 @@ bool GraphicsHelps::validateFor2xScaleDown(FIBITMAP *image, const std::string &o
 
     D_pLogDebug("Texture CAN be shrank (%s)", origPath.c_str());
     return true;
+}
+
+bool GraphicsHelps::validateBitmaskRequired(FIBITMAP *image, FIBITMAP *mask, const std::string &origPath)
+{
+    if(!image || !mask)
+        return false;
+
+    (void)origPath; // supress warning when build the release build
+
+    auto fw = static_cast<uint32_t>(FreeImage_GetWidth(image));
+    auto fh = static_cast<uint32_t>(FreeImage_GetHeight(image));
+    auto fpitch = static_cast<uint32_t>(FreeImage_GetPitch(image));
+    BYTE *fimg_bits  = FreeImage_GetBits(image);
+
+    auto bw = static_cast<uint32_t>(FreeImage_GetWidth(mask));
+    auto bh = static_cast<uint32_t>(FreeImage_GetHeight(mask));
+    auto bpitch = static_cast<uint32_t>(FreeImage_GetPitch(mask));
+    BYTE *bimg_bits  = FreeImage_GetBits(mask);
+
+    BYTE *line1 = fimg_bits;
+    BYTE *line2 = bimg_bits;
+
+    BYTE black[3] = {0x00, 0x00, 0x00};
+    BYTE white[3] = {0xFF, 0xFF, 0xFF};
+
+    for(uint32_t y = 0; y < fh && y < bh; ++y)
+    {
+        for(uint32_t x = 0; x < fw && x < bw; ++x)
+        {
+            BYTE *fp = line1 + (y * fpitch) + (x * 4);
+            BYTE *bp = line2 + (y * bpitch) + (x * 4);
+
+            // pixel is black
+            if(SDL_memcmp(bp, black, 3) == 0)
+                continue;
+
+            // pixel is white
+            if(SDL_memcmp(bp, white, 3) == 0)
+                continue;
+
+            // pixel is matching with the front (i.e. is not an example of the lazily-made sprite)
+            if(SDL_memcmp(bp, fp, 3) == 0)
+                continue;
+
+            D_pLogDebug("Texture REQUIRES the bitmask render (%s)", origPath.c_str());
+            return true;
+        }
+    }
+
+    D_pLogDebug("Texture doesn't require bitmask render (%s)", origPath.c_str());
+    return false;
 }
 
 bool GraphicsHelps::setWindowIcon(SDL_Window *window, FIBITMAP *img, int iconSize)

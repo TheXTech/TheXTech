@@ -146,6 +146,23 @@ void AbstractRender_t::close()
 #endif
 }
 
+static void setUpLowColors(StdPicture &target, FIBITMAP *sourceImage)
+{
+    int h = FreeImage_GetHeight(sourceImage);
+
+    RGBQUAD upperColor;
+    FreeImage_GetPixelColor(sourceImage, 0, 0, &upperColor);
+    target.ColorUpper.r = upperColor.rgbRed;
+    target.ColorUpper.b = upperColor.rgbBlue;
+    target.ColorUpper.g = upperColor.rgbGreen;
+
+    RGBQUAD lowerColor;
+    FreeImage_GetPixelColor(sourceImage, 0, static_cast<unsigned int>(h - 1), &lowerColor);
+    target.ColorLower.r = lowerColor.rgbRed;
+    target.ColorLower.b = lowerColor.rgbBlue;
+    target.ColorLower.g = lowerColor.rgbGreen;
+}
+
 StdPicture AbstractRender_t::LoadPicture(const std::string &path,
                                          const std::string &maskPath,
                                          const std::string &maskFallbackPath)
@@ -198,17 +215,29 @@ StdPicture AbstractRender_t::LoadPicture(const std::string &path,
 #ifdef DEBUG_BUILD
         maskMergingTime.start();
 #endif
-        GraphicsHelps::mergeWithMask(sourceImage, maskPath);
+        FIBITMAP *mask = GraphicsHelps::loadMask(maskPath, false);
+        if(mask)
+        {
+            GraphicsHelps::validateBitmaskRequired(sourceImage, mask, StdPictureGetOrigPath(target));
+            GraphicsHelps::mergeWithMask(sourceImage, mask);
+            GraphicsHelps::closeImage(mask);
+        }
 #ifdef DEBUG_BUILD
         maskElapsed = maskMergingTime.nanoelapsed();
 #endif
     }
-    else if(useMask && !maskFallbackPath.empty())
+    else if(useMask && !maskFallbackPath.empty() && Files::fileExists(maskFallbackPath))
     {
 #ifdef DEBUG_BUILD
         maskMergingTime.start();
 #endif
-        GraphicsHelps::mergeWithMask(sourceImage, "", maskFallbackPath);
+        FIBITMAP *mask = GraphicsHelps::loadMask(maskPath, false);
+        if(mask)
+        {
+            GraphicsHelps::validateBitmaskRequired(sourceImage, mask, StdPictureGetOrigPath(target));
+            GraphicsHelps::mergeWithMask(sourceImage, mask);
+            GraphicsHelps::closeImage(mask);
+        }
 #ifdef DEBUG_BUILD
         maskElapsed = maskMergingTime.nanoelapsed();
 #endif
@@ -348,7 +377,7 @@ StdPicture AbstractRender_t::lazyLoadPicture(const std::string &path,
         dumpFullFile(target.l.rawMask, maskPath);
         target.l.isMaskPng = false; //-V1048
     }
-    else if(useMask && !maskFallbackPath.empty())
+    else if(useMask && !maskFallbackPath.empty() && Files::fileExists(maskFallbackPath))
     {
         dumpFullFile(target.l.rawMask, maskFallbackPath);
         target.l.isMaskPng = true;
@@ -374,7 +403,58 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
     }
 
     if(!target.l.rawMask.empty())
-        GraphicsHelps::mergeWithMask(sourceImage, target.l.rawMask, target.l.isMaskPng);
+    {
+        FIBITMAP *mask = GraphicsHelps::loadMask(target.l.rawMask, target.l.isMaskPng);
+        if(mask)
+        {
+            if(!GraphicsHelps::validateBitmaskRequired(sourceImage, mask, StdPictureGetOrigPath(target)))
+            {
+                GraphicsHelps::mergeWithMask(sourceImage, mask);
+                GraphicsHelps::closeImage(mask);
+            }
+            else
+            {
+                // Software bitmask render
+                target.d.bitmask = true;
+                int size;
+                FIBITMAP *front = FreeImage_ConvertTo24Bits(sourceImage);
+                FIBITMAP *back = FreeImage_ConvertTo24Bits(mask);
+                GraphicsHelps::closeImage(mask);
+                GraphicsHelps::closeImage(sourceImage);
+
+                FreeImage_FlipVertical(front);
+                FreeImage_FlipVertical(back);
+
+                target.d.mask_front_pitch = FreeImage_GetPitch(front);
+                target.d.mask_front_w = FreeImage_GetWidth(front);
+                target.d.mask_front_h = FreeImage_GetHeight(front);
+                size = target.d.mask_front_pitch * target.d.mask_front_h;
+                target.d.mask_front = (uint8_t*)SDL_malloc(size);
+                SDL_memcpy(target.d.mask_front, FreeImage_GetBits(front), size);
+                m_lazyLoadedBytes += size;
+
+                target.d.mask_back_pitch = FreeImage_GetPitch(back);
+                target.d.mask_back_w = FreeImage_GetWidth(back);
+                target.d.mask_back_h = FreeImage_GetHeight(back);
+                size = target.d.mask_back_pitch * target.d.mask_back_h;
+                target.d.mask_back = (uint8_t*)SDL_malloc(size);
+                SDL_memcpy(target.d.mask_back, FreeImage_GetBits(back), size);
+                m_lazyLoadedBytes += size;
+
+                target.d.mask_render_buffer_w = SDL_max(target.d.mask_front_w, target.d.mask_back_w);
+                target.d.mask_render_buffer_h = SDL_max(target.d.mask_front_h, target.d.mask_back_h);
+                target.d.mask_render_buffer_pitch = SDL_max(target.d.mask_front_pitch, target.d.mask_back_pitch);
+                size = target.d.mask_render_buffer_pitch * target.d.mask_render_buffer_h;
+                target.d.mask_render_buffer = (uint8_t*)SDL_malloc(size);
+
+                setUpLowColors(target, front);
+
+                GraphicsHelps::closeImage(front);
+                GraphicsHelps::closeImage(back);
+                return;
+            }
+        }
+    }
 
     uint32_t w = static_cast<uint32_t>(FreeImage_GetWidth(sourceImage));
     uint32_t h = static_cast<uint32_t>(FreeImage_GetHeight(sourceImage));
@@ -394,17 +474,7 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
     if(!target.l.rawMask.empty())
         m_lazyLoadedBytes += (w * h * 4);
 
-    RGBQUAD upperColor;
-    FreeImage_GetPixelColor(sourceImage, 0, 0, &upperColor);
-    target.ColorUpper.r = float(upperColor.rgbRed) / 255.0f;
-    target.ColorUpper.b = float(upperColor.rgbBlue) / 255.0f;
-    target.ColorUpper.g = float(upperColor.rgbGreen) / 255.0f;
-
-    RGBQUAD lowerColor;
-    FreeImage_GetPixelColor(sourceImage, 0, static_cast<unsigned int>(h - 1), &lowerColor);
-    target.ColorLower.r = float(lowerColor.rgbRed) / 255.0f;
-    target.ColorLower.b = float(lowerColor.rgbBlue) / 255.0f;
-    target.ColorLower.g = float(lowerColor.rgbGreen) / 255.0f;
+    setUpLowColors(target, sourceImage);
 
     FreeImage_FlipVertical(sourceImage);
     target.w = static_cast<int>(w);

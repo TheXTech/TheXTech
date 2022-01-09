@@ -59,8 +59,11 @@ public:
      * \param convertTo32bit need to convert image into 32bit RGBA
      * \return FreeImage descriptor to loaded image
      */
-    static FIBITMAP *loadImage(std::string file, bool convertTo32bit = true);
+    static FIBITMAP *loadImage(const std::string &file, bool convertTo32bit = true);
     static FIBITMAP *loadImage(std::vector<char> &raw, bool convertTo32bit = true);
+
+    static FIBITMAP *loadMask(const std::string &file, bool maskIsPng, bool convertTo32bit = true);
+    static FIBITMAP *loadMask(std::vector<char> &raw, bool maskIsPng, bool convertTo32bit = true);
     /*!
      * \brief Loads image from application resources
      * \param file in-resource path to the file
@@ -128,6 +131,15 @@ public:
      * \return true - image will be shrank without damages
      */
     static bool validateFor2xScaleDown(FIBITMAP *image, const std::string &origPath = std::string());
+
+    /*!
+     * \brief Check textures are they require the bitmask render or not
+     * \param image Front image
+     * \param mask Mask image
+     * \param origPath The optional original path to the texture, needed for log printing
+     * \return true if bitmask render suggested for better accuracy
+     */
+    static bool validateBitmaskRequired(FIBITMAP *image, FIBITMAP *mask, const std::string &origPath = std::string());
 
     /*!
      * \brief Set the icon for the SDL Window

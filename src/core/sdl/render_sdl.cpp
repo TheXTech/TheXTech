@@ -374,29 +374,45 @@ void RenderSDL::loadTexture(StdPicture &target, uint32_t width, uint32_t height,
 
 void RenderSDL::deleteTexture(StdPicture &tx, bool lazyUnload)
 {
-    if(!tx.inited || !tx.d.texture)
+    if(!tx.inited || (!tx.d.texture && !tx.d.bitmask))
     {
         if(!lazyUnload)
             tx.inited = false;
         return;
     }
 
-    auto corpseIt = m_textureBank.find(tx.d.texture);
-    if(corpseIt == m_textureBank.end())
+    if(tx.d.texture)
     {
-        SDL_DestroyTexture(tx.d.texture);
+        auto corpseIt = m_textureBank.find(tx.d.texture);
+        if(corpseIt == m_textureBank.end())
+        {
+            SDL_DestroyTexture(tx.d.texture);
+            tx.d.texture = nullptr;
+            if(!lazyUnload)
+                tx.inited = false;
+            return;
+        }
+
+        SDL_Texture *corpse = *corpseIt;
+        if(corpse)
+            SDL_DestroyTexture(corpse);
+        m_textureBank.erase(corpse);
+
         tx.d.texture = nullptr;
-        if(!lazyUnload)
-            tx.inited = false;
-        return;
     }
-
-    SDL_Texture *corpse = *corpseIt;
-    if(corpse)
-        SDL_DestroyTexture(corpse);
-    m_textureBank.erase(corpse);
-
-    tx.d.texture = nullptr;
+    else if(tx.d.bitmask)
+    {
+        SDL_free(tx.d.mask_front);
+        tx.d.mask_front = nullptr;
+        SDL_free(tx.d.mask_back);
+        tx.d.mask_back = nullptr;
+        SDL_free(tx.d.mask_render_buffer);
+        tx.d.mask_render_buffer = nullptr;
+        tx.d.bitmask = false;
+        if(tx.d.mask_render)
+            SDL_DestroyTexture(tx.d.mask_render);
+        tx.d.mask_render = nullptr;
+    }
 
     if(!lazyUnload)
         tx.resetAll();
@@ -561,6 +577,61 @@ void RenderSDL::renderCircleHole(int cx, int cy, int radius, float red, float gr
 }
 
 
+static void renderBitmaskTextureSW(SDL_Renderer *m_gRenderer,
+                                   SDL_Rect &srcRect,
+                                   SDL_FRect &dstRect,
+                                   StdPicture &tx)
+{
+    SDL_Rect rect = {(int)dstRect.x + srcRect.x,
+                     (int)dstRect.y + srcRect.y,
+                     SDL_min(tx.d.mask_render_buffer_w, srcRect.w),
+                     SDL_min(tx.d.mask_render_buffer_h, srcRect.h)};
+
+    SDL_RenderReadPixels(m_gRenderer,
+                         &rect,
+                         SDL_PIXELFORMAT_BGR24,
+                         tx.d.mask_render_buffer,
+                         tx.d.mask_render_buffer_pitch);
+
+    if(!tx.d.mask_render)
+    {
+        tx.d.mask_render = SDL_CreateTexture(m_gRenderer,
+                                             SDL_PIXELFORMAT_BGR24,
+                                             SDL_TEXTUREACCESS_STREAMING,
+                                             tx.d.mask_render_buffer_w,
+                                             tx.d.mask_render_buffer_h);
+    }
+
+    for(int y = srcRect.y; y < srcRect.h && y < tx.d.mask_back_h; ++y)
+    {
+        for(int x = srcRect.x; x < srcRect.w && x < tx.d.mask_back_w; ++x)
+        {
+            uint8_t *dst = tx.d.mask_render_buffer + (tx.d.mask_render_buffer_pitch * y) + (x * 3);
+            uint8_t *src = tx.d.mask_back + (tx.d.mask_back_pitch * y) + (x * 3);
+            dst[0] &= src[0];
+            dst[1] &= src[1];
+            dst[2] &= src[2];
+        }
+    }
+
+    for(int y = srcRect.y; y < srcRect.h && y < tx.d.mask_front_h; ++y)
+    {
+        for(int x = srcRect.x; x < srcRect.w && x < tx.d.mask_front_w; ++x)
+        {
+            uint8_t *dst = tx.d.mask_render_buffer + (tx.d.mask_render_buffer_pitch * y) + (x * 3);
+            uint8_t *src = tx.d.mask_front + (tx.d.mask_front_pitch * y) + (x * 3);
+            dst[0] |= src[0];
+            dst[1] |= src[1];
+            dst[2] |= src[2];
+        }
+    }
+
+    SDL_UpdateTexture(tx.d.mask_render, &srcRect, tx.d.mask_render_buffer, tx.d.mask_render_buffer_pitch);
+
+    SDL_RenderCopyExF(m_gRenderer, tx.d.mask_render,
+                      &srcRect, &dstRect,
+                      0.0, nullptr, SDL_FLIP_NONE);
+}
 
 static SDL_INLINE void txColorMod(StdPictureData &tx, float red, float green, float blue, float alpha)
 {
@@ -597,16 +668,16 @@ void RenderSDL::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, d
     if(!tx.inited)
         return;
 
-    if(!tx.d.texture && tx.l.lazyLoaded)
+    if(!tx.d.texture && !tx.d.bitmask && tx.l.lazyLoaded)
         lazyLoad(tx);
 
-    if(!tx.d.texture)
+    if(!tx.d.texture && !tx.d.bitmask)
     {
         D_pLogWarningNA("Attempt to render an empty texture!");
         return;
     }
 
-    SDL_assert_release(tx.d.texture);
+    SDL_assert_release(tx.d.texture || tx.d.bitmask);
 
     int xDst = Maths::iRound(xDstD);
     int yDst = Maths::iRound(yDstD);
@@ -651,8 +722,13 @@ void RenderSDL::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, d
                       int(tx.l.w_scale * wSrc), int(tx.l.h_scale * hSrc)};
 
     txColorMod(tx.d, red, green, blue, alpha);
-    SDL_RenderCopyExF(m_gRenderer, tx.d.texture, &sourceRect, &destRect,
-                      rotateAngle, centerD, static_cast<SDL_RendererFlip>(flip));
+
+
+    if(tx.d.bitmask)
+        renderBitmaskTextureSW(m_gRenderer, sourceRect, destRect, tx);
+    else
+        SDL_RenderCopyExF(m_gRenderer, tx.d.texture, &sourceRect, &destRect,
+                          rotateAngle, centerD, static_cast<SDL_RendererFlip>(flip));
 }
 
 void RenderSDL::renderTextureScale(double xDst, double yDst, double wDst, double hDst,
@@ -667,10 +743,10 @@ void RenderSDL::renderTextureScale(double xDst, double yDst, double wDst, double
     if(!tx.inited)
         return;
 
-    if(!tx.d.texture && tx.l.lazyLoaded)
+    if(!tx.d.texture && !tx.d.bitmask && tx.l.lazyLoaded)
         lazyLoad(tx);
 
-    if(!tx.d.texture)
+    if(!tx.d.texture && !tx.d.bitmask)
     {
         D_pLogWarningNA("Attempt to render an empty texture!");
         return;
@@ -695,9 +771,15 @@ void RenderSDL::renderTextureScale(double xDst, double yDst, double wDst, double
         sourceRect = {0, 0, tx.l.w_orig, tx.l.h_orig};
 
     txColorMod(tx.d, red, green, blue, alpha);
-    SDL_RenderCopyExF(m_gRenderer, tx.d.texture, &sourceRect, &destRect,
-                      0.0, nullptr, static_cast<SDL_RendererFlip>(flip));
+
+    if(tx.d.bitmask)
+        renderBitmaskTextureSW(m_gRenderer, sourceRect, destRect, tx);
+    else
+        SDL_RenderCopyExF(m_gRenderer, tx.d.texture, &sourceRect, &destRect,
+                          0.0, nullptr, static_cast<SDL_RendererFlip>(flip));
 }
+
+
 
 void RenderSDL::renderTexture(double xDstD, double yDstD, double wDstD, double hDstD,
                                 StdPicture &tx,
@@ -710,16 +792,16 @@ void RenderSDL::renderTexture(double xDstD, double yDstD, double wDstD, double h
     if(!tx.inited)
         return;
 
-    if(!tx.d.texture && tx.l.lazyLoaded)
+    if(!tx.d.texture && !tx.d.bitmask && tx.l.lazyLoaded)
         lazyLoad(tx);
 
-    if(!tx.d.texture)
+    if(!tx.d.texture && !tx.d.bitmask)
     {
         D_pLogWarningNA("Attempt to render an empty texture!");
         return;
     }
 
-    SDL_assert_release(tx.d.texture);
+    SDL_assert_release(tx.d.texture || tx.d.bitmask);
 
     int xDst = Maths::iRound(xDstD);
     int yDst = Maths::iRound(yDstD);
@@ -762,7 +844,11 @@ void RenderSDL::renderTexture(double xDstD, double yDstD, double wDstD, double h
                       int(tx.l.w_scale * wDst), int(tx.l.h_scale * hDst)};
 
     txColorMod(tx.d, red, green, blue, alpha);
-    SDL_RenderCopyF(m_gRenderer, tx.d.texture, &sourceRect, &destRect);
+
+    if(tx.d.bitmask)
+        renderBitmaskTextureSW(m_gRenderer, sourceRect, destRect, tx);
+    else
+        SDL_RenderCopyF(m_gRenderer, tx.d.texture, &sourceRect, &destRect);
 }
 
 void RenderSDL::renderTextureFL(double xDstD, double yDstD, double wDstD, double hDstD,
@@ -777,16 +863,16 @@ void RenderSDL::renderTextureFL(double xDstD, double yDstD, double wDstD, double
     if(!tx.inited)
         return;
 
-    if(!tx.d.texture && tx.l.lazyLoaded)
+    if(!tx.d.texture && !tx.d.bitmask && tx.l.lazyLoaded)
         lazyLoad(tx);
 
-    if(!tx.d.texture)
+    if(!tx.d.texture && !tx.d.bitmask)
     {
         D_pLogWarningNA("Attempt to render an empty texture!");
         return;
     }
 
-    SDL_assert_release(tx.d.texture);
+    SDL_assert_release(tx.d.texture || tx.d.bitmask);
 
     int xDst = Maths::iRound(xDstD);
     int yDst = Maths::iRound(yDstD);
@@ -849,10 +935,10 @@ void RenderSDL::renderTexture(float xDst, float yDst,
     if(!tx.inited)
         return;
 
-    if(!tx.d.texture && tx.l.lazyLoaded)
+    if(!tx.d.texture && !tx.d.bitmask && tx.l.lazyLoaded)
         lazyLoad(tx);
 
-    if(!tx.d.texture)
+    if(!tx.d.texture && !tx.d.bitmask)
     {
         D_pLogWarningNA("Attempt to render an empty texture!");
         return;
@@ -871,8 +957,11 @@ void RenderSDL::renderTexture(float xDst, float yDst,
         sourceRect = {0, 0, tx.l.w_orig, tx.l.h_orig};
 
     txColorMod(tx.d, red, green, blue, alpha);
-    SDL_RenderCopyExF(m_gRenderer, tx.d.texture, &sourceRect, &destRect,
-                      0.0, nullptr, static_cast<SDL_RendererFlip>(flip));
+    if(tx.d.bitmask)
+        renderBitmaskTextureSW(m_gRenderer, sourceRect, destRect, tx);
+    else
+        SDL_RenderCopyExF(m_gRenderer, tx.d.texture, &sourceRect, &destRect,
+                          0.0, nullptr, static_cast<SDL_RendererFlip>(flip));
 }
 
 void RenderSDL::getScreenPixels(int x, int y, int w, int h, unsigned char *pixels)
