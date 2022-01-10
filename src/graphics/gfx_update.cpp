@@ -2195,100 +2195,6 @@ void UpdateGraphics(bool skipRepaint)
                         }
                     }
                 }
-
-
-                // TODO: use the improved code from multires
-                if(GamePaused == PauseCode::Message)
-                {
-                    XRender::offsetViewportIgnore(true);
-
-                        X = 0;
-                        Y = 0;
-
-                        if((DScreenType == 1 && Z == 2) || (DScreenType == 2 && Z == 1))
-                            X = -400;
-                        else if((DScreenType == 6 && Z == 2) || (DScreenType == 4 && Z == 2) || (DScreenType == 3 && Z == 1))
-                            Y = -300;
-
-                        SuperText = MessageText;
-                        BoxY = 150;
-                        XRender::renderTexture(400 - GFX.TextBox.w / 2 + X,
-                                              BoxY + Y + Y,
-                                              GFX.TextBox.w, 20, GFX.TextBox, 0, 0);
-                        BoxY += 10;
-                        tempBool = false;
-
-                        do
-                        {
-                            B = 0;
-
-#if 0 // Old line breaking algorithm
-                            for(A = 1; A <= int(SuperText.size()); A++)
-                            {
-                                if(SuperText[size_t(A) - 1] == ' ' || A == int(SuperText.size()))
-                                {
-                                    if(A < 28)
-                                        B = A;
-                                    else
-                                        break;
-                                }
-                            }
-#else // Better line breaking algorithm
-
-                            for(A = 1; A <= int(SuperText.size()) && A <= 27; A++)
-                            {
-                                auto c = SuperText[size_t(A) - 1];
-
-                                if(B == 0 && A >= 27)
-                                    break;
-
-                                if(A == int(SuperText.size()))
-                                {
-                                    if(A < 28)
-                                        B = A;
-                                }
-                                else if(c == ' ')
-                                {
-                                    B = A;
-                                }
-                                else if(c == '\n')
-                                {
-                                    B = A;
-                                    break;
-                                }
-                            }
-#endif
-
-                            if(B == 0)
-                                B = A;
-
-                            tempText = SuperText.substr(0, size_t(B));
-//                            SuperText = SuperText.substr(size_t(B), SuperText.length());
-                            SuperText.erase(0, size_t(B));
-
-                            XRender::renderTexture(400 - GFX.TextBox.w / 2 + X, BoxY + Y + Y,
-                                                  GFX.TextBox.w, 20, GFX.TextBox, 0, 20);
-
-                            if(SuperText.length() == 0 && !tempBool)
-                            {
-                                SuperPrint(tempText,
-                                           4,
-                                           162 + X + (27 * 9) - (tempText.length() * 9),
-                                           Y + BoxY);
-                            }
-                            else
-                            {
-                                SuperPrint(tempText, 4, 162 + X, Y + BoxY);
-                            }
-
-                            BoxY += 16;
-                            tempBool = true;
-                        } while(!SuperText.empty());
-
-                        XRender::renderTexture(400 - GFX.TextBox.w / 2 + X, BoxY + Y + Y, GFX.TextBox.w, 10, GFX.TextBox, 0, GFX.TextBox.h - 10);
-                }
-    //            ElseIf GameOutro = False Then
-                XRender::offsetViewportIgnore(false);
             }
 
             else if(!GameOutro)
@@ -2310,6 +2216,7 @@ void UpdateGraphics(bool skipRepaint)
 //        If LevelEditor = True Or MagicHand = True Then
         if((LevelEditor || MagicHand) && GamePaused == PauseCode::None)
         {
+            // TODO: port the editor code (`gfx_editor.cpp`) from multires
 
 #if 0 //.Useless editor-only stuff
 //            If LevelEditor = True Then
@@ -2505,61 +2412,8 @@ void UpdateGraphics(bool skipRepaint)
 //    Next A
 //End If
 
-            // TODO: use the improved code from multires (and deduplicate!)
             if(!MessageText.empty()) // In-Editor message box preview
-            {
-                X = 0;
-                Y = 0;
-
-                if((DScreenType == 1 && Z == 2) || (DScreenType == 2 && Z == 1))
-                    X = -400;
-                else if((DScreenType == 6 && Z == 2) || (DScreenType == 4 && Z == 2) || (DScreenType == 3 && Z == 1))
-                    Y = -300;
-
-                SuperText = MessageText;
-                BoxY = 150;
-                XRender::renderTexture(400 - GFX.TextBox.w / 2 + X,
-                                      BoxY + Y + Y,
-                                      GFX.TextBox.w, 20, GFX.TextBox, 0, 0);
-                BoxY += 10;
-                tempBool = false;
-                do
-                {
-                    B = 0;
-                    for(A = 1; A <= int(SuperText.size()); A++)
-                    {
-                        if(SuperText[size_t(A) - 1] == ' ' || A == int(SuperText.size()))
-                        {
-                            if(A < 28)
-                                B = A;
-                            else
-                                break;
-                        }
-                    }
-
-                    if(B == 0)
-                        B = A;
-
-                    tempText = SuperText.substr(0, size_t(B));
-                    SuperText = SuperText.substr(size_t(B), SuperText.length());
-                    XRender::renderTexture(400 - GFX.TextBox.w / 2 + X, BoxY + Y + Y,
-                                          GFX.TextBox.w, 20, GFX.TextBox, 0, 20);
-                    if(SuperText.length() == 0 && !tempBool)
-                    {
-                        SuperPrint(tempText,
-                                   4,
-                                   float(162 + X + (27 * 9)) - (tempText.length() * 9),
-                                   Y + BoxY);
-                    }
-                    else
-                    {
-                        SuperPrint(tempText, 4, 162 + X, Y + BoxY);
-                    }
-                    BoxY += 16;
-                    tempBool = true;
-                } while(!SuperText.empty());
-                XRender::renderTexture(400 - GFX.TextBox.w / 2 + X, BoxY + Y + Y, GFX.TextBox.w, 10, GFX.TextBox, 0, GFX.TextBox.h - 10);
-            }
+                DrawMessage(MessageText);
 
             // Display the cursor
             {
@@ -2821,6 +2675,9 @@ void UpdateGraphics(bool skipRepaint)
     // render special screens
     if(GamePaused == PauseCode::PauseGame)
         PauseScreen::Render();
+
+    if(GamePaused == PauseCode::Message)
+        DrawMessage(MessageText);
 
     if(QuickReconnectScreen::g_active)
         QuickReconnectScreen::Render();
