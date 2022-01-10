@@ -101,6 +101,7 @@ TouchScreenGFX_t::TouchScreenGFX_t()
     loadImage(touch[BUTTON_VIEW_TOGGLE_ON], uiPath + "KeysShow.png");
     loadImage(touch[BUTTON_ANALOG_BORDER], uiPath + "SBorder.png");
     loadImage(touch[BUTTON_ANALOG_STICK], uiPath + "AStick.png");
+    loadImage(touch[BUTTON_ENTER_CHEATS], uiPath + "EnterCheats.png");
 
     if(m_loadErrors > 0)
     {
@@ -458,6 +459,7 @@ static const TouchKeyMap::KeyPos c_4_tinyPhoneMap[TouchScreenController::key_END
     {196.0f, 12.0f, 312.0f, 52.0f, TouchScreenController::key_drop},
     {494.0f, 50.0f, 618.0f, 97.0f, TouchScreenController::key_holdRun},
     {10.0f, 10.0f, 64.0f, 64.0f, TouchScreenController::key_toggleKeysView},
+    {10.0f, 66.0f, 64.0f, 110.0f, TouchScreenController::key_enterCheats},
 };
 
 static const TouchKeyMap::KeyPos c_averagePhoneMap[TouchScreenController::key_END] =
@@ -479,6 +481,7 @@ static const TouchKeyMap::KeyPos c_averagePhoneMap[TouchScreenController::key_EN
     {331.0f, 537.0f, 482.0f, 587.0f, TouchScreenController::key_drop},
     {827.0f, 129.0f, 943.0f, 169.0f, TouchScreenController::key_holdRun},
     {10.0f, 10.0f, 70.0f, 70.0f, TouchScreenController::key_toggleKeysView},
+    {10.0f, 74.0f, 70.0f, 134.0f, TouchScreenController::key_enterCheats},
 };
 
 static const TouchKeyMap::KeyPos c_averagePhoneLongMap[TouchScreenController::key_END] =
@@ -500,6 +503,7 @@ static const TouchKeyMap::KeyPos c_averagePhoneLongMap[TouchScreenController::ke
     {474.0f, 632.0f, 658.0f, 691.0f, TouchScreenController::key_drop},
     {1178.0f, 214.0f, 1315.0f, 275.0f, TouchScreenController::key_holdRun},
     {10.0f, 10.0f, 85.0f, 85.0f, TouchScreenController::key_toggleKeysView},
+    {10.0f, 90.0f, 85.0f, 165.0f, TouchScreenController::key_enterCheats},
 };
 
 static const TouchKeyMap::KeyPos c_7_tablet[TouchScreenController::key_END] =
@@ -521,6 +525,7 @@ static const TouchKeyMap::KeyPos c_7_tablet[TouchScreenController::key_END] =
     {257.0f, 544.0f, 396.0f, 582.0f, TouchScreenController::key_drop},
     {873.0f, 226.0f, 968.0f, 258.0f, TouchScreenController::key_holdRun},
     {10.0f, 10.0f, 58.0f, 58.0f, TouchScreenController::key_toggleKeysView},
+    {10.0f, 64.0f, 58.0f, 112.0f, TouchScreenController::key_enterCheats},
 };
 
 static const TouchKeyMap::KeyPos c_10_6_tablet[TouchScreenController::key_END] =
@@ -542,6 +547,7 @@ static const TouchKeyMap::KeyPos c_10_6_tablet[TouchScreenController::key_END] =
     {256.0f, 753.0f, 389.0f, 785.0f, TouchScreenController::key_drop},
     {1131.0f, 387.0f, 1225.0f, 426.0f, TouchScreenController::key_holdRun},
     {10.0f, 10.0f, 57.0f, 57.0f, TouchScreenController::key_toggleKeysView},
+    {10.0f, 60.0f, 57.0f, 107.0f, TouchScreenController::key_enterCheats},
 };
 
 // watch your aspect ratios. they are preserved now!
@@ -566,6 +572,7 @@ static const TouchKeyMap::KeyPos c_smallAutoMap[TouchScreenController::key_END] 
     {0.3475, -0.08, 0.4625, -0.04, TouchScreenController::key_drop},
     {-0.09, -0.40, -0.015, -0.36, TouchScreenController::key_holdRun},
     {0.01, 0.01, 0.07, 0.07, TouchScreenController::key_toggleKeysView},
+    {0.01, 0.08, 0.07, 0.14, TouchScreenController::key_enterCheats},
 };
 
 // based on c_averagePhoneMap
@@ -588,6 +595,7 @@ static const TouchKeyMap::KeyPos c_mediumAutoMap[TouchScreenController::key_END]
     {0.47, -0.09, 0.70, -0.01, TouchScreenController::key_drop},
     {-0.20, 0.11, -0.05, 0.19, TouchScreenController::key_holdRun},
     {0.02, 0.02, 0.12, 0.12, TouchScreenController::key_toggleKeysView},
+    {0.02, 0.14, 0.12, 0.24, TouchScreenController::key_enterCheats},
 };
 
 // based on c_4_tinyPhoneMap
@@ -610,6 +618,7 @@ static const TouchKeyMap::KeyPos c_largeAutoMap[TouchScreenController::key_END] 
     {0.165, 0.02, 0.50, 0.14, TouchScreenController::key_drop},
     {-0.245, 0.16, -0.02, 0.28, TouchScreenController::key_holdRun},
     {0.02, 0.02, 0.14, 0.14, TouchScreenController::key_toggleKeysView},
+    {0.02, 0.16, 0.14, 0.28, TouchScreenController::key_enterCheats},
 };
 /*---------------------------------------------------------------------------------------*/
 
@@ -784,6 +793,10 @@ static void updateFingerKeyState(TouchScreenController::FingerState &st,
                 extraSt.keyHoldRunOnce = (setState & !extraSt.keyHoldRun);
                 extraSt.keyHoldRun = setState;
                 break;
+            case TouchScreenController::key_enterCheats:
+                extraSt.keyCheatsOnce = (setState & !extraSt.keyCheatsOnce);
+                extraSt.keyCheats = setState;
+                break;
             default:
                 break;
         }
@@ -920,6 +933,9 @@ void TouchScreenController::processTouchDevice(int dev_i)
 
     if(m_current_extra_keys.keyHoldRunOnce)
         m_runHeld = !m_runHeld;
+
+    if(m_current_extra_keys.keyCheatsOnce && m_enable_enter_cheats)
+        Hotkeys::Activate(Hotkeys::Buttons::EnterCheats);
 }
 
 void TouchScreenController::update()
@@ -933,6 +949,7 @@ void TouchScreenController::update()
         if(p)
         {
             this->m_touchpad_style = p->m_touchpad_style;
+            this->m_enable_enter_cheats = p->m_enable_enter_cheats;
             if(this->m_vibration_strength != p->m_vibration_strength
                 || this->m_vibration_length != p->m_vibration_length)
             {
@@ -1055,6 +1072,10 @@ void TouchScreenController::render(int player_no)
             break;
         case TouchScreenController::key_altrun:
             XRender::renderTextureScale(x1, y1, w, h, m_GFX.touch[buttonY(player_no, style)], 1.f, 1.f, 1.f, a);
+            break;
+        case TouchScreenController::key_enterCheats:
+            if(m_enable_enter_cheats)
+                XRender::renderTextureScale(x1, y1, w, h, m_GFX.touch[TouchScreenGFX_t::BUTTON_ENTER_CHEATS], 1.f, 1.f, 1.f, a);
             break;
         default:
             XRender::renderRect(x1, y1, w, h, r, g, 0.f, 0.3f);
@@ -1220,6 +1241,7 @@ void InputMethodProfile_TouchScreen::SaveConfig(IniProcessing* ctl)
     ctl->setValue("vibration-strength", this->m_vibration_strength);
     ctl->setValue("vibration-length", this->m_vibration_length);
     ctl->setValue("hold-run", this->m_hold_run);
+    ctl->setValue("enable-enter-cheats", this->m_enable_enter_cheats);
 }
 
 void InputMethodProfile_TouchScreen::LoadConfig(IniProcessing* ctl)
@@ -1229,12 +1251,13 @@ void InputMethodProfile_TouchScreen::LoadConfig(IniProcessing* ctl)
     ctl->read("vibration-strength", this->m_vibration_strength, 0.f);
     ctl->read("vibration-length", this->m_vibration_length, 12);
     ctl->read("hold-run", this->m_hold_run, false);
+    ctl->read("enable-enter-cheats", this->m_enable_enter_cheats, false);
 }
 
 // How many per-type special options are there?
 size_t InputMethodProfile_TouchScreen::GetSpecialOptionCount()
 {
-    return 5;
+    return InputMethodProfile_TouchScreen::o_COUNT;
 }
 
 // Methods to manage per-profile options
@@ -1255,6 +1278,8 @@ const char* InputMethodProfile_TouchScreen::GetOptionName(size_t i)
         return "VIBRATE LENGTH";
     case o_hold_run:
         return "HOLD RUN ON START";
+    case o_enable_enter_cheats:
+        return "SHOW CHEAT BUTTON";
     }
     return nullptr;
 }
@@ -1299,6 +1324,11 @@ const char* InputMethodProfile_TouchScreen::GetOptionValue(size_t i)
             return "ON";
         else
             return "OFF";
+    case o_enable_enter_cheats:
+        if(this->m_enable_enter_cheats)
+            return "ON";
+        else
+            return "OFF";
     }
     return nullptr;
 }
@@ -1340,6 +1370,10 @@ bool InputMethodProfile_TouchScreen::OptionRotateLeft(size_t i)
         return false;
     case o_hold_run:
         this->m_hold_run = !this->m_hold_run;
+        return true;
+    case o_enable_enter_cheats:
+        this->m_enable_enter_cheats = !this->m_enable_enter_cheats;
+        return true;
     }
     return false;
 }
@@ -1370,6 +1404,10 @@ bool InputMethodProfile_TouchScreen::OptionRotateRight(size_t i)
         return true;
     case o_hold_run:
         this->m_hold_run = !this->m_hold_run;
+        return true;
+    case o_enable_enter_cheats:
+        this->m_enable_enter_cheats = !this->m_enable_enter_cheats;
+        return true;
     }
     return false;
 }

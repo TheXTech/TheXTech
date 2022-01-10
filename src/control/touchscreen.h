@@ -106,6 +106,7 @@ public:
         BUTTON_VIEW_TOGGLE_ON,
         BUTTON_ANALOG_BORDER,
         BUTTON_ANALOG_STICK,
+        BUTTON_ENTER_CHEATS,
         BUTTONS_END
     };
     StdPicture touch[BUTTONS_END];
@@ -160,6 +161,7 @@ public:
         key_drop,
         key_holdRun,
         key_toggleKeysView,
+        key_enterCheats,
         key_END
     };
 
@@ -185,6 +187,7 @@ public:
     float m_vibration_strength = 0.f;
     int m_vibration_length = 12;
     bool m_hold_run = false;
+    bool m_enable_enter_cheats = false;
 
     // active InputMethod (nullable, used for configuration)
     InputMethod* m_active_method = nullptr;
@@ -205,6 +208,9 @@ public:
 
         bool keyRunOnce = false;
         bool keyAltRunOnce = false;
+
+        bool keyCheats = false;
+        bool keyCheatsOnce = false;
     } m_current_extra_keys;
 
     //! Touch can be hidden by left-top corner to use virtual mouse
@@ -281,7 +287,7 @@ public:
     float m_vibration_strength = 0.f;
     int m_vibration_length = 12;
     bool m_hold_run = false;
-
+    bool m_enable_enter_cheats = false;
 
     InputMethodProfile_TouchScreen();
 
@@ -314,7 +320,9 @@ public:
         o_style,
         o_v_strength,
         o_v_length,
-        o_hold_run
+        o_hold_run,
+        o_enable_enter_cheats,
+        o_COUNT
     };
 public:
     // How many per-type special options are there?
