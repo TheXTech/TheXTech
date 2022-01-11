@@ -22,6 +22,7 @@
 #include <sstream>
 
 #include <Logger/logger.h>
+#include <fmt_format_ne.h>
 
 #include "autocode.h"
 #include "autocode_manager.h"
@@ -1137,10 +1138,10 @@ void Autocode::Do(bool init)
         // DEBUG
         case AT_DebugPrint:
         {
-            Renderer::Get().AddOp(new RenderStringOp("LUNADLL (WITH LUA) VERSION-" + std::to_string((long long)LUNA_VERSION), 3, 50, 250));
+            Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("LUNADLL (TheXTech) VERSION-{0}", LUNA_VERSION), 3, 50, 250));
             //Renderer::Get().SafePrint(, 3, 340, 250);
 
-            Renderer::Get().AddOp(new RenderStringOp("GLOBL-" + std::to_string((long long)gAutoMan.m_GlobalCodes.size()), 3, 50, 300));
+            Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("GLOBL-{0}", gAutoMan.m_GlobalCodes.size()), 3, 50, 300));
 
             Renderer::Get().AddOp(new RenderStringOp("INIT -" + std::to_string((long long)gAutoMan.m_InitAutocodes.size()), 3, 50, 330));
 
