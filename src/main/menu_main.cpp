@@ -346,6 +346,7 @@ bool mainMenuUpdate()
     bool downPressed = SharedControls.MenuDown;
     bool leftPressed = SharedControls.MenuLeft;
     bool rightPressed = SharedControls.MenuRight;
+    bool homePressed = SharedCursor.Tertiary;
 
     bool menuDoPress = SharedControls.MenuDo;
     bool menuBackPress = SharedControls.MenuBack;
@@ -361,6 +362,8 @@ bool mainMenuUpdate()
         downPressed |= c.Down;
         leftPressed |= c.Left;
         rightPressed |= c.Right;
+
+        homePressed |= c.Drop;
     }
 
     menuBackPress |= SharedCursor.Secondary && MenuMouseRelease;
@@ -383,6 +386,7 @@ bool mainMenuUpdate()
             k |= downPressed;
             k |= leftPressed;
             k |= rightPressed;
+            k |= homePressed;
 
             if(!k)
                 MenuCursorCanMove = true;
@@ -882,47 +886,40 @@ bool mainMenuUpdate()
 
             }
 
+            // New world select scroll options!
+            // Based on Wohlstand's but somewhat simpler and less keyboard-specific.
+            // Left and right are -/+ 3 (repeatable, so they also provide a quick-first/quick-last function).
+            // DropItem / Tertiary cursor button is return to last episode.
             bool dontWrap = false;
 
-            // TODO: hmmm..........
-#if 0
-            if((c.AltRun || homePressed) && MenuCursorCanMove)
-            {
-                PlaySoundMenu(SFX_Saw);
-                MenuCursor = 0;
-                MenuCursorCanMove = false;
-                dontWrap = true;
-            }
-            else if((c.AltJump || endPressed) && MenuCursorCanMove)
-            {
-                PlaySoundMenu(SFX_Saw);
-                MenuCursor = NumSelectWorld - 1;
-                MenuCursorCanMove = false;
-                dontWrap = true;
-            }
-            else if(leftPressed && MenuCursorCanMove)
+            if(leftPressed && (MenuCursorCanMove || ScrollDelay == 0))
             {
                 PlaySoundMenu(SFX_Saw);
                 MenuCursor -= 3;
                 MenuCursorCanMove = false;
+                ScrollDelay = 15;
                 dontWrap = true;
             }
-            else if(rightPressed && MenuCursorCanMove)
+            else if(rightPressed && (MenuCursorCanMove || ScrollDelay == 0))
             {
                 PlaySoundMenu(SFX_Saw);
                 MenuCursor += 3;
                 MenuCursorCanMove = false;
+                ScrollDelay = 15;
                 dontWrap = true;
             }
-            else if((c.Drop || deletePressed) && menuRecentEpisode >= 0 && MenuCursorCanMove)
+            else if((leftPressed || rightPressed) && !SharedCursor.Move)
+            {
+                ScrollDelay -= 1;
+            }
+
+            if(homePressed && MenuCursorCanMove && menuRecentEpisode >= 0)
             {
                 PlaySoundMenu(SFX_Camera);
                 MenuCursor = menuRecentEpisode;
                 MenuCursorCanMove = false;
                 dontWrap = true;
             }
-            // ...???
-#endif
             
             if(MenuMode == MENU_1PLAYER_GAME || MenuMode == MENU_2PLAYER_GAME || MenuMode == MENU_BATTLE_MODE)
             {
