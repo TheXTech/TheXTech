@@ -13,10 +13,17 @@ bool gLunaEnabled = true;
 static void (*levelCodeRun)() = nullptr;
 
 
+#include "levels/Docopoper-Calleoca.h"
 
 static void InitLevel()
 {
     levelCodeRun = nullptr;
+
+    if(FileNameFull == "Docopoper-Calleoca.lvl")
+    {
+        CalleocaInitCode();
+        levelCodeRun = CalleocaCode;
+    }
 }
 
 void lunaReset()

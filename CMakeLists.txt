@@ -339,6 +339,7 @@ set(THEXTECH_SRC
     src/script/renderop_bitmap.cpp
     src/script/renderop_rect.cpp
     src/script/mememu.cpp
+    src/script/levels/Docopoper-Calleoca.cpp
     src/graphics/gfx_update2.cpp
     src/graphics/gfx_update.cpp
     src/graphics/gfx_background.cpp
