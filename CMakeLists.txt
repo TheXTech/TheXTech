@@ -320,6 +320,7 @@ set(THEXTECH_SRC
     src/main/outro_loop.cpp
     src/main/trees.cpp
     src/main/QuadTree/LooseQuadtree-impl.cpp
+    src/script/autocode.cpp
     src/graphics/gfx_update2.cpp
     src/graphics/gfx_update.cpp
     src/graphics/gfx_background.cpp
@@ -372,6 +373,7 @@ file(GLOB THEXTECH_HEADS_SRC
     lib/InterProcess/*.h
     src/*.h
     src/*.hpp
+    src/script/*.h
     src/control/*.h
     src/core/*.h
     src/core/base/*.h
