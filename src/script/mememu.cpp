@@ -117,7 +117,7 @@ public:
         auto fres = m_ff.find(address);
         if(fres != m_ff.end())
         {
-            *dres->second = (float)value;
+            *fres->second = (float)value;
             return;
         }
 
