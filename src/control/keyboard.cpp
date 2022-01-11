@@ -1034,7 +1034,8 @@ bool InputMethodType_Keyboard::ConsumeEvent(const SDL_Event* ev)
         case SDL_MOUSEWHEEL:
             if(ev->wheel.which != SDL_TOUCH_MOUSEID)
             {
-                this->m_scroll += ev->wheel.y;
+                // scrolling up results in traversing items backwards
+                this->m_scroll -= ev->wheel.y;
                 return true;
             }
             else
