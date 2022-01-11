@@ -221,7 +221,8 @@ struct PlayDoSentinel
     }
 };
 
-void Player_Back(int p)
+// returns true to signal exit from menu
+bool Player_Back(int p)
 {
     s_inputReady[p] = false;
     if(s_playerState[p] == PlayerState::SelectChar && s_context == Context::MainMenu)
@@ -229,12 +230,12 @@ void Player_Back(int p)
         DeleteInputMethod(Controls::g_InputMethods[p]);
         s_playerState[p] = PlayerState::Disconnected;
         g_charSelect[p] = 0;
-        return;
+        return false;
     }
     else if(s_playerState[p] == PlayerState::SelectChar && p >= numPlayers)
     {
         Player_Remove(p);
-        return;
+        return false;
     }
     else if(s_playerState[p] == PlayerState::SelectChar)
     {
@@ -249,7 +250,10 @@ void Player_Back(int p)
 
     if(s_playerState[p] == PlayerState::ReconnectMain)
     {
-        return;
+        if(s_context == Context::DropAdd)
+            return true;
+        else
+            return false;
     }
 
     PlaySoundMenu(SFX_Slide);
@@ -264,12 +268,14 @@ void Player_Back(int p)
         s_playerState[p] = PlayerState::ReconnectMain;
         s_menuItem[p] = 0;
     }
-    if(s_playerState[p] == PlayerState::SelectProfile)
+    else if(s_playerState[p] == PlayerState::SelectProfile)
     {
         s_playerState[p] = s_savedState[p];
         s_savedState[p] = PlayerState::Disconnected;
         s_menuItem[p] = -3;
     }
+
+    return  false;
 }
 
 bool Player_Select(int p)
@@ -1180,7 +1186,8 @@ int Logic()
         if(c.Run || (p == menuPlayer-1 && SharedControls.MenuBack)
             || (p == 0 && p == menuPlayer && SharedControls.MenuBack))
         {
-            Player_Back(p);
+            if(Player_Back(p))
+                return -1;
         }
         else if(c.Jump || c.Start || (p == menuPlayer && SharedControls.MenuDo))
         {
