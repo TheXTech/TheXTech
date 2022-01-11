@@ -669,17 +669,143 @@ public:
 };
 
 static const char npc_t_name[] = "NPC_t";
-class NPCMemory final : public SMBXObjectMemoryEmulator<NPC_t, npc_t_name>
+typedef SMBXObjectMemoryEmulator<NPC_t, npc_t_name> NpcParent;
+class NPCMemory final : public NpcParent
 {
 public:
-    NPCMemory() : SMBXObjectMemoryEmulator<NPC_t, npc_t_name>()
+    NPCMemory() : NpcParent()
     {
         buildTable();
     }
 
     void buildTable()
     {
+        m_bf.clear();
+        m_df.clear();
+        m_if.clear();
+        m_ff.clear();
+        m_sf.clear();
 
+        m_sf.insert({0x00000000, &NPC_t::AttLayer});
+        m_if.insert({0x00000004, &NPC_t::Quicksand});
+        m_if.insert({0x00000006, &NPC_t::RespawnDelay});
+        m_bf.insert({0x00000008, &NPC_t::Bouce});
+        m_if.insert({0x0000000a, &NPC_t::Pinched1});
+        m_if.insert({0x0000000c, &NPC_t::Pinched2});
+        m_if.insert({0x0000000e, &NPC_t::Pinched3});
+        m_if.insert({0x00000010, &NPC_t::Pinched4});
+        m_if.insert({0x00000012, &NPC_t::MovingPinched});
+        m_if.insert({0x00000014, &NPC_t::NetTimeout});
+        m_ff.insert({0x00000018, &NPC_t::RealSpeedX});
+        m_if.insert({0x0000001c, &NPC_t::Wet});
+        m_if.insert({0x0000001e, &NPC_t::Settings});
+        m_bf.insert({0x00000020, &NPC_t::NoLavaSplash});
+        m_if.insert({0x00000022, &NPC_t::Slope});
+        m_if.insert({0x00000024, &NPC_t::Multiplier});
+        m_if.insert({0x00000026, &NPC_t::TailCD});
+        m_bf.insert({0x00000028, &NPC_t::Shadow});
+        m_sf.insert({0x0000002c, &NPC_t::TriggerActivate});
+        m_sf.insert({0x00000030, &NPC_t::TriggerDeath});
+        m_sf.insert({0x00000034, &NPC_t::TriggerTalk});
+        m_sf.insert({0x00000038, &NPC_t::TriggerLast});
+        m_sf.insert({0x0000003c, &NPC_t::Layer});
+        m_bf.insert({0x00000040, &NPC_t::Hidden});
+        m_bf.insert({0x00000042, &NPC_t::Legacy});
+        m_bf.insert({0x00000044, &NPC_t::Chat});
+        m_bf.insert({0x00000046, &NPC_t::Inert});
+        m_bf.insert({0x00000048, &NPC_t::Stuck});
+        m_bf.insert({0x0000004a, &NPC_t::DefaultStuck});
+        m_sf.insert({0x0000004c, &NPC_t::Text});
+        m_ff.insert({0x00000050, &NPC_t::oldAddBelt});
+        m_if.insert({0x00000054, &NPC_t::PinchCount});
+        m_bf.insert({0x00000056, &NPC_t::Pinched});
+        m_if.insert({0x00000058, &NPC_t::PinchedDirection});
+        m_ff.insert({0x0000005c, &NPC_t::BeltSpeed});
+        m_if.insert({0x00000060, &NPC_t::standingOnPlayer});
+        m_if.insert({0x00000062, &NPC_t::standingOnPlayerY});
+        m_bf.insert({0x00000064, &NPC_t::Generator});
+        m_ff.insert({0x00000068, &NPC_t::GeneratorTimeMax});
+        m_ff.insert({0x0000006c, &NPC_t::GeneratorTime});
+        m_if.insert({0x00000070, &NPC_t::GeneratorDirection});
+        m_if.insert({0x00000072, &NPC_t::GeneratorEffect});
+        m_bf.insert({0x00000074, &NPC_t::GeneratorActive});
+        m_bf.insert({0x00000076, &NPC_t::playerTemp});
+        // m_bf.insert({0x00000078, &NPC_t::Location}); // between 0x78 and 0xA8
+        // m_bf.insert({0x000000a8, &NPC_t::DefaultLocation}); // between 0xA8 and 0xD8
+        m_ff.insert({0x000000d8, &NPC_t::DefaultDirection});
+        m_if.insert({0x000000dc, &NPC_t::DefaultType});
+        m_if.insert({0x000000de, &NPC_t::DefaultSpecial});
+        m_if.insert({0x000000e0, &NPC_t::DefaultSpecial2});
+        m_if.insert({0x000000e2, &NPC_t::Type});
+        m_if.insert({0x000000e4, &NPC_t::Frame});
+        m_ff.insert({0x000000e8, &NPC_t::FrameCount});
+        m_ff.insert({0x000000ec, &NPC_t::Direction});
+        m_df.insert({0x000000f0, &NPC_t::Special});
+        m_df.insert({0x000000f8, &NPC_t::Special2});
+        m_df.insert({0x00000100, &NPC_t::Special3});
+        m_df.insert({0x00000108, &NPC_t::Special4});
+        m_df.insert({0x00000110, &NPC_t::Special5});
+        m_df.insert({0x00000118, &NPC_t::Special6});
+        m_bf.insert({0x00000120, &NPC_t::TurnAround});
+        m_if.insert({0x00000122, &NPC_t::Killed});
+        m_bf.insert({0x00000124, &NPC_t::Active});
+        // m_bf.insert({0x00000126, &NPC_t::Reset});
+        m_if.insert({0x0000012a, &NPC_t::TimeLeft});
+        m_if.insert({0x0000012c, &NPC_t::HoldingPlayer});
+        m_if.insert({0x0000012e, &NPC_t::CantHurt});
+        m_if.insert({0x00000130, &NPC_t::CantHurtPlayer});
+        m_if.insert({0x00000132, &NPC_t::BattleOwner});
+        m_if.insert({0x00000134, &NPC_t::WallDeath});
+        m_bf.insert({0x00000136, &NPC_t::Projectile});
+        m_if.insert({0x00000138, &NPC_t::Effect});
+        m_df.insert({0x0000013c, &NPC_t::Effect2});
+        m_if.insert({0x00000144, &NPC_t::Effect3});
+        m_if.insert({0x00000146, &NPC_t::Section});
+        m_ff.insert({0x00000148, &NPC_t::Damage});
+        m_if.insert({0x0000014c, &NPC_t::JustActivated});
+        m_if.insert({0x0000014e, &NPC_t::Block});
+        m_if.insert({0x00000150, &NPC_t::tempBlock});
+        m_bf.insert({0x00000152, &NPC_t::onWall});
+        m_bf.insert({0x00000154, &NPC_t::TurnBackWipe});
+        m_if.insert({0x00000156, &NPC_t::Immune});
+    }
+
+    double getAny(NPC_t *obj, int address) override
+    {
+        if(address >= 0x78 && address < 0xA8) // YoshiTongue
+            return s_locMem.getAny(&obj->Location, address - 0x78);
+        else if(address >= 0xA8 && address < 0xD8) // Location
+            return s_locMem.getAny(&obj->DefaultLocation, address - 0xA8);
+        else if(address == 0x126)
+            return obj->Reset[1] ? 0xFFFF : 0;
+        else if(address == 0x128)
+            return obj->Reset[2] ? 0xFFFF : 0;
+
+        return NpcParent::getAny(obj, address);
+    }
+
+    void setAny(NPC_t *obj, int address, double value) override
+    {
+        if(address >= 0x78 && address < 0xA8) // YoshiTongue
+        {
+            s_locMem.setAny(&obj->Location, address - 0x78, value);
+            return;
+        }
+        else if(address >= 0xA8 && address < 0xD8) // Location
+        {
+            s_locMem.setAny(&obj->DefaultLocation, address - 0xA8, value);
+            return;
+        }
+        else if(address == 0x126)
+        {
+            obj->Reset[1] = value != 0;
+        }
+        else if(address == 0x128)
+        {
+            obj->Reset[2] = value != 0;
+        }
+
+        NpcParent::setAny(obj, address, value);
     }
 };
 
