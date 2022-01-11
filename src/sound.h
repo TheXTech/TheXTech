@@ -199,4 +199,6 @@ void LoadCustomSound();
 // EXTRA: Unload custom-loaded music and sounds, and restore originals
 void UnloadCustomSound();
 
+void PlayExtSound(const std::string &path);
+
 #endif // SOUND_H

@@ -67,6 +67,7 @@
 #include "core/render.h"
 #include "core/window.h"
 #include "core/events.h"
+#include "script/luna.h"
 
 #include "pseudo_vb.h"
 
@@ -397,6 +398,8 @@ int GameMain(const CmdLineSetup_t &setup)
                     Player[A].Dead = true;
             }
 
+            lunaLoad();
+
             clearScreenFaders();
 
             // Run the frame-loop
@@ -533,6 +536,8 @@ int GameMain(const CmdLineSetup_t &setup)
             // Clear the speed-runner timer
             speedRun_resetTotal();
 
+            lunaLoad();
+
             delayedMusicStart(); // Allow music being started
 
             ProcEvent("Level - Start", true);
@@ -608,6 +613,7 @@ int GameMain(const CmdLineSetup_t &setup)
                 XRender::clearBuffer();
                 XRender::repaint();
 
+                lunaReset();
                 ClearLevel();
 
                 std::string levelPath;
@@ -816,6 +822,8 @@ int GameMain(const CmdLineSetup_t &setup)
             else
                 clearScreenFaders();
 
+            lunaLoad();
+
             delayedMusicStart(); // Allow music being started
 
             ProcEvent("Level - Start", true);
@@ -896,6 +904,7 @@ int GameMain(const CmdLineSetup_t &setup)
 //            Else
             else if(!LevelRestartRequested)
             {
+                lunaReset();
                 ClearLevel();
 //            End If
             } // TestLevel
@@ -944,6 +953,7 @@ void NextLevel()
     LevelMacro = LEVELMACRO_OFF;
     LevelMacroCounter = 0;
     StopMusic();
+    lunaReset();
     ClearLevel();
     XRender::setTargetTexture();
     XRender::clearBuffer();
@@ -1643,6 +1653,7 @@ void StartBattleMode()
     StopMusic();
     XEvents::doEvents();
     PGE_Delay(500);
+    lunaReset();
     ClearLevel();
 
     if(NumSelectWorld <= 1)

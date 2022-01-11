@@ -32,6 +32,7 @@
 #include "../main/trees.h"
 #include "../main/game_globals.h"
 #include "../core/render.h"
+#include "../script/luna.h"
 
 #include <fmt_format_ne.h>
 #include <Utils/maths.h>
@@ -2142,6 +2143,7 @@ void UpdateGraphics(bool skipRepaint)
                     }
                 }
 
+                lunaRender();
     //                DrawInterface Z, numScreens
                 if(ShowOnScreenMeta)
                     DrawInterface(Z, numScreens);

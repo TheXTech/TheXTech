@@ -320,7 +320,25 @@ set(THEXTECH_SRC
     src/main/outro_loop.cpp
     src/main/trees.cpp
     src/main/QuadTree/LooseQuadtree-impl.cpp
+    src/script/luna.cpp
     src/script/autocode.cpp
+    src/script/autocode_manager.cpp
+    src/script/csprite.cpp
+    src/script/lunaspriteman.cpp
+    src/script/hitbox.cpp
+    src/script/sprite_component.cpp
+    src/script/sprite_funcs.cpp
+    src/script/lunaplayer.cpp
+    src/script/lunanpc.cpp
+    src/script/lunablock.cpp
+    src/script/lunamisc.cpp
+    src/script/lunalevel.cpp
+    src/script/lunarender.cpp
+    src/script/lunacell.cpp
+    src/script/lunainput.cpp
+    src/script/renderop_bitmap.cpp
+    src/script/renderop_rect.cpp
+    src/script/mememu.cpp
     src/graphics/gfx_update2.cpp
     src/graphics/gfx_update.cpp
     src/graphics/gfx_background.cpp

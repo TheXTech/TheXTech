@@ -21,7 +21,13 @@
 #include <list>
 #include <sstream>
 
+#include <Logger/logger.h>
+
 #include "autocode.h"
+#include "autocode_manager.h"
+#include "lunamisc.h"
+#include "sprite_funcs.h"
+#include "csprite.h"
 #include "globals.h"
 #include "player.h"
 #include "graphics.h"
@@ -29,132 +35,16 @@
 #include "layers.h"
 #include "core/msgbox.h"
 #include "main/cheat_code.h"
-
-
-struct LunaRect
-{
-    int left;
-    int top;
-    int right;
-    int bottom;
-};
-
-namespace PlayerF
-{
-
-// FILTER FUNCS
-void FilterToFire(Player_t *player)
-{
-    if(player->State > 3)
-        player->State = 3;
-}
-
-void FilterToBig(Player_t *player)
-{
-    if(player->State > 2)
-        player->State = 2;
-}
-
-void FilterToSmall(Player_t *player)
-{
-    if(player->State > 1)
-        player->State = 1;
-}
-
-void FilterReservePowerup(Player_t *player)
-{
-    player->HeldBonus = 0;
-}
-
-void FilterMount(Player_t *player)
-{
-    player->MountType = 0;
-    player->Mount = 0;
-}
-
-Player_t *Get(int num)
-{
-    if(num > numPlayers || num < 1)
-        return nullptr;
-
-    return &Player[num];
-}
-
-void InfiniteFlying(int player)
-{
-    Player_t* demo = Get(player);
-
-    if(demo != 0)
-        demo->FlyCount = 50;
-}
-
-bool UsesHearts(Player_t *p)
-{
-    return p->Character != 1 && p->Character != 2;
-}
-
-// GET SCREEN POSITION
-LunaRect GetScreenPosition(Player_t *player)
-{
-//    double* pCameraY = (double*)GM_CAMERA_Y;
-//    double* pCameraX = (double*)GM_CAMERA_X;
-    double cam_y = -vScreenY[1];
-    double cam_x = -vScreenX[1];
-//    double cam_d = cam_y + 600;
-//    double cam_r = cam_x + 800;
-
-    LunaRect ret_rect;
-    ret_rect.left = (player->Location.X - cam_x);
-    ret_rect.top = (player->Location.Y - cam_y);
-    ret_rect.right = ret_rect.left + player->Location.Width;
-    ret_rect.bottom = ret_rect.top + player->Location.Height;
-    return ret_rect;
-}
-
-} // PlayerF
-
-
-namespace NpcF
-{
-
-void FindAll(int ID, int section, std::list<NPC_t*>* return_list)
-{
-    bool anyID = (ID == -1 ? true : false);
-    bool anySec = (section == -1 ? true : false);
-    NPC_t* thisnpc = NULL;
-
-    for(int i = 0; i < numNPCs; i++)
-    {
-        thisnpc = &NPC[i];
-        if(thisnpc->Type == ID || anyID)
-        {
-            if(thisnpc->Section == section || anySec)
-                return_list->push_back(thisnpc);
-        }
-    }
-}
-
-// GET FIRST MATCH
-NPC_t* GetFirstMatch(int ID, int section)
-{
-    bool anyID = (ID == -1 ? true : false);
-    bool anySec = (section == -1 ? true : false);
-    NPC_t* thisnpc = nullptr;
-
-    for(int i = 0; i < numNPCs; i++)
-    {
-        thisnpc = &NPC[i];
-        if(thisnpc->Type == ID || anyID)
-        {
-            if(thisnpc->Section == section || anySec)
-                return thisnpc; //matched
-        }
-    }
-
-    return nullptr; //not matched
-}
-
-} // NpcF
+#include "lunarender.h"
+#include "lunaplayer.h"
+#include "lunalevel.h"
+#include "lunanpc.h"
+#include "lunablock.h"
+#include "lunacell.h"
+#include "lunaspriteman.h"
+#include "lunainput.h"
+#include "renderop_string.h"
+#include "mememu.h"
 
 
 namespace LayerF
@@ -168,21 +58,21 @@ Layer_t *Get(int layerIdx)
 }
 
 // Stop a layer
-void Stop(Layer_t* layer)
+void Stop(Layer_t *layer)
 {
     layer->EffectStop = false;
     layer->SpeedX = 0.0001f;
     layer->SpeedY = 0.0001f;
 }
 
-void SetYSpeed(Layer_t* layer, float setY)
+void SetYSpeed(Layer_t *layer, float setY)
 {
     setY = (setY == 0 ?  0.0001f : setY);
     layer->SpeedY = setY;
     layer->EffectStop = true;
 }
 
-void SetXSpeed(Layer_t* layer, float setX)
+void SetXSpeed(Layer_t *layer, float setX)
 {
     setX = (setX == 0 ?  0.0001f : setX);
     layer->SpeedX = setX;
@@ -212,6 +102,22 @@ static FIELDTYPE StrToFieldtype(std::string string)
     return FT_BYTE;
 }
 
+static void PrintSyntaxError(std::string errored_line)
+{
+    static int errors = 0;
+    errors += 25;
+    //    RenderStringOp* render_str = new RenderStringOp();
+    //    render_str->m_FontType = 2;
+    //    render_str->m_FramesLeft = 440;
+    //    render_str->m_String = errored_line;
+    //    render_str->m_String += L"- SYNTAX ERROR";
+    //    render_str->m_X = 125;
+    //    render_str->m_Y = (float)(errors % 600);
+    //    Renderer::Get().AddOp(render_str);
+    pLogWarning("Autocode Syntax Error: %s", errored_line.c_str());
+}
+
+
 
 Autocode::Autocode()
 {
@@ -240,9 +146,9 @@ Autocode::Autocode(AutocodeType _Type, double _Target, double _p1, double _p2, d
     Activated = (_Section < 1000 ? true : false);
 }
 
-Autocode* Autocode::MakeCopy()
+Autocode *Autocode::MakeCopy()
 {
-    Autocode* newcode = new Autocode();
+    Autocode *newcode = new Autocode();
 
     newcode->Activated = Activated;
     newcode->ActiveSection = ActiveSection;
@@ -263,14 +169,15 @@ Autocode* Autocode::MakeCopy()
 }
 
 // DO - Perform autocodes for this section. Only does init codes if "init" is set
-void Autocode::Do(bool init) {
+void Autocode::Do(bool init)
+{
 
     // Is it expired?
     if(Expired || !Activated)
         return;
 
     // Make sure game is in OK state to run
-    Player_t* demo = PlayerF::Get(1);
+    Player_t *demo = PlayerF::Get(1);
 
     if(!demo)
         return;
@@ -294,30 +201,35 @@ void Autocode::Do(bool init) {
             break;
 
         // FILTERS
-        case AT_FilterToSmall: {
+        case AT_FilterToSmall:
+        {
             PlayerF::FilterToSmall(demo);
             break;
-                            }
-        case AT_FilterToBig: {
+        }
+        case AT_FilterToBig:
+        {
             PlayerF::FilterToBig(demo);
             break;
-                          }
-        case AT_FilterToFire: {
+        }
+        case AT_FilterToFire:
+        {
             PlayerF::FilterToFire(demo);
             break;
-                           }
-        case AT_FilterMount: {
+        }
+        case AT_FilterMount:
+        {
             PlayerF::FilterMount(demo);
             break;
-                          }
-        case AT_FilterReservePowerup: {
+        }
+        case AT_FilterReservePowerup:
+        {
             PlayerF::FilterReservePowerup(demo);
             break;
-                                   }
+        }
 
         case AT_FilterPlayer:
         {
-            Player_t* demo = PlayerF::Get(1);
+            Player_t *demo = PlayerF::Get(1);
             if(demo != 0)
             {
                 if(demo->Character == Param1)
@@ -347,19 +259,20 @@ void Autocode::Do(bool init) {
             break;
 
         // SCREEN EDGE BUFFER
-        case AT_ScreenEdgeBuffer: {
+        case AT_ScreenEdgeBuffer:
+        {
             //char* dbg = "SCREEN EDGE DBG";
 
             // Get all target NPCs in section into a list
-            std::list<NPC_t*> npcs;
+            std::list<NPC_t *> npcs;
             NpcF::FindAll((int)Target, demo->Section, &npcs);
 
             if(npcs.size() > 0)
             {
                 // Loop over list of NPCs
-                for(std::list<NPC_t*>::iterator iter = npcs.begin(), end = npcs.end(); iter != end; ++iter)
+                for(std::list<NPC_t *>::iterator iter = npcs.begin(), end = npcs.end(); iter != end; ++iter)
                 {
-                    NPC_t* npc = *iter;
+                    NPC_t *npc = *iter;
                     switch((int)Param1)
                     {
                     default:
@@ -412,71 +325,80 @@ void Autocode::Do(bool init) {
             break;
 
         // SHOW NPC LIFE LEFT
-        case AT_ShowNPCLifeLeft: {
+        case AT_ShowNPCLifeLeft:
+        {
             int base_health = SDL_atoi(MyString.data());
-            NPC_t* npc = NpcF::GetFirstMatch((int)Target, (int)Param3 - 1);
-            if(npc != NULL) {
-                float hits = *(((float*)((&(*(byte*)npc)) + 0x148)));
-                Renderer::Get().AddOp(new RenderStringOp(std::to_wstring((long long)(base_health - hits)), 3, (float)Param1, (float)Param2));
-            } else {
-                Renderer::Get().AddOp(new RenderStringOp(L"?", 3, (float)Param1, (float)Param2));
+            NPC_t *npc = NpcF::GetFirstMatch((int)Target, (int)Param3 - 1);
+            if(npc != NULL)
+            {
+                float hits = *(((float *)((&(*(uint8_t *)npc)) + 0x148)));
+                Renderer::Get().AddOp(new RenderStringOp(std::to_string((long long)(base_health - hits)), 3, (float)Param1, (float)Param2));
             }
+            else
+                Renderer::Get().AddOp(new RenderStringOp("?", 3, (float)Param1, (float)Param2));
             break;
-                            }
+        }
 
         // AUDIO
-        case AT_SFX: {
+        case AT_SFX:
+        {
             if(this->Length <= 1) // Play once when delay runs out
             {
                 // Play built in sound
                 if(Param1 > 0)
-                {
                     PlaySound((int)Param1);
-                }
                 else
                 {
                     // Sound from level folder
                     if(MyString.length() > 0)
                     {
                         //char* dbg = "CUSTOM SOUND PLAY DBG";
-                        std::wstring full_path = getCustomFolderPath() + MyString;
-                        PlaySound(full_path.c_str(), 0, SND_FILENAME | SND_ASYNC);
+                        std::string full_path = FileNamePath + FileName + "/" + MyString;
+                        PlayExtSound(full_path);
                     }
 
                 }
                 Expired = true;
             }
             break;
-                     }
+        }
 
-        case AT_SetMusic: {
-            SMBXSound::SetMusic((int)Param1, (int)Target - 1);
-
-            if(MyString.length() >= 5)
-                SMBXSound::SetMusicPath((int)Target-1, MyString);
+        case AT_SetMusic:
+        {
+            int sec = (int)Target - 1;
+            if(sec >= 0 && sec <= numSections)
+            {
+                if(Param1 >= 0.0 && Param1 <= 24)
+                    bgMusic[sec] = (int)Param1;
+                if(MyString.length() >= 5)
+                    CustomMusic[sec] = MyString;
+            }
             break;
-                           }
+        }
 
-        case AT_PlayMusic: {
-            if(Length <= 1) { // Play once when delay runs out
-                SMBXSound::PlayMusic((int)Param1 - 1, true);
+        case AT_PlayMusic:
+        {
+            if(Length <= 1)   // Play once when delay runs out
+            {
+                StartMusic((int)Param1 - 1);
                 Expired = true;
             }
             break;
-                           }
+        }
 
         // EVENTS & BRANCHES
-        case AT_Trigger: {
+        case AT_Trigger:
+        {
             Expired = true;
             gAutoMan.ActivateCustomEvents((int)Target, (int)Param1);
             break;
-                         }
+        }
 
         case AT_Timer:
             if(Param2) // Display timer?
             {
-                Renderer::Get().AddOp(new RenderStringOp(L"TIMER", 3, 600, 27));
-                Renderer::Get().AddOp(new RenderStringOp(std::to_wstring((long long)Length / 60), 3, 618, 48));
+                Renderer::Get().AddOp(new RenderStringOp("TIMER", 3, 600, 27));
+                Renderer::Get().AddOp(new RenderStringOp(std::to_string((long long)Length / 60), 3, 618, 48));
             }
 
             if(Length == 1 || Length == 0)
@@ -487,7 +409,8 @@ void Autocode::Do(bool init) {
                 DoPredicate((int)Target, (int)Param1);
 
                 // Reset time?
-                if(Param3) {
+                if(Param3)
+                {
                     Activated = true;
                     Expired = false;
                     Length = m_OriginalTime;
@@ -512,7 +435,8 @@ void Autocode::Do(bool init) {
         {
             if(Target == 0) //if target is player
             {
-                if(Blocks::IsPlayerTouchingType((int)Param1, (int)Param2, demo)) {
+                if(BlocksF::IsPlayerTouchingType((int)Param1, (int)Param2, demo))
+                {
                     RunSelfOption();
                     gAutoMan.ActivateCustomEvents(0, (int)Param3);
                 }
@@ -523,7 +447,8 @@ void Autocode::Do(bool init) {
         case AT_TriggerRandom:
         {
             int choice = rand() % 4;
-            switch(choice) {
+            switch(choice)
+            {
             case 0:
                 gAutoMan.ActivateCustomEvents(0, (int)Target);
                 break;
@@ -654,40 +579,40 @@ void Autocode::Do(bool init) {
 
         case AT_OnPlayerMem:
         {
-            if(ftype == FT_INVALID) {
+            if(ftype == FT_INVALID)
+            {
                 ftype = FT_BYTE;
                 ftype = StrToFieldtype(MyString);
             }
-            byte* ptr = (byte*)demo;
-            ptr += (int)Target; // offset
-            bool triggered = CheckMem((int)ptr, Param1, (COMPARETYPE)(int)Param2, ftype);
-            if(triggered) {
+//            uint8_t *ptr = (uint8_t *)demo;
+//            ptr += (int)Target; // offset
+            bool triggered = CheckMem(demo, Target, Param1, (COMPARETYPE)(int)Param2, ftype);
+            if(triggered)
                 gAutoMan.ActivateCustomEvents(0, (int)Param3);
-            }
             break;
         }
 
-        case AT_OnGlobalMem: {
-            if(ftype == FT_INVALID) {
+        case AT_OnGlobalMem:
+        {
+            if(ftype == FT_INVALID)
+            {
                 ftype = FT_BYTE;
                 ftype = StrToFieldtype(MyString);
             }
+
             bool triggered = CheckMem((int)Target, Param1, (COMPARETYPE)(int)Param2, ftype);
-            if(triggered) {
+            if(triggered)
                 gAutoMan.ActivateCustomEvents(0, (int)Param3);
-            }
             break;
-                             }
+        }
 
         // USER VARS
         case AT_SetVar:
         {
-            if(ReferenceOK()) {
+            if(ReferenceOK())
                 gAutoMan.VarOperation(MyRef, Param2, (OPTYPE)(int)Param1);
-            }
-            else {
+            else
                 gAutoMan.VarOperation(MyString, Param2, (OPTYPE)(int)Param1);
-            }
             break;
         }
 
@@ -695,15 +620,17 @@ void Autocode::Do(bool init) {
         {
             if(!this->ReferenceOK() || Param1 > (0x184 * 99))
                 break;
-            if(ftype == FT_INVALID) {
+
+            if(ftype == FT_INVALID)
+            {
                 ftype = FT_BYTE;
                 ftype = StrToFieldtype(MyString);
             }
 
             // Get the memory
-            byte* ptr = (byte*)demo;
-            ptr += (int)Param1; // offset
-            double gotval = GetMem((int)ptr, ftype);
+            //uint8_t *ptr = (uint8_t *)demo;
+            //ptr += (int)Param1; // offset
+            double gotval = GetMem(demo, (int)Param1, ftype);
 
             // Perform the load/add/sub/etc operation on the banked variable using the ref as the name
             gAutoMan.VarOperation(MyRef, gotval, (OPTYPE)(int)Param2);
@@ -715,17 +642,16 @@ void Autocode::Do(bool init) {
         {
             if(!this->ReferenceOK() || Param1 > (0x158))
                 break;
-            if(ftype == FT_INVALID) {
+            if(ftype == FT_INVALID)
+            {
                 ftype = FT_BYTE;
                 ftype = StrToFieldtype(MyString);
             }
 
-            NPC_t* pFound_npc = NpcF::GetFirstMatch((int)Target, (int)Param3);
+            NPC_t *pFound_npc = NpcF::GetFirstMatch((int)Target, (int)Param3);
             if(pFound_npc != nullptr)
             {
-                uint8_t* ptr = (uint8_t*)pFound_npc;
-                ptr += (int)Param1;
-                double gotval = GetMem((int)ptr, ftype);
+                double gotval = GetMem(pFound_npc, (int)Param1, ftype);
                 gAutoMan.VarOperation(MyRef, gotval, (OPTYPE)(int)Param2);
             }
 
@@ -734,15 +660,16 @@ void Autocode::Do(bool init) {
 
         case AT_LoadGlobalVar:
         {
-            if(Target >= GM_BASE && Param1 <=  GM_END && ReferenceOK()) {
-                if(ftype == FT_INVALID) {
+            if(Target >= GM_BASE && Param1 <=  GM_END && ReferenceOK())
+            {
+                if(ftype == FT_INVALID)
+                {
                     ftype = FT_BYTE;
                     ftype = StrToFieldtype(MyString);
                 }
 
-                byte* ptr = (byte*)(int)Target;
-                double gotval = GetMem((int)ptr, ftype);
-
+                // byte *ptr = (byte *)(int)Target;
+                double gotval = GetMem((int)Target, ftype);
                 gAutoMan.VarOperation(MyRef, gotval, (OPTYPE)(int)Param1);
             }
             break;
@@ -750,19 +677,19 @@ void Autocode::Do(bool init) {
 
         case AT_IfVar:
         {
-            if(!ReferenceOK()) {
+            if(!ReferenceOK())
+            {
                 InitIfMissing(&gAutoMan.m_UserVars, MyString, 0);// Initalize var if not existing
             }
             double varval;
-            if(ReferenceOK()) {
+            if(ReferenceOK())
                 varval = gAutoMan.m_UserVars[MyRef];
-            }
-            else {
+            else
                 varval = gAutoMan.m_UserVars[MyString];
-            }
 
             // Check if the value meets the criteria and activate event if so
-            switch((COMPARETYPE)(int)Param1) {
+            switch((COMPARETYPE)(int)Param1)
+            {
             case CMPT_EQUALS:
                 if(varval == Param2)
                     gAutoMan.ActivateCustomEvents(0, (int)Param3);
@@ -790,14 +717,16 @@ void Autocode::Do(bool init) {
             if(ReferenceOK())
             {
                 COMPARETYPE compare_type = (COMPARETYPE)(int)Param1;
-                if(true) {
+                if(true)
+                {
                     InitIfMissing(&gAutoMan.m_UserVars, MyString, 0);
                     InitIfMissing(&gAutoMan.m_UserVars, MyRef, 0);
 
                     double var1 = gAutoMan.m_UserVars[MyRef];
                     double var2 = gAutoMan.m_UserVars[MyString];
 
-                    switch(compare_type) {
+                    switch(compare_type)
+                    {
                     case CMPT_EQUALS:
                         if(var1 == var2)
                             gAutoMan.ActivateCustomEvents(0, (int)Param3);
@@ -824,8 +753,9 @@ void Autocode::Do(bool init) {
 
         case AT_ShowVar:
         {
-            if(ReferenceOK()) {
-                std::wstring str = std::to_wstring((long double)gAutoMan.GetVar(MyRef));
+            if(ReferenceOK())
+            {
+                std::string str = std::to_string((long double)gAutoMan.GetVar(MyRef));
                 if(MyString.length() > 0)
                     str = MyString + str;
                 Renderer::Get().AddOp(new RenderStringOp(str, (int)Param3, (float)Param1, (float)Param2));
@@ -835,15 +765,14 @@ void Autocode::Do(bool init) {
 
         case AT_BankVar:
         {
-            if(MyString.length() > 0) {
-                gSavedVarBank.SetVar(MyString, gAutoMan.GetVar(MyString));
-            }
+//            if(MyString.length() > 0)
+//                gSavedVarBank.SetVar(MyString, gAutoMan.GetVar(MyString));
             break;
         }
 
         case AT_WriteBank:
         {
-            gSavedVarBank.WriteBank();
+//            gSavedVarBank.WriteBank();
             break;
         }
 
@@ -868,26 +797,26 @@ void Autocode::Do(bool init) {
         {
             if(Target < 6 && Target > 0)
             {
-                Autocode* coderef = 0;
+                Autocode *coderef = 0;
                 coderef = gAutoMan.GetEventByRef(MyString);
-                if(coderef !=0)
+                if(coderef != 0)
                 {
                     switch((int)Target)
                     {
                     case 1:
-                        MemAssign((int)&(coderef->Target), Param1, (OPTYPE)(int)Param2, FT_DWORD);
+                        modParam(coderef->Target, Param1, (OPTYPE)(int)Param2);
                         break;
                     case 2:
-                        MemAssign((int)&(coderef->Param1), Param1, (OPTYPE)(int)Param2, FT_DWORD);
+                        modParam(coderef->Param1, Param1, (OPTYPE)(int)Param2);
                         break;
                     case 3:
-                        MemAssign((int)&(coderef->Param2), Param1, (OPTYPE)(int)Param2, FT_DWORD);
+                        modParam(coderef->Param2, Param1, (OPTYPE)(int)Param2);
                         break;
                     case 4:
-                        MemAssign((int)&(coderef->Param3), Param1, (OPTYPE)(int)Param2, FT_DWORD);
+                        modParam(coderef->Param3, Param1, (OPTYPE)(int)Param2);
                         break;
                     case 5:
-                        MemAssign((int)&(coderef->Length), Param1, (OPTYPE)(int)Param2, FT_DWORD);
+                        modParam(coderef->Length, Param1, (OPTYPE)(int)Param2);
                         break;
                     }
                 }
@@ -898,11 +827,10 @@ void Autocode::Do(bool init) {
         // ChangeTime
         case AT_ChangeTime:
         {
-            Autocode* coderef = 0;
+            Autocode *coderef = 0;
             coderef = gAutoMan.GetEventByRef(MyString);
-            if(coderef !=0) {
-                MemAssign((int)&coderef->Length, Param1, (OPTYPE)(int)Param2, FT_DFLOAT);
-            }
+            if(coderef != 0)
+                modParam(coderef->Length, Param1, (OPTYPE)(int)Param2);
             break;
         }
 
@@ -935,7 +863,7 @@ void Autocode::Do(bool init) {
         // LAYER CONTROL
         case AT_LayerXSpeed:
         {
-            Layer_t* layer = LayerF::Get((int)Target);
+            Layer_t *layer = LayerF::Get((int)Target);
             if(layer)
             {
                 LayerF::SetXSpeed(layer, (float)SDL_atof(MyString.c_str()));
@@ -947,7 +875,7 @@ void Autocode::Do(bool init) {
 
         case AT_LayerYSpeed:
         {
-            Layer_t* layer = LayerF::Get((int)Target);
+            Layer_t *layer = LayerF::Get((int)Target);
             if(layer)
             {
                 LayerF::SetYSpeed(layer, (float)SDL_atof(MyString.c_str()));
@@ -959,7 +887,7 @@ void Autocode::Do(bool init) {
 
         case AT_AccelerateLayerX:
         {
-            Layer_t* layer = LayerF::Get((int)Target);
+            Layer_t *layer = LayerF::Get((int)Target);
             if(layer)
             {
                 float accel = (float)SDL_atof(MyString.c_str());
@@ -973,7 +901,7 @@ void Autocode::Do(bool init) {
 
         case AT_AccelerateLayerY:
         {
-            Layer_t* layer = LayerF::Get((int)Target);
+            Layer_t *layer = LayerF::Get((int)Target);
             if(layer)
             {
                 float accel = (float)SDL_atof(MyString.c_str());
@@ -987,7 +915,7 @@ void Autocode::Do(bool init) {
 
         case AT_DeccelerateLayerX:
         {
-            Layer_t* layer = LayerF::Get((int)Target);
+            Layer_t *layer = LayerF::Get((int)Target);
             if(layer)
             {
                 float deccel = (float)SDL_atof(MyString.c_str());
@@ -998,7 +926,7 @@ void Autocode::Do(bool init) {
                     if(layer->SpeedX < 0)
                         LayerF::Stop(layer);
                 }
-                else if (layer->SpeedX < 0)
+                else if(layer->SpeedX < 0)
                 {
                     layer->SpeedX += deccel;
                     if(layer->SpeedX > 0)
@@ -1011,7 +939,7 @@ void Autocode::Do(bool init) {
 
         case AT_DeccelerateLayerY:
         {
-            Layer_t* layer = LayerF::Get((int)Target);
+            Layer_t *layer = LayerF::Get((int)Target);
             if(layer)
             {
                 float deccel = (float)SDL_atof(MyString.c_str());
@@ -1022,7 +950,7 @@ void Autocode::Do(bool init) {
                     if(layer->SpeedY < 0)
                         LayerF::Stop(layer);
                 }
-                else if (layer->SpeedY < 0)
+                else if(layer->SpeedY < 0)
                 {
                     layer->SpeedY += deccel;
                     if(layer->SpeedY > 0)
@@ -1035,34 +963,33 @@ void Autocode::Do(bool init) {
         // BLOCK MODIFIERS
         case AT_SetAllBlocksID:
         {
-            Blocks::SetAll((int)Target, (int)Param1);
+            BlocksF::SetAll((int)Target, (int)Param1);
             break;
         }
 
         case AT_SwapAllBlocks:
         {
-            Blocks::SwapAll((int)Target, (int)Param1);
+            BlocksF::SwapAll((int)Target, (int)Param1);
             break;
         }
 
         case AT_ShowAllBlocks:
         {
-            Blocks::ShowAll((int)Target);
+            BlocksF::ShowAll((int)Target);
             break;
         }
 
         case AT_HideAllBlocks:
         {
-            Blocks::HideAll((int)Target);
+            BlocksF::HideAll((int)Target);
             break;
         }
 
 
         case AT_PushScreenBoundary:
         {
-            if(Target > 0 && Target < 22 && Param1 >= 0 && Param1 < 5) {
-                Level::PushSectionBoundary((int)Target - 1, (int)Param1, SDL_atof(MyString.c_str()));
-            }
+            if(Target > 0 && Target < numSections && Param1 >= 0 && Param1 < 5)
+                LevelF::PushSectionBoundary((int)Target - 1, (int)Param1, SDL_atof(MyString.c_str()));
             break;
         }
 
@@ -1082,7 +1009,7 @@ void Autocode::Do(bool init) {
                 //Level::SetSectionBounds(sec, x_stepped,  y_stepped, x_stepped + 800, y_stepped + 600);
 
                 //if(Length <= 1) { // When travel time is up, force screen into the right place
-                    Level::SetSectionBounds((int)Target - 1, Param1, Param2, Param1 + 800, Param2 + 600);
+                LevelF::SetSectionBounds((int)Target - 1, Param1, Param2, Param1 + 800, Param2 + 600);
                 //}
             }
             break;
@@ -1091,13 +1018,13 @@ void Autocode::Do(bool init) {
         // PLAYER CYCLE
         case AT_CyclePlayerRight:
         {
-            Player::CycleRight(demo);
+            PlayerF::CycleRight(demo);
             break;
         }
 
         case AT_CyclePlayerLeft:
         {
-            Player::CycleLeft(demo);
+            PlayerF::CycleLeft(demo);
             break;
         }
 
@@ -1105,17 +1032,16 @@ void Autocode::Do(bool init) {
         // SET HITS
         case AT_SetHits:
         {
-            NPC::AllSetHits((int)Target, (int)Param1 - 1, (float)Param2);
+            NpcF::AllSetHits((int)Target, (int)Param1 - 1, (float)Param2);
             break;
         }
 
         // FORCE FACING
         case AT_ForceFacing:
         {
-            Player_t* demo = PlayerF::Get(1);
-            if(demo != 0) {
+            Player_t *demo = PlayerF::Get(1);
+            if(demo != 0)
                 NpcF::AllFace((int)Target, (int)Param1 - 1, demo->Location.SpeedX);
-            }
             break;
         }
 
@@ -1131,7 +1057,7 @@ void Autocode::Do(bool init) {
         {
             short tempint = 1;
             if(Target == 0)
-                Player::Harm(tempint);
+                PlayerHurt(tempint);
             RunSelfOption();
             break;
         }
@@ -1140,7 +1066,7 @@ void Autocode::Do(bool init) {
         {
             short tempint = 1;
             if(Target == 0)
-                Player::Kill(tempint);
+                KillPlayer(tempint);
             RunSelfOption();
             break;
         }
@@ -1148,87 +1074,96 @@ void Autocode::Do(bool init) {
         // NPC MEMORY SET
         case AT_NPCMemSet:
         {
-            if(ftype == FT_INVALID) {
+            if(ftype == FT_INVALID)
+            {
                 ftype = FT_BYTE;
                 ftype = StrToFieldtype(MyString);
             }
 
             // Assign the mem
-            if(ReferenceOK()) { // Use referenced var as value
+            if(ReferenceOK())   // Use referenced var as value
+            {
                 double gotval = gAutoMan.GetVar(MyRef);
-                NPC::MemSet((int)Target, (int)Param1, gotval, (OPTYPE)(int)Param3, ftype);
+                NpcF::MemSet((int)Target, (int)Param1, gotval, (OPTYPE)(int)Param3, ftype);
             }
-            else { // Use given value as value
-                NPC::MemSet((int)Target, (int)Param1, Param2, (OPTYPE)(int)Param3, ftype); // NPC ID, offset in obj, value, op, field type
+            else   // Use given value as value
+            {
+                NpcF::MemSet((int)Target, (int)Param1, Param2, (OPTYPE)(int)Param3, ftype); // NPC ID, offset in obj, value, op, field type
             }
 
             break;
         }
 
         // PLAYER MEMORY SET
-        case AT_PlayerMemSet: {
-            if(ftype == FT_INVALID) {
+        case AT_PlayerMemSet:
+        {
+            if(ftype == FT_INVALID)
+            {
                 ftype = FT_BYTE;
                 ftype = StrToFieldtype(MyString);
             }
-            if(ReferenceOK()) {
+            if(ReferenceOK())
+            {
                 double gotval = gAutoMan.GetVar(MyRef);
-                Player::MemSet((int)Param1, gotval, (OPTYPE)(int)Param3, ftype);
+                PlayerF::MemSet((int)Param1, gotval, (OPTYPE)(int)Param3, ftype);
             }
-            else {
-                Player::MemSet((int)Param1, Param2, (OPTYPE)(int)Param3, ftype);
-            }
+            else
+                PlayerF::MemSet((int)Param1, Param2, (OPTYPE)(int)Param3, ftype);
             break;
-                              }
+        }
 
 
         // MEM ASSIGN
-        case AT_MemAssign: {
-            if(Target >= GM_BASE && Param1 <=  GM_END) {
-                if(ftype == FT_INVALID) {
+        case AT_MemAssign:
+        {
+            if(Target >= GM_BASE && Param1 <=  GM_END)
+            {
+                if(ftype == FT_INVALID)
+                {
                     ftype = FT_BYTE;
                     ftype = StrToFieldtype(MyString);
                 }
-                if(ReferenceOK()) {
+                if(ReferenceOK())
+                {
                     double gotval = gAutoMan.GetVar(MyRef);
                     MemAssign((int)Target, gotval, (OPTYPE)(int)Param2, ftype);
                 }
-                else {
+                else
                     MemAssign((int)Target, Param1, (OPTYPE)(int)Param2, ftype);
-                }
             }
             break;
-                           }
+        }
 
         // DEBUG
         case AT_DebugPrint:
         {
-            Renderer::Get().AddOp(new RenderStringOp(L"LUNADLL (WITH LUA) VERSION-" + std::to_wstring((long long)LUNA_VERSION), 3, 50, 250));
+            Renderer::Get().AddOp(new RenderStringOp("LUNADLL (WITH LUA) VERSION-" + std::to_string((long long)LUNA_VERSION), 3, 50, 250));
             //Renderer::Get().SafePrint(, 3, 340, 250);
 
-            Renderer::Get().AddOp(new RenderStringOp(L"GLOBL-" + std::to_wstring((long long)gAutoMan.m_GlobalCodes.size()), 3, 50, 300));
+            Renderer::Get().AddOp(new RenderStringOp("GLOBL-" + std::to_string((long long)gAutoMan.m_GlobalCodes.size()), 3, 50, 300));
 
-            Renderer::Get().AddOp(new RenderStringOp(L"INIT -" + std::to_wstring((long long)gAutoMan.m_InitAutocodes.size()), 3, 50, 330));
+            Renderer::Get().AddOp(new RenderStringOp("INIT -" + std::to_string((long long)gAutoMan.m_InitAutocodes.size()), 3, 50, 330));
 
-            Renderer::Get().AddOp(new RenderStringOp(L"CODES-" + std::to_wstring((long long)gAutoMan.m_Autocodes.size()), 3, 50, 360));
+            Renderer::Get().AddOp(new RenderStringOp("CODES-" + std::to_string((long long)gAutoMan.m_Autocodes.size()), 3, 50, 360));
 
-            Renderer::Get().AddOp(new RenderStringOp(L"QUEUE-" + std::to_wstring((long long)gAutoMan.m_CustomCodes.size()), 3, 50, 390));
+            Renderer::Get().AddOp(new RenderStringOp("QUEUE-" + std::to_string((long long)gAutoMan.m_CustomCodes.size()), 3, 50, 390));
 
-            Renderer::Get().AddOp(new RenderStringOp(L"SPRITE-" + std::to_wstring((long long)gSpriteMan.CountSprites()), 3, 50, 420));
+            Renderer::Get().AddOp(new RenderStringOp("SPRITE-" + std::to_string((long long)gSpriteMan.CountSprites()), 3, 50, 420));
 
-            Renderer::Get().AddOp(new RenderStringOp(L"BLPRNT-" + std::to_wstring((long long)gSpriteMan.CountBlueprints()), 3, 50, 450));
+            Renderer::Get().AddOp(new RenderStringOp("BLPRNT-" + std::to_string((long long)gSpriteMan.CountBlueprints()), 3, 50, 450));
 
-            Renderer::Get().AddOp(new RenderStringOp(L"COMP-" + std::to_wstring((long long)gSpriteMan.m_ComponentList.size()), 3, 50, 480));
+            Renderer::Get().AddOp(new RenderStringOp("COMP-" + std::to_string((long long)gSpriteMan.m_ComponentList.size()), 3, 50, 480));
 
             int buckets = 0, cells = 0, objs = 0;
             gCellMan.CountAll(&buckets, &cells, &objs);
-            Renderer::Get().AddOp(new RenderStringOp(L"BCO-" + std::to_wstring((long long)buckets) + L" "
-                                    + std::to_wstring((long long)cells) + L" "
-                                    + std::to_wstring((long long)objs), 3, 50, 510));
+            Renderer::Get().AddOp(new RenderStringOp("BCO-" + std::to_string((long long)buckets) + " "
+                                  + std::to_string((long long)cells) + " "
+                                  + std::to_string((long long)objs), 3, 50, 510));
 
             std::list<CellObj> cellobjs;
-            gCellMan.GetObjectsOfInterest(&cellobjs, demo->momentum.x, demo->momentum.y, (int)demo->momentum.width, (int)demo->momentum.height);
-            Renderer::Get().AddOp(new RenderStringOp(L"NEAR-" + std::to_wstring((long long)cellobjs.size()), 3, 50, 540));
+            gCellMan.GetObjectsOfInterest(&cellobjs, demo->Location.X, demo->Location.Y,
+                                          (int)demo->Location.Width, (int)demo->Location.Height);
+            Renderer::Get().AddOp(new RenderStringOp("NEAR-" + std::to_string((long long)cellobjs.size()), 3, 50, 540));
 
             break;
         }
@@ -1259,7 +1194,7 @@ void Autocode::Do(bool init) {
         {
             if(ReferenceOK())
             {
-                CSprite* blueprint = new CSprite();
+                CSprite *blueprint = new CSprite();
                 gSpriteMan.AddBlueprint(MyRef.c_str(), blueprint);
             }
 
@@ -1274,10 +1209,12 @@ void Autocode::Do(bool init) {
             {
                 if(gSpriteMan.m_SpriteBlueprints.find(MyRef) != gSpriteMan.m_SpriteBlueprints.end()) // BLueprint exists
                 {
-                    CSprite* pSpr = gSpriteMan.m_SpriteBlueprints[MyRef];					// Get blueprint
-                    Autocode* pComponent = gAutoMan.GetEventByRef(MyString);				// Get autocode containing component
-                    if(pComponent != NULL) {
-                        switch((BlueprintAttachType)(int)Target) {
+                    CSprite *pSpr = gSpriteMan.m_SpriteBlueprints[MyRef];                   // Get blueprint
+                    Autocode *pComponent = gAutoMan.GetEventByRef(MyString);                // Get autocode containing component
+                    if(pComponent != NULL)
+                    {
+                        switch((BlueprintAttachType)(int)Target)
+                        {
                         case BPAT_Behavior:
                             pSpr->AddBehaviorComponent(GenerateComponent(pComponent));
                             break;
@@ -1303,7 +1240,7 @@ void Autocode::Do(bool init) {
 
         case AT_PlaceSprite:
         {
-            //1: Type	2: ImgResource	3: Xpos			4: Ypos		5:				6: Extra
+            //1: Type   2: ImgResource  3: Xpos         4: Ypos     5:              6: Extra
             CSpriteRequest req;
             req.type = (int)Target;
             req.img_resource_code = (int)Param1;
@@ -1334,7 +1271,8 @@ void Autocode::SelfTick()
 }
 
 // DO PREDICATE
-void Autocode::DoPredicate(int target, int predicate) {
+void Autocode::DoPredicate(int target, int predicate)
+{
 
     // Activate custom event?
     if(predicate >= 1000 && predicate < 100000)
@@ -1347,7 +1285,7 @@ void Autocode::DoPredicate(int target, int predicate) {
     AutocodePredicate pred = (AutocodePredicate)predicate;
     short tempint = 1;
 
-    switch (pred)
+    switch(pred)
     {
     // DEATH PREDICATE
     case AP_Hurt:
@@ -1369,22 +1307,25 @@ bool Autocode::NPCConditional(int target, int cond)
     //const char* dbg = "NPC COND DBG";
     bool ret = false;
 
-    switch((AC_Conditional)cond) {
+    switch((AC_Conditional)cond)
+    {
 
     case AC_Invalid:
     default:
         return ret;
         break;
 
-    case AC_Exists: {
+    case AC_Exists:
+    {
         return (NpcF::GetFirstMatch(target, -1) == nullptr ? false : true);
         break;
-                    }
+    }
 
-    case AC_DoesNotExist: {
+    case AC_DoesNotExist:
+    {
         return (NpcF::GetFirstMatch(target, -1) == nullptr ? true : false);
         break;
-                    }
+    }
     }
 }
 
@@ -1405,7 +1346,7 @@ bool Autocode::ReferenceOK()
 
 void Autocode::HeartSystem()
 {
-    Player_t* sheath = PlayerF::Get(1);
+    Player_t *sheath = PlayerF::Get(1);
 
     if(sheath != 0)
     {
@@ -1442,37 +1383,529 @@ void Autocode::HeartSystem()
             gAutoMan.m_Hearts = 1;
         }
         else if(sheath->Hearts == 0)
-        {
             gAutoMan.m_Hearts = 0;
-        }
 
         std::stringstream gAutoMan_m_Hearts;
         gAutoMan_m_Hearts << (long long)gAutoMan.m_Hearts;
         // Display life stuff on screen
-        Renderer::Get().AddOp(new RenderStringOp(std::wstring(
+        Renderer::Get().AddOp(new RenderStringOp(std::string(
                                   std::string("HP: ") + std::string(gAutoMan_m_Hearts.str())
-                                  )
-                              ,3, (float)Target, (float)Param1));
+                              )
+                              , 3, (float)Target, (float)Param1));
     }//if heartuser
 }
 
 
 void Autocode::LunaControl(LunaControlAct act, int val)
 {
-    switch(act) {
-
+    switch(act)
+    {
     case LCA_DemoCounter:
         break;
 
     case LCA_SMBXHUD:
-        if(val == 1)
-            gSMBXHUDSettings.skip = true;
-        else
-            gSMBXHUDSettings.skip = false;
+//        if(val == 1)
+//            gSMBXHUDSettings.skip = true;
+//        else
+//            gSMBXHUDSettings.skip = false;
         break;
 
     case LCA_Invalid:
     default:
         return;
+    }
+}
+
+void Autocode::modParam(double &dst, double src, OPTYPE operation)
+{
+    switch(operation)
+    {
+    default: // Do nothing
+        break;
+    case OP_Assign:
+        dst = src;
+        break;
+    case OP_Add:
+        dst += src;
+        break;
+    case OP_Sub:
+        dst -= src;
+        break;
+    case OP_Mult:
+        dst *= src;
+        break;
+    case OP_Div:
+        dst /= src;
+        break;
+    case OP_XOR:
+        dst = (int)dst ^ (int)src;
+        break;
+    }
+}
+
+
+AutocodeType Autocode::EnumerizeCommand(char *wbuf)
+{
+    if(wbuf)
+    {
+        char command[100];
+        SDL_memset(command, 9, 100 * sizeof(char));
+        int success = SDL_sscanf(wbuf, " %99[^,] ,", command);
+        if(!success)
+        {
+            // Bad or mistyped command?
+            std::string line = std::string(wbuf);
+            if(line.size() > 10)
+                PrintSyntaxError(line);
+            return AT_Invalid;
+        }
+
+        if(SDL_strcmp(command, "FilterToSmal") == 0)
+            return AT_FilterToSmall;
+
+        if(SDL_strcmp(command, "FilterToBig") == 0)
+            return AT_FilterToBig;
+
+        if(SDL_strcmp(command, "FilterToFire") == 0)
+            return AT_FilterToFire;
+
+        if(SDL_strcmp(command, "FilterMount") == 0)
+            return AT_FilterMount;
+
+        if(SDL_strcmp(command, "FilterReservePowerup") == 0)
+            return AT_FilterReservePowerup;
+
+        if(SDL_strcmp(command, "FilterPlayer") == 0)
+            return AT_FilterPlayer;
+
+
+        if(SDL_strcmp(command, "SetHearts") == 0)
+            return AT_SetHearts;
+
+        if(SDL_strcmp(command, "HeartSystem") == 0)
+            return AT_HeartSystem;
+
+        if(SDL_strcmp(command, "InfiniteFlying") == 0)
+            return AT_InfiniteFlying;
+
+
+        if(SDL_strcmp(command, "ScreenEdgeBuffer") == 0)
+            return AT_ScreenEdgeBuffer;
+
+
+        if(SDL_strcmp(command, "ShowText") == 0)
+            return AT_ShowText;
+
+        if(SDL_strcmp(command, "ShowNPCLifeLeft") == 0)
+            return AT_ShowNPCLifeLeft;
+
+
+        if(SDL_strcmp(command, "Trigger") == 0)
+            return AT_Trigger;
+
+        if(SDL_strcmp(command, "Timer") == 0)
+            return AT_Timer;
+
+        if(SDL_strcmp(command, "IfNPC") == 0)
+            return AT_IfNPC;
+
+        if(SDL_strcmp(command, "BlockTrigger") == 0)
+            return AT_BlockTrigger;
+
+        if(SDL_strcmp(command, "TriggerRandom") == 0)
+            return AT_TriggerRandom;
+
+        if(SDL_strcmp(command, "TriggerRandomRange") == 0)
+            return AT_TriggerRandomRange;
+
+        if(SDL_strcmp(command, "TriggerZone") == 0)
+            return AT_TriggerZone;
+
+        if(SDL_strcmp(command, "ScreenBorderTrigger") == 0)
+            return AT_ScreenBorderTrigger;
+
+        if(SDL_strcmp(command, "OnInput") == 0)
+            return AT_OnInput;
+
+        if(SDL_strcmp(command, "OnCustomCheat") == 0)
+            return AT_OnCustomCheat;
+
+        if(SDL_strcmp(command, "OnPlayerMem") == 0)
+            return AT_OnPlayerMem;
+
+        if(SDL_strcmp(command, "OnGlobalMem") == 0)
+            return AT_OnGlobalMem;
+
+
+        if(SDL_strcmp(command, "SetVar") == 0)
+            return AT_SetVar;
+
+        if(SDL_strcmp(command, "LoadPlayerVar") == 0)
+            return AT_LoadPlayerVar;
+
+        if(SDL_strcmp(command, "LoadNPCVar") == 0)
+            return AT_LoadNPCVar;
+
+        if(SDL_strcmp(command, "LoadGlobalVar") == 0)
+            return AT_LoadGlobalVar;
+
+        if(SDL_strcmp(command, "ShowVar") == 0)
+            return AT_ShowVar;
+
+        if(SDL_strcmp(command, "IfVar") == 0)
+            return AT_IfVar;
+
+        if(SDL_strcmp(command, "CompareVar") == 0)
+            return AT_CompareVar;
+
+        if(SDL_strcmp(command, "BankVar") == 0)
+            return AT_BankVar;
+
+        if(SDL_strcmp(command, "WriteBank") == 0)
+            return AT_WriteBank;
+
+
+        if(SDL_strcmp(command, "LunaContro") == 0)
+            return AT_LunaControl;
+
+
+        if(SDL_strcmp(command, "DeleteCommand") == 0)
+            return AT_DeleteCommand;
+
+        if(SDL_strcmp(command, "ModParam") == 0)
+            return AT_ModParam;
+
+        if(SDL_strcmp(command, "ChangeTime") == 0)
+            return AT_ChangeTime;
+
+
+        if(SDL_strcmp(command, "DeleteEventsFrom") == 0)
+            return AT_DeleteEventsFrom;
+
+        if(SDL_strcmp(command, "ClearInputString") == 0)
+            return AT_ClearInputString;
+
+
+        if(SDL_strcmp(command, "LayerXSpeed") == 0)
+            return AT_LayerXSpeed;
+
+        if(SDL_strcmp(command, "LayerYSpeed") == 0)
+            return AT_LayerYSpeed;
+
+        if(SDL_strcmp(command, "AccelerateLayerX") == 0)
+            return AT_AccelerateLayerX;
+
+        if(SDL_strcmp(command, "AccelerateLayerY") == 0)
+            return AT_AccelerateLayerY;
+
+        if(SDL_strcmp(command, "DeccelerateLayerX") == 0)
+            return AT_DeccelerateLayerX;
+
+        if(SDL_strcmp(command, "DeccelerateLayerY") == 0)
+            return AT_DeccelerateLayerY;
+
+        if(SDL_strcmp(command, "SetAllBlocksID") == 0)
+            return AT_SetAllBlocksID;
+
+        if(SDL_strcmp(command, "SwapAllBlocks") == 0)
+            return AT_SwapAllBlocks;
+
+        if(SDL_strcmp(command, "ShowAllBlocks") == 0)
+            return AT_ShowAllBlocks;
+
+        if(SDL_strcmp(command, "HideAllBlocks") == 0)
+            return AT_HideAllBlocks;
+
+
+        if(SDL_strcmp(command, "PushScreenBoundary") == 0)
+            return AT_PushScreenBoundary;
+
+        if(SDL_strcmp(command, "SnapSectionBounds") == 0)
+            return AT_SnapSectionBounds;
+
+
+        if(SDL_strcmp(command, "CyclePlayerRight") == 0)
+            return AT_CyclePlayerRight;
+
+        if(SDL_strcmp(command, "CyclePlayerLeft") == 0)
+            return AT_CyclePlayerLeft;
+
+
+        if(SDL_strcmp(command, "SFX") == 0)
+            return AT_SFX;
+
+        if(SDL_strcmp(command, "SetMusic") == 0)
+            return AT_SetMusic;
+
+        if(SDL_strcmp(command, "PlayMusic") == 0)
+            return AT_PlayMusic;
+
+
+        if(SDL_strcmp(command, "TriggerSMBXEvent") == 0)
+            return AT_TriggerSMBXEvent;
+
+
+        if(SDL_strcmp(command, "Kil") == 0)
+            return AT_Kill;
+
+        if(SDL_strcmp(command, "Hurt") == 0)
+            return AT_Hurt;
+
+
+        if(SDL_strcmp(command, "SetHits") == 0)
+            return AT_SetHits;
+
+        if(SDL_strcmp(command, "NPCMemSet") == 0)
+            return AT_NPCMemSet;
+
+        if(SDL_strcmp(command, "PlayerMemSet") == 0)
+            return AT_PlayerMemSet;
+
+        if(SDL_strcmp(command, "ForceFacing") == 0)
+            return AT_ForceFacing;
+
+        if(SDL_strcmp(command, "MemAssign") == 0)
+            return AT_MemAssign;
+
+        if(SDL_strcmp(command, "DebugPrint") == 0)
+            return AT_DebugPrint;
+
+        if(SDL_strcmp(command, "DebugWindow") == 0)
+            return AT_DebugWindow;
+
+
+        if(SDL_strcmp(command, "CollisionScan") == 0)
+            return AT_CollisionScan;
+
+
+        if(SDL_strcmp(command, "LoadImage") == 0)
+            return AT_LoadImage;
+
+        if(SDL_strcmp(command, "SpriteBlueprint") == 0)
+            return AT_SpriteBlueprint;
+
+        if(SDL_strcmp(command, "Attach") == 0)
+            return AT_Attach;
+
+        if(SDL_strcmp(command, "PlaceSprite") == 0)
+            return AT_PlaceSprite;
+
+
+        // Sprite Component section
+        if(SDL_strcmp(command, "OnPlayerCollide") == 0)
+            return AT_OnPlayerCollide;
+
+        if(SDL_strcmp(command, "OnPlayerDistance") == 0)
+            return AT_OnPlayerDistance;
+
+        if(SDL_strcmp(command, "WaitForPlayer") == 0)
+            return AT_WaitForPlayer;
+
+        if(SDL_strcmp(command, "PlayerHoldingSprite") == 0)
+            return AT_PlayerHoldingSprite;
+
+        if(SDL_strcmp(command, "RandomComponent") == 0)
+            return AT_RandomComponent;
+
+        if(SDL_strcmp(command, "RandomComponentRange") == 0)
+            return AT_RandomComponentRange;
+
+        if(SDL_strcmp(command, "SetSpriteVar") == 0)
+            return AT_SetSpriteVar;
+
+        if(SDL_strcmp(command, "IfSpriteVar") == 0)
+            return AT_IfSpriteVar;
+
+        if(SDL_strcmp(command, "IfLunaVar") == 0)
+            return AT_IfLunaVar;
+
+        if(SDL_strcmp(command, "Die") == 0)
+            return AT_Die;
+
+        if(SDL_strcmp(command, "Deccelerate") == 0)
+            return AT_Deccelerate;
+
+        if(SDL_strcmp(command, "AccelToPlayer") == 0)
+            return AT_AccelToPlayer;
+
+        if(SDL_strcmp(command, "ApplyVariableGravity") == 0)
+            return AT_ApplyVariableGravity;
+
+        if(SDL_strcmp(command, "PhaseMove") == 0)
+            return AT_PhaseMove;
+
+        if(SDL_strcmp(command, "BumpMove") == 0)
+            return AT_BumpMove;
+
+        if(SDL_strcmp(command, "CrashMove") == 0)
+            return AT_CrashMove;
+
+        if(SDL_strcmp(command, "SetXSpeed") == 0)
+            return AT_SetXSpeed;
+
+        if(SDL_strcmp(command, "SetYSpeed") == 0)
+            return AT_SetYSpeed;
+
+        if(SDL_strcmp(command, "SetAlwaysProcess") == 0)
+            return AT_SetAlwaysProcess;
+
+        if(SDL_strcmp(command, "SetVisible") == 0)
+            return AT_SetVisible;
+
+        if(SDL_strcmp(command, "SetHitbox") == 0)
+            return AT_SetHitbox;
+
+        if(SDL_strcmp(command, "TeleportNearPlayer") == 0)
+            return AT_TeleportNearPlayer;
+
+        if(SDL_strcmp(command, "TeleportTo") == 0)
+            return AT_TeleportTo;
+
+        if(SDL_strcmp(command, "HarmPlayer") == 0)
+            return AT_HarmPlayer;
+
+        if(SDL_strcmp(command, "GenerateInRadius") == 0)
+            return AT_GenerateInRadius;
+
+        if(SDL_strcmp(command, "GenerateAtAngle") == 0)
+            return AT_GenerateAtAngle;
+
+        if(SDL_strcmp(command, "BasicAnimate") == 0)
+            return AT_BasicAnimate;
+
+        if(SDL_strcmp(command, "Blink") == 0)
+            return AT_Blink;
+
+        if(SDL_strcmp(command, "AnimateFloat") == 0)
+            return AT_AnimateFloat;
+
+        if(SDL_strcmp(command, "TriggerLunaEvent") == 0)
+            return AT_TriggerLunaEvent;
+
+        if(SDL_strcmp(command, "HarmPlayer") == 0)
+            return AT_HarmPlayer;
+
+        if(SDL_strcmp(command, "SpriteTimer") == 0)
+            return AT_SpriteTimer;
+
+        if(SDL_strcmp(command, "SpriteDebug") == 0)
+            return AT_SpriteDebug;
+
+        if(SDL_strcmp(command, "StaticDraw") == 0)
+            return AT_StaticDraw;
+
+        if(SDL_strcmp(command, "RelativeDraw") == 0)
+            return AT_RelativeDraw;
+    }
+
+    if(wbuf)
+    {
+        // Nothing matched. Bad or mistyped command?
+        std::string line = std::string(wbuf);
+        if(line.size() > 10)
+            PrintSyntaxError(line);
+    }
+
+    return AT_Invalid;
+}
+
+SpriteComponent Autocode::GenerateComponent(Autocode *obj_to_convert)
+{
+    SpriteComponent comp;
+    comp.Init((int)obj_to_convert->Length);
+    comp.data1 = obj_to_convert->Target;
+    comp.data2 = obj_to_convert->Param1;
+    comp.data3 = obj_to_convert->Param2;
+    comp.data4 = obj_to_convert->Param3;
+    comp.data5 = obj_to_convert->MyString;
+    comp.lookup_code = obj_to_convert->ActiveSection;
+
+    comp.func = Autocode::GetSpriteFunc(obj_to_convert);
+    return comp;
+}
+
+pfnSprFunc Autocode::GetSpriteFunc(Autocode *pAC)
+{
+    switch(pAC->m_Type)
+    {
+    case AT_OnPlayerCollide:
+        return SpriteFunc::OnPlayerCollide;
+    case AT_OnPlayerDistance:
+        return SpriteFunc::OnPlayerDistance;
+    case AT_WaitForPlayer:
+        return SpriteFunc::WaitForPlayer;
+    case AT_PlayerHoldingSprite:
+        return SpriteFunc::PlayerHoldingSprite;
+    case AT_RandomComponent:
+        return SpriteFunc::RandomComponent;
+    case AT_RandomComponentRange:
+        return SpriteFunc::RandomComponentRange;
+    case AT_SetSpriteVar:
+        return SpriteFunc::SetSpriteVar;
+    case AT_IfSpriteVar:
+        return SpriteFunc::IfSpriteVar;
+    case AT_IfLunaVar:
+        return SpriteFunc::IfLunaVar;
+    case AT_Die:
+        return SpriteFunc::Die;
+    case AT_Deccelerate:
+        return SpriteFunc::Deccelerate;
+    case AT_AccelToPlayer:
+        return SpriteFunc::AccelToPlayer;
+    case AT_ApplyVariableGravity:
+        return SpriteFunc::ApplyVariableGravity;
+    case AT_PhaseMove:
+        return SpriteFunc::PhaseMove;
+    case AT_BumpMove:
+        return SpriteFunc::BumpMove;
+    case AT_CrashMove:
+        return SpriteFunc::CrashMove;
+    case AT_SetXSpeed:
+        return SpriteFunc::SetXSpeed;
+    case AT_SetYSpeed:
+        return SpriteFunc::SetYSpeed;
+    case AT_SetAlwaysProcess:
+        return SpriteFunc::SetAlwaysProcess;
+    case AT_SetVisible:
+        return SpriteFunc::SetVisible;
+    case AT_SetHitbox:
+        return SpriteFunc::SetHitbox;
+    case AT_TeleportNearPlayer:
+        return SpriteFunc::TeleportNearPlayer;
+    case AT_TeleportTo:
+        return SpriteFunc::TeleportTo;
+    case AT_GenerateInRadius:
+        return SpriteFunc::GenerateInRadius;
+    case AT_GenerateAtAngle:
+        return SpriteFunc::GenerateAtAngle;
+    case AT_BasicAnimate:
+        return SpriteFunc::BasicAnimate;
+    case AT_Blink:
+        return SpriteFunc::Blink;
+    case AT_AnimateFloat:
+        return SpriteFunc::AnimateFloat;
+    case AT_TriggerLunaEvent:
+        return SpriteFunc::TriggerLunaEvent;
+    case AT_HarmPlayer:
+        return SpriteFunc::HarmPlayer;
+    case AT_SpriteTimer:
+        return SpriteFunc::SpriteTimer;
+    case AT_SpriteDebug:
+        return SpriteFunc::SpriteDebug;
+    default:
+        return NULL;
+    }
+}
+
+pfnSprDraw Autocode::GetDrawFunc(Autocode *pAC)
+{
+    switch(pAC->m_Type)
+    {
+    case AT_StaticDraw:
+        return SpriteFunc::StaticDraw;
+    case AT_RelativeDraw:
+        return SpriteFunc::RelativeDraw;
+    default:
+        return NULL;
     }
 }

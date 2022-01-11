@@ -43,6 +43,7 @@
 #include "world_globals.h"
 #include "speedrunner.h"
 #include "menu_main.h"
+#include "script/luna.h"
 
 #include "../pseudo_vb.h"
 
@@ -89,6 +90,8 @@ void CheckActive();//in game_main.cpp
 
 void GameLoop()
 {
+    lunaLoop();
+
     UpdateControls();
     if(LevelMacro > LEVELMACRO_OFF)
         UpdateMacro();

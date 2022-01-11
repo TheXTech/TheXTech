@@ -107,6 +107,9 @@ struct SFX_t
 static std::unordered_map<std::string, Music_t> music;
 static std::unordered_map<std::string, SFX_t>   sound;
 
+//! Sounds played by scripts
+static std::unordered_map<std::string, Mix_Chunk*> extSfx;
+
 static const int maxSfxChannels = 91;
 
 int CustomWorldMusicId()
@@ -941,6 +944,10 @@ void UnloadCustomSound()
     restoreDefaultSfx();
     g_customMusicInDataFolder = false;
     g_customSoundsInDataFolder = false;
+
+    for(auto &f : extSfx)
+        Mix_FreeChunk(f.second);
+    extSfx.clear();
 }
 
 void UpdateYoshiMusic()
@@ -954,4 +961,26 @@ void UpdateYoshiMusic()
         hasYoshi |= (Player[i].Mount == 3);
 
     Mix_SetMusicTrackMute(g_curMusic, s_musicYoshiTrackNumber, hasYoshi ? 0 : 1);
+}
+
+void PlayExtSound(const std::string &path)
+{
+    if(noSound)
+        return;
+
+    auto f = extSfx.find(path);
+    if(f == extSfx.end())
+    {
+        auto *ch = Mix_LoadWAV(path.c_str());
+        if(!ch)
+        {
+            pLogWarning("Can't load custom sound: %s", Mix_GetError());
+            return;
+        }
+        extSfx.insert({path, ch});
+        Mix_PlayChannelVol(-1, ch, 0, MIX_MAX_VOLUME);
+        return;
+    }
+
+    Mix_PlayChannelVol(-1, f->second, 0, MIX_MAX_VOLUME);
 }

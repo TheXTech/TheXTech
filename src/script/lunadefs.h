@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#pragma once
 #ifndef LUNADEFS_H
 #define LUNADEFS_H
 
@@ -79,6 +80,14 @@ enum WORLD_HUD_CONTROL
 enum LEVEL_HUD_CONTROL
 {
     LHUD_UNKNOWN1 // Only temporary
+};
+
+struct LunaRect
+{
+    int left;
+    int top;
+    int right;
+    int bottom;
 };
 
 class LunaImage;
