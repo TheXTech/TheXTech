@@ -89,8 +89,8 @@ public:
         if(dres != m_df.end())
             return *dres->second;
 
-        auto fres = m_df.find(address);
-        if(fres != m_df.end())
+        auto fres = m_ff.find(address);
+        if(fres != m_ff.end())
             return (double) * fres->second;
 
         auto ires = m_if.find(address);
@@ -101,7 +101,7 @@ public:
         if(bres != m_bf.end())
             return *bres->second ? 0xffff : 0000;
 
-        pLogWarning("MemEmu: Unknown <any> address to read: %x", address);
+        pLogWarning("MemEmu: Unknown <any> address to read: 0x%x", address);
         return 0.0;
     }
 
@@ -114,8 +114,8 @@ public:
             return;
         }
 
-        auto fres = m_df.find(address);
-        if(fres != m_df.end())
+        auto fres = m_ff.find(address);
+        if(fres != m_ff.end())
         {
             *dres->second = (float)value;
             return;
@@ -135,7 +135,7 @@ public:
             return;
         }
 
-        pLogWarning("MemEmu: Unknown <any> address to write: %x", address);
+        pLogWarning("MemEmu: Unknown <any> address to write: 0x%x", address);
     }
 
 
@@ -277,8 +277,8 @@ public:
         if(dres != m_df.end())
             return obj->*(dres->second);
 
-        auto fres = m_df.find(address);
-        if(fres != m_df.end())
+        auto fres = m_ff.find(address);
+        if(fres != m_ff.end())
             return (double)(obj->*(fres->second));
 
         auto ires = m_if.find(address);
@@ -289,7 +289,7 @@ public:
         if(bres != m_bf.end())
             return obj->*(bres->second) ? 0xffff : 0000;
 
-        pLogWarning("MemEmu: Unknown %s::<any> address to read: %x", objName, address);
+        pLogWarning("MemEmu: Unknown %s::<any> address to read: 0x%x", objName, address);
         return 0.0;
     }
 
@@ -302,8 +302,8 @@ public:
             return;
         }
 
-        auto fres = m_df.find(address);
-        if(fres != m_df.end())
+        auto fres = m_ff.find(address);
+        if(fres != m_ff.end())
         {
             obj->*(fres->second) = (float)value;
             return;
@@ -323,7 +323,7 @@ public:
             return;
         }
 
-        pLogWarning("MemEmu: Unknown %s::<any> address to write: %x", objName, address);
+        pLogWarning("MemEmu: Unknown %s::<any> address to write: 0x%x", objName, address);
     }
 
 //    double getDouble(T *obj, int address)
