@@ -2251,3 +2251,10 @@ void CheatCode(char sym)
 
     processCheats();
 }
+
+bool cheats_contains(const std::string &needle)
+{
+    const char *buf = s_buffer.getString();
+    auto bufLen = s_buffer.getBugLen();
+    return cheatCompare(bufLen, buf, needle.size(), needle.c_str());
+}
