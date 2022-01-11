@@ -1388,6 +1388,8 @@ void Autocode::HeartSystem()
 
 void Autocode::LunaControl(LunaControlAct act, int val)
 {
+    UNUSED(val);
+
     switch(act)
     {
     case LCA_DemoCounter:

@@ -3,6 +3,7 @@
 #include "globals.h"
 #include "lunamisc.h"
 #include "renderop_string.h"
+#include <fmt_format_ne.h>
 
 #include <algorithm>
 
@@ -43,22 +44,27 @@ Renderer::~Renderer()
 
 bool Renderer::LoadBitmapResource(std::string filename, int resource_code, int transparency_color)
 {
-//    if (Renderer::LoadBitmapResource(filename, resource_code)) {
-//        auto it = m_legacyResourceCodeImages.find(resource_code);
-//        if (it != m_legacyResourceCodeImages.end()) {
+    UNUSED(filename);
+    UNUSED(resource_code);
+    UNUSED(transparency_color);
+    //    if (Renderer::LoadBitmapResource(filename, resource_code)) {
+    //        auto it = m_legacyResourceCodeImages.find(resource_code);
+    //        if (it != m_legacyResourceCodeImages.end()) {
 
-//            it->second->makeColorTransparent(transparency_color);
+    //            it->second->makeColorTransparent(transparency_color);
 
-//            // LUNAIMAGE_TODO: Add support for trasnparency colors for old-style image loading API
-//        }
-//        return true;
-//    }
+    //            // LUNAIMAGE_TODO: Add support for trasnparency colors for old-style image loading API
+    //        }
+    //        return true;
+    //    }
 
     return false;
 }
 
 bool Renderer::LoadBitmapResource(std::string filename, int resource_code)
 {
+    UNUSED(filename);
+    UNUSED(resource_code);
     return false;
 }
 
@@ -70,7 +76,8 @@ void Renderer::StoreImage(const std::shared_ptr<LunaImage> &bmp, int resource_co
 bool Renderer::DeleteImage(int resource_code)
 {
     auto it = m_legacyResourceCodeImages.find(resource_code);
-    if (it != m_legacyResourceCodeImages.end()) {
+    if(it != m_legacyResourceCodeImages.end())
+    {
         m_legacyResourceCodeImages.erase(it);
         return true;
     }
@@ -80,7 +87,7 @@ bool Renderer::DeleteImage(int resource_code)
 std::shared_ptr<LunaImage> Renderer::GetImageForResourceCode(int resource_code)
 {
     auto it = m_legacyResourceCodeImages.find(resource_code);
-    if (it != m_legacyResourceCodeImages.end())
+    if(it != m_legacyResourceCodeImages.end())
         return it->second;
 
     return nullptr;
@@ -88,6 +95,7 @@ std::shared_ptr<LunaImage> Renderer::GetImageForResourceCode(int resource_code)
 
 std::vector<std::shared_ptr<LunaImage> > Renderer::LoadAnimatedBitmapResource(std::string filename, int *frameTime)
 {
+    UNUSED(frameTime);
     // construct full filepath
 
     std::string full_path = resolveIfNotAbsolutePath(filename);
@@ -118,7 +126,7 @@ std::vector<std::shared_ptr<LunaImage> > Renderer::LoadAnimatedBitmapResource(st
 
 void Renderer::AddOp(RenderOp *op)
 {
-    if (op->m_selectedCamera == 0)
+    if(op->m_selectedCamera == 0)
     {
         // If the rendering operation was created in the middle of handling a
         // camera's rendering, lock the rendering operation to that camera.
@@ -135,55 +143,55 @@ void Renderer::DebugPrint(const std::string &message)
 
 void Renderer::DebugPrint(const std::string &message, double val)
 {
-    this->m_queueState.m_debugMessages.push_back(message + " " + std::to_string((long long)val));
+    this->m_queueState.m_debugMessages.push_back(fmt::format_ne("{0} {1}", message, val));
 }
 
-static bool CompareRenderPriority(const RenderOp* lhs, const RenderOp* rhs)
+static bool CompareRenderPriority(const RenderOp *lhs, const RenderOp *rhs)
 {
     return lhs->m_renderPriority < rhs->m_renderPriority;
 }
 
 void Renderer::RenderBelowPriority(double maxPriority)
 {
-    if (!m_queueState.m_InFrameRender) return;
+    if(!m_queueState.m_InFrameRender) return;
 
-//    if (this == &sLunaRender)
-//    {
-//        // Make sure we kill the loadscreen before main thread rendering
-//        LunaLoadScreenKill();
-//    }
+    //    if (this == &sLunaRender)
+    //    {
+    //        // Make sure we kill the loadscreen before main thread rendering
+    //        LunaLoadScreenKill();
+    //    }
 
-    auto& ops = m_queueState.m_currentRenderOps;
-    if (ops.size() <= m_queueState.m_renderOpsProcessedCount) return;
+    auto &ops = m_queueState.m_currentRenderOps;
+    if(ops.size() <= m_queueState.m_renderOpsProcessedCount) return;
 
     // Flush pending BltBlt
-//    g_BitBltEmulation.flushPendingBlt();
+    //    g_BitBltEmulation.flushPendingBlt();
 
     // Assume operations already processed were already sorted
-    if (m_queueState.m_renderOpsSortedCount == 0)
+    if(m_queueState.m_renderOpsSortedCount == 0)
     {
         std::stable_sort(ops.begin(), ops.end(), CompareRenderPriority);
         m_queueState.m_renderOpsSortedCount = ops.size();
     }
-    else if (m_queueState.m_renderOpsSortedCount < ops.size())
+    else if(m_queueState.m_renderOpsSortedCount < ops.size())
     {
         // Sort the new operations
         std::stable_sort(ops.begin() + m_queueState.m_renderOpsSortedCount, ops.end(), CompareRenderPriority);
 
         // Render things as many of the new items as we should before merging the sorted lists
         double maxPassPriority = maxPriority;
-        if (m_queueState.m_renderOpsSortedCount > m_queueState.m_renderOpsProcessedCount)
+        if(m_queueState.m_renderOpsSortedCount > m_queueState.m_renderOpsProcessedCount)
         {
             double nextPriorityInOldList = ops[m_queueState.m_renderOpsProcessedCount]->m_renderPriority;
-            if (nextPriorityInOldList < maxPassPriority)
-            {
+            if(nextPriorityInOldList < maxPassPriority)
                 maxPassPriority = nextPriorityInOldList;
-            }
         }
-        for (auto iter = ops.cbegin() + m_queueState.m_renderOpsSortedCount, end = ops.cend(); iter != end; ++iter)
+
+        for(auto iter = ops.cbegin() + m_queueState.m_renderOpsSortedCount, end = ops.cend(); iter != end; ++iter)
         {
-            RenderOp& op = **iter;
-            if (op.m_renderPriority >= maxPassPriority) break;
+            RenderOp &op = **iter;
+            if(op.m_renderPriority >= maxPassPriority)
+                break;
             DrawOp(op);
             m_queueState.m_renderOpsProcessedCount++;
         }
@@ -194,28 +202,33 @@ void Renderer::RenderBelowPriority(double maxPriority)
     }
 
     // Render other operations
-    for (auto iter = ops.cbegin() + m_queueState.m_renderOpsProcessedCount, end = ops.cend(); iter != end; ++iter) {
-        RenderOp& op = **iter;
-        if (op.m_renderPriority >= maxPriority) break;
+    for(auto iter = ops.cbegin() + m_queueState.m_renderOpsProcessedCount, end = ops.cend(); iter != end; ++iter)
+    {
+        RenderOp &op = **iter;
+        if(op.m_renderPriority >= maxPriority)
+            break;
         DrawOp(op);
         m_queueState.m_renderOpsProcessedCount++;
     }
 
-    if (maxPriority >= DBL_MAX)
+    if(maxPriority >= DBL_MAX)
     {
         // Format debug messages and enter them into renderstring list
         int dbg_x = 325;
         int dbg_y = 160;
-        for (auto it = m_queueState.m_debugMessages.begin(); it != m_queueState.m_debugMessages.end(); it++)
+
+        for(auto it = m_queueState.m_debugMessages.begin(); it != m_queueState.m_debugMessages.end(); it++)
         {
             std::string dbg = *it;
             RenderStringOp(dbg, 4, (float)dbg_x, (float)dbg_y).Draw(this);
             dbg_y += 20;
-            if (dbg_y > 560) {
+            if(dbg_y > 560)
+            {
                 dbg_y = 160;
                 dbg_x += 190;
             }
         }
+
         this->m_queueState.m_debugMessages.clear();
     }
 }
@@ -233,13 +246,14 @@ void Renderer::StartCameraRender(int idx)
 
 void Renderer::StoreCameraPosition(int idx)
 {
-//    if (g_GLEngine.IsEnabled())
-//    {
-//        std::shared_ptr<GLEngineCmd_SetCamera> cmd = std::make_shared<GLEngineCmd_SetCamera>();
-//        cmd->mX = SMBX_CameraInfo::getCameraX(idx);
-//        cmd->mY = SMBX_CameraInfo::getCameraY(idx);
-//        g_GLEngine.QueueCmd(cmd);
-//    }
+    UNUSED(idx);
+    //    if (g_GLEngine.IsEnabled())
+    //    {
+    //        std::shared_ptr<GLEngineCmd_SetCamera> cmd = std::make_shared<GLEngineCmd_SetCamera>();
+    //        cmd->mX = SMBX_CameraInfo::getCameraX(idx);
+    //        cmd->mY = SMBX_CameraInfo::getCameraY(idx);
+    //        g_GLEngine.QueueCmd(cmd);
+    //    }
 }
 
 void Renderer::StartFrameRender()
@@ -250,25 +264,25 @@ void Renderer::StartFrameRender()
 
 void Renderer::EndFrameRender()
 {
-    if (!m_queueState.m_InFrameRender) return;
+    if(!m_queueState.m_InFrameRender) return;
 
     m_queueState.m_curCamIdx = 0;
 
     // Remove cleared operations
-    std::vector<RenderOp*> nonExpiredOps;
-    for (auto iter = m_queueState.m_currentRenderOps.begin(), end = m_queueState.m_currentRenderOps.end(); iter != end; ++iter) {
-        RenderOp* pOp = *iter;
+    std::vector<RenderOp *> nonExpiredOps;
+    for(auto iter = m_queueState.m_currentRenderOps.begin(), end = m_queueState.m_currentRenderOps.end(); iter != end; ++iter)
+    {
+        RenderOp *pOp = *iter;
         pOp->m_FramesLeft--;
-        if (pOp->m_FramesLeft <= 0)
+        if(pOp->m_FramesLeft <= 0)
         {
             *iter = nullptr;
             delete pOp;
         }
         else
-        {
             nonExpiredOps.push_back(pOp);
-        }
     }
+
     m_queueState.m_currentRenderOps.swap(nonExpiredOps);
     m_queueState.m_renderOpsProcessedCount = 0;
     m_queueState.m_renderOpsSortedCount = m_queueState.m_currentRenderOps.size();
@@ -278,9 +292,8 @@ void Renderer::EndFrameRender()
 void Renderer::ClearQueue()
 {
     m_queueState.m_curCamIdx = 0;
-    for (auto iter = m_queueState.m_currentRenderOps.begin(), end = m_queueState.m_currentRenderOps.end(); iter != end; ++iter) {
+    for(auto iter = m_queueState.m_currentRenderOps.begin(), end = m_queueState.m_currentRenderOps.end(); iter != end; ++iter)
         delete *iter;
-    }
     m_queueState.m_currentRenderOps.clear();
     m_queueState.m_renderOpsProcessedCount = 0;
     m_queueState.m_renderOpsSortedCount = 0;
@@ -296,7 +309,8 @@ void Renderer::DrawOp(RenderOp &op)
 
 bool Render::IsOnScreen(double x, double y, double w, double h)
 {
-    double cam_x; double cam_y;
+    double cam_x;
+    double cam_y;
     CalcCameraPos(&cam_x, &cam_y);
 
     return FastTestCollision((int)cam_x, (int)cam_y, (int)cam_x + 800, (int)cam_y + 600,

@@ -7,8 +7,10 @@ class RenderRectOp : public RenderOp
 {
 public:
     RenderRectOp() : x1(0), y1(0), x2(0), y2(0),
+        fillColor(0.0, 0.0, 0.0, 0.0),
         borderColor(1.0f, 1.0f, 1.0f, 1.0f),
-        fillColor(0.0, 0.0, 0.0, 0.0), sceneCoords(false) {};
+        sceneCoords(false)
+    {};
 
     void Draw(Renderer *renderer);
 

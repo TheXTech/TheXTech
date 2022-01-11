@@ -108,6 +108,8 @@ void lunaLoop()
 
 void lunaRender()
 {
+    if(!gLunaEnabled)
+        return;
     Renderer::Get().StartFrameRender();
     Renderer::Get().RenderBelowPriority(5);
     Renderer::Get().EndFrameRender();

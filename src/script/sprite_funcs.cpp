@@ -65,6 +65,7 @@ void SpriteFunc::PlayerCollectible(CSprite *me, SpriteComponent *comp)
 // WAIT FOR PLAYER -- Activate the linked component when a player condition becomes true
 void SpriteFunc::WaitForPlayer(CSprite *me, SpriteComponent *obj)
 {
+    UNUSED(me);
     Player_t *demo = PlayerF::Get(1);
     if(demo)
     {
@@ -208,6 +209,7 @@ void SpriteFunc::RandomComponentRange(CSprite *me, SpriteComponent *obj)
 // DIE
 void SpriteFunc::Die(CSprite *me, SpriteComponent *obj)
 {
+    UNUSED(obj);
     me->Die();
 }
 
@@ -252,6 +254,8 @@ void SpriteFunc::Deccelerate(CSprite *me, SpriteComponent *obj)
 // ACCELERATE
 void SpriteFunc::Accelerate(CSprite *me, SpriteComponent *obj)
 {
+    UNUSED(me);
+    UNUSED(obj);
     //TODO
 }
 
@@ -344,6 +348,7 @@ void SpriteFunc::OnPlayerDistance(CSprite *me, SpriteComponent *obj)
 // PHASE MOVE
 void SpriteFunc::PhaseMove(CSprite *me, SpriteComponent *obj)
 {
+    UNUSED(obj);
     me->m_Xpos += me->m_Xspd;
     me->m_Ypos += me->m_Yspd;
 }
@@ -361,7 +366,7 @@ void SpriteFunc::BumpMove(CSprite *me, SpriteComponent *obj)
     bool collided_left = false;
     bool collided_right = false;
     bool collided_top = false;
-    bool collided_bot = false;
+//    bool collided_bot = false;
 
     std::list<CellObj> nearby_list;
     gCellMan.GetObjectsOfInterest(&nearby_list, me->m_Hitbox.CalcLeft(),
@@ -443,7 +448,7 @@ void SpriteFunc::BumpMove(CSprite *me, SpriteComponent *obj)
                         {
                             me->m_Ypos = ((block->Location.Y + block->Location.Height) - me->m_Hitbox.Top_off) + 1;
                             me->m_Yspd = -(me->m_Yspd * energy_loss_mod);
-                            collided_bot = true;
+                            // collided_bot = true;
                         }
 
                         // Left collision, push sprite left
@@ -471,6 +476,7 @@ void SpriteFunc::BumpMove(CSprite *me, SpriteComponent *obj)
 // CRASH MOVE
 void SpriteFunc::CrashMove(CSprite *me, SpriteComponent *obj)
 {
+    UNUSED(obj);
     me->m_Xpos += me->m_Xspd;
     me->m_Ypos += me->m_Yspd;
 
@@ -558,6 +564,7 @@ void SpriteFunc::TeleportTo(CSprite *me, SpriteComponent *obj)
 // TRIGGER LUNA EVENT -- Trigger a lunadll script event (such as #1000)
 void SpriteFunc::TriggerLunaEvent(CSprite *me, SpriteComponent *obj)
 {
+    UNUSED(me);
     if(obj->data1 > 21)
         gAutoMan.ActivateCustomEvents(0, (int)obj->data1);
 }
@@ -565,8 +572,9 @@ void SpriteFunc::TriggerLunaEvent(CSprite *me, SpriteComponent *obj)
 // HARM PLAYER
 void SpriteFunc::HarmPlayer(CSprite *me, SpriteComponent *obj)
 {
-    short player = 1;
-    PlayerHurt(player);
+    UNUSED(me);
+    UNUSED(obj);
+    PlayerHurt(1);
 }
 
 // GENERATE IN RADIUS
@@ -701,6 +709,7 @@ void SpriteFunc::Blink(CSprite *me, SpriteComponent *obj)
 // SPRITE DEBUG
 void SpriteFunc::SpriteDebug(CSprite *me, SpriteComponent *obj)
 {
+    UNUSED(obj);
     Renderer::Get().DebugPrint("XPOS - ", me->m_Xpos);
     Renderer::Get().DebugPrint("YPOS - ", me->m_Ypos);
     Renderer::Get().DebugPrint("XSPD - ", me->m_Xspd);

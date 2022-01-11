@@ -27,7 +27,7 @@ public:
     RenderOp() : m_FramesLeft(1), m_selectedCamera(0), m_renderPriority(RENDEROP_DEFAULT_PRIORITY_RENDEROP) { }
     RenderOp(double priority) : m_FramesLeft(1), m_selectedCamera(0), m_renderPriority(priority) { }
     virtual ~RenderOp() {}
-    virtual void Draw(Renderer* renderer) {}
+    virtual void Draw(Renderer* /*renderer*/) {}
 
     int m_FramesLeft;		// How many frames until this op should be destroyed
     int m_selectedCamera;

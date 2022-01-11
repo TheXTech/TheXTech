@@ -361,6 +361,9 @@ void CSpriteManager::ClearSprites(int imgResourceCode)
 
 void CSpriteManager::ClearSprites(const std::shared_ptr<LunaImage> &img, int xPos, int yPos)
 {
+    UNUSED(img);
+    UNUSED(xPos);
+    UNUSED(yPos);
     //    std::list<CSprite*>::iterator iter = m_SpriteList.begin();
     //    std::list<CSprite*>::iterator end = m_SpriteList.end();
 
@@ -380,6 +383,7 @@ void CSpriteManager::ClearSprites(const std::shared_ptr<LunaImage> &img, int xPo
 
 void CSpriteManager::ClearSprites(const std::shared_ptr<LunaImage> &img)
 {
+    UNUSED(img);
     //    std::list<CSprite*>::iterator iter = m_SpriteList.begin();
     //    std::list<CSprite*>::iterator end = m_SpriteList.end();
 
