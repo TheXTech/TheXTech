@@ -1140,32 +1140,21 @@ void Autocode::Do(bool init)
         {
             Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("LUNADLL (TheXTech) VERSION-{0}", LUNA_VERSION), 3, 50, 250));
             //Renderer::Get().SafePrint(, 3, 340, 250);
-
             Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("GLOBL-{0}", gAutoMan.m_GlobalCodes.size()), 3, 50, 300));
-
-            Renderer::Get().AddOp(new RenderStringOp("INIT -" + std::to_string((long long)gAutoMan.m_InitAutocodes.size()), 3, 50, 330));
-
-            Renderer::Get().AddOp(new RenderStringOp("CODES-" + std::to_string((long long)gAutoMan.m_Autocodes.size()), 3, 50, 360));
-
-            Renderer::Get().AddOp(new RenderStringOp("QUEUE-" + std::to_string((long long)gAutoMan.m_CustomCodes.size()), 3, 50, 390));
-
-            Renderer::Get().AddOp(new RenderStringOp("SPRITE-" + std::to_string((long long)gSpriteMan.CountSprites()), 3, 50, 420));
-
-            Renderer::Get().AddOp(new RenderStringOp("BLPRNT-" + std::to_string((long long)gSpriteMan.CountBlueprints()), 3, 50, 450));
-
-            Renderer::Get().AddOp(new RenderStringOp("COMP-" + std::to_string((long long)gSpriteMan.m_ComponentList.size()), 3, 50, 480));
+            Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("INIT -{0}", gAutoMan.m_InitAutocodes.size()), 3, 50, 330));
+            Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("CODES-{0}", gAutoMan.m_Autocodes.size()), 3, 50, 360));
+            Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("QUEUE-{0}", gAutoMan.m_CustomCodes.size()), 3, 50, 390));
+            Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("SPRITE-{0}", gSpriteMan.CountSprites()), 3, 50, 420));
+            Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("BLPRNT-{0}", gSpriteMan.CountBlueprints()), 3, 50, 450));
+            Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("COMP-{0}", gSpriteMan.m_ComponentList.size()), 3, 50, 480));
 
             int buckets = 0, cells = 0, objs = 0;
             gCellMan.CountAll(&buckets, &cells, &objs);
-            Renderer::Get().AddOp(new RenderStringOp("BCO-" + std::to_string((long long)buckets) + " "
-                                  + std::to_string((long long)cells) + " "
-                                  + std::to_string((long long)objs), 3, 50, 510));
+            Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("BCO-{0} {1} {2}", buckets, cells, objs), 3, 50, 510));
 
             std::list<CellObj> cellobjs;
-            gCellMan.GetObjectsOfInterest(&cellobjs, demo->Location.X, demo->Location.Y,
-                                          (int)demo->Location.Width, (int)demo->Location.Height);
-            Renderer::Get().AddOp(new RenderStringOp("NEAR-" + std::to_string((long long)cellobjs.size()), 3, 50, 540));
-
+            gCellMan.GetObjectsOfInterest(&cellobjs, demo->Location.X, demo->Location.Y, (int)demo->Location.Width, (int)demo->Location.Height);
+            Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("NEAR-{0}", cellobjs.size()), 3, 50, 540));
             break;
         }
 
