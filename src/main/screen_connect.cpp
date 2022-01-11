@@ -678,24 +678,53 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pW, int sY, int line, bool m
             return ret;
         }
 
-        int max_lines = 6;
+        int start_y = sY + (4)*line;
 
-        // TODO: calculate scroll (top rendered index) here
-        int scroll = 0;
+        // calculate scroll (top rendered index) here
+        int total_lines = (int)profiles.size() + 1;
+        int avail_lines = 6;
+
+        int scroll_start = 0;
+        int scroll_end = total_lines;
+
+        if(avail_lines < total_lines)
+        {
+            // for scroll indicator
+            avail_lines --;
+
+            if(s_menuItem[p] >= 0)
+                scroll_start = s_menuItem[p] - avail_lines/2;
+            if(scroll_start < 0)
+                scroll_start = 0;
+            scroll_end = scroll_start + avail_lines;
+            if(scroll_end > total_lines)
+            {
+                scroll_end = total_lines;
+                scroll_start = scroll_end - avail_lines;
+            }
+        }
+
+        // render the scroll indicators
+        if(render)
+        {
+            if(scroll_start > 0)
+                XRender::renderTexture(cX - GFX.MCursor[1].w / 2, start_y - GFX.MCursor[1].h, GFX.MCursor[1]);
+
+            if(scroll_end < total_lines)
+                XRender::renderTexture(cX - GFX.MCursor[2].w / 2, start_y + (avail_lines)*line - line + 18, GFX.MCursor[2]);
+        }
 
         // show the menu cursor for the player
         if(s_menuItem[p] >= 0)
-            XRender::renderTexture(pX - 20, sY+(4+s_menuItem[p]-scroll)*line, GFX.MCursor[0]);
+            XRender::renderTexture(pX - 20, start_y + (s_menuItem[p]-scroll_start)*line, GFX.MCursor[0]);
 
-        for(int i = 0; i < (int)profiles.size() + 1; i++)
+        for(int i = scroll_start; i < scroll_end; i++)
         {
-            if(i < scroll || i >= scroll+max_lines)
-                continue;
             std::string* name = &g_mainMenu.wordBack;
             if(i != (int)profiles.size())
                 name = &(profiles[i]->Name);
             Player_MenuItem_Mouse_Render(p, i, *name,
-                pX, sY+(4+i-scroll)*line, mouse, render);
+                pX, start_y + (i-scroll_start)*line, mouse, render);
         }
     }
 

@@ -1485,9 +1485,9 @@ void mainMenuDraw()
             SuperPrint(w.WorldName, 3, 300, 320 + (B * 30), r, 1.f, 1.f, 1.f);
         }
 
+        // render the scroll indicators
         if(minShow > 1)
             XRender::renderTexture(400 - 8, 350 - 20, GFX.MCursor[1]);
-
 
         if(maxShow < NumSelectWorld)
             XRender::renderTexture(400 - 8, 490, GFX.MCursor[2]);

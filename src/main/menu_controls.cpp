@@ -150,9 +150,10 @@ int menuControls_Mouse_Render(bool mouse, bool render)
     int sY = ScreenH/2 - (line*max_line)/2;
     sY -= sY & 1;
 
+    // render the background
     if(render)
     {
-        XRender::renderRect(sX, sY - (line-18), width, line*max_line + line-18, 0, 0, 0, .5);
+        XRender::renderRect(sX, sY - (line-18), width, line*max_line + (line-18), 0, 0, 0, .5);
     }
 
     // rendering of profile deletion screen
@@ -295,7 +296,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
             SuperPrintScreenCenter(g_mainMenu.controlsTitle, 3, sY);
         }
 
-        // render the types at the top of the screen and the players at the bottom
+        // render the types at the top of the screen and the currently connected devices at the bottom
         if(render)
         {
             SuperPrint(g_mainMenu.controlsDeviceTypes, 3, sX+16, sY+2*line);
@@ -306,7 +307,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
 
         if(max_line - 9 < n_types)
         {
-            int scroll_n = max_line - 9;
+            int scroll_n = max_line - 10;
             scroll_start = MenuCursor - scroll_n/2;
             scroll_end = scroll_start + scroll_n;
             if(scroll_start < 0)
@@ -320,6 +321,18 @@ int menuControls_Mouse_Render(bool mouse, bool render)
                 scroll_start = scroll_end - scroll_n;
             }
         }
+
+        // render the scroll indicators
+        if(render)
+        {
+            if(scroll_start > 0)
+                XRender::renderTexture(sX + width / 2 - GFX.MCursor[1].w / 2, sY + 3*line - GFX.MCursor[1].h, GFX.MCursor[1]);
+
+            if(scroll_end < n_types)
+                XRender::renderTexture(sX + width / 2 - GFX.MCursor[2].w / 2, sY + (3+scroll_end-scroll_start)*line - line + 18, GFX.MCursor[2]);
+        }
+
+        // render the menu items
         for(int i = 0; i < scroll_end - scroll_start; i++)
         {
             if(render)
@@ -362,14 +375,6 @@ int menuControls_Mouse_Render(bool mouse, bool render)
                     MenuMouseRelease = false;
                 }
             }
-        }
-        if(render)
-        {
-            if(scroll_start > 0)
-                XRender::renderTexture(sX + width / 2 - GFX.MCursor[1].w / 2, sY+3*line - GFX.MCursor[1].h, GFX.MCursor[1]);
-
-            if(scroll_end < n_types)
-                XRender::renderTexture(sX + width / 2 - GFX.MCursor[2].w / 2, sY+(3+scroll_end-scroll_start)*line, GFX.MCursor[2]);
         }
 
         // render the players
@@ -436,7 +441,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
         }
 
         // first come the profiles, and then the type options.
-        // work out scrolling here
+        // the scrolling is determined here
 
         int avail_lines = max_line - 2;
 
@@ -460,23 +465,34 @@ int menuControls_Mouse_Render(bool mouse, bool render)
 
         if(avail_lines < total_lines)
         {
-            int scroll_n = avail_lines;
-            scroll_start = cur_line - scroll_n/2;
-            scroll_end = scroll_start + scroll_n;
+            avail_lines --; // for scroll indicator
+
+            scroll_start = cur_line - avail_lines/2;
+            scroll_end = scroll_start + avail_lines;
             if(scroll_start < 0)
             {
                 scroll_start = 0;
-                scroll_end = scroll_start + scroll_n;
+                scroll_end = scroll_start + avail_lines;
             }
             if(scroll_end > total_lines)
             {
                 scroll_end = total_lines;
-                scroll_start = scroll_end - scroll_n;
+                scroll_start = scroll_end - avail_lines;
             }
         }
 
         // overall title and "PROFILES" come before the profiles
         int start_y = sY + 2*line;
+
+        // render the scroll indicators
+        if(render)
+        {
+            if(scroll_start > 0)
+                XRender::renderTexture(sX + width / 2 - GFX.MCursor[1].w / 2, start_y - GFX.MCursor[1].h, GFX.MCursor[1]);
+
+            if(scroll_end < total_lines)
+                XRender::renderTexture(sX + width / 2 - GFX.MCursor[2].w / 2, start_y + (avail_lines)*line - line + 18, GFX.MCursor[2]);
+        }
 
         if(render && 0 >= scroll_start && 0 < scroll_end)
             SuperPrint(g_mainMenu.wordProfiles, 3, sX+16, start_y + (0-scroll_start)*line);
@@ -680,7 +696,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
         }
 
         // first come the stock options, then the profile options.
-        // work out scrolling here
+        // the scrolling is determined here
 
         int avail_lines = max_line - 2;
 
@@ -708,6 +724,8 @@ int menuControls_Mouse_Render(bool mouse, bool render)
 
         if(avail_lines < total_lines)
         {
+            avail_lines --; // for scroll indicator
+
             scroll_start = cur_line - avail_lines/2;
             scroll_end = scroll_start + avail_lines;
             if(scroll_start < 0)
@@ -724,6 +742,16 @@ int menuControls_Mouse_Render(bool mouse, bool render)
 
         // overall title comes before the stock options
         int start_y = sY + 1*line;
+
+        // render the scroll indicators
+        if(render)
+        {
+            if(scroll_start > 0)
+                XRender::renderTexture(sX + width / 2 - GFX.MCursor[1].w / 2, start_y - GFX.MCursor[1].h, GFX.MCursor[1]);
+
+            if(scroll_end < total_lines)
+                XRender::renderTexture(sX + width / 2 - GFX.MCursor[2].w / 2, start_y + (avail_lines)*line - line + 18, GFX.MCursor[2]);
+        }
 
         for(int i = 0; i < n_stock; i++)
         {
@@ -955,6 +983,8 @@ int menuControls_Mouse_Render(bool mouse, bool render)
 
         if(avail_lines < total_lines)
         {
+            avail_lines --; // for scroll indicator
+
             scroll_start = cur_line - avail_lines/2;
             scroll_end = scroll_start + avail_lines;
             if(scroll_start < 0)
@@ -973,6 +1003,17 @@ int menuControls_Mouse_Render(bool mouse, bool render)
         int start_y = sY + 2*line;
         int b_base = 1;
 
+        // render the scroll indicators
+        if(render)
+        {
+            if(scroll_start > 0)
+                XRender::renderTexture(sX + width / 2 - GFX.MCursor[1].w / 2, start_y - GFX.MCursor[1].h, GFX.MCursor[1]);
+
+            if(scroll_end < total_lines)
+                XRender::renderTexture(sX + width / 2 - GFX.MCursor[2].w / 2, start_y + (avail_lines)*line - line + 18, GFX.MCursor[2]);
+        }
+
+        // render the word "BUTTONS"
         if(render && scroll_start == 0)
         {
             SuperPrint(g_mainMenu.wordButtons, 3, sX+16, start_y);
