@@ -67,6 +67,8 @@ extern void cheats_erase(CheatsScope scope, const std::string &source);
 
 extern void cheats_setBuffer(const std::string &line);
 
+extern bool cheats_contains(const std::string &needle);
+
 #ifdef __ANDROID__
 extern void cheats_callDialog();
 #endif
