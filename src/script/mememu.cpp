@@ -464,9 +464,11 @@ public:
 
     double getAny(Location_t *obj, int address) override
     {
-        if(address == 0x0C) // Workaround for Analog Funk, using incorrect NPC address 0x84
+        // Workaround for Analog Funk: Talkhaus-Science_Final_Battle,
+        // using incorrect NPC address 0x84 as byte
+        if(address == 0x0C)
         {
-            uint16_t t = *reinterpret_cast<uint16_t*>(reinterpret_cast<uint8_t*>(&obj->Y) + 12);
+            uint8_t t = *reinterpret_cast<uint8_t*>(&obj->Y) + 4;
             return (double)t;
         }
 
@@ -475,10 +477,12 @@ public:
 
     void setAny(Location_t *obj, int address, double value) override
     {
-        if(address == 0x0C) // Workaround for Analog Funk, using incorrect NPC address 0x84
+        // Workaround for Analog Funk: Talkhaus-Science_Final_Battle,
+        // using incorrect NPC address 0x84 as byte
+        if(address == 0x0C)
         {
-            uint16_t* d = reinterpret_cast<uint16_t*>(reinterpret_cast<uint8_t*>(&obj->Y) + 12);
-            *d = (uint16_t)value;
+            uint8_t *d = reinterpret_cast<uint8_t*>(&obj->Y) + 4;
+            *d = (uint8_t)value;
             return;
         }
 
