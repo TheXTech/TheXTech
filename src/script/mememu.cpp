@@ -461,38 +461,6 @@ public:
         m_df.insert({0x20, &Location_t::SpeedX});
         m_df.insert({0x28, &Location_t::SpeedY});
     }
-
-    double getAny(Location_t *obj, int address) override
-    {
-        // Workaround for Analog Funk: Talkhaus-Science_Final_Battle,
-        // using incorrect NPC address 0x84 as byte
-        if(address == 0x0C)
-        {
-            uint8_t t = *reinterpret_cast<uint8_t*>(&obj->Y) + 4;
-            return (double)t;
-        }
-
-        return LocationParent::getAny(obj, address);
-    }
-
-    void setAny(Location_t *obj, int address, double value) override
-    {
-        // Workaround for Analog Funk: Talkhaus-Science_Final_Battle,
-        // using incorrect NPC address 0x84 as byte
-        if(address == 0x0C)
-        {
-            double old = obj->Y;
-            uint8_t *d = reinterpret_cast<uint8_t*>(&obj->Y) + 4;
-            *d = (uint8_t)value;
-            D_pLogDebug("Modifying byte 4 at double value 0x%016X (%g) by %02X, result is 0x%016X (%g)",
-                        *reinterpret_cast<uint64_t*>(&old), old,
-                        (uint8_t)value,
-                        *reinterpret_cast<uint64_t*>(&obj->Y), obj->Y);
-            return;
-        }
-
-        LocationParent::setAny(obj, address, value);
-    }
 };
 
 
@@ -806,7 +774,17 @@ public:
     double getAny(NPC_t *obj, int address) override
     {
         if(address >= 0x78 && address < 0xA8) // Location
+        {
+            // Workaround for Analog Funk: Talkhaus-Science_Final_Battle,
+            // using incorrect NPC address 0x84 as byte
+            if(address == 0x84)
+            {
+                uint8_t t = *reinterpret_cast<uint8_t*>(&obj->Location.Y) + 4;
+                return (double)t;
+            }
+
             return s_locMem.getAny(&obj->Location, address - 0x78);
+        }
         else if(address >= 0xA8 && address < 0xD8) // DefaultLocation
             return s_locMem.getAny(&obj->DefaultLocation, address - 0xA8);
         else if(address == 0x126)
@@ -821,6 +799,28 @@ public:
     {
         if(address >= 0x78 && address < 0xA8) // Location
         {
+            // Workaround for Analog Funk: Talkhaus-Science_Final_Battle,
+            // using incorrect NPC address 0x84 as byte
+            if(address == 0x84)
+            {
+                // TODO: Verify this behaviour on PowerPC-BE and on ARM
+                // ---------------------------------------------------------
+                //                          Unit test
+                // ---------------------------------------------------------
+                // Initial value  0xC08100007AE147AE (-544)
+                // Modify byte with offset at begin of field 4 by FF,
+                // result must be 0xC08100FF7AE147AE (-544.125)
+                // ---------------------------------------------------------
+                double old = obj->Location.Y;
+                uint8_t *d = reinterpret_cast<uint8_t*>(&obj->Location.Y) + 4;
+                *d = (uint8_t)value;
+                D_pLogDebug("Modifying byte 4 at double value 0x%016llX (%g) by %02X, result is 0x%016llX (%g)",
+                            *reinterpret_cast<uint64_t*>(&old), old,
+                            (uint8_t)value,
+                            *reinterpret_cast<uint64_t*>(&obj->Location.Y), obj->Location.Y);
+                return;
+            }
+
             s_locMem.setAny(&obj->Location, address - 0x78, value);
             return;
         }
