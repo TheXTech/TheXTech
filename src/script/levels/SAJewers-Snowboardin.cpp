@@ -39,7 +39,7 @@ NPC_t *FindNPC(short identity)
 {
     NPC_t *currentnpc = nullptr;
 
-    for(int i = 0; i < numNPCs; i++)
+    for(int i = 0; i <= numNPCs; i++)
     {
         currentnpc = NpcF::Get(i);
         if(currentnpc->Type == identity)

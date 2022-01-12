@@ -481,8 +481,13 @@ public:
         // using incorrect NPC address 0x84 as byte
         if(address == 0x0C)
         {
+            double old = obj->Y;
             uint8_t *d = reinterpret_cast<uint8_t*>(&obj->Y) + 4;
             *d = (uint8_t)value;
+            D_pLogDebug("Modifying byte 4 at double value 0x%016X (%g) by %02X, result is 0x%016X (%g)",
+                        *reinterpret_cast<uint64_t*>(&old), old,
+                        (uint8_t)value,
+                        *reinterpret_cast<uint64_t*>(&obj->Y), obj->Y);
             return;
         }
 
