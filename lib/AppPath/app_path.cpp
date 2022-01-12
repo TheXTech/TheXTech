@@ -381,6 +381,11 @@ std::string AppPathManager::settingsFileSTD() // Writable
     return m_settingsPath + "thextech.ini";
 }
 
+std::string AppPathManager::settingsRoot() // Writable
+{
+    return m_settingsPath;
+}
+
 std::string AppPathManager::settingsControlsFileSTD() // Writable
 {
     return m_settingsPath + "controls.ini";
