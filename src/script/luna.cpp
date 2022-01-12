@@ -153,13 +153,16 @@ void lunaReset()
 //    gSavedVarBank.ClearBank();
     Input::ResetAll();
 
+    gDeathCounter.quit();
 }
 
 void lunaLoad()
 {
     lunaReset();
 
-    if(gEnableDemoCounter)
+    bool isGame = !GameMenu && !GameOutro && !BattleMode && !LevelEditor && !TestLevel;
+
+    if(gEnableDemoCounter && isGame)
         gDeathCounter.init();
 
     if(gLunaEnabledGlobally && gLunaEnabled)
@@ -179,7 +182,7 @@ void lunaLoad()
         gAutoMan.m_Hearts = 2;
     }
 
-    if(gEnableDemoCounter)
+    if(gEnableDemoCounter && isGame)
         gDeathCounter.Recount();
 }
 

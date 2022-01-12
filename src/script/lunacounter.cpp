@@ -11,6 +11,7 @@
 #include "renderop_string.h"
 #include "globals.h"
 #include "graphics.h"
+#include "game_main.h"
 #include "core/render.h"
 
 
@@ -29,10 +30,22 @@ void DeathCounter::init()
 {
     if(counterFile.empty())
     {
-        counterFile = AppPathManager::settingsRoot() + DEATHCT_FNAME;
+        counterFile = makeGameSavePath(SelectWorld[selWorld].WorldPath,
+                                       SelectWorld[selWorld].WorldFile,
+                                       fmt::format_ne("demos-{0}.dmo", selSave));
         if(!TryLoadStats())
             mEnabled = false;
     }
+}
+
+void DeathCounter::quit()
+{
+    counterFile.clear();
+    mStatFileOK = false;
+    mEnabled = true;
+    mCurTotalDeaths = 0;
+    mCurLevelDeaths = 0;
+    mDeathRecords.clear();
 }
 
 // TRY LOAD STATS - Attempts to load stats from stats file. Creates and inits the file if it doesn't exist.

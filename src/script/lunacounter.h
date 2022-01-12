@@ -15,6 +15,7 @@ struct DeathCounter
     DeathCounter();
 
     void init();
+    void quit();
 
     bool TryLoadStats();
     void UpdateDeaths(bool write_save);
