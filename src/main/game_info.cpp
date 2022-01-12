@@ -24,6 +24,7 @@
 #include <IniProcessor/ini_processing.h>
 #include "game_info.h"
 #include "cheat_code.h"
+#include "script/luna.h"
 
 #include "../version.h"
 
@@ -113,6 +114,19 @@ void initGameInfo()
             g_gameInfo.titleWindow = fmt::format_ne("{0} - (X-Tech v{1})", g_gameInfo.title, V_LATEST_STABLE);
             config.read("disable-two-player", g_gameInfo.disableTwoPlayer, false);
             config.read("disable-battle-mode", g_gameInfo.disableBattleMode, false);
+        }
+        config.endGroup();
+
+        config.beginGroup("deaths-counter");
+        {
+            config.read("enabled", gEnableDemoCounter, false);
+            config.read("title", gDemoCounterTitle, "DEMOS");
+        }
+        config.endGroup();
+
+        config.beginGroup("luna-script");
+        {
+            config.read("enable-engine", gLunaEnabledGlobally, true);
         }
         config.endGroup();
 

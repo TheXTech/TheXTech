@@ -337,6 +337,8 @@ set(THEXTECH_SRC
     src/script/lunarender.cpp
     src/script/lunacell.cpp
     src/script/lunainput.cpp
+    src/script/lunacounter.cpp
+    src/script/lunacounter_record.cpp
     src/script/renderop_bitmap.cpp
     src/script/renderop_rect.cpp
     src/script/renderop_effect.cpp

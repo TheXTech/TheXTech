@@ -6,13 +6,18 @@
 #include "lunaspriteman.h"
 #include "lunacell.h"
 #include "lunaplayer.h"
+#include "lunacounter.h"
 
 #include "globals.h"
 
 #include <unordered_map>
 #include <functional>
 
+bool gLunaEnabledGlobally = true;
 bool gLunaEnabled = true;
+bool gShowDemoCounter = true;
+bool gEnableDemoCounter = true;
+std::string gDemoCounterTitle = "DEMOS";
 
 static void (*levelCodeRun)() = nullptr;
 
@@ -154,7 +159,10 @@ void lunaLoad()
 {
     lunaReset();
 
-    if(gLunaEnabled)
+    if(gEnableDemoCounter)
+        gDeathCounter.init();
+
+    if(gLunaEnabledGlobally && gLunaEnabled)
     {
         // Load autocode
         gAutoMan.Clear(false);
@@ -170,18 +178,27 @@ void lunaLoad()
         InitLevel();
         gAutoMan.m_Hearts = 2;
     }
+
+    if(gEnableDemoCounter)
+        gDeathCounter.Recount();
 }
 
 void lunaLoop()
 {
-    // Clean up
-    gAutoMan.ClearExpired();
+    if(gLunaEnabledGlobally)
+    {
+        // Clean up
+        gAutoMan.ClearExpired();
 
-    // Update inputs
-    Input::CheckSpecialCheats();
-    Input::UpdateInputTasks();
+        // Update inputs
+        Input::CheckSpecialCheats();
+        Input::UpdateInputTasks();
+    }
 
-    if(gLunaEnabled)
+    if(gEnableDemoCounter)
+        gDeathCounter.UpdateDeaths(true);
+
+    if(gLunaEnabledGlobally && gLunaEnabled)
     {
 #if COMPILE_PLAYGROUND
         Playground::doPlaygroundStuff();
@@ -204,9 +221,13 @@ void lunaLoop()
 
 void lunaRender()
 {
-    if(!gLunaEnabled)
-        return;
-    Renderer::Get().StartFrameRender();
-    Renderer::Get().RenderBelowPriority(5);
-    Renderer::Get().EndFrameRender();
+    if(gEnableDemoCounter && gShowDemoCounter)
+        gDeathCounter.Draw();
+
+    if(gLunaEnabled && gLunaEnabledGlobally)
+    {
+        Renderer::Get().StartFrameRender();
+        Renderer::Get().RenderBelowPriority(5);
+        Renderer::Get().EndFrameRender();
+    }
 }
