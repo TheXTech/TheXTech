@@ -30,6 +30,7 @@ public:
     static void initAppPath();
 
     static std::string settingsFileSTD(); // Must be writable
+    static std::string settingsRoot(); // Must be writable
     static std::string settingsControlsFileSTD(); // Must be writable
     static std::string userAppDirSTD(); // Must be writable
     static std::string assetsRoot(); // Read-Only
