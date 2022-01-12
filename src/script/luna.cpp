@@ -5,25 +5,121 @@
 #include "lunarender.h"
 #include "lunaspriteman.h"
 #include "lunacell.h"
+#include "lunaplayer.h"
 
 #include "globals.h"
+
+#include <unordered_map>
+#include <functional>
 
 bool gLunaEnabled = true;
 
 static void (*levelCodeRun)() = nullptr;
 
 
+#include "levels/dlltestlvlCode.h"
 #include "levels/Docopoper-Calleoca.h"
+#include "levels/Docopoper-AbstractAssault.h"
+#include "levels/Docopoper-TheFloorisLava.h"
+#include "levels/SAJewers-QraestoliaCaverns.h"
+#include "levels/SAJewers-Snowboardin.h"
+#include "levels/Talkhaus-Science_Final_Battle.h"
+#include "levels/KilArmoryCode.h"
+
+static const std::unordered_map<std::string, std::function<void()>> s_levelInit =
+{
+
+// Example init block
+{
+    "dlltest.lvl",
+    []()->void
+    {
+        levelCodeRun = dlltestlvlCode;
+    }
+},
+// Abtract Assault init block
+{
+    "Docopoper-AbstractAssault.lvl",
+    []()->void
+    {
+        levelCodeRun = AbstractAssaultCode;
+    }
+},
+// Calleoca init block
+{
+    "Docopoper-Calleoca.lvl",
+    []()->void
+    {
+        CalleocaInitCode();
+        levelCodeRun = CalleocaCode;
+    }
+},
+// The Floor is Lava init block
+{
+    "Docopoper-TheFloorisLava.lvl",
+    []()->void
+    {
+        levelCodeRun = TheFloorisLavaCode;
+        Player_t* demo = PlayerF::Get(1);
+        if(demo)
+            demo->Character = 1;
+    }
+},
+
+// Qraestolia Caverns init block
+{
+    "SAJewers-QraestoliaCaverns.lvl",
+    []()->void
+    {
+        levelCodeRun = QraestoliaCavernsCode;
+    }
+},
+
+// Snowbordin init block
+{
+    "SAJewers-Snowboardin.lvl",
+    []()->void
+    {
+        levelCodeRun = SAJSnowbordin::SnowbordinCode;
+        SAJSnowbordin::SnowbordinInitCode();
+    }
+},
+
+// Science init block
+{
+    "Talkhaus-Science_Final_Battle.lvl",
+    []()->void
+    {
+        levelCodeRun = ScienceBattle::ScienceCode;
+        ScienceBattle::ScienceInitCode();
+    }
+},
+
+{
+    "LUNA12-thou_starts_a_new_video.lvl",
+    []()->void
+    {
+        levelCodeRun = KilArmoryCode;
+        auto *demo = PlayerF::Get(1);
+        if(demo)
+        {
+            PlayerF::FilterToBig(demo);
+            PlayerF::FilterMount(demo);
+            PlayerF::FilterReservePowerup(demo);
+            demo->Character = 1;
+        }
+    }
+},
+
+};
 
 static void InitLevel()
 {
     levelCodeRun = nullptr;
 
-    if(FileNameFull == "Docopoper-Calleoca.lvl")
-    {
-        CalleocaInitCode();
-        levelCodeRun = CalleocaCode;
-    }
+    auto l = s_levelInit.find(FileNameFull);
+    if(l != s_levelInit.end())
+        l->second();
 }
 
 void lunaReset()

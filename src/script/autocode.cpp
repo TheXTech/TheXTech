@@ -40,48 +40,13 @@
 #include "lunaplayer.h"
 #include "lunalevel.h"
 #include "lunanpc.h"
+#include "lunalayer.h"
 #include "lunablock.h"
 #include "lunacell.h"
 #include "lunaspriteman.h"
 #include "lunainput.h"
 #include "renderop_string.h"
 #include "mememu.h"
-
-
-namespace LayerF
-{
-
-Layer_t *Get(int layerIdx)
-{
-    if(layerIdx < 0 || layerIdx > numLayers)
-        return nullptr;
-    return &Layer[layerIdx];
-}
-
-// Stop a layer
-void Stop(Layer_t *layer)
-{
-    layer->EffectStop = false;
-    layer->SpeedX = 0.0001f;
-    layer->SpeedY = 0.0001f;
-}
-
-void SetYSpeed(Layer_t *layer, float setY)
-{
-    setY = (setY == 0 ?  0.0001f : setY);
-    layer->SpeedY = setY;
-    layer->EffectStop = true;
-}
-
-void SetXSpeed(Layer_t *layer, float setX)
-{
-    setX = (setX == 0 ?  0.0001f : setX);
-    layer->SpeedX = setX;
-    layer->EffectStop = true;
-}
-
-} // LayerF
-
 
 
 static FIELDTYPE StrToFieldtype(std::string string)

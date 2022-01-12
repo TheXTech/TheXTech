@@ -331,6 +331,7 @@ set(THEXTECH_SRC
     src/script/lunaplayer.cpp
     src/script/lunanpc.cpp
     src/script/lunablock.cpp
+    src/script/lunalayer.cpp
     src/script/lunamisc.cpp
     src/script/lunalevel.cpp
     src/script/lunarender.cpp
@@ -338,8 +339,16 @@ set(THEXTECH_SRC
     src/script/lunainput.cpp
     src/script/renderop_bitmap.cpp
     src/script/renderop_rect.cpp
+    src/script/renderop_effect.cpp
     src/script/mememu.cpp
+    src/script/levels/dlltestlvlCode.cpp
+    src/script/levels/Docopoper-AbstractAssault.cpp
     src/script/levels/Docopoper-Calleoca.cpp
+    src/script/levels/Docopoper-TheFloorisLava.cpp
+    src/script/levels/SAJewers-QraestoliaCaverns.cpp
+    src/script/levels/SAJewers-Snowboardin.cpp
+    src/script/levels/Talkhaus-Science_Final_Battle.cpp
+    src/script/levels/KilArmoryCode.cpp
     src/graphics/gfx_update2.cpp
     src/graphics/gfx_update.cpp
     src/graphics/gfx_background.cpp
