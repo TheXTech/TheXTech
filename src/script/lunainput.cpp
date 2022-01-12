@@ -188,8 +188,7 @@ void Input::CheckSpecialCheats()
     {
         const char *none = "__null";
         // FIXME: Replace this with the boolean toggle than adding this command infinitely times
-        Autocode* ac = new Autocode(AT_DebugPrint, 0, 0, 0, 0, none, 600, 0, none);
-        gAutoMan.m_CustomCodes.push_back(ac);
+        gAutoMan.m_CustomCodes.emplace_back(AT_DebugPrint, 0, 0, 0, 0, none, 600, 0, none);
         PlaySound(SFX_Stomp);
         cheats_clearBuffer();
         return;

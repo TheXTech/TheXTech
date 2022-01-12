@@ -34,7 +34,7 @@
 #define GLOBALCODE_FNAME    "lunaglobal.txt"
 #define PARSE_FMT_STR       " %149[^,], %lf , %lf , %lf , %lf , %lf , %999[^\n]"
 #define PARSE_FMT_STR_2     " %149[^,], %i , %i , %i , %i , %i , %999[^\n]"
-//						 Cmd	Trg   P1    P2    P3    Len   String
+//                       Cmd    Trg   P1    P2    P3    Len   String
 
 struct AutocodeManager
 {
@@ -42,38 +42,38 @@ struct AutocodeManager
     ~AutocodeManager();
 
     // File funcs
-    void ReadFile(std::string dir_path); // Load level codes from dir_path
-    void ReadWorld(std::string dir_path); // Load worldwide codes from dir_path
-    void ReadGlobals(std::string dir_path); // Load global codes from dir_path
+    bool ReadFile(const std::string &dir_path); // Load level codes from dir_path
+    bool ReadWorld(const std::string &dir_path); // Load worldwide codes from dir_path
+    bool ReadGlobals(const std::string &dir_path); // Load global codes from dir_path
     void Parse(FILE *open_file, bool add_to_globals);
 
     // Management funcs
     void Clear(bool clear_global_codes);
     void ForceExpire(int section);
     void ClearExpired();
-    void DeleteEvent(std::string event_reference_name);		// Look up event with given name and expire it
+    void DeleteEvent(std::string event_reference_name);     // Look up event with given name and expire it
     void DoEvents(bool init);
     void ActivateCustomEvents(int new_section, int eventcode);
-    Autocode* GetEventByRef(std::string event_reference_name);	// Return ptr to event with the given ref, or NULL if it fails
-    Autocode* FindMatching(int section, std::string string);
+    Autocode *GetEventByRef(const std::string &event_reference_name);   // Return ptr to event with the given ref, or NULL if it fails
+    Autocode *FindMatching(int section, const std::string &string);
 
     // Variable bank funcs
-    double GetVar(std::string var_name);		// returns 0 if var doesn't exist in bank
+    double GetVar(std::string var_name);        // returns 0 if var doesn't exist in bank
     bool VarExists(std::string var_name);
     bool VarOperation(std::string var_name, double value, OPTYPE operation_to_do);
 
     // Members
-    bool					m_Enabled;			// Whether or not individual level scripts enabled
-    bool					m_GlobalEnabled;	// Whether or not global game scripts enabled
-    std::list<Autocode*>	m_Autocodes;
-    std::list<Autocode*>	m_InitAutocodes;
-    std::list<Autocode*>	m_CustomCodes;
-    std::list<Autocode*>	m_GlobalCodes;
+    bool                    m_Enabled = false;          // Whether or not individual level scripts enabled
+    bool                    m_GlobalEnabled = false;    // Whether or not global game scripts enabled
+    std::list<Autocode>     m_Autocodes;
+    std::list<Autocode>     m_InitAutocodes;
+    std::list<Autocode>     m_CustomCodes;
+    std::list<Autocode>     m_GlobalCodes;
 
     std::map<std::string, double> m_UserVars;
 
     // Hearts manager stuff
-    int m_Hearts;
+    int m_Hearts = 2;
 };
 
 extern AutocodeManager gAutoMan;

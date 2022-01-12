@@ -50,83 +50,70 @@ void AutocodeManager::Clear(bool clear_global_codes)
 {
     if(clear_global_codes)
     {
-        while(m_GlobalCodes.empty() == false)
-        {
-            delete m_GlobalCodes.front();
-            m_GlobalCodes.pop_front();
-        }
         m_GlobalCodes.clear();
+        m_GlobalEnabled = false;
     }
-    while(m_Autocodes.empty() == false)
-    {
-        delete m_Autocodes.front();
-        m_Autocodes.pop_front();
-    }
-    while(m_InitAutocodes.empty() == false)
-    {
-        delete m_InitAutocodes.front();
-        m_InitAutocodes.pop_front();
-    }
-    while(m_CustomCodes.empty() == false)
-    {
-        delete m_CustomCodes.front();
-        m_CustomCodes.pop_front();
-    }
+
     m_Autocodes.clear();
     m_InitAutocodes.clear();
     m_CustomCodes.clear();
 
     m_Hearts = 2;
+
+    m_Enabled = false;
 }
 
 // READ FILE - Read the autocode file in the level folder
-void AutocodeManager::ReadFile(std::string dir_path)
+bool AutocodeManager::ReadFile(const std::string &dir_path)
 {
     // Form full path
     //string full_path = RemoveExtension(dir_path);
-    std::string full_path = dir_path.append(FileName);
-    full_path = full_path.append("/");
-    full_path = full_path.append(AUTOCODE_FNAME);
+    std::string full_path = dir_path;
+    full_path.append(FileName).append("/").append(AUTOCODE_FNAME);
 
     FILE *code_file = Files::utf8_fopen(full_path.c_str(), "rb");
     if(!code_file)
-        return;
+        return false;
 
     m_Enabled = true;
     Parse(code_file, false);
 
     std::fclose(code_file);
+
+    return true;
 }
 
 // READ WORLD - Read the world autocode file in the world folder
-void AutocodeManager::ReadWorld(std::string dir_path)
+bool AutocodeManager::ReadWorld(const std::string &dir_path)
 {
     std::string full_path = dir_path;
-
-    full_path = full_path.append("/");
-    full_path = full_path.append(WORLDCODE_FNAME);
+    full_path.append("/").append(WORLDCODE_FNAME);
 
     FILE *code_file = Files::utf8_fopen(full_path.c_str(), "rb");
     if(!code_file)
-        return;
+        return false;
 
     Parse(code_file, false);
     std::fclose(code_file);
+    return true;
 }
 
 // READ GLOBALS - Read the global code file
-void AutocodeManager::ReadGlobals(std::string dir_path)
+bool AutocodeManager::ReadGlobals(const std::string &dir_path)
 {
-    std::string full_path = dir_path.append("/");
-    full_path = full_path.append(GLOBALCODE_FNAME);
+    std::string full_path = dir_path;
+    full_path.append("/").append(GLOBALCODE_FNAME);
 
     FILE *code_file = Files::utf8_fopen(full_path.c_str(), "rb");
     if(!code_file)
-        return;
+        return false;
 
     Parse(code_file, true);
 
+    m_GlobalEnabled = true;
+
     std::fclose(code_file);
+    return true;
 }
 
 // PARSE    - Parse the autocode file and populate manager with the contained code/settings
@@ -181,23 +168,22 @@ void AutocodeManager::Parse(FILE *code_file, bool add_to_globals)
             continue;
 
         // Is it a new section header?
-        if(wbuf[0] == L'#')
+        if(wbuf[0] == '#')
         {
             // Is it the level load header?
-            if(wbuf[1] == L'-')
+            if(wbuf[1] == '-')
                 cur_section = -1;
             else   // Else, parse the section number
                 cur_section = SDL_atoi(&wbuf[1]);
         }
         else   // Else, parse as a command
         {
-
             // Is there a variable reference marker?
             if(wbuf[0] == '$')
             {
                 int i = 1;
-                for(i = 1; wbuf[i] != L',' && wbuf[i] != '\x0D' && wbuf[i] != '\x0A' && i < 126; i++)
-                {}
+                while(wbuf[i] != ',' && wbuf[i] != '\x0D' && wbuf[i] != '\x0A' && i < 126)
+                    ++i;
 
                 wbuf[i] = '\x00'; // Turn the comma into a null terminator
                 SDL_strlcpy(wrefbuf, &wbuf[1], 128); // Copy new string into wrefbuf
@@ -238,20 +224,17 @@ void AutocodeManager::Parse(FILE *code_file, bool add_to_globals)
 
             std::string ref_str = std::string(wrefbuf); // Get var reference string if any
 
-            Autocode *newcode = new Autocode(ac_type, target, param1, param2, param3, ac_str, length, cur_section, ref_str);
+            Autocode newcode(ac_type, target, param1, param2, param3, ac_str, length, cur_section, ref_str);
             if(!add_to_globals)
             {
-                if(newcode->m_Type < 10000 || newcode->MyRef.length() > 0)
+                if(newcode.m_Type < 10000 || newcode.MyRef.length() > 0)
                     m_Autocodes.emplace_back(std::move(newcode));
                 else   // Sprite components (type 10000+) with no reference go into callable component list
-                {
                     gSpriteMan.m_ComponentList.push_back(Autocode::GenerateComponent(newcode));
-                    delete newcode;
-                }
             }
             else
             {
-                if(newcode->m_Type < 10000)
+                if(newcode.m_Type < 10000)
                     m_GlobalCodes.emplace_back(std::move(newcode));
             }
         }
@@ -272,30 +255,30 @@ void AutocodeManager::DoEvents(bool init)
         }
 
         // Do each code
-        for(std::list<Autocode *>::iterator iter = m_Autocodes.begin(), end = m_Autocodes.end(); iter != end; ++iter)
-            (*iter)->Do(init);
+        for(auto iter = m_Autocodes.begin(), end = m_Autocodes.end(); iter != end; ++iter)
+            (*iter).Do(init);
     }
 
     if(m_GlobalEnabled)
     {
         // Do each global code
-        for(std::list<Autocode *>::iterator iter = m_GlobalCodes.begin(), end = m_GlobalCodes.end(); iter != end; ++iter)
-            (*iter)->Do(init);
+        for(auto iter = m_GlobalCodes.begin(), end = m_GlobalCodes.end(); iter != end; ++iter)
+            (*iter).Do(init);
     }
 }
 
 // GET EVENT BY REF
-Autocode *AutocodeManager::GetEventByRef(std::string ref_name)
+Autocode *AutocodeManager::GetEventByRef(const std::string &ref_name)
 {
     if(ref_name.length() > 0)
     {
-        for(std::list<Autocode *>::iterator iter = m_Autocodes.begin(), end = m_Autocodes.end(); iter != end; ++iter)
+        for(auto iter = m_Autocodes.begin(), end = m_Autocodes.end(); iter != end; ++iter)
         {
-            if((*iter)->MyRef == ref_name)
-                return (*iter);
+            if((*iter).MyRef == ref_name)
+                return &(*iter);
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 // DELETE EVENT -- Expires any command that matches the given name
@@ -303,10 +286,10 @@ void AutocodeManager::DeleteEvent(std::string ref_name)
 {
     if(ref_name.length() > 0)
     {
-        for(std::list<Autocode *>::iterator iter = m_Autocodes.begin(), end = m_Autocodes.end(); iter != end; ++iter)
+        for(auto iter = m_Autocodes.begin(), end = m_Autocodes.end(); iter != end; ++iter)
         {
-            if((*iter)->MyRef == ref_name)
-                (*iter)->Expired = true;
+            if((*iter).MyRef == ref_name)
+                (*iter).Expired = true;
         }
     }
 }
@@ -315,15 +298,15 @@ void AutocodeManager::DeleteEvent(std::string ref_name)
 void AutocodeManager::ClearExpired()
 {
     //char* dbg = "CLEAN EXPIRED DBG";
-    std::list<Autocode *>::iterator iter = m_Autocodes.begin();
-    std::list<Autocode *>::iterator end  = m_Autocodes.end();
+    auto iter = m_Autocodes.begin();
+    auto end  = m_Autocodes.end();
 
     while(iter != m_Autocodes.end())
     {
         //Autocode* ac = *iter;
-        if((*iter)->Expired || (*iter)->m_Type == AT_Invalid)
+        if((*iter).Expired || (*iter).m_Type == AT_Invalid)
         {
-            delete(*iter);
+//            delete(*iter);
             iter = m_Autocodes.erase(iter);
         }
         else
@@ -336,9 +319,9 @@ void AutocodeManager::ClearExpired()
     while(iter != m_GlobalCodes.end())
     {
         //Autocode* ac = *iter;
-        if((*iter)->Expired || (*iter)->m_Type == AT_Invalid)
+        if((*iter).Expired || (*iter).m_Type == AT_Invalid)
         {
-            delete(*iter);
+//            delete(*iter);
             iter = m_GlobalCodes.erase(iter);
         }
         else
@@ -352,32 +335,32 @@ void AutocodeManager::ActivateCustomEvents(int new_section, int eventcode)
     //char* dbg = "ACTIVATE CUSTOM DBG";
     if(m_Enabled)
     {
-        for(std::list<Autocode *>::iterator iter = m_Autocodes.begin(), end = m_Autocodes.end(); iter != end; ++iter)
+        for(auto iter = m_Autocodes.begin(), end = m_Autocodes.end(); iter != end; ++iter)
         {
 
             // Activate copies of events with 'eventcode' and move them to 'new_section'
-            if((*iter)->ActiveSection == eventcode && (*iter)->Activated == false && !(*iter)->Expired)
+            if((*iter).ActiveSection == eventcode && (*iter).Activated == false && !(*iter).Expired)
             {
-                Autocode *newcode = (*iter)->MakeCopy();
-                newcode->Activated = true;
-                newcode->ActiveSection = (new_section < 1000 ? (new_section - 1) : new_section);
-                newcode->Length = (*iter)->m_OriginalTime;
-                m_CustomCodes.push_front(newcode);
+                Autocode newcode = (*iter);
+                newcode.Activated = true;
+                newcode.ActiveSection = (new_section < 1000 ? (new_section - 1) : new_section);
+                newcode.Length = (*iter).m_OriginalTime;
+                m_CustomCodes.push_front(std::move(newcode));
             }
 
         }
 
-        for(std::list<Autocode *>::iterator iter = m_GlobalCodes.begin(), end = m_GlobalCodes.end(); iter != end; ++iter)
+        for(auto iter = m_GlobalCodes.begin(), end = m_GlobalCodes.end(); iter != end; ++iter)
         {
 
             // Activate copies of events with 'eventcode' and move them to 'new_section'
-            if((*iter)->ActiveSection == eventcode && (*iter)->Activated == false && !(*iter)->Expired)
+            if((*iter).ActiveSection == eventcode && !(*iter).Activated && !(*iter).Expired)
             {
-                Autocode *newcode = (*iter)->MakeCopy();
-                newcode->Activated = true;
-                newcode->ActiveSection = (new_section < 1000 ? (new_section - 1) : new_section);
-                newcode->Length = (*iter)->m_OriginalTime;
-                m_CustomCodes.push_front(newcode);
+                Autocode newcode = (*iter);
+                newcode.Activated = true;
+                newcode.ActiveSection = (new_section < 1000 ? (new_section - 1) : new_section);
+                newcode.Length = (*iter).m_OriginalTime;
+                m_CustomCodes.push_front(std::move(newcode));
             }
 
         }
@@ -390,28 +373,28 @@ void AutocodeManager::ForceExpire(int section)
     //char* dbg = "FORCE EXPIRE DBG";
     if(m_Enabled)
     {
-        for(std::list<Autocode *>::iterator iter = m_Autocodes.begin(), end = m_Autocodes.end(); iter != end; ++iter)
+        for(auto iter = m_Autocodes.begin(), end = m_Autocodes.end(); iter != end; ++iter)
         {
-            if((*iter)->ActiveSection == section)
-                (*iter)->Expired = true;
+            if((*iter).ActiveSection == section)
+                (*iter).Expired = true;
         }
 
-        for(std::list<Autocode *>::iterator iter = m_GlobalCodes.begin(), end = m_GlobalCodes.end(); iter != end; ++iter)
+        for(auto iter = m_GlobalCodes.begin(), end = m_GlobalCodes.end(); iter != end; ++iter)
         {
-            if((*iter)->ActiveSection == section)
-                (*iter)->Expired = true;
+            if((*iter).ActiveSection == section)
+                (*iter).Expired = true;
         }
     }
 }
 
 // FIND MATCHING -- Return a reference to the first autocode that matches, or 0
-Autocode *AutocodeManager::FindMatching(int section, std::string soughtstr)
+Autocode *AutocodeManager::FindMatching(int section, const std::string &soughtstr)
 {
     //char* dbg = "FIND MATCHING DBG";
-    for(std::list<Autocode *>::iterator iter = m_Autocodes.begin(), end = m_Autocodes.end(); iter != end; ++iter)
+    for(auto iter = m_Autocodes.begin(), end = m_Autocodes.end(); iter != end; ++iter)
     {
-        if((*iter)->ActiveSection == section && (*iter)->MyString == soughtstr)
-            return (*iter);
+        if((*iter).ActiveSection == section && (*iter).MyString == soughtstr)
+            return &(*iter);
     }
     return 0;
 }

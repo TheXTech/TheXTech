@@ -105,33 +105,37 @@ Autocode::Autocode(AutocodeType _Type, double _Target, double _p1, double _p2, d
     ftype = FT_INVALID;
     Activated = true;
     Expired = false;
-    //comp = NULL;
+    //comp = nullptr;
 
     // Adjust section
     ActiveSection = (_Section < 1000 ? --_Section : _Section);
     Activated = (_Section < 1000 ? true : false);
 }
 
-Autocode *Autocode::MakeCopy()
+Autocode::Autocode(const Autocode &o)
 {
-    Autocode *newcode = new Autocode();
+    operator=(o);
+}
 
-    newcode->Activated = Activated;
-    newcode->ActiveSection = ActiveSection;
-    newcode->Expired = Expired;
-    newcode->ftype = ftype;
-    newcode->Length = Length;
-    newcode->MyString = MyString;
-    newcode->MyRef = MyRef;
-    newcode->m_OriginalTime = m_OriginalTime;
-    newcode->m_Type = m_Type;
-    newcode->Param1 = Param1;
-    newcode->Param2 = Param2;
-    newcode->Param3 = Param3;
-    newcode->Target = Target;
-    //newcode->comp = NULL;
+Autocode &Autocode::operator=(const Autocode &o)
+{
+    m_Type = o.m_Type;
 
-    return newcode;
+    Target = o.Target;
+    Param1 = o.Param1;
+    Param2 = o.Param2;
+    Param3 = o.Param3;
+    Length = o.Length;
+    MyString = o.MyString;
+    MyRef = o.MyRef;
+
+    m_OriginalTime = o.m_OriginalTime;
+    ActiveSection = o.ActiveSection;
+    ftype = o.ftype;
+    Activated = o.Activated;
+    Expired = o.Expired;
+
+    return *this;
 }
 
 // DO - Perform autocodes for this section. Only does init codes if "init" is set
@@ -295,7 +299,7 @@ void Autocode::Do(bool init)
         {
             int base_health = SDL_atoi(MyString.data());
             NPC_t *npc = NpcF::GetFirstMatch((int)Target, (int)Param3 - 1);
-            if(npc != NULL)
+            if(npc != nullptr)
             {
                 float hits = *(((float *)((&(*(uint8_t *)npc)) + 0x148)));
                 Renderer::Get().AddOp(new RenderStringOp(std::to_string((long long)(base_health - hits)), 3, (float)Param1, (float)Param2));
@@ -763,7 +767,7 @@ void Autocode::Do(bool init)
         {
             if(Target < 6 && Target > 0)
             {
-                Autocode *coderef = 0;
+                Autocode *coderef = nullptr;
                 coderef = gAutoMan.GetEventByRef(MyString);
                 if(coderef != 0)
                 {
@@ -793,7 +797,7 @@ void Autocode::Do(bool init)
         // ChangeTime
         case AT_ChangeTime:
         {
-            Autocode *coderef = 0;
+            Autocode *coderef = nullptr;
             coderef = gAutoMan.GetEventByRef(MyString);
             if(coderef != 0)
                 modParam(coderef->Length, Param1, (OPTYPE)(int)Param2);
@@ -1166,21 +1170,21 @@ void Autocode::Do(bool init)
                 {
                     CSprite *pSpr = gSpriteMan.m_SpriteBlueprints[MyRef];                   // Get blueprint
                     Autocode *pComponent = gAutoMan.GetEventByRef(MyString);                // Get autocode containing component
-                    if(pComponent != NULL)
+                    if(pComponent)
                     {
                         switch((BlueprintAttachType)(int)Target)
                         {
                         case BPAT_Behavior:
-                            pSpr->AddBehaviorComponent(GenerateComponent(pComponent));
+                            pSpr->AddBehaviorComponent(GenerateComponent(*pComponent));
                             break;
                         case BPAT_Draw:
-                            pSpr->AddDrawComponent(GetDrawFunc(pComponent));
+                            pSpr->AddDrawComponent(GetDrawFunc(*pComponent));
                             break;
                         case BPAT_Birth:
-                            pSpr->AddBirthComponent(GenerateComponent(pComponent));
+                            pSpr->AddBirthComponent(GenerateComponent(*pComponent));
                             break;
                         case BPAT_Death:
-                            pSpr->AddDeathComponent(GenerateComponent(pComponent));
+                            pSpr->AddDeathComponent(GenerateComponent(*pComponent));
                             break;
                         default:
                             break;
@@ -1766,24 +1770,24 @@ AutocodeType Autocode::EnumerizeCommand(char *wbuf)
     return AT_Invalid;
 }
 
-SpriteComponent Autocode::GenerateComponent(Autocode *obj_to_convert)
+SpriteComponent Autocode::GenerateComponent(const Autocode &obj_to_convert)
 {
     SpriteComponent comp;
-    comp.Init((int)obj_to_convert->Length);
-    comp.data1 = obj_to_convert->Target;
-    comp.data2 = obj_to_convert->Param1;
-    comp.data3 = obj_to_convert->Param2;
-    comp.data4 = obj_to_convert->Param3;
-    comp.data5 = obj_to_convert->MyString;
-    comp.lookup_code = obj_to_convert->ActiveSection;
+    comp.Init((int)obj_to_convert.Length);
+    comp.data1 = obj_to_convert.Target;
+    comp.data2 = obj_to_convert.Param1;
+    comp.data3 = obj_to_convert.Param2;
+    comp.data4 = obj_to_convert.Param3;
+    comp.data5 = obj_to_convert.MyString;
+    comp.lookup_code = obj_to_convert.ActiveSection;
 
     comp.func = Autocode::GetSpriteFunc(obj_to_convert);
     return comp;
 }
 
-pfnSprFunc Autocode::GetSpriteFunc(Autocode *pAC)
+pfnSprFunc Autocode::GetSpriteFunc(const Autocode &pAC)
 {
-    switch(pAC->m_Type)
+    switch(pAC.m_Type)
     {
     case AT_OnPlayerCollide:
         return SpriteFunc::OnPlayerCollide;
@@ -1850,19 +1854,19 @@ pfnSprFunc Autocode::GetSpriteFunc(Autocode *pAC)
     case AT_SpriteDebug:
         return SpriteFunc::SpriteDebug;
     default:
-        return NULL;
+        return nullptr;
     }
 }
 
-pfnSprDraw Autocode::GetDrawFunc(Autocode *pAC)
+pfnSprDraw Autocode::GetDrawFunc(const Autocode &pAC)
 {
-    switch(pAC->m_Type)
+    switch(pAC.m_Type)
     {
     case AT_StaticDraw:
         return SpriteFunc::StaticDraw;
     case AT_RelativeDraw:
         return SpriteFunc::RelativeDraw;
     default:
-        return NULL;
+        return nullptr;
     }
 }

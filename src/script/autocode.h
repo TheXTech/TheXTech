@@ -215,9 +215,10 @@ public:
     Autocode();
     Autocode(AutocodeType, double Target, double p1, double p2, double p3,
              std::string p4, double Length, int Section, std::string VarRef);
+    Autocode(const Autocode &o);
     ~Autocode() = default;
 
-    Autocode *MakeCopy(); // return preallocated copy of this code
+    Autocode &operator=(const Autocode &o);
 
     void Do(bool init);
     void DoPredicate(int target, int predicate);
@@ -225,30 +226,30 @@ public:
     bool NPCConditional(int NPCID, int condition);
 
     static AutocodeType EnumerizeCommand(char *wbuf);
-    static SpriteComponent GenerateComponent(Autocode *obj_to_convert); // Convert an autocode object to a sprite component
-    static pfnSprFunc GetSpriteFunc(Autocode *pAC);                     // Get sprite function address from AC object, or NULL
-    static pfnSprDraw GetDrawFunc(Autocode *pAC);                       // Get draw function address from AC object, or NULL
+    static SpriteComponent GenerateComponent(const Autocode &obj_to_convert); // Convert an autocode object to a sprite component
+    static pfnSprFunc GetSpriteFunc(const Autocode &pAC);                     // Get sprite function address from AC object, or NULL
+    static pfnSprDraw GetDrawFunc(const Autocode &pAC);                       // Get draw function address from AC object, or NULL
 
     /// Command functions ///
     void HeartSystem();
     void LunaControl(LunaControlAct act, int val);
 
     /// Members ///
-    AutocodeType m_Type;
+    AutocodeType m_Type = AT_Invalid;
 
-    double  Target;             // arg 1 "Target"
-    double Param1;              // arg 2 "Param 1"
-    double Param2;              // arg 3 "Param 2"
-    double Param3;              // arg 4 "Param 3"
-    double Length;              // arg 5 "Length"
+    double Target = 0.0;             // arg 1 "Target"
+    double Param1 = 0.0;              // arg 2 "Param 1"
+    double Param2 = 0.0;              // arg 3 "Param 2"
+    double Param3 = 0.0;              // arg 4 "Param 3"
+    double Length = 0.0;              // arg 5 "Length"
     std::string MyString;       // arg 6 "string"
     std::string MyRef;          // Optional arg 0 value
 
-    double m_OriginalTime;
-    int ActiveSection;          // Section to be active in, or custom event ID if > 1000
-    FIELDTYPE ftype;
-    bool Activated;             // False for custom event blueprints
-    bool Expired;
+    double m_OriginalTime = 0.0;
+    int ActiveSection = 0;          // Section to be active in, or custom event ID if > 1000
+    FIELDTYPE ftype = FT_INVALID;
+    bool Activated = false;             // False for custom event blueprints
+    bool Expired = false;
 
     //SpriteComponent* comp;
 

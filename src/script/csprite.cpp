@@ -83,21 +83,21 @@ void CSprite::ClearExpiredComponents()
 // ADD BIRTH -- Add a birth function to sprite
 void CSprite::AddBirthComponent(SpriteComponent comp)
 {
-    if(comp.func != NULL)
+    if(comp.func != nullptr)
         m_BirthComponents.push_back(comp);
 }
 
 // ADD BEHAVIOR -- Add a behavior component to sprite
 void CSprite::AddBehaviorComponent(SpriteComponent comp)
 {
-    if(comp.func != NULL)
+    if(comp.func != nullptr)
         m_BehavComponents.push_back(comp);
 }
 
 // ADD DRAW -- Add a draw component to sprite. Updates m_StaticScreenPos if static drawing detected.
 void CSprite::AddDrawComponent(pfnSprDraw func)
 {
-    if(func != NULL)
+    if(func != nullptr)
         m_DrawFuncs.push_back(func);
     if(func == SpriteFunc::StaticDraw)
         m_StaticScreenPos = true;
@@ -106,7 +106,7 @@ void CSprite::AddDrawComponent(pfnSprDraw func)
 // ADD DEATH -- Add a death function to sprite
 void CSprite::AddDeathComponent(SpriteComponent comp)
 {
-    if(comp.func != NULL)
+    if(comp.func != nullptr)
         m_DeathComponents.push_back(comp);
 }
 
