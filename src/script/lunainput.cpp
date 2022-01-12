@@ -1,5 +1,10 @@
+#include "luna.h"
 #include "lunainput.h"
 #include "lunaplayer.h"
+#include "lunacounter.h"
+#include "main/cheat_code.h"
+#include "sound.h"
+#include "autocode_manager.h"
 
 int gFrames;
 
@@ -164,9 +169,51 @@ void Input::UpdateKeyRecords(Player_t *pPlayer)
     }
 }
 
+#define FULL_LUNA_TOGGLE_CHT    "thouartdamned"
+#define TOGGLE_DEMO_COUNTER_CHT "toggledemocounter"
+#define DELETE_ALL_RECORDS_CHT  "formatcdrive"
+#define LUNA_DEBUG_CHT          "lunadebug"
+
 void Input::CheckSpecialCheats()
 {
+    if(cheats_contains(FULL_LUNA_TOGGLE_CHT))
+    {
+        gLunaEnabled = !gLunaEnabled;
+        PlaySound(SFX_Smash);
+        cheats_clearBuffer();
+        return;
+    }
 
+    else if(cheats_contains(LUNA_DEBUG_CHT))
+    {
+        const char *none = "__null";
+        // FIXME: Replace this with the boolean toggle than adding this command infinitely times
+        Autocode* ac = new Autocode(AT_DebugPrint, 0, 0, 0, 0, none, 600, 0, none);
+        gAutoMan.m_CustomCodes.push_back(ac);
+        PlaySound(SFX_Stomp);
+        cheats_clearBuffer();
+        return;
+    }
+
+    if(gEnableDemoCounter)
+    {
+        if(cheats_contains(TOGGLE_DEMO_COUNTER_CHT))
+        {
+            gShowDemoCounter = !gShowDemoCounter;
+            PlaySound(SFX_Smash);
+            cheats_clearBuffer();
+            return;
+        }
+        else if(cheats_contains(DELETE_ALL_RECORDS_CHT))
+        {
+            gDeathCounter.ClearRecords();
+            gDeathCounter.TrySave();
+            gDeathCounter.Recount();
+            PlaySound(SFX_Smash);
+            cheats_clearBuffer();
+            return;
+        }
+    }
 }
 
 void Input::UpdateInputTasks()
