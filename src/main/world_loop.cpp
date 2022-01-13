@@ -340,8 +340,6 @@ void WorldLoop()
         tempLocation.Y += 4;
         WorldPlayer[1].LevelName.clear();
 
-        bool pausePress = Player[1].Controls.Start || SharedControls.Pause;
-
         treeWorldLevelQuery(tempLocation, larr, true);
         //for(A = 1; A <= numWorldLevels; A++)
         for(auto *t : larr)
@@ -358,10 +356,17 @@ void WorldLoop()
             }
         }
 
-        if(pausePress)
+        if(SharedControls.Pause)
         {
-            if(Player[1].UnStart)
-                PauseGame(PauseCode::PauseGame, 1);
+            PauseGame(PauseCode::PauseGame, 0);
+        }
+        for(int i = 1; i <= numPlayers; i++)
+        {
+            if(Player[i].Controls.Start && Player[i].UnStart)
+                PauseGame(PauseCode::PauseGame, i);
+            // only allow P1 to pause if multiplayer pause controls disabled
+            if(!g_compatibility.multiplayer_pause_controls)
+                break;
         }
 
         if(Player[1].Controls.Up)
