@@ -70,7 +70,7 @@ void AbstractAssaultCode()
     else if(!gameStarted)
     {
         powerup = 6;
-        demo -> SpinJump = 0;
+        demo -> SpinJump = false;
         demo -> Hearts = 3;
         vspeed = -16;
         hspeed = -4;
@@ -84,7 +84,7 @@ void AbstractAssaultCode()
         if(layerStartingPlatform -> SpeedY == 0)
             gameStarted = 0;
 
-        demo -> SpinJump = 0;
+        demo -> SpinJump = false;
 
         layerDefault -> SpeedX = (float) MAX(layerDefault -> SpeedX - 0.015, -2.5);
 

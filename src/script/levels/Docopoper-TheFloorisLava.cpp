@@ -104,6 +104,9 @@ void TheFloorisLavaCode()
         layerSecretExit -> SpeedY = 0;
         secretExitFailedStage = 5;
         break;
+
+    default:
+        break;
     }
 
     //Up Down sine wave motion

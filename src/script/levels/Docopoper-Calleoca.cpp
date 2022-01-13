@@ -25,14 +25,16 @@
  *  Author:     Docopoper                        *
  *************************************************/
 
-#include <vector>
-#include <stdlib.h>
-#include <time.h>
+#include <cstdlib>
 #include <cmath>
+
+#include <Utils/maths.h>
+
 #include "Docopoper-Calleoca.h"
 #include "globals.h"
 #include "../lunaplayer.h"
 #include "../lunanpc.h"
+
 
 #define PI 3.1415926535897932384626433832795
 
@@ -56,10 +58,10 @@ bool init_doonce;
 
 Player_t* demo;
 
-NPC_t* calleoca_npc1 = NULL;
-NPC_t* calleoca_npc2 = NULL;
-NPC_t* hurt_npc = NULL;
-NPC_t* goal_npc = NULL;
+NPC_t* calleoca_npc1 = nullptr;
+NPC_t* calleoca_npc2 = nullptr;
+NPC_t* hurt_npc = nullptr;
+NPC_t* goal_npc = nullptr;
 
 int win_timer;
 int freeze_timer = 0;
@@ -80,9 +82,9 @@ double fishingboo_hspeed = 0;
 double fishingboo_vspeed = 0;
 double fishingboo_ferocity = 1;
 
-template <typename T> T Clamp(const T& value, const T& low, const T& high) 
+template <typename T> T Clamp(const T& value, const T& low, const T& high)
 {
-  return value < low ? low : (value > high ? high : value); 
+  return value < low ? low : (value > high ? high : value);
 }
 
 void CalleocaInitCode()
@@ -148,7 +150,7 @@ void Phase1()
         thwomp_vspeed = 0;
         freeze_timer--;
     }
-        
+
 
     calleoca_x += thwomp_hspeed;
     calleoca_y += thwomp_vspeed;
@@ -174,7 +176,7 @@ void Phase2()
 
     thwomp_vspeed += (thwomp_bottom - calleoca_y) * 0.05;
     thwomp_vspeed = Clamp<double>(thwomp_vspeed, -8.0, 8.0);
-    
+
     calleoca_x += thwomp_hspeed;
     calleoca_y += thwomp_vspeed;
     calleoca_npc1->Frame = 1;
@@ -198,7 +200,7 @@ void Phase2()
 //Missile
 void Phase3()
 {
-    calleoca_npc1->Frame = 3 + int(0.5 + missile_direction / 45) % 8;
+    calleoca_npc1->Frame = 3 + Maths::iRound(missile_direction / 45) % 8;
 
     int dir = (int)(std::atan2((demo->Location.Y + demo->Location.Height / 2) - (calleoca_y + 32),
                               -(demo->Location.X + demo->Location.Width / 2) + (calleoca_x + 32))
@@ -208,12 +210,11 @@ void Phase3()
 
     if (missile_direction >= 360)
         missile_direction -= 360;
-    else
-    if (missile_direction < 0)
+    else if (missile_direction < 0)
         missile_direction += 360;
 
-    missile_hspeed += cos(missile_direction * PI / 180) * 0.25;
-    missile_vspeed -= sin(missile_direction * PI / 180) * 0.25;
+    missile_hspeed += std::cos(missile_direction * PI / 180) * 0.25;
+    missile_vspeed -= std::sin(missile_direction * PI / 180) * 0.25;
 
     missile_hspeed = Clamp<double>(missile_hspeed * 0.975, -15, 15);
     missile_vspeed = Clamp<double>(missile_vspeed * 0.975, -15, 15);
@@ -233,7 +234,7 @@ void Phase3()
                 freeze_timer = 110;
     }
 
-    
+
     calleoca_x = Clamp<double>(calleoca_x + missile_hspeed, demo->Location.X - 464, demo->Location.X + 464);
     calleoca_y = Clamp<double>(calleoca_y + missile_vspeed, missile_top, missile_bottom);
 
@@ -274,7 +275,7 @@ void Phase4()
 void CalleocaCode()
 {
     demo = PlayerF::Get(1);
-    
+
     demo->Character = 1;
 
     if (calleoca_npc2 == nullptr && init_doonce)
@@ -290,10 +291,10 @@ void CalleocaCode()
                 goal_npc->Location.Y = demo->Location.Y;
             }
         }
-        
+
         return; //boss beaten
     }
-    
+
     if (!init_doonce)
     {
         calleoca_npc1 = FindNPC(NPC_SIGN);
@@ -328,28 +329,31 @@ void CalleocaCode()
 
     switch (phase)
     {
-        case 0: //Standing there
-            Phase0();
+    case 0: //Standing there
+        Phase0();
         break;
 
-        case 1: //Thwomp rising
-            Phase1();
+    case 1: //Thwomp rising
+        Phase1();
         break;
 
-        case 2: //Thwomp attacking
-            Phase2();
+    case 2: //Thwomp attacking
+        Phase2();
         break;
 
-        case 3: //Missile
-            Phase3();
+    case 3: //Missile
+        Phase3();
         break;
 
-        case 4: //Fishing Boo
-            Phase4();
+    case 4: //Fishing Boo
+        Phase4();
+        break;
+
+    default:
         break;
     }
 
-    if (calleoca_npc2 == NULL)
+    if (!calleoca_npc2)
         return; //boss beaten
 
     if (phase < 4)
@@ -387,10 +391,10 @@ NPC_t* FindNPC(short identity)
 
 bool TriggerBox(double x1, double y1, double x2, double y2)
 {
-    return (demo->Location.X + demo->Location.Width		> x1 &&
-            demo->Location.X					< x2 &&
-            demo->Location.Y + demo->Location.Height	> y1 &&
-            demo->Location.Y					< y2);
+    return (demo->Location.X + demo->Location.Width     > x1 &&
+            demo->Location.X                            < x2 &&
+            demo->Location.Y + demo->Location.Height    > y1 &&
+            demo->Location.Y                            < y2);
 }
 
 void HurtPlayer()

@@ -59,7 +59,6 @@ void SnowbordinCode()
     }
 
     //Renderer::Get().SafePrint(std::wstring(L"KILLS: " + std::to_wstring(*shell_kills)), 3, 0, 256);
-
 }
 
 NPC_t *FindNPC(short identity)

@@ -57,7 +57,7 @@ void KilArmoryCode()
         {
             int intensity = (int)(sin((float)(gFrames) / 22) * 35) + 60;
             intensity <<= 16;
-            RenderEffectOp *op = new RenderEffectOp(RNDEFF_ScreenGlow, BLEND_Additive, intensity, 100);
+            auto *op = new RenderEffectOp(RNDEFF_ScreenGlow, BLEND_Additive, intensity, 100);
             op->m_FramesLeft = 1;
             Renderer::Get().AddOp(op);
         }
@@ -67,7 +67,7 @@ void KilArmoryCode()
         {
             int intensity = (int)(sin((float)(gFrames) / 10) * 45) + 48;
             intensity <<= 16;
-            RenderEffectOp *op = new RenderEffectOp(RNDEFF_ScreenGlow, BLEND_Additive, intensity, 100);
+            auto *op = new RenderEffectOp(RNDEFF_ScreenGlow, BLEND_Additive, intensity, 100);
             op->m_FramesLeft = 1;
             Renderer::Get().AddOp(op);
         }

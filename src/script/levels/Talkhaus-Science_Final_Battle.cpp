@@ -96,9 +96,8 @@ void ScienceCode()
 
     if(grace_timer >= 0)
     {
-        for(auto it = doughnuts.begin(); it != doughnuts.end(); it++)
+        for(auto doughnut : doughnuts)
         {
-            NPC_t *doughnut = *it;
             double x_diff, y_diff, m;
 
             x_diff = doughnut->Location.X - demo->Location.X;
@@ -120,9 +119,8 @@ void ScienceCode()
     {
         if(throw_timer <= 0)
         {
-            for(auto it = doughnuts.begin(); it != doughnuts.end(); it++)
+            for(auto doughnut : doughnuts)
             {
-                NPC_t *doughnut = *it;
                 //Ignore generators
                 if(doughnut->Hidden) // if((*((int *)doughnut + 16)) != 0)
                     continue;
