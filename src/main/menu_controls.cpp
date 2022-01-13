@@ -413,7 +413,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
             return 0;
         }
         Controls::InputMethodType* type = Controls::g_InputMethodTypes[s_curType];
-        const int n_options = type->GetSpecialOptionCount();
+        const int n_options = type->GetOptionCount();
         std::vector<Controls::InputMethodProfile*> profiles = type->GetProfiles();
         const int n_profiles = profiles.size();
 
@@ -672,7 +672,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
         }
 
         Controls::InputMethodProfile* profile = type->GetProfiles()[s_curProfile];
-        const int n_options = profile->GetSpecialOptionCount();
+        const int n_options = profile->GetOptionCount();
         const int n_stock = 7;
 
         if(render)
@@ -1402,7 +1402,7 @@ int menuControls_Logic()
             return 0;
         }
         Controls::InputMethodType* type = Controls::g_InputMethodTypes[s_curType];
-        const int n_options = type->GetSpecialOptionCount();
+        const int n_options = type->GetOptionCount();
         const int n_profiles = type->GetProfiles().size();
 
         // keep things in range
@@ -1497,7 +1497,7 @@ int menuControls_Logic()
 
         Controls::InputMethodProfile* profile = type->GetProfiles()[s_curProfile];
         const int n_stock = 7;
-        const int n_options = profile->GetSpecialOptionCount();
+        const int n_options = profile->GetOptionCount();
 
         // first come the stock options, then the profile options.
 

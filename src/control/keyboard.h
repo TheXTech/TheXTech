@@ -113,7 +113,7 @@ public:
     bool ConsumeEvent(const SDL_Event* ev);
 
     // How many per-type special options are there?
-    size_t GetSpecialOptionCount();
+    size_t GetOptionCount();
     // Methods to manage per-profile options
     // It is guaranteed that none of these will be called if
     // GetOptionCount() returns 0.

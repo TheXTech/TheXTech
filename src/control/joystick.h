@@ -105,7 +105,6 @@ public:
 
     bool m_controllerProfile = false;
     bool m_legacyProfile = false;
-    bool m_rumbleEnabled = true;
 
     // primary keys (also controller keys in legacy mode)
     KM_Key m_keys[PlayerControls::n_buttons];
@@ -152,26 +151,6 @@ public:
     // one can assume that the IniProcessing* is already in the correct group
     void SaveConfig(IniProcessing* ctl);
     void LoadConfig(IniProcessing* ctl);
-
-    // OPTIONAL METHODS
-
-    // How many per-type special options are there?
-    size_t GetSpecialOptionCount();
-    // Methods to manage per-profile options
-    // It is guaranteed that none of these will be called if
-    // GetOptionCount() returns 0.
-    // get a char* describing the option
-    const char* GetOptionName(size_t i);
-    // get a char* describing the current option value
-    // must be allocated in static or instance memory
-    // WILL NOT be freed
-    const char* GetOptionValue(size_t i);
-    // called when A is pressed; allowed to interrupt main game loop
-    bool OptionChange(size_t i);
-    // called when left is pressed
-    bool OptionRotateLeft(size_t i);
-    // called when right is pressed
-    bool OptionRotateRight(size_t i);
 };
 
 class InputMethodType_Joystick : public InputMethodType
@@ -228,7 +207,7 @@ public:
 
 public:
     // How many per-type special options are there?
-    size_t GetSpecialOptionCount();
+    size_t GetOptionCount();
     // Methods to manage per-profile options
     // It is guaranteed that none of these will be called if
     // GetOptionCount() returns 0.

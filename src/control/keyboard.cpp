@@ -1114,7 +1114,7 @@ bool InputMethodType_Keyboard::SetProfile_Custom(InputMethod* method, int player
 }
 
 // How many per-type special options are there?
-size_t InputMethodType_Keyboard::GetSpecialOptionCount()
+size_t InputMethodType_Keyboard::GetOptionCount()
 {
     return 2;
 }

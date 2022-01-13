@@ -491,6 +491,45 @@ public:
 
     virtual ~InputMethodProfile();
 
+    /*----------------------*\
+    || SHARED CONFIGURATION ||
+    \*----------------------*/
+
+    struct CommonOptions
+    {
+        enum co
+        {
+            rumble = 0,
+            ground_pound_by_alt_run,
+            COUNT
+        };
+    };
+
+    bool m_rumbleEnabled = false;
+    bool m_groundPoundByAltRun = false;
+
+    // assume that the IniProcessing* is already in the correct group
+    // saves/loads the shared options and calls the device-specific Save/LoadConfig
+    void SaveConfig_All(IniProcessing* ctl);
+    void LoadConfig_All(IniProcessing* ctl);
+
+    // each of these delegate to the _Custom methods.
+    // How many per-profile special options are there?
+    size_t GetOptionCount();
+
+    // Methods to manage per-profile options
+    // get a nullable char* describing the option
+    const char* GetOptionName(size_t i);
+    // get a nullable char* describing the current option value
+    // must be allocated in static or instance memory
+    const char* GetOptionValue(size_t i);
+    // called when A is pressed; allowed to interrupt main game loop
+    bool OptionChange(size_t i);
+    // called when left is pressed
+    bool OptionRotateLeft(size_t i);
+    // called when right is pressed
+    bool OptionRotateRight(size_t i);
+
     /*-------------------------*\
     || PURE VIRTUAL FUNCTIONS  ||
     \*-------------------------*/
@@ -512,29 +551,30 @@ public:
     virtual const char* NameSecondaryButton(ControlsClass c, size_t i) = 0;
 
     // assume that the IniProcessing* is already in the correct group
+    // saves/loads the controls and the device-specific options
     virtual void SaveConfig(IniProcessing* ctl) = 0;
     virtual void LoadConfig(IniProcessing* ctl) = 0;
 
     /*-----------------------*\
     || OPTIONAL METHODS      ||
     \*-----------------------*/
-    // How many per-profile special options are there?
-    virtual size_t GetSpecialOptionCount();
+    // How many device-specific per-profile special options are there?
+    virtual size_t GetOptionCount_Custom();
 
-    // Methods to manage per-profile options
+    // Methods to manage device-specific per-profile options
     // It is guaranteed that none of these will be called if
-    // GetOptionCount() returns 0.
+    // GetOptionCount_Custom() returns 0.
     // get a nullable char* describing the option
-    virtual const char* GetOptionName(size_t i);
+    virtual const char* GetOptionName_Custom(size_t i);
     // get a nullable char* describing the current option value
     // must be allocated in static or instance memory
-    virtual const char* GetOptionValue(size_t i);
+    virtual const char* GetOptionValue_Custom(size_t i);
     // called when A is pressed; allowed to interrupt main game loop
-    virtual bool OptionChange(size_t i);
+    virtual bool OptionChange_Custom(size_t i);
     // called when left is pressed
-    virtual bool OptionRotateLeft(size_t i);
+    virtual bool OptionRotateLeft_Custom(size_t i);
     // called when right is pressed
-    virtual bool OptionRotateRight(size_t i);
+    virtual bool OptionRotateRight_Custom(size_t i);
 };
 
 // represents a class of input devices, such as keyboard, SDL gamepad,
@@ -624,7 +664,7 @@ protected:
 
 public:
     // How many per-type special options are there?
-    virtual size_t GetSpecialOptionCount();
+    virtual size_t GetOptionCount();
 
     // Methods to manage per-profile options
     // It is guaranteed that none of these will be called if

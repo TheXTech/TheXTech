@@ -192,7 +192,7 @@ InputMethod* InputMethodType_Duplicate::Poll(const std::vector<InputMethod*>& ac
 \*-----------------------*/
 
 // How many per-type special options are there?
-size_t InputMethodType_Duplicate::GetSpecialOptionCount()
+size_t InputMethodType_Duplicate::GetOptionCount()
 {
     return 1;
 }

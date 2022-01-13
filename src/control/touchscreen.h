@@ -184,8 +184,8 @@ public:
     // touchscreen settings (duplicated from InputMethodProfile_TouchScreen)
     int m_size = TouchScreenController::size_medium;
     int m_touchpad_style = TouchScreenController::style_actions;
-    float m_vibration_strength = 0.f;
-    int m_vibration_length = 12;
+    float m_feedback_strength = 0.f;
+    int m_feedback_length = 12;
     bool m_hold_run = false;
     bool m_enable_enter_cheats = false;
 
@@ -284,8 +284,8 @@ public:
     // touchscreen settings
     int m_size = TouchScreenController::size_medium;
     int m_touchpad_style = TouchScreenController::style_actions;
-    float m_vibration_strength = 0.f;
-    int m_vibration_length = 12;
+    float m_feedback_strength = 0.f;
+    int m_feedback_length = 12;
     bool m_hold_run = false;
     bool m_enable_enter_cheats = false;
 
@@ -314,34 +314,38 @@ public:
     /*-----------------------*\
     || OPTIONAL METHODS      ||
     \*-----------------------*/
-    enum options
+    struct Options
     {
-        o_size,
-        o_style,
-        o_v_strength,
-        o_v_length,
-        o_hold_run,
-        o_enable_enter_cheats,
-        o_COUNT
+        enum o
+        {
+            size,
+            style,
+            fb_strength,
+            fb_length,
+            hold_run,
+            enable_enter_cheats,
+            COUNT
+        };
     };
+
 public:
     // How many per-type special options are there?
-    size_t GetSpecialOptionCount();
+    size_t GetOptionCount_Custom();
     // Methods to manage per-profile options
     // It is guaranteed that none of these will be called if
-    // GetOptionCount() returns 0.
+    // GetOptionCount_Custom() returns 0.
     // get a char* describing the option
-    const char* GetOptionName(size_t i);
+    const char* GetOptionName_Custom(size_t i);
     // get a char* describing the current option value
     // must be allocated in static or instance memory
     // WILL NOT be freed
-    const char* GetOptionValue(size_t i);
+    const char* GetOptionValue_Custom(size_t i);
     // called when A is pressed; allowed to interrupt main game loop
-    bool OptionChange(size_t i);
+    bool OptionChange_Custom(size_t i);
     // called when left is pressed
-    bool OptionRotateLeft(size_t i);
+    bool OptionRotateLeft_Custom(size_t i);
     // called when right is pressed
-    bool OptionRotateRight(size_t i);
+    bool OptionRotateRight_Custom(size_t i);
 };
 
 class InputMethodType_TouchScreen : public InputMethodType

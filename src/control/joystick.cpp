@@ -1164,7 +1164,6 @@ void InputMethodProfile_Joystick::SaveConfig(IniProcessing* ctl)
         }
     }
 
-    ctl->setValue("enable-rumble", this->m_rumbleEnabled);
     ctl->setValue("old-joystick", !this->m_controllerProfile);
 }
 
@@ -1228,9 +1227,6 @@ void InputMethodProfile_Joystick::LoadConfig(IniProcessing* ctl)
         }
     }
 
-
-    ctl->read("enable-rumble", this->m_rumbleEnabled, true);
-
     bool legacyProfile;
     ctl->read("old-joystick", legacyProfile, false);
     this->m_controllerProfile = !legacyProfile;
@@ -1284,68 +1280,6 @@ void InputMethodProfile_Joystick::LoadConfig_Legacy(IniProcessing* ctl)
     }
 
     this->m_legacyProfile = true;
-}
-
-// How many per-type special options are there?
-size_t InputMethodProfile_Joystick::GetSpecialOptionCount()
-{
-    return 1;
-}
-// Methods to manage per-profile options
-// It is guaranteed that none of these will be called if
-// GetOptionCount() returns 0.
-// get a char* describing the option
-const char* InputMethodProfile_Joystick::GetOptionName(size_t i)
-{
-    if(i == 0)
-        return "RUMBLE";
-    else
-        return nullptr;
-}
-// get a char* describing the current option value
-// must be allocated in static or instance memory
-// WILL NOT be freed
-const char* InputMethodProfile_Joystick::GetOptionValue(size_t i)
-{
-    if(i == 0)
-    {
-        if(this->m_rumbleEnabled)
-            return "ENABLED";
-        else
-            return "DISABLED";
-    }
-    else
-        return nullptr;
-}
-// called when A is pressed; allowed to interrupt main game loop
-bool InputMethodProfile_Joystick::OptionChange(size_t i)
-{
-    if(i == 0) // rumble
-    {
-        this->m_rumbleEnabled = !this->m_rumbleEnabled;
-        for(InputMethod* m : g_InputMethods)
-        {
-            if(!m || m->Profile != this)
-                continue;
-            if(this->m_rumbleEnabled)
-                m->Rumble(200, .5);
-        }
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
-// called when left is pressed
-bool InputMethodProfile_Joystick::OptionRotateLeft(size_t i)
-{
-    return this->OptionChange(i);
-}
-// called when right is pressed
-bool InputMethodProfile_Joystick::OptionRotateRight(size_t i)
-{
-    return this->OptionChange(i);
 }
 
 /*====================================================*\
@@ -1755,7 +1689,7 @@ bool InputMethodType_Joystick::ConsumeEvent(const SDL_Event* ev)
 }
 
 // How many per-type special options are there?
-size_t InputMethodType_Joystick::GetSpecialOptionCount()
+size_t InputMethodType_Joystick::GetOptionCount()
 {
     return 1;
 }

@@ -669,11 +669,11 @@ void TouchScreenController::doVibration()
     if(!m_vibrator)
         return;
 
-    if(m_vibration_strength == 0.f)
+    if(m_feedback_strength == 0.f)
         return;
 
-    SDL_HapticRumblePlay(m_vibrator, m_vibration_strength, m_vibration_length);
-    D_pLogDebug("TouchScreen: Vibration %g, %d ms", m_vibration_strength, m_vibration_length);
+    SDL_HapticRumblePlay(m_vibrator, m_feedback_strength, m_feedback_length);
+    D_pLogDebug("TouchScreen: Vibration %g, %d ms", m_feedback_strength, m_feedback_length);
 }
 
 TouchScreenController::~TouchScreenController()
@@ -950,11 +950,11 @@ void TouchScreenController::update()
         {
             this->m_touchpad_style = p->m_touchpad_style;
             this->m_enable_enter_cheats = p->m_enable_enter_cheats;
-            if(this->m_vibration_strength != p->m_vibration_strength
-                || this->m_vibration_length != p->m_vibration_length)
+            if(this->m_feedback_strength != p->m_feedback_strength
+                || this->m_feedback_length != p->m_feedback_length)
             {
-                this->m_vibration_strength = p->m_vibration_strength;
-                this->m_vibration_length = p->m_vibration_length;
+                this->m_feedback_strength = p->m_feedback_strength;
+                this->m_feedback_length = p->m_feedback_length;
                 this->doVibration();
             }
             if(this->m_hold_run != p->m_hold_run)
@@ -1238,8 +1238,8 @@ void InputMethodProfile_TouchScreen::SaveConfig(IniProcessing* ctl)
 {
     ctl->setValue("ui-size", this->m_size);
     ctl->setValue("ui-style", this->m_touchpad_style);
-    ctl->setValue("vibration-strength", this->m_vibration_strength);
-    ctl->setValue("vibration-length", this->m_vibration_length);
+    ctl->setValue("vibration-strength", this->m_feedback_strength);
+    ctl->setValue("vibration-length", this->m_feedback_length);
     ctl->setValue("hold-run", this->m_hold_run);
     ctl->setValue("enable-enter-cheats", this->m_enable_enter_cheats);
 }
@@ -1248,37 +1248,37 @@ void InputMethodProfile_TouchScreen::LoadConfig(IniProcessing* ctl)
 {
     ctl->read("ui-size", this->m_size, TouchScreenController::size_medium);
     ctl->read("ui-style", this->m_touchpad_style, TouchScreenController::style_actions);
-    ctl->read("vibration-strength", this->m_vibration_strength, 0.f);
-    ctl->read("vibration-length", this->m_vibration_length, 12);
+    ctl->read("vibration-strength", this->m_feedback_strength, 0.f);
+    ctl->read("vibration-length", this->m_feedback_length, 12);
     ctl->read("hold-run", this->m_hold_run, false);
     ctl->read("enable-enter-cheats", this->m_enable_enter_cheats, false);
 }
 
 // How many per-type special options are there?
-size_t InputMethodProfile_TouchScreen::GetSpecialOptionCount()
+size_t InputMethodProfile_TouchScreen::GetOptionCount_Custom()
 {
-    return InputMethodProfile_TouchScreen::o_COUNT;
+    return Options::COUNT;
 }
 
 // Methods to manage per-profile options
 // It is guaranteed that none of these will be called if
-// GetOptionCount() returns 0.
+// GetOptionCount_Custom() returns 0.
 // get a char* describing the option
-const char* InputMethodProfile_TouchScreen::GetOptionName(size_t i)
+const char* InputMethodProfile_TouchScreen::GetOptionName_Custom(size_t i)
 {
     switch(i)
     {
-    case o_size:
+    case Options::size:
         return "INTERFACE SIZE";
-    case o_style:
+    case Options::style:
         return "INTERFACE STYLE";
-    case o_v_strength:
-        return "VIBRATE STRENGTH";
-    case o_v_length:
-        return "VIBRATE LENGTH";
-    case o_hold_run:
+    case Options::fb_strength:
+        return "FEEDBACK STRENGTH";
+    case Options::fb_length:
+        return "FEEDBACK LENGTH";
+    case Options::hold_run:
         return "HOLD RUN ON START";
-    case o_enable_enter_cheats:
+    case Options::enable_enter_cheats:
         return "SHOW CHEAT BUTTON";
     }
     return nullptr;
@@ -1286,45 +1286,45 @@ const char* InputMethodProfile_TouchScreen::GetOptionName(size_t i)
 // get a char* describing the current option value
 // must be allocated in static or instance memory
 // WILL NOT be freed
-const char* InputMethodProfile_TouchScreen::GetOptionValue(size_t i)
+const char* InputMethodProfile_TouchScreen::GetOptionValue_Custom(size_t i)
 {
     static char length_buf[8];
     switch(i)
     {
-    case o_size:
+    case Options::size:
         if(this->m_size == TouchScreenController::size_small)
             return "SMALL";
         else if(this->m_size == TouchScreenController::size_medium)
             return "MEDIUM";
         else
             return "LARGE";
-    case o_style:
+    case Options::style:
         if(this->m_touchpad_style == TouchScreenController::style_actions)
             return "ACTIONS";
         else if(this->m_touchpad_style == TouchScreenController::style_abxy)
             return "ABXY";
         else
             return "XODA";
-    case o_v_strength:
-        if(this->m_vibration_strength == 0.f)
+    case Options::fb_strength:
+        if(this->m_feedback_strength == 0.f)
             return "OFF";
-        else if(this->m_vibration_strength == 0.25f)
+        else if(this->m_feedback_strength == 0.25f)
             return "25%";
-        else if(this->m_vibration_strength == 0.50f)
+        else if(this->m_feedback_strength == 0.50f)
             return "50%";
-        else if(this->m_vibration_strength == 0.75f)
+        else if(this->m_feedback_strength == 0.75f)
             return "75%";
         else
             return "100%";
-    case o_v_length:
-        SDL_snprintf(length_buf, 8, "%d MS", this->m_vibration_length);
+    case Options::fb_length:
+        SDL_snprintf(length_buf, 8, "%d MS", this->m_feedback_length);
         return length_buf;
-    case o_hold_run:
+    case Options::hold_run:
         if(this->m_hold_run)
             return "ON";
         else
             return "OFF";
-    case o_enable_enter_cheats:
+    case Options::enable_enter_cheats:
         if(this->m_enable_enter_cheats)
             return "ON";
         else
@@ -1333,79 +1333,79 @@ const char* InputMethodProfile_TouchScreen::GetOptionValue(size_t i)
     return nullptr;
 }
 // called when A is pressed; allowed to interrupt main game loop
-bool InputMethodProfile_TouchScreen::OptionChange(size_t i)
+bool InputMethodProfile_TouchScreen::OptionChange_Custom(size_t i)
 {
-    return this->OptionRotateRight(i);
+    return this->OptionRotateRight_Custom(i);
 }
 // called when left is pressed
-bool InputMethodProfile_TouchScreen::OptionRotateLeft(size_t i)
+bool InputMethodProfile_TouchScreen::OptionRotateLeft_Custom(size_t i)
 {
     switch(i)
     {
-    case o_size:
+    case Options::size:
         if(this->m_size > 0)
             this->m_size --;
         else
             this->m_size = TouchScreenController::size_END - 1;
         return true;
-    case o_style:
+    case Options::style:
         if(this->m_touchpad_style > 0)
             this->m_touchpad_style --;
         else
             this->m_touchpad_style = TouchScreenController::style_END - 1;
         return true;
-    case o_v_strength:
-        if(this->m_vibration_strength > 0.f)
+    case Options::fb_strength:
+        if(this->m_feedback_strength > 0.f)
         {
-            this->m_vibration_strength -= 0.25f;
+            this->m_feedback_strength -= 0.25f;
             return true;
         }
         return false;
-    case o_v_length:
-        if(this->m_vibration_length > 2)
+    case Options::fb_length:
+        if(this->m_feedback_length > 2)
         {
-            this->m_vibration_length -= 2;
+            this->m_feedback_length -= 2;
             return true;
         }
         return false;
-    case o_hold_run:
+    case Options::hold_run:
         this->m_hold_run = !this->m_hold_run;
         return true;
-    case o_enable_enter_cheats:
+    case Options::enable_enter_cheats:
         this->m_enable_enter_cheats = !this->m_enable_enter_cheats;
         return true;
     }
     return false;
 }
 // called when right is pressed
-bool InputMethodProfile_TouchScreen::OptionRotateRight(size_t i)
+bool InputMethodProfile_TouchScreen::OptionRotateRight_Custom(size_t i)
 {
     switch(i)
     {
-    case o_size:
+    case Options::size:
         this->m_size ++;
         if(this->m_size >= TouchScreenController::size_END)
             this->m_size = 0;
         return true;
-    case o_style:
+    case Options::style:
         this->m_touchpad_style ++;
         if(this->m_touchpad_style >= TouchScreenController::style_END)
             this->m_touchpad_style = 0;
         return true;
-    case o_v_strength:
-        if(this->m_vibration_strength < 1.f)
+    case Options::fb_strength:
+        if(this->m_feedback_strength < 1.f)
         {
-            this->m_vibration_strength += 0.25f;
+            this->m_feedback_strength += 0.25f;
             return true;
         }
         return false;
-    case o_v_length:
-        this->m_vibration_length += 2;
+    case Options::fb_length:
+        this->m_feedback_length += 2;
         return true;
-    case o_hold_run:
+    case Options::hold_run:
         this->m_hold_run = !this->m_hold_run;
         return true;
-    case o_enable_enter_cheats:
+    case Options::enable_enter_cheats:
         this->m_enable_enter_cheats = !this->m_enable_enter_cheats;
         return true;
     }

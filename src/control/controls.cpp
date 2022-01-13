@@ -120,39 +120,144 @@ bool InputMethod::ConsumeEvent(const SDL_Event* ev)
 
 InputMethodProfile::~InputMethodProfile() {}
 
+void InputMethodProfile::SaveConfig_All(IniProcessing* ctl)
+{
+    ctl->setValue("enable-rumble", this->m_rumbleEnabled);
+    ctl->setValue("ground-pound-by-alt-run", this->m_groundPoundByAltRun);
+    this->SaveConfig(ctl);
+}
+
+void InputMethodProfile::LoadConfig_All(IniProcessing* ctl)
+{
+    ctl->read("enable-rumble", this->m_rumbleEnabled, g_config.JoystickEnableRumble);
+    ctl->read("ground-pound-by-alt-run", this->m_groundPoundByAltRun, g_config.GameplayPoundByAltRun);
+    this->LoadConfig(ctl);
+}
+
 // How many per-type special options are there?
-size_t InputMethodProfile::GetSpecialOptionCount()
+size_t InputMethodProfile::GetOptionCount()
+{
+    return CommonOptions::COUNT + this->GetOptionCount_Custom();
+}
+// Methods to manage per-profile options
+// It is guaranteed that none of these will be called if
+// GetOptionCount() returns 0.
+// get a char* describing the option
+const char* InputMethodProfile::GetOptionName(size_t i)
+{
+    if(i >= CommonOptions::COUNT)
+        return this->GetOptionName_Custom(i - CommonOptions::COUNT);
+
+    if(i == CommonOptions::rumble)
+        return "RUMBLE";
+    else if(i == CommonOptions::ground_pound_by_alt_run)
+        return "GROUND POUND BUTTON";
+    else
+        return nullptr;
+}
+// get a char* describing the current option value
+// must be allocated in static or instance memory
+// WILL NOT be freed
+const char* InputMethodProfile::GetOptionValue(size_t i)
+{
+    if(i >= CommonOptions::COUNT)
+        return this->GetOptionValue_Custom(i - CommonOptions::COUNT);
+
+    if(i == CommonOptions::rumble)
+    {
+        if(this->m_rumbleEnabled)
+            return "ENABLED";
+        else
+            return "DISABLED";
+    }
+    else if(i == CommonOptions::ground_pound_by_alt_run)
+    {
+        if(this->m_groundPoundByAltRun)
+            return "ALT RUN";
+        else
+            return "DOWN";
+    }
+    else
+        return nullptr;
+}
+// called when A is pressed; allowed to interrupt main game loop
+bool InputMethodProfile::OptionChange(size_t i)
+{
+    if(i >= CommonOptions::COUNT)
+        return this->OptionChange_Custom(i - CommonOptions::COUNT);
+
+    if(i == CommonOptions::rumble)
+    {
+        this->m_rumbleEnabled = !this->m_rumbleEnabled;
+        for(InputMethod* m : g_InputMethods)
+        {
+            if(!m || m->Profile != this)
+                continue;
+            if(this->m_rumbleEnabled)
+                m->Rumble(200, .5);
+        }
+        return true;
+    }
+    else if(i == CommonOptions::ground_pound_by_alt_run)
+    {
+        this->m_groundPoundByAltRun = !this->m_groundPoundByAltRun;
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+// called when left is pressed
+bool InputMethodProfile::OptionRotateLeft(size_t i)
+{
+    if(i >= CommonOptions::COUNT)
+        return this->OptionRotateLeft_Custom(i - CommonOptions::COUNT);
+
+    return this->OptionChange(i);
+}
+// called when right is pressed
+bool InputMethodProfile::OptionRotateRight(size_t i)
+{
+    if(i >= CommonOptions::COUNT)
+        return this->OptionRotateRight_Custom(i - CommonOptions::COUNT);
+
+    return this->OptionChange(i);
+}
+
+// How many per-type special options are there?
+size_t InputMethodProfile::GetOptionCount_Custom()
 {
     return 0;
 }
 
 // get a nullable char* describing the option
-const char* InputMethodProfile::GetOptionName(size_t i)
+const char* InputMethodProfile::GetOptionName_Custom(size_t i)
 {
     (void)i;
     return nullptr;
 }
 // get a nullable char* describing the current option value
 // must be allocated in static or instance memory
-const char* InputMethodProfile::GetOptionValue(size_t i)
+const char* InputMethodProfile::GetOptionValue_Custom(size_t i)
 {
     (void)i;
     return nullptr;
 }
 // called when A is pressed; allowed to interrupt main game loop
-bool InputMethodProfile::OptionChange(size_t i)
+bool InputMethodProfile::OptionChange_Custom(size_t i)
 {
     (void)i;
     return false;
 }
 // called when left is pressed
-bool InputMethodProfile::OptionRotateLeft(size_t i)
+bool InputMethodProfile::OptionRotateLeft_Custom(size_t i)
 {
     (void)i;
     return false;
 }
 // called when right is pressed
-bool InputMethodProfile::OptionRotateRight(size_t i)
+bool InputMethodProfile::OptionRotateRight_Custom(size_t i)
 {
     (void)i;
     return false;
@@ -396,7 +501,7 @@ bool InputMethodType::DeleteProfile_Custom(InputMethodProfile* profile, const st
 }
 
 // How many per-type special options are there?
-size_t InputMethodType::GetSpecialOptionCount()
+size_t InputMethodType::GetOptionCount()
 {
     return 0;
 }
@@ -437,13 +542,13 @@ void InputMethodType::SaveConfig_Custom(IniProcessing* ctl)
 {
     (void)ctl;
     // must be implemented if user has created special options
-    SDL_assert_release(this->GetSpecialOptionCount() == 0);
+    SDL_assert_release(this->GetOptionCount() == 0);
 }
 void InputMethodType::LoadConfig_Custom(IniProcessing* ctl)
 {
     (void)ctl;
     // must be implemented if user has created special options
-    SDL_assert_release(this->GetSpecialOptionCount() == 0);
+    SDL_assert_release(this->GetOptionCount() == 0);
 }
 
 /*====================================================*\
@@ -844,24 +949,32 @@ void ClearInputMethods()
 // player is 1-indexed :(
 void Rumble(int player, int ms, float strength)
 {
-    if(!g_config.JoystickEnableRumble || GameMenu || GameOutro)
+    if(GameMenu || GameOutro)
         return;
 
     if(player < 1 || player > (int)g_InputMethods.size())
         return;
     if(!g_InputMethods[player-1])
         return;
+    if(!g_InputMethods[player-1]->Profile)
+        return;
+    if(!g_InputMethods[player-1]->Profile->m_rumbleEnabled)
+        return;
     g_InputMethods[player-1]->Rumble(ms, strength);
 }
 
 void RumbleAllPlayers(int ms, float strength)
 {
-    if(!g_config.JoystickEnableRumble || GameMenu || GameOutro)
+    if(GameMenu || GameOutro)
         return;
 
     for(InputMethod* method : g_InputMethods)
     {
         if(!method)
+            continue;
+        if(!method->Profile)
+            continue;
+        if(!method->Profile->m_rumbleEnabled)
             continue;
         method->Rumble(ms, strength);
     }
