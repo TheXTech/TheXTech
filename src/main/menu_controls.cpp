@@ -601,8 +601,10 @@ int menuControls_Mouse_Render(bool mouse, bool render)
 
                         if(MenuMouseRelease && SharedCursor.Primary)
                         {
-                            PlaySoundMenu(SFX_Do);
-                            type->OptionChange(i);
+                            if(type->OptionChange(i))
+                                PlaySoundMenu(SFX_Do);
+                            else
+                                PlaySoundMenu(SFX_BlockHit);
                             MenuMouseRelease = false;
                         }
                     }
@@ -635,8 +637,10 @@ int menuControls_Mouse_Render(bool mouse, bool render)
 
                         if(MenuMouseRelease && SharedCursor.Primary)
                         {
-                            PlaySoundMenu(SFX_Do);
-                            type->OptionChange(i);
+                            if(type->OptionChange(i))
+                                PlaySoundMenu(SFX_Do);
+                            else
+                                PlaySoundMenu(SFX_BlockHit);
                             MenuMouseRelease = false;
                         }
                     }
@@ -853,8 +857,10 @@ int menuControls_Mouse_Render(bool mouse, bool render)
 
                         if(MenuMouseRelease && SharedCursor.Primary)
                         {
-                            PlaySoundMenu(SFX_Do);
-                            type->OptionChange(i);
+                            if(type->OptionChange(i))
+                                PlaySoundMenu(SFX_Do);
+                            else
+                                PlaySoundMenu(SFX_BlockHit);
                             MenuMouseRelease = false;
                         }
                     }
@@ -887,8 +893,10 @@ int menuControls_Mouse_Render(bool mouse, bool render)
 
                         if(MenuMouseRelease && SharedCursor.Primary)
                         {
-                            PlaySoundMenu(SFX_Do);
-                            profile->OptionChange(i);
+                            if(profile->OptionChange(i))
+                                PlaySoundMenu(SFX_Do);
+                            else
+                                PlaySoundMenu(SFX_BlockHit);
                             MenuMouseRelease = false;
                         }
                     }
@@ -1452,20 +1460,26 @@ int menuControls_Logic()
         {
             if(menuDoPress)
             {
-                PlaySoundMenu(SFX_Slide);
-                type->OptionChange(MenuCursor - n_profiles - 1);
+                if(type->OptionChange(MenuCursor - n_profiles - 1))
+                    PlaySoundMenu(SFX_Slide);
+                else
+                    PlaySoundMenu(SFX_BlockHit);
                 MenuCursorCanMove = false;
             }
             else if(leftPressed)
             {
-                PlaySoundMenu(SFX_Slide);
-                type->OptionRotateLeft(MenuCursor - n_profiles - 1);
+                if(type->OptionRotateLeft(MenuCursor - n_profiles - 1))
+                    PlaySoundMenu(SFX_Slide);
+                else
+                    PlaySoundMenu(SFX_BlockHit);
                 MenuCursorCanMove = false;
             }
             else if(rightPressed)
             {
-                PlaySoundMenu(SFX_Slide);
-                type->OptionRotateRight(MenuCursor - n_profiles - 1);
+                if(type->OptionRotateRight(MenuCursor - n_profiles - 1))
+                    PlaySoundMenu(SFX_Slide);
+                else
+                    PlaySoundMenu(SFX_BlockHit);
                 MenuCursorCanMove = false;
             }
         }
@@ -1531,20 +1545,26 @@ int menuControls_Logic()
         {
             if(menuDoPress)
             {
-                PlaySoundMenu(SFX_Slide);
-                profile->OptionChange(MenuCursor - n_stock);
+                if(profile->OptionChange(MenuCursor - n_stock))
+                    PlaySoundMenu(SFX_Slide);
+                else
+                    PlaySoundMenu(SFX_BlockHit);
                 MenuCursorCanMove = false;
             }
             else if(leftPressed)
             {
-                PlaySoundMenu(SFX_Slide);
-                profile->OptionRotateLeft(MenuCursor - n_stock);
+                if(profile->OptionRotateLeft(MenuCursor - n_stock))
+                    PlaySoundMenu(SFX_Slide);
+                else
+                    PlaySoundMenu(SFX_BlockHit);
                 MenuCursorCanMove = false;
             }
             else if(rightPressed)
             {
-                PlaySoundMenu(SFX_Slide);
-                profile->OptionRotateRight(MenuCursor - n_stock);
+                if(profile->OptionRotateRight(MenuCursor - n_stock))
+                    PlaySoundMenu(SFX_Slide);
+                else
+                    PlaySoundMenu(SFX_BlockHit);
                 MenuCursorCanMove = false;
             }
         }
