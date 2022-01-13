@@ -592,7 +592,10 @@ bool mainMenuUpdate()
                 else
                 {
                     MenuCursor = selSave - 1;
-                    MenuMode = MENU_SELECT_SLOT_1P;
+                    if(menuPlayersNum == 1)
+                        MenuMode = MENU_SELECT_SLOT_1P;
+                    else
+                        MenuMode = MENU_SELECT_SLOT_2P;
                 }
                 MenuCursorCanMove = false;
             }
