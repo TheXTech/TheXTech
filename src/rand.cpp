@@ -28,6 +28,8 @@
 static pcg32 g_random_engine;
 static long g_random_n_calls = 0;
 
+static pcg32 g_random_engine_isolated;
+
 #ifdef DEBUG_RANDOM_CALLS
 std::vector<void*> g_random_calls;
 #endif
@@ -42,6 +44,7 @@ void seedRandom(int seed)
     g_random_calls.clear();
 #endif
     g_random_engine.seed(seed);
+    g_random_engine_isolated.seed(seed);
 }
 
 int readSeed()
@@ -78,6 +81,18 @@ int iRand(int max)
 
     return g_random_engine() % max;
 }
+
+int iRand2(int max)
+{
+    if(max == 0)
+    {
+        g_random_engine_isolated();
+        return 0;
+    }
+
+    return g_random_engine_isolated() % max;
+}
+
 
 double dRand()
 {
