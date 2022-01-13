@@ -1167,7 +1167,7 @@ bool mainMenuUpdate()
                     {
                         MenuCursor = 0;
                         MenuMode = MENU_INPUT_SETTINGS;
-                        PlaySoundMenu(SFX_Slide);
+                        PlaySoundMenu(SFX_Do);
                     }
 #ifndef __ANDROID__ // on Android run the always full-screen
                     else if(MenuCursor == i++)
