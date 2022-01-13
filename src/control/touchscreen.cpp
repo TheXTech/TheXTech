@@ -848,7 +848,7 @@ void TouchScreenController::processTouchDevice(int dev_i)
                 if(fs.ignore)
                     break;
                 if(m_touchHidden && key != key_toggleKeysView)
-                    key = key_toggleKeysView;
+                    continue;
                 if(fs.heldKeyPrev[key] && !fs.heldKey[key]) // set key off
                 {
                     updateFingerKeyState(fs, m_current_keys, key, false, m_current_extra_keys);
@@ -876,7 +876,7 @@ void TouchScreenController::processTouchDevice(int dev_i)
             for(int key = key_BEGIN; key < key_END; key++)
             {
                 if(m_touchHidden && key != key_toggleKeysView)
-                    key = key_toggleKeysView;
+                    continue;
                 if(st.heldKey[key]) // set key on
                 {
                     updateFingerKeyState(st, m_current_keys, key, true, m_current_extra_keys);
