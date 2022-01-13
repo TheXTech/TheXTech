@@ -63,6 +63,15 @@ extern double dRand();
 extern int iRand(int max);
 
 /**
+ * @brief Random number generator in integer format, between 0 to argument max (exclusive)
+ * Distribution equivalent to `Int(dRand() * max)`
+ *
+ * Note: It's the second isolated randomizer
+ * @return random integer value
+ */
+extern int iRand2(int max);
+
+/**
  * @brief Random number generator in integer format, between 0 to argument max (inclusive)
  * Each midpoint has probability 1/max. Each endpoint has probability 1/2max.
  * Distribution equivalent to implicitly casting `dRand() * max` to an Int in vb6
