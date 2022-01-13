@@ -33,6 +33,7 @@
 
 namespace SAJSnowbordin
 {
+
 NPC_t *FindNPC(short identity);
 int combo_start;
 
@@ -43,10 +44,9 @@ void SnowbordinInitCode()
 
 void SnowbordinCode()
 {
-    NPC_t *shell_npc;
-    shell_npc = FindNPC(NPC_SHELL);
+    NPC_t *shell_npc = FindNPC(NPC_SHELL);
 
-    if(shell_npc == NULL)
+    if(!shell_npc)
         return;
 
     int &shell_kills = shell_npc->Multiplier;

@@ -277,14 +277,14 @@ void CalleocaCode()
     
     demo->Character = 1;
 
-    if (calleoca_npc2 == NULL && init_doonce)
+    if (calleoca_npc2 == nullptr && init_doonce)
     {
         if (win_timer > 0)
             win_timer--;
         else
         {
             goal_npc = FindNPC(NPC_GOAL);
-            if (goal_npc != NULL)
+            if (goal_npc != nullptr)
             {
                 goal_npc->Location.X = demo->Location.X;
                 goal_npc->Location.Y = demo->Location.Y;
@@ -373,7 +373,7 @@ void CalleocaCode()
 
 NPC_t* FindNPC(short identity)
 {
-    NPC_t* currentnpc = NULL;
+    NPC_t* currentnpc = nullptr;
 
     for(int i = 0; i <= numNPCs; i++)
     {
@@ -382,7 +382,7 @@ NPC_t* FindNPC(short identity)
             return currentnpc;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 bool TriggerBox(double x1, double y1, double x2, double y2)

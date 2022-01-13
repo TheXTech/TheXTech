@@ -54,8 +54,16 @@ void TheFloorisLavaCode()
     static double layerSinRightLeft_displacement = 0;
     static char secretExitFailedStage = 0;
 
-    if(demo == 0)
+    if(!demo)
         return;
+
+    SDL_assert_release(layerSecretExit);
+    SDL_assert_release(layerSinUpDown);
+    SDL_assert_release(layerSinRightLeft);
+    SDL_assert_release(layerSinUpDownAlternate);
+    SDL_assert_release(layerSinUpDownWeak);
+    SDL_assert_release(layerSinUpDownWeakAlt);
+    SDL_assert_release(layerSinRightLeftAlternate);
 
     // The player has touched the ground, trigger the fail sequence
     if(demo->Slippy && secretExitFailedStage == 0)

@@ -25,6 +25,8 @@
  *  Author:     Docopoper                        *
  *************************************************/
 
+#include <SDL2/SDL_assert.h>
+
 #include "globals.h"
 #include "layers.h"
 #include "../lunaplayer.h"
@@ -42,6 +44,10 @@ void AbstractAssaultCode()
     Player_t *demo = PlayerF::Get(1);
     Layer_t *layerDefault = LayerF::Get(0);
     Layer_t *layerStartingPlatform = LayerF::Get(3);
+
+    SDL_assert_release(demo);
+    SDL_assert_release(layerDefault);
+    SDL_assert_release(layerStartingPlatform);
 
     static float hspeed = 0, vspeed = 0;
     static char gameStarted = 0;

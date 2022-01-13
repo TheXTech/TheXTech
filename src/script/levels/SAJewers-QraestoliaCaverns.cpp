@@ -30,11 +30,13 @@
 #include "../lunaplayer.h"
 #include "../lunainput.h"
 
+
 void QraestoliaCavernsCode()
 {
     static int lastDownPress = 0;
     Player_t *demo = PlayerF::Get(1);
-    if(demo == 0)
+
+    if(!demo)
         return;
 
     // Player pressed down, what do we do?

@@ -33,6 +33,7 @@
 #include "../lunanpc.h"
 #include "../lunaplayer.h"
 
+
 #define NPC_FIREBAR 260
 #define NPC_DOUGHNUT 210
 #define NPC_SCIENCE 209
@@ -66,11 +67,12 @@ void ScienceCode()
         hurt_timer      = 0;
         throw_timer     = 0;
         demo            = PlayerF::Get(1);
+        SDL_assert_release(demo);
     }
 
     hurt_npc = FindNPC(NPC_FIREBAR);
 
-    if(hurt_npc == NULL)
+    if(!hurt_npc)
         return;
 
 
@@ -81,6 +83,7 @@ void ScienceCode()
         hurt_timer--;
         hurt_npc ->Location.Y = demo->Location.Y;
     }
+
     hurt_npc->Location.X = demo->Location.X;
 
     doughnuts = FindAllNPC(NPC_DOUGHNUT);
@@ -93,7 +96,7 @@ void ScienceCode()
 
     if(grace_timer >= 0)
     {
-        for(std::vector<NPC_t *>::const_iterator it = doughnuts.begin(); it != doughnuts.end(); it++)
+        for(auto it = doughnuts.begin(); it != doughnuts.end(); it++)
         {
             NPC_t *doughnut = *it;
             double x_diff, y_diff, m;
@@ -117,12 +120,16 @@ void ScienceCode()
     {
         if(throw_timer <= 0)
         {
-            for(std::vector<NPC_t *>::const_iterator it = doughnuts.begin(); it != doughnuts.end(); it++)
+            for(auto it = doughnuts.begin(); it != doughnuts.end(); it++)
             {
                 NPC_t *doughnut = *it;
                 //Ignore generators
-                if((*((int *)doughnut + 16)) != 0)
+                if(doughnut->Hidden) // if((*((int *)doughnut + 16)) != 0)
                     continue;
+                // Explanation why "Hidden":
+                //   1) pointer turned into int* format
+                //   2) +16 made an offset with 16 steps of int, i.e. 4 bytes. So, offset is 4x16 = 64
+                //   3) at 64 (0x40) position, the "Hidden" field, not "generator"
 
                 double x1, x2, y1, y2;
 
@@ -185,4 +192,4 @@ static bool TriggerBox(double x1, double y1, double x2, double y2)
             demo->Location.Y                            < y2);
 }
 
-}
+} // ScienceBattle
