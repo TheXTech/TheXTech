@@ -2,6 +2,7 @@ package ru.wohlsoft.thextech;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
@@ -50,6 +51,7 @@ enum ControllerKeys
 public class thextechActivity extends SDLActivity
 {
     static boolean gameRunning = false;
+    private String levelToRun;
 
     protected String[] getLibraries()
     {
@@ -109,6 +111,9 @@ public class thextechActivity extends SDLActivity
                 args.add("--speed-run-semitransparent");
         }
 
+        if(!levelToRun.isEmpty())
+            args.add(levelToRun);
+
         String gameAssetsPath = setup.getString("setup_assets_path", "");
         if(!gameAssetsPath.isEmpty())
         {
@@ -129,6 +134,14 @@ public class thextechActivity extends SDLActivity
     {
         super.onStart();
         gameRunning = true;
+        levelToRun = "";
+        Intent intent = getIntent();
+        Bundle extras = intent.getExtras();
+        if(extras != null)
+        {
+            if(extras.containsKey("do-open-file"))
+                levelToRun = extras.getString("do-open-file");
+        }
     }
 
 
