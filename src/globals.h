@@ -226,7 +226,27 @@ struct OldEditorControls_t
 //End Type
 };
 
+
+// Structures moved into con_control.h
+
 // Functionality moved into the Controls namespace
+
+// The information of conKeyboard and conJoystick is now found in the InputMethodType Profiles.
+// To access it you will need to access the internals of the Controls namespace.
+// Avoid doing this.
+
+//Public conKeyboard(1 To 2) As conKeyboard  'player 1 and 2's controls
+// extern RangeArr<ConKeyboard_t, 1, maxLocalPlayers> conKeyboard;
+//Public conJoystick(1 To 2) As conJoystick
+// extern RangeArr<ConJoystick_t, 1, maxLocalPlayers> conJoystick;
+
+// The information of useJoystick and wantedKeyboard is now dynamic you can
+// determine by observing the RTTI of the members of Controls::g_InputMethods.
+// Avoid doing this.
+
+//Public useJoystick(1 To 2) As Integer
+// extern RangeArrI<int, 1, maxLocalPlayers, 0> useJoystick; // no longer
+// extern RangeArrI<bool, 1, maxLocalPlayers, false> wantedKeyboard;
 
 //Public Type NPC 'The NPC Type
 struct NPC_t
@@ -1055,6 +1075,20 @@ extern bool ClearBuffer;
 extern int numLocked;
 //Public resChanged As Boolean 'true if in fullscreen mode
 extern bool resChanged;
+
+
+// These have been partially moved into the Controls namespace
+// and partially moved to g_pollingInput (declared and defined in main/menu_controls.*)
+
+//Public inputKey As Integer 'for setting the players controls
+// extern int inputKey;
+//Public getNewKeyboard As Boolean 'true if setting keyboard controls
+// extern bool getNewKeyboard;
+//Public getNewJoystick As Boolean
+// extern bool getNewJoystick;
+//Public lastJoyButton As Integer
+// extern KM_Key lastJoyButton;
+
 //Public GamePaused As Boolean 'true if the game is paused
 extern PauseCode GamePaused;
 //Public MessageText As String 'when talking to an npc
@@ -1728,6 +1762,11 @@ extern RangeArr<std::string, 1, maxWorldCredits> WorldCredits;
 extern int Score;
 //Public Points(1 To 13) As Integer
 extern RangeArrI<int, 1, 13, 0> Points;
+
+// moved into the implementation details of InputMethodProfile_Joystick
+//Public oldJumpJoy As Integer
+// extern KM_Key oldJumpJoy;
+
 //Public MaxWorldStars As Integer 'maximum number of world stars
 extern int MaxWorldStars;
 //Public Debugger As Boolean 'if the debugger window is open
@@ -1995,7 +2034,8 @@ extern int PlayerCharacter;
 //Public PlayerCharacter2 As Integer
 extern int PlayerCharacter2;
 
-// replaced with cursor controls
+// replaced with SharedCursor.*
+
 //Public MenuMouseX As Double
 // extern double MenuMouseX;
 //Public MenuMouseY As Double
@@ -2008,6 +2048,11 @@ extern int PlayerCharacter2;
 // extern bool MenuMouseDown;
 //Public MenuMouseBack As Boolean
 // extern bool MenuMouseBack;
+//Public MenuMouseMove As Boolean
+// extern bool MenuMouseMove;
+
+// these are preserved because they keep track of the specific frame
+//   that the mouse is clicked / released
 
 //Public MenuMouseRelease As Boolean
 extern bool MenuMouseRelease;
