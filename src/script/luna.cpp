@@ -170,14 +170,7 @@ void lunaLoad()
     if(gLunaEnabledGlobally && gLunaEnabled)
     {
         // Load autocode
-        gAutoMan.Clear(false);
-        gAutoMan.ReadFile(FileNamePath);
-
-        // Try to load world codes
-        gAutoMan.ReadWorld(FileNamePath);
-
-        // Do some stuff
-        gAutoMan.DoEvents(true); // do with init
+        gAutoMan.LoadFiles();
 
         // Init some stuff
         InitLevel();

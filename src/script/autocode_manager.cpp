@@ -21,6 +21,8 @@
 #include <sstream>
 #include <fstream>
 #include <Utils/files.h>
+#include <Utils/dir_list_ci.h>
+#include <AppPath/app_path.h>
 
 #include "autocode_manager.h"
 #include "globals.h"
@@ -29,7 +31,8 @@
 
 #define PARSEDEBUG true
 
-
+static DirListCI s_dirEpisode;
+static DirListCI s_dirCustom;
 
 AutocodeManager gAutoMan;
 
@@ -63,15 +66,37 @@ void AutocodeManager::Clear(bool clear_global_codes)
     m_Enabled = false;
 }
 
-// READ FILE - Read the autocode file in the level folder
-bool AutocodeManager::ReadFile(const std::string &dir_path)
+bool AutocodeManager::LoadFiles()
 {
-    // Form full path
-    //string full_path = RemoveExtension(dir_path);
-    std::string full_path = dir_path;
-    full_path.append(FileName).append("/").append(AUTOCODE_FNAME);
+    bool ret = false;
+    std::string lunaLevel, lunaWorld;
 
-    FILE *code_file = Files::utf8_fopen(full_path.c_str(), "rb");
+    s_dirEpisode.setCurDir(FileNamePath);
+    s_dirCustom.setCurDir(FileNamePath + FileName);
+
+    Clear(false);
+
+    // Load autocode
+    lunaLevel = FileNamePath + FileName + "/" + s_dirCustom.resolveFileCase(AUTOCODE_FNAME);
+    ret |= ReadFile(lunaLevel);
+
+    // Try to load world codes
+    lunaWorld = FileNamePath + s_dirEpisode.resolveFileCase(WORLDCODE_FNAME);
+    ret |= ReadWorld(lunaWorld);
+
+    // Attempt to load global codes at the assets directory
+    ret |= ReadGlobals(AppPathManager::assetsRoot() + GLOBALCODE_FNAME);
+
+    // Do some stuff
+    DoEvents(true); // do with init
+
+    return ret;
+}
+
+// READ FILE - Read the autocode file in the level folder
+bool AutocodeManager::ReadFile(const std::string &script_path)
+{
+    FILE *code_file = Files::utf8_fopen(script_path.c_str(), "rb");
     if(!code_file)
         return false;
 
@@ -84,12 +109,9 @@ bool AutocodeManager::ReadFile(const std::string &dir_path)
 }
 
 // READ WORLD - Read the world autocode file in the world folder
-bool AutocodeManager::ReadWorld(const std::string &dir_path)
+bool AutocodeManager::ReadWorld(const std::string &script_path)
 {
-    std::string full_path = dir_path;
-    full_path.append("/").append(WORLDCODE_FNAME);
-
-    FILE *code_file = Files::utf8_fopen(full_path.c_str(), "rb");
+    FILE *code_file = Files::utf8_fopen(script_path.c_str(), "rb");
     if(!code_file)
         return false;
 
@@ -99,12 +121,9 @@ bool AutocodeManager::ReadWorld(const std::string &dir_path)
 }
 
 // READ GLOBALS - Read the global code file
-bool AutocodeManager::ReadGlobals(const std::string &dir_path)
+bool AutocodeManager::ReadGlobals(const std::string &script_path)
 {
-    std::string full_path = dir_path;
-    full_path.append("/").append(GLOBALCODE_FNAME);
-
-    FILE *code_file = Files::utf8_fopen(full_path.c_str(), "rb");
+    FILE *code_file = Files::utf8_fopen(script_path.c_str(), "rb");
     if(!code_file)
         return false;
 
