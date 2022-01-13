@@ -33,6 +33,19 @@
 #include "../renderop_effect.h"
 #include "../autocode_manager.h"
 
+
+void KilArmoryInit()
+{
+    auto *demo = PlayerF::Get(1);
+    if(demo)
+    {
+        PlayerF::FilterToBig(demo);
+        PlayerF::FilterMount(demo);
+        PlayerF::FilterReservePowerup(demo);
+        demo->Character = 1;
+    }
+}
+
 void KilArmoryCode()
 {
     Player_t *demo = PlayerF::Get(1);
@@ -60,3 +73,4 @@ void KilArmoryCode()
         }
     }
 }
+

@@ -32,6 +32,13 @@
 #include "Docopoper-TheFloorisLava.h"
 
 
+void TheFloorisLavaInit()
+{
+    Player_t* demo = PlayerF::Get(1);
+    if(demo)
+        demo->Character = 1;
+}
+
 void TheFloorisLavaCode()
 {
     Player_t *demo = PlayerF::Get(1);

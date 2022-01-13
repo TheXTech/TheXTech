@@ -328,6 +328,7 @@ set(THEXTECH_SRC
     src/script/hitbox.cpp
     src/script/sprite_component.cpp
     src/script/sprite_funcs.cpp
+    src/script/lunalevels.cpp
     src/script/lunaplayer.cpp
     src/script/lunanpc.cpp
     src/script/lunablock.cpp
