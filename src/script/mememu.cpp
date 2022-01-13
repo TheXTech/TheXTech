@@ -26,6 +26,25 @@
 
 #include <unordered_map>
 
+static const char *FieldtypeToStr(FIELDTYPE ftype)
+{
+    switch(ftype)
+    {
+    case FT_BYTE:
+        return "Uint8";
+    case FT_WORD:
+        return "SInt16";
+    case FT_DWORD:
+        return "SInt32";
+    case FT_FLOAT:
+        return "Float";
+    case FT_DFLOAT:
+        return "Double";
+    default:
+        return "<Invalid>";
+    }
+}
+
 /*!
  * \brief Global memory emulator
  */
@@ -83,175 +102,187 @@ public:
         m_sf.insert({0xB25724, &StartLevel});
     }
 
-    double getAny(int address)
+    double getAny(int address, FIELDTYPE ftype)
     {
         auto dres = m_df.find(address);
         if(dres != m_df.end())
-            return *dres->second;
+        {
+            if(ftype != FT_DFLOAT)
+                pLogWarning("MemEmu: Read type missmatched at 0x%x (Double expected, %s actually)", address, FieldtypeToStr(ftype));
+            switch(ftype)
+            {
+            case FT_BYTE:
+                return static_cast<double>(static_cast<uint8_t>(*dres->second));
+            case FT_WORD:
+                return static_cast<double>(static_cast<int16_t>(*dres->second));
+            case FT_DWORD:
+                return static_cast<double>(static_cast<int32_t>(*dres->second));
+            case FT_FLOAT:
+                return static_cast<double>(static_cast<float>(*dres->second));
+            default:
+            case FT_DFLOAT:
+                return *dres->second;
+            }
+        }
 
         auto fres = m_ff.find(address);
         if(fres != m_ff.end())
-            return (double) * fres->second;
+        {
+            if(ftype != FT_FLOAT)
+                pLogWarning("MemEmu: Read type missmatched at 0x%x (Float expected, %s actually)", address, FieldtypeToStr(ftype));
+            switch(ftype)
+            {
+            case FT_BYTE:
+                return static_cast<double>(static_cast<uint8_t>(*fres->second));
+            case FT_WORD:
+                return static_cast<double>(static_cast<int16_t>(*fres->second));
+            case FT_DWORD:
+                return static_cast<double>(static_cast<int32_t>(*fres->second));
+            case FT_FLOAT:
+                return static_cast<double>(*fres->second);
+            default:
+            case FT_DFLOAT:
+                return static_cast<double>(*fres->second);
+            }
+        }
 
         auto ires = m_if.find(address);
         if(ires != m_if.end())
-            return (double) * ires->second;
+        {
+            if(ftype != FT_DWORD && ftype != FT_WORD)
+                pLogWarning("MemEmu: Read type missmatched at 0x%x (SInt16 or SInt32 expected, %s actually)", address, FieldtypeToStr(ftype));
+
+            switch(ftype)
+            {
+            case FT_BYTE:
+                return static_cast<double>(static_cast<uint8_t>(*ires->second));
+            case FT_WORD:
+                return static_cast<double>(static_cast<int16_t>(*ires->second));
+            default:
+            case FT_DWORD:
+                return static_cast<double>(*ires->second);
+            case FT_FLOAT:
+                return static_cast<double>(static_cast<float>(*ires->second));
+            case FT_DFLOAT:
+                return static_cast<double>(*ires->second);
+            }
+        }
 
         auto bres = m_bf.find(address);
         if(bres != m_bf.end())
+        {
+            if(ftype != FT_WORD && ftype != FT_BYTE)
+                pLogWarning("MemEmu: Read type missmatched at 0x%x (Sint16 or Uint8 as boolean expected, %s actually)", address, FieldtypeToStr(ftype));
             return *bres->second ? 0xffff : 0000;
+        }
 
-        pLogWarning("MemEmu: Unknown <any> address to read: 0x%x", address);
+        pLogWarning("MemEmu: Unknown %s address to read: 0x%x", FieldtypeToStr(ftype), address);
         return 0.0;
     }
 
-    void setAny(int address, double value)
+    void setAny(int address, double value, FIELDTYPE ftype)
     {
         auto dres = m_df.find(address);
         if(dres != m_df.end())
         {
-            *dres->second = value;
+            if(ftype != FT_DFLOAT)
+                pLogWarning("MemEmu: Write type missmatched at 0x%x (Double expected, %s actually)", address, FieldtypeToStr(ftype));
+
+            switch(ftype)
+            {
+            case FT_BYTE:
+                *dres->second = static_cast<double>(static_cast<uint8_t>(value));
+                break;
+            case FT_WORD:
+                *dres->second = static_cast<double>(static_cast<int16_t>(value));
+                break;
+            case FT_DWORD:
+                *dres->second = static_cast<double>(static_cast<int32_t>(value));
+                break;
+            case FT_FLOAT:
+                *dres->second = static_cast<double>(static_cast<float>(value));
+                break;
+            case FT_DFLOAT:
+                *dres->second = value;
+                break;
+            default: //Don't change
+                break;
+            }
+
             return;
         }
 
         auto fres = m_ff.find(address);
         if(fres != m_ff.end())
         {
-            *fres->second = (float)value;
+            if(ftype != FT_FLOAT)
+                pLogWarning("MemEmu: Write type missmatched at 0x%x (Float expected, %s actually)", address, FieldtypeToStr(ftype));
+
+            switch(ftype)
+            {
+            case FT_BYTE:
+                *fres->second = static_cast<float>(static_cast<uint8_t>(value));
+                break;
+            case FT_WORD:
+                *fres->second = static_cast<float>(static_cast<int16_t>(value));
+                break;
+            case FT_DWORD:
+                *fres->second = static_cast<float>(static_cast<int32_t>(value));
+                break;
+            case FT_FLOAT:
+                *fres->second = static_cast<float>(value);
+                break;
+            case FT_DFLOAT:
+                *fres->second = static_cast<float>(value);
+                break;
+            default: //Don't change
+                break;
+            }
+
             return;
         }
 
         auto ires = m_if.find(address);
         if(ires != m_if.end())
         {
-            *dres->second = (int)value;
+            if(ftype != FT_DWORD && ftype != FT_WORD)
+                pLogWarning("MemEmu: Write type missmatched at 0x%x (SInt16 or SInt32 expected, %s actually)", address, FieldtypeToStr(ftype));
+
+            switch(ftype)
+            {
+            case FT_BYTE:
+                *ires->second = static_cast<int32_t>(static_cast<uint8_t>(value));
+                break;
+            case FT_WORD:
+                *ires->second = static_cast<int32_t>(static_cast<int16_t>(value));
+                break;
+            case FT_DWORD:
+                *ires->second = static_cast<int32_t>(value);
+                break;
+            case FT_FLOAT:
+                *ires->second = static_cast<int32_t>(static_cast<float>(value));
+                break;
+            case FT_DFLOAT:
+                *ires->second = static_cast<int32_t>(value);
+                break;
+            default: //Don't change
+                break;
+            }
+
             return;
         }
 
         auto bres = m_bf.find(address);
         if(bres != m_bf.end())
         {
-            *dres->second = (value != 0.0);
+            if(ftype != FT_WORD && ftype != FT_BYTE)
+                pLogWarning("MemEmu: Write type missmatched at 0x%x (Sint16 or Uint8 as boolean expected, %s actually)", address, FieldtypeToStr(ftype));
+            *bres->second = (value != 0.0);
             return;
         }
 
-        pLogWarning("MemEmu: Unknown <any> address to write: 0x%x", address);
+        pLogWarning("MemEmu: Unknown %s address to write: 0x%x", FieldtypeToStr(ftype), address);
     }
-
-
-//    double getDouble(int address)
-//    {
-//        auto res = m_df.find(address);
-//        if(res == m_df.end())
-//        {
-//            pLogWarning("MemEmu: Unknown double address to read: %x", address);
-//            return 0.0;
-//        }
-//        return *res->second;
-//    }
-
-//    void setDouble(int address, double value)
-//    {
-//        auto res = m_df.find(address);
-//        if(res == m_df.end())
-//        {
-//            pLogWarning("MemEmu: Unknown double address to write: %x", address);
-//            return;
-//        }
-//        *res->second = value;
-//    }
-
-
-
-//    float getFloat(int address)
-//    {
-//        auto res = m_ff.find(address);
-//        if(res == m_ff.end())
-//        {
-//            pLogWarning("MemEmu: Unknown float address to read: %x", address);
-//            return 0.0;
-//        }
-//        return *res->second;
-//    }
-
-//    void setFloat(int address, float value)
-//    {
-//        auto res = m_ff.find(address);
-//        if(res == m_ff.end())
-//        {
-//            pLogWarning("MemEmu: Unknown float address to write: %x", address);
-//            return;
-//        }
-//        *res->second = value;
-//    }
-
-
-
-//    int getInt(int address)
-//    {
-//        auto res = m_if.find(address);
-//        if(res == m_if.end())
-//        {
-//            pLogWarning("MemEmu: Unknown int address to read: %x", address);
-//            return 0.0;
-//        }
-//        return *res->second;
-//    }
-
-//    void setInt(int address, double value)
-//    {
-//        auto res = m_if.find(address);
-//        if(res == m_if.end())
-//        {
-//            pLogWarning("MemEmu: Unknown int address to write: %x", address);
-//            return;
-//        }
-//        *res->second = value;
-//    }
-
-//    bool getBool(int address)
-//    {
-//        auto res = m_bf.find(address);
-//        if(res == m_bf.end())
-//        {
-//            pLogWarning("MemEmu: Unknown bool address to read: %x", address);
-//            return 0.0;
-//        }
-//        return *res->second;
-//    }
-
-//    void setBool(int address, double value)
-//    {
-//        auto res = m_bf.find(address);
-//        if(res == m_bf.end())
-//        {
-//            pLogWarning("MemEmu: Unknown bool address to write: %x", address);
-//            return;
-//        }
-//        *res->second = value;
-//    }
-
-//    std::string getString(int address)
-//    {
-//        auto res = m_sf.find(address);
-//        if(res == m_sf.end())
-//        {
-//            pLogWarning("MemEmu: Unknown string address to read: %x", address);
-//            return std::string();
-//        }
-//        return *res->second;
-//    }
-
-//    void setString(int address, const std::string &value)
-//    {
-//        auto res = m_sf.find(address);
-//        if(res == m_sf.end())
-//        {
-//            pLogWarning("MemEmu: Unknown string address to write: %x", address);
-//            return;
-//        }
-//        *res->second = value;
-//    }
 };
 
 /*!
@@ -270,174 +301,187 @@ protected:
 public:
     SMBXObjectMemoryEmulator() noexcept = default;
 
-    virtual double getAny(T *obj, int address)
+    virtual double getAny(T *obj, int address, FIELDTYPE ftype)
     {
         auto dres = m_df.find(address);
         if(dres != m_df.end())
-            return obj->*(dres->second);
+        {
+            if(ftype != FT_DFLOAT)
+                pLogWarning("MemEmu: Read type missmatched at %s 0x%x (Double expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+            switch(ftype)
+            {
+            case FT_BYTE:
+                return static_cast<double>(static_cast<uint8_t>(obj->*(dres->second)));
+            case FT_WORD:
+                return static_cast<double>(static_cast<int16_t>(obj->*(dres->second)));
+            case FT_DWORD:
+                return static_cast<double>(static_cast<int32_t>(obj->*(dres->second)));
+            case FT_FLOAT:
+                return static_cast<double>(static_cast<float>(obj->*(dres->second)));
+            default:
+            case FT_DFLOAT:
+                return obj->*(dres->second);
+            }
+        }
 
         auto fres = m_ff.find(address);
         if(fres != m_ff.end())
-            return (double)(obj->*(fres->second));
+        {
+            if(ftype != FT_FLOAT)
+                pLogWarning("MemEmu: Read type missmatched at %s 0x%x (Float expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+            switch(ftype)
+            {
+            case FT_BYTE:
+                return static_cast<double>(static_cast<uint8_t>(obj->*(fres->second)));
+            case FT_WORD:
+                return static_cast<double>(static_cast<int16_t>(obj->*(fres->second)));
+            case FT_DWORD:
+                return static_cast<double>(static_cast<int32_t>(obj->*(fres->second)));
+            case FT_FLOAT:
+                return static_cast<double>(obj->*(fres->second));
+            default:
+            case FT_DFLOAT:
+                return static_cast<double>(obj->*(fres->second));
+            }
+        }
 
         auto ires = m_if.find(address);
         if(ires != m_if.end())
-            return (double)(obj->*(ires->second));
+        {
+            if(ftype != FT_DWORD && ftype != FT_WORD)
+                pLogWarning("MemEmu: Read type missmatched at %s 0x%x (SInt16 or SInt32 expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+
+            switch(ftype)
+            {
+            case FT_BYTE:
+                return static_cast<double>(static_cast<uint8_t>(obj->*(ires->second)));
+            case FT_WORD:
+                return static_cast<double>(static_cast<int16_t>(obj->*(ires->second)));
+            default:
+            case FT_DWORD:
+                return static_cast<double>(obj->*(ires->second));
+            case FT_FLOAT:
+                return static_cast<double>(static_cast<float>(obj->*(ires->second)));
+            case FT_DFLOAT:
+                return static_cast<double>(obj->*(ires->second));
+            }
+        }
 
         auto bres = m_bf.find(address);
         if(bres != m_bf.end())
+        {
+            if(ftype != FT_WORD && ftype != FT_BYTE)
+                pLogWarning("MemEmu: Read type missmatched at %s 0x%x (Sint16 or Uint8 as boolean expected, %s actually)", objName, address, FieldtypeToStr(ftype));
             return obj->*(bres->second) ? 0xffff : 0000;
+        }
 
-        pLogWarning("MemEmu: Unknown %s::<any> address to read: 0x%x", objName, address);
+        pLogWarning("MemEmu: Unknown %s::%s address to read: 0x%x", objName, FieldtypeToStr(ftype), address);
         return 0.0;
     }
 
-    virtual void setAny(T *obj, int address, double value)
+    virtual void setAny(T *obj, int address, double value, FIELDTYPE ftype)
     {
         auto dres = m_df.find(address);
         if(dres != m_df.end())
         {
-            obj->*(dres->second) = value;
+            if(ftype != FT_DFLOAT)
+                pLogWarning("MemEmu: Write type missmatched at %s 0x%x (Double expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+
+            switch(ftype)
+            {
+            case FT_BYTE:
+                obj->*(dres->second) = static_cast<double>(static_cast<uint8_t>(value));
+                break;
+            case FT_WORD:
+                obj->*(dres->second) = static_cast<double>(static_cast<int16_t>(value));
+                break;
+            case FT_DWORD:
+                obj->*(dres->second) = static_cast<double>(static_cast<int32_t>(value));
+                break;
+            case FT_FLOAT:
+                obj->*(dres->second) = static_cast<double>(static_cast<float>(value));
+                break;
+            case FT_DFLOAT:
+                obj->*(dres->second) = value;
+                break;
+            default: //Don't change
+                break;
+            }
+
             return;
         }
 
         auto fres = m_ff.find(address);
         if(fres != m_ff.end())
         {
-            obj->*(fres->second) = (float)value;
+            if(ftype != FT_FLOAT)
+                pLogWarning("MemEmu: Write type missmatched at %s 0x%x (Float expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+
+            switch(ftype)
+            {
+            case FT_BYTE:
+                obj->*(fres->second) = static_cast<float>(static_cast<uint8_t>(value));
+                break;
+            case FT_WORD:
+                obj->*(fres->second) = static_cast<float>(static_cast<int16_t>(value));
+                break;
+            case FT_DWORD:
+                obj->*(fres->second) = static_cast<float>(static_cast<int32_t>(value));
+                break;
+            case FT_FLOAT:
+                obj->*(fres->second) = static_cast<float>(value);
+                break;
+            case FT_DFLOAT:
+                obj->*(fres->second) = static_cast<float>(value);
+                break;
+            default: //Don't change
+                break;
+            }
+
             return;
         }
 
         auto ires = m_if.find(address);
         if(ires != m_if.end())
         {
-            obj->*(ires->second) = (int)value;
+            if(ftype != FT_DWORD && ftype != FT_WORD && (ftype != FT_BYTE || value > 255.0))
+                pLogWarning("MemEmu: Write type missmatched at %s 0x%x (SInt16 or SInt32 expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+
+            switch(ftype)
+            {
+            case FT_BYTE:
+                obj->*(ires->second) = static_cast<int32_t>(static_cast<uint8_t>(value));
+                break;
+            case FT_WORD:
+                obj->*(ires->second) = static_cast<int32_t>(static_cast<int16_t>(value));
+                break;
+            case FT_DWORD:
+                obj->*(ires->second) = static_cast<int32_t>(value);
+                break;
+            case FT_FLOAT:
+                obj->*(ires->second) = static_cast<int32_t>(static_cast<float>(value));
+                break;
+            case FT_DFLOAT:
+                obj->*(ires->second) = static_cast<int32_t>(value);
+                break;
+            default: //Don't change
+                break;
+            }
+
             return;
         }
 
         auto bres = m_bf.find(address);
         if(bres != m_bf.end())
         {
+            if(ftype != FT_WORD && ftype != FT_BYTE)
+                pLogWarning("MemEmu: Write type missmatched at %s 0x%x (Sint16 or Uint8 as boolean expected, %s actually)", objName, address, FieldtypeToStr(ftype));
             obj->*(bres->second) = (value != 0.0);
             return;
         }
 
-        pLogWarning("MemEmu: Unknown %s::<any> address to write: 0x%x", objName, address);
+        pLogWarning("MemEmu: Unknown %s::%s address to write: 0x%x", objName, FieldtypeToStr(ftype), address);
     }
-
-//    double getDouble(T *obj, int address)
-//    {
-//        auto res = m_df.find(address);
-//        if(res == m_df.end())
-//        {
-//            pLogWarning("MemEmu: Unknown %s::double address to read: %x", objName, address);
-//            return 0.0;
-//        }
-//        return obj->*(res->second);
-//    }
-
-//    void setDouble(T *obj, int address, double value)
-//    {
-//        auto res = m_df.find(address);
-//        if(res == m_df.end())
-//        {
-//            pLogWarning("MemEmu: Unknown %s::double address to write: %x", objName, address);
-//            return;
-//        }
-//        obj->*(res->second) = value;
-//    }
-
-
-
-//    float getFloat(T *obj, int address)
-//    {
-//        auto res = m_ff.find(address);
-//        if(res == m_ff.end())
-//        {
-//            pLogWarning("MemEmu: Unknown %s::float address to read: %x", objName, address);
-//            return 0.0;
-//        }
-//        return obj->*(res->second);
-//    }
-
-//    void setFloat(T *obj, int address, float value)
-//    {
-//        auto res = m_ff.find(address);
-//        if(res == m_ff.end())
-//        {
-//            pLogWarning("MemEmu: Unknown %s::float address to write: %x", objName, address);
-//            return;
-//        }
-//        obj->*(res->second) = value;
-//    }
-
-
-
-//    int getInt(T *obj, int address)
-//    {
-//        auto res = m_if.find(address);
-//        if(res == m_if.end())
-//        {
-//            pLogWarning("MemEmu: Unknown %s::int address to read: %x", objName, address);
-//            return 0.0;
-//        }
-//        return obj->*(res->second);
-//    }
-
-//    void setInt(T *obj, int address, double value)
-//    {
-//        auto res = m_if.find(address);
-//        if(res == m_if.end())
-//        {
-//            pLogWarning("MemEmu: Unknown %s::int address to write: %x", objName, address);
-//            return;
-//        }
-//        obj->*(res->second) = value;
-//    }
-
-//    bool getBool(T *obj, int address)
-//    {
-//        auto res = m_bf.find(address);
-//        if(res == m_bf.end())
-//        {
-//            pLogWarning("MemEmu: Unknown objName::bool address to read: %x", objName, address);
-//            return 0.0;
-//        }
-//        return obj->*(res->second);
-//    }
-
-//    void setBool(T *obj, int address, double value)
-//    {
-//        auto res = m_bf.find(address);
-//        if(res == m_bf.end())
-//        {
-//            pLogWarning("MemEmu: Unknown objName::bool address to write: %x", objName, address);
-//            return;
-//        }
-//        obj->*(res->second) = value;
-//    }
-
-//    std::string getString(T *obj, int address)
-//    {
-//        auto res = m_sf.find(address);
-//        if(res == m_sf.end())
-//        {
-//            pLogWarning("MemEmu: Unknown objName::string address to read: %x", objName, address);
-//            return std::string();
-//        }
-//        return obj->*(res->second);
-//    }
-
-//    void setString(T *obj, int address, const std::string &value)
-//    {
-//        auto res = m_sf.find(address);
-//        if(res == m_sf.end())
-//        {
-//            pLogWarning("MemEmu: Unknown objName::string address to write: %x", objName, address);
-//            return;
-//        }
-//        obj->*(res->second) = value;
-//    }
 };
 
 static const char location_t_name[] = "Location_t";
@@ -635,36 +679,36 @@ public:
         m_ff.insert({0x00000180, &Player_t::SpeedFixY});
     }
 
-    double getAny(Player_t *obj, int address) override
+    double getAny(Player_t *obj, int address, FIELDTYPE ftype) override
     {
         if(address >= 0x80 && address < 0xB0) // YoshiTongue
-            return s_locMem.getAny(&obj->YoshiTongue, address - 0x80);
+            return s_locMem.getAny(&obj->YoshiTongue, address - 0x80, ftype);
         else if(address >= 0xC0 && address < 0xF0) // Location
-            return s_locMem.getAny(&obj->Location, address - 0xC0);
+            return s_locMem.getAny(&obj->Location, address - 0xC0, ftype);
         else if(address >= 0xF2 && address < 0x106) // Controls
-            return s_conMem.getAny(&obj->Controls, address - 0xF2);
-        return PlayerParent::getAny(obj, address);
+            return s_conMem.getAny(&obj->Controls, address - 0xF2, ftype);
+        return PlayerParent::getAny(obj, address, ftype);
     }
 
-    void setAny(Player_t *obj, int address, double value) override
+    void setAny(Player_t *obj, int address, double value, FIELDTYPE ftype) override
     {
         if(address >= 0x80 && address < 0xB0) // YoshiTongue
         {
-            s_locMem.setAny(&obj->YoshiTongue, address - 0x80, value);
+            s_locMem.setAny(&obj->YoshiTongue, address - 0x80, value, ftype);
             return;
         }
         else if(address >= 0xC0 && address < 0xF0) // Location
         {
-            s_locMem.setAny(&obj->Location, address - 0xC0, value);
+            s_locMem.setAny(&obj->Location, address - 0xC0, value, ftype);
             return;
         }
         else if(address >= 0xF2 && address < 0x106) // Controls
         {
-            s_conMem.setAny(&obj->Controls, address - 0xF2, value);
+            s_conMem.setAny(&obj->Controls, address - 0xF2, value, ftype);
             return;
         }
 
-        PlayerParent::setAny(obj, address, value);
+        PlayerParent::setAny(obj, address, value, ftype);
     }
 };
 
@@ -770,31 +814,28 @@ public:
         m_if.insert({0x00000156, &NPC_t::Immune});
     }
 
-    double getAny(NPC_t *obj, int address) override
+    double getAny(NPC_t *obj, int address, FIELDTYPE ftype) override
     {
         if(address >= 0x78 && address < 0xA8) // Location
         {
             // Workaround for Analog Funk: Talkhaus-Science_Final_Battle,
             // using incorrect NPC address 0x84 as byte
-            if(address == 0x84)
-            {
-                uint8_t t = *reinterpret_cast<uint8_t*>(&obj->Location.Y) + 4;
-                return (double)t;
-            }
+            if(address == 0x84 && ftype == FT_BYTE)
+                return (double)getByteX86(obj->Location.Y, 4);
 
-            return s_locMem.getAny(&obj->Location, address - 0x78);
+            return s_locMem.getAny(&obj->Location, address - 0x78, ftype);
         }
         else if(address >= 0xA8 && address < 0xD8) // DefaultLocation
-            return s_locMem.getAny(&obj->DefaultLocation, address - 0xA8);
+            return s_locMem.getAny(&obj->DefaultLocation, address - 0xA8, ftype);
         else if(address == 0x126)
             return obj->Reset[1] ? 0xFFFF : 0;
         else if(address == 0x128)
             return obj->Reset[2] ? 0xFFFF : 0;
 
-        return NpcParent::getAny(obj, address);
+        return NpcParent::getAny(obj, address, ftype);
     }
 
-    void setAny(NPC_t *obj, int address, double value) override
+    void setAny(NPC_t *obj, int address, double value, FIELDTYPE ftype) override
     {
         if(address >= 0x78 && address < 0xA8) // Location
         {
@@ -820,12 +861,12 @@ public:
                 return;
             }
 
-            s_locMem.setAny(&obj->Location, address - 0x78, value);
+            s_locMem.setAny(&obj->Location, address - 0x78, value, ftype);
             return;
         }
         else if(address >= 0xA8 && address < 0xD8) // DefaultLocation
         {
-            s_locMem.setAny(&obj->DefaultLocation, address - 0xA8, value);
+            s_locMem.setAny(&obj->DefaultLocation, address - 0xA8, value, ftype);
             return;
         }
         else if(address == 0x126)
@@ -837,13 +878,53 @@ public:
             obj->Reset[2] = value != 0;
         }
 
-        NpcParent::setAny(obj, address, value);
+        NpcParent::setAny(obj, address, value, ftype);
     }
 };
 
 static SMBXMemoryEmulator   s_emu;
 static PlayerMemory         s_emuPlayer;
 static NPCMemory            s_emuNPC;
+
+template<typename T, class D>
+SDL_FORCE_INLINE void opAdd(D &mem, int addr, T o2, FIELDTYPE ftype)
+{
+    double o1 = mem.getAny(addr, ftype);
+    T res = static_cast<T>(o1) + static_cast<T>(o2);
+    mem.setAny(addr, static_cast<double>(res), ftype);
+}
+
+template<typename T, class D>
+SDL_FORCE_INLINE void opSub(D &mem, int addr, T o2, FIELDTYPE ftype)
+{
+    double o1 = mem.getAny(addr, ftype);
+    T res = static_cast<T>(o1) - static_cast<T>(o2);
+    mem.setAny(addr, static_cast<double>(res), ftype);
+}
+
+template<typename T, class D>
+SDL_FORCE_INLINE void opMul(D &mem, int addr, T o2, FIELDTYPE ftype)
+{
+    double o1 = mem.getAny(addr, ftype);
+    T res = static_cast<T>(o1) * static_cast<T>(o2);
+    mem.setAny(addr, static_cast<double>(res), ftype);
+}
+
+template<typename T, class D>
+SDL_FORCE_INLINE void opDiv(D &mem, int addr, T o2, FIELDTYPE ftype)
+{
+    double o1 = mem.getAny(addr, ftype);
+    T res = static_cast<T>(o1) / static_cast<T>(o2);
+    mem.setAny(addr, static_cast<double>(res), ftype);
+}
+
+template<typename T, class D>
+SDL_FORCE_INLINE void opXor(D &mem, int addr, T o2, FIELDTYPE ftype)
+{
+    double o1 = mem.getAny(addr, ftype);
+    T res = static_cast<T>(o1) ^ static_cast<T>(o2);
+    mem.setAny(addr, static_cast<double>(res), ftype);
+}
 
 
 void MemAssign(int address, double value, OPTYPE operation, FIELDTYPE ftype)
@@ -857,29 +938,8 @@ void MemAssign(int address, double value, OPTYPE operation, FIELDTYPE ftype)
     switch(operation)
     {
     case OP_Assign:
-    {
-        switch(ftype)
-        {
-        case FT_BYTE:
-            s_emu.setAny(address, static_cast<double>(static_cast<uint8_t>(value)));
-            break;
-        case FT_WORD:
-            s_emu.setAny(address, static_cast<double>(static_cast<int16_t>(value)));
-            break;
-        case FT_DWORD:
-            s_emu.setAny(address, static_cast<double>(static_cast<int32_t>(value)));
-            break;
-        case FT_FLOAT:
-            s_emu.setAny(address, static_cast<double>(static_cast<float>(value)));
-            break;
-        case FT_DFLOAT:
-            s_emu.setAny(address, value);
-            break;
-        default:
-            break;
-        }
-    }//OP Assign
-    break;
+        s_emu.setAny(address, value, ftype);
+        break;
 
     case OP_Add:
     {
@@ -887,30 +947,26 @@ void MemAssign(int address, double value, OPTYPE operation, FIELDTYPE ftype)
         {
         case FT_BYTE:
         {
-            auto cur = static_cast<uint8_t>(s_emu.getAny(address));
-            s_emu.setAny(address, static_cast<double>(cur + static_cast<uint8_t>(value)));
+            opAdd<uint8_t>(s_emu, address, value, ftype);
             break;
         }
         case FT_WORD:
         {
-            auto cur = static_cast<int16_t>(s_emu.getAny(address));
-            s_emu.setAny(address, static_cast<double>(cur + static_cast<int16_t>(value)));
+            opAdd<int16_t>(s_emu, address, value, ftype);
             break;
         }
         case FT_DWORD:
         {
-            auto cur = static_cast<int32_t>(s_emu.getAny(address));
-            s_emu.setAny(address, static_cast<double>(cur + static_cast<int32_t>(value)));
+            opAdd<int32_t>(s_emu, address, value, ftype);
             break;
         }
         case FT_FLOAT:
         {
-            auto cur = static_cast<float>(s_emu.getAny(address));
-            s_emu.setAny(address, static_cast<double>(cur + static_cast<float>(value)));
+            opAdd<float>(s_emu, address, value, ftype);
             break;
         }
         case FT_DFLOAT:
-            s_emu.setAny(address, s_emu.getAny(address) + value);
+            opAdd<double>(s_emu, address, value, ftype);
             break;
         default:
             break;
@@ -924,30 +980,26 @@ void MemAssign(int address, double value, OPTYPE operation, FIELDTYPE ftype)
         {
         case FT_BYTE:
         {
-            auto cur = static_cast<uint8_t>(s_emu.getAny(address));
-            s_emu.setAny(address, static_cast<double>(cur - static_cast<uint8_t>(value)));
+            opSub<uint8_t>(s_emu, address, value, ftype);
             break;
         }
         case FT_WORD:
         {
-            auto cur = static_cast<int16_t>(s_emu.getAny(address));
-            s_emu.setAny(address, static_cast<double>(cur - static_cast<int16_t>(value)));
+            opSub<int16_t>(s_emu, address, value, ftype);
             break;
         }
         case FT_DWORD:
         {
-            auto cur = static_cast<int32_t>(s_emu.getAny(address));
-            s_emu.setAny(address, static_cast<double>(cur - static_cast<int32_t>(value)));
+            opSub<int32_t>(s_emu, address, value, ftype);
             break;
         }
         case FT_FLOAT:
         {
-            auto cur = static_cast<float>(s_emu.getAny(address));
-            s_emu.setAny(address, static_cast<double>(cur - static_cast<float>(value)));
+            opSub<float>(s_emu, address, value, ftype);
             break;
         }
         case FT_DFLOAT:
-            s_emu.setAny(address, s_emu.getAny(address) - value);
+            opSub<double>(s_emu, address, value, ftype);
             break;
         default:
             break;
@@ -961,30 +1013,26 @@ void MemAssign(int address, double value, OPTYPE operation, FIELDTYPE ftype)
         {
         case FT_BYTE:
         {
-            auto cur = static_cast<uint8_t>(s_emu.getAny(address));
-            s_emu.setAny(address, static_cast<double>(cur * static_cast<uint8_t>(value)));
+            opMul<uint8_t>(s_emu, address, value, ftype);
             break;
         }
         case FT_WORD:
         {
-            auto cur = static_cast<int16_t>(s_emu.getAny(address));
-            s_emu.setAny(address, static_cast<double>(cur * static_cast<int16_t>(value)));
+            opMul<int16_t>(s_emu, address, value, ftype);
             break;
         }
         case FT_DWORD:
         {
-            auto cur = static_cast<int32_t>(s_emu.getAny(address));
-            s_emu.setAny(address, static_cast<double>(cur * static_cast<int32_t>(value)));
+            opMul<int32_t>(s_emu, address, value, ftype);
             break;
         }
         case FT_FLOAT:
         {
-            auto cur = static_cast<float>(s_emu.getAny(address));
-            s_emu.setAny(address, static_cast<double>(cur * static_cast<float>(value)));
+            opMul<float>(s_emu, address, value, ftype);
             break;
         }
         case FT_DFLOAT:
-            s_emu.setAny(address, s_emu.getAny(address) * value);
+            opMul<double>(s_emu, address, value, ftype);
             break;
         default:
             break;
@@ -998,30 +1046,26 @@ void MemAssign(int address, double value, OPTYPE operation, FIELDTYPE ftype)
         {
         case FT_BYTE:
         {
-            auto cur = static_cast<uint8_t>(s_emu.getAny(address));
-            s_emu.setAny(address, static_cast<double>(cur / static_cast<uint8_t>(value)));
+            opDiv<uint8_t>(s_emu, address, value, ftype);
             break;
         }
         case FT_WORD:
         {
-            auto cur = static_cast<int16_t>(s_emu.getAny(address));
-            s_emu.setAny(address, static_cast<double>(cur / static_cast<int16_t>(value)));
+            opDiv<int16_t>(s_emu, address, value, ftype);
             break;
         }
         case FT_DWORD:
         {
-            auto cur = static_cast<int32_t>(s_emu.getAny(address));
-            s_emu.setAny(address, static_cast<double>(cur / static_cast<int32_t>(value)));
+            opDiv<int32_t>(s_emu, address, value, ftype);
             break;
         }
         case FT_FLOAT:
         {
-            auto cur = static_cast<float>(s_emu.getAny(address));
-            s_emu.setAny(address, static_cast<double>(cur / static_cast<float>(value)));
+            opDiv<float>(s_emu, address, value, ftype);
             break;
         }
         case FT_DFLOAT:
-            s_emu.setAny(address, s_emu.getAny(address) / value);
+            opDiv<double>(s_emu, address, value, ftype);
             break;
         default:
             break;
@@ -1035,20 +1079,17 @@ void MemAssign(int address, double value, OPTYPE operation, FIELDTYPE ftype)
         {
         case FT_BYTE:
         {
-            auto cur = static_cast<uint8_t>(s_emu.getAny(address));
-            s_emu.setAny(address, static_cast<double>(cur ^ static_cast<uint8_t>(value)));
+            opXor<uint8_t>(s_emu, address, value, ftype);
             break;
         }
         case FT_WORD:
         {
-            auto cur = static_cast<int16_t>(s_emu.getAny(address));
-            s_emu.setAny(address, static_cast<double>(cur ^ static_cast<int16_t>(value)));
+            opXor<int16_t>(s_emu, address, value, ftype);
             break;
         }
         case FT_DWORD:
         {
-            auto cur = static_cast<int32_t>(s_emu.getAny(address));
-            s_emu.setAny(address, static_cast<double>(cur ^ static_cast<int32_t>(value)));
+            opXor<int32_t>(s_emu, address, value, ftype);
             break;
         }
         default:
@@ -1064,7 +1105,7 @@ void MemAssign(int address, double value, OPTYPE operation, FIELDTYPE ftype)
 
 bool CheckMem(int address, double value, COMPARETYPE ctype, FIELDTYPE ftype)
 {
-    double cur = s_emu.getAny(address);
+    double cur = s_emu.getAny(address, ftype);
 
     switch(ctype)
     {
@@ -1142,7 +1183,7 @@ bool CheckMem(int address, double value, COMPARETYPE ctype, FIELDTYPE ftype)
 
 double GetMem(int addr, FIELDTYPE ftype)
 {
-    double cur = s_emu.getAny(addr);
+    double cur = s_emu.getAny(addr, ftype);
 
     switch(ftype)
     {
@@ -1161,7 +1202,45 @@ double GetMem(int addr, FIELDTYPE ftype)
 }
 
 
+template<typename T, class D, class U>
+SDL_FORCE_INLINE void opAdd(D &mem, U *obj, int addr, T o2, FIELDTYPE ftype)
+{
+    double o1 = mem.getAny(obj, addr, ftype);
+    T res = static_cast<T>(o1) + static_cast<T>(o2);
+    mem.setAny(obj, addr, static_cast<double>(res), ftype);
+}
 
+template<typename T, class D, class U>
+SDL_FORCE_INLINE void opSub(D &mem, U *obj, int addr, T o2, FIELDTYPE ftype)
+{
+    double o1 = mem.getAny(obj, addr, ftype);
+    T res = static_cast<T>(o1) - static_cast<T>(o2);
+    mem.setAny(obj, addr, static_cast<double>(res), ftype);
+}
+
+template<typename T, class D, class U>
+SDL_FORCE_INLINE void opMul(D &mem, U *obj, int addr, T o2, FIELDTYPE ftype)
+{
+    double o1 = mem.getAny(obj, addr, ftype);
+    T res = static_cast<T>(o1) * static_cast<T>(o2);
+    mem.setAny(obj, addr, static_cast<double>(res), ftype);
+}
+
+template<typename T, class D, class U>
+SDL_FORCE_INLINE void opDiv(D &mem, U *obj, int addr, T o2, FIELDTYPE ftype)
+{
+    double o1 = mem.getAny(obj, addr, ftype);
+    T res = static_cast<T>(o1) / static_cast<T>(o2);
+    mem.setAny(obj, addr, static_cast<double>(res), ftype);
+}
+
+template<typename T, class D, class U>
+SDL_FORCE_INLINE void opXor(D &mem, U *obj, int addr, T o2, FIELDTYPE ftype)
+{
+    double o1 = mem.getAny(obj, addr, ftype);
+    T res = static_cast<T>(o1) ^ static_cast<T>(o2);
+    mem.setAny(obj, addr, static_cast<double>(res), ftype);
+}
 
 template<class T, class U>
 static void MemAssignType(T &mem, U *obj, int address, double value, OPTYPE operation, FIELDTYPE ftype)
@@ -1175,29 +1254,8 @@ static void MemAssignType(T &mem, U *obj, int address, double value, OPTYPE oper
     switch(operation)
     {
     case OP_Assign:
-    {
-        switch(ftype)
-        {
-        case FT_BYTE:
-            mem.setAny(obj, address, static_cast<double>(static_cast<uint8_t>(value)));
-            break;
-        case FT_WORD:
-            mem.setAny(obj, address, static_cast<double>(static_cast<int16_t>(value)));
-            break;
-        case FT_DWORD:
-            mem.setAny(obj, address, static_cast<double>(static_cast<int32_t>(value)));
-            break;
-        case FT_FLOAT:
-            mem.setAny(obj, address, static_cast<double>(static_cast<float>(value)));
-            break;
-        case FT_DFLOAT:
-            mem.setAny(obj, address, value);
-            break;
-        default:
-            break;
-        }
-    }//OP Assign
-    break;
+        mem.setAny(obj, address, value, ftype);
+        break;
 
     case OP_Add:
     {
@@ -1205,30 +1263,26 @@ static void MemAssignType(T &mem, U *obj, int address, double value, OPTYPE oper
         {
         case FT_BYTE:
         {
-            auto cur = static_cast<uint8_t>(mem.getAny(obj, address));
-            mem.setAny(obj, address, static_cast<double>(cur + static_cast<uint8_t>(value)));
+            opAdd<uint8_t>(mem, obj, address, value, ftype);
             break;
         }
         case FT_WORD:
         {
-            auto cur = static_cast<int16_t>(mem.getAny(obj, address));
-            mem.setAny(obj, address, static_cast<double>(cur + static_cast<int16_t>(value)));
+            opAdd<int16_t>(mem, obj, address, value, ftype);
             break;
         }
         case FT_DWORD:
         {
-            auto cur = static_cast<int32_t>(mem.getAny(obj, address));
-            mem.setAny(obj, address, static_cast<double>(cur + static_cast<int32_t>(value)));
+            opAdd<int32_t>(mem, obj, address, value, ftype);
             break;
         }
         case FT_FLOAT:
         {
-            auto cur = static_cast<float>(mem.getAny(obj, address));
-            mem.setAny(obj, address, static_cast<double>(cur + static_cast<float>(value)));
+            opAdd<float>(mem, obj, address, value, ftype);
             break;
         }
         case FT_DFLOAT:
-            mem.setAny(obj, address, mem.getAny(obj, address) + value);
+            opAdd<double>(mem, obj, address, value, ftype);
             break;
         default:
             break;
@@ -1242,30 +1296,26 @@ static void MemAssignType(T &mem, U *obj, int address, double value, OPTYPE oper
         {
         case FT_BYTE:
         {
-            auto cur = static_cast<uint8_t>(mem.getAny(obj, address));
-            mem.setAny(obj, address, static_cast<double>(cur - static_cast<uint8_t>(value)));
+            opSub<uint8_t>(mem, obj, address, value, ftype);
             break;
         }
         case FT_WORD:
         {
-            auto cur = static_cast<int16_t>(mem.getAny(obj, address));
-            mem.setAny(obj, address, static_cast<double>(cur - static_cast<int16_t>(value)));
+            opSub<int16_t>(mem, obj, address, value, ftype);
             break;
         }
         case FT_DWORD:
         {
-            auto cur = static_cast<int32_t>(mem.getAny(obj, address));
-            mem.setAny(obj, address, static_cast<double>(cur - static_cast<int32_t>(value)));
+            opSub<int32_t>(mem, obj, address, value, ftype);
             break;
         }
         case FT_FLOAT:
         {
-            auto cur = static_cast<float>(mem.getAny(obj, address));
-            mem.setAny(obj, address, static_cast<double>(cur - static_cast<float>(value)));
+            opSub<float>(mem, obj, address, value, ftype);
             break;
         }
         case FT_DFLOAT:
-            mem.setAny(obj, address, mem.getAny(obj, address) - value);
+            opSub<double>(mem, obj, address, value, ftype);
             break;
         default:
             break;
@@ -1279,30 +1329,26 @@ static void MemAssignType(T &mem, U *obj, int address, double value, OPTYPE oper
         {
         case FT_BYTE:
         {
-            auto cur = static_cast<uint8_t>(mem.getAny(obj, address));
-            mem.setAny(obj, address, static_cast<double>(cur * static_cast<uint8_t>(value)));
+            opMul<uint8_t>(mem, obj, address, value, ftype);
             break;
         }
         case FT_WORD:
         {
-            auto cur = static_cast<int16_t>(mem.getAny(obj, address));
-            mem.setAny(obj, address, static_cast<double>(cur * static_cast<int16_t>(value)));
+            opMul<int16_t>(mem, obj, address, value, ftype);
             break;
         }
         case FT_DWORD:
         {
-            auto cur = static_cast<int32_t>(mem.getAny(obj, address));
-            mem.setAny(obj, address, static_cast<double>(cur * static_cast<int32_t>(value)));
+            opMul<int32_t>(mem, obj, address, value, ftype);
             break;
         }
         case FT_FLOAT:
         {
-            auto cur = static_cast<float>(mem.getAny(obj, address));
-            mem.setAny(obj, address, static_cast<double>(cur * static_cast<float>(value)));
+            opMul<float>(mem, obj, address, value, ftype);
             break;
         }
         case FT_DFLOAT:
-            mem.setAny(obj, address, mem.getAny(obj, address) * value);
+            opMul<double>(mem, obj, address, value, ftype);
             break;
         default:
             break;
@@ -1316,30 +1362,26 @@ static void MemAssignType(T &mem, U *obj, int address, double value, OPTYPE oper
         {
         case FT_BYTE:
         {
-            auto cur = static_cast<uint8_t>(mem.getAny(obj, address));
-            mem.setAny(obj, address, static_cast<double>(cur / static_cast<uint8_t>(value)));
+            opDiv<uint8_t>(mem, obj, address, value, ftype);
             break;
         }
         case FT_WORD:
         {
-            auto cur = static_cast<int16_t>(mem.getAny(obj, address));
-            mem.setAny(obj, address, static_cast<double>(cur / static_cast<int16_t>(value)));
+            opDiv<int16_t>(mem, obj, address, value, ftype);
             break;
         }
         case FT_DWORD:
         {
-            auto cur = static_cast<int32_t>(mem.getAny(obj, address));
-            mem.setAny(obj, address, static_cast<double>(cur / static_cast<int32_t>(value)));
+            opDiv<int32_t>(mem, obj, address, value, ftype);
             break;
         }
         case FT_FLOAT:
         {
-            auto cur = static_cast<float>(mem.getAny(obj, address));
-            mem.setAny(obj, address, static_cast<double>(cur / static_cast<float>(value)));
+            opDiv<float>(mem, obj, address, value, ftype);
             break;
         }
         case FT_DFLOAT:
-            mem.setAny(obj, address, mem.getAny(obj, address) / value);
+            opDiv<double>(mem, obj, address, value, ftype);
             break;
         default:
             break;
@@ -1353,20 +1395,17 @@ static void MemAssignType(T &mem, U *obj, int address, double value, OPTYPE oper
         {
         case FT_BYTE:
         {
-            auto cur = static_cast<uint8_t>(mem.getAny(obj, address));
-            mem.setAny(obj, address, static_cast<double>(cur ^ static_cast<uint8_t>(value)));
+            opXor<uint8_t>(mem, obj, address, value, ftype);
             break;
         }
         case FT_WORD:
         {
-            auto cur = static_cast<int16_t>(mem.getAny(obj, address));
-            mem.setAny(obj, address, static_cast<double>(cur ^ static_cast<int16_t>(value)));
+            opXor<int16_t>(mem, obj, address, value, ftype);
             break;
         }
         case FT_DWORD:
         {
-            auto cur = static_cast<int32_t>(mem.getAny(obj, address));
-            mem.setAny(obj, address, static_cast<double>(cur ^ static_cast<int32_t>(value)));
+            opXor<int32_t>(mem, obj, address, value, ftype);
             break;
         }
         default:
@@ -1383,7 +1422,7 @@ static void MemAssignType(T &mem, U *obj, int address, double value, OPTYPE oper
 template<class T, class U>
 static bool ChecmMemType(T &mem, U *obj, int offset, double value, COMPARETYPE ctype, FIELDTYPE ftype)
 {
-    double cur = mem.getAny(obj, offset);
+    double cur = mem.getAny(obj, offset, ftype);
 
     switch(ctype)
     {
@@ -1472,22 +1511,7 @@ bool CheckMem(Player_t *obj, int offset, double value, COMPARETYPE ctype, FIELDT
 
 double GetMem(Player_t *obj, int offset, FIELDTYPE ftype)
 {
-    double cur = s_emuPlayer.getAny(obj, offset);
-
-    switch(ftype)
-    {
-    case FT_BYTE:
-        return static_cast<double>(static_cast<uint8_t>(cur));
-    case FT_WORD:
-        return static_cast<double>(static_cast<int16_t>(cur));
-    case FT_DWORD:
-        return static_cast<double>(static_cast<int32_t>(cur));
-    case FT_FLOAT:
-        return static_cast<double>(static_cast<float>(cur));
-    default:
-    case FT_DFLOAT:
-        return cur;
-    }
+    return s_emuPlayer.getAny(obj, offset, ftype);
 }
 
 
@@ -1503,20 +1527,5 @@ bool CheckMem(NPC_t *obj, int offset, double value, COMPARETYPE ctype, FIELDTYPE
 
 double GetMem(NPC_t *obj, int offset, FIELDTYPE ftype)
 {
-    double cur = s_emuNPC.getAny(obj, offset);
-
-    switch(ftype)
-    {
-    case FT_BYTE:
-        return static_cast<double>(static_cast<uint8_t>(cur));
-    case FT_WORD:
-        return static_cast<double>(static_cast<int16_t>(cur));
-    case FT_DWORD:
-        return static_cast<double>(static_cast<int32_t>(cur));
-    case FT_FLOAT:
-        return static_cast<double>(static_cast<float>(cur));
-    default:
-    case FT_DFLOAT:
-        return cur;
-    }
+    return s_emuNPC.getAny(obj, offset, ftype);
 }
