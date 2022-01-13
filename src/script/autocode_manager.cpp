@@ -246,7 +246,7 @@ void AutocodeManager::Parse(FILE *code_file, bool add_to_globals)
             Autocode newcode(ac_type, target, param1, param2, param3, ac_str, length, cur_section, ref_str);
             if(!add_to_globals)
             {
-                if(newcode.m_Type < 10000 || newcode.MyRef.length() > 0)
+                if(newcode.m_Type < 10000 || !newcode.MyRef.empty())
                     m_Autocodes.emplace_back(std::move(newcode));
                 else   // Sprite components (type 10000+) with no reference go into callable component list
                     gSpriteMan.m_ComponentList.push_back(Autocode::GenerateComponent(newcode));
@@ -356,7 +356,6 @@ void AutocodeManager::ActivateCustomEvents(int new_section, int eventcode)
     {
         for(auto iter = m_Autocodes.begin(), end = m_Autocodes.end(); iter != end; ++iter)
         {
-
             // Activate copies of events with 'eventcode' and move them to 'new_section'
             if((*iter).ActiveSection == eventcode && (*iter).Activated == false && !(*iter).Expired)
             {
@@ -366,12 +365,10 @@ void AutocodeManager::ActivateCustomEvents(int new_section, int eventcode)
                 newcode.Length = (*iter).m_OriginalTime;
                 m_CustomCodes.push_front(std::move(newcode));
             }
-
         }
 
         for(auto iter = m_GlobalCodes.begin(), end = m_GlobalCodes.end(); iter != end; ++iter)
         {
-
             // Activate copies of events with 'eventcode' and move them to 'new_section'
             if((*iter).ActiveSection == eventcode && !(*iter).Activated && !(*iter).Expired)
             {
@@ -381,7 +378,6 @@ void AutocodeManager::ActivateCustomEvents(int new_section, int eventcode)
                 newcode.Length = (*iter).m_OriginalTime;
                 m_CustomCodes.push_front(std::move(newcode));
             }
-
         }
     }
 }
@@ -415,7 +411,8 @@ Autocode *AutocodeManager::FindMatching(int section, const std::string &soughtst
         if((*iter).ActiveSection == section && (*iter).MyString == soughtstr)
             return &(*iter);
     }
-    return 0;
+
+    return nullptr;
 }
 
 // VAR OPERATION -- Do something to a variable in the user variable bank

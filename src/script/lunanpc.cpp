@@ -112,6 +112,7 @@ void NpcF::AllFace(int identity, int section, double x)
     bool anyID = (identity == -1 ? true : false);
     bool anySec = (section == -1 ? true : false);
     NPC_t *thisnpc;
+
     for(int i = 0; i <= numNPCs; i++)
     {
         thisnpc = Get(i);
