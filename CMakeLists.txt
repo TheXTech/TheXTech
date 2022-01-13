@@ -7,6 +7,8 @@ include(ExternalProject)
 include(CheckLibraryExists)
 include(GNUInstallDirs)
 include(FindBacktrace)
+include(TestBigEndian)
+
 
 include(cmake/git_info.cmake)
 message("== Current GIT hash [${GIT_COMMIT_HASH}], branch [${GIT_BRANCH}], package [${PACKAGE_SUFFIX}] ==")
@@ -596,6 +598,14 @@ endif()
 
 if(NOT USE_SYSTEM_LIBS)
     add_dependencies(thextech ${A2XT_DEPS})
+endif()
+
+test_big_endian(THEXTECH_IS_BIG_ENDIAN)
+if(THEXTECH_IS_BIG_ENDIAN)
+    message("== Target processor endianess: BIG ENDIAN")
+    target_compile_definitions(thextech PRIVATE -DTHEXTECH_BIG_ENDIAN)
+else()
+    message("== Target processor endianess: LITTLE ENDIAN")
 endif()
 
 if(USE_STATIC_LIBC AND NOT USE_SYSTEM_LIBS)

@@ -26,6 +26,117 @@
 
 #include <unordered_map>
 
+
+#if defined(arm) && !defined(__SOFTFP__) && !defined(__VFP_FP__) && !defined(__MAVERICK__)
+#   define ARM_BIDI_ENDIAN
+//inline void swap_halfes(uint64_t &x)
+//{
+//    uint64_t y = ((x & 0xFFFFFFFF00000000) >> 32) & 0xFFFFFFFF;
+//    x = ((x << 32) & 0xFFFFFFFF00000000) & y;
+//}
+//#else // Do nothing
+//#   define swap_halfes(x)
+#endif
+
+SDL_FORCE_INLINE void toX86Endian(double in_d, uint8_t out[8])
+{
+    uint8_t *in = reinterpret_cast<uint8_t*>(&in_d);
+
+#if defined(THEXTECH_BIG_ENDIAN)
+    out[0] = in[7];
+    out[1] = in[6];
+    out[2] = in[5];
+    out[3] = in[4];
+    out[4] = in[3];
+    out[5] = in[2];
+    out[6] = in[1];
+    out[7] = in[0];
+#elif defined(ARM_BIDI_ENDIAN) // some old devices
+    out[4] = in[0];
+    out[5] = in[1];
+    out[6] = in[2];
+    out[7] = in[3];
+    out[0] = in[4];
+    out[1] = in[5];
+    out[2] = in[6];
+    out[3] = in[7];
+#else // normal little endian
+    out[0] = in[0];
+    out[1] = in[1];
+    out[2] = in[2];
+    out[3] = in[3];
+    out[4] = in[4];
+    out[5] = in[5];
+    out[6] = in[6];
+    out[7] = in[7];
+#endif
+}
+
+SDL_FORCE_INLINE void fromX86Endian(uint8_t in[8], double &out_d)
+{
+    uint8_t *out = reinterpret_cast<uint8_t*>(&out_d);
+
+#if defined(THEXTECH_BIG_ENDIAN)
+    out[0] = in[7];
+    out[1] = in[6];
+    out[2] = in[5];
+    out[3] = in[4];
+    out[4] = in[3];
+    out[5] = in[2];
+    out[6] = in[1];
+    out[7] = in[0];
+#elif defined(ARM_BIDI_ENDIAN) // some old devices
+    out[4] = in[0];
+    out[5] = in[1];
+    out[6] = in[2];
+    out[7] = in[3];
+    out[0] = in[4];
+    out[1] = in[5];
+    out[2] = in[6];
+    out[3] = in[7];
+#else // normal little endian
+    out[0] = in[0];
+    out[1] = in[1];
+    out[2] = in[2];
+    out[3] = in[3];
+    out[4] = in[4];
+    out[5] = in[5];
+    out[6] = in[6];
+    out[7] = in[7];
+#endif
+}
+
+SDL_FORCE_INLINE void modifyByteX86(double &dst, size_t byte, uint8_t data)
+{
+    uint8_t *in = reinterpret_cast<uint8_t*>(&dst);
+    SDL_assert(byte < 8);
+
+#if defined(THEXTECH_BIG_ENDIAN)
+    in[7 - byte] = data;
+#elif defined(ARM_BIDI_ENDIAN) // some old devices
+    byte += (byte < 4) ? +4 : -4;
+    in[byte] = data;
+#else // normal little endian
+    in[byte] = data;
+#endif
+}
+
+SDL_FORCE_INLINE uint8_t getByteX86(const double &src, size_t byte)
+{
+    const uint8_t *in = reinterpret_cast<const uint8_t*>(&src);
+    SDL_assert(byte < 8);
+#if defined(THEXTECH_BIG_ENDIAN)
+    return in[7 - byte];
+#elif defined(ARM_BIDI_ENDIAN) // some old devices
+    byte += (byte < 4) ? +4 : -4;
+    return in[byte];
+#else // normal little endian
+    return in[byte];
+#endif
+}
+
+
+
 static const char *FieldtypeToStr(FIELDTYPE ftype)
 {
     switch(ftype)
@@ -851,13 +962,12 @@ public:
                 // Modify byte with offset at begin of field 4 by FF,
                 // result must be 0xC08100FF7AE147AE (-544.125)
                 // ---------------------------------------------------------
-                double old = obj->Location.Y;
-                uint8_t *d = reinterpret_cast<uint8_t*>(&obj->Location.Y) + 4;
-                *d = (uint8_t)value;
-                D_pLogDebug("Modifying byte 4 at double value 0x%016llX (%g) by %02X, result is 0x%016llX (%g)",
-                            *reinterpret_cast<uint64_t*>(&old), old,
-                            (uint8_t)value,
-                            *reinterpret_cast<uint64_t*>(&obj->Location.Y), obj->Location.Y);
+                // double old = obj->Location.Y;
+                modifyByteX86(obj->Location.Y, 4, (uint8_t)value);
+                //D_pLogDebug("Modifying byte 4 at double value 0x%016llX (%g) by %02X, result is 0x%016llX (%g)",
+                //            *reinterpret_cast<uint64_t*>(&old), old,
+                //            (uint8_t)value,
+                //            *reinterpret_cast<uint64_t*>(&obj->Location.Y), obj->Location.Y);
                 return;
             }
 
