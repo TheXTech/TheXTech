@@ -20,7 +20,7 @@
 
 /*************************************************
  *  Episode:    A2MBXT, Episode 1: Analog Funk   *
- *  Level:      The Floor is Lava                *
+ *  Level:      The Floor is Lava!               *
  *  Filename:   Docopoper-TheFloorisLava.lvl     *
  *  Author:     Docopoper                        *
  *************************************************/
