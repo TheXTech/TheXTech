@@ -366,7 +366,7 @@ void Autocode::Do(bool init)
             if(Param2 != 0.0) // Display timer?
             {
                 Renderer::Get().AddOp(new RenderStringOp("TIMER", 3, 600, 27));
-                Renderer::Get().AddOp(new RenderStringOp(std::to_string((long long)Length / 60), 3, 618, 48));
+                Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("{0}", (int64_t)Length / 60), 3, 618, 48));
             }
 
             if(Length == 1 || Length == 0)
