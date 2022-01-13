@@ -367,6 +367,7 @@ void UpdateGraphics(bool skipRepaint)
 
     frameNextInc();
     frameRenderStart();
+    lunaRenderStart();
 
     g_stats.reset();
 
@@ -2111,6 +2112,8 @@ void UpdateGraphics(bool skipRepaint)
         // player names
         /* Dropped */
 
+            lunaRender(Z);
+
             if(numPlayers == 1) // Always draw for single-player
                 g_levelVScreenFader[Z].draw();
             else if(numScreens != 1) // Don't draw when many players at the same screen
@@ -2143,7 +2146,7 @@ void UpdateGraphics(bool skipRepaint)
                     }
                 }
 
-                lunaRender();
+                lunaRenderHud();
     //                DrawInterface Z, numScreens
                 if(ShowOnScreenMeta)
                     DrawInterface(Z, numScreens);
@@ -2887,6 +2890,7 @@ void UpdateGraphics(bool skipRepaint)
 //            Netplay::sendData timeStr + LB;
 //    }
 
+    lunaRenderEnd();
     frameRenderEnd();
 
 //    if(XRender::lazyLoadedBytes() > 200000) // Reset timer while loading many pictures at the same time

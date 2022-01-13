@@ -13,6 +13,9 @@ extern std::string gDemoCounterTitle;
 extern void lunaReset();
 extern void lunaLoad();
 extern void lunaLoop();
-extern void lunaRender();
+extern void lunaRenderStart();
+extern void lunaRenderHud();
+extern void lunaRender(int screenZ);
+extern void lunaRenderEnd();
 
 #endif // LUNA_H

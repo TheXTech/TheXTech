@@ -219,16 +219,31 @@ void lunaLoop()
     }
 }
 
-void lunaRender()
+
+void lunaRenderHud()
 {
     bool dcAllow = (gEnableDemoCounter || g_compatibility.demos_counter_enable);
     if(dcAllow && gShowDemoCounter)
         gDeathCounter.Draw();
+}
 
+void lunaRender(int screenZ)
+{
     if(gLunaEnabled && gLunaEnabledGlobally)
     {
-        Renderer::Get().StartFrameRender();
+        Renderer::Get().StartCameraRender(screenZ);
         Renderer::Get().RenderBelowPriority(5);
-        Renderer::Get().EndFrameRender();
     }
+}
+
+void lunaRenderStart()
+{
+    if(gLunaEnabled && gLunaEnabledGlobally)
+        Renderer::Get().StartFrameRender();
+}
+
+void lunaRenderEnd()
+{
+    if(gLunaEnabled && gLunaEnabledGlobally)
+        Renderer::Get().EndFrameRender();
 }
