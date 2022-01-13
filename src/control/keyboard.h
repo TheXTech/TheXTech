@@ -92,6 +92,7 @@ public:
     InputMethodType_Keyboard();
 
     bool TestProfileType(InputMethodProfile* profile);
+    bool RumbleSupported();
 
     void UpdateControlsPre();
     void UpdateControlsPost();

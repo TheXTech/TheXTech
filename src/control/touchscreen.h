@@ -364,6 +364,7 @@ public:
     InputMethodType_TouchScreen();
 
     bool TestProfileType(InputMethodProfile* profile);
+    bool RumbleSupported();
 
     void UpdateControlsPre();
     void UpdateControlsPost();

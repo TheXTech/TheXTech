@@ -177,6 +177,7 @@ public:
     InputMethodType_Joystick();
 
     bool TestProfileType(InputMethodProfile* profile);
+    bool RumbleSupported();
 
     void UpdateControlsPre();
     void UpdateControlsPost();

@@ -131,6 +131,11 @@ bool InputMethodType_Duplicate::TestProfileType(InputMethodProfile* profile)
     return (bool)dynamic_cast<InputMethodProfile_Duplicate*>(profile);
 }
 
+bool InputMethodType_Duplicate::RumbleSupported()
+{
+    return true;
+}
+
 void InputMethodType_Duplicate::UpdateControlsPre()
 {
 }

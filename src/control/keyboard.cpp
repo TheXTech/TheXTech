@@ -696,6 +696,11 @@ bool InputMethodType_Keyboard::TestProfileType(InputMethodProfile* profile)
     return (bool)dynamic_cast<InputMethodProfile_Keyboard*>(profile);
 }
 
+bool InputMethodType_Keyboard::RumbleSupported()
+{
+    return false;
+}
+
 void InputMethodType_Keyboard::UpdateControlsPre() {}
 void InputMethodType_Keyboard::UpdateControlsPost()
 {

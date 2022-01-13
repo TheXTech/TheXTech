@@ -122,14 +122,16 @@ InputMethodProfile::~InputMethodProfile() {}
 
 void InputMethodProfile::SaveConfig_All(IniProcessing* ctl)
 {
-    ctl->setValue("enable-rumble", this->m_rumbleEnabled);
+    if(this->Type->RumbleSupported())
+        ctl->setValue("enable-rumble", this->m_rumbleEnabled);
     ctl->setValue("ground-pound-by-alt-run", this->m_groundPoundByAltRun);
     this->SaveConfig(ctl);
 }
 
 void InputMethodProfile::LoadConfig_All(IniProcessing* ctl)
 {
-    ctl->read("enable-rumble", this->m_rumbleEnabled, g_config.JoystickEnableRumble);
+    if(this->Type->RumbleSupported())
+        ctl->read("enable-rumble", this->m_rumbleEnabled, g_config.JoystickEnableRumble);
     ctl->read("ground-pound-by-alt-run", this->m_groundPoundByAltRun, g_config.GameplayPoundByAltRun);
     this->LoadConfig(ctl);
 }
@@ -137,6 +139,9 @@ void InputMethodProfile::LoadConfig_All(IniProcessing* ctl)
 // How many per-type special options are there?
 size_t InputMethodProfile::GetOptionCount()
 {
+    size_t shared_options_count = CommonOptions::COUNT;
+    if(!this->Type->RumbleSupported())
+        shared_options_count -= 1;
     return CommonOptions::COUNT + this->GetOptionCount_Custom();
 }
 // Methods to manage per-profile options
@@ -145,6 +150,9 @@ size_t InputMethodProfile::GetOptionCount()
 // get a char* describing the option
 const char* InputMethodProfile::GetOptionName(size_t i)
 {
+    if(!this->Type->RumbleSupported() && i >= CommonOptions::rumble)
+        i += 1;
+
     if(i >= CommonOptions::COUNT)
         return this->GetOptionName_Custom(i - CommonOptions::COUNT);
 
@@ -160,6 +168,9 @@ const char* InputMethodProfile::GetOptionName(size_t i)
 // WILL NOT be freed
 const char* InputMethodProfile::GetOptionValue(size_t i)
 {
+    if(!this->Type->RumbleSupported() && i >= CommonOptions::rumble)
+        i += 1;
+
     if(i >= CommonOptions::COUNT)
         return this->GetOptionValue_Custom(i - CommonOptions::COUNT);
 
@@ -183,6 +194,9 @@ const char* InputMethodProfile::GetOptionValue(size_t i)
 // called when A is pressed; allowed to interrupt main game loop
 bool InputMethodProfile::OptionChange(size_t i)
 {
+    if(!this->Type->RumbleSupported() && i >= CommonOptions::rumble)
+        i += 1;
+
     if(i >= CommonOptions::COUNT)
         return this->OptionChange_Custom(i - CommonOptions::COUNT);
 
@@ -211,16 +225,24 @@ bool InputMethodProfile::OptionChange(size_t i)
 // called when left is pressed
 bool InputMethodProfile::OptionRotateLeft(size_t i)
 {
-    if(i >= CommonOptions::COUNT)
-        return this->OptionRotateLeft_Custom(i - CommonOptions::COUNT);
+    int i_proc = i;
+    if(!this->Type->RumbleSupported() && i >= CommonOptions::rumble)
+        i_proc += 1;
+
+    if(i_proc >= CommonOptions::COUNT)
+        return this->OptionRotateLeft_Custom(i_proc - CommonOptions::COUNT);
 
     return this->OptionChange(i);
 }
 // called when right is pressed
 bool InputMethodProfile::OptionRotateRight(size_t i)
 {
-    if(i >= CommonOptions::COUNT)
-        return this->OptionRotateRight_Custom(i - CommonOptions::COUNT);
+    int i_proc = i;
+    if(!this->Type->RumbleSupported() && i >= CommonOptions::rumble)
+        i_proc += 1;
+
+    if(i_proc >= CommonOptions::COUNT)
+        return this->OptionRotateRight_Custom(i_proc - CommonOptions::COUNT);
 
     return this->OptionChange(i);
 }

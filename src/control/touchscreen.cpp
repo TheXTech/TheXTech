@@ -1431,6 +1431,11 @@ bool InputMethodType_TouchScreen::TestProfileType(InputMethodProfile* profile)
     return (bool)dynamic_cast<InputMethodProfile_TouchScreen*>(profile);
 }
 
+bool InputMethodType_TouchScreen::RumbleSupported()
+{
+    return true;
+}
+
 void InputMethodType_TouchScreen::UpdateControlsPre()
 {
     this->m_controller.update();
