@@ -2114,9 +2114,9 @@ void UpdateGraphics(bool skipRepaint)
 
             lunaRender(Z);
 
-            if(numPlayers == 1) // Always draw for single-player
-                g_levelVScreenFader[Z].draw();
-            else if(numScreens != 1) // Don't draw when many players at the same screen
+            // Always draw for single-player
+            // And don't draw when many players at the same screen
+            if(numPlayers == 1 || numScreens != 1)
                 g_levelVScreenFader[Z].draw();
 
     //    'Interface
@@ -2148,7 +2148,7 @@ void UpdateGraphics(bool skipRepaint)
 
                 lunaRenderHud();
     //                DrawInterface Z, numScreens
-                if(ShowOnScreenMeta)
+                if(ShowOnScreenMeta && !gSMBXHUDSettings.skip)
                     DrawInterface(Z, numScreens);
 
                 For(A, 1, numNPCs) // Display NPCs that got dropped from the container

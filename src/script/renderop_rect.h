@@ -23,7 +23,7 @@
 
 #include "renderop.h"
 
-class RenderRectOp : public RenderOp
+class RenderRectOp final : public RenderOp
 {
 public:
     RenderRectOp() : x1(0), y1(0), x2(0), y2(0),
@@ -32,7 +32,7 @@ public:
         sceneCoords(false)
     {};
 
-    void Draw(Renderer *renderer);
+    void Draw(Renderer *renderer) override;
 
     double x1;
     double y1;

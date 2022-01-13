@@ -36,6 +36,7 @@
 #include "layers.h"
 #include "core/msgbox.h"
 #include "main/cheat_code.h"
+#include "luna.h"
 #include "lunarender.h"
 #include "lunaplayer.h"
 #include "lunalevel.h"
@@ -54,9 +55,7 @@ static FIELDTYPE StrToFieldtype(std::string string)
     string.erase(string.find_last_not_of(" \n\r\t") + 1);
     if(string == "b")
         return FT_BYTE;
-    else if(string == "s")
-        return FT_WORD;
-    else if(string == "w")
+    else if(string == "s" || string == "w")
         return FT_WORD;
     else if(string == "dw")
         return FT_DWORD;
@@ -68,7 +67,7 @@ static FIELDTYPE StrToFieldtype(std::string string)
     return FT_BYTE;
 }
 
-static void PrintSyntaxError(std::string errored_line)
+static void PrintSyntaxError(const std::string &errored_line)
 {
     static int errors = 0;
     errors += 25;
@@ -90,26 +89,26 @@ Autocode::Autocode()
     m_Type = AT_Invalid;
 }
 
-Autocode::Autocode(AutocodeType _Type, double _Target, double _p1, double _p2, double _p3,
-                   std::string _p4, double _Length, int _Section, std::string _VarRef)
+Autocode::Autocode(AutocodeType iType, double iTarget, double ip1, double ip2, double ip3,
+                   const std::string &ip4, double iLength, int iSection, const std::string &iVarRef)
 {
-    m_Type = _Type;
-    Target = _Target;
-    Param1 = _p1;
-    Param2 = _p2;
-    Param3 = _p3;
-    Length = _Length;
-    MyString = _p4;
-    MyRef = _VarRef;
-    m_OriginalTime = _Length;
+    m_Type = iType;
+    Target = iTarget;
+    Param1 = ip1;
+    Param2 = ip2;
+    Param3 = ip3;
+    Length = iLength;
+    MyString = ip4;
+    MyRef = iVarRef;
+    m_OriginalTime = iLength;
     ftype = FT_INVALID;
     Activated = true;
     Expired = false;
     //comp = nullptr;
 
     // Adjust section
-    ActiveSection = (_Section < 1000 ? --_Section : _Section);
-    Activated = (_Section < 1000 ? true : false);
+    ActiveSection = (iSection < 1000 ? --iSection : iSection);
+    Activated = (iSection < 1000);
 }
 
 Autocode::Autocode(const Autocode &o)
@@ -141,7 +140,6 @@ Autocode &Autocode::operator=(const Autocode &o)
 // DO - Perform autocodes for this section. Only does init codes if "init" is set
 void Autocode::Do(bool init)
 {
-
     // Is it expired?
     if(Expired || !Activated)
         return;
@@ -154,7 +152,7 @@ void Autocode::Do(bool init)
 
     // Only allow initrun on codes set to section -1
     if(init)
-        init = ((uint8_t)ActiveSection == (uint8_t)0xFE ? true : false);
+        init = (uint8_t)ActiveSection == (uint8_t)0xFE;
 
     // Run this code if "always" section, or if current section is a match, or forced by init
     if((uint8_t)ActiveSection == (uint8_t)0xFF || demo->Section == ActiveSection || init)
@@ -199,15 +197,15 @@ void Autocode::Do(bool init)
 
         case AT_FilterPlayer:
         {
-            Player_t *demo = PlayerF::Get(1);
-            if(demo != 0)
+            // Player_t *demo = PlayerF::Get(1); // Already declared above
+            //if(demo) // Useless, null check was done above
+            //{
+            if(demo->Character == Param1)
             {
-                if(demo->Character == Param1)
-                {
-                    if(Param2 > 0 && Param2 < 6)
-                        demo->Character = (int)Param2;
-                }
+                if(Param2 > 0 && Param2 < 6)
+                    demo->Character = (int)Param2;
             }
+            //}
             break;
         }
 
@@ -237,12 +235,11 @@ void Autocode::Do(bool init)
             std::list<NPC_t *> npcs;
             NpcF::FindAll((int)Target, demo->Section, &npcs);
 
-            if(npcs.size() > 0)
+            if(!npcs.empty())
             {
                 // Loop over list of NPCs
-                for(std::list<NPC_t *>::iterator iter = npcs.begin(), end = npcs.end(); iter != end; ++iter)
+                for(auto npc : npcs)
                 {
-                    NPC_t *npc = *iter;
                     switch((int)Param1)
                     {
                     default:
@@ -301,8 +298,9 @@ void Autocode::Do(bool init)
             NPC_t *npc = NpcF::GetFirstMatch((int)Target, (int)Param3 - 1);
             if(npc != nullptr)
             {
-                float hits = *(((float *)((&(*(uint8_t *)npc)) + 0x148)));
-                Renderer::Get().AddOp(new RenderStringOp(std::to_string((long long)(base_health - hits)), 3, (float)Param1, (float)Param2));
+                //float hits = *(((float *)((&(*(uint8_t *)npc)) + 0x148)));
+                int hits = Maths::iRound(npc->Damage);
+                Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("{0}", (base_health - hits)), 3, (float)Param1, (float)Param2));
             }
             else
                 Renderer::Get().AddOp(new RenderStringOp("?", 3, (float)Param1, (float)Param2));
@@ -365,7 +363,7 @@ void Autocode::Do(bool init)
         }
 
         case AT_Timer:
-            if(Param2) // Display timer?
+            if(Param2 != 0.0) // Display timer?
             {
                 Renderer::Get().AddOp(new RenderStringOp("TIMER", 3, 600, 27));
                 Renderer::Get().AddOp(new RenderStringOp(std::to_string((long long)Length / 60), 3, 618, 48));
@@ -376,10 +374,10 @@ void Autocode::Do(bool init)
                 if(Length == 1)
                     Expired = true;
 
-                DoPredicate((int)Target, (int)Param1);
+                Autocode::DoPredicate((int)Target, (int)Param1);
 
                 // Reset time?
-                if(Param3)
+                if(Param3 != 0.0)
                 {
                     Activated = true;
                     Expired = false;
@@ -393,7 +391,7 @@ void Autocode::Do(bool init)
             if(numNPCs < 1)
                 break;
 
-            if(NPCConditional((int)Target, (int)Param1))
+            if(Autocode::NPCConditional((int)Target, (int)Param1))
             {
                 RunSelfOption();
                 gAutoMan.ActivateCustomEvents((int)Param2, (int)Param3);
@@ -416,9 +414,11 @@ void Autocode::Do(bool init)
 
         case AT_TriggerRandom:
         {
-            int choice = rand() % 4;
+            int choice = iRand2(4);
             switch(choice)
             {
+            default:
+                break;
             case 0:
                 gAutoMan.ActivateCustomEvents(0, (int)Target);
                 break;
@@ -441,7 +441,7 @@ void Autocode::Do(bool init)
                 break;
 
             int diff = (int)Param1 - (int)Target;
-            int choice = iRand(diff);
+            int choice = iRand2(diff);
             gAutoMan.ActivateCustomEvents(0, (int)Target + choice);
             break;
         }
@@ -556,7 +556,7 @@ void Autocode::Do(bool init)
             }
 //            uint8_t *ptr = (uint8_t *)demo;
 //            ptr += (int)Target; // offset
-            bool triggered = CheckMem(demo, Target, Param1, (COMPARETYPE)(int)Param2, ftype);
+            bool triggered = CheckMem(demo, (int)Target, Param1, (COMPARETYPE)(int)Param2, ftype);
             if(triggered)
                 gAutoMan.ActivateCustomEvents(0, (int)Param3);
             break;
@@ -686,37 +686,37 @@ void Autocode::Do(bool init)
         {
             if(ReferenceOK())
             {
-                COMPARETYPE compare_type = (COMPARETYPE)(int)Param1;
-                if(true)
+                auto compare_type = (COMPARETYPE)(int)Param1;
+                // if(true)
+                //{
+                InitIfMissing(&gAutoMan.m_UserVars, MyString, 0);
+                InitIfMissing(&gAutoMan.m_UserVars, MyRef, 0);
+
+                double var1 = gAutoMan.m_UserVars[MyRef];
+                double var2 = gAutoMan.m_UserVars[MyString];
+
+                switch(compare_type)
                 {
-                    InitIfMissing(&gAutoMan.m_UserVars, MyString, 0);
-                    InitIfMissing(&gAutoMan.m_UserVars, MyRef, 0);
-
-                    double var1 = gAutoMan.m_UserVars[MyRef];
-                    double var2 = gAutoMan.m_UserVars[MyString];
-
-                    switch(compare_type)
-                    {
-                    case CMPT_EQUALS:
-                        if(var1 == var2)
-                            gAutoMan.ActivateCustomEvents(0, (int)Param3);
-                        break;
-                    case CMPT_GREATER:
-                        if(var1 > var2)
-                            gAutoMan.ActivateCustomEvents(0, (int)Param3);
-                        break;
-                    case CMPT_LESS:
-                        if(var1 < var2)
-                            gAutoMan.ActivateCustomEvents(0, (int)Param3);
-                        break;
-                    case CMPT_NOTEQ:
-                        if(var1 != var2)
-                            gAutoMan.ActivateCustomEvents(0, (int)Param3);
-                        break;
-                    default:
-                        break;
-                    }
+                case CMPT_EQUALS:
+                    if(var1 == var2)
+                        gAutoMan.ActivateCustomEvents(0, (int)Param3);
+                    break;
+                case CMPT_GREATER:
+                    if(var1 > var2)
+                        gAutoMan.ActivateCustomEvents(0, (int)Param3);
+                    break;
+                case CMPT_LESS:
+                    if(var1 < var2)
+                        gAutoMan.ActivateCustomEvents(0, (int)Param3);
+                    break;
+                case CMPT_NOTEQ:
+                    if(var1 != var2)
+                        gAutoMan.ActivateCustomEvents(0, (int)Param3);
+                    break;
+                default:
+                    break;
                 }
+                //}
             }
             break;
         }
@@ -750,7 +750,7 @@ void Autocode::Do(bool init)
         // LUNA CONTROL
         case AT_LunaControl:
         {
-            LunaControl((LunaControlAct)(int)Target, (int)Param1);
+            Autocode::LunaControl((LunaControlAct)(int)Target, (int)Param1);
             break;
         }
 
@@ -769,24 +769,24 @@ void Autocode::Do(bool init)
             {
                 Autocode *coderef = nullptr;
                 coderef = gAutoMan.GetEventByRef(MyString);
-                if(coderef != 0)
+                if(coderef)
                 {
                     switch((int)Target)
                     {
                     case 1:
-                        modParam(coderef->Target, Param1, (OPTYPE)(int)Param2);
+                        Autocode::modParam(coderef->Target, Param1, (OPTYPE)(int)Param2);
                         break;
                     case 2:
-                        modParam(coderef->Param1, Param1, (OPTYPE)(int)Param2);
+                        Autocode::modParam(coderef->Param1, Param1, (OPTYPE)(int)Param2);
                         break;
                     case 3:
-                        modParam(coderef->Param2, Param1, (OPTYPE)(int)Param2);
+                        Autocode::modParam(coderef->Param2, Param1, (OPTYPE)(int)Param2);
                         break;
                     case 4:
-                        modParam(coderef->Param3, Param1, (OPTYPE)(int)Param2);
+                        Autocode::modParam(coderef->Param3, Param1, (OPTYPE)(int)Param2);
                         break;
                     case 5:
-                        modParam(coderef->Length, Param1, (OPTYPE)(int)Param2);
+                        Autocode::modParam(coderef->Length, Param1, (OPTYPE)(int)Param2);
                         break;
                     }
                 }
@@ -799,8 +799,8 @@ void Autocode::Do(bool init)
         {
             Autocode *coderef = nullptr;
             coderef = gAutoMan.GetEventByRef(MyString);
-            if(coderef != 0)
-                modParam(coderef->Length, Param1, (OPTYPE)(int)Param2);
+            if(coderef)
+                Autocode::modParam(coderef->Length, Param1, (OPTYPE)(int)Param2);
             break;
         }
 
@@ -837,7 +837,7 @@ void Autocode::Do(bool init)
             if(layer)
             {
                 LayerF::SetXSpeed(layer, (float)SDL_atof(MyString.c_str()));
-                if(Length == 1 && Param1)
+                if(Length == 1 && Param1 != 0.0)
                     LayerF::SetXSpeed(layer, 0.0001f);
             }
             break;
@@ -849,7 +849,7 @@ void Autocode::Do(bool init)
             if(layer)
             {
                 LayerF::SetYSpeed(layer, (float)SDL_atof(MyString.c_str()));
-                if(Length == 1 && Param1)
+                if(Length == 1 && Param1 != 0.0)
                     LayerF::SetYSpeed(layer, 0.0001f);
             }
             break;
@@ -860,7 +860,7 @@ void Autocode::Do(bool init)
             Layer_t *layer = LayerF::Get((int)Target);
             if(layer)
             {
-                float accel = (float)SDL_atof(MyString.c_str());
+                auto accel = (float)SDL_atof(MyString.c_str());
                 if(std::abs(layer->SpeedX) + std::abs(accel) >= std::abs((float)Param1))
                     LayerF::SetXSpeed(layer, (float)Param1);
                 else
@@ -874,7 +874,7 @@ void Autocode::Do(bool init)
             Layer_t *layer = LayerF::Get((int)Target);
             if(layer)
             {
-                float accel = (float)SDL_atof(MyString.c_str());
+                auto accel = (float)SDL_atof(MyString.c_str());
                 if(std::abs(layer->SpeedY) + std::abs(accel) >= std::abs((float)Param1))
                     LayerF::SetYSpeed(layer, (float)Param1);
                 else
@@ -888,7 +888,7 @@ void Autocode::Do(bool init)
             Layer_t *layer = LayerF::Get((int)Target);
             if(layer)
             {
-                float deccel = (float)SDL_atof(MyString.c_str());
+                auto deccel = (float)SDL_atof(MyString.c_str());
                 deccel = std::abs(deccel);
                 if(layer->SpeedX > 0)
                 {
@@ -912,7 +912,7 @@ void Autocode::Do(bool init)
             Layer_t *layer = LayerF::Get((int)Target);
             if(layer)
             {
-                float deccel = (float)SDL_atof(MyString.c_str());
+                auto deccel = (float)SDL_atof(MyString.c_str());
                 deccel = std::abs(deccel);
                 if(layer->SpeedY > 0)
                 {
@@ -1009,9 +1009,9 @@ void Autocode::Do(bool init)
         // FORCE FACING
         case AT_ForceFacing:
         {
-            Player_t *demo = PlayerF::Get(1);
-            if(demo != 0)
-                NpcF::AllFace((int)Target, (int)Param1 - 1, demo->Location.SpeedX);
+            // Player_t *demo = PlayerF::Get(1); // No need, everything was done above
+            // if(demo != 0)
+            NpcF::AllFace((int)Target, (int)Param1 - 1, demo->Location.SpeedX);
             break;
         }
 
@@ -1036,7 +1036,7 @@ void Autocode::Do(bool init)
         {
             short tempint = 1;
             if(Target == 0)
-                KillPlayer(tempint);
+                PlayerDead(tempint);
             RunSelfOption();
             break;
         }
@@ -1153,7 +1153,7 @@ void Autocode::Do(bool init)
         {
             if(ReferenceOK())
             {
-                CSprite *blueprint = new CSprite();
+                auto *blueprint = new CSprite();
                 gSpriteMan.AddBlueprint(MyRef.c_str(), blueprint);
             }
 
@@ -1164,7 +1164,7 @@ void Autocode::Do(bool init)
         case AT_Attach:
         {
             //char* dbg = "!!! ATTACH DEBUG !!!";
-            if(ReferenceOK() && MyString.length() > 0)
+            if(ReferenceOK() && !MyString.empty())
             {
                 if(gSpriteMan.m_SpriteBlueprints.find(MyRef) != gSpriteMan.m_SpriteBlueprints.end()) // BLueprint exists
                 {
@@ -1232,7 +1232,6 @@ void Autocode::SelfTick()
 // DO PREDICATE
 void Autocode::DoPredicate(int target, int predicate)
 {
-
     // Activate custom event?
     if(predicate >= 1000 && predicate < 100000)
     {
@@ -1241,7 +1240,7 @@ void Autocode::DoPredicate(int target, int predicate)
     }
 
     // Else, do predicate
-    AutocodePredicate pred = (AutocodePredicate)predicate;
+    auto pred = (AutocodePredicate)predicate;
     short tempint = 1;
 
     switch(pred)
@@ -1252,7 +1251,7 @@ void Autocode::DoPredicate(int target, int predicate)
         break;
 
     case AP_Death:
-        KillPlayer(tempint);
+        PlayerDead(tempint);
         break;
 
     default:
@@ -1268,23 +1267,15 @@ bool Autocode::NPCConditional(int target, int cond)
 
     switch((AC_Conditional)cond)
     {
-
     case AC_Invalid:
     default:
         return ret;
-        break;
 
     case AC_Exists:
-    {
-        return (NpcF::GetFirstMatch(target, -1) == nullptr ? false : true);
-        break;
-    }
+        return NpcF::GetFirstMatch(target, -1) != nullptr;
 
     case AC_DoesNotExist:
-    {
-        return (NpcF::GetFirstMatch(target, -1) == nullptr ? true : false);
-        break;
-    }
+        return NpcF::GetFirstMatch(target, -1) == nullptr;
     }
 }
 
@@ -1296,18 +1287,18 @@ void Autocode::RunSelfOption()
 }
 
 // REFERENCE OK
-bool Autocode::ReferenceOK()
+bool Autocode::ReferenceOK() const
 {
     return (this->MyRef.length() >= 1);
 }
 
 
 
-void Autocode::HeartSystem()
+void Autocode::HeartSystem() const
 {
     Player_t *sheath = PlayerF::Get(1);
 
-    if(sheath != 0)
+    if(sheath)
     {
         // Don't run for demo or iris
         if(!PlayerF::UsesHearts(sheath))
@@ -1357,18 +1348,13 @@ void Autocode::HeartSystem()
 
 void Autocode::LunaControl(LunaControlAct act, int val)
 {
-    UNUSED(val);
-
     switch(act)
     {
     case LCA_DemoCounter:
         break;
 
     case LCA_SMBXHUD:
-//        if(val == 1)
-//            gSMBXHUDSettings.skip = true;
-//        else
-//            gSMBXHUDSettings.skip = false;
+        gSMBXHUDSettings.skip = (val == 1);
         break;
 
     case LCA_Invalid:
@@ -1606,7 +1592,7 @@ AutocodeType Autocode::EnumerizeCommand(char *wbuf)
             return AT_TriggerSMBXEvent;
 
 
-        if(SDL_strcmp(command, "Kil") == 0)
+        if(SDL_strcmp(command, "Kill") == 0)
             return AT_Kill;
 
         if(SDL_strcmp(command, "Hurt") == 0)

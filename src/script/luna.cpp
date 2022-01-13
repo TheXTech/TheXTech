@@ -33,6 +33,8 @@
 #include "globals.h"
 
 
+SMBXHUDSettings gSMBXHUDSettings;
+
 bool gLunaEnabledGlobally = true;
 bool gLunaEnabled = true;
 bool gShowDemoCounter = true;

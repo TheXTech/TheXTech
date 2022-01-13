@@ -76,8 +76,8 @@ int ComputeLevelSection(int x, int y)
 
 void RandomPointInRadius(double *ox, double *oy, double cx, double cy, int radius)
 {
-    double phase1 = iRand(360);
-    double phase2 = iRand(360);
+    double phase1 = iRand2(360);
+    double phase2 = iRand2(360);
     double xoff = std::sin(phase1) * radius;
     double yoff = std::cos(phase2) * radius;
 

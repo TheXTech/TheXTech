@@ -23,7 +23,7 @@
 
 RenderStringOp::RenderStringOp() : RenderStringOp(std::string(), 1, 400.f, 400.f) {}
 
-RenderStringOp::RenderStringOp(const std::string &str, short font_type, float X, float Y) :
+RenderStringOp::RenderStringOp(const std::string &str, int font_type, float X, float Y) :
     RenderOp(RENDEROP_DEFAULT_PRIORITY_TEXT),
     m_String(str),
     m_FontType(font_type),

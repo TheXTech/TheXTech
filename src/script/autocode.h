@@ -214,16 +214,16 @@ public:
     // Ctors
     Autocode();
     Autocode(AutocodeType, double Target, double p1, double p2, double p3,
-             std::string p4, double Length, int Section, std::string VarRef);
+             const std::string &p4, double Length, int Section, const std::string &VarRef);
     Autocode(const Autocode &o);
     ~Autocode() = default;
 
     Autocode &operator=(const Autocode &o);
 
     void Do(bool init);
-    void DoPredicate(int target, int predicate);
+    static void DoPredicate(int target, int predicate);
 
-    bool NPCConditional(int NPCID, int condition);
+    static bool NPCConditional(int NPCID, int condition);
 
     static AutocodeType EnumerizeCommand(char *wbuf);
     static SpriteComponent GenerateComponent(const Autocode &obj_to_convert); // Convert an autocode object to a sprite component
@@ -231,8 +231,8 @@ public:
     static pfnSprDraw GetDrawFunc(const Autocode &pAC);                       // Get draw function address from AC object, or NULL
 
     /// Command functions ///
-    void HeartSystem();
-    void LunaControl(LunaControlAct act, int val);
+    void HeartSystem() const;
+    static void LunaControl(LunaControlAct act, int val);
 
     /// Members ///
     AutocodeType m_Type = AT_Invalid;
@@ -254,10 +254,10 @@ public:
     //SpriteComponent* comp;
 
 private:
-    void modParam(double &dst, double src, OPTYPE operation);
+    static void modParam(double &dst, double src, OPTYPE operation);
     void SelfTick();
     void RunSelfOption(); // activate the string portion of this code on self
-    bool ReferenceOK(); // check if this object has a valid reference (not empty)
+    bool ReferenceOK() const; // check if this object has a valid reference (not empty)
 };
 
 #endif // AutoCode_hhh

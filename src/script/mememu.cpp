@@ -38,7 +38,7 @@ class SMBXMemoryEmulator
     std::unordered_map<int, std::string *>   m_sf;
 
 public:
-    SMBXMemoryEmulator()
+    SMBXMemoryEmulator() noexcept
     {
         buildTable();
     }
@@ -268,8 +268,7 @@ protected:
     std::unordered_map<int, std::string T::*>   m_sf;
 
 public:
-    SMBXObjectMemoryEmulator()
-    {}
+    SMBXObjectMemoryEmulator() noexcept = default;
 
     virtual double getAny(T *obj, int address)
     {
@@ -446,7 +445,7 @@ typedef SMBXObjectMemoryEmulator<Location_t, location_t_name> LocationParent;
 class LocationMemory final : public LocationParent
 {
 public:
-    LocationMemory() : LocationParent()
+    LocationMemory() noexcept : LocationParent()
     {
         buildTable();
     }
@@ -468,7 +467,7 @@ static const char controls_t_name[] = "Controls_t";
 class ControlsMemory final : public SMBXObjectMemoryEmulator<Controls_t, controls_t_name>
 {
 public:
-    ControlsMemory() : SMBXObjectMemoryEmulator<Controls_t, controls_t_name>()
+    ControlsMemory() noexcept : SMBXObjectMemoryEmulator<Controls_t, controls_t_name>()
     {
         buildTable();
     }
@@ -498,7 +497,7 @@ typedef SMBXObjectMemoryEmulator<Player_t, playere_t_name> PlayerParent;
 class PlayerMemory final : public PlayerParent
 {
 public:
-    PlayerMemory() : PlayerParent()
+    PlayerMemory() noexcept : PlayerParent()
     {
         buildTable();
     }
@@ -674,7 +673,7 @@ typedef SMBXObjectMemoryEmulator<NPC_t, npc_t_name> NpcParent;
 class NPCMemory final : public NpcParent
 {
 public:
-    NPCMemory() : NpcParent()
+    NPCMemory() noexcept : NpcParent()
     {
         buildTable();
     }
@@ -888,25 +887,25 @@ void MemAssign(int address, double value, OPTYPE operation, FIELDTYPE ftype)
         {
         case FT_BYTE:
         {
-            uint8_t cur = static_cast<uint8_t>(s_emu.getAny(address));
+            auto cur = static_cast<uint8_t>(s_emu.getAny(address));
             s_emu.setAny(address, static_cast<double>(cur + static_cast<uint8_t>(value)));
             break;
         }
         case FT_WORD:
         {
-            int16_t cur = static_cast<int16_t>(s_emu.getAny(address));
+            auto cur = static_cast<int16_t>(s_emu.getAny(address));
             s_emu.setAny(address, static_cast<double>(cur + static_cast<int16_t>(value)));
             break;
         }
         case FT_DWORD:
         {
-            int32_t cur = static_cast<int32_t>(s_emu.getAny(address));
+            auto cur = static_cast<int32_t>(s_emu.getAny(address));
             s_emu.setAny(address, static_cast<double>(cur + static_cast<int32_t>(value)));
             break;
         }
         case FT_FLOAT:
         {
-            float cur = static_cast<float>(s_emu.getAny(address));
+            auto cur = static_cast<float>(s_emu.getAny(address));
             s_emu.setAny(address, static_cast<double>(cur + static_cast<float>(value)));
             break;
         }
@@ -925,25 +924,25 @@ void MemAssign(int address, double value, OPTYPE operation, FIELDTYPE ftype)
         {
         case FT_BYTE:
         {
-            uint8_t cur = static_cast<uint8_t>(s_emu.getAny(address));
+            auto cur = static_cast<uint8_t>(s_emu.getAny(address));
             s_emu.setAny(address, static_cast<double>(cur - static_cast<uint8_t>(value)));
             break;
         }
         case FT_WORD:
         {
-            int16_t cur = static_cast<int16_t>(s_emu.getAny(address));
+            auto cur = static_cast<int16_t>(s_emu.getAny(address));
             s_emu.setAny(address, static_cast<double>(cur - static_cast<int16_t>(value)));
             break;
         }
         case FT_DWORD:
         {
-            int32_t cur = static_cast<int32_t>(s_emu.getAny(address));
+            auto cur = static_cast<int32_t>(s_emu.getAny(address));
             s_emu.setAny(address, static_cast<double>(cur - static_cast<int32_t>(value)));
             break;
         }
         case FT_FLOAT:
         {
-            float cur = static_cast<float>(s_emu.getAny(address));
+            auto cur = static_cast<float>(s_emu.getAny(address));
             s_emu.setAny(address, static_cast<double>(cur - static_cast<float>(value)));
             break;
         }
@@ -962,25 +961,25 @@ void MemAssign(int address, double value, OPTYPE operation, FIELDTYPE ftype)
         {
         case FT_BYTE:
         {
-            uint8_t cur = static_cast<uint8_t>(s_emu.getAny(address));
+            auto cur = static_cast<uint8_t>(s_emu.getAny(address));
             s_emu.setAny(address, static_cast<double>(cur * static_cast<uint8_t>(value)));
             break;
         }
         case FT_WORD:
         {
-            int16_t cur = static_cast<int16_t>(s_emu.getAny(address));
+            auto cur = static_cast<int16_t>(s_emu.getAny(address));
             s_emu.setAny(address, static_cast<double>(cur * static_cast<int16_t>(value)));
             break;
         }
         case FT_DWORD:
         {
-            int32_t cur = static_cast<int32_t>(s_emu.getAny(address));
+            auto cur = static_cast<int32_t>(s_emu.getAny(address));
             s_emu.setAny(address, static_cast<double>(cur * static_cast<int32_t>(value)));
             break;
         }
         case FT_FLOAT:
         {
-            float cur = static_cast<float>(s_emu.getAny(address));
+            auto cur = static_cast<float>(s_emu.getAny(address));
             s_emu.setAny(address, static_cast<double>(cur * static_cast<float>(value)));
             break;
         }
@@ -999,25 +998,25 @@ void MemAssign(int address, double value, OPTYPE operation, FIELDTYPE ftype)
         {
         case FT_BYTE:
         {
-            uint8_t cur = static_cast<uint8_t>(s_emu.getAny(address));
+            auto cur = static_cast<uint8_t>(s_emu.getAny(address));
             s_emu.setAny(address, static_cast<double>(cur / static_cast<uint8_t>(value)));
             break;
         }
         case FT_WORD:
         {
-            int16_t cur = static_cast<int16_t>(s_emu.getAny(address));
+            auto cur = static_cast<int16_t>(s_emu.getAny(address));
             s_emu.setAny(address, static_cast<double>(cur / static_cast<int16_t>(value)));
             break;
         }
         case FT_DWORD:
         {
-            int32_t cur = static_cast<int32_t>(s_emu.getAny(address));
+            auto cur = static_cast<int32_t>(s_emu.getAny(address));
             s_emu.setAny(address, static_cast<double>(cur / static_cast<int32_t>(value)));
             break;
         }
         case FT_FLOAT:
         {
-            float cur = static_cast<float>(s_emu.getAny(address));
+            auto cur = static_cast<float>(s_emu.getAny(address));
             s_emu.setAny(address, static_cast<double>(cur / static_cast<float>(value)));
             break;
         }
@@ -1036,19 +1035,19 @@ void MemAssign(int address, double value, OPTYPE operation, FIELDTYPE ftype)
         {
         case FT_BYTE:
         {
-            uint8_t cur = static_cast<uint8_t>(s_emu.getAny(address));
+            auto cur = static_cast<uint8_t>(s_emu.getAny(address));
             s_emu.setAny(address, static_cast<double>(cur ^ static_cast<uint8_t>(value)));
             break;
         }
         case FT_WORD:
         {
-            int16_t cur = static_cast<int16_t>(s_emu.getAny(address));
+            auto cur = static_cast<int16_t>(s_emu.getAny(address));
             s_emu.setAny(address, static_cast<double>(cur ^ static_cast<int16_t>(value)));
             break;
         }
         case FT_DWORD:
         {
-            int32_t cur = static_cast<int32_t>(s_emu.getAny(address));
+            auto cur = static_cast<int32_t>(s_emu.getAny(address));
             s_emu.setAny(address, static_cast<double>(cur ^ static_cast<int32_t>(value)));
             break;
         }
@@ -1206,25 +1205,25 @@ static void MemAssignType(T &mem, U *obj, int address, double value, OPTYPE oper
         {
         case FT_BYTE:
         {
-            uint8_t cur = static_cast<uint8_t>(mem.getAny(obj, address));
+            auto cur = static_cast<uint8_t>(mem.getAny(obj, address));
             mem.setAny(obj, address, static_cast<double>(cur + static_cast<uint8_t>(value)));
             break;
         }
         case FT_WORD:
         {
-            int16_t cur = static_cast<int16_t>(mem.getAny(obj, address));
+            auto cur = static_cast<int16_t>(mem.getAny(obj, address));
             mem.setAny(obj, address, static_cast<double>(cur + static_cast<int16_t>(value)));
             break;
         }
         case FT_DWORD:
         {
-            int32_t cur = static_cast<int32_t>(mem.getAny(obj, address));
+            auto cur = static_cast<int32_t>(mem.getAny(obj, address));
             mem.setAny(obj, address, static_cast<double>(cur + static_cast<int32_t>(value)));
             break;
         }
         case FT_FLOAT:
         {
-            float cur = static_cast<float>(mem.getAny(obj, address));
+            auto cur = static_cast<float>(mem.getAny(obj, address));
             mem.setAny(obj, address, static_cast<double>(cur + static_cast<float>(value)));
             break;
         }
@@ -1243,25 +1242,25 @@ static void MemAssignType(T &mem, U *obj, int address, double value, OPTYPE oper
         {
         case FT_BYTE:
         {
-            uint8_t cur = static_cast<uint8_t>(mem.getAny(obj, address));
+            auto cur = static_cast<uint8_t>(mem.getAny(obj, address));
             mem.setAny(obj, address, static_cast<double>(cur - static_cast<uint8_t>(value)));
             break;
         }
         case FT_WORD:
         {
-            int16_t cur = static_cast<int16_t>(mem.getAny(obj, address));
+            auto cur = static_cast<int16_t>(mem.getAny(obj, address));
             mem.setAny(obj, address, static_cast<double>(cur - static_cast<int16_t>(value)));
             break;
         }
         case FT_DWORD:
         {
-            int32_t cur = static_cast<int32_t>(mem.getAny(obj, address));
+            auto cur = static_cast<int32_t>(mem.getAny(obj, address));
             mem.setAny(obj, address, static_cast<double>(cur - static_cast<int32_t>(value)));
             break;
         }
         case FT_FLOAT:
         {
-            float cur = static_cast<float>(mem.getAny(obj, address));
+            auto cur = static_cast<float>(mem.getAny(obj, address));
             mem.setAny(obj, address, static_cast<double>(cur - static_cast<float>(value)));
             break;
         }
@@ -1280,25 +1279,25 @@ static void MemAssignType(T &mem, U *obj, int address, double value, OPTYPE oper
         {
         case FT_BYTE:
         {
-            uint8_t cur = static_cast<uint8_t>(mem.getAny(obj, address));
+            auto cur = static_cast<uint8_t>(mem.getAny(obj, address));
             mem.setAny(obj, address, static_cast<double>(cur * static_cast<uint8_t>(value)));
             break;
         }
         case FT_WORD:
         {
-            int16_t cur = static_cast<int16_t>(mem.getAny(obj, address));
+            auto cur = static_cast<int16_t>(mem.getAny(obj, address));
             mem.setAny(obj, address, static_cast<double>(cur * static_cast<int16_t>(value)));
             break;
         }
         case FT_DWORD:
         {
-            int32_t cur = static_cast<int32_t>(mem.getAny(obj, address));
+            auto cur = static_cast<int32_t>(mem.getAny(obj, address));
             mem.setAny(obj, address, static_cast<double>(cur * static_cast<int32_t>(value)));
             break;
         }
         case FT_FLOAT:
         {
-            float cur = static_cast<float>(mem.getAny(obj, address));
+            auto cur = static_cast<float>(mem.getAny(obj, address));
             mem.setAny(obj, address, static_cast<double>(cur * static_cast<float>(value)));
             break;
         }
@@ -1317,25 +1316,25 @@ static void MemAssignType(T &mem, U *obj, int address, double value, OPTYPE oper
         {
         case FT_BYTE:
         {
-            uint8_t cur = static_cast<uint8_t>(mem.getAny(obj, address));
+            auto cur = static_cast<uint8_t>(mem.getAny(obj, address));
             mem.setAny(obj, address, static_cast<double>(cur / static_cast<uint8_t>(value)));
             break;
         }
         case FT_WORD:
         {
-            int16_t cur = static_cast<int16_t>(mem.getAny(obj, address));
+            auto cur = static_cast<int16_t>(mem.getAny(obj, address));
             mem.setAny(obj, address, static_cast<double>(cur / static_cast<int16_t>(value)));
             break;
         }
         case FT_DWORD:
         {
-            int32_t cur = static_cast<int32_t>(mem.getAny(obj, address));
+            auto cur = static_cast<int32_t>(mem.getAny(obj, address));
             mem.setAny(obj, address, static_cast<double>(cur / static_cast<int32_t>(value)));
             break;
         }
         case FT_FLOAT:
         {
-            float cur = static_cast<float>(mem.getAny(obj, address));
+            auto cur = static_cast<float>(mem.getAny(obj, address));
             mem.setAny(obj, address, static_cast<double>(cur / static_cast<float>(value)));
             break;
         }
@@ -1354,19 +1353,19 @@ static void MemAssignType(T &mem, U *obj, int address, double value, OPTYPE oper
         {
         case FT_BYTE:
         {
-            uint8_t cur = static_cast<uint8_t>(mem.getAny(obj, address));
+            auto cur = static_cast<uint8_t>(mem.getAny(obj, address));
             mem.setAny(obj, address, static_cast<double>(cur ^ static_cast<uint8_t>(value)));
             break;
         }
         case FT_WORD:
         {
-            int16_t cur = static_cast<int16_t>(mem.getAny(obj, address));
+            auto cur = static_cast<int16_t>(mem.getAny(obj, address));
             mem.setAny(obj, address, static_cast<double>(cur ^ static_cast<int16_t>(value)));
             break;
         }
         case FT_DWORD:
         {
-            int32_t cur = static_cast<int32_t>(mem.getAny(obj, address));
+            auto cur = static_cast<int32_t>(mem.getAny(obj, address));
             mem.setAny(obj, address, static_cast<double>(cur ^ static_cast<int32_t>(value)));
             break;
         }

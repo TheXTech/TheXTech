@@ -510,7 +510,7 @@ void StartMusic(int A, int fadeInMs)
             pLogDebug("Starting world music [%s]", mus.c_str());
             PlayMusic(mus, fadeInMs);
         }
-        musicName = mus;
+        musicName = std::move(mus);
     }
     else if(A == -1) // P switch music
     {
@@ -564,7 +564,7 @@ void StartMusic(int A, int fadeInMs)
             pLogDebug("Starting level music [%s]", mus.c_str());
             PlayMusic(mus);
         }
-        musicName = mus;
+        musicName = std::move(mus);
     }
 
     musicPlaying = true;
@@ -644,10 +644,10 @@ static void loadMusicIni(const std::string &root, const std::string &path, bool 
         musicSetup.read("level-custom-music-id", g_customLvlMusicId, 0);
         musicSetup.read("world-custom-music-id", g_customWldMusicId, 0);
         musicSetup.endGroup();
+
+        UpdateLoad();
     }
 
-    if(!isLoadingCustom)
-        UpdateLoad();
     for(unsigned int i = 1; i <= g_totalMusicLevel; ++i)
     {
         std::string alias = fmt::format_ne("music{0}", i);

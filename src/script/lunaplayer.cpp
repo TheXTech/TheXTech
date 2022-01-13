@@ -113,7 +113,7 @@ void PlayerF::InfiniteFlying(int player)
 {
     Player_t *demo = Get(player);
 
-    if(demo != 0)
+    if(demo)
         demo->FlyCount = 50;
 }
 
@@ -132,10 +132,10 @@ LunaRect PlayerF::GetScreenPosition(Player_t *player)
     //    double cam_r = cam_x + 800;
 
     LunaRect ret_rect;
-    ret_rect.left = (player->Location.X - cam_x);
-    ret_rect.top = (player->Location.Y - cam_y);
-    ret_rect.right = ret_rect.left + player->Location.Width;
-    ret_rect.bottom = ret_rect.top + player->Location.Height;
+    ret_rect.left = Maths::iRound(player->Location.X - cam_x);
+    ret_rect.top = Maths::iRound(player->Location.Y - cam_y);
+    ret_rect.right = Maths::iRound(ret_rect.left + player->Location.Width);
+    ret_rect.bottom = Maths::iRound(ret_rect.top + player->Location.Height);
     return ret_rect;
 }
 

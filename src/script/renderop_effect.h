@@ -46,7 +46,7 @@ enum FLIP_TYPE
     FLIP_TYPE_XY = 0x3,
 };
 
-class RenderEffectOp : public RenderOp
+class RenderEffectOp final : public RenderOp
 {
 public:
     RenderEffectOp();
@@ -59,7 +59,7 @@ public:
         flip_type = FLIP_TYPE_NONE;
     }
 
-    void Draw(Renderer *renderer);
+    void Draw(Renderer *renderer) override;
 
     // Effects //
     void ScreenGlow(Renderer *renderer);

@@ -301,7 +301,7 @@ Autocode *AutocodeManager::GetEventByRef(const std::string &ref_name)
 }
 
 // DELETE EVENT -- Expires any command that matches the given name
-void AutocodeManager::DeleteEvent(std::string ref_name)
+void AutocodeManager::DeleteEvent(const std::string &ref_name)
 {
     if(ref_name.length() > 0)
     {
@@ -419,7 +419,7 @@ Autocode *AutocodeManager::FindMatching(int section, const std::string &soughtst
 }
 
 // VAR OPERATION -- Do something to a variable in the user variable bank
-bool AutocodeManager::VarOperation(std::string var_name, double value, OPTYPE operation_to_do)
+bool AutocodeManager::VarOperation(const std::string &var_name, double value, OPTYPE operation_to_do)
 {
     if(var_name.length() > 0)
     {
@@ -460,13 +460,13 @@ bool AutocodeManager::VarOperation(std::string var_name, double value, OPTYPE op
 }
 
 // VAR EXISTS
-bool AutocodeManager::VarExists(std::string var_name)
+bool AutocodeManager::VarExists(const std::string &var_name)
 {
     return m_UserVars.find(var_name) == m_UserVars.end() ? false : true;
 }
 
 // GET VAR
-double AutocodeManager::GetVar(std::string var_name)
+double AutocodeManager::GetVar(const std::string &var_name)
 {
     if(!VarExists(var_name))
         return 0;

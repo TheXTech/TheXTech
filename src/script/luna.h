@@ -24,6 +24,15 @@
 
 #include <string>
 
+struct SMBXHUDSettings
+{
+    bool              skip = false; // Skip the whole HUD drawing
+    // WORLD_HUD_CONTROL overworldHudState;
+    // bool              skipStarCount;
+};
+
+extern SMBXHUDSettings gSMBXHUDSettings;
+
 extern bool gLunaEnabledGlobally;
 extern bool gLunaEnabled;
 extern bool gShowDemoCounter;

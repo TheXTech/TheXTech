@@ -25,11 +25,11 @@
 #include <memory>
 #include "renderop.h"
 
-class RenderBitmapOp : public RenderOp
+class RenderBitmapOp final : public RenderOp
 {
 public:
     RenderBitmapOp();
-    void Draw(Renderer* renderer);
+    void Draw(Renderer* renderer) override;
 
     double x = 0.0;				// Absolute screen x position
     double y = 0.0;				// Absolute screen y position

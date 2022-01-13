@@ -25,6 +25,7 @@
 #include "csprite.h"
 #include "globals.h"
 #include "player.h"
+#include "rand.h"
 #include "lunarender.h"
 #include "lunaplayer.h"
 #include "lunacell.h"
@@ -41,7 +42,7 @@ void Activate(int code, CSprite *spr)
     {
         std::list<SpriteComponent *> complist;
         gSpriteMan.GetComponents(code, &complist);
-        while(complist.empty() == false)
+        while(!complist.empty())
         {
             spr->AddBehaviorComponent(*complist.front());
             complist.pop_front();
@@ -69,10 +70,10 @@ void SpriteFunc::WaitForPlayer(CSprite *me, SpriteComponent *obj)
     Player_t *demo = PlayerF::Get(1);
     if(demo)
     {
-        FIELDTYPE ftype = (FIELDTYPE)SDL_atoi(obj->data5.c_str());
+        auto ftype = (FIELDTYPE)SDL_atoi(obj->data5.c_str());
 //        uint8_t *ptr = (uint8_t *)demo;
 //        ptr += (int)obj->data1; // offset
-        bool triggered = CheckMem(demo, (int)obj->data1, (int)obj->data2, (COMPARETYPE)(int)obj->data3, ftype);
+        bool triggered = CheckMem(demo, (int)obj->data1, (double)(int)obj->data2, (COMPARETYPE)(int)obj->data3, ftype);
         if(triggered)
         {
             //TODO: FINISH IT
@@ -175,9 +176,12 @@ void SpriteFunc::IfLunaVar(CSprite *me, SpriteComponent *obj)
 // RANDOM COMPONENT
 void SpriteFunc::RandomComponent(CSprite *me, SpriteComponent *obj)
 {
-    int choice = rand() % 4;
+    int choice = iRand2(4);
+
     switch(choice)
     {
+    default:
+        break;
     case 0:
         Activate((int)obj->data1, me);
         break;
@@ -201,7 +205,7 @@ void SpriteFunc::RandomComponentRange(CSprite *me, SpriteComponent *obj)
     if(val1 < val2)   // rule out bad values
     {
         int diff = val2 - val1;
-        int choice = rand() % diff;
+        int choice = iRand2(diff);
         Activate(val1 + choice, me);
     }
 }
@@ -376,13 +380,12 @@ void SpriteFunc::BumpMove(CSprite *me, SpriteComponent *obj)
 
     // Get all blocks being collided with into collide_list
     std::list<CellObj> collide_list;
-    for(std::list<CellObj >::const_iterator it = nearby_list.begin(); it != nearby_list.end(); it++)
+    for(const auto cellobj : nearby_list)
     {
-        CellObj cellobj = *it;
         bool collide = false;
         if(cellobj.Type == CLOBJ_SMBXBLOCK)
         {
-            Block_t *block = (Block_t *)cellobj.pObj;
+            auto *block = (Block_t *)cellobj.pObj;
             if(!block->Invis && !block->Hidden)
             {
                 collide = me->m_Hitbox.Test((int)block->Location.X, (int)block->Location.Y, (int)block->Location.Width, (int)block->Location.Height);
@@ -393,17 +396,16 @@ void SpriteFunc::BumpMove(CSprite *me, SpriteComponent *obj)
     }
 
     // Sort the blocks by distance to find the best one
-    gCellMan.SortByNearest(&collide_list, me->m_Hitbox.CenterX(), me->m_Hitbox.CenterY());
+    CellManager::SortByNearest(&collide_list, me->m_Hitbox.CenterX(), me->m_Hitbox.CenterY());
 
     // Force sprite out of block if colliding with block, and reverse speed according to energy_loss_mod
-    if(collide_list.size() > 0)
+    if(!collide_list.empty())
     {
-        for(std::list<CellObj >::const_iterator it = collide_list.begin(); it != collide_list.end(); it++)
+        for(const auto cellobj : collide_list)
         {
-            CellObj cellobj = *it;
             if(cellobj.Type == CLOBJ_SMBXBLOCK)
             {
-                Block_t *block = (Block_t *)cellobj.pObj;
+                auto *block = (Block_t *)cellobj.pObj;
                 if(!block->Invis && !block->Hidden
                    && me->m_Hitbox.Test((int)block->Location.X, (int)block->Location.Y, (int)block->Location.Width, (int)block->Location.Height))
                 {
@@ -412,8 +414,8 @@ void SpriteFunc::BumpMove(CSprite *me, SpriteComponent *obj)
                     double sprite_top = me->m_Hitbox.CalcTop();
                     double sprite_left = me->m_Hitbox.CalcLeft();
 
-                    if(false)   // debugging
-                    {
+//                    if(false)   // debugging
+//                    {
                         //double camtop = -vScreenY[1];
                         //double camleft = -vScreenX[1];
                         //debug_rect.color = COLOR;
@@ -424,7 +426,7 @@ void SpriteFunc::BumpMove(CSprite *me, SpriteComponent *obj)
                         //debug_rect.x2 = (block->XPos + block->W) - camleft;
                         //debug_rect.y2 = (block->YPos + block->H) - camtop;
                         //debug_rect.Draw(&Renderer::Get());
-                    }
+//                    }
 
                     if(me->m_CollisionCode == -1)   // default solid collision
                     {
@@ -485,16 +487,18 @@ void SpriteFunc::CrashMove(CSprite *me, SpriteComponent *obj)
                                   me->m_Hitbox.CalcTop(),
                                   (int)me->m_Hitbox.W,
                                   (int)me->m_Hitbox.H);
-    if(collide_list.size() > 0)
+    if(!collide_list.empty())
     {
-        for(std::list<CellObj >::const_iterator it = collide_list.begin(); it != collide_list.end(); it++)
+        for(const auto cellobj : collide_list)
         {
-            CellObj cellobj = *it;
             if(cellobj.Type == CLOBJ_SMBXBLOCK)
             {
-                Block_t *block = (Block_t *)cellobj.pObj;
-                if(!block->Invis && !block->Hidden
-                   && me->m_Hitbox.Test((int)block->Location.X, (int)block->Location.Y, (int)block->Location.Width, (int)block->Location.Height))
+                auto *block = (Block_t *)cellobj.pObj;
+                if(!block->Invis && !block->Hidden &&
+                    me->m_Hitbox.Test((int)block->Location.X,
+                                      (int)block->Location.Y,
+                                      (int)block->Location.Width,
+                                      (int)block->Location.Height))
                     me->Die();
             }
         }
@@ -546,7 +550,7 @@ void SpriteFunc::TeleportNearPlayer(CSprite *me, SpriteComponent *obj)
     {
         double cx = demo->Location.X;
         double cy = demo->Location.Y;
-        double phase = rand() % 360;
+        double phase = iRand2(360);
         double xoff = sin(phase) * obj->data1;
         double yoff = cos(phase) * obj->data1;
         me->m_Xpos = cx + xoff;
@@ -715,9 +719,9 @@ void SpriteFunc::SpriteDebug(CSprite *me, SpriteComponent *obj)
     Renderer::Get().DebugPrint("XSPD - ", me->m_Xspd);
     Renderer::Get().DebugPrint("YSPD - ", me->m_Yspd);
     Renderer::Get().DebugPrint("FRAME - ", me->m_AnimationFrame);
-    Renderer::Get().DebugPrint("VISIBLE - ", me->m_Visible);
-    Renderer::Get().DebugPrint("CVARS - ", me->m_CustomVars.size());
-    Renderer::Get().DebugPrint("BEHAVIORS - ", me->m_BehavComponents.size());
+    Renderer::Get().DebugPrint("VISIBLE - ", (me->m_Visible ? 1 : 0));
+    Renderer::Get().DebugPrint("CVARS - ", (uint32_t)me->m_CustomVars.size());
+    Renderer::Get().DebugPrint("BEHAVIORS - ", (uint32_t)me->m_BehavComponents.size());
 }
 
 
@@ -736,10 +740,11 @@ void SpriteFunc::StaticDraw(CSprite *me)
             op->m_FramesLeft = 1;
             op->x = me->m_Xpos + me->m_GfxXOffset;
             op->y = me->m_Ypos + me->m_GfxYOffset;
-            op->sx = me->m_GfxRects[me->m_AnimationFrame].left;
-            op->sy = me->m_GfxRects[me->m_AnimationFrame].top;
-            op->sw = me->m_GfxRects[me->m_AnimationFrame].right;
-            op->sh = me->m_GfxRects[me->m_AnimationFrame].bottom;
+            auto &r = me->m_GfxRects[me->m_AnimationFrame];
+            op->sx = r.left;
+            op->sy = r.top;
+            op->sw = r.right;
+            op->sh = r.bottom;
             if(me->m_directImg)
                 op->direct_img = me->m_directImg;
             else

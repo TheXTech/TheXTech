@@ -53,16 +53,16 @@ struct AutocodeManager
     void Clear(bool clear_global_codes);
     void ForceExpire(int section);
     void ClearExpired();
-    void DeleteEvent(std::string event_reference_name);     // Look up event with given name and expire it
+    void DeleteEvent(const std::string &event_reference_name);     // Look up event with given name and expire it
     void DoEvents(bool init);
     void ActivateCustomEvents(int new_section, int eventcode);
     Autocode *GetEventByRef(const std::string &event_reference_name);   // Return ptr to event with the given ref, or NULL if it fails
     Autocode *FindMatching(int section, const std::string &string);
 
     // Variable bank funcs
-    double GetVar(std::string var_name);        // returns 0 if var doesn't exist in bank
-    bool VarExists(std::string var_name);
-    bool VarOperation(std::string var_name, double value, OPTYPE operation_to_do);
+    double GetVar(const std::string &var_name);        // returns 0 if var doesn't exist in bank
+    bool VarExists(const std::string &var_name);
+    bool VarOperation(const std::string &var_name, double value, OPTYPE operation_to_do);
 
     // Members
     bool                    m_Enabled = false;          // Whether or not individual level scripts enabled
