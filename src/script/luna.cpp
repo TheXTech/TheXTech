@@ -7,6 +7,7 @@
 #include "lunacell.h"
 #include "lunaplayer.h"
 #include "lunacounter.h"
+#include "compat.h"
 
 #include "globals.h"
 
@@ -161,8 +162,9 @@ void lunaLoad()
     lunaReset();
 
     bool isGame = !GameMenu && !GameOutro && !BattleMode && !LevelEditor && !TestLevel;
+    bool dcAllow = (gEnableDemoCounter || g_compatibility.demos_counter_enable);
 
-    if(gEnableDemoCounter && isGame)
+    if(dcAllow && isGame)
         gDeathCounter.init();
 
     if(gLunaEnabledGlobally && gLunaEnabled)
@@ -182,12 +184,14 @@ void lunaLoad()
         gAutoMan.m_Hearts = 2;
     }
 
-    if(gEnableDemoCounter && isGame)
+    if(dcAllow && isGame)
         gDeathCounter.Recount();
 }
 
 void lunaLoop()
 {
+    bool dcAllow = (gEnableDemoCounter || g_compatibility.demos_counter_enable);
+
     if(gLunaEnabledGlobally)
     {
         // Clean up
@@ -198,7 +202,7 @@ void lunaLoop()
         Input::UpdateInputTasks();
     }
 
-    if(gEnableDemoCounter)
+    if(dcAllow)
         gDeathCounter.UpdateDeaths(true);
 
     if(gLunaEnabledGlobally && gLunaEnabled)
@@ -224,7 +228,8 @@ void lunaLoop()
 
 void lunaRender()
 {
-    if(gEnableDemoCounter && gShowDemoCounter)
+    bool dcAllow = (gEnableDemoCounter || g_compatibility.demos_counter_enable);
+    if(dcAllow && gShowDemoCounter)
         gDeathCounter.Draw();
 
     if(gLunaEnabled && gLunaEnabledGlobally)

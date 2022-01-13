@@ -83,6 +83,7 @@ static void compatInit(Compatibility_t &c)
     c.fix_npc_activation_event_loop_bug = true;
     c.sfx_player_grow_with_got_item = Compatibility_t::SPGWGI_UNSPECIFIED;
     // 1.3.6
+    c.demos_counter_enable = false;
 
 
     if(s_compatLevel >= COMPAT_SMBX2) // Make sure that bugs were same as on SMBX2 Beta 4 on this moment
@@ -167,6 +168,12 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
             {"false", Compatibility_t::SPGWGI_DISABLE}
         };
         compat.readEnum("sfx-player-grow-with-got-item", c.sfx_player_grow_with_got_item, c.sfx_player_grow_with_got_item, spgwgi);
+    }
+    compat.endGroup();
+
+    compat.beginGroup("deaths-counter");
+    {
+        compat.read("enabled", c.demos_counter_enable, c.demos_counter_enable);
     }
     compat.endGroup();
 
