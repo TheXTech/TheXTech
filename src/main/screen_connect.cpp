@@ -62,6 +62,7 @@ void MainMenu_Start(int minPlayers)
         s_inputReady[i] = false;
     }
     s_context = Context::MainMenu;
+    Logic();
 }
 
 void Reconnect_Start()
@@ -77,6 +78,7 @@ void Reconnect_Start()
         s_inputReady[i] = false;
     }
     s_context = Context::Reconnect;
+    Logic();
 }
 
 void DropAdd_Start()
@@ -93,6 +95,7 @@ void DropAdd_Start()
         g_charSelect[i] = Player[i+1].Character;
     }
     s_context = Context::DropAdd;
+    Logic();
 }
 
 // void menuPlayerSelect_Resume()
