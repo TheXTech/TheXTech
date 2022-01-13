@@ -806,6 +806,7 @@ void InputMethodType_Keyboard::UpdateControlsPost()
     SharedControls.MenuLeft |= leftPressed;
     SharedControls.MenuRight |= rightPressed;
     SharedControls.MenuDo |= (returnPressed && !altPressed) || spacePressed;
+    SharedControls.MenuBack |= backPressed;
     SharedControls.MenuBack |= (escPressed && !altPressed);
 }
 
