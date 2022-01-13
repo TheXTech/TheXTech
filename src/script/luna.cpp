@@ -23,7 +23,6 @@ std::string gDemoCounterTitle = "DEMOS";
 static void (*levelCodeRun)() = nullptr;
 
 
-#include "levels/dlltestlvlCode.h"
 #include "levels/Docopoper-Calleoca.h"
 #include "levels/Docopoper-AbstractAssault.h"
 #include "levels/Docopoper-TheFloorisLava.h"
@@ -35,14 +34,6 @@ static void (*levelCodeRun)() = nullptr;
 static const std::unordered_map<std::string, std::function<void()>> s_levelInit =
 {
 
-// Example init block
-{
-    "dlltest.lvl",
-    []()->void
-    {
-        levelCodeRun = dlltestlvlCode;
-    }
-},
 // Abtract Assault init block
 {
     "Docopoper-AbstractAssault.lvl",

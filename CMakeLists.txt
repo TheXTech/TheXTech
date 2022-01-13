@@ -344,7 +344,6 @@ set(THEXTECH_SRC
     src/script/renderop_effect.cpp
     src/script/renderop_string.cpp
     src/script/mememu.cpp
-    src/script/levels/dlltestlvlCode.cpp
     src/script/levels/Docopoper-AbstractAssault.cpp
     src/script/levels/Docopoper-Calleoca.cpp
     src/script/levels/Docopoper-TheFloorisLava.cpp
