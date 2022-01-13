@@ -98,16 +98,26 @@ void DropAdd_Start()
     Logic();
 }
 
-// void menuPlayerSelect_Resume()
-// {
-//     for(int i = 0; i < maxLocalPlayers; i++)
-//     {
-//         s_inputReady[i] = false;
-//     }
-//     s_lastNumInputs = Controls::g_InputMethods.size();
-// }
+// find the first player that isn't done (receives MenuControls)
+int GetMenuPlayer()
+{
+    int n = Controls::g_InputMethods.size();
+    if(n < s_minPlayers)
+        n = s_minPlayers;
+    if(n > maxLocalPlayers)
+        n = maxLocalPlayers;
 
-bool CharAvailable(int c)
+    // What is the first player that is not done?
+    int menuPlayer;
+    for(menuPlayer = 0; menuPlayer < n; menuPlayer++)
+    {
+        if(menuPlayer == (int)Controls::g_InputMethods.size())
+            break;
+        if(s_playerState[menuPlayer] != PlayerState::StartGame)
+            break;
+    }
+    return menuPlayer;
+}
 {
     if(c < 1 || c > 5)
         return false;
@@ -126,19 +136,8 @@ bool CharAvailable(int c)
 
 bool CheckDone()
 {
-    int n = Controls::g_InputMethods.size();
-    if(n < s_minPlayers)
-        n = s_minPlayers;
-    if(n > maxLocalPlayers)
-        n = maxLocalPlayers;
-
     // What is the first player that is not done?
-    int menuPlayer;
-    for(menuPlayer = 0; menuPlayer < n; menuPlayer++)
-    {
-        if(s_playerState[menuPlayer] != PlayerState::StartGame)
-            break;
-    }
+    int menuPlayer = GetMenuPlayer();
 
     if(menuPlayer >= s_minPlayers && (int)Controls::g_InputMethods.size() >= s_minPlayers
         && (menuPlayer == (int)Controls::g_InputMethods.size() || menuPlayer == maxLocalPlayers))
@@ -888,12 +887,7 @@ int Mouse_Render(bool mouse, bool render)
         n = maxLocalPlayers;
 
     // What is the first player that is not done?
-    int menuPlayer;
-    for(menuPlayer = 0; menuPlayer < n; menuPlayer++)
-    {
-        if(s_playerState[menuPlayer] != PlayerState::StartGame)
-            break;
-    }
+    int menuPlayer = GetMenuPlayer();
 
     /*--------------------*\
     || Get screen pos     ||
@@ -1035,14 +1029,7 @@ int Logic()
     }
 
     // What is the first player that is not done?
-    int menuPlayer;
-    for(menuPlayer = 0; menuPlayer < maxLocalPlayers; menuPlayer++)
-    {
-        if(menuPlayer == (int)Controls::g_InputMethods.size())
-            break;
-        if(s_playerState[menuPlayer] != PlayerState::StartGame)
-            break;
-    }
+    int menuPlayer = GetMenuPlayer();
 
     for(int p = 0; p < maxLocalPlayers; p++)
     {
