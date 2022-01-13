@@ -73,7 +73,7 @@ void BlocksF::HideAll(int type)
 bool BlocksF::IsPlayerTouchingType(int type, int sought, Player_t *demo)
 {
     //    Block* blocks = Blocks::GetBase();
-    Block_t *block = 0;
+    Block_t *block = nullptr;
     double playerX = demo->Location.X - 0.20;
     double playerY = demo->Location.Y - 0.20;
     double playerX2 = demo->Location.X + demo->Location.Width + 0.20;

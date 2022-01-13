@@ -43,6 +43,9 @@ void LevelF::PushSectionBoundary(int section, int which_boundary_UDLR, double pu
     case 3:     // R
         boundarray.Width += push_val;
         break;
+
+    default:
+        break;
     }
 }
 
@@ -63,20 +66,16 @@ double LevelF::GetBoundary(int section, int which_boundary_UDLR)
     {
     case 0:     // U
         return boundarray.Y;
-        break;
-
     case 1:     // D
         return boundarray.Height;
-        break;
-
     case 2:     // L
         return boundarray.X;
-        break;
-
     case 3:     // R
         return boundarray.Width;
+    default:
         break;
     }
+
     return 0;
 }
 

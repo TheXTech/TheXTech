@@ -71,19 +71,19 @@ struct CSpriteManager
     CSprite *CopyFromBlueprint(const char *blueprint_name);// Generate new sprite based on blueprint
 
     void RunSprites();
-    int CountSprites()
+    int CountSprites() const
     {
-        return m_SpriteList.size();
+        return (int)m_SpriteList.size();
     }
 
-    int CountBlueprints()
+    int CountBlueprints() const
     {
-        return m_SpriteBlueprints.size();
+        return (int)m_SpriteBlueprints.size();
     }
 
-    int CountComponents()
+    int CountComponents() const
     {
-        return m_ComponentList.size();
+        return (int)m_ComponentList.size();
     }
 
     void ClearInvalidSprites(); // Don't call while iterating

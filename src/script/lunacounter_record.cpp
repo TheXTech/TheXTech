@@ -24,18 +24,18 @@
 void DeathRecord::Save(FILE *openfile)
 {
     // Write character count
-    uint32_t tempint = (uint32_t)LevelName.size();
+    auto tempint = (uint32_t)m_levelName.size();
 
     tempint = SDL_SwapLE32(tempint);
     std::fwrite(&tempint, 1, sizeof(uint32_t), openfile);
 
     // Write string data
     int16_t nullt = 0;
-    std::fwrite(LevelName.data(), 1, tempint, openfile);
+    std::fwrite(m_levelName.data(), 1, tempint, openfile);
     std::fwrite(&nullt, 1, sizeof(int16_t), openfile);
 
     // Write death count
-    int32_t tempsint = SDL_SwapLE32(Deaths);
+    int32_t tempsint = SDL_SwapLE32(m_deaths);
     std::fwrite(&tempsint, 1, sizeof(int32_t), openfile);
 }
 
@@ -61,12 +61,12 @@ void DeathRecord::Load(FILE *openfile)
     // Read string data
     std::fread(buf, 1, length, openfile);
     if(skip > 0)
-    std::fseek(openfile, skip, SEEK_CUR);
+        std::fseek(openfile, skip, SEEK_CUR);
 
-    LevelName = std::string(buf);
+    m_levelName = std::string(buf);
     std::fseek(openfile, 2, SEEK_CUR);
 
     // Read death count
     std::fread(&tempsint, 1, sizeof(int32_t), openfile);
-    Deaths = SDL_SwapLE32(tempsint);
+    m_deaths = SDL_SwapLE32(tempsint);
 }

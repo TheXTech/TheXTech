@@ -20,7 +20,6 @@
 
 #include <SDL2/SDL_endian.h>
 #include <Utils/files.h>
-#include <AppPath/app_path.h>
 #include <Logger/logger.h>
 #include <fmt_format_ne.h>
 
@@ -38,7 +37,7 @@
 DeathCounter gDeathCounter;
 
 // CTOR
-DeathCounter::DeathCounter()
+DeathCounter::DeathCounter() noexcept
 {
     mStatFileOK = false;
     mEnabled = true;
@@ -153,7 +152,7 @@ void DeathCounter::UpdateDeaths(bool write_save)
     std::wstring debuginfo(L"UpdateDeaths");
 
     Player_t *demo = PlayerF::Get(1);
-    if(demo == 0)
+    if(!demo)
         return;
 
     // For now, we'll assume the player died if player 1's death timer is at exactly 50 frames
@@ -171,22 +170,22 @@ void DeathCounter::UpdateDeaths(bool write_save)
 // ADD DEATH
 void DeathCounter::AddDeath(const std::string &lvlname, int amount)
 {
-    if(mEnabled == false)
+    if(!mEnabled)
         return;
 
-    for(auto iter = mDeathRecords.begin(), end = mDeathRecords.end(); iter != end; ++iter)
+    for(auto &iter : mDeathRecords)
     {
-        if((*iter).LevelName.compare(lvlname) == 0)   // On first name match...
+        if(iter.m_levelName == lvlname)   // On first name match...
         {
-            (*iter).Deaths += amount;      // Inc death count
+            iter.m_deaths += amount;      // Inc death count
             return;                        // and exit
         }
     }
 
     // if no match, create new death record and add it to list
     DeathRecord newrec;
-    newrec.LevelName = lvlname;
-    newrec.Deaths = amount;
+    newrec.m_levelName = lvlname;
+    newrec.m_deaths = amount;
     mDeathRecords.push_back(newrec);
 }
 
@@ -251,12 +250,11 @@ void DeathCounter::WriteRecords(FILE *statsfile)
     std::fwrite(&reccount, 1, sizeof(reccount), statsfile);
 
     // Write each record, if any exist
-    if(mDeathRecords.size() >= 1)
+    if(!mDeathRecords.empty())
     {
-        for(auto iter = mDeathRecords.begin(), end = mDeathRecords.end(); iter != end; ++iter)
-            (*iter).Save(statsfile);
+        for(auto &mDeathRecord : mDeathRecords)
+            mDeathRecord.Save(statsfile);
     }
-
 }
 
 // TRY SAVE - Externally callable, safe auto-save function
@@ -294,16 +292,17 @@ void DeathCounter::ClearRecords()
 // RECOUNT - Recount and relist the death count for the current level and the total deathcount
 void DeathCounter::Recount()
 {
-    if(!mEnabled) return;
+    if(!mEnabled)
+        return;
 
     int total = 0;
     mCurLevelDeaths = 0;
 
-    for(auto iter = mDeathRecords.begin(), end = mDeathRecords.end(); iter != end; ++iter)
+    for(const auto &iter : mDeathRecords)
     {
-        total += (*iter).Deaths;
-        if((*iter).LevelName.compare(FileNameFull) == 0)
-            mCurLevelDeaths = (*iter).Deaths;
+        total += iter.m_deaths;
+        if(iter.m_levelName == FileNameFull)
+            mCurLevelDeaths = iter.m_deaths;
     }
 
     mCurTotalDeaths = total;
@@ -311,14 +310,14 @@ void DeathCounter::Recount()
 }
 
 // DRAW - Print the death counter in its current state
-void DeathCounter::Draw()
+void DeathCounter::Draw() const
 {
     if(!mEnabled)
         return;
 
     // Format string to print
     std::string printstr = fmt::format_ne("{0} / {1}", mCurLevelDeaths, mCurTotalDeaths);
-    float minusoffset = (float)(123 - (printstr.size() * 8));
+    auto minusoffset = (float)(123 - (printstr.size() * 8));
 
     XRender::offsetViewportIgnore(true);
     // Print to screen in upper left
@@ -328,18 +327,18 @@ void DeathCounter::Draw()
 }
 
 // PRINT DEBUG - Prints all death records to the screen
-void DeathCounter::PrintDebug()
+void DeathCounter::PrintDebug() const
 {
     if(!gLunaEnabled || !gLunaEnabledGlobally)
         return;
 
-    if(mDeathRecords.size() >= 1)
+    if(!mDeathRecords.empty())
     {
         float y = 300;
-        for(auto iter = mDeathRecords.begin(), end = mDeathRecords.end(); iter != end; ++iter)
+        for(const auto &iter : mDeathRecords)
         {
-            Renderer::Get().AddOp(new RenderStringOp(std::to_string((*iter).Deaths), 2, 50, y));
-            Renderer::Get().AddOp(new RenderStringOp((*iter).LevelName, 2, 80, y));
+            Renderer::Get().AddOp(new RenderStringOp(std::to_string(iter.m_deaths), 2, 50, y));
+            Renderer::Get().AddOp(new RenderStringOp(iter.m_levelName, 2, 80, y));
             y += 30;
         }
     }

@@ -39,26 +39,26 @@ enum CELL_OBJ_TYPE
 
 struct CellObj   // Objects that can be contained in a Cell, such as block/NPC references
 {
-    CELL_OBJ_TYPE Type;
-    void *pObj;
+    CELL_OBJ_TYPE Type = CLOBJ_INVALID;
+    void *pObj = nullptr;
 };
 
 
 struct Cell   // Cells that hold references to objects and are singly linked
 {
-    Cell(int _x, int _y);
-    int x, y;
-    Cell *pNext;
+    Cell(int _x, int _y) noexcept;
+    int x = 0, y = 0;
+    Cell *pNext = nullptr;
     std::list<CellObj> ContainedObjs;
 
-    int CountDownward(int *oObjCount);  // Return count of downard linked cells, including this one as head + optionally count of total objs
+    int CountDownward(int *oObjCount) const;  // Return count of downard linked cells, including this one as head + optionally count of total objs
     bool AddUnique(CellObj obj);        // Add an object to this cell ONLY if it doesn't already exist in it
 };
 
 
 struct Bucket   // Map buckets that hold (sometimes multiple) cells
 {
-    Cell *ContainedCellsHead;
+    Cell *ContainedCellsHead = nullptr;
 };
 
 
@@ -66,7 +66,7 @@ struct Bucket   // Map buckets that hold (sometimes multiple) cells
 class CellManager
 {
 public:
-    CellManager();
+    CellManager() noexcept;
 
     /// Functions ///
     void Reset();                                   // Re-initialize cell manager
@@ -75,7 +75,7 @@ public:
 
     void CountAll(int *oFilledBuckets, int *oCellCount, int *oObjReferences);
 
-    int ComputeHashBucketIndex(int x, int y);               // Get index into bucket array the given coords would have
+    static int ComputeHashBucketIndex(int x, int y);               // Get index into bucket array the given coords would have
     void ScanLevel(bool update_blocks);                     // Rebuild cell grid, scan in objs of the specified types
     void AddObj(void *pObj, CELL_OBJ_TYPE);                 // Add object to map at coords, creating new cell if necessary
 
@@ -88,7 +88,7 @@ public:
     static void SortByNearest(std::list<CellObj> *objlist, double cx, double cy); // Sort a list of cell objects by which is closest to cx/cy
 
     /// Members ///
-    Bucket m_BucketArray[BUCKET_COUNT];
+    Bucket m_BucketArray[BUCKET_COUNT] = {};
 };
 
 inline double SnapToGrid(double coord, double span);

@@ -32,29 +32,33 @@ CellManager  gCellMan;
 
 
 // CELL :: COUNT
-Cell::Cell(int _x, int _y)
+Cell::Cell(int _x, int _y) noexcept
 {
     x = _x;
     y = _y;
-    pNext = 0;
+    pNext = nullptr;
 }
 
-int Cell::CountDownward(int *oObjCounter)
+int Cell::CountDownward(int *oObjCounter) const
 {
     int count = 1;
     int objcount = 0;
     Cell *downward = pNext;
-    if(oObjCounter != NULL)
-        objcount += ContainedObjs.size();
-    while(downward != NULL)
+
+    if(oObjCounter != nullptr)
+        objcount += (int)ContainedObjs.size();
+
+    while(downward != nullptr)
     {
-        if(oObjCounter != NULL)
-            objcount += downward->ContainedObjs.size();
+        if(oObjCounter != nullptr)
+            objcount += (int)downward->ContainedObjs.size();
         count++;
         downward = downward->pNext;
     }
-    if(oObjCounter != NULL)
+
+    if(oObjCounter != nullptr)
         *oObjCounter = objcount;
+
     return count;
 }
 
@@ -72,7 +76,7 @@ bool Cell::AddUnique(CellObj new_obj)
 }
 
 // CELL MANAGER :: RESET
-CellManager::CellManager()
+CellManager::CellManager() noexcept
 {
     Reset();
 }
@@ -94,21 +98,22 @@ void CellManager::ClearBucket(int bucket_index)
 {
 
     // If there is a cell list head at all...
-    while(m_BucketArray[bucket_index].ContainedCellsHead != NULL)
+    while(m_BucketArray[bucket_index].ContainedCellsHead != nullptr)
     {
         Cell *pNextCell = m_BucketArray[bucket_index].ContainedCellsHead->pNext;
 
         // If head isn't the end of the list, delete head and next elem becomes head of bucket
         // Delete until it does == null
-        while(pNextCell != NULL)
+        while(pNextCell != nullptr)
         {
             delete m_BucketArray[bucket_index].ContainedCellsHead;
             m_BucketArray[bucket_index].ContainedCellsHead = pNextCell;
             pNextCell = m_BucketArray[bucket_index].ContainedCellsHead->pNext;
         }
+
         // Reached end of list, delete it
         delete m_BucketArray[bucket_index].ContainedCellsHead;
-        m_BucketArray[bucket_index].ContainedCellsHead = NULL;
+        m_BucketArray[bucket_index].ContainedCellsHead = nullptr;
     }
 }
 
@@ -119,9 +124,9 @@ void CellManager::CountAll(int *oFilledBuckets, int *oCellCount, int *oObjRefs)
     int cellcount = 0;
     int objcount = 0;
 
-    for(int i = 0; i < BUCKET_COUNT; i++)
+    for(int i = 0; i < BUCKET_COUNT; ++i)
     {
-        if(m_BucketArray[i].ContainedCellsHead != NULL)
+        if(m_BucketArray[i].ContainedCellsHead != nullptr)
         {
             int objtemp = 0;
             fillcount++;
@@ -129,11 +134,14 @@ void CellManager::CountAll(int *oFilledBuckets, int *oCellCount, int *oObjRefs)
             objcount += objtemp;
         }
     }
-    if(oFilledBuckets != NULL)
+
+    if(oFilledBuckets != nullptr)
         *oFilledBuckets = fillcount;
-    if(oCellCount != NULL)
+
+    if(oCellCount != nullptr)
         *oCellCount = cellcount;
-    if(oObjRefs != NULL)
+
+    if(oObjRefs != nullptr)
         *oObjRefs = objcount;
 }
 
@@ -156,12 +164,12 @@ void CellManager::ScanLevel(bool update_blocks)
 
     if(update_blocks)
     {
-        Block_t *cur_block = NULL;
+        Block_t *cur_block = nullptr;
         int ct = numBlock;
         for(int i = 0; i <  ct; i++)
         {
             cur_block = BlocksF::Get(i);
-            if(cur_block != NULL && demo && demo->Section + 1 == ComputeLevelSection((int)cur_block->Location.X, (int)cur_block->Location.Y))
+            if(cur_block != nullptr && demo && demo->Section + 1 == ComputeLevelSection((int)cur_block->Location.X, (int)cur_block->Location.Y))
                 AddObj((void *)cur_block, CLOBJ_SMBXBLOCK);
         }
     }
@@ -174,7 +182,7 @@ void CellManager::AddObj(void *pObj, CELL_OBJ_TYPE type)
     {
     case CLOBJ_SMBXBLOCK:
     {
-        Block_t *cur_block = (Block_t *)pObj;
+        auto *cur_block = (Block_t *)pObj;
         double block_x = cur_block->Location.X;
         double block_y = cur_block->Location.Y;
         double block_xMax = block_x + cur_block->Location.Width;                    // Rightmost block point
@@ -198,12 +206,12 @@ void CellManager::AddObj(void *pObj, CELL_OBJ_TYPE type)
                 int hash_i = ComputeHashBucketIndex((int)snapped_x, (int)snapped_y);
 
                 // If target bucket doesn't contain a cell head, create new one
-                if(m_BucketArray[hash_i].ContainedCellsHead == NULL)
+                if(m_BucketArray[hash_i].ContainedCellsHead == nullptr)
                     m_BucketArray[hash_i].ContainedCellsHead = new Cell((int)snapped_x, (int)snapped_y);
 
                 // If target bucket doesn't contain cell with these coords, create new one and add it to bucket
                 Cell *p_sought_cell = FindCell(hash_i, (int)snapped_x, (int)snapped_y);
-                if(p_sought_cell == NULL)
+                if(p_sought_cell == nullptr)
                 {
                     p_sought_cell = new Cell((int)snapped_x, (int)snapped_y);
                     AddCell(hash_i, p_sought_cell);
@@ -232,20 +240,21 @@ void CellManager::AddObj(void *pObj, CELL_OBJ_TYPE type)
 Cell *CellManager::FindCell(int bucket_index, int ax, int ay)
 {
     Cell *cur_cell = m_BucketArray[bucket_index].ContainedCellsHead;
-    while(cur_cell != NULL)
+    while(cur_cell != nullptr)
     {
         if(cur_cell->x == ax && cur_cell->y == ay)
             return cur_cell;
         cur_cell = cur_cell->pNext;
     }
-    return NULL;
+
+    return nullptr;
 }
 
 // CELL MANAGER :: ADD CELL
 void CellManager::AddCell(int bucket_index, Cell *pcell)
 {
     // Add as head?
-    if(m_BucketArray[bucket_index].ContainedCellsHead == NULL)
+    if(m_BucketArray[bucket_index].ContainedCellsHead == nullptr)
     {
         m_BucketArray[bucket_index].ContainedCellsHead = pcell;
         return;
@@ -253,8 +262,10 @@ void CellManager::AddCell(int bucket_index, Cell *pcell)
     else   // Add to end of list
     {
         Cell *next_cell = m_BucketArray[bucket_index].ContainedCellsHead;
-        while(next_cell->pNext != NULL)
+
+        while(next_cell->pNext != nullptr)
             next_cell = next_cell->pNext;
+
         next_cell->pNext = pcell;
     }
 }
@@ -297,22 +308,24 @@ void CellManager::GetUniqueObjs(std::list<CellObj> *objlist, double x, double y)
     int hash_i = ComputeHashBucketIndex((int)x, (int)y);
     Cell *sought_cell = FindCell(hash_i, (int)x, (int)y);
 
-    if(sought_cell != NULL)
+    if(sought_cell != nullptr)
     {
         bool add = true;
         for(std::list<CellObj >::const_iterator it = sought_cell->ContainedObjs.begin();
             it != sought_cell->ContainedObjs.end(); it++)
         {
             CellObj cellobj = *it;
+
             // Loop over all objs in this cell
-            for(std::list<CellObj>::iterator iter = objlist->begin(), end = objlist->end(); iter != end; ++iter)   // Compare to each passed obj
+            for(auto &iter : *objlist)   // Compare to each passed obj
             {
-                if((*iter).pObj == cellobj.pObj)   // Set to not add if pointing to same obj
+                if(iter.pObj == cellobj.pObj)   // Set to not add if pointing to same obj
                 {
                     add = false;
                     break;
                 }
             }
+
             if(add)
                 objlist->push_back(cellobj);
             add = true;
@@ -334,7 +347,7 @@ void CellManager::SortByNearest(std::list<CellObj> *objlist, double cx, double c
         {
         case CLOBJ_SMBXBLOCK:
         {
-            Block_t *block = (Block_t *)obj.pObj;
+            auto *block = (Block_t *)obj.pObj;
             double block_cx = (block->Location.X + (block->Location.Width / 2));
             double block_cy = (block->Location.Y + (block->Location.Height / 2));
             double x_dist = cx - block_cx;
@@ -373,12 +386,12 @@ void CellManager::SortByNearest(std::list<CellObj> *objlist, double cx, double c
 
         lowest_dist = 9999999;
         extent++;
-        lowest_index = extent;
+        lowest_index = (int)extent;
     }
 
     // Replace stuff in objlist with ordered ones
     objlist->clear();
-    for(int i = objvec.size() - 1; i >= 0; i--)
+    for(int i = (int)objvec.size() - 1; i >= 0; i--)
         objlist->push_front(objvec[i]);
 }
 

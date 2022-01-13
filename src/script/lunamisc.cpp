@@ -25,7 +25,7 @@
 #include <Utils/files.h>
 
 
-void InitIfMissing(std::map<std::string, double> *pMap, std::string sought_key, double init_val)
+void InitIfMissing(std::map<std::string, double> *pMap, const std::string& sought_key, double init_val)
 {
     if(pMap->find(sought_key) == pMap->end())
         (*pMap)[sought_key] = init_val;
@@ -47,8 +47,9 @@ bool FastTestCollision(int L1, int U1, int R1, int D1, int L2, int U2, int R2, i
     if(D1 < U2)
         upcol = false;
 
-    if(rightcol == false || leftcol == false || upcol == false || downcol == false)
+    if(!rightcol || !leftcol || !upcol || !downcol)
         return false;
+
     return true;
 }
 

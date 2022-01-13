@@ -40,7 +40,7 @@
 
 SDL_FORCE_INLINE void toX86Endian(double in_d, uint8_t out[8])
 {
-    uint8_t *in = reinterpret_cast<uint8_t*>(&in_d);
+    auto *in = reinterpret_cast<uint8_t*>(&in_d);
 
 #if defined(THEXTECH_BIG_ENDIAN)
     out[0] = in[7];
@@ -72,9 +72,9 @@ SDL_FORCE_INLINE void toX86Endian(double in_d, uint8_t out[8])
 #endif
 }
 
-SDL_FORCE_INLINE void fromX86Endian(uint8_t in[8], double &out_d)
+SDL_FORCE_INLINE void fromX86Endian(const uint8_t in[8], double &out_d)
 {
-    uint8_t *out = reinterpret_cast<uint8_t*>(&out_d);
+    auto *out = reinterpret_cast<uint8_t*>(&out_d);
 
 #if defined(THEXTECH_BIG_ENDIAN)
     out[0] = in[7];
@@ -108,7 +108,7 @@ SDL_FORCE_INLINE void fromX86Endian(uint8_t in[8], double &out_d)
 
 SDL_FORCE_INLINE void modifyByteX86(double &dst, size_t byte, uint8_t data)
 {
-    uint8_t *in = reinterpret_cast<uint8_t*>(&dst);
+    auto *in = reinterpret_cast<uint8_t*>(&dst);
     SDL_assert(byte < 8);
 
 #if defined(THEXTECH_BIG_ENDIAN)
@@ -123,7 +123,7 @@ SDL_FORCE_INLINE void modifyByteX86(double &dst, size_t byte, uint8_t data)
 
 SDL_FORCE_INLINE uint8_t getByteX86(const double &src, size_t byte)
 {
-    const uint8_t *in = reinterpret_cast<const uint8_t*>(&src);
+    const auto *in = reinterpret_cast<const uint8_t*>(&src);
     SDL_assert(byte < 8);
 #if defined(THEXTECH_BIG_ENDIAN)
     return in[7 - byte];
@@ -249,9 +249,8 @@ public:
                 return static_cast<double>(static_cast<int16_t>(*fres->second));
             case FT_DWORD:
                 return static_cast<double>(static_cast<int32_t>(*fres->second));
-            case FT_FLOAT:
-                return static_cast<double>(*fres->second);
             default:
+            case FT_FLOAT:
             case FT_DFLOAT:
                 return static_cast<double>(*fres->second);
             }
@@ -341,8 +340,6 @@ public:
                 *fres->second = static_cast<float>(static_cast<int32_t>(value));
                 break;
             case FT_FLOAT:
-                *fres->second = static_cast<float>(value);
-                break;
             case FT_DFLOAT:
                 *fres->second = static_cast<float>(value);
                 break;
@@ -448,9 +445,8 @@ public:
                 return static_cast<double>(static_cast<int16_t>(obj->*(fres->second)));
             case FT_DWORD:
                 return static_cast<double>(static_cast<int32_t>(obj->*(fres->second)));
-            case FT_FLOAT:
-                return static_cast<double>(obj->*(fres->second));
             default:
+            case FT_FLOAT:
             case FT_DFLOAT:
                 return static_cast<double>(obj->*(fres->second));
             }
@@ -540,8 +536,6 @@ public:
                 obj->*(fres->second) = static_cast<float>(static_cast<int32_t>(value));
                 break;
             case FT_FLOAT:
-                obj->*(fres->second) = static_cast<float>(value);
-                break;
             case FT_DFLOAT:
                 obj->*(fres->second) = static_cast<float>(value);
                 break;
@@ -997,7 +991,7 @@ static PlayerMemory         s_emuPlayer;
 static NPCMemory            s_emuNPC;
 
 template<typename T, class D>
-SDL_FORCE_INLINE void opAdd(D &mem, int addr, T o2, FIELDTYPE ftype)
+SDL_FORCE_INLINE void opAdd(D &mem, int addr, double o2, FIELDTYPE ftype)
 {
     double o1 = mem.getAny(addr, ftype);
     T res = static_cast<T>(o1) + static_cast<T>(o2);
@@ -1005,7 +999,7 @@ SDL_FORCE_INLINE void opAdd(D &mem, int addr, T o2, FIELDTYPE ftype)
 }
 
 template<typename T, class D>
-SDL_FORCE_INLINE void opSub(D &mem, int addr, T o2, FIELDTYPE ftype)
+SDL_FORCE_INLINE void opSub(D &mem, int addr, double o2, FIELDTYPE ftype)
 {
     double o1 = mem.getAny(addr, ftype);
     T res = static_cast<T>(o1) - static_cast<T>(o2);
@@ -1013,7 +1007,7 @@ SDL_FORCE_INLINE void opSub(D &mem, int addr, T o2, FIELDTYPE ftype)
 }
 
 template<typename T, class D>
-SDL_FORCE_INLINE void opMul(D &mem, int addr, T o2, FIELDTYPE ftype)
+SDL_FORCE_INLINE void opMul(D &mem, int addr, double o2, FIELDTYPE ftype)
 {
     double o1 = mem.getAny(addr, ftype);
     T res = static_cast<T>(o1) * static_cast<T>(o2);
@@ -1021,7 +1015,7 @@ SDL_FORCE_INLINE void opMul(D &mem, int addr, T o2, FIELDTYPE ftype)
 }
 
 template<typename T, class D>
-SDL_FORCE_INLINE void opDiv(D &mem, int addr, T o2, FIELDTYPE ftype)
+SDL_FORCE_INLINE void opDiv(D &mem, int addr, double o2, FIELDTYPE ftype)
 {
     double o1 = mem.getAny(addr, ftype);
     T res = static_cast<T>(o1) / static_cast<T>(o2);
@@ -1029,7 +1023,7 @@ SDL_FORCE_INLINE void opDiv(D &mem, int addr, T o2, FIELDTYPE ftype)
 }
 
 template<typename T, class D>
-SDL_FORCE_INLINE void opXor(D &mem, int addr, T o2, FIELDTYPE ftype)
+SDL_FORCE_INLINE void opXor(D &mem, int addr, double o2, FIELDTYPE ftype)
 {
     double o1 = mem.getAny(addr, ftype);
     T res = static_cast<T>(o1) ^ static_cast<T>(o2);
@@ -1313,7 +1307,7 @@ double GetMem(int addr, FIELDTYPE ftype)
 
 
 template<typename T, class D, class U>
-SDL_FORCE_INLINE void opAdd(D &mem, U *obj, int addr, T o2, FIELDTYPE ftype)
+SDL_FORCE_INLINE void opAdd(D &mem, U *obj, int addr, double o2, FIELDTYPE ftype)
 {
     double o1 = mem.getAny(obj, addr, ftype);
     T res = static_cast<T>(o1) + static_cast<T>(o2);
@@ -1321,7 +1315,7 @@ SDL_FORCE_INLINE void opAdd(D &mem, U *obj, int addr, T o2, FIELDTYPE ftype)
 }
 
 template<typename T, class D, class U>
-SDL_FORCE_INLINE void opSub(D &mem, U *obj, int addr, T o2, FIELDTYPE ftype)
+SDL_FORCE_INLINE void opSub(D &mem, U *obj, int addr, double o2, FIELDTYPE ftype)
 {
     double o1 = mem.getAny(obj, addr, ftype);
     T res = static_cast<T>(o1) - static_cast<T>(o2);
@@ -1329,7 +1323,7 @@ SDL_FORCE_INLINE void opSub(D &mem, U *obj, int addr, T o2, FIELDTYPE ftype)
 }
 
 template<typename T, class D, class U>
-SDL_FORCE_INLINE void opMul(D &mem, U *obj, int addr, T o2, FIELDTYPE ftype)
+SDL_FORCE_INLINE void opMul(D &mem, U *obj, int addr, double o2, FIELDTYPE ftype)
 {
     double o1 = mem.getAny(obj, addr, ftype);
     T res = static_cast<T>(o1) * static_cast<T>(o2);
@@ -1337,7 +1331,7 @@ SDL_FORCE_INLINE void opMul(D &mem, U *obj, int addr, T o2, FIELDTYPE ftype)
 }
 
 template<typename T, class D, class U>
-SDL_FORCE_INLINE void opDiv(D &mem, U *obj, int addr, T o2, FIELDTYPE ftype)
+SDL_FORCE_INLINE void opDiv(D &mem, U *obj, int addr, double o2, FIELDTYPE ftype)
 {
     double o1 = mem.getAny(obj, addr, ftype);
     T res = static_cast<T>(o1) / static_cast<T>(o2);
@@ -1345,7 +1339,7 @@ SDL_FORCE_INLINE void opDiv(D &mem, U *obj, int addr, T o2, FIELDTYPE ftype)
 }
 
 template<typename T, class D, class U>
-SDL_FORCE_INLINE void opXor(D &mem, U *obj, int addr, T o2, FIELDTYPE ftype)
+SDL_FORCE_INLINE void opXor(D &mem, U *obj, int addr, double o2, FIELDTYPE ftype)
 {
     double o1 = mem.getAny(obj, addr, ftype);
     T res = static_cast<T>(o1) ^ static_cast<T>(o2);

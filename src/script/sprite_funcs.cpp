@@ -73,7 +73,7 @@ void SpriteFunc::WaitForPlayer(CSprite *me, SpriteComponent *obj)
         auto ftype = (FIELDTYPE)SDL_atoi(obj->data5.c_str());
 //        uint8_t *ptr = (uint8_t *)demo;
 //        ptr += (int)obj->data1; // offset
-        bool triggered = CheckMem(demo, (int)obj->data1, (double)(int)obj->data2, (COMPARETYPE)(int)obj->data3, ftype);
+        bool triggered = CheckMem(demo, (int)obj->data1, std::floor(obj->data2), (COMPARETYPE)(int)obj->data3, ftype);
         if(triggered)
         {
             //TODO: FINISH IT
@@ -654,9 +654,9 @@ void SpriteFunc::BasicAnimate(CSprite *me, SpriteComponent *obj)
     int implicit_frames = (int)me->m_Ht / anim_height;
 
     // Init animation state if necessary
-    if(me->m_AnimationSet == false)
+    if(!me->m_AnimationSet)
     {
-        me->m_Hitbox.H = anim_height;
+        me->m_Hitbox.H = static_cast<short>(anim_height);
         me->m_AnimationFrame = 0;
         me->m_AnimationPhase = (int)obj->data2;
         me->m_AnimationTimer = (int)obj->data2;
@@ -732,11 +732,11 @@ void SpriteFunc::SpriteDebug(CSprite *me, SpriteComponent *obj)
 //               by registering a new bitmap render operation
 void SpriteFunc::StaticDraw(CSprite *me)
 {
-    if(me != NULL && me->m_Visible)
+    if(me != nullptr && me->m_Visible)
     {
         if(me->m_AnimationFrame < (signed)me->m_GfxRects.size())   // Frame should be less than size of GfxRect container
         {
-            RenderBitmapOp *op = new RenderBitmapOp();
+            auto *op = new RenderBitmapOp();
             op->m_FramesLeft = 1;
             op->x = me->m_Xpos + me->m_GfxXOffset;
             op->y = me->m_Ypos + me->m_GfxYOffset;
@@ -759,7 +759,7 @@ void SpriteFunc::StaticDraw(CSprite *me)
 //                 to camera position by registering new bitmap render operation
 void SpriteFunc::RelativeDraw(CSprite *me)
 {
-    if(me != NULL && me->m_Visible)
+    if(me != nullptr && me->m_Visible)
     {
         if(me->m_AnimationFrame < (signed)me->m_GfxRects.size())
         {
@@ -776,7 +776,7 @@ void SpriteFunc::RelativeDraw(CSprite *me)
             sy = sy - cy;
 
             // Register drawing operation
-            RenderBitmapOp *op = new RenderBitmapOp();
+            auto *op = new RenderBitmapOp();
             op->m_FramesLeft = 1;
             op->x = sx;
             op->y = sy;

@@ -86,10 +86,10 @@ void CSpriteManager::InitializeDimensions(CSprite *spr, bool center_coords)
 
 void CSpriteManager::InstantiateSprite(CSpriteRequest *req, bool center_coords)
 {
-    CSprite *spr = NULL;
+    CSprite *spr = nullptr;
 
     // For built in sprites
-    if(req != NULL && req->type != (BUILTIN_SPRITE_TYPE)BST_Custom)
+    if(req != nullptr && req->type != (BUILTIN_SPRITE_TYPE)BST_Custom)
     {
         switch(req->type)
         {
@@ -144,7 +144,7 @@ void CSpriteManager::InstantiateSprite(CSpriteRequest *req, bool center_coords)
         {
             //spr = new CSprite;
             //TODO: MAKE IT
-            spr = NULL;
+            spr = nullptr;
             spr->m_Xpos = req->x;
             spr->m_Ypos = req->y;
             break;
@@ -273,7 +273,7 @@ CSprite *CSpriteManager::CopyFromBlueprint(const char *blueprint_name)
 {
     if(m_SpriteBlueprints.find(blueprint_name) != m_SpriteBlueprints.end())
     {
-        CSprite *newspr = new CSprite;
+        auto *newspr = new CSprite;
         *newspr = *m_SpriteBlueprints[blueprint_name];
         return newspr;
     }
@@ -291,24 +291,24 @@ void CSpriteManager::RunSprites()
         // Process each
         if(!GamePaused)
         {
-            for(std::list<CSprite *>::iterator iter = m_SpriteList.begin(); iter != m_SpriteList.end(); ++iter)
+            for(auto & iter : m_SpriteList)
             {
-                if(!(*iter)->m_Invalidated)  // Don't process invalids
+                if(!iter->m_Invalidated)  // Don't process invalids
                 {
-                    if(ComputeLevelSection((int)(*iter)->m_Xpos, (int)(*iter)->m_Ypos) == demo->Section + 1 ||
-                       (*iter)->m_AlwaysProcess || (*iter)->m_StaticScreenPos)   // Valid level section to process in?
-                        (*iter)->Process();
+                    if(ComputeLevelSection((int)iter->m_Xpos, (int)iter->m_Ypos) == demo->Section + 1 ||
+                       iter->m_AlwaysProcess || iter->m_StaticScreenPos)   // Valid level section to process in?
+                        iter->Process();
                 }
             }
         }
 
         // Draw each
-        for(std::list<CSprite *>::iterator iter = m_SpriteList.begin(); iter != m_SpriteList.end(); ++iter)
+        for(auto & iter : m_SpriteList)
         {
-            if(!(*iter)->m_Invalidated)
+            if(!iter->m_Invalidated)
             {
-                if((*iter)->m_StaticScreenPos || Render::IsOnScreen((*iter)->m_Xpos, (*iter)->m_Ypos, (*iter)->m_Wd, (*iter)->m_Ht))
-                    (*iter)->Draw();
+                if(iter->m_StaticScreenPos || Render::IsOnScreen(iter->m_Xpos, iter->m_Ypos, iter->m_Wd, iter->m_Ht))
+                    iter->Draw();
             }
         }
     }
@@ -316,7 +316,7 @@ void CSpriteManager::RunSprites()
 
 void CSpriteManager::ClearInvalidSprites()
 {
-    std::list<CSprite *>::iterator iter = m_SpriteList.begin();
+    auto iter = m_SpriteList.begin();
     // std::list<CSprite*>::iterator end = m_SpriteList.end();
 
     while(iter != m_SpriteList.end())
@@ -343,7 +343,7 @@ void CSpriteManager::ClearAllSprites()
 
 void CSpriteManager::ClearSprites(int imgResourceCode, int xPos, int yPos)
 {
-    std::list<CSprite *>::iterator iter = m_SpriteList.begin();
+    auto iter = m_SpriteList.begin();
     //    std::list<CSprite*>::iterator end = m_SpriteList.end();
 
     while(iter != m_SpriteList.end())
@@ -362,7 +362,7 @@ void CSpriteManager::ClearSprites(int imgResourceCode, int xPos, int yPos)
 
 void CSpriteManager::ClearSprites(int imgResourceCode)
 {
-    std::list<CSprite *>::iterator iter = m_SpriteList.begin();
+    auto iter = m_SpriteList.begin();
     //    std::list<CSprite*>::iterator end = m_SpriteList.end();
 
     while(iter != m_SpriteList.end())
@@ -427,10 +427,10 @@ void CSpriteManager::AddSprite(CSprite *spr)
 
 void CSpriteManager::GetComponents(int code, std::list<SpriteComponent *> *component_list)
 {
-    for(std::list<SpriteComponent>::iterator iter = m_ComponentList.begin(), end = m_ComponentList.end(); iter != end; ++iter)
+    for(auto &iter : m_ComponentList)
     {
         // Lookup components that match the code
-        if((*iter).lookup_code == code)
-            component_list->push_back(&(*iter));
+        if(iter.lookup_code == code)
+            component_list->push_back(&iter);
     }
 }

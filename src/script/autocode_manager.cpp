@@ -18,8 +18,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <sstream>
-#include <fstream>
 #include <Utils/files.h>
 #include <Utils/dir_list_ci.h>
 #include <AppPath/app_path.h>
@@ -37,7 +35,7 @@ static DirListCI s_dirCustom;
 AutocodeManager gAutoMan;
 
 // CTOR
-AutocodeManager::AutocodeManager()
+AutocodeManager::AutocodeManager() noexcept
 {
     Clear(true);
     m_Enabled = true;
@@ -222,7 +220,7 @@ void AutocodeManager::Parse(FILE *code_file, bool add_to_globals)
                 continue;
 
             // Check for hexadecimal inputs
-            if(true)
+            //if(true) // Always true
             {
                 if(target == 0 && btarget != 0)
                     target = btarget;
@@ -274,15 +272,15 @@ void AutocodeManager::DoEvents(bool init)
         }
 
         // Do each code
-        for(auto iter = m_Autocodes.begin(), end = m_Autocodes.end(); iter != end; ++iter)
-            (*iter).Do(init);
+        for(auto &m_Autocode : m_Autocodes)
+            m_Autocode.Do(init);
     }
 
     if(m_GlobalEnabled)
     {
         // Do each global code
-        for(auto iter = m_GlobalCodes.begin(), end = m_GlobalCodes.end(); iter != end; ++iter)
-            (*iter).Do(init);
+        for(auto &m_GlobalCode : m_GlobalCodes)
+            m_GlobalCode.Do(init);
     }
 }
 
@@ -291,10 +289,10 @@ Autocode *AutocodeManager::GetEventByRef(const std::string &ref_name)
 {
     if(ref_name.length() > 0)
     {
-        for(auto iter = m_Autocodes.begin(), end = m_Autocodes.end(); iter != end; ++iter)
+        for(auto &m_Autocode : m_Autocodes)
         {
-            if((*iter).MyRef == ref_name)
-                return &(*iter);
+            if(m_Autocode.MyRef == ref_name)
+                return &m_Autocode;
         }
     }
     return nullptr;
@@ -305,10 +303,10 @@ void AutocodeManager::DeleteEvent(const std::string &ref_name)
 {
     if(ref_name.length() > 0)
     {
-        for(auto iter = m_Autocodes.begin(), end = m_Autocodes.end(); iter != end; ++iter)
+        for(auto &m_Autocode : m_Autocodes)
         {
-            if((*iter).MyRef == ref_name)
-                (*iter).Expired = true;
+            if(m_Autocode.MyRef == ref_name)
+                m_Autocode.Expired = true;
         }
     }
 }
@@ -354,28 +352,28 @@ void AutocodeManager::ActivateCustomEvents(int new_section, int eventcode)
     //char* dbg = "ACTIVATE CUSTOM DBG";
     if(m_Enabled)
     {
-        for(auto iter = m_Autocodes.begin(), end = m_Autocodes.end(); iter != end; ++iter)
+        for(auto &m_Autocode : m_Autocodes)
         {
             // Activate copies of events with 'eventcode' and move them to 'new_section'
-            if((*iter).ActiveSection == eventcode && (*iter).Activated == false && !(*iter).Expired)
+            if(m_Autocode.ActiveSection == eventcode && !m_Autocode.Activated && !m_Autocode.Expired)
             {
-                Autocode newcode = (*iter);
+                Autocode newcode = m_Autocode;
                 newcode.Activated = true;
                 newcode.ActiveSection = (new_section < 1000 ? (new_section - 1) : new_section);
-                newcode.Length = (*iter).m_OriginalTime;
+                newcode.Length = m_Autocode.m_OriginalTime;
                 m_CustomCodes.push_front(std::move(newcode));
             }
         }
 
-        for(auto iter = m_GlobalCodes.begin(), end = m_GlobalCodes.end(); iter != end; ++iter)
+        for(auto &m_GlobalCode : m_GlobalCodes)
         {
             // Activate copies of events with 'eventcode' and move them to 'new_section'
-            if((*iter).ActiveSection == eventcode && !(*iter).Activated && !(*iter).Expired)
+            if(m_GlobalCode.ActiveSection == eventcode && !m_GlobalCode.Activated && !m_GlobalCode.Expired)
             {
-                Autocode newcode = (*iter);
+                Autocode newcode = m_GlobalCode;
                 newcode.Activated = true;
                 newcode.ActiveSection = (new_section < 1000 ? (new_section - 1) : new_section);
-                newcode.Length = (*iter).m_OriginalTime;
+                newcode.Length = m_GlobalCode.m_OriginalTime;
                 m_CustomCodes.push_front(std::move(newcode));
             }
         }
@@ -388,16 +386,16 @@ void AutocodeManager::ForceExpire(int section)
     //char* dbg = "FORCE EXPIRE DBG";
     if(m_Enabled)
     {
-        for(auto iter = m_Autocodes.begin(), end = m_Autocodes.end(); iter != end; ++iter)
+        for(auto &m_Autocode : m_Autocodes)
         {
-            if((*iter).ActiveSection == section)
-                (*iter).Expired = true;
+            if(m_Autocode.ActiveSection == section)
+                m_Autocode.Expired = true;
         }
 
-        for(auto iter = m_GlobalCodes.begin(), end = m_GlobalCodes.end(); iter != end; ++iter)
+        for(auto &m_GlobalCode : m_GlobalCodes)
         {
-            if((*iter).ActiveSection == section)
-                (*iter).Expired = true;
+            if(m_GlobalCode.ActiveSection == section)
+                m_GlobalCode.Expired = true;
         }
     }
 }
@@ -406,10 +404,10 @@ void AutocodeManager::ForceExpire(int section)
 Autocode *AutocodeManager::FindMatching(int section, const std::string &soughtstr)
 {
     //char* dbg = "FIND MATCHING DBG";
-    for(auto iter = m_Autocodes.begin(), end = m_Autocodes.end(); iter != end; ++iter)
+    for(auto &m_Autocode : m_Autocodes)
     {
-        if((*iter).ActiveSection == section && (*iter).MyString == soughtstr)
-            return &(*iter);
+        if(m_Autocode.ActiveSection == section && m_Autocode.MyString == soughtstr)
+            return &m_Autocode;
     }
 
     return nullptr;
@@ -459,7 +457,7 @@ bool AutocodeManager::VarOperation(const std::string &var_name, double value, OP
 // VAR EXISTS
 bool AutocodeManager::VarExists(const std::string &var_name)
 {
-    return m_UserVars.find(var_name) == m_UserVars.end() ? false : true;
+    return (m_UserVars.find(var_name) != m_UserVars.end());
 }
 
 // GET VAR

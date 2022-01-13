@@ -46,12 +46,12 @@ bool Renderer::IsAltThreadActive()
     return false;
 }
 
-Renderer::Renderer() :
+Renderer::Renderer() noexcept :
     m_queueState(),
     m_legacyResourceCodeImages()
 {}
 
-bool Renderer::LoadBitmapResource(std::string filename, int resource_code, int transparency_color)
+bool Renderer::LoadBitmapResource(const std::string& filename, int resource_code, int transparency_color)
 {
     UNUSED(filename);
     UNUSED(resource_code);
@@ -73,7 +73,7 @@ bool Renderer::LoadBitmapResource(std::string filename, int resource_code, int t
     return false;
 }
 
-bool Renderer::LoadBitmapResource(std::string filename, int resource_code)
+bool Renderer::LoadBitmapResource(const std::string& filename, int resource_code)
 {
     UNUSED(filename);
     UNUSED(resource_code);
@@ -108,7 +108,7 @@ std::shared_ptr<LunaImage> Renderer::GetImageForResourceCode(int resource_code)
     return nullptr;
 }
 
-std::vector<std::shared_ptr<LunaImage> > Renderer::LoadAnimatedBitmapResource(std::string filename, int *frameTime)
+std::vector<std::shared_ptr<LunaImage> > Renderer::LoadAnimatedBitmapResource(const std::string& filename, int *frameTime)
 {
     UNUSED(frameTime);
     // construct full filepath
@@ -232,9 +232,8 @@ void Renderer::RenderBelowPriority(double maxPriority)
         int dbg_x = 325;
         int dbg_y = 160;
 
-        for(auto it = m_queueState.m_debugMessages.begin(); it != m_queueState.m_debugMessages.end(); it++)
+        for(auto &dbg : m_queueState.m_debugMessages)
         {
-            std::string dbg = *it;
             RenderStringOp(dbg, 4, (float)dbg_x, (float)dbg_y).Draw(this);
             dbg_y += 20;
             if(dbg_y > 560)
@@ -285,13 +284,13 @@ void Renderer::EndFrameRender()
 
     // Remove cleared operations
     std::vector<RenderOp *> nonExpiredOps;
-    for(auto iter = m_queueState.m_currentRenderOps.begin(), end = m_queueState.m_currentRenderOps.end(); iter != end; ++iter)
+    for(auto &m_currentRenderOp : m_queueState.m_currentRenderOps)
     {
-        RenderOp *pOp = *iter;
+        RenderOp *pOp = m_currentRenderOp;
         pOp->m_FramesLeft--;
         if(pOp->m_FramesLeft <= 0)
         {
-            *iter = nullptr;
+            m_currentRenderOp = nullptr;
             delete pOp;
         }
         else
@@ -307,8 +306,8 @@ void Renderer::EndFrameRender()
 void Renderer::ClearQueue()
 {
     m_queueState.m_curCamIdx = 0;
-    for(auto iter = m_queueState.m_currentRenderOps.begin(), end = m_queueState.m_currentRenderOps.end(); iter != end; ++iter)
-        delete *iter;
+    for(auto &m_currentRenderOp : m_queueState.m_currentRenderOps)
+        delete m_currentRenderOp;
     m_queueState.m_currentRenderOps.clear();
     m_queueState.m_renderOpsProcessedCount = 0;
     m_queueState.m_renderOpsSortedCount = 0;

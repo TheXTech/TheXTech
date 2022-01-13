@@ -45,67 +45,67 @@ int gRunTapped;
 
 bool Input::PressingUp()
 {
-    return gLastUpPress == gFrames ? true : false;
+    return gLastUpPress == gFrames;
 }
 
 bool Input::PressingDown()
 {
-    return gLastDownPress == gFrames ? true : false;
+    return gLastDownPress == gFrames;
 }
 
 bool Input::PressingLeft()
 {
-    return gLastLeftPress == gFrames ? true : false;
+    return gLastLeftPress == gFrames;
 }
 
 bool Input::PressingRight()
 {
-    return gLastRightPress == gFrames ? true : false;
+    return gLastRightPress == gFrames;
 }
 
 bool Input::PressingRun()
 {
-    return gLastRunPress == gFrames ? true : false;
+    return gLastRunPress == gFrames;
 }
 
 bool Input::PressingJump()
 {
-    return gLastJumpPress == gFrames ? true : false;
+    return gLastJumpPress == gFrames;
 }
 
 bool Input::UpThisFrame()
 {
-    return gUpTapped != 0 ? true : false;
+    return gUpTapped != 0;
 }
 
 bool Input::DownThisFrame()
 {
-    return gDownTapped != 0 ? true : false;
+    return gDownTapped != 0;
 }
 
 bool Input::LeftThisFrame()
 {
-    return gLeftTapped != 0 ? true : false;
+    return gLeftTapped != 0;
 }
 
 bool Input::RightThisFrame()
 {
-    return gRightTapped != 0 ? true : false;
+    return gRightTapped != 0;
 }
 
 bool Input::RunThisFrame()
 {
-    return gRunTapped != 0 ? true : false;
+    return gRunTapped != 0;
 }
 
 bool Input::JumpThisFrame()
 {
-    return gJumpTapped != 0 ? true : false;
+    return gJumpTapped != 0;
 }
 
 void Input::UpdateKeyRecords(Player_t *pPlayer)
 {
-    if(pPlayer == 0)
+    if(!pPlayer)
         return;
 
     //wchar_t* dbg = L"Update keys debug";

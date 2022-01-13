@@ -37,16 +37,16 @@ struct Renderer
     static void UnsetAltThread();
     static bool IsAltThreadActive();
 
-    Renderer();
+    Renderer() noexcept;
     ~Renderer() = default;
 
-    bool LoadBitmapResource(std::string filename, int resource_code, int transparency_color); // don't give full path
-    bool LoadBitmapResource(std::string filename, int resource_code);
+    bool LoadBitmapResource(const std::string& filename, int resource_code, int transparency_color); // don't give full path
+    bool LoadBitmapResource(const std::string& filename, int resource_code);
     void StoreImage(const std::shared_ptr<LunaImage>& bmp, int resource_code);
     bool DeleteImage(int resource_code);
     std::shared_ptr<LunaImage> GetImageForResourceCode(int resource_code);
 
-    std::vector<std::shared_ptr<LunaImage>> LoadAnimatedBitmapResource(std::string filename, int* frameTime = 0);
+    std::vector<std::shared_ptr<LunaImage>> LoadAnimatedBitmapResource(const std::string& filename, int* frameTime = 0);
 
     void AddOp(RenderOp* op);							// Add a drawing operation to the list
     // void GLCmd(const std::shared_ptr<GLEngineCmd>& cmd, double renderPriority = 1.0);
@@ -101,7 +101,7 @@ private:
 
     // Simple getters //
 public:
-    int GetCameraIdx() { return m_queueState.m_curCamIdx; }
+    int GetCameraIdx() const { return m_queueState.m_curCamIdx; }
     // HDC GetScreenDC() { return (HDC)GM_SCRN_HDC; }
 
     class QueueStateStacker {

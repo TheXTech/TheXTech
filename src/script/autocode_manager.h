@@ -38,7 +38,7 @@
 
 struct AutocodeManager
 {
-    AutocodeManager();
+    AutocodeManager() noexcept;
     ~AutocodeManager();
 
     bool LoadFiles();

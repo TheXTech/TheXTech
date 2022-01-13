@@ -23,8 +23,7 @@
 #include "globals.h"
 
 
-RenderBitmapOp::RenderBitmapOp()
-{}
+RenderBitmapOp::RenderBitmapOp() = default;
 
 void RenderBitmapOp::Draw(Renderer *renderer)
 {

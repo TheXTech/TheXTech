@@ -72,45 +72,68 @@ public:
     double GetCustomVar(std::string var_name);
 
     /// Members///
-    int m_ImgResCode;				// Image bank code of image resource the sprite uses
+    //! Image bank code of image resource the sprite uses
+    int m_ImgResCode = 0;
     std::shared_ptr<LunaImage> m_directImg;
-    int m_CollisionCode;			// Collision code for collision blueprint bank (-1 == all blocks collide as solid)
+    //! Collision code for collision blueprint bank (-1 == all blocks collide as solid)
+    int m_CollisionCode = 0;
 
-    int m_FramesLeft;				// How many frames are left if dying automatically
-    int m_DrawPriorityLevel;		// 0 = Low  1 = Mid  2 = High (drawn in front)
-    int m_OffscreenCount;			// How many frames this sprite has been offscreen
-    int m_FrameCounter;				// Incremented each Process()
-    int m_GfxXOffset;
-    int m_GfxYOffset;
-    bool m_StaticScreenPos;			// Whether or not sprite uses absolute screen coords for drawing
-    bool m_Visible;					// Whether or not this sprite should be drawn
-    bool m_Birthed;					// Whether or not sprite's birth funcs have been run yet
-    bool m_Died;					// Whether or not sprite's death funcs have been run yet
-    bool m_Invalidated;				// Whether or not this sprite will be removed during the next cleanup phase
-    bool m_LimitedFrameLife;		// Whether or not the sprite dies automatically after a number of frames
-    bool m_AnimationSet;			// Whether or not the animation parameters have been set for this sprite yet
-    bool m_AlwaysProcess;			// Whether or not this sprite should be processed regardless of player's current section
+    //! How many frames are left if dying automatically
+    int m_FramesLeft = 0;
+    //! 0 = Low  1 = Mid  2 = High (drawn in front)
+    int m_DrawPriorityLevel = 0;
+    //! How many frames this sprite has been offscreen
+    int m_OffscreenCount = 0;
+    //! Incremented each Process()
+    int m_FrameCounter = 0;
+    int m_GfxXOffset = 0;
+    int m_GfxYOffset = 0;
+    //! Whether or not sprite uses absolute screen coords for drawing
+    bool m_StaticScreenPos = false;
+    //! Whether or not this sprite should be drawn
+    bool m_Visible = true;
+    //! Whether or not sprite's birth funcs have been run yet
+    bool m_Birthed = false;
+    //! Whether or not sprite's death funcs have been run yet
+    bool m_Died = false;
+    //! Whether or not this sprite will be removed during the next cleanup phase
+    bool m_Invalidated = false;
+    //! Whether or not the sprite dies automatically after a number of frames
+    bool m_LimitedFrameLife = false;
+    //! Whether or not the animation parameters have been set for this sprite yet
+    bool m_AnimationSet = false;
+    //! Whether or not this sprite should be processed regardless of player's current section
+    bool m_AlwaysProcess = false;
 
     double m_Xpos;
     double m_Ypos;
-    double m_Ht;					// Of loaded image graphic for backwards compat with native SMBX sprites
-    double m_Wd;					// Of loaded image graphic for backwards compat with native SMBX sprites
+    //! Height Of loaded image graphic for backwards compat with native SMBX sprites
+    double m_Ht;
+    //! Width Of loaded image graphic for backwards compat with native SMBX sprites
+    double m_Wd;
     double m_Xspd;
     double m_Yspd;
 
-    Hitbox m_Hitbox;				// Hitbox relative to sprite position
+    //! Hitbox relative to sprite position
+    Hitbox m_Hitbox;
 
-    int m_AnimationPhase;			// Time per animation
-    int m_AnimationTimer;			// Current timer for animation (animate when reaching 0)
-    int m_AnimationFrame;			// The current frame in m_GfxRects to be drawn (0 == first frame)
-    std::vector<LunaRect> m_GfxRects;	// Spritesheet areas to draw, indexed by animation frame
+    //! Time per animation
+    int m_AnimationPhase;
+    //! Current timer for animation (animate when reaching 0)
+    int m_AnimationTimer;
+    //! The current frame in m_GfxRects to be drawn (0 == first frame)
+    int m_AnimationFrame;
+    //! Spritesheet areas to draw, indexed by animation frame
+    std::vector<LunaRect> m_GfxRects;
 
     std::list<SpriteComponent> m_BirthComponents;
-    std::list<SpriteComponent> m_BehavComponents;	// Currently loaded behavioral components
+    //! Currently loaded behavioral components
+    std::list<SpriteComponent> m_BehavComponents;
     std::list<pfnSprDraw> m_DrawFuncs;
     std::list<SpriteComponent> m_DeathComponents;
 
-    std::map<std::string, double> m_CustomVars;	// User-defined vars
+    //! User-defined vars
+    std::map<std::string, double> m_CustomVars;
 };
 
 
@@ -118,18 +141,19 @@ public:
 struct CSpriteRequest
 {
     CSpriteRequest() : type(0), x(0), y(0), time(0), img_resource_code(0), x_speed(0), y_speed(0), spawned(false) {}
-    int type;
-    int x;
-    int y;
-    int time;
-    int img_resource_code;
+    int type = 0;
+    int x = 0;
+    int y = 0;
+    int time = 0;
+    int img_resource_code = 0;
     std::shared_ptr<LunaImage> direct_img;
     std::string str;
 
     // Optional parameters
-    double x_speed;
-    double y_speed;
-    bool spawned;			// "spawned" means the sprite will be deleted after being offscreen for some time
+    double x_speed = 0.0;
+    double y_speed = 0.0;
+    //! "spawned" means the sprite will be deleted after being offscreen for some time
+    bool spawned = false;
 };
 
 #endif // CSPRITE_HHHHH

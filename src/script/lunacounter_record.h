@@ -31,8 +31,8 @@ struct DeathRecord
     void Save(FILE *openfile);
     void Load(FILE *openfile);
 
-    std::string LevelName;
-    int32_t Deaths = 0;
+    std::string m_levelName;
+    int32_t m_deaths = 0;
 };
 
 #endif // DEATHRECORD_H

@@ -22,34 +22,37 @@
 #include "csprite.h"
 
 // TEST -- fast rectangle
-bool Hitbox::Test(int Left2, int Up2, int _W, int _H)
+bool Hitbox::Test(int Left2, int Up2, int iW, int iH) const
 {
     if(pParent)
     {
         if(this->CollisionType == 0)   // square aabb collision detection
         {
-            bool rightcol = true;
-            bool leftcol = true;
-            bool upcol = true;
-            bool downcol = true;
+            // bool rightcol = true;
+            // bool leftcol = true;
+            // bool upcol = true;
+            // bool downcol = true;
 
             if(CalcRight() < Left2)
                 return false;
-            if(CalcLeft() > Left2 + _W)
+            if(CalcLeft() > Left2 + iW)
                 return false;
-            if(CalcTop() > Up2 + _H)
+            if(CalcTop() > Up2 + iH)
                 return false;
             if(CalcBottom() < Up2)
                 return false;
 
-            if(!rightcol || !leftcol || !upcol || !downcol)
-                return false;
+            // This condition is ALWAYS FALSE
+            //if(!rightcol || !leftcol || !upcol || !downcol)
+            //    return false;
             return true;
         }
         else   // circle vs aaab -> convert to circle
         {
-            double halfwidth = _W / 2;
-            double halfheight = _H / 2;
+            int hW = iW / 2;
+            int hH = iH / 2;
+            double halfwidth = hW;
+            double halfheight = hH;
             return Test((int)(Left2 + halfwidth), (int)(Up2 + halfheight), (int)(halfwidth <= halfheight ? halfwidth : halfheight));
         }
     }
@@ -58,7 +61,7 @@ bool Hitbox::Test(int Left2, int Up2, int _W, int _H)
 }
 
 // TEST -- fast circle/distance
-bool Hitbox::Test(int cx, int cy, int radius)
+bool Hitbox::Test(int cx, int cy, int radius) const
 {
     int radi_total = radius + (W <= H ? W / 2 : H / 2); // Other obj radius + my radius
     radi_total *= radi_total;
@@ -72,40 +75,40 @@ bool Hitbox::Test(int cx, int cy, int radius)
     return true;
 }
 
-double Hitbox::CalcLeft()
+double Hitbox::CalcLeft() const
 {
     if(pParent)
         return pParent->m_Xpos + Left_off;
     return 0;
 }
 
-double Hitbox::CalcTop()
+double Hitbox::CalcTop() const
 {
     if(pParent)
         return pParent->m_Ypos + Top_off;
     return 0;
 }
 
-double Hitbox::CalcBottom()
+double Hitbox::CalcBottom() const
 {
     if(pParent)
         return pParent->m_Ypos + H;
     return 0;
 }
 
-double Hitbox::CalcRight()
+double Hitbox::CalcRight() const
 {
     if(pParent)
         return pParent->m_Xpos + W;
     return 0;
 }
 
-double Hitbox::CenterX()
+double Hitbox::CenterX() const
 {
-    return CalcLeft() + (W / 2);
+    return CalcLeft() + (W / 2.0);
 }
 
-double Hitbox::CenterY()
+double Hitbox::CenterY() const
 {
-    return CalcTop() + (H / 2);
+    return CalcTop() + (H / 2.0);
 }

@@ -22,7 +22,7 @@
 #ifndef HitBox_HHHHH
 #define HitBox_HHHHH
 
-#include <stddef.h>
+#include <cstddef>
 
 class CSprite;
 
@@ -39,15 +39,15 @@ struct Hitbox
 {
     Hitbox() = default;
 
-    double CalcLeft();      // Get the left absolute position (with parent base coords)
-    double CalcRight();     // Get the right absolute position (with parent base coords)
-    double CalcTop();       // Get the top absolute position (with parent base coords)
-    double CalcBottom();    // Get the bottom absolute position (with parent base coords)
-    double CenterX();       // Get the center X position (from parent base coords)
-    double CenterY();       // Get the center Y position (from parent base coords)
+    double CalcLeft() const;      // Get the left absolute position (with parent base coords)
+    double CalcRight() const;     // Get the right absolute position (with parent base coords)
+    double CalcTop() const;       // Get the top absolute position (with parent base coords)
+    double CalcBottom() const;    // Get the bottom absolute position (with parent base coords)
+    double CenterX() const;       // Get the center X position (from parent base coords)
+    double CenterY() const;       // Get the center Y position (from parent base coords)
 
-    bool Test(int left, int up, int width, int height); // Test hitbox against given rect
-    bool Test(int cx, int cy, int radius);              // Test hitbox against given circle
+    bool Test(int left, int up, int iW, int iH) const; // Test hitbox against given rect
+    bool Test(int cx, int cy, int radius) const;              // Test hitbox against given circle
 
     short Left_off = 0;         // Offset from 0,0 on sprite
     short Top_off = 0;          // Offset from 0,0 on sprite
@@ -60,4 +60,4 @@ struct Hitbox
 
 };
 
-#endif // CSPRITE_HHHHH
+#endif // HitBox_HHHHH

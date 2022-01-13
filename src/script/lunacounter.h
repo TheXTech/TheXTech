@@ -32,7 +32,7 @@
 
 struct DeathCounter
 {
-    DeathCounter();
+    DeathCounter() noexcept;
 
     void init();
     void quit();
@@ -41,15 +41,15 @@ struct DeathCounter
     void UpdateDeaths(bool write_save);
     void AddDeath(const std::string &, int amount);
     void TrySave();
-    void Draw();
+    void Draw() const;
     void Recount();
     void ClearRecords();
 
-    void PrintDebug();
+    void PrintDebug() const;
 
 private:
-    void InitStatsFile(FILE *openfile);
-    void WriteHeader(FILE *openfile);
+    static void InitStatsFile(FILE *openfile);
+    static void WriteHeader(FILE *openfile);
     void WriteRecords(FILE *statsfile);
     void ReadRecords(FILE *openfile);
     void Save(FILE *openfile);

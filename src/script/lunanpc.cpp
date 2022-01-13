@@ -39,9 +39,9 @@ NPC_t *NpcF::GetRaw(int index)
 
 void NpcF::FindAll(int ID, int section, std::list<NPC_t *> *return_list)
 {
-    bool anyID = (ID == -1 ? true : false);
-    bool anySec = (section == -1 ? true : false);
-    NPC_t *thisnpc = NULL;
+    bool anyID = (ID == -1);
+    bool anySec = (section == -1);
+    NPC_t *thisnpc = nullptr;
 
     for(int i = 0; i <= numNPCs; i++)
     {
@@ -56,8 +56,8 @@ void NpcF::FindAll(int ID, int section, std::list<NPC_t *> *return_list)
 
 NPC_t *NpcF::GetFirstMatch(int ID, int section)
 {
-    bool anyID = (ID == -1 ? true : false);
-    bool anySec = (section == -1 ? true : false);
+    bool anyID = (ID == -1);
+    bool anySec = (section == -1);
     NPC_t *thisnpc = nullptr;
 
     for(int i = 0; i <= numNPCs; i++)
@@ -79,7 +79,7 @@ void NpcF::MemSet(int ID, int offset, double value, OPTYPE operation, FIELDTYPE 
     if(ftype == FT_INVALID || offset > 0x15C)
         return;
 
-    bool anyID = (ID == -1 ? true : false);
+    bool anyID = (ID == -1);
     NPC_t *thisnpc;
 
     for(int i = 0; i <= numNPCs; i++)
@@ -92,8 +92,8 @@ void NpcF::MemSet(int ID, int offset, double value, OPTYPE operation, FIELDTYPE 
 
 void NpcF::AllSetHits(int identity, int section, float hits)
 {
-    bool anyID = (identity == -1 ? true : false);
-    bool anySec = (section == -1 ? true : false);
+    bool anyID = (identity == -1);
+    bool anySec = (section == -1);
     NPC_t *thisnpc;
 
     for(int i = 0; i <= numNPCs; i++)
@@ -109,8 +109,8 @@ void NpcF::AllSetHits(int identity, int section, float hits)
 
 void NpcF::AllFace(int identity, int section, double x)
 {
-    bool anyID = (identity == -1 ? true : false);
-    bool anySec = (section == -1 ? true : false);
+    bool anyID = (identity == -1);
+    bool anySec = (section == -1);
     NPC_t *thisnpc;
 
     for(int i = 0; i <= numNPCs; i++)
