@@ -168,6 +168,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         };
         compat.readEnum("sfx-player-grow-with-got-item", c.sfx_player_grow_with_got_item, c.sfx_player_grow_with_got_item, spgwgi);
     }
+    compat.endGroup();
 
     if(s_compatLevel >= COMPAT_SMBX13)
     {
