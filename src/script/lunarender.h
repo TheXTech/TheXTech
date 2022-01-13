@@ -18,7 +18,7 @@ struct Renderer
     static bool IsAltThreadActive();
 
     Renderer();
-    ~Renderer();
+    ~Renderer() = default;
 
     bool LoadBitmapResource(std::string filename, int resource_code, int transparency_color); // don't give full path
     bool LoadBitmapResource(std::string filename, int resource_code);

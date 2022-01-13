@@ -16,14 +16,10 @@ Renderer &Renderer::Get()
 }
 
 void Renderer::SetAltThread()
-{
-
-}
+{}
 
 void Renderer::UnsetAltThread()
-{
-
-}
+{}
 
 bool Renderer::IsAltThreadActive()
 {
@@ -33,30 +29,26 @@ bool Renderer::IsAltThreadActive()
 Renderer::Renderer() :
     m_queueState(),
     m_legacyResourceCodeImages()
-{
-
-}
-
-Renderer::~Renderer()
-{
-
-}
+{}
 
 bool Renderer::LoadBitmapResource(std::string filename, int resource_code, int transparency_color)
 {
     UNUSED(filename);
     UNUSED(resource_code);
     UNUSED(transparency_color);
-    //    if (Renderer::LoadBitmapResource(filename, resource_code)) {
-    //        auto it = m_legacyResourceCodeImages.find(resource_code);
-    //        if (it != m_legacyResourceCodeImages.end()) {
 
-    //            it->second->makeColorTransparent(transparency_color);
+    // TODO: Implement this using proper stuff
 
-    //            // LUNAIMAGE_TODO: Add support for trasnparency colors for old-style image loading API
-    //        }
-    //        return true;
-    //    }
+//    if(Renderer::LoadBitmapResource(filename, resource_code))
+//    {
+//        auto it = m_legacyResourceCodeImages.find(resource_code);
+//        if (it != m_legacyResourceCodeImages.end())
+//        {
+//            it->second->makeColorTransparent(transparency_color);
+//            // LUNAIMAGE_TODO: Add support for trasnparency colors for old-style image loading API
+//        }
+//        return true;
+//    }
 
     return false;
 }
@@ -65,6 +57,9 @@ bool Renderer::LoadBitmapResource(std::string filename, int resource_code)
 {
     UNUSED(filename);
     UNUSED(resource_code);
+
+    // TODO: Implement this using proper stuff
+
     return false;
 }
 
