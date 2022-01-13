@@ -1,6 +1,7 @@
 package ru.wohlsoft.thextech;
 
 import android.Manifest;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -32,7 +33,9 @@ public class Launcher extends AppCompatActivity
 {
     final String LOG_TAG = "TheXTech";
     public static final int READWRITE_PERMISSION_FOR_GAME = 1;
+    public static final int READWRITE_PERMISSION_FOR_GAME_BY_INTENT = 2;
     private Context m_context = null;
+    private String filePathToOpen;
 
     /* ============ Animated background code ============ */
     private int m_bgAnimatorFrames = 1;
@@ -69,6 +72,8 @@ public class Launcher extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_launcher);
         initUiSetup();
+        filePathToOpen = "";
+        handleFileIntent();
     }
 
     @Override
@@ -103,6 +108,42 @@ public class Launcher extends AppCompatActivity
         });
 
         updateOverlook();
+    }
+
+    private void handleFileIntent()
+    {
+        Intent intent = getIntent();
+        String scheme = intent.getScheme();
+        if(scheme != null)
+        {
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            if(checkFilePermissions(READWRITE_PERMISSION_FOR_GAME_BY_INTENT) || !hasManageAppFS())
+                return;
+            if(scheme.equals(ContentResolver.SCHEME_FILE))
+            {
+                Uri url = intent.getData();
+                if(url != null)
+                {
+                    Log.d(LOG_TAG, "Got a file: " + url + ";");
+                    filePathToOpen = url.getPath();
+                    if(m_context == null)
+                        m_context = getApplicationContext();
+                    tryStartGame(m_context);
+                }
+            }
+            else if(scheme.equals(ContentResolver.SCHEME_CONTENT))
+            {
+                Uri url = intent.getData();
+                if(url != null)
+                {
+                    Log.d(LOG_TAG, "Got a content: " + url + ";");
+                    filePathToOpen = url.getPath();
+                    if(m_context == null)
+                        m_context = getApplicationContext();
+                    tryStartGame(m_context);
+                }
+            }
+        }
     }
 
     public void OnStartGameClick(View view)
@@ -310,7 +351,8 @@ public class Launcher extends AppCompatActivity
     public void startGame()
     {
         Intent myIntent = new Intent(Launcher.this, thextechActivity.class);
-//        myIntent.putExtra("key", value); //Optional parameters
+        if(!filePathToOpen.isEmpty())
+            myIntent.putExtra("do-open-file", filePathToOpen);
 //        myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 //        myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         myIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
