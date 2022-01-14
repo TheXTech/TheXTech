@@ -30,4 +30,7 @@
     <string name="touchscreen_vibration_test_label">测试反馈</string>
     <string name="setup_show_battery_status_label">电池状态</string>
     <string name="setup_show_controller_state_label">显示控制键状态</string>
+    <string name="cheat_dialog_ok">执行</string>
+    <string name="cheat_dialog_cancel">取消</string>
+    <string name="cheat_dialog_title">输入指令：</string>
 </resources>
