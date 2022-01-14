@@ -590,7 +590,7 @@ public:
     }
 };
 
-static const char location_t_name[] = "Location_t";
+static constexpr char location_t_name[] = "Location_t";
 typedef SMBXObjectMemoryEmulator<Location_t, location_t_name> LocationParent;
 class LocationMemory final : public LocationParent
 {
@@ -613,7 +613,7 @@ public:
 };
 
 
-static const char controls_t_name[] = "Controls_t";
+static constexpr char controls_t_name[] = "Controls_t";
 class ControlsMemory final : public SMBXObjectMemoryEmulator<Controls_t, controls_t_name>
 {
 public:
@@ -642,7 +642,7 @@ static ControlsMemory s_conMem;
 static LocationMemory s_locMem;
 
 
-static const char playere_t_name[] = "Player_t";
+static constexpr char playere_t_name[] = "Player_t";
 typedef SMBXObjectMemoryEmulator<Player_t, playere_t_name> PlayerParent;
 class PlayerMemory final : public PlayerParent
 {
@@ -818,7 +818,7 @@ public:
     }
 };
 
-static const char npc_t_name[] = "NPC_t";
+static constexpr char npc_t_name[] = "NPC_t";
 typedef SMBXObjectMemoryEmulator<NPC_t, npc_t_name> NpcParent;
 class NPCMemory final : public NpcParent
 {
