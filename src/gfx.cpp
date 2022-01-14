@@ -44,7 +44,7 @@ void GFX_t::loadImage(StdPicture &img, const std::string &path)
 }
 
 GFX_t::GFX_t() noexcept
-{};
+{}
 
 bool GFX_t::load()
 {
