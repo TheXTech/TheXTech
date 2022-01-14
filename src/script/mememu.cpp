@@ -407,7 +407,8 @@ protected:
     std::unordered_map<int, std::string T::*>   m_sf;
 
 public:
-    SMBXObjectMemoryEmulator() noexcept = default;
+    SMBXObjectMemoryEmulator() noexcept
+    {};
 
     virtual double getAny(T *obj, int address, FIELDTYPE ftype)
     {
