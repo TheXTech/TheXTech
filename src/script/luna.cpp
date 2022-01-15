@@ -41,6 +41,13 @@ bool gShowDemoCounter = true;
 bool gEnableDemoCounter = true;
 std::string gDemoCounterTitle = "DEMOS";
 
+SDL_FORCE_INLINE bool lunaAllowed()
+{
+    if(g_compatibility.luna_enable_engine == Compatibility_t::LUNA_ENGINE_UNSPECIFIED)
+        return gLunaEnabledGlobally;
+
+    return g_compatibility.luna_enable_engine == Compatibility_t::LUNA_ENGINE_ENABLE;
+}
 
 void lunaReset()
 {
@@ -81,7 +88,7 @@ void lunaLoad()
     if(dcAllow && isGame)
         gDeathCounter.init();
 
-    if(gLunaEnabledGlobally && gLunaEnabled)
+    if(gLunaEnabled && lunaAllowed())
     {
         // Load autocode
         gAutoMan.LoadFiles();
@@ -112,7 +119,7 @@ void lunaLoop()
     if(dcAllow)
         gDeathCounter.UpdateDeaths(true);
 
-    if(gLunaEnabledGlobally && gLunaEnabled)
+    if(gLunaEnabled && lunaAllowed())
     {
 #if COMPILE_PLAYGROUND
         Playground::doPlaygroundStuff();
@@ -142,7 +149,7 @@ void lunaRenderHud()
 
 void lunaRender(int screenZ)
 {
-    if(gLunaEnabled && gLunaEnabledGlobally)
+    if(gLunaEnabled && lunaAllowed())
     {
         Renderer::Get().StartCameraRender(screenZ);
         Renderer::Get().RenderBelowPriority(5);
@@ -151,12 +158,12 @@ void lunaRender(int screenZ)
 
 void lunaRenderStart()
 {
-    if(gLunaEnabled && gLunaEnabledGlobally)
+    if(gLunaEnabled && lunaAllowed())
         Renderer::Get().StartFrameRender();
 }
 
 void lunaRenderEnd()
 {
-    if(gLunaEnabled && gLunaEnabledGlobally)
+    if(gLunaEnabled && lunaAllowed())
         Renderer::Get().EndFrameRender();
 }

@@ -84,6 +84,7 @@ static void compatInit(Compatibility_t &c)
     c.sfx_player_grow_with_got_item = Compatibility_t::SPGWGI_UNSPECIFIED;
     // 1.3.6
     c.demos_counter_enable = false;
+    c.luna_enable_engine = Compatibility_t::LUNA_ENGINE_UNSPECIFIED;
 
 
     if(s_compatLevel >= COMPAT_SMBX2) // Make sure that bugs were same as on SMBX2 Beta 4 on this moment
@@ -174,6 +175,20 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
     compat.beginGroup("deaths-counter");
     {
         compat.read("enabled", c.demos_counter_enable, c.demos_counter_enable);
+    }
+    compat.endGroup();
+
+    compat.beginGroup("luna-script");
+    {
+        const IniProcessing::StrEnumMap lunaEnable
+        {
+            {"unpsecified", Compatibility_t::LUNA_ENGINE_UNSPECIFIED},
+            {"enable", Compatibility_t::LUNA_ENGINE_ENABLE},
+            {"true", Compatibility_t::LUNA_ENGINE_ENABLE},
+            {"disable", Compatibility_t::LUNA_ENGINE_DISABLE},
+            {"false", Compatibility_t::LUNA_ENGINE_DISABLE}
+        };
+        compat.readEnum("enable-engine", c.luna_enable_engine, c.luna_enable_engine, lunaEnable);
     }
     compat.endGroup();
 
