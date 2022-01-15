@@ -479,6 +479,7 @@ static void updateIntroLevelActivity()
     if(LevelMacro > LEVELMACRO_OFF)
         UpdateMacro();
 
+    ClearTriggeredEvents();
     UpdateLayers();
     UpdateNPCs();
     UpdateBlocks();
@@ -501,6 +502,7 @@ void MenuLoop()
         updateIntroLevelActivity();
     else
     {
+        ClearTriggeredEvents();
         UpdateLayers();
         UpdateNPCs();
         UpdateBlocks();

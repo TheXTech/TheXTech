@@ -155,6 +155,7 @@ void GameLoop()
     }
     else
     {
+        ClearTriggeredEvents();
         UpdateLayers(); // layers before/after npcs
         UpdateNPCs();
 
