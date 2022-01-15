@@ -43,7 +43,8 @@ void GFX_t::loadImage(StdPicture &img, const std::string &path)
     m_loadedImages.push_back(&img);
 }
 
-GFX_t::GFX_t() noexcept = default;
+GFX_t::GFX_t() noexcept
+{}
 
 bool GFX_t::load()
 {
