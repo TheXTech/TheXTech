@@ -145,7 +145,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
     compat.beginGroup("speedrun");
     {
         std::string buffer;
-        IniProcessing::StrEnumMap stopBy
+        const IniProcessing::StrEnumMap stopBy
         {
             {"none", Compatibility_t::SPEEDRUN_STOP_NONE},
             {"event", Compatibility_t::SPEEDRUN_STOP_EVENT},
@@ -160,7 +160,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
 
     compat.beginGroup("effects");
     {
-        IniProcessing::StrEnumMap spgwgi
+        const IniProcessing::StrEnumMap spgwgi
         {
             {"unpsecified", Compatibility_t::SPGWGI_UNSPECIFIED},
             {"enable", Compatibility_t::SPGWGI_ENABLE},
