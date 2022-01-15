@@ -20,6 +20,7 @@
 
 #include <list>
 #include <sstream>
+#include <unordered_map>
 
 #include <Logger/logger.h>
 #include <fmt_format_ne.h>
@@ -1410,13 +1411,142 @@ void Autocode::modParam(double &dst, double src, OPTYPE operation)
     }
 }
 
+static const std::unordered_map<std::string, AutocodeType> s_commandMap =
+{
+    {"FilterToSmall", AT_FilterToSmall},
+    {"FilterToBig", AT_FilterToBig},
+    {"FilterToFire", AT_FilterToFire},
+    {"FilterMount", AT_FilterMount},
+    {"FilterReservePowerup", AT_FilterReservePowerup},
+    {"FilterPlayer", AT_FilterPlayer},
+
+    {"SetHearts", AT_SetHearts},
+    {"HeartSystem", AT_HeartSystem},
+    {"InfiniteFlying", AT_InfiniteFlying},
+
+    {"ScreenEdgeBuffer", AT_ScreenEdgeBuffer},
+
+    {"ShowText", AT_ShowText},
+    {"ShowNPCLifeLeft", AT_ShowNPCLifeLeft},
+
+    {"Trigger", AT_Trigger},
+    {"Timer", AT_Timer},
+    {"IfNPC", AT_IfNPC},
+    {"BlockTrigger", AT_BlockTrigger},
+    {"TriggerRandom", AT_TriggerRandom},
+    {"TriggerRandomRange", AT_TriggerRandomRange},
+    {"TriggerZone", AT_TriggerZone},
+    {"ScreenBorderTrigger", AT_ScreenBorderTrigger},
+    {"OnInput", AT_OnInput},
+    {"OnCustomCheat", AT_OnCustomCheat},
+    {"OnPlayerMem", AT_OnPlayerMem},
+    {"OnGlobalMem", AT_OnGlobalMem},
+
+    {"SetVar", AT_SetVar},
+    {"LoadPlayerVar", AT_LoadPlayerVar},
+    {"LoadNPCVar", AT_LoadNPCVar},
+    {"LoadGlobalVar", AT_LoadGlobalVar},
+    {"ShowVar", AT_ShowVar},
+    {"IfVar", AT_IfVar},
+    {"CompareVar", AT_CompareVar},
+    {"BankVar", AT_BankVar},
+    {"WriteBank", AT_WriteBank},
+
+    {"LunaControl", AT_LunaControl},
+
+    {"DeleteCommand", AT_DeleteCommand},
+    {"ModParam", AT_ModParam},
+    {"ChangeTime", AT_ChangeTime},
+
+    {"DeleteEventsFrom", AT_DeleteEventsFrom},
+    {"ClearInputString", AT_ClearInputString},
+
+    {"LayerXSpeed", AT_LayerXSpeed},
+    {"LayerYSpeed", AT_LayerYSpeed},
+    {"AccelerateLayerX", AT_AccelerateLayerX},
+    {"AccelerateLayerY", AT_AccelerateLayerY},
+    {"DeccelerateLayerX", AT_DeccelerateLayerX},
+    {"DeccelerateLayerY", AT_DeccelerateLayerY},
+    {"SetAllBlocksID", AT_SetAllBlocksID},
+    {"SwapAllBlocks", AT_SwapAllBlocks},
+    {"ShowAllBlocks", AT_ShowAllBlocks},
+    {"HideAllBlocks", AT_HideAllBlocks},
+
+    {"PushScreenBoundary", AT_PushScreenBoundary},
+    {"SnapSectionBounds", AT_SnapSectionBounds},
+
+    {"CyclePlayerRight", AT_CyclePlayerRight},
+    {"CyclePlayerLeft", AT_CyclePlayerLeft},
+
+    {"SFX", AT_SFX},
+    {"SetMusic", AT_SetMusic},
+    {"PlayMusic", AT_PlayMusic},
+
+    {"TriggerSMBXEvent", AT_TriggerSMBXEvent},
+    {"OnEvent", AT_OnEvent},
+    {"CancelSMBXEvent", AT_CancelSMBXEvent},
+
+    {"Kill", AT_Kill},
+    {"Hurt", AT_Hurt},
+
+    {"SetHits", AT_SetHits},
+    {"NPCMemSet", AT_NPCMemSet},
+    {"PlayerMemSet", AT_PlayerMemSet},
+    {"ForceFacing", AT_ForceFacing},
+    {"MemAssign", AT_MemAssign},
+    {"DebugPrint", AT_DebugPrint},
+    {"DebugWindow", AT_DebugWindow},
+
+    {"CollisionScan", AT_CollisionScan},
+
+    {"LoadImage", AT_LoadImage},
+    {"SpriteBlueprint", AT_SpriteBlueprint},
+    {"Attach", AT_Attach},
+    {"PlaceSprite", AT_PlaceSprite},
+
+    {"OnPlayerCollide", AT_OnPlayerCollide},
+    {"OnPlayerDistance", AT_OnPlayerDistance},
+    {"WaitForPlayer", AT_WaitForPlayer},
+    {"PlayerHoldingSprite", AT_PlayerHoldingSprite},
+    {"RandomComponent", AT_RandomComponent},
+    {"RandomComponentRange", AT_RandomComponentRange},
+    {"SetSpriteVar", AT_SetSpriteVar},
+    {"IfSpriteVar", AT_IfSpriteVar},
+    {"IfLunaVar", AT_IfLunaVar},
+    {"Die", AT_Die},
+    {"Deccelerate", AT_Deccelerate},
+    {"AccelToPlayer", AT_AccelToPlayer},
+    {"ApplyVariableGravity", AT_ApplyVariableGravity},
+    {"PhaseMove", AT_PhaseMove},
+    {"BumpMove", AT_BumpMove},
+    {"CrashMove", AT_CrashMove},
+    {"SetXSpeed", AT_SetXSpeed},
+    {"SetYSpeed", AT_SetYSpeed},
+    {"SetAlwaysProcess", AT_SetAlwaysProcess},
+    {"SetVisible", AT_SetVisible},
+    {"SetHitbox", AT_SetHitbox},
+    {"TeleportNearPlayer", AT_TeleportNearPlayer},
+    {"TeleportTo", AT_TeleportTo},
+    {"HarmPlayer", AT_HarmPlayer},
+    {"GenerateInRadius", AT_GenerateInRadius},
+    {"GenerateAtAngle", AT_GenerateAtAngle},
+    {"BasicAnimate", AT_BasicAnimate},
+    {"Blink", AT_Blink},
+    {"AnimateFloat", AT_AnimateFloat},
+    {"TriggerLunaEvent", AT_TriggerLunaEvent},
+    {"HarmPlayer", AT_HarmPlayer},
+    {"SpriteTimer", AT_SpriteTimer},
+    {"SpriteDebug", AT_SpriteDebug},
+    {"StaticDraw", AT_StaticDraw},
+    {"RelativeDraw", AT_RelativeDraw}
+};
 
 AutocodeType Autocode::EnumerizeCommand(char *wbuf)
 {
     if(wbuf)
     {
         char command[100];
-        SDL_memset(command, 9, 100 * sizeof(char));
+        SDL_memset(command, 0, 100 * sizeof(char));
         int success = SDL_sscanf(wbuf, " %99[^,] ,", command);
         if(!success)
         {
@@ -1427,347 +1557,9 @@ AutocodeType Autocode::EnumerizeCommand(char *wbuf)
             return AT_Invalid;
         }
 
-        if(SDL_strcmp(command, "FilterToSmal") == 0)
-            return AT_FilterToSmall;
-
-        if(SDL_strcmp(command, "FilterToBig") == 0)
-            return AT_FilterToBig;
-
-        if(SDL_strcmp(command, "FilterToFire") == 0)
-            return AT_FilterToFire;
-
-        if(SDL_strcmp(command, "FilterMount") == 0)
-            return AT_FilterMount;
-
-        if(SDL_strcmp(command, "FilterReservePowerup") == 0)
-            return AT_FilterReservePowerup;
-
-        if(SDL_strcmp(command, "FilterPlayer") == 0)
-            return AT_FilterPlayer;
-
-
-        if(SDL_strcmp(command, "SetHearts") == 0)
-            return AT_SetHearts;
-
-        if(SDL_strcmp(command, "HeartSystem") == 0)
-            return AT_HeartSystem;
-
-        if(SDL_strcmp(command, "InfiniteFlying") == 0)
-            return AT_InfiniteFlying;
-
-
-        if(SDL_strcmp(command, "ScreenEdgeBuffer") == 0)
-            return AT_ScreenEdgeBuffer;
-
-
-        if(SDL_strcmp(command, "ShowText") == 0)
-            return AT_ShowText;
-
-        if(SDL_strcmp(command, "ShowNPCLifeLeft") == 0)
-            return AT_ShowNPCLifeLeft;
-
-
-        if(SDL_strcmp(command, "Trigger") == 0)
-            return AT_Trigger;
-
-        if(SDL_strcmp(command, "Timer") == 0)
-            return AT_Timer;
-
-        if(SDL_strcmp(command, "IfNPC") == 0)
-            return AT_IfNPC;
-
-        if(SDL_strcmp(command, "BlockTrigger") == 0)
-            return AT_BlockTrigger;
-
-        if(SDL_strcmp(command, "TriggerRandom") == 0)
-            return AT_TriggerRandom;
-
-        if(SDL_strcmp(command, "TriggerRandomRange") == 0)
-            return AT_TriggerRandomRange;
-
-        if(SDL_strcmp(command, "TriggerZone") == 0)
-            return AT_TriggerZone;
-
-        if(SDL_strcmp(command, "ScreenBorderTrigger") == 0)
-            return AT_ScreenBorderTrigger;
-
-        if(SDL_strcmp(command, "OnInput") == 0)
-            return AT_OnInput;
-
-        if(SDL_strcmp(command, "OnCustomCheat") == 0)
-            return AT_OnCustomCheat;
-
-        if(SDL_strcmp(command, "OnPlayerMem") == 0)
-            return AT_OnPlayerMem;
-
-        if(SDL_strcmp(command, "OnGlobalMem") == 0)
-            return AT_OnGlobalMem;
-
-
-        if(SDL_strcmp(command, "SetVar") == 0)
-            return AT_SetVar;
-
-        if(SDL_strcmp(command, "LoadPlayerVar") == 0)
-            return AT_LoadPlayerVar;
-
-        if(SDL_strcmp(command, "LoadNPCVar") == 0)
-            return AT_LoadNPCVar;
-
-        if(SDL_strcmp(command, "LoadGlobalVar") == 0)
-            return AT_LoadGlobalVar;
-
-        if(SDL_strcmp(command, "ShowVar") == 0)
-            return AT_ShowVar;
-
-        if(SDL_strcmp(command, "IfVar") == 0)
-            return AT_IfVar;
-
-        if(SDL_strcmp(command, "CompareVar") == 0)
-            return AT_CompareVar;
-
-        if(SDL_strcmp(command, "BankVar") == 0)
-            return AT_BankVar;
-
-        if(SDL_strcmp(command, "WriteBank") == 0)
-            return AT_WriteBank;
-
-
-        if(SDL_strcmp(command, "LunaContro") == 0)
-            return AT_LunaControl;
-
-
-        if(SDL_strcmp(command, "DeleteCommand") == 0)
-            return AT_DeleteCommand;
-
-        if(SDL_strcmp(command, "ModParam") == 0)
-            return AT_ModParam;
-
-        if(SDL_strcmp(command, "ChangeTime") == 0)
-            return AT_ChangeTime;
-
-
-        if(SDL_strcmp(command, "DeleteEventsFrom") == 0)
-            return AT_DeleteEventsFrom;
-
-        if(SDL_strcmp(command, "ClearInputString") == 0)
-            return AT_ClearInputString;
-
-
-        if(SDL_strcmp(command, "LayerXSpeed") == 0)
-            return AT_LayerXSpeed;
-
-        if(SDL_strcmp(command, "LayerYSpeed") == 0)
-            return AT_LayerYSpeed;
-
-        if(SDL_strcmp(command, "AccelerateLayerX") == 0)
-            return AT_AccelerateLayerX;
-
-        if(SDL_strcmp(command, "AccelerateLayerY") == 0)
-            return AT_AccelerateLayerY;
-
-        if(SDL_strcmp(command, "DeccelerateLayerX") == 0)
-            return AT_DeccelerateLayerX;
-
-        if(SDL_strcmp(command, "DeccelerateLayerY") == 0)
-            return AT_DeccelerateLayerY;
-
-        if(SDL_strcmp(command, "SetAllBlocksID") == 0)
-            return AT_SetAllBlocksID;
-
-        if(SDL_strcmp(command, "SwapAllBlocks") == 0)
-            return AT_SwapAllBlocks;
-
-        if(SDL_strcmp(command, "ShowAllBlocks") == 0)
-            return AT_ShowAllBlocks;
-
-        if(SDL_strcmp(command, "HideAllBlocks") == 0)
-            return AT_HideAllBlocks;
-
-
-        if(SDL_strcmp(command, "PushScreenBoundary") == 0)
-            return AT_PushScreenBoundary;
-
-        if(SDL_strcmp(command, "SnapSectionBounds") == 0)
-            return AT_SnapSectionBounds;
-
-
-        if(SDL_strcmp(command, "CyclePlayerRight") == 0)
-            return AT_CyclePlayerRight;
-
-        if(SDL_strcmp(command, "CyclePlayerLeft") == 0)
-            return AT_CyclePlayerLeft;
-
-
-        if(SDL_strcmp(command, "SFX") == 0)
-            return AT_SFX;
-
-        if(SDL_strcmp(command, "SetMusic") == 0)
-            return AT_SetMusic;
-
-        if(SDL_strcmp(command, "PlayMusic") == 0)
-            return AT_PlayMusic;
-
-
-        if(SDL_strcmp(command, "TriggerSMBXEvent") == 0)
-            return AT_TriggerSMBXEvent;
-
-        if(SDL_strcmp(command, "OnEvent") == 0)
-            return AT_OnEvent;
-
-        if(SDL_strcmp(command, "CancelSMBXEvent") == 0)
-            return AT_CancelSMBXEvent;
-
-        if(SDL_strcmp(command, "Kill") == 0)
-            return AT_Kill;
-
-        if(SDL_strcmp(command, "Hurt") == 0)
-            return AT_Hurt;
-
-
-        if(SDL_strcmp(command, "SetHits") == 0)
-            return AT_SetHits;
-
-        if(SDL_strcmp(command, "NPCMemSet") == 0)
-            return AT_NPCMemSet;
-
-        if(SDL_strcmp(command, "PlayerMemSet") == 0)
-            return AT_PlayerMemSet;
-
-        if(SDL_strcmp(command, "ForceFacing") == 0)
-            return AT_ForceFacing;
-
-        if(SDL_strcmp(command, "MemAssign") == 0)
-            return AT_MemAssign;
-
-        if(SDL_strcmp(command, "DebugPrint") == 0)
-            return AT_DebugPrint;
-
-        if(SDL_strcmp(command, "DebugWindow") == 0)
-            return AT_DebugWindow;
-
-
-        if(SDL_strcmp(command, "CollisionScan") == 0)
-            return AT_CollisionScan;
-
-
-        if(SDL_strcmp(command, "LoadImage") == 0)
-            return AT_LoadImage;
-
-        if(SDL_strcmp(command, "SpriteBlueprint") == 0)
-            return AT_SpriteBlueprint;
-
-        if(SDL_strcmp(command, "Attach") == 0)
-            return AT_Attach;
-
-        if(SDL_strcmp(command, "PlaceSprite") == 0)
-            return AT_PlaceSprite;
-
-
-        // Sprite Component section
-        if(SDL_strcmp(command, "OnPlayerCollide") == 0)
-            return AT_OnPlayerCollide;
-
-        if(SDL_strcmp(command, "OnPlayerDistance") == 0)
-            return AT_OnPlayerDistance;
-
-        if(SDL_strcmp(command, "WaitForPlayer") == 0)
-            return AT_WaitForPlayer;
-
-        if(SDL_strcmp(command, "PlayerHoldingSprite") == 0)
-            return AT_PlayerHoldingSprite;
-
-        if(SDL_strcmp(command, "RandomComponent") == 0)
-            return AT_RandomComponent;
-
-        if(SDL_strcmp(command, "RandomComponentRange") == 0)
-            return AT_RandomComponentRange;
-
-        if(SDL_strcmp(command, "SetSpriteVar") == 0)
-            return AT_SetSpriteVar;
-
-        if(SDL_strcmp(command, "IfSpriteVar") == 0)
-            return AT_IfSpriteVar;
-
-        if(SDL_strcmp(command, "IfLunaVar") == 0)
-            return AT_IfLunaVar;
-
-        if(SDL_strcmp(command, "Die") == 0)
-            return AT_Die;
-
-        if(SDL_strcmp(command, "Deccelerate") == 0)
-            return AT_Deccelerate;
-
-        if(SDL_strcmp(command, "AccelToPlayer") == 0)
-            return AT_AccelToPlayer;
-
-        if(SDL_strcmp(command, "ApplyVariableGravity") == 0)
-            return AT_ApplyVariableGravity;
-
-        if(SDL_strcmp(command, "PhaseMove") == 0)
-            return AT_PhaseMove;
-
-        if(SDL_strcmp(command, "BumpMove") == 0)
-            return AT_BumpMove;
-
-        if(SDL_strcmp(command, "CrashMove") == 0)
-            return AT_CrashMove;
-
-        if(SDL_strcmp(command, "SetXSpeed") == 0)
-            return AT_SetXSpeed;
-
-        if(SDL_strcmp(command, "SetYSpeed") == 0)
-            return AT_SetYSpeed;
-
-        if(SDL_strcmp(command, "SetAlwaysProcess") == 0)
-            return AT_SetAlwaysProcess;
-
-        if(SDL_strcmp(command, "SetVisible") == 0)
-            return AT_SetVisible;
-
-        if(SDL_strcmp(command, "SetHitbox") == 0)
-            return AT_SetHitbox;
-
-        if(SDL_strcmp(command, "TeleportNearPlayer") == 0)
-            return AT_TeleportNearPlayer;
-
-        if(SDL_strcmp(command, "TeleportTo") == 0)
-            return AT_TeleportTo;
-
-        if(SDL_strcmp(command, "HarmPlayer") == 0)
-            return AT_HarmPlayer;
-
-        if(SDL_strcmp(command, "GenerateInRadius") == 0)
-            return AT_GenerateInRadius;
-
-        if(SDL_strcmp(command, "GenerateAtAngle") == 0)
-            return AT_GenerateAtAngle;
-
-        if(SDL_strcmp(command, "BasicAnimate") == 0)
-            return AT_BasicAnimate;
-
-        if(SDL_strcmp(command, "Blink") == 0)
-            return AT_Blink;
-
-        if(SDL_strcmp(command, "AnimateFloat") == 0)
-            return AT_AnimateFloat;
-
-        if(SDL_strcmp(command, "TriggerLunaEvent") == 0)
-            return AT_TriggerLunaEvent;
-
-        if(SDL_strcmp(command, "HarmPlayer") == 0)
-            return AT_HarmPlayer;
-
-        if(SDL_strcmp(command, "SpriteTimer") == 0)
-            return AT_SpriteTimer;
-
-        if(SDL_strcmp(command, "SpriteDebug") == 0)
-            return AT_SpriteDebug;
-
-        if(SDL_strcmp(command, "StaticDraw") == 0)
-            return AT_StaticDraw;
-
-        if(SDL_strcmp(command, "RelativeDraw") == 0)
-            return AT_RelativeDraw;
+        auto cmd = s_commandMap.find(std::string(command));
+        if(cmd != s_commandMap.end())
+            return cmd->second;
     }
 
     if(wbuf)
