@@ -24,6 +24,7 @@
 
 #include <string>
 #include <map>
+#include <unordered_map>
 #include <list>
 #include <fstream>
 
@@ -71,6 +72,36 @@ struct AutocodeManager
     std::list<Autocode>     m_InitAutocodes;
     std::list<Autocode>     m_CustomCodes;
     std::list<Autocode>     m_GlobalCodes;
+
+    //! When any event gets expired, this field gets set to proceed the cleanup of expired events
+    bool                    m_hasExpired = false;
+
+    //! Index table to find autocodes by section
+    std::unordered_map<int, std::list<Autocode*>>          m_autocodeIdxSection;
+    //! Index table to find autocodes by referrence
+    std::unordered_map<std::string, std::list<Autocode*>>  m_autocodeIdxRef;
+
+    //! Index table to find global autocodes by section
+    std::unordered_map<int, std::list<Autocode*>>          m_globcodeIdxSection;
+    //! Index table to find global autocodes by reference
+    std::unordered_map<std::string, std::list<Autocode*>>  m_globcodeIdxRef;
+
+    void addToIndex(Autocode *code);
+    void removeFromIndex(Autocode *code);
+
+    void addToIndexGlob(Autocode *code);
+    void removeFromIndexGlob(Autocode *code);
+
+    struct ParseError
+    {
+        int lineNumber = -1;
+        std::string line;
+        std::string message;
+    };
+
+    std::list<ParseError> m_errors;
+    void addError(int lineNumber, const std::string &line, const std::string &msg);
+    void showErrors(const std::string &file);
 
     std::map<std::string, double> m_UserVars;
 

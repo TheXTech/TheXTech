@@ -227,7 +227,7 @@ public:
 
     static bool NPCConditional(int NPCID, int condition);
 
-    static AutocodeType EnumerizeCommand(char *wbuf);
+    static AutocodeType EnumerizeCommand(char *wbuf, int lineNumber = -1);
     static SpriteComponent GenerateComponent(const Autocode &obj_to_convert); // Convert an autocode object to a sprite component
     static pfnSprFunc GetSpriteFunc(const Autocode &pAC);                     // Get sprite function address from AC object, or NULL
     static pfnSprDraw GetDrawFunc(const Autocode &pAC);                       // Get draw function address from AC object, or NULL
@@ -252,6 +252,8 @@ public:
     FIELDTYPE ftype = FT_INVALID;
     bool Activated = false;             // False for custom event blueprints
     bool Expired = false;
+
+    void expire();
 
     //SpriteComponent* comp;
 

@@ -21,6 +21,9 @@
 #include <Utils/files.h>
 #include <Utils/dir_list_ci.h>
 #include <AppPath/app_path.h>
+#include <Logger/logger.h>
+#include "core/msgbox.h"
+#include <fmt_format_ne.h>
 
 #include "autocode_manager.h"
 #include "globals.h"
@@ -53,11 +56,16 @@ void AutocodeManager::Clear(bool clear_global_codes)
     {
         m_GlobalCodes.clear();
         m_GlobalEnabled = false;
+        m_globcodeIdxRef.clear();
+        m_globcodeIdxSection.clear();
     }
 
     m_Autocodes.clear();
     m_InitAutocodes.clear();
     m_CustomCodes.clear();
+
+    m_autocodeIdxRef.clear();
+    m_autocodeIdxSection.clear();
 
     m_Hearts = 2;
 
@@ -98,10 +106,12 @@ bool AutocodeManager::ReadFile(const std::string &script_path)
     if(!code_file)
         return false;
 
+    pLogDebug("Loading %s level local autocode script...", script_path.c_str());
+
     m_Enabled = true;
     Parse(code_file, false);
-
     std::fclose(code_file);
+    showErrors(script_path);
 
     return true;
 }
@@ -113,8 +123,12 @@ bool AutocodeManager::ReadWorld(const std::string &script_path)
     if(!code_file)
         return false;
 
+    pLogDebug("Loading %s episode wide autocode script...", script_path.c_str());
+
     Parse(code_file, false);
     std::fclose(code_file);
+    showErrors(script_path);
+
     return true;
 }
 
@@ -125,11 +139,13 @@ bool AutocodeManager::ReadGlobals(const std::string &script_path)
     if(!code_file)
         return false;
 
+    pLogDebug("Loading %s global autocode script...", script_path.c_str());
+
     Parse(code_file, true);
-
-    m_GlobalEnabled = true;
-
     std::fclose(code_file);
+    m_GlobalEnabled = true;
+    showErrors(script_path);
+
     return true;
 }
 
@@ -138,6 +154,7 @@ bool AutocodeManager::ReadGlobals(const std::string &script_path)
 void AutocodeManager::Parse(FILE *code_file, bool add_to_globals)
 {
     char wbuf[2000];
+    size_t wbuflen = 0;
     char combuf[150];
     SDL_memset(wbuf, 0, 2000 * sizeof(char));
     SDL_memset(combuf, 0, 150 * sizeof(char));
@@ -157,6 +174,9 @@ void AutocodeManager::Parse(FILE *code_file, bool add_to_globals)
     char wrefbuf[128];
     SDL_memset(wstrbuf, 0, 1000 * sizeof(char));
     SDL_memset(wrefbuf, 0, 128 * sizeof(char));
+    int lineNum = 0;
+
+    m_errors.clear();
 
     std::fseek(code_file, 0, SEEK_SET);
 
@@ -178,10 +198,29 @@ void AutocodeManager::Parse(FILE *code_file, bool add_to_globals)
         bparam2 = 0;
         bparam3 = 0;
         blength = 0;
-        std::fgets(wbuf, 2000, code_file);
+
+        if(!std::fgets(wbuf, 2000, code_file))
+            break; // End of file has reached
+        lineNum++;
 
         // Is it a comment?
-        if(SDL_strstr(wbuf, "//") != nullptr)
+        char *commentLine = SDL_strstr(wbuf, "//");
+        if(commentLine != nullptr)
+            commentLine[0] = '\0'; // Cut the comment line at here
+
+        // does this line contains anything useful?
+        wbuflen = SDL_strlen(wbuf);
+        while(wbuflen > 0)
+        {
+            auto c = wbuf[wbuflen - 1];
+            if(c != '\n' && c != '\r' && c != '\t' && c != ' ')
+                break;
+            wbuf[wbuflen - 1] = '\0';
+            wbuflen--;
+        }
+
+        // Is it an empty line?
+        if(wbuflen <= 0)
             continue;
 
         // Is it a new section header?
@@ -190,8 +229,20 @@ void AutocodeManager::Parse(FILE *code_file, bool add_to_globals)
             // Is it the level load header?
             if(wbuf[1] == '-')
                 cur_section = -1;
-            else   // Else, parse the section number
-                cur_section = SDL_atoi(&wbuf[1]);
+            else if(SDL_strncasecmp(wbuf + 1, "end", 1999) == 0)
+                continue; // "END" keyword, just do nothing
+            else // Else, parse the section number
+            {
+                try
+                {
+                    cur_section = std::stoi(wbuf + 1);
+                }
+                catch (const std::exception &e)
+                {
+                    addError(lineNum, wbuf, fmt::format_ne("Bad section format ({0})", e.what()));
+                    // Keep section number unchanged
+                }
+            }
         }
         else   // Else, parse as a command
         {
@@ -207,7 +258,7 @@ void AutocodeManager::Parse(FILE *code_file, bool add_to_globals)
                 SDL_strlcpy(wbuf, &wbuf[i + 1], 2000); // The rest of the line minus the ref is the new wbuf
             }
 
-            ac_type = Autocode::EnumerizeCommand(wbuf);
+            ac_type = Autocode::EnumerizeCommand(wbuf, lineNum);
 
             // Decimal pass
             int hits = SDL_sscanf(wbuf, PARSE_FMT_STR, combuf, &target, &param1, &param2, &param3, &length, wstrbuf);
@@ -217,7 +268,10 @@ void AutocodeManager::Parse(FILE *code_file, bool add_to_globals)
 
             // Check for formatting failure
             if(hits < 3 && bhits < 3)
+            {
+                addError(lineNum, wbuf, "Bad line format");
                 continue;
+            }
 
             // Check for hexadecimal inputs
             //if(true) // Always true
@@ -245,14 +299,20 @@ void AutocodeManager::Parse(FILE *code_file, bool add_to_globals)
             if(!add_to_globals)
             {
                 if(newcode.m_Type < 10000 || !newcode.MyRef.empty())
+                {
                     m_Autocodes.emplace_back(std::move(newcode));
+                    addToIndex(&m_Autocodes.back());
+                }
                 else   // Sprite components (type 10000+) with no reference go into callable component list
                     gSpriteMan.m_ComponentList.push_back(Autocode::GenerateComponent(newcode));
             }
             else
             {
                 if(newcode.m_Type < 10000)
+                {
                     m_GlobalCodes.emplace_back(std::move(newcode));
+                    addToIndexGlob(&m_GlobalCodes.back());
+                }
             }
         }
     }//while
@@ -269,6 +329,7 @@ void AutocodeManager::DoEvents(bool init)
         {
             m_Autocodes.push_back(m_CustomCodes.back());
             m_CustomCodes.pop_back();
+            addToIndex(&m_Autocodes.back());
         }
 
         // Do each code
@@ -289,11 +350,11 @@ Autocode *AutocodeManager::GetEventByRef(const std::string &ref_name)
 {
     if(ref_name.length() > 0)
     {
-        for(auto &m_Autocode : m_Autocodes)
-        {
-            if(m_Autocode.MyRef == ref_name)
-                return &m_Autocode;
-        }
+        auto ref = m_autocodeIdxRef.find(ref_name);
+        if(ref == m_autocodeIdxRef.end() || ref->second.empty())
+            return nullptr;
+
+        return ref->second.front();
     }
     return nullptr;
 }
@@ -303,10 +364,11 @@ void AutocodeManager::DeleteEvent(const std::string &ref_name)
 {
     if(ref_name.length() > 0)
     {
-        for(auto &m_Autocode : m_Autocodes)
+        auto ref = m_autocodeIdxRef.find(ref_name);
+        if(ref != m_autocodeIdxRef.end())
         {
-            if(m_Autocode.MyRef == ref_name)
-                m_Autocode.Expired = true;
+            for(auto *code : ref->second)
+                code->expire();
         }
     }
 }
@@ -314,6 +376,13 @@ void AutocodeManager::DeleteEvent(const std::string &ref_name)
 // CLEAN EXPIRED - Don't call this while iterating over codes
 void AutocodeManager::ClearExpired()
 {
+    if(!m_hasExpired)
+        return; // Nothing to do
+
+#ifdef DEBUG_BUILD
+    int cleanedAutos = 0, cleanedGlobs = 0;
+#endif
+
     //char* dbg = "CLEAN EXPIRED DBG";
     auto iter = m_Autocodes.begin();
     auto end  = m_Autocodes.end();
@@ -323,8 +392,12 @@ void AutocodeManager::ClearExpired()
         //Autocode* ac = *iter;
         if((*iter).Expired || (*iter).m_Type == AT_Invalid)
         {
+            removeFromIndex(&*iter);
 //            delete(*iter);
             iter = m_Autocodes.erase(iter);
+#ifdef DEBUG_BUILD
+            cleanedAutos++;
+#endif
         }
         else
             ++iter;
@@ -339,11 +412,25 @@ void AutocodeManager::ClearExpired()
         if((*iter).Expired || (*iter).m_Type == AT_Invalid)
         {
 //            delete(*iter);
+            removeFromIndexGlob(&*iter);
             iter = m_GlobalCodes.erase(iter);
+#ifdef DEBUG_BUILD
+            cleanedGlobs++;
+#endif
         }
         else
             ++iter;
     }
+
+#ifdef DEBUG_BUILD
+    if(cleanedAutos > 0)
+        D_pLogDebug("Autocode: Cleaned %d expired autocodes", cleanedAutos);
+
+    if(cleanedGlobs > 0)
+        D_pLogDebug("Autocode: Cleaned %d expired global autocodes", cleanedGlobs);
+#endif
+
+    m_hasExpired = false;
 }
 
 // ACTIVATE CUSTOM EVENTS
@@ -352,29 +439,37 @@ void AutocodeManager::ActivateCustomEvents(int new_section, int eventcode)
     //char* dbg = "ACTIVATE CUSTOM DBG";
     if(m_Enabled)
     {
-        for(auto &code : m_Autocodes)
+        auto secA = m_autocodeIdxSection.find(eventcode);
+        if(secA != m_autocodeIdxSection.end())
         {
-            // Activate copies of events with 'eventcode' and move them to 'new_section'
-            if(code.ActiveSection == eventcode && !code.Activated && !code.Expired)
+            for(auto *code : secA->second)
             {
-                Autocode newcode = code;
-                newcode.Activated = true;
-                newcode.ActiveSection = (new_section < 1000 ? (new_section - 1) : new_section);
-                newcode.Length = code.m_OriginalTime;
-                m_CustomCodes.push_front(std::move(newcode));
+                // Activate copies of events with 'eventcode' and move them to 'new_section'
+                if(!code->Activated && !code->Expired)
+                {
+                    Autocode newcode = *code;
+                    newcode.Activated = true;
+                    newcode.ActiveSection = (new_section < 1000 ? (new_section - 1) : new_section);
+                    newcode.Length = code->m_OriginalTime;
+                    m_CustomCodes.push_front(std::move(newcode));
+                }
             }
         }
 
-        for(auto &code : m_GlobalCodes)
+        auto secG = m_globcodeIdxSection.find(eventcode);
+        if(secG != m_globcodeIdxSection.end())
         {
-            // Activate copies of events with 'eventcode' and move them to 'new_section'
-            if(code.ActiveSection == eventcode && !code.Activated && !code.Expired)
+            for(auto *code : secG->second)
             {
-                Autocode newcode = code;
-                newcode.Activated = true;
-                newcode.ActiveSection = (new_section < 1000 ? (new_section - 1) : new_section);
-                newcode.Length = code.m_OriginalTime;
-                m_CustomCodes.push_front(std::move(newcode));
+                // Activate copies of events with 'eventcode' and move them to 'new_section'
+                if(!code->Activated && !code->Expired)
+                {
+                    Autocode newcode = *code;
+                    newcode.Activated = true;
+                    newcode.ActiveSection = (new_section < 1000 ? (new_section - 1) : new_section);
+                    newcode.Length = code->m_OriginalTime;
+                    m_CustomCodes.push_front(std::move(newcode));
+                }
             }
         }
     }
@@ -386,16 +481,18 @@ void AutocodeManager::ForceExpire(int section)
     //char* dbg = "FORCE EXPIRE DBG";
     if(m_Enabled)
     {
-        for(auto &m_Autocode : m_Autocodes)
+        auto sec = m_autocodeIdxSection.find(section);
+        if(sec != m_autocodeIdxSection.end())
         {
-            if(m_Autocode.ActiveSection == section)
-                m_Autocode.Expired = true;
+            for(auto *code : sec->second)
+                code->expire();
         }
 
-        for(auto &m_GlobalCode : m_GlobalCodes)
+        auto secG = m_globcodeIdxSection.find(section);
+        if(secG != m_globcodeIdxSection.end())
         {
-            if(m_GlobalCode.ActiveSection == section)
-                m_GlobalCode.Expired = true;
+            for(auto *code : secG->second)
+                code->expire();
         }
     }
 }
@@ -404,10 +501,15 @@ void AutocodeManager::ForceExpire(int section)
 Autocode *AutocodeManager::FindMatching(int section, const std::string &soughtstr)
 {
     //char* dbg = "FIND MATCHING DBG";
-    for(auto &m_Autocode : m_Autocodes)
+    // Find at m_Autocodes
+    auto s = m_autocodeIdxSection.find(section);
+    if(s == m_autocodeIdxSection.end())
+        return nullptr;
+
+    for(auto *code : s->second)
     {
-        if(m_Autocode.ActiveSection == section && m_Autocode.MyString == soughtstr)
-            return &m_Autocode;
+        if(code->MyString == soughtstr)
+            return code;
     }
 
     return nullptr;
@@ -452,6 +554,113 @@ bool AutocodeManager::VarOperation(const std::string &var_name, double value, OP
         }
     }
     return false;
+}
+
+void AutocodeManager::addToIndex(Autocode *code)
+{
+    m_autocodeIdxSection[code->ActiveSection].push_back(code);
+    if(!code->MyRef.empty())
+        m_autocodeIdxRef[code->MyRef].push_back(code);
+}
+
+void AutocodeManager::removeFromIndex(Autocode *code)
+{
+    auto &sec = m_autocodeIdxSection[code->ActiveSection];
+    for(auto it = sec.begin(); it != sec.end(); )
+    {
+        if(*it == code)
+            it = sec.erase(it);
+        else
+            ++it;
+    }
+
+    if(!code->MyRef.empty())
+    {
+        auto &ref = m_autocodeIdxRef[code->MyRef];
+        for(auto it = ref.begin(); it != ref.end(); )
+        {
+            if(*it == code)
+                it = ref.erase(it);
+            else
+                ++it;
+        }
+    }
+}
+
+void AutocodeManager::addToIndexGlob(Autocode *code)
+{
+    m_globcodeIdxSection[code->ActiveSection].push_back(code);
+    if(!code->MyRef.empty())
+        m_globcodeIdxRef[code->MyRef].push_back(code);
+}
+
+void AutocodeManager::removeFromIndexGlob(Autocode *code)
+{
+    auto &sec = m_globcodeIdxSection[code->ActiveSection];
+    for(auto it = sec.begin(); it != sec.end(); )
+    {
+        if(*it == code)
+            it = sec.erase(it);
+        else
+            ++it;
+    }
+
+    if(!code->MyRef.empty())
+    {
+        auto &ref = m_globcodeIdxRef[code->MyRef];
+        for(auto it = ref.begin(); it != ref.end(); )
+        {
+            if(*it == code)
+                it = ref.erase(it);
+            else
+                ++it;
+        }
+    }
+}
+
+void AutocodeManager::addError(int lineNumber, const std::string &line, const std::string &msg)
+{
+    ParseError err;
+    err.lineNumber = lineNumber;
+    err.line = line;
+    err.message = msg;
+
+    // Trim the tail of the line
+    while(!err.line.empty())
+    {
+        auto c = err.line.back();
+        if(c != '\n' && c != '\r' && c != '\t' && c != ' ')
+            break;
+        err.line.pop_back();
+    }
+
+    pLogWarning("Autocode: Script parse error: [%s] at %d: %s",
+                err.message.c_str(), err.lineNumber, err.line.c_str());
+
+    m_errors.push_back(std::move(err));
+}
+
+void AutocodeManager::showErrors(const std::string &file)
+{
+    if(m_errors.empty())
+        return; // No errors
+
+    std::string out = fmt::format_ne("While parsing the {0} file, next errors has ocurred:\n\n", file);
+
+    int lines = 0;
+    for(auto &e : m_errors)
+    {
+        out += fmt::format_ne("{0}, {1}:{2}\n", e.message, e.lineNumber, e.line);
+        lines++;
+        if(lines > 25)
+        {
+            out += "... ";
+            break;
+        }
+    }
+
+    XMsgBox::simpleMsgBox(AbstractMsgBox_t::MESSAGEBOX_ERROR, "Autocode script parse errors", out);
+
 }
 
 // VAR EXISTS

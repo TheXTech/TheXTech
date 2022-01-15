@@ -68,22 +68,6 @@ static FIELDTYPE StrToFieldtype(std::string string)
     return FT_BYTE;
 }
 
-static void PrintSyntaxError(const std::string &errored_line)
-{
-    static int errors = 0;
-    errors += 25;
-    //    RenderStringOp* render_str = new RenderStringOp();
-    //    render_str->m_FontType = 2;
-    //    render_str->m_FramesLeft = 440;
-    //    render_str->m_String = errored_line;
-    //    render_str->m_String += L"- SYNTAX ERROR";
-    //    render_str->m_X = 125;
-    //    render_str->m_Y = (float)(errors % 600);
-    //    Renderer::Get().AddOp(render_str);
-    pLogWarning("Autocode Syntax Error: %s", errored_line.c_str());
-}
-
-
 
 Autocode::Autocode()
 {
@@ -327,7 +311,7 @@ void Autocode::Do(bool init)
                     }
 
                 }
-                Expired = true;
+                expire();
             }
             break;
         }
@@ -350,7 +334,7 @@ void Autocode::Do(bool init)
             if(Length <= 1)   // Play once when delay runs out
             {
                 StartMusic((int)Param1 - 1);
-                Expired = true;
+                expire();
             }
             break;
         }
@@ -358,7 +342,7 @@ void Autocode::Do(bool init)
         // EVENTS & BRANCHES
         case AT_Trigger:
         {
-            Expired = true;
+            expire();
             gAutoMan.ActivateCustomEvents((int)Target, (int)Param1);
             break;
         }
@@ -373,7 +357,7 @@ void Autocode::Do(bool init)
             if(Length == 1 || Length == 0)
             {
                 if(Length == 1)
-                    Expired = true;
+                    expire();
 
                 Autocode::DoPredicate((int)Target, (int)Param1);
 
@@ -813,7 +797,7 @@ void Autocode::Do(bool init)
                 gAutoMan.ActivateCustomEvents(0, (int)Param3);
                 cheats_clearBuffer();
                 if(Param2 != 0)
-                    this->Expired = true;
+                    this->expire();
             }
             break;
         }
@@ -1028,7 +1012,7 @@ void Autocode::Do(bool init)
             {
                 gAutoMan.ActivateCustomEvents(0, (int)Param3);
                 if(Param2 != 0)
-                    this->Expired = true;
+                    this->expire();
             }
             break;
         }
@@ -1038,7 +1022,7 @@ void Autocode::Do(bool init)
             if(Length <= 1) // Cancel event after delay
             {
                 CancelNewEvent(MyString);
-                Expired = true;
+                expire();
             }
             break;
         }
@@ -1151,6 +1135,7 @@ void Autocode::Do(bool init)
         case AT_DebugWindow:
         {
             XMsgBox::simpleMsgBox(AbstractMsgBox_t::MESSAGEBOX_INFORMATION, "LunaDLL debug message", MyString);
+            expire();
             break;
         }
 
@@ -1166,7 +1151,7 @@ void Autocode::Do(bool init)
             // Only allow loading image during init phase
             if(init)
                 Renderer::Get().LoadBitmapResource(MyString, (int)Target, (int)Param1);
-            Expired = true;
+            expire();
             break;
         }
 
@@ -1178,7 +1163,7 @@ void Autocode::Do(bool init)
                 gSpriteMan.AddBlueprint(MyRef.c_str(), blueprint);
             }
 
-            Expired = true;
+            expire();
             break;
         }
 
@@ -1214,7 +1199,7 @@ void Autocode::Do(bool init)
                 }
             }
 
-            Expired = true;
+            expire();
             break;
         }
 
@@ -1230,7 +1215,7 @@ void Autocode::Do(bool init)
             req.str = MyString;
             gSpriteMan.InstantiateSprite(&req, false);
 
-            Expired = true;
+            expire();
             break;
         }
 
@@ -1243,7 +1228,7 @@ void Autocode::Do(bool init)
 void Autocode::SelfTick()
 {
     if(Length == 1)
-        Expired = true;
+        expire();
     else if(Length == 0)
         return;
     else
@@ -1304,7 +1289,7 @@ bool Autocode::NPCConditional(int target, int cond)
 void Autocode::RunSelfOption()
 {
     if(this->MyString.find("once") != std::string::npos)
-        this->Expired = true;
+        this->expire();
 }
 
 // REFERENCE OK
@@ -1382,6 +1367,12 @@ void Autocode::LunaControl(LunaControlAct act, int val)
     default:
         return;
     }
+}
+
+void Autocode::expire()
+{
+    Expired = true;
+    gAutoMan.m_hasExpired = true;
 }
 
 void Autocode::modParam(double &dst, double src, OPTYPE operation)
@@ -1541,7 +1532,7 @@ static const std::unordered_map<std::string, AutocodeType> s_commandMap =
     {"RelativeDraw", AT_RelativeDraw}
 };
 
-AutocodeType Autocode::EnumerizeCommand(char *wbuf)
+AutocodeType Autocode::EnumerizeCommand(char *wbuf, int lineNumber)
 {
     if(wbuf)
     {
@@ -1552,8 +1543,8 @@ AutocodeType Autocode::EnumerizeCommand(char *wbuf)
         {
             // Bad or mistyped command?
             std::string line = std::string(wbuf);
-            if(line.size() > 10)
-                PrintSyntaxError(line);
+            gAutoMan.addError(lineNumber, line, "Syntax error");
+            gAutoMan.m_hasExpired = true;
             return AT_Invalid;
         }
 
@@ -1566,10 +1557,10 @@ AutocodeType Autocode::EnumerizeCommand(char *wbuf)
     {
         // Nothing matched. Bad or mistyped command?
         std::string line = std::string(wbuf);
-        if(line.size() > 10)
-            PrintSyntaxError(line);
+        gAutoMan.addError(lineNumber, line, "Unknown command");
     }
 
+    gAutoMan.m_hasExpired = true;
     return AT_Invalid;
 }
 
