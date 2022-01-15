@@ -322,38 +322,6 @@ set(THEXTECH_SRC
     src/main/outro_loop.cpp
     src/main/trees.cpp
     src/main/QuadTree/LooseQuadtree-impl.cpp
-    src/script/luna.cpp
-    src/script/autocode.cpp
-    src/script/autocode_manager.cpp
-    src/script/csprite.cpp
-    src/script/lunaspriteman.cpp
-    src/script/hitbox.cpp
-    src/script/sprite_component.cpp
-    src/script/sprite_funcs.cpp
-    src/script/lunalevels.cpp
-    src/script/lunaplayer.cpp
-    src/script/lunanpc.cpp
-    src/script/lunablock.cpp
-    src/script/lunalayer.cpp
-    src/script/lunamisc.cpp
-    src/script/lunalevel.cpp
-    src/script/lunarender.cpp
-    src/script/lunacell.cpp
-    src/script/lunainput.cpp
-    src/script/lunacounter.cpp
-    src/script/lunacounter_record.cpp
-    src/script/renderop_bitmap.cpp
-    src/script/renderop_rect.cpp
-    src/script/renderop_effect.cpp
-    src/script/renderop_string.cpp
-    src/script/mememu.cpp
-    src/script/levels/Docopoper-AbstractAssault.cpp
-    src/script/levels/Docopoper-Calleoca.cpp
-    src/script/levels/Docopoper-TheFloorisLava.cpp
-    src/script/levels/SAJewers-QraestoliaCaverns.cpp
-    src/script/levels/SAJewers-Snowboardin.cpp
-    src/script/levels/Talkhaus-Science_Final_Battle.cpp
-    src/script/levels/KilArmoryCode.cpp
     src/graphics/gfx_update2.cpp
     src/graphics/gfx_update.cpp
     src/graphics/gfx_background.cpp
@@ -387,6 +355,40 @@ set(THEXTECH_SRC
     src/npc/npc_frames.cpp
     src/npc/npc_bonus.cpp
     src/player/player_update.cpp
+
+# Luna Autocode script engine
+    src/script/luna/luna.cpp
+    src/script/luna/autocode.cpp
+    src/script/luna/autocode_manager.cpp
+    src/script/luna/csprite.cpp
+    src/script/luna/lunaspriteman.cpp
+    src/script/luna/hitbox.cpp
+    src/script/luna/sprite_component.cpp
+    src/script/luna/sprite_funcs.cpp
+    src/script/luna/lunalevels.cpp
+    src/script/luna/lunaplayer.cpp
+    src/script/luna/lunanpc.cpp
+    src/script/luna/lunablock.cpp
+    src/script/luna/lunalayer.cpp
+    src/script/luna/lunamisc.cpp
+    src/script/luna/lunalevel.cpp
+    src/script/luna/lunarender.cpp
+    src/script/luna/lunacell.cpp
+    src/script/luna/lunainput.cpp
+    src/script/luna/lunacounter.cpp
+    src/script/luna/lunacounter_record.cpp
+    src/script/luna/renderop_bitmap.cpp
+    src/script/luna/renderop_rect.cpp
+    src/script/luna/renderop_effect.cpp
+    src/script/luna/renderop_string.cpp
+    src/script/luna/mememu.cpp
+    src/script/luna/levels/Docopoper-AbstractAssault.cpp
+    src/script/luna/levels/Docopoper-Calleoca.cpp
+    src/script/luna/levels/Docopoper-TheFloorisLava.cpp
+    src/script/luna/levels/SAJewers-QraestoliaCaverns.cpp
+    src/script/luna/levels/SAJewers-Snowboardin.cpp
+    src/script/luna/levels/Talkhaus-Science_Final_Battle.cpp
+    src/script/luna/levels/KilArmoryCode.cpp
 )
 
 add_definitions(-DCORE_EVERYTHING_SDL)
@@ -407,6 +409,8 @@ file(GLOB THEXTECH_HEADS_SRC
     src/*.h
     src/*.hpp
     src/script/*.h
+    src/script/luna/*.h
+    src/script/luna/level/*.h
     src/control/*.h
     src/core/*.h
     src/core/base/*.h

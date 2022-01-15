@@ -24,7 +24,7 @@
 #include <IniProcessor/ini_processing.h>
 #include "game_info.h"
 #include "cheat_code.h"
-#include "script/luna.h"
+#include "script/luna/luna.h"
 
 #include "../version.h"
 

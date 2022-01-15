@@ -67,7 +67,7 @@
 #include "core/render.h"
 #include "core/window.h"
 #include "core/events.h"
-#include "script/luna.h"
+#include "script/luna/luna.h"
 
 #include "pseudo_vb.h"
 
