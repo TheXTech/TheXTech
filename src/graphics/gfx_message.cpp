@@ -132,14 +132,14 @@ void DrawMessage(const std::string& SuperText)
 
         if(lastWord == int(SuperText.size()) && firstLine)
         {
-            SuperPrint(SuperText.c_str() + size_t(lineStart), size_t(lastWord) - size_t(lineStart),
+            SuperPrint(size_t(lastWord) - size_t(lineStart), SuperText.c_str() + size_t(lineStart),
                 4,
                 ScreenW/2 - ((lastWord - lineStart) * charWidth)/2,
                 BoxY);
         }
         else
         {
-            SuperPrint(SuperText.c_str() + size_t(lineStart), size_t(lastWord) - size_t(lineStart),
+            SuperPrint(size_t(lastWord) - size_t(lineStart), SuperText.c_str() + size_t(lineStart),
                 4,
                 ScreenW/2 - TextBoxW / 2 + 12,
                 BoxY);

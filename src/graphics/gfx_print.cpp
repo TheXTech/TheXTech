@@ -33,7 +33,7 @@ namespace std
 }
 #endif
 
-int SuperTextPixLen(const char* SuperChars, int SuperN, int Font)
+int SuperTextPixLen(int SuperN, const char* SuperChars, int Font)
 {
     int len = 0;
 
@@ -71,25 +71,25 @@ int SuperTextPixLen(const char* SuperChars, int SuperN, int Font)
     return len;
 }
 
-void SuperPrintRightAlign(const char* SuperChars, int SuperN, int Font, float X, float Y, float r, float g, float b, float a)
+void SuperPrintRightAlign(int SuperN, const char* SuperChars, int Font, float X, float Y, float r, float g, float b, float a)
 {
-    X -= SuperTextPixLen(SuperChars, SuperN, Font);
-    SuperPrint(SuperChars, SuperN, Font, X, Y, r, g, b, a);
+    X -= SuperTextPixLen(SuperN, SuperChars, Font);
+    SuperPrint(SuperN, SuperChars, Font, X, Y, r, g, b, a);
 }
 
-void SuperPrintCenter(const char* SuperChars, int SuperN, int Font, float X, float Y, float r, float g, float b, float a)
+void SuperPrintCenter(int SuperN, const char* SuperChars, int Font, float X, float Y, float r, float g, float b, float a)
 {
-    X -= SuperTextPixLen(SuperChars, SuperN, Font) / 2;
-    SuperPrint(SuperChars, SuperN, Font, X, Y, r, g, b, a);
+    X -= SuperTextPixLen(SuperN, SuperChars, Font) / 2;
+    SuperPrint(SuperN, SuperChars, Font, X, Y, r, g, b, a);
 }
 
-void SuperPrintScreenCenter(const char* SuperChars, int SuperN, int Font, float Y, float r, float g, float b, float a)
+void SuperPrintScreenCenter(int SuperN, const char* SuperChars, int Font, float Y, float r, float g, float b, float a)
 {
-    float X = (ScreenW / 2) - (SuperTextPixLen(SuperChars, SuperN, Font) / 2);
-    SuperPrint(SuperChars, SuperN, Font, X, Y, r, g, b, a);
+    float X = (ScreenW / 2) - (SuperTextPixLen(SuperN, SuperChars, Font) / 2);
+    SuperPrint(SuperN, SuperChars, Font, X, Y, r, g, b, a);
 }
 
-void SuperPrint(const char* SuperChars, int SuperN, int Font, float X, float Y,
+void SuperPrint(int SuperN, const char* SuperChars, int Font, float X, float Y,
                 float r, float g, float b, float a)
 {
 //    int A = 0;
@@ -204,27 +204,57 @@ void SuperPrint(const char* SuperChars, int SuperN, int Font, float X, float Y,
     }
 }
 
+// const char* versions
+
+int SuperTextPixLen(const char* SuperChars, int Font)
+{
+    return SuperTextPixLen(SDL_strlen(SuperChars), SuperChars, Font);
+}
+
+void SuperPrintRightAlign(const char* SuperChars, int Font, float X, float Y, float r, float g, float b, float a)
+{
+    SuperPrintRightAlign(SDL_strlen(SuperChars), SuperChars, Font, X, Y, r, g, b, a);
+}
+
+void SuperPrintCenter(const char* SuperChars, int Font, float X, float Y, float r, float g, float b, float a)
+{
+    SuperPrintCenter(SDL_strlen(SuperChars), SuperChars, Font, X, Y, r, g, b, a);
+}
+
+void SuperPrintScreenCenter(const char* SuperChars, int Font, float Y, float r, float g, float b, float a)
+{
+    SuperPrintScreenCenter(SDL_strlen(SuperChars), SuperChars, Font, Y, r, g, b, a);
+}
+
+void SuperPrint(const char* SuperChars, int Font, float X, float Y, float r, float g, float b, float a)
+{
+    SuperPrint(SDL_strlen(SuperChars), SuperChars, Font, X, Y, r, g, b, a);
+}
+
+
+// const std::string& versions
+
 int SuperTextPixLen(const std::string& SuperWords, int Font)
 {
-    return SuperTextPixLen(SuperWords.c_str(), SuperWords.size(), Font);
+    return SuperTextPixLen(SuperWords.size(), SuperWords.c_str(), Font);
 }
 
 void SuperPrintRightAlign(const std::string& SuperWords, int Font, float X, float Y, float r, float g, float b, float a)
 {
-    SuperPrintRightAlign(SuperWords.c_str(), SuperWords.size(), Font, X, Y, r, g, b, a);
+    SuperPrintRightAlign(SuperWords.size(), SuperWords.c_str(), Font, X, Y, r, g, b, a);
 }
 
 void SuperPrintCenter(const std::string& SuperWords, int Font, float X, float Y, float r, float g, float b, float a)
 {
-    SuperPrintCenter(SuperWords.c_str(), SuperWords.size(), Font, X, Y, r, g, b, a);
+    SuperPrintCenter(SuperWords.size(), SuperWords.c_str(), Font, X, Y, r, g, b, a);
 }
 
 void SuperPrintScreenCenter(const std::string& SuperWords, int Font, float Y, float r, float g, float b, float a)
 {
-    SuperPrintScreenCenter(SuperWords.c_str(), SuperWords.size(), Font, Y, r, g, b, a);
+    SuperPrintScreenCenter(SuperWords.size(), SuperWords.c_str(), Font, Y, r, g, b, a);
 }
 
 void SuperPrint(const std::string& SuperWords, int Font, float X, float Y, float r, float g, float b, float a)
 {
-    SuperPrint(SuperWords.c_str(), SuperWords.size(), Font, X, Y, r, g, b, a);
+    SuperPrint(SuperWords.size(), SuperWords.c_str(), Font, X, Y, r, g, b, a);
 }
