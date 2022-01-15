@@ -717,13 +717,14 @@ void CancelNewEvent(const std::string &eventName)
     if(newEventNum <= 0)
         return; // Nothing to do
 
-    for(int A = 1; A <= newEventNum; A++)
+    for(int A = 1; A <= newEventNum; ++A)
     {
         if(equalCase(eventName, NewEvent[A]))
         {
             newEventDelay[A] = newEventDelay[newEventNum];
             NewEvent[A] = NewEvent[newEventNum];
             newEventNum--;
+            --A;
         }
     }
 }
