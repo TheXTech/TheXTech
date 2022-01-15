@@ -352,28 +352,28 @@ void AutocodeManager::ActivateCustomEvents(int new_section, int eventcode)
     //char* dbg = "ACTIVATE CUSTOM DBG";
     if(m_Enabled)
     {
-        for(auto &m_Autocode : m_Autocodes)
+        for(auto &code : m_Autocodes)
         {
             // Activate copies of events with 'eventcode' and move them to 'new_section'
-            if(m_Autocode.ActiveSection == eventcode && !m_Autocode.Activated && !m_Autocode.Expired)
+            if(code.ActiveSection == eventcode && !code.Activated && !code.Expired)
             {
-                Autocode newcode = m_Autocode;
+                Autocode newcode = code;
                 newcode.Activated = true;
                 newcode.ActiveSection = (new_section < 1000 ? (new_section - 1) : new_section);
-                newcode.Length = m_Autocode.m_OriginalTime;
+                newcode.Length = code.m_OriginalTime;
                 m_CustomCodes.push_front(std::move(newcode));
             }
         }
 
-        for(auto &m_GlobalCode : m_GlobalCodes)
+        for(auto &code : m_GlobalCodes)
         {
             // Activate copies of events with 'eventcode' and move them to 'new_section'
-            if(m_GlobalCode.ActiveSection == eventcode && !m_GlobalCode.Activated && !m_GlobalCode.Expired)
+            if(code.ActiveSection == eventcode && !code.Activated && !code.Expired)
             {
-                Autocode newcode = m_GlobalCode;
+                Autocode newcode = code;
                 newcode.Activated = true;
                 newcode.ActiveSection = (new_section < 1000 ? (new_section - 1) : new_section);
-                newcode.Length = m_GlobalCode.m_OriginalTime;
+                newcode.Length = code.m_OriginalTime;
                 m_CustomCodes.push_front(std::move(newcode));
             }
         }
