@@ -94,7 +94,8 @@ void lunaLoad()
         gAutoMan.LoadFiles();
 
         // Init some stuff
-        lunaLevelsInit();
+        if(g_compatibility.luna_allow_level_codes)
+            lunaLevelsInit();
         gAutoMan.m_Hearts = 2;
     }
 
@@ -135,7 +136,8 @@ void lunaLoop()
 
         // Run any framecode
 //        TestFrameCode();
-        lunaLevelsDo();
+        if(g_compatibility.luna_allow_level_codes)
+            lunaLevelsDo();
     }
 }
 

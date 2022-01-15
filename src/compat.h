@@ -98,6 +98,7 @@ struct Compatibility_t
         LUNA_ENGINE_DISABLE
     };
     LunaEnableEngine_t luna_enable_engine;
+    bool luna_allow_level_codes;
 };
 
 extern Compatibility_t g_compatibility;
