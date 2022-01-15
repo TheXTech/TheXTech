@@ -702,10 +702,10 @@ bool Update()
     For(B, 1, numPlayers)
     {
         int A;
-        // if there is an input method bound to the player,
+        // if there is/was an input method bound to the player,
         //   let them control themselves.
         //   (same in spirit as old B == 2 && numPlayers == 2 case)
-        if((B-1 < (int)g_InputMethods.size() && g_InputMethods[B-1]) || QuickReconnectScreen::g_active)
+        if(B-1 < (int)g_InputMethods.size())
             A = B;
         // otherwise, let Player 1 control them (blank controls later for SingleCoop)
         else
