@@ -7237,10 +7237,13 @@ void SwapCharacter(int A, int Character, bool Die, bool Block)
             SizeCheck(A);
         }
 
-        Location_t tempLocation = p.Location;
-        tempLocation.Y = p.Location.Y + p.Location.Height / 2.0 - 16;
-        tempLocation.X = p.Location.X + p.Location.Width / 2.0 - 16;
-        NewEffect(10, tempLocation);
+        if(!LevelSelect)
+        {
+            Location_t tempLocation = p.Location;
+            tempLocation.Y = p.Location.Y + p.Location.Height / 2.0 - 16;
+            tempLocation.X = p.Location.X + p.Location.Width / 2.0 - 16;
+            NewEffect(10, tempLocation);
+        }
 
         PlaySound(SFX_Raccoon);
     }
@@ -7254,4 +7257,13 @@ void SwapCharacter(int A, int Character, bool Die, bool Block)
         RespawnPlayerTo(A, A);
         PlaySound(SFX_DropItem);
     }
+}
+
+// returns whether a player is allowed to swap characters
+bool SwapCharAllowed()
+{
+    if(LevelSelect)
+        return true;
+    else
+        return false;
 }

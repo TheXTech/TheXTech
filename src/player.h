@@ -117,4 +117,7 @@ void AddPlayer(int Character);
 // NEW but, when Die is false, identical to player block.
 void SwapCharacter(int A, int Character, bool Die = false, bool Block = false);
 
+// returns whether a player is allowed to swap characters
+bool SwapCharAllowed();
+
 #endif // PLAYER_H
