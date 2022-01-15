@@ -1021,6 +1021,26 @@ void Autocode::Do(bool init)
             break;
         }
 
+        case AT_OnEvent:
+        {
+            if(EventWasTriggered(MyString))
+            {
+                gAutoMan.ActivateCustomEvents(0, (int)Param3);
+                if(Param2 != 0)
+                    this->Expired = true;
+            }
+            break;
+        }
+
+        case AT_CancelSMBXEvent:
+        {
+            if(Length <= 1) // Cancel event after delay
+            {
+                CancelNewEvent(MyString);
+                Expired = true;
+            }
+            break;
+        }
 
         // PREDICATES
         case AT_Hurt:
@@ -1591,6 +1611,11 @@ AutocodeType Autocode::EnumerizeCommand(char *wbuf)
         if(SDL_strcmp(command, "TriggerSMBXEvent") == 0)
             return AT_TriggerSMBXEvent;
 
+        if(SDL_strcmp(command, "OnEvent") == 0)
+            return AT_OnEvent;
+
+        if(SDL_strcmp(command, "CancelSMBXEvent") == 0)
+            return AT_CancelSMBXEvent;
 
         if(SDL_strcmp(command, "Kill") == 0)
             return AT_Kill;
