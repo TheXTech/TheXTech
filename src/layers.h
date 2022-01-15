@@ -161,6 +161,9 @@ void ProcEvent(const std::string &EventName, bool NoEffect = false);
 // Public Sub UpdateEvents()
 void UpdateEvents();
 
+// EXTRA: Cancel awaiting event trigger
+void CancelNewEvent(const std::string &eventName);
+
 // Public Sub UpdateLayers()
 void UpdateLayers();
 
