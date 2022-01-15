@@ -947,7 +947,7 @@ public:
         {
             // Workaround for Analog Funk: Talkhaus-Science_Final_Battle,
             // using incorrect NPC address 0x84 as byte
-            if(address == 0x84)
+            if(address == 0x84 && ftype == FT_BYTE)
             {
                 // TODO: Verify this behaviour on PowerPC-BE and on ARM
                 // ---------------------------------------------------------
