@@ -136,7 +136,145 @@ SDL_FORCE_INLINE uint8_t getByteX86(const double &src, size_t byte)
 }
 
 
+/*----------------------------------------------*
+ *          Write memory value                  *
+ *----------------------------------------------*/
 
+SDL_FORCE_INLINE void memToDouble(double &target, double value, FIELDTYPE ftype)
+{
+    switch(ftype)
+    {
+    case FT_BYTE:
+        target =static_cast<double>(static_cast<uint8_t>(value));
+        break;
+    case FT_WORD:
+        target =static_cast<double>(static_cast<int16_t>(static_cast<uint16_t>(value)));
+        break;
+    case FT_DWORD:
+        target =static_cast<double>(static_cast<int32_t>(value));
+        break;
+    case FT_FLOAT:
+        target =static_cast<double>(static_cast<float>(value));
+        break;
+    case FT_DFLOAT:
+        target = value;
+        break;
+    default:
+        break; // Don't change
+    }
+}
+
+SDL_FORCE_INLINE void memToFloat(float &target, double value, FIELDTYPE ftype)
+{
+    switch(ftype)
+    {
+    case FT_BYTE:
+        target = static_cast<float>(static_cast<uint8_t>(value));
+        break;
+    case FT_WORD:
+        target = static_cast<float>(static_cast<int16_t>(static_cast<uint16_t>(value)));
+        break;
+    case FT_DWORD:
+        target = static_cast<float>(static_cast<int32_t>(value));
+        break;
+    case FT_FLOAT:
+        target = static_cast<float>(value);
+        break;
+    case FT_DFLOAT:
+        target = static_cast<double>(static_cast<float>(value));
+        break;
+    default: //Don't change
+        break;
+    }
+}
+
+SDL_FORCE_INLINE void memToInt(int &target, double value, FIELDTYPE ftype)
+{
+    switch(ftype)
+    {
+    case FT_BYTE:
+        target = static_cast<int32_t>(static_cast<uint8_t>(value));
+        break;
+    case FT_WORD:
+        target = static_cast<int32_t>(static_cast<int16_t>(static_cast<uint16_t>(value)));
+        break;
+    case FT_DWORD:
+        target = static_cast<int32_t>(value);
+        break;
+    case FT_FLOAT:
+        target = static_cast<int32_t>(static_cast<float>(value));
+        break;
+    case FT_DFLOAT:
+        target = static_cast<int32_t>(value);
+        break;
+    default: //Don't change
+        break;
+    }
+}
+
+/*----------------------------------------------*
+ *           Read memory value                  *
+ *----------------------------------------------*/
+
+SDL_FORCE_INLINE double doubleToMem(double &source, FIELDTYPE ftype)
+{
+    switch(ftype)
+    {
+    case FT_BYTE:
+        return static_cast<double>(static_cast<uint8_t>(source));
+    case FT_WORD:
+        return static_cast<double>(static_cast<int16_t>(static_cast<uint16_t>(source)));
+    case FT_DWORD:
+        return static_cast<double>(static_cast<int32_t>(source));
+    case FT_FLOAT:
+        return static_cast<double>(static_cast<float>(source));
+    default:
+    case FT_DFLOAT:
+        return source;
+    }
+}
+
+SDL_FORCE_INLINE double floatToMem(float &source, FIELDTYPE ftype)
+{
+    switch(ftype)
+    {
+    case FT_BYTE:
+        return static_cast<double>(static_cast<uint8_t>(source));
+    case FT_WORD:
+        return static_cast<double>(static_cast<int16_t>(static_cast<uint16_t>(source)));
+    case FT_DWORD:
+        return static_cast<double>(static_cast<int32_t>(source));
+    default:
+    case FT_FLOAT:
+    case FT_DFLOAT:
+        return static_cast<double>(source);
+    }
+}
+
+SDL_FORCE_INLINE double intToMem(int &source, FIELDTYPE ftype)
+{
+    switch(ftype)
+    {
+    case FT_BYTE:
+        return static_cast<double>(static_cast<uint8_t>(source));
+    case FT_WORD:
+        return static_cast<double>(static_cast<int16_t>(source));
+    default:
+    case FT_DWORD:
+        return static_cast<double>(source);
+    case FT_FLOAT:
+        return static_cast<double>(static_cast<float>(source));
+    case FT_DFLOAT:
+        return static_cast<double>(source);
+    }
+}
+
+
+/*!
+ * \brief Convert field type into string
+ * \param ftype Field type
+ * \return Human-readable string
+ */
 static const char *FieldtypeToStr(FIELDTYPE ftype)
 {
     switch(ftype)
@@ -155,6 +293,8 @@ static const char *FieldtypeToStr(FIELDTYPE ftype)
         return "<Invalid>";
     }
 }
+
+
 
 /*!
  * \brief Global memory emulator
@@ -215,25 +355,19 @@ public:
 
     double getAny(int address, FIELDTYPE ftype)
     {
+        if(ftype == FT_INVALID)
+        {
+            pLogWarning("MemEmu: Requested value of invalid type: <Global> 0x%x", address);
+            return 0.0;
+        }
+
         auto dres = m_df.find(address);
         if(dres != m_df.end())
         {
             if(ftype != FT_DFLOAT)
                 pLogWarning("MemEmu: Read type missmatched at 0x%x (Double expected, %s actually)", address, FieldtypeToStr(ftype));
-            switch(ftype)
-            {
-            case FT_BYTE:
-                return static_cast<double>(static_cast<uint8_t>(*dres->second));
-            case FT_WORD:
-                return static_cast<double>(static_cast<int16_t>(*dres->second));
-            case FT_DWORD:
-                return static_cast<double>(static_cast<int32_t>(*dres->second));
-            case FT_FLOAT:
-                return static_cast<double>(static_cast<float>(*dres->second));
-            default:
-            case FT_DFLOAT:
-                return *dres->second;
-            }
+
+            return doubleToMem(*dres->second, ftype);
         }
 
         auto fres = m_ff.find(address);
@@ -241,19 +375,8 @@ public:
         {
             if(ftype != FT_FLOAT)
                 pLogWarning("MemEmu: Read type missmatched at 0x%x (Float expected, %s actually)", address, FieldtypeToStr(ftype));
-            switch(ftype)
-            {
-            case FT_BYTE:
-                return static_cast<double>(static_cast<uint8_t>(*fres->second));
-            case FT_WORD:
-                return static_cast<double>(static_cast<int16_t>(*fres->second));
-            case FT_DWORD:
-                return static_cast<double>(static_cast<int32_t>(*fres->second));
-            default:
-            case FT_FLOAT:
-            case FT_DFLOAT:
-                return static_cast<double>(*fres->second);
-            }
+
+            return floatToMem(*fres->second, ftype);
         }
 
         auto ires = m_if.find(address);
@@ -262,20 +385,7 @@ public:
             if(ftype != FT_DWORD && ftype != FT_WORD)
                 pLogWarning("MemEmu: Read type missmatched at 0x%x (SInt16 or SInt32 expected, %s actually)", address, FieldtypeToStr(ftype));
 
-            switch(ftype)
-            {
-            case FT_BYTE:
-                return static_cast<double>(static_cast<uint8_t>(*ires->second));
-            case FT_WORD:
-                return static_cast<double>(static_cast<int16_t>(*ires->second));
-            default:
-            case FT_DWORD:
-                return static_cast<double>(*ires->second);
-            case FT_FLOAT:
-                return static_cast<double>(static_cast<float>(*ires->second));
-            case FT_DFLOAT:
-                return static_cast<double>(*ires->second);
-            }
+            return intToMem(*ires->second, ftype);
         }
 
         auto bres = m_bf.find(address);
@@ -286,39 +396,25 @@ public:
             return *bres->second ? 0xffff : 0000;
         }
 
-        pLogWarning("MemEmu: Unknown %s address to read: 0x%x", FieldtypeToStr(ftype), address);
+        pLogWarning("MemEmu: Unknown %s address to read: <Global> 0x%x", FieldtypeToStr(ftype), address);
         return 0.0;
     }
 
     void setAny(int address, double value, FIELDTYPE ftype)
     {
+        if(ftype == FT_INVALID)
+        {
+            pLogWarning("MemEmu: Passed value of invalid type: <Global> 0x%x", address);
+            return;
+        }
+
         auto dres = m_df.find(address);
         if(dres != m_df.end())
         {
             if(ftype != FT_DFLOAT)
                 pLogWarning("MemEmu: Write type missmatched at 0x%x (Double expected, %s actually)", address, FieldtypeToStr(ftype));
 
-            switch(ftype)
-            {
-            case FT_BYTE:
-                *dres->second = static_cast<double>(static_cast<uint8_t>(value));
-                break;
-            case FT_WORD:
-                *dres->second = static_cast<double>(static_cast<int16_t>(value));
-                break;
-            case FT_DWORD:
-                *dres->second = static_cast<double>(static_cast<int32_t>(value));
-                break;
-            case FT_FLOAT:
-                *dres->second = static_cast<double>(static_cast<float>(value));
-                break;
-            case FT_DFLOAT:
-                *dres->second = value;
-                break;
-            default: //Don't change
-                break;
-            }
-
+            memToDouble(*dres->second, value, ftype);
             return;
         }
 
@@ -328,25 +424,7 @@ public:
             if(ftype != FT_FLOAT)
                 pLogWarning("MemEmu: Write type missmatched at 0x%x (Float expected, %s actually)", address, FieldtypeToStr(ftype));
 
-            switch(ftype)
-            {
-            case FT_BYTE:
-                *fres->second = static_cast<float>(static_cast<uint8_t>(value));
-                break;
-            case FT_WORD:
-                *fres->second = static_cast<float>(static_cast<int16_t>(value));
-                break;
-            case FT_DWORD:
-                *fres->second = static_cast<float>(static_cast<int32_t>(value));
-                break;
-            case FT_FLOAT:
-            case FT_DFLOAT:
-                *fres->second = static_cast<float>(value);
-                break;
-            default: //Don't change
-                break;
-            }
-
+            memToFloat(*fres->second, value, ftype);
             return;
         }
 
@@ -356,27 +434,7 @@ public:
             if(ftype != FT_DWORD && ftype != FT_WORD)
                 pLogWarning("MemEmu: Write type missmatched at 0x%x (SInt16 or SInt32 expected, %s actually)", address, FieldtypeToStr(ftype));
 
-            switch(ftype)
-            {
-            case FT_BYTE:
-                *ires->second = static_cast<int32_t>(static_cast<uint8_t>(value));
-                break;
-            case FT_WORD:
-                *ires->second = static_cast<int32_t>(static_cast<int16_t>(value));
-                break;
-            case FT_DWORD:
-                *ires->second = static_cast<int32_t>(value);
-                break;
-            case FT_FLOAT:
-                *ires->second = static_cast<int32_t>(static_cast<float>(value));
-                break;
-            case FT_DFLOAT:
-                *ires->second = static_cast<int32_t>(value);
-                break;
-            default: //Don't change
-                break;
-            }
-
+            memToInt(*ires->second, value, ftype);
             return;
         }
 
@@ -412,25 +470,19 @@ public:
 
     virtual double getAny(T *obj, int address, FIELDTYPE ftype)
     {
+        if(ftype == FT_INVALID)
+        {
+            pLogWarning("MemEmu: Requested value of invalid type: %s 0x%x", objName, address);
+            return 0.0;
+        }
+
         auto dres = m_df.find(address);
         if(dres != m_df.end())
         {
             if(ftype != FT_DFLOAT)
                 pLogWarning("MemEmu: Read type missmatched at %s 0x%x (Double expected, %s actually)", objName, address, FieldtypeToStr(ftype));
-            switch(ftype)
-            {
-            case FT_BYTE:
-                return static_cast<double>(static_cast<uint8_t>(obj->*(dres->second)));
-            case FT_WORD:
-                return static_cast<double>(static_cast<int16_t>(obj->*(dres->second)));
-            case FT_DWORD:
-                return static_cast<double>(static_cast<int32_t>(obj->*(dres->second)));
-            case FT_FLOAT:
-                return static_cast<double>(static_cast<float>(obj->*(dres->second)));
-            default:
-            case FT_DFLOAT:
-                return obj->*(dres->second);
-            }
+
+            return doubleToMem(obj->*(dres->second), ftype);
         }
 
         auto fres = m_ff.find(address);
@@ -438,19 +490,8 @@ public:
         {
             if(ftype != FT_FLOAT)
                 pLogWarning("MemEmu: Read type missmatched at %s 0x%x (Float expected, %s actually)", objName, address, FieldtypeToStr(ftype));
-            switch(ftype)
-            {
-            case FT_BYTE:
-                return static_cast<double>(static_cast<uint8_t>(obj->*(fres->second)));
-            case FT_WORD:
-                return static_cast<double>(static_cast<int16_t>(obj->*(fres->second)));
-            case FT_DWORD:
-                return static_cast<double>(static_cast<int32_t>(obj->*(fres->second)));
-            default:
-            case FT_FLOAT:
-            case FT_DFLOAT:
-                return static_cast<double>(obj->*(fres->second));
-            }
+
+            return floatToMem(obj->*(fres->second), ftype);
         }
 
         auto ires = m_if.find(address);
@@ -459,20 +500,7 @@ public:
             if(ftype != FT_DWORD && ftype != FT_WORD)
                 pLogWarning("MemEmu: Read type missmatched at %s 0x%x (SInt16 or SInt32 expected, %s actually)", objName, address, FieldtypeToStr(ftype));
 
-            switch(ftype)
-            {
-            case FT_BYTE:
-                return static_cast<double>(static_cast<uint8_t>(obj->*(ires->second)));
-            case FT_WORD:
-                return static_cast<double>(static_cast<int16_t>(obj->*(ires->second)));
-            default:
-            case FT_DWORD:
-                return static_cast<double>(obj->*(ires->second));
-            case FT_FLOAT:
-                return static_cast<double>(static_cast<float>(obj->*(ires->second)));
-            case FT_DFLOAT:
-                return static_cast<double>(obj->*(ires->second));
-            }
+            return intToMem(obj->*(ires->second), ftype);
         }
 
         auto bres = m_bf.find(address);
@@ -489,33 +517,19 @@ public:
 
     virtual void setAny(T *obj, int address, double value, FIELDTYPE ftype)
     {
+        if(ftype == FT_INVALID)
+        {
+            pLogWarning("MemEmu: Passed value of invalid type: %s 0x%x", objName, address);
+            return;
+        }
+
         auto dres = m_df.find(address);
         if(dres != m_df.end())
         {
             if(ftype != FT_DFLOAT)
                 pLogWarning("MemEmu: Write type missmatched at %s 0x%x (Double expected, %s actually)", objName, address, FieldtypeToStr(ftype));
 
-            switch(ftype)
-            {
-            case FT_BYTE:
-                obj->*(dres->second) = static_cast<double>(static_cast<uint8_t>(value));
-                break;
-            case FT_WORD:
-                obj->*(dres->second) = static_cast<double>(static_cast<int16_t>(value));
-                break;
-            case FT_DWORD:
-                obj->*(dres->second) = static_cast<double>(static_cast<int32_t>(value));
-                break;
-            case FT_FLOAT:
-                obj->*(dres->second) = static_cast<double>(static_cast<float>(value));
-                break;
-            case FT_DFLOAT:
-                obj->*(dres->second) = value;
-                break;
-            default: //Don't change
-                break;
-            }
-
+            memToDouble(obj->*(dres->second), value, ftype);
             return;
         }
 
@@ -525,25 +539,7 @@ public:
             if(ftype != FT_FLOAT)
                 pLogWarning("MemEmu: Write type missmatched at %s 0x%x (Float expected, %s actually)", objName, address, FieldtypeToStr(ftype));
 
-            switch(ftype)
-            {
-            case FT_BYTE:
-                obj->*(fres->second) = static_cast<float>(static_cast<uint8_t>(value));
-                break;
-            case FT_WORD:
-                obj->*(fres->second) = static_cast<float>(static_cast<int16_t>(value));
-                break;
-            case FT_DWORD:
-                obj->*(fres->second) = static_cast<float>(static_cast<int32_t>(value));
-                break;
-            case FT_FLOAT:
-            case FT_DFLOAT:
-                obj->*(fres->second) = static_cast<float>(value);
-                break;
-            default: //Don't change
-                break;
-            }
-
+            memToFloat(obj->*(fres->second), value, ftype);
             return;
         }
 
@@ -553,27 +549,7 @@ public:
             if(ftype != FT_DWORD && ftype != FT_WORD && (ftype != FT_BYTE || value > 255.0))
                 pLogWarning("MemEmu: Write type missmatched at %s 0x%x (SInt16 or SInt32 expected, %s actually)", objName, address, FieldtypeToStr(ftype));
 
-            switch(ftype)
-            {
-            case FT_BYTE:
-                obj->*(ires->second) = static_cast<int32_t>(static_cast<uint8_t>(value));
-                break;
-            case FT_WORD:
-                obj->*(ires->second) = static_cast<int32_t>(static_cast<int16_t>(value));
-                break;
-            case FT_DWORD:
-                obj->*(ires->second) = static_cast<int32_t>(value);
-                break;
-            case FT_FLOAT:
-                obj->*(ires->second) = static_cast<int32_t>(static_cast<float>(value));
-                break;
-            case FT_DFLOAT:
-                obj->*(ires->second) = static_cast<int32_t>(value);
-                break;
-            default: //Don't change
-                break;
-            }
-
+            memToInt(obj->*(ires->second), value, ftype);
             return;
         }
 
@@ -1604,33 +1580,59 @@ static bool ChecmMemType(T &mem, U *obj, int offset, double value, COMPARETYPE c
 }
 
 
+// #define DEBUG_MEMEMU_TRACE
+
 void MemAssign(Player_t *obj, int address, double value, OPTYPE operation, FIELDTYPE ftype)
 {
+#ifdef DEBUG_MEMEMU_TRACE
+    D_pLogDebug("Player mem TRACE: Write 0x%08X, %g, op-%d, ft-%d", address, value, (int)operation, (int)ftype);
+#endif
     MemAssignType(s_emuPlayer, obj, address, value, operation, ftype);
 }
 
 bool CheckMem(Player_t *obj, int offset, double value, COMPARETYPE ctype, FIELDTYPE ftype)
 {
+#ifdef DEBUG_MEMEMU_TRACE
+    D_pLogDebug("Player mem TRACE: Compare 0x%08X, %g, cp-%d, ft-%d", offset, value, (int)ctype, (int)ftype);
+#endif
     return ChecmMemType(s_emuPlayer, obj, offset, value, ctype, ftype);
 }
 
 double GetMem(Player_t *obj, int offset, FIELDTYPE ftype)
 {
+#ifdef DEBUG_MEMEMU_TRACE
+    double value = s_emuPlayer.getAny(obj, offset, ftype);
+    D_pLogDebug("Player mem TRACE: Read 0x%08X, %g, ft-%d", offset, value, (int)ftype);
+    return value;
+#else
     return s_emuPlayer.getAny(obj, offset, ftype);
+#endif
 }
 
 
 void MemAssign(NPC_t *obj, int address, double value, OPTYPE operation, FIELDTYPE ftype)
 {
+#ifdef DEBUG_MEMEMU_TRACE
+    D_pLogDebug("NPC mem TRACE: Write 0x%08X, %g, op-%d, ft-%d", address, value, (int)operation, (int)ftype);
+#endif
     MemAssignType(s_emuNPC, obj, address, value, operation, ftype);
 }
 
 bool CheckMem(NPC_t *obj, int offset, double value, COMPARETYPE ctype, FIELDTYPE ftype)
 {
+#ifdef DEBUG_MEMEMU_TRACE
+    D_pLogDebug("NPC mem TRACE: Compare 0x%08X, %g, cp-%d, ft-%d", offset, value, (int)ctype, (int)ftype);
+#endif
     return ChecmMemType(s_emuNPC, obj, offset, value, ctype, ftype);
 }
 
 double GetMem(NPC_t *obj, int offset, FIELDTYPE ftype)
 {
+#ifdef DEBUG_MEMEMU_TRACE
+    double value = s_emuNPC.getAny(obj, offset, ftype);
+    D_pLogDebug("NPC mem TRACE: Read 0x%08X, %g, ft-%d", offset, value, (int)ftype);
+    return value;
+#else
     return s_emuNPC.getAny(obj, offset, ftype);
+#endif
 }
