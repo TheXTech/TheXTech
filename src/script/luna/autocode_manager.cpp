@@ -660,7 +660,6 @@ void AutocodeManager::showErrors(const std::string &file)
     }
 
     XMsgBox::simpleMsgBox(AbstractMsgBox_t::MESSAGEBOX_ERROR, "Autocode script parse errors", out);
-
 }
 
 // VAR EXISTS
