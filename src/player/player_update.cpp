@@ -309,8 +309,10 @@ void UpdatePlayer()
                     if(Player[A].Mount == 3 && Player[A].MountType == 6) // Purple Yoshi Pound
                     {
                         bool groundPoundByAltRun = false;
-                        if(A-1 < Controls::g_InputMethods.size() && Controls::g_InputMethods[A-1]
-                            && Controls::g_InputMethods[A-1]->Profile && Controls::g_InputMethods[A-1]->Profile->m_groundPoundByAltRun)
+                        if(A - 1 < (int)Controls::g_InputMethods.size() &&
+                           Controls::g_InputMethods[A - 1] &&
+                           Controls::g_InputMethods[A-1]->Profile &&
+                           Controls::g_InputMethods[A - 1]->Profile->m_groundPoundByAltRun)
                         {
                             groundPoundByAltRun = true;
                         }
