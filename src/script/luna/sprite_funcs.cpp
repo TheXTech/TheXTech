@@ -332,8 +332,8 @@ void SpriteFunc::OnPlayerDistance(CSprite *me, SpriteComponent *obj)
     Player_t *demo = PlayerF::Get(1);
     if(demo)
     {
-        double xdist = abs(demo->Location.X - me->m_Xpos);
-        double ydist = abs(demo->Location.Y - me->m_Ypos);
+        double xdist = std::abs(demo->Location.X - me->m_Xpos);
+        double ydist = std::abs(demo->Location.Y - me->m_Ypos);
 
         // Checking farness or nearness?
         if(obj->data2 == 0)
@@ -551,8 +551,8 @@ void SpriteFunc::TeleportNearPlayer(CSprite *me, SpriteComponent *obj)
         double cx = demo->Location.X;
         double cy = demo->Location.Y;
         double phase = iRand2(360);
-        double xoff = sin(phase) * obj->data1;
-        double yoff = cos(phase) * obj->data1;
+        double xoff = std::sin(phase) * obj->data1;
+        double yoff = std::cos(phase) * obj->data1;
         me->m_Xpos = cx + xoff;
         me->m_Ypos = cy + yoff;
     }
@@ -606,8 +606,8 @@ void SpriteFunc::GenerateAtAngle(CSprite *me, SpriteComponent *obj)
     double angle = me->GetCustomVar(CVAR_GEN_ANGLE);
     double speed = obj->data3;
 
-    double vx = cos(angle) * speed;                 // vector x speed
-    double vy = sin(angle) * speed;                 // vector y speed
+    double vx = std::cos(angle) * speed;                 // vector x speed
+    double vy = std::sin(angle) * speed;                 // vector y speed
     double gx = me->m_Hitbox.CenterX() + (vx * 2);  // generation point
     double gy = me->m_Hitbox.CenterY() + (vy * 2);  // generation point
 
@@ -694,9 +694,9 @@ void SpriteFunc::AnimateFloat(CSprite *me, SpriteComponent *obj)
     {
         double frame_val = me->m_FrameCounter / speed;
         if(x_mag != 0)
-            me->m_GfxXOffset = (int)(cos(frame_val) * x_mag);
+            me->m_GfxXOffset = (int)(std::cos(frame_val) * x_mag);
         if(y_mag != 0)
-            me->m_GfxYOffset = (int)(sin(frame_val) * y_mag);
+            me->m_GfxYOffset = (int)(std::sin(frame_val) * y_mag);
     }
 }
 
