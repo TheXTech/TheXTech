@@ -151,16 +151,6 @@ extern bool ShowOnScreenMeta;
 //Public EoT As String  ' End of Transmission for WINSOCK
 //extern std::string EoT;
 
-enum class PauseCode
-{
-    None,
-    PauseGame,
-    Message,
-    Reconnect,
-    DropAdd,
-    TextEntry,
-};
-
 // Moved back into "control_types.h"
 //     since "controls.h" is changing more rapidly
 #include "control_types.h"

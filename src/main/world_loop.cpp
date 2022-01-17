@@ -358,12 +358,12 @@ void WorldLoop()
 
         if(SharedControls.Pause)
         {
-            PauseGame(PauseCode::PauseGame, 0);
+            PauseGame(PauseCode::PauseScreen, 0);
         }
         for(int i = 1; i <= numPlayers; i++)
         {
             if(Player[i].Controls.Start && Player[i].UnStart)
-                PauseGame(PauseCode::PauseGame, i);
+                PauseGame(PauseCode::PauseScreen, i);
             // only allow P1 to pause if multiplayer pause controls disabled
             if(!g_compatibility.multiplayer_pause_controls)
                 break;

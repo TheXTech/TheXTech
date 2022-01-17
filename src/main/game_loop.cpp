@@ -190,7 +190,7 @@ void GameLoop()
         {
             // this is always able to pause the game even when CaptainN is enabled.
             if(SharedControls.Pause)
-                PauseGame(PauseCode::PauseGame, 0);
+                PauseGame(PauseCode::PauseScreen, 0);
             // don't let double-pause or double-toggle happen
             else
             {
@@ -232,7 +232,7 @@ void GameLoop()
                     // normally pause the game
                     else
                     {
-                        PauseGame(PauseCode::PauseGame, p);
+                        PauseGame(PauseCode::PauseScreen, p);
                     }
                     // don't let double-pause or double-toggle happen
                     break;
@@ -313,8 +313,8 @@ int PauseGame(PauseCode code, int plr)
 
     if(code == PauseCode::Message)
         MessageScreen_Init();
-    else if(code == PauseCode::PauseGame)
-        PauseScreen::Init();
+    else if(code == PauseCode::PauseScreen || code == PauseCode::ClassicPause)
+        PauseScreen::Init(code == PauseCode::ClassicPause);
     else if(code == PauseCode::Reconnect)
         ConnectScreen::Reconnect_Start();
     else if(code == PauseCode::DropAdd)
@@ -377,7 +377,7 @@ int PauseGame(PauseCode code, int plr)
             {
                 // prevent any logic or unpause from taking place
             }
-            else if(GamePaused == PauseCode::PauseGame)
+            else if(GamePaused == PauseCode::PauseScreen)
             {
                 if(PauseScreen::Logic(plr))
                     break;

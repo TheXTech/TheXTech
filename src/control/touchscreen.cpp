@@ -26,6 +26,7 @@
 
 #include "touchscreen.h"
 #include "../globals.h"
+#include "../player.h"
 #include "../core/render.h"
 #include "../core/window.h"
 
@@ -190,7 +191,7 @@ static int buttonLeft(int player_no, int style)
 {
     (void)player_no;
     (void)style;
-    if(LevelSelect && GamePaused == PauseCode::PauseGame)
+    if(SwapCharAllowed() && GamePaused == PauseCode::PauseScreen)
         return TouchScreenGFX_t::BUTTON_LEFT_CHAR;
     else
         return TouchScreenGFX_t::BUTTON_LEFT;
@@ -200,7 +201,7 @@ static int buttonRight(int player_no, int style)
 {
     (void)player_no;
     (void)style;
-    if(LevelSelect && GamePaused == PauseCode::PauseGame)
+    if(SwapCharAllowed() && GamePaused == PauseCode::PauseScreen)
         return TouchScreenGFX_t::BUTTON_RIGHT_CHAR;
     else
         return TouchScreenGFX_t::BUTTON_RIGHT;

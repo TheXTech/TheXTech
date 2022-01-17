@@ -25,6 +25,17 @@
 #include "globals.h"
 #include "cmd_line_setup.h"
 
+enum class PauseCode
+{
+    None,
+    PauseScreen,
+    ClassicPause,
+    Message,
+    Reconnect,
+    DropAdd,
+    TextEntry,
+};
+
 void SetupPhysics();
 
 void initAll();

@@ -5,7 +5,7 @@
 namespace PauseScreen
 {
 
-void Init();
+void Init(bool ClassicPause);
 
 bool Logic(int plr);
 void Render();

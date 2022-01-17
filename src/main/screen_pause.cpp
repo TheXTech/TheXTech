@@ -150,7 +150,7 @@ static bool s_Quit()
 	return true;
 }
 
-void Init()
+void Init(bool ClassicPause)
 {
     PlaySound(SFX_Pause);
     MenuCursor = 0;
@@ -166,18 +166,18 @@ void Init()
     	s_items.push_back(MenuItem{"CONTINUE", s_Continue});
     	s_items.push_back(MenuItem{"RESTART LEVEL", s_RestartLevel});
     	s_items.push_back(MenuItem{"RESET CHECKPOINTS", s_ResetCheckpoints});
-    	if(g_compatibility.allow_drop_add)
+    	if(g_compatibility.allow_drop_add && !ClassicPause)
 	    	s_items.push_back(MenuItem{"DROP/ADD PLAYERS", s_DropAddScreen});
-	    if(g_config.enter_cheats_menu_item)
+	    if(g_config.enter_cheats_menu_item && !ClassicPause)
 	    	s_items.push_back(MenuItem{"ENTER CHEAT", s_CheatScreen});
 	    s_items.push_back(MenuItem{"QUIT TESTING", s_QuitTesting});
     }
     else
     {
     	s_items.push_back(MenuItem{"CONTINUE", s_Continue});
-    	if(g_compatibility.allow_drop_add)
+    	if(g_compatibility.allow_drop_add && !ClassicPause)
 	    	s_items.push_back(MenuItem{"DROP/ADD PLAYERS", s_DropAddScreen});
-	    if(g_config.enter_cheats_menu_item)
+	    if(g_config.enter_cheats_menu_item && !ClassicPause)
 	    	s_items.push_back(MenuItem{"ENTER CHEAT", s_CheatScreen});
 	    if(CanSave)
         {

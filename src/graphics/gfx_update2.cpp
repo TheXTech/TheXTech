@@ -760,7 +760,7 @@ void UpdateGraphics2(bool skipRepaint)
         speedRun_renderTimer();
 
         // render special screens
-        if(GamePaused == PauseCode::PauseGame)
+        if(GamePaused == PauseCode::PauseScreen)
             PauseScreen::Render();
 
         if(QuickReconnectScreen::g_active)

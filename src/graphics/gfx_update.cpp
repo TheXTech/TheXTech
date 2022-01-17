@@ -2673,7 +2673,7 @@ void UpdateGraphics(bool skipRepaint)
     speedRun_renderTimer();
 
     // render special screens
-    if(GamePaused == PauseCode::PauseGame)
+    if(GamePaused == PauseCode::PauseScreen)
         PauseScreen::Render();
 
     if(GamePaused == PauseCode::Message)
