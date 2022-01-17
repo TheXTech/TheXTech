@@ -22,6 +22,7 @@ struct Controls_t
 struct SharedControls_t
 {
     bool Pause = false;
+    bool LegacyPause = false; // modifier, only set if Pause is also set
     bool QuitCredits = false;
     bool MenuUp = false;
     bool MenuDown = false;

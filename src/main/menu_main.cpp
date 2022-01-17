@@ -348,7 +348,7 @@ bool mainMenuUpdate()
     bool rightPressed = SharedControls.MenuRight;
     bool homePressed = SharedCursor.Tertiary;
 
-    bool menuDoPress = SharedControls.MenuDo;
+    bool menuDoPress = SharedControls.MenuDo || SharedControls.Pause;
     bool menuBackPress = SharedControls.MenuBack;
 
     for(int i = 0; i < maxLocalPlayers; i++)

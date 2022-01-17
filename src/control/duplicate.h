@@ -36,7 +36,7 @@ public:
 
     // Update functions that set player controls (and editor controls)
     // based on current device input. Return false if device lost.
-    bool Update(Controls_t& c, CursorControls_t& m, EditorControls_t& e);
+    bool Update(int player, Controls_t& c, CursorControls_t& m, EditorControls_t& e);
 
     void Rumble(int ms, float strength);
 };

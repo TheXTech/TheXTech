@@ -225,7 +225,7 @@ bool Logic(int plr)
     bool upPressed = SharedControls.MenuUp;
     bool downPressed = SharedControls.MenuDown;
 
-    bool menuDoPress = SharedControls.MenuDo;
+    bool menuDoPress = SharedControls.MenuDo || SharedControls.Pause;
     bool menuBackPress = SharedControls.MenuBack;
 
     if(SingleCoop > 0 || numPlayers > 2)

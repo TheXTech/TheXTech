@@ -53,7 +53,7 @@ bool g_renderTouchscreen = false;
 static PauseCode s_requestedPause = PauseCode::None;
 bool g_disallowHotkeys = false;
 
-void Hotkeys::Activate(size_t i)
+void Hotkeys::Activate(size_t i, int player)
 {
     if(g_disallowHotkeys || g_pollingInput)
         return;
@@ -83,7 +83,11 @@ void Hotkeys::Activate(size_t i)
             ShowOnScreenMeta = !ShowOnScreenMeta;
             return;
         case Buttons::LegacyPause:
-            s_requestedPause = PauseCode::LegacyPause;
+            if(player >= 1 && player <= numPlayers)
+                Player[player].Controls.Start = true;
+            else
+                SharedControls.Pause = true;
+            SharedControls.LegacyPause = true;
             return;
         default:
             return;
@@ -644,6 +648,7 @@ bool Update()
     SharedCursor.Primary = false;
     SharedCursor.Secondary = false;
     SharedCursor.Tertiary = false;
+    SharedControls = SharedControls_t();
 
     for(InputMethodType* type : g_InputMethodTypes)
     {
@@ -669,7 +674,7 @@ bool Update()
             // okay = false;
             continue;
         }
-        if(!method->Update(controls, cursor, editor))
+        if(!method->Update(i+1, controls, cursor, editor))
         {
             okay = false;
             DeleteInputMethod(method);
@@ -678,7 +683,6 @@ bool Update()
         }
     }
 
-    SharedControls = SharedControls_t();
     for(InputMethodType* type : g_InputMethodTypes)
     {
         type->UpdateControlsPost();

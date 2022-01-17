@@ -41,7 +41,7 @@ namespace Controls
 
 // Update functions that set player controls (and editor controls)
 // based on current device input. Return false if device lost.
-bool InputMethod_Keyboard::Update(Controls_t& c, CursorControls_t& m, EditorControls_t& e)
+bool InputMethod_Keyboard::Update(int player, Controls_t& c, CursorControls_t& m, EditorControls_t& e)
 {
     InputMethodType_Keyboard* k = dynamic_cast<InputMethodType_Keyboard*>(this->Type);
     InputMethodProfile_Keyboard* p = dynamic_cast<InputMethodProfile_Keyboard*>(this->Profile);
@@ -128,7 +128,7 @@ bool InputMethod_Keyboard::Update(Controls_t& c, CursorControls_t& m, EditorCont
             if(a == 3 && *b)
             {
                 if(this->m_hotkey_okay)
-                    Hotkeys::Activate(i);
+                    Hotkeys::Activate(i, player);
                 hotkey_okay = false;
             }
         }

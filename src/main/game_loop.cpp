@@ -253,7 +253,7 @@ void MessageScreen_Init()
 
 bool MessageScreen_Logic(int plr)
 {
-    bool menuDoPress = SharedControls.MenuDo;
+    bool menuDoPress = SharedControls.MenuDo || SharedControls.Pause;
     bool menuBackPress = SharedControls.MenuBack;
 
     // this might no longer be necessary...
@@ -307,8 +307,8 @@ int PauseGame(PauseCode code, int plr)
 //    double fpsTime = 0;
 //    int fpsCount = 0;
 
-    // no reason to allow game to be paused during main menu
-    if(GameMenu)
+    // no reason to allow game to be paused during main menu or credits
+    if(GameMenu || GameOutro)
         return 0;
 
     if(!GameMenu)
@@ -320,14 +320,7 @@ int PauseGame(PauseCode code, int plr)
     if(code == PauseCode::Message)
         MessageScreen_Init();
     else if(code == PauseCode::PauseScreen)
-    {
-        PauseScreen::Init(false);
-    }
-    else if(code == PauseCode::LegacyPause)
-    {
-        PauseScreen::Init(true);
-        code = PauseCode::PauseScreen;
-    }
+        PauseScreen::Init(SharedControls.LegacyPause);
     else if(code == PauseCode::Reconnect)
         ConnectScreen::Reconnect_Start();
     else if(code == PauseCode::DropAdd)

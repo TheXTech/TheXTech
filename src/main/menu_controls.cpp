@@ -1279,7 +1279,7 @@ int menuControls_Logic()
     bool leftPressed = SharedControls.MenuLeft;
     bool rightPressed = SharedControls.MenuRight;
 
-    bool menuDoPress = SharedControls.MenuDo;
+    bool menuDoPress = SharedControls.MenuDo || SharedControls.Pause;
     bool menuBackPress = SharedControls.MenuBack || (SharedCursor.Secondary && MenuMouseRelease);
 
     bool delPressed = false;

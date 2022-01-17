@@ -410,14 +410,14 @@ namespace Hotkeys
             case Buttons::ToggleHUD:
                 return "Toggle HUD";
             case Buttons::LegacyPause:
-                return "Legacy Pause Menu";
+                return "Old Pause";
             default:
                 return "NULL";
         }
     }
 
     // function for activating a hotkey
-    void Activate(size_t i);
+    void Activate(size_t i, int player = 0);
 } // namespace (Controls::)Hotkeys
 
 // information about a particular bound input method
@@ -457,7 +457,7 @@ public:
     // Remember that hotkeys should only process once per hotkey press, so it may be easier
     // to put them in ConsumeEvent.
     // Return false if device lost.
-    virtual bool Update(Controls_t& c, CursorControls_t& m, EditorControls_t& e) = 0;
+    virtual bool Update(int player, Controls_t& c, CursorControls_t& m, EditorControls_t& e) = 0;
 
     virtual void Rumble(int ms, float strength) = 0;
 

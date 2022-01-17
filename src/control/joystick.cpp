@@ -363,7 +363,7 @@ InputMethod_Joystick::~InputMethod_Joystick()
 
 // Update functions that set player controls (and editor controls)
 // based on current device input. Return false if device lost.
-bool InputMethod_Joystick::Update(Controls_t& c, CursorControls_t& m, EditorControls_t& e)
+bool InputMethod_Joystick::Update(int player, Controls_t& c, CursorControls_t& m, EditorControls_t& e)
 {
     InputMethodProfile_Joystick* p = dynamic_cast<InputMethodProfile_Joystick*>(this->Profile);
     if(!p || !this->m_devices)
@@ -444,7 +444,7 @@ bool InputMethod_Joystick::Update(Controls_t& c, CursorControls_t& m, EditorCont
             if(a == 3 && *b)
             {
                 if(this->m_hotkey_okay)
-                    Hotkeys::Activate(i);
+                    Hotkeys::Activate(i, player);
                 hotkey_okay = false;
             }
         }

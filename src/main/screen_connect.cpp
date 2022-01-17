@@ -762,7 +762,7 @@ void Chars_Mouse_Render(int x, int w, int y, int h, bool mouse, bool render)
 }
 
 // each player gets a precious 5 lines to display and handle as much unique info as possible
-bool Player_Mouse_Render(int p, int pX, int cX, int pW, int pY, int line, bool mouse, bool render)
+bool Player_Mouse_Render(int p, int pX, int cX, int pY, int line, bool mouse, bool render)
 {
     bool ret = false;
 
@@ -1153,7 +1153,7 @@ int Mouse_Render(bool mouse, bool render)
         lX -= lX & 1;
         cX -= cX & 1;
 
-        Player_Mouse_Render(p, lX, cX, p_width, sY+line*(max_line-5), line, mouse, render);
+        Player_Mouse_Render(p, lX, cX, sY+line*(max_line-5), line, mouse, render);
     }
 
     if(CheckDone())

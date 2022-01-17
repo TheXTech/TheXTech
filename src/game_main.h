@@ -29,7 +29,6 @@ enum class PauseCode
 {
     None,
     PauseScreen,
-    LegacyPause,
     Message,
     Reconnect,
     DropAdd,

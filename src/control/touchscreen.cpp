@@ -817,7 +817,8 @@ static void updateFingerKeyState(TouchScreenController::FingerState &st,
                 extraSt.keyHoldRun = setState;
                 break;
             case TouchScreenController::key_enterCheats:
-                extraSt.keyCheatsOnce = (setState & !extraSt.keyCheatsOnce);
+                // unset in input method update
+                extraSt.keyCheatsOnce |= (setState & !extraSt.keyCheats);
                 extraSt.keyCheats = setState;
                 break;
             default:
@@ -956,9 +957,6 @@ void TouchScreenController::processTouchDevice(int dev_i)
 
     if(m_current_extra_keys.keyHoldRunOnce)
         m_runHeld = !m_runHeld;
-
-    if(m_current_extra_keys.keyCheatsOnce && m_enable_enter_cheats)
-        Hotkeys::Activate(Hotkeys::Buttons::EnterCheats);
 }
 
 void TouchScreenController::update()
@@ -1144,7 +1142,7 @@ InputMethod_TouchScreen::~InputMethod_TouchScreen()
 
 // Update functions that set player controls (and editor controls)
 // based on current device input. Return false if device lost.
-bool InputMethod_TouchScreen::Update(Controls_t& c, CursorControls_t& m, EditorControls_t& e)
+bool InputMethod_TouchScreen::Update(int player, Controls_t& c, CursorControls_t& m, EditorControls_t& e)
 {
     InputMethodType_TouchScreen* t = dynamic_cast<InputMethodType_TouchScreen*>(this->Type);
     if(!t)
@@ -1191,6 +1189,12 @@ bool InputMethod_TouchScreen::Update(Controls_t& c, CursorControls_t& m, EditorC
     // TODO: beautiful editor controls :)
 
     (void)e;
+
+    if(t->m_controller.m_current_extra_keys.keyCheatsOnce && t->m_controller.m_enable_enter_cheats)
+    {
+        Hotkeys::Activate(Hotkeys::Buttons::EnterCheats, player);
+        t->m_controller.m_current_extra_keys.keyCheatsOnce = false;
+    }
 
     return true;
 }
