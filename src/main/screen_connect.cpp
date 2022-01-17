@@ -286,7 +286,7 @@ bool Player_Back(int p)
     // adding player at main menu
     if(s_playerState[p] == PlayerState::SelectChar && s_context == Context::MainMenu)
     {
-        DeleteInputMethod(Controls::g_InputMethods[p]);
+        Controls::DeleteInputMethod(Controls::g_InputMethods[p]);
         s_playerState[p] = PlayerState::Disconnected;
         g_charSelect[p] = 0;
         return false;
@@ -399,9 +399,15 @@ bool Player_Select(int p)
     {
         if(s_menuItem[p] == 2)
         {
-            DeleteInputMethod(Controls::g_InputMethods[p]);
+            Controls::DeleteInputMethod(Controls::g_InputMethods[p]);
             s_playerState[p] = PlayerState::Disconnected;
-            if(s_context == Context::MainMenu)
+            if(s_context == Context::MainMenu && s_minPlayers == 1)
+            {
+                Controls::DeleteInputMethodSlot(p);
+                if(g_charSelect[p] == 0)
+                    Player_ValidateChar(p);
+            }
+            else if(s_context == Context::MainMenu)
                 g_charSelect[p] = 0;
             do_sentinel.active = false;
             return false;
@@ -895,7 +901,7 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pY, int line, bool mouse, bo
     //   because the standard cursor icons are already tinted.
 
     // render the player's header
-    if(render && s_playerState[p] != PlayerState::SelectProfile)
+    if(render && s_playerState[p] != PlayerState::SelectProfile && !(s_context == Context::MainMenu && s_minPlayers == 1))
         SuperPrintCenter(fmt::format_ne("{0} {1}", g_mainMenu.wordPlayer, p+1), 3, cX, pY, r, g, b);
 
     // now render / process the player's menu as appropriate to its case
@@ -1089,7 +1095,7 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pY, int line, bool mouse, bo
             Player_MenuItem_Mouse_Render(p, 2, g_mainMenu.wordDisconnect,
                 pX, pY + 4*line, mouse, render);
         else
-            Player_MenuItem_Mouse_Render(p, 2, g_mainMenu.wordBack,
+            Player_MenuItem_Mouse_Render(p, 2, "RECONNECT",
                 pX, pY + 4*line, mouse, render);
     }
 
@@ -1099,7 +1105,13 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pY, int line, bool mouse, bo
     {
         if(render)
         {
-            if(BlockFlash < 45)
+            if(s_context == Context::MainMenu && s_minPlayers == 1)
+            {
+                XRender::renderRect(ScreenW / 2 - 320, pY + 2.5 * line, 640, 2.5 * line, 0, 0, 0, 0.5);
+                if(BlockFlash < 45)
+                    SuperPrintCenter(g_mainMenu.phrasePressAButton, 3, cX, pY+3.5*line);
+            }
+            else if(BlockFlash < 45)
                 SuperPrintCenter(g_mainMenu.phrasePressAButton, 3, cX, pY+2*line);
         }
         return ret;
@@ -1116,7 +1128,7 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pY, int line, bool mouse, bo
         return ret;
 
     // show the controls info and SELECT TO CHANGE message
-    if(render)
+    if(render && !(s_context == Context::MainMenu && s_minPlayers == 1))
     {
         if(p < (int)Controls::g_InputMethods.size() && Controls::g_InputMethods[p])
         {
@@ -1133,6 +1145,23 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pY, int line, bool mouse, bo
 
         SuperPrintCenter("PRESS SELECT FOR", 3, cX, pY + 3*line, 0.8f, 0.8f, 0.8f, 0.8f);
         SuperPrintCenter("CONTROLS OPTIONS", 3, cX, pY + 4*line, 0.8f, 0.8f, 0.8f, 0.8f);
+    }
+    // show the squashed info for 1P mode
+    else if(render)
+    {
+        XRender::renderRect(ScreenW / 2 - 320, pY + 2.5 * line, 640, 2.5 * line, 0, 0, 0, 0.5);
+
+        if(p < (int)Controls::g_InputMethods.size() && Controls::g_InputMethods[p])
+        {
+            // global information about controller
+            // Profile should never be null
+            if(Controls::g_InputMethods[p]->Profile != nullptr)
+                SuperPrintCenter(Controls::g_InputMethods[p]->Name + " - " + Controls::g_InputMethods[p]->Profile->Name, 3, cX, pY + 3*line);
+            else
+                SuperPrintCenter(Controls::g_InputMethods[p]->Name, 3, cX, pY + 3*line);
+        }
+
+        SuperPrintCenter("PRESS SELECT FOR CONTROLS OPTIONS", 3, cX, pY + 4*line, 0.8f, 0.8f, 0.8f, 0.8f);
     }
 
     return ret;
@@ -1180,7 +1209,7 @@ int Mouse_Render(bool mouse, bool render)
     // line height is scaled so that these fit onscreen
     // with at least 30px of padding on either side
     int max_line = 15;
-    int line = (ScreenH - 60) / 15;
+    int line = (ScreenH - 60) / max_line;
     if(line > 30)
         line = 30;
     if(line < 18)
@@ -1233,7 +1262,7 @@ int Mouse_Render(bool mouse, bool render)
         sW = p_width*n;
     }
 
-    if(render)
+    if(render && !(s_context == Context::MainMenu && s_minPlayers == 1))
     {
         XRender::renderRect(sX, sY - (line-16), p_width*n, line*max_line + line-16, 0, 0, 0, .5);
     }
@@ -1244,7 +1273,12 @@ int Mouse_Render(bool mouse, bool render)
 
     if(render)
     {
-        if(s_context == Context::MainMenu)
+        if(s_context == Context::MainMenu && s_minPlayers == 1)
+        {
+            SuperPrint(g_mainMenu.main1PlayerGame, 3, 300, 280, 1.0f, 0.3f, 0.3f);
+            SuperPrint(SelectWorld[selWorld].WorldName, 3, 300, 310, 0.6f, 1.f, 1.f);
+        }
+        else if(s_context == Context::MainMenu)
             SuperPrintScreenCenter(g_mainMenu.charSelTitle, 3, sY);
         else if(s_context == Context::DropAdd)
             SuperPrintScreenCenter(g_mainMenu.dropAddTitle, 3, sY);
@@ -1252,7 +1286,13 @@ int Mouse_Render(bool mouse, bool render)
             SuperPrintScreenCenter(g_mainMenu.reconnectTitle, 3, sY);
     }
 
-    Chars_Mouse_Render(sX, sW, sY+line*2, line*5, mouse, render);
+    if(s_context == Context::MainMenu && s_minPlayers == 1)
+    {
+        if(s_playerState[0] == PlayerState::Disconnected || s_playerState[0] == PlayerState::SelectChar)
+            Chars_Mouse_Render(300, 200, 350, 150, mouse, render);
+    }
+    else
+        Chars_Mouse_Render(sX, sW, sY+line*2, line*5, mouse, render);
 
     if(s_context == Context::Reconnect || s_context == Context::DropAdd)
     {
@@ -1291,7 +1331,17 @@ int Mouse_Render(bool mouse, bool render)
         lX -= lX & 1;
         cX -= cX & 1;
 
-        Player_Mouse_Render(p, lX, cX, sY+line*(max_line-5), line, mouse, render);
+        if(s_context == Context::MainMenu && s_minPlayers == 1)
+        {
+            if(s_playerState[p] == PlayerState::Disconnected || s_playerState[p] == PlayerState::SelectChar)
+                Player_Mouse_Render(p, 300, 400, 420, 30, mouse, render);
+            else if(s_playerState[p] == PlayerState::ControlsMenu)
+                Player_Mouse_Render(p, 300, 400, 350, 30, mouse, render);
+            else
+                Player_Mouse_Render(p, 300, 400, 380, 30, mouse, render);
+        }
+        else
+            Player_Mouse_Render(p, lX, cX, sY+line*(max_line-5), line, mouse, render);
     }
 
     if(CheckDone())
