@@ -1357,6 +1357,7 @@ void Autocode::LunaControl(LunaControlAct act, int val)
     switch(act)
     {
     case LCA_DemoCounter:
+        gShowDemoCounter = (val == 1);
         break;
 
     case LCA_SMBXHUD:
