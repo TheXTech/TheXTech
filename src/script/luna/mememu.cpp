@@ -333,9 +333,9 @@ public:
         m_if.insert({0x00B2595E, &numPlayers}); // Player Count
         m_if.insert({0x00B2595A, &numNPCs}); // NPC count
 
-        m_if.insert({0xB2C906, &numStars}); // HUD star count
+        m_if.insert({0x00B2C906, &maxStars}); // Max stars at episode
 
-        m_if.insert({0x00B251E0, &maxStars}); // HUD star count
+        m_if.insert({0x00B251E0, &numStars}); // HUD star count
         m_if.insert({0x00B2C5A8, &Coins}); // HUD coins count
         m_if.insert({0x00B2C880, &MenuCursor}); // Current menu choice
         m_if.insert({0x00B2C8E4, &Score}); // HUD points count
