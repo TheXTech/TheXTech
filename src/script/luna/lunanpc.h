@@ -22,6 +22,7 @@
 #ifndef LUNANPC_H
 #define LUNANPC_H
 
+#include <cstddef>
 #include <list>
 
 #include "lunadefs.h"

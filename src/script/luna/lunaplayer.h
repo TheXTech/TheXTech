@@ -22,7 +22,7 @@
 #ifndef LunaPlayer_HHH
 #define LunaPlayer_HHH
 
-#include <stddef.h>
+#include <cstddef>
 #include "lunadefs.h"
 
 struct Player_t;

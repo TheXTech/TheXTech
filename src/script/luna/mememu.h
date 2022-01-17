@@ -21,8 +21,9 @@
 #ifndef MEMEMU_H
 #define MEMEMU_H
 
-#include <stddef.h>
+#include <cstddef>
 #include "lunadefs.h"
+
 struct Player_t;
 struct NPC_t;
 
