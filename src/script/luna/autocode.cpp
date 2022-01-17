@@ -1112,7 +1112,7 @@ void Autocode::Do(bool init)
         // DEBUG
         case AT_DebugPrint:
         {
-            Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("LUNADLL (TheXTech) VERSION-{0}", LUNA_VERSION), 3, 50, 250));
+            Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("LunaScript (TheXTech) VERSION-{0}", LUNA_VERSION), 3, 50, 250));
             //Renderer::Get().SafePrint(, 3, 340, 250);
             Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("GLOBL-{0}", gAutoMan.m_GlobalCodes.size()), 3, 50, 300));
             Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("INIT -{0}", gAutoMan.m_InitAutocodes.size()), 3, 50, 330));
@@ -1134,7 +1134,7 @@ void Autocode::Do(bool init)
 
         case AT_DebugWindow:
         {
-            XMsgBox::simpleMsgBox(AbstractMsgBox_t::MESSAGEBOX_INFORMATION, "LunaDLL debug message", MyString);
+            XMsgBox::simpleMsgBox(AbstractMsgBox_t::MESSAGEBOX_INFORMATION, "LunaScript debug message", MyString);
             expire();
             break;
         }
