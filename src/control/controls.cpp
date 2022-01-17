@@ -430,7 +430,11 @@ void InputMethodType::SaveConfig(IniProcessing* ctl)
 {
     ctl->beginGroup(this->Name);
     this->SaveConfig_Custom(ctl);
+
+    // save the number of profiles
     ctl->setValue("n-profiles", this->m_profiles.size());
+
+    // save the default (most recent) profile for each player
     for(int i = 0; i < maxLocalPlayers; i++)
     {
         InputMethodProfile* default_profile = this->m_defaultProfiles[i];
@@ -448,6 +452,8 @@ void InputMethodType::SaveConfig(IniProcessing* ctl)
             ctl->setValue(default_profile_key.c_str(), index);
     }
     ctl->endGroup();
+
+    // save each profile
     for(size_t i = 0; i < this->m_profiles.size(); i++)
     {
         ctl->beginGroup(this->Name + "-" + std::to_string(i+1));
@@ -466,26 +472,35 @@ void InputMethodType::LoadConfig(IniProcessing* ctl)
     ctl->read("n-profiles", n_profiles, 0);
     ctl->endGroup();
 
-    for(int i = 0; i < n_profiles; i++)
+    for(int i = 0; i < n_profiles || i < 2; i++)
     {
+        std::string group_name = this->Name + "-" + std::to_string(i+n_existing+1);
+
+        // look for legacy profile if there is no modern profile
+        if(!ctl->contains(group_name))
+        {
+            if(!this->LegacyName.empty())
+            {
+                group_name = "player-" + std::to_string(i+1) + "-" + this->LegacyName;
+                if(!ctl->contains(group_name))
+                    continue;
+            }
+            else
+                continue;
+        }
+
+        // found a profile in the INI, now allocate and load it
         InputMethodProfile* new_profile = this->AddProfile();
         if(new_profile)
         {
-            // load legacy profile
-            if(!this->LegacyName.empty())
-            {
-                ctl->beginGroup("player-" + std::to_string(i+1) + "-" + this->LegacyName);
-                new_profile->LoadConfig_All(ctl);
-                ctl->endGroup();
-            }
-            // load modern profile
-            ctl->beginGroup(this->Name + "-" + std::to_string(i+1));
+            ctl->beginGroup(group_name);
             new_profile->LoadConfig_All(ctl);
             ctl->read("name", new_profile->Name, this->Name + " " + std::to_string(i+n_existing+1));
             ctl->endGroup();
         }
     }
 
+    // load the default recent profile for each player
     ctl->beginGroup(this->Name);
     for(int i = 0; i < maxLocalPlayers; i++)
     {

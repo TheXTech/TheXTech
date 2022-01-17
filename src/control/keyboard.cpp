@@ -202,6 +202,7 @@ InputMethodProfile_Keyboard::InputMethodProfile_Keyboard()
 {
     for(size_t i = 0; i < PlayerControls::n_buttons; i++)
     {
+        this->m_keys[i] = null_key;
         this->m_keys2[i] = null_key;
     }
     for(size_t i = 0; i < CursorControls::n_buttons; i++)
@@ -210,10 +211,12 @@ InputMethodProfile_Keyboard::InputMethodProfile_Keyboard()
     }
     for(size_t i = 0; i < EditorControls::n_buttons; i++)
     {
+        this->m_editor_keys[i] = null_key;
         this->m_editor_keys2[i] = null_key;
     }
     for(size_t i = 0; i < Hotkeys::n_buttons; i++)
     {
+        this->m_hotkeys[i] = null_key;
         this->m_hotkeys2[i] = null_key;
     }
 
@@ -242,7 +245,6 @@ InputMethodProfile_Keyboard::InputMethodProfile_Keyboard()
     this->m_editor_keys[EditorControls::Buttons::TestPlay] = SDL_SCANCODE_RETURN;
 
     // ALSO UPDATE InputMethodType_Keyboard::DefaultHotkey
-    this->m_hotkeys[Hotkeys::Buttons::EnterCheats] = null_key;
     this->m_hotkeys[Hotkeys::Buttons::ToggleHUD] = SDL_SCANCODE_F1;
     this->m_hotkeys[Hotkeys::Buttons::DebugInfo] = SDL_SCANCODE_F3;
     this->m_hotkeys[Hotkeys::Buttons::Fullscreen] = SDL_SCANCODE_F7;
@@ -671,7 +673,11 @@ void InputMethodProfile_Keyboard::LoadConfig(IniProcessing* ctl)
                 }
                 name2[c] = name[c];
             }
-            ctl->read(name2, keys2[i], keys2[i]);
+            // only add RSHIFT secondary key during conversion if current primary key is LSHIFT
+            int def = keys2[i];
+            if(a == 0 && i == PlayerControls::Buttons::Drop && keys[i] != SDL_SCANCODE_LSHIFT)
+                def = null_key;
+            ctl->read(name2, keys2[i], def);
         }
     }
 }
