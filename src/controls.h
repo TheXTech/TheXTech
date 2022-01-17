@@ -363,7 +363,7 @@ namespace Hotkeys
     // enumerate of the Hotkey indices (which are almost never used)
     enum Buttons : size_t
     {
-        Fullscreen = 0, Screenshot, RecordGif, DebugInfo, EnterCheats, ToggleHUD, MAX
+        Fullscreen = 0, Screenshot, RecordGif, DebugInfo, EnterCheats, ToggleHUD, LegacyPause, MAX
     };
 
     constexpr size_t n_buttons = Buttons::MAX;
@@ -385,6 +385,8 @@ namespace Hotkeys
                 return "enter-cheats";
             case Buttons::ToggleHUD:
                 return "toggle-hud";
+            case Buttons::LegacyPause:
+                return "legacy-pause";
             default:
                 return "NULL";
         }
@@ -407,6 +409,8 @@ namespace Hotkeys
                 return "Enter Cheat";
             case Buttons::ToggleHUD:
                 return "Toggle HUD";
+            case Buttons::LegacyPause:
+                return "Legacy Pause Menu";
             default:
                 return "NULL";
         }

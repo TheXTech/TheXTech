@@ -50,7 +50,7 @@ namespace Controls
 std::vector<InputMethod*> g_InputMethods;
 std::vector<InputMethodType*> g_InputMethodTypes;
 bool g_renderTouchscreen = false;
-static bool s_enterCheatScreen = false;
+static PauseCode s_requestedPause = PauseCode::None;
 bool g_disallowHotkeys = false;
 
 void Hotkeys::Activate(size_t i)
@@ -77,10 +77,13 @@ void Hotkeys::Activate(size_t i)
             g_stats.enabled = !g_stats.enabled;
             return;
         case Buttons::EnterCheats:
-            s_enterCheatScreen = true;
+            s_requestedPause = PauseCode::TextEntry;
             return;
         case Buttons::ToggleHUD:
             ShowOnScreenMeta = !ShowOnScreenMeta;
+            return;
+        case Buttons::LegacyPause:
+            s_requestedPause = PauseCode::LegacyPause;
             return;
         default:
             return;
@@ -775,13 +778,23 @@ bool Update()
         okay = false;
     }
 
-    if(s_enterCheatScreen && GamePaused != PauseCode::TextEntry)
+    if(s_requestedPause != PauseCode::None && GamePaused != s_requestedPause)
     {
-        cheats_setBuffer(TextEntryScreen::Run("Enter cheat:"));
-        s_enterCheatScreen = false;
+        if(s_requestedPause == PauseCode::TextEntry)
+        {
+            cheats_setBuffer(TextEntryScreen::Run("Enter cheat:"));
+        }
+        else
+        {
+            PauseGame(s_requestedPause);
+        }
         MenuCursorCanMove = false;
         MenuMouseRelease = false;
         MouseRelease = false;
+    }
+    else if(s_requestedPause != PauseCode::None)
+    {
+        s_requestedPause = PauseCode::None;
     }
 
     g_disallowHotkeys = false;

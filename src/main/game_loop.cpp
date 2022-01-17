@@ -315,8 +315,8 @@ int PauseGame(PauseCode code, int plr)
 
     if(code == PauseCode::Message)
         MessageScreen_Init();
-    else if(code == PauseCode::PauseScreen || code == PauseCode::ClassicPause)
-        PauseScreen::Init(code == PauseCode::ClassicPause);
+    else if(code == PauseCode::PauseScreen || code == PauseCode::LegacyPause)
+        PauseScreen::Init(code == PauseCode::LegacyPause);
     else if(code == PauseCode::Reconnect)
         ConnectScreen::Reconnect_Start();
     else if(code == PauseCode::DropAdd)
