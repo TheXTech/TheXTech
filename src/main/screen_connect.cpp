@@ -188,12 +188,28 @@ void Player_ValidateChar(int p)
 {
     // ensure that each character's selection is still valid
     // i is a dummy variable so that if invalid, end up where we started
-    for(int i = 0; i < 5; i++)
+    int i;
+    for(i = 0; i < 5; i++)
     {
         if(s_menuItem[p] < 0 || CharAvailable(s_menuItem[p]+1, p))
             break;
         s_menuItem[p] ++;
         if(s_menuItem[p] == 5)
+            s_menuItem[p] = 0;
+    }
+    // if we failed (total block), first try to find an unblock char
+    if(i == 5)
+    {
+        for(i = 0; i < 5; i++)
+        {
+            if(!blockCharacter[i+1])
+            {
+                s_menuItem[p] = i;
+                break;
+            }
+        }
+        // just do char 1
+        if(i == 5)
             s_menuItem[p] = 0;
     }
 }
@@ -580,13 +596,26 @@ void Player_Up(int p)
     if(s_playerState[p] == PlayerState::SelectChar)
     {
         PlaySoundMenu(SFX_Slide);
-        for(int i = 0; i < 6; i++)
+        int i = 0;
+        for(i = 0; i < 5; i++)
         {
             if(s_menuItem[p] == 0)
                 s_menuItem[p] = 5;
             s_menuItem[p] --;
-            if(s_menuItem[p] < 0 || CharAvailable(s_menuItem[p]+1, p))
+            if(CharAvailable(s_menuItem[p]+1, p))
                 break;
+        }
+        // if can't traverse normally, allow duplicates
+        if(i == 5)
+        {
+            for(i = 0; i < 5; i++)
+            {
+                if(s_menuItem[p] == 0)
+                    s_menuItem[p] = 5;
+                s_menuItem[p] --;
+                if(!blockCharacter[s_menuItem[p]+1])
+                    break;
+            }
         }
     }
     if(s_playerState[p] == PlayerState::SelectProfile)
@@ -638,13 +667,26 @@ void Player_Down(int p)
     if(s_playerState[p] == PlayerState::SelectChar)
     {
         PlaySoundMenu(SFX_Slide);
-        for(int i = 0; i < 6; i++)
+        int i;
+        for(i = 0; i < 5; i++)
         {
             s_menuItem[p] ++;
             if(s_menuItem[p] == 5)
                 s_menuItem[p] = 0;
-            if(s_menuItem[p] < 0 || CharAvailable(s_menuItem[p]+1, p))
+            if(CharAvailable(s_menuItem[p]+1, p))
                 break;
+        }
+        // if can't traverse normally, allow duplicates
+        if(i == 5)
+        {
+            for(i = 0; i < 5; i++)
+            {
+                s_menuItem[p] ++;
+                if(s_menuItem[p] == 5)
+                    s_menuItem[p] = 0;
+                if(!blockCharacter[s_menuItem[p]+1])
+                    break;
+            }
         }
     }
     if(s_playerState[p] == PlayerState::SelectProfile)
