@@ -445,7 +445,7 @@ void InputMethodType::SaveConfig(IniProcessing* ctl)
     {
         ctl->beginGroup(this->Name + "-" + std::to_string(i+1));
         ctl->setValue("name", this->m_profiles[i]->Name);
-        this->m_profiles[i]->SaveConfig(ctl);
+        this->m_profiles[i]->SaveConfig_All(ctl);
         ctl->endGroup();
     }
 }
@@ -468,12 +468,12 @@ void InputMethodType::LoadConfig(IniProcessing* ctl)
             if(!this->LegacyName.empty())
             {
                 ctl->beginGroup("player-" + std::to_string(i+1) + "-" + this->LegacyName);
-                new_profile->LoadConfig(ctl);
+                new_profile->LoadConfig_All(ctl);
                 ctl->endGroup();
             }
             // load modern profile
             ctl->beginGroup(this->Name + "-" + std::to_string(i+1));
-            new_profile->LoadConfig(ctl);
+            new_profile->LoadConfig_All(ctl);
             ctl->read("name", new_profile->Name, this->Name + " " + std::to_string(i+n_existing+1));
             ctl->endGroup();
         }
