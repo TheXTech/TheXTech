@@ -300,7 +300,7 @@ bool Player_Back(int p)
     }
 
     // escape the drop/add menu
-    if(s_playerState[p] == PlayerState::DropAddMain)
+    if(s_playerState[p] == PlayerState::DropAddMain || s_playerState[p] == PlayerState::ReconnectMain)
     {
         s_playerState[p] = PlayerState::StartGame;
         s_menuItem[p] = 0;
