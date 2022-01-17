@@ -7067,13 +7067,16 @@ void PlayerEffects(const int A)
 void PlayerGone(const int A)
 {
     PlaySound(SFX_PlayerDied2);
-    PlayerDismount(A);
-    if(Player[A].HoldingNPC > 0)
+    if(!Player[A].Dead && Player[A].TimeToLive == 0)
     {
-        NPC[Player[A].HoldingNPC].HoldingPlayer = 0;
-        Player[A].HoldingNPC = 0;
+        PlayerDismount(A);
+        if(Player[A].HoldingNPC > 0)
+        {
+            NPC[Player[A].HoldingNPC].HoldingPlayer = 0;
+            Player[A].HoldingNPC = 0;
+        }
+        PlayerDeathEffect(A);
     }
-    PlayerDeathEffect(A);
 }
 
 void AddPlayer(int Character)
