@@ -785,7 +785,34 @@ void Chars_Mouse_Render(int x, int w, int y, int h, bool mouse, bool render)
                 else
                     act_select_char = false;
                 if(act_select_char && s_menuItem[p] == c)
+                {
                     Render_PCursor(menu_x - 20, y+c*line, pr, pg, pb);
+
+                    // do the fun player transformation thing!
+                    // This WILL switch certain entities back and forth
+                    //   over the course of this function when multiple
+                    //   players are selecting their character.
+                    if(s_context == Context::MainMenu)
+                    {
+                        for(int A = 1; A <= numPlayers; A++)
+                        {
+                            if(A % (p + 1) == 0)
+                            {
+                                if(Player[A].Character != c+1)
+                                {
+                                    Player[A].Character = c+1;
+                                    SizeCheck(A);
+                                }
+                            }
+                        }
+
+                        for(int A = 1; A <= numNPCs; A++)
+                        {
+                            if(A % (p + 1) == 0 && NPC[A].Type == 13)
+                                NPC[A].Special = c+1;
+                        }
+                    }
+                }
 
                 // also signal if some player has already selected it
                 bool player_okay = (s_playerState[p] != PlayerState::Disconnected);
