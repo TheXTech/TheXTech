@@ -731,7 +731,7 @@ void AbstractRender_t::toggleGifRecorder()
         {
             m_gif->enabled = true;
             m_gif->doFinalize = false;
-            PlaySound(SFX_PlayerGrow);
+            PlaySoundMenu(SFX_PlayerGrow);
         }
 
         m_gif->worker = SDL_CreateThread(processRecorder_action, "gif_recorder", reinterpret_cast<void *>(m_gif));
@@ -741,11 +741,11 @@ void AbstractRender_t::toggleGifRecorder()
         if(!m_gif->doFinalize)
         {
             m_gif->doFinalize = true;
-            PlaySound(SFX_PlayerShrink);
+            PlaySoundMenu(SFX_PlayerShrink);
         }
         else
         {
-            PlaySound(SFX_BlockHit);
+            PlaySoundMenu(SFX_BlockHit);
         }
     }
 }
