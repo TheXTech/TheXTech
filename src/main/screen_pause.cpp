@@ -300,7 +300,7 @@ bool Logic(int plr)
         MenuCursor = 0;
 
     // special char change code
-    if(LevelSelect)
+    if(SwapCharAllowed())
     {
         for(int A = 1; A <= numPlayers; A++)
         {
@@ -329,34 +329,57 @@ bool Logic(int plr)
                 {
                     PlaySound(SFX_Slide);
                     Player[A].RunRelease = false;
-                    int B;
-                    if(A == 1)
-                        B = 2;
-                    else
-                        B = 1;
-                    if(numPlayers == 1)
-                        B = 0;
-                    Player[0].Character = 0;
-                    if(Player[A].Controls.Left)
+
+                    // replaced old character swap code with this new code,
+                    // supporting arbitrary multiplayer and in-level swap.
+                    int target = Player[A].Character;
+
+                    // do the full wrap-around to find an acceptable target
+                    for(int i = 0; i < 5; i++)
                     {
-                        do
+                        // move the target in the direction requested by the player
+                        if(Player[A].Controls.Left)
                         {
-                            Player[A].Character = Player[A].Character - 1;
-                            if(Player[A].Character <= 0)
-                                Player[A].Character = 5;
-                        } while(Player[A].Character == Player[B].Character || blockCharacter[Player[A].Character]);
+                            target --;
+                            if(target <= 0)
+                                target = 5;
+                        }
+                        else
+                        {
+                            target ++;
+                            if(target > 5)
+                                target = 1;
+                        }
+
+                        // immediately skip the target if it's blocked
+                        if(blockCharacter[target])
+                            continue;
+
+                        // also skip the target if it's another player's character
+                        int B;
+                        for(B = 1; B <= numPlayers; B++)
+                        {
+                            if(B == A)
+                                continue;
+                            if(target == Player[B].Character)
+                                break;
+                        }
+                        // B <= numPlayers only if the above break was triggered
+                        if(B <= numPlayers)
+                            continue;
+
+                        // otherwise we are good and can keep the target
+                        break;
                     }
-                    else
+
+                    // if a suitable target found, swap character
+                    if(target != Player[A].Character)
                     {
-                        do
-                        {
-                            Player[A].Character = Player[A].Character + 1;
-                            if(Player[A].Character >= 6)
-                                Player[A].Character = 1;
-                        } while(Player[A].Character == Player[B].Character || blockCharacter[Player[A].Character]);
+                        SwapCharacter(A, target);
+
+                        if(LevelSelect)
+                            SetupPlayers();
                     }
-                    Player[A] = SavedChar[Player[A].Character];
-                    SetupPlayers();
                 }
             }
         }

@@ -286,7 +286,11 @@ bool Player_Back(int p)
         g_charSelect[p] = s_menuItem[p]+1;
         // (unless this has become impossible)
         if(g_charSelect[p] != Player[p+1].Character)
+        {
             SwapCharacter(p+1, g_charSelect[p], g_config.StrictDropAdd);
+            if(!g_config.StrictDropAdd)
+                PlaySound(SFX_Raccoon);
+        }
         s_playerState[p] = PlayerState::DropAddMain;
         s_menuItem[p] = 1;
     }
@@ -413,7 +417,11 @@ bool Player_Select(int p)
             {
                 s_menuItem[p] = 1;
                 if(g_charSelect[p] != Player[p+1].Character)
-                    SwapCharacter(p+1, g_charSelect[p], g_config.StrictDropAdd && !LevelSelect);
+                {
+                    SwapCharacter(p+1, g_charSelect[p], g_config.StrictDropAdd && !SwapCharAllowed());
+                    if(!g_config.StrictDropAdd || SwapCharAllowed())
+                        PlaySound(SFX_Raccoon);
+                }
                 do_sentinel.active = false;
             }
             else

@@ -118,6 +118,8 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                 {
                     SwapCharacter(whatPlayer, 5, false, true);
                 }
+
+                PlaySound(SFX_Raccoon);
             }
             else
             {

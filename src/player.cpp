@@ -7244,8 +7244,6 @@ void SwapCharacter(int A, int Character, bool Die, bool Block)
             tempLocation.X = p.Location.X + p.Location.Width / 2.0 - 16;
             NewEffect(10, tempLocation);
         }
-
-        PlaySound(SFX_Raccoon);
     }
 
     if(Die)
