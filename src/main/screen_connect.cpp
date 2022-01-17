@@ -300,8 +300,6 @@ bool Player_Back(int p)
     }
 
     // escape the drop/add menu
-    // (TODO: think about how this will work when drop/add is a tab of the
-    //  pause menu)
     if(s_playerState[p] == PlayerState::DropAddMain)
     {
         s_playerState[p] = PlayerState::StartGame;
@@ -313,6 +311,19 @@ bool Player_Back(int p)
     }
 
     PlaySoundMenu(SFX_Slide);
+
+    // the fake back for P1 on the Main Menu
+    if(s_context == Context::MainMenu && p == 0 && s_playerState[p] == PlayerState::Disconnected)
+    {
+        if(g_charSelect[p] == 0)
+            return true;
+        else
+        {
+            g_charSelect[p] = 0;
+            return false;
+        }
+    }
+
     if(s_playerState[p] == PlayerState::StartGame)
     {
         if(s_context == Context::MainMenu)
@@ -402,6 +413,20 @@ bool Player_Select(int p)
             }
         }        
         return false;
+    }
+
+    // allow mouse to work for P1 in main menu
+    if(s_context == Context::MainMenu && s_minPlayers == 1 && p == 0 && s_playerState[p] == PlayerState::Disconnected)
+    {
+        if(g_charSelect[p] == 0)
+        {
+            s_playerState[p] = PlayerState::SelectChar;
+        }
+        else
+        {
+            do_sentinel.active = false;
+            return false;
+        }
     }
 
     if(s_playerState[p] == PlayerState::SelectChar)
@@ -715,8 +740,20 @@ void Chars_Mouse_Render(int x, int w, int y, int h, bool mouse, bool render)
     // render character by character
     for(int c = 0; c < 5; c++)
     {
+        // enable mousing only if the menu player is on the char select screen
+        bool menuPlayer_active;
+        if(menuPlayer < (int)Controls::g_InputMethods.size() && s_playerState[menuPlayer] == PlayerState::SelectChar)
+            menuPlayer_active = true;
+        else if(menuPlayer == 0 && s_context == Context::MainMenu && s_minPlayers == 1
+            && s_playerState[menuPlayer] == PlayerState::Disconnected && g_charSelect[menuPlayer] == 0)
+        {
+            menuPlayer_active = true;
+        }
+        else
+            menuPlayer_active = false;
+
         // only mouse available chars
-        if(mouse && menuPlayer < (int)Controls::g_InputMethods.size() && s_playerState[menuPlayer] == PlayerState::SelectChar && CharAvailable(c+1, menuPlayer))
+        if(mouse && menuPlayer_active && CharAvailable(c+1, menuPlayer))
         {
             Player_MenuItem_Mouse_Render(menuPlayer, c, g_mainMenu.selectPlayer[c+1],
                 menu_x, y+c*line, mouse, false);
@@ -1034,7 +1071,7 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pY, int line, bool mouse, bo
 
 int Mouse_Render(bool mouse, bool render)
 {
-    if(mouse && !SharedCursor.Move && !render && !SharedCursor.Primary)
+    if(mouse && !SharedCursor.Move && !render && !SharedCursor.Primary && !SharedCursor.Secondary)
         return 0;
 
     int n = Controls::g_InputMethods.size();
@@ -1047,6 +1084,24 @@ int Mouse_Render(bool mouse, bool render)
 
     // What is the first player that is not done?
     int menuPlayer = GetMenuPlayer();
+
+    // call their Player_Back routine in the correct circumstances
+    if(mouse && SharedCursor.Secondary && MenuMouseRelease)
+    {
+        // normally want to cancel the thing that the previous player did
+        MenuMouseRelease = false;
+        if(menuPlayer == 0)
+        {
+            if(Player_Back(menuPlayer))
+                return -1;
+        }
+        else
+        {
+            if(Player_Back(menuPlayer-1))
+                return -1;
+        }
+    }
+
 
     /*--------------------*\
     || Get screen pos     ||
@@ -1206,6 +1261,13 @@ int Logic()
             }
         }
     }
+    // in 1-player mode, only allow a single player to connect
+    if(s_context == Context::MainMenu && s_minPlayers == 1)
+    {
+        if((int)Controls::g_InputMethods.size() >= s_minPlayers)
+            block_poll = true;
+    }
+    // block polling if a player is hitting random buttons
     for(int p = 0; p < maxLocalPlayers; p++)
     {
         if(s_playerState[p] == PlayerState::TestControls || s_playerState[p] == PlayerState::ConfirmProfile)
@@ -1236,14 +1298,7 @@ int Logic()
             || (!Controls::g_InputMethods[p] && s_context != Context::MainMenu))
         {
             s_playerState[p] = PlayerState::Disconnected;
-            if(s_context == Context::MainMenu)
-                g_charSelect[p] = 0;
-            // because P1's UI is shown in 1 player mode on the main menu,
-            // allow the first controller to immediately act upon connection
-            if(p == 0 && s_context == Context::MainMenu && s_minPlayers == 1)
-                s_inputReady[p] = true;
-            else
-                s_inputReady[p] = false;
+            s_inputReady[p] = false;
             continue;
         }
 
@@ -1270,11 +1325,28 @@ int Logic()
             s_inputReady[p] = false;
             if(s_context == Context::MainMenu)
             {
-                s_menuItem[p] = 0;
+                // because P1's UI is shown in 1 player mode on the main menu,
+                // allow the first controller to immediately act upon connection
                 if(p == 0 && s_minPlayers == 1)
+                {
                     s_inputReady[p] = true;
-                s_playerState[p] = PlayerState::SelectChar;
-                Player_ValidateChar(p);
+                    if(g_charSelect[p] != 0)
+                    {
+                        s_playerState[p] = PlayerState::StartGame;
+                        s_menuItem[p] = -4;
+                    }
+                    else
+                    {
+                        s_playerState[p] = PlayerState::SelectChar;
+                        Player_ValidateChar(p);
+                    }
+                }
+                else
+                {
+                    s_menuItem[p] = 0;
+                    s_playerState[p] = PlayerState::SelectChar;
+                    Player_ValidateChar(p);
+                }
             }
             else if(s_context == Context::DropAdd)
             {
