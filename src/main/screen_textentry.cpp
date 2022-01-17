@@ -104,6 +104,14 @@ bool UpdateButton(int x, int y, int size, const char* c, bool sel, bool render)
     {
         print_char[0] = 's'; print_char[1] = 'p'; print_char[2] = 'a'; print_char[3] = 'c'; print_char[4] = 'e'; print_char[5] = '\0';
     }
+    else if(*c == '\x1d')
+    {
+        print_char[0] = '<'; print_char[1] = '-'; print_char[2] = '\0';
+    }
+    else if(*c == '\x1c')
+    {
+        print_char[0] = '-'; print_char[1] = '>'; print_char[2] = '\0';
+    }
     else if(c[0] & 1<<7)
     {
         print_char[0] = c[0];
