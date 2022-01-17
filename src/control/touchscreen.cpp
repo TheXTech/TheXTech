@@ -1486,12 +1486,20 @@ void InputMethodType_TouchScreen::UpdateControlsPre()
 
 void InputMethodType_TouchScreen::UpdateControlsPost()
 {
+    bool method_exists = false;
+    for(InputMethod* m : g_InputMethods)
+    {
+        if(m)
+        {
+            method_exists = true;
+            break;
+        }
+    }
+
     // deactivate the touchscreen rendering when there is no longer an active touchscreen,
     //   but some other input method exists (ie, not the transition between menu and player add)
-    if(g_InputMethods.size() > 0 && this->m_controller.m_active_method == nullptr)
-    {
+    if(method_exists && this->m_controller.m_active_method == nullptr && g_renderTouchscreen)
         g_renderTouchscreen = false;
-    }
 }
 
 InputMethod* InputMethodType_TouchScreen::Poll(const std::vector<InputMethod*>& active_methods) noexcept
