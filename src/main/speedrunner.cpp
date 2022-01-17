@@ -77,7 +77,7 @@ void speedRun_resetTotal()
 #define bool2red(b)  (b ? 1.f : 0.0f),  0.f,                0.f
 #define bool2yellow(b) (b ? 1.f : 0.0f), (b ? 1.f : 0.0f),  0.f
 #define bool2gray(b) (b ? 0.9f : 0.0f), (b ? 0.9f : 0.0f),  (b ? 0.9f : 0.0f)
-#define bool2sepia(b) (b ? 0.7f : 0.0f), (b ? 0.5f : 0.0f),  (b ? 0.2f : 0.0f)
+#define bool2legacy(b) (b ? 0.7f : 0.0f), (b ? 0.7f : 0.0f),  (b ? 0.7f : 0.0f)
 
 static Controls_t s_displayControls[maxLocalPlayers] = {Controls_t()};
 
@@ -167,7 +167,7 @@ void RenderControls(int player, int x, int y, int w, int h)
 
     XRender::renderRect(x + 26, y + 22, 10, 4, bool2gray(c.Drop), alhpaB, true);
     if(SharedControls.LegacyPause)
-        XRender::renderRect(x + 40, y + 22, 10, 4, bool2sepia(c.Start), alhpaB, true);
+        XRender::renderRect(x + 40, y + 22, 10, 4, bool2legacy(c.Start), alhpaB, true);
     else
         XRender::renderRect(x + 40, y + 22, 10, 4, bool2gray(c.Start), alhpaB, true);
 
