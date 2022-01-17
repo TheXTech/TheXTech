@@ -41,7 +41,7 @@ namespace Controls
 
 // Update functions that set player controls (and editor controls)
 // based on current device input. Return false if device lost.
-bool InputMethod_Keyboard::Update(int player, Controls_t& c, CursorControls_t& m, EditorControls_t& e)
+bool InputMethod_Keyboard::Update(int player, Controls_t& c, CursorControls_t& m, EditorControls_t& e, HotkeysPressed_t& h)
 {
     InputMethodType_Keyboard* k = dynamic_cast<InputMethodType_Keyboard*>(this->Type);
     InputMethodProfile_Keyboard* p = dynamic_cast<InputMethodProfile_Keyboard*>(this->Profile);
@@ -54,7 +54,6 @@ bool InputMethod_Keyboard::Update(int player, Controls_t& c, CursorControls_t& m
                 || k->m_keyboardState[SDL_SCANCODE_RALT]
                 || k->m_keyboardState[SDL_SCANCODE_LCTRL]
                 || k->m_keyboardState[SDL_SCANCODE_RCTRL]);
-    bool hotkey_okay = true;
     for(int a = 0; a < 4; a++)
     {
         int* keys;
@@ -127,13 +126,10 @@ bool InputMethod_Keyboard::Update(int player, Controls_t& c, CursorControls_t& m
 
             if(a == 3 && *b)
             {
-                if(this->m_hotkey_okay)
-                    Hotkeys::Activate(i, player);
-                hotkey_okay = false;
+                h[i] = player;
             }
         }
     }
-    this->m_hotkey_okay = hotkey_okay;
 
     double* const scroll[4] = {&e.ScrollUp, &e.ScrollDown, &e.ScrollLeft, &e.ScrollRight};
     bool cursor[4];
@@ -862,9 +858,11 @@ InputMethod* InputMethodType_Keyboard::Poll(const std::vector<InputMethod*>& act
     {
         if(!this->m_keyboardState[key])
             continue;
+
         bool allowed = true;
         if(key == SDL_SCANCODE_LALT || key == SDL_SCANCODE_RALT || key == SDL_SCANCODE_LCTRL || key == SDL_SCANCODE_RCTRL || key == SDL_SCANCODE_ESCAPE)
             allowed = false;
+
         // ban attachment from active profile
         for(InputMethod* method : active_methods)
         {
@@ -973,23 +971,23 @@ bool InputMethodType_Keyboard::DefaultHotkey(const SDL_Event* ev)
     bool altEnter = ((evt.keysym.mod & KMOD_ALT) != 0 && (evt.keysym.scancode == SDL_SCANCODE_RETURN || evt.keysym.scancode == SDL_SCANCODE_KP_ENTER));
 
     if(ctrlF || altEnter)
-        Hotkeys::Activate(Hotkeys::Buttons::Fullscreen);
+        g_hotkeysPressed[Hotkeys::Buttons::Fullscreen] = 0;
 
-    if(m_lastNumKeyboards == 0)
+    if(m_lastNumKeyboards == 0 && evt.repeat == 0)
     {
         // ALSO UPDATE InputMethodProfile_Keyboard::InputMethodProfile_Keyboard
         if(KeyCode == SDL_SCANCODE_F12 || KeyCode == SDL_SCANCODE_F2)
-            Hotkeys::Activate(Hotkeys::Buttons::Screenshot);
+            g_hotkeysPressed[Hotkeys::Buttons::Screenshot] = 0;
         else if(KeyCode == SDL_SCANCODE_F3)
-            Hotkeys::Activate(Hotkeys::Buttons::DebugInfo);
+            g_hotkeysPressed[Hotkeys::Buttons::DebugInfo] = 0;
         else if(KeyCode == SDL_SCANCODE_F1)
-            Hotkeys::Activate(Hotkeys::Buttons::ToggleHUD);
+            g_hotkeysPressed[Hotkeys::Buttons::ToggleHUD] = 0;
 #ifdef __APPLE__
         else if(KeyCode == SDL_SCANCODE_F10) // Reserved by macOS as "show desktop"
 #else
         else if(KeyCode == SDL_SCANCODE_F11)
 #endif
-            Hotkeys::Activate(Hotkeys::Buttons::RecordGif);
+            g_hotkeysPressed[Hotkeys::Buttons::RecordGif] = 0;
     }
 
     SDL_Scancode KeyASCII = evt.keysym.scancode;
@@ -1061,7 +1059,7 @@ bool InputMethodType_Keyboard::ConsumeEvent(const SDL_Event* ev)
                 if(doubleClick && !MagicHand)
                 {
                     this->m_lastMousePress = 0;
-                    Hotkeys::Activate(Hotkeys::Buttons::Fullscreen);
+                    g_hotkeysPressed[Hotkeys::Buttons::Fullscreen] = 0;
                     return true;
                 }
             }
@@ -1115,6 +1113,7 @@ bool InputMethodType_Keyboard::SetProfile_Custom(InputMethod* method, int player
     {
         return false;
     }
+    // prevent duplicates of a profile from ever being set
     for(InputMethod* o_method : active_methods)
     {
         if(!o_method)

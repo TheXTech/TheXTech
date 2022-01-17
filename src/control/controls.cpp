@@ -51,6 +51,8 @@ std::vector<InputMethod*> g_InputMethods;
 std::vector<InputMethodType*> g_InputMethodTypes;
 bool g_renderTouchscreen = false;
 static PauseCode s_requestedPause = PauseCode::None;
+HotkeysPressed_t g_hotkeysPressed;
+static HotkeysPressed_t s_hotkeysPressedOld;
 bool g_disallowHotkeys = false;
 
 void Hotkeys::Activate(size_t i, int player)
@@ -616,6 +618,11 @@ void Init()
 #endif
     // not yet ready for prime time
     // g_InputMethodTypes.push_back(new InputMethodType_Duplicate);
+    for(size_t i = 0; i < Hotkeys::n_buttons; i++)
+    {
+        g_hotkeysPressed[i] = -1;
+        s_hotkeysPressedOld[i] = -1;
+    }
 }
 
 void Quit()
@@ -692,7 +699,7 @@ bool Update()
             // okay = false;
             continue;
         }
-        if(!method->Update(i+1, controls, cursor, editor))
+        if(!method->Update(i+1, controls, cursor, editor, g_hotkeysPressed))
         {
             okay = false;
             DeleteInputMethod(method);
@@ -704,6 +711,14 @@ bool Update()
     for(InputMethodType* type : g_InputMethodTypes)
     {
         type->UpdateControlsPost();
+    }
+
+    // check for legacy pause key
+    if(g_hotkeysPressed[Hotkeys::Buttons::LegacyPause] != -1)
+    {
+        int A = g_hotkeysPressed[Hotkeys::Buttons::LegacyPause];
+        Player[A].Controls.Start = true;
+        SharedControls.LegacyPause = true;
     }
 
     if(SharedCursor.Move)
@@ -798,6 +813,16 @@ bool Update()
         while((int)g_InputMethods.size() < numPlayers)
             g_InputMethods.push_back(nullptr);
         okay = false;
+    }
+
+    // trigger hotkeys
+    for(size_t i = 0; i < Hotkeys::n_buttons; i++)
+    {
+        if(s_hotkeysPressedOld[i] != g_hotkeysPressed[i] && g_hotkeysPressed[i] != -1)
+            Hotkeys::Activate(i, g_hotkeysPressed[i]);
+
+        s_hotkeysPressedOld[i] = g_hotkeysPressed[i];
+        g_hotkeysPressed[i] = -1;
     }
 
     if(s_requestedPause != PauseCode::None && GamePaused != s_requestedPause)

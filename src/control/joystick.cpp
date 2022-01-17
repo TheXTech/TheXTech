@@ -363,7 +363,7 @@ InputMethod_Joystick::~InputMethod_Joystick()
 
 // Update functions that set player controls (and editor controls)
 // based on current device input. Return false if device lost.
-bool InputMethod_Joystick::Update(int player, Controls_t& c, CursorControls_t& m, EditorControls_t& e)
+bool InputMethod_Joystick::Update(int player, Controls_t& c, CursorControls_t& m, EditorControls_t& e, HotkeysPressed_t& h)
 {
     InputMethodProfile_Joystick* p = dynamic_cast<InputMethodProfile_Joystick*>(this->Profile);
     if(!p || !this->m_devices)
@@ -374,7 +374,6 @@ bool InputMethod_Joystick::Update(int player, Controls_t& c, CursorControls_t& m
         this->m_devices = nullptr;
         return false;
     }
-    bool hotkey_okay = true;
     for(int a = 0; a < 4; a++)
     {
         KM_Key* keys;
@@ -443,13 +442,10 @@ bool InputMethod_Joystick::Update(int player, Controls_t& c, CursorControls_t& m
 
             if(a == 3 && *b)
             {
-                if(this->m_hotkey_okay)
-                    Hotkeys::Activate(i, player);
-                hotkey_okay = false;
+                h[i] = player;
             }
         }
     }
-    this->m_hotkey_okay = hotkey_okay;
 
     double cursor[4];
     double* const scroll[4] = {&e.ScrollUp, &e.ScrollDown, &e.ScrollLeft, &e.ScrollRight};
@@ -1800,6 +1796,7 @@ void InputMethodType_Joystick::LoadConfig_Custom(IniProcessing* ctl)
             InputMethodProfile_Joystick* profile = new(std::nothrow) InputMethodProfile_Joystick;
             if(profile)
             {
+                profile->Type = this;
                 profile->LoadConfig_Legacy(ctl);
                 this->m_lastProfileByGUID[guid] = profile;
                 pLogDebug("Loaded legacy profile as '%s'.", guid.c_str());

@@ -80,8 +80,6 @@ class InputMethod_Joystick : public InputMethod
 public:
     JoystickDevices* m_devices;
 
-    bool m_hotkey_okay = false;
-
     using InputMethod::Type;
     using InputMethod::Profile;
 
@@ -89,7 +87,7 @@ public:
 
     // Update functions that set player controls (and editor controls)
     // based on current device input. Return false if device lost.
-    bool Update(int player, Controls_t& c, CursorControls_t& m, EditorControls_t& e);
+    bool Update(int player, Controls_t& c, CursorControls_t& m, EditorControls_t& e, HotkeysPressed_t& h);
 
     void Rumble(int ms, float strength);
 };

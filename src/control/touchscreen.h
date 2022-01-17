@@ -211,7 +211,6 @@ public:
         bool keyAltRunOnce = false;
 
         bool keyCheats = false;
-        bool keyCheatsOnce = false;
     } m_current_extra_keys;
 
     //! Touch can be hidden by left-top corner to use virtual mouse
@@ -273,7 +272,7 @@ public:
 
     // Update functions that set player controls (and editor controls)
     // based on current device input. Return false if device lost.
-    bool Update(int player, Controls_t& c, CursorControls_t& m, EditorControls_t& e);
+    bool Update(int player, Controls_t& c, CursorControls_t& m, EditorControls_t& e, HotkeysPressed_t& h);
 
     void Rumble(int ms, float strength);
 };

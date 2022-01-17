@@ -37,13 +37,6 @@ class InputMethod;
 class InputMethodProfile;
 class InputMethodType;
 
-// a nulled pointer in here signifies a player whose controller has disconnected
-extern std::vector<InputMethod*> g_InputMethods;
-// no nulled pointers here
-extern std::vector<InputMethodType*> g_InputMethodTypes;
-extern bool g_renderTouchscreen;
-extern bool g_disallowHotkeys;
-
 enum class ControlsClass
 {
     None, Player, Cursor, Editor, Hotkey
@@ -420,6 +413,8 @@ namespace Hotkeys
     void Activate(size_t i, int player = 0);
 } // namespace (Controls::)Hotkeys
 
+using HotkeysPressed_t = std::array<int, Hotkeys::n_buttons>;
+
 // information about a particular bound input method
 struct StatusInfo
 {
@@ -457,7 +452,7 @@ public:
     // Remember that hotkeys should only process once per hotkey press, so it may be easier
     // to put them in ConsumeEvent.
     // Return false if device lost.
-    virtual bool Update(int player, Controls_t& c, CursorControls_t& m, EditorControls_t& e) = 0;
+    virtual bool Update(int player, Controls_t& c, CursorControls_t& m, EditorControls_t& e, HotkeysPressed_t& h) = 0;
 
     virtual void Rumble(int ms, float strength) = 0;
 
@@ -736,6 +731,16 @@ StatusInfo GetStatus(int player);
 
 void RenderTouchControls();
 void UpdateTouchScreenSize();
+
+// global variables at bottom
+
+// a nulled pointer in here signifies a player whose controller has disconnected
+extern std::vector<InputMethod*> g_InputMethods;
+// no nulled pointers here
+extern std::vector<InputMethodType*> g_InputMethodTypes;
+extern bool g_renderTouchscreen;
+extern HotkeysPressed_t g_hotkeysPressed;
+extern bool g_disallowHotkeys;
 
 } // namespace Controls
 

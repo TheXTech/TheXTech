@@ -33,7 +33,7 @@ namespace Controls
 
 // Update functions that set player controls (and editor controls)
 // based on current device input. Return false if device lost.
-bool InputMethod_Duplicate::Update(int player, Controls_t& c, CursorControls_t& m, EditorControls_t& e)
+bool InputMethod_Duplicate::Update(int player, Controls_t& c, CursorControls_t& m, EditorControls_t& e, HotkeysPressed_t& h)
 {
     if(this->player_no < 1 || this->player_no > maxLocalPlayers)
         return false;
@@ -46,6 +46,7 @@ bool InputMethod_Duplicate::Update(int player, Controls_t& c, CursorControls_t& 
     (void)player;
     (void)m;
     (void)e;
+    (void)h;
 
     return true;
 }
