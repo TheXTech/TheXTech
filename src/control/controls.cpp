@@ -648,6 +648,9 @@ bool Update()
     SharedCursor.Primary = false;
     SharedCursor.Secondary = false;
     SharedCursor.Tertiary = false;
+    SharedCursor.ScrollUp = false;
+    SharedCursor.ScrollDown = false;
+    // reset SharedControls
     SharedControls = SharedControls_t();
 
     for(InputMethodType* type : g_InputMethodTypes)

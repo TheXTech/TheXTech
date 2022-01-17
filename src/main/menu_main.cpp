@@ -915,6 +915,18 @@ bool mainMenuUpdate()
             {
                 ScrollDelay -= 1;
             }
+            else if(SharedCursor.ScrollUp)
+            {
+                PlaySoundMenu(SFX_Saw);
+                MenuCursor -= 1;
+                dontWrap = true;
+            }
+            else if(SharedCursor.ScrollDown)
+            {
+                PlaySoundMenu(SFX_Saw);
+                MenuCursor += 1;
+                dontWrap = true;
+            }
 
             if(homePressed && MenuCursorCanMove && menuRecentEpisode >= 0)
             {

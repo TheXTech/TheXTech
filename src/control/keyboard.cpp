@@ -741,12 +741,12 @@ void InputMethodType_Keyboard::UpdateControlsPost()
     if(this->m_scroll >= 1)
     {
         this->m_scroll -= 1;
-        SharedControls.MenuDown |= true;
+        SharedCursor.ScrollDown |= true;
     }
     else if(this->m_scroll <= -1)
     {
         this->m_scroll += 1;
-        SharedControls.MenuUp |= true;
+        SharedCursor.ScrollUp |= true;
     }
 
     if(this->m_directText && GamePaused == PauseCode::TextEntry)

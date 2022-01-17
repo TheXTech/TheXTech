@@ -48,6 +48,9 @@ struct CursorControls_t
     bool Secondary = false;
     // "middle button" down
     bool Tertiary = false;
+    // scroll up / down
+    bool ScrollUp = false;
+    bool ScrollDown = false;
     // call to easily send cursor offscreen (on disconnect, etc)
     inline void GoOffscreen()
     {
