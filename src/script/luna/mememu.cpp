@@ -121,6 +121,31 @@ SDL_FORCE_INLINE void modifyByteX86(double &dst, size_t byte, uint8_t data)
 #endif
 }
 
+SDL_FORCE_INLINE void modifyByteX86(float &dst, size_t byte, uint8_t data)
+{
+    auto *in = reinterpret_cast<uint8_t*>(&dst);
+    SDL_assert(byte < 4);
+
+#if defined(THEXTECH_BIG_ENDIAN)
+    in[3 - byte] = data;
+#else // normal little endian
+    in[byte] = data;
+#endif
+}
+
+SDL_FORCE_INLINE void modifyByteX86(int16_t &dst, size_t byte, uint8_t data)
+{
+    auto *in = reinterpret_cast<uint8_t*>(&dst);
+    SDL_assert(byte < 2);
+
+#if defined(THEXTECH_BIG_ENDIAN)
+    in[1 - byte] = data;
+#else // normal little endian
+    in[byte] = data;
+#endif
+}
+
+
 SDL_FORCE_INLINE uint8_t getByteX86(const double &src, size_t byte)
 {
     const auto *in = reinterpret_cast<const uint8_t*>(&src);
@@ -130,6 +155,28 @@ SDL_FORCE_INLINE uint8_t getByteX86(const double &src, size_t byte)
 #elif defined(ARM_BIDI_ENDIAN) // some old devices
     byte += (byte < 4) ? +4 : -4;
     return in[byte];
+#else // normal little endian
+    return in[byte];
+#endif
+}
+
+SDL_FORCE_INLINE uint8_t getByteX86(const float &src, size_t byte)
+{
+    const auto *in = reinterpret_cast<const uint8_t*>(&src);
+    SDL_assert(byte < 4);
+#if defined(THEXTECH_BIG_ENDIAN)
+    return in[3 - byte];
+#else // normal little endian
+    return in[byte];
+#endif
+}
+
+SDL_FORCE_INLINE uint8_t getByteX86(const int16_t &src, size_t byte)
+{
+    const auto *in = reinterpret_cast<const uint8_t*>(&src);
+    SDL_assert(byte < 2);
+#if defined(THEXTECH_BIG_ENDIAN)
+    return in[1 - byte];
 #else // normal little endian
     return in[byte];
 #endif
@@ -563,39 +610,105 @@ protected:
         VT_FLOAT,
         VT_INT,
         VT_BOOL,
-        VT_STRING
+        VT_STRING,
+        VT_BYTE_HACK
     };
 
-    std::unordered_map<int, ValueType> m_type;
+    struct Value
+    {
+        ValueType type = VT_UNKNOWN;
+        ValueType baseType = VT_UNKNOWN;
+        int offset = 0;
+        int baseAddress = 0;
+    };
+
+    std::unordered_map<int, Value> m_type;
 
     void insert(int address, int T::*field)
     {
+        Value v;
         m_if.insert({address, field});
-        m_type.insert({address, VT_INT});
+
+        // Normal field
+        v.type = VT_INT;
+        v.baseType = VT_INT;
+        v.offset = 0;
+        v.baseAddress = address;
+        m_type.insert({address, v});
+
+        // Byte hack fields
+        v.type = VT_BYTE_HACK;
+        for(int i = 1; i < 2; ++i)
+        {
+            v.offset = i;
+            m_type.insert({address + i, v});
+        }
     }
 
     void insert(int address, double T::*field)
     {
+        Value v;
         m_df.insert({address, field});
-        m_type.insert({address, VT_DOUBLE});
+
+        // Normal field
+        v.type = VT_DOUBLE;
+        v.baseType = VT_DOUBLE;
+        v.offset = 0;
+        v.baseAddress = address;
+        m_type.insert({address, v});
+
+        // Byte hack fields
+        v.type = VT_BYTE_HACK;
+        for(int i = 1; i < 8; ++i)
+        {
+            v.offset = i;
+            m_type.insert({address + i, v});
+        }
     }
 
     void insert(int address, float T::*field)
     {
+        Value v;
         m_ff.insert({address, field});
-        m_type.insert({address, VT_FLOAT});
+
+        // Normal field
+        v.type = VT_FLOAT;
+        v.baseType = VT_FLOAT;
+        v.offset = 0;
+        v.baseAddress = address;
+        m_type.insert({address, v});
+
+        // Byte hack fields
+        v.type = VT_BYTE_HACK;
+        for(int i = 1; i < 8; ++i)
+        {
+            v.offset = i;
+            m_type.insert({address + i, v});
+        }
     }
 
     void insert(int address, bool T::*field)
     {
+        Value v;
         m_bf.insert({address, field});
-        m_type.insert({address, VT_INT});
+
+        // Normal field
+        v.type = VT_BOOL;
+        v.baseType = VT_BOOL;
+        v.offset = 0;
+        v.baseAddress = address;
+        m_type.insert({address, v});
     }
 
     void insert(int address, std::string T::*field)
     {
+        Value v;
         m_sf.insert({address, field});
-        m_type.insert({address, VT_STRING});
+        v.type = VT_STRING;
+        v.baseType = VT_STRING;
+        v.offset = 0;
+        v.baseAddress = address;
+        m_type.insert({address, v});
     }
 
 public:
@@ -617,7 +730,9 @@ public:
             return 0.0;
         }
 
-        switch(ft->second)
+        const auto &t = ft->second;
+
+        switch(t.type)
         {
         case VT_DOUBLE:
         {
@@ -670,6 +785,55 @@ public:
             break;
         }
 
+        case VT_BYTE_HACK:
+        {
+            switch(t.baseType)
+            {
+            case VT_DOUBLE:
+            {
+                auto dres = m_df.find(t.baseAddress);
+                if(dres != m_df.end())
+                {
+                    if(ftype != FT_BYTE)
+                        pLogWarning("MemEmu: Read type missmatched at %s 0x%x (byte expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+                    return (double)getByteX86(obj->*(dres->second), t.offset);
+                }
+                break;
+            }
+
+            case VT_FLOAT:
+            {
+                auto fres = m_ff.find(t.baseAddress);
+                if(fres != m_ff.end())
+                {
+                    if(ftype != FT_BYTE)
+                        pLogWarning("MemEmu: Read type missmatched at %s 0x%x (byte expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+                    return (double)getByteX86(obj->*(fres->second), t.offset);
+                }
+                break;
+            }
+
+            case VT_INT:
+            {
+                auto ires = m_if.find(t.baseAddress);
+                if(ires != m_if.end())
+                {
+                    if(ftype != FT_BYTE)
+                        pLogWarning("MemEmu: Read type missmatched at %s 0x%x (byte expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+
+                    int16_t s = static_cast<int16_t>(obj->*(ires->second));
+                    return (double)getByteX86(s, t.offset);
+                }
+                break;
+            }
+
+            default:
+                break;
+            }
+
+            break;
+        }
+
         default:
             break;
         }
@@ -692,7 +856,9 @@ public:
             return;
         }
 
-        switch(ft->second)
+        const auto &t = ft->second;
+
+        switch(t.type)
         {
         case VT_DOUBLE:
         {
@@ -746,6 +912,55 @@ public:
                 obj->*(bres->second) = (value != 0.0);
                 return;
             }
+            break;
+        }
+
+        case VT_BYTE_HACK:
+        {
+            switch(t.baseType)
+            {
+            case VT_DOUBLE:
+            {
+                auto dres = m_df.find(t.baseAddress);
+                if(dres != m_df.end())
+                {
+                    if(ftype != FT_BYTE)
+                        pLogWarning("MemEmu: Write type missmatched at %s 0x%x (byte expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+                    modifyByteX86(obj->*(dres->second), t.offset, (uint8_t)value);
+                }
+                break;
+            }
+
+            case VT_FLOAT:
+            {
+                auto fres = m_ff.find(t.baseAddress);
+                if(fres != m_ff.end())
+                {
+                    if(ftype != FT_BYTE)
+                        pLogWarning("MemEmu: Write type missmatched at %s 0x%x (byte expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+                    modifyByteX86(obj->*(fres->second), t.offset, (uint8_t)value);
+                }
+                break;
+            }
+
+            case VT_INT:
+            {
+                auto ires = m_if.find(t.baseAddress);
+                if(ires != m_if.end())
+                {
+                    if(ftype != FT_BYTE)
+                        pLogWarning("MemEmu: Write type missmatched at %s 0x%x (byte expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+                    int16_t s = static_cast<int16_t>(obj->*(ires->second));
+                    modifyByteX86(s, t.offset, (uint8_t)value);
+                    obj->*(ires->second) = static_cast<int>(s);
+                }
+                break;
+            }
+
+            default:
+                break;
+            }
+
             break;
         }
 
@@ -1074,14 +1289,7 @@ public:
     double getAny(NPC_t *obj, int address, FIELDTYPE ftype) override
     {
         if(address >= 0x78 && address < 0xA8) // Location
-        {
-            // Workaround for Analog Funk: Talkhaus-Science_Final_Battle,
-            // using incorrect NPC address 0x84 as byte
-            if(address == 0x84 && ftype == FT_BYTE)
-                return (double)getByteX86(obj->Location.Y, 4);
-
             return s_locMem.getAny(&obj->Location, address - 0x78, ftype);
-        }
         else if(address >= 0xA8 && address < 0xD8) // DefaultLocation
             return s_locMem.getAny(&obj->DefaultLocation, address - 0xA8, ftype);
         else if(address == 0x126)
@@ -1096,27 +1304,6 @@ public:
     {
         if(address >= 0x78 && address < 0xA8) // Location
         {
-            // Workaround for Analog Funk: Talkhaus-Science_Final_Battle,
-            // using incorrect NPC address 0x84 as byte
-            if(address == 0x84 && ftype == FT_BYTE)
-            {
-                // TODO: Verify this behaviour on PowerPC-BE and on ARM
-                // ---------------------------------------------------------
-                //                          Unit test
-                // ---------------------------------------------------------
-                // Initial value  0xC08100007AE147AE (-544)
-                // Modify byte with offset at begin of field 4 by FF,
-                // result must be 0xC08100FF7AE147AE (-544.125)
-                // ---------------------------------------------------------
-                // double old = obj->Location.Y;
-                modifyByteX86(obj->Location.Y, 4, (uint8_t)value);
-                //D_pLogDebug("Modifying byte 4 at double value 0x%016llX (%g) by %02X, result is 0x%016llX (%g)",
-                //            *reinterpret_cast<uint64_t*>(&old), old,
-                //            (uint8_t)value,
-                //            *reinterpret_cast<uint64_t*>(&obj->Location.Y), obj->Location.Y);
-                return;
-            }
-
             s_locMem.setAny(&obj->Location, address - 0x78, value, ftype);
             return;
         }
