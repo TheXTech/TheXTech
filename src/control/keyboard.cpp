@@ -911,9 +911,29 @@ InputMethod* InputMethodType_Keyboard::Poll(const std::vector<InputMethod*>& act
         }
         if(!allowed)
             continue;
-        // must find new profile
-        for(InputMethodProfile* profile : this->m_profiles)
+
+        // which player index is connecting?
+        int my_index = 0;
+        for(const InputMethod* method : active_methods)
         {
+            if(!method)
+                break;
+            my_index ++;
+        }
+
+        // try to find profile matching the keypress
+        for(int i = -1; i < (int)this->m_profiles.size(); i++)
+        {
+            // start with the most recent profile for this player index
+            InputMethodProfile* profile;
+            if(i == -1)
+                profile = this->GetDefaultProfile(my_index);
+            else
+                profile = this->m_profiles[i];
+
+            if(!profile)
+                continue;
+
             InputMethodProfile_Keyboard* p = dynamic_cast<InputMethodProfile_Keyboard*>(profile);
             if(!p)
                 continue;
