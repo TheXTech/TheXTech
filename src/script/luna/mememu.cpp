@@ -187,7 +187,7 @@ SDL_FORCE_INLINE uint8_t getByteX86(const int16_t &src, size_t byte)
  *          Write memory value                  *
  *----------------------------------------------*/
 
-SDL_FORCE_INLINE void memToDouble(double &target, double value, FIELDTYPE ftype)
+SDL_FORCE_INLINE void memToValue(double &target, double value, FIELDTYPE ftype)
 {
     switch(ftype)
     {
@@ -211,7 +211,7 @@ SDL_FORCE_INLINE void memToDouble(double &target, double value, FIELDTYPE ftype)
     }
 }
 
-SDL_FORCE_INLINE void memToFloat(float &target, double value, FIELDTYPE ftype)
+SDL_FORCE_INLINE void memToValue(float &target, double value, FIELDTYPE ftype)
 {
     switch(ftype)
     {
@@ -235,7 +235,7 @@ SDL_FORCE_INLINE void memToFloat(float &target, double value, FIELDTYPE ftype)
     }
 }
 
-SDL_FORCE_INLINE void memToInt(int &target, double value, FIELDTYPE ftype)
+SDL_FORCE_INLINE void memToValue(int &target, double value, FIELDTYPE ftype)
 {
     switch(ftype)
     {
@@ -259,11 +259,18 @@ SDL_FORCE_INLINE void memToInt(int &target, double value, FIELDTYPE ftype)
     }
 }
 
+SDL_FORCE_INLINE void memToValue(bool &target, double value, FIELDTYPE ftype)
+{
+    UNUSED(ftype);
+    target = (value != 0.0);
+}
+
+
 /*----------------------------------------------*
  *           Read memory value                  *
  *----------------------------------------------*/
 
-SDL_FORCE_INLINE double doubleToMem(double &source, FIELDTYPE ftype)
+SDL_FORCE_INLINE double valueToMem(double &source, FIELDTYPE ftype)
 {
     switch(ftype)
     {
@@ -281,7 +288,7 @@ SDL_FORCE_INLINE double doubleToMem(double &source, FIELDTYPE ftype)
     }
 }
 
-SDL_FORCE_INLINE double floatToMem(float &source, FIELDTYPE ftype)
+SDL_FORCE_INLINE double valueToMem(float &source, FIELDTYPE ftype)
 {
     switch(ftype)
     {
@@ -298,7 +305,7 @@ SDL_FORCE_INLINE double floatToMem(float &source, FIELDTYPE ftype)
     }
 }
 
-SDL_FORCE_INLINE double intToMem(int &source, FIELDTYPE ftype)
+SDL_FORCE_INLINE double valueToMem(int &source, FIELDTYPE ftype)
 {
     switch(ftype)
     {
@@ -314,6 +321,12 @@ SDL_FORCE_INLINE double intToMem(int &source, FIELDTYPE ftype)
     case FT_DFLOAT:
         return static_cast<double>(source);
     }
+}
+
+SDL_FORCE_INLINE double valueToMem(bool &source, FIELDTYPE ftype)
+{
+    UNUSED(ftype);
+    return source ? 0xFFFF : 0;
 }
 
 
@@ -463,7 +476,7 @@ public:
                 if(ftype != FT_DFLOAT)
                     pLogWarning("MemEmu: Read type missmatched at 0x%x (Double expected, %s actually)", address, FieldtypeToStr(ftype));
 
-                return doubleToMem(*dres->second, ftype);
+                return valueToMem(*dres->second, ftype);
             }
             break;
         }
@@ -476,7 +489,7 @@ public:
                 if(ftype != FT_FLOAT)
                     pLogWarning("MemEmu: Read type missmatched at 0x%x (Float expected, %s actually)", address, FieldtypeToStr(ftype));
 
-                return floatToMem(*fres->second, ftype);
+                return valueToMem(*fres->second, ftype);
             }
             break;
         }
@@ -489,7 +502,7 @@ public:
                 if(ftype != FT_DWORD && ftype != FT_WORD)
                     pLogWarning("MemEmu: Read type missmatched at 0x%x (SInt16 or SInt32 expected, %s actually)", address, FieldtypeToStr(ftype));
 
-                return intToMem(*ires->second, ftype);
+                return valueToMem(*ires->second, ftype);
             }
             break;
         }
@@ -537,7 +550,7 @@ public:
                 if(ftype != FT_DFLOAT)
                     pLogWarning("MemEmu: Write type missmatched at 0x%x (Double expected, %s actually)", address, FieldtypeToStr(ftype));
 
-                memToDouble(*dres->second, value, ftype);
+                memToValue(*dres->second, value, ftype);
                 return;
             }
             break;
@@ -551,7 +564,7 @@ public:
                 if(ftype != FT_FLOAT)
                     pLogWarning("MemEmu: Write type missmatched at 0x%x (Float expected, %s actually)", address, FieldtypeToStr(ftype));
 
-                memToFloat(*fres->second, value, ftype);
+                memToValue(*fres->second, value, ftype);
                 return;
             }
             break;
@@ -565,7 +578,7 @@ public:
                 if(ftype != FT_DWORD && ftype != FT_WORD)
                     pLogWarning("MemEmu: Write type missmatched at 0x%x (SInt16 or SInt32 expected, %s actually)", address, FieldtypeToStr(ftype));
 
-                memToInt(*ires->second, value, ftype);
+                memToValue(*ires->second, value, ftype);
                 return;
             }
             break;
@@ -616,13 +629,22 @@ protected:
 
     struct Value
     {
+        //! Type of field
         ValueType type = VT_UNKNOWN;
+        //! Base type for byte hacking mode
         ValueType baseType = VT_UNKNOWN;
+        //! Byte offset
         int offset = 0;
+        //! Base address of real value
         int baseAddress = 0;
     };
 
-    std::unordered_map<int, Value> m_type;
+    typedef std::unordered_map<int, Value> ValueMap;
+    typedef typename std::unordered_map<int, Value>::const_iterator ValueMapIt;
+    //! Basic map of addresses
+    ValueMap m_type;
+    //! Byte map of addresses
+    ValueMap m_byte;
 
     void insert(int address, int T::*field)
     {
@@ -638,10 +660,12 @@ protected:
 
         // Byte hack fields
         v.type = VT_BYTE_HACK;
-        for(int i = 1; i < 2; ++i)
+        for(int i = 0; i < 2; ++i)
         {
             v.offset = i;
-            m_type.insert({address + i, v});
+            m_byte.insert({address + i, v});
+            if(i > 0)
+                m_type.insert({address + i, v});
         }
     }
 
@@ -659,10 +683,12 @@ protected:
 
         // Byte hack fields
         v.type = VT_BYTE_HACK;
-        for(int i = 1; i < 8; ++i)
+        for(int i = 0; i < 8; ++i)
         {
             v.offset = i;
-            m_type.insert({address + i, v});
+            m_byte.insert({address + i, v});
+            if(i > 0)
+                m_type.insert({address + i, v});
         }
     }
 
@@ -680,10 +706,12 @@ protected:
 
         // Byte hack fields
         v.type = VT_BYTE_HACK;
-        for(int i = 1; i < 8; ++i)
+        for(int i = 0; i < 4; ++i)
         {
             v.offset = i;
-            m_type.insert({address + i, v});
+            m_byte.insert({address + i, v});
+            if(i > 0)
+                m_type.insert({address + i, v});
         }
     }
 
@@ -717,13 +745,23 @@ public:
 
     virtual double getAny(T *obj, int address, FIELDTYPE ftype)
     {
+        ValueMapIt ft;
+
         if(ftype == FT_INVALID)
         {
             pLogWarning("MemEmu: Requested value of invalid type: %s 0x%x", objName, address);
             return 0.0;
         }
 
-        auto ft = m_type.find(address);
+        if(ftype == FT_BYTE) // byte hacking
+        {
+            ft = m_byte.find(address);
+            if(ft == m_type.end())
+                ft = m_type.find(address);
+        }
+        else
+            ft = m_type.find(address);
+
         if(ft == m_type.end())
         {
             pLogWarning("MemEmu: Unknown %s::%s address to read: 0x%x", objName, FieldtypeToStr(ftype), address);
@@ -742,7 +780,7 @@ public:
                 if(ftype != FT_DFLOAT)
                     pLogWarning("MemEmu: Read type missmatched at %s 0x%x (Double expected, %s actually)", objName, address, FieldtypeToStr(ftype));
 
-                return doubleToMem(obj->*(dres->second), ftype);
+                return valueToMem(obj->*(dres->second), ftype);
             }
             break;
         }
@@ -755,7 +793,7 @@ public:
                 if(ftype != FT_FLOAT)
                     pLogWarning("MemEmu: Read type missmatched at %s 0x%x (Float expected, %s actually)", objName, address, FieldtypeToStr(ftype));
 
-                return floatToMem(obj->*(fres->second), ftype);
+                return valueToMem(obj->*(fres->second), ftype);
             }
             break;
         }
@@ -768,7 +806,7 @@ public:
                 if(ftype != FT_DWORD && ftype != FT_WORD)
                     pLogWarning("MemEmu: Read type missmatched at %s 0x%x (SInt16 or SInt32 expected, %s actually)", objName, address, FieldtypeToStr(ftype));
 
-                return intToMem(obj->*(ires->second), ftype);
+                return valueToMem(obj->*(ires->second), ftype);
             }
             break;
         }
@@ -780,7 +818,7 @@ public:
             {
                 if(ftype != FT_WORD && ftype != FT_BYTE)
                     pLogWarning("MemEmu: Read type missmatched at %s 0x%x (Sint16 or Uint8 as boolean expected, %s actually)", objName, address, FieldtypeToStr(ftype));
-                return obj->*(bres->second) ? 0xffff : 0000;
+                return valueToMem(obj->*(bres->second), ftype);
             }
             break;
         }
@@ -843,13 +881,23 @@ public:
 
     virtual void setAny(T *obj, int address, double value, FIELDTYPE ftype)
     {
+        ValueMapIt ft;
+
         if(ftype == FT_INVALID)
         {
             pLogWarning("MemEmu: Passed value of invalid type: %s 0x%x", objName, address);
             return;
         }
 
-        auto ft = m_type.find(address);
+        if(ftype == FT_BYTE) // byte hacking
+        {
+            ft = m_byte.find(address);
+            if(ft == m_type.end())
+                ft = m_type.find(address);
+        }
+        else
+            ft = m_type.find(address);
+
         if(ft == m_type.end())
         {
             pLogWarning("MemEmu: Unknown %s::%s address to write: 0x%x", objName, FieldtypeToStr(ftype), address);
@@ -868,7 +916,7 @@ public:
                 if(ftype != FT_DFLOAT)
                     pLogWarning("MemEmu: Write type missmatched at %s 0x%x (Double expected, %s actually)", objName, address, FieldtypeToStr(ftype));
 
-                memToDouble(obj->*(dres->second), value, ftype);
+                memToValue(obj->*(dres->second), value, ftype);
                 return;
             }
             break;
@@ -882,7 +930,7 @@ public:
                 if(ftype != FT_FLOAT)
                     pLogWarning("MemEmu: Write type missmatched at %s 0x%x (Float expected, %s actually)", objName, address, FieldtypeToStr(ftype));
 
-                memToFloat(obj->*(fres->second), value, ftype);
+                memToValue(obj->*(fres->second), value, ftype);
                 return;
             }
             break;
@@ -893,10 +941,10 @@ public:
             auto ires = m_if.find(address);
             if(ires != m_if.end())
             {
-                if(ftype != FT_DWORD && ftype != FT_WORD && (ftype != FT_BYTE || value > 255.0))
+                if(ftype != FT_DWORD && ftype != FT_WORD)
                     pLogWarning("MemEmu: Write type missmatched at %s 0x%x (SInt16 or SInt32 expected, %s actually)", objName, address, FieldtypeToStr(ftype));
 
-                memToInt(obj->*(ires->second), value, ftype);
+                memToValue(obj->*(ires->second), value, ftype);
                 return;
             }
             break;
@@ -909,7 +957,8 @@ public:
             {
                 if(ftype != FT_WORD && ftype != FT_BYTE)
                     pLogWarning("MemEmu: Write type missmatched at %s 0x%x (Sint16 or Uint8 as boolean expected, %s actually)", objName, address, FieldtypeToStr(ftype));
-                obj->*(bres->second) = (value != 0.0);
+
+                memToValue(obj->*(bres->second), value, ftype);
                 return;
             }
             break;
