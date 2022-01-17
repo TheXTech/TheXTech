@@ -18,6 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <SDL2/SDL.h>
+
 #include <Logger/logger.h>
 #include <Utils/maths.h>
 #ifdef __ANDROID__
@@ -701,10 +703,9 @@ TouchScreenController::TouchScreenController() noexcept
     for(int key = key_BEGIN; key < key_END; ++key)
         m_keysHeld[key] = false;
     pLogDebug("Initialization of touch-screen controller...");
-    m_touchDevicesCount = SDL_GetNumTouchDevices();
-    pLogDebug("Found %d touch devices, screen size: %d x %d",
-                m_touchDevicesCount,
-                m_screenWidth, m_screenHeight);
+    if(!m_GFX.m_success)
+        pLogDebug("Touch-screen controller cannot be used due to missing assets.");
+    scanTouchDevices();
 
     m_vibrator = nullptr;
     int numHaptics = SDL_NumHaptics();
@@ -724,6 +725,17 @@ TouchScreenController::TouchScreenController() noexcept
                 pLogWarning("TouchScreen: Can't open the vibrator service");
             break;
         }
+    }
+}
+
+void TouchScreenController::scanTouchDevices()
+{
+    m_touchDevicesCount = SDL_GetNumTouchDevices();
+    if(touchSupported())
+    {
+        pLogDebug("Found %d touch devices, screen size: %d x %d",
+                    m_touchDevicesCount,
+                    m_screenWidth, m_screenHeight);
     }
 }
 
@@ -1172,6 +1184,8 @@ bool InputMethod_TouchScreen::Update(Controls_t& c, CursorControls_t& m, EditorC
 
     // TODO: beautiful editor controls :)
 
+    (void)e;
+
     return true;
 }
 
@@ -1445,6 +1459,14 @@ bool InputMethodType_TouchScreen::TestProfileType(InputMethodProfile* profile)
 bool InputMethodType_TouchScreen::RumbleSupported()
 {
     return true;
+}
+
+bool InputMethodType_TouchScreen::ConsumeEvent(const SDL_Event* ev)
+{
+    // update the touch devices count as needed
+    if(ev->type == SDL_FINGERDOWN && !this->m_controller.touchSupported())
+        this->m_controller.scanTouchDevices();
+    return false;
 }
 
 void InputMethodType_TouchScreen::UpdateControlsPre()

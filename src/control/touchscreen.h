@@ -247,10 +247,12 @@ public:
      */
     ~TouchScreenController();
 
+    void scanTouchDevices();
+
     void updateScreenSize();
 
     /*!
-     * \brief Read current state of keyboard controller
+     * \brief Read current state of touch controller
      */
     void processTouchDevice(int dev_i);
 
@@ -366,6 +368,7 @@ public:
 
     bool TestProfileType(InputMethodProfile* profile);
     bool RumbleSupported();
+    bool ConsumeEvent(const SDL_Event* ev);
 
     void UpdateControlsPre();
     void UpdateControlsPost();
