@@ -185,43 +185,82 @@ void RenderControllerBattery(int player, int bx, int by, int bw, int bh)
 
     Controls::StatusInfo status_info = Controls::GetStatus(player);
 
-    if(status_info.power_status != Controls::StatusInfo::POWER_UNKNOWN && status_info.power_status != Controls::StatusInfo::POWER_WIRED)
+    if(status_info.power_status != Controls::StatusInfo::POWER_DISABLED)
     {
         XRender::renderRect(bx, by, bw - 4, bh, 0.f, 0.f, 0.f, alhpa, true);//Edge
         XRender::renderRect(bx + 2, by + 2, bw - 8, bh - 4, r, g, b, alhpa, true);//Box
         XRender::renderRect(bx + 36, by + 6, 4, 10, 0.f, 0.f, 0.f, alhpa, true);//Edge
         XRender::renderRect(bx + 34, by + 8, 4, 6, r, g, b, alhpa, true);//Box
 
-        int level;
+        int segments;
 
-        if(status_info.power_level > .75f)
-            level = 3;
-        else if(status_info.power_level > .5f)
-            level = 2;
-        else if(status_info.power_level > .25f)
-            level = 1;
+        if(status_info.power_level > .90f)
+            segments = 4;
+        else if(status_info.power_level > .60f)
+            segments = 3;
+        else if(status_info.power_level > .30f)
+            segments = 2;
         else
-            level = 0;
+            segments = 1;
 
-        // eventually, want to flash to indicate charging.
-        // but want to avoid introducing new variable in static memory so not yet.
-
-        // if(charging_flash && level != 3) level += 1;
-
-        switch(level)
+        float r = 0.f;
+        float g = 0.f;
+        float b = 0.f;
+        if(status_info.power_level <= .5f)
         {
+            r = (.5f - status_info.power_level) / .5f;
+        }
+        if(status_info.power_status == Controls::StatusInfo::POWER_CHARGING)
+        {
+            g = 1.f;
+            g -= r;
+        }
+        if(status_info.power_status == Controls::StatusInfo::POWER_CHARGED)
+        {
+            b = 0.8f;
+            g = 0.4f;
+        }
+
+        int s;
+
+        switch(segments)
+        {
+        case 4:
+            s = 2.f * (status_info.power_level - 0.9f) / 0.1f;
+            if(s > 2) s = 2;
+            // if(flash && status_info.power_status == Controls::StatusInfo::POWER_CHARGING)
+            //     s = 2;
+            XRender::renderRect(bx + 34, by + 10, s, 2, r, g, b, alhpaB, true); // fallthrough
         case 3:
-            XRender::renderRect(bx + 24, by + 4, 8, 14, 0.f, 0.f, 0.f, alhpaB, true); // fallthrough
+            s = 4.f * (status_info.power_level - 0.6f) / 0.3f;
+            if(s > 4) s = 4;
+            // if(flash && status_info.power_status == Controls::StatusInfo::POWER_CHARGING)
+            //     s = 4;
+            XRender::renderRect(bx + 24, by + 4, s*2, 14, r, g, b, alhpaB, true); // fallthrough
         case 2:
-            XRender::renderRect(bx + 14, by + 4, 8, 14, 0.f, 0.f, 0.f, alhpaB, true); // fallthrough
+            s = 4.f * (status_info.power_level - 0.3f) / 0.3f;
+            if(s > 4) s = 4;
+            // if(flash && status_info.power_status == Controls::StatusInfo::POWER_CHARGING)
+            //     s = 4;
+            XRender::renderRect(bx + 14, by + 4, s*2, 14, r, g, b, alhpaB, true); // fallthrough
         case 1:
-            XRender::renderRect(bx + 4, by + 4, 8, 14, 0.f, 0.f, 0.f, alhpaB, true);
-            break;
-        case 0:
-            XRender::renderRect(bx + 4, by + 4, 8, 14, 1.f, 0.f, 0.f, alhpaB / 2.f, true);
+            s = 4.f * status_info.power_level / 0.3f;
+            if(s > 4) s = 4;
+            // if(flash && status_info.power_status == Controls::StatusInfo::POWER_CHARGING)
+            //     s = 4;
+            XRender::renderRect(bx + 4, by + 4, s*2, 14, r, g, b, alhpaB, true);
             break;
         }
+        if(status_info.power_status == Controls::StatusInfo::POWER_UNKNOWN)
+            SuperPrintCenter("?", 3, bx + bw / 2, by + bh / 2 - 8);
+        if(status_info.power_status == Controls::StatusInfo::POWER_WIRED)
+            SuperPrintCenter("W", 3, bx + bw / 2, by + bh / 2 - 8);
+        if(status_info.power_status == Controls::StatusInfo::POWER_CHARGING)
+            SuperPrintCenter("+", 3, bx + bw / 2, by + bh / 2 - 7);
     }
+
+    if(status_info.info_string)
+        SuperPrintCenter(status_info.info_string, 3, bx + bw / 2, by - 30);
 }
 
 void speedRun_renderControls(int player, int screenZ)

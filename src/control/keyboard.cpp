@@ -189,6 +189,30 @@ void InputMethod_Keyboard::Rumble(int ms, float strength)
     (void)strength;
 }
 
+StatusInfo InputMethod_Keyboard::GetStatus()
+{
+    StatusInfo res;
+
+    int percent;
+
+    SDL_PowerState state = SDL_GetPowerInfo(nullptr, &percent);
+
+    if(state == SDL_POWERSTATE_UNKNOWN)
+        res.power_status = StatusInfo::POWER_UNKNOWN;
+    else if(state == SDL_POWERSTATE_ON_BATTERY)
+        res.power_status = StatusInfo::POWER_DISCHARGING;
+    else if(state == SDL_POWERSTATE_NO_BATTERY)
+        res.power_status = StatusInfo::POWER_WIRED;
+    else if(state == SDL_POWERSTATE_CHARGING)
+        res.power_status = StatusInfo::POWER_CHARGING;
+    else if(state == SDL_POWERSTATE_CHARGED)
+        res.power_status = StatusInfo::POWER_CHARGED;
+
+    res.power_level = percent / 100.f;
+
+    return res;
+}
+
 /*====================================================*\
 || implementation for InputMethodProfile_Keyboard     ||
 \*====================================================*/

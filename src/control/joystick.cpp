@@ -525,6 +525,39 @@ void InputMethod_Joystick::Rumble(int ms, float strength)
 #endif
 }
 
+StatusInfo InputMethod_Joystick::GetStatus()
+{
+    StatusInfo res;
+    if(!this->m_devices)
+        return res;
+
+    SDL_JoystickPowerLevel level = SDL_JoystickCurrentPowerLevel(this->m_devices->joy);
+
+    if(level == SDL_JOYSTICK_POWER_UNKNOWN)
+        res.power_status = StatusInfo::POWER_UNKNOWN;
+    else if(level == SDL_JOYSTICK_POWER_WIRED)
+        res.power_status = StatusInfo::POWER_WIRED;
+    else if(level == SDL_JOYSTICK_POWER_MAX)
+    {
+        res.power_status = StatusInfo::POWER_CHARGED;
+        res.power_level = 1.f;
+    }
+    else
+    {
+        res.power_status = StatusInfo::POWER_DISCHARGING;
+        if(level == SDL_JOYSTICK_POWER_EMPTY)
+            res.power_level = 0.15f;
+        if(level == SDL_JOYSTICK_POWER_LOW)
+            res.power_level = 0.3f;
+        if(level == SDL_JOYSTICK_POWER_MEDIUM)
+            res.power_level = 0.6f;
+        if(level == SDL_JOYSTICK_POWER_FULL)
+            res.power_level = 0.9f;
+    }
+
+    return res;
+}
+
 /*====================================================*\
 || implementation for InputMethodProfile_Joystick     ||
 \*====================================================*/
@@ -533,6 +566,7 @@ void InputMethod_Joystick::Rumble(int ms, float strength)
 InputMethodProfile_Joystick::InputMethodProfile_Joystick()
 {
     this->InitAsController();
+    this->m_showPowerStatus = true;
 }
 
 void InputMethodProfile_Joystick::InitAsJoystick()

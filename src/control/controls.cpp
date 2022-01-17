@@ -134,6 +134,7 @@ void InputMethodProfile::SaveConfig_All(IniProcessing* ctl)
     if(this->Type->RumbleSupported())
         ctl->setValue("enable-rumble", this->m_rumbleEnabled);
     ctl->setValue("ground-pound-by-alt-run", this->m_groundPoundByAltRun);
+    ctl->setValue("show-power-status", this->m_showPowerStatus);
     this->SaveConfig(ctl);
 }
 
@@ -142,6 +143,7 @@ void InputMethodProfile::LoadConfig_All(IniProcessing* ctl)
     if(this->Type->RumbleSupported())
         ctl->read("enable-rumble", this->m_rumbleEnabled, g_config.JoystickEnableRumble);
     ctl->read("ground-pound-by-alt-run", this->m_groundPoundByAltRun, g_config.GameplayPoundByAltRun);
+    ctl->read("show-power-status", this->m_showPowerStatus, this->m_showPowerStatus);
     this->LoadConfig(ctl);
 }
 
@@ -151,7 +153,7 @@ size_t InputMethodProfile::GetOptionCount()
     size_t shared_options_count = CommonOptions::COUNT;
     if(!this->Type->RumbleSupported())
         shared_options_count -= 1;
-    return CommonOptions::COUNT + this->GetOptionCount_Custom();
+    return shared_options_count + this->GetOptionCount_Custom();
 }
 // Methods to manage per-profile options
 // It is guaranteed that none of these will be called if
@@ -169,6 +171,8 @@ const char* InputMethodProfile::GetOptionName(size_t i)
         return "RUMBLE";
     else if(i == CommonOptions::ground_pound_by_alt_run)
         return "GROUND POUND BUTTON";
+    else if(i == CommonOptions::show_power_status)
+        return "BATTERY STATUS";
     else
         return nullptr;
 }
@@ -197,6 +201,13 @@ const char* InputMethodProfile::GetOptionValue(size_t i)
         else
             return "DOWN";
     }
+    else if(i == CommonOptions::show_power_status)
+    {
+        if(this->m_showPowerStatus)
+            return "SHOW";
+        else
+            return "HIDE";
+    }
     else
         return nullptr;
 }
@@ -224,6 +235,11 @@ bool InputMethodProfile::OptionChange(size_t i)
     else if(i == CommonOptions::ground_pound_by_alt_run)
     {
         this->m_groundPoundByAltRun = !this->m_groundPoundByAltRun;
+        return true;
+    }
+    else if(i == CommonOptions::show_power_status)
+    {
+        this->m_showPowerStatus = !this->m_showPowerStatus;
         return true;
     }
     else
@@ -1069,6 +1085,8 @@ void RumbleAllPlayers(int ms, float strength)
 StatusInfo GetStatus(int player)
 {
     if(player < 1 || player >= (int)g_InputMethods.size() + 1 || g_InputMethods[player - 1] == nullptr)
+        return StatusInfo();
+    if(!g_InputMethods[player - 1]->Profile || !g_InputMethods[player - 1]->Profile->m_showPowerStatus)
         return StatusInfo();
     return g_InputMethods[player - 1]->GetStatus();
 }

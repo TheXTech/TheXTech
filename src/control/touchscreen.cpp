@@ -1215,6 +1215,30 @@ void InputMethod_TouchScreen::Rumble(int ms, float strength)
         return;
 }
 
+StatusInfo InputMethod_TouchScreen::GetStatus()
+{
+    StatusInfo res;
+
+    int percent;
+
+    SDL_PowerState state = SDL_GetPowerInfo(nullptr, &percent);
+
+    if(state == SDL_POWERSTATE_UNKNOWN)
+        res.power_status = StatusInfo::POWER_UNKNOWN;
+    else if(state == SDL_POWERSTATE_ON_BATTERY)
+        res.power_status = StatusInfo::POWER_DISCHARGING;
+    else if(state == SDL_POWERSTATE_NO_BATTERY)
+        res.power_status = StatusInfo::POWER_WIRED;
+    else if(state == SDL_POWERSTATE_CHARGING)
+        res.power_status = StatusInfo::POWER_CHARGING;
+    else if(state == SDL_POWERSTATE_CHARGED)
+        res.power_status = StatusInfo::POWER_CHARGED;
+
+    res.power_level = percent / 100.f;
+
+    return res;
+}
+
 /*====================================================*\
 || implementation for InputMethodProfile_TouchScreen  ||
 \*====================================================*/
@@ -1222,6 +1246,7 @@ void InputMethod_TouchScreen::Rumble(int ms, float strength)
 // the job of this function is to initialize the class in a consistent state
 InputMethodProfile_TouchScreen::InputMethodProfile_TouchScreen()
 {
+    this->m_showPowerStatus = true;
 }
 
 bool InputMethodProfile_TouchScreen::PollPrimaryButton(ControlsClass c, size_t i)

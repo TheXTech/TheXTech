@@ -19,6 +19,8 @@ public:
     bool Update(int player, Controls_t& c, CursorControls_t& m, EditorControls_t& e, HotkeysPressed_t& h);
 
     void Rumble(int ms, float strength);
+
+    StatusInfo GetStatus();
 };
 
 class InputMethodProfile_Keyboard : public InputMethodProfile

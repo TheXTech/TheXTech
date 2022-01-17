@@ -420,13 +420,14 @@ using HotkeysPressed_t = std::array<int, Hotkeys::n_buttons>;
 struct StatusInfo
 {
     typedef enum _PowerStatus {
-        POWER_UNKNOWN = -1,
+        POWER_DISABLED = -1,
+        POWER_UNKNOWN,
         POWER_WIRED,
         POWER_DISCHARGING,
         POWER_CHARGING,
         POWER_CHARGED
     } PowerStatus;
-    PowerStatus power_status = POWER_UNKNOWN;
+    PowerStatus power_status = POWER_DISABLED;
     float power_level = 1.f;
     const char* info_string = nullptr;
 };
@@ -501,12 +502,14 @@ public:
         {
             rumble = 0,
             ground_pound_by_alt_run,
+            show_power_status,
             COUNT
         };
     };
 
     bool m_rumbleEnabled = false;
     bool m_groundPoundByAltRun = false;
+    bool m_showPowerStatus = false;
 
     // assume that the IniProcessing* is already in the correct group
     // saves/loads the shared options and calls the device-specific Save/LoadConfig
