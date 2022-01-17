@@ -392,7 +392,6 @@ int PauseGame(PauseCode code, int plr)
             }
             else if(GamePaused == PauseCode::PauseScreen)
             {
-                printf("doing pause screen loger\n");
                 if(PauseScreen::Logic(plr))
                     break;
             }
