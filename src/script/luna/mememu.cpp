@@ -518,7 +518,7 @@ public:
             {
                 if(ftype != FT_WORD && ftype != FT_BYTE)
                     pLogWarning("MemEmu: Read type missmatched at 0x%x (Sint16 or Uint8 as boolean expected, %s actually)", address, FieldtypeToStr(ftype));
-                return *bres->second ? 0xffff : 0000;
+                return *bres->second ? 0xffff : 0x0000;
             }
         }
 
