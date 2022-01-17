@@ -20,6 +20,9 @@
 
 #include <Logger/logger.h>
 #include <Utils/maths.h>
+#ifdef __ANDROID__
+#   include <Utils/files.h>
+#endif
 
 #include "touchscreen.h"
 #include "../globals.h"
@@ -35,13 +38,19 @@ namespace Controls
 || implementation for TouchScreenGFX_t      ||
 \*------------------------------------------*/
 
-void TouchScreenGFX_t::loadImage(StdPicture &img, std::string path)
+void TouchScreenGFX_t::loadImage(StdPicture &img, const std::string &fileName)
 {
-    pLogDebug("Loading texture %s...", path.c_str());
-    img = XRender::LoadPicture(path);
+    std::string imgPath = m_gfxPath + fileName;
+#ifdef __ANDROID__
+    if(!Files::fileExists(imgPath)) // If not exists at assets, do load bundled
+        imgPath = "buttons/" + fileName;
+#endif
+
+    pLogDebug("Loading texture %s...", imgPath.c_str());
+    img = XRender::LoadPicture(imgPath);
     if(!img.inited)
     {
-        pLogWarning("Failed to load texture: %s...", path.c_str());
+        pLogWarning("Failed to load texture: %s...", imgPath.c_str());
         m_loadErrors++;
     }
     m_loadedImages.push_back(&img);
@@ -49,59 +58,59 @@ void TouchScreenGFX_t::loadImage(StdPicture &img, std::string path)
 
 TouchScreenGFX_t::TouchScreenGFX_t()
 {
-    std::string uiPath = AppPath + "graphics/touchscreen/";
+    m_gfxPath = AppPath + "graphics/touchscreen/";
 
     // Loading a touch-screen buttons from assets
-    loadImage(touch[BUTTON_START], uiPath + "Start.png");
-    loadImage(touch[BUTTON_LEFT], uiPath + "Left.png");
-    loadImage(touch[BUTTON_LEFT_CHAR], uiPath + "Left_char.png");
-    loadImage(touch[BUTTON_RIGHT], uiPath + "Right.png");
-    loadImage(touch[BUTTON_RIGHT_CHAR], uiPath + "Right_char.png");
-    loadImage(touch[BUTTON_UP], uiPath + "Up.png");
-    loadImage(touch[BUTTON_DOWN], uiPath + "Down.png");
-    loadImage(touch[BUTTON_UPLEFT], uiPath + "UpLeft.png");
-    loadImage(touch[BUTTON_UPRIGHT], uiPath + "UpRight.png");
-    loadImage(touch[BUTTON_DOWNLEFT], uiPath + "DownLeft.png");
-    loadImage(touch[BUTTON_DOWNRIGHT], uiPath + "DownRight.png");
-    loadImage(touch[BUTTON_A], uiPath + "A.png");
-    loadImage(touch[BUTTON_A_PS], uiPath + "A_ps.png");
-    loadImage(touch[BUTTON_A_BLANK], uiPath + "A_blank.png");
-    loadImage(touch[BUTTON_A_DO], uiPath + "A_do.png");
-    loadImage(touch[BUTTON_A_ENTER], uiPath + "A_enter.png");
-    loadImage(touch[BUTTON_A_JUMP], uiPath + "A_jump.png");
-    loadImage(touch[BUTTON_B], uiPath + "V.png");
-    loadImage(touch[BUTTON_B_PS], uiPath + "V_ps.png");
-    loadImage(touch[BUTTON_B_BLANK], uiPath + "V_blank.png");
-    loadImage(touch[BUTTON_B_JUMP], uiPath + "V_jump.png");
-    loadImage(touch[BUTTON_B_SPINJUMP], uiPath + "V_spinjump.png");
-    loadImage(touch[BUTTON_X], uiPath + "X.png");
-    loadImage(touch[BUTTON_X_PS], uiPath + "X_ps.png");
-    loadImage(touch[BUTTON_X_BACK], uiPath + "X_back.png");
-    loadImage(touch[BUTTON_X_BLANK], uiPath + "X_blank.png");
-    loadImage(touch[BUTTON_X_BOMB], uiPath + "X_bomb.png");
-    loadImage(touch[BUTTON_X_BUMERANG], uiPath + "X_bumerang.png");
-    loadImage(touch[BUTTON_X_FIRE], uiPath + "X_fire.png");
-    loadImage(touch[BUTTON_X_HAMMER], uiPath + "X_hammer.png");
-    loadImage(touch[BUTTON_X_RUN], uiPath + "X_run.png");
-    loadImage(touch[BUTTON_X_SWORD], uiPath + "X_sword.png");
-    loadImage(touch[BUTTON_Y], uiPath + "Y.png");
-    loadImage(touch[BUTTON_Y_PS], uiPath + "Y_ps.png");
-    loadImage(touch[BUTTON_Y_BLANK], uiPath + "Y_blank.png");
-    loadImage(touch[BUTTON_Y_BOMB], uiPath + "Y_bomb.png");
-    loadImage(touch[BUTTON_Y_BUMERANG], uiPath + "Y_bumerang.png");
-    loadImage(touch[BUTTON_Y_FIRE], uiPath + "Y_fire.png");
-    loadImage(touch[BUTTON_Y_HAMMER], uiPath + "Y_hammer.png");
-    loadImage(touch[BUTTON_Y_RUN], uiPath + "Y_run.png");
-    loadImage(touch[BUTTON_Y_STATUE], uiPath + "Y_statue.png");
-    loadImage(touch[BUTTON_Y_SWORD], uiPath + "Y_sword.png");
-    loadImage(touch[BUTTON_DROP], uiPath + "Select.png");
-    loadImage(touch[BUTTON_HOLD_RUN_OFF], uiPath + "RunOff.png");
-    loadImage(touch[BUTTON_HOLD_RUN_ON], uiPath + "RunOn.png");
-    loadImage(touch[BUTTON_VIEW_TOGGLE_OFF], uiPath + "KeysShowOff.png");
-    loadImage(touch[BUTTON_VIEW_TOGGLE_ON], uiPath + "KeysShow.png");
-    loadImage(touch[BUTTON_ANALOG_BORDER], uiPath + "SBorder.png");
-    loadImage(touch[BUTTON_ANALOG_STICK], uiPath + "AStick.png");
-    loadImage(touch[BUTTON_ENTER_CHEATS], uiPath + "EnterCheats.png");
+    loadImage(touch[BUTTON_START], "Start.png");
+    loadImage(touch[BUTTON_LEFT], "Left.png");
+    loadImage(touch[BUTTON_LEFT_CHAR], "Left_char.png");
+    loadImage(touch[BUTTON_RIGHT], "Right.png");
+    loadImage(touch[BUTTON_RIGHT_CHAR], "Right_char.png");
+    loadImage(touch[BUTTON_UP], "Up.png");
+    loadImage(touch[BUTTON_DOWN], "Down.png");
+    loadImage(touch[BUTTON_UPLEFT], "UpLeft.png");
+    loadImage(touch[BUTTON_UPRIGHT], "UpRight.png");
+    loadImage(touch[BUTTON_DOWNLEFT], "DownLeft.png");
+    loadImage(touch[BUTTON_DOWNRIGHT], "DownRight.png");
+    loadImage(touch[BUTTON_A], "A.png");
+    loadImage(touch[BUTTON_A_PS], "A_ps.png");
+    loadImage(touch[BUTTON_A_BLANK], "A_blank.png");
+    loadImage(touch[BUTTON_A_DO], "A_do.png");
+    loadImage(touch[BUTTON_A_ENTER], "A_enter.png");
+    loadImage(touch[BUTTON_A_JUMP], "A_jump.png");
+    loadImage(touch[BUTTON_B], "V.png");
+    loadImage(touch[BUTTON_B_PS], "V_ps.png");
+    loadImage(touch[BUTTON_B_BLANK], "V_blank.png");
+    loadImage(touch[BUTTON_B_JUMP], "V_jump.png");
+    loadImage(touch[BUTTON_B_SPINJUMP], "V_spinjump.png");
+    loadImage(touch[BUTTON_X], "X.png");
+    loadImage(touch[BUTTON_X_PS], "X_ps.png");
+    loadImage(touch[BUTTON_X_BACK], "X_back.png");
+    loadImage(touch[BUTTON_X_BLANK], "X_blank.png");
+    loadImage(touch[BUTTON_X_BOMB], "X_bomb.png");
+    loadImage(touch[BUTTON_X_BUMERANG], "X_bumerang.png");
+    loadImage(touch[BUTTON_X_FIRE], "X_fire.png");
+    loadImage(touch[BUTTON_X_HAMMER], "X_hammer.png");
+    loadImage(touch[BUTTON_X_RUN], "X_run.png");
+    loadImage(touch[BUTTON_X_SWORD], "X_sword.png");
+    loadImage(touch[BUTTON_Y], "Y.png");
+    loadImage(touch[BUTTON_Y_PS], "Y_ps.png");
+    loadImage(touch[BUTTON_Y_BLANK], "Y_blank.png");
+    loadImage(touch[BUTTON_Y_BOMB], "Y_bomb.png");
+    loadImage(touch[BUTTON_Y_BUMERANG], "Y_bumerang.png");
+    loadImage(touch[BUTTON_Y_FIRE], "Y_fire.png");
+    loadImage(touch[BUTTON_Y_HAMMER], "Y_hammer.png");
+    loadImage(touch[BUTTON_Y_RUN], "Y_run.png");
+    loadImage(touch[BUTTON_Y_STATUE], "Y_statue.png");
+    loadImage(touch[BUTTON_Y_SWORD], "Y_sword.png");
+    loadImage(touch[BUTTON_DROP], "Select.png");
+    loadImage(touch[BUTTON_HOLD_RUN_OFF], "RunOff.png");
+    loadImage(touch[BUTTON_HOLD_RUN_ON], "RunOn.png");
+    loadImage(touch[BUTTON_VIEW_TOGGLE_OFF], "KeysShowOff.png");
+    loadImage(touch[BUTTON_VIEW_TOGGLE_ON], "KeysShow.png");
+    loadImage(touch[BUTTON_ANALOG_BORDER], "SBorder.png");
+    loadImage(touch[BUTTON_ANALOG_STICK], "AStick.png");
+    loadImage(touch[BUTTON_ENTER_CHEATS], "EnterCheats.png");
 
     if(m_loadErrors > 0)
     {

@@ -47,7 +47,8 @@ class InputMethod_TouchScreen;
 class TouchScreenGFX_t
 {
     std::vector<StdPicture*> m_loadedImages;
-    void loadImage(StdPicture &img, std::string path);
+    void loadImage(StdPicture &img, const std::string &fileName);
+    std::string m_gfxPath;
     int m_loadErrors = 0;
 public:
     bool m_success = false;

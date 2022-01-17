@@ -172,75 +172,75 @@ public class thextechActivity extends SDLActivity
         System.exit(0);
     }
 
-    private void requestTextShow()
-    {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(R.string.cheat_dialog_title);
+    //private void requestTextShow()
+    //{
+    //    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    //    builder.setTitle(R.string.cheat_dialog_title);
+    //
+    //    // Set up the input
+    //    final EditText input = new EditText(this);
+    //
+    //    input.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+    //    builder.setView(input);
+    //
+    //    builder.setPositiveButton(R.string.cheat_dialog_ok, new DialogInterface.OnClickListener()
+    //    {
+    //        @Override
+    //        public void onClick(DialogInterface dialog, int which)
+    //        {
+    //            textentry_setBuffer(input.getText().toString());
+    //            messageboxSelection[0] = 1;
+    //            dialog.dismiss();
+    //        }
+    //    });
+    //
+    //    builder.setNegativeButton(R.string.cheat_dialog_cancel, new DialogInterface.OnClickListener()
+    //    {
+    //        @Override
+    //        public void onClick(DialogInterface dialog, int which) {
+    //            messageboxSelection[0] = 1;
+    //            dialog.cancel();
+    //        }
+    //    });
+    //
+    //    final AlertDialog dialog = builder.create();
+    //    dialog.setCancelable(false);
+    //    dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+    //        @Override
+    //        public void onDismiss(DialogInterface unused) {
+    //            synchronized (messageboxSelection) {
+    //                messageboxSelection.notify();
+    //            }
+    //        }
+    //    });
+    //
+    //    dialog.show();
+    //}
 
-        // Set up the input
-        final EditText input = new EditText(this);
-
-        input.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
-        builder.setView(input);
-
-        builder.setPositiveButton(R.string.cheat_dialog_ok, new DialogInterface.OnClickListener()
-        {
-            @Override
-            public void onClick(DialogInterface dialog, int which)
-            {
-                textentry_setBuffer(input.getText().toString());
-                messageboxSelection[0] = 1;
-                dialog.dismiss();
-            }
-        });
-
-        builder.setNegativeButton(R.string.cheat_dialog_cancel, new DialogInterface.OnClickListener()
-        {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                messageboxSelection[0] = 1;
-                dialog.cancel();
-            }
-        });
-
-        final AlertDialog dialog = builder.create();
-        dialog.setCancelable(false);
-        dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface unused) {
-                synchronized (messageboxSelection) {
-                    messageboxSelection.notify();
-                }
-            }
-        });
-
-        dialog.show();
-    }
-
-    public void requestText()
-    {
-        messageboxSelection[0] = -1;
-
-        runOnUiThread(new Runnable()
-        {
-            @Override
-            public void run() {
-                requestTextShow();
-            }
-        });
-
-        synchronized (messageboxSelection) {
-            try {
-                messageboxSelection.wait();
-            } catch (InterruptedException ex) {
-                ex.printStackTrace();
-            }
-        }
-    }
+    //public void requestText()
+    //{
+    //    messageboxSelection[0] = -1;
+    //
+    //    runOnUiThread(new Runnable()
+    //    {
+    //        @Override
+    //        public void run() {
+    //            requestTextShow();
+    //        }
+    //    });
+    //
+    //    synchronized (messageboxSelection) {
+    //        try {
+    //            messageboxSelection.wait();
+    //        } catch (InterruptedException ex) {
+    //            ex.printStackTrace();
+    //        }
+    //    }
+    //}
 
     public static native void setSdCardPath(String path);
     public static native void setAppDataPath(String path);
     public static native void setGameAssetsPath(String path);
     // Send the cheat buffer line
-    public static native void textentry_setBuffer(String line);
+    // public static native void textentry_setBuffer(String line);
 }
