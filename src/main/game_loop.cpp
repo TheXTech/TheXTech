@@ -39,6 +39,7 @@
 #include "../editor.h"
 #include "../core/render.h"
 #include "../core/events.h"
+#include "../core/window.h"
 #include "game_globals.h"
 #include "world_globals.h"
 #include "speedrunner.h"
@@ -311,6 +312,8 @@ int PauseGame(PauseCode code, int plr)
     if(GameMenu || GameOutro)
         return 0;
 
+    int prev_cursor = XWindow::showCursor(-1);
+
     if(!GameMenu)
     {
         for(int A = numPlayers; A >= 1; A--)
@@ -322,9 +325,15 @@ int PauseGame(PauseCode code, int plr)
     else if(code == PauseCode::PauseScreen)
         PauseScreen::Init(SharedControls.LegacyPause);
     else if(code == PauseCode::Reconnect)
+    {
         ConnectScreen::Reconnect_Start();
+        XWindow::showCursor(0);
+    }
     else if(code == PauseCode::DropAdd)
+    {
         ConnectScreen::DropAdd_Start();
+        XWindow::showCursor(0);
+    }
     else if(code == PauseCode::TextEntry)
     {
         // assume TextEntryScreen has already been inited through its Run function.
@@ -417,6 +426,8 @@ int PauseGame(PauseCode code, int plr)
         Player[i].UnStart = false;
         Player[i].CanJump = false;
     }
+
+    XWindow::showCursor(prev_cursor);
 
     if(PSwitchTime > 0)
     {

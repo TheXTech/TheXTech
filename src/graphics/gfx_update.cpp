@@ -2684,14 +2684,13 @@ void UpdateGraphics(bool skipRepaint)
         QuickReconnectScreen::Render();
 
     if(GamePaused == PauseCode::Reconnect || GamePaused == PauseCode::DropAdd)
+    {
         ConnectScreen::Render();
+        XRender::renderTexture(int(SharedCursor.X), int(SharedCursor.Y), GFX.ECursor[2]);
+    }
 
     if(GamePaused == PauseCode::TextEntry)
         TextEntryScreen::Render();
-
-    // render the mouse
-    if(GamePaused != PauseCode::None && GamePaused != PauseCode::Message)
-        XRender::renderTexture(int(SharedCursor.X), int(SharedCursor.Y), GFX.ECursor[2]);
 
     XRender::offsetViewportIgnore(false);
 

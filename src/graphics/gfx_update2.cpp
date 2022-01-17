@@ -768,7 +768,10 @@ void UpdateGraphics2(bool skipRepaint)
             QuickReconnectScreen::Render();
 
         if(GamePaused == PauseCode::Reconnect || GamePaused == PauseCode::DropAdd)
+        {
             ConnectScreen::Render();
+            XRender::renderTexture(int(SharedCursor.X), int(SharedCursor.Y), GFX.ECursor[2]);
+        }
 
         if(GamePaused == PauseCode::TextEntry)
             TextEntryScreen::Render();
