@@ -22,7 +22,7 @@
 #ifndef LUNADEFS_H
 #define LUNADEFS_H
 
-#define LUNA_VERSION    8
+#define LUNA_VERSION    9
 
 enum FIELDTYPE
 {
