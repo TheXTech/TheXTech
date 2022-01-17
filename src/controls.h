@@ -25,6 +25,7 @@
 // forward declaration since some clients do not have SDL
 typedef union SDL_Event SDL_Event;
 
+#include <array>
 #include <vector>
 
 #include <IniProcessor/ini_processing.h>
