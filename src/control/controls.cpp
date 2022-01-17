@@ -780,13 +780,16 @@ bool Update()
 
     if(s_requestedPause != PauseCode::None && GamePaused != s_requestedPause)
     {
-        if(s_requestedPause == PauseCode::TextEntry)
+        PauseCode p = s_requestedPause;
+        s_requestedPause = PauseCode::None;
+
+        if(p == PauseCode::TextEntry)
         {
             cheats_setBuffer(TextEntryScreen::Run("Enter cheat:"));
         }
         else
         {
-            PauseGame(s_requestedPause);
+            PauseGame(p);
         }
         MenuCursorCanMove = false;
         MenuMouseRelease = false;

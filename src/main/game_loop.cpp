@@ -307,6 +307,10 @@ int PauseGame(PauseCode code, int plr)
 //    double fpsTime = 0;
 //    int fpsCount = 0;
 
+    // no reason to allow game to be paused during main menu
+    if(GameMenu)
+        return 0;
+
     if(!GameMenu)
     {
         for(int A = numPlayers; A >= 1; A--)
@@ -315,8 +319,15 @@ int PauseGame(PauseCode code, int plr)
 
     if(code == PauseCode::Message)
         MessageScreen_Init();
-    else if(code == PauseCode::PauseScreen || code == PauseCode::LegacyPause)
-        PauseScreen::Init(code == PauseCode::LegacyPause);
+    else if(code == PauseCode::PauseScreen)
+    {
+        PauseScreen::Init(false);
+    }
+    else if(code == PauseCode::LegacyPause)
+    {
+        PauseScreen::Init(true);
+        code = PauseCode::PauseScreen;
+    }
     else if(code == PauseCode::Reconnect)
         ConnectScreen::Reconnect_Start();
     else if(code == PauseCode::DropAdd)
@@ -381,6 +392,7 @@ int PauseGame(PauseCode code, int plr)
             }
             else if(GamePaused == PauseCode::PauseScreen)
             {
+                printf("doing pause screen loger\n");
                 if(PauseScreen::Logic(plr))
                     break;
             }
