@@ -50,6 +50,8 @@ static PlayerState s_playerState[maxLocalPlayers] = {PlayerState::Disconnected};
 static int s_menuItem[maxLocalPlayers] = {0};
 static Controls::InputMethodProfile* s_savedProfile[maxLocalPlayers];
 
+void Player_ValidateChar(int p);
+
 void MainMenu_Start(int minPlayers)
 {
     Controls::ClearInputMethods();
@@ -65,6 +67,8 @@ void MainMenu_Start(int minPlayers)
 
     // prepare for first frame
     BlockFlash = 0;
+    if(minPlayers == 1)
+        Player_ValidateChar(0);
     Logic();
 }
 
@@ -723,6 +727,9 @@ void Chars_Mouse_Render(int x, int w, int y, int h, bool mouse, bool render)
             float r = 1.f;
             float g = 1.f;
             float b = 1.f;
+            float a = 1.f;
+            if(blockCharacter[c+1])
+                a = 0.2f;
 
             for(int p = 0; p < maxLocalPlayers; p++)
             {
@@ -730,12 +737,13 @@ void Chars_Mouse_Render(int x, int w, int y, int h, bool mouse, bool render)
                 float pr = (p == 0 ? 1.f : 0.f);
                 float pg = (p == 1 ? 1.f : 0.f);
                 float pb = (p > 1 ? 1.f : 0.f);
+                float pa = 1.f;
 
                 // render cursor if a player is currently (or pretend) selecting it
                 bool act_select_char;
                 if(s_playerState[p] == PlayerState::SelectChar)
                     act_select_char = true;
-                else if(p == 0 && s_context == Context::MainMenu && s_minPlayers == 1 && s_playerState[p] == PlayerState::Disconnected)
+                else if(p == 0 && s_context == Context::MainMenu && s_minPlayers == 1 && s_playerState[p] == PlayerState::Disconnected && g_charSelect[p] == 0)
                     act_select_char = true;
                 else
                     act_select_char = false;
@@ -744,19 +752,25 @@ void Chars_Mouse_Render(int x, int w, int y, int h, bool mouse, bool render)
 
                 // also signal if some player has already selected it
                 bool player_okay = (s_playerState[p] != PlayerState::Disconnected);
-                if(p < numPlayers
+                if(p == 0 && s_context == Context::MainMenu && s_minPlayers == 1 && s_playerState[p] == PlayerState::Disconnected)
+                    player_okay = true;
+                // render disconnected players as transparent
+                if(!player_okay && p < numPlayers
                     && (s_context == Context::DropAdd || s_context == Context::Reconnect))
                 {
                     player_okay = true;
+                    if(BlockFlash % 45 < 25)
+                        pa = 0.5f;
                 }
                 if(player_okay && g_charSelect[p] == c+1)
                 {
                     r = pr;
                     g = pg;
                     b = pb;
+                    a = pa;
                 }
             }
-            SuperPrint(g_mainMenu.selectPlayer[c+1], 3, menu_x, y+c*line, r, g, b);
+            SuperPrint(g_mainMenu.selectPlayer[c+1], 3, menu_x, y+c*line, r, g, b, a);
         }
     }
 }
