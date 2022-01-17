@@ -322,6 +322,7 @@ public:
         m_bf.insert({0x00B2D6D0, &MenuMouseRelease});
         m_bf.insert({0x00B2D6CC, &MenuMouseDown});
         m_bf.insert({0x00B250E2, &GamePaused}); // Pause menu visible
+        m_bf.insert({0x00B2C8C4, &Cheater});
 
         // m_bf.insert({0x00B2C884, ???}); // Key Released!!!
 
